@@ -1,7 +1,7 @@
 
 'use client';
 
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { analyzeWordAction, type AnalysisState } from '@/app/actions';
 
 // ==== Design tokens (from spec) =============================================
@@ -54,6 +54,9 @@ type HistItem = { word: string; mode: "strict" | "open"; primary: string[]; at: 
 const HIST_KEY = "ld:history:v1";
 
 function readHist(): HistItem[] {
+  if (typeof window === 'undefined') {
+    return [];
+  }
   try { return JSON.parse(localStorage.getItem(HIST_KEY) || "[]"); } catch { return []; }
 }
 function saveHistItem(item: HistItem, max = 50) {
@@ -202,7 +205,11 @@ export default function LinguisticDecoderApp(){
   const [data, setData] = useState<AnalyzeResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState<string | null>(null);
-  const [history, setHistory] = useState<HistItem[]>(() => readHist());
+  const [history, setHistory] = useState<HistItem[]>([]);
+
+  useEffect(() => {
+    setHistory(readHist());
+  }, []);
 
   const canAnalyze = word.trim().length > 0 && !loading;
 
