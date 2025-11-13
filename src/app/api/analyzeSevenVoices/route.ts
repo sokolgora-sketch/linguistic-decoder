@@ -1,12 +1,12 @@
 
 import { NextResponse, type NextRequest } from 'next/server';
+import { solveMatrix } from '@/lib/solver';
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const { word, mode } = body;
-    console.log("analyzeSevenVoices proxy in:", { word, mode });
-
+    
     if (!word || typeof word !== 'string' || word.trim() === '') {
         return NextResponse.json({ error: "The 'word' field is required and cannot be empty." }, { status: 400 });
     }
@@ -23,6 +23,7 @@ export async function POST(request: NextRequest) {
     }
     
     const functionUrl = `${process.env.FUNCTION_BASE_URL}/analyzeSevenVoices`;
+    console.log("Proxying to function URL:", functionUrl);
 
     const response = await fetch(functionUrl, {
         method: "POST",
@@ -33,13 +34,13 @@ export async function POST(request: NextRequest) {
         })
     });
 
+    const data = await response.json();
+
     if (!response.ok) {
-        const errorBody = await response.text();
-        console.error("Function call failed:", response.status, errorBody);
-        return NextResponse.json({ error: `Function call failed with status: ${response.status}`, details: errorBody }, { status: response.status });
+        console.error("Function call failed:", response.status, data);
+        return NextResponse.json({ error: data.error || `Function call failed with status: ${response.status}` }, { status: response.status });
     }
 
-    const data = await response.json();
     return NextResponse.json(data);
 
   } catch (e) {
@@ -53,3 +54,5 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }
+
+    

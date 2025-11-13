@@ -114,7 +114,6 @@ function observedHasInstrument(slots: (Vowel|undefined)[]) {
 
 export function solveMatrix(word: string, mode: SolveMode): Analysis {
   const { consonants, slots } = buildSlots(word);
-  console.log("slots", slots);
   const beam = mode==="strict" ? DEFAULTS.beamStrict : DEFAULTS.beamOpen;
 
   let col: State[] = [{ row:null, cost:0, path:[], ops:[], cStab:0, kept: 0, deleted: 0 }];
@@ -214,3 +213,5 @@ export function solveMatrix(word: string, mode: SolveMode): Analysis {
     signals: ["deterministic: beam DP; gravity; closure prefers Ë on tie"]
   };
 }
+
+    
