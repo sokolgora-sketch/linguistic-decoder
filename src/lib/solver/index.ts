@@ -86,7 +86,7 @@ function dedupeKeepK(states: State[], K:number){
 
 const rankClosure = (c:Vowel)=> c==="Ë"?0: c==="A"?1:2;
 
-function uniqByPath<T extends { path: string[] }>(arr: T[]): T[] {
+function uniqByPath<T extends { path: Vowel[] }>(arr: T[]): T[] {
   const seen = new Set<string>(); const out: T[] = [];
   for (const x of arr) { const k = x.path.join(""); if (seen.has(k)) continue; seen.add(k); out.push(x); }
   return out;
@@ -139,9 +139,9 @@ export function solveMatrix(word: string, mode: SolveMode): Analysis {
     col = dedupeKeepK(next, beam);
   }
 
+  const obsHasInstr = observedHasInstrument(slots);
   type Sol = { path: Vowel[]; E:number; ops:string[]; cStab:number; closure: Vowel; kept: number; hasInstr:boolean; };
   const sols: Sol[] = [];
-  const obsHasInstr = observedHasInstrument(slots);
 
   for (const st of col){
     if (!st.row) continue;
@@ -163,12 +163,13 @@ export function solveMatrix(word: string, mode: SolveMode): Analysis {
       solsFiltered = sols; // fallback if truly unavoidable
   }
 
-  solsFiltered.sort((a,b)=> 
-    (a.E-b.E) || 
-    (b.kept - a.kept) || // more keeps wins
-    (rankClosure(a.closure)-rankClosure(b.closure)) || 
-    (a.path.length-b.path.length) || 
-    a.path.join("").localeCompare(b.path.join(""))
+  solsFiltered.sort((a,b) =>
+    (a.E - b.E) ||                            // 1) lowest energy
+    ((+b.hasInstr) - (+a.hasInstr)) ||        // 2) prefer paths with E/I before closure
+    (b.kept - a.kept) ||                      // 3) more observed vowels kept
+    (rankClosure(a.closure) - rankClosure(b.closure)) || // 4) prefer Ë over A
+    (a.path.length - b.path.length) ||        // 5) shorter path next
+    a.path.join("").localeCompare(b.path.join(""))       // 6) stable tie-break
   );
   
   if (solsFiltered.length === 0) {
@@ -176,7 +177,9 @@ export function solveMatrix(word: string, mode: SolveMode): Analysis {
   }
   
   const primary = solsFiltered[0];
-  const frontier = uniqByPath(solsFiltered.slice(1).filter(s => s.E <= primary.E + (mode==="strict" ? DEFAULTS.frontierDeltaE.strict : DEFAULTS.frontierDeltaE.open)));
+  const frontier = uniqByPath(
+    solsFiltered.slice(1).filter(s => s.E <= primary.E + (mode==="strict" ? DEFAULTS.frontierDeltaE.strict : DEFAULTS.frontierDeltaE.open))
+  );
 
   const toPath = (sol: {path: Vowel[], E: number, cStab: number, ops: string[]}): Path => ({
     voicePath: sol.path,
