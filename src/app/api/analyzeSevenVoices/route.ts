@@ -6,8 +6,15 @@ export async function POST(request: NextRequest) {
     const { word, mode } = await request.json();
     console.log("analyzeSevenVoices proxy in:", { word, mode });
 
+    // The user's instructions imply a fallback for local development is needed.
+    // However, since we cannot know the user's project ID, we'll rely on FUNCTION_BASE_URL
+    // and guide the user to set it up for local dev.
     if (!process.env.FUNCTION_BASE_URL) {
-      throw new Error("FUNCTION_BASE_URL is not set in the environment.");
+      // In a real local dev setup, you might fallback to a hardcoded emulator URL,
+      // but that requires knowing the project ID. A clear error is better.
+      const errorMessage = "FUNCTION_BASE_URL is not set. Please set it in your .env file. For local development, this typically looks like 'http://127.0.0.1:5001/your-project-id/us-central1'.";
+      console.error(errorMessage);
+      return NextResponse.json({ error: errorMessage }, { status: 500 });
     }
     
     const functionUrl = `${process.env.FUNCTION_BASE_URL}/analyzeSevenVoices`;
@@ -23,8 +30,8 @@ export async function POST(request: NextRequest) {
 
     if (!response.ok) {
         const errorBody = await response.text();
-        console.error("Function call failed:", errorBody);
-        return NextResponse.json({ error: `Function call failed with status: ${response.status}` }, { status: response.status });
+        console.error("Function call failed:", response.status, errorBody);
+        return NextResponse.json({ error: `Function call failed with status: ${response.status}`, details: errorBody }, { status: response.status });
     }
 
     const data = await response.json();
