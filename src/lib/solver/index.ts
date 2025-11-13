@@ -54,7 +54,7 @@ function buildSlots(word: string){
   return { consonants, slots };
 }
 
-type State = { row: Vowel|null; cost: number; path: Vowel[]; ops: string[]; cStab: number };
+type State = { row: Vowel|null; cost: number; path: Vowel[]; ops: string[]; cStab: number, keptCount: number };
 
 function opCost(observed: Vowel|undefined, chosen: Vowel|"Ø"): {cost:number,op?:string}{
   if (!observed) return chosen==="Ø" ? {cost:0} : {cost:2, op:`insert ${chosen}`};
@@ -92,7 +92,7 @@ export function solveMatrix(word: string, mode: SolveMode): Analysis {
   console.log("slots", slots);
   const beam = mode==="strict" ? DEFAULTS.beamStrict : DEFAULTS.beamOpen;
 
-  let col: State[] = [{ row:null, cost:0, path:[], ops:[], cStab:0 }];
+  let col: State[] = [{ row:null, cost:0, path:[], ops:[], cStab:0, keptCount: 0 }];
 
   for (let j=0; j<slots.length; j++){
     const observed = slots[j];
@@ -108,14 +108,23 @@ export function solveMatrix(word: string, mode: SolveMode): Analysis {
           if (newPath[newPath.length-1] !== newRow) newPath.push(newRow);
         }
         const stab = stabilizerAcross(consonants, j-1, st.row, cand);
-        next.push({ row:newRow, cost: st.cost + oc + tCost + stab, path:newPath, ops: op?[...st.ops,op]:st.ops, cStab: st.cStab + stab });
+        const isKeep = (observed && cand !== "Ø" && observed === cand);
+
+        next.push({ 
+            row:newRow, 
+            cost: st.cost + oc + tCost + stab, 
+            path:newPath, 
+            ops: op?[...st.ops,op]:st.ops, 
+            cStab: st.cStab + stab,
+            keptCount: st.keptCount + (isKeep ? 1 : 0)
+        });
       }
     }
     next.sort((a,b)=> (a.cost-b.cost) || a.path.join("").localeCompare(b.path.join("")));
     col = dedupeKeepK(next, beam);
   }
 
-  type Sol = { path: Vowel[]; E:number; ops:string[]; cStab:number; closure: Vowel };
+  type Sol = { path: Vowel[]; E:number; ops:string[]; cStab:number; closure: Vowel; keptCount: number; };
   const sols: Sol[] = [];
 
   for (const st of col){
@@ -125,7 +134,7 @@ export function solveMatrix(word: string, mode: SolveMode): Analysis {
       const path = st.path[st.path.length-1]===closure ? st.path.slice() : [...st.path, closure];
       const base = st.cost + t;
       const E = base + gravityBonus(path);
-      sols.push({ path, E, ops:[...st.ops, `closure ${closure}`], cStab: st.cStab, closure });
+      sols.push({ path, E, ops:[...st.ops, `closure ${closure}`], cStab: st.cStab, closure, keptCount: st.keptCount });
     }
   }
 
@@ -134,7 +143,13 @@ export function solveMatrix(word: string, mode: SolveMode): Analysis {
       solsFiltered = sols; // fallback if truly unavoidable
   }
 
-  solsFiltered.sort((a,b)=> (a.E-b.E) || (rankClosure(a.closure)-rankClosure(b.closure)) || (a.path.length-b.path.length) || a.path.join("").localeCompare(b.path.join("")));
+  solsFiltered.sort((a,b)=> 
+    (a.E-b.E) || 
+    (b.keptCount - a.keptCount) || // more keeps wins
+    (rankClosure(a.closure)-rankClosure(b.closure)) || 
+    (a.path.length-b.path.length) || 
+    a.path.join("").localeCompare(b.path.join(""))
+  );
   
   if (solsFiltered.length === 0) {
     throw new Error("Solver failed to find a valid path for the given word.");
