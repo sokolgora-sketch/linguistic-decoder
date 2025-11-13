@@ -139,9 +139,9 @@ export function solveMatrix(word: string, mode: SolveMode): Analysis {
     col = dedupeKeepK(next, beam);
   }
 
-  type Sol = { path: Vowel[]; E:number; ops:string[]; cStab:number; closure: Vowel; kept: number; };
+  type Sol = { path: Vowel[]; E:number; ops:string[]; cStab:number; closure: Vowel; kept: number; hasInstr:boolean; };
   const sols: Sol[] = [];
-  const obsHasInstrument = observedHasInstrument(slots);
+  const obsHasInstr = observedHasInstrument(slots);
 
   for (const st of col){
     if (!st.row) continue;
@@ -149,14 +149,12 @@ export function solveMatrix(word: string, mode: SolveMode): Analysis {
       const t = moveCost(st.row, closure);
       const path = st.path[st.path.length-1]===closure ? st.path.slice() : [...st.path, closure];
       const base = st.cost + t;
+      const g = gravityBonus(path);
+      const instr = hasInstrument(path);
+      const instrPenalty = instr ? 0 : (obsHasInstr ? 2 : 1);
+      const E = base + g + instrPenalty;
 
-      let penalty = 0;
-      if (!hasInstrument(path)) {
-        penalty = obsHasInstrument ? 2 : 1;
-      }
-
-      const E = base + gravityBonus(path) + penalty;
-      sols.push({ path, E, ops:[...st.ops, `closure ${closure}`], cStab: st.cStab, closure, kept: st.kept });
+      sols.push({ path, E, ops:[...st.ops, `closure ${closure}`], cStab: st.cStab, closure, kept: st.kept, hasInstr: instr });
     }
   }
 
