@@ -188,8 +188,13 @@ export function solveMatrix(word: string, mode: SolveMode): Analysis {
   }
   
   const primary = solsFiltered[0];
+  const pKey = primary.path.join("");
+  const delta = mode === "strict" ? DEFAULTS.frontierDeltaE.strict : DEFAULTS.frontierDeltaE.open;
+
   const frontier = uniqByPath(
-    solsFiltered.slice(1).filter(s => s.E <= primary.E + (mode==="strict" ? DEFAULTS.frontierDeltaE.strict : DEFAULTS.frontierDeltaE.open))
+    solsFiltered
+      .slice(1)
+      .filter(s => s.E <= primary.E + delta && s.path.join("") !== pKey)
   );
 
   const toPath = (sol: {path: Vowel[], E: number, cStab: number, ops: string[]}): Path => ({
@@ -213,5 +218,3 @@ export function solveMatrix(word: string, mode: SolveMode): Analysis {
     signals: ["deterministic: beam DP; gravity; closure prefers Ë on tie"]
   };
 }
-
-    
