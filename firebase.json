@@ -1,6 +1,20 @@
+
 {
   "hosting": {
-    "public": "dist",
-    "rewrites": [{ "source": "/analyzeSevenVoices", "function": "analyzeSevenVoices" }]
+    "source": ".",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "frameworksBackend": {
+      "region": "us-central1"
+    },
+    "rewrites": [
+      {
+        "source": "/analyzeSevenVoices",
+        "destination": "/api/analyzeSevenVoices"
+      }
+    ]
   }
 }
