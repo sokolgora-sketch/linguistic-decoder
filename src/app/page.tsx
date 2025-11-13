@@ -225,6 +225,7 @@ export default function LinguisticDecoderApp(){
   const [data, setData] = useState<AnalyzeResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+  const [showDebug, setShowDebug] = useState(false);
 
   const canAnalyze = word.trim().length > 0 && !loading;
 
@@ -348,10 +349,26 @@ export default function LinguisticDecoderApp(){
         />
       </div>
 
+      {/* Debug view */}
+      {showDebug && data && (
+        <div style={{ maxWidth: 1080, margin: "16px auto", padding: "0 16px" }}>
+            <div className="card" style={{ padding: 16 }}>
+                <div className="section-title">API Echo (debug)</div>
+                <pre className="code" style={{ fontSize: 11, whiteSpace:"pre-wrap", background:"#f9fafb", padding:10, borderRadius:8, maxHeight:400, overflow:"auto" }}>
+                    {orderedStringify(data)}
+                </pre>
+            </div>
+        </div>
+      )}
+
+
       {/* Footer */}
       <div style={{ padding: 24, opacity: 0.8 }}>
-        <div style={{ maxWidth: 1080, margin: "0 auto", fontSize: 12, color: "#6b7280" }}>
-          <b>Style:</b> Deep Indigo primary · Light Grey background · Soft Amber accents · Fonts: Space Grotesk / Inter / Source Code Pro
+        <div style={{ maxWidth: 1080, margin: "0 auto", fontSize: 12, color: "#6b7280", display: 'flex', justifyContent: 'space-between' }}>
+          <div><b>Style:</b> Deep Indigo primary · Light Grey background · Soft Amber accents · Fonts: Space Grotesk / Inter / Source Code Pro</div>
+          <button className="btn" style={{ background: "#6b7280", padding: "4px 10px", fontSize: 12 }} onClick={() => setShowDebug(s => !s)}>
+            {showDebug ? "Hide" : "Show"} Debug
+          </button>
         </div>
       </div>
     </div>
