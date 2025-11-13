@@ -81,6 +81,12 @@ function dedupeKeepK(states: State[], K:number){
 
 const rankClosure = (c:Vowel)=> c==="Ë"?0: c==="A"?1:2;
 
+function uniqByPath<T extends { path: string[] }>(arr: T[]): T[] {
+  const seen = new Set<string>(); const out: T[] = [];
+  for (const x of arr) { const k = x.path.join(""); if (seen.has(k)) continue; seen.add(k); out.push(x); }
+  return out;
+}
+
 export function solveMatrix(word: string, mode: SolveMode): Analysis {
   const { consonants, slots } = buildSlots(word);
   console.log("slots", slots);
@@ -135,7 +141,7 @@ export function solveMatrix(word: string, mode: SolveMode): Analysis {
   }
   
   const primary = solsFiltered[0];
-  const frontier = solsFiltered.filter(s => s.E <= primary.E + (mode==="strict" ? DEFAULTS.frontierDeltaE.strict : DEFAULTS.frontierDeltaE.open)).slice(1);
+  const frontier = uniqByPath(solsFiltered.slice(1).filter(s => s.E <= primary.E + (mode==="strict" ? DEFAULTS.frontierDeltaE.strict : DEFAULTS.frontierDeltaE.open)));
 
   const toPath = (sol: {path: Vowel[], E: number, cStab: number, ops: string[]}): Path => ({
     voicePath: sol.path,
