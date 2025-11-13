@@ -7,7 +7,7 @@ import { z } from 'zod';
 
 export type AnalysisState = {
   analysis: Analysis | null;
-  languageFamilies: string[] | null;
+  languageFamilies: any | null; // Changed to any to match candidates_map
   error?: string;
 };
 
@@ -41,8 +41,6 @@ export async function analyzeWordAction(
 
     const primaryPath = analysisResult.primaryPath;
     
-    // The AI flow is optional, but we'll run it as it's a core feature.
-    // We can add a flag to disable it if needed.
     const mappingInput = {
       word: analysisResult.word,
       voice_path: primaryPath.voicePath,
@@ -52,22 +50,17 @@ export async function analyzeWordAction(
       signals: analysisResult.signals,
     };
 
-    let languageFamilies: string[] = [];
+    let mappingResult = null;
     try {
-        const mappingResult = await mapWordToLanguageFamilies(mappingInput);
-        if (mappingResult.candidates_map) {
-            languageFamilies = Object.keys(mappingResult.candidates_map);
-        }
+        mappingResult = await mapWordToLanguageFamilies(mappingInput);
     } catch(aiError) {
         console.warn("AI mapping failed, returning analysis without language families.", aiError);
-        // Not treating AI failure as a hard error for the user,
-        // just returning the deterministic solver results.
     }
 
 
     return {
       analysis: analysisResult,
-      languageFamilies,
+      languageFamilies: mappingResult?.candidates_map || null,
       error: undefined,
     };
   } catch (e) {
@@ -80,3 +73,5 @@ export async function analyzeWordAction(
     };
   }
 }
+
+    

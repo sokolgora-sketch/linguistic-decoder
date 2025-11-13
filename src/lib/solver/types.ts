@@ -14,7 +14,7 @@ export type Path = {
   levelPath: number[];
   ops: string[];
   checksums: Checksum[];
-  kept?: number;
+  kept: number;
 };
 
 export type Analysis = {
@@ -27,3 +27,5 @@ export type Analysis = {
 };
 
 export type SolveMode = "strict" | "open";
+
+    
