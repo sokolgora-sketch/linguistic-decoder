@@ -19,6 +19,16 @@ const mapToVowel = (ch:string): Vowel|undefined => {
   if (c==="ë" || c==="ë") return "Ë"; return undefined;
 };
 
+function nounishScore(word: string): number {
+  const w = word.toLowerCase();
+  // strong noun/result suffixes → 2, softer → 1
+  if (/(age|ment|tion|sion|ance|ence)\b/.test(w)) return 2;
+  if (/(ness|ship|hood|dom|ure|um|us)\b/.test(w)) return 1;
+  // English silent -e after g/c often marks result nouns (e.g., damage, service)
+  if (/(ge|ce)\b/.test(w)) return 1;
+  return 0;
+}
+
 export function moveCost(a: Vowel, b: Vowel): number {
   const ringStep = Math.abs(VOWEL_RING[a] - VOWEL_RING[b]);
   const ringDisc = (a === "O" || b === "O") ? 1 : 0;
