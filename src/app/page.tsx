@@ -142,24 +142,36 @@ function InfoLine({label, value, mono}:{label:string; value:string; mono?:boolea
 }
 
 function Candidates({map}:{map: AnalyzeResponse["languageFamilies"]}){
+    const [isOpen, setIsOpen] = useState(true);
     if (!map || Object.keys(map).length===0) return null;
+    
     return (
         <div className="card" style={{ padding: 16 }}>
-        <div className="section-title">Language Candidate Mapping (Gemini 2.5)</div>
-        {Object.entries(map).map(([family, arr])=> (
-            <div key={family} style={{ marginBottom: 12 }}>
-            <div style={{ fontWeight: 700, color: COLORS.primary, marginBottom: 6 }}>{family}</div>
-            <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(260px,1fr))", gap: 10 }}>
-                {(arr || []).map((c, i)=> (
-                <div key={i} className="card" style={{ padding: 10, borderColor: COLORS.primary }}>
-                    <div style={{ fontWeight: 700 }}>{c.form}</div>
-                    <div className="code" style={{ fontSize: 12, marginTop: 6 }}>map: {c.map ? c.map.join(" · ") : ''}</div>
-                    <div style={{ fontSize: 12, marginTop: 6, color: "#374151" }}>{c.functional}</div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div className="section-title">Language Candidate Mapping (Gemini 2.5)</div>
+                <button className="btn" style={{ padding: "4px 10px", fontSize: 12 }} onClick={() => setIsOpen(o => !o)}>
+                    {isOpen ? "Minimize" : "Maximize"}
+                </button>
+            </div>
+
+            {isOpen && (
+                <div style={{ marginTop: '8px' }}>
+                    {Object.entries(map).map(([family, arr])=> (
+                        <div key={family} style={{ marginBottom: 12 }}>
+                        <div style={{ fontWeight: 700, color: COLORS.primary, marginBottom: 6 }}>{family}</div>
+                        <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(260px,1fr))", gap: 10 }}>
+                            {(arr || []).map((c, i)=> (
+                            <div key={i} className="card" style={{ padding: 10, borderColor: COLORS.primary }}>
+                                <div style={{ fontWeight: 700 }}>{c.form}</div>
+                                <div className="code" style={{ fontSize: 12, marginTop: 6 }}>map: {c.map ? c.map.join(" · ") : ''}</div>
+                                <div style={{ fontSize: 12, marginTop: 6, color: "#374151" }}>{c.functional}</div>
+                            </div>
+                            ))}
+                        </div>
+                        </div>
+                    ))}
                 </div>
-                ))}
-            </div>
-            </div>
-        ))}
+            )}
         </div>
     );
 }
