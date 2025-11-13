@@ -54,7 +54,7 @@ function buildSlots(word: string){
   return { consonants, slots };
 }
 
-type State = { row: Vowel|null; cost: number; path: Vowel[]; ops: string[]; cStab: number, keptCount: number };
+type State = { row: Vowel|null; cost: number; path: Vowel[]; ops: string[]; cStab: number; kept: number; deleted: number; };
 type OpKind = "keep" | "sub" | "ins" | "del";
 
 function opCost(observed: Vowel|undefined, chosen: Vowel|"Ø"): {cost:number, op?:string, kind: OpKind}{
@@ -97,7 +97,7 @@ export function solveMatrix(word: string, mode: SolveMode): Analysis {
   console.log("slots", slots);
   const beam = mode==="strict" ? DEFAULTS.beamStrict : DEFAULTS.beamOpen;
 
-  let col: State[] = [{ row:null, cost:0, path:[], ops:[], cStab:0, keptCount: 0 }];
+  let col: State[] = [{ row:null, cost:0, path:[], ops:[], cStab:0, kept: 0, deleted: 0 }];
 
   for (let j=0; j<slots.length; j++){
     const observed = slots[j];
@@ -120,7 +120,8 @@ export function solveMatrix(word: string, mode: SolveMode): Analysis {
             path:newPath, 
             ops: op?[...st.ops,op]:st.ops, 
             cStab: st.cStab + stab,
-            keptCount: st.keptCount + (kind === "keep" ? 1 : 0)
+            kept: st.kept + (kind === "keep" ? 1 : 0),
+            deleted: st.deleted + (kind === "del" ? 1 : 0)
         });
       }
     }
@@ -128,7 +129,7 @@ export function solveMatrix(word: string, mode: SolveMode): Analysis {
     col = dedupeKeepK(next, beam);
   }
 
-  type Sol = { path: Vowel[]; E:number; ops:string[]; cStab:number; closure: Vowel; keptCount: number; };
+  type Sol = { path: Vowel[]; E:number; ops:string[]; cStab:number; closure: Vowel; kept: number; };
   const sols: Sol[] = [];
 
   for (const st of col){
@@ -138,7 +139,7 @@ export function solveMatrix(word: string, mode: SolveMode): Analysis {
       const path = st.path[st.path.length-1]===closure ? st.path.slice() : [...st.path, closure];
       const base = st.cost + t;
       const E = base + gravityBonus(path);
-      sols.push({ path, E, ops:[...st.ops, `closure ${closure}`], cStab: st.cStab, closure, keptCount: st.keptCount });
+      sols.push({ path, E, ops:[...st.ops, `closure ${closure}`], cStab: st.cStab, closure, kept: st.kept });
     }
   }
 
@@ -149,7 +150,7 @@ export function solveMatrix(word: string, mode: SolveMode): Analysis {
 
   solsFiltered.sort((a,b)=> 
     (a.E-b.E) || 
-    (b.keptCount - a.keptCount) || // more keeps wins
+    (b.kept - a.kept) || // more keeps wins
     (rankClosure(a.closure)-rankClosure(b.closure)) || 
     (a.path.length-b.path.length) || 
     a.path.join("").localeCompare(b.path.join(""))
@@ -183,5 +184,3 @@ export function solveMatrix(word: string, mode: SolveMode): Analysis {
     signals: ["deterministic: beam DP; gravity; closure prefers Ë on tie"]
   };
 }
-
-    
