@@ -83,6 +83,7 @@ const rankClosure = (c:Vowel)=> c==="Ë"?0: c==="A"?1:2;
 
 export function solveMatrix(word: string, mode: SolveMode): Analysis {
   const { consonants, slots } = buildSlots(word);
+  console.log("slots", slots);   // expect [undefined,"A","A","E"] for "damage"
   const beam = mode==="strict" ? DEFAULTS.beamStrict : DEFAULTS.beamOpen;
 
   let col: State[] = [{ row:null, cost:0, path:[], ops:[], cStab:0 }];
