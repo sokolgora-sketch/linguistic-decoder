@@ -14,6 +14,7 @@ export type Path = {
   levelPath: number[];
   ops: string[];
   checksums: Checksum[];
+  kept?: number;
 };
 
 export type Analysis = {

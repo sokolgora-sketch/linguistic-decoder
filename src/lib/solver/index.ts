@@ -197,7 +197,7 @@ export function solveMatrix(word: string, mode: SolveMode): Analysis {
       .filter(s => s.E <= primary.E + delta && s.path.join("") !== pKey)
   );
 
-  const toPath = (sol: {path: Vowel[], E: number, cStab: number, ops: string[]}): Path => ({
+  const toPath = (sol: {path: Vowel[], E: number, cStab: number, ops: string[], kept: number}): Path => ({
     voicePath: sol.path,
     ringPath: sol.path.map(v => VOWEL_RING[v]),
     levelPath: sol.path.map(v => VOWEL_LEVEL[v]),
@@ -206,7 +206,8 @@ export function solveMatrix(word: string, mode: SolveMode): Analysis {
         { type: 'V', value: sol.path.reduce((acc,v)=> acc*VOWEL_VALUE[v], 1) },
         { type: 'E', value: sol.E },
         { type: 'C', value: sol.cStab }
-    ]
+    ],
+    kept: sol.kept
   });
 
   return {
