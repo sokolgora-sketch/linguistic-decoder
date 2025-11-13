@@ -83,7 +83,7 @@ const rankClosure = (c:Vowel)=> c==="Ë"?0: c==="A"?1:2;
 
 export function solveMatrix(word: string, mode: SolveMode): Analysis {
   const { consonants, slots } = buildSlots(word);
-  console.log("slots", slots);   // expect [undefined,"A","A","E"] for "damage"
+  console.log("slots", slots);
   const beam = mode==="strict" ? DEFAULTS.beamStrict : DEFAULTS.beamOpen;
 
   let col: State[] = [{ row:null, cost:0, path:[], ops:[], cStab:0 }];
@@ -122,14 +122,20 @@ export function solveMatrix(word: string, mode: SolveMode): Analysis {
       sols.push({ path, E, ops:[...st.ops, `closure ${closure}`], cStab: st.cStab, closure });
     }
   }
-  sols.sort((a,b)=> (a.E-b.E) || (rankClosure(a.closure)-rankClosure(b.closure)) || (a.path.length-b.path.length) || a.path.join("").localeCompare(b.path.join("")));
+
+  let solsFiltered = sols.filter(s => s.path.length >= 2);
+  if (solsFiltered.length === 0) { 
+      solsFiltered = sols; // fallback if truly unavoidable
+  }
+
+  solsFiltered.sort((a,b)=> (a.E-b.E) || (rankClosure(a.closure)-rankClosure(b.closure)) || (a.path.length-b.path.length) || a.path.join("").localeCompare(b.path.join("")));
   
-  if (sols.length === 0) {
+  if (solsFiltered.length === 0) {
     throw new Error("Solver failed to find a valid path for the given word.");
   }
   
-  const primary = sols[0];
-  const frontier = sols.filter(s => s.E <= primary.E + (mode==="strict" ? DEFAULTS.frontierDeltaE.strict : DEFAULTS.frontierDeltaE.open)).slice(1);
+  const primary = solsFiltered[0];
+  const frontier = solsFiltered.filter(s => s.E <= primary.E + (mode==="strict" ? DEFAULTS.frontierDeltaE.strict : DEFAULTS.frontierDeltaE.open)).slice(1);
 
   const toPath = (sol: {path: Vowel[], E: number, cStab: number, ops: string[]}): Path => ({
     voicePath: sol.path,
