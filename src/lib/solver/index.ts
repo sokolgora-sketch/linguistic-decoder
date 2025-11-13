@@ -150,6 +150,7 @@ export function solveMatrix(word: string, mode: SolveMode): Analysis {
   }
 
   const obsHasInstr = observedHasInstrument(slots);
+  const nounish = nounishScore(word);
   type Sol = { path: Vowel[]; E:number; ops:string[]; cStab:number; closure: Vowel; kept: number; hasInstr:boolean; };
   const sols: Sol[] = [];
 
@@ -162,7 +163,8 @@ export function solveMatrix(word: string, mode: SolveMode): Analysis {
       const g = gravityBonus(path);
       const instr = hasInstrument(path);
       const instrPenalty = instr ? 0 : (obsHasInstr ? 2 : 1);
-      const E = base + g + instrPenalty;
+      const closureBias = closure === "Ë" ? -nounish : (nounish ? +nounish : 0);
+      const E = base + g + instrPenalty + closureBias;
 
       sols.push({ path, E, ops:[...st.ops, `closure ${closure}`], cStab: st.cStab, closure, kept: st.kept, hasInstr: instr });
     }
