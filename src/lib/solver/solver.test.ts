@@ -20,7 +20,7 @@ describe("Seven-Voices solver (v1.0)", () => {
 
     if (Array.isArray(exp) && exp.length > 0) {
       // Expect an exact voice path match
-      expect(vp(p)).toBe(vp(exp));
+      expect(vp(p)).toBe(vp(exp as string[]));
     } else {
       // Special case for 'philosophy' as requested:
       // must end in Ë, and the path before closure must contain E or I.
