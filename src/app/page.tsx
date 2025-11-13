@@ -1,385 +1,140 @@
 
-'use client';
+"use client";
 
-import React, { useMemo, useState, useEffect } from "react";
-import { analyzeWordAction, type AnalysisState } from '@/app/actions';
+import * as React from "react";
+import { useActionState } from "react";
+import { analyzeWordAction } from "./actions";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Separator } from "@/components/ui/separator";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { useToast } from "@/hooks/use-toast";
+import { Loader2 } from "lucide-react";
 
-// ==== Design tokens (from spec) =============================================
-const COLORS = {
-  primary: "#3F51B5",   // Deep Indigo
-  bg: "#EEEEEE",        // Light Grey
-  accent: "#FFB300",    // Soft Amber
-  text: "#111827"
-};
+type EngineResult = Awaited<ReturnType<typeof analyzeWordAction>> extends { ok:true; data: { analysis: infer D } } ? D : never;
 
-// Seven‑Voices palette (kept from engine conventions)
-const VOICE_COLOR: Record<string, string> = {
-  A: "#ef4444",   // red
-  E: "#f59e0b",   // orange
-  I: "#facc15",   // yellow
-  O: "#22c55e",   // green
-  U: "#3b82f6",   // blue
-  Y: "#6366f1",   // indigo
-  "Ë": "#a855f7"   // violet
-};
+const COLORS: Record<string,string> = { A:"#ef4444", E:"#f59e0b", I:"#eab308", O:"#10b981", U:"#3b82f6", Y:"#6366f1", "Ë":"#8b5cf6" };
 
-// Level labels
-const LEVEL_LABEL: Record<number, string> = { 1: "High", 0: "Mid", [-1]: "Low" } as any;
-
-// ==== Fonts (Space Grotesk, Inter, Source Code Pro) ==========================
-const FontImports = () => (
-  <style>{`
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Space+Grotesk:wght@600;700&family=Source+Code+Pro:wght@400;600&display=swap');
-    :root { --c-primary: ${COLORS.primary}; --c-bg: ${COLORS.bg}; --c-accent: ${COLORS.accent}; --c-text: ${COLORS.text}; }
-    html, body, #root { height: 100%; background: var(--c-bg); }
-    body { margin: 0; font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, 'Helvetica Neue', Arial, 'Noto Sans', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol'; color: var(--c-text); }
-    .headline { font-family: 'Space Grotesk', Inter, system-ui; }
-    .code { font-family: 'Source Code Pro', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace; }
-    .card { background: #fff; border: 1px solid #e5e7eb; border-radius: 14px; box-shadow: 0 2px 10px rgba(0,0,0,0.04); }
-    .btn { background: var(--c-primary); color: #fff; border: none; border-radius: 10px; padding: 10px 14px; font-weight: 600; cursor: pointer; }
-    .btn:disabled { opacity: 0.6; cursor: not-allowed; }
-    .chip { display:inline-flex; align-items:center; gap:6px; padding:4px 8px; border-radius:999px; border:1px solid #e5e7eb; background:#fff; }
-    .chip-dot { width:10px; height:10px; border-radius:999px; display:inline-block; }
-    .section-title { font-weight:700; margin: 0 0 8px 0; font-size: 14px; letter-spacing: .02em; }
-    .hr { height:1px; background:#e5e7eb; margin: 14px 0; }
-    .kbd { border:1px solid #cbd5e1; border-bottom-width:2px; padding:2px 6px; border-radius:6px; background:#f8fafc; font-size:12px; }
-  `}</style>
-);
-
-
-import type { Path, Analysis } from '@/lib/solver';
-
-// Local history (stateless backend)
-type HistItem = { word: string; mode: "strict" | "open"; primary: string[]; at: number };
-const HIST_KEY = "ld:history:v1";
-
-function readHist(): HistItem[] {
-  if (typeof window === 'undefined') {
-    return [];
-  }
-  try { return JSON.parse(localStorage.getItem(HIST_KEY) || "[]"); } catch { return []; }
-}
-function saveHistItem(item: HistItem, max = 50) {
-  try {
-    const cur = readHist();
-    const key = (x: HistItem) => `${x.word}|${x.mode}|${x.primary.join("")}`;
-    const next = [item, ...cur.filter(x => key(x) !== key(item))].slice(0, max);
-    localStorage.setItem(HIST_KEY, JSON.stringify(next));
-  } catch {}
-}
-function clearHist() { try { localStorage.removeItem(HIST_KEY); } catch {} }
-
-interface AnalyzeResponse extends Analysis {
-    candidates_map?: Record<string, { form:string; map:string[]; functional:string }[]>;
-}
-
-// ==== Small helpers ==========================================================
-const joinPath = (p: string[]) => p.join(" → ");
-const labelLevels = (levels: number[]) => levels.map(l=> LEVEL_LABEL[l] ?? l).join(" → ");
-const labelRings = (rings: number[]) => rings.join(" → ");
-
-function Chip({v}:{v:string}){
+function PathChips({ path }: { path: string[] }) {
   return (
-    <span className="chip" style={{ borderColor: COLORS.accent }}>
-      <span className="chip-dot" style={{ background: VOICE_COLOR[v] || COLORS.primary }} />
-      <span style={{ fontWeight: 700 }}>{v}</span>
-    </span>
-  );
-}
-
-function PathRow({block, title}:{block:Path; title:string}){
-  return (
-    <div className="card" style={{ padding: 16 }}>
-      <div className="section-title">{title}</div>
-      <div style={{ display:"flex", flexWrap:"wrap", gap:8, alignItems:"center" }}>
-        {block.voicePath.map((v,i)=> (
-          <React.Fragment key={i}>
-            <Chip v={v} />
-            {i < block.voicePath.length-1 && <span style={{ color: COLORS.accent, fontWeight:700 }}>→</span>}
-          </React.Fragment>
-        ))}
-      </div>
-      <div style={{ marginTop: 10, display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(220px, 1fr))", gap: 10 }}>
-        <InfoLine label="Voice Path" value={joinPath(block.voicePath)} />
-        <InfoLine label="Level Path" value={labelLevels(block.levelPath)} />
-        <InfoLine label="Ring Path" value={labelRings(block.ringPath)} />
-        <InfoLine label="Checksums" value={`V=${block.checksums[0].value} · E=${block.checksums[1].value} · C=${block.checksums[2].value}`} mono />
-        {typeof block.kept === "number" ? <InfoLine label="Keeps" value={String(block.kept)} /> : null}
-      </div>
-      {block.ops?.length ? (
-        <div style={{ marginTop: 10 }}>
-          <div className="section-title">Ops</div>
-          <div className="code" style={{ fontSize: 12, whiteSpace:"pre-wrap" }}>{block.ops.join("; ")}</div>
-        </div>
-      ) : null}
-    </div>
-  );
-}
-
-function InfoLine({label, value, mono}:{label:string; value:string; mono?:boolean}){
-  return (
-    <div className="card" style={{ padding: 10, display:"flex", flexDirection:"column", gap:4 }}>
-      <span style={{ fontSize: 12, color: "#6b7280" }}>{label}</span>
-      <span className={mono?"code":""} style={{ fontWeight: 600 }}>{value}</span>
-    </div>
-  );
-}
-
-function Candidates({map}:{map: AnalyzeResponse["candidates_map"]}){
-  if (!map || Object.keys(map).length===0) return null;
-  return (
-    <div className="card" style={{ padding: 16 }}>
-      <div className="section-title">Language Candidate Mapping (Gemini 2.5)</div>
-      {Object.entries(map).map(([family, arr])=> (
-        <div key={family} style={{ marginBottom: 12 }}>
-          <div style={{ fontWeight: 700, color: COLORS.primary, marginBottom: 6 }}>{family}</div>
-          <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(260px,1fr))", gap: 10 }}>
-            {Array.isArray(arr) && arr.map((c, i)=> (
-              <div key={i} className="card" style={{ padding: 10, borderColor: COLORS.primary }}>
-                <div style={{ fontWeight: 700 }}>{c.form}</div>
-                <div className="code" style={{ fontSize: 12, marginTop: 6 }}>map: {c.map ? c.map.join(" · ") : ''}</div>
-                <div style={{ fontSize: 12, marginTop: 6, color: "#374151" }}>{c.functional}</div>
-              </div>
-            ))}
-          </div>
-        </div>
+    <div className="flex flex-wrap gap-1.5">
+      {path.map((v, i) => (
+        <React.Fragment key={i}>
+          <span className="inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs">
+            <span className="inline-block h-2 w-2 rounded-full" style={{ background: COLORS[v] || "#3F51B5" }} />
+            {v}
+          </span>
+          {i < path.length - 1 && <span className="font-bold text-amber-600">→</span>}
+        </React.Fragment>
       ))}
     </div>
   );
 }
 
-function HistoryPanel({
-  items,
-  onRerun,
-  onClear,
-}: {
-  items: HistItem[];
-  onRerun: (w: string, m: "strict" | "open") => void;
-  onClear: () => void;
-}) {
-  return (
-    <div className="card" style={{ padding: 16 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <div className="section-title">History (local)</div>
-        <button className="btn" style={{ background: "#6b7280" }} onClick={onClear} disabled={!items.length}>
-          Clear
-        </button>
-      </div>
+export default function Page() {
+  const { toast } = useToast();
+  const [word, setWord] = React.useState("damage");
+  const [mode, setMode] = React.useState<"strict"|"open">("strict");
 
-      {!items.length ? (
-        <div style={{ fontSize: 12, color: "#6b7280" }}>No history yet. Run an analysis to add entries.</div>
-      ) : (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px,1fr))", gap: 10, marginTop: 10 }}>
-          {items.map((it, i) => (
-            <div key={i} className="card" style={{ padding: 12 }}>
-              <div style={{ fontWeight: 700 }}>
-                {it.word} <span style={{ fontWeight: 400, color: "#6b7280" }}>· {it.mode}</span>
-              </div>
-              <div style={{ marginTop: 6, display: "flex", flexWrap: "wrap", gap: 6, alignItems: "center" }}>
-                {it.primary.map((v, j) => (
-                  <React.Fragment key={j}>
-                    <span className="chip">
-                      <span className="chip-dot" style={{ background: VOICE_COLOR[v] || COLORS.primary }} />
-                      <span style={{ fontWeight: 700, paddingLeft: 2 }}>{v}</span>
-                    </span>
-                    {j < it.primary.length - 1 && <span style={{ color: COLORS.accent, fontWeight: 700 }}>→</span>}
-                  </React.Fragment>
-                ))}
-              </div>
-              <div style={{ fontSize: 11, color: "#6b7280", marginTop: 6 }}>{new Date(it.at).toLocaleString()}</div>
-              <div style={{ marginTop: 8 }}>
-                <button className="btn" onClick={() => onRerun(it.word, it.mode)}>Re-analyze</button>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ==== Main App ===============================================================
-export default function LinguisticDecoderApp(){
-  const [word, setWord] = useState("damage");
-  const [mode, setMode] = useState<"strict"|"open">("strict");
-  const [data, setData] = useState<AnalyzeResponse | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [err, setErr] = useState<string | null>(null);
-  const [history, setHistory] = useState<HistItem[]>([]);
-
-  useEffect(() => {
-    setHistory(readHist());
-  }, []);
-
-  const canAnalyze = word.trim().length > 0 && !loading;
-
-  async function analyze(nextWord?: string, nextMode?: "strict"|"open"){
-    const useWord = (nextWord ?? word).trim();
-    const useMode: "strict" | "open" = nextMode ?? mode;
-    if (!useWord) return;
-
+  // Server Action wiring
+  async function submit(_: any, fd: FormData) {
+    const res = await analyzeWordAction(fd);
+    if (!res.ok) {
+      toast({ title: "Error", description: res.error, variant: "destructive" });
+      return null;
+    }
+    // local history (stateless)
     try {
-      setLoading(true); setErr(null);
-      const res = await fetch("/api/analyzeSevenVoices", {
-        method: "POST",
-        headers: { "Content-Type":"application/json" },
-        body: JSON.stringify({ word: useWord, mode: useMode })
-      });
-      const j = await res.json();
-      if (!res.ok) throw new Error(j?.error || "Engine error");
-      
-      const analysisResult = {
-        ...j,
-        primaryPath: {
-          ...j.primary,
-          voicePath: j.primary.voice_path,
-          ringPath: j.primary.ring_path,
-          levelPath: j.primary.level_path,
-          checksums: Object.entries(j.primary.checksums).map(([type, value]) => ({ type, value })),
-        },
-        frontierPaths: j.frontier.map((p: any) => ({
-          ...p,
-          voicePath: p.voice_path,
-          ringPath: p.ring_path,
-          levelPath: p.level_path,
-          checksums: Object.entries(p.checksums).map(([type, value]) => ({ type, value })),
-        })),
-      }
+      const k = "ld:history:v1";
+      const cur: any[] = JSON.parse(localStorage.getItem(k) || "[]");
+      const item = { word: res.data.analysis.word, mode: res.data.analysis.mode, primary: res.data.analysis.primary.voice_path, at: Date.now() };
+      const key = (x:any) => `${x.word}|${x.mode}|${x.primary.join("")}`;
+      const next = [item, ...cur.filter(x => key(x) !== key(item))].slice(0, 50);
+      localStorage.setItem(k, JSON.stringify(next));
+    } catch {}
 
-      // The AI flow is optional, but we'll run it as it's a core feature.
-      const mappingRes = await fetch('/api/mapWordToLanguageFamilies', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          word: analysisResult.word,
-          voice_path: analysisResult.primaryPath.voicePath,
-          ring_path: analysisResult.primaryPath.ringPath,
-          level_path: analysisResult.primaryPath.levelPath,
-          ops: analysisResult.primaryPath.ops,
-          signals: analysisResult.signals,
-        }),
-      });
-
-      let candidates_map;
-      if (mappingRes.ok) {
-        const mappingData = await mappingRes.json();
-        candidates_map = mappingData.candidates_map;
-      }
-
-      setData({ ...analysisResult, candidates_map });
-
-      // Save local history
-      if (j?.primary?.voice_path) {
-        saveHistItem({ word: useWord, mode: useMode, primary: j.primary.voice_path, at: Date.now() });
-        setHistory(readHist());
-      }
-
-    } catch (e:any) {
-      setErr(e?.message || String(e));
-      setData(null);
-    } finally { setLoading(false); }
+    return res.data.analysis as EngineResult;
   }
-
-  const primary = data?.primaryPath;
-  const frontierList = useMemo(() => (data?.frontierPaths || []), [data]);
+  const [state, formAction, pending] = useActionState(submit, null as any as EngineResult | null);
 
   return (
-    <div>
-      <FontImports />
-      {/* Header */}
-      <div style={{ padding: 24, borderBottom: `3px solid ${COLORS.primary}`, background: "#fff" }}>
-        <div style={{ maxWidth: 1080, margin: "0 auto" }}>
-          <div className="headline" style={{ fontSize: 28, fontWeight: 700, letterSpacing: ".01em", color: COLORS.primary }}>Linguistic Decoder</div>
-          <div style={{ fontSize: 13, color: "#4b5563", marginTop: 4 }}>Seven‑Voices matrix solver · primary & frontier paths · optional Gemini mapping</div>
-        </div>
-      </div>
+    <div className="mx-auto max-w-5xl p-4 md:p-6 space-y-4">
+      <Card>
+        <CardHeader>
+          <CardTitle>Linguistic Decoder</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <form action={formAction} className="flex flex-col gap-3 md:flex-row">
+            <Input name="word" value={word} onChange={e=>setWord(e.target.value)} placeholder="Enter a word…" />
+            <input type="hidden" name="mode" value={mode} />
+            <div className="flex gap-2">
+              <Button type="submit" disabled={pending || !word.trim()}>
+                {pending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />} Analyze
+              </Button>
+              <Button type="button" variant={mode==="strict"?"secondary":"outline"} onClick={()=>setMode("strict")}>Strict</Button>
+              <Button type="button" variant={mode==="open"?"secondary":"outline"} onClick={()=>setMode("open")}>Open</Button>
+            </div>
+          </form>
 
-      {/* Controls */}
-      <div style={{ maxWidth: 1080, margin: "18px auto", padding: "0 16px" }}>
-        <div className="card" style={{ padding: 16 }}>
-          <div style={{ display:"grid", gridTemplateColumns:"1fr auto auto", gap: 10, alignItems:"center" }}>
-            <input
-              value={word}
-              onChange={e=> setWord(e.target.value)}
-              placeholder="Type a word…"
-              style={{ width:"100%", padding: "12px 14px", borderRadius: 10, border: "1px solid #d1d5db", outlineColor: COLORS.accent, fontWeight:600 }}
-              onKeyDown={(e) => e.key === 'Enter' && canAnalyze && analyze()}
-            />
-            <label style={{ display:"flex", alignItems:"center", gap: 8, fontSize: 13 }}>
-              <input type="checkbox" checked={mode==="strict"} onChange={e=> setMode(e.target.checked?"strict":"open")} />
-              Strict
-            </label>
-            <button className="btn" onClick={() => analyze()} disabled={!canAnalyze}>
-              {loading ? "Analyzing…" : "Analyze"}
-            </button>
-          </div>
-          {err && <div style={{ marginTop: 10, color: "#b91c1c", fontWeight: 600 }}>Error: {err}</div>}
-        </div>
-      </div>
+          <Separator />
 
-      {/* Results */}
-      <div style={{ maxWidth: 1080, margin: "0 auto", padding: "0 16px", display:"grid", gridTemplateColumns:"1fr", gap: 16 }}>
-        {primary ? (
-          <>
-            <PathRow block={primary} title="Primary Path" />
-            {frontierList.length > 0 ? (
-              <div className="card" style={{ padding: 16 }}>
-                <div className="section-title">Frontier (near‑optimal alternates)</div>
-                <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(280px, 1fr))", gap: 12 }}>
-                  {frontierList.map((f, idx)=> (
-                    <div key={idx} className="card" style={{ padding: 12, borderColor: COLORS.accent }}>
-                      <div style={{ fontWeight: 700, marginBottom: 8 }}>Alt #{idx+1}</div>
-                      <div style={{ display:"flex", flexWrap:"wrap", gap:6, alignItems:"center" }}>
-                        {f.voicePath.map((v,i)=> (
-                          <React.Fragment key={i}>
-                            <Chip v={v} />
-                            {i < f.voicePath.length-1 && <span style={{ color: COLORS.accent, fontWeight:700 }}>→</span>}
-                          </React.Fragment>
+          {!state ? (
+            <div className="text-sm text-muted-foreground">Type a word and click Analyze.</div>
+          ) : (
+            <div className="grid gap-3 md:grid-cols-2">
+              <Card className="col-span-1">
+                <CardHeader><CardTitle className="text-base">Primary Path</CardTitle></CardHeader>
+                <CardContent className="space-y-2">
+                  <PathChips path={state.primary.voice_path} />
+                  <div className="text-xs font-mono">Levels: {state.primary.level_path.join(" → ")}</div>
+                  <div className="text-xs font-mono">Rings: {state.primary.ring_path.join(" → ")}</div>
+                  <div className="text-xs font-mono">Checksums: V={state.primary.checksums.V} · E={state.primary.checksums.E} · C={state.primary.checksums.C}</div>
+                  {"kept" in state.primary && <div className="text-xs">Keeps: {state.primary.kept}</div>}
+                  {!!state.primary.ops?.length && (
+                    <div className="text-xs">Ops: {state.primary.ops.join("; ")}</div>
+                  )}
+                </CardContent>
+              </Card>
+
+              <Card className="col-span-1">
+                <CardHeader><CardTitle className="text-base">Frontier (near-optimal)</CardTitle></CardHeader>
+                <CardContent>
+                  {!state.frontier?.length ? (
+                    <div className="text-xs text-muted-foreground">No alternates.</div>
+                  ) : (
+                    <ScrollArea className="h-56 pr-2">
+                      <div className="space-y-3">
+                        {state.frontier.map((f, i) => (
+                          <div key={i} className="rounded-md border p-2">
+                            <div className="text-xs mb-1 font-medium">Alt #{i+1}</div>
+                            <PathChips path={f.voice_path} />
+                            <div className="mt-1 grid grid-cols-3 gap-2 text-[11px] font-mono">
+                              <div>V={f.checksums.V}</div><div>E={f.checksums.E}</div><div>C={f.checksums.C}</div>
+                            </div>
+                            {"kept" in f && <div className="text-[11px]">Keeps: {f.kept}</div>}
+                            <div className="text-[11px]">Levels: {f.level_path.join(" → ")}</div>
+                            <div className="text-[11px]">Rings: {f.ring_path.join(" → ")}</div>
+                          </div>
                         ))}
                       </div>
-                      <div className="hr" />
-                      <div className="code" style={{ fontSize: 12 }}>V={f.checksums[0].value} · E={f.checksums[1].value} · C={f.checksums[2].value}</div>
-                      <div className="code" style={{ fontSize: 12, marginTop: 4 }}>Keeps: {typeof f.kept === "number" ? f.kept : "—"}</div>
-                      <div style={{ fontSize: 12, marginTop: 6, color: "#6b7280" }}>Levels: {labelLevels(f.levelPath)}</div>
-                      <div style={{ fontSize: 12, color: "#6b7280" }}>Rings: {labelRings(f.ringPath)}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ) : null}
+                    </ScrollArea>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
-            {/* Candidate mapping (if backend enabled) */}
-            {data?.candidates_map && <Candidates map={data.candidates_map} />}
-
-          </>
-        ) : (
-          !loading && <div className="card" style={{ padding: 20 }}>
-            <div className="section-title">How to use</div>
-            <ol style={{ margin: 0, paddingLeft: 18, lineHeight: 1.7 }}>
-              <li>Type a word and click <span className="kbd">Analyze</span>.</li>
-              <li>Primary block shows Voice / Level / Ring paths and checksums <span className="code">V/E/C</span>.</li>
-              <li>Frontier lists near‑optimal alternates (deterministic order).</li>
-              <li>If mapping is enabled server‑side, language candidates appear below.</li>
-            </ol>
-          </div>
-        )}
-      </div>
-
-       {/* History */}
-      <div style={{ maxWidth: 1080, margin: "16px auto", padding: "0 16px" }}>
-        <HistoryPanel
-          items={history}
-          onRerun={(w, m) => analyze(w, m)}
-          onClear={() => { clearHist(); setHistory([]); }}
-        />
-      </div>
-
-      {/* Footer */}
-      <div style={{ padding: 24, opacity: 0.8 }}>
-        <div style={{ maxWidth: 1080, margin: "0 auto", fontSize: 12, color: "#6b7280" }}>
-          <b>Style:</b> Deep Indigo primary · Light Grey background · Soft Amber accents · Fonts: Space Grotesk / Inter / Source Code Pro
-        </div>
-      </div>
+      {state && (
+        <Card>
+          <CardHeader><CardTitle className="text-base">API Echo (normalized)</CardTitle></CardHeader>
+          <CardContent>
+            <pre className="text-xs font-mono whitespace-pre-wrap">{JSON.stringify(state, null, 2)}</pre>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }
