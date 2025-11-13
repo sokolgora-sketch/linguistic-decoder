@@ -1,8 +1,8 @@
 
 'use client';
 
-import { useEffect, useRef, useState, type FC } from 'react';
-import { useFormState, useFormStatus } from 'react-dom';
+import { useEffect, useRef, useState, type FC, useActionState } from 'react';
+import { useFormStatus } from 'react-dom';
 import { analyzeWordAction, type AnalysisState } from '@/app/actions';
 import type { Path } from '@/lib/solver';
 import { Input } from '@/components/ui/input';
@@ -176,7 +176,7 @@ const AnalysisSkeleton: FC = () => {
 
 export default function LinguisticDecoderPage() {
   const [showSkeleton, setShowSkeleton] = useState(false);
-  const [state, formAction] = useFormState(analyzeWordAction, initialState);
+  const [state, formAction] = useActionState(analyzeWordAction, initialState);
   const formRef = useRef<HTMLFormElement>(null);
   const resultsRef = useRef<HTMLDivElement>(null);
 
