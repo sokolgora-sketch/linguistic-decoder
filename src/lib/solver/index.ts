@@ -92,6 +92,16 @@ function uniqByPath<T extends { path: string[] }>(arr: T[]): T[] {
   return out;
 }
 
+function hasInstrument(path: Vowel[]) {
+  // E or I anywhere before the final closure
+  const inner = path.slice(0, -1);
+  return inner.some(v => v === "E" || v === "I");
+}
+function observedHasInstrument(slots: (Vowel|undefined)[]) {
+  return slots.some(v => v === "E" || v === "I");
+}
+
+
 export function solveMatrix(word: string, mode: SolveMode): Analysis {
   const { consonants, slots } = buildSlots(word);
   console.log("slots", slots);
@@ -131,6 +141,7 @@ export function solveMatrix(word: string, mode: SolveMode): Analysis {
 
   type Sol = { path: Vowel[]; E:number; ops:string[]; cStab:number; closure: Vowel; kept: number; };
   const sols: Sol[] = [];
+  const obsHasInstrument = observedHasInstrument(slots);
 
   for (const st of col){
     if (!st.row) continue;
@@ -138,7 +149,13 @@ export function solveMatrix(word: string, mode: SolveMode): Analysis {
       const t = moveCost(st.row, closure);
       const path = st.path[st.path.length-1]===closure ? st.path.slice() : [...st.path, closure];
       const base = st.cost + t;
-      const E = base + gravityBonus(path);
+
+      let penalty = 0;
+      if (!hasInstrument(path)) {
+        penalty = obsHasInstrument ? 2 : 1;
+      }
+
+      const E = base + gravityBonus(path) + penalty;
       sols.push({ path, E, ops:[...st.ops, `closure ${closure}`], cStab: st.cStab, closure, kept: st.kept });
     }
   }
