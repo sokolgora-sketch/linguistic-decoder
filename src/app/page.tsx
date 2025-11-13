@@ -1,6 +1,8 @@
 'use client';
 
 import React, { useMemo, useState, useEffect } from "react";
+import { analyzeWordAction } from './actions';
+import { useToast } from "@/hooks/use-toast";
 
 // ==== Design tokens (from spec) =============================================
 const COLORS = {
@@ -48,14 +50,17 @@ const FontImports = () => (
 interface Checksums { V: number; E: number; C: number; }
 interface PathBlock { voice_path: string[]; ring_path: number[]; level_path: number[]; ops: string[]; checksums: Checksums; kept?: number; deleted?: number; }
 interface AnalyzeResponse {
-  engineVersion: string;
-  word: string;
-  mode: "strict"|"open";
-  primary: PathBlock;
-  frontier: PathBlock[];
-  signals: string[];
-  candidates_map?: Record<string, { form:string; map:string[]; functional:string }[]>;
+  analysis: {
+    engineVersion: string;
+    word: string;
+    mode: "strict"|"open";
+    primary: PathBlock;
+    frontier: PathBlock[];
+    signals: string[];
+  },
+  languageFamilies?: Record<string, { form:string; map:string[]; functional:string }[]> | null;
 }
+
 
 // ==== Small helpers ==========================================================
 // Local history (stateless backend)
@@ -78,7 +83,7 @@ const labelRings = (rings: number[]) => rings.join(" → ");
 // Custom stringify to enforce key order for readability
 function orderedStringify(obj: any): string {
   if (!obj) return "";
-  const keyOrder = ["engineVersion", "word", "mode", "primary", "frontier", "candidates_map", "signals"];
+  const keyOrder = ["analysis", "languageFamilies"];
   const allKeys = [...keyOrder, ...Object.keys(obj).filter(k => !keyOrder.includes(k))];
   const orderedObj: Record<string, any> = {};
   for (const key of allKeys) {
@@ -136,27 +141,27 @@ function InfoLine({label, value, mono}:{label:string; value:string; mono?:boolea
   );
 }
 
-function Candidates({map}:{map: AnalyzeResponse["candidates_map"]}){
-  if (!map || Object.keys(map).length===0) return null;
-  return (
-    <div className="card" style={{ padding: 16 }}>
-      <div className="section-title">Language Candidate Mapping (Gemini 2.5)</div>
-      {Object.entries(map).map(([family, arr])=> (
-        <div key={family} style={{ marginBottom: 12 }}>
-          <div style={{ fontWeight: 700, color: COLORS.primary, marginBottom: 6 }}>{family}</div>
-          <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(260px,1fr))", gap: 10 }}>
-            {(arr || []).map((c, i)=> (
-              <div key={i} className="card" style={{ padding: 10, borderColor: COLORS.primary }}>
-                <div style={{ fontWeight: 700 }}>{c.form}</div>
-                <div className="code" style={{ fontSize: 12, marginTop: 6 }}>map: {c.map ? c.map.join(" · ") : ''}</div>
-                <div style={{ fontSize: 12, marginTop: 6, color: "#374151" }}>{c.functional}</div>
-              </div>
-            ))}
-          </div>
+function Candidates({map}:{map: AnalyzeResponse["languageFamilies"]}){
+    if (!map || Object.keys(map).length===0) return null;
+    return (
+        <div className="card" style={{ padding: 16 }}>
+        <div className="section-title">Language Candidate Mapping (Gemini 2.5)</div>
+        {Object.entries(map).map(([family, arr])=> (
+            <div key={family} style={{ marginBottom: 12 }}>
+            <div style={{ fontWeight: 700, color: COLORS.primary, marginBottom: 6 }}>{family}</div>
+            <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(260px,1fr))", gap: 10 }}>
+                {(arr || []).map((c, i)=> (
+                <div key={i} className="card" style={{ padding: 10, borderColor: COLORS.primary }}>
+                    <div style={{ fontWeight: 700 }}>{c.form}</div>
+                    <div className="code" style={{ fontSize: 12, marginTop: 6 }}>map: {c.map ? c.map.join(" · ") : ''}</div>
+                    <div style={{ fontSize: 12, marginTop: 6, color: "#374151" }}>{c.functional}</div>
+                </div>
+                ))}
+            </div>
+            </div>
+        ))}
         </div>
-      ))}
-    </div>
-  );
+    );
 }
 
 // ==== History Panel ===========================================================
@@ -211,6 +216,7 @@ function HistoryPanel({ items, onRerun, onClear }:{ items: HistItem[]; onRerun:(
 
 // ==== Main App ===============================================================
 export default function LinguisticDecoderApp(){
+  const { toast } = useToast();
   const [history, setHistory] = useState<HistItem[]>([]);
   useEffect(() => setHistory(readHist()), []);
 
@@ -228,19 +234,18 @@ export default function LinguisticDecoderApp(){
     if (!useWord) return;
     try {
       setLoading(true); setErr(null);
-      // NOTE: This uses the Next.js API route, not the standalone function.
-      // This is to accommodate the Gemini candidate mapping, which might be stateful.
-      const res = await fetch("/api/analyzeSevenVoices", {
-        method: "POST",
-        headers: { "Content-Type":"application/json" },
-        body: JSON.stringify({ word: useWord, mode: useMode })
-      });
-      const j = await res.json();
-      if (!res.ok) throw new Error(j?.error || "Engine error");
+      const res = await analyzeWordAction({ word: useWord, mode: useMode });
+
+      if (!res.ok) {
+        toast({ title: "Error", description: res.error, variant: "destructive" });
+        setData(null);
+        return;
+      }
+      const j = res.data;
       setData(j);
       // Save local history
-      if (j?.primary?.voice_path) {
-        saveHistItem({ word: useWord, mode: useMode, primary: j.primary.voice_path, at: Date.now() });
+      if (j?.analysis.primary?.voice_path) {
+        saveHistItem({ word: useWord, mode: useMode, primary: j.analysis.primary.voice_path, at: Date.now() });
         setHistory(readHist());
       }
     } catch (e:any) {
@@ -249,9 +254,10 @@ export default function LinguisticDecoderApp(){
     } finally { setLoading(false); }
   }
 
-  const primary = data?.primary;
-  const frontierList = useMemo(() => (data?.frontier || []).filter(f => f.voice_path.join("") !== (primary?.voice_path || []).join("")), [data, primary]);
-
+  const analysis = data?.analysis;
+  const primary = analysis?.primary;
+  const frontierList = useMemo(() => (analysis?.frontier || []).filter(f => f.voice_path.join("") !== (primary?.voice_path || []).join("")), [analysis, primary]);
+  
   return (
     <div>
       <FontImports />
@@ -287,7 +293,7 @@ export default function LinguisticDecoderApp(){
 
       {/* Results */}
       <div style={{ maxWidth: 1080, margin: "0 auto", padding: "0 16px", display:"grid", gridTemplateColumns:"1fr", gap: 16 }}>
-        {primary ? (
+        {primary && analysis ? (
           <>
             <PathRow block={primary} title="Primary Path" />
             {frontierList.length ? (
@@ -317,7 +323,7 @@ export default function LinguisticDecoderApp(){
             ) : null}
 
             {/* Candidate mapping (if backend enabled) */}
-            {data?.candidates_map && <Candidates map={data.candidates_map} />}
+            {data?.languageFamilies && <Candidates map={data.languageFamilies} />}
 
             <div className="card" style={{ padding: 16 }}>
               <div className="section-title">API Echo (debug)</div>

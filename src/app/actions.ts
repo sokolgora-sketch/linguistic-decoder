@@ -102,3 +102,4 @@ export async function analyzeWordAction(formData: FormData | { word:string; mode
     return { ok: false, error: errorMessage } as const;
   }
 }
+
