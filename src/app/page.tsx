@@ -49,6 +49,23 @@ const FontImports = () => (
 
 import type { Path, Analysis } from '@/lib/solver';
 
+// Local history (stateless backend)
+type HistItem = { word: string; mode: "strict" | "open"; primary: string[]; at: number };
+const HIST_KEY = "ld:history:v1";
+
+function readHist(): HistItem[] {
+  try { return JSON.parse(localStorage.getItem(HIST_KEY) || "[]"); } catch { return []; }
+}
+function saveHistItem(item: HistItem, max = 50) {
+  try {
+    const cur = readHist();
+    const key = (x: HistItem) => `${x.word}|${x.mode}|${x.primary.join("")}`;
+    const next = [item, ...cur.filter(x => key(x) !== key(item))].slice(0, max);
+    localStorage.setItem(HIST_KEY, JSON.stringify(next));
+  } catch {}
+}
+function clearHist() { try { localStorage.removeItem(HIST_KEY); } catch {} }
+
 interface AnalyzeResponse extends Analysis {
     candidates_map?: Record<string, { form:string; map:string[]; functional:string }[]>;
 }
@@ -117,13 +134,63 @@ function Candidates({map}:{map: AnalyzeResponse["candidates_map"]}){
             {arr.map((c, i)=> (
               <div key={i} className="card" style={{ padding: 10, borderColor: COLORS.primary }}>
                 <div style={{ fontWeight: 700 }}>{c.form}</div>
-                <div className="code" style={{ fontSize: 12, marginTop: 6 }}>map: {c.map.join(" · ")}</div>
+                <div className="code" style={{ fontSize: 12, marginTop: 6 }}>map: {c.map ? c.map.join(" · ") : ''}</div>
                 <div style={{ fontSize: 12, marginTop: 6, color: "#374151" }}>{c.functional}</div>
               </div>
             ))}
           </div>
         </div>
       ))}
+    </div>
+  );
+}
+
+function HistoryPanel({
+  items,
+  onRerun,
+  onClear,
+}: {
+  items: HistItem[];
+  onRerun: (w: string, m: "strict" | "open") => void;
+  onClear: () => void;
+}) {
+  return (
+    <div className="card" style={{ padding: 16 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <div className="section-title">History (local)</div>
+        <button className="btn" style={{ background: "#6b7280" }} onClick={onClear} disabled={!items.length}>
+          Clear
+        </button>
+      </div>
+
+      {!items.length ? (
+        <div style={{ fontSize: 12, color: "#6b7280" }}>No history yet. Run an analysis to add entries.</div>
+      ) : (
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px,1fr))", gap: 10, marginTop: 10 }}>
+          {items.map((it, i) => (
+            <div key={i} className="card" style={{ padding: 12 }}>
+              <div style={{ fontWeight: 700 }}>
+                {it.word} <span style={{ fontWeight: 400, color: "#6b7280" }}>· {it.mode}</span>
+              </div>
+              <div style={{ marginTop: 6, display: "flex", flexWrap: "wrap", gap: 6, alignItems: "center" }}>
+                {it.primary.map((v, j) => (
+                  <React.Fragment key={j}>
+                    <span className="chip">
+                      <span className="chip-dot" style={{ background: VOICE_COLOR[v] || COLORS.primary }} />
+                      <span style={{ fontWeight: 700, paddingLeft: 2 }}>{v}</span>
+                    </span>
+                    {j < it.primary.length - 1 && <span style={{ color: COLORS.accent, fontWeight: 700 }}>→</span>}
+                  </React.Fragment>
+                ))}
+              </div>
+              <div style={{ fontSize: 11, color: "#6b7280", marginTop: 6 }}>{new Date(it.at).toLocaleString()}</div>
+              <div style={{ marginTop: 8 }}>
+                <button className="btn" onClick={() => onRerun(it.word, it.mode)}>Re-analyze</button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -135,31 +202,54 @@ export default function LinguisticDecoderApp(){
   const [data, setData] = useState<AnalyzeResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+  const [history, setHistory] = useState<HistItem[]>(() => readHist());
 
   const canAnalyze = word.trim().length > 0 && !loading;
 
-  async function analyze(){
+  async function analyze(nextWord?: string, nextMode?: "strict"|"open"){
+    const useWord = (nextWord ?? word).trim();
+    const useMode: "strict" | "open" = nextMode ?? mode;
+    if (!useWord) return;
+
     try {
       setLoading(true); setErr(null);
-      const res = await fetch("/api/analyzeWord", {
+      const res = await fetch("/api/analyzeSevenVoices", {
         method: "POST",
         headers: { "Content-Type":"application/json" },
-        body: JSON.stringify({ word: word.trim(), mode })
+        body: JSON.stringify({ word: useWord, mode: useMode })
       });
       const j = await res.json();
       if (!res.ok) throw new Error(j?.error || "Engine error");
+      
+      const analysisResult = {
+        ...j,
+        primaryPath: {
+          ...j.primary,
+          voicePath: j.primary.voice_path,
+          ringPath: j.primary.ring_path,
+          levelPath: j.primary.level_path,
+          checksums: Object.entries(j.primary.checksums).map(([type, value]) => ({ type, value })),
+        },
+        frontierPaths: j.frontier.map((p: any) => ({
+          ...p,
+          voicePath: p.voice_path,
+          ringPath: p.ring_path,
+          levelPath: p.level_path,
+          checksums: Object.entries(p.checksums).map(([type, value]) => ({ type, value })),
+        })),
+      }
 
       // The AI flow is optional, but we'll run it as it's a core feature.
       const mappingRes = await fetch('/api/mapWordToLanguageFamilies', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          word: j.word,
-          voice_path: j.primaryPath.voicePath,
-          ring_path: j.primaryPath.ringPath,
-          level_path: j.primaryPath.levelPath,
-          ops: j.primaryPath.ops,
-          signals: j.signals,
+          word: analysisResult.word,
+          voice_path: analysisResult.primaryPath.voicePath,
+          ring_path: analysisResult.primaryPath.ringPath,
+          level_path: analysisResult.primaryPath.levelPath,
+          ops: analysisResult.primaryPath.ops,
+          signals: analysisResult.signals,
         }),
       });
 
@@ -169,9 +259,16 @@ export default function LinguisticDecoderApp(){
         candidates_map = mappingData.candidates_map;
       }
 
-      setData({ ...j, candidates_map });
+      setData({ ...analysisResult, candidates_map });
+
+      // Save local history
+      if (j?.primary?.voice_path) {
+        saveHistItem({ word: useWord, mode: useMode, primary: j.primary.voice_path, at: Date.now() });
+        setHistory(readHist());
+      }
+
     } catch (e:any) {
-      setErr(e?.message || "Request failed");
+      setErr(e?.message || String(e));
       setData(null);
     } finally { setLoading(false); }
   }
@@ -205,7 +302,7 @@ export default function LinguisticDecoderApp(){
               <input type="checkbox" checked={mode==="strict"} onChange={e=> setMode(e.target.checked?"strict":"open")} />
               Strict
             </label>
-            <button className="btn" onClick={analyze} disabled={!canAnalyze}>
+            <button className="btn" onClick={() => analyze()} disabled={!canAnalyze}>
               {loading ? "Analyzing…" : "Analyze"}
             </button>
           </div>
@@ -259,6 +356,15 @@ export default function LinguisticDecoderApp(){
             </ol>
           </div>
         )}
+      </div>
+
+       {/* History */}
+      <div style={{ maxWidth: 1080, margin: "16px auto", padding: "0 16px" }}>
+        <HistoryPanel
+          items={history}
+          onRerun={(w, m) => analyze(w, m)}
+          onClear={() => { clearHist(); setHistory([]); }}
+        />
       </div>
 
       {/* Footer */}
