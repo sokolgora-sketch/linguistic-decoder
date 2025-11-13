@@ -75,6 +75,20 @@ const joinPath = (p: string[]) => p.join(" → ");
 const labelLevels = (levels: number[]) => levels.map(l=> LEVEL_LABEL[l] ?? l).join(" → ");
 const labelRings = (rings: number[]) => rings.join(" → ");
 
+// Custom stringify to enforce key order for readability
+function orderedStringify(obj: any): string {
+  if (!obj) return "";
+  const keyOrder = ["engineVersion", "word", "mode", "primary", "frontier", "candidates_map", "signals"];
+  const allKeys = [...keyOrder, ...Object.keys(obj).filter(k => !keyOrder.includes(k))];
+  const orderedObj: Record<string, any> = {};
+  for (const key of allKeys) {
+    if (obj.hasOwnProperty(key)) {
+      orderedObj[key] = obj[key];
+    }
+  }
+  return JSON.stringify(orderedObj, null, 2);
+}
+
 function Chip({v}:{v:string}){
   return (
     <span className="chip" style={{ borderColor: COLORS.accent }}>
@@ -308,7 +322,7 @@ export default function LinguisticDecoderApp(){
             <div className="card" style={{ padding: 16 }}>
               <div className="section-title">API Echo (debug)</div>
               <pre className="code" style={{ margin: 0, whiteSpace: "pre-wrap", fontSize: 12 }}>
-                {JSON.stringify(data, null, 2)}
+                {orderedStringify(data)}
               </pre>
             </div>
           </>
