@@ -12,6 +12,7 @@ const schema = z.object({
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
+    console.log("analyzeSevenVoices in:", body);
     const validatedFields = schema.safeParse(body);
 
     if (!validatedFields.success) {
