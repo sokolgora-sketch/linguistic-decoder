@@ -3,9 +3,14 @@ import { NextResponse, type NextRequest } from 'next/server';
 
 export async function POST(request: NextRequest) {
   try {
-    const { word, mode } = await request.json();
+    const body = await request.json();
+    const { word, mode } = body;
     console.log("analyzeSevenVoices proxy in:", { word, mode });
 
+    if (!word || typeof word !== 'string' || word.trim() === '') {
+        return NextResponse.json({ error: "The 'word' field is required and cannot be empty." }, { status: 400 });
+    }
+    
     // The user's instructions imply a fallback for local development is needed.
     // However, since we cannot know the user's project ID, we'll rely on FUNCTION_BASE_URL
     // and guide the user to set it up for local dev.
