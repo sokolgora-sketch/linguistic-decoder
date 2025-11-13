@@ -55,11 +55,12 @@ const PrimaryPathCard: FC<{ path: Path }> = ({ path }) => (
         <span className="font-code text-primary">{path.levelPath.join(' ')}</span>
       </div>
       <div className="flex items-center justify-between">
-        <span className="text-muted-foreground">Checksums</span>
-        <div className="flex gap-2">
+        <span className="text-muted-foreground">Checksums & Keeps</span>
+        <div className="flex gap-2 items-center">
           {path.checksums.map((sum) => (
             <Badge key={sum.type} variant="secondary" className="bg-accent/20 text-accent-foreground">{sum.type}: {sum.value}</Badge>
           ))}
+          {path.kept !== undefined && <Badge variant="secondary" className="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">Keeps: {path.kept}</Badge>}
         </div>
       </div>
     </CardContent>
@@ -103,7 +104,7 @@ const FrontierPathsTable: FC<{ paths: Path[] }> = ({ paths }) => (
             <TableHead><Pilcrow className="inline-block mr-2 h-4 w-4" />Voice Path</TableHead>
             <TableHead><ChevronRight className="inline-block mr-2 h-4 w-4" />Ring Path</TableHead>
             <TableHead><Rows3 className="inline-block mr-2 h-4 w-4" />Level Path</TableHead>
-            <TableHead className="text-right"><Hash className="inline-block mr-2 h-4 w-4" />Checksums</TableHead>
+            <TableHead className="text-right"><Hash className="inline-block mr-2 h-4 w-4" />Info</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -117,6 +118,7 @@ const FrontierPathsTable: FC<{ paths: Path[] }> = ({ paths }) => (
                   {path.checksums.map((sum) => (
                     <Badge key={sum.type} variant="secondary">{sum.type}: {sum.value}</Badge>
                   ))}
+                  {path.kept !== undefined && <Badge variant="secondary">K: {path.kept}</Badge>}
                 </div>
               </TableCell>
             </TableRow>
@@ -277,3 +279,5 @@ export default function LinguisticDecoderPage() {
     </div>
   );
 }
+
+    
