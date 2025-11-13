@@ -11,8 +11,14 @@ export type AnalysisState = {
   error?: string;
 };
 
+const WordSchema = z.string()
+  .trim()
+  .min(1, { message: "Word is required." })
+  .max(48, { message: "Word must be 48 characters or less." })
+  .regex(/^[a-zë-]+$/i, { message: "Word can only contain letters and hyphens." });
+
 const schema = z.object({
-    word: z.string().min(1, { message: "Word is required." }).max(48, { message: "Word cannot be longer than 48 characters." }),
+    word: WordSchema,
     mode: z.enum(['strict', 'open']),
 });
 
