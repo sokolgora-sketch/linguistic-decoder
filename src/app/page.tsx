@@ -325,12 +325,6 @@ export default function LinguisticDecoderApp(){
             {/* Candidate mapping (if backend enabled) */}
             {data?.languageFamilies && <Candidates map={data.languageFamilies} />}
 
-            <div className="card" style={{ padding: 16 }}>
-              <div className="section-title">API Echo (debug)</div>
-              <pre className="code" style={{ margin: 0, whiteSpace: "pre-wrap", fontSize: 12 }}>
-                {orderedStringify(data)}
-              </pre>
-            </div>
           </>
         ) : (
           <div className="card" style={{ padding: 20 }}>
