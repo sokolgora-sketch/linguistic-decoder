@@ -55,12 +55,17 @@ function buildSlots(word: string){
 }
 
 type State = { row: Vowel|null; cost: number; path: Vowel[]; ops: string[]; cStab: number, keptCount: number };
+type OpKind = "keep" | "sub" | "ins" | "del";
 
-function opCost(observed: Vowel|undefined, chosen: Vowel|"Ø"): {cost:number,op?:string}{
-  if (!observed) return chosen==="Ø" ? {cost:0} : {cost:2, op:`insert ${chosen}`};
-  if (chosen==="Ø") return {cost:1, op:`delete ${observed}`};
-  if (chosen===observed) return {cost:0};
-  return {cost:1, op:`${observed}→${chosen}`};
+function opCost(observed: Vowel|undefined, chosen: Vowel|"Ø"): {cost:number, op?:string, kind: OpKind}{
+  if (!observed){
+    if (chosen === "Ø") return { cost: 0, kind: "keep" };  // nothing to keep
+    return { cost: 2, op: `insert ${chosen}`, kind: "ins" };
+  } else {
+    if (chosen === "Ø") return { cost: 1, op: `delete ${observed}`, kind: "del" };
+    if (chosen === observed) return { cost: 0, kind: "keep" };
+    return { cost: 1, op: `${observed}→${chosen}`, kind: "sub" };
+  }
 }
 
 function stabilizerAcross(cons: string[], idx: number, prev: Vowel|null, curr: Vowel|"Ø"): number {
@@ -100,7 +105,7 @@ export function solveMatrix(word: string, mode: SolveMode): Analysis {
     const next: State[] = [];
     for (const st of col){
       for (const cand of candidates){
-        const { cost: oc, op } = opCost(observed, cand);
+        const { cost: oc, op, kind } = opCost(observed, cand);
         let tCost = 0, newRow = st.row, newPath = st.path.slice();
         if (cand !== "Ø"){
           if (st.row){ tCost = moveCost(st.row, cand as Vowel); }
@@ -108,15 +113,14 @@ export function solveMatrix(word: string, mode: SolveMode): Analysis {
           if (newPath[newPath.length-1] !== newRow) newPath.push(newRow);
         }
         const stab = stabilizerAcross(consonants, j-1, st.row, cand);
-        const isKeep = (observed && cand !== "Ø" && observed === cand);
-
+        
         next.push({ 
             row:newRow, 
             cost: st.cost + oc + tCost + stab, 
             path:newPath, 
             ops: op?[...st.ops,op]:st.ops, 
             cStab: st.cStab + stab,
-            keptCount: st.keptCount + (isKeep ? 1 : 0)
+            keptCount: st.keptCount + (kind === "keep" ? 1 : 0)
         });
       }
     }
@@ -179,3 +183,5 @@ export function solveMatrix(word: string, mode: SolveMode): Analysis {
     signals: ["deterministic: beam DP; gravity; closure prefers Ë on tie"]
   };
 }
+
+    
