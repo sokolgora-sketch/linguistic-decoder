@@ -1,7 +1,7 @@
 
 import { NextResponse, type NextRequest } from 'next/server';
 import { solveMatrix, type SolveOptions } from '@/lib/solver';
-import { ENGINE_VERSION, CFG } from '@/lib/solver/engineConfig';
+import { ENGINE_VERSION, CFG, Alphabet } from '@/lib/solver/engineConfig';
 
 // Helper to transform the checksums array into an object
 const formatChecksums = (checksums: {type: 'V'|'E'|'C', value:number}[]) => {
@@ -52,6 +52,8 @@ export async function POST(request: NextRequest) {
         mode: analysisResult.mode,
         primary: formatPath(analysisResult.primaryPath),
         frontier: analysisResult.frontierPaths.map(formatPath),
+        windows: analysisResult.windows,
+        windowClasses: analysisResult.windowClasses,
         signals: analysisResult.signals,
     };
     

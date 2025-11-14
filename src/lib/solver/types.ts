@@ -1,5 +1,5 @@
 
-import type { Vowel } from "./valueTables";
+import type { Vowel, CClass } from "./valueTables";
 
 export type { Vowel } from "./valueTables";
 
@@ -24,8 +24,8 @@ export type Analysis = {
   primaryPath: Path;
   frontierPaths: Path[];
   signals: string[];
+  windows?: string[];
+  windowClasses?: CClass[];
 };
 
 export type SolveMode = "strict" | "open";
-
-    

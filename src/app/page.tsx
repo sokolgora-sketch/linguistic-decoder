@@ -13,6 +13,7 @@ import { HistoryPanel, type HistItem } from "@/components/HistoryPanel";
 import { ResultsDisplay } from "@/components/ResultsDisplay";
 import { ConsonantReference } from "@/components/ConsonantReference";
 import { TwoRailsWithConsonants } from "@/components/TwoRailsWithConsonants";
+import { CClass } from "@/lib/solver/valueTables";
 
 // ==== Types matching the /analyzeWord response ===============================
 interface Checksums { V: number; E: number; C: number; }
@@ -25,6 +26,8 @@ export interface AnalyzeResponse {
     primary: PathBlock;
     frontier: PathBlock[];
     signals: string[];
+    windows?: string[];
+    windowClasses?: CClass[];
     trace?: { v: string; level: 1 | 0 | -1; E?: number }[];
   },
   languageFamilies?: Record<string, { form:string; map:string[]; functional:string }[]> | null;

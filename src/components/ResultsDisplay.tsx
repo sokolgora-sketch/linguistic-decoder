@@ -1,7 +1,9 @@
+
 'use client';
 import React, { useMemo } from "react";
 import { Card } from "@/components/ui/card";
 import type { PathBlock, AnalyzeResponse } from "@/app/page";
+import { CClass } from "@/lib/solver/valueTables";
 
 // Seven‑Voices palette (uses CSS variables from globals.css)
 const VOICE_COLOR: Record<string, string> = {
@@ -40,7 +42,7 @@ function Chip({v}:{v:string}){
   );
 }
 
-function PathRow({block, title}:{block:PathBlock; title:string}){
+function PathRow({block, title, windows, windowClasses}:{block:PathBlock; title:string; windows?:string[], windowClasses?:CClass[]}){
   const V = getChecksum(block, "V");
   const E = getChecksum(block, "E");
   const C = getChecksum(block, "C");
@@ -63,12 +65,17 @@ function PathRow({block, title}:{block:PathBlock; title:string}){
         <InfoLine label="Checksums" value={`V=${V} · E=${E} · C=${C}`} mono />
         {typeof block.kept === "number" ? <InfoLine label="Keeps" value={String(block.kept)} /> : null}
       </div>
-      {block.ops?.length ? (
+      {windows && windowClasses && (
+        <div className="mt-2.5">
+          <InfoLine label="Consonant Windows" value={windows.map((w,i)=>`'${w}' → ${windowClasses[i]}`).join(" | ")} mono />
+        </div>
+      )}
+      {block.ops?.length > 0 && (
         <div className="mt-2.5">
           <h4 className="font-bold text-sm tracking-wide">Ops</h4>
           <div className="font-code text-xs whitespace-pre-wrap">{block.ops.join("; ")}</div>
         </div>
-      ) : null}
+      )}
     </Card>
   );
 }
@@ -90,7 +97,7 @@ export function ResultsDisplay({ analysis }: { analysis: AnalyzeResponse['analys
 
     return (
         <>
-            <PathRow block={primary} title="Primary Path" />
+            <PathRow block={primary} title="Primary Path" windows={analysis.windows} windowClasses={analysis.windowClasses}/>
             {frontierList.length > 0 && (
               <Card className="p-4">
                 <h3 className="font-bold text-sm tracking-wide">Frontier (near‑optimal alternates)</h3>

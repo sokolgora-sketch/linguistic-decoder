@@ -1,6 +1,6 @@
 
 
-import { VOWELS, Vowel, VOWEL_LEVEL, VOWEL_RING, VOWEL_VALUE, computeC, chooseProfile, LangProfile, extractWindowClassesWithProfile } from "./valueTables";
+import { VOWELS, Vowel, VOWEL_LEVEL, VOWEL_RING, VOWEL_VALUE, computeC, chooseProfile, LangProfile, extractWindowClassesWithProfile, readWindowsDebug } from "./valueTables";
 import type { Analysis, Path, SolveMode } from "./types";
 import { CFG, ENGINE_VERSION, Alphabet } from "./engineConfig";
 
@@ -132,7 +132,7 @@ function solveWord(word: string, opts: SolveOptions): Omit<Analysis, "word" | "m
   const base = normalizeTerminalY(rawBase, word);
   const baseSeq = base.length ? base : (["O"] as Vowel[]);
   const profile = chooseProfile(word, opts.alphabet === "auto" ? undefined : opts.alphabet);
-  const consClasses = extractWindowClassesWithProfile(word, baseSeq, profile);
+  const { windows, classes: consClasses } = readWindowsDebug(word, baseSeq, profile);
   
   const K = opts.beamWidth;
   const maxOps = opts.maxOps;
@@ -187,6 +187,8 @@ function solveWord(word: string, opts: SolveOptions): Omit<Analysis, "word" | "m
     engineVersion: ENGINE_VERSION,
     primaryPath: primary,
     frontierPaths: frontier,
+    windows,
+    windowClasses: consClasses,
     signals,
   };
 }
@@ -208,3 +210,4 @@ export function baseForTests(word: string): Vowel[] {
   const norm = normalizeTerminalY(raw, word);
   return (norm.length ? norm : (["O"] as Vowel[])) as Vowel[];
 }
+
