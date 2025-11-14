@@ -1,6 +1,6 @@
 
 
-import { VOWELS, Vowel, VOWEL_LEVEL, VOWEL_RING, VOWEL_VALUE, computeC, chooseProfile, LangProfile, classifyWindow } from "./valueTables";
+import { VOWELS, Vowel, VOWEL_LEVEL, VOWEL_RING, VOWEL_VALUE, computeC, chooseProfile, LangProfile, classifyWindow, CClass } from "./valueTables";
 import type { Analysis, Path, SolveMode } from "./types";
 import { CFG, ENGINE_VERSION, Alphabet } from "./engineConfig";
 
@@ -19,7 +19,7 @@ export type SolveOptions = {
 function isVowelChar(ch:string){ const c=ch.normalize("NFC"); return /[aeiouy]/i.test(c)||c==="ë"||c==="Ë"; }
 function toVowel(ch:string):Vowel|null{ const u=ch.toUpperCase(); return u==="Ë" ? "Ë" : (VOWELS.includes(u as any)?(u as Vowel):null); }
 
-function extractBase(word:string):Vowel[]{ 
+export function extractBase(word:string):Vowel[]{ 
     const out:Vowel[]=[]; 
     for(const ch of word.normalize("NFC")){ 
         if(!isVowelChar(ch))continue; 
@@ -31,7 +31,7 @@ function extractBase(word:string):Vowel[]{
 }
 function keptCount(base:Vowel[], cand:Vowel[]){ let k=0; for(let i=0;i<Math.min(base.length,cand.length);i++) if(base[i]===cand[i]) k++; return k; }
 
-function normalizeTerminalY(seq: Vowel[], rawWord: string): Vowel[] {
+export function normalizeTerminalY(seq: Vowel[], rawWord: string): Vowel[] {
   if (CFG.norm.terminalYtoI && seq.length && seq[seq.length - 1] === "Y" && rawWord.toLowerCase().endsWith("y")) {
     const out = seq.slice();
     out[out.length - 1] = "I";
@@ -77,7 +77,7 @@ function opCostFromLabel(op: string, costs: { sub: number; del: number; ins: num
   return costs.sub;
 }
 
-function extractWindowClasses(word: string, baseSeq: Vowel[], P: LangProfile): ReturnType<typeof classifyWindow>[] {
+export function extractWindowClasses(word: string, baseSeq: Vowel[], P: LangProfile): CClass[] {
   const s = word.normalize("NFC");
   const pos:number[]=[]; let vi=0;
   for (let i=0;i<s.length && vi<baseSeq.length;i++){
@@ -215,4 +215,3 @@ export function solveMatrix(word: string, options: SolveOptions): Analysis {
     mode,
   };
 }
-
