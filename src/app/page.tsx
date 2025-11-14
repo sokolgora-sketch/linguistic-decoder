@@ -6,9 +6,11 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Candidates } from "@/components/Candidates";
 import { HistoryPanel, type HistItem } from "@/components/HistoryPanel";
 import { ResultsDisplay } from "@/components/ResultsDisplay";
+import { ConsonantReference } from "@/components/ConsonantReference";
 import { TwoRailsWithConsonants } from "@/components/TwoRailsWithConsonants";
 
 // ==== Types matching the /analyzeWord response ===============================
@@ -155,15 +157,27 @@ export default function LinguisticDecoderApp(){
             {data?.languageFamilies && <Candidates map={data.languageFamilies} />}
           </>
         ) : (
-          <Card className="p-5">
-            <h3 className="font-bold text-sm tracking-wide">How to use</h3>
-            <ol className="list-decimal pl-5 mt-2 space-y-2 text-sm">
-              <li>Type a word and click <kbd className="border border-b-2 rounded-md bg-slate-100 px-1.5 py-0.5 text-xs">Analyze</kbd>.</li>
-              <li>Primary block shows Voice / Level / Ring paths and checksums <span className="font-code">V/E/C</span>.</li>
-              <li>Frontier lists near‑optimal alternates (deterministic order).</li>
-              <li>If mapping is enabled server‑side, language candidates appear below.</li>
-            </ol>
-          </Card>
+          <Accordion type="single" collapsible className="w-full" defaultValue="item-1">
+            <AccordionItem value="item-1">
+              <AccordionTrigger>How to Use</AccordionTrigger>
+              <AccordionContent>
+                <Card className="p-5">
+                  <ol className="list-decimal pl-5 mt-2 space-y-2 text-sm">
+                    <li>Type a word and click <kbd className="border border-b-2 rounded-md bg-slate-100 px-1.5 py-0.5 text-xs">Analyze</kbd>.</li>
+                    <li>Primary block shows Voice / Level / Ring paths and checksums <span className="font-code">V/E/C</span>.</li>
+                    <li>Frontier lists near‑optimal alternates (deterministic order).</li>
+                    <li>If mapping is enabled server‑side, language candidates appear below.</li>
+                  </ol>
+                </Card>
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="item-2">
+              <AccordionTrigger>Consonant Reference</AccordionTrigger>
+              <AccordionContent>
+                <ConsonantReference />
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
         )}
       </div>
 
