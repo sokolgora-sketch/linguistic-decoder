@@ -16,6 +16,7 @@ import { TwoRailsWithConsonants } from "@/components/TwoRailsWithConsonants";
 import { analyzeClient } from "@/lib/analyzeClient";
 import type { Alphabet } from "@/lib/solver/engineConfig";
 import { PROFILES } from "@/lib/solver/valueTables";
+import { ThemeToggle } from "@/components/ThemeProvider";
 
 
 // ==== Types matching the /analyzeWord response ===============================
@@ -100,15 +101,18 @@ export default function LinguisticDecoderApp(){
     <div className="grid grid-cols-1 gap-6 p-4 lg:p-8 max-w-5xl mx-auto">
       <main className="space-y-4">
         {/* Header */}
-        <header className="p-6 border-b-4 border-primary bg-white -mx-6 -mt-8">
+        <header className="p-6 border-b-4 border-primary bg-background -mx-6 -mt-8">
           <div className="max-w-5xl mx-auto flex justify-between items-center">
             <div>
               <h1 className="font-headline text-3xl font-bold tracking-wide text-primary">Linguistic Decoder</h1>
-              <p className="text-sm text-slate-600 mt-1">Seven‑Voices matrix solver · primary & frontier paths · optional Gemini mapping</p>
+              <p className="text-sm text-muted-foreground mt-1">Seven‑Voices matrix solver · primary & frontier paths · optional Gemini mapping</p>
             </div>
-            <Button asChild variant="outline">
-                <Link href="/history">View History</Link>
-            </Button>
+            <div className="flex items-center gap-4">
+              <ThemeToggle />
+              <Button asChild variant="outline">
+                  <Link href="/history">View History</Link>
+              </Button>
+            </div>
           </div>
         </header>
 
@@ -211,5 +215,3 @@ export default function LinguisticDecoderApp(){
     </div>
   );
 }
-
-    
