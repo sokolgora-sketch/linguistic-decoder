@@ -265,7 +265,7 @@ export default function LinguisticDecoderApp(){
                 Share this result
               </Link>
             )}
-            <Button variant="secondary" size="sm" onClick={() => setShowDebug(s => !s)}>
+            <Button variant="outline" size="sm" onClick={() => setShowDebug(s => !s)}>
               {showDebug ? "Hide" : "Show"} Debug
             </Button>
           </div>
