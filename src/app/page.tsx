@@ -37,6 +37,7 @@ export interface AnalyzeResponse {
     windows?: string[];
     windowClasses?: any[];
     trace?: { v: string; level: 1 | 0 | -1; E?: number }[];
+    solveMs?: number;
   },
   languageFamilies?: Record<string, { form:string; map:string[]; functional:string }[]> | null;
   cacheHit?: boolean;
@@ -254,8 +255,20 @@ export default function LinguisticDecoderApp(){
 
       {/* Footer */}
       <footer className="p-6 opacity-80 col-span-1">
-        <div className="max-w-5xl mx-auto text-xs text-slate-500 flex justify-between">
-          <div className="font-code">{signals}</div>
+        <div className="max-w-5xl mx-auto text-xs text-slate-500 flex justify-between items-start">
+          <div className="font-code flex-1">
+            {analysis && (
+              <div className="text-xs opacity-80 pt-2">
+                <b>Diagnostics:</b>
+                <span className="ml-2">engine={analysis.engineVersion}</span>
+                <span className="ml-2">mode={analysis.mode}</span>
+                <span className="ml-2">alphabet={analysis.alphabet}</span>
+                {"solveMs" in analysis && <span className="ml-2">solveMs={analysis.solveMs}</span>}
+                {data?.cacheHit && <span className="ml-2 px-1.5 py-0.5 rounded bg-accent/20 border border-accent text-accent-foreground">cacheHit</span>}
+                <div className="mt-1">{signals}</div>
+              </div>
+            )}
+          </div>
           <div className="flex items-center gap-4">
             {analysis && (
               <Link
@@ -274,3 +287,5 @@ export default function LinguisticDecoderApp(){
     </div>
   );
 }
+
+    
