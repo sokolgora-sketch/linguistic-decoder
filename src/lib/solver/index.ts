@@ -1,6 +1,6 @@
 
 
-import { VOWELS, Vowel, VOWEL_LEVEL, VOWEL_RING, VOWEL_VALUE, computeC, chooseProfile, LangProfile, extractWindowClassesWithProfile, readWindowsDebug, checksumV } from "./valueTables";
+import { VOWELS, Vowel, VOWEL_LEVEL, VOWEL_RING, computeC, chooseProfile, LangProfile, extractWindowClassesWithProfile, readWindowsDebug, checksumV, VOWEL_VALUE } from "./valueTables";
 import type { Analysis, Path, SolveMode } from "./types";
 import { CFG, ENGINE_VERSION, Alphabet } from "./engineConfig";
 
@@ -76,18 +76,19 @@ function opCostFromLabel(op: string, costs: { sub: number; del: number; ins: num
   return costs.sub;
 }
 
-function mkPath(base: Vowel[], seq: Vowel[], E: number, ops: string[], consClasses: ReturnType<typeof extractWindowClassesWithProfile>): Path {
+function mkPath(baseSeq: Vowel[], consClasses: ReturnType<typeof extractWindowClassesWithProfile>, seq: Vowel[], E: number, ops: string[]): Path {
+    const voicePath = seq;
     const p: Path = {
-        vowelPath: seq,
-        ringPath: seq.map(v=>VOWEL_RING[v]),
-        levelPath: seq.map(v=>VOWEL_LEVEL[v]),
-        checksums: [{type:"V",value:checksumV(seq)}, {type:"E",value:E}, {type:"C",value:computeC(seq, consClasses)}],
-        kept: keptCount(base, seq),
+        vowelPath: voicePath,
+        ringPath: voicePath.map(v=>VOWEL_RING[v]),
+        levelPath: voicePath.map(v=>VOWEL_LEVEL[v]),
+        checksums: [{type:"V",value:checksumV(voicePath)}, {type:"E",value:E}, {type:"C",value:computeC(voicePath, consClasses)}],
+        kept: keptCount(baseSeq, voicePath),
         ops,
     };
 
-    if (p.kept > Math.min(base.length, seq.length)) {
-        throw new Error(`Keeps overflow: kept=${p.kept} base=${base.length} seq=${seq.length}`);
+    if (p.kept > Math.min(baseSeq.length, seq.length)) {
+        throw new Error(`Keeps overflow: kept=${p.kept} base=${baseSeq.length} seq=${seq.length}`);
     }
     if (ops.some(o=>o.startsWith("insert ") && o!=="closure Ë")) throw new Error("Illegal insert op");
     return p;
@@ -146,7 +147,7 @@ function solveWord(word: string, opts: SolveOptions): Omit<Analysis, "word" | "m
     if (st.ops.length > maxOps) continue;
     
     // Add current state to solutions
-    const p = mkPath(baseSeq, st.seq, st.E, st.ops, consClasses);
+    const p = mkPath(baseSeq, consClasses, st.seq, st.E, st.ops);
     paths.push(p);
 
     // Get next states
@@ -210,5 +211,6 @@ export function baseForTests(word: string): Vowel[] {
   const norm = normalizeTerminalY(raw, word);
   return (norm.length ? norm : (["O"] as Vowel[])) as Vowel[];
 }
+
 
 
