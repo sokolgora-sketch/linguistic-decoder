@@ -1,3 +1,4 @@
+
 'use server';
 
 /**
@@ -9,7 +10,7 @@
  */
 
 import {ai, MODELS} from '@/ai/genkit';
-import {GenerateResponse, generate} from 'genkit/ai';
+import {generate} from 'genkit';
 import {z} from 'genkit';
 
 const MapWordToLanguageFamiliesInputSchema = z.object({
@@ -34,13 +35,13 @@ export async function mapWordToLanguageFamilies(
   return mapWordToLanguageFamiliesFlow(input);
 }
 
-const prompt = ai.definePrompt({
+const promptConfig = {
   name: 'mapWordToLanguageFamiliesPrompt',
   input: {schema: MapWordToLanguageFamiliesInputSchema},
   output: {schema: MapWordToLanguageFamiliesOutputSchema},
   prompt: `ROLE: Map a computed Seven-Voices path to language candidate families.\nNEVER change the path. No rankings. No stories. Output ONLY JSON.\n\nSEVEN VOICES (for wording only)\nA=Action, E=Expansion, I=Insight, O=Mediator, U=Breath/Impulse, Y=Network/Integrity, Ë=Unit/Mother.\n\nFAMILIES TO CONSIDER (include only if plausible):\nAlbanian (Gegë/Tosk), Greek, Latin, Sanskrit, Semitic, Slavic, Germanic/English, PIE, Sumerian.\n\nALLOWED NOTES:\n- You may mention soft morphs: g↔gj, s↔sh, optional h/j around gu/gi, final -a/-ë.\n- Do NOT invent historical chains; if unsure, omit that family.\n\nOUTPUT SCHEMA (exact):\n{\n  "candidates_map": {\n    "Albanian": [\n      { "form": "string", "map": ["smallest parts…"], "functional": "Action | Instrument/Function | Unit/Result" }\n    ],\n    "Greek": [ { "form": "string", "map": ["…"], "functional": "…" } ],\n    "Latin": [ { "form": "string", "map": ["…"], "functional": "…" } ]\n  },\n  "signals": ["short notes if any"]\n}\n\nSTYLE:\n- Deterministic, concise, JSON only. No prose outside JSON.\n\nINPUT YOU RECEIVE (actual):\n{{{json this}}}
 \nReturn ONLY the JSON per schema.`,
-});
+};
 
 const mapWordToLanguageFamiliesFlow = ai.defineFlow(
   {
@@ -52,7 +53,11 @@ const mapWordToLanguageFamiliesFlow = ai.defineFlow(
     let lastError: any;
     for (const model of MODELS) {
       try {
-        const {output} = await prompt({input, model});
+        const {output} = await generate({
+          model,
+          ...promptConfig,
+          input,
+        });
         return output!;
       } catch (e) {
         lastError = e;
