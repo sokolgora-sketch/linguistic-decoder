@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useEffect } from "react";
@@ -41,10 +42,7 @@ export default function LinguisticDecoderApp(){
   useEffect(() => {
     // This is a pre-fetch, so we don't handle errors here.
     // analyzeClient is designed to be robust.
-    analyzeClient(debouncedWord.trim(), mode, alphabet, {
-      onStart: () => setIsWarming(true),
-      onFinish: () => setIsWarming(false),
-    }).catch(() => {/* prefetch failed, do nothing */});
+    analyzeClient(debouncedWord.trim(), mode, alphabet).catch(() => {/* prefetch failed, do nothing */});
   }, [debouncedWord, mode, alphabet]);
   
 
@@ -60,10 +58,15 @@ export default function LinguisticDecoderApp(){
     setErr(null);
     setData(null);
     try {
-      // 1. Get raw result from API or cache and GUARANTEE the shape
-      const normalizedPayload = await analyzeClient(useWord, useMode, useAlphabet);
-      
-      // 2. Call the AI flow with the guaranteed-correct data shape
+      // 1. Get raw result from API or cache
+      const clientResponse = await analyzeClient(useWord, useMode, useAlphabet);
+      console.log("API result:", clientResponse);
+
+      // 2. GUARANTEE the shape
+      const normalizedPayload = normalizeEnginePayload(clientResponse);
+      console.debug("Primary Path object:", normalizedPayload.primaryPath);
+
+      // 3. Call the AI flow with the guaranteed-correct data shape
       let finalPayload = normalizedPayload;
       if (!normalizedPayload.cacheHit) {
           try {
@@ -76,18 +79,45 @@ export default function LinguisticDecoderApp(){
           }
       }
       
-      // 3. Set state with the clean, final payload
+      // 4. Set state with the clean, final payload
       setData(finalPayload);
 
     } catch (e: any) {
       const error = e?.message || "Request failed";
+      console.error("Analysis chain failed:", e);
       setErr(error);
-      toast({ title: "Error", description: error, variant: "destructive" });
       setData(null);
     } finally {
       setLoading(false);
     }
   }
+
+  function runSmokeTest() {
+    const mock: any = {
+        engineVersion: "mock-v1",
+        word: "smoke-test",
+        mode: "strict",
+        alphabet: "auto",
+        primaryPath: { voicePath: ["U","I"], ringPath: [1,1], levelPath: [-1,1], ops: ["test-op"], kept: 2, checksums: {V:55, E:0, C:2} },
+        frontierPaths: [
+            { voicePath: ["A","E"], ringPath: [3,2], levelPath: [1,1], ops: [], checksums: {V:6, E:1, C:1}, kept: 0 },
+        ],
+        windows: ["d"],
+        windowClasses: ["Plosive"],
+        signals: ["smoke-test-signal"],
+        solveMs: 1,
+    };
+    try {
+        const normalized = normalizeEnginePayload(mock);
+        setData(normalized);
+        setErr(null);
+        toast({ title: "Smoke Test", description: "Displaying mock data for 'study'." });
+    } catch(e:any){
+        setErr(`Smoke test failed: ${e.message}`);
+        setData(null);
+    }
+  }
+
 
   useEffect(() => {
     const p = new URLSearchParams(window.location.search);
@@ -149,7 +179,7 @@ export default function LinguisticDecoderApp(){
 
         {/* Controls */}
         <Card className="p-4">
-          <div className="grid grid-cols-[1fr_auto_auto_auto_auto] gap-2.5 items-center">
+          <div className="grid grid-cols-[1fr_auto_auto_auto_auto_auto] gap-2.5 items-center">
             <Input
               value={word}
               onChange={e=> setWord(e.target.value)}
@@ -176,6 +206,7 @@ export default function LinguisticDecoderApp(){
             <Button onClick={()=> analyze()} disabled={!canAnalyze}>
               {loading ? "Analyzing…" : "Analyze"}
             </Button>
+            <Button onClick={runSmokeTest} variant="outline" title="Display a mock result to test the UI">Smoke Test</Button>
           </div>
           {err && (
             <div className="mt-2.5 border border-red-300 bg-red-50 text-red-800 text-sm p-2 rounded">
@@ -288,5 +319,7 @@ export default function LinguisticDecoderApp(){
     </div>
   );
 }
+
+    
 
     
