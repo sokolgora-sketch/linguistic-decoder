@@ -15,11 +15,13 @@ export type CClass =
   | "Affricate" | "Plosive";
 
 export type LangProfile = {
-  id: "albanian" | "latin" | "turkish" | "german" | string;
-  detect: (w: string) => boolean;
-  DIGRAPH: Record<string, CClass>;
-  LETTER: Record<string, CClass>;
+  id: "albanian" | "latin" | "sanskrit" | "ancient_greek" | "pie" | string;
+  detect: (w: string) => boolean;         // heuristic
+  DIGRAPH: Record<string, CClass>;        // matched first
+  LETTER:  Record<string, CClass>;         // fallback
+  pre?: (s: string) => string;             // optional window preproc (e.g., transliterate)
 };
+
 
 export function classRange(cls: CClass): [number, number] {
   switch (cls) {
@@ -131,20 +133,19 @@ export function chooseProfile(word: string, override?: string): LangProfile {
 }
 
 function classifyWindow(chars: string, profile: LangProfile): CClass {
-  const s = chars.toLowerCase();
-  const { DIGRAPH, LETTER } = profile;
+    let s = chars.toLowerCase();
+    if (profile.pre) s = profile.pre(s);
 
-  for (let i = 0; i < s.length - 1; i++) {
-    const dg = s.slice(i, i + 2);
-    if (DIGRAPH[dg as keyof typeof DIGRAPH]) return DIGRAPH[dg as keyof typeof DIGRAPH];
-  }
-  for (const ch of s) {
-    if (/[aeiouyë]/i.test(ch)) continue;
-    if (LETTER[ch as keyof typeof LETTER]) return LETTER[ch as keyof typeof LETTER];
-  }
-  return "NonSibilantFricative";
+    for (let i = 0; i < s.length - 1; i++) {
+        const dg = s.slice(i, i + 2);
+        if (profile.DIGRAPH[dg as keyof typeof profile.DIGRAPH]) return profile.DIGRAPH[dg as keyof typeof profile.DIGRAPH];
+    }
+    for (const ch of s) {
+        if (/[aeiouyë]/i.test(ch)) continue;
+        if (profile.LETTER[ch as keyof typeof profile.LETTER]) return profile.LETTER[ch as keyof typeof profile.LETTER];
+    }
+    return "NonSibilantFricative";
 }
-
 
 export function extractWindowClasses(
   word: string,
