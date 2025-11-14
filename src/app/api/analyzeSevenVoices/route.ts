@@ -31,12 +31,15 @@ function baseSeqFor(word: string): Vowel[] {
 // Main handler for the POST request
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
-    const w = String(body.word || "").trim();
-    const strict = String(body.mode || "strict") === "strict";
-    const alphabet = String(body.alphabet || CFG.alphabet) as Alphabet;
+    const { word, mode, alphabet: alphaFromReq } = await request.json().catch(() => ({}));
+    const w = String(word || "").trim();
+    const strict = String(mode || "strict") === "strict";
+    const alphabet = (alphaFromReq || CFG.alphabet) as Alphabet;
     
     // Input validation
+    if (!w) {
+        return NextResponse.json({ error: "Missing 'word'." }, { status: 400 });
+    }
     if (!/^[a-zë*-₁₂₃ḱǵ-]{1,48}$/i.test(w)) {
         return NextResponse.json({ error: "letters/dashes/special only, ≤48" }, { status: 400 });
     }
@@ -64,7 +67,7 @@ export async function POST(request: NextRequest) {
         frontier: analysisResult.frontierPaths.map(formatPath),
         windows,
         windowClasses: classes,
-        signals: [...analysisResult.signals, `alphabet=${profile.id}`],
+        signals: [...analysisResult.signals],
         ts: Date.now(),
     };
     
