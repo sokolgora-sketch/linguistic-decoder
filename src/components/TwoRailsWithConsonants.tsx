@@ -15,7 +15,7 @@ const VOICE_COLOR: Record<Vowel, string> = {
   Y: "#6366F1",
   "Ë": "#8B5CF6",
 };
-const PALETTE = { rail:"#1f2937", accent:"#FFB300", text:"#111827", muted:"#6b7280", bg:"#fff" };
+const PALETTE = { rail:"#1f2937", accent:"#FFB300", text:"#111827", muted:"#6b7280", bg:"#f9fafb" };
 
 // --- Consonant classes (from solver) ---
 type CClass = "Plosive" | "Affricate" | "SibilantFricative" | "NonSibilantFricative" | "Nasal" | "Liquid" | "Glide";
@@ -319,3 +319,5 @@ export function TwoRailsWithConsonants({
     </div>
   );
 }
+
+    
