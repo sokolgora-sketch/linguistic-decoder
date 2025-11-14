@@ -10,9 +10,9 @@ export type Checksum = {
 };
 
 export type Path = {
-  voice_path: Vowel[];
-  ring_path: number[];
-  level_path: number[];
+  voicePath: Vowel[];
+  ringPath: number[];
+  levelPath: number[];
   ops: string[];
   checksums: Checksum;
   kept: number;
@@ -23,13 +23,11 @@ export type Analysis = {
   word: string;
   mode: SolveMode;
   alphabet: string;
-  primary: Path;
-  frontier: Path[];
+  primaryPath: Path;
+  frontierPaths: Path[];
   signals: string[];
   windows?: string[];
   windowClasses?: CClass[];
 };
 
 export type SolveMode = "strict" | "open";
-
-    

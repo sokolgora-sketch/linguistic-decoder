@@ -7,10 +7,10 @@ test("toMappingRecord provides required fields", () => {
     engineVersion: "2025-11-14-core-6",
     mode: "strict",
     alphabet: "albanian",
-    primary: {
-      voice_path: ["I","E"],
-      ring_path: [1,2],
-      level_path: [1,1],
+    primaryPath: {
+      voicePath: ["I","E"],
+      ringPath: [1,2],
+      levelPath: [1,1],
       ops: []
     },
     signals: []
@@ -22,5 +22,3 @@ test("toMappingRecord provides required fields", () => {
   expect(m.level_path).toEqual([1,1]);
   expect(Array.isArray(m.ops)).toBe(true);
 });
-
-    

@@ -70,7 +70,7 @@ function scoreTuple(p: Path): [number, number, number, number, number] {
   const C = p.checksums.C;
   return [
     E,
-    ringPenalty(p.voice_path),
+    ringPenalty(p.voicePath),
     C * CFG.cWeight,
     -p.kept,
     V,
@@ -88,13 +88,13 @@ function opCostFromLabel(op: string, costs: { sub: number; del: number; ins: num
 }
 
 function mkPath(baseSeq: Vowel[], consClasses: ReturnType<typeof extractWindowClassesWithProfile>, seq: Vowel[], E: number, ops: string[]): Path {
-    const voice_path = seq;
+    const voicePath = seq;
     const p: Path = {
-        voice_path,
-        ring_path: voice_path.map(v=>VOWEL_RING[v]),
-        level_path: voice_path.map(v=>VOWEL_LEVEL[v]),
-        checksums: {V:checksumV(voice_path), E:E, C:computeC(voice_path, consClasses)},
-        kept: keptCount(baseSeq, voice_path),
+        voicePath,
+        ringPath: voicePath.map(v=>VOWEL_RING[v]),
+        levelPath: voicePath.map(v=>VOWEL_LEVEL[v]),
+        checksums: {V:checksumV(voicePath), E:E, C:computeC(voicePath, consClasses)},
+        kept: keptCount(baseSeq, voicePath),
         ops,
     };
 
@@ -172,13 +172,13 @@ function solveWord(word: string, opts: SolveOptions): Omit<Analysis, "word" | "m
   }
 
   // De-duplicate and sort paths
-  const uniqPaths = Array.from(new Map(paths.map(p => [p.voice_path.join(""), p])).values());
+  const uniqPaths = Array.from(new Map(paths.map(p => [p.voicePath.join(""), p])).values());
 
   uniqPaths.sort((p, q) => {
     const A = scoreTuple(p), B = scoreTuple(q);
     for(let i=0; i<A.length; i++) if (A[i] !== B[i]) return A[i] - B[i];
 
-    return preferClosureTie(p.voice_path, q.voice_path);
+    return preferClosureTie(p.voicePath, q.voicePath);
   });
 
   const primary = uniqPaths[0];
@@ -195,8 +195,8 @@ function solveWord(word: string, opts: SolveOptions): Omit<Analysis, "word" | "m
 
   return {
     engineVersion: ENGINE_VERSION,
-    primary: primary,
-    frontier: frontier,
+    primaryPath: primary,
+    frontierPaths: frontier,
     windows,
     windowClasses: consClasses,
     signals,
@@ -221,5 +221,3 @@ export function baseForTests(word: string): Vowel[] {
   const norm = normalizeTerminalY(raw, word);
   return (norm.length ? norm : (["O"] as Vowel[])) as Vowel[];
 }
-
-    

@@ -2,7 +2,7 @@
 'use client';
 import React, { useMemo } from "react";
 import { Card } from "@/components/ui/card";
-import type { PathBlock, AnalyzeResponse } from "@/app/page";
+import type { Path, AnalyzeResponse } from "@/app/page";
 import { CClass } from "@/lib/solver/valueTables";
 
 // Seven‑Voices palette (uses CSS variables from globals.css)
@@ -16,7 +16,7 @@ const VOICE_COLOR: Record<string, string> = {
   "Ë": "var(--voice-EH)"
 };
 
-function getChecksum(b: PathBlock, t: "V"|"E"|"C") {
+function getChecksum(b: any, t: "V"|"E"|"C") {
   const checksums = b.checksums;
   return checksums?.[t] ?? 0;
 }
@@ -43,6 +43,7 @@ type AnyPath = {
 };
 
 function normalizePath(p?: AnyPath) {
+  if (!p) return { voice: [], ring: [], level: [], checksums: undefined, ops: [], kept: undefined };
   return {
     voice: p?.voice_path ?? p?.voicePath ?? [],
     ring:  p?.ring_path  ?? p?.ringPath  ?? [],
@@ -119,8 +120,8 @@ function InfoLine({label, value, mono}:{label:string; value:string; mono?:boolea
 
 
 export function ResultsDisplay({ analysis }: { analysis: AnalyzeResponse['analysis'] }) {
-    const primary = analysis?.primary;
-    const frontierList = useMemo(() => (analysis?.frontier || []).filter(f => f?.voice_path && f.voice_path.join("") !== (primary?.voice_path || []).join("")), [analysis, primary]);
+    const primary = analysis?.primaryPath;
+    const frontierList = useMemo(() => (analysis?.frontierPaths || []).filter(f => f?.voicePath && f.voicePath.join("") !== (primary?.voicePath || []).join("")), [analysis, primary]);
 
     if (!primary) return null;
     
@@ -135,18 +136,18 @@ export function ResultsDisplay({ analysis }: { analysis: AnalyzeResponse['analys
                     <Card key={idx} className="p-3 border-accent">
                       <div className="font-bold mb-2">Alt #{idx+1}</div>
                       <div className="flex flex-wrap gap-1.5 items-center">
-                        {f.voice_path.map((v,i)=> (
+                        {f.voicePath.map((v,i)=> (
                           <React.Fragment key={i}>
                             <Chip v={v} />
-                            {i < f.voice_path.length-1 && <Arrow/>}
+                            {i < f.voicePath.length-1 && <Arrow/>}
                           </React.Fragment>
                         ))}
                       </div>
                       <hr className="my-2 border-border" />
                       <div className="font-code text-xs">V={getChecksum(f, "V")} · E={getChecksum(f, "E")} · C={getChecksum(f, "C")}</div>
                       <div className="font-code text-xs mt-1">Keeps: {typeof f.kept === "number" ? f.kept : "—"}</div>
-                      <div className="text-xs mt-1.5 text-slate-500">Levels: {labelLevels(f.level_path)}</div>
-                      <div className="text-xs text-slate-500">Rings: {labelRings(f.ring_path)}</div>
+                      <div className="text-xs mt-1.5 text-slate-500">Levels: {labelLevels(f.levelPath)}</div>
+                      <div className="text-xs text-slate-500">Rings: {labelRings(f.ringPath)}</div>
                     </Card>
                   ))}
                 </div>
@@ -155,7 +156,3 @@ export function ResultsDisplay({ analysis }: { analysis: AnalyzeResponse['analys
         </>
     );
 }
-
-    
-
-    

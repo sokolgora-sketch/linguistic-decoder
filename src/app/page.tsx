@@ -23,19 +23,18 @@ import ComparePanel from "@/components/ComparePanel";
 import { mapWordToLanguageFamilies } from "@/ai/flows/map-word-to-language-families";
 import { toMappingRecord } from "@/lib/schemaAdapter";
 import { ensureEnginePayload } from "@/lib/ensureEngine";
+import type { Path as AnalysisPath } from "@/lib/solver/types";
 
 
 // ==== Types matching the /analyzeWord response ===============================
-interface Checksums { V: number; E: number; C: number; }
-export interface PathBlock { voice_path: string[]; ring_path: number[]; level_path: number[]; ops: string[]; checksums: Checksums; kept?: number; deleted?: number; }
 export interface AnalyzeResponse {
   analysis: {
     engineVersion: string;
     word: string;
     mode: "strict"|"open";
     alphabet: Alphabet;
-    primary: PathBlock;
-    frontier: PathBlock[];
+    primaryPath: AnalysisPath;
+    frontierPaths: AnalysisPath[];
     signals: string[];
     windows?: string[];
     windowClasses?: any[];
@@ -45,6 +44,7 @@ export interface AnalyzeResponse {
   languageFamilies?: Record<string, { form:string; map:string[]; functional:string }[]> | null;
   cacheHit?: boolean;
 }
+export type Path = AnalysisPath;
 type Vowel = "A"|"E"|"I"|"O"|"U"|"Y"|"Ë";
 
 
@@ -87,7 +87,8 @@ export default function LinguisticDecoderApp(){
       
       // 2. Ensure we have a valid payload for the AI
       const enginePayload = await ensureEnginePayload(clientResponse.analysis, useMode, useAlphabet);
-      console.debug("Primary Path object:", enginePayload?.primary);
+      console.debug("Primary Path object:", enginePayload?.primaryPath);
+      console.debug("PrimaryPath keys:", enginePayload?.primaryPath && Object.keys(enginePayload.primaryPath));
 
 
       // 3. Call the AI flow with the guaranteed-correct data shape
@@ -214,9 +215,9 @@ export default function LinguisticDecoderApp(){
         {/* Visualization & Results */}
         <TwoRailsWithConsonants
           word={analysis?.word || word}
-          path={(analysis?.primary?.voice_path as Vowel[]) || []}
+          path={(analysis?.primaryPath?.voicePath as Vowel[]) || []}
           running={loading}
-          playKey={`${analysis?.word}|${(analysis?.primary?.voice_path || []).join("")}`}
+          playKey={`${analysis?.word}|${(analysis?.primaryPath?.voicePath || []).join("")}`}
           height={320}
           durationPerHopMs={900}
         />
@@ -313,7 +314,3 @@ export default function LinguisticDecoderApp(){
     </div>
   );
 }
-
-    
-
-    
