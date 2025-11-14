@@ -1,32 +1,16 @@
 
 import { NextResponse, type NextRequest } from 'next/server';
 import { solveMatrix, type SolveOptions, extractBase, normalizeTerminalY, type Vowel } from '@/lib/solver';
-import { ENGINE_VERSION, CFG, Alphabet } from '@/lib/solver/engineConfig';
-import { chooseProfile, readWindowsDebug, checksumV } from '@/lib/solver/valueTables';
+import { CFG, Alphabet } from '@/lib/solver/engineConfig';
+import { chooseProfile, readWindowsDebug } from '@/lib/solver/valueTables';
+import { ENGINE_VERSION } from '@/lib/solver/engineVersion';
 
 
-// Helper to transform a Path object to the specified format
-const formatPath = (path: any) => {
-  const checksums = (path.checksums || []).reduce((acc: any, curr: any) => {
-    acc[curr.type] = curr.value;
-    return acc;
-  }, {} as Record<'V' | 'E' | 'C', number>);
-
-  return {
-    voice_path: path.vowelPath,
-    ring_path: path.ringPath,
-    level_path: path.levelPath,
-    ops: path.ops,
-    checksums: checksums,
-    kept: path.kept,
-  };
-};
-
-function baseSeqFor(word: string): Vowel[] {
-  const raw = extractBase(word);
-  const norm = normalizeTerminalY(raw, word);
+const baseSeqFor = (w: string): Vowel[] => {
+  const raw = extractBase(w);
+  const norm = normalizeTerminalY(raw, w);
   return (norm.length ? norm : (["O"] as Vowel[])) as Vowel[];
-}
+};
 
 // Main handler for the POST request
 export async function POST(request: NextRequest) {
@@ -44,39 +28,35 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: "letters/dashes/special only, ≤48" }, { status: 400 });
     }
     
+    const t0 = Date.now();
     const opts: SolveOptions = strict
       ? { beamWidth: CFG.beamWidth, maxOps: CFG.maxOpsStrict, allowDelete: false, allowClosure: false, opCost: { sub: CFG.cost.sub, del: CFG.cost.del, ins: CFG.cost.insClosure }, alphabet }
       : { beamWidth: CFG.beamWidth, maxOps: CFG.maxOpsOpen,   allowDelete: true,  allowClosure: true,  opCost: { sub: CFG.cost.sub, del: CFG.cost.del, ins: CFG.cost.insClosure }, alphabet };
 
-
-    // Get windows debug info
-    const base = baseSeqFor(w);
-    const profile = chooseProfile(w, alphabet === "auto" ? undefined : alphabet);
-    const { windows, classes } = readWindowsDebug(w, base, profile);
-    console.log('Consonant windows: ', windows); // before path calculation
     
     // Run the solver
     const analysisResult = solveMatrix(w, opts);
 
-    const primaryPath = analysisResult.primaryPath;
-    console.log('Primary path: ', primaryPath.vowelPath);
-    console.log('Checksums: ', checksumV(primaryPath.vowelPath));
+    const base = baseSeqFor(w);
+    const profile = chooseProfile(w, alphabet === "auto" ? undefined : alphabet);
+    const { windows, classes } = readWindowsDebug(w, base, profile);
     
     // Format the response to match the specification
-    const formattedResponse = {
+    const payload = {
         engineVersion: ENGINE_VERSION,
         word: analysisResult.word,
         mode: analysisResult.mode,
         alphabet,
-        primary: formatPath(analysisResult.primaryPath),
-        frontier: analysisResult.frontierPaths.map(formatPath),
+        primary: analysisResult.primaryPath,
+        frontier: analysisResult.frontierPaths,
         windows,
         windowClasses: classes,
-        signals: [...analysisResult.signals],
+        signals: [...analysisResult.signals, `alphabet=${profile.id}`],
+        solveMs: Date.now() - t0,
         ts: Date.now(),
     };
     
-    return NextResponse.json(formattedResponse);
+    return NextResponse.json(payload);
 
   } catch (e) {
     console.error("Error in /analyzeSevenVoices route:", e);
@@ -89,4 +69,3 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }
-

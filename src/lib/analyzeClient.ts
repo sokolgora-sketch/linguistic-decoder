@@ -5,7 +5,7 @@ import {
 } from "firebase/firestore";
 import { analyzeWordAction } from "@/app/actions";
 import type { Alphabet } from "./solver/engineConfig";
-import { ENGINE_VERSION } from "./solver/engineConfig";
+import { ENGINE_VERSION } from "./solver/engineVersion";
 
 type Mode = "strict" | "open";
 
