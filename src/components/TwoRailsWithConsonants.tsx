@@ -102,7 +102,7 @@ export function TwoRailsWithConsonants({
 
   // Mid-rail band
   const midY = (top + bottom) / 2;
-  const bandH = 48;
+  const bandH = 36;
 
   // Scanners while running
   const [scanT, setScanT] = React.useState(0);
@@ -222,11 +222,11 @@ export function TwoRailsWithConsonants({
           return (
             <g key={klass}>
               <rect x={x} y={midY - bandH/2} width={segW} height={bandH}
-                rx={10} ry={10}
+                rx={8} ry={8}
                 fill={active ? PALETTE.accent : "#f3f4f6"}
                 fillOpacity={active ? 0.9 : 0.6}
                 stroke="#d1d5db" strokeOpacity={0.6} />
-              <text x={x+segW/2} y={midY} textAnchor="middle" fontSize={11}
+              <text x={x+segW/2} y={midY} textAnchor="middle" fontSize={10}
                 fill={active ? "#111827" : PALETTE.muted} dominantBaseline="central">
                 {shortName}
               </text>
@@ -319,5 +319,3 @@ export function TwoRailsWithConsonants({
     </div>
   );
 }
-
-    
