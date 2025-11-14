@@ -23,24 +23,12 @@ import ComparePanel from "@/components/ComparePanel";
 import { mapWordToLanguageFamilies } from "@/ai/flows/map-word-to-language-families";
 import { toMappingRecord } from "@/lib/schemaAdapter";
 import { ensureEnginePayload } from "@/lib/ensureEngine";
-import type { Path as AnalysisPath } from "@/lib/solver/types";
+import type { Path as AnalysisPath, Analysis } from "@/lib/solver/types";
 
 
 // ==== Types matching the /analyzeWord response ===============================
 export interface AnalyzeResponse {
-  analysis: {
-    engineVersion: string;
-    word: string;
-    mode: "strict"|"open";
-    alphabet: Alphabet;
-    primaryPath: AnalysisPath;
-    frontierPaths: AnalysisPath[];
-    signals: string[];
-    windows?: string[];
-    windowClasses?: any[];
-    trace?: { v: string; level: 1 | 0 | -1; E?: number }[];
-    solveMs?: number;
-  },
+  analysis: Analysis,
   languageFamilies?: Record<string, { form:string; map:string[]; functional:string }[]> | null;
   cacheHit?: boolean;
 }
@@ -152,7 +140,7 @@ export default function LinguisticDecoderApp(){
     const fn = `${data.analysis.word || "analysis"}_${data.analysis.mode || "mode"}_${data.analysis.alphabet || "auto"}.json`;
     a.download = fn;
     document.body.appendChild(a);
-    a.click();
+a.click();
     a.remove();
     URL.revokeObjectURL(url);
   }
