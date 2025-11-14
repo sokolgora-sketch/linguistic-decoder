@@ -7,6 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Candidates } from "@/components/Candidates";
 import { HistoryPanel, type HistItem } from "@/components/HistoryPanel";
@@ -14,6 +15,9 @@ import { ResultsDisplay } from "@/components/ResultsDisplay";
 import { ConsonantReference } from "@/components/ConsonantReference";
 import { TwoRailsWithConsonants } from "@/components/TwoRailsWithConsonants";
 import { CClass } from "@/lib/solver/valueTables";
+import type { Alphabet } from "@/lib/solver/engineConfig";
+import { PROFILES } from "@/lib/solver/valueTables";
+
 
 // ==== Types matching the /analyzeWord response ===============================
 interface Checksums { V: number; E: number; C: number; }
@@ -23,6 +27,7 @@ export interface AnalyzeResponse {
     engineVersion: string;
     word: string;
     mode: "strict"|"open";
+    alphabet: Alphabet;
     primary: PathBlock;
     frontier: PathBlock[];
     signals: string[];
@@ -72,6 +77,7 @@ export default function LinguisticDecoderApp(){
 
   const [word, setWord] = useState("study");
   const [mode, setMode] = useState<"strict"|"open">("strict");
+  const [alphabet, setAlphabet] = useState<Alphabet>("auto");
   const [data, setData] = useState<AnalyzeResponse | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -79,14 +85,15 @@ export default function LinguisticDecoderApp(){
   
   const canAnalyze = word.trim().length > 0 && !loading;
 
-  async function analyze(nextWord?: string, nextMode?: "strict"|"open"){
+  async function analyze(nextWord?: string, nextMode?: "strict"|"open", nextAlphabet?: Alphabet){
     const useWord = (nextWord ?? word).trim();
     const useMode: "strict"|"open" = nextMode ?? mode;
+    const useAlphabet = nextAlphabet ?? alphabet;
     if (!useWord) return;
     try {
       setLoading(true); 
       setErr(null);
-      const res = await analyzeWordAction({ word: useWord, mode: useMode });
+      const res = await analyzeWordAction({ word: useWord, mode: useMode, alphabet: useAlphabet });
 
       if (!res.ok) {
         toast({ title: "Error", description: res.error, variant: "destructive" });
@@ -125,7 +132,7 @@ export default function LinguisticDecoderApp(){
       {/* Controls */}
       <main className="max-w-5xl mx-auto my-4 p-4">
         <Card className="p-4">
-          <div className="grid grid-cols-[1fr_auto_auto] gap-2.5 items-center">
+          <div className="grid grid-cols-[1fr_auto_auto_auto] gap-2.5 items-center">
             <Input
               value={word}
               onChange={e=> setWord(e.target.value)}
@@ -137,6 +144,17 @@ export default function LinguisticDecoderApp(){
               <input type="checkbox" checked={mode==="strict"} onChange={e=> setMode(e.target.checked?"strict":"open")} className="w-4 h-4 rounded text-primary focus:ring-primary" />
               Strict
             </label>
+            <Select value={alphabet} onValueChange={(v) => setAlphabet(v as Alphabet)}>
+                <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="Language" />
+                </SelectTrigger>
+                <SelectContent>
+                    <SelectItem value="auto">Auto-Detect</SelectItem>
+                    {PROFILES.map(p => (
+                        <SelectItem key={p.id} value={p.id}>{p.id.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</SelectItem>
+                    ))}
+                </SelectContent>
+            </Select>
             <Button onClick={()=> analyze()} disabled={!canAnalyze}>
               {loading ? "Analyzing…" : "Analyze"}
             </Button>
@@ -169,6 +187,7 @@ export default function LinguisticDecoderApp(){
                 <Card className="p-5">
                   <ol className="list-decimal pl-5 mt-2 space-y-2 text-sm">
                     <li>Type a word and click <kbd className="border border-b-2 rounded-md bg-slate-100 px-1.5 py-0.5 text-xs">Analyze</kbd>.</li>
+                    <li>Use the dropdown to force a specific phonetic profile, or leave on "Auto-Detect".</li>
                     <li>Primary block shows Voice / Level / Ring paths and checksums <span className="font-code">V/E/C</span>.</li>
                     <li>Frontier lists near‑optimal alternates (deterministic order).</li>
                     <li>If mapping is enabled server‑side, language candidates appear below.</li>

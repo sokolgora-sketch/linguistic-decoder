@@ -1,60 +1,71 @@
 
 import { NextResponse, type NextRequest } from 'next/server';
-import { solveMatrix, type SolveOptions } from '@/lib/solver';
+import { solveMatrix, type SolveOptions, extractBase, normalizeTerminalY, type Vowel } from '@/lib/solver';
 import { ENGINE_VERSION, CFG, Alphabet } from '@/lib/solver/engineConfig';
+import { chooseProfile, readWindowsDebug } from '@/lib/solver/valueTables';
 
-// Helper to transform the checksums array into an object
-const formatChecksums = (checksums: {type: 'V'|'E'|'C', value:number}[]) => {
-  return checksums.reduce((acc, curr) => {
-    acc[curr.type] = curr.value;
-    return acc;
-  }, {} as Record<'V' | 'E' | 'C', number>);
-};
 
 // Helper to transform a Path object to the specified format
 const formatPath = (path: any) => {
+  const checksums = (path.checksums || []).reduce((acc: any, curr: any) => {
+    acc[curr.type] = curr.value;
+    return acc;
+  }, {} as Record<'V' | 'E' | 'C', number>);
+
   return {
     voice_path: path.vowelPath,
     ring_path: path.ringPath,
     level_path: path.levelPath,
     ops: path.ops,
-    checksums: formatChecksums(path.checksums),
+    checksums: checksums,
     kept: path.kept,
   };
 };
 
+function baseSeqFor(word: string): Vowel[] {
+  const raw = extractBase(word);
+  const norm = normalizeTerminalY(raw, word);
+  return (norm.length ? norm : (["O"] as Vowel[])) as Vowel[];
+}
 
 // Main handler for the POST request
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { word, mode = "strict" } = body;
+    const w = String(body.word || "").trim();
+    const strict = String(body.mode || "strict") === "strict";
+    const alphabet = String(body.alphabet || CFG.alphabet) as Alphabet;
     
     // Input validation
-    const w = String(word || "").trim();
-    if (!/^[a-zë-]{1,48}$/i.test(w)) {
-        return NextResponse.json({ error: "letters/dashes only, ≤48" }, { status: 400 });
+    if (!/^[a-zë*-₁₂₃ḱǵ-]{1,48}$/i.test(w)) {
+        return NextResponse.json({ error: "letters/dashes/special only, ≤48" }, { status: 400 });
     }
     
-    const strict = mode === "strict";
     const opts: SolveOptions = strict
-      ? { beamWidth: CFG.beamWidth, maxOps: CFG.maxOpsStrict, allowDelete: false, allowClosure: false, opCost: { sub: CFG.cost.sub, del: CFG.cost.del, ins: CFG.cost.insClosure } }
-      : { beamWidth: CFG.beamWidth, maxOps: CFG.maxOpsOpen,   allowDelete: true,  allowClosure: true,  opCost: { sub: CFG.cost.sub, del: CFG.cost.del, ins: CFG.cost.insClosure } };
+      ? { beamWidth: CFG.beamWidth, maxOps: CFG.maxOpsStrict, allowDelete: false, allowClosure: false, opCost: { sub: CFG.cost.sub, del: CFG.cost.del, ins: CFG.cost.insClosure }, alphabet }
+      : { beamWidth: CFG.beamWidth, maxOps: CFG.maxOpsOpen,   allowDelete: true,  allowClosure: true,  opCost: { sub: CFG.cost.sub, del: CFG.cost.del, ins: CFG.cost.insClosure }, alphabet };
 
 
     // Run the solver
     const analysisResult = solveMatrix(w, opts);
+
+    // Get windows debug info
+    const base = baseSeqFor(w);
+    const profile = chooseProfile(w, alphabet === "auto" ? undefined : alphabet);
+    const { windows, classes } = readWindowsDebug(w, base, profile);
     
     // Format the response to match the specification
     const formattedResponse = {
         engineVersion: ENGINE_VERSION,
         word: analysisResult.word,
         mode: analysisResult.mode,
+        alphabet,
         primary: formatPath(analysisResult.primaryPath),
         frontier: analysisResult.frontierPaths.map(formatPath),
-        windows: analysisResult.windows,
-        windowClasses: analysisResult.windowClasses,
-        signals: analysisResult.signals,
+        windows,
+        windowClasses: classes,
+        signals: [...analysisResult.signals, `alphabet=${profile.id}`],
+        ts: Date.now(),
     };
     
     return NextResponse.json(formattedResponse);

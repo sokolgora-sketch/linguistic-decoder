@@ -24,11 +24,7 @@ const labelLevels = (levels: number[]) => levels.map(l=> LEVEL_LABEL[l] ?? l).jo
 const labelRings = (rings: number[]) => rings.join(" → ");
 
 function getChecksum(b: PathBlock, t: "V"|"E"|"C") {
-  const checksums = b.checksums as { type: "V"|"E"|"C"; value: number }[] | { V: number; E: number; C: number };
-  if (Array.isArray(checksums)) {
-    return checksums.find(c => c.type === t)?.value ?? 0;
-  }
-  // Fallback for old structure, can be removed later
+  const checksums = b.checksums;
   return checksums?.[t] ?? 0;
 }
 
@@ -65,7 +61,7 @@ function PathRow({block, title, windows, windowClasses}:{block:PathBlock; title:
         <InfoLine label="Checksums" value={`V=${V} · E=${E} · C=${C}`} mono />
         {typeof block.kept === "number" ? <InfoLine label="Keeps" value={String(block.kept)} /> : null}
       </div>
-      {windows && windowClasses && (
+      {windows && windowClasses && windows.length > 0 && (
         <div className="mt-2.5">
           <InfoLine label="Consonant Windows" value={windows.map((w,i)=>`'${w}' → ${windowClasses[i]}`).join(" | ")} mono />
         </div>
