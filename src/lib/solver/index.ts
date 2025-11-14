@@ -56,10 +56,10 @@ function preferClosureTie(a: Vowel[], b: Vowel[]): number {
 function scoreTuple(base: Vowel[], p: Path): [number, number, number, number, number] {
   return [
     p.checksums.find(c => c.type === "E")!.value,
-    p.checksums.find(c => c.type === "C")!.value,
     ringPenalty(p.vowelPath),
     -p.kept,
-    checksumV(p.vowelPath),
+    p.checksums.find(c => c.type === "V")!.value,
+    p.checksums.find(c => c.type === "C")!.value,
   ];
 }
 
@@ -165,7 +165,7 @@ function mkPath(base: Vowel[], seq: Vowel[], E: number, ops: string[], consClass
 function neighbors(base: Vowel[], st: State, opts: SolveOptions): State[] {
   const out: State[] = [];
   const seq = st.seq;
-  const { allowDelete = true, allowClosure = true, opCost = { sub:CFG.cost.sub, del:CFG.cost.del, ins:CFG.cost.insClosure } } = opts;
+  const { allowDelete, allowClosure, opCost } = opts;
 
   // substitute
   for (let i=0;i<seq.length;i++){
@@ -234,10 +234,7 @@ function solveWord(word: string, opts: SolveOptions): Omit<Analysis, "word" | "m
     const A = scoreTuple(baseSeq, p), B = scoreTuple(baseSeq, q);
     for(let i=0; i<A.length; i++) if (A[i] !== B[i]) return A[i] - B[i];
 
-    const c = preferClosureTie(p.vowelPath, q.vowelPath);
-    if (c !== 0) return c;
-    
-    return A[A.length-1] - B[B.length-1];
+    return preferClosureTie(p.vowelPath, q.vowelPath);
   });
 
   const primary = uniqPaths[0];
