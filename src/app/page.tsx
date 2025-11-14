@@ -13,10 +13,12 @@ import { Candidates } from "@/components/Candidates";
 import { ResultsDisplay } from "@/components/ResultsDisplay";
 import { ConsonantReference } from "@/components/ConsonantReference";
 import { TwoRailsWithConsonants } from "@/components/TwoRailsWithConsonants";
-import { analyzeClient } from "@/lib/analyzeClient";
+import { analyzeClient, prefetchAnalyze } from "@/lib/analyzeClient";
 import type { Alphabet } from "@/lib/solver/engineConfig";
 import { PROFILES } from "@/lib/solver/valueTables";
 import { ThemeToggle } from "@/components/ThemeProvider";
+import { useDebounced } from "@/hooks/useDebounced";
+import { Copy, Download } from "lucide-react";
 
 
 // ==== Types matching the /analyzeWord response ===============================
@@ -51,6 +53,12 @@ export default function LinguisticDecoderApp(){
   const [err, setErr] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [showDebug, setShowDebug] = useState(false);
+
+  // Debounce user input, then warm the cache in the background
+  const debouncedWord = useDebounced(word, 450);
+  useEffect(() => {
+    prefetchAnalyze(debouncedWord.trim(), mode, alphabet);
+  }, [debouncedWord, mode, alphabet]);
 
   const canAnalyze = word.trim().length > 0 && !loading;
 
@@ -93,6 +101,26 @@ export default function LinguisticDecoderApp(){
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  async function copyJSON() {
+    if (!data) return;
+    await navigator.clipboard.writeText(JSON.stringify(data, null, 2));
+    toast({ title: "Copied!", description: "Result JSON copied to clipboard." });
+  }
+
+  function downloadJSON() {
+    if (!data) return;
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    const fn = `${data.analysis.word || "analysis"}_${data.analysis.mode || "mode"}_${data.analysis.alphabet || "auto"}.json`;
+    a.download = fn;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
 
   const analysis = data?.analysis;
   const signals = analysis?.signals?.join(" · ") || "";
@@ -193,8 +221,14 @@ export default function LinguisticDecoderApp(){
         {showDebug && data && (
           <div className="my-4">
               <Card className="p-4">
-                  <h3 className="font-bold text-sm tracking-wide">API Echo (debug)</h3>
-                  <pre className="font-code text-xs whitespace-pre-wrap bg-slate-50 p-2.5 rounded-lg max-h-96 overflow-auto mt-2">
+                  <div className="flex justify-between items-center mb-2">
+                    <h3 className="font-bold text-sm tracking-wide">API Echo (debug)</h3>
+                    <div className="flex gap-2">
+                        <Button onClick={copyJSON} size="sm" variant="outline"><Copy className="mr-2"/> Copy</Button>
+                        <Button onClick={downloadJSON} size="sm" variant="outline"><Download className="mr-2"/> Download</Button>
+                    </div>
+                  </div>
+                  <pre className="font-code text-xs whitespace-pre-wrap bg-slate-50 dark:bg-slate-800 p-2.5 rounded-lg max-h-96 overflow-auto mt-2">
                       {JSON.stringify(data, null, 2)}
                   </pre>
               </Card>
