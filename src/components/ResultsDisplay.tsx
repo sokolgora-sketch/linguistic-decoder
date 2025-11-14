@@ -21,6 +21,16 @@ const joinPath = (p: string[]) => p.join(" → ");
 const labelLevels = (levels: number[]) => levels.map(l=> LEVEL_LABEL[l] ?? l).join(" → ");
 const labelRings = (rings: number[]) => rings.join(" → ");
 
+function getChecksum(b: PathBlock, t: "V"|"E"|"C") {
+  const checksums = b.checksums as { type: "V"|"E"|"C"; value: number }[] | { V: number; E: number; C: number };
+  if (Array.isArray(checksums)) {
+    return checksums.find(c => c.type === t)?.value ?? 0;
+  }
+  // Fallback for old structure, can be removed later
+  return checksums?.[t] ?? 0;
+}
+
+
 function Chip({v}:{v:string}){
   return (
     <span className="inline-flex items-center gap-1.5 py-1 px-2 rounded-full border border-accent bg-white">
@@ -31,9 +41,9 @@ function Chip({v}:{v:string}){
 }
 
 function PathRow({block, title}:{block:PathBlock; title:string}){
-  const V = block.checksums?.V ?? 0;
-  const E = block.checksums?.E ?? 0;
-  const C = block.checksums?.C ?? 0;
+  const V = getChecksum(block, "V");
+  const E = getChecksum(block, "E");
+  const C = getChecksum(block, "C");
 
   return (
     <Card className="p-4">
@@ -77,8 +87,6 @@ export function ResultsDisplay({ analysis }: { analysis: AnalyzeResponse['analys
     const frontierList = useMemo(() => (analysis?.frontier || []).filter(f => f.voice_path.join("") !== (primary?.voice_path || []).join("")), [analysis, primary]);
 
     if (!primary) return null;
-    
-    const getChecksum = (b: PathBlock, t: "V"|"E"|"C") => b.checksums?.[t] ?? 0;
 
     return (
         <>
