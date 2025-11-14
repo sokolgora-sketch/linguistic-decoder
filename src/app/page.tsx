@@ -12,7 +12,7 @@ import { Candidates } from "@/components/Candidates";
 import { ResultsDisplay } from "@/components/ResultsDisplay";
 import { ConsonantReference } from "@/components/ConsonantReference";
 import { TwoRailsWithConsonants } from "@/components/TwoRailsWithConsonants";
-import { analyzeClient, prefetchAnalyze } from "@/lib/analyzeClient";
+import { analyzeClient } from "@/lib/analyzeClient";
 import type { Alphabet } from "@/lib/solver/engineConfig";
 import { PROFILES } from "@/functions/languages";
 import { ThemeToggle } from "@/components/ThemeProvider";
@@ -21,8 +21,7 @@ import { Copy, Download, Loader } from "lucide-react";
 import ComparePanel from "@/components/ComparePanel";
 import { mapWordToLanguageFamilies } from "@/ai/flows/map-word-to-language-families";
 import { toMappingRecord } from "@/lib/schemaAdapter";
-import type { EnginePayload, Vowel } from "@/shared/engineShape";
-import { normalizeEnginePayload } from "@/shared/engineShape";
+import { normalizeEnginePayload, type EnginePayload, type Vowel } from "@/shared/engineShape";
 
 
 // ==== Main App ===============================================================
@@ -40,11 +39,14 @@ export default function LinguisticDecoderApp(){
   // Debounce user input, then warm the cache in the background
   const debouncedWord = useDebounced(word, 450);
   useEffect(() => {
-    prefetchAnalyze(debouncedWord.trim(), mode, alphabet, {
+    // This is a pre-fetch, so we don't handle errors here.
+    // analyzeClient is designed to be robust.
+    analyzeClient(debouncedWord.trim(), mode, alphabet, {
       onStart: () => setIsWarming(true),
       onFinish: () => setIsWarming(false),
-    });
+    }).catch(() => {/* prefetch failed, do nothing */});
   }, [debouncedWord, mode, alphabet]);
+  
 
   const canAnalyze = word.trim().length > 0 && !loading;
 
@@ -55,17 +57,13 @@ export default function LinguisticDecoderApp(){
     if (!useWord) return;
 
     setLoading(true);
-    setIsWarming(false);
     setErr(null);
     setData(null);
     try {
-      // 1. Get raw result from API or cache
-      const rawResponse = await analyzeClient(useWord, useMode, useAlphabet);
+      // 1. Get raw result from API or cache and GUARANTEE the shape
+      const normalizedPayload = await analyzeClient(useWord, useMode, useAlphabet);
       
-      // 2. GUARANTEE the shape with the normalizer. This is the single source of truth.
-      const normalizedPayload = normalizeEnginePayload(rawResponse);
-      
-      // 3. Call the AI flow with the guaranteed-correct data shape
+      // 2. Call the AI flow with the guaranteed-correct data shape
       let finalPayload = normalizedPayload;
       if (!normalizedPayload.cacheHit) {
           try {
@@ -78,7 +76,7 @@ export default function LinguisticDecoderApp(){
           }
       }
       
-      // 4. Set state with the clean, final payload
+      // 3. Set state with the clean, final payload
       setData(finalPayload);
 
     } catch (e: any) {
@@ -179,7 +177,11 @@ export default function LinguisticDecoderApp(){
               {loading ? "Analyzing…" : "Analyze"}
             </Button>
           </div>
-          {err && <div className="mt-2.5 text-red-700 font-semibold">Error: {err}</div>}
+          {err && (
+            <div className="mt-2.5 border border-red-300 bg-red-50 text-red-800 text-sm p-2 rounded">
+              <b>Error:</b> {err}
+            </div>
+          )}
            {data?.cacheHit && <div className="mt-2.5 text-sm font-semibold text-accent-foreground">Result loaded from cache.</div>}
         </Card>
 
@@ -263,6 +265,7 @@ export default function LinguisticDecoderApp(){
                 <span className="ml-2">alphabet={data.alphabet}</span>
                 {"solveMs" in data && <span className="ml-2">solveMs={data.solveMs}</span>}
                 {data?.cacheHit && <span className="ml-2 px-1.5 py-0.5 rounded bg-accent/20 border border-accent text-accent-foreground">cacheHit</span>}
+                {data?.recomputed && <span className="ml-2 px-1.5 py-0.5 rounded bg-blue-100 dark:bg-blue-900 border border-blue-300 dark:border-blue-700">recomputed</span>}
                 <div className="mt-1">{signals}</div>
               </div>
             )}
@@ -285,3 +288,5 @@ export default function LinguisticDecoderApp(){
     </div>
   );
 }
+
+    
