@@ -122,7 +122,37 @@ export const German: LangProfile = {
   },
 };
 
-export const PROFILES: LangProfile[] = [Albanian, Turkish, German, Latin];
+export const Sanskrit: LangProfile = {
+  id: "sanskrit",
+  // IAST markers or common ASCII surrogates
+  detect: (w) => /[āīūṛṝḷḹṅñṇṭḍśṣḥṃṁ]|kh|gh|ch|jh|ṭ|ḍ|ś|ṣ/i.test(w),
+  DIGRAPH: {
+    // aspirated plosives → Plosive
+    kh:"Plosive", gh:"Plosive", th:"Plosive", dh:"Plosive", ph:"Plosive", bh:"Plosive",
+    // palatal affricates
+    ch:"Affricate", jh:"Affricate",
+    // clusters often seen
+    ks:"SibilantFricative", kṣ:"SibilantFricative", // ASCII & IAST
+  },
+  LETTER: {
+    // plosives (incl. retroflex)
+    k:"Plosive", g:"Plosive", t:"Plosive", d:"Plosive", p:"Plosive", b:"Plosive",
+    ṭ:"Plosive", ḍ:"Plosive", q:"Plosive",
+    // affricates
+    c:"Affricate", j:"Affricate",
+    // sibilants
+    s:"SibilantFricative", ś:"SibilantFricative", ṣ:"SibilantFricative", z:"SibilantFricative",
+    // non-sibilant fricatives/approximants
+    f:"NonSibilantFricative", v:"NonSibilantFricative", h:"NonSibilantFricative",
+    // sonorants
+    m:"Nasal", n:"Nasal", ñ:"Nasal", ṅ:"Nasal", ṇ:"Nasal",
+    l:"Liquid", r:"Liquid",
+    y:"Glide", w:"Glide",
+  },
+};
+
+
+export const PROFILES: LangProfile[] = [Albanian, Sanskrit, Turkish, German, Latin];
 
 export function chooseProfile(word: string, override?: string): LangProfile {
   if (override) {
