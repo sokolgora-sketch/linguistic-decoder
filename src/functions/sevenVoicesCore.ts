@@ -67,9 +67,11 @@ function mkPath(
     const dPrefix = Math.abs(VOWEL_RING[voicePath[1]] - VOWEL_RING[voicePath[0]]);
     finalE += edgeBiasPenalty(dPrefix, edgeInfo.prefix?.cls ?? null, edgeWeight);
 
-    const lastHopIdx = voicePath.length - 2;
-    const dSuffix = Math.abs(VOWEL_RING[voicePath[lastHopIdx + 1]] - VOWEL_RING[voicePath[lastHopIdx]]);
-    finalE += edgeBiasPenalty(dSuffix, edgeInfo.suffix?.cls ?? null, edgeWeight);
+    if (voicePath.length > 2) {
+        const lastHopIdx = voicePath.length - 2;
+        const dSuffix = Math.abs(VOWEL_RING[voicePath[lastHopIdx + 1]] - VOWEL_RING[voicePath[lastHopIdx]]);
+        finalE += edgeBiasPenalty(dSuffix, edgeInfo.suffix?.cls ?? null, edgeWeight);
+    }
   }
 
 
