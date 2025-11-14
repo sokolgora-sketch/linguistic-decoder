@@ -49,16 +49,15 @@ export async function analyzeClient(word: string, mode: Mode, alphabet: Alphabet
   // BYPASS / WRITE-THROUGH: compute fresh or use provided payload, skip cache read
   if (opts.bypass) {
     const payload = opts.payload ? normalizeEnginePayload(opts.payload) : computeLocal(word, mode, alphabet);
-    const finalPayload = { ...payload, recomputed: true, cacheHit: false };
+    const finalPayload = { 
+        ...payload, 
+        recomputed: true, 
+        cacheHit: false,
+        languageFamilies: payload.languageFamilies ?? null,
+    };
     
     if (!opts.skipWrite) {
-      // Ensure no undefined fields before writing
-      const docToWrite = {
-        ...finalPayload,
-        languageFamilies: finalPayload.languageFamilies ?? null,
-        cachedAt: serverTimestamp()
-      };
-      await setDoc(cacheRef, docToWrite, { merge: true });
+      await setDoc(cacheRef, { ...finalPayload, cachedAt: serverTimestamp() }, { merge: true });
     }
     
     void saveHistory(cacheId, word, mode, alphabet, "bypass");
@@ -142,5 +141,3 @@ export async function prefetchAnalyze(
     callbacks?.onFinish?.();
   }
 }
-
-    
