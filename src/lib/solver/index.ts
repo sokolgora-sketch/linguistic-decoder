@@ -197,7 +197,7 @@ function solveWord(word: string, opts: SolveOptions): Omit<Analysis, "word" | "m
 
   return {
     engineVersion: ENGINE_VERSION,
-    primaryPath: primary,
+    primary: primary,
     frontierPaths: frontier,
     windows,
     windowClasses: consClasses,
@@ -222,6 +222,7 @@ export function baseForTests(word: string): Vowel[] {
   const norm = normalizeTerminalY(raw, word);
   return (norm.length ? norm : (["O"] as Vowel[])) as Vowel[];
 }
+
 
 
 

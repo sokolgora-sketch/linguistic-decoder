@@ -21,7 +21,7 @@ export type Analysis = {
   engineVersion: string;
   word: string;
   mode: SolveMode;
-  primaryPath: Path;
+  primary: Path;
   frontierPaths: Path[];
   signals: string[];
   windows?: string[];
