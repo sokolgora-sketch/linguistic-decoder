@@ -61,7 +61,7 @@ function opCost(observed: Vowel|undefined, chosen: Vowel|"Ø", opts: SolveOption
   const { opCost: costs = { sub:1, del:3, ins:2 } } = opts;
   if (!observed){
     if (chosen === "Ø") return { cost: 0, kind: "keep" };  // nothing to keep
-    return { cost: costs.ins, op: `insert ${chosen}`, kind: "ins" };
+    return { cost: costs.ins, kind: "ins" };
   } else {
     if (chosen === "Ø") {
         if (!opts.allowDelete) return { cost: 999, kind: "del" };
