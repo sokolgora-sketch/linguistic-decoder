@@ -31,7 +31,7 @@ function getChecksum(b: PathBlock, t: "V"|"E"|"C") {
 
 function Chip({v}:{v:string}){
   return (
-    <span className="inline-flex items-center gap-1.5 py-1 px-2 rounded-full border border-accent bg-white">
+    <span className="inline-flex items-center gap-1.5 py-1 px-2 rounded-full border border-accent bg-card text-card-foreground">
       <span className="w-2.5 h-2.5 rounded-full inline-block" style={{ background: VOICE_COLOR[v] || 'hsl(var(--primary))' }} />
       <span className="font-bold">{v}</span>
     </span>
