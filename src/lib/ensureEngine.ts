@@ -4,6 +4,7 @@ import { db } from "@/lib/firebase";
 import { doc, getDoc } from "firebase/firestore";
 import { analyzeClient } from "@/lib/analyzeClient";
 import type { Alphabet } from "./solver/engineConfig";
+import { ENGINE_VERSION } from "./solver/engineVersion";
 
 type Mode = "strict"|"open";
 
@@ -16,8 +17,9 @@ export async function ensureEnginePayload(
   if (source?.primary?.voice_path?.length) return source;
 
   // History row? Try analyses/{cacheId}
-  if (source?.cacheId) {
-    const snap = await getDoc(doc(db, "analyses", source.cacheId));
+  const cacheId = `${source.word}|${source.mode}|${source.alphabet}|${ENGINE_VERSION}`;
+  if (source?.word && source?.mode && source?.alphabet) {
+    const snap = await getDoc(doc(db, "analyses", cacheId));
     if (snap.exists()) {
         const data = snap.data();
         // The data from cache is nested under an 'analysis' key

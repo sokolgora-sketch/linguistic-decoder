@@ -65,12 +65,12 @@ function preferClosureTie(a: Vowel[], b: Vowel[]): number {
 }
 
 function scoreTuple(p: Path): [number, number, number, number, number] {
-  const E = p.checksums.find(c => c.type === "E")!.value;
-  const V = p.checksums.find(c => c.type === "V")!.value;
-  const C = p.checksums.find(c => c.type === "C")!.value;
+  const E = p.checksums.E;
+  const V = p.checksums.V;
+  const C = p.checksums.C;
   return [
     E,
-    ringPenalty(p.vowelPath),
+    ringPenalty(p.voice_path),
     C * CFG.cWeight,
     -p.kept,
     V,
@@ -88,13 +88,13 @@ function opCostFromLabel(op: string, costs: { sub: number; del: number; ins: num
 }
 
 function mkPath(baseSeq: Vowel[], consClasses: ReturnType<typeof extractWindowClassesWithProfile>, seq: Vowel[], E: number, ops: string[]): Path {
-    const voicePath = seq;
+    const voice_path = seq;
     const p: Path = {
-        vowelPath: voicePath,
-        ringPath: voicePath.map(v=>VOWEL_RING[v]),
-        levelPath: voicePath.map(v=>VOWEL_LEVEL[v]),
-        checksums: [{type:"V",value:checksumV(voicePath)}, {type:"E",value:E}, {type:"C",value:computeC(voicePath, consClasses)}],
-        kept: keptCount(baseSeq, voicePath),
+        voice_path,
+        ring_path: voice_path.map(v=>VOWEL_RING[v]),
+        level_path: voice_path.map(v=>VOWEL_LEVEL[v]),
+        checksums: {V:checksumV(voice_path), E:E, C:computeC(voice_path, consClasses)},
+        kept: keptCount(baseSeq, voice_path),
         ops,
     };
 
@@ -139,7 +139,7 @@ function neighbors(base: Vowel[], st: State, opts: SolveOptions): State[] {
 
 
 // --- Main Solver ---
-function solveWord(word: string, opts: SolveOptions): Omit<Analysis, "word" | "mode"> {
+function solveWord(word: string, opts: SolveOptions): Omit<Analysis, "word" | "mode" | "alphabet"> {
   const rawBase = extractBase(word);
   const base = normalizeTerminalY(rawBase, word);
   const baseSeq = base.length ? base : (["O"] as Vowel[]);
@@ -172,24 +172,22 @@ function solveWord(word: string, opts: SolveOptions): Omit<Analysis, "word" | "m
   }
 
   // De-duplicate and sort paths
-  const uniqPaths = Array.from(new Map(paths.map(p => [p.vowelPath.join(""), p])).values());
+  const uniqPaths = Array.from(new Map(paths.map(p => [p.voice_path.join(""), p])).values());
 
   uniqPaths.sort((p, q) => {
     const A = scoreTuple(p), B = scoreTuple(q);
     for(let i=0; i<A.length; i++) if (A[i] !== B[i]) return A[i] - B[i];
 
-    return preferClosureTie(p.vowelPath, q.vowelPath);
+    return preferClosureTie(p.voice_path, q.voice_path);
   });
 
   const primary = uniqPaths[0];
 
   const frontier = uniqPaths
     .slice(1, K)
-    .filter(p => p.checksums.find(c => c.type === "E")!.value <= primary.checksums.find(c => c.type === "E")!.value + 2);
+    .filter(p => p.checksums.E <= primary.checksums.E + 2);
   
   const signals = [
-      `engine=${ENGINE_VERSION}`,
-      `alphabet=${profile.id}`,
       `base_raw=${rawBase.join("") || "-"}`,
       `base_norm=${base.join("") || "-"}`,
       `cons_windows=${consClasses.join(",") || "-"}`,
@@ -198,7 +196,7 @@ function solveWord(word: string, opts: SolveOptions): Omit<Analysis, "word" | "m
   return {
     engineVersion: ENGINE_VERSION,
     primary: primary,
-    frontierPaths: frontier,
+    frontier: frontier,
     windows,
     windowClasses: consClasses,
     signals,
@@ -214,6 +212,7 @@ export function solveMatrix(word: string, options: SolveOptions): Analysis {
     ...analysis,
     word,
     mode,
+    alphabet: (options.alphabet || CFG.alphabet) as Alphabet,
   };
 }
 
@@ -222,6 +221,7 @@ export function baseForTests(word: string): Vowel[] {
   const norm = normalizeTerminalY(raw, word);
   return (norm.length ? norm : (["O"] as Vowel[])) as Vowel[];
 }
+
 
 
 

@@ -4,16 +4,17 @@ import type { Vowel, CClass } from "./valueTables";
 export type { Vowel } from "./valueTables";
 
 export type Checksum = {
-  type: 'V' | 'E' | 'C';
-  value: number;
+  V: number;
+  E: number;
+  C: number;
 };
 
 export type Path = {
-  vowelPath: Vowel[];
-  ringPath: number[];
-  levelPath: number[];
+  voice_path: Vowel[];
+  ring_path: number[];
+  level_path: number[];
   ops: string[];
-  checksums: Checksum[];
+  checksums: Checksum;
   kept: number;
 };
 
@@ -21,8 +22,9 @@ export type Analysis = {
   engineVersion: string;
   word: string;
   mode: SolveMode;
+  alphabet: string;
   primary: Path;
-  frontierPaths: Path[];
+  frontier: Path[];
   signals: string[];
   windows?: string[];
   windowClasses?: CClass[];
