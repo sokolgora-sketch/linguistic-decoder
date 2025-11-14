@@ -1,7 +1,6 @@
-
-import { solveMatrix, baseForTests } from "./index";
-import { checksumV } from './valueTables';
-import type { SolveOptions } from "./index";
+import { solveWord } from "@/functions/sevenVoicesCore";
+import { checksumV, baseForTests } from "@/functions/sevenVoicesC";
+import type { SolveOptions } from "@/functions/sevenVoicesCore";
 import { CFG } from "./engineConfig";
 
 const strict: SolveOptions = { beamWidth: CFG.beamWidth, maxOps: CFG.maxOpsStrict, allowDelete: false, allowClosure: false, opCost: { sub: CFG.cost.sub, del: CFG.cost.del, ins: CFG.cost.insClosure } };
@@ -28,27 +27,27 @@ describe("checksumV", () => {
 
 
 test("mind (strict) → I", () => {
-  const { primary } = solveMatrix("mind", strict);
-  expect(primary.voice_path).toEqual(["I"]);
-  expect(V(primary)).toBe(5);
-  expect(E(primary)).toBe(0);
-  expect(C(primary)).toBe(0);
+  const { primaryPath } = solveWord("mind", strict, "auto");
+  expect(primaryPath.voicePath).toEqual(["I"]);
+  expect(V(primaryPath)).toBe(5);
+  expect(E(primaryPath)).toBe(0);
+  expect(C(primaryPath)).toBe(0);
 });
 
 test("study (strict) → U→I (Y normalized to I)", () => {
-  const { primary } = solveMatrix("study", strict);
-  expect(primary.voice_path).toEqual(["U","I"]);
-  expect(V(primary)).toBe(55);
-  expect(E(primary)).toBe(0); // Y→I is a normalization, not an op
-  expect(C(primary)).toBe(2); // |1-1|=0, t is plosive [2,3] → penalty 2
+  const { primaryPath } = solveWord("study", strict, "auto");
+  expect(primaryPath.voicePath).toEqual(["U","I"]);
+  expect(V(primaryPath)).toBe(55);
+  expect(E(primaryPath)).toBe(0); // Y→I is a normalization, not an op
+  expect(C(primaryPath)).toBe(2); // |1-1|=0, t is plosive [2,3] → penalty 2
 });
 
 test("damage (open) → A→I→Ë", () => {
-  const { primary } = solveMatrix("damage", open);
-  expect(primary.voice_path).toEqual(["A","I","Ë"]);
-  expect(V(primary)).toBe(170); // 2*5*17
-  expect(E(primary)).toBe(3); // A→E->I is 1 op, + closure-Ë
-  expect(C(primary)).toBe(0); // A(3)->I(1) |d|=2; I(1)->E(3) |d|=2
+  const { primaryPath } = solveWord("damage", open, "auto");
+  expect(primaryPath.voicePath).toEqual(["A","I","Ë"]);
+  expect(V(primaryPath)).toBe(170); // 2*5*17
+  expect(E(primaryPath)).toBe(3); // A→E->I is 1 op, + closure-Ë
+  expect(C(primaryPath)).toBe(0); // A(3)->I(1) |d|=2; I(1)->E(3) |d|=2
 });
 
 test('checksumV basics', () => {

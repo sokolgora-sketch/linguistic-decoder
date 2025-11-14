@@ -1,4 +1,4 @@
-import { ENGINE_VERSION } from "./engineVersion";
+import { ENGINE_VERSION } from "@/shared/engineVersion";
 export { ENGINE_VERSION };
 
 export type Alphabet = "auto" | "albanian" | "latin" | "sanskrit" | "ancient_greek" | "pie" | "turkish" | "german";

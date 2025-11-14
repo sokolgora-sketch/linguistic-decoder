@@ -1,8 +1,7 @@
-
 'use client';
 import React, { useMemo } from "react";
 import { Card } from "@/components/ui/card";
-import type { CClass } from "@/lib/solver/valueTables";
+import type { CClass } from "@/functions/languages";
 import type { EnginePayload, EnginePath } from "@/shared/engineShape";
 
 // Seven‑Voices palette (uses CSS variables from globals.css)

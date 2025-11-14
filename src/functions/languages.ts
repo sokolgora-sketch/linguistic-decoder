@@ -1,27 +1,3 @@
-
-import type { Vowel } from "./types";
-import { toVowel } from "./index";
-
-export const VOWELS = ["A", "E", "I", "O", "U", "Y", "Ë"] as const;
-
-export const VOWEL_VALUE: Record<Vowel, number> = { A: 2, E: 3, I: 5, O: 7, U: 11, Y: 13, "Ë": 17 };
-export const VOWEL_RING: Record<Vowel, number> = { A: 3, E: 2, I: 1, O: 0, U: 1, Y: 2, "Ë": 3 };
-export const VOWEL_LEVEL: Record<Vowel, number> = { A: +1, E: +1, I: +1, O: 0, U: -1, Y: -1, "Ë": -1 };
-
-export function checksumV(path: Vowel[]): number {
-  let product = 1;
-  const seen = new Set<Vowel>();
-  for (const v of path) {
-    if (!seen.has(v)) {
-      product *= VOWEL_VALUE[v];
-      seen.add(v);
-    }
-  }
-  return product;
-}
-
-// --- Language-Aware Consonant Classification ---
-
 export type CClass =
   | "Glide" | "Liquid" | "Nasal"
   | "NonSibilantFricative" | "SibilantFricative"
@@ -29,12 +5,11 @@ export type CClass =
 
 export type LangProfile = {
   id: "albanian" | "latin" | "sanskrit" | "ancient_greek" | "pie" | string;
-  detect: (w: string) => boolean;         // heuristic
-  DIGRAPH: Record<string, CClass>;        // matched first
-  LETTER:  Record<string, CClass>;         // fallback
-  pre?: (s: string) => string;             // optional window preproc (e.g., transliterate)
+  detect: (w: string) => boolean;
+  DIGRAPH: Record<string, CClass>;
+  LETTER: Record<string, CClass>;
+  pre?: (s: string) => string;
 };
-
 
 export function classRange(cls: CClass): [number, number] {
   switch (cls) {
@@ -250,81 +225,4 @@ export function chooseProfile(word: string, overrideId?: string): LangProfile {
     if (p) return p;
   }
   return PROFILES.find(p => p.detect(word)) || Latin;
-}
-
-export function classifyWindow(chars: string, P: LangProfile): CClass {
-    let s = chars.toLowerCase();
-    if (P.pre) s = P.pre(s);
-
-    for (let i = 0; i < s.length - 1; i++) {
-        const dg = s.slice(i, i + 2);
-        if (P.DIGRAPH[dg as keyof typeof P.DIGRAPH]) return P.DIGRAPH[dg as keyof typeof P.DIGRAPH];
-    }
-    for (const ch of s) {
-        if (/[aeiouyë]/i.test(ch)) continue;
-        if (P.LETTER[ch as keyof typeof P.LETTER]) return P.LETTER[ch as keyof typeof P.LETTER];
-    }
-    return "NonSibilantFricative";
-}
-
-export function computeC(voicePath: Vowel[], consClasses: CClass[]): number {
-  let c = 0;
-  const hops = Math.max(0, voicePath.length - 1);
-  for (let i = 0; i < hops; i++) {
-    const cls = i < consClasses.length ? consClasses[i] : "Glide";
-    const d = Math.abs(VOWEL_RING[voicePath[i + 1]] - VOWEL_RING[voicePath[i]]);
-    const [lo, hi] = classRange(cls);
-    if (d < lo) c += (lo - d);
-    else if (d > hi) c += (d - hi);
-  }
-  return c;
-}
-
-/**
- * Extract the raw substrings between the normalized base vowels.
- * Pure read: does NOT mutate state, does NOT depend on scoring.
- */
-export function extractWindows(word: string, baseSeq: Vowel[]): string[] {
-  const s = word.normalize("NFC");
-  // find indices of base vowels in raw string (first match per base slot)
-  const pos: number[] = [];
-  let vi = 0;
-  for (let i = 0; i < s.length && vi < baseSeq.length; i++) {
-    const v = toVowel ? toVowel(s[i]) : null;
-    if (!v) continue;
-    if (v === baseSeq[vi]) { pos.push(i); vi++; }
-  }
-
-  const windows: string[] = [];
-  for (let k = 0; k < pos.length - 1; k++) {
-    windows.push(s.slice(pos[k] + 1, pos[k + 1]));
-  }
-  return windows;
-}
-
-/**
- * Thin helper used by tests: map windows → 7-class consonant labels,
- * using a chosen language profile. No scoring, deterministic.
- */
-export function extractWindowClassesWithProfile(
-  word: string,
-  baseSeq: Vowel[],
-  profile: LangProfile
-): CClass[] {
-  const windows = extractWindows(word, baseSeq);
-  // classifyWindow is your existing function that uses DIGRAPH/LETTER maps on the profile
-  return windows.map(w => classifyWindow(w, profile));
-}
-
-/**
- * Optional debug export (handy for UI): returns both windows and classes.
- */
-export function readWindowsDebug(
-  word: string,
-  baseSeq: Vowel[],
-  profile: LangProfile
-): { windows: string[]; classes: CClass[] } {
-  const windows = extractWindows(word, baseSeq);
-  const classes = windows.map(w => classifyWindow(w, profile));
-  return { windows, classes };
 }

@@ -1,9 +1,8 @@
-
 import { toMappingRecord } from "@/lib/schemaAdapter";
-import type { Analysis } from "@/lib/solver/types";
+import type { EnginePayload } from "@/shared/engineShape";
 
 test("toMappingRecord provides required fields", () => {
-  const engine: Analysis = {
+  const engine: EnginePayload = {
     word: "life",
     engineVersion: "2025-11-14-core-6",
     mode: "strict",

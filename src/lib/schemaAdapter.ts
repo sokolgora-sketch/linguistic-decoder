@@ -1,4 +1,3 @@
-
 // src/lib/schemaAdapter.ts
 import type { EnginePayload } from "@/shared/engineShape";
 

@@ -1,9 +1,4 @@
-
-
-import { chooseProfile } from "./valueTables";
-import { extractWindowClassesWithProfile } from "./valueTables";
-import { baseForTests } from "./index";
-import type { Vowel } from "./valueTables";
+import { chooseProfile, extractWindowClassesWithProfile, baseForTests } from "@/functions/sevenVoicesC";
 
 const classes = (word: string, profileId: string) => {
   const P = chooseProfile(word, profileId);

@@ -1,78 +1,79 @@
-
 import { db, ensureAnon, auth } from "@/lib/firebase";
-import {
-  doc, getDoc, setDoc, serverTimestamp, collection, addDoc
-} from "firebase/firestore";
-import type { Alphabet } from "./solver/engineConfig";
-import { ENGINE_VERSION } from "./solver/engineVersion";
+import { doc, getDoc, setDoc, serverTimestamp, collection, addDoc } from "firebase/firestore";
+import { ENGINE_VERSION } from "@/shared/engineVersion";
+import { normalizeEnginePayload, type EnginePayload } from "@/shared/engineShape";
+
+// Browser-safe engine code:
+import { solveWord } from "@/functions/sevenVoicesCore";
+import type { SolveOptions, Vowel } from "@/functions/sevenVoicesCore";
+import { chooseProfile } from "@/functions/languages";
+import { readWindowsDebug, extractBase, normalizeTerminalY } from "@/functions/sevenVoicesC";
+
 
 type Mode = "strict" | "open";
+type Alphabet = "auto"|"albanian"|"latin"|"sanskrit"|"ancient_greek"|"pie"|"turkish"|"german";
 type AnalyzeOpts = { bypass?: boolean; skipWrite?: boolean };
 
-// This returns the full payload from the API, which includes the `analysis` key
+const CFG = { beamWidth: 8, maxOpsStrict: 1, maxOpsOpen: 2, cost: { sub:1, del:3, insClosure:2 } };
+
+function computeLocal(word: string, mode: Mode, alphabet: Alphabet): EnginePayload {
+  const strict = mode === "strict";
+  const t0 = Date.now();
+  const opts: SolveOptions = strict
+    ? { beamWidth: CFG.beamWidth, maxOps: CFG.maxOpsStrict, allowDelete: false, allowClosure: false, opCost: CFG.cost }
+    : { beamWidth: CFG.beamWidth, maxOps: CFG.maxOpsOpen,   allowDelete: true,  allowClosure: true,  opCost: CFG.cost };
+
+  const analysisResult = solveWord(word, opts, alphabet);
+
+  // Construct canonical, then pass through normalizer (paranoid but consistent)
+  return normalizeEnginePayload({
+    ...analysisResult,
+    word,
+    mode,
+    alphabet,
+    solveMs: Date.now() - t0,
+    cacheHit: false,
+  });
+}
+
 export async function analyzeClient(word: string, mode: Mode, alphabet: Alphabet, opts: AnalyzeOpts = {}) {
   await ensureAnon();
   const cacheId = `${word}|${mode}|${alphabet}|${ENGINE_VERSION}`;
   const cacheRef = doc(db, "analyses", cacheId);
 
-  // BYPASS: For re-analysis or special cases.
+  // BYPASS: compute fresh, skip cache unless skipWrite=false
   if (opts.bypass) {
-    const apiResponse = await fetchAnalysis(word, mode, alphabet);
+    const fresh = computeLocal(word, mode, alphabet);
+    const payload = { ...fresh, recomputed: true, cacheHit: false };
     if (!opts.skipWrite) {
-      await setDoc(cacheRef, { ...apiResponse, cachedAt: serverTimestamp() }, { merge: true });
+      await setDoc(cacheRef, { ...payload, cachedAt: serverTimestamp() }, { merge: false });
     }
-    void saveHistory(word, mode, alphabet);
-    return { ...apiResponse, cacheHit: false, recomputed: true };
+    void saveHistory(cacheId, word, mode, alphabet, "bypass");
+    return payload;
   }
 
-  // 1) READ CACHE
+  // Try cache -> normalize (in case older writes used a different shape)
   const snap = await getDoc(cacheRef);
   if (snap.exists()) {
-    console.log("Cache hit!");
-    const data = snap.data();
-    void saveHistory(word, mode, alphabet); 
-    // The cached data should have the same shape as the API response
-    return { ...data, cacheHit: true };
+    const normalized = normalizeEnginePayload(snap.data());
+    void saveHistory(cacheId, word, mode, alphabet, "cache");
+    return { ...normalized, cacheHit: true, recomputed: false };
   }
 
-  console.log("Cache miss, calling API...");
-  
-  // 2) CALL API
-  const apiResponse = await fetchAnalysis(word, mode, alphabet);
-  
-  // 3) WRITE CACHE - The page will handle enriching with families and then writing.
-  // The API response now contains the `analysis` object directly.
-  await setDoc(cacheRef, { ...apiResponse, cachedAt: serverTimestamp() }, { merge: true });
-
-  // 4) WRITE USER HISTORY
-  await saveHistory(word, mode, alphabet);
-
-  // Return the full API response for the page to orchestrate AI call
-  return { ...apiResponse, cacheHit: false };
+  // Miss -> compute -> write -> return
+  const fresh = computeLocal(word, mode, alphabet);
+  await setDoc(cacheRef, { ...fresh, cachedAt: serverTimestamp() }, { merge: false });
+  void saveHistory(cacheId, word, mode, alphabet, "fresh");
+  return { ...fresh, cacheHit: false, recomputed: false };
 }
 
-async function fetchAnalysis(word: string, mode: Mode, alphabet: Alphabet) {
-  const res = await fetch(`/api/analyzeSevenVoices`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ word, mode, alphabet }),
-  });
-
-  if (!res.ok) {
-      const errorData = await res.json();
-      throw new Error(errorData.error || 'Analysis failed');
-  }
-  return await res.json();
-}
-
-async function saveHistory(word: string, mode: Mode, alphabet: Alphabet) {
+async function saveHistory(
+  cacheId: string, word: string, mode: Mode, alphabet: Alphabet, source: "cache"|"fresh"|"bypass"
+) {
   const u = auth.currentUser;
   if (!u) return;
   const ref = collection(db, "users", u.uid, "history");
-  await addDoc(ref, {
-    word, mode, alphabet,
-    createdAt: serverTimestamp(),
-  });
+  await addDoc(ref, { cacheId, word, mode, alphabet, engineVersion: ENGINE_VERSION, source, createdAt: serverTimestamp() });
 }
 
 
@@ -106,16 +107,8 @@ export async function prefetchAnalyze(
   PREFETCH_SEEN.add(cacheId);
 
   try {
-    const r = await fetch("/api/analyzeSevenVoices", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ word, mode, alphabet }),
-    });
-    const apiResponse = await r.json();
-    if (apiResponse?.error) return;
-
-    // The API response contains the `analysis` object, so we cache it all.
-    await setDoc(cacheRef, { ...apiResponse, cachedAt: serverTimestamp() }, { merge: true });
+    const fresh = computeLocal(word, mode, alphabet);
+    await setDoc(cacheRef, { ...fresh, cachedAt: serverTimestamp() }, { merge: false });
 
   } catch (e) {
     console.warn("Prefetch failed", e);
@@ -123,5 +116,3 @@ export async function prefetchAnalyze(
     callbacks?.onFinish?.();
   }
 }
-
-    

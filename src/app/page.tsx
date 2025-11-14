@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState, useEffect } from "react";
@@ -15,7 +14,7 @@ import { ConsonantReference } from "@/components/ConsonantReference";
 import { TwoRailsWithConsonants } from "@/components/TwoRailsWithConsonants";
 import { analyzeClient, prefetchAnalyze } from "@/lib/analyzeClient";
 import type { Alphabet } from "@/lib/solver/engineConfig";
-import { PROFILES } from "@/lib/solver/valueTables";
+import { PROFILES } from "@/functions/languages";
 import { ThemeToggle } from "@/components/ThemeProvider";
 import { useDebounced } from "@/hooks/useDebounced";
 import { Copy, Download, Loader } from "lucide-react";
@@ -69,9 +68,14 @@ export default function LinguisticDecoderApp(){
       // 3. Call the AI flow with the guaranteed-correct data shape
       let finalPayload = normalizedPayload;
       if (!normalizedPayload.cacheHit) {
-          const mappingInput = toMappingRecord(normalizedPayload);
-          const mappingResult = await mapWordToLanguageFamilies(mappingInput);
-          finalPayload = { ...normalizedPayload, languageFamilies: mappingResult?.candidates_map || null };
+          try {
+            const mappingInput = toMappingRecord(normalizedPayload);
+            const mappingResult = await mapWordToLanguageFamilies(mappingInput);
+            finalPayload = { ...normalizedPayload, languageFamilies: mappingResult?.candidates_map || null };
+          } catch(aiError: any) {
+            console.warn("AI mapping failed, showing results without it.", aiError.message);
+            // Non-fatal, we can still show the main analysis
+          }
       }
       
       // 4. Set state with the clean, final payload
@@ -119,7 +123,7 @@ export default function LinguisticDecoderApp(){
     const fn = `${data.word || "analysis"}_${data.mode || "mode"}_${data.alphabet || "auto"}.json`;
     a.download = fn;
     document.body.appendChild(a);
-a.click();
+    a.click();
     a.remove();
     URL.revokeObjectURL(url);
   }
