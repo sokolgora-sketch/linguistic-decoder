@@ -151,8 +151,49 @@ export const Sanskrit: LangProfile = {
   },
 };
 
+function greekPre(s: string): string {
+  // Map Greek letters → ASCII tokens (minimal, deterministic)
+  return s
+    .replace(/[άὰᾶἀἁἄἅἂἃα]/g,"a")
+    .replace(/[έὲἐἑἔἕἒἓε]/g,"e")
+    .replace(/[ίὶῖἰἱἴἵἲἳι]/g,"i")
+    .replace(/[όὸοὀὁὄὅὂὃ]/g,"o")
+    .replace(/[ύὺῦυὐὑὔὕὒὓ]/g,"y")
+    .replace(/[ώὼωὠὡὤὥὢὣ]/g,"o")
 
-export const PROFILES: LangProfile[] = [Albanian, Sanskrit, Turkish, German, Latin];
+    .replace(/[β]/g,"b").replace(/[γ]/g,"g").replace(/[δ]/g,"d")
+    .replace(/[ζ]/g,"z").replace(/[θ]/g,"th")
+    .replace(/[κ]/g,"k").replace(/[λ]/g,"l").replace(/[μ]/g,"m").replace(/[ν]/g,"n")
+    .replace(/[ξ]/g,"ks").replace(/[π]/g,"p").replace(/[ρ]/g,"r")
+    .replace(/[σς]/g,"s").replace(/[τ]/g,"t")
+    .replace(/[φ]/g,"ph")   // classical: aspirated Plosive
+    .replace(/[χ]/g,"kh")   // aspirated Plosive
+    .replace(/[ψ]/g,"ps")
+    ;
+}
+
+export const AncientGreek: LangProfile = {
+  id: "ancient_greek",
+  detect: (w) => /[ἀ-῾φθχψξβγδζκλμνπρστσς]/i.test(w) || /(ph|th|kh|ps|ks)\b/i.test(w),
+  pre: greekPre,
+  DIGRAPH: {
+    ph:"Plosive", th:"Plosive", kh:"Plosive",
+    ps:"Plosive", ks:"SibilantFricative",   // treat ks as sibilant cluster
+    ch:"NonSibilantFricative",              // for latinized 'ch' variants if present
+  },
+  LETTER: {
+    p:"Plosive", b:"Plosive", t:"Plosive", d:"Plosive", k:"Plosive", g:"Plosive",
+    z:"Affricate",                           // ζ ~ [dz]/[zd] → affricate-ish
+    s:"SibilantFricative", x:"SibilantFricative",
+    f:"NonSibilantFricative", v:"NonSibilantFricative", h:"NonSibilantFricative",
+    m:"Nasal", n:"Nasal",
+    l:"Liquid", r:"Liquid",
+    w:"Glide", y:"Glide",
+  },
+};
+
+
+export const PROFILES: LangProfile[] = [Albanian, Sanskrit, AncientGreek, Turkish, German, Latin];
 
 export function chooseProfile(word: string, override?: string): LangProfile {
   if (override) {
