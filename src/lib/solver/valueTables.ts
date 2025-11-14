@@ -1,5 +1,4 @@
 
-
 import type { Vowel } from "./types";
 import { toVowel } from "./index";
 
@@ -279,7 +278,6 @@ export function extractWindows(word: string, baseSeq: Vowel[]): string[] {
   const pos: number[] = [];
   let vi = 0;
   for (let i = 0; i < s.length && vi < baseSeq.length; i++) {
-    // toVowel is already in your core; we just need a truthy check here
     const v = toVowel ? toVowel(s[i]) : null;
     if (!v) continue;
     if (v === baseSeq[vi]) { pos.push(i); vi++; }
