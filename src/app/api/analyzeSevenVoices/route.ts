@@ -2,6 +2,8 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { solveMatrix, type Analysis, type Path, type Checksum, type SolveMode, type SolveOptions } from '@/lib/solver';
 
+const ENGINE_VERSION = "2025-11-14-core-2";
+
 // Helper to transform the checksums array into an object
 const formatChecksums = (checksums: Checksum[]) => {
   return checksums.reduce((acc, curr) => {
@@ -61,7 +63,7 @@ export async function POST(request: NextRequest) {
     
     // Format the response to match the specification
     const formattedResponse = {
-        engineVersion: analysisResult.engineVersion,
+        engineVersion: ENGINE_VERSION,
         word: analysisResult.word,
         mode: analysisResult.mode,
         primary: formatPath(analysisResult.primaryPath),

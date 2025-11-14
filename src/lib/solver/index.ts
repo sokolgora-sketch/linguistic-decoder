@@ -1,5 +1,5 @@
 
-import { VOWELS, Vowel, VOWEL_LEVEL, VOWEL_RING, VOWEL_VALUE, STABILIZER_S, DIGRAPHS } from "./valueTables";
+import { VOWELS, Vowel, VOWEL_LEVEL, VOWEL_RING, VOWEL_VALUE } from "./valueTables";
 import type { Analysis, Path, SolveMode } from "./types";
 
 export type { Analysis, Path, SolveMode, Checksum, Vowel } from "./types";
@@ -13,116 +13,59 @@ export type SolveOptions = {
 };
 
 const DEFAULTS = {
-  engineVersion: "2025-11-14-core-1",
-  beamStrict: 12,
-  beamOpen: 20,
-  frontierDeltaE: { strict: 2, open: 3 }
+  engineVersion: "2025-11-14-core-2",
+  beamWidth: 8,
+  frontierDeltaE: 2
 };
 
+// --- Base Extraction & Keep Count ---
 function isVowelChar(ch:string){ const c=ch.normalize("NFC"); return /[aeiouy]/i.test(c)||c==="ë"||c==="Ë"; }
 function toVowel(ch:string):Vowel|null{ const u=ch.toUpperCase(); return u==="Ë" ? "Ë" : (["A","E","I","O","U","Y"].includes(u)?(u as Vowel):null); }
 function extractBase(word:string):Vowel[]{ const out:Vowel[]=[]; for(const ch of word.normalize("NFC")){ if(!isVowelChar(ch))continue; const v=toVowel(ch)!; if(out.length && out[out.length-1]===v)continue; out.push(v);} return out; }
 function keptCount(base:Vowel[], cand:Vowel[]){ let k=0; for(let i=0;i<Math.min(base.length,cand.length);i++) if(base[i]===cand[i]) k++; return k; }
 
-
 function nounishScore(word: string): number {
   const w = word.toLowerCase();
-  // strong noun/result suffixes → 2, softer → 1
   if (/(age|ment|tion|sion|ance|ence)\b/.test(w)) return 2;
   if (/(ness|ship|hood|dom|ure|um|us)\b/.test(w)) return 1;
-  // English silent -e after g/c often marks result nouns (e.g., damage, service)
   if (/(ge|ce)\b/.test(w)) return 1;
   return 0;
 }
 
-export function moveCost(a: Vowel, b: Vowel): number {
-  const ringStep = Math.abs(VOWEL_RING[a] - VOWEL_RING[b]);
-  const ringDisc = (a === "O" || b === "O") ? 1 : 0;
-  const ringCost = Math.max(0, ringStep - ringDisc);
-
-  const lvlStep = Math.abs(VOWEL_LEVEL[a] - VOWEL_LEVEL[b]);
-  const lvlDisc = (a === "O" || b === "O") ? 1 : 0;
-  const levelCost = Math.max(0, lvlStep - lvlDisc);
-
-  return ringCost + levelCost;
-}
-
-function gravityBonus(path: Vowel[]): number {
-  const lvl = path.map(v => VOWEL_LEVEL[v]);
-  let reversals = 0; for (let i=1;i<lvl.length;i++) if (lvl[i] > lvl[i-1]) reversals++;
-  const monotone = lvl.every((v,i)=> i===0 || v<=lvl[i-1]);
-  return (monotone ? -1 : 0) + reversals; // negative lowers E
-}
-
-type State = { row: Vowel|null; cost: number; path: Vowel[]; ops: string[]; cStab: number; kept: number; deleted: number; };
-type OpKind = "keep" | "sub" | "ins" | "del";
-
-function opCost(observed: Vowel|undefined, chosen: Vowel|"Ø", opts: SolveOptions): {cost:number, op?:string, kind: OpKind}{
-  const { opCost: costs = { sub:1, del:3, ins:2 } } = opts;
-  if (!observed){
-    if (chosen === "Ø") return { cost: 0, kind: "keep" };  // nothing to keep
-    return { cost: costs.ins, kind: "ins" };
-  } else {
-    if (chosen === "Ø") {
-        if (!opts.allowDelete) return { cost: 999, kind: "del" };
-        return { cost: costs.del, op: `delete ${observed}`, kind: "del" };
-    }
-    if (chosen === observed) return { cost: 0, kind: "keep" };
-    return { cost: costs.sub, op: `${observed}→${chosen}`, kind: "sub" };
-  }
-}
-
-function stabilizerAcross(cons: string[], idx: number, prev: Vowel|null, curr: Vowel|"Ø"): number {
-  if (idx<0 || curr==="Ø" || !prev) return 0;
-  if (prev === curr) return 0;
-  return STABILIZER_S[cons[idx]] ?? 0;
-}
-
-function dedupeKeepK(states: State[], K:number){
-  const seen = new Set<string>(), out: State[] = [];
-  for (const s of states){
-    const key = `${s.cost}|${s.path.join("")}`;
-    if (seen.has(key)) continue; seen.add(key); out.push(s);
-    if (out.length>=K) break;
-  }
-  return out;
-}
-
-const rankClosure = (c:Vowel)=> c==="Ë"?0: c==="A"?1:2;
-
-function uniqByPath<T extends { path: Vowel[] }>(arr: T[]): T[] {
-  const seen = new Set<string>(); const out: T[] = [];
-  for (const x of arr) { const k = x.path.join(""); if (seen.has(k)) continue; seen.add(k); out.push(x); }
-  return out;
-}
-
-function hasInstrument(path: Vowel[]) {
-  // E or I anywhere before the final closure
-  const inner = path.slice(0, -1);
-  return inner.some(v => v === "E" || v === "I");
-}
-function observedHasInstrument(slots: (Vowel|undefined)[]) {
-  return slots.some(v => v === "E" || v === "I");
-}
-
+// --- Path Scoring ---
+const checksumV = (p: Vowel[]) => p.reduce((acc,v)=> acc*VOWEL_VALUE[v], 1);
+const ringPenalty = (p:Vowel[]) => { let d=0; for(let i=0;i<p.length-1;i++) d+=Math.abs(VOWEL_RING[p[i]]-VOWEL_RING[p[i+1]]); return d;};
 function preferClosureTie(a: Vowel[], b: Vowel[]): number {
   const enda = a[a.length - 1] === "Ë" ? 0 : 1;
   const endb = b[b.length - 1] === "Ë" ? 0 : 1;
   return enda - endb;
 }
 
-function opCostFromLabel(op:string, costs: { sub: number; del: number; ins: number; }){ 
-    if(op.startsWith("delete")) return costs.del; 
-    if(op.startsWith("closure") || op.startsWith("insert")) return costs.ins; 
-    return costs.sub; 
+function scoreTuple(base: Vowel[], p: Path): [number, number, number, number] {
+  return [
+    p.checksums.find(c => c.type === "E")!.value,
+    ringPenalty(p.voicePath),
+    -p.kept,
+    checksumV(p.voicePath),
+  ];
 }
 
-function mkPath(base: Vowel[], seq: Vowel[], E: number, ops: string[], kept: number, cStab: number, opCosts: { sub: number; del: number; ins: number; }): Path {
+
+// --- Path Generation & State ---
+type State = { seq: Vowel[]; E: number; ops: string[] };
+
+function opCostFromLabel(op: string, costs: { sub: number; del: number; ins: number; }){ 
+  if(op.startsWith("delete")) return costs.del; 
+  if(op.startsWith("closure")) return costs.ins;
+  return costs.sub;
+}
+
+function mkPath(base: Vowel[], seq: Vowel[], E: number, ops: string[], opCosts: { sub: number; del: number; ins: number; }): Path {
     const p: Path = {
         voicePath: seq,
         ringPath: seq.map(v=>VOWEL_RING[v]),
         levelPath: seq.map(v=>VOWEL_LEVEL[v]),
-        checksums: [{type:"V",value:seq.reduce((acc,v)=> acc*VOWEL_VALUE[v], 1)}, {type:"E",value:E}, {type:"C",value:cStab}],
+        checksums: [{type:"V",value:checksumV(seq)}, {type:"E",value:E}, {type:"C",value:0}],
         kept: keptCount(base, seq),
         ops,
     };
@@ -132,169 +75,110 @@ function mkPath(base: Vowel[], seq: Vowel[], E: number, ops: string[], kept: num
     // if (Ecalc !== E) throw new Error(`Energy mismatch E=${E} sum(ops)=${Ecalc} ops=${ops.join(',')}`);
 
     if (p.kept > Math.min(base.length, seq.length)) {
-        console.warn(`Keeps overflow: kept=${p.kept} base=${base.length} seq=${seq.length}`);
+        throw new Error(`Keeps overflow: kept=${p.kept} base=${base.length} seq=${seq.length}`);
     }
-    // hard block any illegal op text that slipped in from old code:
-    if (ops.some(o=>o.startsWith("insert ") && !o.startsWith("insert Ë"))) throw new Error("Illegal insert op");
+    if (ops.some(o=>o.startsWith("insert ") && o!=="closure Ë")) throw new Error("Illegal insert op");
     return p;
 }
 
-function buildSlots(word: string){
-  const s = word.toLowerCase();
-  const consonants: string[] = [];
-  const slots: (Vowel|undefined)[] = [undefined];
-  for (let i=0; i<s.length;){
-    const two = s.slice(i,i+2);
-    if (!isVowelChar(s[i]) && DIGRAPHS.includes(two)) { consonants.push(two); slots.push(undefined); i+=2; continue; }
-    if (!isVowelChar(s[i])) { consonants.push(s[i]); slots.push(undefined); i++; continue; }
-    // vowel run -> take last of the run
-    let j=i, last: Vowel|undefined = undefined;
-    while (j<s.length && isVowelChar(s[j])){ last = toVowel(s[j]) ?? last; j++; }
-    slots[slots.length-1] = last; i=j;
+
+function neighbors(base: Vowel[], st: State, opts: SolveOptions): State[] {
+  const out: State[] = [];
+  const seq = st.seq;
+  const { allowDelete = true, allowClosure = true, opCost = { sub:1, del:3, ins:2 } } = opts;
+
+  // substitute
+  for (let i=0;i<seq.length;i++){
+    for (const v of VOWELS) if (v !== seq[i]) {
+      const next = seq.slice(); next[i] = v;
+      out.push({ seq: next, E: st.E + opCost.sub, ops: [...st.ops, `${seq[i]}→${v}`] });
+    }
   }
-  return { consonants, slots };
+
+  // delete (optional)
+  if (allowDelete) {
+    for (let i=0;i<seq.length;i++){
+      const next = seq.slice(0,i).concat(seq.slice(i+1));
+      if (!next.length) continue;
+      out.push({ seq: next, E: st.E + opCost.del, ops: [...st.ops, `delete ${seq[i]}`] });
+    }
+  }
+
+  // insert closure Ë (optional) — THE ONLY INSERT ALLOWED
+  if (allowClosure && seq[seq.length-1] !== "Ë") {
+    const next = seq.concat("Ë");
+    out.push({ seq: next, E: st.E + opCost.ins, ops: [...st.ops, "closure Ë"] });
+  }
+
+  return out;
+}
+
+// --- Main Solver ---
+function solveWord(word: string, opts: SolveOptions): Omit<Analysis, "word" | "mode"> {
+  const base = extractBase(word);
+  const baseSeq = base.length ? base : (["O"] as Vowel[]);
+
+  const K = opts.beamWidth ?? DEFAULTS.beamWidth;
+  const maxOps = opts.maxOps ?? 1;
+
+  let paths: Path[] = [];
+  const q: State[] = [{ seq: baseSeq, E: 0, ops: [] }];
+  const visited = new Set<string>([baseSeq.join("")]);
+
+  while (q.length > 0) {
+    const st = q.shift()!;
+    if (st.ops.length > maxOps) continue;
+    
+    // Add current state to solutions
+    const p = mkPath(baseSeq, st.seq, st.E, st.ops, opts.opCost!);
+    paths.push(p);
+
+    // Get next states
+    const nextStates = neighbors(baseSeq, st, opts);
+    for (const n of nextStates) {
+      const key = n.seq.join("");
+      if (visited.has(key)) continue;
+      visited.add(key);
+      q.push(n);
+    }
+  }
+
+  // De-duplicate and sort paths
+  const uniqPaths = Array.from(new Map(paths.map(p => [p.voicePath.join(""), p])).values());
+
+  uniqPaths.sort((p, q) => {
+    const A = scoreTuple(baseSeq, p), B = scoreTuple(baseSeq, q);
+    if (A[0] !== B[0]) return A[0] - B[0];
+    if (A[1] !== B[1]) return A[1] - B[1];
+    if (A[2] !== B[2]) return A[2] - B[2];
+    const c = preferClosureTie(p.voicePath, q.voicePath);
+    if (c !== 0) return c;
+    return A[3] - B[3];
+  });
+
+  const primary = uniqPaths[0];
+  const pKey = primary.voicePath.join("");
+
+  const frontier = uniqPaths
+    .slice(1, K)
+    .filter(p => p.checksums.find(c => c.type === "E")!.value <= primary.checksums.find(c => c.type === "E")!.value + DEFAULTS.frontierDeltaE);
+
+  return {
+    engineVersion: DEFAULTS.engineVersion,
+    primaryPath: primary,
+    frontierPaths: frontier,
+    signals: ["beam search; op costs; Ë-closure tiebreak"],
+  };
 }
 
 
 export function solveMatrix(word: string, options: SolveOptions): Analysis {
   const mode = (options.maxOps ?? 2) > 1 ? "open" : "strict";
-  const opCosts = options.opCost ?? { sub: 1, del: 3, ins: 2 };
-
-  const { consonants, slots } = buildSlots(word);
-  const beam = (mode==="strict" ? DEFAULTS.beamStrict : DEFAULTS.beamOpen) * (options.beamWidth ?? 1);
-
-  let col: State[] = [{ row:null, cost:0, path:[], ops:[], cStab:0, kept: 0, deleted: 0 }];
-
-  for (let j=0; j<slots.length; j++){
-    const observed = slots[j];
-    const candidates: (Vowel|"Ø")[] = ["Ø", ...VOWELS];
-    let next: State[] = [];
-    for (const st of col){
-      if (st.ops.length > (options.maxOps ?? 2)) continue;
-
-      for (const cand of candidates){
-        const { cost: oc, op, kind } = opCost(observed, cand, options);
-        if (oc > 900) continue; // prune illegal op
-
-        let tCost = 0, newRow = st.row, newPath = st.path.slice();
-        if (cand !== "Ø"){
-          if (st.row){ tCost = moveCost(st.row, cand as Vowel); }
-          newRow = cand as Vowel;
-          if (newPath[newPath.length-1] !== newRow) newPath.push(newRow);
-        }
-        const stab = stabilizerAcross(consonants, j-1, st.row, cand);
-        const newOps = op ? [...st.ops, op] : st.ops;
-
-        if (newOps.length > (options.maxOps ?? 2)) continue;
-        
-        next.push({ 
-            row:newRow, 
-            cost: st.cost + oc + tCost + stab, 
-            path:newPath, 
-            ops: newOps,
-            cStab: st.cStab + stab,
-            kept: st.kept + (kind === "keep" ? 1 : 0),
-            deleted: st.deleted + (kind === "del" ? 1 : 0)
-        });
-      }
-    }
-    next.sort((a,b)=> (a.cost-b.cost) || a.path.join("").localeCompare(b.path.join("")));
-    col = dedupeKeepK(next, beam);
-  }
-
-  const obsHasInstr = observedHasInstrument(slots);
-  const nounish = nounishScore(word);
-  type Sol = { path: Vowel[]; E:number; ops:string[]; cStab:number; closure: Vowel; kept: number; hasInstr:boolean; };
-  const sols: Sol[] = [];
-
-  for (const st of col){
-    if (!st.row) continue;
-    const closures = options.allowClosure ? ["Ë"] : [];
-
-    for (const closure of closures){
-      const t = moveCost(st.row, closure);
-      const path = st.path[st.path.length-1]===closure ? st.path.slice() : [...st.path, closure];
-      const base = st.cost + t;
-      const g = gravityBonus(path);
-      const instr = hasInstrument(path);
-      const instrPenalty = instr ? 0 : (obsHasInstr ? 2 : 1);
-      const closureBias = closure === "Ë" ? -nounish : (nounish ? +nounish : 0);
-      
-      const opCostTotal = st.ops.reduce((s, op) => s + opCostFromLabel(op, opCosts), 0) + opCosts.ins;
-      const finalOps = [...st.ops, `closure ${closure}`];
-
-      if (finalOps.length > (options.maxOps ?? 2) + 1) continue;
-
-      const E = opCostTotal + t + g + instrPenalty + closureBias;
-
-      sols.push({ path, E, ops:finalOps, cStab: st.cStab, closure, kept: st.kept, hasInstr: instr });
-    }
-    // Handle no-closure case (for strict mode primarily)
-    if (!options.allowClosure) {
-        const path = st.path;
-        if (!path.length) continue;
-        const g = gravityBonus(path);
-        const instr = hasInstrument(path);
-        const instrPenalty = instr ? 0 : (obsHasInstr ? 2 : 1);
-        const opCostTotal = st.ops.reduce((s, op) => s + opCostFromLabel(op, opCosts), 0);
-        const E = opCostTotal + g + instrPenalty;
-        sols.push({ path, E, ops: st.ops, cStab: st.cStab, closure: path[path.length - 1], kept: st.kept, hasInstr: instr });
-    }
-  }
-
-  let solsFiltered = sols.filter(s => s.path.length >= 2);
-  if (solsFiltered.length === 0) { 
-      solsFiltered = sols; // fallback if truly unavoidable
-  }
-  
-  const checksumV = (p: Vowel[]) => p.reduce((acc,v)=> acc*VOWEL_VALUE[v], 1);
-  const ringPenalty = (p:Vowel[]) => { let d=0; for(let i=0;i<p.length-1;i++) d+=Math.abs(VOWEL_RING[p[i]]-VOWEL_RING[p[i+1]]); return d;};
-  
-  const scoreTuple = (p: {path:Vowel[], E:number, kept: number}): [number,number,number,number] => [
-    p.E,
-    ringPenalty(p.path),
-    -p.kept,
-    checksumV(p.path)
-  ];
-
-  solsFiltered.sort((a,b) => {
-    const A = scoreTuple(a), B = scoreTuple(b);
-    if (A[0] !== B[0]) return A[0] - B[0];
-    if (A[1] !== B[1]) return A[1] - B[1];
-    if (A[2] !== B[2]) return A[2] - B[2];
-    const c = preferClosureTie(a.path, b.path);
-    if (c !== 0) return c;
-    return A[3] - B[3];
-  });
-  
-  if (solsFiltered.length === 0) {
-    throw new Error("Solver failed to find a valid path for the given word.");
-  }
-  
-  const primary = solsFiltered[0];
-  const pKey = primary.path.join("");
-  const delta = mode === "strict" ? DEFAULTS.frontierDeltaE.strict : DEFAULTS.frontierDeltaE.open;
-
-  const frontier = uniqByPath(
-    solsFiltered
-      .slice(1)
-      .filter(s => s.E <= primary.E + delta && s.path.join("") !== pKey)
-  );
-  
-  const baseVowels = extractBase(word);
-
-  const toPath = (sol: {path: Vowel[], E: number, cStab: number, ops: string[], kept: number}): Path => mkPath(
-    baseVowels, sol.path, sol.E, sol.ops, sol.kept, sol.cStab, opCosts
-  );
+  const analysis = solveWord(word, options);
 
   return {
-    engineVersion: DEFAULTS.engineVersion,
+    ...analysis,
     word,
     mode,
-    primaryPath: toPath(primary),
-    frontierPaths: frontier.map(f => toPath(f)),
-    signals: ["deterministic: beam DP; gravity; closure prefers Ë on tie"]
   };
 }
-
-    
