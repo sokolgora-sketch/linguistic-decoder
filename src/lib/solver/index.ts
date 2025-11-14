@@ -1,6 +1,6 @@
 
 
-import { VOWELS, Vowel, VOWEL_LEVEL, VOWEL_RING, VOWEL_VALUE, computeC, chooseProfile, LangProfile, extractWindowClassesWithProfile, readWindowsDebug } from "./valueTables";
+import { VOWELS, Vowel, VOWEL_LEVEL, VOWEL_RING, VOWEL_VALUE, computeC, chooseProfile, LangProfile, extractWindowClassesWithProfile, readWindowsDebug, checksumV } from "./valueTables";
 import type { Analysis, Path, SolveMode } from "./types";
 import { CFG, ENGINE_VERSION, Alphabet } from "./engineConfig";
 
@@ -81,7 +81,7 @@ function mkPath(base: Vowel[], seq: Vowel[], E: number, ops: string[], consClass
         vowelPath: seq,
         ringPath: seq.map(v=>VOWEL_RING[v]),
         levelPath: seq.map(v=>VOWEL_LEVEL[v]),
-        checksums: [{type:"V",value:VOWELS.reduce((acc,v)=> acc * VOWEL_VALUE[v], 1)}, {type:"E",value:E}, {type:"C",value:computeC(seq, consClasses)}],
+        checksums: [{type:"V",value:checksumV(seq)}, {type:"E",value:E}, {type:"C",value:computeC(seq, consClasses)}],
         kept: keptCount(base, seq),
         ops,
     };
@@ -210,4 +210,5 @@ export function baseForTests(word: string): Vowel[] {
   const norm = normalizeTerminalY(raw, word);
   return (norm.length ? norm : (["O"] as Vowel[])) as Vowel[];
 }
+
 

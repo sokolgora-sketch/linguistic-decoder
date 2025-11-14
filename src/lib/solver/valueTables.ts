@@ -8,6 +8,18 @@ export const VOWEL_VALUE: Record<Vowel, number> = { A: 2, E: 3, I: 5, O: 7, U: 1
 export const VOWEL_RING: Record<Vowel, number> = { A: 3, E: 2, I: 1, O: 0, U: 1, Y: 2, "Ë": 3 };
 export const VOWEL_LEVEL: Record<Vowel, number> = { A: +1, E: +1, I: +1, O: 0, U: -1, Y: -1, "Ë": -1 };
 
+export function checksumV(path: Vowel[]): number {
+  let product = 1;
+  const seen = new Set<Vowel>();
+  for (const v of path) {
+    if (!seen.has(v)) {
+      product *= VOWEL_VALUE[v];
+      seen.add(v);
+    }
+  }
+  return product;
+}
+
 // --- Language-Aware Consonant Classification ---
 
 export type CClass =
