@@ -235,7 +235,7 @@ function solveWord(word: string, opts: SolveOptions): Omit<Analysis, "word" | "m
 
   const frontier = uniqPaths
     .slice(1, K)
-    .filter(p => p.checksums.find(c => c.type === "E")!.value <= primary.checksums.find(c => c.type === "E")!.value + CFG.frontierDeltaE);
+    .filter(p => p.checksums.find(c => c.type === "E")!.value <= primary.checksums.find(c => c.type === "E")!.value + 2);
   
   const signals = [
       `engine=${ENGINE_VERSION}`,

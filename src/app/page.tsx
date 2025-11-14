@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useEffect } from "react";
@@ -106,6 +107,7 @@ export default function LinguisticDecoderApp(){
   }
 
   const analysis = data?.analysis;
+  const signals = analysis?.signals?.join(" · ") || "";
   
   return (
     <div>
@@ -126,7 +128,7 @@ export default function LinguisticDecoderApp(){
               onChange={e=> setWord(e.target.value)}
               placeholder="Type a word…"
               className="font-semibold"
-              onKeyUp={(e) => e.key === 'Enter' && analyze()}
+              onKeyUp={(e) => e.key === 'Enter' && canAnalyze && analyze()}
             />
             <label className="flex items-center gap-2 text-sm">
               <input type="checkbox" checked={mode==="strict"} onChange={e=> setMode(e.target.checked?"strict":"open")} className="w-4 h-4 rounded text-primary focus:ring-primary" />
@@ -209,7 +211,7 @@ export default function LinguisticDecoderApp(){
       {/* Footer */}
       <footer className="p-6 opacity-80">
         <div className="max-w-5xl mx-auto text-xs text-slate-500 flex justify-between">
-          <div><b>Style:</b> Deep Indigo primary · Light Grey background · Soft Amber accents · Fonts: Space Grotesk / Inter / Source Code Pro</div>
+          <div className="font-code">{signals}</div>
           <Button variant="secondary" size="sm" onClick={() => setShowDebug(s => !s)}>
             {showDebug ? "Hide" : "Show"} Debug
           </Button>
