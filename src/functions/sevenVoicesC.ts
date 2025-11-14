@@ -9,8 +9,7 @@ export function toVowel(ch: string): Vowel | null {
 }
 
 export function isVowelChar(ch: string) {
-  const c = ch.normalize("NFC");
-  return /[aeiouy]/i.test(c) || c === "ë" || c === "Ë";
+  return /[AEIOUYËaeiouyë]/.test(ch);
 }
 
 export function extractBase(word: string): Vowel[] {
@@ -112,8 +111,91 @@ export function readWindowsDebug(
   word: string,
   baseSeq: Vowel[],
   profile: LangProfile
-): { windows: string[]; classes: CClass[] } {
+): { windows: string[]; classes: CClass[]; edge: EdgeInfo, edgeWindows: string[] } {
   const windows = extractWindows(word, baseSeq);
   const classes = windows.map((w) => classifyWindow(w, profile));
-  return { windows, classes };
+  
+  const edge = readEdgeWindows(word, profile);
+  const edgeWindows: string[] = [];
+  if (edge.prefix?.cls) edgeWindows.push(`prefix '${edge.prefix.raw}' → ${edge.prefix.cls}`);
+  if (edge.suffix?.cls) edgeWindows.push(`suffix '${edge.suffix.raw}' → ${edge.suffix.cls}`);
+
+  return { windows, classes, edge, edgeWindows };
+}
+
+
+// --- Edge windows (prefix/suffix) support ---
+
+export type EdgeInfo = {
+  prefix?: { raw: string; cls: string | null };
+  suffix?: { raw: string; cls: string | null };
+};
+
+function takePrefixCluster(word: string): string {
+  let i = 0;
+  while (i < word.length && !isVowelChar(word[i])) i++;
+  return word.slice(0, i);
+}
+
+function takeSuffixCluster(word: string): string {
+  let i = word.length - 1;
+  while (i >= 0 && !isVowelChar(word[i])) i--;
+  return word.slice(i + 1);
+}
+
+// If you already have a classifier, reuse it. Otherwise, a simple fallback mapper:
+function classifyClusterByProfile(cluster: string, profile: any): string | null {
+  if (!cluster) return null;
+  // Prefer profile.classify if it exists
+  if (profile?.classify) return profile.classify(cluster);
+
+  // Fallback: rough class map (keep consistent with your main table)
+  const c = cluster.toLowerCase();
+  const hit = (list: string[]) => list.some(x => c.includes(x));
+
+  if (hit(["p","b","t","d","k","g","q","c","ck","gj"])) return "Plosive";
+  if (hit(["ch","j","dz","ts","dʒ","tʃ","ç","xh"]))     return "Affricate";
+  if (hit(["s","z","sh","zh","x"]))                      return "SibilantFricative";
+  if (hit(["f","v","h","th","ph","dh"]))                 return "NonSibilantFricative";
+  if (hit(["m","n","nj"]))                                return "Nasal";
+  if (hit(["ll","rr","l","r"]))                           return "Liquid";
+  if (hit(["w","y"]))                                     return "Glide";
+  return "Other";
+}
+
+// Preferred |Δring| per class (same as your main table)
+const CLASS_DELTA_PREF: Record<string, [number, number]> = {
+  Plosive: [2, 3],
+  Affricate: [1, 2],
+  SibilantFricative: [1, 2],
+  NonSibilantFricative: [1, 1],
+  Nasal: [0, 1],
+  Liquid: [0, 1],
+  Glide: [0, 1],
+  Other: [0, 3],
+};
+
+export function readEdgeWindows(word: string, profile: any): EdgeInfo {
+  const prefixRaw = takePrefixCluster(word);
+  const suffixRaw = takeSuffixCluster(word);
+  const prefixCls = classifyClusterByProfile(prefixRaw, profile);
+  const suffixCls = classifyClusterByProfile(suffixRaw, profile);
+  return {
+    prefix: prefixRaw ? { raw: prefixRaw, cls: prefixCls } : undefined,
+    suffix: suffixRaw ? { raw: suffixRaw, cls: suffixCls } : undefined,
+  };
+}
+
+// Small penalty if hop Δ is outside preferred range; small bonus if inside.
+// edgeWeight is tiny by design so it never dominates interior windows.
+export function edgeBiasPenalty(deltaAbs: number, cls: string | null, edgeWeight = 0.25): number {
+  if (!cls) return 0;
+  const pref = CLASS_DELTA_PREF[cls] ?? [0, 3];
+  const [lo, hi] = pref;
+  if (deltaAbs >= lo && deltaAbs <= hi) {
+    return -edgeWeight; // tiny reward for alignment
+  }
+  // distance outside range
+  const dist = deltaAbs < lo ? (lo - deltaAbs) : (deltaAbs - hi);
+  return edgeWeight * Math.min(2, dist); // cap
 }

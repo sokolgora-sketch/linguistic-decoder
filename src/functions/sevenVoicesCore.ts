@@ -1,6 +1,6 @@
 
 import { ENGINE_VERSION } from "@/shared/engineVersion";
-import { computeC, extractBase, normalizeTerminalY, readWindowsDebug } from "./sevenVoicesC";
+import { computeC, extractBase, normalizeTerminalY, readWindowsDebug, edgeBiasPenalty, type EdgeInfo } from "./sevenVoicesC";
 import { chooseProfile } from "./languages";
 
 export const VOWELS = ["A", "E", "I", "O", "U", "Y", "Ë"] as const;
@@ -54,16 +54,33 @@ function mkPath(
   consClasses: ReturnType<typeof readWindowsDebug>["classes"],
   seq: Vowel[],
   E: number,
-  ops: string[]
+  ops: string[],
+  edgeInfo: EdgeInfo
 ): Path {
   const voicePath = seq;
+  let finalE = E;
+
+  // Apply edge bias
+  if (voicePath.length > 1) {
+    if (edgeInfo.prefix) {
+      const d = Math.abs(VOWEL_RING[voicePath[1]] - VOWEL_RING[voicePath[0]]);
+      finalE += edgeBiasPenalty(d, edgeInfo.prefix.cls);
+    }
+    if (edgeInfo.suffix) {
+      const last = voicePath.length - 1;
+      const d = Math.abs(VOWEL_RING[voicePath[last]] - VOWEL_RING[voicePath[last-1]]);
+      finalE += edgeBiasPenalty(d, edgeInfo.suffix.cls);
+    }
+  }
+
+
   const p: Path = {
     voicePath,
     ringPath: voicePath.map((v) => VOWEL_RING[v]),
     levelPath: voicePath.map((v) => VOWEL_LEVEL[v]),
     checksums: {
       V: checksumV(voicePath),
-      E: E,
+      E: finalE,
       C: computeC(voicePath, consClasses),
     },
     kept: keptCount(baseSeq, voicePath),
@@ -151,7 +168,7 @@ export function solveWord(word: string, opts: SolveOptions, alphabet: string) {
     const baseSeq = base.length ? base : (["O"] as Vowel[]);
 
     const profile = chooseProfile(word, alphabet === "auto" ? undefined : alphabet);
-    const { windows, classes: consClasses } = readWindowsDebug(word, baseSeq, profile);
+    const { windows, classes: consClasses, edge, edgeWindows } = readWindowsDebug(word, baseSeq, profile);
     
     const K = opts.beamWidth;
     const maxOps = opts.maxOps;
@@ -164,7 +181,7 @@ export function solveWord(word: string, opts: SolveOptions, alphabet: string) {
         const st = q.shift()!;
         if (st.ops.length > maxOps) continue;
         
-        const p = mkPath(baseSeq, consClasses, st.seq, st.E, st.ops);
+        const p = mkPath(baseSeq, consClasses, st.seq, st.E, st.ops, edge);
         paths.push(p);
 
         const nextStates = neighbors(st, opts);
@@ -194,6 +211,7 @@ export function solveWord(word: string, opts: SolveOptions, alphabet: string) {
         `base_raw=${rawBase.join("") || "-"}`,
         `base_norm=${base.join("") || "-"}`,
         `cons_windows=${consClasses.join(",") || "-"}`,
+        ...edgeWindows,
         `alphabet=${profile.id}`
     ];
 

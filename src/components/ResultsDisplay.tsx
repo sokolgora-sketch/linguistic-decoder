@@ -29,7 +29,10 @@ const Chip = ({ v }: { v: string | number }) => (
     </span>
 );
 
-function ConsonantInfo({ windows, windowClasses, ringPath }: { windows?: string[], windowClasses?: (CClass | string)[], ringPath?: number[] }) {
+function ConsonantInfo({ analysis }: { analysis: EnginePayload }) {
+  const { windows, windowClasses, primaryPath } = analysis;
+  const ringPath = primaryPath?.ringPath;
+
   if (!windows || !windowClasses || windows.length === 0) {
     return null;
   }
@@ -45,12 +48,13 @@ function ConsonantInfo({ windows, windowClasses, ringPath }: { windows?: string[
           if (ringPath && i < ringPath.length - 1) {
             const delta = Math.abs(ringPath[i+1] - ringPath[i]);
             const isOptimal = delta >= lo && delta <= hi;
-            hopInfo = `→ |Δring| = ${delta} ${isOptimal ? "✓" : "✗"}`;
+            hopInfo = `|Δring| = ${delta} ${isOptimal ? "✓" : "✗"}`;
           }
 
           return (
-            <Card key={i} className="p-2.5 text-sm font-code">
-              '{w}' is <span className="font-semibold">{cClass}</span> (prefers {lo}–{hi}) {hopInfo}
+            <Card key={i} className="p-2.5 text-sm font-code flex justify-between items-center">
+              <span>'{w}' is <span className="font-semibold">{cClass}</span> (prefers {lo}–{hi})</span>
+              <span className="font-semibold">{hopInfo}</span>
             </Card>
           );
         })}
@@ -59,7 +63,8 @@ function ConsonantInfo({ windows, windowClasses, ringPath }: { windows?: string[
   );
 }
 
-export function PathRow({ title, block, windows, windowClasses }: { title: string; block?: EnginePath, windows?:string[], windowClasses?:CClass[] | string[] }) {
+
+export function PathRow({ title, block, analysis }: { title: string; block?: EnginePath, analysis: EnginePayload }) {
   if (!block || !block.voicePath || block.voicePath.length === 0) {
     return (
       <Card className="p-4">
@@ -89,12 +94,12 @@ export function PathRow({ title, block, windows, windowClasses }: { title: strin
             <InfoLine label="Level Path" value={labelLevels(levelPath)} />
             <InfoLine label="Ring Path" value={labelRings(ringPath)} />
             {checksums && (
-                <InfoLine label="Checksums" value={`V=${checksums.V} · E=${checksums.E} · C=${checksums.C}`} mono />
+                <InfoLine label="Checksums" value={`V=${checksums.V} · E=${checksums.E.toFixed(2)} · C=${checksums.C}`} mono />
             )}
             {typeof kept === "number" ? <InfoLine label="Keeps" value={String(kept)} /> : null}
         </div>
         
-        <ConsonantInfo windows={windows} windowClasses={windowClasses} ringPath={ringPath} />
+        {title === "Primary Path" && <ConsonantInfo analysis={analysis} />}
 
         {ops?.length > 0 && (
           <div className="mt-2.5">
@@ -117,7 +122,7 @@ function InfoLine({label, value, mono}:{label:string; value:string; mono?:boolea
 }
 
 export function ResultsDisplay({ analysis }: { analysis: EnginePayload }) {
-    const { primaryPath, frontierPaths, windows, windowClasses } = analysis;
+    const { primaryPath, frontierPaths } = analysis;
 
     const frontierList = useMemo(() => (frontierPaths || []).filter(f => f?.voicePath && f.voicePath.join("") !== (primaryPath?.voicePath || []).join("")), [frontierPaths, primaryPath]);
 
@@ -125,7 +130,7 @@ export function ResultsDisplay({ analysis }: { analysis: EnginePayload }) {
     
     return (
         <>
-            <PathRow block={primaryPath} title="Primary Path" windows={windows} windowClasses={windowClasses}/>
+            <PathRow block={primaryPath} title="Primary Path" analysis={analysis} />
             {frontierList.length > 0 && (
               <Card className="p-4">
                 <h3 className="font-bold text-sm tracking-wide">Frontier (near‑optimal alternates)</h3>
@@ -142,7 +147,7 @@ export function ResultsDisplay({ analysis }: { analysis: EnginePayload }) {
                         ))}
                       </div>
                       <hr className="my-2 border-border" />
-                      {f.checksums && <div className="font-code text-xs">V={f.checksums.V} · E={f.checksums.E} · C={f.checksums.C}</div>}
+                      {f.checksums && <div className="font-code text-xs">V={f.checksums.V} · E={f.checksums.E.toFixed(2)} · C={f.checksums.C}</div>}
                       <div className="font-code text-xs mt-1">Keeps: {typeof f.kept === "number" ? f.kept : "—"}</div>
                       <div className="text-xs mt-1.5 text-slate-500">Levels: {labelLevels(f.levelPath)}</div>
                       <div className="text-xs text-slate-500">Rings: {labelRings(f.ringPath)}</div>
