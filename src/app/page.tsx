@@ -160,7 +160,7 @@ function Candidates({map}:{map: AnalyzeResponse["languageFamilies"]}){
                         <div key={family} style={{ marginBottom: 12 }}>
                         <div style={{ fontWeight: 700, color: COLORS.primary, marginBottom: 6 }}>{family}</div>
                         <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(260px,1fr))", gap: 10 }}>
-                            {(arr || []).map((c, i)=> (
+                            {(arr || []).filter(Boolean).map((c, i)=> (
                             <div key={i} className="card" style={{ padding: 10, borderColor: COLORS.primary }}>
                                 <div style={{ fontWeight: 700 }}>{c.form}</div>
                                 <div className="code" style={{ fontSize: 12, marginTop: 6 }}>map: {c.map ? c.map.join(" · ") : ''}</div>
