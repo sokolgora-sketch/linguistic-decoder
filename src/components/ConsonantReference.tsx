@@ -36,15 +36,16 @@ export function ConsonantReference() {
                 <TableHeader>
                     <TableRow>
                         <TableHead>Class</TableHead>
+                        <TableHead>Examples</TableHead>
                         <TableHead>Preferred |Δring|</TableHead>
                         <TableHead>Voice Align</TableHead>
-                        <TableHead>Examples</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
                     {referenceData.map((row) => (
                         <TableRow key={row.class}>
                             <TableCell className="font-medium">{row.class}</TableCell>
+                            <TableCell className="font-code text-slate-500">{row.examples}</TableCell>
                             <TableCell className="font-code">{row.preferredDeltaRing}</TableCell>
                             <TableCell>
                                 <span className="inline-flex items-center gap-1.5 py-1 px-2 rounded-full border bg-white">
@@ -52,7 +53,6 @@ export function ConsonantReference() {
                                     <span className="font-bold">{row.voiceAlign}</span>
                                 </span>
                             </TableCell>
-                            <TableCell className="font-code text-slate-500">{row.examples}</TableCell>
                         </TableRow>
                     ))}
                 </TableBody>
