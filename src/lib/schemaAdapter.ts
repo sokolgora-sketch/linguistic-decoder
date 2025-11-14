@@ -1,20 +1,17 @@
 
 // src/lib/schemaAdapter.ts
-import type { Path, Analysis } from "./solver/types";
+import type { EnginePayload } from "@/shared/engineShape";
 
 export type MappingRecord = {
   word: string;
-  voice_path: string[];   // required by your schema
-  ring_path: number[];    // required
-  level_path: number[];   // required
-  ops: string[];          // required
-  signals?: string[];     // optional
+  voice_path: string[];
+  ring_path: number[];
+  level_path: number[];
+  ops: string[];
+  signals?: string[];
 };
 
-export function toMappingRecord(e: Analysis): MappingRecord {
-  if (!e?.primaryPath?.voicePath?.length) {
-    throw new Error("No primaryPath.voicePath in engine payload");
-  }
+export function toMappingRecord(e: EnginePayload): MappingRecord {
   return {
     word: e.word,
     voice_path: e.primaryPath.voicePath,
@@ -28,5 +25,3 @@ export function toMappingRecord(e: Analysis): MappingRecord {
     ],
   };
 }
-
-    

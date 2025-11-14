@@ -22,18 +22,8 @@ import { Copy, Download, Loader } from "lucide-react";
 import ComparePanel from "@/components/ComparePanel";
 import { mapWordToLanguageFamilies } from "@/ai/flows/map-word-to-language-families";
 import { toMappingRecord } from "@/lib/schemaAdapter";
-import { ensureEnginePayload } from "@/lib/ensureEngine";
-import type { Path as AnalysisPath, Analysis } from "@/lib/solver/types";
-
-
-// ==== Types matching the /analyzeWord response ===============================
-export interface AnalyzeResponse {
-  analysis: Analysis,
-  languageFamilies?: Record<string, { form:string; map:string[]; functional:string }[]> | null;
-  cacheHit?: boolean;
-}
-export type Path = AnalysisPath;
-type Vowel = "A"|"E"|"I"|"O"|"U"|"Y"|"Ë";
+import type { EnginePayload, Vowel } from "@/shared/engineShape";
+import { normalizeEnginePayload } from "@/shared/engineShape";
 
 
 // ==== Main App ===============================================================
@@ -42,7 +32,7 @@ export default function LinguisticDecoderApp(){
   const [word, setWord] = useState("study");
   const [mode, setMode] = useState<"strict"|"open">("strict");
   const [alphabet, setAlphabet] = useState<Alphabet>("auto");
-  const [data, setData] = useState<AnalyzeResponse | null>(null);
+  const [data, setData] = useState<EnginePayload | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [isWarming, setIsWarming] = useState(false);
@@ -70,33 +60,22 @@ export default function LinguisticDecoderApp(){
     setErr(null);
     setData(null);
     try {
-      // 1. Get the analysis result (from cache or API)
-      const clientResponse = await analyzeClient(useWord, useMode, useAlphabet);
-      console.log("API result:", clientResponse); // Debug this line to ensure the structure is correct.
+      // 1. Get raw result from API or cache
+      const rawResponse = await analyzeClient(useWord, useMode, useAlphabet);
       
-      // 2. Ensure we have a valid payload for the AI
-      const enginePayload = await ensureEnginePayload(clientResponse, useMode, useAlphabet);
-      console.debug("Primary Path object:", enginePayload?.primaryPath);
-      console.debug("PrimaryPath keys:", enginePayload?.primaryPath && Object.keys(enginePayload.primaryPath));
-
-
+      // 2. GUARANTEE the shape with the normalizer. This is the single source of truth.
+      const normalizedPayload = normalizeEnginePayload(rawResponse);
+      
       // 3. Call the AI flow with the guaranteed-correct data shape
-      let languageFamilies = null;
-      if (!clientResponse.cacheHit) {
-          const mappingInput = toMappingRecord(enginePayload);
+      let finalPayload = normalizedPayload;
+      if (!normalizedPayload.cacheHit) {
+          const mappingInput = toMappingRecord(normalizedPayload);
           const mappingResult = await mapWordToLanguageFamilies(mappingInput);
-          languageFamilies = mappingResult?.candidates_map || null;
-      } else {
-          languageFamilies = clientResponse.languageFamilies;
+          finalPayload = { ...normalizedPayload, languageFamilies: mappingResult?.candidates_map || null };
       }
       
-      // 4. Combine results and set state
-      const fullResponse: AnalyzeResponse = {
-          analysis: enginePayload,
-          languageFamilies: languageFamilies,
-          cacheHit: clientResponse.cacheHit
-      };
-      setData(fullResponse);
+      // 4. Set state with the clean, final payload
+      setData(finalPayload);
 
     } catch (e: any) {
       const error = e?.message || "Request failed";
@@ -137,7 +116,7 @@ export default function LinguisticDecoderApp(){
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    const fn = `${data.analysis.word || "analysis"}_${data.analysis.mode || "mode"}_${data.analysis.alphabet || "auto"}.json`;
+    const fn = `${data.word || "analysis"}_${data.mode || "mode"}_${data.alphabet || "auto"}.json`;
     a.download = fn;
     document.body.appendChild(a);
 a.click();
@@ -145,8 +124,7 @@ a.click();
     URL.revokeObjectURL(url);
   }
 
-  const analysis = data?.analysis;
-  const signals = analysis?.signals?.join(" · ") || "";
+  const signals = data?.signals?.join(" · ") || "";
   
   return (
     <div className="grid grid-cols-1 gap-6 p-4 lg:p-8 max-w-5xl mx-auto">
@@ -203,23 +181,23 @@ a.click();
 
         {/* Visualization & Results */}
         <TwoRailsWithConsonants
-          word={analysis?.word || word}
-          path={(analysis?.primaryPath?.voicePath as Vowel[]) || []}
+          word={data?.word || word}
+          path={(data?.primaryPath?.voicePath as Vowel[]) || []}
           running={loading}
-          playKey={`${analysis?.word}|${(analysis?.primaryPath?.voicePath || []).join("")}`}
+          playKey={`${data?.word}|${(data?.primaryPath?.voicePath || []).join("")}`}
           height={320}
           durationPerHopMs={900}
         />
         
-        {analysis ? (
+        {data ? (
           <>
-            <ResultsDisplay analysis={analysis} />
+            <ResultsDisplay analysis={data} />
             {data?.languageFamilies && <Candidates map={data.languageFamilies} />}
           </>
         ) : null}
 
-        <Accordion type="single" collapsible className="w-full" defaultValue={analysis ? "" : "item-1"}>
-          {!analysis && (
+        <Accordion type="single" collapsible className="w-full" defaultValue={data ? "" : "item-1"}>
+          {!data && (
             <AccordionItem value="item-1">
               <AccordionTrigger>How to Use</AccordionTrigger>
               <AccordionContent>
@@ -273,20 +251,20 @@ a.click();
       <footer className="p-6 opacity-80 col-span-1">
         <div className="max-w-5xl mx-auto text-xs text-slate-500 flex justify-between items-start">
           <div className="font-code flex-1">
-            {analysis && (
+            {data && (
               <div className="text-xs opacity-80 pt-2">
                 <b>Diagnostics:</b>
-                <span className="ml-2">engine={analysis.engineVersion}</span>
-                <span className="ml-2">mode={analysis.mode}</span>
-                <span className="ml-2">alphabet={analysis.alphabet}</span>
-                {"solveMs" in analysis && <span className="ml-2">solveMs={analysis.solveMs}</span>}
+                <span className="ml-2">engine={data.engineVersion}</span>
+                <span className="ml-2">mode={data.mode}</span>
+                <span className="ml-2">alphabet={data.alphabet}</span>
+                {"solveMs" in data && <span className="ml-2">solveMs={data.solveMs}</span>}
                 {data?.cacheHit && <span className="ml-2 px-1.5 py-0.5 rounded bg-accent/20 border border-accent text-accent-foreground">cacheHit</span>}
                 <div className="mt-1">{signals}</div>
               </div>
             )}
           </div>
           <div className="flex items-center gap-4">
-            {analysis && (
+            {data && (
               <Link
                 className="underline text-xs"
                 href={`/?word=${encodeURIComponent(word)}&mode=${mode}&alphabet=${alphabet}`}
@@ -303,5 +281,3 @@ a.click();
     </div>
   );
 }
-
-    

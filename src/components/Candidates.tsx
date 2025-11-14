@@ -1,10 +1,11 @@
+
 'use client';
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { AnalyzeResponse } from "@/app/page";
+import { EnginePayload } from "@/shared/engineShape";
 
-export function Candidates({map}:{map: AnalyzeResponse["languageFamilies"]}){
+export function Candidates({map}:{map: EnginePayload["languageFamilies"]}){
     const [isOpen, setIsOpen] = useState(true);
     if (!map || Object.keys(map).length===0) return null;
     

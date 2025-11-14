@@ -2,8 +2,8 @@
 'use client';
 import React, { useMemo } from "react";
 import { Card } from "@/components/ui/card";
-import type { Path, AnalyzeResponse } from "@/app/page";
-import { CClass } from "@/lib/solver/valueTables";
+import type { CClass } from "@/lib/solver/valueTables";
+import type { EnginePayload, EnginePath } from "@/shared/engineShape";
 
 // Seven‑Voices palette (uses CSS variables from globals.css)
 const VOICE_COLOR: Record<string, string> = {
@@ -20,34 +20,6 @@ const LEVEL_LABEL: Record<number, string> = { 1: "High", 0: "Mid", [-1]: "Low" }
 const labelLevels = (levels: number[]) => levels.map(l=> LEVEL_LABEL[l] ?? l).join(" → ");
 const labelRings = (rings: number[]) => rings.join(" → ");
 
-// This is the new, more robust PathRow implementation
-type AnyPath = {
-  // snake_case (mapper)
-  voice_path?: string[];
-  ring_path?: number[];
-  level_path?: number[];
-  // camelCase (engine)
-  voicePath?: string[];
-  ringPath?: number[];
-  levelPath?: number[];
-  // from both
-  checksums?: { V: number; E: number; C: number; };
-  ops?: string[];
-  kept?: number;
-};
-
-function normalizePath(p?: AnyPath) {
-  if (!p) return { voice: [], ring: [], level: [], checksums: undefined, ops: [], kept: undefined };
-  return {
-    voice: p?.voice_path ?? p?.voicePath ?? [],
-    ring:  p?.ring_path  ?? p?.ringPath  ?? [],
-    level: p?.level_path ?? p?.levelPath ?? [],
-    checksums: p?.checksums,
-    ops: p?.ops ?? [],
-    kept: p?.kept,
-  };
-}
-
 const Arrow = () => <span className="font-bold text-accent">→</span>;
 const Chip = ({ v }: { v: string | number }) => (
     <span className="inline-flex items-center gap-1.5 py-1 px-2 rounded-full border bg-card text-card-foreground">
@@ -56,49 +28,53 @@ const Chip = ({ v }: { v: string | number }) => (
     </span>
 );
 
-export function PathRow({ title, block, windows, windowClasses }: { title: string; block?: AnyPath, windows?:string[], windowClasses?:CClass[] }) {
-  const { voice, ring, level, checksums, ops, kept } = normalizePath(block);
-  const empty = !voice || voice.length === 0;
+export function PathRow({ title, block, windows, windowClasses }: { title: string; block?: EnginePath, windows?:string[], windowClasses?:CClass[] | string[] }) {
+  if (!block || !block.voicePath || block.voicePath.length === 0) {
+    return (
+      <Card className="p-4">
+        <h3 className="font-bold text-sm tracking-wide mb-2">{title}</h3>
+        <div className="text-xs opacity-60">— no path —</div>
+      </Card>
+    );
+  }
+
+  const { voicePath, ringPath, levelPath, checksums, ops, kept } = block;
 
   return (
     <Card className="p-4">
       <h3 className="font-bold text-sm tracking-wide mb-2">{title}</h3>
 
-      {empty ? (
-        <div className="text-xs opacity-60">— no path —</div>
-      ) : (
-        <>
-          <div className="flex flex-wrap gap-2 items-center">
-            {voice.map((v,i)=>(
-              <React.Fragment key={`v-${i}`}>
-                <Chip v={v} />{i<voice.length-1 && <Arrow/>}
-              </React.Fragment>
-            ))}
-          </div>
+      <>
+        <div className="flex flex-wrap gap-2 items-center">
+          {voicePath.map((v,i)=>(
+            <React.Fragment key={`v-${i}`}>
+              <Chip v={v} />{i<voicePath.length-1 && <Arrow/>}
+            </React.Fragment>
+          ))}
+        </div>
 
-          <div className="mt-2.5 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2.5">
-              <InfoLine label="Voice Path" value={voice.join(" → ")} />
-              <InfoLine label="Level Path" value={labelLevels(level)} />
-              <InfoLine label="Ring Path" value={labelRings(ring)} />
-              {checksums && (
-                  <InfoLine label="Checksums" value={`V=${checksums.V} · E=${checksums.E} · C=${checksums.C}`} mono />
-              )}
-              {typeof kept === "number" ? <InfoLine label="Keeps" value={String(kept)} /> : null}
-          </div>
+        <div className="mt-2.5 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2.5">
+            <InfoLine label="Voice Path" value={voicePath.join(" → ")} />
+            <InfoLine label="Level Path" value={labelLevels(levelPath)} />
+            <InfoLine label="Ring Path" value={labelRings(ringPath)} />
+            {checksums && (
+                <InfoLine label="Checksums" value={`V=${checksums.V} · E=${checksums.E} · C=${checksums.C}`} mono />
+            )}
+            {typeof kept === "number" ? <InfoLine label="Keeps" value={String(kept)} /> : null}
+        </div>
 
-          {windows && windowClasses && windows.length > 0 && (
-            <div className="mt-2.5">
-              <InfoLine label="Consonant Windows" value={windows.map((w,i)=>`'${w}' → ${windowClasses[i]}`).join(" | ")} mono />
-            </div>
-          )}
-          {ops?.length > 0 && (
-            <div className="mt-2.5">
-              <h4 className="font-bold text-sm tracking-wide">Ops</h4>
-              <div className="font-code text-xs whitespace-pre-wrap">{ops.join("; ")}</div>
-            </div>
-          )}
-        </>
-      )}
+        {windows && windowClasses && windows.length > 0 && (
+          <div className="mt-2.5">
+            <InfoLine label="Consonant Windows" value={windows.map((w,i)=>`'${w}' → ${windowClasses[i]}`).join(" | ")} mono />
+          </div>
+        )}
+        {ops?.length > 0 && (
+          <div className="mt-2.5">
+            <h4 className="font-bold text-sm tracking-wide">Ops</h4>
+            <div className="font-code text-xs whitespace-pre-wrap">{ops.join("; ")}</div>
+          </div>
+        )}
+      </>
     </Card>
   );
 }
@@ -112,16 +88,16 @@ function InfoLine({label, value, mono}:{label:string; value:string; mono?:boolea
   );
 }
 
+export function ResultsDisplay({ analysis }: { analysis: EnginePayload }) {
+    const { primaryPath, frontierPaths, windows, windowClasses } = analysis;
 
-export function ResultsDisplay({ analysis }: { analysis: AnalyzeResponse['analysis'] }) {
-    const primary = analysis?.primaryPath;
-    const frontierList = useMemo(() => (analysis?.frontierPaths || []).filter(f => f?.voicePath && f.voicePath.join("") !== (primary?.voicePath || []).join("")), [analysis, primary]);
+    const frontierList = useMemo(() => (frontierPaths || []).filter(f => f?.voicePath && f.voicePath.join("") !== (primaryPath?.voicePath || []).join("")), [frontierPaths, primaryPath]);
 
-    if (!primary) return null;
+    if (!primaryPath) return null;
     
     return (
         <>
-            <PathRow block={primary} title="Primary Path" windows={analysis.windows} windowClasses={analysis.windowClasses}/>
+            <PathRow block={primaryPath} title="Primary Path" windows={windows} windowClasses={windowClasses}/>
             {frontierList.length > 0 && (
               <Card className="p-4">
                 <h3 className="font-bold text-sm tracking-wide">Frontier (near‑optimal alternates)</h3>
@@ -138,7 +114,7 @@ export function ResultsDisplay({ analysis }: { analysis: AnalyzeResponse['analys
                         ))}
                       </div>
                       <hr className="my-2 border-border" />
-                      <div className="font-code text-xs">V={f.checksums.V} · E={f.checksums.E} · C={f.checksums.C}</div>
+                      {f.checksums && <div className="font-code text-xs">V={f.checksums.V} · E={f.checksums.E} · C={f.checksums.C}</div>}
                       <div className="font-code text-xs mt-1">Keeps: {typeof f.kept === "number" ? f.kept : "—"}</div>
                       <div className="text-xs mt-1.5 text-slate-500">Levels: {labelLevels(f.levelPath)}</div>
                       <div className="text-xs text-slate-500">Rings: {labelRings(f.ringPath)}</div>
@@ -150,5 +126,3 @@ export function ResultsDisplay({ analysis }: { analysis: AnalyzeResponse['analys
         </>
     );
 }
-
-    
