@@ -1,7 +1,6 @@
 
-export type Alphabet = "auto" | "albanian" | "latin";
-
-export const ENGINE_VERSION = "2025-11-14-core-5";
+export const ENGINE_VERSION = "2025-11-14-core-6"; // bump
+export type Alphabet = "auto" | "albanian" | "latin" | "sanskrit" | "ancient_greek" | "pie";
 
 export const CFG = {
   beamWidth: 8,
@@ -11,6 +10,6 @@ export const CFG = {
   preferClosureË: true,
   ringJumpPenalty: 1,
   cWeight: 1,
-  alphabet: "auto" as Alphabet,     // default: auto-detect
+  alphabet: "auto" as Alphabet,
   norm: { foldDiacritics: true, terminalYtoI: true, collapseDupes: true },
 };
