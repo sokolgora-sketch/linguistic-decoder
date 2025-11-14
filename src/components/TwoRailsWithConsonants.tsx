@@ -175,7 +175,7 @@ export function TwoRailsWithConsonants({
   );
 
   const MidRail = () => {
-    const segW = 76, gap = 6;
+    const segW = 60, gap = 4;
     const totalW = CLASS_ORDER.length*segW + (CLASS_ORDER.length-1)*gap;
     const startX = (W - totalW)/2;
 
