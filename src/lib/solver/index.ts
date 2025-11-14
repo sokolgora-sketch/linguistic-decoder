@@ -1,5 +1,5 @@
 
-import { VOWELS, Vowel, VOWEL_LEVEL, VOWEL_RING, VOWEL_VALUE } from "./valueTables";
+import { VOWELS, Vowel, VOWEL_LEVEL, VOWEL_RING, VOWEL_VALUE, CClass, MAP_CLASS } from "./valueTables";
 import type { Analysis, Path, SolveMode } from "./types";
 import { CFG, ENGINE_VERSION } from "./engineConfig";
 
@@ -31,7 +31,7 @@ function keptCount(base:Vowel[], cand:Vowel[]){ let k=0; for(let i=0;i<Math.min(
 function normalizeTerminalY(seq: Vowel[], rawWord: string): Vowel[] {
   // Rule N0: English terminal “y” behaves like /i/
   // e.g., study, happy, duty → final Y becomes I
-  if (CFG.norm.terminalYtoI && seq.length && seq[seq.length - 1] === "Y") {
+  if (CFG.norm.terminalYtoI && seq.length && seq[seq.length - 1] === "Y" && rawWord.toLowerCase().endsWith("y")) {
     const out = seq.slice();
     out[out.length - 1] = "I";
     return out;
@@ -53,9 +53,10 @@ function preferClosureTie(a: Vowel[], b: Vowel[]): number {
   return enda - endb;
 }
 
-function scoreTuple(base: Vowel[], p: Path): [number, number, number, number] {
+function scoreTuple(base: Vowel[], p: Path): [number, number, number, number, number] {
   return [
     p.checksums.find(c => c.type === "E")!.value,
+    p.checksums.find(c => c.type === "C")!.value,
     ringPenalty(p.vowelPath),
     -p.kept,
     checksumV(p.vowelPath),
@@ -72,15 +73,16 @@ function opCostFromLabel(op: string, costs: { sub: number; del: number; ins: num
   return costs.sub;
 }
 
-function mkPath(base: Vowel[], seq: Vowel[], E: number, ops: string[]): Path {
+function mkPath(base: Vowel[], seq: Vowel[], E: number, ops: string[], computeC: (path: Vowel[]) => number): Path {
     const p: Path = {
         vowelPath: seq,
         ringPath: seq.map(v=>VOWEL_RING[v]),
         levelPath: seq.map(v=>VOWEL_LEVEL[v]),
-        checksums: [{type:"V",value:checksumV(seq)}, {type:"E",value:E}, {type:"C",value:0}],
+        checksums: [{type:"V",value:checksumV(seq)}, {type:"E",value:E}, {type:"C",value:computeC(seq)}],
         kept: keptCount(base, seq),
         ops,
     };
+    
     // Note: E includes penalties, so it won't perfectly match op costs.
     // const Ecalc = ops.reduce((s,op)=>s+opCostFromLabel(op, {sub: CFG.cost.sub, del: CFG.cost.del, ins: CFG.cost.insClosure}),0);
     // if (Ecalc !== E) { console.warn(`Energy mismatch E=${E} sum(ops)=${Ecalc} ops=${ops.join(',')}`); }
@@ -124,10 +126,81 @@ function neighbors(base: Vowel[], st: State, opts: SolveOptions): State[] {
   return out;
 }
 
+function classRange(cls: CClass): [number, number] {
+  switch (cls) {
+    case "Glide":
+    case "Liquid":
+    case "Nasal":     return [0,1];
+    case "Fricative": return [1,1];
+    case "Affricate": return [1,2];
+    case "Plosive":   return [2,3];
+  }
+}
+
+function hopPenalty(absDelta: number, cls: CClass): number {
+  const [lo, hi] = classRange(cls);
+  if (absDelta < lo) return lo - absDelta;
+  if (absDelta > hi) return absDelta - hi;
+  return 0;
+}
+
+function extractWindowsClasses(word: string, baseSeq: Vowel[]): CClass[] {
+  const s = word.normalize("NFC");
+  const pos: number[] = [];
+  let vi = 0;
+
+  // Find the word-indices of the base vowels.
+  // This is tricky because of dupe collapse, e.g. "aa" -> A.
+  // This simple model just finds the first match.
+  let lastWordI = -1;
+  for (let i=0; i<baseSeq.length; i++) {
+    const targetV = baseSeq[i];
+    let found = false;
+    for (let j=lastWordI+1; j<s.length; j++) {
+      const wordV = toVowel(s[j]);
+      if (wordV === targetV) {
+        pos.push(j);
+        lastWordI = j;
+        found = true;
+        break;
+      }
+    }
+    if (!found) pos.push(lastWordI + 1); // fallback
+  }
+
+  const windows: string[] = [];
+  for (let k=0;k<pos.length-1;k++){
+    windows.push(s.slice(pos[k]+1, pos[k+1]));
+  }
+
+  return windows.map(chars => {
+    for (const ch of chars.toLowerCase()) {
+      if (isVowelChar(ch)) continue;
+      if (MAP_CLASS[ch]) return MAP_CLASS[ch];
+    }
+    return "Fricative"; // neutral default
+  });
+}
+
 // --- Main Solver ---
 function solveWord(word: string, opts: SolveOptions): Omit<Analysis, "word" | "mode"> {
   const rawBase = extractBase(word);
   const base = normalizeTerminalY(rawBase, word);
+  const consClasses = extractWindowsClasses(word, base);
+
+  const computeC = (vowelPath: Vowel[]): number => {
+    let c = 0;
+    for (let i=0;i<Math.min(vowelPath.length-1, consClasses.length); i++){
+      const d = Math.abs(VOWEL_RING[vowelPath[i+1]] - VOWEL_RING[vowelPath[i]]);
+      c += hopPenalty(d, consClasses[i]);
+    }
+    // extra hop (e.g., closure) → assume Glide expectation
+    for (let j=consClasses.length; j<vowelPath.length-1; j++){
+      const d = Math.abs(VOWEL_RING[vowelPath[j+1]] - VOWEL_RING[vowelPath[j]]);
+      c += hopPenalty(d, "Glide");
+    }
+    return c;
+  }
 
   const baseSeq = base.length ? base : (["O"] as Vowel[]);
 
@@ -143,7 +216,7 @@ function solveWord(word: string, opts: SolveOptions): Omit<Analysis, "word" | "m
     if (st.ops.length > maxOps) continue;
     
     // Add current state to solutions
-    const p = mkPath(baseSeq, st.seq, st.E, st.ops);
+    const p = mkPath(baseSeq, st.seq, st.E, st.ops, computeC);
     paths.push(p);
 
     // Get next states
@@ -161,12 +234,12 @@ function solveWord(word: string, opts: SolveOptions): Omit<Analysis, "word" | "m
 
   uniqPaths.sort((p, q) => {
     const A = scoreTuple(baseSeq, p), B = scoreTuple(baseSeq, q);
-    if (A[0] !== B[0]) return A[0] - B[0];
-    if (A[1] !== B[1]) return A[1] - B[1];
-    if (A[2] !== B[2]) return A[2] - B[2];
+    for(let i=0; i<A.length; i++) if (A[i] !== B[i]) return A[i] - B[i];
+
     const c = preferClosureTie(p.vowelPath, q.vowelPath);
     if (c !== 0) return c;
-    return A[3] - B[3];
+    
+    return A[A.length-1] - B[B.length-1];
   });
 
   const primary = uniqPaths[0];
@@ -178,6 +251,7 @@ function solveWord(word: string, opts: SolveOptions): Omit<Analysis, "word" | "m
   const signals = [
       `base_raw=${rawBase.join("") || "-"}`,
       `base_norm=${base.join("") || "-"}`,
+      `cons_windows=${consClasses.join(",") || "-"}`,
       `signals: deterministic beam; Ë-closure tie-break`
   ];
 

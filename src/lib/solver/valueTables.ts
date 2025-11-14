@@ -16,3 +16,14 @@ export const STABILIZER_S: Record<string, number> = {
   l:0,ll:0,r:0,rr:0,
   w:0,y:0
 };
+
+export type CClass = "Plosive"|"Fricative"|"Affricate"|"Nasal"|"Liquid"|"Glide";
+
+export const MAP_CLASS: Record<string,CClass> = {
+  p:"Plosive", b:"Plosive", t:"Plosive", d:"Plosive", k:"Plosive", g:"Plosive", q:"Plosive", c:"Plosive",
+  f:"Fricative", v:"Fricative", s:"Fricative", z:"Fricative", h:"Fricative", x:"Fricative",
+  j:"Affricate",
+  m:"Nasal", n:"Nasal",
+  l:"Liquid", r:"Liquid",
+  w:"Glide", y:"Glide",
+};
