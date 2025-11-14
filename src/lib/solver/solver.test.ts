@@ -17,11 +17,12 @@ test("mind (strict) → I", () => {
   expect(C(primaryPath)).toBe(0);
 });
 
-test("study (strict) → U→I", () => {
+test("study (strict) → U→I (Y normalized to I)", () => {
   const { primaryPath } = solveMatrix("study", strict);
   expect(primaryPath.voicePath).toEqual(["U","I"]);
   expect(V(primaryPath)).toBe(55);
-  expect(E(primaryPath)).toBe(1); // Y→I
+  // Y is normalized to I before solving, so there is no op. E=0.
+  expect(E(primaryPath)).toBe(0);
   expect(C(primaryPath)).toBe(0);
 });
 

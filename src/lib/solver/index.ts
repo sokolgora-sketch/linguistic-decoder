@@ -24,13 +24,17 @@ function toVowel(ch:string):Vowel|null{ const u=ch.toUpperCase(); return u==="Ë
 function extractBase(word:string):Vowel[]{ const out:Vowel[]=[]; for(const ch of word.normalize("NFC")){ if(!isVowelChar(ch))continue; const v=toVowel(ch)!; if(out.length && out[out.length-1]===v)continue; out.push(v);} return out; }
 function keptCount(base:Vowel[], cand:Vowel[]){ let k=0; for(let i=0;i<Math.min(base.length,cand.length);i++) if(base[i]===cand[i]) k++; return k; }
 
-function nounishScore(word: string): number {
-  const w = word.toLowerCase();
-  if (/(age|ment|tion|sion|ance|ence)\b/.test(w)) return 2;
-  if (/(ness|ship|hood|dom|ure|um|us)\b/.test(w)) return 1;
-  if (/(ge|ce)\b/.test(w)) return 1;
-  return 0;
+function normalizeTerminalY(seq: Vowel[], rawWord: string): Vowel[] {
+  // Rule N0: English terminal “y” behaves like /i/
+  // e.g., study, happy, duty → final Y becomes I
+  if (seq.length && seq[seq.length - 1] === "Y") {
+    const out = seq.slice();
+    out[out.length - 1] = "I";
+    return out;
+  }
+  return seq;
 }
+
 
 // --- Path Scoring ---
 const checksumV = (p: Vowel[]) => p.reduce((acc,v)=> acc*VOWEL_VALUE[v], 1);
@@ -115,7 +119,9 @@ function neighbors(base: Vowel[], st: State, opts: SolveOptions): State[] {
 
 // --- Main Solver ---
 function solveWord(word: string, opts: SolveOptions): Omit<Analysis, "word" | "mode"> {
-  const base = extractBase(word);
+  const rawBase = extractBase(word);
+  const base = normalizeTerminalY(rawBase, word);
+
   const baseSeq = base.length ? base : (["O"] as Vowel[]);
 
   const K = opts.beamWidth ?? DEFAULTS.beamWidth;
@@ -162,12 +168,18 @@ function solveWord(word: string, opts: SolveOptions): Omit<Analysis, "word" | "m
   const frontier = uniqPaths
     .slice(1, K)
     .filter(p => p.checksums.find(c => c.type === "E")!.value <= primary.checksums.find(c => c.type === "E")!.value + DEFAULTS.frontierDeltaE);
+  
+  const signals = [
+      `base_raw=${rawBase.join("") || "-"}`,
+      `base_norm=${base.join("") || "-"}`,
+      `signals: deterministic beam; Ë-closure tie-break`
+  ];
 
   return {
     engineVersion: DEFAULTS.engineVersion,
     primaryPath: primary,
     frontierPaths: frontier,
-    signals: ["beam search; op costs; Ë-closure tiebreak"],
+    signals,
   };
 }
 
