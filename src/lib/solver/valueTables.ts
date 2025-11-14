@@ -24,40 +24,39 @@ export function classRange(cls: CClass): [number, number] {
   }
 }
 
-export const ALB_DIGRAPH_CLASS: Record<string, CClass> = {
+export const ALB_DIGRAPH_CLASS = {
   ll:"Liquid", rr:"Liquid",
   nj:"Nasal",
   sh:"SibilantFricative", zh:"SibilantFricative",
   dh:"NonSibilantFricative", th:"NonSibilantFricative",
   xh:"Affricate",
   gj:"Plosive",
-};
+} as const;
 
-export const ALB_LETTER_CLASS: Record<string, CClass> = {
-  // NOTE: Albanian 'c' = /ts/ → Affricate (this is the Albanian-specific tweak)
-  ç:"Affricate", c:"Affricate",
+export const ALB_LETTER_CLASS = {
+  c:"Affricate", ç:"Affricate", x:"Affricate",
   q:"Plosive", k:"Plosive", g:"Plosive", p:"Plosive", b:"Plosive", t:"Plosive", d:"Plosive",
   f:"NonSibilantFricative", v:"NonSibilantFricative", h:"NonSibilantFricative",
-  s:"SibilantFricative", z:"SibilantFricative", x:"SibilantFricative",
-  j:"Glide",    // Albanian j = /j/
+  s:"SibilantFricative", z:"SibilantFricative",
+  j:"Glide",
   m:"Nasal", n:"Nasal",
   l:"Liquid", r:"Liquid",
-  w:"Glide",    // rare; harmless
-};
+  w:"Glide", // rare but harmless
+} as const;
 
-export const LAT_DIGRAPH_CLASS: Record<string, CClass> = {
+export const LAT_DIGRAPH_CLASS = {
   ch:"Affricate", ts:"Affricate", dz:"Affricate",
   sh:"SibilantFricative", zh:"SibilantFricative",
   th:"NonSibilantFricative", ph:"NonSibilantFricative",
   ck:"Plosive",
-};
+} as const;
 
-export const LAT_LETTER_CLASS: Record<string, CClass> = {
+export const LAT_LETTER_CLASS = {
   p:"Plosive", b:"Plosive", t:"Plosive", d:"Plosive", k:"Plosive", g:"Plosive", q:"Plosive", c:"Plosive",
   f:"NonSibilantFricative", v:"NonSibilantFricative", h:"NonSibilantFricative",
   s:"SibilantFricative", z:"SibilantFricative", x:"SibilantFricative",
-  j:"Affricate", // English/Latin j = /dʒ/
+  j:"Affricate",
   m:"Nasal", n:"Nasal",
   l:"Liquid", r:"Liquid",
   w:"Glide", y:"Glide",
-};
+} as const;
