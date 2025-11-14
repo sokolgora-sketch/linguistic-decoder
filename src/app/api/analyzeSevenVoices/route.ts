@@ -13,18 +13,18 @@ const formatChecksums = (checksums: Checksum[]) => {
 // Helper to transform a Path object to the specified format
 const formatPath = (path: Path) => {
   const E = path.checksums.find(c => c.type === 'E')?.value ?? 0;
-  const opCost = { sub: 1, del: 3, ins: 2 };
-  const Ecalc = (path.ops || []).reduce((s, op) => {
-    if (op.includes("→")) return s + opCost.sub;
-    if (op.startsWith("delete")) return s + opCost.del;
-    if (op.startsWith("closure")) return s + opCost.ins;
-    if (op.startsWith("insert")) return s + opCost.ins;
-    return s;
-  }, 0);
-
+  
   // Note: This check is disabled for now as the core engine's E value includes
   // more than just op costs (e.g. gravity, penalties). A more sophisticated
   // validation could be re-introduced if needed.
+  // const opCost = { sub: 1, del: 3, ins: 2 };
+  // const Ecalc = (path.ops || []).reduce((s, op) => {
+  //   if (op.includes("→")) return s + opCost.sub;
+  //   if (op.startsWith("delete")) return s + opCost.del;
+  //   if (op.startsWith("closure")) return s + opCost.ins;
+  //   if (op.startsWith("insert")) return s + opCost.ins;
+  //   return s;
+  // }, 0);
   // if (Ecalc !== E) { console.warn(`Energy mismatch for ${path.voicePath.join("")}: calc=${Ecalc} engine=${E}`); }
 
   return {
@@ -49,9 +49,15 @@ export async function POST(request: NextRequest) {
     if (!/^[a-zë-]{1,48}$/i.test(w)) {
         return NextResponse.json({ error: "letters/dashes only, ≤48" }, { status: 400 });
     }
+    
+    const strict = mode === "strict";
+    const opts: SolveOptions = strict
+      ? { beamWidth: 8, maxOps: 1, allowDelete: false, allowClosure: false, opCost: { sub:1, del:3, ins:2 } }
+      : { beamWidth: 8, maxOps: 2, allowDelete: true,  allowClosure: true,  opCost: { sub:1, del:3, ins:2 } };
+
 
     // Run the solver
-    const analysisResult = solveMatrix(w, mode as SolveMode);
+    const analysisResult = solveMatrix(w, opts);
     
     // Format the response to match the specification
     const formattedResponse = {

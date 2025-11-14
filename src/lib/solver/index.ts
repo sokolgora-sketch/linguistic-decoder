@@ -13,7 +13,7 @@ export type SolveOptions = {
 };
 
 const DEFAULTS = {
-  engineVersion: "2025-11-13-v1.0",
+  engineVersion: "2025-11-14-core-1",
   beamStrict: 12,
   beamOpen: 20,
   frontierDeltaE: { strict: 2, open: 3 }
@@ -130,10 +130,8 @@ function preferClosureTie(a: Vowel[], b: Vowel[]): number {
 }
 
 
-export function solveMatrix(word: string, mode: SolveMode): Analysis {
-  const options: SolveOptions = mode === 'strict'
-  ? { beamWidth: 8, maxOps: 1, allowDelete: false, allowClosure: false, opCost: { sub: 1, del: 3, ins: 2 } }
-  : { beamWidth: 8, maxOps: 2, allowDelete: true,  allowClosure: true,  opCost: { sub: 1, del: 3, ins: 2 } };
+export function solveMatrix(word: string, options: SolveOptions): Analysis {
+  const mode = (options.maxOps ?? 2) > 1 ? "open" : "strict";
 
   const { consonants, slots } = buildSlots(word);
   const beam = (mode==="strict" ? DEFAULTS.beamStrict : DEFAULTS.beamOpen) * (options.beamWidth ?? 1);
