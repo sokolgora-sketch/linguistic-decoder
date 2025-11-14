@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { analyzeWordAction } from './actions';
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -9,8 +9,9 @@ import { Input } from "@/components/ui/input";
 import { Candidates } from "@/components/Candidates";
 import { HistoryPanel, type HistItem } from "@/components/HistoryPanel";
 import { ResultsDisplay } from "@/components/ResultsDisplay";
+import DigitalRain from "@/components/DigitalRain";
 import { TwoRailsWithConsonants } from "@/components/TwoRailsWithConsonants";
-
+import WordRevealRain from "@/components/WordRevealRain";
 
 // ==== Types matching the /analyzeWord response ===============================
 interface Checksums { V: number; E: number; C: number; }
@@ -27,6 +28,7 @@ export interface AnalyzeResponse {
   },
   languageFamilies?: Record<string, { form:string; map:string[]; functional:string }[]> | null;
 }
+type Vowel = "A"|"E"|"I"|"O"|"U"|"Y"|"Ë";
 
 
 // ==== Small helpers ==========================================================
@@ -67,9 +69,15 @@ export default function LinguisticDecoderApp(){
   const [word, setWord] = useState("study");
   const [mode, setMode] = useState<"strict"|"open">("strict");
   const [data, setData] = useState<AnalyzeResponse | null>(null);
-  const [loading, setLoading] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [showDebug, setShowDebug] = useState(false);
+  
+  const [phase, setPhase] = useState<"idle"|"scan"|"hops"|"reveal"|"done">("idle");
+  const [loading, setLoading] = useState(false);
+  const [path, setPath] = useState<Vowel[]>([]);
+  const [currentWord, setCurrentWord] = useState("study");
+  const scanningMs = 1400;
+  const hopMs = 900;
 
   const canAnalyze = word.trim().length > 0 && !loading;
 
@@ -78,18 +86,31 @@ export default function LinguisticDecoderApp(){
     const useMode: "strict"|"open" = nextMode ?? mode;
     if (!useWord) return;
     try {
-      setData(null); // Clear previous results immediately
-      setLoading(true); setErr(null);
+      setData(null); // Clear previous results
+      setPath([]); // Clear path
+      setLoading(true); 
+      setErr(null);
+      setCurrentWord(useWord);
+      setPhase("scan");
       
       const res = await analyzeWordAction({ word: useWord, mode: useMode });
 
       if (!res.ok) {
         toast({ title: "Error", description: res.error, variant: "destructive" });
         setData(null);
+        setPhase("idle");
+        setLoading(false);
         return;
       }
       const j = res.data as AnalyzeResponse;
       setData(j);
+      
+      // Set path and start hops after scanning is notionally done
+      setTimeout(() => {
+        setPath((j.analysis.primary.voice_path as Vowel[]) || []);
+        setPhase("hops");
+      }, scanningMs);
+
 
       // Save local history
       if (j?.analysis.primary?.voice_path) {
@@ -99,11 +120,18 @@ export default function LinguisticDecoderApp(){
     } catch (e:any) {
       setErr(e?.message || "Request failed");
       setData(null);
-    } finally { setLoading(false); }
+      setPhase("idle");
+    } finally { 
+      // Loading is finished once hops start
+      setLoading(false); 
+    }
   }
 
+  const handleHopsDone = useCallback(() => {
+    setPhase("reveal");
+  }, []);
+
   const analysis = data?.analysis;
-  const primaryPath = analysis?.primary.voice_path || [];
   
   return (
     <div>
@@ -131,7 +159,7 @@ export default function LinguisticDecoderApp(){
               Strict
             </label>
             <Button onClick={()=> analyze()} disabled={!canAnalyze}>
-              {loading ? "Analyzing…" : "Analyze"}
+              {loading && phase === 'scan' ? "Analyzing…" : "Analyze"}
             </Button>
           </div>
           {err && <div className="mt-2.5 text-red-700 font-semibold">Error: {err}</div>}
@@ -140,20 +168,39 @@ export default function LinguisticDecoderApp(){
 
       {/* Visualization & Results */}
       <div className="max-w-5xl mx-auto px-4 grid grid-cols-1 gap-4">
-        <div className="flex justify-center">
-            <TwoRailsWithConsonants
-                word={data?.analysis.word || word}
-                path={primaryPath as any}
-                running={loading}
-                playKey={`${data?.analysis.word}|${primaryPath.join('')}`}
-            />
+        <div className="relative h-[360px] rounded-2xl overflow-hidden border bg-black">
+          {/* Matrix rain while scanning */}
+          <DigitalRain className="absolute inset-0" paused={phase!=="scan"} backgroundTint="rgba(0,0,0,0.35)" />
+
+          {/* Rails + hops (visible during hops/done) */}
+          <div className="absolute inset-0 pointer-events-none" style={{opacity: phase==="hops" || phase==="done" || phase === "reveal" ? 1 : 0, transition:"opacity 250ms"}}>
+            <div className="p-3">
+              <TwoRailsWithConsonants
+                word={currentWord}
+                path={path}
+                running={phase==="scan"}
+                playKey={`${currentWord}|${path.join("")}`}
+                height={320}
+                durationPerHopMs={hopMs}
+                onDone={handleHopsDone}
+              />
+            </div>
+          </div>
+
+          {/* Word reveal constructed from rain after hops */}
+          <WordRevealRain
+            word={currentWord}
+            show={phase==="reveal"}
+            onDone={()=>setPhase("done")}
+          />
         </div>
+
         {analysis ? (
           <>
             <ResultsDisplay analysis={analysis} />
             {data?.languageFamilies && <Candidates map={data.languageFamilies} />}
           </>
-        ) : !loading && (
+        ) : phase === 'idle' && (
           <Card className="p-5">
             <h3 className="font-bold text-sm tracking-wide">How to use</h3>
             <ol className="list-decimal pl-5 mt-2 space-y-2 text-sm">
