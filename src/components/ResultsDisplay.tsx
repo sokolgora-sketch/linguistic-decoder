@@ -30,35 +30,47 @@ const Chip = ({ v }: { v: string | number }) => (
 );
 
 function ConsonantInfo({ analysis }: { analysis: EnginePayload }) {
-  const { windows, windowClasses, primaryPath } = analysis;
+  const { windows, windowClasses, primaryPath, edgeWindows } = analysis;
   const ringPath = primaryPath?.ringPath;
 
-  if (!windows || !windowClasses || windows.length === 0) {
+  const hasInteriorWindows = windows && windowClasses && windows.length > 0;
+  const hasEdgeWindows = edgeWindows && edgeWindows.length > 0;
+
+  if (!hasInteriorWindows && !hasEdgeWindows) {
     return null;
   }
 
   return (
     <div className="mt-2.5">
       <h4 className="text-xs text-slate-500 mb-1">Consonant Influence</h4>
-      <div className="flex flex-col gap-1.5">
-        {windows.map((w, i) => {
-          const cClass = windowClasses[i] as CClass;
-          const [lo, hi] = classRange(cClass);
-          let hopInfo = "";
-          if (ringPath && i < ringPath.length - 1) {
-            const delta = Math.abs(ringPath[i+1] - ringPath[i]);
-            const isOptimal = delta >= lo && delta <= hi;
-            hopInfo = `|Δring| = ${delta} ${isOptimal ? "✓" : "✗"}`;
-          }
+      
+      {hasInteriorWindows && (
+        <div className="flex flex-col gap-1.5">
+          {windows.map((w, i) => {
+            const cClass = windowClasses[i] as CClass;
+            const [lo, hi] = classRange(cClass);
+            let hopInfo = "";
+            if (ringPath && i < ringPath.length - 1) {
+              const delta = Math.abs(ringPath[i+1] - ringPath[i]);
+              const isOptimal = delta >= lo && delta <= hi;
+              hopInfo = `|Δring| = ${delta} ${isOptimal ? "✓" : "✗"}`;
+            }
 
-          return (
-            <Card key={i} className="p-2.5 text-sm font-code flex justify-between items-center">
-              <span>'{w}' is <span className="font-semibold">{cClass}</span> (prefers {lo}–{hi})</span>
-              <span className="font-semibold">{hopInfo}</span>
-            </Card>
-          );
-        })}
-      </div>
+            return (
+              <Card key={i} className="p-2.5 text-sm font-code flex justify-between items-center">
+                <span>'{w}' is <span className="font-semibold">{cClass}</span> (prefers {lo}–{hi})</span>
+                <span className="font-semibold">{hopInfo}</span>
+              </Card>
+            );
+          })}
+        </div>
+      )}
+
+      {hasEdgeWindows && (
+        <div className="text-xs text-muted-foreground mt-2 pt-2 border-t">
+          <b>Edge:</b> {edgeWindows.join(" · ")}
+        </div>
+      )}
     </div>
   );
 }
