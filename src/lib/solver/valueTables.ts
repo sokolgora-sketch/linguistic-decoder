@@ -1,6 +1,9 @@
 
+import { detectAlphabet } from "./alphabet";
+import type { Alphabet } from "./engineConfig";
+import type { Vowel } from "./types";
+
 export const VOWELS = ["A","E","I","O","U","Y","Ë"] as const;
-export type Vowel = typeof VOWELS[number];
 
 export const VOWEL_VALUE: Record<Vowel, number> = { A:2, E:3, I:5, O:7, U:11, Y:13, "Ë":17 };
 export const VOWEL_RING:  Record<Vowel, number> = { A:3, E:2, I:1, O:0, U:1, Y:2, "Ë":3 };
@@ -11,7 +14,6 @@ export type CClass =
   | "NonSibilantFricative" | "SibilantFricative"
   | "Affricate" | "Plosive";
 
-// Expected |Δring| per class
 export function classRange(cls: CClass): [number, number] {
   switch (cls) {
     case "Glide":
@@ -60,3 +62,64 @@ export const LAT_LETTER_CLASS = {
   l:"Liquid", r:"Liquid",
   w:"Glide", y:"Glide",
 } as const;
+
+
+function classifyWindow(chars: string, alphabet: "albanian"|"latin"): CClass {
+  const s = chars.toLowerCase();
+  const DG = alphabet === "albanian" ? ALB_DIGRAPH_CLASS : LAT_DIGRAPH_CLASS;
+  const LT = alphabet === "albanian" ? ALB_LETTER_CLASS  : LAT_LETTER_CLASS;
+
+  // digraph pass
+  for (let i = 0; i < s.length - 1; i++) {
+    const dg = s.slice(i, i + 2);
+    if (DG[dg as keyof typeof DG]) return DG[dg as keyof typeof DG];
+  }
+  // first consonant fallback
+  for (const ch of s) {
+    if (/[aeiouyë]/i.test(ch)) continue;
+    if (LT[ch as keyof typeof LT]) return LT[ch as keyof typeof LT];
+  }
+  return "NonSibilantFricative";
+}
+
+
+// This is defined here but needs `toVowel` which is in `index.ts`
+// It will be passed as an argument to avoid circular dependencies.
+export function extractWindowClasses(
+  word: string,
+  baseSeq: Vowel[],
+  alphabetPref: Alphabet,
+  toVowel: (ch: string) => Vowel | null
+): CClass[] {
+  const alphabet = alphabetPref === "auto" ? detectAlphabet(word) : alphabetPref;
+  const s = word.normalize("NFC");
+
+  // indices of base vowels in raw string
+  const pos: number[] = [];
+  let vi = 0;
+  for (let i = 0; i < s.length && vi < baseSeq.length; i++) {
+    const ch = s[i];
+    const v = toVowel(ch);
+    if (!v) continue;
+    if (v === baseSeq[vi]) { pos.push(i); vi++; }
+  }
+
+  const windows: string[] = [];
+  for (let k = 0; k < pos.length - 1; k++) {
+    windows.push(s.slice(pos[k] + 1, pos[k + 1]));
+  }
+  return windows.map(chars => classifyWindow(chars, alphabet));
+}
+
+export function computeC(voicePath: Vowel[], consClasses: CClass[]): number {
+  let c = 0;
+  const hops = Math.max(0, voicePath.length - 1);
+  for (let i = 0; i < hops; i++) {
+    const cls = i < consClasses.length ? consClasses[i] : "Glide";
+    const d = Math.abs(VOWEL_RING[voicePath[i + 1]] - VOWEL_RING[voicePath[i]]);
+    const [lo, hi] = classRange(cls);
+    if (d < lo) c += (lo - d);
+    else if (d > hi) c += (d - hi);
+  }
+  return c;
+}

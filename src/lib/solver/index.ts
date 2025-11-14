@@ -1,5 +1,6 @@
 
-import { VOWELS, Vowel, VOWEL_LEVEL, VOWEL_RING, VOWEL_VALUE, CClass, classRange, ALB_DIGRAPH_CLASS, ALB_LETTER_CLASS, LAT_DIGRAPH_CLASS, LAT_LETTER_CLASS } from "./valueTables";
+import { VOWELS, Vowel, VOWEL_LEVEL, VOWEL_RING, VOWEL_VALUE, CClass, computeC, extractWindowClasses } from "./valueTables";
+import { detectAlphabet } from "./alphabet";
 import type { Analysis, Path, SolveMode } from "./types";
 import { CFG, ENGINE_VERSION, Alphabet } from "./engineConfig";
 
@@ -15,7 +16,8 @@ export type SolveOptions = {
 
 // --- Base Extraction & Keep Count ---
 function isVowelChar(ch:string){ const c=ch.normalize("NFC"); return /[aeiouy]/i.test(c)||c==="ë"||c==="Ë"; }
-function toVowel(ch:string):Vowel|null{ const u=ch.toUpperCase(); return u==="Ë" ? "Ë" : (["A","E","I","O","U","Y"].includes(u)?(u as Vowel):null); }
+function toVowel(ch:string):Vowel|null{ const u=ch.toUpperCase(); return u==="Ë" ? "Ë" : (VOWELS.includes(u as any)?(u as Vowel):null); }
+
 function extractBase(word:string):Vowel[]{ 
     const out:Vowel[]=[]; 
     for(const ch of word.normalize("NFC")){ 
@@ -29,8 +31,6 @@ function extractBase(word:string):Vowel[]{
 function keptCount(base:Vowel[], cand:Vowel[]){ let k=0; for(let i=0;i<Math.min(base.length,cand.length);i++) if(base[i]===cand[i]) k++; return k; }
 
 function normalizeTerminalY(seq: Vowel[], rawWord: string): Vowel[] {
-  // Rule N0: English terminal “y” behaves like /i/
-  // e.g., study, happy, duty → final Y becomes I
   if (CFG.norm.terminalYtoI && seq.length && seq[seq.length - 1] === "Y" && rawWord.toLowerCase().endsWith("y")) {
     const out = seq.slice();
     out[out.length - 1] = "I";
@@ -53,8 +53,6 @@ function preferClosureTie(a: Vowel[], b: Vowel[]): number {
   return enda - endb;
 }
 
-// Ranking tuple: (E_total, ringPenalty, C * cWeight, -kept, V)
-// preferClosureTie is handled separately after this tuple comparison.
 function scoreTuple(p: Path): [number, number, number, number, number] {
   const E = p.checksums.find(c => c.type === "E")!.value;
   const V = p.checksums.find(c => c.type === "V")!.value;
@@ -77,66 +75,6 @@ function opCostFromLabel(op: string, costs: { sub: number; del: number; ins: num
   if(op.startsWith("closure")) return costs.ins;
   return costs.sub;
 }
-
-// --- Consonant Classification & Hop Penalty ---
-
-function detectAlphabet(word: string): "albanian" | "latin" {
-  // Albanian signals: ë, ç, or canonical digraphs/letters
-  return /[ëç]|xh|zh|sh|dh|th|nj|gj|ll|rr|q/i.test(word) ? "albanian" : "latin";
-}
-
-function classifyWindow(chars: string, alphabet: "albanian" | "latin"): CClass {
-  const s = chars.toLowerCase();
-  const DG = alphabet === "albanian" ? ALB_DIGRAPH_CLASS : LAT_DIGRAPH_CLASS;
-  const LT = alphabet === "albanian" ? ALB_LETTER_CLASS  : LAT_LETTER_CLASS;
-
-  // digraph pass (left-to-right, non-overlapping signal)
-  for (let i = 0; i < s.length - 1; i++) {
-    const dg = s.slice(i, i + 2);
-    if (DG[dg]) return DG[dg];
-  }
-  // first consonant letter fallback
-  for (const ch of s) {
-    if (/[aeiouyë]/i.test(ch)) continue;
-    if (LT[ch]) return LT[ch];
-  }
-  return "NonSibilantFricative"; // neutral default
-}
-
-
-export function extractWindowClasses(word: string, baseSeq: Vowel[], alphabetPref: Alphabet): CClass[] {
-  const alphabet = alphabetPref === "auto" ? detectAlphabet(word) : alphabetPref;
-  const s = word.normalize("NFC");
-
-  // find indices of normalized base vowels in raw string
-  const pos: number[] = [];
-  let vi = 0;
-  for (let i = 0; i < s.length && vi < baseSeq.length; i++) {
-    const v = toVowel(s[i]);
-    if (!v) continue;
-    if (v === baseSeq[vi]) { pos.push(i); vi++; }
-  }
-
-  const windows: string[] = [];
-  for (let k = 0; k < pos.length - 1; k++) {
-    windows.push(s.slice(pos[k] + 1, pos[k + 1]));
-  }
-  return windows.map(chars => classifyWindow(chars, alphabet));
-}
-
-export function computeC(voicePath: Vowel[], consClasses: CClass[]): number {
-  let c = 0;
-  const hops = Math.max(0, voicePath.length - 1);
-  for (let i = 0; i < hops; i++) {
-    const cls = i < consClasses.length ? consClasses[i] : "Glide"; // extra hop (e.g., closure) ~ Glide
-    const d = Math.abs(VOWEL_RING[voicePath[i + 1]] - VOWEL_RING[voicePath[i]]);
-    const [lo, hi] = classRange(cls);
-    if (d < lo) c += (lo - d);
-    else if (d > hi) c += (d - hi);
-  }
-  return c;
-}
-
 
 function mkPath(base: Vowel[], seq: Vowel[], E: number, ops: string[], consClasses: CClass[]): Path {
     const p: Path = {
@@ -193,7 +131,7 @@ function solveWord(word: string, opts: SolveOptions): Omit<Analysis, "word" | "m
   const rawBase = extractBase(word);
   const base = normalizeTerminalY(rawBase, word);
   const baseSeq = base.length ? base : (["O"] as Vowel[]);
-  const consClasses = extractWindowClasses(word, baseSeq, CFG.alphabet);
+  const consClasses = extractWindowClasses(word, baseSeq, CFG.alphabet, toVowel);
   const alphabet = CFG.alphabet === 'auto' ? detectAlphabet(word) : CFG.alphabet;
 
   const K = opts.beamWidth;
