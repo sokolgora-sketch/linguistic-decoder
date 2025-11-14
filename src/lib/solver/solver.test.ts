@@ -1,5 +1,6 @@
 
-import { solveMatrix } from "./index";
+import { solveMatrix, baseForTests } from "./index";
+import { checksumV } from './valueTables';
 import type { SolveOptions } from "./index";
 import { CFG } from "./engineConfig";
 
@@ -7,7 +8,7 @@ const strict: SolveOptions = { beamWidth: CFG.beamWidth, maxOps: CFG.maxOpsStric
 const open: SolveOptions   = { beamWidth: CFG.beamWidth, maxOps: CFG.maxOpsOpen,   allowDelete: true,  allowClosure: true,  opCost: { sub: CFG.cost.sub, del: CFG.cost.del, ins: CFG.cost.insClosure } };
 
 
-const V = (p:any)=> p.checksums.find((c:any)=>c.type==="V")?.value ?? -1;
+const V = (p:any)=> p.checksums.find((c:any)=>c.type==="V"?.value ?? -1;
 const E = (p:any)=> p.checksums.find((c:any)=>c.type==="E")?.value ?? -1;
 const C = (p:any)=> p.checksums.find((c:any)=>c.type==="C")?.value ?? -1;
 
@@ -33,4 +34,10 @@ test("damage (open) → A→I→Ë", () => {
   expect(V(primaryPath)).toBe(170); // 2*5*17
   expect(E(primaryPath)).toBe(3); // A→E->I is 1 op, + closure-Ë
   expect(C(primaryPath)).toBe(0); // A(3)->I(1) |d|=2; I(1)->E(3) |d|=2
+});
+
+test('checksumV basics', () => {
+  expect(checksumV(['U','I'] as any)).toBe(55);         // 11*5
+  expect(checksumV(['A','E','Ë'] as any)).toBe(102);    // 2*3*17
+  expect(checksumV(['A','A','E','E'] as any)).toBe(6);  // dedup
 });
