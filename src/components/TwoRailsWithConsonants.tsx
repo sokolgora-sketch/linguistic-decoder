@@ -209,7 +209,7 @@ export function TwoRailsWithConsonants({
   );
 
   const MidRail = () => {
-    const segW = 60, gap = 4;
+    const segW = 54, gap = 3;
     const totalW = CLASS_ORDER.length*segW + (CLASS_ORDER.length-1)*gap;
     const startX = (W - totalW)/2;
 
@@ -226,7 +226,7 @@ export function TwoRailsWithConsonants({
                 fill={active ? PALETTE.accent : "#f3f4f6"}
                 fillOpacity={active ? 0.9 : 0.6}
                 stroke="#d1d5db" strokeOpacity={0.6} />
-              <text x={x+segW/2} y={midY} textAnchor="middle" fontSize={12}
+              <text x={x+segW/2} y={midY} textAnchor="middle" fontSize={11}
                 fill={active ? "#111827" : PALETTE.muted} dominantBaseline="central">
                 {shortName}
               </text>
@@ -319,3 +319,5 @@ export function TwoRailsWithConsonants({
     </div>
   );
 }
+
+    
