@@ -129,9 +129,38 @@ function preferClosureTie(a: Vowel[], b: Vowel[]): number {
   return enda - endb;
 }
 
+function opCostFromLabel(op:string, costs: { sub: number; del: number; ins: number; }){ 
+    if(op.startsWith("delete")) return costs.del; 
+    if(op.startsWith("closure") || op.startsWith("insert")) return costs.ins; 
+    return costs.sub; 
+}
+
+function mkPath(base: Vowel[], seq: Vowel[], E: number, ops: string[], kept: number, cStab: number, opCosts: { sub: number; del: number; ins: number; }): Path {
+    const p: Path = {
+        voicePath: seq,
+        ringPath: seq.map(v=>VOWEL_RING[v]),
+        levelPath: seq.map(v=>VOWEL_LEVEL[v]),
+        checksums: [{type:"V",value:seq.reduce((acc,v)=> acc*VOWEL_VALUE[v], 1)}, {type:"E",value:E}, {type:"C",value:cStab}],
+        kept: kept,
+        ops,
+    };
+    // Note: E includes gravity and penalties, so it won't perfectly match op costs.
+    // This is an area for future refinement if exact cost tracking is needed.
+    // const Ecalc = ops.reduce((s,op)=>s+opCostFromLabel(op, opCosts),0);
+    // if (Ecalc !== E) throw new Error(`Energy mismatch E=${E} sum(ops)=${Ecalc} ops=${ops.join(',')}`);
+
+    if (p.kept > Math.min(base.length, seq.length)) {
+        console.warn(`Keeps overflow: kept=${p.kept} base=${base.length} seq=${seq.length}`);
+    }
+    // hard block any illegal op text that slipped in from old code:
+    if (ops.some(o=>o.startsWith("insert ") && !o.startsWith("insert Ë"))) throw new Error("Illegal insert op");
+    return p;
+}
+
 
 export function solveMatrix(word: string, options: SolveOptions): Analysis {
   const mode = (options.maxOps ?? 2) > 1 ? "open" : "strict";
+  const opCosts = options.opCost ?? { sub: 1, del: 3, ins: 2 };
 
   const { consonants, slots } = buildSlots(word);
   const beam = (mode==="strict" ? DEFAULTS.beamStrict : DEFAULTS.beamOpen) * (options.beamWidth ?? 1);
@@ -192,7 +221,8 @@ export function solveMatrix(word: string, options: SolveOptions): Analysis {
       const instr = hasInstrument(path);
       const instrPenalty = instr ? 0 : (obsHasInstr ? 2 : 1);
       const closureBias = closure === "Ë" ? -nounish : (nounish ? +nounish : 0);
-      const opCostTotal = st.ops.reduce((s, op) => s + (op.startsWith("delete") ? 3 : op.startsWith("closure") ? 2 : 1), 0);
+      
+      const opCostTotal = st.ops.reduce((s, op) => s + opCostFromLabel(op, opCosts), 0) + opCosts.ins;
       const finalOps = [...st.ops, `closure ${closure}`];
 
       if (finalOps.length > (options.maxOps ?? 2) + 1) continue;
@@ -204,10 +234,11 @@ export function solveMatrix(word: string, options: SolveOptions): Analysis {
     // Handle no-closure case (for strict mode primarily)
     if (!options.allowClosure) {
         const path = st.path;
+        if (!path.length) continue;
         const g = gravityBonus(path);
         const instr = hasInstrument(path);
         const instrPenalty = instr ? 0 : (obsHasInstr ? 2 : 1);
-        const opCostTotal = st.ops.reduce((s, op) => s + (op.startsWith("delete") ? 3 : op.startsWith("closure") ? 2 : 1), 0);
+        const opCostTotal = st.ops.reduce((s, op) => s + opCostFromLabel(op, opCosts), 0);
         const E = opCostTotal + g + instrPenalty;
         sols.push({ path, E, ops: st.ops, cStab: st.cStab, closure: path[path.length - 1], kept: st.kept, hasInstr: instr });
     }
@@ -251,19 +282,12 @@ export function solveMatrix(word: string, options: SolveOptions): Analysis {
       .slice(1)
       .filter(s => s.E <= primary.E + delta && s.path.join("") !== pKey)
   );
+  
+  const baseVowels = slots.filter((v): v is Vowel => !!v);
 
-  const toPath = (sol: {path: Vowel[], E: number, cStab: number, ops: string[], kept: number}): Path => ({
-    voicePath: sol.path,
-    ringPath: sol.path.map(v => VOWEL_RING[v]),
-    levelPath: sol.path.map(v => VOWEL_LEVEL[v]),
-    ops: sol.ops,
-    checksums: [
-        { type: 'V', value: sol.path.reduce((acc,v)=> acc*VOWEL_VALUE[v], 1) },
-        { type: 'E', value: sol.E },
-        { type: 'C', value: sol.cStab }
-    ],
-    kept: sol.kept
-  });
+  const toPath = (sol: {path: Vowel[], E: number, cStab: number, ops: string[], kept: number}): Path => mkPath(
+    baseVowels, sol.path, sol.E, sol.ops, sol.kept, sol.cStab, opCosts
+  );
 
   return {
     engineVersion: DEFAULTS.engineVersion,
