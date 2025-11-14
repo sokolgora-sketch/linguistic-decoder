@@ -9,6 +9,7 @@ import { ENGINE_VERSION } from "./solver/engineVersion";
 type Mode = "strict" | "open";
 type AnalyzeOpts = { bypass?: boolean; skipWrite?: boolean };
 
+// This returns the full payload from the API, which includes the `analysis` key
 export async function analyzeClient(word: string, mode: Mode, alphabet: Alphabet, opts: AnalyzeOpts = {}) {
   await ensureAnon();
   const cacheId = `${word}|${mode}|${alphabet}|${ENGINE_VERSION}`;
@@ -16,12 +17,14 @@ export async function analyzeClient(word: string, mode: Mode, alphabet: Alphabet
 
   // BYPASS: For re-analysis or special cases.
   if (opts.bypass) {
-    const analysisResult = await fetchAnalysis(word, mode, alphabet);
+    const apiResponse = await fetchAnalysis(word, mode, alphabet);
     if (!opts.skipWrite) {
-      await setDoc(cacheRef, { analysis: analysisResult, cachedAt: serverTimestamp() }, { merge: true });
+      // The API response now includes { analysis: ..., languageFamilies: ... }
+      // We write the whole thing to the cache.
+      await setDoc(cacheRef, { ...apiResponse, cachedAt: serverTimestamp() }, { merge: true });
     }
     void saveHistory(word, mode, alphabet);
-    return { analysis: analysisResult, cacheHit: false, recomputed: true };
+    return { ...apiResponse, cacheHit: false, recomputed: true };
   }
 
   // 1) READ CACHE
@@ -30,22 +33,24 @@ export async function analyzeClient(word: string, mode: Mode, alphabet: Alphabet
     console.log("Cache hit!");
     const data = snap.data();
     void saveHistory(word, mode, alphabet); 
-    return { analysis: data.analysis, languageFamilies: data.languageFamilies, cacheHit: true };
+    // The cached data should have the same shape as the API response
+    return { ...data, cacheHit: true };
   }
 
   console.log("Cache miss, calling API...");
   
   // 2) CALL API
-  const analysisResult = await fetchAnalysis(word, mode, alphabet);
+  const apiResponse = await fetchAnalysis(word, mode, alphabet);
   
-  // 3) WRITE CACHE (client-side) - The page will now handle writing the full payload with families
-  await setDoc(cacheRef, { analysis: analysisResult, cachedAt: serverTimestamp() }, { merge: true });
+  // 3) WRITE CACHE - The page will handle enriching with families and then writing.
+  // For now, we just cache the raw analysis.
+  await setDoc(cacheRef, { analysis: apiResponse.analysis, cachedAt: serverTimestamp() }, { merge: true });
 
   // 4) WRITE USER HISTORY
   await saveHistory(word, mode, alphabet);
 
-  // Return just the analysis portion for the page to orchestrate AI call
-  return { analysis: analysisResult, cacheHit: false };
+  // Return the full API response for the page to orchestrate AI call
+  return { ...apiResponse, cacheHit: false };
 }
 
 async function fetchAnalysis(word: string, mode: Mode, alphabet: Alphabet) {
@@ -108,11 +113,11 @@ export async function prefetchAnalyze(
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ word, mode, alphabet }),
     });
-    const analysisResult = await r.json();
-    if (analysisResult?.error) return;
+    const apiResponse = await r.json();
+    if (apiResponse?.error) return;
 
     // We only cache the analysis part. The page component is responsible for the AI call.
-    await setDoc(cacheRef, { analysis: analysisResult, cachedAt: serverTimestamp() }, { merge: true });
+    await setDoc(cacheRef, { analysis: apiResponse.analysis, cachedAt: serverTimestamp() }, { merge: true });
 
   } catch (e) {
     console.warn("Prefetch failed", e);

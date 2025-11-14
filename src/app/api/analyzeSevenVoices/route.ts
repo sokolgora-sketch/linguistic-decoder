@@ -43,17 +43,19 @@ export async function POST(request: NextRequest) {
     
     // Format the response to match the specification
     const payload = {
-        engineVersion: ENGINE_VERSION,
-        word: analysisResult.word,
-        mode: analysisResult.mode,
-        alphabet,
-        primary: analysisResult.primaryPath,
-        frontier: analysisResult.frontierPaths,
-        windows,
-        windowClasses: classes,
-        signals: [...analysisResult.signals, `alphabet=${profile.id}`],
-        solveMs: Date.now() - t0,
-        ts: Date.now(),
+        analysis: {
+            engineVersion: ENGINE_VERSION,
+            word: analysisResult.word,
+            mode: analysisResult.mode,
+            alphabet,
+            primaryPath: analysisResult.primaryPath,
+            frontierPaths: analysisResult.frontierPaths,
+            windows,
+            windowClasses: classes,
+            signals: [...analysisResult.signals, `alphabet=${profile.id}`],
+            solveMs: Date.now() - t0,
+            ts: Date.now(),
+        }
     };
     
     return NextResponse.json(payload);

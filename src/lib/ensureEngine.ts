@@ -9,16 +9,22 @@ import { ENGINE_VERSION } from "./solver/engineVersion";
 type Mode = "strict"|"open";
 
 export async function ensureEnginePayload(
-  source: any,               // engine payload OR history row
+  source: any,               // Can be clientResponse or a history row
   mode: Mode,
   alphabet: Alphabet
 ) {
-  // Already good? If it has the 'primaryPath' key, we assume it's a valid analysis object.
-  if (source?.primaryPath?.voicePath?.length) return source;
+  // Case 1: Already a valid analysis payload from analyzeClient or cache
+  if (source?.analysis?.primaryPath?.voicePath?.length) {
+    return source.analysis;
+  }
 
-  // History row? Try analyses/{cacheId}
-  const cacheId = `${source.word}|${source.mode}|${source.alphabet}|${ENGINE_VERSION}`;
-  if (source?.word && source?.mode && source?.alphabet) {
+  // Case 2: History row? Try to get the full analysis from cache.
+  const word = source?.word;
+  const sourceMode = source?.mode ?? mode;
+  const sourceAlphabet = source?.alphabet ?? alphabet;
+
+  if (word) {
+    const cacheId = `${word}|${sourceMode}|${sourceAlphabet}|${ENGINE_VERSION}`;
     const snap = await getDoc(doc(db, "analyses", cacheId));
     if (snap.exists()) {
         const data = snap.data();
@@ -28,9 +34,9 @@ export async function ensureEnginePayload(
   }
 
   // Last resort: recompute fresh. This is a failsafe.
-  // The result from analyzeClient has the analysis data nested under 'analysis'
-  if (source?.word) {
-    const result = await analyzeClient(source.word, mode, alphabet, { bypass: true, skipWrite: true });
+  if (word) {
+    const result = await analyzeClient(word, mode, alphabet, { bypass: true, skipWrite: true });
+    // analyzeClient's result has the analysis data nested under 'analysis'
     if (result?.analysis) return result.analysis;
   }
 

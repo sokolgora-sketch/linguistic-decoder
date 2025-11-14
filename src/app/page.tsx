@@ -84,9 +84,10 @@ export default function LinguisticDecoderApp(){
     try {
       // 1. Get the analysis result (from cache or API)
       const clientResponse = await analyzeClient(useWord, useMode, useAlphabet);
+      console.log("API result:", clientResponse); // Debug this line to ensure the structure is correct.
       
       // 2. Ensure we have a valid payload for the AI
-      const enginePayload = await ensureEnginePayload(clientResponse.analysis, useMode, useAlphabet);
+      const enginePayload = await ensureEnginePayload(clientResponse, useMode, useAlphabet);
       console.debug("Primary Path object:", enginePayload?.primaryPath);
       console.debug("PrimaryPath keys:", enginePayload?.primaryPath && Object.keys(enginePayload.primaryPath));
 
