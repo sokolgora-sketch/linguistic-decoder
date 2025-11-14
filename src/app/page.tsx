@@ -1,7 +1,7 @@
 
 'use client';
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -77,6 +77,23 @@ export default function LinguisticDecoderApp(){
       setLoading(false);
     }
   }
+
+  useEffect(() => {
+    const p = new URLSearchParams(window.location.search);
+    const w = p.get("word"); 
+    const m = p.get("mode") as "strict"|"open" | null; 
+    const a = p.get("alphabet") as Alphabet | null;
+    if (w) { 
+      const currentWord = w;
+      const currentMode = m || 'strict';
+      const currentAlphabet = a || 'auto';
+      setWord(currentWord); 
+      setMode(currentMode); 
+      setAlphabet(currentAlphabet); 
+      analyze(currentWord, currentMode, currentAlphabet); 
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const analysis = data?.analysis;
   const signals = analysis?.signals?.join(" · ") || "";
