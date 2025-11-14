@@ -171,7 +171,7 @@ export default function LinguisticDecoderApp(){
               <AccordionContent>
                 <Card className="p-5">
                   <ol className="list-decimal pl-5 mt-2 space-y-2 text-sm">
-                    <li>Type a word and click <kbd className="border border-b-2 rounded-md bg-slate-100 px-1.5 py-0.5 text-xs">Analyze</kbd>.</li>
+                    <li>Type a word and click <kbd className="bg-primary text-primary-foreground rounded-md px-2 py-1 text-xs font-semibold">Analyze</kbd>.</li>
                     <li>Use the dropdown to force a specific phonetic profile, or leave on "Auto-Detect".</li>
                     <li>Primary block shows Voice / Level / Ring paths and checksums <span className="font-code">V/E/C</span>.</li>
                     <li>Frontier lists near‑optimal alternates (deterministic order).</li>
