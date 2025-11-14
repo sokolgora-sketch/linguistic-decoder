@@ -5,50 +5,50 @@ import { extractWindowClassesWithProfile } from "./valueTables";
 import { baseForTests } from "./index";
 import type { Vowel } from "./valueTables";
 
-function classes(word: string, overrideId?: string) {
-  const P = chooseProfile(word, overrideId); // override: "latin" | "albanian" | "sanskrit" | "ancient_greek" | "pie"
+const classes = (word: string, profileId: string) => {
+  const P = chooseProfile(word, profileId);
   const seq = baseForTests(word);
-  return extractWindowClassesWithProfile(word, seq, P); // returns array of CClass
-}
+  return extractWindowClassesWithProfile(word, seq, P);
+};
 
-describe("Language profiles → window classes are deterministic", () => {
+describe("window→class (deterministic)", () => {
   // Latin
-  test("study (Latin fallback)", () => {
-    expect(classes("study", "latin")).toEqual(["Plosive"]); // "d"
+  it("study (latin) → ['Plosive']", () => {
+    expect(classes("study", "latin")).toEqual(["Plosive"]);
   });
-  test("damage (Latin fallback)", () => {
-    expect(classes("damage", "latin")).toEqual(["Nasal"]); // "mag" -> m
+  it("damage (latin) → ['Nasal']", () => {
+    expect(classes("damage", "latin")).toEqual(["Nasal"]);
   });
 
   // Albanian
-  test("zemër (Albanian)", () => {
-    expect(classes("zemër", "albanian")).toEqual(["Nasal"]); // "m"
+  it("zemër (albanian) → ['Nasal']", () => {
+    expect(classes("zemër", "albanian")).toEqual(["Nasal"]);
   });
-  test("gjuhë (Albanian)", () => {
-    expect(classes("gjuhë", "albanian")).toEqual(["NonSibilantFricative"]); // "h"
-  });
-
-  // Sanskrit (romanized)
-  test("śakti (Sanskrit)", () => {
-    expect(classes("śakti", "sanskrit")).toEqual(["Plosive"]); // "kt"
-  });
-  test("moksha (Sanskrit)", () => {
-    expect(classes("moksha", "sanskrit")).toEqual(["SibilantFricative"]); // "ksh" -> ks
+  it("gjuhë (albanian) → ['NonSibilantFricative']", () => {
+    expect(classes("gjuhë", "albanian")).toEqual(["NonSibilantFricative"]);
   });
 
-  // Ancient Greek (latinized)
-  test("physis (Ancient Greek)", () => {
-    expect(classes("physis", "ancient_greek")).toEqual(["SibilantFricative"]); // "s"
+  // Sanskrit
+  it("śakti (sanskrit) → ['Plosive']", () => {
+    expect(classes("śakti", "sanskrit")).toEqual(["Plosive"]);
   });
-  test("philos (Ancient Greek)", () => {
-    expect(classes("philos", "ancient_greek")).toEqual(["Liquid"]); // "l"
+  it("moksha (sanskrit) → ['SibilantFricative']", () => {
+    expect(classes("moksha", "sanskrit")).toEqual(["SibilantFricative"]);
+  });
+
+  // Ancient Greek
+  it("physis (ancient_greek) → ['SibilantFricative']", () => {
+    expect(classes("physis", "ancient_greek")).toEqual(["SibilantFricative"]);
+  });
+  it("philos (ancient_greek) → ['Liquid']", () => {
+    expect(classes("philos", "ancient_greek")).toEqual(["Liquid"]);
   });
 
   // PIE
-  test("*h₁éḱwos (PIE)", () => {
-    expect(classes("*h₁éḱwos", "pie")).toEqual(["Plosive"]); // "kw"
+  it("*h₁éḱwos (pie) → ['Plosive']", () => {
+    expect(classes("*h₁éḱwos", "pie")).toEqual(["Plosive"]);
   });
-  test("*dʰugh₂ter (PIE)", () => {
-    expect(classes("*dʰugh₂ter", "pie")).toEqual(["Plosive"]); // "ght" -> gh
+  it("*dʰugh₂ter (pie) → ['Plosive']", () => {
+    expect(classes("*dʰugh₂ter", "pie")).toEqual(["Plosive"]);
   });
 });
