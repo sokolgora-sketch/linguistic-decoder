@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { analyzeWordAction } from './actions';
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Candidates } from "@/components/Candidates";
 import { HistoryPanel, type HistItem } from "@/components/HistoryPanel";
 import { ResultsDisplay } from "@/components/ResultsDisplay";
-import { SevenVoicesMatrixLive } from "@/components/SevenVoicesMatrixLive";
+import { TwoRailsViz, type TwoRailsVizHandle } from "@/components/TwoRailsViz";
 
 
 // ==== Types matching the /analyzeWord response ===============================
@@ -64,12 +64,13 @@ export default function LinguisticDecoderApp(){
   const [history, setHistory] = useState<HistItem[]>([]);
   useEffect(() => setHistory(readHist()), []);
 
-  const [word, setWord] = useState("damage");
+  const [word, setWord] = useState("study");
   const [mode, setMode] = useState<"strict"|"open">("strict");
   const [data, setData] = useState<AnalyzeResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [showDebug, setShowDebug] = useState(false);
+  const vizRef = useRef<TwoRailsVizHandle>(null);
 
   const canAnalyze = word.trim().length > 0 && !loading;
 
@@ -80,6 +81,12 @@ export default function LinguisticDecoderApp(){
     try {
       setData(null); // Clear previous results immediately
       setLoading(true); setErr(null);
+      
+      vizRef.current?.triggerAnalysis({
+        word: useWord,
+        voicePath: [], // Pass empty path to start scan
+      });
+      
       const res = await analyzeWordAction({ word: useWord, mode: useMode });
 
       if (!res.ok) {
@@ -89,6 +96,13 @@ export default function LinguisticDecoderApp(){
       }
       const j = res.data as AnalyzeResponse;
       setData(j);
+      
+      // Inject final result into viz
+      vizRef.current?.triggerAnalysis({
+        word: j.analysis.word,
+        voicePath: j.analysis.primary.voice_path,
+      });
+
       // Save local history
       if (j?.analysis.primary?.voice_path) {
         saveHistItem({ word: useWord, mode: useMode, primary: j.analysis.primary.voice_path, at: Date.now() });
@@ -121,6 +135,7 @@ export default function LinguisticDecoderApp(){
               onChange={e=> setWord(e.target.value)}
               placeholder="Type a word…"
               className="font-semibold"
+              onKeyUp={(e) => e.key === 'Enter' && analyze()}
             />
             <label className="flex items-center gap-2 text-sm">
               <input type="checkbox" checked={mode==="strict"} onChange={e=> setMode(e.target.checked?"strict":"open")} className="w-4 h-4 rounded text-primary focus:ring-primary" />
@@ -134,19 +149,13 @@ export default function LinguisticDecoderApp(){
         </Card>
       </main>
 
-      {/* Results */}
+      {/* Visualization & Results */}
       <div className="max-w-5xl mx-auto px-4 grid grid-cols-1 gap-4">
-        {analysis && (
-          <SevenVoicesMatrixLive
-            word={analysis.word}
-            path={analysis.primary.voice_path as any}
-            levelPath={analysis.primary.level_path as any}
-            playKey={`${analysis.word}|${analysis.primary.voice_path.join("")}|${analysis.primary.level_path.join("")}`}
-            running={loading}
-            durationMs={1200}
-            trace={analysis.trace as any}
-          />
-        )}
+        <TwoRailsViz
+            ref={vizRef}
+            initialWord={word}
+            initialVoicePath={data?.analysis.primary.voice_path || []}
+        />
         {analysis ? (
           <>
             <ResultsDisplay analysis={analysis} />
