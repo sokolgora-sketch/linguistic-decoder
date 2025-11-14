@@ -39,6 +39,8 @@ function Chip({v}:{v:string}){
 }
 
 function PathRow({block, title, windows, windowClasses}:{block:PathBlock; title:string; windows?:string[], windowClasses?:CClass[]}){
+  if (!block || !block.voice_path) return null; // Defensive check
+
   const V = getChecksum(block, "V");
   const E = getChecksum(block, "E");
   const C = getChecksum(block, "C");
