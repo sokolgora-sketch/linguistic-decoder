@@ -1,3 +1,4 @@
+
 import { db, ensureAnon, auth } from "@/lib/firebase";
 import { doc, getDoc, setDoc, serverTimestamp, collection, addDoc } from "firebase/firestore";
 import { ENGINE_VERSION } from "@/shared/engineVersion";
