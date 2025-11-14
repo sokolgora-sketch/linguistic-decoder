@@ -11,6 +11,19 @@ export type CClass =
   | "NonSibilantFricative" | "SibilantFricative"
   | "Affricate" | "Plosive";
 
+// Expected |Δring| per class
+export function classRange(cls: CClass): [number, number] {
+  switch (cls) {
+    case "Glide":
+    case "Liquid":
+    case "Nasal": return [0,1];
+    case "NonSibilantFricative": return [1,1];
+    case "SibilantFricative":
+    case "Affricate": return [1,2];
+    case "Plosive": return [2,3];
+  }
+}
+
 export const ALB_DIGRAPH_CLASS: Record<string, CClass> = {
   ll:"Liquid", rr:"Liquid",
   nj:"Nasal",
@@ -21,15 +34,15 @@ export const ALB_DIGRAPH_CLASS: Record<string, CClass> = {
 };
 
 export const ALB_LETTER_CLASS: Record<string, CClass> = {
-  // single letters
-  ç:"Affricate",
-  q:"Plosive", k:"Plosive", g:"Plosive", p:"Plosive", b:"Plosive", t:"Plosive", d:"Plosive", c:"Plosive", // c≈/ts/ but we keep Plosive here; move to Affricate if you prefer
+  // NOTE: Albanian 'c' = /ts/ → Affricate (this is the Albanian-specific tweak)
+  ç:"Affricate", c:"Affricate",
+  q:"Plosive", k:"Plosive", g:"Plosive", p:"Plosive", b:"Plosive", t:"Plosive", d:"Plosive",
   f:"NonSibilantFricative", v:"NonSibilantFricative", h:"NonSibilantFricative",
   s:"SibilantFricative", z:"SibilantFricative", x:"SibilantFricative",
-  j:"Glide",
+  j:"Glide",    // Albanian j = /j/
   m:"Nasal", n:"Nasal",
   l:"Liquid", r:"Liquid",
-  w:"Glide", // rarely used; harmless
+  w:"Glide",    // rare; harmless
 };
 
 export const LAT_DIGRAPH_CLASS: Record<string, CClass> = {
@@ -43,7 +56,7 @@ export const LAT_LETTER_CLASS: Record<string, CClass> = {
   p:"Plosive", b:"Plosive", t:"Plosive", d:"Plosive", k:"Plosive", g:"Plosive", q:"Plosive", c:"Plosive",
   f:"NonSibilantFricative", v:"NonSibilantFricative", h:"NonSibilantFricative",
   s:"SibilantFricative", z:"SibilantFricative", x:"SibilantFricative",
-  j:"Affricate",
+  j:"Affricate", // English/Latin j = /dʒ/
   m:"Nasal", n:"Nasal",
   l:"Liquid", r:"Liquid",
   w:"Glide", y:"Glide",

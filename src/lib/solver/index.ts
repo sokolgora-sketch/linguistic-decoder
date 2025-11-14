@@ -1,5 +1,5 @@
 
-import { VOWELS, Vowel, VOWEL_LEVEL, VOWEL_RING, VOWEL_VALUE, CClass, ALB_DIGRAPH_CLASS, ALB_LETTER_CLASS, LAT_DIGRAPH_CLASS, LAT_LETTER_CLASS } from "./valueTables";
+import { VOWELS, Vowel, VOWEL_LEVEL, VOWEL_RING, VOWEL_VALUE, CClass, classRange, ALB_DIGRAPH_CLASS, ALB_LETTER_CLASS, LAT_DIGRAPH_CLASS, LAT_LETTER_CLASS } from "./valueTables";
 import type { Analysis, Path, SolveMode } from "./types";
 import { CFG, ENGINE_VERSION, Alphabet } from "./engineConfig";
 
@@ -75,24 +75,12 @@ function opCostFromLabel(op: string, costs: { sub: number; del: number; ins: num
 
 // --- Consonant Classification & Hop Penalty ---
 
-function classRange(cls: CClass): [number, number] {
-  switch (cls) {
-    case "Glide":
-    case "Liquid":
-    case "Nasal": return [0, 1];
-    case "NonSibilantFricative": return [1, 1];
-    case "SibilantFricative":
-    case "Affricate": return [1, 2];
-    case "Plosive": return [2, 3];
-  }
-}
-
 function detectAlphabet(word: string): "albanian" | "latin" {
   // Albanian signals: ë, ç, or canonical digraphs/letters
   return /[ëç]|xh|zh|sh|dh|th|nj|gj|ll|rr|q/i.test(word) ? "albanian" : "latin";
 }
 
-function classifyWindow(chars: string, alphabet: "albanian"|"latin"): CClass {
+function classifyWindow(chars: string, alphabet: "albanian" | "latin"): CClass {
   const s = chars.toLowerCase();
   const DG = alphabet === "albanian" ? ALB_DIGRAPH_CLASS : LAT_DIGRAPH_CLASS;
   const LT = alphabet === "albanian" ? ALB_LETTER_CLASS  : LAT_LETTER_CLASS;
@@ -111,22 +99,19 @@ function classifyWindow(chars: string, alphabet: "albanian"|"latin"): CClass {
 }
 
 
-function hopPenalty(absDelta: number, cls: CClass): number {
-  const [lo, hi] = classRange(cls);
-  if (absDelta < lo) return lo - absDelta;
-  if (absDelta > hi) return absDelta - hi;
-  return 0;
-}
-
-function extractWindowClasses(word: string, baseSeq: Vowel[], alphabetCfg: Alphabet): CClass[] {
-  const alphabet = alphabetCfg === "auto" ? detectAlphabet(word) : alphabetCfg;
+function extractWindowClasses(word: string, baseSeq: Vowel[], alphabetPref: Alphabet): CClass[] {
+  const alphabet = alphabetPref === "auto" ? detectAlphabet(word) : alphabetPref;
   const s = word.normalize("NFC");
+
+  // find indices of normalized base vowels in raw string
   const pos: number[] = [];
   let vi = 0;
   for (let i = 0; i < s.length && vi < baseSeq.length; i++) {
-    const v = toVowel(s[i]); if (!v) continue;
+    const v = toVowel(s[i]);
+    if (!v) continue;
     if (v === baseSeq[vi]) { pos.push(i); vi++; }
   }
+
   const windows: string[] = [];
   for (let k = 0; k < pos.length - 1; k++) {
     windows.push(s.slice(pos[k] + 1, pos[k + 1]));
@@ -134,13 +119,15 @@ function extractWindowClasses(word: string, baseSeq: Vowel[], alphabetCfg: Alpha
   return windows.map(chars => classifyWindow(chars, alphabet));
 }
 
-function computeC(vowelPath: Vowel[], consClasses: CClass[]): number {
+export function computeC(vowelPath: Vowel[], consClasses: CClass[]): number {
   let c = 0;
   const hops = Math.max(0, vowelPath.length - 1);
   for (let i = 0; i < hops; i++) {
-    const cls = i < consClasses.length ? consClasses[i] : "Glide"; // extra hop (e.g., closure) = Glide expectation
+    const cls = i < consClasses.length ? consClasses[i] : "Glide"; // extra hop (e.g., closure) ~ Glide
     const d = Math.abs(VOWEL_RING[vowelPath[i + 1]] - VOWEL_RING[vowelPath[i]]);
-    c += hopPenalty(d, cls);
+    const [lo, hi] = classRange(cls);
+    if (d < lo) c += (lo - d);
+    else if (d > hi) c += (d - hi);
   }
   return c;
 }
