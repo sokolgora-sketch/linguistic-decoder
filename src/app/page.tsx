@@ -247,9 +247,19 @@ export default function LinguisticDecoderApp(){
       <footer className="p-6 opacity-80 col-span-1">
         <div className="max-w-5xl mx-auto text-xs text-slate-500 flex justify-between">
           <div className="font-code">{signals}</div>
-          <Button variant="secondary" size="sm" onClick={() => setShowDebug(s => !s)}>
-            {showDebug ? "Hide" : "Show"} Debug
-          </Button>
+          <div className="flex items-center gap-4">
+            {analysis && (
+              <Link
+                className="underline text-xs"
+                href={`/?word=${encodeURIComponent(word)}&mode=${mode}&alphabet=${alphabet}`}
+              >
+                Share this result
+              </Link>
+            )}
+            <Button variant="secondary" size="sm" onClick={() => setShowDebug(s => !s)}>
+              {showDebug ? "Hide" : "Show"} Debug
+            </Button>
+          </div>
         </div>
       </footer>
     </div>
