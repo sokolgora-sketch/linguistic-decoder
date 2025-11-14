@@ -1,6 +1,6 @@
 
 export const ENGINE_VERSION = "2025-11-14-core-6"; // bump
-export type Alphabet = "auto" | "albanian" | "latin" | "sanskrit" | "ancient_greek" | "pie";
+export type Alphabet = "auto" | "albanian" | "latin" | "sanskrit" | "ancient_greek" | "pie" | "turkish" | "german";
 
 export const CFG = {
   beamWidth: 8,
