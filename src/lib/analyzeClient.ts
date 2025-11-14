@@ -1,15 +1,17 @@
+
 import { db, ensureAnon, auth } from "@/lib/firebase";
 import {
   doc, getDoc, setDoc, serverTimestamp, collection, addDoc
 } from "firebase/firestore";
 import { analyzeWordAction } from "@/app/actions";
 import type { Alphabet } from "./solver/engineConfig";
+import { ENGINE_VERSION } from "./solver/engineConfig";
 
 type Mode = "strict" | "open";
 
 export async function analyzeClient(word: string, mode: Mode, alphabet: Alphabet) {
   await ensureAnon();
-  const cacheId = `${word}|${mode}|${alphabet}`; // if you want to include engineVersion in client cache id, append it
+  const cacheId = `${word}|${mode}|${alphabet}|${ENGINE_VERSION}`;
   const cacheRef = doc(db, "analyses", cacheId);
 
   // 1) READ CACHE
@@ -65,7 +67,7 @@ export async function prefetchAnalyze(
     return;
   }
   await ensureAnon();
-  const cacheId = `${word}|${mode}|${alphabet}`;
+  const cacheId = `${word}|${mode}|${alphabet}|${ENGINE_VERSION}`;
   if (PREFETCH_SEEN.has(cacheId)) {
     callbacks?.onFinish?.();
     return;
@@ -89,7 +91,7 @@ export async function prefetchAnalyze(
     });
     const data = await r.json();
     if (data?.error) return;
-    await setDoc(cacheRef, { ...data, cachedAt: serverTimestamp() }, { merge: false });
+    await setDoc(cacheRef, { analysis: data, cachedAt: serverTimestamp() }, { merge: false });
   } catch (e) {
     console.warn("Prefetch failed", e);
   } finally {
