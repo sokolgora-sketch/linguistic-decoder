@@ -48,14 +48,12 @@ export function SevenVoicesMatrix({
   path,
   levelPath,
   playKey,           // change this to re-play animation (e.g., `${word}|${path.join("")}`)
-  showRain = false,
   durationMs = 1400, // duration per hop
 }: {
   word: string;
   path: Vowel[];
-  levelPath?: number[];            // +1/0/-1; if missing we auto-derive from vowel
+  levelPath?: (1|0|-1)[];
   playKey: string;
-  showRain?: boolean;
   durationMs?: number;
 }) {
 
@@ -65,9 +63,9 @@ export function SevenVoicesMatrix({
 
   const steps: MatrixVizStep[] = React.useMemo(() => {
     const lvls = levelPath && levelPath.length === path.length
-      ? levelPath as (1|0|-1)[]
+      ? levelPath
       : path.map(derivedLevel);
-    return path.map((v, i) => ({ v, level: (lvls[i] as 1|0|-1) }));
+    return path.map((v, i) => ({ v, level: (lvls[i]) }));
   }, [path, levelPath]);
 
   // Layout calc
@@ -104,6 +102,7 @@ export function SevenVoicesMatrix({
   const points = React.useMemo(() => {
     const p: {x:number;y:number}[] = [];
     for (let i = 0; i <= idx; i++) {
+      if (!steps[i]) continue; // Guard against out-of-bounds
       const { x, y } = coord(steps[i].v, steps[i].level);
       p.push({ x, y });
     }
@@ -120,9 +119,6 @@ export function SevenVoicesMatrix({
       className="relative w-full rounded-2xl border"
       style={{ background: PALETTE.bg, minHeight: H }}
     >
-      {/* Optional Matrix rain */}
-      {showRain && <MatrixRain />}
-
       {/* Grid */}
       <svg width={W} height={H} style={{ display:"block", position:"relative", zIndex: 1 }}>
         {/* Column headers */}
@@ -216,44 +212,4 @@ function Rail({ text }: { text: string }) {
       </div>
     </div>
   );
-}
-
-/** Optional Matrix rain background (very light to not distract) */
-function MatrixRain() {
-  const canvasRef = React.useRef<HTMLCanvasElement|null>(null);
-  React.useEffect(() => {
-    const canvas = canvasRef.current!;
-    const ctx = canvas.getContext("2d")!;
-    let w = canvas.width = canvas.offsetWidth;
-    let h = canvas.height = canvas.offsetHeight;
-    let cols = Math.floor(w / 12);
-    const drops = new Array(cols).fill(0);
-    const letters = "AEIOUYË".split("");
-
-    const onResize = () => {
-      w = canvas.width = canvas.offsetWidth;
-      h = canvas.height = canvas.offsetHeight;
-      cols = Math.floor(w / 12);
-      drops.length = cols; drops.fill(0);
-    };
-    const ro = new ResizeObserver(onResize); ro.observe(canvas);
-
-    let raf: number;
-    const tick = () => {
-      ctx.fillStyle = "rgba(63,81,181,0.08)";
-      ctx.fillRect(0,0,w,h);
-      ctx.fillStyle = "rgba(255,179,0,0.9)";
-      ctx.font = "12px monospace";
-      for (let i=0;i<cols;i++){
-        const char = letters[Math.floor(Math.random()*letters.length)];
-        ctx.fillText(char, i*12, drops[i]*14);
-        if (drops[i]*14 > h && Math.random() > 0.975) drops[i]=0;
-        drops[i]++;
-      }
-      raf = requestAnimationFrame(tick);
-    };
-    tick();
-    return () => { cancelAnimationFrame(raf); ro.disconnect(); };
-  }, []);
-  return <canvas ref={canvasRef} className="absolute inset-0 rounded-2xl" style={{ zIndex: 0 }} />;
 }

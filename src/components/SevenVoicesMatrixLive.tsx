@@ -48,7 +48,6 @@ export function SevenVoicesMatrixLive({
   levelPath,
   playKey,
   running,
-  showRain = false,
   durationMs = 1300,
   trace,
 }: {
@@ -57,7 +56,6 @@ export function SevenVoicesMatrixLive({
   levelPath?: (1 | 0 | -1)[];
   playKey: string;
   running: boolean;          // true while the server is computing
-  showRain?: boolean;
   durationMs?: number;       // token hop speed once result arrives
   trace?: TraceStep[];       // optional engine trace for heat
 }) {
@@ -131,7 +129,6 @@ export function SevenVoicesMatrixLive({
         path={path}
         levelPath={levelPath}
         playKey={playKey}
-        showRain={showRain}
         durationMs={durationMs}
       />
 

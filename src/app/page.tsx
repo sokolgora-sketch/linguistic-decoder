@@ -143,7 +143,6 @@ export default function LinguisticDecoderApp(){
             levelPath={analysis.primary.level_path as any}
             playKey={`${analysis.word}|${analysis.primary.voice_path.join("")}|${analysis.primary.level_path.join("")}`}
             running={loading}
-            showRain={true}
             durationMs={1200}
             trace={analysis.trace as any}
           />
