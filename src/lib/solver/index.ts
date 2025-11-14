@@ -75,14 +75,18 @@ function buildSlots(word: string){
 type State = { row: Vowel|null; cost: number; path: Vowel[]; ops: string[]; cStab: number; kept: number; deleted: number; };
 type OpKind = "keep" | "sub" | "ins" | "del";
 
-function opCost(observed: Vowel|undefined, chosen: Vowel|"Ø"): {cost:number, op?:string, kind: OpKind}{
+function opCost(observed: Vowel|undefined, chosen: Vowel|"Ø", opts: SolveOptions): {cost:number, op?:string, kind: OpKind}{
+  const { opCost: costs = { sub:1, del:3, ins:2 } } = opts;
   if (!observed){
     if (chosen === "Ø") return { cost: 0, kind: "keep" };  // nothing to keep
-    return { cost: 2, op: `insert ${chosen}`, kind: "ins" };
+    return { cost: costs.ins, op: `insert ${chosen}`, kind: "ins" };
   } else {
-    if (chosen === "Ø") return { cost: 1, op: `delete ${observed}`, kind: "del" };
+    if (chosen === "Ø") {
+        if (!opts.allowDelete) return { cost: 999, kind: "del" };
+        return { cost: costs.del, op: `delete ${observed}`, kind: "del" };
+    }
     if (chosen === observed) return { cost: 0, kind: "keep" };
-    return { cost: 1, op: `${observed}→${chosen}`, kind: "sub" };
+    return { cost: costs.sub, op: `${observed}→${chosen}`, kind: "sub" };
   }
 }
 
@@ -119,6 +123,12 @@ function observedHasInstrument(slots: (Vowel|undefined)[]) {
   return slots.some(v => v === "E" || v === "I");
 }
 
+function preferClosureTie(a: Vowel[], b: Vowel[]): number {
+  const enda = a[a.length - 1] === "Ë" ? 0 : 1;
+  const endb = b[b.length - 1] === "Ë" ? 0 : 1;
+  return enda - endb;
+}
+
 
 export function solveMatrix(word: string, mode: SolveMode): Analysis {
   const options: SolveOptions = mode === 'strict'
@@ -133,10 +143,14 @@ export function solveMatrix(word: string, mode: SolveMode): Analysis {
   for (let j=0; j<slots.length; j++){
     const observed = slots[j];
     const candidates: (Vowel|"Ø")[] = ["Ø", ...VOWELS];
-    const next: State[] = [];
+    let next: State[] = [];
     for (const st of col){
+      if (st.ops.length > (options.maxOps ?? 2)) continue;
+
       for (const cand of candidates){
-        const { cost: oc, op, kind } = opCost(observed, cand);
+        const { cost: oc, op, kind } = opCost(observed, cand, options);
+        if (oc > 900) continue; // prune illegal op
+
         let tCost = 0, newRow = st.row, newPath = st.path.slice();
         if (cand !== "Ø"){
           if (st.row){ tCost = moveCost(st.row, cand as Vowel); }
@@ -144,12 +158,15 @@ export function solveMatrix(word: string, mode: SolveMode): Analysis {
           if (newPath[newPath.length-1] !== newRow) newPath.push(newRow);
         }
         const stab = stabilizerAcross(consonants, j-1, st.row, cand);
+        const newOps = op ? [...st.ops, op] : st.ops;
+
+        if (newOps.length > (options.maxOps ?? 2)) continue;
         
         next.push({ 
             row:newRow, 
             cost: st.cost + oc + tCost + stab, 
             path:newPath, 
-            ops: op?[...st.ops,op]:st.ops, 
+            ops: newOps,
             cStab: st.cStab + stab,
             kept: st.kept + (kind === "keep" ? 1 : 0),
             deleted: st.deleted + (kind === "del" ? 1 : 0)
@@ -167,14 +184,9 @@ export function solveMatrix(word: string, mode: SolveMode): Analysis {
 
   for (const st of col){
     if (!st.row) continue;
-    const closures = options.allowClosure ? ["Ë"] : (mode === 'strict' ? [] : ["A", "Ë"]);
+    const closures = options.allowClosure ? ["Ë"] : [];
 
-    for (const closure of (["Ë","A"] as Vowel[])){
-      if (mode === 'strict' && closure === 'A' && !options.allowClosure) continue;
-      if (mode === 'strict' && !options.allowClosure) continue;
-      if (options.allowClosure === false && closure === 'A') continue;
-
-
+    for (const closure of closures){
       const t = moveCost(st.row, closure);
       const path = st.path[st.path.length-1]===closure ? st.path.slice() : [...st.path, closure];
       const base = st.cost + t;
@@ -182,9 +194,24 @@ export function solveMatrix(word: string, mode: SolveMode): Analysis {
       const instr = hasInstrument(path);
       const instrPenalty = instr ? 0 : (obsHasInstr ? 2 : 1);
       const closureBias = closure === "Ë" ? -nounish : (nounish ? +nounish : 0);
-      const E = base + g + instrPenalty + closureBias;
+      const opCostTotal = st.ops.reduce((s, op) => s + (op.startsWith("delete") ? 3 : op.startsWith("closure") ? 2 : 1), 0);
+      const finalOps = [...st.ops, `closure ${closure}`];
 
-      sols.push({ path, E, ops:[...st.ops, `closure ${closure}`], cStab: st.cStab, closure, kept: st.kept, hasInstr: instr });
+      if (finalOps.length > (options.maxOps ?? 2) + 1) continue;
+
+      const E = opCostTotal + t + g + instrPenalty + closureBias;
+
+      sols.push({ path, E, ops:finalOps, cStab: st.cStab, closure, kept: st.kept, hasInstr: instr });
+    }
+    // Handle no-closure case (for strict mode primarily)
+    if (!options.allowClosure) {
+        const path = st.path;
+        const g = gravityBonus(path);
+        const instr = hasInstrument(path);
+        const instrPenalty = instr ? 0 : (obsHasInstr ? 2 : 1);
+        const opCostTotal = st.ops.reduce((s, op) => s + (op.startsWith("delete") ? 3 : op.startsWith("closure") ? 2 : 1), 0);
+        const E = opCostTotal + g + instrPenalty;
+        sols.push({ path, E, ops: st.ops, cStab: st.cStab, closure: path[path.length - 1], kept: st.kept, hasInstr: instr });
     }
   }
 
@@ -195,8 +222,7 @@ export function solveMatrix(word: string, mode: SolveMode): Analysis {
   
   const checksumV = (p: Vowel[]) => p.reduce((acc,v)=> acc*VOWEL_VALUE[v], 1);
   const ringPenalty = (p:Vowel[]) => { let d=0; for(let i=0;i<p.length-1;i++) d+=Math.abs(VOWEL_RING[p[i]]-VOWEL_RING[p[i+1]]); return d;};
-  const preferClosureTie = (a: Vowel[], b: Vowel[]) => (a[a.length-1]==="Ë"?0:1) - (b[b.length-1]==="Ë"?0:1);
-
+  
   const scoreTuple = (p: {path:Vowel[], E:number, kept: number}): [number,number,number,number] => [
     p.E,
     ringPenalty(p.path),
@@ -250,5 +276,3 @@ export function solveMatrix(word: string, mode: SolveMode): Analysis {
     signals: ["deterministic: beam DP; gravity; closure prefers Ë on tie"]
   };
 }
-
-    

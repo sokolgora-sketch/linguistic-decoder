@@ -1,6 +1,6 @@
 
 import { NextResponse, type NextRequest } from 'next/server';
-import { solveMatrix, type Analysis, type Path, type Checksum, type SolveMode } from '@/lib/solver';
+import { solveMatrix, type Analysis, type Path, type Checksum, type SolveMode, type SolveOptions } from '@/lib/solver';
 
 // Helper to transform the checksums array into an object
 const formatChecksums = (checksums: Checksum[]) => {
@@ -11,14 +11,32 @@ const formatChecksums = (checksums: Checksum[]) => {
 };
 
 // Helper to transform a Path object to the specified format
-const formatPath = (path: Path) => ({
-  voice_path: path.voicePath,
-  ring_path: path.ringPath,
-  level_path: path.levelPath,
-  ops: path.ops,
-  checksums: formatChecksums(path.checksums),
-  kept: path.kept,
-});
+const formatPath = (path: Path) => {
+  const E = path.checksums.find(c => c.type === 'E')?.value ?? 0;
+  const opCost = { sub: 1, del: 3, ins: 2 };
+  const Ecalc = (path.ops || []).reduce((s, op) => {
+    if (op.includes("→")) return s + opCost.sub;
+    if (op.startsWith("delete")) return s + opCost.del;
+    if (op.startsWith("closure")) return s + opCost.ins;
+    if (op.startsWith("insert")) return s + opCost.ins;
+    return s;
+  }, 0);
+
+  // Note: This check is disabled for now as the core engine's E value includes
+  // more than just op costs (e.g. gravity, penalties). A more sophisticated
+  // validation could be re-introduced if needed.
+  // if (Ecalc !== E) { console.warn(`Energy mismatch for ${path.voicePath.join("")}: calc=${Ecalc} engine=${E}`); }
+
+  return {
+    voice_path: path.voicePath,
+    ring_path: path.ringPath,
+    level_path: path.levelPath,
+    ops: path.ops,
+    checksums: formatChecksums(path.checksums),
+    kept: path.kept,
+  };
+};
+
 
 // Main handler for the POST request
 export async function POST(request: NextRequest) {
