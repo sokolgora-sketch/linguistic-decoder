@@ -19,15 +19,26 @@ export type SolveOptions = {
 function isVowelChar(ch:string){ const c=ch.normalize("NFC"); return /[aeiouy]/i.test(c)||c==="ë"||c==="Ë"; }
 export function toVowel(ch:string):Vowel|null{ const u=ch.toUpperCase(); return u==="Ë" ? "Ë" : (VOWELS.includes(u as any)?(u as Vowel):null); }
 
-export function extractBase(word:string):Vowel[]{ 
-    const out:Vowel[]=[]; 
-    for(const ch of word.normalize("NFC")){ 
-        if(!isVowelChar(ch))continue; 
-        const v=toVowel(ch)!; 
-        if(CFG.norm.collapseDupes && out.length && out[out.length-1]===v) continue; 
-        out.push(v);
-    } 
-    return out; 
+export function extractBase(word: string): Vowel[] {
+  const out: Vowel[] = [];
+  const s = word.normalize("NFC").toLowerCase();
+  for (let i = 0; i < s.length; i++) {
+    if (!isVowelChar(s[i])) continue;
+
+    // special case for 'ie' -> I
+    if (i < s.length - 1 && s[i] === 'i' && s[i+1] === 'e') {
+      if (out.length === 0 || out[out.length-1] !== "I") {
+        out.push("I");
+      }
+      i++; // skip 'e'
+      continue;
+    }
+
+    const v = toVowel(s[i])!;
+    if (CFG.norm.collapseDupes && out.length && out[out.length - 1] === v) continue;
+    out.push(v);
+  }
+  return out;
 }
 function keptCount(base:Vowel[], cand:Vowel[]){ let k=0; for(let i=0;i<Math.min(base.length,cand.length);i++) if(base[i]===cand[i]) k++; return k; }
 
@@ -211,6 +222,7 @@ export function baseForTests(word: string): Vowel[] {
   const norm = normalizeTerminalY(raw, word);
   return (norm.length ? norm : (["O"] as Vowel[])) as Vowel[];
 }
+
 
 
 
