@@ -10,7 +10,6 @@
  */
 
 import {ai, MODELS} from '@/ai/genkit';
-import {generate} from 'genkit';
 import {z} from 'genkit';
 
 const MapWordToLanguageFamiliesInputSchema = z.object({
@@ -53,12 +52,16 @@ const mapWordToLanguageFamiliesFlow = ai.defineFlow(
     let lastError: any;
     for (const model of MODELS) {
       try {
-        const {output} = await generate({
+        const {output} = await ai.generate({
           model,
-          ...promptConfig,
+          prompt: promptConfig.prompt,
           input,
+          output: {
+            format: 'json',
+            schema: MapWordToLanguageFamiliesOutputSchema,
+          },
         });
-        return output!;
+        return output;
       } catch (e) {
         lastError = e;
         console.warn(`Model ${model.name} failed, trying next model.`, e);
