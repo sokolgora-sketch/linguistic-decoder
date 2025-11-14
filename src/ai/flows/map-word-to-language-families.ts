@@ -8,7 +8,8 @@
  * - MapWordToLanguageFamiliesOutput - The return type for the mapWordToLanguageFamilies function.
  */
 
-import {ai} from '@/ai/genkit';
+import {ai, MODELS} from '@/ai/genkit';
+import {GenerateResponse, generate} from 'genkit/ai';
 import {z} from 'genkit';
 
 const MapWordToLanguageFamiliesInputSchema = z.object({
@@ -48,7 +49,16 @@ const mapWordToLanguageFamiliesFlow = ai.defineFlow(
     outputSchema: MapWordToLanguageFamiliesOutputSchema,
   },
   async input => {
-    const {output} = await prompt(input);
-    return output!;
+    let lastError: any;
+    for (const model of MODELS) {
+      try {
+        const {output} = await prompt({input, model});
+        return output!;
+      } catch (e) {
+        lastError = e;
+        console.warn(`Model ${model.name} failed, trying next model.`, e);
+      }
+    }
+    throw lastError;
   }
 );
