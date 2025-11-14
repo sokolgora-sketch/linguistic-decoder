@@ -23,7 +23,7 @@ function toChecksums(cs:any): Checksums {
     const o: any = {}; for (const it of cs) o[it?.type] = Number(it?.value);
     return { V:o.V??0, E:o.E??0, C:o.C??0 };
   }
-  return { V:Number(cs?.V??0), E:Number(cs?.E??0), C:Number(cs?.C??0) };
+  return cs;
 }
 function normBlock(b:any): PathBlock {
   return {

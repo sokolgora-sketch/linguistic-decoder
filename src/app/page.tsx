@@ -19,6 +19,7 @@ import { PROFILES } from "@/lib/solver/valueTables";
 import { ThemeToggle } from "@/components/ThemeProvider";
 import { useDebounced } from "@/hooks/useDebounced";
 import { Copy, Download, Loader } from "lucide-react";
+import ComparePanel from "@/components/ComparePanel";
 
 
 // ==== Types matching the /analyzeWord response ===============================
@@ -198,8 +199,10 @@ export default function LinguisticDecoderApp(){
             <ResultsDisplay analysis={analysis} />
             {data?.languageFamilies && <Candidates map={data.languageFamilies} />}
           </>
-        ) : (
-          <Accordion type="single" collapsible className="w-full" defaultValue="item-1">
+        ) : null}
+
+        <Accordion type="single" collapsible className="w-full" defaultValue={analysis ? "" : "item-1"}>
+          {!analysis && (
             <AccordionItem value="item-1">
               <AccordionTrigger>How to Use</AccordionTrigger>
               <AccordionContent>
@@ -214,14 +217,20 @@ export default function LinguisticDecoderApp(){
                 </Card>
               </AccordionContent>
             </AccordionItem>
-            <AccordionItem value="item-2">
-              <AccordionTrigger>Consonant Reference</AccordionTrigger>
-              <AccordionContent>
-                <ConsonantReference />
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
-        )}
+          )}
+          <AccordionItem value="item-2">
+            <AccordionTrigger>Compare Two Words</AccordionTrigger>
+            <AccordionContent>
+              <ComparePanel defaultMode={mode} defaultAlphabet={alphabet} />
+            </AccordionContent>
+          </AccordionItem>
+          <AccordionItem value="item-3">
+            <AccordionTrigger>Consonant Reference</AccordionTrigger>
+            <AccordionContent>
+              <ConsonantReference />
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
 
         {/* Debug view */}
         {showDebug && data && (

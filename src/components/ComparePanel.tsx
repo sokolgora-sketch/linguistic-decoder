@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { analyzeClient } from "@/lib/analyzeClient";
 import type { Alphabet } from "@/lib/solver/engineConfig";
 import { PROFILES } from "@/lib/solver/valueTables";
@@ -21,6 +21,12 @@ export default function ComparePanel({
   const [left, setLeft] = useState<any>(null);
   const [right, setRight] = useState<any>(null);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const h = new URL(window.location.href).hash || "";
+    const m = h.match(/#compare=([^&]+)/);
+    if (m?.[1]) setRightWord(decodeURIComponent(m[1]));
+  }, []);
 
   async function runCompare() {
     if (!leftWord.trim() || !rightWord.trim()) return;
@@ -105,7 +111,7 @@ function ResultCard({ title, data }: { title: string; data: any }) {
             {data.cacheHit && <span className="ml-2 px-1.5 py-0.5 text-xs rounded bg-amber-100 border border-amber-300">Cached</span>}
           </div>
           <div><b>Primary:</b> {analysis.primary?.voice_path?.join(" → ")}</div>
-          <div><b>Checksums:</b> {analysis.primary?.checksums?.map((c:any)=>`${c.type}=${c.value}`).join(" · ")}</div>
+          <div><b>Checksums:</b> V={analysis.primary?.checksums?.V} · E={analysis.primary?.checksums?.E} · C={analysis.primary?.checksums?.C}</div>
           {!!analysis.windowClasses?.length && (
             <div><b>Windows:</b> {analysis.windowClasses.join(" | ")}</div>
           )}
