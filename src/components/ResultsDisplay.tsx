@@ -63,7 +63,7 @@ const Chip = ({ v }: { v: string | number }) => (
 
 export function PathRow({ title, block, windows, windowClasses }: { title: string; block?: AnyPath, windows?:string[], windowClasses?:CClass[] }) {
   const { voice, ring, level, checksums, ops, kept } = normalizePath(block);
-  const empty = voice.length === 0 && ring.length === 0 && level.length === 0;
+  const empty = !voice || voice.length === 0;
 
   return (
     <Card className="p-4">
