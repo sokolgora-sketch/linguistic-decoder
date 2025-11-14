@@ -79,6 +79,7 @@ export async function analyzeClient(word: string, mode: Mode, alphabet: Alphabet
   const docToWrite = {
     ...fresh,
     languageFamilies: fresh.languageFamilies ?? null,
+    recomputed: fresh.recomputed ?? false,
     cachedAt: serverTimestamp()
   };
 
@@ -131,6 +132,7 @@ export async function prefetchAnalyze(
     const docToWrite = {
         ...fresh,
         languageFamilies: fresh.languageFamilies ?? null,
+        recomputed: fresh.recomputed ?? false,
         cachedAt: serverTimestamp()
     };
     await setDoc(cacheRef, docToWrite, { merge: false });
