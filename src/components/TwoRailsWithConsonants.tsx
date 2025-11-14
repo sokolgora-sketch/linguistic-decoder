@@ -42,11 +42,10 @@ export function TwoRailsWithConsonants({
   path,
   running,
   playKey,
-  height = 320,
+  height = 300,
   durationPerHopMs = 900,
   showLabels = true,
-  consonants,
-  onDone,
+  consonants,              // optional override sequence (e.g., [{ch:"s",klass:"Fricative"}...])
 }: {
   word: string;
   path: Vowel[];           // e.g., ["U","I"]
@@ -56,7 +55,6 @@ export function TwoRailsWithConsonants({
   durationPerHopMs?: number;
   showLabels?: boolean;
   consonants?: { ch: string; klass: CClass }[];
-  onDone?: () => void;
 }) {
   // Layout
   const W = 680;
@@ -106,7 +104,7 @@ export function TwoRailsWithConsonants({
 
     const runHop = async (i: number) => {
       if (stop) return;
-      if (i >= path.length - 1) { onDone?.(); return; }
+      if (i >= path.length - 1) return;
 
       const leftToRight = i % 2 === 0;
       const startX = leftToRight ? leftX : rightX;
@@ -154,7 +152,7 @@ export function TwoRailsWithConsonants({
     runHop(0);
     return () => { stop = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [running, path, durationPerHopMs, leftX, rightX, word, onDone]);
+  }, [running, path, durationPerHopMs, leftX, rightX, word]);
 
   // Scanner bars
   const scanY1 = top + (Math.sin(scanT * 2.2) * 0.5 + 0.5) * railH;
