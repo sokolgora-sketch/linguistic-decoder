@@ -1,8 +1,7 @@
 
 'use client';
 
-import React, { useState, useEffect } from "react";
-import { analyzeWordAction } from './actions';
+import React, { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -10,16 +9,13 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Candidates } from "@/components/Candidates";
-import { HistoryPanel, type HistItem } from "@/components/HistoryPanel";
 import { ResultsDisplay } from "@/components/ResultsDisplay";
 import { ConsonantReference } from "@/components/ConsonantReference";
 import { TwoRailsWithConsonants } from "@/components/TwoRailsWithConsonants";
-import { CClass } from "@/lib/solver/valueTables";
+import { analyzeClient } from "@/lib/analyzeClient";
+import { useHistory, type HistoryItem } from "@/hooks/useHistory";
 import type { Alphabet } from "@/lib/solver/engineConfig";
 import { PROFILES } from "@/lib/solver/valueTables";
-import { ensureAnon, auth } from "@/lib/firebase";
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
-import { db } from "@/lib/firebase";
 
 
 // ==== Types matching the /analyzeWord response ===============================
@@ -35,62 +31,18 @@ export interface AnalyzeResponse {
     frontier: PathBlock[];
     signals: string[];
     windows?: string[];
-    windowClasses?: CClass[];
+    windowClasses?: any[];
     trace?: { v: string; level: 1 | 0 | -1; E?: number }[];
   },
   languageFamilies?: Record<string, { form:string; map:string[]; functional:string }[]> | null;
+  cacheHit?: boolean;
 }
 type Vowel = "A"|"E"|"I"|"O"|"U"|"Y"|"Ë";
 
 
-// ==== Small helpers ==========================================================
-// Local history (stateless backend)
-const HIST_KEY = "ld:history:v1";
-function readHist(): HistItem[] { try { return JSON.parse(localStorage.getItem(HIST_KEY) || "[]"); } catch { return []; } }
-function saveHistItem(item: HistItem, max = 50) {
-  try {
-    const cur = readHist();
-    const key = (x: HistItem) => `${x.word}|${x.mode}|${x.primary.join("")}`;
-    const next = [item, ...cur.filter(x => key(x) !== key(item))].slice(0, max);
-    localStorage.setItem(HIST_KEY, JSON.stringify(next));
-    void saveHistoryToFirestore(item.word, item.mode, item.primary.join(''));
-  } catch {}
-}
-function clearHist() { try { localStorage.removeItem(HIST_KEY); } catch {} }
-
-async function saveHistoryToFirestore(word: string, mode: "strict"|"open", primary: string) {
-  const u = auth.currentUser;
-  if (!u) return;
-  const ref = collection(db, "users", u.uid, "history");
-  await addDoc(ref, {
-    word, mode, primary,
-    createdAt: serverTimestamp(),
-  });
-}
-
-// Custom stringify to enforce key order for readability
-function orderedStringify(obj: any): string {
-  if (!obj) return "";
-  const keyOrder = ["analysis", "languageFamilies"];
-  const allKeys = [...keyOrder, ...Object.keys(obj).filter(k => !keyOrder.includes(k))];
-  const orderedObj: Record<string, any> = {};
-  for (const key of allKeys) {
-    if (obj.hasOwnProperty(key)) {
-      orderedObj[key] = obj[key];
-    }
-  }
-  return JSON.stringify(orderedObj, null, 2);
-}
-
 // ==== Main App ===============================================================
 export default function LinguisticDecoderApp(){
   const { toast } = useToast();
-  const [history, setHistory] = useState<HistItem[]>([]);
-  useEffect(() => {
-    ensureAnon();
-    setHistory(readHist())
-  }, []);
-
   const [word, setWord] = useState("study");
   const [mode, setMode] = useState<"strict"|"open">("strict");
   const [alphabet, setAlphabet] = useState<Alphabet>("auto");
@@ -99,6 +51,8 @@ export default function LinguisticDecoderApp(){
   const [loading, setLoading] = useState(false);
   const [showDebug, setShowDebug] = useState(false);
   
+  const history = useHistory(12);
+
   const canAnalyze = word.trim().length > 0 && !loading;
 
   async function analyze(nextWord?: string, nextMode?: "strict"|"open", nextAlphabet?: Alphabet){
@@ -106,30 +60,21 @@ export default function LinguisticDecoderApp(){
     const useMode: "strict"|"open" = nextMode ?? mode;
     const useAlphabet = nextAlphabet ?? alphabet;
     if (!useWord) return;
+
+    setLoading(true);
+    setErr(null);
     try {
-      setLoading(true); 
-      setErr(null);
-      await ensureAnon();
-      const res = await analyzeWordAction({ word: useWord, mode: useMode, alphabet: useAlphabet });
-
-      if (!res.ok) {
-        toast({ title: "Error", description: res.error, variant: "destructive" });
-        setData(null);
-        return;
+      const res = await analyzeClient(useWord, useMode, useAlphabet);
+      if (res) {
+        setData(res as AnalyzeResponse);
       }
-      const j = res.data as AnalyzeResponse;
-      setData(j);
-
-      // Save local history
-      if (j?.analysis.primary?.voice_path) {
-        saveHistItem({ word: useWord, mode: useMode, primary: j.analysis.primary.voice_path, at: Date.now() });
-        setHistory(readHist());
-      }
-    } catch (e:any) {
-      setErr(e?.message || "Request failed");
+    } catch (e: any) {
+      const error = e?.message || "Request failed";
+      setErr(error);
+      toast({ title: "Error", description: error, variant: "destructive" });
       setData(null);
-    } finally { 
-      setLoading(false); 
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -137,17 +82,17 @@ export default function LinguisticDecoderApp(){
   const signals = analysis?.signals?.join(" · ") || "";
   
   return (
-    <div>
-      {/* Header */}
-      <header className="p-6 border-b-4 border-primary bg-white">
-        <div className="max-w-5xl mx-auto">
-          <h1 className="font-headline text-3xl font-bold tracking-wide text-primary">Linguistic Decoder</h1>
-          <p className="text-sm text-slate-600 mt-1">Seven‑Voices matrix solver · primary & frontier paths · optional Gemini mapping</p>
-        </div>
-      </header>
+    <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6 p-4 lg:p-8">
+      <main className="space-y-4">
+        {/* Header */}
+        <header className="p-6 border-b-4 border-primary bg-white -mx-6 -mt-8">
+          <div className="max-w-5xl mx-auto">
+            <h1 className="font-headline text-3xl font-bold tracking-wide text-primary">Linguistic Decoder</h1>
+            <p className="text-sm text-slate-600 mt-1">Seven‑Voices matrix solver · primary & frontier paths · optional Gemini mapping</p>
+          </div>
+        </header>
 
-      {/* Controls */}
-      <main className="max-w-5xl mx-auto my-4 p-4">
+        {/* Controls */}
         <Card className="p-4">
           <div className="grid grid-cols-[1fr_auto_auto_auto] gap-2.5 items-center">
             <Input
@@ -177,11 +122,10 @@ export default function LinguisticDecoderApp(){
             </Button>
           </div>
           {err && <div className="mt-2.5 text-red-700 font-semibold">Error: {err}</div>}
+           {data?.cacheHit && <div className="mt-2.5 text-sm font-semibold text-amber-600">Result loaded from cache.</div>}
         </Card>
-      </main>
 
-      {/* Visualization & Results */}
-      <div className="max-w-5xl mx-auto px-4 grid grid-cols-1 gap-4">
+        {/* Visualization & Results */}
         <TwoRailsWithConsonants
           word={analysis?.word || word}
           path={(analysis?.primary?.voice_path as Vowel[]) || []}
@@ -220,35 +164,55 @@ export default function LinguisticDecoderApp(){
             </AccordionItem>
           </Accordion>
         )}
-      </div>
+
+        {/* Debug view */}
+        {showDebug && data && (
+          <div className="my-4">
+              <Card className="p-4">
+                  <h3 className="font-bold text-sm tracking-wide">API Echo (debug)</h3>
+                  <pre className="font-code text-xs whitespace-pre-wrap bg-slate-50 p-2.5 rounded-lg max-h-96 overflow-auto mt-2">
+                      {JSON.stringify(data, null, 2)}
+                  </pre>
+              </Card>
+          </div>
+        )}
+
+      </main>
 
       {/* History */}
-      <div className="max-w-5xl mx-auto my-4 px-4">
-        <HistoryPanel
-          items={history}
-          onRerun={(w, m) => {
-            setWord(w);
-            setMode(m);
-            analyze(w, m);
-          }}
-          onClear={() => { clearHist(); setHistory([]); }}
-        />
-      </div>
-
-      {/* Debug view */}
-      {showDebug && data && (
-        <div className="max-w-5xl mx-auto my-4 px-4">
-            <Card className="p-4">
-                <h3 className="font-bold text-sm tracking-wide">API Echo (debug)</h3>
-                <pre className="font-code text-xs whitespace-pre-wrap bg-slate-50 p-2.5 rounded-lg max-h-96 overflow-auto mt-2">
-                    {orderedStringify(data)}
-                </pre>
-            </Card>
-        </div>
-      )}
+      <aside className="space-y-3 pt-20">
+          <div className="font-semibold">History</div>
+          <Card className="p-2">
+            {history.length === 0 && <div className="text-xs text-slate-500 p-2">History will appear here.</div>}
+            <ul className="space-y-1 text-sm">
+              {history.map((h: HistoryItem) => (
+                <li key={h.id}>
+                  <button
+                    className="w-full text-left border rounded px-2 py-1 hover:bg-slate-50 flex items-center justify-between"
+                    onClick={() => {
+                      setWord(h.word);
+                      setMode(h.mode as "strict"|"open");
+                      setAlphabet(h.alphabet as Alphabet);
+                      analyze(h.word, h.mode as "strict"|"open", h.alphabet as Alphabet);
+                    }}
+                  >
+                    <span>{h.word} <span className="text-slate-500">· {h.mode}</span></span>
+                     <a
+                      className="underline text-xs hover:text-primary"
+                      href={`/?word=${encodeURIComponent(h.word)}&mode=${h.mode}&alphabet=${h.alphabet}`}
+                      onClick={(e) => e.stopPropagation()} // prevent re-analyzing when clicking share
+                    >
+                      Share
+                    </a>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </Card>
+      </aside>
 
       {/* Footer */}
-      <footer className="p-6 opacity-80">
+      <footer className="p-6 opacity-80 col-span-1 lg:col-span-2">
         <div className="max-w-5xl mx-auto text-xs text-slate-500 flex justify-between">
           <div className="font-code">{signals}</div>
           <Button variant="secondary" size="sm" onClick={() => setShowDebug(s => !s)}>
