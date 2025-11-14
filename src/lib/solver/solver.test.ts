@@ -1,10 +1,12 @@
-import { solveWord } from "@/functions/sevenVoicesCore";
-import { checksumV, baseForTests } from "@/functions/sevenVoicesC";
-import type { SolveOptions } from "@/functions/sevenVoicesCore";
-import { CFG } from "./engineConfig";
 
-const strict: SolveOptions = { beamWidth: CFG.beamWidth, maxOps: CFG.maxOpsStrict, allowDelete: false, allowClosure: false, opCost: { sub: CFG.cost.sub, del: CFG.cost.del, ins: CFG.cost.insClosure } };
-const open: SolveOptions   = { beamWidth: CFG.beamWidth, maxOps: CFG.maxOpsOpen,   allowDelete: true,  allowClosure: true,  opCost: { sub: CFG.cost.sub, del: CFG.cost.del, ins: CFG.cost.insClosure } };
+import { solveWord } from "@/functions/sevenVoicesCore";
+import type { SolveOptions, Vowel } from "@/functions/sevenVoicesCore";
+import { CFG } from "./engineConfig";
+import { checksumV } from '@/functions/sevenVoicesCore'
+
+
+const strict: SolveOptions = { beamWidth: CFG.beamWidth, maxOps: CFG.maxOpsStrict, allowDelete: false, allowClosure: false, opCost: { sub: CFG.cost.sub, del: CFG.cost.del, insClosure: CFG.cost.insClosure } };
+const open: SolveOptions   = { beamWidth: CFG.beamWidth, maxOps: CFG.maxOpsOpen,   allowDelete: true,  allowClosure: true,  opCost: { sub: CFG.cost.sub, del: CFG.cost.del, insClosure: CFG.cost.insClosure } };
 
 
 const V = (p:any)=> p.checksums.V;

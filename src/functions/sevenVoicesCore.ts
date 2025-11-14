@@ -1,3 +1,4 @@
+
 import { ENGINE_VERSION } from "@/shared/engineVersion";
 import { computeC, extractBase, normalizeTerminalY, readWindowsDebug } from "./sevenVoicesC";
 import { chooseProfile } from "./languages";
@@ -17,7 +18,7 @@ export type SolveOptions = {
   opCost: { sub: number; del: number; insClosure: number };
 };
 
-type Path = {
+export type Path = {
   voicePath: Vowel[];
   ringPath: number[];
   levelPath: number[];
@@ -29,7 +30,7 @@ type Path = {
 // --- Path Generation & State ---
 type State = { seq: Vowel[]; E: number; ops: string[] };
 
-function checksumV(path: Vowel[]): number {
+export function checksumV(path: Vowel[]): number {
   let product = 1;
   const seen = new Set<Vowel>();
   for (const v of path) {
@@ -193,6 +194,7 @@ export function solveWord(word: string, opts: SolveOptions, alphabet: string) {
         `base_raw=${rawBase.join("") || "-"}`,
         `base_norm=${base.join("") || "-"}`,
         `cons_windows=${consClasses.join(",") || "-"}`,
+        `alphabet=${profile.id}`
     ];
 
     return {

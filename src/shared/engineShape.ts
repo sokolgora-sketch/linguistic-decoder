@@ -1,3 +1,4 @@
+
 // Canonical shape your UI will use everywhere.
 export type Vowel = 'A'|'E'|'I'|'O'|'U'|'Y'|'Ë';
 

@@ -9,6 +9,7 @@ import { solveWord } from "@/functions/sevenVoicesCore";
 import type { SolveOptions, Vowel } from "@/functions/sevenVoicesCore";
 import { chooseProfile } from "@/functions/languages";
 import { readWindowsDebug, extractBase, normalizeTerminalY } from "@/functions/sevenVoicesC";
+import { sanitizeForFirestore } from "@/lib/sanitize";
 
 
 type Mode = "strict" | "open";
@@ -53,11 +54,11 @@ export async function analyzeClient(word: string, mode: Mode, alphabet: Alphabet
         ...payload, 
         recomputed: true, 
         cacheHit: false,
-        languageFamilies: payload.languageFamilies ?? null,
     };
     
     if (!opts.skipWrite) {
-      await setDoc(cacheRef, { ...finalPayload, cachedAt: serverTimestamp() }, { merge: true });
+      const cleanPayload = sanitizeForFirestore(finalPayload);
+      await setDoc(cacheRef, { ...cleanPayload, cachedAt: serverTimestamp() }, { merge: true });
     }
     
     void saveHistory(cacheId, word, mode, alphabet, "bypass");
@@ -76,14 +77,9 @@ export async function analyzeClient(word: string, mode: Mode, alphabet: Alphabet
   const fresh = computeLocal(word, mode, alphabet);
   
   // Ensure no undefined fields in the final payload
-  const docToWrite = {
-    ...fresh,
-    languageFamilies: fresh.languageFamilies ?? null,
-    recomputed: fresh.recomputed ?? false,
-    cachedAt: serverTimestamp()
-  };
+  const cleanFresh = sanitizeForFirestore(fresh);
 
-  await setDoc(cacheRef, docToWrite, { merge: false });
+  await setDoc(cacheRef, { ...cleanFresh, cachedAt: serverTimestamp() }, { merge: false });
   void saveHistory(cacheId, word, mode, alphabet, "fresh");
   return fresh;
 }
@@ -129,13 +125,8 @@ export async function prefetchAnalyze(
 
   try {
     const fresh = computeLocal(word, mode, alphabet);
-    const docToWrite = {
-        ...fresh,
-        languageFamilies: fresh.languageFamilies ?? null,
-        recomputed: fresh.recomputed ?? false,
-        cachedAt: serverTimestamp()
-    };
-    await setDoc(cacheRef, docToWrite, { merge: false });
+    const cleanFresh = sanitizeForFirestore(fresh);
+    await setDoc(cacheRef, { ...cleanFresh, cachedAt: serverTimestamp() }, { merge: false });
 
   } catch (e) {
     console.warn("Prefetch failed", e);
