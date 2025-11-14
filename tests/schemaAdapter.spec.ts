@@ -1,3 +1,4 @@
+
 import { toMappingRecord } from "@/lib/schemaAdapter";
 
 test("toMappingRecord provides required fields", () => {
@@ -7,9 +8,9 @@ test("toMappingRecord provides required fields", () => {
     mode: "strict",
     alphabet: "albanian",
     primary: {
-      voicePath: ["I","E"],
-      ringPath: [1,2],
-      levelPath: [1,1],
+      voice_path: ["I","E"],
+      ring_path: [1,2],
+      level_path: [1,1],
       ops: []
     },
     signals: []

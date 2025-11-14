@@ -1,3 +1,4 @@
+
 // src/lib/schemaAdapter.ts
 type Vowel = 'A'|'E'|'I'|'O'|'U'|'Y'|'Ë';
 
@@ -7,9 +8,9 @@ export type EnginePayload = {
   mode: 'strict'|'open';
   alphabet: string;
   primary: {
-    voicePath: Vowel[];
-    ringPath: number[];
-    levelPath: number[];
+    voice_path: Vowel[];
+    ring_path: number[];
+    level_path: number[];
     ops?: string[];
   };
   signals?: string[];
@@ -25,14 +26,14 @@ export type MappingRecord = {
 };
 
 export function toMappingRecord(e: EnginePayload): MappingRecord {
-  if (!e?.primary?.voicePath?.length) {
-    throw new Error("No primary.voicePath in engine payload");
+  if (!e?.primary?.voice_path?.length) {
+    throw new Error("No primary.voice_path in engine payload");
   }
   return {
     word: e.word,
-    voice_path: e.primary.voicePath,   // flatten & rename
-    ring_path: e.primary.ringPath,
-    level_path: e.primary.levelPath,
+    voice_path: e.primary.voice_path,   // flatten & rename
+    ring_path: e.primary.ring_path,
+    level_path: e.primary.level_path,
     ops: e.primary.ops ?? [],
     signals: [
       `engine=${e.engineVersion}`,
