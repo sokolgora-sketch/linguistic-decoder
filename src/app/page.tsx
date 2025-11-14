@@ -3,48 +3,23 @@
 import React, { useMemo, useState, useEffect } from "react";
 import { analyzeWordAction } from './actions';
 import { useToast } from "@/hooks/use-toast";
-
-// ==== Design tokens (from spec) =============================================
-const COLORS = {
-  primary: "#3F51B5",   // Deep Indigo
-  bg: "#EEEEEE",        // Light Grey
-  accent: "#FFB300",    // Soft Amber
-  text: "#111827"
-};
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 
 // Seven‑Voices palette (kept from engine conventions)
 const VOICE_COLOR: Record<string, string> = {
-  A: "#ef4444",   // red
-  E: "#f59e0b",   // orange
-  I: "#facc15",   // yellow
-  O: "#22c55e",   // green
-  U: "#3b82f6",   // blue
-  Y: "#6366f1",   // indigo
-  "Ë": "#a855f7"   // violet
+  A: "hsl(var(--chart-1))", // red-ish
+  E: "hsl(var(--chart-2))", // orange-ish
+  I: "hsl(var(--chart-3))", // yellow-ish
+  O: "hsl(var(--chart-4))", // green-ish
+  U: "hsl(var(--chart-5))", // blue-ish
+  Y: "hsl(231 48% 48%)", // indigo-ish (primary)
+  "Ë": "hsl(262 80% 50%)"   // violet-ish
 };
 
 // Level labels
 const LEVEL_LABEL: Record<number, string> = { 1: "High", 0: "Mid", [-1]: "Low" } as any;
-
-// ==== Fonts (Space Grotesk, Inter, Source Code Pro) ==========================
-const FontImports = () => (
-  <style>{`
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Space+Grotesk:wght@600;700&family=Source+Code+Pro:wght@400;600&display=swap');
-    :root { --c-primary: ${COLORS.primary}; --c-bg: ${COLORS.bg}; --c-accent: ${COLORS.accent}; --c-text: ${COLORS.text}; }
-    html, body, #root { height: 100%; background: var(--c-bg); }
-    body { margin: 0; font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, 'Helvetica Neue', Arial, 'Noto Sans', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol'; color: var(--c-text); }
-    .headline { font-family: 'Space Grotesk', Inter, system-ui; }
-    .code { font-family: 'Source Code Pro', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace; }
-    .card { background: #fff; border: 1px solid #e5e7eb; border-radius: 14px; box-shadow: 0 2px 10px rgba(0,0,0,0.04); }
-    .btn { background: var(--c-primary); color: #fff; border: none; border-radius: 10px; padding: 10px 14px; font-weight: 600; cursor: pointer; }
-    .btn:disabled { opacity: 0.6; cursor: not-allowed; }
-    .chip { display:inline-flex; align-items:center; gap:6px; padding:4px 8px; border-radius:999px; border:1px solid #e5e7eb; background:#fff; }
-    .chip-dot { width:10px; height:10px; border-radius:999px; display:inline-block; }
-    .section-title { font-weight:700; margin: 0 0 8px 0; font-size: 14px; letter-spacing: .02em; }
-    .hr { height:1px; background:#e5e7eb; margin: 14px 0; }
-    .kbd { border:1px solid #cbd5e1; border-bottom-width:2px; padding:2px 6px; border-radius:6px; background:#f8fafc; font-size:12px; }
-  `}</style>
-);
 
 // ==== Types matching the /analyzeWord response ===============================
 interface Checksums { V: number; E: number; C: number; }
@@ -96,26 +71,26 @@ function orderedStringify(obj: any): string {
 
 function Chip({v}:{v:string}){
   return (
-    <span className="chip" style={{ borderColor: COLORS.accent }}>
-      <span className="chip-dot" style={{ background: VOICE_COLOR[v] || COLORS.primary }} />
-      <span style={{ fontWeight: 700 }}>{v}</span>
+    <span className="inline-flex items-center gap-1.5 py-1 px-2 rounded-full border border-accent bg-white">
+      <span className="w-2.5 h-2.5 rounded-full inline-block" style={{ background: VOICE_COLOR[v] || 'hsl(var(--primary))' }} />
+      <span className="font-bold">{v}</span>
     </span>
   );
 }
 
 function PathRow({block, title}:{block:PathBlock; title:string}){
   return (
-    <div className="card" style={{ padding: 16 }}>
-      <div className="section-title">{title}</div>
-      <div style={{ display:"flex", flexWrap:"wrap", gap:8, alignItems:"center" }}>
+    <Card className="p-4">
+      <h3 className="font-bold text-sm tracking-wide mb-2">{title}</h3>
+      <div className="flex flex-wrap gap-2 items-center">
         {block.voice_path.map((v,i)=> (
           <React.Fragment key={i}>
             <Chip v={v} />
-            {i < block.voice_path.length-1 && <span style={{ color: COLORS.accent, fontWeight:700 }}>→</span>}
+            {i < block.voice_path.length-1 && <span className="font-bold text-accent">→</span>}
           </React.Fragment>
         ))}
       </div>
-      <div style={{ marginTop: 10, display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(220px, 1fr))", gap: 10 }}>
+      <div className="mt-2.5 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2.5">
         <InfoLine label="Voice Path" value={joinPath(block.voice_path)} />
         <InfoLine label="Level Path" value={labelLevels(block.level_path)} />
         <InfoLine label="Ring Path" value={labelRings(block.ring_path)} />
@@ -123,21 +98,21 @@ function PathRow({block, title}:{block:PathBlock; title:string}){
         {typeof block.kept === "number" ? <InfoLine label="Keeps" value={String(block.kept)} /> : null}
       </div>
       {block.ops?.length ? (
-        <div style={{ marginTop: 10 }}>
-          <div className="section-title">Ops</div>
-          <div className="code" style={{ fontSize: 12, whiteSpace:"pre-wrap" }}>{block.ops.join("; ")}</div>
+        <div className="mt-2.5">
+          <h4 className="font-bold text-sm tracking-wide">Ops</h4>
+          <div className="font-code text-xs whitespace-pre-wrap">{block.ops.join("; ")}</div>
         </div>
       ) : null}
-    </div>
+    </Card>
   );
 }
 
 function InfoLine({label, value, mono}:{label:string; value:string; mono?:boolean}){
   return (
-    <div className="card" style={{ padding: 10, display:"flex", flexDirection:"column", gap:4 }}>
-      <span style={{ fontSize: 12, color: "#6b7280" }}>{label}</span>
-      <span className={mono?"code":""} style={{ fontWeight: 600 }}>{value}</span>
-    </div>
+    <Card className="p-2.5 flex flex-col gap-1">
+      <span className="text-xs text-slate-500">{label}</span>
+      <span className={`font-semibold ${mono ? "font-code":""}`}>{value}</span>
+    </Card>
   );
 }
 
@@ -146,33 +121,33 @@ function Candidates({map}:{map: AnalyzeResponse["languageFamilies"]}){
     if (!map || Object.keys(map).length===0) return null;
     
     return (
-        <div className="card" style={{ padding: 16 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div className="section-title">Language Candidate Mapping (Gemini 2.5)</div>
-                <button className="btn" style={{ padding: "4px 10px", fontSize: 12 }} onClick={() => setIsOpen(o => !o)}>
+        <Card className="p-4">
+            <div className="flex justify-between items-center">
+                <h3 className="font-bold text-sm tracking-wide">Language Candidate Mapping (Gemini 2.5)</h3>
+                <Button variant="outline" size="sm" onClick={() => setIsOpen(o => !o)}>
                     {isOpen ? "Minimize" : "Maximize"}
-                </button>
+                </Button>
             </div>
 
             {isOpen && (
-                <div style={{ marginTop: '8px' }}>
+                <div className="mt-2">
                     {Object.entries(map).map(([family, arr])=> (
-                        <div key={family} style={{ marginBottom: 12 }}>
-                        <div style={{ fontWeight: 700, color: COLORS.primary, marginBottom: 6 }}>{family}</div>
-                        <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(260px,1fr))", gap: 10 }}>
+                        <div key={family} className="mb-3">
+                        <div className="font-bold text-primary mb-1.5">{family}</div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2.5">
                             {(arr || []).filter(Boolean).map((c, i)=> (
-                            <div key={i} className="card" style={{ padding: 10, borderColor: COLORS.primary }}>
-                                <div style={{ fontWeight: 700 }}>{c.form}</div>
-                                <div className="code" style={{ fontSize: 12, marginTop: 6 }}>map: {c.map ? c.map.join(" · ") : ''}</div>
-                                <div style={{ fontSize: 12, marginTop: 6, color: "#374151" }}>{c.functional}</div>
-                            </div>
+                            <Card key={i} className="p-2.5 border-primary">
+                                <div className="font-bold">{c.form}</div>
+                                <div className="font-code text-xs mt-1.5">map: {c.map ? c.map.join(" · ") : ''}</div>
+                                <div className="text-xs mt-1.5 text-slate-700">{c.functional}</div>
+                            </Card>
                             ))}
                         </div>
                         </div>
                     ))}
                 </div>
             )}
-        </div>
+        </Card>
     );
 }
 
@@ -183,46 +158,46 @@ function HistoryPanel({ items, onRerun, onClear }:{ items: HistItem[]; onRerun:(
 
   if (!isClient) {
     return (
-      <div className="card" style={{ padding: 16 }}>
-        <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
-          <div className="section-title">History (local)</div>
-          <button className="btn" style={{ background: "#6b7280" }} onClick={onClear} disabled>Clear</button>
+      <Card className="p-4">
+        <div className="flex justify-between items-center">
+          <h3 className="font-bold text-sm tracking-wide">History (local)</h3>
+          <Button variant="secondary" onClick={onClear} disabled>Clear</Button>
         </div>
-        <div style={{ fontSize: 12, color: "#6b7280" }}>Loading history...</div>
-      </div>
+        <div className="text-xs text-slate-500">Loading history...</div>
+      </Card>
     );
   }
 
   return (
-    <div className="card" style={{ padding: 16 }}>
-      <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
-        <div className="section-title">History (local)</div>
-        <button className="btn" style={{ background: "#6b7280" }} onClick={onClear} disabled={!items.length}>Clear</button>
+    <Card className="p-4">
+      <div className="flex justify-between items-center">
+        <h3 className="font-bold text-sm tracking-wide">History (local)</h3>
+        <Button variant="secondary" onClick={onClear} disabled={!items.length}>Clear</Button>
       </div>
       {items.length === 0 ? (
-        <div style={{ fontSize: 12, color: "#6b7280" }}>No history yet. Run an analysis to add entries.</div>
+        <div className="text-xs text-slate-500 mt-2">No history yet. Run an analysis to add entries.</div>
       ) : (
-        <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(260px,1fr))", gap: 10, marginTop: 10 }}>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2.5 mt-2.5">
           {items.map((it, i)=> (
-            <div key={i} className="card" style={{ padding: 12 }}>
-              <div style={{ fontWeight: 700 }}>{it.word} <span style={{ fontWeight:400, color:'#6b7280' }}>· {it.mode}</span></div>
-              <div style={{ marginTop: 6, display:'flex', flexWrap:'wrap', gap:6, alignItems:'center' }}>
+            <Card key={i} className="p-3">
+              <div className="font-bold">{it.word} <span className="font-normal text-slate-500">· {it.mode}</span></div>
+              <div className="mt-1.5 flex flex-wrap gap-1.5 items-center">
                 {it.primary.map((v, j)=> (
                   <React.Fragment key={j}>
-                    <span className="chip"><span className="chip-dot" style={{ background: VOICE_COLOR[v] || COLORS.primary }} />{v}</span>
-                    {j < it.primary.length-1 && <span style={{ color: COLORS.accent, fontWeight:700 }}>→</span>}
+                    <span className="inline-flex items-center gap-1 py-0.5 px-1.5 rounded-full border bg-white text-xs"><span className="w-2 h-2 rounded-full inline-block" style={{ background: VOICE_COLOR[v] || 'hsl(var(--primary))' }} />{v}</span>
+                    {j < it.primary.length-1 && <span className="font-bold text-accent">→</span>}
                   </React.Fragment>
                 ))}
               </div>
-              <div style={{ fontSize: 11, color:'#6b7280', marginTop:6 }}>{new Date(it.at).toLocaleString()}</div>
-              <div style={{ marginTop: 8 }}>
-                <button className="btn" onClick={()=> onRerun(it.word, it.mode)}>Re‑analyze</button>
+              <div className="text-xs text-slate-500 mt-1.5">{new Date(it.at).toLocaleString()}</div>
+              <div className="mt-2">
+                <Button onClick={()=> onRerun(it.word, it.mode)}>Re‑analyze</Button>
               </div>
-            </div>
+            </Card>
           ))}
         </div>
       )}
-    </div>
+    </Card>
   );
 }
 
@@ -273,66 +248,65 @@ export default function LinguisticDecoderApp(){
   
   return (
     <div>
-      <FontImports />
       {/* Header */}
-      <div style={{ padding: 24, borderBottom: `3px solid ${COLORS.primary}`, background: "#fff" }}>
-        <div style={{ maxWidth: 1080, margin: "0 auto" }}>
-          <div className="headline" style={{ fontSize: 28, fontWeight: 700, letterSpacing: ".01em", color: COLORS.primary }}>Linguistic Decoder</div>
-          <div style={{ fontSize: 13, color: "#4b5563", marginTop: 4 }}>Seven‑Voices matrix solver · primary & frontier paths · optional Gemini mapping</div>
+      <header className="p-6 border-b-4 border-primary bg-white">
+        <div className="max-w-5xl mx-auto">
+          <h1 className="font-headline text-3xl font-bold tracking-wide text-primary">Linguistic Decoder</h1>
+          <p className="text-sm text-slate-600 mt-1">Seven‑Voices matrix solver · primary & frontier paths · optional Gemini mapping</p>
         </div>
-      </div>
+      </header>
 
       {/* Controls */}
-      <div style={{ maxWidth: 1080, margin: "18px auto", padding: "0 16px" }}>
-        <div className="card" style={{ padding: 16 }}>
-          <div style={{ display:"grid", gridTemplateColumns:"1fr auto auto", gap: 10, alignItems:"center" }}>
-            <input
+      <main className="max-w-5xl mx-auto my-4 p-4">
+        <Card className="p-4">
+          <div className="grid grid-cols-[1fr_auto_auto] gap-2.5 items-center">
+            <Input
               value={word}
               onChange={e=> setWord(e.target.value)}
               placeholder="Type a word…"
-              style={{ width:"100%", padding: "12px 14px", borderRadius: 10, border: "1px solid #d1d5db", outlineColor: COLORS.accent, fontWeight:600 }}
+              className="font-semibold"
             />
-            <label style={{ display:"flex", alignItems:"center", gap: 8, fontSize: 13 }}>
-              <input type="checkbox" checked={mode==="strict"} onChange={e=> setMode(e.target.checked?"strict":"open")} />
+            <label className="flex items-center gap-2 text-sm">
+              <input type="checkbox" checked={mode==="strict"} onChange={e=> setMode(e.target.checked?"strict":"open")} className="w-4 h-4 rounded text-primary focus:ring-primary" />
               Strict
             </label>
-            <button className="btn" onClick={()=> analyze()} disabled={!canAnalyze}>
+            <Button onClick={()=> analyze()} disabled={!canAnalyze}>
               {loading ? "Analyzing…" : "Analyze"}
-            </button>
+            </Button>
           </div>
-          {err && <div style={{ marginTop: 10, color: "#b91c1c", fontWeight: 600 }}>Error: {err}</div>}
-        </div>
-      </div>
+          {err && <div className="mt-2.5 text-red-700 font-semibold">Error: {err}</div>}
+        </Card>
+      </main>
 
       {/* Results */}
-      <div style={{ maxWidth: 1080, margin: "0 auto", padding: "0 16px", display:"grid", gridTemplateColumns:"1fr", gap: 16 }}>
+      <div className="max-w-5xl mx-auto px-4 grid grid-cols-1 gap-4">
         {primary && analysis ? (
           <>
             <PathRow block={primary} title="Primary Path" />
             {frontierList.length ? (
-              <div className="card" style={{ padding: 16 }}>
-                <div className="section-title">Frontier (near‑optimal alternates)</div>
-                <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(280px, 1fr))", gap: 12 }}>
+              <Card className="p-4">
+                <h3 className="font-bold text-sm tracking-wide">Frontier (near‑optimal alternates)</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mt-3">
                   {frontierList.map((f, idx)=> (
-                    <div key={idx} className="card" style={{ padding: 12, borderColor: COLORS.accent }}>
-                      <div style={{ fontWeight: 700, marginBottom: 8 }}>Alt #{idx+1}</div>
-                      <div style={{ display:"flex", flexWrap:"wrap", gap:6, alignItems:"center" }}>
+                    <Card key={idx} className="p-3 border-accent">
+                      <div className="font-bold mb-2">Alt #{idx+1}</div>
+                      <div className="flex flex-wrap gap-1.5 items-center">
                         {f.voice_path.map((v,i)=> (
                           <React.Fragment key={i}>
                             <Chip v={v} />
-                            {i < f.voice_path.length-1 && <span style={{ color: COLORS.accent, fontWeight:700 }}>→</span>}
+                            {i < f.voice_path.length-1 && <span className="font-bold text-accent">→</span>}
                           </React.Fragment>
                         ))}
                       </div>
-                      <div className="hr" />
-                      <div className="code" style={{ fontSize: 12 }}>V={f.checksums.V} · E={f.checksums.E} · C={f.checksums.C}</div>
-                      <div className="code" style={{ fontSize: 12, marginTop: 4 }}>Keeps: {typeof f.kept === "number" ? f.kept : "—"}</div>
-                      <div style={{ fontSize: 12, marginTop: 6, color: "#6b7280" }}>Levels: {labelLevels(f.level_path)}</div>
-                      <div style={{ fontSize: 12, color: "#6b7280" }}>Rings: {labelRings(f.ring_path)}</div>
-                    </div>
+                      <hr className="my-2 border-border" />
+                      <div className="font-code text-xs">V={f.checksums.V} · E={f.checksums.E} · C={f.checksums.C}</div>
+                      <div className="font-code text-xs mt-1">Keeps: {typeof f.kept === "number" ? f.kept : "—"}</div>
+                      <div className="text-xs mt-1.5 text-slate-500">Levels: {labelLevels(f.level_path)}</div>
+                      <div className="text-xs text-slate-500">Rings: {labelRings(f.ring_path)}</div>
+                    </Card>
                   ))}
                 </div>
-              </div>
+              </Card>
             ) : null}
 
             {/* Candidate mapping (if backend enabled) */}
@@ -340,20 +314,20 @@ export default function LinguisticDecoderApp(){
 
           </>
         ) : (
-          <div className="card" style={{ padding: 20 }}>
-            <div className="section-title">How to use</div>
-            <ol style={{ margin: 0, paddingLeft: 18, lineHeight: 1.7 }}>
-              <li>Type a word and click <span className="kbd">Analyze</span>.</li>
-              <li>Primary block shows Voice / Level / Ring paths and checksums <span className="code">V/E/C</span>.</li>
+          <Card className="p-5">
+            <h3 className="font-bold text-sm tracking-wide">How to use</h3>
+            <ol className="list-decimal pl-5 mt-2 space-y-2 text-sm">
+              <li>Type a word and click <kbd className="border border-b-2 rounded-md bg-slate-100 px-1.5 py-0.5 text-xs">Analyze</kbd>.</li>
+              <li>Primary block shows Voice / Level / Ring paths and checksums <span className="font-code">V/E/C</span>.</li>
               <li>Frontier lists near‑optimal alternates (deterministic order).</li>
               <li>If mapping is enabled server‑side, language candidates appear below.</li>
             </ol>
-          </div>
+          </Card>
         )}
       </div>
 
       {/* History */}
-      <div style={{ maxWidth: 1080, margin: "16px auto", padding: "0 16px" }}>
+      <div className="max-w-5xl mx-auto my-4 px-4">
         <HistoryPanel
           items={history}
           onRerun={(w, m) => analyze(w, m)}
@@ -363,26 +337,25 @@ export default function LinguisticDecoderApp(){
 
       {/* Debug view */}
       {showDebug && data && (
-        <div style={{ maxWidth: 1080, margin: "16px auto", padding: "0 16px" }}>
-            <div className="card" style={{ padding: 16 }}>
-                <div className="section-title">API Echo (debug)</div>
-                <pre className="code" style={{ fontSize: 11, whiteSpace:"pre-wrap", background:"#f9fafb", padding:10, borderRadius:8, maxHeight:400, overflow:"auto" }}>
+        <div className="max-w-5xl mx-auto my-4 px-4">
+            <Card className="p-4">
+                <h3 className="font-bold text-sm tracking-wide">API Echo (debug)</h3>
+                <pre className="font-code text-xs whitespace-pre-wrap bg-slate-50 p-2.5 rounded-lg max-h-96 overflow-auto mt-2">
                     {orderedStringify(data)}
                 </pre>
-            </div>
+            </Card>
         </div>
       )}
 
-
       {/* Footer */}
-      <div style={{ padding: 24, opacity: 0.8 }}>
-        <div style={{ maxWidth: 1080, margin: "0 auto", fontSize: 12, color: "#6b7280", display: 'flex', justifyContent: 'space-between' }}>
+      <footer className="p-6 opacity-80">
+        <div className="max-w-5xl mx-auto text-xs text-slate-500 flex justify-between">
           <div><b>Style:</b> Deep Indigo primary · Light Grey background · Soft Amber accents · Fonts: Space Grotesk / Inter / Source Code Pro</div>
-          <button className="btn" style={{ background: "#6b7280", padding: "4px 10px", fontSize: 12 }} onClick={() => setShowDebug(s => !s)}>
+          <Button variant="secondary" size="sm" onClick={() => setShowDebug(s => !s)}>
             {showDebug ? "Hide" : "Show"} Debug
-          </button>
+          </Button>
         </div>
-      </div>
+      </footer>
     </div>
   );
 }
