@@ -1,4 +1,5 @@
 
+
 import { VOWELS, Vowel, VOWEL_LEVEL, VOWEL_RING, VOWEL_VALUE, computeC, extractWindowClasses, chooseProfile } from "./valueTables";
 import type { Analysis, Path, SolveMode } from "./types";
 import { CFG, ENGINE_VERSION, Alphabet } from "./engineConfig";
@@ -11,6 +12,7 @@ export type SolveOptions = {
   allowDelete: boolean;
   allowClosure: boolean;
   opCost: { sub: number; del: number; ins: number; };
+  alphabet?: Alphabet;
 };
 
 // --- Base Extraction & Keep Count ---
@@ -80,7 +82,7 @@ function mkPath(base: Vowel[], seq: Vowel[], E: number, ops: string[], consClass
         vowelPath: seq,
         ringPath: seq.map(v=>VOWEL_RING[v]),
         levelPath: seq.map(v=>VOWEL_LEVEL[v]),
-        checksums: [{type:"V",value:checksumV(seq)}, {type:"E",value:E}, {type:"C",value:computeC(seq, consClasses)}],
+        checksums: [{type:"V",value:checksumV(seq)}, {type:"E",value:E}, {type:"C",value:computeC(seq, consClasses, toVowel)}],
         kept: keptCount(base, seq),
         ops,
     };
@@ -130,7 +132,7 @@ function solveWord(word: string, opts: SolveOptions): Omit<Analysis, "word" | "m
   const rawBase = extractBase(word);
   const base = normalizeTerminalY(rawBase, word);
   const baseSeq = base.length ? base : (["O"] as Vowel[]);
-  const profile = chooseProfile(word, CFG.alphabet === "auto" ? undefined : CFG.alphabet);
+  const profile = chooseProfile(word, opts.alphabet === "auto" ? undefined : opts.alphabet);
   const consClasses = extractWindowClasses(word, baseSeq, profile, toVowel);
   
   const K = opts.beamWidth;

@@ -170,7 +170,7 @@ export function extractWindowClasses(
   return windows.map(chars => classifyWindow(chars, profile));
 }
 
-export function computeC(voicePath: Vowel[], consClasses: CClass[]): number {
+export function computeC(voicePath: Vowel[], consClasses: CClass[], toVowel: (ch: string) => Vowel | null): number {
   let c = 0;
   const hops = Math.max(0, voicePath.length - 1);
   for (let i = 0; i < hops; i++) {
