@@ -7,49 +7,76 @@ import { motion, AnimatePresence } from "framer-motion";
 type Vowel = "A" | "E" | "I" | "O" | "U" | "Y" | "Ë";
 const ORDER: Vowel[] = ["A", "E", "I", "O", "U", "Y", "Ë"];
 const VOICE_COLOR: Record<Vowel, string> = {
-  A: "#EF4444", // Red
-  E: "#F59E0B", // Orange
-  I: "#EAB308", // Yellow
-  O: "#10B981", // Green
-  U: "#3B82F6", // Blue
-  Y: "#6366F1", // Indigo
-  "Ë": "#8B5CF6", // Violet
+  A: "#EF4444",
+  E: "#F59E0B",
+  I: "#EAB308",
+  O: "#10B981",
+  U: "#3B82F6",
+  Y: "#6366F1",
+  "Ë": "#8B5CF6",
 };
 const PALETTE = { rail:"#1f2937", accent:"#FFB300", text:"#111827", muted:"#6b7280", bg:"#fff" };
 
-// --- Consonant classes (simple EN mapping; Y is a vowel here) ---
-type CClass = "Plosive"|"Fricative"|"Affricate"|"Nasal"|"Liquid"|"Glide";
-const CLASS_ORDER: CClass[] = ["Plosive","Fricative","Affricate","Nasal","Liquid","Glide"];
+// --- Consonant classes (from solver) ---
+type CClass = "Plosive" | "Affricate" | "SibilantFricative" | "NonSibilantFricative" | "Nasal" | "Liquid" | "Glide";
 
-const CHAR_CLASS: Record<string, CClass> = {
-  p:"Plosive", b:"Plosive", t:"Plosive", d:"Plosive", k:"Plosive", g:"Plosive", q:"Plosive", c:"Plosive",
-  f:"Fricative", v:"Fricative", s:"Fricative", z:"Fricative", h:"Fricative", x:"Fricative",
-  j:"Affricate", /* ch */ // (we treat single letters; pro users can pass a custom map)
-  m:"Nasal", n:"Nasal",
-  l:"Liquid", r:"Liquid",
-  w:"Glide",
+const CLASS_ORDER: CClass[] = ["Plosive", "Affricate", "SibilantFricative", "NonSibilantFricative", "Nasal", "Liquid", "Glide"];
+
+const DIGRAPH_CLASS: Record<string, CClass> = {
+  "ch": "Affricate", "dz": "Affricate", "ts": "Affricate", "dʒ": "Affricate", "tʃ": "Affricate",
+  "sh": "SibilantFricative", "zh": "SibilantFricative",
+  "th": "NonSibilantFricative", "ph": "NonSibilantFricative",
+  "gj": "Affricate", "nj":"Nasal", "ll":"Liquid", "rr":"Liquid",
 };
 
-const VOWEL_SET = new Set(["a","e","i","o","u","y","ë"]); // Y & Ë are vowels in your system
+const LETTER_CLASS: Record<string, CClass> = {
+  p:"Plosive", b:"Plosive", t:"Plosive", d:"Plosive", k:"Plosive", g:"Plosive", q:"Plosive", c:"Plosive",
+  f:"NonSibilantFricative", v:"NonSibilantFricative", h:"NonSibilantFricative",
+  s:"SibilantFricative", z:"SibilantFricative", x:"SibilantFricative",
+  j:"Affricate",
+  m:"Nasal", n:"Nasal",
+  l:"Liquid", r:"Liquid",
+  w:"Glide", y:"Glide",
+};
+
+const VOWEL_SET = new Set(["a","e","i","o","u","y","ë"]);
 
 function extractConsonants(word: string): { ch: string; klass: CClass }[] {
-  const raw = word.normalize("NFC").toLowerCase().replace(/[^a-zë]/g,"");
-  const out: {ch:string;klass:CClass}[] = [];
-  for (let i=0;i<raw.length;i++){
-    const ch = raw[i];
-    if (VOWEL_SET.has(ch)) continue;
-    const klass = CHAR_CLASS[ch] ?? "Fricative"; // fallback bucket
-    out.push({ ch, klass });
+  const s = word.normalize("NFC").toLowerCase();
+  const out: { ch: string; klass: CClass }[] = [];
+
+  let i = 0;
+  while (i < s.length) {
+    if (VOWEL_SET.has(s[i])) { i++; continue; }
+
+    // Check for digraphs first
+    let foundDigraph = false;
+    if (i < s.length - 1) {
+      const dg = s.slice(i, i + 2);
+      if (DIGRAPH_CLASS[dg]) {
+        out.push({ ch: dg, klass: DIGRAPH_CLASS[dg] });
+        i += 2;
+        foundDigraph = true;
+      }
+    }
+
+    if (!foundDigraph) {
+      const ch = s[i];
+      const klass = LETTER_CLASS[ch] ?? "NonSibilantFricative";
+      out.push({ ch, klass });
+      i++;
+    }
   }
   return out;
 }
+
 
 export function TwoRailsWithConsonants({
   word,
   path,
   running,
   playKey,
-  height = 300,
+  height = 320,
   durationPerHopMs = 900,
   showLabels = true,
   consonants,              // optional override sequence (e.g., [{ch:"s",klass:"Fricative"}...])
@@ -191,6 +218,7 @@ export function TwoRailsWithConsonants({
         {CLASS_ORDER.map((klass, i) => {
           const x = startX + i*(segW+gap);
           const active = activePulse?.klass === klass;
+          const shortName = klass.replace("SibilantFricative", "Sibilant").replace("NonSibilantFricative", "Fricative");
           return (
             <g key={klass}>
               <rect x={x} y={midY - bandH/2} width={segW} height={bandH}
@@ -200,7 +228,7 @@ export function TwoRailsWithConsonants({
                 stroke="#d1d5db" strokeOpacity={0.6} />
               <text x={x+segW/2} y={midY} textAnchor="middle" fontSize={12}
                 fill={active ? "#111827" : PALETTE.muted} dominantBaseline="central">
-                {klass}
+                {shortName}
               </text>
               {/* pulse ring */}
               {active && (
