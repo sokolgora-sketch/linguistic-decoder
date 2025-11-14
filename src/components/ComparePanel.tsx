@@ -108,7 +108,7 @@ function ResultCard({ title, data }: { title: string; data: any }) {
         <div className="space-y-1 mt-2">
           <div className="text-xs opacity-80">
             {analysis.mode} · {analysis.alphabet}
-            {data.cacheHit && <span className="ml-2 px-1.5 py-0.5 text-xs rounded bg-amber-100 border border-amber-300">Cached</span>}
+            {data.cacheHit && <span className="ml-2 px-1.5 py-0.5 text-xs rounded bg-accent/20 border border-accent text-accent-foreground">Cached</span>}
           </div>
           <div><b>Primary:</b> {analysis.primary?.voice_path?.join(" → ")}</div>
           <div><b>Checksums:</b> V={analysis.primary?.checksums?.V} · E={analysis.primary?.checksums?.E} · C={analysis.primary?.checksums?.C}</div>

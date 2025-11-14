@@ -181,7 +181,7 @@ export default function LinguisticDecoderApp(){
             </Button>
           </div>
           {err && <div className="mt-2.5 text-red-700 font-semibold">Error: {err}</div>}
-           {data?.cacheHit && <div className="mt-2.5 text-sm font-semibold text-amber-600">Result loaded from cache.</div>}
+           {data?.cacheHit && <div className="mt-2.5 text-sm font-semibold text-accent-foreground">Result loaded from cache.</div>}
         </Card>
 
         {/* Visualization & Results */}
