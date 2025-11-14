@@ -1,18 +1,14 @@
 
-import { chooseProfile } from "./valueTables";
-import { extractWindowClasses, extractBase, normalizeTerminalY, Vowel } from "./index";
-import type { LangProfile } from "./valueTables";
 
-function base(word: string): Vowel[] {
-  const raw = extractBase(word);
-  const norm = normalizeTerminalY(raw, word);
-  return norm.length ? (norm as Vowel[]) : (["O"] as Vowel[]);
-}
+import { chooseProfile } from "./valueTables";
+import { extractWindowClassesWithProfile } from "./valueTables";
+import { baseForTests } from "./index";
+import type { Vowel } from "./valueTables";
 
 function classes(word: string, overrideId?: string) {
   const P = chooseProfile(word, overrideId);
-  const seq = base(word);
-  return extractWindowClasses(word, seq, P); // returns array of CClass
+  const seq = baseForTests(word);
+  return extractWindowClassesWithProfile(word, seq, P); // returns array of CClass
 }
 
 describe("Language profiles → window classes are deterministic", () => {

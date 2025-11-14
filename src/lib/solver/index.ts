@@ -42,7 +42,6 @@ export function normalizeTerminalY(seq: Vowel[], rawWord: string): Vowel[] {
 
 
 // --- Path Scoring ---
-const checksumV = (p: Vowel[]) => p.reduce((acc,v)=> acc*VOWEL_VALUE[v], 1);
 const ringPenalty = (p:Vowel[]) => { 
     if (CFG.ringJumpPenalty === 0) return 0;
     let d=0; for(let i=0;i<p.length-1;i++) d+=Math.abs(VOWEL_RING[p[i]]-VOWEL_RING[p[i+1]]); return d * CFG.ringJumpPenalty;
@@ -82,7 +81,7 @@ function mkPath(base: Vowel[], seq: Vowel[], E: number, ops: string[], consClass
         vowelPath: seq,
         ringPath: seq.map(v=>VOWEL_RING[v]),
         levelPath: seq.map(v=>VOWEL_LEVEL[v]),
-        checksums: [{type:"V",value:checksumV(seq)}, {type:"E",value:E}, {type:"C",value:computeC(seq, consClasses)}],
+        checksums: [{type:"V",value:VOWELS.reduce((acc,v)=> acc * VOWEL_VALUE[v], 1)}, {type:"E",value:E}, {type:"C",value:computeC(seq, consClasses)}],
         kept: keptCount(base, seq),
         ops,
     };
@@ -202,4 +201,10 @@ export function solveMatrix(word: string, options: SolveOptions): Analysis {
     word,
     mode,
   };
+}
+
+export function baseForTests(word: string): Vowel[] {
+  const raw = extractBase(word);
+  const norm = normalizeTerminalY(raw, word);
+  return (norm.length ? norm : (["O"] as Vowel[])) as Vowel[];
 }
