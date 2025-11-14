@@ -80,12 +80,15 @@ export default function LinguisticDecoderApp(){
     setLoading(true);
     setIsWarming(false);
     setErr(null);
+    setData(null);
     try {
       // 1. Get the analysis result (from cache or API)
       const clientResponse = await analyzeClient(useWord, useMode, useAlphabet);
       
       // 2. Ensure we have a valid payload for the AI
       const enginePayload = await ensureEnginePayload(clientResponse.analysis, useMode, useAlphabet);
+      console.debug("Primary keys:", enginePayload?.primary && Object.keys(enginePayload.primary));
+      console.debug("Primary path:", enginePayload?.primary);
 
       // 3. Call the AI flow with the guaranteed-correct data shape
       let languageFamilies = null;
@@ -310,3 +313,5 @@ export default function LinguisticDecoderApp(){
     </div>
   );
 }
+
+    

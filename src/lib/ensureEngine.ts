@@ -28,7 +28,7 @@ export async function ensureEnginePayload(
   }
 
   // Last resort: recompute fresh. This is a failsafe.
-  // The result from analyzeClient has the analysis data at the top level.
+  // The result from analyzeClient has the analysis data nested under 'analysis'
   if (source?.word) {
     const result = await analyzeClient(source.word, mode, alphabet, { bypass: true, skipWrite: true });
     if (result?.analysis) return result.analysis;
@@ -36,3 +36,5 @@ export async function ensureEnginePayload(
 
   throw new Error("ensureEnginePayload: cannot resolve engine payload");
 }
+
+    

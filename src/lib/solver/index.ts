@@ -222,9 +222,4 @@ export function baseForTests(word: string): Vowel[] {
   return (norm.length ? norm : (["O"] as Vowel[])) as Vowel[];
 }
 
-
-
-
-
-
-
+    

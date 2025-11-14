@@ -124,8 +124,6 @@ export function ResultsDisplay({ analysis }: { analysis: AnalyzeResponse['analys
 
     if (!primary) return null;
     
-    console.debug("Primary keys:", analysis?.primary && Object.keys(analysis.primary));
-
     return (
         <>
             <PathRow block={primary} title="Primary Path" windows={analysis.windows} windowClasses={analysis.windowClasses}/>
@@ -157,3 +155,5 @@ export function ResultsDisplay({ analysis }: { analysis: AnalyzeResponse['analys
         </>
     );
 }
+
+    
