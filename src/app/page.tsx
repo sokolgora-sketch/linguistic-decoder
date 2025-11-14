@@ -97,13 +97,18 @@ export default function LinguisticDecoderApp(){
   const signals = analysis?.signals?.join(" · ") || "";
   
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6 p-4 lg:p-8">
+    <div className="grid grid-cols-1 gap-6 p-4 lg:p-8 max-w-5xl mx-auto">
       <main className="space-y-4">
         {/* Header */}
         <header className="p-6 border-b-4 border-primary bg-white -mx-6 -mt-8">
-          <div className="max-w-5xl mx-auto">
-            <h1 className="font-headline text-3xl font-bold tracking-wide text-primary">Linguistic Decoder</h1>
-            <p className="text-sm text-slate-600 mt-1">Seven‑Voices matrix solver · primary & frontier paths · optional Gemini mapping</p>
+          <div className="max-w-5xl mx-auto flex justify-between items-center">
+            <div>
+              <h1 className="font-headline text-3xl font-bold tracking-wide text-primary">Linguistic Decoder</h1>
+              <p className="text-sm text-slate-600 mt-1">Seven‑Voices matrix solver · primary & frontier paths · optional Gemini mapping</p>
+            </div>
+            <Button asChild variant="outline">
+                <Link href="/history">View History</Link>
+            </Button>
           </div>
         </header>
 
@@ -194,17 +199,8 @@ export default function LinguisticDecoderApp(){
 
       </main>
 
-      {/* History Link */}
-      <aside className="space-y-3 pt-20">
-        <div className="text-right">
-            <Link href="/history" className="text-sm font-medium text-primary hover:underline">
-                View History
-            </Link>
-        </div>
-      </aside>
-
       {/* Footer */}
-      <footer className="p-6 opacity-80 col-span-1 lg:col-span-2">
+      <footer className="p-6 opacity-80 col-span-1">
         <div className="max-w-5xl mx-auto text-xs text-slate-500 flex justify-between">
           <div className="font-code">{signals}</div>
           <Button variant="secondary" size="sm" onClick={() => setShowDebug(s => !s)}>
@@ -215,3 +211,5 @@ export default function LinguisticDecoderApp(){
     </div>
   );
 }
+
+    
