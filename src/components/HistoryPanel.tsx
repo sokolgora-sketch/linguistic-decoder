@@ -4,15 +4,15 @@ import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
-// Seven‑Voices palette (kept from engine conventions)
+// Seven‑Voices palette (uses CSS variables from globals.css)
 const VOICE_COLOR: Record<string, string> = {
-  A: "hsl(var(--chart-1))", // red-ish
-  E: "hsl(var(--chart-2))", // orange-ish
-  I: "hsl(var(--chart-3))", // yellow-ish
-  O: "hsl(var(--chart-4))", // green-ish
-  U: "hsl(var(--chart-5))", // blue-ish
-  Y: "hsl(231 48% 48%)", // indigo-ish (primary)
-  "Ë": "hsl(262 80% 50%)"   // violet-ish
+  A: "var(--voice-A)",
+  E: "var(--voice-E)",
+  I: "var(--voice-I)",
+  O: "var(--voice-O)",
+  U: "var(--voice-U)",
+  Y: "var(--voice-Y)",
+  "Ë": "var(--voice-EH)"
 };
 
 export type HistItem = { word: string; mode: "strict" | "open"; primary: string[]; at: number };

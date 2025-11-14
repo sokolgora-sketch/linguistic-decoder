@@ -6,7 +6,13 @@ import { motion, AnimatePresence } from "framer-motion";
 type Vowel = "A" | "E" | "I" | "O" | "U" | "Y" | "Ë";
 const ORDER: Vowel[] = ["A", "E", "I", "O", "U", "Y", "Ë"];
 const VOICE_COLOR: Record<Vowel, string> = {
-  A:"#ef4444", E:"#f59e0b", I:"#eab308", O:"#10b981", U:"#3b82f6", Y:"#6366f1", "Ë":"#8b5cf6",
+  A: "#EF4444", // Red
+  E: "#F59E0B", // Orange
+  I: "#EAB308", // Yellow
+  O: "#10B981", // Green
+  U: "#3B82F6", // Blue
+  Y: "#6366F1", // Indigo
+  "Ë": "#8B5CF6", // Violet
 };
 const PALETTE = { rail:"#1f2937", accent:"#FFB300", text:"#111827", muted:"#6b7280", bg:"#fff" };
 
