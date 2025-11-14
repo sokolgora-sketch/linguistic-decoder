@@ -2,6 +2,7 @@
 'use client';
 
 import React, { useState, useEffect } from "react";
+import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -13,7 +14,6 @@ import { ResultsDisplay } from "@/components/ResultsDisplay";
 import { ConsonantReference } from "@/components/ConsonantReference";
 import { TwoRailsWithConsonants } from "@/components/TwoRailsWithConsonants";
 import { analyzeClient } from "@/lib/analyzeClient";
-import { useHistory, type HistoryItem } from "@/hooks/useHistory";
 import type { Alphabet } from "@/lib/solver/engineConfig";
 import { PROFILES } from "@/lib/solver/valueTables";
 
@@ -50,9 +50,6 @@ export default function LinguisticDecoderApp(){
   const [err, setErr] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [showDebug, setShowDebug] = useState(false);
-  const [showHistory, setShowHistory] = useState(true);
-  
-  const history = useHistory(12);
 
   const canAnalyze = word.trim().length > 0 && !loading;
 
@@ -197,43 +194,13 @@ export default function LinguisticDecoderApp(){
 
       </main>
 
-      {/* History */}
+      {/* History Link */}
       <aside className="space-y-3 pt-20">
-        <div className="flex justify-between items-center pr-2">
-            <div className="font-semibold pl-4">History</div>
-            <Button variant="ghost" size="sm" onClick={() => setShowHistory(s => !s)}>
-                {showHistory ? "Hide" : "Show"}
-            </Button>
+        <div className="text-right">
+            <Link href="/history" className="text-sm font-medium text-primary hover:underline">
+                View History
+            </Link>
         </div>
-        {showHistory && (
-            <Card className="p-2">
-                {history.length === 0 && <div className="text-xs text-slate-500 p-2">History will appear here.</div>}
-                <ul className="space-y-1 text-sm">
-                {history.map((h: HistoryItem) => (
-                    <li key={h.id}>
-                    <button
-                        className="w-full text-left border rounded px-2 py-1 hover:bg-slate-50 flex items-center justify-between"
-                        onClick={() => {
-                        setWord(h.word);
-                        setMode(h.mode as "strict"|"open");
-                        setAlphabet(h.alphabet as Alphabet);
-                        analyze(h.word, h.mode as "strict"|"open", h.alphabet as Alphabet);
-                        }}
-                    >
-                        <span>{h.word} <span className="text-slate-500">· {h.mode}</span></span>
-                        <a
-                        className="underline text-xs hover:text-primary"
-                        href={`/?word=${encodeURIComponent(h.word)}&mode=${h.mode}&alphabet=${h.alphabet}`}
-                        onClick={(e) => e.stopPropagation()} // prevent re-analyzing when clicking share
-                        >
-                        Share
-                        </a>
-                    </button>
-                    </li>
-                ))}
-                </ul>
-            </Card>
-        )}
       </aside>
 
       {/* Footer */}

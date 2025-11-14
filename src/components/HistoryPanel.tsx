@@ -1,67 +1,41 @@
+
 'use client';
 
-import React, { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
+import React from "react";
+import Link from "next/link";
 import { Card } from "@/components/ui/card";
+import { useHistory, type HistoryItem } from "@/hooks/useHistory";
 
-// Seven‑Voices palette (uses CSS variables from globals.css)
-const VOICE_COLOR: Record<string, string> = {
-  A: "var(--voice-A)",
-  E: "var(--voice-E)",
-  I: "var(--voice-I)",
-  O: "var(--voice-O)",
-  U: "var(--voice-U)",
-  Y: "var(--voice-Y)",
-  "Ë": "var(--voice-EH)"
-};
+export function HistoryPanel() {
+    const history = useHistory(50); // Fetch more items for a dedicated page
 
-export type HistItem = { word: string; mode: "strict" | "open"; primary: string[]; at: number };
-
-export function HistoryPanel({ items, onRerun, onClear }:{ items: HistItem[]; onRerun:(w:string, m:"strict"|"open")=>void; onClear:()=>void }){
-  const [isClient, setIsClient] = useState(false);
-  useEffect(() => { setIsClient(true); }, []);
-
-  if (!isClient) {
     return (
-      <Card className="p-4">
-        <div className="flex justify-between items-center">
-          <h3 className="font-bold text-sm tracking-wide">History (local)</h3>
-          <Button variant="secondary" onClick={onClear} disabled>Clear</Button>
-        </div>
-        <div className="text-xs text-slate-500">Loading history...</div>
-      </Card>
+        <Card className="p-4">
+            <div className="font-semibold text-lg mb-4">Analysis History</div>
+            {history.length === 0 ? (
+                <div className="text-sm text-slate-500 p-2">
+                    No history yet. Run an analysis on the main page to see entries here.
+                </div>
+            ) : (
+                <ul className="space-y-2 text-sm">
+                    {history.map((h: HistoryItem) => (
+                        <li key={h.id}>
+                            <Link
+                                href={`/?word=${encodeURIComponent(h.word)}&mode=${h.mode}&alphabet=${h.alphabet}`}
+                                className="w-full text-left border rounded px-3 py-2 hover:bg-slate-50 flex items-center justify-between transition-colors"
+                            >
+                                <div>
+                                    <span className="font-medium">{h.word}</span>
+                                    <span className="text-slate-500 ml-2">· {h.mode} · {h.alphabet}</span>
+                                </div>
+                                <span className="text-xs text-slate-400">
+                                    {h.createdAt?.toDate ? h.createdAt.toDate().toLocaleDateString() : ''}
+                                </span>
+                            </Link>
+                        </li>
+                    ))}
+                </ul>
+            )}
+        </Card>
     );
-  }
-
-  return (
-    <Card className="p-4">
-      <div className="flex justify-between items-center">
-        <h3 className="font-bold text-sm tracking-wide">History (local)</h3>
-        <Button variant="secondary" onClick={onClear} disabled={!items.length}>Clear</Button>
-      </div>
-      {items.length === 0 ? (
-        <div className="text-xs text-slate-500 mt-2">No history yet. Run an analysis to add entries.</div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2.5 mt-2.5">
-          {items.map((it, i)=> (
-            <Card key={i} className="p-3">
-              <div className="font-bold">{it.word} <span className="font-normal text-slate-500">· {it.mode}</span></div>
-              <div className="mt-1.5 flex flex-wrap gap-1.5 items-center">
-                {it.primary.map((v, j)=> (
-                  <React.Fragment key={j}>
-                    <span className="inline-flex items-center gap-1 py-0.5 px-1.5 rounded-full border bg-white text-xs"><span className="w-2 h-2 rounded-full inline-block" style={{ background: VOICE_COLOR[v] || 'hsl(var(--primary))' }} />{v}</span>
-                    {j < it.primary.length-1 && <span className="font-bold text-accent">→</span>}
-                  </React.Fragment>
-                ))}
-              </div>
-              <div className="text-xs text-slate-500 mt-1.5">{new Date(it.at).toLocaleString()}</div>
-              <div className="mt-2">
-                <Button onClick={()=> onRerun(it.word, it.mode)}>Re‑analyze</Button>
-              </div>
-            </Card>
-          ))}
-        </div>
-      )}
-    </Card>
-  );
 }
