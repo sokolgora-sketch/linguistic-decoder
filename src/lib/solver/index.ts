@@ -19,13 +19,11 @@ const DEFAULTS = {
   frontierDeltaE: { strict: 2, open: 3 }
 };
 
-const isVowelChar = (ch:string)=> "aeiouyëAEIOUYË".includes(ch);
-const mapToVowel = (ch:string): Vowel|undefined => {
-  const c = ch.toLowerCase();
-  if (c==="a") return "A"; if (c==="e") return "E"; if (c==="i") return "I";
-  if (c==="o") return "O"; if (c==="u") return "U"; if (c==="y") return "Y";
-  if (c==="ë" || c==="ë") return "Ë"; return undefined;
-};
+function isVowelChar(ch:string){ const c=ch.normalize("NFC"); return /[aeiouy]/i.test(c)||c==="ë"||c==="Ë"; }
+function toVowel(ch:string):Vowel|null{ const u=ch.toUpperCase(); return u==="Ë" ? "Ë" : (["A","E","I","O","U","Y"].includes(u)?(u as Vowel):null); }
+function extractBase(word:string):Vowel[]{ const out:Vowel[]=[]; for(const ch of word.normalize("NFC")){ if(!isVowelChar(ch))continue; const v=toVowel(ch)!; if(out.length && out[out.length-1]===v)continue; out.push(v);} return out; }
+function keptCount(base:Vowel[], cand:Vowel[]){ let k=0; for(let i=0;i<Math.min(base.length,cand.length);i++) if(base[i]===cand[i]) k++; return k; }
+
 
 function nounishScore(word: string): number {
   const w = word.toLowerCase();
@@ -54,22 +52,6 @@ function gravityBonus(path: Vowel[]): number {
   let reversals = 0; for (let i=1;i<lvl.length;i++) if (lvl[i] > lvl[i-1]) reversals++;
   const monotone = lvl.every((v,i)=> i===0 || v<=lvl[i-1]);
   return (monotone ? -1 : 0) + reversals; // negative lowers E
-}
-
-function buildSlots(word: string){
-  const s = word.toLowerCase();
-  const consonants: string[] = [];
-  const slots: (Vowel|undefined)[] = [undefined];
-  for (let i=0; i<s.length;){
-    const two = s.slice(i,i+2);
-    if (!isVowelChar(s[i]) && DIGRAPHS.includes(two)) { consonants.push(two); slots.push(undefined); i+=2; continue; }
-    if (!isVowelChar(s[i])) { consonants.push(s[i]); slots.push(undefined); i++; continue; }
-    // vowel run -> take last of the run
-    let j=i, last: Vowel|undefined = undefined;
-    while (j<s.length && isVowelChar(s[j])){ last = mapToVowel(s[j]) ?? last; j++; }
-    slots[slots.length-1] = last; i=j;
-  }
-  return { consonants, slots };
 }
 
 type State = { row: Vowel|null; cost: number; path: Vowel[]; ops: string[]; cStab: number; kept: number; deleted: number; };
@@ -141,7 +123,7 @@ function mkPath(base: Vowel[], seq: Vowel[], E: number, ops: string[], kept: num
         ringPath: seq.map(v=>VOWEL_RING[v]),
         levelPath: seq.map(v=>VOWEL_LEVEL[v]),
         checksums: [{type:"V",value:seq.reduce((acc,v)=> acc*VOWEL_VALUE[v], 1)}, {type:"E",value:E}, {type:"C",value:cStab}],
-        kept: kept,
+        kept: keptCount(base, seq),
         ops,
     };
     // Note: E includes gravity and penalties, so it won't perfectly match op costs.
@@ -155,6 +137,22 @@ function mkPath(base: Vowel[], seq: Vowel[], E: number, ops: string[], kept: num
     // hard block any illegal op text that slipped in from old code:
     if (ops.some(o=>o.startsWith("insert ") && !o.startsWith("insert Ë"))) throw new Error("Illegal insert op");
     return p;
+}
+
+function buildSlots(word: string){
+  const s = word.toLowerCase();
+  const consonants: string[] = [];
+  const slots: (Vowel|undefined)[] = [undefined];
+  for (let i=0; i<s.length;){
+    const two = s.slice(i,i+2);
+    if (!isVowelChar(s[i]) && DIGRAPHS.includes(two)) { consonants.push(two); slots.push(undefined); i+=2; continue; }
+    if (!isVowelChar(s[i])) { consonants.push(s[i]); slots.push(undefined); i++; continue; }
+    // vowel run -> take last of the run
+    let j=i, last: Vowel|undefined = undefined;
+    while (j<s.length && isVowelChar(s[j])){ last = toVowel(s[j]) ?? last; j++; }
+    slots[slots.length-1] = last; i=j;
+  }
+  return { consonants, slots };
 }
 
 
@@ -283,7 +281,7 @@ export function solveMatrix(word: string, options: SolveOptions): Analysis {
       .filter(s => s.E <= primary.E + delta && s.path.join("") !== pKey)
   );
   
-  const baseVowels = slots.filter((v): v is Vowel => !!v);
+  const baseVowels = extractBase(word);
 
   const toPath = (sol: {path: Vowel[], E: number, cStab: number, ops: string[], kept: number}): Path => mkPath(
     baseVowels, sol.path, sol.E, sol.ops, sol.kept, sol.cStab, opCosts
@@ -298,3 +296,5 @@ export function solveMatrix(word: string, options: SolveOptions): Analysis {
     signals: ["deterministic: beam DP; gravity; closure prefers Ë on tie"]
   };
 }
+
+    
