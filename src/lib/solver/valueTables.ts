@@ -17,12 +17,34 @@ export const STABILIZER_S: Record<string, number> = {
   w:0,y:0
 };
 
-export type CClass = "Plosive"|"Fricative"|"Affricate"|"Nasal"|"Liquid"|"Glide";
+// --- Seven-class consonant model -------------------------------------------
 
-export const MAP_CLASS: Record<string,CClass> = {
+export type CClass =
+  | "Glide"
+  | "Liquid"
+  | "Nasal"
+  | "NonSibilantFricative"
+  | "SibilantFricative"
+  | "Affricate"
+  | "Plosive";
+
+
+// Order matters: match digraphs before single letters
+export const DIGRAPH_CLASS: Record<string, CClass> = {
+  "ch": "Affricate", "dz": "Affricate", "ts": "Affricate",
+  "sh": "SibilantFricative", "zh": "SibilantFricative",
+  "th": "NonSibilantFricative", "ph": "NonSibilantFricative",
+};
+
+export const LETTER_CLASS: Record<string, CClass> = {
+  // Plosive
   p:"Plosive", b:"Plosive", t:"Plosive", d:"Plosive", k:"Plosive", g:"Plosive", q:"Plosive", c:"Plosive",
-  f:"Fricative", v:"Fricative", s:"Fricative", z:"Fricative", h:"Fricative", x:"Fricative",
+  // Fricatives
+  f:"NonSibilantFricative", v:"NonSibilantFricative", h:"NonSibilantFricative",
+  s:"SibilantFricative", z:"SibilantFricative", x:"SibilantFricative",
+  // Affricate (single-letter j)
   j:"Affricate",
+  // Sonorants
   m:"Nasal", n:"Nasal",
   l:"Liquid", r:"Liquid",
   w:"Glide", y:"Glide",

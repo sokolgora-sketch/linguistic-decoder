@@ -1,5 +1,5 @@
 
-import { VOWELS, Vowel, VOWEL_LEVEL, VOWEL_RING, VOWEL_VALUE, CClass, MAP_CLASS } from "./valueTables";
+import { VOWELS, Vowel, VOWEL_LEVEL, VOWEL_RING, VOWEL_VALUE, CClass, DIGRAPH_CLASS, LETTER_CLASS } from "./valueTables";
 import type { Analysis, Path, SolveMode } from "./types";
 import { CFG, ENGINE_VERSION } from "./engineConfig";
 
@@ -73,12 +73,79 @@ function opCostFromLabel(op: string, costs: { sub: number; del: number; ins: num
   return costs.sub;
 }
 
-function mkPath(base: Vowel[], seq: Vowel[], E: number, ops: string[], computeC: (path: Vowel[]) => number): Path {
+// --- Consonant Classification & Hop Penalty ---
+
+function classRange(cls: CClass): [number, number] {
+  switch (cls) {
+    case "Glide":
+    case "Liquid":
+    case "Nasal": return [0, 1];
+    case "NonSibilantFricative": return [1, 1];
+    case "SibilantFricative":
+    case "Affricate": return [1, 2];
+    case "Plosive": return [2, 3];
+  }
+}
+
+function classifyWindow(chars: string): CClass {
+  const s = chars.toLowerCase();
+  // digraph pass (left-to-right)
+  for (let i = 0; i < s.length - 1; i++) {
+    const dg = s.slice(i, i + 2);
+    if (DIGRAPH_CLASS[dg]) return DIGRAPH_CLASS[dg];
+  }
+  // single-letter fallback: first consonant we see
+  for (const ch of s) {
+    if (/[aeiouyë]/i.test(ch)) continue;
+    if (LETTER_CLASS[ch]) return LETTER_CLASS[ch];
+  }
+  // default neutral friction
+  return "NonSibilantFricative";
+}
+
+function hopPenalty(absDelta: number, cls: CClass): number {
+  const [lo, hi] = classRange(cls);
+  if (absDelta < lo) return lo - absDelta;
+  if (absDelta > hi) return absDelta - hi;
+  return 0;
+}
+
+// Extract consonant-class windows between normalized base vowels
+function extractWindowClasses(word: string, baseSeq: Vowel[]): CClass[] {
+  const s = word.normalize("NFC");
+  // find indices of base vowels in raw word (first match per base slot)
+  const pos: number[] = [];
+  let vi = 0;
+  for (let i = 0; i < s.length && vi < baseSeq.length; i++) {
+    const v = toVowel(s[i]);
+    if (!v) continue;
+    if (v === baseSeq[vi]) { pos.push(i); vi++; }
+  }
+  const windows: string[] = [];
+  for (let k = 0; k < pos.length - 1; k++) {
+    windows.push(s.slice(pos[k] + 1, pos[k + 1]));
+  }
+  return windows.map(classifyWindow);
+}
+
+function computeC(vowelPath: Vowel[], consClasses: CClass[]): number {
+  let c = 0;
+  const hops = Math.max(0, vowelPath.length - 1);
+  for (let i = 0; i < hops; i++) {
+    const cls = i < consClasses.length ? consClasses[i] : "Glide"; // extra hop (e.g., closure) = Glide expectation
+    const d = Math.abs(VOWEL_RING[vowelPath[i + 1]] - VOWEL_RING[vowelPath[i]]);
+    c += hopPenalty(d, cls);
+  }
+  return c;
+}
+
+
+function mkPath(base: Vowel[], seq: Vowel[], E: number, ops: string[], consClasses: CClass[]): Path {
     const p: Path = {
         vowelPath: seq,
         ringPath: seq.map(v=>VOWEL_RING[v]),
         levelPath: seq.map(v=>VOWEL_LEVEL[v]),
-        checksums: [{type:"V",value:checksumV(seq)}, {type:"E",value:E}, {type:"C",value:computeC(seq)}],
+        checksums: [{type:"V",value:checksumV(seq)}, {type:"E",value:E}, {type:"C",value:computeC(seq, consClasses)}],
         kept: keptCount(base, seq),
         ops,
     };
@@ -126,81 +193,12 @@ function neighbors(base: Vowel[], st: State, opts: SolveOptions): State[] {
   return out;
 }
 
-function classRange(cls: CClass): [number, number] {
-  switch (cls) {
-    case "Glide":
-    case "Liquid":
-    case "Nasal":     return [0,1];
-    case "Fricative": return [1,1];
-    case "Affricate": return [1,2];
-    case "Plosive":   return [2,3];
-  }
-}
-
-function hopPenalty(absDelta: number, cls: CClass): number {
-  const [lo, hi] = classRange(cls);
-  if (absDelta < lo) return lo - absDelta;
-  if (absDelta > hi) return absDelta - hi;
-  return 0;
-}
-
-function extractWindowsClasses(word: string, baseSeq: Vowel[]): CClass[] {
-  const s = word.normalize("NFC");
-  const pos: number[] = [];
-  let vi = 0;
-
-  // Find the word-indices of the base vowels.
-  // This is tricky because of dupe collapse, e.g. "aa" -> A.
-  // This simple model just finds the first match.
-  let lastWordI = -1;
-  for (let i=0; i<baseSeq.length; i++) {
-    const targetV = baseSeq[i];
-    let found = false;
-    for (let j=lastWordI+1; j<s.length; j++) {
-      const wordV = toVowel(s[j]);
-      if (wordV === targetV) {
-        pos.push(j);
-        lastWordI = j;
-        found = true;
-        break;
-      }
-    }
-    if (!found) pos.push(lastWordI + 1); // fallback
-  }
-
-  const windows: string[] = [];
-  for (let k=0;k<pos.length-1;k++){
-    windows.push(s.slice(pos[k]+1, pos[k+1]));
-  }
-
-  return windows.map(chars => {
-    for (const ch of chars.toLowerCase()) {
-      if (isVowelChar(ch)) continue;
-      if (MAP_CLASS[ch]) return MAP_CLASS[ch];
-    }
-    return "Fricative"; // neutral default
-  });
-}
 
 // --- Main Solver ---
 function solveWord(word: string, opts: SolveOptions): Omit<Analysis, "word" | "mode"> {
   const rawBase = extractBase(word);
   const base = normalizeTerminalY(rawBase, word);
-  const consClasses = extractWindowsClasses(word, base);
-
-  const computeC = (vowelPath: Vowel[]): number => {
-    let c = 0;
-    for (let i=0;i<Math.min(vowelPath.length-1, consClasses.length); i++){
-      const d = Math.abs(VOWEL_RING[vowelPath[i+1]] - VOWEL_RING[vowelPath[i]]);
-      c += hopPenalty(d, consClasses[i]);
-    }
-    // extra hop (e.g., closure) → assume Glide expectation
-    for (let j=consClasses.length; j<vowelPath.length-1; j++){
-      const d = Math.abs(VOWEL_RING[vowelPath[j+1]] - VOWEL_RING[vowelPath[j]]);
-      c += hopPenalty(d, "Glide");
-    }
-    return c;
-  }
+  const consClasses = extractWindowClasses(word, base);
 
   const baseSeq = base.length ? base : (["O"] as Vowel[]);
 
@@ -216,7 +214,7 @@ function solveWord(word: string, opts: SolveOptions): Omit<Analysis, "word" | "m
     if (st.ops.length > maxOps) continue;
     
     // Add current state to solutions
-    const p = mkPath(baseSeq, st.seq, st.E, st.ops, computeC);
+    const p = mkPath(baseSeq, st.seq, st.E, st.ops, consClasses);
     paths.push(p);
 
     // Get next states
