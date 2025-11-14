@@ -41,15 +41,22 @@ export async function analyzeClient(word: string, mode: Mode, alphabet: Alphabet
   const cacheId = `${word}|${mode}|${alphabet}|${ENGINE_VERSION}`;
   const cacheRef = doc(db, "analyses", cacheId);
 
-  // BYPASS: compute fresh, skip cache unless skipWrite=false
+  // BYPASS: compute fresh, skip cache unless caller overrides
   if (opts.bypass) {
     const fresh = computeLocal(word, mode, alphabet);
     const payload = { ...fresh, recomputed: true, cacheHit: false };
+
+    // Ensure no undefined fields (e.g., recomputed)
+    const safePayload = {
+      ...payload,
+      recomputed: payload.recomputed ?? false,  // Default to false if undefined
+    };
+
     if (!opts.skipWrite) {
-      await setDoc(cacheRef, { ...payload, cachedAt: serverTimestamp() }, { merge: false });
+      await setDoc(cacheRef, { ...safePayload, cachedAt: serverTimestamp() }, { merge: false });
     }
     void saveHistory(cacheId, word, mode, alphabet, "bypass");
-    return payload;
+    return safePayload;
   }
 
   // Try cache -> normalize (in case older writes used a different shape)
@@ -60,11 +67,17 @@ export async function analyzeClient(word: string, mode: Mode, alphabet: Alphabet
     return { ...normalized, cacheHit: true, recomputed: false };
   }
 
-  // Miss -> compute -> write -> return
+  // Miss → compute → write → return
   const fresh = computeLocal(word, mode, alphabet);
-  await setDoc(cacheRef, { ...fresh, cachedAt: serverTimestamp() }, { merge: false });
+  // Ensure no undefined fields in the final payload
+  const safeFresh = {
+    ...fresh,
+    recomputed: fresh.recomputed ?? false,  // Default to false if undefined
+  };
+
+  await setDoc(cacheRef, { ...safeFresh, cachedAt: serverTimestamp() }, { merge: false });
   void saveHistory(cacheId, word, mode, alphabet, "fresh");
-  return { ...fresh, cacheHit: false, recomputed: false };
+  return safeFresh;
 }
 
 async function saveHistory(
