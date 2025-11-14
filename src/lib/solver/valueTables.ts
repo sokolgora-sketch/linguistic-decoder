@@ -192,8 +192,44 @@ export const AncientGreek: LangProfile = {
   },
 };
 
+function piePre(s: string): string {
+  return s
+    .toLowerCase()
+    .replace(/\*/g,"")           // strip asterisk
+    .replace(/[h₁₁]/g,"h")       // h₁ → h
+    .replace(/[h₂₂]/g,"h")
+    .replace(/[h₃₃]/g,"h")
+    .normalize("NFD").replace(/[\u0300-\u036f]/g,""); // fold diacritics (ḱ→k, ǵ→g)
+}
 
-export const PROFILES: LangProfile[] = [Albanian, Sanskrit, AncientGreek, Turkish, German, Latin];
+export const PIE: LangProfile = {
+  id: "pie",
+  detect: (w) => /\*|h[₁₂₃]|[ḱǵ]|gʷ|kʷ|bh|dh|gh/i.test(w),
+  pre: piePre,
+  DIGRAPH: {
+    // labiovelars & aspirates → Plosive
+    "kw":"Plosive", "gw":"Plosive", "gwh":"Plosive",
+    "kh":"Plosive", "gh":"Plosive", "th":"Plosive", "dh":"Plosive", "ph":"Plosive", "bh":"Plosive",
+    // clusters
+    "ks":"SibilantFricative",
+  },
+  LETTER: {
+    // plosives (incl palatovelars after diacritic fold)
+    p:"Plosive", b:"Plosive", t:"Plosive", d:"Plosive", k:"Plosive", g:"Plosive", q:"Plosive", c:"Plosive",
+    // sibilant
+    s:"SibilantFricative", z:"SibilantFricative", x:"SibilantFricative",
+    // non-sibilant / laryngeals
+    h:"NonSibilantFricative", f:"NonSibilantFricative", v:"NonSibilantFricative",
+    // sonorants
+    m:"Nasal", n:"Nasal",
+    l:"Liquid", r:"Liquid",
+    y:"Glide", w:"Glide",
+    j:"Glide",
+  },
+};
+
+
+export const PROFILES: LangProfile[] = [PIE, Albanian, Sanskrit, AncientGreek, Turkish, German, Latin];
 
 export function chooseProfile(word: string, override?: string): LangProfile {
   if (override) {
