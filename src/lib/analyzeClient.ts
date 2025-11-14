@@ -5,28 +5,50 @@ import {
 } from "firebase/firestore";
 import type { Alphabet } from "./solver/engineConfig";
 import { ENGINE_VERSION } from "./solver/engineVersion";
-import { toMappingRecord } from "@/lib/schemaAdapter";
 
 type Mode = "strict" | "open";
+type AnalyzeOpts = { bypass?: boolean; skipWrite?: boolean };
 
-export async function analyzeClient(word: string, mode: Mode, alphabet: Alphabet) {
+export async function analyzeClient(word: string, mode: Mode, alphabet: Alphabet, opts: AnalyzeOpts = {}) {
   await ensureAnon();
   const cacheId = `${word}|${mode}|${alphabet}|${ENGINE_VERSION}`;
   const cacheRef = doc(db, "analyses", cacheId);
+
+  // BYPASS: For re-analysis or special cases.
+  if (opts.bypass) {
+    const analysisResult = await fetchAnalysis(word, mode, alphabet);
+    if (!opts.skipWrite) {
+      await setDoc(cacheRef, { analysis: analysisResult, cachedAt: serverTimestamp() }, { merge: true });
+    }
+    void saveHistory(word, mode, alphabet);
+    return { analysis: analysisResult, cacheHit: false, recomputed: true };
+  }
 
   // 1) READ CACHE
   const snap = await getDoc(cacheRef);
   if (snap.exists()) {
     console.log("Cache hit!");
     const data = snap.data();
-    // fire-and-forget history save
     void saveHistory(word, mode, alphabet); 
     return { analysis: data.analysis, languageFamilies: data.languageFamilies, cacheHit: true };
   }
 
-  console.log("Cache miss, calculating result...");
+  console.log("Cache miss, calling API...");
+  
+  // 2) CALL API
+  const analysisResult = await fetchAnalysis(word, mode, alphabet);
+  
+  // 3) WRITE CACHE (client-side) - The page will now handle writing the full payload with families
+  await setDoc(cacheRef, { analysis: analysisResult, cachedAt: serverTimestamp() }, { merge: true });
 
-  // 2) CALL your Next.js API
+  // 4) WRITE USER HISTORY
+  await saveHistory(word, mode, alphabet);
+
+  // Return just the analysis portion for the page to orchestrate AI call
+  return { analysis: analysisResult, cacheHit: false };
+}
+
+async function fetchAnalysis(word: string, mode: Mode, alphabet: Alphabet) {
   const res = await fetch(`/api/analyzeSevenVoices`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -37,20 +59,8 @@ export async function analyzeClient(word: string, mode: Mode, alphabet: Alphabet
       const errorData = await res.json();
       throw new Error(errorData.error || 'Analysis failed');
   }
-  const analysisResult = await res.json();
-  
-  // 3) WRITE CACHE (client-side) - The page will now handle writing the full payload with families
-  // Note: We only cache the raw analysis result here. The language families are added on the page.
-  await setDoc(cacheRef, { analysis: analysisResult, cachedAt: serverTimestamp() }, { merge: true });
-
-
-  // 4) WRITE USER HISTORY
-  await saveHistory(word, mode, alphabet);
-
-  // Return just the analysis portion
-  return { analysis: analysisResult, cacheHit: false };
+  return await res.json();
 }
-
 
 async function saveHistory(word: string, mode: Mode, alphabet: Alphabet) {
   const u = auth.currentUser;
@@ -93,7 +103,6 @@ export async function prefetchAnalyze(
   PREFETCH_SEEN.add(cacheId);
 
   try {
-    // This fetch just warms the server-side analysis cache, not the Gemini part.
     const r = await fetch("/api/analyzeSevenVoices", {
       method: "POST",
       headers: { "content-type": "application/json" },
@@ -102,11 +111,8 @@ export async function prefetchAnalyze(
     const analysisResult = await r.json();
     if (analysisResult?.error) return;
 
-    // Prefetch doesn't include Gemini, so we can't fully populate the cache here.
-    // We could store just the analysis part, but that complicates the cache structure.
-    // For now, the prefetch just ensures the heavy lifting (the matrix solve) is done
-    // and cached in memory on the server if it's hit again quickly.
-    // A more advanced prefetch would call Gemini too.
+    // We only cache the analysis part. The page component is responsible for the AI call.
+    await setDoc(cacheRef, { analysis: analysisResult, cachedAt: serverTimestamp() }, { merge: true });
 
   } catch (e) {
     console.warn("Prefetch failed", e);

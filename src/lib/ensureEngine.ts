@@ -1,3 +1,4 @@
+
 // src/lib/ensureEngine.ts
 import { db } from "@/lib/firebase";
 import { doc, getDoc } from "firebase/firestore";
@@ -11,18 +12,23 @@ export async function ensureEnginePayload(
   mode: Mode,
   alphabet: Alphabet
 ) {
-  // Already good?
-  if (source?.primaryPath?.voicePath?.length) return source;
+  // Already good? If it has the 'primary' key, we assume it's a valid analysis object.
+  if (source?.primary?.voice_path?.length) return source;
 
   // History row? Try analyses/{cacheId}
   if (source?.cacheId) {
     const snap = await getDoc(doc(db, "analyses", source.cacheId));
-    if (snap.exists()) return snap.data();
+    if (snap.exists()) {
+        const data = snap.data();
+        // The data from cache is nested under an 'analysis' key
+        if (data?.analysis?.primary) return data.analysis;
+    }
   }
 
-  // Last resort: recompute fresh
+  // Last resort: recompute fresh. This is a failsafe.
   if (source?.word) {
-    return await analyzeClient(source.word, mode, alphabet, { bypass: true, skipWrite: true });
+    const result = await analyzeClient(source.word, mode, alphabet, { bypass: true, skipWrite: true });
+    return result.analysis;
   }
 
   throw new Error("ensureEnginePayload: cannot resolve engine payload");

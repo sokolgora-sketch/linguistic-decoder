@@ -81,30 +81,30 @@ export default function LinguisticDecoderApp(){
     setIsWarming(false);
     setErr(null);
     try {
+      // 1. Get the analysis result (from cache or API)
       const clientResponse = await analyzeClient(useWord, useMode, useAlphabet);
-      if (clientResponse) {
-        
-        const enginePayload = await ensureEnginePayload(clientResponse.analysis, useMode, useAlphabet);
-        
-        console.log("engine keys:", Object.keys(enginePayload));
-        console.log("primaryPath:", enginePayload.primaryPath); 
+      
+      // 2. Ensure we have a valid payload for the AI
+      const enginePayload = await ensureEnginePayload(clientResponse.analysis, useMode, useAlphabet);
 
-        let languageFamilies = null;
-        if (!clientResponse.cacheHit) {
-            const mappingInput = toMappingRecord(enginePayload);
-            const mappingResult = await mapWordToLanguageFamilies(mappingInput);
-            languageFamilies = mappingResult?.candidates_map || null;
-        } else {
-            languageFamilies = clientResponse.languageFamilies;
-        }
-        
-        const fullResponse: AnalyzeResponse = {
-            analysis: enginePayload,
-            languageFamilies: languageFamilies,
-            cacheHit: clientResponse.cacheHit
-        };
-        setData(fullResponse);
+      // 3. Call the AI flow with the guaranteed-correct data shape
+      let languageFamilies = null;
+      if (!clientResponse.cacheHit) {
+          const mappingInput = toMappingRecord(enginePayload);
+          const mappingResult = await mapWordToLanguageFamilies(mappingInput);
+          languageFamilies = mappingResult?.candidates_map || null;
+      } else {
+          languageFamilies = clientResponse.languageFamilies;
       }
+      
+      // 4. Combine results and set state
+      const fullResponse: AnalyzeResponse = {
+          analysis: enginePayload,
+          languageFamilies: languageFamilies,
+          cacheHit: clientResponse.cacheHit
+      };
+      setData(fullResponse);
+
     } catch (e: any) {
       const error = e?.message || "Request failed";
       setErr(error);
