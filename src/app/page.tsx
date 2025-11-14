@@ -18,7 +18,7 @@ import type { Alphabet } from "@/lib/solver/engineConfig";
 import { PROFILES } from "@/lib/solver/valueTables";
 import { ThemeToggle } from "@/components/ThemeProvider";
 import { useDebounced } from "@/hooks/useDebounced";
-import { Copy, Download } from "lucide-react";
+import { Copy, Download, Loader } from "lucide-react";
 
 
 // ==== Types matching the /analyzeWord response ===============================
@@ -52,12 +52,16 @@ export default function LinguisticDecoderApp(){
   const [data, setData] = useState<AnalyzeResponse | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [isWarming, setIsWarming] = useState(false);
   const [showDebug, setShowDebug] = useState(false);
 
   // Debounce user input, then warm the cache in the background
   const debouncedWord = useDebounced(word, 450);
   useEffect(() => {
-    prefetchAnalyze(debouncedWord.trim(), mode, alphabet);
+    prefetchAnalyze(debouncedWord.trim(), mode, alphabet, {
+      onStart: () => setIsWarming(true),
+      onFinish: () => setIsWarming(false),
+    });
   }, [debouncedWord, mode, alphabet]);
 
   const canAnalyze = word.trim().length > 0 && !loading;
@@ -69,6 +73,7 @@ export default function LinguisticDecoderApp(){
     if (!useWord) return;
 
     setLoading(true);
+    setIsWarming(false);
     setErr(null);
     try {
       const res = await analyzeClient(useWord, useMode, useAlphabet);
@@ -146,7 +151,7 @@ export default function LinguisticDecoderApp(){
 
         {/* Controls */}
         <Card className="p-4">
-          <div className="grid grid-cols-[1fr_auto_auto_auto] gap-2.5 items-center">
+          <div className="grid grid-cols-[1fr_auto_auto_auto_auto] gap-2.5 items-center">
             <Input
               value={word}
               onChange={e=> setWord(e.target.value)}
@@ -154,6 +159,7 @@ export default function LinguisticDecoderApp(){
               className="font-semibold"
               onKeyUp={(e) => e.key === 'Enter' && canAnalyze && analyze()}
             />
+            {isWarming && <Loader className="animate-spin text-muted-foreground" size={18} />}
             <label className="flex items-center gap-2 text-sm">
               <input type="checkbox" checked={mode==="strict"} onChange={e=> setMode(e.target.checked?"strict":"open")} className="w-4 h-4 rounded text-primary focus:ring-primary" />
               Strict

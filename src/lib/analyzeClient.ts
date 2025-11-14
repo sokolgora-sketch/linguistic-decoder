@@ -57,27 +57,42 @@ const PREFETCH_SEEN = new Set<string>();
 export async function prefetchAnalyze(
   word: string,
   mode: "strict" | "open",
-  alphabet: Alphabet
+  alphabet: Alphabet,
+  callbacks?: { onStart?: () => void; onFinish?: () => void }
 ) {
-  if (!word || word.length < 3) return;
+  if (!word || word.length < 3) {
+    callbacks?.onFinish?.();
+    return;
+  }
   await ensureAnon();
   const cacheId = `${word}|${mode}|${alphabet}`;
-  if (PREFETCH_SEEN.has(cacheId)) return; // in-memory throttle
-  PREFETCH_SEEN.add(cacheId);
+  if (PREFETCH_SEEN.has(cacheId)) {
+    callbacks?.onFinish?.();
+    return;
+  }
 
   const cacheRef = doc(db, "analyses", cacheId);
   const snap = await getDoc(cacheRef);
-  if (snap.exists()) return; // already cached
+  if (snap.exists()) {
+    callbacks?.onFinish?.();
+    return;
+  }
 
-  // fetch fresh from your Next.js API
-  const r = await fetch("/api/analyzeSevenVoices", {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify({ word, mode, alphabet }),
-  });
-  const data = await r.json();
-  if (data?.error) return;
+  callbacks?.onStart?.();
+  PREFETCH_SEEN.add(cacheId);
 
-  // write cache only (no per-user history)
-  await setDoc(cacheRef, { ...data, cachedAt: serverTimestamp() }, { merge: false });
+  try {
+    const r = await fetch("/api/analyzeSevenVoices", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ word, mode, alphabet }),
+    });
+    const data = await r.json();
+    if (data?.error) return;
+    await setDoc(cacheRef, { ...data, cachedAt: serverTimestamp() }, { merge: false });
+  } catch (e) {
+    console.warn("Prefetch failed", e);
+  } finally {
+    callbacks?.onFinish?.();
+  }
 }
