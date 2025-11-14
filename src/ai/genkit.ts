@@ -7,6 +7,6 @@ export const ai = genkit({
 });
 
 export const MODELS: ModelReference[] = [
-  googleAI.model('gemini-2.5-flash'),
+  googleAI.model('gemini-1.5-flash-latest'),
   googleAI.model('gemini-pro'),
 ];
