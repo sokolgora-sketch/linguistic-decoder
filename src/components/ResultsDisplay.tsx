@@ -1,7 +1,9 @@
+
 'use client';
 import React, { useMemo } from "react";
 import { Card } from "@/components/ui/card";
 import type { CClass } from "@/functions/languages";
+import { classRange } from "@/functions/languages";
 import type { EnginePayload, EnginePath } from "@/shared/engineShape";
 
 // Seven‑Voices palette (uses CSS variables from globals.css)
@@ -26,6 +28,36 @@ const Chip = ({ v }: { v: string | number }) => (
       <span className="font-bold">{String(v)}</span>
     </span>
 );
+
+function ConsonantInfo({ windows, windowClasses, ringPath }: { windows?: string[], windowClasses?: (CClass | string)[], ringPath?: number[] }) {
+  if (!windows || !windowClasses || windows.length === 0) {
+    return null;
+  }
+
+  return (
+    <div className="mt-2.5">
+      <h4 className="text-xs text-slate-500 mb-1">Consonant Influence</h4>
+      <div className="flex flex-col gap-1.5">
+        {windows.map((w, i) => {
+          const cClass = windowClasses[i] as CClass;
+          const [lo, hi] = classRange(cClass);
+          let hopInfo = "";
+          if (ringPath && i < ringPath.length - 1) {
+            const delta = Math.abs(ringPath[i+1] - ringPath[i]);
+            const isOptimal = delta >= lo && delta <= hi;
+            hopInfo = `→ |Δring| = ${delta} ${isOptimal ? "✓" : "✗"}`;
+          }
+
+          return (
+            <Card key={i} className="p-2.5 text-sm font-code">
+              '{w}' is <span className="font-semibold">{cClass}</span> (prefers {lo}–{hi}) {hopInfo}
+            </Card>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
 
 export function PathRow({ title, block, windows, windowClasses }: { title: string; block?: EnginePath, windows?:string[], windowClasses?:CClass[] | string[] }) {
   if (!block || !block.voicePath || block.voicePath.length === 0) {
@@ -61,12 +93,9 @@ export function PathRow({ title, block, windows, windowClasses }: { title: strin
             )}
             {typeof kept === "number" ? <InfoLine label="Keeps" value={String(kept)} /> : null}
         </div>
+        
+        <ConsonantInfo windows={windows} windowClasses={windowClasses} ringPath={ringPath} />
 
-        {windows && windowClasses && windows.length > 0 && (
-          <div className="mt-2.5">
-            <InfoLine label="Consonant Windows" value={windows.map((w,i)=>`'${w}' → ${windowClasses[i]}`).join(" | ")} mono />
-          </div>
-        )}
         {ops?.length > 0 && (
           <div className="mt-2.5">
             <h4 className="font-bold text-sm tracking-wide">Ops</h4>
