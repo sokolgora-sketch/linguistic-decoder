@@ -198,7 +198,7 @@ export default function LinguisticDecoderApp(){
 
       {/* History */}
       <aside className="space-y-3 pt-20">
-          <div className="font-semibold">History</div>
+          <div className="font-semibold pl-2">History</div>
           <Card className="p-2">
             {history.length === 0 && <div className="text-xs text-slate-500 p-2">History will appear here.</div>}
             <ul className="space-y-1 text-sm">
