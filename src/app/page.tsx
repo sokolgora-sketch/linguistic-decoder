@@ -50,6 +50,7 @@ export default function LinguisticDecoderApp(){
   const [err, setErr] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [showDebug, setShowDebug] = useState(false);
+  const [showHistory, setShowHistory] = useState(true);
   
   const history = useHistory(12);
 
@@ -198,34 +199,41 @@ export default function LinguisticDecoderApp(){
 
       {/* History */}
       <aside className="space-y-3 pt-20">
-          <div className="font-semibold pl-2">History</div>
-          <Card className="p-2">
-            {history.length === 0 && <div className="text-xs text-slate-500 p-2">History will appear here.</div>}
-            <ul className="space-y-1 text-sm">
-              {history.map((h: HistoryItem) => (
-                <li key={h.id}>
-                  <button
-                    className="w-full text-left border rounded px-2 py-1 hover:bg-slate-50 flex items-center justify-between"
-                    onClick={() => {
-                      setWord(h.word);
-                      setMode(h.mode as "strict"|"open");
-                      setAlphabet(h.alphabet as Alphabet);
-                      analyze(h.word, h.mode as "strict"|"open", h.alphabet as Alphabet);
-                    }}
-                  >
-                    <span>{h.word} <span className="text-slate-500">· {h.mode}</span></span>
-                     <a
-                      className="underline text-xs hover:text-primary"
-                      href={`/?word=${encodeURIComponent(h.word)}&mode=${h.mode}&alphabet=${h.alphabet}`}
-                      onClick={(e) => e.stopPropagation()} // prevent re-analyzing when clicking share
+        <div className="flex justify-between items-center pr-2">
+            <div className="font-semibold pl-2">History</div>
+            <Button variant="ghost" size="sm" onClick={() => setShowHistory(s => !s)}>
+                {showHistory ? "Hide" : "Show"}
+            </Button>
+        </div>
+        {showHistory && (
+            <Card className="p-2">
+                {history.length === 0 && <div className="text-xs text-slate-500 p-2">History will appear here.</div>}
+                <ul className="space-y-1 text-sm">
+                {history.map((h: HistoryItem) => (
+                    <li key={h.id}>
+                    <button
+                        className="w-full text-left border rounded px-2 py-1 hover:bg-slate-50 flex items-center justify-between"
+                        onClick={() => {
+                        setWord(h.word);
+                        setMode(h.mode as "strict"|"open");
+                        setAlphabet(h.alphabet as Alphabet);
+                        analyze(h.word, h.mode as "strict"|"open", h.alphabet as Alphabet);
+                        }}
                     >
-                      Share
-                    </a>
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </Card>
+                        <span>{h.word} <span className="text-slate-500">· {h.mode}</span></span>
+                        <a
+                        className="underline text-xs hover:text-primary"
+                        href={`/?word=${encodeURIComponent(h.word)}&mode=${h.mode}&alphabet=${h.alphabet}`}
+                        onClick={(e) => e.stopPropagation()} // prevent re-analyzing when clicking share
+                        >
+                        Share
+                        </a>
+                    </button>
+                    </li>
+                ))}
+                </ul>
+            </Card>
+        )}
       </aside>
 
       {/* Footer */}
