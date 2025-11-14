@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Candidates } from "@/components/Candidates";
 import { HistoryPanel, type HistItem } from "@/components/HistoryPanel";
 import { ResultsDisplay } from "@/components/ResultsDisplay";
-import { TwoRailsViz } from "@/components/TwoRailsViz";
+import { TwoRailsWithConsonants } from "@/components/TwoRailsWithConsonants";
 
 
 // ==== Types matching the /analyzeWord response ===============================
@@ -141,7 +141,7 @@ export default function LinguisticDecoderApp(){
       {/* Visualization & Results */}
       <div className="max-w-5xl mx-auto px-4 grid grid-cols-1 gap-4">
         <div className="flex justify-center">
-            <TwoRailsViz
+            <TwoRailsWithConsonants
                 word={data?.analysis.word || word}
                 path={primaryPath as any}
                 running={loading}
