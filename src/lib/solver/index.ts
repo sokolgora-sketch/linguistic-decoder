@@ -1,6 +1,6 @@
 
 
-import { VOWELS, Vowel, VOWEL_LEVEL, VOWEL_RING, VOWEL_VALUE, computeC, extractWindowClasses, chooseProfile } from "./valueTables";
+import { VOWELS, Vowel, VOWEL_LEVEL, VOWEL_RING, VOWEL_VALUE, computeC, chooseProfile, LangProfile, classifyWindow } from "./valueTables";
 import type { Analysis, Path, SolveMode } from "./types";
 import { CFG, ENGINE_VERSION, Alphabet } from "./engineConfig";
 
@@ -77,12 +77,24 @@ function opCostFromLabel(op: string, costs: { sub: number; del: number; ins: num
   return costs.sub;
 }
 
-function mkPath(base: Vowel[], seq: Vowel[], E: number, ops: string[], consClasses: ReturnType<typeof extractWindowClasses>): Path {
+function extractWindowClasses(word: string, baseSeq: Vowel[], P: LangProfile): ReturnType<typeof classifyWindow>[] {
+  const s = word.normalize("NFC");
+  const pos:number[]=[]; let vi=0;
+  for (let i=0;i<s.length && vi<baseSeq.length;i++){
+    const v = toVowel(s[i]); if (!v) continue;
+    if (v === baseSeq[vi]) { pos.push(i); vi++; }
+  }
+  const windows:string[]=[];
+  for (let k=0;k<pos.length-1;k++) windows.push(s.slice(pos[k]+1, pos[k+1]));
+  return windows.map(chars => classifyWindow(chars, P));
+}
+
+function mkPath(base: Vowel[], seq: Vowel[], E: number, ops: string[], consClasses: ReturnType<typeof classifyWindow>[]): Path {
     const p: Path = {
         vowelPath: seq,
         ringPath: seq.map(v=>VOWEL_RING[v]),
         levelPath: seq.map(v=>VOWEL_LEVEL[v]),
-        checksums: [{type:"V",value:checksumV(seq)}, {type:"E",value:E}, {type:"C",value:computeC(seq, consClasses, toVowel)}],
+        checksums: [{type:"V",value:checksumV(seq)}, {type:"E",value:E}, {type:"C",value:computeC(seq, consClasses)}],
         kept: keptCount(base, seq),
         ops,
     };
@@ -133,7 +145,7 @@ function solveWord(word: string, opts: SolveOptions): Omit<Analysis, "word" | "m
   const base = normalizeTerminalY(rawBase, word);
   const baseSeq = base.length ? base : (["O"] as Vowel[]);
   const profile = chooseProfile(word, opts.alphabet === "auto" ? undefined : opts.alphabet);
-  const consClasses = extractWindowClasses(word, baseSeq, profile, toVowel);
+  const consClasses = extractWindowClasses(word, baseSeq, profile);
   
   const K = opts.beamWidth;
   const maxOps = opts.maxOps;
@@ -203,3 +215,4 @@ export function solveMatrix(word: string, options: SolveOptions): Analysis {
     mode,
   };
 }
+

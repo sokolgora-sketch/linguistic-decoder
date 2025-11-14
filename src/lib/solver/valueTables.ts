@@ -229,56 +229,32 @@ export const PIE: LangProfile = {
 };
 
 
-export const PROFILES: LangProfile[] = [PIE, Albanian, Sanskrit, AncientGreek, Turkish, German, Latin];
+export const PROFILES: LangProfile[] = [PIE, Sanskrit, AncientGreek, Albanian, Turkish, German, Latin];
 
-export function chooseProfile(word: string, override?: string): LangProfile {
-  if (override) {
-    const p = PROFILES.find(p => p.id === override);
+export function chooseProfile(word: string, overrideId?: string): LangProfile {
+  if (overrideId) {
+    const p = PROFILES.find(p => p.id === overrideId);
     if (p) return p;
   }
   return PROFILES.find(p => p.detect(word)) || Latin;
 }
 
-function classifyWindow(chars: string, profile: LangProfile): CClass {
+export function classifyWindow(chars: string, P: LangProfile): CClass {
     let s = chars.toLowerCase();
-    if (profile.pre) s = profile.pre(s);
+    if (P.pre) s = P.pre(s);
 
     for (let i = 0; i < s.length - 1; i++) {
         const dg = s.slice(i, i + 2);
-        if (profile.DIGRAPH[dg as keyof typeof profile.DIGRAPH]) return profile.DIGRAPH[dg as keyof typeof profile.DIGRAPH];
+        if (P.DIGRAPH[dg as keyof typeof P.DIGRAPH]) return P.DIGRAPH[dg as keyof typeof P.DIGRAPH];
     }
     for (const ch of s) {
         if (/[aeiouyë]/i.test(ch)) continue;
-        if (profile.LETTER[ch as keyof typeof profile.LETTER]) return profile.LETTER[ch as keyof typeof profile.LETTER];
+        if (P.LETTER[ch as keyof typeof P.LETTER]) return P.LETTER[ch as keyof typeof P.LETTER];
     }
     return "NonSibilantFricative";
 }
 
-export function extractWindowClasses(
-  word: string,
-  baseSeq: Vowel[],
-  profile: LangProfile,
-  toVowel: (ch: string) => Vowel | null
-): CClass[] {
-  const s = word.normalize("NFC");
-
-  const pos: number[] = [];
-  let vi = 0;
-  for (let i = 0; i < s.length && vi < baseSeq.length; i++) {
-    const ch = s[i];
-    const v = toVowel(ch);
-    if (!v) continue;
-    if (v === baseSeq[vi]) { pos.push(i); vi++; }
-  }
-
-  const windows: string[] = [];
-  for (let k = 0; k < pos.length - 1; k++) {
-    windows.push(s.slice(pos[k] + 1, pos[k + 1]));
-  }
-  return windows.map(chars => classifyWindow(chars, profile));
-}
-
-export function computeC(voicePath: Vowel[], consClasses: CClass[], toVowel: (ch: string) => Vowel | null): number {
+export function computeC(voicePath: Vowel[], consClasses: CClass[]): number {
   let c = 0;
   const hops = Math.max(0, voicePath.length - 1);
   for (let i = 0; i < hops; i++) {
@@ -290,3 +266,4 @@ export function computeC(voicePath: Vowel[], consClasses: CClass[], toVowel: (ch
   }
   return c;
 }
+
