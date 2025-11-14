@@ -73,6 +73,7 @@
     "preset": "ts-jest",
     "testEnvironment": "node",
     "testMatch": [
+      "**/src/lib/solver/**/*.test.ts",
       "**/src/lib/solver/**/*.spec.ts"
     ]
   }

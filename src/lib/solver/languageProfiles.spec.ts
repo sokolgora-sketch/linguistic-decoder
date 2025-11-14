@@ -6,7 +6,7 @@ import { baseForTests } from "./index";
 import type { Vowel } from "./valueTables";
 
 function classes(word: string, overrideId?: string) {
-  const P = chooseProfile(word, overrideId);
+  const P = chooseProfile(word, overrideId); // override: "latin" | "albanian" | "sanskrit" | "ancient_greek" | "pie"
   const seq = baseForTests(word);
   return extractWindowClassesWithProfile(word, seq, P); // returns array of CClass
 }
@@ -30,7 +30,7 @@ describe("Language profiles → window classes are deterministic", () => {
 
   // Sanskrit (romanized)
   test("śakti (Sanskrit)", () => {
-    expect(classes("śakti", "sanskrit")).toEqual(["Plosive"]); // "kt" -> k
+    expect(classes("śakti", "sanskrit")).toEqual(["Plosive"]); // "kt"
   });
   test("moksha (Sanskrit)", () => {
     expect(classes("moksha", "sanskrit")).toEqual(["SibilantFricative"]); // "ksh" -> ks
