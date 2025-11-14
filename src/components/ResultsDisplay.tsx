@@ -26,7 +26,7 @@ const labelLevels = (levels: number[]) => levels.map(l=> LEVEL_LABEL[l] ?? l).jo
 const labelRings = (rings: number[]) => rings.join(" → ");
 
 // This is the new, more robust PathRow implementation
-type Checksum = { type: string; value: number };
+type Checksum = { V: number; E: number; C: number; };
 type AnyPath = {
   // snake_case (mapper)
   voice_path?: string[];
@@ -37,7 +37,7 @@ type AnyPath = {
   ringPath?: number[];
   levelPath?: number[];
   // from both
-  checksums?: Checksum[];
+  checksums?: Checksum;
   ops?: string[];
   kept?: number;
 };
@@ -47,7 +47,7 @@ function normalizePath(p?: AnyPath) {
     voice: p?.voice_path ?? p?.voicePath ?? [],
     ring:  p?.ring_path  ?? p?.ringPath  ?? [],
     level: p?.level_path ?? p?.levelPath ?? [],
-    checksums: p?.checksums ?? [],
+    checksums: p?.checksums,
     ops: p?.ops ?? [],
     kept: p?.kept,
   };
@@ -85,8 +85,8 @@ export function PathRow({ title, block, windows, windowClasses }: { title: strin
               <InfoLine label="Voice Path" value={voice.join(" → ")} />
               <InfoLine label="Level Path" value={labelLevels(level)} />
               <InfoLine label="Ring Path" value={labelRings(ring)} />
-              {checksums.length > 0 && (
-                  <InfoLine label="Checksums" value={checksums.map(c=>`${c.type}=${c.value}`).join(" · ")} mono />
+              {checksums && (
+                  <InfoLine label="Checksums" value={`V=${checksums.V} · E=${checksums.E} · C=${checksums.C}`} mono />
               )}
               {typeof kept === "number" ? <InfoLine label="Keeps" value={String(kept)} /> : null}
           </div>
@@ -123,6 +123,8 @@ export function ResultsDisplay({ analysis }: { analysis: AnalyzeResponse['analys
     const frontierList = useMemo(() => (analysis?.frontier || []).filter(f => f?.voice_path && f.voice_path.join("") !== (primary?.voice_path || []).join("")), [analysis, primary]);
 
     if (!primary) return null;
+    
+    console.debug("Primary keys:", analysis?.primary && Object.keys(analysis.primary));
 
     return (
         <>
