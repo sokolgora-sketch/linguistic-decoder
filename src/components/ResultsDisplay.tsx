@@ -16,17 +16,11 @@ const VOICE_COLOR: Record<string, string> = {
   "Ë": "var(--voice-EH)"
 };
 
-function getChecksum(b: any, t: "V"|"E"|"C") {
-  const checksums = b.checksums;
-  return checksums?.[t] ?? 0;
-}
-
 const LEVEL_LABEL: Record<number, string> = { 1: "High", 0: "Mid", [-1]: "Low" } as any;
 const labelLevels = (levels: number[]) => levels.map(l=> LEVEL_LABEL[l] ?? l).join(" → ");
 const labelRings = (rings: number[]) => rings.join(" → ");
 
 // This is the new, more robust PathRow implementation
-type Checksum = { V: number; E: number; C: number; };
 type AnyPath = {
   // snake_case (mapper)
   voice_path?: string[];
@@ -37,7 +31,7 @@ type AnyPath = {
   ringPath?: number[];
   levelPath?: number[];
   // from both
-  checksums?: Checksum;
+  checksums?: { V: number; E: number; C: number; };
   ops?: string[];
   kept?: number;
 };
@@ -144,7 +138,7 @@ export function ResultsDisplay({ analysis }: { analysis: AnalyzeResponse['analys
                         ))}
                       </div>
                       <hr className="my-2 border-border" />
-                      <div className="font-code text-xs">V={getChecksum(f, "V")} · E={getChecksum(f, "E")} · C={getChecksum(f, "C")}</div>
+                      <div className="font-code text-xs">V={f.checksums.V} · E={f.checksums.E} · C={f.checksums.C}</div>
                       <div className="font-code text-xs mt-1">Keeps: {typeof f.kept === "number" ? f.kept : "—"}</div>
                       <div className="text-xs mt-1.5 text-slate-500">Levels: {labelLevels(f.levelPath)}</div>
                       <div className="text-xs text-slate-500">Rings: {labelRings(f.ringPath)}</div>

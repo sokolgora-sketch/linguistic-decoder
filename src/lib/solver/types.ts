@@ -28,6 +28,8 @@ export type Analysis = {
   signals: string[];
   windows?: string[];
   windowClasses?: CClass[];
+  solveMs?: number;
+  ts?: number;
 };
 
 export type SolveMode = "strict" | "open";

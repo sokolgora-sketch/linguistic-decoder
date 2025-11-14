@@ -19,8 +19,6 @@ export async function analyzeClient(word: string, mode: Mode, alphabet: Alphabet
   if (opts.bypass) {
     const apiResponse = await fetchAnalysis(word, mode, alphabet);
     if (!opts.skipWrite) {
-      // The API response now includes { analysis: ..., languageFamilies: ... }
-      // We write the whole thing to the cache.
       await setDoc(cacheRef, { ...apiResponse, cachedAt: serverTimestamp() }, { merge: true });
     }
     void saveHistory(word, mode, alphabet);
@@ -43,8 +41,8 @@ export async function analyzeClient(word: string, mode: Mode, alphabet: Alphabet
   const apiResponse = await fetchAnalysis(word, mode, alphabet);
   
   // 3) WRITE CACHE - The page will handle enriching with families and then writing.
-  // For now, we just cache the raw analysis.
-  await setDoc(cacheRef, { analysis: apiResponse.analysis, cachedAt: serverTimestamp() }, { merge: true });
+  // The API response now contains the `analysis` object directly.
+  await setDoc(cacheRef, { ...apiResponse, cachedAt: serverTimestamp() }, { merge: true });
 
   // 4) WRITE USER HISTORY
   await saveHistory(word, mode, alphabet);
@@ -116,8 +114,8 @@ export async function prefetchAnalyze(
     const apiResponse = await r.json();
     if (apiResponse?.error) return;
 
-    // We only cache the analysis part. The page component is responsible for the AI call.
-    await setDoc(cacheRef, { analysis: apiResponse.analysis, cachedAt: serverTimestamp() }, { merge: true });
+    // The API response contains the `analysis` object, so we cache it all.
+    await setDoc(cacheRef, { ...apiResponse, cachedAt: serverTimestamp() }, { merge: true });
 
   } catch (e) {
     console.warn("Prefetch failed", e);

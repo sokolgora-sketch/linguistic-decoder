@@ -1,5 +1,4 @@
 
-
 import { VOWELS, Vowel, VOWEL_LEVEL, VOWEL_RING, computeC, chooseProfile, LangProfile, extractWindowClassesWithProfile, readWindowsDebug, checksumV, VOWEL_VALUE } from "./valueTables";
 import type { Analysis, Path, SolveMode } from "./types";
 import { CFG, ENGINE_VERSION, Alphabet } from "./engineConfig";
@@ -139,7 +138,7 @@ function neighbors(base: Vowel[], st: State, opts: SolveOptions): State[] {
 
 
 // --- Main Solver ---
-function solveWord(word: string, opts: SolveOptions): Omit<Analysis, "word" | "mode" | "alphabet"> {
+function solveWord(word: string, opts: SolveOptions): Omit<Analysis, "word" | "mode" | "alphabet" | "solveMs" | "ts"> {
   const rawBase = extractBase(word);
   const base = normalizeTerminalY(rawBase, word);
   const baseSeq = base.length ? base : (["O"] as Vowel[]);
@@ -213,6 +212,8 @@ export function solveMatrix(word: string, options: SolveOptions): Analysis {
     word,
     mode,
     alphabet: (options.alphabet || CFG.alphabet) as Alphabet,
+    solveMs: 0, // This will be filled by the API route
+    ts: 0,      // This will be filled by the API route
   };
 }
 

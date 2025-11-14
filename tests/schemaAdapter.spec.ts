@@ -1,8 +1,9 @@
 
 import { toMappingRecord } from "@/lib/schemaAdapter";
+import type { Analysis } from "@/lib/solver/types";
 
 test("toMappingRecord provides required fields", () => {
-  const engine: any = {
+  const engine: Analysis = {
     word: "life",
     engineVersion: "2025-11-14-core-6",
     mode: "strict",
@@ -11,8 +12,11 @@ test("toMappingRecord provides required fields", () => {
       voicePath: ["I","E"],
       ringPath: [1,2],
       levelPath: [1,1],
-      ops: []
+      ops: [],
+      checksums: { V: 1, E: 1, C: 1 },
+      kept: 2,
     },
+    frontierPaths: [],
     signals: []
   };
   const m = toMappingRecord(engine);

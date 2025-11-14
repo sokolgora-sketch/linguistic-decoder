@@ -36,23 +36,11 @@ export async function POST(request: NextRequest) {
     
     // Run the solver
     const analysisResult = solveMatrix(w, opts);
-
-    const base = baseSeqFor(w);
-    const profile = chooseProfile(w, alphabet === "auto" ? undefined : alphabet);
-    const { windows, classes } = readWindowsDebug(w, base, profile);
     
     // Format the response to match the specification
     const payload = {
         analysis: {
-            engineVersion: ENGINE_VERSION,
-            word: analysisResult.word,
-            mode: analysisResult.mode,
-            alphabet,
-            primaryPath: analysisResult.primaryPath,
-            frontierPaths: analysisResult.frontierPaths,
-            windows,
-            windowClasses: classes,
-            signals: [...analysisResult.signals, `alphabet=${profile.id}`],
+            ...analysisResult,
             solveMs: Date.now() - t0,
             ts: Date.now(),
         }

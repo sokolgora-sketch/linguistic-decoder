@@ -5,6 +5,7 @@ import { doc, getDoc } from "firebase/firestore";
 import { analyzeClient } from "@/lib/analyzeClient";
 import type { Alphabet } from "./solver/engineConfig";
 import { ENGINE_VERSION } from "./solver/engineVersion";
+import type { Analysis } from "./solver/types";
 
 type Mode = "strict"|"open";
 
@@ -12,7 +13,7 @@ export async function ensureEnginePayload(
   source: any,               // Can be clientResponse or a history row
   mode: Mode,
   alphabet: Alphabet
-) {
+): Promise<Analysis> {
   // Case 1: Already a valid analysis payload from analyzeClient or cache
   if (source?.analysis?.primaryPath?.voicePath?.length) {
     return source.analysis;
