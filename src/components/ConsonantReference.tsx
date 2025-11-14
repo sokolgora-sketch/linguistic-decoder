@@ -48,7 +48,7 @@ export function ConsonantReference() {
                             <TableCell className="font-code text-slate-500">{row.examples}</TableCell>
                             <TableCell className="font-code">{row.preferredDeltaRing}</TableCell>
                             <TableCell>
-                                <span className="inline-flex items-center gap-1.5 py-1 px-2 rounded-full border bg-white">
+                                <span className="inline-flex items-center gap-1.5 py-1 px-2 rounded-full border bg-card text-card-foreground">
                                     <span className="w-2.5 h-2.5 rounded-full inline-block" style={{ background: VOICE_COLOR[row.voiceAlign] }} />
                                     <span className="font-bold">{row.voiceAlign}</span>
                                 </span>
