@@ -5,7 +5,6 @@ import {
 } from "firebase/firestore";
 import type { Alphabet } from "./solver/engineConfig";
 import { ENGINE_VERSION } from "./solver/engineVersion";
-import { mapWordToLanguageFamilies } from "@/ai/flows/map-word-to-language-families";
 import { toMappingRecord } from "@/lib/schemaAdapter";
 
 type Mode = "strict" | "open";
@@ -22,7 +21,7 @@ export async function analyzeClient(word: string, mode: Mode, alphabet: Alphabet
     const data = snap.data();
     // fire-and-forget history save
     void saveHistory(word, mode, alphabet); 
-    return { ...data, cacheHit: true };
+    return { analysis: data.analysis, languageFamilies: data.languageFamilies, cacheHit: true };
   }
 
   console.log("Cache miss, calculating result...");
@@ -40,17 +39,15 @@ export async function analyzeClient(word: string, mode: Mode, alphabet: Alphabet
   }
   const analysisResult = await res.json();
 
-  // 3) ADAPT & CALL GEMINI (if not cached)
-  const mappingRecord = toMappingRecord(analysisResult);
-  const mappingResult = await mapWordToLanguageFamilies(mappingRecord);
-
+  // 3) ADAPT & CALL GEMINI is now handled on the page
   const payload = { 
     analysis: analysisResult,
-    languageFamilies: mappingResult?.candidates_map || null
+    // languageFamilies will be added on the page
   };
   
-  // 4) WRITE CACHE (client-side)
-  await setDoc(cacheRef, { ...payload, cachedAt: serverTimestamp() }, { merge: false });
+  // 4) WRITE CACHE (client-side) - The page will now handle writing the full payload with families
+  await setDoc(cacheRef, { analysis: analysisResult, cachedAt: serverTimestamp() }, { merge: true });
+
 
   // 5) WRITE USER HISTORY
   await saveHistory(word, mode, alphabet);

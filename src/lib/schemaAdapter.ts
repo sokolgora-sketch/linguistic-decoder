@@ -31,7 +31,7 @@ export function toMappingRecord(e: EnginePayload): MappingRecord {
   }
   return {
     word: e.word,
-    voice_path: e.primary.voice_path,   // flatten & rename
+    voice_path: e.primary.voice_path,
     ring_path: e.primary.ring_path,
     level_path: e.primary.level_path,
     ops: e.primary.ops ?? [],
