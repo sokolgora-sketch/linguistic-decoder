@@ -17,6 +17,9 @@ import { TwoRailsWithConsonants } from "@/components/TwoRailsWithConsonants";
 import { CClass } from "@/lib/solver/valueTables";
 import type { Alphabet } from "@/lib/solver/engineConfig";
 import { PROFILES } from "@/lib/solver/valueTables";
+import { ensureAnon, auth } from "@/lib/firebase";
+import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 
 
 // ==== Types matching the /analyzeWord response ===============================
@@ -50,10 +53,20 @@ function saveHistItem(item: HistItem, max = 50) {
     const key = (x: HistItem) => `${x.word}|${x.mode}|${x.primary.join("")}`;
     const next = [item, ...cur.filter(x => key(x) !== key(item))].slice(0, max);
     localStorage.setItem(HIST_KEY, JSON.stringify(next));
+    void saveHistoryToFirestore(item.word, item.mode, item.primary.join(''));
   } catch {}
 }
 function clearHist() { try { localStorage.removeItem(HIST_KEY); } catch {} }
 
+async function saveHistoryToFirestore(word: string, mode: "strict"|"open", primary: string) {
+  const u = auth.currentUser;
+  if (!u) return;
+  const ref = collection(db, "users", u.uid, "history");
+  await addDoc(ref, {
+    word, mode, primary,
+    createdAt: serverTimestamp(),
+  });
+}
 
 // Custom stringify to enforce key order for readability
 function orderedStringify(obj: any): string {
@@ -73,7 +86,10 @@ function orderedStringify(obj: any): string {
 export default function LinguisticDecoderApp(){
   const { toast } = useToast();
   const [history, setHistory] = useState<HistItem[]>([]);
-  useEffect(() => setHistory(readHist()), []);
+  useEffect(() => {
+    ensureAnon();
+    setHistory(readHist())
+  }, []);
 
   const [word, setWord] = useState("study");
   const [mode, setMode] = useState<"strict"|"open">("strict");
@@ -93,6 +109,7 @@ export default function LinguisticDecoderApp(){
     try {
       setLoading(true); 
       setErr(null);
+      await ensureAnon();
       const res = await analyzeWordAction({ word: useWord, mode: useMode, alphabet: useAlphabet });
 
       if (!res.ok) {

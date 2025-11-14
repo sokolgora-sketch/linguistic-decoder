@@ -5,6 +5,11 @@ import { solveMatrix, type Analysis, type SolveMode } from '@/lib/solver';
 import { mapWordToLanguageFamilies } from '@/ai/flows/map-word-to-language-families';
 import { z } from 'zod';
 import type { Alphabet } from '@/lib/solver/engineConfig';
+import {
+  doc, getDoc, setDoc, serverTimestamp, collection, addDoc
+} from "firebase/firestore";
+import { db } from '@/lib/firebase';
+
 
 // ==== From user prompt =================================
 type Checksums = { V:number; E:number; C:number };
@@ -62,6 +67,16 @@ export async function analyzeWordAction(formData: FormData | { word:string; mode
   }
 
   try {
+
+    const cacheId = `${word}|${mode}|${alphabet}`; // if you want to include engineVersion in client cache id, append it
+    const cacheRef = doc(db, "analyses", cacheId);
+
+    const snap = await getDoc(cacheRef);
+    if (snap.exists()) {
+      const data = { ...snap.data(), cacheHit: true };
+      return { ok: true, data: data };
+    }
+
     const analysisResult = await (async () => {
       const res = await fetch(`http://localhost:9002/api/analyzeSevenVoices`, {
           method: 'POST',
@@ -86,12 +101,16 @@ export async function analyzeWordAction(formData: FormData | { word:string; mode
         signals: normalizedData.signals
     });
 
+    const payload = { 
+      analysis: analysisResult, // Pass the original analysis result
+      languageFamilies: mappingResult?.candidates_map || null
+    };
+
+    await setDoc(cacheRef, { ...payload, cachedAt: serverTimestamp() }, { merge: false });
+
     return { 
       ok: true, 
-      data: {
-        analysis: analysisResult, // Pass the original analysis result
-        languageFamilies: mappingResult?.candidates_map || null
-      }
+      data: { ...payload, cacheHit: false }
     } as const;
 
   } catch (e) {
