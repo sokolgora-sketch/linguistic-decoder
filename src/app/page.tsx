@@ -31,6 +31,7 @@ export default function LinguisticDecoderApp(){
   const [word, setWord] = useState("study");
   const [mode, setMode] = useState<"strict"|"open">("strict");
   const [alphabet, setAlphabet] = useState<Alphabet>("auto");
+  const [edgeWeight, setEdgeWeight] = useState(0.25);
   const [data, setData] = useState<EnginePayload | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -43,9 +44,9 @@ export default function LinguisticDecoderApp(){
     // This is a pre-fetch, so we don't handle errors here.
     // analyzeClient is designed to be robust.
     if (debouncedWord.trim()) {
-      analyzeClient(debouncedWord.trim(), mode, alphabet).catch(() => {/* prefetch failed, do nothing */});
+      analyzeClient(debouncedWord.trim(), mode, alphabet, { edgeWeight }).catch(() => {/* prefetch failed, do nothing */});
     }
-  }, [debouncedWord, mode, alphabet]);
+  }, [debouncedWord, mode, alphabet, edgeWeight]);
   
 
   const canAnalyze = word.trim().length > 0 && !loading;
@@ -61,7 +62,7 @@ export default function LinguisticDecoderApp(){
     setData(null);
     try {
       // 1. Get raw result from API or cache
-      const clientResponse = await analyzeClient(useWord, useMode, useAlphabet);
+      const clientResponse = await analyzeClient(useWord, useMode, useAlphabet, { edgeWeight });
       console.log("API result:", clientResponse);
 
       // 2. GUARANTEE the shape
@@ -79,6 +80,7 @@ export default function LinguisticDecoderApp(){
 
             // IMPORTANT: Save the AI-enhanced payload back to the cache
             await analyzeClient(useWord, useMode, useAlphabet, {
+              edgeWeight,
               bypass: true, // Force a write
               skipWrite: false,
               payload: finalPayload, // Provide the payload to write
@@ -221,6 +223,14 @@ export default function LinguisticDecoderApp(){
             </Button>
             <Button onClick={runSmokeTest} variant="outline" title="Display a mock result to test the UI">Smoke Test</Button>
           </div>
+          <div className="flex items-center gap-4 mt-3">
+              <label className="text-xs text-muted-foreground">Edge weight: {edgeWeight.toFixed(2)}</label>
+              <input
+                type="range" min={0} max={0.6} step={0.05}
+                value={edgeWeight} onChange={e=>setEdgeWeight(Number(e.target.value))}
+                className="w-32"
+              />
+          </div>
           {err && (
             <div className="mt-2.5 border border-red-300 bg-red-50 text-red-800 text-sm p-2 rounded">
               <b>Error:</b> {err}
@@ -332,5 +342,7 @@ export default function LinguisticDecoderApp(){
     </div>
   );
 }
+
+    
 
     

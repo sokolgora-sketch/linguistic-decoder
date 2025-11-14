@@ -18,16 +18,17 @@ type AnalyzeOpts = {
     bypass?: boolean;
     skipWrite?: boolean;
     payload?: EnginePayload; // Allow passing a payload to write
+    edgeWeight?: number;
 };
 
 const CFG = { beamWidth: 8, maxOpsStrict: 1, maxOpsOpen: 2, cost: { sub:1, del:3, insClosure:2 } };
 
-function computeLocal(word: string, mode: Mode, alphabet: Alphabet): EnginePayload {
+function computeLocal(word: string, mode: Mode, alphabet: Alphabet, edgeWeight?: number): EnginePayload {
   const strict = mode === "strict";
   const t0 = Date.now();
   const opts: SolveOptions = strict
-    ? { beamWidth: CFG.beamWidth, maxOps: CFG.maxOpsStrict, allowDelete: false, allowClosure: false, opCost: CFG.cost }
-    : { beamWidth: CFG.beamWidth, maxOps: CFG.maxOpsOpen,   allowDelete: true,  allowClosure: true,  opCost: CFG.cost };
+    ? { beamWidth: CFG.beamWidth, maxOps: CFG.maxOpsStrict, allowDelete: false, allowClosure: false, opCost: CFG.cost, edgeWeight }
+    : { beamWidth: CFG.beamWidth, maxOps: CFG.maxOpsOpen,   allowDelete: true,  allowClosure: true,  opCost: CFG.cost, edgeWeight };
 
   const analysisResult = solveWord(word, opts, alphabet);
 
@@ -44,12 +45,12 @@ function computeLocal(word: string, mode: Mode, alphabet: Alphabet): EnginePaylo
 
 export async function analyzeClient(word: string, mode: Mode, alphabet: Alphabet, opts: AnalyzeOpts = {}) {
   await ensureAnon();
-  const cacheId = `${word}|${mode}|${alphabet}|${ENGINE_VERSION}`;
+  const cacheId = `${word}|${mode}|${alphabet}|${ENGINE_VERSION}|ew:${opts.edgeWeight ?? 0.25}`;
   const cacheRef = doc(db, "analyses", cacheId);
 
   // BYPASS / WRITE-THROUGH: compute fresh or use provided payload, skip cache read
   if (opts.bypass) {
-    const payloadToUse = opts.payload ? normalizeEnginePayload(opts.payload) : computeLocal(word, mode, alphabet);
+    const payloadToUse = opts.payload ? normalizeEnginePayload(opts.payload) : computeLocal(word, mode, alphabet, opts.edgeWeight);
     const finalPayload = { 
         ...payloadToUse, 
         recomputed: true, 
@@ -74,7 +75,7 @@ export async function analyzeClient(word: string, mode: Mode, alphabet: Alphabet
   }
 
   // Miss → compute → write → return
-  const fresh = computeLocal(word, mode, alphabet);
+  const fresh = computeLocal(word, mode, alphabet, opts.edgeWeight);
   
   const cleanFresh = sanitizeForFirestore(fresh);
 
@@ -133,3 +134,5 @@ export async function prefetchAnalyze(
     callbacks?.onFinish?.();
   }
 }
+
+    
