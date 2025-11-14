@@ -49,9 +49,9 @@ export async function analyzeClient(word: string, mode: Mode, alphabet: Alphabet
 
   // BYPASS / WRITE-THROUGH: compute fresh or use provided payload, skip cache read
   if (opts.bypass) {
-    const payload = opts.payload ? normalizeEnginePayload(opts.payload) : computeLocal(word, mode, alphabet);
+    const payloadToUse = opts.payload ? normalizeEnginePayload(opts.payload) : computeLocal(word, mode, alphabet);
     const finalPayload = { 
-        ...payload, 
+        ...payloadToUse, 
         recomputed: true, 
         cacheHit: false,
     };
@@ -76,7 +76,6 @@ export async function analyzeClient(word: string, mode: Mode, alphabet: Alphabet
   // Miss → compute → write → return
   const fresh = computeLocal(word, mode, alphabet);
   
-  // Ensure no undefined fields in the final payload
   const cleanFresh = sanitizeForFirestore(fresh);
 
   await setDoc(cacheRef, { ...cleanFresh, cachedAt: serverTimestamp() }, { merge: false });

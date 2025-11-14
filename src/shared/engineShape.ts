@@ -25,6 +25,7 @@ export type EnginePayload = {
   cacheHit?: boolean;
   recomputed?: boolean;
   languageFamilies?: Record<string, { form:string; map:string[]; functional:string }[]> | null;
+  edgeWindows?: string[];
 };
 
 // --- normalizer accepts API/local/malformed and returns EnginePayload or throws ---
@@ -99,6 +100,7 @@ export function normalizeEnginePayload(raw:any): EnginePayload {
     solveMs: a.solveMs,
     cacheHit: raw.cacheHit, // from wrapper
     recomputed: raw.recomputed,
-    languageFamilies: a.languageFamilies ?? raw.languageFamilies,
+    languageFamilies: a.languageFamilies,
+    edgeWindows: a.edgeWindows ?? [],
   };
 }
