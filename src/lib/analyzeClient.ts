@@ -6,6 +6,7 @@ import {
 import type { Alphabet } from "./solver/engineConfig";
 import { ENGINE_VERSION } from "./solver/engineVersion";
 import { mapWordToLanguageFamilies } from "@/ai/flows/map-word-to-language-families";
+import { toMappingRecord } from "@/lib/schemaAdapter";
 
 type Mode = "strict" | "open";
 
@@ -20,7 +21,7 @@ export async function analyzeClient(word: string, mode: Mode, alphabet: Alphabet
     console.log("Cache hit!");
     const data = snap.data();
     // fire-and-forget history save
-    void saveHistory(data.analysis.word, data.analysis.mode, data.analysis.alphabet); 
+    void saveHistory(word, mode, alphabet); 
     return { ...data, cacheHit: true };
   }
 
@@ -39,15 +40,9 @@ export async function analyzeClient(word: string, mode: Mode, alphabet: Alphabet
   }
   const analysisResult = await res.json();
 
-  // 3) CALL GEMINI (if not cached)
-  const mappingResult = await mapWordToLanguageFamilies({
-      word: analysisResult.word,
-      voice_path: analysisResult.primary.voice_path,
-      ring_path: analysisResult.primary.ring_path,
-      level_path: analysisResult.primary.level_path,
-      ops: analysisResult.primary.ops,
-      signals: analysisResult.signals
-  });
+  // 3) ADAPT & CALL GEMINI (if not cached)
+  const mappingRecord = toMappingRecord(analysisResult);
+  const mappingResult = await mapWordToLanguageFamilies(mappingRecord);
 
   const payload = { 
     analysis: analysisResult,
