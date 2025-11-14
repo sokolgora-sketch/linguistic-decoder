@@ -31,6 +31,10 @@ function Chip({v}:{v:string}){
 }
 
 function PathRow({block, title}:{block:PathBlock; title:string}){
+  const V = block.checksums?.V ?? 0;
+  const E = block.checksums?.E ?? 0;
+  const C = block.checksums?.C ?? 0;
+
   return (
     <Card className="p-4">
       <h3 className="font-bold text-sm tracking-wide mb-2">{title}</h3>
@@ -46,7 +50,7 @@ function PathRow({block, title}:{block:PathBlock; title:string}){
         <InfoLine label="Voice Path" value={joinPath(block.voice_path)} />
         <InfoLine label="Level Path" value={labelLevels(block.level_path)} />
         <InfoLine label="Ring Path" value={labelRings(block.ring_path)} />
-        <InfoLine label="Checksums" value={`V=${block.checksums.V} · E=${block.checksums.E} · C=${block.checksums.C}`} mono />
+        <InfoLine label="Checksums" value={`V=${V} · E=${E} · C=${C}`} mono />
         {typeof block.kept === "number" ? <InfoLine label="Keeps" value={String(block.kept)} /> : null}
       </div>
       {block.ops?.length ? (
@@ -73,6 +77,8 @@ export function ResultsDisplay({ analysis }: { analysis: AnalyzeResponse['analys
     const frontierList = useMemo(() => (analysis?.frontier || []).filter(f => f.voice_path.join("") !== (primary?.voice_path || []).join("")), [analysis, primary]);
 
     if (!primary) return null;
+    
+    const getChecksum = (b: PathBlock, t: "V"|"E"|"C") => b.checksums?.[t] ?? 0;
 
     return (
         <>
@@ -93,7 +99,7 @@ export function ResultsDisplay({ analysis }: { analysis: AnalyzeResponse['analys
                         ))}
                       </div>
                       <hr className="my-2 border-border" />
-                      <div className="font-code text-xs">V={f.checksums.V} · E={f.checksums.E} · C={f.checksums.C}</div>
+                      <div className="font-code text-xs">V={getChecksum(f, "V")} · E={getChecksum(f, "E")} · C={getChecksum(f, "C")}</div>
                       <div className="font-code text-xs mt-1">Keeps: {typeof f.kept === "number" ? f.kept : "—"}</div>
                       <div className="text-xs mt-1.5 text-slate-500">Levels: {labelLevels(f.level_path)}</div>
                       <div className="text-xs text-slate-500">Rings: {labelRings(f.ring_path)}</div>
