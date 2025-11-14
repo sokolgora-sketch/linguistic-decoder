@@ -27,10 +27,10 @@ const formatPath = (path: Path) => {
   //   if (op.startsWith("insert")) return s + opCost.ins;
   //   return s;
   // }, 0);
-  // if (Ecalc !== E) { console.warn(`Energy mismatch for ${path.voicePath.join("")}: calc=${Ecalc} engine=${E}`); }
+  // if (Ecalc !== E) { console.warn(`Energy mismatch for ${path.vowelPath.join("")}: calc=${Ecalc} engine=${E}`); }
 
   return {
-    voice_path: path.voicePath,
+    voice_path: path.vowelPath,
     ring_path: path.ringPath,
     level_path: path.levelPath,
     ops: path.ops,

@@ -48,9 +48,9 @@ function preferClosureTie(a: Vowel[], b: Vowel[]): number {
 function scoreTuple(base: Vowel[], p: Path): [number, number, number, number] {
   return [
     p.checksums.find(c => c.type === "E")!.value,
-    ringPenalty(p.voicePath),
+    ringPenalty(p.vowelPath),
     -p.kept,
-    checksumV(p.voicePath),
+    checksumV(p.vowelPath),
   ];
 }
 
@@ -66,7 +66,7 @@ function opCostFromLabel(op: string, costs: { sub: number; del: number; ins: num
 
 function mkPath(base: Vowel[], seq: Vowel[], E: number, ops: string[], opCosts: { sub: number; del: number; ins: number; }): Path {
     const p: Path = {
-        voicePath: seq,
+        vowelPath: seq,
         ringPath: seq.map(v=>VOWEL_RING[v]),
         levelPath: seq.map(v=>VOWEL_LEVEL[v]),
         checksums: [{type:"V",value:checksumV(seq)}, {type:"E",value:E}, {type:"C",value:0}],
@@ -76,7 +76,7 @@ function mkPath(base: Vowel[], seq: Vowel[], E: number, ops: string[], opCosts: 
     // Note: E includes gravity and penalties, so it won't perfectly match op costs.
     // This is an area for future refinement if exact cost tracking is needed.
     // const Ecalc = ops.reduce((s,op)=>s+opCostFromLabel(op, opCosts),0);
-    // if (Ecalc !== E) throw new Error(`Energy mismatch E=${E} sum(ops)=${Ecalc} ops=${ops.join(',')}`);
+    // if (Ecalc !== E) { console.warn(`Energy mismatch E=${E} sum(ops)=${Ecalc} ops=${ops.join(',')}`); }
 
     if (p.kept > Math.min(base.length, seq.length)) {
         throw new Error(`Keeps overflow: kept=${p.kept} base=${base.length} seq=${seq.length}`);
@@ -150,20 +150,19 @@ function solveWord(word: string, opts: SolveOptions): Omit<Analysis, "word" | "m
   }
 
   // De-duplicate and sort paths
-  const uniqPaths = Array.from(new Map(paths.map(p => [p.voicePath.join(""), p])).values());
+  const uniqPaths = Array.from(new Map(paths.map(p => [p.vowelPath.join(""), p])).values());
 
   uniqPaths.sort((p, q) => {
     const A = scoreTuple(baseSeq, p), B = scoreTuple(baseSeq, q);
     if (A[0] !== B[0]) return A[0] - B[0];
     if (A[1] !== B[1]) return A[1] - B[1];
     if (A[2] !== B[2]) return A[2] - B[2];
-    const c = preferClosureTie(p.voicePath, q.voicePath);
+    const c = preferClosureTie(p.vowelPath, q.vowelPath);
     if (c !== 0) return c;
     return A[3] - B[3];
   });
 
   const primary = uniqPaths[0];
-  const pKey = primary.voicePath.join("");
 
   const frontier = uniqPaths
     .slice(1, K)

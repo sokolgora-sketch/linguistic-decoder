@@ -9,7 +9,7 @@ export type Checksum = {
 };
 
 export type Path = {
-  voicePath: Vowel[];
+  vowelPath: Vowel[];
   ringPath: number[];
   levelPath: number[];
   ops: string[];
