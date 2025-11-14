@@ -3,9 +3,9 @@ import { db, ensureAnon, auth } from "@/lib/firebase";
 import {
   doc, getDoc, setDoc, serverTimestamp, collection, addDoc
 } from "firebase/firestore";
-import { analyzeWordAction } from "@/app/actions";
 import type { Alphabet } from "./solver/engineConfig";
 import { ENGINE_VERSION } from "./solver/engineVersion";
+import { mapWordToLanguageFamilies } from "@/ai/flows/map-word-to-language-families";
 
 type Mode = "strict" | "open";
 
@@ -18,30 +18,51 @@ export async function analyzeClient(word: string, mode: Mode, alphabet: Alphabet
   const snap = await getDoc(cacheRef);
   if (snap.exists()) {
     console.log("Cache hit!");
-    const data = { ...snap.data(), cacheHit: true };
-    void saveHistory(word, mode, alphabet); // fire-and-forget
-    return data;
+    const data = snap.data();
+    // fire-and-forget history save
+    void saveHistory(data.analysis.word, data.analysis.mode, data.analysis.alphabet); 
+    return { ...data, cacheHit: true };
   }
 
   console.log("Cache miss, calculating result...");
 
-  // 2) CALL your Next.js API (or compute locally)
-  const result = await analyzeWordAction({ word, mode, alphabet });
+  // 2) CALL your Next.js API
+  const res = await fetch(`/api/analyzeSevenVoices`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ word, mode, alphabet }),
+  });
 
-  if (!result.ok) {
-    throw new Error(result.error);
+  if (!res.ok) {
+      const errorData = await res.json();
+      throw new Error(errorData.error || 'Analysis failed');
   }
+  const analysisResult = await res.json();
 
-  const data = result.data;
+  // 3) CALL GEMINI (if not cached)
+  const mappingResult = await mapWordToLanguageFamilies({
+      word: analysisResult.word,
+      voice_path: analysisResult.primary.voice_path,
+      ring_path: analysisResult.primary.ring_path,
+      level_path: analysisResult.primary.level_path,
+      ops: analysisResult.primary.ops,
+      signals: analysisResult.signals
+  });
 
-  // 3) WRITE CACHE (client-side)
-  await setDoc(cacheRef, { ...data, cachedAt: serverTimestamp() }, { merge: false });
+  const payload = { 
+    analysis: analysisResult,
+    languageFamilies: mappingResult?.candidates_map || null
+  };
+  
+  // 4) WRITE CACHE (client-side)
+  await setDoc(cacheRef, { ...payload, cachedAt: serverTimestamp() }, { merge: false });
 
-  // 4) WRITE USER HISTORY
+  // 5) WRITE USER HISTORY
   await saveHistory(word, mode, alphabet);
 
-  return { ...data, cacheHit: false };
+  return { ...payload, cacheHit: false };
 }
+
 
 async function saveHistory(word: string, mode: Mode, alphabet: Alphabet) {
   const u = auth.currentUser;
@@ -84,14 +105,21 @@ export async function prefetchAnalyze(
   PREFETCH_SEEN.add(cacheId);
 
   try {
+    // This fetch just warms the server-side analysis cache, not the Gemini part.
     const r = await fetch("/api/analyzeSevenVoices", {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ word, mode, alphabet }),
     });
-    const data = await r.json();
-    if (data?.error) return;
-    await setDoc(cacheRef, { analysis: data, cachedAt: serverTimestamp() }, { merge: false });
+    const analysisResult = await r.json();
+    if (analysisResult?.error) return;
+
+    // Prefetch doesn't include Gemini, so we can't fully populate the cache here.
+    // We could store just the analysis part, but that complicates the cache structure.
+    // For now, the prefetch just ensures the heavy lifting (the matrix solve) is done
+    // and cached in memory on the server if it's hit again quickly.
+    // A more advanced prefetch would call Gemini too.
+
   } catch (e) {
     console.warn("Prefetch failed", e);
   } finally {
