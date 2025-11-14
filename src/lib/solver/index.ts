@@ -4,6 +4,14 @@ import type { Analysis, Path, SolveMode } from "./types";
 
 export type { Analysis, Path, SolveMode, Checksum, Vowel } from "./types";
 
+export type SolveOptions = {
+  beamWidth?: number;
+  maxOps?: number;
+  allowDelete?: boolean;
+  allowClosure?: boolean;
+  opCost?: { sub: number; del: number; ins: number };
+};
+
 const DEFAULTS = {
   engineVersion: "2025-11-13-v1.0",
   beamStrict: 12,
@@ -113,8 +121,12 @@ function observedHasInstrument(slots: (Vowel|undefined)[]) {
 
 
 export function solveMatrix(word: string, mode: SolveMode): Analysis {
+  const options: SolveOptions = mode === 'strict'
+  ? { beamWidth: 8, maxOps: 1, allowDelete: false, allowClosure: false, opCost: { sub: 1, del: 3, ins: 2 } }
+  : { beamWidth: 8, maxOps: 2, allowDelete: true,  allowClosure: true,  opCost: { sub: 1, del: 3, ins: 2 } };
+
   const { consonants, slots } = buildSlots(word);
-  const beam = mode==="strict" ? DEFAULTS.beamStrict : DEFAULTS.beamOpen;
+  const beam = (mode==="strict" ? DEFAULTS.beamStrict : DEFAULTS.beamOpen) * (options.beamWidth ?? 1);
 
   let col: State[] = [{ row:null, cost:0, path:[], ops:[], cStab:0, kept: 0, deleted: 0 }];
 
@@ -155,7 +167,14 @@ export function solveMatrix(word: string, mode: SolveMode): Analysis {
 
   for (const st of col){
     if (!st.row) continue;
-    for (const closure of ["Ë","A"] as Vowel[]){
+    const closures = options.allowClosure ? ["Ë"] : (mode === 'strict' ? [] : ["A", "Ë"]);
+
+    for (const closure of (["Ë","A"] as Vowel[])){
+      if (mode === 'strict' && closure === 'A' && !options.allowClosure) continue;
+      if (mode === 'strict' && !options.allowClosure) continue;
+      if (options.allowClosure === false && closure === 'A') continue;
+
+
       const t = moveCost(st.row, closure);
       const path = st.path[st.path.length-1]===closure ? st.path.slice() : [...st.path, closure];
       const base = st.cost + t;
@@ -173,15 +192,27 @@ export function solveMatrix(word: string, mode: SolveMode): Analysis {
   if (solsFiltered.length === 0) { 
       solsFiltered = sols; // fallback if truly unavoidable
   }
+  
+  const checksumV = (p: Vowel[]) => p.reduce((acc,v)=> acc*VOWEL_VALUE[v], 1);
+  const ringPenalty = (p:Vowel[]) => { let d=0; for(let i=0;i<p.length-1;i++) d+=Math.abs(VOWEL_RING[p[i]]-VOWEL_RING[p[i+1]]); return d;};
+  const preferClosureTie = (a: Vowel[], b: Vowel[]) => (a[a.length-1]==="Ë"?0:1) - (b[b.length-1]==="Ë"?0:1);
 
-  solsFiltered.sort((a,b) =>
-    (a.E - b.E) ||                            // 1) lowest energy
-    ((+b.hasInstr) - (+a.hasInstr)) ||        // 2) prefer paths with E/I before closure
-    (b.kept - a.kept) ||                      // 3) more observed vowels kept
-    (rankClosure(a.closure) - rankClosure(b.closure)) || // 4) prefer Ë over A
-    (a.path.length - b.path.length) ||        // 5) shorter path next
-    a.path.join("").localeCompare(b.path.join(""))       // 6) stable tie-break
-  );
+  const scoreTuple = (p: {path:Vowel[], E:number, kept: number}): [number,number,number,number] => [
+    p.E,
+    ringPenalty(p.path),
+    -p.kept,
+    checksumV(p.path)
+  ];
+
+  solsFiltered.sort((a,b) => {
+    const A = scoreTuple(a), B = scoreTuple(b);
+    if (A[0] !== B[0]) return A[0] - B[0];
+    if (A[1] !== B[1]) return A[1] - B[1];
+    if (A[2] !== B[2]) return A[2] - B[2];
+    const c = preferClosureTie(a.path, b.path);
+    if (c !== 0) return c;
+    return A[3] - B[3];
+  });
   
   if (solsFiltered.length === 0) {
     throw new Error("Solver failed to find a valid path for the given word.");
@@ -219,3 +250,5 @@ export function solveMatrix(word: string, mode: SolveMode): Analysis {
     signals: ["deterministic: beam DP; gravity; closure prefers Ë on tie"]
   };
 }
+
+    
