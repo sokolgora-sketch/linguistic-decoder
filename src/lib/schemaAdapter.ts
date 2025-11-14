@@ -6,7 +6,7 @@ export type EnginePayload = {
   engineVersion: string;
   mode: 'strict'|'open';
   alphabet: string;
-  primaryPath: {
+  primary: {
     voicePath: Vowel[];
     ringPath: number[];
     levelPath: number[];
@@ -25,15 +25,15 @@ export type MappingRecord = {
 };
 
 export function toMappingRecord(e: EnginePayload): MappingRecord {
-  if (!e?.primaryPath?.voicePath?.length) {
-    throw new Error("No primaryPath.voicePath in engine payload");
+  if (!e?.primary?.voicePath?.length) {
+    throw new Error("No primary.voicePath in engine payload");
   }
   return {
     word: e.word,
-    voice_path: e.primaryPath.voicePath,   // flatten & rename
-    ring_path: e.primaryPath.ringPath,
-    level_path: e.primaryPath.levelPath,
-    ops: e.primaryPath.ops ?? [],
+    voice_path: e.primary.voicePath,   // flatten & rename
+    ring_path: e.primary.ringPath,
+    level_path: e.primary.levelPath,
+    ops: e.primary.ops ?? [],
     signals: [
       `engine=${e.engineVersion}`,
       `alphabet=${e.alphabet}`,

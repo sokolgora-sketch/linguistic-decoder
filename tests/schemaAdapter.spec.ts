@@ -6,7 +6,7 @@ test("toMappingRecord provides required fields", () => {
     engineVersion: "2025-11-14-core-6",
     mode: "strict",
     alphabet: "albanian",
-    primaryPath: {
+    primary: {
       voicePath: ["I","E"],
       ringPath: [1,2],
       levelPath: [1,1],
