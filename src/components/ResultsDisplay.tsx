@@ -87,7 +87,7 @@ function InfoLine({label, value, mono}:{label:string; value:string; mono?:boolea
 
 export function ResultsDisplay({ analysis }: { analysis: AnalyzeResponse['analysis'] }) {
     const primary = analysis?.primary;
-    const frontierList = useMemo(() => (analysis?.frontier || []).filter(f => f.voice_path.join("") !== (primary?.voice_path || []).join("")), [analysis, primary]);
+    const frontierList = useMemo(() => (analysis?.frontier || []).filter(f => f?.voice_path && f.voice_path.join("") !== (primary?.voice_path || []).join("")), [analysis, primary]);
 
     if (!primary) return null;
 
