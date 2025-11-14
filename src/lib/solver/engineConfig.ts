@@ -1,6 +1,8 @@
 
 export const ENGINE_VERSION = "2025-11-14-core-3";
 
+export type Alphabet = "auto" | "albanian" | "latin";
+
 export type EngineConfig = {
   // Search
   beamWidth: number;
@@ -14,6 +16,8 @@ export type EngineConfig = {
   // Preferences
   preferClosureË: boolean;
   ringJumpPenalty: number;  // +1 per |Δring|>1 jump
+  alphabet: Alphabet;
+  cWeight: number;
 
   // Normalizations (cost 0, pre-solver)
   norm: {
@@ -31,5 +35,7 @@ export const CFG: EngineConfig = {
   cost: { sub: 1, del: 3, insClosure: 2 },
   preferClosureË: true,
   ringJumpPenalty: 1,
+  alphabet: "auto",
+  cWeight: 1,
   norm: { foldDiacritics: true, terminalYtoI: true, collapseDupes: true },
 };

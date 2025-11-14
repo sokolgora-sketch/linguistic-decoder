@@ -1,7 +1,7 @@
 
-import { VOWELS, Vowel, VOWEL_LEVEL, VOWEL_RING, VOWEL_VALUE, CClass, DIGRAPH_CLASS, LETTER_CLASS } from "./valueTables";
+import { VOWELS, Vowel, VOWEL_LEVEL, VOWEL_RING, VOWEL_VALUE, CClass, ALB_DIGRAPH_CLASS, ALB_LETTER_CLASS, LAT_DIGRAPH_CLASS, LAT_LETTER_CLASS } from "./valueTables";
 import type { Analysis, Path, SolveMode } from "./types";
-import { CFG, ENGINE_VERSION } from "./engineConfig";
+import { CFG, ENGINE_VERSION, Alphabet } from "./engineConfig";
 
 export type { Analysis, Path, SolveMode, Checksum, Vowel } from "./types";
 
@@ -59,7 +59,7 @@ function scoreTuple(base: Vowel[], p: Path): [number, number, number, number, nu
     ringPenalty(p.vowelPath),
     -p.kept,
     p.checksums.find(c => c.type === "V")!.value,
-    p.checksums.find(c => c.type === "C")!.value,
+    (p.checksums.find(c => c.type === "C")!.value * CFG.cWeight),
   ];
 }
 
@@ -87,21 +87,29 @@ function classRange(cls: CClass): [number, number] {
   }
 }
 
-function classifyWindow(chars: string): CClass {
+function detectAlphabet(word: string): "albanian" | "latin" {
+  // Albanian signals: ë, ç, or canonical digraphs/letters
+  return /[ëç]|xh|zh|sh|dh|th|nj|gj|ll|rr|q/i.test(word) ? "albanian" : "latin";
+}
+
+function classifyWindow(chars: string, alphabet: "albanian"|"latin"): CClass {
   const s = chars.toLowerCase();
-  // digraph pass (left-to-right)
+  const DG = alphabet === "albanian" ? ALB_DIGRAPH_CLASS : LAT_DIGRAPH_CLASS;
+  const LT = alphabet === "albanian" ? ALB_LETTER_CLASS  : LAT_LETTER_CLASS;
+
+  // digraph pass (left-to-right, non-overlapping signal)
   for (let i = 0; i < s.length - 1; i++) {
     const dg = s.slice(i, i + 2);
-    if (DIGRAPH_CLASS[dg]) return DIGRAPH_CLASS[dg];
+    if (DG[dg]) return DG[dg];
   }
-  // single-letter fallback: first consonant we see
+  // first consonant letter fallback
   for (const ch of s) {
     if (/[aeiouyë]/i.test(ch)) continue;
-    if (LETTER_CLASS[ch]) return LETTER_CLASS[ch];
+    if (LT[ch]) return LT[ch];
   }
-  // default neutral friction
-  return "NonSibilantFricative";
+  return "NonSibilantFricative"; // neutral default
 }
+
 
 function hopPenalty(absDelta: number, cls: CClass): number {
   const [lo, hi] = classRange(cls);
@@ -110,22 +118,20 @@ function hopPenalty(absDelta: number, cls: CClass): number {
   return 0;
 }
 
-// Extract consonant-class windows between normalized base vowels
-function extractWindowClasses(word: string, baseSeq: Vowel[]): CClass[] {
+function extractWindowClasses(word: string, baseSeq: Vowel[], alphabetCfg: Alphabet): CClass[] {
+  const alphabet = alphabetCfg === "auto" ? detectAlphabet(word) : alphabetCfg;
   const s = word.normalize("NFC");
-  // find indices of base vowels in raw word (first match per base slot)
   const pos: number[] = [];
   let vi = 0;
   for (let i = 0; i < s.length && vi < baseSeq.length; i++) {
-    const v = toVowel(s[i]);
-    if (!v) continue;
+    const v = toVowel(s[i]); if (!v) continue;
     if (v === baseSeq[vi]) { pos.push(i); vi++; }
   }
   const windows: string[] = [];
   for (let k = 0; k < pos.length - 1; k++) {
     windows.push(s.slice(pos[k] + 1, pos[k + 1]));
   }
-  return windows.map(classifyWindow);
+  return windows.map(chars => classifyWindow(chars, alphabet));
 }
 
 function computeC(vowelPath: Vowel[], consClasses: CClass[]): number {
@@ -198,7 +204,7 @@ function neighbors(base: Vowel[], st: State, opts: SolveOptions): State[] {
 function solveWord(word: string, opts: SolveOptions): Omit<Analysis, "word" | "mode"> {
   const rawBase = extractBase(word);
   const base = normalizeTerminalY(rawBase, word);
-  const consClasses = extractWindowClasses(word, base);
+  const consClasses = extractWindowClasses(word, base, CFG.alphabet);
 
   const baseSeq = base.length ? base : (["O"] as Vowel[]);
 
