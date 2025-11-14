@@ -1,5 +1,7 @@
 
+
 import type { Vowel } from "./types";
+import { toVowel } from "./index";
 
 export const VOWELS = ["A", "E", "I", "O", "U", "Y", "Ë"] as const;
 
@@ -267,3 +269,52 @@ export function computeC(voicePath: Vowel[], consClasses: CClass[]): number {
   return c;
 }
 
+/**
+ * Extract the raw substrings between the normalized base vowels.
+ * Pure read: does NOT mutate state, does NOT depend on scoring.
+ */
+export function extractWindows(word: string, baseSeq: Vowel[]): string[] {
+  const s = word.normalize("NFC");
+  // find indices of base vowels in raw string (first match per base slot)
+  const pos: number[] = [];
+  let vi = 0;
+  for (let i = 0; i < s.length && vi < baseSeq.length; i++) {
+    // toVowel is already in your core; we just need a truthy check here
+    const v = toVowel ? toVowel(s[i]) : null;
+    if (!v) continue;
+    if (v === baseSeq[vi]) { pos.push(i); vi++; }
+  }
+
+  const windows: string[] = [];
+  for (let k = 0; k < pos.length - 1; k++) {
+    windows.push(s.slice(pos[k] + 1, pos[k + 1]));
+  }
+  return windows;
+}
+
+/**
+ * Thin helper used by tests: map windows → 7-class consonant labels,
+ * using a chosen language profile. No scoring, deterministic.
+ */
+export function extractWindowClassesWithProfile(
+  word: string,
+  baseSeq: Vowel[],
+  profile: LangProfile
+): CClass[] {
+  const windows = extractWindows(word, baseSeq);
+  // classifyWindow is your existing function that uses DIGRAPH/LETTER maps on the profile
+  return windows.map(w => classifyWindow(w, profile));
+}
+
+/**
+ * Optional debug export (handy for UI): returns both windows and classes.
+ */
+export function readWindowsDebug(
+  word: string,
+  baseSeq: Vowel[],
+  profile: LangProfile
+): { windows: string[]; classes: CClass[] } {
+  const windows = extractWindows(word, baseSeq);
+  const classes = windows.map(w => classifyWindow(w, profile));
+  return { windows, classes };
+}

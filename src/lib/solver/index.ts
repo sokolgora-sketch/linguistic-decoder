@@ -1,6 +1,6 @@
 
 
-import { VOWELS, Vowel, VOWEL_LEVEL, VOWEL_RING, VOWEL_VALUE, computeC, chooseProfile, LangProfile, classifyWindow, CClass } from "./valueTables";
+import { VOWELS, Vowel, VOWEL_LEVEL, VOWEL_RING, VOWEL_VALUE, computeC, chooseProfile, LangProfile, extractWindowClassesWithProfile } from "./valueTables";
 import type { Analysis, Path, SolveMode } from "./types";
 import { CFG, ENGINE_VERSION, Alphabet } from "./engineConfig";
 
@@ -17,7 +17,7 @@ export type SolveOptions = {
 
 // --- Base Extraction & Keep Count ---
 function isVowelChar(ch:string){ const c=ch.normalize("NFC"); return /[aeiouy]/i.test(c)||c==="ë"||c==="Ë"; }
-function toVowel(ch:string):Vowel|null{ const u=ch.toUpperCase(); return u==="Ë" ? "Ë" : (VOWELS.includes(u as any)?(u as Vowel):null); }
+export function toVowel(ch:string):Vowel|null{ const u=ch.toUpperCase(); return u==="Ë" ? "Ë" : (VOWELS.includes(u as any)?(u as Vowel):null); }
 
 export function extractBase(word:string):Vowel[]{ 
     const out:Vowel[]=[]; 
@@ -77,19 +77,7 @@ function opCostFromLabel(op: string, costs: { sub: number; del: number; ins: num
   return costs.sub;
 }
 
-export function extractWindowClasses(word: string, baseSeq: Vowel[], P: LangProfile): CClass[] {
-  const s = word.normalize("NFC");
-  const pos:number[]=[]; let vi=0;
-  for (let i=0;i<s.length && vi<baseSeq.length;i++){
-    const v = toVowel(s[i]); if (!v) continue;
-    if (v === baseSeq[vi]) { pos.push(i); vi++; }
-  }
-  const windows:string[]=[];
-  for (let k=0;k<pos.length-1;k++) windows.push(s.slice(pos[k]+1, pos[k+1]));
-  return windows.map(chars => classifyWindow(chars, P));
-}
-
-function mkPath(base: Vowel[], seq: Vowel[], E: number, ops: string[], consClasses: ReturnType<typeof classifyWindow>[]): Path {
+function mkPath(base: Vowel[], seq: Vowel[], E: number, ops: string[], consClasses: ReturnType<typeof extractWindowClassesWithProfile>): Path {
     const p: Path = {
         vowelPath: seq,
         ringPath: seq.map(v=>VOWEL_RING[v]),
@@ -145,7 +133,7 @@ function solveWord(word: string, opts: SolveOptions): Omit<Analysis, "word" | "m
   const base = normalizeTerminalY(rawBase, word);
   const baseSeq = base.length ? base : (["O"] as Vowel[]);
   const profile = chooseProfile(word, opts.alphabet === "auto" ? undefined : opts.alphabet);
-  const consClasses = extractWindowClasses(word, baseSeq, profile);
+  const consClasses = extractWindowClassesWithProfile(word, baseSeq, profile);
   
   const K = opts.beamWidth;
   const maxOps = opts.maxOps;
