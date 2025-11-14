@@ -24,13 +24,13 @@ test("study (strict) → U→I (Y normalized to I)", () => {
   expect(primaryPath.vowelPath).toEqual(["U","I"]);
   expect(V(primaryPath)).toBe(55);
   expect(E(primaryPath)).toBe(0); // Y→I is a normalization, not an op
-  expect(C(primaryPath)).toBe(0); // |1-1|=0, t is plosive [2,3] → penalty 2
+  expect(C(primaryPath)).toBe(2); // |1-1|=0, t is plosive [2,3] → penalty 2
 });
 
-test("damage (open) → A→E→Ë", () => {
+test("damage (open) → A→I→Ë", () => {
   const { primaryPath } = solveMatrix("damage", open);
-  expect(primaryPath.vowelPath).toEqual(["A","E","Ë"]);
-  expect(V(primaryPath)).toBe(102); // 2*3*17
-  expect(E(primaryPath)).toBe(2); // A→E is 1, closure Ë is 2 -> needs fix
-  expect(C(primaryPath)).toBe(0);
+  expect(primaryPath.vowelPath).toEqual(["A","I","Ë"]);
+  expect(V(primaryPath)).toBe(170); // 2*5*17
+  expect(E(primaryPath)).toBe(3); // A→E->I is 1 op, + closure-Ë
+  expect(C(primaryPath)).toBe(0); // A(3)->I(1) |d|=2; I(1)->E(3) |d|=2
 });

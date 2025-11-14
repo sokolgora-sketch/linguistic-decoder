@@ -53,13 +53,18 @@ function preferClosureTie(a: Vowel[], b: Vowel[]): number {
   return enda - endb;
 }
 
-function scoreTuple(base: Vowel[], p: Path): [number, number, number, number, number] {
+// Ranking tuple: (E_total, ringPenalty, C * cWeight, -kept, V)
+// preferClosureTie is handled separately after this tuple comparison.
+function scoreTuple(p: Path): [number, number, number, number, number] {
+  const E = p.checksums.find(c => c.type === "E")!.value;
+  const V = p.checksums.find(c => c.type === "V")!.value;
+  const C = p.checksums.find(c => c.type === "C")!.value;
   return [
-    p.checksums.find(c => c.type === "E")!.value,
+    E,
     ringPenalty(p.vowelPath),
+    C * CFG.cWeight,
     -p.kept,
-    p.checksums.find(c => c.type === "V")!.value,
-    (p.checksums.find(c => c.type === "C")!.value * CFG.cWeight),
+    V,
   ];
 }
 
@@ -99,7 +104,7 @@ function classifyWindow(chars: string, alphabet: "albanian" | "latin"): CClass {
 }
 
 
-function extractWindowClasses(word: string, baseSeq: Vowel[], alphabetPref: Alphabet): CClass[] {
+export function extractWindowClasses(word: string, baseSeq: Vowel[], alphabetPref: Alphabet): CClass[] {
   const alphabet = alphabetPref === "auto" ? detectAlphabet(word) : alphabetPref;
   const s = word.normalize("NFC");
 
@@ -119,12 +124,12 @@ function extractWindowClasses(word: string, baseSeq: Vowel[], alphabetPref: Alph
   return windows.map(chars => classifyWindow(chars, alphabet));
 }
 
-export function computeC(vowelPath: Vowel[], consClasses: CClass[]): number {
+export function computeC(voicePath: Vowel[], consClasses: CClass[]): number {
   let c = 0;
-  const hops = Math.max(0, vowelPath.length - 1);
+  const hops = Math.max(0, voicePath.length - 1);
   for (let i = 0; i < hops; i++) {
     const cls = i < consClasses.length ? consClasses[i] : "Glide"; // extra hop (e.g., closure) ~ Glide
-    const d = Math.abs(VOWEL_RING[vowelPath[i + 1]] - VOWEL_RING[vowelPath[i]]);
+    const d = Math.abs(VOWEL_RING[voicePath[i + 1]] - VOWEL_RING[voicePath[i]]);
     const [lo, hi] = classRange(cls);
     if (d < lo) c += (lo - d);
     else if (d > hi) c += (d - hi);
@@ -142,10 +147,6 @@ function mkPath(base: Vowel[], seq: Vowel[], E: number, ops: string[], consClass
         kept: keptCount(base, seq),
         ops,
     };
-    
-    // Note: E includes penalties, so it won't perfectly match op costs.
-    // const Ecalc = ops.reduce((s,op)=>s+opCostFromLabel(op, {sub: CFG.cost.sub, del: CFG.cost.del, ins: CFG.cost.insClosure}),0);
-    // if (Ecalc !== E) { console.warn(`Energy mismatch E=${E} sum(ops)=${Ecalc} ops=${ops.join(',')}`); }
 
     if (p.kept > Math.min(base.length, seq.length)) {
         throw new Error(`Keeps overflow: kept=${p.kept} base=${base.length} seq=${seq.length}`);
@@ -191,9 +192,9 @@ function neighbors(base: Vowel[], st: State, opts: SolveOptions): State[] {
 function solveWord(word: string, opts: SolveOptions): Omit<Analysis, "word" | "mode"> {
   const rawBase = extractBase(word);
   const base = normalizeTerminalY(rawBase, word);
-  const consClasses = extractWindowClasses(word, base, CFG.alphabet);
-
   const baseSeq = base.length ? base : (["O"] as Vowel[]);
+  const consClasses = extractWindowClasses(word, baseSeq, CFG.alphabet);
+  const alphabet = CFG.alphabet === 'auto' ? detectAlphabet(word) : CFG.alphabet;
 
   const K = opts.beamWidth;
   const maxOps = opts.maxOps;
@@ -224,7 +225,7 @@ function solveWord(word: string, opts: SolveOptions): Omit<Analysis, "word" | "m
   const uniqPaths = Array.from(new Map(paths.map(p => [p.vowelPath.join(""), p])).values());
 
   uniqPaths.sort((p, q) => {
-    const A = scoreTuple(baseSeq, p), B = scoreTuple(baseSeq, q);
+    const A = scoreTuple(p), B = scoreTuple(q);
     for(let i=0; i<A.length; i++) if (A[i] !== B[i]) return A[i] - B[i];
 
     return preferClosureTie(p.vowelPath, q.vowelPath);
@@ -237,10 +238,11 @@ function solveWord(word: string, opts: SolveOptions): Omit<Analysis, "word" | "m
     .filter(p => p.checksums.find(c => c.type === "E")!.value <= primary.checksums.find(c => c.type === "E")!.value + CFG.frontierDeltaE);
   
   const signals = [
+      `engine=${ENGINE_VERSION}`,
+      `alphabet=${alphabet}`,
       `base_raw=${rawBase.join("") || "-"}`,
       `base_norm=${base.join("") || "-"}`,
       `cons_windows=${consClasses.join(",") || "-"}`,
-      `signals: deterministic beam; Ë-closure tie-break`
   ];
 
   return {
