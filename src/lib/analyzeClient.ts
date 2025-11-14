@@ -107,7 +107,7 @@ export async function prefetchAnalyze(
     return;
   }
   await ensureAnon();
-  const cacheId = `${word}|${mode}|${alphabet}|${ENGINE_VERSION}`;
+  const cacheId = `${word}|${mode}|${alphabet}|${ENGINE_VERSION}|ew:0.25`; // Prefetch with default weight
   if (PREFETCH_SEEN.has(cacheId)) {
     callbacks?.onFinish?.();
     return;
@@ -134,5 +134,3 @@ export async function prefetchAnalyze(
     callbacks?.onFinish?.();
   }
 }
-
-    
