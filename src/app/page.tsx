@@ -22,6 +22,7 @@ import { Copy, Download, Loader } from "lucide-react";
 import ComparePanel from "@/components/ComparePanel";
 import { mapWordToLanguageFamilies } from "@/ai/flows/map-word-to-language-families";
 import { toMappingRecord } from "@/lib/schemaAdapter";
+import { ensureEnginePayload } from "@/lib/ensureEngine";
 
 
 // ==== Types matching the /analyzeWord response ===============================
@@ -80,22 +81,27 @@ export default function LinguisticDecoderApp(){
     setIsWarming(false);
     setErr(null);
     try {
-      const engineResponse = await analyzeClient(useWord, useMode, useAlphabet);
-      if (engineResponse) {
-        // The engine response is just the analysis part.
-        // Now, we call the Gemini flow with the adapted data.
+      const clientResponse = await analyzeClient(useWord, useMode, useAlphabet);
+      if (clientResponse) {
+        
+        const enginePayload = await ensureEnginePayload(clientResponse.analysis, useMode, useAlphabet);
+        
+        console.log("engine keys:", Object.keys(enginePayload));
+        console.log("primaryPath:", enginePayload.primaryPath); 
+
         let languageFamilies = null;
-        if (!engineResponse.cacheHit) {
-            const mappingInput = toMappingRecord(engineResponse.analysis);
+        if (!clientResponse.cacheHit) {
+            const mappingInput = toMappingRecord(enginePayload);
             const mappingResult = await mapWordToLanguageFamilies(mappingInput);
             languageFamilies = mappingResult?.candidates_map || null;
         } else {
-            languageFamilies = engineResponse.languageFamilies;
+            languageFamilies = clientResponse.languageFamilies;
         }
-
+        
         const fullResponse: AnalyzeResponse = {
-            ...engineResponse,
+            analysis: enginePayload,
             languageFamilies: languageFamilies,
+            cacheHit: clientResponse.cacheHit
         };
         setData(fullResponse);
       }

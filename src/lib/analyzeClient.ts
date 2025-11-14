@@ -38,21 +38,17 @@ export async function analyzeClient(word: string, mode: Mode, alphabet: Alphabet
       throw new Error(errorData.error || 'Analysis failed');
   }
   const analysisResult = await res.json();
-
-  // 3) ADAPT & CALL GEMINI is now handled on the page
-  const payload = { 
-    analysis: analysisResult,
-    // languageFamilies will be added on the page
-  };
   
-  // 4) WRITE CACHE (client-side) - The page will now handle writing the full payload with families
+  // 3) WRITE CACHE (client-side) - The page will now handle writing the full payload with families
+  // Note: We only cache the raw analysis result here. The language families are added on the page.
   await setDoc(cacheRef, { analysis: analysisResult, cachedAt: serverTimestamp() }, { merge: true });
 
 
-  // 5) WRITE USER HISTORY
+  // 4) WRITE USER HISTORY
   await saveHistory(word, mode, alphabet);
 
-  return { ...payload, cacheHit: false };
+  // Return just the analysis portion
+  return { analysis: analysisResult, cacheHit: false };
 }
 
 
