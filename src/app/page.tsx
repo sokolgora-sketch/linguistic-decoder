@@ -200,7 +200,7 @@ export default function LinguisticDecoderApp(){
       {/* History */}
       <aside className="space-y-3 pt-20">
         <div className="flex justify-between items-center pr-2">
-            <div className="font-semibold pl-2">History</div>
+            <div className="font-semibold pl-4">History</div>
             <Button variant="ghost" size="sm" onClick={() => setShowHistory(s => !s)}>
                 {showHistory ? "Hide" : "Show"}
             </Button>
