@@ -1,6 +1,5 @@
 
-import { VOWELS, Vowel, VOWEL_LEVEL, VOWEL_RING, VOWEL_VALUE, CClass, computeC, extractWindowClasses } from "./valueTables";
-import { detectAlphabet } from "./alphabet";
+import { VOWELS, Vowel, VOWEL_LEVEL, VOWEL_RING, VOWEL_VALUE, computeC, extractWindowClasses, chooseProfile } from "./valueTables";
 import type { Analysis, Path, SolveMode } from "./types";
 import { CFG, ENGINE_VERSION, Alphabet } from "./engineConfig";
 
@@ -76,7 +75,7 @@ function opCostFromLabel(op: string, costs: { sub: number; del: number; ins: num
   return costs.sub;
 }
 
-function mkPath(base: Vowel[], seq: Vowel[], E: number, ops: string[], consClasses: CClass[]): Path {
+function mkPath(base: Vowel[], seq: Vowel[], E: number, ops: string[], consClasses: ReturnType<typeof extractWindowClasses>): Path {
     const p: Path = {
         vowelPath: seq,
         ringPath: seq.map(v=>VOWEL_RING[v]),
@@ -131,9 +130,9 @@ function solveWord(word: string, opts: SolveOptions): Omit<Analysis, "word" | "m
   const rawBase = extractBase(word);
   const base = normalizeTerminalY(rawBase, word);
   const baseSeq = base.length ? base : (["O"] as Vowel[]);
-  const consClasses = extractWindowClasses(word, baseSeq, CFG.alphabet, toVowel);
-  const alphabet = CFG.alphabet === 'auto' ? detectAlphabet(word) : CFG.alphabet;
-
+  const profile = chooseProfile(word, CFG.alphabet === "auto" ? undefined : CFG.alphabet);
+  const consClasses = extractWindowClasses(word, baseSeq, profile, toVowel);
+  
   const K = opts.beamWidth;
   const maxOps = opts.maxOps;
 
@@ -177,7 +176,7 @@ function solveWord(word: string, opts: SolveOptions): Omit<Analysis, "word" | "m
   
   const signals = [
       `engine=${ENGINE_VERSION}`,
-      `alphabet=${alphabet}`,
+      `alphabet=${profile.id}`,
       `base_raw=${rawBase.join("") || "-"}`,
       `base_norm=${base.join("") || "-"}`,
       `cons_windows=${consClasses.join(",") || "-"}`,

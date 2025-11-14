@@ -1,100 +1,159 @@
 
-import { detectAlphabet } from "./alphabet";
-import type { Alphabet } from "./engineConfig";
 import type { Vowel } from "./types";
 
-export const VOWELS = ["A","E","I","O","U","Y","Ë"] as const;
+export const VOWELS = ["A", "E", "I", "O", "U", "Y", "Ë"] as const;
 
-export const VOWEL_VALUE: Record<Vowel, number> = { A:2, E:3, I:5, O:7, U:11, Y:13, "Ë":17 };
-export const VOWEL_RING:  Record<Vowel, number> = { A:3, E:2, I:1, O:0, U:1, Y:2, "Ë":3 };
-export const VOWEL_LEVEL: Record<Vowel, number> = { A:+1, E:+1, I:+1, O:0, U:-1, Y:-1, "Ë":-1 };
+export const VOWEL_VALUE: Record<Vowel, number> = { A: 2, E: 3, I: 5, O: 7, U: 11, Y: 13, "Ë": 17 };
+export const VOWEL_RING: Record<Vowel, number> = { A: 3, E: 2, I: 1, O: 0, U: 1, Y: 2, "Ë": 3 };
+export const VOWEL_LEVEL: Record<Vowel, number> = { A: +1, E: +1, I: +1, O: 0, U: -1, Y: -1, "Ë": -1 };
+
+// --- Language-Aware Consonant Classification ---
 
 export type CClass =
   | "Glide" | "Liquid" | "Nasal"
   | "NonSibilantFricative" | "SibilantFricative"
   | "Affricate" | "Plosive";
 
+export type LangProfile = {
+  id: "albanian" | "latin" | "turkish" | "german" | string;
+  detect: (w: string) => boolean;
+  DIGRAPH: Record<string, CClass>;
+  LETTER: Record<string, CClass>;
+};
+
 export function classRange(cls: CClass): [number, number] {
   switch (cls) {
     case "Glide":
     case "Liquid":
-    case "Nasal": return [0,1];
-    case "NonSibilantFricative": return [1,1];
+    case "Nasal": return [0, 1];
+    case "NonSibilantFricative": return [1, 1];
     case "SibilantFricative":
-    case "Affricate": return [1,2];
-    case "Plosive": return [2,3];
+    case "Affricate": return [1, 2];
+    case "Plosive": return [2, 3];
   }
 }
 
-export const ALB_DIGRAPH_CLASS = {
-  ll:"Liquid", rr:"Liquid",
-  nj:"Nasal",
-  sh:"SibilantFricative", zh:"SibilantFricative",
-  dh:"NonSibilantFricative", th:"NonSibilantFricative",
-  xh:"Affricate",
-  gj:"Plosive",
-} as const;
+export const Albanian: LangProfile = {
+  id: "albanian",
+  detect: (w) => /[ëç]|xh|zh|sh|dh|th|nj|gj|ll|rr|q/i.test(w),
+  DIGRAPH: {
+    "ll": "Liquid", "rr": "Liquid",
+    "nj": "Nasal",
+    "sh": "SibilantFricative", "zh": "SibilantFricative",
+    "dh": "NonSibilantFricative", "th": "NonSibilantFricative",
+    "xh": "Affricate",
+    "gj": "Plosive",
+  },
+  LETTER: {
+    c: "Affricate", ç: "Affricate", x: "Affricate",
+    q: "Plosive", k: "Plosive", g: "Plosive", p: "Plosive", b: "Plosive", t: "Plosive", d: "Plosive",
+    f: "NonSibilantFricative", v: "NonSibilantFricative", h: "NonSibilantFricative",
+    s: "SibilantFricative", z: "SibilantFricative",
+    j: "Glide",
+    m: "Nasal", n: "Nasal",
+    l: "Liquid", r: "Liquid",
+    w: "Glide",
+  },
+};
 
-export const ALB_LETTER_CLASS = {
-  c:"Affricate", ç:"Affricate", x:"Affricate",
-  q:"Plosive", k:"Plosive", g:"Plosive", p:"Plosive", b:"Plosive", t:"Plosive", d:"Plosive",
-  f:"NonSibilantFricative", v:"NonSibilantFricative", h:"NonSibilantFricative",
-  s:"SibilantFricative", z:"SibilantFricative",
-  j:"Glide",
-  m:"Nasal", n:"Nasal",
-  l:"Liquid", r:"Liquid",
-  w:"Glide", // rare but harmless
-} as const;
+export const Latin: LangProfile = {
+  id: "latin",
+  detect: () => false, // Fallback
+  DIGRAPH: {
+    "ch": "Affricate", "ts": "Affricate", "dz": "Affricate",
+    "sh": "SibilantFricative", "zh": "SibilantFricative",
+    "th": "NonSibilantFricative", "ph": "NonSibilantFricative",
+    "ck": "Plosive",
+  },
+  LETTER: {
+    p: "Plosive", b: "Plosive", t: "Plosive", d: "Plosive", k: "Plosive", g: "Plosive", q: "Plosive", c: "Plosive",
+    f: "NonSibilantFricative", v: "NonSibilantFricative", h: "NonSibilantFricative",
+    s: "SibilantFricative", z: "SibilantFricative", x: "SibilantFricative",
+    j: "Affricate",
+    m: "Nasal", n: "Nasal",
+    l: "Liquid", r: "Liquid",
+    w: "Glide", y: "Glide",
+  },
+};
 
-export const LAT_DIGRAPH_CLASS = {
-  ch:"Affricate", ts:"Affricate", dz:"Affricate",
-  sh:"SibilantFricative", zh:"SibilantFricative",
-  th:"NonSibilantFricative", ph:"NonSibilantFricative",
-  ck:"Plosive",
-} as const;
+export const Turkish: LangProfile = {
+  id: "turkish",
+  detect: (w) => /[çğşıöü]|sch|tsch|ç|ş|c(?!h)|j/i.test(w),
+  DIGRAPH: {
+    "ch": "Affricate",
+    "sch": "SibilantFricative", "tsch": "Affricate",
+  },
+  LETTER: {
+    c: "Affricate",
+    ç: "Affricate",
+    s: "SibilantFricative", z: "SibilantFricative", ş: "SibilantFricative", j: "SibilantFricative",
+    f: "NonSibilantFricative", v: "NonSibilantFricative", h: "NonSibilantFricative",
+    p: "Plosive", b: "Plosive", t: "Plosive", d: "Plosive", k: "Plosive", g: "Plosive", q: "Plosive",
+    m: "Nasal", n: "Nasal",
+    l: "Liquid", r: "Liquid",
+    y: "Glide", w: "Glide",
+    ğ: "Glide",
+    x: "SibilantFricative",
+  },
+};
 
-export const LAT_LETTER_CLASS = {
-  p:"Plosive", b:"Plosive", t:"Plosive", d:"Plosive", k:"Plosive", g:"Plosive", q:"Plosive", c:"Plosive",
-  f:"NonSibilantFricative", v:"NonSibilantFricative", h:"NonSibilantFricative",
-  s:"SibilantFricative", z:"SibilantFricative", x:"SibilantFricative",
-  j:"Affricate",
-  m:"Nasal", n:"Nasal",
-  l:"Liquid", r:"Liquid",
-  w:"Glide", y:"Glide",
-} as const;
+export const German: LangProfile = {
+  id: "german",
+  detect: (w) => /sch|tsch|qu|pf|sp|st|ä|ö|ü|ß/i.test(w),
+  DIGRAPH: {
+    "sch": "SibilantFricative",
+    "tsch": "Affricate",
+    "ch": "NonSibilantFricative",
+    "qu": "Plosive",
+    "ck": "Plosive",
+    "pf": "Plosive",
+    "ts": "Affricate",
+  },
+  LETTER: {
+    p: "Plosive", b: "Plosive", t: "Plosive", d: "Plosive", k: "Plosive", g: "Plosive", q: "Plosive", c: "Plosive",
+    f: "NonSibilantFricative", v: "NonSibilantFricative", h: "NonSibilantFricative",
+    s: "SibilantFricative", z: "SibilantFricative", ß: "SibilantFricative", x: "SibilantFricative",
+    j: "Affricate",
+    m: "Nasal", n: "Nasal",
+    l: "Liquid", r: "Liquid",
+    w: "Glide", y: "Glide",
+  },
+};
 
+export const PROFILES: LangProfile[] = [Albanian, Turkish, German, Latin];
 
-function classifyWindow(chars: string, alphabet: "albanian"|"latin"): CClass {
+export function chooseProfile(word: string, override?: string): LangProfile {
+  if (override) {
+    const p = PROFILES.find(p => p.id === override);
+    if (p) return p;
+  }
+  return PROFILES.find(p => p.detect(word)) || Latin;
+}
+
+function classifyWindow(chars: string, profile: LangProfile): CClass {
   const s = chars.toLowerCase();
-  const DG = alphabet === "albanian" ? ALB_DIGRAPH_CLASS : LAT_DIGRAPH_CLASS;
-  const LT = alphabet === "albanian" ? ALB_LETTER_CLASS  : LAT_LETTER_CLASS;
+  const { DIGRAPH, LETTER } = profile;
 
-  // digraph pass
   for (let i = 0; i < s.length - 1; i++) {
     const dg = s.slice(i, i + 2);
-    if (DG[dg as keyof typeof DG]) return DG[dg as keyof typeof DG];
+    if (DIGRAPH[dg as keyof typeof DIGRAPH]) return DIGRAPH[dg as keyof typeof DIGRAPH];
   }
-  // first consonant fallback
   for (const ch of s) {
     if (/[aeiouyë]/i.test(ch)) continue;
-    if (LT[ch as keyof typeof LT]) return LT[ch as keyof typeof LT];
+    if (LETTER[ch as keyof typeof LETTER]) return LETTER[ch as keyof typeof LETTER];
   }
   return "NonSibilantFricative";
 }
 
 
-// This is defined here but needs `toVowel` which is in `index.ts`
-// It will be passed as an argument to avoid circular dependencies.
 export function extractWindowClasses(
   word: string,
   baseSeq: Vowel[],
-  alphabetPref: Alphabet,
+  profile: LangProfile,
   toVowel: (ch: string) => Vowel | null
 ): CClass[] {
-  const alphabet = alphabetPref === "auto" ? detectAlphabet(word) : alphabetPref;
   const s = word.normalize("NFC");
 
-  // indices of base vowels in raw string
   const pos: number[] = [];
   let vi = 0;
   for (let i = 0; i < s.length && vi < baseSeq.length; i++) {
@@ -108,7 +167,7 @@ export function extractWindowClasses(
   for (let k = 0; k < pos.length - 1; k++) {
     windows.push(s.slice(pos[k] + 1, pos[k + 1]));
   }
-  return windows.map(chars => classifyWindow(chars, alphabet));
+  return windows.map(chars => classifyWindow(chars, profile));
 }
 
 export function computeC(voicePath: Vowel[], consClasses: CClass[]): number {
