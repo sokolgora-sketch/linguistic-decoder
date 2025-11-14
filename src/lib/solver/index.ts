@@ -1,33 +1,37 @@
 
 import { VOWELS, Vowel, VOWEL_LEVEL, VOWEL_RING, VOWEL_VALUE } from "./valueTables";
 import type { Analysis, Path, SolveMode } from "./types";
+import { CFG, ENGINE_VERSION } from "./engineConfig";
 
 export type { Analysis, Path, SolveMode, Checksum, Vowel } from "./types";
 
 export type SolveOptions = {
-  beamWidth?: number;
-  maxOps?: number;
-  allowDelete?: boolean;
-  allowClosure?: boolean;
-  opCost?: { sub: number; del: number; ins: number };
-};
-
-const DEFAULTS = {
-  engineVersion: "2025-11-14-core-2",
-  beamWidth: 8,
-  frontierDeltaE: 2
+  beamWidth: number;
+  maxOps: number;
+  allowDelete: boolean;
+  allowClosure: boolean;
+  opCost: { sub: number; del: number; ins: number; };
 };
 
 // --- Base Extraction & Keep Count ---
 function isVowelChar(ch:string){ const c=ch.normalize("NFC"); return /[aeiouy]/i.test(c)||c==="ë"||c==="Ë"; }
 function toVowel(ch:string):Vowel|null{ const u=ch.toUpperCase(); return u==="Ë" ? "Ë" : (["A","E","I","O","U","Y"].includes(u)?(u as Vowel):null); }
-function extractBase(word:string):Vowel[]{ const out:Vowel[]=[]; for(const ch of word.normalize("NFC")){ if(!isVowelChar(ch))continue; const v=toVowel(ch)!; if(out.length && out[out.length-1]===v)continue; out.push(v);} return out; }
+function extractBase(word:string):Vowel[]{ 
+    const out:Vowel[]=[]; 
+    for(const ch of word.normalize("NFC")){ 
+        if(!isVowelChar(ch))continue; 
+        const v=toVowel(ch)!; 
+        if(CFG.norm.collapseDupes && out.length && out[out.length-1]===v) continue; 
+        out.push(v);
+    } 
+    return out; 
+}
 function keptCount(base:Vowel[], cand:Vowel[]){ let k=0; for(let i=0;i<Math.min(base.length,cand.length);i++) if(base[i]===cand[i]) k++; return k; }
 
 function normalizeTerminalY(seq: Vowel[], rawWord: string): Vowel[] {
   // Rule N0: English terminal “y” behaves like /i/
   // e.g., study, happy, duty → final Y becomes I
-  if (seq.length && seq[seq.length - 1] === "Y") {
+  if (CFG.norm.terminalYtoI && seq.length && seq[seq.length - 1] === "Y") {
     const out = seq.slice();
     out[out.length - 1] = "I";
     return out;
@@ -38,8 +42,12 @@ function normalizeTerminalY(seq: Vowel[], rawWord: string): Vowel[] {
 
 // --- Path Scoring ---
 const checksumV = (p: Vowel[]) => p.reduce((acc,v)=> acc*VOWEL_VALUE[v], 1);
-const ringPenalty = (p:Vowel[]) => { let d=0; for(let i=0;i<p.length-1;i++) d+=Math.abs(VOWEL_RING[p[i]]-VOWEL_RING[p[i+1]]); return d;};
+const ringPenalty = (p:Vowel[]) => { 
+    if (CFG.ringJumpPenalty === 0) return 0;
+    let d=0; for(let i=0;i<p.length-1;i++) d+=Math.abs(VOWEL_RING[p[i]]-VOWEL_RING[p[i+1]]); return d * CFG.ringJumpPenalty;
+};
 function preferClosureTie(a: Vowel[], b: Vowel[]): number {
+  if (!CFG.preferClosureË) return 0;
   const enda = a[a.length - 1] === "Ë" ? 0 : 1;
   const endb = b[b.length - 1] === "Ë" ? 0 : 1;
   return enda - endb;
@@ -64,7 +72,7 @@ function opCostFromLabel(op: string, costs: { sub: number; del: number; ins: num
   return costs.sub;
 }
 
-function mkPath(base: Vowel[], seq: Vowel[], E: number, ops: string[], opCosts: { sub: number; del: number; ins: number; }): Path {
+function mkPath(base: Vowel[], seq: Vowel[], E: number, ops: string[]): Path {
     const p: Path = {
         vowelPath: seq,
         ringPath: seq.map(v=>VOWEL_RING[v]),
@@ -73,9 +81,8 @@ function mkPath(base: Vowel[], seq: Vowel[], E: number, ops: string[], opCosts: 
         kept: keptCount(base, seq),
         ops,
     };
-    // Note: E includes gravity and penalties, so it won't perfectly match op costs.
-    // This is an area for future refinement if exact cost tracking is needed.
-    // const Ecalc = ops.reduce((s,op)=>s+opCostFromLabel(op, opCosts),0);
+    // Note: E includes penalties, so it won't perfectly match op costs.
+    // const Ecalc = ops.reduce((s,op)=>s+opCostFromLabel(op, {sub: CFG.cost.sub, del: CFG.cost.del, ins: CFG.cost.insClosure}),0);
     // if (Ecalc !== E) { console.warn(`Energy mismatch E=${E} sum(ops)=${Ecalc} ops=${ops.join(',')}`); }
 
     if (p.kept > Math.min(base.length, seq.length)) {
@@ -89,7 +96,7 @@ function mkPath(base: Vowel[], seq: Vowel[], E: number, ops: string[], opCosts: 
 function neighbors(base: Vowel[], st: State, opts: SolveOptions): State[] {
   const out: State[] = [];
   const seq = st.seq;
-  const { allowDelete = true, allowClosure = true, opCost = { sub:1, del:3, ins:2 } } = opts;
+  const { allowDelete = true, allowClosure = true, opCost = { sub:CFG.cost.sub, del:CFG.cost.del, ins:CFG.cost.insClosure } } = opts;
 
   // substitute
   for (let i=0;i<seq.length;i++){
@@ -124,8 +131,8 @@ function solveWord(word: string, opts: SolveOptions): Omit<Analysis, "word" | "m
 
   const baseSeq = base.length ? base : (["O"] as Vowel[]);
 
-  const K = opts.beamWidth ?? DEFAULTS.beamWidth;
-  const maxOps = opts.maxOps ?? 1;
+  const K = opts.beamWidth;
+  const maxOps = opts.maxOps;
 
   let paths: Path[] = [];
   const q: State[] = [{ seq: baseSeq, E: 0, ops: [] }];
@@ -136,7 +143,7 @@ function solveWord(word: string, opts: SolveOptions): Omit<Analysis, "word" | "m
     if (st.ops.length > maxOps) continue;
     
     // Add current state to solutions
-    const p = mkPath(baseSeq, st.seq, st.E, st.ops, opts.opCost!);
+    const p = mkPath(baseSeq, st.seq, st.E, st.ops);
     paths.push(p);
 
     // Get next states
@@ -166,7 +173,7 @@ function solveWord(word: string, opts: SolveOptions): Omit<Analysis, "word" | "m
 
   const frontier = uniqPaths
     .slice(1, K)
-    .filter(p => p.checksums.find(c => c.type === "E")!.value <= primary.checksums.find(c => c.type === "E")!.value + DEFAULTS.frontierDeltaE);
+    .filter(p => p.checksums.find(c => c.type === "E")!.value <= primary.checksums.find(c => c.type === "E")!.value + CFG.frontierDeltaE);
   
   const signals = [
       `base_raw=${rawBase.join("") || "-"}`,
@@ -175,7 +182,7 @@ function solveWord(word: string, opts: SolveOptions): Omit<Analysis, "word" | "m
   ];
 
   return {
-    engineVersion: DEFAULTS.engineVersion,
+    engineVersion: ENGINE_VERSION,
     primaryPath: primary,
     frontierPaths: frontier,
     signals,
@@ -184,7 +191,7 @@ function solveWord(word: string, opts: SolveOptions): Omit<Analysis, "word" | "m
 
 
 export function solveMatrix(word: string, options: SolveOptions): Analysis {
-  const mode = (options.maxOps ?? 2) > 1 ? "open" : "strict";
+  const mode = options.maxOps > 1 ? "open" : "strict";
   const analysis = solveWord(word, options);
 
   return {

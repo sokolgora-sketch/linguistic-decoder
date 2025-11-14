@@ -1,11 +1,10 @@
 
 import { NextResponse, type NextRequest } from 'next/server';
-import { solveMatrix, type Analysis, type Path, type Checksum, type SolveMode, type SolveOptions } from '@/lib/solver';
-
-const ENGINE_VERSION = "2025-11-14-core-2";
+import { solveMatrix, type SolveOptions } from '@/lib/solver';
+import { ENGINE_VERSION, CFG } from '@/lib/solver/engineConfig';
 
 // Helper to transform the checksums array into an object
-const formatChecksums = (checksums: Checksum[]) => {
+const formatChecksums = (checksums: {type: 'V'|'E'|'C', value:number}[]) => {
   return checksums.reduce((acc, curr) => {
     acc[curr.type] = curr.value;
     return acc;
@@ -13,22 +12,7 @@ const formatChecksums = (checksums: Checksum[]) => {
 };
 
 // Helper to transform a Path object to the specified format
-const formatPath = (path: Path) => {
-  const E = path.checksums.find(c => c.type === 'E')?.value ?? 0;
-  
-  // Note: This check is disabled for now as the core engine's E value includes
-  // more than just op costs (e.g. gravity, penalties). A more sophisticated
-  // validation could be re-introduced if needed.
-  // const opCost = { sub: 1, del: 3, ins: 2 };
-  // const Ecalc = (path.ops || []).reduce((s, op) => {
-  //   if (op.includes("→")) return s + opCost.sub;
-  //   if (op.startsWith("delete")) return s + opCost.del;
-  //   if (op.startsWith("closure")) return s + opCost.ins;
-  //   if (op.startsWith("insert")) return s + opCost.ins;
-  //   return s;
-  // }, 0);
-  // if (Ecalc !== E) { console.warn(`Energy mismatch for ${path.vowelPath.join("")}: calc=${Ecalc} engine=${E}`); }
-
+const formatPath = (path: any) => {
   return {
     voice_path: path.vowelPath,
     ring_path: path.ringPath,
@@ -54,8 +38,8 @@ export async function POST(request: NextRequest) {
     
     const strict = mode === "strict";
     const opts: SolveOptions = strict
-      ? { beamWidth: 8, maxOps: 1, allowDelete: false, allowClosure: false, opCost: { sub:1, del:3, ins:2 } }
-      : { beamWidth: 8, maxOps: 2, allowDelete: true,  allowClosure: true,  opCost: { sub:1, del:3, ins:2 } };
+      ? { beamWidth: CFG.beamWidth, maxOps: CFG.maxOpsStrict, allowDelete: false, allowClosure: false, opCost: { sub: CFG.cost.sub, del: CFG.cost.del, ins: CFG.cost.insClosure } }
+      : { beamWidth: CFG.beamWidth, maxOps: CFG.maxOpsOpen,   allowDelete: true,  allowClosure: true,  opCost: { sub: CFG.cost.sub, del: CFG.cost.del, ins: CFG.cost.insClosure } };
 
 
     // Run the solver
