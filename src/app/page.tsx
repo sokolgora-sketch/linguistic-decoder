@@ -42,7 +42,9 @@ export default function LinguisticDecoderApp(){
   useEffect(() => {
     // This is a pre-fetch, so we don't handle errors here.
     // analyzeClient is designed to be robust.
-    analyzeClient(debouncedWord.trim(), mode, alphabet).catch(() => {/* prefetch failed, do nothing */});
+    if (debouncedWord.trim()) {
+      analyzeClient(debouncedWord.trim(), mode, alphabet).catch(() => {/* prefetch failed, do nothing */});
+    }
   }, [debouncedWord, mode, alphabet]);
   
 
@@ -67,15 +69,25 @@ export default function LinguisticDecoderApp(){
       console.debug("Primary Path object:", normalizedPayload.primaryPath);
 
       // 3. Call the AI flow with the guaranteed-correct data shape
-      let finalPayload = normalizedPayload;
+      let finalPayload = { ...normalizedPayload, languageFamilies: normalizedPayload.languageFamilies ?? null };
+
       if (!normalizedPayload.cacheHit) {
           try {
             const mappingInput = toMappingRecord(normalizedPayload);
             const mappingResult = await mapWordToLanguageFamilies(mappingInput);
-            finalPayload = { ...normalizedPayload, languageFamilies: mappingResult?.candidates_map || null };
+            finalPayload.languageFamilies = mappingResult?.candidates_map || null;
+
+            // IMPORTANT: Save the AI-enhanced payload back to the cache
+            await analyzeClient(useWord, useMode, useAlphabet, {
+              bypass: true, // Force a write
+              skipWrite: false,
+              payload: finalPayload, // Provide the payload to write
+            });
+
           } catch(aiError: any) {
             console.warn("AI mapping failed, showing results without it.", aiError.message);
-            // Non-fatal, we can still show the main analysis
+            // Non-fatal, we can still show the main analysis. Ensure languageFamilies is null.
+            finalPayload.languageFamilies = null;
           }
       }
       
@@ -106,6 +118,7 @@ export default function LinguisticDecoderApp(){
         windowClasses: ["Plosive"],
         signals: ["smoke-test-signal"],
         solveMs: 1,
+        languageFamilies: null,
     };
     try {
         const normalized = normalizeEnginePayload(mock);
@@ -229,7 +242,7 @@ export default function LinguisticDecoderApp(){
         {data ? (
           <>
             <ResultsDisplay analysis={data} />
-            {data?.languageFamilies && <Candidates map={data.languageFamilies} />}
+            {data.languageFamilies && <Candidates map={data.languageFamilies} />}
           </>
         ) : null}
 
@@ -319,7 +332,5 @@ export default function LinguisticDecoderApp(){
     </div>
   );
 }
-
-    
 
     
