@@ -2,7 +2,7 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { solveMatrix, type SolveOptions, extractBase, normalizeTerminalY, type Vowel } from '@/lib/solver';
 import { ENGINE_VERSION, CFG, Alphabet } from '@/lib/solver/engineConfig';
-import { chooseProfile, readWindowsDebug } from '@/lib/solver/valueTables';
+import { chooseProfile, readWindowsDebug, checksumV } from '@/lib/solver/valueTables';
 
 
 // Helper to transform a Path object to the specified format
@@ -49,13 +49,18 @@ export async function POST(request: NextRequest) {
       : { beamWidth: CFG.beamWidth, maxOps: CFG.maxOpsOpen,   allowDelete: true,  allowClosure: true,  opCost: { sub: CFG.cost.sub, del: CFG.cost.del, ins: CFG.cost.insClosure }, alphabet };
 
 
-    // Run the solver
-    const analysisResult = solveMatrix(w, opts);
-
     // Get windows debug info
     const base = baseSeqFor(w);
     const profile = chooseProfile(w, alphabet === "auto" ? undefined : alphabet);
     const { windows, classes } = readWindowsDebug(w, base, profile);
+    console.log('Consonant windows: ', windows); // before path calculation
+    
+    // Run the solver
+    const analysisResult = solveMatrix(w, opts);
+
+    const primaryPath = analysisResult.primaryPath;
+    console.log('Primary path: ', primaryPath.vowelPath);
+    console.log('Checksums: ', checksumV(primaryPath.vowelPath));
     
     // Format the response to match the specification
     const formattedResponse = {
@@ -84,3 +89,4 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }
+
