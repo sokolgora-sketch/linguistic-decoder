@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { analyzeWordAction } from './actions';
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Candidates } from "@/components/Candidates";
 import { HistoryPanel, type HistItem } from "@/components/HistoryPanel";
 import { ResultsDisplay } from "@/components/ResultsDisplay";
-import { TwoRailsViz, type TwoRailsVizHandle } from "@/components/TwoRailsViz";
+import { TwoRailsViz } from "@/components/TwoRailsViz";
 
 
 // ==== Types matching the /analyzeWord response ===============================
@@ -70,7 +70,6 @@ export default function LinguisticDecoderApp(){
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [showDebug, setShowDebug] = useState(false);
-  const vizRef = useRef<TwoRailsVizHandle>(null);
 
   const canAnalyze = word.trim().length > 0 && !loading;
 
@@ -82,11 +81,6 @@ export default function LinguisticDecoderApp(){
       setData(null); // Clear previous results immediately
       setLoading(true); setErr(null);
       
-      vizRef.current?.triggerAnalysis({
-        word: useWord,
-        voicePath: [], // Pass empty path to start scan
-      });
-      
       const res = await analyzeWordAction({ word: useWord, mode: useMode });
 
       if (!res.ok) {
@@ -96,12 +90,6 @@ export default function LinguisticDecoderApp(){
       }
       const j = res.data as AnalyzeResponse;
       setData(j);
-      
-      // Inject final result into viz
-      vizRef.current?.triggerAnalysis({
-        word: j.analysis.word,
-        voicePath: j.analysis.primary.voice_path,
-      });
 
       // Save local history
       if (j?.analysis.primary?.voice_path) {
@@ -115,6 +103,7 @@ export default function LinguisticDecoderApp(){
   }
 
   const analysis = data?.analysis;
+  const primaryPath = analysis?.primary.voice_path || [];
   
   return (
     <div>
@@ -151,11 +140,14 @@ export default function LinguisticDecoderApp(){
 
       {/* Visualization & Results */}
       <div className="max-w-5xl mx-auto px-4 grid grid-cols-1 gap-4">
-        <TwoRailsViz
-            ref={vizRef}
-            initialWord={word}
-            initialVoicePath={data?.analysis.primary.voice_path || []}
-        />
+        <div className="flex justify-center">
+            <TwoRailsViz
+                word={data?.analysis.word || word}
+                path={primaryPath as any}
+                running={loading}
+                playKey={`${data?.analysis.word}|${primaryPath.join('')}`}
+            />
+        </div>
         {analysis ? (
           <>
             <ResultsDisplay analysis={analysis} />
