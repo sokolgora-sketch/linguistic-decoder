@@ -17,12 +17,12 @@ type ConsonantClassInfo = {
 };
 
 const referenceData: ConsonantClassInfo[] = [
-    { class: "Plosive", examples: "p, b, t, d, k, g, q, c", preferredDeltaRing: "2–3", voiceAlign: "A" },
-    { class: "Affricate", examples: "ch, j, dz, ts, dʒ, tʃ", preferredDeltaRing: "1–2", voiceAlign: "I" },
+    { class: "Plosive", examples: "p, b, t, d, k, g, q, c, ck, gj", preferredDeltaRing: "2–3", voiceAlign: "A" },
+    { class: "Affricate", examples: "ch, j, dz, ts, dʒ, tʃ, ç, xh", preferredDeltaRing: "1–2", voiceAlign: "I" },
     { class: "Sibilant Fricative", examples: "s, z, sh, zh, x", preferredDeltaRing: "1–2", voiceAlign: "Y" },
-    { class: "Non-sibilant Fricative", examples: "f, v, h, th, ph", preferredDeltaRing: "1", voiceAlign: "E" },
-    { class: "Nasal", examples: "m, n", preferredDeltaRing: "0–1", voiceAlign: "Ë" },
-    { class: "Liquid", examples: "l, r", preferredDeltaRing: "0–1", voiceAlign: "O" },
+    { class: "Non-sibilant Fricative", examples: "f, v, h, th, ph, dh", preferredDeltaRing: "1", voiceAlign: "E" },
+    { class: "Nasal", examples: "m, n, nj", preferredDeltaRing: "0–1", voiceAlign: "Ë" },
+    { class: "Liquid", examples: "l, r, ll, rr", preferredDeltaRing: "0–1", voiceAlign: "O" },
     { class: "Glide", examples: "w, y", preferredDeltaRing: "0–1", voiceAlign: "U" },
 ];
 
