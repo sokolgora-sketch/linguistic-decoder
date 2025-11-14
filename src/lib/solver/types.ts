@@ -33,3 +33,5 @@ export type Analysis = {
 };
 
 export type SolveMode = "strict" | "open";
+
+    
