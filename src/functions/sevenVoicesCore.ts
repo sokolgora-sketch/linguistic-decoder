@@ -16,6 +16,7 @@ export type SolveOptions = {
   allowDelete: boolean;
   allowClosure: boolean;
   opCost: { sub: number; del: number; insClosure: number };
+  edgeWeight?: number;
 };
 
 export type Path = {
@@ -55,22 +56,20 @@ function mkPath(
   seq: Vowel[],
   E: number,
   ops: string[],
-  edgeInfo: EdgeInfo
+  edgeInfo: EdgeInfo,
+  edgeWeight: number
 ): Path {
   const voicePath = seq;
   let finalE = E;
 
-  // Apply edge bias
+  // Apply edge bias to first and last hops
   if (voicePath.length > 1) {
-    if (edgeInfo.prefix) {
-      const d = Math.abs(VOWEL_RING[voicePath[1]] - VOWEL_RING[voicePath[0]]);
-      finalE += edgeBiasPenalty(d, edgeInfo.prefix.cls);
-    }
-    if (edgeInfo.suffix) {
-      const last = voicePath.length - 1;
-      const d = Math.abs(VOWEL_RING[voicePath[last]] - VOWEL_RING[voicePath[last-1]]);
-      finalE += edgeBiasPenalty(d, edgeInfo.suffix.cls);
-    }
+    const dPrefix = Math.abs(VOWEL_RING[voicePath[1]] - VOWEL_RING[voicePath[0]]);
+    finalE += edgeBiasPenalty(dPrefix, edgeInfo.prefix?.cls ?? null, edgeWeight);
+
+    const lastHopIdx = voicePath.length - 2;
+    const dSuffix = Math.abs(VOWEL_RING[voicePath[lastHopIdx + 1]] - VOWEL_RING[voicePath[lastHopIdx]]);
+    finalE += edgeBiasPenalty(dSuffix, edgeInfo.suffix?.cls ?? null, edgeWeight);
   }
 
 
@@ -169,7 +168,8 @@ export function solveWord(word: string, opts: SolveOptions, alphabet: string) {
 
     const profile = chooseProfile(word, alphabet === "auto" ? undefined : alphabet);
     const { windows, classes: consClasses, edge, edgeWindows } = readWindowsDebug(word, baseSeq, profile);
-    
+    const edgeWeight = typeof opts.edgeWeight === "number" ? opts.edgeWeight : 0.25;
+
     const K = opts.beamWidth;
     const maxOps = opts.maxOps;
 
@@ -181,7 +181,7 @@ export function solveWord(word: string, opts: SolveOptions, alphabet: string) {
         const st = q.shift()!;
         if (st.ops.length > maxOps) continue;
         
-        const p = mkPath(baseSeq, consClasses, st.seq, st.E, st.ops, edge);
+        const p = mkPath(baseSeq, consClasses, st.seq, st.E, st.ops, edge, edgeWeight);
         paths.push(p);
 
         const nextStates = neighbors(st, opts);
@@ -221,6 +221,7 @@ export function solveWord(word: string, opts: SolveOptions, alphabet: string) {
         frontierPaths: frontier,
         windows,
         windowClasses: consClasses,
+        edgeWindows,
         signals,
     };
 }
