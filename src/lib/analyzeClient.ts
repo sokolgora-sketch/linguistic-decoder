@@ -1,16 +1,16 @@
 
 import { db, ensureAnon, auth } from "@/lib/firebase";
 import { doc, getDoc, setDoc, serverTimestamp, collection, addDoc } from "firebase/firestore";
-import { normalizeEnginePayload, type EnginePayload } from "@/shared/engineShape";
+import { normalizeEnginePayload, type EnginePayload, type Vowel, LanguageFamily } from "@/shared/engineShape";
 import { logError } from "./logError";
 
 // Browser-safe engine code:
 import { solveWord } from "@/functions/sevenVoicesCore";
-import type { SolveOptions, Vowel } from "@/functions/sevenVoicesCore";
+import type { SolveOptions } from "@/functions/sevenVoicesCore";
 import { mapWordToLanguageFamilies } from "@/lib/mapper";
 import { sanitizeForFirestore } from "@/lib/sanitize";
 import { getManifest } from "@/engine/manifest";
-import { autoDetectAlphabet } from "./alphabet/autoAlphabet";
+import { detectAlphabetFair } from "./alphabet/autoDetect";
 
 
 type Mode = "strict" | "open";
@@ -33,7 +33,9 @@ function computeLocal(word: string, mode: Mode, alphabet: Alphabet, edgeWeight?:
   const strict = mode === "strict";
   const opCost = manifest.opCost;
 
-  const effectiveAlphabet = autoDetectAlphabet(word, alphabet);
+  // Initial detection without voice path to determine solver alphabet
+  const initialDet = detectAlphabetFair(word, [], alphabet);
+  const effectiveAlphabet = initialDet.winner;
 
   const opts: SolveOptions = {
     beamWidth: 8,
@@ -47,6 +49,19 @@ function computeLocal(word: string, mode: Mode, alphabet: Alphabet, edgeWeight?:
   };
 
   const analysisResult = solveWord(word, opts, effectiveAlphabet);
+  
+  // Now, run detection *again* with the voice path to get final family scores
+  const finalDet = detectAlphabetFair(word, analysisResult.primaryPath.voicePath, alphabet);
+
+  const languageFamilies: LanguageFamily[] = finalDet.scores.map(s => ({
+    familyId: s.family,
+    label: s.family.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+    confidence: s.score / 100,
+    rationale: "", // No rationale from this detector
+    forms: [],
+    signals: [],
+  }));
+
 
   // Construct canonical, then pass through normalizer (paranoid but consistent)
   return normalizeEnginePayload({
@@ -56,6 +71,7 @@ function computeLocal(word: string, mode: Mode, alphabet: Alphabet, edgeWeight?:
     alphabet: effectiveAlphabet, // Return the effective alphabet
     solveMs: Date.now() - t0,
     cacheHit: false,
+    languageFamilies,
   });
 }
 
@@ -63,57 +79,51 @@ export async function analyzeClient(word: string, mode: Mode, alphabet: Alphabet
   await ensureAnon();
   const manifest = getManifest();
 
-  // Use the effective alphabet for the cache key
-  const effectiveAlphabet = autoDetectAlphabet(word, alphabet);
+  // Initial detection to get a consistent cache key
+  const initialDet = detectAlphabetFair(word, [], alphabet);
+  const effectiveAlphabet = initialDet.winner;
   const cacheId = `${word}|${mode}|${effectiveAlphabet}|${manifest.version}|ew:${opts.edgeWeight ?? manifest.edgeWeight}`;
   
   const cacheRef = doc(db, "analyses", cacheId);
-  const useAiForMapping = opts.useAi ?? false;
 
   try {
     // BYPASS / WRITE-THROUGH: compute fresh or use provided payload, skip cache read
     if (opts.bypass) {
       const payloadToUse = opts.payload ? normalizeEnginePayload(opts.payload) : computeLocal(word, mode, alphabet, opts.edgeWeight);
-      const families = await mapWordToLanguageFamilies(payloadToUse.word, payloadToUse.primaryPath.voicePath, useAiForMapping);
-      const enrichedPayload = { ...payloadToUse, languageFamilies: families ?? [] };
       
       if (!opts.skipWrite) {
-        const cleanPayload = sanitizeForFirestore(enrichedPayload);
+        const cleanPayload = sanitizeForFirestore(payloadToUse);
         await setDoc(cacheRef, { ...cleanPayload, cachedAt: serverTimestamp() }, { merge: true });
       }
       
-      void saveHistory(cacheId, enrichedPayload, "bypass");
-      return { ...enrichedPayload, recomputed: true, cacheHit: false };
+      void saveHistory(cacheId, payloadToUse, "bypass");
+      return { ...payloadToUse, recomputed: true, cacheHit: false };
     }
 
     // Try cache -> normalize (in case older writes used a different shape)
     const snap = await getDoc(cacheRef);
     if (snap.exists()) {
       const normalized = normalizeEnginePayload(snap.data());
-      // If cached version doesn't have families, compute them now.
-      if (!normalized.languageFamilies || normalized.languageFamilies.length === 0) {
-        const families = await mapWordToLanguageFamilies(normalized.word, normalized.primaryPath.voicePath, useAiForMapping);
-        normalized.languageFamilies = families;
-        // Asynchronously update cache with families
-        if (!opts.skipWrite) {
-          const cleanPayload = sanitizeForFirestore(normalized);
-          setDoc(cacheRef, { ...cleanPayload, cachedAt: serverTimestamp() }, { merge: true }).catch(e => logError({ where: "analyzeClient-cache-update", message: e.message }));
-        }
-      }
+      // Re-run detection to ensure families are up to date with latest logic
+      const det = detectAlphabetFair(word, normalized.primaryPath.voicePath, alphabet);
+      normalized.languageFamilies = det.scores.map(s => ({
+          familyId: s.family,
+          label: s.family.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+          confidence: s.score / 100,
+          rationale: "", forms: [], signals: [],
+      }));
+      
       void saveHistory(cacheId, normalized, "cache");
       return { ...normalized, cacheHit: true, recomputed: false };
     }
 
-    // Miss → compute → map → write → return
+    // Miss → compute → write → return
     const fresh = computeLocal(word, mode, alphabet, opts.edgeWeight);
-    const families = await mapWordToLanguageFamilies(fresh.word, fresh.primaryPath.voicePath, useAiForMapping);
-    const enriched = { ...fresh, languageFamilies: families ?? [] };
-
-    const cleanFresh = sanitizeForFirestore(enriched);
+    const cleanFresh = sanitizeForFirestore(fresh);
 
     await setDoc(cacheRef, { ...cleanFresh, cachedAt: serverTimestamp() }, { merge: false });
-    void saveHistory(cacheId, enriched, "fresh");
-    return { ...enriched, cacheHit: false, recomputed: false };
+    void saveHistory(cacheId, fresh, "fresh");
+    return { ...fresh, cacheHit: false, recomputed: false };
   } catch (e: any) {
     logError({ where: "analyzeClient", message: e.message, detail: { word, mode, alphabet, stack: e.stack } });
     throw e; // re-throw to be caught by UI
@@ -174,7 +184,8 @@ export async function prefetchAnalyze(
   }
   await ensureAnon();
   const manifest = getManifest();
-  const effectiveAlphabet = autoDetectAlphabet(word, alphabet);
+  const initialDet = detectAlphabetFair(word, [], alphabet);
+  const effectiveAlphabet = initialDet.winner;
   const cacheId = `${word}|${mode}|${effectiveAlphabet}|${manifest.version}|ew:${manifest.edgeWeight}`;
   if (PREFETCH_SEEN.has(cacheId)) {
     callbacks?.onFinish?.();
@@ -193,9 +204,7 @@ export async function prefetchAnalyze(
 
   try {
     const fresh = computeLocal(word, mode, alphabet);
-    const families = await mapWordToLanguageFamilies(fresh.word, fresh.primaryPath.voicePath, false); // always use local for prefetch
-    const enriched = { ...fresh, languageFamilies: families ?? [] };
-    const cleanFresh = sanitizeForFirestore(enriched);
+    const cleanFresh = sanitizeForFirestore(fresh);
     await setDoc(cacheRef, { ...cleanFresh, cachedAt: serverTimestamp() }, { merge: false });
 
   } catch (e) {

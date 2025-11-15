@@ -11,8 +11,18 @@ export function Candidates({ items }: { items?: LanguageFamily[] }) {
   if (visibleFamilies.length === 0) return null;
 
   // A simple way to get dialect from rationale if it exists.
-  const getDialect = (rationale?: string) => {
-    const match = rationale?.match(/dialect: (geg|tosk)/);
+  const getDialect = (family: LanguageFamily) => {
+    // The new detector doesn't put dialect in rationale, so we check familyId
+    if (family.familyId !== 'albanian') return null;
+    
+    // Heuristic: if rationale contains Gegë/Tosk cues, use them.
+    // This part is less critical now that the main detector is better.
+    const r = family.rationale?.toLowerCase() || "";
+    if (r.includes('geg')) return 'geg';
+    if (r.includes('tosk')) return 'tosk';
+    
+    // Fallback for older data or different rationale formats
+    const match = r.match(/dialect: (geg|tosk)/);
     return match?.[1];
   };
 
@@ -21,7 +31,7 @@ export function Candidates({ items }: { items?: LanguageFamily[] }) {
       <h3 className="font-bold text-sm tracking-wide mb-2">Language Family Candidates</h3>
       <div className="space-y-2">
         {visibleFamilies.map((f, i) => {
-          const dialect = getDialect(f.rationale);
+          const dialect = getDialect(f);
           return (
             <Card key={f.familyId || i} className="p-2.5 text-sm border-primary/50">
                <div className="flex items-center gap-2">
