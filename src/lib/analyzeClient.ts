@@ -10,7 +10,7 @@ import type { SolveOptions, Vowel } from "@/functions/sevenVoicesCore";
 import { mapWordToLanguageFamilies } from "@/lib/mapper";
 import { sanitizeForFirestore } from "@/lib/sanitize";
 import { getManifest } from "@/engine/manifest";
-import { chooseProfile } from "@/functions/languages";
+import { autoDetectAlphabet } from "./alphabet/autoAlphabet";
 
 
 type Mode = "strict" | "open";
@@ -33,8 +33,7 @@ function computeLocal(word: string, mode: Mode, alphabet: Alphabet, edgeWeight?:
   const strict = mode === "strict";
   const opCost = manifest.opCost;
 
-  const profile = chooseProfile(word, alphabet === "auto" ? undefined : alphabet);
-  const effectiveAlphabet = profile.id;
+  const effectiveAlphabet = autoDetectAlphabet(word, alphabet);
 
   const opts: SolveOptions = {
     beamWidth: 8,
@@ -65,8 +64,7 @@ export async function analyzeClient(word: string, mode: Mode, alphabet: Alphabet
   const manifest = getManifest();
 
   // Use the effective alphabet for the cache key
-  const profile = chooseProfile(word, alphabet === "auto" ? undefined : alphabet);
-  const effectiveAlphabet = profile.id;
+  const effectiveAlphabet = autoDetectAlphabet(word, alphabet);
   const cacheId = `${word}|${mode}|${effectiveAlphabet}|${manifest.version}|ew:${opts.edgeWeight ?? manifest.edgeWeight}`;
   
   const cacheRef = doc(db, "analyses", cacheId);
@@ -176,8 +174,7 @@ export async function prefetchAnalyze(
   }
   await ensureAnon();
   const manifest = getManifest();
-  const profile = chooseProfile(word, alphabet === "auto" ? undefined : alphabet);
-  const effectiveAlphabet = profile.id;
+  const effectiveAlphabet = autoDetectAlphabet(word, alphabet);
   const cacheId = `${word}|${mode}|${effectiveAlphabet}|${manifest.version}|ew:${manifest.edgeWeight}`;
   if (PREFETCH_SEEN.has(cacheId)) {
     callbacks?.onFinish?.();

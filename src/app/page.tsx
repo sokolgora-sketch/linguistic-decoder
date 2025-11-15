@@ -48,6 +48,7 @@ export default function LinguisticDecoderApp(){
   const [loading, setLoading] = useState(false);
   const [isWarming, setIsWarming] = useState(false);
   const [showDebug, setShowDebug] = useState(false);
+  const [useAi, setUseAi] = useState(false);
 
   // Debounce user input, then warm the cache in the background
   const debouncedWord = useDebounced(word, 450);
@@ -55,9 +56,9 @@ export default function LinguisticDecoderApp(){
     // This is a pre-fetch, so we don't handle errors here.
     // analyzeClient is designed to be robust.
     if (debouncedWord.trim()) {
-      analyzeClient(debouncedWord.trim(), mode, alphabet, { edgeWeight }).catch(() => {/* prefetch failed, do nothing */});
+      analyzeClient(debouncedWord.trim(), mode, alphabet, { edgeWeight, useAi }).catch(() => {/* prefetch failed, do nothing */});
     }
-  }, [debouncedWord, mode, alphabet, edgeWeight]);
+  }, [debouncedWord, mode, alphabet, edgeWeight, useAi]);
   
 
   const canAnalyze = word.trim().length > 0 && !loading;
@@ -77,7 +78,7 @@ export default function LinguisticDecoderApp(){
     setData(null);
     try {
       // 1. Get raw result from API or cache
-      const clientResponse = await analyzeClient(useWord, useMode, useAlphabet, { edgeWeight });
+      const clientResponse = await analyzeClient(useWord, useMode, useAlphabet, { edgeWeight, useAi });
       console.log("API result:", clientResponse);
 
       // 2. GUARANTEE the shape
@@ -174,7 +175,8 @@ export default function LinguisticDecoderApp(){
           const result = await analyzeClient(word, (m as any) || mode, (a as any) || alphabet, {
             bypass: true,
             skipWrite: false,
-            edgeWeight
+            edgeWeight,
+            useAi
           });
           setData(result);
           toast({ title: "Recomputed", description: `Fresh analysis for '${result.word}' complete.` });
@@ -243,6 +245,10 @@ export default function LinguisticDecoderApp(){
                 value={edgeWeight} onChange={e=>setEdgeWeight(Number(e.target.value))}
                 className="w-32"
               />
+              <label className="flex items-center gap-2 text-sm ml-4">
+                  <input type="checkbox" checked={useAi} onChange={e=> setUseAi(e.target.checked)} className="w-4 h-4 rounded text-primary focus:ring-primary" />
+                  Use AI Mapper
+              </label>
           </div>
           {err && (
             <div className="mt-2.5 border border-red-300 bg-red-50 text-red-800 text-sm p-2 rounded">
