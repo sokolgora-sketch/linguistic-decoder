@@ -201,8 +201,8 @@ export default function LinguisticDecoderApp(){
   const signals = data?.signals?.join(" · ") || "";
   
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 p-4 lg:p-8 max-w-7xl mx-auto">
-       <main className="lg:col-span-2 space-y-4">
+    <div className="p-4 lg:p-8 max-w-4xl mx-auto">
+       <main className="space-y-4">
         {/* Header */}
         <header className="p-6 border-b-4 border-primary bg-background -mx-6 -mt-8">
           <div className="max-w-5xl mx-auto flex justify-between items-center">
@@ -311,6 +311,18 @@ export default function LinguisticDecoderApp(){
               <ConsonantReference />
             </AccordionContent>
           </AccordionItem>
+          <AccordionItem value="item-4">
+            <AccordionTrigger>History</AccordionTrigger>
+            <AccordionContent>
+                <HistoryPanel onLoadAnalysis={onLoadAnalysis} onRecompute={onRecompute} />
+            </AccordionContent>
+          </AccordionItem>
+          <AccordionItem value="item-5">
+            <AccordionTrigger>Batch Evaluation</AccordionTrigger>
+            <AccordionContent>
+                <EvalPanel />
+            </AccordionContent>
+          </AccordionItem>
         </Accordion>
 
         {/* Debug view */}
@@ -332,17 +344,8 @@ export default function LinguisticDecoderApp(){
         )}
       </main>
 
-      <aside className="lg:col-span-1 space-y-4">
-          <Card className="p-4">
-              <h2 className="text-xl font-semibold mb-2">History</h2>
-              <HistoryPanel onLoadAnalysis={onLoadAnalysis} onRecompute={onRecompute} />
-          </Card>
-          <EvalPanel />
-      </aside>
-
-
       {/* Footer */}
-      <footer className="p-6 opacity-80 lg:col-span-3">
+      <footer className="p-6 opacity-80">
         <div className="max-w-7xl mx-auto text-xs text-slate-500 flex justify-between items-start">
           <div className="font-code flex-1">
             {data && (
@@ -377,5 +380,7 @@ export default function LinguisticDecoderApp(){
     </div>
   );
 }
+
+    
 
     
