@@ -97,7 +97,7 @@ export default function LinguisticDecoderApp(){
         windowClasses: ["Plosive"],
         signals: ["smoke-test-signal"],
         solveMs: 1,
-        languageFamilies: null,
+        languageFamilies: [],
     };
     try {
         const normalized = normalizeEnginePayload(mock);
@@ -360,5 +360,3 @@ export default function LinguisticDecoderApp(){
     </div>
   );
 }
-
-    
