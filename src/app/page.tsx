@@ -25,6 +25,7 @@ import HistoryPanel from "@/components/HistoryPanel";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import FooterBuild from "@/components/FooterBuild";
+import { allowAnalyze } from "@/lib/throttle";
 
 
 // ==== Main App ===============================================================
@@ -54,6 +55,10 @@ export default function LinguisticDecoderApp(){
   const canAnalyze = word.trim().length > 0 && !loading;
 
   async function analyze(nextWord?: string, nextMode?: "strict"|"open", nextAlphabet?: Alphabet){
+    if (!allowAnalyze()) { 
+      toast({ variant: "destructive", title: "Too many requests", description: "Please try again in a few moments." }); 
+      return; 
+    }
     const useWord = (nextWord ?? word).trim();
     const useMode: "strict"|"open" = nextMode ?? mode;
     const useAlphabet = nextAlphabet ?? alphabet;
