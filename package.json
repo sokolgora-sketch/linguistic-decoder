@@ -10,7 +10,7 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
-    "test": "jest",
+    "test": "jest -c jest.config.mjs",
     "eval": "ts-node scripts/eval.ts --file data/gold.csv --mode=strict --alphabet=auto --edge=0.25 --manifest=2025-11-15-core-1"
   },
   "dependencies": {
@@ -73,14 +73,5 @@
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.6.3",
     "tsx": "^4.16.2"
-  },
-  "jest": {
-    "preset": "ts-jest",
-    "testEnvironment": "node",
-    "testMatch": [
-      "**/tests/**/*.spec.ts",
-      "**/src/lib/solver/**/*.test.ts",
-      "**/src/lib/solver/**/*.spec.ts"
-    ]
   }
 }
