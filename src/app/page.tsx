@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Candidates } from "@/components/Candidates";
-import { ResultsDisplay } from "@/components/ResultsDisplay";
+import { ResultsDisplay, PrinciplesBlock } from "@/components/ResultsDisplay";
 import { ConsonantReference } from "@/components/ConsonantReference";
 import { TwoRailsWithConsonants } from "@/components/TwoRailsWithConsonants";
 import { analyzeClient } from "@/lib/analyzeClient";
@@ -268,6 +268,7 @@ export default function LinguisticDecoderApp(){
         {data ? (
           <>
             <ResultsDisplay analysis={data} />
+            <PrinciplesBlock engine={data} />
             <Candidates items={data.languageFamilies} />
           </>
         ) : null}
@@ -364,5 +365,3 @@ export default function LinguisticDecoderApp(){
     </div>
   );
 }
-
-    

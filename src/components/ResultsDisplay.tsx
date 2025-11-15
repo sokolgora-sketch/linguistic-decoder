@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import type { CClass } from "@/functions/languages";
 import { classRange } from "@/functions/languages";
 import type { EnginePayload, EnginePath } from "@/shared/engineShape";
+import { summarizePrinciples } from "@/lib/principles";
 
 // Seven‑Voices palette (uses CSS variables from globals.css)
 const VOICE_COLOR: Record<string, string> = {
@@ -133,6 +134,23 @@ function InfoLine({label, value, mono}:{label:string; value:string; mono?:boolea
   );
 }
 
+export function PrinciplesBlock({ engine }: { engine:any }) {
+  if (!engine?.primaryPath?.voicePath?.length) return null;
+  const s = summarizePrinciples(engine);
+  return (
+    <div className="mt-3 border rounded p-2 text-sm">
+      <div className="font-semibold mb-1">Seven Principles</div>
+      <div className="opacity-80">Path: {s.pathLabel}</div>
+      {s.dominant.length > 0 && (
+        <div className="opacity-80">
+          Dominant: {s.dominant.map(x=>`${x.label} (${x.hits})`).join(", ")}
+        </div>
+      )}
+      <div className="opacity-60 text-xs mt-1">7 words: {s.sevenWords}</div>
+    </div>
+  );
+}
+
 export function ResultsDisplay({ analysis }: { analysis: EnginePayload }) {
     const { primaryPath, frontierPaths } = analysis;
 
@@ -143,6 +161,7 @@ export function ResultsDisplay({ analysis }: { analysis: EnginePayload }) {
     return (
         <>
             <PathRow block={primaryPath} title="Primary Path" analysis={analysis} />
+            <PrinciplesBlock engine={analysis} />
             {frontierList.length > 0 && (
               <Card className="p-4">
                 <h3 className="font-bold text-sm tracking-wide">Frontier (near‑optimal alternates)</h3>
@@ -171,5 +190,3 @@ export function ResultsDisplay({ analysis }: { analysis: EnginePayload }) {
         </>
     );
 }
-
-    
