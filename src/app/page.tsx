@@ -26,6 +26,7 @@ import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import FooterBuild from "@/components/FooterBuild";
 import { allowAnalyze } from "@/lib/throttle";
+import WhyThisPath from "@/components/WhyThisPath";
 
 
 // ==== Main App ===============================================================
@@ -274,6 +275,7 @@ export default function LinguisticDecoderApp(){
         {data ? (
           <>
             <ResultsDisplay analysis={data} />
+            {data.primaryPath && <WhyThisPath primary={data.primaryPath} />}
             <PrinciplesBlock engine={data} />
             <Candidates items={data.languageFamilies} />
           </>
