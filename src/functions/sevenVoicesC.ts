@@ -1,4 +1,5 @@
-import { VOWELS, VOWEL_RING } from "./sevenVoicesCore";
+
+import { VOWELS } from "./sevenVoicesCore";
 import type { Vowel } from "./sevenVoicesCore";
 import { chooseProfile, classRange } from "./languages";
 import type { LangProfile, CClass } from "./languages";
@@ -48,12 +49,12 @@ export function normalizeTerminalY(seq: Vowel[], rawWord: string): Vowel[] {
 }
 
 
-export function computeC(voicePath: Vowel[], consClasses: CClass[]): number {
+export function computeC(voicePath: Vowel[], consClasses: CClass[], RING: Record<Vowel, number>): number {
   let c = 0;
   const hops = Math.max(0, voicePath.length - 1);
   for (let i = 0; i < hops; i++) {
     const cls = i < consClasses.length ? consClasses[i] : "Glide";
-    const d = Math.abs(VOWEL_RING[voicePath[i + 1]] - VOWEL_RING[voicePath[i]]);
+    const d = Math.abs(RING[voicePath[i + 1]] - RING[voicePath[i]]);
     const [lo, hi] = classRange(cls);
     if (d < lo) c += lo - d;
     else if (d > hi) c += d - hi;

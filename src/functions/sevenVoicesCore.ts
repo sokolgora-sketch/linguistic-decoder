@@ -2,13 +2,12 @@
 import { ENGINE_VERSION } from "@/shared/engineVersion";
 import { computeC, extractBase, normalizeTerminalY, readWindowsDebug, edgeBiasPenalty, type EdgeInfo } from "./sevenVoicesC";
 import { chooseProfile } from "./languages";
+import { getManifest } from "@/engine/manifest";
 
 export const VOWELS = ["A", "E", "I", "O", "U", "Y", "Ë"] as const;
 export type Vowel = (typeof VOWELS)[number];
 
 export const VOWEL_VALUE: Record<Vowel, number> = { A: 2, E: 3, I: 5, O: 7, U: 11, Y: 13, "Ë": 17 };
-export const VOWEL_RING: Record<Vowel, number> = { A: 3, E: 2, I: 1, O: 0, U: 1, Y: 2, "Ë": 3 };
-export const VOWEL_LEVEL: Record<Vowel, number> = { A: +1, E: +1, I: +1, O: 0, U: -1, Y: -1, "Ë": -1 };
 
 export type SolveOptions = {
   beamWidth: number;
@@ -17,6 +16,7 @@ export type SolveOptions = {
   allowClosure: boolean;
   opCost: { sub: number; del: number; insClosure: number };
   edgeWeight?: number;
+  manifest?: any;
 };
 
 export type Path = {
@@ -57,31 +57,33 @@ function mkPath(
   E: number,
   ops: string[],
   edgeInfo: EdgeInfo,
-  edgeWeight: number
+  edgeWeight: number,
+  RING: Record<Vowel, number>,
+  LVL: Record<Vowel, number>
 ): Path {
   const voicePath = seq;
   let finalE = E;
 
   // Apply edge bias to first and last hops
   if (voicePath.length > 1 && edgeInfo.prefix?.cls) {
-    const dPrefix = Math.abs(VOWEL_RING[voicePath[1]] - VOWEL_RING[voicePath[0]]);
+    const dPrefix = Math.abs(RING[voicePath[1]] - RING[voicePath[0]]);
     finalE += edgeBiasPenalty(dPrefix, edgeInfo.prefix.cls, edgeWeight);
   }
   if (voicePath.length > 1 && edgeInfo.suffix?.cls) {
       const lastHopIdx = voicePath.length - 2;
-      const dSuffix = Math.abs(VOWEL_RING[voicePath[lastHopIdx + 1]] - VOWEL_RING[voicePath[lastHopIdx]]);
+      const dSuffix = Math.abs(RING[voicePath[lastHopIdx + 1]] - RING[voicePath[lastHopIdx]]);
       finalE += edgeBiasPenalty(dSuffix, edgeInfo.suffix.cls, edgeWeight);
   }
 
 
   const p: Path = {
     voicePath,
-    ringPath: voicePath.map((v) => VOWEL_RING[v]),
-    levelPath: voicePath.map((v) => VOWEL_LEVEL[v]),
+    ringPath: voicePath.map((v) => RING[v]),
+    levelPath: voicePath.map((v) => LVL[v]),
     checksums: {
       V: checksumV(voicePath),
       E: finalE,
-      C: computeC(voicePath, consClasses),
+      C: computeC(voicePath, consClasses, RING),
     },
     kept: keptCount(baseSeq, voicePath),
     ops,
@@ -143,10 +145,10 @@ function neighbors(st: State, opts: SolveOptions): State[] {
 }
 
 // --- Path Scoring ---
-const ringPenalty = (p: Vowel[]) => {
+const ringPenalty = (p: Vowel[], RING: Record<Vowel, number>) => {
   let d = 0;
   for (let i = 0; i < p.length - 1; i++)
-    d += Math.abs(VOWEL_RING[p[i]] - VOWEL_RING[p[i + 1]]);
+    d += Math.abs(RING[p[i]] - RING[p[i + 1]]);
   return d;
 };
 function preferClosureTie(a: Vowel[], b: Vowel[]): number {
@@ -155,22 +157,26 @@ function preferClosureTie(a: Vowel[], b: Vowel[]): number {
   return enda - endb;
 }
 
-function scoreTuple(p: Path): [number, number, number, number] {
+function scoreTuple(p: Path, RING: Record<Vowel, number>): [number, number, number, number] {
   const { E, V, C } = p.checksums;
-  return [E, ringPenalty(p.voicePath), C, -p.kept];
+  return [E, ringPenalty(p.voicePath, RING), C, -p.kept];
 }
 
 
 // --- Main Solver ---
 export function solveWord(word: string, opts: SolveOptions, alphabet: string) {
+    const manifest = opts?.manifest ?? getManifest(process.env.NEXT_PUBLIC_ENGINE_VERSION);
+    const RING = manifest.ringIndex;
+    const LVL  = manifest.levelIndex;
+    const EDGE_W = typeof opts.edgeWeight === "number" ? opts.edgeWeight : manifest.edgeWeight;
+
     const rawBase = extractBase(word);
     const base = normalizeTerminalY(rawBase, word);
     const baseSeq = base.length ? base : (["O"] as Vowel[]);
 
     const profile = chooseProfile(word, alphabet === "auto" ? undefined : alphabet);
     const { windows, classes: consClasses, edge, edgeWindows } = readWindowsDebug(word, baseSeq, profile);
-    const edgeWeight = typeof opts.edgeWeight === "number" ? opts.edgeWeight : 0.25;
-
+    
     const K = opts.beamWidth;
     const maxOps = opts.maxOps;
 
@@ -182,7 +188,7 @@ export function solveWord(word: string, opts: SolveOptions, alphabet: string) {
         const st = q.shift()!;
         if (st.ops.length > maxOps) continue;
         
-        const p = mkPath(baseSeq, consClasses, st.seq, st.E, st.ops, edge, edgeWeight);
+        const p = mkPath(baseSeq, consClasses, st.seq, st.E, st.ops, edge, EDGE_W, RING, LVL);
         paths.push(p);
 
         const nextStates = neighbors(st, opts);
@@ -197,7 +203,7 @@ export function solveWord(word: string, opts: SolveOptions, alphabet: string) {
     const uniqPaths = Array.from(new Map(paths.map(p => [p.voicePath.join(""), p])).values());
 
     uniqPaths.sort((p, q) => {
-        const A = scoreTuple(p), B = scoreTuple(q);
+        const A = scoreTuple(p, RING), B = scoreTuple(q, RING);
         for(let i=0; i<A.length; i++) if (A[i] !== B[i]) return A[i] - B[i];
         return preferClosureTie(p.voicePath, q.voicePath);
     });
@@ -226,5 +232,3 @@ export function solveWord(word: string, opts: SolveOptions, alphabet: string) {
         signals,
     };
 }
-
-    
