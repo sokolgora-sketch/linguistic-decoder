@@ -1,7 +1,13 @@
+
 "use client";
 import React, { useState } from "react";
 import { solveWord } from "@/functions/sevenVoicesCore";
 import { getManifest } from "@/engine/manifest";
+import { Button } from "./ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
+import { Card } from "./ui/card";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
+import { Input } from "./ui/input";
 
 type Mode = "strict"|"open";
 type Alphabet = "auto"|"albanian"|"latin"|"sanskrit"|"ancient_greek"|"pie";
@@ -105,29 +111,40 @@ export default function EvalPanel() {
   }
 
   return (
-    <div className="border rounded-lg p-3 space-y-2 bg-card">
-      <div className="font-semibold">Batch Eval</div>
+    <div className="space-y-2">
       <div className="text-xs opacity-80">Upload CSV with headers: <code>word,expected,mode,alphabet</code></div>
       <div className="flex gap-2 items-center">
         <label className="text-xs">Default mode</label>
-        <select className="border rounded px-2 py-1 text-sm bg-background" value={modeDefault} onChange={e=>setModeDefault(e.target.value as Mode)}>
-          <option value="strict">strict</option>
-          <option value="open">open</option>
-        </select>
+        <Select value={modeDefault} onValueChange={(v: Mode) => setModeDefault(v)}>
+          <SelectTrigger className="text-sm h-8">
+            <SelectValue/>
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="strict">strict</SelectItem>
+            <SelectItem value="open">open</SelectItem>
+          </SelectContent>
+        </Select>
         <label className="text-xs">Default alphabet</label>
-        <select className="border rounded px-2 py-1 text-sm bg-background" value={alphabetDefault} onChange={e=>setAlphabetDefault(e.target.value as Alphabet)}>
-          <option value="auto">auto</option>
-          <option value="albanian">albanian</option>
-          <option value="latin">latin</option>
-          <option value="sanskrit">sanskrit</option>
-          <option value="ancient_greek">ancient_greek</option>
-          <option value="pie">pie</option>
-        </select>
+        <Select value={alphabetDefault} onValueChange={(v: Alphabet) => setAlphabetDefault(v)}>
+          <SelectTrigger className="text-sm h-8">
+            <SelectValue/>
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="auto">auto</SelectItem>
+            <SelectItem value="albanian">albanian</SelectItem>
+            <SelectItem value="latin">latin</SelectItem>
+            <SelectItem value="sanskrit">sanskrit</SelectItem>
+            <SelectItem value="ancient_greek">ancient_greek</SelectItem>
+            <SelectItem value="pie">pie</SelectItem>
+          </SelectContent>
+        </Select>
 
-        <label className="border rounded px-2 py-1 text-sm cursor-pointer ml-auto bg-primary text-primary-foreground hover:bg-primary/90">
-          {busy ? "Processing…" : "Upload CSV"}
-          <input type="file" accept=".csv" className="hidden" onChange={onFile} />
-        </label>
+        <Button asChild variant="default" size="sm" className="ml-auto">
+          <label className="cursor-pointer">
+            {busy ? "Processing…" : "Upload CSV"}
+            <Input type="file" accept=".csv" className="hidden" onChange={onFile} />
+          </label>
+        </Button>
       </div>
 
       <div className="text-xs opacity-80">
@@ -137,39 +154,41 @@ export default function EvalPanel() {
 
       {rows.length > 0 && (
         <div className="flex gap-2">
-          <button className="border rounded px-2 py-1 text-sm" onClick={downloadPreds}>Download predictions.csv</button>
-          <button className="border rounded px-2 py-1 text-sm" onClick={downloadConfusion}>Download confusion.csv</button>
+          <Button variant="outline" size="sm" onClick={downloadPreds}>Download predictions.csv</Button>
+          <Button variant="outline" size="sm" onClick={downloadConfusion}>Download confusion.csv</Button>
         </div>
       )}
 
       {rows.length > 0 && (
-        <div className="max-h-64 overflow-auto border rounded">
-          <table className="w-full text-xs">
-            <thead className="bg-gray-50 dark:bg-slate-800">
-              <tr>
-                <th className="text-left p-2">word</th>
-                <th className="text-left p-2">expected</th>
-                <th className="text-left p-2">predicted</th>
-                <th className="text-left p-2">ok</th>
-                <th className="text-left p-2">mode</th>
-                <th className="text-left p-2">alphabet</th>
-              </tr>
-            </thead>
-            <tbody>
+        <Card className="max-h-64 overflow-auto border rounded">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>word</TableHead>
+                <TableHead>expected</TableHead>
+                <TableHead>predicted</TableHead>
+                <TableHead>ok</TableHead>
+                <TableHead>mode</TableHead>
+                <TableHead>alphabet</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
               {rows.map((r,i)=>(
-                <tr key={i} className="odd:bg-white even:bg-slate-50 dark:odd:bg-slate-900/50 dark:even:bg-slate-800/50">
-                  <td className="p-2 font-medium">{r.word}</td>
-                  <td className="p-2 text-green-700 dark:text-green-400">{r.expected}</td>
-                  <td className="p-2 font-semibold">{r.predicted}</td>
-                  <td className="p-2 text-center">{r.ok===null ? "—" : (r.ok ? "✅" : "❌")}</td>
-                  <td className="p-2">{r.mode}</td>
-                  <td className="p-2">{r.alphabet}</td>
-                </tr>
+                <TableRow key={i}>
+                  <TableCell className="font-medium">{r.word}</TableCell>
+                  <TableCell className="text-green-700 dark:text-green-400">{r.expected}</TableCell>
+                  <TableCell className="font-semibold">{r.predicted}</TableCell>
+                  <TableCell className="text-center">{r.ok===null ? "—" : (r.ok ? "✅" : "❌")}</TableCell>
+                  <TableCell>{r.mode}</TableCell>
+                  <TableCell>{r.alphabet}</TableCell>
+                </TableRow>
               ))}
-            </tbody>
-          </table>
-        </div>
+            </TableBody>
+          </Table>
+        </Card>
       )}
     </div>
   );
 }
+
+    
