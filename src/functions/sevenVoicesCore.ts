@@ -1,7 +1,7 @@
 
-import { getManifest } from "@/engine/manifest";
+import { getManifest, EngineManifest } from "@/engine/manifest";
 import { computeC, extractBase, normalizeTerminalY, readWindowsDebug, edgeBiasPenalty, type EdgeInfo } from "./sevenVoicesC";
-import { chooseProfile } from "./languages";
+import { chooseProfile, CClass } from "./languages";
 
 export const VOWELS = ["A", "E", "I", "O", "U", "Y", "Ë"] as const;
 export type Vowel = (typeof VOWELS)[number];
@@ -15,7 +15,7 @@ export type SolveOptions = {
   allowClosure: boolean;
   opCost: { sub: number; del: number; ins: number };
   edgeWeight?: number;
-  manifest?: any;
+  manifest: EngineManifest;
   alphabet: string;
 };
 
@@ -52,7 +52,7 @@ function keptCount(base: Vowel[], cand: Vowel[]) {
 
 function mkPath(
   baseSeq: Vowel[],
-  consClasses: ReturnType<typeof readWindowsDebug>["classes"],
+  consClasses: CClass[],
   seq: Vowel[],
   E: number,
   ops: string[],
@@ -165,7 +165,7 @@ function scoreTuple(p: Path, RING: Record<Vowel, number>): [number, number, numb
 
 // --- Main Solver ---
 export function solveWord(word: string, opts: SolveOptions, alphabet: string) {
-    const manifest = opts?.manifest ?? getManifest(process.env.NEXT_PUBLIC_ENGINE_VERSION);
+    const manifest = opts.manifest;
     const RING = manifest.ringIndex;
     const LVL  = manifest.levelIndex;
     const EDGE_W = typeof opts.edgeWeight === "number" ? opts.edgeWeight : manifest.edgeWeight;
@@ -185,7 +185,8 @@ export function solveWord(word: string, opts: SolveOptions, alphabet: string) {
     const visited = new Set<string>([baseSeq.join("")]);
 
     while (q.length > 0) {
-        const st = q.shift()!;
+        const st = q.shift();
+        if(!st) continue;
         if (st.ops.length > maxOps) continue;
         
         const p = mkPath(baseSeq, consClasses, st.seq, st.E, st.ops, edge, EDGE_W, RING, LVL);
@@ -193,10 +194,10 @@ export function solveWord(word: string, opts: SolveOptions, alphabet: string) {
 
         const nextStates = neighbors(st, opts);
         for (const n of nextStates) {
-        const key = n.seq.join("");
-        if (visited.has(key)) continue;
-        visited.add(key);
-        q.push(n);
+            const key = n.seq.join("");
+            if (visited.has(key)) continue;
+            visited.add(key);
+            q.push(n);
         }
     }
 
@@ -212,7 +213,7 @@ export function solveWord(word: string, opts: SolveOptions, alphabet: string) {
 
     const frontier = uniqPaths
         .slice(1, K)
-        .filter(p => p.checksums.E <= primary.checksums.E + 2);
+        .filter(p => p.checksums.E <= (primary.checksums.E || 0) + 2);
     
     const signals = [
         `base_raw=${rawBase.join("") || "-"}`,

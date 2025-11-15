@@ -3,6 +3,7 @@ import { VOWELS } from "./sevenVoicesCore";
 import type { Vowel } from "./sevenVoicesCore";
 import { chooseProfile, classRange } from "./languages";
 import type { LangProfile, CClass } from "./languages";
+import { getManifest } from "@/engine/manifest";
 
 export function toVowel(ch: string): Vowel | null {
   const u = ch.toUpperCase();
@@ -145,10 +146,8 @@ function takeSuffixCluster(word: string): string {
 }
 
 // If you already have a classifier, reuse it. Otherwise, a simple fallback mapper:
-function classifyClusterByProfile(cluster: string, profile: any): string | null {
+function classifyClusterByProfile(cluster: string, profile: LangProfile): CClass | null {
   if (!cluster) return null;
-  // Prefer profile.classify if it exists
-  if (profile?.classify) return profile.classify(cluster);
 
   // Fallback: rough class map (keep consistent with your main table)
   const c = cluster.toLowerCase();
@@ -161,22 +160,17 @@ function classifyClusterByProfile(cluster: string, profile: any): string | null 
   if (hit(["m","n","nj"]))                                return "Nasal";
   if (hit(["ll","rr","l","r"]))                           return "Liquid";
   if (hit(["w","y"]))                                     return "Glide";
-  return "Other";
+  return "NonSibilantFricative";
 }
 
-// Preferred |Δring| per class (same as your main table)
-const CLASS_DELTA_PREF: Record<string, [number, number]> = {
-  Plosive: [2, 3],
-  Affricate: [1, 2],
-  SibilantFricative: [1, 2],
-  NonSibilantFricative: [1, 1],
-  Nasal: [0, 1],
-  Liquid: [0, 1],
-  Glide: [0, 1],
-  Other: [0, 3],
-};
+const manifest = getManifest();
+const CLASS_DELTA_PREF: Record<string, [number, number]> = Object.entries(manifest.consonant.classes).reduce((acc, [key, val]) => {
+  acc[key] = val.preferredDelta;
+  return acc;
+}, {} as Record<string, [number, number]>);
 
-export function readEdgeWindows(word: string, profile: any): EdgeInfo {
+
+export function readEdgeWindows(word: string, profile: LangProfile): EdgeInfo {
   const prefixRaw = takePrefixCluster(word);
   const suffixRaw = takeSuffixCluster(word);
   const prefixCls = classifyClusterByProfile(prefixRaw, profile);
