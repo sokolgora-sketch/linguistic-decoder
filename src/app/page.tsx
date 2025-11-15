@@ -325,7 +325,7 @@ export default function LinguisticDecoderApp(){
       <aside className="lg:col-span-1 space-y-4">
           <Card className="p-4">
             <h2 className="text-xl font-semibold mb-2">History</h2>
-            <HistoryPanel onLoadAnalysis={onLoadAnalysis} onRecompute={onRecompute as any} />
+            <HistoryPanel onLoadAnalysis={onLoadAnalysis} onRecompute={onRecompute} />
           </Card>
       </aside>
 
