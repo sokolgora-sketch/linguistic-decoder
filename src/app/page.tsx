@@ -20,9 +20,9 @@ import { ThemeToggle } from "@/components/ThemeProvider";
 import { useDebounced } from "@/hooks/useDebounced";
 import { Copy, Download, Loader } from "lucide-react";
 import ComparePanel from "@/components/ComparePanel";
-import { mapWordToLanguageFamilies } from "@/ai/flows/map-word-to-language-families";
 import { toMappingRecord } from "@/lib/schemaAdapter";
 import { normalizeEnginePayload, type EnginePayload, type Vowel } from "@/shared/engineShape";
+import { mapWordToLanguageFamilies } from "@/lib/mapper";
 
 
 // ==== Main App ===============================================================
@@ -74,9 +74,8 @@ export default function LinguisticDecoderApp(){
 
       if (!normalizedPayload.cacheHit) {
           try {
-            const mappingInput = toMappingRecord(normalizedPayload);
-            const mappingResult = await mapWordToLanguageFamilies(mappingInput);
-            finalPayload.languageFamilies = mappingResult?.candidates_map || null;
+            const families = await mapWordToLanguageFamilies(normalizedPayload);
+            finalPayload.languageFamilies = families ?? [];
 
             // IMPORTANT: Save the AI-enhanced payload back to the cache
             await analyzeClient(useWord, useMode, useAlphabet, {
@@ -252,7 +251,7 @@ export default function LinguisticDecoderApp(){
         {data ? (
           <>
             <ResultsDisplay analysis={data} />
-            {data.languageFamilies && <Candidates map={data.languageFamilies} />}
+            <Candidates items={data.languageFamilies} />
           </>
         ) : null}
 
@@ -342,5 +341,3 @@ export default function LinguisticDecoderApp(){
     </div>
   );
 }
-
-    
