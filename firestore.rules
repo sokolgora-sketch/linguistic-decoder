@@ -1,3 +1,4 @@
+
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
@@ -12,6 +13,12 @@ service cloud.firestore {
     match /users/{uid}/history/{doc} {
       allow read, list: if request.auth != null && request.auth.uid == uid;
       allow create, update, delete: if request.auth != null && request.auth.uid == uid;
+    }
+
+    // Per-user error logs (silent, write-only for the user)
+    match /users/{uid}/errors/{doc} {
+      allow create: if request.auth != null && request.auth.uid == uid;
+      allow read, update, delete: if false; // only backend processes should read
     }
   }
 }

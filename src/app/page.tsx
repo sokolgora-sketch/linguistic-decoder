@@ -28,6 +28,7 @@ import FooterBuild from "@/components/FooterBuild";
 import { allowAnalyze } from "@/lib/throttle";
 import WhyThisPath from "@/components/WhyThisPath";
 import ExportBar from "@/components/ExportBar";
+import { logError } from "@/lib/logError";
 
 let EvalPanelComp: React.ComponentType | null = null;
 if (process.env.NEXT_PUBLIC_DEV_EVAL === "1") {
@@ -88,6 +89,7 @@ export default function LinguisticDecoderApp(){
 
     } catch (e: any) {
       const error = e?.message || "Request failed";
+      logError({ where: "analyze", message: error, detail: { word: useWord, stack: e.stack } });
       console.error("Analysis chain failed:", e);
       setErr(error);
       setData(null);
@@ -156,6 +158,7 @@ export default function LinguisticDecoderApp(){
           toast({ variant: "destructive", title: "Not Found", description: "Could not find that analysis in the cache." });
       }
     } catch (e: any) {
+        logError({where: "history-load", message: e.message, detail: {cacheId}});
         toast({ variant: "destructive", title: "Load Error", description: e.message || "Failed to load analysis." });
         setErr(e.message);
     } finally {
@@ -176,6 +179,7 @@ export default function LinguisticDecoderApp(){
           setData(result);
           toast({ title: "Recomputed", description: `Fresh analysis for '${result.word}' complete.` });
       } catch (e: any) {
+          logError({where: "history-recompute", message: e.message, detail: {word}});
           toast({ variant: "destructive", title: "Recompute Error", description: e.message || "Failed to recompute analysis." });
           setErr(e.message);
       } finally {

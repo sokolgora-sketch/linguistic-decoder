@@ -1,6 +1,7 @@
 
 import { toMappingRecord } from "@/lib/schemaAdapter";
 import type { EnginePayload, LanguageFamily } from "@/shared/engineShape";
+import { logError } from "./logError";
 
 
 // Optional remote mapper (e.g., Cloud Function or Next API). Leave blank to use local.
@@ -145,8 +146,10 @@ export async function mapWordToLanguageFamilies(engine: EnginePayload): Promise<
         }
       }
       // fall through to local if remote fails
+      logError({where: "mapper-fallback", message: `Remote mapper returned status ${res.status}`, detail: {word: engine.word}});
       console.warn("Remote mapper failed or returned bad shape; using local heuristic");
-    } catch (e) {
+    } catch (e: any) {
+      logError({where: "mapper-error", message: e.message, detail: {word: engine.word, stack: e.stack}});
       console.warn("Remote mapper error; using local heuristic", e);
     }
   }

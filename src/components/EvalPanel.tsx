@@ -8,6 +8,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { Card } from "./ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
 import { Input } from "./ui/input";
+import { logError } from "@/lib/logError";
+import { useToast } from "@/hooks/use-toast";
 
 type Mode = "strict"|"open";
 type Alphabet = "auto"|"albanian"|"latin"|"sanskrit"|"ancient_greek"|"pie";
@@ -30,6 +32,7 @@ function download(name: string, content: string) {
 }
 
 export default function EvalPanel() {
+  const { toast } = useToast();
   const [rows, setRows] = useState<any[]>([]);
   const [metrics, setMetrics] = useState<{accuracy:number|null; labeled:number; total:number}>({accuracy:null, labeled:0, total:0});
   const [busy, setBusy] = useState(false);
@@ -78,7 +81,8 @@ export default function EvalPanel() {
         labeled, total: out.length
       });
     } catch (err:any) {
-      alert(err?.message || String(err));
+      logError({ where: "eval-panel-parse", message: err.message, detail: err.stack });
+      toast({ variant: "destructive", title: "CSV Error", description: err.message || "Failed to parse file." });
     } finally {
       setBusy(false);
       (e.target as HTMLInputElement).value = "";
@@ -191,5 +195,3 @@ export default function EvalPanel() {
     </Card>
   );
 }
-
-    
