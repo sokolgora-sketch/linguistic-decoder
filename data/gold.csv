@@ -1,0 +1,6 @@
+word,expected,mode,alphabet
+damage,A→E,strict,auto
+study,U→I,strict,auto
+hope,O→E,strict,auto
+life,,strict,auto
+mind,,strict,auto

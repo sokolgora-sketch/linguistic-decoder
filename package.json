@@ -10,7 +10,8 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
-    "test": "jest"
+    "test": "jest",
+    "eval": "ts-node scripts/eval.ts --file data/gold.csv --mode=strict --alphabet=auto --edge=0.25 --manifest=2025-11-15-core-1"
   },
   "dependencies": {
     "@genkit-ai/google-genai": "^1.20.0",
