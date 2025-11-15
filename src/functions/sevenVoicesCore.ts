@@ -1,4 +1,4 @@
-// @ts-nocheck
+
 
 import { getManifest, EngineManifest } from "@/engine/manifest";
 import { computeC, extractBase, normalizeTerminalY, readWindowsDebug, edgeBiasPenalty, type EdgeInfo } from "./sevenVoicesC";
@@ -44,7 +44,7 @@ export function checksumV(path: Vowel[]): number {
   return product;
 }
 
-function keptCount(base: Vowel[], cand: Vowel[]) {
+function keptCount(base: Vowel[], cand: Vowel[]): number {
   let k = 0;
   for (let i = 0; i < Math.min(base.length, cand.length); i++)
     if (base[i] === cand[i]) k++;
