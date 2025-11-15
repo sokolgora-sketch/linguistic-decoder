@@ -23,7 +23,7 @@ type AnalyzeOpts = {
 };
 
 // NEW helper: safe join
-const joinPath = (xs?: string[]) => Array.isArray(xs) ? xs.join("→") : "";
+const joinPath = (xs?: (string|Vowel)[]) => Array.isArray(xs) ? xs.join("→") : "";
 
 function computeLocal(word: string, mode: Mode, alphabet: Alphabet, edgeWeight?: number): EnginePayload {
   const manifest = getManifest(); // Use default manifest for local compute
@@ -32,9 +32,16 @@ function computeLocal(word: string, mode: Mode, alphabet: Alphabet, edgeWeight?:
   const strict = mode === "strict";
   const opCost = manifest.opCost;
 
-  const opts: SolveOptions = strict
-    ? { beamWidth: 8, maxOps: 1, allowDelete: false, allowClosure: false, opCost, edgeWeight, alphabet, manifest }
-    : { beamWidth: 8, maxOps: 2, allowDelete: true,  allowClosure: true,  opCost, edgeWeight, alphabet, manifest };
+  const opts: SolveOptions = {
+    beamWidth: 8,
+    maxOps: strict ? 1 : 2,
+    allowDelete: !strict,
+    allowClosure: !strict,
+    opCost: opCost,
+    edgeWeight,
+    alphabet,
+    manifest,
+  };
 
   const analysisResult = solveWord(word, opts, alphabet);
 
@@ -60,7 +67,7 @@ export async function analyzeClient(word: string, mode: Mode, alphabet: Alphabet
     // BYPASS / WRITE-THROUGH: compute fresh or use provided payload, skip cache read
     if (opts.bypass) {
       const payloadToUse = opts.payload ? normalizeEnginePayload(opts.payload) : computeLocal(word, mode, alphabet, opts.edgeWeight);
-      const families = await mapWordToLanguageFamilies(payloadToUse, useAiForMapping);
+      const families = await mapWordToLanguageFamilies(payloadToUse.word, payloadToUse.primaryPath.voicePath, useAiForMapping);
       const enrichedPayload = { ...payloadToUse, languageFamilies: families ?? [] };
       
       if (!opts.skipWrite) {
@@ -78,7 +85,7 @@ export async function analyzeClient(word: string, mode: Mode, alphabet: Alphabet
       const normalized = normalizeEnginePayload(snap.data());
       // If cached version doesn't have families, compute them now.
       if (!normalized.languageFamilies || normalized.languageFamilies.length === 0) {
-        const families = await mapWordToLanguageFamilies(normalized, useAiForMapping);
+        const families = await mapWordToLanguageFamilies(normalized.word, normalized.primaryPath.voicePath, useAiForMapping);
         normalized.languageFamilies = families;
         // Asynchronously update cache with families
         if (!opts.skipWrite) {
@@ -92,7 +99,7 @@ export async function analyzeClient(word: string, mode: Mode, alphabet: Alphabet
 
     // Miss → compute → map → write → return
     const fresh = computeLocal(word, mode, alphabet, opts.edgeWeight);
-    const families = await mapWordToLanguageFamilies(fresh, useAiForMapping);
+    const families = await mapWordToLanguageFamilies(fresh.word, fresh.primaryPath.voicePath, useAiForMapping);
     const enriched = { ...fresh, languageFamilies: families ?? [] };
 
     const cleanFresh = sanitizeForFirestore(enriched);
@@ -108,7 +115,7 @@ export async function analyzeClient(word: string, mode: Mode, alphabet: Alphabet
 
 async function saveHistory(
   cacheId: string,
-  engine: any,                 // <-- pass the full engine payload
+  engine: EnginePayload,
   source: "cache"|"fresh"|"bypass"
 ) {
   const u = auth.currentUser;
@@ -178,7 +185,7 @@ export async function prefetchAnalyze(
 
   try {
     const fresh = computeLocal(word, mode, alphabet);
-    const families = await mapWordToLanguageFamilies(fresh, false); // always use local for prefetch
+    const families = await mapWordToLanguageFamilies(fresh.word, fresh.primaryPath.voicePath, false); // always use local for prefetch
     const enriched = { ...fresh, languageFamilies: families ?? [] };
     const cleanFresh = sanitizeForFirestore(enriched);
     await setDoc(cacheRef, { ...cleanFresh, cachedAt: serverTimestamp() }, { merge: false });
