@@ -3,8 +3,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { db, auth, ensureAnon } from "@/lib/firebase";
 import {
-  collection, query, where, orderBy, limit, getDocs, startAfter,
-  DocumentData, QueryDocumentSnapshot
+  collection, query, orderBy, limit, getDocs, startAfter,
+  deleteDoc, doc, writeBatch, DocumentData, QueryDocumentSnapshot
 } from "firebase/firestore";
 
 type Row = {
@@ -24,62 +24,73 @@ export default function HistoryPanel({
   onRecompute,
 }: {
   onLoadAnalysis: (cacheId: string) => Promise<void>;
-  onRecompute: (word: string, mode: "strict" | "open", alphabet: string) => Promise<void>;
+  onRecompute: (word: string, mode: 'strict' | 'open', alphabet: string) => Promise<void>;
 }) {
   const [rows, setRows] = useState<Row[]>([]);
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState<string | null>(null);
-  const [after, setAfter] = useState<QueryDocumentSnapshot<DocumentData> | null>(null);
   const [mode, setMode] = useState<"all"|"strict"|"open">("all");
   const [alphabet, setAlphabet] = useState<"all"|"auto"|"albanian"|"latin"|"sanskrit"|"ancient_greek"|"pie"|"turkish"|"german">("all");
   const [wordFilter, setWordFilter] = useState("");
 
   useEffect(() => { (async () => ensureAnon())(); }, []);
-
   const uid = auth.currentUser?.uid || null;
 
   const baseQuery = useMemo(() => {
     if (!uid) return null;
     const col = collection(db, "users", uid, "history");
-    const parts: any[] = [orderBy("createdAt", "desc")];
-    const q = query(col, ...parts, limit(20));
-    return q;
+    return query(col, orderBy("createdAt", "desc"), limit(20));
   }, [uid]);
 
-  async function load(reset = false) {
+  async function load() {
     if (!uid || !baseQuery) return;
-    setLoading(true);
-    setErr(null);
+    setLoading(true); setErr(null);
     try {
-      let q = baseQuery;
-
-      const snap = await getDocs(q);
-      const docs = snap.docs;
-      setAfter(docs.length ? docs[docs.length - 1] : null);
-
-      const mapped: Row[] = docs.map(d => {
+      const snap = await getDocs(baseQuery);
+      const mapped: Row[] = snap.docs.map(d => {
         const x = d.data() as any;
         return {
           id: d.id,
-          cacheId: x.cacheId,
-          word: x.word,
-          mode: x.mode,
-          alphabet: x.alphabet,
-          engineVersion: x.engineVersion,
-          source: x.source,
-          primaryVoice: x.primaryVoice,
+          cacheId: String(x.cacheId || ""),
+          word: String(x.word || ""),
+          mode: String(x.mode || ""),
+          alphabet: String(x.alphabet || ""),
+          engineVersion: String(x.engineVersion || ""),
+          source: String(x.source || ""),
+          primaryVoice: x.primaryVoice ? String(x.primaryVoice) : undefined,
           createdAt: x.createdAt,
         };
       });
-
       const filtered = mapped.filter(r => {
         if (mode !== "all" && r.mode !== mode) return false;
         if (alphabet !== "all" && r.alphabet !== alphabet) return false;
         if (wordFilter && !r.word?.toLowerCase().includes(wordFilter.toLowerCase())) return false;
         return true;
       });
+      setRows(filtered);
+    } catch (e:any) {
+      setErr(e?.message || String(e));
+    } finally {
+      setLoading(false);
+    }
+  }
+  useEffect(() => { load(); }, [baseQuery, mode, alphabet, wordFilter]);
 
-      setRows(reset ? filtered : [...rows, ...filtered]);
+  async function deleteRow(row: Row) {
+    if (!uid) return;
+    const sure = window.confirm(`Delete history entry for "${row.word}"? This cannot be undone.`);
+    if (!sure) return;
+    setLoading(true); setErr(null);
+    try {
+      await deleteDoc(doc(db, "users", uid, "history", row.id));
+      // Optional: also remove shared cache
+      if (row.cacheId) {
+        const also = window.confirm("Also delete the shared cache entry (analyses) for this item?");
+        if (also) {
+          await deleteDoc(doc(db, "analyses", row.cacheId));
+        }
+      }
+      setRows(prev => prev.filter(r => r.id !== row.id));
     } catch (e:any) {
       setErr(e?.message || String(e));
     } finally {
@@ -87,10 +98,44 @@ export default function HistoryPanel({
     }
   }
 
-  useEffect(() => { load(true); /* reload on filter change */ }, [baseQuery, mode, alphabet, wordFilter]);
+  async function clearAll() {
+    if (!uid) return;
+    const sure = window.confirm("Delete ALL your history entries? This cannot be undone.");
+    if (!sure) return;
+
+    setLoading(true); setErr(null);
+    try {
+      let last: QueryDocumentSnapshot<DocumentData> | null = null;
+      let total = 0;
+      while (true) {
+        const q = query(
+          collection(db, "users", uid, "history"),
+          orderBy("createdAt", "desc"),
+          ...(last ? [startAfter(last)] : []),
+          limit(200)
+        );
+        const snap = await getDocs(q);
+        if (snap.empty) break;
+
+        const batch = writeBatch(db);
+        snap.docs.forEach(d => batch.delete(d.ref));
+        await batch.commit();
+
+        total += snap.docs.length;
+        last = snap.docs[snap.docs.length - 1];
+        if (snap.docs.length < 200) break;
+      }
+      setRows([]);
+      // We intentionally do NOT bulk-delete shared cache; it may be referenced by others.
+    } catch (e:any) {
+      setErr(e?.message || String(e));
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
-    <div className="border rounded-lg p-3">
+    <div className="border rounded-lg p-3 bg-card">
       <div className="flex flex-wrap gap-2 items-end mb-3">
         <div className="flex flex-col">
           <label className="text-xs text-muted-foreground">Mode</label>
@@ -110,16 +155,20 @@ export default function HistoryPanel({
             <option value="sanskrit">sanskrit</option>
             <option value="ancient_greek">ancient_greek</option>
             <option value="pie">pie</option>
-            <option value="german">german</option>
             <option value="turkish">turkish</option>
+            <option value="german">german</option>
           </select>
         </div>
         <div className="flex flex-col grow">
           <label className="text-xs text-muted-foreground">Word</label>
           <input className="border rounded px-2 py-1 text-sm bg-background" placeholder="search…" value={wordFilter} onChange={e=>setWordFilter(e.target.value)} />
         </div>
-        <button className="border rounded px-3 py-1 text-sm" onClick={()=>load(true)} disabled={loading}>
+
+        <button className="border rounded px-3 py-1 text-sm" onClick={load} disabled={loading}>
           {loading ? "Loading…" : "Refresh"}
+        </button>
+        <button className="border rounded px-3 py-1 text-sm text-red-700 border-red-300" onClick={clearAll} disabled={loading}>
+          {loading ? "…" : "Clear All"}
         </button>
       </div>
 
@@ -143,14 +192,13 @@ export default function HistoryPanel({
               </div>
             </div>
             <div className="flex gap-2 shrink-0">
-              <button className="border rounded px-2 py-1 text-xs" title="Load cached analysis"
-                onClick={()=>onLoadAnalysis(r.cacheId)}>Load</button>
-              <button className="border rounded px-2 py-1 text-xs" title="Recompute (bypass cache)"
-                onClick={()=>onRecompute(r.word, r.mode as any, r.alphabet)}>Recompute</button>
+              <button className="border rounded px-2 py-1 text-xs" onClick={()=>onLoadAnalysis(r.cacheId)} title="Load cached analysis">Load</button>
+              <button className="border rounded px-2 py-1 text-xs" onClick={()=>onRecompute(r.word, r.mode as any, r.alphabet)} title="Recompute (bypass cache)">Recompute</button>
+              <button className="border rounded px-2 py-1 text-xs text-red-700 border-red-300" onClick={()=>deleteRow(r)} title="Delete history">Delete</button>
             </div>
           </div>
         ))}
-        {rows.length === 0 && !loading && (
+         {rows.length === 0 && !loading && (
             <div className="text-sm text-center py-4 text-slate-500">No history matching filters.</div>
         )}
       </div>
