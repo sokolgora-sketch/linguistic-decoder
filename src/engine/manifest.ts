@@ -45,7 +45,7 @@ export const manifest_v1: EngineManifest = {
 
 export const manifest_v2: EngineManifest = {
     ...manifest_v1,
-    version: "2025-11-15-core-2",
+    version: "2025-11-16-core-1",
     edgeWeight: 0.35,
     opCost: { sub:1, del:4, ins:3 },
 };

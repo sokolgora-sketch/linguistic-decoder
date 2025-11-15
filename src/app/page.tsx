@@ -18,7 +18,7 @@ import type { Alphabet } from "@/lib/solver/engineConfig";
 import { PROFILES } from "@/functions/languages";
 import { ThemeToggle } from "@/components/ThemeProvider";
 import { useDebounced } from "@/hooks/useDebounced";
-import { Copy, Download, Loader } from "lucide-react";
+import { Loader } from "lucide-react";
 import ComparePanel from "@/components/ComparePanel";
 import { normalizeEnginePayload, type EnginePayload, type Vowel } from "@/shared/engineShape";
 import HistoryPanel from "@/components/HistoryPanel";
@@ -27,7 +27,7 @@ import { db } from "@/lib/firebase";
 import FooterBuild from "@/components/FooterBuild";
 import { allowAnalyze } from "@/lib/throttle";
 import WhyThisPath from "@/components/WhyThisPath";
-// import EvalPanel from "@/components/EvalPanel"; - REMOVED
+import ExportBar from "@/components/ExportBar";
 
 let EvalPanelComp: React.ComponentType | null = null;
 if (process.env.NEXT_PUBLIC_DEV_EVAL === "1") {
@@ -140,26 +140,6 @@ export default function LinguisticDecoderApp(){
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  async function copyJSON() {
-    if (!data) return;
-    await navigator.clipboard.writeText(JSON.stringify(data, null, 2));
-    toast({ title: "Copied!", description: "Result JSON copied to clipboard." });
-  }
-
-  function downloadJSON() {
-    if (!data) return;
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    const fn = `${data.word || "analysis"}_${data.mode || "mode"}_${data.alphabet || "auto"}.json`;
-    a.download = fn;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
-  }
 
   async function onLoadAnalysis(cacheId: string) {
     setLoading(true);
@@ -281,6 +261,7 @@ export default function LinguisticDecoderApp(){
         {data ? (
           <>
             <ResultsDisplay analysis={data} />
+            <ExportBar analysis={data} />
             <WhyThisPath primary={data.primaryPath} />
             <PrinciplesBlock engine={data} />
             <Candidates items={data.languageFamilies} />
@@ -338,10 +319,6 @@ export default function LinguisticDecoderApp(){
               <Card className="p-4">
                   <div className="flex justify-between items-center mb-2">
                     <h3 className="font-bold text-sm tracking-wide">API Echo (debug)</h3>
-                    <div className="flex gap-2">
-                        <Button onClick={copyJSON} size="sm" variant="outline"><Copy className="mr-2"/> Copy</Button>
-                        <Button onClick={downloadJSON} size="sm" variant="outline"><Download className="mr-2"/> Download</Button>
-                    </div>
                   </div>
                   <pre className="font-code text-xs whitespace-pre-wrap bg-slate-50 dark:bg-slate-800 p-2.5 rounded-lg max-h-96 overflow-auto mt-2">
                       {JSON.stringify(data, null, 2)}
@@ -387,7 +364,3 @@ export default function LinguisticDecoderApp(){
     </div>
   );
 }
-
-    
-
-    
