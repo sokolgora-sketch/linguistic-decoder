@@ -3,6 +3,8 @@ import { initializeApp, getApps } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 import { getAuth, signInAnonymously, onAuthStateChanged, type User } from "firebase/auth";
 
+const isTest = process.env.NODE_ENV === 'test';
+
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FB_API_KEY!,
   authDomain: process.env.NEXT_PUBLIC_FB_AUTH_DOMAIN!,
@@ -12,14 +14,20 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FB_APP_ID!,
 };
 
-export const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
-export const db = getFirestore(app);
-export const auth = getAuth(app);
+export const app = isTest
+  ? (null as any)
+  : (getApps().length ? getApps()[0] : initializeApp(firebaseConfig));
+
+export const db = isTest ? ({} as any) : getFirestore(app);
+export const auth = isTest ? ({ currentUser: null } as any) : getAuth(app);
+
 
 // Store the promise to avoid multiple simultaneous calls
 let authPromise: Promise<User> | null = null;
 
 export function ensureAnon(): Promise<User> {
+  if (isTest) return Promise.resolve({ uid: 'test-uid' } as any);
+
   const existing = auth.currentUser;
   if (existing) return Promise.resolve(existing);
 

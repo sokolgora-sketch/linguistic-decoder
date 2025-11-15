@@ -1,13 +1,11 @@
-
 import { getFirestore, collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
-import { app } from "./firebase";
+import { app, auth, db } from "./firebase";
 
 export async function logError(ev: { where: string; message: string; detail?: any }) {
   try {
-    const db = getFirestore(app);
-    const auth = getAuth(app);
-    const uid = auth.currentUser?.uid || "anon";
+    if (!db || Object.keys(db).length === 0) return; // test stub – no-op
+    const uid = (auth && auth.currentUser && auth.currentUser.uid) || "anon";
     const ref = collection(db, "users", uid, "errors");
     await addDoc(ref, {
       where: ev.where,
@@ -16,5 +14,7 @@ export async function logError(ev: { where: string; message: string; detail?: an
       ts: serverTimestamp(),
       engine: process.env.NEXT_PUBLIC_ENGINE_VERSION || "dev"
     });
-  } catch {}
+  } catch {
+    // swallow errors, especially in test env
+  }
 }
