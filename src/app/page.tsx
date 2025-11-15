@@ -20,8 +20,10 @@ import { ThemeToggle } from "@/components/ThemeProvider";
 import { useDebounced } from "@/hooks/useDebounced";
 import { Copy, Download, Loader } from "lucide-react";
 import ComparePanel from "@/components/ComparePanel";
-import { toMappingRecord } from "@/lib/schemaAdapter";
 import { normalizeEnginePayload, type EnginePayload, type Vowel } from "@/shared/engineShape";
+import HistoryPanel from "@/components/HistoryPanel";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 
 
 // ==== Main App ===============================================================
@@ -146,11 +148,49 @@ export default function LinguisticDecoderApp(){
     URL.revokeObjectURL(url);
   }
 
+  async function onLoadAnalysis(cacheId: string) {
+    setLoading(true);
+    setErr(null);
+    setData(null);
+    try {
+      const cacheRef = doc(db, "analyses", cacheId);
+      const snap = await getDoc(cacheRef);
+      if (snap.exists()) {
+          const normalized = normalizeEnginePayload(snap.data());
+          setData({ ...normalized, cacheHit: true, recomputed: false });
+          toast({ title: "Loaded from Cache", description: `Analysis for '${normalized.word}' loaded.` });
+      } else {
+          toast({ variant: "destructive", title: "Not Found", description: "Could not find that analysis in the cache." });
+      }
+    } catch (e: any) {
+        toast({ variant: "destructive", title: "Load Error", description: e.message || "Failed to load analysis." });
+        setErr(e.message);
+    } finally {
+        setLoading(false);
+    }
+  }
+
+  async function onRecompute(word: string, mode: 'strict' | 'open', alphabet: string) {
+      setLoading(true);
+      setData(null);
+      setErr(null);
+      try {
+          const result = await analyzeClient(word, mode, alphabet as any, { bypass: true, edgeWeight });
+          setData(result);
+          toast({ title: "Recomputed", description: `Fresh analysis for '${result.word}' complete.` });
+      } catch (e: any) {
+          toast({ variant: "destructive", title: "Recompute Error", description: e.message || "Failed to recompute analysis." });
+          setErr(e.message);
+      } finally {
+          setLoading(false);
+      }
+  }
+
   const signals = data?.signals?.join(" · ") || "";
   
   return (
-    <div className="grid grid-cols-1 gap-6 p-4 lg:p-8 max-w-5xl mx-auto">
-      <main className="space-y-4">
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 p-4 lg:p-8 max-w-7xl mx-auto">
+       <main className="lg:col-span-2 space-y-4">
         {/* Header */}
         <header className="p-6 border-b-4 border-primary bg-background -mx-6 -mt-8">
           <div className="max-w-5xl mx-auto flex justify-between items-center">
@@ -160,9 +200,6 @@ export default function LinguisticDecoderApp(){
             </div>
             <div className="flex items-center gap-4">
               <ThemeToggle />
-              <Button asChild variant="outline">
-                  <Link href="/history">View History</Link>
-              </Button>
             </div>
           </div>
         </header>
@@ -279,12 +316,18 @@ export default function LinguisticDecoderApp(){
               </Card>
           </div>
         )}
-
       </main>
 
+      <aside className="lg:col-span-1 space-y-4">
+          <Card className="p-4">
+            <h2 className="text-xl font-semibold mb-2">History</h2>
+            <HistoryPanel onLoadAnalysis={onLoadAnalysis} onRecompute={onRecompute} />
+          </Card>
+      </aside>
+
       {/* Footer */}
-      <footer className="p-6 opacity-80 col-span-1">
-        <div className="max-w-5xl mx-auto text-xs text-slate-500 flex justify-between items-start">
+      <footer className="p-6 opacity-80 lg:col-span-3">
+        <div className="max-w-7xl mx-auto text-xs text-slate-500 flex justify-between items-start">
           <div className="font-code flex-1">
             {data && (
               <div className="text-xs opacity-80 pt-2">
@@ -317,3 +360,5 @@ export default function LinguisticDecoderApp(){
     </div>
   );
 }
+
+    

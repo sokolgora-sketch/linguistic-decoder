@@ -1,3 +1,4 @@
+
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import { db, auth, ensureAnon } from "@/lib/firebase";
@@ -156,3 +157,5 @@ export default function HistoryPanel({
     </div>
   );
 }
+
+    
