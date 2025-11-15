@@ -22,7 +22,6 @@ import { Copy, Download, Loader } from "lucide-react";
 import ComparePanel from "@/components/ComparePanel";
 import { toMappingRecord } from "@/lib/schemaAdapter";
 import { normalizeEnginePayload, type EnginePayload, type Vowel } from "@/shared/engineShape";
-import { mapWordToLanguageFamilies } from "@/lib/mapper";
 
 
 // ==== Main App ===============================================================
@@ -68,32 +67,9 @@ export default function LinguisticDecoderApp(){
       // 2. GUARANTEE the shape
       const normalizedPayload = normalizeEnginePayload(clientResponse);
       console.debug("Primary Path object:", normalizedPayload.primaryPath);
-
-      // 3. Call the AI flow with the guaranteed-correct data shape
-      let finalPayload = { ...normalizedPayload, languageFamilies: normalizedPayload.languageFamilies ?? null };
-
-      if (!normalizedPayload.cacheHit) {
-          try {
-            const families = await mapWordToLanguageFamilies(normalizedPayload);
-            finalPayload.languageFamilies = families ?? [];
-
-            // IMPORTANT: Save the AI-enhanced payload back to the cache
-            await analyzeClient(useWord, useMode, useAlphabet, {
-              edgeWeight,
-              bypass: true, // Force a write
-              skipWrite: false,
-              payload: finalPayload, // Provide the payload to write
-            });
-
-          } catch(aiError: any) {
-            console.warn("AI mapping failed, showing results without it.", aiError.message);
-            // Non-fatal, we can still show the main analysis. Ensure languageFamilies is null.
-            finalPayload.languageFamilies = null;
-          }
-      }
       
       // 4. Set state with the clean, final payload
-      setData(finalPayload);
+      setData(normalizedPayload);
 
     } catch (e: any) {
       const error = e?.message || "Request failed";
