@@ -78,8 +78,8 @@ function mkPath(
 
   const p: Path = {
     voicePath,
-    ringPath: voicePath.map((v) => RING[v]),
-    levelPath: voicePath.map((v) => LVL[v]),
+    ringPath: voicePath.map((v: Vowel) => RING[v]),
+    levelPath: voicePath.map((v: Vowel) => LVL[v]),
     checksums: {
       V: checksumV(voicePath),
       E: finalE,
@@ -94,7 +94,7 @@ function mkPath(
       `Keeps overflow: kept=${p.kept} base=${baseSeq.length} seq=${seq.length}`
     );
   }
-  if (ops.some((o) => o.startsWith("insert ") && o !== "closure Ë"))
+  if (ops.some((o: string) => o.startsWith("insert ") && o !== "closure Ë"))
     throw new Error("Illegal insert op");
   return p;
 }
