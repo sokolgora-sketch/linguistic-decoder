@@ -10,6 +10,7 @@ import type { SolveOptions, Vowel } from "@/functions/sevenVoicesCore";
 import { mapWordToLanguageFamilies } from "@/lib/mapper";
 import { sanitizeForFirestore } from "@/lib/sanitize";
 import { getManifest } from "@/engine/manifest";
+import { chooseProfile } from "@/functions/languages";
 
 
 type Mode = "strict" | "open";
@@ -32,6 +33,9 @@ function computeLocal(word: string, mode: Mode, alphabet: Alphabet, edgeWeight?:
   const strict = mode === "strict";
   const opCost = manifest.opCost;
 
+  const profile = chooseProfile(word, alphabet === "auto" ? undefined : alphabet);
+  const effectiveAlphabet = profile.id;
+
   const opts: SolveOptions = {
     beamWidth: 8,
     maxOps: strict ? 1 : 2,
@@ -39,18 +43,18 @@ function computeLocal(word: string, mode: Mode, alphabet: Alphabet, edgeWeight?:
     allowClosure: !strict,
     opCost: opCost,
     edgeWeight,
-    alphabet,
+    alphabet: effectiveAlphabet,
     manifest,
   };
 
-  const analysisResult = solveWord(word, opts, alphabet);
+  const analysisResult = solveWord(word, opts, effectiveAlphabet);
 
   // Construct canonical, then pass through normalizer (paranoid but consistent)
   return normalizeEnginePayload({
     ...analysisResult,
     word,
     mode,
-    alphabet,
+    alphabet: effectiveAlphabet, // Return the effective alphabet
     solveMs: Date.now() - t0,
     cacheHit: false,
   });
@@ -59,7 +63,12 @@ function computeLocal(word: string, mode: Mode, alphabet: Alphabet, edgeWeight?:
 export async function analyzeClient(word: string, mode: Mode, alphabet: Alphabet, opts: AnalyzeOpts = {}) {
   await ensureAnon();
   const manifest = getManifest();
-  const cacheId = `${word}|${mode}|${alphabet}|${manifest.version}|ew:${opts.edgeWeight ?? manifest.edgeWeight}`;
+
+  // Use the effective alphabet for the cache key
+  const profile = chooseProfile(word, alphabet === "auto" ? undefined : alphabet);
+  const effectiveAlphabet = profile.id;
+  const cacheId = `${word}|${mode}|${effectiveAlphabet}|${manifest.version}|ew:${opts.edgeWeight ?? manifest.edgeWeight}`;
+  
   const cacheRef = doc(db, "analyses", cacheId);
   const useAiForMapping = opts.useAi ?? false;
 
@@ -167,7 +176,9 @@ export async function prefetchAnalyze(
   }
   await ensureAnon();
   const manifest = getManifest();
-  const cacheId = `${word}|${mode}|${alphabet}|${manifest.version}|ew:${manifest.edgeWeight}`; // Prefetch with default weight
+  const profile = chooseProfile(word, alphabet === "auto" ? undefined : alphabet);
+  const effectiveAlphabet = profile.id;
+  const cacheId = `${word}|${mode}|${effectiveAlphabet}|${manifest.version}|ew:${manifest.edgeWeight}`;
   if (PREFETCH_SEEN.has(cacheId)) {
     callbacks?.onFinish?.();
     return;
