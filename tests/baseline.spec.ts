@@ -25,3 +25,5 @@ test("mind (strict) stable path exists", () => {
   const { primaryPath } = solveWord("mind", opts);
   expect(primaryPath.voicePath.length).toBeGreaterThan(0);
 });
+
+    

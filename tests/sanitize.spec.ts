@@ -1,3 +1,4 @@
+
 import { sanitizeForFirestore } from "@/lib/sanitize";
 
 test("sanitize drops undefined recursively", () => {
@@ -5,3 +6,5 @@ test("sanitize drops undefined recursively", () => {
   const clean = sanitizeForFirestore(dirty);
   expect(clean).toEqual({ a:1, c:{ d:2 }, f:[1, null, 3] }); // JSON roundtrip turns array holes into null
 });
+
+    

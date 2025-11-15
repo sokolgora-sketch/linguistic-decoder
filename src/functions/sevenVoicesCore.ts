@@ -226,3 +226,5 @@ export function solveWord(word: string, opts: SolveOptions, alphabet: string) {
         signals,
     };
 }
+
+    
