@@ -24,6 +24,7 @@ import { normalizeEnginePayload, type EnginePayload, type Vowel } from "@/shared
 import HistoryPanel from "@/components/HistoryPanel";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import FooterBuild from "@/components/FooterBuild";
 
 
 // ==== Main App ===============================================================
@@ -361,6 +362,7 @@ export default function LinguisticDecoderApp(){
             </Button>
           </div>
         </div>
+        <FooterBuild />
       </footer>
     </div>
   );
