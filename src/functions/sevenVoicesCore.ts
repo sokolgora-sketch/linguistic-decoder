@@ -1,8 +1,7 @@
 
-import { ENGINE_VERSION } from "@/shared/engineVersion";
+import { getManifest } from "@/engine/manifest";
 import { computeC, extractBase, normalizeTerminalY, readWindowsDebug, edgeBiasPenalty, type EdgeInfo } from "./sevenVoicesC";
 import { chooseProfile } from "./languages";
-import { getManifest } from "@/engine/manifest";
 
 export const VOWELS = ["A", "E", "I", "O", "U", "Y", "Ë"] as const;
 export type Vowel = (typeof VOWELS)[number];
@@ -17,6 +16,7 @@ export type SolveOptions = {
   opCost: { sub: number; del: number; insClosure: number };
   edgeWeight?: number;
   manifest?: any;
+  alphabet: string;
 };
 
 export type Path = {
@@ -223,7 +223,7 @@ export function solveWord(word: string, opts: SolveOptions, alphabet: string) {
     ];
 
     return {
-        engineVersion: ENGINE_VERSION,
+        engineVersion: manifest.version,
         primaryPath: primary,
         frontierPaths: frontier,
         windows,

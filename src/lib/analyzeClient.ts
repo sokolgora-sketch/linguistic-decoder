@@ -1,7 +1,6 @@
 
 import { db, ensureAnon, auth } from "@/lib/firebase";
 import { doc, getDoc, setDoc, serverTimestamp, collection, addDoc } from "firebase/firestore";
-import { ENGINE_VERSION } from "@/shared/engineVersion";
 import { normalizeEnginePayload, type EnginePayload } from "@/shared/engineShape";
 
 // Browser-safe engine code:
@@ -9,6 +8,7 @@ import { solveWord } from "@/functions/sevenVoicesCore";
 import type { SolveOptions, Vowel } from "@/functions/sevenVoicesCore";
 import { mapWordToLanguageFamilies } from "@/lib/mapper";
 import { sanitizeForFirestore } from "@/lib/sanitize";
+import { getManifest } from "@/engine/manifest";
 
 
 type Mode = "strict" | "open";
@@ -27,10 +27,11 @@ const CFG = { beamWidth: 8, maxOpsStrict: 1, maxOpsOpen: 2, cost: { sub:1, del:3
 
 function computeLocal(word: string, mode: Mode, alphabet: Alphabet, edgeWeight?: number): EnginePayload {
   const strict = mode === "strict";
+  const manifest = getManifest(); // Use default manifest for local compute
   const t0 = Date.now();
   const opts: SolveOptions = strict
-    ? { beamWidth: CFG.beamWidth, maxOps: CFG.maxOpsStrict, allowDelete: false, allowClosure: false, opCost: CFG.cost, edgeWeight }
-    : { beamWidth: CFG.beamWidth, maxOps: CFG.maxOpsOpen,   allowDelete: true,  allowClosure: true,  opCost: CFG.cost, edgeWeight };
+    ? { beamWidth: CFG.beamWidth, maxOps: CFG.maxOpsStrict, allowDelete: false, allowClosure: false, opCost: CFG.cost, edgeWeight, alphabet, manifest }
+    : { beamWidth: CFG.beamWidth, maxOps: CFG.maxOpsOpen,   allowDelete: true,  allowClosure: true,  opCost: CFG.cost, edgeWeight, alphabet, manifest };
 
   const analysisResult = solveWord(word, opts, alphabet);
 
@@ -47,7 +48,8 @@ function computeLocal(word: string, mode: Mode, alphabet: Alphabet, edgeWeight?:
 
 export async function analyzeClient(word: string, mode: Mode, alphabet: Alphabet, opts: AnalyzeOpts = {}) {
   await ensureAnon();
-  const cacheId = `${word}|${mode}|${alphabet}|${ENGINE_VERSION}|ew:${opts.edgeWeight ?? 0.25}`;
+  const manifest = getManifest();
+  const cacheId = `${word}|${mode}|${alphabet}|${manifest.version}|ew:${opts.edgeWeight ?? manifest.edgeWeight}`;
   const cacheRef = doc(db, "analyses", cacheId);
 
   // BYPASS / WRITE-THROUGH: compute fresh or use provided payload, skip cache read
@@ -133,7 +135,8 @@ export async function prefetchAnalyze(
     return;
   }
   await ensureAnon();
-  const cacheId = `${word}|${mode}|${alphabet}|${ENGINE_VERSION}|ew:0.25`; // Prefetch with default weight
+  const manifest = getManifest();
+  const cacheId = `${word}|${mode}|${alphabet}|${manifest.version}|ew:${manifest.edgeWeight}`; // Prefetch with default weight
   if (PREFETCH_SEEN.has(cacheId)) {
     callbacks?.onFinish?.();
     return;

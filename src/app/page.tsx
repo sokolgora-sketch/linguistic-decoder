@@ -27,6 +27,7 @@ import { db } from "@/lib/firebase";
 import FooterBuild from "@/components/FooterBuild";
 import { allowAnalyze } from "@/lib/throttle";
 import WhyThisPath from "@/components/WhyThisPath";
+import EvalPanel from "@/components/EvalPanel";
 
 
 // ==== Main App ===============================================================
@@ -336,6 +337,7 @@ export default function LinguisticDecoderApp(){
             <h2 className="text-xl font-semibold mb-2">History</h2>
             <HistoryPanel onLoadAnalysis={onLoadAnalysis} onRecompute={onRecompute} />
           </Card>
+          <EvalPanel />
       </aside>
 
       {/* Footer */}
