@@ -111,7 +111,8 @@ export default function EvalPanel() {
   }
 
   return (
-    <div className="space-y-2">
+    <Card className="p-4 space-y-2">
+      <h2 className="text-xl font-semibold">Batch Eval</h2>
       <div className="text-xs opacity-80">Upload CSV with headers: <code>word,expected,mode,alphabet</code></div>
       <div className="flex gap-2 items-center">
         <label className="text-xs">Default mode</label>
@@ -187,7 +188,7 @@ export default function EvalPanel() {
           </Table>
         </Card>
       )}
-    </div>
+    </Card>
   );
 }
 

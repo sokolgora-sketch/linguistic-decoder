@@ -18,7 +18,7 @@ import type { Alphabet } from "@/lib/solver/engineConfig";
 import { PROFILES } from "@/functions/languages";
 import { ThemeToggle } from "@/components/ThemeProvider";
 import { useDebounced } from "@/hooks/useDebounced";
-import { Copy, Download, Eye, EyeOff, Loader } from "lucide-react";
+import { Copy, Download, Loader } from "lucide-react";
 import ComparePanel from "@/components/ComparePanel";
 import { normalizeEnginePayload, type EnginePayload, type Vowel } from "@/shared/engineShape";
 import HistoryPanel from "@/components/HistoryPanel";
@@ -42,8 +42,6 @@ export default function LinguisticDecoderApp(){
   const [loading, setLoading] = useState(false);
   const [isWarming, setIsWarming] = useState(false);
   const [showDebug, setShowDebug] = useState(false);
-  const [showHistory, setShowHistory] = useState(true);
-  const [showEval, setShowEval] = useState(true);
 
   // Debounce user input, then warm the cache in the background
   const debouncedWord = useDebounced(word, 450);
@@ -201,11 +199,10 @@ export default function LinguisticDecoderApp(){
   }
 
   const signals = data?.signals?.join(" · ") || "";
-  const sidePanelsVisible = showHistory || showEval;
   
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 p-4 lg:p-8 max-w-7xl mx-auto">
-       <main className={sidePanelsVisible ? "lg:col-span-2 space-y-4" : "lg:col-span-3 space-y-4"}>
+       <main className="lg:col-span-2 space-y-4">
         {/* Header */}
         <header className="p-6 border-b-4 border-primary bg-background -mx-6 -mt-8">
           <div className="max-w-5xl mx-auto flex justify-between items-center">
@@ -335,32 +332,13 @@ export default function LinguisticDecoderApp(){
         )}
       </main>
 
-      {sidePanelsVisible && (
-        <aside className="lg:col-span-1 space-y-4">
-            {showHistory && (
-              <Card className="p-4">
-                <div className="flex justify-between items-center mb-2">
-                    <h2 className="text-xl font-semibold">History</h2>
-                    <Button variant="ghost" size="sm" onClick={() => setShowHistory(!showHistory)} title={showHistory ? "Hide history" : "Show history"}>
-                        {showHistory ? <EyeOff /> : <Eye />}
-                    </Button>
-                </div>
-                <HistoryPanel onLoadAnalysis={onLoadAnalysis} onRecompute={onRecompute} />
-              </Card>
-            )}
-            {showEval && (
-              <Card className="p-4">
-                <div className="flex justify-between items-center mb-2">
-                  <h2 className="text-xl font-semibold">Batch Eval</h2>
-                  <Button variant="ghost" size="sm" onClick={() => setShowEval(!showEval)} title={showEval ? "Hide eval" : "Show eval"}>
-                      {showEval ? <EyeOff /> : <Eye />}
-                  </Button>
-                </div>
-                <EvalPanel />
-              </Card>
-            )}
-        </aside>
-      )}
+      <aside className="lg:col-span-1 space-y-4">
+          <Card className="p-4">
+              <h2 className="text-xl font-semibold mb-2">History</h2>
+              <HistoryPanel onLoadAnalysis={onLoadAnalysis} onRecompute={onRecompute} />
+          </Card>
+          <EvalPanel />
+      </aside>
 
 
       {/* Footer */}
