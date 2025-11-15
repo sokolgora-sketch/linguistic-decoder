@@ -20,6 +20,9 @@ type AnalyzeOpts = {
     edgeWeight?: number;
 };
 
+// NEW helper: safe join
+const joinPath = (xs?: string[]) => Array.isArray(xs) ? xs.join("→") : "";
+
 const CFG = { beamWidth: 8, maxOpsStrict: 1, maxOpsOpen: 2, cost: { sub:1, del:3, insClosure:2 } };
 
 function computeLocal(word: string, mode: Mode, alphabet: Alphabet, edgeWeight?: number): EnginePayload {
@@ -58,7 +61,7 @@ export async function analyzeClient(word: string, mode: Mode, alphabet: Alphabet
       await setDoc(cacheRef, { ...cleanPayload, cachedAt: serverTimestamp() }, { merge: true });
     }
     
-    void saveHistory(cacheId, word, mode, alphabet, "bypass");
+    void saveHistory(cacheId, enrichedPayload, "bypass");
     return { ...enrichedPayload, recomputed: true, cacheHit: false };
   }
 
@@ -66,7 +69,7 @@ export async function analyzeClient(word: string, mode: Mode, alphabet: Alphabet
   const snap = await getDoc(cacheRef);
   if (snap.exists()) {
     const normalized = normalizeEnginePayload(snap.data());
-    void saveHistory(cacheId, word, mode, alphabet, "cache");
+    void saveHistory(cacheId, normalized, "cache");
     return { ...normalized, cacheHit: true, recomputed: false };
   }
 
@@ -78,17 +81,42 @@ export async function analyzeClient(word: string, mode: Mode, alphabet: Alphabet
   const cleanFresh = sanitizeForFirestore(enriched);
 
   await setDoc(cacheRef, { ...cleanFresh, cachedAt: serverTimestamp() }, { merge: false });
-  void saveHistory(cacheId, word, mode, alphabet, "fresh");
+  void saveHistory(cacheId, enriched, "fresh");
   return { ...enriched, cacheHit: false, recomputed: false };
 }
 
 async function saveHistory(
-  cacheId: string, word: string, mode: Mode, alphabet: Alphabet, source: "cache"|"fresh"|"bypass"
+  cacheId: string,
+  engine: any,                 // <-- pass the full engine payload
+  source: "cache"|"fresh"|"bypass"
 ) {
   const u = auth.currentUser;
   if (!u) return;
+
   const ref = collection(db, "users", u.uid, "history");
-  await addDoc(ref, { cacheId, word, mode, alphabet, engineVersion: ENGINE_VERSION, source, createdAt: serverTimestamp() });
+
+  const word = String(engine?.word ?? "");
+  const mode = String(engine?.mode ?? "strict");
+  const alphabet = String(engine?.alphabet ?? "auto");
+  const engineVersion = String(engine?.engineVersion ?? "unknown");
+  const primaryPath = engine?.primaryPath ?? {};
+  const voicePath = primaryPath?.voicePath ?? [];
+  const ringPath  = primaryPath?.ringPath  ?? [];
+  const levelPath = primaryPath?.levelPath ?? [];
+  const primaryVoice = joinPath(voicePath);
+
+  const docData = {
+    cacheId, word, mode, alphabet, engineVersion, source,
+    primaryVoice,
+    voicePath, ringPath, levelPath,
+    solveMs: engine?.solveMs ?? null,
+    cacheHit: !!engine?.cacheHit,
+    createdAt: serverTimestamp(),
+  };
+
+  // strip undefineds
+  const clean = JSON.parse(JSON.stringify(docData));
+  await addDoc(ref, clean);
 }
 
 
