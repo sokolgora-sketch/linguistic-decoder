@@ -170,12 +170,16 @@ export default function LinguisticDecoderApp(){
     }
   }
 
-  async function onRecompute(word: string, mode: 'strict' | 'open', alphabet: string) {
+  async function onRecompute(word: string, m?: string, a?: string) {
       setLoading(true);
       setData(null);
       setErr(null);
       try {
-          const result = await analyzeClient(word, mode, alphabet as any, { bypass: true, edgeWeight });
+          const result = await analyzeClient(word, (m as any) || mode, (a as any) || alphabet, {
+            bypass: true,
+            skipWrite: false,
+            edgeWeight
+          });
           setData(result);
           toast({ title: "Recomputed", description: `Fresh analysis for '${result.word}' complete.` });
       } catch (e: any) {
@@ -321,7 +325,7 @@ export default function LinguisticDecoderApp(){
       <aside className="lg:col-span-1 space-y-4">
           <Card className="p-4">
             <h2 className="text-xl font-semibold mb-2">History</h2>
-            <HistoryPanel onLoadAnalysis={onLoadAnalysis} onRecompute={onRecompute} />
+            <HistoryPanel onLoadAnalysis={onLoadAnalysis} onRecompute={onRecompute as any} />
           </Card>
       </aside>
 
@@ -360,3 +364,5 @@ export default function LinguisticDecoderApp(){
     </div>
   );
 }
+
+    

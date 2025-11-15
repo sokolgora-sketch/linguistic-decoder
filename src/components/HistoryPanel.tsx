@@ -24,7 +24,7 @@ export default function HistoryPanel({
   onRecompute,
 }: {
   onLoadAnalysis: (cacheId: string) => Promise<void>;
-  onRecompute: (word: string, mode: 'strict' | 'open', alphabet: string) => Promise<void>;
+  onRecompute: (word: string, mode?: string, alphabet?: string) => Promise<void>;
 }) {
   const [rows, setRows] = useState<Row[]>([]);
   const [loading, setLoading] = useState(false);
@@ -42,7 +42,7 @@ export default function HistoryPanel({
     return query(col, orderBy("createdAt", "desc"), limit(20));
   }, [uid]);
 
-  async function load() {
+  async function load(hardRefresh = false) {
     if (!uid || !baseQuery) return;
     setLoading(true); setErr(null);
     try {
@@ -80,17 +80,20 @@ export default function HistoryPanel({
     if (!uid) return;
     const sure = window.confirm(`Delete history entry for "${row.word}"? This cannot be undone.`);
     if (!sure) return;
+
     setLoading(true); setErr(null);
     try {
       await deleteDoc(doc(db, "users", uid, "history", row.id));
-      // Optional: also remove shared cache
+
       if (row.cacheId) {
         const also = window.confirm("Also delete the shared cache entry (analyses) for this item?");
         if (also) {
           await deleteDoc(doc(db, "analyses", row.cacheId));
         }
       }
-      setRows(prev => prev.filter(r => r.id !== row.id));
+
+      // Refresh list so UI never looks stale
+      await load(true);
     } catch (e:any) {
       setErr(e?.message || String(e));
     } finally {
@@ -100,13 +103,20 @@ export default function HistoryPanel({
 
   async function clearAll() {
     if (!uid) return;
+
+    // Permission step 1 — explicit confirm
     const sure = window.confirm("Delete ALL your history entries? This cannot be undone.");
     if (!sure) return;
+
+    // Permission step 2 — typed confirmation
+    const token = window.prompt('Type CLEAR to confirm bulk delete:');
+    if (token !== 'CLEAR') return;
 
     setLoading(true); setErr(null);
     try {
       let last: QueryDocumentSnapshot<DocumentData> | null = null;
       let total = 0;
+
       while (true) {
         const q = query(
           collection(db, "users", uid, "history"),
@@ -125,8 +135,12 @@ export default function HistoryPanel({
         last = snap.docs[snap.docs.length - 1];
         if (snap.docs.length < 200) break;
       }
+
+      // Optimistic UI clear + hard reload of list
       setRows([]);
-      // We intentionally do NOT bulk-delete shared cache; it may be referenced by others.
+      await load(true);
+
+      alert(`Deleted ${total} history entr${total === 1 ? 'y' : 'ies'}.`);
     } catch (e:any) {
       setErr(e?.message || String(e));
     } finally {
@@ -164,7 +178,7 @@ export default function HistoryPanel({
           <input className="border rounded px-2 py-1 text-sm bg-background" placeholder="search…" value={wordFilter} onChange={e=>setWordFilter(e.target.value)} />
         </div>
 
-        <button className="border rounded px-3 py-1 text-sm" onClick={load} disabled={loading}>
+        <button className="border rounded px-3 py-1 text-sm" onClick={() => load(true)} disabled={loading}>
           {loading ? "Loading…" : "Refresh"}
         </button>
         <button className="border rounded px-3 py-1 text-sm text-red-700 border-red-300" onClick={clearAll} disabled={loading}>
@@ -193,7 +207,13 @@ export default function HistoryPanel({
             </div>
             <div className="flex gap-2 shrink-0">
               <button className="border rounded px-2 py-1 text-xs" onClick={()=>onLoadAnalysis(r.cacheId)} title="Load cached analysis">Load</button>
-              <button className="border rounded px-2 py-1 text-xs" onClick={()=>onRecompute(r.word, r.mode as any, r.alphabet)} title="Recompute (bypass cache)">Recompute</button>
+              <button
+                className="border rounded px-2 py-1 text-xs"
+                title="Recompute (bypass cache)"
+                onClick={()=>onRecompute(r.word, r.mode, r.alphabet)}
+              >
+                Recompute
+              </button>
               <button className="border rounded px-2 py-1 text-xs text-red-700 border-red-300" onClick={()=>deleteRow(r)} title="Delete history">Delete</button>
             </div>
           </div>
@@ -205,3 +225,5 @@ export default function HistoryPanel({
     </div>
   );
 }
+
+    
