@@ -18,7 +18,7 @@ import type { Alphabet } from "@/lib/solver/engineConfig";
 import { PROFILES } from "@/functions/languages";
 import { ThemeToggle } from "@/components/ThemeProvider";
 import { useDebounced } from "@/hooks/useDebounced";
-import { Copy, Download, Loader } from "lucide-react";
+import { Copy, Download, Eye, EyeOff, Loader } from "lucide-react";
 import ComparePanel from "@/components/ComparePanel";
 import { normalizeEnginePayload, type EnginePayload, type Vowel } from "@/shared/engineShape";
 import HistoryPanel from "@/components/HistoryPanel";
@@ -42,6 +42,7 @@ export default function LinguisticDecoderApp(){
   const [loading, setLoading] = useState(false);
   const [isWarming, setIsWarming] = useState(false);
   const [showDebug, setShowDebug] = useState(false);
+  const [showHistory, setShowHistory] = useState(true);
 
   // Debounce user input, then warm the cache in the background
   const debouncedWord = useDebounced(word, 450);
@@ -334,8 +335,13 @@ export default function LinguisticDecoderApp(){
 
       <aside className="lg:col-span-1 space-y-4">
           <Card className="p-4">
-            <h2 className="text-xl font-semibold mb-2">History</h2>
-            <HistoryPanel onLoadAnalysis={onLoadAnalysis} onRecompute={onRecompute} />
+            <div className="flex justify-between items-center mb-2">
+                <h2 className="text-xl font-semibold">History</h2>
+                <Button variant="ghost" size="sm" onClick={() => setShowHistory(!showHistory)} title={showHistory ? "Hide history" : "Show history"}>
+                    {showHistory ? <EyeOff /> : <Eye />}
+                </Button>
+            </div>
+            {showHistory && <HistoryPanel onLoadAnalysis={onLoadAnalysis} onRecompute={onRecompute} />}
           </Card>
           <EvalPanel />
       </aside>
