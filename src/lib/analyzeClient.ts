@@ -7,8 +7,7 @@ import { normalizeEnginePayload, type EnginePayload } from "@/shared/engineShape
 // Browser-safe engine code:
 import { solveWord } from "@/functions/sevenVoicesCore";
 import type { SolveOptions, Vowel } from "@/functions/sevenVoicesCore";
-import { chooseProfile } from "@/functions/languages";
-import { readWindowsDebug, extractBase, normalizeTerminalY } from "@/functions/sevenVoicesC";
+import { mapWordToLanguageFamilies } from "@/lib/mapper";
 import { sanitizeForFirestore } from "@/lib/sanitize";
 
 
@@ -51,19 +50,16 @@ export async function analyzeClient(word: string, mode: Mode, alphabet: Alphabet
   // BYPASS / WRITE-THROUGH: compute fresh or use provided payload, skip cache read
   if (opts.bypass) {
     const payloadToUse = opts.payload ? normalizeEnginePayload(opts.payload) : computeLocal(word, mode, alphabet, opts.edgeWeight);
-    const finalPayload = { 
-        ...payloadToUse, 
-        recomputed: true, 
-        cacheHit: false,
-    };
+    const families = await mapWordToLanguageFamilies(payloadToUse);
+    const enrichedPayload = { ...payloadToUse, languageFamilies: families ?? [] };
     
     if (!opts.skipWrite) {
-      const cleanPayload = sanitizeForFirestore(finalPayload);
+      const cleanPayload = sanitizeForFirestore(enrichedPayload);
       await setDoc(cacheRef, { ...cleanPayload, cachedAt: serverTimestamp() }, { merge: true });
     }
     
     void saveHistory(cacheId, word, mode, alphabet, "bypass");
-    return finalPayload;
+    return { ...enrichedPayload, recomputed: true, cacheHit: false };
   }
 
   // Try cache -> normalize (in case older writes used a different shape)
@@ -74,14 +70,16 @@ export async function analyzeClient(word: string, mode: Mode, alphabet: Alphabet
     return { ...normalized, cacheHit: true, recomputed: false };
   }
 
-  // Miss → compute → write → return
+  // Miss → compute → map → write → return
   const fresh = computeLocal(word, mode, alphabet, opts.edgeWeight);
-  
-  const cleanFresh = sanitizeForFirestore(fresh);
+  const families = await mapWordToLanguageFamilies(fresh);
+  const enriched = { ...fresh, languageFamilies: families ?? [] };
+
+  const cleanFresh = sanitizeForFirestore(enriched);
 
   await setDoc(cacheRef, { ...cleanFresh, cachedAt: serverTimestamp() }, { merge: false });
   void saveHistory(cacheId, word, mode, alphabet, "fresh");
-  return fresh;
+  return { ...enriched, cacheHit: false, recomputed: false };
 }
 
 async function saveHistory(
@@ -125,7 +123,9 @@ export async function prefetchAnalyze(
 
   try {
     const fresh = computeLocal(word, mode, alphabet);
-    const cleanFresh = sanitizeForFirestore(fresh);
+    const families = await mapWordToLanguageFamilies(fresh);
+    const enriched = { ...fresh, languageFamilies: families ?? [] };
+    const cleanFresh = sanitizeForFirestore(enriched);
     await setDoc(cacheRef, { ...cleanFresh, cachedAt: serverTimestamp() }, { merge: false });
 
   } catch (e) {
@@ -134,5 +134,3 @@ export async function prefetchAnalyze(
     callbacks?.onFinish?.();
   }
 }
-
-    
