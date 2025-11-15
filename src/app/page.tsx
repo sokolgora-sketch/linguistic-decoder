@@ -27,7 +27,12 @@ import { db } from "@/lib/firebase";
 import FooterBuild from "@/components/FooterBuild";
 import { allowAnalyze } from "@/lib/throttle";
 import WhyThisPath from "@/components/WhyThisPath";
-import EvalPanel from "@/components/EvalPanel";
+// import EvalPanel from "@/components/EvalPanel"; - REMOVED
+
+let EvalPanelComp: React.ComponentType | null = null;
+if (process.env.NEXT_PUBLIC_DEV_EVAL === "1") {
+  EvalPanelComp = require("@/components/EvalPanel").default;
+}
 
 
 // ==== Main App ===============================================================
@@ -317,11 +322,11 @@ export default function LinguisticDecoderApp(){
                 <HistoryPanel onLoadAnalysis={onLoadAnalysis} onRecompute={onRecompute} />
             </AccordionContent>
           </AccordionItem>
-          {process.env.NEXT_PUBLIC_DEV_EVAL === '1' && (
+          {EvalPanelComp && (
             <AccordionItem value="item-5">
               <AccordionTrigger>Batch Evaluation</AccordionTrigger>
               <AccordionContent>
-                  <EvalPanel />
+                  <EvalPanelComp />
               </AccordionContent>
             </AccordionItem>
           )}
@@ -382,5 +387,7 @@ export default function LinguisticDecoderApp(){
     </div>
   );
 }
+
+    
 
     
