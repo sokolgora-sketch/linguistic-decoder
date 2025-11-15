@@ -19,7 +19,7 @@ export type EngineManifest = {
   };
 };
 
-export const defaultManifest: EngineManifest = {
+export const manifest_v1: EngineManifest = {
   name: "SevenVoices Core",
   version: "2025-11-15-core-1",
   ringIndex: { O:0, I:1, U:1, E:2, Y:2, A:3, "Ë":3 },
@@ -43,9 +43,21 @@ export const defaultManifest: EngineManifest = {
   }
 };
 
+export const manifest_v2: EngineManifest = {
+    ...manifest_v1,
+    version: "2025-11-15-core-2",
+    edgeWeight: 0.35,
+    opCost: { sub:1, del:4, ins:3 },
+};
+
+
+// Default is now v2
+export const defaultManifest = manifest_v2;
+
 // Simple registry if you add future manifests
 const registry: Record<string, EngineManifest> = {
-  [defaultManifest.version]: defaultManifest,
+  [manifest_v1.version]: manifest_v1,
+  [manifest_v2.version]: manifest_v2,
 };
 
 export function getManifest(version?: string) {

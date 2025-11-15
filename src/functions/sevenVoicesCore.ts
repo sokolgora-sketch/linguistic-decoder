@@ -13,7 +13,7 @@ export type SolveOptions = {
   maxOps: number;
   allowDelete: boolean;
   allowClosure: boolean;
-  opCost: { sub: number; del: number; insClosure: number };
+  opCost: { sub: number; del: number; ins: number };
   edgeWeight?: number;
   manifest?: any;
   alphabet: string;
@@ -136,7 +136,7 @@ function neighbors(st: State, opts: SolveOptions): State[] {
     const next = seq.concat("Ë");
     out.push({
       seq: next,
-      E: st.E + opCost.insClosure,
+      E: st.E + opCost.ins,
       ops: [...st.ops, "closure Ë"],
     });
   }

@@ -23,15 +23,16 @@ type AnalyzeOpts = {
 // NEW helper: safe join
 const joinPath = (xs?: string[]) => Array.isArray(xs) ? xs.join("→") : "";
 
-const CFG = { beamWidth: 8, maxOpsStrict: 1, maxOpsOpen: 2, cost: { sub:1, del:3, insClosure:2 } };
-
 function computeLocal(word: string, mode: Mode, alphabet: Alphabet, edgeWeight?: number): EnginePayload {
-  const strict = mode === "strict";
   const manifest = getManifest(); // Use default manifest for local compute
   const t0 = Date.now();
+  
+  const strict = mode === "strict";
+  const opCost = manifest.opCost;
+
   const opts: SolveOptions = strict
-    ? { beamWidth: CFG.beamWidth, maxOps: CFG.maxOpsStrict, allowDelete: false, allowClosure: false, opCost: CFG.cost, edgeWeight, alphabet, manifest }
-    : { beamWidth: CFG.beamWidth, maxOps: CFG.maxOpsOpen,   allowDelete: true,  allowClosure: true,  opCost: CFG.cost, edgeWeight, alphabet, manifest };
+    ? { beamWidth: 8, maxOps: 1, allowDelete: false, allowClosure: false, opCost, edgeWeight, alphabet, manifest }
+    : { beamWidth: 8, maxOps: 2, allowDelete: true,  allowClosure: true,  opCost, edgeWeight, alphabet, manifest };
 
   const analysisResult = solveWord(word, opts, alphabet);
 

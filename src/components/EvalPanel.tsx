@@ -54,9 +54,10 @@ export default function EvalPanel() {
         const mode = (cols[iMode] as Mode) || modeDefault;
         const alphabet = (cols[iAlpha] as Alphabet) || alphabetDefault;
 
+        const opCost = manifest.opCost;
         const opts = mode === "strict"
-          ? { beamWidth:8, maxOps:1, allowDelete:false, allowClosure:false, opCost:{sub:1,del:3,ins:2}, alphabet, manifest, edgeWeight: manifest.edgeWeight }
-          : { beamWidth:8, maxOps:2, allowDelete:true, allowClosure:true,  opCost:{sub:1,del:3,ins:2}, alphabet, manifest, edgeWeight: manifest.edgeWeight };
+          ? { beamWidth:8, maxOps:1, allowDelete:false, allowClosure:false, opCost, alphabet, manifest, edgeWeight: manifest.edgeWeight }
+          : { beamWidth:8, maxOps:2, allowDelete:true, allowClosure:true,  opCost, alphabet, manifest, edgeWeight: manifest.edgeWeight };
 
         const res:any = solveWord(word, opts, alphabet);
         const predicted = joinPath(res?.primaryPath?.voicePath);
