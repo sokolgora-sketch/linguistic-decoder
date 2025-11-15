@@ -1,3 +1,4 @@
+
 // @ts-nocheck
 
 import { getManifest, EngineManifest } from "@/engine/manifest";
@@ -91,7 +92,7 @@ function mkPath(baseSeq, consClasses, seq, E, ops, edgeInfo, edgeWeight, RING, L
 }
 
 function neighbors(st, opts) {
-  const out = [];
+  const out: any[] = [];
   const seq = st.seq;
   const { allowDelete, allowClosure, opCost } = opts;
 
@@ -155,11 +156,12 @@ function scoreTuple(p, RING) {
 
 
 // --- Main Solver ---
-export function solveWord(word, opts, alphabet) {
-    const manifest = opts.manifest;
+export function solveWord(word, opts: any = {}, alphabet) {
+    const manifest = (opts && opts.manifest) ? opts.manifest : getManifest();
     const RING = manifest.ringIndex;
     const LVL  = manifest.levelIndex;
-    const EDGE_W = typeof opts.edgeWeight === "number" ? opts.edgeWeight : manifest.edgeWeight;
+    const EDGE_W = typeof opts.edgeWeight === 'number' ? opts.edgeWeight : manifest.edgeWeight;
+    const opCost = opts.opCost ?? manifest.opCost;
 
     const rawBase = extractBase(word);
     const base = normalizeTerminalY(rawBase, word);
@@ -171,8 +173,8 @@ export function solveWord(word, opts, alphabet) {
     const K = opts.beamWidth;
     const maxOps = opts.maxOps;
 
-    let paths = [];
-    const q = [{ seq: baseSeq, E: 0, ops: [] }];
+    let paths: Path[] = [];
+    const q: State[] = [{ seq: baseSeq, E: 0, ops: [] }];
     const visited = new Set([baseSeq.join("")]);
 
     while (q.length > 0) {
@@ -183,7 +185,7 @@ export function solveWord(word, opts, alphabet) {
         const p = mkPath(baseSeq, consClasses, st.seq, st.E, st.ops, edge, EDGE_W, RING, LVL);
         paths.push(p);
 
-        const nextStates = neighbors(st, opts);
+        const nextStates = neighbors(st, { ...opts, opCost });
         for (const n of nextStates) {
             const key = n.seq.join("");
             if (visited.has(key)) continue;
