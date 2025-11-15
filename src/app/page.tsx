@@ -317,12 +317,14 @@ export default function LinguisticDecoderApp(){
                 <HistoryPanel onLoadAnalysis={onLoadAnalysis} onRecompute={onRecompute} />
             </AccordionContent>
           </AccordionItem>
-          <AccordionItem value="item-5">
-            <AccordionTrigger>Batch Evaluation</AccordionTrigger>
-            <AccordionContent>
-                <EvalPanel />
-            </AccordionContent>
-          </AccordionItem>
+          {process.env.NEXT_PUBLIC_DEV_EVAL === '1' && (
+            <AccordionItem value="item-5">
+              <AccordionTrigger>Batch Evaluation</AccordionTrigger>
+              <AccordionContent>
+                  <EvalPanel />
+              </AccordionContent>
+            </AccordionItem>
+          )}
         </Accordion>
 
         {/* Debug view */}
