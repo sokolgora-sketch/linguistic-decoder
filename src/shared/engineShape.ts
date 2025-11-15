@@ -11,6 +11,15 @@ export type EnginePath = {
   kept?: number;
 };
 
+export type LanguageFamily = {
+  familyId: "albanian"|"latin"|"ancient_greek"|"greek"|"sanskrit"|"pie"|"germanic"|"slavic"|"semitic"|"unknown";
+  label: string;          // UI label
+  confidence: number;     // 0..1 (deterministic buckets)
+  rationale: string;      // short explanation
+  forms?: string[];       // candidates/attested forms
+  signals?: string[];     // debug notes
+};
+
 export type EnginePayload = {
   engineVersion: string;
   word: string;
@@ -24,7 +33,7 @@ export type EnginePayload = {
   solveMs?: number;
   cacheHit?: boolean;
   recomputed?: boolean;
-  languageFamilies?: Record<string, { form:string; map:string[]; functional:string }[]> | null;
+  languageFamilies?: LanguageFamily[]; // NEW
   edgeWindows?: string[];
 };
 
@@ -100,7 +109,7 @@ export function normalizeEnginePayload(raw:any): EnginePayload {
     solveMs: a.solveMs,
     cacheHit: raw.cacheHit, // from wrapper
     recomputed: raw.recomputed,
-    languageFamilies: a.languageFamilies,
+    languageFamilies: Array.isArray(a.languageFamilies) ? a.languageFamilies : [],
     edgeWindows: a.edgeWindows ?? [],
   };
 }
