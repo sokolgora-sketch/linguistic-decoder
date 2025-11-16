@@ -183,7 +183,7 @@ export function solveWord(word, opts: any = {}, alphabet) {
 
     const uniqPaths = Array.from(new Map(paths.map(p => [p.voicePath.join(""), p])).values());
     
-    // Apply edge bias as a final scoring step
+    // Apply edge bias as a final scoring step BEFORE sorting
     for (const p of uniqPaths) {
         let edgePenalty = 0;
         if (p.voicePath.length > 1) {
@@ -199,7 +199,6 @@ export function solveWord(word, opts: any = {}, alphabet) {
         }
         p.checksums.E += edgePenalty;
     }
-
 
     uniqPaths.sort((p, q) => {
         const A = scoreTuple(p, RING), B = scoreTuple(q, RING);
