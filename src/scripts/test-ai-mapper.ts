@@ -1,5 +1,4 @@
 
-#!/usr/bin/env ts-node
 import 'dotenv/config';
 require("ts-node/register");
 require("tsconfig-paths/register");
