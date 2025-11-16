@@ -1,12 +1,23 @@
-name: ci
-on: [push, pull_request]
+name: CI
+on:
+  push:
+  pull_request:
+
 jobs:
   test:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      NODE_ENV: test
+      CI: 'true'
+      FIREBASE_AUTH_EMULATOR_HOST: localhost:9099
+      GCLOUD_PROJECT: dummy
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with: { node-version: 20 }
+        with:
+          node-version: '20'
+          cache: 'npm'
       - run: npm ci
-      - run: npm run test --if-present
-      - run: npm run build --if-present
+      - run: npm test -- --runInBand
+
