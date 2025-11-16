@@ -1,0 +1,163 @@
+
+[
+  {
+    "id": "geg_tosk_01a",
+    "input": "vajzë",
+    "alphabet": "albanian",
+    "expectedPrimary": "A→Ë",
+    "dialect": "tosk",
+    "notes": "Standard/Tosk form for 'girl'. Paired with geg_tosk_01b."
+  },
+  {
+    "id": "geg_tosk_01b",
+    "input": "vajz",
+    "alphabet": "albanian",
+    "expectedPrimary": "A",
+    "dialect": "geg",
+    "notes": "Geg variant of 'girl', drops the final ë."
+  },
+  {
+    "id": "geg_tosk_02a",
+    "input": "është",
+    "alphabet": "albanian",
+    "expectedPrimary": "Ë→Ë",
+    "dialect": "tosk",
+    "notes": "Standard/Tosk for 'is'. Paired with geg_tosk_02b."
+  },
+  {
+    "id": "geg_tosk_02b",
+    "input": "âsht",
+    "alphabet": "albanian",
+    "expectedPrimary": "A",
+    "dialect": "geg",
+    "notes": "Geg variant 'âsht' or 'osht'. Nasal â should map to A."
+  },
+  {
+    "id": "geg_tosk_03a",
+    "input": "bëj",
+    "alphabet": "albanian",
+    "expectedPrimary": "Ë",
+    "dialect": "tosk",
+    "notes": "Standard/Tosk for 'I do'. Paired with geg_tosk_03b."
+  },
+  {
+    "id": "geg_tosk_03b",
+    "input": "bâj",
+    "alphabet": "albanian",
+    "expectedPrimary": "A",
+    "dialect": "geg",
+    "notes": "Geg variant for 'I do' with nasal vowel."
+  },
+  {
+    "id": "geg_tosk_04a",
+    "input": "një",
+    "alphabet": "albanian",
+    "expectedPrimary": "Ë",
+    "dialect": "tosk",
+    "notes": "Standard/Tosk for 'one'."
+  },
+  {
+    "id": "geg_tosk_04b",
+    "input": "nji",
+    "alphabet": "albanian",
+    "expectedPrimary": "I",
+    "dialect": "geg",
+    "notes": "Geg variant for 'one'."
+  },
+  {
+    "id": "geg_tosk_05a",
+    "input": "zëri",
+    "alphabet": "albanian",
+    "expectedPrimary": "Ë→I",
+    "dialect": "tosk",
+    "notes": "Standard/Tosk for 'the voice'."
+  },
+  {
+    "id": "geg_tosk_05b",
+    "input": "zâni",
+    "alphabet": "albanian",
+    "expectedPrimary": "A→I",
+    "dialect": "geg",
+    "notes": "Geg variant for 'the voice' with nasal vowel."
+  },
+  {
+    "id": "geg_tosk_06a",
+    "input": "qen",
+    "alphabet": "albanian",
+    "expectedPrimary": "E",
+    "dialect": "tosk",
+    "notes": "Standard/Tosk 'q' (/c/) for 'dog'."
+  },
+  {
+    "id": "geg_tosk_06b",
+    "input": "çen",
+    "alphabet": "albanian",
+    "expectedPrimary": "E",
+    "dialect": "geg",
+    "notes": "Geg variant 'ç' (/tʃ/) for 'dog'."
+  },
+  {
+    "id": "geg_tosk_07a",
+    "input": "rërë",
+    "alphabet": "albanian",
+    "expectedPrimary": "Ë→Ë",
+    "dialect": "tosk",
+    "notes": "Standard/Tosk for 'sand'."
+  },
+  {
+    "id": "geg_tosk_07b",
+    "input": "rânë",
+    "alphabet": "albanian",
+    "expectedPrimary": "A→Ë",
+    "dialect": "geg",
+    "notes": "Geg variant for 'sand' with nasal vowel and ë-drop."
+  },
+  {
+    "id": "geg_tosk_08a",
+    "input": "nëntë",
+    "alphabet": "albanian",
+    "expectedPrimary": "Ë→Ë",
+    "dialect": "tosk",
+    "notes": "Tosk for 'nine'."
+  },
+  {
+    "id": "geg_tosk_08b",
+    "input": "nândë",
+    "alphabet": "albanian",
+    "expectedPrimary": "A→Ë",
+    "dialect": "geg",
+    "notes": "Geg for 'nine'."
+  },
+  {
+    "id": "geg_tosk_09a",
+    "input": "gjarpër",
+    "alphabet": "albanian",
+    "expectedPrimary": "A→Ë",
+    "dialect": "tosk",
+    "notes": "Tosk for 'snake'."
+  },
+  {
+    "id": "geg_tosk_09b",
+    "input": "gjarpen",
+    "alphabet": "albanian",
+    "expectedPrimary": "A→E",
+    "dialect": "geg",
+    "notes": "Geg for 'snake'."
+  },
+  {
+    "id": "geg_tosk_10a",
+    "input": "emër",
+    "alphabet": "albanian",
+    "expectedPrimary": "E→Ë",
+    "dialect": "tosk",
+    "notes": "Tosk for 'name'."
+  },
+  {
+    "id": "geg_tosk_10b",
+    "input": "emën",
+    "alphabet": "albanian",
+    "expectedPrimary": "E→Ë",
+    "dialect": "geg",
+    "notes": "Geg for 'name'."
+  }
+]
