@@ -135,7 +135,11 @@ export async function analyzeClient(word: string, mode: Mode, alphabet: Alphabet
         logError({ where: "analyzeClient-aiMapper", message: aiError.message, detail: { word, stack: aiError.stack }});
         // Fallback to local mapper on AI error
         freshPayload.languageFamilies = mapLocal(freshPayload);
-        freshPayload.signals?.push("AI_MAPPER_FAILED");
+        if (freshPayload.signals) {
+            freshPayload.signals.push("AI_MAPPER_FAILED");
+        } else {
+            freshPayload.signals = ["AI_MAPPER_FAILED"];
+        }
       }
     } else {
         freshPayload.languageFamilies = mapLocal(freshPayload);
