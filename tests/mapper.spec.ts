@@ -1,29 +1,38 @@
 
-import { mapWordToLanguageFamilies } from "@/lib/mapper";
+import { solveWord } from '@/functions/sevenVoicesCore';
+import { getManifest } from '@/engine/manifest';
+import { mapWordToLanguageFamilies } from '@/lib/mapper';
 
-test("mapper returns at least one family", async () => {
-  const engine: any = {
-    engineVersion: "test",
-    word: "damage",
-    mode: "strict",
-    alphabet: "auto",
-    primaryPath: { voicePath: ["A","E"], ringPath: [3,2], levelPath: [1,1] }
-  };
-  const fams = await mapWordToLanguageFamilies(engine);
-  expect(Array.isArray(fams)).toBe(true);
-  expect(fams.length).toBeGreaterThan(0);
-  expect(fams[0]).toHaveProperty("familyId");
-});
+const manifest = getManifest();
+const base = { manifest, edgeWeight: manifest.edgeWeight, opCost: manifest.opCost, strict: true, beamWidth: 8, maxOps: 1, allowDelete: false, allowClosure: false };
 
-test("ë closure biases Albanian", async () => {
-  const engine: any = {
-    engineVersion: "test",
-    word: "dëm",
-    mode: "strict",
-    alphabet: "auto",
-    primaryPath: { voicePath: ["A","Ë"], ringPath: [3,3], levelPath: [1,-1] }
-  };
-  const fams = await mapWordToLanguageFamilies(engine);
-  const top = fams[0].familyId;
-  expect(["albanian","unknown"]).toContain(top);
+function vp(word: string, alphabet: 'albanian'|'latin'|'auto' = 'auto') {
+  const { primaryPath } = solveWord(word, base, alphabet) as any;
+  return primaryPath.voicePath as string[];
+}
+
+describe('mapper dialect awareness', () => {
+  it('Vetvendosje → Albanian (Gegë)', async () => {
+    const families = await mapWordToLanguageFamilies('Vetvendosje', vp('Vetvendosje', 'albanian'), false);
+    expect(families[0].label).toBe('Albanian');
+    expect((families[0] as any).dialect).toBe('geg');
+  });
+
+  it('Vetëvendosje → Albanian (Tosk)', async () => {
+    const families = await mapWordToLanguageFamilies('Vetëvendosje', vp('Vetëvendosje', 'albanian'), false);
+    expect(families[0].label).toBe('Albanian');
+    expect((families[0] as any).dialect).toBe('tosk');
+  });
+
+  it('mapper returns at least one family', async () => {
+    const families = await mapWordToLanguageFamilies('hope', vp('hope','latin'), false);
+    expect(families.length).toBeGreaterThan(0);
+  });
+
+  it('ë closure biases Albanian', async () => {
+    const a = await mapWordToLanguageFamilies('vete', vp('vete','latin'), false);
+    const b = await mapWordToLanguageFamilies('vetë', vp('vetë','albanian'), false);
+    expect(a[0].label).not.toBe('Albanian');   // often Latin first without cues
+    expect(b[0].label).toBe('Albanian');
+  });
 });

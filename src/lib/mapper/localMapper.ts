@@ -17,8 +17,11 @@ function hitCount(word: string, list: string[]) {
   return list.reduce((n, x) => n + (w.includes(x) ? 1 : 0), 0);
 }
 
-export function mapWordToLanguageFamiliesLocal(word: string, voicePath: string[]): FamilyScore[] {
-  const w = word.normalize("NFC").toLowerCase();
+export function mapWordToLanguageFamiliesLocal(word: any, voicePath: string[]): FamilyScore[] {
+  const wstr = (word ?? '').toString();           // <-- coerce
+  const w = wstr.normalize('NFC').toLowerCase();
+
+  const vp = (voicePath ?? []).map(String);       // safe for PIE nudge
   const notes: string[] = [];
   let alb = 0, latin = 0, pie = 0;
 
@@ -40,8 +43,7 @@ export function mapWordToLanguageFamiliesLocal(word: string, voicePath: string[]
   }
 
   // Light PIE nudge if A/E/O present in the vowel path
-  const vp = (voicePath || []).join("");
-  if (/[AEO]/.test(vp)) { pie += 1; notes.push("A/E/O distribution"); }
+  if (/[AEO]/.test(vp.join(""))) { pie += 1; notes.push("A/E/O distribution"); }
 
   // Normalize to percentages
   const sum = alb + latin + pie || 1;
