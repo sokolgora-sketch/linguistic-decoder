@@ -19,10 +19,9 @@ async function testAiMapper() {
   console.log(`Analyzing "${word}" with AI Mapper enabled...`);
 
   try {
-    // We can remove skipAuth because the firebase module itself is now mocked.
-    const result = await analyzeClient(word, 'strict', 'auto' as Alphabet, { useAi: true });
+    const { payload } = await analyzeClient(word, 'strict', 'auto' as Alphabet, { useAi: true });
     console.log('\n✅ Analysis complete. Full payload:');
-    console.log(JSON.stringify(result, null, 2));
+    console.log(JSON.stringify(payload, null, 2));
   } catch (e) {
     console.error('\n❌ An error occurred during analysis:');
     console.error(e);

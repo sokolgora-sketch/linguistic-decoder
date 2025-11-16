@@ -22,8 +22,8 @@ import { Loader } from "lucide-react";
 import ComparePanel from "@/components/ComparePanel";
 import { normalizeEnginePayload, type EnginePayload, type Vowel } from "@/shared/engineShape";
 import HistoryPanel from "@/components/HistoryPanel";
-import { doc, getDoc } from "firebase/firestore";
-import { db } from "@/lib/firebase";
+import { doc, getDoc, collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { db, auth } from "@/lib/firebase";
 import FooterBuild from "@/components/FooterBuild";
 import { allowAnalyze } from "@/lib/throttle";
 import WhyThisPath from "@/components/WhyThisPath";
@@ -33,6 +33,47 @@ import { logError } from "@/lib/logError";
 let EvalPanelComp: React.ComponentType | null = null;
 if (process.env.NEXT_PUBLIC_DEV_EVAL === "1") {
   EvalPanelComp = require("@/components/EvalPanel").default;
+}
+
+// Moved from analyzeClient.ts to decouple the core analysis from Firebase side-effects.
+async function saveHistory(
+  cacheId: string,
+  engine: EnginePayload,
+  source: "cache" | "fresh" | "bypass" | "load" | "recompute"
+) {
+  const u = auth.currentUser;
+  if (!u) return;
+
+  try {
+    const ref = collection(db, "users", u.uid, "history");
+
+    const joinPath = (xs?: (string|Vowel)[]) => Array.isArray(xs) ? xs.join("→") : "";
+
+    const word = String(engine?.word ?? "");
+    const mode = String(engine?.mode ?? "strict");
+    const alphabet = String(engine?.alphabet ?? "auto");
+    const engineVersion = String(engine?.engineVersion ?? "unknown");
+    const primaryPath = engine?.primaryPath ?? {};
+    const voicePath = primaryPath?.voicePath ?? [];
+    const ringPath  = primaryPath?.ringPath  ?? [];
+    const levelPath = primaryPath?.levelPath ?? [];
+    const primaryVoice = joinPath(voicePath);
+
+    const docData = {
+      cacheId, word, mode, alphabet, engineVersion, source,
+      primaryVoice,
+      voicePath, ringPath, levelPath,
+      solveMs: engine?.solveMs ?? null,
+      cacheHit: !!engine?.cacheHit,
+      createdAt: serverTimestamp(),
+    };
+
+    // strip undefineds
+    const clean = JSON.parse(JSON.stringify(docData));
+    await addDoc(ref, clean);
+  } catch(e:any) {
+    logError({ where: "saveHistory", message: e.message, detail: e.stack });
+  }
 }
 
 
@@ -77,16 +118,15 @@ export default function LinguisticDecoderApp(){
     setErr(null);
     setData(null);
     try {
-      // 1. Get raw result from API or cache
-      const clientResponse = await analyzeClient(useWord, useMode, useAlphabet, { edgeWeight, useAi });
-      console.log("API result:", clientResponse);
-
-      // 2. GUARANTEE the shape
-      const normalizedPayload = normalizeEnginePayload(clientResponse);
+      const { payload, cacheId } = await analyzeClient(useWord, useMode, useAlphabet, { edgeWeight, useAi });
+      console.log("API result:", payload);
+      
+      const normalizedPayload = normalizeEnginePayload(payload);
       console.debug("Primary Path object:", normalizedPayload.primaryPath);
       
-      // 4. Set state with the clean, final payload
       setData(normalizedPayload);
+      void saveHistory(cacheId, normalizedPayload, payload.recomputed ? "bypass" : "fresh");
+
 
     } catch (e: any) {
       const error = e?.message || "Request failed";
@@ -154,6 +194,7 @@ export default function LinguisticDecoderApp(){
       if (snap.exists()) {
           const normalized = normalizeEnginePayload(snap.data());
           setData({ ...normalized, cacheHit: true, recomputed: false });
+          void saveHistory(cacheId, normalized, "load");
           toast({ title: "Loaded from Cache", description: `Analysis for '${normalized.word}' loaded.` });
       } else {
           toast({ variant: "destructive", title: "Not Found", description: "Could not find that analysis in the cache." });
@@ -172,14 +213,15 @@ export default function LinguisticDecoderApp(){
       setData(null);
       setErr(null);
       try {
-          const result = await analyzeClient(word, (m as any) || mode, (a as any) || alphabet, {
+          const { payload, cacheId } = await analyzeClient(word, (m as any) || mode, (a as any) || alphabet, {
             bypass: true,
             skipWrite: false,
             edgeWeight,
             useAi
           });
-          setData(result);
-          toast({ title: "Recomputed", description: `Fresh analysis for '${result.word}' complete.` });
+          setData(payload);
+          void saveHistory(cacheId, payload, "recompute");
+          toast({ title: "Recomputed", description: `Fresh analysis for '${payload.word}' complete.` });
       } catch (e: any) {
           logError({where: "history-recompute", message: e.message, detail: {word}});
           toast({ variant: "destructive", title: "Recompute Error", description: e.message || "Failed to recompute analysis." });

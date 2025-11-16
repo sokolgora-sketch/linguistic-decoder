@@ -1,7 +1,8 @@
 
-import { db, ensureAnon, auth } from "@/lib/firebase";
-import { doc, getDoc, setDoc, serverTimestamp, collection, addDoc } from "firebase/firestore";
-import { normalizeEnginePayload, type EnginePayload, type Vowel, LanguageFamily } from "@/shared/engineShape";
+
+import { db } from "@/lib/firebase";
+import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
+import { normalizeEnginePayload, type EnginePayload, type LanguageFamily } from "@/shared/engineShape";
 import { logError } from "./logError";
 import { toMappingRecord } from "./schemaAdapter";
 
@@ -19,14 +20,15 @@ type Alphabet = "auto"|"albanian"|"latin"|"sanskrit"|"ancient_greek"|"pie"|"turk
 type AnalyzeOpts = {
     bypass?: boolean;
     skipWrite?: boolean;
-    payload?: EnginePayload; // Allow passing a payload to write
+    payload?: EnginePayload;
     edgeWeight?: number;
-    useAi?: boolean; // New flag to control AI mapper
-    skipAuth?: boolean;
+    useAi?: boolean;
 };
 
-// NEW helper: safe join
-const joinPath = (xs?: (string|Vowel)[]) => Array.isArray(xs) ? xs.join("→") : "";
+type AnalyzeResult = {
+  payload: EnginePayload;
+  cacheId: string;
+}
 
 function computeLocal(word: string, mode: Mode, alphabet: Alphabet, edgeWeight?: number): EnginePayload {
   const manifest = getManifest(); // Use default manifest for local compute
@@ -77,14 +79,10 @@ function mapLocal(payload: EnginePayload): LanguageFamily[] {
 }
 
 
-export async function analyzeClient(word: string, mode: Mode, alphabet: Alphabet, opts: AnalyzeOpts = {}) {
-  if (!opts.skipAuth) {
-    await ensureAnon();
-  }
+export async function analyzeClient(word: string, mode: Mode, alphabet: Alphabet, opts: AnalyzeOpts = {}): Promise<AnalyzeResult> {
   const manifest = getManifest();
   const useAi = opts.useAi ?? false;
 
-  // Cache key must now include AI usage flag
   const initialDet = detectAlphabetFair(word, [], alphabet);
   const effectiveAlphabet = initialDet.winner;
   const cacheId = `${word}|${mode}|${effectiveAlphabet}|${manifest.version}|ew:${opts.edgeWeight ?? manifest.edgeWeight}|ai:${useAi}`;
@@ -92,11 +90,10 @@ export async function analyzeClient(word: string, mode: Mode, alphabet: Alphabet
   const cacheRef = doc(db, "analyses", cacheId);
 
   try {
-    // BYPASS / WRITE-THROUGH: always compute fresh
     if (opts.bypass) {
         let payload = opts.payload ? normalizeEnginePayload(opts.payload) : computeLocal(word, mode, alphabet, opts.edgeWeight);
         payload.languageFamilies = useAi
-            ? (await mapWithAi(toMappingRecord(payload)) as any).candidates_map // TODO: Fix type
+            ? (await mapWithAi(toMappingRecord(payload)) as any).candidates_map
             : mapLocal(payload);
 
         if (!opts.skipWrite) {
@@ -104,43 +101,30 @@ export async function analyzeClient(word: string, mode: Mode, alphabet: Alphabet
             await setDoc(cacheRef, { ...cleanPayload, cachedAt: serverTimestamp() }, { merge: true });
         }
         
-        if (!opts.skipAuth) {
-          void saveHistory(cacheId, payload, "bypass");
-        }
-        return { ...payload, recomputed: true, cacheHit: false };
+        return { payload: { ...payload, recomputed: true, cacheHit: false }, cacheId };
     }
 
-    // 1. Try cache
     const snap = await getDoc(cacheRef);
     if (snap.exists()) {
         const normalized = normalizeEnginePayload(snap.data());
-        if (!opts.skipAuth) {
-          void saveHistory(cacheId, normalized, "cache");
-        }
-        return { ...normalized, cacheHit: true, recomputed: false };
+        return { payload: { ...normalized, cacheHit: true, recomputed: false }, cacheId };
     }
 
-    // 2. Cache miss -> compute fresh
     const freshPayload = computeLocal(word, mode, alphabet, opts.edgeWeight);
 
-    // 3. Map languages (local or AI)
     if (useAi) {
       try {
         const aiResult: any = await mapWithAi(toMappingRecord(freshPayload));
-        // This is a rough adaptation; the AI returns a map, not an array.
-        // We will need to adapt the UI to handle this richer structure.
-        // For now, we'll crudely convert it to fit the old shape for verification.
         freshPayload.languageFamilies = Object.entries(aiResult.candidates_map || {}).map(([key, val]: [string, any]) => ({
             familyId: key.toLowerCase() as any,
             label: key,
-            confidence: 0.9, // AI doesn't give confidence, so fake it for now
+            confidence: 0.9,
             rationale: val[0]?.functional || "AI mapped",
             forms: val.map((v:any) => v.form),
             signals: aiResult.signals,
         }));
       } catch (aiError: any) {
         logError({ where: "analyzeClient-aiMapper", message: aiError.message, detail: { word, stack: aiError.stack }});
-        // Fallback to local mapper on AI error
         freshPayload.languageFamilies = mapLocal(freshPayload);
         if (freshPayload.signals) {
             freshPayload.signals.push("AI_MAPPER_FAILED");
@@ -152,100 +136,12 @@ export async function analyzeClient(word: string, mode: Mode, alphabet: Alphabet
         freshPayload.languageFamilies = mapLocal(freshPayload);
     }
 
-    // 4. Write to cache and history
     const cleanFresh = sanitizeForFirestore(freshPayload);
     await setDoc(cacheRef, { ...cleanFresh, cachedAt: serverTimestamp() }, { merge: false });
-    if (!opts.skipAuth) {
-      void saveHistory(cacheId, freshPayload, "fresh");
-    }
     
-    return { ...freshPayload, cacheHit: false, recomputed: false };
+    return { payload: { ...freshPayload, cacheHit: false, recomputed: false }, cacheId };
   } catch (e: any) {
     logError({ where: "analyzeClient", message: e.message, detail: { word, mode, alphabet, stack: e.stack } });
-    throw e; // re-throw to be caught by UI
-  }
-}
-
-async function saveHistory(
-  cacheId: string,
-  engine: EnginePayload,
-  source: "cache"|"fresh"|"bypass"
-) {
-  const u = auth.currentUser;
-  if (!u) return;
-
-  try {
-    const ref = collection(db, "users", u.uid, "history");
-
-    const word = String(engine?.word ?? "");
-    const mode = String(engine?.mode ?? "strict");
-    const alphabet = String(engine?.alphabet ?? "auto");
-    const engineVersion = String(engine?.engineVersion ?? "unknown");
-    const primaryPath = engine?.primaryPath ?? {};
-    const voicePath = primaryPath?.voicePath ?? [];
-    const ringPath  = primaryPath?.ringPath  ?? [];
-    const levelPath = primaryPath?.levelPath ?? [];
-    const primaryVoice = joinPath(voicePath);
-
-    const docData = {
-      cacheId, word, mode, alphabet, engineVersion, source,
-      primaryVoice,
-      voicePath, ringPath, levelPath,
-      solveMs: engine?.solveMs ?? null,
-      cacheHit: !!engine?.cacheHit,
-      createdAt: serverTimestamp(),
-    };
-
-    // strip undefineds
-    const clean = JSON.parse(JSON.stringify(docData));
-    await addDoc(ref, clean);
-  } catch(e:any) {
-    logError({ where: "saveHistory", message: e.message, detail: e.stack });
-    // This is non-critical, so don't throw to the user
-  }
-}
-
-
-const PREFETCH_SEEN = new Set<string>();
-
-export async function prefetchAnalyze(
-  word: string,
-  mode: "strict" | "open",
-  alphabet: Alphabet,
-  callbacks?: { onStart?: () => void; onFinish?: () => void }
-) {
-  if (!word || word.length < 3) {
-    callbacks?.onFinish?.();
-    return;
-  }
-  await ensureAnon();
-  const manifest = getManifest();
-  const initialDet = detectAlphabetFair(word, [], alphabet);
-  const effectiveAlphabet = initialDet.winner;
-  const cacheId = `${word}|${mode}|${effectiveAlphabet}|${manifest.version}|ew:${manifest.edgeWeight}`;
-  if (PREFETCH_SEEN.has(cacheId)) {
-    callbacks?.onFinish?.();
-    return;
-  }
-
-  const cacheRef = doc(db, "analyses", cacheId);
-  const snap = await getDoc(cacheRef);
-  if (snap.exists()) {
-    callbacks?.onFinish?.();
-    return;
-  }
-
-  callbacks?.onStart?.();
-  PREFETCH_SEEN.add(cacheId);
-
-  try {
-    const fresh = computeLocal(word, mode, alphabet);
-    const cleanFresh = sanitizeForFirestore(fresh);
-    await setDoc(cacheRef, { ...cleanFresh, cachedAt: serverTimestamp() }, { merge: false });
-
-  } catch (e) {
-    console.warn("Prefetch failed", e);
-  } finally {
-    callbacks?.onFinish?.();
+    throw e;
   }
 }
