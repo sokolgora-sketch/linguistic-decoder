@@ -1,7 +1,7 @@
 // src/lib/firebase.ts
-import { initializeApp, getApps } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
-import { getAuth, signInAnonymously, onAuthStateChanged, type User } from "firebase/auth";
+import { initializeApp, getApps, type FirebaseApp } from "firebase/app";
+import { getFirestore, type Firestore } from "firebase/firestore";
+import { getAuth, signInAnonymously, onAuthStateChanged, type User, type Auth } from "firebase/auth";
 
 const isTest = process.env.NODE_ENV === 'test';
 
@@ -20,12 +20,12 @@ const firebaseConfig = {
 // Only initialize if the key is present
 const appInitialized = !!apiKey;
 
-export const app = isTest || !appInitialized
-  ? (null as any)
+export const app: FirebaseApp | null = isTest || !appInitialized
+  ? null
   : (getApps().length ? getApps()[0] : initializeApp(firebaseConfig));
 
-export const db = isTest || !appInitialized ? ({} as any) : getFirestore(app);
-export const auth = isTest || !appInitialized ? ({ currentUser: null } as any) : getAuth(app);
+export const db: Firestore | null = app ? getFirestore(app) : null;
+export const auth: Auth | null = app ? getAuth(app) : null;
 
 
 // Store the promise to avoid multiple simultaneous calls
@@ -33,7 +33,7 @@ let authPromise: Promise<User> | null = null;
 
 export function ensureAnon(): Promise<User> {
   if (isTest) return Promise.resolve({ uid: 'test-uid' } as any);
-  if (!appInitialized) {
+  if (!app || !auth) {
     console.warn("Firebase not initialized, cannot ensure anonymous user.");
     return Promise.resolve({ uid: 'uninitialized' } as any);
   }
