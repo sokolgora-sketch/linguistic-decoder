@@ -8,8 +8,8 @@ function toLanguageFamily(f: FamilyScore): LanguageFamily {
   if (f.dialect) rationale += ` (dialect: ${f.dialect})`;
 
   return {
-    familyId: f.family.toLowerCase().replace(/ /g, "_") as any,
-    label: f.family,
+    familyId: f.label.toLowerCase().replace(/ /g, "_") as any,
+    label: f.label,
     confidence: f.score / 100,
     rationale,
     forms: [], // Local mapper doesn't produce forms
@@ -19,14 +19,15 @@ function toLanguageFamily(f: FamilyScore): LanguageFamily {
 
 export async function mapWordToLanguageFamilies(
   word: string,
-  voicePath: Vowel[],
+  voicePath: readonly (Vowel | string)[],
   useAi = false
 ): Promise<LanguageFamily[]> {
-  const localResults = mapWordToLanguageFamiliesLocal(word, voicePath).map(toLanguageFamily);
+  const vp = voicePath.map(s => (s as string).normalize('NFC').toUpperCase() as Vowel);
+  const localResults = mapWordToLanguageFamiliesLocal(word, vp).map(toLanguageFamily);
   if (!useAi) return localResults;
 
   try {
-    // const ai = await mapWithAI(word, voicePath); // your existing remote
+    // const ai = await mapWithAI(word, vp); // your existing remote
     // return ai?.length ? ai : local;
     return localResults; // keep deterministic for now; re-enable AI when ready
   } catch (e: any) {
