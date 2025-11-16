@@ -3,11 +3,12 @@ import { db, ensureAnon, auth } from "@/lib/firebase";
 import { doc, getDoc, setDoc, serverTimestamp, collection, addDoc } from "firebase/firestore";
 import { normalizeEnginePayload, type EnginePayload, type Vowel, LanguageFamily } from "@/shared/engineShape";
 import { logError } from "./logError";
+import { toMappingRecord } from "./schemaAdapter";
 
 // Browser-safe engine code:
 import { solveWord } from "@/functions/sevenVoicesCore";
 import type { SolveOptions } from "@/functions/sevenVoicesCore";
-import { mapWordToLanguageFamilies } from "@/lib/mapper";
+import { mapWordToLanguageFamilies as mapWithAi } from "@/ai/flows/map-word-to-language-families";
 import { sanitizeForFirestore } from "@/lib/sanitize";
 import { getManifest } from "@/engine/manifest";
 import { detectAlphabetFair } from "./alphabet/autoDetect";
@@ -50,80 +51,102 @@ function computeLocal(word: string, mode: Mode, alphabet: Alphabet, edgeWeight?:
 
   const analysisResult = solveWord(word, opts, effectiveAlphabet);
   
-  // Now, run detection *again* with the voice path to get final family scores
-  const finalDet = detectAlphabetFair(word, analysisResult.primaryPath.voicePath, alphabet);
-
-  const languageFamilies: LanguageFamily[] = finalDet.scores.map(s => ({
-    familyId: s.family,
-    label: s.family.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
-    confidence: s.score / 100,
-    rationale: "", // No rationale from this detector
-    forms: [],
-    signals: [],
-  }));
-
-
-  // Construct canonical, then pass through normalizer (paranoid but consistent)
-  return normalizeEnginePayload({
+  const payload = {
     ...analysisResult,
     word,
     mode,
-    alphabet: effectiveAlphabet, // Return the effective alphabet
+    alphabet: effectiveAlphabet,
     solveMs: Date.now() - t0,
     cacheHit: false,
-    languageFamilies,
-  });
+    languageFamilies: [], // Will be filled in by local or AI mapper later
+  };
+  
+  return normalizeEnginePayload(payload);
 }
+
+// Local-only language mapping
+function mapLocal(payload: EnginePayload): LanguageFamily[] {
+    const det = detectAlphabetFair(payload.word, payload.primaryPath.voicePath, payload.alphabet as Alphabet);
+    return det.scores.map(s => ({
+        familyId: s.family,
+        label: s.family.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+        confidence: s.score / 100,
+        rationale: "", forms: [], signals: ["local_mapper"],
+    }));
+}
+
 
 export async function analyzeClient(word: string, mode: Mode, alphabet: Alphabet, opts: AnalyzeOpts = {}) {
   await ensureAnon();
   const manifest = getManifest();
+  const useAi = opts.useAi ?? false;
 
-  // Initial detection to get a consistent cache key
+  // Cache key must now include AI usage flag
   const initialDet = detectAlphabetFair(word, [], alphabet);
   const effectiveAlphabet = initialDet.winner;
-  const cacheId = `${word}|${mode}|${effectiveAlphabet}|${manifest.version}|ew:${opts.edgeWeight ?? manifest.edgeWeight}`;
+  const cacheId = `${word}|${mode}|${effectiveAlphabet}|${manifest.version}|ew:${opts.edgeWeight ?? manifest.edgeWeight}|ai:${useAi}`;
   
   const cacheRef = doc(db, "analyses", cacheId);
 
   try {
-    // BYPASS / WRITE-THROUGH: compute fresh or use provided payload, skip cache read
+    // BYPASS / WRITE-THROUGH: always compute fresh
     if (opts.bypass) {
-      const payloadToUse = opts.payload ? normalizeEnginePayload(opts.payload) : computeLocal(word, mode, alphabet, opts.edgeWeight);
-      
-      if (!opts.skipWrite) {
-        const cleanPayload = sanitizeForFirestore(payloadToUse);
-        await setDoc(cacheRef, { ...cleanPayload, cachedAt: serverTimestamp() }, { merge: true });
-      }
-      
-      void saveHistory(cacheId, payloadToUse, "bypass");
-      return { ...payloadToUse, recomputed: true, cacheHit: false };
+        let payload = opts.payload ? normalizeEnginePayload(opts.payload) : computeLocal(word, mode, alphabet, opts.edgeWeight);
+        payload.languageFamilies = useAi
+            ? (await mapWithAi(toMappingRecord(payload)) as any).candidates_map // TODO: Fix type
+            : mapLocal(payload);
+
+        if (!opts.skipWrite) {
+            const cleanPayload = sanitizeForFirestore(payload);
+            await setDoc(cacheRef, { ...cleanPayload, cachedAt: serverTimestamp() }, { merge: true });
+        }
+        
+        void saveHistory(cacheId, payload, "bypass");
+        return { ...payload, recomputed: true, cacheHit: false };
     }
 
-    // Try cache -> normalize (in case older writes used a different shape)
+    // 1. Try cache
     const snap = await getDoc(cacheRef);
     if (snap.exists()) {
-      const normalized = normalizeEnginePayload(snap.data());
-      // Re-run detection to ensure families are up to date with latest logic
-      const det = detectAlphabetFair(word, normalized.primaryPath.voicePath, alphabet);
-      normalized.languageFamilies = det.scores.map(s => ({
-          familyId: s.family,
-          label: s.family.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
-          confidence: s.score / 100,
-          rationale: "", forms: [], signals: [],
-      }));
-      
-      void saveHistory(cacheId, normalized, "cache");
-      return { ...normalized, cacheHit: true, recomputed: false };
+        const normalized = normalizeEnginePayload(snap.data());
+        void saveHistory(cacheId, normalized, "cache");
+        return { ...normalized, cacheHit: true, recomputed: false };
     }
 
-    // Miss → compute → write → return
-    const fresh = computeLocal(word, mode, alphabet, opts.edgeWeight);
-    const cleanFresh = sanitizeForFirestore(fresh);
+    // 2. Cache miss -> compute fresh
+    const freshPayload = computeLocal(word, mode, alphabet, opts.edgeWeight);
 
+    // 3. Map languages (local or AI)
+    if (useAi) {
+      try {
+        const aiResult: any = await mapWithAi(toMappingRecord(freshPayload));
+        // This is a rough adaptation; the AI returns a map, not an array.
+        // We will need to adapt the UI to handle this richer structure.
+        // For now, we'll crudely convert it to fit the old shape for verification.
+        freshPayload.languageFamilies = Object.entries(aiResult.candidates_map || {}).map(([key, val]: [string, any]) => ({
+            familyId: key.toLowerCase() as any,
+            label: key,
+            confidence: 0.9, // AI doesn't give confidence, so fake it for now
+            rationale: val[0]?.functional || "AI mapped",
+            forms: val.map((v:any) => v.form),
+            signals: aiResult.signals,
+        }));
+      } catch (aiError: any) {
+        logError({ where: "analyzeClient-aiMapper", message: aiError.message, detail: { word, stack: aiError.stack }});
+        // Fallback to local mapper on AI error
+        freshPayload.languageFamilies = mapLocal(freshPayload);
+        freshPayload.signals?.push("AI_MAPPER_FAILED");
+      }
+    } else {
+        freshPayload.languageFamilies = mapLocal(freshPayload);
+    }
+
+    // 4. Write to cache and history
+    const cleanFresh = sanitizeForFirestore(freshPayload);
     await setDoc(cacheRef, { ...cleanFresh, cachedAt: serverTimestamp() }, { merge: false });
-    void saveHistory(cacheId, fresh, "fresh");
-    return { ...fresh, cacheHit: false, recomputed: false };
+    void saveHistory(cacheId, freshPayload, "fresh");
+    
+    return { ...freshPayload, cacheHit: false, recomputed: false };
   } catch (e: any) {
     logError({ where: "analyzeClient", message: e.message, detail: { word, mode, alphabet, stack: e.stack } });
     throw e; // re-throw to be caught by UI
