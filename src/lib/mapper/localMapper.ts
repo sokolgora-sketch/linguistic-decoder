@@ -20,6 +20,7 @@ export function mapWordToLanguageFamiliesLocal(word: any, voicePath: string[]): 
 
   // very cheap signals
   if (/[ëç]/.test(w)) alb += 40;                 // ë/ç => Albanian tilt
+  if (/gj|xh|ll|rr|nj|zh|sh|dh|th/.test(w)) alb += 30; // common digraphs
   if (/[aeiouy]/.test(w)) latin += 20;           // latin vowels present
   if (/[aoe]/.test(w)) pie += 10;                // A/E/O core
 
