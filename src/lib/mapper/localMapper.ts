@@ -1,7 +1,7 @@
 
 // src/lib/mapper/localMapper.ts
 export type FamilyScore = {
-  family: string;
+  label: string;
   score: number;         // 0–100
   notes?: string[];
   dialect?: "geg" | "tosk";
@@ -24,40 +24,44 @@ export function mapWordToLanguageFamiliesLocal(word: any, voicePath: string[]): 
 
   const vp = (voicePath ?? []).map(String);
   const notes: string[] = [];
-  let alb = 0, latin = 0, pie = 0;
+  
+  const scoreMap: Record<string, number> = { albanian: 0, latin: 0, pie: 0 };
 
   const hasDia = /[ëç]/.test(w);
   const digHits = hitCount(w, ALB_DIGRAPHS);
   const morphHits = hitCount(w, ALB_MORPHS);
 
-  if (hasDia)        { alb += 3; notes.push("ë/ç present"); }
-  if (digHits > 0)   { alb += 2; notes.push("Albanian digraph(s)"); }
-  if (morphHits > 0) { alb += 1; notes.push("Albanian morpheme(s)"); }
-
-  const dialect: FamilyScore["dialect"] =
-    hasDia ? "tosk" : (digHits > 0 || morphHits > 0 ? "geg" : undefined);
+  if (hasDia)        { scoreMap.albanian += 3; notes.push("ë/ç present"); }
+  if (digHits > 0)   { scoreMap.albanian += 2; notes.push("Albanian digraph(s)"); }
+  if (morphHits > 0) { scoreMap.albanian += 1; notes.push("Albanian morpheme(s)"); }
 
   if (!hasDia && digHits === 0 && morphHits === 0) {
-    latin += 2; notes.push("ASCII only; no Albanian cues");
+    scoreMap.latin += 2; notes.push("ASCII only; no Albanian cues");
   }
 
-  if (/[AEO]/.test(vp.join(""))) { pie += 1; notes.push("A/E/O distribution"); }
+  if (/[AEO]/.test(vp.join(""))) { scoreMap.pie += 1; notes.push("A/E/O distribution"); }
 
-  const sum = alb + latin + pie || 1;
+  const sum = scoreMap.albanian + scoreMap.latin + scoreMap.pie || 1;
   const pct = (n: number) => Math.round((n / sum) * 100);
 
-  const out: FamilyScore[] = [];
-  if (alb > 0) {
-    out.push({ family: "Albanian", score: pct(alb), notes, dialect });
+  const scores: FamilyScore[] = [];
+  if (scoreMap.albanian > 0) {
+    scores.push({ label: "Albanian", score: pct(scoreMap.albanian), notes });
   }
-  if (latin > 0) {
-    out.push({ family: "Latin", score: pct(latin), notes });
+  if (scoreMap.latin > 0) {
+    scores.push({ label: "Latin", score: pct(scoreMap.latin), notes });
   }
-  if (pie > 0) {
-    out.push({ family: "Proto-Indo-European", score: pct(pie), notes });
+  if (scoreMap.pie > 0) {
+    scores.push({ label: "Proto-Indo-European", score: pct(scoreMap.pie), notes });
   }
   
-  out.sort((a,b) => b.score - a.score);
+  scores.sort((a,b) => b.score - a.score);
 
-  return out;
+  // --- Dialect tagging for Albanian (fair, deterministic) ---
+  const top = scores.find(s => s.label === 'Albanian');
+  if (top) {
+    top.dialect = hasDia ? 'tosk' : 'geg';
+  }
+
+  return scores;
 }

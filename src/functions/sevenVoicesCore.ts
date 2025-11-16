@@ -52,29 +52,15 @@ function keptCount(base, cand) {
   return k;
 }
 
-function mkPath(baseSeq, consClasses, seq, E, ops, edgeInfo, edgeWeight, RING, LVL) {
+function mkPath(baseSeq, consClasses, seq, E, ops, RING, LVL) {
   const voicePath = seq;
-  let finalE = E;
-
-  // Apply edge bias to first and last hops
-  if (voicePath.length > 1 && edgeInfo.prefix?.cls) {
-    const dPrefix = Math.abs(RING[voicePath[1]] - RING[voicePath[0]]);
-    finalE += edgeBiasPenalty(dPrefix, edgeInfo.prefix.cls, edgeWeight);
-  }
-  if (voicePath.length > 1 && edgeInfo.suffix?.cls) {
-      const lastHopIdx = voicePath.length - 2;
-      const dSuffix = Math.abs(RING[voicePath[lastHopIdx + 1]] - RING[voicePath[lastHopIdx]]);
-      finalE += edgeBiasPenalty(dSuffix, edgeInfo.suffix.cls, edgeWeight);
-  }
-
-
   const p = {
     voicePath,
     ringPath: voicePath.map((v) => RING[v]),
     levelPath: voicePath.map((v) => LVL[v]),
     checksums: {
       V: checksumV(voicePath),
-      E: finalE,
+      E: E,
       C: computeC(voicePath, consClasses, RING),
     },
     kept: keptCount(baseSeq, voicePath),
@@ -90,6 +76,7 @@ function mkPath(baseSeq, consClasses, seq, E, ops, edgeInfo, edgeWeight, RING, L
     throw new Error("Illegal insert op");
   return p;
 }
+
 
 function neighbors(st, opts) {
   const out: any[] = [];
@@ -182,7 +169,7 @@ export function solveWord(word, opts: any = {}, alphabet) {
         if(!st) continue;
         if (st.ops.length > maxOps) continue;
         
-        const p = mkPath(baseSeq, consClasses, st.seq, st.E, st.ops, edge, EDGE_W, RING, LVL);
+        const p = mkPath(baseSeq, consClasses, st.seq, st.E, st.ops, RING, LVL);
         paths.push(p);
 
         const nextStates = neighbors(st, { ...opts, opCost });
@@ -195,6 +182,24 @@ export function solveWord(word, opts: any = {}, alphabet) {
     }
 
     const uniqPaths = Array.from(new Map(paths.map(p => [p.voicePath.join(""), p])).values());
+    
+    // Apply edge bias as a final scoring step
+    for (const p of uniqPaths) {
+        let edgePenalty = 0;
+        if (p.voicePath.length > 1) {
+            if (edge.prefix?.cls) {
+                const dPrefix = Math.abs(RING[p.voicePath[1]] - RING[p.voicePath[0]]);
+                edgePenalty += edgeBiasPenalty(dPrefix, edge.prefix.cls, EDGE_W);
+            }
+            if (edge.suffix?.cls) {
+                const lastHopIdx = p.voicePath.length - 2;
+                const dSuffix = Math.abs(RING[p.voicePath[lastHopIdx + 1]] - RING[p.voicePath[lastHopIdx]]);
+                edgePenalty += edgeBiasPenalty(dSuffix, edge.suffix.cls, EDGE_W);
+            }
+        }
+        p.checksums.E += edgePenalty;
+    }
+
 
     uniqPaths.sort((p, q) => {
         const A = scoreTuple(p, RING), B = scoreTuple(q, RING);
