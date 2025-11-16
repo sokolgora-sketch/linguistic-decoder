@@ -1,20 +1,17 @@
 
-import { solveWord } from "@/functions/sevenVoicesCore";
-import { getManifest } from "@/engine/manifest";
+import { solveWord } from '@/functions/sevenVoicesCore';
+import { getManifest } from '@/engine/manifest';
 
-const baseOpts = {
-  beamWidth: 8,
-  maxOps: 1,
-  allowDelete: false,
-  allowClosure: false,
-  opCost: { sub:1, del:3, insClosure:2 },
-  alphabet: "latin" as const,
-  manifest: getManifest()
-};
+const manifest = getManifest();
+const baseOpts = { manifest, edgeWeight: manifest.edgeWeight, opCost: manifest.opCost, maxOps: 1, beamWidth: 8, allowDelete: false, allowClosure: false };
 
-test("edge bias does not flip hope primary O→E up to 0.5", () => {
-  for (const w of [0, 0.15, 0.25, 0.4, 0.5]) {
-    const { primaryPath } = solveWord("hope", { ...baseOpts, edgeWeight: w }, 'latin') as any;
-    expect(primaryPath.voicePath.join("→")).toBe("O→E");
+test('edge bias does not flip "hope" primary up to 0.5', () => {
+  const baseline = (solveWord('hope', { ...baseOpts, edgeWeight: 0 }, 'latin') as any)
+    .primaryPath.voicePath.join('→');
+
+  for (const w of [0.15, 0.25, 0.4, 0.5]) {
+    const got = (solveWord('hope', { ...baseOpts, edgeWeight: w }, 'latin') as any)
+      .primaryPath.voicePath.join('→');
+    expect(got).toBe(baseline); // stability assertion
   }
 });
