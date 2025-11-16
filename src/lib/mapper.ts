@@ -1,37 +1,43 @@
-import type { LanguageFamily, Vowel } from "@/shared/engineShape";
+
+import type { Vowel } from "@/shared/engineShape";
 import { logError } from "./logError";
 import { mapWordToLanguageFamiliesLocal, type FamilyScore } from "./mapper/localMapper";
 // import { mapWithAI } from "./remoteMapper" // if you have one
 
-function toLanguageFamily(f: FamilyScore): LanguageFamily {
-  let rationale = f.notes?.join("; ") ?? "";
-  if (f.dialect) rationale += ` (dialect: ${f.dialect})`;
+type LanguageFamily = {
+  familyId: 'albanian'|'latin'|'proto-indo-european'|'unknown';
+  label: string;
+  confidence: number;      // 0..1
+  rationale: string[];
+  dialect?: 'geg'|'tosk';
+};
 
+
+function clamp01(n: number) { return Math.max(0, Math.min(1, n)); }
+
+function toLanguageFamily(f: any): LanguageFamily | null {
+  if (!f || typeof f.label !== 'string') return null;
+  const id = f.label.toLowerCase().replace(/ /g, '_');
   return {
-    familyId: f.label.toLowerCase().replace(/ /g, "_") as any,
+    familyId: (id as any),
     label: f.label,
-    confidence: f.score / 100,
-    rationale,
-    forms: [], // Local mapper doesn't produce forms
-    signals: f.notes,
+    confidence: clamp01((Number(f.score) || 0) / 100),
+    rationale: Array.isArray(f.rationale) ? f.rationale : [],
+    dialect: f.dialect,
   };
 }
 
 export async function mapWordToLanguageFamilies(
   word: string,
-  voicePath: readonly (Vowel | string)[],
+  voicePath: readonly (string)[],
   useAi = false
 ): Promise<LanguageFamily[]> {
-  const vp = voicePath.map(s => (s as string).normalize('NFC').toUpperCase() as Vowel);
-  const localResults = mapWordToLanguageFamiliesLocal(word, vp).map(toLanguageFamily);
-  if (!useAi) return localResults;
+  // local first
+  const localScores = mapWordToLanguageFamiliesLocal(word, voicePath as string[]);
+  const locals = (localScores ?? []).map(toLanguageFamily).filter(Boolean) as LanguageFamily[];
 
-  try {
-    // const ai = await mapWithAI(word, vp); // your existing remote
-    // return ai?.length ? ai : local;
-    return localResults; // keep deterministic for now; re-enable AI when ready
-  } catch (e: any) {
-    logError({where: "mapper-ai-fallback", message: e.message, detail: {word}});
-    return localResults;
-  }
+  if (!useAi) return locals.length ? locals : [{ familyId: 'unknown', label: 'Unknown', confidence: 0, rationale: ['no local mapping'] }];
+
+  // (AI path can merge later; for now keep deterministic)
+  return locals.length ? locals : [{ familyId: 'unknown', label: 'Unknown', confidence: 0, rationale: ['no local mapping'] }];
 }
