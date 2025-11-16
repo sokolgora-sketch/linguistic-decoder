@@ -22,6 +22,7 @@ type AnalyzeOpts = {
     payload?: EnginePayload; // Allow passing a payload to write
     edgeWeight?: number;
     useAi?: boolean; // New flag to control AI mapper
+    skipAuth?: boolean;
 };
 
 // NEW helper: safe join
@@ -77,7 +78,9 @@ function mapLocal(payload: EnginePayload): LanguageFamily[] {
 
 
 export async function analyzeClient(word: string, mode: Mode, alphabet: Alphabet, opts: AnalyzeOpts = {}) {
-  await ensureAnon();
+  if (!opts.skipAuth) {
+    await ensureAnon();
+  }
   const manifest = getManifest();
   const useAi = opts.useAi ?? false;
 
@@ -101,7 +104,9 @@ export async function analyzeClient(word: string, mode: Mode, alphabet: Alphabet
             await setDoc(cacheRef, { ...cleanPayload, cachedAt: serverTimestamp() }, { merge: true });
         }
         
-        void saveHistory(cacheId, payload, "bypass");
+        if (!opts.skipAuth) {
+          void saveHistory(cacheId, payload, "bypass");
+        }
         return { ...payload, recomputed: true, cacheHit: false };
     }
 
@@ -109,7 +114,9 @@ export async function analyzeClient(word: string, mode: Mode, alphabet: Alphabet
     const snap = await getDoc(cacheRef);
     if (snap.exists()) {
         const normalized = normalizeEnginePayload(snap.data());
-        void saveHistory(cacheId, normalized, "cache");
+        if (!opts.skipAuth) {
+          void saveHistory(cacheId, normalized, "cache");
+        }
         return { ...normalized, cacheHit: true, recomputed: false };
     }
 
@@ -148,7 +155,9 @@ export async function analyzeClient(word: string, mode: Mode, alphabet: Alphabet
     // 4. Write to cache and history
     const cleanFresh = sanitizeForFirestore(freshPayload);
     await setDoc(cacheRef, { ...cleanFresh, cachedAt: serverTimestamp() }, { merge: false });
-    void saveHistory(cacheId, freshPayload, "fresh");
+    if (!opts.skipAuth) {
+      void saveHistory(cacheId, freshPayload, "fresh");
+    }
     
     return { ...freshPayload, cacheHit: false, recomputed: false };
   } catch (e: any) {

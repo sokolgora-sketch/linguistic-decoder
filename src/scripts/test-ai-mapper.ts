@@ -16,7 +16,7 @@ async function testAiMapper() {
   console.log(`Analyzing "${word}" with AI Mapper enabled...`);
 
   try {
-    const result = await analyzeClient(word, 'strict', 'auto' as Alphabet, { useAi: true });
+    const result = await analyzeClient(word, 'strict', 'auto' as Alphabet, { useAi: true, skipAuth: true });
     console.log('\n✅ Analysis complete. Full payload:');
     console.log(JSON.stringify(result, null, 2));
   } catch (e) {
