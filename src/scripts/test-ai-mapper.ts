@@ -1,6 +1,9 @@
 
+// Set a flag to signal a test environment BEFORE other imports.
+process.env.IS_TEST_SCRIPT = 'true';
+
 import { config } from 'dotenv';
-config(); // Load .env.local
+config(); // Load .env.local for GOOGLE_GENAI_API_KEY
 
 import { analyzeClient } from '../lib/analyzeClient';
 import type { Alphabet } from '@/lib/solver/engineConfig';
@@ -16,7 +19,8 @@ async function testAiMapper() {
   console.log(`Analyzing "${word}" with AI Mapper enabled...`);
 
   try {
-    const result = await analyzeClient(word, 'strict', 'auto' as Alphabet, { useAi: true, skipAuth: true });
+    // We can remove skipAuth because the firebase module itself is now mocked.
+    const result = await analyzeClient(word, 'strict', 'auto' as Alphabet, { useAi: true });
     console.log('\n✅ Analysis complete. Full payload:');
     console.log(JSON.stringify(result, null, 2));
   } catch (e) {
