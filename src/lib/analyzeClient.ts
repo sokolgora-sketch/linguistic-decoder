@@ -84,6 +84,12 @@ export async function analyzeClient(word: string, mode: Mode, alphabet: Alphabet
   const effectiveAlphabet = initialDet.winner;
   const cacheId = `${word}|${mode}|${effectiveAlphabet}|${manifest.version}|ew:${opts.edgeWeight ?? manifest.edgeWeight}`;
   
+  // If db isn't initialized, we can only do local computation.
+  if (!db) {
+    console.warn("Firestore not available. Skipping cache and returning local computation.");
+    return computeLocal(word, mode, alphabet, opts.edgeWeight);
+  }
+
   const cacheRef = doc(db, "analyses", cacheId);
 
   try {
@@ -135,7 +141,8 @@ async function saveHistory(
   engine: EnginePayload,
   source: "cache"|"fresh"|"bypass"
 ) {
-  const u = auth.currentUser;
+  if (!db) return; // Guard clause
+  const u = auth?.currentUser;
   if (!u) return;
 
   try {
@@ -188,6 +195,12 @@ export async function prefetchAnalyze(
   const effectiveAlphabet = initialDet.winner;
   const cacheId = `${word}|${mode}|${effectiveAlphabet}|${manifest.version}|ew:${manifest.edgeWeight}`;
   if (PREFETCH_SEEN.has(cacheId)) {
+    callbacks?.onFinish?.();
+    return;
+  }
+
+  // If db isn't initialized, we can't prefetch.
+  if (!db) {
     callbacks?.onFinish?.();
     return;
   }

@@ -21,7 +21,10 @@ export default function HistoryPage() {
     const [analysisResult, setAnalysisResult] = useState<EnginePayload | null>(null);
 
     async function handleLoadAnalysis(cacheId: string) {
-        if (!cacheId) return;
+        if (!cacheId || !db) {
+            toast({ variant: "destructive", title: "Database Error", description: "Firestore is not available." });
+            return;
+        };
         setLoading(true);
         setAnalysisResult(null);
         try {

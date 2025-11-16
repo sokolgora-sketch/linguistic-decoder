@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
@@ -57,7 +58,10 @@ export default function HistoryPanel({
   }, [uid]);
 
   async function load(reset = true) {
-    if (!uid || !baseQuery || !db) return;
+    if (!uid || !baseQuery || !db) {
+        if (!db) console.warn("HistoryPanel: Firestore not available.");
+        return;
+    }
     setLoading(true);
     setErr(null);
     try {

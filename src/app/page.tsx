@@ -145,6 +145,10 @@ export default function LinguisticDecoderApp(){
   }, []);
 
   async function onLoadAnalysis(cacheId: string) {
+    if (!db) {
+        toast({ variant: "destructive", title: "Database Error", description: "Firestore is not available." });
+        return;
+    }
     setLoading(true);
     setErr(null);
     setData(null);
