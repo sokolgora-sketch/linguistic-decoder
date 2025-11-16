@@ -1,7 +1,7 @@
 
 import 'dotenv/config';
-require("ts-node/register");
-require("tsconfig-paths/register");
+import 'ts-node/register';
+import 'tsconfig-paths/register';
 
 import { analyzeClient } from "@/lib/analyzeClient";
 

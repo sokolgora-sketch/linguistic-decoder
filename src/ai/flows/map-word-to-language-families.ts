@@ -9,7 +9,7 @@
  * - MapWordToLanguageFamiliesOutput - The return type for the mapWordToLanguageFamilies function.
  */
 
-import {ai} from '@/ai/genkit';
+import {ai, MODELS} from '@/ai/genkit';
 import {z} from 'genkit';
 import { toMappingRecord, MappingRecord } from '@/lib/schemaAdapter';
 
@@ -39,6 +39,7 @@ const prompt = ai.definePrompt({
   name: 'mapWordToLanguageFamiliesPrompt',
   input: {schema: MapWordToLanguageFamiliesInputSchema},
   output: {schema: MapWordToLanguageFamiliesOutputSchema},
+  model: MODELS[0],
   prompt: `ROLE: Map a computed Seven-Voices path to language candidate families.
 NEVER change the path. No rankings. No stories. Output ONLY JSON.
 
