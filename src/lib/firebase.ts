@@ -5,8 +5,11 @@ import { getAuth, signInAnonymously, onAuthStateChanged, type User } from "fireb
 
 const isTest = process.env.NODE_ENV === 'test';
 
+// Use the server-side key for scripts/server-side, fall back to public key for client
+const apiKey = process.env.FIREBASE_SERVER_API_KEY || process.env.NEXT_PUBLIC_FB_API_KEY;
+
 const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FB_API_KEY!,
+  apiKey: apiKey,
   authDomain: process.env.NEXT_PUBLIC_FB_AUTH_DOMAIN!,
   projectId: process.env.NEXT_PUBLIC_FB_PROJECT_ID!,
   storageBucket: process.env.NEXT_PUBLIC_FB_STORAGE_BUCKET!,
@@ -14,12 +17,15 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FB_APP_ID!,
 };
 
-export const app = isTest
+// Only initialize if the key is present
+const appInitialized = !!apiKey;
+
+export const app = isTest || !appInitialized
   ? (null as any)
   : (getApps().length ? getApps()[0] : initializeApp(firebaseConfig));
 
-export const db = isTest ? ({} as any) : getFirestore(app);
-export const auth = isTest ? ({ currentUser: null } as any) : getAuth(app);
+export const db = isTest || !appInitialized ? ({} as any) : getFirestore(app);
+export const auth = isTest || !appInitialized ? ({ currentUser: null } as any) : getAuth(app);
 
 
 // Store the promise to avoid multiple simultaneous calls
@@ -27,6 +33,10 @@ let authPromise: Promise<User> | null = null;
 
 export function ensureAnon(): Promise<User> {
   if (isTest) return Promise.resolve({ uid: 'test-uid' } as any);
+  if (!appInitialized) {
+    console.warn("Firebase not initialized, cannot ensure anonymous user.");
+    return Promise.resolve({ uid: 'uninitialized' } as any);
+  }
 
   const existing = auth.currentUser;
   if (existing) return Promise.resolve(existing);
