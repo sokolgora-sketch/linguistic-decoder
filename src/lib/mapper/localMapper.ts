@@ -1,3 +1,4 @@
+
 // src/lib/mapper/localMapper.ts
 export type FamilyScore = {
   family: string;
@@ -18,18 +19,17 @@ function hitCount(word: string, list: string[]) {
 }
 
 export function mapWordToLanguageFamiliesLocal(word: any, voicePath: string[]): FamilyScore[] {
-  const wstr = (word ?? '').toString();           // <-- coerce
+  const wstr = (word ?? '').toString();
   const w = wstr.normalize('NFC').toLowerCase();
 
-  const vp = (voicePath ?? []).map(String);       // safe for PIE nudge
+  const vp = (voicePath ?? []).map(String);
   const notes: string[] = [];
   let alb = 0, latin = 0, pie = 0;
 
-  const hasDia = /[ëç]/.test(w);                 // Tosk-friendly orthography signal
-  const digHits = hitCount(w, ALB_DIGRAPHS);     // Albanian digraphs (present in both dialects)
-  const morphHits = hitCount(w, ALB_MORPHS);     // Common Albanian morphemes
+  const hasDia = /[ëç]/.test(w);
+  const digHits = hitCount(w, ALB_DIGRAPHS);
+  const morphHits = hitCount(w, ALB_MORPHS);
 
-  // Albanian scoring (dialect-aware)
   if (hasDia)        { alb += 3; notes.push("ë/ç present"); }
   if (digHits > 0)   { alb += 2; notes.push("Albanian digraph(s)"); }
   if (morphHits > 0) { alb += 1; notes.push("Albanian morpheme(s)"); }
@@ -37,15 +37,12 @@ export function mapWordToLanguageFamiliesLocal(word: any, voicePath: string[]): 
   const dialect: FamilyScore["dialect"] =
     hasDia ? "tosk" : (digHits > 0 || morphHits > 0 ? "geg" : undefined);
 
-  // Plain ASCII with no Albanian cues nudges Latin
   if (!hasDia && digHits === 0 && morphHits === 0) {
     latin += 2; notes.push("ASCII only; no Albanian cues");
   }
 
-  // Light PIE nudge if A/E/O present in the vowel path
   if (/[AEO]/.test(vp.join(""))) { pie += 1; notes.push("A/E/O distribution"); }
 
-  // Normalize to percentages
   const sum = alb + latin + pie || 1;
   const pct = (n: number) => Math.round((n / sum) * 100);
 
@@ -60,8 +57,7 @@ export function mapWordToLanguageFamiliesLocal(word: any, voicePath: string[]): 
     out.push({ family: "Proto-Indo-European", score: pct(pie), notes });
   }
   
-
-  // sort desc
   out.sort((a,b) => b.score - a.score);
+
   return out;
 }
