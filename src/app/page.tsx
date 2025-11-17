@@ -269,7 +269,7 @@ export default function LinguisticDecoderApp(){
                             Strict Mode
                         </label>
                         <label className="flex items-center gap-2 text-sm">
-                            <input type="checkbox" checked={useAi} onChange={e => setUseAi(e.target.checked)} className="w-4 h-4 rounded text-primary focus:ring-primary" />
+                            <input type="checkbox" checked={useAi} onChange={e => setUseAi(e.target.checked)} className="w-4 h.4 rounded text-primary focus:ring-primary" />
                             <Sparkles className="inline-block w-4 h-4 text-accent-foreground" /> AI Mapper
                         </label>
                     </div>
@@ -284,14 +284,14 @@ export default function LinguisticDecoderApp(){
         </Card>
 
         {/* Visualization & Metadata Section */}
-        <section className="space-y-6">
+        <section className="space-y-8">
           <div className="grid gap-6 md:grid-cols-[2fr,1fr]">
             <Card>
               <CardHeader>
                 <CardTitle>Seven-Voices Path</CardTitle>
                 <CardDescription>An animated view of the word’s primary path through the vowel matrix.</CardDescription>
               </CardHeader>
-              <CardContent className="p-2 sm:p-4">
+              <CardContent className="p-3 sm:p-4">
                 <TwoRailsWithConsonants
                   word={data?.word || word}
                   path={(data?.primaryPath?.voicePath as Vowel[]) || []}
