@@ -310,7 +310,7 @@ export default function LinguisticDecoderApp(){
                     <CardDescription>Core principles of the phonetic matrix.</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <ul className="space-y-2 text-sm font-medium">
+                    <ul className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-sm font-medium">
                       {Object.entries(VOICE_COLOR_MAP).map(([voice, color]) => (
                         <li key={voice} className="flex items-center gap-3">
                           <span className="w-3 h-3 rounded-full" style={{ backgroundColor: color }} />
