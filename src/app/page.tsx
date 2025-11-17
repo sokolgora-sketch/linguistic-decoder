@@ -241,38 +241,60 @@ export default function LinguisticDecoderApp(){
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center pt-4 border-t mt-4">
-                    <div className="space-y-3">
-                        <Select value={alphabet} onValueChange={(v) => setAlphabet(v as Alphabet)}>
-                            <SelectTrigger>
-                                <SelectValue placeholder="Language Profile" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="auto">Auto-Detect Profile</SelectItem>
-                                {PROFILES.map(p => (
-                                    <SelectItem key={p.id} value={p.id}>{p.id.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                        <div className="flex items-center gap-4">
-                            <label className="text-xs text-muted-foreground whitespace-nowrap">Edge: {edgeWeight.toFixed(2)}</label>
-                            <input
-                                type="range" min={0} max={0.6} step={0.05}
-                                value={edgeWeight} onChange={e => setEdgeWeight(Number(e.target.value))}
-                                className="w-full"
-                            />
-                        </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center pt-4 mt-4 border-t">
+                  <div className="space-y-3">
+                    <Select value={alphabet} onValueChange={(v) => setAlphabet(v as Alphabet)}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Language Profile" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="auto">Auto-Detect Profile</SelectItem>
+                        {PROFILES.map((p) => (
+                          <SelectItem key={p.id} value={p.id}>
+                            {p.id.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+
+                    <div className="space-y-1">
+                      <div className="flex justify-between text-[11px] text-muted-foreground">
+                        <span>Edge weight</span>
+                        <span className="tabular-nums">{edgeWeight.toFixed(2)}</span>
+                      </div>
+                      <input
+                        type="range"
+                        min={0}
+                        max={0.6}
+                        step={0.05}
+                        value={edgeWeight}
+                        onChange={(e) => setEdgeWeight(Number(e.target.value))}
+                        className="w-full"
+                      />
                     </div>
-                    <div className="flex justify-start md:justify-end items-center gap-4">
-                        <label className="flex items-center gap-2 text-sm">
-                            <input type="checkbox" checked={mode === "strict"} onChange={e => setMode(e.target.checked ? "strict" : "open")} className="w-4 h-4 rounded text-primary focus:ring-primary" />
-                            Strict Mode
-                        </label>
-                        <label className="flex items-center gap-2 text-sm">
-                            <input type="checkbox" checked={useAi} onChange={e => setUseAi(e.target.checked)} className="w-4 h-4 rounded text-primary focus:ring-primary" />
-                            <Sparkles className="inline-block w-4 h-4 text-accent-foreground" /> AI Mapper
-                        </label>
-                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap justify-start md:justify-end items-center gap-3">
+                    <label className="flex items-center gap-2 text-sm">
+                      <input
+                        type="checkbox"
+                        checked={mode === "strict"}
+                        onChange={(e) => setMode(e.target.checked ? "strict" : "open")}
+                        className="w-4 h-4 rounded text-primary focus:ring-primary"
+                      />
+                      Strict Mode
+                    </label>
+                    <label className="flex items-center gap-2 text-sm">
+                      <input
+                        type="checkbox"
+                        checked={useAi}
+                        onChange={(e) => setUseAi(e.target.checked)}
+                        className="w-4 h-4 rounded text-primary focus:ring-primary"
+                      />
+                      <Sparkles className="inline-block w-4 h-4 text-accent-foreground" />
+                      AI Mapper
+                    </label>
+                  </div>
                 </div>
 
                 {err && (
@@ -455,3 +477,5 @@ export default function LinguisticDecoderApp(){
     </div>
   );
 }
+
+    
