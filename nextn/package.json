@@ -11,7 +11,8 @@
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
     "test": "jest",
-    "eval": "ts-node scripts/eval.ts --file data/gold.csv --mode=strict --alphabet=auto --edge=0.25 --manifest=2025-11-15-core-1"
+    "test:auth": "tsx src/scripts/test-firebase-auth.ts",
+    "eval": "ts-node scripts/eval.ts --file=data/gold.csv --mode=strict --alphabet=auto --edge=0.25 --manifest=2025-11-15-core-1"
   },
   "dependencies": {
     "@genkit-ai/google-genai": "^1.20.0",
@@ -71,15 +72,7 @@
     "ts-jest": "^29.2.5",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
-    "typescript": "^5.6.3"
-  },
-  "jest": {
-    "preset": "ts-jest",
-    "testEnvironment": "node",
-    "testMatch": [
-      "**/tests/**/*.spec.ts",
-      "**/src/lib/solver/**/*.test.ts",
-      "**/src/lib/solver/**/*.spec.ts"
-    ]
+    "typescript": "^5.6.3",
+    "tsx": "^4.16.2"
   }
 }
