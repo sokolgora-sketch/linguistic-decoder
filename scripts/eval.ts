@@ -23,11 +23,11 @@ require("ts-node/register");
 require("tsconfig-paths/register");
 
 // ====== IMPORT YOUR ENGINE ======
-import { solveWord } from "@/functions/sevenVoicesCore";
+import { runAnalysis } from "@/lib/runAnalysis";
 import { getManifest } from "@/engine/manifest";
+import type { Alphabet } from "@/lib/runAnalysis";
 
 type Mode = "strict"|"open";
-type Alphabet = "auto"|"albanian"|"latin"|"sanskrit"|"ancient_greek"|"pie";
 
 type Row = {
   word: string;
@@ -85,8 +85,8 @@ function joinPath(vowels: string[]): string {
   return (vowels || []).join("→");
 }
 
-function toCSVRow(fields: (string|number)[]) {
-  return fields.map((f) => String(f)).join(",") + "\n";
+function toCSVRow(fields: (string|number|null)[]) {
+  return fields.map((f) => String(f ?? "")).join(",") + "\n";
 }
 
 // ---- load set ----
@@ -147,7 +147,7 @@ for (const row of rows) {
     ? defaults
     : { ...defaults, maxOps: 2, allowDelete: true, allowClosure: true, opCost: manifest.opCost };
 
-  const out: any = solveWord(row.word, opts, alphabet);
+  const out: any = runAnalysis(row.word, opts, alphabet);
   const pred = joinPath(out?.primaryPath?.voicePath || []);
   const exp = normalizePath(row.expected);
   const hasLabel = !!exp;

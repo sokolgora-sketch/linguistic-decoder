@@ -2,8 +2,9 @@
 require("ts-node/register"); require("tsconfig-paths/register");
 
 import fs from "fs";
-import { solveWord } from "@/functions/sevenVoicesCore";
+import { runAnalysis } from "@/lib/runAnalysis";
 import { getManifest } from "@/engine/manifest";
+import type { Alphabet } from "@/lib/runAnalysis";
 
 type Mode = "strict"|"open";
 function norm(s?: string){ if(!s) return ""; return s.toUpperCase().replace(/[^AEIOUYË]/g,"").split("").join("→"); }
@@ -47,7 +48,7 @@ for (const edge of edges){
       let labeled=0, correct=0;
       for (const r of set){
         if (!r.expected || r.mode!=="strict") continue;
-        const out:any = solveWord(r.word, optsStrict(edge,ins,del), "auto");
+        const out:any = runAnalysis(r.word, optsStrict(edge,ins,del) as any, "auto");
         const pred = (out?.primaryPath?.voicePath||[]).join("→");
         labeled++; if (pred === r.expected) correct++;
       }
