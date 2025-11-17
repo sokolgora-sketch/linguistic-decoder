@@ -202,12 +202,12 @@ export default function LinguisticDecoderApp(){
   const signals = data?.signals?.join(" · ") || "";
   
   return (
-    <div className="p-4 lg:p-8 max-w-5xl mx-auto">
-       <main className="space-y-6">
+    <div className="min-h-screen bg-background text-foreground p-4 lg:p-8 flex flex-col items-stretch">
+       <main className="max-w-5xl mx-auto w-full space-y-8 flex-1">
         {/* Header */}
-        <header className="pb-4 border-b">
-          <div className="flex justify-between items-start">
-            <div>
+        <header className="pb-4 border-b border-border/60">
+          <div className="flex justify-between items-start gap-3">
+            <div className="space-y-1 max-w-xl">
               <h1 className="text-3xl font-bold tracking-tight text-primary">Linguistic Decoder</h1>
               <p className="text-sm text-muted-foreground mt-1">A tool for analyzing words with the Seven-Voices phonetic model.</p>
             </div>
@@ -455,3 +455,5 @@ export default function LinguisticDecoderApp(){
     </div>
   );
 }
+
+    
