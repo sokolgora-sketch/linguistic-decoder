@@ -206,19 +206,19 @@ export default function LinguisticDecoderApp(){
        <main className="space-y-6">
         {/* Header */}
         <header className="pb-4 border-b">
-          <div className="flex justify-between items-center">
+          <div className="flex justify-between items-start">
             <div>
               <h1 className="text-3xl font-bold tracking-tight text-primary">Linguistic Decoder</h1>
-              <p className="text-sm text-muted-foreground mt-1">Seven‑Voices matrix solver · primary & frontier paths · optional Gemini mapping</p>
+              <p className="text-sm text-muted-foreground mt-1">A tool for analyzing words with the Seven-Voices phonetic model.</p>
             </div>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 pt-1">
               <ThemeToggle />
             </div>
           </div>
         </header>
 
         {/* Controls */}
-        <Card className="mb-6">
+        <Card>
             <CardHeader>
                 <CardTitle>Analyze a word</CardTitle>
                 <CardDescription>Type a word, choose analysis options, and run the Seven-Voices solver.</CardDescription>
@@ -291,7 +291,7 @@ export default function LinguisticDecoderApp(){
                 <CardTitle>Seven-Voices Path</CardTitle>
                 <CardDescription>An animated view of the word’s primary path through the vowel matrix.</CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-2 sm:p-4">
                 <TwoRailsWithConsonants
                   word={data?.word || word}
                   path={(data?.primaryPath?.voicePath as Vowel[]) || []}
@@ -306,8 +306,8 @@ export default function LinguisticDecoderApp(){
             <div className="space-y-6">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Seven Voices</CardTitle>
-                    <CardDescription>The core principles of the matrix.</CardDescription>
+                    <CardTitle>The Seven Voices</CardTitle>
+                    <CardDescription>Core principles of the phonetic matrix.</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <ul className="space-y-2 text-sm font-medium">
@@ -330,8 +330,8 @@ export default function LinguisticDecoderApp(){
                         <p><strong>Mode:</strong> {data.mode}</p>
                         <p><strong>Alphabet:</strong> {data.alphabet}</p>
                         {"solveMs" in data && <p><strong>Solve Time:</strong> {data.solveMs} ms</p>}
-                        {data.cacheHit && <p className="font-bold text-accent-foreground">Loaded from cache</p>}
-                        {data.recomputed && <p className="font-bold text-blue-400">Recomputed</p>}
+                        {data.cacheHit && <p className="font-bold text-accent-foreground pt-1">Loaded from cache</p>}
+                        {data.recomputed && <p className="font-bold text-blue-400 pt-1">Recomputed</p>}
                     </CardContent>
                   </Card>
                 )}
@@ -367,9 +367,9 @@ export default function LinguisticDecoderApp(){
                   <ol className="list-decimal pl-5 mt-2 space-y-2 text-sm">
                     <li>Type a word and click <kbd className="bg-primary text-primary-foreground rounded-md px-2 py-1 text-xs font-semibold">Analyze</kbd>.</li>
                     <li>Use the dropdown to force a specific phonetic profile, or leave on "Auto-Detect".</li>
-                    <li>Primary block shows Voice / Level / Ring paths and checksums <span className="font-code">V/E/C</span>.</li>
-                    <li>Frontier lists near‑optimal alternates (deterministic order).</li>
-                    <li>If mapping is enabled server‑side, language candidates appear below.</li>
+                    <li>The "Primary Path" block shows Voice, Level, and Ring paths with checksums.</li>
+                    <li>"Frontier" lists near‑optimal alternate paths in a deterministic order.</li>
+                    <li>Enable the "AI Mapper" toggle to see potential language family mappings for the result.</li>
                   </ol>
                 </Card>
               </AccordionContent>
@@ -419,29 +419,31 @@ export default function LinguisticDecoderApp(){
       </main>
 
       {/* Footer */}
-      <footer className="p-6 opacity-80 mt-8">
-        <div className="max-w-7xl mx-auto text-xs text-muted-foreground flex justify-between items-start">
-          <div className="font-code flex-1">
+      <footer className="pt-8 mt-8 border-t border-border/50">
+        <div className="text-xs text-muted-foreground flex justify-between items-start gap-4">
+          <div className="font-code flex-1 opacity-70 space-y-1">
             {data && (
-              <div className="text-xs opacity-80 pt-2">
-                <b>Diagnostics:</b>
-                <span className="ml-2">engine={data.engineVersion}</span>
-                <span className="ml-2">mode={data.mode}</span>
-                <span className="ml-2">alphabet={data.alphabet}</span>
-                {"solveMs" in data && <span className="ml-2">solveMs={data.solveMs}</span>}
-                {data?.cacheHit && <span className="ml-2 px-1.5 py-0.5 rounded bg-accent/20 border border-accent text-accent-foreground">cacheHit</span>}
-                {data?.recomputed && <span className="ml-2 px-1.5 py-0.5 rounded bg-blue-900 border border-blue-700">recomputed</span>}
-                <div className="mt-1">{signals}</div>
-              </div>
+              <>
+                <div>
+                  <span className="mr-2">engine={data.engineVersion}</span>
+                  <span className="mr-2">mode={data.mode}</span>
+                  <span className="mr-2">alphabet={data.alphabet}</span>
+                  {"solveMs" in data && <span className="mr-2">solveMs={data.solveMs}</span>}
+                  {data?.cacheHit && <span className="mr-2 px-1.5 py-0.5 rounded bg-accent/20 border border-accent text-accent-foreground">cacheHit</span>}
+                  {data?.recomputed && <span className="mr-2 px-1.5 py-0.5 rounded bg-blue-900 border border-blue-700">recomputed</span>}
+                </div>
+                <div>{signals}</div>
+              </>
             )}
+            <FooterBuild />
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 shrink-0">
             {data && (
               <Link
                 className="underline text-xs"
                 href={`/?word=${encodeURIComponent(word)}&mode=${mode}&alphabet=${alphabet}`}
               >
-                Share this result
+                Share Result
               </Link>
             )}
             <Button variant="outline" size="sm" onClick={() => setShowDebug(s => !s)}>
@@ -449,7 +451,6 @@ export default function LinguisticDecoderApp(){
             </Button>
           </div>
         </div>
-        <FooterBuild />
       </footer>
     </div>
   );
