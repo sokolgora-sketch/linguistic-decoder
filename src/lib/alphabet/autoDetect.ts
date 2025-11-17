@@ -1,5 +1,6 @@
 
 import { CUES, Family } from "./cues";
+import { detectAlbanianDialect } from "@/lib/detectDialect";
 
 export type Alphabet = "auto"|Family;
 
@@ -55,15 +56,8 @@ export function detectAlphabetFair(word: string, voicePath: string[], selected: 
 
   // Dialect hint for Albanian
   if (winner === 'albanian' && pct[0].score > 0) {
-    const w = word.normalize('NFC').toLowerCase();
-    let geg = 0, tosk = 0;
-    if (/[âà]/.test(w) || /(ç|xh)/.test(w)) geg += 1;
-    if (/[ë]/.test(w) || /(q|gj)/.test(w)) tosk += 1;
-    if (geg > tosk) {
-      pct[0] = { ...pct[0], dialect: 'geg' } as any;
-    } else if (tosk > geg) {
-      pct[0] = { ...pct[0], dialect: 'tosk' } as any;
-    }
+    const dialect = detectAlbanianDialect(word);
+    pct[0] = { ...pct[0], dialect } as any;
   }
 
 
