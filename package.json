@@ -4,11 +4,11 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "next dev src --turbopack",
     "genkit:dev": "genkit start -- tsx src/ai/dev.ts",
     "genkit:watch": "genkit start -- tsx --watch srcai/dev.ts",
     "build": "NODE_ENV=production next build src",
-    "start": "next start",
+    "start": "next start src",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
     "test": "jest -c jest.config.mjs",
