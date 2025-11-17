@@ -3,41 +3,27 @@
 import React from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
+import type { AnalysisResult } from "@/lib/runAnalysis";
 
-export default function ExportBar({ analysis }: { analysis: any }) {
+export default function ExportBar({ analysis }: { analysis: AnalysisResult }) {
   const { toast } = useToast();
   if (!analysis?.primaryPath) return null;
 
-  const payload = {
-    engine: process.env.NEXT_PUBLIC_ENGINE_VERSION || "dev",
-    word: analysis.word,
-    mode: analysis.mode,
-    alphabet: analysis.alphabet,
-    primaryPath: analysis.primaryPath,
-    frontierPaths: analysis.frontierPaths || [],
-    languageFamilies: analysis.languageFamilies || [],
-    signals: analysis.signals || [],
-    windows: analysis.windows || [],
-    windowClasses: analysis.windowClasses || [],
-    edgeWindows: analysis.edgeWindows || [],
-    timestamp: new Date().toISOString()
-  };
-
   const downloadJSON = () => {
     try {
-      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+      const blob = new Blob([JSON.stringify(analysis, null, 2)], { type: "application/json" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
       const safeWord = (analysis.word || 'analysis').replace(/[^a-z0-9]/gi, '_').toLowerCase();
-      a.download = `analysis-${safeWord}-${payload.engine}.json`;
+      a.download = `analysis-${safeWord}-${analysis.engineVersion}.json`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
       toast({ title: "Download Started", description: "Your JSON file has started downloading." });
-    } catch (e) {
-      toast({ variant: "destructive", title: "Download Failed", description: "Could not prepare the JSON file for download." });
+    } catch (e: any) {
+      toast({ variant: "destructive", title: "Download Failed", description: e.message || "Could not prepare the JSON file for download." });
     }
   };
 
@@ -65,7 +51,7 @@ export default function ExportBar({ analysis }: { analysis: any }) {
       <Button variant="outline" size="sm" onClick={downloadJSON}>Download JSON</Button>
       <Button variant="outline" size="sm" onClick={copyLink}>Copy Link</Button>
       <div className="ml-auto text-xs opacity-70 flex items-center">
-        Engine <b>{process.env.NEXT_PUBLIC_ENGINE_VERSION || "dev"}</b>
+        Engine <b>{analysis.engineVersion || "dev"}</b>
       </div>
     </div>
   );
