@@ -6846,7 +6846,7 @@ function LinguisticDecoderApp() {
                                                                 type: "checkbox",
                                                                 checked: useAi,
                                                                 onChange: (e)=>setUseAi(e.target.checked),
-                                                                className: "w-4 h.4 rounded text-primary focus:ring-primary"
+                                                                className: "w-4 h-4 rounded text-primary focus:ring-primary"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/page.tsx",
                                                                 lineNumber: 272,

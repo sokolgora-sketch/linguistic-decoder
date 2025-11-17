@@ -269,7 +269,7 @@ export default function LinguisticDecoderApp(){
                             Strict Mode
                         </label>
                         <label className="flex items-center gap-2 text-sm">
-                            <input type="checkbox" checked={useAi} onChange={e => setUseAi(e.target.checked)} className="w-4 h.4 rounded text-primary focus:ring-primary" />
+                            <input type="checkbox" checked={useAi} onChange={e => setUseAi(e.target.checked)} className="w-4 h-4 rounded text-primary focus:ring-primary" />
                             <Sparkles className="inline-block w-4 h-4 text-accent-foreground" /> AI Mapper
                         </label>
                     </div>
@@ -455,5 +455,3 @@ export default function LinguisticDecoderApp(){
     </div>
   );
 }
-
-    
