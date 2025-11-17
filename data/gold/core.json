@@ -1,0 +1,10 @@
+[
+  {
+    "id": "vajza_core_01",
+    "word": "vajza",
+    "expectedPrimaryVoicePath": ["A"],
+    "expectedPrimaryRingPath": [3],
+    "expectedDialect": "geg",
+    "notes": "Baseline Albanian feminine form; no ë in surface form, geg orthography."
+  }
+]
