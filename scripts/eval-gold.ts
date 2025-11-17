@@ -103,7 +103,7 @@ function main() {
 
   if (failed > 0) {
     console.log("Failed items:");
-    for (const row of rows.filter(r => !row.ok)) {
+    for (const row of rows.filter(r => !r.ok)) {
       console.log(
         `- ${row.id} [${row.word}]:`,
         {
