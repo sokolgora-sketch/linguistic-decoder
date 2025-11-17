@@ -6,7 +6,7 @@ import type { Vowel } from '@/shared/engineShape';
 import type { Alphabet } from '@/lib/runAnalysis';
 
 const manifest = getManifest();
-const base = { manifest, edgeWeight: manifest.edgeWeight, opCost: manifest.opCost, maxOps: 1, beamWidth: 8, allowDelete: false, allowClosure: false };
+const base: any = { manifest, edgeWeight: manifest.edgeWeight, opCost: manifest.opCost, maxOps: 1, beamWidth: 8, allowDelete: false, allowClosure: false, alphabet: "auto" };
 
 function vp(word: string, alphabet: Alphabet = 'auto'): Vowel[] {
   const { primaryPath } = runAnalysis(word, base, alphabet) as any;
