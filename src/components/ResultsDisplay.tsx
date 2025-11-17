@@ -1,11 +1,11 @@
 
 'use client';
 import React, { useMemo } from "react";
-import { Card } from "@/components/ui/card";
-import type { CClass } from "@/functions/languages";
-import { classRange } from "@/functions/languages";
-import type { EnginePayload, EnginePath } from "@/shared/engineShape";
-import { summarizePrinciples } from "@/lib/principles";
+import { Card } from "./ui/card";
+import type { CClass } from "../functions/languages";
+import { classRange } from "../functions/languages";
+import type { EnginePayload, EnginePath } from "../shared/engineShape";
+import { summarizePrinciples } from "../lib/principles";
 import WhyThisPath from "./WhyThisPath";
 
 // Seven‑Voices palette (uses CSS variables from globals.css)

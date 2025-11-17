@@ -67,7 +67,7 @@ export default {
         },
       },
       borderColor: {
-        'border': 'hsl(var(--border))',
+        DEFAULT: 'hsl(var(--border))',
       },
       borderRadius: {
         lg: 'var(--radius)',

@@ -1,7 +1,7 @@
 import type {Metadata} from 'next';
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 import './globals.css';
-import { Toaster } from "@/components/ui/toaster"
+import { Toaster } from "../components/ui/toaster"
 
 export const metadata: Metadata = {
   title: 'Linguistic Decoder',
