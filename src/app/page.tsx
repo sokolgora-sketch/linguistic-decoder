@@ -220,23 +220,25 @@ export default function LinguisticDecoderApp(){
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_auto] gap-4 items-center">
+            <div className="flex flex-col md:flex-row gap-4">
               <Input
                 value={word}
                 onChange={e=> setWord(e.target.value)}
                 placeholder="Type a word…"
-                className="font-semibold text-lg"
+                className="font-semibold text-lg flex-1"
                 onKeyUp={(e) => e.key === 'Enter' && canAnalyze && analyze()}
               />
-              {isWarming && <Loader className="animate-spin text-muted-foreground" size={18} />}
-              <Button onClick={()=> analyze()} disabled={!canAnalyze} size="lg" className="w-full md:w-auto">
-                {loading ? "Analyzing…" : "Analyze"}
-              </Button>
-              <Button onClick={runSmokeTest} variant="outline" title="Display a mock result to test the UI" className="hidden md:inline-flex">Smoke</Button>
+              <div className="flex gap-2">
+                <Button onClick={()=> analyze()} disabled={!canAnalyze} size="lg" className="flex-1 md:flex-none">
+                  {loading ? "Analyzing…" : "Analyze"}
+                </Button>
+                <Button onClick={runSmokeTest} variant="outline" size="lg" title="Display a mock result to test the UI" className="hidden md:inline-flex">Smoke</Button>
+              </div>
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-[auto_1fr_auto] gap-4 items-center pt-4 border-t">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center pt-4 border-t">
+              <div className="space-y-3">
                 <Select value={alphabet} onValueChange={(v) => setAlphabet(v as Alphabet)}>
-                    <SelectTrigger className="w-full md:w-[180px]">
+                    <SelectTrigger>
                         <SelectValue placeholder="Language" />
                     </SelectTrigger>
                     <SelectContent>
@@ -246,15 +248,16 @@ export default function LinguisticDecoderApp(){
                         ))}
                     </SelectContent>
                 </Select>
-              <div className="flex items-center gap-4">
-                <label className="text-xs text-muted-foreground">Edge: {edgeWeight.toFixed(2)}</label>
-                <input
-                  type="range" min={0} max={0.6} step={0.05}
-                  value={edgeWeight} onChange={e=>setEdgeWeight(Number(e.target.value))}
-                  className="w-full"
-                />
+                <div className="flex items-center gap-4">
+                  <label className="text-xs text-muted-foreground whitespace-nowrap">Edge: {edgeWeight.toFixed(2)}</label>
+                  <input
+                    type="range" min={0} max={0.6} step={0.05}
+                    value={edgeWeight} onChange={e=>setEdgeWeight(Number(e.target.value))}
+                    className="w-full"
+                  />
+                </div>
               </div>
-              <div className="col-span-2 md:col-span-1 flex items-center justify-end gap-4">
+              <div className="flex md:justify-end items-center gap-4">
                 <label className="flex items-center gap-2 text-sm">
                   <input type="checkbox" checked={mode==="strict"} onChange={e=> setMode(e.target.checked?"strict":"open")} className="w-4 h-4 rounded text-primary focus:ring-primary" />
                   Strict Mode
@@ -393,7 +396,5 @@ export default function LinguisticDecoderApp(){
     </div>
   );
 }
-
-    
 
     
