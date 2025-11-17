@@ -1,17 +1,17 @@
 
 // tests/edge-guard.spec.ts
-import { solveWord } from '@/functions/sevenVoicesCore';
+import { runAnalysis } from '@/lib/runAnalysis';
 import { getManifest } from '@/engine/manifest';
 
 const manifest = getManifest();
-const baseOpts = { manifest, edgeWeight: manifest.edgeWeight, opCost: manifest.opCost, maxOps: 1, beamWidth: 8, allowDelete: false, allowClosure: false };
+const baseOpts: any = { manifest, edgeWeight: manifest.edgeWeight, opCost: manifest.opCost, maxOps: 1, beamWidth: 8, allowDelete: false, allowClosure: false };
 
 test('edge weight up to 0.5 preserves E target for "hope"', () => {
   const weights = [0, 0.15, 0.25, 0.4, 0.5];
 
   let baseline: string | null = null;
   for (const w of weights) {
-    const { primaryPath } = solveWord('hope', { ...baseOpts, edgeWeight: w }, 'latin') as any;
+    const { primaryPath } = runAnalysis('hope', { ...baseOpts, edgeWeight: w }, 'latin') as any;
     const path = primaryPath.voicePath.join('→');
     const rings = primaryPath.ringPath.join(',');
 

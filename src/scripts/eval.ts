@@ -23,11 +23,11 @@ require("ts-node/register");
 require("tsconfig-paths/register");
 
 // ====== IMPORT YOUR ENGINE ======
-import { solveWord } from "@/functions/sevenVoicesCore";
+import { runAnalysis } from "@/lib/runAnalysis";
 import { getManifest } from "@/engine/manifest";
+import type { Alphabet } from "@/lib/runAnalysis";
 
 type Mode = "strict"|"open";
-type Alphabet = "auto"|"albanian"|"latin"|"sanskrit"|"ancient_greek"|"pie";
 
 type Row = {
   word: string;
@@ -85,8 +85,8 @@ function joinPath(vowels: string[]): string {
   return (vowels || []).join("→");
 }
 
-function toCSVRow(fields: (string|number)[]) {
-  return fields.map((f) => String(f)).join(",") + "\n";
+function toCSVRow(fields: (string|number|null)[]) {
+  return fields.map((f) => String(f ?? "")).join(",") + "\n";
 }
 
 // ---- load set ----
@@ -125,7 +125,7 @@ const defaults = {
   maxOps: 1,
   allowDelete: false,
   allowClosure: false,
-  opCost: { sub: 1, del: 3, insClosure: 2 },
+  opCost: manifest.opCost,
   alphabet: "auto" as Alphabet,
   manifest,
   edgeWeight: edgeWeightCLI ?? manifest.edgeWeight,
@@ -137,7 +137,7 @@ const labelsSet = new Set<string>();
 let labeled = 0;
 let correct = 0;
 
-const preds: { word: string; expected: string; predicted: string; ok: boolean; mode: Mode; alphabet: Alphabet }[] = [];
+const preds: { word: string; expected: string; predicted: string; ok: boolean | null; mode: Mode; alphabet: Alphabet }[] = [];
 
 for (const row of rows) {
   const mode = (row.mode || modeCLI) as Mode;
@@ -145,9 +145,9 @@ for (const row of rows) {
 
   const opts = mode === "strict"
     ? defaults
-    : { ...defaults, maxOps: 2, allowDelete: true, allowClosure: true };
+    : { ...defaults, maxOps: 2, allowDelete: true, allowClosure: true, opCost: manifest.opCost };
 
-  const out: any = solveWord(row.word, opts, alphabet);
+  const out: any = runAnalysis(row.word, opts, alphabet);
   const pred = joinPath(out?.primaryPath?.voicePath || []);
   const exp = normalizePath(row.expected);
   const hasLabel = !!exp;
@@ -162,7 +162,7 @@ for (const row of rows) {
     preds.push({ word: row.word, expected: exp, predicted: pred, ok, mode, alphabet });
   } else {
     // unlabeled: still record prediction
-    preds.push({ word: row.word, expected: "", predicted: pred, ok: false, mode, alphabet });
+    preds.push({ word: row.word, expected: "", predicted: pred, ok: null, mode, alphabet });
     labelsSet.add(pred);
   }
 }
@@ -170,7 +170,8 @@ for (const row of rows) {
 // ---- write predictions.csv ----
 let outPred = "word,expected,predicted,ok,mode,alphabet\n";
 for (const p of preds) {
-  outPred += toCSVRow([p.word, p.expected, p.predicted, p.ok ? 1 : 0, p.mode, p.alphabet]);
+  const okStr = p.ok === null ? "" : (p.ok ? "1" : "0");
+  outPred += toCSVRow([p.word, p.expected, p.predicted, okStr, p.mode, p.alphabet]);
 }
 fs.writeFileSync(path.join(outDir, "predictions.csv"), outPred, "utf8");
 

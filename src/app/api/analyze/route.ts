@@ -1,9 +1,9 @@
 
 import { NextResponse } from 'next/server';
-import { solveWord } from '@/functions/sevenVoicesCore';
+import { runAnalysis } from '@/lib/runAnalysis';
 import { getManifest } from '@/engine/manifest';
 import type { SolveOptions } from '@/functions/sevenVoicesCore';
-import type { Alphabet } from '@/lib/solver/engineConfig';
+import type { Alphabet } from '@/lib/runAnalysis';
 
 // A server-side analysis endpoint for reproducibility and direct access.
 export async function GET(request: Request) {
@@ -33,15 +33,11 @@ export async function GET(request: Request) {
       edgeWeight: manifest.edgeWeight,
     };
 
-    const analysis = solveWord(word, opts, alphabet);
+    const analysis = runAnalysis(word, opts, alphabet);
 
     const payload = {
-      engineVersion: manifest.version,
-      word,
-      mode,
-      alphabet,
-      solveMs: Date.now() - t0,
       ...analysis,
+      solveMs: Date.now() - t0,
     };
 
     return NextResponse.json(payload);

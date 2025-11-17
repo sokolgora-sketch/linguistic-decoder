@@ -1,11 +1,12 @@
 
+
 import { db, ensureAnon, auth } from "@/lib/firebase";
 import { doc, getDoc, setDoc, serverTimestamp, collection, addDoc } from "firebase/firestore";
 import { normalizeEnginePayload, type EnginePayload, type Vowel, LanguageFamily } from "@/shared/engineShape";
 import { logError } from "./logError";
 
 // Browser-safe engine code:
-import { solveWord } from "@/functions/sevenVoicesCore";
+import { runAnalysis } from "@/lib/runAnalysis";
 import type { SolveOptions } from "@/functions/sevenVoicesCore";
 import { sanitizeForFirestore } from "@/lib/sanitize";
 import { getManifest } from "@/engine/manifest";
@@ -47,7 +48,7 @@ function computeLocal(word: string, mode: Mode, alphabet: Alphabet, edgeWeight?:
     manifest,
   };
 
-  const analysisResult = solveWord(word, opts, effectiveAlphabet);
+  const analysisResult = runAnalysis(word, opts, effectiveAlphabet);
   
   // Now, run detection *again* with the voice path to get final family scores
   const finalDet = detectAlphabetFair(word, analysisResult.primaryPath.voicePath, alphabet);

@@ -1,6 +1,7 @@
 
-import { solveWord } from "@/functions/sevenVoicesCore";
+import { runAnalysis } from "@/lib/runAnalysis";
 import { getManifest } from "@/engine/manifest";
+import type { Alphabet } from "@/lib/runAnalysis";
 
 const opts = {
   beamWidth: 8, maxOps: 1, allowDelete: false, allowClosure: false,
@@ -9,23 +10,21 @@ const opts = {
 };
 
 test("damage → A→E", () => {
-  const { primaryPath } = solveWord("damage", opts, "auto");
+  const { primaryPath } = runAnalysis("damage", opts, "auto");
   expect(primaryPath.voicePath.join("→")).toBe("A→E");
 });
 
 test("study (strict) → U→I", () => {
-  const { primaryPath } = solveWord("study", opts, "auto");
+  const { primaryPath } = runAnalysis("study", opts, "auto");
   expect(primaryPath.voicePath.join("→")).toBe("U→I");
 });
 
 test("life (strict) stable path exists", () => {
-  const { primaryPath } = solveWord("life", opts, "auto");
+  const { primaryPath } = runAnalysis("life", opts, "auto");
   expect(primaryPath.voicePath.length).toBeGreaterThan(0);
 });
 
 test("mind (strict) stable path exists", () => {
-  const { primaryPath } = solveWord("mind", opts, "auto");
+  const { primaryPath } = runAnalysis("mind", opts, "auto");
   expect(primaryPath.voicePath.length).toBeGreaterThan(0);
 });
-
-    
