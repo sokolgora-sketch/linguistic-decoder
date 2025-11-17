@@ -1,7 +1,7 @@
 
 'use client';
-import type { LanguageFamily } from "@/shared/engineShape";
-import { Card } from "@/components/ui/card";
+import type { LanguageFamily } from "../shared/engineShape";
+import { Card } from "./ui/card";
 
 export function Candidates({ items }: { items?: LanguageFamily[] }) {
   if (!items || items.length === 0) return null;

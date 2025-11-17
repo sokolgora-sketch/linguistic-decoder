@@ -1,8 +1,8 @@
 // src/components/ExportJsonButton.tsx
 "use client";
 
-import { Button } from "@/components/ui/button";
-import type { AnalysisResult } from "@/lib/runAnalysis";
+import { Button } from "./ui/button";
+import type { AnalysisResult } from "../lib/runAnalysis";
 
 type ExportJsonButtonProps = {
   analysis: AnalysisResult;

@@ -1,8 +1,8 @@
 
 'use client';
-import { Card } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import type { Vowel } from "@/lib/solver/types";
+import { Card } from "./ui/card";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
+import type { Vowel } from "../functions/sevenVoicesCore";
 
 const VOICE_COLOR: Record<Vowel, string> = {
     A: "var(--voice-A)", E: "var(--voice-E)", I: "var(--voice-I)",
