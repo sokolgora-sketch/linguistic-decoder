@@ -218,12 +218,12 @@ export default function LinguisticDecoderApp(){
         </header>
 
         {/* Controls */}
-        <Card>
+        <Card className="mt-4 border border-border/60 shadow-sm">
             <CardHeader>
                 <CardTitle>Analyze a word</CardTitle>
                 <CardDescription>Type a word, choose analysis options, and run the Seven-Voices solver.</CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="space-y-4">
                 <div className="flex flex-col sm:flex-row gap-2">
                     <Input
                         value={word}
