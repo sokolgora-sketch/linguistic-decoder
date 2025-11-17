@@ -14,7 +14,7 @@
     "test": "jest -c jest.config.mjs",
     "test:auth": "tsx src/scripts/test-firebase-auth.ts",
     "eval": "tsx scripts/eval.ts --file=data/gold/dialect.json",
-    "eval:gold": "tsx scripts/eval.ts --file=data/gold/dialect.json"
+    "eval:gold": "tsx scripts/eval-gold.ts"
   },
   "dependencies": {
     "@genkit-ai/google-genai": "^1.20.0",
