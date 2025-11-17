@@ -14,6 +14,9 @@ export function Candidates({ items }: { items?: LanguageFamily[] }) {
   const getDialect = (family: LanguageFamily) => {
     // The new detector doesn't put dialect in rationale, so we check familyId
     if (family.familyId !== 'albanian') return null;
+
+    // Check for the dialect property directly on the family object
+    if ((family as any).dialect) return (family as any).dialect;
     
     // Heuristic: if rationale contains Gegë/Tosk cues, use them.
     // This part is less critical now that the main detector is better.

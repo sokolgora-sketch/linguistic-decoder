@@ -7,7 +7,6 @@ import { logError } from "./logError";
 // Browser-safe engine code:
 import { solveWord } from "@/functions/sevenVoicesCore";
 import type { SolveOptions } from "@/functions/sevenVoicesCore";
-import { mapWordToLanguageFamilies } from "@/lib/mapper";
 import { sanitizeForFirestore } from "@/lib/sanitize";
 import { getManifest } from "@/engine/manifest";
 import { detectAlphabetFair } from "./alphabet/autoDetect";
