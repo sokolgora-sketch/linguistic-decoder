@@ -14,7 +14,7 @@ import { ResultsDisplay, PrinciplesBlock } from "@/components/ResultsDisplay";
 import { ConsonantReference } from "@/components/ConsonantReference";
 import { TwoRailsWithConsonants } from "@/components/TwoRailsWithConsonants";
 import { analyzeClient } from "@/lib/analyzeClient";
-import type { Alphabet } from "@/lib/solver/engineConfig";
+import type { Alphabet } from "@/lib/runAnalysis";
 import { PROFILES } from "@/functions/languages";
 import { ThemeToggle } from "@/components/ThemeProvider";
 import { useDebounced } from "@/hooks/useDebounced";
@@ -27,7 +27,7 @@ import { db } from "@/lib/firebase";
 import FooterBuild from "@/components/FooterBuild";
 import { allowAnalyze } from "@/lib/throttle";
 import WhyThisPath from "@/components/WhyThisPath";
-import ExportBar from "@/components/ExportBar";
+import { ExportJsonButton } from "@/components/ExportBar";
 import { logError } from "@/lib/logError";
 
 let EvalPanelComp: React.ComponentType | null = null;
@@ -275,7 +275,7 @@ export default function LinguisticDecoderApp(){
         {data ? (
           <>
             <ResultsDisplay analysis={data} />
-            <ExportBar analysis={data} />
+            <ExportJsonButton analysis={data} />
             <WhyThisPath primary={data.primaryPath} />
             <PrinciplesBlock engine={data} />
             <Candidates items={data.languageFamilies} />
