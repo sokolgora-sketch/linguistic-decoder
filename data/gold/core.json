@@ -6,5 +6,19 @@
     "expectedPrimaryRingPath": [3],
     "expectedDialect": "geg",
     "notes": "Baseline Albanian feminine form; no ë in surface form, geg orthography."
+  },
+  {
+    "id": "vv_geg_01",
+    "word": "Vetvendosje",
+    "expectedPrimaryVoicePath": ["E", "O"],
+    "expectedDialect": "geg",
+    "notes": "Political name, geg orthography."
+  },
+  {
+    "id": "vv_tosk_01",
+    "word": "Vetëvendosje",
+    "expectedPrimaryVoicePath": ["E", "O"],
+    "expectedDialect": "tosk",
+    "notes": "Same word, with ë — tosk orthography."
   }
 ]
