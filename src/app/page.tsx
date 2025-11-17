@@ -419,8 +419,8 @@ export default function LinguisticDecoderApp(){
       </main>
 
       {/* Footer */}
-      <footer className="pt-8 mt-8 border-t border-border/50">
-        <div className="text-xs text-muted-foreground flex justify-between items-start gap-4">
+      <footer className="pt-8 mt-8 border-t border-border/60">
+        <div className="max-w-5xl mx-auto w-full text-xs text-muted-foreground flex justify-between items-start gap-4">
           <div className="font-code flex-1 opacity-70 space-y-1">
             {data && (
               <>
