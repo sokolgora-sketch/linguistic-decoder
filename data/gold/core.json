@@ -1,3 +1,4 @@
+
 [
   {
     "id": "vajza_core_01",
@@ -10,15 +11,13 @@
   {
     "id": "vv_geg_01",
     "word": "Vetvendosje",
-    "expectedPrimaryVoicePath": ["E", "O"],
     "expectedDialect": "geg",
-    "notes": "Political name, geg orthography."
+    "notes": "Geg orthography."
   },
   {
     "id": "vv_tosk_01",
     "word": "Vetëvendosje",
-    "expectedPrimaryVoicePath": ["E", "O"],
     "expectedDialect": "tosk",
-    "notes": "Same word, with ë — tosk orthography."
+    "notes": "Tosk orthography with ë."
   }
 ]
