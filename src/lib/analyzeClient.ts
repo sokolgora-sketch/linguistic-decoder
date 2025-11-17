@@ -1,12 +1,11 @@
 
-
 import { db, ensureAnon, auth } from "@/lib/firebase";
 import { doc, getDoc, setDoc, serverTimestamp, collection, addDoc } from "firebase/firestore";
 import { normalizeEnginePayload, type EnginePayload, type Vowel, LanguageFamily } from "@/shared/engineShape";
 import { logError } from "./logError";
+import { runAnalysis, type AnalysisResult } from "@/lib/runAnalysis";
 
 // Browser-safe engine code:
-import { runAnalysis } from "@/lib/runAnalysis";
 import type { SolveOptions } from "@/functions/sevenVoicesCore";
 import { sanitizeForFirestore } from "@/lib/sanitize";
 import { getManifest } from "@/engine/manifest";
@@ -66,9 +65,6 @@ function computeLocal(word: string, mode: Mode, alphabet: Alphabet, edgeWeight?:
   // Construct canonical, then pass through normalizer (paranoid but consistent)
   return normalizeEnginePayload({
     ...analysisResult,
-    word,
-    mode,
-    alphabet: effectiveAlphabet, // Return the effective alphabet
     solveMs: Date.now() - t0,
     cacheHit: false,
     languageFamilies,
