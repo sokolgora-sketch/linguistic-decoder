@@ -214,8 +214,10 @@ export default function LinguisticDecoderApp(){
         {/* Controls */}
         <Card className="mb-6">
           <CardHeader>
-            <CardTitle>Analyze a word</CardTitle>
-            <CardDescription>Type a word, choose options, and run the Seven-Voices solver.</CardDescription>
+            <CardTitle>Seven-Voices Linguistic Decoder</CardTitle>
+            <CardDescription>
+              Type a word, choose analysis options, and run the engine.
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_auto] gap-4 items-center">
@@ -391,5 +393,7 @@ export default function LinguisticDecoderApp(){
     </div>
   );
 }
+
+    
 
     
