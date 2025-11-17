@@ -57,7 +57,10 @@ export function detectAlphabetFair(word: string, voicePath: string[], selected: 
   // Dialect hint for Albanian
   if (winner === 'albanian' && pct[0].score > 0) {
     const dialect = detectAlbanianDialect(word);
-    pct[0] = { ...pct[0], dialect } as any;
+    const albFamily = pct.find(f => f.family === 'albanian');
+    if (albFamily) {
+        (albFamily as any).dialect = dialect;
+    }
   }
 
 

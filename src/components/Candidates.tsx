@@ -34,7 +34,7 @@ export function Candidates({ items }: { items?: LanguageFamily[] }) {
       <h3 className="font-bold text-sm tracking-wide mb-2">Language Family Candidates</h3>
       <div className="space-y-2">
         {visibleFamilies.map((f, i) => {
-          const dialect = getDialect(f);
+          const dialect = getDialect(f) || f.dialect;
           return (
             <Card key={f.familyId || i} className="p-2.5 text-sm border-primary/50">
                <div className="flex items-center gap-2">

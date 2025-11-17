@@ -18,6 +18,7 @@ export type LanguageFamily = {
   rationale: string;      // short explanation
   forms?: string[];       // candidates/attested forms
   signals?: string[];     // debug notes
+  dialect?: 'geg' | 'tosk'; // NEW
 };
 
 export type EnginePayload = {
