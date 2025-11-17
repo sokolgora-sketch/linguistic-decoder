@@ -4,6 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 
 import { solveWord } from "../src/functions/sevenVoicesCore";
+import { detectAlbanianDialect } from "../src/lib/detectDialect";
 
 type GoldItem = {
   id: string;
@@ -39,14 +40,15 @@ function loadGoldSet(): GoldItem[] {
 function evaluateGoldItem(item: GoldItem): GoldEvalRow {
   const result = solveWord(item.word);
 
-  // adjust these paths to your actual result shape
+  // Adjust these to your actual result shape
   const primaryVoicePath: string[] = result.primaryPath?.voicePath ?? [];
   const primaryRingPath: number[] = result.primaryPath?.ringPath ?? [];
 
-  const albanianFamily = (result.languageFamilies ?? []).find(
-    (f: any) => f.familyId === "albanian"
-  );
-  const predictedDialect: string | undefined = albanianFamily?.dialect;
+  // For gold eval, we *explicitly* use the same helper as the mapper,
+  // so we're not depending on engine internals for dialect.
+  const predictedDialect: string | undefined = item.expectedDialect
+    ? detectAlbanianDialect(item.word)
+    : undefined;
 
   let primaryVoiceOk: boolean | undefined;
   let primaryRingOk: boolean | undefined;
@@ -69,10 +71,10 @@ function evaluateGoldItem(item: GoldItem): GoldEvalRow {
   }
 
   const checks = [primaryVoiceOk, primaryRingOk, dialectOk].filter(
-    v => v !== undefined
+    (v) => v !== undefined
   ) as boolean[];
 
-  const ok = checks.length === 0 ? true : checks.every(Boolean);
+  const ok = checks.length === 0 ? true : checks.every((v) => v === true);
 
   return {
     id: item.id,
@@ -87,7 +89,7 @@ function evaluateGoldItem(item: GoldItem): GoldEvalRow {
     predictedPrimaryRingPath: primaryRingPath,
     expectedDialect: item.expectedDialect,
     predictedDialect,
-    notes: item.notes
+    notes: item.notes,
   };
 }
 
@@ -96,24 +98,21 @@ function main() {
   const rows: GoldEvalRow[] = gold.map(evaluateGoldItem);
 
   const total = rows.length;
-  const passed = rows.filter(r => r.ok).length;
+  const passed = rows.filter((r) => r.ok).length;
   const failed = total - passed;
 
   console.log(`Gold eval: ${passed}/${total} passed, ${failed} failed.`);
 
   if (failed > 0) {
     console.log("Failed items:");
-    for (const row of rows.filter(r => !r.ok)) {
-      console.log(
-        `- ${row.id} [${row.word}]:`,
-        {
-          primaryVoiceOk: row.primaryVoiceOk,
-          primaryRingOk: row.primaryRingOk,
-          dialectOk: row.dialectOk,
-          expectedDialect: row.expectedDialect,
-          predictedDialect: row.predictedDialect
-        }
-      );
+    for (const row of rows.filter((r) => !r.ok)) {
+      console.log(`- ${row.id} [${row.word}]:`, {
+        primaryVoiceOk: row.primaryVoiceOk,
+        primaryRingOk: row.primaryRingOk,
+        dialectOk: row.dialectOk,
+        expectedDialect: row.expectedDialect,
+        predictedDialect: row.predictedDialect,
+      });
     }
   }
 
