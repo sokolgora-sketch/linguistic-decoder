@@ -199,10 +199,10 @@ export default function LinguisticDecoderApp(){
     <div className="p-4 lg:p-8 max-w-4xl mx-auto">
        <main className="space-y-4">
         {/* Header */}
-        <header className="p-6 border-b-4 border-primary bg-background -mx-6 -mt-8">
+        <header className="p-6 border-b bg-card -mx-6 -mt-8">
           <div className="max-w-5xl mx-auto flex justify-between items-center">
             <div>
-              <h1 className="font-headline text-3xl font-bold tracking-wide text-primary">Linguistic Decoder</h1>
+              <h1 className="text-3xl font-bold tracking-wide text-primary">Linguistic Decoder</h1>
               <p className="text-sm text-muted-foreground mt-1">Seven‑Voices matrix solver · primary & frontier paths · optional Gemini mapping</p>
             </div>
             <div className="flex items-center gap-4">
@@ -213,7 +213,7 @@ export default function LinguisticDecoderApp(){
 
         {/* Controls */}
         <Card className="p-4">
-          <div className="grid grid-cols-[1fr_auto_auto_auto_auto_auto] gap-2.5 items-center">
+          <div className="grid grid-cols-[1fr_auto_auto_auto] gap-2.5 items-center">
             <Input
               value={word}
               onChange={e=> setWord(e.target.value)}
@@ -222,10 +222,6 @@ export default function LinguisticDecoderApp(){
               onKeyUp={(e) => e.key === 'Enter' && canAnalyze && analyze()}
             />
             {isWarming && <Loader className="animate-spin text-muted-foreground" size={18} />}
-            <label className="flex items-center gap-2 text-sm">
-              <input type="checkbox" checked={mode==="strict"} onChange={e=> setMode(e.target.checked?"strict":"open")} className="w-4 h-4 rounded text-primary focus:ring-primary" />
-              Strict
-            </label>
             <Select value={alphabet} onValueChange={(v) => setAlphabet(v as Alphabet)}>
                 <SelectTrigger className="w-[180px]">
                     <SelectValue placeholder="Language" />
@@ -242,14 +238,18 @@ export default function LinguisticDecoderApp(){
             </Button>
             <Button onClick={runSmokeTest} variant="outline" title="Display a mock result to test the UI">Smoke Test</Button>
           </div>
-          <div className="flex items-center gap-4 mt-3">
+          <div className="flex items-center gap-4 mt-3 pt-3 border-t">
+              <label className="flex items-center gap-2 text-sm">
+                <input type="checkbox" checked={mode==="strict"} onChange={e=> setMode(e.target.checked?"strict":"open")} className="w-4 h-4 rounded text-primary focus:ring-primary" />
+                Strict
+              </label>
               <label className="text-xs text-muted-foreground">Edge weight: {edgeWeight.toFixed(2)}</label>
               <input
                 type="range" min={0} max={0.6} step={0.05}
                 value={edgeWeight} onChange={e=>setEdgeWeight(Number(e.target.value))}
                 className="w-32"
               />
-              <label className="flex items-center gap-2 text-sm ml-4">
+              <label className="flex items-center gap-2 text-sm ml-auto">
                   <input type="checkbox" checked={useAi} onChange={e=> setUseAi(e.target.checked)} className="w-4 h-4 rounded text-primary focus:ring-primary" />
                   Use AI Mapper
               </label>
@@ -380,3 +380,5 @@ export default function LinguisticDecoderApp(){
     </div>
   );
 }
+
+    
