@@ -205,8 +205,8 @@ export default function LinguisticDecoderApp(){
     <div className="p-4 lg:p-8 max-w-5xl mx-auto">
        <main className="space-y-6">
         {/* Header */}
-        <header className="p-6 border-b bg-card -mx-6 -mt-8 rounded-t-lg">
-          <div className="max-w-5xl mx-auto flex justify-between items-center">
+        <header className="pb-4 border-b">
+          <div className="flex justify-between items-center">
             <div>
               <h1 className="text-3xl font-bold tracking-tight text-primary">Linguistic Decoder</h1>
               <p className="text-sm text-muted-foreground mt-1">Seven‑Voices matrix solver · primary & frontier paths · optional Gemini mapping</p>
