@@ -5,7 +5,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useToast } from "../hooks/use-toast";
 import { Button } from "../components/ui/button";
-import { Card } from "../components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
 import { Input } from "../components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../components/ui/accordion";
@@ -212,55 +212,66 @@ export default function LinguisticDecoderApp(){
         </header>
 
         {/* Controls */}
-        <Card className="p-4">
-          <div className="grid grid-cols-[1fr_auto_auto_auto] gap-4 items-center">
-            <Input
-              value={word}
-              onChange={e=> setWord(e.target.value)}
-              placeholder="Type a word…"
-              className="font-semibold text-lg"
-              onKeyUp={(e) => e.key === 'Enter' && canAnalyze && analyze()}
-            />
-            {isWarming && <Loader className="animate-spin text-muted-foreground" size={18} />}
-            <Select value={alphabet} onValueChange={(v) => setAlphabet(v as Alphabet)}>
-                <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder="Language" />
-                </SelectTrigger>
-                <SelectContent>
-                    <SelectItem value="auto">Auto-Detect</SelectItem>
-                    {PROFILES.map(p => (
-                        <SelectItem key={p.id} value={p.id}>{p.id.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</SelectItem>
-                    ))}
-                </SelectContent>
-            </Select>
-            <Button onClick={()=> analyze()} disabled={!canAnalyze} size="lg">
-              {loading ? "Analyzing…" : "Analyze"}
-            </Button>
-            <Button onClick={runSmokeTest} variant="outline" title="Display a mock result to test the UI">Smoke</Button>
-          </div>
-          <div className="flex items-center gap-4 mt-4 pt-4 border-t">
-              <label className="flex items-center gap-2 text-sm">
-                <input type="checkbox" checked={mode==="strict"} onChange={e=> setMode(e.target.checked?"strict":"open")} className="w-4 h-4 rounded text-primary focus:ring-primary" />
-                Strict Mode
-              </label>
-              <label className="text-xs text-muted-foreground">Edge weight: {edgeWeight.toFixed(2)}</label>
-              <input
-                type="range" min={0} max={0.6} step={0.05}
-                value={edgeWeight} onChange={e=>setEdgeWeight(Number(e.target.value))}
-                className="w-32"
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle>Analyze a word</CardTitle>
+            <CardDescription>Type a word, choose options, and run the Seven-Voices solver.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_auto] gap-4 items-center">
+              <Input
+                value={word}
+                onChange={e=> setWord(e.target.value)}
+                placeholder="Type a word…"
+                className="font-semibold text-lg"
+                onKeyUp={(e) => e.key === 'Enter' && canAnalyze && analyze()}
               />
-              <label className="flex items-center gap-2 text-sm ml-auto">
-                  <input type="checkbox" checked={useAi} onChange={e=> setUseAi(e.target.checked)} className="w-4 h-4 rounded text-primary focus:ring-primary" />
-                  Use AI Mapper
-              </label>
-          </div>
-          {err && (
-            <div className="mt-4 border border-red-500/50 bg-red-500/10 text-red-400 text-sm p-3 rounded-md">
-              <b>Error:</b> {err}
+              {isWarming && <Loader className="animate-spin text-muted-foreground" size={18} />}
+              <Button onClick={()=> analyze()} disabled={!canAnalyze} size="lg" className="w-full md:w-auto">
+                {loading ? "Analyzing…" : "Analyze"}
+              </Button>
+              <Button onClick={runSmokeTest} variant="outline" title="Display a mock result to test the UI" className="hidden md:inline-flex">Smoke</Button>
             </div>
-          )}
-           {data?.cacheHit && <div className="mt-2.5 text-sm font-semibold text-accent-foreground">Result loaded from cache.</div>}
+            <div className="grid grid-cols-2 md:grid-cols-[auto_1fr_auto] gap-4 items-center pt-4 border-t">
+                <Select value={alphabet} onValueChange={(v) => setAlphabet(v as Alphabet)}>
+                    <SelectTrigger className="w-full md:w-[180px]">
+                        <SelectValue placeholder="Language" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="auto">Auto-Detect</SelectItem>
+                        {PROFILES.map(p => (
+                            <SelectItem key={p.id} value={p.id}>{p.id.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+              <div className="flex items-center gap-4">
+                <label className="text-xs text-muted-foreground">Edge: {edgeWeight.toFixed(2)}</label>
+                <input
+                  type="range" min={0} max={0.6} step={0.05}
+                  value={edgeWeight} onChange={e=>setEdgeWeight(Number(e.target.value))}
+                  className="w-full"
+                />
+              </div>
+              <div className="col-span-2 md:col-span-1 flex items-center justify-end gap-4">
+                <label className="flex items-center gap-2 text-sm">
+                  <input type="checkbox" checked={mode==="strict"} onChange={e=> setMode(e.target.checked?"strict":"open")} className="w-4 h-4 rounded text-primary focus:ring-primary" />
+                  Strict Mode
+                </label>
+                <label className="flex items-center gap-2 text-sm">
+                    <input type="checkbox" checked={useAi} onChange={e=> setUseAi(e.target.checked)} className="w-4 h-4 rounded text-primary focus:ring-primary" />
+                    AI Mapper
+                </label>
+              </div>
+            </div>
+            {err && (
+              <div className="mt-4 border border-red-500/50 bg-red-500/10 text-red-400 text-sm p-3 rounded-md">
+                <b>Error:</b> {err}
+              </div>
+            )}
+            {data?.cacheHit && <div className="mt-2.5 text-sm font-semibold text-accent-foreground">Result loaded from cache.</div>}
+          </CardContent>
         </Card>
+
 
         {/* Visualization & Results */}
         <TwoRailsWithConsonants
@@ -380,5 +391,7 @@ export default function LinguisticDecoderApp(){
     </div>
   );
 }
+
+    
 
     
