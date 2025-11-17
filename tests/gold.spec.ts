@@ -3,9 +3,9 @@ import { runAnalysis } from "@/lib/runAnalysis";
 import { getManifest } from "@/engine/manifest";
 import type { Alphabet } from "@/lib/runAnalysis";
 
-const base = {
+const base: any = {
   beamWidth: 8, maxOps: 1, allowDelete: false, allowClosure: false,
-  opCost:{sub:1,del:3,ins:2}, alphabet:"auto" as const,
+  opCost:{sub:1,del:3,ins:2},
   manifest: getManifest(), edgeWeight: getManifest().edgeWeight
 };
 

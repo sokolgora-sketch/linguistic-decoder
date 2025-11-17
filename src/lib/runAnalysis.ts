@@ -1,4 +1,3 @@
-
 // src/lib/runAnalysis.ts
 import { solveWord } from "@/functions/sevenVoicesCore";
 import type { SolveOptions as SolveWordOptions } from "@/functions/sevenVoicesCore";
@@ -30,12 +29,13 @@ export function runAnalysis(
   opts: SolveWordOptions,
   alphabet: Alphabet
 ): AnalysisResult {
-  const baseResult = solveWord(word, opts, alphabet);
+  const trimmed = word.trim();
+  const baseResult = solveWord(trimmed, opts, alphabet);
 
   return {
     ...baseResult,
     engineVersion: ENGINE_VERSION,
-    word: word,
+    word: trimmed,
     mode: opts.allowDelete ? 'open' : 'strict',
     alphabet: alphabet
   };
