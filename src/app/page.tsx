@@ -218,7 +218,7 @@ export default function LinguisticDecoderApp(){
         </header>
 
         {/* Controls */}
-        <Card className="mt-4 border border-border/60 shadow-sm">
+        <Card className="mt-4 border border-border/60 shadow-sm animate-fade-in">
             <CardHeader>
                 <CardTitle>Analyze a word</CardTitle>
                 <CardDescription>Type a word, choose analysis options, and run the Seven-Voices solver.</CardDescription>
@@ -477,5 +477,7 @@ export default function LinguisticDecoderApp(){
     </div>
   );
 }
+
+    
 
     
