@@ -1,15 +1,15 @@
 
 "use client";
 import React, { useState } from "react";
-import { solveWord } from "@/functions/sevenVoicesCore";
-import { getManifest } from "@/engine/manifest";
+import { solveWord } from "../functions/sevenVoicesCore";
+import { getManifest } from "../engine/manifest";
 import { Button } from "./ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { Card } from "./ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
 import { Input } from "./ui/input";
-import { logError } from "@/lib/logError";
-import { useToast } from "@/hooks/use-toast";
+import { logError } from "../lib/logError";
+import { useToast } from "../hooks/use-toast";
 
 type Mode = "strict"|"open";
 type Alphabet = "auto"|"albanian"|"latin"|"sanskrit"|"ancient_greek"|"pie";

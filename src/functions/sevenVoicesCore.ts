@@ -1,7 +1,7 @@
 
 // @ts-nocheck
 
-import { getManifest, EngineManifest } from "@/engine/manifest";
+import { getManifest, EngineManifest } from "../engine/manifest";
 import { computeC, extractBase, normalizeTerminalY, readWindowsDebug, edgeBiasPenalty, type EdgeInfo } from "./sevenVoicesC";
 import { chooseProfile, CClass } from "./languages";
 

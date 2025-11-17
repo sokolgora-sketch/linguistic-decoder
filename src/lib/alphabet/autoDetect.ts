@@ -1,6 +1,6 @@
 
 import { CUES, Family } from "./cues";
-import { detectAlbanianDialect } from "@/lib/detectDialect";
+import { detectAlbanianDialect } from "../detectDialect";
 
 export type Alphabet = "auto"|Family;
 

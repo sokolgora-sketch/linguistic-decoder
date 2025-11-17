@@ -1,7 +1,7 @@
 
 // src/lib/runAnalysis.ts
-import { solveWord } from "@/functions/sevenVoicesCore";
-import type { SolveOptions as SolveWordOptions } from "@/functions/sevenVoicesCore";
+import { solveWord } from "../functions/sevenVoicesCore";
+import type { SolveOptions as SolveWordOptions } from "../functions/sevenVoicesCore";
 
 export type Alphabet = "auto"|"albanian"|"latin"|"sanskrit"|"ancient_greek"|"pie"|"turkish"|"german";
 export const ENGINE_VERSION = process.env.NEXT_PUBLIC_ENGINE_VERSION ?? "dev";

@@ -1,14 +1,14 @@
 
-import { db, ensureAnon, auth } from "@/lib/firebase";
+import { db, ensureAnon, auth } from "./firebase";
 import { doc, getDoc, setDoc, serverTimestamp, collection, addDoc } from "firebase/firestore";
-import { normalizeEnginePayload, type EnginePayload, type Vowel, LanguageFamily } from "@/shared/engineShape";
+import { normalizeEnginePayload, type EnginePayload, type Vowel, LanguageFamily } from "../shared/engineShape";
 import { logError } from "./logError";
-import { runAnalysis, type AnalysisResult } from "@/lib/runAnalysis";
+import { runAnalysis, type AnalysisResult } from "./runAnalysis";
 
 // Browser-safe engine code:
-import type { SolveOptions } from "@/functions/sevenVoicesCore";
-import { sanitizeForFirestore } from "@/lib/sanitize";
-import { getManifest } from "@/engine/manifest";
+import type { SolveOptions } from "../functions/sevenVoicesCore";
+import { sanitizeForFirestore } from "./sanitize";
+import { getManifest } from "../engine/manifest";
 import { detectAlphabetFair } from "./alphabet/autoDetect";
 
 

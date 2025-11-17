@@ -2,7 +2,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { db, auth, ensureAnon } from "@/lib/firebase";
+import { db, auth, ensureAnon } from "../lib/firebase";
 import {
   collection,
   query,
