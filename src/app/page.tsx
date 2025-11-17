@@ -220,19 +220,19 @@ export default function LinguisticDecoderApp(){
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex flex-col md:flex-row gap-4">
+            <div className="flex flex-col sm:flex-row gap-2">
               <Input
                 value={word}
-                onChange={e=> setWord(e.target.value)}
+                onChange={(e) => setWord(e.target.value)}
                 placeholder="Type a word…"
                 className="font-semibold text-lg flex-1"
-                onKeyUp={(e) => e.key === 'Enter' && canAnalyze && analyze()}
+                onKeyUp={(e) => e.key === "Enter" && canAnalyze && analyze()}
               />
               <div className="flex gap-2">
-                <Button onClick={()=> analyze()} disabled={!canAnalyze} size="lg" className="flex-1 md:flex-none">
+                <Button onClick={() => analyze()} disabled={!canAnalyze} size="lg" className="flex-1 sm:flex-none">
                   {loading ? "Analyzing…" : "Analyze"}
                 </Button>
-                <Button onClick={runSmokeTest} variant="outline" size="lg" title="Display a mock result to test the UI" className="hidden md:inline-flex">Smoke</Button>
+                <Button onClick={runSmokeTest} variant="outline" size="lg" title="Display a mock result to test the UI" className="hidden sm:inline-flex">Smoke</Button>
               </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center pt-4 border-t">
@@ -257,7 +257,7 @@ export default function LinguisticDecoderApp(){
                   />
                 </div>
               </div>
-              <div className="flex md:justify-end items-center gap-4">
+              <div className="flex justify-start md:justify-end items-center gap-4">
                 <label className="flex items-center gap-2 text-sm">
                   <input type="checkbox" checked={mode==="strict"} onChange={e=> setMode(e.target.checked?"strict":"open")} className="w-4 h-4 rounded text-primary focus:ring-primary" />
                   Strict Mode

@@ -6438,14 +6438,14 @@ function LinguisticDecoderApp() {
                                 className: "space-y-4",
                                 children: [
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                        className: "flex flex-col md:flex-row gap-4",
+                                        className: "flex flex-col sm:flex-row gap-2",
                                         children: [
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$input$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Input"], {
                                                 value: word,
                                                 onChange: (e)=>setWord(e.target.value),
                                                 placeholder: "Type a word…",
                                                 className: "font-semibold text-lg flex-1",
-                                                onKeyUp: (e)=>e.key === 'Enter' && canAnalyze && analyze()
+                                                onKeyUp: (e)=>e.key === "Enter" && canAnalyze && analyze()
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/page.tsx",
                                                 lineNumber: 224,
@@ -6458,7 +6458,7 @@ function LinguisticDecoderApp() {
                                                         onClick: ()=>analyze(),
                                                         disabled: !canAnalyze,
                                                         size: "lg",
-                                                        className: "flex-1 md:flex-none",
+                                                        className: "flex-1 sm:flex-none",
                                                         children: loading ? "Analyzing…" : "Analyze"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/page.tsx",
@@ -6470,7 +6470,7 @@ function LinguisticDecoderApp() {
                                                         variant: "outline",
                                                         size: "lg",
                                                         title: "Display a mock result to test the UI",
-                                                        className: "hidden md:inline-flex",
+                                                        className: "hidden sm:inline-flex",
                                                         children: "Smoke"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/page.tsx",
@@ -6582,7 +6582,7 @@ function LinguisticDecoderApp() {
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                className: "flex md:justify-end items-center gap-4",
+                                                className: "flex justify-start md:justify-end items-center gap-4",
                                                 children: [
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
                                                         className: "flex items-center gap-2 text-sm",
