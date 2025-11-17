@@ -3,36 +3,36 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { useToast } from "@/hooks/use-toast";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Candidates } from "@/components/Candidates";
-import { ResultsDisplay, PrinciplesBlock } from "@/components/ResultsDisplay";
-import { ConsonantReference } from "@/components/ConsonantReference";
-import { TwoRailsWithConsonants } from "@/components/TwoRailsWithConsonants";
-import { analyzeClient } from "@/lib/analyzeClient";
-import type { Alphabet } from "@/lib/runAnalysis";
-import { PROFILES } from "@/functions/languages";
-import { ThemeToggle } from "@/components/ThemeProvider";
-import { useDebounced } from "@/hooks/useDebounced";
+import { useToast } from "../hooks/use-toast";
+import { Button } from "../components/ui/button";
+import { Card } from "../components/ui/card";
+import { Input } from "../components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../components/ui/accordion";
+import { Candidates } from "../components/Candidates";
+import { ResultsDisplay, PrinciplesBlock } from "../components/ResultsDisplay";
+import { ConsonantReference } from "../components/ConsonantReference";
+import { TwoRailsWithConsonants } from "../components/TwoRailsWithConsonants";
+import { analyzeClient } from "../lib/analyzeClient";
+import type { Alphabet } from "../lib/runAnalysis";
+import { PROFILES } from "../functions/languages";
+import { ThemeToggle } from "../components/ThemeProvider";
+import { useDebounced } from "../hooks/useDebounced";
 import { Loader } from "lucide-react";
-import ComparePanel from "@/components/ComparePanel";
-import { normalizeEnginePayload, type EnginePayload, type Vowel } from "@/shared/engineShape";
-import HistoryPanel from "@/components/HistoryPanel";
+import ComparePanel from "../components/ComparePanel";
+import { normalizeEnginePayload, type EnginePayload, type Vowel } from "../shared/engineShape";
+import HistoryPanel from "../components/HistoryPanel";
 import { doc, getDoc } from "firebase/firestore";
-import { db } from "@/lib/firebase";
-import FooterBuild from "@/components/FooterBuild";
-import { allowAnalyze } from "@/lib/throttle";
-import WhyThisPath from "@/components/WhyThisPath";
-import { ExportJsonButton } from "@/components/ExportJsonButton";
-import { logError } from "@/lib/logError";
+import { db } from "../lib/firebase";
+import FooterBuild from "../components/FooterBuild";
+import { allowAnalyze } from "../lib/throttle";
+import WhyThisPath from "../components/WhyThisPath";
+import { ExportJsonButton } from "../components/ExportJsonButton";
+import { logError } from "../lib/logError";
 
 let EvalPanelComp: React.ComponentType | null = null;
 if (process.env.NEXT_PUBLIC_DEV_EVAL === "1") {
-  EvalPanelComp = require("@/components/EvalPanel").default;
+  EvalPanelComp = require("../components/EvalPanel").default;
 }
 
 
@@ -380,3 +380,5 @@ export default function LinguisticDecoderApp(){
     </div>
   );
 }
+
+    
