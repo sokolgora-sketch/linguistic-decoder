@@ -1,3 +1,4 @@
+
 #!/usr/bin/env ts-node
 
 /**
@@ -26,6 +27,7 @@ require("tsconfig-paths/register");
 import { runAnalysis } from "@/lib/runAnalysis";
 import { getManifest } from "@/engine/manifest";
 import type { Alphabet } from "@/lib/runAnalysis";
+import type { SolveOptions } from "@/functions/sevenVoicesCore";
 
 type Mode = "strict"|"open";
 
@@ -120,16 +122,21 @@ const rows: Row[] = data.map((r) => ({
 ensureDir(outDir);
 
 const manifest = getManifest(manifestVersion);
-const defaults = {
-  beamWidth: 8,
-  maxOps: 1,
-  allowDelete: false,
-  allowClosure: false,
-  opCost: manifest.opCost,
-  alphabet: "auto" as Alphabet,
-  manifest,
-  edgeWeight: edgeWeightCLI ?? manifest.edgeWeight,
-};
+
+function getOpts(mode: Mode, alphabet: Alphabet): SolveOptions {
+    const isStrict = mode === 'strict';
+    return {
+      beamWidth: 8,
+      maxOps: isStrict ? 1 : 2,
+      allowDelete: !isStrict,
+      allowClosure: !isStrict,
+      opCost: manifest.opCost,
+      alphabet,
+      manifest,
+      edgeWeight: edgeWeightCLI ?? manifest.edgeWeight,
+    };
+}
+
 
 type ConfusionKey = string; // "expected|predicted"
 const confusion = new Map<ConfusionKey, number>();
@@ -143,11 +150,9 @@ for (const row of rows) {
   const mode = (row.mode || modeCLI) as Mode;
   const alphabet = (row.alphabet || alphabetCLI) as Alphabet;
 
-  const opts = mode === "strict"
-    ? defaults
-    : { ...defaults, maxOps: 2, allowDelete: true, allowClosure: true, opCost: manifest.opCost };
+  const opts = getOpts(mode, alphabet);
+  const out = runAnalysis(row.word, opts, alphabet);
 
-  const out: any = runAnalysis(row.word, opts, alphabet);
   const pred = joinPath(out?.primaryPath?.voicePath || []);
   const exp = normalizePath(row.expected);
   const hasLabel = !!exp;
@@ -199,7 +204,7 @@ const metrics = {
   manifest: manifest.version,
   mode_default: modeCLI,
   alphabet_default: alphabetCLI,
-  edge_weight: defaults.edgeWeight,
+  edge_weight: edgeWeightCLI ?? manifest.edgeWeight,
 };
 fs.writeFileSync(path.join(outDir, "metrics.json"), JSON.stringify(metrics, null, 2), "utf8");
 

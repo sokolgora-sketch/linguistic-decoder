@@ -4,11 +4,14 @@ import { chooseProfile } from "@/functions/languages";
 import { readWindowsDebug, extractBase, normalizeTerminalY } from "@/functions/sevenVoicesC";
 import { Vowel } from "@/functions/sevenVoicesCore";
 import type { Alphabet } from "@/lib/runAnalysis";
+import type { SolveOptions } from "@/functions/sevenVoicesCore";
+import { getManifest } from "@/engine/manifest";
 
 describe("word: hope", () => {
   const mode = "strict" as const;
   const alphabet = "auto" as Alphabet;
-  const opts: any = { beamWidth: 8, maxOps: 1, allowDelete: false, allowClosure: false, opCost: { sub:1, del:3, insClosure:2 } };
+  const manifest = getManifest();
+  const opts: SolveOptions = { beamWidth: 8, maxOps: 1, allowDelete: false, allowClosure: false, opCost: { sub:1, del:3, ins:2 }, alphabet, manifest, edgeWeight: manifest.edgeWeight };
 
   test("primary path and consonant pressure", () => {
     const { primaryPath: primary, signals } = runAnalysis("hope", opts, alphabet);

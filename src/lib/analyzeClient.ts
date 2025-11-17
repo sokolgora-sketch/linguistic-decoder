@@ -58,6 +58,7 @@ function computeLocal(word: string, mode: Mode, alphabet: Alphabet, edgeWeight?:
     rationale: "", // No rationale from this detector
     forms: [],
     signals: [],
+    ...(s as any).dialect && { dialect: (s as any).dialect },
   }));
 
 
@@ -112,6 +113,7 @@ export async function analyzeClient(word: string, mode: Mode, alphabet: Alphabet
           label: s.family.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
           confidence: s.score / 100,
           rationale: "", forms: [], signals: [],
+          ...((s as any).dialect && { dialect: (s as any).dialect }),
       }));
       
       void saveHistory(cacheId, normalized, "cache");

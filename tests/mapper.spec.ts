@@ -4,12 +4,13 @@ import { getManifest } from '@/engine/manifest';
 import { detectAlphabetFair } from '@/lib/alphabet/autoDetect';
 import type { Vowel } from '@/shared/engineShape';
 import type { Alphabet } from '@/lib/runAnalysis';
+import type { SolveOptions } from '@/functions/sevenVoicesCore';
 
 const manifest = getManifest();
-const base: any = { manifest, edgeWeight: manifest.edgeWeight, opCost: manifest.opCost, maxOps: 1, beamWidth: 8, allowDelete: false, allowClosure: false, alphabet: "auto" };
+const base: SolveOptions = { manifest, edgeWeight: manifest.edgeWeight, opCost: manifest.opCost, maxOps: 1, beamWidth: 8, allowDelete: false, allowClosure: false, alphabet: "auto" };
 
 function vp(word: string, alphabet: Alphabet = 'auto'): Vowel[] {
-  const { primaryPath } = runAnalysis(word, base, alphabet) as any;
+  const { primaryPath } = runAnalysis(word, base, alphabet);
   return primaryPath.voicePath as Vowel[];
 }
 
