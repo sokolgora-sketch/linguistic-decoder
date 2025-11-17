@@ -25,9 +25,8 @@ type AnalyzeOpts = {
 // NEW helper: safe join
 const joinPath = (xs?: (string|Vowel)[]) => Array.isArray(xs) ? xs.join("→") : "";
 
-function computeLocal(word: string, mode: Mode, alphabet: Alphabet, edgeWeight?: number): EnginePayload {
+function computeLocal(word: string, mode: Mode, alphabet: Alphabet, edgeWeight?: number): AnalysisResult {
   const manifest = getManifest(); // Use default manifest for local compute
-  const t0 = Date.now();
   
   const strict = mode === "strict";
   const opCost = manifest.opCost;
@@ -65,13 +64,11 @@ function computeLocal(word: string, mode: Mode, alphabet: Alphabet, edgeWeight?:
   // Construct canonical, then pass through normalizer (paranoid but consistent)
   return normalizeEnginePayload({
     ...analysisResult,
-    solveMs: Date.now() - t0,
-    cacheHit: false,
     languageFamilies,
   });
 }
 
-export async function analyzeClient(word: string, mode: Mode, alphabet: Alphabet, opts: AnalyzeOpts = {}) {
+export async function analyzeClient(word: string, mode: Mode, alphabet: Alphabet, opts: AnalyzeOpts = {}): Promise<AnalysisResult> {
   await ensureAnon();
   const manifest = getManifest();
 
@@ -83,10 +80,12 @@ export async function analyzeClient(word: string, mode: Mode, alphabet: Alphabet
   // If db isn't initialized, we can only do local computation.
   if (!db) {
     console.warn("Firestore not available. Skipping cache and returning local computation.");
-    return computeLocal(word, mode, alphabet, opts.edgeWeight);
+    const result = computeLocal(word, mode, alphabet, opts.edgeWeight);
+    return { ...result, solveMs: 0, cacheHit: false };
   }
 
   const cacheRef = doc(db, "analyses", cacheId);
+  const t0 = Date.now();
 
   try {
     // BYPASS / WRITE-THROUGH: compute fresh or use provided payload, skip cache read
@@ -99,7 +98,7 @@ export async function analyzeClient(word: string, mode: Mode, alphabet: Alphabet
       }
       
       void saveHistory(cacheId, payloadToUse, "bypass");
-      return { ...payloadToUse, recomputed: true, cacheHit: false };
+      return { ...payloadToUse, recomputed: true, cacheHit: false, solveMs: Date.now() - t0 };
     }
 
     // Try cache -> normalize (in case older writes used a different shape)
@@ -116,7 +115,7 @@ export async function analyzeClient(word: string, mode: Mode, alphabet: Alphabet
       }));
       
       void saveHistory(cacheId, normalized, "cache");
-      return { ...normalized, cacheHit: true, recomputed: false };
+      return { ...normalized, cacheHit: true, recomputed: false, solveMs: Date.now() - t0 };
     }
 
     // Miss → compute → write → return
@@ -125,7 +124,7 @@ export async function analyzeClient(word: string, mode: Mode, alphabet: Alphabet
 
     await setDoc(cacheRef, { ...cleanFresh, cachedAt: serverTimestamp() }, { merge: false });
     void saveHistory(cacheId, fresh, "fresh");
-    return { ...fresh, cacheHit: false, recomputed: false };
+    return { ...fresh, cacheHit: false, recomputed: false, solveMs: Date.now() - t0 };
   } catch (e: any) {
     logError({ where: "analyzeClient", message: e.message, detail: { word, mode, alphabet, stack: e.stack } });
     throw e; // re-throw to be caught by UI
@@ -134,7 +133,7 @@ export async function analyzeClient(word: string, mode: Mode, alphabet: Alphabet
 
 async function saveHistory(
   cacheId: string,
-  engine: EnginePayload,
+  engine: AnalysisResult,
   source: "cache"|"fresh"|"bypass"
 ) {
   if (!db) return; // Guard clause
