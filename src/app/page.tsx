@@ -27,7 +27,7 @@ import { db } from "@/lib/firebase";
 import FooterBuild from "@/components/FooterBuild";
 import { allowAnalyze } from "@/lib/throttle";
 import WhyThisPath from "@/components/WhyThisPath";
-import { ExportJsonButton } from "@/components/ExportBar";
+import { ExportJsonButton } from "@/components/ExportJsonButton";
 import { logError } from "@/lib/logError";
 
 let EvalPanelComp: React.ComponentType | null = null;
@@ -275,7 +275,9 @@ export default function LinguisticDecoderApp(){
         {data ? (
           <>
             <ResultsDisplay analysis={data} />
-            <ExportJsonButton analysis={data} />
+            <div className="flex justify-end pt-2">
+              <ExportJsonButton analysis={data} />
+            </div>
             <WhyThisPath primary={data.primaryPath} />
             <PrinciplesBlock engine={data} />
             <Candidates items={data.languageFamilies} />
