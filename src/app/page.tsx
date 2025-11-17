@@ -361,7 +361,7 @@ export default function LinguisticDecoderApp(){
           </div>
 
           {data && (
-            <Card>
+            <Card className="animate-fade-in">
               <CardHeader>
                 <CardTitle>Analysis Results</CardTitle>
                 <CardDescription>Primary and frontier paths, principles, and language candidates.</CardDescription>
@@ -481,3 +481,4 @@ export default function LinguisticDecoderApp(){
     
 
     
+
