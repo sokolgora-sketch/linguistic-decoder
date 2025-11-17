@@ -14,6 +14,7 @@ import { useToast } from "@/hooks/use-toast";
 import { ResultsDisplay } from "@/components/ResultsDisplay";
 import { Candidates } from "@/components/Candidates";
 import { Card } from "@/components/ui/card";
+import type { Alphabet } from "@/lib/runAnalysis";
 
 export default function HistoryPage() {
     const { toast } = useToast();
@@ -44,11 +45,11 @@ export default function HistoryPage() {
         }
     }
     
-    async function handleRecompute(word: string, mode: 'strict' | 'open', alphabet: string) {
+    async function handleRecompute(word: string, mode: 'strict' | 'open', alphabet: Alphabet) {
         setLoading(true);
         setAnalysisResult(null);
         try {
-            const result = await analyzeClient(word, mode, alphabet as any, { bypass: true });
+            const result = await analyzeClient(word, mode, alphabet, { bypass: true });
             setAnalysisResult(result);
             toast({ title: "Recomputed", description: `Fresh analysis for '${result.word}' complete.` });
         } catch (e: any) {
