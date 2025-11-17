@@ -1961,11 +1961,11 @@ const VOICE_COLOR = {
     "Ë": "#8B5CF6"
 };
 const PALETTE = {
-    rail: "#1f2937",
-    accent: "#FFB300",
-    text: "#111827",
-    muted: "#6b7280",
-    bg: "#f9fafb"
+    rail: "#4b5563",
+    accent: "#e5e7eb",
+    text: "#f9fafb",
+    muted: "#9ca3af",
+    bg: "#111827"
 };
 const CLASS_ORDER = [
     "Plosive",
@@ -2195,7 +2195,7 @@ function TwoRailsWithConsonants({ word, path, running, playKey, height = 320, du
                     strokeWidth: 2
                 }, void 0, false, {
                     fileName: "[project]/src/components/TwoRailsWithConsonants.tsx",
-                    lineNumber: 198,
+                    lineNumber: 206,
                     columnNumber: 7
                 }, this),
                 ORDER.map((v)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("g", {
@@ -2204,12 +2204,12 @@ function TwoRailsWithConsonants({ word, path, running, playKey, height = 320, du
                                 cx: x,
                                 cy: yFor(v),
                                 r: 10,
-                                fill: "#fff",
+                                fill: "#1F2937",
                                 stroke: PALETTE.rail,
-                                strokeOpacity: 0.25
+                                strokeOpacity: 0.5
                             }, void 0, false, {
                                 fileName: "[project]/src/components/TwoRailsWithConsonants.tsx",
-                                lineNumber: 201,
+                                lineNumber: 209,
                                 columnNumber: 11
                             }, this),
                             showLabels && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("text", {
@@ -2221,19 +2221,19 @@ function TwoRailsWithConsonants({ word, path, running, playKey, height = 320, du
                                 children: v
                             }, void 0, false, {
                                 fileName: "[project]/src/components/TwoRailsWithConsonants.tsx",
-                                lineNumber: 203,
+                                lineNumber: 211,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, `${x}-${v}`, true, {
                         fileName: "[project]/src/components/TwoRailsWithConsonants.tsx",
-                        lineNumber: 200,
+                        lineNumber: 208,
                         columnNumber: 9
                     }, this))
             ]
         }, void 0, true, {
             fileName: "[project]/src/components/TwoRailsWithConsonants.tsx",
-            lineNumber: 197,
+            lineNumber: 205,
             columnNumber: 5
         }, this);
     const MidRail = ()=>{
@@ -2254,13 +2254,13 @@ function TwoRailsWithConsonants({ word, path, running, playKey, height = 320, du
                             height: bandH,
                             rx: 8,
                             ry: 8,
-                            fill: active ? PALETTE.accent : "#f3f4f6",
+                            fill: active ? PALETTE.accent : "#374151",
                             fillOpacity: active ? 0.9 : 0.6,
-                            stroke: "#d1d5db",
+                            stroke: "#4b5563",
                             strokeOpacity: 0.6
                         }, void 0, false, {
                             fileName: "[project]/src/components/TwoRailsWithConsonants.tsx",
-                            lineNumber: 224,
+                            lineNumber: 232,
                             columnNumber: 15
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("text", {
@@ -2273,7 +2273,7 @@ function TwoRailsWithConsonants({ word, path, running, playKey, height = 320, du
                             children: shortName
                         }, void 0, false, {
                             fileName: "[project]/src/components/TwoRailsWithConsonants.tsx",
-                            lineNumber: 229,
+                            lineNumber: 237,
                             columnNumber: 15
                         }, this),
                         active && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["motion"].circle, {
@@ -2286,19 +2286,19 @@ function TwoRailsWithConsonants({ word, path, running, playKey, height = 320, du
                             strokeWidth: 2
                         }, void 0, false, {
                             fileName: "[project]/src/components/TwoRailsWithConsonants.tsx",
-                            lineNumber: 235,
+                            lineNumber: 243,
                             columnNumber: 17
                         }, this)
                     ]
                 }, klass, true, {
                     fileName: "[project]/src/components/TwoRailsWithConsonants.tsx",
-                    lineNumber: 223,
+                    lineNumber: 231,
                     columnNumber: 13
                 }, this);
             })
         }, void 0, false, {
             fileName: "[project]/src/components/TwoRailsWithConsonants.tsx",
-            lineNumber: 217,
+            lineNumber: 225,
             columnNumber: 7
         }, this);
     };
@@ -2323,26 +2323,26 @@ function TwoRailsWithConsonants({ word, path, running, playKey, height = 320, du
                     children: word
                 }, void 0, false, {
                     fileName: "[project]/src/components/TwoRailsWithConsonants.tsx",
-                    lineNumber: 248,
+                    lineNumber: 256,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(Rail, {
                     x: leftX
                 }, void 0, false, {
                     fileName: "[project]/src/components/TwoRailsWithConsonants.tsx",
-                    lineNumber: 251,
+                    lineNumber: 259,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(Rail, {
                     x: rightX
                 }, void 0, false, {
                     fileName: "[project]/src/components/TwoRailsWithConsonants.tsx",
-                    lineNumber: 252,
+                    lineNumber: 260,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(MidRail, {}, void 0, false, {
                     fileName: "[project]/src/components/TwoRailsWithConsonants.tsx",
-                    lineNumber: 255,
+                    lineNumber: 263,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$components$2f$AnimatePresence$2f$index$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["AnimatePresence"], {
@@ -2366,7 +2366,7 @@ function TwoRailsWithConsonants({ word, path, running, playKey, height = 320, du
                                 }
                             }, void 0, false, {
                                 fileName: "[project]/src/components/TwoRailsWithConsonants.tsx",
-                                lineNumber: 261,
+                                lineNumber: 269,
                                 columnNumber: 15
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["motion"].line, {
@@ -2387,7 +2387,7 @@ function TwoRailsWithConsonants({ word, path, running, playKey, height = 320, du
                                 }
                             }, void 0, false, {
                                 fileName: "[project]/src/components/TwoRailsWithConsonants.tsx",
-                                lineNumber: 264,
+                                lineNumber: 272,
                                 columnNumber: 15
                             }, this),
                             Math.abs(scanY1 - scanY2) < 8 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["motion"].circle, {
@@ -2410,18 +2410,18 @@ function TwoRailsWithConsonants({ word, path, running, playKey, height = 320, du
                                 }
                             }, void 0, false, {
                                 fileName: "[project]/src/components/TwoRailsWithConsonants.tsx",
-                                lineNumber: 268,
+                                lineNumber: 276,
                                 columnNumber: 17
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/components/TwoRailsWithConsonants.tsx",
-                        lineNumber: 260,
+                        lineNumber: 268,
                         columnNumber: 13
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/src/components/TwoRailsWithConsonants.tsx",
-                    lineNumber: 258,
+                    lineNumber: 266,
                     columnNumber: 9
                 }, this),
                 trail.length > 1 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("polyline", {
@@ -2432,11 +2432,11 @@ function TwoRailsWithConsonants({ word, path, running, playKey, height = 320, du
                     strokeLinejoin: "round",
                     strokeLinecap: "round",
                     style: {
-                        filter: "drop-shadow(0 0 6px rgba(255,179,0,0.55))"
+                        filter: "drop-shadow(0 0 6px #d1d5db)"
                     }
                 }, void 0, false, {
                     fileName: "[project]/src/components/TwoRailsWithConsonants.tsx",
-                    lineNumber: 280,
+                    lineNumber: 288,
                     columnNumber: 11
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$components$2f$AnimatePresence$2f$index$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["AnimatePresence"], {
@@ -2462,12 +2462,12 @@ function TwoRailsWithConsonants({ word, path, running, playKey, height = 320, du
                         }
                     }, `${pos.x}-${pos.y}`, false, {
                         fileName: "[project]/src/components/TwoRailsWithConsonants.tsx",
-                        lineNumber: 291,
+                        lineNumber: 299,
                         columnNumber: 13
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/src/components/TwoRailsWithConsonants.tsx",
-                    lineNumber: 289,
+                    lineNumber: 297,
                     columnNumber: 9
                 }, this),
                 !running && path.length >= 2 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("g", {
@@ -2479,7 +2479,7 @@ function TwoRailsWithConsonants({ word, path, running, playKey, height = 320, du
                             fill: VOICE_COLOR[path[Math.min(idx, path.length - 1)]]
                         }, void 0, false, {
                             fileName: "[project]/src/components/TwoRailsWithConsonants.tsx",
-                            lineNumber: 303,
+                            lineNumber: 311,
                             columnNumber: 13
                         }, this),
                         idx < path.length - 1 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("circle", {
@@ -2490,13 +2490,13 @@ function TwoRailsWithConsonants({ word, path, running, playKey, height = 320, du
                             fillOpacity: 0.6
                         }, void 0, false, {
                             fileName: "[project]/src/components/TwoRailsWithConsonants.tsx",
-                            lineNumber: 306,
+                            lineNumber: 314,
                             columnNumber: 15
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/components/TwoRailsWithConsonants.tsx",
-                    lineNumber: 302,
+                    lineNumber: 310,
                     columnNumber: 11
                 }, this),
                 !running && path.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("text", {
@@ -2508,18 +2508,18 @@ function TwoRailsWithConsonants({ word, path, running, playKey, height = 320, du
                     children: path.join(" → ")
                 }, void 0, false, {
                     fileName: "[project]/src/components/TwoRailsWithConsonants.tsx",
-                    lineNumber: 314,
+                    lineNumber: 322,
                     columnNumber: 11
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/src/components/TwoRailsWithConsonants.tsx",
-            lineNumber: 247,
+            lineNumber: 255,
             columnNumber: 7
         }, this)
     }, void 0, false, {
         fileName: "[project]/src/components/TwoRailsWithConsonants.tsx",
-        lineNumber: 246,
+        lineNumber: 254,
         columnNumber: 5
     }, this);
 }
@@ -6354,20 +6354,20 @@ function LinguisticDecoderApp() {
     }
     const signals = data?.signals?.join(" · ") || "";
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-        className: "p-4 lg:p-8 max-w-4xl mx-auto",
+        className: "p-4 lg:p-8 max-w-5xl mx-auto",
         children: [
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("main", {
-                className: "space-y-4",
+                className: "space-y-6",
                 children: [
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("header", {
-                        className: "p-6 border-b bg-card -mx-6 -mt-8",
+                        className: "p-6 border-b bg-card -mx-6 -mt-8 rounded-t-lg",
                         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                             className: "max-w-5xl mx-auto flex justify-between items-center",
                             children: [
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                     children: [
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h1", {
-                                            className: "text-3xl font-bold tracking-wide text-primary",
+                                            className: "text-3xl font-bold tracking-tight text-primary",
                                             children: "Linguistic Decoder"
                                         }, void 0, false, {
                                             fileName: "[project]/src/app/page.tsx",
@@ -6415,13 +6415,13 @@ function LinguisticDecoderApp() {
                         className: "p-4",
                         children: [
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                className: "grid grid-cols-[1fr_auto_auto_auto] gap-2.5 items-center",
+                                className: "grid grid-cols-[1fr_auto_auto_auto] gap-4 items-center",
                                 children: [
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$input$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Input"], {
                                         value: word,
                                         onChange: (e)=>setWord(e.target.value),
                                         placeholder: "Type a word…",
-                                        className: "font-semibold",
+                                        className: "font-semibold text-lg",
                                         onKeyUp: (e)=>e.key === 'Enter' && canAnalyze && analyze()
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/page.tsx",
@@ -6487,6 +6487,7 @@ function LinguisticDecoderApp() {
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
                                         onClick: ()=>analyze(),
                                         disabled: !canAnalyze,
+                                        size: "lg",
                                         children: loading ? "Analyzing…" : "Analyze"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/page.tsx",
@@ -6497,7 +6498,7 @@ function LinguisticDecoderApp() {
                                         onClick: runSmokeTest,
                                         variant: "outline",
                                         title: "Display a mock result to test the UI",
-                                        children: "Smoke Test"
+                                        children: "Smoke"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/page.tsx",
                                         lineNumber: 239,
@@ -6510,7 +6511,7 @@ function LinguisticDecoderApp() {
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                className: "flex items-center gap-4 mt-3 pt-3 border-t",
+                                className: "flex items-center gap-4 mt-4 pt-4 border-t",
                                 children: [
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
                                         className: "flex items-center gap-2 text-sm",
@@ -6525,7 +6526,7 @@ function LinguisticDecoderApp() {
                                                 lineNumber: 243,
                                                 columnNumber: 17
                                             }, this),
-                                            "Strict"
+                                            "Strict Mode"
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/page.tsx",
@@ -6583,7 +6584,7 @@ function LinguisticDecoderApp() {
                                 columnNumber: 11
                             }, this),
                             err && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                className: "mt-2.5 border border-red-300 bg-red-50 text-red-800 text-sm p-2 rounded",
+                                className: "mt-4 border border-red-500/50 bg-red-500/10 text-red-400 text-sm p-3 rounded-md",
                                 children: [
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("b", {
                                         children: "Error:"
@@ -6914,7 +6915,7 @@ function LinguisticDecoderApp() {
                                     columnNumber: 19
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("pre", {
-                                    className: "font-code text-xs whitespace-pre-wrap bg-slate-50 dark:bg-slate-800 p-2.5 rounded-lg max-h-96 overflow-auto mt-2",
+                                    className: "font-code text-xs whitespace-pre-wrap bg-slate-800 p-2.5 rounded-lg max-h-96 overflow-auto mt-2",
                                     children: JSON.stringify(data, null, 2)
                                 }, void 0, false, {
                                     fileName: "[project]/src/app/page.tsx",
@@ -6939,10 +6940,10 @@ function LinguisticDecoderApp() {
                 columnNumber: 8
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("footer", {
-                className: "p-6 opacity-80",
+                className: "p-6 opacity-80 mt-8",
                 children: [
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                        className: "max-w-7xl mx-auto text-xs text-slate-500 flex justify-between items-start",
+                        className: "max-w-7xl mx-auto text-xs text-muted-foreground flex justify-between items-start",
                         children: [
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                 className: "font-code flex-1",
@@ -7009,7 +7010,7 @@ function LinguisticDecoderApp() {
                                             columnNumber: 36
                                         }, this),
                                         data?.recomputed && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                            className: "ml-2 px-1.5 py-0.5 rounded bg-blue-100 dark:bg-blue-900 border border-blue-300 dark:border-blue-700",
+                                            className: "ml-2 px-1.5 py-0.5 rounded bg-blue-900 border border-blue-700",
                                             children: "recomputed"
                                         }, void 0, false, {
                                             fileName: "[project]/src/app/page.tsx",

@@ -15,7 +15,15 @@ const VOICE_COLOR: Record<Vowel, string> = {
   Y: "#6366F1",
   "Ë": "#8B5CF6",
 };
-const PALETTE = { rail:"#1f2937", accent:"#FFB300", text:"#111827", muted:"#6b7280", bg:"#f9fafb" };
+
+const PALETTE = { 
+  rail:"#4b5563", 
+  accent:"#e5e7eb", 
+  text:"#f9fafb", 
+  muted:"#9ca3af", 
+  bg:"#111827" 
+};
+
 
 // --- Consonant classes (from solver) ---
 type CClass = "Plosive" | "Affricate" | "SibilantFricative" | "NonSibilantFricative" | "Nasal" | "Liquid" | "Glide";
@@ -198,7 +206,7 @@ export function TwoRailsWithConsonants({
       <line x1={x} y1={top-6} x2={x} y2={bottom+6} stroke={PALETTE.rail} strokeOpacity={0.35} strokeWidth={2}/>
       {ORDER.map(v=>(
         <g key={`${x}-${v}`}>
-          <circle cx={x} cy={yFor(v)} r={10} fill="#fff" stroke={PALETTE.rail} strokeOpacity={0.25}/>
+          <circle cx={x} cy={yFor(v)} r={10} fill="#1F2937" stroke={PALETTE.rail} strokeOpacity={0.5}/>
           {showLabels && (
             <text x={x + (x===leftX ? -24 : 24)} y={yFor(v)+4} fontSize={12}
               textAnchor={x===leftX ? "end":"start"} fill={VOICE_COLOR[v]}>{v}</text>
@@ -223,9 +231,9 @@ export function TwoRailsWithConsonants({
             <g key={klass}>
               <rect x={x} y={midY - bandH/2} width={segW} height={bandH}
                 rx={8} ry={8}
-                fill={active ? PALETTE.accent : "#f3f4f6"}
+                fill={active ? PALETTE.accent : "#374151"}
                 fillOpacity={active ? 0.9 : 0.6}
-                stroke="#d1d5db" strokeOpacity={0.6} />
+                stroke="#4b5563" strokeOpacity={0.6} />
               <text x={x+segW/2} y={midY} textAnchor="middle" fontSize={10}
                 fill={active ? "#111827" : PALETTE.muted} dominantBaseline="central">
                 {shortName}
@@ -281,7 +289,7 @@ export function TwoRailsWithConsonants({
             points={trail.map(p=>`${p.x},${p.y}`).join(" ")}
             fill="none" stroke={PALETTE.accent} strokeWidth={5}
             strokeLinejoin="round" strokeLinecap="round"
-            style={{ filter: "drop-shadow(0 0 6px rgba(255,179,0,0.55))" }}
+            style={{ filter: "drop-shadow(0 0 6px #d1d5db)" }}
           />
         )}
 
@@ -319,5 +327,3 @@ export function TwoRailsWithConsonants({
     </div>
   );
 }
-
-    

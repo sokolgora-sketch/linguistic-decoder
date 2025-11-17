@@ -196,13 +196,13 @@ export default function LinguisticDecoderApp(){
   const signals = data?.signals?.join(" · ") || "";
   
   return (
-    <div className="p-4 lg:p-8 max-w-4xl mx-auto">
-       <main className="space-y-4">
+    <div className="p-4 lg:p-8 max-w-5xl mx-auto">
+       <main className="space-y-6">
         {/* Header */}
-        <header className="p-6 border-b bg-card -mx-6 -mt-8">
+        <header className="p-6 border-b bg-card -mx-6 -mt-8 rounded-t-lg">
           <div className="max-w-5xl mx-auto flex justify-between items-center">
             <div>
-              <h1 className="text-3xl font-bold tracking-wide text-primary">Linguistic Decoder</h1>
+              <h1 className="text-3xl font-bold tracking-tight text-primary">Linguistic Decoder</h1>
               <p className="text-sm text-muted-foreground mt-1">Seven‑Voices matrix solver · primary & frontier paths · optional Gemini mapping</p>
             </div>
             <div className="flex items-center gap-4">
@@ -213,12 +213,12 @@ export default function LinguisticDecoderApp(){
 
         {/* Controls */}
         <Card className="p-4">
-          <div className="grid grid-cols-[1fr_auto_auto_auto] gap-2.5 items-center">
+          <div className="grid grid-cols-[1fr_auto_auto_auto] gap-4 items-center">
             <Input
               value={word}
               onChange={e=> setWord(e.target.value)}
               placeholder="Type a word…"
-              className="font-semibold"
+              className="font-semibold text-lg"
               onKeyUp={(e) => e.key === 'Enter' && canAnalyze && analyze()}
             />
             {isWarming && <Loader className="animate-spin text-muted-foreground" size={18} />}
@@ -233,15 +233,15 @@ export default function LinguisticDecoderApp(){
                     ))}
                 </SelectContent>
             </Select>
-            <Button onClick={()=> analyze()} disabled={!canAnalyze}>
+            <Button onClick={()=> analyze()} disabled={!canAnalyze} size="lg">
               {loading ? "Analyzing…" : "Analyze"}
             </Button>
-            <Button onClick={runSmokeTest} variant="outline" title="Display a mock result to test the UI">Smoke Test</Button>
+            <Button onClick={runSmokeTest} variant="outline" title="Display a mock result to test the UI">Smoke</Button>
           </div>
-          <div className="flex items-center gap-4 mt-3 pt-3 border-t">
+          <div className="flex items-center gap-4 mt-4 pt-4 border-t">
               <label className="flex items-center gap-2 text-sm">
                 <input type="checkbox" checked={mode==="strict"} onChange={e=> setMode(e.target.checked?"strict":"open")} className="w-4 h-4 rounded text-primary focus:ring-primary" />
-                Strict
+                Strict Mode
               </label>
               <label className="text-xs text-muted-foreground">Edge weight: {edgeWeight.toFixed(2)}</label>
               <input
@@ -255,7 +255,7 @@ export default function LinguisticDecoderApp(){
               </label>
           </div>
           {err && (
-            <div className="mt-2.5 border border-red-300 bg-red-50 text-red-800 text-sm p-2 rounded">
+            <div className="mt-4 border border-red-500/50 bg-red-500/10 text-red-400 text-sm p-3 rounded-md">
               <b>Error:</b> {err}
             </div>
           )}
@@ -336,7 +336,7 @@ export default function LinguisticDecoderApp(){
                   <div className="flex justify-between items-center mb-2">
                     <h3 className="font-bold text-sm tracking-wide">API Echo (debug)</h3>
                   </div>
-                  <pre className="font-code text-xs whitespace-pre-wrap bg-slate-50 dark:bg-slate-800 p-2.5 rounded-lg max-h-96 overflow-auto mt-2">
+                  <pre className="font-code text-xs whitespace-pre-wrap bg-slate-800 p-2.5 rounded-lg max-h-96 overflow-auto mt-2">
                       {JSON.stringify(data, null, 2)}
                   </pre>
               </Card>
@@ -345,8 +345,8 @@ export default function LinguisticDecoderApp(){
       </main>
 
       {/* Footer */}
-      <footer className="p-6 opacity-80">
-        <div className="max-w-7xl mx-auto text-xs text-slate-500 flex justify-between items-start">
+      <footer className="p-6 opacity-80 mt-8">
+        <div className="max-w-7xl mx-auto text-xs text-muted-foreground flex justify-between items-start">
           <div className="font-code flex-1">
             {data && (
               <div className="text-xs opacity-80 pt-2">
@@ -356,7 +356,7 @@ export default function LinguisticDecoderApp(){
                 <span className="ml-2">alphabet={data.alphabet}</span>
                 {"solveMs" in data && <span className="ml-2">solveMs={data.solveMs}</span>}
                 {data?.cacheHit && <span className="ml-2 px-1.5 py-0.5 rounded bg-accent/20 border border-accent text-accent-foreground">cacheHit</span>}
-                {data?.recomputed && <span className="ml-2 px-1.5 py-0.5 rounded bg-blue-100 dark:bg-blue-900 border border-blue-300 dark:border-blue-700">recomputed</span>}
+                {data?.recomputed && <span className="ml-2 px-1.5 py-0.5 rounded bg-blue-900 border border-blue-700">recomputed</span>}
                 <div className="mt-1">{signals}</div>
               </div>
             )}
@@ -380,5 +380,3 @@ export default function LinguisticDecoderApp(){
     </div>
   );
 }
-
-    
