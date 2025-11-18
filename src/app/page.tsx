@@ -437,46 +437,50 @@ export default function LinguisticDecoderApp(){
 
           {data && (
             <Card className="animate-fade-in">
-              <CardHeader>
-                <CardTitle>Analysis Results</CardTitle>
-                <CardDescription>Primary and frontier paths, principles, and language candidates.</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                {/* Core paths + export */}
-                <section className="space-y-2">
-                  <div className="flex items-center justify-between gap-2">
-                    <h3 className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
-                      Core paths
-                    </h3>
-                    <ExportJsonButton analysis={data} />
-                  </div>
-                  <ResultsDisplay analysis={data} />
-                </section>
+              <CardHeader className="space-y-2">
+      <CardTitle>Analysis Results</CardTitle>
+      <CardDescription>
+        Primary and frontier paths, principles, and language candidates.
+      </CardDescription>
 
-                {/* Why this path */}
-                <section className="pt-2 border-t border-border/40 space-y-2">
-                  <h3 className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
-                    Why this path
-                  </h3>
-                  <WhyThisPath primary={data.primaryPath} />
-                </section>
+      {/* Engine status strip */}
+      <div className="flex flex-wrap gap-2 text-[11px] text-muted-foreground">
+        <span className="inline-flex items-center gap-1 rounded-full border border-border/70 bg-muted/40 px-2 py-0.5">
+          <span className="font-semibold text-foreground">Engine</span>
+          <span className="font-code">{data.engineVersion}</span>
+        </span>
 
-                {/* Seven Principles view */}
-                <section className="pt-2 border-t border-border/40 space-y-2">
-                  <h3 className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
-                    Seven Principles view
-                  </h3>
-                  <PrinciplesBlock engine={data} />
-                </section>
+        {"solveMs" in data && (
+          <span className="inline-flex items-center gap-1 rounded-full border border-border/70 bg-muted/40 px-2 py-0.5">
+            <span className="font-semibold text-foreground">Solve</span>
+            <span>{data.solveMs} ms</span>
+          </span>
+        )}
 
-                {/* Language candidates */}
-                <section className="pt-2 border-t border-border/40 space-y-2">
-                  <h3 className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
-                    Language candidates
-                  </h3>
-                  <Candidates items={data.languageFamilies} />
-                </section>
-              </CardContent>
+        {data.cacheHit && (
+          <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/60 bg-emerald-500/10 px-2 py-0.5 text-emerald-400">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+            <span className="font-semibold">Cache Hit</span>
+          </span>
+        )}
+
+        {data.recomputed && (
+          <span className="inline-flex items-center gap-1 rounded-full border border-sky-500/60 bg-sky-500/10 px-2 py-0.5 text-sky-400">
+            <span className="w-1.5 h-1.5 rounded-full bg-sky-400" />
+            <span className="font-semibold">Recomputed</span>
+          </span>
+        )}
+      </div>
+    </CardHeader>
+              <CardContent className="space-y-4">
+      <ResultsDisplay analysis={data} />
+      <div className="flex justify-end pt-2">
+        <ExportJsonButton analysis={data} />
+      </div>
+      <WhyThisPath primary={data.primaryPath} />
+      <PrinciplesBlock engine={data} />
+      <Candidates items={data.languageFamilies} />
+    </CardContent>
             </Card>
           )}
         </section>
@@ -657,8 +661,3 @@ export default function LinguisticDecoderApp(){
     </div>
   );
 }
-
-    
-
-    
-
