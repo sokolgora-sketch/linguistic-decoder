@@ -432,13 +432,12 @@ export default function LinguisticDecoderApp(){
 
           {data && (
             <Card className="animate-fade-in">
-              <CardHeader className="space-y-2">
+              <CardHeader>
                 <CardTitle>Analysis Results</CardTitle>
                 <CardDescription>
                   Primary and frontier paths, principles, and language candidates.
                 </CardDescription>
 
-                {/* Engine status strip */}
                 <div className="mt-3 flex flex-wrap items-center gap-2 text-[11px]">
                   <span className="px-2 py-0.5 rounded-full border border-border/60 bg-muted/40">
                     Mode: {data.mode === "strict" ? "Strict" : "Open"}
