@@ -223,32 +223,46 @@ export default function LinguisticDecoderApp(){
               <ThemeToggle />
             </div>
           </div>
-
-          {/* Status strip */}
-          <div className="mt-3 flex flex-wrap gap-2 text-[11px] text-muted-foreground">
-            <span className="inline-flex items-center gap-1 rounded-full border border-border/70 bg-muted/40 px-2 py-0.5 max-w-[180px]">
-              <span className="font-semibold text-foreground">Word</span>
-              <span className="truncate">{word || "—"}</span>
-            </span>
-
-            <span className="inline-flex items-center gap-1 rounded-full border border-border/70 bg-muted/40 px-2 py-0.5">
-              <span className="font-semibold text-foreground">Mode</span>
-              <span className="uppercase">{mode}</span>
-            </span>
-
-            <span className="inline-flex items-center gap-1 rounded-full border border-border/70 bg-muted/40 px-2 py-0.5">
-              <span className="font-semibold text-foreground">Alphabet</span>
-              <span className="uppercase">{alphabet}</span>
-            </span>
-
-            <span className="inline-flex items-center gap-1 rounded-full border border-border/70 bg-muted/40 px-2 py-0.5">
-              <span className="font-semibold text-foreground">AI Mapper</span>
-              <span className={useAi ? "text-emerald-500 font-semibold" : "text-muted-foreground"}>
-                {useAi ? "ON" : "OFF"}
-              </span>
-            </span>
-          </div>
         </header>
+
+        {/* Status strip */}
+        <section className="mt-2 text-[11px] text-muted-foreground flex flex-wrap items-center gap-x-3 gap-y-1">
+          {data ? (
+            <>
+              <span className="uppercase tracking-wide font-semibold text-xs text-primary/80">
+                Current analysis
+              </span>
+              <span>
+                <span className="font-semibold">Word:</span> {data.word}
+              </span>
+              <span>
+                <span className="font-semibold">Mode:</span> {data.mode}
+              </span>
+              <span>
+                <span className="font-semibold">Alphabet:</span> {data.alphabet}
+              </span>
+              {"solveMs" in data && (
+                <span>
+                  <span className="font-semibold">Solve:</span> {data.solveMs} ms
+                </span>
+              )}
+              {data.cacheHit && (
+                <span className="px-1.5 py-0.5 rounded-full border border-accent/60 text-accent-foreground bg-accent/10">
+                  cache hit
+                </span>
+              )}
+              {data.recomputed && (
+                <span className="px-1.5 py-0.5 rounded-full border border-blue-500/60 text-blue-300 bg-blue-500/10">
+                  recomputed
+                </span>
+              )}
+            </>
+          ) : (
+            <span className="text-xs">
+              No analysis yet. Type a word below and run the solver to see the Seven-Voices path.
+            </span>
+          )}
+        </section>
 
         {/* Controls */}
         <Card>
@@ -288,9 +302,10 @@ export default function LinguisticDecoderApp(){
 
                 <Button
                   onClick={runSmokeTest}
+                  variant="outline"
                   size="lg"
                   title="Display a mock result to test the UI"
-                  className="bg-secondary hover:bg-secondary/80 text-secondary-foreground hidden sm:inline-flex"
+                  className="hidden sm:inline-flex"
                 >
                   Smoke
                 </Button>
@@ -454,21 +469,18 @@ export default function LinguisticDecoderApp(){
                 <CardDescription>
                   Primary and frontier paths, principles, and language candidates.
                 </CardDescription>
-
                 <div className="mt-3 flex flex-wrap items-center gap-2 text-[11px]">
                   <span className="px-2 py-0.5 rounded-full border border-border/60 bg-muted/40">
                     Mode: {data.mode === "strict" ? "Strict" : "Open"}
                   </span>
-
                   <span className="px-2 py-0.5 rounded-full border border-border/60">
                     Alphabet: {data.alphabet}
                   </span>
-
                   {useAi && (
-                    <span className="px-2 py-0.5 rounded-full border border-border/60 flex items-center gap-1">
-                      <Sparkles className="w-3 h-3" />
-                      AI Mapper
-                    </span>
+                  <span className="px-2 py-0.5 rounded-full border border-border/60 flex items-center gap-1">
+                    <Sparkles className="w-3 h-3" />
+                    AI Mapper
+                  </span>
                   )}
                 </div>
               </CardHeader>
@@ -678,3 +690,6 @@ export default function LinguisticDecoderApp(){
     
 
 
+
+
+    
