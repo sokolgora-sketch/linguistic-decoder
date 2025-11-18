@@ -412,14 +412,41 @@ export default function LinguisticDecoderApp(){
                 <CardTitle>Analysis Results</CardTitle>
                 <CardDescription>Primary and frontier paths, principles, and language candidates.</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <ResultsDisplay analysis={data} />
-                <div className="flex justify-end pt-2">
-                  <ExportJsonButton analysis={data} />
-                </div>
-                <WhyThisPath primary={data.primaryPath} />
-                <PrinciplesBlock engine={data} />
-                <Candidates items={data.languageFamilies} />
+              <CardContent className="space-y-6">
+                {/* Core paths + export */}
+                <section className="space-y-2">
+                  <div className="flex items-center justify-between gap-2">
+                    <h3 className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+                      Core paths
+                    </h3>
+                    <ExportJsonButton analysis={data} />
+                  </div>
+                  <ResultsDisplay analysis={data} />
+                </section>
+
+                {/* Why this path */}
+                <section className="pt-2 border-t border-border/40 space-y-2">
+                  <h3 className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+                    Why this path
+                  </h3>
+                  <WhyThisPath primary={data.primaryPath} />
+                </section>
+
+                {/* Seven Principles view */}
+                <section className="pt-2 border-t border-border/40 space-y-2">
+                  <h3 className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+                    Seven Principles view
+                  </h3>
+                  <PrinciplesBlock engine={data} />
+                </section>
+
+                {/* Language candidates */}
+                <section className="pt-2 border-t border-border/40 space-y-2">
+                  <h3 className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+                    Language candidates
+                  </h3>
+                  <Candidates items={data.languageFamilies} />
+                </section>
               </CardContent>
             </Card>
           )}
