@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState, useEffect } from "react";
@@ -29,18 +28,12 @@ import { allowAnalyze } from "../lib/throttle";
 import WhyThisPath from "../components/WhyThisPath";
 import { ExportJsonButton } from "../components/ExportJsonButton";
 import { logError } from "../lib/logError";
+import { VOICE_COLOR_MAP } from "../shared/voiceColors";
 
 let EvalPanelComp: React.ComponentType | null = null;
 if (process.env.NEXT_PUBLIC_DEV_EVAL === "1") {
   EvalPanelComp = require("../components/EvalPanel").default;
 }
-
-
-// A map for displaying the Seven Voices colors, consistent with the visualization.
-const VOICE_COLOR_MAP: Record<Vowel, string> = {
-  A: "#EF4444", E: "#F59E0B", I: "#EAB308",
-  O: "#10B981", U: "#3B82F6", Y: "#6366F1", "Ë": "#8B5CF6",
-};
 
 // ==== Main App ===============================================================
 export default function LinguisticDecoderApp(){
