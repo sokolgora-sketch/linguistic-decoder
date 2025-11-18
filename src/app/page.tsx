@@ -210,16 +210,45 @@ export default function LinguisticDecoderApp(){
        <main className="max-w-5xl mx-auto w-full space-y-8 flex-1 animate-fade-in">
         {/* Header */}
         <header className="pb-4 border-b border-border/60">
-          <div className="flex justify-between items-start gap-3">
-            <div className="space-y-1 max-w-xl">
-              <h1 className="text-3xl font-bold tracking-tight text-primary">Linguistic Decoder</h1>
-              <p className="text-sm text-muted-foreground mt-1">A tool for analyzing words with the Seven-Voices phonetic model.</p>
-            </div>
-            <div className="flex items-center gap-2 pt-1">
-              <ThemeToggle />
-            </div>
-          </div>
-        </header>
+  <div className="flex justify-between items-start gap-3">
+    <div className="space-y-1 max-w-xl">
+      <h1 className="text-3xl font-bold tracking-tight text-primary">
+        Linguistic Decoder
+      </h1>
+      <p className="text-sm text-muted-foreground mt-1">
+        A tool for analyzing words with the Seven-Voices phonetic model.
+      </p>
+    </div>
+    <div className="flex items-center gap-2 pt-1">
+      <ThemeToggle />
+    </div>
+  </div>
+
+  {/* Status strip */}
+  <div className="mt-3 flex flex-wrap gap-2 text-[11px] text-muted-foreground">
+    <span className="inline-flex items-center gap-1 rounded-full border border-border/70 bg-muted/40 px-2 py-0.5 max-w-[180px]">
+      <span className="font-semibold text-foreground">Word</span>
+      <span className="truncate">{word || "—"}</span>
+    </span>
+
+    <span className="inline-flex items-center gap-1 rounded-full border border-border/70 bg-muted/40 px-2 py-0.5">
+      <span className="font-semibold text-foreground">Mode</span>
+      <span className="uppercase">{mode}</span>
+    </span>
+
+    <span className="inline-flex items-center gap-1 rounded-full border border-border/70 bg-muted/40 px-2 py-0.5">
+      <span className="font-semibold text-foreground">Alphabet</span>
+      <span className="uppercase">{alphabet}</span>
+    </span>
+
+    <span className="inline-flex items-center gap-1 rounded-full border border-border/70 bg-muted/40 px-2 py-0.5">
+      <span className="font-semibold text-foreground">AI Mapper</span>
+      <span className={useAi ? "text-emerald-500 font-semibold" : "text-muted-foreground"}>
+        {useAi ? "ON" : "OFF"}
+      </span>
+    </span>
+  </div>
+</header>
 
         {/* Controls */}
 <Card className="mt-4 border border-border/60 shadow-sm animate-fade-in">
@@ -632,3 +661,4 @@ export default function LinguisticDecoderApp(){
     
 
     
+
