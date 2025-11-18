@@ -385,7 +385,7 @@ export default function LinguisticDecoderApp(){
         {/* Visualization & Metadata Section */}
         <section className="space-y-8">
           <div className="grid gap-6 md:grid-cols-[2fr,1fr]">
-            <Card className={data ? "animate-fade-in" : ""}>
+            <Card className="animate-fade-in">
               <CardHeader>
                 <CardTitle>Seven-Voices Path</CardTitle>
                 <CardDescription>An animated view of the word’s primary path through the vowel matrix.</CardDescription>
@@ -403,7 +403,7 @@ export default function LinguisticDecoderApp(){
             </Card>
 
             <div className="space-y-6">
-                <Card>
+                <Card className="animate-fade-in">
                   <CardHeader>
                     <CardTitle>The Seven Voices</CardTitle>
                     <CardDescription>Color, role, and function in the matrix.</CardDescription>
@@ -676,4 +676,5 @@ export default function LinguisticDecoderApp(){
     
 
     
+
 
