@@ -173,9 +173,22 @@ export function ResultsDisplay({ analysis }: { analysis: EnginePayload }) {
               <Card className="p-4">
                 <h3 className="font-bold text-sm tracking-wide">Frontier (near‑optimal alternates)</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mt-3">
-                  {frontierList.map((f, idx)=> (
+                  {frontierList.map((f, idx)=> {
+                    const altVoice = f.voicePath?.[0] as Vowel | undefined;
+                    const altBadgeStyle = altVoice
+                      ? { backgroundColor: VOICE_COLOR_MAP[altVoice], color: "#020617" }
+                      : {};
+                    return (
                     <Card key={idx} className="p-3 border-accent">
-                      <div className="font-bold mb-2">Alt #{idx+1}</div>
+                      <div className="font-bold mb-2 flex items-center gap-2">
+                        <div
+                            className="w-8 h-8 rounded-full border flex items-center justify-center text-sm font-bold shrink-0"
+                            style={altBadgeStyle}
+                        >
+                            {altVoice ?? "?"}
+                        </div>
+                        Alt #{idx+1}
+                      </div>
                       <div className="flex flex-wrap gap-1.5 items-center">
                         {f.voicePath.map((v,i)=> (
                           <React.Fragment key={i}>
@@ -190,7 +203,7 @@ export function ResultsDisplay({ analysis }: { analysis: EnginePayload }) {
                       <div className="text-xs mt-1.5 text-slate-500">Levels: {labelLevels(f.levelPath)}</div>
                       <div className="text-xs text-slate-500">Rings: {labelRings(f.ringPath)}</div>
                     </Card>
-                  ))}
+                  )})}
                 </div>
               </Card>
             )}
