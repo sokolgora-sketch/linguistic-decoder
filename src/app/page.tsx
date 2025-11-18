@@ -453,50 +453,128 @@ export default function LinguisticDecoderApp(){
         </section>
 
         {/* Informational Accordions */}
-        <Accordion type="single" collapsible className="w-full" defaultValue={data ? "" : "item-1"}>
-          {!data && (
-            <AccordionItem value="item-1">
-              <AccordionTrigger>How to Use</AccordionTrigger>
-              <AccordionContent>
-                <Card className="p-5">
-                  <ol className="list-decimal pl-5 mt-2 space-y-2 text-sm">
-                    <li>Type a word and click <kbd className="bg-primary text-primary-foreground rounded-md px-2 py-1 text-xs font-semibold">Analyze</kbd>.</li>
-                    <li>Use the dropdown to force a specific phonetic profile, or leave on "Auto-Detect".</li>
-                    <li>The "Primary Path" block shows Voice, Level, and Ring paths with checksums.</li>
-                    <li>"Frontier" lists near‑optimal alternate paths in a deterministic order.</li>
-                    <li>Enable the "AI Mapper" toggle to see potential language family mappings for the result.</li>
-                  </ol>
-                </Card>
-              </AccordionContent>
-            </AccordionItem>
-          )}
-          <AccordionItem value="item-2">
-            <AccordionTrigger>Compare Two Words</AccordionTrigger>
-            <AccordionContent>
-              <ComparePanel defaultMode={mode} defaultAlphabet={alphabet} />
-            </AccordionContent>
-          </AccordionItem>
-          <AccordionItem value="item-3">
-            <AccordionTrigger>Consonant Reference</AccordionTrigger>
-            <AccordionContent>
-              <ConsonantReference />
-            </AccordionContent>
-          </AccordionItem>
-          <AccordionItem value="item-4">
-            <AccordionTrigger>History</AccordionTrigger>
-            <AccordionContent>
-                <HistoryPanel onLoadAnalysis={onLoadAnalysis} onRecompute={onRecompute} />
-            </AccordionContent>
-          </AccordionItem>
-          {EvalPanelComp && (
-            <AccordionItem value="item-5">
-              <AccordionTrigger>Batch Evaluation</AccordionTrigger>
-              <AccordionContent>
-                  <EvalPanelComp />
-              </AccordionContent>
-            </AccordionItem>
-          )}
-        </Accordion>
+        <Accordion
+  type="single"
+  collapsible
+  className="w-full"
+  defaultValue={data ? "" : "item-1"}
+>
+  {/* How to Use – only when empty state */}
+  {!data && (
+    <AccordionItem value="item-1">
+      <AccordionTrigger className="text-sm font-semibold">
+        <div className="flex items-center gap-2">
+          <HelpCircle className="w-4 h-4 text-muted-foreground" />
+          <span>How to Use</span>
+        </div>
+      </AccordionTrigger>
+      <AccordionContent>
+        <Card className="p-5">
+          <ol className="list-decimal pl-5 mt-2 space-y-2 text-sm leading-relaxed">
+            <li>
+              Type a word and click{" "}
+              <kbd className="bg-primary text-primary-foreground rounded-md px-2 py-1 text-xs font-semibold">
+                Analyze
+              </kbd>
+              .
+            </li>
+            <li>
+              Use the <strong>Language Profile</strong> dropdown to force a
+              specific phonetic profile, or leave it on{" "}
+              <strong>Auto-Detect</strong>.
+            </li>
+            <li>
+              The <strong>Seven-Voices Path</strong> shows the primary vowel path
+              and consonant windows.
+            </li>
+            <li>
+              The <strong>Analysis Results</strong> card breaks down primary and
+              frontier paths, principles, and language candidates.
+            </li>
+            <li>
+              Toggle <strong>AI Mapper</strong> to include language-family
+              mappings when available.
+            </li>
+          </ol>
+        </Card>
+      </AccordionContent>
+    </AccordionItem>
+  )}
+
+  {/* Compare Two Words */}
+  <AccordionItem value="item-2">
+    <AccordionTrigger className="text-sm font-semibold">
+      <div className="flex items-center gap-2">
+        <GitBranch className="w-4 h-4 text-muted-foreground" />
+        <span>Compare Two Words</span>
+      </div>
+    </AccordionTrigger>
+    <AccordionContent>
+      <Card className="p-4">
+        <p className="text-xs text-muted-foreground mb-3">
+          Analyze two words side by side and compare their Seven-Voices paths.
+        </p>
+        <ComparePanel defaultMode={mode} defaultAlphabet={alphabet} />
+      </Card>
+    </AccordionContent>
+  </AccordionItem>
+
+  {/* Consonant Reference */}
+  <AccordionItem value="item-3">
+    <AccordionTrigger className="text-sm font-semibold">
+      <div className="flex items-center gap-2">
+        <BookOpen className="w-4 h-4 text-muted-foreground" />
+        <span>Consonant Reference</span>
+      </div>
+    </AccordionTrigger>
+    <AccordionContent>
+      <Card className="p-4">
+        <p className="text-xs text-muted-foreground mb-3">
+          See how consonants behave around the Seven Voices in the matrix.
+        </p>
+        <ConsonantReference />
+      </Card>
+    </AccordionContent>
+  </AccordionItem>
+
+  {/* History */}
+  <AccordionItem value="item-4">
+    <AccordionTrigger className="text-sm font-semibold">
+      <div className="flex items-center gap-2">
+        <HistoryIcon className="w-4 h-4 text-muted-foreground" />
+        <span>History</span>
+      </div>
+    </AccordionTrigger>
+    <AccordionContent>
+      <Card className="p-4">
+        <p className="text-xs text-muted-foreground mb-3">
+          Reload or recompute previous analyses from Firestore history.
+        </p>
+        <HistoryPanel onLoadAnalysis={onLoadAnalysis} onRecompute={onRecompute} />
+      </Card>
+    </AccordionContent>
+  </AccordionItem>
+
+  {/* Batch Evaluation – dev only */}
+  {EvalPanelComp && (
+    <AccordionItem value="item-5">
+      <AccordionTrigger className="text-sm font-semibold">
+        <div className="flex items-center gap-2">
+          <ListChecks className="w-4 h-4 text-muted-foreground" />
+          <span>Batch Evaluation</span>
+        </div>
+      </AccordionTrigger>
+      <AccordionContent>
+        <Card className="p-4">
+          <p className="text-xs text-muted-foreground mb-3">
+            Run the engine across a list of words and inspect aggregate behavior.
+          </p>
+          <EvalPanelComp />
+        </Card>
+      </AccordionContent>
+    </AccordionItem>
+  )}
+</Accordion>
 
         {/* Debug view */}
         {showDebug && data && (
