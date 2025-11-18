@@ -293,9 +293,9 @@ export default function LinguisticDecoderApp(){
                   className="flex-1 sm:flex-none"
                 >
                   {loading ? (
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />
                   ) : (
-                    <Wand2 className="mr-2 h-4 w-4" />
+                    <Wand2 className="mr-2 h-4 w-4" aria-hidden="true" />
                   )}
                   {loading ? "Analyzing…" : "Analyze"}
                 </Button>
@@ -684,12 +684,3 @@ export default function LinguisticDecoderApp(){
     </div>
   );
 }
-
-    
-
-    
-
-
-
-
-    
