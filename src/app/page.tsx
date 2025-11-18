@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useEffect } from "react";
@@ -364,14 +365,24 @@ export default function LinguisticDecoderApp(){
                 <Card>
                   <CardHeader>
                     <CardTitle>The Seven Voices</CardTitle>
-                    <CardDescription>Core principles of the phonetic matrix.</CardDescription>
+                    <CardDescription>Color, role, and function in the matrix.</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <ul className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-sm font-medium">
-                      {Object.entries(VOICE_COLOR_MAP).map(([voice, color]) => (
-                        <li key={voice} className="flex items-center gap-3">
-                          <span className="w-3 h-3 rounded-full" style={{ backgroundColor: color }} />
-                          <span className="font-bold">{voice}</span>
+                    <ul className="space-y-3 text-sm">
+                      {VOICE_META.map((v) => (
+                        <li key={v.id} className="flex items-center gap-3">
+                          <span
+                            className="w-3 h-3 rounded-full shrink-0"
+                            style={{ backgroundColor: VOICE_COLOR_MAP[v.id] }}
+                          />
+                          <div className="flex flex-col leading-tight">
+                            <span className="font-semibold">
+                              {v.id} · {v.label}
+                            </span>
+                            <span className="text-[11px] text-muted-foreground">
+                              {v.role}
+                            </span>
+                          </div>
                         </li>
                       ))}
                     </ul>
