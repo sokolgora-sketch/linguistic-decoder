@@ -38,7 +38,7 @@ const VOICE_META: { id: Vowel; label: string; role: string }[] = [
   { id: "O", label: "Balance / Heart", role: "Holds the center, mediates between high and low." },
   { id: "U", label: "Unity / Breath", role: "Carries the flow, breath and movement through the word." },
   { id: "Y", label: "Network / Weave", role: "Loops, branches, weaves paths across the matrix." },
-  { id: "Ë", label: "Evolution / Unit", role: "Closes the cycle, formed unit, the ‘done’ state." },
+  { id: "Ë", label: "Evolution / Unit", role: "Closes the cycle, a formed unit, the ‘done’ state." },
 ];
 
 let EvalPanelComp: React.ComponentType | null = null;
@@ -409,7 +409,7 @@ export default function LinguisticDecoderApp(){
           </div>
 
           {data && (
-            <Card>
+            <Card className="animate-fade-in">
               <CardHeader className="space-y-2">
       <CardTitle>Analysis Results</CardTitle>
       <CardDescription>
