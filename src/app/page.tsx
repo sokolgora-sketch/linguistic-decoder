@@ -417,7 +417,24 @@ export default function LinguisticDecoderApp(){
       </CardDescription>
 
       {/* Engine status strip */}
-      <div className="flex flex-wrap gap-2 text-[11px] text-muted-foreground">
+      <div className="mt-3 flex flex-wrap gap-2 text-[11px] text-muted-foreground">
+        {/* Chips for analysis context */}
+        <span className="inline-flex items-center gap-1 rounded-full border border-border/70 bg-muted/40 px-2 py-0.5">
+          <span className="font-semibold text-foreground">Mode</span>
+          <span className="uppercase">{data.mode}</span>
+        </span>
+        <span className="inline-flex items-center gap-1 rounded-full border border-border/70 bg-muted/40 px-2 py-0.5">
+          <span className="font-semibold text-foreground">Alphabet</span>
+          <span className="uppercase">{data.alphabet}</span>
+        </span>
+        {useAi && (
+            <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/60 bg-emerald-500/10 px-2 py-0.5 text-emerald-400">
+                <Sparkles className="w-3 h-3" />
+                <span className="font-semibold">AI Mapper</span>
+            </span>
+        )}
+
+        {/* Chips for engine/cache status */}
         <span className="inline-flex items-center gap-1 rounded-full border border-border/70 bg-muted/40 px-2 py-0.5">
           <span className="font-semibold text-foreground">Engine</span>
           <span className="font-code">{data.engineVersion}</span>
