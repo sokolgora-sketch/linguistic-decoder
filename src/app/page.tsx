@@ -203,7 +203,7 @@ export default function LinguisticDecoderApp(){
   
   return (
     <div className="min-h-screen bg-background text-foreground p-4 lg:p-8 flex flex-col items-stretch">
-       <main className="max-w-5xl mx-auto w-full space-y-8 flex-1">
+       <main className="max-w-5xl mx-auto w-full space-y-8 flex-1 animate-fade-in">
         {/* Header */}
         <header className="pb-4 border-b border-border/60">
           <div className="flex justify-between items-start gap-3">
@@ -483,3 +483,6 @@ export default function LinguisticDecoderApp(){
     
 
 
+
+
+    
