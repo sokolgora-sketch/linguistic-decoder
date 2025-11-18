@@ -25,12 +25,17 @@ const labelLevels = (levels: number[]) => levels.map(l=> LEVEL_LABEL[l] ?? l).jo
 const labelRings = (rings: number[]) => rings.join(" → ");
 
 const Arrow = () => <span className="font-bold text-accent">→</span>;
-const Chip = ({ v }: { v: string | number }) => (
-    <span className="inline-flex items-center gap-1.5 py-1 px-2 rounded-full border bg-card text-card-foreground">
-      <span className="w-2.5 h-2.5 rounded-full inline-block" style={{ background: VOICE_COLOR_MAP[v as Vowel] || 'hsl(var(--primary))' }} />
-      <span className="font-bold">{String(v)}</span>
-    </span>
-);
+const Chip = ({ v }: { v: string | number }) => {
+    const chipStyle = v in VOICE_COLOR_MAP ? { backgroundColor: VOICE_COLOR_MAP[v as Vowel], color: "#020617" } : {};
+    return (
+        <span
+          className="inline-flex items-center gap-1.5 py-1 px-2.5 rounded-full border border-black/10 text-sm font-bold"
+          style={chipStyle}
+        >
+          {String(v)}
+        </span>
+    );
+};
 
 function ConsonantInfo({ analysis }: { analysis: EnginePayload }) {
   const { windows, windowClasses, primaryPath, edgeWindows } = analysis;
@@ -192,5 +197,3 @@ export function ResultsDisplay({ analysis }: { analysis: EnginePayload }) {
         </>
     );
 }
-
-    
