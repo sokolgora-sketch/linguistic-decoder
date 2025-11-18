@@ -18,7 +18,7 @@ import type { Alphabet } from "../lib/runAnalysis";
 import { PROFILES } from "../functions/languages";
 import { ThemeToggle } from "../components/ThemeProvider";
 import { useDebounced } from "../hooks/useDebounced";
-import { Loader2, Sparkles, Wand2 } from "lucide-react";
+import { Loader2, Sparkles, Wand2, HelpCircle, GitBranch, BookOpen, History as HistoryIcon, ListChecks } from "lucide-react";
 import ComparePanel from "../components/ComparePanel";
 import { normalizeEnginePayload, type EnginePayload, type Vowel } from "../shared/engineShape";
 import HistoryPanel from "../components/HistoryPanel";
@@ -550,3 +550,5 @@ export default function LinguisticDecoderApp(){
     </div>
   );
 }
+
+    
