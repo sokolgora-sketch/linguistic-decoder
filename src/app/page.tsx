@@ -251,129 +251,102 @@ export default function LinguisticDecoderApp(){
 </header>
 
         {/* Controls */}
-<Card className="mt-4 border border-border/60 shadow-sm animate-fade-in">
-  <CardHeader>
-    <CardTitle>Analyze a word</CardTitle>
-    <CardDescription>
-      Type a word, choose analysis options, and run the Seven-Voices solver.
-    </CardDescription>
-  </CardHeader>
+        <Card>
+          <CardHeader>
+            <CardTitle>Analyze a word</CardTitle>
+            <CardDescription>
+              Type a word, choose analysis options, and run the Seven-Voices solver.
+            </CardDescription>
+          </CardHeader>
+          <CardContent
+            className={`space-y-4 transition-opacity duration-150 ${
+              loading ? "opacity-60" : "opacity-100"
+            }`}
+          >
+            <div className="flex flex-col sm:flex-row gap-2">
+              <Input
+                value={word}
+                onChange={(e) => setWord(e.target.value)}
+                placeholder="Type a word…"
+                className="font-semibold text-lg flex-1"
+                onKeyUp={(e) => e.key === "Enter" && canAnalyze && analyze()}
+              />
+              <Button onClick={() => analyze()} disabled={!canAnalyze} size="lg">
+                {loading ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <Wand2 className="mr-2 h-4 w-4" />
+                )}
+                {loading ? "Analyzing…" : "Analyze"}
+              </Button>
+              <Button
+                onClick={runSmokeTest}
+                variant="outline"
+                size="lg"
+                title="Display a mock result to test the UI"
+              >
+                Smoke
+              </Button>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4 items-center pt-2">
+                <div className="space-y-3">
+                    <Select value={alphabet} onValueChange={(v) => setAlphabet(v as Alphabet)}>
+                        <SelectTrigger>
+                        <SelectValue placeholder="Language Profile" />
+                        </SelectTrigger>
+                        <SelectContent>
+                        <SelectItem value="auto">Auto-Detect Profile</SelectItem>
+                        {PROFILES.map(p=>(
+                            <SelectItem key={p.id} value={p.id}>{p.id.replace(/_/g,' ').replace(/\b\w/g, l => l.toUpperCase())}</SelectItem>
+                        ))}
+                        </SelectContent>
+                    </Select>
+                    <div className="flex items-center gap-4">
+                        <label className="text-xs text-muted-foreground">Edge: {edgeWeight.toFixed(2)}</label>
+                        <input
+                            type="range" min={0} max={0.6} step={0.05}
+                            value={edgeWeight} onChange={e => setEdgeWeight(Number(e.target.value))}
+                            className="w-full"
+                        />
+                    </div>
+                </div>
 
-  <CardContent
-  className={`space-y-4 transition-opacity duration-150 ${
-    loading ? "opacity-90" : "opacity-100"
-  }`}
->
-  {/* Input + buttons */}
-  <div className="flex flex-col sm:flex-row gap-3 sm:items-center">
-    <Input
-      value={word}
-      onChange={(e) => setWord(e.target.value)}
-      placeholder="Type a word…"
-      className="font-semibold text-lg flex-1"
-      onKeyUp={(e) => e.key === "Enter" && canAnalyze && analyze()}
-    />
+              <div className="flex justify-end items-center gap-4">
+                <label className="flex items-center gap-2 text-sm">
+                  <input
+                    type="checkbox"
+                    checked={mode === "strict"}
+                    onChange={(e) => setMode(e.target.checked ? "strict" : "open")}
+                    className="w-4 h-4 rounded text-primary focus:ring-primary"
+                  />
+                  Strict Mode
+                </label>
+                <label className="flex items-center gap-2 text-sm">
+                  <input
+                    type="checkbox"
+                    checked={useAi}
+                    onChange={(e) => setUseAi(e.target.checked)}
+                    className="w-4 h-4 rounded text-primary focus:ring-primary"
+                  />
+                  <Sparkles className="inline-block w-4 h-4 text-accent-foreground" />
+                  AI Mapper
+                </label>
+              </div>
+            </div>
 
-    <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-      <Button
-        onClick={() => analyze()}
-        disabled={!canAnalyze}
-        size="lg"
-        className="w-full sm:w-auto flex items-center justify-center gap-2"
-      >
-        {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" />}
-        {loading ? "Analyzing…" : "Analyze"}
-      </Button>
-
-      <Button
-        onClick={runSmokeTest}
-        variant="outline"
-        size="lg"
-        title="Display a mock result to test the UI"
-        className="hidden sm:inline-flex"
-      >
-        Smoke
-      </Button>
-    </div>
-  </div>
-
-  {/* Subtle loading hint */}
-  {loading && (
-    <p className="flex items-center gap-2 text-xs text-muted-foreground animate-fade-in">
-      <Loader2 className="h-3 w-3 animate-spin" />
-      Running solver on “{word.trim() || "…"}”…
-    </p>
-  )}
-
-  {/* Slider + toggles */}
-  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center pt-4 border-t mt-4">
-    <div className="space-y-3">
-      <Select value={alphabet} onValueChange={(v) => setAlphabet(v as Alphabet)}>
-        <SelectTrigger>
-          <SelectValue placeholder="Language Profile" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="auto">Auto-Detect Profile</SelectItem>
-          {PROFILES.map((p) => (
-            <SelectItem key={p.id} value={p.id}>
-              {p.id.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-
-      <div className="flex items-center gap-4">
-        <label className="text-xs text-muted-foreground whitespace-nowrap">
-          Edge: {edgeWeight.toFixed(2)}
-        </label>
-        <input
-          type="range"
-          min={0}
-          max={0.6}
-          step={0.05}
-          value={edgeWeight}
-          onChange={(e) => setEdgeWeight(Number(e.target.value))}
-          className="w-full"
-        />
-      </div>
-    </div>
-
-    <div className="flex flex-wrap justify-start md:justify-end items-center gap-3">
-      <label className="flex items-center gap-2 text-sm">
-        <input
-          type="checkbox"
-          checked={mode === "strict"}
-          onChange={(e) => setMode(e.target.checked ? "strict" : "open")}
-          className="w-4 h-4 rounded text-primary focus:ring-primary"
-        />
-        Strict Mode
-      </label>
-
-      <label className="flex items-center gap-2 text-sm">
-        <input
-          type="checkbox"
-          checked={useAi}
-          onChange={(e) => setUseAi(e.target.checked)}
-          className="w-4 h-4 rounded text-primary focus:ring-primary"
-        />
-        <Sparkles className="inline-block w-4 h-4 text-accent-foreground" />
-        AI Mapper
-      </label>
-    </div>
-  </div>
-
-  {err && (
-    <div className="mt-4 border border-red-500/50 bg-red-500/10 text-red-400 text-sm p-3 rounded-md">
-      <b>Error:</b> {err}
-    </div>
-  )}
-</CardContent>
-</Card>
+            {err && (
+              <div className="mt-2 border border-red-500/50 bg-red-500/10 text-red-400 text-sm p-3 rounded-md">
+                <b>Error:</b> {err}
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
         {/* Visualization & Metadata Section */}
         <section className="space-y-8">
           <div className="grid gap-6 md:grid-cols-[2fr,1fr]">
-            <Card className="animate-fade-in">
+            <Card>
               <CardHeader>
                 <CardTitle>Seven-Voices Path</CardTitle>
                 <CardDescription>An animated view of the word’s primary path through the vowel matrix.</CardDescription>
@@ -436,7 +409,7 @@ export default function LinguisticDecoderApp(){
           </div>
 
           {data && (
-            <Card className="animate-fade-in">
+            <Card>
               <CardHeader className="space-y-2">
       <CardTitle>Analysis Results</CardTitle>
       <CardDescription>
@@ -473,14 +446,14 @@ export default function LinguisticDecoderApp(){
       </div>
     </CardHeader>
               <CardContent className="space-y-4">
-      <ResultsDisplay analysis={data} />
-      <div className="flex justify-end pt-2">
-        <ExportJsonButton analysis={data} />
-      </div>
-      <WhyThisPath primary={data.primaryPath} />
-      <PrinciplesBlock engine={data} />
-      <Candidates items={data.languageFamilies} />
-    </CardContent>
+                <ResultsDisplay analysis={data} />
+                <div className="flex justify-end pt-2">
+                  <ExportJsonButton analysis={data} />
+                </div>
+                <WhyThisPath primary={data.primaryPath} />
+                <PrinciplesBlock engine={data} />
+                <Candidates items={data.languageFamilies} />
+              </CardContent>
             </Card>
           )}
         </section>
