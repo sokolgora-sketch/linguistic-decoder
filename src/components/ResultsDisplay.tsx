@@ -9,17 +9,6 @@ import { summarizePrinciples } from "../lib/principles";
 import WhyThisPath from "./WhyThisPath";
 import { VOICE_COLOR_MAP } from "../shared/voiceColors";
 
-// Seven‑Voices palette (uses CSS variables from globals.css)
-const VOICE_COLOR: Record<string, string> = {
-  A: "var(--voice-A)",
-  E: "var(--voice-E)",
-  I: "var(--voice-I)",
-  O: "var(--voice-O)",
-  U: "var(--voice-U)",
-  Y: "var(--voice-Y)",
-  "Ë": "var(--voice-EH)"
-};
-
 const LEVEL_LABEL: Record<number, string> = { 1: "High", 0: "Mid", [-1]: "Low" } as any;
 const labelLevels = (levels: number[]) => levels.map(l=> LEVEL_LABEL[l] ?? l).join(" → ");
 const labelRings = (rings: number[]) => rings.join(" → ");
