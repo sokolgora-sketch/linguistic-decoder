@@ -4,9 +4,10 @@ import React, { useMemo } from "react";
 import { Card } from "./ui/card";
 import type { CClass } from "../functions/languages";
 import { classRange } from "../functions/languages";
-import type { EnginePayload, EnginePath } from "../shared/engineShape";
+import type { EnginePayload, EnginePath, Vowel } from "../shared/engineShape";
 import { summarizePrinciples } from "../lib/principles";
 import WhyThisPath from "./WhyThisPath";
+import { VOICE_COLOR_MAP } from "../shared/voiceColors";
 
 // Seven‑Voices palette (uses CSS variables from globals.css)
 const VOICE_COLOR: Record<string, string> = {
@@ -26,7 +27,7 @@ const labelRings = (rings: number[]) => rings.join(" → ");
 const Arrow = () => <span className="font-bold text-accent">→</span>;
 const Chip = ({ v }: { v: string | number }) => (
     <span className="inline-flex items-center gap-1.5 py-1 px-2 rounded-full border bg-card text-card-foreground">
-      <span className="w-2.5 h-2.5 rounded-full inline-block" style={{ background: VOICE_COLOR[String(v)] || 'hsl(var(--primary))' }} />
+      <span className="w-2.5 h-2.5 rounded-full inline-block" style={{ background: VOICE_COLOR_MAP[v as Vowel] || 'hsl(var(--primary))' }} />
       <span className="font-bold">{String(v)}</span>
     </span>
 );
@@ -191,3 +192,5 @@ export function ResultsDisplay({ analysis }: { analysis: EnginePayload }) {
         </>
     );
 }
+
+    
