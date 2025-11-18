@@ -210,45 +210,45 @@ export default function LinguisticDecoderApp(){
        <main className="max-w-5xl mx-auto w-full space-y-8 flex-1 animate-fade-in">
         {/* Header */}
         <header className="pb-4 border-b border-border/60">
-  <div className="flex justify-between items-start gap-3">
-    <div className="space-y-1 max-w-xl">
-      <h1 className="text-3xl font-bold tracking-tight text-primary">
-        Linguistic Decoder
-      </h1>
-      <p className="text-sm text-muted-foreground mt-1">
-        A tool for analyzing words with the Seven-Voices phonetic model.
-      </p>
-    </div>
-    <div className="flex items-center gap-2 pt-1">
-      <ThemeToggle />
-    </div>
-  </div>
+          <div className="flex justify-between items-start gap-3">
+            <div className="space-y-1 max-w-xl">
+              <h1 className="text-3xl font-bold tracking-tight text-primary">
+                Linguistic Decoder
+              </h1>
+              <p className="text-sm text-muted-foreground mt-1">
+                A tool for analyzing words with the Seven-Voices phonetic model.
+              </p>
+            </div>
+            <div className="flex items-center gap-2 pt-1">
+              <ThemeToggle />
+            </div>
+          </div>
 
-  {/* Status strip */}
-  <div className="mt-3 flex flex-wrap gap-2 text-[11px] text-muted-foreground">
-    <span className="inline-flex items-center gap-1 rounded-full border border-border/70 bg-muted/40 px-2 py-0.5 max-w-[180px]">
-      <span className="font-semibold text-foreground">Word</span>
-      <span className="truncate">{word || "—"}</span>
-    </span>
+          {/* Status strip */}
+          <div className="mt-3 flex flex-wrap gap-2 text-[11px] text-muted-foreground">
+            <span className="inline-flex items-center gap-1 rounded-full border border-border/70 bg-muted/40 px-2 py-0.5 max-w-[180px]">
+              <span className="font-semibold text-foreground">Word</span>
+              <span className="truncate">{word || "—"}</span>
+            </span>
 
-    <span className="inline-flex items-center gap-1 rounded-full border border-border/70 bg-muted/40 px-2 py-0.5">
-      <span className="font-semibold text-foreground">Mode</span>
-      <span className="uppercase">{mode}</span>
-    </span>
+            <span className="inline-flex items-center gap-1 rounded-full border border-border/70 bg-muted/40 px-2 py-0.5">
+              <span className="font-semibold text-foreground">Mode</span>
+              <span className="uppercase">{mode}</span>
+            </span>
 
-    <span className="inline-flex items-center gap-1 rounded-full border border-border/70 bg-muted/40 px-2 py-0.5">
-      <span className="font-semibold text-foreground">Alphabet</span>
-      <span className="uppercase">{alphabet}</span>
-    </span>
+            <span className="inline-flex items-center gap-1 rounded-full border border-border/70 bg-muted/40 px-2 py-0.5">
+              <span className="font-semibold text-foreground">Alphabet</span>
+              <span className="uppercase">{alphabet}</span>
+            </span>
 
-    <span className="inline-flex items-center gap-1 rounded-full border border-border/70 bg-muted/40 px-2 py-0.5">
-      <span className="font-semibold text-foreground">AI Mapper</span>
-      <span className={useAi ? "text-emerald-500 font-semibold" : "text-muted-foreground"}>
-        {useAi ? "ON" : "OFF"}
-      </span>
-    </span>
-  </div>
-</header>
+            <span className="inline-flex items-center gap-1 rounded-full border border-border/70 bg-muted/40 px-2 py-0.5">
+              <span className="font-semibold text-foreground">AI Mapper</span>
+              <span className={useAi ? "text-emerald-500 font-semibold" : "text-muted-foreground"}>
+                {useAi ? "ON" : "OFF"}
+              </span>
+            </span>
+          </div>
+        </header>
 
         {/* Controls */}
         <Card>
@@ -271,22 +271,44 @@ export default function LinguisticDecoderApp(){
                 className="font-semibold text-lg flex-1"
                 onKeyUp={(e) => e.key === "Enter" && canAnalyze && analyze()}
               />
-              <Button onClick={() => analyze()} disabled={!canAnalyze} size="lg">
-                {loading ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                ) : (
-                  <Wand2 className="mr-2 h-4 w-4" />
-                )}
-                {loading ? "Analyzing…" : "Analyze"}
-              </Button>
-              <Button
-                onClick={runSmokeTest}
-                size="lg"
-                title="Display a mock result to test the UI"
-                className="bg-secondary hover:bg-secondary/80 text-secondary-foreground"
-              >
-                Smoke
-              </Button>
+              <div className="flex gap-2 sm:flex-none">
+                <Button
+                  onClick={() => analyze()}
+                  disabled={!canAnalyze}
+                  size="lg"
+                  className="flex-1 sm:flex-none"
+                >
+                  {loading ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    <Wand2 className="mr-2 h-4 w-4" />
+                  )}
+                  {loading ? "Analyzing…" : "Analyze"}
+                </Button>
+
+                <Button
+                  onClick={runSmokeTest}
+                  size="lg"
+                  title="Display a mock result to test the UI"
+                  className="bg-secondary hover:bg-secondary/80 text-secondary-foreground hidden sm:inline-flex"
+                >
+                  Smoke
+                </Button>
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="hidden sm:inline-flex"
+                  onClick={() => {
+                    setWord("");
+                    setData(null);
+                    setErr(null);
+                  }}
+                >
+                  Clear
+                </Button>
+              </div>
             </div>
             
             <div className="grid grid-cols-2 gap-4 items-center pt-2">
@@ -411,57 +433,29 @@ export default function LinguisticDecoderApp(){
           {data && (
             <Card className="animate-fade-in">
               <CardHeader className="space-y-2">
-      <CardTitle>Analysis Results</CardTitle>
-      <CardDescription>
-        Primary and frontier paths, principles, and language candidates.
-      </CardDescription>
+                <CardTitle>Analysis Results</CardTitle>
+                <CardDescription>
+                  Primary and frontier paths, principles, and language candidates.
+                </CardDescription>
 
-      {/* Engine status strip */}
-      <div className="mt-3 flex flex-wrap gap-2 text-[11px] text-muted-foreground">
-        {/* Chips for analysis context */}
-        <span className="inline-flex items-center gap-1 rounded-full border border-border/70 bg-muted/40 px-2 py-0.5">
-          <span className="font-semibold text-foreground">Mode</span>
-          <span className="uppercase">{data.mode}</span>
-        </span>
-        <span className="inline-flex items-center gap-1 rounded-full border border-border/70 bg-muted/40 px-2 py-0.5">
-          <span className="font-semibold text-foreground">Alphabet</span>
-          <span className="uppercase">{data.alphabet}</span>
-        </span>
-        {useAi && (
-            <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/60 bg-emerald-500/10 px-2 py-0.5 text-emerald-400">
-                <Sparkles className="w-3 h-3" />
-                <span className="font-semibold">AI Mapper</span>
-            </span>
-        )}
+                {/* Engine status strip */}
+                <div className="mt-3 flex flex-wrap items-center gap-2 text-[11px]">
+                  <span className="px-2 py-0.5 rounded-full border border-border/60 bg-muted/40">
+                    Mode: {data.mode === "strict" ? "Strict" : "Open"}
+                  </span>
 
-        {/* Chips for engine/cache status */}
-        <span className="inline-flex items-center gap-1 rounded-full border border-border/70 bg-muted/40 px-2 py-0.5">
-          <span className="font-semibold text-foreground">Engine</span>
-          <span className="font-code">{data.engineVersion}</span>
-        </span>
+                  <span className="px-2 py-0.5 rounded-full border border-border/60">
+                    Alphabet: {data.alphabet}
+                  </span>
 
-        {"solveMs" in data && (
-          <span className="inline-flex items-center gap-1 rounded-full border border-border/70 bg-muted/40 px-2 py-0.5">
-            <span className="font-semibold text-foreground">Solve</span>
-            <span>{data.solveMs} ms</span>
-          </span>
-        )}
-
-        {data.cacheHit && (
-          <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/60 bg-emerald-500/10 px-2 py-0.5 text-emerald-400">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-            <span className="font-semibold">Cache Hit</span>
-          </span>
-        )}
-
-        {data.recomputed && (
-          <span className="inline-flex items-center gap-1 rounded-full border border-sky-500/60 bg-sky-500/10 px-2 py-0.5 text-sky-400">
-            <span className="w-1.5 h-1.5 rounded-full bg-sky-400" />
-            <span className="font-semibold">Recomputed</span>
-          </span>
-        )}
-      </div>
-    </CardHeader>
+                  {useAi && (
+                    <span className="px-2 py-0.5 rounded-full border border-border/60 flex items-center gap-1">
+                      <Sparkles className="w-3 h-3" />
+                      AI Mapper
+                    </span>
+                  )}
+                </div>
+              </CardHeader>
               <CardContent className="space-y-4">
                 <ResultsDisplay analysis={data} />
                 <div className="flex justify-end pt-2">
@@ -477,127 +471,127 @@ export default function LinguisticDecoderApp(){
 
         {/* Informational Accordions */}
         <Accordion
-  type="single"
-  collapsible
-  className="w-full"
-  defaultValue={data ? "" : "item-1"}
->
-  {/* How to Use – only when empty state */}
-  {!data && (
-    <AccordionItem value="item-1">
-      <AccordionTrigger className="text-sm font-semibold">
-        <div className="flex items-center gap-2">
-          <HelpCircle className="w-4 h-4 text-muted-foreground" />
-          <span>How to Use</span>
-        </div>
-      </AccordionTrigger>
-      <AccordionContent>
-        <Card className="p-5">
-          <ol className="list-decimal pl-5 mt-2 space-y-2 text-sm leading-relaxed">
-            <li>
-              Type a word and click{" "}
-              <kbd className="bg-primary text-primary-foreground rounded-md px-2 py-1 text-xs font-semibold">
-                Analyze
-              </kbd>
-              .
-            </li>
-            <li>
-              Use the <strong>Language Profile</strong> dropdown to force a
-              specific phonetic profile, or leave it on{" "}
-              <strong>Auto-Detect</strong>.
-            </li>
-            <li>
-              The <strong>Seven-Voices Path</strong> shows the primary vowel path
-              and consonant windows.
-            </li>
-            <li>
-              The <strong>Analysis Results</strong> card breaks down primary and
-              frontier paths, principles, and language candidates.
-            </li>
-            <li>
-              Toggle <strong>AI Mapper</strong> to include language-family
-              mappings when available.
-            </li>
-          </ol>
-        </Card>
-      </AccordionContent>
-    </AccordionItem>
-  )}
+          type="single"
+          collapsible
+          className="w-full"
+          defaultValue={data ? "" : "item-1"}
+        >
+          {/* How to Use – only when empty state */}
+          {!data && (
+            <AccordionItem value="item-1">
+              <AccordionTrigger className="text-sm font-semibold">
+                <div className="flex items-center gap-2">
+                  <HelpCircle className="w-4 h-4 text-muted-foreground" />
+                  <span>How to Use</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent>
+                <Card className="p-5">
+                  <ol className="list-decimal pl-5 mt-2 space-y-2 text-sm leading-relaxed">
+                    <li>
+                      Type a word and click{" "}
+                      <kbd className="bg-primary text-primary-foreground rounded-md px-2 py-1 text-xs font-semibold">
+                        Analyze
+                      </kbd>
+                      .
+                    </li>
+                    <li>
+                      Use the <strong>Language Profile</strong> dropdown to force a
+                      specific phonetic profile, or leave it on{" "}
+                      <strong>Auto-Detect</strong>.
+                    </li>
+                    <li>
+                      The <strong>Seven-Voices Path</strong> shows the primary vowel path
+                      and consonant windows.
+                    </li>
+                    <li>
+                      The <strong>Analysis Results</strong> card breaks down primary and
+                      frontier paths, principles, and language candidates.
+                    </li>
+                    <li>
+                      Toggle <strong>AI Mapper</strong> to include language-family
+                      mappings when available.
+                    </li>
+                  </ol>
+                </Card>
+              </AccordionContent>
+            </AccordionItem>
+          )}
 
-  {/* Compare Two Words */}
-  <AccordionItem value="item-2">
-    <AccordionTrigger className="text-sm font-semibold">
-      <div className="flex items-center gap-2">
-        <GitBranch className="w-4 h-4 text-muted-foreground" />
-        <span>Compare Two Words</span>
-      </div>
-    </AccordionTrigger>
-    <AccordionContent>
-      <Card className="p-4">
-        <p className="text-xs text-muted-foreground mb-3">
-          Analyze two words side by side and compare their Seven-Voices paths.
-        </p>
-        <ComparePanel defaultMode={mode} defaultAlphabet={alphabet} />
-      </Card>
-    </AccordionContent>
-  </AccordionItem>
+          {/* Compare Two Words */}
+          <AccordionItem value="item-2">
+            <AccordionTrigger className="text-sm font-semibold">
+              <div className="flex items-center gap-2">
+                <GitBranch className="w-4 h-4 text-muted-foreground" />
+                <span>Compare Two Words</span>
+              </div>
+            </AccordionTrigger>
+            <AccordionContent>
+              <Card className="p-4">
+                <p className="text-xs text-muted-foreground mb-3">
+                  Analyze two words side by side and compare their Seven-Voices paths.
+                </p>
+                <ComparePanel defaultMode={mode} defaultAlphabet={alphabet} />
+              </Card>
+            </AccordionContent>
+          </AccordionItem>
 
-  {/* Consonant Reference */}
-  <AccordionItem value="item-3">
-    <AccordionTrigger className="text-sm font-semibold">
-      <div className="flex items-center gap-2">
-        <BookOpen className="w-4 h-4 text-muted-foreground" />
-        <span>Consonant Reference</span>
-      </div>
-    </AccordionTrigger>
-    <AccordionContent>
-      <Card className="p-4">
-        <p className="text-xs text-muted-foreground mb-3">
-          See how consonants behave around the Seven Voices in the matrix.
-        </p>
-        <ConsonantReference />
-      </Card>
-    </AccordionContent>
-  </AccordionItem>
+          {/* Consonant Reference */}
+          <AccordionItem value="item-3">
+            <AccordionTrigger className="text-sm font-semibold">
+              <div className="flex items-center gap-2">
+                <BookOpen className="w-4 h-4 text-muted-foreground" />
+                <span>Consonant Reference</span>
+              </div>
+            </AccordionTrigger>
+            <AccordionContent>
+              <Card className="p-4">
+                <p className="text-xs text-muted-foreground mb-3">
+                  See how consonants behave around the Seven Voices in the matrix.
+                </p>
+                <ConsonantReference />
+              </Card>
+            </AccordionContent>
+          </AccordionItem>
 
-  {/* History */}
-  <AccordionItem value="item-4">
-    <AccordionTrigger className="text-sm font-semibold">
-      <div className="flex items-center gap-2">
-        <HistoryIcon className="w-4 h-4 text-muted-foreground" />
-        <span>History</span>
-      </div>
-    </AccordionTrigger>
-    <AccordionContent>
-      <Card className="p-4">
-        <p className="text-xs text-muted-foreground mb-3">
-          Reload or recompute previous analyses from Firestore history.
-        </p>
-        <HistoryPanel onLoadAnalysis={onLoadAnalysis} onRecompute={onRecompute} />
-      </Card>
-    </AccordionContent>
-  </AccordionItem>
+          {/* History */}
+          <AccordionItem value="item-4">
+            <AccordionTrigger className="text-sm font-semibold">
+              <div className="flex items-center gap-2">
+                <HistoryIcon className="w-4 h-4 text-muted-foreground" />
+                <span>History</span>
+              </div>
+            </AccordionTrigger>
+            <AccordionContent>
+              <Card className="p-4">
+                <p className="text-xs text-muted-foreground mb-3">
+                  Reload or recompute previous analyses from Firestore history.
+                </p>
+                <HistoryPanel onLoadAnalysis={onLoadAnalysis} onRecompute={onRecompute} />
+              </Card>
+            </AccordionContent>
+          </AccordionItem>
 
-  {/* Batch Evaluation – dev only */}
-  {EvalPanelComp && (
-    <AccordionItem value="item-5">
-      <AccordionTrigger className="text-sm font-semibold">
-        <div className="flex items-center gap-2">
-          <ListChecks className="w-4 h-4 text-muted-foreground" />
-          <span>Batch Evaluation</span>
-        </div>
-      </AccordionTrigger>
-      <AccordionContent>
-        <Card className="p-4">
-          <p className="text-xs text-muted-foreground mb-3">
-            Run the engine across a list of words and inspect aggregate behavior.
-          </p>
-          <EvalPanelComp />
-        </Card>
-      </AccordionContent>
-    </AccordionItem>
-  )}
-</Accordion>
+          {/* Batch Evaluation – dev only */}
+          {EvalPanelComp && (
+            <AccordionItem value="item-5">
+              <AccordionTrigger className="text-sm font-semibold">
+                <div className="flex items-center gap-2">
+                  <ListChecks className="w-4 h-4 text-muted-foreground" />
+                  <span>Batch Evaluation</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent>
+                <Card className="p-4">
+                  <p className="text-xs text-muted-foreground mb-3">
+                    Run the engine across a list of words and inspect aggregate behavior.
+                  </p>
+                  <EvalPanelComp />
+                </Card>
+              </AccordionContent>
+            </AccordionItem>
+          )}
+        </Accordion>
 
         {/* Debug view */}
         {showDebug && data && (
