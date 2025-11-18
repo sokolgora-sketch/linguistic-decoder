@@ -13,7 +13,7 @@ const LEVEL_LABEL: Record<number, string> = { 1: "High", 0: "Mid", [-1]: "Low" }
 const labelLevels = (levels: number[]) => levels.map(l=> LEVEL_LABEL[l] ?? l).join(" → ");
 const labelRings = (rings: number[]) => rings.join(" → ");
 
-const Arrow = () => <span className="font-bold text-accent">→</span>;
+const Arrow = () => <span className="font-bold text-muted-foreground">→</span>;
 const Chip = ({ v }: { v: string | number }) => {
     const chipStyle = v in VOICE_COLOR_MAP ? { backgroundColor: VOICE_COLOR_MAP[v as Vowel], color: "#020617" } : {};
     return (
@@ -157,9 +157,9 @@ export function ResultsDisplay({ analysis }: { analysis: EnginePayload }) {
     return (
         <>
             <PathRow block={primaryPath} title="Primary Path" analysis={analysis} />
-            <PrinciplesBlock engine={analysis} />
+            
             {frontierList.length > 0 && (
-              <Card className="p-4">
+              <Card className="p-4 mt-4">
                 <h3 className="font-bold text-sm tracking-wide">Frontier (near‑optimal alternates)</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mt-3">
                   {frontierList.map((f, idx)=> {
