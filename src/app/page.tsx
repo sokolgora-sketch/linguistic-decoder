@@ -621,7 +621,18 @@ export default function LinguisticDecoderApp(){
                   {data?.cacheHit && <span className="mr-2 px-1.5 py-0.5 rounded bg-accent/20 border border-accent text-accent-foreground">cacheHit</span>}
                   {data?.recomputed && <span className="mr-2 px-1.5 py-0.5 rounded bg-blue-900 border border-blue-700">recomputed</span>}
                 </div>
-                <div>{signals}</div>
+                {signals.length > 0 && (
+                  <div className="flex flex-wrap gap-1 pt-1">
+                    {signals.map((sig) => (
+                      <span
+                        key={sig}
+                        className="px-1.5 py-0.5 rounded border border-border/60 bg-muted/40 text-[10px] uppercase tracking-wide"
+                      >
+                        {sig}
+                      </span>
+                    ))}
+                  </div>
+                )}
               </>
             )}
             <FooterBuild />
