@@ -207,7 +207,7 @@ export default function LinguisticDecoderApp(){
   
   return (
     <div className="min-h-screen bg-background text-foreground p-4 lg:p-8 flex flex-col items-stretch">
-       <main className="max-w-5xl mx-auto w-full space-y-8 flex-1 animate-fade-in">
+       <main className="max-w-5xl mx-auto w-full space-y-8 flex-1">
         {/* Header */}
         <header className="pb-4 border-b border-border/60">
           <div className="flex justify-between items-start gap-3">
@@ -368,7 +368,7 @@ export default function LinguisticDecoderApp(){
         {/* Visualization & Metadata Section */}
         <section className="space-y-8">
           <div className="grid gap-6 md:grid-cols-[2fr,1fr]">
-            <Card className="animate-fade-in">
+            <Card className={data ? "animate-fade-in" : ""}>
               <CardHeader>
                 <CardTitle>Seven-Voices Path</CardTitle>
                 <CardDescription>An animated view of the word’s primary path through the vowel matrix.</CardDescription>
@@ -655,5 +655,7 @@ export default function LinguisticDecoderApp(){
     </div>
   );
 }
+
+    
 
     
