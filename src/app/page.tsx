@@ -30,6 +30,16 @@ import { ExportJsonButton } from "../components/ExportJsonButton";
 import { logError } from "../lib/logError";
 import { VOICE_COLOR_MAP } from "../shared/voiceColors";
 
+const VOICE_META: { id: Vowel; label: string; role: string }[] = [
+  { id: "A", label: "Action / Truth", role: "Launches, cuts through, sets the first line." },
+  { id: "E", label: "Expansion / Bridge", role: "Opens, connects, stretches what A starts." },
+  { id: "I", label: "Insight / Measure", role: "Focuses, measures, makes a clear line of thought." },
+  { id: "O", label: "Balance / Heart", role: "Holds the center, mediates between high and low." },
+  { id: "U", label: "Unity / Breath", role: "Carries the flow, breath and movement through the word." },
+  { id: "Y", label: "Network / Weave", role: "Loops, branches, weaves paths across the matrix." },
+  { id: "Ë", label: "Evolution / Unit", role: "Closes the cycle, formed unit, the ‘done’ state." },
+];
+
 let EvalPanelComp: React.ComponentType | null = null;
 if (process.env.NEXT_PUBLIC_DEV_EVAL === "1") {
   EvalPanelComp = require("../components/EvalPanel").default;
