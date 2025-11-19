@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState, useEffect } from "react";
@@ -120,8 +119,7 @@ export default function LinguisticDecoderApp(){
       logError({ where: "analyze", message: error, detail: { word: useWord, stack: e.stack } });
       console.error("Analysis chain failed:", e);
       setErr(error);
-      // optional: you can either keep the old result or clear it on error.
-      // setData(null);
+      setData(null);
     } finally {
       setLoading(false);
     }
