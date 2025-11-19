@@ -102,28 +102,22 @@ export default function LinguisticDecoderApp(){
     const useMode: "strict"|"open" = nextMode ?? mode;
     const useAlphabet = nextAlphabet ?? alphabet;
     if (!useWord) return;
-
+  
     setLoading(true);
     setErr(null);
-    setData(null);
+    // ❌ do NOT clear data here — keep the previous analysis on screen
+    // setData(null);
     try {
-      // 1. Get raw result from API or cache
       const clientResponse = await analyzeClient(useWord, useMode, useAlphabet, { edgeWeight, useAi });
-      console.log("API result:", clientResponse);
-
-      // 2. GUARANTEE the shape
       const normalizedPayload = normalizeEnginePayload(clientResponse);
-      console.debug("Primary Path object:", normalizedPayload.primaryPath);
-      
-      // 4. Set state with the clean, final payload
       setData(normalizedPayload);
-
     } catch (e: any) {
       const error = e?.message || "Request failed";
       logError({ where: "analyze", message: error, detail: { word: useWord, stack: e.stack } });
-      console.error("Analysis chain failed:", e);
       setErr(error);
-      setData(null);
+      // optional: you *can* decide whether to clear data on hard error or not.
+      // I’d leave the old result:
+      // setData(null);
     } finally {
       setLoading(false);
     }
@@ -745,6 +739,8 @@ export default function LinguisticDecoderApp(){
     </div>
   );
 }
+
+    
 
     
 
