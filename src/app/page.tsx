@@ -372,7 +372,8 @@ export default function LinguisticDecoderApp(){
                     type="checkbox"
                     checked={mode === "strict"}
                     onChange={(e) => setMode(e.target.checked ? "strict" : "open")}
-                    className="w-4 h-4 rounded text-primary focus:ring-primary"
+                    className="w-4 h-4 rounded border-border text-primary focus-visible:ring-2 focus-visible:ring-primary"
+                    title="Strict = Seven-Voices rules only · Open = allow softer interpretations"
                   />
                   Strict Mode
                 </label>
@@ -381,7 +382,8 @@ export default function LinguisticDecoderApp(){
                     type="checkbox"
                     checked={useAi}
                     onChange={(e) => setUseAi(e.target.checked)}
-                    className="w-4 h-4 rounded text-primary focus:ring-primary"
+                    className="w-4 h-4 rounded border-border text-primary focus-visible:ring-2 focus-visible:ring-primary"
+                    title="Toggle AI-assisted language family mapping"
                   />
                   <Sparkles className="inline-block w-4 h-4 text-accent-foreground" />
                   AI Mapper
