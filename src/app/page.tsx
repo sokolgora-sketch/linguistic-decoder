@@ -243,7 +243,30 @@ export default function LinguisticDecoderApp(){
               <p className="text-sm text-muted-foreground mt-1">
                 A tool for analyzing words with the Seven-Voices phonetic model.
               </p>
+
+              {/* Live status chips */}
+              <div className="flex flex-wrap gap-2 pt-2">
+                <span className="inline-flex items-center rounded-full border border-border/60 px-2.5 py-0.5 text-[11px] uppercase tracking-wide">
+                  <span className="opacity-70 mr-1">Mode:</span>
+                  <span className="font-semibold">
+                    {mode === "strict" ? "Strict" : "Open"}
+                  </span>
+                </span>
+
+                <span className="inline-flex items-center rounded-full border border-border/60 px-2.5 py-0.5 text-[11px] uppercase tracking-wide">
+                  <span className="opacity-70 mr-1">Profile:</span>
+                  <span className="font-semibold">{alphabetLabel}</span>
+                </span>
+
+                {useAi && (
+                  <span className="inline-flex items-center gap-1 rounded-full border border-accent/60 bg-accent/10 px-2.5 py-0.5 text-[11px] uppercase tracking-wide text-accent-foreground">
+                    <Sparkles className="w-3 h-3" />
+                    <span className="font-semibold">AI Mapper On</span>
+                  </span>
+                )}
+              </div>
             </div>
+
             <div className="flex items-center gap-2 pt-1">
               <ThemeToggle />
             </div>
