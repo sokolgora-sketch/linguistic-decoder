@@ -412,7 +412,31 @@ export default function LinguisticDecoderApp(){
                 <CardTitle>Seven-Voices Path</CardTitle>
                 <CardDescription>An animated view of the word’s primary path through the vowel matrix.</CardDescription>
               </CardHeader>
-              <CardContent className="p-3 sm:p-4">
+              <CardContent className="p-3 sm:p-4 space-y-3">
+                {/* Status strip above the rails */}
+                <div className="flex items-center justify-between text-[11px] uppercase tracking-wide text-muted-foreground">
+                  <div>
+                    <span className="opacity-70 mr-1">Word:</span>
+                    <span className="font-semibold text-foreground">
+                      {data?.word || word}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-1">
+                    {loading ? (
+                      <>
+                        <Loader2 className="w-3 h-3 animate-spin" />
+                        <span>Analyzing…</span>
+                      </>
+                    ) : data ? (
+                      <span className="text-green-500 font-semibold">Ready</span>
+                    ) : (
+                      <span>Idle</span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Rails visualization */}
                 <TwoRailsWithConsonants
                   word={data?.word || word}
                   path={(data?.primaryPath?.voicePath as Vowel[]) || []}
