@@ -271,25 +271,41 @@ export default function LinguisticDecoderApp(){
               <span className="uppercase tracking-wide font-semibold text-xs text-primary/80">
                 Current analysis
               </span>
+
               <span>
                 <span className="font-semibold">Word:</span> {data.word}
               </span>
-              <span>
-                <span className="font-semibold">Mode:</span> {data.mode}
+
+              <span className="inline-flex items-center gap-1">
+                <span className="font-semibold">Profile:</span> {alphabetLabel}
               </span>
-              <span>
-                <span className="font-semibold">Alphabet:</span> {data.alphabet}
+
+              <span className="inline-flex items-center gap-1">
+                <span className="font-semibold">Mode:</span>
+                <span className="px-1.5 py-0.5 rounded-full border border-border/60 bg-muted/60 uppercase tracking-wide">
+                  {data.mode}
+                </span>
               </span>
+
+              {useAi && (
+                <span className="px-1.5 py-0.5 rounded-full border border-accent/60 bg-accent/10 text-accent-foreground inline-flex items-center gap-1">
+                  <Sparkles className="w-3 h-3" />
+                  AI Mapper
+                </span>
+              )}
+
               {"solveMs" in data && (
                 <span>
                   <span className="font-semibold">Solve:</span> {data.solveMs} ms
                 </span>
               )}
+
               {data.cacheHit && (
                 <span className="px-1.5 py-0.5 rounded-full border border-accent/60 text-accent-foreground bg-accent/10">
                   cache hit
                 </span>
               )}
+
               {data.recomputed && (
                 <span className="px-1.5 py-0.5 rounded-full border border-blue-500/60 text-blue-300 bg-blue-500/10">
                   recomputed
@@ -739,5 +755,3 @@ export default function LinguisticDecoderApp(){
     </div>
   );
 }
-
-    
