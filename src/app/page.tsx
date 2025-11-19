@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useEffect } from "react";
@@ -315,12 +316,14 @@ export default function LinguisticDecoderApp(){
               loading ? "opacity-60" : "opacity-100"
             }`}
           >
-            {isWarming && !loading && (
-              <p className="text-xs text-muted-foreground flex items-center gap-2">
-                <Loader2 className="w-3 h-3 animate-spin" />
-                Precomputing in the background…
-              </p>
-            )}
+            <div className="min-h-[20px]">
+              {isWarming && !loading && (
+                <p className="text-xs text-muted-foreground flex items-center gap-2 animate-fade-in">
+                  <Loader2 className="w-3 h-3 animate-spin" />
+                  Precomputing in the background…
+                </p>
+              )}
+            </div>
 
             <form
               onSubmit={handleSubmit}
