@@ -518,7 +518,10 @@ export default function LinguisticDecoderApp(){
           </div>
 
           {data && (
-            <Card className="animate-fade-in">
+            <Card
+              key={`${data.word}-${data.mode}-${data.alphabet}`}
+              className="animate-fade-in"
+            >
               <CardHeader>
                 <CardTitle>Analysis Results</CardTitle>
                 <CardDescription>
@@ -745,3 +748,4 @@ export default function LinguisticDecoderApp(){
     
 
     
+
