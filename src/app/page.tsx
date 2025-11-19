@@ -380,19 +380,26 @@ export default function LinguisticDecoderApp(){
             
             <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
               <span className="opacity-80">Try:</span>
-              {["study", "language", "damage", "mathematics"].map(example => (
-                <button
-                  key={example}
-                  type="button"
-                  onClick={() => {
-                    setWord(example);
-                    analyze(example);
-                  }}
-                  className="px-2 py-1 rounded-full border border-border/60 hover:bg-accent/40 hover:border-accent/80 transition text-xs font-medium"
-                >
-                  {example}
-                </button>
-              ))}
+              {["study", "language", "damage", "mathematics"].map((example) => {
+                const isActive =
+                  word.trim().toLowerCase() === example.toLowerCase() ||
+                  data?.word?.toLowerCase() === example.toLowerCase();
+
+                return (
+                  <button
+                    key={example}
+                    type="button"
+                    onClick={() => {
+                      setWord(example);
+                      analyze(example);
+                    }}
+                    className={`px-2 py-1 rounded-full border border-border/60 hover:bg-accent/40 hover:border-accent/80 transition text-xs font-medium
+                      ${isActive ? "bg-accent/30 border-accent/80" : ""}`}
+                  >
+                    {example}
+                  </button>
+                );
+              })}
             </div>
 
             <div className="grid grid-cols-2 gap-4 items-center pt-2">
