@@ -302,6 +302,13 @@ export default function LinguisticDecoderApp(){
               loading ? "opacity-60" : "opacity-100"
             }`}
           >
+            {isWarming && !loading && (
+              <p className="text-xs text-muted-foreground flex items-center gap-2">
+                <Loader2 className="w-3 h-3 animate-spin" />
+                Precomputing in the background…
+              </p>
+            )}
+
             <div className="flex flex-col sm:flex-row gap-2">
               <Input
                 value={word}
