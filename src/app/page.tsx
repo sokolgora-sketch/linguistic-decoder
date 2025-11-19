@@ -324,17 +324,19 @@ export default function LinguisticDecoderApp(){
               </p>
             )}
 
-            <div className="flex flex-col sm:flex-row gap-2">
+            <form
+              onSubmit={handleSubmit}
+              className="flex flex-col sm:flex-row gap-2"
+            >
               <Input
                 value={word}
                 onChange={(e) => setWord(e.target.value)}
                 placeholder="Type a word…"
                 className="font-semibold text-lg flex-1"
-                onKeyUp={(e) => e.key === "Enter" && canAnalyze && analyze()}
               />
-              <div className="flex gap-2 sm:flex-none">
+              <div className="flex gap-2">
                 <Button
-                  onClick={() => analyze()}
+                  type="submit"
                   disabled={!canAnalyze}
                   size="lg"
                   className="flex-1 sm:flex-none"
@@ -348,6 +350,7 @@ export default function LinguisticDecoderApp(){
                 </Button>
 
                 <Button
+                  type="button"
                   onClick={runSmokeTest}
                   variant="outline"
                   size="lg"
@@ -371,7 +374,7 @@ export default function LinguisticDecoderApp(){
                   Clear
                 </Button>
               </div>
-            </div>
+            </form>
             
             <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
               <span className="opacity-80">Try:</span>
@@ -727,8 +730,3 @@ export default function LinguisticDecoderApp(){
     </div>
   );
 }
-
-    
-    
-
-    
