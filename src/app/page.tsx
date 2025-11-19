@@ -426,7 +426,7 @@ export default function LinguisticDecoderApp(){
                   <input
                     type="checkbox"
                     checked={mode === "strict"}
-                    onChange={(e) => setMode(e.target.checked ? "strict" : "open")}
+                    onChange={e => setMode(e.target.checked ? "strict" : "open")}
                     className="w-4 h-4 rounded border-border text-primary focus-visible:ring-2 focus-visible:ring-primary"
                     title="Strict = Seven-Voices rules only · Open = allow softer interpretations"
                   />
@@ -763,3 +763,5 @@ export default function LinguisticDecoderApp(){
     </div>
   );
 }
+
+    
