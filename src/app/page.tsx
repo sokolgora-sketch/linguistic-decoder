@@ -237,28 +237,15 @@ export default function LinguisticDecoderApp(){
               <p className="text-sm text-muted-foreground mt-1">
                 A tool for analyzing words with the Seven-Voices phonetic model.
               </p>
-
-              {/* Live status chips */}
-              <div className="flex flex-wrap gap-2 pt-2">
-                <span className="inline-flex items-center rounded-full border border-border/60 px-2.5 py-0.5 text-[11px] uppercase tracking-wide">
-                  <span className="opacity-70 mr-1">Mode:</span>
-                  <span className="font-semibold">
-                    {mode === "strict" ? "Strict" : "Open"}
-                  </span>
-                </span>
-
-                <span className="inline-flex items-center rounded-full border border-border/60 px-2.5 py-0.5 text-[11px] uppercase tracking-wide">
-                  <span className="opacity-70 mr-1">Profile:</span>
-                  <span className="font-semibold">{alphabetLabel}</span>
-                </span>
-
-                {useAi && (
-                  <span className="inline-flex items-center gap-1 rounded-full border border-accent/60 bg-accent/10 px-2.5 py-0.5 text-[11px] uppercase tracking-wide text-accent-foreground">
-                    <Sparkles className="w-3 h-3" />
-                    <span className="font-semibold">AI Mapper On</span>
-                  </span>
-                )}
-              </div>
+              {data && (
+                <p className="text-xs text-muted-foreground/80">
+                  <span className="font-code">engine={data.engineVersion}</span>
+                  <span className="mx-2">·</span>
+                  <span className="font-code">mode={data.mode}</span>
+                  <span className="mx-2">·</span>
+                  <span className="font-code">alphabet={data.alphabet}</span>
+                </p>
+              )}
             </div>
 
             <div className="flex items-center gap-2 pt-1">
@@ -527,20 +514,6 @@ export default function LinguisticDecoderApp(){
                 <CardDescription>
                   Primary and frontier paths, principles, and language candidates.
                 </CardDescription>
-                <div className="mt-3 flex flex-wrap items-center gap-2 text-[11px]">
-                  <span className="px-2 py-0.5 rounded-full border border-border/60 bg-muted/40">
-                    Mode: {data.mode === "strict" ? "Strict" : "Open"}
-                  </span>
-                  <span className="px-2 py-0.5 rounded-full border border-border/60">
-                    Alphabet: {data.alphabet}
-                  </span>
-                  {useAi && (
-                  <span className="px-2 py-0.5 rounded-full border border-border/60 flex items-center gap-1">
-                    <Sparkles className="w-3 h-3" />
-                    AI Mapper
-                  </span>
-                  )}
-                </div>
               </CardHeader>
               <CardContent className="space-y-4">
                 <ResultsDisplay analysis={data} />
