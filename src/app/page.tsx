@@ -63,11 +63,31 @@ export default function LinguisticDecoderApp(){
   // Debounce user input, then warm the cache in the background
   const debouncedWord = useDebounced(word, 450);
   useEffect(() => {
-    // This is a pre-fetch, so we don't handle errors here.
-    // analyzeClient is designed to be robust.
-    if (debouncedWord.trim()) {
-      analyzeClient(debouncedWord.trim(), mode, alphabet, { edgeWeight, useAi }).catch(() => {/* prefetch failed, do nothing */});
+    let cancelled = false;
+
+    async function warm() {
+      const w = debouncedWord.trim();
+      if (!w) {
+        if (!cancelled) setIsWarming(false);
+        return;
+      }
+  
+      if (!cancelled) setIsWarming(true);
+      try {
+        // Pre-fetch only; same options, no behavior change.
+        await analyzeClient(w, mode, alphabet, { edgeWeight, useAi });
+      } catch {
+        // ignore prefetch errors
+      } finally {
+        if (!cancelled) setIsWarming(false);
+      }
     }
+  
+    warm();
+  
+    return () => {
+      cancelled = true;
+    };
   }, [debouncedWord, mode, alphabet, edgeWeight, useAi]);
   
 
