@@ -225,7 +225,7 @@ export default function LinguisticDecoderApp(){
       : alphabet.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
 
   return (
-    <div className="min-h-screen bg-background text-foreground p-4 lg:p-8 flex flex-col items-stretch">
+    <div className="min-h-screen bg-background text-foreground p-4 lg:p-8 flex flex-col items-stretch transition-colors duration-300">
        <main className="max-w-5xl mx-auto w-full space-y-8 flex-1 animate-fade-in">
         {/* Header */}
         <header className="pb-4 border-b border-border/60">
