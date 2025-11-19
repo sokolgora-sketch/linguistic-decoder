@@ -334,6 +334,7 @@ export default function LinguisticDecoderApp(){
                 onChange={(e) => setWord(e.target.value)}
                 placeholder="Type a word…"
                 className="font-semibold text-lg flex-1"
+                autoFocus={!word}
               />
               <div className="flex gap-2">
                 <Button
