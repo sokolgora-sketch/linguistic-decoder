@@ -423,10 +423,11 @@ export default function LinguisticDecoderApp(){
                     checked={useAi}
                     onChange={(e) => setUseAi(e.target.checked)}
                     className="w-4 h-4 rounded border-border text-primary focus-visible:ring-2 focus-visible:ring-primary"
-                    title="Toggle AI-assisted language family mapping"
                   />
-                  <Sparkles className="inline-block w-4 h-4 text-accent-foreground" />
-                  AI Mapper
+                  <span className="inline-flex items-center gap-1.5">
+                    <Sparkles className="w-4 h-4 text-accent-foreground" />
+                    AI Mapper
+                  </span>
                 </label>
               </div>
             </div>
@@ -719,16 +720,3 @@ export default function LinguisticDecoderApp(){
     </div>
   );
 }
-
-    
-
-    
-
-    
-
-
-
-
-    
-
-    
