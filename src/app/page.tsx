@@ -105,19 +105,23 @@ export default function LinguisticDecoderApp(){
   
     setLoading(true);
     setErr(null);
-    // ❌ do NOT clear data here — keep the previous analysis on screen
-    // setData(null);
+    // ❌ do NOT clear data here – keep the previous result visible
+  
     try {
       const clientResponse = await analyzeClient(useWord, useMode, useAlphabet, { edgeWeight, useAi });
+      console.log("API result:", clientResponse);
+  
       const normalizedPayload = normalizeEnginePayload(clientResponse);
+      console.debug("Primary Path object:", normalizedPayload.primaryPath);
+  
+      // overwrite with the new clean payload
       setData(normalizedPayload);
     } catch (e: any) {
       const error = e?.message || "Request failed";
       logError({ where: "analyze", message: error, detail: { word: useWord, stack: e.stack } });
+      console.error("Analysis chain failed:", e);
       setErr(error);
-      // optional: you *can* decide whether to clear data on hard error or not.
-      // I’d leave the old result:
-      // setData(null);
+      setData(null);      // on real error, we still clear the result
     } finally {
       setLoading(false);
     }
