@@ -49,7 +49,7 @@ if (process.env.NEXT_PUBLIC_DEV_EVAL === "1") {
 // ==== Main App ===============================================================
 export default function LinguisticDecoderApp(){
   const { toast } = useToast();
-  const [word, setWord] = useState("study");
+  const [word, setWord] = useState("");
   const [mode, setMode] = useState<"strict"|"open">("strict");
   const [alphabet, setAlphabet] = useState<Alphabet>("auto");
   const [edgeWeight, setEdgeWeight] = useState(0.25);
@@ -750,3 +750,6 @@ export default function LinguisticDecoderApp(){
     
 
 
+
+
+    
