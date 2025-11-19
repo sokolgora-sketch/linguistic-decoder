@@ -98,6 +98,7 @@ export default function LinguisticDecoderApp(){
       toast({ variant: "destructive", title: "Too many requests", description: "Please try again in a few moments." }); 
       return; 
     }
+  
     const useWord = (nextWord ?? word).trim();
     const useMode: "strict"|"open" = nextMode ?? mode;
     const useAlphabet = nextAlphabet ?? alphabet;
@@ -724,4 +725,5 @@ export default function LinguisticDecoderApp(){
   );
 }
 
+    
     
