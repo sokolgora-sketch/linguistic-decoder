@@ -29,7 +29,7 @@ import { allowAnalyze } from "../lib/throttle";
 import WhyThisPath from "../components/WhyThisPath";
 import { ExportJsonButton } from "../components/ExportJsonButton";
 import { logError } from "../lib/logError";
-import { VOICE_COLOR_MAP } from "../shared/voiceColors";
+import { VOICE_COLOR_MAP, VOICE_LABEL_MAP } from "../shared/voiceColors";
 
 const VOICE_META: { id: Vowel; label: string; role: string }[] = [
   { id: "A", label: "Action / Truth", role: "Launches, cuts through, sets the first line." },
@@ -505,19 +505,17 @@ export default function LinguisticDecoderApp(){
                     <CardDescription>Color, role, and function in the matrix.</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <ul className="space-y-3 text-sm">
-                      {VOICE_META.map((v) => (
-                        <li key={v.id} className="flex items-center gap-3">
+                    <ul className="space-y-2 text-sm">
+                      {Object.entries(VOICE_COLOR_MAP).map(([voice, color]) => (
+                        <li key={voice} className="flex items-center gap-3">
                           <span
                             className="w-3 h-3 rounded-full shrink-0"
-                            style={{ backgroundColor: VOICE_COLOR_MAP[v.id] }}
+                            style={{ backgroundColor: color }}
                           />
                           <div className="flex flex-col leading-tight">
-                            <span className="font-semibold">
-                              {v.id} · {v.label}
-                            </span>
-                            <span className="text-[11px] text-muted-foreground">
-                              {v.role}
+                            <span className="font-bold text-sm">{voice}</span>
+                            <span className="text-xs text-muted-foreground">
+                              {VOICE_LABEL_MAP[voice as Vowel]}
                             </span>
                           </div>
                         </li>
