@@ -223,6 +223,13 @@ export default function LinguisticDecoderApp(){
 
   const signals = data?.signals ?? [];
   
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (canAnalyze) {
+      analyze();
+    }
+  }
+
   const alphabetLabel =
     alphabet === "auto"
       ? "Auto-Detect"
