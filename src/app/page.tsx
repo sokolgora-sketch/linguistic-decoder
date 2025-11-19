@@ -175,7 +175,7 @@ export default function LinguisticDecoderApp(){
     }
     setLoading(true);
     setErr(null);
-    setData(null);
+    // setData(null);
     try {
       const cacheRef = doc(db, "analyses", cacheId);
       const snap = await getDoc(cacheRef);
@@ -197,7 +197,7 @@ export default function LinguisticDecoderApp(){
 
   async function onRecompute(word: string, m?: string, a?: string) {
       setLoading(true);
-      setData(null);
+      // setData(null);
       setErr(null);
       try {
           const result = await analyzeClient(word, (m as any) || mode, (a as any) || alphabet, {
