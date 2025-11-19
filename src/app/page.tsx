@@ -454,7 +454,7 @@ export default function LinguisticDecoderApp(){
               <CardContent className="p-3 sm:p-4 space-y-3">
                 <TwoRailsWithConsonants
                   word={data?.word || word}
-                  path={(data?.primaryPath?.voicePath as Vowel[]) || []}
+                  path={loading ? [] : ((data?.primaryPath?.voicePath as Vowel[]) || [])}
                   running={loading}
                   playKey={`${data?.word}|${(data?.primaryPath?.voicePath || []).join("")}`}
                   height={320}
@@ -723,3 +723,5 @@ export default function LinguisticDecoderApp(){
     </div>
   );
 }
+
+    
