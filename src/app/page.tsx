@@ -98,6 +98,7 @@ export default function LinguisticDecoderApp(){
       toast({ variant: "destructive", title: "Too many requests", description: "Please try again in a few moments." }); 
       return; 
     }
+  
     const useWord = (nextWord ?? word).trim();
     const useMode: "strict"|"open" = nextMode ?? mode;
     const useAlphabet = nextAlphabet ?? alphabet;
@@ -105,23 +106,26 @@ export default function LinguisticDecoderApp(){
   
     setLoading(true);
     setErr(null);
-    // ❌ do NOT clear data here – keep the previous result visible
+    // ❌ DO NOT clear data here – we keep the previous result visible
   
     try {
+      // 1. Get raw result from API or cache
       const clientResponse = await analyzeClient(useWord, useMode, useAlphabet, { edgeWeight, useAi });
       console.log("API result:", clientResponse);
   
+      // 2. GUARANTEE the shape
       const normalizedPayload = normalizeEnginePayload(clientResponse);
       console.debug("Primary Path object:", normalizedPayload.primaryPath);
-  
-      // overwrite with the new clean payload
+      
+      // 3. Set state with the clean, final payload
       setData(normalizedPayload);
+  
     } catch (e: any) {
       const error = e?.message || "Request failed";
       logError({ where: "analyze", message: error, detail: { word: useWord, stack: e.stack } });
       console.error("Analysis chain failed:", e);
       setErr(error);
-      setData(null);      // on real error, we still clear the result
+      setData(null);  // ✅ only clear on real error
     } finally {
       setLoading(false);
     }
