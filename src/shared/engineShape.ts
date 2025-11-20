@@ -107,7 +107,15 @@ export type ConsonantSummary = {
 };
 
 
-// --- New analysis schema (on top of EnginePayload) ---
+// High-level semantic expectations about consonant behaviour for a candidate origin.
+export type ConsonantProfile =
+  | 'cut'        // split, break, attack
+  | 'carry'      // hold, bear, remain
+  | 'bind'       // join, tie, unify
+  | 'flow'       // move, wave, spread
+  | 'speak'      // voice, shout, declare
+  | 'build'      // make, form, construct
+  | 'none';      // neutral / not specified
 
 export type TensionLevel = 'low' | 'medium' | 'high';
 
@@ -217,6 +225,11 @@ export type Candidate = {
   fitTag?: 'strong' | 'medium' | 'weak';
   status: 'pass' | 'fail' | 'experimental' | 'deprecated';
   confidenceTag: 'solid' | 'speculative';
+
+  // Expected consonant semantics for this origin and whether the observed field agrees.
+  consonantProfile?: ConsonantProfile;
+  consonantProfileOk?: boolean;
+  consonantSignals?: string[]; // short human-readable notes, optional
 };
 
 export type AnalysisDebug = {
