@@ -1,6 +1,7 @@
 
 'use client';
 import type { LanguageFamily, Candidate, AnalysisResult } from '../shared/engineShape';
+import { Badge } from './ui/badge';
 import { Card } from './ui/card';
 
 export function Candidates({ items, analysis }: { items?: LanguageFamily[]; analysis?: AnalysisResult }) {
@@ -59,6 +60,25 @@ export function Candidates({ items, analysis }: { items?: LanguageFamily[]; anal
                  <p className="text-xs opacity-80 mt-1.5 pt-1.5 border-t">{c.decomposition.functionalStatement}</p>
               )}
 
+              {c.morphology && (
+                <div className="mt-2 text-xs text-muted-foreground">
+                  <div>
+                    <span className="font-semibold">Morphology:</span>{' '}
+                    root <span className="font-mono">{c.morphology.base}</span>
+                    {c.morphology.affixes.length > 0 && (
+                      <> + {c.morphology.affixes.join(', ')}</>
+                    )}
+                  </div>
+                  {c.morphology.wordSums.length > 0 && (
+                    <ul className="mt-1 list-disc list-inside">
+                      {c.morphology.wordSums.slice(0, 2).map((sum, idx) => (
+                        <li key={idx}>{sum}</li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              )}
+
               {c.principleSignals?.notes && c.principleSignals.notes.length > 0 && (
                 <div className="text-xs opacity-60 mt-1.5">
                   {c.principleSignals.notes.join(" · ")}
@@ -76,6 +96,11 @@ export function Candidates({ items, analysis }: { items?: LanguageFamily[]; anal
                         ${c.confidenceTag === 'solid' ? 'bg-blue-100 text-blue-800 border border-blue-200' : 'bg-gray-100 text-gray-800 border border-gray-200'}`}>
                             {c.confidenceTag}
                         </span>
+                    )}
+                    {c.fitTag && (
+                      <Badge variant="outline" className="ml-2">
+                        {c.fitTag}
+                      </Badge>
                     )}
                 </div>
               )}
