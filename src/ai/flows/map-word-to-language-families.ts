@@ -9,7 +9,7 @@
  * - MapWordToLanguageFamiliesOutput - The return type for the mapWordToLanguageFamilies function.
  */
 
-import {ai} from '@/ai/genkit';
+import {ai, MODELS} from '@/ai/genkit';
 import {z} from 'genkit';
 import { toMappingRecord, MappingRecord } from '@/lib/schemaAdapter';
 

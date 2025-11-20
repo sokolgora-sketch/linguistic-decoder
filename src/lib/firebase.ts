@@ -1,9 +1,10 @@
+
 // src/lib/firebase.ts
 import { initializeApp, getApps, type FirebaseApp } from "firebase/app";
 import { getFirestore, type Firestore } from "firebase/firestore";
 import { getAuth, signInAnonymously, onAuthStateChanged, type User, type Auth } from "firebase/auth";
 
-const isTest = process.env.NODE_ENV === 'test';
+const isTest = process.env.NODE_ENV === 'test' || process.env.IS_TEST_SCRIPT === 'true';
 
 // Use the server-side key for scripts/server-side, fall back to public key for client
 const apiKey = process.env.FIREBASE_SERVER_API_KEY || process.env.NEXT_PUBLIC_FB_API_KEY;
