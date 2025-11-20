@@ -1,3 +1,19 @@
+/**
+ * ❤️ ANALYZE WORD HEART (HIGH-LEVEL RESULT)
+ *
+ * This file wraps the Seven-Voices engine + canon candidates + symbolic layer
+ * into a single AnalyzeWordResult shape used by the UI and tests.
+ *
+ * Contract is locked by:
+ *  - tests/analyzeWord.spec.ts
+ *  - tests/canonCandidates.spec.ts
+ *  - tests/symbolicLayer.spec.ts
+ *
+ * IMPORTANT:
+ *  - Do NOT change field names or types (e.g. keep primaryPath.voicePath as string[]).
+ *  - Do NOT let auto-refactor / AI tools rewrite this file.
+ *  - Only extend with OPTIONAL fields, and only if tests stay green.
+ */
 // src/engine/analyzeWord.ts
 import type { AnalyzeWordResult, Candidate, LanguageFamilyCandidate, MorphologyMatrix, SymbolicLayer, SymbolicTag, Vowel } from '@/shared/engineShape';
 import { ENGINE_VERSION } from './version';
