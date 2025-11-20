@@ -1,7 +1,7 @@
 // tests/canonCandidates.spec.ts
 
 import { enginePayloadToAnalysisResult } from '@/shared/analysisAdapter';
-import type { EnginePayload } from '@/shared/engineShape';
+import type { EnginePayload, Candidate } from '@/shared/engineShape';
 
 describe('Canonical Candidate Adapter', () => {
   const basePayload: Omit<EnginePayload, 'word'> = {
@@ -24,7 +24,7 @@ describe('Canonical Candidate Adapter', () => {
     edgeWindows: ["prefix 's' -> SibilantFricative"]
   };
 
-  test('it returns canonical candidates for "study" with consonant profiles and axes', () => {
+  it('it returns canonical candidates for "study" with consonant profiles and axes', () => {
     const payload: EnginePayload = {
       ...basePayload,
       word: 'study',
@@ -53,7 +53,20 @@ describe('Canonical Candidate Adapter', () => {
     }
   });
 
-  test('it returns canonical candidates for "damage" with consonant profiles and axes', () => {
+  it('study has a morphology matrix for Latin and Albanian', () => {
+    const payload: EnginePayload = { ...basePayload, word: 'study' };
+    const result = enginePayloadToAnalysisResult(payload);
+    
+    const langs = result.candidates.reduce(
+      (acc, c) => ({ ...acc, [c.language]: c }),
+      {} as Record<string, Candidate>
+    );
+  
+    expect(langs['latin'].morphologyMatrix?.pivot).toBe('stud');
+    expect(langs['albanian'].morphologyMatrix?.pivot).toBe("s'tu");
+  });
+
+  it('it returns canonical candidates for "damage" with consonant profiles and axes', () => {
     const payload: EnginePayload = {
       ...basePayload,
       word: 'damage',
@@ -93,7 +106,7 @@ describe('Canonical Candidate Adapter', () => {
     }
   });
 
-  test('it falls back to placeholder candidates for other words', () => {
+  it('it falls back to placeholder candidates for other words', () => {
     const payload: EnginePayload = {
       ...basePayload,
       word: 'unknownword',
