@@ -165,6 +165,11 @@ export const CANON_CANDIDATES: Record<string, Candidate[]> = {
       consonantSignals: [
         "Plosive + Nasal pattern (d + m) around outer rings matches 'cut that leaves a harmed state'.",
       ],
+      axes: {
+        principles: 'pass',
+        morphology: 'pass',
+        consonants: 'pass',
+      },
     },
     {
       id: 'alb_damage_01',
@@ -218,6 +223,11 @@ export const CANON_CANDIDATES: Record<string, Candidate[]> = {
       consonantSignals: [
         "Same Plosive + Nasal pattern supports 'harm / loss that remains as a condition'.",
       ],
+      axes: {
+        principles: 'pass',
+        morphology: 'pass',
+        consonants: 'pass',
+      },
     },
   ],
 };
