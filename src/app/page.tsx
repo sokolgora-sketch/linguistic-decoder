@@ -33,6 +33,7 @@ import { logError } from "../lib/logError";
 import { VOICE_COLOR_MAP, VOICE_LABEL_MAP } from "../shared/voiceColors";
 import { SymbolicReadingCard } from "@/components/SymbolicReadingCard";
 
+
 const VOICE_META: { id: Vowel; label: string; role: string }[] = [
   { id: "A", label: "Action / Truth", role: "Launches, cuts through, sets the first line." },
   { id: "E", label: "Expansion / Bridge", role: "Opens, connects, stretches what A starts." },
@@ -517,7 +518,7 @@ export default function LinguisticDecoderApp(){
               <CardContent className="space-y-4">
                 <ResultsDisplay analysis={data} />
                 <div className="flex justify-end pt-2">
-                  <ExportJsonButton analysis={data as any} />
+                  <ExportJsonButton analysis={data} />
                 </div>
               </CardContent>
             </Card>
