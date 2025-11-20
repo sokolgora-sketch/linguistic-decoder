@@ -1,3 +1,15 @@
+/**
+ * 🧩 ANALYSIS ADAPTER
+ *
+ * Bridges raw engine payload → UI / test-friendly structure.
+ * Canon tests depend on this file:
+ *  - tests/canonCandidates.spec.ts
+ *
+ * IMPORTANT:
+ *  - Do NOT remove or rename existing fields expected by tests.
+ *  - Do NOT let auto-refactor / AI tools delete or inline this file.
+ *  - If you change how something is mapped, re-run Jest and keep all suites green.
+ */
 // src/shared/analysisAdapter.ts
 
 import type {
