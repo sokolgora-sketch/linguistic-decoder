@@ -251,6 +251,22 @@ export type AnalysisDebug = {
   rawEnginePayload?: EnginePayload;
 };
 
+export type PrincipleName =
+  | 'Truth'
+  | 'Expansion'
+  | 'Insight'
+  | 'Balance'
+  | 'Unity'
+  | 'Network Integrity'
+  | 'Evolution';
+
+export type SevenVoicesSummary = {
+  voicePath: Vowel[];              // e.g. ['U', 'I']
+  principlesPath: PrincipleName[]; // e.g. ['Unity', 'Insight']
+  dominant: PrincipleName[];       // sorted by frequency, e.g. ['Insight', 'Unity']
+  sevenWords: string[];            // 7-word sentence in principle order
+};
+
 export type AnalysisResult = {
   core: AnalysisCore;
   // NEW: word-level consonant behaviour, shared by all candidates.
@@ -260,4 +276,5 @@ export type AnalysisResult = {
   };
   candidates: Candidate[];
   debug?: AnalysisDebug;
+  sevenVoices?: SevenVoicesSummary;
 };
