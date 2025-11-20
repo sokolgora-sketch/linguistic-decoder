@@ -390,7 +390,7 @@ export const CANON_CANDIDATES: Record<string, Candidate[]> = {
         decomposition: {
             parts: [
                 { role: 'action', form: 'am-', gloss: 'love, fondness' },
-                { role: 'unit', form: '-or', gloss: 'agent/bearer of quality' },
+                { role: 'unit', form: 'or', gloss: 'agent/bearer of quality' },
             ],
             functionalStatement: 'One who carries or embodies love.',
         },
