@@ -15,6 +15,7 @@ import type {
   Candidate,
   TensionLevel,
   ConsonantProfile,
+  SymbolicLayer,
 } from './engineShape';
 import { CANON_CANDIDATES } from './canonCandidates';
 import { buildConsonantField } from './consonantField';
@@ -88,7 +89,7 @@ function estimateTension(primaryPath: EnginePath): TensionLevel {
   return 'high';
 }
 
-export function enginePayloadToAnalysisResult(payload: EnginePayload): AnalysisResult {
+export function enginePayloadToAnalysisResult(payload: EnginePayload & { symbolic?: SymbolicLayer }): AnalysisResult {
   const normalized = normalizeWord(payload.word);
 
   const lg = guessLanguageFromFamilies(payload.languageFamilies);
@@ -191,6 +192,7 @@ export function enginePayloadToAnalysisResult(payload: EnginePayload): AnalysisR
     },
     candidates,
     debug,
+    symbolic: payload.symbolic,
   };
 
   return result;

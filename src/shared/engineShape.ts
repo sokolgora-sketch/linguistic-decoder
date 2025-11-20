@@ -293,6 +293,12 @@ export type SevenVoicesSummary = {
   sevenWords: string[];            // 7-word sentence in principle order
 };
 
+// placeholder for Petro Zheji layer; we’ll fill later
+export interface SymbolicLayer {
+  notes: string[];
+  label?: string; // e.g. "Zheji-inspired symbolic reading (experimental)"
+}
+
 export type AnalysisResult = {
   core: AnalysisCore;
   // NEW: word-level consonant behaviour, shared by all candidates.
@@ -303,4 +309,5 @@ export type AnalysisResult = {
   candidates: Candidate[];
   debug?: AnalysisDebug;
   sevenVoices?: SevenVoicesSummary;
+  symbolic?: SymbolicLayer;
 };

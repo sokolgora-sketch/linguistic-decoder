@@ -31,6 +31,7 @@ import WhyThisPath from "../components/WhyThisPath";
 import { ExportJsonButton } from "../components/ExportJsonButton";
 import { logError } from "../lib/logError";
 import { VOICE_COLOR_MAP, VOICE_LABEL_MAP } from "../shared/voiceColors";
+import { SymbolicReadingCard } from "@/components/SymbolicReadingCard";
 
 const VOICE_META: { id: Vowel; label: string; role: string }[] = [
   { id: "A", label: "Action / Truth", role: "Launches, cuts through, sets the first line." },
@@ -564,6 +565,7 @@ export default function LinguisticDecoderApp(){
                 </div>
                 <WhyThisPath primary={data.primaryPath} />
                 <PrinciplesBlock analysis={data.analysis} />
+                {data.analysis.symbolic && <SymbolicReadingCard symbolic={data.analysis.symbolic} />}
               </CardContent>
             </Card>
           )}
@@ -756,5 +758,3 @@ export default function LinguisticDecoderApp(){
     </div>
   );
 }
-
-    

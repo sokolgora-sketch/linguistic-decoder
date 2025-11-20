@@ -5,6 +5,7 @@
 // These are assumed to exist based on your instructions.
 // You will need to replace these with your actual implementations.
 import { ENGINE_VERSION } from './version';
+import { SymbolicLayer } from '@/shared/engineShape';
 
 // Mock implementation for placeholder functions
 const analyzeSevenVoices = (word: string): any => ({
@@ -66,12 +67,6 @@ export interface FrontierPath {
   keeps: number;
   levelPath: Array<'Low' | 'Mid' | 'High'>;
   ringPath: number[];
-}
-
-// placeholder for Petro Zheji layer; we’ll fill later
-export interface SymbolicLayer {
-  notes: string[];
-  label?: string; // e.g. "Zheji-inspired symbolic reading (experimental)"
 }
 
 export interface AnalyzeWordResponse {
