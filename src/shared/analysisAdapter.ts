@@ -15,8 +15,13 @@ import type {
   Candidate,
   TensionLevel,
   MorphologyEvidence,
+  ConsonantField,
+  ConsonantSummary,
+  ConsonantArchetype,
+  ConsonantSlot,
 } from './engineShape';
 import { CANON_CANDIDATES } from './canonCandidates';
+import { VOWELS } from '@/functions/sevenVoicesCore';
 
 // --- Helper Functions ---
 
@@ -67,12 +72,9 @@ function countVoices(voices: Vowel[]): Record<string, number> {
 }
 
 function mapLevels(levelPath: number[]): ('high' | 'mid' | 'low')[] {
-  // if n >= 2 → 'high'
-  // if n === 1 → 'mid'
-  // else → 'low'.
   return levelPath.map(n => {
-    if (n >= 2) return 'high';
-    if (n === 1) return 'mid';
+    if (n >= 1) return 'high';
+    if (n === 0) return 'mid';
     return 'low';
   });
 }
@@ -90,12 +92,79 @@ function estimateTension(primaryPath: EnginePath): TensionLevel {
   return 'high';
 }
 
+// --- Consonant Field Builder ---
+
+const ARCHETYPES: ConsonantArchetype[] = ['Plosive', 'Affricate', 'SibilantFric', 'NonSibilantFric', 'Nasal', 'LiquidGlide'];
+
+function buildConsonantField(payload: EnginePayload): { field: ConsonantField; summary: ConsonantSummary } {
+    const { primaryPath, windows = [], windowClasses = [], edgeWindows = [] } = payload;
+    const { voicePath, ringPath } = primaryPath;
+    
+    // Initialize 42 slots
+    const slots = VOWELS.flatMap(vowel => 
+        ARCHETYPES.map(archetype => ({ vowel, archetype, smooth: 0, spiky: 0 }))
+    ) as ConsonantSlot[];
+    const slotMap = new Map<string, ConsonantSlot>();
+    slots.forEach(s => slotMap.set(`${s.vowel}:${s.archetype}`, s));
+
+    let smoothHits = 0;
+    let spikyHits = 0;
+
+    // Placeholder logic for consonant class preferences (replace with manifest later)
+    const PREF: Record<string, [number, number]> = {
+        Plosive: [2, 3], Affricate: [1, 2], SibilantFric: [1, 2],
+        NonSibilantFric: [1, 1], Nasal: [0, 1], LiquidGlide: [0, 1]
+    };
+
+    // Process interior windows
+    for (let i = 0; i < voicePath.length - 1; i++) {
+        const arch = windowClasses[i] as ConsonantArchetype;
+        if (!arch) continue;
+        
+        const delta = Math.abs(ringPath[i+1] - ringPath[i]);
+        const [lo, hi] = PREF[arch] ?? [0, 3];
+        const vowel = voicePath[i];
+        
+        const key = `${vowel}:${arch}`;
+        const slot = slotMap.get(key);
+        if (!slot) continue;
+
+        if (delta >= lo && delta <= hi) {
+            slot.smooth++;
+            smoothHits++;
+        } else {
+            slot.spiky++;
+            spikyHits++;
+        }
+    }
+
+    const field: ConsonantField = {
+        smoothHits,
+        spikyHits,
+        slots,
+        hasConflict: (smoothHits + spikyHits > 0) && (smoothHits / (smoothHits + spikyHits)) < 0.4 && spikyHits > 0,
+    };
+
+    const summary: ConsonantSummary = {
+        smoothRatio: (smoothHits + spikyHits > 0) ? smoothHits / (smoothHits + spikyHits) : 0,
+        dominantArchetypes: [...ARCHETYPES].sort((a, b) => {
+            const scoreA = (slotMap.get(`${voicePath[0]}:${a}`)?.smooth ?? 0) - (slotMap.get(`${voicePath[0]}:${a}`)?.spiky ?? 0);
+            const scoreB = (slotMap.get(`${voicePath[0]}:${b}`)?.smooth ?? 0) - (slotMap.get(`${voicePath[0]}:${b}`)?.spiky ?? 0);
+            return scoreB - scoreA;
+        }).slice(0, 3).filter(arch => {
+            const slot = slots.find(s => s.archetype === arch);
+            return (slot?.smooth ?? 0) + (slot?.spiky ?? 0) > 0;
+        }),
+        notes: [],
+    };
+
+    return { field, summary };
+}
+
 export function enginePayloadToAnalysisResult(payload: EnginePayload): AnalysisResult {
   const normalized = normalizeWord(payload.word);
 
-  // 1) Input / language guess
   const lg = guessLanguageFromFamilies(payload.languageFamilies);
-
   const inputCore: AnalysisCoreInput = {
     raw: payload.word,
     normalized,
@@ -106,10 +175,8 @@ export function enginePayloadToAnalysisResult(payload: EnginePayload): AnalysisR
     mode: mapMode(payload.mode)
   };
 
-  // 2) Voices from primaryPath
   const primary = payload.primaryPath;
   const levelPath = mapLevels(primary.levelPath ?? []);
-
   const voicesCore: AnalysisCoreVoices = {
     vowelVoices: primary.voicePath,
     ringPath: primary.ringPath,
@@ -117,23 +184,17 @@ export function enginePayloadToAnalysisResult(payload: EnginePayload): AnalysisR
     dominantVoices: countVoices(primary.voicePath)
   };
 
-  // 3) Consonants from windows / windowClasses (placeholder harmony)
   const clusters = (payload.windows || []).map((w, idx) => ({
     cluster: w,
     classes: [payload.windowClasses?.[idx] ?? 'unknown'],
     orbitSlots: [],
     harmonyScore: 0.5
   }));
-
   const consonantsCore: AnalysisConsonants = {
     clusters,
-    overallHarmony: {
-      byVoice: {},
-      globalHarmonyScore: 0.5
-    }
+    overallHarmony: { byVoice: {}, globalHarmonyScore: 0.5 }
   };
 
-  // 4) Heart paths summary
   const heartPathsCore: AnalysisHeartPaths = {
     primary: {
       voiceSequence: primary.voicePath,
@@ -152,64 +213,52 @@ export function enginePayloadToAnalysisResult(payload: EnginePayload): AnalysisR
     heartPaths: heartPathsCore
   };
 
-  // 5) Map languageFamilies -> experimental candidates (placeholder)
-  let candidates: Candidate[];
+  const { field: consonantField, summary: consonantSummary } = buildConsonantField(payload);
 
+  let candidates: Candidate[];
   const normalizedWord = normalized;
 
   const canonFactory = CANON_CANDIDATES[normalizedWord];
   if (canonFactory) {
     candidates = canonFactory(payload);
   } else {
-    candidates = (payload.languageFamilies ?? []).map((lf, idx) => {
-      return {
-        id: `family_${lf.familyId}_${idx}`,
-        language: lf.familyId,
-        family: lf.familyId,
-        form: payload.word,
-        decomposition: {
-          parts: [],
-          functionalStatement: lf.rationale || ''
-        },
-        voices: {
-          voiceSequence: primary.voicePath,
-          ringPath: primary.ringPath,
-          dominantVoices: countVoices(primary.voicePath)
-        },
-        ruleChecks: {
-          soundPathOk: true,
-          functionalDecompOk: false, // no real decomposition yet
-          sevenVoicesAlignmentOk: true,
-          consonantMeaningOk: true,
-          harmonyOk: true
-        },
-        principleSignals: {
-          truthOk: true,
-          expansionOk: true,
-          insightOk: true,
-          balanceOk: true,
-          unityOk: true,
-          networkIntegrityOk: true,
-          evolutionOk: true,
-          notes: [
-            'Placeholder candidate generated from languageFamilies; no real origin decomposition yet.'
-          ]
-        },
-        status: 'experimental',
-        confidenceTag: 'speculative'
-      };
-    });
+    candidates = (payload.languageFamilies ?? []).map((lf, idx) => ({
+      id: `family_${lf.familyId}_${idx}`,
+      language: lf.familyId,
+      family: lf.familyId,
+      form: payload.word,
+      decomposition: {
+        parts: [],
+        functionalStatement: lf.rationale || ''
+      },
+      voices: {
+        voiceSequence: primary.voicePath,
+        ringPath: primary.ringPath,
+        dominantVoices: countVoices(primary.voicePath)
+      },
+      ruleChecks: {
+        soundPathOk: true, functionalDecompOk: false, sevenVoicesAlignmentOk: true,
+        consonantMeaningOk: true, harmonyOk: true,
+      },
+      principleSignals: {
+        truthOk: true, expansionOk: true, insightOk: true, balanceOk: true,
+        unityOk: true, networkIntegrityOk: true, evolutionOk: true,
+        notes: ['Placeholder candidate generated from languageFamilies; no real origin decomposition yet.'],
+      },
+      status: 'experimental',
+      confidenceTag: 'speculative'
+    }));
   }
 
   const debug = {
     rawEnginePayload: payload,
     signals: payload.signals ?? [],
-    edgeWindows: payload.edgeWindows ?? []
+    edgeWindows: payload.edgeWindows ?? [],
+    consonants: {
+      field: consonantField,
+      summary: consonantSummary,
+    }
   };
 
-  return {
-    core,
-    candidates,
-    debug
-  };
+  return { core, candidates, debug };
 }

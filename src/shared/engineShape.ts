@@ -1,3 +1,4 @@
+
 // Canonical shape your UI will use everywhere.
 export type Vowel = 'A'|'E'|'I'|'O'|'U'|'Y'|'Ë';
 
@@ -134,18 +135,56 @@ export type AnalysisCore = {
 };
 
 export type MorphologyEvidence = {
-  base: string;          // core root, e.g. "stud", "dam", "dëm"
-  affixes: string[];     // affixes/suffixes/prefixes involved
-  wordSums: string[];    // matrix-style word sums as text, e.g. "stud + ium → studium (study)"
-  notes?: string[];      // short comments
+  base: string;
+  affixes: string[];
+  wordSums: string[];
+  notes?: string[];
 };
+
+// --- Consonant Layer ---
+export type ConsonantArchetype =
+  | 'Plosive'
+  | 'Affricate'
+  | 'SibilantFric'
+  | 'NonSibilantFric'
+  | 'Nasal'
+  | 'LiquidGlide'; // NOTE: V1: combines Liquids (l,r) and Glides (w,y); may split later
+
+export type ConsonantSlot = {
+  vowel: Vowel;
+  archetype: ConsonantArchetype;
+  smooth: number;
+  spiky: number;
+};
+
+export type ConsonantField = {
+  smoothHits: number;
+  spikyHits: number;
+  slots: ConsonantSlot[];
+  hasConflict?: boolean;
+};
+
+export type ConsonantSummary = {
+  smoothRatio: number;
+  dominantArchetypes: ConsonantArchetype[];
+  notes?: string[];
+};
+
+export type ConsonantProfile =
+  | 'cut'
+  | 'carry'
+  | 'bind'
+  | 'flow'
+  | 'speak'
+  | 'build'
+  | 'none';
 
 // Candidate-level origin entry (per language/form)
 export type Candidate = {
   id: string;
-  language: string;            // e.g. "latin", "albanian"
-  family: string;              // same as language family for now
-  form: string;                // origin form (we can use the input word as placeholder)
+  language: string;
+  family: string;
+  form: string;
 
   decomposition: {
     parts: {
@@ -182,16 +221,21 @@ export type Candidate = {
   };
 
   morphology?: MorphologyEvidence;
-
-  status: 'pass' | 'experimental';
-  confidenceTag?: 'solid' | 'speculative';
   fitTag?: 'strong' | 'medium' | 'weak';
+
+  consonantProfiles?: ConsonantProfile[];
+  consonantProfileOk?: boolean;
+  consonantSignals?: string[];
 };
 
 export type AnalysisDebug = {
   rawEnginePayload?: EnginePayload;
   signals?: string[];
   edgeWindows?: string[];
+  consonants?: {
+    field: ConsonantField;
+    summary: ConsonantSummary;
+  };
 };
 
 export type AnalysisResult = {

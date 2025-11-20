@@ -7,7 +7,6 @@ import { Card } from './ui/card';
 export function Candidates({ items, analysis }: { items?: LanguageFamily[]; analysis?: AnalysisResult }) {
   const fromAnalysis = analysis?.candidates ?? [];
   
-  // Fallback for older data shape or when candidates are not generated
   const fromFamilies =
     (items ?? []).map((lf, idx) => ({
       id: `family_${lf.familyId}_${idx}`,
@@ -21,7 +20,6 @@ export function Candidates({ items, analysis }: { items?: LanguageFamily[]; anal
       status: 'experimental',
       confidenceTag: lf.confidence >= 0.66 ? 'solid' : 'speculative',
       dialect: lf.dialect,
-      // map confidence back for display
       _confidence: lf.confidence,
     })) as Partial<Candidate>[];
 
@@ -79,9 +77,9 @@ export function Candidates({ items, analysis }: { items?: LanguageFamily[]; anal
                 </div>
               )}
 
-              {c.principleSignals?.notes && c.principleSignals.notes.length > 0 && (
+              {c.consonantSignals && c.consonantSignals.length > 0 && (
                 <div className="text-xs opacity-60 mt-1.5">
-                  {c.principleSignals.notes.join(" · ")}
+                  {c.consonantSignals.join(" · ")}
                 </div>
               )}
 
