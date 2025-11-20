@@ -1,18 +1,22 @@
 // src/components/PrinciplesBlock.tsx
 "use client";
 
-import type { AnalysisResult } from "@/shared/engineShape";
+import type { AnalysisResult, SevenVoicesSummary } from "@/shared/engineShape";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 
 type PrinciplesBlockProps = {
   analysis: AnalysisResult;
 };
 
+function hasData(sv: SevenVoicesSummary | undefined): sv is SevenVoicesSummary {
+    return !!sv && Array.isArray(sv.principlesPath) && sv.principlesPath.length > 0;
+}
+
+
 export function PrinciplesBlock({ analysis }: PrinciplesBlockProps) {
   const sv = analysis.sevenVoices;
-  const primary = analysis.core.input; // Corresponds to engine.primaryPath in spirit
 
-  if (!sv) {
+  if (!hasData(sv)) {
     return (
       <Card>
         <CardHeader>
