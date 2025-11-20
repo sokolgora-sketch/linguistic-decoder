@@ -1,8 +1,7 @@
-
 // src/shared/engineShape.ts
 
 // Canonical shape your UI will use everywhere.
-export type Vowel = 'A'|'E'|'I'|'O'|'U'|'Y'|'Ë';
+export type Vowel = 'A' | 'E' | 'I' | 'O' | 'U' | 'Y' | 'Ë';
 
 export type SymbolicAxis =
   | 'love'
@@ -22,8 +21,16 @@ export interface SymbolicTag {
 export interface MorphologyMatrix {
   pivot: string;
   meaning: string;
-  morphemes: Morpheme[];
-  wordSums: WordSum[];
+  morphemes: {
+    form: string;
+    role: 'root' | 'prefix' | 'suffix';
+    gloss?: string;
+  }[];
+  wordSums: {
+    parts: string[];
+    result: string;
+    gloss?: string;
+  }[];
 }
 
 export interface LanguageFamilyCandidate {
@@ -33,9 +40,11 @@ export interface LanguageFamilyCandidate {
   passes: boolean;
   experimental?: boolean;
   speculative?: boolean;
+
   voicePath: string;
   levelPath: string;
   ringPath: string;
+
   morphologyMatrix?: MorphologyMatrix;
   symbolic?: SymbolicTag[];
 }
@@ -43,18 +52,22 @@ export interface LanguageFamilyCandidate {
 export interface AnalyzeWordResult {
   word: string;
   sanitized: string;
+
   primaryPath: {
     voicePath: string;
     levelPath: string;
     ringPath: string;
   };
+
   frontier: {
     id: string;
     voicePath: string;
     levelPath: string;
     ringPath: string;
   }[];
+
   languageFamilies: LanguageFamilyCandidate[];
+
   meta: {
     engineVersion: string;
     createdAt: string;
@@ -265,6 +278,7 @@ export type Candidate = {
   
   // Optional morphology matrix for structured word-sum data.
   morphologyMatrix?: MorphologyMatrix;
+  symbolic?: SymbolicTag[];
 };
 
 // High-level consonant behaviour classes used for the 42-slot field.
@@ -357,7 +371,7 @@ export interface SymbolicLayer {
   label?: string; // e.g. "Zheji-inspired symbolic reading (experimental)"
 }
 
-export type AnalysisResult = {
+export type AnalysisResult_DEPRECATED = {
   core: AnalysisCore;
   // NEW: word-level consonant behaviour, shared by all candidates.
   consonants?: {

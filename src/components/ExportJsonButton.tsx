@@ -3,16 +3,16 @@
 "use client";
 
 import { Button } from "./ui/button";
-import type { EnginePayload, AnalysisResult } from "../shared/engineShape";
+import type { EnginePayload, AnalyzeWordResult } from "../shared/engineShape";
 
 type ExportJsonButtonProps = {
-  analysis: EnginePayload & { analysis?: AnalysisResult };
+  analysis: AnalyzeWordResult;
 };
 
 export function ExportJsonButton({ analysis }: ExportJsonButtonProps) {
   const handleExport = () => {
     // Export the rich AnalysisResult if it exists, otherwise fall back to the base payload.
-    const exportData = analysis.analysis ?? analysis;
+    const exportData = analysis;
     const json = JSON.stringify(exportData, null, 2);
 
     const blob = new Blob([json], { type: "application/json" });
@@ -20,7 +20,7 @@ export function ExportJsonButton({ analysis }: ExportJsonButtonProps) {
 
     // make a simple, safe filename: analysis-<word>-<version>.json
     const safeWord = (analysis.word || "").replace(/\s+/g, "_");
-    const version = analysis.engineVersion || "dev";
+    const version = analysis.meta.engineVersion || "dev";
     const fileName = `analysis-${safeWord}-${version}.json`;
 
     const a = document.createElement("a");

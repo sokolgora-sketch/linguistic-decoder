@@ -4,12 +4,13 @@ import React, { useMemo } from "react";
 import { Card } from "./ui/card";
 import type { CClass } from "../functions/languages";
 import { classRange } from "../functions/languages";
-import type { AnalyzeWordResult, LanguageFamilyCandidate } from "../shared/engineShape";
+import type { AnalyzeWordResult, LanguageFamilyCandidate, Vowel } from "../shared/engineShape";
 import { getVoiceMeta } from '@/shared/sevenVoices';
 import WhyThisPath from "./WhyThisPath";
 import { VOICE_COLOR_MAP } from "../shared/voiceColors";
 import { Candidates } from "./Candidates";
 import { PrinciplesBlock } from "./PrinciplesBlock";
+import { SymbolicReadingCard } from "./SymbolicReadingCard";
 
 
 const LEVEL_LABEL: Record<number, string> = { 1: "High", 0: "Mid", [-1]: "Low" } as any;
@@ -123,7 +124,7 @@ function InfoLine({label, value, mono}:{label:string; value:string; mono?:boolea
 }
 
 export function ResultsDisplay({ analysis: data }: { analysis: AnalyzeWordResult }) {
-    const { primaryPath, frontier, languageFamilies } = data;
+    const { primaryPath, frontier, languageFamilies, symbolic } = data;
 
     if (!primaryPath) return null;
     
@@ -132,6 +133,9 @@ export function ResultsDisplay({ analysis: data }: { analysis: AnalyzeWordResult
             <PathRow block={primaryPath} title="Primary Path" analysis={data} />
             
             <Candidates items={languageFamilies} />
+            
+            {symbolic && <SymbolicReadingCard symbolic={symbolic} />}
+
 
             {frontier.length > 0 && (
               <Card className="p-4 mt-4">

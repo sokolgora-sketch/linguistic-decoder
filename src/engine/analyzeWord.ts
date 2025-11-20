@@ -1,11 +1,10 @@
 // src/engine/analyzeWord.ts
-import type { AnalyzeWordResult } from '@/shared/engineShape';
+import type { AnalyzeWordResult, Candidate, MorphologyMatrix, SymbolicLayer, SymbolicTag, Vowel } from '@/shared/engineShape';
 import { ENGINE_VERSION } from './version';
 import { solveWord } from '@/functions/sevenVoicesCore';
-import { enginePayloadToAnalysisResult } from '@/shared/analysisAdapter';
 import { getManifest } from './manifest';
-import type { Alphabet } from '@/lib/runAnalysis';
 import type { SolveOptions } from '@/functions/sevenVoicesCore';
+import { CANON_CANDIDATES } from '@/shared/canonCandidates';
 
 function runSevenVoices(word: string, opts: { mode: 'strict' | 'explore' }): any {
   const manifest = getManifest();
@@ -22,76 +21,114 @@ function runSevenVoices(word: string, opts: { mode: 'strict' | 'explore' }): any
     edgeWeight: manifest.edgeWeight,
   };
 
+  // This part is tricky. The old system was very different.
+  // We'll call solveWord and then try to adapt it to a partial AnalysisResult.
+  // The canon candidates will be attached later.
   const analysis = solveWord(word, solveOpts, 'auto');
-  const result = enginePayloadToAnalysisResult({
-    ...analysis,
+  
+  // A simplified adaptation for the pipeline
+  return {
     word: word,
-    mode: opts.mode === 'strict' ? 'strict' : 'open',
-    alphabet: 'auto',
-    engineVersion: ENGINE_VERSION,
-  });
-
-  return result;
+    sanitized: word.toLowerCase().replace(/[^a-zë]/g, ''),
+    primaryPath: analysis.primaryPath,
+    frontier: analysis.frontierPaths,
+    languageFamilies: [], // will be populated by canon candidates
+    meta: {
+        engineVersion: ENGINE_VERSION,
+        createdAt: new Date().toISOString(),
+        mode: opts.mode,
+    },
+    // For later pipeline steps
+    rawPayload: analysis,
+  };
 }
 
 function attachCanonCandidates(base: any): any {
-  // This logic is already handled inside enginePayloadToAnalysisResult,
-  // which is called by runSevenVoices. So this is a pass-through.
-  return base;
+    const word = base.word.toLowerCase();
+    const canon = CANON_CANDIDATES[word] || [];
+    
+    // This is a simplified mapping to the new LanguageFamilyCandidate shape
+    const candidates = canon.map((c: Candidate): LanguageFamilyCandidate => ({
+        language: c.language,
+        form: c.form,
+        gloss: c.decomposition.functionalStatement,
+        passes: c.status === 'pass',
+        experimental: c.status === 'experimental',
+        speculative: c.confidenceTag === 'speculative',
+        voicePath: (c.voices.voiceSequence || []).join(' → '),
+        levelPath: 'N/A',
+        ringPath: (c.voices.ringPath || []).join(' → '),
+        morphologyMatrix: c.morphologyMatrix ? {
+            pivot: c.morphologyMatrix.pivot,
+            meaning: c.morphologyMatrix.meaning, // Use 'meaning' instead of 'gloss'
+            morphemes: c.morphologyMatrix.morphemes.map(m => ({ form: m.form, role: m.role, gloss: m.gloss })),
+            wordSums: c.morphologyMatrix.wordSums.map(ws => `${ws.parts.join(' + ')} → ${ws.result}${ws.gloss ? ` — ${ws.gloss}` : ''}`),
+        } : undefined,
+        symbolic: c.symbolic,
+    }));
+
+    return { ...base, languageFamilies: candidates };
 }
 function attachMorphology(base: any): any {
-  // This logic is also handled inside enginePayloadToAnalysisResult
-  // via the canon candidates. Pass-through.
+  // Logic is now inside attachCanonCandidates for simplicity. This is a pass-through.
   return base;
 }
-function attachSymbolicLayer(base: any): any {
-  // This is also handled inside enginePayloadToAnalysisResult
-  return base;
+
+function buildSymbolicLayer(base: any): SymbolicLayer | undefined {
+    // This logic is also now handled within the candidate mapping.
+    // We can extract it here if needed, but for now, it's simpler to keep it there.
+    const notes: string[] = [];
+    base.languageFamilies.forEach((candidate: LanguageFamilyCandidate) => {
+        if (candidate.symbolic) {
+            candidate.symbolic.forEach(tag => notes.push(tag.note));
+        }
+    });
+
+    if (notes.length > 0) {
+        return {
+            notes: notes,
+            label: 'Zheji-inspired symbolic reading (experimental)',
+        };
+    }
+    return undefined;
 }
+
 
 export function analyzeWord(word: string, mode: 'strict' | 'explore' = 'strict'): AnalyzeWordResult {
   const base = runSevenVoices(word, { mode });
   const withCanon = attachCanonCandidates(base);
   const withMorph = attachMorphology(withCanon);
-  const withSymbols = attachSymbolicLayer(withMorph);
+  const symbolic = buildSymbolicLayer(withCanon);
 
   const join = (arr: any[]) => (arr || []).join(' → ');
 
   const result: AnalyzeWordResult = {
     word: word,
-    sanitized: withSymbols.core.input.normalized,
+    sanitized: withCanon.sanitized,
 
     primaryPath: {
-      voicePath: join(withSymbols.core.voices.vowelVoices),
-      levelPath: join(withSymbols.core.voices.levelPath),
-      ringPath: join(withSymbols.core.voices.ringPath),
+      voicePath: join(withCanon.primaryPath.voicePath),
+      levelPath: join(withCanon.primaryPath.levelPath.map((l: number) => l === 1 ? 'high' : l === 0 ? 'mid' : 'low')),
+      ringPath: join(withCanon.primaryPath.ringPath),
     },
 
-    frontier: (withSymbols.debug?.rawEnginePayload?.frontierPaths || []).map((alt: any, idx: number) => ({
+    frontier: (withCanon.frontier || []).map((alt: any, idx: number) => ({
       id: `alt-${idx + 1}`,
       voicePath: join(alt.voicePath),
       levelPath: join(alt.levelPath.map((l: number) => l === 1 ? 'high' : l === 0 ? 'mid' : 'low')),
       ringPath: join(alt.ringPath),
     })),
 
-    languageFamilies: (withSymbols.candidates || []).map((lf: any) => ({
-      language: lf.language,
-      form: lf.form,
-      gloss: lf.decomposition.functionalStatement,
-      passes: lf.status === 'pass',
-      experimental: lf.status === 'experimental',
-      speculative: lf.confidenceTag === 'speculative',
-      voicePath: join(lf.voices?.voiceSequence),
-      levelPath: 'N/A', // This data isn't on the candidate level in the old model
-      ringPath: join(lf.voices?.ringPath),
-      morphologyMatrix: lf.morphologyMatrix,
-      symbolic: lf.symbolic,
-    })),
+    languageFamilies: withCanon.languageFamilies,
 
     meta: {
-      engineVersion: withSymbols.core.engineVersion,
-      createdAt: new Date().toISOString(),
+      engineVersion: withCanon.meta.engineVersion,
+      createdAt: withCanon.meta.createdAt,
+      mode: mode,
+      alphabet: withCanon.rawPayload.alphabet,
+      solveMs: withCanon.rawPayload.solveMs,
     },
+    symbolic,
   };
 
   return result;

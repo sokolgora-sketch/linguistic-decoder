@@ -21,7 +21,7 @@ import { ThemeToggle } from "../components/ThemeProvider";
 import { useDebounced } from "../hooks/useDebounced";
 import { Loader2, Sparkles, Wand2, HelpCircle, GitBranch, BookOpen, History as HistoryIcon, ListChecks } from "lucide-react";
 import ComparePanel from "../components/ComparePanel";
-import { normalizeEnginePayload, type Vowel, type AnalyzeWordResult } from "../shared/engineShape";
+import { normalizeEnginePayload, type Vowel, type AnalyzeWordResult, AnalysisResult_DEPRECATED } from "../shared/engineShape";
 import HistoryPanel from "../components/HistoryPanel";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../lib/firebase";
@@ -32,7 +32,6 @@ import { ExportJsonButton } from "../components/ExportJsonButton";
 import { logError } from "../lib/logError";
 import { VOICE_COLOR_MAP, VOICE_LABEL_MAP } from "../shared/voiceColors";
 import { SymbolicReadingCard } from "@/components/SymbolicReadingCard";
-import { analysisResultToEnginePayload } from "@/shared/analysisAdapter";
 
 const VOICE_META: { id: Vowel; label: string; role: string }[] = [
   { id: "A", label: "Action / Truth", role: "Launches, cuts through, sets the first line." },
@@ -100,22 +99,17 @@ export default function LinguisticDecoderApp(){
 
   function runSmokeTest() {
     const mock: any = {
-        engineVersion: "mock-v1",
         word: "smoke-test",
-        mode: "strict",
-        alphabet: "auto",
-        primaryPath: { voicePath: "U → I", ringPath: "1 → 1", levelPath: "low → high" },
-        frontier: [
-            { id: "alt-1", voicePath: "A → E", ringPath: "3 → 2", levelPath: "high → high" },
-        ],
+        sanitized: "smoketest",
+        primaryPath: { voicePath: "O → E", levelPath: "mid → high", ringPath: "0 → 2" },
+        frontier: [],
         languageFamilies: [],
-        meta: { engineVersion: 'mock-v1', createdAt: new Date().toISOString() },
-        sanitized: 'smoke-test'
+        meta: { engineVersion: 'mock-v1', createdAt: new Date().toISOString(), mode: 'strict' },
     };
     try {
         setData(mock);
         setErr(null);
-        toast({ title: "Smoke Test", description: "Displaying mock data for 'study'." });
+        toast({ title: "Smoke Test", description: "Displaying mock data." });
     } catch(e:any){
         setErr(`Smoke test failed: ${e.message}`);
         setData(null);
@@ -151,10 +145,9 @@ export default function LinguisticDecoderApp(){
       const cacheRef = doc(db, "analyses", cacheId);
       const snap = await getDoc(cacheRef);
       if (snap.exists()) {
-          const payload = normalizeEnginePayload(snap.data());
-          const result = analysisResultToEnginePayload(payload);
-          setData({ ...result, meta: { ...result.meta, cacheHit: true } });
-          toast({ title: "Loaded from Cache", description: `Analysis for '${result.word}' loaded.` });
+          const payload = snap.data() as AnalyzeWordResult;
+          setData({ ...payload, meta: { ...payload.meta, cacheHit: true } });
+          toast({ title: "Loaded from Cache", description: `Analysis for '${payload.word}' loaded.` });
       } else {
           toast({ variant: "destructive", title: "Not Found", description: "Could not find that analysis in the cache." });
       }
@@ -200,9 +193,6 @@ export default function LinguisticDecoderApp(){
       ? "Auto-Detect"
       : alphabet.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
       
-  const enginePayloadForOldComponents = data ? analysisResultToEnginePayload(data) : null;
-
-
   return (
     <div className="min-h-screen bg-background text-foreground p-4 lg:p-8 flex flex-col items-stretch transition-colors duration-300">
        <main className="max-w-5xl mx-auto w-full space-y-8 flex-1 animate-fade-in">
@@ -527,9 +517,8 @@ export default function LinguisticDecoderApp(){
               <CardContent className="space-y-4">
                 <ResultsDisplay analysis={data} />
                 <div className="flex justify-end pt-2">
-                  {enginePayloadForOldComponents && <ExportJsonButton analysis={enginePayloadForOldComponents} />}
+                  <ExportJsonButton analysis={data as any} />
                 </div>
-                {enginePayloadForOldComponents && <WhyThisPath primary={enginePayloadForOldComponents.primaryPath} />}
               </CardContent>
             </Card>
           )}
@@ -710,3 +699,5 @@ export default function LinguisticDecoderApp(){
     </div>
   );
 }
+
+    

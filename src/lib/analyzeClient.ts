@@ -1,6 +1,6 @@
 import { db, ensureAnon, auth } from "./firebase";
 import { doc, getDoc, setDoc, serverTimestamp, collection, addDoc } from "firebase/firestore";
-import { normalizeEnginePayload, type EnginePayload, type Vowel, LanguageFamily, type AnalyzeWordResult } from "../shared/engineShape";
+import { normalizeEnginePayload, type AnalyzeWordResult, type Vowel, LanguageFamily } from "../shared/engineShape";
 import { logError } from "./logError";
 import { sanitizeForFirestore } from "./sanitize";
 import { analyzeWord } from "@/engine/analyzeWord";

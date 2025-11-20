@@ -70,6 +70,10 @@ export const CANON_CANDIDATES: Record<string, Candidate[]> = {
           { parts: ['stud', 'ens'], result: 'students', gloss: 'those in a focused effort to learn' },
         ],
       },
+      symbolic: [
+          { axis: 'creation', source: 'hybrid', note: 'U-I path suggests a unified insight, a flow toward a specific point.' },
+          { axis: 'law', source: 'zheji', note: 'The consonants "st" and "d" create a container for this inner process.' },
+      ],
     },
     {
       id: 'alb_study_01',
@@ -140,6 +144,9 @@ export const CANON_CANDIDATES: Record<string, Candidate[]> = {
           },
         ],
       },
+      symbolic: [
+          { axis: 'creation', source: 'zheji', note: 'Albanian functional path s\'tu-di-m implies making external knowledge internal.' },
+      ],
     },
   ],
   damage: [
@@ -212,6 +219,10 @@ export const CANON_CANDIDATES: Record<string, Candidate[]> = {
           { parts: ['dam', 'n', 'atio'], result: 'damnatio', gloss: 'inflicted state of loss / condemnation' },
         ],
       },
+      symbolic: [
+          { axis: 'law', source: 'zheji', note: 'A-E path (action/expansion) suggests a breaking out or transgression.' },
+          { axis: 'power', source: 'hybrid', note: 'The "d" and "m" consonants suggest a cutting action resulting in a material state.' },
+      ],
     },
     {
       id: 'alb_damage_01',
@@ -285,6 +296,9 @@ export const CANON_CANDIDATES: Record<string, Candidate[]> = {
           },
         ],
       },
+      symbolic: [
+          { axis: 'law', source: 'zheji', note: 'Albanian "dëm" as a cut (d-) that becomes a state (ë) in matter (m).' },
+      ],
     },
   ],
   mode: [
