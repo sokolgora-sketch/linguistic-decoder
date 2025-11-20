@@ -2,6 +2,7 @@
 
 import { enginePayloadToAnalysisResult } from '@/shared/analysisAdapter';
 import type { EnginePayload, Candidate } from '@/shared/engineShape';
+import { CANON_CANDIDATES } from '@/shared/canonCandidates';
 
 describe('Canonical Candidate Adapter', () => {
   const basePayload: Omit<EnginePayload, 'word'> = {
@@ -22,6 +23,13 @@ describe('Canonical Candidate Adapter', () => {
     signals: [],
     languageFamilies: [],
     edgeWindows: ["prefix 's' -> SibilantFricative"]
+  };
+
+  const indexByLanguage = (candidates: Candidate[]) => {
+    return candidates.reduce(
+      (acc, c) => ({ ...acc, [c.language]: c }),
+      {} as Record<string, Candidate>
+    );
   };
 
   it('it returns canonical candidates for "study" with consonant profiles and axes', () => {
@@ -107,17 +115,14 @@ describe('Canonical Candidate Adapter', () => {
   });
 
   it('damage has a morphology matrix for Latin and Albanian', () => {
-    const payload: EnginePayload = { ...basePayload, word: 'damage' };
-    const result = enginePayloadToAnalysisResult(payload);
-    
-    const langs = result.candidates.reduce(
-      (acc, c) => ({ ...acc, [c.language]: c }),
-      {} as Record<string, Candidate>
-    );
+    const entry = CANON_CANDIDATES['damage'];
+    expect(entry).toBeDefined();
+  
+    const langs = indexByLanguage(entry);
   
     expect(langs['latin'].form.toLowerCase()).toBe('damnum');
     expect(langs['latin'].morphologyMatrix?.pivot).toBe('dam');
-
+  
     expect(langs['albanian'].form.toLowerCase()).toBe('dëm');
     expect(langs['albanian'].morphologyMatrix?.pivot).toBe('dëm');
   });
@@ -145,5 +150,12 @@ describe('Canonical Candidate Adapter', () => {
     expect(candidate.consonantSignals).toBeUndefined();
     // axes should be undefined for non-canon
     expect(candidate.axes).toBeUndefined();
+  });
+
+  it('mode has a Latin morphology matrix with pivot "mode"', () => {
+    const entry = CANON_CANDIDATES['mode'];
+    expect(entry).toBeDefined();
+    const langs = indexByLanguage(entry);
+    expect(langs['latin'].morphologyMatrix?.pivot).toBe('mode');
   });
 });
