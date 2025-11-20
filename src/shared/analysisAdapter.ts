@@ -14,6 +14,7 @@ import type {
   AnalysisHeartPaths,
   Candidate,
   TensionLevel,
+  MorphologyEvidence,
 } from './engineShape';
 
 // --- Helper Functions ---
@@ -23,7 +24,7 @@ function normalizeWord(word: string): string {
 }
 
 function mapMode(mode: 'strict' | 'open'): 'strict' | 'explore' {
-  return mode === 'open' ? 'explore' : 'strict';
+  return mode === 'open' ? 'explore' : 'mode';
 }
 
 function guessLanguageFromFamilies(families?: LanguageFamily[]): {
@@ -158,7 +159,19 @@ function makeStudyCandidates(payload: EnginePayload): Candidate[] {
       ]
     },
     status: 'pass',
-    confidenceTag: 'solid'
+    confidenceTag: 'solid',
+    morphology: {
+      base: 'stud',
+      affixes: ['-ium'],
+      wordSums: [
+        'stud + ium → studium (zeal, study)',
+        'stud + ens → studens (one who studies)'
+      ],
+      notes: [
+        'Root stud- is productive in Latin with consistent meaning of eager application / study.'
+      ]
+    },
+    fitTag: 'strong',
   };
 
   // Albanian functional candidate: s'tu-di-m
@@ -218,7 +231,18 @@ function makeStudyCandidates(payload: EnginePayload): Candidate[] {
       ]
     },
     status: 'pass',
-    confidenceTag: 'solid'
+    confidenceTag: 'solid',
+    morphology: {
+      base: "s'tu-di-m",
+      affixes: [],
+      wordSums: [
+        "s'tu + di + m → s'tu-di-m (what is not yours → know → make it yours)"
+      ],
+      notes: [
+        'Expressed as a functional, three-part structure matching the Seven-Voices action/instrument/unit pattern.'
+      ]
+    },
+    fitTag: 'strong',
   };
 
   return [latinCandidate, albanianCandidate];
@@ -287,7 +311,19 @@ function makeDamageCandidates(payload: EnginePayload): Candidate[] {
       ]
     },
     status: 'pass',
-    confidenceTag: 'solid'
+    confidenceTag: 'solid',
+    morphology: {
+      base: 'dam',
+      affixes: ['-num'],
+      wordSums: [
+        'dam + num → damnum (damage, loss)',
+        'damn + atio → damnatio (condemnation, infliction of loss)'
+      ],
+      notes: [
+        'Root dam-/damn- forms a family of Latin words about loss and condemnation.'
+      ]
+    },
+    fitTag: 'strong',
   };
 
   // Albanian functional candidate: dëm / dam / dom
@@ -344,7 +380,20 @@ function makeDamageCandidates(payload: EnginePayload): Candidate[] {
       ]
     },
     status: 'pass',
-    confidenceTag: 'solid'
+    confidenceTag: 'solid',
+    morphology: {
+      base: 'dëm',
+      affixes: ['-tim', '-tar', '-shpërblim'],
+      wordSums: [
+        'dëm → dëm (harm, loss)',
+        'dëm + tim → dëmtim (damaging, act of causing harm)',
+        'dëm + shpërblim → dëmshpërblim (compensation for damage)'
+      ],
+      notes: [
+        'Productive root in Albanian forming a clear family of “harm / damage / compensation” words.'
+      ]
+    },
+    fitTag: 'strong',
   };
 
   return [latinCandidate, albanianCandidate];
