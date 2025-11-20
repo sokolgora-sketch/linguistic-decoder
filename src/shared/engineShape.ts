@@ -133,6 +133,13 @@ export type AnalysisCore = {
   heartPaths: AnalysisHeartPaths;
 };
 
+export type MorphologyEvidence = {
+  base: string;          // core root, e.g. "stud", "dam", "dëm"
+  affixes: string[];     // affixes/suffixes/prefixes involved
+  wordSums: string[];    // matrix-style word sums as text, e.g. "stud + ium → studium (study)"
+  notes?: string[];      // short comments
+};
+
 // Candidate-level origin entry (per language/form)
 export type Candidate = {
   id: string;
@@ -174,8 +181,11 @@ export type Candidate = {
     notes?: string[];
   };
 
+  morphology?: MorphologyEvidence;
+
   status: 'pass' | 'experimental';
   confidenceTag?: 'solid' | 'speculative';
+  fitTag?: 'strong' | 'medium' | 'weak';
 };
 
 export type AnalysisDebug = {
