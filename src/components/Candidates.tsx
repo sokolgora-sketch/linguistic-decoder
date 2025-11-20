@@ -3,6 +3,7 @@
 import type { LanguageFamily, Candidate, AnalysisResult, OriginAxisStatus, MorphologyMatrix } from '../shared/engineShape';
 import { Badge } from './ui/badge';
 import { Card } from './ui/card';
+import { cn } from '@/lib/utils';
 
 const axisLabel = (status: OriginAxisStatus | undefined) => {
   switch (status) {
@@ -18,7 +19,7 @@ const axisLabel = (status: OriginAxisStatus | undefined) => {
 
 function MorphologyMatrixBlock({ matrix }: { matrix: MorphologyMatrix }) {
   return (
-    <div className="mt-3 border border-border/60 rounded-xl p-3 bg-background/40">
+    <div className="mt-4 rounded-xl border border-slate-600/80 bg-slate-900/60 px-4 py-3">
       <div className="text-xs font-semibold uppercase tracking-wide mb-1">
         Morphology Matrix
       </div>
@@ -89,6 +90,9 @@ export function Candidates({ items, analysis }: { items?: LanguageFamily[]; anal
 
   if (displayCandidates.length === 0) return null;
 
+  // Check if the first candidate is the primary one
+  const primaryCandidateId = displayCandidates[0]?.id;
+
   return (
     <div className="mt-3">
       <h3 className="font-bold text-sm tracking-wide mb-2">Language Family Candidates</h3>
@@ -97,9 +101,14 @@ export function Candidates({ items, analysis }: { items?: LanguageFamily[]; anal
           const confidencePercent = (c as any)._confidence !== undefined 
             ? ((c as any)._confidence * 100).toFixed(0) 
             : null;
+          
+          const isPrimary = c.id === primaryCandidateId;
 
           return (
-            <Card key={c.id || i} className="p-3 text-sm border-primary/50">
+            <Card key={c.id || i} className={cn(
+              "p-3 text-sm",
+              isPrimary ? "bg-slate-900/60 border-slate-600" : "bg-slate-900/20 border-slate-700/60"
+            )}>
               <div className="flex items-center justify-between gap-2">
                 <div className="font-semibold">
                   {c.language?.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}

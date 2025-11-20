@@ -126,14 +126,18 @@ export const CANON_CANDIDATES: Record<string, Candidate[]> = {
       },
       morphologyMatrix: {
         pivot: "s'tu",
-        meaning: 'what is not yours → to know → make it yours',
+        meaning: 'what is not yours → you know it → you make it yours',
         morphemes: [
-          { form: "s'tu", role: 'root', gloss: 'not yours' },
-          { form: 'di', role: 'root', gloss: 'know' },
-          { form: 'm', role: 'suffix', gloss: 'make / become yours' },
+          { form: "s'tu", role: 'root',   gloss: 'what is not yours' },
+          { form: 'di',  role: 'root',   gloss: 'know' },
+          { form: 'm',   role: 'suffix', gloss: 'make / become yours' },
         ],
         wordSums: [
-          { parts: ["s'tu", 'di', 'm'], result: "s'tu-di-m", gloss: 'turn not-yours into known/owned knowledge' },
+          {
+            parts: ["s'tu", 'di', 'm'],
+            result: "s'tu-di-m",
+            gloss: 'turn what is not yours into your own knowledge',
+          },
         ],
       },
     },
@@ -201,11 +205,11 @@ export const CANON_CANDIDATES: Record<string, Candidate[]> = {
         morphemes: [
           { form: 'dam', role: 'root', gloss: 'harm, loss, reduction' },
           { form: 'num', role: 'suffix', gloss: 'thing / unit / result' },
-          { form: 'natio', role: 'suffix', gloss: 'inflicted state of loss / condemnation' }
+          { form: 'atio', role: 'suffix', gloss: 'act of / process' },
         ],
         wordSums: [
           { parts: ['dam', 'num'], result: 'damnum', gloss: 'a harmed thing / damaged state' },
-          { parts: ['dam', 'natio'], result: 'damnatio', gloss: 'inflicted state of loss / condemnation' },
+          { parts: ['dam', 'n', 'atio'], result: 'damnatio', gloss: 'inflicted state of loss / condemnation' },
         ],
       },
     },
