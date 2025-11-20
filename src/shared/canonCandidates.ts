@@ -381,4 +381,78 @@ export const CANON_CANDIDATES: Record<string, Candidate[]> = {
       },
     },
   ],
+  love: [
+    {
+        id: 'lat_love_01',
+        language: 'latin',
+        family: 'latin',
+        form: 'amor',
+        decomposition: {
+            parts: [
+                { role: 'action', form: 'am-', gloss: 'love, fondness' },
+                { role: 'unit', form: '-or', gloss: 'agent/bearer of quality' },
+            ],
+            functionalStatement: 'One who carries or embodies love.',
+        },
+        voices: { voiceSequence: ['O', 'E'], ringPath: [0, 2], dominantVoices: {} },
+        ruleChecks: { soundPathOk: true, functionalDecompOk: true, sevenVoicesAlignmentOk: true, consonantMeaningOk: true, harmonyOk: true },
+        principleSignals: { truthOk: true, expansionOk: true, insightOk: true, balanceOk: true, unityOk: true, networkIntegrityOk: true, evolutionOk: true },
+        fitTag: 'strong',
+        status: 'pass',
+        confidenceTag: 'solid',
+        consonantProfile: 'flow',
+        consonantProfileOk: true,
+        consonantSignals: ['liquid / sonorant frame around open vowels'],
+        axes: { principles: 'pass', morphology: 'pass', consonants: 'pass' },
+        morphologyMatrix: {
+            pivot: 'am',
+            meaning: 'warm, directed affection / friendly love',
+            morphemes: [
+                { form: 'am', role: 'root', gloss: 'love, fondness, friendly affection' },
+                { form: 'or', role: 'suffix', gloss: 'agent / bearer of quality' },
+            ],
+            wordSums: [{ parts: ['am', 'or'], result: 'amor', gloss: 'one who carries/embodies love' }],
+        },
+        symbolic: [
+            { axis: 'love', source: 'hybrid', note: "Latin 'amor' makes love a carried quality — something you bear." },
+        ]
+    },
+    {
+        id: 'alb_love_01',
+        language: 'albanian',
+        family: 'albanian',
+        form: 'dashuri',
+        decomposition: {
+            parts: [
+                { role: 'action', form: 'dash-', gloss: 'to love, to like' },
+                { role: 'instrument', form: '-ur-', gloss: 'state/quality' },
+                { role: 'unit', form: '-i', gloss: 'noun marker' },
+            ],
+            functionalStatement: 'The state or quality of loving.',
+        },
+        voices: { voiceSequence: ['A', 'U', 'I'], ringPath: [3, 1, 1], dominantVoices: {} },
+        ruleChecks: { soundPathOk: true, functionalDecompOk: true, sevenVoicesAlignmentOk: true, consonantMeaningOk: true, harmonyOk: true },
+        principleSignals: { truthOk: true, expansionOk: true, insightOk: true, balanceOk: true, unityOk: true, networkIntegrityOk: true, evolutionOk: true },
+        fitTag: 'strong',
+        status: 'pass',
+        confidenceTag: 'solid',
+        consonantProfile: 'bind',
+        consonantProfileOk: true,
+        consonantSignals: ['soft fricatives and sonorants shaping attachment'],
+        axes: { principles: 'pass', morphology: 'pass', consonants: 'pass' },
+        morphologyMatrix: {
+            pivot: 'dash',
+            meaning: 'intentional affection / chosen closeness',
+            morphemes: [
+                { form: 'dash', role: 'root', gloss: 'to love, to like' },
+                { form: 'ur', role: 'suffix', gloss: 'state / quality' },
+                { form: 'i', role: 'suffix', gloss: 'noun marker' },
+            ],
+            wordSums: [{ parts: ['dash', 'ur', 'i'], result: 'dashuri', gloss: 'the state/quality of loving' }],
+        },
+        symbolic: [
+             { axis: 'love', source: 'hybrid', note: "Albanian 'dashuri' frames love as a chosen state, not just a feeling." },
+        ]
+    }
+  ]
 };
