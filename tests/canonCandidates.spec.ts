@@ -24,7 +24,7 @@ describe('Canonical Candidate Adapter', () => {
     edgeWindows: ["prefix 's' -> SibilantFricative"]
   };
 
-  test('it returns canonical candidates for "study" with consonant profiles', () => {
+  test('it returns canonical candidates for "study" with consonant profiles and axes', () => {
     const payload: EnginePayload = {
       ...basePayload,
       word: 'study',
@@ -41,14 +41,19 @@ describe('Canonical Candidate Adapter', () => {
       expect(c.fitTag).toBe('strong');
       expect(c.morphology).toBeDefined();
       expect(c.id).toContain('study');
-      // New consonant checks
+      // consonant checks
       expect(c.consonantProfile).toBe('build');
       expect(c.consonantProfileOk).toBe(true);
       expect(c.consonantSignals && c.consonantSignals.length).toBeGreaterThan(0);
+      // axes checks
+      expect(c.axes).toBeDefined();
+      expect(c.axes?.principles).toBe('pass');
+      expect(c.axes?.morphology).toBe('pass');
+      expect(c.axes?.consonants).toBe('pass');
     }
   });
 
-  test('it returns canonical candidates for "damage" with consonant profiles', () => {
+  test('it returns canonical candidates for "damage" with consonant profiles and axes', () => {
     const payload: EnginePayload = {
       ...basePayload,
       word: 'damage',
@@ -76,10 +81,15 @@ describe('Canonical Candidate Adapter', () => {
       expect(c.fitTag).toBe('strong');
       expect(c.morphology).toBeDefined();
       expect(c.id).toContain('damage');
-      // New consonant checks
+      // consonant checks
       expect(c.consonantProfile).toBe('cut');
       expect(c.consonantProfileOk).toBe(true);
       expect(c.consonantSignals && c.consonantSignals.length).toBeGreaterThan(0);
+      // axes checks
+      expect(c.axes).toBeDefined();
+      expect(c.axes?.principles).toBe('pass');
+      expect(c.axes?.morphology).toBe('pass');
+      expect(c.axes?.consonants).toBe('pass');
     }
   });
 
@@ -104,5 +114,7 @@ describe('Canonical Candidate Adapter', () => {
     expect(candidate.consonantProfile).toBeUndefined();
     expect(candidate.consonantProfileOk).toBeUndefined();
     expect(candidate.consonantSignals).toBeUndefined();
+    // axes should be undefined for non-canon
+    expect(candidate.axes).toBeUndefined();
   });
 });
