@@ -21,9 +21,10 @@ describe('Canonical Candidate Adapter', () => {
     windowClasses: ['SibilantFricative', 'Plosive'],
     signals: [],
     languageFamilies: [],
+    edgeWindows: ["prefix 's' -> SibilantFricative"]
   };
 
-  test('it returns canonical candidates for "study"', () => {
+  test('it returns canonical candidates for "study" with consonant profiles', () => {
     const payload: EnginePayload = {
       ...basePayload,
       word: 'study',
@@ -32,15 +33,22 @@ describe('Canonical Candidate Adapter', () => {
     const result = enginePayloadToAnalysisResult(payload);
 
     expect(result.candidates).toHaveLength(2);
+    expect(result.consonants).toBeDefined();
+    expect(result.consonants!.field.smoothHits + result.consonants!.field.spikyHits).toBeGreaterThanOrEqual(1);
+
     for (const c of result.candidates) {
       expect(c.status).toBe('pass');
       expect(c.fitTag).toBe('strong');
       expect(c.morphology).toBeDefined();
       expect(c.id).toContain('study');
+      // New consonant checks
+      expect(c.consonantProfile).toBe('build');
+      expect(c.consonantProfileOk).toBe(true);
+      expect(c.consonantSignals && c.consonantSignals.length).toBeGreaterThan(0);
     }
   });
 
-  test('it returns canonical candidates for "damage"', () => {
+  test('it returns canonical candidates for "damage" with consonant profiles', () => {
     const payload: EnginePayload = {
       ...basePayload,
       word: 'damage',
@@ -52,16 +60,26 @@ describe('Canonical Candidate Adapter', () => {
         checksums: { V: 6, E: 1, C: 1 },
         kept: 2,
       },
+      windows: ['m', 'g'],
+      windowClasses: ['Nasal', 'Plosive'],
+      edgeWindows: ["prefix 'd' -> Plosive"],
     };
 
     const result = enginePayloadToAnalysisResult(payload);
 
     expect(result.candidates).toHaveLength(2);
+    expect(result.consonants).toBeDefined();
+    expect(result.consonants!.field.smoothHits + result.consonants!.field.spikyHits).toBeGreaterThanOrEqual(1);
+
     for (const c of result.candidates) {
       expect(c.status).toBe('pass');
       expect(c.fitTag).toBe('strong');
       expect(c.morphology).toBeDefined();
       expect(c.id).toContain('damage');
+      // New consonant checks
+      expect(c.consonantProfile).toBe('cut');
+      expect(c.consonantProfileOk).toBe(true);
+      expect(c.consonantSignals && c.consonantSignals.length).toBeGreaterThan(0);
     }
   });
 
@@ -82,5 +100,9 @@ describe('Canonical Candidate Adapter', () => {
     expect(candidate.confidenceTag).toBe('speculative');
     expect(candidate.morphology).toBeUndefined();
     expect(candidate.fitTag).toBeUndefined();
+    // Consonant profile should be undefined for non-canon candidates for now
+    expect(candidate.consonantProfile).toBeUndefined();
+    expect(candidate.consonantProfileOk).toBeUndefined();
+    expect(candidate.consonantSignals).toBeUndefined();
   });
 });
