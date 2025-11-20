@@ -1,6 +1,6 @@
 
 'use client';
-import type { LanguageFamily, Candidate, AnalysisResult, OriginAxisStatus } from '../shared/engineShape';
+import type { LanguageFamily, Candidate, AnalysisResult, OriginAxisStatus, MorphologyMatrix } from '../shared/engineShape';
 import { Badge } from './ui/badge';
 import { Card } from './ui/card';
 
@@ -15,6 +15,56 @@ const axisLabel = (status: OriginAxisStatus | undefined) => {
       return '❓';
   }
 };
+
+function MorphologyMatrixBlock({ matrix }: { matrix: MorphologyMatrix }) {
+  return (
+    <div className="mt-3 border border-border/60 rounded-xl p-3 bg-background/40">
+      <div className="text-xs font-semibold uppercase tracking-wide mb-1">
+        Morphology Matrix
+      </div>
+      <div className="text-sm mb-2">
+        <span className="font-mono font-semibold">{matrix.pivot}</span>{' '}
+        <span className="text-muted-foreground">— {matrix.meaning}</span>
+      </div>
+
+      <div className="text-xs mb-2">
+        <div className="font-semibold mb-1">Morphemes</div>
+        <ul className="list-disc list-inside space-y-0.5">
+          {matrix.morphemes.map((m, idx) => (
+            <li key={idx}>
+              <span className="font-mono">{m.form}</span>{' '}
+              <span className="text-muted-foreground">
+                ({m.role}){m.gloss ? ` — ${m.gloss}` : ''}
+              </span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div className="text-xs">
+        <div className="font-semibold mb-1">Word sums</div>
+        <ul className="list-disc list-inside space-y-0.5">
+          {matrix.wordSums.map((w, idx) => (
+            <li key={idx}>
+              {w.parts.map((p, i) => (
+                <span key={i} className="font-mono">
+                  {i > 0 && ' + '}
+                  {p}
+                </span>
+              ))}{' '}
+              <span>{' → '}</span>
+              <span className="font-mono font-semibold">{w.result}</span>
+              {w.gloss && (
+                <span className="text-muted-foreground">{` — ${w.gloss}`}</span>
+              )}
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  );
+}
+
 
 export function Candidates({ items, analysis }: { items?: LanguageFamily[]; analysis?: AnalysisResult }) {
   const fromAnalysis = analysis?.candidates ?? [];
@@ -111,6 +161,10 @@ export function Candidates({ items, analysis }: { items?: LanguageFamily[]; anal
                   Morphology {axisLabel(c.axes.morphology)} ·{' '}
                   Consonants {axisLabel(c.axes.consonants)}
                 </div>
+              )}
+
+              {c.morphologyMatrix && (
+                <MorphologyMatrixBlock matrix={c.morphologyMatrix} />
               )}
 
               {c.status && (
