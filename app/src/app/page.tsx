@@ -696,7 +696,7 @@ export default function LinguisticDecoderApp(){
               </Link>
             )}
             <Button variant="outline" size="sm" onClick={() => setShowDebug(s => !s)}>
-              {showDebug ? "Hide" : "Show JSON"}
+              {showDebug ? "Hide JSON" : "Show JSON"}
             </Button>
           </div>
         </div>

@@ -5,6 +5,7 @@ import { logError } from "./logError";
 import { sanitizeForFirestore } from "./sanitize";
 import { runAnalysis, ENGINE_VERSION } from "./runAnalysis";
 import { mapWordToLanguageFamilies } from "./mapper";
+import { getManifest } from "@/engine/manifest";
 
 
 type Mode = "strict" | "open";
@@ -127,4 +128,6 @@ async function saveHistory(
     const clean = sanitizeForFirestore(docData);
     await addDoc(ref, clean);
   } catch(e:any) {
-    logError({ where: "
+    logError({ where: "saveHistory", message: e.message, detail: { word: result.word } });
+  }
+}

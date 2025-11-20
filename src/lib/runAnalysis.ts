@@ -48,4 +48,8 @@ export function runAnalysis(
     frontierPaths: result.frontierPaths,
     windows: result.windows,
     windowClasses: result.windowClasses,
-    signals: result
+    signals: result.signals,
+  };
+
+  return payload;
+}
