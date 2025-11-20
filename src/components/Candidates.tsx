@@ -77,6 +77,21 @@ export function Candidates({ items, analysis }: { items?: LanguageFamily[]; anal
                 </div>
               )}
 
+              {c.consonantProfile && (
+                <div className="mt-2 text-xs text-muted-foreground">
+                  <span className="font-semibold">Consonants:</span>{' '}
+                  {c.consonantProfile}
+                  {c.consonantProfileOk === false && ' (in tension)'}
+                </div>
+              )}
+              {c.consonantSignals && c.consonantSignals.length > 0 && (
+                <ul className="mt-1 list-disc list-inside text-xs text-muted-foreground">
+                  {c.consonantSignals.slice(0, 2).map((s, idx) => (
+                    <li key={idx}>{s}</li>
+                  ))}
+                </ul>
+              )}
+
               {c.status && (
                 <div className="mt-2 flex items-center gap-2">
                     <span className={`px-2 py-0.5 rounded-full text-xs font-medium
