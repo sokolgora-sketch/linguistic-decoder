@@ -8,18 +8,19 @@ import { ArrowLeft, Loader2 } from "lucide-react";
 import HistoryPanel from "@/components/HistoryPanel"; // Updated component
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import { normalizeEnginePayload, type EnginePayload } from "@/shared/engineShape";
+import { normalizeEnginePayload, type EnginePayload, type AnalysisResult } from "@/shared/engineShape";
 import { analyzeClient } from "@/lib/analyzeClient";
 import { useToast } from "@/hooks/use-toast";
 import { ResultsDisplay } from "@/components/ResultsDisplay";
-import { Candidates } from "@/components/Candidates";
 import { Card } from "@/components/ui/card";
 import type { Alphabet } from "@/lib/runAnalysis";
+
+type AnalysisResponse = EnginePayload & { analysis?: AnalysisResult };
 
 export default function HistoryPage() {
     const { toast } = useToast();
     const [loading, setLoading] = useState(false);
-    const [analysisResult, setAnalysisResult] = useState<EnginePayload | null>(null);
+    const [analysisResult, setAnalysisResult] = useState<AnalysisResponse | null>(null);
 
     async function handleLoadAnalysis(cacheId: string) {
         if (!cacheId || !db) {
@@ -33,6 +34,7 @@ export default function HistoryPage() {
             const snap = await getDoc(cacheRef);
             if (snap.exists()) {
                 const normalized = normalizeEnginePayload(snap.data());
+                // In a real app, you would run the adapter here. For now, we assume the shape is compatible enough.
                 setAnalysisResult({ ...normalized, cacheHit: true, recomputed: false });
                 toast({ title: "Loaded from Cache", description: `Analysis for '${normalized.word}' loaded.` });
             } else {
@@ -86,7 +88,6 @@ export default function HistoryPage() {
                     <div className="space-y-4">
                          <h2 className="text-xl font-semibold text-primary/90">Loaded Analysis: <span className="font-bold text-foreground">{analysisResult.word}</span></h2>
                          <ResultsDisplay analysis={analysisResult} />
-                         <Candidates items={analysisResult.languageFamilies} />
                     </div>
                 )}
             </main>

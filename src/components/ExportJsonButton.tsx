@@ -1,17 +1,19 @@
+
 // src/components/ExportJsonButton.tsx
 "use client";
 
 import { Button } from "./ui/button";
-import type { AnalysisResult } from "../lib/runAnalysis";
+import type { EnginePayload, AnalysisResult } from "../shared/engineShape";
 
 type ExportJsonButtonProps = {
-  analysis: AnalysisResult;
+  analysis: EnginePayload & { analysis?: AnalysisResult };
 };
 
 export function ExportJsonButton({ analysis }: ExportJsonButtonProps) {
   const handleExport = () => {
-    // stringify the full engine payload
-    const json = JSON.stringify(analysis, null, 2);
+    // Export the rich AnalysisResult if it exists, otherwise fall back to the base payload.
+    const exportData = analysis.analysis ?? analysis;
+    const json = JSON.stringify(exportData, null, 2);
 
     const blob = new Blob([json], { type: "application/json" });
     const url = URL.createObjectURL(blob);

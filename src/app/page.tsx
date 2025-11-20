@@ -20,7 +20,7 @@ import { ThemeToggle } from "../components/ThemeProvider";
 import { useDebounced } from "../hooks/useDebounced";
 import { Loader2, Sparkles, Wand2, HelpCircle, GitBranch, BookOpen, History as HistoryIcon, ListChecks } from "lucide-react";
 import ComparePanel from "../components/ComparePanel";
-import { normalizeEnginePayload, type EnginePayload, type Vowel } from "../shared/engineShape";
+import { normalizeEnginePayload, type EnginePayload, type Vowel, type AnalysisResult } from "../shared/engineShape";
 import HistoryPanel from "../components/HistoryPanel";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../lib/firebase";
@@ -46,6 +46,9 @@ if (process.env.NEXT_PUBLIC_DEV_EVAL === "1") {
   EvalPanelComp = require("../components/EvalPanel").default;
 }
 
+type AnalysisResponse = EnginePayload & { analysis?: AnalysisResult };
+
+
 // ==== Main App ===============================================================
 export default function LinguisticDecoderApp(){
   const { toast } = useToast();
@@ -53,7 +56,7 @@ export default function LinguisticDecoderApp(){
   const [mode, setMode] = useState<"strict"|"open">("strict");
   const [alphabet, setAlphabet] = useState<Alphabet>("auto");
   const [edgeWeight, setEdgeWeight] = useState(0.25);
-  const [data, setData] = useState<EnginePayload | null>(null);
+  const [data, setData] = useState<AnalysisResponse | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [isWarming, setIsWarming] = useState(false);
@@ -111,10 +114,8 @@ export default function LinguisticDecoderApp(){
       const clientResponse = await analyzeClient(useWord, useMode, useAlphabet, { edgeWeight, useAi });
       console.log("API result:", clientResponse);
   
-      const normalizedPayload = normalizeEnginePayload(clientResponse);
-      console.debug("Primary Path object:", normalizedPayload.primaryPath);
-        
-      setData(normalizedPayload);  // new result replaces old one as soon as it’s ready
+      // The payload from analyzeClient is already normalized and includes the analysis object
+      setData(clientResponse);
     } catch (e: any) {
       const error = e?.message || "Request failed";
       logError({ where: "analyze", message: error, detail: { word: useWord, stack: e.stack } });
@@ -144,7 +145,7 @@ export default function LinguisticDecoderApp(){
     };
     try {
         const normalized = normalizeEnginePayload(mock);
-        setData(normalized);
+        setData(normalized as AnalysisResponse);
         setErr(null);
         toast({ title: "Smoke Test", description: "Displaying mock data for 'study'." });
     } catch(e:any){
@@ -184,7 +185,7 @@ export default function LinguisticDecoderApp(){
       const snap = await getDoc(cacheRef);
       if (snap.exists()) {
           const normalized = normalizeEnginePayload(snap.data());
-          setData({ ...normalized, cacheHit: true, recomputed: false });
+          setData({ ...normalized, cacheHit: true, recomputed: false } as AnalysisResponse);
           toast({ title: "Loaded from Cache", description: `Analysis for '${normalized.word}' loaded.` });
       } else {
           toast({ variant: "destructive", title: "Not Found", description: "Could not find that analysis in the cache." });
@@ -562,7 +563,6 @@ export default function LinguisticDecoderApp(){
                 </div>
                 <WhyThisPath primary={data.primaryPath} />
                 <PrinciplesBlock engine={data} />
-                <Candidates items={data.languageFamilies} />
               </CardContent>
             </Card>
           )}

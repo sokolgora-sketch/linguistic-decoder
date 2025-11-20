@@ -4,10 +4,11 @@ import React, { useMemo } from "react";
 import { Card } from "./ui/card";
 import type { CClass } from "../functions/languages";
 import { classRange } from "../functions/languages";
-import type { EnginePayload, EnginePath, Vowel } from "../shared/engineShape";
+import type { EnginePayload, EnginePath, Vowel, AnalysisResult } from "../shared/engineShape";
 import { summarizePrinciples } from "../lib/principles";
 import WhyThisPath from "./WhyThisPath";
 import { VOICE_COLOR_MAP } from "../shared/voiceColors";
+import { Candidates } from "./Candidates";
 
 const LEVEL_LABEL: Record<number, string> = { 1: "High", 0: "Mid", [-1]: "Low" } as any;
 const labelLevels = (levels: number[]) => levels.map(l=> LEVEL_LABEL[l] ?? l).join(" → ");
@@ -147,8 +148,8 @@ export function PrinciplesBlock({ engine }: { engine:any }) {
   );
 }
 
-export function ResultsDisplay({ analysis }: { analysis: EnginePayload }) {
-    const { primaryPath, frontierPaths } = analysis;
+export function ResultsDisplay({ analysis: data }: { analysis: (EnginePayload & { analysis?: AnalysisResult }) }) {
+    const { primaryPath, frontierPaths, analysis } = data;
 
     const frontierList = useMemo(() => (frontierPaths || []).filter(f => f?.voicePath && f.voicePath.join("") !== (primaryPath?.voicePath || []).join("")), [frontierPaths, primaryPath]);
 
@@ -156,8 +157,10 @@ export function ResultsDisplay({ analysis }: { analysis: EnginePayload }) {
     
     return (
         <>
-            <PathRow block={primaryPath} title="Primary Path" analysis={analysis} />
+            <PathRow block={primaryPath} title="Primary Path" analysis={data} />
             
+            <Candidates items={data.languageFamilies} analysis={analysis} />
+
             {frontierList.length > 0 && (
               <Card className="p-4 mt-4">
                 <h3 className="font-bold text-sm tracking-wide">Frontier (near‑optimal alternates)</h3>
@@ -199,3 +202,4 @@ export function ResultsDisplay({ analysis }: { analysis: EnginePayload }) {
         </>
     );
 }
+
