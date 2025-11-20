@@ -106,6 +106,22 @@ describe('Canonical Candidate Adapter', () => {
     }
   });
 
+  it('damage has a morphology matrix for Latin and Albanian', () => {
+    const payload: EnginePayload = { ...basePayload, word: 'damage' };
+    const result = enginePayloadToAnalysisResult(payload);
+    
+    const langs = result.candidates.reduce(
+      (acc, c) => ({ ...acc, [c.language]: c }),
+      {} as Record<string, Candidate>
+    );
+  
+    expect(langs['latin'].form.toLowerCase()).toBe('damnum');
+    expect(langs['latin'].morphologyMatrix?.pivot).toBe('dam');
+
+    expect(langs['albanian'].form.toLowerCase()).toBe('dëm');
+    expect(langs['albanian'].morphologyMatrix?.pivot).toBe('dëm');
+  });
+
   it('it falls back to placeholder candidates for other words', () => {
     const payload: EnginePayload = {
       ...basePayload,
