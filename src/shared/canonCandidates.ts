@@ -59,15 +59,23 @@ export const CANON_CANDIDATES: Record<string, Candidate[]> = {
       },
       morphologyMatrix: {
         pivot: 'stud',
-        meaning: 'deliberate effort / inner state of focus',
+        meaning: 'deliberate effort, inner state of focused attention',
         morphemes: [
-          { form: 'stud', role: 'root', gloss: 'zeal, focused effort' },
-          { form: 'ium', role: 'suffix', gloss: 'state / condition' },
-          { form: 'ens', role: 'suffix', gloss: 'person / agent' },
+          { form: 'stud', role: 'root',   gloss: 'zeal, focused effort' },
+          { form: 'ium',  role: 'suffix', gloss: 'state / condition' },
+          { form: 'ens',  role: 'suffix', gloss: 'person / agent (one who …)' },
         ],
         wordSums: [
-          { parts: ['stud', 'ium'], result: 'studium', gloss: 'state of focused effort' },
-          { parts: ['stud', 'ens'], result: 'students', gloss: 'those in a focused effort to learn' },
+          {
+            parts: ['stud', 'ium'],
+            result: 'studium',
+            gloss: 'state of focused effort to learn',
+          },
+          {
+            parts: ['stud', 'ens'],
+            result: 'students',
+            gloss: 'those in a focused effort to learn',
+          },
         ],
       },
     },
@@ -126,14 +134,18 @@ export const CANON_CANDIDATES: Record<string, Candidate[]> = {
       },
       morphologyMatrix: {
         pivot: "s'tu",
-        meaning: 'what is not yours → to know → make it yours',
+        meaning: 'what is not yours → you know it → you make it yours',
         morphemes: [
-          { form: "s'tu", role: 'root', gloss: 'not yours' },
-          { form: 'di', role: 'root', gloss: 'know' },
-          { form: 'm', role: 'suffix', gloss: 'make / become yours' },
+          { form: "s'tu", role: 'root',   gloss: 'what is not yours' },
+          { form: 'di',  role: 'root',   gloss: 'know' },
+          { form: 'm',   role: 'suffix', gloss: 'make / become yours' },
         ],
         wordSums: [
-          { parts: ["s'tu", 'di', 'm'], result: "s'tu-di-m", gloss: 'turn not-yours into known/owned knowledge' },
+          {
+            parts: ["s'tu", 'di', 'm'],
+            result: "s'tu-di-m",
+            gloss: 'turn what is not yours into your own knowledge',
+          },
         ],
       },
     },
