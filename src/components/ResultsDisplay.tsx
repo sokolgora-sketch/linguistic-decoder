@@ -146,8 +146,6 @@ export function ResultsDisplay({ analysis: data }: { analysis: (EnginePayload & 
             
             <Candidates items={data.languageFamilies} analysis={analysis} />
 
-            {analysis && <PrinciplesBlock analysis={analysis} />}
-
             {frontierList.length > 0 && (
               <Card className="p-4 mt-4">
                 <h3 className="font-bold text-sm tracking-wide">Frontier (near‑optimal alternates)</h3>
@@ -189,3 +187,5 @@ export function ResultsDisplay({ analysis: data }: { analysis: (EnginePayload & 
         </div>
     );
 }
+
+    

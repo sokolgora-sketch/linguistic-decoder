@@ -563,7 +563,7 @@ export default function LinguisticDecoderApp(){
                   <ExportJsonButton analysis={data} />
                 </div>
                 <WhyThisPath primary={data.primaryPath} />
-                {data.analysis && <PrinciplesBlock analysis={data.analysis} />}
+                <PrinciplesBlock analysis={data.analysis} />
               </CardContent>
             </Card>
           )}
@@ -756,3 +756,5 @@ export default function LinguisticDecoderApp(){
     </div>
   );
 }
+
+    
