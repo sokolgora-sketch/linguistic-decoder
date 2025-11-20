@@ -71,6 +71,7 @@ export interface FrontierPath {
 // placeholder for Petro Zheji layer; we’ll fill later
 export interface SymbolicLayer {
   notes: string[];
+  label?: string; // e.g. "Zheji-inspired symbolic reading (experimental)"
 }
 
 export interface AnalyzeWordResponse {
