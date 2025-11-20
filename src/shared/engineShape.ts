@@ -1,4 +1,3 @@
-
 // src/shared/engineShape.ts
 
 // Canonical shape your UI will use everywhere.
@@ -130,6 +129,61 @@ export type CandidateOriginAxes = {
   consonants: OriginAxisStatus;
 };
 
+export type Candidate = {
+  id: string;
+  language: string;
+  family: string;
+  form: string;
+
+  decomposition: {
+    parts: {
+      role: 'action' | 'instrument' | 'unit';
+      form: string;
+      gloss: string;
+    }[];
+    functionalStatement: string;
+  };
+
+  voices: {
+    voiceSequence: Vowel[];
+    ringPath: number[];
+    dominantVoices: Record<string, number>;
+  };
+
+  ruleChecks: {
+    soundPathOk: boolean;
+    functionalDecompOk: boolean;
+    sevenVoicesAlignmentOk: boolean;
+    consonantMeaningOk: boolean;
+    harmonyOk: boolean;
+  };
+
+  principleSignals: {
+    truthOk: boolean;
+    expansionOk: boolean;
+    insightOk: boolean;
+    balanceOk: boolean;
+    unityOk: boolean;
+    networkIntegrityOk: boolean;
+    evolutionOk: boolean;
+    notes?: string[];
+  };
+
+  morphology?: MorphologyEvidence;
+  fitTag?: 'strong' | 'medium' | 'weak';
+  status: 'pass' | 'fail' | 'experimental' | 'deprecated';
+  confidenceTag: 'solid' | 'speculative';
+
+  // Expected consonant semantics for this origin and whether the observed field agrees.
+  consonantProfile?: ConsonantProfile;
+  consonantProfileOk?: boolean;
+  consonantSignals?: string[]; // short human-readable notes, optional
+
+  // Optional 3-axis diagnostic verdict for this origin.
+  axes?: CandidateOriginAxes;
+};
+
+// High-level consonant behaviour classes used for the 42-slot field.
 export type TensionLevel = 'low' | 'medium' | 'high';
 
 export type AnalysisCoreInput = {
@@ -191,58 +245,6 @@ export type MorphologyEvidence = {
   affixes: string[];
   wordSums: string[];
   notes?: string[];
-};
-
-// Candidate-level origin entry (per language/form)
-export type Candidate = {
-  id: string;
-  language: string;
-  family: string;
-  form: string;
-
-  decomposition: {
-    parts: {
-      role: 'action' | 'instrument' | 'unit';
-      form: string;
-      gloss: string;
-    }[];
-    functionalStatement: string;
-  };
-
-  voices: {
-    voiceSequence: Vowel[];
-    ringPath: number[];
-    dominantVoices: Record<string, number>;
-  };
-
-  ruleChecks: {
-    soundPathOk: boolean;
-    functionalDecompOk: boolean;
-    sevenVoicesAlignmentOk: boolean;
-    consonantMeaningOk: boolean;
-    harmonyOk: boolean;
-  };
-
-  principleSignals: {
-    truthOk: boolean;
-    expansionOk: boolean;
-    insightOk: boolean;
-    balanceOk: boolean;
-    unityOk: boolean;
-    networkIntegrityOk: boolean;
-    evolutionOk: boolean;
-    notes?: string[];
-  };
-
-  morphology?: MorphologyEvidence;
-  fitTag?: 'strong' | 'medium' | 'weak';
-  status: 'pass' | 'fail' | 'experimental' | 'deprecated';
-  confidenceTag: 'solid' | 'speculative';
-
-  // Expected consonant semantics for this origin and whether the observed field agrees.
-  consonantProfile?: ConsonantProfile;
-  consonantProfileOk?: boolean;
-  consonantSignals?: string[]; // short human-readable notes, optional
 };
 
 export type AnalysisDebug = {
