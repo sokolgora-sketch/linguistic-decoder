@@ -1,4 +1,17 @@
-
+/**
+ * ⚠️ SEVEN-VOICES CORE ENGINE (solveWord)
+ *
+ * This file defines the deterministic core: vowel paths, rings, levels,
+ * op costs, consonant influence. It is heavily covered by tests:
+ *  - tests/engine.smoke.test.ts
+ *  - tests/baseline.spec.ts
+ *  - tests/gold.spec.ts
+ *
+ * IMPORTANT:
+ *  - Do NOT let auto-refactor / AI tools rewrite this file.
+ *  - Any change here MUST keep all those tests green.
+ *  - No pretty-printing (like turning voicePath arrays into strings) in here.
+ */
 // @ts-nocheck
 
 import { getManifest, EngineManifest } from "../engine/manifest";
