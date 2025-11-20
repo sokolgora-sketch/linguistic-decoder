@@ -124,7 +124,7 @@ export type CandidateOriginAxes = {
   // Seven-Voices path + principles consistency.
   principles: OriginAxisStatus;
   // Word-sum / morphology story: does it actually explain function?
-  morphology: OriginAxis-Status;
+  morphology: OriginAxisStatus;
   // Consonant behaviour vs. semantic profile (cut/build/etc.).
   consonants: OriginAxisStatus;
 };
