@@ -64,18 +64,19 @@ function countVoices(voices: Vowel[]): Record<string, number> {
 }
 
 function mapLevels(levelPath: number[]): ('high' | 'mid' | 'low')[] {
-    // Current UI seems to use 1=High, 0=Mid, -1=Low
-    // This adapter will follow the new logic specified.
-    return levelPath.map(n => {
-        if (n >= 1) return 'high'; // Map 1 to high as per prompt clarification
-        if (n === 0) return 'mid';
-        return 'low'; // Map -1 to low
-    });
+  // if n >= 2 → 'high'
+  // if n === 1 → 'mid'
+  // else → 'low'.
+  return levelPath.map(n => {
+    if (n >= 2) return 'high';
+    if (n === 1) return 'mid';
+    return 'low';
+  });
 }
 
 function estimateTension(primaryPath: EnginePath): TensionLevel {
   const ops = primaryPath.ops ?? [];
-  const nonKeepOps = ops.filter(op => op !== 'keep').length; // Assuming 'keep' is the no-op string
+  const nonKeepOps = ops.filter(op => op !== 'keep').length;
 
   if (nonKeepOps <= 1) {
     return 'low';
@@ -84,4 +85,119 @@ function estimateTension(primaryPath: EnginePath): TensionLevel {
     return 'medium';
   }
   return 'high';
+}
+
+export function enginePayloadToAnalysisResult(payload: EnginePayload): AnalysisResult {
+  const normalized = normalizeWord(payload.word);
+
+  // 1) Input / language guess
+  const lg = guessLanguageFromFamilies(payload.languageFamilies);
+
+  const inputCore: AnalysisCoreInput = {
+    raw: payload.word,
+    normalized,
+    alphabet: payload.alphabet,
+    languageGuess: lg.languageGuess,
+    languageConfidence: lg.confidence,
+    dialectGuess: lg.dialectGuess,
+    mode: mapMode(payload.mode)
+  };
+
+  // 2) Voices from primaryPath
+  const primary = payload.primaryPath;
+  const levelPath = mapLevels(primary.levelPath ?? []);
+
+  const voicesCore: AnalysisCoreVoices = {
+    vowelVoices: primary.voicePath,
+    ringPath: primary.ringPath,
+    levelPath,
+    dominantVoices: countVoices(primary.voicePath)
+  };
+
+  // 3) Consonants from windows / windowClasses (placeholder harmony)
+  const clusters = (payload.windows || []).map((w, idx) => ({
+    cluster: w,
+    classes: [payload.windowClasses?.[idx] ?? 'unknown'],
+    orbitSlots: [],
+    harmonyScore: 0.5
+  }));
+
+  const consonantsCore: AnalysisConsonants = {
+    clusters,
+    overallHarmony: {
+      byVoice: {},
+      globalHarmonyScore: 0.5
+    }
+  };
+
+  // 4) Heart paths summary
+  const heartPathsCore: AnalysisHeartPaths = {
+    primary: {
+      voiceSequence: primary.voicePath,
+      ringPath: primary.ringPath,
+      tensionLevel: estimateTension(primary)
+    },
+    frontierCount: payload.frontierPaths?.length ?? 0
+  };
+
+  const core: AnalysisCore = {
+    word: payload.word,
+    engineVersion: payload.engineVersion,
+    input: inputCore,
+    voices: voicesCore,
+    consonants: consonantsCore,
+    heartPaths: heartPathsCore
+  };
+
+  // 5) Map languageFamilies -> experimental candidates (placeholder)
+  const candidates: Candidate[] = (payload.languageFamilies ?? []).map((lf, idx) => {
+    return {
+      id: `family_${lf.familyId}_${idx}`,
+      language: lf.familyId,
+      family: lf.familyId,
+      form: payload.word,
+      decomposition: {
+        parts: [],
+        functionalStatement: lf.rationale || ''
+      },
+      voices: {
+        voiceSequence: primary.voicePath,
+        ringPath: primary.ringPath,
+        dominantVoices: countVoices(primary.voicePath)
+      },
+      ruleChecks: {
+        soundPathOk: true,
+        functionalDecompOk: false, // no real decomposition yet
+        sevenVoicesAlignmentOk: true,
+        consonantMeaningOk: true,
+        harmonyOk: true
+      },
+      principleSignals: {
+        truthOk: true,
+        expansionOk: true,
+        insightOk: true,
+        balanceOk: true,
+        unityOk: true,
+        networkIntegrityOk: true,
+        evolutionOk: true,
+        notes: [
+          'Placeholder candidate generated from languageFamilies; no real origin decomposition yet.'
+        ]
+      },
+      status: 'experimental',
+      confidenceTag: 'speculative'
+    };
+  });
+
+  const debug = {
+    rawEnginePayload: payload,
+    signals: payload.signals ?? [],
+    edgeWindows: payload.edgeWindows ?? []
+  };
+
+  return {
+    core,
+    candidates,
+    debug
+  };
 }
