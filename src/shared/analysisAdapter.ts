@@ -77,21 +77,8 @@ export function enginePayloadToAnalysisResult(
   const canon = CANON_CANDIDATES[word.toLowerCase()] ?? [];
 
   const candidates: Candidate[] = canon.map(c => {
-    // Check if consonant profile aligns with the field summary.
-    let profileOk = false; // Default to false
-    if (c.consonantProfile && summary.dominantArchetypes.length > 0) {
-      profileOk = summary.dominantArchetypes.some(
-        a =>
-          (c.consonantProfile === 'build' &&
-            (a === 'Plosive' || a === 'Nasal')) ||
-          (c.consonantProfile === 'cut' &&
-            (a === 'Plosive' || a === 'Affricate' || a === 'Nasal')) || // Added Nasal for cut
-          (c.consonantProfile === 'flow' && a === 'LiquidGlide')
-      );
-    } else if (c.consonantProfile) {
-        // If profile is expected but no dominant archetypes, it's not a match.
-        profileOk = false;
-    }
+    // Per instruction: set consonantProfileOk to true if the axes verdict for consonants is 'pass'.
+    const profileOk = c.axes?.consonants === 'pass';
 
     return {
       ...c,
