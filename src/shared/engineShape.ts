@@ -3,84 +3,6 @@
 // Canonical shape your UI will use everywhere.
 export type Vowel = 'A' | 'E' | 'I' | 'O' | 'U' | 'Y' | 'Ë';
 
-export type SymbolicAxis =
-  | 'love'
-  | 'religion'
-  | 'mathematics'
-  | 'law'
-  | 'power'
-  | 'creation'
-  | 'unknown';
-
-export interface SymbolicTag {
-  axis: SymbolicAxis;
-  source: 'sevenVoices' | 'zheji' | 'hybrid';
-  note: string;
-}
-
-export interface MorphologyMatrix {
-  pivot: string;
-  meaning: string;
-  morphemes: {
-    form: string;
-    role: 'root' | 'prefix' | 'suffix';
-    gloss?: string;
-  }[];
-  wordSums: {
-    parts: string[];
-    result: string;
-    gloss?: string;
-  }[];
-}
-
-export interface LanguageFamilyCandidate {
-  language: string;
-  form: string;
-  gloss: string;
-  passes: boolean;
-  experimental?: boolean;
-  speculative?: boolean;
-
-  voicePath: string;
-  levelPath: string;
-  ringPath: string;
-
-  morphologyMatrix?: MorphologyMatrix;
-  symbolic?: SymbolicTag[];
-}
-
-export interface AnalyzeWordResult {
-  word: string;
-  sanitized: string;
-
-  primaryPath: {
-    voicePath: string;
-    levelPath: string;
-    ringPath: string;
-  };
-
-  frontier: {
-    id: string;
-    voicePath: string;
-    levelPath: string;
-    ringPath: string;
-  }[];
-
-  languageFamilies: LanguageFamilyCandidate[];
-
-  meta: {
-    engineVersion: string;
-    createdAt: string;
-    mode?: 'strict' | 'open';
-    alphabet?: string;
-    solveMs?: number;
-    cacheHit?: boolean;
-    recomputed?: boolean;
-  };
-  symbolic?: SymbolicLayer;
-}
-
-
 export type EnginePath = {
   voicePath: Vowel[];
   ringPath: number[];
@@ -222,6 +144,27 @@ export interface WordSum {
   gloss?: string;        // "focused effort to know"
 }
 
+export interface MorphologyMatrix {
+  pivot: string;         // the core form: "stud", "dam", "mode"
+  meaning: string;       // short description: "measure, manner"
+  morphemes: Morpheme[];
+  wordSums: WordSum[];
+}
+
+export type SymbolicAxis =
+  | 'love'
+  | 'religion'
+  | 'mathematics'
+  | 'law'
+  | 'power'
+  | 'creation'
+  | 'unknown';
+
+export interface SymbolicTag {
+  axis: SymbolicAxis;
+  source: 'sevenVoices' | 'zheji' | 'hybrid';
+  note: string;
+}
 
 export type Candidate = {
   id: string;
@@ -255,131 +198,4 @@ export type Candidate = {
   principleSignals: {
     truthOk: boolean;
     expansionOk: boolean;
-    insightOk: boolean;
-    balanceOk: boolean;
-    unityOk: boolean;
-    networkIntegrityOk: boolean;
-    evolutionOk: boolean;
-    notes?: string[];
-  };
-
-  morphology?: MorphologyEvidence;
-  fitTag?: 'strong' | 'medium' | 'weak';
-  status: 'pass' | 'fail' | 'experimental' | 'deprecated';
-  confidenceTag: 'solid' | 'speculative';
-
-  // Expected consonant semantics for this origin and whether the observed field agrees.
-  consonantProfile?: ConsonantProfile;
-  consonantProfileOk?: boolean;
-  consonantSignals?: string[]; // short human-readable notes, optional
-
-  // Optional 3-axis diagnostic verdict for this origin.
-  axes?: CandidateOriginAxes;
-  
-  // Optional morphology matrix for structured word-sum data.
-  morphologyMatrix?: MorphologyMatrix;
-  symbolic?: SymbolicTag[];
-};
-
-// High-level consonant behaviour classes used for the 42-slot field.
-export type TensionLevel = 'low' | 'medium' | 'high';
-
-export type AnalysisCoreInput = {
-  raw: string;
-  normalized: string;
-  alphabet: string;
-  languageGuess: string; // "albanian" | "english" | "latin" | "unknown" | etc.
-  languageConfidence: 'low' | 'medium' | 'high';
-  dialectGuess?: string; // e.g. "geg" | "tosk" | "unknown"
-  mode: 'strict' | 'explore';
-};
-
-export type AnalysisCoreVoices = {
-  vowelVoices: Vowel[];
-  ringPath: number[];
-  levelPath: ('high' | 'mid' | 'low')[];
-  dominantVoices: Record<string, number>;
-};
-
-export type AnalysisConsonantCluster = {
-  cluster: string;
-  classes: string[];
-  orbitSlots: string[];     // e.g. ["A1","A3"] once 42-grid is implemented
-  harmonyScore: number;     // 0–1, placeholder for now
-};
-
-export type AnalysisConsonants = {
-  clusters: AnalysisConsonantCluster[];
-  overallHarmony: {
-    byVoice: Record<string, {
-      harmonicSlots: number;
-      disharmonicSlots: number;
-      harmonyScore: number; // 0–1
-    }>;
-    globalHarmonyScore: number; // 0–1
-  };
-};
-
-export type AnalysisHeartPaths = {
-  primary: {
-    voiceSequence: Vowel[];
-    ringPath: number[];
-    tensionLevel: TensionLevel;
-  };
-  frontierCount: number;
-};
-
-export type AnalysisCore = {
-  word: string;
-  engineVersion: string;
-  input: AnalysisCoreInput;
-  voices: AnalysisCoreVoices;
-  consonants: AnalysisConsonants;
-  heartPaths: AnalysisHeartPaths;
-};
-
-export type MorphologyEvidence = {
-  base: string;
-  affixes: string[];
-  wordSums: string[];
-  notes?: string[];
-};
-
-export type AnalysisDebug = {
-  rawEnginePayload?: EnginePayload;
-};
-
-export type PrincipleName =
-  | 'Truth'
-  | 'Expansion'
-  | 'Insight'
-  | 'Balance'
-  | 'Unity'
-  | 'Network Integrity'
-  | 'Evolution';
-
-export type SevenVoicesSummary = {
-  voicePath: Vowel[];              // e.g. ['U', 'I']
-  principlesPath: PrincipleName[]; // e.g. ['Unity', 'Insight']
-  dominant: PrincipleName[];       // sorted by frequency, e.g. ['Insight', 'Unity']
-  sevenWords: string[];            // 7-word sentence in principle order
-};
-
-// placeholder for Petro Zheji layer; we’ll fill later
-export interface SymbolicLayer {
-  notes: string[];
-  label?: string; // e.g. "Zheji-inspired symbolic reading (experimental)"
-}
-
-export type AnalysisResult_DEPRECATED = {
-  core: AnalysisCore;
-  // NEW: word-level consonant behaviour, shared by all candidates.
-  consonants?: {
-    field: ConsonantField;
-    summary: ConsonantSummary;
-  };
-  candidates: Candidate[];
-  debug?: AnalysisDebug;
-  sevenVoices?: SevenVoicesSummary;
-  symbolic?: SymbolicLayer;
-};
+ᱣ

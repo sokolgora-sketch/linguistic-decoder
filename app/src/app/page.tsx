@@ -20,7 +20,7 @@ import { ThemeToggle } from "../components/ThemeProvider";
 import { useDebounced } from "../hooks/useDebounced";
 import { Loader2, Sparkles, Wand2, HelpCircle, GitBranch, BookOpen, History as HistoryIcon, ListChecks } from "lucide-react";
 import ComparePanel from "../components/ComparePanel";
-import { normalizeEnginePayload, type Vowel, type EnginePayload, type AnalysisResult_DEPRECATED } from "../shared/engineShape";
+import { normalizeEnginePayload, type Vowel, type EnginePayload } from "../shared/engineShape";
 import { analysisResultToEnginePayload } from "@/shared/analysisAdapter";
 import HistoryPanel from "../components/HistoryPanel";
 import { doc, getDoc } from "firebase/firestore";
@@ -661,7 +661,7 @@ export default function LinguisticDecoderApp(){
                     <h3 className="font-bold text-sm tracking-wide">API Echo (debug)</h3>
                   </div>
                   <pre className="font-code text-xs whitespace-pre-wrap bg-slate-800 p-2.5 rounded-lg max-h-96 overflow-auto mt-2">
-                      {JSON.stringify(analysisResultToEnginePayload(data), null, 2)}
+                      {JSON.stringify(analysisResultToEnginePayload(data as any), null, 2)}
                   </pre>
               </Card>
           </div>
@@ -696,4 +696,11 @@ export default function LinguisticDecoderApp(){
               </Link>
             )}
             <Button variant="outline" size="sm" onClick={() => setShowDebug(s => !s)}>
-              {showDebug ? "Hide" :
+              {showDebug ? "Hide" : "Show JSON"}
+            </Button>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+}

@@ -2,14 +2,11 @@
 import { solveWord } from "../functions/sevenVoicesCore";
 import type { SolveOptions as SolveWordOptions } from "../functions/sevenVoicesCore";
 import type { EnginePayload } from "@/shared/engineShape";
-import { analysisResultToEnginePayload } from "@/shared/analysisAdapter";
-import { analyzeWord } from "@/engine/analyzeWord";
 
 export type Alphabet = "auto"|"albanian"|"latin"|"sanskrit"|"ancient_greek"|"pie"|"turkish"|"german";
 export const ENGINE_VERSION = process.env.NEXT_PUBLIC_ENGINE_VERSION ?? "dev";
 
-// This is what the app & JSON export will see.
-export type AnalysisResult = ReturnType<typeof analyzeWord>;
+export type AnalysisResult = EnginePayload;
 
 /**
  * Central wrapper for the Seven-Voices engine.
@@ -25,7 +22,30 @@ export function runAnalysis(
   alphabet: Alphabet
 ): AnalysisResult {
   const trimmed = word.trim();
-  const mode = opts.allowDelete ? 'explore' : 'strict';
-  const result = analyzeWord(trimmed, mode);
-  return result;
-}
+  if (!trimmed) {
+    // Return a default, empty payload
+    return {
+      engineVersion: ENGINE_VERSION,
+      word: "",
+      mode: "strict",
+      alphabet: "auto",
+      primaryPath: { voicePath:[], ringPath:[], levelPath:[], ops:[], checksums:{V:0,E:0,C:0}, kept:0 },
+      frontierPaths: [],
+      windows: [],
+      windowClasses: [],
+      signals: ["empty-input"],
+    };
+  }
+  
+  const result = solveWord(trimmed, opts, alphabet);
+
+  const payload: EnginePayload = {
+    engineVersion: result.engineVersion || ENGINE_VERSION,
+    word: trimmed,
+    mode: opts.allowDelete ? 'open' : 'strict',
+    alphabet: result.alphabet || alphabet, // Use result's detected alphabet if available
+    primaryPath: result.primaryPath,
+    frontierPaths: result.frontierPaths,
+    windows: result.windows,
+    windowClasses: result.windowClasses,
+    signals: result

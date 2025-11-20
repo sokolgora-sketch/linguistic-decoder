@@ -1,4 +1,3 @@
-
 // src/shared/analysisAdapter.ts
 
 import type {
