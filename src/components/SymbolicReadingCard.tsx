@@ -14,22 +14,26 @@ export function SymbolicReadingCard({ symbolic }: SymbolicReadingCardProps) {
     return null;
   }
 
+  const label = symbolic.label ?? 'Symbolic reading (experimental)';
+
   return (
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
             <Sparkles className="w-5 h-5 text-accent-foreground" />
-            <span>{symbolic.label || 'Symbolic Reading'}</span>
+            <span>{label}</span>
         </CardTitle>
         <CardDescription>
-          An experimental, functional reading based on the Seven-Voices path and morphological signals.
+          This is a symbolic / interpretive layer built on top of the Seven-Voices path and morphology.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-2 text-sm">
-        <ul className="list-disc list-inside space-y-1">
-          {symbolic.notes.map((note, index) => (
-            <li key={index} className="leading-relaxed">{note}</li>
-          ))}
+        <ul className="list-disc pl-5 space-y-1">
+            {symbolic.notes.map((note, idx) => (
+            <li key={idx} className="text-muted-foreground leading-relaxed">
+                {note}
+            </li>
+            ))}
         </ul>
       </CardContent>
     </Card>
