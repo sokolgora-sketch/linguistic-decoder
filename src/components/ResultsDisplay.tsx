@@ -4,8 +4,8 @@ import React, { useMemo } from "react";
 import { Card } from "./ui/card";
 import type { CClass } from "../functions/languages";
 import { classRange } from "../functions/languages";
-import type { EnginePayload, EnginePath, Vowel, AnalysisResult } from "../shared/engineShape";
-import { summarizePrinciples } from "../lib/principles";
+import type { EnginePayload, EnginePath, Vowel, AnalysisResult, OriginAxisStatus } from "../shared/engineShape";
+import { mapPathToPrinciples, getVoiceMeta } from '@/shared/sevenVoices';
 import WhyThisPath from "./WhyThisPath";
 import { VOICE_COLOR_MAP } from "../shared/voiceColors";
 import { Candidates } from "./Candidates";
@@ -131,19 +131,24 @@ function InfoLine({label, value, mono}:{label:string; value:string; mono?:boolea
   );
 }
 
-export function PrinciplesBlock({ engine }: { engine:any }) {
-  if (!engine?.primaryPath?.voicePath?.length) return null;
-  const s = summarizePrinciples(engine);
+export function PrinciplesBlock({ engine }: { engine: EnginePayload }) {
+  const primary = engine?.primaryPath;
+  if (!primary?.voicePath?.length) return null;
+  const principles = mapPathToPrinciples(primary.voicePath);
+
   return (
     <div className="mt-3 border rounded p-2 text-sm">
       <div className="font-semibold mb-1">Seven Principles</div>
-      <div className="opacity-80">Path: {s.pathLabel}</div>
-      {s.dominant.length > 0 && (
+      <div className="opacity-80">Path: {principles.principlePath.join(" → ")}</div>
+      {principles.dominantVoices.length > 0 && (
         <div className="opacity-80">
-          Dominant: {s.dominant.map(x=>`${x.label} (${x.hits})`).join(", ")}
+          Dominant:{' '}
+          {principles.dominantVoices
+            .map(v => `${getVoiceMeta(v).principle} (${v})`)
+            .join(', ')}
         </div>
       )}
-      <div className="opacity-60 text-xs mt-1">7 words: {s.sevenWords}</div>
+      <div className="opacity-60 text-xs mt-1">7 words: {principles.sevenWords.join(' · ')}</div>
     </div>
   );
 }
@@ -202,4 +207,3 @@ export function ResultsDisplay({ analysis: data }: { analysis: (EnginePayload & 
         </>
     );
 }
-
