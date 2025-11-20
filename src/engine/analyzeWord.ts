@@ -84,6 +84,36 @@ export interface AnalyzeWordResponse {
   symbolic?: SymbolicLayer;
 }
 
+// --- Private Helper for Symbolic Layer ---
+
+function buildSymbolicLayer(
+  core: SevenVoicesSummary,
+  canon: CanonLanguageCandidate[],
+): SymbolicLayer | undefined {
+  
+  const notes: string[] = [];
+
+  if (core.normalized === 'study') {
+    notes.push("Seven-Voices path U → I (Unity → Insight) fits a movement from shared field into focused inner knowing.");
+    notes.push("Latin studium: stud + ium → state of focused effort; matches the idea of 'inner, deliberate effort'.");
+    notes.push("Albanian s'tu-di-m: what is not yours → know → make it yours; mirrors the act of drawing the unknown into the self.");
+  } else if (core.normalized === 'damage') {
+    notes.push("Seven-Voices path A → E (Action → Expansion) for damage fits an act that opens into a harmed / reduced state.");
+    notes.push("Latin damnum: dam + num → harmed unit / state; symbolic reading: 'cut / harm' crystallised as a fixed condition.");
+    notes.push("Albanian dëm / dëmtim: harm + act of causing; emphasises the doing of harm as a process, not just a static state.");
+  }
+
+  if (notes.length > 0) {
+    return {
+      label: 'Zheji-inspired symbolic reading (experimental)',
+      notes: notes,
+    };
+  }
+
+  return undefined;
+}
+
+
 // --- Main Engine Function ---
 
 /**
@@ -126,7 +156,10 @@ export async function analyzeWord(
     ...f,
   }));
 
-  // 5. Assemble and return the final response
+  // 5. Build the symbolic layer
+  const symbolic = buildSymbolicLayer(core, canon);
+
+  // 6. Assemble and return the final response
   const response: AnalyzeWordResponse = {
     word: trimmedWord,
     mode,
@@ -134,7 +167,7 @@ export async function analyzeWord(
     core,
     canon,
     frontier,
-    symbolic: undefined, // Placeholder as requested
+    symbolic,
   };
 
   return Promise.resolve(response);
