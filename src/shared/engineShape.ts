@@ -75,3 +75,118 @@ export function normalizeEnginePayload(raw: any): EnginePayload {
 
   return payload;
 }
+
+// --- New analysis schema (on top of EnginePayload) ---
+
+export type TensionLevel = 'low' | 'medium' | 'high';
+
+export type AnalysisCoreInput = {
+  raw: string;
+  normalized: string;
+  alphabet: string;
+  languageGuess: string; // "albanian" | "english" | "latin" | "unknown" | etc.
+  languageConfidence: 'low' | 'medium' | 'high';
+  dialectGuess?: string; // e.g. "geg" | "tosk" | "unknown"
+  mode: 'strict' | 'explore';
+};
+
+export type AnalysisCoreVoices = {
+  vowelVoices: Vowel[];
+  ringPath: number[];
+  levelPath: ('high' | 'mid' | 'low')[];
+  dominantVoices: Record<string, number>;
+};
+
+export type AnalysisConsonantCluster = {
+  cluster: string;
+  classes: string[];
+  orbitSlots: string[];     // e.g. ["A1","A3"] once 42-grid is implemented
+  harmonyScore: number;     // 0–1, placeholder for now
+};
+
+export type AnalysisConsonants = {
+  clusters: AnalysisConsonantCluster[];
+  overallHarmony: {
+    byVoice: Record<string, {
+      harmonicSlots: number;
+      disharmonicSlots: number;
+      harmonyScore: number; // 0–1
+    }>;
+    globalHarmonyScore: number; // 0–1
+  };
+};
+
+export type AnalysisHeartPaths = {
+  primary: {
+    voiceSequence: Vowel[];
+    ringPath: number[];
+    tensionLevel: TensionLevel;
+  };
+  frontierCount: number;
+};
+
+export type AnalysisCore = {
+  word: string;
+  engineVersion: string;
+  input: AnalysisCoreInput;
+  voices: AnalysisCoreVoices;
+  consonants: AnalysisConsonants;
+  heartPaths: AnalysisHeartPaths;
+};
+
+// Candidate-level origin entry (per language/form)
+export type Candidate = {
+  id: string;
+  language: string;            // e.g. "latin", "albanian"
+  family: string;              // same as language family for now
+  form: string;                // origin form (we can use the input word as placeholder)
+
+  decomposition: {
+    parts: {
+      role: 'action' | 'instrument' | 'unit';
+      form: string;
+      gloss: string;
+    }[];
+    functionalStatement: string;
+  };
+
+  voices: {
+    voiceSequence: Vowel[];
+    ringPath: number[];
+    dominantVoices: Record<string, number>;
+  };
+
+  ruleChecks: {
+    soundPathOk: boolean;
+    functionalDecompOk: boolean;
+    sevenVoicesAlignmentOk: boolean;
+    consonantMeaningOk: boolean;
+    harmonyOk: boolean;
+  };
+
+  principleSignals: {
+    truthOk: boolean;
+    expansionOk: boolean;
+    insightOk: boolean;
+    balanceOk: boolean;
+    unityOk: boolean;
+    networkIntegrityOk: boolean;
+    evolutionOk: boolean;
+    notes?: string[];
+  };
+
+  status: 'pass' | 'experimental';
+  confidenceTag?: 'solid' | 'speculative';
+};
+
+export type AnalysisDebug = {
+  rawEnginePayload?: EnginePayload;
+  signals?: string[];
+  edgeWindows?: string[];
+};
+
+export type AnalysisResult = {
+  core: AnalysisCore;
+  candidates: Candidate[];
+  debug?: AnalysisDebug;
+};
