@@ -1,7 +1,72 @@
+
 // src/shared/engineShape.ts
 
 // Canonical shape your UI will use everywhere.
 export type Vowel = 'A'|'E'|'I'|'O'|'U'|'Y'|'Ë';
+
+export type SymbolicAxis =
+  | 'love'
+  | 'religion'
+  | 'mathematics'
+  | 'law'
+  | 'power'
+  | 'creation'
+  | 'unknown';
+
+export interface SymbolicTag {
+  axis: SymbolicAxis;
+  source: 'sevenVoices' | 'zheji' | 'hybrid';
+  note: string;
+}
+
+export interface MorphologyMatrix {
+  pivot: string;
+  meaning: string;
+  morphemes: Morpheme[];
+  wordSums: WordSum[];
+}
+
+export interface LanguageFamilyCandidate {
+  language: string;
+  form: string;
+  gloss: string;
+  passes: boolean;
+  experimental?: boolean;
+  speculative?: boolean;
+  voicePath: string;
+  levelPath: string;
+  ringPath: string;
+  morphologyMatrix?: MorphologyMatrix;
+  symbolic?: SymbolicTag[];
+}
+
+export interface AnalyzeWordResult {
+  word: string;
+  sanitized: string;
+  primaryPath: {
+    voicePath: string;
+    levelPath: string;
+    ringPath: string;
+  };
+  frontier: {
+    id: string;
+    voicePath: string;
+    levelPath: string;
+    ringPath: string;
+  }[];
+  languageFamilies: LanguageFamilyCandidate[];
+  meta: {
+    engineVersion: string;
+    createdAt: string;
+    mode?: 'strict' | 'open';
+    alphabet?: string;
+    solveMs?: number;
+    cacheHit?: boolean;
+    recomputed?: boolean;
+  };
+  symbolic?: SymbolicLayer;
+}
+
 
 export type EnginePath = {
   voicePath: Vowel[];
@@ -142,13 +207,6 @@ export interface WordSum {
   parts: string[];       // ["stud", "y"] → "study"
   result: string;        // "study"
   gloss?: string;        // "focused effort to know"
-}
-
-export interface MorphologyMatrix {
-  pivot: string;         // the core form: "stud", "dam", "mode"
-  meaning: string;       // short description: "measure, manner"
-  morphemes: Morpheme[];
-  wordSums: WordSum[];
 }
 
 

@@ -1,3 +1,3 @@
 
 // src/engine/version.ts
-export const ENGINE_VERSION = '2025-11-15-v1';
+export const ENGINE_VERSION = '0.2.0-symbolic';

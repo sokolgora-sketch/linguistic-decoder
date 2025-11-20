@@ -21,7 +21,7 @@ import { ThemeToggle } from "../components/ThemeProvider";
 import { useDebounced } from "../hooks/useDebounced";
 import { Loader2, Sparkles, Wand2, HelpCircle, GitBranch, BookOpen, History as HistoryIcon, ListChecks } from "lucide-react";
 import ComparePanel from "../components/ComparePanel";
-import { normalizeEnginePayload, type EnginePayload, type Vowel, type AnalysisResult } from "../shared/engineShape";
+import { normalizeEnginePayload, type Vowel, type AnalyzeWordResult } from "../shared/engineShape";
 import HistoryPanel from "../components/HistoryPanel";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../lib/firebase";
@@ -32,6 +32,7 @@ import { ExportJsonButton } from "../components/ExportJsonButton";
 import { logError } from "../lib/logError";
 import { VOICE_COLOR_MAP, VOICE_LABEL_MAP } from "../shared/voiceColors";
 import { SymbolicReadingCard } from "@/components/SymbolicReadingCard";
+import { analysisResultToEnginePayload } from "@/shared/analysisAdapter";
 
 const VOICE_META: { id: Vowel; label: string; role: string }[] = [
   { id: "A", label: "Action / Truth", role: "Launches, cuts through, sets the first line." },
@@ -48,9 +49,6 @@ if (process.env.NEXT_PUBLIC_DEV_EVAL === "1") {
   EvalPanelComp = require("../components/EvalPanel").default;
 }
 
-type AnalysisResponse = EnginePayload & { analysis?: AnalysisResult };
-
-
 // ==== Main App ===============================================================
 export default function LinguisticDecoderApp(){
   const { toast } = useToast();
@@ -58,7 +56,7 @@ export default function LinguisticDecoderApp(){
   const [mode, setMode] = useState<"strict"|"open">("strict");
   const [alphabet, setAlphabet] = useState<Alphabet>("auto");
   const [edgeWeight, setEdgeWeight] = useState(0.25);
-  const [data, setData] = useState<AnalysisResponse | null>(null);
+  const [data, setData] = useState<AnalyzeWordResult | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [isWarming, setIsWarming] = useState(false);
@@ -67,35 +65,7 @@ export default function LinguisticDecoderApp(){
 
   // Debounce user input, then warm the cache in the background
   const debouncedWord = useDebounced(word, 450);
-  useEffect(() => {
-    let cancelled = false;
-
-    async function warm() {
-      const w = debouncedWord.trim();
-      if (!w) {
-        if (!cancelled) setIsWarming(false);
-        return;
-      }
   
-      if (!cancelled) setIsWarming(true);
-      try {
-        // Pre-fetch only; same options, no behavior change.
-        await analyzeClient(w, mode, alphabet, { edgeWeight, useAi });
-      } catch {
-        // ignore prefetch errors
-      } finally {
-        if (!cancelled) setIsWarming(false);
-      }
-    }
-  
-    warm();
-  
-    return () => {
-      cancelled = true;
-    };
-  }, [debouncedWord, mode, alphabet, edgeWeight, useAi]);
-  
-
   const canAnalyze = word.trim().length > 0 && !loading;
 
   async function analyze(nextWord?: string, nextMode?: "strict"|"open", nextAlphabet?: Alphabet){
@@ -116,7 +86,6 @@ export default function LinguisticDecoderApp(){
       const clientResponse = await analyzeClient(useWord, useMode, useAlphabet, { edgeWeight, useAi });
       console.log("API result:", clientResponse);
   
-      // The payload from analyzeClient is already normalized and includes the analysis object
       setData(clientResponse);
     } catch (e: any) {
       const error = e?.message || "Request failed";
@@ -135,19 +104,16 @@ export default function LinguisticDecoderApp(){
         word: "smoke-test",
         mode: "strict",
         alphabet: "auto",
-        primaryPath: { voicePath: ["U","I"], ringPath: [1,1], levelPath: [-1,1], ops: ["test-op"], kept: 2, checksums: {V:55, E:0, C:2} },
-        frontierPaths: [
-            { voicePath: ["A","E"], ringPath: [3,2], levelPath: [1,1], ops: [], checksums: {V:6, E:1, C:1}, kept: 0 },
+        primaryPath: { voicePath: "U → I", ringPath: "1 → 1", levelPath: "low → high" },
+        frontier: [
+            { id: "alt-1", voicePath: "A → E", ringPath: "3 → 2", levelPath: "high → high" },
         ],
-        windows: ["d"],
-        windowClasses: ["Plosive"],
-        signals: ["smoke-test-signal"],
-        solveMs: 1,
         languageFamilies: [],
+        meta: { engineVersion: 'mock-v1', createdAt: new Date().toISOString() },
+        sanitized: 'smoke-test'
     };
     try {
-        const normalized = normalizeEnginePayload(mock);
-        setData(normalized as AnalysisResponse);
+        setData(mock);
         setErr(null);
         toast({ title: "Smoke Test", description: "Displaying mock data for 'study'." });
     } catch(e:any){
@@ -181,14 +147,14 @@ export default function LinguisticDecoderApp(){
     }
     setLoading(true);
     setErr(null);
-    // setData(null);
     try {
       const cacheRef = doc(db, "analyses", cacheId);
       const snap = await getDoc(cacheRef);
       if (snap.exists()) {
-          const normalized = normalizeEnginePayload(snap.data());
-          setData({ ...normalized, cacheHit: true, recomputed: false } as AnalysisResponse);
-          toast({ title: "Loaded from Cache", description: `Analysis for '${normalized.word}' loaded.` });
+          const payload = normalizeEnginePayload(snap.data());
+          const result = analysisResultToEnginePayload(payload);
+          setData({ ...result, meta: { ...result.meta, cacheHit: true } });
+          toast({ title: "Loaded from Cache", description: `Analysis for '${result.word}' loaded.` });
       } else {
           toast({ variant: "destructive", title: "Not Found", description: "Could not find that analysis in the cache." });
       }
@@ -203,7 +169,6 @@ export default function LinguisticDecoderApp(){
 
   async function onRecompute(word: string, m?: string, a?: string) {
       setLoading(true);
-      // setData(null);
       setErr(null);
       try {
           const result = await analyzeClient(word, (m as any) || mode, (a as any) || alphabet, {
@@ -212,7 +177,7 @@ export default function LinguisticDecoderApp(){
             edgeWeight,
             useAi
           });
-          setData(result);
+          setData({ ...result, meta: { ...result.meta, recomputed: true } });
           toast({ title: "Recomputed", description: `Fresh analysis for '${result.word}' complete.` });
       } catch (e: any) {
           logError({where: "history-recompute", message: e.message, detail: {word}});
@@ -222,8 +187,6 @@ export default function LinguisticDecoderApp(){
           setLoading(false);
       }
   }
-
-  const signals = data?.signals ?? [];
   
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -236,6 +199,9 @@ export default function LinguisticDecoderApp(){
     alphabet === "auto"
       ? "Auto-Detect"
       : alphabet.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
+      
+  const enginePayloadForOldComponents = data ? analysisResultToEnginePayload(data) : null;
+
 
   return (
     <div className="min-h-screen bg-background text-foreground p-4 lg:p-8 flex flex-col items-stretch transition-colors duration-300">
@@ -252,11 +218,11 @@ export default function LinguisticDecoderApp(){
               </p>
               {data && (
                 <p className="text-xs text-muted-foreground/80">
-                  <span className="font-code">engine={data.engineVersion}</span>
+                  <span className="font-code">engine={data.meta.engineVersion}</span>
                   <span className="mx-2">·</span>
-                  <span className="font-code">mode={data.mode}</span>
+                  <span className="font-code">mode={data.meta.mode}</span>
                   <span className="mx-2">·</span>
-                  <span className="font-code">alphabet={data.alphabet}</span>
+                  <span className="font-code">alphabet={data.meta.alphabet}</span>
                 </p>
               )}
             </div>
@@ -286,7 +252,7 @@ export default function LinguisticDecoderApp(){
               <span className="inline-flex items-center gap-1">
                 <span className="font-semibold">Mode:</span>
                 <span className="px-1.5 py-0.5 rounded-full border border-border/60 bg-muted/60 uppercase tracking-wide">
-                  {data.mode}
+                  {data.meta.mode}
                 </span>
               </span>
 
@@ -297,19 +263,19 @@ export default function LinguisticDecoderApp(){
                 </span>
               )}
 
-              {"solveMs" in data && (
+              {"solveMs" in data.meta && (
                 <span>
-                  <span className="font-semibold">Solve:</span> {data.solveMs} ms
+                  <span className="font-semibold">Solve:</span> {data.meta.solveMs} ms
                 </span>
               )}
 
-              {data.cacheHit && (
+              {data.meta.cacheHit && (
                 <span className="px-1.5 py-0.5 rounded-full border border-accent/60 text-accent-foreground bg-accent/10">
                   cache hit
                 </span>
               )}
 
-              {data.recomputed && (
+              {data.meta.recomputed && (
                 <span className="px-1.5 py-0.5 rounded-full border border-blue-500/60 text-blue-300 bg-blue-500/10">
                   recomputed
                 </span>
@@ -489,9 +455,9 @@ export default function LinguisticDecoderApp(){
               <CardContent className="p-3 sm:p-4 space-y-3">
                 <TwoRailsWithConsonants
                   word={data?.word || word}
-                  path={loading ? [] : ((data?.primaryPath?.voicePath as Vowel[]) || [])}
+                  path={loading ? [] : ((data?.primaryPath?.voicePath?.split('→').map(s=>s.trim()) as Vowel[]) || [])}
                   running={loading}
-                  playKey={`${data?.word}|${(data?.primaryPath?.voicePath || []).join("")}`}
+                  playKey={`${data?.word}|${data?.primaryPath?.voicePath}`}
                   height={320}
                   durationPerHopMs={900}
                 />
@@ -536,20 +502,20 @@ export default function LinguisticDecoderApp(){
                     </CardHeader>
                     <CardContent className="space-y-1 text-xs text-muted-foreground">
                         <p><strong>Word:</strong> {data.word}</p>
-                        <p><strong>Mode:</strong> {data.mode}</p>
-                        <p><strong>Alphabet:</strong> {data.alphabet}</p>
-                        {"solveMs" in data && <p><strong>Solve Time:</strong> {data.solveMs} ms</p>}
-                        {data.cacheHit && <p className="font-bold text-accent-foreground pt-1">Loaded from cache</p>}
-                        {data.recomputed && <p className="font-bold text-blue-400 pt-1">Recomputed</p>}
+                        <p><strong>Mode:</strong> {data.meta.mode}</p>
+                        <p><strong>Alphabet:</strong> {data.meta.alphabet}</p>
+                        {"solveMs" in data.meta && <p><strong>Solve Time:</strong> {data.meta.solveMs} ms</p>}
+                        {data.meta.cacheHit && <p className="font-bold text-accent-foreground pt-1">Loaded from cache</p>}
+                        {data.meta.recomputed && <p className="font-bold text-blue-400 pt-1">Recomputed</p>}
                     </CardContent>
                   </Card>
                 )}
             </div>
           </div>
 
-          {data && data.analysis && (
+          {data && (
             <Card
-              key={`${data.word}-${data.mode}-${data.alphabet}`}
+              key={`${data.word}-${data.meta.mode}-${data.meta.alphabet}`}
               className="animate-fade-in"
             >
               <CardHeader>
@@ -561,11 +527,9 @@ export default function LinguisticDecoderApp(){
               <CardContent className="space-y-4">
                 <ResultsDisplay analysis={data} />
                 <div className="flex justify-end pt-2">
-                  <ExportJsonButton analysis={data} />
+                  {enginePayloadForOldComponents && <ExportJsonButton analysis={enginePayloadForOldComponents} />}
                 </div>
-                <WhyThisPath primary={data.primaryPath} />
-                <PrinciplesBlock analysis={data.analysis} />
-                {data.analysis.symbolic && <SymbolicReadingCard symbolic={data.analysis.symbolic} />}
+                {enginePayloadForOldComponents && <WhyThisPath primary={enginePayloadForOldComponents.primaryPath} />}
               </CardContent>
             </Card>
           )}
@@ -717,25 +681,13 @@ export default function LinguisticDecoderApp(){
             {data && (
               <>
                 <div>
-                  <span className="mr-2">engine={data.engineVersion}</span>
-                  <span className="mr-2">mode={data.mode}</span>
-                  <span className="mr-2">alphabet={data.alphabet}</span>
-                  {"solveMs" in data && <span className="mr-2">solveMs={data.solveMs}</span>}
-                  {data?.cacheHit && <span className="mr-2 px-1.5 py-0.5 rounded bg-accent/20 border border-accent text-accent-foreground">cacheHit</span>}
-                  {data?.recomputed && <span className="mr-2 px-1.5 py-0.5 rounded bg-blue-900 border border-blue-700">recomputed</span>}
+                  <span className="mr-2">engine={data.meta.engineVersion}</span>
+                  <span className="mr-2">mode={data.meta.mode}</span>
+                  <span className="mr-2">alphabet={data.meta.alphabet}</span>
+                  {"solveMs" in data.meta && <span className="mr-2">solveMs={data.meta.solveMs}</span>}
+                  {data.meta.cacheHit && <span className="mr-2 px-1.5 py-0.5 rounded bg-accent/20 border border-accent text-accent-foreground">cacheHit</span>}
+                  {data.meta.recomputed && <span className="mr-2 px-1.5 py-0.5 rounded bg-blue-900 border border-blue-700">recomputed</span>}
                 </div>
-                {signals.length > 0 && (
-                  <div className="flex flex-wrap gap-1 pt-1">
-                    {signals.map((sig) => (
-                      <span
-                        key={sig}
-                        className="px-1.5 py-0.5 rounded border border-border/60 bg-muted/40 text-[10px] uppercase tracking-wide"
-                      >
-                        {sig}
-                      </span>
-                    ))}
-                  </div>
-                )}
               </>
             )}
             <FooterBuild />

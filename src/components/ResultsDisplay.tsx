@@ -4,8 +4,8 @@ import React, { useMemo } from "react";
 import { Card } from "./ui/card";
 import type { CClass } from "../functions/languages";
 import { classRange } from "../functions/languages";
-import type { EnginePayload, EnginePath, Vowel, AnalysisResult, OriginAxisStatus } from "../shared/engineShape";
-import { mapPathToPrinciples, getVoiceMeta } from '@/shared/sevenVoices';
+import type { AnalyzeWordResult, LanguageFamilyCandidate } from "../shared/engineShape";
+import { getVoiceMeta } from '@/shared/sevenVoices';
 import WhyThisPath from "./WhyThisPath";
 import { VOICE_COLOR_MAP } from "../shared/voiceColors";
 import { Candidates } from "./Candidates";
@@ -13,8 +13,8 @@ import { PrinciplesBlock } from "./PrinciplesBlock";
 
 
 const LEVEL_LABEL: Record<number, string> = { 1: "High", 0: "Mid", [-1]: "Low" } as any;
-const labelLevels = (levels: number[]) => levels.map(l=> LEVEL_LABEL[l] ?? l).join(" → ");
-const labelRings = (rings: number[]) => rings.join(" → ");
+const labelLevels = (levels: string) => levels.split(" → ").map(l => l.charAt(0).toUpperCase() + l.slice(1)).join(" → ");
+const labelRings = (rings: string) => rings;
 
 const Arrow = () => <span className="font-bold text-muted-foreground">→</span>;
 const Chip = ({ v }: { v: string | number }) => {
@@ -29,12 +29,14 @@ const Chip = ({ v }: { v: string | number }) => {
     );
 };
 
-function ConsonantInfo({ analysis }: { analysis: EnginePayload }) {
-  const { windows, windowClasses, primaryPath, edgeWindows } = analysis;
-  const ringPath = primaryPath?.ringPath;
+function ConsonantInfo({ analysis }: { analysis: any }) {
+  const windows = analysis.windows || [];
+  const windowClasses = analysis.windowClasses || [];
+  const ringPath = analysis.primaryPath?.ringPath?.split('→').map(Number) || [];
+  const edgeWindows = analysis.edgeWindows || [];
 
-  const hasInteriorWindows = windows && windowClasses && windows.length > 0;
-  const hasEdgeWindows = edgeWindows && edgeWindows.length > 0;
+  const hasInteriorWindows = windows.length > 0;
+  const hasEdgeWindows = edgeWindows.length > 0;
 
   if (!hasInteriorWindows && !hasEdgeWindows) {
     return null;
@@ -46,7 +48,7 @@ function ConsonantInfo({ analysis }: { analysis: EnginePayload }) {
       
       {hasInteriorWindows && (
         <div className="flex flex-col gap-1.5">
-          {windows.map((w, i) => {
+          {windows.map((w:string, i:number) => {
             const cClass = windowClasses[i] as CClass;
             const [lo, hi] = classRange(cClass);
             let hopInfo = "";
@@ -76,8 +78,8 @@ function ConsonantInfo({ analysis }: { analysis: EnginePayload }) {
 }
 
 
-export function PathRow({ title, block, analysis }: { title: string; block?: EnginePath, analysis: EnginePayload }) {
-  if (!block || !block.voicePath || block.voicePath.length === 0) {
+export function PathRow({ title, block, analysis }: { title: string; block?: {voicePath:string, ringPath:string, levelPath:string}, analysis: AnalyzeWordResult }) {
+  if (!block || !block.voicePath) {
     return (
       <Card className="p-4">
         <h3 className="font-bold text-sm tracking-wide mb-2">{title}</h3>
@@ -86,7 +88,7 @@ export function PathRow({ title, block, analysis }: { title: string; block?: Eng
     );
   }
 
-  const { voicePath, ringPath, levelPath, checksums, ops, kept } = block;
+  const { voicePath, ringPath, levelPath } = block;
 
   return (
     <Card className="p-4">
@@ -94,31 +96,18 @@ export function PathRow({ title, block, analysis }: { title: string; block?: Eng
 
       <>
         <div className="flex flex-wrap gap-2 items-center">
-          {voicePath.map((v,i)=>(
+          {voicePath.split("→").map((v,i)=>(
             <React.Fragment key={`v-${i}`}>
-              <Chip v={v} />{i<voicePath.length-1 && <Arrow/>}
+              <Chip v={v.trim()} />{i<voicePath.split("→").length-1 && <Arrow/>}
             </React.Fragment>
           ))}
         </div>
 
         <div className="mt-2.5 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2.5">
-            <InfoLine label="Voice Path" value={voicePath.join(" → ")} />
+            <InfoLine label="Voice Path" value={voicePath} />
             <InfoLine label="Level Path" value={labelLevels(levelPath)} />
             <InfoLine label="Ring Path" value={labelRings(ringPath)} />
-            {checksums && (
-                <InfoLine label="Checksums" value={`V=${checksums.V} · E=${checksums.E.toFixed(2)} · C=${checksums.C}`} mono />
-            )}
-            {typeof kept === "number" ? <InfoLine label="Keeps" value={String(kept)} /> : null}
         </div>
-        
-        {title === "Primary Path" && <ConsonantInfo analysis={analysis} />}
-
-        {ops?.length > 0 && (
-          <div className="mt-2.5">
-            <h4 className="font-bold text-sm tracking-wide">Ops</h4>
-            <div className="font-code text-xs whitespace-pre-wrap">{ops.join("; ")}</div>
-          </div>
-        )}
       </>
     </Card>
   );
@@ -133,10 +122,8 @@ function InfoLine({label, value, mono}:{label:string; value:string; mono?:boolea
   );
 }
 
-export function ResultsDisplay({ analysis: data }: { analysis: (EnginePayload & { analysis?: AnalysisResult }) }) {
-    const { primaryPath, frontierPaths, analysis } = data;
-
-    const frontierList = useMemo(() => (frontierPaths || []).filter(f => f?.voicePath && f.voicePath.join("") !== (primaryPath?.voicePath || []).join("")), [frontierPaths, primaryPath]);
+export function ResultsDisplay({ analysis: data }: { analysis: AnalyzeWordResult }) {
+    const { primaryPath, frontier, languageFamilies } = data;
 
     if (!primaryPath) return null;
     
@@ -144,14 +131,15 @@ export function ResultsDisplay({ analysis: data }: { analysis: (EnginePayload & 
         <div className="space-y-4">
             <PathRow block={primaryPath} title="Primary Path" analysis={data} />
             
-            <Candidates items={data.languageFamilies} analysis={analysis} />
+            <Candidates items={languageFamilies} />
 
-            {frontierList.length > 0 && (
+            {frontier.length > 0 && (
               <Card className="p-4 mt-4">
                 <h3 className="font-bold text-sm tracking-wide">Frontier (near‑optimal alternates)</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mt-3">
-                  {frontierList.map((f, idx)=> {
-                    const altVoice = f.voicePath?.[0] as Vowel | undefined;
+                  {frontier.map((f, idx)=> {
+                    const voicePathArray = f.voicePath.split('→').map(s=>s.trim());
+                    const altVoice = voicePathArray[0] as Vowel | undefined;
                     const altBadgeStyle = altVoice
                       ? { backgroundColor: VOICE_COLOR_MAP[altVoice], color: "#020617" }
                       : {};
@@ -164,19 +152,17 @@ export function ResultsDisplay({ analysis: data }: { analysis: (EnginePayload & 
                         >
                             {altVoice ?? "?"}
                         </div>
-                        Alt #{idx+1}
+                        {f.id}
                       </div>
                       <div className="flex flex-wrap gap-1.5 items-center">
-                        {f.voicePath.map((v,i)=> (
+                        {voicePathArray.map((v,i)=> (
                           <React.Fragment key={i}>
                             <Chip v={v} />
-                            {i < f.voicePath.length-1 && <Arrow/>}
+                            {i < voicePathArray.length-1 && <Arrow/>}
                           </React.Fragment>
                         ))}
                       </div>
                       <hr className="my-2 border-border" />
-                      {f.checksums && <div className="font-code text-xs">V={f.checksums.V} · E={f.checksums.E.toFixed(2)} · C={f.checksums.C}</div>}
-                      <div className="font-code text-xs mt-1">Keeps: {typeof f.kept === "number" ? f.kept : "—"}</div>
                       <div className="text-xs mt-1.5 text-slate-500">Levels: {labelLevels(f.levelPath)}</div>
                       <div className="text-xs text-slate-500">Rings: {labelRings(f.ringPath)}</div>
                     </Card>
@@ -187,5 +173,3 @@ export function ResultsDisplay({ analysis: data }: { analysis: (EnginePayload & 
         </div>
     );
 }
-
-    

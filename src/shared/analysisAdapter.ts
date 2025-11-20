@@ -20,6 +20,7 @@ import type {
 import { CANON_CANDIDATES } from './canonCandidates';
 import { buildConsonantField } from './consonantField';
 import { getVoiceMeta, mapPathToPrinciples } from './sevenVoices';
+import { analyzeWord } from '@/engine/analyzeWord';
 
 // --- Helper Functions ---
 
@@ -226,4 +227,36 @@ export function enginePayloadToAnalysisResult(payload: EnginePayload): AnalysisR
   };
 
   return result;
+}
+
+export function analysisResultToEnginePayload(result: AnalyzeWordResult): EnginePayload {
+  const mode = (result.core?.input?.mode === 'explore') ? 'open' : 'strict';
+  const alphabet = result.core?.input?.alphabet || 'auto';
+  
+  return result.debug?.rawEnginePayload ?? {
+    engineVersion: result.core.engineVersion,
+    word: result.core.word,
+    mode: mode,
+    alphabet: alphabet,
+    primaryPath: {
+      voicePath: result.core.voices.vowelVoices,
+      ringPath: result.core.voices.ringPath,
+      levelPath: result.core.voices.levelPath.map(l => l === 'high' ? 1 : l === 'mid' ? 0 : -1),
+      ops: [],
+      checksums: { V: 0, E: 0, C: 0 }, // This data is lost in translation
+      kept: 0,
+    },
+    frontierPaths: [],
+    windows: result.core.consonants.clusters.map(c => c.cluster),
+    windowClasses: result.core.consonants.clusters.map(c => c.classes[0]),
+    signals: [],
+    languageFamilies: result.candidates.map(c => ({
+      familyId: c.family,
+      label: c.language,
+      confidence: 0.5, // Lost in translation
+      rationale: c.decomposition.functionalStatement,
+      forms: [],
+      signals: [],
+    }))
+  };
 }
