@@ -9,6 +9,8 @@ import { mapPathToPrinciples, getVoiceMeta } from '@/shared/sevenVoices';
 import WhyThisPath from "./WhyThisPath";
 import { VOICE_COLOR_MAP } from "../shared/voiceColors";
 import { Candidates } from "./Candidates";
+import { PrinciplesBlock } from "./PrinciplesBlock";
+
 
 const LEVEL_LABEL: Record<number, string> = { 1: "High", 0: "Mid", [-1]: "Low" } as any;
 const labelLevels = (levels: number[]) => levels.map(l=> LEVEL_LABEL[l] ?? l).join(" → ");
@@ -131,28 +133,6 @@ function InfoLine({label, value, mono}:{label:string; value:string; mono?:boolea
   );
 }
 
-export function PrinciplesBlock({ engine }: { engine: EnginePayload }) {
-  const primary = engine?.primaryPath;
-  if (!primary?.voicePath?.length) return null;
-  const principles = mapPathToPrinciples(primary.voicePath);
-
-  return (
-    <div className="mt-3 border rounded p-2 text-sm">
-      <div className="font-semibold mb-1">Seven Principles</div>
-      <div className="opacity-80">Path: {principles.principlePath.join(" → ")}</div>
-      {principles.dominantVoices.length > 0 && (
-        <div className="opacity-80">
-          Dominant:{' '}
-          {principles.dominantVoices
-            .map(v => `${getVoiceMeta(v).principle} (${v})`)
-            .join(', ')}
-        </div>
-      )}
-      <div className="opacity-60 text-xs mt-1">7 words: {principles.sevenWords.join(' · ')}</div>
-    </div>
-  );
-}
-
 export function ResultsDisplay({ analysis: data }: { analysis: (EnginePayload & { analysis?: AnalysisResult }) }) {
     const { primaryPath, frontierPaths, analysis } = data;
 
@@ -161,10 +141,12 @@ export function ResultsDisplay({ analysis: data }: { analysis: (EnginePayload & 
     if (!primaryPath) return null;
     
     return (
-        <>
+        <div className="space-y-4">
             <PathRow block={primaryPath} title="Primary Path" analysis={data} />
             
             <Candidates items={data.languageFamilies} analysis={analysis} />
+
+            {analysis && <PrinciplesBlock analysis={analysis} />}
 
             {frontierList.length > 0 && (
               <Card className="p-4 mt-4">
@@ -204,6 +186,6 @@ export function ResultsDisplay({ analysis: data }: { analysis: (EnginePayload & 
                 </div>
               </Card>
             )}
-        </>
+        </div>
     );
 }

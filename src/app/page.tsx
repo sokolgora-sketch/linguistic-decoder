@@ -10,7 +10,8 @@ import { Input } from "../components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../components/ui/accordion";
 import { Candidates } from "../components/Candidates";
-import { ResultsDisplay, PrinciplesBlock } from "../components/ResultsDisplay";
+import { ResultsDisplay } from "../components/ResultsDisplay";
+import { PrinciplesBlock } from "../components/PrinciplesBlock";
 import { ConsonantReference } from "../components/ConsonantReference";
 import { TwoRailsWithConsonants } from "../components/TwoRailsWithConsonants";
 import { analyzeClient } from "../lib/analyzeClient";
@@ -545,7 +546,7 @@ export default function LinguisticDecoderApp(){
             </div>
           </div>
 
-          {data && (
+          {data && data.analysis && (
             <Card
               key={`${data.word}-${data.mode}-${data.alphabet}`}
               className="animate-fade-in"
@@ -562,7 +563,7 @@ export default function LinguisticDecoderApp(){
                   <ExportJsonButton analysis={data} />
                 </div>
                 <WhyThisPath primary={data.primaryPath} />
-                <PrinciplesBlock engine={data} />
+                {data.analysis && <PrinciplesBlock analysis={data.analysis} />}
               </CardContent>
             </Card>
           )}
