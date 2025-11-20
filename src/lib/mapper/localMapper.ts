@@ -16,7 +16,7 @@ export function mapWordToLanguageFamiliesLocal(word: any, voicePath: string[]): 
 
   // --- signals ---
   // diacritics → strong Albanian tilt
-  if (/[ëç]/.test(w)) alb += 40;
+  if (/[ëç]/i.test(w)) alb += 40;
 
   // simple Albanian morphology cues (deterministic, low weight):
   // - “vet…” prefix (self-)
@@ -47,7 +47,11 @@ export function mapWordToLanguageFamiliesLocal(word: any, voicePath: string[]): 
 
   const top = scores[0];
   if (top && top.label === 'Albanian') {
-    top.dialect = /[ëç]/i.test(w) ? 'tosk' : 'geg';
+    let geg = 0, tosk = 0;
+    if (/[âà]/.test(w) || /(ç|xh)/.test(w)) geg += 1;
+    if (/[ë]/.test(w) || /(q|gj)/.test(w)) tosk += 1;
+    if (geg > tosk) top.dialect = 'geg';
+    if (tosk > geg) top.dialect = 'tosk';
   }
 
   return scores;

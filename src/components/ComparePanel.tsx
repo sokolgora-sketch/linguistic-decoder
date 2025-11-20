@@ -1,12 +1,12 @@
 "use client";
 import { useState, useEffect } from "react";
-import { analyzeClient } from "@/lib/analyzeClient";
-import type { Alphabet } from "@/lib/solver/engineConfig";
-import { PROFILES } from "@/functions/languages";
-import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
+import { analyzeClient } from "../lib/analyzeClient";
+import type { Alphabet } from "../lib/runAnalysis";
+import { PROFILES } from "../functions/languages";
+import { Card } from "./ui/card";
+import { Input } from "./ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
+import { Button } from "./ui/button";
 
 type Mode = "strict" | "open";
 

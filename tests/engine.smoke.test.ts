@@ -1,9 +1,6 @@
-// If your exported API differs, adjust this import to your real entry:
-// Example A (core function):
-import { solveWord } from '@/functions/sevenVoicesCore';
-// Example B (wrapper):
-// import { solveWord } from '@/lib/solver';
 
+// If your exported API differs, adjust this import to your real entry:
+import { runAnalysis } from '@/lib/runAnalysis';
 import { getManifest } from '@/engine/manifest';
 
 const manifest = getManifest();
@@ -27,7 +24,7 @@ function norm(v: string[] | string) {
 }
 
 function expectPrimary(word: string, expectedPath: string, expectedRings: number[]) {
-  const { primaryPath } = solveWord(word, opts, 'auto') as { primaryPath: Primary };
+  const { primaryPath } = runAnalysis(word, opts, 'auto') as { primaryPath: Primary };
   expect(norm(primaryPath.voicePath)).toBe(norm(expectedPath));
   expect(primaryPath.ringPath).toEqual(expectedRings);
 }

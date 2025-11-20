@@ -1,18 +1,11 @@
-
-
-import { db } from "@/lib/firebase";
-import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
-import { normalizeEnginePayload, type EnginePayload, type LanguageFamily } from "@/shared/engineShape";
+import { db, ensureAnon, auth } from "./firebase";
+import { doc, getDoc, setDoc, serverTimestamp, collection, addDoc } from "firebase/firestore";
+import { normalizeEnginePayload, type EnginePayload, type Vowel, LanguageFamily } from "../shared/engineShape";
 import { logError } from "./logError";
-import { toMappingRecord } from "./schemaAdapter";
-
-// Browser-safe engine code:
-import { solveWord } from "@/functions/sevenVoicesCore";
-import type { SolveOptions } from "@/functions/sevenVoicesCore";
-import { mapWordToLanguageFamilies as mapWithAi } from "@/ai/flows/map-word-to-language-families";
-import { sanitizeForFirestore } from "@/lib/sanitize";
+import { sanitizeForFirestore } from "./sanitize";
+import { runAnalysis, ENGINE_VERSION } from "./runAnalysis";
+import { mapWordToLanguageFamilies } from "./mapper";
 import { getManifest } from "@/engine/manifest";
-import { detectAlphabetFair } from "./alphabet/autoDetect";
 
 
 type Mode = "strict" | "open";
@@ -20,128 +13,121 @@ type Alphabet = "auto"|"albanian"|"latin"|"sanskrit"|"ancient_greek"|"pie"|"turk
 type AnalyzeOpts = {
     bypass?: boolean;
     skipWrite?: boolean;
-    payload?: EnginePayload;
+    payload?: any; // Allow passing a payload to write
     edgeWeight?: number;
-    useAi?: boolean;
+    useAi?: boolean; // New flag to control AI mapper
 };
 
-type AnalyzeResult = {
-  payload: EnginePayload;
-  cacheId: string;
-}
-
 function computeLocal(word: string, mode: Mode, alphabet: Alphabet, edgeWeight?: number): EnginePayload {
-  const manifest = getManifest(); // Use default manifest for local compute
+    const manifest = { edgeWeight };
+    const analysis = runAnalysis(word, {
+        beamWidth: 8,
+        maxOps: mode === 'strict' ? 1 : 2,
+        allowDelete: mode !== 'strict',
+        allowClosure: mode !== 'strict',
+        opCost: { sub:1, del:4, ins:3 },
+        alphabet,
+        manifest: {
+            ...getManifest(),
+            ...manifest
+        } as any,
+        edgeWeight: edgeWeight ?? getManifest().edgeWeight,
+    }, alphabet);
+    return analysis;
+}
+
+export async function analyzeClient(word: string, mode: Mode, alphabet: Alphabet, opts: AnalyzeOpts = {}): Promise<EnginePayload> {
+  await ensureAnon();
+  const cacheId = `${word}|${mode}|${alphabet}|${ENGINE_VERSION}`;
+
+  if (!opts.bypass) {
+    const cached = await loadCache(cacheId);
+    if (cached) {
+      void saveHistory(cached, "cache", cacheId);
+      return { ...cached, cacheHit: true };
+    }
+  }
+
   const t0 = Date.now();
+  let analysisResult;
+
+  if (opts.payload) {
+    analysisResult = normalizeEnginePayload(opts.payload);
+  } else {
+    analysisResult = computeLocal(word, mode, alphabet, opts.edgeWeight);
+  }
+
+  if (opts.useAi) {
+      const families = await mapWordToLanguageFamilies(word, analysisResult.primaryPath.voicePath, true);
+      analysisResult.languageFamilies = families;
+  }
   
-  const strict = mode === "strict";
-  const opCost = manifest.opCost;
-
-  // Initial detection without voice path to determine solver alphabet
-  const initialDet = detectAlphabetFair(word, [], alphabet);
-  const effectiveAlphabet = initialDet.winner;
-
-  const opts: SolveOptions = {
-    beamWidth: 8,
-    maxOps: strict ? 1 : 2,
-    allowDelete: !strict,
-    allowClosure: !strict,
-    opCost: opCost,
-    edgeWeight,
-    alphabet: effectiveAlphabet,
-    manifest,
-  };
-
-  const analysisResult = solveWord(word, opts, effectiveAlphabet);
+  if (!opts.skipWrite) {
+    void saveCache(cacheId, analysisResult);
+    void saveHistory(analysisResult, opts.bypass ? "bypass" : "fresh", cacheId);
+  }
   
-  const payload = {
-    ...analysisResult,
-    word,
-    mode,
-    alphabet: effectiveAlphabet,
-    solveMs: Date.now() - t0,
-    cacheHit: false,
-    languageFamilies: [], // Will be filled in by local or AI mapper later
-  };
-  
-  return normalizeEnginePayload(payload);
-}
-
-// Local-only language mapping
-function mapLocal(payload: EnginePayload): LanguageFamily[] {
-    const det = detectAlphabetFair(payload.word, payload.primaryPath.voicePath, payload.alphabet as Alphabet);
-    return det.scores.map(s => ({
-        familyId: s.family,
-        label: s.family.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
-        confidence: s.score / 100,
-        rationale: "", forms: [], signals: ["local_mapper"],
-    }));
+  return { ...analysisResult, solveMs: Date.now() - t0 };
 }
 
 
-export async function analyzeClient(word: string, mode: Mode, alphabet: Alphabet, opts: AnalyzeOpts = {}): Promise<AnalyzeResult> {
-  const manifest = getManifest();
-  const useAi = opts.useAi ?? false;
+async function loadCache(id: string): Promise<EnginePayload | null> {
+  if (!db) return null; // Guard clause
+  try {
+    const ref = doc(db, "analyses", id);
+    const snap = await getDoc(ref);
+    if (snap.exists()) {
+      return normalizeEnginePayload(snap.data());
+    }
+  } catch (e: any) {
+    logError({ where: "loadCache", message: e.message, detail: { id } });
+  }
+  return null;
+}
 
-  const initialDet = detectAlphabetFair(word, [], alphabet);
-  const effectiveAlphabet = initialDet.winner;
-  const cacheId = `${word}|${mode}|${effectiveAlphabet}|${manifest.version}|ew:${opts.edgeWeight ?? manifest.edgeWeight}|ai:${useAi}`;
-  
-  const cacheRef = doc(db, "analyses", cacheId);
+async function saveCache(id: string, payload: EnginePayload) {
+  if (!db) return; // Guard clause
+  try {
+    const ref = doc(db, "analyses", id);
+    const data = {
+      ...payload,
+      meta: { ...payload, client: undefined },
+      createdAt: serverTimestamp(),
+    };
+    const clean = sanitizeForFirestore(data);
+    await setDoc(ref, clean, { merge: true });
+  } catch (e: any) {
+    logError({ where: "saveCache", message: e.message, detail: { id } });
+  }
+}
+
+async function saveHistory(
+  result: EnginePayload,
+  source: "cache"|"fresh"|"bypass",
+  cacheId: string
+) {
+  if (!db) return; // Guard clause
+  const u = auth?.currentUser;
+  if (!u) return;
 
   try {
-    if (opts.bypass) {
-        let payload = opts.payload ? normalizeEnginePayload(opts.payload) : computeLocal(word, mode, alphabet, opts.edgeWeight);
-        payload.languageFamilies = useAi
-            ? (await mapWithAi(toMappingRecord(payload)) as any).candidates_map
-            : mapLocal(payload);
+    const ref = collection(db, "users", u.uid, "history");
+    const { primaryPath } = result;
 
-        if (!opts.skipWrite) {
-            const cleanPayload = sanitizeForFirestore(payload);
-            await setDoc(cacheRef, { ...cleanPayload, cachedAt: serverTimestamp() }, { merge: true });
-        }
-        
-        return { payload: { ...payload, recomputed: true, cacheHit: false }, cacheId };
-    }
-
-    const snap = await getDoc(cacheRef);
-    if (snap.exists()) {
-        const normalized = normalizeEnginePayload(snap.data());
-        return { payload: { ...normalized, cacheHit: true, recomputed: false }, cacheId };
-    }
-
-    const freshPayload = computeLocal(word, mode, alphabet, opts.edgeWeight);
-
-    if (useAi) {
-      try {
-        const aiResult: any = await mapWithAi(toMappingRecord(freshPayload));
-        freshPayload.languageFamilies = Object.entries(aiResult.candidates_map || {}).map(([key, val]: [string, any]) => ({
-            familyId: key.toLowerCase() as any,
-            label: key,
-            confidence: 0.9,
-            rationale: val[0]?.functional || "AI mapped",
-            forms: val.map((v:any) => v.form),
-            signals: aiResult.signals,
-        }));
-      } catch (aiError: any) {
-        logError({ where: "analyzeClient-aiMapper", message: aiError.message, detail: { word, stack: aiError.stack }});
-        freshPayload.languageFamilies = mapLocal(freshPayload);
-        if (freshPayload.signals) {
-            freshPayload.signals.push("AI_MAPPER_FAILED");
-        } else {
-            freshPayload.signals = ["AI_MAPPER_FAILED"];
-        }
-      }
-    } else {
-        freshPayload.languageFamilies = mapLocal(freshPayload);
-    }
-
-    const cleanFresh = sanitizeForFirestore(freshPayload);
-    await setDoc(cacheRef, { ...cleanFresh, cachedAt: serverTimestamp() }, { merge: false });
+    const docData = {
+      word: result.word,
+      mode: result.mode,
+      alphabet: result.alphabet,
+      engineVersion: result.engineVersion,
+      source: source,
+      primaryVoice: primaryPath.voicePath.join("→"),
+      createdAt: serverTimestamp(),
+      cacheId,
+    };
     
-    return { payload: { ...freshPayload, cacheHit: false, recomputed: false }, cacheId };
-  } catch (e: any) {
-    logError({ where: "analyzeClient", message: e.message, detail: { word, mode, alphabet, stack: e.stack } });
-    throw e;
+    const clean = sanitizeForFirestore(docData);
+    await addDoc(ref, clean);
+  } catch(e:any) {
+    logError({ where: "saveHistory", message: e.message, detail: { word: result.word } });
   }
 }

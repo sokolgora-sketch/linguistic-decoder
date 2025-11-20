@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import type { EnginePath } from "@/shared/engineShape";
+import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import type { EnginePath } from "../shared/engineShape";
 
 export default function WhyThisPath({ primary }: { primary: EnginePath }) {
   const v = primary?.voicePath ?? [];

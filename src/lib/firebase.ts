@@ -1,13 +1,16 @@
 
 // src/lib/firebase.ts
-import { initializeApp, getApps } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
-import { getAuth, signInAnonymously, onAuthStateChanged, type User } from "firebase/auth";
+import { initializeApp, getApps, type FirebaseApp } from "firebase/app";
+import { getFirestore, type Firestore } from "firebase/firestore";
+import { getAuth, signInAnonymously, onAuthStateChanged, type User, type Auth } from "firebase/auth";
 
 const isTest = process.env.NODE_ENV === 'test' || process.env.IS_TEST_SCRIPT === 'true';
 
+// Use the server-side key for scripts/server-side, fall back to public key for client
+const apiKey = process.env.FIREBASE_SERVER_API_KEY || process.env.NEXT_PUBLIC_FB_API_KEY;
+
 const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FB_API_KEY!,
+  apiKey: apiKey,
   authDomain: process.env.NEXT_PUBLIC_FB_AUTH_DOMAIN!,
   projectId: process.env.NEXT_PUBLIC_FB_PROJECT_ID!,
   storageBucket: process.env.NEXT_PUBLIC_FB_STORAGE_BUCKET!,
@@ -15,12 +18,15 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FB_APP_ID!,
 };
 
-export const app = isTest
-  ? (null as any)
+// Only initialize if the key is present
+const appInitialized = !!apiKey;
+
+export const app: FirebaseApp | null = isTest || !appInitialized
+  ? null
   : (getApps().length ? getApps()[0] : initializeApp(firebaseConfig));
 
-export const db = isTest ? ({} as any) : getFirestore(app);
-export const auth = isTest ? ({ currentUser: null } as any) : getAuth(app);
+export const db: Firestore | null = app ? getFirestore(app) : null;
+export const auth: Auth | null = app ? getAuth(app) : null;
 
 
 // Store the promise to avoid multiple simultaneous calls
@@ -28,6 +34,10 @@ let authPromise: Promise<User> | null = null;
 
 export function ensureAnon(): Promise<User> {
   if (isTest) return Promise.resolve({ uid: 'test-uid' } as any);
+  if (!app || !auth) {
+    console.warn("Firebase not initialized, cannot ensure anonymous user.");
+    return Promise.resolve({ uid: 'uninitialized' } as any);
+  }
 
   const existing = auth.currentUser;
   if (existing) return Promise.resolve(existing);

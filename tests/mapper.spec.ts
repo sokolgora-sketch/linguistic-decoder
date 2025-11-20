@@ -1,44 +1,52 @@
 
-import { solveWord } from '@/functions/sevenVoicesCore';
+import { runAnalysis } from '@/lib/runAnalysis';
 import { getManifest } from '@/engine/manifest';
-import { mapWordToLanguageFamilies } from '@/lib/mapper';
+import { detectAlphabetFair } from '@/lib/alphabet/autoDetect';
 import type { Vowel } from '@/shared/engineShape';
+import type { Alphabet } from '@/lib/runAnalysis';
+import type { SolveOptions } from '@/functions/sevenVoicesCore';
 
 const manifest = getManifest();
-const base = { manifest, edgeWeight: manifest.edgeWeight, opCost: manifest.opCost, strict: true, beamWidth: 8, maxOps: 1, allowDelete: false, allowClosure: false };
+const base: SolveOptions = { manifest, edgeWeight: manifest.edgeWeight, opCost: manifest.opCost, maxOps: 1, beamWidth: 8, allowDelete: false, allowClosure: false, alphabet: "auto" };
 
-function vp(word: string, alphabet: 'albanian'|'latin'|'auto' = 'auto'): Vowel[] {
-  const { primaryPath } = solveWord(word, base, alphabet) as any;
+function vp(word: string, alphabet: Alphabet = 'auto'): Vowel[] {
+  const { primaryPath } = runAnalysis(word, base, alphabet);
   return primaryPath.voicePath as Vowel[];
 }
 
+function families(word:string, voicePath: Vowel[]) {
+    return detectAlphabetFair(word, voicePath, 'auto');
+}
+
+
 describe('mapper dialect awareness', () => {
-  it('Vetvendosje → Albanian (Gegë)', async () => {
-    const families = await mapWordToLanguageFamilies('Vetvendosje', vp('Vetvendosje', 'albanian'), false);
-    const albanianFamily = families.find(f => f.label === 'Albanian');
+  it('Vetvendosje → Albanian (Gegë)', () => {
+    const { scores } = families('Vetvendosje', vp('Vetvendosje', 'albanian'));
+    const albanianFamily = scores.find(f => f.family === 'albanian');
     expect(albanianFamily).toBeDefined();
-    // The local mapper doesn't have dialect detection, so we can't test for it here.
-    // We are just asserting that Albanian is present.
+    expect((albanianFamily as any).dialect).toBe('geg');
   });
 
-  it('Vetëvendosje → Albanian (Tosk)', async () => {
-    const families = await mapWordToLanguageFamilies('Vetëvendosje', vp('Vetëvendosje', 'albanian'), false);
-    const albanianFamily = families.find(f => f.label === 'Albanian');
+  it('Vetëvendosje → Albanian (Tosk)', () => {
+    const { scores } = families('Vetëvendosje', vp('Vetëvendosje', 'albanian'));
+    const albanianFamily = scores.find(f => f.family === 'albanian');
     expect(albanianFamily).toBeDefined();
-    // The local mapper should be biased towards Tosk here.
+    expect((albanianFamily as any).dialect).toBe('tosk');
   });
 
-  it('mapper returns at least one family', async () => {
-    const families = await mapWordToLanguageFamilies('hope', vp('hope','latin'), false);
-    expect(families.length).toBeGreaterThan(0);
+  it('mapper returns at least one family', () => {
+    const { scores } = families('hope', vp('hope','latin'));
+    expect(scores.length).toBeGreaterThan(0);
   });
 
-  it('ë closure biases Albanian', async () => {
-    const a = await mapWordToLanguageFamilies('vete', vp('vete','latin'), false);
-    const b = await mapWordToLanguageFamilies('vetë', vp('vetë','albanian'), false);
-    // This assertion can be brittle depending on scoring, but the principle is what we test.
-    // We expect 'vete' to likely be Latin, and 'vetë' to be Albanian.
-    expect(a.find(f => f.label === 'Albanian')?.confidence ?? 0).toBeLessThan(b.find(f => f.label === 'Albanian')?.confidence ?? 0);
-    expect(b[0].label).toBe('Albanian');
+  it('ë biases Albanian', () => {
+    const a = families('vete', vp('vete','latin'));
+    const b = families('vetë', vp('vetë','albanian'));
+
+    const confidenceA = a.scores.find(f => f.family === 'albanian')?.score ?? 0;
+    const confidenceB = b.scores.find(f => f.family === 'albanian')?.score ?? 0;
+
+    expect(confidenceA).toBeLessThan(confidenceB);
+    expect(b.winner).toBe('albanian');
   });
 });

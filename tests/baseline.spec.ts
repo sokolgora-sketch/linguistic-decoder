@@ -1,31 +1,34 @@
 
-import { solveWord } from "@/functions/sevenVoicesCore";
+import { runAnalysis } from "@/lib/runAnalysis";
 import { getManifest } from "@/engine/manifest";
+import type { Alphabet } from "@/lib/runAnalysis";
+import type { SolveOptions } from "@/functions/sevenVoicesCore";
 
-const opts = {
+const manifest = getManifest();
+const opts: SolveOptions = {
   beamWidth: 8, maxOps: 1, allowDelete: false, allowClosure: false,
-  opCost:{sub:1,del:3,ins:2}, alphabet:"auto" as const, edgeWeight: 0.25,
-  manifest: getManifest()
+  opCost:{sub:1,del:3,ins:2},
+  manifest: manifest,
+  edgeWeight: manifest.edgeWeight,
+  alphabet: "auto",
 };
 
 test("damage → A→E", () => {
-  const { primaryPath } = solveWord("damage", opts, "auto");
+  const { primaryPath } = runAnalysis("damage", opts, "auto");
   expect(primaryPath.voicePath.join("→")).toBe("A→E");
 });
 
 test("study (strict) → U→I", () => {
-  const { primaryPath } = solveWord("study", opts, "auto");
+  const { primaryPath } = runAnalysis("study", opts, "auto");
   expect(primaryPath.voicePath.join("→")).toBe("U→I");
 });
 
 test("life (strict) stable path exists", () => {
-  const { primaryPath } = solveWord("life", opts, "auto");
+  const { primaryPath } = runAnalysis("life", opts, "auto");
   expect(primaryPath.voicePath.length).toBeGreaterThan(0);
 });
 
 test("mind (strict) stable path exists", () => {
-  const { primaryPath } = solveWord("mind", opts, "auto");
+  const { primaryPath } = runAnalysis("mind", opts, "auto");
   expect(primaryPath.voicePath.length).toBeGreaterThan(0);
 });
-
-    

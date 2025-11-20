@@ -1,7 +1,8 @@
+
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { db, auth, ensureAnon } from "@/lib/firebase";
+import { db, auth, ensureAnon } from "../lib/firebase";
 import {
   collection,
   query,
@@ -44,21 +45,23 @@ export default function HistoryPanel({
     "all" | "auto" | "albanian" | "latin" | "sanskrit" | "ancient_greek" | "pie" | "turkish" | "german"
   >("all");
   const [wordFilter, setWordFilter] = useState("");
+  const [uid, setUid] = useState<string | null>(null);
 
   useEffect(() => {
-    (async () => ensureAnon())();
+    ensureAnon().then(user => setUid(user.uid));
   }, []);
 
-  const uid = auth.currentUser?.uid || null;
-
   const baseQuery = useMemo(() => {
-    if (!uid) return null;
+    if (!uid || !db) return null;
     const col = collection(db, "users", uid, "history");
     return query(col, orderBy("createdAt", "desc"), limit(20));
   }, [uid]);
 
   async function load(reset = true) {
-    if (!uid || !baseQuery) return;
+    if (!uid || !baseQuery || !db) {
+        if (!db) console.warn("HistoryPanel: Firestore not available.");
+        return;
+    }
     setLoading(true);
     setErr(null);
     try {
@@ -95,11 +98,13 @@ export default function HistoryPanel({
   }
 
   useEffect(() => {
-    load(true);
-  }, [baseQuery, mode, alphabet, wordFilter]);
+    if (uid) {
+        load(true);
+    }
+  }, [uid, baseQuery, mode, alphabet, wordFilter]);
 
   async function deleteRow(row: Row) {
-    if (!uid) return;
+    if (!uid || !db) return;
     const ok = window.confirm(
       `Delete history entry for "${row.word}"? This cannot be undone.`
     );
@@ -128,7 +133,7 @@ export default function HistoryPanel({
   }
 
   async function clearAll() {
-    if (!uid) return;
+    if (!uid || !db) return;
 
     // Step 1 — explicit confirm
     const sure = window.confirm(

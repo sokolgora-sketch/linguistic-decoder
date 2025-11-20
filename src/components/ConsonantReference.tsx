@@ -1,13 +1,9 @@
 
 'use client';
-import { Card } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import type { Vowel } from "@/lib/solver/types";
-
-const VOICE_COLOR: Record<Vowel, string> = {
-    A: "var(--voice-A)", E: "var(--voice-E)", I: "var(--voice-I)",
-    O: "var(--voice-O)", U: "var(--voice-U)", Y: "var(--voice-Y)", "Ë": "var(--voice-EH)"
-};
+import { Card } from "./ui/card";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
+import type { Vowel } from "../shared/engineShape";
+import { VOICE_COLOR_MAP } from "../shared/voiceColors";
 
 type ConsonantClassInfo = {
     class: string;
@@ -49,7 +45,7 @@ export function ConsonantReference() {
                             <TableCell className="font-code">{row.preferredDeltaRing}</TableCell>
                             <TableCell>
                                 <span className="inline-flex items-center gap-1.5 py-1 px-2 rounded-full border bg-card text-card-foreground">
-                                    <span className="w-2.5 h-2.5 rounded-full inline-block" style={{ background: VOICE_COLOR[row.voiceAlign] }} />
+                                    <span className="w-2.5 h-2.5 rounded-full inline-block" style={{ background: VOICE_COLOR_MAP[row.voiceAlign] }} />
                                     <span className="font-bold">{row.voiceAlign}</span>
                                 </span>
                             </TableCell>

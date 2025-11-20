@@ -1,0 +1,23 @@
+
+[
+  {
+    "id": "vajza_core_01",
+    "word": "vajza",
+    "expectedPrimaryVoicePath": ["A"],
+    "expectedPrimaryRingPath": [3],
+    "expectedDialect": "geg",
+    "notes": "Baseline Albanian feminine form; no ë in surface form, geg orthography."
+  },
+  {
+    "id": "vv_geg_01",
+    "word": "Vetvendosje",
+    "expectedDialect": "geg",
+    "notes": "Geg orthography."
+  },
+  {
+    "id": "vv_tosk_01",
+    "word": "Vetëvendosje",
+    "expectedDialect": "tosk",
+    "notes": "Tosk orthography with ë."
+  }
+]

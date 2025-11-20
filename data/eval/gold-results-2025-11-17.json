@@ -1,0 +1,67 @@
+[
+  {
+    "id": "vajza_core_01",
+    "word": "vajza",
+    "ok": true,
+    "primaryVoiceOk": true,
+    "primaryRingOk": true,
+    "dialectOk": true,
+    "expectedPrimaryVoicePath": [
+      "A"
+    ],
+    "predictedPrimaryVoicePath": [
+      "A"
+    ],
+    "expectedPrimaryRingPath": [
+      3
+    ],
+    "predictedPrimaryRingPath": [
+      3
+    ],
+    "expectedDialect": "geg",
+    "predictedDialect": "geg",
+    "notes": "Baseline Albanian feminine form; no ë in surface form, geg orthography."
+  },
+  {
+    "id": "vv_geg_01",
+    "word": "Vetvendosje",
+    "ok": true,
+    "dialectOk": true,
+    "predictedPrimaryVoicePath": [
+      "E",
+      "O",
+      "E"
+    ],
+    "predictedPrimaryRingPath": [
+      2,
+      0,
+      2
+    ],
+    "expectedDialect": "geg",
+    "predictedDialect": "geg",
+    "notes": "Geg orthography."
+  },
+  {
+    "id": "vv_tosk_01",
+    "word": "Vetëvendosje",
+    "ok": true,
+    "dialectOk": true,
+    "predictedPrimaryVoicePath": [
+      "E",
+      "Ë",
+      "E",
+      "O",
+      "E"
+    ],
+    "predictedPrimaryRingPath": [
+      2,
+      3,
+      2,
+      0,
+      2
+    ],
+    "expectedDialect": "tosk",
+    "predictedDialect": "tosk",
+    "notes": "Tosk orthography with ë."
+  }
+]

@@ -1,9 +1,12 @@
+
 #!/usr/bin/env ts-node
 require("ts-node/register"); require("tsconfig-paths/register");
 
 import fs from "fs";
-import { solveWord } from "@/functions/sevenVoicesCore";
+import { runAnalysis } from "@/lib/runAnalysis";
 import { getManifest } from "@/engine/manifest";
+import type { Alphabet } from "@/lib/runAnalysis";
+import type { SolveOptions } from "@/functions/sevenVoicesCore";
 
 type Mode = "strict"|"open";
 function norm(s?: string){ if(!s) return ""; return s.toUpperCase().replace(/[^AEIOUYË]/g,"").split("").join("→"); }
@@ -29,12 +32,12 @@ const edges = [0.15, 0.25, 0.35];
 const insCosts = [2,3];
 const delCosts = [3,4];
 
-function optsStrict(edge:number, ins:number, del:number){
+function optsStrict(edge:number, ins:number, del:number): SolveOptions {
   const manifest = { ...manifestBase, edgeWeight: edge, opCost: { sub:1, del, ins } };
   return {
     beamWidth:8, maxOps:1, allowDelete:false, allowClosure:false,
     opCost: manifest.opCost,
-    alphabet:"auto" as const,
+    alphabet:"auto",
     manifest,
     edgeWeight: edge
   };
@@ -47,7 +50,8 @@ for (const edge of edges){
       let labeled=0, correct=0;
       for (const r of set){
         if (!r.expected || r.mode!=="strict") continue;
-        const out:any = solveWord(r.word, optsStrict(edge,ins,del), "auto");
+        const opts = optsStrict(edge,ins,del);
+        const out = runAnalysis(r.word, opts, "auto");
         const pred = (out?.primaryPath?.voicePath||[]).join("→");
         labeled++; if (pred === r.expected) correct++;
       }

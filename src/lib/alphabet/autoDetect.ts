@@ -1,5 +1,6 @@
 
 import { CUES, Family } from "./cues";
+import { detectAlbanianDialect } from "../detectDialect";
 
 export type Alphabet = "auto"|Family;
 
@@ -52,6 +53,13 @@ export function detectAlphabetFair(word: string, voicePath: string[], selected: 
   const allZeroish = scores.every(x => x.score === 0);
   const asciiOnly = /^[\u0000-\u007F]*$/.test(word);
   if (allZeroish && asciiOnly) winner = "latin";
+
+  // Dialect hint for Albanian
+  const albanianFamily = pct.find(f => f.family === 'albanian');
+  if (albanianFamily) {
+    (albanianFamily as any).dialect = detectAlbanianDialect(word);
+  }
+
 
   return { winner, scores: pct };
 }

@@ -4,8 +4,8 @@ import { app, auth, db } from "./firebase";
 
 export async function logError(ev: { where: string; message: string; detail?: any }) {
   try {
-    if (!db || Object.keys(db).length === 0) return; // test stub – no-op
-    const uid = (auth && auth.currentUser && auth.currentUser.uid) || "anon";
+    if (!db || !auth) return; // Do not log if firebase is not initialized
+    const uid = (auth.currentUser && auth.currentUser.uid) || "anon";
     const ref = collection(db, "users", uid, "errors");
     await addDoc(ref, {
       where: ev.where,

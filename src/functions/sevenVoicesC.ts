@@ -1,9 +1,10 @@
 
+
 import { VOWELS } from "./sevenVoicesCore";
 import type { Vowel } from "./sevenVoicesCore";
 import { chooseProfile, classRange } from "./languages";
 import type { LangProfile, CClass } from "./languages";
-import { getManifest } from "@/engine/manifest";
+import { getManifest } from "../engine/manifest";
 
 export function toVowel(ch: string): Vowel | null {
   const u = ch.toUpperCase();

@@ -1,17 +1,17 @@
+
 import type {Config} from 'tailwindcss';
 
 export default {
   darkMode: ['class'],
   content: [
-    './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
-    './src/components/**/*.{js,ts,jsx,tsx,mdx}',
-    './src/app/**/*.{js,ts,jsx,tsx,mdx}',
+    "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/lib/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
     extend: {
       fontFamily: {
         sans: ['Inter', 'sans-serif'],
-        headline: ['Space Grotesk', 'sans-serif'],
         code: ['Source Code Pro', 'monospace'],
       },
       colors: {
@@ -66,6 +66,9 @@ export default {
           ring: 'hsl(var(--sidebar-ring))',
         },
       },
+      borderColor: {
+        DEFAULT: 'hsl(var(--border))',
+      },
       borderRadius: {
         lg: 'var(--radius)',
         md: 'calc(var(--radius) - 2px)',
@@ -102,3 +105,5 @@ export default {
   },
   plugins: [require('tailwindcss-animate')],
 } satisfies Config;
+
+    

@@ -1,42 +1,28 @@
-
 'use client';
 import React, { useMemo } from "react";
-import { Card } from "@/components/ui/card";
-import type { CClass } from "@/functions/languages";
-import { classRange } from "@/functions/languages";
-import type { EnginePayload, EnginePath } from "@/shared/engineShape";
-import { summarizePrinciples } from "@/lib/principles";
+import { Card } from "./ui/card";
+import type { CClass } from "../functions/languages";
+import { classRange } from "../functions/languages";
+import type { EnginePayload, AnalysisResult_DEPRECATED, Vowel } from "../shared/engineShape";
+import { enginePayloadToAnalysisResult } from "@/shared/analysisAdapter";
+import { getVoiceMeta } from '@/shared/sevenVoices';
 import WhyThisPath from "./WhyThisPath";
+import { VOICE_COLOR_MAP } from "../shared/voiceColors";
+import { Candidates } from "./Candidates";
+import { PrinciplesBlock } from "./PrinciplesBlock";
+import { SymbolicReadingCard } from "./SymbolicReadingCard";
 
-// Seven‑Voices palette (uses CSS variables from globals.css)
-const VOICE_COLOR: Record<string, string> = {
-  A: "var(--voice-A)",
-  E: "var(--voice-E)",
-  I: "var(--voice-I)",
-  O: "var(--voice-O)",
-  U: "var(--voice-U)",
-  Y: "var(--voice-Y)",
-  "Ë": "var(--voice-EH)"
-};
 
 const LEVEL_LABEL: Record<number, string> = { 1: "High", 0: "Mid", [-1]: "Low" } as any;
-const labelLevels = (levels: number[]) => levels.map(l=> LEVEL_LABEL[l] ?? l).join(" → ");
-const labelRings = (rings: number[]) => rings.join(" → ");
 
-const Arrow = () => <span className="font-bold text-accent">→</span>;
-const Chip = ({ v }: { v: string | number }) => (
-    <span className="inline-flex items-center gap-1.5 py-1 px-2 rounded-full border bg-card text-card-foreground">
-      <span className="w-2.5 h-2.5 rounded-full inline-block" style={{ background: VOICE_COLOR[String(v)] || 'hsl(var(--primary))' }} />
-      <span className="font-bold">{String(v)}</span>
-    </span>
-);
+function ConsonantInfo({ analysis }: { analysis: AnalysisResult_DEPRECATED }) {
+  const windows = analysis.core.consonants.clusters?.map(c => c.cluster) || [];
+  const windowClasses = analysis.core.consonants.clusters?.map(c => c.classes[0]) || [];
+  const ringPath = analysis.core.voices.ringPath;
+  const edgeWindows = analysis.debug?.rawEnginePayload?.edgeWindows || [];
 
-function ConsonantInfo({ analysis }: { analysis: EnginePayload }) {
-  const { windows, windowClasses, primaryPath, edgeWindows } = analysis;
-  const ringPath = primaryPath?.ringPath;
-
-  const hasInteriorWindows = windows && windowClasses && windows.length > 0;
-  const hasEdgeWindows = edgeWindows && edgeWindows.length > 0;
+  const hasInteriorWindows = windows.length > 0;
+  const hasEdgeWindows = edgeWindows.length > 0;
 
   if (!hasInteriorWindows && !hasEdgeWindows) {
     return null;
@@ -78,8 +64,8 @@ function ConsonantInfo({ analysis }: { analysis: EnginePayload }) {
 }
 
 
-export function PathRow({ title, block, analysis }: { title: string; block?: EnginePath, analysis: EnginePayload }) {
-  if (!block || !block.voicePath || block.voicePath.length === 0) {
+export function PathRow({ title, block, analysis }: { title: string; block: any, analysis: AnalysisResult_DEPRECATED }) {
+  if (!block || !block.voicePath.length) {
     return (
       <Card className="p-4">
         <h3 className="font-bold text-sm tracking-wide mb-2">{title}</h3>
@@ -88,39 +74,26 @@ export function PathRow({ title, block, analysis }: { title: string; block?: Eng
     );
   }
 
-  const { voicePath, ringPath, levelPath, checksums, ops, kept } = block;
-
   return (
     <Card className="p-4">
       <h3 className="font-bold text-sm tracking-wide mb-2">{title}</h3>
 
       <>
         <div className="flex flex-wrap gap-2 items-center">
-          {voicePath.map((v,i)=>(
+          {block.voicePath.map((v:Vowel,i:number)=>(
             <React.Fragment key={`v-${i}`}>
-              <Chip v={v} />{i<voicePath.length-1 && <Arrow/>}
+              <Chip v={v} />{i<block.voicePath.length-1 && <Arrow/>}
             </React.Fragment>
           ))}
         </div>
 
         <div className="mt-2.5 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2.5">
-            <InfoLine label="Voice Path" value={voicePath.join(" → ")} />
-            <InfoLine label="Level Path" value={labelLevels(levelPath)} />
-            <InfoLine label="Ring Path" value={labelRings(ringPath)} />
-            {checksums && (
-                <InfoLine label="Checksums" value={`V=${checksums.V} · E=${checksums.E.toFixed(2)} · C=${checksums.C}`} mono />
-            )}
-            {typeof kept === "number" ? <InfoLine label="Keeps" value={String(kept)} /> : null}
+            <InfoLine label="Voice Path" value={block.voicePath.join(" → ")} />
+            <InfoLine label="Level Path" value={block.levelPath.map(l=>LEVEL_LABEL[l]).join(" → ")} />
+            <InfoLine label="Ring Path" value={block.ringPath.join(" → ")} />
         </div>
         
         {title === "Primary Path" && <ConsonantInfo analysis={analysis} />}
-
-        {ops?.length > 0 && (
-          <div className="mt-2.5">
-            <h4 className="font-bold text-sm tracking-wide">Ops</h4>
-            <div className="font-code text-xs whitespace-pre-wrap">{ops.join("; ")}</div>
-          </div>
-        )}
       </>
     </Card>
   );
@@ -135,59 +108,76 @@ function InfoLine({label, value, mono}:{label:string; value:string; mono?:boolea
   );
 }
 
-export function PrinciplesBlock({ engine }: { engine:any }) {
-  if (!engine?.primaryPath?.voicePath?.length) return null;
-  const s = summarizePrinciples(engine);
+const Arrow = () => <span className="font-bold text-muted-foreground">→</span>;
+const Chip = ({ v }: { v: string | number }) => {
+    const chipStyle = v in VOICE_COLOR_MAP ? { backgroundColor: VOICE_COLOR_MAP[v as Vowel], color: "#020617" } : {};
+    return (
+        <span
+          className="inline-flex items-center gap-1.5 py-1 px-2.5 rounded-full border border-black/10 text-sm font-bold"
+          style={chipStyle}
+        >
+          {String(v)}
+        </span>
+    );
+};
+
+
+export function ResultsDisplay({ analysis: raw }: { analysis: EnginePayload }) {
+  const analysis = useMemo(() => enginePayloadToAnalysisResult(raw), [raw]);
+  if (!analysis) return null;
+  const { core, candidates, symbolic } = analysis;
+
   return (
-    <div className="mt-3 border rounded p-2 text-sm">
-      <div className="font-semibold mb-1">Seven Principles</div>
-      <div className="opacity-80">Path: {s.pathLabel}</div>
-      {s.dominant.length > 0 && (
-        <div className="opacity-80">
-          Dominant: {s.dominant.map(x=>`${x.label} (${x.hits})`).join(", ")}
+    <div className="space-y-4">
+        {core && core.heartPaths && (
+            <PathRow block={{voicePath: core.voices.vowelVoices, ringPath: core.voices.ringPath, levelPath: core.voices.levelPath.map(l=>l==='high'?1:l==='low'?-1:0)}} title="Primary Path" analysis={analysis} />
+        )}
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <WhyThisPath primary={raw.primaryPath} />
+            <PrinciplesBlock analysis={analysis} />
         </div>
-      )}
-      <div className="opacity-60 text-xs mt-1">7 words: {s.sevenWords}</div>
+        
+        <Candidates candidates={candidates} />
+        
+        {symbolic && <SymbolicReadingCard symbolic={symbolic} />}
+
+        {core && core.heartPaths && core.heartPaths.frontierCount > 0 && (
+          <Card className="p-4 mt-4">
+            <h3 className="font-bold text-sm tracking-wide">Frontier (near‑optimal alternates)</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mt-3">
+              {raw.frontierPaths.map((f, idx)=> {
+                const altVoice = f.voicePath[0];
+                const altBadgeStyle = altVoice
+                  ? { backgroundColor: VOICE_COLOR_MAP[altVoice], color: "#020617" }
+                  : {};
+                return (
+                <Card key={idx} className="p-3 border-accent">
+                  <div className="font-bold mb-2 flex items-center gap-2">
+                    <div
+                        className="w-8 h-8 rounded-full border flex items-center justify-center text-sm font-bold shrink-0"
+                        style={altBadgeStyle}
+                    >
+                        {altVoice ?? "?"}
+                    </div>
+                    {`alt-${idx}`}
+                  </div>
+                  <div className="flex flex-wrap gap-1.5 items-center">
+                    {f.voicePath.map((v,i)=> (
+                      <React.Fragment key={i}>
+                        <Chip v={v} />
+                        {i < f.voicePath.length-1 && <Arrow/>}
+                      </React.Fragment>
+                    ))}
+                  </div>
+                  <hr className="my-2 border-border" />
+                  <div className="text-xs mt-1.5 text-slate-500">Levels: {f.levelPath.map(l=>LEVEL_LABEL[l]).join(" → ")}</div>
+                  <div className="text-xs text-slate-500">Rings: {f.ringPath.join(" → ")}</div>
+                </Card>
+              )})}
+            </div>
+          </Card>
+        )}
     </div>
   );
-}
-
-export function ResultsDisplay({ analysis }: { analysis: EnginePayload }) {
-    const { primaryPath, frontierPaths } = analysis;
-
-    const frontierList = useMemo(() => (frontierPaths || []).filter(f => f?.voicePath && f.voicePath.join("") !== (primaryPath?.voicePath || []).join("")), [frontierPaths, primaryPath]);
-
-    if (!primaryPath) return null;
-    
-    return (
-        <>
-            <PathRow block={primaryPath} title="Primary Path" analysis={analysis} />
-            <PrinciplesBlock engine={analysis} />
-            {frontierList.length > 0 && (
-              <Card className="p-4">
-                <h3 className="font-bold text-sm tracking-wide">Frontier (near‑optimal alternates)</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mt-3">
-                  {frontierList.map((f, idx)=> (
-                    <Card key={idx} className="p-3 border-accent">
-                      <div className="font-bold mb-2">Alt #{idx+1}</div>
-                      <div className="flex flex-wrap gap-1.5 items-center">
-                        {f.voicePath.map((v,i)=> (
-                          <React.Fragment key={i}>
-                            <Chip v={v} />
-                            {i < f.voicePath.length-1 && <Arrow/>}
-                          </React.Fragment>
-                        ))}
-                      </div>
-                      <hr className="my-2 border-border" />
-                      {f.checksums && <div className="font-code text-xs">V={f.checksums.V} · E={f.checksums.E.toFixed(2)} · C={f.checksums.C}</div>}
-                      <div className="font-code text-xs mt-1">Keeps: {typeof f.kept === "number" ? f.kept : "—"}</div>
-                      <div className="text-xs mt-1.5 text-slate-500">Levels: {labelLevels(f.levelPath)}</div>
-                      <div className="text-xs text-slate-500">Rings: {labelRings(f.ringPath)}</div>
-                    </Card>
-                  ))}
-                </div>
-              </Card>
-            )}
-        </>
-    );
 }
