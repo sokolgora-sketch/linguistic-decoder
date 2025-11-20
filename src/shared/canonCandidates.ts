@@ -1,4 +1,3 @@
-
 // src/shared/canonCandidates.ts
 
 import type { Candidate } from './engineShape';
@@ -151,6 +150,11 @@ export const CANON_CANDIDATES: Record<string, Candidate[]> = {
       fitTag: 'strong',
       status: 'pass',
       confidenceTag: 'solid',
+      consonantProfile: 'cut',
+      consonantProfileOk: true,
+      consonantSignals: [
+        "Plosive + Nasal pattern (d + m) around outer rings matches 'cut that leaves a harmed state'.",
+      ],
     },
     {
       id: 'alb_damage_01',
@@ -199,6 +203,11 @@ export const CANON_CANDIDATES: Record<string, Candidate[]> = {
       fitTag: 'strong',
       status: 'pass',
       confidenceTag: 'solid',
+      consonantProfile: 'cut',
+      consonantProfileOk: true,
+      consonantSignals: [
+        "Same Plosive + Nasal pattern supports 'harm / loss that remains as a condition'.",
+      ],
     },
   ],
 };
