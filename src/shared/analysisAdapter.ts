@@ -14,8 +14,10 @@ import type {
   AnalysisHeartPaths,
   Candidate,
   TensionLevel,
+  ConsonantProfile,
 } from './engineShape';
 import { CANON_CANDIDATES } from './canonCandidates';
+import { buildConsonantField } from './consonantField';
 
 // --- Helper Functions ---
 
@@ -138,6 +140,9 @@ export function enginePayloadToAnalysisResult(payload: EnginePayload): AnalysisR
     heartPaths: heartPathsCore
   };
 
+  const { field: consonantField, summary: consonantSummary } =
+    buildConsonantField(payload);
+
   let candidates: Candidate[];
 
   const normalizedWord = normalized;
@@ -178,5 +183,15 @@ export function enginePayloadToAnalysisResult(payload: EnginePayload): AnalysisR
     rawEnginePayload: payload,
   };
 
-  return { core, candidates, debug };
+  const result: AnalysisResult = {
+    core,
+    consonants: {
+      field: consonantField,
+      summary: consonantSummary,
+    },
+    candidates,
+    debug,
+  };
+
+  return result;
 }
