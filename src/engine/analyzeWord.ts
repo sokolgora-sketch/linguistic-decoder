@@ -1,5 +1,5 @@
 // src/engine/analyzeWord.ts
-import type { AnalyzeWordResult, Candidate, MorphologyMatrix, SymbolicLayer, SymbolicTag, Vowel } from '@/shared/engineShape';
+import type { AnalyzeWordResult, Candidate, LanguageFamilyCandidate, MorphologyMatrix, SymbolicLayer, SymbolicTag, Vowel } from '@/shared/engineShape';
 import { ENGINE_VERSION } from './version';
 import { solveWord } from '@/functions/sevenVoicesCore';
 import { getManifest } from './manifest';
@@ -58,12 +58,7 @@ function attachCanonCandidates(base: any): any {
         voicePath: (c.voices.voiceSequence || []).join(' → '),
         levelPath: 'N/A',
         ringPath: (c.voices.ringPath || []).join(' → '),
-        morphologyMatrix: c.morphologyMatrix ? {
-            pivot: c.morphologyMatrix.pivot,
-            meaning: c.morphologyMatrix.meaning, // Use 'meaning' instead of 'gloss'
-            morphemes: c.morphologyMatrix.morphemes.map(m => ({ form: m.form, role: m.role, gloss: m.gloss })),
-            wordSums: c.morphologyMatrix.wordSums.map(ws => `${ws.parts.join(' + ')} → ${ws.result}${ws.gloss ? ` — ${ws.gloss}` : ''}`),
-        } : undefined,
+        morphologyMatrix: c.morphologyMatrix,
         symbolic: c.symbolic,
     }));
 
