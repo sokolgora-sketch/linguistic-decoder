@@ -57,6 +57,19 @@ export const CANON_CANDIDATES: Record<string, Candidate[]> = {
         morphology: 'pass',
         consonants: 'pass',
       },
+      morphologyMatrix: {
+        pivot: 'stud',
+        meaning: 'deliberate effort / inner state of focus',
+        morphemes: [
+          { form: 'stud', role: 'root', gloss: 'zeal, focused effort' },
+          { form: 'ium', role: 'suffix', gloss: 'state / condition' },
+          { form: 'ens', role: 'suffix', gloss: 'person / agent' },
+        ],
+        wordSums: [
+          { parts: ['stud', 'ium'], result: 'studium', gloss: 'state of focused effort' },
+          { parts: ['stud', 'ens'], result: 'students', gloss: 'those in a focused effort to learn' },
+        ],
+      },
     },
     {
       id: 'alb_study_01',
@@ -110,6 +123,18 @@ export const CANON_CANDIDATES: Record<string, Candidate[]> = {
         principles: 'pass',
         morphology: 'pass',
         consonants: 'pass',
+      },
+      morphologyMatrix: {
+        pivot: "s'tu",
+        meaning: 'what is not yours → to know → make it yours',
+        morphemes: [
+          { form: "s'tu", role: 'root', gloss: 'not yours' },
+          { form: 'di', role: 'root', gloss: 'know' },
+          { form: 'm', role: 'suffix', gloss: 'make / become yours' },
+        ],
+        wordSums: [
+          { parts: ["s'tu", 'di', 'm'], result: "s'tu-di-m", gloss: 'turn not-yours into known/owned knowledge' },
+        ],
       },
     },
   ],
@@ -170,6 +195,19 @@ export const CANON_CANDIDATES: Record<string, Candidate[]> = {
         morphology: 'pass',
         consonants: 'pass',
       },
+      morphologyMatrix: {
+        pivot: 'dam',
+        meaning: 'act that cuts / reduces, leaving a harmed state',
+        morphemes: [
+          { form: 'dam', role: 'root', gloss: 'harm / loss' },
+          { form: 'num', role: 'suffix', gloss: 'resulting state' },
+          { form: 'atio', role: 'suffix', gloss: 'act of / process' },
+        ],
+        wordSums: [
+          { parts: ['dam', 'num'], result: 'damnum', gloss: 'state of harm / loss' },
+          { parts: ['dam', 'n', 'atio'], result: 'damnatio', gloss: 'infliction / condemnation into harm' },
+        ],
+      },
     },
     {
       id: 'alb_damage_01',
@@ -227,6 +265,18 @@ export const CANON_CANDIDATES: Record<string, Candidate[]> = {
         principles: 'pass',
         morphology: 'pass',
         consonants: 'pass',
+      },
+      morphologyMatrix: {
+        pivot: 'dëm',
+        meaning: 'cut / loss that remains as a condition',
+        morphemes: [
+          { form: 'dëm', role: 'root', gloss: 'harm, loss' },
+          { form: 'tim', role: 'suffix', gloss: 'act / process of causing' },
+        ],
+        wordSums: [
+          { parts: ['dëm'], result: 'dëm', gloss: 'harm, loss' },
+          { parts: ['dëm', 'tim'], result: 'dëmtim', gloss: 'act of damaging / causing loss' },
+        ],
       },
     },
   ],
