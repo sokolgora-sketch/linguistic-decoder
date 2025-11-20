@@ -19,6 +19,7 @@ import type {
 } from './engineShape';
 import { CANON_CANDIDATES } from './canonCandidates';
 import { buildConsonantField } from './consonantField';
+import { getVoiceMeta, mapPathToPrinciples } from './sevenVoices';
 
 // --- Helper Functions ---
 
@@ -89,7 +90,33 @@ function estimateTension(primaryPath: EnginePath): TensionLevel {
   return 'high';
 }
 
-export function enginePayloadToAnalysisResult(payload: EnginePayload & { symbolic?: SymbolicLayer }): AnalysisResult {
+function buildSymbolicLayer(
+  normalizedWord: string,
+): SymbolicLayer | undefined {
+  const notes: string[] = [];
+
+  if (normalizedWord === 'study') {
+    notes.push("Seven-Voices path U → I (Unity → Insight) fits a movement from shared field into focused inner knowing.");
+    notes.push("Latin studium: stud + ium → state of focused effort; matches the idea of 'inner, deliberate effort'.");
+    notes.push("Albanian s'tu-di-m: what is not yours → know → make it yours; mirrors the act of drawing the unknown into the self.");
+  } else if (normalizedWord === 'damage') {
+    notes.push("Seven-Voices path A → E (Action → Expansion) for damage fits an act that opens into a harmed / reduced state.");
+    notes.push("Latin damnum: dam + num → harmed unit / state; symbolic reading: 'cut / harm' crystallised as a fixed condition.");
+    notes.push("Albanian dëm / dëmtim: harm + act of causing; emphasises the doing of harm as a process, not just a static state.");
+  }
+
+  if (notes.length > 0) {
+    return {
+      label: 'Zheji-inspired symbolic reading (experimental)',
+      notes: notes,
+    };
+  }
+
+  return undefined;
+}
+
+
+export function enginePayloadToAnalysisResult(payload: EnginePayload): AnalysisResult {
   const normalized = normalizeWord(payload.word);
 
   const lg = guessLanguageFromFamilies(payload.languageFamilies);
@@ -183,6 +210,8 @@ export function enginePayloadToAnalysisResult(payload: EnginePayload & { symboli
   const debug = {
     rawEnginePayload: payload,
   };
+  
+  const sevenVoices = mapPathToPrinciples(primary.voicePath);
 
   const result: AnalysisResult = {
     core,
@@ -192,7 +221,8 @@ export function enginePayloadToAnalysisResult(payload: EnginePayload & { symboli
     },
     candidates,
     debug,
-    symbolic: payload.symbolic,
+    sevenVoices,
+    symbolic: buildSymbolicLayer(normalizedWord),
   };
 
   return result;
