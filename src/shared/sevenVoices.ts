@@ -98,3 +98,44 @@ export const SEVEN_PRINCIPLES_WORDS: string[] = [
   'Network Integrity',
   'Evolution',
 ];
+
+export const getVoiceMeta = (vowel: Vowel): VoiceMeta => {
+  return SEVEN_VOICES[vowel];
+};
+
+export type PrinciplesSummary = {
+  principlePath: string[];   // e.g. ['Unity', 'Insight']
+  dominantVoices: Vowel[];   // vowels that appear most often
+  dominantPrinciples: string[];
+  sevenWords: string[];      // always SEVEN_PRINCIPLES_WORDS
+};
+
+export function mapPathToPrinciples(path: Vowel[]): PrinciplesSummary {
+  const counts: Record<Vowel, number> = {
+    A: 0,
+    E: 0,
+    I: 0,
+    O: 0,
+    U: 0,
+    Y: 0,
+    Ë: 0,
+  };
+
+  const principlePath = path.map(v => {
+    counts[v] = (counts[v] ?? 0) + 1;
+    return SEVEN_VOICES[v].principle;
+  });
+
+  const max = Math.max(0, ...Object.values(counts));
+  const dominantVoices =
+    max > 0 ? (Object.keys(counts).filter(v => counts[v as Vowel] === max) as Vowel[]) : [];
+
+  const dominantPrinciples = dominantVoices.map(v => SEVEN_VOICES[v].principle);
+
+  return {
+    principlePath,
+    dominantVoices,
+    dominantPrinciples,
+    sevenWords: SEVEN_PRINCIPLES_WORDS,
+  };
+}
