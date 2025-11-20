@@ -48,6 +48,11 @@ export const CANON_CANDIDATES: Record<string, Candidate[]> = {
       fitTag: 'strong',
       status: 'pass',
       confidenceTag: 'solid',
+      consonantProfile: 'build',
+      consonantProfileOk: true,
+      consonantSignals: [
+        "Edge cluster 'st' (Plosive + Sibilant) supports focused effort / building an inner state.",
+      ],
     },
     {
       id: 'alb_study_01',
@@ -92,6 +97,11 @@ export const CANON_CANDIDATES: Record<string, Candidate[]> = {
       fitTag: 'strong',
       status: 'pass',
       confidenceTag: 'solid',
+      consonantProfile: 'build',
+      consonantProfileOk: true,
+      consonantSignals: [
+        "Consonant pattern matches the idea of moving what is not yours into your own knowledge.",
+      ],
     },
   ],
   damage: [
