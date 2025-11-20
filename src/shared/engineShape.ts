@@ -118,34 +118,16 @@ export type ConsonantProfile =
   | 'build'      // make, form, construct
   | 'none';      // neutral / not specified
 
-// High-level consonant behaviour classes used for the 42-slot field.
-export type ConsonantArchetype =
-  | 'Plosive'
-  | 'Affricate'
-  | 'SibilantFric'
-  | 'NonSibilantFric'
-  | 'Nasal'
-  | 'LiquidGlide'; // NOTE: V1: combines Liquids (l,r) and Glides (w,y); may split later.
+// Coarse verdict on how well an origin matches a particular axis.
+export type OriginAxisStatus = 'pass' | 'weak' | 'unknown';
 
-export type ConsonantSlot = {
-  vowel: Vowel;
-  archetype: ConsonantArchetype;
-  smooth: number; // hops where this archetype supported the ring change
-  spiky: number;  // hops where this archetype fought the ring change
-};
-
-export type ConsonantField = {
-  smoothHits: number;
-  spikyHits: number;
-  slots: ConsonantSlot[];
-  // Optional coarse flag: true when consonant behaviour is globally "spiky".
-  hasConflict?: boolean;
-};
-
-export type ConsonantSummary = {
-  smoothRatio: number;                // between 0 and 1, 0 if no hits
-  dominantArchetypes: ConsonantArchetype[]; // top 1–3 archetypes by (smooth - spiky)
-  notes?: string[];
+export type CandidateOriginAxes = {
+  // Seven-Voices path + principles consistency.
+  principles: OriginAxisStatus;
+  // Word-sum / morphology story: does it actually explain function?
+  morphology: OriginAxisStatus;
+  // Consonant behaviour vs. semantic profile (cut/build/etc.).
+  consonants: OriginAxisStatus;
 };
 
 export type TensionLevel = 'low' | 'medium' | 'high';
