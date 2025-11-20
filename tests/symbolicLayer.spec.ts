@@ -1,3 +1,4 @@
+
 // tests/symbolicLayer.spec.ts
 
 import { analyzeWord } from '../src/engine/analyzeWord';
