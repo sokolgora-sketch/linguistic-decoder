@@ -229,9 +229,31 @@ export function enginePayloadToAnalysisResult(payload: EnginePayload): AnalysisR
   return result;
 }
 
-export function analysisResultToEnginePayload(result: AnalyzeWordResult): EnginePayload {
-  const mode = (result.core?.input?.mode === 'explore') ? 'open' : 'strict';
-  const alphabet = result.core?.input?.alphabet || 'auto';
+export function analysisResultToEnginePayload(result: AnalysisResult): EnginePayload {
+  // Guard against calls with incomplete/mock data that lacks a `core` object
+  if (!result.core) {
+    return {
+      engineVersion: 'mock-or-error',
+      word: result.word || 'error',
+      mode: 'strict',
+      alphabet: 'auto',
+      primaryPath: {
+        voicePath: (result as any).primaryPath?.voicePath?.split('→') || [],
+        ringPath: (result as any).primaryPath?.ringPath?.split('→')?.map(Number) || [],
+        levelPath: [],
+        ops: [],
+        checksums: { V: 0, E: 0, C: 0 },
+        kept: 0,
+      },
+      frontierPaths: [],
+      windows: [],
+      windowClasses: [],
+      signals: ['incomplete-payload'],
+    };
+  }
+
+  const mode = (result.core.input?.mode === 'explore') ? 'open' : 'strict';
+  const alphabet = result.core.input?.alphabet || 'auto';
   
   return result.debug?.rawEnginePayload ?? {
     engineVersion: result.core.engineVersion,
