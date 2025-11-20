@@ -1,9 +1,10 @@
-
 import { db, ensureAnon, auth } from "./firebase";
 import { doc, getDoc, setDoc, serverTimestamp, collection, addDoc } from "firebase/firestore";
-import { normalizeEnginePayload, type EnginePayload, type Vowel, LanguageFamily } from "../shared/engineShape";
+import { normalizeEnginePayload, type EnginePayload, type Vowel, LanguageFamily, type AnalysisResult } from "../shared/engineShape";
 import { logError } from "./logError";
-import { runAnalysis, type AnalysisResult } from "./runAnalysis";
+import { runAnalysis } from "./runAnalysis";
+import { enginePayloadToAnalysisResult } from '@/shared/analysisAdapter';
+
 
 // Browser-safe engine code:
 import type { SolveOptions } from "../functions/sevenVoicesCore";
@@ -25,7 +26,7 @@ type AnalyzeOpts = {
 // NEW helper: safe join
 const joinPath = (xs?: (string|Vowel)[]) => Array.isArray(xs) ? xs.join("→") : "";
 
-function computeLocal(word: string, mode: Mode, alphabet: Alphabet, edgeWeight?: number): AnalysisResult {
+function computeLocal(word: string, mode: Mode, alphabet: Alphabet, edgeWeight?: number): EnginePayload {
   const manifest = getManifest(); // Use default manifest for local compute
   
   const strict = mode === "strict";
@@ -69,7 +70,7 @@ function computeLocal(word: string, mode: Mode, alphabet: Alphabet, edgeWeight?:
   });
 }
 
-export async function analyzeClient(word: string, mode: Mode, alphabet: Alphabet, opts: AnalyzeOpts = {}): Promise<AnalysisResult> {
+export async function analyzeClient(word: string, mode: Mode, alphabet: Alphabet, opts: AnalyzeOpts = {}): Promise<EnginePayload & { analysis?: AnalysisResult }> {
   await ensureAnon();
   const manifest = getManifest();
 
@@ -81,52 +82,61 @@ export async function analyzeClient(word: string, mode: Mode, alphabet: Alphabet
   // If db isn't initialized, we can only do local computation.
   if (!db) {
     console.warn("Firestore not available. Skipping cache and returning local computation.");
-    const result = computeLocal(word, mode, alphabet, opts.edgeWeight);
-    return { ...result, solveMs: 0, cacheHit: false };
+    const enginePayload = computeLocal(word, mode, alphabet, opts.edgeWeight);
+    const analysis = enginePayloadToAnalysisResult(enginePayload);
+    return { ...enginePayload, solveMs: 0, cacheHit: false, analysis };
   }
 
   const cacheRef = doc(db, "analyses", cacheId);
   const t0 = Date.now();
 
   try {
+    let enginePayload: EnginePayload;
+    let fromCache = false;
+    let wasRecomputed = false;
+
     // BYPASS / WRITE-THROUGH: compute fresh or use provided payload, skip cache read
     if (opts.bypass) {
-      const payloadToUse = opts.payload ? normalizeEnginePayload(opts.payload) : computeLocal(word, mode, alphabet, opts.edgeWeight);
-      
+      enginePayload = opts.payload ? normalizeEnginePayload(opts.payload) : computeLocal(word, mode, alphabet, opts.edgeWeight);
+      wasRecomputed = true;
       if (!opts.skipWrite) {
-        const cleanPayload = sanitizeForFirestore(payloadToUse);
+        const cleanPayload = sanitizeForFirestore(enginePayload);
         await setDoc(cacheRef, { ...cleanPayload, cachedAt: serverTimestamp() }, { merge: true });
       }
-      
-      void saveHistory(cacheId, payloadToUse, "bypass");
-      return { ...payloadToUse, recomputed: true, cacheHit: false, solveMs: Date.now() - t0 };
+    } else {
+      // Try cache -> normalize (in case older writes used a different shape)
+      const snap = await getDoc(cacheRef);
+      if (snap.exists()) {
+        enginePayload = normalizeEnginePayload(snap.data());
+        // Re-run detection to ensure families are up to date with latest logic
+        const det = detectAlphabetFair(word, enginePayload.primaryPath.voicePath, alphabet);
+        enginePayload.languageFamilies = det.scores.map(s => ({
+            familyId: s.family,
+            label: s.family.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+            confidence: s.score / 100,
+            rationale: "", forms: [], signals: [],
+            dialect: (s as any).dialect,
+        }));
+        fromCache = true;
+      } else {
+        // Miss → compute → write → return
+        enginePayload = computeLocal(word, mode, alphabet, opts.edgeWeight);
+        const cleanFresh = sanitizeForFirestore(enginePayload);
+        await setDoc(cacheRef, { ...cleanFresh, cachedAt: serverTimestamp() }, { merge: false });
+      }
     }
+    
+    void saveHistory(cacheId, enginePayload, fromCache ? "cache" : (wasRecomputed ? "bypass" : "fresh"));
+    const analysis = enginePayloadToAnalysisResult(enginePayload);
 
-    // Try cache -> normalize (in case older writes used a different shape)
-    const snap = await getDoc(cacheRef);
-    if (snap.exists()) {
-      const normalized = normalizeEnginePayload(snap.data());
-      // Re-run detection to ensure families are up to date with latest logic
-      const det = detectAlphabetFair(word, normalized.primaryPath.voicePath, alphabet);
-      normalized.languageFamilies = det.scores.map(s => ({
-          familyId: s.family,
-          label: s.family.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
-          confidence: s.score / 100,
-          rationale: "", forms: [], signals: [],
-          dialect: (s as any).dialect,
-      }));
-      
-      void saveHistory(cacheId, normalized, "cache");
-      return { ...normalized, cacheHit: true, recomputed: false, solveMs: Date.now() - t0 };
-    }
+    return { 
+      ...enginePayload,
+      analysis,
+      cacheHit: fromCache, 
+      recomputed: wasRecomputed,
+      solveMs: Date.now() - t0 
+    };
 
-    // Miss → compute → write → return
-    const fresh = computeLocal(word, mode, alphabet, opts.edgeWeight);
-    const cleanFresh = sanitizeForFirestore(fresh);
-
-    await setDoc(cacheRef, { ...cleanFresh, cachedAt: serverTimestamp() }, { merge: false });
-    void saveHistory(cacheId, fresh, "fresh");
-    return { ...fresh, cacheHit: false, recomputed: false, solveMs: Date.now() - t0 };
   } catch (e: any) {
     logError({ where: "analyzeClient", message: e.message, detail: { word, mode, alphabet, stack: e.stack } });
     throw e; // re-throw to be caught by UI
@@ -135,7 +145,7 @@ export async function analyzeClient(word: string, mode: Mode, alphabet: Alphabet
 
 async function saveHistory(
   cacheId: string,
-  engine: AnalysisResult,
+  engine: EnginePayload,
   source: "cache"|"fresh"|"bypass"
 ) {
   if (!db) return; // Guard clause

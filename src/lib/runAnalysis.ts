@@ -1,7 +1,7 @@
-
 // src/lib/runAnalysis.ts
 import { solveWord } from "../functions/sevenVoicesCore";
 import type { SolveOptions as SolveWordOptions } from "../functions/sevenVoicesCore";
+import type { EnginePayload } from "@/shared/engineShape";
 
 export type Alphabet = "auto"|"albanian"|"latin"|"sanskrit"|"ancient_greek"|"pie"|"turkish"|"german";
 export const ENGINE_VERSION = process.env.NEXT_PUBLIC_ENGINE_VERSION ?? "dev";
@@ -10,12 +10,7 @@ export const ENGINE_VERSION = process.env.NEXT_PUBLIC_ENGINE_VERSION ?? "dev";
 export type SolveWordResult = ReturnType<typeof solveWord>;
 
 // This is what the app & JSON export will see.
-export type AnalysisResult = SolveWordResult & {
-  engineVersion: string;
-  word: string;
-  mode: string;
-  alphabet: string;
-};
+export type AnalysisResult = EnginePayload;
 
 /**
  * Central wrapper for the Seven-Voices engine.
