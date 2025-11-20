@@ -77,12 +77,6 @@ export function Candidates({ items, analysis }: { items?: LanguageFamily[]; anal
                 </div>
               )}
 
-              {c.consonantSignals && c.consonantSignals.length > 0 && (
-                <div className="text-xs opacity-60 mt-1.5">
-                  {c.consonantSignals.join(" · ")}
-                </div>
-              )}
-
               {c.status && (
                 <div className="mt-2 flex items-center gap-2">
                     <span className={`px-2 py-0.5 rounded-full text-xs font-medium

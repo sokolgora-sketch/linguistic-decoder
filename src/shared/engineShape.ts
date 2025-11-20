@@ -141,44 +141,6 @@ export type MorphologyEvidence = {
   notes?: string[];
 };
 
-// --- Consonant Layer ---
-export type ConsonantArchetype =
-  | 'Plosive'
-  | 'Affricate'
-  | 'SibilantFric'
-  | 'NonSibilantFric'
-  | 'Nasal'
-  | 'LiquidGlide'; // NOTE: V1: combines Liquids (l,r) and Glides (w,y); may split later
-
-export type ConsonantSlot = {
-  vowel: Vowel;
-  archetype: ConsonantArchetype;
-  smooth: number;
-  spiky: number;
-};
-
-export type ConsonantField = {
-  smoothHits: number;
-  spikyHits: number;
-  slots: ConsonantSlot[];
-  hasConflict?: boolean;
-};
-
-export type ConsonantSummary = {
-  smoothRatio: number;
-  dominantArchetypes: ConsonantArchetype[];
-  notes?: string[];
-};
-
-export type ConsonantProfile =
-  | 'cut'
-  | 'carry'
-  | 'bind'
-  | 'flow'
-  | 'speak'
-  | 'build'
-  | 'none';
-
 // Candidate-level origin entry (per language/form)
 export type Candidate = {
   id: string;
@@ -222,20 +184,12 @@ export type Candidate = {
 
   morphology?: MorphologyEvidence;
   fitTag?: 'strong' | 'medium' | 'weak';
-
-  consonantProfiles?: ConsonantProfile[];
-  consonantProfileOk?: boolean;
-  consonantSignals?: string[];
+  status: 'pass' | 'fail' | 'experimental' | 'deprecated';
+  confidenceTag: 'solid' | 'speculative';
 };
 
 export type AnalysisDebug = {
   rawEnginePayload?: EnginePayload;
-  signals?: string[];
-  edgeWindows?: string[];
-  consonants?: {
-    field: ConsonantField;
-    summary: ConsonantSummary;
-  };
 };
 
 export type AnalysisResult = {

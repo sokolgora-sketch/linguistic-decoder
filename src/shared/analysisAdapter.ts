@@ -14,14 +14,8 @@ import type {
   AnalysisHeartPaths,
   Candidate,
   TensionLevel,
-  MorphologyEvidence,
-  ConsonantField,
-  ConsonantSummary,
-  ConsonantArchetype,
-  ConsonantSlot,
 } from './engineShape';
 import { CANON_CANDIDATES } from './canonCandidates';
-import { VOWELS } from '@/functions/sevenVoicesCore';
 
 // --- Helper Functions ---
 
@@ -92,75 +86,6 @@ function estimateTension(primaryPath: EnginePath): TensionLevel {
   return 'high';
 }
 
-// --- Consonant Field Builder ---
-
-const ARCHETYPES: ConsonantArchetype[] = ['Plosive', 'Affricate', 'SibilantFric', 'NonSibilantFric', 'Nasal', 'LiquidGlide'];
-
-function buildConsonantField(payload: EnginePayload): { field: ConsonantField; summary: ConsonantSummary } {
-    const { primaryPath, windows = [], windowClasses = [], edgeWindows = [] } = payload;
-    const { voicePath, ringPath } = primaryPath;
-    
-    // Initialize 42 slots
-    const slots = VOWELS.flatMap(vowel => 
-        ARCHETYPES.map(archetype => ({ vowel, archetype, smooth: 0, spiky: 0 }))
-    ) as ConsonantSlot[];
-    const slotMap = new Map<string, ConsonantSlot>();
-    slots.forEach(s => slotMap.set(`${s.vowel}:${s.archetype}`, s));
-
-    let smoothHits = 0;
-    let spikyHits = 0;
-
-    // Placeholder logic for consonant class preferences (replace with manifest later)
-    const PREF: Record<string, [number, number]> = {
-        Plosive: [2, 3], Affricate: [1, 2], SibilantFric: [1, 2],
-        NonSibilantFric: [1, 1], Nasal: [0, 1], LiquidGlide: [0, 1]
-    };
-
-    // Process interior windows
-    for (let i = 0; i < voicePath.length - 1; i++) {
-        const arch = windowClasses[i] as ConsonantArchetype;
-        if (!arch) continue;
-        
-        const delta = Math.abs(ringPath[i+1] - ringPath[i]);
-        const [lo, hi] = PREF[arch] ?? [0, 3];
-        const vowel = voicePath[i];
-        
-        const key = `${vowel}:${arch}`;
-        const slot = slotMap.get(key);
-        if (!slot) continue;
-
-        if (delta >= lo && delta <= hi) {
-            slot.smooth++;
-            smoothHits++;
-        } else {
-            slot.spiky++;
-            spikyHits++;
-        }
-    }
-
-    const field: ConsonantField = {
-        smoothHits,
-        spikyHits,
-        slots,
-        hasConflict: (smoothHits + spikyHits > 0) && (smoothHits / (smoothHits + spikyHits)) < 0.4 && spikyHits > 0,
-    };
-
-    const summary: ConsonantSummary = {
-        smoothRatio: (smoothHits + spikyHits > 0) ? smoothHits / (smoothHits + spikyHits) : 0,
-        dominantArchetypes: [...ARCHETYPES].sort((a, b) => {
-            const scoreA = (slotMap.get(`${voicePath[0]}:${a}`)?.smooth ?? 0) - (slotMap.get(`${voicePath[0]}:${a}`)?.spiky ?? 0);
-            const scoreB = (slotMap.get(`${voicePath[0]}:${b}`)?.smooth ?? 0) - (slotMap.get(`${voicePath[0]}:${b}`)?.spiky ?? 0);
-            return scoreB - scoreA;
-        }).slice(0, 3).filter(arch => {
-            const slot = slots.find(s => s.archetype === arch);
-            return (slot?.smooth ?? 0) + (slot?.spiky ?? 0) > 0;
-        }),
-        notes: [],
-    };
-
-    return { field, summary };
-}
-
 export function enginePayloadToAnalysisResult(payload: EnginePayload): AnalysisResult {
   const normalized = normalizeWord(payload.word);
 
@@ -213,14 +138,13 @@ export function enginePayloadToAnalysisResult(payload: EnginePayload): AnalysisR
     heartPaths: heartPathsCore
   };
 
-  const { field: consonantField, summary: consonantSummary } = buildConsonantField(payload);
-
   let candidates: Candidate[];
+
   const normalizedWord = normalized;
 
-  const canonFactory = CANON_CANDIDATES[normalizedWord];
-  if (canonFactory) {
-    candidates = canonFactory(payload);
+  const canon = CANON_CANDIDATES[normalizedWord];
+  if (canon && canon.length > 0) {
+    candidates = canon;
   } else {
     candidates = (payload.languageFamilies ?? []).map((lf, idx) => ({
       id: `family_${lf.familyId}_${idx}`,
@@ -252,12 +176,6 @@ export function enginePayloadToAnalysisResult(payload: EnginePayload): AnalysisR
 
   const debug = {
     rawEnginePayload: payload,
-    signals: payload.signals ?? [],
-    edgeWindows: payload.edgeWindows ?? [],
-    consonants: {
-      field: consonantField,
-      summary: consonantSummary,
-    }
   };
 
   return { core, candidates, debug };
