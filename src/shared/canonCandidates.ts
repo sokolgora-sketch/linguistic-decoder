@@ -209,15 +209,14 @@ export const CANON_CANDIDATES: Record<string, Candidate[]> = {
       },
       morphologyMatrix: {
         pivot: 'dam',
-        meaning: 'act that cuts / reduces, leaving a harmed state',
+        meaning: 'cut / act that leaves something in a harmed state',
         morphemes: [
-          { form: 'dam', role: 'root', gloss: 'harm / loss' },
-          { form: 'num', role: 'suffix', gloss: 'resulting state' },
-          { form: 'atio', role: 'suffix', gloss: 'act of / process' },
+          { form: 'dam', role: 'root', gloss: 'harm, loss, reduction' },
+          { form: 'num', role: 'suffix', gloss: 'thing / unit / result' },
         ],
         wordSums: [
-          { parts: ['dam', 'num'], result: 'damnum', gloss: 'state of harm / loss' },
-          { parts: ['dam', 'n', 'atio'], result: 'damnatio', gloss: 'infliction / condemnation into harm' },
+          { parts: ['dam', 'num'], result: 'damnum', gloss: 'a harmed thing / damaged state' },
+          { parts: ['dam', 'natio'], result: 'damnatio', gloss: 'inflicted state of loss / condemnation' },
         ],
       },
     },
@@ -280,14 +279,17 @@ export const CANON_CANDIDATES: Record<string, Candidate[]> = {
       },
       morphologyMatrix: {
         pivot: 'dëm',
-        meaning: 'cut / loss that remains as a condition',
+        meaning: 'harm / loss that remains as a condition',
         morphemes: [
-          { form: 'dëm', role: 'root', gloss: 'harm, loss' },
-          { form: 'tim', role: 'suffix', gloss: 'act / process of causing' },
+          { form: 'dëm', role: 'root',   gloss: 'harm, loss' },
+          { form: 'tim', role: 'suffix', gloss: 'act of causing / process' },
         ],
         wordSums: [
-          { parts: ['dëm'], result: 'dëm', gloss: 'harm, loss' },
-          { parts: ['dëm', 'tim'], result: 'dëmtim', gloss: 'act of damaging / causing loss' },
+          {
+            parts: ['dëm', 'tim'],
+            result: 'dëmtim',
+            gloss: 'the act of causing harm / damaging',
+          },
         ],
       },
     },
