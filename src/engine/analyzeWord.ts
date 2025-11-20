@@ -1,0 +1,140 @@
+
+// src/engine/analyzeWord.ts
+
+// --- Placeholder Imports ---
+// These are assumed to exist based on your instructions.
+// You will need to replace these with your actual implementations.
+import { ENGINE_VERSION } from './version';
+
+// Mock implementation for placeholder functions
+const analyzeSevenVoices = (word: string): any => ({
+  word,
+  normalized: word,
+  voicePath: ['U', 'I'],
+  levelPath: [-1, 1],
+  ringPath: [1, 1],
+  checksums: { V: 55, E: 0, C: 1 },
+  keeps: 2,
+  edgeProfile: 's(plosive)-d(plosive)',
+});
+
+const getCanonCandidatesForWord = (word: string): any[] => ([]);
+const getFrontierForWord = (word: string): any[] => ([]);
+
+
+// --- Type Definitions ---
+
+export type AnalyzeMode = 'basic' | 'full';
+
+export interface SevenVoicesSummary {
+  word: string;
+  normalized: string;
+  voicePath: string[];
+  levelPath: Array<'Low' | 'Mid' | 'High'>;
+  ringPath: number[];
+  checksums: { V: number; E: number; C: number };
+  keeps: number;
+  edgeProfile: string;
+}
+
+export interface CanonMorphologyMatrix {
+  pivot: string;
+  gloss: string;
+  morphemes: Array<{ part: string; gloss: string }>;
+  wordSums: Array<{ sum: string; gloss:string }>;
+}
+
+export interface CanonLanguageCandidate {
+  language: string;
+  form: string;
+  gloss: string;
+  axes: {
+    voices: 'pass' | 'fail';
+    morphology: 'pass' | 'fail';
+    consonants: 'pass' | 'fail';
+  };
+  strength: 'experimental' | 'solid' | 'strong';
+  morphologyMatrix?: CanonMorphologyMatrix;
+}
+
+export interface FrontierPath {
+  label: string;
+  voicePath: string[];
+  V: number;
+  E: number;
+  C: number;
+  keeps: number;
+  levelPath: Array<'Low' | 'Mid' | 'High'>;
+  ringPath: number[];
+}
+
+// placeholder for Petro Zheji layer; we’ll fill later
+export interface SymbolicLayer {
+  notes: string[];
+}
+
+export interface AnalyzeWordResponse {
+  word: string;
+  mode: AnalyzeMode;
+  engineVersion: string;
+  core: SevenVoicesSummary;
+  canon: CanonLanguageCandidate[];
+  frontier: FrontierPath[];
+  symbolic?: SymbolicLayer;
+}
+
+// --- Main Engine Function ---
+
+/**
+ * The deterministic heart of the Seven-Voices analysis engine.
+ * @param word The word to analyze.
+ * @param mode 'basic' or 'full' analysis mode.
+ * @returns A structured analysis object.
+ */
+export async function analyzeWord(
+  word: string,
+  mode: AnalyzeMode = 'full',
+): Promise<AnalyzeWordResponse> {
+  const trimmedWord = word.trim();
+  if (!trimmedWord) {
+    throw new Error('Input word cannot be empty.');
+  }
+  
+  // 1. Normalize the word
+  const normalized = trimmedWord.normalize('NFC').toLowerCase();
+
+  // 2. Call helper for core Seven-Voices analysis and map the result
+  const sevenVoicesResult = analyzeSevenVoices(normalized);
+  const core: SevenVoicesSummary = {
+    ...sevenVoicesResult,
+    // The mapping is assumed to be direct based on the placeholder function.
+    // If the helper returns a different shape, this is where you adapt it.
+  };
+
+  // 3. Call helper for canonical candidates
+  const canonCandidates = getCanonCandidatesForWord(normalized);
+  const canon: CanonLanguageCandidate[] = canonCandidates.map((c: any) => ({
+    // Direct mapping assumed. Adapt if the helper's shape differs.
+    ...c,
+  }));
+
+  // 4. Call helper for frontier paths
+  const frontierPaths = getFrontierForWord(normalized);
+  const frontier: FrontierPath[] = frontierPaths.map((f: any) => ({
+    // Direct mapping assumed.
+    ...f,
+  }));
+
+  // 5. Assemble and return the final response
+  const response: AnalyzeWordResponse = {
+    word: trimmedWord,
+    mode,
+    engineVersion: ENGINE_VERSION,
+    core,
+    canon,
+    frontier,
+    symbolic: undefined, // Placeholder as requested
+  };
+
+  return Promise.resolve(response);
+}
