@@ -1,8 +1,20 @@
 
 'use client';
-import type { LanguageFamily, Candidate, AnalysisResult } from '../shared/engineShape';
+import type { LanguageFamily, Candidate, AnalysisResult, OriginAxisStatus } from '../shared/engineShape';
 import { Badge } from './ui/badge';
 import { Card } from './ui/card';
+
+const axisLabel = (status: OriginAxisStatus | undefined) => {
+  switch (status) {
+    case 'pass':
+      return '✅';
+    case 'weak':
+      return '⚠️';
+    case 'unknown':
+    default:
+      return '❓';
+  }
+};
 
 export function Candidates({ items, analysis }: { items?: LanguageFamily[]; analysis?: AnalysisResult }) {
   const fromAnalysis = analysis?.candidates ?? [];
@@ -90,6 +102,15 @@ export function Candidates({ items, analysis }: { items?: LanguageFamily[]; anal
                     <li key={idx}>{s}</li>
                   ))}
                 </ul>
+              )}
+
+              {c.axes && (
+                <div className="mt-2 text-xs text-muted-foreground">
+                  <span className="font-semibold">Axes:</span>{' '}
+                  Voices {axisLabel(c.axes.principles)} ·{' '}
+                  Morphology {axisLabel(c.axes.morphology)} ·{' '}
+                  Consonants {axisLabel(c.axes.consonants)}
+                </div>
               )}
 
               {c.status && (
