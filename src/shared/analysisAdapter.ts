@@ -69,7 +69,14 @@ function buildSymbolicLayer(
     return undefined;
   }
 
-  const notes = candidates.flatMap(c => c.symbolic?.map(s => s.note) ?? []);
+  const notes: string[] = [];
+  for (const c of candidates) {
+    if (c.symbolic) {
+      for (const s of c.symbolic) {
+        notes.push(s.note);
+      }
+    }
+  }
 
   if (notes.length === 0) return undefined;
 
@@ -105,7 +112,7 @@ export function enginePayloadToAnalysisResult(
         id: `spec_${fam.familyId}_${word}`,
         language: fam.label,
         family: fam.familyId,
-        form: fam.forms[0] ?? word,
+        form: (fam.forms && fam.forms[0]) ?? word,
         decomposition: { parts: [], functionalStatement: fam.rationale },
         voices: {
           voiceSequence: payload.primaryPath.voicePath,
