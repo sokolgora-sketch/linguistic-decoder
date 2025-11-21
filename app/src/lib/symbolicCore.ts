@@ -10,7 +10,19 @@
 //
 // Safe v1: pure helpers, no side effects, not wired into analyzeWord yet.
 
-import type { Vowel, SevenVoicesSummary } from "@/shared/engineShape";
+// Self-contained type to avoid circular dependencies
+export type Vowel = 'A' | 'E' | 'I' | 'O' | 'U' | 'Y' | 'Ë';
+
+
+/**
+ * Seven-Voices summary needed for symbolic layer.
+ * This is intentionally minimal so it can be fed
+ * from either EnginePayload or AnalysisResult.
+ */
+export type SevenVoicesSummary = {
+  voicePath: Vowel[];
+  ringPath?: number[];
+};
 
 /**
  * Direction / polarity of the vowel motion.
