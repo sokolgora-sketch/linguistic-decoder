@@ -1,4 +1,3 @@
-
 // src/shared/canonCandidates.ts
 
 import type { Candidate } from './engineShape';
@@ -71,6 +70,10 @@ export const CANON_CANDIDATES: Record<string, Candidate[]> = {
           { parts: ['stud', 'ens'], result: 'students', gloss: 'those in a focused effort to learn' },
         ],
       },
+      symbolic: [
+          { axis: 'creation', source: 'hybrid', note: 'U-I path suggests a unified insight, a flow toward a specific point.' },
+          { axis: 'law', source: 'zheji', note: 'The consonants "st" and "d" create a container for this inner process.' },
+      ],
     },
     {
       id: 'alb_study_01',
@@ -127,16 +130,23 @@ export const CANON_CANDIDATES: Record<string, Candidate[]> = {
       },
       morphologyMatrix: {
         pivot: "s'tu",
-        meaning: 'what is not yours → to know → make it yours',
+        meaning: 'what is not yours → you know it → you make it yours',
         morphemes: [
-          { form: "s'tu", role: 'root', gloss: 'not yours' },
-          { form: 'di', role: 'root', gloss: 'know' },
-          { form: 'm', role: 'suffix', gloss: 'make / become yours' },
+          { form: "s'tu", role: 'root',   gloss: 'what is not yours' },
+          { form: 'di',  role: 'root',   gloss: 'know' },
+          { form: 'm',   role: 'suffix', gloss: 'make / become yours' },
         ],
         wordSums: [
-          { parts: ["s'tu", 'di', 'm'], result: "s'tu-di-m", gloss: 'turn not-yours into known/owned knowledge' },
+          {
+            parts: ["s'tu", 'di', 'm'],
+            result: "s'tu-di-m",
+            gloss: 'turn what is not yours into your own knowledge',
+          },
         ],
       },
+      symbolic: [
+          { axis: 'creation', source: 'zheji', note: 'Albanian functional path s\'tu-di-m implies making external knowledge internal.' },
+      ],
     },
   ],
   damage: [
@@ -198,17 +208,21 @@ export const CANON_CANDIDATES: Record<string, Candidate[]> = {
       },
       morphologyMatrix: {
         pivot: 'dam',
-        meaning: 'act that cuts / reduces, leaving a harmed state',
+        meaning: 'cut / act that leaves something in a harmed state',
         morphemes: [
-          { form: 'dam', role: 'root', gloss: 'harm / loss' },
-          { form: 'num', role: 'suffix', gloss: 'resulting state' },
+          { form: 'dam', role: 'root', gloss: 'harm, loss, reduction' },
+          { form: 'num', role: 'suffix', gloss: 'thing / unit / result' },
           { form: 'atio', role: 'suffix', gloss: 'act of / process' },
         ],
         wordSums: [
-          { parts: ['dam', 'num'], result: 'damnum', gloss: 'state of harm / loss' },
-          { parts: ['dam', 'n', 'atio'], result: 'damnatio', gloss: 'infliction / condemnation into harm' },
+          { parts: ['dam', 'num'], result: 'damnum', gloss: 'a harmed thing / damaged state' },
+          { parts: ['dam', 'n', 'atio'], result: 'damnatio', gloss: 'inflicted state of loss / condemnation' },
         ],
       },
+      symbolic: [
+          { axis: 'law', source: 'zheji', note: 'A-E path (action/expansion) suggests a breaking out or transgression.' },
+          { axis: 'power', source: 'hybrid', note: 'The "d" and "m" consonants suggest a cutting action resulting in a material state.' },
+      ],
     },
     {
       id: 'alb_damage_01',
@@ -269,16 +283,176 @@ export const CANON_CANDIDATES: Record<string, Candidate[]> = {
       },
       morphologyMatrix: {
         pivot: 'dëm',
-        meaning: 'cut / loss that remains as a condition',
+        meaning: 'harm / loss that remains as a condition',
         morphemes: [
-          { form: 'dëm', role: 'root', gloss: 'harm, loss' },
-          { form: 'tim', role: 'suffix', gloss: 'act / process of causing' },
+          { form: 'dëm', role: 'root',   gloss: 'harm, loss' },
+          { form: 'tim', role: 'suffix', gloss: 'act of causing / process' },
         ],
         wordSums: [
-          { parts: ['dëm'], result: 'dëm', gloss: 'harm, loss' },
-          { parts: ['dëm', 'tim'], result: 'dëmtim', gloss: 'act of damaging / causing loss' },
+          {
+            parts: ['dëm', 'tim'],
+            result: 'dëmtim',
+            gloss: 'the act of causing harm / damaging',
+          },
+        ],
+      },
+      symbolic: [
+          { axis: 'law', source: 'zheji', note: 'Albanian "dëm" as a cut (d-) that becomes a state (ë) in matter (m).' },
+      ],
+    },
+  ],
+  mode: [
+    {
+      id: 'lat_mode_01',
+      language: 'latin',
+      family: 'latin',
+      form: 'modus',
+      decomposition: {
+        parts: [
+          { role: 'action', form: 'mod-', gloss: 'to measure, set a limit' },
+          { role: 'instrument', form: '-u-', gloss: 'a manner or way' },
+          { role: 'unit', form: '-s', gloss: 'a specific instance' },
+        ],
+        functionalStatement: 'A specific instance of a measured way or manner.',
+      },
+      voices: {
+        voiceSequence: ['O', 'U'],
+        ringPath: [0, 1],
+        dominantVoices: { O: 1, U: 1 },
+      },
+      ruleChecks: {
+        soundPathOk: true,
+        functionalDecompOk: true,
+        sevenVoicesAlignmentOk: true,
+        consonantMeaningOk: true,
+        harmonyOk: true,
+      },
+      principleSignals: {
+        truthOk: true, expansionOk: true, insightOk: true, balanceOk: true,
+        unityOk: true, networkIntegrityOk: true, evolutionOk: true,
+        notes: ['Classical Latin source for words related to mode, model, and modification.'],
+      },
+      morphology: {
+        base: 'mod',
+        affixes: ['-us'],
+        wordSums: ['mod + us → modus (measure, manner, mode)'],
+        notes: ['Root mod- is productive in Latin with consistent meaning of measure and manner.'],
+      },
+      fitTag: 'strong',
+      status: 'pass',
+      confidenceTag: 'solid',
+      consonantProfile: 'build',
+      consonantProfileOk: true,
+      consonantSignals: ["Consonant pattern (m-d) supports a 'measured/bounded state'"],
+      axes: {
+        principles: 'pass',
+        morphology: 'pass',
+        consonants: 'pass',
+      },
+      morphologyMatrix: {
+        pivot: 'mode',
+        meaning: 'measure, manner',
+        morphemes: [
+          { form: 'mod(e)', role: 'root', gloss: 'measure, manner' },
+          { form: 'i', role: 'suffix', gloss: 'process / become' },
+          { form: 'fy', role: 'suffix', gloss: 'make / cause' },
+          { form: 'fic', role: 'root', gloss: 'making / doing' },
+          { form: 'ate', role: 'suffix', gloss: 'act / result of doing' },
+          { form: 'ion', role: 'suffix', gloss: 'state / result' },
+          { form: 'ity', role: 'suffix', gloss: 'quality / state' },
+          { form: 'al', role: 'suffix', gloss: 'relating to / of the nature of' },
+          { form: 'bi', role: 'prefix', gloss: 'two / double' },
+          { form: 'com', role: 'prefix', gloss: 'together / with' },
+          { form: 'ac', role: 'prefix', gloss: 'toward / intensifier' },
+          { form: 'une', role: 'prefix', gloss: 'single / one' },
+        ],
+        wordSums: [
+          { parts: ['mode', 'i', 'fy'], result: 'modify', gloss: 'to make or cause a change in measure/form' },
+          { parts: ['mode', 'i', 'fy', 'es'], result: 'modifies', gloss: 'acts that change or adjust something' },
+          { parts: ['mode', 'i', 'fy', 'ing'], result: 'modifying', gloss: 'the process of changing or adjusting' },
+          { parts: ['mode', 'i', 'fic', 'ate', 'ion', 's'], result: 'modifications', gloss: 'results of acts of changing the mode' },
+          { parts: ['ac', 'com', 'mode', 'ate', 'ion'], result: 'accommodation', gloss: 'bringing into a fitting mode / making fit' },
+          { parts: ['com', 'mode', 'ity'], result: 'commodity', gloss: 'a thing made to a shared mode / standard' },
+          { parts: ['une', 'i', 'mode', 'al'], result: 'unimodal', gloss: 'having a single mode / pattern' },
+          { parts: ['bi', 'mode', 'al'], result: 'bimodal', gloss: 'having two modes / patterns' },
+          { parts: ['mode', 'al', 'ity'], result: 'modality', gloss: 'the way / manner in which something is done' },
+          { parts: ['mode', 'al', 'ity', 'es'], result: 'modalities', gloss: 'different ways / manners / modes' },
         ],
       },
     },
   ],
+  love: [
+    {
+        id: 'lat_love_01',
+        language: 'latin',
+        family: 'latin',
+        form: 'amor',
+        decomposition: {
+            parts: [
+                { role: 'action', form: 'am-', gloss: 'love, fondness' },
+                { role: 'unit', form: 'or', gloss: 'agent/bearer of quality' },
+            ],
+            functionalStatement: 'One who carries or embodies love.',
+        },
+        voices: { voiceSequence: ['O', 'E'], ringPath: [0, 2], dominantVoices: {} },
+        ruleChecks: { soundPathOk: true, functionalDecompOk: true, sevenVoicesAlignmentOk: true, consonantMeaningOk: true, harmonyOk: true },
+        principleSignals: { truthOk: true, expansionOk: true, insightOk: true, balanceOk: true, unityOk: true, networkIntegrityOk: true, evolutionOk: true },
+        fitTag: 'strong',
+        status: 'pass',
+        confidenceTag: 'solid',
+        consonantProfile: 'flow',
+        consonantProfileOk: true,
+        consonantSignals: ['liquid / sonorant frame around open vowels'],
+        axes: { principles: 'pass', morphology: 'pass', consonants: 'pass' },
+        morphologyMatrix: {
+            pivot: 'am',
+            meaning: 'warm, directed affection / friendly love',
+            morphemes: [
+                { form: 'am', role: 'root', gloss: 'love, fondness, friendly affection' },
+                { form: 'or', role: 'suffix', gloss: 'agent / bearer of quality' },
+            ],
+            wordSums: [{ parts: ['am', 'or'], result: 'amor', gloss: 'one who carries/embodies love' }],
+        },
+        symbolic: [
+            { axis: 'love', source: 'hybrid', note: "Latin 'amor' makes love a carried quality — something you bear." },
+        ]
+    },
+    {
+        id: 'alb_love_01',
+        language: 'albanian',
+        family: 'albanian',
+        form: 'dashuri',
+        decomposition: {
+            parts: [
+                { role: 'action', form: 'dash-', gloss: 'to love, to like' },
+                { role: 'instrument', form: '-ur-', gloss: 'state/quality' },
+                { role: 'unit', form: '-i', gloss: 'noun marker' },
+            ],
+            functionalStatement: 'The state or quality of loving.',
+        },
+        voices: { voiceSequence: ['A', 'U', 'I'], ringPath: [3, 1, 1], dominantVoices: {} },
+        ruleChecks: { soundPathOk: true, functionalDecompOk: true, sevenVoicesAlignmentOk: true, consonantMeaningOk: true, harmonyOk: true },
+        principleSignals: { truthOk: true, expansionOk: true, insightOk: true, balanceOk: true, unityOk: true, networkIntegrityOk: true, evolutionOk: true },
+        fitTag: 'strong',
+        status: 'pass',
+        confidenceTag: 'solid',
+        consonantProfile: 'bind',
+        consonantProfileOk: true,
+        consonantSignals: ['soft fricatives and sonorants shaping attachment'],
+        axes: { principles: 'pass', morphology: 'pass', consonants: 'pass' },
+        morphologyMatrix: {
+            pivot: 'dash',
+            meaning: 'intentional affection / chosen closeness',
+            morphemes: [
+                { form: 'dash', role: 'root', gloss: 'to love, to like' },
+                { form: 'ur', role: 'suffix', gloss: 'state / quality' },
+                { form: 'i', role: 'suffix', gloss: 'noun marker' },
+            ],
+            wordSums: [{ parts: ['dash', 'ur', 'i'], result: 'dashuri', gloss: 'the state/quality of loving' }],
+        },
+        symbolic: [
+             { axis: 'love', source: 'hybrid', note: "Albanian 'dashuri' frames love as a chosen state, not just a feeling." },
+        ]
+    }
+  ]
 };
