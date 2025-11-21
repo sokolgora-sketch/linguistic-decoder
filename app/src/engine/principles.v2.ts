@@ -1,111 +1,109 @@
 // src/engine/principles.v2.ts
 
-export type SevenVoiceId = "A" | "E" | "I" | "O" | "U" | "Y" | "Ë";
+export type PrincipleId = "A" | "E" | "I" | "O" | "U" | "Y" | "Ë";
 
-export type SevenPrinciple = {
-  id: SevenVoiceId;
-  principle: string;
-  color: string;
-  ring: 0 | 1 | 2 | 3;
-  level: "high" | "mid" | "low";
-  gender: "male" | "female" | "neutral";
-  element: "fire" | "water" | "air" | "earth" | "ether";
-  metal: "iron" | "copper" | "gold" | "silver" | "mercury" | "bronze" | "none";
-  role: string;
-  function: string;
-  notes: string[];
-};
+export interface PrincipleV2 {
+  id: PrincipleId;
+  name: string;
+  coreWord: string;
+  color: string;          // semantic color, you already know the palette
+  ring: "outer" | "middle" | "inner" | "core";
+  role: string;           // short archetype
+  coreQuestion: string;   // the main check this principle asks
+  healthyUse: string;     // what this principle should do
+  shadowUse: string;      // what happens when it dominates / is distorted
+}
 
-export const PRINCIPLES_V2: Record<SevenVoiceId, SevenPrinciple> = {
-  A: {
+export const PRINCIPLES_V2: PrincipleV2[] = [
+  {
     id: "A",
-    principle: "Truth / Source / Action",
-    color: "#FF3B30",
-    ring: 3,
-    level: "high",
-    gender: "male",
-    element: "fire",
-    metal: "iron",
-    role: "Father tone, first strike",
-    function: "initiate, cut, assert",
-    notes: ["The first cry", "Action and assertion", "Sun-force"],
+    name: "Truth / Origin",
+    coreWord: "Truth",
+    color: "red",
+    ring: "outer",
+    role: "Father / Source",
+    coreQuestion: "Is this the cleanest, most honest statement of what it is?",
+    healthyUse:
+      "Name things precisely, cut noise, define units and actions clearly.",
+    shadowUse:
+      "Dogma and rigidity; assumes its own frame is the only truth and cuts away too much."
   },
-  E: {
+  {
     id: "E",
-    principle: "Expansion",
-    color: "#FF9500",
-    ring: 2,
-    level: "high",
-    gender: "female",
-    element: "air",
-    metal: "bronze",
-    role: "Expansion of what A starts",
-    function: "stretch, spread, radiate",
-    notes: ["Connects and stretches", "Grows the field", "Radiates outward"],
+    name: "Expansion / Reach",
+    coreWord: "Expansion",
+    color: "orange",
+    ring: "middle",
+    role: "Breath / Horizon",
+    coreQuestion: "Have we explored enough possibilities and directions?",
+    healthyUse:
+      "Open options, search alternatives, see a wider field before locking in.",
+    shadowUse:
+      "Endless branching and inflation; no decision, everything keeps expanding."
   },
-  I: {
+  {
     id: "I",
-    principle: "Insight / Focus",
-    color: "#FFCC00",
-    ring: 1,
-    level: "high",
-    gender: "male",
-    element: "air",
-    metal: "gold",
-    role: "Ray of understanding",
-    function: "concentrate, see, discriminate",
-    notes: ["A clear line of thought", "Focuses energy", "The 'I' of awareness"],
+    name: "Insight / Focus",
+    coreWord: "Insight",
+    color: "yellow",
+    ring: "inner",
+    role: "Beam / Eye / Nerve",
+    coreQuestion: "What pattern or rule actually explains this?",
+    healthyUse:
+      "Compress complexity into a simple rule or pattern; pick the minimal explanation.",
+    shadowUse:
+      "Over-analysis and clever models that drift away from reality on the ground."
   },
-  O: {
+  {
     id: "O",
-    principle: "Balance / Mediator",
-    color: "#34C759",
-    ring: 0,
-    level: "mid",
-    gender: "neutral",
-    element: "ether",
-    metal: "none",
-    role: "Heart, mediator of flows",
-    function: "hold, contain, harmonize",
-    notes: ["The central pivot", "Holds balance", "A container or field"],
+    name: "Balance / Center",
+    coreWord: "Balance",
+    color: "green",
+    ring: "core",
+    role: "Heart / Mediator",
+    coreQuestion: "Is the system in balance and self-consistent?",
+    healthyUse:
+      "Reconcile tensions fairly, stabilize the structure, keep both sides in view.",
+    shadowUse:
+      "Compromises everything; avoids sharp decisions even when they’re needed."
   },
-  U: {
+  {
     id: "U",
-    principle: "Unity / Flow",
-    color: "#007AFF",
-    ring: 1,
-    level: "low",
-    gender: "male",
-    element: "water",
-    metal: "silver",
-    role: "River of connection",
-    function: "unify, bind, sustain",
-    notes: ["Carries the flow", "Connects all parts", "The breath of the word"],
+    name: "Unity / Cohesion",
+    coreWord: "Unity",
+    color: "blue",
+    ring: "inner",
+    role: "Body / River",
+    coreQuestion: "Does this hold together as one working body?",
+    healthyUse:
+      "Connect parts, ensure continuous flow, apply the same rules across the whole.",
+    shadowUse:
+      "Smears important differences, drifts into groupthink and over-fusion."
   },
-  Y: {
+  {
     id: "Y",
-    principle: "Network / Integrity",
-    color: "#5856D6",
-    ring: 2,
-    level: "low",
-    gender: "female",
-    element: "ether",
-    metal: "mercury",
-    role: "Weaving connections",
-    function: "link, branch, create paths",
-    notes: ["Forms loops and networks", "Maintains structural integrity", "Weaves across the matrix"],
+    name: "Network Integrity",
+    coreWord: "Network",
+    color: "indigo",
+    ring: "middle",
+    role: "Web / Grid / Circuit",
+    coreQuestion: "Are all links, references, and interfaces honest and solid?",
+    healthyUse:
+      "Track relationships, dependencies, and interfaces; keep the web honest.",
+    shadowUse:
+      "Paranoid or over-wired system; obsessed with links and signals everywhere."
   },
-  Ë: {
+  {
     id: "Ë",
-    principle: "Evolution / Closure",
-    color: "#AF52DE",
-    ring: 3,
-    level: "low",
-    gender: "female",
-    element: "earth",
-    metal: "copper",
-    role: "Mother tone, soft closure",
-    function: "receive, transform, complete",
-    notes: ["The completion of a cycle", "Birth of a new state", "The 'done' or formed unit"],
-  },
-} as const;
+    name: "Evolution / Outcome",
+    coreWord: "Evolution",
+    color: "violet",
+    ring: "outer",
+    role: "Mother / Womb",
+    coreQuestion: "What does this become over time, and is that the right final form?",
+    healthyUse:
+      "Check lifecycle, consequence, and maturation; hold a long-term arc in view.",
+    shadowUse:
+      "Hides everything in ‘future evolution’ and avoids real commitments now, or forces a single destiny."
+  }
+];
