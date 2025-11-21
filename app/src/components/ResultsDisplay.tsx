@@ -13,6 +13,7 @@ import { PrinciplesBlock } from "./PrinciplesBlock";
 import { SymbolicReadingCard } from "./SymbolicReadingCard";
 import { Button } from "@/components/ui/button";
 import { downloadJson } from "@/lib/downloadJson";
+import { WordMatrix } from "./WordMatrix";
 
 
 const LEVEL_LABEL: Record<number, string> = { 1: "High", 0: "Mid", [-1]: "Low" } as any;
@@ -127,24 +128,16 @@ const Chip = ({ v }: { v: string | number }) => {
 export function ResultsDisplay({ analysis: raw }: { analysis: EnginePayload }) {
   const analysis = useMemo(() => enginePayloadToAnalysisResult(raw), [raw]);
 
-  const handleExportJson = () => {
-    if (!analysis) return;
-
-    const rawWord = analysis.core.word || "analysis";
-
-    const safeWord = String(rawWord).toLowerCase().replace(/[^a-z0-9_-]+/g, "-") || "analysis";
-
-    downloadJson(`analysis-${safeWord}.json`, analysis);
-  };
-
   if (!analysis) return null;
-  const { core, candidates, symbolic } = analysis;
+  const { core, candidates, symbolicCore } = analysis;
 
   return (
     <div className="space-y-4">
         {core && core.heartPaths && (
             <PathRow block={{voicePath: core.voices.vowelVoices, ringPath: core.voices.ringPath, levelPath: core.voices.levelPath.map(l=>l==='high'?1:l==='low'?-1:0)}} title="Primary Path" analysis={analysis} />
         )}
+
+        <WordMatrix analysis={analysis} />
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <WhyThisPath primary={raw.primaryPath} />
@@ -153,7 +146,7 @@ export function ResultsDisplay({ analysis: raw }: { analysis: EnginePayload }) {
         
         <Candidates candidates={candidates} />
         
-        {symbolic && <SymbolicReadingCard symbolic={symbolic} />}
+        {symbolicCore && <SymbolicReadingCard symbolic={symbolicCore} />}
 
         {core && core.heartPaths && core.heartPaths.frontierCount > 0 && (
           <Card className="p-4 mt-4">
@@ -191,11 +184,6 @@ export function ResultsDisplay({ analysis: raw }: { analysis: EnginePayload }) {
             </div>
           </Card>
         )}
-         <div className="flex justify-end pt-2">
-            <Button variant="outline" size="sm" onClick={handleExportJson}>
-                Export JSON
-            </Button>
-        </div>
     </div>
   );
 }
