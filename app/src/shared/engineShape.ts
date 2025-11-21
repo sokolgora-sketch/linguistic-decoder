@@ -1,7 +1,6 @@
 // src/shared/engineShape.ts
 
 // Canonical shape your UI will use everywhere.
-import type { SymbolicCoreResult } from "@/lib/symbolicCore";
 export type Vowel = 'A' | 'E' | 'I' | 'O' | 'U' | 'Y' | 'Ë';
 
 export type EnginePath = {

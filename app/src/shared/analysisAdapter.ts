@@ -1,3 +1,4 @@
+
 // src/shared/analysisAdapter.ts
 
 import type {
@@ -104,7 +105,7 @@ export function enginePayloadToAnalysisResult(
         id: `spec_${fam.familyId}_${word}`,
         language: fam.label,
         family: fam.familyId,
-        form: fam.forms?.[0] ?? word,
+        form: (fam.forms && fam.forms[0]) ?? word,
         decomposition: { parts: [], functionalStatement: fam.rationale },
         voices: {
           voiceSequence: payload.primaryPath.voicePath,
