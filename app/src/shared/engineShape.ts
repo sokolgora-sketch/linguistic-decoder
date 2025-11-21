@@ -326,6 +326,5 @@ export type AnalysisResult_DEPRECATED = {
   debug?: AnalysisDebug;
   sevenVoices?: SevenVoicesSummary;
   symbolic?: SymbolicLayer;
-  symbolicCore?: SymbolicCoreResult; // NEW, optional
+  symbolicCore?: any; // NEW, optional
 };
-```

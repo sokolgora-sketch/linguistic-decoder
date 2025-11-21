@@ -15,6 +15,7 @@ import { CANON_CANDIDATES } from './canonCandidates';
 import { buildConsonantField } from './consonantField';
 import { mapPathToPrinciples, getVoiceMeta } from './sevenVoices';
 import { detectAlbanianDialect } from '../lib/detectDialect';
+import { computeSymbolicCore } from "@/lib/symbolicCore";
 
 function buildSevenVoicesSummary(
   payload: EnginePayload
@@ -103,7 +104,7 @@ export function enginePayloadToAnalysisResult(
         id: `spec_${fam.familyId}_${word}`,
         language: fam.label,
         family: fam.familyId,
-        form: fam.forms[0] ?? word,
+        form: fam.forms?.[0] ?? word,
         decomposition: { parts: [], functionalStatement: fam.rationale },
         voices: {
           voiceSequence: payload.primaryPath.voicePath,
@@ -181,6 +182,15 @@ export function enginePayloadToAnalysisResult(
   const sevenVoices = buildSevenVoicesSummary(payload);
   const symbolic = buildSymbolicLayer(candidates);
 
+  const symbolicCore = computeSymbolicCore({
+    word: payload.word,
+    alphabet: payload.alphabet,
+    summary: {
+      voicePath: payload.primaryPath.voicePath,
+      ringPath: payload.primaryPath.ringPath,
+    },
+  });
+
   return {
     core,
     consonants: { field, summary },
@@ -188,6 +198,7 @@ export function enginePayloadToAnalysisResult(
     debug,
     sevenVoices,
     symbolic,
+    symbolicCore,
   };
 }
 

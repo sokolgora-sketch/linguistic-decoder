@@ -1,4 +1,3 @@
-
 // src/lib/symbolicCore.ts
 //
 // Symbolic core layer for the Seven-Voices engine.
