@@ -11,6 +11,8 @@ import { VOICE_COLOR_MAP } from "../shared/voiceColors";
 import { Candidates } from "./Candidates";
 import { PrinciplesBlock } from "./PrinciplesBlock";
 import { SymbolicReadingCard } from "./SymbolicReadingCard";
+import { Button } from "@/components/ui/button";
+import { downloadJson } from "@/lib/downloadJson";
 
 
 const LEVEL_LABEL: Record<number, string> = { 1: "High", 0: "Mid", [-1]: "Low" } as any;
@@ -124,6 +126,17 @@ const Chip = ({ v }: { v: string | number }) => {
 
 export function ResultsDisplay({ analysis: raw }: { analysis: EnginePayload }) {
   const analysis = useMemo(() => enginePayloadToAnalysisResult(raw), [raw]);
+
+  const handleExportJson = () => {
+    if (!analysis) return;
+
+    const rawWord = analysis.core.word || "analysis";
+
+    const safeWord = String(rawWord).toLowerCase().replace(/[^a-z0-9_-]+/g, "-") || "analysis";
+
+    downloadJson(`analysis-${safeWord}.json`, analysis);
+  };
+
   if (!analysis) return null;
   const { core, candidates, symbolic } = analysis;
 
@@ -178,6 +191,11 @@ export function ResultsDisplay({ analysis: raw }: { analysis: EnginePayload }) {
             </div>
           </Card>
         )}
+         <div className="flex justify-end pt-2">
+            <Button variant="outline" size="sm" onClick={handleExportJson}>
+                Export JSON
+            </Button>
+        </div>
     </div>
   );
 }
