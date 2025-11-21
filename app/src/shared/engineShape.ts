@@ -1,7 +1,8 @@
 // src/shared/engineShape.ts
 
 // Canonical shape your UI will use everywhere.
-export type Vowel = 'A'|'E'|'I'|'O'|'U'|'Y'|'Ë';
+import type { SymbolicCoreResult } from "@/lib/symbolicCore";
+export type Vowel = 'A' | 'E' | 'I' | 'O' | 'U' | 'Y' | 'Ë';
 
 export type EnginePath = {
   voicePath: Vowel[];
@@ -151,6 +152,20 @@ export interface MorphologyMatrix {
   wordSums: WordSum[];
 }
 
+export type SymbolicAxis =
+  | 'love'
+  | 'religion'
+  | 'mathematics'
+  | 'law'
+  | 'power'
+  | 'creation'
+  | 'unknown';
+
+export interface SymbolicTag {
+  axis: SymbolicAxis;
+  source: 'sevenVoices' | 'zheji' | 'hybrid';
+  note: string;
+}
 
 export type Candidate = {
   id: string;
@@ -207,6 +222,8 @@ export type Candidate = {
   
   // Optional morphology matrix for structured word-sum data.
   morphologyMatrix?: MorphologyMatrix;
+  
+  symbolic?: SymbolicTag[];
 };
 
 // High-level consonant behaviour classes used for the 42-slot field.
@@ -293,7 +310,12 @@ export type SevenVoicesSummary = {
   sevenWords: string[];            // 7-word sentence in principle order
 };
 
-export type AnalysisResult = {
+export type SymbolicLayer = {
+  notes: string[];
+  label?: string;
+};
+
+export type AnalysisResult_DEPRECATED = {
   core: AnalysisCore;
   // NEW: word-level consonant behaviour, shared by all candidates.
   consonants?: {
@@ -303,4 +325,7 @@ export type AnalysisResult = {
   candidates: Candidate[];
   debug?: AnalysisDebug;
   sevenVoices?: SevenVoicesSummary;
+  symbolic?: SymbolicLayer;
+  symbolicCore?: SymbolicCoreResult; // NEW, optional
 };
+```
