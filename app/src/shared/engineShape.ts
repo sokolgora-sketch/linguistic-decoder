@@ -124,7 +124,7 @@ export type CandidateOriginAxes = {
   // Seven-Voices path + principles consistency.
   principles: OriginAxisStatus;
   // Word-sum / morphology story: does it actually explain function?
-  morphology: OriginAxisStatus;
+  morphology: OriginAxisTatus;
   // Consonant behaviour vs. semantic profile (cut/build/etc.).
   consonants: OriginAxisStatus;
 };
@@ -327,3 +327,18 @@ export type AnalysisResult_DEPRECATED = {
   symbolic?: SymbolicLayer;
   symbolicCore?: any; // NEW, optional
 };
+
+export interface WordMatrix {
+  word: string;                            // e.g. "study"
+  languageFamily: string;                  // e.g. "Latin", "Albanian"
+  morphology: {
+    root: string;                          // e.g. "stud"
+    suffixes?: string[];                   // e.g. ["ium", "ens"]
+    gloss: string;                         // short meaning of the root
+  };
+  meaning: string;                         // compact functional meaning
+  wordSums?: string[];                     // morphological expansions
+  consonantPattern?: string;               // optional pattern logic e.g. "plosive + nasal"
+  principles: string[];                    // e.g. ["Truth", "Expansion", "Balance"]
+  symbolicNotes?: string;                  // interpretive note or Zheji-style insight
+}
