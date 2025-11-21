@@ -1,5 +1,7 @@
 // src/shared/engineShape.ts
 
+import type { PrincipleV2, PrincipleId } from "@/engine/principles.v2";
+
 // Canonical shape your UI will use everywhere.
 export type Vowel = 'A' | 'E' | 'I' | 'O' | 'U' | 'Y' | 'Ë';
 
@@ -124,7 +126,7 @@ export type CandidateOriginAxes = {
   // Seven-Voices path + principles consistency.
   principles: OriginAxisStatus;
   // Word-sum / morphology story: does it actually explain function?
-  morphology: OriginAxisTatus;
+  morphology: OriginAxisStatus;
   // Consonant behaviour vs. semantic profile (cut/build/etc.).
   consonants: OriginAxisStatus;
 };
@@ -327,6 +329,46 @@ export type AnalysisResult_DEPRECATED = {
   symbolic?: SymbolicLayer;
   symbolicCore?: any; // NEW, optional
 };
+
+export type AnalyzeWordResult = {
+  word: string;
+  sanitized: string;
+  primaryPath: {
+    voicePath: string;
+    levelPath: string;
+    ringPath: string;
+  };
+  frontier: {
+    id: string;
+    voicePath: string;
+    levelPath: string;
+    ringPath: string;
+  }[];
+  languageFamilies: LanguageFamilyCandidate[];
+  meta: {
+    engineVersion: string;
+    createdAt: string;
+    mode: 'strict' | 'explore';
+    alphabet?: string;
+    solveMs?: number;
+  },
+  symbolic?: SymbolicLayer;
+  wordMatrix?: WordMatrix | null;
+}
+
+export type LanguageFamilyCandidate = {
+  language: string;
+  form: string;
+  gloss: string;
+  passes: boolean;
+  experimental: boolean;
+  speculative: boolean;
+  voicePath: string;
+  levelPath: string;
+  ringPath: string;
+  morphologyMatrix?: MorphologyMatrix;
+  symbolic?: SymbolicTag[];
+}
 
 export interface WordMatrix {
   word: string;                            // e.g. "study"
