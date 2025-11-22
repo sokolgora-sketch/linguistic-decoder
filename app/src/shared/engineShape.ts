@@ -2,6 +2,7 @@
 
 import type { PrincipleV2, PrincipleId } from "@/engine/principles.v2";
 import type { SymbolicCoreResult } from "@/lib/symbolicCore";
+import type { Math7Summary } from "@/engine/math7";
 
 
 // Canonical shape your UI will use everywhere.
@@ -42,6 +43,7 @@ export type EnginePayload = {
   recomputed?: boolean;
   languageFamilies?: LanguageFamily[];
   edgeWindows?: string[];
+  math7?: Math7Summary;
 };
 
 
@@ -76,6 +78,7 @@ export function normalizeEnginePayload(raw: any): EnginePayload {
     recomputed: raw.recomputed,
     languageFamilies: raw.languageFamilies ?? [],
     edgeWindows: raw.edgeWindows ?? [],
+    math7: raw.math7,
   };
 
   return payload;
@@ -331,6 +334,7 @@ export type AnalysisResult_DEPRECATED = {
   sevenVoices?: SevenVoicesSummary;
   symbolic?: SymbolicLayer;
   symbolicCore?: any; // Changed from SymbolicCoreResult to any to break circular dependency
+  math7?: Math7Summary;
 };
 
 export type AnalyzeWordResult = {

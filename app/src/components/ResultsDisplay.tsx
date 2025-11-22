@@ -1,6 +1,6 @@
 'use client';
 import React, { useMemo } from "react";
-import { Card } from "./ui/card";
+import { Card, CardContent } from "./ui/card";
 import type { CClass } from "../functions/languages";
 import { classRange } from "../functions/languages";
 import type { EnginePayload, AnalysisResult_DEPRECATED, Vowel } from "../shared/engineShape";
@@ -96,6 +96,30 @@ export function PathRow({ title, block, analysis }: { title: string; block: any,
         </div>
         
         {title === "Primary Path" && <ConsonantInfo analysis={analysis} />}
+
+        {(analysis as any).math7 && (
+          <div className="mt-4 rounded-xl border px-4 py-3 text-sm bg-background/50">
+            <div className="font-semibold mb-1">
+              Heart (Seven-Voices Path)
+            </div>
+            <div className="flex flex-wrap gap-4">
+              <div>
+                <div className="text-xs uppercase opacity-70">State</div>
+                <div>{(analysis as any).math7.primary.cycleState}</div>
+              </div>
+              <div>
+                <div className="text-xs uppercase opacity-70">Total (mod 7)</div>
+                <div>{(analysis as any).math7.primary.totalMod7}</div>
+              </div>
+              <div>
+                <div className="text-xs uppercase opacity-70">Principles Path</div>
+                <div>
+                  {(analysis as any).math7.primary.principlesPath.join(" → ")}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </>
     </Card>
   );

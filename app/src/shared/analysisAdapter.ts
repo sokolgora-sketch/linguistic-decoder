@@ -16,6 +16,7 @@ import { buildConsonantField } from './consonantField';
 import { mapPathToPrinciples, getVoiceMeta } from './sevenVoices';
 import { detectAlbanianDialect } from '../lib/detectDialect';
 import { computeSymbolicCore, type SymbolicCoreResult } from "@/lib/symbolicCore";
+import { computeMath7ForResult } from '@/engine/math7';
 
 function buildSevenVoicesSummary(
   payload: EnginePayload
@@ -191,6 +192,29 @@ export function enginePayloadToAnalysisResult(
     },
   });
 
+  const math7 = computeMath7ForResult({
+    core: core,
+    candidates: candidates,
+    primaryPath: {
+        voicePath: core.voices.vowelVoices.join(' → '),
+        levelPath: '', // Not needed for math7
+        ringPath: '', // Not needed for math7
+    },
+    frontier: payload.frontierPaths.map(p => ({
+        id: '',
+        voicePath: p.voicePath.join(' → '),
+        levelPath: '',
+        ringPath: '',
+    })),
+    languageFamilies: [],
+    meta: {
+        engineVersion: payload.engineVersion,
+        createdAt: new Date().toISOString(),
+        mode: payload.mode as 'strict' | 'explore',
+    }
+  });
+
+
   return {
     core,
     consonants: { field, summary },
@@ -199,6 +223,7 @@ export function enginePayloadToAnalysisResult(
     sevenVoices,
     symbolic,
     symbolicCore,
+    math7
   };
 }
 
@@ -230,8 +255,7 @@ export function analysisResultToEnginePayload(
 
   const { mode, alphabet } = result.core.input;
 
-  return (
-    result.debug?.rawEnginePayload ?? {
+  const payload = result.debug?.rawEnginePayload ?? {
       engineVersion: result.core.engineVersion,
       word: result.core.word,
       mode: mode,
@@ -252,6 +276,11 @@ export function analysisResultToEnginePayload(
         c => c.classes[0]
       ),
       signals: [],
+    };
+    
+    if ((result as any).math7) {
+        (payload as any).math7 = (result as any).math7;
     }
-  );
+    
+    return payload;
 }
