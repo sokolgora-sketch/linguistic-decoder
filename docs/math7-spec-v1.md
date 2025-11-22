@@ -26,15 +26,16 @@ type Math7Summary = {
 
     state: "flow" | "cycle";  // "flow" if first ≠ last vowel, "cycle" if first == last
     totalSteps: number;       // number of steps in primary path (length of voice path)
-    totalMod7: number;        // totalSteps % 7, but 0 is mapped to 7 (1..7 only)
+    totalMod7: number;        // totalSteps % 7 (0 → 7), so 1..7 only
 
     principlesPath: string[]; // mapped sequence of Seven Principles, same length as voice path
   };
 };
-
+```
 
 This is attached to the normal analysis:
 
+```ts
 type AnalyzeWordResultWithMath7 = AnalyzeWordResult & {
   math7?: Math7Summary;
 };
