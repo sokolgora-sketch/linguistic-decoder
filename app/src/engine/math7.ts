@@ -94,3 +94,24 @@ function parseVoicePath(raw: unknown): Vowel[] {
 
   return [];
 }
+
+function summarizePath(voicePath: Vowel[]): Math7PathSummary {
+  const indexPath = voicePathToIndexPath(voicePath);
+  const totalMod7 = sumMod7(indexPath);
+  const principlesPath = indexPathToPrinciples(indexPath);
+  const pairCoverage = countInversePairs(voicePath);
+
+  let cycleState: CycleState;
+  if (totalMod7 === 0) cycleState = "balanced";
+  else if (totalMod7 <= 3) cycleState = "open";
+  else cycleState = "overloaded";
+
+  return {
+    voicePath,
+    indexPath,
+    totalMod7,
+    cycleState,
+    pairCoverage,
+    principlesPath,
+  };
+}
