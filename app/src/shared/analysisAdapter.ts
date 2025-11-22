@@ -17,22 +17,15 @@ import type {
   AnalysisDebug,
   AnalysisResult_DEPRECATED,
   Candidate,
-  ConsonantField,
-  ConsonantSummary,
   EnginePayload,
   SevenVoicesSummary,
   SymbolicLayer,
-  AnalyzeWordResult,
-  Vowel,
-  Math7Summary,
-  Math7PathSummary,
-  CycleState
 } from './engineShape';
 import { CANON_CANDIDATES } from './canonCandidates';
 import { buildConsonantField } from './consonantField';
-import { mapPathToPrinciples, getVoiceMeta } from './sevenVoices';
+import { getVoiceMeta } from './sevenVoices';
 import { detectAlbanianDialect } from '../lib/detectDialect';
-import { voicePathToIndexPath, sumMod7, indexPathToPrinciples, countInversePairs } from "@/engine/math7";
+import { computeMath7ForResult } from '@/engine/math7';
 
 function buildSevenVoicesSummary(
   payload: EnginePayload
@@ -92,75 +85,13 @@ function buildSymbolicLayer(
   };
 }
 
-function parseVoicePath(raw: unknown): Vowel[] {
-  if (!raw) return [];
-  if (Array.isArray(raw)) return raw as Vowel[];
-
-  if (typeof raw === "string") {
-    return raw
-      .split("→")
-      .map(s => s.trim())
-      .filter(Boolean) as Vowel[];
-  }
-
-  return [];
-}
-
-function summarizePath(voicePath: Vowel[]): Math7PathSummary {
-  const indexPath = voicePathToIndexPath(voicePath);
-  const totalMod7 = sumMod7(indexPath);
-  const principlesPath = indexPathToPrinciples(indexPath);
-  const pairCoverage = countInversePairs(voicePath);
-
-  let cycleState: CycleState;
-  if (totalMod7 === 0) cycleState = "balanced";
-  else if (totalMod7 <= 3) cycleState = "open";
-  else cycleState = "overloaded";
-
-  return {
-    voicePath,
-    indexPath,
-    totalMod7,
-    cycleState,
-    pairCoverage,
-    principlesPath,
-  };
-}
-
-export function computeMath7ForResult(result: AnalyzeWordResult): Math7Summary {
-  // primary path
-  const primaryVoices = parseVoicePath(result.primaryPath.voicePath);
-  const primary = summarizePath(primaryVoices);
-
-  // frontier paths
-  const frontier = (result.frontier || []).map(f => {
-    const voices = parseVoicePath(f.voicePath);
-    return summarizePath(voices);
-  });
-
-  // per-language candidates
-  const candidates = (result.languageFamilies || []).map(c => {
-    const voices = parseVoicePath(c.voicePath);
-    return {
-      ...summarizePath(voices),
-      language: c.language,
-    };
-  });
-
-  return {
-    primary,
-    frontier,
-    candidates,
-  };
-}
-
 // Adapts a raw EnginePayload into the richer AnalysisResult structure,
 // which includes canonical candidates, consonant summaries, and principles.
 export function enginePayloadToAnalysisResult(
   payload: EnginePayload
 ): AnalysisResult_DEPRECATED {
   const { field, summary } = buildConsonantField(payload);
-  const { word, alphabet, mode } = payload;
+  const { word, mode } = payload;
   const canon = CANON_CANDIDATES[word.toLowerCase()] ?? [];
 
   const candidates: Candidate[] = canon.map(c => {

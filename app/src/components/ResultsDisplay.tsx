@@ -76,6 +76,8 @@ export function PathRow({ title, block, analysis }: { title: string; block: any,
     );
   }
 
+  const { math7 } = analysis || {};
+
   return (
     <Card className="p-4">
       <h3 className="font-bold text-sm tracking-wide mb-2">{title}</h3>
@@ -97,7 +99,7 @@ export function PathRow({ title, block, analysis }: { title: string; block: any,
         
         {title === "Primary Path" && <ConsonantInfo analysis={analysis} />}
 
-        {(analysis as any).math7 && (
+        {math7 && (
           <div className="mt-4 rounded-xl border px-4 py-3 text-sm bg-background/50">
             <div className="font-semibold mb-1">
               Heart (Seven-Voices Path)
@@ -105,16 +107,16 @@ export function PathRow({ title, block, analysis }: { title: string; block: any,
             <div className="flex flex-wrap gap-4">
               <div>
                 <div className="text-xs uppercase opacity-70">State</div>
-                <div>{(analysis as any).math7.primary.cycleState}</div>
+                <div>{math7.primary.cycleState}</div>
               </div>
               <div>
                 <div className="text-xs uppercase opacity-70">Total (mod 7)</div>
-                <div>{(analysis as any).math7.primary.totalMod7}</div>
+                <div>{math7.primary.totalMod7}</div>
               </div>
               <div>
                 <div className="text-xs uppercase opacity-70">Principles Path</div>
                 <div>
-                  {(analysis as any).math7.primary.principlesPath.join(" → ")}
+                  {math7.primary.principlesPath.join(" → ")}
                 </div>
               </div>
             </div>
