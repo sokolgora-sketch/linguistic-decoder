@@ -62,3 +62,35 @@ export function countInversePairs(voicePath: Vowel[]): number {
   // Ë↔Ë is special; we won't count it here to keep 0–3 range.
   return count;
 }
+
+export type CycleState = "open" | "balanced" | "overloaded";
+
+export interface Math7PathSummary {
+  voicePath: Vowel[];
+  indexPath: number[];      // 0–6
+  totalMod7: number;        // 0–6
+  cycleState: CycleState;   // open | balanced | overloaded
+  pairCoverage: number;     // 0–3
+  principlesPath: string[]; // ["Unity", "Balance", ...]
+}
+
+export interface Math7Summary {
+  primary: Math7PathSummary;
+  frontier: Math7PathSummary[];
+  candidates: Array<Math7PathSummary & { language: string }>;
+}
+
+function parseVoicePath(raw: unknown): Vowel[] {
+  if (!raw) return [];
+  if (Array.isArray(raw)) return raw as Vowel[];
+
+  if (typeof raw === "string") {
+    // We joined with " → ", but we'll just split on the arrow and trim.
+    return raw
+      .split("→")
+      .map(s => s.trim())
+      .filter(Boolean) as Vowel[];
+  }
+
+  return [];
+}
