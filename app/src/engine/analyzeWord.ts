@@ -15,13 +15,12 @@
  *  - Only extend with OPTIONAL fields, and only if tests stay green.
  */
 // src/engine/analyzeWord.ts
-import type { AnalyzeWordResult, Candidate, LanguageFamilyCandidate, MorphologyMatrix, SymbolicLayer, SymbolicTag, Vowel, Math7Summary } from '@/shared/engineShape';
+import type { AnalyzeWordResult, Candidate, LanguageFamilyCandidate, MorphologyMatrix, SymbolicLayer, SymbolicTag, Vowel } from '@/shared/engineShape';
 import { ENGINE_VERSION } from './version';
 import { solveWord } from '@/functions/sevenVoicesCore';
 import { getManifest } from './manifest';
 import type { SolveOptions } from '@/functions/sevenVoicesCore';
 import { CANON_CANDIDATES } from '@/shared/canonCandidates';
-import { computeMath7ForResult } from '@/engine/math7';
 
 function runSevenVoices(word: string, opts: { mode: 'strict' | 'explore' }): any {
   const manifest = getManifest();
@@ -180,13 +179,4 @@ export function analyzeWord(word: string, mode: 'strict' | 'explore' = 'strict')
   };
 
   return result;
-}
-
-export function analyzeWordWithMath7(
-  word: string,
-  mode: 'strict' | 'explore' = 'strict',
-): AnalyzeWordResult & { math7: Math7Summary } {
-  const base = analyzeWord(word, mode);
-  const math7 = computeMath7ForResult(base);
-  return { ...base, math7 };
 }
