@@ -86,30 +86,36 @@ function buildGeneratedWordMatrix(candidate: Candidate): MorphologyMatrix {
 function attachCanonCandidates(base: any): any {
   const word = base.word.toLowerCase();
   const canon = CANON_CANDIDATES[word] || [];
-  
-  const candidates: LanguageFamilyCandidate[] = canon.map((c: Candidate) => {
-    const hasManual = !!c.morphologyMatrix;
 
-    const matrix: MorphologyMatrix = hasManual
-      ? { ...c.morphologyMatrix, source: 'manual' as const }
-      : buildGeneratedWordMatrix(c);
+  // Words whose canon entries are treated as having true "manual" matrices
+  const MANUAL_MATRIX_WORDS = new Set(['study', 'damage']);
 
-    return {
-      language: c.language,
-      form: c.form,
-      gloss: c.decomposition.functionalStatement,
-      passes: c.status === 'pass',
-      experimental: c.status === 'experimental',
-      speculative: c.confidenceTag === 'speculative',
-      voicePath: (c.voices.voiceSequence || []).join(' → '),
-      levelPath: 'N/A',
-      ringPath: (c.voices.ringPath || []).join(' → '),
-      morphologyMatrix: matrix,
-      symbolic: c.symbolic,
-    };
-  });
+  const languageFamilies: LanguageFamilyCandidate[] = canon.map(
+    (c: Candidate): LanguageFamilyCandidate => {
+      const treatAsManual =
+        MANUAL_MATRIX_WORDS.has(word) && !!c.morphologyMatrix;
 
-  return { ...base, languageFamilies: candidates };
+      const matrix: MorphologyMatrix = treatAsManual
+        ? { ...c.morphologyMatrix, source: 'manual' as const }
+        : buildGeneratedWordMatrix(c);
+
+      return {
+        language: c.language,
+        form: c.form,
+        gloss: c.decomposition.functionalStatement,
+        passes: c.status === 'pass',
+        experimental: c.status === 'experimental',
+        speculative: c.confidenceTag === 'speculative',
+        voicePath: (c.voices.voiceSequence || []).join(' → '),
+        levelPath: 'N/A',
+        ringPath: (c.voices.ringPath || []).join(' → '),
+        morphologyMatrix: matrix,
+        symbolic: c.symbolic,
+      };
+    },
+  );
+
+  return { ...base, languageFamilies };
 }
 
 function attachMorphology(base: any): any {

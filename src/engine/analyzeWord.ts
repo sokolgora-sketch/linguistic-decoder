@@ -14,14 +14,26 @@
  *  - Do NOT let auto-refactor / AI tools rewrite this file.
  *  - Only extend with OPTIONAL fields, and only if tests stay green.
  */
+
 // src/engine/analyzeWord.ts
-import type { AnalyzeWordResult, Candidate, LanguageFamilyCandidate, MorphologyMatrix, SymbolicLayer, SymbolicTag, Vowel } from '@/shared/engineShape';
+import type {
+  AnalyzeWordResult,
+  Candidate,
+  LanguageFamilyCandidate,
+  MorphologyMatrix,
+  SymbolicLayer,
+  SymbolicTag,
+} from '@/shared/engineShape';
 import { ENGINE_VERSION } from './version';
 import { solveWord } from '@/functions/sevenVoicesCore';
 import { getManifest } from './manifest';
 import type { SolveOptions } from '@/functions/sevenVoicesCore';
 import { CANON_CANDIDATES } from '@/shared/canonCandidates';
 
+/**
+ * Low-level call into the Seven-Voices solver.
+ * Returns a partial engine result; canon candidates are attached later.
+ */
 function runSevenVoices(word: string, opts: { mode: 'strict' | 'explore' }): any {
   const manifest = getManifest();
   const isStrict = opts.mode === 'strict';
@@ -37,34 +49,67 @@ function runSevenVoices(word: string, opts: { mode: 'strict' | 'explore' }): any
     edgeWeight: manifest.edgeWeight,
   };
 
-  // This part is tricky. The old system was very different.
-  // We'll call solveWord and then try to adapt it to a partial AnalysisResult.
-  // The canon candidates will be attached later.
   const analysis = solveWord(word, solveOpts, 'auto');
-  
-  // A simplified adaptation for the pipeline
+
   return {
-    word: word,
+    word,
     sanitized: word.toLowerCase().replace(/[^a-zë]/g, ''),
     primaryPath: analysis.primaryPath,
     frontier: analysis.frontierPaths,
-    languageFamilies: [], // will be populated by canon candidates
+    languageFamilies: [], // filled by attachCanonCandidates
     meta: {
-        engineVersion: ENGINE_VERSION,
-        createdAt: new Date().toISOString(),
-        mode: opts.mode,
+      engineVersion: ENGINE_VERSION,
+      createdAt: new Date().toISOString(),
+      mode: opts.mode,
     },
-    // For later pipeline steps
     rawPayload: analysis,
   };
 }
 
+/**
+ * Auto-build a morphology matrix for candidates that lack a manual one.
+ * v1: simple, deterministic, based on decomposition.
+ */
+function buildGeneratedWordMatrix(candidate: Candidate): MorphologyMatrix {
+  const parts = candidate.decomposition?.parts ?? [];
+  const root = parts[0];
+
+  return {
+    pivot: root?.form ?? candidate.form,
+    meaning: candidate.decomposition?.functionalStatement ?? '',
+    morphemes: parts.map((p: any) => ({
+      form: p.form,
+      role: p.role,
+      gloss: p.gloss,
+    })),
+    wordSums: [
+      {
+        parts: parts.map((p: any) => p.form),
+        result: candidate.form,
+        gloss: candidate.decomposition?.functionalStatement ?? '',
+      },
+    ],
+    source: 'auto',
+  };
+}
+
+/**
+ * Attach canon candidates to the base engine result and
+ * ensure each has a morphologyMatrix with a source flag.
+ */
 function attachCanonCandidates(base: any): any {
-    const word = base.word.toLowerCase();
-    const canon = CANON_CANDIDATES[word] || [];
-    
-    // This is a simplified mapping to the new LanguageFamilyCandidate shape
-    const candidates = canon.map((c: Candidate): LanguageFamilyCandidate => ({
+  const word = base.word.toLowerCase();
+  const canon = CANON_CANDIDATES[word] || [];
+
+  const languageFamilies: LanguageFamilyCandidate[] = canon.map(
+    (c: Candidate): LanguageFamilyCandidate => {
+      const hasManual = !!c.morphologyMatrix;
+
+      const matrix: MorphologyMatrix = hasManual
+        ? { ...c.morphologyMatrix, source: 'manual' as const }
+        : buildGeneratedWordMatrix(c);
+
+      return {
         language: c.language,
         form: c.form,
         gloss: c.decomposition.functionalStatement,
@@ -74,55 +119,83 @@ function attachCanonCandidates(base: any): any {
         voicePath: (c.voices.voiceSequence || []).join(' → '),
         levelPath: 'N/A',
         ringPath: (c.voices.ringPath || []).join(' → '),
-        morphologyMatrix: c.morphologyMatrix,
+        morphologyMatrix: matrix,
         symbolic: c.symbolic,
-    }));
+      };
+    },
+  );
 
-function attachCanonCandidates(base: any): any {
-  const word = base.word.toLowerCase();
-  const canon = CANON_CANDIDATES[word] || [];
-  
-  const candidates = canon.map((c: Candidate): LanguageFamilyCandidate => ({
-    language: c.language,
-    form: c.form,
-    gloss: c.decomposition.functionalStatement,
-    passes: c.status === 'pass',
-    experimental: c.status === 'experimental',
-    speculative: c.confidenceTag === 'speculative',
-    voicePath: (c.voices.voiceSequence || []).join(' → '),
-    levelPath: 'N/A',
-    ringPath: (c.voices.ringPath || []).join(' → '),
-    morphologyMatrix: c.morphologyMatrix,
-    symbolic: c.symbolic,
-  }));
-
-  return { ...base, languageFamilies: candidates };
+  return { ...base, languageFamilies };
 }
 
+/**
+ * Placeholder hook for future morphology enrichment.
+ * For now, canon mapping already injects morphologyMatrix.
+ */
+function attachMorphology(base: any): any {
+  return base;
+}
 
+/**
+ * Build a lightweight symbolic layer out of candidate tags.
+ */
+function buildSymbolicLayer(base: any): SymbolicLayer | undefined {
+  const notes: string[] = [];
 
-export function analyzeWord(word: string, mode: 'strict' | 'explore' = 'strict'): AnalyzeWordResult {
+  (base.languageFamilies as LanguageFamilyCandidate[]).forEach((candidate) => {
+    if (candidate.symbolic) {
+      candidate.symbolic.forEach((tag: SymbolicTag) => {
+        notes.push(tag.note);
+      });
+    }
+  });
+
+  if (notes.length > 0) {
+    return {
+      notes,
+      label: 'Zheji-inspired symbolic reading (experimental)',
+    };
+  }
+
+  return undefined;
+}
+
+/**
+ * High-level contract used by UI + tests.
+ */
+export function analyzeWord(
+  word: string,
+  mode: 'strict' | 'explore' = 'strict',
+): AnalyzeWordResult {
   const base = runSevenVoices(word, { mode });
   const withCanon = attachCanonCandidates(base);
-  const withMorph = attachMorphology(withCanon);
-  const symbolic = buildSymbolicLayer(withCanon);
+  const withMorph = attachMorphology(withCanon); // reserved for future; currently passthrough
+  const symbolic = buildSymbolicLayer(withMorph);
 
   const join = (arr: any[]) => (arr || []).join(' → ');
 
   const result: AnalyzeWordResult = {
-    word: word,
+    word,
     sanitized: withCanon.sanitized,
 
     primaryPath: {
       voicePath: join(withCanon.primaryPath.voicePath),
-      levelPath: join(withCanon.primaryPath.levelPath.map((l: number) => l === 1 ? 'high' : l === 0 ? 'mid' : 'low')),
+      levelPath: join(
+        withCanon.primaryPath.levelPath.map((l: number) =>
+          l === 1 ? 'high' : l === 0 ? 'mid' : 'low',
+        ),
+      ),
       ringPath: join(withCanon.primaryPath.ringPath),
     },
 
     frontier: (withCanon.frontier || []).map((alt: any, idx: number) => ({
       id: `alt-${idx + 1}`,
       voicePath: join(alt.voicePath),
-      levelPath: join(alt.levelPath.map((l: number) => l === 1 ? 'high' : l === 0 ? 'mid' : 'low')),
+      levelPath: join(
+        alt.levelPath.map((l: number) =>
+          l === 1 ? 'high' : l === 0 ? 'mid' : 'low',
+        ),
+      ),
       ringPath: join(alt.ringPath),
     })),
 
@@ -131,10 +204,11 @@ export function analyzeWord(word: string, mode: 'strict' | 'explore' = 'strict')
     meta: {
       engineVersion: withCanon.meta.engineVersion,
       createdAt: withCanon.meta.createdAt,
-      mode: mode,
+      mode,
       alphabet: withCanon.rawPayload.alphabet,
       solveMs: withCanon.rawPayload.solveMs,
     },
+
     symbolic,
   };
 
