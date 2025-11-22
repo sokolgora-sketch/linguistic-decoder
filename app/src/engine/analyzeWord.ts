@@ -159,17 +159,17 @@ export function analyzeWord(word: string, mode: 'strict' | 'explore' = 'strict')
       ringPath: join(alt.ringPath),
     })),
 
-    languageFamilies: withCanon.languageFamilies.map((c: Candidate) => ({
+    languageFamilies: withCanon.languageFamilies.map((c: LanguageFamilyCandidate) => ({
       language: c.language,
       form: c.form,
-      gloss: c.decomposition.functionalStatement,
-      passes: c.status === 'pass',
-      experimental: c.status === 'experimental',
-      speculative: c.confidenceTag === 'speculative',
-      voicePath: (c.voices.voiceSequence || []).join(' → '),
+      gloss: c.gloss,
+      passes: c.passes,
+      experimental: c.experimental,
+      speculative: c.speculative,
+      voicePath: c.voicePath,
       levelPath: 'N/A',
-      ringPath: (c.voices.ringPath || []).join(' → '),
-      morphologyMatrix: c.morphologyMatrix, // Pass the matrix through directly
+      ringPath: c.ringPath,
+      morphologyMatrix: c.morphologyMatrix,
       symbolic: c.symbolic,
     })),
 
