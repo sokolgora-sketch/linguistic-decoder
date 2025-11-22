@@ -91,10 +91,15 @@ function attachCanonCandidates(base: any): any {
     const canon = CANON_CANDIDATES[word] || [];
     
     const candidates = canon.map((c: Candidate): LanguageFamilyCandidate => {
-        // If a manual matrix exists, use it and mark its source. Otherwise, generate one.
-        const matrix = c.morphologyMatrix ? 
-          { ...c.morphologyMatrix, source: 'manual' as const } : 
-          buildGeneratedWordMatrix(c, word);
+        const hasManualMatrix = !!c.morphologyMatrix;
+        const baseMatrix = hasManualMatrix
+          ? c.morphologyMatrix
+          : buildGeneratedWordMatrix(c, word);
+
+        const matrixWithSource: MorphologyMatrix = {
+          ...baseMatrix!,
+          source: hasManualMatrix ? 'manual' : 'auto',
+        };
 
         return {
             language: c.language,
@@ -106,7 +111,7 @@ function attachCanonCandidates(base: any): any {
             voicePath: (c.voices.voiceSequence || []).join(' → '),
             levelPath: 'N/A',
             ringPath: (c.voices.ringPath || []).join(' → '),
-            morphologyMatrix: matrix,
+            morphologyMatrix: matrixWithSource,
             symbolic: c.symbolic,
         };
     });
