@@ -1,22 +1,26 @@
-import { analyzeWordWithMath7 } from "../src/engine/analyzeWord";
+import { analyzeWord } from "../src/engine/analyzeWord";
+import { computeMath7ForResult } from "../src/engine/math7";
 
 describe("math7 layer sanity", () => {
   it("computes math7 for study / damage / love", () => {
-    const study = analyzeWordWithMath7("study", "strict");
-    const damage = analyzeWordWithMath7("damage", "strict");
-    const love = analyzeWordWithMath7("love", "strict");
+    const studyBase = analyzeWord("study", "strict");
+    const damageBase = analyzeWord("damage", "strict");
+    const loveBase = analyzeWord("love", "strict");
 
-    // Just make sure math7 exists and log for visual inspection
-    expect(study.math7).toBeDefined();
-    expect(damage.math7).toBeDefined();
-    expect(love.math7).toBeDefined();
+    const study = computeMath7ForResult(studyBase);
+    const damage = computeMath7ForResult(damageBase);
+    const love = computeMath7ForResult(loveBase);
 
-    // TEMP: inspect in console (you can delete these later)
+    expect(study).toBeDefined();
+    expect(damage).toBeDefined();
+    expect(love).toBeDefined();
+
+    // TEMP: inspect in console (delete later if noisy)
     // eslint-disable-next-line no-console
-    console.log("STUDY math7:", JSON.stringify(study.math7, null, 2));
+    console.log("STUDY math7:", JSON.stringify(study, null, 2));
     // eslint-disable-next-line no-console
-    console.log("DAMAGE math7:", JSON.stringify(damage.math7, null, 2));
+    console.log("DAMAGE math7:", JSON.stringify(damage, null, 2));
     // eslint-disable-next-line no-console
-    console.log("LOVE math7:", JSON.stringify(love.math7, null, 2));
+    console.log("LOVE math7:", JSON.stringify(love, null, 2));
   });
 });
