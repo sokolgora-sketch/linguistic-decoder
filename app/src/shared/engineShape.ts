@@ -1,6 +1,8 @@
 // src/shared/engineShape.ts
 
 import type { PrincipleV2, PrincipleId } from "@/engine/principles.v2";
+import type { SymbolicCoreResult } from "@/lib/symbolicCore";
+
 
 // Canonical shape your UI will use everywhere.
 export type Vowel = 'A' | 'E' | 'I' | 'O' | 'U' | 'Y' | 'Ë';
@@ -126,7 +128,7 @@ export type CandidateOriginAxes = {
   // Seven-Voices path + principles consistency.
   principles: OriginAxisStatus;
   // Word-sum / morphology story: does it actually explain function?
-  morphology: OriginAxisStatus;
+  morphology: OriginAxisTatus;
   // Consonant behaviour vs. semantic profile (cut/build/etc.).
   consonants: OriginAxisStatus;
 };
@@ -327,7 +329,7 @@ export type AnalysisResult_DEPRECATED = {
   debug?: AnalysisDebug;
   sevenVoices?: SevenVoicesSummary;
   symbolic?: SymbolicLayer;
-  symbolicCore?: any; // NEW, optional
+  symbolicCore?: SymbolicCoreResult; // NEW, optional
 };
 
 export type AnalyzeWordResult = {

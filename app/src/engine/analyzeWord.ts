@@ -65,19 +65,33 @@ function attachCanonCandidates(base: any): any {
     const canon = CANON_CANDIDATES[word] || [];
     
     // This is a simplified mapping to the new LanguageFamilyCandidate shape
-    const candidates = canon.map((c: Candidate): LanguageFamilyCandidate => ({
-        language: c.language,
-        form: c.form,
-        gloss: c.decomposition.functionalStatement,
-        passes: c.status === 'pass',
-        experimental: c.status === 'experimental',
-        speculative: c.confidenceTag === 'speculative',
-        voicePath: (c.voices.voiceSequence || []).join(' → '),
-        levelPath: 'N/A',
-        ringPath: (c.voices.ringPath || []).join(' → '),
-        morphologyMatrix: c.morphologyMatrix,
-        symbolic: c.symbolic,
-    }));
+    const candidates = canon.map((c: Candidate): LanguageFamilyCandidate => {
+        // Auto-generate a morphologyMatrix if one doesn't exist
+        const matrix = c.morphologyMatrix ?? {
+            pivot: c.decomposition.parts[0]?.form ?? c.form,
+            meaning: c.decomposition.functionalStatement,
+            morphemes: c.decomposition.parts.map(p => ({
+                form: p.form,
+                role: p.role,
+                gloss: p.gloss,
+            })),
+            wordSums: [],
+        };
+
+        return {
+            language: c.language,
+            form: c.form,
+            gloss: c.decomposition.functionalStatement,
+            passes: c.status === 'pass',
+            experimental: c.status === 'experimental',
+            speculative: c.confidenceTag === 'speculative',
+            voicePath: (c.voices.voiceSequence || []).join(' → '),
+            levelPath: 'N/A',
+            ringPath: (c.voices.ringPath || []).join(' → '),
+            morphologyMatrix: matrix,
+            symbolic: c.symbolic,
+        };
+    });
 
     return { ...base, languageFamilies: candidates };
 }
@@ -143,10 +157,10 @@ export function analyzeWord(word: string, mode: 'strict' | 'explore' = 'strict')
     symbolic,
   };
 
-  const matrix = wordMatrixExamples.find(m => m.word.toLowerCase() === word.toLowerCase());
+  const matrix = withCanon.languageFamilies.find(c => c.morphologyMatrix)?.morphologyMatrix;
 
   return {
     ...baseResult,
-    wordMatrix: matrix ?? null
+    wordMatrix: matrix ?? wordMatrixExamples.find(m => m.word.toLowerCase() === word.toLowerCase()) ?? null,
   };
 }

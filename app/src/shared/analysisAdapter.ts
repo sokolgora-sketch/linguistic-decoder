@@ -1,4 +1,3 @@
-
 // src/shared/analysisAdapter.ts
 
 import type {
@@ -16,7 +15,7 @@ import { CANON_CANDIDATES } from './canonCandidates';
 import { buildConsonantField } from './consonantField';
 import { mapPathToPrinciples, getVoiceMeta } from './sevenVoices';
 import { detectAlbanianDialect } from '../lib/detectDialect';
-import { computeSymbolicCore } from "@/lib/symbolicCore";
+import { computeSymbolicCore, type SymbolicCoreResult } from "@/lib/symbolicCore";
 
 function buildSevenVoicesSummary(
   payload: EnginePayload
