@@ -1,10 +1,9 @@
 'use client';
-import React, { useMemo } from "react";
+import React from "react";
 import { Card, CardContent } from "./ui/card";
 import type { CClass } from "../functions/languages";
 import { classRange } from "../functions/languages";
 import type { EnginePayload, AnalysisResult_DEPRECATED, Vowel } from "../shared/engineShape";
-import { enginePayloadToAnalysisResult } from "@/shared/analysisAdapter";
 import { getVoiceMeta } from '@/shared/sevenVoices';
 import WhyThisPath from "./WhyThisPath";
 import { VOICE_COLOR_MAP } from "../shared/voiceColors";
@@ -151,9 +150,7 @@ const Chip = ({ v }: { v: string | number }) => {
 };
 
 
-export function ResultsDisplay({ analysis: raw }: { analysis: EnginePayload }) {
-  const analysis = useMemo(() => enginePayloadToAnalysisResult(raw), [raw]);
-
+export function ResultsDisplay({ analysis }: { analysis: AnalysisResult_DEPRECATED | null }) {
   const handleExportJson = () => {
     if (!analysis) return;
 
@@ -165,7 +162,8 @@ export function ResultsDisplay({ analysis: raw }: { analysis: EnginePayload }) {
   };
 
   if (!analysis) return null;
-  const { core, candidates, symbolic } = analysis;
+  const { core, candidates, symbolic, debug } = analysis;
+  const raw = debug?.rawEnginePayload;
 
   return (
     <div className="space-y-4">
@@ -174,7 +172,7 @@ export function ResultsDisplay({ analysis: raw }: { analysis: EnginePayload }) {
         )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <WhyThisPath primary={raw.primaryPath} />
+            {raw && <WhyThisPath primary={raw.primaryPath} />}
             <PrinciplesBlock analysis={analysis} />
         </div>
         
@@ -182,7 +180,7 @@ export function ResultsDisplay({ analysis: raw }: { analysis: EnginePayload }) {
         
         {symbolic && <SymbolicReadingCard symbolic={symbolic} />}
 
-        {core && core.heartPaths && core.heartPaths.frontierCount > 0 && (
+        {core && core.heartPaths && raw && raw.frontierPaths.length > 0 && (
           <Card className="p-4 mt-4">
             <h3 className="font-bold text-sm tracking-wide">Frontier (near‑optimal alternates)</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mt-3">

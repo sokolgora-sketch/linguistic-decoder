@@ -350,7 +350,7 @@ export type AnalysisResult_DEPRECATED = {
   math7?: Math7Summary;
 };
 
-export type AnalysisResult = {
+export type AnalyzeWordResult = {
   word: string;
   sanitized: string;
   primaryPath: {
