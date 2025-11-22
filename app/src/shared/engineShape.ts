@@ -1,5 +1,8 @@
 // src/shared/engineShape.ts
 
+import type { PrincipleV2, PrincipleId } from "@/engine/principles.v2";
+import type { SymbolicCoreResult } from "@/lib/symbolicCore";
+
 // Canonical shape your UI will use everywhere.
 export type Vowel = 'A' | 'E' | 'I' | 'O' | 'U' | 'Y' | 'Ë';
 
@@ -22,6 +25,21 @@ export type LanguageFamily = {
     dialect?: 'geg' | 'tosk';
 };
 
+// ---------------- Heart Math (Seven-Voices cycle) ----------------
+
+export interface Math7PrimarySummary {
+  /** e.g. "open", "closed" – simple cycle state */
+  cycleState: string;
+  /** total count reduced mod 7 */
+  totalMod7: number;
+  /** 7-Principles names along the path */
+  principlesPath: string[];
+}
+
+export interface Math7Summary {
+  primary: Math7PrimarySummary;
+}
+
 // This is what the app & JSON export will see.
 export type EnginePayload = {
   engineVersion: string;
@@ -38,6 +56,7 @@ export type EnginePayload = {
   recomputed?: boolean;
   languageFamilies?: LanguageFamily[];
   edgeWindows?: string[];
+  math7?: Math7Summary;
 };
 
 
@@ -72,6 +91,7 @@ export function normalizeEnginePayload(raw: any): EnginePayload {
     recomputed: raw.recomputed,
     languageFamilies: raw.languageFamilies ?? [],
     edgeWindows: raw.edgeWindows ?? [],
+    math7: raw.math7,
   };
 
   return payload;
@@ -130,7 +150,7 @@ export type CandidateOriginAxes = {
 };
 
 // New types for morphology matrix
-export type MorphemeRole = 'root' | 'prefix' | 'suffix';
+export type MorphemeRole = 'root' | 'prefix' | 'suffix' | 'action' | 'instrument' | 'unit';
 
 export interface Morpheme {
   form: string;          // "stud", "dam", "dëm", "un", "ify"
@@ -149,6 +169,7 @@ export interface MorphologyMatrix {
   meaning: string;       // short description: "measure, manner"
   morphemes: Morpheme[];
   wordSums: WordSum[];
+  source?: 'manual' | 'auto'; // Added to track origin
 }
 
 export type SymbolicAxis =
@@ -325,5 +346,74 @@ export type AnalysisResult_DEPRECATED = {
   debug?: AnalysisDebug;
   sevenVoices?: SevenVoicesSummary;
   symbolic?: SymbolicLayer;
-  symbolicCore?: any; // NEW, optional
+  symbolicCore?: any; // Changed from SymbolicCoreResult to any to break circular dependency
+  math7?: Math7Summary;
 };
+
+export type AnalysisResult = {
+  word: string;
+  sanitized: string;
+  primaryPath: {
+    voicePath: string;
+    levelPath: string;
+    ringPath: string;
+  };
+  frontier: {
+    id: string;
+    voicePath: string;
+    levelPath: string;
+    ringPath: string;
+  }[];
+  languageFamilies: LanguageFamilyCandidate[];
+  meta: {
+    engineVersion: string;
+    createdAt: string;
+    mode: 'strict' | 'explore';
+    alphabet?: string;
+    solveMs?: number;
+  },
+  symbolic?: SymbolicLayer;
+  wordMatrix?: WordMatrix | null;
+  // Optional Heart Math (Seven-Principles) layer
+  math7?: Math7Summary;
+}
+
+export type LanguageFamilyCandidate = {
+  language: string;
+  form: string;
+  gloss: string;
+  passes: boolean;
+  experimental: boolean;
+  speculative: boolean;
+  voicePath: string;
+  levelPath: string;
+  ringPath: string;
+  morphologyMatrix?: MorphologyMatrix;
+  symbolic?: SymbolicTag[];
+}
+
+export interface WordMatrix {
+  word: string;                            // e.g. "study"
+  languageFamily: string;                  // e.g. "Latin", "Albanian"
+  morphology: {
+    root: string;                          // e.g. "stud"
+    suffixes?: string[];                   // e.g. ["ium", "ens"]
+    gloss: string;                         // short meaning of the root
+  };
+  meaning: string;                         // compact functional meaning
+  wordSums?: string[];                     // morphological expansions
+  consonantPattern?: string;               // optional pattern logic e.g. "plosive + nasal"
+  principles: string[];                    // e.g. ["Truth", "Expansion", "Balance"]
+  symbolicNotes?: string;                  // interpretive note or Zheji-style insight
+}
+
+export type CycleState = "open" | "balanced" | "overloaded";
+
+export interface Math7PathSummary {
+  voicePath: Vowel[];
+  indexPath: number[];      // 0–6
+  totalMod7: number;        // 0–6
+  cycleState: CycleState;   // open | balanced | overloaded
+  pairCoverage: number;     // 0–3 (A–Y, E–U, I–O)
+  principlesPath: string[]; // ["Unity", "Balance", ...]
+}
