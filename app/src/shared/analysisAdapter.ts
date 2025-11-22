@@ -94,7 +94,7 @@ export function enginePayloadToAnalysisResult(
     return null;
   }
 
-  const { field, summary } = buildConsonantField(payload);
+  const { field, summary } = buildConsonantField(payload, payload.primaryPath);
   const { word, mode } = payload;
   const canon = CANON_CANDIDATES[word.toLowerCase()] ?? [];
 
