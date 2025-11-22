@@ -15,7 +15,7 @@
  *  - Only extend with OPTIONAL fields, and only if tests stay green.
  */
 // src/engine/analyzeWord.ts
-import type { AnalyzeWordResult, Candidate, LanguageFamilyCandidate, MorphologyMatrix, SymbolicLayer, SymbolicTag, Vowel } from '@/shared/engineShape';
+import type { AnalyzeWordResult, Candidate, LanguageFamilyCandidate, MorphologyMatrix, SymbolicLayer, SymbolicTag, Vowel, Morpheme } from '@/shared/engineShape';
 import { ENGINE_VERSION } from './version';
 import { solveWord } from '@/functions/sevenVoicesCore';
 import { getManifest } from './manifest';
@@ -63,16 +63,17 @@ function runSevenVoices(word: string, opts: { mode: 'strict' | 'explore' }): any
  */
 export function buildGeneratedWordMatrix(candidate: Candidate, word: string): MorphologyMatrix {
   const root = candidate.decomposition.parts[0] ?? { form: candidate.form, gloss: 'word' };
-  const suffixes = candidate.decomposition.parts.slice(1).map(p => p.form);
+  
+  const morphemes: Morpheme[] = candidate.decomposition.parts.map(p => ({
+      form: p.form,
+      role: p.role,
+      gloss: p.gloss,
+  }));
 
   return {
     pivot: root.form,
     meaning: candidate.decomposition.functionalStatement,
-    morphemes: candidate.decomposition.parts.map(p => ({
-      form: p.form,
-      role: p.role,
-      gloss: p.gloss,
-    })),
+    morphemes: morphemes,
     wordSums: [
       {
         parts: candidate.decomposition.parts.map(p => p.form),
@@ -80,6 +81,7 @@ export function buildGeneratedWordMatrix(candidate: Candidate, word: string): Mo
         gloss: candidate.decomposition.functionalStatement,
       }
     ],
+    source: 'auto',
   };
 }
 
@@ -90,7 +92,9 @@ function attachCanonCandidates(base: any): any {
     
     const candidates = canon.map((c: Candidate): LanguageFamilyCandidate => {
         // If a manual matrix exists, use it. Otherwise, generate one.
-        const matrix = c.morphologyMatrix ?? buildGeneratedWordMatrix(c, word);
+        const matrix = c.morphologyMatrix ? 
+          { ...c.morphologyMatrix, source: 'manual' as const } : 
+          buildGeneratedWordMatrix(c, word);
 
         return {
             language: c.language,
@@ -170,10 +174,12 @@ export function analyzeWord(word: string, mode: 'strict' | 'explore' = 'strict')
     symbolic,
   };
 
+  // The matrix is now attached to the candidate, not the top level.
+  // This logic can be simplified as it's now part of the candidate data.
   const matrix = withCanon.languageFamilies.find((c: any) => c.morphologyMatrix)?.morphologyMatrix;
 
   return {
     ...baseResult,
-    wordMatrix: matrix ?? wordMatrixExamples.find(m => m.word.toLowerCase() === word.toLowerCase()) ?? null,
+    wordMatrix: matrix ?? null,
   };
 }

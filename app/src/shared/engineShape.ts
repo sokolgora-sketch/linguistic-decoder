@@ -153,6 +153,7 @@ export interface MorphologyMatrix {
   meaning: string;       // short description: "measure, manner"
   morphemes: Morpheme[];
   wordSums: WordSum[];
+  source?: 'manual' | 'auto'; // Added to track origin
 }
 
 export type SymbolicAxis =
