@@ -1,144 +1,235 @@
-// src/engine/math7.ts
-//
-// Seven-Principles math layer for vowels.
-// PURE: no engine calls, just mappings and helpers over Vowel sequences.
+/**
+ * ❤️ ANALYZE WORD HEART (HIGH-LEVEL RESULT)
+ *
+ * This file wraps the Seven-Voices engine + canon candidates + symbolic layer
+ * into a single AnalyzeWordResult shape used by the UI and tests.
+ *
+ * Contract is locked by:
+ *  - tests/analyzeWord.spec.ts
+ *  - tests/canonCandidates.spec.ts
+ *  - tests/symbolicLayer.spec.ts
+ *
+ * IMPORTANT:
+ *  - Do NOT change field names or types (e.g. keep primaryPath.voicePath as string[]).
+ *  - Do NOT let auto-refactor / AI tools rewrite this file.
+ *  - Only extend with OPTIONAL fields, and only if tests stay green.
+ */
 
-import type { AnalyzeWordResult, Vowel } from "@/shared/engineShape";
+// src/engine/analyzeWord.ts
+import type {
+  AnalyzeWordResult,
+  Candidate,
+  LanguageFamilyCandidate,
+  MorphologyMatrix,
+  SymbolicLayer,
+  SymbolicTag,
+  Vowel,
+} from "@/shared/engineShape";
+import { ENGINE_VERSION } from "./version";
+import { solveWord } from "@/functions/sevenVoicesCore";
+import { getManifest } from "./manifest";
+import type { SolveOptions } from "@/functions/sevenVoicesCore";
+import { CANON_CANDIDATES } from "@/shared/canonCandidates";
+import { computeMath7ForResult, type Math7Summary } from "./math7";
 
-export type CycleState = "open" | "balanced" | "overloaded";
+/**
+ * Low-level call into the Seven-Voices solver.
+ * Returns a partial engine result; canon candidates are attached later.
+ */
+function runSevenVoices(word: string, opts: { mode: "strict" | "explore" }): any {
+  const manifest = getManifest();
+  const isStrict = opts.mode === "strict";
 
-export interface Math7PathSummary {
-  voicePath: Vowel[];
-  indexPath: number[];      // 0–6
-  totalMod7: number;        // 0–6
-  cycleState: CycleState;   // open | balanced | overloaded
-  pairCoverage: number;     // 0–3 (A–Y, E–U, I–O)
-  principlesPath: string[]; // ["Unity", "Balance", ...]
+  const solveOpts: SolveOptions = {
+    beamWidth: 8,
+    maxOps: isStrict ? 1 : 2,
+    allowDelete: !isStrict,
+    allowClosure: !isStrict,
+    opCost: manifest.opCost,
+    alphabet: "auto",
+    manifest,
+    edgeWeight: manifest.edgeWeight,
+  };
+
+  const analysis = solveWord(word, solveOpts, "auto");
+
+  return {
+    word,
+    sanitized: word.toLowerCase().replace(/[^a-zë]/g, ""),
+    primaryPath: analysis.primaryPath,
+    frontier: analysis.frontierPaths,
+    languageFamilies: [], // filled by attachCanonCandidates
+    meta: {
+      engineVersion: ENGINE_VERSION,
+      createdAt: new Date().toISOString(),
+      mode: opts.mode,
+    },
+    rawPayload: analysis,
+  };
 }
 
-export interface Math7Summary {
-  primary: Math7PathSummary;
-  frontier: Math7PathSummary[];
-  candidates: Array<Math7PathSummary & { language: string }>;
+/**
+ * Auto-build a morphology matrix for candidates that lack a manual one.
+ * v1: simple, deterministic, based on decomposition.
+ */
+function buildGeneratedWordMatrix(candidate: Candidate): MorphologyMatrix {
+  const parts = candidate.decomposition?.parts ?? [];
+  const root = parts[0];
+
+  return {
+    pivot: root?.form ?? candidate.form,
+    meaning: candidate.decomposition?.functionalStatement ?? "",
+    morphemes: parts.map((p: any) => ({
+      form: p.form,
+      role: p.role,
+      gloss: p.gloss,
+    })),
+    wordSums: [
+      {
+        parts: parts.map((p: any) => p.form),
+        result: candidate.form,
+        gloss: candidate.decomposition?.functionalStatement ?? "",
+      },
+    ],
+    source: "auto",
+  };
 }
 
-// Internal numeric model (mod-7 universe):
-// A → 1, E → 2, I → 3, O → 4, U → 5, Y → 6, Ë → 0
-export const VOICE_TO_INDEX: Record<Vowel, number> = {
-  A: 1,
-  E: 2,
-  I: 3,
-  O: 4,
-  U: 5,
-  Y: 6,
-  Ë: 0,
-};
+/**
+ * Attach canon candidates to the base engine result and
+ * ensure each has a morphologyMatrix with a source flag.
+ */
+function attachCanonCandidates(base: any): any {
+  const word = base.word.toLowerCase();
+  const canon = CANON_CANDIDATES[word] || [];
 
-export const INDEX_TO_PRINCIPLE: Record<number, string> = {
-  1: "Unity",      // A – Bashkimi
-  2: "Vibration",  // E – Vibrimi
-  3: "Rhythm",     // I – Ritmi
-  4: "Balance",    // O – Balanca (mediator)
-  5: "Change",     // U – Ndryshimi
-  6: "Initiative", // Y – Nisma
-  0: "Love",       // Ë – Dashuria / Resolution (7 ≡ 0)
-};
+  // Words whose canon entries are treated as having true "manual" matrices
+  const MANUAL_MATRIX_WORDS = new Set(["study", "damage"]);
 
-// Inverse pairs in this mod-7 model:
-// A ↔ Y, E ↔ U, I ↔ O, Ë ↔ Ë
-export const INVERSE_PAIRS: Array<[Vowel, Vowel]> = [
-  ["A", "Y"],
-  ["E", "U"],
-  ["I", "O"],
-  ["Ë", "Ë"],
-];
+  const languageFamilies: LanguageFamilyCandidate[] = canon.map(
+    (c: Candidate): LanguageFamilyCandidate => {
+      const treatAsManual =
+        MANUAL_MATRIX_WORDS.has(word) && !!c.morphologyMatrix;
 
-// ——— Basic helpers ———
+      const matrix: MorphologyMatrix = treatAsManual
+        ? { ...c.morphologyMatrix, source: "manual" as const }
+        : buildGeneratedWordMatrix(c);
 
-export function voicePathToIndexPath(voicePath: Vowel[]): number[] {
-  return voicePath.map(v => VOICE_TO_INDEX[v]);
+      return {
+        language: c.language,
+        form: c.form,
+        gloss: c.decomposition.functionalStatement,
+        passes: c.status === "pass",
+        experimental: c.status === "experimental",
+        speculative: c.confidenceTag === "speculative",
+        voicePath: (c.voices.voiceSequence || []).join(" → "),
+        levelPath: "N/A",
+        ringPath: (c.voices.ringPath || []).join(" → "),
+        morphologyMatrix: matrix,
+        symbolic: c.symbolic,
+      };
+    }
+  );
+
+  return { ...base, languageFamilies };
 }
 
-export function indexPathToPrinciples(indexPath: number[]): string[] {
-  return indexPath.map(i => INDEX_TO_PRINCIPLE[i]);
+/**
+ * Placeholder hook for future morphology enrichment.
+ * For now, canon mapping already injects morphologyMatrix.
+ */
+function attachMorphology(base: any): any {
+  return base;
 }
 
-// Sum indices mod 7, stay in [0..6]
-export function sumMod7(indexPath: number[]): number {
-  return indexPath.reduce((acc, n) => (acc + n) % 7, 0);
-}
+/**
+ * Build a lightweight symbolic layer out of candidate tags.
+ */
+function buildSymbolicLayer(base: any): SymbolicLayer | undefined {
+  const notes: string[] = [];
 
-// Count how many inverse pairs (A–Y, E–U, I–O) are present in a path
-export function countInversePairs(voicePath: Vowel[]): number {
-  const set = new Set(voicePath);
-  let count = 0;
-  if (set.has("A") && set.has("Y")) count++;
-  if (set.has("E") && set.has("U")) count++;
-  if (set.has("I") && set.has("O")) count++;
-  // Ë↔Ë is special; we keep it out so pairCoverage stays 0–3.
-  return count;
-}
+  (base.languageFamilies as LanguageFamilyCandidate[]).forEach((candidate) => {
+    if (candidate.symbolic) {
+      candidate.symbolic.forEach((tag: SymbolicTag) => {
+        notes.push(tag.note);
+      });
+    }
+  });
 
-// Normalize whatever we stored in AnalyzeWordResult.voicePath back to Vowel[]
-// We currently store "A → O → Ë" as a string in analyzeWord.
-function parseVoicePath(raw: unknown): Vowel[] {
-  if (!raw) return [];
-  if (Array.isArray(raw)) return raw as Vowel[];
-
-  if (typeof raw === "string") {
-    return raw
-      .split("→")
-      .map(s => s.trim())
-      .filter(Boolean) as Vowel[];
+  if (notes.length > 0) {
+    return {
+      notes,
+      label: "Zheji-inspired symbolic reading (experimental)",
+    };
   }
 
-  return [];
+  return undefined;
 }
 
-function summarizePath(voicePath: Vowel[]): Math7PathSummary {
-  const indexPath = voicePathToIndexPath(voicePath);
-  const totalMod7 = sumMod7(indexPath);
-  const principlesPath = indexPathToPrinciples(indexPath);
-  const pairCoverage = countInversePairs(voicePath);
+/**
+ * High-level contract used by UI + tests.
+ */
+export function analyzeWord(
+  word: string,
+  mode: "strict" | "explore" = "strict"
+): AnalyzeWordResult {
+  const base = runSevenVoices(word, { mode });
+  const withCanon = attachCanonCandidates(base);
+  const withMorph = attachMorphology(withCanon); // reserved for future; currently passthrough
+  const symbolic = buildSymbolicLayer(withMorph);
 
-  let cycleState: CycleState;
-  if (totalMod7 === 0) cycleState = "balanced";
-  else if (totalMod7 <= 3) cycleState = "open";
-  else cycleState = "overloaded";
+  const join = (arr: any[]) => (arr || []).join(" → ");
 
-  return {
-    voicePath,
-    indexPath,
-    totalMod7,
-    cycleState,
-    pairCoverage,
-    principlesPath,
+  const result: AnalyzeWordResult = {
+    word,
+    sanitized: withCanon.sanitized,
+
+    primaryPath: {
+      voicePath: join(withCanon.primaryPath.voicePath),
+      levelPath: join(
+        withCanon.primaryPath.levelPath.map((l: number) =>
+          l === 1 ? "high" : l === 0 ? "mid" : "low"
+        )
+      ),
+      ringPath: join(withCanon.primaryPath.ringPath),
+    },
+
+    frontier: (withCanon.frontier || []).map((alt: any, idx: number) => ({
+      id: `alt-${idx + 1}`,
+      voicePath: join(alt.voicePath),
+      levelPath: join(
+        alt.levelPath.map((l: number) =>
+          l === 1 ? "high" : l === 0 ? "mid" : "low"
+        )
+      ),
+      ringPath: join(alt.ringPath),
+    })),
+
+    languageFamilies: withCanon.languageFamilies,
+
+    meta: {
+      engineVersion: withCanon.meta.engineVersion,
+      createdAt: withCanon.meta.createdAt,
+      mode,
+      alphabet: withCanon.rawPayload.alphabet,
+      solveMs: withCanon.rawPayload.solveMs,
+    },
+
+    symbolic,
   };
+
+  return result;
 }
 
-export function computeMath7ForResult(result: AnalyzeWordResult): Math7Summary {
-  // primary path
-  const primaryVoices = parseVoicePath(result.primaryPath.voicePath);
-  const primary = summarizePath(primaryVoices);
-
-  // frontier paths
-  const frontier = (result.frontier || []).map(f => {
-    const voices = parseVoicePath(f.voicePath);
-    return summarizePath(voices);
-  });
-
-  // per-language candidates
-  const candidates = (result.languageFamilies || []).map(c => {
-    const voices = parseVoicePath(c.voicePath);
-    return {
-      ...summarizePath(voices),
-      language: c.language,
-    };
-  });
-
-  return {
-    primary,
-    frontier,
-    candidates,
-  };
+/**
+ * Optional wrapper: same contract + math7 summary attached.
+ * You can use this in UI / API without touching tests.
+ */
+export function analyzeWordWithMath7(
+  word: string,
+  mode: "strict" | "explore" = "strict"
+): AnalyzeWordResult & { math7: Math7Summary } {
+  const base = analyzeWord(word, mode);
+  const math7 = computeMath7ForResult(base);
+  return { ...base, math7 };
 }
