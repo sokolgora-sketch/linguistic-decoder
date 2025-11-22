@@ -1,10 +1,26 @@
 // src/engine/math7.ts
 //
 // Seven-Principles math layer for vowels.
-// This file is PURE: no side effects, no engine calls,
-// just mappings and helpers over Vowel sequences.
+// PURE: no engine calls, just mappings and helpers over Vowel sequences.
 
 import type { AnalyzeWordResult, Vowel } from "@/shared/engineShape";
+
+export type CycleState = "open" | "balanced" | "overloaded";
+
+export interface Math7PathSummary {
+  voicePath: Vowel[];
+  indexPath: number[];      // 0–6
+  totalMod7: number;        // 0–6
+  cycleState: CycleState;   // open | balanced | overloaded
+  pairCoverage: number;     // 0–3 (A–Y, E–U, I–O)
+  principlesPath: string[]; // ["Unity", "Balance", ...]
+}
+
+export interface Math7Summary {
+  primary: Math7PathSummary;
+  frontier: Math7PathSummary[];
+  candidates: Array<Math7PathSummary & { language: string }>;
+}
 
 // Internal numeric model (mod-7 universe):
 // A → 1, E → 2, I → 3, O → 4, U → 5, Y → 6, Ë → 0
@@ -19,13 +35,13 @@ export const VOICE_TO_INDEX: Record<Vowel, number> = {
 };
 
 export const INDEX_TO_PRINCIPLE: Record<number, string> = {
-  1: "Unity",       // A – Bashkimi
-  2: "Vibration",   // E – Vibrimi
-  3: "Rhythm",      // I – Ritmi
-  4: "Balance",     // O – Balanca (mediator)
-  5: "Change",      // U – Ndryshimi
-  6: "Initiative",  // Y – Nisma
-  0: "Love",        // Ë – Dashuria / Resolution (7 ≡ 0)
+  1: "Unity",      // A – Bashkimi
+  2: "Vibration",  // E – Vibrimi
+  3: "Rhythm",     // I – Ritmi
+  4: "Balance",    // O – Balanca (mediator)
+  5: "Change",     // U – Ndryshimi
+  6: "Initiative", // Y – Nisma
+  0: "Love",       // Ë – Dashuria / Resolution (7 ≡ 0)
 };
 
 // Inverse pairs in this mod-7 model:
@@ -59,33 +75,17 @@ export function countInversePairs(voicePath: Vowel[]): number {
   if (set.has("A") && set.has("Y")) count++;
   if (set.has("E") && set.has("U")) count++;
   if (set.has("I") && set.has("O")) count++;
-  // Ë↔Ë is special; we won't count it here to keep 0–3 range.
+  // Ë↔Ë is special; we keep it out so pairCoverage stays 0–3.
   return count;
 }
 
-export type CycleState = "open" | "balanced" | "overloaded";
-
-export interface Math7PathSummary {
-  voicePath: Vowel[];
-  indexPath: number[];      // 0–6
-  totalMod7: number;        // 0–6
-  cycleState: CycleState;   // open | balanced | overloaded
-  pairCoverage: number;     // 0–3
-  principlesPath: string[]; // ["Unity", "Balance", ...]
-}
-
-export interface Math7Summary {
-  primary: Math7PathSummary;
-  frontier: Math7PathSummary[];
-  candidates: Array<Math7PathSummary & { language: string }>;
-}
-
+// Normalize whatever we stored in AnalyzeWordResult.voicePath back to Vowel[]
+// We currently store "A → O → Ë" as a string in analyzeWord.
 function parseVoicePath(raw: unknown): Vowel[] {
   if (!raw) return [];
   if (Array.isArray(raw)) return raw as Vowel[];
 
   if (typeof raw === "string") {
-    // We joined with " → ", but we'll just split on the arrow and trim.
     return raw
       .split("→")
       .map(s => s.trim())
