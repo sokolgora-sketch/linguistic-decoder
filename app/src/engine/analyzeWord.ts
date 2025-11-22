@@ -56,7 +56,6 @@ function runSevenVoices(word: string, opts: { mode: 'strict' | 'explore' }): any
   };
 }
 
-
 function buildGeneratedWordMatrix(candidate: Candidate): MorphologyMatrix {
   const parts = candidate.decomposition?.parts ?? [];
   const root = parts[0];
