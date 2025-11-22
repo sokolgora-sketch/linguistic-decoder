@@ -4,7 +4,8 @@ import { runAnalysis } from '@/lib/runAnalysis';
 import { getManifest } from '@/engine/manifest';
 import type { SolveOptions } from '@/functions/sevenVoicesCore';
 import type { Alphabet } from '@/lib/runAnalysis';
-import { analyzeWordWithMath7 } from '@/engine/analyzeWord';
+import { analyzeWord } from '@/engine/analyzeWord';
+import { computeMath7ForResult } from '@/engine/math7';
 
 // A server-side analysis endpoint for reproducibility and direct access.
 export async function GET(request: Request) {
@@ -56,10 +57,16 @@ export async function POST(req: NextRequest) {
     if (!word) {
       return NextResponse.json({ error: 'Missing "word" in request body' }, { status: 400 });
     }
+    
+    // 1) base engine (old, stable path)
+    const base = analyzeWord(word, mode ?? "strict");
 
-    const result = analyzeWordWithMath7(word, mode ?? "strict");
+    // 2) heart math layered on top
+    const math7 = computeMath7ForResult(base);
+    
+    // 3) return both together
+    return NextResponse.json({ ...base, math7 });
 
-    return NextResponse.json(result);
   } catch(e: any) {
     console.error(`[API /analyze POST] Error:`, e);
     return NextResponse.json({ error: e.message || 'Analysis failed' }, { status: 500 });
