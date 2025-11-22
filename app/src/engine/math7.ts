@@ -115,3 +115,30 @@ function summarizePath(voicePath: Vowel[]): Math7PathSummary {
     principlesPath,
   };
 }
+
+export function computeMath7ForResult(result: AnalyzeWordResult): Math7Summary {
+  // primary path
+  const primaryVoices = parseVoicePath(result.primaryPath.voicePath);
+  const primary = summarizePath(primaryVoices);
+
+  // frontier paths
+  const frontier = (result.frontier || []).map(f => {
+    const voices = parseVoicePath(f.voicePath);
+    return summarizePath(voices);
+  });
+
+  // per-language candidates
+  const candidates = (result.languageFamilies || []).map(c => {
+    const voices = parseVoicePath(c.voicePath);
+    return {
+      ...summarizePath(voices),
+      language: c.language,
+    };
+  });
+
+  return {
+    primary,
+    frontier,
+    candidates,
+  };
+}
