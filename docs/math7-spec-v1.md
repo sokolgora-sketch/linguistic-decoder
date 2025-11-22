@@ -1,105 +1,60 @@
+# Math7 / Seven-Principles Heart Summary — Spec v1
 
-# Math7 / Heart Summary Specification v1
+## Purpose
 
-## What is math7?
+The **Math7 / Heart** layer is a *secondary* analysis built on top of the Seven-Voices solver.
 
-"Math7" is a "Seven-Principles" summary derived from the primary voice path of a word's analysis. It provides a higher-level, symbolic interpretation of the core engine's output, focusing on the sequence and nature of the principles involved.
+- Input: the existing `AnalyzeWordResult` (core engine output).
+- Output: a compact, deterministic summary of the **primary voice path** in terms of the **Seven Principles**.
+- This layer does **not** change the core solver – it only reads the primary path and derives extra structure.
 
-## JSON Shape
+The goal is to be a stable contract for UI, APIs, and future AI helpers.
 
-The `math7` object will be attached to the main `AnalyzeWordResult` and will have the following structure:
+---
 
-```json
-{
-  "math7": {
-    "primary": {
-      "voicePath": "string",
-      "levelPath": "string",
-      "ringPath": "string",
-      "state": "'flow' | 'cycle'",
-      "totalSteps": "number",
-      "totalMod7": "number",
-      "principlesPath": "string[]"
-    }
-  }
-}
+## Data shape
+
+The core result gains an optional field:
+
+```ts
+// Conceptual only – actual type names may differ in engineShape.ts
+type Math7Summary = {
+  primary: {
+    voicePath: string;        // e.g. "U → I"
+    levelPath: string;        // e.g. "Low → High"
+    ringPath: string;         // e.g. "1 → 1"
+
+    state: "flow" | "cycle";  // "flow" if first ≠ last vowel, "cycle" if first == last
+    totalSteps: number;       // number of steps in primary path (length of voice path)
+    totalMod7: number;        // totalSteps % 7, but 0 is mapped to 7 (1..7 only)
+
+    principlesPath: string[]; // mapped sequence of Seven Principles, same length as voice path
+  };
+};
+
+
+This is attached to the normal analysis:
+
+type AnalyzeWordResultWithMath7 = AnalyzeWordResult & {
+  math7?: Math7Summary;
+};
 ```
 
-### Field Descriptions
+If the engine cannot produce a primary path for a word, it may simply omit `math7`.
 
--   **`voicePath`**: The primary voice path, e.g., `"U → I"`.
--   **`levelPath`**: The corresponding level path, e.g., `"Low → High"`.
--   **`ringPath`**: The corresponding ring path, e.g., `"1 → 1"`.
--   **`state`**: Describes the path's nature.
-    -   `"flow"`: The first and last vowels are different.
-    -   `"cycle"`: The first and last vowels are the same.
--   **`totalSteps`**: The number of vowels in the path.
--   **`totalMod7`**: `totalSteps % 7`. A result of `0` is represented as `7`.
--   **`principlesPath`**: An array of principle names corresponding to the `voicePath`.
+## Principles map (vowel → principle)
 
-## Principle Mapping
+The Math7 layer uses a fixed, deterministic mapping from vowels (Seven Voices) to principles:
 
-Each vowel in the Seven-Voices model maps to a core principle:
+| Voice | Principle         | Short meaning (v1)                                |
+| :---- | :---------------- | :------------------------------------------------ |
+| A     | Truth / Action    | Source, decision, initiating force                |
+| E     | Expansion         | Growth, unfolding, projection                     |
+| I     | Insight           | Focused knowing, inner clarity                    |
+| O     | Balance           | Mediation, harmony, stabilising centre            |
+| U     | Unity             | Connection, togetherness, shared field            |
+| Y     | Network Integrity | Structure, links, channels, information flow      |
+| Ë     | Evolution         | Transition, mutation, completion into new         |
 
-| Vowel | Principle           |
-| :---- | :------------------ |
-| **A** | Truth / Source / Action |
-| **E** | Expansion           |
-| **I** | Insight             |
-| **O** | Balance             |
-| **U** | Unity               |
-| **Y** | Network Integrity   |
-| **Ë** | Evolution           |
-
-## Examples
-
-### 1. `study`
-
--   **Voice Path**: `U → I` (Unity → Insight)
--   **Reading**: A state of **Unity** seeks **Insight**. The path is a "flow" from one principle to another.
--   **JSON (conceptual)**:
-    ```json
-    "primary": {
-      "voicePath": "U → I",
-      "levelPath": "Low → High",
-      "ringPath": "1 → 1",
-      "state": "flow",
-      "totalSteps": 2,
-      "totalMod7": 2,
-      "principlesPath": ["Unity", "Insight"]
-    }
-    ```
-
-### 2. `damage`
-
--   **Voice Path**: `A → E` (Truth → Expansion)
--   **Reading**: An initial **Action** or **Truth** leads to **Expansion**. This is also a "flow."
--   **JSON (conceptual)**:
-    ```json
-    "primary": {
-      "voicePath": "A → E",
-      "levelPath": "High → High",
-      "ringPath": "3 → 2",
-      "state": "flow",
-      "totalSteps": 2,
-      "totalMod7": 2,
-      "principlesPath": ["Truth", "Expansion"]
-    }
-    ```
-
-### 3. `love`
-
--   **Voice Path**: `O → E` (Balance → Expansion)
--   **Reading**: A state of **Balance** moves toward **Expansion**.
--   **JSON (conceptual)**:
-    ```json
-    "primary": {
-      "voicePath": "O → E",
-      "levelPath": "Mid → High",
-      "ringPath": "0 → 2",
-      "state": "flow",
-      "totalSteps": 2,
-      "totalMod7": 2,
-      "principlesPath": ["Balance", "Expansion"]
-    }
-    ```
+Internal engine logic always uses the real vowels.
+The UI is free to mask them with symbols / colours / icons if we want to keep the order secret.
