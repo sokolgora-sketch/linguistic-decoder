@@ -182,3 +182,12 @@ export function analyzeWord(word: string, mode: 'strict' | 'explore' = 'strict')
 
   return result;
 }
+
+export function analyzeWordWithMath7(
+  word: string,
+  mode: 'strict' | 'explore' = 'strict',
+): AnalyzeWordResult & { math7: Math7Summary } {
+  const base = analyzeWord(word, mode);
+  const math7 = computeMath7ForResult(base);
+  return { ...base, math7 };
+}
