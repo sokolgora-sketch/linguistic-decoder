@@ -22,6 +22,7 @@ import { getManifest } from './manifest';
 import type { SolveOptions } from '@/functions/sevenVoicesCore';
 import { CANON_CANDIDATES } from '@/shared/canonCandidates';
 import { wordMatrixExamples } from "./wordMatrix";
+import { getVoiceMeta } from '@/shared/sevenVoices';
 
 function runSevenVoices(word: string, opts: { mode: 'strict' | 'explore' }): any {
   const manifest = getManifest();
@@ -38,45 +39,58 @@ function runSevenVoices(word: string, opts: { mode: 'strict' | 'explore' }): any
     edgeWeight: manifest.edgeWeight,
   };
 
-  // This part is tricky. The old system was very different.
-  // We'll call solveWord and then try to adapt it to a partial AnalysisResult.
-  // The canon candidates will be attached later.
   const analysis = solveWord(word, solveOpts, 'auto');
   
-  // A simplified adaptation for the pipeline
   return {
     word: word,
     sanitized: word.toLowerCase().replace(/[^a-zë]/g, ''),
     primaryPath: analysis.primaryPath,
     frontier: analysis.frontierPaths,
-    languageFamilies: [], // will be populated by canon candidates
+    languageFamilies: [], 
     meta: {
         engineVersion: ENGINE_VERSION,
         createdAt: new Date().toISOString(),
         mode: opts.mode,
     },
-    // For later pipeline steps
     rawPayload: analysis,
   };
 }
+
+
+/**
+ * v1: pure, deterministic, no network calls.
+ * Auto-generates a WordMatrix for candidates that don't have a manual one.
+ */
+export function buildGeneratedWordMatrix(candidate: Candidate, word: string): MorphologyMatrix {
+  const root = candidate.decomposition.parts[0] ?? { form: candidate.form, gloss: 'word' };
+  const suffixes = candidate.decomposition.parts.slice(1).map(p => p.form);
+
+  return {
+    pivot: root.form,
+    meaning: candidate.decomposition.functionalStatement,
+    morphemes: candidate.decomposition.parts.map(p => ({
+      form: p.form,
+      role: p.role,
+      gloss: p.gloss,
+    })),
+    wordSums: [
+      {
+        parts: candidate.decomposition.parts.map(p => p.form),
+        result: candidate.form,
+        gloss: candidate.decomposition.functionalStatement,
+      }
+    ],
+  };
+}
+
 
 function attachCanonCandidates(base: any): any {
     const word = base.word.toLowerCase();
     const canon = CANON_CANDIDATES[word] || [];
     
-    // This is a simplified mapping to the new LanguageFamilyCandidate shape
     const candidates = canon.map((c: Candidate): LanguageFamilyCandidate => {
-        // Auto-generate a morphologyMatrix if one doesn't exist
-        const matrix = c.morphologyMatrix ?? {
-            pivot: c.decomposition.parts[0]?.form ?? c.form,
-            meaning: c.decomposition.functionalStatement,
-            morphemes: c.decomposition.parts.map(p => ({
-                form: p.form,
-                role: p.role,
-                gloss: p.gloss,
-            })),
-            wordSums: [],
-        };
+        // If a manual matrix exists, use it. Otherwise, generate one.
+        const matrix = c.morphologyMatrix ?? buildGeneratedWordMatrix(c, word);
 
         return {
             language: c.language,
@@ -95,14 +109,13 @@ function attachCanonCandidates(base: any): any {
 
     return { ...base, languageFamilies: candidates };
 }
+
 function attachMorphology(base: any): any {
   // Logic is now inside attachCanonCandidates for simplicity. This is a pass-through.
   return base;
 }
 
 function buildSymbolicLayer(base: any): SymbolicLayer | undefined {
-    // This logic is also now handled within the candidate mapping.
-    // We can extract it here if needed, but for now, it's simpler to keep it there.
     const notes: string[] = [];
     base.languageFamilies.forEach((candidate: LanguageFamilyCandidate) => {
         if (candidate.symbolic) {
@@ -157,7 +170,7 @@ export function analyzeWord(word: string, mode: 'strict' | 'explore' = 'strict')
     symbolic,
   };
 
-  const matrix = withCanon.languageFamilies.find(c => c.morphologyMatrix)?.morphologyMatrix;
+  const matrix = withCanon.languageFamilies.find((c: any) => c.morphologyMatrix)?.morphologyMatrix;
 
   return {
     ...baseResult,

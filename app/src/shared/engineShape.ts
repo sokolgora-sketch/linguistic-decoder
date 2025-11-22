@@ -128,13 +128,13 @@ export type CandidateOriginAxes = {
   // Seven-Voices path + principles consistency.
   principles: OriginAxisStatus;
   // Word-sum / morphology story: does it actually explain function?
-  morphology: OriginAxisTatus;
+  morphology: OriginAxisStatus;
   // Consonant behaviour vs. semantic profile (cut/build/etc.).
   consonants: OriginAxisStatus;
 };
 
 // New types for morphology matrix
-export type MorphemeRole = 'root' | 'prefix' | 'suffix';
+export type MorphemeRole = 'root' | 'prefix' | 'suffix' | 'action' | 'instrument' | 'unit';
 
 export interface Morpheme {
   form: string;          // "stud", "dam", "dëm", "un", "ify"
@@ -329,7 +329,7 @@ export type AnalysisResult_DEPRECATED = {
   debug?: AnalysisDebug;
   sevenVoices?: SevenVoicesSummary;
   symbolic?: SymbolicLayer;
-  symbolicCore?: SymbolicCoreResult; // NEW, optional
+  symbolicCore?: any; // Changed from SymbolicCoreResult to any to break circular dependency
 };
 
 export type AnalyzeWordResult = {
