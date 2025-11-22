@@ -3,24 +3,7 @@
 // Seven-Principles math layer for vowels.
 // PURE: no engine calls, just mappings and helpers over Vowel sequences.
 
-import type { AnalyzeWordResult, Vowel } from "@/shared/engineShape";
-
-export type CycleState = "open" | "balanced" | "overloaded";
-
-export interface Math7PathSummary {
-  voicePath: Vowel[];
-  indexPath: number[];      // 0–6
-  totalMod7: number;        // 0–6
-  cycleState: CycleState;   // open | balanced | overloaded
-  pairCoverage: number;     // 0–3 (A–Y, E–U, I–O)
-  principlesPath: string[]; // ["Unity", "Balance", ...]
-}
-
-export interface Math7Summary {
-  primary: Math7PathSummary;
-  frontier: Math7PathSummary[];
-  candidates: Array<Math7PathSummary & { language: string }>;
-}
+import type { AnalyzeWordResult, Vowel, Math7Summary, Math7PathSummary, CycleState } from "@/shared/engineShape";
 
 // Internal numeric model (mod-7 universe):
 // A → 1, E → 2, I → 3, O → 4, U → 5, Y → 6, Ë → 0
@@ -77,4 +60,68 @@ export function countInversePairs(voicePath: Vowel[]): number {
   if (set.has("I") && set.has("O")) count++;
   // Ë↔Ë is special; we keep it out so pairCoverage stays 0–3.
   return count;
+}
+
+// Normalize whatever we stored in AnalyzeWordResult.voicePath back to Vowel[]
+// We currently store "A → O → Ë" as a string in analyzeWord.
+function parseVoicePath(raw: unknown): Vowel[] {
+  if (!raw) return [];
+  if (Array.isArray(raw)) return raw as Vowel[];
+
+  if (typeof raw === "string") {
+    return raw
+      .split("→")
+      .map(s => s.trim())
+      .filter(Boolean) as Vowel[];
+  }
+
+  return [];
+}
+
+function summarizePath(voicePath: Vowel[]): Math7PathSummary {
+  const indexPath = voicePathToIndexPath(voicePath);
+  const totalMod7 = sumMod7(indexPath);
+  const principlesPath = indexPathToPrinciples(indexPath);
+  const pairCoverage = countInversePairs(voicePath);
+
+  let cycleState: CycleState;
+  if (totalMod7 === 0) cycleState = "balanced";
+  else if (totalMod7 <= 3) cycleState = "open";
+  else cycleState = "overloaded";
+
+  return {
+    voicePath,
+    indexPath,
+    totalMod7,
+    cycleState,
+    pairCoverage,
+    principlesPath,
+  };
+}
+
+export function computeMath7ForResult(result: AnalyzeWordResult): Math7Summary {
+  // primary path
+  const primaryVoices = parseVoicePath(result.primaryPath.voicePath);
+  const primary = summarizePath(primaryVoices);
+
+  // frontier paths
+  const frontier = (result.frontier || []).map(f => {
+    const voices = parseVoicePath(f.voicePath);
+    return summarizePath(voices);
+  });
+
+  // per-language candidates
+  const candidates = (result.languageFamilies || []).map(c => {
+    const voices = parseVoicePath(c.voicePath);
+    return {
+      ...summarizePath(voices),
+      language: c.language,
+    };
+  });
+
+  return {
+    primary,
+    frontier,
+    candidates,
+  };
 }

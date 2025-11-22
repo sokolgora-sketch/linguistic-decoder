@@ -2,8 +2,6 @@
 
 import type { PrincipleV2, PrincipleId } from "@/engine/principles.v2";
 import type { SymbolicCoreResult } from "@/lib/symbolicCore";
-import type { Math7Summary, Math7PathSummary, CycleState } from "@/engine/math7";
-
 
 // Canonical shape your UI will use everywhere.
 export type Vowel = 'A' | 'E' | 'I' | 'O' | 'U' | 'Y' | 'Ë';
@@ -392,4 +390,19 @@ export interface WordMatrix {
   symbolicNotes?: string;                  // interpretive note or Zheji-style insight
 }
 
-export type { Math7Summary, Math7PathSummary, CycleState };
+export type CycleState = "open" | "balanced" | "overloaded";
+
+export interface Math7PathSummary {
+  voicePath: Vowel[];
+  indexPath: number[];      // 0–6
+  totalMod7: number;        // 0–6
+  cycleState: CycleState;   // open | balanced | overloaded
+  pairCoverage: number;     // 0–3 (A–Y, E–U, I–O)
+  principlesPath: string[]; // ["Unity", "Balance", ...]
+}
+
+export interface Math7Summary {
+  primary: Math7PathSummary;
+  frontier: Math7PathSummary[];
+  candidates: Array<Math7PathSummary & { language: string }>;
+}
