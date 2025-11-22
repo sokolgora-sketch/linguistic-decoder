@@ -90,7 +90,7 @@ function attachCanonCandidates(base: any): any {
     const word = base.word.toLowerCase();
     const canon = CANON_CANDIDATES[word] || [];
     
-    const candidates = canon.map((c: Candidate): LanguageFamilyCandidate => {
+    const candidates = canon.map((c: Candidate): Candidate => {
         const hasManualMatrix = !!c.morphologyMatrix;
         const baseMatrix = hasManualMatrix
           ? c.morphologyMatrix
@@ -102,17 +102,8 @@ function attachCanonCandidates(base: any): any {
         };
 
         return {
-            language: c.language,
-            form: c.form,
-            gloss: c.decomposition.functionalStatement,
-            passes: c.status === 'pass',
-            experimental: c.status === 'experimental',
-            speculative: c.confidenceTag === 'speculative',
-            voicePath: (c.voices.voiceSequence || []).join(' → '),
-            levelPath: 'N/A',
-            ringPath: (c.voices.ringPath || []).join(' → '),
+            ...c,
             morphologyMatrix: matrixWithSource,
-            symbolic: c.symbolic,
         };
     });
 
@@ -167,7 +158,19 @@ export function analyzeWord(word: string, mode: 'strict' | 'explore' = 'strict')
       ringPath: join(alt.ringPath),
     })),
 
-    languageFamilies: withCanon.languageFamilies,
+    languageFamilies: withCanon.languageFamilies.map((c: Candidate) => ({
+      language: c.language,
+      form: c.form,
+      gloss: c.decomposition.functionalStatement,
+      passes: c.status === 'pass',
+      experimental: c.status === 'experimental',
+      speculative: c.confidenceTag === 'speculative',
+      voicePath: (c.voices.voiceSequence || []).join(' → '),
+      levelPath: 'N/A',
+      ringPath: (c.voices.ringPath || []).join(' → '),
+      morphologyMatrix: c.morphologyMatrix, // This now includes .source
+      symbolic: c.symbolic,
+    })),
 
     meta: {
       engineVersion: withCanon.meta.engineVersion,
