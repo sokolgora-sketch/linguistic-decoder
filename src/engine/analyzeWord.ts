@@ -77,7 +77,23 @@ function attachCanonCandidates(base: any): any {
         morphologyMatrix: c.morphologyMatrix,
         symbolic: c.symbolic,
     }));
-
+    languageFamilies: withCanon.languageFamilies.map((c: Candidate) => ({
+      language: c.language,
+      form: c.form,
+      gloss: c.decomposition.functionalStatement,
+      passes: c.status === 'pass',
+      experimental: c.status === 'experimental',
+      speculative: c.confidenceTag === 'speculative',
+      voicePath: (c.voices.voiceSequence || []).join(' → '),
+      levelPath: 'N/A',
+      ringPath: (c.voices.ringPath || []).join(' → '),
+    
+      // ✅ forward the matrix that already has source: 'manual' | 'auto'
+      morphologyMatrix: c.morphologyMatrix,
+    
+      symbolic: c.symbolic,
+    })),
+    
     return { ...base, languageFamilies: candidates };
 }
 function attachMorphology(base: any): any {
