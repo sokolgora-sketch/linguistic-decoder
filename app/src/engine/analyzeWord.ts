@@ -57,57 +57,56 @@ function runSevenVoices(word: string, opts: { mode: 'strict' | 'explore' }): any
 }
 
 
-/**
- * v1: pure, deterministic, no network calls.
- * Auto-generates a WordMatrix for candidates that don't have a manual one.
- */
-export function buildGeneratedWordMatrix(candidate: Candidate, word: string): MorphologyMatrix {
-  const root = candidate.decomposition.parts[0] ?? { form: candidate.form, gloss: 'word', role: 'root' };
-  
-  const morphemes: Morpheme[] = candidate.decomposition.parts.map(p => ({
+function buildGeneratedWordMatrix(candidate: Candidate): MorphologyMatrix {
+  const parts = candidate.decomposition?.parts ?? [];
+  const root = parts[0];
+
+  return {
+    pivot: root?.form ?? candidate.form,
+    meaning: candidate.decomposition?.functionalStatement ?? '',
+    morphemes: parts.map((p: any) => ({
       form: p.form,
       role: p.role,
       gloss: p.gloss,
-  }));
-
-  return {
-    pivot: root.form,
-    meaning: candidate.decomposition.functionalStatement,
-    morphemes: morphemes,
+    })),
     wordSums: [
       {
-        parts: candidate.decomposition.parts.map(p => p.form),
+        parts: parts.map((p: any) => p.form),
         result: candidate.form,
-        gloss: candidate.decomposition.functionalStatement,
-      }
+        gloss: candidate.decomposition?.functionalStatement ?? '',
+      },
     ],
     source: 'auto',
   };
 }
 
-
 function attachCanonCandidates(base: any): any {
-    const word = base.word.toLowerCase();
-    const canon = CANON_CANDIDATES[word] || [];
-    
-    const candidates = canon.map((c: Candidate): Candidate => {
-        const hasManualMatrix = !!c.morphologyMatrix;
-        const baseMatrix = hasManualMatrix
-          ? c.morphologyMatrix!
-          : buildGeneratedWordMatrix(c, word);
+  const word = base.word.toLowerCase();
+  const canon = CANON_CANDIDATES[word] || [];
+  
+  const candidates: LanguageFamilyCandidate[] = canon.map((c: Candidate) => {
+    const hasManual = !!c.morphologyMatrix;
 
-        const matrixWithSource: MorphologyMatrix = {
-          ...baseMatrix,
-          source: hasManualMatrix ? 'manual' : 'auto',
-        };
+    const matrix: MorphologyMatrix = hasManual
+      ? { ...c.morphologyMatrix, source: 'manual' as const }
+      : buildGeneratedWordMatrix(c);
 
-        return {
-            ...c,
-            morphologyMatrix: matrixWithSource,
-        };
-    });
+    return {
+      language: c.language,
+      form: c.form,
+      gloss: c.decomposition.functionalStatement,
+      passes: c.status === 'pass',
+      experimental: c.status === 'experimental',
+      speculative: c.confidenceTag === 'speculative',
+      voicePath: (c.voices.voiceSequence || []).join(' → '),
+      levelPath: 'N/A',
+      ringPath: (c.voices.ringPath || []).join(' → '),
+      morphologyMatrix: matrix,
+      symbolic: c.symbolic,
+    };
+  });
 
-    return { ...base, languageFamilies: candidates };
+  return { ...base, languageFamilies: candidates };
 }
 
 function attachMorphology(base: any): any {
@@ -116,20 +115,22 @@ function attachMorphology(base: any): any {
 }
 
 function buildSymbolicLayer(base: any): SymbolicLayer | undefined {
-    const notes: string[] = [];
-    base.languageFamilies.forEach((candidate: LanguageFamilyCandidate) => {
-        if (candidate.symbolic) {
-            candidate.symbolic.forEach(tag => notes.push(tag.note));
-        }
-    });
+  const notes: string[] = [];
 
-    if (notes.length > 0) {
-        return {
-            notes: notes,
-            label: 'Zheji-inspired symbolic reading (experimental)',
-        };
+  (base.languageFamilies as LanguageFamilyCandidate[]).forEach((candidate) => {
+    if (candidate.symbolic) {
+      candidate.symbolic.forEach((tag: SymbolicTag) => notes.push(tag.note));
     }
-    return undefined;
+  });
+
+  if (notes.length > 0) {
+    return {
+      notes,
+      label: 'Zheji-inspired symbolic reading (experimental)',
+    };
+  }
+
+  return undefined;
 }
 
 

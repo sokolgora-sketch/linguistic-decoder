@@ -77,48 +77,28 @@ function attachCanonCandidates(base: any): any {
         morphologyMatrix: c.morphologyMatrix,
         symbolic: c.symbolic,
     }));
-    languageFamilies: withCanon.languageFamilies.map((c: Candidate) => ({
-      language: c.language,
-      form: c.form,
-      gloss: c.decomposition.functionalStatement,
-      passes: c.status === 'pass',
-      experimental: c.status === 'experimental',
-      speculative: c.confidenceTag === 'speculative',
-      voicePath: (c.voices.voiceSequence || []).join(' → '),
-      levelPath: 'N/A',
-      ringPath: (c.voices.ringPath || []).join(' → '),
-    
-      // ✅ forward the matrix that already has source: 'manual' | 'auto'
-      morphologyMatrix: c.morphologyMatrix,
-    
-      symbolic: c.symbolic,
-    })),
-    
-    return { ...base, languageFamilies: candidates };
-}
-function attachMorphology(base: any): any {
-  // Logic is now inside attachCanonCandidates for simplicity. This is a pass-through.
-  return base;
+
+function attachCanonCandidates(base: any): any {
+  const word = base.word.toLowerCase();
+  const canon = CANON_CANDIDATES[word] || [];
+  
+  const candidates = canon.map((c: Candidate): LanguageFamilyCandidate => ({
+    language: c.language,
+    form: c.form,
+    gloss: c.decomposition.functionalStatement,
+    passes: c.status === 'pass',
+    experimental: c.status === 'experimental',
+    speculative: c.confidenceTag === 'speculative',
+    voicePath: (c.voices.voiceSequence || []).join(' → '),
+    levelPath: 'N/A',
+    ringPath: (c.voices.ringPath || []).join(' → '),
+    morphologyMatrix: c.morphologyMatrix,
+    symbolic: c.symbolic,
+  }));
+
+  return { ...base, languageFamilies: candidates };
 }
 
-function buildSymbolicLayer(base: any): SymbolicLayer | undefined {
-    // This logic is also now handled within the candidate mapping.
-    // We can extract it here if needed, but for now, it's simpler to keep it there.
-    const notes: string[] = [];
-    base.languageFamilies.forEach((candidate: LanguageFamilyCandidate) => {
-        if (candidate.symbolic) {
-            candidate.symbolic.forEach(tag => notes.push(tag.note));
-        }
-    });
-
-    if (notes.length > 0) {
-        return {
-            notes: notes,
-            label: 'Zheji-inspired symbolic reading (experimental)',
-        };
-    }
-    return undefined;
-}
 
 
 export function analyzeWord(word: string, mode: 'strict' | 'explore' = 'strict'): AnalyzeWordResult {
