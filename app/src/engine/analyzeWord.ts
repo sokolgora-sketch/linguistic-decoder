@@ -15,14 +15,12 @@
  *  - Only extend with OPTIONAL fields, and only if tests stay green.
  */
 // src/engine/analyzeWord.ts
-import type { AnalyzeWordResult, Candidate, LanguageFamilyCandidate, MorphologyMatrix, SymbolicLayer, SymbolicTag, Vowel, Morpheme } from '@/shared/engineShape';
+import type { AnalyzeWordResult, Candidate, LanguageFamilyCandidate, MorphologyMatrix, SymbolicLayer, SymbolicTag, Vowel } from '@/shared/engineShape';
 import { ENGINE_VERSION } from './version';
 import { solveWord } from '@/functions/sevenVoicesCore';
 import { getManifest } from './manifest';
 import type { SolveOptions } from '@/functions/sevenVoicesCore';
 import { CANON_CANDIDATES } from '@/shared/canonCandidates';
-import { wordMatrixExamples } from "./wordMatrix";
-import { getVoiceMeta } from '@/shared/sevenVoices';
 
 function runSevenVoices(word: string, opts: { mode: 'strict' | 'explore' }): any {
   const manifest = getManifest();
@@ -39,19 +37,24 @@ function runSevenVoices(word: string, opts: { mode: 'strict' | 'explore' }): any
     edgeWeight: manifest.edgeWeight,
   };
 
+  // This part is tricky. The old system was very different.
+  // We'll call solveWord and then try to adapt it to a partial AnalysisResult.
+  // The canon candidates will be attached later.
   const analysis = solveWord(word, solveOpts, 'auto');
   
+  // A simplified adaptation for the pipeline
   return {
     word: word,
     sanitized: word.toLowerCase().replace(/[^a-zë]/g, ''),
     primaryPath: analysis.primaryPath,
     frontier: analysis.frontierPaths,
-    languageFamilies: [], 
+    languageFamilies: [], // will be populated by canon candidates
     meta: {
         engineVersion: ENGINE_VERSION,
         createdAt: new Date().toISOString(),
         mode: opts.mode,
     },
+    // For later pipeline steps
     rawPayload: analysis,
   };
 }
@@ -132,7 +135,6 @@ function buildSymbolicLayer(base: any): SymbolicLayer | undefined {
   return undefined;
 }
 
-
 export function analyzeWord(word: string, mode: 'strict' | 'explore' = 'strict'): AnalyzeWordResult {
   const base = runSevenVoices(word, { mode });
   const withCanon = attachCanonCandidates(base);
@@ -158,19 +160,7 @@ export function analyzeWord(word: string, mode: 'strict' | 'explore' = 'strict')
       ringPath: join(alt.ringPath),
     })),
 
-    languageFamilies: withCanon.languageFamilies.map((c: LanguageFamilyCandidate) => ({
-      language: c.language,
-      form: c.form,
-      gloss: c.gloss,
-      passes: c.passes,
-      experimental: c.experimental,
-      speculative: c.speculative,
-      voicePath: c.voicePath,
-      levelPath: 'N/A',
-      ringPath: c.ringPath,
-      morphologyMatrix: c.morphologyMatrix,
-      symbolic: c.symbolic,
-    })),
+    languageFamilies: withCanon.languageFamilies,
 
     meta: {
       engineVersion: withCanon.meta.engineVersion,
@@ -182,12 +172,5 @@ export function analyzeWord(word: string, mode: 'strict' | 'explore' = 'strict')
     symbolic,
   };
 
-  // The matrix is now attached to the candidate, not the top level.
-  // This logic can be simplified as it's now part of the candidate data.
-  const matrix = withCanon.languageFamilies.find((c: any) => c.morphologyMatrix)?.morphologyMatrix;
-
-  return {
-    ...result,
-    wordMatrix: matrix ?? null,
-  };
+  return result;
 }
