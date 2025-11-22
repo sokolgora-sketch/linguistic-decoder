@@ -1,8 +1,7 @@
 import { analyzeWord } from "../src/engine/analyzeWord";
 import { computeMath7ForResult } from "../src/engine/math7";
 
-// Temporarily disable this suite – we don't need it in CI.
-describe.skip("math7 layer sanity", () => {
+describe("math7 layer sanity", () => {
   it("computes math7 for study / damage / love", () => {
     const studyBase = analyzeWord("study", "strict");
     const damageBase = analyzeWord("damage", "strict");
@@ -16,8 +15,12 @@ describe.skip("math7 layer sanity", () => {
     expect(damage).toBeDefined();
     expect(love).toBeDefined();
 
+    // TEMP: inspect in console (delete later if noisy)
+    // eslint-disable-next-line no-console
     console.log("STUDY math7:", JSON.stringify(study, null, 2));
+    // eslint-disable-next-line no-console
     console.log("DAMAGE math7:", JSON.stringify(damage, null, 2));
+    // eslint-disable-next-line no-console
     console.log("LOVE math7:", JSON.stringify(love, null, 2));
   });
 });
