@@ -88,8 +88,12 @@ function buildSymbolicLayer(
 // Adapts a raw EnginePayload into the richer AnalysisResult structure,
 // which includes canonical candidates, consonant summaries, and principles.
 export function enginePayloadToAnalysisResult(
-  payload: EnginePayload
-): AnalysisResult_DEPRECATED {
+  payload: EnginePayload | null
+): AnalysisResult_DEPRECATED | null {
+  if (!payload || !payload.primaryPath) {
+    return null;
+  }
+
   const { field, summary } = buildConsonantField(payload);
   const { word, mode } = payload;
   const canon = CANON_CANDIDATES[word.toLowerCase()] ?? [];
@@ -211,26 +215,9 @@ export function enginePayloadToAnalysisResult(
 // which is useful for mocks or testing other parts of the pipeline.
 export function analysisResultToEnginePayload(
   result: AnalysisResult_DEPRECATED | null
-): EnginePayload {
+): EnginePayload | null {
   if (!result || !result.core) {
-    return {
-      engineVersion: 'mock-v0',
-      word: 'error',
-      mode: 'strict',
-      alphabet: 'latin',
-      primaryPath: {
-        voicePath: [],
-        ringPath: [],
-        levelPath: [],
-        ops: [],
-        checksums: { V: 0, E: 0, C: 0 },
-        kept: 0,
-      },
-      frontierPaths: [],
-      windows: [],
-      windowClasses: [],
-      signals: [],
-    };
+    return null;
   }
 
   const { mode, alphabet } = result.core.input;
