@@ -414,7 +414,7 @@ export const CANON_CANDIDATES: Record<string, Candidate[]> = {
             wordSums: [{ parts: ['am', 'or'], result: 'amor', gloss: 'one who carries/embodies love' }],
         },
         symbolic: [
-            { axis: 'love', source: 'hybrid', note: "Latin 'amor' makes love a carried quality — something you bear." },
+            { axis: 'creation', source: 'hybrid', note: "Latin 'amor' makes love a carried quality — something you bear." },
         ]
     },
     {
@@ -451,7 +451,7 @@ export const CANON_CANDIDATES: Record<string, Candidate[]> = {
             wordSums: [{ parts: ['dash', 'ur', 'i'], result: 'dashuri', gloss: 'the state/quality of loving' }],
         },
         symbolic: [
-             { axis: 'love', source: 'hybrid', note: "Albanian 'dashuri' frames love as a chosen state, not just a feeling." },
+             { axis: 'creation', source: 'hybrid', note: "Albanian 'dashuri' frames love as a chosen state, not just a feeling." },
         ]
     }
   ]
