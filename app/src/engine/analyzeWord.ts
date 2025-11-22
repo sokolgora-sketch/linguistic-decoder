@@ -91,7 +91,7 @@ function attachCanonCandidates(base: any): any {
     const canon = CANON_CANDIDATES[word] || [];
     
     const candidates = canon.map((c: Candidate): LanguageFamilyCandidate => {
-        // If a manual matrix exists, use it. Otherwise, generate one.
+        // If a manual matrix exists, use it and mark its source. Otherwise, generate one.
         const matrix = c.morphologyMatrix ? 
           { ...c.morphologyMatrix, source: 'manual' as const } : 
           buildGeneratedWordMatrix(c, word);
