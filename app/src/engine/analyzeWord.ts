@@ -62,7 +62,7 @@ function runSevenVoices(word: string, opts: { mode: 'strict' | 'explore' }): any
  * Auto-generates a WordMatrix for candidates that don't have a manual one.
  */
 export function buildGeneratedWordMatrix(candidate: Candidate, word: string): MorphologyMatrix {
-  const root = candidate.decomposition.parts[0] ?? { form: candidate.form, gloss: 'word' };
+  const root = candidate.decomposition.parts[0] ?? { form: candidate.form, gloss: 'word', role: 'root' };
   
   const morphemes: Morpheme[] = candidate.decomposition.parts.map(p => ({
       form: p.form,
@@ -93,11 +93,11 @@ function attachCanonCandidates(base: any): any {
     const candidates = canon.map((c: Candidate): Candidate => {
         const hasManualMatrix = !!c.morphologyMatrix;
         const baseMatrix = hasManualMatrix
-          ? c.morphologyMatrix
+          ? c.morphologyMatrix!
           : buildGeneratedWordMatrix(c, word);
 
         const matrixWithSource: MorphologyMatrix = {
-          ...baseMatrix!,
+          ...baseMatrix,
           source: hasManualMatrix ? 'manual' : 'auto',
         };
 
@@ -168,7 +168,7 @@ export function analyzeWord(word: string, mode: 'strict' | 'explore' = 'strict')
       voicePath: (c.voices.voiceSequence || []).join(' → '),
       levelPath: 'N/A',
       ringPath: (c.voices.ringPath || []).join(' → '),
-      morphologyMatrix: c.morphologyMatrix, // This now includes .source
+      morphologyMatrix: c.morphologyMatrix, // Pass the matrix through directly
       symbolic: c.symbolic,
     })),
 
