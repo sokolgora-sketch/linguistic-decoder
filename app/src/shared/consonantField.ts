@@ -65,18 +65,28 @@ function findSlot(
 export function buildConsonantField(
   payload: EnginePayload
 ): { field: ConsonantField; summary: ConsonantSummary } {
+  // If we somehow don't have a path, just return an empty field
+  // so the UI can render without blowing up.
+  if (!payload || !payload.primaryPath) {
+    const emptyField = {
+        smoothHits: 0,
+        spikyHits: 0,
+        slots: makeEmptySlots(),
+        hasConflict: false,
+    };
+    const emptySummary = {
+        smoothRatio: 0,
+        dominantArchetypes: [],
+        notes: [],
+    };
+    return { field: emptyField, summary: emptySummary };
+  }
+
   const slots = makeEmptySlots();
   let smoothHits = 0;
   let spikyHits = 0;
 
   const path = payload.primaryPath;
-
-  // If we somehow don't have a path, just return an empty field
-  // so the UI can render without blowing up.
-  if (!path || !path.voicePath) {
-    return {} as any;
-  }
-
   const windows = payload.windows ?? [];
   const windowClasses = payload.windowClasses ?? [];
 
