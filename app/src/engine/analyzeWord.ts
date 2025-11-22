@@ -1,3 +1,4 @@
+
 /**
  * ❤️ ANALYZE WORD HEART (HIGH-LEVEL RESULT)
  *
