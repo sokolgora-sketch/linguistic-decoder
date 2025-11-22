@@ -4,7 +4,7 @@
 // This file is PURE: no side effects, no engine calls,
 // just mappings and helpers over Vowel sequences.
 
-import type { Vowel } from "@/shared/engineShape";
+import type { AnalyzeWordResult, Vowel } from "@/shared/engineShape";
 
 // Internal numeric model (mod-7 universe):
 // A → 1, E → 2, I → 3, O → 4, U → 5, Y → 6, Ë → 0
