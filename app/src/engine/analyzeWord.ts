@@ -22,6 +22,7 @@ import { solveWord } from '@/functions/sevenVoicesCore';
 import { getManifest } from './manifest';
 import type { SolveOptions } from '@/functions/sevenVoicesCore';
 import { CANON_CANDIDATES } from '@/shared/canonCandidates';
+import { computeMath7ForResult, type Math7Summary } from './math7';
 
 function runSevenVoices(word: string, opts: { mode: 'strict' | 'explore' }): any {
   const manifest = getManifest();
