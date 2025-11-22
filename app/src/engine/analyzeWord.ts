@@ -141,7 +141,7 @@ export function analyzeWord(word: string, mode: 'strict' | 'explore' = 'strict')
 
   const join = (arr: any[]) => (arr || []).join(' → ');
 
-  const baseResult: AnalyzeWordResult = {
+  const result: AnalyzeWordResult = {
     word: word,
     sanitized: withCanon.sanitized,
 
@@ -187,7 +187,7 @@ export function analyzeWord(word: string, mode: 'strict' | 'explore' = 'strict')
   const matrix = withCanon.languageFamilies.find((c: any) => c.morphologyMatrix)?.morphologyMatrix;
 
   return {
-    ...baseResult,
+    ...result,
     wordMatrix: matrix ?? null,
   };
 }
