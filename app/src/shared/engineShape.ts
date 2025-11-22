@@ -2,7 +2,7 @@
 
 import type { PrincipleV2, PrincipleId } from "@/engine/principles.v2";
 import type { SymbolicCoreResult } from "@/lib/symbolicCore";
-import type { Math7Summary } from "@/engine/math7";
+import type { Math7Summary, Math7PathSummary, CycleState } from "@/engine/math7";
 
 
 // Canonical shape your UI will use everywhere.
@@ -391,3 +391,5 @@ export interface WordMatrix {
   principles: string[];                    // e.g. ["Truth", "Expansion", "Balance"]
   symbolicNotes?: string;                  // interpretive note or Zheji-style insight
 }
+
+export type { Math7Summary, Math7PathSummary, CycleState };

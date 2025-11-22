@@ -1,5 +1,5 @@
 import { analyzeWord } from "../src/engine/analyzeWord";
-import { computeMath7ForResult } from "../src/engine/math7";
+import { computeMath7ForResult } from "../src/shared/analysisAdapter";
 
 describe("math7 layer sanity", () => {
   it("computes math7 for study / damage / love", () => {

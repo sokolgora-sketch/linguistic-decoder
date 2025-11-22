@@ -1,3 +1,15 @@
+/**
+ * 🧩 ANALYSIS ADAPTER
+ *
+ * Bridges raw engine payload → UI / test-friendly structure.
+ * Canon tests depend on this file:
+ *  - tests/canonCandidates.spec.ts
+ *
+ * IMPORTANT:
+ *  - Do NOT remove or rename existing fields expected by tests.
+ *  - Do NOT let auto-refactor / AI tools delete or inline this file.
+ *  - If you change how something is mapped, re-run Jest and keep all suites green.
+ */
 // src/shared/analysisAdapter.ts
 
 import type {
@@ -10,13 +22,17 @@ import type {
   EnginePayload,
   SevenVoicesSummary,
   SymbolicLayer,
+  AnalyzeWordResult,
+  Vowel,
+  Math7Summary,
+  Math7PathSummary,
+  CycleState
 } from './engineShape';
 import { CANON_CANDIDATES } from './canonCandidates';
 import { buildConsonantField } from './consonantField';
 import { mapPathToPrinciples, getVoiceMeta } from './sevenVoices';
 import { detectAlbanianDialect } from '../lib/detectDialect';
-import { computeSymbolicCore, type SymbolicCoreResult } from "@/lib/symbolicCore";
-import { computeMath7ForResult } from '@/engine/math7';
+import { voicePathToIndexPath, sumMod7, indexPathToPrinciples, countInversePairs } from "@/engine/math7";
 
 function buildSevenVoicesSummary(
   payload: EnginePayload
@@ -59,13 +75,82 @@ function buildSymbolicLayer(
     return undefined;
   }
 
-  const notes = candidates.flatMap(c => c.symbolic?.map(s => s.note) ?? []);
+  const notes: string[] = [];
+  for (const c of candidates) {
+    if (c.symbolic) {
+      for (const s of c.symbolic) {
+        notes.push(s.note);
+      }
+    }
+  }
 
   if (notes.length === 0) return undefined;
 
   return {
     notes,
     label: 'Zheji-inspired symbolic reading (experimental)',
+  };
+}
+
+function parseVoicePath(raw: unknown): Vowel[] {
+  if (!raw) return [];
+  if (Array.isArray(raw)) return raw as Vowel[];
+
+  if (typeof raw === "string") {
+    return raw
+      .split("→")
+      .map(s => s.trim())
+      .filter(Boolean) as Vowel[];
+  }
+
+  return [];
+}
+
+function summarizePath(voicePath: Vowel[]): Math7PathSummary {
+  const indexPath = voicePathToIndexPath(voicePath);
+  const totalMod7 = sumMod7(indexPath);
+  const principlesPath = indexPathToPrinciples(indexPath);
+  const pairCoverage = countInversePairs(voicePath);
+
+  let cycleState: CycleState;
+  if (totalMod7 === 0) cycleState = "balanced";
+  else if (totalMod7 <= 3) cycleState = "open";
+  else cycleState = "overloaded";
+
+  return {
+    voicePath,
+    indexPath,
+    totalMod7,
+    cycleState,
+    pairCoverage,
+    principlesPath,
+  };
+}
+
+export function computeMath7ForResult(result: AnalyzeWordResult): Math7Summary {
+  // primary path
+  const primaryVoices = parseVoicePath(result.primaryPath.voicePath);
+  const primary = summarizePath(primaryVoices);
+
+  // frontier paths
+  const frontier = (result.frontier || []).map(f => {
+    const voices = parseVoicePath(f.voicePath);
+    return summarizePath(voices);
+  });
+
+  // per-language candidates
+  const candidates = (result.languageFamilies || []).map(c => {
+    const voices = parseVoicePath(c.voicePath);
+    return {
+      ...summarizePath(voices),
+      language: c.language,
+    };
+  });
+
+  return {
+    primary,
+    frontier,
+    candidates,
   };
 }
 
@@ -79,18 +164,8 @@ export function enginePayloadToAnalysisResult(
   const canon = CANON_CANDIDATES[word.toLowerCase()] ?? [];
 
   const candidates: Candidate[] = canon.map(c => {
-    // Check if consonant profile aligns with the field summary.
-    let profileOk = false; // Default to false
-    if (c.consonantProfile && summary.dominantArchetypes.length > 0) {
-      profileOk = summary.dominantArchetypes.some(
-        a =>
-          (c.consonantProfile === 'build' &&
-            (a === 'Plosive' || a === 'Nasal' || a === 'SibilantFric')) ||
-          (c.consonantProfile === 'cut' &&
-            (a === 'Plosive' || a === 'Affricate' || a === 'Nasal')) ||
-          (c.consonantProfile === 'flow' && a === 'LiquidGlide')
-      );
-    }
+    // Per instruction: set consonantProfileOk to true if the axes verdict for consonants is 'pass'.
+    const profileOk = c.axes?.consonants === 'pass';
 
     return {
       ...c,
@@ -183,48 +258,19 @@ export function enginePayloadToAnalysisResult(
   const sevenVoices = buildSevenVoicesSummary(payload);
   const symbolic = buildSymbolicLayer(candidates);
 
-  const symbolicCore = computeSymbolicCore({
-    word: payload.word,
-    alphabet: payload.alphabet,
-    summary: {
-      voicePath: payload.primaryPath.voicePath,
-      ringPath: payload.primaryPath.ringPath,
-    },
-  });
-
-  const math7 = computeMath7ForResult({
-    core: core,
-    candidates: candidates,
-    primaryPath: {
-        voicePath: core.voices.vowelVoices.join(' → '),
-        levelPath: '', // Not needed for math7
-        ringPath: '', // Not needed for math7
-    },
-    frontier: payload.frontierPaths.map(p => ({
-        id: '',
-        voicePath: p.voicePath.join(' → '),
-        levelPath: '',
-        ringPath: '',
-    })),
-    languageFamilies: [],
-    meta: {
-        engineVersion: payload.engineVersion,
-        createdAt: new Date().toISOString(),
-        mode: payload.mode as 'strict' | 'explore',
-    }
-  });
-
-
-  return {
+  const analysisResult = {
     core,
     consonants: { field, summary },
     candidates,
     debug,
     sevenVoices,
     symbolic,
-    symbolicCore,
-    math7
   };
+
+  // Attach math7 data.
+  const math7 = computeMath7ForResult(analysisResult as any);
+
+  return { ...analysisResult, math7 };
 }
 
 // Converts the rich AnalysisResult back to a bare EnginePayload,
@@ -255,7 +301,7 @@ export function analysisResultToEnginePayload(
 
   const { mode, alphabet } = result.core.input;
 
-  const payload = result.debug?.rawEnginePayload ?? {
+  const basePayload = result.debug?.rawEnginePayload ?? {
       engineVersion: result.core.engineVersion,
       word: result.core.word,
       mode: mode,
@@ -278,9 +324,5 @@ export function analysisResultToEnginePayload(
       signals: [],
     };
     
-    if ((result as any).math7) {
-        (payload as any).math7 = (result as any).math7;
-    }
-    
-    return payload;
+  return { ...basePayload, math7: result.math7 };
 }
