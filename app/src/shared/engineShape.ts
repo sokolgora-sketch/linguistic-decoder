@@ -378,6 +378,30 @@ export type AnalysisResult = {
   math7?: Math7Summary;
 }
 
+// ---------------- Math7 / Heart Summary (Seven Principles) ----------------
+
+export interface Math7PrimarySummaryExtended {
+  /** Raw engine primary path, as already shown in UI */
+  voicePath: string;        // e.g. "U → I"
+  levelPath: string;        // e.g. "Low → High"
+  ringPath: string;         // e.g. "1 → 1"
+
+  /** Simple state: does the path return to the same vowel or not? */
+  state: "flow" | "cycle";  // "flow" if first ≠ last vowel, "cycle" if first == last
+
+  /** Count and modulo 7 */
+  totalSteps: number;       // length of the voice path, e.g. 2
+  totalMod7: number;        // totalSteps % 7, but 0 is mapped to 7 (1..7 only)
+
+  /** Seven-Principles reading of the path */
+  principlesPath: string[]; // same length as voicePath step count
+}
+
+export interface Math7SummaryExtended {
+  primary: Math7PrimarySummaryExtended;
+}
+
+
 export type LanguageFamilyCandidate = {
   language: string;
   form: string;
