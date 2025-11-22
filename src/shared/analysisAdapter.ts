@@ -17,16 +17,15 @@ import type {
   AnalysisDebug,
   AnalysisResult_DEPRECATED,
   Candidate,
-  ConsonantField,
-  ConsonantSummary,
   EnginePayload,
   SevenVoicesSummary,
   SymbolicLayer,
 } from './engineShape';
 import { CANON_CANDIDATES } from './canonCandidates';
 import { buildConsonantField } from './consonantField';
-import { mapPathToPrinciples, getVoiceMeta } from './sevenVoices';
+import { getVoiceMeta } from './sevenVoices';
 import { detectAlbanianDialect } from '../lib/detectDialect';
+import { computeMath7ForResult } from '@/engine/math7';
 
 function buildSevenVoicesSummary(
   payload: EnginePayload
@@ -89,10 +88,14 @@ function buildSymbolicLayer(
 // Adapts a raw EnginePayload into the richer AnalysisResult structure,
 // which includes canonical candidates, consonant summaries, and principles.
 export function enginePayloadToAnalysisResult(
-  payload: EnginePayload
-): AnalysisResult_DEPRECATED {
-  const { field, summary } = buildConsonantField(payload);
-  const { word, alphabet, mode } = payload;
+  payload: EnginePayload | null
+): AnalysisResult_DEPRECATED | null {
+  if (!payload || !payload.primaryPath) {
+    return null;
+  }
+
+  const { field, summary } = buildConsonantField(payload, payload.primaryPath);
+  const { word, mode } = payload;
   const canon = CANON_CANDIDATES[word.toLowerCase()] ?? [];
 
   const candidates: Candidate[] = canon.map(c => {
@@ -190,7 +193,7 @@ export function enginePayloadToAnalysisResult(
   const sevenVoices = buildSevenVoicesSummary(payload);
   const symbolic = buildSymbolicLayer(candidates);
 
-  return {
+  const analysisResult: AnalysisResult_DEPRECATED = {
     core,
     consonants: { field, summary },
     candidates,
@@ -198,38 +201,28 @@ export function enginePayloadToAnalysisResult(
     sevenVoices,
     symbolic,
   };
+  
+  // Attach Heart Math as an optional extra layer
+  const math7 = computeMath7ForResult(analysisResult);
+  if (math7) {
+    analysisResult.math7 = math7;
+  }
+
+  return analysisResult;
 }
 
 // Converts the rich AnalysisResult back to a bare EnginePayload,
 // which is useful for mocks or testing other parts of the pipeline.
 export function analysisResultToEnginePayload(
   result: AnalysisResult_DEPRECATED | null
-): EnginePayload {
+): EnginePayload | null {
   if (!result || !result.core) {
-    return {
-      engineVersion: 'mock-v0',
-      word: 'error',
-      mode: 'strict',
-      alphabet: 'latin',
-      primaryPath: {
-        voicePath: [],
-        ringPath: [],
-        levelPath: [],
-        ops: [],
-        checksums: { V: 0, E: 0, C: 0 },
-        kept: 0,
-      },
-      frontierPaths: [],
-      windows: [],
-      windowClasses: [],
-      signals: [],
-    };
+    return null;
   }
 
   const { mode, alphabet } = result.core.input;
 
-  return (
-    result.debug?.rawEnginePayload ?? {
+  const basePayload = result.debug?.rawEnginePayload ?? {
       engineVersion: result.core.engineVersion,
       word: result.core.word,
       mode: mode,
@@ -250,6 +243,7 @@ export function analysisResultToEnginePayload(
         c => c.classes[0]
       ),
       signals: [],
-    }
-  );
+    };
+    
+  return { ...basePayload, math7: result.math7 };
 }
