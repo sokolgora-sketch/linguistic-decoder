@@ -1,122 +1,98 @@
 // src/engine/math7.ts
 //
-// Seven-Principles math layer for vowels.
-// PURE: no engine calls, just mappings and helpers over Vowel sequences.
+// Seven-Voices “Heart Math” over an AnalyzeWordResult.
+// Pure reader: it does NOT change the core solver, it just reads paths.
 
-import type { AnalyzeWordResult, Vowel, Math7Summary, Math7PathSummary, CycleState } from "@/shared/engineShape";
+import type { AnalyzeWordResult } from "@/shared/engineShape";
 
-// Internal numeric model (mod-7 universe):
-// A → 1, E → 2, I → 3, O → 4, U → 5, Y → 6, Ë → 0
-export const VOICE_TO_INDEX: Record<Vowel, number> = {
-  A: 1,
-  E: 2,
-  I: 3,
-  O: 4,
-  U: 5,
-  Y: 6,
-  Ë: 0,
+export type Math7CycleState = "open" | "balanced" | "overloaded";
+
+export interface Math7PathSummary {
+  voices: string[];            // e.g. ["U", "I"]
+  total: number;               // raw sum of indices
+  totalMod7: number;           // total % 7, 0–6
+  principlesPath: string[];    // mapped principle names
+  cycleState: Math7CycleState; // open | balanced | overloaded
+}
+
+export interface Math7Summary {
+  primary: Math7PathSummary;
+  frontier: Math7PathSummary[];
+  candidates: Record<string, Math7PathSummary>;
+}
+
+// Vowel → index 0–6
+const VOICE_INDEX: Record<string, number> = {
+  A: 0,
+  E: 1,
+  I: 2,
+  O: 3,
+  U: 4,
+  Y: 5,
+  Ë: 6,
 };
 
-export const INDEX_TO_PRINCIPLE: Record<number, string> = {
-  1: "Unity",      // A – Bashkimi
-  2: "Vibration",  // E – Vibrimi
-  3: "Rhythm",     // I – Ritmi
-  4: "Balance",    // O – Balanca (mediator)
-  5: "Change",     // U – Ndryshimi
-  6: "Initiative", // Y – Nisma
-  0: "Love",       // Ë – Dashuria / Resolution (7 ≡ 0)
+// Vowel → principle label
+const PRINCIPLE_BY_VOICE: Record<string, string> = {
+  A: "Truth",
+  E: "Expansion",
+  I: "Insight",
+  O: "Balance",
+  U: "Unity",
+  Y: "Network Integrity",
+  Ë: "Evolution",
 };
 
-// Inverse pairs in this mod-7 model:
-// A ↔ Y, E ↔ U, I ↔ O, Ë ↔ Ë
-export const INVERSE_PAIRS: Array<[Vowel, Vowel]> = [
-  ["A", "Y"],
-  ["E", "U"],
-  ["I", "O"],
-  ["Ë", "Ë"],
-];
-
-// ——— Basic helpers ———
-
-export function voicePathToIndexPath(voicePath: Vowel[]): number[] {
-  return voicePath.map(v => VOICE_TO_INDEX[v]);
+function parseVoicePath(path: string | undefined): string[] {
+  if (!path) return [];
+  return path
+    .split("→")
+    .map((s) => s.trim())
+    .filter(Boolean);
 }
 
-export function indexPathToPrinciples(indexPath: number[]): string[] {
-  return indexPath.map(i => INDEX_TO_PRINCIPLE[i]);
-}
+function scoreVoices(voices: string[]): Math7PathSummary {
+  const total = voices.reduce(
+    (sum, v) => sum + (VOICE_INDEX[v] ?? 0),
+    0
+  );
+  const totalMod7 = ((total % 7) + 7) % 7;
 
-// Sum indices mod 7, stay in [0..6]
-export function sumMod7(indexPath: number[]): number {
-  return indexPath.reduce((acc, n) => (acc + n) % 7, 0);
-}
-
-// Count how many inverse pairs (A–Y, E–U, I–O) are present in a path
-export function countInversePairs(voicePath: Vowel[]): number {
-  const set = new Set(voicePath);
-  let count = 0;
-  if (set.has("A") && set.has("Y")) count++;
-  if (set.has("E") && set.has("U")) count++;
-  if (set.has("I") && set.has("O")) count++;
-  // Ë↔Ë is special; we keep it out so pairCoverage stays 0–3.
-  return count;
-}
-
-// Normalize whatever we stored in AnalyzeWordResult.voicePath back to Vowel[]
-// We currently store "A → O → Ë" as a string in analyzeWord.
-function parseVoicePath(raw: unknown): Vowel[] {
-  if (!raw) return [];
-  if (Array.isArray(raw)) return raw as Vowel[];
-
-  if (typeof raw === "string") {
-    return raw
-      .split("→")
-      .map(s => s.trim())
-      .filter(Boolean) as Vowel[];
+  let cycleState: Math7CycleState;
+  if (totalMod7 === 0 || totalMod7 === 3) {
+    cycleState = "balanced";
+  } else if (totalMod7 === 1 || totalMod7 === 2) {
+    cycleState = "open";
+  } else {
+    cycleState = "overloaded";
   }
 
-  return [];
-}
-
-function summarizePath(voicePath: Vowel[]): Math7PathSummary {
-  const indexPath = voicePathToIndexPath(voicePath);
-  const totalMod7 = sumMod7(indexPath);
-  const principlesPath = indexPathToPrinciples(indexPath);
-  const pairCoverage = countInversePairs(voicePath);
-
-  let cycleState: CycleState;
-  if (totalMod7 === 0) cycleState = "balanced";
-  else if (totalMod7 <= 3) cycleState = "open";
-  else cycleState = "overloaded";
+  const principlesPath = voices.map(
+    (v) => PRINCIPLE_BY_VOICE[v] ?? v
+  );
 
   return {
-    voicePath,
-    indexPath,
+    voices,
+    total,
     totalMod7,
-    cycleState,
-    pairCoverage,
     principlesPath,
+    cycleState,
   };
 }
 
+// 🔥 Named export – this MUST exist and there must be NO default export.
 export function computeMath7ForResult(result: AnalyzeWordResult): Math7Summary {
-  // primary path
   const primaryVoices = parseVoicePath(result.primaryPath.voicePath);
-  const primary = summarizePath(primaryVoices);
+  const primary = scoreVoices(primaryVoices);
 
-  // frontier paths
-  const frontier = (result.frontier || []).map(f => {
-    const voices = parseVoicePath(f.voicePath);
-    return summarizePath(voices);
-  });
+  const frontier = (result.frontier || []).map((alt) =>
+    scoreVoices(parseVoicePath(alt.voicePath))
+  );
 
-  // per-language candidates
-  const candidates = (result.languageFamilies || []).map(c => {
+  const candidates: Record<string, Math7PathSummary> = {};
+  (result.languageFamilies || []).forEach((c: any) => {
     const voices = parseVoicePath(c.voicePath);
-    return {
-      ...summarizePath(voices),
-      language: c.language,
-    };
+    candidates[c.language] = scoreVoices(voices);
   });
 
   return {
