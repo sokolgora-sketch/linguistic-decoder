@@ -1,50 +1,38 @@
 // src/engine/math7.ts
-// Simple "Seven-Principles" math layer based on the existing analyzeWord result.
-// Safe placeholder: does not change the core engine, only adds a secondary view.
+//
+// Pure "Heart Math" helper.
+// Takes the full AnalyzeWordResult and derives a simple
+// Seven-Principles summary from the primary voice path.
 
-export interface Math7Primary {
-  cycleState: string;          // e.g. 'Open', 'Closed', 'Seed'
-  totalMod7: number;           // length of path mod 7
-  principlesPath: string[];    // mapped Seven Principles
-}
+import type { AnalyzeWordResult, Math7Summary } from "@/shared/engineShape";
 
-export interface Math7Result {
-  primary: Math7Primary;
-}
+const PRINCIPLE_MAP: Record<string, string> = {
+  A: "Truth",
+  E: "Expansion",
+  I: "Insight",
+  O: "Balance",
+  U: "Unity",
+  Y: "Network Integrity",
+  Ë: "Evolution",
+};
 
-// We keep this loose on purpose to avoid tight coupling with engineShape.ts
-// and accidentally breaking the locked AnalyzeWordResult contract.
-export function computeMath7ForResult(result: any): Math7Result {
-  const voicePathStr: string = result?.primaryPath?.voicePath || "";
-
-  // voicePath is like "O → E" or "U → I"
-  const steps = voicePathStr
+export function computeMath7ForResult(result: AnalyzeWordResult): Math7Summary {
+  const voicePath = result.primaryPath?.voicePath ?? "";
+  const vowels = voicePath
     .split("→")
-    .map((s) => s.trim())
+    .map((v) => v.trim())
     .filter(Boolean);
 
-  const totalMod7 = steps.length % 7;
+  const principlesPath = vowels.map((v) => PRINCIPLE_MAP[v] ?? v);
 
-  // Your Seven Principles in fixed order
-  const SEVEN_PRINCIPLES = [
-    "Truth",
-    "Expansion",
-    "Insight",
-    "Balance",
-    "Unity",
-    "Network Integrity",
-    "Evolution",
-  ];
-
-  // For now: map each step index onto a principle by position.
-  const principlesPath = steps.map((_, idx) => {
-    return SEVEN_PRINCIPLES[idx % SEVEN_PRINCIPLES.length];
-  });
+  const first = vowels[0];
+  const last = vowels[vowels.length - 1];
 
   const cycleState =
-    totalMod7 === 0 ? "Closed" :
-    totalMod7 === 1 ? "Seed" :
-    "Open";
+    vowels.length > 1 && first && last && first === last ? "closed" : "open";
+
+  // keep it simple for now: number of steps mod 7
+  const totalMod7 = ((vowels.length % 7) + 7) % 7;
 
   return {
     primary: {

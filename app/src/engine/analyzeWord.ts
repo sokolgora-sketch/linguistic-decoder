@@ -21,6 +21,8 @@ import { solveWord } from '@/functions/sevenVoicesCore';
 import { getManifest } from './manifest';
 import type { SolveOptions } from '@/functions/sevenVoicesCore';
 import { CANON_CANDIDATES } from '@/shared/canonCandidates';
+import { computeMath7ForResult } from "./math7";
+
 
 function runSevenVoices(word: string, opts: { mode: 'strict' | 'explore' }): any {
   const manifest = getManifest();
@@ -178,5 +180,8 @@ export function analyzeWord(word: string, mode: 'strict' | 'explore' = 'strict')
     symbolic,
   };
 
-  return result;
+  // 🔁 Attach Heart Math as an optional extra layer
+  const math7 = computeMath7ForResult(result);
+
+  return { ...result, math7 };
 }
