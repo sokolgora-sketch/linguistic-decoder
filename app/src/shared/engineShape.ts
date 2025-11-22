@@ -2,6 +2,7 @@
 
 import type { PrincipleV2, PrincipleId } from "@/engine/principles.v2";
 import type { SymbolicCoreResult } from "@/lib/symbolicCore";
+import type { Math7Summary } from "@/engine/math7";
 
 // Canonical shape your UI will use everywhere.
 export type Vowel = 'A' | 'E' | 'I' | 'O' | 'U' | 'Y' | 'Ë';
@@ -24,21 +25,6 @@ export type LanguageFamily = {
     signals: string[];
     dialect?: 'geg' | 'tosk';
 };
-
-// ---------------- Heart Math (Seven-Voices cycle) ----------------
-
-export interface Math7PrimarySummary {
-  /** e.g. "open", "closed" – simple cycle state */
-  cycleState: string;
-  /** total count reduced mod 7 */
-  totalMod7: number;
-  /** 7-Principles names along the path */
-  principlesPath: string[];
-}
-
-export interface Math7Summary {
-  primary: Math7PrimarySummary;
-}
 
 // This is what the app & JSON export will see.
 export type EnginePayload = {
@@ -346,7 +332,7 @@ export type AnalysisResult_DEPRECATED = {
   debug?: AnalysisDebug;
   sevenVoices?: SevenVoicesSummary;
   symbolic?: SymbolicLayer;
-  symbolicCore?: any; // Changed from SymbolicCoreResult to any to break circular dependency
+  symbolicCore?: SymbolicCoreResult;
   math7?: Math7Summary;
 };
 

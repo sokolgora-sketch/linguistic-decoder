@@ -189,7 +189,7 @@ export function enginePayloadToAnalysisResult(
   const sevenVoices = buildSevenVoicesSummary(payload);
   const symbolic = buildSymbolicLayer(candidates);
 
-  const analysisResult = {
+  const analysisResult: AnalysisResult_DEPRECATED = {
     core,
     consonants: { field, summary },
     candidates,
@@ -197,11 +197,14 @@ export function enginePayloadToAnalysisResult(
     sevenVoices,
     symbolic,
   };
+  
+  // Attach Heart Math as an optional extra layer
+  const math7 = computeMath7ForResult(analysisResult);
+  if (math7) {
+    analysisResult.math7 = math7;
+  }
 
-  // Attach math7 data.
-  const math7 = computeMath7ForResult(analysisResult as any);
-
-  return { ...analysisResult, math7 };
+  return analysisResult;
 }
 
 // Converts the rich AnalysisResult back to a bare EnginePayload,
