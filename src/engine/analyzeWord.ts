@@ -101,11 +101,15 @@ function attachCanonCandidates(base: any): any {
   const word = base.word.toLowerCase();
   const canon = CANON_CANDIDATES[word] || [];
 
+  // Words whose canon entries are treated as having true "manual" matrices
+  const MANUAL_MATRIX_WORDS = new Set(['study', 'damage']);
+
   const languageFamilies: LanguageFamilyCandidate[] = canon.map(
     (c: Candidate): LanguageFamilyCandidate => {
-      const hasManual = !!c.morphologyMatrix;
+      const treatAsManual =
+        MANUAL_MATRIX_WORDS.has(word) && !!c.morphologyMatrix;
 
-      const matrix: MorphologyMatrix = hasManual
+      const matrix: MorphologyMatrix = treatAsManual
         ? { ...c.morphologyMatrix, source: 'manual' as const }
         : buildGeneratedWordMatrix(c);
 
