@@ -99,25 +99,26 @@ export function PathRow({ title, block, analysis }: { title: string; block: any,
         
         {title === "Primary Path" && <ConsonantInfo analysis={analysis} />}
 
-        {math7 && (
-          <div className="mt-4 rounded-xl border px-4 py-3 text-sm bg-background/50">
+        {math7 && math7.primary && (
+          <div className="mt-4 rounded-xl border px-4 py-3 text-sm">
             <div className="font-semibold mb-1">
-              Heart (Seven-Voices Path)
+              Heart (Seven-Voices Math)
             </div>
+
             <div className="flex flex-wrap gap-4">
               <div>
                 <div className="text-xs uppercase opacity-70">State</div>
                 <div>{math7.primary.cycleState}</div>
               </div>
+
               <div>
                 <div className="text-xs uppercase opacity-70">Total (mod 7)</div>
                 <div>{math7.primary.totalMod7}</div>
               </div>
-              <div>
+
+              <div className="min-w-[220px]">
                 <div className="text-xs uppercase opacity-70">Principles Path</div>
-                <div>
-                  {math7.primary.principlesPath.join(" → ")}
-                </div>
+                <div>{math7.primary.principlesPath.join(" → ")}</div>
               </div>
             </div>
           </div>
