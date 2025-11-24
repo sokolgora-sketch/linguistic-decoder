@@ -1,6 +1,5 @@
 // src/shared/engineShape.ts
 
-import type { PrincipleV2, PrincipleId } from "@/engine/principles.v2";
 import type { SymbolicCoreResult } from "@/lib/symbolicCore";
 import type { Math7Summary } from "@/engine/math7";
 
