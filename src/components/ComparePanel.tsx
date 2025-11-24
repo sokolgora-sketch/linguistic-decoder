@@ -478,10 +478,10 @@ const ComparePanel: React.FC<ComparePanelProps> = ({
     rightPrinciplesPath || []
   );
 
-  const originRelation = classifyOriginRelation(leftMainCand, rightMainCand);
+  const originRelationNew = classifyOriginRelation(leftMainCand, rightMainCand);
 
   // --- Origin relationship ---
-  const originRelationLegacy = analyzeOriginRelation(left, right);
+  const originRelation = analyzeOriginRelation(left, right);
 
   // -----------------------------------------------------------------------
   // Render
@@ -777,13 +777,8 @@ const ComparePanel: React.FC<ComparePanelProps> = ({
               <span className="font-mono">{formatFunctionLine(left.word, leftFunctionText)}</span>
             </div>
             <div>
-              Right function (principles):{" "}
-              {right.word && (
-                <span className="font-semibold mr-1">
-                  {right.word.trim()}
-                </span>
-              )}
-              <span className="font-mono">{rightFunctionText}</span>
+              <span className="font-semibold">Right function (principles):</span>{" "}
+              <span className="font-mono">{formatFunctionLine(right.word, rightFunctionText)}</span>
             </div>
 
             <div>
@@ -805,24 +800,24 @@ const ComparePanel: React.FC<ComparePanelProps> = ({
               <span className="font-semibold">Origin relation:</span>{" "}
               <span
                 className={
-                  originRelationLegacy.family.startsWith("Shared")
+                  originRelation.family.startsWith("Shared")
                     ? "text-green-400"
                     : "text-yellow-400"
                 }
               >
-                {originRelationLegacy.family}
+                {originRelation.family}
               </span>{" "}
               |{" "}
               <span
                 className={
-                  originRelationLegacy.mirror.startsWith("YES")
+                  originRelation.mirror.startsWith("YES")
                     ? "text-blue-400"
-                    : originRelationLegacy.mirror.startsWith("Similar")
+                    : originRelation.mirror.startsWith("Similar")
                     ? "text-cyan-400"
                     : "text-muted-foreground"
                 }
               >
-                {originRelationLegacy.mirror}
+                {originRelation.mirror}
               </span>
             </div>
 
