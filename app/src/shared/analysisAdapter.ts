@@ -26,72 +26,9 @@ import { buildConsonantField } from "@/shared/consonantField";
 import { getVoiceMeta } from "@/shared/sevenVoices";
 import { detectAlbanianDialect } from "@/lib/detectDialect";
 import { computeMath7ForResult } from "@/engine/math7";
+import { computePrinciples } from "./computePrinciples";
+import { analyzeWord } from "@/engine/analyzeWord";
 
-/**
- * Builds a light Seven-Voices / principles summary from the primary path.
- * Safe against missing / empty paths.
- */
-function buildSevenVoicesSummary(
-  payload: EnginePayload
-): SevenVoicesSummary | undefined {
-  const path = payload.primaryPath?.voicePath;
-  if (!path || path.length === 0) return undefined;
-
-  const principlePath: PrincipleName[] = path.map(
-    (v) => getVoiceMeta(v).principle as PrincipleName
-  );
-
-  const voiceCounts: Record<string, number> = {};
-  for (const v of path) {
-    voiceCounts[v] = (voiceCounts[v] ?? 0) + 1;
-  }
-
-  const maxCount = Math.max(...Object.values(voiceCounts));
-  const dominant: PrincipleName[] = Object.entries(voiceCounts)
-    .filter(([, count]) => count === maxCount)
-    .map(([v]) => getVoiceMeta(v as any).principle as PrincipleName);
-
-  const sevenWords: PrincipleName[] = [
-    "Truth",
-    "Expansion",
-    "Insight",
-    "Balance",
-    "Unity",
-    "Network Integrity",
-    "Evolution",
-  ] as PrincipleName[];
-
-  return {
-    voicePath: path,
-    principlesPath: principlePath,
-    dominant,
-    sevenWords,
-  };
-}
-
-function buildSymbolicLayer(
-  candidates: Candidate[]
-): SymbolicLayer | undefined {
-  if (!candidates || candidates.length === 0) {
-    return undefined;
-  }
-
-  const notes: string[] = [];
-  for (const c of candidates) {
-    if (c.symbolic) {
-      for (const s of c.symbolic) {
-        notes.push(s.note);
-      }
-    }
-  }
-
-  if (notes.length === 0) return undefined;
-
-  return {
-    notes,
-    label: "Zheji-inspired symbolic reading (experimental)",
-  };
-}
 
 /**
  * Adapts a raw EnginePayload into the richer AnalysisResult structure,
@@ -110,82 +47,67 @@ export function enginePayloadToAnalysisResult(
   ) {
     return null;
   }
+  
+  const analysis = analyzeWord(payload.word, payload.mode);
 
-  // Cast to any to tolerate evolution of the consonant summary type
   const { field, summary } = buildConsonantField(
     payload,
     payload.primaryPath
-  ) as any;
+  );
 
-  const { word } = payload;
-  const canon = CANON_CANDIDATES[word.toLowerCase()] ?? [];
-
-  // Canonical candidates, with consonantProfileOk derived from axes.verdict
-  const candidates: Candidate[] = canon.map((c) => {
-    const profileOk = c.axes?.consonants === "pass";
-    return {
-      ...c,
-      consonantProfileOk: profileOk,
-    };
-  });
-
-  // If no canonical candidates, synthesize speculative ones from languageFamilies.
-  if (candidates.length === 0) {
-    for (const fam of payload.languageFamilies ?? []) {
-      candidates.push({
-        id: `spec_${fam.familyId}_${word}`,
-        language: fam.label,
-        family: fam.familyId,
-        form: (fam.forms && fam.forms[0]) ?? word,
-        decomposition: { parts: [], functionalStatement: fam.rationale },
-        voices: {
-          voiceSequence: payload.primaryPath.voicePath,
-          ringPath: payload.primaryPath.ringPath,
-          dominantVoices: {},
-        },
-        ruleChecks: {
-          soundPathOk: true,
-          functionalDecompOk: true,
-          sevenVoicesAlignmentOk: true,
-          consonantMeaningOk: true,
-          harmonyOk: true,
-        },
-        principleSignals: {
-          truthOk: true,
-          expansionOk: true,
-          insightOk: true,
-          balanceOk: true,
-          unityOk: true,
-          networkIntegrityOk: true,
-          evolutionOk: true,
-        },
-        status: "experimental",
-        confidenceTag: "speculative",
-      });
-    }
-  }
-
-  const core: AnalysisCore = {
-    word: payload.word,
-    engineVersion: payload.engineVersion,
-    input: {
-      raw: payload.word,
-      normalized: payload.word,
-      alphabet: payload.alphabet,
-      languageGuess: payload.languageFamilies?.[0]?.label ?? "unknown",
-      languageConfidence: "medium",
-      dialectGuess: detectAlbanianDialect(word),
-      // EnginePayload.mode is "strict" | "open", but AnalysisCore.input.mode
-      // is typed slightly differently in older code ("strict" | "explore").
-      // Cast keeps both sides happy without changing runtime behaviour.
-      mode: payload.mode as any,
+  const candidates: Candidate[] = (analysis.languageFamilies || []).map(c => ({
+    id: `${c.language}-${c.form}`,
+    language: c.language,
+    family: c.language,
+    form: c.form,
+    decomposition: {
+      parts: [],
+      functionalStatement: c.gloss,
     },
     voices: {
-      vowelVoices: payload.primaryPath.voicePath,
-      ringPath: payload.primaryPath.ringPath,
-      levelPath: payload.primaryPath.levelPath.map((l) =>
-        l > 0 ? "high" : l < 0 ? "low" : "mid"
-      ),
+      voiceSequence: c.voicePath.split('→').map(v => v.trim()) as any,
+      ringPath: c.ringPath.split('→').map(v => parseInt(v.trim())),
+      dominantVoices: {},
+    },
+    ruleChecks: {
+      soundPathOk: c.passes,
+      functionalDecompOk: c.passes,
+      sevenVoicesAlignmentOk: c.passes,
+      consonantMeaningOk: c.passes,
+      harmonyOk: c.passes,
+    },
+    principleSignals: {
+      truthOk: true,
+      expansionOk: true,
+      insightOk: true,
+      balanceOk: true,
+      unityOk: true,
+      networkIntegrityOk: true,
+      evolutionOk: true,
+    },
+    status: c.experimental ? 'experimental' : (c.passes ? 'pass' : 'fail'),
+    confidenceTag: c.speculative ? 'speculative' : 'solid',
+    morphologyMatrix: c.morphologyMatrix,
+    symbolic: c.symbolic,
+  }));
+
+
+  const core: AnalysisCore = {
+    word: analysis.word,
+    engineVersion: analysis.meta.engineVersion,
+    input: {
+      raw: analysis.word,
+      normalized: analysis.sanitized,
+      alphabet: analysis.meta.alphabet || 'auto',
+      languageGuess: analysis.languageFamilies?.[0]?.language ?? "unknown",
+      languageConfidence: "medium",
+      dialectGuess: detectAlbanianDialect(analysis.word),
+      mode: analysis.meta.mode,
+    },
+    voices: {
+      vowelVoices: analysis.primaryPath.voicePath.split('→').map(v=>v.trim()) as any,
+      ringPath: analysis.primaryPath.ringPath.split('→').map(v=>parseInt(v.trim())),
+      levelPath: analysis.primaryPath.levelPath.split('→').map(v=>v.trim()) as any,
       dominantVoices: {},
     },
     consonants: {
@@ -202,35 +124,32 @@ export function enginePayloadToAnalysisResult(
     },
     heartPaths: {
       primary: {
-        voiceSequence: payload.primaryPath.voicePath,
-        ringPath: payload.primaryPath.ringPath,
+        voiceSequence: analysis.primaryPath.voicePath.split('→').map(v=>v.trim()) as any,
+        ringPath: analysis.primaryPath.ringPath.split('→').map(v=>parseInt(v.trim())),
         tensionLevel: "low",
       },
-      frontierCount: payload.frontierPaths.length,
+      frontierCount: analysis.frontier.length,
     },
+    primaryPath: analysis.primaryPath,
   };
 
   const debug: AnalysisDebug = {
     rawEnginePayload: payload,
   };
 
-  const sevenVoices = buildSevenVoicesSummary(payload);
-  const symbolic = buildSymbolicLayer(candidates);
+  const principles = computePrinciples(payload);
 
   const analysisResult: AnalysisResult_DEPRECATED = {
     core,
     consonants: { field, summary: summary as any },
     candidates,
     debug,
-    sevenVoices,
-    symbolic,
+    sevenVoices: undefined, // This can be rebuilt if needed
+    symbolic: analysis.symbolic,
+    math7: analysis.math7,
+    principles,
   };
 
-  // Attach Math7 / Heart layer (optional)
-  const math7 = computeMath7ForResult(analysisResult);
-  if (math7) {
-    (analysisResult as any).math7 = math7;
-  }
 
   return analysisResult;
 }

@@ -6,7 +6,7 @@ import { classRange } from "../functions/languages";
 import type { EnginePayload, AnalysisResult_DEPRECATED, Vowel } from "../shared/engineShape";
 import { getVoiceMeta } from '@/shared/sevenVoices';
 import WhyThisPath from "./WhyThisPath";
-import { VOICE_COLOR_MAP } from "../shared/voiceColors";
+import { VOICE_COLOR_MAP } from "@/shared/voiceColors";
 import { Candidates } from "./Candidates";
 import { PrinciplesBlock } from "./PrinciplesBlock";
 import { SymbolicReadingCard } from "./SymbolicReadingCard";
@@ -151,24 +151,29 @@ const Chip = ({ v }: { v: string | number }) => {
 
 
 export function ResultsDisplay({ analysis }: { analysis: AnalysisResult_DEPRECATED | null }) {
-  const handleExportJson = () => {
-    if (!analysis) return;
-
-    const rawWord = analysis.core.word || "analysis";
-
-    const safeWord = String(rawWord).toLowerCase().replace(/[^a-z0-9_-]+/g, "-") || "analysis";
-
-    downloadJson(`analysis-${safeWord}.json`, analysis);
-  };
-
   if (!analysis) return null;
   const { core, candidates, symbolic, debug } = analysis;
   const raw = debug?.rawEnginePayload;
 
+  // The primaryPath in the new AnalyzeWordResult is a string, not an array.
+  // We need to parse it back into an array for the PathRow component.
+  const primaryVoicePath = core.primaryPath.voicePath.split(" → ").filter(Boolean) as Vowel[];
+  const primaryRingPath = core.primaryPath.ringPath.split(" → ").map(Number);
+  // Map 'high'/'mid'/'low' back to numbers for LEVEL_LABEL
+  const primaryLevelPath = core.primaryPath.levelPath.split(" → ").map(l => (l === 'high' ? 1 : l === 'mid' ? 0 : -1));
+
   return (
     <div className="space-y-4">
-        {core && core.heartPaths && (
-            <PathRow block={{voicePath: core.voices.vowelVoices, ringPath: core.voices.ringPath, levelPath: core.voices.levelPath.map(l=>l==='high'?1:l==='low'?-1:0)}} title="Primary Path" analysis={analysis} />
+        {core && core.primaryPath && (
+            <PathRow
+              title="Primary Path"
+              block={{
+                voicePath: primaryVoicePath,
+                ringPath: primaryRingPath,
+                levelPath: primaryLevelPath,
+              }}
+              analysis={analysis}
+            />
         )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -180,7 +185,7 @@ export function ResultsDisplay({ analysis }: { analysis: AnalysisResult_DEPRECAT
         
         {symbolic && <SymbolicReadingCard symbolic={symbolic} />}
 
-        {core && core.heartPaths && raw && raw.frontierPaths.length > 0 && (
+        {raw && raw.frontierPaths && raw.frontierPaths.length > 0 && (
           <Card className="p-4 mt-4">
             <h3 className="font-bold text-sm tracking-wide">Frontier (near‑optimal alternates)</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mt-3">
@@ -216,11 +221,6 @@ export function ResultsDisplay({ analysis }: { analysis: AnalysisResult_DEPRECAT
             </div>
           </Card>
         )}
-         <div className="flex justify-end pt-2">
-            <Button variant="outline" size="sm" onClick={handleExportJson}>
-                Export JSON
-            </Button>
-        </div>
     </div>
   );
 }
