@@ -3,18 +3,10 @@
 
 import * as React from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { VOICE_COLOR_MAP } from "@/shared/voiceColors";
 
 type Vowel = "A" | "E" | "I" | "O" | "U" | "Y" | "Ë";
 const ORDER: Vowel[] = ["A", "E", "I", "O", "U", "Y", "Ë"];
-const VOICE_COLOR: Record<Vowel, string> = {
-  A: "#EF4444",
-  E: "#F59E0B",
-  I: "#EAB308",
-  O: "#10B981",
-  U: "#3B82F6",
-  Y: "#6366F1",
-  "Ë": "#8B5CF6",
-};
 
 const PALETTE = { 
   rail:"#4b5563", 
@@ -209,7 +201,7 @@ export function TwoRailsWithConsonants({
           <circle cx={x} cy={yFor(v)} r={10} fill="#1F2937" stroke={PALETTE.rail} strokeOpacity={0.5}/>
           {showLabels && (
             <text x={x + (x===leftX ? -24 : 24)} y={yFor(v)+4} fontSize={12}
-              textAnchor={x===leftX ? "end":"start"} fill={VOICE_COLOR[v]}>{v}</text>
+              textAnchor={x===leftX ? "end":"start"} fill={VOICE_COLOR_MAP[v]}>{v}</text>
           )}
         </g>
       ))}
@@ -297,7 +289,7 @@ export function TwoRailsWithConsonants({
         <AnimatePresence>
           {pos && (
             <motion.circle key={`${pos.x}-${pos.y}`} cx={pos.x} cy={pos.y} r={11}
-              fill={VOICE_COLOR[path[Math.min(idx, path.length-1)] ] || "#3F51B5"}
+              fill={VOICE_COLOR_MAP[path[Math.min(idx, path.length-1)] ] || "#3F51B5"}
               stroke="#fff" strokeOpacity={0.7}
               initial={{ scale: 0.7, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
               transition={{ type:"spring", stiffness:140, damping:18 }}
@@ -309,10 +301,10 @@ export function TwoRailsWithConsonants({
         {!running && path.length>=2 && (
           <g>
             <circle cx={idx%2===0?leftX:rightX} cy={yFor(path[Math.min(idx, path.length-1)])} r={6}
-              fill={VOICE_COLOR[path[Math.min(idx, path.length-1)]]}/>
+              fill={VOICE_COLOR_MAP[path[Math.min(idx, path.length-1)]]}/>
             {idx < path.length-1 && (
               <circle cx={idx%2===0?rightX:leftX} cy={yFor(path[idx+1])} r={6}
-                fill={VOICE_COLOR[path[idx+1]]} fillOpacity={0.6}/>
+                fill={VOICE_COLOR_MAP[path[idx+1]]} fillOpacity={0.6}/>
             )}
           </g>
         )}
