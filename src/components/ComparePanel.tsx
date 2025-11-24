@@ -32,11 +32,6 @@ const initialSide: SideState = {
   result: null,
 };
 
-interface ComparePanelProps {
-  defaultMode: Mode;
-  defaultAlphabet: Alphabet;
-}
-
 type OriginCandidate = {
   language?: string | null;
   family?: string | null;
@@ -756,94 +751,101 @@ const ComparePanel: React.FC<ComparePanelProps> = ({
 
         {/* Comparison summary --------------------------------------------- */}
         {left.result && right.result && (
-          <div className="mt-4 rounded-lg border border-border/70 bg-muted/40 p-3 text-xs space-y-2">
-            <div className="font-semibold text-sm mb-1">
-              Comparison summary
-            </div>
+          <Card className="mt-6">
+            <CardHeader>
+              <CardTitle>Comparison summary</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-1 text-xs">
+              {comparisonVerdict && (
+                <p className="mb-2 text-sm">
+                  <span className="font-semibold">Verdict:</span>{" "}
+                  {comparisonVerdict}
+                </p>
+              )}
+              <div>
+                Primary path:{" "}
+                <span className="font-mono">
+                  {primaryPathEqual ? "SAME" : "DIFFERENT"}
+                </span>
+              </div>
+              <div>
+                Opener:{" "}
+                <span className="font-mono">
+                  {describeVoice(leftOpener)}
+                  {" vs "}
+                  {describeVoice(rightOpener)}
+                </span>
+              </div>
+              <div>
+                Closer:{" "}
+                <span className="font-mono">
+                  {describeVoice(leftCloser)}
+                  {" vs "}
+                  {describeVoice(rightCloser)}
+                </span>
+              </div>
+              <div>
+                Total mod 7:{" "}
+                <span className="font-mono">
+                  {leftHeart?.totalMod7 ?? "—"}
+                </span>{" "}
+                vs{" "}
+                <span className="font-mono">
+                  {rightHeart?.totalMod7 ?? "—"}
+                </span>
+              </div>
+              <div>
+                Left heart:{" "}
+                <span className="font-mono">{leftHeartLabel}</span>
+              </div>
+              <div>
+                Right heart:{" "}
+                <span className="font-mono">{rightHeartLabel}</span>
+              </div>
+              <div>
+                Shared voices:{" "}
+                <span className="font-mono">
+                  {sharedVoices.length ? sharedVoices.join(", ") : "none"}
+                </span>
+              </div>
 
-            <div>
-              Primary path:{" "}
-              <span className="font-mono">
-                {primaryPathEqual ? "SAME" : "DIFFERENT"}
-              </span>
-            </div>
-            <div>
-              Opener:{" "}
-              <span className="font-mono">
-                {describeVoice(leftOpener)}{" "}
-                {" vs "}
-                {describeVoice(rightOpener)}
-              </span>
-            </div>
-            <div>
-              Closer:{" "}
-              <span className="font-mono">
-                {describeVoice(leftCloser)}{" "}
-                {" vs "}
-                {describeVoice(rightCloser)}
-              </span>
-            </div>
-            <div>
-              Total mod 7:{" "}
-              <span className="font-mono">
-                {leftHeart?.totalMod7 ?? "—"}
-              </span>{" "}
-              vs{" "}
-              <span className="font-mono">
-                {rightHeart?.totalMod7 ?? "—"}
-              </span>
-            </div>
-            <div>
-              Left heart:{" "}
-              <span className="font-mono">{leftHeartLabel}</span>
-            </div>
-            <div>
-              Right heart:{" "}
-              <span className="font-mono">{rightHeartLabel}</span>
-            </div>
-            <div>
-              Shared voices:{" "}
-              <span className="font-mono">
-                {sharedVoices.length ? sharedVoices.join(", ") : "none"}
-              </span>
-            </div>
+              <div>
+                <span className="font-semibold">Left function (principles):</span>{" "}
+                <span className="font-mono">{formatFunctionLine(left.word, leftFunctionText)}</span>
+              </div>
+              <div>
+                <span className="font-semibold">Right function (principles):</span>{" "}
+                <span className="font-mono">{formatFunctionLine(right.word, rightFunctionText)}</span>
+              </div>
 
-            <div>
-              <span className="font-semibold">Left function (principles):</span>{" "}
-              <span className="font-mono">{formatFunctionLine(left.word, leftFunctionText)}</span>
-            </div>
-            <div>
-              <span className="font-semibold">Right function (principles):</span>{" "}
-              <span className="font-mono">{formatFunctionLine(right.word, rightFunctionText)}</span>
-            </div>
+              <div>
+                <span className="font-semibold">Origin relation:</span>{" "}
+                {originRelationNew.label}
+                {originRelationNew.detail ? ` — ${originRelationNew.detail}` : ""}
+              </div>
 
-            <div>
-              <span className="font-semibold">Origin relation:</span>{" "}
-              {originRelationNew.label}
-              {originRelationNew.detail ? ` — ${originRelationNew.detail}` : ""}
-            </div>
+              <div>
+                Origin function (left):{" "}
+                <span className="font-mono">
+                  {leftMainCand?.decomposition?.functionalStatement ?? "—"}
+                </span>
+              </div>
+              <div>
+                Origin function (right):{" "}
+                <span className="font-mono">
+                  {rightMainCand?.decomposition?.functionalStatement ?? "—"}
+                </span>
+              </div>
 
-            <div>
-              Origin function (left):{" "}
-              <span className="font-mono">
-                {leftMainCand?.decomposition?.functionalStatement ?? "—"}
-              </span>
-            </div>
-            <div>
-              Origin function (right):{" "}
-              <span className="font-mono">
-                {rightMainCand?.decomposition?.functionalStatement ?? "—"}
-              </span>
-            </div>
-
-            <div className="text-[11px] text-muted-foreground mt-1">
-              Both sides use the same engine pipeline
-              (EnginePayload → analysisAdapter → math7). This panel shows how
-              their paths open, close, overlap, and what kind of functional
-              movement each word encodes at the Seven-Voices level, including
-              the best origin candidate and its axes when available.
-            </div>
-          </div>
+              <div className="text-[11px] text-muted-foreground mt-1 pt-2 border-t">
+                Both sides use the same engine pipeline
+                (EnginePayload → analysisAdapter → math7). This panel shows how
+                their paths open, close, overlap, and what kind of functional
+                movement each word encodes at the Seven-Voices level, including
+                the best origin candidate and its axes when available.
+              </div>
+            </CardContent>
+          </Card>
         )}
       </CardContent>
     </Card>
