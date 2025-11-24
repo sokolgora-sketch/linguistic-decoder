@@ -133,6 +133,33 @@ function analyzeOriginRelation(
   return { family, mirror };
 }
 
+function formatFunctionLine(
+  word: string | null | undefined,
+  fn: string | null | undefined
+): string {
+  const label = (word ?? "").trim();
+  if (!fn) {
+    return label || "—";
+  }
+
+  const trimmed = fn.trim();
+  if (!trimmed) {
+    return label || "—";
+  }
+
+  // lower-case first letter so it reads as a continuation
+  const first = trimmed.charAt(0).toLowerCase();
+  const rest = trimmed.slice(1);
+  const lowered = first + rest;
+
+  // drop trailing dots and add a single one
+  const noTrailingDot = lowered.replace(/\.*$/, "");
+
+  return label
+    ? `${label} — ${noTrailingDot}.`
+    : `${noTrailingDot}.`;
+}
+
 // ---------------------------------------------------------------------------
 // Small helpers
 // ---------------------------------------------------------------------------
@@ -452,6 +479,9 @@ const ComparePanel: React.FC<ComparePanelProps> = ({
   );
 
   const originRelation = classifyOriginRelation(leftMainCand, rightMainCand);
+
+  // --- Origin relationship ---
+  const originRelationLegacy = analyzeOriginRelation(left, right);
 
   // -----------------------------------------------------------------------
   // Render
