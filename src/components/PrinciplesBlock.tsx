@@ -1,69 +1,28 @@
-// src/components/PrinciplesBlock.tsx
-"use client";
+import React from "react";
+import { Card } from "./ui/card";
+import type { PrinciplesSet } from "@/shared/engineShape";
 
-import type { AnalysisResult, SevenVoicesSummary } from "@/shared/engineShape";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
-
-type PrinciplesBlockProps = {
-  analysis: AnalysisResult;
-};
-
-function hasData(sv: SevenVoicesSummary | undefined): sv is SevenVoicesSummary {
-    return !!sv && Array.isArray(sv.principlesPath) && sv.principlesPath.length > 0;
-}
-
-
-export function PrinciplesBlock({ analysis }: PrinciplesBlockProps) {
-  const sv = analysis.sevenVoices;
-
-  if (!hasData(sv)) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Seven Principles</CardTitle>
-          <CardDescription>Coming soon for this word.</CardDescription>
-        </CardHeader>
-        <CardContent className="text-sm text-muted-foreground">
-          Engine voice path: {analysis.core.voices.vowelVoices.join(' → ')}
-        </CardContent>
-      </Card>
-    );
-  }
+export function PrinciplesBlock({ analysis }: { analysis: any }) {
+  const pset: PrinciplesSet | undefined = analysis.principles;
+  if (!pset || !pset.principles?.length) return null;
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Seven Principles</CardTitle>
-        <CardDescription>
-          Path: {sv.principlesPath.join(' → ')}
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-3 text-sm">
-        <div>
-          <div className="font-medium">Voice Path</div>
-          <div>{sv.voicePath.join(' → ')}</div>
-        </div>
-
-        <div>
-          <div className="font-medium">Dominant</div>
-          <div>{sv.dominant.join(', ')}</div>
-        </div>
-
-        <div>
-          <div className="font-medium">7 words (experimental)</div>
-          {sv.sevenWords && sv.sevenWords.length === 7 ? (
-            <ol className="list-decimal list-inside space-y-1">
-              {sv.sevenWords.map((w, i) => (
-                <li key={i}>{w}</li>
-              ))}
-            </ol>
-          ) : (
-            <p className="text-xs text-muted-foreground">
-              Not enough signal yet for a full sentence.
-            </p>
-          )}
-        </div>
-      </CardContent>
+    <Card className="p-4 space-y-2">
+      <h3 className="font-bold text-sm tracking-wide">Seven Principles (Heart Calculator)</h3>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
+        {pset.principles.map(p => (
+          <div key={p.id} className="flex flex-col border border-border/50 rounded-lg p-2 bg-muted/30">
+            <div className="flex items-center justify-between">
+              <span className="font-semibold text-primary">{p.id}</span>
+              <span className="text-xs opacity-70">{(p.value*100).toFixed(0)}%</span>
+            </div>
+            <div className="text-xs opacity-80">{p.name}</div>
+            <div className={`text-[11px] mt-1 ${p.active ? "text-accent-foreground" : "text-muted-foreground"}`}>
+              {p.summary}
+            </div>
+          </div>
+        ))}
+      </div>
     </Card>
   );
 }
