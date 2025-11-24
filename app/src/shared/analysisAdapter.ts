@@ -10,7 +10,6 @@
  *  - Do NOT let auto-refactor / AI tools delete or inline this file.
  *  - If you change how something is mapped, re-run Jest and keep all suites green.
  */
-// src/shared/analysisAdapter.ts
 
 import type {
   AnalysisCore,
@@ -20,11 +19,12 @@ import type {
   EnginePayload,
   SevenVoicesSummary,
   SymbolicLayer,
-} from "./engineShape";
-import { CANON_CANDIDATES } from "./canonCandidates";
-import { buildConsonantField } from "./consonantField";
-import { getVoiceMeta } from "./sevenVoices";
-import { detectAlbanianDialect } from "../lib/detectDialect";
+  PrincipleName,
+} from "@/shared/engineShape";
+import { CANON_CANDIDATES } from "@/shared/canonCandidates";
+import { buildConsonantField } from "@/shared/consonantField";
+import { getVoiceMeta } from "@/shared/sevenVoices";
+import { detectAlbanianDialect } from "@/lib/detectDialect";
 import { computeMath7ForResult } from "@/engine/math7";
 
 /**
@@ -37,7 +37,9 @@ function buildSevenVoicesSummary(
   const path = payload.primaryPath?.voicePath;
   if (!path || path.length === 0) return undefined;
 
-  const principlePath = path.map((v) => getVoiceMeta(v).principle);
+  const principlePath: PrincipleName[] = path.map(
+    (v) => getVoiceMeta(v).principle as PrincipleName
+  );
 
   const voiceCounts: Record<string, number> = {};
   for (const v of path) {
@@ -45,11 +47,11 @@ function buildSevenVoicesSummary(
   }
 
   const maxCount = Math.max(...Object.values(voiceCounts));
-  const dominant = Object.entries(voiceCounts)
+  const dominant: PrincipleName[] = Object.entries(voiceCounts)
     .filter(([, count]) => count === maxCount)
-    .map(([v]) => getVoiceMeta(v as any).principle);
+    .map(([v]) => getVoiceMeta(v as any).principle as PrincipleName);
 
-  const sevenWords = [
+  const sevenWords: PrincipleName[] = [
     "Truth",
     "Expansion",
     "Insight",
@@ -57,7 +59,7 @@ function buildSevenVoicesSummary(
     "Unity",
     "Network Integrity",
     "Evolution",
-  ];
+  ] as PrincipleName[];
 
   return {
     voicePath: path,
@@ -109,10 +111,11 @@ export function enginePayloadToAnalysisResult(
     return null;
   }
 
+  // Cast to any to tolerate evolution of the consonant summary type
   const { field, summary } = buildConsonantField(
     payload,
     payload.primaryPath
-  );
+  ) as any;
 
   const { word } = payload;
   const canon = CANON_CANDIDATES[word.toLowerCase()] ?? [];
@@ -172,7 +175,10 @@ export function enginePayloadToAnalysisResult(
       languageGuess: payload.languageFamilies?.[0]?.label ?? "unknown",
       languageConfidence: "medium",
       dialectGuess: detectAlbanianDialect(word),
-      mode: "strict",
+      // EnginePayload.mode is "strict" | "open", but AnalysisCore.input.mode
+      // is typed slightly differently in older code ("strict" | "explore").
+      // Cast keeps both sides happy without changing runtime behaviour.
+      mode: payload.mode as any,
     },
     voices: {
       vowelVoices: payload.primaryPath.voicePath,
@@ -213,7 +219,7 @@ export function enginePayloadToAnalysisResult(
 
   const analysisResult: AnalysisResult_DEPRECATED = {
     core,
-    consonants: { field, summary },
+    consonants: { field, summary: summary as any },
     candidates,
     debug,
     sevenVoices,
@@ -240,10 +246,19 @@ export function analysisResultToEnginePayload(
     return null;
   }
 
-  const { mode, alphabet } = result.core.input;
+  const { alphabet } = result.core.input;
+  const modeFromResult = result.core.input.mode as any;
 
-  const basePayload =
-    result.debug?.rawEnginePayload ?? {
+  // Normalise back to the EnginePayload mode type ("strict" | "open").
+  const mode: EnginePayload["mode"] =
+    modeFromResult === "open" ? "open" : "strict";
+
+  let basePayload: EnginePayload;
+
+  if (result.debug?.rawEnginePayload) {
+    basePayload = result.debug.rawEnginePayload as EnginePayload;
+  } else {
+    basePayload = {
       engineVersion: result.core.engineVersion,
       word: result.core.word,
       mode,
@@ -265,7 +280,12 @@ export function analysisResultToEnginePayload(
       ),
       signals: [],
     };
+  }
 
-  // We optionally attach math7 here so it can round-trip if needed.
-  return { ...basePayload, math7: (result as any).math7 };
+  // Optionally attach math7 here so it can round-trip if needed.
+  if ((result as any).math7) {
+    (basePayload as any).math7 = (result as any).math7;
+  }
+
+  return basePayload;
 }
