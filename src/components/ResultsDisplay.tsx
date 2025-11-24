@@ -155,12 +155,9 @@ export function ResultsDisplay({ analysis }: { analysis: AnalysisResult_DEPRECAT
   const { core, candidates, symbolic, debug } = analysis;
   const raw = debug?.rawEnginePayload;
 
-  // The primaryPath in the new AnalyzeWordResult is a string, not an array.
-  // We need to parse it back into an array for the PathRow component.
-  const primaryVoicePath = core.primaryPath.voicePath.split(" → ").filter(Boolean) as Vowel[];
-  const primaryRingPath = core.primaryPath.ringPath.split(" → ").map(Number);
-  // Map 'high'/'mid'/'low' back to numbers for LEVEL_LABEL
-  const primaryLevelPath = core.primaryPath.levelPath.split(" → ").map(l => (l === 'high' ? 1 : l === 'mid' ? 0 : -1));
+  const primaryVoicePath = core.voices.vowelVoices;
+  const primaryRingPath = core.voices.ringPath;
+  const primaryLevelPath = core.voices.levelPath.map(l => (l === 'high' ? 1 : l === 'mid' ? 0 : -1));
 
   return (
     <div className="space-y-4">

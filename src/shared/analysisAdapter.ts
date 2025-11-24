@@ -10,7 +10,6 @@
  *  - Do NOT let auto-refactor / AI tools delete or inline this file.
  *  - If you change how something is mapped, re-run Jest and keep all suites green.
  */
-// src/shared/analysisAdapter.ts
 
 import type {
   AnalysisCore,
@@ -20,13 +19,15 @@ import type {
   EnginePayload,
   SevenVoicesSummary,
   SymbolicLayer,
-} from "./engineShape";
-import { CANON_CANDIDATES } from "./canonCandidates";
-import { buildConsonantField } from "./consonantField";
-import { getVoiceMeta } from "./sevenVoices";
-import { detectAlbanianDialect } from "../lib/detectDialect";
+  PrincipleName,
+} from "@/shared/engineShape";
+import { CANON_CANDIDATES } from "@/shared/canonCandidates";
+import { buildConsonantField } from "@/shared/consonantField";
+import { getVoiceMeta } from "@/shared/sevenVoices";
+import { detectAlbanianDialect } from "@/lib/detectDialect";
 import { computeMath7ForResult } from "@/engine/math7";
 import { computePrinciples } from "./computePrinciples";
+
 
 /**
  * Builds a light Seven-Voices / principles summary from the primary path.
@@ -92,6 +93,7 @@ function buildSymbolicLayer(
   };
 }
 
+
 /**
  * Adapts a raw EnginePayload into the richer AnalysisResult structure,
  * which includes canonical candidates, consonant summaries, Seven-Voices summary,
@@ -109,7 +111,7 @@ export function enginePayloadToAnalysisResult(
   ) {
     return null;
   }
-
+  
   const { field, summary } = buildConsonantField(
     payload,
     payload.primaryPath
@@ -159,10 +161,34 @@ export function enginePayloadToAnalysisResult(
         },
         status: "experimental",
         confidenceTag: "speculative",
-      });
+      } as any);
     }
   }
 
+  // Create a temporary object that conforms to AnalyzeWordResult for computeMath7ForResult
+  const analysisForMath7 = {
+    word: payload.word,
+    primaryPath: {
+      voicePath: payload.primaryPath.voicePath.join(' → '),
+      levelPath: payload.primaryPath.levelPath.map((l: number) => l === 1 ? 'high' : l === 0 ? 'mid' : 'low').join(' → '),
+      ringPath: payload.primaryPath.ringPath.join(' → '),
+    },
+    frontier: payload.frontierPaths.map((alt: any, idx: number) => ({
+      id: `alt-${idx + 1}`,
+      voicePath: alt.voicePath.join(' → '),
+      levelPath: alt.levelPath.map((l: number) => l === 1 ? 'high' : l === 0 ? 'mid' : 'low').join(' → '),
+      ringPath: alt.ringPath.join(' → '),
+    })),
+    languageFamilies: (payload.languageFamilies || []).map((c: any) => ({
+      language: c.label,
+      form: c.forms?.[0] ?? payload.word,
+      gloss: c.rationale,
+      voicePath: payload.primaryPath.voicePath.join(' → '),
+      // ... other properties
+    })),
+    // ... other meta properties if needed by computeMath7ForResult
+  };
+  
   const core: AnalysisCore = {
     word: payload.word,
     engineVersion: payload.engineVersion,
@@ -173,14 +199,14 @@ export function enginePayloadToAnalysisResult(
       languageGuess: payload.languageFamilies?.[0]?.label ?? "unknown",
       languageConfidence: "medium",
       dialectGuess: detectAlbanianDialect(word),
-      mode: "strict",
+      mode: payload.mode as 'strict' | 'open',
     },
     voices: {
       vowelVoices: payload.primaryPath.voicePath,
       ringPath: payload.primaryPath.ringPath,
       levelPath: payload.primaryPath.levelPath.map((l) =>
         l > 0 ? "high" : l < 0 ? "low" : "mid"
-      ),
+      ) as ('high' | 'mid' | 'low')[],
       dominantVoices: {},
     },
     consonants: {
@@ -203,6 +229,7 @@ export function enginePayloadToAnalysisResult(
       },
       frontierCount: payload.frontierPaths.length,
     },
+    primaryPath: analysisForMath7.primaryPath,
   };
 
   const debug: AnalysisDebug = {
@@ -214,20 +241,14 @@ export function enginePayloadToAnalysisResult(
 
   const analysisResult: AnalysisResult_DEPRECATED = {
     core,
-    consonants: { field, summary },
+    consonants: { field, summary: summary as any },
     candidates,
     debug,
     sevenVoices,
     symbolic,
+    principles: computePrinciples(payload),
+    math7: computeMath7ForResult(analysisForMath7 as any),
   };
-
-  // Attach Math7 / Heart layer (optional)
-  const math7 = computeMath7ForResult(analysisResult);
-  if (math7) {
-    (analysisResult as any).math7 = math7;
-  }
-  
-  (analysisResult as any).principles = computePrinciples(payload);
 
   return analysisResult;
 }
@@ -243,10 +264,19 @@ export function analysisResultToEnginePayload(
     return null;
   }
 
-  const { mode, alphabet } = result.core.input;
+  const { alphabet } = result.core.input;
+  const modeFromResult = result.core.input.mode as any;
 
-  const basePayload =
-    result.debug?.rawEnginePayload ?? {
+  // Normalise back to the EnginePayload mode type ("strict" | "open").
+  const mode: EnginePayload["mode"] =
+    modeFromResult === "open" ? "open" : "strict";
+
+  let basePayload: EnginePayload;
+
+  if (result.debug?.rawEnginePayload) {
+    basePayload = result.debug.rawEnginePayload as EnginePayload;
+  } else {
+    basePayload = {
       engineVersion: result.core.engineVersion,
       word: result.core.word,
       mode,
@@ -268,7 +298,12 @@ export function analysisResultToEnginePayload(
       ),
       signals: [],
     };
+  }
 
-  // We optionally attach math7 here so it can round-trip if needed.
-  return { ...basePayload, math7: (result as any).math7 };
+  // Optionally attach math7 here so it can round-trip if needed.
+  if ((result as any).math7) {
+    (basePayload as any).math7 = (result as any).math7;
+  }
+
+  return basePayload;
 }
