@@ -37,6 +37,36 @@ interface ComparePanelProps {
   defaultAlphabet: Alphabet;
 }
 
+// --- Origin comparison helper ---
+function analyzeOriginRelation(
+  left: any,
+  right: any
+): { family: string; mirror: string } {
+  const leftFamily = left?.result?.origin?.family || left?.result?.originCandidate || "";
+  const rightFamily = right?.result?.origin?.family || right?.result?.originCandidate || "";
+
+  let family = "Unknown";
+  if (leftFamily && rightFamily) {
+    if (leftFamily === rightFamily) family = `Shared (${leftFamily})`;
+    else family = `Different (${leftFamily} vs ${rightFamily})`;
+  }
+
+  const leftPrinciples = left?.result?.primary?.principlesPath || [];
+  const rightPrinciples = right?.result?.primary?.principlesPath || [];
+  let mirror = "No";
+  if (leftPrinciples.length && rightPrinciples.length) {
+    const lOpen = leftPrinciples[0];
+    const lClose = leftPrinciples[leftPrinciples.length - 1];
+    const rOpen = rightPrinciples[0];
+    const rClose = rightPrinciples[rightPrinciples.length - 1];
+
+    if (lOpen === rClose && lClose === rOpen) mirror = "YES — reversed path";
+    else if (lClose === rClose) mirror = "Similar — same closure";
+  }
+
+  return { family, mirror };
+}
+
 // ---------------------------------------------------------------------------
 // Small helpers
 // ---------------------------------------------------------------------------
