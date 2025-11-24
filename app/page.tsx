@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useEffect, useMemo } from "react";
@@ -523,7 +524,7 @@ export default function LinguisticDecoderApp(){
             </div>
           </div>
 
-          {data && (
+          {analysisResult && (
             <Card
               key={`${data.word}-${data.mode}-${data.alphabet}`}
               className="animate-fade-in"
@@ -536,7 +537,7 @@ export default function LinguisticDecoderApp(){
               </CardHeader>
               <CardContent className="space-y-4">
                 {/* Pass EnginePayload directly so ResultsDisplay can adapt it */}
-                <ResultsDisplay analysis={data} />
+                <ResultsDisplay analysis={analysisResult} />
                 <div className="flex justify-end pt-2">
                   {data && <ExportJsonButton analysis={data} />}
                 </div>

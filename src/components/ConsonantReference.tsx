@@ -3,7 +3,7 @@
 import { Card } from "./ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
 import type { Vowel } from "../shared/engineShape";
-import { VOICE_COLOR_MAP } from "../shared/voiceColors";
+import { VOICE_COLOR_MAP } from "@/shared/voiceColors";
 
 type ConsonantClassInfo = {
     class: string;
