@@ -55,6 +55,12 @@ const VOICE_META: { id: Vowel; label: string; role: string }[] = [
   { id: "Ë", label: "Evolution / Unit", role: "Closes the cycle, the ‘done’ state." },
 ];
 
+type HeartSnapshot = {
+  word: string;
+  state: string | null;
+  principlesPath: string[] | null;
+};
+
 let EvalPanelComp: React.ComponentType | null = null;
 if (process.env.NEXT_PUBLIC_DEV_EVAL === "1") {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -74,6 +80,9 @@ export default function LinguisticDecoderApp() {
   const [isWarming, setIsWarming] = useState(false);
   const [showDebug, setShowDebug] = useState(false);
   const [useAi, setUseAi] = useState(false);
+
+  // 🔹 New: keep a short “recent hearts” history
+  const [heartHistory, setHeartHistory] = useState<HeartSnapshot[]>([]);
 
   // Debounce user input, then warm the cache in the background
   const debouncedWord = useDebounced(word, 450); // currently unused, fine
