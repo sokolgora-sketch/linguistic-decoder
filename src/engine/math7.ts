@@ -1,79 +1,95 @@
 // src/engine/math7.ts
-// Seven-Principles / Math7 "heart" summary layer.
-// Pure function: takes a core analysis result and returns a compact summary
-// of the primary voice path in terms of the Seven Principles.
+//
+// Seven-Voices “Heart Math” over an AnalyzeWordResult.
+// Pure reader: it does NOT change the core solver, it just reads paths.
 
-// Fixed mapping from vowel → principle.
-const PRINCIPLE_MAP: Record<string, string> = {
-  A: "Truth / Action",
+import type { AnalyzeWordResult, Math7PathSummary, Vowel } from "@/shared/engineShape";
+
+export type Math7CycleState = "open" | "balanced" | "overloaded";
+
+export interface Math7Summary {
+  primary: Math7PathSummary;
+  frontier: Math7PathSummary[];
+  candidates: Record<string, Math7PathSummary>;
+}
+
+// Vowel → index 0–6
+const VOICE_INDEX: Record<string, number> = {
+  A: 0,
+  E: 1,
+  I: 2,
+  O: 3,
+  U: 4,
+  Y: 5,
+  Ë: 6,
+};
+
+// Vowel → principle label
+const PRINCIPLE_BY_VOICE: Record<string, string> = {
+  A: "Truth",
   E: "Expansion",
   I: "Insight",
   O: "Balance",
   U: "Unity",
   Y: "Network Integrity",
-  "Ë": "Evolution",
+  Ë: "Evolution",
 };
 
-export type Math7PrimarySummary = {
-  voicePath: string;        // e.g. "U → I"
-  levelPath: string;        // e.g. "Low → High"
-  ringPath: string;         // e.g. "1 → 1"
-  state: "flow" | "cycle";  // "flow" if first ≠ last, "cycle" if first == last
-  totalSteps: number;       // how many vowels in the path
-  totalMod7: number;        // totalSteps % 7, but mapped into 1..7
-  principlesPath: string[]; // sequence of principles, same length as vowels
-};
+function parseVoicePath(path: string | undefined): Vowel[] {
+  if (!path) return [];
+  return path
+    .split("→")
+    .map((s) => s.trim())
+    .filter(Boolean) as Vowel[];
+}
 
-export type Math7Summary = {
-  primary: Math7PrimarySummary;
-};
+function scoreVoices(voices: Vowel[]): Math7PathSummary {
+  const total = voices.reduce(
+    (sum, v) => sum + (VOICE_INDEX[v] ?? 0),
+    0
+  );
+  const totalMod7 = ((total % 7) + 7) % 7;
 
-/**
- * Compute the Math7 / Seven-Principles summary from a core engine result.
- *
- * - Expects result.primaryPath.voicePath to exist (e.g. "U → I").
- * - Never mutates the incoming result.
- * - Returns undefined if there's no usable primary path.
- */
-export function computeMath7ForResult(result: any): Math7Summary | undefined {
-  if (!result || !result.primaryPath) return undefined;
-
-  const primary = result.primaryPath;
-  const voicePath: string | undefined = primary.voicePath;
-  const levelPath: string | undefined = primary.levelPath;
-  const ringPath: string | undefined = primary.ringPath;
-
-  if (!voicePath || typeof voicePath !== "string") {
-    return undefined;
+  let cycleState: Math7CycleState;
+  if (totalMod7 === 0 || totalMod7 === 3) {
+    cycleState = "balanced";
+  } else if (totalMod7 === 1 || totalMod7 === 2) {
+    cycleState = "open";
+  } else {
+    cycleState = "overloaded";
   }
 
-  // Split "U → I" into ["U", "I"], trimming spaces.
-  const vowels = voicePath
-    .split("→")
-    .map((v) => v.trim())
-    .filter(Boolean);
-
-  if (vowels.length === 0) return undefined;
-
-  const first = vowels[0];
-  const last = vowels[vowels.length - 1];
-  const state: "flow" | "cycle" = first === last ? "cycle" : "flow";
-
-  const principlesPath = vowels.map((v) => PRINCIPLE_MAP[v] ?? v);
-
-  const totalSteps = vowels.length;
-  const rawMod = totalSteps % 7;
-  const totalMod7 = rawMod === 0 ? 7 : rawMod; // keep 1..7 only
+  const principlesPath = voices.map(
+    (v) => PRINCIPLE_BY_VOICE[v] ?? v
+  );
 
   return {
-    primary: {
-      voicePath,
-      levelPath: levelPath ?? "",
-      ringPath: ringPath ?? "",
-      state,
-      totalSteps,
-      totalMod7,
-      principlesPath,
-    },
+    voices,
+    total,
+    totalMod7,
+    principlesPath,
+    cycleState,
+  };
+}
+
+// 🔥 Named export – this MUST exist and there must be NO default export.
+export function computeMath7ForResult(result: AnalyzeWordResult): Math7Summary {
+  const primaryVoices = parseVoicePath(result.primaryPath.voicePath);
+  const primary = scoreVoices(primaryVoices);
+
+  const frontier = (result.frontier || []).map((alt) =>
+    scoreVoices(parseVoicePath(alt.voicePath))
+  );
+
+  const candidates: Record<string, Math7PathSummary> = {};
+  (result.languageFamilies || []).forEach((c: any) => {
+    const voices = parseVoicePath(c.voicePath);
+    candidates[c.language] = scoreVoices(voices);
+  });
+
+  return {
+    primary,
+    frontier,
+    candidates,
   };
 }

@@ -432,6 +432,7 @@ export interface Math7PathSummary {
   principlesPath: string[];
   cycleState: CycleState;
 }
+
 export interface PrincipleScore {
   id: Vowel;              // e.g. "A"
   name: string;           // e.g. "Truth / Source / Action"
