@@ -242,7 +242,7 @@ export type AnalysisCoreInput = {
   languageGuess: string; // "albanian" | "english" | "latin" | "unknown" | etc.
   languageConfidence: 'low' | 'medium' | 'high';
   dialectGuess?: string; // e.g. "geg" | "tosk" | "unknown"
-  mode: 'strict' | 'explore';
+  mode: 'strict' | 'open';
 };
 
 export type AnalysisCoreVoices = {
@@ -287,6 +287,11 @@ export type AnalysisCore = {
   voices: AnalysisCoreVoices;
   consonants: AnalysisConsonants;
   heartPaths: AnalysisHeartPaths;
+  primaryPath: {
+    voicePath: string;
+    levelPath: string;
+    ringPath: string;
+  };
 };
 
 export type MorphologyEvidence = {
@@ -334,6 +339,7 @@ export type AnalysisResult_DEPRECATED = {
   symbolic?: SymbolicLayer;
   symbolicCore?: SymbolicCoreResult;
   math7?: Math7Summary;
+  principles?: PrinciplesSet;
 };
 
 export type AnalyzeWordResult = {
@@ -354,7 +360,7 @@ export type AnalyzeWordResult = {
   meta: {
     engineVersion: string;
     createdAt: string;
-    mode: 'strict' | 'explore';
+    mode: 'strict' | 'open';
     alphabet?: string;
     solveMs?: number;
   },
@@ -420,12 +426,11 @@ export interface WordMatrix {
 export type CycleState = "open" | "balanced" | "overloaded";
 
 export interface Math7PathSummary {
-  voicePath: Vowel[];
-  indexPath: number[];      // 0–6
-  totalMod7: number;        // 0–6
-  cycleState: CycleState;   // open | balanced | overloaded
-  pairCoverage: number;     // 0–3 (A–Y, E–U, I–O)
-  principlesPath: string[]; // ["Unity", "Balance", ...]
+  voices: Vowel[];
+  total: number;
+  totalMod7: number;
+  principlesPath: string[];
+  cycleState: CycleState;
 }
 export interface PrincipleScore {
   id: Vowel;              // e.g. "A"
