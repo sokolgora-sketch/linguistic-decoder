@@ -331,8 +331,8 @@ const ComparePanel: React.FC<ComparePanelProps> = ({
   defaultMode,
   defaultAlphabet,
 }) => {
-  const [left, setLeft] = useState<SideState>({ ...initialSide });
-  const [right, setRight] = useState<SideState>({ ...initialSide });
+  const [left, setLeft] = useState<SideState>({ ...initialSide, word: "study" });
+  const [right, setRight] = useState<SideState>({ ...initialSide, word: "damage" });
 
   async function runAnalysis(side: "left" | "right") {
     const sideState = side === "left" ? left : right;
@@ -773,13 +773,8 @@ const ComparePanel: React.FC<ComparePanelProps> = ({
             </div>
 
             <div>
-              Left function (principles):{" "}
-              {left.word && (
-                <span className="font-semibold mr-1">
-                  {left.word.trim()}
-                </span>
-              )}
-              <span className="font-mono">{leftFunctionText}</span>
+              <span className="font-semibold">Left function (principles):</span>{" "}
+              <span className="font-mono">{formatFunctionLine(left.word, leftFunctionText)}</span>
             </div>
             <div>
               Right function (principles):{" "}
@@ -808,8 +803,27 @@ const ComparePanel: React.FC<ComparePanelProps> = ({
 
             <div>
               <span className="font-semibold">Origin relation:</span>{" "}
-              {originRelation.label}
-              {originRelation.detail ? ` — ${originRelation.detail}` : ""}
+              <span
+                className={
+                  originRelationLegacy.family.startsWith("Shared")
+                    ? "text-green-400"
+                    : "text-yellow-400"
+                }
+              >
+                {originRelationLegacy.family}
+              </span>{" "}
+              |{" "}
+              <span
+                className={
+                  originRelationLegacy.mirror.startsWith("YES")
+                    ? "text-blue-400"
+                    : originRelationLegacy.mirror.startsWith("Similar")
+                    ? "text-cyan-400"
+                    : "text-muted-foreground"
+                }
+              >
+                {originRelationLegacy.mirror}
+              </span>
             </div>
 
             <div>
