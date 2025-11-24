@@ -52,20 +52,34 @@ export async function GET(request: Request) {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { word, mode } = body;
+    const { word, mode, alphabet, edgeWeight } = body;
 
     if (!word) {
       return NextResponse.json({ error: 'Missing "word" in request body' }, { status: 400 });
     }
-    
-    // 1) base engine (old, stable path)
-    const base = analyzeWord(word, mode ?? "strict");
 
-    // 2) heart math layered on top
-    const math7 = computeMath7ForResult(base);
+    const t0 = Date.now();
+    const manifest = getManifest();
+    const isStrict = mode === 'strict';
+    const opts: SolveOptions = {
+      beamWidth: 8,
+      maxOps: isStrict ? 1 : 2,
+      allowDelete: !isStrict,
+      allowClosure: !isStrict,
+      opCost: manifest.opCost,
+      alphabet,
+      manifest,
+      edgeWeight: edgeWeight ?? manifest.edgeWeight,
+    };
     
-    // 3) return both together
-    return NextResponse.json({ ...base, math7 });
+    const analysis = runAnalysis(word, opts, alphabet);
+
+    const payload = {
+      ...analysis,
+      solveMs: Date.now() - t0,
+    };
+
+    return NextResponse.json(payload);
 
   } catch(e: any) {
     console.error(`[API /analyze POST] Error:`, e);
