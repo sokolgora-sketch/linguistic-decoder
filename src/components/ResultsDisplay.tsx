@@ -168,7 +168,7 @@ export function ResultsDisplay({ analysis }: { analysis: AnalysisResult_DEPRECAT
 
   return (
     <div className="space-y-4">
-        {core && core.voices && (
+        {core && core.heartPaths && (
             <PathRow block={{voicePath: core.voices.vowelVoices, ringPath: core.voices.ringPath, levelPath: core.voices.levelPath.map(l=>l==='high'?1:l==='low'?-1:0)}} title="Primary Path" analysis={analysis} />
         )}
 
