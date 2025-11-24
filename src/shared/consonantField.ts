@@ -2,7 +2,7 @@
 // Safe consonant field builder for the adapter + UI.
 // Keeps the older contract (smoothHits / spikyHits) so tests stay green.
 
-import type { EnginePayload } from "./engineShape";
+import type { EnginePayload, ConsonantField } from "./engineShape";
 
 export type ConsonantClusterField = {
   cluster: string;
@@ -11,13 +11,14 @@ export type ConsonantClusterField = {
   harmonyScore: number;
 };
 
-export type ConsonantField = {
-  clusters: ConsonantClusterField[];
-  windowCount: number;
-  hopCount: number;
-  smoothHits: number;
-  spikyHits: number;
-};
+// This local type is now superseded by the one in engineShape.
+// export type ConsonantField = {
+//   clusters: ConsonantClusterField[];
+//   windowCount: number;
+//   hopCount: number;
+//   smoothHits: number;
+//   spikyHits: number;
+// };
 
 export type ConsonantSummary = {
   windowCount: number;
@@ -30,29 +31,12 @@ export function buildConsonantField(
   payload: EnginePayload,
   path: any
 ): { field: ConsonantField; summary: ConsonantSummary } {
-  // 🔒 Hard guard: if there's no path, return an "empty" consonant field.
-  if (!path || !path.voicePath || !path.ringPath) {
-    const emptyField = {
-      clusters: [],
-      windowCount: 0,
-      hopCount: 0,
-      smoothHits: 0,
-      spikyHits: 0,
-    };
-    const emptySummary = {
-        windowCount: 0,
-        hopCount: 0,
-        smoothHits: 0,
-        spikyHits: 0,
-    };
-    return { field: emptyField, summary: emptySummary };
-  }
+  const windows = payload?.windows ?? [];
+  const windowClasses = payload?.windowClasses ?? [];
 
-  const windows = payload.windows ?? [];
-  const windowClasses = payload.windowClasses ?? [];
-
-  const voicePath = path.voicePath as string[];
-  const ringPath = path.ringPath as number[];
+  // path can be undefined in weird edge cases – be defensive
+  const voicePath = path?.voicePath ?? [];
+  const ringPath = path?.ringPath ?? [];
 
   const clusters: ConsonantClusterField[] = windows.map(
     (cluster: string, idx: number) => ({
@@ -63,9 +47,11 @@ export function buildConsonantField(
     })
   );
 
+  // Simple hop count: how many steps in the voice path
   const hopCount = Math.max(voicePath.length - 1, 0);
 
   // --- Legacy-style "smooth vs spiky" hits so tests can assert on them ---
+
   let smoothHits = 0;
   let spikyHits = 0;
 
@@ -93,6 +79,7 @@ export function buildConsonantField(
     hopCount,
     smoothHits,
     spikyHits,
+    slots: [], // Add the missing 'slots' property
   };
 
   const summary: ConsonantSummary = {
