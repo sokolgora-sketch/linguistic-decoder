@@ -451,8 +451,7 @@ const ComparePanel: React.FC<ComparePanelProps> = ({
     rightPrinciplesPath || []
   );
 
-  // --- Origin relationship ---
-  const originRelation = analyzeOriginRelation(left, right);
+  const originRelation = classifyOriginRelation(leftMainCand, rightMainCand);
 
   // -----------------------------------------------------------------------
   // Render
