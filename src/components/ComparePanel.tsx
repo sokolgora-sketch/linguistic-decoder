@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useMemo } from "react";
@@ -322,7 +323,10 @@ function AxesRow({ axes }: { axes: any }) {
 // Main component
 // ---------------------------------------------------------------------------
 
-const ComparePanel: React.FC<ComparePanelProps> = ({
+const ComparePanel: React.FC<{
+  defaultMode: Mode;
+  defaultAlphabet: Alphabet;
+}> = ({
   defaultMode,
   defaultAlphabet,
 }) => {
@@ -755,7 +759,7 @@ const ComparePanel: React.FC<ComparePanelProps> = ({
             <CardHeader>
               <CardTitle>Comparison summary</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-1 text-xs">
+            <CardContent className="text-sm text-muted-foreground leading-relaxed space-y-2">
               {comparisonVerdict && (
                 <p className="mb-2 text-sm">
                   <span className="font-semibold">Verdict:</span>{" "}
@@ -853,3 +857,5 @@ const ComparePanel: React.FC<ComparePanelProps> = ({
 };
 
 export default ComparePanel;
+
+    
