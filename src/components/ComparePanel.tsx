@@ -37,6 +37,72 @@ interface ComparePanelProps {
   defaultAlphabet: Alphabet;
 }
 
+type OriginCandidate = {
+  language?: string | null;
+  family?: string | null;
+  form?: string | null;
+};
+
+type OriginRelation =
+  | { code: "same"; label: "SAME FAMILY"; detail?: string }
+  | { code: "different"; label: "DIFFERENT FAMILIES"; detail?: string }
+  | { code: "unknown"; label: "UNKNOWN"; detail?: string };
+
+function classifyOriginRelation(
+  left?: OriginCandidate | null,
+  right?: OriginCandidate | null
+): OriginRelation {
+  if (!left || !right) {
+    return {
+      code: "unknown",
+      label: "UNKNOWN",
+      detail: "One side has no origin candidate yet.",
+    };
+  }
+
+  const leftLang = left.language?.toLowerCase() ?? "";
+  const rightLang = right.language?.toLowerCase() ?? "";
+  const leftFam = left.family?.toLowerCase() ?? "";
+  const rightFam = right.family?.toLowerCase() ?? "";
+
+  const sameFamily =
+    leftFam !== "" && rightFam !== "" && leftFam === rightFam;
+  const sameLanguage =
+    leftLang !== "" && rightLang !== "" && leftLang === rightLang;
+
+  if (sameLanguage || sameFamily) {
+    const familyLabel =
+      leftFam ||
+      rightFam ||
+      (leftLang === rightLang ? leftLang : `${leftLang} / ${rightLang}`);
+
+    return {
+      code: "same",
+      label: "SAME FAMILY",
+      detail: familyLabel
+        ? `Both sides lean on ${familyLabel} roots.`
+        : undefined,
+    };
+  }
+
+  if (!leftFam && !rightFam && !leftLang && !rightLang) {
+    return {
+      code: "unknown",
+      label: "UNKNOWN",
+      detail: "The engine has not proposed any origins yet.",
+    };
+  }
+
+  return {
+    code: "different",
+    label: "DIFFERENT FAMILIES",
+    detail:
+      leftLang || rightLang
+        ? `Left: ${leftLang || "—"} vs right: ${rightLang || "—"}.`
+        : undefined,
+  };
+}
+
 // --- Origin comparison helper ---
 function analyzeOriginRelation(
   left: any,
