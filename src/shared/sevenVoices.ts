@@ -1,141 +1,59 @@
+// src/shared/sevenVoices.ts
+import type { Vowel, PrincipleName } from "@/shared/engineShape";
+import { VOICE_LABEL_MAP } from "@/shared/voiceColors";
 
-import type { Vowel } from './engineShape';
+export interface VoiceMeta {
+  id: Vowel;
+  principle: PrincipleName;
+  label: string;      // long label like "Truth / Source / Action"
+  short: string;      // short label if you want it
+}
 
-export type VoiceLevel = 'High' | 'Mid' | 'Low';
-
-export type VoiceMeta = {
-  vowel: Vowel;
-  colorHex: string;         // UI colour (rainbow mapping)
-  ring: number;             // 3,2,1,0 from engine manifest
-  level: VoiceLevel;        // High / Mid / Low
-  principle: string;        // e.g. 'Truth', 'Expansion'
-  role: 'father' | 'mother' | 'mediator' | 'inner-male' | 'middle-female';
-  hzHint: [number, number]; // symbolic band only, not physical acoustics
-  keywords: string[];       // short functional keywords for this voice
-};
-
-export const SEVEN_VOICES: Record<Vowel, VoiceMeta> = {
+const META: Record<Vowel, VoiceMeta> = {
   A: {
-    vowel: 'A',
-    colorHex: '#FF3B30',
-    ring: 3,
-    level: 'High',
-    principle: 'Truth',
-    role: 'father',
-    hzHint: [110, 220],
-    keywords: ['truth', 'start', 'strike', 'iron', 'sun'],
+    id: "A",
+    principle: "Truth",
+    label: VOICE_LABEL_MAP.A,
+    short: "Truth",
   },
   E: {
-    vowel: 'E',
-    colorHex: '#FF9500',
-    ring: 2,
-    level: 'High',
-    principle: 'Expansion',
-    role: 'middle-female',
-    hzHint: [220, 330],
-    keywords: ['expansion', 'growth', 'field', 'bridge'],
+    id: "E",
+    principle: "Expansion",
+    label: VOICE_LABEL_MAP.E,
+    short: "Expansion",
   },
   I: {
-    vowel: 'I',
-    colorHex: '#FFCC00',
-    ring: 1,
-    level: 'High',
-    principle: 'Insight',
-    role: 'inner-male',
-    hzHint: [330, 440],
-    keywords: ['insight', 'focus', 'ray', 'eye'],
+    id: "I",
+    principle: "Insight",
+    label: VOICE_LABEL_MAP.I,
+    short: "Insight",
   },
   O: {
-    vowel: 'O',
-    colorHex: '#34C759',
-    ring: 0,
-    level: 'Mid',
-    principle: 'Balance',
-    role: 'mediator',
-    hzHint: [260, 340],
-    keywords: ['balance', 'center', 'circle', 'heart'],
+    id: "O",
+    principle: "Balance",
+    label: VOICE_LABEL_MAP.O,
+    short: "Balance",
   },
   U: {
-    vowel: 'U',
-    colorHex: '#007AFF',
-    ring: 1,
-    level: 'Low',
-    principle: 'Unity',
-    role: 'inner-male',
-    hzHint: [110, 220],
-    keywords: ['unity', 'breath', 'flow', 'together'],
+    id: "U",
+    principle: "Unity",
+    label: VOICE_LABEL_MAP.U,
+    short: "Unity",
   },
   Y: {
-    vowel: 'Y',
-    colorHex: '#5856D6',
-    ring: 2,
-    level: 'Low',
-    principle: 'Network Integrity',
-    role: 'middle-female',
-    hzHint: [440, 550],
-    keywords: ['network', 'weave', 'links', 'integrity'],
+    id: "Y",
+    principle: "Network Integrity",
+    label: VOICE_LABEL_MAP.Y,
+    short: "Network",
   },
-  Ë: {
-    vowel: 'Ë',
-    colorHex: '#AF52DE',
-    ring: 3,
-    level: 'Low',
-    principle: 'Evolution',
-    role: 'mother',
-    hzHint: [550, 660],
-    keywords: ['evolution', 'birth', 'womb', 'change'],
+  "Ë": {
+    id: "Ë",
+    principle: "Evolution",
+    label: VOICE_LABEL_MAP["Ë"],
+    short: "Evolution",
   },
 };
 
-export const SEVEN_PRINCIPLES_ORDER: Vowel[] = ['A', 'E', 'I', 'O', 'U', 'Y', 'Ë'];
-
-export const SEVEN_PRINCIPLES_WORDS: string[] = [
-  'Truth',
-  'Expansion',
-  'Insight',
-  'Balance',
-  'Unity',
-  'Network Integrity',
-  'Evolution',
-];
-
-export const getVoiceMeta = (vowel: Vowel): VoiceMeta => {
-  return SEVEN_VOICES[vowel];
-};
-
-export type PrinciplesSummary = {
-  principlePath: string[];   // e.g. ['Unity', 'Insight']
-  dominantVoices: Vowel[];   // vowels that appear most often
-  dominantPrinciples: string[];
-  sevenWords: string[];      // always SEVEN_PRINCIPLES_WORDS
-};
-
-export function mapPathToPrinciples(path: Vowel[]): PrinciplesSummary {
-  const counts: Record<Vowel, number> = {
-    A: 0,
-    E: 0,
-    I: 0,
-    O: 0,
-    U: 0,
-    Y: 0,
-    Ë: 0,
-  };
-
-  const principlePath = path.map(v => {
-    counts[v] = (counts[v] ?? 0) + 1;
-    return SEVEN_VOICES[v].principle;
-  });
-
-  const max = Math.max(0, ...Object.values(counts));
-  const dominantVoices =
-    max > 0 ? (Object.keys(counts).filter(v => counts[v as Vowel] === max) as Vowel[]) : [];
-
-  const dominantPrinciples = dominantVoices.map(v => SEVEN_VOICES[v].principle);
-
-  return {
-    principlePath,
-    dominantVoices,
-    dominantPrinciples,
-    sevenWords: SEVEN_PRINCIPLES_WORDS,
-  };
+export function getVoiceMeta(v: Vowel): VoiceMeta {
+  return META[v];
 }
