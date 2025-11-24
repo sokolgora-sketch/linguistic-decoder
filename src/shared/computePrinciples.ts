@@ -1,6 +1,4 @@
-
-// src/shared/computePrinciples.ts  (or whatever filename you're using)
-
+// src/shared/computePrinciples.ts
 import type {
   EnginePayload,
   PrinciplesSet,
@@ -25,6 +23,8 @@ export function computePrinciples(payload: EnginePayload): PrinciplesSet {
   }
 
   const voices = payload.primaryPath.voicePath;
+
+  // Count how many times each voice appears in the primary path
   const counts: Record<Vowel, number> = {
     A: 0,
     E: 0,
@@ -35,29 +35,33 @@ export function computePrinciples(payload: EnginePayload): PrinciplesSet {
     Ë: 0,
   };
 
-  voices.forEach((v) => {
-    if (counts[v as Vowel] !== undefined) counts[v as Vowel]++;
-  });
+  for (const v of voices) {
+    if (counts[v as Vowel] !== undefined) {
+      counts[v as Vowel]++;
+    }
+  }
 
-  const total = voices.length;
+  const total = voices.length || 1;
 
   const principles: PrincipleScore[] = (Object.keys(counts) as Vowel[]).map(
     (v) => {
-      const value = total > 0 ? counts[v] / total : 0;
-      const active = value > 0.15; // threshold you can tune later
-      const summary = `${v} reflects ${VOICE_LABEL_MAP[v]} (${Math.round(
-        value * 100
-      )}%)`;
+      const raw = counts[v] / total;
+      const value = Number.isFinite(raw) ? raw : 0;
+      const pct = Math.round(value * 100);
+      const active = value > 0.15; // simple “lit up” threshold
 
       return {
         id: v,
         name: PRINCIPLE_BASE[v],
         value,
-        summary,
+        summary: `${v} reflects ${VOICE_LABEL_MAP[v]} (${pct}%)`,
         active,
       };
     }
   );
 
-  return { source: "heart-calculator", principles };
+  return {
+    source: "heart-calculator",
+    principles,
+  };
 }

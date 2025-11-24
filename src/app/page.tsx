@@ -1,38 +1,49 @@
 'use client';
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
-import { useToast } from "../hooks/use-toast";
-import { Button } from "../components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
-import { Input } from "../components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../components/ui/accordion";
-import { Candidates } from "../components/Candidates";
-import { ResultsDisplay } from "../components/ResultsDisplay";
-import { PrinciplesBlock } from "../components/PrinciplesBlock";
-import { ConsonantReference } from "../components/ConsonantReference";
-import { TwoRailsWithConsonants } from "../components/TwoRailsWithConsonants";
-import { analyzeClient } from "../lib/analyzeClient";
-import type { Alphabet } from "../lib/runAnalysis";
-import { PROFILES } from "../functions/languages";
-import { ThemeToggle } from "../components/ThemeProvider";
-import { useDebounced } from "../hooks/useDebounced";
+import { useToast } from "@/hooks/use-toast";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Candidates } from "@/components/Candidates";
+import { ResultsDisplay } from "@/components/ResultsDisplay";
+import { PrinciplesBlock } from "@/components/PrinciplesBlock";
+import { ConsonantReference } from "@/components/ConsonantReference";
+import { TwoRailsWithConsonants } from "@/components/TwoRailsWithConsonants";
+import { analyzeClient } from "@/lib/analyzeClient";
+import type { Alphabet } from "@/lib/runAnalysis";
+import { PROFILES } from "@/functions/languages";
+import { ThemeToggle } from "@/components/ThemeProvider";
+import { useDebounced } from "@/hooks/useDebounced";
 import { Loader2, Sparkles, Wand2, HelpCircle, GitBranch, BookOpen, History as HistoryIcon, ListChecks } from "lucide-react";
-import ComparePanel from "../components/ComparePanel";
-import { normalizeEnginePayload, type Vowel, type EnginePayload, type AnalysisResult_DEPRECATED } from "../shared/engineShape";
-import { analysisResultToEnginePayload } from "@/shared/analysisAdapter";
-import HistoryPanel from "../components/HistoryPanel";
+import ComparePanel from "@/components/ComparePanel";
+import { normalizeEnginePayload, type Vowel, type EnginePayload, type AnalysisResult_DEPRECATED } from "@/shared/engineShape";
+import { enginePayloadToAnalysisResult, analysisResultToEnginePayload } from "@/shared/analysisAdapter";
+import HistoryPanel from "@/components/HistoryPanel";
 import { doc, getDoc } from "firebase/firestore";
-import { db } from "../lib/firebase";
-import FooterBuild from "../components/FooterBuild";
-import { allowAnalyze } from "../lib/throttle";
-import WhyThisPath from "../components/WhyThisPath";
-import { ExportJsonButton } from "../components/ExportJsonButton";
-import { logError } from "../lib/logError";
-import { VOICE_COLOR_MAP, VOICE_LABEL_MAP } from "../shared/voiceColors";
+import { db } from "@/lib/firebase";
+import FooterBuild from "@/components/FooterBuild";
+import { allowAnalyze } from "@/lib/throttle";
+import WhyThisPath from "@/components/WhyThisPath";
+import { ExportJsonButton } from "@/components/ExportJsonButton";
+import { logError } from "@/lib/logError";
+import { VOICE_COLOR_MAP, VOICE_LABEL_MAP } from "@/shared/voiceColors";
 import { SymbolicReadingCard } from "@/components/SymbolicReadingCard";
-
 
 const VOICE_META: { id: Vowel; label: string; role: string }[] = [
   { id: "A", label: "Action / Truth", role: "Launches, cuts through, sets the first line." },
@@ -41,19 +52,20 @@ const VOICE_META: { id: Vowel; label: string; role: string }[] = [
   { id: "O", label: "Balance / Heart", role: "Holds the center, mediates between high and low." },
   { id: "U", label: "Unity / Breath", role: "Carries the flow, breath and movement through the word." },
   { id: "Y", label: "Network / Weave", role: "Loops, branches, weaves paths across the matrix." },
-  { id: "Ë", label: "Evolution / Unit", role: "Closes the cycle, a formed unit, the ‘done’ state." },
+  { id: "Ë", label: "Evolution / Unit", role: "Closes the cycle, the ‘done’ state." },
 ];
 
 let EvalPanelComp: React.ComponentType | null = null;
 if (process.env.NEXT_PUBLIC_DEV_EVAL === "1") {
-  EvalPanelComp = require("../components/EvalPanel").default;
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  EvalPanelComp = require("@/components/EvalPanel").default;
 }
 
 // ==== Main App ===============================================================
-export default function LinguisticDecoderApp(){
+export default function LinguisticDecoderApp() {
   const { toast } = useToast();
   const [word, setWord] = useState("");
-  const [mode, setMode] = useState<"strict"|"open">("strict");
+  const [mode, setMode] = useState<"strict" | "open">("strict");
   const [alphabet, setAlphabet] = useState<Alphabet>("auto");
   const [edgeWeight, setEdgeWeight] = useState(0.25);
   const [data, setData] = useState<EnginePayload | null>(null);
@@ -64,28 +76,36 @@ export default function LinguisticDecoderApp(){
   const [useAi, setUseAi] = useState(false);
 
   // Debounce user input, then warm the cache in the background
-  const debouncedWord = useDebounced(word, 450);
-  
+  const debouncedWord = useDebounced(word, 450); // currently unused, fine
+
   const canAnalyze = word.trim().length > 0 && !loading;
 
-  async function analyze(nextWord?: string, nextMode?: "strict"|"open", nextAlphabet?: Alphabet){
-    if (!allowAnalyze()) { 
-      toast({ variant: "destructive", title: "Too many requests", description: "Please try again in a few moments." }); 
-      return; 
+  const analysisResult = useMemo(() => {
+    if (!data) return null;
+    return enginePayloadToAnalysisResult(data);
+  }, [data]);
+
+  // Optional fields from EnginePayload (solveMs, cacheHit, recomputed, etc.)
+  const solveMs = (data as any)?.solveMs as number | undefined;
+
+  async function analyze(nextWord?: string, nextMode?: "strict" | "open", nextAlphabet?: Alphabet) {
+    if (!allowAnalyze()) {
+      toast({ variant: "destructive", title: "Too many requests", description: "Please try again in a few moments." });
+      return;
     }
     const useWord = (nextWord ?? word).trim();
-    const useMode: "strict"|"open" = nextMode ?? mode;
+    const useMode: "strict" | "open" = nextMode ?? mode;
     const useAlphabet = nextAlphabet ?? alphabet;
     if (!useWord) return;
-  
+
     setLoading(true);
     setErr(null);
     // 🔥 do NOT clear data here – keep previous result while new one is computing
-  
+
     try {
       const clientResponse = await analyzeClient(useWord, useMode, useAlphabet, { edgeWeight, useAi });
       console.log("API result:", clientResponse);
-  
+
       setData(clientResponse);
     } catch (e: any) {
       const error = e?.message || "Request failed";
@@ -100,49 +120,48 @@ export default function LinguisticDecoderApp(){
 
   function runSmokeTest() {
     const mock: any = {
-      engineVersion: 'mock-v1',
-      word: 'smoke-test',
-      mode: 'strict',
-      alphabet: 'auto',
-      primaryPath: { voicePath: ['O', 'E'], ringPath: [0, 2], levelPath: [0, 1], ops: [], checksums: {V:0, E:0, C:0}, kept:0 },
+      engineVersion: "mock-v1",
+      word: "smoke-test",
+      mode: "strict",
+      alphabet: "auto",
+      primaryPath: { voicePath: ["O", "E"], ringPath: [0, 2], levelPath: [0, 1], ops: [], checksums: { V: 0, E: 0, C: 0 }, kept: 0 },
       frontierPaths: [],
       windows: [],
       windowClasses: [],
       signals: [],
     };
     try {
-        const normalized = normalizeEnginePayload(mock);
-        setData(normalized);
-        setErr(null);
-        toast({ title: "Smoke Test", description: "Displaying mock data." });
-    } catch(e:any){
-        setErr(`Smoke test failed: ${e.message}`);
-        setData(null);
+      const normalized = normalizeEnginePayload(mock);
+      setData(normalized);
+      setErr(null);
+      toast({ title: "Smoke Test", description: "Displaying mock data." });
+    } catch (e: any) {
+      setErr(`Smoke test failed: ${e.message}`);
+      setData(null);
     }
   }
 
-
   useEffect(() => {
     const p = new URLSearchParams(window.location.search);
-    const w = p.get("word"); 
-    const m = p.get("mode") as "strict"|"open" | null; 
+    const w = p.get("word");
+    const m = p.get("mode") as "strict" | "open" | null;
     const a = p.get("alphabet") as Alphabet | null;
-    if (w) { 
+    if (w) {
       const currentWord = w;
-      const currentMode = m || 'strict';
-      const currentAlphabet = a || 'auto';
-      setWord(currentWord); 
-      setMode(currentMode); 
-      setAlphabet(currentAlphabet); 
-      analyze(currentWord, currentMode, currentAlphabet); 
+      const currentMode = m || "strict";
+      const currentAlphabet = a || "auto";
+      setWord(currentWord);
+      setMode(currentMode);
+      setAlphabet(currentAlphabet);
+      analyze(currentWord, currentMode, currentAlphabet);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function onLoadAnalysis(cacheId: string) {
     if (!db) {
-        toast({ variant: "destructive", title: "Database Error", description: "Firestore is not available." });
-        return;
+      toast({ variant: "destructive", title: "Database Error", description: "Firestore is not available." });
+      return;
     }
     setLoading(true);
     setErr(null);
@@ -150,42 +169,42 @@ export default function LinguisticDecoderApp(){
       const cacheRef = doc(db, "analyses", cacheId);
       const snap = await getDoc(cacheRef);
       if (snap.exists()) {
-          const payload = normalizeEnginePayload(snap.data());
-          setData({ ...payload, cacheHit: true });
-          toast({ title: "Loaded from Cache", description: `Analysis for '${payload.word}' loaded.` });
+        const payload = normalizeEnginePayload(snap.data());
+        setData({ ...payload, cacheHit: true } as EnginePayload);
+        toast({ title: "Loaded from Cache", description: `Analysis for '${payload.word}' loaded.` });
       } else {
-          toast({ variant: "destructive", title: "Not Found", description: "Could not find that analysis in the cache." });
+        toast({ variant: "destructive", title: "Not Found", description: "Could not find that analysis in the cache." });
       }
     } catch (e: any) {
-        logError({where: "history-load", message: e.message, detail: {cacheId}});
-        toast({ variant: "destructive", title: "Load Error", description: e.message || "Failed to load analysis." });
-        setErr(e.message);
+      logError({ where: "history-load", message: e.message, detail: { cacheId } });
+      toast({ variant: "destructive", title: "Load Error", description: e.message || "Failed to load analysis." });
+      setErr(e.message);
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
   }
 
   async function onRecompute(word: string, m?: string, a?: string) {
-      setLoading(true);
-      setErr(null);
-      try {
-          const result = await analyzeClient(word, (m as any) || mode, (a as any) || alphabet, {
-            bypass: true,
-            skipWrite: false,
-            edgeWeight,
-            useAi
-          });
-          setData({ ...result, recomputed: true });
-          toast({ title: "Recomputed", description: `Fresh analysis for '${result.word}' complete.` });
-      } catch (e: any) {
-          logError({where: "history-recompute", message: e.message, detail: {word}});
-          toast({ variant: "destructive", title: "Recompute Error", description: e.message || "Failed to recompute analysis." });
-          setErr(e.message);
-      } finally {
-          setLoading(false);
-      }
+    setLoading(true);
+    setErr(null);
+    try {
+      const result = await analyzeClient(word, (m as any) || mode, (a as any) || alphabet, {
+        bypass: true,
+        skipWrite: false,
+        edgeWeight,
+        useAi,
+      });
+      setData({ ...result, recomputed: true } as EnginePayload);
+      toast({ title: "Recomputed", description: `Fresh analysis for '${result.word}' complete.` });
+    } catch (e: any) {
+      logError({ where: "history-recompute", message: e.message, detail: { word } });
+      toast({ variant: "destructive", title: "Recompute Error", description: e.message || "Failed to recompute analysis." });
+      setErr(e.message);
+    } finally {
+      setLoading(false);
+    }
   }
-  
+
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (canAnalyze) {
@@ -197,10 +216,14 @@ export default function LinguisticDecoderApp(){
     alphabet === "auto"
       ? "Auto-Detect"
       : alphabet.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
-      
+
+  // Safe key for the Analysis Results card (avoids 'data is possibly null')
+  const analysisCardKey =
+    data != null ? `${data.word}-${data.mode}-${data.alphabet}` : `analysis-${mode}-${alphabet}`;
+
   return (
     <div className="min-h-screen bg-background text-foreground p-4 lg:p-8 flex flex-col items-stretch transition-colors duration-300">
-       <main className="max-w-5xl mx-auto w-full space-y-8 flex-1 animate-fade-in">
+      <main className="max-w-5xl mx-auto w-full space-y-8 flex-1 animate-fade-in">
         {/* Header */}
         <header className="pb-4 border-b border-border/60">
           <div className="flex justify-between items-start gap-3">
@@ -213,11 +236,11 @@ export default function LinguisticDecoderApp(){
               </p>
               {data && (
                 <p className="text-xs text-muted-foreground/80">
-                  <span className="font-code">engine={data.engineVersion}</span>
+                  <span className="font-code">engine={data?.engineVersion}</span>
                   <span className="mx-2">·</span>
-                  <span className="font-code">mode={data.mode}</span>
+                  <span className="font-code">mode={data?.mode}</span>
                   <span className="mx-2">·</span>
-                  <span className="font-code">alphabet={data.alphabet}</span>
+                  <span className="font-code">alphabet={data?.alphabet}</span>
                 </p>
               )}
             </div>
@@ -258,19 +281,19 @@ export default function LinguisticDecoderApp(){
                 </span>
               )}
 
-              {"solveMs" in data && (
+              {solveMs !== undefined && (
                 <span>
-                  <span className="font-semibold">Solve:</span> {data.solveMs} ms
+                  <span className="font-semibold">Solve:</span> {solveMs} ms
                 </span>
               )}
 
-              {data.cacheHit && (
+              {(data as any).cacheHit && (
                 <span className="px-1.5 py-0.5 rounded-full border border-accent/60 text-accent-foreground bg-accent/10">
                   cache hit
                 </span>
               )}
 
-              {data.recomputed && (
+              {(data as any).recomputed && (
                 <span className="px-1.5 py-0.5 rounded-full border border-blue-500/60 text-blue-300 bg-blue-500/10">
                   recomputed
                 </span>
@@ -357,7 +380,7 @@ export default function LinguisticDecoderApp(){
                 </Button>
               </div>
             </form>
-            
+
             <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
               <span className="opacity-80">Try:</span>
               {["study", "language", "damage", "mathematics"].map((example) => {
@@ -383,34 +406,40 @@ export default function LinguisticDecoderApp(){
             </div>
 
             <div className="grid grid-cols-2 gap-4 items-center pt-2">
-                <div className="space-y-3">
-                    <Select value={alphabet} onValueChange={(v) => setAlphabet(v as Alphabet)}>
-                        <SelectTrigger>
-                        <SelectValue placeholder="Language Profile" />
-                        </SelectTrigger>
-                        <SelectContent>
-                        <SelectItem value="auto">Auto-Detect Profile</SelectItem>
-                        {PROFILES.map(p=>(
-                            <SelectItem key={p.id} value={p.id}>{p.id.replace(/_/g,' ').replace(/\b\w/g, l => l.toUpperCase())}</SelectItem>
-                        ))}
-                        </SelectContent>
-                    </Select>
-                    <div className="flex items-center gap-4">
-                        <label className="text-xs text-muted-foreground">Edge: {edgeWeight.toFixed(2)}</label>
-                        <input
-                            type="range" min={0} max={0.6} step={0.05}
-                            value={edgeWeight} onChange={e => setEdgeWeight(Number(e.target.value))}
-                            className="w-full"
-                        />
-                    </div>
+              <div className="space-y-3">
+                <Select value={alphabet} onValueChange={(v) => setAlphabet(v as Alphabet)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Language Profile" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="auto">Auto-Detect Profile</SelectItem>
+                    {PROFILES.map((p) => (
+                      <SelectItem key={p.id} value={p.id}>
+                        {p.id.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <div className="flex items-center gap-4">
+                  <label className="text-xs text-muted-foreground">Edge: {edgeWeight.toFixed(2)}</label>
+                  <input
+                    type="range"
+                    min={0}
+                    max={0.6}
+                    step={0.05}
+                    value={edgeWeight}
+                    onChange={(e) => setEdgeWeight(Number(e.target.value))}
+                    className="w-full"
+                  />
                 </div>
+              </div>
 
               <div className="flex flex-col items-start gap-2 sm:flex-row sm:justify-start md:justify-end sm:items-center sm:gap-4">
                 <label className="flex items-center gap-2 text-sm">
                   <input
                     type="checkbox"
                     checked={mode === "strict"}
-                    onChange={e => setMode(e.target.checked ? "strict" : "open")}
+                    onChange={(e) => setMode(e.target.checked ? "strict" : "open")}
                     className="w-4 h-4 rounded border-border text-primary focus-visible:ring-2 focus-visible:ring-primary"
                     title="Strict = Seven-Voices rules only · Open = allow softer interpretations"
                   />
@@ -450,9 +479,9 @@ export default function LinguisticDecoderApp(){
               <CardContent className="p-3 sm:p-4 space-y-3">
                 <TwoRailsWithConsonants
                   word={data?.word || word}
-                  path={loading ? [] : (data?.primaryPath?.voicePath || [])}
+                  path={loading ? [] : data?.primaryPath?.voicePath || []}
                   running={loading}
-                  playKey={`${data?.word}|${data?.primaryPath?.voicePath?.join(',')}`}
+                  playKey={`${data?.word || ""}|${data?.primaryPath?.voicePath?.join(",") || ""}`}
                   height={320}
                   durationPerHopMs={900}
                 />
@@ -466,49 +495,63 @@ export default function LinguisticDecoderApp(){
             </Card>
 
             <div className="space-y-6">
+              <Card className="animate-fade-in">
+                <CardHeader>
+                  <CardTitle>The Seven Voices</CardTitle>
+                  <CardDescription>Color, role, and function in the matrix.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-2 text-sm">
+                    {Object.entries(VOICE_COLOR_MAP).map(([voice, color]) => (
+                      <li key={voice} className="flex items-center gap-3">
+                        <span
+                          className="w-3 h-3 rounded-full shrink-0"
+                          style={{ backgroundColor: color }}
+                        />
+                        <div className="flex flex-col leading-tight">
+                          <span className="font-bold text-sm">{voice}</span>
+                          <span className="text-xs text-muted-foreground">
+                            {VOICE_LABEL_MAP[voice as Vowel]}
+                          </span>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                </CardContent>
+              </Card>
+              {data && (
                 <Card className="animate-fade-in">
                   <CardHeader>
-                    <CardTitle>The Seven Voices</CardTitle>
-                    <CardDescription>Color, role, and function in the matrix.</CardDescription>
+                    <CardTitle>Metadata</CardTitle>
                   </CardHeader>
-                  <CardContent>
-                    <ul className="space-y-2 text-sm">
-                      {Object.entries(VOICE_COLOR_MAP).map(([voice, color]) => (
-                        <li key={voice} className="flex items-center gap-3">
-                          <span
-                            className="w-3 h-3 rounded-full shrink-0"
-                            style={{ backgroundColor: color }}
-                          />
-                          <div className="flex flex-col leading-tight">
-                            <span className="font-bold text-sm">{voice}</span>
-                            <span className="text-xs text-muted-foreground">
-                              {VOICE_LABEL_MAP[voice as Vowel]}
-                            </span>
-                          </div>
-                        </li>
-                      ))}
-                    </ul>
+                  <CardContent className="space-y-1 text-xs text-muted-foreground">
+                    <p>
+                      <strong>Word:</strong> {data.word}
+                    </p>
+                    <p>
+                      <strong>Mode:</strong> {data.mode}
+                    </p>
+                    <p>
+                      <strong>Alphabet:</strong> {data.alphabet}
+                    </p>
+                    {solveMs !== undefined && (
+                      <p>
+                        <strong>Solve Time:</strong> {solveMs} ms
+                      </p>
+                    )}
+                    {(data as any).cacheHit && (
+                      <p className="font-bold text-accent-foreground pt-1">Loaded from cache</p>
+                    )}
+                    {(data as any).recomputed && (
+                      <p className="font-bold text-blue-400 pt-1">Recomputed</p>
+                    )}
                   </CardContent>
                 </Card>
-                {data && (
-                  <Card className="animate-fade-in">
-                    <CardHeader>
-                      <CardTitle>Metadata</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-1 text-xs text-muted-foreground">
-                        <p><strong>Word:</strong> {data.word}</p>
-                        <p><strong>Mode:</strong> {data.mode}</p>
-                        <p><strong>Alphabet:</strong> {data.alphabet}</p>
-                        {"solveMs" in data && <p><strong>Solve Time:</strong> {data.solveMs} ms</p>}
-                        {data.cacheHit && <p className="font-bold text-accent-foreground pt-1">Loaded from cache</p>}
-                        {data.recomputed && <p className="font-bold text-blue-400 pt-1">Recomputed</p>}
-                    </CardContent>
-                  </Card>
-                )}
+              )}
             </div>
           </div>
 
-          {data && (
+          {data && analysisResult && (
             <Card
               key={`${data.word}-${data.mode}-${data.alphabet}`}
               className="animate-fade-in"
@@ -520,7 +563,7 @@ export default function LinguisticDecoderApp(){
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <ResultsDisplay analysis={data} />
+                <ResultsDisplay analysis={analysisResult} />
                 <div className="flex justify-end pt-2">
                   <ExportJsonButton analysis={data} />
                 </div>
@@ -656,14 +699,14 @@ export default function LinguisticDecoderApp(){
         {/* Debug view */}
         {showDebug && data && (
           <div className="my-4">
-              <Card className="p-4">
-                  <div className="flex justify-between items-center mb-2">
-                    <h3 className="font-bold text-sm tracking-wide">API Echo (debug)</h3>
-                  </div>
-                  <pre className="font-code text-xs whitespace-pre-wrap bg-slate-800 p-2.5 rounded-lg max-h-96 overflow-auto mt-2">
-                      {JSON.stringify(analysisResultToEnginePayload(data as any), null, 2)}
-                  </pre>
-              </Card>
+            <Card className="p-4">
+              <div className="flex justify-between items-center mb-2">
+                <h3 className="font-bold text-sm tracking-wide">API Echo (debug)</h3>
+              </div>
+              <pre className="font-code text-xs whitespace-pre-wrap bg-slate-800 p-2.5 rounded-lg max-h-96 overflow-auto mt-2">
+                {analysisResult ? JSON.stringify(analysisResultToEnginePayload(analysisResult), null, 2) : ""}
+              </pre>
+            </Card>
           </div>
         )}
       </main>
@@ -678,9 +721,17 @@ export default function LinguisticDecoderApp(){
                   <span className="mr-2">engine={data.engineVersion}</span>
                   <span className="mr-2">mode={data.mode}</span>
                   <span className="mr-2">alphabet={data.alphabet}</span>
-                  {"solveMs" in data && <span className="mr-2">solveMs={data.solveMs}</span>}
-                  {data.cacheHit && <span className="mr-2 px-1.5 py-0.5 rounded bg-accent/20 border border-accent text-accent-foreground">cacheHit</span>}
-                  {data.recomputed && <span className="mr-2 px-1.5 py-0.5 rounded bg-blue-900 border border-blue-700">recomputed</span>}
+                  {solveMs !== undefined && <span className="mr-2">solveMs={solveMs}</span>}
+                  {(data as any).cacheHit && (
+                    <span className="mr-2 px-1.5 py-0.5 rounded bg-accent/20 border border-accent text-accent-foreground">
+                      cacheHit
+                    </span>
+                  )}
+                  {(data as any).recomputed && (
+                    <span className="mr-2 px-1.5 py-0.5 rounded bg-blue-900 border border-blue-700">
+                      recomputed
+                    </span>
+                  )}
                 </div>
               </>
             )}
@@ -695,7 +746,7 @@ export default function LinguisticDecoderApp(){
                 Share Result
               </Link>
             )}
-            <Button variant="outline" size="sm" onClick={() => setShowDebug(s => !s)}>
+            <Button variant="outline" size="sm" onClick={() => setShowDebug((s) => !s)}>
               {showDebug ? "Hide JSON" : "Show JSON"}
             </Button>
           </div>
