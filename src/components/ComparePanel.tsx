@@ -723,6 +723,30 @@ const ComparePanel: React.FC<ComparePanelProps> = ({
                   : "unknown"}
               </span>
             </div>
+            <div className="mt-1">
+              <strong>Origin relation:</strong>{" "}
+              <span
+                className={
+                  originRelation.family.startsWith("Shared")
+                    ? "text-green-400"
+                    : "text-yellow-400"
+                }
+              >
+                {originRelation.family}
+              </span>{" "}
+              |{" "}
+              <span
+                className={
+                  originRelation.mirror.startsWith("YES")
+                    ? "text-blue-400"
+                    : originRelation.mirror.startsWith("Similar")
+                    ? "text-cyan-400"
+                    : "text-muted-foreground"
+                }
+              >
+                {originRelation.mirror}
+              </span>
+            </div>
 
             <div>
               Origin function (left):{" "}
