@@ -1,5 +1,6 @@
 import { analyzeWord } from "../src/engine/analyzeWord";
 import { computeMath7ForResult } from "../src/engine/math7";
+import type { AnalyzeWordResult } from "@/shared/engineShape";
 
 describe("math7 layer sanity", () => {
   it("computes math7 for study / damage / love", () => {
@@ -7,6 +8,7 @@ describe("math7 layer sanity", () => {
     const damageBase = analyzeWord("damage", "strict");
     const loveBase = analyzeWord("love", "strict");
 
+    // The computeMath7ForResult function now directly takes the result of analyzeWord
     const study = computeMath7ForResult(studyBase);
     const damage = computeMath7ForResult(damageBase);
     const love = computeMath7ForResult(loveBase);
@@ -15,12 +17,12 @@ describe("math7 layer sanity", () => {
     expect(damage).toBeDefined();
     expect(love).toBeDefined();
 
-    // TEMP: inspect in console (delete later if noisy)
-    // eslint-disable-next-line no-console
-    console.log("STUDY math7:", JSON.stringify(study, null, 2));
-    // eslint-disable-next-line no-console
-    console.log("DAMAGE math7:", JSON.stringify(damage, null, 2));
-    // eslint-disable-next-line no-console
-    console.log("LOVE math7:", JSON.stringify(love, null, 2));
+    expect(study.primary.cycleState).toBeDefined();
+    expect(damage.primary.cycleState).toBeDefined();
+    expect(love.primary.cycleState).toBeDefined();
+
+    expect(study.primary.totalMod7).toBeDefined();
+    expect(damage.primary.totalMod7).toBeDefined();
+    expect(love.primary.totalMod7).toBeDefined();
   });
 });
