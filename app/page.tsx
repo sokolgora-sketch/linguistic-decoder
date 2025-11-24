@@ -97,6 +97,31 @@ export default function LinguisticDecoderApp() {
   // Optional fields from EnginePayload (solveMs, cacheHit, recomputed, etc.)
   const solveMs = (data as any)?.solveMs as number | undefined;
 
+  const math7: any = (analysisResult as any)?.math7 || null;
+
+  // 🔹 Whenever we get a fresh analysis with math7, update the heart history
+  useEffect(() => {
+    if (!analysisResult || !data) return;
+
+    const math7: any = (analysisResult as any).math7;
+    const primary = math7?.primary;
+    if (!primary) return;
+
+    setHeartHistory((prev) => {
+      // avoid duplicates for the same word
+      const filtered = prev.filter((h) => h.word !== data.word);
+
+      const snapshot: HeartSnapshot = {
+        word: data.word,
+        state: primary.cycleState ?? null,
+        principlesPath: primary.principlesPath ?? null,
+      };
+
+      // newest first, keep last 5
+      return [snapshot, ...filtered].slice(0, 5);
+    });
+  }, [analysisResult, data?.word]);
+
   async function analyze(nextWord?: string, nextMode?: "strict" | "open", nextAlphabet?: Alphabet) {
     if (!allowAnalyze()) {
       toast({ variant: "destructive", title: "Too many requests", description: "Please try again in a few moments." });
@@ -560,7 +585,7 @@ export default function LinguisticDecoderApp() {
             </div>
           </div>
 
-          {analysisResult && (
+          {data && analysisResult && (
             <Card
               key={analysisCardKey}
               className="animate-fade-in"
@@ -574,7 +599,7 @@ export default function LinguisticDecoderApp() {
               <CardContent className="space-y-4">
                 <ResultsDisplay analysis={analysisResult} />
                 <div className="flex justify-end pt-2">
-                  {data && <ExportJsonButton analysis={data} />}
+                  <ExportJsonButton analysis={data} />
                 </div>
               </CardContent>
             </Card>
