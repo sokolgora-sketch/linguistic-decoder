@@ -1,5 +1,9 @@
 // src/shared/engineShape.ts
 
+import type { PrincipleV2, PrincipleId } from "@/engine/principles.v2";
+import type { SymbolicCoreResult } from "@/lib/symbolicCore";
+import type { Math7Summary } from "@/engine/math7";
+
 // Canonical shape your UI will use everywhere.
 export type Vowel = 'A' | 'E' | 'I' | 'O' | 'U' | 'Y' | 'Ë';
 
@@ -38,6 +42,7 @@ export type EnginePayload = {
   recomputed?: boolean;
   languageFamilies?: LanguageFamily[];
   edgeWindows?: string[];
+  math7?: Math7Summary;
 };
 
 
@@ -72,6 +77,7 @@ export function normalizeEnginePayload(raw: any): EnginePayload {
     recomputed: raw.recomputed,
     languageFamilies: raw.languageFamilies ?? [],
     edgeWindows: raw.edgeWindows ?? [],
+    math7: raw.math7,
   };
 
   return payload;
@@ -130,7 +136,7 @@ export type CandidateOriginAxes = {
 };
 
 // New types for morphology matrix
-export type MorphemeRole = 'root' | 'prefix' | 'suffix';
+export type MorphemeRole = 'root' | 'prefix' | 'suffix' | 'action' | 'instrument' | 'unit';
 
 export interface Morpheme {
   form: string;          // "stud", "dam", "dëm", "un", "ify"
@@ -149,6 +155,7 @@ export interface MorphologyMatrix {
   meaning: string;       // short description: "measure, manner"
   morphemes: Morpheme[];
   wordSums: WordSum[];
+  source?: 'manual' | 'auto'; // Added to track origin
 }
 
 export type SymbolicAxis =
@@ -325,4 +332,110 @@ export type AnalysisResult_DEPRECATED = {
   debug?: AnalysisDebug;
   sevenVoices?: SevenVoicesSummary;
   symbolic?: SymbolicLayer;
+  symbolicCore?: SymbolicCoreResult;
+  math7?: Math7Summary;
 };
+
+export type AnalyzeWordResult = {
+  word: string;
+  sanitized: string;
+  primaryPath: {
+    voicePath: string;
+    levelPath: string;
+    ringPath: string;
+  };
+  frontier: {
+    id: string;
+    voicePath: string;
+    levelPath: string;
+    ringPath: string;
+  }[];
+  languageFamilies: LanguageFamilyCandidate[];
+  meta: {
+    engineVersion: string;
+    createdAt: string;
+    mode: 'strict' | 'explore';
+    alphabet?: string;
+    solveMs?: number;
+  },
+  symbolic?: SymbolicLayer;
+  wordMatrix?: WordMatrix | null;
+  // Optional Heart Math (Seven-Principles) layer
+  math7?: Math7Summary;
+}
+
+// ---------------- Math7 / Heart Summary (Seven Principles) ----------------
+
+export interface Math7PrimarySummaryExtended {
+  /** Raw engine primary path, as already shown in UI */
+  voicePath: string;        // e.g. "U → I"
+  levelPath: string;        // e.g. "Low → High"
+  ringPath: string;         // e.g. "1 → 1"
+
+  /** Simple state: does the path return to the same vowel or not? */
+  state: "flow" | "cycle";  // "flow" if first ≠ last vowel, "cycle" if first == last
+
+  /** Count and modulo 7 */
+  totalSteps: number;       // length of the voice path, e.g. 2
+  totalMod7: number;        // totalSteps % 7, but 0 is mapped to 7 (1..7 only)
+
+  /** Seven-Principles reading of the path */
+  principlesPath: string[]; // same length as voicePath step count
+}
+
+export interface Math7SummaryExtended {
+  primary: Math7PrimarySummaryExtended;
+}
+
+
+export type LanguageFamilyCandidate = {
+  language: string;
+  form: string;
+  gloss: string;
+  passes: boolean;
+  experimental: boolean;
+  speculative: boolean;
+  voicePath: string;
+  levelPath: string;
+  ringPath: string;
+  morphologyMatrix?: MorphologyMatrix;
+  symbolic?: SymbolicTag[];
+}
+
+export interface WordMatrix {
+  word: string;                            // e.g. "study"
+  languageFamily: string;                  // e.g. "Latin", "Albanian"
+  morphology: {
+    root: string;                          // e.g. "stud"
+    suffixes?: string[];                   // e.g. ["ium", "ens"]
+    gloss: string;                         // short meaning of the root
+  };
+  meaning: string;                         // compact functional meaning
+  wordSums?: string[];                     // morphological expansions
+  consonantPattern?: string;               // optional pattern logic e.g. "plosive + nasal"
+  principles: string[];                    // e.g. ["Truth", "Expansion", "Balance"]
+  symbolicNotes?: string;                  // interpretive note or Zheji-style insight
+}
+
+export type CycleState = "open" | "balanced" | "overloaded";
+
+export interface Math7PathSummary {
+  voicePath: Vowel[];
+  indexPath: number[];      // 0–6
+  totalMod7: number;        // 0–6
+  cycleState: CycleState;   // open | balanced | overloaded
+  pairCoverage: number;     // 0–3 (A–Y, E–U, I–O)
+  principlesPath: string[]; // ["Unity", "Balance", ...]
+}
+export interface PrincipleScore {
+  id: Vowel;              // e.g. "A"
+  name: string;           // e.g. "Truth / Source / Action"
+  value: number;          // 0–1 normalized strength
+  summary: string;        // one-sentence interpretation
+  active: boolean;        // true if this principle is dominant
+}
+
+export interface PrinciplesSet {
+  source: "heart-calculator";
+  principles: PrincipleScore[];
+}

@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState, useEffect, useMemo } from "react";
@@ -45,7 +44,6 @@ import { ExportJsonButton } from "@/components/ExportJsonButton";
 import { logError } from "@/lib/logError";
 import { VOICE_COLOR_MAP, VOICE_LABEL_MAP } from "@/shared/voiceColors";
 import { SymbolicReadingCard } from "@/components/SymbolicReadingCard";
-
 
 const VOICE_META: { id: Vowel; label: string; role: string }[] = [
   { id: "A", label: "Action / Truth", role: "Launches, cuts through, sets the first line." },
@@ -138,7 +136,6 @@ export default function LinguisticDecoderApp(){
         setData(null);
     }
   }
-
 
   useEffect(() => {
     const p = new URLSearchParams(window.location.search);
@@ -526,7 +523,7 @@ export default function LinguisticDecoderApp(){
             </div>
           </div>
 
-          {analysisResult && (
+          {data && (
             <Card
               key={`${data.word}-${data.mode}-${data.alphabet}`}
               className="animate-fade-in"
@@ -538,7 +535,8 @@ export default function LinguisticDecoderApp(){
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <ResultsDisplay analysis={analysisResult} />
+                {/* Pass EnginePayload directly so ResultsDisplay can adapt it */}
+                <ResultsDisplay analysis={data} />
                 <div className="flex justify-end pt-2">
                   {data && <ExportJsonButton analysis={data} />}
                 </div>

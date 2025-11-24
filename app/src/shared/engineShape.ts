@@ -427,3 +427,15 @@ export interface Math7PathSummary {
   pairCoverage: number;     // 0–3 (A–Y, E–U, I–O)
   principlesPath: string[]; // ["Unity", "Balance", ...]
 }
+export interface PrincipleScore {
+  id: Vowel;              // e.g. "A"
+  name: string;           // e.g. "Truth / Source / Action"
+  value: number;          // 0–1 normalized strength
+  summary: string;        // one-sentence interpretation
+  active: boolean;        // true if this principle is dominant
+}
+
+export interface PrinciplesSet {
+  source: "heart-calculator";
+  principles: PrincipleScore[];
+}

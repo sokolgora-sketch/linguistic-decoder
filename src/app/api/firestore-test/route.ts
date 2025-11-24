@@ -1,3 +1,4 @@
+// src/app/api/firestore-test/route.ts
 import { NextResponse } from "next/server";
 
 export async function GET() {
