@@ -1,5 +1,12 @@
 
-import type { EnginePayload, PrinciplesSet, PrincipleScore, Vowel } from "./engineShape";
+// src/shared/computePrinciples.ts  (or whatever filename you're using)
+
+import type {
+  EnginePayload,
+  PrinciplesSet,
+  PrincipleScore,
+  Vowel,
+} from "./engineShape";
 import { VOICE_LABEL_MAP } from "@/shared/voiceColors";
 
 const PRINCIPLE_BASE: Record<Vowel, string> = {
@@ -18,16 +25,39 @@ export function computePrinciples(payload: EnginePayload): PrinciplesSet {
   }
 
   const voices = payload.primaryPath.voicePath;
-  const counts: Record<Vowel, number> = { A:0, E:0, I:0, O:0, U:0, Y:0, Ë:0 };
-  voices.forEach(v => { if (counts[v as Vowel] !== undefined) counts[v as Vowel]++; });
+  const counts: Record<Vowel, number> = {
+    A: 0,
+    E: 0,
+    I: 0,
+    O: 0,
+    U: 0,
+    Y: 0,
+    Ë: 0,
+  };
+
+  voices.forEach((v) => {
+    if (counts[v as Vowel] !== undefined) counts[v as Vowel]++;
+  });
 
   const total = voices.length;
-  const principles: PrincipleScore[] = (Object.keys(counts) as Vowel[]).map(v => {
-    const value = total > 0 ? counts[v] / total : 0;
-    const active = value > 0.15; // arbitrary threshold
-    const summary = `${v} reflects ${VOICE_LABEL_MAP[v]} (${Math.round(value*100)}%)`;
-    return { id: v, name: PRINCIPLE_BASE[v], value, summary, active };
-  });
+
+  const principles: PrincipleScore[] = (Object.keys(counts) as Vowel[]).map(
+    (v) => {
+      const value = total > 0 ? counts[v] / total : 0;
+      const active = value > 0.15; // threshold you can tune later
+      const summary = `${v} reflects ${VOICE_LABEL_MAP[v]} (${Math.round(
+        value * 100
+      )}%)`;
+
+      return {
+        id: v,
+        name: PRINCIPLE_BASE[v],
+        value,
+        summary,
+        active,
+      };
+    }
+  );
 
   return { source: "heart-calculator", principles };
 }
