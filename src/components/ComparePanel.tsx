@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -483,6 +483,42 @@ const ComparePanel: React.FC<ComparePanelProps> = ({
   // --- Origin relationship ---
   const originRelation = analyzeOriginRelation(left, right);
 
+  // Short human verdict for the comparison summary
+  const comparisonVerdict = useMemo(() => {
+    if (!left.result || !right.result) return null;
+
+    const parts: string[] = [];
+
+    // 1) Path
+    if (primaryPathEqual) {
+      parts.push("Same Seven-Voices path");
+    } else {
+      parts.push("Different Seven-Voices paths");
+    }
+
+    // 2) Shared voices
+    const shared = sharedVoices ?? [];
+    if (shared.length === 0) {
+      parts.push("No shared voices");
+    } else {
+      const list = shared.join(", ");
+      parts.push(`Shared voice${shared.length > 1 ? "s" : ""} ${list}`);
+    }
+
+    // 3) Origin family
+    const fam = (originRelationNew.code || "").toString().toUpperCase();
+
+    if (fam === "SAME") {
+      parts.push("Same origin family");
+    } else if (fam === "DIFFERENT") {
+      parts.push("Different origin families");
+    } else {
+      parts.push("Origin family unknown");
+    }
+
+    return parts.join(" · ");
+  }, [left.result, right.result, primaryPathEqual, sharedVoices, originRelationNew]);
+
   // -----------------------------------------------------------------------
   // Render
   // -----------------------------------------------------------------------
@@ -782,43 +818,9 @@ const ComparePanel: React.FC<ComparePanelProps> = ({
             </div>
 
             <div>
-              Origin:{" "}
-              <span className="font-mono">
-                {leftMainCand
-                  ? `${leftMainCand.language} · ${leftMainCand.form}`
-                  : "—"}
-              </span>{" "}
-              vs{" "}
-              <span className="font-mono">
-                {rightMainCand
-                  ? `${rightMainCand.language} · ${rightMainCand.form}`
-                  : "—"}
-              </span>
-            </div>
-
-            <div>
               <span className="font-semibold">Origin relation:</span>{" "}
-              <span
-                className={
-                  originRelation.family.startsWith("Shared")
-                    ? "text-green-400"
-                    : "text-yellow-400"
-                }
-              >
-                {originRelation.family}
-              </span>{" "}
-              |{" "}
-              <span
-                className={
-                  originRelation.mirror.startsWith("YES")
-                    ? "text-blue-400"
-                    : originRelation.mirror.startsWith("Similar")
-                    ? "text-cyan-400"
-                    : "text-muted-foreground"
-                }
-              >
-                {originRelation.mirror}
-              </span>
+              {originRelationNew.label}
+              {originRelationNew.detail ? ` — ${originRelationNew.detail}` : ""}
             </div>
 
             <div>
