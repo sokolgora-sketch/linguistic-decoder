@@ -385,6 +385,9 @@ const ComparePanel: React.FC<ComparePanelProps> = ({
     rightPrinciplesPath || []
   );
 
+  // --- Origin relationship ---
+  const originRelation = analyzeOriginRelation(left, right);
+
   // -----------------------------------------------------------------------
   // Render
   // -----------------------------------------------------------------------
