@@ -756,8 +756,17 @@ const ComparePanel: React.FC<{
         {/* Comparison summary --------------------------------------------- */}
         {left.result && right.result && (
           <Card className="mt-6">
-            <CardHeader>
-              <CardTitle>Comparison summary</CardTitle>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base font-semibold">
+                Comparison summary
+              </CardTitle>
+              <CardDescription className="text-xs text-muted-foreground">
+                Comparing{" "}
+                <span className="font-semibold">{left.word}</span>
+                {" "}
+                vs{" "}
+                <span className="font-semibold">{right.word}</span>
+              </CardDescription>
             </CardHeader>
             <CardContent className="text-sm text-muted-foreground leading-relaxed space-y-2">
               {comparisonVerdict && (
