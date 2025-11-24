@@ -340,6 +340,35 @@ export default function LinguisticDecoderApp() {
           )}
         </section>
 
+        {/* Recent hearts strip */}
+        {heartHistory.length > 0 && (
+          <section className="mt-1 text-[11px] text-muted-foreground flex flex-wrap items-center gap-1">
+            <span className="uppercase tracking-wide font-semibold text-[10px] text-primary/80">
+              Recent hearts:
+            </span>
+            {heartHistory.map((h) => (
+              <button
+                key={h.word}
+                type="button"
+                onClick={() => {
+                  setWord(h.word);
+                  analyze(h.word);
+                }}
+                className="px-1.5 py-0.5 rounded-full border border-border/60 bg-muted/50 hover:bg-accent/20 hover:border-accent/70 transition text-[10px] font-medium"
+              >
+                <span className="font-semibold mr-1">{h.word}</span>
+                {h.state && <span className="opacity-80">· {h.state}</span>}
+                {h.principlesPath && h.principlesPath.length > 0 && (
+                  <span className="opacity-80">
+                    {" "}
+                    · {h.principlesPath.join(" → ")}
+                  </span>
+                )}
+              </button>
+            ))}
+          </section>
+        )}
+
         {/* Controls */}
         <Card>
           <CardHeader>
