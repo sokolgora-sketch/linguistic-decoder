@@ -1,5 +1,6 @@
+
 import type { EnginePayload, PrinciplesSet, PrincipleScore, Vowel } from "./engineShape";
-import { VOICE_LABEL_MAP } from "./voiceColors";
+import { VOICE_LABEL_MAP } from "@/shared/voiceColors";
 
 const PRINCIPLE_BASE: Record<Vowel, string> = {
   A: "Truth / Source / Action",
