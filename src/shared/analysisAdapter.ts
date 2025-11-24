@@ -20,43 +20,50 @@ import type {
   EnginePayload,
   SevenVoicesSummary,
   SymbolicLayer,
-} from './engineShape';
-import { CANON_CANDIDATES } from './canonCandidates';
-import { buildConsonantField } from './consonantField';
-import { getVoiceMeta } from './sevenVoices';
-import { detectAlbanianDialect } from '../lib/detectDialect';
-import { computeMath7ForResult } from '@/engine/math7';
+} from "./engineShape";
+import { CANON_CANDIDATES } from "./canonCandidates";
+import { buildConsonantField } from "./consonantField";
+import { getVoiceMeta } from "./sevenVoices";
+import { detectAlbanianDialect } from "../lib/detectDialect";
+import { computeMath7ForResult } from "@/engine/math7";
+import { computePrinciples } from "./computePrinciples";
 
+/**
+ * Builds a light Seven-Voices / principles summary from the primary path.
+ * Safe against missing / empty paths.
+ */
 function buildSevenVoicesSummary(
   payload: EnginePayload
 ): SevenVoicesSummary | undefined {
-  const path = payload.primaryPath.voicePath;
+  const path = payload.primaryPath?.voicePath;
   if (!path || path.length === 0) return undefined;
 
-  const principlePath = path.map(v => getVoiceMeta(v).principle);
+  const principlePath = path.map((v) => getVoiceMeta(v).principle);
+
   const voiceCounts: Record<string, number> = {};
   for (const v of path) {
     voiceCounts[v] = (voiceCounts[v] ?? 0) + 1;
   }
+
   const maxCount = Math.max(...Object.values(voiceCounts));
   const dominant = Object.entries(voiceCounts)
     .filter(([, count]) => count === maxCount)
     .map(([v]) => getVoiceMeta(v as any).principle);
 
   const sevenWords = [
-    'Truth',
-    'Expansion',
-    'Insight',
-    'Balance',
-    'Unity',
-    'Network Integrity',
-    'Evolution',
+    "Truth",
+    "Expansion",
+    "Insight",
+    "Balance",
+    "Unity",
+    "Network Integrity",
+    "Evolution",
   ];
 
   return {
     voicePath: path,
     principlesPath: principlePath,
-    dominant: dominant,
+    dominant,
     sevenWords,
   };
 }
@@ -81,34 +88,46 @@ function buildSymbolicLayer(
 
   return {
     notes,
-    label: 'Zheji-inspired symbolic reading (experimental)',
+    label: "Zheji-inspired symbolic reading (experimental)",
   };
 }
 
-// Adapts a raw EnginePayload into the richer AnalysisResult structure,
-// which includes canonical candidates, consonant summaries, and principles.
+/**
+ * Adapts a raw EnginePayload into the richer AnalysisResult structure,
+ * which includes canonical candidates, consonant summaries, Seven-Voices summary,
+ * and the optional math7 “heart” layer.
+ */
 export function enginePayloadToAnalysisResult(
   payload: EnginePayload | null
 ): AnalysisResult_DEPRECATED | null {
-  if (!payload || !payload.primaryPath) {
+  // Hard guard – if engine didn’t give us a primary path, no analysis.
+  if (
+    !payload ||
+    !payload.primaryPath ||
+    !payload.primaryPath.voicePath ||
+    !payload.primaryPath.ringPath
+  ) {
     return null;
   }
 
-  const { field, summary } = buildConsonantField(payload, payload.primaryPath);
-  const { word, mode } = payload;
+  const { field, summary } = buildConsonantField(
+    payload,
+    payload.primaryPath
+  );
+
+  const { word } = payload;
   const canon = CANON_CANDIDATES[word.toLowerCase()] ?? [];
 
-  const candidates: Candidate[] = canon.map(c => {
-    // Per instruction: set consonantProfileOk to true if the axes verdict for consonants is 'pass'.
-    const profileOk = c.axes?.consonants === 'pass';
-
+  // Canonical candidates, with consonantProfileOk derived from axes.verdict
+  const candidates: Candidate[] = canon.map((c) => {
+    const profileOk = c.axes?.consonants === "pass";
     return {
       ...c,
       consonantProfileOk: profileOk,
     };
   });
 
-  // If no canonical candidates found, create speculative ones.
+  // If no canonical candidates, synthesize speculative ones from languageFamilies.
   if (candidates.length === 0) {
     for (const fam of payload.languageFamilies ?? []) {
       candidates.push({
@@ -138,8 +157,8 @@ export function enginePayloadToAnalysisResult(
           networkIntegrityOk: true,
           evolutionOk: true,
         },
-        status: 'experimental',
-        confidenceTag: 'speculative',
+        status: "experimental",
+        confidenceTag: "speculative",
       });
     }
   }
@@ -151,23 +170,23 @@ export function enginePayloadToAnalysisResult(
       raw: payload.word,
       normalized: payload.word,
       alphabet: payload.alphabet,
-      languageGuess: payload.languageFamilies?.[0]?.label ?? 'unknown',
-      languageConfidence: 'medium',
+      languageGuess: payload.languageFamilies?.[0]?.label ?? "unknown",
+      languageConfidence: "medium",
       dialectGuess: detectAlbanianDialect(word),
-      mode: 'strict',
+      mode: "strict",
     },
     voices: {
       vowelVoices: payload.primaryPath.voicePath,
       ringPath: payload.primaryPath.ringPath,
-      levelPath: payload.primaryPath.levelPath.map(l =>
-        l > 0 ? 'high' : l < 0 ? 'low' : 'mid'
+      levelPath: payload.primaryPath.levelPath.map((l) =>
+        l > 0 ? "high" : l < 0 ? "low" : "mid"
       ),
       dominantVoices: {},
     },
     consonants: {
       clusters: (payload.windows ?? []).map((c, i) => ({
         cluster: c,
-        classes: [payload.windowClasses?.[i] ?? ''],
+        classes: [payload.windowClasses?.[i] ?? ""],
         orbitSlots: [],
         harmonyScore: 0,
       })),
@@ -180,7 +199,7 @@ export function enginePayloadToAnalysisResult(
       primary: {
         voiceSequence: payload.primaryPath.voicePath,
         ringPath: payload.primaryPath.ringPath,
-        tensionLevel: 'low',
+        tensionLevel: "low",
       },
       frontierCount: payload.frontierPaths.length,
     },
@@ -201,18 +220,22 @@ export function enginePayloadToAnalysisResult(
     sevenVoices,
     symbolic,
   };
-  
-  // Attach Heart Math as an optional extra layer
+
+  // Attach Math7 / Heart layer (optional)
   const math7 = computeMath7ForResult(analysisResult);
   if (math7) {
-    analysisResult.math7 = math7;
+    (analysisResult as any).math7 = math7;
   }
+  
+  (analysisResult as any).principles = computePrinciples(payload);
 
   return analysisResult;
 }
 
-// Converts the rich AnalysisResult back to a bare EnginePayload,
-// which is useful for mocks or testing other parts of the pipeline.
+/**
+ * Converts the rich AnalysisResult back to a bare EnginePayload,
+ * useful for mocks or piping into other tools.
+ */
 export function analysisResultToEnginePayload(
   result: AnalysisResult_DEPRECATED | null
 ): EnginePayload | null {
@@ -222,28 +245,30 @@ export function analysisResultToEnginePayload(
 
   const { mode, alphabet } = result.core.input;
 
-  const basePayload = result.debug?.rawEnginePayload ?? {
+  const basePayload =
+    result.debug?.rawEnginePayload ?? {
       engineVersion: result.core.engineVersion,
       word: result.core.word,
-      mode: mode,
-      alphabet: alphabet,
+      mode,
+      alphabet,
       primaryPath: {
         voicePath: result.core.voices.vowelVoices,
         ringPath: result.core.voices.ringPath,
-        levelPath: result.core.voices.levelPath.map(l =>
-          l === 'high' ? 1 : l === 'low' ? -1 : 0
+        levelPath: result.core.voices.levelPath.map((l) =>
+          l === "high" ? 1 : l === "low" ? -1 : 0
         ),
         ops: [],
         checksums: { V: 0, E: 0, C: 0 },
         kept: 0,
       },
       frontierPaths: [],
-      windows: result.core.consonants.clusters.map(c => c.cluster),
+      windows: result.core.consonants.clusters.map((c) => c.cluster),
       windowClasses: result.core.consonants.clusters.map(
-        c => c.classes[0]
+        (c) => c.classes[0]
       ),
       signals: [],
     };
-    
-  return { ...basePayload, math7: result.math7 };
+
+  // We optionally attach math7 here so it can round-trip if needed.
+  return { ...basePayload, math7: (result as any).math7 };
 }
