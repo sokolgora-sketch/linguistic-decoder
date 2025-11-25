@@ -2,7 +2,13 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
@@ -760,13 +766,12 @@ const ComparePanel: React.FC<{
               <CardTitle className="text-base font-semibold">
                 Comparison summary
               </CardTitle>
-              <CardDescription className="text-xs text-muted-foreground">
+              <p className="text-[13px] text-slate-300 mb-1 pt-1">
                 Comparing{" "}
-                <span className="font-semibold">{left.word}</span>
-                {" "}
-                vs{" "}
-                <span className="font-semibold">{right.word}</span>
-              </CardDescription>
+                <span className="font-semibold text-slate-100">{left.word}</span>
+                {" vs "}
+                <span className="font-semibold text-slate-100">{right.word}</span>
+              </p>
             </CardHeader>
             <CardContent className="text-sm text-muted-foreground leading-relaxed space-y-2">
               {comparisonVerdict && (
