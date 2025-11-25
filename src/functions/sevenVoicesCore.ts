@@ -17,6 +17,119 @@
 import { getManifest, EngineManifest } from "../engine/manifest";
 import { computeC, extractBase, normalizeTerminalY, readWindowsDebug, edgeBiasPenalty, type EdgeInfo } from "./sevenVoicesC";
 import { chooseProfile, CClass } from "./languages";
+// ───────────────────────────────────────────────
+// Layer 1: Heart / Seven-Principles shared types
+// ───────────────────────────────────────────────
+
+export type SevenVoice = "A" | "E" | "I" | "O" | "U" | "Y" | "Ë";
+
+export type HeartLightDark =
+  | "LIGHT"
+  | "DARK"
+  | "MIXED"
+  | "UNKNOWN";
+
+export type HeartTone =
+  | "LOW"
+  | "MID"
+  | "HIGH"
+  | "BALANCED";
+
+export type HeartRole = "ACTION" | "DOMAIN" | "RESULT";
+
+export interface HeartChunk {
+  role: HeartRole;        // ACTION | DOMAIN | RESULT
+  form: string;           // e.g. "da", "ma", "gje"
+  gloss?: string;         // optional short meaning
+}
+
+export interface HeartCandidate {
+  language?: string;               // "English", "Latin", "Albanian", ...
+  form: string;                    // surface form: "damage", "damnum", ...
+  decomposition: HeartChunk[];     // structured triad/pieces
+  vowel_path: SevenVoice[];        // e.g. ["A", "A", "E"]
+  functional_statement: string;    // strict one-sentence function
+
+  light_dark?: HeartLightDark;
+  vibrational_tone?: HeartTone;
+  signals?: string[];              // notes like "strong fit", "dialectal"
+}
+
+export interface HeartResult {
+  meta: {
+    engine_version: string;
+    mode: "STRICT" | "EXPLORATORY";
+    input_word: string;
+    timestamp_iso: string;
+  };
+
+  // Canonical verdict from the Heart
+  core_function: string;           // e.g. "Divide something from its wholeness..."
+  core_vowel_motif: SevenVoice[];  // main voice motif, e.g. ["A","A","E"]
+  light_dark: HeartLightDark;
+  vibrational_tone: HeartTone;
+
+  // All candidates that PASS Seven Principles
+  candidates: HeartCandidate[];
+  warnings?: string[];
+}// ───────────────────────────────────────────────
+// Layer 2: Mind / Deep-root etymology types
+// ───────────────────────────────────────────────
+
+// Same triad as the Heart roles, just a semantic alias.
+export type RootRole = HeartRole; // "ACTION" | "DOMAIN" | "RESULT"
+
+export interface DeepRootPiece {
+  role: RootRole;        // ACTION | DOMAIN | RESULT
+  block: string;         // "da", "ma", "gje", "ligj", "ter", "fi", ...
+  language: string;      // "Albanian", "Greek", "Latin", ...
+  meaning: string;       // plain meaning: "to split", "law", "darkness", ...
+  notes?: string;        // e.g. "everyday Albanian verb", "borrowed form"
+}
+
+export interface DeepRootExample {
+  language: string;      // e.g. "Albanian"
+  form: string;          // e.g. "dëm", "ligj"
+  gloss: string;         // short explanation: "harm", "law"
+}
+
+export interface DeepRootResult {
+  // Always mirrors the Heart — no contradictions allowed.
+  core_function: string;                     // copy from HeartResult
+  core_vowel_motif: SevenVoice[];           // copy from HeartResult
+  light_dark: HeartLightDark;               // copy from HeartResult
+  vibrational_tone: HeartTone;              // copy from HeartResult
+
+  // Minimal functional pieces making up the word.
+  pieces: DeepRootPiece[];                  // usually 2–4 blocks
+
+  // One or two sentences tying ACTION / DOMAIN / RESULT together.
+  explanation_short: string;
+
+  // A few real-world forms that show the same roots in use.
+  examples_modern_usage: DeepRootExample[];
+}// ───────────────────────────────────────────────
+// Combined engine output (Layers 0 → 1 → 2)
+// ───────────────────────────────────────────────
+
+/**
+ * Canonical result of the Seven-Voices engine for a single word.
+ * - layer0: raw input + family forms (no philosophy)
+ * - heart: Seven Principles verdict (must always be present)
+ * - mind: optional deeper etymology layers (DeepRoot etc.)
+ */
+export interface SevenVoicesEngineResult {
+  layer0: Layer0Output;
+  heart: HeartResult;
+
+  // Layer 2 will gradually fill this. It’s optional so
+  // we don’t break anything while we are still wiring it.
+  mind?: {
+    deepRoot?: DeepRootResult;
+  };
+}
+
+
 
 export const VOWELS = ["A", "E", "I", "O", "U", "Y", "Ë"] as const;
 export type Vowel = (typeof VOWELS)[number];
