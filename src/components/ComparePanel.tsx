@@ -483,10 +483,7 @@ const ComparePanel: React.FC<{
     rightPrinciplesPath || []
   );
 
-  const originRelationNew = classifyOriginRelation(leftMainCand, rightMainCand);
-
-  // --- Origin relationship ---
-  const originRelation = analyzeOriginRelation(left, right);
+  const originRelation = classifyOriginRelation(leftMainCand, rightMainCand);
 
   // Short human verdict for the comparison summary
   const comparisonVerdict = useMemo(() => {
@@ -511,7 +508,7 @@ const ComparePanel: React.FC<{
     }
 
     // 3) Origin family
-    const fam = (originRelationNew.code || "").toString().toUpperCase();
+    const fam = (originRelation.code || "").toString().toUpperCase();
 
     if (fam === "SAME") {
       parts.push("Same origin family");
@@ -522,7 +519,7 @@ const ComparePanel: React.FC<{
     }
 
     return parts.join(" · ");
-  }, [left.result, right.result, primaryPathEqual, sharedVoices, originRelationNew]);
+  }, [left.result, right.result, primaryPathEqual, sharedVoices, originRelation]);
 
   // -----------------------------------------------------------------------
   // Render
@@ -766,16 +763,18 @@ const ComparePanel: React.FC<{
               <CardTitle className="text-base font-semibold">
                 Comparison summary
               </CardTitle>
-              <p className="text-[13px] text-slate-300 mb-1 pt-1">
-                Comparing{" "}
-                <span className="font-semibold text-slate-100">{left.word}</span>
-                {" vs "}
-                <span className="font-semibold text-slate-100">{right.word}</span>
-              </p>
+              <CardDescription>
+                <p className="text-[13px] text-slate-300 pt-1">
+                  Comparing{" "}
+                  <span className="font-semibold text-slate-100">{left.word}</span>
+                  {" vs "}
+                  <span className="font-semibold text-slate-100">{right.word}</span>
+                </p>
+              </CardDescription>
             </CardHeader>
             <CardContent className="text-sm text-muted-foreground leading-relaxed space-y-2">
               {comparisonVerdict && (
-                <p className="mb-2 text-sm">
+                <p className="mb-3 text-[13px] leading-relaxed">
                   <span className="font-semibold">Verdict:</span>{" "}
                   {comparisonVerdict}
                 </p>
@@ -838,8 +837,8 @@ const ComparePanel: React.FC<{
 
               <div>
                 <span className="font-semibold">Origin relation:</span>{" "}
-                {originRelationNew.label}
-                {originRelationNew.detail ? ` — ${originRelationNew.detail}` : ""}
+                {originRelation.label}
+                {originRelation.detail ? ` — ${originRelation.detail}` : ""}
               </div>
 
               <div>
