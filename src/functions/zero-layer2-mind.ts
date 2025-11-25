@@ -112,10 +112,10 @@ function findMicroRootForBlock(
 ): DeepRootPiece | null {
   const variants: BlockVariant[] = generateBlockVariants(block);
 
+  // First pass: respect the roleHint (ACTION / DOMAIN / RESULT)
   for (const variant of variants) {
     const root = ALBANIAN_MICRO_ROOTS.find((lexeme) => {
       if (lexeme.base !== variant.form) return false;
-      // If the root explicitly supports this role, prefer it.
       return lexeme.roles.includes(roleHint);
     });
 
@@ -124,7 +124,9 @@ function findMicroRootForBlock(
       if (root.notes) notesParts.push(root.notes);
       if (variant.appliedRuleIds.length > 0) {
         notesParts.push(
-          `applied morph rule(s): ${'${variant.appliedRuleIds.join(", ")}'} from original block '${block}'`
+          `applied morph rule(s): ${variant.appliedRuleIds.join(
+            ", "
+          )} from original block '${block}'`
         );
       }
 
@@ -140,8 +142,7 @@ function findMicroRootForBlock(
     }
   }
 
-  // If nothing matched on roleHint, try again ignoring role,
-  // just to see if there is *some* plausible micro-root connection.
+  // Second pass: ignore roleHint, just see if some micro-root matches at all
   for (const variant of variants) {
     const root = ALBANIAN_MICRO_ROOTS.find(
       (lexeme) => lexeme.base === variant.form
@@ -151,7 +152,9 @@ function findMicroRootForBlock(
       if (root.notes) notesParts.push(root.notes);
       if (variant.appliedRuleIds.length > 0) {
         notesParts.push(
-          `applied morph rule(s): ${'${variant.appliedRuleIds.join(", ")}'} from original block '${block}'`
+          `applied morph rule(s): ${variant.appliedRuleIds.join(
+            ", "
+          )} from original block '${block}'`
         );
       }
 
