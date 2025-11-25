@@ -295,6 +295,28 @@ async function main() {
     console.log(JSON.stringify(deepStudy, null, 2));
   }
 
+  // MATHEMATICS
+  const heartMath = makeHeartMathematics();
+  const deepMath = buildDeepRootFromHeart(heartMath);
+
+  console.log("\n--- DeepRoot for 'mathematics' ---");
+  if (!deepMath) {
+    console.log("No DeepRootResult produced for 'mathematics'.");
+  } else {
+    console.log(JSON.stringify(deepMath, null, 2));
+  }
+
+  // RELIGION
+  const heartRel = makeHeartReligion();
+  const deepRel = buildDeepRootFromHeart(heartRel);
+
+  console.log("\n--- DeepRoot for 'religion' ---");
+  if (!deepRel) {
+    console.log("No DeepRootResult produced for 'religion'.");
+  } else {
+    console.log(JSON.stringify(deepRel, null, 2));
+  }
+
   console.log("\n=== smoke test done ===");
 }
 
