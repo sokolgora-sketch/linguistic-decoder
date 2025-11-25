@@ -1,7 +1,7 @@
 // src/functions/zero-engine-smoke.ts
 // Smoke test for Layer 2 (Mind) DeepRoot builder.
 // This does NOT touch your real engine. It just:
-//  - builds fake HeartResult objects for "damage" and "study"
+//  - builds fake HeartResult objects for "damage", "dëmtim" and "study"
 //  - runs buildDeepRootFromHeart
 //  - logs the DeepRootResult to console
 
@@ -37,6 +37,54 @@ function makeHeartDamage(): HeartResult {
         vowel_path: ["A", "A", "E"],
         functional_statement:
           "Split or cut off a part of something so that the remaining thing is left in a harmed state.",
+        light_dark: "DARK",
+        vibrational_tone: "LOW",
+        signals: ["strong fit", "albanian-micro-roots"],
+      },
+    ],
+    warnings: [],
+  } as HeartResult;
+
+  return heart;
+}
+
+function makeHeartDemtim(): HeartResult {
+  // Here we treat "dëmtim" as the state/process that results
+  // when DA–MA–GJË has already been applied.
+  const heart = {
+    meta: {
+      engine_version: "zero-core-v1-smoke",
+      mode: "STRICT",
+      input_word: "dëmtim",
+      timestamp_iso: new Date().toISOString(),
+    },
+    core_function:
+      "The state or process where a thing has already been harmed and stands reduced from its wholeness.",
+    // For dëmtim you computed Ë → I in your core engine;
+    // here we keep the deeper A–A–E motif underneath as the damage root.
+    core_vowel_motif: ["A", "A", "E"],
+    light_dark: "DARK",
+    vibrational_tone: "LOW",
+    candidates: [
+      {
+        language: "Albanian",
+        form: "dëmtim",
+        decomposition: [
+          { role: "ACTION", form: "da", gloss: "to split, divide" },
+          {
+            role: "DOMAIN",
+            form: "ma",
+            gloss: "more, larger portion / measure",
+          },
+          {
+            role: "RESULT",
+            form: "gje",
+            gloss: "thing, object, asset; the harmed unit",
+          },
+        ],
+        vowel_path: ["A", "A", "E"],
+        functional_statement:
+          "Apply division to a thing so that the remaining unit stays in a harmed, reduced state.",
         light_dark: "DARK",
         vibrational_tone: "LOW",
         signals: ["strong fit", "albanian-micro-roots"],
@@ -85,7 +133,7 @@ function makeHeartStudy(): HeartResult {
         decomposition: [
           {
             role: "ACTION",
-            form: "stu", // Mind will use stu → shtu via ADD_H_AFTER_S
+            form: "stu", // Mind will use stu → shtu via S_TO_SH / ADD_H_AFTER_S
             gloss: "what is not yet yours / to be added",
           },
           {
@@ -125,6 +173,17 @@ async function main() {
     console.log("No DeepRootResult produced for 'damage'.");
   } else {
     console.log(JSON.stringify(deepDamage, null, 2));
+  }
+
+  // DËMTIM
+  const heartDemtim = makeHeartDemtim();
+  const deepDemtim = buildDeepRootFromHeart(heartDemtim);
+
+  console.log("\n--- DeepRoot for 'dëmtim' ---");
+  if (!deepDemtim) {
+    console.log("No DeepRootResult produced for 'dëmtim'.");
+  } else {
+    console.log(JSON.stringify(deepDemtim, null, 2));
   }
 
   // STUDY
