@@ -161,6 +161,104 @@ function makeHeartStudy(): HeartResult {
   return heart;
 }
 
+function makeHeartMathematics(): HeartResult {
+  const heart = {
+    meta: {
+      engine_version: "zero-core-v1-smoke",
+      mode: "STRICT",
+      input_word: "mathematics",
+      timestamp_iso: new Date().toISOString(),
+    },
+    core_function:
+      "Measure and re-measure what is present so that what you have becomes a clear, stable quantity.",
+    // Based on 'matematika' → A–E–A–I–A
+    core_vowel_motif: ["A", "E", "A", "I", "A"],
+    light_dark: "MIXED",
+    vibrational_tone: "MID",
+    candidates: [
+      {
+        language: "Albanian-pattern",
+        form: "matematika",
+        decomposition: [
+          {
+            role: "ACTION",
+            form: "mat",
+            gloss: "to measure",
+          },
+          {
+            role: "DOMAIN",
+            form: "mat",
+            gloss: "field of repeated measurement",
+          },
+          {
+            role: "RESULT",
+            form: "tika",
+            gloss: "what you have; counted unit",
+          },
+        ],
+        vowel_path: ["A", "E", "A", "I", "A"],
+        functional_statement:
+          "Measure and re-measure what is there so that what you have becomes a clear, stable quantity.",
+        light_dark: "MIXED",
+        vibrational_tone: "MID",
+        signals: ["strong fit", "albanian-micro-roots"],
+      },
+    ],
+    warnings: [],
+  } as HeartResult;
+
+  return heart;
+}
+
+function makeHeartReligion(): HeartResult {
+  const heart = {
+    meta: {
+      engine_version: "zero-core-v1-smoke",
+      mode: "STRICT",
+      input_word: "religion",
+      timestamp_iso: new Date().toISOString(),
+    },
+    core_function:
+      "Return or bind people under a law or rule inside a shared circle.",
+    // re-ligj-on → E–I–O as core motif
+    core_vowel_motif: ["E", "I", "O"],
+    light_dark: "MIXED",
+    vibrational_tone: "MID",
+    candidates: [
+      {
+        language: "Latin/Albanian-bridge",
+        form: "religion",
+        decomposition: [
+          {
+            role: "ACTION",
+            form: "re",
+            gloss: "again, back, return",
+          },
+          {
+            role: "DOMAIN",
+            form: "ligj",
+            gloss: "law, binding rule",
+          },
+          {
+            role: "RESULT",
+            form: "on",
+            gloss: "state under that law",
+          },
+        ],
+        vowel_path: ["E", "I", "O"],
+        functional_statement:
+          "Bind or return people under a law or rule within a shared circle or order.",
+        light_dark: "MIXED",
+        vibrational_tone: "MID",
+        signals: ["strong fit", "albanian-micro-roots", "law-circle"],
+      },
+    ],
+    warnings: [],
+  } as HeartResult;
+
+  return heart;
+}
+
 async function main() {
   console.log("=== ZË-RO DeepRoot smoke test ===");
 
