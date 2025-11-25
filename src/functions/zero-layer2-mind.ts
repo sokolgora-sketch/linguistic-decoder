@@ -35,7 +35,7 @@ interface MicroRootLexeme {
  * Mind is NOT allowed to invent roots outside this list.
  */
 const ALBANIAN_MICRO_ROOTS: MicroRootLexeme[] = [
-  // damage: da – ma – gje
+  // damage / dëmtim: da – ma – gje
   {
     base: "da",
     language: "Albanian",
@@ -95,6 +95,38 @@ const ALBANIAN_MICRO_ROOTS: MicroRootLexeme[] = [
     meaning: "law, formal rule",
     roles: ["DOMAIN"],
     notes: "Noun 'ligj' – law / rule.",
+  },
+
+  // mathematics: mat – mat – tika (ti + ka)
+  {
+    base: "mat",
+    language: "Albanian",
+    meaning: "to measure, to count, to assess quantity",
+    roles: ["ACTION", "DOMAIN"],
+    notes: "Verb 'me mat' – to measure.",
+  },
+  {
+    base: "tika",
+    language: "Albanian-pattern",
+    meaning: "what you have; that which is counted as yours",
+    roles: ["RESULT"],
+    notes: "Compressed from ti (you) + ka (has); 'what you have' as a unit.",
+  },
+
+  // religion: re – ligj – on
+  {
+    base: "re",
+    language: "Latin/Albanian-bridge",
+    meaning: "again, back, return to a point",
+    roles: ["ACTION"],
+    notes: "Latin prefix 're-' (again/back); functional match to returning/binding again.",
+  },
+  {
+    base: "on",
+    language: "Latin/Greek suffix",
+    meaning: "state, condition, ongoing process",
+    roles: ["RESULT"],
+    notes: "Abstract noun ending (-ion, -tion etc.): 'state under X'.",
   },
 ];
 
