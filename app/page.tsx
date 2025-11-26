@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useEffect, useMemo } from "react";
@@ -258,6 +259,8 @@ export default function LinguisticDecoderApp() {
   // Safe key for the Analysis Results card (avoids 'data is possibly null')
   const analysisCardKey =
     data != null ? `${data.word}-${data.mode}-${data.alphabet}` : `analysis-${mode}-${alphabet}`;
+    
+  const calculatorExprA = (analysisResult?.core.primaryPath.voicePath ?? "").replace(/[^AEIOUYË1-7]/gi, "");
 
   return (
     <div className="min-h-screen bg-background text-foreground p-4 lg:p-8 flex flex-col items-stretch transition-colors duration-300">
@@ -732,7 +735,13 @@ export default function LinguisticDecoderApp() {
               </div>
             </AccordionTrigger>
             <AccordionContent>
-              <HeartCalculator onResult={setCalcOverlay} />
+              <HeartCalculator
+                onResult={setCalcOverlay}
+                initialExprA={calculatorExprA || "AO"}
+                initialExprB="A"
+                initialOp="add"
+                autoRun={true}
+              />
             </AccordionContent>
           </AccordionItem>
 

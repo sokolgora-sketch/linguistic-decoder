@@ -7,7 +7,7 @@ import type { SevenCalcResult } from "./sevenPrinciplesCalc";
 export type { Math7Summary, SevenCalcResult };
 
 // Canonical shape your UI will use everywhere.
-export type Vowel = 'A' | 'E' | 'I' | 'O' | 'U' | 'Y' | 'Ë';
+export type Vowel = "A" | "E" | "I" | "O" | "U" | "Y" | "Ë";
 
 export type EnginePath = {
   voicePath: Vowel[];
@@ -25,14 +25,14 @@ export type LanguageFamily = {
   rationale: string;
   forms: any[];
   signals: string[];
-  dialect?: 'geg' | 'tosk';
+  dialect?: "geg" | "tosk";
 };
 
 // This is what the app & JSON export will see.
 export type EnginePayload = {
   engineVersion: string;
   word: string;
-  mode: 'strict' | 'open';
+  mode: "strict" | "open";
   alphabet: string;
   primaryPath: EnginePath;
   frontierPaths: EnginePath[];
@@ -47,7 +47,6 @@ export type EnginePayload = {
   math7?: Math7Summary;
 };
 
-
 // A placeholder normalizer. In a real scenario, this would be a robust
 // function that validates and transforms raw API output into the strict
 // AnalysisResult shape. For now, it's a simple type assertion.
@@ -56,18 +55,18 @@ export function normalizeEnginePayload(raw: any): EnginePayload {
     console.error("Invalid payload for normalization:", raw);
     throw new Error("Normalization failed: payload is missing required fields.");
   }
-  
+
   const payload: EnginePayload = {
-    engineVersion: raw.engineVersion ?? 'unknown',
+    engineVersion: raw.engineVersion ?? "unknown",
     word: raw.word,
-    mode: raw.mode ?? 'strict',
-    alphabet: raw.alphabet ?? 'auto',
+    mode: raw.mode ?? "strict",
+    alphabet: raw.alphabet ?? "auto",
     primaryPath: {
       voicePath: raw.primaryPath.voicePath ?? [],
       ringPath: raw.primaryPath.ringPath ?? [],
       levelPath: raw.primaryPath.levelPath ?? [],
       ops: raw.primaryPath.ops ?? [],
-      checksums: raw.primaryPath.checksums ?? { V:0, E:0, C:0 },
+      checksums: raw.primaryPath.checksums ?? { V: 0, E: 0, C: 0 },
       kept: raw.primaryPath.kept ?? 0,
     },
     frontierPaths: raw.frontierPaths ?? [],
@@ -87,18 +86,18 @@ export function normalizeEnginePayload(raw: any): EnginePayload {
 
 // High-level consonant behaviour classes used for the 42-slot field.
 export type ConsonantArchetype =
-  | 'Plosive'
-  | 'Affricate'
-  | 'SibilantFric'
-  | 'NonSibilantFric'
-  | 'Nasal'
-  | 'LiquidGlide'; // NOTE: V1: combines Liquids (l,r) and Glides (w,y); may split later.
+  | "Plosive"
+  | "Affricate"
+  | "SibilantFric"
+  | "NonSibilantFric"
+  | "Nasal"
+  | "LiquidGlide"; // NOTE: V1: combines Liquids (l,r) and Glides (w,y); may split later.
 
 export type ConsonantSlot = {
   vowel: Vowel;
   archetype: ConsonantArchetype;
   smooth: number; // hops where this archetype supported the ring change
-  spiky: number;  // hops where this archetype fought the ring change
+  spiky: number; // hops where this archetype fought the ring change
 };
 
 export type ConsonantField = {
@@ -113,23 +112,23 @@ export type ConsonantField = {
 };
 
 export type ConsonantSummary = {
-  smoothRatio: number;                // between 0 and 1, 0 if no hits
+  smoothRatio: number; // between 0 and 1, 0 if no hits
   dominantArchetypes: ConsonantArchetype[]; // top 1–3 archetypes by (smooth - spiky)
   notes?: string[];
 };
 
 // High-level semantic expectations about consonant behaviour for a candidate origin.
 export type ConsonantProfile =
-  | 'cut'        // split, break, attack
-  | 'carry'      // hold, bear, remain
-  | 'bind'       // join, tie, unify
-  | 'flow'       // move, wave, spread
-  | 'speak'      // voice, shout, declare
-  | 'build'      // make, form, construct
-  | 'none';      // neutral / not specified
+  | "cut" // split, break, attack
+  | "carry" // hold, bear, remain
+  | "bind" // join, tie, unify
+  | "flow" // move, wave, spread
+  | "speak" // voice, shout, declare
+  | "build" // make, form, construct
+  | "none"; // neutral / not specified
 
 // Coarse verdict on how well an origin matches a particular axis.
-export type OriginAxisStatus = 'pass' | 'weak' | 'unknown';
+export type OriginAxisStatus = "pass" | "weak" | "unknown";
 
 export interface CandidateOriginAxes {
   // Seven-Voices path + principles consistency.
@@ -141,40 +140,46 @@ export interface CandidateOriginAxes {
 }
 
 // New types for morphology matrix
-export type MorphemeRole = 'root' | 'prefix' | 'suffix' | 'action' | 'instrument' | 'unit';
+export type MorphemeRole =
+  | "root"
+  | "prefix"
+  | "suffix"
+  | "action"
+  | "instrument"
+  | "unit";
 
 export interface Morpheme {
-  form: string;          // "stud", "dam", "dëm", "un", "ify"
-  role: MorphemeRole;    // 'root' | 'prefix' | 'suffix'
-  gloss?: string;        // short meaning: "measure", "cut", "negation"
+  form: string; // "stud", "dam", "dëm", "un", "ify"
+  role: MorphemeRole; // 'root' | 'prefix' | 'suffix'
+  gloss?: string; // short meaning: "measure", "cut", "negation"
 }
 
 export interface WordSum {
-  parts: string[];       // ["stud", "y"] → "study"
-  result: string;        // "study"
-  gloss?: string;        // "focused effort to know"
+  parts: string[]; // ["stud", "y"] → "study"
+  result: string; // "study"
+  gloss?: string; // "focused effort to know"
 }
 
 export interface MorphologyMatrix {
-  pivot: string;         // the core form: "stud", "dam", "mode"
-  meaning: string;       // short description: "measure, manner"
+  pivot: string; // the core form: "stud", "dam", "mode"
+  meaning: string; // short description: "measure, manner"
   morphemes: Morpheme[];
   wordSums: WordSum[];
-  source?: 'manual' | 'auto'; // Added to track origin
+  source?: "manual" | "auto"; // Added to track origin
 }
 
 export type SymbolicAxis =
-  | 'love'
-  | 'religion'
-  | 'mathematics'
-  | 'law'
-  | 'power'
-  | 'creation'
-  | 'unknown';
+  | "love"
+  | "religion"
+  | "mathematics"
+  | "law"
+  | "power"
+  | "creation"
+  | "unknown";
 
 export interface SymbolicTag {
   axis: SymbolicAxis;
-  source: 'sevenVoices' | 'zheji' | 'hybrid';
+  source: "sevenVoices" | "zheji" | "hybrid";
   note: string;
 }
 
@@ -186,7 +191,7 @@ export type Candidate = {
 
   decomposition: {
     parts: {
-      role: 'action' | 'instrument' | 'unit';
+      role: "action" | "instrument" | "unit";
       form: string;
       gloss: string;
     }[];
@@ -219,9 +224,9 @@ export type Candidate = {
   };
 
   morphology?: MorphologyEvidence;
-  fitTag?: 'strong' | 'medium' | 'weak';
-  status: 'pass' | 'fail' | 'experimental' | 'deprecated';
-  confidenceTag: 'solid' | 'speculative';
+  fitTag?: "strong" | "medium" | "weak";
+  status: "pass" | "fail" | "experimental" | "deprecated";
+  confidenceTag: "solid" | "speculative";
 
   // Expected consonant semantics for this origin and whether the observed field agrees.
   consonantProfile?: ConsonantProfile;
@@ -230,48 +235,51 @@ export type Candidate = {
 
   // Optional 3-axis diagnostic verdict for this origin.
   axes?: CandidateOriginAxes;
-  
+
   // Optional morphology matrix for structured word-sum data.
   morphologyMatrix?: MorphologyMatrix;
-  
+
   symbolic?: SymbolicTag[];
 };
 
 // High-level consonant behaviour classes used for the 42-slot field.
-export type TensionLevel = 'low' | 'medium' | 'high';
+export type TensionLevel = "low" | "medium" | "high";
 
 export type AnalysisCoreInput = {
   raw: string;
   normalized: string;
   alphabet: string;
   languageGuess: string; // "albanian" | "english" | "latin" | "unknown" | etc.
-  languageConfidence: 'low' | 'medium' | 'high';
+  languageConfidence: "low" | "medium" | "high";
   dialectGuess?: string; // e.g. "geg" | "tosk" | "unknown"
-  mode: 'strict' | 'open';
+  mode: "strict" | "open";
 };
 
 export type AnalysisCoreVoices = {
   vowelVoices: Vowel[];
   ringPath: number[];
-  levelPath: ('high' | 'mid' | 'low')[];
+  levelPath: ("high" | "mid" | "low")[];
   dominantVoices: Record<string, number>;
 };
 
 export type AnalysisConsonantCluster = {
   cluster: string;
   classes: string[];
-  orbitSlots: string[];     // e.g. ["A1","A3"] once 42-grid is implemented
-  harmonyScore: number;     // 0–1, placeholder for now
+  orbitSlots: string[]; // e.g. ["A1","A3"] once 42-grid is implemented
+  harmonyScore: number; // 0–1, placeholder for now
 };
 
 export type AnalysisConsonants = {
   clusters: AnalysisConsonantCluster[];
   overallHarmony: {
-    byVoice: Record<string, {
-      harmonicSlots: number;
-      disharmonicSlots: number;
-      harmonyScore: number; // 0–1
-    }>;
+    byVoice: Record<
+      string,
+      {
+        harmonicSlots: number;
+        disharmonicSlots: number;
+        harmonyScore: number; // 0–1
+      }
+    >;
     globalHarmonyScore: number; // 0–1
   };
 };
@@ -311,19 +319,19 @@ export type AnalysisDebug = {
 };
 
 export type PrincipleName =
-  | 'Truth'
-  | 'Expansion'
-  | 'Insight'
-  | 'Balance'
-  | 'Unity'
-  | 'Network Integrity'
-  | 'Evolution';
+  | "Truth"
+  | "Expansion"
+  | "Insight"
+  | "Balance"
+  | "Unity"
+  | "Network Integrity"
+  | "Evolution";
 
 export type SevenVoicesSummary = {
-  voicePath: Vowel[];              // e.g. ['U', 'I']
-  principlesPath: PrincipleName[]; // e.g. ['Unity', 'Insight']
-  dominant: PrincipleName[];       // sorted by frequency, e.g. ['Insight', 'Unity']
-  sevenWords: string[];            // 7-word sentence in principle order
+  voicePath: Vowel[]; // e.g. ['U', 'I']
+  principlesPath: PrincipleName[]; // e.g. ['Truth', 'Expansion']
+  dominant: PrincipleName[]; // sorted by frequency
+  sevenWords: string[]; // 7-word sentence in principle order
 };
 
 export type SymbolicLayer = {
@@ -331,12 +339,9 @@ export type SymbolicLayer = {
   label?: string;
 };
 
-export interface DeepRootResult {
-  family?: string;
-  protoForm?: string;
-  gloss?: string;
-  notes?: string;
-}
+// NOTE: DeepRootResult used to be a separate mini type.
+// Now it is the same normalized shape as DeepRootSummary.
+// (Alias is defined after DeepRootSummary below.)
 
 export type AnalysisResult_DEPRECATED = {
   core: AnalysisCore;
@@ -374,10 +379,10 @@ export type AnalyzeWordResult = {
   meta: {
     engineVersion: string;
     createdAt: string;
-    mode: 'strict' | 'open';
+    mode: "strict" | "open";
     alphabet?: string;
     solveMs?: number;
-  },
+  };
   symbolic?: SymbolicLayer;
   wordMatrix?: WordMatrix | null;
   // Optional Heart Math (Seven-Principles) layer
@@ -391,16 +396,16 @@ export type AnalyzeWordResult = {
 
 export interface Math7PrimarySummaryExtended {
   /** Raw engine primary path, as already shown in UI */
-  voicePath: string;        // e.g. "U → I"
-  levelPath: string;        // e.g. "Low → High"
-  ringPath: string;         // e.g. "1 → 1"
+  voicePath: string; // e.g. "U → I"
+  levelPath: string; // e.g. "Low → High"
+  ringPath: string; // e.g. "1 → 1"
 
   /** Simple state: does the path return to the same vowel or not? */
-  state: "flow" | "cycle";  // "flow" if first ≠ last vowel, "cycle" if first == last
+  state: "flow" | "cycle"; // "flow" if first ≠ last vowel, "cycle" if first == last
 
   /** Count and modulo 7 */
-  totalSteps: number;       // length of the voice path, e.g. 2
-  totalMod7: number;        // totalSteps % 7, but 0 is mapped to 7 (1..7 only)
+  totalSteps: number; // length of the voice path, e.g. 2
+  totalMod7: number; // totalSteps % 7, but 0 is mapped to 7 (1..7 only)
 
   /** Seven-Principles reading of the path */
   principlesPath: string[]; // same length as voicePath step count
@@ -409,7 +414,6 @@ export interface Math7PrimarySummaryExtended {
 export interface Math7SummaryExtended {
   primary: Math7PrimarySummaryExtended;
 }
-
 
 export type LanguageFamilyCandidate = {
   language: string;
@@ -423,21 +427,21 @@ export type LanguageFamilyCandidate = {
   ringPath: string;
   morphologyMatrix?: MorphologyMatrix;
   symbolic?: SymbolicTag[];
-}
+};
 
 export interface WordMatrix {
-  word: string;                            // e.g. "study"
-  languageFamily: string;                  // e.g. "Latin", "Albanian"
+  word: string; // e.g. "study"
+  languageFamily: string; // e.g. "Latin", "Albanian"
   morphology: {
-    root: string;                          // e.g. "stud"
-    suffixes?: string[];                   // e.g. ["ium", "ens"]
-    gloss: string;                         // short meaning of the root
+    root: string; // e.g. "stud"
+    suffixes?: string[]; // e.g. ["ium", "ens"]
+    gloss: string; // short meaning of the root
   };
-  meaning: string;                         // compact functional meaning
-  wordSums?: string[];                     // morphological expansions
-  consonantPattern?: string;               // optional pattern logic e.g. "plosive + nasal"
-  principles: string[];                    // e.g. ["Truth", "Expansion", "Balance"]
-  symbolicNotes?: string;                  // interpretive note or Zheji-style insight
+  meaning: string; // compact functional meaning
+  wordSums?: string[]; // morphological expansions
+  consonantPattern?: string; // optional pattern logic e.g. "plosive + nasal"
+  principles: string[]; // e.g. ["Truth", "Expansion", "Balance"]
+  symbolicNotes?: string; // interpretive note or Zheji-style insight
 }
 
 export type CycleState = "open" | "balanced" | "overloaded";
@@ -451,11 +455,11 @@ export interface Math7PathSummary {
 }
 
 export interface PrincipleScore {
-  id: Vowel;              // e.g. "A"
-  name: string;           // e.g. "Truth / Source / Action"
-  value: number;          // 0–1 normalized strength
-  summary: string;        // one-sentence interpretation
-  active: boolean;        // true if this principle is dominant
+  id: Vowel; // e.g. "A"
+  name: string; // e.g. "Truth / Source / Action"
+  value: number; // 0–1 normalized strength
+  summary: string; // one-sentence interpretation
+  active: boolean; // true if this principle is dominant
 }
 
 export interface PrinciplesSet {
@@ -485,11 +489,14 @@ export interface DeepRootExample {
 
 // Normalised shape the app sees.
 export interface DeepRootSummary {
-  coreFunction: string;    // core_function
-  motif: Vowel[];          // core_vowel_motif → as Seven-Voices vowels
-  lightDark: DeepRootLightDark;       // LIGHT / DARK / MIXED
-  vibrationalTone: DeepRootTone;      // LOW / MID / HIGH
-  pieces: DeepRootPiece[];            // ACTION / DOMAIN / RESULT blocks
-  short: string;                      // explanation_short
-  examples: DeepRootExample[];        // examples_modern_usage
+  coreFunction: string; // core_function
+  motif: Vowel[]; // core_vowel_motif → as Seven-Voices vowels
+  lightDark: DeepRootLightDark; // LIGHT / DARK / MIXED
+  vibrationalTone: DeepRootTone; // LOW / MID / HIGH
+  pieces: DeepRootPiece[]; // ACTION / DOMAIN / RESULT blocks
+  short: string; // explanation_short
+  examples: DeepRootExample[]; // examples_modern_usage
 }
+
+// Alias: DeepRootResult == DeepRootSummary (keeps legacy name, single shape).
+export type DeepRootResult = DeepRootSummary;
