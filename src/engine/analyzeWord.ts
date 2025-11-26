@@ -24,6 +24,7 @@ import type {
   SymbolicTag,
   WordMatrix,
   Math7Summary,
+  Vowel,
 } from '@/shared/engineShape';
 import { ENGINE_VERSION } from './version';
 import { solveWord } from '@/functions/sevenVoicesCore';
