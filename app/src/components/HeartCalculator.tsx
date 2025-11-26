@@ -63,7 +63,7 @@ export default function HeartCalculator({ onResult }: Props) {
               <span className="text-muted-foreground">Input</span>
               <ToggleGroup type="single" value={mode} onValueChange={(v: InputMode) => v && setMode(v)} size="sm">
                 <ToggleGroupItem value="voices">Voices</ToggleGroupItem>
-                <ToggleGroupItem value="numbers">1–7</ToggleGroupItem>
+                <ToggleGroupItem value="numbers">1-7</ToggleGroupItem>
               </ToggleGroup>
             </div>
         </div>
