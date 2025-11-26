@@ -1,7 +1,7 @@
 // src/shared/sevenPrinciplesCalc.ts
-export type VoicePrinciple = 'A' | 'E' | 'I' | 'O' | 'U' | 'Y' | 'Ë';
+export type VoicePrinciple = "A" | "E" | "I" | "O" | "U" | "Y" | "Ë";
 
-export type SevenOp = 'add' | 'subtract' | 'multiply' | 'divide';
+export type SevenOp = "add" | "subtract" | "multiply" | "divide";
 
 export interface SevenCalcResult {
   leftExpr: string;        // e.g. "AO"

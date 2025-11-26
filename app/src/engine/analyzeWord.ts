@@ -32,7 +32,7 @@ import { getManifest } from './manifest';
 import type { SolveOptions } from '@/functions/sevenVoicesCore';
 import { CANON_CANDIDATES } from '@/shared/canonCandidates';
 import { computeMath7ForResult } from "./math7";
-import { computeDeepRoot } from '@/functions/deepRootEngine';
+import { computeDeepRootForWord } from '@/functions/deepRootEngine';
 
 function runSevenVoices(word: string, opts: { mode: 'strict' | 'open' }): any {
   const manifest = getManifest();
@@ -155,6 +155,17 @@ export function analyzeWord(word: string, mode: 'strict' | 'open' = 'strict'): A
   const withCanon = attachCanonCandidates(base);
   const withMorph = attachMorphology(withCanon);
 
+  // 🔍 DeepRoot proto-root layer (optional, best-effort)
+  let deepRoot: DeepRootSummary | undefined;
+  try {
+    // use sanitized so "DAMAGE" / "Damage" still hit
+    deepRoot = computeDeepRootForWord(withCanon.sanitized) as DeepRootSummary;
+  } catch (err) {
+    // We NEVER want DeepRoot to crash the main analysis.
+    // eslint-disable-next-line no-console
+    console.error("[DeepRoot] failed for word:", word, err);
+  }
+
   const symbolic = buildSymbolicLayer(withCanon);
 
   const join = (arr: any[]) => (arr || []).join(' → ');
@@ -205,11 +216,8 @@ export function analyzeWord(word: string, mode: 'strict' | 'open' = 'strict'): A
     result.languageFamilies,
     math7 || undefined
   );
-  
-  // 🔎 Attach DeepRoot proto-root layer (best effort, non-blocking)
-  const deepRoot = computeDeepRoot(result);
 
-  return { ...result, math7, wordMatrix, deepRoot };
+  return { ...result, math7, deepRoot, wordMatrix };
 }
 
 
@@ -220,23 +228,33 @@ function buildWordMatrix(
 ): WordMatrix | null {
   if (!families || families.length === 0) return null;
 
+  // Prefer: passes + not speculative. Fall back to first.
   const primary =
-    families.find(f => f.passes && !f.speculative) ?? families[0];
+    families.find(f => f.passes && !f.speculative) ??
+    families[0];
+
   if (!primary || !primary.morphologyMatrix) return null;
 
   const m = primary.morphologyMatrix;
 
   const root = m.pivot;
   const suffixes =
-    m.morphemes?.filter(mm => mm.role !== "root").map(mm => mm.form) ?? [];
+    m.morphemes
+      ?.filter(mm => mm.role !== "root")
+      .map(mm => mm.form) ?? [];
 
   const wordSums =
-    m.wordSums?.map(ws => `${ws.parts.join(" + ")} → ${ws.result}`) ?? [];
+    m.wordSums?.map(ws =>
+      `${ws.parts.join(" + ")} → ${ws.result}`
+    ) ?? [];
 
-  const principles = math7?.primary?.principlesPath ?? [];
+  const principles =
+    math7?.primary?.principlesPath ?? [];
 
   const symbolicNotes =
-    primary.symbolic?.map(tag => tag.note).join(" | ");
+    primary.symbolic
+      ?.map(tag => tag.note)
+      .join(" | ");
 
   return {
     word,
