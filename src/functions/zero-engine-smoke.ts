@@ -259,62 +259,86 @@ function makeHeartReligion(): HeartResult {
   return heart;
 }
 
+// New smoke test functions
+function makeHeartMystery(): HeartResult {
+    return {
+        meta: { engine_version: 'zero-core-v1-smoke', mode: 'STRICT', input_word: 'mystery', timestamp_iso: new Date().toISOString() },
+        core_function: 'To hide or conceal something within a dark or unknown field.',
+        core_vowel_motif: ['I', 'E', 'I'],
+        light_dark: 'DARK',
+        vibrational_tone: 'LOW',
+        candidates: [
+            { language: 'Albanian-pattern', form: 'misteri', decomposition: [{ role: 'ACTION', form: 'mis', gloss: 'to close, conceal' }, { role: 'DOMAIN', form: 'ter', gloss: 'darkness' }], vowel_path: ['I', 'E'], functional_statement: 'To close something within darkness.', signals: ['strong fit'] }
+        ]
+    } as HeartResult;
+}
+
+function makeHeartPhilosophy(): HeartResult {
+    return {
+        meta: { engine_version: 'zero-core-v1-smoke', mode: 'STRICT', input_word: 'philosophy', timestamp_iso: new Date().toISOString() },
+        core_function: 'A love or pursuit of wisdom that unifies diverse ideas.',
+        core_vowel_motif: ['I', 'O', 'O', 'I'],
+        light_dark: 'MIXED',
+        vibrational_tone: 'HIGH',
+        candidates: [
+            { language: 'Greek', form: 'philosophia', decomposition: [{ role: 'ACTION', form: 'philo', gloss: 'love' }, { role: 'DOMAIN', form: 'sophia', gloss: 'wisdom' }], vowel_path: ['I', 'O', 'I', 'A'], functional_statement: 'The love of wisdom.', signals: ['historical-carrier'] }
+        ]
+    } as HeartResult;
+}
+
+function makeHeartFilozofi(): HeartResult {
+    return {
+        meta: { engine_version: 'zero-core-v1-smoke', mode: 'STRICT', input_word: 'filozofi', timestamp_iso: new Date().toISOString() },
+        core_function: 'A love or pursuit of wisdom that unifies diverse ideas.',
+        core_vowel_motif: ['I', 'O', 'O', 'I'],
+        light_dark: 'MIXED',
+        vibrational_tone: 'HIGH',
+        candidates: [
+            { language: 'Albanian', form: 'filozofi', decomposition: [{ role: 'ACTION', form: 'filo', gloss: 'love, thread' }, { role: 'DOMAIN', form: 'zofi', gloss: 'wisdom, craft' }], vowel_path: ['I', 'O', 'O', 'I'], functional_statement: 'The thread of wisdom.', signals: ['strong fit'] }
+        ]
+    } as HeartResult;
+}
+
+function makeHeartLanguage(): HeartResult {
+    return {
+        meta: { engine_version: 'zero-core-v1-smoke', mode: 'STRICT', input_word: 'language', timestamp_iso: new Date().toISOString() },
+        core_function: 'The instrument of the tongue that gives form to a shared field.',
+        core_vowel_motif: ['A', 'U', 'A', 'E'],
+        light_dark: 'MIXED',
+        vibrational_tone: 'MID',
+        candidates: [
+            { language: 'Latin', form: 'lingua', decomposition: [{ role: 'DOMAIN', form: 'lingua', gloss: 'tongue' }], vowel_path: ['I', 'A'], functional_statement: 'Relating to the tongue.', signals: ['historical-carrier'] },
+            { language: 'Albanian-pattern', form: 'gjuhë', decomposition: [{ role: 'DOMAIN', form: 'gju', gloss: 'tongue' }], vowel_path: ['U', 'E'], functional_statement: 'The instrument of the tongue.', signals: ['strong fit'] }
+        ]
+    } as HeartResult;
+}
+
+
 async function main() {
+  const testCases = [
+    { name: "damage", fn: makeHeartDamage },
+    { name: "dëmtim", fn: makeHeartDemtim },
+    { name: "study", fn: makeHeartStudy },
+    { name: "mathematics", fn: makeHeartMathematics },
+    { name: "religion", fn: makeHeartReligion },
+    { name: "mystery", fn: makeHeartMystery },
+    { name: "philosophy", fn: makeHeartPhilosophy },
+    { name: "filozofi", fn: makeHeartFilozofi },
+    { name: "language", fn: makeHeartLanguage },
+  ];
+
   console.log("=== ZË-RO DeepRoot smoke test ===");
 
-  // DAMAGE
-  const heartDamage = makeHeartDamage();
-  const deepDamage = buildDeepRootFromHeart(heartDamage);
+  for (const testCase of testCases) {
+    const heart = testCase.fn();
+    const deepRoot = buildDeepRootFromHeart(heart);
 
-  console.log("\n--- DeepRoot for 'damage' ---");
-  if (!deepDamage) {
-    console.log("No DeepRootResult produced for 'damage'.");
-  } else {
-    console.log(JSON.stringify(deepDamage, null, 2));
-  }
-
-  // DËMTIM
-  const heartDemtim = makeHeartDemtim();
-  const deepDemtim = buildDeepRootFromHeart(heartDemtim);
-
-  console.log("\n--- DeepRoot for 'dëmtim' ---");
-  if (!deepDemtim) {
-    console.log("No DeepRootResult produced for 'dëmtim'.");
-  } else {
-    console.log(JSON.stringify(deepDemtim, null, 2));
-  }
-
-  // STUDY
-  const heartStudy = makeHeartStudy();
-  const deepStudy = buildDeepRootFromHeart(heartStudy);
-
-  console.log("\n--- DeepRoot for 'study' ---");
-  if (!deepStudy) {
-    console.log("No DeepRootResult produced for 'study'.");
-  } else {
-    console.log(JSON.stringify(deepStudy, null, 2));
-  }
-
-  // MATHEMATICS
-  const heartMath = makeHeartMathematics();
-  const deepMath = buildDeepRootFromHeart(heartMath);
-
-  console.log("\n--- DeepRoot for 'mathematics' ---");
-  if (!deepMath) {
-    console.log("No DeepRootResult produced for 'mathematics'.");
-  } else {
-    console.log(JSON.stringify(deepMath, null, 2));
-  }
-
-  // RELIGION
-  const heartRel = makeHeartReligion();
-  const deepRel = buildDeepRootFromHeart(heartRel);
-
-  console.log("\n--- DeepRoot for 'religion' ---");
-  if (!deepRel) {
-    console.log("No DeepRootResult produced for 'religion'.");
-  } else {
-    console.log(JSON.stringify(deepRel, null, 2));
+    console.log(`\n--- DeepRoot for '${testCase.name}' ---`);
+    if (!deepRoot) {
+      console.log(`No DeepRootResult produced for '${testCase.name}'.`);
+    } else {
+      console.log(JSON.stringify(deepRoot, null, 2));
+    }
   }
 
   console.log("\n=== smoke test done ===");
