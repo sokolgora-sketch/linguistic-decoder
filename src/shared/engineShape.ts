@@ -3,6 +3,8 @@
 import type { SymbolicCoreResult } from "@/lib/symbolicCore";
 import type { Math7Summary } from "@/engine/math7";
 
+export type { Math7Summary };
+
 // Canonical shape your UI will use everywhere.
 export type Vowel = 'A' | 'E' | 'I' | 'O' | 'U' | 'Y' | 'Ë';
 
