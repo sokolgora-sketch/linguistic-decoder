@@ -5,65 +5,31 @@
 // Here we only define how the consonant "jacket" is allowed to bend,
 // e.g.  stu → shtu  (ADD_H_AFTER_S) so we can reach Albanian roots like "shtoj".
 
-// How a morph tends to move: toward more marked / stronger form, softer form,
-// or in both directions.
-export type MorphDirection = "TO_STRONGER" | "TO_SOFTER" | "BIDIRECTIONAL";
-
-export type MorphCategory =
-  | "FRICATIVE"      // s ↔ sh, z ↔ zh
-  | "PALATAL"        // k ↔ q, g ↔ gj
-  | "GLIDE"          // s + h → sh, th etc.
-  | "AFFRICATE"      // c, x, ç, xh families (optional)
-  | "NASAL_LIQUID"   // n ↔ r, l ↔ ll (rare / opt)
-  | "OTHER";
-
 export type MorphRuleId =
-| "S_TO_SH"
-| "ADD_H_AFTER_S"
-| "Z_TO_ZH"
-| "N_TO_NJ"
-| "L_TO_LL"
-| "R_TO_RR"
-| "K_Q"
-| "G_GJ"
-| "D_T_DH_TH";
+  | "S_TO_SH"
+  | "ADD_H_AFTER_S"
+  | "Z_TO_ZH"
+  | "N_TO_NJ"
+  | "L_TO_LL"
+  | "R_TO_RR"
+  | "K_Q"
+  | "G_GJ"
+  | "D_T_DH_TH"
+  | "SH_TO_S"
+  | "ZH_TO_Z"
+  | "DROP_H_IN_SH"
+  | "Q_TO_K"
+  | "GJ_TO_G"
+  | "C_TO_X"
+  | "C_TO_C_CEDILLA"
+  | "N_TO_R";
 
-/**
- * One legal consonant transform Mind is allowed to apply
- * when searching for micro-roots.
- *
- * Example:
- *  - id: "ADD_H_AFTER_S"
- *  - from: "s"
- *  - to: "sh"
- *  - direction: "TO_STRONGER"
- *  - category: "GLIDE"
- */
-export interface ConsonantTransformRule {
-  id: string;
-  label: string;
-  description: string;
-
-  // Substring pattern to replace.
-  from: string;
-  to: string;
-
-  // Morph direction – used only for reporting / future tuning.
-  direction: MorphDirection;
-  category: MorphCategory;
-
-  // Whether this rule should be used by default.
-  enabledByDefault: boolean;
-
-  notes?: string;
+export interface BlockVariant {
+  form: string;
+  appliedRuleIds: string[];
 }
 
-interface BlockVariant {
-  variant: string;
-  appliedRuleIds: MorphRuleId[];
-}
-
-interface MorphRule {
+export interface MorphRule {
   id: MorphRuleId;
   description: string;
   apply: (block: string) => BlockVariant[];
@@ -84,14 +50,14 @@ function makeSwapRule(
 
       if (block.includes(a)) {
         out.push({
-          variant: block.replace(a, b),
+          form: block.replace(a, b),
           appliedRuleIds: [id],
         });
       }
 
       if (block.includes(b)) {
         out.push({
-          variant: block.replace(b, a),
+          form: block.replace(b, a),
           appliedRuleIds: [id],
         });
       }
@@ -101,18 +67,17 @@ function makeSwapRule(
   };
 }
 
-const MORPH_RULES: MorphRule[] = [
-  // --- existing rules ---
+export const MORPH_RULES: MorphRule[] = [
   {
     id: "S_TO_SH",
     description: "Allow s ↔ sh as fricative variants.",
     apply(block: string): BlockVariant[] {
       const out: BlockVariant[] = [];
       if (block.includes("s")) {
-        out.push({ variant: block.replace("s", "sh"), appliedRuleIds: ["S_TO_SH"] });
+        out.push({ form: block.replace("s", "sh"), appliedRuleIds: ["S_TO_SH"] });
       }
       if (block.includes("sh")) {
-        out.push({ variant: block.replace("sh", "s"), appliedRuleIds: ["S_TO_SH"] });
+        out.push({ form: block.replace("sh", "s"), appliedRuleIds: ["S_TO_SH"] });
       }
       return out;
     },
@@ -122,7 +87,7 @@ const MORPH_RULES: MorphRule[] = [
     description: "Allow s → sh to match roots like 'shtoj'.",
     apply(block: string): BlockVariant[] {
       if (block.startsWith("s")) {
-        return [{ variant: `sh${block.substring(1)}`, appliedRuleIds: ["ADD_H_AFTER_S"] }];
+        return [{ form: `sh${block.substring(1)}`, appliedRuleIds: ["ADD_H_AFTER_S"] }];
       }
       return [];
     },
@@ -192,7 +157,7 @@ const MORPH_RULES: MorphRule[] = [
         for (const to of family) {
           if (to === from) continue;
           out.push({
-            variant: block.replace(from, to),
+            form: block.replace(from, to),
             appliedRuleIds: ["D_T_DH_TH"],
           });
         }
@@ -204,28 +169,32 @@ const MORPH_RULES: MorphRule[] = [
 ];
 
 
+// ─────────────────────────────────────────────
+// Helper – generate block variants from rules
+// ─────────────────────────────────────────────
+
 /**
  * Generate legal consonant variants for a block using the rules above.
  *
  * We keep it intentionally shallow:
  *  - always include the original block
- *  - apply each rule once to generate variants
- *
- * This is enough for patterns like:
- *  "stu" → "shtu" (ADD_H_AFTER_S)
- *  "gju" ↔ "gu"   (G_GJ)
+ *  - apply at most 1 rule once per variant (maxOps = 1 by default)
  */
 export function generateBlockVariants(
   block: string,
-  maxOps: number = 1 // Currently unused, but good for future extension
+  maxOps: number = 1
 ): BlockVariant[] {
   const variants: BlockVariant[] = [
-    { variant: block, appliedRuleIds: [] },
+    { form: block, appliedRuleIds: [] },
   ];
+
+  if (maxOps < 1) {
+    return variants;
+  }
 
   for (const rule of MORPH_RULES) {
     const newVariants = rule.apply(block);
-    variants.push(...newVariants.map(v => ({ form: v.variant, appliedRuleIds: v.appliedRuleIds })));
+    variants.push(...newVariants);
   }
 
   // Deduplicate by form; if multiple rules yield same form we keep first.
@@ -234,7 +203,7 @@ export function generateBlockVariants(
   for (const v of variants) {
     if (seen.has(v.form)) continue;
     seen.add(v.form);
-    unique.push({form: v.variant, appliedRuleIds: v.appliedRuleIds });
+    unique.push(v);
   }
 
   return unique;
