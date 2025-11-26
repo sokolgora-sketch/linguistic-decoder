@@ -122,6 +122,17 @@ export function PathRow({ title, block, analysis }: { title: string; block: any,
             </div>
           </div>
         )}
+        
+        {analysis.math7?.heart && (
+          <div className="mt-4 border border-pink-600/40 rounded-xl p-4 bg-pink-900/10">
+            <h3 className="text-pink-400 font-medium mb-2">💗 Heart Auto-Calculation</h3>
+            <p><strong>Expression:</strong> {analysis.math7.heart.expression}</p>
+            <p><strong>Decimal:</strong> {analysis.math7.heart.decimal}</p>
+            <p><strong>Base-7:</strong> {analysis.math7.heart.base7.join(" ")}</p>
+            <p><strong>Voices:</strong> {analysis.math7.heart.voices.join(" → ")}</p>
+            <p><strong>Principle:</strong> <span className="text-pink-300">{analysis.math7.heart.principle}</span></p>
+          </div>
+        )}
       </>
     </Card>
   );
