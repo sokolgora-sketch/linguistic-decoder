@@ -17,6 +17,30 @@ export type MorphCategory =
   | "NASAL_LIQUID"   // n ↔ r, l ↔ ll (rare / opt)
   | "OTHER";
 
+export type MorphRuleId =
+  | "S_TO_SH"          // existing
+  | "ADD_H_AFTER_S"    // existing
+  | "Z_TO_ZH"          // new – z ↔ zh
+  | "N_TO_NJ"          // new – n ↔ nj
+  | "L_TO_LL"          // new – l ↔ ll
+  | "R_TO_RR"          // new – r ↔ rr
+  | "K_Q"              // new – k ↔ q
+  | "G_GJ"             // new – g ↔ gj
+  | "D_T_DH_TH"        // new – cluster for d/t/dh/th
+  // Symmetric pairs for the above
+  | "SH_TO_S"
+  | "ZH_TO_Z"
+  | "NJ_TO_N"
+  | "LL_TO_L"
+  | "RR_TO_R"
+  | "Q_TO_K"
+  | "GJ_TO_G"
+  | "C_TO_X"
+  | "C_TO_C_CEDILLA"
+  | "N_TO_R"
+  | "DROP_H_IN_SH";
+
+
 /**
  * One legal consonant transform Mind is allowed to apply
  * when searching for micro-roots.
@@ -29,7 +53,7 @@ export type MorphCategory =
  *  - category: "GLIDE"
  */
 export interface ConsonantTransformRule {
-  id: string;
+  id: MorphRuleId;
   label: string;
   description: string;
 
@@ -141,7 +165,7 @@ export const CONSONANT_TRANSFORMS: ConsonantTransformRule[] = [
   // ─────────────────────────────────────────────
 
   {
-    id: "K_TO_Q",
+    id: "K_Q",
     label: "k → q",
     description:
       "Allow velar k to shift to palatal q when Albanian roots are written with q.",
@@ -162,10 +186,10 @@ export const CONSONANT_TRANSFORMS: ConsonantTransformRule[] = [
     direction: "TO_SOFTER",
     category: "PALATAL",
     enabledByDefault: true,
-    notes: "Opposite direction of K_TO_Q.",
+    notes: "Opposite direction of K_Q.",
   },
   {
-    id: "G_TO_GJ",
+    id: "G_GJ",
     label: "g → gj",
     description:
       "Allow velar g to strengthen to palatal gj when searching Albanian roots.",
@@ -186,7 +210,7 @@ export const CONSONANT_TRANSFORMS: ConsonantTransformRule[] = [
     direction: "TO_SOFTER",
     category: "PALATAL",
     enabledByDefault: true,
-    notes: "Opposite direction of G_TO_GJ.",
+    notes: "Opposite direction of G_GJ.",
   },
 
   // ─────────────────────────────────────────────
@@ -267,7 +291,7 @@ export interface BlockVariant {
  *
  * This is enough for patterns like:
  *  "stu" → "shtu" (ADD_H_AFTER_S)
- *  "gju" ↔ "gu"   (G_TO_GJ / GJ_TO_G)   [if used around known roots]
+ *  "gju" ↔ "gu"   (G_GJ / GJ_TO_G)   [if used around known roots]
  */
 export function generateBlockVariants(
   block: string,
