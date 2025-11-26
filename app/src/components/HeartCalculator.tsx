@@ -69,32 +69,10 @@ export default function HeartCalculator({ onResult }: Props) {
           {/* Tiny mode toggle */}
           <div className="flex items-center gap-2 text-xs">
             <span className="text-muted-foreground">Mode</span>
-            <div className="inline-flex rounded-full border border-border overflow-hidden">
-              <button
-                type="button"
-                onClick={() => setMode('voices')}
-                className={
-                  'px-2 py-1 transition-colors ' +
-                  (mode === 'voices'
-                    ? 'bg-primary text-primary-foreground'
-                    : 'bg-background text-muted-foreground hover:text-foreground')
-                }
-              >
-                Voices
-              </button>
-              <button
-                type="button"
-                onClick={() => setMode('numbers')}
-                className={
-                  'px-2 py-1 transition-colors ' +
-                  (mode === 'numbers'
-                    ? 'bg-primary text-primary-foreground'
-                    : 'bg-background text-muted-foreground hover:text-foreground')
-                }
-              >
-                1-7
-              </button>
-            </div>
+            <ToggleGroup type="single" value={mode} onValueChange={(v: InputMode) => v && setMode(v)}>
+              <ToggleGroupItem value="voices">Voices</ToggleGroupItem>
+              <ToggleGroupItem value="numbers">1–7</ToggleGroupItem>
+            </ToggleGroup>
           </div>
         </div>
       </CardHeader>
