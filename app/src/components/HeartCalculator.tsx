@@ -6,6 +6,7 @@ import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from ".
 import { Button } from "./ui/button";
 import { evaluateVoiceEquation, VOICE_TO_DIGIT } from "@/shared/heartMath";
 import type { SevenCalcResult, SevenOp } from "@/shared/sevenPrinciplesCalc";
+import { cn } from "@/lib/utils";
 
 type InputMode = 'voices' | 'numbers';
 
@@ -43,7 +44,41 @@ export default function HeartCalculator({ onResult }: Props) {
   return (
     <Card className="mt-6 border border-emerald-600/40 shadow-md">
       <CardHeader>
-        <CardTitle>💗 Seven-Principles Calculator</CardTitle>
+        <div className="flex items-center justify-between mb-2">
+            <CardTitle className="flex items-center gap-2">
+                <span role="img" aria-hidden="true">💗</span>
+                Seven-Principles Calculator
+            </CardTitle>
+            <div className="flex items-center gap-2 text-xs">
+              <span className="text-muted-foreground">Input</span>
+              <div className="inline-flex rounded-md border border-border overflow-hidden">
+                <button
+                  type="button"
+                  onClick={() => setMode('voices')}
+                  className={cn(
+                    'px-2 py-1 transition-colors',
+                    mode === 'voices'
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-transparent text-muted-foreground hover:bg-accent'
+                  )}
+                >
+                  Voices
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setMode('numbers')}
+                  className={cn(
+                    'px-2 py-1 transition-colors',
+                    mode === 'numbers'
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-transparent text-muted-foreground hover:bg-accent'
+                  )}
+                >
+                  1–7
+                </button>
+              </div>
+            </div>
+        </div>
         <CardDescription>Combine two Voice expressions (A, E, I, O, U, Y, Ë, or 1-7)</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -51,7 +86,7 @@ export default function HeartCalculator({ onResult }: Props) {
           <Input
             value={exprA}
             onChange={(e) => setExprA(e.target.value.toUpperCase())}
-            placeholder="First (e.g., AO or 14)"
+            placeholder={mode === 'voices' ? "First (e.g., AO)" : "First (e.g., 14)"}
           />
           <Select value={op} onValueChange={(v) => setOp(v as any)}>
             <SelectTrigger><SelectValue placeholder="Operation" /></SelectTrigger>
@@ -65,7 +100,7 @@ export default function HeartCalculator({ onResult }: Props) {
           <Input
             value={exprB}
             onChange={(e) => setExprB(e.target.value.toUpperCase())}
-            placeholder="Second (e.g., ËA or 71)"
+            placeholder={mode === 'voices' ? "Second (e.g., ËA)" : "Second (e.g., 71)"}
           />
         </div>
 
