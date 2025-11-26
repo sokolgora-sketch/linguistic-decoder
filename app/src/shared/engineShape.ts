@@ -331,13 +331,6 @@ export type SymbolicLayer = {
   label?: string;
 };
 
-export interface DeepRootResult {
-  family?: string;
-  protoForm?: string;
-  gloss?: string;
-  notes?: string;
-}
-
 export type AnalysisResult_DEPRECATED = {
   core: AnalysisCore;
   // NEW: word-level consonant behaviour, shared by all candidates.
@@ -493,3 +486,6 @@ export interface DeepRootSummary {
   short: string;                      // explanation_short
   examples: DeepRootExample[];        // examples_modern_usage
 }
+
+// Engine “result” type is just the DeepRoot summary shape.
+export type DeepRootResult = DeepRootSummary;
