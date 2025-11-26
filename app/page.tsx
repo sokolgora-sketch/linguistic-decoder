@@ -45,6 +45,8 @@ import { logError } from "@/lib/logError";
 import { VOICE_COLOR_MAP, VOICE_LABEL_MAP } from "@/shared/voiceColors";
 import { SymbolicReadingCard } from "@/components/SymbolicReadingCard";
 import HeartCalculator from "@/components/HeartCalculator";
+import type { SevenCalcResult } from "@/shared/sevenPrinciplesCalc";
+
 
 const VOICE_META: { id: Vowel; label: string; role: string }[] = [
   { id: "A", label: "Action / Truth", role: "Launches, cuts through, sets the first line." },
@@ -81,6 +83,7 @@ export default function LinguisticDecoderApp() {
   const [isWarming, setIsWarming] = useState(false);
   const [showDebug, setShowDebug] = useState(false);
   const [useAi, setUseAi] = useState(false);
+  const [calcOverlay, setCalcOverlay] = useState<SevenCalcResult | null>(null);
 
   // 🔹 New: keep a short “recent hearts” history
   const [heartHistory, setHeartHistory] = useState<HeartSnapshot[]>([]);
@@ -627,7 +630,7 @@ export default function LinguisticDecoderApp() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <ResultsDisplay analysis={analysisResult} />
+                <ResultsDisplay analysis={analysisResult} calcOverlay={calcOverlay} />
                 <div className="flex justify-end pt-2">
                   <ExportJsonButton analysis={data} />
                 </div>
@@ -729,7 +732,7 @@ export default function LinguisticDecoderApp() {
               </div>
             </AccordionTrigger>
             <AccordionContent>
-              <HeartCalculator onResult={(res) => console.log('Calculator Result:', res)} />
+              <HeartCalculator onResult={setCalcOverlay} />
             </AccordionContent>
           </AccordionItem>
 

@@ -12,6 +12,7 @@ import { PrinciplesBlock } from "./PrinciplesBlock";
 import { SymbolicReadingCard } from "./SymbolicReadingCard";
 import { Button } from "@/components/ui/button";
 import { downloadJson } from "@/lib/downloadJson";
+import type { SevenCalcResult } from "@/shared/sevenPrinciplesCalc";
 
 
 const LEVEL_LABEL: Record<number, string> = { 1: "High", 0: "Mid", [-1]: "Low" } as any;
@@ -122,6 +123,17 @@ export function PathRow({ title, block, analysis }: { title: string; block: any,
             </div>
           </div>
         )}
+        
+        {analysis.math7?.heart && (
+          <div className="mt-4 border border-pink-600/40 rounded-xl p-4 bg-pink-900/10">
+            <h3 className="text-pink-400 font-medium mb-2">💗 Heart Auto-Calculation</h3>
+            <p><strong>Expression:</strong> {analysis.math7.heart.expression}</p>
+            <p><strong>Decimal:</strong> {analysis.math7.heart.decimal}</p>
+            <p><strong>Base-7:</strong> {analysis.math7.heart.base7.join(" ")}</p>
+            <p><strong>Voices:</strong> {analysis.math7.heart.voices.join(" → ")}</p>
+            <p><strong>Principle:</strong> <span className="text-pink-300">{analysis.math7.heart.principle}</span></p>
+          </div>
+        )}
       </>
     </Card>
   );
@@ -150,9 +162,9 @@ const Chip = ({ v }: { v: string | number }) => {
 };
 
 
-export function ResultsDisplay({ analysis }: { analysis: AnalysisResult_DEPRECATED | null }) {
+export function ResultsDisplay({ analysis, calcOverlay }: { analysis: AnalysisResult_DEPRECATED | null; calcOverlay: SevenCalcResult | null; }) {
   if (!analysis) return null;
-  const { core, candidates, symbolic, debug, wordMatrix } = analysis;
+  const { core, candidates, symbolic, debug, wordMatrix, deepRoot } = analysis;
   const raw = debug?.rawEnginePayload;
 
   // The primaryPath in the new AnalyzeWordResult is a string, not an array.
@@ -174,6 +186,17 @@ export function ResultsDisplay({ analysis }: { analysis: AnalysisResult_DEPRECAT
               }}
               analysis={analysis}
             />
+        )}
+        
+        {calcOverlay && (
+          <div className="mt-4 border border-emerald-600/40 rounded-xl p-4 bg-emerald-900/20 animate-fade-in">
+            <h3 className="text-emerald-400 font-medium mb-2">Calculator Overlay</h3>
+            <p><strong>Expression:</strong> {calcOverlay.leftExpr} {calcOverlay.op} {calcOverlay.rightExpr}</p>
+            <p><strong>Decimal:</strong> {calcOverlay.decimal}</p>
+            <p><strong>Base-7:</strong> {calcOverlay.base7.join(" ")}</p>
+            <p><strong>Voices:</strong> {calcOverlay.voices.join(" → ")}</p>
+            <p><strong>Principle:</strong> <span className="text-emerald-300 text-lg">{calcOverlay.principle}</span></p>
+          </div>
         )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -232,6 +255,21 @@ export function ResultsDisplay({ analysis }: { analysis: AnalysisResult_DEPRECAT
                   {wordMatrix.symbolicNotes}
                 </div>
               )}
+            </CardContent>
+          </Card>
+        )}
+        
+        {deepRoot && (
+          <Card className="mt-4">
+            <CardHeader>
+              <CardTitle>Proto-Root Analysis</CardTitle>
+              <CardDescription>Minimal functional origin</CardDescription>
+            </CardHeader>
+            <CardContent className="text-sm space-y-1">
+              <p><strong>Proto-Root:</strong> {deepRoot.protoRoot}</p>
+              <p><strong>Meaning:</strong> {deepRoot.meaning}</p>
+              <p><strong>Axis:</strong> {deepRoot.functionAxis}</p>
+              <p><strong>Examples:</strong> {deepRoot.examples.join(", ")}</p>
             </CardContent>
           </Card>
         )}
