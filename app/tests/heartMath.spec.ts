@@ -15,18 +15,24 @@ describe("Seven-Principles Heart Math", () => {
   });
 
   it("converts between base-7 and voices", () => {
-    const digits = decimalToBase7(45);
-    expect(base7DigitsToVoices(digits)).toEqual(["U", "A"]); // 45 → [6,3] → ["Y","I"]?
+    const digits = decimalToBase7(45); // [6, 3] -> voices [7, 4] -> [Ë, O]
+    expect(base7DigitsToVoices(digits)).toEqual(["Ë", "O"]);
   });
 
   it("performs calculator ops", () => {
     const sum = calculate(4, 5, "add");
     expect(sum.decimal).toBe(9);
-    expect(sum.principle).toBe("B" as any ? "B" : "I"); // just verifying principle logic
+    expect(sum.principle).toBe("E");
   });
 
   it("evaluates voice equations", () => {
     const result = evaluateVoiceEquation("AO", "ËA", "add");
     expect(result.principle).toBeDefined();
+    expect(result.principle).toBe('I');
+  });
+
+  it("evaluates digit equations", () => {
+    const result = evaluateVoiceEquation("14", "71", "add");
+    expect(result.principle).toBe('I');
   });
 });
