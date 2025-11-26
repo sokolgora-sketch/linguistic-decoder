@@ -19,11 +19,11 @@ import type {
   AnalyzeWordResult,
   Candidate,
   LanguageFamilyCandidate,
-  Math7Summary,
   MorphologyMatrix,
   SymbolicLayer,
   SymbolicTag,
   WordMatrix,
+  Math7Summary,
 } from '@/shared/engineShape';
 import { ENGINE_VERSION } from './version';
 import { solveWord } from '@/functions/sevenVoicesCore';
@@ -210,15 +210,16 @@ export function analyzeWord(word: string, mode: 'strict' | 'open' = 'strict'): A
     console.error("[DeepRoot] failed for word:", word, err);
   }
   
-  const wordMatrix = buildWordMatrix(word, result.languageFamilies, math7);
+  // 🧩 Compact Word Matrix summary
+  const wordMatrix = buildWordMatrix(
+    result.word,
+    result.languageFamilies,
+    math7 || undefined
+  );
 
-  return {
-    ...result,
-    math7,
-    deepRoot,
-    wordMatrix,
-  };
+  return { ...result, math7, deepRoot, wordMatrix };
 }
+
 
 function buildWordMatrix(
   word: string,
