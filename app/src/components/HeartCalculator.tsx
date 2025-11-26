@@ -8,6 +8,7 @@ import { Button } from "./ui/button";
 import { evaluateVoiceEquation, VOICE_TO_DIGIT } from "@/shared/heartMath";
 import type { SevenCalcResult, SevenOp } from "@/shared/sevenPrinciplesCalc";
 import { cn } from "@/lib/utils";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 type InputMode = 'voices' | 'numbers';
 
@@ -60,32 +61,10 @@ export default function HeartCalculator({ onResult }: Props) {
             </CardTitle>
             <div className="flex items-center gap-2 text-xs">
               <span className="text-muted-foreground">Input</span>
-              <div className="inline-flex rounded-md border border-border overflow-hidden">
-                <button
-                  type="button"
-                  onClick={() => setMode('voices')}
-                  className={cn(
-                    'px-2 py-1 transition-colors',
-                    mode === 'voices'
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-transparent text-muted-foreground hover:bg-accent'
-                  )}
-                >
-                  Voices
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setMode('numbers')}
-                  className={cn(
-                    'px-2 py-1 transition-colors',
-                    mode === 'numbers'
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-transparent text-muted-foreground hover:bg-accent'
-                  )}
-                >
-                  1–7
-                </button>
-              </div>
+              <ToggleGroup type="single" value={mode} onValueChange={(v: InputMode) => v && setMode(v)} size="sm">
+                <ToggleGroupItem value="voices">Voices</ToggleGroupItem>
+                <ToggleGroupItem value="numbers">1–7</ToggleGroupItem>
+              </ToggleGroup>
             </div>
         </div>
         <CardDescription>Combine two Voice expressions as letters (A, E, I, O, U, Y, Ë) or numbers (1–7).</CardDescription>
