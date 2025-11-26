@@ -402,7 +402,10 @@ export type AnalyzeWordResult = {
   wordMatrix?: WordMatrix | null;
   // Optional Heart Math (Seven-Principles) layer
   math7?: Math7Summary;
-}
+
+  // ✅ NEW: optional DeepRoot proto-root layer
+  deepRoot?: DeepRootResult;
+};
 
 // ---------------- Math7 / Heart Summary (Seven Principles) ----------------
 
