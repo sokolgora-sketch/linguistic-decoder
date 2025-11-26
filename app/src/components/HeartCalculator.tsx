@@ -1,3 +1,4 @@
+
 "use client";
 import React, { useState } from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "./ui/card";
@@ -40,6 +41,14 @@ export default function HeartCalculator({ onResult }: Props) {
       setResult(null);
     }
   };
+
+  const voicesDisplay = result ? result.voices.join(' → ') : '';
+  const digitsDisplay = result ? result.voices.map(v => VOICE_TO_DIGIT[v]).join(' → ') : '';
+
+  const primaryDisplay = mode === 'voices' ? voicesDisplay : digitsDisplay;
+  const secondaryDisplay = mode === 'voices' ? digitsDisplay : voicesDisplay;
+
+  const principleDigit = result ? VOICE_TO_DIGIT[result.principle] : undefined;
 
   return (
     <Card className="mt-6 border border-emerald-600/40 shadow-md">
@@ -110,20 +119,26 @@ export default function HeartCalculator({ onResult }: Props) {
 
         {result && (
           <div className="mt-4 p-3 rounded-lg border border-emerald-500/50 bg-emerald-950/20 text-sm space-y-1">
-            <p><strong>Decimal:</strong> {result.decimal}</p>
-            <p><strong>Base-7:</strong> {result.base7.join(" ")}</p>
-            <p>
-              <strong>Voices:</strong> {result.voices.join(" → ")}
-              <span className="text-muted-foreground ml-2">
-                ({result.voices.map(v => VOICE_TO_DIGIT[v]).join(" → ")})
-              </span>
-            </p>
-            <p>
-              <strong>Principle:</strong> <span className="text-emerald-400 text-lg">{result.principle}</span>
-              <span className="text-muted-foreground ml-2">
-                ({VOICE_TO_DIGIT[result.principle]})
-              </span>
-            </p>
+            <div><strong>Decimal:</strong> {result.decimal}</div>
+            <div><strong>Base-7:</strong> {result.base7.join(" ")}</div>
+            <div>
+              <strong>Voices:</strong>{' '}
+              {primaryDisplay || '—'}
+              {secondaryDisplay && (
+                <span className="ml-2 text-muted-foreground">
+                  ({secondaryDisplay})
+                </span>
+              )}
+            </div>
+            {result.principle && (
+              <div>
+                <strong>Principle:</strong>{' '}
+                {mode === 'voices' ? result.principle : principleDigit}
+                <span className="ml-2 text-muted-foreground">
+                  ({mode === 'voices' ? principleDigit : result.principle})
+                </span>
+              </div>
+            )}
           </div>
         )}
       </CardContent>
