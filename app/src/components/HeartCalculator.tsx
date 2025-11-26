@@ -54,20 +54,49 @@ export default function HeartCalculator({ onResult }: Props) {
   return (
     <Card className="mt-6 border border-emerald-600/40 shadow-md">
       <CardHeader>
-        <div className="flex items-center justify-between mb-2">
-            <CardTitle className="flex items-center gap-2">
-                <span role="img" aria-hidden="true">💗</span>
-                Seven-Principles Calculator
+        <div className="flex items-center justify-between gap-4">
+          {/* Title + description */}
+          <div>
+            <CardTitle className="text-lg font-semibold flex items-center gap-2">
+              <span role="img" aria-hidden="true">💗</span>
+              Seven-Principles Calculator
             </CardTitle>
-            <div className="flex items-center gap-2 text-xs">
-              <span className="text-muted-foreground">Input</span>
-              <ToggleGroup type="single" value={mode} onValueChange={(v: InputMode) => v && setMode(v)} size="sm">
-                <ToggleGroupItem value="voices">Voices</ToggleGroupItem>
-                <ToggleGroupItem value="numbers">1-7</ToggleGroupItem>
-              </ToggleGroup>
+            <CardDescription>
+              Combine two Voice expressions (A, E, I, O, U, Y, Ë, or 1–7)
+            </CardDescription>
+          </div>
+
+          {/* Tiny mode toggle */}
+          <div className="flex items-center gap-2 text-xs">
+            <span className="text-muted-foreground">Mode</span>
+            <div className="inline-flex rounded-full border border-border overflow-hidden">
+              <button
+                type="button"
+                onClick={() => setMode('voices')}
+                className={
+                  'px-2 py-1 transition-colors ' +
+                  (mode === 'voices'
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-background text-muted-foreground hover:text-foreground')
+                }
+              >
+                Voices
+              </button>
+              <button
+                type="button"
+                onClick={() => setMode('numbers')}
+                className={
+                  'px-2 py-1 transition-colors ' +
+                  (mode === 'numbers'
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-background text-muted-foreground hover:text-foreground')
+                }
+              >
+                1-7
+              </button>
             </div>
+          </div>
         </div>
-        <CardDescription>Combine two Voice expressions as letters (A, E, I, O, U, Y, Ë) or numbers (1–7).</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
