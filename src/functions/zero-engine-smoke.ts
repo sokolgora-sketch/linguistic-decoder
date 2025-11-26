@@ -268,7 +268,7 @@ function makeHeartMystery(): HeartResult {
         light_dark: 'DARK',
         vibrational_tone: 'LOW',
         candidates: [
-            { language: 'Albanian-pattern', form: 'misteri', decomposition: [{ role: 'ACTION', form: 'mis', gloss: 'to close, conceal' }, { role: 'DOMAIN', form: 'ter', gloss: 'darkness' }], vowel_path: ['I', 'E'], functional_statement: 'To close something within darkness.', signals: ['strong fit'] }
+            { language: 'Albanian-pattern', form: 'misteri', decomposition: [{ role: 'ACTION', form: 'mys' }, { role: 'DOMAIN', form: 'ter' }, { role: 'RESULT', form: 'y' }], vowel_path: ['I', 'E', 'I'], functional_statement: 'To close something within darkness.', signals: ['strong fit'] }
         ]
     } as HeartResult;
 }
@@ -281,7 +281,7 @@ function makeHeartPhilosophy(): HeartResult {
         light_dark: 'MIXED',
         vibrational_tone: 'HIGH',
         candidates: [
-            { language: 'Greek', form: 'philosophia', decomposition: [{ role: 'ACTION', form: 'philo', gloss: 'love' }, { role: 'DOMAIN', form: 'sophia', gloss: 'wisdom' }], vowel_path: ['I', 'O', 'I', 'A'], functional_statement: 'The love of wisdom.', signals: ['historical-carrier'] }
+            { language: 'Greek', form: 'philosophia', decomposition: [{ role: 'ACTION', form: 'fi' }, { role: 'DOMAIN', form: 'lo' }, { role: 'DOMAIN', form: 'so' }, { role: 'RESULT', form: 'fi' }], vowel_path: ['I', 'O', 'O', 'I'], functional_statement: 'The love of wisdom.', signals: ['historical-carrier'] }
         ]
     } as HeartResult;
 }
@@ -294,7 +294,7 @@ function makeHeartFilozofi(): HeartResult {
         light_dark: 'MIXED',
         vibrational_tone: 'HIGH',
         candidates: [
-            { language: 'Albanian', form: 'filozofi', decomposition: [{ role: 'ACTION', form: 'filo', gloss: 'love, thread' }, { role: 'DOMAIN', form: 'zofi', gloss: 'wisdom, craft' }], vowel_path: ['I', 'O', 'O', 'I'], functional_statement: 'The thread of wisdom.', signals: ['strong fit'] }
+            { language: 'Albanian', form: 'filozofi', decomposition: [{ role: 'ACTION', form: 'fi' }, { role: 'DOMAIN', form: 'lo' }, { role: 'DOMAIN', form: 'zo' }, { role: 'RESULT', form: 'fi' }], vowel_path: ['I', 'O', 'O', 'I'], functional_statement: 'The thread of wisdom.', signals: ['strong fit'] }
         ]
     } as HeartResult;
 }
@@ -307,8 +307,7 @@ function makeHeartLanguage(): HeartResult {
         light_dark: 'MIXED',
         vibrational_tone: 'MID',
         candidates: [
-            { language: 'Latin', form: 'lingua', decomposition: [{ role: 'DOMAIN', form: 'lingua', gloss: 'tongue' }], vowel_path: ['I', 'A'], functional_statement: 'Relating to the tongue.', signals: ['historical-carrier'] },
-            { language: 'Albanian-pattern', form: 'gjuhë', decomposition: [{ role: 'DOMAIN', form: 'gju', gloss: 'tongue' }], vowel_path: ['U', 'E'], functional_statement: 'The instrument of the tongue.', signals: ['strong fit'] }
+            { language: 'Latin', form: 'lingua', decomposition: [{ role: 'DOMAIN', form: 'lan' }, { role: 'DOMAIN', form: 'gua' }, { role: 'RESULT', form: 'ge' }], vowel_path: ['I', 'A'], functional_statement: 'Relating to the tongue.', signals: ['historical-carrier'] },
         ]
     } as HeartResult;
 }
