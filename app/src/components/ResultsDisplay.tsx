@@ -12,6 +12,7 @@ import { PrinciplesBlock } from "./PrinciplesBlock";
 import { SymbolicReadingCard } from "./SymbolicReadingCard";
 import { Button } from "@/components/ui/button";
 import { downloadJson } from "@/lib/downloadJson";
+import type { SevenCalcResult } from "@/shared/sevenPrinciplesCalc";
 
 
 const LEVEL_LABEL: Record<number, string> = { 1: "High", 0: "Mid", [-1]: "Low" } as any;
@@ -161,7 +162,7 @@ const Chip = ({ v }: { v: string | number }) => {
 };
 
 
-export function ResultsDisplay({ analysis }: { analysis: AnalysisResult_DEPRECATED | null }) {
+export function ResultsDisplay({ analysis, calcOverlay }: { analysis: AnalysisResult_DEPRECATED | null; calcOverlay: SevenCalcResult | null; }) {
   if (!analysis) return null;
   const { core, candidates, symbolic, debug, wordMatrix, deepRoot } = analysis;
   const raw = debug?.rawEnginePayload;
@@ -191,6 +192,17 @@ export function ResultsDisplay({ analysis }: { analysis: AnalysisResult_DEPRECAT
             {raw && <WhyThisPath primary={raw.primaryPath} />}
             <PrinciplesBlock analysis={analysis} />
         </div>
+        
+        {calcOverlay && (
+          <div className="mt-4 border border-emerald-600/40 rounded-xl p-4 bg-emerald-900/20 animate-fade-in">
+            <h3 className="text-emerald-400 font-medium mb-2">Calculator Overlay</h3>
+            <p><strong>Expression:</strong> {calcOverlay.leftExpr} {calcOverlay.op} {calcOverlay.rightExpr}</p>
+            <p><strong>Decimal:</strong> {calcOverlay.decimal}</p>
+            <p><strong>Base-7:</strong> {calcOverlay.base7.join(" ")}</p>
+            <p><strong>Voices:</strong> {calcOverlay.voices.join(" → ")}</p>
+            <p><strong>Principle:</strong> <span className="text-emerald-300 text-lg">{calcOverlay.principle}</span></p>
+          </div>
+        )}
         
         <Candidates candidates={candidates} />
         
