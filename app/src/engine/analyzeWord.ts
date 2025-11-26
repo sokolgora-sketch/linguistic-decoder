@@ -22,8 +22,9 @@ import type {
   MorphologyMatrix,
   SymbolicLayer,
   SymbolicTag,
-  WordMatrix,
   Vowel,
+  WordMatrix,
+  DeepRootSummary,
 } from '@/shared/engineShape';
 import { ENGINE_VERSION } from './version';
 import { solveWord } from '@/functions/sevenVoicesCore';
@@ -31,7 +32,7 @@ import { getManifest } from './manifest';
 import type { SolveOptions } from '@/functions/sevenVoicesCore';
 import { CANON_CANDIDATES } from '@/shared/canonCandidates';
 import { computeMath7ForResult } from "./math7";
-import { computeDeepRootForWord } from "@/functions/deepRootEngine";
+import { computeDeepRootForWord } from '@/functions/deepRootEngine';
 
 function runSevenVoices(word: string, opts: { mode: 'strict' | 'open' }): any {
   const manifest = getManifest();
@@ -194,22 +195,9 @@ export function analyzeWord(word: string, mode: 'strict' | 'open' = 'strict'): A
     symbolic,
   };
 
-  // 🔁 Attach Heart Math as an optional extra layer
+  // 🔢 Heart math
   const math7 = computeMath7ForResult(result);
 
-  // 🧠 Attach DeepRoot Mind layer (safe: optional, can fail silently)
-  let deepRoot = undefined;
-  try {
-    const r = computeDeepRootForWord(word);
-    if (r) {
-      deepRoot = r;
-    }
-  } catch (err) {
-    // We don't want analysis to crash if DeepRoot blows up.
-    // eslint-disable-next-line no-console
-    console.error("[DeepRoot] failed for word:", word, err);
-  }
-  
   // 🧩 Compact Word Matrix summary
   const wordMatrix = buildWordMatrix(
     result.word,
@@ -217,7 +205,7 @@ export function analyzeWord(word: string, mode: 'strict' | 'open' = 'strict'): A
     math7 || undefined
   );
 
-  return { ...result, math7, deepRoot, wordMatrix };
+  return { ...result, math7, wordMatrix };
 }
 
 
