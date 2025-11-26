@@ -3,6 +3,8 @@
 import type { SymbolicCoreResult } from "@/lib/symbolicCore";
 import type { Math7Summary } from "@/engine/math7";
 
+export type { Math7Summary };
+
 // Canonical shape your UI will use everywhere.
 export type Vowel = 'A' | 'E' | 'I' | 'O' | 'U' | 'Y' | 'Ë';
 
@@ -16,20 +18,20 @@ export type EnginePath = {
 };
 
 export type LanguageFamily = {
-    familyId: string;
-    label: string;
-    confidence: number;
-    rationale: string;
-    forms: any[];
-    signals: string[];
-    dialect?: 'geg' | 'tosk';
+  familyId: string;
+  label: string;
+  confidence: number;
+  rationale: string;
+  forms: any[];
+  signals: string[];
+  dialect?: 'geg' | 'tosk';
 };
 
 // This is what the app & JSON export will see.
 export type EnginePayload = {
   engineVersion: string;
   word: string;
-  mode: 'strict'|'open';
+  mode: 'strict' | 'open';
   alphabet: string;
   primaryPath: EnginePath;
   frontierPaths: EnginePath[];
@@ -99,6 +101,9 @@ export type ConsonantSlot = {
 };
 
 export type ConsonantField = {
+  clusters: any[]; // from buildConsonantField
+  windowCount: number;
+  hopCount: number;
   smoothHits: number;
   spikyHits: number;
   slots: ConsonantSlot[];
@@ -339,6 +344,8 @@ export type AnalysisResult_DEPRECATED = {
   symbolicCore?: SymbolicCoreResult;
   math7?: Math7Summary;
   principles?: PrinciplesSet;
+  wordMatrix?: WordMatrix | null;
+  deepRoot?: DeepRootSummary;
 };
 
 export type AnalyzeWordResult = {
@@ -367,7 +374,10 @@ export type AnalyzeWordResult = {
   wordMatrix?: WordMatrix | null;
   // Optional Heart Math (Seven-Principles) layer
   math7?: Math7Summary;
-}
+
+  // Optional Proto-root / DeepRoot layer (Layer 3)
+  deepRoot?: DeepRootSummary;
+};
 
 // ---------------- Math7 / Heart Summary (Seven Principles) ----------------
 
@@ -443,4 +453,35 @@ export interface PrincipleScore {
 export interface PrinciplesSet {
   source: "heart-calculator";
   principles: PrincipleScore[];
+}
+
+// ---------------- DeepRoot / Proto-root (Layer 3) ----------------
+
+export type DeepRootLightDark = "LIGHT" | "DARK" | "MIXED";
+export type DeepRootTone = "LOW" | "MID" | "HIGH";
+export type DeepRootPieceRole = "ACTION" | "DOMAIN" | "RESULT";
+
+export interface DeepRootPiece {
+  role: DeepRootPieceRole;
+  block: string;
+  language: string;
+  meaning: string;
+  notes?: string;
+}
+
+export interface DeepRootExample {
+  language: string;
+  form: string;
+  gloss: string;
+}
+
+// Normalised shape the app sees.
+export interface DeepRootSummary {
+  coreFunction: string;    // core_function
+  motif: Vowel[];          // core_vowel_motif → as Seven-Voices vowels
+  lightDark: DeepRootLightDark;       // LIGHT / DARK / MIXED
+  vibrationalTone: DeepRootTone;      // LOW / MID / HIGH
+  pieces: DeepRootPiece[];            // ACTION / DOMAIN / RESULT blocks
+  short: string;                      // explanation_short
+  examples: DeepRootExample[];        // examples_modern_usage
 }

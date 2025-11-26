@@ -134,7 +134,7 @@ export type CandidateOriginAxes = {
   // Seven-Voices path + principles consistency.
   principles: OriginAxisStatus;
   // Word-sum / morphology story: does it actually explain function?
-  morphology: OriginAxisStatus;
+  morphology: OriginAxis-Status;
   // Consonant behaviour vs. semantic profile (cut/build/etc.).
   consonants: OriginAxisStatus;
 };
@@ -325,39 +325,6 @@ export type SevenVoicesSummary = {
   sevenWords: string[];            // 7-word sentence in principle order
 };
 
-// ---------------- DeepRoot (proto-root) layer ----------------
-
-export type DeepRootRole = 'ACTION' | 'DOMAIN' | 'RESULT';
-
-export interface DeepRootPiece {
-  role: DeepRootRole;      // ACTION / DOMAIN / RESULT
-  block: string;           // e.g. "da", "ma", "gje"
-  language: string;        // e.g. "Albanian"
-  meaning: string;         // short gloss
-  notes?: string;          // optional extra explanation
-}
-
-export interface DeepRootExample {
-  language: string;        // e.g. "Albanian"
-  form: string;            // e.g. "dëm"
-  gloss: string;           // e.g. "harm, damage"
-}
-
-/**
- * Raw DeepRoot output, kept close to the JSON printed by zero-engine-smoke.ts
- * so we don't lose any information.
- */
-export interface DeepRootResult {
-  core_function: string;
-  core_vowel_motif: Vowel[];
-  light_dark: 'LIGHT' | 'DARK' | 'MIXED';
-  vibrational_tone: 'LOW' | 'MID' | 'HIGH';
-  pieces: DeepRootPiece[];
-  explanation_short: string;
-  examples_modern_usage?: DeepRootExample[];
-}
-
-
 export type SymbolicLayer = {
   notes: string[];
   label?: string;
@@ -377,7 +344,8 @@ export type AnalysisResult_DEPRECATED = {
   symbolicCore?: SymbolicCoreResult;
   math7?: Math7Summary;
   principles?: PrinciplesSet;
-  wordMatrix?: WordMatrix | null; // Added from previous step
+  wordMatrix?: WordMatrix | null;
+  deepRoot?: DeepRootSummary;
 };
 
 export type AnalyzeWordResult = {
@@ -408,7 +376,7 @@ export type AnalyzeWordResult = {
   math7?: Math7Summary;
 
   // Optional Proto-root / DeepRoot layer (Layer 3)
-  deepRoot?: DeepRootResult;
+  deepRoot?: DeepRootSummary;
 };
 
 // ---------------- Math7 / Heart Summary (Seven Principles) ----------------
@@ -485,4 +453,35 @@ export interface PrincipleScore {
 export interface PrinciplesSet {
   source: "heart-calculator";
   principles: PrincipleScore[];
+}
+
+// ---------------- DeepRoot / Proto-root (Layer 3) ----------------
+
+export type DeepRootLightDark = "LIGHT" | "DARK" | "MIXED";
+export type DeepRootTone = "LOW" | "MID" | "HIGH";
+export type DeepRootPieceRole = "ACTION" | "DOMAIN" | "RESULT";
+
+export interface DeepRootPiece {
+  role: DeepRootPieceRole;
+  block: string;
+  language: string;
+  meaning: string;
+  notes?: string;
+}
+
+export interface DeepRootExample {
+  language: string;
+  form: string;
+  gloss: string;
+}
+
+// Normalised shape the app sees.
+export interface DeepRootSummary {
+  coreFunction: string;    // core_function
+  motif: Vowel[];          // core_vowel_motif → as Seven-Voices vowels
+  lightDark: DeepRootLightDark;       // LIGHT / DARK / MIXED
+  vibrationalTone: DeepRootTone;      // LOW / MID / HIGH
+  pieces: DeepRootPiece[];            // ACTION / DOMAIN / RESULT blocks
+  short: string;                      // explanation_short
+  examples: DeepRootExample[];        // examples_modern_usage
 }
