@@ -32,7 +32,7 @@ import { getManifest } from './manifest';
 import type { SolveOptions } from '@/functions/sevenVoicesCore';
 import { CANON_CANDIDATES } from '@/shared/canonCandidates';
 import { computeMath7ForResult } from "./math7";
-import { computeDeepRootForWord } from '@/functions/deepRootEngine';
+import { computeDeepRoot } from '@/functions/deepRootEngine';
 
 function runSevenVoices(word: string, opts: { mode: 'strict' | 'open' }): any {
   const manifest = getManifest();
@@ -154,6 +154,7 @@ export function analyzeWord(word: string, mode: 'strict' | 'open' = 'strict'): A
   const base = runSevenVoices(word, { mode });
   const withCanon = attachCanonCandidates(base);
   const withMorph = attachMorphology(withCanon);
+
   const symbolic = buildSymbolicLayer(withCanon);
 
   const join = (arr: any[]) => (arr || []).join(' → ');
@@ -206,14 +207,7 @@ export function analyzeWord(word: string, mode: 'strict' | 'open' = 'strict'): A
   );
   
   // 🔎 Attach DeepRoot proto-root layer (best effort, non-blocking)
-  let deepRoot: DeepRootSummary | undefined;
-  try {
-    deepRoot = computeDeepRootForWord(result.word);
-  } catch (err) {
-    // We never want DeepRoot to break the main engine
-    // eslint-disable-next-line no-console
-    console.error("[DeepRoot] failed for word:", word, err);
-  }
+  const deepRoot = computeDeepRoot(result);
 
   return { ...result, math7, wordMatrix, deepRoot };
 }

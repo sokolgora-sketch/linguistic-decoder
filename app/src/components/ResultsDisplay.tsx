@@ -1,6 +1,6 @@
 'use client';
 import React from "react";
-import { Card, CardContent } from "./ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "./ui/card";
 import type { CClass } from "../functions/languages";
 import { classRange } from "../functions/languages";
 import type { EnginePayload, AnalysisResult_DEPRECATED, Vowel } from "../shared/engineShape";
@@ -152,7 +152,7 @@ const Chip = ({ v }: { v: string | number }) => {
 
 export function ResultsDisplay({ analysis }: { analysis: AnalysisResult_DEPRECATED | null }) {
   if (!analysis) return null;
-  const { core, candidates, symbolic, debug } = analysis;
+  const { core, candidates, symbolic, debug, wordMatrix, deepRoot } = analysis;
   const raw = debug?.rawEnginePayload;
 
   // The primaryPath in the new AnalyzeWordResult is a string, not an array.
@@ -184,6 +184,72 @@ export function ResultsDisplay({ analysis }: { analysis: AnalysisResult_DEPRECAT
         <Candidates candidates={candidates} />
         
         {symbolic && <SymbolicReadingCard symbolic={symbolic} />}
+
+        {wordMatrix && (
+          <Card className="mt-6">
+            <CardHeader>
+              <CardTitle>Word Matrix (compact summary)</CardTitle>
+              <CardDescription>
+                {wordMatrix.languageFamily} · {wordMatrix.morphology.root}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-2 text-sm">
+              <div>
+                <span className="font-semibold">Meaning:</span>{" "}
+                {wordMatrix.meaning}
+              </div>
+
+              <div>
+                <span className="font-semibold">Morphology:</span>{" "}
+                {wordMatrix.morphology.root}
+                {wordMatrix.morphology.suffixes &&
+                  ` + ${wordMatrix.morphology.suffixes.join(" + ")}`}
+                {" — "}
+                {wordMatrix.morphology.gloss}
+              </div>
+
+              {wordMatrix.wordSums && (
+                <div>
+                  <span className="font-semibold">Word sums:</span>
+                  <ul className="list-disc list-inside">
+                    {wordMatrix.wordSums.map((ws, i) => (
+                      <li key={i}>{ws}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {wordMatrix.principles.length > 0 && (
+                <div>
+                  <span className="font-semibold">Principles path:</span>{" "}
+                  {wordMatrix.principles.join(" → ")}
+                </div>
+              )}
+
+              {wordMatrix.symbolicNotes && (
+                <div>
+                  <span className="font-semibold">Symbolic:</span>{" "}
+                  {wordMatrix.symbolicNotes}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
+        
+        {deepRoot && (
+          <Card className="mt-4">
+            <CardHeader>
+              <CardTitle>Proto-Root Analysis</CardTitle>
+              <CardDescription>Minimal functional origin</CardDescription>
+            </CardHeader>
+            <CardContent className="text-sm space-y-1">
+              <p><strong>Proto-Root:</strong> {deepRoot.protoRoot}</p>
+              <p><strong>Meaning:</strong> {deepRoot.meaning}</p>
+              <p><strong>Axis:</strong> {deepRoot.functionAxis}</p>
+              <p><strong>Examples:</strong> {deepRoot.examples.join(", ")}</p>
+            </CardContent>
+          </Card>
+        )}
 
         {raw && raw.frontierPaths && raw.frontierPaths.length > 0 && (
           <Card className="p-4 mt-4">

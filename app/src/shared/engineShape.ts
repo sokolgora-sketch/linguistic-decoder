@@ -457,31 +457,9 @@ export interface PrinciplesSet {
 
 // ---------------- DeepRoot / Proto-root (Layer 3) ----------------
 
-export type DeepRootLightDark = "LIGHT" | "DARK" | "MIXED";
-export type DeepRootTone = "LOW" | "MID" | "HIGH";
-export type DeepRootPieceRole = "ACTION" | "DOMAIN" | "RESULT";
-
-export interface DeepRootPiece {
-  role: DeepRootPieceRole;
-  block: string;
-  language: string;
-  meaning: string;
-  notes?: string;
-}
-
-export interface DeepRootExample {
-  language: string;
-  form: string;
-  gloss: string;
-}
-
-// Normalised shape the app sees.
 export interface DeepRootSummary {
-  coreFunction: string;    // core_function
-  motif: Vowel[];          // core_vowel_motif → as Seven-Voices vowels
-  lightDark: DeepRootLightDark;       // LIGHT / DARK / MIXED
-  vibrationalTone: DeepRootTone;      // LOW / MID / HIGH
-  pieces: DeepRootPiece[];            // ACTION / DOMAIN / RESULT blocks
-  short: string;                      // explanation_short
-  examples: DeepRootExample[];        // examples_modern_usage
+  protoRoot: string;
+  meaning: string;
+  functionAxis: string;
+  examples: string[];
 }
