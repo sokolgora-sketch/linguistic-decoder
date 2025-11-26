@@ -128,6 +128,55 @@ const ALBANIAN_MICRO_ROOTS: MicroRootLexeme[] = [
     roles: ["RESULT"],
     notes: "Abstract noun ending (-ion, -tion etc.): 'state under X'.",
   },
+  // --- mystery / filozofi / language support ---
+
+  {
+    base: "mys",
+    language: "Albanian-pattern",
+    meaning: "to hide, conceal, keep secret",
+    roles: ["ACTION"],
+    notes: "Bridge to 'mshef' / 'i msheftë' (hidden). Used in 'mystery'.",
+  },
+
+  {
+    base: "fi",
+    language: "Greek/Albanian-bridge",
+    meaning: "inner spark of mind / love of wisdom",
+    roles: ["ACTION"],
+    notes: "Carries the mind/wisdom role in 'filozofi' / 'philosophy'.",
+  },
+
+  {
+    base: "lo",
+    language: "Albanian",
+    meaning: "play, movement, interaction",
+    roles: ["DOMAIN"],
+    notes: "From 'lojë' / 'loz' – play; middle field in 'filozofi'.",
+  },
+
+  {
+    base: "zo",
+    language: "Albanian",
+    meaning: "voice, being, to seize",
+    roles: ["DOMAIN"],
+    notes: "From 'zë' / 'me zënë'; used as part of the living field in 'filozofi'.",
+  },
+
+  {
+    base: "lan",
+    language: "Albanian-pattern",
+    meaning: "actor / mover, linked to 'luan'",
+    roles: ["ACTION"],
+    notes: "Bridges to 'luan' (actor/lion). ACTION for 'language'.",
+  },
+
+  {
+    base: "gua",
+    language: "Latin/Albanian-bridge",
+    meaning: "tongue, language (bridge to 'gjuha')",
+    roles: ["DOMAIN"],
+    notes: "Carries the 'tongue/language' role in 'language' / 'lingua'.",
+  },
 ];
 
 // ─────────────────────────────────────────────
