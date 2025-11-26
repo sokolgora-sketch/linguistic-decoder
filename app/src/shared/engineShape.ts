@@ -331,6 +331,13 @@ export type SymbolicLayer = {
   label?: string;
 };
 
+export interface DeepRootResult {
+  family?: string;
+  protoForm?: string;
+  gloss?: string;
+  notes?: string;
+}
+
 export type AnalysisResult_DEPRECATED = {
   core: AnalysisCore;
   // NEW: word-level consonant behaviour, shared by all candidates.
@@ -478,8 +485,11 @@ export interface DeepRootExample {
 
 // Normalised shape the app sees.
 export interface DeepRootSummary {
-  protoRoot: string;
-  meaning: string;
-  functionAxis: string;
-  examples: string[];
+  coreFunction: string;    // core_function
+  motif: Vowel[];          // core_vowel_motif → as Seven-Voices vowels
+  lightDark: DeepRootLightDark;       // LIGHT / DARK / MIXED
+  vibrationalTone: DeepRootTone;      // LOW / MID / HIGH
+  pieces: DeepRootPiece[];            // ACTION / DOMAIN / RESULT blocks
+  short: string;                      // explanation_short
+  examples: DeepRootExample[];        // examples_modern_usage
 }
