@@ -15,14 +15,21 @@
  *  - Only extend with OPTIONAL fields, and only if tests stay green.
  */
 // src/engine/analyzeWord.ts
-import type { AnalyzeWordResult, Candidate, LanguageFamilyCandidate, MorphologyMatrix, SymbolicLayer, SymbolicTag, Vowel } from '@/shared/engineShape';
+import type {
+  AnalyzeWordResult,
+  Candidate,
+  LanguageFamilyCandidate,
+  MorphologyMatrix,
+  SymbolicLayer,
+  SymbolicTag,
+} from '@/shared/engineShape';
 import { ENGINE_VERSION } from './version';
 import { solveWord } from '@/functions/sevenVoicesCore';
 import { getManifest } from './manifest';
 import type { SolveOptions } from '@/functions/sevenVoicesCore';
 import { CANON_CANDIDATES } from '@/shared/canonCandidates';
 import { computeMath7ForResult } from "./math7";
-
+import { computeDeepRootForWord } from "@/functions/deepRootEngine";
 
 function runSevenVoices(word: string, opts: { mode: 'strict' | 'open' }): any {
   const manifest = getManifest();
@@ -39,11 +46,8 @@ function runSevenVoices(word: string, opts: { mode: 'strict' | 'open' }): any {
     edgeWeight: manifest.edgeWeight,
   };
 
-  // This part is tricky. The old system was very different.
-  // We'll call solveWord and then try to adapt it to a partial AnalysisResult.
-  // The canon candidates will be attached later.
   const analysis = solveWord(word, solveOpts, 'auto');
-  
+
   // A simplified adaptation for the pipeline
   return {
     word: word,
@@ -52,9 +56,9 @@ function runSevenVoices(word: string, opts: { mode: 'strict' | 'open' }): any {
     frontier: analysis.frontierPaths,
     languageFamilies: [], // will be populated by canon candidates
     meta: {
-        engineVersion: ENGINE_VERSION,
-        createdAt: new Date().toISOString(),
-        mode: opts.mode,
+      engineVersion: ENGINE_VERSION,
+      createdAt: new Date().toISOString(),
+      mode: opts.mode,
     },
     // For later pipeline steps
     rawPayload: analysis,
@@ -73,7 +77,7 @@ function buildGeneratedWordMatrix(candidate: Candidate): MorphologyMatrix {
       role: p.role,
       gloss: p.gloss,
     })),
-    wordSums: [
+  wordSums: [
       {
         parts: parts.map((p: any) => p.form),
         result: candidate.form,
@@ -157,14 +161,22 @@ export function analyzeWord(word: string, mode: 'strict' | 'open' = 'strict'): A
 
     primaryPath: {
       voicePath: join(withCanon.primaryPath.voicePath),
-      levelPath: join(withCanon.primaryPath.levelPath.map((l: number) => l === 1 ? 'high' : l === 0 ? 'mid' : 'low')),
+      levelPath: join(
+        withCanon.primaryPath.levelPath.map((l: number) =>
+          l === 1 ? 'high' : l === 0 ? 'mid' : 'low'
+        ),
+      ),
       ringPath: join(withCanon.primaryPath.ringPath),
     },
 
     frontier: (withCanon.frontier || []).map((alt: any, idx: number) => ({
       id: `alt-${idx + 1}`,
       voicePath: join(alt.voicePath),
-      levelPath: join(alt.levelPath.map((l: number) => l === 1 ? 'high' : l === 0 ? 'mid' : 'low')),
+      levelPath: join(
+        alt.levelPath.map((l: number) =>
+          l === 1 ? 'high' : l === 0 ? 'mid' : 'low'
+        ),
+      ),
       ringPath: join(alt.ringPath),
     })),
 
@@ -183,5 +195,22 @@ export function analyzeWord(word: string, mode: 'strict' | 'open' = 'strict'): A
   // 🔁 Attach Heart Math as an optional extra layer
   const math7 = computeMath7ForResult(result);
 
-  return { ...result, math7 };
+  // 🧠 Attach DeepRoot Mind layer (safe: optional, can fail silently)
+  let deepRoot = undefined;
+  try {
+    const r = computeDeepRootForWord(word);
+    if (r) {
+      deepRoot = r;
+    }
+  } catch (err) {
+    // We don't want analysis to crash if DeepRoot blows up.
+    // eslint-disable-next-line no-console
+    console.error("[DeepRoot] failed for word:", word, err);
+  }
+
+  return {
+    ...result,
+    math7,
+    deepRoot,
+  };
 }

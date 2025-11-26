@@ -16,20 +16,20 @@ export type EnginePath = {
 };
 
 export type LanguageFamily = {
-    familyId: string;
-    label: string;
-    confidence: number;
-    rationale: string;
-    forms: any[];
-    signals: string[];
-    dialect?: 'geg' | 'tosk';
+  familyId: string;
+  label: string;
+  confidence: number;
+  rationale: string;
+  forms: any[];
+  signals: string[];
+  dialect?: 'geg' | 'tosk';
 };
 
 // This is what the app & JSON export will see.
 export type EnginePayload = {
   engineVersion: string;
   word: string;
-  mode: 'strict'|'open';
+  mode: 'strict' | 'open';
   alphabet: string;
   primaryPath: EnginePath;
   frontierPaths: EnginePath[];
@@ -42,6 +42,8 @@ export type EnginePayload = {
   languageFamilies?: LanguageFamily[];
   edgeWindows?: string[];
   math7?: Math7Summary;
+  // Optional DeepRoot – can be attached later when we push Mind/Heart
+  deepRoot?: DeepRootResult;
 };
 
 
@@ -53,7 +55,7 @@ export function normalizeEnginePayload(raw: any): EnginePayload {
     console.error("Invalid payload for normalization:", raw);
     throw new Error("Normalization failed: payload is missing required fields.");
   }
-  
+
   const payload: EnginePayload = {
     engineVersion: raw.engineVersion ?? 'unknown',
     word: raw.word,
@@ -64,7 +66,7 @@ export function normalizeEnginePayload(raw: any): EnginePayload {
       ringPath: raw.primaryPath.ringPath ?? [],
       levelPath: raw.primaryPath.levelPath ?? [],
       ops: raw.primaryPath.ops ?? [],
-      checksums: raw.primaryPath.checksums ?? { V:0, E:0, C:0 },
+      checksums: raw.primaryPath.checksums ?? { V: 0, E: 0, C: 0 },
       kept: raw.primaryPath.kept ?? 0,
     },
     frontierPaths: raw.frontierPaths ?? [],
@@ -77,6 +79,7 @@ export function normalizeEnginePayload(raw: any): EnginePayload {
     languageFamilies: raw.languageFamilies ?? [],
     edgeWindows: raw.edgeWindows ?? [],
     math7: raw.math7,
+    deepRoot: raw.deepRoot,
   };
 
   return payload;
@@ -224,10 +227,10 @@ export type Candidate = {
 
   // Optional 3-axis diagnostic verdict for this origin.
   axes?: CandidateOriginAxes;
-  
+
   // Optional morphology matrix for structured word-sum data.
   morphologyMatrix?: MorphologyMatrix;
-  
+
   symbolic?: SymbolicTag[];
 };
 
@@ -325,6 +328,33 @@ export type SymbolicLayer = {
   label?: string;
 };
 
+// 🔻 DeepRoot types (Mind layer)
+export type DeepRootRole = "ACTION" | "DOMAIN" | "RESULT";
+
+export interface DeepRootPiece {
+  role: DeepRootRole;    // ACTION | DOMAIN | RESULT
+  block: string;         // "da", "ma", "gje", "shtu", "di", "m", ...
+  language: string;      // "Albanian", "Greek/Albanian-bridge", ...
+  meaning: string;       // short gloss: "to split, divide, separate"
+  notes?: string;        // free-form notes from the engine
+}
+
+export interface DeepRootExample {
+  language: string;
+  form: string;
+  gloss: string;
+}
+
+export interface DeepRootResult {
+  core_function: string;                     // canonical functional sentence
+  core_vowel_motif: Vowel[];                 // e.g. ["A","A","E"]
+  light_dark: "LIGHT" | "DARK" | "MIXED" | "UNKNOWN";
+  vibrational_tone: "LOW" | "MID" | "HIGH" | "BALANCED";
+  pieces: DeepRootPiece[];                   // usually 2–4 blocks
+  explanation_short: string;                 // compressed explanation (1–2 sentences)
+  examples_modern_usage: DeepRootExample[];  // examples from smoke-test style
+};
+
 export type AnalysisResult_DEPRECATED = {
   core: AnalysisCore;
   // NEW: word-level consonant behaviour, shared by all candidates.
@@ -367,6 +397,8 @@ export type AnalyzeWordResult = {
   wordMatrix?: WordMatrix | null;
   // Optional Heart Math (Seven-Principles) layer
   math7?: Math7Summary;
+  // Optional DeepRoot layer (Mind)
+  deepRoot?: DeepRootResult;
 }
 
 // ---------------- Math7 / Heart Summary (Seven Principles) ----------------
@@ -391,7 +423,6 @@ export interface Math7PrimarySummaryExtended {
 export interface Math7SummaryExtended {
   primary: Math7PrimarySummaryExtended;
 }
-
 
 export type LanguageFamilyCandidate = {
   language: string;
