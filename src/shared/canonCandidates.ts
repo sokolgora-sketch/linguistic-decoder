@@ -456,3 +456,122 @@ export const CANON_CANDIDATES: Record<string, Candidate[]> = {
     }
   ]
 };
+
+// --- DËMTIM ---
+CANON_CANDIDATES['dëmtim'] = [
+  {
+    id: 'alb-demtim',
+    language: 'Albanian',
+    family: 'Albanian',
+    form: 'dëmtim',
+    decomposition: {
+      parts: [
+        { role: 'action', form: 'dëm', gloss: 'harm / loss' },
+        { role: 'instrument', form: 'tim', gloss: 'act / process' },
+      ],
+      functionalStatement: 'act of causing harm or damage',
+    },
+    voices: {
+      voiceSequence: ['A', 'A', 'E'],
+      ringPath: [1, 1, 2],
+      dominantVoices: { A: 2, E: 1 },
+    },
+    ruleChecks: {
+      soundPathOk: true,
+      functionalDecompOk: true,
+      sevenVoicesAlignmentOk: true,
+      consonantMeaningOk: true,
+      harmonyOk: true,
+    },
+    principleSignals: {
+      truthOk: true,
+      expansionOk: false,
+      insightOk: false,
+      balanceOk: false,
+      unityOk: false,
+      networkIntegrityOk: false,
+      evolutionOk: false,
+    },
+    status: 'pass',
+    confidenceTag: 'solid',
+    morphologyMatrix: {
+      pivot: 'dëm',
+      meaning: 'harm / loss',
+      morphemes: [
+        { form: 'dëm', role: 'root', gloss: 'harm / loss' },
+        { form: 'tim', role: 'suffix', gloss: 'act of causing / process' },
+      ],
+      wordSums: [
+        { parts: ['dëm', 'tim'], result: 'dëmtim', gloss: 'the act of causing harm' },
+      ],
+      source: 'manual',
+    },
+    symbolic: [
+      {
+        axis: 'law',
+        source: 'sevenVoices',
+        note: 'Represents consequence and rebalancing through harm.',
+      },
+    ],
+  },
+];
+
+// --- MATHEMATICS ---
+CANON_CANDIDATES['mathematics'] = [
+  {
+    id: 'lat-mathematics',
+    language: 'Latin',
+    family: 'Greek–Latin',
+    form: 'mathematics',
+    decomposition: {
+      parts: [
+        { role: 'action', form: 'mat', gloss: 'measure' },
+        { role: 'instrument', form: 'mat', gloss: 'measure again' },
+        { role: 'unit', form: 'tika', gloss: 'what you have / counted thing' },
+      ],
+      functionalStatement: 'measure and re-measure what is present so that what you have becomes a clear, stable quantity',
+    },
+    voices: {
+      voiceSequence: ['A', 'E', 'A', 'I', 'A'],
+      ringPath: [1, 1, 2, 3, 1],
+      dominantVoices: { A: 3, E: 1, I: 1 },
+    },
+    ruleChecks: {
+      soundPathOk: true,
+      functionalDecompOk: true,
+      sevenVoicesAlignmentOk: true,
+      consonantMeaningOk: true,
+      harmonyOk: true,
+    },
+    principleSignals: {
+      truthOk: true,
+      expansionOk: true,
+      insightOk: true,
+      balanceOk: true,
+      unityOk: false,
+      networkIntegrityOk: false,
+      evolutionOk: false,
+    },
+    status: 'pass',
+    confidenceTag: 'solid',
+    morphologyMatrix: {
+      pivot: 'mat',
+      meaning: 'measure / count',
+      morphemes: [
+        { form: 'mat', role: 'root', gloss: 'measure / count' },
+        { form: 'tika', role: 'suffix', gloss: 'what you have / counted thing' },
+      ],
+      wordSums: [
+        { parts: ['mat', 'tika'], result: 'mathematics', gloss: 'measure what you have' },
+      ],
+      source: 'manual',
+    },
+    symbolic: [
+      {
+        axis: 'mathematics',
+        source: 'sevenVoices',
+        note: 'Reflects Truth–Expansion–Insight–Balance harmony.',
+      },
+    ],
+  },
+];
