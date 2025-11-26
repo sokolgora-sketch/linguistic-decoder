@@ -2,8 +2,9 @@
 
 import type { SymbolicCoreResult } from "@/lib/symbolicCore";
 import type { Math7Summary } from "@/engine/math7";
+import type { SevenCalcResult } from "./sevenPrinciplesCalc";
 
-export type { Math7Summary };
+export type { Math7Summary, SevenCalcResult };
 
 // Canonical shape your UI will use everywhere.
 export type Vowel = 'A' | 'E' | 'I' | 'O' | 'U' | 'Y' | 'Ë';
@@ -329,6 +330,13 @@ export type SymbolicLayer = {
   notes: string[];
   label?: string;
 };
+
+export interface DeepRootResult {
+  family?: string;
+  protoForm?: string;
+  gloss?: string;
+  notes?: string;
+}
 
 export type AnalysisResult_DEPRECATED = {
   core: AnalysisCore;
