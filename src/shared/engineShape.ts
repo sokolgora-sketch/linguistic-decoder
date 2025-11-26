@@ -369,6 +369,7 @@ export type AnalysisResult_DEPRECATED = {
   symbolicCore?: SymbolicCoreResult;
   math7?: Math7Summary;
   principles?: PrinciplesSet;
+  wordMatrix?: WordMatrix | null;
 };
 
 export type AnalyzeWordResult = {

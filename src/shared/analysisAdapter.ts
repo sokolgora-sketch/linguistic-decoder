@@ -20,6 +20,7 @@ import type {
   SevenVoicesSummary,
   SymbolicLayer,
   PrincipleName,
+  AnalyzeWordResult,
 } from "@/shared/engineShape";
 import { CANON_CANDIDATES } from "@/shared/canonCandidates";
 import { buildConsonantField } from "@/shared/consonantField";
@@ -27,6 +28,7 @@ import { getVoiceMeta } from "@/shared/sevenVoices";
 import { detectAlbanianDialect } from "@/lib/detectDialect";
 import { computeMath7ForResult } from "@/engine/math7";
 import { computePrinciples } from "./computePrinciples";
+import { analyzeWord } from "@/engine/analyzeWord";
 
 
 /**
@@ -112,6 +114,9 @@ export function enginePayloadToAnalysisResult(
     return null;
   }
   
+  // Create a temporary object that conforms to AnalyzeWordResult for computeMath7ForResult
+  const analysisFromPayload = analyzeWord(payload.word, payload.mode);
+  
   const { field, summary } = buildConsonantField(
     payload,
     payload.primaryPath
@@ -165,30 +170,6 @@ export function enginePayloadToAnalysisResult(
     }
   }
 
-  // Create a temporary object that conforms to AnalyzeWordResult for computeMath7ForResult
-  const analysisForMath7 = {
-    word: payload.word,
-    primaryPath: {
-      voicePath: payload.primaryPath.voicePath.join(' → '),
-      levelPath: payload.primaryPath.levelPath.map((l: number) => l === 1 ? 'high' : l === 0 ? 'mid' : 'low').join(' → '),
-      ringPath: payload.primaryPath.ringPath.join(' → '),
-    },
-    frontier: payload.frontierPaths.map((alt: any, idx: number) => ({
-      id: `alt-${idx + 1}`,
-      voicePath: alt.voicePath.join(' → '),
-      levelPath: alt.levelPath.map((l: number) => l === 1 ? 'high' : l === 0 ? 'mid' : 'low').join(' → '),
-      ringPath: alt.ringPath.join(' → '),
-    })),
-    languageFamilies: (payload.languageFamilies || []).map((c: any) => ({
-      language: c.label,
-      form: c.forms?.[0] ?? payload.word,
-      gloss: c.rationale,
-      voicePath: payload.primaryPath.voicePath.join(' → '),
-      // ... other properties
-    })),
-    // ... other meta properties if needed by computeMath7ForResult
-  };
-  
   const core: AnalysisCore = {
     word: payload.word,
     engineVersion: payload.engineVersion,
@@ -229,7 +210,7 @@ export function enginePayloadToAnalysisResult(
       },
       frontierCount: payload.frontierPaths.length,
     },
-    primaryPath: analysisForMath7.primaryPath,
+    primaryPath: analysisFromPayload.primaryPath,
   };
 
   const debug: AnalysisDebug = {
@@ -247,7 +228,8 @@ export function enginePayloadToAnalysisResult(
     sevenVoices,
     symbolic,
     principles: computePrinciples(payload),
-    math7: computeMath7ForResult(analysisForMath7 as any),
+    math7: computeMath7ForResult({ ...analysisFromPayload, primaryPath: core.primaryPath } as any),
+    wordMatrix: analysisFromPayload.wordMatrix,
   };
 
   return analysisResult;
@@ -303,6 +285,10 @@ export function analysisResultToEnginePayload(
   // Optionally attach math7 here so it can round-trip if needed.
   if ((result as any).math7) {
     (basePayload as any).math7 = (result as any).math7;
+  }
+   // Attach wordMatrix if it exists
+   if (result.wordMatrix) {
+    (basePayload as any).wordMatrix = result.wordMatrix;
   }
 
   return basePayload;

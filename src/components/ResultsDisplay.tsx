@@ -1,6 +1,6 @@
 'use client';
 import React from "react";
-import { Card, CardContent } from "./ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "./ui/card";
 import type { CClass } from "../functions/languages";
 import { classRange } from "../functions/languages";
 import type { EnginePayload, AnalysisResult_DEPRECATED, Vowel } from "../shared/engineShape";
@@ -152,12 +152,15 @@ const Chip = ({ v }: { v: string | number }) => {
 
 export function ResultsDisplay({ analysis }: { analysis: AnalysisResult_DEPRECATED | null }) {
   if (!analysis) return null;
-  const { core, candidates, symbolic, debug } = analysis;
+  const { core, candidates, symbolic, debug, wordMatrix } = analysis;
   const raw = debug?.rawEnginePayload;
 
-  const primaryVoicePath = core.voices.vowelVoices;
-  const primaryRingPath = core.voices.ringPath;
-  const primaryLevelPath = core.voices.levelPath.map(l => (l === 'high' ? 1 : l === 'mid' ? 0 : -1));
+  // The primaryPath in the new AnalyzeWordResult is a string, not an array.
+  // We need to parse it back into an array for the PathRow component.
+  const primaryVoicePath = core.primaryPath.voicePath.split(" → ").filter(Boolean) as Vowel[];
+  const primaryRingPath = core.primaryPath.ringPath.split(" → ").map(Number);
+  // Map 'high'/'mid'/'low' back to numbers for LEVEL_LABEL
+  const primaryLevelPath = core.primaryPath.levelPath.split(" → ").map(l => (l === 'high' ? 1 : l === 'mid' ? 0 : -1));
 
   return (
     <div className="space-y-4">
@@ -181,6 +184,57 @@ export function ResultsDisplay({ analysis }: { analysis: AnalysisResult_DEPRECAT
         <Candidates candidates={candidates} />
         
         {symbolic && <SymbolicReadingCard symbolic={symbolic} />}
+
+        {wordMatrix && (
+          <Card className="mt-6">
+            <CardHeader>
+              <CardTitle>Word Matrix (compact summary)</CardTitle>
+              <CardDescription>
+                {wordMatrix.languageFamily} · {wordMatrix.morphology.root}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-2 text-sm">
+              <div>
+                <span className="font-semibold">Meaning:</span>{" "}
+                {wordMatrix.meaning}
+              </div>
+
+              <div>
+                <span className="font-semibold">Morphology:</span>{" "}
+                {wordMatrix.morphology.root}
+                {wordMatrix.morphology.suffixes &&
+                  ` + ${wordMatrix.morphology.suffixes.join(" + ")}`}
+                {" — "}
+                {wordMatrix.morphology.gloss}
+              </div>
+
+              {wordMatrix.wordSums && (
+                <div>
+                  <span className="font-semibold">Word sums:</span>
+                  <ul className="list-disc list-inside">
+                    {wordMatrix.wordSums.map((ws, i) => (
+                      <li key={i}>{ws}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {wordMatrix.principles.length > 0 && (
+                <div>
+                  <span className="font-semibold">Principles path:</span>{" "}
+                  {wordMatrix.principles.join(" → ")}
+                </div>
+              )}
+
+              {wordMatrix.symbolicNotes && (
+                <div>
+                  <span className="font-semibold">Symbolic:</span>{" "}
+                  {wordMatrix.symbolicNotes}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
 
         {raw && raw.frontierPaths && raw.frontierPaths.length > 0 && (
           <Card className="p-4 mt-4">
