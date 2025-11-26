@@ -44,6 +44,7 @@ import { ExportJsonButton } from "@/components/ExportJsonButton";
 import { logError } from "@/lib/logError";
 import { VOICE_COLOR_MAP, VOICE_LABEL_MAP } from "@/shared/voiceColors";
 import { SymbolicReadingCard } from "@/components/SymbolicReadingCard";
+import HeartCalculator from "@/components/HeartCalculator";
 
 const VOICE_META: { id: Vowel; label: string; role: string }[] = [
   { id: "A", label: "Action / Truth", role: "Launches, cuts through, sets the first line." },
@@ -719,6 +720,19 @@ export default function LinguisticDecoderApp() {
               </Card>
             </AccordionContent>
           </AccordionItem>
+          
+          <AccordionItem value="item-heart-calculator">
+            <AccordionTrigger className="text-sm font-semibold">
+              <div className="flex items-center gap-2">
+                <span className="text-lg">💗</span>
+                <span>Seven-Principles Calculator</span>
+              </div>
+            </AccordionTrigger>
+            <AccordionContent>
+              <HeartCalculator />
+            </AccordionContent>
+          </AccordionItem>
+
 
           {/* History */}
           <AccordionItem value="item-4">
