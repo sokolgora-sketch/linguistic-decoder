@@ -22,6 +22,8 @@ import type {
   MorphologyMatrix,
   SymbolicLayer,
   SymbolicTag,
+  WordMatrix,
+  Vowel,
 } from '@/shared/engineShape';
 import { ENGINE_VERSION } from './version';
 import { solveWord } from '@/functions/sevenVoicesCore';
@@ -207,10 +209,54 @@ export function analyzeWord(word: string, mode: 'strict' | 'open' = 'strict'): A
     // eslint-disable-next-line no-console
     console.error("[DeepRoot] failed for word:", word, err);
   }
+  
+  // 🧩 Compact Word Matrix summary
+  const wordMatrix = buildWordMatrix(
+    result.word,
+    result.languageFamilies,
+    math7 || undefined
+  );
+
+  return { ...result, math7, deepRoot, wordMatrix };
+}
+
+
+function buildWordMatrix(
+  word: string,
+  families: LanguageFamilyCandidate[],
+  math7?: { primary?: { principlesPath?: string[] } }
+): WordMatrix | null {
+  if (!families || families.length === 0) return null;
+
+  const primary =
+    families.find(f => f.passes && !f.speculative) ?? families[0];
+  if (!primary || !primary.morphologyMatrix) return null;
+
+  const m = primary.morphologyMatrix;
+
+  const root = m.pivot;
+  const suffixes =
+    m.morphemes?.filter(mm => mm.role !== "root").map(mm => mm.form) ?? [];
+
+  const wordSums =
+    m.wordSums?.map(ws => `${ws.parts.join(" + ")} → ${ws.result}`) ?? [];
+
+  const principles = math7?.primary?.principlesPath ?? [];
+
+  const symbolicNotes =
+    primary.symbolic?.map(tag => tag.note).join(" | ");
 
   return {
-    ...result,
-    math7,
-    deepRoot,
+    word,
+    languageFamily: primary.language,
+    morphology: {
+      root,
+      suffixes: suffixes.length ? suffixes : undefined,
+      gloss: m.meaning,
+    },
+    meaning: primary.gloss,
+    wordSums: wordSums.length ? wordSums : undefined,
+    principles,
+    symbolicNotes,
   };
 }
