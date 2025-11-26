@@ -130,14 +130,14 @@ export type ConsonantProfile =
 // Coarse verdict on how well an origin matches a particular axis.
 export type OriginAxisStatus = 'pass' | 'weak' | 'unknown';
 
-export type CandidateOriginAxes = {
+export interface CandidateOriginAxes {
   // Seven-Voices path + principles consistency.
   principles: OriginAxisStatus;
   // Word-sum / morphology story: does it actually explain function?
-  morphology: OriginAxis-Status;
+  morphology: OriginAxisStatus;
   // Consonant behaviour vs. semantic profile (cut/build/etc.).
   consonants: OriginAxisStatus;
-};
+}
 
 // New types for morphology matrix
 export type MorphemeRole = 'root' | 'prefix' | 'suffix' | 'action' | 'instrument' | 'unit';
