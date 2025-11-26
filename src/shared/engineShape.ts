@@ -101,6 +101,9 @@ export type ConsonantSlot = {
 };
 
 export type ConsonantField = {
+  clusters: any[]; // from buildConsonantField
+  windowCount: number;
+  hopCount: number;
   smoothHits: number;
   spikyHits: number;
   slots: ConsonantSlot[];
@@ -374,6 +377,7 @@ export type AnalysisResult_DEPRECATED = {
   symbolicCore?: SymbolicCoreResult;
   math7?: Math7Summary;
   principles?: PrinciplesSet;
+  wordMatrix?: WordMatrix | null; // Added from previous step
 };
 
 export type AnalyzeWordResult = {
@@ -403,7 +407,7 @@ export type AnalyzeWordResult = {
   // Optional Heart Math (Seven-Principles) layer
   math7?: Math7Summary;
 
-  // ✅ NEW: optional DeepRoot proto-root layer
+  // Optional Proto-root / DeepRoot layer (Layer 3)
   deepRoot?: DeepRootResult;
 };
 
