@@ -4,6 +4,29 @@
 export type Voice = 'A' | 'E' | 'I' | 'O' | 'U' | 'Y' | 'Ë';
 export type Operation = 'add' | 'subtract' | 'multiply' | 'divide';
 
+export type VoicePrinciple = 'A' | 'E' | 'I' | 'O' | 'U' | 'Y' | 'Ë';
+
+export const DIGIT_TO_VOICE: Record<string, VoicePrinciple> = {
+  "1": "A",
+  "2": "E",
+  "3": "I",
+  "4": "O",
+  "5": "U",
+  "6": "Y",
+  "7": "Ë",
+};
+
+export const VOICE_TO_DIGIT: Record<VoicePrinciple, number> = {
+  A: 1,
+  E: 2,
+  I: 3,
+  O: 4,
+  U: 5,
+  Y: 6,
+  Ë: 7,
+};
+
+
 /** Fixed Seven-Voices order */
 const VOICES: Voice[] = ['A', 'E', 'I', 'O', 'U', 'Y', 'Ë'];
 
