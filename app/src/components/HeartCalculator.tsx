@@ -88,7 +88,7 @@ export default function HeartCalculator({ onResult }: Props) {
               </div>
             </div>
         </div>
-        <CardDescription>Combine two Voice expressions (A, E, I, O, U, Y, Ë, or 1-7)</CardDescription>
+        <CardDescription>Combine two Voice expressions as letters (A, E, I, O, U, Y, Ë) or numbers (1–7).</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
