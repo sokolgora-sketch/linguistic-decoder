@@ -19,9 +19,11 @@ import type {
   AnalyzeWordResult,
   Candidate,
   LanguageFamilyCandidate,
+  Math7Summary,
   MorphologyMatrix,
   SymbolicLayer,
   SymbolicTag,
+  WordMatrix,
 } from '@/shared/engineShape';
 import { ENGINE_VERSION } from './version';
 import { solveWord } from '@/functions/sevenVoicesCore';
@@ -93,7 +95,7 @@ function attachCanonCandidates(base: any): any {
   const canon = CANON_CANDIDATES[word] || [];
 
   // Words whose canon entries are treated as having true "manual" matrices
-  const MANUAL_MATRIX_WORDS = new Set(['study', 'damage']);
+  const MANUAL_MATRIX_WORDS = new Set(['study', 'damage', 'dëmtim', 'mathematics']);
 
   const languageFamilies: LanguageFamilyCandidate[] = canon.map(
     (c: Candidate): LanguageFamilyCandidate => {
@@ -207,10 +209,63 @@ export function analyzeWord(word: string, mode: 'strict' | 'open' = 'strict'): A
     // eslint-disable-next-line no-console
     console.error("[DeepRoot] failed for word:", word, err);
   }
+  
+  const wordMatrix = buildWordMatrix(word, result.languageFamilies, math7);
 
   return {
     ...result,
     math7,
     deepRoot,
+    wordMatrix,
+  };
+}
+
+function buildWordMatrix(
+  word: string,
+  families: LanguageFamilyCandidate[],
+  math7?: Math7Summary
+): WordMatrix | null {
+  if (!families || families.length === 0) return null;
+
+  // Prefer: passes + not speculative. Fall back to first.
+  const primary =
+    families.find(f => f.passes && !f.speculative) ??
+    families[0];
+
+  if (!primary || !primary.morphologyMatrix) return null;
+
+  const m = primary.morphologyMatrix;
+
+  const root = m.pivot;
+  const suffixes =
+    m.morphemes
+      ?.filter(mm => mm.role !== "root")
+      .map(mm => mm.form) ?? [];
+
+  const wordSums =
+    m.wordSums?.map(ws =>
+      `${ws.parts.join(" + ")} → ${ws.result}`
+    ) ?? [];
+
+  const principles =
+    math7?.primary?.principlesPath ?? [];
+
+  const symbolicNotes =
+    primary.symbolic
+      ?.map(tag => tag.note)
+      .join(" | ");
+
+  return {
+    word,
+    languageFamily: primary.language,
+    morphology: {
+      root,
+      suffixes: suffixes.length ? suffixes : undefined,
+      gloss: m.meaning,
+    },
+    meaning: primary.gloss,
+    wordSums: wordSums.length ? wordSums : undefined,
+    principles,
+    symbolicNotes,
   };
 }
