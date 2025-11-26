@@ -154,6 +154,18 @@ export function analyzeWord(word: string, mode: 'strict' | 'open' = 'strict'): A
   const base = runSevenVoices(word, { mode });
   const withCanon = attachCanonCandidates(base);
   const withMorph = attachMorphology(withCanon);
+
+  // 🔍 DeepRoot proto-root layer (optional, best-effort)
+  let deepRoot: DeepRootResult | undefined;
+  try {
+    // use sanitized so "DAMAGE" / "Damage" still hit
+    deepRoot = computeDeepRootForWord(withCanon.sanitized) as DeepRootResult;
+  } catch (err) {
+    // We NEVER want DeepRoot to crash the main analysis.
+    // eslint-disable-next-line no-console
+    console.error("[DeepRoot] failed for word:", word, err);
+  }
+
   const symbolic = buildSymbolicLayer(withCanon);
 
   const join = (arr: any[]) => (arr || []).join(' → ');
@@ -195,22 +207,9 @@ export function analyzeWord(word: string, mode: 'strict' | 'open' = 'strict'): A
     symbolic,
   };
 
-  // 🔁 Attach Heart Math as an optional extra layer
+  // 🔢 Heart math
   const math7 = computeMath7ForResult(result);
 
-  // 🧠 Attach DeepRoot Mind layer (safe: optional, can fail silently)
-  let deepRoot = undefined;
-  try {
-    const r = computeDeepRootForWord(word);
-    if (r) {
-      deepRoot = r;
-    }
-  } catch (err) {
-    // We don't want analysis to crash if DeepRoot blows up.
-    // eslint-disable-next-line no-console
-    console.error("[DeepRoot] failed for word:", word, err);
-  }
-  
   // 🧩 Compact Word Matrix summary
   const wordMatrix = buildWordMatrix(
     result.word,
