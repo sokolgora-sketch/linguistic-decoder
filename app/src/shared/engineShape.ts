@@ -1,9 +1,9 @@
 // src/shared/engineShape.ts
 
 import type { SymbolicCoreResult } from "@/lib/symbolicCore";
-import type { Math7Summary } from "@/engine/math7";
+import type { Math7Summary as Math7SummaryFromEngine } from "@/engine/math7";
 
-export type { Math7Summary };
+export type Math7Summary = Math7SummaryFromEngine;
 
 // Canonical shape your UI will use everywhere.
 export type Vowel = 'A' | 'E' | 'I' | 'O' | 'U' | 'Y' | 'Ë';
@@ -134,9 +134,9 @@ export interface CandidateOriginAxes {
   // Seven-Voices path + principles consistency.
   principles: OriginAxisStatus;
   // Word-sum / morphology story: does it actually explain function?
-  morphology: OriginAxisStatus;
+  morphology: OriginAxis-Status;
   // Consonant behaviour vs. semantic profile (cut/build/etc.).
-  consonants: OriginAxisStatus;
+  consonants: OriginAxis-Status;
 }
 
 // New types for morphology matrix
@@ -457,9 +457,31 @@ export interface PrinciplesSet {
 
 // ---------------- DeepRoot / Proto-root (Layer 3) ----------------
 
-export interface DeepRootSummary {
-  protoRoot: string;
+export type DeepRootLightDark = "LIGHT" | "DARK" | "MIXED";
+export type DeepRootTone = "LOW" | "MID" | "HIGH";
+export type DeepRootPieceRole = "ACTION" | "DOMAIN" | "RESULT";
+
+export interface DeepRootPiece {
+  role: DeepRootPieceRole;
+  block: string;
+  language: string;
   meaning: string;
-  functionAxis: string;
-  examples: string[];
+  notes?: string;
+}
+
+export interface DeepRootExample {
+  language: string;
+  form: string;
+  gloss: string;
+}
+
+// Normalised shape the app sees.
+export interface DeepRootSummary {
+  coreFunction: string;    // core_function
+  motif: Vowel[];          // core_vowel_motif → as Seven-Voices vowels
+  lightDark: DeepRootLightDark;       // LIGHT / DARK / MIXED
+  vibrationalTone: DeepRootTone;      // LOW / MID / HIGH
+  pieces: DeepRootPiece[];            // ACTION / DOMAIN / RESULT blocks
+  short: string;                      // explanation_short
+  examples: DeepRootExample[];        // examples_modern_usage
 }

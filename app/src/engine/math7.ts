@@ -3,22 +3,23 @@
 // Seven-Voices “Heart Math” over an AnalyzeWordResult.
 // Pure reader: it does NOT change the core solver, it just reads paths.
 
-import type { AnalyzeWordResult } from "@/shared/engineShape";
+import type { AnalyzeWordResult, Math7PathSummary, Vowel } from "@/shared/engineShape";
+import { calculate, voiceToNumber, reduceToPrinciple } from "@/shared/heartMath";
+
 
 export type Math7CycleState = "open" | "balanced" | "overloaded";
-
-export interface Math7PathSummary {
-  voices: string[];            // e.g. ["U", "I"]
-  total: number;               // raw sum of indices
-  totalMod7: number;           // total % 7, 0–6
-  principlesPath: string[];    // mapped principle names
-  cycleState: Math7CycleState; // open | balanced | overloaded
-}
 
 export interface Math7Summary {
   primary: Math7PathSummary;
   frontier: Math7PathSummary[];
   candidates: Record<string, Math7PathSummary>;
+  heart?: {
+    expression: string;
+    decimal: number;
+    base7: number[];
+    voices: Vowel[];
+    principle: Vowel;
+  };
 }
 
 // Vowel → index 0–6
@@ -43,15 +44,15 @@ const PRINCIPLE_BY_VOICE: Record<string, string> = {
   Ë: "Evolution",
 };
 
-function parseVoicePath(path: string | undefined): string[] {
+function parseVoicePath(path: string | undefined): Vowel[] {
   if (!path) return [];
   return path
     .split("→")
     .map((s) => s.trim())
-    .filter(Boolean);
+    .filter(Boolean) as Vowel[];
 }
 
-function scoreVoices(voices: string[]): Math7PathSummary {
+function scoreVoices(voices: Vowel[]): Math7PathSummary {
   const total = voices.reduce(
     (sum, v) => sum + (VOICE_INDEX[v] ?? 0),
     0
@@ -92,12 +93,33 @@ export function computeMath7ForResult(result: AnalyzeWordResult): Math7Summary {
   const candidates: Record<string, Math7PathSummary> = {};
   (result.languageFamilies || []).forEach((c: any) => {
     const voices = parseVoicePath(c.voicePath);
-    candidates[c.language] = scoreVoices(voices);
+    if (voices.length > 0) {
+      candidates[c.language] = scoreVoices(voices);
+    }
   });
 
-  return {
+  const summary: Math7Summary = {
     primary,
     frontier,
     candidates,
   };
+
+  // 🔗 Connect Seven-Principles Calculator
+  if (result?.primaryPath?.voicePath) {
+    const voices = result.primaryPath.voicePath.replace(/\s|→/g, "").split("") as Vowel[];
+    if (voices.length >= 2) {
+      const a = voiceToNumber[voices[0] as any] ?? 1;
+      const b = voiceToNumber[voices[voices.length - 1] as any] ?? 1;
+      const heartResult = calculate(a, b, "add"); // you can change "add" later to dynamic logic
+      summary.heart = {
+        expression: `${voices[0]} + ${voices[voices.length - 1]}`,
+        decimal: heartResult.decimal,
+        base7: heartResult.base7,
+        voices: heartResult.voices,
+        principle: heartResult.principle,
+      };
+    }
+  }
+  
+  return summary;
 }
