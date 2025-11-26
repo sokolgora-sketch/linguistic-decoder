@@ -3,7 +3,7 @@ import React from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "./ui/card";
 import type { CClass } from "../functions/languages";
 import { classRange } from "../functions/languages";
-import type { EnginePayload, AnalysisResult_DEPRECATED, Vowel } from "../shared/engineShape";
+import type { EnginePayload, AnalysisResult_DEPRECATED, Vowel, SevenCalcResult } from "../shared/engineShape";
 import { getVoiceMeta } from '@/shared/sevenVoices';
 import WhyThisPath from "./WhyThisPath";
 import { VOICE_COLOR_MAP } from "@/shared/voiceColors";
@@ -12,7 +12,6 @@ import { PrinciplesBlock } from "./PrinciplesBlock";
 import { SymbolicReadingCard } from "./SymbolicReadingCard";
 import { Button } from "@/components/ui/button";
 import { downloadJson } from "@/lib/downloadJson";
-import type { SevenCalcResult } from "@/shared/sevenPrinciplesCalc";
 
 
 const LEVEL_LABEL: Record<number, string> = { 1: "High", 0: "Mid", [-1]: "Low" } as any;
@@ -187,11 +186,6 @@ export function ResultsDisplay({ analysis, calcOverlay }: { analysis: AnalysisRe
               analysis={analysis}
             />
         )}
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {raw && <WhyThisPath primary={raw.primaryPath} />}
-            <PrinciplesBlock analysis={analysis} />
-        </div>
         
         {calcOverlay && (
           <div className="mt-4 border border-emerald-600/40 rounded-xl p-4 bg-emerald-900/20 animate-fade-in">
@@ -203,6 +197,11 @@ export function ResultsDisplay({ analysis, calcOverlay }: { analysis: AnalysisRe
             <p><strong>Principle:</strong> <span className="text-emerald-300 text-lg">{calcOverlay.principle}</span></p>
           </div>
         )}
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {raw && <WhyThisPath primary={raw.primaryPath} />}
+            <PrinciplesBlock analysis={analysis} calcOverlay={calcOverlay} />
+        </div>
         
         <Candidates candidates={candidates} />
         
