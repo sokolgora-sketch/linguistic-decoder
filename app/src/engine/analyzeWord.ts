@@ -204,8 +204,18 @@ export function analyzeWord(word: string, mode: 'strict' | 'open' = 'strict'): A
     result.languageFamilies,
     math7 || undefined
   );
+  
+  // 🔎 Attach DeepRoot proto-root layer (best effort, non-blocking)
+  let deepRoot: DeepRootSummary | undefined;
+  try {
+    deepRoot = computeDeepRootForWord(result.word);
+  } catch (err) {
+    // We never want DeepRoot to break the main engine
+    // eslint-disable-next-line no-console
+    console.error("[DeepRoot] failed for word:", word, err);
+  }
 
-  return { ...result, math7, wordMatrix };
+  return { ...result, math7, wordMatrix, deepRoot };
 }
 
 
