@@ -7,6 +7,8 @@ import { Button } from "./ui/button";
 import { evaluateVoiceEquation, VOICE_TO_DIGIT } from "@/shared/heartMath";
 import type { SevenCalcResult, SevenOp } from "@/shared/sevenPrinciplesCalc";
 
+type InputMode = 'voices' | 'numbers';
+
 type Props = {
   onResult?: (result: SevenCalcResult) => void;
 };
@@ -16,6 +18,7 @@ export default function HeartCalculator({ onResult }: Props) {
   const [exprB, setExprB] = useState("ËA");
   const [op, setOp] = useState<SevenOp>("add");
   const [result, setResult] = useState<SevenCalcResult | null>(null);
+  const [mode, setMode] = useState<InputMode>('voices');
 
   const handleCalculate = () => {
     try {
