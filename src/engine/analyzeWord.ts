@@ -22,9 +22,9 @@ import type {
   MorphologyMatrix,
   SymbolicLayer,
   SymbolicTag,
-  WordMatrix,
-  Math7Summary,
   Vowel,
+  WordMatrix,
+  DeepRootResult,
 } from '@/shared/engineShape';
 import { ENGINE_VERSION } from './version';
 import { solveWord } from '@/functions/sevenVoicesCore';
@@ -32,7 +32,7 @@ import { getManifest } from './manifest';
 import type { SolveOptions } from '@/functions/sevenVoicesCore';
 import { CANON_CANDIDATES } from '@/shared/canonCandidates';
 import { computeMath7ForResult } from "./math7";
-import { computeDeepRootForWord } from "@/functions/deepRootEngine";
+import { computeDeepRootForWord } from '@/functions/deepRootEngine';
 
 function runSevenVoices(word: string, opts: { mode: 'strict' | 'open' }): any {
   const manifest = getManifest();
@@ -225,7 +225,7 @@ export function analyzeWord(word: string, mode: 'strict' | 'open' = 'strict'): A
 function buildWordMatrix(
   word: string,
   families: LanguageFamilyCandidate[],
-  math7?: Math7Summary
+  math7?: { primary?: { principlesPath?: string[] } }
 ): WordMatrix | null {
   if (!families || families.length === 0) return null;
 
