@@ -1,24 +1,39 @@
-
 "use client";
 import React, { useState } from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "./ui/card";
 import { Input } from "./ui/input";
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "./ui/select";
 import { Button } from "./ui/button";
-import { calculate, evaluateVoiceEquation } from "@/shared/heartMath";
+import { evaluateVoiceEquation } from "@/shared/heartMath";
+import type { SevenCalcResult, SevenOp } from "@/shared/sevenPrinciplesCalc";
 
-export default function HeartCalculator() {
+type Props = {
+  onResult?: (result: SevenCalcResult) => void;
+};
+
+export default function HeartCalculator({ onResult }: Props) {
   const [exprA, setExprA] = useState("AO");
   const [exprB, setExprB] = useState("ËA");
-  const [op, setOp] = useState<"add" | "subtract" | "multiply" | "divide">("add");
-  const [result, setResult] = useState<any>(null);
+  const [op, setOp] = useState<SevenOp>("add");
+  const [result, setResult] = useState<SevenCalcResult | null>(null);
 
-  const run = () => {
+  const handleCalculate = () => {
     try {
       const res = evaluateVoiceEquation(exprA, exprB, op);
-      setResult(res);
+      const calcResult: SevenCalcResult = {
+        leftExpr: exprA,
+        rightExpr: exprB,
+        op,
+        decimal: res.decimal,
+        base7: res.base7,
+        voices: res.voices,
+        principle: res.principle,
+      };
+      setResult(calcResult);
+      onResult?.(calcResult);
     } catch (e) {
       console.error("Error evaluating:", e);
+      setResult(null);
     }
   };
 
@@ -51,7 +66,7 @@ export default function HeartCalculator() {
           />
         </div>
 
-        <Button onClick={run} className="w-full mt-2 bg-emerald-700 hover:bg-emerald-600">
+        <Button onClick={handleCalculate} className="w-full mt-2 bg-emerald-700 hover:bg-emerald-600">
           Calculate
         </Button>
 

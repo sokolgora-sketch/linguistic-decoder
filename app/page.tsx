@@ -729,7 +729,7 @@ export default function LinguisticDecoderApp() {
               </div>
             </AccordionTrigger>
             <AccordionContent>
-              <HeartCalculator />
+              <HeartCalculator onResult={(res) => console.log('Calculator Result:', res)} />
             </AccordionContent>
           </AccordionItem>
 
