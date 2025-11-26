@@ -18,16 +18,15 @@ export type MorphCategory =
   | "OTHER";
 
 export type MorphRuleId =
-  | "S_TO_SH"          // existing
-  | "ADD_H_AFTER_S"    // existing
-  | "Z_TO_ZH"          // new – z ↔ zh
-  | "N_TO_NJ"          // new – n ↔ nj
-  | "L_TO_LL"          // new – l ↔ ll
-  | "R_TO_RR"          // new – r ↔ rr
-  | "K_Q"              // new – k ↔ q
-  | "G_GJ"             // new – g ↔ gj
-  | "D_T_DH_TH"        // new – cluster for d/t/dh/th
-  // Symmetric pairs for the above
+  | "S_TO_SH"
+  | "ADD_H_AFTER_S"
+  | "Z_TO_ZH"
+  | "N_TO_NJ"
+  | "L_TO_LL"
+  | "R_TO_RR"
+  | "K_Q"
+  | "G_GJ"
+  | "D_T_DH_TH"
   | "SH_TO_S"
   | "ZH_TO_Z"
   | "NJ_TO_N"
@@ -38,9 +37,9 @@ export type MorphRuleId =
   | "C_TO_X"
   | "C_TO_C_CEDILLA"
   | "N_TO_R"
-  | "DROP_H_IN_SH";
-
-
+  | "DROP_H_IN_SH"
+  | "K_TO_Q"
+  | "G_TO_GJ";
 /**
  * One legal consonant transform Mind is allowed to apply
  * when searching for micro-roots.
@@ -69,6 +68,49 @@ export interface ConsonantTransformRule {
   enabledByDefault: boolean;
 
   notes?: string;
+}
+
+interface BlockVariant {
+  variant: string;
+  appliedRuleIds: MorphRuleId[];
+}
+
+interface MorphRule {
+  id: MorphRuleId;
+  description: string;
+  apply: (block: string) => BlockVariant[];
+}
+
+// helper: create simple A ↔ B swap rules
+function makeSwapRule(
+  id: MorphRuleId,
+  a: string,
+  b: string,
+  description: string
+): MorphRule {
+  return {
+    id,
+    description,
+    apply(block: string): BlockVariant[] {
+      const out: BlockVariant[] = [];
+
+      if (block.includes(a)) {
+        out.push({
+          variant: block.replace(a, b),
+          appliedRuleIds: [id],
+        });
+      }
+
+      if (block.includes(b)) {
+        out.push({
+          variant: block.replace(b, a),
+          appliedRuleIds: [id],
+        });
+      }
+
+      return out;
+    },
+  };
 }
 
 /**
@@ -165,7 +207,7 @@ export const CONSONANT_TRANSFORMS: ConsonantTransformRule[] = [
   // ─────────────────────────────────────────────
 
   {
-    id: "K_Q",
+    id: "K_TO_Q",
     label: "k → q",
     description:
       "Allow velar k to shift to palatal q when Albanian roots are written with q.",
@@ -186,10 +228,10 @@ export const CONSONANT_TRANSFORMS: ConsonantTransformRule[] = [
     direction: "TO_SOFTER",
     category: "PALATAL",
     enabledByDefault: true,
-    notes: "Opposite direction of K_Q.",
+    notes: "Opposite direction of K_TO_Q.",
   },
   {
-    id: "G_GJ",
+    id: "G_TO_GJ",
     label: "g → gj",
     description:
       "Allow velar g to strengthen to palatal gj when searching Albanian roots.",
@@ -210,7 +252,7 @@ export const CONSONANT_TRANSFORMS: ConsonantTransformRule[] = [
     direction: "TO_SOFTER",
     category: "PALATAL",
     enabledByDefault: true,
-    notes: "Opposite direction of G_GJ.",
+    notes: "Opposite direction of G_TO_GJ.",
   },
 
   // ─────────────────────────────────────────────
@@ -276,10 +318,6 @@ export const CONSONANT_TRANSFORMS: ConsonantTransformRule[] = [
 // Helper – generate block variants from rules
 // ─────────────────────────────────────────────
 
-export interface BlockVariant {
-  form: string;
-  appliedRuleIds: string[];
-}
 
 /**
  * Generate legal consonant variants for a block using the rules above.
@@ -291,14 +329,14 @@ export interface BlockVariant {
  *
  * This is enough for patterns like:
  *  "stu" → "shtu" (ADD_H_AFTER_S)
- *  "gju" ↔ "gu"   (G_GJ / GJ_TO_G)   [if used around known roots]
+ *  "gju" ↔ "gu"   (G_TO_GJ / GJ_TO_G)   [if used around known roots]
  */
 export function generateBlockVariants(
   block: string,
   maxOps: number = 1
 ): BlockVariant[] {
   const variants: BlockVariant[] = [
-    { form: block, appliedRuleIds: [] },
+    { variant: block, appliedRuleIds: [] },
   ];
 
   if (maxOps < 1) {
@@ -319,7 +357,7 @@ export function generateBlockVariants(
     if (transformed === block) continue;
 
     variants.push({
-      form: transformed,
+      variant: transformed,
       appliedRuleIds: [rule.id],
     });
   }
@@ -328,8 +366,8 @@ export function generateBlockVariants(
   const seen = new Set<string>();
   const unique: BlockVariant[] = [];
   for (const v of variants) {
-    if (seen.has(v.form)) continue;
-    seen.add(v.form);
+    if (seen.has(v.variant)) continue;
+    seen.add(v.variant);
     unique.push(v);
   }
 
