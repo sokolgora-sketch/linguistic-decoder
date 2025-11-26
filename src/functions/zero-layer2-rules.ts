@@ -18,28 +18,16 @@ export type MorphCategory =
   | "OTHER";
 
 export type MorphRuleId =
-  | "S_TO_SH"
-  | "ADD_H_AFTER_S"
-  | "Z_TO_ZH"
-  | "N_TO_NJ"
-  | "L_TO_LL"
-  | "R_TO_RR"
-  | "K_Q"
-  | "G_GJ"
-  | "D_T_DH_TH"
-  | "SH_TO_S"
-  | "ZH_TO_Z"
-  | "NJ_TO_N"
-  | "LL_TO_L"
-  | "RR_TO_R"
-  | "Q_TO_K"
-  | "GJ_TO_G"
-  | "C_TO_X"
-  | "C_TO_C_CEDILLA"
-  | "N_TO_R"
-  | "DROP_H_IN_SH"
-  | "K_TO_Q"
-  | "G_TO_GJ";
+| "S_TO_SH"
+| "ADD_H_AFTER_S"
+| "Z_TO_ZH"
+| "N_TO_NJ"
+| "L_TO_LL"
+| "R_TO_RR"
+| "K_Q"
+| "G_GJ"
+| "D_T_DH_TH";
+
 /**
  * One legal consonant transform Mind is allowed to apply
  * when searching for micro-roots.
@@ -52,7 +40,7 @@ export type MorphRuleId =
  *  - category: "GLIDE"
  */
 export interface ConsonantTransformRule {
-  id: MorphRuleId;
+  id: string;
   label: string;
   description: string;
 
@@ -113,210 +101,107 @@ function makeSwapRule(
   };
 }
 
-/**
- * All core consonant morph rules for Layer 2.
- *
- * These are deliberately small and explicit. Mind is NOT allowed to invent
- * new morphs outside this list.
- */
-export const CONSONANT_TRANSFORMS: ConsonantTransformRule[] = [
-  // ─────────────────────────────────────────────
-  // 1. FRICATIVE BRIDGE: S ↔ SH, Z ↔ ZH
-  // ─────────────────────────────────────────────
-
+const MORPH_RULES: MorphRule[] = [
+  // --- existing rules ---
   {
     id: "S_TO_SH",
-    label: "s → sh",
-    description:
-      "Allow alveolar fricative s to strengthen to postalveolar sh when matching Albanian roots.",
-    from: "s",
-    to: "sh",
-    direction: "TO_STRONGER",
-    category: "FRICATIVE",
-    enabledByDefault: true,
-    notes: "Used for patterns like stu → shtu; helps reach roots like 'shtoj'.",
+    description: "Allow s ↔ sh as fricative variants.",
+    apply(block: string): BlockVariant[] {
+      const out: BlockVariant[] = [];
+      if (block.includes("s")) {
+        out.push({ variant: block.replace("s", "sh"), appliedRuleIds: ["S_TO_SH"] });
+      }
+      if (block.includes("sh")) {
+        out.push({ variant: block.replace("sh", "s"), appliedRuleIds: ["S_TO_SH"] });
+      }
+      return out;
+    },
   },
-  {
-    id: "SH_TO_S",
-    label: "sh → s",
-    description:
-      "Allow postalveolar sh to simplify to s when surface form is lighter than the root.",
-    from: "sh",
-    to: "s",
-    direction: "TO_SOFTER",
-    category: "FRICATIVE",
-    enabledByDefault: true,
-    notes: "Lets us recognise roots even if h is dropped in the surface word.",
-  },
-  {
-    id: "Z_TO_ZH",
-    label: "z → zh",
-    description:
-      "Allow voiced alveolar fricative z to shift toward zh when matching deeper Albanian roots.",
-    from: "z",
-    to: "zh",
-    direction: "TO_STRONGER",
-    category: "FRICATIVE",
-    enabledByDefault: false,
-    notes: "More experimental; keep off by default or use only when there is evidence.",
-  },
-  {
-    id: "ZH_TO_Z",
-    label: "zh → z",
-    description:
-      "Allow zh to simplify to z when surface forms weaken the fricative.",
-    from: "zh",
-    to: "z",
-    direction: "TO_SOFTER",
-    category: "FRICATIVE",
-    enabledByDefault: false,
-    notes: "Symmetric partner to Z_TO_ZH.",
-  },
-
-  // ─────────────────────────────────────────────
-  // 2. GLIDE / DIGRAPH RULES (s + h → sh, etc.)
-  // ─────────────────────────────────────────────
-
   {
     id: "ADD_H_AFTER_S",
-    label: "s + h → sh",
-    description:
-      "If a block begins with s and can reach an Albanian root with sh (sht- family), allow inserting h to form sh.",
-    from: "s",
-    to: "sh",
-    direction: "TO_STRONGER",
-    category: "GLIDE",
-    enabledByDefault: true,
-    notes: "Core rule for patterns like stu → shtu → shtoj (to add).",
-  },
-  {
-    id: "DROP_H_IN_SH",
-    label: "sh → s (drop h)",
-    description:
-      "Treat missing h in a surface sh-cluster as acceptable when matching an sh-based root.",
-    from: "sh",
-    to: "s",
-    direction: "TO_SOFTER",
-    category: "GLIDE",
-    enabledByDefault: true,
-    notes: "Allows mapping between 'sh' roots and lighter surface forms.",
+    description: "Allow s → sh to match roots like 'shtoj'.",
+    apply(block: string): BlockVariant[] {
+      if (block.startsWith("s")) {
+        return [{ variant: `sh${block.substring(1)}`, appliedRuleIds: ["ADD_H_AFTER_S"] }];
+      }
+      return [];
+    },
   },
 
-  // ─────────────────────────────────────────────
-  // 3. PALATAL / VELAR BRIDGE: K↔Q, G↔GJ
-  // ─────────────────────────────────────────────
+  // --- new consonant-class rules ---
 
-  {
-    id: "K_TO_Q",
-    label: "k → q",
-    description:
-      "Allow velar k to shift to palatal q when Albanian roots are written with q.",
-    from: "k",
-    to: "q",
-    direction: "TO_STRONGER",
-    category: "PALATAL",
-    enabledByDefault: true,
-    notes: "Useful around roots where k/q alternate across dialects.",
-  },
-  {
-    id: "Q_TO_K",
-    label: "q → k",
-    description:
-      "Allow palatal q to simplify to k when surface form is less palatalised.",
-    from: "q",
-    to: "k",
-    direction: "TO_SOFTER",
-    category: "PALATAL",
-    enabledByDefault: true,
-    notes: "Opposite direction of K_TO_Q.",
-  },
-  {
-    id: "G_TO_GJ",
-    label: "g → gj",
-    description:
-      "Allow velar g to strengthen to palatal gj when searching Albanian roots.",
-    from: "g",
-    to: "gj",
-    direction: "TO_STRONGER",
-    category: "PALATAL",
-    enabledByDefault: true,
-    notes: "Used for patterns like gju/guha families.",
-  },
-  {
-    id: "GJ_TO_G",
-    label: "gj → g",
-    description:
-      "Allow gj to simplify to g when the surface form is less palatalised.",
-    from: "gj",
-    to: "g",
-    direction: "TO_SOFTER",
-    category: "PALATAL",
-    enabledByDefault: true,
-    notes: "Opposite direction of G_TO_GJ.",
-  },
+  // z ↔ zh  (sibilant / palato-alveolar pair)
+  makeSwapRule(
+    "Z_TO_ZH",
+    "z",
+    "zh",
+    "Allow z ↔ zh as sibilant / palato-alveolar variants."
+  ),
 
-  // ─────────────────────────────────────────────
-  // 4. AFFRICATE GROUPS – conservative, optional
-  // ─────────────────────────────────────────────
+  // n ↔ nj  (nasal / palatal nasal)
+  makeSwapRule(
+    "N_TO_NJ",
+    "n",
+    "nj",
+    "Allow n ↔ nj as nasal variants in the same field."
+  ),
 
-  {
-    id: "C_TO_X",
-    label: "c ↔ x (ts/dz pair)",
-    description:
-      "Treat dental affricates c and x as a family when matching known roots.",
-    from: "c",
-    to: "x",
-    direction: "BIDIRECTIONAL",
-    category: "AFFRICATE",
-    enabledByDefault: false,
-    notes: "Keep off by default; can be enabled for specific word families.",
-  },
-  {
-    id: "C_TO_C_CEDILLA",
-    label: "c ↔ ç (ts/tʃ pair)",
-    description:
-      "Allow mild shift between dental c and postalveolar ç when evidence exists.",
-    from: "c",
-    to: "ç",
-    direction: "BIDIRECTIONAL",
-    category: "AFFRICATE",
-    enabledByDefault: false,
-    notes: "Very conservative; only use when a known root is hit.",
-  },
+  // l ↔ ll  (laterals)
+  makeSwapRule(
+    "L_TO_LL",
+    "l",
+    "ll",
+    "Allow l ↔ ll as lateral (liquid) variants."
+  ),
 
-  // ─────────────────────────────────────────────
-  // 5. NASAL / LIQUID – rare, mostly off
-  // ─────────────────────────────────────────────
+  // r ↔ rr  (trill strength)
+  makeSwapRule(
+    "R_TO_RR",
+    "r",
+    "rr",
+    "Allow r ↔ rr; strength of trill does not break the root."
+  ),
 
+  // k ↔ q  (velar vs palatal-velar)
+  makeSwapRule(
+    "K_Q",
+    "k",
+    "q",
+    "Allow k ↔ q as velar/palatal-velar variants."
+  ),
+
+  // g ↔ gj  (voiced velar vs palatal)
+  makeSwapRule(
+    "G_GJ",
+    "g",
+    "gj",
+    "Allow g ↔ gj as voiced velar/palatal variants."
+  ),
+
+  // d/t/dh/th cluster – treat as one family for soft shifts
   {
-    id: "N_TO_R",
-    label: "n ↔ r (rhotacism)",
-    description:
-      "Optional rhotacism: n and r can alternate in well-known pairs (femën/femër).",
-    from: "n",
-    to: "r",
-    direction: "BIDIRECTIONAL",
-    category: "NASAL_LIQUID",
-    enabledByDefault: false,
-    notes: "Use only for whitelisted roots; not general.",
-  },
-  {
-    id: "L_TO_LL",
-    label: "l ↔ ll",
-    description:
-      "Treat l and ll as strength variants inside the same root family.",
-    from: "l",
-    to: "ll",
-    direction: "BIDIRECTIONAL",
-    category: "NASAL_LIQUID",
-    enabledByDefault: false,
-    notes: "Optional; can be turned on for specific patterns.",
+    id: "D_T_DH_TH",
+    description: "Allow soft shifts inside the dental/alveolar stop cluster: d, t, dh, th.",
+    apply(block: string): BlockVariant[] {
+      const out: BlockVariant[] = [];
+      const family = ["d", "t", "dh", "th"] as const;
+
+      for (const from of family) {
+        if (!block.includes(from)) continue;
+
+        for (const to of family) {
+          if (to === from) continue;
+          out.push({
+            variant: block.replace(from, to),
+            appliedRuleIds: ["D_T_DH_TH"],
+          });
+        }
+      }
+
+      return out;
+    },
   },
 ];
-
-// ─────────────────────────────────────────────
-// Helper – generate block variants from rules
-// ─────────────────────────────────────────────
 
 
 /**
@@ -324,51 +209,32 @@ export const CONSONANT_TRANSFORMS: ConsonantTransformRule[] = [
  *
  * We keep it intentionally shallow:
  *  - always include the original block
- *  - apply at most 1 rule once per variant (maxOps = 1 by default)
- *  - only use rules that are enabledByDefault
+ *  - apply each rule once to generate variants
  *
  * This is enough for patterns like:
  *  "stu" → "shtu" (ADD_H_AFTER_S)
- *  "gju" ↔ "gu"   (G_TO_GJ / GJ_TO_G)   [if used around known roots]
+ *  "gju" ↔ "gu"   (G_GJ)
  */
 export function generateBlockVariants(
   block: string,
-  maxOps: number = 1
+  maxOps: number = 1 // Currently unused, but good for future extension
 ): BlockVariant[] {
   const variants: BlockVariant[] = [
     { variant: block, appliedRuleIds: [] },
   ];
 
-  if (maxOps < 1) {
-    return variants;
-  }
-
-  for (const rule of CONSONANT_TRANSFORMS) {
-    if (!rule.enabledByDefault) continue;
-
-    const idx = block.indexOf(rule.from);
-    if (idx === -1) continue;
-
-    const transformed =
-      block.slice(0, idx) +
-      rule.to +
-      block.slice(idx + rule.from.length);
-
-    if (transformed === block) continue;
-
-    variants.push({
-      variant: transformed,
-      appliedRuleIds: [rule.id],
-    });
+  for (const rule of MORPH_RULES) {
+    const newVariants = rule.apply(block);
+    variants.push(...newVariants.map(v => ({ form: v.variant, appliedRuleIds: v.appliedRuleIds })));
   }
 
   // Deduplicate by form; if multiple rules yield same form we keep first.
   const seen = new Set<string>();
   const unique: BlockVariant[] = [];
   for (const v of variants) {
-    if (seen.has(v.variant)) continue;
-    seen.add(v.variant);
-    unique.push(v);
+    if (seen.has(v.form)) continue;
+    seen.add(v.form);
+    unique.push({form: v.variant, appliedRuleIds: v.appliedRuleIds });
   }
 
   return unique;
