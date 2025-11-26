@@ -4,7 +4,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "./ui/
 import { Input } from "./ui/input";
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "./ui/select";
 import { Button } from "./ui/button";
-import { evaluateVoiceEquation } from "@/shared/heartMath";
+import { evaluateVoiceEquation, VOICE_TO_DIGIT } from "@/shared/heartMath";
 import type { SevenCalcResult, SevenOp } from "@/shared/sevenPrinciplesCalc";
 
 type Props = {
@@ -41,14 +41,14 @@ export default function HeartCalculator({ onResult }: Props) {
     <Card className="mt-6 border border-emerald-600/40 shadow-md">
       <CardHeader>
         <CardTitle>💗 Seven-Principles Calculator</CardTitle>
-        <CardDescription>Combine two Voice expressions (A, E, I, O, U, Y, Ë)</CardDescription>
+        <CardDescription>Combine two Voice expressions (A, E, I, O, U, Y, Ë, or 1-7)</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
           <Input
             value={exprA}
             onChange={(e) => setExprA(e.target.value.toUpperCase())}
-            placeholder="First (e.g., AO)"
+            placeholder="First (e.g., AO or 14)"
           />
           <Select value={op} onValueChange={(v) => setOp(v as any)}>
             <SelectTrigger><SelectValue placeholder="Operation" /></SelectTrigger>
@@ -62,7 +62,7 @@ export default function HeartCalculator({ onResult }: Props) {
           <Input
             value={exprB}
             onChange={(e) => setExprB(e.target.value.toUpperCase())}
-            placeholder="Second (e.g., ËA)"
+            placeholder="Second (e.g., ËA or 71)"
           />
         </div>
 
@@ -71,11 +71,21 @@ export default function HeartCalculator({ onResult }: Props) {
         </Button>
 
         {result && (
-          <div className="mt-4 p-3 rounded-lg border border-emerald-500/50 bg-emerald-950/20">
+          <div className="mt-4 p-3 rounded-lg border border-emerald-500/50 bg-emerald-950/20 text-sm space-y-1">
             <p><strong>Decimal:</strong> {result.decimal}</p>
             <p><strong>Base-7:</strong> {result.base7.join(" ")}</p>
-            <p><strong>Voices:</strong> {result.voices.join(" → ")}</p>
-            <p><strong>Principle:</strong> <span className="text-emerald-400 text-lg">{result.principle}</span></p>
+            <p>
+              <strong>Voices:</strong> {result.voices.join(" → ")}
+              <span className="text-muted-foreground ml-2">
+                ({result.voices.map(v => VOICE_TO_DIGIT[v]).join(" → ")})
+              </span>
+            </p>
+            <p>
+              <strong>Principle:</strong> <span className="text-emerald-400 text-lg">{result.principle}</span>
+              <span className="text-muted-foreground ml-2">
+                ({VOICE_TO_DIGIT[result.principle]})
+              </span>
+            </p>
           </div>
         )}
       </CardContent>
