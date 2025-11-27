@@ -1,23 +1,20 @@
 // src/engine/wordAnalyzer.ts
 
 import type { WordInput } from "./wordCleaner";
-import {
-  generateCandidates,
-  type CandidateForm,
-  type LanguageCode,
-} from "./wordCandidates";
-
-import type { VowelId } from "../core/sevenVowelsCore";
-import { VOWEL_TRAITS } from "../core/sevenVowelsTraits";
+import type { CandidateForm, LanguageCode } from "./wordCandidates";
+import { generateCandidates } from "./wordCandidates";
+import type { VowelId } from "@/core/sevenVowelsCore";
+import { VOWEL_TRAITS } from "@/core/sevenVowelsTraits";
 
 export interface CandidateAnalysis {
   language: LanguageCode;
   form: string;
 
-  decomposition: string[];       // e.g. ["DA", "M"]
-  functionalStatement: string;   // short explanation in plain language
-  vowelPath: VowelId[];          // ["A", "Ë"], etc.
-  notes: string[];               // extra comments / reasoning
+  decomposition: string[];       // ["DA", "M"], ["DAM", "NUM"], ...
+  functionalStatement: string;   // human explanation
+  vowelPath: VowelId[];          // ["A", "Ë"], ["A", "U"], ...
+
+  notes: string[];               // reasoning trail
 
   dominantVowel?: VowelId;
   traitsSummary?: string;
@@ -29,8 +26,7 @@ export interface WordAnalysisResult {
 }
 
 /**
- * Main ZË-RO analyzer entry point.
- * You give it a cleaned word, it returns all PASS candidates.
+ * Top-level: given a cleaned word, run candidates + analysis.
  */
 export function analyzeWord(cleaned: WordInput): WordAnalysisResult {
   const candidateForms = generateCandidates(cleaned);
@@ -38,9 +34,7 @@ export function analyzeWord(cleaned: WordInput): WordAnalysisResult {
 
   for (const c of candidateForms) {
     const analysis = analyzeCandidate(c);
-    if (analysis) {
-      analyses.push(analysis);
-    }
+    if (analysis) analyses.push(analysis);
   }
 
   return {
@@ -49,37 +43,33 @@ export function analyzeWord(cleaned: WordInput): WordAnalysisResult {
   };
 }
 
-// ---------------------------------------------------------------------------
-// INTERNAL HELPERS
-// ---------------------------------------------------------------------------
-
+/**
+ * For now, we implement explicit logic for our canon test words.
+ * Later we generalize this into rule-based decomposition.
+ */
 function analyzeCandidate(c: CandidateForm): CandidateAnalysis | null {
-  const { language, form, fromWord } = c;
-  const normalizedForm = form.toLowerCase();
+  const base = c.fromWord.toLowerCase();
+  const form = c.form.toLowerCase();
 
-  // v1: only handle canonical test word "damage"
-  if (fromWord === "damage") {
-    if (
-      language === "sq" &&
-      ["dëm", "dem", "dam", "dom"].includes(normalizedForm)
-    ) {
+  if (base === "damage") {
+    if (c.language === "sq" && ["dëm", "dem", "dam", "dom"].includes(form)) {
       return buildDamageSqAnalysis(c);
     }
-
-    if (language === "la" && normalizedForm === "damnum") {
+    if (c.language === "la" && form === "damnum") {
       return buildDamageLaAnalysis(c);
     }
-
-    // Others (en/fr) are currently treated as non-passing.
+    // ignore other candidates for now
     return null;
   }
 
-  // TODO: handle "study", "mathematics", etc. later.
+  // TODO: add similar specialised analyzers for "study", "mathematics", etc.
   return null;
 }
 
+// ---- Canon word: DAMAGE ----
+
 function buildDamageSqAnalysis(c: CandidateForm): CandidateAnalysis {
-  const vowelPath: VowelId[] = ["A", "Ë"]; // DA (A) + Ë closure
+  const vowelPath: VowelId[] = ["A", "Ë"]; // DA core + Ë closure
 
   const dominantVowel: VowelId = "A";
   const aTraits = VOWEL_TRAITS["A"];
@@ -94,13 +84,13 @@ function buildDamageSqAnalysis(c: CandidateForm): CandidateAnalysis {
     form: c.form,
     decomposition: ["DA", "M"],
     functionalStatement:
-      "DA = divide, cut, separate; M = the affected body/unit. " +
-      "Together they express the act of cutting or harming a unit – the core function of 'damage'.",
+      "DA = divide, cut, separate; M = the affected unit/body. " +
+      "Together they express the act of cutting or harming a unit – the living function of 'damage'.",
     vowelPath,
     notes: [
-      "DA element survives across dëm/dam/dom, always tied to harm/loss.",
-      "A at the start marks an initiating, outward cutting action.",
-      "Ë marks consequence settling back into the unit (loss that remains).",
+      "DA element appears across dëm/dam/dom with the sense of harm or loss.",
+      "A at the front marks an initiating, outward cut.",
+      "Ë marks the consequence settling back into the material unit.",
     ],
     dominantVowel,
     traitsSummary,
@@ -108,7 +98,7 @@ function buildDamageSqAnalysis(c: CandidateForm): CandidateAnalysis {
 }
 
 function buildDamageLaAnalysis(c: CandidateForm): CandidateAnalysis {
-  const vowelPath: VowelId[] = ["A", "U"]; // DAM + NUM → A → U
+  const vowelPath: VowelId[] = ["A", "U"]; // DA(M) + NU(M) simplified
 
   const dominantVowel: VowelId = "A";
   const aTraits = VOWEL_TRAITS["A"];
@@ -123,12 +113,12 @@ function buildDamageLaAnalysis(c: CandidateForm): CandidateAnalysis {
     form: c.form,
     decomposition: ["DAM", "NUM"],
     functionalStatement:
-      "DAM = act of harm/cut based on DA; NUM = counted unit/amount. " +
-      "Together they express 'a quantified harm' – damage as measurable loss.",
+      "DAM = act of harm/cut (same DA root plus consonant dressing); " +
+      "NUM = counted unit or amount. Together they express 'a quantified harm' – damage as measurable loss.",
     vowelPath,
     notes: [
-      "Shares DA-root with Albanian dëm/dam/dom: cutting/harming action is stable.",
-      "Latin -num adds the sense of counted amount (NUM), turning harm into measurable loss.",
+      "Shares DA-root with Albanian dëm/dam: the cutting, harming action is stable.",
+      "Latin -num adds the sense of counted amount, making damage a measurable loss.",
     ],
     dominantVowel,
     traitsSummary,
