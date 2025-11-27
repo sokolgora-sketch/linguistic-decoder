@@ -23,7 +23,6 @@ interface CalculatorResult {
   voices: Voice[];
   principle: string;
   cycleState: CycleState;
-  description: string;
 }
 
 const VOICES: Voice[] = ["A", "E", "I", "O", "U", "Y", "Ë"];
@@ -38,19 +37,30 @@ const NUMBER_TO_VOICE: Record<string, Voice> = {
   "7": "Ë",
 };
 
-// -------- parsers --------
+// ---------- parsers ----------
 
-function parseVoicesFromString(input: string): string {
-  return input
+function parseVoicesFromString(input: string): Voice[] {
+  const cleaned = input
     .toUpperCase()
-    .replace(/[^AEIOUYË]/g, "");
+    .replace(/[^AEIOUYË]/g, "")
+    .split("")
+    .filter(Boolean);
+
+  const voices: Voice[] = [];
+  for (const ch of cleaned) {
+    if (VOICES.includes(ch as Voice)) {
+      voices.push(ch as Voice);
+    }
+  }
+  return voices;
 }
 
-function parseVoicesFromNumbers(input: string): string {
+function parseVoicesFromNumbers(input: string): Voice[] {
   const matches = input.match(/[1-7]/g) ?? [];
-  return matches.map((d) => NUMBER_TO_VOICE[d]).join('');
+  return matches
+    .map((d) => NUMBER_TO_VOICE[d])
+    .filter((v): v is Voice => Boolean(v));
 }
-
 
 function hasVowel(input: string) {
   return /[AEIOUYË]/i.test(input);
@@ -60,13 +70,13 @@ function hasDigit(input: string) {
   return /[1-7]/.test(input);
 }
 
-function parseSmart(input: string): string {
+function parseSmart(input: string): Voice[] {
   if (hasVowel(input)) return parseVoicesFromString(input);
   if (hasDigit(input)) return parseVoicesFromNumbers(input);
-  return "";
+  return [];
 }
 
-// -------- description text (UI only) --------
+// ---------- description text (UI only) ----------
 
 function describePrinciple(principle: string, cycleState: CycleState): string {
   const core = principle.toLowerCase();
@@ -116,29 +126,32 @@ function describePrinciple(principle: string, cycleState: CycleState): string {
   return `This path leans toward ${principle} in a ${cycleState} cycle.`;
 }
 
-// -------- component --------
+// ---------- component ----------
 
 export const SevenPrinciplesCalculator: React.FC = () => {
-  const [leftInput, setLeftInput] = useState("AE");
-  const [rightInput, setRightInput] = useState("A");
-  const [op, setOp] = useState<Operation>("add");
+  // EMPTY defaults so it does NOT open with AO + A
+  const [leftInput, setLeftInput] = useState("");
+  const [rightInput, setRightInput] = useState("");
+  const [op, setOp] = useState<Operation>("+");
   const [result, setResult] = useState<CalculatorResult | null>(null);
+  const [description, setDescription] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const handleCalculate = () => {
     setError(null);
 
-    const leftExpr = parseSmart(leftInput);
-    const rightExpr = parseSmart(rightInput);
+    const leftVoices = parseSmart(leftInput);
+    const rightVoices = parseSmart(rightInput);
 
-    if (!leftExpr.length || !rightExpr.length) {
+    if (!leftVoices.length || !rightVoices.length) {
       setResult(null);
+      setDescription(null);
       setError("Please enter at least one valid voice/number on each side.");
       return;
     }
 
     try {
-      const raw = evaluateVoiceEquation(leftExpr, rightExpr, op) as any;
+      const raw = evaluateVoiceEquation(leftVoices, rightVoices, op) as any;
 
       const decimal: number = raw.decimal ?? 0;
       const base7Array: number[] = Array.isArray(raw.base7)
@@ -152,7 +165,7 @@ export const SevenPrinciplesCalculator: React.FC = () => {
       const principle: string = raw.principle ?? "Unknown";
 
       const cycleState = computeCycleStateFromTotal(decimal);
-      const description = describePrinciple(principle, cycleState);
+      const desc = describePrinciple(principle, cycleState);
 
       setResult({
         decimal,
@@ -160,12 +173,12 @@ export const SevenPrinciplesCalculator: React.FC = () => {
         voices,
         principle,
         cycleState,
-        description,
       });
-
+      setDescription(desc);
     } catch (e) {
       console.error(e);
       setResult(null);
+      setDescription(null);
       setError("Calculator failed – check inputs or heartMath wiring.");
     }
   };
@@ -191,14 +204,14 @@ export const SevenPrinciplesCalculator: React.FC = () => {
 
           <div className="w-28">
             <select
-              className="w-full rounded-md border bg-transparent px-2 py-1 text-sm h-10 border-input"
+              className="w-full rounded-md border bg-transparent px-2 py-1 text-sm"
               value={op}
               onChange={(e) => setOp(e.target.value as Operation)}
             >
-              <option value="add">Add</option>
-              <option value="subtract">Subtract</option>
-              <option value="multiply">Multiply</option>
-              <option value="divide">Divide</option>
+              <option value="+">Add</option>
+              <option value="-">Subtract</option>
+              <option value="*">Multiply</option>
+              <option value="/">Divide</option>
             </select>
           </div>
 
@@ -212,9 +225,9 @@ export const SevenPrinciplesCalculator: React.FC = () => {
         </div>
 
         <p className="text-xs text-muted-foreground">
-          You can type vowels (<code>AEIOUYË</code>) or digits 1–7 in any format
-          (<code>147</code>, <code>1-4-7</code>, <code>3 6</code>). If any vowel
-          appears, it treats the input as Voices; otherwise it maps digits 1–7 to A–Ë.
+          You can type vowels (<code>AEIOUYË</code>) or digits 1–7 in any format:
+          <code>147</code>, <code>1-4-7</code>, <code>3 6</code>. If any vowel appears,
+          it treats the input as Voices; otherwise it maps digits 1–7 to A–Ë.
         </p>
 
         <Button className="w-full" onClick={handleCalculate}>
@@ -239,9 +252,7 @@ export const SevenPrinciplesCalculator: React.FC = () => {
             </div>
             <div>
               <span className="font-semibold">Voices:</span>{" "}
-              {result.voices.length
-                ? result.voices.join(" → ")
-                : "—"}
+              {result.voices.length ? result.voices.join(" → ") : "—"}
             </div>
             <div>
               <span className="font-semibold">Principle:</span>{" "}
@@ -251,9 +262,9 @@ export const SevenPrinciplesCalculator: React.FC = () => {
               <span className="font-semibold">Cycle state:</span>{" "}
               {result.cycleState}
             </div>
-            {result.description && (
+            {description && (
               <div className="text-xs text-muted-foreground mt-1">
-                {result.description}
+                {description}
               </div>
             )}
           </div>
