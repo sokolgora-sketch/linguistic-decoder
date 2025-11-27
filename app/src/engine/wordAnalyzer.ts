@@ -30,23 +30,6 @@ export interface WordAnalysisResult {
   candidates: CandidateAnalysis[];
 }
 
-// NOTE: This function is currently not exported because of a name collision.
-// It will be re-exported once the engine wiring is complete.
-function analyzeWordInternal(cleaned: WordInput): WordAnalysisResult {
-  const candidateForms = generateCandidates(cleaned);
-  const analyses: CandidateAnalysis[] = [];
-
-  for (const c of candidateForms) {
-    const a = analyzeCandidate(cleaned, c);
-    if (a) analyses.push(a);
-  }
-
-  return {
-    word: cleaned,
-    candidates: analyses,
-  };
-}
-
 function analyzeCandidate(
   cleaned: WordInput,
   c: CandidateForm
@@ -108,7 +91,7 @@ function buildDamageSqAnalysis(c: CandidateForm): CandidateAnalysis {
 
     vowelPath,
     notes: [
-      "Albanian dëm/dam/dom keeps the DA cutting root and mark harm/loss.",
+      "Albanian dëm/dam/dom keeps the DA root for cutting or harming.",
       "The shift A→Ë in dëm signals the consequence settling back into matter.",
       "Same DA core appears in other languages where the meaning is harm or loss.",
     ],
@@ -207,11 +190,17 @@ function buildDamageFrAnalysis(c: CandidateForm): CandidateAnalysis {
   };
 }
 
-export function analyzeWord(word: string) {
-  // Temporary stub for ZË-RO API — can be replaced with full logic later
+export function analyzeWord(cleaned: WordInput): WordAnalysisResult {
+  const candidateForms = generateCandidates(cleaned);
+  const analyses: CandidateAnalysis[] = [];
+
+  for (const c of candidateForms) {
+    const a = analyzeCandidate(cleaned, c);
+    if (a) analyses.push(a);
+  }
+
   return {
-    word,
-    primaryPath: { voicePath: "A" }, // stub to prevent runtime error
-    frontier: [],
+    word: cleaned,
+    candidates: analyses,
   };
 }

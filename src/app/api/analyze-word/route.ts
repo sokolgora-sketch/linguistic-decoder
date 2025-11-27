@@ -1,28 +1,47 @@
 // src/app/api/analyze-word/route.ts
-// ZË-RO API: thin wrapper around zeroAnalyzeWord()
+// HTTP API for ZË-RO: POST /api/analyze-word  { word, languageHint? }
 
 import { NextResponse } from "next/server";
-import { zeroAnalyzeWord } from "@/engine/zeroAnalyzeWord";
+import { cleanWord } from "@/engine/wordCleaner";
+import { analyzeWord } from "@/engine/wordAnalyzer";
 
 export async function POST(req: Request) {
-  let body: any = {};
+  let body: unknown;
+
   try {
     body = await req.json();
   } catch {
-    // ignore, will fall through to 400 if word missing
-  }
-
-  const word = typeof body.word === "string" ? body.word : "";
-  const languageHint =
-    typeof body.languageHint === "string" ? body.languageHint : undefined;
-
-  if (!word) {
     return NextResponse.json(
-      { error: "Missing 'word' string" },
-      { status: 400 }
+      { error: "Invalid JSON body" },
+      { status: 400 },
     );
   }
 
-  const result = zeroAnalyzeWord(word, languageHint);
-  return NextResponse.json(result);
+  const asAny = body as { word?: unknown; languageHint?: unknown };
+
+  const word = asAny.word;
+  const languageHint = asAny.languageHint;
+
+  if (typeof word !== "string" || word.trim().length === 0) {
+    return NextResponse.json(
+      { error: "Missing 'word' string" },
+      { status: 400 },
+    );
+  }
+
+  const cleaned = cleanWord(
+    word,
+    typeof languageHint === "string" ? languageHint : undefined,
+  );
+  const result = analyzeWord(cleaned);
+
+  return NextResponse.json(result, { status: 200 });
+}
+
+// Optional: quick GET health-check
+export function GET() {
+  return NextResponse.json(
+    { ok: true, message: "ZË-RO /api/analyze-word – send POST { word }" },
+    { status: 200 },
+  );
 }
