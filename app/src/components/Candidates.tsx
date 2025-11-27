@@ -1,5 +1,5 @@
 'use client';
-import type { Candidate, MorphologyMatrix, OriginAxisStatus } from '../shared/engineShape';
+import type { Candidate, MorphologyMatrix, OriginAxisStatus, Math7Summary } from '../shared/engineShape';
 import { Badge } from './ui/badge';
 import { Card } from './ui/card';
 
@@ -69,8 +69,12 @@ function MorphologyMatrixBlock({ matrix }: { matrix: MorphologyMatrix }) {
   );
 }
 
+type CandidatesProps = {
+  candidates?: Candidate[];
+  math7?: Math7Summary;
+};
 
-export function Candidates({ candidates }: { candidates?: Candidate[] }) {
+export function Candidates({ candidates, math7 }: CandidatesProps) {
   if (!candidates || candidates.length === 0) {
     return (
       <div className="mt-3">
