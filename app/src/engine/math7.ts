@@ -1,4 +1,3 @@
-
 // src/engine/math7.ts
 //
 // Seven-Voices “Core Math” over an AnalyzeWordResult.
@@ -7,7 +6,7 @@
 // Seven-Principles calculator engine.
 
 import type { AnalyzeWordResult, Math7PathSummary, Vowel } from "@/shared/engineShape";
-import { VOICE_TO_DIGIT, calculate, computeCycleState } from "@/shared/heartMath";
+import { VOICE_TO_DIGIT, calculate } from "@/shared/heartMath";
 
 export type Math7CycleState = "open" | "balanced" | "overloaded";
 
@@ -66,9 +65,17 @@ function scoreVoices(voices: Vowel[]): Math7PathSummary {
     (sum, v) => sum + (VOICE_INDEX[v] ?? 0),
     0
   );
-  const totalMod7 = ((total % 7) + 7) % 7;
-  
-  const cycleState = computeCycleState(total);
+  const totalMod7Raw = ((total % 7) + 7) % 7;
+  const totalMod7 = totalMod7Raw === 0 ? 7 : totalMod7Raw;
+
+  let cycleState: Math7CycleState;
+  if (totalMod7 === 1 || totalMod7 === 2) {
+    cycleState = "open";
+  } else if (totalMod7 === 3 || totalMod7 === 4) {
+    cycleState = "balanced";
+  } else {
+    cycleState = "overloaded";
+  }
 
   const principlesPath = voices.map(
     (v) => PRINCIPLE_BY_VOICE[v] ?? v
@@ -117,7 +124,8 @@ function computeHeartForVoices(voices: Vowel[]): Math7HeartResult | undefined {
 
 // 🔥 Named export – this MUST exist and there must be NO default export.
 export function computeMath7ForResult(result: AnalyzeWordResult): Math7Summary {
-  const primaryVoices = parseVoicePath(result.primaryPath.voicePath);
+  const voicePath = result?.primaryPath?.voicePath ?? "A"; // default safe fallback
+  const primaryVoices = parseVoicePath(voicePath);
   const primary = scoreVoices(primaryVoices);
 
   const frontier = (result.frontier || []).map((alt) =>
