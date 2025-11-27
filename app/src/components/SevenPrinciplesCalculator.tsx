@@ -17,6 +17,8 @@ import {
   computeCycleStateFromTotal,
 } from "../shared/heartMath";
 
+type OperationSymbol = "+" | "-" | "*" | "/";
+
 interface CalculatorResult {
   decimal: number;
   base7: number[];
@@ -131,7 +133,7 @@ function describePrinciple(principle: string, cycleState: CycleState): string {
 export const SevenPrinciplesCalculator: React.FC = () => {
   const [leftInput, setLeftInput] = useState("AE");
   const [rightInput, setRightInput] = useState("A");
-  const [op, setOp] = useState<string>("+");
+  const [op, setOp] = useState<OperationSymbol>("+");
   const [result, setResult] = useState<CalculatorResult | null>(null);
   const [description, setDescription] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -205,7 +207,7 @@ export const SevenPrinciplesCalculator: React.FC = () => {
             <select
               className="w-full rounded-md border bg-transparent px-2 py-1 text-sm"
               value={op}
-              onChange={(e) => setOp(e.target.value as any)}
+              onChange={(e) => setOp(e.target.value as OperationSymbol)}
             >
               <option value="+">Add</option>
               <option value="-">Subtract</option>
