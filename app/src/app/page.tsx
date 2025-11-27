@@ -619,6 +619,10 @@ export default function LinguisticDecoderApp() {
           )}
         </section>
 
+        <section className="mt-12">
+          <ZeroPanel />
+        </section>
+
         {/* Informational Accordions */}
         <Accordion
           type="single"
@@ -725,18 +729,6 @@ export default function LinguisticDecoderApp() {
             </AccordionContent>
           </AccordionItem>
 
-          <AccordionItem value="item-zero-engine">
-            <AccordionTrigger className="text-sm font-semibold">
-              <div className="flex items-center gap-2">
-                <span className="text-lg">🧐</span>
-                <span>ZË-RO Engine (Experimental)</span>
-              </div>
-            </AccordionTrigger>
-            <AccordionContent>
-              <ZeroPanel />
-            </AccordionContent>
-          </AccordionItem>
-
           {/* Batch Evaluation – dev only */}
           {EvalPanelComp && (
             <AccordionItem value="item-5">
@@ -817,5 +809,3 @@ export default function LinguisticDecoderApp() {
     </div>
   );
 }
-
-    
