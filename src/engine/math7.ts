@@ -124,7 +124,8 @@ function computeHeartForVoices(voices: Vowel[]): Math7HeartResult | undefined {
 
 // 🔥 Named export – this MUST exist and there must be NO default export.
 export function computeMath7ForResult(result: AnalyzeWordResult): Math7Summary {
-  const primaryVoices = parseVoicePath(result.primaryPath.voicePath);
+  const voicePath = result?.primaryPath?.voicePath ?? "A"; // fallback
+  const primaryVoices = parseVoicePath(voicePath);
   const primary = scoreVoices(primaryVoices);
 
   const frontier = (result.frontier || []).map((alt) =>
