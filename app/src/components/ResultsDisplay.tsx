@@ -1,4 +1,3 @@
-
 'use client';
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "./ui/card";
@@ -102,7 +101,7 @@ export function PathRow({ title, block, analysis }: { title: string; block: any,
         {math7 && math7.primary && (
           <div className="mt-4 rounded-xl border px-4 py-3 text-sm">
             <div className="font-semibold mb-1">
-              Heart (Seven-Voices Math)
+              Core (Seven-Voices Math)
             </div>
 
             <div className="flex flex-wrap gap-4">
@@ -126,7 +125,9 @@ export function PathRow({ title, block, analysis }: { title: string; block: any,
         
         {analysis.math7?.heart && (
           <div className="mt-4 border border-pink-600/40 rounded-xl p-4 bg-pink-900/10">
-            <h3 className="text-pink-400 font-medium mb-2">💗 Heart Auto-Calculation</h3>
+            <h3 className="text-pink-400 font-medium mb-2">
+              Core Auto-Calculation (Seven-Voices Math)
+            </h3>
             <p><strong>Expression:</strong> {analysis.math7.heart.expression}</p>
             <p><strong>Decimal:</strong> {analysis.math7.heart.decimal}</p>
             <p><strong>Base-7:</strong> {analysis.math7.heart.base7.join(" ")}</p>
