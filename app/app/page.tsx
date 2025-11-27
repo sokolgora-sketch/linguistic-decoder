@@ -104,6 +104,12 @@ export default function LinguisticDecoderApp() {
 
   const math7: any = (analysisResult as any)?.math7 || null;
 
+  // 🔑 whenever a NEW word is analysed, drop the old calculator overlay
+  useEffect(() => {
+    if (!analysisResult) return;
+    setCalcOverlay(null);
+  }, [analysisResult?.core?.word]);
+  
   // 🔹 Whenever we get a fresh analysis with math7, update the heart history
   useEffect(() => {
     if (!analysisResult || !data) return;
