@@ -257,10 +257,51 @@ export function ResultsDisplay({ analysis }: { analysis: AnalysisResult_DEPRECAT
               <CardDescription>Minimal functional origin</CardDescription>
             </CardHeader>
             <CardContent className="text-sm space-y-1">
-              <p><strong>Proto-Root:</strong> {deepRoot.protoRoot}</p>
-              <p><strong>Meaning:</strong> {deepRoot.meaning}</p>
-              <p><strong>Axis:</strong> {deepRoot.functionAxis}</p>
-              <p><strong>Examples:</strong> {deepRoot.examples.join(", ")}</p>
+              <p>
+                <strong>Core function:</strong> {deepRoot.coreFunction}
+              </p>
+
+              <p>
+                <strong>Vowel motif:</strong>{" "}
+                {deepRoot.motif && deepRoot.motif.length
+                  ? deepRoot.motif.join(" → ")
+                  : "—"}
+              </p>
+
+              <p>
+                <strong>Light / Dark:</strong> {deepRoot.lightDark}
+              </p>
+
+              <p>
+                <strong>Tone:</strong> {deepRoot.vibrationalTone}
+              </p>
+
+              <p>
+                <strong>Blocks:</strong>{" "}
+                {deepRoot.pieces && deepRoot.pieces.length
+                  ? deepRoot.pieces
+                      .map(
+                        (p) =>
+                          `${p.role}: ${p.block} (${p.language} – ${p.meaning})`,
+                      )
+                      .join(" · ")
+                  : "—"}
+              </p>
+
+              <p>
+                <strong>Summary:</strong> {deepRoot.short}
+              </p>
+
+              <p>
+                <strong>Examples:</strong>{" "}
+                {deepRoot.examples && deepRoot.examples.length
+                  ? deepRoot.examples
+                      .map(
+                        (ex) => `${ex.language}: ${ex.form} (${ex.gloss})`,
+                      )
+                      .join(" · ")
+                  : "—"}
+              </p>
             </CardContent>
           </Card>
         )}
