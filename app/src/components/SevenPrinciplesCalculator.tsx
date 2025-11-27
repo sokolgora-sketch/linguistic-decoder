@@ -10,21 +10,14 @@ import {
 } from "./ui/card";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "./ui/select";
 
 import type { Voice, Operation, CycleState } from "../shared/heartMath";
 import {
   evaluateVoiceEquation,
-  numberToVoice,
-  computeCycleState,
+  computeCycleStateFromTotal,
 } from "../shared/heartMath";
 
+type Mode = "voices" | "numbers";
 
 interface CalculatorResult {
   decimal: number;
@@ -37,10 +30,23 @@ interface CalculatorResult {
 
 const VOICES: Voice[] = ["A", "E", "I", "O", "U", "Y", "Ë"];
 
+const DIGIT_TO_VOICE_MAP: Record<string, Voice> = {
+  "1": "A",
+  "2": "E",
+  "3": "I",
+  "4": "O",
+  "5": "U",
+  "6": "Y",
+  "7": "Ë",
+};
+
+// ---------- Parsing helpers ----------
+
 function parseVoicesFromString(input: string): Voice[] {
+  // Keeps only A, E, I, O, U, Y, Ë
   const cleaned = input
     .toUpperCase()
-    .replace(/[^AEIOUYË]/g, "") // keep only allowed
+    .replace(/[^AEIOUYË]/g, "")
     .split("")
     .filter(Boolean);
 
@@ -55,24 +61,10 @@ function parseVoicesFromString(input: string): Voice[] {
 
 function parseVoicesFromNumbers(input: string): Voice[] {
   const matches = input.match(/[1-7]/g) ?? [];
-  const digits = matches.map((d) => Number(d));
-
-  const voices: Voice[] = [];
-  for (const n of digits) {
-    try {
-      // cast to any to avoid TS complaining if heartMath
-      // uses a narrower numeric type
-      const v = numberToVoice(n as any) as Voice;
-      if (VOICES.includes(v)) {
-        voices.push(v);
-      }
-    } catch {
-      // ignore invalid numbers
-    }
-  }
-  return voices;
+  return matches.map((digit) => DIGIT_TO_VOICE_MAP[digit]);
 }
 
+// ---------- UI-only explanation text ----------
 
 function describePrinciple(principle: string, cycleState: CycleState): string {
   const core = principle.toLowerCase();
@@ -80,7 +72,7 @@ function describePrinciple(principle: string, cycleState: CycleState): string {
   if (core.includes("truth")) {
     if (cycleState === "balanced") return "Clear truth expressed in a stable way.";
     if (cycleState === "open") return "Truth is opening new cycles and revelations.";
-    return "Truth is pushing hard, risking overload or dogma.";
+    return "Truth is pushing hard and may slip into dogma.";
   }
 
   if (core.includes("expansion")) {
@@ -90,9 +82,9 @@ function describePrinciple(principle: string, cycleState: CycleState): string {
   }
 
   if (core.includes("insight")) {
-    if (cycleState === "balanced") return "Insight is sharp and grounded in reality.";
+    if (cycleState === "balanced") return "Insight is sharp and grounded.";
     if (cycleState === "open") return "New insights are emerging and inviting exploration.";
-    return "Insight is overactive and may cause mental overload.";
+    return "Insight is overactive and may cause overload.";
   }
 
   if (core.includes("balance")) {
@@ -104,30 +96,31 @@ function describePrinciple(principle: string, cycleState: CycleState): string {
   if (core.includes("unity")) {
     if (cycleState === "balanced") return "Unity is stable and inclusive.";
     if (cycleState === "open") return "New unities are forming and inviting connection.";
-    return "Unity is intense and may become fusion or collapse.";
+    return "Unity is intense and may collapse or fuse too hard.";
   }
 
   if (core.includes("network")) {
     if (cycleState === "balanced") return "Networks are coherent and trustworthy.";
     if (cycleState === "open") return "New links and relations are being woven.";
-    return "Network is overloaded with signals and connections.";
+    return "Network is overloaded with signals.";
   }
 
   if (core.includes("evolution")) {
     if (cycleState === "balanced") return "Evolution is steady and sustainable.";
     if (cycleState === "open") return "Evolution is opening a new phase or generation.";
-    return "Evolution is rapid and may become chaotic or disruptive.";
+    return "Evolution is rapid and may become chaotic.";
   }
 
-  // Fallback
   return `This path leans toward ${principle} in a ${cycleState} cycle.`;
 }
 
+// ---------- Component ----------
+
 export const SevenPrinciplesCalculator: React.FC = () => {
-  const [mode, setMode] = useState<"voices" | "numbers">("voices");
-  const [leftInput, setLeftInput] = useState<string>("A");
-  const [rightInput, setRightInput] = useState<string>("O");
-  const [op, setOp] = useState<string>("+");
+  const [mode, setMode] = useState<Mode>("voices");
+  const [leftInput, setLeftInput] = useState("AE");
+  const [rightInput, setRightInput] = useState("A");
+  const [op, setOp] = useState<Operation>("add");
   const [result, setResult] = useState<CalculatorResult | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -154,10 +147,11 @@ export const SevenPrinciplesCalculator: React.FC = () => {
       const raw = evaluateVoiceEquation(
         leftVoices.join(''),
         rightVoices.join(''),
-        op as Operation
+        op
       ) as any;
 
       const decimal: number = raw.decimal ?? 0;
+
       const base7Array: number[] = Array.isArray(raw.base7)
         ? raw.base7
         : String(raw.base7 ?? "")
@@ -168,7 +162,7 @@ export const SevenPrinciplesCalculator: React.FC = () => {
       const voices: Voice[] = raw.voices ?? [];
       const principle: string = raw.principle ?? "Unknown";
 
-      const cycleState = computeCycleState(decimal);
+      const cycleState = computeCycleStateFromTotal(decimal);
       const description = describePrinciple(principle, cycleState);
 
       setResult({
@@ -179,6 +173,7 @@ export const SevenPrinciplesCalculator: React.FC = () => {
         cycleState,
         description,
       });
+
     } catch (e) {
       console.error(e);
       setResult(null);
@@ -186,113 +181,119 @@ export const SevenPrinciplesCalculator: React.FC = () => {
     }
   };
 
-  const expressionLabel =
+  const expressionHint =
     mode === "voices"
-      ? "Voices (A/E/I/O/U/Y/Ë)"
-      : "Numbers (1–7, any separators)";
+      ? "Type A, E, I, O, U, Y, Ë (with or without separators)."
+      : "Type digits 1–7 in any format (e.g. 1-4-7, 2 5, 361).";
 
   return (
     <Card className="mt-4">
-      <CardHeader>
-        <CardTitle>Seven-Principles Calculator</CardTitle>
-        <CardDescription>
-          Uses the same Heart Math engine as the core, but as a sandbox
-          (does not affect the word result).
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="flex flex-col gap-3 md:flex-row md:items-center">
-          <div className="w-full md:w-40">
-            <label className="block text-sm mb-1">Input mode</label>
-            <Select
-              value={mode}
-              onValueChange={(v) => setMode(v as "voices" | "numbers")}
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="voices">Voices (A–Ë)</SelectItem>
-                <SelectItem value="numbers">Numbers (1–7)</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+      <CardHeader className="flex flex-row items-center justify-between gap-4">
+        <div>
+          <CardTitle>💗 Seven-Principles Calculator</CardTitle>
+          <CardDescription>
+            Combine two Voice expressions (A, E, I, O, U, Y, Ë, or 1–7)
+          </CardDescription>
+        </div>
 
+        {/* Mode toggle – this is the bit that *must* drive the `mode` state */}
+        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+          <span>Mode</span>
+          <button
+            type="button"
+            onClick={() => setMode("voices")}
+            className={
+              "px-3 py-1 rounded-full border text-xs " +
+              (mode === "voices"
+                ? "bg-slate-800 border-slate-500 text-white"
+                : "bg-transparent border-slate-700 text-slate-400")
+            }
+          >
+            Voices
+          </button>
+          <button
+            type="button"
+            onClick={() => setMode("numbers")}
+            className={
+              "px-3 py-1 rounded-full border text-xs " +
+              (mode === "numbers"
+                ? "bg-slate-800 border-slate-500 text-white"
+                : "bg-transparent border-slate-700 text-slate-400")
+            }
+          >
+            1–7
+          </button>
+        </div>
+      </CardHeader>
+
+      <CardContent className="space-y-4">
+        {/* Inputs row */}
+        <div className="flex flex-col gap-3 md:flex-row md:items-center">
           <div className="flex-1">
-            <label className="block text-sm mb-1">Left expression</label>
             <Input
               value={leftInput}
               onChange={(e) => setLeftInput(e.target.value)}
-              placeholder={
-                mode === "voices" ? "e.g. AOU" : "e.g. 1-4-7"
-              }
+              placeholder={mode === "voices" ? "e.g. AE" : "e.g. 1-4-7"}
             />
           </div>
 
-          <div className="w-20">
-            <label className="block text-sm mb-1">Op</label>
-            <Select value={op} onValueChange={(v) => setOp(v)}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="+">+</SelectItem>
-                <SelectItem value="-">−</SelectItem>
-                <SelectItem value="*">×</SelectItem>
-                <SelectItem value="/">÷</SelectItem>
-              </SelectContent>
-            </Select>
+          <div className="w-28">
+            <select
+              className="w-full rounded-md border bg-transparent px-2 py-1 text-sm h-10 border-input"
+              value={op}
+              onChange={(e) => setOp(e.target.value as Operation)}
+            >
+              <option value="add">Add</option>
+              <option value="subtract">Subtract</option>
+              <option value="multiply">Multiply</option>
+              <option value="divide">Divide</option>
+            </select>
           </div>
 
           <div className="flex-1">
-            <label className="block text-sm mb-1">Right expression</label>
             <Input
               value={rightInput}
               onChange={(e) => setRightInput(e.target.value)}
-              placeholder={
-                mode === "voices" ? "e.g. IY" : "e.g. 3,6"
-              }
+              placeholder={mode === "voices" ? "e.g. A" : "e.g. 3-6"}
             />
-          </div>
-
-          <div className="w-full md:w-auto md:self-end">
-            <Button className="w-full" onClick={handleCalculate}>
-              Calculate
-            </Button>
           </div>
         </div>
 
         <p className="text-xs text-muted-foreground">
-          {expressionLabel}. You can type with or without separators, e.g.
-          &nbsp;
-          <code>AOU</code>, <code>A-O-U</code>, <code>1 4 7</code>.
+          {expressionHint}
         </p>
 
+        <Button className="w-full" onClick={handleCalculate}>
+          Calculate
+        </Button>
+
         {error && (
-          <p className="text-sm text-red-500">
+          <p className="mt-2 text-sm text-red-500">
             {error}
           </p>
         )}
 
         {result && (
-          <div className="mt-3 space-y-2 border-t pt-3">
-            <div className="text-sm">
+          <div className="mt-3 space-y-2 border-t border-slate-700 pt-3 text-sm">
+            <div>
               <span className="font-semibold">Decimal:</span>{" "}
               {result.decimal}
             </div>
-            <div className="text-sm">
-              <span className="font-semibold">Base-7 digits:</span>{" "}
-              {result.base7.join(" ")}
+            <div>
+              <span className="font-semibold">Base-7:</span>{" "}
+              {result.base7.length ? result.base7.join(" ") : "—"}
             </div>
-            <div className="text-sm">
-              <span className="font-semibold">Voices path:</span>{" "}
-              {result.voices.join(" → ")}
+            <div>
+              <span className="font-semibold">Voices:</span>{" "}
+              {result.voices.length
+                ? result.voices.join(" → ")
+                : "—"}
             </div>
-            <div className="text-sm">
+            <div>
               <span className="font-semibold">Principle:</span>{" "}
               {result.principle}
             </div>
-            <div className="text-sm">
+            <div>
               <span className="font-semibold">Cycle state:</span>{" "}
               {result.cycleState}
             </div>
