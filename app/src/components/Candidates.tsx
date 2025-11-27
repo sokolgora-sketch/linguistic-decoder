@@ -69,6 +69,24 @@ function MorphologyMatrixBlock({ matrix }: { matrix: MorphologyMatrix }) {
   );
 }
 
+function renderCoreMini(lang: string, math7?: Math7Summary) {
+  if (!math7?.candidates) return null;
+
+  const core = math7.candidates[lang];
+  if (!core) return null;
+
+  const voices = core.voices.join(" → ");
+  const principle = core.principlesPath[0] ?? "";
+  const state = core.cycleState;
+
+  return (
+    <div className="mt-2 text-xs text-emerald-300">
+      <span className="font-semibold">Core:</span>{" "}
+      {principle} · {core.totalMod7} · {state} · {voices}
+    </div>
+  );
+}
+
 type CandidatesProps = {
   candidates?: Candidate[];
   math7?: Math7Summary;
