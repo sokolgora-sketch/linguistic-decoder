@@ -103,12 +103,6 @@ export default function LinguisticDecoderApp() {
   const solveMs = (data as any)?.solveMs as number | undefined;
 
   const math7: any = (analysisResult as any)?.math7 || null;
-
-  // 🔑 whenever a NEW word is analysed, drop the old calculator overlay
-  useEffect(() => {
-    if (!analysisResult) return;
-    setCalcOverlay(null);
-  }, [analysisResult?.core?.word]);
   
   // 🔹 Whenever we get a fresh analysis with math7, update the heart history
   useEffect(() => {
@@ -134,6 +128,8 @@ export default function LinguisticDecoderApp() {
   }, [analysisResult, data?.word]);
 
   async function analyze(nextWord?: string, nextMode?: "strict" | "open", nextAlphabet?: Alphabet) {
+    // 🔑 clear the last calculator result when we analyse a new word
+    setCalcOverlay(null);
     if (!allowAnalyze()) {
       toast({ variant: "destructive", title: "Too many requests", description: "Please try again in a few moments." });
       return;
