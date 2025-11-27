@@ -11,11 +11,13 @@ import {
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 
-import type { Voice, Operation, CycleState } from "../shared/heartMath";
-import {
-  evaluateVoiceEquation,
-  computeCycleStateFromTotal,
-} from "../shared/heartMath";
+// We only use the function from heartMath – no types.
+import { evaluateVoiceEquation } from "../shared/heartMath";
+
+// Local types – we don't rely on heartMath.ts types here
+type Voice = "A" | "E" | "I" | "O" | "U" | "Y" | "Ë";
+type OperationSymbol = "+" | "-" | "*" | "/";
+type CycleState = "open" | "balanced" | "overloaded";
 
 interface CalculatorResult {
   decimal: number;
@@ -23,6 +25,7 @@ interface CalculatorResult {
   voices: Voice[];
   principle: string;
   cycleState: CycleState;
+  description: string;
 }
 
 const VOICES: Voice[] = ["A", "E", "I", "O", "U", "Y", "Ë"];
@@ -37,7 +40,18 @@ const NUMBER_TO_VOICE: Record<string, Voice> = {
   "7": "Ë",
 };
 
-// ---------- parsers ----------
+// ---------- cycle state (local copy, same logic as engine) ----------
+
+function computeCycleStateFromTotal(total: number): CycleState {
+  const mod = ((total % 7) + 7) % 7; // 0..6
+
+  // Mirror your engine thresholds; adjust if yours differ.
+  if (mod === 0 || mod === 3) return "balanced";
+  if (mod === 1 || mod === 6) return "open";
+  return "overloaded";
+}
+
+// ---------- parsing helpers ----------
 
 function parseVoicesFromString(input: string): Voice[] {
   const cleaned = input
@@ -62,21 +76,16 @@ function parseVoicesFromNumbers(input: string): Voice[] {
     .filter((v): v is Voice => Boolean(v));
 }
 
-function hasVowel(input: string) {
-  return /[AEIOUYË]/i.test(input);
-}
-
-function hasDigit(input: string) {
-  return /[1-7]/.test(input);
-}
-
 function parseSmart(input: string): Voice[] {
-  if (hasVowel(input)) return parseVoicesFromString(input);
-  if (hasDigit(input)) return parseVoicesFromNumbers(input);
+  const hasVowel = /[AEIOUYË]/i.test(input);
+  const hasDigit = /[1-7]/.test(input);
+
+  if (hasVowel) return parseVoicesFromString(input);
+  if (hasDigit) return parseVoicesFromNumbers(input);
   return [];
 }
 
-// ---------- description text (UI only) ----------
+// ---------- description text ----------
 
 function describePrinciple(principle: string, cycleState: CycleState): string {
   const core = principle.toLowerCase();
@@ -129,12 +138,11 @@ function describePrinciple(principle: string, cycleState: CycleState): string {
 // ---------- component ----------
 
 export const SevenPrinciplesCalculator: React.FC = () => {
-  // EMPTY defaults so it does NOT open with AO + A
+  // Start EMPTY so it doesn't auto-show AO + A
   const [leftInput, setLeftInput] = useState("");
   const [rightInput, setRightInput] = useState("");
-  const [op, setOp] = useState<Operation>("+");
+  const [op, setOp] = useState<OperationSymbol>("+");
   const [result, setResult] = useState<CalculatorResult | null>(null);
-  const [description, setDescription] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const handleCalculate = () => {
@@ -145,15 +153,23 @@ export const SevenPrinciplesCalculator: React.FC = () => {
 
     if (!leftVoices.length || !rightVoices.length) {
       setResult(null);
-      setDescription(null);
       setError("Please enter at least one valid voice/number on each side.");
       return;
     }
 
     try {
-      const raw = evaluateVoiceEquation(leftVoices, rightVoices, op) as any;
+      // Turn voices into expressions like "AE" before sending to heartMath
+      const leftExpr = leftVoices.join("");
+      const rightExpr = rightVoices.join("");
+
+      const raw = evaluateVoiceEquation(
+        leftExpr,
+        rightExpr,
+        op as any // we don't care about the exact Operation type here
+      ) as any;
 
       const decimal: number = raw.decimal ?? 0;
+
       const base7Array: number[] = Array.isArray(raw.base7)
         ? raw.base7
         : String(raw.base7 ?? "")
@@ -161,25 +177,24 @@ export const SevenPrinciplesCalculator: React.FC = () => {
             .map((d: string) => Number(d))
             .filter((n: number) => !Number.isNaN(n));
 
-      const voices: Voice[] = raw.voices ?? [];
+      const voicesFromRaw: Voice[] = raw.voices ?? [];
       const principle: string = raw.principle ?? "Unknown";
 
       const cycleState = computeCycleStateFromTotal(decimal);
-      const desc = describePrinciple(principle, cycleState);
+      const description = describePrinciple(principle, cycleState);
 
       setResult({
         decimal,
         base7: base7Array,
-        voices,
+        voices: voicesFromRaw,
         principle,
         cycleState,
+        description,
       });
-      setDescription(desc);
     } catch (e) {
       console.error(e);
       setResult(null);
-      setDescription(null);
-      setError("Calculator failed – check inputs or heartMath wiring.");
+      setError("Calculator failed – check inputs or heart math wiring.");
     }
   };
 
@@ -206,7 +221,7 @@ export const SevenPrinciplesCalculator: React.FC = () => {
             <select
               className="w-full rounded-md border bg-transparent px-2 py-1 text-sm"
               value={op}
-              onChange={(e) => setOp(e.target.value as Operation)}
+              onChange={(e) => setOp(e.target.value as OperationSymbol)}
             >
               <option value="+">Add</option>
               <option value="-">Subtract</option>
@@ -262,11 +277,9 @@ export const SevenPrinciplesCalculator: React.FC = () => {
               <span className="font-semibold">Cycle state:</span>{" "}
               {result.cycleState}
             </div>
-            {description && (
-              <div className="text-xs text-muted-foreground mt-1">
-                {description}
-              </div>
-            )}
+            <div className="text-xs text-muted-foreground mt-1">
+              {result.description}
+            </div>
           </div>
         )}
       </CardContent>

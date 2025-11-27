@@ -93,17 +93,45 @@ export function calculate(a: number, b: number, op: Operation) {
   };
 }
 
-/** Utility for symbolic equations like “AO + ËA” */
-export function parseVoiceExpression(expr: string): number[] {
-  const clean = expr.replace(/[^AEIOUYË]/g, '').split('');
-  return clean.map((v) => voiceToNumber[v as Voice]);
+const VOICE_CHARS = new Set(["A", "E", "I", "O", "U", "Y", "Ë"]);
+
+/** Utility for symbolic equations like “AO + ËA” or "14+71" */
+function parseVoiceExpression(input: string): VoicePrinciple[] {
+  const out: VoicePrinciple[] = [];
+
+  for (const raw of input.toUpperCase()) {
+    if (VOICE_CHARS.has(raw as VoicePrinciple)) {
+      out.push(raw as VoicePrinciple);
+    } else if (raw in DIGIT_TO_VOICE) {
+      out.push(DIGIT_TO_VOICE[raw as keyof typeof DIGIT_TO_VOICE]);
+    } else {
+      // ignore spaces, commas, etc.
+    }
+  }
+
+  return out;
 }
 
 /** Evaluate symbolic expression */
 export function evaluateVoiceEquation(aExpr: string, bExpr: string, op: Operation) {
   const aVal = parseVoiceExpression(aExpr)
-    .reduce((acc, n) => acc + n, 0);
+    .reduce((acc, v) => acc + VOICE_TO_DIGIT[v], 0);
   const bVal = parseVoiceExpression(bExpr)
-    .reduce((acc, n) => acc + n, 0);
+    .reduce((acc, v) => acc + VOICE_TO_DIGIT[v], 0);
   return calculate(aVal, bVal, op);
+}
+
+// Cycle state used by both engine math and the calculator
+export type CycleState = "open" | "balanced" | "overloaded";
+
+export function computeCycleState(total: number): CycleState {
+  const totalMod7 = ((total % 7) + 7) % 7; // normalize 0..6
+
+  if (totalMod7 === 1 || totalMod7 === 2) {
+    return "open";
+  } else if (totalMod7 === 3 || totalMod7 === 4) {
+    return "balanced";
+  } else {
+    return "overloaded";
+  }
 }

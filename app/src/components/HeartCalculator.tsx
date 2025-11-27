@@ -17,13 +17,15 @@ type Props = {
   initialExprB?: string;
   initialOp?: SevenOp;
   autoRun?: boolean;
+  onResult?: (result: SevenCalcResult | null) => void;
 };
 
-export default function HeartCalculator({ 
+function HeartCalculator({ 
   initialExprA,
   initialExprB,
   initialOp = "add",
-  autoRun = false
+  autoRun = false,
+  onResult
 }: Props) {
   const [exprA, setExprA] = useState(initialExprA ?? "AO");
   const [exprB, setExprB] = useState(initialExprB ?? "ËA");
@@ -56,11 +58,13 @@ export default function HeartCalculator({
         principle: res.principle,
       };
       setResult(calcResult);
+      onResult?.(calcResult);
     } catch (e) {
       console.error("Error evaluating:", e);
       setResult(null);
+      onResult?.(null);
     }
-  }, [exprA, exprB, op]);
+  }, [exprA, exprB, op, onResult]);
 
   useEffect(() => {
     if (autoRun) {
@@ -156,3 +160,5 @@ export default function HeartCalculator({
     </Card>
   );
 }
+
+export default HeartCalculator;
