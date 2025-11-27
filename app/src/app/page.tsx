@@ -43,7 +43,7 @@ import { logError } from "@/lib/logError";
 import { VOICE_COLOR_MAP, VOICE_LABEL_MAP } from "@/shared/voiceColors";
 import { HeartCalculator } from "@/components/HeartCalculator";
 import type { HistoryEntry } from "@/shared/history";
-import ZeroPanel from "@/components/ZeroPanel";
+import { ZeroWordPanel } from "@/components/ZeroWordPanel";
 
 const VOICE_META: { id: Vowel; label: string; role: string }[] = [
   { id: "A", label: "Action / Truth", role: "Launches, cuts through, sets the first line." },
@@ -620,7 +620,7 @@ export default function LinguisticDecoderApp() {
         </section>
 
         <section className="mt-12">
-          <ZeroPanel />
+          <ZeroWordPanel />
         </section>
 
         {/* Informational Accordions */}
