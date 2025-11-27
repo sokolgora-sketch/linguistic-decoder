@@ -41,7 +41,7 @@ import { allowAnalyze } from "@/lib/throttle";
 import { ExportJsonButton } from "@/components/ExportJsonButton";
 import { logError } from "@/lib/logError";
 import { VOICE_COLOR_MAP, VOICE_LABEL_MAP } from "@/shared/voiceColors";
-import HeartCalculator from "@/components/HeartCalculator";
+import { SevenPrinciplesCalculator } from "@/components/SevenPrinciplesCalculator";
 import type { HistoryEntry } from "@/shared/history";
 
 const VOICE_META: { id: Vowel; label: string; role: string }[] = [
@@ -706,7 +706,7 @@ export default function LinguisticDecoderApp() {
               </div>
             </AccordionTrigger>
             <AccordionContent>
-              <HeartCalculator />
+              <SevenPrinciplesCalculator />
             </AccordionContent>
           </AccordionItem>
 

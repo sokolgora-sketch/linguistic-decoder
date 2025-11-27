@@ -1,5 +1,8 @@
+
 // src/shared/heartMath.ts
 // Seven-Principles Calculator — deterministic base-7 Heart Math
+
+import type { CycleState } from "./engineShape";
 
 export type Voice = 'A' | 'E' | 'I' | 'O' | 'U' | 'Y' | 'Ë';
 export type Operation = 'add' | 'subtract' | 'multiply' | 'divide';
@@ -119,4 +122,19 @@ export function evaluateVoiceEquation(aExpr: string, bExpr: string, op: Operatio
   const bVal = parseVoiceExpression(bExpr)
     .reduce((acc, v) => acc + VOICE_TO_DIGIT[v], 0);
   return calculate(aVal, bVal, op);
+}
+
+/**
+ * Computes the cycle state from a total, matching the logic in math7.ts
+ */
+export function computeCycleState(total: number): CycleState {
+  const totalMod7 = total % 7 === 0 ? 7 : total % 7;
+
+  if (totalMod7 === 7 || totalMod7 === 3) {
+    return "balanced";
+  } else if (totalMod7 === 1 || totalMod7 === 2) {
+    return "open";
+  } else {
+    return "overloaded";
+  }
 }

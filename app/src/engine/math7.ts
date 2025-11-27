@@ -1,3 +1,4 @@
+
 // src/engine/math7.ts
 //
 // Seven-Voices “Heart Math” over an AnalyzeWordResult.
@@ -9,6 +10,7 @@ import {
   decimalToBase7,
   base7DigitsToVoices,
   reduceToPrinciple,
+  computeCycleState,
 } from "@/shared/heartMath";
 
 
@@ -54,18 +56,9 @@ function scoreVoices(voices: Vowel[]): Math7PathSummary {
     (sum, v) => sum + (voiceToNumber[v as keyof typeof voiceToNumber] ?? 0),
     0
   );
-  const totalMod7Raw = total % 7;
-  const totalMod7 = totalMod7Raw === 0 ? 7 : totalMod7Raw; // keep 1–7 domain
+  const totalMod7 = total % 7 === 0 ? 7 : total % 7;
 
-  let cycleState: Math7CycleState;
-  // keep your old cycle logic, just on the new mod-7
-  if (totalMod7 === 7 || totalMod7 === 3) {
-    cycleState = "balanced";
-  } else if (totalMod7 === 1 || totalMod7 === 2) {
-    cycleState = "open";
-  } else {
-    cycleState = "overloaded";
-  }
+  const cycleState = computeCycleState(total);
 
   const principlesPath = voices.map(
     (v) => PRINCIPLE_BY_VOICE[v] ?? v
@@ -116,9 +109,12 @@ export function computeMath7ForResult(result: AnalyzeWordResult): Math7Summary {
     candidates[c.language] = scoreVoices(voices);
   });
 
+  const heart = computeHeartFromPrimary(primaryVoices);
+
   return {
     primary,
     frontier,
     candidates,
+    heart
   };
 }
