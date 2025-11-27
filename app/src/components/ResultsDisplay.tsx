@@ -126,7 +126,7 @@ export function PathRow({ title, block, analysis }: { title: string; block: any,
         {analysis.math7?.heart && (
           <div className="mt-4 border border-pink-600/40 rounded-xl p-4 bg-pink-900/10">
             <h3 className="text-pink-400 font-medium mb-2">
-              Core Auto-Calculation (Seven-Voices Math)
+              Core Auto-Calculation (Seven Principles)
             </h3>
             <p><strong>Expression:</strong> {analysis.math7.heart.expression}</p>
             <p><strong>Decimal:</strong> {analysis.math7.heart.decimal}</p>
