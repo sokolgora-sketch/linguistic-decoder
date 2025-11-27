@@ -193,13 +193,6 @@ export function ComparePanel({ history }: Props) {
                 />
               </CardContent>
             </Card>
-
-            {/* Small legend */}
-            <p className="text-[10px] text-slate-500">
-              This panel is read-only. It uses cached analyses from the current
-              session; re-run a word above if you want to refresh its math or
-              candidates.
-            </p>
           </>
         )}
       </CardContent>
