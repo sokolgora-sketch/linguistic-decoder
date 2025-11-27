@@ -7,7 +7,7 @@ export type LanguageCode =
   | "el"  // Greek
   | "la"  // Latin
   | "sa"  // Sanskrit
-  | "en"  // English
+  | "en"
   | "fr"
   | "de"
   | "it"
@@ -18,10 +18,10 @@ export type LanguageCode =
 
 export interface CandidateForm {
   fromWord: string;       // the original normalized word ("damage")
-  language: LanguageCode; // "sq", "la", ...
-  form: string;           // candidate spelling ("dëm", "damnum")
-  opsUsed: string[];      // short labels of how we got here
-  meaningHint?: string;   // optional gloss
+  language: LanguageCode; // "sq", "la", etc.
+  form: string;           // concrete candidate form: "dëm", "damnum"
+  opsUsed: string[];      // description of how we got here
+  meaningHint?: string;
 }
 
 export interface CandidateGeneratorConfig {
@@ -31,69 +31,35 @@ export interface CandidateGeneratorConfig {
 
 export function generateCandidates(
   cleaned: WordInput,
-  config?: CandidateGeneratorConfig
+  _config?: CandidateGeneratorConfig
 ): CandidateForm[] {
   const { normalized } = cleaned;
   const forms: CandidateForm[] = [];
 
-  // v1: hard-code canon words while we wire the pipeline.
-  switch (normalized) {
-    case "damage":
-      forms.push(
-        {
-          fromWord: "damage",
-          language: "la",
-          form: "damnum",
-          opsUsed: ["latin-family", "historical-record"],
-          meaningHint: "cut / act that leaves something in a harmed state",
-        },
-        {
-          fromWord: "damage",
-          language: "sq",
-          form: "dëm",
-          opsUsed: ["albanian-family", "functional-root"],
-          meaningHint: "harm / loss that remains as a condition",
-        }
-      );
-      break;
-
-    case "study":
-      forms.push(
-        {
-          fromWord: "study",
-          language: "en",
-          form: "study",
-          opsUsed: ["base-form"],
-          meaningHint: "apply the mind to know something",
-        }
-        // later: add Latin/Greek/Albanian candidates
-      );
-      break;
-
-    case "mathematics":
-    case "matematika":
-      forms.push(
-        {
-          fromWord: normalized,
-          language: "la",
-          form: "mathematica",
-          opsUsed: ["latin-family"],
-          meaningHint: "art of learning / measuring",
-        },
-        {
-          fromWord: normalized,
-          language: "sq",
-          form: "matematike",
-          opsUsed: ["albanian-borrowed", "functional-split"],
-          meaningHint: "measure what you have / what is",
-        }
-      );
-      break;
-
-    default:
-      // for now: leave empty; later we’ll generate algorithmically
-      break;
+  // v1: only damage — canonical test word
+  if (normalized === "damage") {
+    forms.push(
+      {
+        fromWord: "damage",
+        language: "en",
+        form: "damage",
+        opsUsed: ["base-form"],
+      },
+      {
+        fromWord: "damage",
+        language: "la",
+        form: "damnum",
+        opsUsed: ["latin-family"],
+      },
+      {
+        fromWord: "damage",
+        language: "sq",
+        form: "dëm",
+        opsUsed: ["sq-family", "vowel A→Ë", "final -ë simplification"],
+      }
+    );
   }
 
+  // later we generalise for study, mathematics, etc.
   return forms;
 }
