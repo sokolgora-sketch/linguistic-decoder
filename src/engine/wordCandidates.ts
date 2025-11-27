@@ -1,14 +1,13 @@
-
 // src/engine/wordCandidates.ts
 
 import type { WordInput } from "./wordCleaner";
 
 export type LanguageCode =
-  | "sq"   // Albanian
-  | "el"   // Greek
-  | "la"   // Latin
-  | "sa"   // Sanskrit
-  | "en"   // English
+  | "sq"  // Albanian
+  | "el"  // Greek
+  | "la"  // Latin
+  | "sa"  // Sanskrit
+  | "en"  // English
   | "fr"
   | "de"
   | "it"
@@ -18,11 +17,11 @@ export type LanguageCode =
   | "other";
 
 export interface CandidateForm {
-  fromWord: string;       // normalized input (e.g. "damage")
-  language: LanguageCode; // "sq", "la", etc.
-  form: string;           // candidate written form (e.g. "dëm", "damnum")
-  opsUsed: string[];      // description of ops / transformations
-  meaningHint?: string;   // optional short gloss
+  fromWord: string;       // the original normalized word ("damage")
+  language: LanguageCode; // "sq", "la", ...
+  form: string;           // candidate spelling ("dëm", "damnum")
+  opsUsed: string[];      // short labels of how we got here
+  meaningHint?: string;   // optional gloss
 }
 
 export interface CandidateGeneratorConfig {
@@ -37,78 +36,64 @@ export function generateCandidates(
   const { normalized } = cleaned;
   const forms: CandidateForm[] = [];
 
-  const langs = new Set<LanguageCode>(
-    config?.languages ?? [
-      "en",
-      "sq",
-      "la",
-      "fr",
-      "de",
-      "it",
-      "el",
-      "sa",
-      "other",
-    ]
-  );
-
-  // --- HARD-CODED EXAMPLES FOR v1 ----------------------------------------
-
-  if (normalized === "damage") {
-    if (langs.has("en")) {
-      forms.push({
-        fromWord: "damage",
-        language: "en",
-        form: "damage",
-        opsUsed: ["base-form"],
-        meaningHint: "harm, injury, loss",
-      });
-    }
-    if (langs.has("fr")) {
-      forms.push({
-        fromWord: "damage",
-        language: "fr",
-        form: "dommage",
-        opsUsed: ["romance-family", "vowel-swap A→O"],
-        meaningHint: "harm, inconvenience",
-      });
-    }
-    if (langs.has("la")) {
-      forms.push({
-        fromWord: "damage",
-        language: "la",
-        form: "damnum",
-        opsUsed: ["latin-root-family"],
-        meaningHint: "loss, damage, penalty",
-      });
-    }
-    if (langs.has("sq")) {
+  // v1: hard-code canon words while we wire the pipeline.
+  switch (normalized) {
+    case "damage":
       forms.push(
+        {
+          fromWord: "damage",
+          language: "la",
+          form: "damnum",
+          opsUsed: ["latin-family", "historical-record"],
+          meaningHint: "cut / act that leaves something in a harmed state",
+        },
         {
           fromWord: "damage",
           language: "sq",
           form: "dëm",
-          opsUsed: ["sq-family", "vowel-swap A→Ë", "consonant simplification M"],
-          meaningHint: "harm, loss, damage",
-        },
-        {
-          fromWord: "damage",
-          language: "sq",
-          form: "dam",
-          opsUsed: ["sq-dialect", "keep A"],
-        },
-        {
-          fromWord: "damage",
-          language: "sq",
-          form: "dom",
-          opsUsed: ["sq-dialect", "vowel-swap A→O"],
+          opsUsed: ["albanian-family", "functional-root"],
+          meaningHint: "harm / loss that remains as a condition",
         }
       );
-    }
-  }
+      break;
 
-  // TODO: add similar blocks for "study", "mathematics", etc.
-  // For any other word we return empty for now.
-  // -----------------------------------------------------------------------
+    case "study":
+      forms.push(
+        {
+          fromWord: "study",
+          language: "en",
+          form: "study",
+          opsUsed: ["base-form"],
+          meaningHint: "apply the mind to know something",
+        }
+        // later: add Latin/Greek/Albanian candidates
+      );
+      break;
+
+    case "mathematics":
+    case "matematika":
+      forms.push(
+        {
+          fromWord: normalized,
+          language: "la",
+          form: "mathematica",
+          opsUsed: ["latin-family"],
+          meaningHint: "art of learning / measuring",
+        },
+        {
+          fromWord: normalized,
+          language: "sq",
+          form: "matematike",
+          opsUsed: ["albanian-borrowed", "functional-split"],
+          meaningHint: "measure what you have / what is",
+        }
+      );
+      break;
+
+    default:
+      // for now: leave empty; later we’ll generate algorithmically
+      break;
+  }
 
   return forms;
 }
