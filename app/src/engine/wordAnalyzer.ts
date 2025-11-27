@@ -8,8 +8,8 @@ import {
   type CandidateForm,
   type LanguageCode,
 } from "./wordCandidates";
-import type { VowelId } from "../core/sevenVowelsCore";
-import { VOWEL_TRAITS } from "../core/sevenVowelsTraits";
+import type { VowelId } from "@/core/sevenVowelsCore";
+import { VOWEL_TRAITS } from "@/core/sevenVowelsTraits";
 
 export interface CandidateAnalysis {
   language: LanguageCode;
