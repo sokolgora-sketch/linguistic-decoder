@@ -1,30 +1,14 @@
-
 // src/engine/wordAnalyzer.ts
 // Takes CandidateForm[] and applies functional + 7-vowel logic.
 
-import type { WordInput } from "./wordCleaner";
-import {
-  generateCandidates,
-  type CandidateForm,
-  type LanguageCode,
-} from "./wordCandidates";
+import type { CandidateForm, CandidateAnalysis } from "@/core/engineShape";
 import type { VowelId } from "@/core/sevenVowelsCore";
 import { VOWEL_TRAITS } from "@/core/sevenVowelsTraits";
+import {
+  generateCandidates,
+  type LanguageCode,
+} from "./wordCandidates";
 
-export interface CandidateAnalysis {
-  language: LanguageCode;
-  form: string;
-
-  // Structural reading
-  decomposition: string[];      // ["DA", "M"] etc.
-  functionalStatement: string;  // one short paragraph
-  vowelPath: VowelId[];         // e.g. ["A", "Ë"]
-  notes: string[];              // bullet points
-
-  // Enrichment for UI
-  dominantVowel?: VowelId;
-  traitsSummary?: string;
-}
 
 export interface WordAnalysisResult {
   word: WordInput;
@@ -178,28 +162,26 @@ function buildDamageEnAnalysis(c: CandidateForm): CandidateAnalysis {
 }
 
 function buildDamageFrAnalysis(c: CandidateForm): CandidateAnalysis {
-  const vowelPath: VowelId[] = ["A", "O", "Ë"]; // DA → DO (rounded) → closure
+  const vowelPath: VowelId[] = ["A", "O", "E"];
 
   const dominantVowel: VowelId = "O";
   const oTraits = VOWEL_TRAITS["O"];
 
   const traitsSummary =
-    `O as mediator rounds the sharp A-cut into a state, matching French 'dommage' as condition or situation. ` +
+    `O as mediator rounds the sharp A-cut into a canopy, linking DA-harm to AO-protection. ` +
     `O (${oTraits.polarity}, ${oTraits.role}): ${oTraits.personality}`;
 
   return {
     language: c.language,
     form: c.form,
-    decomposition: ["DOMM", "-AGE"],
-
+    decomposition: ["DA", "M"],
     functionalStatement:
-      "DOMM continues the DA/DM harm-root with a rounded O; -age again packages it into a condition. " +
-      "Functionally: 'a harmed condition / situation', aligned with legal and everyday French usage.",
-
+      "Like English 'damage', French 'dommage' carries the same DA-cut root but softens it " +
+      "with an O-mediated, more buffered sense of harm—often moral or situational rather than purely physical.",
     vowelPath,
     notes: [
-      "Romance layer that still carries the original DA harm root.",
-      "Rounded O softens the cut – from pure act to condition/state.",
+      "French keeps the DA root and adds an O-opening and E-settling, matching a more diffuse, situational harm.",
+      "O in the middle matches mediation / cushioning of the blow; the final vowel lets the condition settle.",
     ],
     dominantVowel,
     traitsSummary,
