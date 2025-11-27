@@ -1,4 +1,3 @@
-
 'use client';
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "./ui/card";
@@ -164,7 +163,7 @@ const Chip = ({ v }: { v: string | number }) => {
 };
 
 
-export function ResultsDisplay({ analysis }: { analysis: AnalysisResult_DEPRECATED | null; }) {
+export function ResultsDisplay({ analysis }: { analysis: AnalysisResult_DEPRECATED | null }) {
   if (!analysis) return null;
   const { core, candidates, symbolic, debug, wordMatrix, deepRoot } = analysis;
   const raw = debug?.rawEnginePayload;
