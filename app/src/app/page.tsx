@@ -33,7 +33,7 @@ import { Loader2, Sparkles, Wand2, HelpCircle, GitBranch, BookOpen, History as H
 import { ComparePanel } from "@/components/ComparePanel";
 import { normalizeEnginePayload, type Vowel, type EnginePayload, type AnalysisResult_DEPRECATED } from "@/shared/engineShape";
 import { enginePayloadToAnalysisResult, analysisResultToEnginePayload } from "@/shared/analysisAdapter";
-import HistoryPanel from "@/components/HistoryPanel";
+import { HistoryPanel } from "@/components/HistoryPanel";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import FooterBuild from "@/components/FooterBuild";
@@ -207,57 +207,14 @@ export default function LinguisticDecoderApp() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  async function onLoadAnalysis(cacheId: string) {
-    if (!db) {
-      toast({ variant: "destructive", title: "Database Error", description: "Firestore is not available." });
-      return;
-    }
-    setLoading(true);
-    setErr(null);
-    try {
-      const cacheRef = doc(db, "analyses", cacheId);
-      const snap = await getDoc(cacheRef);
-      if (snap.exists()) {
-        const payload = normalizeEnginePayload(snap.data());
-        setData({ ...payload, cacheHit: true } as EnginePayload);
-        toast({ title: "Loaded from Cache", description: `Analysis for '${payload.word}' loaded.` });
-      } else {
-        toast({ variant: "destructive", title: "Not Found", description: "Could not find that analysis in the cache." });
-      }
-    } catch (e: any) {
-      logError({ where: "history-load", message: e.message, detail: { cacheId } });
-      toast({ variant: "destructive", title: "Load Error", description: e.message || "Failed to load analysis." });
-      setErr(e.message);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function onRecompute(word: string, m?: string, a?: string) {
-    setLoading(true);
-    setErr(null);
-    try {
-      const result = await analyzeClient(word, (m as any) || mode, (a as any) || alphabet, {
-        bypass: true,
-        skipWrite: false,
-        edgeWeight,
-        useAi,
+  function handleSelectHistory(entry: HistoryEntry) {
+    const payload = analysisResultToEnginePayload(entry.result);
+    if (payload) {
+      setData({ ...payload, cacheHit: true });
+      toast({
+        title: "Loaded from History",
+        description: `Analysis for '${payload.word}' loaded.`,
       });
-      setData({ ...result, recomputed: true } as EnginePayload);
-      toast({ title: "Recomputed", description: `Fresh analysis for '${result.word}' complete.` });
-    } catch (e: any) {
-      logError({ where: "history-recompute", message: e.message, detail: { word } });
-      toast({ variant: "destructive", title: "Recompute Error", description: e.message || "Failed to recompute analysis." });
-      setErr(e.message);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    if (canAnalyze) {
-      analyze();
     }
   }
 
@@ -763,12 +720,7 @@ export default function LinguisticDecoderApp() {
               </div>
             </AccordionTrigger>
             <AccordionContent>
-              <Card className="p-4">
-                <p className="text-xs text-muted-foreground mb-3">
-                  Reload or recompute previous analyses from Firestore history.
-                </p>
-                <HistoryPanel onLoadAnalysis={onLoadAnalysis} onRecompute={onRecompute} />
-              </Card>
+              <HistoryPanel history={history} onSelect={handleSelectHistory} />
             </AccordionContent>
           </AccordionItem>
 
@@ -852,4 +804,3 @@ export default function LinguisticDecoderApp() {
     </div>
   );
 }
-
