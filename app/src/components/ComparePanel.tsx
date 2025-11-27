@@ -1,861 +1,308 @@
 
 "use client";
 
-import React, { useState, useMemo } from "react";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import React, { useMemo, useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./ui/select";
+import type { HistoryEntry } from "@/shared/history";
+import { VOICE_COLOR_MAP } from "@/shared/voiceColors";
+import type { Vowel } from "@/shared/engineShape";
 
-import type { Alphabet } from "@/lib/runAnalysis";
-import { analyzeClient } from "@/lib/analyzeClient";
-import type {
-  EnginePayload,
-  AnalysisResult_DEPRECATED,
-} from "@/shared/engineShape";
-import { enginePayloadToAnalysisResult } from "@/shared/analysisAdapter";
-import { VOICE_COLOR_MAP, VOICE_LABEL_MAP } from "@/shared/voiceColors";
-
-type Mode = "strict" | "open";
-
-type SideState = {
-  word: string;
-  loading: boolean;
-  error: string | null;
-  payload: EnginePayload | null;
-  result: AnalysisResult_DEPRECATED | null;
+type Props = {
+  history: HistoryEntry[];
 };
 
-const initialSide: SideState = {
-  word: "",
-  loading: false,
-  error: null,
-  payload: null,
-  result: null,
+const LEVEL_LABEL: Record<string, string> = {
+  low: "Low",
+  mid: "Mid",
+  high: "High",
 };
 
-type OriginCandidate = {
-  language?: string | null;
-  family?: string | null;
-  form?: string | null;
-};
+export function ComparePanel({ history }: Props) {
+  const [leftId, setLeftId] = useState<string | undefined>();
+  const [rightId, setRightId] = useState<string | undefined>();
 
-type OriginRelation =
-  | { code: "same"; label: "SAME FAMILY"; detail?: string }
-  | { code: "different"; label: "DIFFERENT FAMILIES"; detail?: string }
-  | { code: "unknown"; label: "UNKNOWN"; detail?: string };
+  const left = useMemo(
+    () => history.find((h) => h.id === leftId),
+    [history, leftId],
+  );
+  const right = useMemo(
+    () => history.find((h) => h.id === rightId),
+    [history, rightId],
+  );
 
-function classifyOriginRelation(
-  left?: OriginCandidate | null,
-  right?: OriginCandidate | null
-): OriginRelation {
-  if (!left || !right) {
-    return {
-      code: "unknown",
-      label: "UNKNOWN",
-      detail: "One side has no origin candidate yet.",
-    };
-  }
+  const canCompare = !!left && !!right && left.id !== right.id;
 
-  const leftLang = left.language?.toLowerCase() ?? "";
-  const rightLang = right.language?.toLowerCase() ?? "";
-  const leftFam = left.family?.toLowerCase() ?? "";
-  const rightFam = right.family?.toLowerCase() ?? "";
-
-  const sameFamily =
-    leftFam !== "" && rightFam !== "" && leftFam === rightFam;
-  const sameLanguage =
-    leftLang !== "" && rightLang !== "" && leftLang === rightLang;
-
-  if (sameLanguage || sameFamily) {
-    const familyLabel =
-      leftFam ||
-      rightFam ||
-      (leftLang === rightLang ? leftLang : `${leftLang} / ${rightLang}`);
+  const primarySummary = (entry?: HistoryEntry) => {
+    if (!entry) return null;
+    const { core, math7 } = entry.result;
+    const p = core.primaryPath;
+    const heart = math7?.heart;
+    const coreMath = math7?.primary;
 
     return {
-      code: "same",
-      label: "SAME FAMILY",
-      detail: familyLabel
-        ? `Both sides lean on ${familyLabel} roots.`
-        : undefined,
+      voicePath: p.voicePath, // already "U → I"
+      levelPath: p.levelPath, // "low → high"
+      ringPath: p.ringPath,   // "1 → 1"
+      state: coreMath?.cycleState,
+      totalMod7: coreMath?.totalMod7,
+      principlesPath:
+        coreMath?.principlesPath?.join(" → "),
+      heartPrinciple: heart?.principle ?? "—",
+      heartVoices: heart?.voices?.join(" → ") ?? "",
     };
-  }
-
-  if (!leftFam && !rightFam && !leftLang && !rightLang) {
-    return {
-      code: "unknown",
-      label: "UNKNOWN",
-      detail: "The engine has not proposed any origins yet.",
-    };
-  }
-
-  return {
-    code: "different",
-    label: "DIFFERENT FAMILIES",
-    detail:
-      leftLang || rightLang
-        ? `Left: ${leftLang || "—"} vs right: ${rightLang || "—"}.`
-        : undefined,
   };
-}
 
-// --- Origin comparison helper ---
-function analyzeOriginRelation(
-  left: any,
-  right: any
-): { family: string; mirror: string } {
-  const leftFamily = left?.result?.origin?.family || left?.result?.originCandidate || "";
-  const rightFamily = right?.result?.origin?.family || right?.result?.originCandidate || "";
+  const leftSummary = primarySummary(left);
+  const rightSummary = primarySummary(right);
 
-  let family = "Unknown";
-  if (leftFamily && rightFamily) {
-    if (leftFamily === rightFamily) family = `Shared (${leftFamily})`;
-    else family = `Different (${leftFamily} vs ${rightFamily})`;
-  }
+  const diffLabel = (field: keyof NonNullable<typeof leftSummary>) => {
+    if (!leftSummary || !rightSummary) return "";
+    const l = leftSummary[field];
+    const r = rightSummary[field];
+    if (l === r) return "SAME";
+    return "DIFFERENT";
+  };
 
-  const leftPrinciples = left?.result?.primary?.principlesPath || [];
-  const rightPrinciples = right?.result?.primary?.principlesPath || [];
-  let mirror = "No";
-  if (leftPrinciples.length && rightPrinciples.length) {
-    const lOpen = leftPrinciples[0];
-    const lClose = leftPrinciples[leftPrinciples.length - 1];
-    const rOpen = rightPrinciples[0];
-    const rClose = rightPrinciples[rightPrinciples.length - 1];
-
-    if (lOpen === rClose && lClose === rOpen) mirror = "YES — reversed path";
-    else if (lClose === rClose) mirror = "Similar — same closure";
-  }
-
-  return { family, mirror };
-}
-
-function formatFunctionLine(
-  word: string | null | undefined,
-  fn: string | null | undefined
-): string {
-  const label = (word ?? "").trim();
-  if (!fn) {
-    return label || "—";
-  }
-
-  const trimmed = fn.trim();
-  if (!trimmed) {
-    return label || "—";
-  }
-
-  // lower-case first letter so it reads as a continuation
-  const first = trimmed.charAt(0).toLowerCase();
-  const rest = trimmed.slice(1);
-  const lowered = first + rest;
-
-  // drop trailing dots and add a single one
-  const noTrailingDot = lowered.replace(/\.*$/, "");
-
-  return label
-    ? `${label} — ${noTrailingDot}.`
-    : `${noTrailingDot}.`;
-}
-
-// ---------------------------------------------------------------------------
-// Small helpers
-// ---------------------------------------------------------------------------
-
-function describeVoice(v: string | null): string {
-  if (!v) return "—";
-  const label = VOICE_LABEL_MAP[v as keyof typeof VOICE_LABEL_MAP] ?? "";
-  return label ? `${v} (${label})` : v;
-}
-
-function VoicePathChips({ path }: { path: string[] }) {
-  if (!path.length) {
+  const renderDot = (vowel: string | undefined) => {
+    if (!vowel) return null;
+    const color = VOICE_COLOR_MAP[vowel as Vowel];
     return (
-      <p className="text-[11px] text-muted-foreground">
-        No primary path computed for this word.
-      </p>
+      <span
+        className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full border text-xs font-bold"
+        style={{ backgroundColor: color ?? "transparent", color: "#020617" }}
+      >
+        {vowel}
+      </span>
     );
-  }
-
-  return (
-    <div className="flex flex-wrap gap-1 mt-1">
-      {path.map((v, idx) => {
-        const color = VOICE_COLOR_MAP[v as keyof typeof VOICE_COLOR_MAP] ?? "#888";
-        return (
-          <span
-            key={`${v}-${idx}`}
-            className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full border text-[11px] font-mono"
-            style={{
-              borderColor: color,
-              backgroundColor: `${color}22`,
-            }}
-          >
-            <span
-              className="w-2 h-2 rounded-full"
-              style={{ backgroundColor: color }}
-            />
-            <span>{v}</span>
-          </span>
-        );
-      })}
-    </div>
-  );
-}
-
-/**
- * Turn a principlesPath like ["Unity","Insight"] or ["Truth","Expansion"]
- * into a short functional sentence using Seven-Voices logic.
- */
-function describePrinciplesNarrative(path: string[] | null | undefined): string {
-  if (!path || !path.length) {
-    return "No clear principle path detected.";
-  }
-
-  const [p0, p1] = path;
-  const key = p1 ? `${p0}->${p1}` : p0;
-
-  const MAP: Record<string, string> = {
-    "Truth->Expansion":
-      "An act or cut that exposes something and spreads its effect outward.",
-    "Truth->Insight":
-      "A sharp realisation or judgement that reveals what is really there.",
-    "Truth->Unity":
-      "A clear decision that pulls things into one aligned direction.",
-    "Expansion->Insight":
-      "Opening or stretching something in order to see and understand its pattern.",
-    "Unity->Insight":
-      "Gathering many elements into one field so the pattern becomes clear.",
-    "Evolution->Insight":
-      "A change or wound that becomes recognised, understood, and integrated.",
-    "Evolution->Expansion":
-      "A shift or break that then propagates, spreading its consequences.",
-    "Unity->Evolution":
-      "Holding things together until they transform into a new state.",
-    "Balance->Insight":
-      "Centered, mediated experience that leads to clear perception.",
-    "Network Integrity->Insight":
-      "Signals across the network revealing an underlying pattern.",
-    "Evolution->Unity":
-      "Multiple changes consolidating into a single stable form.",
-    "Insight->Evolution":
-      "Understanding that triggers or accelerates transformation.",
   };
 
-  if (MAP[key]) return MAP[key];
-
-  if (!p1) {
-    return `Rooted in ${p0.toLowerCase()}, with no clear second movement.`;
-  }
-
-  return `Movement from ${p0.toLowerCase()} to ${p1.toLowerCase()}, combining their qualities.`;
-}
-
-// ---- Axes helpers ----------------------------------------------------------
-
-type AxisStatus = "pass" | "fail" | "unknown";
-
-function normalizeAxisStatus(raw: any): AxisStatus {
-  if (raw === "pass" || raw === true || raw === "ok") return "pass";
-  if (raw === "fail" || raw === false || raw === "no") return "fail";
-  return "unknown";
-}
-
-function AxisPill({ label, status }: { label: string; status: AxisStatus }) {
-  const base =
-    "inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full border text-[10px] font-mono";
-
-  let extra = "";
-  let dot = "";
-
-  switch (status) {
-    case "pass":
-      extra = "border-emerald-500/70 bg-emerald-500/10 text-emerald-300";
-      dot = "bg-emerald-400";
-      break;
-    case "fail":
-      extra = "border-red-500/70 bg-red-500/10 text-red-300";
-      dot = "bg-red-400";
-      break;
-    default:
-      extra = "border-border/60 bg-muted/40 text-muted-foreground";
-      dot = "bg-muted-foreground/60";
-  }
-
   return (
-    <span className={`${base} ${extra}`}>
-      <span className={`w-1.5 h-1.5 rounded-full ${dot}`} />
-      <span>{label}</span>
-    </span>
-  );
-}
-
-function AxesRow({ axes }: { axes: any }) {
-  const hasRealAxes =
-    axes &&
-    Object.values(axes).some((v) => v !== undefined && v !== null && v !== "");
-
-  const statusPrinciples = normalizeAxisStatus(axes?.principles);
-  const statusConsonants = normalizeAxisStatus(axes?.consonants);
-  const statusMorphology = normalizeAxisStatus(axes?.morphology);
-  const statusFamily = normalizeAxisStatus(axes?.family);
-
-  return (
-    <div className="flex flex-wrap gap-1 mt-1">
-      <AxisPill
-        label="principles"
-        status={hasRealAxes ? statusPrinciples : "unknown"}
-      />
-      <AxisPill
-        label="consonants"
-        status={hasRealAxes ? statusConsonants : "unknown"}
-      />
-      <AxisPill
-        label="morphology"
-        status={hasRealAxes ? statusMorphology : "unknown"}
-      />
-      <AxisPill
-        label="family"
-        status={hasRealAxes ? statusFamily : "unknown"}
-      />
-    </div>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Main component
-// ---------------------------------------------------------------------------
-
-const ComparePanel: React.FC<{
-  defaultMode: Mode;
-  defaultAlphabet: Alphabet;
-}> = ({
-  defaultMode,
-  defaultAlphabet,
-}) => {
-  const [left, setLeft] = useState<SideState>({ ...initialSide, word: "study" });
-  const [right, setRight] = useState<SideState>({ ...initialSide, word: "damage" });
-
-  async function runAnalysis(side: "left" | "right") {
-    const sideState = side === "left" ? left : right;
-    const setSide = side === "left" ? setLeft : setRight;
-
-    const word = sideState.word.trim();
-    if (!word) {
-      setSide((prev) => ({
-        ...prev,
-        error: "Enter a word first.",
-      }));
-      return;
-    }
-
-    setSide((prev) => ({
-      ...prev,
-      loading: true,
-      error: null,
-      payload: null,
-      result: null,
-    }));
-
-    try {
-      // Same pipeline as the main page
-      const payload: EnginePayload = await analyzeClient(
-        word,
-        defaultMode,
-        defaultAlphabet,
-        {
-          edgeWeight: 0.25,
-          useAi: false,
-        }
-      );
-
-      const result = enginePayloadToAnalysisResult(payload);
-
-      setSide((prev) => ({
-        ...prev,
-        loading: false,
-        error: null,
-        payload,
-        result,
-      }));
-    } catch (err: any) {
-      console.error("ComparePanel analysis error:", err);
-      setSide((prev) => ({
-        ...prev,
-        loading: false,
-        error: err?.message ?? "Failed to analyze word.",
-        payload: null,
-        result: null,
-      }));
-    }
-  }
-
-  // -----------------------------------------------------------------------
-  // Derived comparison data
-  // -----------------------------------------------------------------------
-
-  const leftVoicePath: string[] = Array.isArray(
-    (left.payload as any)?.primaryPath?.voicePath
-  )
-    ? ((left.payload as any).primaryPath.voicePath as string[])
-    : [];
-
-  const rightVoicePath: string[] = Array.isArray(
-    (right.payload as any)?.primaryPath?.voicePath
-  )
-    ? ((right.payload as any).primaryPath.voicePath as string[])
-    : [];
-
-  const primaryPathEqual =
-    leftVoicePath.length > 0 &&
-    rightVoicePath.length > 0 &&
-    leftVoicePath.join("") === rightVoicePath.join("");
-
-  const leftHeart: any = (left.result as any)?.math7?.primary ?? null;
-  const rightHeart: any = (right.result as any)?.math7?.primary ?? null;
-
-  const leftHeartState =
-    leftHeart?.state ?? leftHeart?.cycleState ?? leftHeart?.heartState ?? null;
-  const rightHeartState =
-    rightHeart?.state ?? rightHeart?.cycleState ?? rightHeart?.heartState ?? null;
-
-  const leftPrinciplesPath: string[] | null = Array.isArray(
-    leftHeart?.principlesPath
-  )
-    ? (leftHeart.principlesPath as string[])
-    : null;
-
-  const rightPrinciplesPath: string[] | null = Array.isArray(
-    rightHeart?.principlesPath
-  )
-    ? (rightHeart.principlesPath as string[])
-    : null;
-
-  const leftHeartLabel = leftHeart
-    ? `${leftHeartState ?? "—"} · ${
-        leftPrinciplesPath ? leftPrinciplesPath.join(" → ") : "—"
-      }`
-    : "—";
-
-  const rightHeartLabel = rightHeart
-    ? `${rightHeartState ?? "—"} · ${
-        rightPrinciplesPath ? rightPrinciplesPath.join(" → ") : "—"
-      }`
-    : "—";
-
-  const leftOpener = leftVoicePath[0] ?? null;
-  const leftCloser =
-    leftVoicePath.length > 1
-      ? leftVoicePath[leftVoicePath.length - 1]
-      : leftOpener;
-
-  const rightOpener = rightVoicePath[0] ?? null;
-  const rightCloser =
-    rightVoicePath.length > 1
-      ? rightVoicePath[rightVoicePath.length - 1]
-      : rightOpener;
-
-  const sharedVoices: string[] =
-    leftVoicePath.length && rightVoicePath.length
-      ? Array.from(
-          new Set(leftVoicePath.filter((v) => rightVoicePath.includes(v)))
-        )
-      : [];
-
-  const leftCandidates: any[] =
-    ((left.result as any)?.candidates ??
-      (left.payload as any)?.candidates ??
-      []) as any[];
-
-  const rightCandidates: any[] =
-    ((right.result as any)?.candidates ??
-      (right.payload as any)?.candidates ??
-      []) as any[];
-
-  const leftMainCand = leftCandidates[0] ?? null;
-  const rightMainCand = rightCandidates[0] ?? null;
-
-  const leftFunctionText = describePrinciplesNarrative(leftPrinciplesPath || []);
-  const rightFunctionText = describePrinciplesNarrative(
-    rightPrinciplesPath || []
-  );
-
-  const originRelationNew = classifyOriginRelation(leftMainCand, rightMainCand);
-
-  // --- Origin relationship ---
-  const originRelation = analyzeOriginRelation(left, right);
-
-  // Short human verdict for the comparison summary
-  const comparisonVerdict = useMemo(() => {
-    if (!left.result || !right.result) return null;
-
-    const parts: string[] = [];
-
-    // 1) Path
-    if (primaryPathEqual) {
-      parts.push("Same Seven-Voices path");
-    } else {
-      parts.push("Different Seven-Voices paths");
-    }
-
-    // 2) Shared voices
-    const shared = sharedVoices ?? [];
-    if (shared.length === 0) {
-      parts.push("No shared voices");
-    } else {
-      const list = shared.join(", ");
-      parts.push(`Shared voice${shared.length > 1 ? "s" : ""} ${list}`);
-    }
-
-    // 3) Origin family
-    const fam = (originRelationNew.code || "").toString().toUpperCase();
-
-    if (fam === "SAME") {
-      parts.push("Same origin family");
-    } else if (fam === "DIFFERENT") {
-      parts.push("Different origin families");
-    } else {
-      parts.push("Origin family unknown");
-    }
-
-    return parts.join(" · ");
-  }, [left.result, right.result, primaryPathEqual, sharedVoices, originRelationNew]);
-
-  // -----------------------------------------------------------------------
-  // Render
-  // -----------------------------------------------------------------------
-
-  return (
-    <Card className="mt-2">
+    <Card>
       <CardHeader>
-        <CardTitle className="text-sm sm:text-base">
-          Compare Two Words (Seven-Voices core)
-        </CardTitle>
+        <CardTitle>Compare Two Words</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-6">
-        {/* Inputs row */}
-        <div className="grid gap-4 md:grid-cols-2">
-          {/* LEFT SIDE ---------------------------------------------------- */}
-          <div className="space-y-2">
-            <label className="text-xs font-medium uppercase tracking-wide">
-              Left word
-            </label>
-            <div className="flex gap-2">
-              <Input
-                value={left.word}
-                placeholder="e.g. study"
-                onChange={(e) =>
-                  setLeft((prev) => ({
-                    ...prev,
-                    word: e.target.value,
-                    error: null,
-                  }))
-                }
-              />
-              <Button
-                type="button"
-                size="sm"
-                disabled={left.loading}
-                onClick={() => runAnalysis("left")}
-              >
-                {left.loading ? "…" : "Run"}
-              </Button>
-            </div>
-            {left.error && (
-              <p className="text-[11px] text-red-500">{left.error}</p>
-            )}
-
-            {left.result && (
-              <div className="mt-2 rounded-lg border border-border/60 p-3 text-xs space-y-2">
-                <div className="font-semibold">
-                  Word:{" "}
-                  <span className="font-mono">
-                    {left.word.trim() || "—"}
-                  </span>
-                </div>
-
-                {leftVoicePath.length > 0 && (
-                  <div className="mt-1">
-                    <div className="text-[11px] text-muted-foreground">
-                      Voice path:
-                    </div>
-                    <VoicePathChips path={leftVoicePath} />
-                  </div>
-                )}
-
-                <div className="mt-2 text-[11px] text-muted-foreground space-y-0.5">
-                  <div>Opener: {describeVoice(leftOpener)}</div>
-                  <div>Closer: {describeVoice(leftCloser)}</div>
-                </div>
-
-                {leftHeart && (
-                  <div className="mt-2 space-y-0.5">
-                    <div>
-                      Heart state:{" "}
-                      <span className="font-semibold">
-                        {leftHeartState ?? "—"}
-                      </span>
-                    </div>
-                    <div>
-                      Total mod 7:{" "}
-                      <span className="font-mono">
-                        {leftHeart.totalMod7 ?? "—"}
-                      </span>
-                    </div>
-                    <div>
-                      Principles path:{" "}
-                      <span className="font-mono">
-                        {leftPrinciplesPath
-                          ? leftPrinciplesPath.join(" → ")
-                          : "—"}
-                      </span>
-                    </div>
-                  </div>
-                )}
-
-                {leftPrinciplesPath && (
-                  <div className="mt-2 text-[11px] text-muted-foreground">
-                    Functional (principles):{" "}
-                    <span className="text-[11px]">
-                      {leftFunctionText}
-                    </span>
-                  </div>
-                )}
-
-                {leftMainCand && (
-                  <div className="mt-2 text-[11px] text-muted-foreground space-y-0.5">
-                    <div>
-                      Origin candidate:{" "}
-                      <span className="font-mono">
-                        {leftMainCand.language} · {leftMainCand.form}
-                      </span>
-                    </div>
-                    {leftMainCand.decomposition?.functionalStatement && (
-                      <div>
-                        Origin function:{" "}
-                        <span className="text-[11px]">
-                          {leftMainCand.decomposition.functionalStatement}
-                        </span>
-                      </div>
-                    )}
-                    <AxesRow axes={leftMainCand.axes} />
-                  </div>
-                )}
-              </div>
-            )}
+      <CardContent className="space-y-4">
+        {/* Pick words */}
+        <div className="grid gap-3 md:grid-cols-2">
+          <div className="space-y-1">
+            <div className="text-xs uppercase text-slate-400">Left word</div>
+            <Select
+              value={leftId}
+              onValueChange={(v) => setLeftId(v === rightId ? rightId : v)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Choose from history" />
+              </SelectTrigger>
+              <SelectContent>
+                {history.map((h) => (
+                  <SelectItem key={h.id} value={h.id}>
+                    {h.word}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
-          {/* RIGHT SIDE --------------------------------------------------- */}
-          <div className="space-y-2">
-            <label className="text-xs font-medium uppercase tracking-wide">
-              Right word
-            </label>
-            <div className="flex gap-2">
-              <Input
-                value={right.word}
-                placeholder="e.g. damage"
-                onChange={(e) =>
-                  setRight((prev) => ({
-                    ...prev,
-                    word: e.target.value,
-                    error: null,
-                  }))
-                }
-              />
-              <Button
-                type="button"
-                size="sm"
-                disabled={right.loading}
-                onClick={() => runAnalysis("right")}
-              >
-                {right.loading ? "…" : "Run"}
-              </Button>
-            </div>
-            {right.error && (
-              <p className="text-[11px] text-red-500">{right.error}</p>
-            )}
-
-            {right.result && (
-              <div className="mt-2 rounded-lg border border-border/60 p-3 text-xs space-y-2">
-                <div className="font-semibold">
-                  Word:{" "}
-                  <span className="font-mono">
-                    {right.word.trim() || "—"}
-                  </span>
-                </div>
-
-                {rightVoicePath.length > 0 && (
-                  <div className="mt-1">
-                    <div className="text-[11px] text-muted-foreground">
-                      Voice path:
-                    </div>
-                    <VoicePathChips path={rightVoicePath} />
-                  </div>
-                )}
-
-                <div className="mt-2 text-[11px] text-muted-foreground space-y-0.5">
-                  <div>Opener: {describeVoice(rightOpener)}</div>
-                  <div>Closer: {describeVoice(rightCloser)}</div>
-                </div>
-
-                {rightHeart && (
-                  <div className="mt-2 space-y-0.5">
-                    <div>
-                      Heart state:{" "}
-                      <span className="font-semibold">
-                        {rightHeartState ?? "—"}
-                      </span>
-                    </div>
-                    <div>
-                      Total mod 7:{" "}
-                      <span className="font-mono">
-                        {rightHeart.totalMod7 ?? "—"}
-                      </span>
-                    </div>
-                    <div>
-                      Principles path:{" "}
-                      <span className="font-mono">
-                        {rightPrinciplesPath
-                          ? rightPrinciplesPath.join(" → ")
-                          : "—"}
-                      </span>
-                    </div>
-                  </div>
-                )}
-
-                {rightPrinciplesPath && (
-                  <div className="mt-2 text-[11px] text-muted-foreground">
-                    Functional (principles):{" "}
-                    <span className="text-[11px]">
-                      {rightFunctionText}
-                    </span>
-                  </div>
-                )}
-
-                {rightMainCand && (
-                  <div className="mt-2 text-[11px] text-muted-foreground space-y-0.5">
-                    <div>
-                      Origin candidate:{" "}
-                      <span className="font-mono">
-                        {rightMainCand.language} · {rightMainCand.form}
-                      </span>
-                    </div>
-                    {rightMainCand.decomposition?.functionalStatement && (
-                      <div>
-                        Origin function:{" "}
-                        <span className="text-[11px]">
-                          {rightMainCand.decomposition.functionalStatement}
-                        </span>
-                      </div>
-                    )}
-                    <AxesRow axes={rightMainCand.axes} />
-                  </div>
-                )}
-              </div>
-            )}
+          <div className="space-y-1">
+            <div className="text-xs uppercase text-slate-400">Right word</div>
+            <Select
+              value={rightId}
+              onValueChange={(v) => setRightId(v === leftId ? leftId : v)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Choose from history" />
+              </SelectTrigger>
+              <SelectContent>
+                {history.map((h) => (
+                  <SelectItem key={h.id} value={h.id}>
+                    {h.word}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </div>
 
-        {/* Comparison summary --------------------------------------------- */}
-        {left.result && right.result && (
-          <Card className="mt-6">
-            <CardHeader>
-              <CardTitle>Comparison summary</CardTitle>
-            </CardHeader>
-            <CardContent className="text-sm text-muted-foreground leading-relaxed space-y-1.5">
-              {comparisonVerdict && (
-                <p className="mb-2 text-sm">
-                  <span className="font-semibold">Verdict:</span>{" "}
-                  {comparisonVerdict}
-                </p>
-              )}
-              <div>
-                Primary path:{" "}
-                <span className="font-mono">
-                  {primaryPathEqual ? "SAME" : "DIFFERENT"}
-                </span>
-              </div>
-              <div>
-                Opener:{" "}
-                <span className="font-mono">
-                  {describeVoice(leftOpener)}
-                  {" vs "}
-                  {describeVoice(rightOpener)}
-                </span>
-              </div>
-              <div>
-                Closer:{" "}
-                <span className="font-mono">
-                  {describeVoice(leftCloser)}
-                  {" vs "}
-                  {describeVoice(rightCloser)}
-                </span>
-              </div>
-              <div>
-                Total mod 7:{" "}
-                <span className="font-mono">
-                  {leftHeart?.totalMod7 ?? "—"}
-                </span>{" "}
-                vs{" "}
-                <span className="font-mono">
-                  {rightHeart?.totalMod7 ?? "—"}
-                </span>
-              </div>
-              <div>
-                Left heart:{" "}
-                <span className="font-mono">{leftHeartLabel}</span>
-              </div>
-              <div>
-                Right heart:{" "}
-                <span className="font-mono">{rightHeartLabel}</span>
-              </div>
-              <div>
-                Shared voices:{" "}
-                <span className="font-mono">
-                  {sharedVoices.length ? sharedVoices.join(", ") : "none"}
-                </span>
-              </div>
+        {!canCompare && (
+          <p className="text-xs text-slate-500">
+            Pick two different words from history to see a side-by-side
+            comparison.
+          </p>
+        )}
 
-              <div>
-                <span className="font-semibold">Left function (principles):</span>{" "}
-                <span className="font-mono">{formatFunctionLine(left.word, leftFunctionText)}</span>
-              </div>
-              <div>
-                <span className="font-semibold">Right function (principles):</span>{" "}
-                <span className="font-mono">{formatFunctionLine(right.word, rightFunctionText)}</span>
-              </div>
+        {canCompare && left && right && leftSummary && rightSummary && (
+          <>
+            {/* Side by side core summary */}
+            <div className="grid gap-4 md:grid-cols-2">
+              <MiniSummaryCard
+                label="Left"
+                entry={left}
+                summary={leftSummary}
+                align="right"
+              />
+              <MiniSummaryCard
+                label="Right"
+                entry={right}
+                summary={rightSummary}
+                align="left"
+              />
+            </div>
 
-              <div>
-                <span className="font-semibold">Origin relation:</span>{" "}
-                {originRelationNew.label}
-                {originRelationNew.detail ? ` — ${originRelationNew.detail}` : ""}
-              </div>
+            {/* Differences */}
+            <Card className="border-dashed bg-slate-950/40">
+              <CardContent className="space-y-1.5 p-4 text-xs">
+                <div className="font-semibold text-slate-200">
+                  Quick differences
+                </div>
+                <DiffLine
+                  label="Primary voice path"
+                  left={leftSummary.voicePath}
+                  right={rightSummary.voicePath}
+                  status={diffLabel("voicePath")}
+                />
+                <DiffLine
+                  label="Level path"
+                  left={leftSummary.levelPath}
+                  right={rightSummary.levelPath}
+                  status={diffLabel("levelPath")}
+                />
+                <DiffLine
+                  label="Ring path"
+                  left={leftSummary.ringPath}
+                  right={rightSummary.ringPath}
+                  status={diffLabel("ringPath")}
+                />
+                <DiffLine
+                  label="Core principles path"
+                  left={leftSummary.principlesPath}
+                  right={rightSummary.principlesPath}
+                  status={diffLabel("principlesPath")}
+                />
+                <DiffLine
+                  label="Heart principle"
+                  left={leftSummary.heartPrinciple}
+                  right={rightSummary.heartPrinciple}
+                  status={diffLabel("heartPrinciple")}
+                />
+              </CardContent>
+            </Card>
 
-              <div>
-                Origin function (left):{" "}
-                <span className="font-mono">
-                  {leftMainCand?.decomposition?.functionalStatement ?? "—"}
-                </span>
-              </div>
-              <div>
-                Origin function (right):{" "}
-                <span className="font-mono">
-                  {rightMainCand?.decomposition?.functionalStatement ?? "—"}
-                </span>
-              </div>
-
-              <div className="text-[11px] text-muted-foreground mt-1 pt-2 border-t">
-                Both sides use the same engine pipeline
-                (EnginePayload → analysisAdapter → math7). This panel shows how
-                their paths open, close, overlap, and what kind of functional
-                movement each word encodes at the Seven-Voices level, including
-                the best origin candidate and its axes when available.
-              </div>
-            </CardContent>
-          </Card>
+            {/* Small legend */}
+            <p className="text-[10px] text-slate-500">
+              This panel is read-only. It uses cached analyses from the current
+              session; re-run a word above if you want to refresh its math or
+              candidates.
+            </p>
+          </>
         )}
       </CardContent>
     </Card>
   );
+}
+
+type MiniSummaryProps = {
+  label: string;
+  entry: HistoryEntry;
+  summary: NonNullable<ReturnType<typeof primarySummary>>;
+  align: "left" | "right";
 };
 
-export default ComparePanel;
+function MiniSummaryCard({ label, entry, summary, align }: MiniSummaryProps) {
+  const meta = entry.result.core.input;
+  const primary = entry.result.core.primaryPath;
 
-    
+  return (
+    <Card className="border-slate-600/40 bg-slate-950/40">
+      <CardHeader className="pb-2">
+        <div className="flex items-center justify-between gap-2 text-xs text-slate-400">
+          <span>{label}</span>
+          <span>{new Date(entry.createdAt).toLocaleTimeString()}</span>
+        </div>
+        <CardTitle className="flex items-center gap-2 text-sm">
+          {entry.word}
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-1.5 text-xs">
+        <Line label="Primary path" value={primary.voicePath} />
+        <Line label="Levels" value={primary.levelPath} />
+        <Line label="Rings" value={primary.ringPath} />
+        <Line label="Core principle" value={summary.principlesPath} />
+        <Line
+          label="Heart principle"
+          value={`${summary.heartPrinciple} ${
+            summary.heartVoices ? `(${summary.heartVoices})` : ""
+          }`}
+        />
+        <Line label="Core state" value={summary.state ?? meta?.state ?? "—"} />
+      </CardContent>
+    </Card>
+  );
+}
+
+function Line({ label, value }: { label: string; value?: string | number | null }) {
+  return (
+    <div className="flex justify-between gap-2">
+      <span className="text-slate-500">{label}</span>
+      <span className="font-mono text-slate-200">{value ?? "—"}</span>
+    </div>
+  );
+}
+
+function DiffLine({
+  label,
+  left,
+  right,
+  status,
+}: {
+  label: string;
+  left: string | number | null | undefined;
+  right: string | number | null | undefined;
+  status: string;
+}) {
+  const same = status === "SAME";
+  return (
+    <div className="flex flex-col gap-0.5">
+      <div className="flex items-center justify-between gap-2">
+        <span className="text-slate-400">{label}</span>
+        <span
+          className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+            same ? "bg-emerald-900/60 text-emerald-200" : "bg-amber-900/60 text-amber-200"
+          }`}
+        >
+          {status}
+        </span>
+      </div>
+      <div className="grid gap-2 text-[11px] md:grid-cols-2">
+        <span className="font-mono text-slate-200">L: {left ?? '—'}</span>
+        <span className="font-mono text-slate-200">R: {right ?? '—'}</span>
+      </div>
+    </div>
+  );
+}
+
+const primarySummary = (entry?: HistoryEntry) => {
+    if (!entry) return null;
+    const { core, math7 } = entry.result;
+    const p = core.primaryPath;
+    const heart = math7?.heart;
+    const coreMath = math7?.primary;
+
+    return {
+      voicePath: p.voicePath, // already "U → I"
+      levelPath: p.levelPath, // "low → high"
+      ringPath: p.ringPath,   // "1 → 1"
+      state: coreMath?.cycleState,
+      totalMod7: coreMath?.totalMod7,
+      principlesPath:
+        coreMath?.principlesPath?.join(" → "),
+      heartPrinciple: heart?.principle ?? "—",
+      heartVoices: heart?.voices?.join(" → ") ?? "",
+    };
+  };

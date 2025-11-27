@@ -21,9 +21,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Candidates } from "@/components/Candidates";
 import { ResultsDisplay } from "@/components/ResultsDisplay";
-import { PrinciplesBlock } from "@/components/PrinciplesBlock";
 import { ConsonantReference } from "@/components/ConsonantReference";
 import { TwoRailsWithConsonants } from "@/components/TwoRailsWithConsonants";
 import { analyzeClient } from "@/lib/analyzeClient";
@@ -32,7 +30,7 @@ import { PROFILES } from "@/functions/languages";
 import { ThemeToggle } from "@/components/ThemeProvider";
 import { useDebounced } from "@/hooks/useDebounced";
 import { Loader2, Sparkles, Wand2, HelpCircle, GitBranch, BookOpen, History as HistoryIcon, ListChecks } from "lucide-react";
-import ComparePanel from "@/components/ComparePanel";
+import { ComparePanel } from "@/components/ComparePanel";
 import { normalizeEnginePayload, type Vowel, type EnginePayload, type AnalysisResult_DEPRECATED } from "@/shared/engineShape";
 import { enginePayloadToAnalysisResult, analysisResultToEnginePayload } from "@/shared/analysisAdapter";
 import HistoryPanel from "@/components/HistoryPanel";
@@ -40,14 +38,11 @@ import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import FooterBuild from "@/components/FooterBuild";
 import { allowAnalyze } from "@/lib/throttle";
-import WhyThisPath from "@/components/WhyThisPath";
 import { ExportJsonButton } from "@/components/ExportJsonButton";
 import { logError } from "@/lib/logError";
 import { VOICE_COLOR_MAP, VOICE_LABEL_MAP } from "@/shared/voiceColors";
-import { SymbolicReadingCard } from "@/components/SymbolicReadingCard";
 import HeartCalculator from "@/components/HeartCalculator";
-import type { SevenCalcResult } from "@/shared/sevenPrinciplesCalc";
-
+import type { HistoryEntry } from "@/shared/history";
 
 const VOICE_META: { id: Vowel; label: string; role: string }[] = [
   { id: "A", label: "Action / Truth", role: "Launches, cuts through, sets the first line." },
@@ -87,6 +82,7 @@ export default function LinguisticDecoderApp() {
 
   // 🔹 New: keep a short “recent hearts” history
   const [heartHistory, setHeartHistory] = useState<HeartSnapshot[]>([]);
+  const [history, setHistory] = useState<HistoryEntry[]>([]);
 
   // Debounce user input, then warm the cache in the background
   const debouncedWord = useDebounced(word, 450); // currently unused, fine
@@ -97,6 +93,21 @@ export default function LinguisticDecoderApp() {
     if (!data) return null;
     return enginePayloadToAnalysisResult(data);
   }, [data]);
+  
+  useEffect(() => {
+    if (analysisResult) {
+      const newEntry: HistoryEntry = {
+        id: `${analysisResult.core.word}-${new Date().getTime()}`,
+        word: analysisResult.core.word,
+        result: analysisResult,
+        createdAt: new Date().toISOString(),
+      };
+      setHistory(prev => {
+        const filtered = prev.filter(h => h.word.toLowerCase() !== newEntry.word.toLowerCase());
+        return [newEntry, ...filtered].slice(0, 10);
+      });
+    }
+  }, [analysisResult]);
 
   // Optional fields from EnginePayload (solveMs, cacheHit, recomputed, etc.)
   const solveMs = (data as any)?.solveMs as number | undefined;
@@ -260,6 +271,14 @@ export default function LinguisticDecoderApp() {
     data != null ? `${data.word}-${data.mode}-${data.alphabet}` : `analysis-${mode}-${alphabet}`;
     
   const calculatorExprA = (analysisResult?.core.primaryPath.voicePath ?? "").replace(/[^AEIOUYË1-7]/gi, "");
+  
+  const coreHeart = analysisResult?.math7?.heart;
+  const coreId =
+    coreHeart
+      ? `${coreHeart.principle} (${coreHeart.decimal} / ${coreHeart.base7.join(
+          " "
+        )} / ${coreHeart.voices.join(" → ")})`
+      : "—";
 
   return (
     <div className="min-h-screen bg-background text-foreground p-4 lg:p-8 flex flex-col items-stretch transition-colors duration-300">
@@ -588,7 +607,7 @@ export default function LinguisticDecoderApp() {
                   </ul>
                 </CardContent>
               </Card>
-              {data && (
+              {analysisResult && data && (
                 <Card className="animate-fade-in">
                   <CardHeader>
                     <CardTitle>Metadata</CardTitle>
@@ -603,6 +622,7 @@ export default function LinguisticDecoderApp() {
                     <p>
                       <strong>Alphabet:</strong> {data.alphabet}
                     </p>
+                    <p><strong>Core ID:</strong> {coreId}</p>
                     {solveMs !== undefined && (
                       <p>
                         <strong>Solve Time:</strong> {solveMs} ms
@@ -699,12 +719,7 @@ export default function LinguisticDecoderApp() {
               </div>
             </AccordionTrigger>
             <AccordionContent>
-              <Card className="p-4">
-                <p className="text-xs text-muted-foreground mb-3">
-                  Analyze two words side by side and compare their Seven-Voices paths.
-                </p>
-                <ComparePanel defaultMode={mode} defaultAlphabet={alphabet} />
-              </Card>
+              <ComparePanel history={history} />
             </AccordionContent>
           </AccordionItem>
 
@@ -734,13 +749,7 @@ export default function LinguisticDecoderApp() {
               </div>
             </AccordionTrigger>
             <AccordionContent>
-              <HeartCalculator
-                key={analysisResult?.core?.word ?? "no-word"}
-                initialExprA={calculatorExprA || "AO"}
-                initialExprB="A"
-                initialOp="add"
-                autoRun={true}
-              />
+              <HeartCalculator />
             </AccordionContent>
           </AccordionItem>
 
@@ -843,3 +852,4 @@ export default function LinguisticDecoderApp() {
     </div>
   );
 }
+
