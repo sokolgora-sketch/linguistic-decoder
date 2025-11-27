@@ -104,7 +104,7 @@ export default function LinguisticDecoderApp() {
       };
       setHistory(prev => {
         const filtered = prev.filter(h => h.word.toLowerCase() !== newEntry.word.toLowerCase());
-        return [newEntry, ...filtered].slice(0, 10);
+        return [newEntry, ...filtered].slice(0, 20);
       });
     }
   }, [analysisResult]);
@@ -374,7 +374,7 @@ export default function LinguisticDecoderApp() {
             </div>
 
             <form
-              onSubmit={handleSubmit}
+              onSubmit={(e) => { e.preventDefault(); if (canAnalyze) analyze(); }}
               className="flex flex-col sm:flex-row gap-2"
             >
               <Input
@@ -668,7 +668,7 @@ export default function LinguisticDecoderApp() {
           )}
 
           {/* Compare Two Words */}
-          <AccordionItem value="item-2">
+          <AccordionItem value="compare">
             <AccordionTrigger className="text-sm font-semibold">
               <div className="flex items-center gap-2">
                 <GitBranch className="w-4 h-4 text-muted-foreground" />
@@ -712,7 +712,7 @@ export default function LinguisticDecoderApp() {
 
 
           {/* History */}
-          <AccordionItem value="item-4">
+          <AccordionItem value="history">
             <AccordionTrigger className="text-sm font-semibold">
               <div className="flex items-center gap-2">
                 <HistoryIcon className="w-4 h-4 text-muted-foreground" />
@@ -804,4 +804,3 @@ export default function LinguisticDecoderApp() {
     </div>
   );
 }
-
