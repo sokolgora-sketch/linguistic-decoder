@@ -12,6 +12,7 @@ import { PrinciplesBlock } from "./PrinciplesBlock";
 import { SymbolicReadingCard } from "./SymbolicReadingCard";
 import { Button } from "@/components/ui/button";
 import { downloadJson } from "@/lib/downloadJson";
+import { toWordProtocol } from "@/shared/wordProtocol";
 
 
 const LEVEL_LABEL: Record<number, string> = { 1: "High", 0: "Mid", [-1]: "Low" } as any;
@@ -92,7 +93,7 @@ export function PathRow({ title, block, analysis }: { title: string; block: any,
 
         <div className="mt-2.5 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2.5">
             <InfoLine label="Voice Path" value={block.voicePath.join(" → ")} />
-            <InfoLine label="Level Path" value={block.levelPath.map(l=>LEVEL_LABEL[l]).join(" → ")} />
+            <InfoLine label="Level Path" value={block.levelPath.map((l: number)=>LEVEL_LABEL[l]).join(" → ")} />
             <InfoLine label="Ring Path" value={block.ringPath.join(" → ")} />
         </div>
         
@@ -163,7 +164,7 @@ const Chip = ({ v }: { v: string | number }) => {
 };
 
 
-export function ResultsDisplay({ analysis }: { analysis: AnalysisResult_DEPRECATED | null }) {
+export function ResultsDisplay({ analysis, calcOverlay }: { analysis: AnalysisResult_DEPRECATED | null; calcOverlay?: SevenCalcResult | null; }) {
   if (!analysis) return null;
   const { core, candidates, symbolic, debug, wordMatrix, deepRoot, math7 } = analysis;
   const raw = debug?.rawEnginePayload;
@@ -191,7 +192,7 @@ export function ResultsDisplay({ analysis }: { analysis: AnalysisResult_DEPRECAT
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {raw && <WhyThisPath primary={raw.primaryPath} />}
-            <PrinciplesBlock analysis={analysis} />
+            <PrinciplesBlock analysis={analysis} calcOverlay={calcOverlay} />
         </div>
         
         <Candidates candidates={candidates} math7={math7} />
@@ -307,37 +308,71 @@ export function ResultsDisplay({ analysis }: { analysis: AnalysisResult_DEPRECAT
 
         {raw && raw.frontierPaths && raw.frontierPaths.length > 0 && (
           <Card className="p-4 mt-4">
-            <h3 className="font-bold text-sm tracking-wide">Frontier (near‑optimal alternates)</h3>
+            <h3 className="font-bold text-sm tracking-wide">
+              Frontier (near-optimal alternates)
+            </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mt-3">
-              {raw.frontierPaths.map((f, idx)=> {
+              {raw.frontierPaths.map((f, idx) => {
                 const altVoice = f.voicePath[0];
                 const altBadgeStyle = altVoice
                   ? { backgroundColor: VOICE_COLOR_MAP[altVoice], color: "#020617" }
                   : {};
+
+                // Math-7 summary for this alternate (if present)
+                const frontierMath = analysis.math7?.frontier?.[idx];
+
                 return (
-                <Card key={idx} className="p-3 border-accent">
-                  <div className="font-bold mb-2 flex items-center gap-2">
-                    <div
+                  <Card key={idx} className="p-3 border-accent">
+                    <div className="font-bold mb-2 flex items-center gap-2">
+                      <div
                         className="w-8 h-8 rounded-full border flex items-center justify-center text-sm font-bold shrink-0"
                         style={altBadgeStyle}
-                    >
+                      >
                         {altVoice ?? "?"}
+                      </div>
+                      {`alt-${idx}`}
                     </div>
-                    {`alt-${idx}`}
-                  </div>
-                  <div className="flex flex-wrap gap-1.5 items-center">
-                    {f.voicePath.map((v,i)=> (
-                      <React.Fragment key={i}>
-                        <Chip v={v} />
-                        {i < f.voicePath.length-1 && <Arrow/>}
-                      </React.Fragment>
-                    ))}
-                  </div>
-                  <hr className="my-2 border-border" />
-                  <div className="text-xs mt-1.5 text-slate-500">Levels: {f.levelPath.map(l=>LEVEL_LABEL[l]).join(" → ")}</div>
-                  <div className="text-xs text-slate-500">Rings: {f.ringPath.join(" → ")}</div>
-                </Card>
-              )})}
+
+                    <div className="flex flex-wrap gap-1.5 items-center">
+                      {f.voicePath.map((v, i) => (
+                        <React.Fragment key={i}>
+                          <Chip v={v} />
+                          {i < f.voicePath.length - 1 && <Arrow />}
+                        </React.Fragment>
+                      ))}
+                    </div>
+
+                    <hr className="my-2 border-border" />
+
+                    <div className="text-xs mt-1.5 text-slate-500">
+                      Levels: {f.levelPath.map((l: number) => LEVEL_LABEL[l]).join(" → ")}
+                    </div>
+                    <div className="text-xs text-slate-500">
+                      Rings: {f.ringPath.join(" → ")}
+                    </div>
+
+                    {frontierMath && (
+                      <div className="mt-2 pt-2 border-t border-border/40 text-[11px] text-slate-400 space-y-0.5">
+                        <div className="uppercase tracking-wide opacity-70">
+                          Core (Seven-Voices Math)
+                        </div>
+                        <div>
+                          State: <span className="font-semibold">{frontierMath.cycleState}</span>
+                          {" · "}
+                          Total (mod 7):{" "}
+                          <span className="font-semibold">{frontierMath.totalMod7}</span>
+                        </div>
+                        <div>
+                          Principles:{" "}
+                          <span className="font-semibold">
+                            {frontierMath.principlesPath.join(" → ")}
+                          </span>
+                        </div>
+                      </div>
+                    )}
+                  </Card>
+                );
+              })}
             </div>
           </Card>
         )}
