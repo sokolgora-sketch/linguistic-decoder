@@ -1,35 +1,42 @@
 
 // src/engine/math7.ts
 //
-// Seven-Voices “Heart Math” over an AnalyzeWordResult.
-// Pure reader: it does NOT change the core solver, it just reads paths.
+// Seven-Voices “Core Math” over an AnalyzeWordResult.
+// This is a pure reader: it does NOT change the core solver,
+// it just reads the paths and runs them through the shared
+// Seven-Principles calculator engine.
 
 import type { AnalyzeWordResult, Math7PathSummary, Vowel } from "@/shared/engineShape";
-import {
-  voiceToNumber,
-  decimalToBase7,
-  base7DigitsToVoices,
-  reduceToPrinciple,
-  computeCycleState,
-} from "@/shared/heartMath";
-
+import { VOICE_TO_DIGIT, calculate, computeCycleState } from "@/shared/heartMath";
 
 export type Math7CycleState = "open" | "balanced" | "overloaded";
 
-export interface HeartAutoCalc {
-  expression: string;     // path as voices, e.g. "A → E"
-  decimal: number;        // sum in decimal
-  base7: number[];        // base-7 digits
-  voices: Vowel[];        // base-7 digits mapped back to voices
-  principle: Vowel;       // final reduced principle
+export interface Math7HeartResult {
+  expression: string;   // e.g. "A → E"
+  decimal: number;      // e.g. 3
+  base7: number[];      // e.g. [3]
+  voices: Vowel[];      // e.g. ["I"]
+  principle: Vowel;     // e.g. "I"
 }
 
 export interface Math7Summary {
   primary: Math7PathSummary;
   frontier: Math7PathSummary[];
   candidates: Record<string, Math7PathSummary>;
-  heart?: HeartAutoCalc;  // auto calculator result for the primary path
+  // Core 7-Principles read, driven by the same engine as the calculator
+  heart?: Math7HeartResult;
 }
+
+// Vowel → index 0–6 for the path-state math (state, mod7 etc.)
+const VOICE_INDEX: Record<string, number> = {
+  A: 0,
+  E: 1,
+  I: 2,
+  O: 3,
+  U: 4,
+  Y: 5,
+  Ë: 6,
+};
 
 // Vowel → principle label
 const PRINCIPLE_BY_VOICE: Record<string, string> = {
@@ -50,14 +57,17 @@ function parseVoicePath(path: string | undefined): Vowel[] {
     .filter(Boolean) as Vowel[];
 }
 
+/**
+ * Old path-based scoring (state, total, principles path).
+ * We keep this so existing UI + tests stay happy.
+ */
 function scoreVoices(voices: Vowel[]): Math7PathSummary {
-  // use the same 1–7 mapping as the calculator
   const total = voices.reduce(
-    (sum, v) => sum + (voiceToNumber[v as keyof typeof voiceToNumber] ?? 0),
+    (sum, v) => sum + (VOICE_INDEX[v] ?? 0),
     0
   );
-  const totalMod7 = total % 7 === 0 ? 7 : total % 7;
-
+  const totalMod7 = ((total % 7) + 7) % 7;
+  
   const cycleState = computeCycleState(total);
 
   const principlesPath = voices.map(
@@ -73,24 +83,35 @@ function scoreVoices(voices: Vowel[]): Math7PathSummary {
   };
 }
 
-function computeHeartFromPrimary(voices: Vowel[]): HeartAutoCalc | undefined {
+/**
+ * NEW: Core 7-Principles result using the *same* engine as the
+ * Seven-Principles Calculator.
+ *
+ * Rule (for now, nice and strict):
+ *   - Take the primary voice path for the word.
+ *   - Use FIRST and LAST vowels only.
+ *   - Map them to 1–7 via VOICE_TO_DIGIT.
+ *   - Run `calculate(a, b, "add")` from heartMath.
+ */
+function computeHeartForVoices(voices: Vowel[]): Math7HeartResult | undefined {
   if (!voices.length) return undefined;
 
-  // Sum of the path in 1–7 space
-  const decimal = voices
-    .map(v => voiceToNumber[v as keyof typeof voiceToNumber] ?? 0)
-    .reduce((sum, n) => sum + n, 0);
+  const first = voices[0];
+  const last = voices[voices.length - 1];
 
-  const base7 = decimalToBase7(decimal);
-  const baseVoices = base7DigitsToVoices(base7) as Vowel[];
-  const principle = reduceToPrinciple(decimal) as Vowel;
+  const a = VOICE_TO_DIGIT[first];
+  const b = VOICE_TO_DIGIT[last];
+
+  if (!a || !b) return undefined;
+
+  const calc = calculate(a, b, "add");
 
   return {
-    expression: voices.join(" → "), // how it will show in "Heart Auto-Calculation"
-    decimal,
-    base7,
-    voices: baseVoices,
-    principle,
+    expression: `${first} → ${last}`,
+    decimal: calc.decimal,
+    base7: calc.base7,
+    voices: calc.voices as Vowel[],
+    principle: calc.principle as Vowel,
   };
 }
 
@@ -109,12 +130,12 @@ export function computeMath7ForResult(result: AnalyzeWordResult): Math7Summary {
     candidates[c.language] = scoreVoices(voices);
   });
 
-  const heart = computeHeartFromPrimary(primaryVoices);
+  const heart = computeHeartForVoices(primaryVoices);
 
   return {
     primary,
     frontier,
     candidates,
-    heart
+    heart,
   };
 }

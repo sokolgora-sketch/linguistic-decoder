@@ -130,10 +130,10 @@ export function evaluateVoiceEquation(aExpr: string, bExpr: string, op: Operatio
 export function computeCycleState(total: number): CycleState {
   const totalMod7 = total % 7 === 0 ? 7 : total % 7;
 
-  if (totalMod7 === 7 || totalMod7 === 3) {
-    return "balanced";
-  } else if (totalMod7 === 1 || totalMod7 === 2) {
+  if (totalMod7 === 1 || totalMod7 === 2) {
     return "open";
+  } else if (totalMod7 === 3 || totalMod7 === 4) {
+    return "balanced";
   } else {
     return "overloaded";
   }
