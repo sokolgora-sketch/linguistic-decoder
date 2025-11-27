@@ -18,6 +18,7 @@ import {
 } from "../shared/heartMath";
 
 type OperationSymbol = "+" | "-" | "*" | "/";
+type Operation = "add" | "subtract" | "multiply" | "divide";
 
 interface CalculatorResult {
   decimal: number;
@@ -152,7 +153,18 @@ export const SevenPrinciplesCalculator: React.FC = () => {
     }
 
     try {
-      const raw = evaluateVoiceEquation(leftVoices, rightVoices, op) as any;
+      const opMap: Record<OperationSymbol, Operation> = {
+        "+": "add",
+        "-": "subtract",
+        "*": "multiply",
+        "/": "divide",
+      };
+      
+      const raw = evaluateVoiceEquation(
+        leftVoices.join(""),
+        rightVoices.join(""),
+        opMap[op]
+      ) as any;
 
       const decimal: number = raw.decimal ?? 0;
       const base7Array: number[] = Array.isArray(raw.base7)
