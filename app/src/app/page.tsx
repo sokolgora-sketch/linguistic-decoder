@@ -41,8 +41,9 @@ import { allowAnalyze } from "@/lib/throttle";
 import { ExportJsonButton } from "@/components/ExportJsonButton";
 import { logError } from "@/lib/logError";
 import { VOICE_COLOR_MAP, VOICE_LABEL_MAP } from "@/shared/voiceColors";
-import { SevenPrinciplesCalculator } from "@/components/SevenPrinciplesCalculator";
+import { HeartCalculator } from "@/components/HeartCalculator";
 import type { HistoryEntry } from "@/shared/history";
+import ZeroPanel from "@/components/ZeroPanel";
 
 const VOICE_META: { id: Vowel; label: string; role: string }[] = [
   { id: "A", label: "Action / Truth", role: "Launches, cuts through, sets the first line." },
@@ -706,7 +707,7 @@ export default function LinguisticDecoderApp() {
               </div>
             </AccordionTrigger>
             <AccordionContent>
-              <SevenPrinciplesCalculator />
+              <HeartCalculator />
             </AccordionContent>
           </AccordionItem>
 
@@ -721,6 +722,18 @@ export default function LinguisticDecoderApp() {
             </AccordionTrigger>
             <AccordionContent>
               <HistoryPanel history={history} onSelect={handleSelectHistory} />
+            </AccordionContent>
+          </AccordionItem>
+
+          <AccordionItem value="item-zero-engine">
+            <AccordionTrigger className="text-sm font-semibold">
+              <div className="flex items-center gap-2">
+                <span className="text-lg">🧐</span>
+                <span>ZË-RO Engine (Experimental)</span>
+              </div>
+            </AccordionTrigger>
+            <AccordionContent>
+              <ZeroPanel />
             </AccordionContent>
           </AccordionItem>
 
@@ -804,3 +817,5 @@ export default function LinguisticDecoderApp() {
     </div>
   );
 }
+
+    
