@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState } from "react";
@@ -19,13 +18,12 @@ import {
   SelectValue,
 } from "./ui/select";
 
-import type { Voice, Operation } from "../shared/heartMath";
+import type { Voice, Operation, CycleState } from "../shared/heartMath";
 import {
   evaluateVoiceEquation,
   numberToVoice,
   computeCycleState,
 } from "../shared/heartMath";
-import type { CycleState } from "@/shared/engineShape";
 
 
 interface CalculatorResult {
