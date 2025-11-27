@@ -1,6 +1,6 @@
 
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "./ui/card";
 import { Input } from "./ui/input";
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "./ui/select";
@@ -13,17 +13,37 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 type InputMode = 'voices' | 'numbers';
 
 type Props = {
-  onResult?: (result: SevenCalcResult) => void;
+  initialExprA?: string;
+  initialExprB?: string;
+  initialOp?: SevenOp;
+  autoRun?: boolean;
 };
 
-export default function HeartCalculator({ onResult }: Props) {
-  const [exprA, setExprA] = useState("AO");
-  const [exprB, setExprB] = useState("ËA");
-  const [op, setOp] = useState<SevenOp>("add");
+export default function HeartCalculator({ 
+  initialExprA,
+  initialExprB,
+  initialOp = "add",
+  autoRun = false
+}: Props) {
+  const [exprA, setExprA] = useState(initialExprA ?? "AO");
+  const [exprB, setExprB] = useState(initialExprB ?? "ËA");
+  const [op, setOp] = useState<SevenOp>(initialOp);
   const [result, setResult] = useState<SevenCalcResult | null>(null);
   const [mode, setMode] = useState<InputMode>('voices');
 
-  const handleCalculate = () => {
+  useEffect(() => {
+    if (initialExprA !== undefined) setExprA(initialExprA);
+  }, [initialExprA]);
+  
+  useEffect(() => {
+    if (initialExprB !== undefined) setExprB(initialExprB);
+  }, [initialExprB]);
+
+  useEffect(() => {
+    setOp(initialOp);
+  }, [initialOp]);
+
+  const handleCalculate = useCallback(() => {
     try {
       const res = evaluateVoiceEquation(exprA, exprB, op);
       const calcResult: SevenCalcResult = {
@@ -36,12 +56,17 @@ export default function HeartCalculator({ onResult }: Props) {
         principle: res.principle,
       };
       setResult(calcResult);
-      onResult?.(calcResult);
     } catch (e) {
       console.error("Error evaluating:", e);
       setResult(null);
     }
-  };
+  }, [exprA, exprB, op]);
+
+  useEffect(() => {
+    if (autoRun) {
+      handleCalculate();
+    }
+  }, [autoRun, handleCalculate]);
 
   const voicesDisplay = result ? result.voices.join(' → ') : '';
   const digitsDisplay = result ? result.voices.map(v => VOICE_TO_DIGIT[v]).join(' → ') : '';
