@@ -30,16 +30,6 @@ interface CalculatorResult {
 
 const VOICES: Voice[] = ["A", "E", "I", "O", "U", "Y", "Ë"];
 
-const DIGIT_TO_VOICE_MAP: Record<string, Voice> = {
-  "1": "A",
-  "2": "E",
-  "3": "I",
-  "4": "O",
-  "5": "U",
-  "6": "Y",
-  "7": "Ë",
-};
-
 // ---------- Parsing helpers ----------
 
 function parseVoicesFromString(input: string): Voice[] {
@@ -59,9 +49,24 @@ function parseVoicesFromString(input: string): Voice[] {
   return voices;
 }
 
+// Fixed, user-facing mapping: 1–7 → A–Ë
+const NUMBER_TO_VOICE: Record<string, Voice> = {
+  "1": "A",
+  "2": "E",
+  "3": "I",
+  "4": "O",
+  "5": "U",
+  "6": "Y",
+  "7": "Ë",
+};
+
 function parseVoicesFromNumbers(input: string): Voice[] {
+  // Grab only digits 1–7, ignore anything else.
   const matches = input.match(/[1-7]/g) ?? [];
-  return matches.map((digit) => DIGIT_TO_VOICE_MAP[digit]);
+
+  return matches
+    .map((digit) => NUMBER_TO_VOICE[digit])
+    .filter((v): v is Voice => Boolean(v));
 }
 
 // ---------- UI-only explanation text ----------
