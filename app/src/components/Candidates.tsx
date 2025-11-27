@@ -132,6 +132,8 @@ export function Candidates({ candidates, math7 }: CandidatesProps) {
               <MorphologyMatrixBlock matrix={c.morphologyMatrix} />
             )}
             
+            {renderCoreMini(c.language, math7)}
+
             {c.consonantSignals && c.consonantSignals.length > 0 && (
               <div className="mt-2 text-xs text-slate-400">
                   {c.consonantSignals[0]}

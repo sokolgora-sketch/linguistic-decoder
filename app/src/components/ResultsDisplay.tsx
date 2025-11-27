@@ -165,7 +165,7 @@ const Chip = ({ v }: { v: string | number }) => {
 
 export function ResultsDisplay({ analysis }: { analysis: AnalysisResult_DEPRECATED | null }) {
   if (!analysis) return null;
-  const { core, candidates, symbolic, debug, wordMatrix, deepRoot } = analysis;
+  const { core, candidates, symbolic, debug, wordMatrix, deepRoot, math7 } = analysis;
   const raw = debug?.rawEnginePayload;
 
   // The primaryPath in the new AnalyzeWordResult is a string, not an array.
@@ -194,7 +194,7 @@ export function ResultsDisplay({ analysis }: { analysis: AnalysisResult_DEPRECAT
             <PrinciplesBlock analysis={analysis} />
         </div>
         
-        <Candidates candidates={candidates} />
+        <Candidates candidates={candidates} math7={math7} />
         
         {symbolic && <SymbolicReadingCard symbolic={symbolic} />}
 
