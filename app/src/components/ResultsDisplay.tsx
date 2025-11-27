@@ -189,17 +189,6 @@ export function ResultsDisplay({ analysis }: { analysis: AnalysisResult_DEPRECAT
             />
         )}
         
-        {calcOverlay && (
-          <div className="mt-4 border border-emerald-600/40 rounded-xl p-4 bg-emerald-900/20 animate-fade-in">
-            <h3 className="text-emerald-400 font-medium mb-2">Calculator Overlay</h3>
-            <p><strong>Expression:</strong> {calcOverlay.leftExpr} {calcOverlay.op} {calcOverlay.rightExpr}</p>
-            <p><strong>Decimal:</strong> {calcOverlay.decimal}</p>
-            <p><strong>Base-7:</strong> {calcOverlay.base7.join(" ")}</p>
-            <p><strong>Voices:</strong> {calcOverlay.voices.join(" → ")}</p>
-            <p><strong>Principle:</strong> <span className="text-emerald-300 text-lg">{calcOverlay.principle}</span></p>
-          </div>
-        )}
-
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {raw && <WhyThisPath primary={raw.primaryPath} />}
             <PrinciplesBlock analysis={analysis} />
