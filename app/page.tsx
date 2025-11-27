@@ -84,7 +84,6 @@ export default function LinguisticDecoderApp() {
   const [isWarming, setIsWarming] = useState(false);
   const [showDebug, setShowDebug] = useState(false);
   const [useAi, setUseAi] = useState(false);
-  const [calcOverlay, setCalcOverlay] = useState<SevenCalcResult | null>(null);
 
   // 🔹 New: keep a short “recent hearts” history
   const [heartHistory, setHeartHistory] = useState<HeartSnapshot[]>([]);
@@ -128,8 +127,6 @@ export default function LinguisticDecoderApp() {
   }, [analysisResult, data?.word]);
 
   async function analyze(nextWord?: string, nextMode?: "strict" | "open", nextAlphabet?: Alphabet) {
-    // 🔑 clear the last calculator result when we analyse a new word
-    setCalcOverlay(null);
     if (!allowAnalyze()) {
       toast({ variant: "destructive", title: "Too many requests", description: "Please try again in a few moments." });
       return;
@@ -263,6 +260,14 @@ export default function LinguisticDecoderApp() {
     data != null ? `${data.word}-${data.mode}-${data.alphabet}` : `analysis-${mode}-${alphabet}`;
     
   const calculatorExprA = (analysisResult?.core.primaryPath.voicePath ?? "").replace(/[^AEIOUYË1-7]/gi, "");
+  
+  const coreHeart = analysisResult?.math7?.heart;
+  const coreId =
+    coreHeart
+      ? `${coreHeart.principle} (${coreHeart.decimal} / ${coreHeart.base7.join(
+          " "
+        )} / ${coreHeart.voices.join(" → ")})`
+      : "—";
 
   return (
     <div className="min-h-screen bg-background text-foreground p-4 lg:p-8 flex flex-col items-stretch transition-colors duration-300">
@@ -591,7 +596,7 @@ export default function LinguisticDecoderApp() {
                   </ul>
                 </CardContent>
               </Card>
-              {data && (
+              {analysisResult && data && (
                 <Card className="animate-fade-in">
                   <CardHeader>
                     <CardTitle>Metadata</CardTitle>
@@ -606,6 +611,7 @@ export default function LinguisticDecoderApp() {
                     <p>
                       <strong>Alphabet:</strong> {data.alphabet}
                     </p>
+                    <p><strong>Core ID:</strong> {coreId}</p>
                     {solveMs !== undefined && (
                       <p>
                         <strong>Solve Time:</strong> {solveMs} ms
@@ -635,7 +641,7 @@ export default function LinguisticDecoderApp() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <ResultsDisplay analysis={analysisResult} calcOverlay={calcOverlay} />
+                <ResultsDisplay analysis={analysisResult} />
                 <div className="flex justify-end pt-2">
                   <ExportJsonButton analysis={data} />
                 </div>
@@ -739,7 +745,6 @@ export default function LinguisticDecoderApp() {
             <AccordionContent>
               <HeartCalculator
                 key={analysisResult?.core?.word ?? "no-word"}
-                onResult={setCalcOverlay}
                 initialExprA={calculatorExprA || "AO"}
                 initialExprB="A"
                 initialOp="add"
