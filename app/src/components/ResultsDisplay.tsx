@@ -3,7 +3,7 @@ import React from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "./ui/card";
 import type { CClass } from "../functions/languages";
 import { classRange } from "../functions/languages";
-import type { EnginePayload, AnalysisResult_DEPRECATED, Vowel, SevenCalcResult } from "../shared/engineShape";
+import type { EnginePayload, AnalysisResult_DEPRECATED, Vowel } from "../shared/engineShape";
 import { getVoiceMeta } from '@/shared/sevenVoices';
 import WhyThisPath from "./WhyThisPath";
 import { VOICE_COLOR_MAP } from "@/shared/voiceColors";
@@ -163,7 +163,7 @@ const Chip = ({ v }: { v: string | number }) => {
 };
 
 
-export function ResultsDisplay({ analysis, calcOverlay }: { analysis: AnalysisResult_DEPRECATED | null; calcOverlay: SevenCalcResult | null; }) {
+export function ResultsDisplay({ analysis }: { analysis: AnalysisResult_DEPRECATED | null; }) {
   if (!analysis) return null;
   const { core, candidates, symbolic, debug, wordMatrix, deepRoot } = analysis;
   const raw = debug?.rawEnginePayload;
@@ -202,7 +202,7 @@ export function ResultsDisplay({ analysis, calcOverlay }: { analysis: AnalysisRe
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {raw && <WhyThisPath primary={raw.primaryPath} />}
-            <PrinciplesBlock analysis={analysis} calcOverlay={calcOverlay} />
+            <PrinciplesBlock analysis={analysis} />
         </div>
         
         <Candidates candidates={candidates} />
