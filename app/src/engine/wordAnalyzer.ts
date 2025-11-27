@@ -1,3 +1,4 @@
+
 // src/engine/wordAnalyzer.ts
 // Takes CandidateForm[] and applies functional + 7-vowel logic.
 
@@ -28,6 +29,21 @@ export interface CandidateAnalysis {
 export interface WordAnalysisResult {
   word: WordInput;
   candidates: CandidateAnalysis[];
+}
+
+export function analyzeWord(cleaned: WordInput): WordAnalysisResult {
+  const candidateForms = generateCandidates(cleaned);
+  const analyses: CandidateAnalysis[] = [];
+
+  for (const c of candidateForms) {
+    const a = analyzeCandidate(cleaned, c);
+    if (a) analyses.push(a);
+  }
+
+  return {
+    word: cleaned,
+    candidates: analyses,
+  };
 }
 
 function analyzeCandidate(
@@ -187,20 +203,5 @@ function buildDamageFrAnalysis(c: CandidateForm): CandidateAnalysis {
     ],
     dominantVowel,
     traitsSummary,
-  };
-}
-
-export function analyzeWord(cleaned: WordInput): WordAnalysisResult {
-  const candidateForms = generateCandidates(cleaned);
-  const analyses: CandidateAnalysis[] = [];
-
-  for (const c of candidateForms) {
-    const a = analyzeCandidate(cleaned, c);
-    if (a) analyses.push(a);
-  }
-
-  return {
-    word: cleaned,
-    candidates: analyses,
   };
 }
