@@ -11,13 +11,11 @@ import {
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 
-import type { Voice, Operation, CycleState } from "../shared/heartMath";
+import type { Voice, CycleState } from "../shared/heartMath";
 import {
   evaluateVoiceEquation,
   computeCycleStateFromTotal,
 } from "../shared/heartMath";
-
-type Mode = "voices" | "numbers";
 
 interface CalculatorResult {
   decimal: number;
@@ -25,15 +23,23 @@ interface CalculatorResult {
   voices: Voice[];
   principle: string;
   cycleState: CycleState;
-  description: string;
 }
 
 const VOICES: Voice[] = ["A", "E", "I", "O", "U", "Y", "Ë"];
 
-// ---------- Parsing helpers ----------
+const NUMBER_TO_VOICE: Record<string, Voice> = {
+  "1": "A",
+  "2": "E",
+  "3": "I",
+  "4": "O",
+  "5": "U",
+  "6": "Y",
+  "7": "Ë",
+};
+
+// -------- parsers --------
 
 function parseVoicesFromString(input: string): Voice[] {
-  // Keeps only A, E, I, O, U, Y, Ë
   const cleaned = input
     .toUpperCase()
     .replace(/[^AEIOUYË]/g, "")
@@ -49,27 +55,28 @@ function parseVoicesFromString(input: string): Voice[] {
   return voices;
 }
 
-// Fixed, user-facing mapping: 1–7 → A–Ë
-const NUMBER_TO_VOICE: Record<string, Voice> = {
-  "1": "A",
-  "2": "E",
-  "3": "I",
-  "4": "O",
-  "5": "U",
-  "6": "Y",
-  "7": "Ë",
-};
-
 function parseVoicesFromNumbers(input: string): Voice[] {
-  // Grab only digits 1–7, ignore anything else.
   const matches = input.match(/[1-7]/g) ?? [];
-
   return matches
-    .map((digit) => NUMBER_TO_VOICE[digit])
+    .map((d) => NUMBER_TO_VOICE[d])
     .filter((v): v is Voice => Boolean(v));
 }
 
-// ---------- UI-only explanation text ----------
+function hasVowel(input: string) {
+  return /[AEIOUYË]/i.test(input);
+}
+
+function hasDigit(input: string) {
+  return /[1-7]/.test(input);
+}
+
+function parseSmart(input: string): Voice[] {
+  if (hasVowel(input)) return parseVoicesFromString(input);
+  if (hasDigit(input)) return parseVoicesFromNumbers(input);
+  return [];
+}
+
+// -------- description text (UI only) --------
 
 function describePrinciple(principle: string, cycleState: CycleState): string {
   const core = principle.toLowerCase();
@@ -119,44 +126,33 @@ function describePrinciple(principle: string, cycleState: CycleState): string {
   return `This path leans toward ${principle} in a ${cycleState} cycle.`;
 }
 
-// ---------- Component ----------
+// -------- component --------
 
 export const SevenPrinciplesCalculator: React.FC = () => {
-  const [mode, setMode] = useState<Mode>("voices");
   const [leftInput, setLeftInput] = useState("AE");
   const [rightInput, setRightInput] = useState("A");
-  const [op, setOp] = useState<Operation>("add");
+  const [op, setOp] = useState<string>("+");
   const [result, setResult] = useState<CalculatorResult | null>(null);
+  const [description, setDescription] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const handleCalculate = () => {
     setError(null);
 
-    const leftVoices =
-      mode === "voices"
-        ? parseVoicesFromString(leftInput)
-        : parseVoicesFromNumbers(leftInput);
+    const leftVoices = parseSmart(leftInput);
+    const rightVoices = parseSmart(rightInput);
 
-    const rightVoices =
-      mode === "voices"
-        ? parseVoicesFromString(rightInput)
-        : parseVoicesFromNumbers(rightInput);
-
-    if (leftVoices.length === 0 || rightVoices.length === 0) {
+    if (!leftVoices.length || !rightVoices.length) {
       setResult(null);
-      setError("Please provide at least one valid voice/number on each side.");
+      setDescription(null);
+      setError("Please enter at least one valid voice/number on each side.");
       return;
     }
 
     try {
-      const raw = evaluateVoiceEquation(
-        leftVoices.join(''),
-        rightVoices.join(''),
-        op
-      ) as any;
+      const raw = evaluateVoiceEquation(leftVoices, rightVoices, op) as any;
 
       const decimal: number = raw.decimal ?? 0;
-
       const base7Array: number[] = Array.isArray(raw.base7)
         ? raw.base7
         : String(raw.base7 ?? "")
@@ -168,7 +164,7 @@ export const SevenPrinciplesCalculator: React.FC = () => {
       const principle: string = raw.principle ?? "Unknown";
 
       const cycleState = computeCycleStateFromTotal(decimal);
-      const description = describePrinciple(principle, cycleState);
+      const desc = describePrinciple(principle, cycleState);
 
       setResult({
         decimal,
@@ -176,82 +172,45 @@ export const SevenPrinciplesCalculator: React.FC = () => {
         voices,
         principle,
         cycleState,
-        description,
       });
-
+      setDescription(desc);
     } catch (e) {
       console.error(e);
       setResult(null);
+      setDescription(null);
       setError("Calculator failed – check inputs or heartMath wiring.");
     }
   };
 
-  const expressionHint =
-    mode === "voices"
-      ? "Type A, E, I, O, U, Y, Ë (with or without separators)."
-      : "Type digits 1–7 in any format (e.g. 1-4-7, 2 5, 361).";
-
   return (
     <Card className="mt-4">
-      <CardHeader className="flex flex-row items-center justify-between gap-4">
-        <div>
-          <CardTitle>💗 Seven-Principles Calculator</CardTitle>
-          <CardDescription>
-            Combine two Voice expressions (A, E, I, O, U, Y, Ë, or 1–7)
-          </CardDescription>
-        </div>
-
-        {/* Mode toggle – this is the bit that *must* drive the `mode` state */}
-        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-          <span>Mode</span>
-          <button
-            type="button"
-            onClick={() => setMode("voices")}
-            className={
-              "px-3 py-1 rounded-full border text-xs " +
-              (mode === "voices"
-                ? "bg-slate-800 border-slate-500 text-white"
-                : "bg-transparent border-slate-700 text-slate-400")
-            }
-          >
-            Voices
-          </button>
-          <button
-            type="button"
-            onClick={() => setMode("numbers")}
-            className={
-              "px-3 py-1 rounded-full border text-xs " +
-              (mode === "numbers"
-                ? "bg-slate-800 border-slate-500 text-white"
-                : "bg-transparent border-slate-700 text-slate-400")
-            }
-          >
-            1–7
-          </button>
-        </div>
+      <CardHeader>
+        <CardTitle>💗 Seven-Principles Calculator</CardTitle>
+        <CardDescription>
+          Combine two Voice expressions (A, E, I, O, U, Y, Ë, or digits 1–7).
+        </CardDescription>
       </CardHeader>
 
       <CardContent className="space-y-4">
-        {/* Inputs row */}
         <div className="flex flex-col gap-3 md:flex-row md:items-center">
           <div className="flex-1">
             <Input
               value={leftInput}
               onChange={(e) => setLeftInput(e.target.value)}
-              placeholder={mode === "voices" ? "e.g. AE" : "e.g. 1-4-7"}
+              placeholder="Left (e.g. AE or 147)"
             />
           </div>
 
           <div className="w-28">
             <select
-              className="w-full rounded-md border bg-transparent px-2 py-1 text-sm h-10 border-input"
+              className="w-full rounded-md border bg-transparent px-2 py-1 text-sm"
               value={op}
-              onChange={(e) => setOp(e.target.value as Operation)}
+              onChange={(e) => setOp(e.target.value as any)}
             >
-              <option value="add">Add</option>
-              <option value="subtract">Subtract</option>
-              <option value="multiply">Multiply</option>
-              <option value="divide">Divide</option>
+              <option value="+">Add</option>
+              <option value="-">Subtract</option>
+              <option value="*">Multiply</option>
+              <option value="/">Divide</option>
             </select>
           </div>
 
@@ -259,13 +218,15 @@ export const SevenPrinciplesCalculator: React.FC = () => {
             <Input
               value={rightInput}
               onChange={(e) => setRightInput(e.target.value)}
-              placeholder={mode === "voices" ? "e.g. A" : "e.g. 3-6"}
+              placeholder="Right (e.g. A or 36)"
             />
           </div>
         </div>
 
         <p className="text-xs text-muted-foreground">
-          {expressionHint}
+          You can type vowels (<code>AEIOUYË</code>) or digits 1–7 in any format
+          (<code>147</code>, <code>1-4-7</code>, <code>3 6</code>). If any vowel
+          appears, it treats the input as Voices; otherwise it maps digits 1–7 to A–Ë.
         </p>
 
         <Button className="w-full" onClick={handleCalculate}>
@@ -302,9 +263,11 @@ export const SevenPrinciplesCalculator: React.FC = () => {
               <span className="font-semibold">Cycle state:</span>{" "}
               {result.cycleState}
             </div>
-            <div className="text-sm text-muted-foreground">
-              {result.description}
-            </div>
+            {description && (
+              <div className="text-xs text-muted-foreground mt-1">
+                {description}
+              </div>
+            )}
           </div>
         )}
       </CardContent>
