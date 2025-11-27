@@ -12,7 +12,6 @@ import { PrinciplesBlock } from "./PrinciplesBlock";
 import { SymbolicReadingCard } from "./SymbolicReadingCard";
 import { Button } from "@/components/ui/button";
 import { downloadJson } from "@/lib/downloadJson";
-import type { SevenCalcResult } from "@/shared/sevenPrinciplesCalc";
 
 
 const LEVEL_LABEL: Record<number, string> = { 1: "High", 0: "Mid", [-1]: "Low" } as any;
@@ -102,7 +101,7 @@ export function PathRow({ title, block, analysis }: { title: string; block: any,
         {math7 && math7.primary && (
           <div className="mt-4 rounded-xl border px-4 py-3 text-sm">
             <div className="font-semibold mb-1">
-              Heart (Seven-Voices Math)
+              Core (Seven-Voices Math)
             </div>
 
             <div className="flex flex-wrap gap-4">
@@ -126,7 +125,9 @@ export function PathRow({ title, block, analysis }: { title: string; block: any,
         
         {analysis.math7?.heart && (
           <div className="mt-4 border border-pink-600/40 rounded-xl p-4 bg-pink-900/10">
-            <h3 className="text-pink-400 font-medium mb-2">💗 Heart Auto-Calculation</h3>
+            <h3 className="text-pink-400 font-medium mb-2">
+              Core Auto-Calculation (Seven-Voices Math)
+            </h3>
             <p><strong>Expression:</strong> {analysis.math7.heart.expression}</p>
             <p><strong>Decimal:</strong> {analysis.math7.heart.decimal}</p>
             <p><strong>Base-7:</strong> {analysis.math7.heart.base7.join(" ")}</p>
@@ -162,7 +163,7 @@ const Chip = ({ v }: { v: string | number }) => {
 };
 
 
-export function ResultsDisplay({ analysis, calcOverlay }: { analysis: AnalysisResult_DEPRECATED | null; calcOverlay: SevenCalcResult | null; }) {
+export function ResultsDisplay({ analysis }: { analysis: AnalysisResult_DEPRECATED | null; }) {
   if (!analysis) return null;
   const { core, candidates, symbolic, debug, wordMatrix, deepRoot } = analysis;
   const raw = debug?.rawEnginePayload;
@@ -188,17 +189,6 @@ export function ResultsDisplay({ analysis, calcOverlay }: { analysis: AnalysisRe
             />
         )}
         
-        {calcOverlay && (
-          <div className="mt-4 border border-emerald-600/40 rounded-xl p-4 bg-emerald-900/20 animate-fade-in">
-            <h3 className="text-emerald-400 font-medium mb-2">Calculator Overlay</h3>
-            <p><strong>Expression:</strong> {calcOverlay.leftExpr} {calcOverlay.op} {calcOverlay.rightExpr}</p>
-            <p><strong>Decimal:</strong> {calcOverlay.decimal}</p>
-            <p><strong>Base-7:</strong> {calcOverlay.base7.join(" ")}</p>
-            <p><strong>Voices:</strong> {calcOverlay.voices.join(" → ")}</p>
-            <p><strong>Principle:</strong> <span className="text-emerald-300 text-lg">{calcOverlay.principle}</span></p>
-          </div>
-        )}
-
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {raw && <WhyThisPath primary={raw.primaryPath} />}
             <PrinciplesBlock analysis={analysis} />
