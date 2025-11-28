@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { analyzeWord } from "@/engine/analyzeWord";
+import { analyzeWord } from "@/engine/analyzeWord"; // adjust path if needed
 
 export async function POST(req: NextRequest) {
   try {
@@ -14,6 +14,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Your core engine – returns the payload your UI already knows how to adapt
     const payload = analyzeWord(word, mode);
 
     return NextResponse.json({ payload }, { status: 200 });
