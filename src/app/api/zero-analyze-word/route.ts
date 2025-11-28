@@ -1,17 +1,27 @@
-// src/app/api/zero-analyze-word/route.ts
-import { NextResponse } from "next/server";
-import { cleanWord } from "@/engine/wordCleaner";
-import { analyzeWord } from "@/engine/wordAnalyzer";
+import { NextRequest, NextResponse } from "next/server";
+import { analyzeWord } from "@/engine/analyzeWord";
 
-export async function POST(req: Request) {
-  const body = await req.json().catch(() => ({}));
-  const { word, languageHint } = body ?? {};
+export async function POST(req: NextRequest) {
+  try {
+    const body = await req.json();
+    const word = (body.word ?? "").trim() as string;
+    const mode = (body.mode ?? "strict") as "strict" | "loose";
 
-  if (!word || typeof word !== "string") {
-    return NextResponse.json({ error: "Missing 'word' string" }, { status: 400 });
+    if (!word) {
+      return NextResponse.json(
+        { error: "Word is required" },
+        { status: 400 }
+      );
+    }
+
+    const payload = analyzeWord(word, mode);
+
+    return NextResponse.json({ payload }, { status: 200 });
+  } catch (err) {
+    console.error("zero-analyze-word error", err);
+    return NextResponse.json(
+      { error: "Internal error running analyzeWord" },
+      { status: 500 }
+    );
   }
-
-  const cleaned = cleanWord(word, languageHint);
-  const analysis = analyzeWord(cleaned);
-  return NextResponse.json(analysis);
 }

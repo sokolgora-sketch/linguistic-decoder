@@ -19,6 +19,26 @@ import { downloadJson } from "@/lib/downloadJson";
 import { toWordProtocol } from "@/shared/wordProtocol";
 import SevenPrinciplesAxisPanel from "@/components/SevenPrinciplesAxisPanel";
 
+const VOWEL_ORDER = ["A", "E", "I", "O", "U", "Y", "Ë"];
+
+function simpleTotalMod7(raw: string | null | undefined): number | null {
+  if (!raw) return null;
+
+  const word = raw.toUpperCase();
+  let total = 0;
+
+  for (const ch of word) {
+    const idx = VOWEL_ORDER.indexOf(ch);
+    if (idx !== -1) {
+      // map A..Ë → 1..7
+      total += idx + 1;
+    }
+  }
+
+  if (total === 0) return null;
+  const mod = total % 7;
+  return mod === 0 ? 7 : mod; // keep 1–7 instead of 0
+}
 
 const LEVEL_LABEL: Record<number, string> = { 1: "High", 0: "Mid", [-1]: "Low" } as any;
 
@@ -168,8 +188,13 @@ const Chip = ({ v }: { v: string | number }) => {
     );
 };
 
+type ResultsDisplayProps = {
+  analysis: any | null;
+  calcOverlay: any;
+  inputWord?: string;
+};
 
-export function ResultsDisplay({ analysis, calcOverlay }: { analysis: AnalysisResultWithFamilies | null; calcOverlay?: SevenCalcResult | null; }) {
+export function ResultsDisplay({ analysis, calcOverlay, inputWord }: ResultsDisplayProps) {
   if (!analysis) return null;
   const { core, candidates, symbolic, debug, wordMatrix, deepRoot, math7 } = analysis;
   const raw = debug?.rawEnginePayload;
@@ -180,6 +205,9 @@ export function ResultsDisplay({ analysis, calcOverlay }: { analysis: AnalysisRe
   const primaryRingPath = core.primaryPath?.ringPath?.split(" → ").map(Number) ?? [];
   // Map 'high'/'mid'/'low' back to numbers for LEVEL_LABEL
   const primaryLevelPath = core.primaryPath?.levelPath?.split(" → ").map(l => (l === 'high' ? 1 : l === 'mid' ? 0 : -1)) ?? [];
+
+  const frontierMath = (analysis as any)?.math7?.primary ?? (analysis as any)?.math7 ?? null;
+  const totalMod7Fallback = simpleTotalMod7(inputWord);
 
   return (
     <div className="space-y-4">
@@ -381,6 +409,45 @@ export function ResultsDisplay({ analysis, calcOverlay }: { analysis: AnalysisRe
             </div>
           </Card>
         )}
+
+        {/* === MATH 7 & PRINCIPLES HEADER === */}
+        {analysis?.math7 ? (
+          <div className="mb-6 rounded-2xl border border-zinc-800 bg-zinc-900/40 p-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+              <h3 className="text-lg font-semibold tracking-wide text-zinc-100">
+                Math-7 Summary
+              </h3>
+              <span>
+                total mod 7 ={" "}
+                {typeof frontierMath?.totalMod7 === "number"
+                  ? frontierMath.totalMod7
+                  : totalMod7Fallback ?? "–"}
+              </span>
+            </div>
+
+            {analysis.math7.frontierPath?.length ? (
+              <div className="mt-2 text-sm text-zinc-300">
+                Frontier path:{" "}
+                <span className="font-mono text-zinc-100">
+                  {analysis.math7.frontierPath.join(" → ")}
+                </span>
+              </div>
+            ) : null}
+
+            {analysis.math7.vowelVector?.length ? (
+              <div className="mt-3 flex flex-wrap gap-2">
+                {analysis.math7.vowelVector.map((v: string, i: number) => (
+                  <span
+                    key={i}
+                    className="rounded-md bg-zinc-800 px-2 py-1 text-xs font-medium text-zinc-200"
+                  >
+                    {v}
+                  </span>
+                ))}
+              </div>
+            ) : null}
+          </div>
+        ) : null}
 
         {analysis?.languageFamilies?.length ? (
           <SevenPrinciplesAxisPanel families={analysis.languageFamilies} />

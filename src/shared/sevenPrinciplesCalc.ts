@@ -4,6 +4,7 @@ export type VoicePrinciple = "A" | "E" | "I" | "O" | "U" | "Y" | "Ë";
 export type SevenOp = "add" | "subtract" | "multiply" | "divide";
 
 export interface SevenCalcResult {
+  expression: string;
   leftExpr: string;        // e.g. "AO"
   rightExpr: string;       // e.g. "ËA"
   op: SevenOp;             // "add" | "subtract" | ...

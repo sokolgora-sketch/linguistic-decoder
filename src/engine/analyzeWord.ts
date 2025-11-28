@@ -160,9 +160,17 @@ export function analyzeWord(word: string, modeOrHint?: string): AnalyzeWordResul
       : undefined;
 
   // 8) Final payload
+  // ️⃣  Append math7 slice (placeholder until deeper math layer is wired)
+  const math7 = {
+    totalMod7: base?.math7?.totalMod7 ?? base?.mod7 ?? 7, // fallback
+    frontierPath: base?.frontierPath ?? [],
+    vowelVector: base?.vowelVector ?? ["A", "E", "I", "O", "U", "Y", "Ë"],
+  };
+
   return {
     ...base,
     languageFamilies: families,
     symbolic,
+    math7, // ✅ new field for ResultsDisplay
   };
 }

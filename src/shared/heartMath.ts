@@ -1,5 +1,6 @@
 // src/shared/heartMath.ts
 // Seven-Principles Calculator — deterministic base-7 Heart Math
+import type { SevenCalcResult } from "./sevenPrinciplesCalc";
 
 export type Voice = 'A' | 'E' | 'I' | 'O' | 'U' | 'Y' | 'Ë';
 export type Operation = 'add' | 'subtract' | 'multiply' | 'divide';
@@ -113,12 +114,25 @@ function parseVoiceExpression(input: string): VoicePrinciple[] {
 }
 
 /** Evaluate symbolic expression */
-export function evaluateVoiceEquation(aExpr: string, bExpr: string, op: Operation) {
+export function evaluateVoiceEquation(aExpr: string, bExpr: string, op: Operation): SevenCalcResult {
   const aVal = parseVoiceExpression(aExpr)
     .reduce((acc, v) => acc + VOICE_TO_DIGIT[v], 0);
   const bVal = parseVoiceExpression(bExpr)
     .reduce((acc, v) => acc + VOICE_TO_DIGIT[v], 0);
-  return calculate(aVal, bVal, op);
+  const calcResult = calculate(aVal, bVal, op);
+
+  const opSymbolMap = { add: '+', subtract: '-', multiply: '*', divide: '/'};
+  const opSymbol = opSymbolMap[op];
+  const voicesExpr = calcResult.voices.join("");
+  const expression = `${aExpr} ${opSymbol} ${bExpr} → ${voicesExpr} → ${calcResult.principle}`;
+
+  return {
+    ...calcResult,
+    expression,
+    leftExpr: aExpr,
+    rightExpr: bExpr,
+    op,
+  };
 }
 
 // Cycle state used by both engine math and the calculator

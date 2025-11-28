@@ -16,8 +16,8 @@ import {
   evaluateVoiceEquation,
   Operation,
   CycleState,
-  computeCycleState,
 } from "../shared/heartMath";
+import { SevenCalcResult } from "@/shared/sevenPrinciplesCalc";
 
 // Local UI-only ops: what the user sees
 type OperationSymbol = "+" | "-" | "*" | "/";
@@ -25,15 +25,6 @@ type InputMode = "voices" | "numbers";
 
 // Voices type – just for typing the result
 type Voice = "A" | "E" | "I" | "O" | "U" | "Y" | "Ë";
-
-interface CalculatorResult {
-  decimal: number;
-  base7: number[];
-  voices: Voice[];
-  principle: string;
-  cycleState: CycleState;
-  description: string;
-}
 
 const VOICES: Voice[] = ["A", "E", "I", "O", "U", "Y", "Ë"];
 
@@ -91,65 +82,15 @@ function parseInputToExpr(input: string, mode: InputMode): string {
   return voices.join("");
 }
 
-// ---------- description text ----------
-
-function describePrinciple(principle: string, cycleState: CycleState): string {
-  const core = principle.toLowerCase();
-
-  if (core.includes("truth")) {
-    if (cycleState === "balanced") return "Clear truth expressed in a stable way.";
-    if (cycleState === "open") return "Truth is opening new cycles and revelations.";
-    return "Truth is pushing hard and may slip into dogma.";
-  }
-
-  if (core.includes("expansion")) {
-    if (cycleState === "balanced") return "Healthy expansion and growth in all directions.";
-    if (cycleState === "open") return "Expansion is just starting to open new space.";
-    return "Expansion is intense and may be stretching limits.";
-  }
-
-  if (core.includes("insight")) {
-    if (cycleState === "balanced") return "Insight is sharp and grounded.";
-    if (cycleState === "open") return "New insights are emerging and inviting exploration.";
-    return "Insight is overactive and may cause overload.";
-  }
-
-  if (core.includes("balance")) {
-    if (cycleState === "balanced") return "Forces are in equilibrium; cycles are harmonized.";
-    if (cycleState === "open") return "Balance is forming but still in motion.";
-    return "Balance is under pressure; something is overweight.";
-  }
-
-  if (core.includes("unity")) {
-    if (cycleState === "balanced") return "Unity is stable and inclusive.";
-    if (cycleState === "open") return "New unities are forming and inviting connection.";
-    return "Unity is intense and may collapse or fuse too hard.";
-  }
-
-  if (core.includes("network")) {
-    if (cycleState === "balanced") return "Networks are coherent and trustworthy.";
-    if (cycleState === "open") return "New links and relations are being woven.";
-    return "Network is overloaded with signals.";
-  }
-
-  if (core.includes("evolution")) {
-    if (cycleState === "balanced") return "Evolution is steady and sustainable.";
-    if (cycleState === "open") return "Evolution is opening a new phase or generation.";
-    return "Evolution is rapid and may become chaotic.";
-  }
-
-  return `This path leans toward ${principle} in a ${cycleState} cycle.`;
-}
-
 // ---------- component ----------
 
-export const HeartCalculator: React.FC = () => {
+const HeartCalculator: React.FC = () => {
   // Start empty – no auto AO+A
   const [leftInput, setLeftInput] = useState("");
   const [rightInput, setRightInput] = useState("");
   const [op, setOp] = useState<OperationSymbol>("+");
   const [mode, setMode] = useState<InputMode>("voices");
-  const [result, setResult] = useState<CalculatorResult | null>(null);
+  const [result, setResult] = useState<SevenCalcResult | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const handleCalculate = () => {
@@ -169,31 +110,8 @@ export const HeartCalculator: React.FC = () => {
         leftExpr,
         rightExpr,
         OP_SYMBOL_TO_OPERATION[op]
-      ) as any;
-
-      const decimal: number = raw.decimal ?? 0;
-
-      const base7Array: number[] = Array.isArray(raw.base7)
-        ? raw.base7
-        : String(raw.base7 ?? "")
-            .split("")
-            .map((d: string) => Number(d))
-            .filter((n: number) => !Number.isNaN(n));
-
-      const voicesFromRaw: Voice[] = raw.voices ?? [];
-      const principle: string = raw.principle ?? "Unknown";
-
-      const cycleState = computeCycleState(decimal);
-      const description = describePrinciple(principle, cycleState);
-
-      setResult({
-        decimal,
-        base7: base7Array,
-        voices: voicesFromRaw,
-        principle,
-        cycleState,
-        description,
-      });
+      ) as SevenCalcResult;
+      setResult(raw);
     } catch (e) {
       console.error(e);
       setResult(null);
@@ -275,6 +193,10 @@ export const HeartCalculator: React.FC = () => {
         {result && (
           <div className="mt-3 space-y-2 border-t border-slate-700 pt-3 text-sm">
             <div>
+              <span className="font-semibold">Expression:</span>{" "}
+              {result.expression}
+            </div>
+            <div>
               <span className="font-semibold">Decimal:</span>{" "}
               {result.decimal}
             </div>
@@ -290,16 +212,11 @@ export const HeartCalculator: React.FC = () => {
               <span className="font-semibold">Principle:</span>{" "}
               {result.principle}
             </div>
-            <div>
-              <span className="font-semibold">Cycle state:</span>{" "}
-              {result.cycleState}
-            </div>
-            <div className="text-xs text-muted-foreground mt-1">
-              {result.description}
-            </div>
           </div>
         )}
       </CardContent>
     </Card>
   );
 };
+
+export default HeartCalculator;

@@ -1,10 +1,4 @@
-// src/shared/engineShape.ts
-
-import type { SymbolicCoreResult } from "@/lib/symbolicCore";
-import type { Math7Summary } from "@/engine/math7";
-import type { SevenCalcResult } from "./sevenPrinciplesCalc";
-
-export type { Math7Summary, SevenCalcResult };
+import { SevenCalcResult } from "./sevenPrinciplesCalc";
 
 // Canonical shape your UI will use everywhere.
 export type Vowel = "A" | "E" | "I" | "O" | "U" | "Y" | "Ë";
@@ -334,11 +328,6 @@ export type SevenVoicesSummary = {
   sevenWords: string[]; // 7-word sentence in principle order
 };
 
-export type SymbolicLayer = {
-  notes: string[];
-  label?: string;
-};
-
 // NOTE: DeepRootResult used to be a separate mini type.
 // Now it is the same normalized shape as DeepRootSummary.
 // (Alias is defined after DeepRootSummary below.)
@@ -354,7 +343,6 @@ export type AnalysisResult_DEPRECATED = {
   debug?: AnalysisDebug;
   sevenVoices?: SevenVoicesSummary;
   symbolic?: SymbolicLayer;
-  symbolicCore?: SymbolicCoreResult;
   math7?: Math7Summary;
   principles?: PrinciplesSet;
   wordMatrix?: WordMatrix | null;
@@ -415,20 +403,6 @@ export interface Math7SummaryExtended {
   primary: Math7PrimarySummaryExtended;
 }
 
-export type LanguageFamilyCandidate = {
-  language: string;
-  form: string;
-  gloss: string;
-  passes: boolean;
-  experimental: boolean;
-  speculative: boolean;
-  voicePath: string;
-  levelPath: string;
-  ringPath: string;
-  morphologyMatrix?: MorphologyMatrix;
-  symbolic?: SymbolicTag[];
-};
-
 export interface WordMatrix {
   word: string; // e.g. "study"
   languageFamily: string; // e.g. "Latin", "Albanian"
@@ -450,8 +424,8 @@ export interface Math7PathSummary {
   voices: Vowel[];
   total: number;
   totalMod7: number;
-  principlesPath: string[];
   cycleState: CycleState;
+  principlesPath: string[];
 }
 
 export interface PrincipleScore {
@@ -500,3 +474,39 @@ export interface DeepRootSummary {
 
 // Alias: DeepRootResult == DeepRootSummary (keeps legacy name, single shape).
 export type DeepRootResult = DeepRootSummary;
+
+
+// --- Seven-Voices axis + symbolic overlay (new) ---
+
+export type LanguageFamilyCandidate = {
+  language: string;
+  morphologyMatrix?: {
+    pivot: string;
+    source: string; // 'manual' | 'auto'
+  };
+  symbolic?: { axis: string; note: string }[];
+};
+
+export type SymbolicLayer = {
+  label: string;
+  notes: string[];
+};
+
+/**
+ * UI-friendly analysis shape that extends the old legacy result
+ * with languageFamilies + symbolic overlay.
+ */
+export type AnalysisResultWithFamilies = AnalysisResult_DEPRECATED & {
+  languageFamilies?: LanguageFamilyCandidate[];
+  symbolic?: SymbolicLayer;
+};
+
+export type Math7Summary = {
+  vowelVector: string[];
+  primaryPath: string[];
+  frontierPath: string[];
+  totalMod7: number;
+  primary?: Math7PathSummary;
+  frontier?: Math7PathSummary[];
+  heart?: SevenCalcResult;
+};
