@@ -1,126 +1,145 @@
-// src/app/api/zero-analyze-word/route.ts
-// New core endpoint used by the Compare panel (and any future tools).
-// Shape: { payload: EnginePayload-like } so the UI can do json.payload.
+// src/components/ComparePanel.tsx
+"use client";
 
-import { NextResponse } from "next/server";
-import { runAnalysis } from "@/lib/runAnalysis";
-import { getManifest } from "@/engine/manifest";
-import type { SolveOptions } from "@/functions/sevenVoicesCore";
-import type { Alphabet } from "@/lib/runAnalysis";
+import React, { useState } from "react";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Loader2 } from "lucide-react";
 
-type ApiBody = {
-  word?: string;
-  mode?: "strict" | "open";
-  alphabet?: Alphabet;
-  manifest?: string;
+import { enginePayloadToAnalysisResult } from "@/shared/analysisAdapter";
+import type {
+  AnalysisResultWithFamilies,
+  SevenCalcResult,
+} from "@/shared/engineShape";
+import SevenPrinciplesCompare from "./SevenPrinciplesCompare";
+
+async function analyzeWord(
+  word: string
+): Promise<AnalysisResultWithFamilies | null> {
+  const trimmed = word.trim();
+  if (!trimmed) return null;
+
+  const res = await fetch("/api/analyze", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      word: trimmed,
+      mode: "strict",
+      alphabet: "auto",
+    }),
+  });
+
+  if (!res.ok) {
+    let message = `API failed (${res.status})`;
+    try {
+      const text = await res.text();
+      // When it's an HTML 404 page, don't dump it fully
+      if (!text.startsWith("<!DOCTYPE")) {
+        message += `: ${text}`;
+      }
+    } catch {
+      // ignore
+    }
+    throw new Error(message);
+  }
+
+  const json = await res.json();
+  // Server returns the engine payload as the top-level object
+  const analysis = enginePayloadToAnalysisResult(json);
+  return analysis as AnalysisResultWithFamilies;
+}
+
+const ComparePanel: React.FC = () => {
+  const [wordA, setWordA] = useState("study");
+  const [wordB, setWordB] = useState("damage");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const [results, setResults] = useState<{
+    a: AnalysisResultWithFamilies | null;
+    b: AnalysisResultWithFamilies | null;
+  }>({ a: null, b: null });
+
+  const handleCompare = async () => {
+    const a = wordA.trim();
+    const b = wordB.trim();
+
+    if (!a || !b) {
+      setError("Please enter both words.");
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+    setResults({ a: null, b: null });
+
+    try {
+      const [resA, resB] = await Promise.all([
+        analyzeWord(a),
+        analyzeWord(b),
+      ]);
+
+      setResults({ a: resA, b: resB });
+    } catch (e: any) {
+      setError(e.message ?? "Comparison failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const sevenCalcResults = {
+    a: (results.a?.math7?.heart ?? null) as SevenCalcResult | null,
+    b: (results.b?.math7?.heart ?? null) as SevenCalcResult | null,
+  };
+
+  return (
+    <Card className="w-full">
+      <CardHeader>
+        <CardTitle>Compare two words</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="flex flex-col sm:flex-row gap-2 items-center">
+          <Input
+            placeholder="First word (e.g. study)"
+            value={wordA}
+            onChange={(e) => setWordA(e.target.value)}
+          />
+          <span className="text-muted-foreground">vs.</span>
+          <Input
+            placeholder="Second word (e.g. damage)"
+            value={wordB}
+            onChange={(e) => setWordB(e.target.value)}
+          />
+          <Button onClick={handleCompare} disabled={loading}>
+            {loading && (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            )}
+            Compare
+          </Button>
+        </div>
+
+        {error && (
+          <p className="text-sm text-red-500 whitespace-pre-wrap">
+            {error}
+          </p>
+        )}
+
+        {(results.a || results.b) && (
+          <SevenPrinciplesCompare
+            results={sevenCalcResults}
+            wordA={wordA}
+            wordB={wordB}
+          />
+        )}
+      </CardContent>
+    </Card>
+  );
 };
 
-// POST /api/zero-analyze-word  { word, mode?, alphabet?, manifest? }
-export async function POST(req: Request) {
-  let body: ApiBody;
-
-  try {
-    body = (await req.json()) as ApiBody;
-  } catch {
-    return NextResponse.json(
-      { error: "Invalid JSON body" },
-      { status: 400 },
-    );
-  }
-
-  const word = body.word?.trim();
-  const mode = body.mode === "open" ? "open" : "strict";
-  const alphabet: Alphabet = body.alphabet ?? "auto";
-  const manifestVersion = body.manifest;
-
-  if (!word) {
-    return NextResponse.json(
-      { error: "Missing 'word' string" },
-      { status: 400 },
-    );
-  }
-
-  const t0 = Date.now();
-  const manifest = getManifest(manifestVersion);
-
-  try {
-    const isStrict = mode === "strict";
-
-    const opts: SolveOptions = {
-      beamWidth: 8,
-      maxOps: isStrict ? 1 : 2,
-      allowDelete: !isStrict,
-      allowClosure: !isStrict,
-      opCost: manifest.opCost,
-      alphabet,
-      manifest,
-      edgeWeight: manifest.edgeWeight,
-    };
-
-    const analysis = runAnalysis(word, opts, alphabet);
-
-    const payload = {
-      ...analysis,
-      solveMs: Date.now() - t0,
-    };
-
-    // IMPORTANT: wrap in { payload } so enginePayloadToAnalysisResult(json.payload) works
-    return NextResponse.json({ payload }, { status: 200 });
-  } catch (e: any) {
-    console.error("[/api/zero-analyze-word] Error", e);
-    return NextResponse.json(
-      { error: e?.message ?? "Analysis failed" },
-      { status: 500 },
-    );
-  }
-}
-
-// Optional GET for debugging in the browser:
-// /api/zero-analyze-word?word=study&mode=strict&alphabet=auto
-export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
-  const word = searchParams.get("word");
-  const mode = (searchParams.get("mode") as "strict" | "open") ?? "strict";
-  const alphabet = (searchParams.get("alphabet") as Alphabet) ?? "auto";
-  const manifestVersion = searchParams.get("manifest") ?? undefined;
-
-  if (!word) {
-    return NextResponse.json(
-      { error: 'Missing "word" query parameter' },
-      { status: 400 },
-    );
-  }
-
-  const t0 = Date.now();
-  const manifest = getManifest(manifestVersion);
-
-  try {
-    const isStrict = mode === "strict";
-
-    const opts: SolveOptions = {
-      beamWidth: 8,
-      maxOps: isStrict ? 1 : 2,
-      allowDelete: !isStrict,
-      allowClosure: !isStrict,
-      opCost: manifest.opCost,
-      alphabet,
-      manifest,
-      edgeWeight: manifest.edgeWeight,
-    };
-
-    const analysis = runAnalysis(word, opts, alphabet);
-
-    const payload = {
-      ...analysis,
-      solveMs: Date.now() - t0,
-    };
-
-    return NextResponse.json({ payload }, { status: 200 });
-  } catch (e: any) {
-    console.error("[/api/zero-analyze-word] GET Error", e);
-    return NextResponse.json(
-      { error: e?.message ?? "Analysis failed" },
-      { status: 500 },
-    );
-  }
-}
+export default ComparePanel;

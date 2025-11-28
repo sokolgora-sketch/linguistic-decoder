@@ -13,7 +13,7 @@ export async function POST(req: Request) {
   } catch {
     return NextResponse.json(
       { error: "Invalid JSON body" },
-      { status: 400 },
+      { status: 400 }
     );
   }
 
@@ -25,13 +25,13 @@ export async function POST(req: Request) {
   if (typeof word !== "string" || word.trim().length === 0) {
     return NextResponse.json(
       { error: "Missing 'word' string" },
-      { status: 400 },
+      { status: 400 }
     );
   }
 
   const cleaned = cleanWord(
     word,
-    typeof languageHint === "string" ? languageHint : undefined,
+    typeof languageHint === "string" ? languageHint : undefined
   );
   const result = analyzeWord(cleaned);
 
@@ -42,6 +42,6 @@ export async function POST(req: Request) {
 export function GET() {
   return NextResponse.json(
     { ok: true, message: "ZË-RO /api/analyze-word – send POST { word }" },
-    { status: 200 },
+    { status: 200 }
   );
 }
