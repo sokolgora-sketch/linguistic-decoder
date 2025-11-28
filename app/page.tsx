@@ -45,7 +45,7 @@ import { ExportJsonButton } from "@/components/ExportJsonButton";
 import { logError } from "@/lib/logError";
 import { VOICE_COLOR_MAP, VOICE_LABEL_MAP } from "@/shared/voiceColors";
 import { SymbolicReadingCard } from "@/components/SymbolicReadingCard";
-import { HeartCalculator } from "@/components/HeartCalculator";
+import HeartCalculator from "@/components/HeartCalculator";
 import type { SevenCalcResult } from "@/shared/sevenPrinciplesCalc";
 
 
