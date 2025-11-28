@@ -12,50 +12,52 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Loader2 } from "lucide-react";
 
+import { analyzeClient } from "@/lib/analyzeClient";
 import { enginePayloadToAnalysisResult } from "@/shared/analysisAdapter";
 import type {
   AnalysisResultWithFamilies,
   SevenCalcResult,
 } from "@/shared/engineShape";
+import type { Alphabet } from "@/lib/runAnalysis";
 import SevenPrinciplesCompare from "./SevenPrinciplesCompare";
 
-async function analyzeWord(
-  word: string
+type Mode = "strict" | "open";
+
+type ComparePanelProps = {
+  defaultMode?: Mode;
+  defaultAlphabet?: Alphabet;
+};
+
+// Reuse the SAME engine path as the main analyzer.
+// No direct fetch, no custom API route – we just call analyzeClient.
+async function analyzeWordWithEngine(
+  word: string,
+  mode: Mode,
+  alphabet: Alphabet
 ): Promise<AnalysisResultWithFamilies | null> {
   const trimmed = word.trim();
   if (!trimmed) return null;
 
-  const res = await fetch("/api/analyze", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      word: trimmed,
-      mode: "strict",
-      alphabet: "auto",
-    }),
+  // You can tune these if you want later
+  const edgeWeight = 0.25;
+  const useAi = false;
+
+  const payload = await analyzeClient(trimmed, mode, alphabet, {
+    edgeWeight,
+    useAi,
+    // we can skip writes + bypass cache if you want it “pure”
+    bypass: true,
+    skipWrite: true,
   });
 
-  if (!res.ok) {
-    let message = `API failed (${res.status})`;
-    try {
-      const text = await res.text();
-      // When it's an HTML 404 page, don't dump it fully
-      if (!text.startsWith("<!DOCTYPE")) {
-        message += `: ${text}`;
-      }
-    } catch {
-      // ignore
-    }
-    throw new Error(message);
-  }
-
-  const json = await res.json();
-  // Server returns the engine payload as the top-level object
-  const analysis = enginePayloadToAnalysisResult(json);
+  const analysis = enginePayloadToAnalysisResult(payload);
   return analysis as AnalysisResultWithFamilies;
 }
 
-const ComparePanel: React.FC = () => {
+const ComparePanel: React.FC<ComparePanelProps> = ({
+  defaultMode = "strict",
+  defaultAlphabet = "auto",
+}) => {
   const [wordA, setWordA] = useState("study");
   const [wordB, setWordB] = useState("damage");
   const [loading, setLoading] = useState(false);
@@ -81,13 +83,13 @@ const ComparePanel: React.FC = () => {
 
     try {
       const [resA, resB] = await Promise.all([
-        analyzeWord(a),
-        analyzeWord(b),
+        analyzeWordWithEngine(a, defaultMode, defaultAlphabet),
+        analyzeWordWithEngine(b, defaultMode, defaultAlphabet),
       ]);
 
       setResults({ a: resA, b: resB });
     } catch (e: any) {
-      setError(e.message ?? "Comparison failed");
+      setError(e?.message ?? "Comparison failed");
     } finally {
       setLoading(false);
     }
@@ -117,17 +119,13 @@ const ComparePanel: React.FC = () => {
             onChange={(e) => setWordB(e.target.value)}
           />
           <Button onClick={handleCompare} disabled={loading}>
-            {loading && (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            )}
+            {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Compare
           </Button>
         </div>
 
         {error && (
-          <p className="text-sm text-red-500 whitespace-pre-wrap">
-            {error}
-          </p>
+          <p className="text-sm text-red-500 whitespace-pre-wrap">{error}</p>
         )}
 
         {(results.a || results.b) && (
