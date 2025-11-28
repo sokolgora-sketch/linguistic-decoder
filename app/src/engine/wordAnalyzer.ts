@@ -8,6 +8,7 @@ import {
   generateCandidates,
   type LanguageCode,
 } from "./wordCandidates";
+import type { WordInput } from "./wordCleaner";
 
 
 export interface WordAnalysisResult {
