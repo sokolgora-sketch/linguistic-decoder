@@ -1,23 +1,7 @@
 // src/engine/wordCleaner.ts
-
-export interface WordInput {
-  raw: string;            // original user input
-  normalized: string;     // cleaned, lowercase
-  languageHint?: string;
-  phoneticHint?: string;  // reserved for later
-}
-
-export function cleanWord(raw: string, languageHint?: string): WordInput {
-  const trimmed = raw.trim();
-  const lower = trimmed.toLowerCase();
-
-  // strip diacritics
-  const normalized = lower.normalize("NFKD").replace(/[\u0300-\u036f]/g, "");
-
-  return {
-    raw,
-    normalized,
-    languageHint,
-    phoneticHint: undefined,
-  };
+export function cleanWord(word: string, hint?: string) {
+  // Some older builds returned { word, languageHint }
+  // Normalize it so everything downstream works
+  if (!word) return "";
+  return typeof word === "string" ? word.trim().toLowerCase() : String(word);
 }
