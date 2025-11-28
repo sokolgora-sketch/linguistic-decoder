@@ -3,7 +3,11 @@ import React from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "./ui/card";
 import type { CClass } from "../functions/languages";
 import { classRange } from "../functions/languages";
-import type { EnginePayload, AnalysisResult_DEPRECATED, Vowel, SevenCalcResult } from "../shared/engineShape";
+import type { 
+  Vowel, 
+  SevenCalcResult, 
+  AnalysisResultWithFamilies 
+} from "../shared/engineShape";
 import { getVoiceMeta } from '@/shared/sevenVoices';
 import WhyThisPath from "./WhyThisPath";
 import { VOICE_COLOR_MAP } from "@/shared/voiceColors";
@@ -13,11 +17,12 @@ import { SymbolicReadingCard } from "./SymbolicReadingCard";
 import { Button } from "@/components/ui/button";
 import { downloadJson } from "@/lib/downloadJson";
 import { toWordProtocol } from "@/shared/wordProtocol";
+import SevenPrinciplesAxisPanel from "@/components/SevenPrinciplesAxisPanel";
 
 
 const LEVEL_LABEL: Record<number, string> = { 1: "High", 0: "Mid", [-1]: "Low" } as any;
 
-function ConsonantInfo({ analysis }: { analysis: AnalysisResult_DEPRECATED }) {
+function ConsonantInfo({ analysis }: { analysis: AnalysisResultWithFamilies }) {
   const windows = analysis.core.consonants.clusters?.map(c => c.cluster) || [];
   const windowClasses = analysis.core.consonants.clusters?.map(c => c.classes[0]) || [];
   const ringPath = analysis.core.voices.ringPath;
@@ -66,7 +71,7 @@ function ConsonantInfo({ analysis }: { analysis: AnalysisResult_DEPRECATED }) {
 }
 
 
-export function PathRow({ title, block, analysis }: { title: string; block: any, analysis: AnalysisResult_DEPRECATED }) {
+export function PathRow({ title, block, analysis }: { title: string; block: any, analysis: AnalysisResultWithFamilies }) {
   if (!block || !block.voicePath.length) {
     return (
       <Card className="p-4">
@@ -164,7 +169,7 @@ const Chip = ({ v }: { v: string | number }) => {
 };
 
 
-export function ResultsDisplay({ analysis, calcOverlay }: { analysis: AnalysisResult_DEPRECATED | null; calcOverlay?: SevenCalcResult | null; }) {
+export function ResultsDisplay({ analysis, calcOverlay }: { analysis: AnalysisResultWithFamilies | null; calcOverlay?: SevenCalcResult | null; }) {
   if (!analysis) return null;
   const { core, candidates, symbolic, debug, wordMatrix, deepRoot, math7 } = analysis;
   const raw = debug?.rawEnginePayload;
@@ -376,6 +381,10 @@ export function ResultsDisplay({ analysis, calcOverlay }: { analysis: AnalysisRe
             </div>
           </Card>
         )}
+
+        {analysis?.languageFamilies?.length ? (
+          <SevenPrinciplesAxisPanel families={analysis.languageFamilies} />
+        ) : null}
     </div>
   );
 }

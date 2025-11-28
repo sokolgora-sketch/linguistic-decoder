@@ -1,16 +1,26 @@
+// src/components/ZeroWordPanel.tsx
 "use client";
 
 import React, { useState } from "react";
-import { Card, CardHeader, CardTitle, CardContent } from "./ui/card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+} from "./ui/card";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
-import type { WordAnalysisResult } from "@/engine/wordAnalyzer";
+
+import type {
+  AnalyzeWordResult,
+  LanguageFamilyCandidate,
+} from "@/engine/analyzeWord";
 
 const ZeroWordPanel: React.FC = () => {
   const [word, setWord] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [result, setResult] = useState<WordAnalysisResult | null>(null);
+  const [result, setResult] = useState<AnalyzeWordResult | null>(null);
 
   async function handleAnalyze(e: React.FormEvent) {
     e.preventDefault();
@@ -22,103 +32,112 @@ const ZeroWordPanel: React.FC = () => {
     setResult(null);
 
     try {
-      const res = await fetch("/api/zero-analyze-word", {
+      const res = await fetch("/api/analyze-word", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ word: trimmed }),
       });
 
-      const data = await res.json();
-
-      if (!res.ok || data.error) {
-        setError(data.error || `Request failed with status ${res.status}`);
-      } else {
-        setResult(data as WordAnalysisResult);
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}`);
       }
+
+      const data = (await res.json()) as AnalyzeWordResult;
+      setResult(data);
     } catch (err: any) {
-      setError(err?.message ?? "Unknown error");
+      console.error(err);
+      setError(err?.message ?? "Something went wrong.");
     } finally {
       setLoading(false);
     }
   }
 
+  const families: LanguageFamilyCandidate[] =
+    result?.languageFamilies ?? [];
+
   return (
-    <Card className="mt-6">
+    <Card className="w-full">
       <CardHeader>
-        <CardTitle>ZË-RO · 7-Vowel Etymology Engine</CardTitle>
+        <CardTitle>ZË-RO Word Panel</CardTitle>
       </CardHeader>
-      <CardContent>
-        <form onSubmit={handleAnalyze} className="flex flex-col gap-3 sm:flex-row">
+      <CardContent className="space-y-4">
+        <form onSubmit={handleAnalyze} className="flex gap-2">
           <Input
-            placeholder="Type a word (e.g. damage, study, mathematics)…"
+            placeholder="Type a word (study, damage, love...)"
             value={word}
             onChange={(e) => setWord(e.target.value)}
           />
-          <Button type="submit" disabled={loading || !word.trim()}>
-            {loading ? "Analyzing…" : "Analyze"}
+          <Button type="submit" disabled={loading}>
+            {loading ? "Analyzing..." : "Analyze"}
           </Button>
         </form>
 
         {error && (
-          <p className="mt-3 text-sm text-red-400">
+          <p className="text-sm text-red-500">
             {error}
           </p>
         )}
 
         {result && (
-          <div className="mt-4 space-y-4 text-sm">
-            <div className="text-xs text-muted-foreground">
-              Word: <span className="font-mono">{result.word.raw}</span> ·
-              normalized as{" "}
-              <span className="font-mono">{result.word.normalized}</span>
-            </div>
-
-            {result.candidates.length === 0 && (
-              <p>No passing candidates yet for this word.</p>
-            )}
-
-            {result.candidates.map((c, idx) => (
+          <div className="space-y-4 mt-2">
+            {/* Language families */}
+            {families.map((fam) => (
               <div
-                key={`${c.language}-${c.form}-${idx}`}
-                className="rounded-md border border-border/50 p-3"
+                key={fam.language}
+                className="border rounded-md p-3 text-sm space-y-1"
               >
-                <div className="text-xs uppercase tracking-wide text-muted-foreground">
-                  {c.language} · <span className="font-mono">{c.form}</span>
+                <div className="font-semibold capitalize">
+                  {fam.language}
                 </div>
 
-                <div className="mt-1 font-semibold">
-                  {c.decomposition.join(" · ")}
-                </div>
-
-                <p className="mt-1">
-                  {c.functionalStatement}
-                </p>
-
-                <div className="mt-2 text-xs text-muted-foreground">
-                  Vowel path:{" "}
-                  {c.vowelPath.map((v, i) => (
-                    <span key={i} className="font-mono">
-                      {v}
-                      {i < c.vowelPath.length - 1 ? " → " : ""}
-                    </span>
-                  ))}
-                </div>
-
-                {c.traitsSummary && (
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    {c.traitsSummary}
-                  </p>
+                {fam.morphologyMatrix && (
+                  <div>
+                    <div className="text-xs text-muted-foreground">
+                      Morphology matrix
+                    </div>
+                    <div>
+                      Pivot:{" "}
+                      <span className="font-mono">
+                        {fam.morphologyMatrix.pivot}
+                      </span>{" "}
+                      <span className="text-xs text-muted-foreground">
+                        ({fam.morphologyMatrix.source})
+                      </span>
+                    </div>
+                  </div>
                 )}
 
-                {c.notes?.length > 0 && (
-                  <ul className="mt-2 list-disc pl-5 text-xs text-muted-foreground">
-                    {c.notes.map((n, i) => (
-                      <li key={i}>{n}</li>
+                {fam.symbolic && fam.symbolic.length > 0 && (
+                  <div className="flex flex-wrap gap-1 mt-1">
+                    {fam.symbolic.map((tag, idx) => (
+                      <span
+                        key={idx}
+                        className="inline-flex items-center rounded-full border px-2 py-0.5 text-[11px]"
+                      >
+                        <span className="font-semibold mr-1">
+                          {tag.axis}
+                        </span>
+                        {tag.note}
+                      </span>
                     ))}
-                  </ul>
+                  </div>
                 )}
               </div>
             ))}
+
+            {/* Top-level symbolic layer */}
+            {result.symbolic && (
+              <div className="border rounded-md p-3 text-sm space-y-1">
+                <div className="font-semibold">
+                  {result.symbolic.label}
+                </div>
+                <ul className="list-disc list-inside text-xs text-muted-foreground">
+                  {result.symbolic.notes.map((note, i) => (
+                    <li key={i}>{note}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
         )}
       </CardContent>
