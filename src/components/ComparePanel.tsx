@@ -1,11 +1,18 @@
 "use client";
+
 import { useState } from "react";
 import { Card } from "./ui/card";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./ui/select";
 import { PROFILES } from "../functions/languages";
-import type { Alphabet } from "../lib/runAnalysis";
+import type { Alphabet, EnginePayload } from "../lib/runAnalysis";
 
 type Mode = "strict" | "open";
 type CompareResult = any | null;
@@ -21,101 +28,115 @@ export default function ComparePanel({
   const [rightWord, setRightWord] = useState("study");
   const [mode, setMode] = useState<Mode>(defaultMode);
   const [alphabet, setAlphabet] = useState<Alphabet>(defaultAlphabet);
-  const [left, setLeft] = useState<CompareResult>(null);
-  const [right, setRight] = useState<CompareResult>(null);
+  const [compareResult, setCompareResult] = useState<CompareResult>(null);
   const [loading, setLoading] = useState(false);
 
-  async function fetchAnalysis(word: string) {
-    const url = `${window.location.origin}/api/analyze?word=${encodeURIComponent(word)}&mode=${mode}&alphabet=${alphabet}`;
-    const res = await fetch(url);
-    if (!res.ok) {
-      console.error("Compare /api/analyze failed", await res.text());
+  async function fetchAnalysis(word: string, mode: Mode, alphabet: Alphabet) {
+    try {
+      const res = await fetch("/api/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ word, mode, alphabet }),
+      });
+  
+      if (!res.ok) {
+        console.error("Compare /api/analyze failed", await res.text());
+        return null;
+      }
+  
+      return (await res.json()) as EnginePayload;
+    } catch (err) {
+      console.error("Compare /api/analyze error", err);
       return null;
     }
-    return res.json();
   }
 
   async function runCompare() {
-    if (!leftWord.trim() || !rightWord.trim()) return;
     setLoading(true);
-    try {
-      const [L, R] = await Promise.all([fetchAnalysis(leftWord), fetchAnalysis(rightWord)]);
-      setLeft(L);
-      setRight(R);
-    } finally {
-      setLoading(false);
-    }
+    const [leftData, rightData] = await Promise.all([
+      fetchAnalysis(leftWord, mode, alphabet),
+      fetchAnalysis(rightWord, mode, alphabet),
+    ]);
+    setCompareResult({ left: leftData, right: rightData });
+    setLoading(false);
   }
 
-  const share = `/?word=${encodeURIComponent(leftWord)}&mode=${mode}&alphabet=${alphabet}#compare=${encodeURIComponent(rightWord)}`;
-  const leftSeq = left?.core?.heartPaths?.primary?.voiceSequence || [];
-  const rightSeq = right?.core?.heartPaths?.primary?.voiceSequence || [];
-  const eqPrimary = leftSeq.join(",") === rightSeq.join(",");
-
   return (
-    <Card className="p-4 space-y-3">
-      <h3 className="font-bold text-sm tracking-wide">Compare Two Words</h3>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
-        <Input value={leftWord} onChange={(e) => setLeftWord(e.target.value)} placeholder="Left word (e.g., damage)" />
-        <Input value={rightWord} onChange={(e) => setRightWord(e.target.value)} placeholder="Right word (e.g., study)" />
+    <Card className="p-4">
+      <h3 className="font-semibold mb-2">Compare Two Words</h3>
+
+      <p className="text-sm text-muted-foreground mb-3">
+        Analyze two words side by side and compare their Seven-Voices paths.
+      </p>
+
+      <div className="flex flex-col gap-2 md:flex-row mb-3">
+        <Input
+          value={leftWord}
+          onChange={(e) => setLeftWord(e.target.value)}
+          placeholder="First word"
+        />
+        <Input
+          value={rightWord}
+          onChange={(e) => setRightWord(e.target.value)}
+          placeholder="Second word"
+        />
       </div>
 
-      <div className="flex flex-wrap gap-2.5 items-center">
+      <div className="flex flex-wrap items-center gap-3 mb-3">
         <label className="flex items-center gap-2 text-sm">
           <input
             type="checkbox"
             checked={mode === "strict"}
             onChange={(e) => setMode(e.target.checked ? "strict" : "open")}
-            className="w-4 h-4 rounded text-primary focus:ring-primary"
           />
-          Strict
+          <span>Strict</span>
         </label>
 
-        <Select value={alphabet} onValueChange={(v) => setAlphabet(v as Alphabet)}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Language" />
+        <Select
+          value={alphabet}
+          onValueChange={(v) => setAlphabet(v as Alphabet)}
+        >
+          <SelectTrigger className="w-[160px]">
+            <SelectValue placeholder="Auto-Detect" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="auto">Auto-Detect</SelectItem>
-            {PROFILES.map((p) => (
-              <SelectItem key={p.id} value={p.id}>
-                {p.id.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())}
+            {Object.keys(PROFILES).map((key) => (
+              <SelectItem key={key} value={key}>
+                {key}
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
 
         <Button onClick={runCompare} disabled={loading}>
-          {loading ? "Comparing…" : "Compare"}
+          {loading ? "Comparing..." : "Compare"}
         </Button>
-
-        {(left || right) && (
-          <a className="underline text-xs" href={share}>
-            Share left + mode/alphabet
-          </a>
-        )}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-        <ResultCard title={leftWord} seq={leftSeq} />
-        <ResultCard title={rightWord} seq={rightSeq} />
-      </div>
+      {compareResult && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+          <Card className="p-3">
+            <p className="font-medium mb-1">{leftWord}</p>
+            <pre className="text-xs whitespace-pre-wrap break-all max-h-64 overflow-auto rounded bg-muted/40 p-2">
+              {JSON.stringify(
+                compareResult.left?.primaryPath ?? "(no result)",
+                null,
+                2
+              )}
+            </pre>
+          </Card>
 
-      {left && right && (
-        <div className="text-sm mt-2 font-semibold">Primary paths equal? {eqPrimary ? "Yes" : "No"}</div>
-      )}
-    </Card>
-  );
-}
-
-function ResultCard({ title, seq }: { title: string; seq: string[] }) {
-  return (
-    <Card className="p-3 text-sm">
-      <div className="font-semibold">{title}</div>
-      {seq.length ? (
-        <div className="opacity-80 text-xs pt-2">{seq.join(" → ")}</div>
-      ) : (
-        <div className="opacity-50 text-xs pt-2">—</div>
+          <Card className="p-3">
+            <p className="font-medium mb-1">{rightWord}</p>
+            <pre className="text-xs whitespace-pre-wrap break-all max-h-64 overflow-auto rounded bg-muted/40 p-2">
+              {JSON.stringify(
+                compareResult.right?.primaryPath ?? "(no result)",
+                null,
+                2
+              )}
+            </pre>
+          </Card>
+        </div>
       )}
     </Card>
   );
