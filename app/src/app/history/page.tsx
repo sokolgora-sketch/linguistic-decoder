@@ -5,7 +5,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Loader2 } from "lucide-react";
-import { HistoryPanel } from "@/components/HistoryPanel"; // Updated component
+import { HistoryPanel } from "@/components/HistoryPanel";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { normalizeEnginePayload, type EnginePayload, type AnalysisResult } from "@/shared/engineShape";
@@ -17,7 +17,7 @@ import type { Alphabet } from "@/lib/runAnalysis";
 
 type AnalysisResponse = EnginePayload & { analysis?: AnalysisResult };
 
-export default function HistoryPage() {
+function HistoryPage() {
     const { toast } = useToast();
     const [loading, setLoading] = useState(false);
     const [analysisResult, setAnalysisResult] = useState<AnalysisResponse | null>(null);

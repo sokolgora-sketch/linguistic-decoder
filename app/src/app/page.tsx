@@ -66,7 +66,7 @@ if (process.env.NEXT_PUBLIC_DEV_EVAL === "1") {
 }
 
 // ==== Main App ===============================================================
-export default function LinguisticDecoderApp() {
+function LinguisticDecoderApp() {
   const { toast } = useToast();
   const [word, setWord] = useState("");
   const [mode, setMode] = useState<"strict" | "open">("strict");
