@@ -75,7 +75,7 @@ export default function LinguisticDecoderApp() {
   const [err, setErr] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [isWarming, setIsWarming] = useState(false);
-  const [showDebug, setShowDebug] = useState(false);
+  const [showDebug, setShowDebug] = useState(showDebug);
   const [useAi, setUseAi] = useState(false);
   const [heartHistory, setHeartHistory] = useState<HeartHistoryItem[]>([]);
 
