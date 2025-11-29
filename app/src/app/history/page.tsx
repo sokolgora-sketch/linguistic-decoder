@@ -17,7 +17,7 @@ import type { Alphabet } from "@/lib/runAnalysis";
 
 type AnalysisResponse = EnginePayload & { analysis?: AnalysisResult };
 
-function HistoryPage() {
+export default function HistoryPage() {
     const { toast } = useToast();
     const [loading, setLoading] = useState(false);
     const [analysisResult, setAnalysisResult] = useState<AnalysisResponse | null>(null);

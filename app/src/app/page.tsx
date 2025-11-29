@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState, useEffect, useMemo } from "react";
@@ -66,7 +65,7 @@ if (process.env.NEXT_PUBLIC_DEV_EVAL === "1") {
 }
 
 // ==== Main App ===============================================================
-function LinguisticDecoderApp() {
+export default function LinguisticDecoderApp() {
   const { toast } = useToast();
   const [word, setWord] = useState("");
   const [mode, setMode] = useState<"strict" | "open">("strict");
