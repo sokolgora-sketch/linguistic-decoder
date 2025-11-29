@@ -30,8 +30,8 @@ import { PROFILES } from "@/functions/languages";
 import { ThemeToggle } from "@/components/ThemeProvider";
 import { useDebounced } from "@/hooks/useDebounced";
 import { Loader2, Sparkles, Wand2, HelpCircle, GitBranch, BookOpen, History as HistoryIcon, ListChecks } from "lucide-react";
-import { ComparePanel } from "@/components/ComparePanel";
-import { normalizeEnginePayload, type Vowel, type EnginePayload, type AnalysisResult_DEPRECATED } from "@/shared/engineShape";
+import ComparePanel from "@/components/ComparePanel";
+import { normalizeEnginePayload, type Vowel, type EnginePayload } from "@/shared/engineShape";
 import { enginePayloadToAnalysisResult, analysisResultToEnginePayload } from "@/shared/analysisAdapter";
 import { HistoryPanel } from "@/components/HistoryPanel";
 import { doc, getDoc } from "firebase/firestore";
@@ -41,9 +41,6 @@ import { allowAnalyze } from "@/lib/throttle";
 import { ExportJsonButton } from "@/components/ExportJsonButton";
 import { logError } from "@/lib/logError";
 import { VOICE_COLOR_MAP, VOICE_LABEL_MAP } from "@/shared/voiceColors";
-import { HeartCalculator } from "@/components/HeartCalculator";
-import type { HistoryEntry } from "@/shared/history";
-import { ZeroWordPanel } from "@/components/ZeroWordPanel";
 
 const VOICE_META: { id: Vowel; label: string; role: string }[] = [
   { id: "A", label: "Action / Truth", role: "Launches, cuts through, sets the first line." },
@@ -52,13 +49,14 @@ const VOICE_META: { id: Vowel; label: string; role: string }[] = [
   { id: "O", label: "Balance / Heart", role: "Holds the center, mediates between high and low." },
   { id: "U", label: "Unity / Breath", role: "Carries the flow, breath and movement through the word." },
   { id: "Y", label: "Network / Weave", role: "Loops, branches, weaves paths across the matrix." },
-  { id: "Ë", label: "Evolution / Unit", role: "Closes the cycle, the ‘done’ state." },
+  { id: "Ë", label: "Evolution / Unit", role: "Closes the cycle, a formed unit, the ‘done’ state." },
 ];
 
-type HeartSnapshot = {
+type HeartHistoryItem = {
   word: string;
-  state: string | null;
-  principlesPath: string[] | null;
+  state: string;
+  principlesPath: string[];
+  totalMod7?: number;
 };
 
 let EvalPanelComp: React.ComponentType | null = null;
@@ -80,13 +78,10 @@ export default function LinguisticDecoderApp() {
   const [isWarming, setIsWarming] = useState(false);
   const [showDebug, setShowDebug] = useState(false);
   const [useAi, setUseAi] = useState(false);
-
-  // 🔹 New: keep a short “recent hearts” history
-  const [heartHistory, setHeartHistory] = useState<HeartSnapshot[]>([]);
-  const [history, setHistory] = useState<HistoryEntry[]>([]);
+  const [heartHistory, setHeartHistory] = useState<HeartHistoryItem[]>([]);
 
   // Debounce user input, then warm the cache in the background
-  const debouncedWord = useDebounced(word, 450); // currently unused, fine
+  const debouncedWord = useDebounced(word, 450);
 
   const canAnalyze = word.trim().length > 0 && !loading;
 
@@ -94,53 +89,45 @@ export default function LinguisticDecoderApp() {
     if (!data) return null;
     return enginePayloadToAnalysisResult(data);
   }, [data]);
-  
-  useEffect(() => {
-    if (analysisResult) {
-      const newEntry: HistoryEntry = {
-        id: `${analysisResult.core.word}-${new Date().getTime()}`,
-        word: analysisResult.core.word,
-        result: analysisResult,
-        createdAt: new Date().toISOString(),
-      };
-      setHistory(prev => {
-        const filtered = prev.filter(h => h.word.toLowerCase() !== newEntry.word.toLowerCase());
-        return [newEntry, ...filtered].slice(0, 20);
-      });
-    }
-  }, [analysisResult]);
 
-  // Optional fields from EnginePayload (solveMs, cacheHit, recomputed, etc.)
-  const solveMs = (data as any)?.solveMs as number | undefined;
-
+  // 🔹 Heart summary from math7 (attached in analysisAdapter)
   const math7: any = (analysisResult as any)?.math7 || null;
-  
-  // 🔹 Whenever we get a fresh analysis with math7, update the heart history
+
+  // 🔹 Heart history strip (last N analyses in this session)
   useEffect(() => {
     if (!analysisResult || !data) return;
+    const m7: any = (analysisResult as any).math7;
+    if (!m7?.primary) return;
 
-    const math7: any = (analysisResult as any).math7;
-    const primary = math7?.primary;
-    if (!primary) return;
+    const item: HeartHistoryItem = {
+      word: data.word,
+      state: m7.primary.state ?? "unknown",
+      principlesPath: Array.isArray(m7.primary.principlesPath)
+        ? m7.primary.principlesPath
+        : [],
+      totalMod7: m7.primary.totalMod7,
+    };
 
     setHeartHistory((prev) => {
-      // avoid duplicates for the same word
-      const filtered = prev.filter((h) => h.word !== data.word);
-
-      const snapshot: HeartSnapshot = {
-        word: data.word,
-        state: primary.cycleState ?? null,
-        principlesPath: primary.principlesPath ?? null,
-      };
-
-      // newest first, keep last 5
-      return [snapshot, ...filtered].slice(0, 5);
+      // keep words unique; newest wins
+      const filtered = prev.filter(
+        (h) => h.word.toLowerCase() !== item.word.toLowerCase()
+      );
+      return [item, ...filtered].slice(0, 6); // cap at 6 items
     });
-  }, [analysisResult, data?.word]);
+  }, [analysisResult, data]);
 
-  async function analyze(nextWord?: string, nextMode?: "strict" | "open", nextAlphabet?: Alphabet) {
+  async function analyze(
+    nextWord?: string,
+    nextMode?: "strict" | "open",
+    nextAlphabet?: Alphabet
+  ) {
     if (!allowAnalyze()) {
-      toast({ variant: "destructive", title: "Too many requests", description: "Please try again in a few moments." });
+      toast({
+        variant: "destructive",
+        title: "Too many requests",
+        description: "Please try again in a few moments.",
+      });
       return;
     }
     const useWord = (nextWord ?? word).trim();
@@ -150,16 +137,23 @@ export default function LinguisticDecoderApp() {
 
     setLoading(true);
     setErr(null);
-    // 🔥 do NOT clear data here – keep previous result while new one is computing
+    // do NOT clear data here – keep previous result while new one is computing
 
     try {
-      const clientResponse = await analyzeClient(useWord, useMode, useAlphabet, { edgeWeight, useAi });
+      const clientResponse = await analyzeClient(useWord, useMode, useAlphabet, {
+        edgeWeight,
+        useAi,
+      });
       console.log("API result:", clientResponse);
 
       setData(clientResponse);
     } catch (e: any) {
       const error = e?.message || "Request failed";
-      logError({ where: "analyze", message: error, detail: { word: useWord, stack: e.stack } });
+      logError({
+        where: "analyze",
+        message: error,
+        detail: { word: useWord, stack: e.stack },
+      });
       console.error("Analysis chain failed:", e);
       setErr(error);
       setData(null);
@@ -174,7 +168,14 @@ export default function LinguisticDecoderApp() {
       word: "smoke-test",
       mode: "strict",
       alphabet: "auto",
-      primaryPath: { voicePath: ["O", "E"], ringPath: [0, 2], levelPath: [0, 1], ops: [], checksums: { V: 0, E: 0, C: 0 }, kept: 0 },
+      primaryPath: {
+        voicePath: ["O", "E"],
+        ringPath: [0, 2],
+        levelPath: [0, 1],
+        ops: [],
+        checksums: { V: 0, E: 0, C: 0 },
+        kept: 0,
+      },
       frontierPaths: [],
       windows: [],
       windowClasses: [],
@@ -208,14 +209,79 @@ export default function LinguisticDecoderApp() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  function handleSelectHistory(entry: HistoryEntry) {
-    const payload = analysisResultToEnginePayload(entry.result);
-    if (payload) {
-      setData({ ...payload, cacheHit: true });
+  async function onLoadAnalysis(cacheId: string) {
+    if (!db) {
       toast({
-        title: "Loaded from History",
-        description: `Analysis for '${payload.word}' loaded.`,
+        variant: "destructive",
+        title: "Database Error",
+        description: "Firestore is not available.",
       });
+      return;
+    }
+    setLoading(true);
+    setErr(null);
+    try {
+      const cacheRef = doc(db, "analyses", cacheId);
+      const snap = await getDoc(cacheRef);
+      if (snap.exists()) {
+        const payload = normalizeEnginePayload(snap.data());
+        setData({ ...payload, cacheHit: true });
+        toast({
+          title: "Loaded from Cache",
+          description: `Analysis for '${payload.word}' loaded.`,
+        });
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Not Found",
+          description: "Could not find that analysis in the cache.",
+        });
+      }
+    } catch (e: any) {
+      logError({ where: "history-load", message: e.message, detail: { cacheId } });
+      toast({
+        variant: "destructive",
+        title: "Load Error",
+        description: e.message || "Failed to load analysis.",
+      });
+      setErr(e.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function onRecompute(word: string, m?: string, a?: string) {
+    setLoading(true);
+    setErr(null);
+    try {
+      const result = await analyzeClient(word, (m as any) || mode, (a as any) || alphabet, {
+        bypass: true,
+        skipWrite: false,
+        edgeWeight,
+        useAi,
+      });
+      setData({ ...result, recomputed: true });
+      toast({
+        title: "Recomputed",
+        description: `Fresh analysis for '${result.word}' complete.`,
+      });
+    } catch (e: any) {
+      logError({ where: "history-recompute", message: e.message, detail: { word } });
+      toast({
+        variant: "destructive",
+        title: "Recompute Error",
+        description: e.message || "Failed to recompute analysis.",
+      });
+      setErr(e.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (canAnalyze) {
+      analyze();
     }
   }
 
@@ -223,20 +289,6 @@ export default function LinguisticDecoderApp() {
     alphabet === "auto"
       ? "Auto-Detect"
       : alphabet.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
-
-  // Safe key for the Analysis Results card (avoids 'data is possibly null')
-  const analysisCardKey =
-    data != null ? `${data.word}-${data.mode}-${data.alphabet}` : `analysis-${mode}-${alphabet}`;
-    
-  const calculatorExprA = (analysisResult?.core.primaryPath.voicePath ?? "").replace(/[^AEIOUYË1-7]/gi, "");
-  
-  const coreHeart = analysisResult?.math7?.heart;
-  const coreId =
-    coreHeart
-      ? `${coreHeart.principle} (${coreHeart.decimal} / ${coreHeart.base7.join(
-          " "
-        )} / ${coreHeart.voices.join(" → ")})`
-      : "—";
 
   return (
     <div className="min-h-screen bg-background text-foreground p-4 lg:p-8 flex flex-col items-stretch transition-colors duration-300">
@@ -253,11 +305,11 @@ export default function LinguisticDecoderApp() {
               </p>
               {data && (
                 <p className="text-xs text-muted-foreground/80">
-                  <span className="font-code">engine={data?.engineVersion}</span>
+                  <span className="font-code">engine={data.engineVersion}</span>
                   <span className="mx-2">·</span>
-                  <span className="font-code">mode={data?.mode}</span>
+                  <span className="font-code">mode={data.mode}</span>
                   <span className="mx-2">·</span>
-                  <span className="font-code">alphabet={data?.alphabet}</span>
+                  <span className="font-code">alphabet={data.alphabet}</span>
                 </p>
               )}
             </div>
@@ -298,22 +350,66 @@ export default function LinguisticDecoderApp() {
                 </span>
               )}
 
-              {solveMs !== undefined && (
+              {"solveMs" in data && (
                 <span>
-                  <span className="font-semibold">Solve:</span> {solveMs} ms
+                  <span className="font-semibold">Solve:</span> {data.solveMs} ms
                 </span>
               )}
 
-              {(data as any).cacheHit && (
+              {data.cacheHit && (
                 <span className="px-1.5 py-0.5 rounded-full border border-accent/60 text-accent-foreground bg-accent/10">
                   cache hit
                 </span>
               )}
 
-              {(data as any).recomputed && (
+              {data.recomputed && (
                 <span className="px-1.5 py-0.5 rounded-full border border-blue-500/60 text-blue-300 bg-blue-500/10">
                   recomputed
                 </span>
+              )}
+
+              {/* 🔹 Heart summary pill */}
+              {math7?.primary && (
+                <span className="px-1.5 py-0.5 rounded-full border border-purple-500/60 bg-purple-500/10 text-purple-200 inline-flex items-center gap-1">
+                  <span className="font-semibold uppercase tracking-wide">
+                    Heart:
+                  </span>
+                  <span className="capitalize">{math7.primary.state}</span>
+                  {math7.primary.principlesPath &&
+                    math7.primary.principlesPath.length > 0 && (
+                      <span className="opacity-80">
+                        · {math7.primary.principlesPath.join(" → ")}
+                      </span>
+                    )}
+                </span>
+              )}
+
+              {/* 🔹 Heart history strip */}
+              {heartHistory.length > 0 && (
+                <div className="flex flex-wrap items-center gap-1">
+                  <span className="font-semibold">Recent hearts:</span>
+                  {heartHistory.map((item) => (
+                    <button
+                      key={item.word}
+                      type="button"
+                      onClick={() => {
+                        setWord(item.word);
+                        analyze(item.word);
+                      }}
+                      className="px-1.5 py-0.5 rounded-full border border-border/60 bg-muted/40 hover:bg-accent/30 hover:border-accent/80 text-[11px] font-mono"
+                    >
+                      <span className="font-semibold">{item.word}</span>
+                      <span className="mx-1">·</span>
+                      <span className="capitalize">{item.state}</span>
+                      {item.principlesPath.length > 0 && (
+                        <>
+                          <span className="mx-1">·</span>
+                          <span>{item.principlesPath.join(" → ")}</span>
+                        </>
+                      )}
+                    </button>
+                  ))}
+                </div>
               )}
             </>
           ) : (
@@ -322,35 +418,6 @@ export default function LinguisticDecoderApp() {
             </span>
           )}
         </section>
-
-        {/* Recent hearts strip */}
-        {heartHistory.length > 0 && (
-          <section className="mt-1 text-[11px] text-muted-foreground flex flex-wrap items-center gap-1">
-            <span className="uppercase tracking-wide font-semibold text-[10px] text-primary/80">
-              Recent hearts:
-            </span>
-            {heartHistory.map((h) => (
-              <button
-                key={h.word}
-                type="button"
-                onClick={() => {
-                  setWord(h.word);
-                  analyze(h.word);
-                }}
-                className="px-1.5 py-0.5 rounded-full border border-border/60 bg-muted/50 hover:bg-accent/20 hover:border-accent/70 transition text-[10px] font-medium"
-              >
-                <span className="font-semibold mr-1">{h.word}</span>
-                {h.state && <span className="opacity-80">· {h.state}</span>}
-                {h.principlesPath && h.principlesPath.length > 0 && (
-                  <span className="opacity-80">
-                    {" "}
-                    · {h.principlesPath.join(" → ")}
-                  </span>
-                )}
-              </button>
-            ))}
-          </section>
-        )}
 
         {/* Controls */}
         <Card>
@@ -374,10 +441,7 @@ export default function LinguisticDecoderApp() {
               )}
             </div>
 
-            <form
-              onSubmit={(e) => { e.preventDefault(); if (canAnalyze) analyze(); }}
-              className="flex flex-col sm:flex-row gap-2"
-            >
+            <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-2">
               <Input
                 value={word}
                 onChange={(e) => setWord(e.target.value)}
@@ -467,7 +531,9 @@ export default function LinguisticDecoderApp() {
                   </SelectContent>
                 </Select>
                 <div className="flex items-center gap-4">
-                  <label className="text-xs text-muted-foreground">Edge: {edgeWeight.toFixed(2)}</label>
+                  <label className="text-xs text-muted-foreground">
+                    Edge: {edgeWeight.toFixed(2)}
+                  </label>
                   <input
                     type="range"
                     min={0}
@@ -520,14 +586,18 @@ export default function LinguisticDecoderApp() {
             <Card className="animate-fade-in">
               <CardHeader>
                 <CardTitle>Seven-Voices Path</CardTitle>
-                <CardDescription>An animated view of the word’s primary path through the vowel matrix.</CardDescription>
+                <CardDescription>
+                  An animated view of the word’s primary path through the vowel matrix.
+                </CardDescription>
               </CardHeader>
               <CardContent className="p-3 sm:p-4 space-y-3">
                 <TwoRailsWithConsonants
                   word={data?.word || word}
                   path={loading ? [] : data?.primaryPath?.voicePath || []}
                   running={loading}
-                  playKey={`${data?.word || ""}|${data?.primaryPath?.voicePath?.join(",") || ""}`}
+                  playKey={`${data?.word || ""}|${
+                    data?.primaryPath?.voicePath?.join(",") || ""
+                  }`}
                   height={320}
                   durationPerHopMs={900}
                 />
@@ -565,7 +635,7 @@ export default function LinguisticDecoderApp() {
                   </ul>
                 </CardContent>
               </Card>
-              {analysisResult && data && (
+              {data && (
                 <Card className="animate-fade-in">
                   <CardHeader>
                     <CardTitle>Metadata</CardTitle>
@@ -580,16 +650,17 @@ export default function LinguisticDecoderApp() {
                     <p>
                       <strong>Alphabet:</strong> {data.alphabet}
                     </p>
-                    <p><strong>Core ID:</strong> {coreId}</p>
-                    {solveMs !== undefined && (
+                    {"solveMs" in data && (
                       <p>
-                        <strong>Solve Time:</strong> {solveMs} ms
+                        <strong>Solve Time:</strong> {data.solveMs} ms
                       </p>
                     )}
-                    {(data as any).cacheHit && (
-                      <p className="font-bold text-accent-foreground pt-1">Loaded from cache</p>
+                    {data.cacheHit && (
+                      <p className="font-bold text-accent-foreground pt-1">
+                        Loaded from cache
+                      </p>
                     )}
-                    {(data as any).recomputed && (
+                    {data.recomputed && (
                       <p className="font-bold text-blue-400 pt-1">Recomputed</p>
                     )}
                   </CardContent>
@@ -598,9 +669,9 @@ export default function LinguisticDecoderApp() {
             </div>
           </div>
 
-          {data && analysisResult && (
+          {analysisResult && data && (
             <Card
-              key={analysisCardKey}
+              key={`${data.word}-${data.mode}-${data.alphabet}`}
               className="animate-fade-in"
             >
               <CardHeader>
@@ -612,15 +683,11 @@ export default function LinguisticDecoderApp() {
               <CardContent className="space-y-4">
                 <ResultsDisplay analysis={analysisResult} />
                 <div className="flex justify-end pt-2">
-                  <ExportJsonButton analysis={data} />
+                  {data && <ExportJsonButton analysis={data} />}
                 </div>
               </CardContent>
             </Card>
           )}
-        </section>
-
-        <section className="mt-12">
-          <ZeroWordPanel />
         </section>
 
         {/* Informational Accordions */}
@@ -650,21 +717,20 @@ export default function LinguisticDecoderApp() {
                       .
                     </li>
                     <li>
-                      Use the <strong>Language Profile</strong> dropdown to force a
-                      specific phonetic profile, or leave it on{" "}
-                      <strong>Auto-Detect</strong>.
+                      Use the <strong>Language Profile</strong> dropdown to force a specific
+                      phonetic profile, or leave it on <strong>Auto-Detect</strong>.
                     </li>
                     <li>
-                      The <strong>Seven-Voices Path</strong> shows the primary vowel path
-                      and consonant windows.
+                      The <strong>Seven-Voices Path</strong> shows the primary vowel path and
+                      consonant windows.
                     </li>
                     <li>
                       The <strong>Analysis Results</strong> card breaks down primary and
                       frontier paths, principles, and language candidates.
                     </li>
                     <li>
-                      Toggle <strong>AI Mapper</strong> to include language-family
-                      mappings when available.
+                      Toggle <strong>AI Mapper</strong> to include language-family mappings
+                      when available.
                     </li>
                   </ol>
                 </Card>
@@ -673,7 +739,7 @@ export default function LinguisticDecoderApp() {
           )}
 
           {/* Compare Two Words */}
-          <AccordionItem value="compare">
+          <AccordionItem value="item-2">
             <AccordionTrigger className="text-sm font-semibold">
               <div className="flex items-center gap-2">
                 <GitBranch className="w-4 h-4 text-muted-foreground" />
@@ -681,7 +747,12 @@ export default function LinguisticDecoderApp() {
               </div>
             </AccordionTrigger>
             <AccordionContent>
-              <ComparePanel history={history} />
+              <Card className="p-4">
+                <p className="text-xs text-muted-foreground mb-3">
+                  Analyze two words side by side and compare their Seven-Voices paths.
+                </p>
+                <ComparePanel defaultMode={mode} defaultAlphabet={alphabet} />
+              </Card>
             </AccordionContent>
           </AccordionItem>
 
@@ -702,22 +773,9 @@ export default function LinguisticDecoderApp() {
               </Card>
             </AccordionContent>
           </AccordionItem>
-          
-          <AccordionItem value="item-heart-calculator">
-            <AccordionTrigger className="text-sm font-semibold">
-              <div className="flex items-center gap-2">
-                <span className="text-lg">💗</span>
-                <span>Seven-Principles Calculator</span>
-              </div>
-            </AccordionTrigger>
-            <AccordionContent>
-              <HeartCalculator />
-            </AccordionContent>
-          </AccordionItem>
-
 
           {/* History */}
-          <AccordionItem value="history">
+          <AccordionItem value="item-4">
             <AccordionTrigger className="text-sm font-semibold">
               <div className="flex items-center gap-2">
                 <HistoryIcon className="w-4 h-4 text-muted-foreground" />
@@ -725,7 +783,12 @@ export default function LinguisticDecoderApp() {
               </div>
             </AccordionTrigger>
             <AccordionContent>
-              <HistoryPanel history={history} onSelect={handleSelectHistory} />
+              <Card className="p-4">
+                <p className="text-xs text-muted-foreground mb-3">
+                  Reload or recompute previous analyses from Firestore history.
+                </p>
+                <HistoryPanel onLoadAnalysis={onLoadAnalysis} onRecompute={onRecompute} />
+              </Card>
             </AccordionContent>
           </AccordionItem>
 
@@ -751,14 +814,14 @@ export default function LinguisticDecoderApp() {
         </Accordion>
 
         {/* Debug view */}
-        {showDebug && data && (
+        {showDebug && analysisResult && (
           <div className="my-4">
             <Card className="p-4">
               <div className="flex justify-between items-center mb-2">
                 <h3 className="font-bold text-sm tracking-wide">API Echo (debug)</h3>
               </div>
               <pre className="font-code text-xs whitespace-pre-wrap bg-slate-800 p-2.5 rounded-lg max-h-96 overflow-auto mt-2">
-                {analysisResult ? JSON.stringify(analysisResultToEnginePayload(analysisResult), null, 2) : ""}
+                {JSON.stringify(analysisResultToEnginePayload(analysisResult), null, 2)}
               </pre>
             </Card>
           </div>
@@ -775,13 +838,15 @@ export default function LinguisticDecoderApp() {
                   <span className="mr-2">engine={data.engineVersion}</span>
                   <span className="mr-2">mode={data.mode}</span>
                   <span className="mr-2">alphabet={data.alphabet}</span>
-                  {solveMs !== undefined && <span className="mr-2">solveMs={solveMs}</span>}
-                  {(data as any).cacheHit && (
+                  {"solveMs" in data && (
+                    <span className="mr-2">solveMs={data.solveMs}</span>
+                  )}
+                  {data.cacheHit && (
                     <span className="mr-2 px-1.5 py-0.5 rounded bg-accent/20 border border-accent text-accent-foreground">
                       cacheHit
                     </span>
                   )}
-                  {(data as any).recomputed && (
+                  {data.recomputed && (
                     <span className="mr-2 px-1.5 py-0.5 rounded bg-blue-900 border border-blue-700">
                       recomputed
                     </span>

@@ -1,4 +1,6 @@
-import { SevenCalcResult } from "./sevenPrinciplesCalc";
+// src/shared/engineShape.ts
+import type { SymbolicCoreResult } from "@/lib/symbolicCore";
+export type { SevenCalcResult } from "./sevenPrinciplesCalc";
 
 // Canonical shape your UI will use everywhere.
 export type Vowel = "A" | "E" | "I" | "O" | "U" | "Y" | "Ë";

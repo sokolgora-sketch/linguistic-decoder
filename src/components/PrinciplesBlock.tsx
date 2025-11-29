@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Card } from "./ui/card";
 import type { PrinciplesSet, SevenCalcResult } from "@/shared/engineShape";
@@ -16,7 +17,7 @@ export function PrinciplesBlock({
   return (
     <Card className="p-4 space-y-2">
       <h3 className="font-bold text-sm tracking-wide">
-        Seven Principles (Heart Calculator)
+        Seven Principles (Core Distribution)
       </h3>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
         {pset.principles.map((p) => {

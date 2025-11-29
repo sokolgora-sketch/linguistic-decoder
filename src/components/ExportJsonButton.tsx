@@ -2,8 +2,10 @@
 "use client";
 
 import { Button } from "./ui/button";
-import type { EnginePayload, AnalysisResult_DEPRECATED } from "../shared/engineShape";
+import type { EnginePayload } from "../shared/engineShape";
 import { enginePayloadToAnalysisResult } from "@/shared/analysisAdapter";
+import { downloadJson } from "@/lib/downloadJson";
+import { toWordProtocol } from "@/shared/wordProtocol";
 
 type ExportJsonButtonProps = {
   analysis: EnginePayload;
@@ -11,24 +13,16 @@ type ExportJsonButtonProps = {
 
 export function ExportJsonButton({ analysis }: ExportJsonButtonProps) {
   const handleExport = () => {
-    // Export the rich AnalysisResult if it exists, otherwise fall back to the base payload.
-    const exportData = enginePayloadToAnalysisResult(analysis);
-    const json = JSON.stringify(exportData, null, 2);
+    const analysisResult = enginePayloadToAnalysisResult(analysis);
+    if (!analysisResult) {
+      console.error("Failed to generate analysis result for export.");
+      return;
+    }
 
-    const blob = new Blob([json], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
+    const protocolRecord = toWordProtocol(analysisResult);
+    const fileName = `${protocolRecord.word || "word"}-protocol.json`;
 
-    // make a simple, safe filename: analysis-<word>-<version>.json
-    const safeWord = (analysis.word || "").replace(/\s+/g, "_");
-    const version = analysis.engineVersion || "dev";
-    const fileName = `analysis-${safeWord}-${version}.json`;
-
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = fileName;
-    a.click();
-
-    URL.revokeObjectURL(url);
+    downloadJson(fileName, protocolRecord);
   };
 
   return (

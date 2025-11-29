@@ -1,56 +1,59 @@
 "use client";
-
 import React, { useState } from "react";
+import type { Alphabet } from "@/lib/runAnalysis";
+import { analyzeClient } from "@/lib/analyzeClient";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Loader2 } from "lucide-react";
-
-import { analyzeClient } from "@/lib/analyzeClient";
-import type { Alphabet } from "@/lib/runAnalysis";
-
-import {
-  normalizeEnginePayload,
-  type EnginePayload,
-  type AnalysisResultWithFamilies,
-} from "@/shared/engineShape";
 import { enginePayloadToAnalysisResult } from "@/shared/analysisAdapter";
-
+import type {
+  AnalysisResultWithFamilies,
+  SevenCalcResult,
+} from "@/shared/engineShape";
 import SevenPrinciplesCompare from "./SevenPrinciplesCompare";
 
-type ComparePanelProps = {
-  defaultMode: "strict" | "open";
-  defaultAlphabet: Alphabet;
-};
+type Mode = "strict" | "open";
 
-async function runSingleWord(
+// Reuse the SAME engine path as the main analyzer.
+// No direct fetch, no custom API route – we just call analyzeClient.
+async function analyzeWordWithEngine(
   word: string,
-  mode: "strict" | "open",
+  mode: Mode,
   alphabet: Alphabet
 ): Promise<AnalysisResultWithFamilies | null> {
   const trimmed = word.trim();
   if (!trimmed) return null;
 
-  const raw = (await analyzeClient(trimmed, mode, alphabet, {
-    edgeWeight: 0.25,
-    useAi: false,
-    bypass: false, // ensure full solver
-  })) as EnginePayload;
+  // You can tune these if you want later
+  const edgeWeight = 0.25;
+  const useAi = false;
 
-  const normalized = normalizeEnginePayload(raw);
-  const analysis = enginePayloadToAnalysisResult(normalized);
-  return analysis;
+  const payload = await analyzeClient(trimmed, mode, alphabet, {
+    edgeWeight,
+    useAi,
+    // we can skip writes + bypass cache if you want it “pure”
+    bypass: true,
+    skipWrite: true,
+  });
+
+  const analysis = enginePayloadToAnalysisResult(payload);
+  return analysis as AnalysisResultWithFamilies;
+}
+
+interface ComparePanelProps {
+  defaultMode?: Mode;
+  defaultAlphabet?: Alphabet;
 }
 
 const ComparePanel: React.FC<ComparePanelProps> = ({
-  defaultMode,
-  defaultAlphabet,
+  defaultMode = "strict",
+  defaultAlphabet = "auto",
 }) => {
   const [wordA, setWordA] = useState("study");
   const [wordB, setWordB] = useState("damage");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [refreshKey, setRefreshKey] = useState(0);
 
   const [results, setResults] = useState<{
     a: AnalysisResultWithFamilies | null;
@@ -66,28 +69,27 @@ const ComparePanel: React.FC<ComparePanelProps> = ({
       return;
     }
 
-    setError(null);
     setLoading(true);
+    setError(null);
     setResults({ a: null, b: null });
-
     try {
       const [resA, resB] = await Promise.all([
-        runSingleWord(a, defaultMode, defaultAlphabet),
-        runSingleWord(b, defaultMode, defaultAlphabet),
+        analyzeWordWithEngine(a, defaultMode, defaultAlphabet),
+        analyzeWordWithEngine(b, defaultMode, defaultAlphabet),
       ]);
+
+      console.log("COMPARE RESULTS", { a: resA, b: resB });
       setResults({ a: resA, b: resB });
-      setRefreshKey((k) => k + 1); // ✅ force re-render on each compare
     } catch (e: any) {
-      console.error("Compare error:", e);
-      setError(e?.message || "Compare failed");
+      setError(e?.message ?? "Comparison failed");
     } finally {
       setLoading(false);
     }
   };
 
-  const heartResults = {
-    a: results.a?.math7?.heart ?? null,
-    b: results.b?.math7?.heart ?? null,
+  const sevenCalcResults = {
+    a: (results.a?.math7?.heart ?? null) as SevenCalcResult | null,
+    b: (results.b?.math7?.heart ?? null) as SevenCalcResult | null,
   };
 
   return (
@@ -98,13 +100,13 @@ const ComparePanel: React.FC<ComparePanelProps> = ({
       <CardContent className="space-y-4">
         <div className="flex flex-col sm:flex-row gap-2 items-center">
           <Input
-            placeholder="First word"
+            placeholder="First word (e.g. study)"
             value={wordA}
             onChange={(e) => setWordA(e.target.value)}
           />
           <span className="text-muted-foreground">vs.</span>
           <Input
-            placeholder="Second word"
+            placeholder="Second word (e.g. damage)"
             value={wordB}
             onChange={(e) => setWordB(e.target.value)}
           />
@@ -116,12 +118,11 @@ const ComparePanel: React.FC<ComparePanelProps> = ({
 
         {error && <p className="text-sm text-red-500">{error}</p>}
 
-        {(heartResults.a || heartResults.b) && (
+        {(results.a || results.b) && (
           <SevenPrinciplesCompare
-            key={refreshKey} // ✅ re-mounts every new compare
+            results={sevenCalcResults}
             wordA={wordA}
             wordB={wordB}
-            results={heartResults}
           />
         )}
       </CardContent>

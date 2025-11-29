@@ -69,9 +69,27 @@ function MorphologyMatrixBlock({ matrix }: { matrix: MorphologyMatrix }) {
   );
 }
 
+function renderCoreMini(lang: string, math7?: Math7Summary) {
+  if (!math7?.candidates) return null;
+
+  const core = math7.candidates[lang];
+  if (!core) return null;
+
+  const voices = core.voices.join(" → ");
+  const principle = core.principlesPath[0] ?? "";
+  const state = core.cycleState;
+
+  return (
+    <div className="mt-2 text-xs text-emerald-300">
+      <span className="font-semibold">Core:</span>{" "}
+      {principle} · {core.totalMod7} · {state} · {voices}
+    </div>
+  );
+}
+
 type CandidatesProps = {
   candidates?: Candidate[];
-  math7?: Math7Summary | null;
+  math7?: Math7Summary;
 };
 
 export function Candidates({ candidates, math7 }: CandidatesProps) {
@@ -88,58 +106,49 @@ export function Candidates({ candidates, math7 }: CandidatesProps) {
     <div className="mt-3">
       <h3 className="font-bold text-sm tracking-wide mb-2">Language Family Candidates</h3>
       <div className="space-y-3">
-        {candidates.map((c, i) => {
-          const core = math7?.candidates?.[c.language];
-          return (
-            <Card key={`${c.language}-${c.form}-${i}`} className="rounded-2xl bg-slate-900/60 border-slate-600 px-4 py-3 text-sm">
-              <div className="flex items-start justify-between gap-2">
-                <div className="font-semibold flex-1 min-w-0">
-                  {c.language?.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                  {c.family && c.family !== c.language && (
-                    <span className="ml-2 text-xs font-medium text-muted-foreground">({c.family})</span>
-                  )}
-                  {c.confidenceTag === 'speculative' && (
-                    <Badge variant="outline" className="ml-2">Speculative</Badge>
-                  )}
-                  {c.status === 'experimental' && (
-                    <Badge variant="outline" className="ml-2">Experimental</Badge>
-                  )}
-                </div>
-                <div className="font-code text-primary/80 shrink-0">{c.form}</div>
+        {candidates.map((c, i) => (
+          <Card key={`${c.language}-${c.form}-${i}`} className="rounded-2xl bg-slate-900/60 border-slate-600 px-4 py-3 text-sm">
+            <div className="flex items-start justify-between gap-2">
+              <div className="font-semibold flex-1 min-w-0">
+                {c.language?.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                {c.family && c.family !== c.language && (
+                  <span className="ml-2 text-xs font-medium text-muted-foreground">({c.family})</span>
+                )}
+                {c.confidenceTag === 'speculative' && (
+                  <Badge variant="outline" className="ml-2">Speculative</Badge>
+                )}
+                {c.status === 'experimental' && (
+                  <Badge variant="outline" className="ml-2">Experimental</Badge>
+                )}
               </div>
+              <div className="font-code text-primary/80 shrink-0">{c.form}</div>
+            </div>
 
-              <p className="text-xs text-muted-foreground mt-1.5 pt-1.5 border-t border-slate-700/60">
-                {c.decomposition.functionalStatement}
-              </p>
+            <p className="text-xs text-muted-foreground mt-1.5 pt-1.5 border-t border-slate-700/60">
+              {c.decomposition.functionalStatement}
+            </p>
 
-              {c.morphologyMatrix && (
-                <MorphologyMatrixBlock matrix={c.morphologyMatrix} />
-              )}
-              
-              {core && (
-                <div className="mt-2 text-xs text-emerald-300">
-                  <span className="font-semibold">Core:</span>{" "}
-                  {core.cycleState} · mod7={core.totalMod7} ·{" "}
-                  {core.principlesPath.join(" → ")}
-                </div>
-              )}
+            {c.morphologyMatrix && (
+              <MorphologyMatrixBlock matrix={c.morphologyMatrix} />
+            )}
+            
+            {renderCoreMini(c.language, math7)}
 
-              {c.consonantSignals && c.consonantSignals.length > 0 && (
-                <div className="mt-2 text-xs text-slate-400">
-                    {c.consonantSignals[0]}
-                </div>
-              )}
-              
-              {c.axes && (
-                <div className="flex gap-4 items-center mt-2 text-xs">
-                    <span>{axisLabel(c.axes.principles)} Principles</span>
-                    <span>{axisLabel(c.axes.morphology)} Morphology</span>
-                    <span>{axisLabel(c.axes.consonants)} Consonants</span>
-                </div>
-              )}
-            </Card>
-          )
-        })}
+            {c.consonantSignals && c.consonantSignals.length > 0 && (
+              <div className="mt-2 text-xs text-slate-400">
+                  {c.consonantSignals[0]}
+              </div>
+            )}
+            
+            {c.axes && (
+              <div className="flex gap-4 items-center mt-2 text-xs">
+                  <span>{axisLabel(c.axes.principles)} Principles</span>
+                  <span>{axisLabel(c.axes.morphology)} Morphology</span>
+                  <span>{axisLabel(c.axes.consonants)} Consonants</span>
+              </div>
+            )}
+          </Card>
+        ))}
       </div>
     </div>
   );

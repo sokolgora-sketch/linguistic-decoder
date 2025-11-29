@@ -26,7 +26,7 @@ const ZeroPanel: React.FC = () => {
 
     setLoading(true);
     try {
-      const res = await fetch("/api/zero-analyze-word", {
+      const res = await fetch("/api/analyze-word", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ word: trimmed }),

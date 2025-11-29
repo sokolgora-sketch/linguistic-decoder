@@ -1,222 +1,164 @@
-'use client';
 
-import React, { useState } from "react";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-} from "./ui/card";
+"use client";
+import React, { useState, useEffect, useCallback } from "react";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "./ui/card";
 import { Input } from "./ui/input";
+import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "./ui/select";
 import { Button } from "./ui/button";
-import { ToggleGroup, ToggleGroupItem } from "./ui/toggle-group";
+import { evaluateVoiceEquation, VOICE_TO_DIGIT } from "@/shared/heartMath";
+import type { SevenCalcResult, SevenOp } from "@/shared/sevenPrinciplesCalc";
+import { cn } from "@/lib/utils";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
-import {
-  evaluateVoiceEquation,
-  Operation,
-  CycleState,
-} from "../shared/heartMath";
-import { SevenCalcResult } from "@/shared/sevenPrinciplesCalc";
+type InputMode = 'voices' | 'numbers';
 
-// Local UI-only ops: what the user sees
-type OperationSymbol = "+" | "-" | "*" | "/";
-type InputMode = "voices" | "numbers";
-
-// Voices type – just for typing the result
-type Voice = "A" | "E" | "I" | "O" | "U" | "Y" | "Ë";
-
-const VOICES: Voice[] = ["A", "E", "I", "O", "U", "Y", "Ë"];
-
-const NUMBER_TO_VOICE: Record<string, Voice> = {
-  "1": "A",
-  "2": "E",
-  "3": "I",
-  "4": "O",
-  "5": "U",
-  "6": "Y",
-  "7": "Ë",
+type Props = {
+  initialExprA?: string;
+  initialExprB?: string;
+  initialOp?: SevenOp;
+  autoRun?: boolean;
+  onResult?: (result: SevenCalcResult | null) => void;
 };
 
-// Map UI symbols to heartMath Operation
-const OP_SYMBOL_TO_OPERATION: Record<OperationSymbol, Operation> = {
-  "+": "add",
-  "-": "subtract",
-  "*": "multiply",
-  "/": "divide",
-};
-
-// ---------- parsing helpers ----------
-
-function parseVoicesFromString(input: string): Voice[] {
-  const cleaned = input
-    .toUpperCase()
-    .replace(/[^AEIOUYË]/g, "")
-    .split("")
-    .filter(Boolean);
-
-  const voices: Voice[] = [];
-  for (const ch of cleaned) {
-    if (VOICES.includes(ch as Voice)) {
-      voices.push(ch as Voice);
-    }
-  }
-  return voices;
-}
-
-function parseVoicesFromNumbers(input: string): Voice[] {
-  const matches = input.match(/[1-7]/g) ?? [];
-  return matches
-    .map((d) => NUMBER_TO_VOICE[d])
-    .filter((v): v is Voice => Boolean(v));
-}
-
-function parseInputToExpr(input: string, mode: InputMode): string {
-  if (!input.trim()) return "";
-
-  const voices =
-    mode === "voices"
-      ? parseVoicesFromString(input)
-      : parseVoicesFromNumbers(input);
-
-  return voices.join("");
-}
-
-// ---------- component ----------
-
-const HeartCalculator: React.FC = () => {
-  // Start empty – no auto AO+A
-  const [leftInput, setLeftInput] = useState("");
-  const [rightInput, setRightInput] = useState("");
-  const [op, setOp] = useState<OperationSymbol>("+");
-  const [mode, setMode] = useState<InputMode>("voices");
+function HeartCalculator({ 
+  initialExprA,
+  initialExprB,
+  initialOp = "add",
+  autoRun = false,
+  onResult
+}: Props) {
+  const [exprA, setExprA] = useState(initialExprA ?? "AO");
+  const [exprB, setExprB] = useState(initialExprB ?? "ËA");
+  const [op, setOp] = useState<SevenOp>(initialOp);
   const [result, setResult] = useState<SevenCalcResult | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [mode, setMode] = useState<InputMode>('voices');
 
-  const handleCalculate = () => {
-    setError(null);
+  useEffect(() => {
+    if (initialExprA !== undefined) setExprA(initialExprA);
+  }, [initialExprA]);
+  
+  useEffect(() => {
+    if (initialExprB !== undefined) setExprB(initialExprB);
+  }, [initialExprB]);
 
-    const leftExpr = parseInputToExpr(leftInput, mode);
-    const rightExpr = parseInputToExpr(rightInput, mode);
+  useEffect(() => {
+    setOp(initialOp);
+  }, [initialOp]);
 
-    if (!leftExpr || !rightExpr) {
-      setResult(null);
-      setError("Please enter at least one valid voice/number on each side.");
-      return;
-    }
-
+  const handleCalculate = useCallback(() => {
     try {
-      const raw = evaluateVoiceEquation(
-        leftExpr,
-        rightExpr,
-        OP_SYMBOL_TO_OPERATION[op]
-      ) as SevenCalcResult;
-      setResult(raw);
+      const res = evaluateVoiceEquation(exprA, exprB, op);
+      const calcResult: SevenCalcResult = {
+        leftExpr: exprA,
+        rightExpr: exprB,
+        op,
+        decimal: res.decimal,
+        base7: res.base7,
+        voices: res.voices,
+        principle: res.principle,
+      };
+      setResult(calcResult);
+      onResult?.(calcResult);
     } catch (e) {
-      console.error(e);
+      console.error("Error evaluating:", e);
       setResult(null);
-      setError("Calculator failed – check inputs or heart math wiring.");
+      onResult?.(null);
     }
-  };
+  }, [exprA, exprB, op, onResult]);
+
+  useEffect(() => {
+    if (autoRun) {
+      handleCalculate();
+    }
+  }, [autoRun, handleCalculate]);
+
+  const voicesDisplay = result ? result.voices.join(' → ') : '';
+  const digitsDisplay = result ? result.voices.map(v => VOICE_TO_DIGIT[v]).join(' → ') : '';
+
+  const primaryDisplay = mode === 'voices' ? voicesDisplay : digitsDisplay;
+  const secondaryDisplay = mode === 'voices' ? digitsDisplay : voicesDisplay;
+
+  const principleDigit = result ? VOICE_TO_DIGIT[result.principle] : undefined;
 
   return (
-    <Card className="mt-4">
-      <CardHeader className="flex flex-row items-center justify-between gap-4">
-        <div>
-          <CardTitle>💗 Seven-Principles Calculator</CardTitle>
-          <CardDescription>
-            Combine two Voice expressions (A, E, I, O, U, Y, Ë or 1–7).
-          </CardDescription>
-        </div>
+    <Card className="mt-6 border border-emerald-600/40 shadow-md">
+      <CardHeader>
+        <div className="flex items-center justify-between gap-4">
+          {/* Title + description */}
+          <div>
+            <CardTitle className="text-lg font-semibold flex items-center gap-2">
+              <span role="img" aria-hidden="true">💗</span>
+              Seven-Principles Calculator
+            </CardTitle>
+            <CardDescription>
+              Combine two Voice expressions (A, E, I, O, U, Y, Ë, or 1–7)
+            </CardDescription>
+          </div>
 
-        <div className="flex items-center gap-2 text-xs">
-          <span className="text-muted-foreground">Mode</span>
-          <ToggleGroup
-            type="single"
-            value={mode}
-            onValueChange={(v) => v && setMode(v as InputMode)}
-          >
-            <ToggleGroupItem value="voices">Voices</ToggleGroupItem>
-            <ToggleGroupItem value="numbers">1–7</ToggleGroupItem>
-          </ToggleGroup>
+          {/* Tiny mode toggle */}
+          <div className="flex items-center gap-2 text-xs">
+            <span className="text-muted-foreground">Mode</span>
+            <ToggleGroup type="single" value={mode} onValueChange={(v: InputMode) => v && setMode(v)}>
+              <ToggleGroupItem value="voices">Voices</ToggleGroupItem>
+              <ToggleGroupItem value="numbers">1–7</ToggleGroupItem>
+            </ToggleGroup>
+          </div>
         </div>
       </CardHeader>
-
       <CardContent className="space-y-4">
-        <div className="flex flex-col gap-3 md:flex-row md:items-center">
-          <div className="flex-1">
-            <Input
-              value={leftInput}
-              onChange={(e) => setLeftInput(e.target.value)}
-              placeholder={mode === "voices" ? "Left (e.g. AE)" : "Left (e.g. 147)"}
-            />
-          </div>
-
-          <div className="w-28">
-            <select
-              className="w-full rounded-md border bg-transparent px-2 py-1 text-sm"
-              value={op}
-              onChange={(e) => setOp(e.target.value as OperationSymbol)}
-            >
-              <option value="+">Add</option>
-              <option value="-">Subtract</option>
-              <option value="*">Multiply</option>
-              <option value="/">Divide</option>
-            </select>
-          </div>
-
-          <div className="flex-1">
-            <Input
-              value={rightInput}
-              onChange={(e) => setRightInput(e.target.value)}
-              placeholder={mode === "voices" ? "Right (e.g. A)" : "Right (e.g. 36)"}
-            />
-          </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+          <Input
+            value={exprA}
+            onChange={(e) => setExprA(e.target.value.toUpperCase())}
+            placeholder={mode === 'voices' ? "First (e.g., AO)" : "First (e.g., 14)"}
+          />
+          <Select value={op} onValueChange={(v) => setOp(v as any)}>
+            <SelectTrigger><SelectValue placeholder="Operation" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="add">Add</SelectItem>
+              <SelectItem value="subtract">Subtract</SelectItem>
+              <SelectItem value="multiply">Multiply</SelectItem>
+              <SelectItem value="divide">Divide</SelectItem>
+            </SelectContent>
+          </Select>
+          <Input
+            value={exprB}
+            onChange={(e) => setExprB(e.target.value.toUpperCase())}
+            placeholder={mode === 'voices' ? "Second (e.g., ËA)" : "Second (e.g., 71)"}
+          />
         </div>
 
-        <p className="text-xs text-muted-foreground">
-          In <strong>Voices</strong> mode, type vowels (<code>AEIOUYË</code>).
-          In <strong>1–7</strong> mode, type digits 1–7 in any format:
-          <code>147</code>, <code>1-4-7</code>, <code>3 6</code>. Digits map to A–Ë.
-        </p>
-
-        <Button className="w-full" onClick={handleCalculate}>
+        <Button onClick={handleCalculate} className="w-full mt-2 bg-emerald-700 hover:bg-emerald-600">
           Calculate
         </Button>
 
-        {error && (
-          <p className="mt-2 text-sm text-red-500">
-            {error}
-          </p>
-        )}
-
         {result && (
-          <div className="mt-3 space-y-2 border-t border-slate-700 pt-3 text-sm">
+          <div className="mt-4 p-3 rounded-lg border border-emerald-500/50 bg-emerald-950/20 text-sm space-y-1">
+            <div><strong>Decimal:</strong> {result.decimal}</div>
+            <div><strong>Base-7:</strong> {result.base7.join(" ")}</div>
             <div>
-              <span className="font-semibold">Expression:</span>{" "}
-              {result.expression}
+              <strong>Voices:</strong>{' '}
+              {primaryDisplay || '—'}
+              {secondaryDisplay && (
+                <span className="ml-2 text-muted-foreground">
+                  ({secondaryDisplay})
+                </span>
+              )}
             </div>
-            <div>
-              <span className="font-semibold">Decimal:</span>{" "}
-              {result.decimal}
-            </div>
-            <div>
-              <span className="font-semibold">Base-7:</span>{" "}
-              {result.base7.length ? result.base7.join(" ") : "—"}
-            </div>
-            <div>
-              <span className="font-semibold">Voices:</span>{" "}
-              {result.voices.length ? result.voices.join(" → ") : "—"}
-            </div>
-            <div>
-              <span className="font-semibold">Principle:</span>{" "}
-              {result.principle}
-            </div>
+            {result.principle && (
+              <div>
+                <strong>Principle:</strong>{' '}
+                {mode === 'voices' ? result.principle : principleDigit}
+                <span className="ml-2 text-muted-foreground">
+                  ({mode === 'voices' ? principleDigit : result.principle})
+                </span>
+              </div>
+            )}
           </div>
         )}
       </CardContent>
     </Card>
   );
-};
+}
 
 export default HeartCalculator;

@@ -5,7 +5,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Loader2 } from "lucide-react";
-import { HistoryPanel } from "@/components/HistoryPanel";
+import { HistoryPanel } from "@/components/HistoryPanel"; // Updated component
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { normalizeEnginePayload, type EnginePayload, type AnalysisResult } from "@/shared/engineShape";
