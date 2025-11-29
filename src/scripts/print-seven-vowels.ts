@@ -1,32 +1,23 @@
 // src/scripts/print-seven-vowels.ts
-// Simple debug script to prove the Seven-Vowels core is wired correctly.
-// Run it with:  npx tsx src/scripts/print-seven-vowels.ts
+// Debug helper: print all seven vowels with index, ring, and traits.
+
+/* eslint-disable no-console */
 
 import { sevenVowelsClient, getVowelView } from "../lib/sevenVowelsClient";
 
-function run() {
-  console.log("Seven-Vowels Core v1\n");
+function main() {
+  console.log("symbol\tindex\tring\ttrait");
 
   for (const v of sevenVowelsClient.VOWELS) {
     const view = getVowelView(v);
-    const t = view.trait;
+    const index = sevenVowelsClient.indexOf(v);
+    const ring = sevenVowelsClient.ringOf(v);
 
-    console.log(
-      [
-        `Vowel: ${view.symbol}`,
-        `index: ${sevenVowelsClient.indexOf(v)}`,
-        `ring: ${sevenVowelsClient.ringOf(v)}`,
-        t.label ? `label: ${t.label}` : null,
-        t.role ? `role: ${t.role}` : null,
-        t.force ? `force: ${t.force}` : null,
-        t.color ? `color: ${t.color}` : null,
-      ]
-        .filter(Boolean)
-        .join(" | ")
-    );
+    // Don't rely on any specific field name on trait; just dump the object.
+    const traitSummary = JSON.stringify(view.trait);
+
+    console.log(`${view.symbol}\t${index}\t${ring}\t${traitSummary}`);
   }
-
-  console.log("\nDone.");
 }
 
-run();
+main();

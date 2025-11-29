@@ -13,7 +13,8 @@
     "test": "jest -c jest.config.mjs",
     "test:auth": "tsx src/scripts/test-firebase-auth.ts",
     "eval": "tsx scripts/eval.ts --file=data/gold/dialect.json",
-    "eval:gold": "tsx scripts/eval-gold.ts"
+    "eval:gold": "tsx scripts/eval-gold.ts",
+    "print:vowels": "tsx src/scripts/print-seven-vowels.ts"
   },
   "dependencies": {
     "@genkit-ai/google-genai": "^1.20.0",
@@ -66,6 +67,7 @@
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "eslint-config-next": "16.0.5",
     "genkit-cli": "^1.20.0",
     "jest": "^29.7.0",
     "postcss": "^8",
