@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import React, { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
@@ -19,7 +19,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { ResultsDisplay } from "@/components/ResultsDisplay";
 import { ConsonantReference } from "@/components/ConsonantReference";
 import { TwoRailsWithConsonants } from "@/components/TwoRailsWithConsonants";
@@ -28,10 +33,26 @@ import type { Alphabet } from "@/lib/runAnalysis";
 import { PROFILES } from "@/functions/languages";
 import { ThemeToggle } from "@/components/ThemeProvider";
 import { useDebounced } from "@/hooks/useDebounced";
-import { Loader2, Sparkles, Wand2, HelpCircle, GitBranch, BookOpen, History as HistoryIcon, ListChecks } from "lucide-react";
+import {
+  Loader2,
+  Sparkles,
+  Wand2,
+  HelpCircle,
+  GitBranch,
+  BookOpen,
+  History as HistoryIcon,
+  ListChecks,
+} from "lucide-react";
 import ComparePanel from "@/components/ComparePanel";
-import { normalizeEnginePayload, type Vowel, type EnginePayload } from "@/shared/engineShape";
-import { enginePayloadToAnalysisResult, analysisResultToEnginePayload } from "@/shared/analysisAdapter";
+import {
+  normalizeEnginePayload,
+  type Vowel,
+  type EnginePayload,
+} from "@/shared/engineShape";
+import {
+  enginePayloadToAnalysisResult,
+  analysisResultToEnginePayload,
+} from "@/shared/analysisAdapter";
 import HistoryPanel from "@/components/HistoryPanel";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
@@ -42,13 +63,41 @@ import { logError } from "@/lib/logError";
 import { VOICE_COLOR_MAP, VOICE_LABEL_MAP } from "@/shared/voiceColors";
 
 const VOICE_META: { id: Vowel; label: string; role: string }[] = [
-  { id: "A", label: "Action / Truth", role: "Launches, cuts through, sets the first line." },
-  { id: "E", label: "Expansion / Bridge", role: "Opens, connects, stretches what A starts." },
-  { id: "I", label: "Insight / Measure", role: "Focuses, measures, makes a clear line of thought." },
-  { id: "O", label: "Balance / Heart", role: "Holds the center, mediates between high and low." },
-  { id: "U", label: "Unity / Breath", role: "Carries the flow, breath and movement through the word." },
-  { id: "Y", label: "Network / Weave", role: "Loops, branches, weaves paths across the matrix." },
-  { id: "Ë", label: "Evolution / Unit", role: "Closes the cycle, a formed unit, the ‘done’ state." },
+  {
+    id: "A",
+    label: "Action / Truth",
+    role: "Launches, cuts through, sets the first line.",
+  },
+  {
+    id: "E",
+    label: "Expansion / Bridge",
+    role: "Opens, connects, stretches what A starts.",
+  },
+  {
+    id: "I",
+    label: "Insight / Measure",
+    role: "Focuses, measures, makes a clear line of thought.",
+  },
+  {
+    id: "O",
+    label: "Balance / Heart",
+    role: "Holds the center, mediates between high and low.",
+  },
+  {
+    id: "U",
+    label: "Unity / Breath",
+    role: "Carries the flow, breath and movement through the word.",
+  },
+  {
+    id: "Y",
+    label: "Network / Weave",
+    role: "Loops, branches, weaves paths across the matrix.",
+  },
+  {
+    id: "Ë",
+    label: "Evolution / Unit",
+    role: "Closes the cycle, a formed unit, the ‘done’ state.",
+  },
 ];
 
 type HeartHistoryItem = {
@@ -64,7 +113,6 @@ if (process.env.NEXT_PUBLIC_DEV_EVAL === "1") {
   EvalPanelComp = require("@/components/EvalPanel").default;
 }
 
-// ==== Main App ===============================================================
 export default function LinguisticDecoderApp() {
   const { toast } = useToast();
   const [word, setWord] = useState("");
@@ -79,9 +127,7 @@ export default function LinguisticDecoderApp() {
   const [useAi, setUseAi] = useState(false);
   const [heartHistory, setHeartHistory] = useState<HeartHistoryItem[]>([]);
 
-  // Debounce user input, then warm the cache in the background
   const debouncedWord = useDebounced(word, 450);
-
   const canAnalyze = word.trim().length > 0 && !loading;
 
   const analysisResult = useMemo(() => {
@@ -89,10 +135,8 @@ export default function LinguisticDecoderApp() {
     return enginePayloadToAnalysisResult(data);
   }, [data]);
 
-  // 🔹 Heart summary from math7 (attached in analysisAdapter)
   const math7: any = (analysisResult as any)?.math7 || null;
 
-  // 🔹 Heart history strip (last N analyses in this session)
   useEffect(() => {
     if (!analysisResult || !data) return;
     const m7: any = (analysisResult as any).math7;
@@ -108,11 +152,10 @@ export default function LinguisticDecoderApp() {
     };
 
     setHeartHistory((prev) => {
-      // keep words unique; newest wins
       const filtered = prev.filter(
         (h) => h.word.toLowerCase() !== item.word.toLowerCase()
       );
-      return [item, ...filtered].slice(0, 6); // cap at 6 items
+      return [item, ...filtered].slice(0, 6);
     });
   }, [analysisResult, data]);
 
@@ -129,6 +172,7 @@ export default function LinguisticDecoderApp() {
       });
       return;
     }
+
     const useWord = (nextWord ?? word).trim();
     const useMode: "strict" | "open" = nextMode ?? mode;
     const useAlphabet = nextAlphabet ?? alphabet;
@@ -136,7 +180,6 @@ export default function LinguisticDecoderApp() {
 
     setLoading(true);
     setErr(null);
-    // do NOT clear data here – keep previous result while new one is computing
 
     try {
       const clientResponse = await analyzeClient(useWord, useMode, useAlphabet, {
@@ -144,7 +187,6 @@ export default function LinguisticDecoderApp() {
         useAi,
       });
       console.log("API result:", clientResponse);
-
       setData(clientResponse);
     } catch (e: any) {
       const error = e?.message || "Request failed";
@@ -237,7 +279,11 @@ export default function LinguisticDecoderApp() {
         });
       }
     } catch (e: any) {
-      logError({ where: "history-load", message: e.message, detail: { cacheId } });
+      logError({
+        where: "history-load",
+        message: e.message,
+        detail: { cacheId },
+      });
       toast({
         variant: "destructive",
         title: "Load Error",
@@ -253,19 +299,28 @@ export default function LinguisticDecoderApp() {
     setLoading(true);
     setErr(null);
     try {
-      const result = await analyzeClient(word, (m as any) || mode, (a as any) || alphabet, {
-        bypass: true,
-        skipWrite: false,
-        edgeWeight,
-        useAi,
-      });
+      const result = await analyzeClient(
+        word,
+        (m as any) || mode,
+        (a as any) || alphabet,
+        {
+          bypass: true,
+          skipWrite: false,
+          edgeWeight,
+          useAi,
+        }
+      );
       setData({ ...result, recomputed: true });
       toast({
         title: "Recomputed",
         description: `Fresh analysis for '${result.word}' complete.`,
       });
     } catch (e: any) {
-      logError({ where: "history-recompute", message: e.message, detail: { word } });
+      logError({
+        where: "history-recompute",
+        message: e.message,
+        detail: { word },
+      });
       toast({
         variant: "destructive",
         title: "Recompute Error",
@@ -367,7 +422,6 @@ export default function LinguisticDecoderApp() {
                 </span>
               )}
 
-              {/* 🔹 Heart summary pill */}
               {math7?.primary && (
                 <span className="px-1.5 py-0.5 rounded-full border border-purple-500/60 bg-purple-500/10 text-purple-200 inline-flex items-center gap-1">
                   <span className="font-semibold uppercase tracking-wide">
@@ -383,7 +437,6 @@ export default function LinguisticDecoderApp() {
                 </span>
               )}
 
-              {/* 🔹 Heart history strip */}
               {heartHistory.length > 0 && (
                 <div className="flex flex-wrap items-center gap-1">
                   <span className="font-semibold">Recent hearts:</span>
@@ -413,7 +466,8 @@ export default function LinguisticDecoderApp() {
             </>
           ) : (
             <span className="text-xs">
-              No analysis yet. Type a word below and run the solver to see the Seven-Voices path.
+              No analysis yet. Type a word below and run the solver to see the
+              Seven-Voices path.
             </span>
           )}
         </section>
@@ -423,7 +477,8 @@ export default function LinguisticDecoderApp() {
           <CardHeader>
             <CardTitle>Analyze a word</CardTitle>
             <CardDescription>
-              Type a word, choose analysis options, and run the Seven-Voices solver.
+              Type a word, choose analysis options, and run the Seven-Voices
+              solver.
             </CardDescription>
           </CardHeader>
           <CardContent
@@ -440,7 +495,10 @@ export default function LinguisticDecoderApp() {
               )}
             </div>
 
-            <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-2">
+            <form
+              onSubmit={handleSubmit}
+              className="flex flex-col sm:flex-row gap-2"
+            >
               <Input
                 value={word}
                 onChange={(e) => setWord(e.target.value)}
@@ -456,9 +514,15 @@ export default function LinguisticDecoderApp() {
                   className="flex-1 sm:flex-none"
                 >
                   {loading ? (
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />
+                    <Loader2
+                      className="mr-2 h-4 w-4 animate-spin"
+                      aria-hidden="true"
+                    />
                   ) : (
-                    <Wand2 className="mr-2 h-4 w-4" aria-hidden="true" />
+                    <Wand2
+                      className="mr-2 h-4 w-4"
+                      aria-hidden="true"
+                    />
                   )}
                   {loading ? "Analyzing…" : "Analyze"}
                 </Button>
@@ -505,8 +569,9 @@ export default function LinguisticDecoderApp() {
                       setWord(example);
                       analyze(example);
                     }}
-                    className={`px-2 py-1 rounded-full border border-border/60 hover:bg-accent/40 hover:border-accent/80 transition text-xs font-medium
-                      ${isActive ? "bg-accent/30 border-accent/80" : ""}`}
+                    className={`px-2 py-1 rounded-full border border-border/60 hover:bg-accent/40 hover:border-accent/80 transition text-xs font-medium ${
+                      isActive ? "bg-accent/30 border-accent/80" : ""
+                    }`}
                   >
                     {example}
                   </button>
@@ -516,7 +581,10 @@ export default function LinguisticDecoderApp() {
 
             <div className="grid grid-cols-2 gap-4 items-center pt-2">
               <div className="space-y-3">
-                <Select value={alphabet} onValueChange={(v) => setAlphabet(v as Alphabet)}>
+                <Select
+                  value={alphabet}
+                  onValueChange={(v) => setAlphabet(v as Alphabet)}
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Language Profile" />
                   </SelectTrigger>
@@ -524,7 +592,9 @@ export default function LinguisticDecoderApp() {
                     <SelectItem value="auto">Auto-Detect Profile</SelectItem>
                     {PROFILES.map((p) => (
                       <SelectItem key={p.id} value={p.id}>
-                        {p.id.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())}
+                        {p.id
+                          .replace(/_/g, " ")
+                          .replace(/\b\w/g, (l) => l.toUpperCase())}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -550,7 +620,9 @@ export default function LinguisticDecoderApp() {
                   <input
                     type="checkbox"
                     checked={mode === "strict"}
-                    onChange={(e) => setMode(e.target.checked ? "strict" : "open")}
+                    onChange={(e) =>
+                      setMode(e.target.checked ? "strict" : "open")
+                    }
                     className="w-4 h-4 rounded border-border text-primary focus-visible:ring-2 focus-visible:ring-primary"
                     title="Strict = Seven-Voices rules only · Open = allow softer interpretations"
                   />
@@ -586,7 +658,8 @@ export default function LinguisticDecoderApp() {
               <CardHeader>
                 <CardTitle>Seven-Voices Path</CardTitle>
                 <CardDescription>
-                  An animated view of the word’s primary path through the vowel matrix.
+                  An animated view of the word’s primary path through the vowel
+                  matrix.
                 </CardDescription>
               </CardHeader>
               <CardContent className="p-3 sm:p-4 space-y-3">
@@ -594,16 +667,17 @@ export default function LinguisticDecoderApp() {
                   word={data?.word || word}
                   path={loading ? [] : data?.primaryPath?.voicePath || []}
                   running={loading}
-                  playKey={`${data?.word || ""}|${
-                    data?.primaryPath?.voicePath?.join(",") || ""
-                  }`}
+                  playKey={`${
+                    data?.word || ""
+                  }|${data?.primaryPath?.voicePath?.join(",") || ""}`}
                   height={320}
                   durationPerHopMs={900}
                 />
 
                 {!data && !loading && (
                   <p className="text-xs text-muted-foreground">
-                    Run an analysis above to see how this word travels through the Seven-Voices matrix.
+                    Run an analysis above to see how this word travels through
+                    the Seven-Voices matrix.
                   </p>
                 )}
               </CardContent>
@@ -613,7 +687,9 @@ export default function LinguisticDecoderApp() {
               <Card className="animate-fade-in">
                 <CardHeader>
                   <CardTitle>The Seven Voices</CardTitle>
-                  <CardDescription>Color, role, and function in the matrix.</CardDescription>
+                  <CardDescription>
+                    Color, role, and function in the matrix.
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <ul className="space-y-2 text-sm">
@@ -634,6 +710,7 @@ export default function LinguisticDecoderApp() {
                   </ul>
                 </CardContent>
               </Card>
+
               {data && (
                 <Card className="animate-fade-in">
                   <CardHeader>
@@ -660,7 +737,9 @@ export default function LinguisticDecoderApp() {
                       </p>
                     )}
                     {data.recomputed && (
-                      <p className="font-bold text-blue-400 pt-1">Recomputed</p>
+                      <p className="font-bold text-blue-400 pt-1">
+                        Recomputed
+                      </p>
                     )}
                   </CardContent>
                 </Card>
@@ -676,7 +755,8 @@ export default function LinguisticDecoderApp() {
               <CardHeader>
                 <CardTitle>Analysis Results</CardTitle>
                 <CardDescription>
-                  Primary and frontier paths, principles, and language candidates.
+                  Primary and frontier paths, principles, and language
+                  candidates.
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -696,7 +776,6 @@ export default function LinguisticDecoderApp() {
           className="w-full"
           defaultValue={data ? "" : "item-1"}
         >
-          {/* How to Use – only when empty state */}
           {!data && (
             <AccordionItem value="item-1">
               <AccordionTrigger className="text-sm font-semibold">
@@ -716,20 +795,22 @@ export default function LinguisticDecoderApp() {
                       .
                     </li>
                     <li>
-                      Use the <strong>Language Profile</strong> dropdown to force a specific
-                      phonetic profile, or leave it on <strong>Auto-Detect</strong>.
+                      Use the <strong>Language Profile</strong> dropdown to
+                      force a specific phonetic profile, or leave it on{" "}
+                      <strong>Auto-Detect</strong>.
                     </li>
                     <li>
-                      The <strong>Seven-Voices Path</strong> shows the primary vowel path and
-                      consonant windows.
+                      The <strong>Seven-Voices Path</strong> shows the primary
+                      vowel path and consonant windows.
                     </li>
                     <li>
-                      The <strong>Analysis Results</strong> card breaks down primary and
-                      frontier paths, principles, and language candidates.
+                      The <strong>Analysis Results</strong> card breaks down
+                      primary and frontier paths, principles, and language
+                      candidates.
                     </li>
                     <li>
-                      Toggle <strong>AI Mapper</strong> to include language-family mappings
-                      when available.
+                      Toggle <strong>AI Mapper</strong> to include
+                      language-family mappings when available.
                     </li>
                   </ol>
                 </Card>
@@ -737,7 +818,6 @@ export default function LinguisticDecoderApp() {
             </AccordionItem>
           )}
 
-          {/* Compare Two Words */}
           <AccordionItem value="item-2">
             <AccordionTrigger className="text-sm font-semibold">
               <div className="flex items-center gap-2">
@@ -748,14 +828,14 @@ export default function LinguisticDecoderApp() {
             <AccordionContent>
               <Card className="p-4">
                 <p className="text-xs text-muted-foreground mb-3">
-                  Analyze two words side by side and compare their Seven-Voices paths.
+                  Analyze two words side by side and compare their Seven-Voices
+                  paths.
                 </p>
-                <ComparePanel defaultMode={mode} defaultAlphabet={alphabet} />
+                <ComparePanel />
               </Card>
             </AccordionContent>
           </AccordionItem>
 
-          {/* Consonant Reference */}
           <AccordionItem value="item-3">
             <AccordionTrigger className="text-sm font-semibold">
               <div className="flex items-center gap-2">
@@ -766,14 +846,14 @@ export default function LinguisticDecoderApp() {
             <AccordionContent>
               <Card className="p-4">
                 <p className="text-xs text-muted-foreground mb-3">
-                  See how consonants behave around the Seven Voices in the matrix.
+                  See how consonants behave around the Seven Voices in the
+                  matrix.
                 </p>
                 <ConsonantReference />
               </Card>
             </AccordionContent>
           </AccordionItem>
 
-          {/* History */}
           <AccordionItem value="item-4">
             <AccordionTrigger className="text-sm font-semibold">
               <div className="flex items-center gap-2">
@@ -786,12 +866,14 @@ export default function LinguisticDecoderApp() {
                 <p className="text-xs text-muted-foreground mb-3">
                   Reload or recompute previous analyses from Firestore history.
                 </p>
-                <HistoryPanel onLoadAnalysis={onLoadAnalysis} onRecompute={onRecompute} />
+                <HistoryPanel
+                  onLoadAnalysis={onLoadAnalysis}
+                  onRecompute={onRecompute}
+                />
               </Card>
             </AccordionContent>
           </AccordionItem>
 
-          {/* Batch Evaluation – dev only */}
           {EvalPanelComp && (
             <AccordionItem value="item-5">
               <AccordionTrigger className="text-sm font-semibold">
@@ -803,7 +885,8 @@ export default function LinguisticDecoderApp() {
               <AccordionContent>
                 <Card className="p-4">
                   <p className="text-xs text-muted-foreground mb-3">
-                    Run the engine across a list of words and inspect aggregate behavior.
+                    Run the engine across a list of words and inspect aggregate
+                    behavior.
                   </p>
                   <EvalPanelComp />
                 </Card>
@@ -812,46 +895,48 @@ export default function LinguisticDecoderApp() {
           )}
         </Accordion>
 
-        {/* Debug view */}
         {showDebug && analysisResult && (
           <div className="my-4">
             <Card className="p-4">
               <div className="flex justify-between items-center mb-2">
-                <h3 className="font-bold text-sm tracking-wide">API Echo (debug)</h3>
+                <h3 className="font-bold text-sm tracking-wide">
+                  API Echo (debug)
+                </h3>
               </div>
               <pre className="font-code text-xs whitespace-pre-wrap bg-slate-800 p-2.5 rounded-lg max-h-96 overflow-auto mt-2">
-                {JSON.stringify(analysisResultToEnginePayload(analysisResult), null, 2)}
+                {JSON.stringify(
+                  analysisResultToEnginePayload(analysisResult),
+                  null,
+                  2
+                )}
               </pre>
             </Card>
           </div>
         )}
       </main>
 
-      {/* Footer */}
       <footer className="pt-8 mt-8 border-t border-border/60">
         <div className="max-w-5xl mx-auto w-full text-xs text-muted-foreground flex justify-between items-start gap-4">
           <div className="font-code flex-1 opacity-70 space-y-1">
             {data && (
-              <>
-                <div>
-                  <span className="mr-2">engine={data.engineVersion}</span>
-                  <span className="mr-2">mode={data.mode}</span>
-                  <span className="mr-2">alphabet={data.alphabet}</span>
-                  {"solveMs" in data && (
-                    <span className="mr-2">solveMs={data.solveMs}</span>
-                  )}
-                  {data.cacheHit && (
-                    <span className="mr-2 px-1.5 py-0.5 rounded bg-accent/20 border border-accent text-accent-foreground">
-                      cacheHit
-                    </span>
-                  )}
-                  {data.recomputed && (
-                    <span className="mr-2 px-1.5 py-0.5 rounded bg-blue-900 border border-blue-700">
-                      recomputed
-                    </span>
-                  )}
-                </div>
-              </>
+              <div>
+                <span className="mr-2">engine={data.engineVersion}</span>
+                <span className="mr-2">mode={data.mode}</span>
+                <span className="mr-2">alphabet={data.alphabet}</span>
+                {"solveMs" in data && (
+                  <span className="mr-2">solveMs={data.solveMs}</span>
+                )}
+                {data.cacheHit && (
+                  <span className="mr-2 px-1.5 py-0.5 rounded bg-accent/20 border border-accent text-accent-foreground">
+                    cacheHit
+                  </span>
+                )}
+                {data.recomputed && (
+                  <span className="mr-2 px-1.5 py-0.5 rounded bg-blue-900 border border-blue-700">
+                    recomputed
+                  </span>
+                )}
+              </div>
             )}
             <FooterBuild />
           </div>
@@ -859,12 +944,18 @@ export default function LinguisticDecoderApp() {
             {data && (
               <Link
                 className="underline text-xs"
-                href={`/?word=${encodeURIComponent(word)}&mode=${mode}&alphabet=${alphabet}`}
+                href={`/?word=${encodeURIComponent(
+                  word
+                )}&mode=${mode}&alphabet=${alphabet}`}
               >
                 Share Result
               </Link>
             )}
-            <Button variant="outline" size="sm" onClick={() => setShowDebug((s) => !s)}>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowDebug((s) => !s)}
+            >
               {showDebug ? "Hide JSON" : "Show JSON"}
             </Button>
           </div>
