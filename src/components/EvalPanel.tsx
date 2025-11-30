@@ -1,6 +1,6 @@
 
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { solveWord } from "../functions/sevenVoicesCore";
 import { getManifest } from "../engine/manifest";
 import { Button } from "./ui/button";
@@ -38,6 +38,7 @@ export default function EvalPanel() {
   const [busy, setBusy] = useState(false);
   const [modeDefault, setModeDefault] = useState<Mode>("strict");
   const [alphabetDefault, setAlphabetDefault] = useState<Alphabet>("auto");
+  const [coreOnly, setCoreOnly] = useState(false);
 
   async function onFile(e: React.ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0]; if (!f) return;
