@@ -1,4 +1,3 @@
-
 'use client';
 import React, { useMemo, useState } from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "./ui/card";
@@ -14,6 +13,26 @@ import { PrinciplesBlock } from "./PrinciplesBlock";
 import { SymbolicReadingCard } from "./SymbolicReadingCard";
 import { Button } from "@/components/ui/button";
 import { downloadJson } from "@/lib/downloadJson";
+
+// Lightweight formatter for the Seven-Voices heart
+function getHeartSummary(core: any) {
+  if (!core) return null;
+
+  const primary = core.heartPaths?.primary ?? {};
+  const voices: string[] = primary.voiceSequence ?? core.voices?.vowelVoices ?? [];
+  const rings: (number | string)[] = primary.ringPath ?? core.voices?.ringPath ?? [];
+  const levels: string[] = core.voices?.levelPath ?? [];
+  const tension: string = primary.tensionLevel ?? "unknown";
+  const frontierCount: number | undefined = core.heartPaths?.frontierCount;
+
+  return {
+    voices,
+    rings,
+    levels,
+    tension,
+    frontierCount,
+  };
+}
 
 
 const LEVEL_LABEL: Record<number, string> = { 1: "High", 0: "Mid", [-1]: "Low" } as any;
@@ -77,8 +96,6 @@ export function PathRow({ title, block, analysis }: { title: string; block: any,
     );
   }
 
-  const { math7 } = analysis || {};
-
   return (
     <Card className="p-4">
       <h3 className="font-bold text-sm tracking-wide mb-2">{title}</h3>
@@ -99,31 +116,6 @@ export function PathRow({ title, block, analysis }: { title: string; block: any,
         </div>
         
         {title === "Primary Path" && <ConsonantInfo analysis={analysis} />}
-
-        {math7 && math7.primary && (
-          <div className="mt-4 rounded-xl border px-4 py-3 text-sm">
-            <div className="font-semibold mb-1">
-              Heart (Seven-Voices Math)
-            </div>
-
-            <div className="flex flex-wrap gap-4">
-              <div>
-                <div className="text-xs uppercase opacity-70">State</div>
-                <div>{math7.primary.cycleState}</div>
-              </div>
-
-              <div>
-                <div className="text-xs uppercase opacity-70">Total (mod 7)</div>
-                <div>{math7.primary.totalMod7}</div>
-              </div>
-
-              <div className="min-w-[220px]">
-                <div className="text-xs uppercase opacity-70">Principles Path</div>
-                <div>{math7.primary.principlesPath.join(" → ")}</div>
-              </div>
-            </div>
-          </div>
-        )}
       </>
     </Card>
   );
@@ -160,26 +152,26 @@ export function ResultsDisplay({ analysis: raw }: { analysis: EnginePayload }) {
     if (!analysis) return;
 
     const exportPayload =
-      coreOnly && core
+      coreOnly && analysis.core
         ? {
-            word: (analysis as any).word,
-            engineVersion: (analysis as any).engineVersion,
-            core: core,
+            word: analysis.core.word,
+            engineVersion: analysis.core.engineVersion,
+            core: analysis.core,
           }
         : analysis;
 
-    const exportFilename =
-      coreOnly && (analysis as any)?.word
-        ? `${(analysis as any).word}-core.json`
-        : ((analysis as any)?.word
-            ? `${(analysis as any).word}-analysis.json`
-            : "analysis.json");
-    
+    const safeWord = String(analysis.core.word || 'analysis').toLowerCase().replace(/[^a-z0-9_-]+/g, "-");
+
+    const exportFilename = coreOnly
+      ? `${safeWord}-core.json`
+      : `${safeWord}-analysis.json`;
+      
     downloadJson(exportFilename, exportPayload);
   };
 
   if (!analysis) return null;
   const core = (analysis as any)?.core;
+  const heartSummary = getHeartSummary(core);
   const { candidates, symbolic } = analysis;
 
   return (
@@ -197,6 +189,78 @@ export function ResultsDisplay({ analysis: raw }: { analysis: EnginePayload }) {
                 <pre className="text-xs whitespace-pre-wrap break-all">
                   {JSON.stringify(core, null, 2)}
                 </pre>
+                {heartSummary && (
+                  <div className="mt-4 border-t border-slate-800 pt-4 text-sm text-slate-200">
+                    <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
+                      Heart summary
+                    </div>
+
+                    <div className="flex flex-wrap gap-6">
+                      <div>
+                        <div className="text-[10px] uppercase tracking-wide text-slate-500">
+                          Primary path
+                        </div>
+                        <div className="mt-1">
+                          {heartSummary.voices.length
+                            ? heartSummary.voices.join(" → ")
+                            : "—"}
+                        </div>
+                      </div>
+
+                      <div>
+                        <div className="text-[10px] uppercase tracking-wide text-slate-500">
+                          Rings
+                        </div>
+                        <div className="mt-1">
+                          {heartSummary.rings.length
+                            ? heartSummary.rings.join(" → ")
+                            : "—"}
+                        </div>
+                      </div>
+
+                      <div>
+                        <div className="text-[10px] uppercase tracking-wide text-slate-500">
+                          Levels
+                        </div>
+                        <div className="mt-1">
+                          {heartSummary.levels.length
+                            ? heartSummary.levels.join(" → ")
+                            : "—"}
+                        </div>
+                      </div>
+
+                      <div>
+                        <div className="text-[10px] uppercase tracking-wide text-slate-500">
+                          Tension
+                        </div>
+                        <div className="mt-1">
+                          <span
+                            className={
+                              heartSummary.tension === "low"
+                                ? "text-emerald-400"
+                                : heartSummary.tension === "medium"
+                                ? "text-amber-400"
+                                : heartSummary.tension === "high"
+                                ? "text-rose-400"
+                                : "text-slate-200"
+                            }
+                          >
+                            {heartSummary.tension}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div>
+                        <div className="text-[10px] uppercase tracking-wide text-slate-500">
+                          Frontier consonants
+                        </div>
+                        <div className="mt-1">
+                          {heartSummary.frontierCount ?? "—"}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
           )
