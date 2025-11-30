@@ -62,9 +62,12 @@ function findSlot(
 }
 
 // Build ConsonantField + a simple summary from an EnginePayload.
-export function buildConsonantField(
-  payload: EnginePayload
-): { field: ConsonantField; summary: ConsonantSummary } {
+export function buildConsonantField(payload: any) {
+  // 🔒 Safety guard: if there is no usable payload, return nothing instead of crashing
+  if (!payload || !payload.primaryPath) {
+    return null;
+  }
+
   const slots = makeEmptySlots();
   let smoothHits = 0;
   let spikyHits = 0;

@@ -91,7 +91,7 @@ function buildSymbolicLayer(
 export function enginePayloadToAnalysisResult(
   payload: EnginePayload
 ): AnalysisResult_DEPRECATED {
-  const { field, summary } = buildConsonantField(payload);
+  const { field, summary } = buildConsonantField(payload) ?? {};
   const { word, alphabet, mode } = payload;
   const canon = CANON_CANDIDATES[word.toLowerCase()] ?? [];
 

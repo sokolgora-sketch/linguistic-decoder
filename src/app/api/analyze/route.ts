@@ -59,10 +59,11 @@ export async function GET(request: Request) {
       manifestVersion
     );
     return NextResponse.json(payload);
-  } catch (e: any) {
+  } catch (e) {
+    const message = e instanceof Error ? e.message : String(e);
     console.error(`[API /analyze][GET] Error for word "${word}":`, e);
     return NextResponse.json(
-      { error: e?.message || "Analysis failed" },
+      { error: message || "Analysis failed" },
       { status: 500 }
     );
   }
@@ -102,10 +103,11 @@ export async function POST(request: Request) {
       manifestVersion
     );
     return NextResponse.json(payload);
-  } catch (e: any) {
+  } catch (e) {
+    const message = e instanceof Error ? e.message : String(e);
     console.error(`[API /analyze][POST] Error for word "${word}":`, e);
     return NextResponse.json(
-      { error: e?.message || "Analysis failed" },
+      { error: message || "Analysis failed" },
       { status: 500 }
     );
   }

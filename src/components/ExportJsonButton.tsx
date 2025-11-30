@@ -6,21 +6,21 @@ import type { EnginePayload, AnalysisResult_DEPRECATED } from "../shared/engineS
 import { enginePayloadToAnalysisResult } from "@/shared/analysisAdapter";
 
 type ExportJsonButtonProps = {
-  analysis: EnginePayload;
+  result: EnginePayload;
 };
 
-export function ExportJsonButton({ analysis }: ExportJsonButtonProps) {
+export function ExportJsonButton({ result }: ExportJsonButtonProps) {
   const handleExport = () => {
     // Export the rich AnalysisResult if it exists, otherwise fall back to the base payload.
-    const exportData = enginePayloadToAnalysisResult(analysis);
+    const exportData = enginePayloadToAnalysisResult(result);
     const json = JSON.stringify(exportData, null, 2);
 
     const blob = new Blob([json], { type: "application/json" });
     const url = URL.createObjectURL(blob);
 
     // make a simple, safe filename: analysis-<word>-<version>.json
-    const safeWord = (analysis.word || "").replace(/\s+/g, "_");
-    const version = analysis.engineVersion || "dev";
+    const safeWord = (result.word || "").replace(/\s+/g, "_");
+    const version = result.engineVersion || "dev";
     const fileName = `analysis-${safeWord}-${version}.json`;
 
     const a = document.createElement("a");
