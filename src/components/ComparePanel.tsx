@@ -1,7 +1,8 @@
+
 "use client";
 
-import { useState } from "react";
-import { Card } from "./ui/card";
+import { useState, useEffect } from "react";
+import { Card, CardContent } from "./ui/card";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import {
@@ -15,7 +16,28 @@ import { PROFILES } from "../functions/languages";
 import type { Alphabet, EnginePayload } from "../lib/runAnalysis";
 
 type Mode = "strict" | "open";
-type CompareResult = any | null;
+type CompareResult = (EnginePayload & { solveMs?: number }) | null;
+
+const ResultCard = ({ word, data }: { word: string; data: CompareResult }) => {
+  if (!data) return null;
+  const { primaryPath, mode, alphabet, solveMs } = data;
+  return (
+    <Card className="p-3">
+      <div className="font-semibold mb-1">{word}</div>
+      <div className="text-xs text-muted-foreground mb-2">
+        {mode} · {alphabet} · {solveMs}ms
+      </div>
+      {primaryPath ? (
+        <pre className="text-xs whitespace-pre-wrap break-all max-h-64 overflow-auto rounded bg-muted/40 p-2">
+          {primaryPath.voicePath.join(" → ")}
+        </pre>
+      ) : (
+        <div className="text-xs text-red-500">No path found</div>
+      )}
+    </Card>
+  );
+};
+
 
 export default function ComparePanel({
   defaultMode = "strict",
@@ -28,38 +50,63 @@ export default function ComparePanel({
   const [rightWord, setRightWord] = useState("study");
   const [mode, setMode] = useState<Mode>(defaultMode);
   const [alphabet, setAlphabet] = useState<Alphabet>(defaultAlphabet);
-  const [compareResult, setCompareResult] = useState<CompareResult>(null);
+  const [leftResult, setLeftResult] = useState<CompareResult>(null);
+  const [rightResult, setRightResult] = useState<CompareResult>(null);
   const [loading, setLoading] = useState(false);
 
-  async function fetchAnalysis(word: string, mode: Mode, alphabet: Alphabet) {
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const hash = window.location.hash || "";
+    const m = hash.match(/#compare=([^&]+)/);
+    if (m?.[1]) setRightWord(decodeURIComponent(m[1]));
+  }, []);
+
+  async function fetchAnalysis(word: string): Promise<CompareResult | null> {
+    const w = word.trim();
+    if (!w) return null;
+
+    const params = new URLSearchParams({
+      word: w,
+      mode,
+      alphabet,
+    });
+
     try {
-      const res = await fetch("/api/analyze", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ word, mode, alphabet }),
-      });
-  
+      const res = await fetch(`/api/analyze?${params.toString()}`);
       if (!res.ok) {
-        console.error("Compare /api/analyze failed", await res.text());
+        console.error(`Compare /api/analyze failed for "${w}"`, await res.text());
         return null;
       }
-  
-      return (await res.json()) as EnginePayload;
-    } catch (err) {
-      console.error("Compare /api/analyze error", err);
+      return (await res.json()) as CompareResult;
+    } catch(err) {
+      console.error(`Compare /api/analyze error for "${w}"`, err);
       return null;
     }
   }
 
   async function runCompare() {
+    if (!leftWord.trim() || !rightWord.trim()) return;
     setLoading(true);
-    const [leftData, rightData] = await Promise.all([
-      fetchAnalysis(leftWord, mode, alphabet),
-      fetchAnalysis(rightWord, mode, alphabet),
-    ]);
-    setCompareResult({ left: leftData, right: rightData });
-    setLoading(false);
+    setLeftResult(null);
+    setRightResult(null);
+    try {
+      const [leftData, rightData] = await Promise.all([
+        fetchAnalysis(leftWord),
+        fetchAnalysis(rightWord),
+      ]);
+      setLeftResult(leftData);
+      setRightResult(rightData);
+    } finally {
+      setLoading(false);
+    }
   }
+  
+  const eqPrimary =
+    leftResult?.primaryPath &&
+    rightResult?.primaryPath &&
+    leftResult.primaryPath.voicePath.join(",") ===
+      rightResult.primaryPath.voicePath.join(",");
+
 
   return (
     <Card className="p-4">
@@ -100,10 +147,8 @@ export default function ComparePanel({
             <SelectValue placeholder="Auto-Detect" />
           </SelectTrigger>
           <SelectContent>
-            {Object.keys(PROFILES).map((key) => (
-              <SelectItem key={key} value={key}>
-                {key}
-              </SelectItem>
+            {PROFILES.map((p) => (
+               <SelectItem key={p.id} value={p.id}>{p.id.replace(/_/g,' ').replace(/\b\w/g, l => l.toUpperCase())}</SelectItem>
             ))}
           </SelectContent>
         </Select>
@@ -112,30 +157,17 @@ export default function ComparePanel({
           {loading ? "Comparing..." : "Compare"}
         </Button>
       </div>
+      
+      {eqPrimary && (
+         <div className="text-sm font-medium text-green-600 dark:text-green-400 mb-2">
+           Paths are identical.
+         </div>
+       )}
 
-      {compareResult && (
+      {(leftResult || rightResult) && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-          <Card className="p-3">
-            <p className="font-medium mb-1">{leftWord}</p>
-            <pre className="text-xs whitespace-pre-wrap break-all max-h-64 overflow-auto rounded bg-muted/40 p-2">
-              {JSON.stringify(
-                compareResult.left?.primaryPath ?? "(no result)",
-                null,
-                2
-              )}
-            </pre>
-          </Card>
-
-          <Card className="p-3">
-            <p className="font-medium mb-1">{rightWord}</p>
-            <pre className="text-xs whitespace-pre-wrap break-all max-h-64 overflow-auto rounded bg-muted/40 p-2">
-              {JSON.stringify(
-                compareResult.right?.primaryPath ?? "(no result)",
-                null,
-                2
-              )}
-            </pre>
-          </Card>
+          <ResultCard word={leftWord} data={leftResult} />
+          <ResultCard word={rightWord} data={rightResult} />
         </div>
       )}
     </Card>
