@@ -32,6 +32,7 @@ import { ExportJsonButton } from "../components/ExportJsonButton";
 import { logError } from "../lib/logError";
 import { VOICE_COLOR_MAP, VOICE_LABEL_MAP } from "../shared/voiceColors";
 import { SymbolicReadingCard } from "@/components/SymbolicReadingCard";
+import { EngineInspector } from "../components/EngineInspector";
 
 
 const VOICE_META: { id: Vowel; label: string; role: string }[] = [
@@ -509,23 +510,26 @@ export default function LinguisticDecoderApp(){
           </div>
 
           {data && (
-            <Card
-              key={`${data.word}-${data.mode}-${data.alphabet}`}
-              className="animate-fade-in"
-            >
-              <CardHeader>
-                <CardTitle>Analysis Results</CardTitle>
-                <CardDescription>
-                  Primary and frontier paths, principles, and language candidates.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <ResultsDisplay analysis={data} />
-                <div className="flex justify-end pt-2">
-                  <ExportJsonButton analysis={data} />
-                </div>
-              </CardContent>
-            </Card>
+            <>
+              <Card
+                key={`${data.word}-${data.mode}-${data.alphabet}`}
+                className="animate-fade-in"
+              >
+                <CardHeader>
+                  <CardTitle>Analysis Results</CardTitle>
+                  <CardDescription>
+                    Primary and frontier paths, principles, and language candidates.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <ResultsDisplay analysis={data} />
+                  <div className="flex justify-end pt-2">
+                    <ExportJsonButton analysis={data} />
+                  </div>
+                </CardContent>
+              </Card>
+              <EngineInspector result={data} />
+            </>
           )}
         </section>
 
