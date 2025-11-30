@@ -1,6 +1,6 @@
 'use client';
 import React, { useMemo, useState } from "react";
-import { Card, CardContent } from "./ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import type { CClass } from "../functions/languages";
 import { classRange } from "../functions/languages";
 import type { EnginePayload, AnalysisResult_DEPRECATED, Vowel } from "../shared/engineShape";
@@ -76,8 +76,6 @@ export function PathRow({ title, block, analysis }: { title: string; block: any,
     );
   }
 
-  const { math7 } = analysis || {};
-
   return (
     <Card className="p-4">
       <h3 className="font-bold text-sm tracking-wide mb-2">{title}</h3>
@@ -98,31 +96,6 @@ export function PathRow({ title, block, analysis }: { title: string; block: any,
         </div>
         
         {title === "Primary Path" && <ConsonantInfo analysis={analysis} />}
-
-        {math7 && math7.primary && (
-          <div className="mt-4 rounded-xl border px-4 py-3 text-sm">
-            <div className="font-semibold mb-1">
-              Heart (Seven-Voices Math)
-            </div>
-
-            <div className="flex flex-wrap gap-4">
-              <div>
-                <div className="text-xs uppercase opacity-70">State</div>
-                <div>{math7.primary.cycleState}</div>
-              </div>
-
-              <div>
-                <div className="text-xs uppercase opacity-70">Total (mod 7)</div>
-                <div>{math7.primary.totalMod7}</div>
-              </div>
-
-              <div className="min-w-[220px]">
-                <div className="text-xs uppercase opacity-70">Principles Path</div>
-                <div>{math7.primary.principlesPath.join(" → ")}</div>
-              </div>
-            </div>
-          </div>
-        )}
       </>
     </Card>
   );
@@ -157,82 +130,144 @@ export function ResultsDisplay({ analysis: raw }: { analysis: EnginePayload }) {
 
   const handleExportJson = () => {
     if (!analysis) return;
+    const core = (analysis as any)?.core;
+    const exportPayload =
+      coreOnly && core
+        ? {
+            word: core.word,
+            engineVersion: core.engineVersion,
+            core: core,
+          }
+        : analysis;
 
-    const rawWord = analysis.core.word || "analysis";
+    const safeWord = String(core?.word || 'analysis').toLowerCase().replace(/[^a-z0-9_-]+/g, "-");
 
-    const safeWord = String(rawWord).toLowerCase().replace(/[^a-z0-9_-]+/g, "-") || "analysis";
-
-    downloadJson(`analysis-${safeWord}.json`, analysis);
+    const exportFilename = coreOnly
+      ? `${safeWord}-core.json`
+      : `${safeWord}-analysis.json`;
+      
+    downloadJson(exportFilename, exportPayload);
   };
 
   if (!analysis) return null;
-  const { core, candidates, symbolic } = analysis;
+  const core = (analysis as any)?.core;
+  const { candidates, symbolic } = analysis;
 
   return (
     <div className="space-y-4">
-        {core && core.heartPaths && (
-            <PathRow block={{voicePath: core.voices.vowelVoices, ringPath: core.voices.ringPath, levelPath: core.voices.levelPath.map(l=>l==='high'?1:l==='low'?-1:0)}} title="Primary Path" analysis={analysis} />
-        )}
+      {coreOnly ? (
+        core && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Seven-Voices Heart (Core)</CardTitle>
+              <CardDescription>
+                Minimal heart snapshot from the engine for this word.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <pre className="text-xs whitespace-pre-wrap break-all">
+                {JSON.stringify(core, null, 2)}
+              </pre>
+            </CardContent>
+          </Card>
+        )
+      ) : (
+        <>
+          {core && core.heartPaths && (
+            <PathRow
+              block={{
+                voicePath: core.voices.vowelVoices,
+                ringPath: core.voices.ringPath,
+                levelPath: core.voices.levelPath.map((l: any) =>
+                  l === 'high' ? 1 : l === 'low' ? -1 : 0
+                ),
+              }}
+              title="Primary Path"
+              analysis={analysis}
+            />
+          )}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <WhyThisPath primary={raw.primaryPath} />
             <PrinciplesBlock analysis={analysis} />
-        </div>
-        
-        <Candidates candidates={candidates} />
-        
-        {symbolic && <SymbolicReadingCard symbolic={symbolic} />}
+          </div>
 
-        {core && core.heartPaths && core.heartPaths.frontierCount > 0 && (
-          <Card className="p-4 mt-4">
-            <h3 className="font-bold text-sm tracking-wide">Frontier (near‑optimal alternates)</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mt-3">
-              {raw.frontierPaths.map((f, idx)=> {
-                const altVoice = f.voicePath[0];
-                const altBadgeStyle = altVoice
-                  ? { backgroundColor: VOICE_COLOR_MAP[altVoice], color: "#020617" }
-                  : {};
-                return (
-                <Card key={idx} className="p-3 border-accent">
-                  <div className="font-bold mb-2 flex items-center gap-2">
-                    <div
-                        className="w-8 h-8 rounded-full border flex items-center justify-center text-sm font-bold shrink-0"
-                        style={altBadgeStyle}
-                    >
-                        {altVoice ?? "?"}
-                    </div>
-                    {`alt-${idx}`}
-                  </div>
-                  <div className="flex flex-wrap gap-1.5 items-center">
-                    {f.voicePath.map((v,i)=> (
-                      <React.Fragment key={i}>
-                        <Chip v={v} />
-                        {i < f.voicePath.length-1 && <Arrow/>}
-                      </React.Fragment>
-                    ))}
-                  </div>
-                  <hr className="my-2 border-border" />
-                  <div className="text-xs mt-1.5 text-slate-500">Levels: {f.levelPath.map(l=>LEVEL_LABEL[l]).join(" → ")}</div>
-                  <div className="text-xs text-slate-500">Rings: {f.ringPath.join(" → ")}</div>
-                </Card>
-              )})}
-            </div>
-          </Card>
-        )}
-         <div className="flex justify-end items-center gap-4 pt-2">
-            <label className="flex items-center gap-2 text-xs text-muted-foreground">
-              <input
-                type="checkbox"
-                checked={coreOnly}
-                onChange={(e) => setCoreOnly(e.target.checked)}
-                className="h-3 w-3"
-              />
-              Core only (Heart)
-            </label>
-            <Button variant="outline" size="sm" onClick={handleExportJson}>
-                Export JSON
-            </Button>
-        </div>
+          <Candidates candidates={candidates} />
+
+          {symbolic && <SymbolicReadingCard symbolic={symbolic} />}
+
+          {core && core.heartPaths && core.heartPaths.frontierCount > 0 && (
+            <Card className="p-4 mt-4">
+              <h3 className="font-bold text-sm tracking-wide">Frontier (near‑optimal alternates)</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mt-3">
+                {raw.frontierPaths.map((f, idx) => {
+                  const altVoice = f.voicePath[0];
+                  const altBadgeStyle = altVoice
+                    ? { backgroundColor: VOICE_COLOR_MAP[altVoice], color: "#020617" }
+                    : {};
+                  return (
+                    <Card key={idx} className="p-3 border-accent">
+                      <div className="font-bold mb-2 flex items-center gap-2">
+                        <div
+                          className="w-8 h-8 rounded-full border flex items-center justify-center text-sm font-bold shrink-0"
+                          style={altBadgeStyle}
+                        >
+                          {altVoice ?? "?"}
+                        </div>
+                        {`alt-${idx}`}
+                      </div>
+                      <div className="flex flex-wrap gap-1.5 items-center">
+                        {f.voicePath.map((v, i) => (
+                          <React.Fragment key={i}>
+                            <Chip v={v} />
+                            {i < f.voicePath.length - 1 && <Arrow />}
+                          </React.Fragment>
+                        ))}
+                      </div>
+                      <hr className="my-2 border-border" />
+                      <div className="text-xs mt-1.5 text-slate-500">Levels: {f.levelPath.map(l => LEVEL_LABEL[l]).join(" → ")}</div>
+                      <div className="text-xs text-slate-500">Rings: {f.ringPath.join(" → ")}</div>
+                    </Card>
+                  )
+                })}
+              </div>
+            </Card>
+          )}
+        </>
+      )}
+
+      {core && (
+        <section className="mt-4">
+          <h3 className="text-sm font-semibold text-muted-foreground mb-1">
+            Core snapshot (Seven-Voices heart)
+          </h3>
+
+          <details className="bg-black/40 border border-slate-700 rounded-lg p-2">
+            <summary className="cursor-pointer text-xs text-slate-300">
+              Show raw core JSON
+            </summary>
+
+            <pre className="mt-2 text-[10px] leading-tight font-mono whitespace-pre-wrap max-h-64 overflow-auto">
+              {JSON.stringify(core, null, 2)}
+            </pre>
+          </details>
+        </section>
+      )}
+
+      <div className="flex justify-end items-center gap-4 pt-2">
+        <label className="flex items-center gap-2 text-xs text-muted-foreground">
+          <input
+            type="checkbox"
+            checked={coreOnly}
+            onChange={(e) => setCoreOnly(e.target.checked)}
+            className="h-3 w-3"
+          />
+          Core only (Heart)
+        </label>
+        <Button variant="outline" size="sm" onClick={handleExportJson}>
+          Export JSON
+        </Button>
+      </div>
     </div>
   );
 }
