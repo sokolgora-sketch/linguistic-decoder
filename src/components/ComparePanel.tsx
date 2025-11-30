@@ -19,8 +19,23 @@ import {
 } from "../lib/runAnalysis";
 import { getManifest } from "@/engine/manifest";
 import type { SolveOptions } from "@/functions/sevenVoicesCore";
+import type { AnalysisCore } from "@/shared/engineShape";
 
 type Mode = "strict" | "open";
+
+// Lightweight formatter for the Seven-Voices heart
+function renderHeartSummary(core?: AnalysisCore) {
+  if (!core) return "No heart data";
+
+  const primary = core.heartPaths?.primary;
+  if (!primary) return "No heart path";
+
+  const seq = primary.voiceSequence?.join(" → ") || "";
+  const tension = primary.tensionLevel ?? "unknown";
+  const frontier = core.heartPaths?.frontierCount ?? 0;
+
+  return `${seq} · tension: ${tension} · frontier: ${frontier}`;
+}
 
 interface ComparePanelProps {
   defaultMode?: Mode;
