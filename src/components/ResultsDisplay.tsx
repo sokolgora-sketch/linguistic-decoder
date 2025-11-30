@@ -76,6 +76,8 @@ export function PathRow({ title, block, analysis }: { title: string; block: any,
     );
   }
 
+  const { math7 } = analysis || {};
+
   return (
     <Card className="p-4">
       <h3 className="font-bold text-sm tracking-wide mb-2">{title}</h3>
@@ -96,6 +98,31 @@ export function PathRow({ title, block, analysis }: { title: string; block: any,
         </div>
         
         {title === "Primary Path" && <ConsonantInfo analysis={analysis} />}
+
+        {math7 && math7.primary && (
+          <div className="mt-4 rounded-xl border px-4 py-3 text-sm">
+            <div className="font-semibold mb-1">
+              Heart (Seven-Voices Math)
+            </div>
+
+            <div className="flex flex-wrap gap-4">
+              <div>
+                <div className="text-xs uppercase opacity-70">State</div>
+                <div>{math7.primary.cycleState}</div>
+              </div>
+
+              <div>
+                <div className="text-xs uppercase opacity-70">Total (mod 7)</div>
+                <div>{math7.primary.totalMod7}</div>
+              </div>
+
+              <div className="min-w-[220px]">
+                <div className="text-xs uppercase opacity-70">Principles Path</div>
+                <div>{math7.primary.principlesPath.join(" → ")}</div>
+              </div>
+            </div>
+          </div>
+        )}
       </>
     </Card>
   );
@@ -139,6 +166,7 @@ export function ResultsDisplay({ analysis: raw }: { analysis: EnginePayload }) {
   };
 
   if (!analysis) return null;
+  
   const core = (analysis as any)?.core;
   const { candidates, symbolic } = analysis;
 
@@ -193,7 +221,16 @@ export function ResultsDisplay({ analysis: raw }: { analysis: EnginePayload }) {
             </div>
           </Card>
         )}
-         <div className="flex justify-end pt-2">
+         <div className="flex justify-end items-center gap-2 pt-2">
+            <label className="flex items-center gap-1 text-xs text-muted-foreground">
+              <input
+                type="checkbox"
+                className="rounded border-muted-foreground/40"
+                checked={coreOnly}
+                onChange={(e) => setCoreOnly(e.target.checked)}
+              />
+              Core only (Heart)
+            </label>
             <Button variant="outline" size="sm" onClick={handleExportJson}>
                 Export JSON
             </Button>
