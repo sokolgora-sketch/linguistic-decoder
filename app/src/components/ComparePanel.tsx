@@ -15,11 +15,11 @@ import { Button } from "./ui/button";
 import {
   runAnalysis,
   type Alphabet,
-  type AnalysisResult as RawAnalysisResult,
+  type AnalysisResult,
 } from "../lib/runAnalysis";
 import { getManifest } from "@/engine/manifest";
 import type { SolveOptions } from "@/functions/sevenVoicesCore";
-import type { AnalysisResult_DEPRECATED, AnalysisCore } from "@/shared/engineShape";
+import type { AnalysisCore } from "@/shared/engineShape";
 import { enginePayloadToAnalysisResult } from "@/shared/analysisAdapter";
 
 // Lightweight formatter for the Seven-Voices heart
@@ -44,8 +44,8 @@ interface ComparePanelProps {
 }
 
 interface CompareResult {
-  left: AnalysisResult_DEPRECATED | null;
-  right: AnalysisResult_DEPRECATED | null;
+  left: AnalysisResult | null;
+  right: AnalysisResult | null;
 }
 
 export default function ComparePanel({
@@ -61,7 +61,7 @@ export default function ComparePanel({
   const [result, setResult] = useState<CompareResult | null>(null);
 
   // Run the core engine directly in the browser (no /api call)
-  function analyzeLocal(word: string): RawAnalysisResult | null {
+  function analyzeLocal(word: string): AnalysisResult | null {
     const trimmed = word.trim();
     if (!trimmed) return null;
 
@@ -87,12 +87,8 @@ export default function ComparePanel({
     setError(null);
 
     try {
-      const leftRaw = analyzeLocal(leftWord);
-      const rightRaw = analyzeLocal(rightWord);
-      
-      const left = leftRaw ? enginePayloadToAnalysisResult(leftRaw) : null;
-      const right = rightRaw ? enginePayloadToAnalysisResult(rightRaw) : null;
-
+      const left = analyzeLocal(leftWord);
+      const right = analyzeLocal(rightWord);
 
       if (!left && !right) {
         setError("No results for either word.");
@@ -109,14 +105,15 @@ export default function ComparePanel({
     }
   }
 
-  function renderSummary(_word: string, payload: AnalysisResult_DEPRECATED | null) {
+  function renderSummary(_word: string, payload: AnalysisResult | null) {
     if (!payload) {
       return (
         <span className="text-xs text-muted-foreground">(no result)</span>
       );
     }
 
-    const path = payload.core?.voices.vowelVoices ?? [];
+    const richResult = enginePayloadToAnalysisResult(payload);
+    const path = richResult.core.voices.vowelVoices ?? [];
 
     return (
       <div className="text-xs text-muted-foreground">
@@ -126,7 +123,7 @@ export default function ComparePanel({
             : "(no path – check engine output)"}
         </div>
         <p className="text-xs text-muted-foreground mt-1">
-          Heart: {renderHeartSummary(payload.core)}
+          Heart: {renderHeartSummary(richResult.core)}
         </p>
       </div>
     );
