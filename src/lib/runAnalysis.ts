@@ -1,5 +1,6 @@
 // src/lib/runAnalysis.ts
-import { solveWord, type SolveOptions } from "../functions/sevenVoicesCore";
+import { solveWord } from "../functions/sevenVoicesCore";
+import type { SolveOptions as SolveWordOptions } from "../functions/sevenVoicesCore";
 import type { EnginePayload } from "@/shared/engineShape";
 
 export type Alphabet =
@@ -23,13 +24,12 @@ export type AnalysisResult = EnginePayload;
  */
 export function runAnalysis(
   word: string,
-  opts: SolveOptions,
+  opts: SolveWordOptions,
   alphabet: Alphabet
 ): AnalysisResult {
   const trimmed = word.trim();
-
-  // Empty input → safe default payload
   if (!trimmed) {
+    // Default empty payload – keeps the UI stable
     return {
       engineVersion: ENGINE_VERSION,
       word: "",
@@ -50,19 +50,19 @@ export function runAnalysis(
     };
   }
 
-  // Core solver – NOTE: three arguments (word, opts, alphabet)
   const result = solveWord(trimmed, opts, alphabet);
+  const r = result as any; // boundary to the core engine
 
   const payload: EnginePayload = {
-    engineVersion: (result as any).engineVersion ?? ENGINE_VERSION,
+    engineVersion: r.engineVersion || ENGINE_VERSION,
     word: trimmed,
     mode: opts.allowDelete ? "open" : "strict",
-    alphabet: (result as any).alphabet ?? alphabet,
-    primaryPath: result.primaryPath,
-    frontierPaths: result.frontierPaths,
-    windows: result.windows,
-    windowClasses: result.windowClasses,
-    signals: result.signals,
+    alphabet: r.alphabet || alphabet,
+    primaryPath: r.primaryPath,
+    frontierPaths: r.frontierPaths,
+    windows: r.windows,
+    windowClasses: r.windowClasses,
+    signals: r.signals,
   };
 
   return payload;
