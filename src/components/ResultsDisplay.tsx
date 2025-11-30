@@ -1,21 +1,41 @@
 'use client';
-import React, { useMemo, useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
-import type { CClass } from "../functions/languages";
-import { classRange } from "../functions/languages";
-import type { EnginePayload, AnalysisResult_DEPRECATED, Vowel } from "../shared/engineShape";
-import { enginePayloadToAnalysisResult } from "@/shared/analysisAdapter";
+import React, { useMemo, useState } from 'react';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from './ui/card';
+import type { CClass } from '../functions/languages';
+import { classRange } from '../functions/languages';
+import type { EnginePayload, AnalysisResult_DEPRECATED, Vowel } from '../shared/engineShape';
+import { enginePayloadToAnalysisResult } from '@/shared/analysisAdapter';
 import { getVoiceMeta } from '@/shared/sevenVoices';
-import WhyThisPath from "./WhyThisPath";
-import { VOICE_COLOR_MAP } from "../shared/voiceColors";
-import { Candidates } from "./Candidates";
-import { PrinciplesBlock } from "./PrinciplesBlock";
-import { SymbolicReadingCard } from "./SymbolicReadingCard";
-import { Button } from "@/components/ui/button";
-import { downloadJson } from "@/lib/downloadJson";
+import WhyThisPath from './WhyThisPath';
+import { VOICE_COLOR_MAP } from '../shared/voiceColors';
+import { Candidates } from './Candidates';
+import { PrinciplesBlock } from './PrinciplesBlock';
+import { SymbolicReadingCard } from './SymbolicReadingCard';
+import { Button } from '@/components/ui/button';
+import { downloadJson } from '@/lib/downloadJson';
 
 
-const LEVEL_LABEL: Record<number, string> = { 1: "High", 0: "Mid", [-1]: "Low" } as any;
+// Lightweight formatter for the Seven-Voices heart
+function getHeartSummary(core: any) {
+  if (!core) return null;
+
+  const primary = core.heartPaths?.primary ?? {};
+  const voices: string[] = primary.voiceSequence ?? core.voices?.vowelVoices ?? [];
+  const rings: (number | string)[] = primary.ringPath ?? core.voices?.ringPath ?? [];
+  const levels: string[] = core.voices?.levelPath ?? [];
+  const tension: string = primary.tensionLevel ?? "unknown";
+  const frontierCount: number | undefined = core.heartPaths?.frontierCount;
+
+  return {
+    voices,
+    rings,
+    levels,
+    tension,
+    frontierCount,
+  };
+}
+
+const LEVEL_LABEL: Record<number, string> = { 1: 'High', 0: 'Mid', [-1]: 'Low' } as any;
 
 function ConsonantInfo({ analysis }: { analysis: AnalysisResult_DEPRECATED }) {
   const windows = analysis.core.consonants.clusters?.map(c => c.cluster) || [];
@@ -151,6 +171,7 @@ export function ResultsDisplay({ analysis: raw }: { analysis: EnginePayload }) {
 
   if (!analysis) return null;
   const core = (analysis as any)?.core;
+  const heartSummary = getHeartSummary(core);
   const { candidates, symbolic } = analysis;
 
   return (
