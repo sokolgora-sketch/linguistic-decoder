@@ -1,6 +1,6 @@
 'use client';
 import React, { useMemo, useState } from "react";
-import { Card } from "./ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import type { CClass } from "../functions/languages";
 import { classRange } from "../functions/languages";
 import type { EnginePayload, AnalysisResult_DEPRECATED, Vowel } from "../shared/engineShape";
@@ -172,6 +172,22 @@ export function ResultsDisplay({ analysis: raw }: { analysis: EnginePayload }) {
 
   return (
     <div className="space-y-4">
+        {coreOnly && core && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Seven-Voices Heart (Core)</CardTitle>
+              <CardDescription>
+                Minimal heart snapshot from the engine for this word.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <pre className="text-xs whitespace-pre-wrap break-all">
+                {JSON.stringify(core, null, 2)}
+              </pre>
+            </CardContent>
+          </Card>
+        )}
+
         {core && core.heartPaths && (
             <PathRow block={{voicePath: core.voices.vowelVoices, ringPath: core.voices.ringPath, levelPath: core.voices.levelPath.map(l=>l==='high'?1:l==='low'?-1:0)}} title="Primary Path" analysis={analysis} />
         )}
