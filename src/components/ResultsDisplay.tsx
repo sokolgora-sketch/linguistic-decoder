@@ -126,6 +126,7 @@ const Chip = ({ v }: { v: string | number }) => {
 
 export function ResultsDisplay({ analysis: raw }: { analysis: EnginePayload }) {
   const analysis = useMemo(() => enginePayloadToAnalysisResult(raw), [raw]);
+  const [coreOnly, setCoreOnly] = useState(false);
 
   const handleExportJson = () => {
     if (!analysis) return;
@@ -138,7 +139,8 @@ export function ResultsDisplay({ analysis: raw }: { analysis: EnginePayload }) {
   };
 
   if (!analysis) return null;
-  const { core, candidates, symbolic } = analysis;
+  const core = (analysis as any)?.core;
+  const { candidates, symbolic } = analysis;
 
   return (
     <div className="space-y-4">
