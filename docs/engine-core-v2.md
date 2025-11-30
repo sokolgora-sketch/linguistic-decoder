@@ -55,8 +55,70 @@ It is a strict subset of the full `AnalysisResult` — enough for:
 
   "frontierCount": 7
 }
+```
 
-Field breakdown
+### Core snapshot (`core`)
+
+The engine now exposes a **minimal, stable "heart" view** of each analysis under the `core` field.
+
+This object is designed for:
+
+- UIs that only need the **Seven-Voices heart** summary
+- Lightweight exports (no heavy frontier, math, or language trees)
+- Future tools that run **comparisons** or **statistics** over many words
+
+#### Shape
+
+```jsonc
+{
+  "word": "study",
+  "engineVersion": "2025-11-16-core-2",
+
+  "input": {
+    "raw": "study",
+    "normalized": "study",
+    "alphabet": "auto",
+    "languageGuess": "unknown",
+    "languageConfidence": "medium",
+    "dialectGuess": "geg",
+    "mode": "strict"
+  },
+
+  "voices": {
+    "vowelVoices": ["U", "I"],
+    "ringPath": [1, 1],             // ring indexes over the path
+    "levelPath": ["low", "high"],   // low / mid / high
+    "dominantVoices": {}
+  },
+
+  "consonants": {
+    "clusters": [],
+    "overallHarmony": {
+      "byVoice": {},
+      "globalHarmonyScore": 0
+    }
+  },
+
+  "heartPaths": {
+    "primary": {
+      "voiceSequence": ["U", "I"],   // main path through the heart
+      "ringPath": [1, 1],
+      "tensionLevel": "low",         // low / medium / high
+      "frontierCount": 7             // number of viable alternates
+    }
+  }
+}
+```
+
+#### Guarantees
+
+core is small and stable compared to the full analysis.
+
+core.heartPaths.primary is always present when an analysis succeeds.
+
+The full analysis still contains everything, and now simply re-embeds this same object under core so UI layers don’t need to recompute it.
+
+### Field breakdown
 Top-level
 
 word: string
