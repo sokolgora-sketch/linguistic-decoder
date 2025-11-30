@@ -1,8 +1,5 @@
 // src/lib/runAnalysis.ts
-import {
-  solveWord,
-  type SolveOptions as SolveWordOptions,
-} from "../functions/sevenVoicesCore";
+import { solveWord, type SolveOptions } from "../functions/sevenVoicesCore";
 import type { EnginePayload } from "@/shared/engineShape";
 
 export type Alphabet =
@@ -22,22 +19,22 @@ export type AnalysisResult = EnginePayload;
 
 /**
  * Central wrapper for the Seven-Voices engine.
- * Trims the word, calls `solveWord`, and normalizes the payload.
+ * Ensures consistent metadata is attached to the raw result.
  */
 export function runAnalysis(
   word: string,
-  opts: SolveWordOptions,
+  opts: SolveOptions,
   alphabet: Alphabet
 ): AnalysisResult {
   const trimmed = word.trim();
 
+  // Empty input → safe default payload
   if (!trimmed) {
-    // Well-formed empty payload
     return {
       engineVersion: ENGINE_VERSION,
       word: "",
-      mode: opts.allowDelete ? "open" : "strict",
-      alphabet,
+      mode: "strict",
+      alphabet: "auto",
       primaryPath: {
         voicePath: [],
         ringPath: [],
@@ -53,7 +50,7 @@ export function runAnalysis(
     };
   }
 
-  // NOTE: sevenVoicesCore.solveWord is typed to take (word, opts, alphabet)
+  // Core solver – NOTE: three arguments (word, opts, alphabet)
   const result = solveWord(trimmed, opts, alphabet);
 
   const payload: EnginePayload = {
