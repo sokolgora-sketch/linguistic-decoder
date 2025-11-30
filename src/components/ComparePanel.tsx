@@ -1,8 +1,8 @@
-
 "use client";
 
-import { useState, useEffect } from "react";
-import { Card, CardContent } from "./ui/card";
+import { useState } from "react";
+
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "./ui/card";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import {
@@ -12,164 +12,163 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select";
+
 import { PROFILES } from "../functions/languages";
-import type { Alphabet, EnginePayload } from "../lib/runAnalysis";
+import { runAnalysis, type Alphabet, type AnalysisResult } from "@/lib/runAnalysis";
+import { getManifest } from "@/engine/manifest";
+import type { SolveOptions } from "@/functions/sevenVoicesCore";
 
 type Mode = "strict" | "open";
-type CompareResult = (EnginePayload & { solveMs?: number }) | null;
 
-const ResultCard = ({ word, data }: { word: string; data: CompareResult }) => {
-  if (!data) return null;
-  const { primaryPath, mode, alphabet, solveMs } = data;
-  return (
-    <Card className="p-3">
-      <div className="font-semibold mb-1">{word}</div>
-      <div className="text-xs text-muted-foreground mb-2">
-        {mode} · {alphabet} · {solveMs}ms
-      </div>
-      {primaryPath ? (
-        <pre className="text-xs whitespace-pre-wrap break-all max-h-64 overflow-auto rounded bg-muted/40 p-2">
-          {primaryPath.voicePath.join(" → ")}
-        </pre>
-      ) : (
-        <div className="text-xs text-red-500">No path found</div>
-      )}
-    </Card>
-  );
+type ComparePanelProps = {
+  defaultMode?: Mode;
+  defaultAlphabet?: Alphabet;
 };
 
+// Re-use the same manifest everywhere
+const manifest = getManifest();
+
+// Build solver options exactly like the API route does
+function buildSolveOptions(mode: Mode, alphabet: Alphabet): SolveOptions {
+  const isStrict = mode === "strict";
+
+  return {
+    beamWidth: 8,
+    maxOps: isStrict ? 1 : 2,
+    allowDelete: !isStrict,
+    allowClosure: !isStrict,
+    opCost: manifest.opCost,
+    alphabet,
+    manifest,
+    edgeWeight: manifest.edgeWeight,
+  };
+}
 
 export default function ComparePanel({
   defaultMode = "strict",
   defaultAlphabet = "auto",
-}: {
-  defaultMode?: Mode;
-  defaultAlphabet?: Alphabet;
-}) {
+}: ComparePanelProps) {
   const [leftWord, setLeftWord] = useState("damage");
   const [rightWord, setRightWord] = useState("study");
+
   const [mode, setMode] = useState<Mode>(defaultMode);
   const [alphabet, setAlphabet] = useState<Alphabet>(defaultAlphabet);
-  const [leftResult, setLeftResult] = useState<CompareResult>(null);
-  const [rightResult, setRightResult] = useState<CompareResult>(null);
+
+  const [leftResult, setLeftResult] = useState<AnalysisResult | null>(null);
+  const [rightResult, setRightResult] = useState<AnalysisResult | null>(null);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const hash = window.location.hash || "";
-    const m = hash.match(/#compare=([^&]+)/);
-    if (m?.[1]) setRightWord(decodeURIComponent(m[1]));
-  }, []);
+  function handleCompare() {
+    const a = leftWord.trim();
+    const b = rightWord.trim();
+    if (!a || !b) return;
 
-  async function fetchAnalysis(word: string): Promise<CompareResult | null> {
-    const w = word.trim();
-    if (!w) return null;
-
-    const params = new URLSearchParams({
-      word: w,
-      mode,
-      alphabet,
-    });
-
-    try {
-      const res = await fetch(`/api/analyze?${params.toString()}`);
-      if (!res.ok) {
-        console.error(`Compare /api/analyze failed for "${w}"`, await res.text());
-        return null;
-      }
-      return (await res.json()) as CompareResult;
-    } catch(err) {
-      console.error(`Compare /api/analyze error for "${w}"`, err);
-      return null;
-    }
-  }
-
-  async function runCompare() {
-    if (!leftWord.trim() || !rightWord.trim()) return;
     setLoading(true);
-    setLeftResult(null);
-    setRightResult(null);
     try {
-      const [leftData, rightData] = await Promise.all([
-        fetchAnalysis(leftWord),
-        fetchAnalysis(rightWord),
-      ]);
-      setLeftResult(leftData);
-      setRightResult(rightData);
+      const opts = buildSolveOptions(mode, alphabet);
+
+      // runAnalysis is synchronous – no fetch, no API, no 404
+      const left = runAnalysis(a, opts, alphabet);
+      const right = runAnalysis(b, opts, alphabet);
+
+      setLeftResult(left);
+      setRightResult(right);
+    } catch (err) {
+      console.error("Compare runAnalysis failed", err);
+      setLeftResult(null);
+      setRightResult(null);
     } finally {
       setLoading(false);
     }
   }
-  
-  const eqPrimary =
-    leftResult?.primaryPath &&
-    rightResult?.primaryPath &&
-    leftResult.primaryPath.voicePath.join(",") ===
-      rightResult.primaryPath.voicePath.join(",");
-
 
   return (
-    <Card className="p-4">
-      <h3 className="font-semibold mb-2">Compare Two Words</h3>
-
-      <p className="text-sm text-muted-foreground mb-3">
-        Analyze two words side by side and compare their Seven-Voices paths.
-      </p>
-
-      <div className="flex flex-col gap-2 md:flex-row mb-3">
-        <Input
-          value={leftWord}
-          onChange={(e) => setLeftWord(e.target.value)}
-          placeholder="First word"
-        />
-        <Input
-          value={rightWord}
-          onChange={(e) => setRightWord(e.target.value)}
-          placeholder="Second word"
-        />
-      </div>
-
-      <div className="flex flex-wrap items-center gap-3 mb-3">
-        <label className="flex items-center gap-2 text-sm">
-          <input
-            type="checkbox"
-            checked={mode === "strict"}
-            onChange={(e) => setMode(e.target.checked ? "strict" : "open")}
+    <Card>
+      <CardHeader>
+        <CardTitle>Compare Two Words</CardTitle>
+        <CardDescription>
+          Analyze two words side by side and compare their Seven-Voices paths.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className=\"space-y-4\">
+        {/* Inputs */}
+        <div className=\"grid gap-3 md:grid-cols-2\">
+          <Input
+            value={leftWord}
+            onChange={(e) => setLeftWord(e.target.value)}
+            placeholder=\"First word\"
           />
-          <span>Strict</span>
-        </label>
-
-        <Select
-          value={alphabet}
-          onValueChange={(v) => setAlphabet(v as Alphabet)}
-        >
-          <SelectTrigger className="w-[160px]">
-            <SelectValue placeholder="Auto-Detect" />
-          </SelectTrigger>
-          <SelectContent>
-            {PROFILES.map((p) => (
-               <SelectItem key={p.id} value={p.id}>{p.id.replace(/_/g,' ').replace(/\b\w/g, l => l.toUpperCase())}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-
-        <Button onClick={runCompare} disabled={loading}>
-          {loading ? "Comparing..." : "Compare"}
-        </Button>
-      </div>
-      
-      {eqPrimary && (
-         <div className="text-sm font-medium text-green-600 dark:text-green-400 mb-2">
-           Paths are identical.
-         </div>
-       )}
-
-      {(leftResult || rightResult) && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-          <ResultCard word={leftWord} data={leftResult} />
-          <ResultCard word={rightWord} data={rightResult} />
+          <Input
+            value={rightWord}
+            onChange={(e) => setRightWord(e.target.value)}
+            placeholder=\"Second word\"
+          />
         </div>
-      )}
+
+        {/* Controls */}
+        <div className=\"flex flex-wrap items-center gap-3\">
+          {/* Strict toggle */}
+          <label className=\"flex items-center gap-2 text-sm\">
+            <input
+              type=\"checkbox\"
+              className=\"h-4 w-4\"
+              checked={mode === "strict"}
+              onChange={(e) => setMode(e.target.checked ? "strict" : "open")}
+            />
+            Strict
+          </label>
+
+          {/* Alphabet select */}
+          <Select
+            value={alphabet}
+            onValueChange={(value) => setAlphabet(value as Alphabet)}
+          >
+            <SelectTrigger className=\"w-[180px]\">
+              <SelectValue placeholder=\"Alphabet\" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value=\"auto\">Auto-detect</SelectItem>
+              {PROFILES.map((profile) => (
+                <SelectItem key={profile.id} value={profile.id as Alphabet}>
+                  {profile.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          {/* Compare button */}
+          <Button onClick={handleCompare} disabled={loading}>
+            {loading ? "Comparing..." : "Compare"}
+          </Button>
+        </div>
+
+        {/* Results */}
+        <div className=\"grid gap-3 md:grid-cols-2\">
+          <ResultBox label={leftWord} payload={leftResult} />
+          <ResultBox label={rightWord} payload={rightResult} />
+        </div>
+      </CardContent>
     </Card>
+  );
+}
+
+
+type ResultBoxProps = {
+  label: string;
+  payload: AnalysisResult | null;
+};
+
+function ResultBox({ label, payload }: ResultBoxProps) {
+  return (
+    <div className=\"rounded-md border bg-muted/20 px-3 py-2\">
+      <div className=\"text-xs font-medium text-muted-foreground\">
+        {label || "(empty)"}
+      </div>
+      <div className=\"mt-1 text-xs text-muted-foreground\">
+        {payload
+          ? payload.primaryPath?.voicePath?.join(" → ") || "(no primary path)"
+          : "(no result)"}
+      </div>
+    </div>
   );
 }
