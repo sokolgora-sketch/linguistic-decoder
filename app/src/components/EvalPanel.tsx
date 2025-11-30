@@ -1,6 +1,6 @@
 
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { solveWord } from "../functions/sevenVoicesCore";
 import { getManifest } from "../engine/manifest";
 import { Button } from "./ui/button";
