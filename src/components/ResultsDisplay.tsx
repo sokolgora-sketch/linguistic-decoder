@@ -147,20 +147,24 @@ const Chip = ({ v }: { v: string | number }) => {
 export function ResultsDisplay({ analysis: raw }: { analysis: EnginePayload }) {
   const analysis = useMemo(() => enginePayloadToAnalysisResult(raw), [raw]);
   const [coreOnly, setCoreOnly] = useState(false);
+  const core = (analysis as any)?.core;
+  const heartSummary = getHeartSummary(core);
+  const { candidates, symbolic } = analysis || {};
+
 
   const handleExportJson = () => {
     if (!analysis) return;
-    const core = (analysis as any)?.core;
+
     const exportPayload =
-      coreOnly && core
+      coreOnly && analysis.core
         ? {
-            word: core.word,
-            engineVersion: core.engineVersion,
-            core: core,
+            word: analysis.core.word,
+            engineVersion: analysis.core.engineVersion,
+            core: analysis.core,
           }
         : analysis;
 
-    const safeWord = String(core?.word || 'analysis').toLowerCase().replace(/[^a-z0-9_-]+/g, "-");
+    const safeWord = String(analysis.core.word || 'analysis').toLowerCase().replace(/[^a-z0-9_-]+/g, "-");
 
     const exportFilename = coreOnly
       ? `${safeWord}-core.json`
@@ -170,25 +174,107 @@ export function ResultsDisplay({ analysis: raw }: { analysis: EnginePayload }) {
   };
 
   if (!analysis) return null;
-  const core = (analysis as any)?.core;
-  const heartSummary = getHeartSummary(core);
-  const { candidates, symbolic } = analysis;
 
   return (
     <div className="space-y-4">
       {coreOnly ? (
         core && (
           <Card>
-            <CardHeader>
-              <CardTitle>Seven-Voices Heart (Core)</CardTitle>
-              <CardDescription>
-                Minimal heart snapshot from the engine for this word.
-              </CardDescription>
+            <CardHeader className="flex flex-row items-start justify-between gap-2">
+              <div>
+                <CardTitle>Seven-Voices Heart (Core)</CardTitle>
+                <CardDescription>
+                  Minimal heart snapshot from the engine for this word.
+                </CardDescription>
+              </div>
+
+              {analysis.core && (
+                <div className="flex flex-col items-end gap-1 text-xs text-muted-foreground">
+                  <span className="rounded-full border px-2 py-0.5 leading-none">
+                    Engine core v2
+                  </span>
+                  <span className="font-mono opacity-70">
+                    {analysis.core.engineVersion}
+                  </span>
+                </div>
+              )}
             </CardHeader>
             <CardContent>
               <pre className="text-xs whitespace-pre-wrap break-all">
                 {JSON.stringify(core, null, 2)}
               </pre>
+              {heartSummary && (
+                <div className="mt-4 border-t border-slate-800 pt-4 text-sm text-slate-200">
+                  <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
+                    Heart summary
+                  </div>
+
+                  <div className="flex flex-wrap gap-6">
+                    <div>
+                      <div className="text-[10px] uppercase tracking-wide text-slate-500">
+                        Primary path
+                      </div>
+                      <div className="mt-1">
+                        {heartSummary.voices.length
+                          ? heartSummary.voices.join(" → ")
+                          : "—"}
+                      </div>
+                    </div>
+
+                    <div>
+                      <div className="text-[10px] uppercase tracking-wide text-slate-500">
+                        Rings
+                      </div>
+                      <div className="mt-1">
+                        {heartSummary.rings.length
+                          ? heartSummary.rings.join(" → ")
+                          : "—"}
+                      </div>
+                    </div>
+
+                    <div>
+                      <div className="text-[10px] uppercase tracking-wide text-slate-500">
+                        Levels
+                      </div>
+                      <div className="mt-1">
+                        {heartSummary.levels.length
+                          ? heartSummary.levels.join(" → ")
+                          : "—"}
+                      </div>
+                    </div>
+
+                    <div>
+                      <div className="text-[10px] uppercase tracking-wide text-slate-500">
+                        Tension
+                      </div>
+                      <div className="mt-1">
+                        <span
+                          className={
+                            heartSummary.tension === "low"
+                              ? "text-emerald-400"
+                              : heartSummary.tension === "medium"
+                              ? "text-amber-400"
+                              : heartSummary.tension === "high"
+                              ? "text-rose-400"
+                              : "text-slate-200"
+                          }
+                        >
+                          {heartSummary.tension}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div>
+                      <div className="text-[10px] uppercase tracking-wide text-slate-500">
+                        Frontier consonants
+                      </div>
+                      <div className="mt-1">
+                        {heartSummary.frontierCount ?? "—"}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
         )
