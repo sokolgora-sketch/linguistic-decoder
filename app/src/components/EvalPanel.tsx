@@ -38,7 +38,6 @@ export default function EvalPanel() {
   const [busy, setBusy] = useState(false);
   const [modeDefault, setModeDefault] = useState<Mode>("strict");
   const [alphabetDefault, setAlphabetDefault] = useState<Alphabet>("auto");
-  const [coreOnly, setCoreOnly] = useState(false);
 
   async function onFile(e: React.ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0]; if (!f) return;
@@ -142,24 +141,10 @@ export default function EvalPanel() {
             <SelectItem value="sanskrit">sanskrit</SelectItem>
             <SelectItem value="ancient_greek">ancient_greek</SelectItem>
             <SelectItem value="pie">pie</SelectItem>
-            <SelectItem value="turkish">turkish</SelectItem>
-            <SelectItem value="german">german</SelectItem>
           </SelectContent>
         </Select>
 
-        <div className="flex-grow" />
-
-        <label className="flex items-center gap-2 text-xs text-muted-foreground">
-          <input
-            type="checkbox"
-            checked={coreOnly}
-            onChange={(e) => setCoreOnly(e.target.checked)}
-            className="h-3 w-3"
-          />
-          Core only (Heart)
-        </label>
-
-        <Button asChild variant="default" size="sm" className="ml-2">
+        <Button asChild variant="default" size="sm" className="ml-auto">
           <label className="cursor-pointer">
             {busy ? "Processing…" : "Upload CSV"}
             <Input type="file" accept=".csv" className="hidden" onChange={onFile} />

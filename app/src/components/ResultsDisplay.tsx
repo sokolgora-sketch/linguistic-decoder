@@ -1,6 +1,7 @@
+
 'use client';
-import React, { useMemo } from "react";
-import { Card, CardContent } from "./ui/card";
+import React, { useMemo, useState } from "react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import type { CClass } from "../functions/languages";
 import { classRange } from "../functions/languages";
 import type { EnginePayload, AnalysisResult_DEPRECATED, Vowel } from "../shared/engineShape";
@@ -153,6 +154,7 @@ const Chip = ({ v }: { v: string | number }) => {
 
 export function ResultsDisplay({ analysis: raw }: { analysis: EnginePayload }) {
   const analysis = useMemo(() => enginePayloadToAnalysisResult(raw), [raw]);
+  const [coreOnly, setCoreOnly] = useState(false);
 
   const handleExportJson = () => {
     if (!analysis) return;
@@ -218,7 +220,16 @@ export function ResultsDisplay({ analysis: raw }: { analysis: EnginePayload }) {
             </div>
           </Card>
         )}
-         <div className="flex justify-end pt-2">
+         <div className="flex justify-end items-center gap-4 pt-2">
+            <label className="flex items-center gap-2 text-xs text-muted-foreground">
+              <input
+                type="checkbox"
+                checked={coreOnly}
+                onChange={(e) => setCoreOnly(e.target.checked)}
+                className="h-3 w-3"
+              />
+              Core only (Heart)
+            </label>
             <Button variant="outline" size="sm" onClick={handleExportJson}>
                 Export JSON
             </Button>
