@@ -1,5 +1,5 @@
 'use client';
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { Card } from "./ui/card";
 import type { CClass } from "../functions/languages";
 import { classRange } from "../functions/languages";
