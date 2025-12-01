@@ -1,5 +1,5 @@
 'use client';
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useRef } from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from './ui/card';
 import type { CClass } from '../functions/languages';
 import { classRange } from '../functions/languages';
@@ -12,6 +12,8 @@ import { Candidates } from './Candidates';
 import { PrinciplesBlock } from './PrinciplesBlock';
 import { SymbolicReadingCard } from './SymbolicReadingCard';
 import { ExportJsonButton } from './ui/ExportJsonButton';
+import { useToast } from '../hooks/use-toast';
+import { Button } from './ui/button';
 
 
 // Lightweight formatter for the Seven-Voices heart
@@ -206,10 +208,41 @@ const Chip = ({ v }: { v: string | number }) => {
 export function ResultsDisplay({ analysis: raw }: { analysis: EnginePayload }) {
   const analysis = useMemo(() => enginePayloadToAnalysisResult(raw), [raw]);
   const [coreOnly, setCoreOnly] = useState(false);
+  const coreJsonRef = useRef<HTMLPreElement | null>(null);
+  const { toast } = useToast();
   const core = (analysis as any)?.core;
   const heartSummary = getHeartSummary(core);
   const { candidates, symbolic } = analysis || {};
   const [copiedHeart, setCopiedHeart] = React.useState(false);
+  const primaryHeart = core?.heartPaths?.primary;
+  const heartVoiceSeq = primaryHeart?.voiceSequence ?? [];
+  const heartRingPath = primaryHeart?.ringPath ?? [];
+  const heartLevelPath = core?.voices?.levelPath ?? [];
+
+  const coreSummary =
+    primaryHeart &&
+    heartVoiceSeq.length > 0 &&
+    heartRingPath.length > 0 &&
+    heartLevelPath.length > 0
+      ? {
+          path: heartVoiceSeq.join(" → "),
+          rings:
+            heartRingPath.length === 1
+              ? `${heartRingPath[0]}`
+              : `${heartRingPath[0]} → ${
+                  heartRingPath[heartRingPath.length - 1]
+                }`,
+          levels:
+            heartLevelPath.length === 1
+              ? `${heartLevelPath[0]}`
+              : `${heartLevelPath[0]} → ${
+                  heartLevelPath[heartLevelPath.length - 1]
+                }`,
+          tension: primaryHeart.tensionLevel ?? "unknown",
+          frontier: primaryHeart.frontierCount ?? 0,
+        }
+      : null;
+
 
 const heartCore = core as HeartCore | undefined;
 
@@ -229,14 +262,33 @@ const handleCopyHeartSummary = React.useCallback(() => {
   }
 }, [heartCore]);
 
-const exportPayload = useMemo(() => {
+const handleCopyCoreJson = async () => {
+  const node = coreJsonRef.current;
+  if (!node) return;
+
+  const text = node.textContent ?? "";
+  if (!text.trim()) return;
+
+  try {
+    await navigator.clipboard.writeText(text);
+    toast({
+      title: "Copied heart JSON",
+      description: "Seven-Voices heart snapshot is now in your clipboard.",
+    });
+  } catch (err) {
+    console.error("Copy failed", err);
+    toast({
+      variant: "destructive",
+      title: "Copy failed",
+      description: "Browser blocked clipboard access.",
+    });
+  }
+};
+
+const coreSnapshot = useMemo(() => {
     if (!analysis) return null;
     if (coreOnly && analysis.core) {
-      return {
-        word: analysis.core.word,
-        engineVersion: analysis.core.engineVersion,
-        core: analysis.core,
-      };
+      return analysis.core;
     }
     return analysis;
   }, [analysis, coreOnly]);
@@ -277,6 +329,15 @@ const exportPayload = useMemo(() => {
               )}
             </CardHeader>
             <CardContent>
+              {coreSummary && (
+                <p className="text-xs text-muted-foreground mb-2">
+                  Seven-Voices heart snapshot: primary path{" "}
+                  <span className="font-mono">{coreSummary.path}</span> ·
+                  Rings: {coreSummary.rings} · Levels: {coreSummary.levels} ·
+                  Tension: {coreSummary.tension} · Frontier consonants:{" "}
+                  {coreSummary.frontier}
+                </p>
+              )}
               <pre className="text-xs whitespace-pre-wrap break-all">
                 {JSON.stringify(core, null, 2)}
               </pre>
@@ -431,36 +492,35 @@ className="rounded-lg border border-slate-700 bg-slate-950/60 px-2.5 py-1 text-[
         </>
       )}
 
-      {core && (
-        <section className="mt-4">
-          <h3 className="text-sm font-semibold text-muted-foreground mb-1">
-            Core snapshot (Seven-Voices heart)
-          </h3>
+      <section className="mt-4">
+  <h3 className="text-sm font-semibold text-muted-foreground mb-1">
+    Core snapshot (Seven-Voices heart)
+  </h3>
 
-          <details className="bg-black/40 border border-slate-700 rounded-lg p-2">
-            <summary className="cursor-pointer text-xs text-slate-300">
-              Show raw core JSON
-            </summary>
+  <pre
+    ref={coreJsonRef}
+    className="mt-2 max-h-[420px] overflow-auto rounded-md bg-slate-950/60 p-3 text-xs font-mono text-slate-100 border border-slate-800"
+  >
+    {coreSnapshot && JSON.stringify(coreSnapshot, null, 2)}
+  </pre>
 
-            <pre className="mt-2 text-[10px] leading-tight font-mono whitespace-pre-wrap max-h-64 overflow-auto">
-              {JSON.stringify(core, null, 2)}
-            </pre>
-          </details>
-        </section>
-      )}
+  <div className="flex items-center justify-end gap-2 mt-2">
+    <label className="flex items-center gap-2 text-xs text-muted-foreground">
+      <input
+        type="checkbox"
+        checked={coreOnly}
+        onChange={(e) => setCoreOnly(e.target.checked)}
+      />
+      Core only (Heart)
+    </label>
 
-      <div className="flex justify-end items-center gap-4 pt-2">
-        <label className="flex items-center gap-2 text-xs text-muted-foreground">
-          <input
-            type="checkbox"
-            checked={coreOnly}
-            onChange={(e) => setCoreOnly(e.target.checked)}
-            className="h-3 w-3"
-          />
-          Core only (Heart)
-        </label>
-        <ExportJsonButton data={exportPayload} filename={exportFilename} />
-      </div>
+    <Button variant="outline" size="sm" onClick={handleCopyCoreJson}>
+      Copy JSON
+    </Button>
+
+    <ExportJsonButton data={exportPayload} filename={exportFilename} />
+  </div>
+</section>
     </div>
   );
 }
