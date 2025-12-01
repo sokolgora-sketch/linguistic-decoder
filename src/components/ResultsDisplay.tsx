@@ -3,8 +3,8 @@ import React, { useMemo, useState, useRef } from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from './ui/card';
 import type { CClass } from '../functions/languages';
 import { classRange } from '../functions/languages';
-import type { EnginePayload, AnalysisResult_DEPRECATED, Vowel } from '../shared/engineShape';
-import { enginePayloadToAnalysisResult } from '@/shared/analysisAdapter';
+import type { EnginePayload, Vowel } from '../shared/engineShape';
+import { enginePayloadToAnalysisResult, type AnalysisResult } from '@/shared/analysisAdapter';
 import { getVoiceMeta } from '@/shared/sevenVoices';
 import WhyThisPath from './WhyThisPath';
 import { VOICE_COLOR_MAP } from '../shared/voiceColors';
@@ -14,6 +14,60 @@ import { SymbolicReadingCard } from './SymbolicReadingCard';
 import { ExportJsonButton } from './ui/ExportJsonButton';
 import { useToast } from '../hooks/use-toast';
 import { Button } from './ui/button';
+
+function copyTextToClipboard(text: string) {
+  // Modern API first
+  if (typeof navigator !== "undefined" && navigator.clipboard && window.isSecureContext) {
+    return navigator.clipboard.writeText(text);
+  }
+
+  // Fallback for weird hosts (like the Firebase Studio sandbox)
+  return new Promise<void>((resolve, reject) => {
+    try {
+      const textArea = document.createElement("textarea");
+      textArea.value = text;
+
+      // Make it invisible but still selectable
+      textArea.style.position = "fixed";
+      textArea.style.left = "-9999px";
+      textArea.style.top = "-9999px";
+
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+
+      const ok = document.execCommand("copy");
+      document.body.removeChild(textArea);
+
+      if (!ok) reject(new Error("execCommand returned false"));
+      else resolve();
+    } catch (err) {
+      reject(err as Error);
+    }
+  });
+}
+
+export function buildHeartSummary(result: AnalysisResult): string {
+  const heart = result.math7?.heartPaths?.primary;
+  if (!heart) return "";
+
+  const [vFrom, vTo] = heart.voiceSequence ?? [];
+  const [rFrom, rTo] = heart.ringPath ?? [];
+  const [lFrom, lTo] = heart.levelPath ?? [];
+  const tension = heart.tensionLevel ?? "unknown";
+  const frontier = result.math7?.frontierConsonants;
+
+  const lines = [
+    `Seven-Voices heart snapshot for "${result.word ?? ""}":`,
+    `- Primary path: ${vFrom ?? "?"} → ${vTo ?? "?"}`,
+    `- Rings: ${rFrom ?? "?"} → ${rTo ?? "?"}`,
+    `- Levels: ${lFrom ?? "?"} → ${lTo ?? "?"}`,
+    `- Tension: ${tension}`,
+    frontier != null ? `- Frontier consonants: ${frontier}` : null,
+  ].filter(Boolean) as string[];
+
+  return lines.join("\n");
+}
 
 
 // Lightweight formatter for the Seven-Voices heart
@@ -36,69 +90,9 @@ function getHeartSummary(core: any) {
   };
 }
 
-type HeartCore = {
-    input?: {
-      normalized?: string;
-      raw?: string;
-    };
-    voices?: {
-      levelPath?: string[];
-    };
-    heartPaths?: {
-      primary?: {
-        voiceSequence?: string[];
-        ringPath?: number[];
-        tensionLevel?: string;
-        frontierCount?: number;
-      };
-    };
-  };
-  
-  function buildHeartSummaryText(core: HeartCore | null | undefined): string | null {
-    if (!core?.heartPaths?.primary?.voiceSequence || core.heartPaths.primary.voiceSequence.length === 0) {
-      return null;
-    }
-  
-    const primary = core.heartPaths.primary;
-    const levels = core.voices?.levelPath ?? [];
-    const levelStart = levels[0];
-    const levelEnd = levels[levels.length - 1];
-  
-    const lines: string[] = [];
-  
-    const word = core.input?.normalized || core.input?.raw;
-    if (word) {
-      lines.push(`Seven-Voices heart snapshot for "${word}":`);
-    } else {
-      lines.push(`Seven-Voices heart snapshot:`);
-    }
-  
-    lines.push(`- Primary path: ${primary.voiceSequence.join(" → ")}`);
-  
-    if (primary.ringPath && primary.ringPath.length > 0) {
-      const ringStart = primary.ringPath[0];
-      const ringEnd = primary.ringPath[primary.ringPath.length - 1];
-      lines.push(`- Rings: ${ringStart} → ${ringEnd}`);
-    }
-  
-    if (levelStart && levelEnd) {
-      lines.push(`- Levels: ${levelStart} → ${levelEnd}`);
-    }
-  
-    if (primary.tensionLevel) {
-      lines.push(`- Tension: ${primary.tensionLevel}`);
-    }
-  
-    if (typeof primary.frontierCount === "number") {
-      lines.push(`- Frontier consonants: ${primary.frontierCount}`);
-    }
-  
-    return lines.join("\n");
-  }
-
 const LEVEL_LABEL: Record<number, string> = { 1: 'High', 0: 'Mid', [-1]: 'Low' } as any;
 
-function ConsonantInfo({ analysis }: { analysis: AnalysisResult_DEPRECATED }) {
+function ConsonantInfo({ analysis }: { analysis: AnalysisResult }) {
   const windows = analysis.core.consonants.clusters?.map(c => c.cluster) || [];
   const windowClasses = analysis.core.consonants.clusters?.map(c => c.classes[0]) || [];
   const ringPath = analysis.core.voices.ringPath;
@@ -147,7 +141,7 @@ function ConsonantInfo({ analysis }: { analysis: AnalysisResult_DEPRECATED }) {
 }
 
 
-export function PathRow({ title, block, analysis }: { title: string; block: any, analysis: AnalysisResult_DEPRECATED }) {
+export function PathRow({ title, block, analysis }: { title: string; block: any, analysis: AnalysisResult }) {
   if (!block || !block.voicePath.length) {
     return (
       <Card className="p-4">
@@ -204,16 +198,40 @@ const Chip = ({ v }: { v: string | number }) => {
     );
 };
 
+type SymbolicSummary = {
+  summary?: string;
+  notes?: string[];
+};
 
-export function ResultsDisplay({ analysis: raw }: { analysis: EnginePayload }) {
-  const analysis = useMemo(() => enginePayloadToAnalysisResult(raw), [raw]);
-  const [coreOnly, setCoreOnly] = useState(false);
+function formatSymbolicReading(symbolic?: SymbolicSummary): string {
+  if (!symbolic) return "";
+
+  const parts: string[] = [];
+
+  if (symbolic.summary) {
+    parts.push(symbolic.summary);
+  }
+
+  if (symbolic.notes && symbolic.notes.length > 0) {
+    parts.push(symbolic.notes.join(" "));
+  }
+
+  return parts.join(" ");
+}
+
+interface ResultsDisplayProps {
+  analysis: AnalysisResult | null;
+  coreOnly?: boolean;
+}
+
+export function ResultsDisplay({ analysis: raw, coreOnly: initialCoreOnly }: ResultsDisplayProps) {
+  const analysis: AnalysisResult | null = useMemo(() => raw, [raw]);
+  const [coreOnly, setCoreOnly] = useState(initialCoreOnly ?? false);
   const coreJsonRef = useRef<HTMLPreElement | null>(null);
   const { toast } = useToast();
-  const core = (analysis as any)?.core;
+  const core = analysis?.core;
   const heartSummary = getHeartSummary(core);
   const { candidates, symbolic } = analysis || {};
-  const [copiedHeart, setCopiedHeart] = React.useState(false);
   const primaryHeart = core?.heartPaths?.primary;
   const heartVoiceSeq = primaryHeart?.voiceSequence ?? [];
   const heartRingPath = primaryHeart?.ringPath ?? [];
@@ -243,24 +261,26 @@ export function ResultsDisplay({ analysis: raw }: { analysis: EnginePayload }) {
         }
       : null;
 
+    const handleCopyHeartSummary = async () => {
+        if (!analysis) return;
 
-const heartCore = core as HeartCore | undefined;
+        const summary = buildHeartSummary(analysis);
 
-const handleCopyHeartSummary = React.useCallback(() => {
-  const text = buildHeartSummaryText(heartCore);
-  if (!text) {
-    console.warn("No heart summary available to copy.");
-    return;
-  }
-
-  try {
-    navigator.clipboard.writeText(text);
-    setCopiedHeart(true);
-    setTimeout(() => setCopiedHeart(false), 2000);
-  } catch (err) {
-    console.error("Failed to copy heart summary:", err);
-  }
-}, [heartCore]);
+        try {
+            await copyTextToClipboard(summary);
+            toast({
+            title: "Copied",
+            description: "Seven-Voices heart snapshot is in your clipboard.",
+            });
+        } catch (err) {
+            console.error(err);
+            toast({
+            variant: "destructive",
+            title: "Could not copy",
+            description: "Clipboard is blocked in this environment.",
+            });
+        }
+    };
 
 const handleCopyCoreJson = async () => {
   const node = coreJsonRef.current;
@@ -295,7 +315,7 @@ const coreSnapshot = useMemo(() => {
 
   const exportPayload = coreOnly ? core : analysis;
 
-  const baseName = (analysis as any)?.word ?? "analysis";
+  const baseName = analysis?.word ?? "analysis";
   const exportFilename = coreOnly
     ? `${baseName}-heart-core.json`
     : `${baseName}-full-analysis.json`;
@@ -346,15 +366,9 @@ const coreSnapshot = useMemo(() => {
 <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-500">
 HEART SUMMARY
 </h3>
-{heartCore && (
-<button
-type="button"
-onClick={handleCopyHeartSummary}
-className="rounded-lg border border-slate-700 bg-slate-950/60 px-2.5 py-1 text-[11px] font-medium text-slate-200 hover:border-slate-500 hover:bg-slate-900 transition-colors"
->
-{copiedHeart ? "Copied" : "Copy heart summary"}
-</button>
-)}
+<Button size="sm" variant="outline" onClick={handleCopyHeartSummary}>
+  Copy heart summary
+</Button>
 </div>
 
                   <div className="flex flex-wrap gap-6">
@@ -428,7 +442,7 @@ className="rounded-lg border border-slate-700 bg-slate-950/60 px-2.5 py-1 text-[
         )
       ) : (
         <>
-          {core && core.heartPaths && (
+          {core && core.heartPaths && analysis && (
             <PathRow
               block={{
                 voicePath: core.voices.vowelVoices,
@@ -444,14 +458,64 @@ className="rounded-lg border border-slate-700 bg-slate-950/60 px-2.5 py-1 text-[
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <WhyThisPath primary={raw.primaryPath} />
-            <PrinciplesBlock analysis={analysis} />
+            {analysis && <PrinciplesBlock analysis={analysis} />}
           </div>
 
           <Candidates candidates={candidates} />
 
-          {symbolic && <SymbolicReadingCard symbolic={symbolic} />}
+          {/* Zheji-inspired symbolic reading (experimental) */}
+          {analysis?.symbolic && (
+            (() => {
+              const symbolic = analysis.symbolic as SymbolicSummary | undefined;
 
-          {core && core.heartPaths && core.heartPaths.frontierCount > 0 && (
+              if (!symbolic || (!symbolic.summary && !symbolic.notes?.length)) {
+                return null;
+              }
+
+              return (
+                <Card>
+                  <CardHeader className="flex items-start justify-between gap-2">
+                    <div>
+                      <CardTitle>✨ Zheji-inspired symbolic reading (experimental)</CardTitle>
+                      <CardDescription>
+                        This is a symbolic / interpretive layer built on top of the Seven-Voices path and
+                        morphology.
+                      </CardDescription>
+                    </div>
+
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="mt-1 shrink-0"
+                      onClick={() => {
+                        const text = formatSymbolicReading(symbolic);
+                        if (!text) return;
+                        if (navigator?.clipboard?.writeText) {
+                          navigator.clipboard.writeText(text).catch(() => {
+                            // ignore clipboard errors in older browsers
+                          });
+                        }
+                      }}
+                    >
+                      Copy reading
+                    </Button>
+                  </CardHeader>
+
+                  <CardContent>
+                    {symbolic.notes && symbolic.notes.length > 0 && (
+                      <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
+                        {symbolic.notes.map((note, idx) => (
+                          <li key={idx}>{note}</li>
+                        ))}
+                      </ul>
+                    )}
+                  </CardContent>
+                </Card>
+              );
+            })()
+          )}
+
+          {core && core.heartPaths && core.heartPaths.frontierCount > 0 && raw && (
             <Card className="p-4 mt-4">
               <h3 className="font-bold text-sm tracking-wide">Frontier (near‑optimal alternates)</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mt-3">

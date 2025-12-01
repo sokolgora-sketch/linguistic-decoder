@@ -21,7 +21,7 @@ import { useDebounced } from "../hooks/useDebounced";
 import { Loader2, Sparkles, Wand2, HelpCircle, GitBranch, BookOpen, History as HistoryIcon, ListChecks } from "lucide-react";
 import ComparePanel from "../components/ComparePanel";
 import { normalizeEnginePayload, type Vowel, type EnginePayload, type AnalysisResult_DEPRECATED } from "../shared/engineShape";
-import { analysisResultToEnginePayload } from "@/shared/analysisAdapter";
+import { analysisResultToEnginePayload, type AnalysisResult } from "@/shared/analysisAdapter";
 import HistoryPanel from "../components/HistoryPanel";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../lib/firebase";
@@ -32,6 +32,7 @@ import { ExportJsonButton } from "../components/ExportJsonButton";
 import { logError } from "../lib/logError";
 import { VOICE_COLOR_MAP, VOICE_LABEL_MAP } from "../shared/voiceColors";
 import { SymbolicReadingCard } from "@/components/SymbolicReadingCard";
+import { fetchWordClient } from "../shared/fetchWordClient";
 
 
 const VOICE_META: { id: Vowel; label: string; role: string }[] = [
@@ -53,20 +54,34 @@ if (process.env.NEXT_PUBLIC_DEV_EVAL === "1") {
 export default function LinguisticDecoderApp(){
   const { toast } = useToast();
   const [word, setWord] = useState("");
-  const [mode, setMode] = useState<"strict"|"open">("strict");
+  const [mode, setMode] = useState<"strict"|"relaxed">("strict");
   const [alphabet, setAlphabet] = useState<Alphabet>("auto");
   const [edgeWeight, setEdgeWeight] = useState(0.25);
-  const [data, setData] = useState<EnginePayload | null>(null);
+  const [data, setData] = useState<AnalysisResult | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [isWarming, setIsWarming] = useState(false);
   const [showDebug, setShowDebug] = useState(false);
   const [useAi, setUseAi] = useState(false);
+  const [coreOnly, setCoreOnly] = useState(false);
 
   // Debounce user input, then warm the cache in the background
   const debouncedWord = useDebounced(word, 450);
   
   const canAnalyze = word.trim().length > 0 && !loading;
+
+  const runAnalysis = async (word: string) => {
+    setLoading(true);
+    try {
+      const result = await fetchWordClient(word, {
+        mode,
+        coreOnly,
+      });
+      setData(result);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   async function analyze(nextWord?: string, nextMode?: "strict"|"open", nextAlphabet?: Alphabet){
     if (!allowAnalyze()) { 
@@ -189,7 +204,7 @@ export default function LinguisticDecoderApp(){
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (canAnalyze) {
-      analyze();
+      runAnalysis(word);
     }
   }
 
@@ -371,7 +386,7 @@ export default function LinguisticDecoderApp(){
                     type="button"
                     onClick={() => {
                       setWord(example);
-                      analyze(example);
+                      runAnalysis(example);
                     }}
                     className={`px-2 py-1 rounded-full border border-border/60 hover:bg-accent/40 hover:border-accent/80 transition text-xs font-medium
                       ${isActive ? "bg-accent/30 border-accent/80" : ""}`}
@@ -591,7 +606,7 @@ export default function LinguisticDecoderApp(){
                 <p className="text-xs text-muted-foreground mb-3">
                   Analyze two words side by side and compare their Seven-Voices paths.
                 </p>
-                <ComparePanel defaultMode={mode} defaultAlphabet={alphabet} />
+                <ComparePanel mode={mode} defaultCoreOnly={coreOnly} />
               </Card>
             </AccordionContent>
           </AccordionItem>

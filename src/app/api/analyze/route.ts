@@ -1,112 +1,74 @@
-// src/app/api/analyze/route.ts
-import { NextResponse } from "next/server";
-import { runAnalysis, type Alphabet } from "@/lib/runAnalysis";
-import { getManifest } from "@/engine/manifest";
-import type { SolveOptions } from "@/functions/sevenVoicesCore";
 
-// Shared helper used by both GET and POST
-async function analyzeWord(
-  word: string,
-  mode: "strict" | "open",
-  alphabet: Alphabet,
-  manifestVersion?: string | null
-) {
-  const manifest = getManifest(manifestVersion || undefined);
-  const isStrict = mode === "strict";
+import { NextResponse, type NextRequest } from 'next/server';
+import { runAnalysis } from '@/lib/runAnalysis';
+import { getManifest } from '@/engine/manifest';
+import type { SolveOptions } from '@/functions/sevenVoicesCore';
+import type { Alphabet } from '@/lib/runAnalysis';
+import { analyzeWord } from '@/engine/analyzeWord';
+import { computeMath7ForResult } from '@/engine/math7';
 
-  const opts: SolveOptions = {
-    beamWidth: 8,
-    maxOps: isStrict ? 1 : 2,
-    allowDelete: !isStrict,
-    allowClosure: !isStrict,
-    opCost: manifest.opCost,
-    alphabet,
-    manifest,
-    edgeWeight: manifest.edgeWeight,
-  };
-
-  const t0 = Date.now();
-  const analysis = runAnalysis(word, opts, alphabet);
-
-  return {
-    ...analysis,
-    solveMs: Date.now() - t0,
-  };
-}
-
-// GET /api/analyze?word=...&mode=...&alphabet=...&manifest=...
+// A server-side analysis endpoint for reproducibility and direct access.
 export async function GET(request: Request) {
-  const url = new URL(request.url);
-  const word = url.searchParams.get("word");
-  const mode =
-    (url.searchParams.get("mode") as "strict" | "open") || "strict";
-  const alphabet =
-    (url.searchParams.get("alphabet") as Alphabet) || "auto";
-  const manifestVersion = url.searchParams.get("manifest");
+  const { searchParams } = new URL(request.url);
+  const word = searchParams.get('word');
+  const mode = (searchParams.get('mode') as 'strict' | 'open') || 'strict';
+  const alphabet = (searchParams.get('alphabet') as Alphabet) || 'auto';
+  const manifestVersion = searchParams.get('manifest');
 
   if (!word) {
-    return NextResponse.json(
-      { error: 'Missing "word" query parameter' },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: 'Missing "word" query parameter' }, { status: 400 });
   }
 
+  const t0 = Date.now();
+  const manifest = getManifest(manifestVersion || undefined);
+
   try {
-    const payload = await analyzeWord(
-      word,
-      mode,
+    const isStrict = mode === 'strict';
+    const opts: SolveOptions = {
+      beamWidth: 8,
+      maxOps: isStrict ? 1 : 2,
+      allowDelete: !isStrict,
+      allowClosure: !isStrict,
+      opCost: manifest.opCost,
       alphabet,
-      manifestVersion
-    );
+      manifest,
+      edgeWeight: manifest.edgeWeight,
+    };
+
+    const analysis = runAnalysis(word, opts, alphabet);
+
+    const payload = {
+      ...analysis,
+      solveMs: Date.now() - t0,
+    };
+
     return NextResponse.json(payload);
   } catch (e: any) {
-    console.error(`[API /analyze][GET] Error for word "${word}":`, e);
-    return NextResponse.json(
-      { error: e?.message || "Analysis failed" },
-      { status: 500 }
-    );
+    console.error(`[API /analyze] Error for word "${word}":`, e);
+    return NextResponse.json({ error: e.message || 'Analysis failed' }, { status: 500 });
   }
 }
 
-// POST /api/analyze  with JSON { word, mode?, alphabet?, manifest? }
-export async function POST(request: Request) {
-  let body: any;
+export async function POST(req: NextRequest) {
   try {
-    body = await request.json();
-  } catch {
-    return NextResponse.json(
-      { error: "Invalid JSON body" },
-      { status: 400 }
-    );
-  }
+    const body = await req.json();
+    const { word, mode } = body;
 
-  const word = typeof body.word === "string" ? body.word : "";
-  const mode: "strict" | "open" =
-    body.mode === "open" ? "open" : "strict";
-  const alphabet: Alphabet = body.alphabet || "auto";
-  const manifestVersion =
-    typeof body.manifest === "string" ? body.manifest : undefined;
+    if (!word) {
+      return NextResponse.json({ error: 'Missing "word" in request body' }, { status: 400 });
+    }
+    
+    // 1) base engine (old, stable path)
+    const base = analyzeWord(word, mode ?? "strict");
 
-  if (!word.trim()) {
-    return NextResponse.json(
-      { error: 'Missing "word" in JSON body' },
-      { status: 400 }
-    );
-  }
+    // 2) heart math layered on top
+    const math7 = computeMath7ForResult(base);
+    
+    // 3) return both together
+    return NextResponse.json({ ...base, math7 });
 
-  try {
-    const payload = await analyzeWord(
-      word,
-      mode,
-      alphabet,
-      manifestVersion
-    );
-    return NextResponse.json(payload);
-  } catch (e: any) {
-    console.error(`[API /analyze][POST] Error for word "${word}":`, e);
-    return NextResponse.json(
-      { error: e?.message || "Analysis failed" },
-      { status: 500 }
-    );
+  } catch(e: any) {
+    console.error(`[API /analyze POST] Error:`, e);
+    return NextResponse.json({ error: e.message || 'Analysis failed' }, { status: 500 });
   }
 }
