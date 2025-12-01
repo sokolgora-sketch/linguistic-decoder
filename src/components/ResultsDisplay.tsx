@@ -491,7 +491,7 @@ className="rounded-lg border border-slate-700 bg-slate-950/60 px-2.5 py-1 text-[
                     </div>
 
                     <Button
-                      size="xs"
+                      size="sm"
                       variant="outline"
                       className="mt-1 shrink-0"
                       onClick={() => {
