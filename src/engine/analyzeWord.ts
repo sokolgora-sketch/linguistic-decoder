@@ -118,13 +118,13 @@ function attachCanonCandidates(base: any): any {
       return {
         language: c.language,
         form: c.form,
-        gloss: c.decomposition.functionalStatement,
+        gloss: c.decomposition?.functionalStatement ?? c.gloss ?? "",
         passes: c.status === "pass",
         experimental: c.status === "experimental",
         speculative: c.confidenceTag === "speculative",
-        voicePath: (c.voices.voiceSequence || []).join(" → "),
+        voicePath: (c.voices?.voiceSequence || []).join(" → "),
         levelPath: "N/A",
-        ringPath: (c.voices.ringPath || []).join(" → "),
+        ringPath: (c.voices?.ringPath || []).join(" → "),
         morphologyMatrix: matrix,
         symbolic: c.symbolic,
       };

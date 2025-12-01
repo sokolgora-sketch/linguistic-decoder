@@ -27,6 +27,7 @@ import { CANON_CANDIDATES } from './canonCandidates';
 import { buildConsonantField } from './consonantField';
 import { mapPathToPrinciples, getVoiceMeta } from './sevenVoices';
 import { detectAlbanianDialect } from '../lib/detectDialect';
+import { classifyHeart, HeartClassification } from '../engine/heartArchetypes';
 
 function buildSevenVoicesSummary(
   payload: EnginePayload
@@ -141,6 +142,18 @@ export function enginePayloadToAnalysisResult(
     }
   }
 
+  const primaryHeartPath = {
+    voiceSequence: payload.primaryPath.voicePath,
+    ringPath: payload.primaryPath.ringPath,
+    levelPath: payload.primaryPath.levelPath.map(l =>
+        l > 0 ? 'high' : l < 0 ? 'low' : 'mid'
+      ),
+    tensionLevel: 'low', // This is a placeholder
+    frontierCount: payload.frontierPaths.length,
+  };
+
+  const heartClassification: HeartClassification = classifyHeart(primaryHeartPath);
+
   const core: AnalysisCore = {
     word: payload.word,
     engineVersion: payload.engineVersion,
@@ -175,9 +188,10 @@ export function enginePayloadToAnalysisResult(
     },
     heartPaths: {
       primary: {
-        voiceSequence: payload.primaryPath.voicePath,
-        ringPath: payload.primaryPath.ringPath,
-        tensionLevel: 'low',
+        ...primaryHeartPath,
+        archetypeId: heartClassification.id,
+        archetypeLabel: heartClassification.label,
+        archetypeSummary: heartClassification.summary,
       },
       frontierCount: payload.frontierPaths.length,
     },
