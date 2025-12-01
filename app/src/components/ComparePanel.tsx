@@ -15,11 +15,11 @@ import { Button } from "./ui/button";
 import {
   runAnalysis,
   type Alphabet,
-  type AnalysisResult,
+  type AnalysisResult as RawAnalysisResult,
 } from "../lib/runAnalysis";
 import { getManifest } from "@/engine/manifest";
 import type { SolveOptions } from "@/functions/sevenVoicesCore";
-import type { AnalysisCore } from "@/shared/engineShape";
+import type { AnalysisResult_DEPRECATED, AnalysisCore } from "@/shared/engineShape";
 import { enginePayloadToAnalysisResult } from "@/shared/analysisAdapter";
 
 // Lightweight formatter for the Seven-Voices heart
@@ -36,6 +36,73 @@ function renderHeartSummary(core?: AnalysisCore) {
   return `${seq} · tension: ${tension} · frontier: ${frontier}`;
 }
 
+// Small helper view: show Seven-Voices heart path for one word
+type HeartCore = {
+  voices?: {
+    levelPath?: string[];
+  };
+  heartPaths?: {
+    primary?: {
+      voiceSequence?: string[];
+      ringPath?: number[];
+      tensionLevel?: string;
+      frontierCount?: number;
+    };
+  };
+};
+
+interface HeartSummaryProps {
+  label: string;
+  core?: HeartCore | null;
+}
+
+const HeartSummary: React.FC<HeartSummaryProps> = ({ label, core }) => {
+  const primary = core?.heartPaths?.primary;
+  const levelPath = core?.voices?.levelPath;
+
+  if (!primary || !primary.voiceSequence || primary.voiceSequence.length === 0) {
+    return null;
+  }
+
+  const voicePath = primary.voiceSequence.join(" → ");
+  const levelStart = levelPath?.[0];
+  const levelEnd = levelPath?.[levelPath.length - 1];
+
+  return (
+    <div className="mt-3 rounded-xl border border-slate-800/60 bg-slate-950/40 px-3 py-2 text-xs text-slate-200">
+      <div className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-slate-500">
+        {label} heart
+      </div>
+      <div className="flex flex-wrap gap-x-4 gap-y-1">
+        <span>
+          Path: <span className="font-medium">{voicePath}</span>
+        </span>
+        {levelStart && levelEnd && (
+          <span>
+            Levels:{" "}
+            <span className="font-medium">
+              {levelStart} → {levelEnd}
+            </span>
+          </span>
+        )}
+        {primary.tensionLevel && (
+          <span>
+            Tension:{" "}
+            <span className="font-medium">{primary.tensionLevel}</span>
+          </span>
+        )}
+        {typeof primary.frontierCount === "number" && (
+          <span>
+            Frontier:{" "}
+            <span className="font-medium">{primary.frontierCount}</span>
+          </span>
+        )}
+      </div>
+    </div>
+  );
+};
+
+
 type Mode = "strict" | "open";
 
 interface ComparePanelProps {
@@ -44,8 +111,8 @@ interface ComparePanelProps {
 }
 
 interface CompareResult {
-  left: AnalysisResult | null;
-  right: AnalysisResult | null;
+  left: AnalysisResult_DEPRECATED | null;
+  right: AnalysisResult_DEPRECATED | null;
 }
 
 export default function ComparePanel({
@@ -61,7 +128,7 @@ export default function ComparePanel({
   const [result, setResult] = useState<CompareResult | null>(null);
 
   // Run the core engine directly in the browser (no /api call)
-  function analyzeLocal(word: string): AnalysisResult | null {
+  function analyzeLocal(word: string): RawAnalysisResult | null {
     const trimmed = word.trim();
     if (!trimmed) return null;
 
@@ -87,8 +154,12 @@ export default function ComparePanel({
     setError(null);
 
     try {
-      const left = analyzeLocal(leftWord);
-      const right = analyzeLocal(rightWord);
+      const leftRaw = analyzeLocal(leftWord);
+      const rightRaw = analyzeLocal(rightWord);
+      
+      const left = leftRaw ? enginePayloadToAnalysisResult(leftRaw) : null;
+      const right = rightRaw ? enginePayloadToAnalysisResult(rightRaw) : null;
+
 
       if (!left && !right) {
         setError("No results for either word.");
@@ -96,7 +167,7 @@ export default function ComparePanel({
       } else {
         setResult({ left, right });
       }
-    } catch (e) {
+    } catch (e: any) {
       console.error("[ComparePanel] local analysis failed", e);
       setError("Compare failed – see console for details.");
       setResult(null);
@@ -105,15 +176,14 @@ export default function ComparePanel({
     }
   }
 
-  function renderSummary(_word: string, payload: AnalysisResult | null) {
+  function renderSummary(_word: string, payload: AnalysisResult_DEPRECATED | null) {
     if (!payload) {
       return (
         <span className="text-xs text-muted-foreground">(no result)</span>
       );
     }
 
-    const richResult = enginePayloadToAnalysisResult(payload);
-    const path = richResult.core.voices.vowelVoices ?? [];
+    const path = payload.core?.voices.vowelVoices ?? [];
 
     return (
       <div className="text-xs text-muted-foreground">
@@ -122,9 +192,6 @@ export default function ComparePanel({
             ? path.join(" → ")
             : "(no path – check engine output)"}
         </div>
-        <p className="text-xs text-muted-foreground mt-1">
-          Heart: {renderHeartSummary(richResult.core)}
-        </p>
       </div>
     );
   }
@@ -190,12 +257,20 @@ export default function ComparePanel({
               {leftWord || "Left word"}
             </div>
             {renderSummary(leftWord, result?.left ?? null)}
+            <HeartSummary
+              label={result?.left?.core.input?.normalized ?? leftWord}
+              core={result?.left?.core as any}
+            />
           </div>
           <div className="rounded-md border bg-muted/40 p-3">
             <div className="mb-1 text-sm font-semibold">
               {rightWord || "Right word"}
             </div>
             {renderSummary(rightWord, result?.right ?? null)}
+             <HeartSummary
+              label={result?.right?.core.input?.normalized ?? rightWord}
+              core={result?.right?.core as any}
+            />
           </div>
         </div>
       </CardContent>
