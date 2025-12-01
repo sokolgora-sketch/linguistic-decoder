@@ -11,8 +11,7 @@ import { VOICE_COLOR_MAP } from '../shared/voiceColors';
 import { Candidates } from './Candidates';
 import { PrinciplesBlock } from './PrinciplesBlock';
 import { SymbolicReadingCard } from './SymbolicReadingCard';
-import { Button } from '@/components/ui/button';
-import { downloadJson } from '@/lib/downloadJson';
+import { ExportJsonButton } from './ui/ExportJsonButton';
 
 
 // Lightweight formatter for the Seven-Voices heart
@@ -34,6 +33,66 @@ function getHeartSummary(core: any) {
     frontierCount,
   };
 }
+
+type HeartCore = {
+    input?: {
+      normalized?: string;
+      raw?: string;
+    };
+    voices?: {
+      levelPath?: string[];
+    };
+    heartPaths?: {
+      primary?: {
+        voiceSequence?: string[];
+        ringPath?: number[];
+        tensionLevel?: string;
+        frontierCount?: number;
+      };
+    };
+  };
+  
+  function buildHeartSummaryText(core: HeartCore | null | undefined): string | null {
+    if (!core?.heartPaths?.primary?.voiceSequence || core.heartPaths.primary.voiceSequence.length === 0) {
+      return null;
+    }
+  
+    const primary = core.heartPaths.primary;
+    const levels = core.voices?.levelPath ?? [];
+    const levelStart = levels[0];
+    const levelEnd = levels[levels.length - 1];
+  
+    const lines: string[] = [];
+  
+    const word = core.input?.normalized || core.input?.raw;
+    if (word) {
+      lines.push(`Seven-Voices heart snapshot for "${word}":`);
+    } else {
+      lines.push(`Seven-Voices heart snapshot:`);
+    }
+  
+    lines.push(`- Primary path: ${primary.voiceSequence.join(" → ")}`);
+  
+    if (primary.ringPath && primary.ringPath.length > 0) {
+      const ringStart = primary.ringPath[0];
+      const ringEnd = primary.ringPath[primary.ringPath.length - 1];
+      lines.push(`- Rings: ${ringStart} → ${ringEnd}`);
+    }
+  
+    if (levelStart && levelEnd) {
+      lines.push(`- Levels: ${levelStart} → ${levelEnd}`);
+    }
+  
+    if (primary.tensionLevel) {
+      lines.push(`- Tension: ${primary.tensionLevel}`);
+    }
+  
+    if (typeof primary.frontierCount === "number") {
+      lines.push(`- Frontier consonants: ${primary.frontierCount}`);
+    }
+  
+    return lines.join("\n");
+  }
 
 const LEVEL_LABEL: Record<number, string> = { 1: 'High', 0: 'Mid', [-1]: 'Low' } as any;
 
@@ -150,28 +209,46 @@ export function ResultsDisplay({ analysis: raw }: { analysis: EnginePayload }) {
   const core = (analysis as any)?.core;
   const heartSummary = getHeartSummary(core);
   const { candidates, symbolic } = analysis || {};
+  const [copiedHeart, setCopiedHeart] = React.useState(false);
 
+const heartCore = core as HeartCore | undefined;
 
-  const handleExportJson = () => {
-    if (!analysis) return;
+const handleCopyHeartSummary = React.useCallback(() => {
+  const text = buildHeartSummaryText(heartCore);
+  if (!text) {
+    console.warn("No heart summary available to copy.");
+    return;
+  }
 
-    const exportPayload =
-      coreOnly && analysis.core
-        ? {
-            word: analysis.core.word,
-            engineVersion: analysis.core.engineVersion,
-            core: analysis.core,
-          }
-        : analysis;
+  try {
+    navigator.clipboard.writeText(text);
+    setCopiedHeart(true);
+    setTimeout(() => setCopiedHeart(false), 2000);
+  } catch (err) {
+    console.error("Failed to copy heart summary:", err);
+  }
+}, [heartCore]);
 
+const exportPayload = useMemo(() => {
+    if (!analysis) return null;
+    if (coreOnly && analysis.core) {
+      return {
+        word: analysis.core.word,
+        engineVersion: analysis.core.engineVersion,
+        core: analysis.core,
+      };
+    }
+    return analysis;
+  }, [analysis, coreOnly]);
+
+  const exportFilename = useMemo(() => {
+    if (!analysis) return 'analysis.json';
     const safeWord = String(analysis.core.word || 'analysis').toLowerCase().replace(/[^a-z0-9_-]+/g, "-");
-
-    const exportFilename = coreOnly
+    return coreOnly
       ? `${safeWord}-core.json`
       : `${safeWord}-analysis.json`;
-      
-    downloadJson(exportFilename, exportPayload);
-  };
+  }, [analysis, coreOnly]);
+
 
   if (!analysis) return null;
 
@@ -205,9 +282,20 @@ export function ResultsDisplay({ analysis: raw }: { analysis: EnginePayload }) {
               </pre>
               {heartSummary && (
                 <div className="mt-4 border-t border-slate-800 pt-4 text-sm text-slate-200">
-                  <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
-                    Heart summary
-                  </div>
+                  <div className="mb-2 flex items-center justify-between gap-3">
+<h3 className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+HEART SUMMARY
+</h3>
+{heartCore && (
+<button
+type="button"
+onClick={handleCopyHeartSummary}
+className="rounded-lg border border-slate-700 bg-slate-950/60 px-2.5 py-1 text-[11px] font-medium text-slate-200 hover:border-slate-500 hover:bg-slate-900 transition-colors"
+>
+{copiedHeart ? "Copied" : "Copy heart summary"}
+</button>
+)}
+</div>
 
                   <div className="flex flex-wrap gap-6">
                     <div>
@@ -371,9 +459,7 @@ export function ResultsDisplay({ analysis: raw }: { analysis: EnginePayload }) {
           />
           Core only (Heart)
         </label>
-        <Button variant="outline" size="sm" onClick={handleExportJson}>
-          Export JSON
-        </Button>
+        <ExportJsonButton data={exportPayload} filename={exportFilename} />
       </div>
     </div>
   );
