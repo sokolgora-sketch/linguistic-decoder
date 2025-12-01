@@ -204,6 +204,27 @@ const Chip = ({ v }: { v: string | number }) => {
     );
 };
 
+type SymbolicSummary = {
+  summary?: string;
+  notes?: string[];
+};
+
+function formatSymbolicReading(symbolic?: SymbolicSummary): string {
+  if (!symbolic) return "";
+
+  const parts: string[] = [];
+
+  if (symbolic.summary) {
+    parts.push(symbolic.summary);
+  }
+
+  if (symbolic.notes && symbolic.notes.length > 0) {
+    parts.push(symbolic.notes.join(" "));
+  }
+
+  return parts.join(" ");
+}
+
 
 export function ResultsDisplay({ analysis: raw }: { analysis: EnginePayload }) {
   const analysis = useMemo(() => enginePayloadToAnalysisResult(raw), [raw]);
@@ -449,7 +470,57 @@ className="rounded-lg border border-slate-700 bg-slate-950/60 px-2.5 py-1 text-[
 
           <Candidates candidates={candidates} />
 
-          {symbolic && <SymbolicReadingCard symbolic={symbolic} />}
+          {/* Zheji-inspired symbolic reading (experimental) */}
+          {(analysis as any).symbolic && (
+            (() => {
+              const symbolic = (analysis as any).symbolic as SymbolicSummary | undefined;
+
+              if (!symbolic || (!symbolic.summary && !symbolic.notes?.length)) {
+                return null;
+              }
+
+              return (
+                <Card>
+                  <CardHeader className="flex items-start justify-between gap-2">
+                    <div>
+                      <CardTitle>✨ Zheji-inspired symbolic reading (experimental)</CardTitle>
+                      <CardDescription>
+                        This is a symbolic / interpretive layer built on top of the Seven-Voices path and
+                        morphology.
+                      </CardDescription>
+                    </div>
+
+                    <Button
+                      size="xs"
+                      variant="outline"
+                      className="mt-1 shrink-0"
+                      onClick={() => {
+                        const text = formatSymbolicReading(symbolic);
+                        if (!text) return;
+                        if (navigator?.clipboard?.writeText) {
+                          navigator.clipboard.writeText(text).catch(() => {
+                            // ignore clipboard errors in older browsers
+                          });
+                        }
+                      }}
+                    >
+                      Copy reading
+                    </Button>
+                  </CardHeader>
+
+                  <CardContent>
+                    {symbolic.notes && symbolic.notes.length > 0 && (
+                      <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
+                        {symbolic.notes.map((note, idx) => (
+                          <li key={idx}>{note}</li>
+                        ))}
+                      </ul>
+                    )}
+                  </CardContent>
+                </Card>
+              );
+            })()
+          )}
 
           {core && core.heartPaths && core.heartPaths.frontierCount > 0 && (
             <Card className="p-4 mt-4">
