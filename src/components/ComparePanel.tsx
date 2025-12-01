@@ -36,6 +36,73 @@ function renderHeartSummary(core?: AnalysisCore) {
   return `${seq} · tension: ${tension} · frontier: ${frontier}`;
 }
 
+// Small helper view: show Seven-Voices heart path for one word
+type HeartCore = {
+  voices?: {
+    levelPath?: string[];
+  };
+  heartPaths?: {
+    primary?: {
+      voiceSequence?: string[];
+      ringPath?: number[];
+      tensionLevel?: string;
+      frontierCount?: number;
+    };
+  };
+};
+
+interface HeartSummaryProps {
+  label: string;
+  core?: HeartCore | null;
+}
+
+const HeartSummary: React.FC<HeartSummaryProps> = ({ label, core }) => {
+  const primary = core?.heartPaths?.primary;
+  const levelPath = core?.voices?.levelPath;
+
+  if (!primary || !primary.voiceSequence || primary.voiceSequence.length === 0) {
+    return null;
+  }
+
+  const voicePath = primary.voiceSequence.join(" → ");
+  const levelStart = levelPath?.[0];
+  const levelEnd = levelPath?.[levelPath.length - 1];
+
+  return (
+    <div className="mt-3 rounded-xl border border-slate-800/60 bg-slate-950/40 px-3 py-2 text-xs text-slate-200">
+      <div className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-slate-500">
+        {label} heart
+      </div>
+      <div className="flex flex-wrap gap-x-4 gap-y-1">
+        <span>
+          Path: <span className="font-medium">{voicePath}</span>
+        </span>
+        {levelStart && levelEnd && (
+          <span>
+            Levels:{" "}
+            <span className="font-medium">
+              {levelStart} → {levelEnd}
+            </span>
+          </span>
+        )}
+        {primary.tensionLevel && (
+          <span>
+            Tension:{" "}
+            <span className="font-medium">{primary.tensionLevel}</span>
+          </span>
+        )}
+        {typeof primary.frontierCount === "number" && (
+          <span>
+            Frontier:{" "}
+            <span className="font-medium">{primary.frontierCount}</span>
+          </span>
+        )}
+      </div>
+    </div>
+  );
+};
+
+
 type Mode = "strict" | "open";
 
 interface ComparePanelProps {
@@ -119,16 +186,18 @@ export default function ComparePanel({
     const path = payload.core?.voices.vowelVoices ?? [];
 
     return (
-      <div className="text-xs text-muted-foreground">
-        <div className="font-mono">
-          {path.length > 0
-            ? path.join(" → ")
-            : "(no path – check engine output)"}
+      <>
+        <div className="text-xs text-muted-foreground">
+          <div className="font-mono">
+            {path.length > 0
+              ? path.join(" → ")
+              : "(no path – check engine output)"}
+          </div>
         </div>
         <p className="text-xs text-muted-foreground mt-1">
           Heart: {renderHeartSummary(payload.core)}
         </p>
-      </div>
+      </>
     );
   }
 
