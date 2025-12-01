@@ -1,7 +1,7 @@
 // src/components/ComparePanel.tsx
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import {
   Card,
   CardHeader,
@@ -22,6 +22,66 @@ import type { SolveOptions } from "@/functions/sevenVoicesCore";
 import type { AnalysisResult_DEPRECATED, AnalysisCore } from "@/shared/engineShape";
 import { enginePayloadToAnalysisResult } from "@/shared/analysisAdapter";
 
+type HeartCore = {
+    input?: {
+      normalized?: string;
+      raw?: string;
+    };
+    voices?: {
+      levelPath?: string[];
+    };
+    heartPaths?: {
+      primary?: {
+        voiceSequence?: string[];
+        ringPath?: number[];
+        tensionLevel?: string;
+        frontierCount?: number;
+      };
+    };
+  };
+  
+  function buildHeartSummaryText(core: HeartCore | null | undefined): string | null {
+    if (!core?.heartPaths?.primary?.voiceSequence || core.heartPaths.primary.voiceSequence.length === 0) {
+      return null;
+    }
+  
+    const primary = core.heartPaths.primary;
+    const levels = core.voices?.levelPath ?? [];
+    const levelStart = levels[0];
+    const levelEnd = levels[levels.length - 1];
+  
+    const lines: string[] = [];
+  
+    const word = core.input?.normalized || core.input?.raw;
+    if (word) {
+      lines.push(`Seven-Voices heart snapshot for "${word}":`);
+    } else {
+      lines.push(`Seven-Voices heart snapshot:`);
+    }
+  
+    lines.push(`- Primary path: ${primary.voiceSequence.join(" → ")}`);
+  
+    if (primary.ringPath && primary.ringPath.length > 0) {
+      const ringStart = primary.ringPath[0];
+      const ringEnd = primary.ringPath[primary.ringPath.length - 1];
+      lines.push(`- Rings: ${ringStart} → ${ringEnd}`);
+    }
+  
+    if (levelStart && levelEnd) {
+      lines.push(`- Levels: ${levelStart} → ${levelEnd}`);
+    }
+  
+    if (primary.tensionLevel) {
+      lines.push(`- Tension: ${primary.tensionLevel}`);
+    }
+  
+    if (typeof primary.frontierCount === "number") {
+      lines.push(`- Frontier consonants: ${primary.frontierCount}`);
+    }
+  
+    return lines.join("\n");
+  }
+
 // Lightweight formatter for the Seven-Voices heart
 function renderHeartSummary(core?: AnalysisCore) {
   if (!core) return "No heart data";
@@ -37,19 +97,6 @@ function renderHeartSummary(core?: AnalysisCore) {
 }
 
 // Small helper view: show Seven-Voices heart path for one word
-type HeartCore = {
-  voices?: {
-    levelPath?: string[];
-  };
-  heartPaths?: {
-    primary?: {
-      voiceSequence?: string[];
-      ringPath?: number[];
-      tensionLevel?: string;
-      frontierCount?: number;
-    };
-  };
-};
 
 interface HeartSummaryProps {
   label: string;
@@ -126,6 +173,43 @@ export default function ComparePanel({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<CompareResult | null>(null);
+
+  const [copiedLeft, setCopiedLeft] = React.useState(false);
+  const [copiedRight, setCopiedRight] = React.useState(false);
+
+  const leftCore = result?.left?.core as HeartCore | undefined;
+  const rightCore = result?.right?.core as HeartCore | undefined;
+
+  const handleCopyLeftHeart = React.useCallback(() => {
+    const text = buildHeartSummaryText(leftCore);
+    if (!text) {
+      console.warn("No left heart summary available to copy.");
+      return;
+    }
+    try {
+      navigator.clipboard.writeText(text);
+      setCopiedLeft(true);
+      setTimeout(() => setCopiedLeft(false), 2000);
+    } catch (err) {
+      console.error("Failed to copy left heart summary:", err);
+    }
+  }, [leftCore]);
+
+  const handleCopyRightHeart = React.useCallback(() => {
+    const text = buildHeartSummaryText(rightCore);
+    if (!text) {
+      console.warn("No right heart summary available to copy.");
+      return;
+    }
+    try {
+      navigator.clipboard.writeText(text);
+      setCopiedRight(true);
+      setTimeout(() => setCopiedRight(false), 2000);
+    } catch (err) {
+      console.error("Failed to copy right heart summary:", err);
+    }
+  }, [rightCore]);
+
 
   // Run the core engine directly in the browser (no /api call)
   function analyzeLocal(word: string): RawAnalysisResult | null {
@@ -261,13 +345,57 @@ export default function ComparePanel({
             <div className="mb-1 text-sm font-semibold">
               {leftWord || "Left word"}
             </div>
-            {renderSummary(leftWord, result?.left ?? null)}
+            {result?.left?.core && (
+        <>
+            <div className="mb-2 flex items-center justify-between gap-3">
+                <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                    HEART SUMMARY
+                </h3>
+                {leftCore && (
+                <button
+                    type="button"
+                    onClick={handleCopyLeftHeart}
+                    className="rounded-lg border border-slate-700 bg-slate-950/60 px-2.5 py-1 text-[11px] font-medium text-slate-200 hover:border-slate-500 hover:bg-slate-900 transition-colors"
+                >
+                    {copiedLeft ? "Copied" : "Copy heart"}
+                </button>
+                )}
+            </div>
+            <HeartSummary
+              label={result?.left?.core.input?.normalized ?? leftWord}
+              core={result.left.core as any}
+            />
+        </>
+    )}
+    {!result?.left?.core && renderSummary(leftWord, null)}
           </div>
           <div className="rounded-md border bg-muted/40 p-3">
             <div className="mb-1 text-sm font-semibold">
               {rightWord || "Right word"}
             </div>
-            {renderSummary(rightWord, result?.right ?? null)}
+            {result?.right?.core && (
+        <>
+            <div className="mb-2 flex items-center justify-between gap-3">
+                <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                    HEART SUMMARY
+                </h3>
+                {rightCore && (
+                <button
+                    type="button"
+                    onClick={handleCopyRightHeart}
+                    className="rounded-lg border border-slate-700 bg-slate-950/60 px-2.5 py-1 text-[11px] font-medium text-slate-200 hover:border-slate-500 hover:bg-slate-900 transition-colors"
+                >
+                    {copiedRight ? "Copied" : "Copy heart"}
+                </button>
+                )}
+            </div>
+            <HeartSummary
+              label={result?.right?.core.input?.normalized ?? rightWord}
+              core={result.right.core as any}
+            />
+        </>
+    )}
+    {!result?.right?.core && renderSummary(rightWord, null)}
           </div>
         </div>
       </CardContent>
