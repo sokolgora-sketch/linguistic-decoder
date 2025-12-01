@@ -15,51 +15,43 @@ const axisLabel = (status: OriginAxisStatus | undefined) => {
   }
 };
 
-function MorphologyMatrixBlock({ matrix }: { matrix: MorphologyMatrix }) {
+function MorphologyMatrixBlock({
+  matrix,
+}: {
+  matrix?: any | null; // keep it loose for now, engine already enforces shape
+}) {
+  // Safely get morphemes – handle missing matrix or morphemes
+  const morphemes = matrix?.morphemes ?? [];
+
+  // If there is no real data, don't render the block at all
+  if (morphemes.length === 0) {
+    return null;
+  }
+
+  const source = matrix?.source;
+  const pivot = matrix?.pivot;
+
   return (
-    <div className="mt-4 rounded-xl border border-slate-600/80 bg-slate-900/60 px-4 py-3">
-      <div className="text-xs font-semibold uppercase tracking-wide mb-1">
-        Morphology Matrix
-      </div>
-      <div className="text-sm mb-2">
-        <span className="font-mono font-semibold">{matrix.pivot}</span>{' '}
-        <span className="text-muted-foreground">— {matrix.meaning}</span>
-      </div>
+    <div className="mt-4 space-y-1">
+      <div className="font-semibold mb-1">Morphemes</div>
+      <ul className="list-disc list-inside space-y-0.5">
+        {morphemes.map((m: any, idx: number) => (
+          <li key={idx}>
+            <span className="font-mono">{m.form}</span>{' '}
+            {m.gloss && (
+              <span className="text-muted-foreground">{m.gloss}</span>
+            )}
+          </li>
+        ))}
+      </ul>
 
-      <div className="text-xs mb-2">
-        <div className="font-semibold mb-1">Morphemes</div>
-        <ul className="list-disc list-inside space-y-0.5">
-          {matrix.morphemes.map((m, idx) => (
-            <li key={idx}>
-              <span className="font-mono">{m.form}</span>{' '}
-              <span className="text-muted-foreground">
-                ({m.role}){m.gloss ? ` — ${m.gloss}` : ''}
-              </span>
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      <div className="text-xs">
-        <div className="font-semibold mb-1">Word sums</div>
-        <ul className="list-disc list-inside space-y-0.5">
-          {matrix.wordSums.map((w, idx) => (
-            <li key={idx}>
-              {w.parts.map((p, i) => (
-                <span key={i} className="font-mono">
-                  {i > 0 && ' + '}
-                  {p}
-                </span>
-              ))}{' '}
-              <span>{' → '}</span>
-              <span className="font-mono font-semibold">{w.result}</span>
-              {w.gloss && (
-                <span className="text-muted-foreground">{` — ${w.gloss}`}</span>
-              )}
-            </li>
-          ))}
-        </ul>
-      </div>
+      {(source || pivot) && (
+        <p className="text-xs text-muted-foreground mt-1">
+          {source && <span>Source: {source}</span>}
+          {source && pivot && <span> · </span>}
+          {pivot && <span>Pivot: {pivot}</span>}
+        </p>
+      )}
     </div>
   );
 }
