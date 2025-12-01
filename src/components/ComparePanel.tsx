@@ -1,7 +1,7 @@
 // src/components/ComparePanel.tsx
 "use client";
 
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import {
   Card,
   CardHeader,
@@ -11,6 +11,7 @@ import {
 } from "./ui/card";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
+import { ExportJsonButton } from "./ui/ExportJsonButton";
 
 import {
   runAnalysis,
@@ -19,68 +20,76 @@ import {
 } from "../lib/runAnalysis";
 import { getManifest } from "@/engine/manifest";
 import type { SolveOptions } from "@/functions/sevenVoicesCore";
-import type { AnalysisResult_DEPRECATED, AnalysisCore } from "@/shared/engineShape";
+import type {
+  AnalysisResult_DEPRECATED,
+  AnalysisCore,
+} from "@/shared/engineShape";
 import { enginePayloadToAnalysisResult } from "@/shared/analysisAdapter";
 
 type HeartCore = {
-    input?: {
-      normalized?: string;
-      raw?: string;
-    };
-    voices?: {
-      levelPath?: string[];
-    };
-    heartPaths?: {
-      primary?: {
-        voiceSequence?: string[];
-        ringPath?: number[];
-        tensionLevel?: string;
-        frontierCount?: number;
-      };
+  input?: {
+    normalized?: string;
+    raw?: string;
+  };
+  voices?: {
+    levelPath?: string[];
+  };
+  heartPaths?: {
+    primary?: {
+      voiceSequence?: string[];
+      ringPath?: number[];
+      tensionLevel?: string;
+      frontierCount?: number;
     };
   };
-  
-  function buildHeartSummaryText(core: HeartCore | null | undefined): string | null {
-    if (!core?.heartPaths?.primary?.voiceSequence || core.heartPaths.primary.voiceSequence.length === 0) {
-      return null;
-    }
-  
-    const primary = core.heartPaths.primary;
-    const levels = core.voices?.levelPath ?? [];
-    const levelStart = levels[0];
-    const levelEnd = levels[levels.length - 1];
-  
-    const lines: string[] = [];
-  
-    const word = core.input?.normalized || core.input?.raw;
-    if (word) {
-      lines.push(`Seven-Voices heart snapshot for "${word}":`);
-    } else {
-      lines.push(`Seven-Voices heart snapshot:`);
-    }
-  
-    lines.push(`- Primary path: ${primary.voiceSequence.join(" → ")}`);
-  
-    if (primary.ringPath && primary.ringPath.length > 0) {
-      const ringStart = primary.ringPath[0];
-      const ringEnd = primary.ringPath[primary.ringPath.length - 1];
-      lines.push(`- Rings: ${ringStart} → ${ringEnd}`);
-    }
-  
-    if (levelStart && levelEnd) {
-      lines.push(`- Levels: ${levelStart} → ${levelEnd}`);
-    }
-  
-    if (primary.tensionLevel) {
-      lines.push(`- Tension: ${primary.tensionLevel}`);
-    }
-  
-    if (typeof primary.frontierCount === "number") {
-      lines.push(`- Frontier consonants: ${primary.frontierCount}`);
-    }
-  
-    return lines.join("\n");
+};
+
+function buildHeartSummaryText(
+  core: HeartCore | null | undefined
+): string | null {
+  if (
+    !core?.heartPaths?.primary?.voiceSequence ||
+    core.heartPaths.primary.voiceSequence.length === 0
+  ) {
+    return null;
   }
+
+  const primary = core.heartPaths.primary;
+  const levels = core.voices?.levelPath ?? [];
+  const levelStart = levels[0];
+  const levelEnd = levels[levels.length - 1];
+
+  const lines: string[] = [];
+
+  const word = core.input?.normalized || core.input?.raw;
+  if (word) {
+    lines.push(`Seven-Voices heart snapshot for \"${word}\":`);
+  } else {
+    lines.push(`Seven-Voices heart snapshot:`);
+  }
+
+  lines.push(`- Primary path: ${primary.voiceSequence.join(" → ")}`);
+
+  if (primary.ringPath && primary.ringPath.length > 0) {
+    const ringStart = primary.ringPath[0];
+    const ringEnd = primary.ringPath[primary.ringPath.length - 1];
+    lines.push(`- Rings: ${ringStart} → ${ringEnd}`);
+  }
+
+  if (levelStart && levelEnd) {
+    lines.push(`- Levels: ${levelStart} → ${levelEnd}`);
+  }
+
+  if (primary.tensionLevel) {
+    lines.push(`- Tension: ${primary.tensionLevel}`);
+  }
+
+  if (typeof primary.frontierCount === "number") {
+    lines.push(`- Frontier consonants: ${primary.frontierCount}`);
+  }
+
+  return lines.join("\n");
+}
 
 // Lightweight formatter for the Seven-Voices heart
 function renderHeartSummary(core?: AnalysisCore) {
@@ -149,7 +158,6 @@ const HeartSummary: React.FC<HeartSummaryProps> = ({ label, core }) => {
   );
 };
 
-
 type Mode = "strict" | "open";
 
 interface ComparePanelProps {
@@ -173,6 +181,7 @@ export default function ComparePanel({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<CompareResult | null>(null);
+  const [coreOnlyCompare, setCoreOnlyCompare] = React.useState(false);
 
   const [copiedLeft, setCopiedLeft] = React.useState(false);
   const [copiedRight, setCopiedRight] = React.useState(false);
@@ -210,6 +219,30 @@ export default function ComparePanel({
     }
   }, [rightCore]);
 
+  const compareExportPayload = React.useMemo(() => {
+    if (!result) return null;
+
+    if (coreOnlyCompare) {
+      return {
+        left: (result.left as any)?.core ?? null,
+        right: (result.right as any)?.core ?? null,
+      };
+    }
+
+    return {
+      left: result.left ?? null,
+      right: result.right ?? null,
+    };
+  }, [result, coreOnlyCompare]);
+
+  const exportFilename = useMemo(() => {
+    const safeLeft =
+      leftWord.toLowerCase().replace(/[^a-z0-9_-]+/g, "-") || "left";
+    const safeRight =
+      rightWord.toLowerCase().replace(/[^a-z0-9_-]+/g, "-") || "right";
+    const suffix = coreOnlyCompare ? "-cores" : "-analysis";
+    return `compare-${safeLeft}-vs-${safeRight}${suffix}.json`;
+  }, [leftWord, rightWord, coreOnlyCompare]);
 
   // Run the core engine directly in the browser (no /api call)
   function analyzeLocal(word: string): RawAnalysisResult | null {
@@ -240,10 +273,9 @@ export default function ComparePanel({
     try {
       const leftRaw = analyzeLocal(leftWord);
       const rightRaw = analyzeLocal(rightWord);
-      
+
       const left = leftRaw ? enginePayloadToAnalysisResult(leftRaw) : null;
       const right = rightRaw ? enginePayloadToAnalysisResult(rightRaw) : null;
-
 
       if (!left && !right) {
         setError("No results for either word.");
@@ -260,11 +292,12 @@ export default function ComparePanel({
     }
   }
 
-  function renderSummary(_word: string, payload: AnalysisResult_DEPRECATED | null) {
+  function renderSummary(
+    _word: string,
+    payload: AnalysisResult_DEPRECATED | null
+  ) {
     if (!payload) {
-      return (
-        <span className="text-xs text-muted-foreground">(no result)</span>
-      );
+      return <span className="text-xs text-muted-foreground">(no result)</span>;
     }
 
     const path = payload.core?.voices.vowelVoices ?? [];
@@ -317,27 +350,19 @@ export default function ComparePanel({
               type="checkbox"
               className="h-4 w-4"
               checked={mode === "strict"}
-              onChange={(e) =>
-                setMode(e.target.checked ? "strict" : "open")
-              }
+              onChange={(e) => setMode(e.target.checked ? "strict" : "open")}
             />
             <label htmlFor="compare-strict">
               Strict <span className="text-xs">(mode: {mode})</span>
             </label>
           </div>
 
-          {/* Button: use a valid size ("default" | "sm" | "lg" | "icon") */}
           <Button onClick={handleCompare} disabled={loading} size="sm">
             {loading ? "Comparing…" : "Compare"}
           </Button>
         </div>
 
-        {/* Error */}
-        {error && (
-          <p className="mt-1 text-xs text-destructive">
-            {error}
-          </p>
-        )}
+        {error && <p className="mt-1 text-xs text-destructive">{error}</p>}
 
         {/* Results */}
         <div className="grid gap-4 md:grid-cols-2">
@@ -345,59 +370,81 @@ export default function ComparePanel({
             <div className="mb-1 text-sm font-semibold">
               {leftWord || "Left word"}
             </div>
-            {result?.left?.core && (
-        <>
-            <div className="mb-2 flex items-center justify-between gap-3">
-                <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+            {result?.left?.core ? (
+              <>
+                <div className="mb-2 flex items-center justify-between gap-3">
+                  <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-500">
                     HEART SUMMARY
-                </h3>
-                {leftCore && (
-                <button
-                    type="button"
-                    onClick={handleCopyLeftHeart}
-                    className="rounded-lg border border-slate-700 bg-slate-950/60 px-2.5 py-1 text-[11px] font-medium text-slate-200 hover:border-slate-500 hover:bg-slate-900 transition-colors"
-                >
-                    {copiedLeft ? "Copied" : "Copy heart"}
-                </button>
-                )}
-            </div>
-            <HeartSummary
-              label={result?.left?.core.input?.normalized ?? leftWord}
-              core={result.left.core as any}
-            />
-        </>
-    )}
-    {!result?.left?.core && renderSummary(leftWord, null)}
+                  </h3>
+                  {leftCore && (
+                    <button
+                      type="button"
+                      onClick={handleCopyLeftHeart}
+                      className="rounded-lg border border-slate-700 bg-slate-950/60 px-2.5 py-1 text-[11px] font-medium text-slate-200 hover:border-slate-500 hover:bg-slate-900 transition-colors"
+                    >
+                      {copiedLeft ? "Copied" : "Copy heart"}
+                    </button>
+                  )}
+                </div>
+                <HeartSummary
+                  label={result?.left?.core.input?.normalized ?? leftWord}
+                  core={result.left.core as any}
+                />
+              </>
+            ) : (
+              renderSummary(leftWord, result?.left ?? null)
+            )}
           </div>
           <div className="rounded-md border bg-muted/40 p-3">
             <div className="mb-1 text-sm font-semibold">
               {rightWord || "Right word"}
             </div>
-            {result?.right?.core && (
-        <>
-            <div className="mb-2 flex items-center justify-between gap-3">
-                <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+            {result?.right?.core ? (
+              <>
+                <div className="mb-2 flex items-center justify-between gap-3">
+                  <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-500">
                     HEART SUMMARY
-                </h3>
-                {rightCore && (
-                <button
-                    type="button"
-                    onClick={handleCopyRightHeart}
-                    className="rounded-lg border border-slate-700 bg-slate-950/60 px-2.5 py-1 text-[11px] font-medium text-slate-200 hover:border-slate-500 hover:bg-slate-900 transition-colors"
-                >
-                    {copiedRight ? "Copied" : "Copy heart"}
-                </button>
-                )}
-            </div>
-            <HeartSummary
-              label={result?.right?.core.input?.normalized ?? rightWord}
-              core={result.right.core as any}
-            />
-        </>
-    )}
-    {!result?.right?.core && renderSummary(rightWord, null)}
+                  </h3>
+                  {rightCore && (
+                    <button
+                      type="button"
+                      onClick={handleCopyRightHeart}
+                      className="rounded-lg border border-slate-700 bg-slate-950/60 px-2.5 py-1 text-[11px] font-medium text-slate-200 hover:border-slate-500 hover:bg-slate-900 transition-colors"
+                    >
+                      {copiedRight ? "Copied" : "Copy heart"}
+                    </button>
+                  )}
+                </div>
+                <HeartSummary
+                  label={result?.right?.core.input?.normalized ?? rightWord}
+                  core={result.right.core as any}
+                />
+              </>
+            ) : (
+              renderSummary(rightWord, result?.right ?? null)
+            )}
           </div>
         </div>
+
+        {/* Export controls */}
+        {compareExportPayload && (
+          <div className="mt-6 flex items-center justify-between gap-3">
+            <label className="flex items-center gap-2 text-xs text-slate-400">
+              <input
+                type="checkbox"
+                checked={coreOnlyCompare}
+                onChange={(e) => setCoreOnlyCompare(e.target.checked)}
+                className="h-3 w-3 rounded border-slate-600 bg-slate-900"
+              />
+              <span>Core only (Heart)</span>
+            </label>
+
+            <ExportJsonButton
+              data={compareExportPayload}
+              filename="compare-heart.json"
+            />
+          </div>
+        )}
       </CardContent>
     </Card>
   );
