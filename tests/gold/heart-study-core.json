@@ -1,0 +1,18 @@
+{
+  "word": "study",
+  "engineVersion": "2025-11-16-core-2",
+  "input": {},
+  "voices": {
+      "levelPath": ["low", "high"]
+  },
+  "consonants": {},
+  "heartPaths": {
+    "primary": {
+      "voiceSequence": ["U", "I"],
+      "ringPath": [1, 1],
+      "levelPath": ["low", "high"],
+      "tensionLevel": "low",
+      "frontierCount": 7
+    }
+  }
+}

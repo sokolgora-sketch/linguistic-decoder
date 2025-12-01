@@ -293,13 +293,12 @@ const coreSnapshot = useMemo(() => {
     return analysis;
   }, [analysis, coreOnly]);
 
-  const exportFilename = useMemo(() => {
-    if (!analysis) return 'analysis.json';
-    const safeWord = String(analysis.core.word || 'analysis').toLowerCase().replace(/[^a-z0-9_-]+/g, "-");
-    return coreOnly
-      ? `${safeWord}-core.json`
-      : `${safeWord}-analysis.json`;
-  }, [analysis, coreOnly]);
+  const exportPayload = coreOnly ? core : analysis;
+
+  const baseName = (analysis as any)?.word ?? "analysis";
+  const exportFilename = coreOnly
+    ? `${baseName}-heart-core.json`
+    : `${baseName}-full-analysis.json`;
 
 
   if (!analysis) return null;

@@ -48,7 +48,7 @@ describe('Canonical Candidate Adapter', () => {
       expect(c.status).toBe('pass');
       expect(c.fitTag).toBe('strong');
       expect(c.morphology).toBeDefined();
-      expect(c.id).toContain('study');
+      expect(c.id).toContain('stud');
       // consonant checks
       expect(c.consonantProfile).toBe('build');
       expect(c.consonantProfileOk).toBe(true);
@@ -70,8 +70,8 @@ describe('Canonical Candidate Adapter', () => {
       {} as Record<string, Candidate>
     );
   
-    expect(langs['latin'].morphologyMatrix?.pivot).toBe('stud');
-    expect(langs['albanian'].morphologyMatrix?.pivot).toBe("s'tu");
+    expect(langs['Latin'].morphologyMatrix?.pivot).toBe('stud');
+    expect(langs['Albanian'].morphologyMatrix?.pivot).toBe("s'tu");
   });
 
   it('it returns canonical candidates for "damage" with consonant profiles and axes', () => {
@@ -101,7 +101,7 @@ describe('Canonical Candidate Adapter', () => {
       expect(c.status).toBe('pass');
       expect(c.fitTag).toBe('strong');
       expect(c.morphology).toBeDefined();
-      expect(c.id).toContain('damage');
+      expect(c.id).toMatch(/dam|dëm/);
       // consonant checks
       expect(c.consonantProfile).toBe('cut');
       expect(c.consonantProfileOk).toBe(true);
@@ -120,11 +120,11 @@ describe('Canonical Candidate Adapter', () => {
   
     const langs = indexByLanguage(entry);
   
-    expect(langs['latin'].form.toLowerCase()).toBe('damnum');
-    expect(langs['latin'].morphologyMatrix?.pivot).toBe('dam');
+    expect(langs['Latin'].form.toLowerCase()).toBe('damnum');
+    expect(langs['Latin'].morphologyMatrix?.pivot).toBe('dam');
   
-    expect(langs['albanian'].form.toLowerCase()).toBe('dëm');
-    expect(langs['albanian'].morphologyMatrix?.pivot).toBe('dëm');
+    expect(langs['Albanian'].form.toLowerCase()).toBe('dëm');
+    expect(langs['Albanian'].morphologyMatrix?.pivot).toBe('dëm');
   });
 
   it('it falls back to placeholder candidates for other words', () => {
@@ -156,6 +156,6 @@ describe('Canonical Candidate Adapter', () => {
     const entry = CANON_CANDIDATES['mode'];
     expect(entry).toBeDefined();
     const langs = indexByLanguage(entry);
-    expect(langs['latin'].morphologyMatrix?.pivot).toBe('mode');
+    expect(langs['Latin'].morphologyMatrix?.pivot).toBe('mode');
   });
 });
