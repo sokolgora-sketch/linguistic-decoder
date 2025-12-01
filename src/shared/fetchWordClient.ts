@@ -1,26 +1,27 @@
-// src/shared/fetchWordClient.ts
-"use client";
+'use client';
 
-import type { AnalysisResult } from "./analysisAdapter";
+import type { AnalysisResult_DEPRECATED } from "./analysisAdapter";
+import { enginePayloadToAnalysisResult } from "./analysisAdapter";
 
 export type ClientMode = "strict" | "relaxed";
 
 export async function fetchWordClient(
   word: string,
   opts: { mode: ClientMode; coreOnly: boolean }
-): Promise<AnalysisResult> {
-  const params = new URLSearchParams();
-  params.set("word", word.trim());
-  params.set("mode", opts.mode);
-  params.set("coreOnly", opts.coreOnly ? "1" : "0");
-
-  const res = await fetch(`/api/analyze?${params.toString()}`, {
-    method: "GET",
+): Promise<AnalysisResult_DEPRECATED> {
+  const res = await fetch("/api/analyze", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      word: word.trim(),
+      mode: opts.mode,
+    }),
   });
 
   if (!res.ok) {
     throw new Error(`analyze failed: ${res.status} ${res.statusText}`);
   }
 
-  return (await res.json()) as AnalysisResult;
+  const raw = await res.json();
+  return enginePayloadToAnalysisResult(raw);
 }
