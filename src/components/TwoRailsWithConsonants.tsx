@@ -3,6 +3,9 @@
 
 import * as React from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Button } from "./ui/button";
+import { Play } from "lucide-react";
+
 
 type Vowel = "A" | "E" | "I" | "O" | "U" | "Y" | "Ë";
 const ORDER: Vowel[] = ["A", "E", "I", "O", "U", "Y", "Ë"];
@@ -82,16 +85,14 @@ function extractConsonants(word: string): { ch: string; klass: CClass }[] {
 export function TwoRailsWithConsonants({
   word,
   path,
-  running,
   playKey,
   height = 320,
   durationPerHopMs = 900,
   showLabels = true,
-  consonants,              // optional override sequence (e.g., [{ch:"s",klass:"Fricative"}...])
+  consonants,
 }: {
   word: string;
-  path: Vowel[];           // e.g., ["U","I"]
-  running: boolean;
+  path: Vowel[];
   playKey?: string;
   height?: number;
   durationPerHopMs?: number;
@@ -112,26 +113,21 @@ export function TwoRailsWithConsonants({
   const midY = (top + bottom) / 2;
   const bandH = 36;
 
-  // Scanners while running
-  const [scanT, setScanT] = React.useState(0);
-  React.useEffect(() => {
-    if (!running) return;
-    let raf = 0; const t0 = performance.now();
-    const loop = (t: number) => { setScanT((t - t0)/1000); raf = requestAnimationFrame(loop); };
-    raf = requestAnimationFrame(loop);
-    return () => cancelAnimationFrame(raf);
-  }, [running]);
-
   // Hop state
   const [idx, setIdx] = React.useState(0);
   const [pos, setPos] = React.useState<{x:number;y:number}|null>(null);
   const [trail, setTrail] = React.useState<{x:number;y:number}[]>([]);
-  React.useEffect(() => { setIdx(0); setPos(null); setTrail([]); }, [playKey]);
+  const [isPlaying, setIsPlaying] = React.useState(false);
+
+  React.useEffect(() => {
+    setIdx(0);
+    setPos(null);
+    setTrail([]);
+    setIsPlaying(false);
+  }, [playKey]);
 
   // Consonant pulses
   const consSeq = React.useMemo(() => consonants ?? extractConsonants(word), [word, consonants]);
-
-  // Distribute consonants across hops (even fallback)
   const hops = Math.max(1, path.length - 1);
   const bucketed: {ch:string;klass:CClass}[][] = Array.from({length:hops}, ()=>[]);
   for (let i=0;i<consSeq.length;i++){
@@ -140,13 +136,21 @@ export function TwoRailsWithConsonants({
 
   const [activePulse, setActivePulse] = React.useState<{ klass: CClass; t: number } | null>(null);
 
-  React.useEffect(() => {
-    if (running || path.length < 2) return;
+  const startAnimation = React.useCallback(async () => {
+    if (isPlaying || path.length < 2) return;
+    
+    setIsPlaying(true);
+    setTrail([]);
+    setPos(null);
+
     let stop = false;
 
     const runHop = async (i: number) => {
       if (stop) return;
-      if (i >= path.length - 1) return;
+      if (i >= path.length - 1) {
+        setIsPlaying(false);
+        return;
+      }
 
       const leftToRight = i % 2 === 0;
       const startX = leftToRight ? leftX : rightX;
@@ -160,7 +164,6 @@ export function TwoRailsWithConsonants({
       const steps = 50;
       const dt = durationPerHopMs / steps;
 
-      // schedule consonant pulses evenly along this hop
       const cons = bucketed[i];
       const thresholds = cons.map((_,k)=> (k+1)/(cons.length+1));
 
@@ -179,7 +182,6 @@ export function TwoRailsWithConsonants({
         setPos({x,y});
         setTrail(tr => [...tr.slice(-80), {x,y}]);
 
-        // trigger pulses
         for (let p=0; p<thresholds.length; p++){
           if (Math.abs(t - thresholds[p]) < 0.02){
             const ev = cons[p];
@@ -192,13 +194,9 @@ export function TwoRailsWithConsonants({
     };
 
     runHop(0);
-    return () => { stop = true; };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [running, path, durationPerHopMs, leftX, rightX, word]);
+    return () => { stop = true; setIsPlaying(false); };
+  }, [isPlaying, path, durationPerHopMs, leftX, rightX, bucketed]);
 
-  // Scanner bars
-  const scanY1 = top + (Math.sin(scanT * 2.2) * 0.5 + 0.5) * railH;
-  const scanY2 = top + (Math.cos(scanT * 2.8) * 0.5 + 0.5) * railH;
 
   // Render helpers
   const Rail = ({ x }: { x: number }) => (
@@ -251,7 +249,7 @@ export function TwoRailsWithConsonants({
   };
 
   return (
-    <div className="w-full rounded-2xl border" style={{ background: PALETTE.bg }}>
+    <div className="w-full rounded-2xl border relative" style={{ background: PALETTE.bg }}>
       <svg width={W} height={H} style={{ display: "block" }}>
         <text x={W/2} y={16} textAnchor="middle" fontSize={14} fill={PALETTE.text}>{word}</text>
 
@@ -261,28 +259,7 @@ export function TwoRailsWithConsonants({
 
         {/* mid consonant strip */}
         <MidRail />
-
-        {/* running scanners */}
-        <AnimatePresence>
-          {running && (
-            <g>
-              <motion.line x1={leftX-18} x2={leftX+18} y1={scanY1} y2={scanY1}
-                stroke={PALETTE.accent} strokeWidth={3}
-                initial={{opacity:0}} animate={{opacity:0.9}} exit={{opacity:0}}/>
-              <motion.line x1={rightX-18} x2={rightX+18} y1={scanY2} y2={scanY2}
-                stroke={PALETTE.accent} strokeWidth={3}
-                initial={{opacity:0}} animate={{opacity:0.9}} exit={{opacity:0}}/>
-              {Math.abs(scanY1 - scanY2) < 8 && (
-                <motion.circle
-                  cx={(leftX + rightX) / 2} cy={(scanY1 + scanY2) / 2} r={8}
-                  fill="none" stroke={PALETTE.accent} strokeWidth={2}
-                  initial={{ opacity: 0.6, r: 4 }} animate={{ r: 14, opacity: 0 }} transition={{ duration: 0.6 }}
-                />
-              )}
-            </g>
-          )}
-        </AnimatePresence>
-
+        
         {/* trail */}
         {trail.length>1 && (
           <polyline
@@ -305,25 +282,24 @@ export function TwoRailsWithConsonants({
           )}
         </AnimatePresence>
 
-        {/* step hints */}
-        {!running && path.length>=2 && (
-          <g>
-            <circle cx={idx%2===0?leftX:rightX} cy={yFor(path[Math.min(idx, path.length-1)])} r={6}
-              fill={VOICE_COLOR[path[Math.min(idx, path.length-1)]]}/>
-            {idx < path.length-1 && (
-              <circle cx={idx%2===0?rightX:leftX} cy={yFor(path[idx+1])} r={6}
-                fill={VOICE_COLOR[path[idx+1]]} fillOpacity={0.6}/>
-            )}
-          </g>
-        )}
-
         {/* footer */}
-        {!running && path.length>0 && (
+        {!isPlaying && path.length>0 && (
           <text x={W/2} y={H-10} textAnchor="middle" fontSize={12} fill={PALETTE.muted}>
             {path.join(" → ")}
           </text>
         )}
       </svg>
+      {path && path.length > 1 && (
+        <Button 
+            onClick={startAnimation} 
+            disabled={isPlaying}
+            variant="destructive"
+            size="icon"
+            className="absolute top-1/2 left-4 -translate-y-1/2 z-10"
+        >
+            <Play className="w-5 h-5"/>
+        </Button>
+      )}
     </div>
   );
 }

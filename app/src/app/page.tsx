@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useEffect } from "react";
@@ -463,7 +464,6 @@ export default function LinguisticDecoderApp(){
                 <TwoRailsWithConsonants
                   word={data?.word || word}
                   path={loading ? [] : (data?.primaryPath?.voicePath || [])}
-                  running={loading}
                   playKey={`${data?.word}|${data?.primaryPath?.voicePath?.join(',')}`}
                   height={320}
                   durationPerHopMs={900}
