@@ -12,6 +12,8 @@ import {
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { ExportJsonButton } from "./ui/ExportJsonButton";
+import { buildEngineMetaSummary } from "../lib/engineMetaSummary";
+import { EngineMetaBadge } from "./EngineMetaBadge";
 
 import {
   runAnalysis,
@@ -370,6 +372,7 @@ export default function ComparePanel({
             <div className="mb-1 text-sm font-semibold">
               {leftWord || "Left word"}
             </div>
+            <EngineMetaBadge result={result?.left as any} className="mb-2" />
             {result?.left?.core ? (
               <>
                 <div className="mb-2 flex items-center justify-between gap-3">
@@ -399,6 +402,7 @@ export default function ComparePanel({
             <div className="mb-1 text-sm font-semibold">
               {rightWord || "Right word"}
             </div>
+            <EngineMetaBadge result={result?.right as any} className="mb-2" />
             {result?.right?.core ? (
               <>
                 <div className="mb-2 flex items-center justify-between gap-3">
@@ -441,7 +445,7 @@ export default function ComparePanel({
 
             <ExportJsonButton
               data={compareExportPayload}
-              filename="compare-heart.json"
+              filename={exportFilename}
             />
           </div>
         )}

@@ -40,4 +40,27 @@ describe("buildEngineMetaSummary", () => {
 
     expect(text).toBe("unknown");
   });
+
+  it("is included in the export payload", () => {
+    const analysis = {
+      engineVersion: "2025-11-16-core-2",
+      mode: "strict",
+      input: {
+        alphabet: "auto",
+      },
+    };
+
+    const engineMetaSummary = buildEngineMetaSummary({
+      engineVersion: analysis.engineVersion,
+      mode: analysis.mode,
+      alphabet: analysis.input.alphabet,
+    });
+
+    const exportPayload = {
+      ...analysis,
+      engineMetaSummary,
+    };
+
+    expect(exportPayload.engineMetaSummary).toBe("2025-11-16-core-2 · strict · auto");
+  });
 });
