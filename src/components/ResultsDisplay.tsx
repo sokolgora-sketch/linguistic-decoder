@@ -11,6 +11,7 @@ import { VOICE_COLOR_MAP } from '../shared/voiceColors';
 import { Candidates } from './Candidates';
 import { PrinciplesBlock } from './PrinciplesBlock';
 import { SymbolicReadingCard } from './SymbolicReadingCard';
+import { HeartSummaryCard } from './HeartSummaryCard';
 import { ExportJsonButton } from './ui/ExportJsonButton';
 import { useToast } from '../hooks/use-toast';
 import { Button } from './ui/button';
