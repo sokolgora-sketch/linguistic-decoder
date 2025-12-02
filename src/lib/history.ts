@@ -49,3 +49,40 @@ export function formatHistoryEngineMeta(meta: HistoryEngineMeta): string {
 export function makeHistoryKey(item: HistoryItemCore): string {
   return `${item.word}::${item.mode}::${item.alphabet}::${item.createdAt}`;
 }
+
+// A minimal shape that matches what our analyze result exposes.
+// We keep this generic so we don't depend on internal types.
+export type AnalysisLikeForHistory = {
+  word: string;
+  mode: string;
+  alphabet: string;
+  engineVersion: string;
+  solveMs?: number | null;
+};
+
+/**
+ * Create a HistoryItemCore from an analysis-like object.
+ * This is what the API / UI will call after each successful run.
+ */
+export function makeHistoryItemFromAnalysis(
+  src: AnalysisLikeForHistory,
+  now: () => Date = () => new Date()
+): HistoryItemCore {
+  const engineMeta: HistoryEngineMeta = {
+    engineVersion: src.engineVersion,
+    mode: src.mode,
+    alphabet: src.alphabet,
+    solveMs:
+      src.solveMs === undefined || Number.isNaN(src.solveMs)
+        ? null
+        : src.solveMs,
+  };
+
+  return {
+    word: src.word,
+    mode: src.mode,
+    alphabet: src.alphabet,
+    engineMeta,
+    createdAt: now().toISOString(),
+  };
+}
