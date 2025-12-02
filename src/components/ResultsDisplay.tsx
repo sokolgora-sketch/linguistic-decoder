@@ -15,6 +15,7 @@ import { HeartSummaryCard } from './HeartSummaryCard';
 import { ExportJsonButton } from './ui/ExportJsonButton';
 import { useToast } from '../hooks/use-toast';
 import { Button } from './ui/button';
+import { EngineMetaBadge } from "./EngineMetaBadge";
 
 
 // Lightweight formatter for the Seven-Voices heart
@@ -357,6 +358,17 @@ className="rounded-lg border border-slate-700 bg-slate-950/60 px-2.5 py-1 text-[
 </button>
 )}
 </div>
+                  {analysis && (
+                    <HeartSummaryCard
+                      word={(analysis as any).word ?? (analysis as any).input?.word ?? ""}
+                      primaryPath={
+                        (analysis as any).core?.primaryPath ??
+                        (analysis as any).primaryPath ??
+                        undefined
+                      }
+                      className="mt-2"
+                    />
+                  )}
 
                   <div className="flex flex-wrap gap-6">
                     <div>
