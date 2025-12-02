@@ -2,6 +2,7 @@
 import { solveWord } from "../functions/sevenVoicesCore";
 import type { SolveOptions as SolveWordOptions } from "../functions/sevenVoicesCore";
 import type { EnginePayload } from "@/shared/engineShape";
+import { recordHistoryRun } from "./historyStore";
 
 export type Alphabet =
   | "auto"
@@ -64,6 +65,26 @@ export function runAnalysis(
     windowClasses: r.windowClasses,
     signals: r.signals,
   };
+
+  // Best-effort history logging – never block the engine.
+  try {
+    void recordHistoryRun({
+      word: payload.word,
+      engineVersion: payload.engineVersion,
+      mode: payload.mode,
+      alphabet: payload.alphabet,
+      result: payload,
+    }).catch((err) => {
+      if (process.env.NODE_ENV === "development") {
+        console.warn("[history] record failed:", err);
+      }
+    });
+  } catch (err) {
+    // Absolutely never let a logging bug break the engine
+    if (process.env.NODE_ENV === "development") {
+      console.warn("[history] logging error:", err);
+    }
+  }
 
   return payload;
 }
