@@ -17,11 +17,7 @@ const PRINCIPLE_MAP: Record<string, string> = {
 };
 
 export function computeMath7ForResult(result: AnalyzeWordResult): Math7Summary {
-  const voicePath = result.primaryPath?.voicePath ?? "";
-  const vowels = voicePath
-    .split("→")
-    .map((v) => v.trim())
-    .filter(Boolean);
+  const vowels = result.primaryPath?.voicePath ?? [];
 
   const principlesPath = vowels.map((v) => PRINCIPLE_MAP[v] ?? v);
 

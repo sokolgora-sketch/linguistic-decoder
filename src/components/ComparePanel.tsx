@@ -12,65 +12,31 @@ import {
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { ExportJsonButton } from "./ui/ExportJsonButton";
-import { buildEngineMetaSummary } from "../lib/engineMetaSummary";
 import { EngineMetaBadge } from "./EngineMetaBadge";
+import type { AnalyzeWordResultV1, HeartSummary, Alphabet } from "@/shared/resultShape.v1";
 
-import {
-  runAnalysis,
-  type Alphabet,
-  type AnalysisResult as RawAnalysisResult,
-} from "../lib/runAnalysis";
-import { getManifest } from "@/engine/manifest";
-import type { SolveOptions } from "@/functions/sevenVoicesCore";
-import type {
-  AnalysisResult_DEPRECATED,
-  AnalysisCore,
-} from "@/shared/engineShape";
-import { enginePayloadToAnalysisResult } from "@/shared/analysisAdapter";
-
-type HeartCore = {
-  input?: {
-    normalized?: string;
-    raw?: string;
-  };
-  voices?: {
-    levelPath?: string[];
-  };
-  heartPaths?: {
-    primary?: {
-      voiceSequence?: string[];
-      ringPath?: number[];
-      tensionLevel?: string;
-      frontierCount?: number;
-    };
-  };
-};
 
 function buildHeartSummaryText(
-  core: HeartCore | null | undefined
+  core: HeartSummary | null | undefined
 ): string | null {
   if (
-    !core?.heartPaths?.primary?.voiceSequence ||
-    core.heartPaths.primary.voiceSequence.length === 0
+    !core?.math7?.primary?.voicePath ||
+    core.math7.primary.voicePath.length === 0
   ) {
     return null;
   }
 
-  const primary = core.heartPaths.primary;
-  const levels = core.voices?.levelPath ?? [];
-  const levelStart = levels[0];
-  const levelEnd = levels[levels.length - 1];
-
+  const primary = core.math7.primary;
   const lines: string[] = [];
 
-  const word = core.input?.normalized || core.input?.raw;
+  const word = core.word;
   if (word) {
     lines.push(`Seven-Voices heart snapshot for \"${word}\":`);
   } else {
     lines.push(`Seven-Voices heart snapshot:`);
   }
 
-  lines.push(`- Primary path: ${primary.voiceSequence.join(" → ")}`);
+  lines.push(`- Primary path: ${primary.voicePath.join(" → ")}`);
 
   if (primary.ringPath && primary.ringPath.length > 0) {
     const ringStart = primary.ringPath[0];
@@ -78,53 +44,37 @@ function buildHeartSummaryText(
     lines.push(`- Rings: ${ringStart} → ${ringEnd}`);
   }
 
-  if (levelStart && levelEnd) {
+  if (primary.levelPath && primary.levelPath.length > 0) {
+    const levelStart = primary.levelPath[0];
+    const levelEnd = primary.levelPath[primary.levelPath.length - 1];
     lines.push(`- Levels: ${levelStart} → ${levelEnd}`);
   }
 
-  if (primary.tensionLevel) {
-    lines.push(`- Tension: ${primary.tensionLevel}`);
+  if (core.math7.tensionLevel) {
+    lines.push(`- Tension: ${core.math7.tensionLevel}`);
   }
 
-  if (typeof primary.frontierCount === "number") {
-    lines.push(`- Frontier consonants: ${primary.frontierCount}`);
+  if (typeof core.math7.frontierCount === "number") {
+    lines.push(`- Frontier consonants: ${core.math7.frontierCount}`);
   }
 
   return lines.join("\n");
 }
 
-// Lightweight formatter for the Seven-Voices heart
-function renderHeartSummary(core?: AnalysisCore) {
-  if (!core) return "No heart data";
-
-  const primary = core.heartPaths?.primary;
-  if (!primary) return "No heart path";
-
-  const seq = primary.voiceSequence?.join(" → ") || "";
-  const tension = primary.tensionLevel ?? "unknown";
-  const frontier = core.heartPaths?.frontierCount ?? 0;
-
-  return `${seq} · tension: ${tension} · frontier: ${frontier}`;
-}
-
-// Small helper view: show Seven-Voices heart path for one word
 
 interface HeartSummaryProps {
   label: string;
-  core?: HeartCore | null;
+  core?: HeartSummary | null;
 }
 
-const HeartSummary: React.FC<HeartSummaryProps> = ({ label, core }) => {
-  const primary = core?.heartPaths?.primary;
-  const levelPath = core?.voices?.levelPath;
+const HeartSummaryView: React.FC<HeartSummaryProps> = ({ label, core }) => {
+  const primary = core?.math7?.primary;
 
-  if (!primary || !primary.voiceSequence || primary.voiceSequence.length === 0) {
+  if (!primary || !primary.voicePath || primary.voicePath.length === 0) {
     return null;
   }
 
-  const voicePath = primary.voiceSequence.join(" → ");
-  const levelStart = levelPath?.[0];
-  const levelEnd = levelPath?.[levelPath.length - 1];
+  const voicePath = primary.voicePath.join(" → ");
 
   return (
     <div className="mt-3 rounded-xl border border-slate-800/60 bg-slate-950/40 px-3 py-2 text-xs text-slate-200">
@@ -135,24 +85,24 @@ const HeartSummary: React.FC<HeartSummaryProps> = ({ label, core }) => {
         <span>
           Path: <span className="font-medium">{voicePath}</span>
         </span>
-        {levelStart && levelEnd && (
+        {primary.levelPath && (
           <span>
             Levels:{" "}
             <span className="font-medium">
-              {levelStart} → {levelEnd}
+              {primary.levelPath.join(" → ")}
             </span>
           </span>
         )}
-        {primary.tensionLevel && (
+        {core?.math7.tensionLevel && (
           <span>
             Tension:{" "}
-            <span className="font-medium">{primary.tensionLevel}</span>
+            <span className="font-medium">{core.math7.tensionLevel}</span>
           </span>
         )}
-        {typeof primary.frontierCount === "number" && (
+        {typeof core?.math7.frontierCount === "number" && (
           <span>
             Frontier:{" "}
-            <span className="font-medium">{primary.frontierCount}</span>
+            <span className="font-medium">{core.math7.frontierCount}</span>
           </span>
         )}
       </div>
@@ -168,8 +118,8 @@ interface ComparePanelProps {
 }
 
 interface CompareResult {
-  left: AnalysisResult_DEPRECATED | null;
-  right: AnalysisResult_DEPRECATED | null;
+  left: AnalyzeWordResultV1 | null;
+  right: AnalyzeWordResultV1 | null;
 }
 
 export default function ComparePanel({
@@ -188,11 +138,11 @@ export default function ComparePanel({
   const [copiedLeft, setCopiedLeft] = React.useState(false);
   const [copiedRight, setCopiedRight] = React.useState(false);
 
-  const leftCore = result?.left?.core as HeartCore | undefined;
-  const rightCore = result?.right?.core as HeartCore | undefined;
+  const leftHeart = result?.left?.heart;
+  const rightHeart = result?.right?.heart;
 
   const handleCopyLeftHeart = React.useCallback(() => {
-    const text = buildHeartSummaryText(leftCore);
+    const text = buildHeartSummaryText(leftHeart);
     if (!text) {
       console.warn("No left heart summary available to copy.");
       return;
@@ -204,10 +154,10 @@ export default function ComparePanel({
     } catch (err) {
       console.error("Failed to copy left heart summary:", err);
     }
-  }, [leftCore]);
+  }, [leftHeart]);
 
   const handleCopyRightHeart = React.useCallback(() => {
-    const text = buildHeartSummaryText(rightCore);
+    const text = buildHeartSummaryText(rightHeart);
     if (!text) {
       console.warn("No right heart summary available to copy.");
       return;
@@ -219,15 +169,15 @@ export default function ComparePanel({
     } catch (err) {
       console.error("Failed to copy right heart summary:", err);
     }
-  }, [rightCore]);
+  }, [rightHeart]);
 
   const compareExportPayload = React.useMemo(() => {
     if (!result) return null;
 
     if (coreOnlyCompare) {
       return {
-        left: (result.left as any)?.core ?? null,
-        right: (result.right as any)?.core ?? null,
+        left: (result.left as any)?.heart ?? null,
+        right: (result.right as any)?.heart ?? null,
       };
     }
 
@@ -242,42 +192,42 @@ export default function ComparePanel({
       leftWord.toLowerCase().replace(/[^a-z0-9_-]+/g, "-") || "left";
     const safeRight =
       rightWord.toLowerCase().replace(/[^a-z0-9_-]+/g, "-") || "right";
-    const suffix = coreOnlyCompare ? "-cores" : "-analysis";
+    const suffix = coreOnlyCompare ? "-hearts" : "-analysis";
     return `compare-${safeLeft}-vs-${safeRight}${suffix}.json`;
   }, [leftWord, rightWord, coreOnlyCompare]);
 
-  // Run the core engine directly in the browser (no /api call)
-  function analyzeLocal(word: string): RawAnalysisResult | null {
+  async function analyzeRemote(word: string): Promise<AnalyzeWordResultV1 | null> {
     const trimmed = word.trim();
     if (!trimmed) return null;
 
-    const manifest = getManifest(undefined);
-    const isStrict = mode === "strict";
-
-    const opts: SolveOptions = {
-      beamWidth: 8,
-      maxOps: isStrict ? 1 : 2,
-      allowDelete: !isStrict,
-      allowClosure: !isStrict,
-      opCost: manifest.opCost,
+    const params = new URLSearchParams({
+      word: trimmed,
+      mode,
       alphabet,
-      manifest,
-      edgeWeight: manifest.edgeWeight,
-    };
+    });
 
-    return runAnalysis(trimmed, opts, alphabet);
+    try {
+      const response = await fetch(`/api/analyze?${params.toString()}`);
+      if (!response.ok) {
+        console.error(`[ComparePanel] API error for word: ${trimmed}`, await response.text());
+        return null;
+      }
+      return await response.json();
+    } catch (e) {
+      console.error(`[ComparePanel] fetch failed for word: ${trimmed}`, e);
+      return null;
+    }
   }
 
-  function handleCompare() {
+  async function handleCompare() {
     setLoading(true);
     setError(null);
 
     try {
-      const leftRaw = analyzeLocal(leftWord);
-      const rightRaw = analyzeLocal(rightWord);
-
-      const left = leftRaw ? enginePayloadToAnalysisResult(leftRaw) : null;
-      const right = rightRaw ? enginePayloadToAnalysisResult(rightRaw) : null;
+      const [left, right] = await Promise.all([
+        analyzeRemote(leftWord),
+        analyzeRemote(rightWord),
+      ]);
 
       if (!left && !right) {
         setError("No results for either word.");
@@ -286,7 +236,7 @@ export default function ComparePanel({
         setResult({ left, right });
       }
     } catch (e) {
-      console.error("[ComparePanel] local analysis failed", e);
+      console.error("[ComparePanel] analysis failed", e);
       setError("Compare failed – see console for details.");
       setResult(null);
     } finally {
@@ -294,31 +244,6 @@ export default function ComparePanel({
     }
   }
 
-  function renderSummary(
-    _word: string,
-    payload: AnalysisResult_DEPRECATED | null
-  ) {
-    if (!payload) {
-      return <span className="text-xs text-muted-foreground">(no result)</span>;
-    }
-
-    const path = payload.core?.voices.vowelVoices ?? [];
-
-    return (
-      <>
-        <div className="text-xs text-muted-foreground">
-          <div className="font-mono">
-            {path.length > 0
-              ? path.join(" → ")
-              : "(no path – check engine output)"}
-          </div>
-        </div>
-        <p className="text-xs text-muted-foreground mt-1">
-          Heart: {renderHeartSummary(payload.core)}
-        </p>
-      </>
-    );
-  }
 
   return (
     <Card id="compare-two-words">
@@ -373,13 +298,13 @@ export default function ComparePanel({
               {leftWord || "Left word"}
             </div>
             <EngineMetaBadge result={result?.left as any} className="mb-2" />
-            {result?.left?.core ? (
+            {result?.left?.heart ? (
               <>
                 <div className="mb-2 flex items-center justify-between gap-3">
                   <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-500">
                     HEART SUMMARY
                   </h3>
-                  {leftCore && (
+                  {leftHeart && (
                     <button
                       type="button"
                       onClick={handleCopyLeftHeart}
@@ -389,27 +314,26 @@ export default function ComparePanel({
                     </button>
                   )}
                 </div>
-                <HeartSummary
-                  label={result?.left?.core.input?.normalized ?? leftWord}
-                  core={result.left.core as any}
+                <HeartSummaryView
+                  label={result?.left?.word ?? leftWord}
+                  core={result.left.heart}
                 />
               </>
-            ) : (
-              renderSummary(leftWord, result?.left ?? null)
-            )}
+            ) : <span className="text-xs text-muted-foreground">(no result)</span>
+            }
           </div>
           <div className="rounded-md border bg-muted/40 p-3">
             <div className="mb-1 text-sm font-semibold">
               {rightWord || "Right word"}
             </div>
             <EngineMetaBadge result={result?.right as any} className="mb-2" />
-            {result?.right?.core ? (
+            {result?.right?.heart ? (
               <>
                 <div className="mb-2 flex items-center justify-between gap-3">
                   <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-500">
                     HEART SUMMARY
                   </h3>
-                  {rightCore && (
+                  {rightHeart && (
                     <button
                       type="button"
                       onClick={handleCopyRightHeart}
@@ -419,14 +343,13 @@ export default function ComparePanel({
                     </button>
                   )}
                 </div>
-                <HeartSummary
-                  label={result?.right?.core.input?.normalized ?? rightWord}
-                  core={result.right.core as any}
+                <HeartSummaryView
+                  label={result?.right?.word ?? rightWord}
+                  core={result.right.heart}
                 />
               </>
-            ) : (
-              renderSummary(rightWord, result?.right ?? null)
-            )}
+            ) : <span className="text-xs text-muted-foreground">(no result)</span>
+            }
           </div>
         </div>
 

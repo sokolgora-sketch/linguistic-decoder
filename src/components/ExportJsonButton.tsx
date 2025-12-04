@@ -1,43 +1,47 @@
-// src/components/ExportJsonButton.tsx
 "use client";
 
+import React from "react";
 import { Button } from "./ui/button";
-import type { EnginePayload, AnalysisResult_DEPRECATED } from "../shared/engineShape";
-import { enginePayloadToAnalysisResult } from "@/shared/analysisAdapter";
+import type { AnalyzeWordResultV1 } from "@/shared/resultShape.v1";
 
 type ExportJsonButtonProps = {
-  analysis: EnginePayload;
+  analysis: AnalyzeWordResultV1 | null;
 };
 
 export function ExportJsonButton({ analysis }: ExportJsonButtonProps) {
-  const handleExport = () => {
-    // Export the rich AnalysisResult if it exists, otherwise fall back to the base payload.
-    const exportData = enginePayloadToAnalysisResult(analysis);
-    const json = JSON.stringify(exportData, null, 2);
+  const handleExport = React.useCallback(() => {
+    if (!analysis) return;
 
-    const blob = new Blob([json], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
+    try {
+      const blob = new Blob([JSON.stringify(analysis, null, 2)], {
+        type: "application/json",
+      });
 
-    // make a simple, safe filename: analysis-<word>-<version>.json
-    const safeWord = (analysis.word || "").replace(/\s+/g, "_");
-    const version = analysis.engineVersion || "dev";
-    const fileName = `analysis-${safeWord}-${version}.json`;
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
 
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = fileName;
-    a.click();
+      const filenameBase = analysis.word || "analysis";
+      a.href = url;
+      a.download = `${filenameBase}.seven-voices.json`;
 
-    URL.revokeObjectURL(url);
-  };
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("Failed to export JSON", err);
+    }
+  }, [analysis]);
 
   return (
     <Button
       variant="outline"
       size="sm"
       onClick={handleExport}
+      disabled={!analysis}
     >
       Export JSON
     </Button>
   );
 }
+
+// Provide both named *and* default export so whatever import you use will work.
+export default ExportJsonButton;

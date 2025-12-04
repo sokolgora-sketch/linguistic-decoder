@@ -1,6 +1,8 @@
 // src/lib/historyStore.ts
 // Central hook for logging analysis runs.
-// Right now it's a no-op stub; later we plug in Firestore.
+
+import { saveHistoryRecord, type HistoryRecord } from "./historyFirestore";
+import type { EnginePayload } from "@/shared/engineShape";
 
 export interface HistoryRunInput {
   word: string;
@@ -23,20 +25,36 @@ export async function recordHistoryRun(input: HistoryRunInput): Promise<void> {
         input.word,
         input.engineVersion,
         input.mode,
-        input.alphabet,
+        input.alphabet
       );
     }
     return;
   }
 
-  // TODO: future step – write to Firestore here.
-  // For now, just log in dev so we know the hook works.
-  if (process.env.NODE_ENV === "development") {
-    console.debug("[history] stub record:", {
-      word: input.word,
-      engineVersion: input.engineVersion,
-      mode: input.mode,
-      alphabet: input.alphabet,
-    });
-  }
+  const run = {
+    word: input.word,
+    engineVersion: input.engineVersion,
+    mode: input.mode,
+    alphabet: input.alphabet,
+    heartSummaryText: extractHeartSummary(input.result as EnginePayload),
+    createdAt: Date.now(),
+  };
+
+  syncHistoryToFirestore(run).catch(console.error);
+}
+
+function extractHeartSummary(payload: EnginePayload): string | undefined {
+  if (!payload?.primaryPath?.voicePath) return;
+  return payload.primaryPath.voicePath.map((v) => v.symbol).join("");
+}
+
+export async function syncHistoryToFirestore(run: any) {
+  await saveHistoryRecord({
+    word: run.word,
+    mode: run.mode || "strict",
+    alphabet: run.alphabet || "auto",
+    engineVersion: run.engineVersion || "unknown",
+    heartSummary: run.heartSummaryText || "",
+    createdAt: Date.now(),
+  });
 }
