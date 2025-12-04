@@ -32,7 +32,7 @@ import { ThemeToggle } from "@/components/ThemeProvider";
 import { useDebounced } from "@/hooks/useDebounced";
 import { Loader2, Sparkles, Wand2, HelpCircle, GitBranch, BookOpen, History as HistoryIcon, ListChecks } from "lucide-react";
 import ComparePanel from "@/components/ComparePanel";
-import { normalizeEnginePayload, type Vowel, type EnginePayload, type AnalysisResult_DEPRECATED } from "@/shared/engineShape";
+import { normalizeEnginePayload, type Vowel, type EnginePayload } from "@/shared/engineShape";
 import { analysisResultToEnginePayload } from "@/shared/analysisAdapter";
 import HistoryPanel from "@/components/HistoryPanel";
 import { doc, getDoc } from "firebase/firestore";
@@ -44,7 +44,7 @@ import { ExportJsonButton } from "@/components/ExportJsonButton";
 import { logError } from "@/lib/logError";
 import { VOICE_COLOR_MAP, VOICE_LABEL_MAP } from "@/shared/voiceColors";
 import { SymbolicReadingCard } from "@/components/SymbolicReadingCard";
-
+import type { AnalyzeWordResultV1 } from "@/shared/resultShape.v1";
 
 const VOICE_META: { id: Vowel; label: string; role: string }[] = [
   { id: "A", label: "Action / Truth", role: "Launches, cuts through, sets the first line." },
@@ -68,7 +68,7 @@ export default function LinguisticDecoderApp(){
   const [mode, setMode] = useState<"strict"|"open">("strict");
   const [alphabet, setAlphabet] = useState<Alphabet>("auto");
   const [edgeWeight, setEdgeWeight] = useState(0.25);
-  const [data, setData] = useState<EnginePayload | null>(null);
+  const [data, setData] = useState<AnalyzeWordResultV1 | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [isWarming, setIsWarming] = useState(false);
@@ -124,7 +124,7 @@ export default function LinguisticDecoderApp(){
     };
     try {
         const normalized = normalizeEnginePayload(mock);
-        setData(normalized);
+        setData(normalized as any);
         setErr(null);
         toast({ title: "Smoke Test", description: "Displaying mock data." });
     } catch(e:any){
@@ -143,10 +143,10 @@ export default function LinguisticDecoderApp(){
       const currentWord = w;
       const currentMode = m || 'strict';
       const currentAlphabet = a || 'auto';
-      setWord(currentWord); 
-      setMode(currentMode); 
-      setAlphabet(currentAlphabet); 
-      analyze(currentWord, currentMode, currentAlphabet); 
+      setWord(currentWord);
+      setMode(currentMode);
+      setAlphabet(currentAlphabet);
+      analyze(currentWord, currentMode, currentAlphabet);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -163,7 +163,7 @@ export default function LinguisticDecoderApp(){
       const snap = await getDoc(cacheRef);
       if (snap.exists()) {
           const payload = normalizeEnginePayload(snap.data());
-          setData({ ...payload, cacheHit: true });
+          setData({ ...payload, cacheHit: true } as any);
           toast({ title: "Loaded from Cache", description: `Analysis for '${payload.word}' loaded.` });
       } else {
           toast({ variant: "destructive", title: "Not Found", description: "Could not find that analysis in the cache." });
@@ -270,11 +270,7 @@ export default function LinguisticDecoderApp(){
                 </span>
               )}
 
-              {"solveMs" in data && (
-                <span>
-                  <span className="font-semibold">Solve:</span> {data.solveMs} ms
-                </span>
-              )}
+              {"solveMs" in data && <p><strong>Solve Time:</strong> {data.solveMs} ms</p>}
 
               {data.cacheHit && (
                 <span className="px-1.5 py-0.5 rounded-full border border-accent/60 text-accent-foreground bg-accent/10">
@@ -511,7 +507,7 @@ export default function LinguisticDecoderApp(){
                         <p><strong>Word:</strong> {data.word}</p>
                         <p><strong>Mode:</strong> {data.mode}</p>
                         <p><strong>Alphabet:</strong> {data.alphabet}</p>
-                        {"solveMs" in data && <p><strong>Solve Time:</strong> {data.solveMs} ms</p>}
+                        <p><strong>Solve Time:</strong> {data.solveMs} ms</p>}
                         {data.cacheHit && <p className="font-bold text-accent-foreground pt-1">Loaded from cache</p>}
                         {data.recomputed && <p className="font-bold text-blue-400 pt-1">Recomputed</p>}
                     </CardContent>
@@ -672,7 +668,7 @@ export default function LinguisticDecoderApp(){
                   <div className="flex justify-between items-center mb-2">
                     <h3 className="font-bold text-sm tracking-wide">API Echo (debug)</h3>
                   </div>
-                  <pre className="font-code text-xs whitespace-pre-wrap bg-slate-800 p-2.5 rounded-lg max-h-96 overflow-auto mt-2">
+                  <pre className="font-code text-xs whitespace-pre-wrap bg-slate-800 p-2.5 rounded-lg max-h-96 overflow-.auto mt-2">
                       {JSON.stringify(analysisResultToEnginePayload(data as any), null, 2)}
                   </pre>
               </Card>
@@ -690,7 +686,7 @@ export default function LinguisticDecoderApp(){
                   <span className="mr-2">engine={data.engineVersion}</span>
                   <span className="mr-2">mode={data.mode}</span>
                   <span className="mr-2">alphabet={data.alphabet}</span>
-                  {"solveMs" in data && <span className="mr-2">solveMs={data.solveMs}</span>}
+                  <span className="mr-2">solveMs={data.solveMs}</span>}
                   {data.cacheHit && <span className="mr-2 px-1.5 py-0.5 rounded bg-accent/20 border border-accent text-accent-foreground">cacheHit</span>}
                   {data.recomputed && <span className="mr-2 px-1.5 py-0.5 rounded bg-blue-900 border border-blue-700">recomputed</span>}
                 </div>

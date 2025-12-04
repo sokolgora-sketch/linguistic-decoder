@@ -1,4 +1,6 @@
 // src/shared/engineShape.ts
+import type { DeepRootSummaryV1 } from "./deepRoot.v1";
+import type { WordMatrixV1 } from "./wordMatrix.v1";
 
 // Canonical shape your UI will use everywhere.
 export type Vowel = 'A' | 'E' | 'I' | 'O' | 'U' | 'Y' | 'Ë';
@@ -325,4 +327,6 @@ export type AnalysisResult_DEPRECATED = {
   debug?: AnalysisDebug;
   sevenVoices?: SevenVoicesSummary;
   symbolic?: SymbolicLayer;
+  deepRoot?: DeepRootSummaryV1;
+  wordMatrix?: WordMatrixV1;
 };

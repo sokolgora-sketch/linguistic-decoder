@@ -118,9 +118,9 @@ export function analyzeWord(word: string, mode: 'strict' | 'explore' = 'strict')
     sanitized: withCanon.sanitized,
 
     primaryPath: {
-      voicePath: join(withCanon.primaryPath.voicePath),
-      levelPath: join(withCanon.primaryPath.levelPath.map((l: number) => l === 1 ? 'high' : l === 0 ? 'mid' : 'low')),
-      ringPath: join(withCanon.primaryPath.ringPath),
+      voicePath: withCanon.primaryPath.voicePath,
+      levelPath: withCanon.primaryPath.levelPath,
+      ringPath: withCanon.primaryPath.ringPath,
     },
 
     frontier: (withCanon.frontier || []).map((alt: any, idx: number) => ({

@@ -32,6 +32,7 @@ import { ExportJsonButton } from "../components/ExportJsonButton";
 import { logError } from "../lib/logError";
 import { VOICE_COLOR_MAP, VOICE_LABEL_MAP } from "../shared/voiceColors";
 import { SymbolicReadingCard } from "@/components/SymbolicReadingCard";
+import { WordMatrix } from "./WordMatrix";
 
 
 const VOICE_META: { id: Vowel; label: string; role: string }[] = [
@@ -527,6 +528,7 @@ export default function LinguisticDecoderApp(){
               </CardContent>
             </Card>
           )}
+          {data && <WordMatrix matrix={(data as any).wordMatrix} />}
         </section>
 
         {/* Informational Accordions */}

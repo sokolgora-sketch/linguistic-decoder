@@ -27,6 +27,8 @@ import { CANON_CANDIDATES } from './canonCandidates';
 import { buildConsonantField } from './consonantField';
 import { mapPathToPrinciples, getVoiceMeta } from './sevenVoices';
 import { detectAlbanianDialect } from '../lib/detectDialect';
+import { buildWordMatrix } from "./wordMatrix.v1";
+import { buildDeepRootSummaryV1 } from './deepRoot.v1';
 
 function buildSevenVoicesSummary(
   payload: EnginePayload
@@ -179,7 +181,11 @@ export function enginePayloadToAnalysisResult(
         ringPath: payload.primaryPath.ringPath,
         tensionLevel: 'low',
       },
-      frontierCount: payload.frontierPaths.length,
+      frontierCount: Array.isArray((payload as any).frontierPaths)
+        ? (payload as any).frontierPaths.length
+        : Array.isArray((payload as any).frontier)
+        ? (payload as any).frontier.length
+        : 0,
     },
   };
 
@@ -189,14 +195,23 @@ export function enginePayloadToAnalysisResult(
 
   const sevenVoices = buildSevenVoicesSummary(payload);
   const symbolic = buildSymbolicLayer(candidates);
+  const deepRoot = buildDeepRootSummaryV1({ word: payload.word });
 
-  return {
+  const baseResult: AnalysisResult_DEPRECATED = {
     core,
     consonants: { field, summary },
     candidates,
     debug,
     sevenVoices,
     symbolic,
+    deepRoot,
+  };
+
+  const wordMatrix = buildWordMatrix(baseResult);
+
+  return {
+    ...baseResult,
+    wordMatrix,
   };
 }
 

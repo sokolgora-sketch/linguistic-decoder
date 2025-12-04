@@ -1,9 +1,9 @@
 'use client';
 import React, { useMemo } from "react";
-import { Card } from "./ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import type { CClass } from "../functions/languages";
 import { classRange } from "../functions/languages";
-import type { EnginePayload, AnalysisResult_DEPRECATED, Vowel } from "../shared/engineShape";
+import type { EnginePayload, AnalysisResult_DEPRECATED, Vowel, WordMatrixV1 } from "../shared/engineShape";
 import { enginePayloadToAnalysisResult } from "@/shared/analysisAdapter";
 import { getVoiceMeta } from '@/shared/sevenVoices';
 import WhyThisPath from "./WhyThisPath";
@@ -124,12 +124,54 @@ const Chip = ({ v }: { v: string | number }) => {
     );
 };
 
+function WordMatrixCard({ matrix }: { matrix: WordMatrixV1 | undefined }) {
+  if (!matrix) return null;
+
+  return (
+    <Card className="mt-6">
+      <CardHeader>
+        <CardTitle>Word matrix (proto-root snapshot)</CardTitle>
+        <CardDescription>
+          Compact view of Heart, Canon, and DeepRoot for this word.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-2 text-sm">
+        <div>
+          <div className="font-medium">Primary</div>
+          <div>{matrix.primary.voicePath ?? "—"}</div>
+          {matrix.primary.notes && (
+            <div className="text-muted-foreground">{matrix.primary.notes}</div>
+          )}
+        </div>
+
+        {matrix.deepRoot && (
+          <div>
+            <div className="font-medium mt-3">Proto-root</div>
+            <div>
+              {matrix.deepRoot.form ?? "—"}{" "}
+              {matrix.deepRoot.language && (
+                <span className="text-muted-foreground">
+                  ({matrix.deepRoot.language})
+                </span>
+              )}
+            </div>
+            {matrix.deepRoot.voicePath && (
+              <div className="text-muted-foreground">
+                Path: {matrix.deepRoot.voicePath}
+              </div>
+            )}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
 
 export function ResultsDisplay({ analysis: raw }: { analysis: EnginePayload }) {
   const analysis = useMemo(() => enginePayloadToAnalysisResult(raw), [raw]);
 
   if (!analysis) return null;
-  const { core, candidates, symbolicCore } = analysis;
+  const { core, candidates, symbolicCore, wordMatrix } = analysis;
 
   return (
     <div className="space-y-4">
@@ -147,6 +189,8 @@ export function ResultsDisplay({ analysis: raw }: { analysis: EnginePayload }) {
         <Candidates candidates={candidates} />
         
         {symbolicCore && <SymbolicReadingCard symbolic={symbolicCore} />}
+
+        {wordMatrix && <WordMatrixCard matrix={wordMatrix} />}
 
         {core && core.heartPaths && core.heartPaths.frontierCount > 0 && (
           <Card className="p-4 mt-4">
