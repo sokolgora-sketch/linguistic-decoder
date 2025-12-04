@@ -1,4 +1,19 @@
+<<<<<<< HEAD
 
+=======
+/**
+ * 🧩 ANALYSIS ADAPTER
+ *
+ * Bridges raw engine payload → UI / test-friendly structure.
+ * Canon tests depend on this file:
+ *  - tests/canonCandidates.spec.ts
+ *
+ * IMPORTANT:
+ *  - Do NOT remove or rename existing fields expected by tests.
+ *  - Do NOT let auto-refactor / AI tools delete or inline this file.
+ *  - If you change how something is mapped, re-run Jest and keep all suites green.
+ */
+>>>>>>> origin/main
 // src/shared/analysisAdapter.ts
 
 import type {
@@ -6,17 +21,19 @@ import type {
   AnalysisDebug,
   AnalysisResult_DEPRECATED,
   Candidate,
-  ConsonantField,
-  ConsonantSummary,
   EnginePayload,
   SevenVoicesSummary,
   SymbolicLayer,
 } from './engineShape';
 import { CANON_CANDIDATES } from './canonCandidates';
 import { buildConsonantField } from './consonantField';
-import { mapPathToPrinciples, getVoiceMeta } from './sevenVoices';
+import { getVoiceMeta } from './sevenVoices';
 import { detectAlbanianDialect } from '../lib/detectDialect';
+<<<<<<< HEAD
 import { computeSymbolicCore } from "@/lib/symbolicCore";
+=======
+import { computeMath7ForResult } from '@/engine/math7';
+>>>>>>> origin/main
 
 function buildSevenVoicesSummary(
   payload: EnginePayload
@@ -59,7 +76,14 @@ function buildSymbolicLayer(
     return undefined;
   }
 
-  const notes = candidates.flatMap(c => c.symbolic?.map(s => s.note) ?? []);
+  const notes: string[] = [];
+  for (const c of candidates) {
+    if (c.symbolic) {
+      for (const s of c.symbolic) {
+        notes.push(s.note);
+      }
+    }
+  }
 
   if (notes.length === 0) return undefined;
 
@@ -75,22 +99,12 @@ export function enginePayloadToAnalysisResult(
   payload: EnginePayload
 ): AnalysisResult_DEPRECATED {
   const { field, summary } = buildConsonantField(payload);
-  const { word, alphabet, mode } = payload;
+  const { word, mode } = payload;
   const canon = CANON_CANDIDATES[word.toLowerCase()] ?? [];
 
   const candidates: Candidate[] = canon.map(c => {
-    // Check if consonant profile aligns with the field summary.
-    let profileOk = false; // Default to false
-    if (c.consonantProfile && summary.dominantArchetypes.length > 0) {
-      profileOk = summary.dominantArchetypes.some(
-        a =>
-          (c.consonantProfile === 'build' &&
-            (a === 'Plosive' || a === 'Nasal' || a === 'SibilantFric')) ||
-          (c.consonantProfile === 'cut' &&
-            (a === 'Plosive' || a === 'Affricate' || a === 'Nasal')) ||
-          (c.consonantProfile === 'flow' && a === 'LiquidGlide')
-      );
-    }
+    // Per instruction: set consonantProfileOk to true if the axes verdict for consonants is 'pass'.
+    const profileOk = c.axes?.consonants === 'pass';
 
     return {
       ...c,
@@ -183,6 +197,7 @@ export function enginePayloadToAnalysisResult(
   const sevenVoices = buildSevenVoicesSummary(payload);
   const symbolic = buildSymbolicLayer(candidates);
 
+<<<<<<< HEAD
   const symbolicCore = computeSymbolicCore({
     word: payload.word,
     alphabet: payload.alphabet,
@@ -193,6 +208,9 @@ export function enginePayloadToAnalysisResult(
   });
 
   return {
+=======
+  const analysisResult = {
+>>>>>>> origin/main
     core,
     consonants: { field, summary },
     candidates,
@@ -201,6 +219,11 @@ export function enginePayloadToAnalysisResult(
     symbolic,
     symbolicCore,
   };
+
+  // Attach math7 data.
+  const math7 = computeMath7ForResult(analysisResult as any);
+
+  return { ...analysisResult, math7 };
 }
 
 // Converts the rich AnalysisResult back to a bare EnginePayload,
@@ -231,8 +254,7 @@ export function analysisResultToEnginePayload(
 
   const { mode, alphabet } = result.core.input;
 
-  return (
-    result.debug?.rawEnginePayload ?? {
+  const basePayload = result.debug?.rawEnginePayload ?? {
       engineVersion: result.core.engineVersion,
       word: result.core.word,
       mode: mode,
@@ -253,6 +275,7 @@ export function analysisResultToEnginePayload(
         c => c.classes[0]
       ),
       signals: [],
-    }
-  );
+    };
+    
+  return { ...basePayload, math7: result.math7 };
 }

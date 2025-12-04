@@ -1,6 +1,6 @@
 // src/shared/wordMatrix.v1.ts
 
-import type { AnalysisResult_DEPRECATED } from "./engineShape";
+import type { AnalyzeWordResultV1 } from "./resultShape.v1";
 
 // This is the compact, “engine-facing” matrix.
 export interface WordMatrixEntryV1 {
@@ -20,23 +20,23 @@ export interface WordMatrixV1 {
 }
 
 // Build a matrix from the *final* analysis result
-export function buildWordMatrix(result: AnalysisResult_DEPRECATED & { deepRoot?: any }): WordMatrixV1 {
-  const primary = result.sevenVoices;
+export function buildWordMatrix(result: AnalyzeWordResultV1): WordMatrixV1 {
+  const primary = result.heart;
 
   return {
-    word: result.core.word,
+    word: result.word,
     primary: {
       layer: "heart",
       label: "Primary path",
-      voicePath: primary?.voicePath.join(" → "),
-      notes: result.symbolic?.notes.join("\n"),
+      voicePath: primary?.principlePath.join(" → "),
+      notes: result.symbolicCore?.notes.join("\n"),
     },
     canon: (result.candidates ?? []).map((fam) => ({
       layer: "canon",
       label: fam.language,
       language: fam.language,
       form: fam.form,
-      voicePath: fam.voices.voiceSequence.join(" → "),
+      voicePath: (fam.voices?.voiceSequence ?? []).join(" → "),
     })),
     deepRoot: result.deepRoot
       ? {

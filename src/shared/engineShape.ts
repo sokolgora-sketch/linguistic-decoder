@@ -1,6 +1,7 @@
 // src/shared/engineShape.ts
 import type { DeepRootSummaryV1 } from "./deepRoot.v1";
 import type { WordMatrixV1 } from "./wordMatrix.v1";
+import type { HeartArchetypeId } from '../engine/heartArchetypes';
 
 // Canonical shape your UI will use everywhere.
 export type Vowel = 'A' | 'E' | 'I' | 'O' | 'U' | 'Y' | 'Ë';
@@ -270,7 +271,12 @@ export type AnalysisHeartPaths = {
   primary: {
     voiceSequence: Vowel[];
     ringPath: number[];
+    levelPath: ('high' | 'mid' | 'low')[];
     tensionLevel: TensionLevel;
+    frontierCount: number;
+    archetypeId: HeartArchetypeId;
+    archetypeLabel: string;
+    archetypeSummary: string;
   };
   frontierCount: number;
 };

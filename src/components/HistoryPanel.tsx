@@ -15,7 +15,9 @@ import {
   writeBatch,
   DocumentData,
   QueryDocumentSnapshot,
+  where,
 } from "firebase/firestore";
+import type { User } from "firebase/auth";
 
 type Row = {
   id: string;
@@ -48,17 +50,54 @@ export default function HistoryPanel({
   const [uid, setUid] = useState<string | null>(null);
 
   useEffect(() => {
-    ensureAnon().then(user => setUid(user.uid));
+    let cancelled = false;
+
+    ensureAnon()
+      .then((user: User | null) => {
+        if (cancelled) return;
+
+        if (user && user.uid) {
+          setUid(user.uid);
+        } else {
+          // no anon user – we can still allow “global” history or just keep uid null
+          setUid(null);
+        }
+      })
+      .catch((err) => {
+        console.error("[HistoryPanel] ensureAnon failed:", err);
+        if (!cancelled) setUid(null);
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const baseQuery = useMemo(() => {
-    if (!uid || !db) return null;
-    const col = collection(db, "users", uid, "history");
-    return query(col, orderBy("createdAt", "desc"), limit(20));
-  }, [uid]);
+    if (!db) return null;
+
+    const col = collection(db, "history");
+
+    const clauses: any[] = [];
+
+    // Only filter by uid if we actually have one
+    if (uid) {
+      clauses.push(where("uid", "==", uid));
+    }
+
+    // existing filters for mode/alphabet are fine – just push them into clauses
+    if (mode && mode !== "all") {
+      clauses.push(where("mode", "==", mode));
+    }
+    if (alphabet && alphabet !== "all") {
+      clauses.push(where("alphabet", "==", alphabet));
+    }
+
+    return query(col, ...clauses, orderBy("createdAt", "desc"), limit(50));
+  }, [uid, mode, alphabet]);
 
   async function load(reset = true) {
-    if (!uid || !baseQuery || !db) {
+    if (!baseQuery || !db) {
         if (!db) console.warn("HistoryPanel: Firestore not available.");
         return;
     }
@@ -82,8 +121,6 @@ export default function HistoryPanel({
       });
 
       const filtered = mapped.filter((r) => {
-        if (mode !== "all" && r.mode !== mode) return false;
-        if (alphabet !== "all" && r.alphabet !== alphabet) return false;
         if (wordFilter && !r.word?.toLowerCase().includes(wordFilter.toLowerCase()))
           return false;
         return true;
@@ -98,10 +135,8 @@ export default function HistoryPanel({
   }
 
   useEffect(() => {
-    if (uid) {
-        load(true);
-    }
-  }, [uid, baseQuery, mode, alphabet, wordFilter]);
+    load(true);
+  }, [baseQuery, wordFilter]);
 
   async function deleteRow(row: Row) {
     if (!uid || !db) return;
