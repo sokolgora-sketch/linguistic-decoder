@@ -1,3 +1,6 @@
+<<<<<<< HEAD
+
+=======
 /**
  * 🧩 ANALYSIS ADAPTER
  *
@@ -10,6 +13,7 @@
  *  - Do NOT let auto-refactor / AI tools delete or inline this file.
  *  - If you change how something is mapped, re-run Jest and keep all suites green.
  */
+>>>>>>> origin/main
 // src/shared/analysisAdapter.ts
 
 import type {
@@ -25,7 +29,11 @@ import { CANON_CANDIDATES } from './canonCandidates';
 import { buildConsonantField } from './consonantField';
 import { getVoiceMeta } from './sevenVoices';
 import { detectAlbanianDialect } from '../lib/detectDialect';
+<<<<<<< HEAD
+import { computeSymbolicCore } from "@/lib/symbolicCore";
+=======
 import { computeMath7ForResult } from '@/engine/math7';
+>>>>>>> origin/main
 
 function buildSevenVoicesSummary(
   payload: EnginePayload
@@ -189,13 +197,27 @@ export function enginePayloadToAnalysisResult(
   const sevenVoices = buildSevenVoicesSummary(payload);
   const symbolic = buildSymbolicLayer(candidates);
 
+<<<<<<< HEAD
+  const symbolicCore = computeSymbolicCore({
+    word: payload.word,
+    alphabet: payload.alphabet,
+    summary: {
+      voicePath: payload.primaryPath.voicePath,
+      ringPath: payload.primaryPath.ringPath,
+    },
+  });
+
+  return {
+=======
   const analysisResult = {
+>>>>>>> origin/main
     core,
     consonants: { field, summary },
     candidates,
     debug,
     sevenVoices,
     symbolic,
+    symbolicCore,
   };
 
   // Attach math7 data.

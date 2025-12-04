@@ -48,7 +48,7 @@ describe('word: love', () => {
     expect(sq?.consonantProfileOk).toBe(true);
     expect(sq?.morphologyMatrix?.pivot).toBe('dash');
 
-    expect(r.symbolic).toBeDefined();
-    expect(r.symbolic?.notes.length).toBeGreaterThan(0);
+    expect(r.symbolicCore).toBeDefined();
+    expect(r.symbolicCore?.notes.length).toBeGreaterThan(0);
   });
 });

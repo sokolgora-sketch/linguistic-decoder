@@ -1,4 +1,7 @@
 // src/shared/resultShape.v1.ts
+import type { DeepRootSummaryV1 } from "./deepRoot.v1";
+import type { WordMatrixV1 } from "./wordMatrix.v1";
+import type { AnalysisResult_DEPRECATED } from "./engineShape";
 
 // Core path types used by the Heart + Frontier UI
 
@@ -37,25 +40,15 @@ export interface LanguageFamilySummary {
   }[];
 }
 
-export interface AnalyzeWordResultV1 {
-  word: string;
-  sanitized: string;
-  primaryPath: SevenVoicesPath;
-  frontier: FrontierCandidate[];
-
-  languageFamilies?: LanguageFamilySummary[];
-
-  meta?: {
-    engineVersion: string;
-    createdAt: string;
-    mode: {
-      mode: "strict" | "explore";
-      alphabet: string;
-    };
+export type AnalyzeWordResultV1 = AnalysisResult_DEPRECATED & {
+    deepRoot?: DeepRootSummaryV1;
+    wordMatrix?: WordMatrixV1;
+    primaryPath: any;
+    frontier?: any;
+    languageFamilies?: any;
+    symbolic?: any;
+    word?: any;
+    meta?: any;
+    sanitized: string;
   };
-
-  symbolic?: {
-    label?: string;
-    notes?: string[];
-  };
-}
+  

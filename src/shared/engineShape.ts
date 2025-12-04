@@ -1,4 +1,6 @@
 // src/shared/engineShape.ts
+import type { DeepRootSummaryV1 } from "./deepRoot.v1";
+import type { WordMatrixV1 } from "./wordMatrix.v1";
 import type { HeartArchetypeId } from '../engine/heartArchetypes';
 
 // Canonical shape your UI will use everywhere.
@@ -331,4 +333,6 @@ export type AnalysisResult_DEPRECATED = {
   debug?: AnalysisDebug;
   sevenVoices?: SevenVoicesSummary;
   symbolic?: SymbolicLayer;
+  deepRoot?: DeepRootSummaryV1;
+  wordMatrix?: WordMatrixV1;
 };

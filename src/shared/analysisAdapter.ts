@@ -4,6 +4,8 @@ import type { EnginePayload, Candidate } from "@/shared/engineShape";
 import { computeMath7ForResult } from "@/engine/math7";
 import { analyzeMind, analyzeConsonants, analyzeSymbolic } from "@/engine/mindAnalyzer";
 import { CANON_CANDIDATES } from "./canonCandidates";
+import { buildWordMatrix } from "./wordMatrix.v1";
+import { buildDeepRootSummaryV1 } from './deepRoot.v1';
 
 export function enginePayloadToAnalysisResult(payload: EnginePayload): AnalyzeWordResultV1 {
   const math7 = computeMath7ForResult(payload);
@@ -14,7 +16,7 @@ export function enginePayloadToAnalysisResult(payload: EnginePayload): AnalyzeWo
   const candidates = buildMindCandidates(payload);
   const deepRoot = buildDeepRoot(payload);
 
-  return {
+  const result: AnalyzeWordResultV1 = {
     word: payload.word,
     engineVersion: payload.engineVersion,
     mode: payload.mode as Mode,
@@ -22,7 +24,7 @@ export function enginePayloadToAnalysisResult(payload: EnginePayload): AnalyzeWo
     heart,
     mind,
     consonants,
-    symbolic,
+    symbolicCore: symbolic,
     candidates,
     deepRoot,
     meta: {
@@ -30,6 +32,11 @@ export function enginePayloadToAnalysisResult(payload: EnginePayload): AnalyzeWo
       source: "live",
     },
   };
+
+  const wordMatrix = buildWordMatrix(result);
+  result.wordMatrix = wordMatrix;
+
+  return result;
 }
 
 // --- helpers (minimal stubs; replace later if needed) ---
@@ -40,7 +47,7 @@ function buildHeartSummary(payload: any, math7: any) {
     mode: payload.mode,
     alphabet: payload.alphabet,
     math7,
-    principlePath: math7.principlePath ?? [],
+    principlePath: math7.primary.principlesPath ?? [],
     narrative: `Word ${payload.word} follows ${math7.tensionLevel} balance.`,
   };
 }
@@ -83,7 +90,7 @@ function buildMindCandidates(payload: EnginePayload): Candidate[] {
 }
 
 function buildDeepRoot(payload: any) {
-  return payload.deepRoot ?? undefined;
+  return buildDeepRootSummaryV1({word: payload.word}) ?? undefined;
 }
 
 // --- Legacy helper: convert whatever we stored into EnginePayload shape ---

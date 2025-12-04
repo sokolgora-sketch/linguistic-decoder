@@ -346,8 +346,12 @@ export type AnalysisResult_DEPRECATED = {
   debug?: AnalysisDebug;
   sevenVoices?: SevenVoicesSummary;
   symbolic?: SymbolicLayer;
+<<<<<<< HEAD
+  symbolicCore?: any; // NEW, optional
+=======
   symbolicCore?: any; // Changed from SymbolicCoreResult to any to break circular dependency
   math7?: Math7Summary;
+>>>>>>> origin/main
 };
 
 export type AnalysisResult = {
