@@ -19,6 +19,8 @@ export default function Page() {
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<AnalyzeWordResultV1 | null>(null);
   const [history, setHistory] = useState<AnalyzeWordResultV1[]>([]);
+  const [mode, setMode] = useState<"strict" | "explore">("strict");
+  const [alphabet, setAlphabet] = useState<"auto" | "latin" | "albanian">("auto");
 
   // --- Engine meta helpers (loose typing for debug fields) ---
   const meta = result?.meta as any | undefined;
@@ -27,37 +29,42 @@ export default function Page() {
       | { hit?: string; elapsedMs?: number; source?: string }
       | undefined;
 
-  async function handleAnalyze(e: React.FormEvent) {
+  async function handleAnalyze(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+  
     const trimmed = word.trim();
     if (!trimmed) return;
-
-    setLoading(true);
+  
     setError(null);
-
+    setLoading(true);
+  
     try {
-      const params = new URLSearchParams({
-        word: trimmed,
-        mode: "strict",
-        alphabet: "auto",
+      const response = await fetch("/api/analyze", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          word: trimmed,
+          mode,      // from your Mode select
+          alphabet,  // from your Alphabet select
+        }),
       });
-
-      const res = await fetch(`/api/analyze?${params.toString()}`);
-      if (!res.ok) {
-        throw new Error(`HTTP ${res.status}`);
+  
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
       }
-
-      const json = (await res.json()) as AnalyzeWordResultV1;
+  
+      const json = (await response.json()) as AnalyzeWordResultV1;
+  
       setResult(json);
-
-      // 🔹 Update in-memory history (keep latest 10, no duplicates by word)
-      setHistory((prev) => {
-        const filtered = prev.filter((item) => item.word !== json.word);
-        return [json, ...filtered].slice(0, 10);
-      });
+      setHistory((prev) => [
+        { word: trimmed, ...json },
+        ...prev,
+      ].slice(0, 10));
     } catch (err: any) {
       console.error(err);
-      setError(err?.message ?? "Failed to analyze word.");
+      setError(err.message || "Something went wrong.");
     } finally {
       setLoading(false);
     }
@@ -100,6 +107,31 @@ export default function Page() {
                 {loading ? "Analyzing..." : "Analyze"}
               </Button>
             </form>
+            <div className="flex flex-wrap gap-4 mt-2">
+              <div>
+                <label className="text-sm opacity-80 mr-2">Mode:</label>
+                <select
+                  value={mode}
+                  onChange={(e) => setMode(e.target.value as "strict" | "explore")}
+                  className="bg-background border border-border/50 rounded-md px-2 py-1"
+                >
+                  <option value="strict">strict</option>
+                  <option value="explore">explore</option>
+                </select>
+              </div>
+              <div>
+                <label className="text-sm opacity-80 mr-2">Alphabet:</label>
+                <select
+                  value={alphabet}
+                  onChange={(e) => setAlphabet(e.target.value as "auto" | "latin" | "albanian")}
+                  className="bg-background border border-border/50 rounded-md px-2 py-1"
+                >
+                  <option value="auto">auto</option>
+                  <option value="latin">latin</option>
+                  <option value="albanian">albanian</option>
+                </select>
+              </div>
+            </div>
             {error && (
               <p className="mt-2 text-sm text-destructive">{error}</p>
             )}
@@ -259,7 +291,7 @@ export default function Page() {
   <CardHeader>
     <CardTitle>Symbolic reading (experimental)</CardTitle>
     <CardDescription>
-      High-level reading of this word&apos;s path. Sketch, not doctrine.
+      High-level reading of this word's path. Sketch, not doctrine.
     </CardDescription>
   </CardHeader>
   <CardContent className="space-y-2">
