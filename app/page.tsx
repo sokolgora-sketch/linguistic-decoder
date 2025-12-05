@@ -16,6 +16,7 @@ import { WordMatrixCard } from "@/components/WordMatrix";
 import type { AnalyzeWordResultUI, HistoryItem } from "@/shared/resultsUI";
 import { buildShareSnippet } from "@/lib/shareSnippet";
 import { useToast } from "@/hooks/use-toast";
+import { Header } from "@radix-ui/react-accordion";
 
 function renderWordMatrix(result: AnalyzeWordResultUI | null): ReactNode {
   if (!result?.wordMatrix) {
@@ -35,8 +36,6 @@ export default function Page() {
   const [alphabet, setAlphabet] = useState<"auto" | "latin" | "albanian">(
     "auto"
   );
-  const analysis = result?.analysis as any | undefined;
-  const mind = analysis?.mind;
 
   async function handleAnalyze(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -87,15 +86,17 @@ export default function Page() {
       const data = (await response.json()) as AnalyzeWordResultUI;
       
       setResult(data);
-      setHistory((prev) => [
-        {
-          word: data.word,
-          voicePath: data.primaryPath?.voicePath ?? "—",
-          levelPath: data.primaryPath?.levelPath ?? "—",
-          ringPath: data.primaryPath?.ringPath ?? "—",
-        },
-        ...prev,
-      ].slice(0, 10));
+      setHistory((prev) =>
+        [
+          {
+            word: data.word,
+            voicePath: data.primaryPath?.voicePath ?? "—",
+            levelPath: data.primaryPath?.levelPath ?? "—",
+            ringPath: data.primaryPath?.ringPath ?? "—",
+          },
+          ...prev,
+        ].slice(0, 10)
+      );
 
     } catch (err: any) {
       console.error("Error while analyzing word:", err);
@@ -284,7 +285,7 @@ export default function Page() {
                 Alternate legal paths the Mind can explore inside the same
                 rules.
               </CardDescription>
-            </CardHeader>
+            </Header>
             <CardContent>
               <div className="overflow-x-auto">
                 <table className="w-full border-collapse text-sm">
@@ -321,50 +322,38 @@ export default function Page() {
         {renderWordMatrix(result)}
 
         {/* Symbolic reading */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Symbolic reading (experimental)</CardTitle>
-            <CardDescription>
-              High-level reading of this word&apos;s path. Sketch, not doctrine.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {!result && (
-              <p className="text-sm text-muted-foreground">
-                Run a word to see a symbolic reading.
-              </p>
-            )}
+        {result?.symbolic && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Symbolic reading (experimental)</CardTitle>
+              <CardDescription>
+                High-level reading of this word&apos;s path. Sketch, not doctrine.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+                <div className="space-y-2">
+                  <div className="text-xs text-muted-foreground">
+                    Sketch from the Seven-Voices core. Experimental, not doctrine.
+                  </div>
 
-            {result && !result.symbolic && (
-              <p className="text-sm text-muted-foreground">
-                No symbolic reading available for this word yet.
-              </p>
-            )}
+                  <div>
+                    <span className="font-semibold">Label: </span>
+                    <span className="font-mono text-xs uppercase tracking-wide">
+                      {result.symbolic.label}
+                    </span>
+                  </div>
 
-            {result?.symbolic && (
-              <div className="space-y-2">
-                <div className="text-xs text-muted-foreground">
-                  Sketch from the Seven-Voices core. Experimental, not doctrine.
+                  {result.symbolic.notes && result.symbolic.notes.length > 0 && (
+                    <ul className="list-disc list-inside text-sm">
+                      {result.symbolic.notes.map((note: any, idx: number) => (
+                        <li key={idx}>{note}</li>
+                      ))}
+                    </ul>
+                  )}
                 </div>
-
-                <div>
-                  <span className="font-semibold">Label: </span>
-                  <span className="font-mono text-xs uppercase tracking-wide">
-                    {result.symbolic.label}
-                  </span>
-                </div>
-
-                {result.symbolic.notes && result.symbolic.notes.length > 0 && (
-                  <ul className="list-disc list-inside text-sm">
-                    {result.symbolic.notes.map((note: any, idx: number) => (
-                      <li key={idx}>{note}</li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            )}
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Recent history (session only) */}
         {history.length > 0 && (
