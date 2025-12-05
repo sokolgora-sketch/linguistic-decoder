@@ -9,6 +9,12 @@ export type EngineMetaInput = {
   alphabet?: string | null;
 };
 
+export type EngineMetaSummary = {
+  version: string;
+  created: string;
+};
+
+
 /**
  * Build a compact, human-friendly summary of the engine meta.
  *

@@ -40,6 +40,12 @@ export interface LanguageFamilySummary {
   }[];
 }
 
+// NEW – summary used by the Engine meta card
+export type EngineMetaSummary = {
+  version: string;
+  created: string;
+};
+
 export type AnalyzeWordResultV1 = AnalysisResult_DEPRECATED & {
     deepRoot?: DeepRootSummaryV1;
     wordMatrix?: WordMatrixV1;
@@ -48,7 +54,7 @@ export type AnalyzeWordResultV1 = AnalysisResult_DEPRECATED & {
     languageFamilies?: any;
     symbolic?: any;
     word?: any;
-    meta?: any;
+    meta?: EngineMetaSummary;
     sanitized: string;
   };
   
