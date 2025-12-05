@@ -139,7 +139,7 @@ export default function Page() {
         </Card>
 
         {/* Heart summary */}
-        {result && (
+        {result && result.primaryPath && (
           <Card>
             <CardHeader>
               <CardTitle>Heart summary</CardTitle>
@@ -287,6 +287,27 @@ export default function Page() {
   </CardContent>
 </Card>
 
+{/* WORD MATRIX CARD */}
+<Card>
+  <CardHeader>
+    <CardTitle>Word matrix (proto-root view)</CardTitle>
+    <CardDescription>
+      Shows proto-root mapping if present.
+    </CardDescription>
+  </CardHeader>
+  <CardContent className="text-sm">
+    {(result as any)?.wordMatrix ? (
+      <pre className="text-xs bg-slate-950 p-2 rounded-md overflow-x-auto">
+        {JSON.stringify((result as any).wordMatrix, null, 2)}
+      </pre>
+    ) : (
+      <p className="text-slate-400 italic">
+        No matrix attached yet. (Result has no <code>wordMatrix</code> field.)
+      </p>
+    )}
+  </CardContent>
+</Card>
+
 <Card>
   <CardHeader>
     <CardTitle>Symbolic reading (experimental)</CardTitle>
@@ -301,7 +322,7 @@ export default function Page() {
       </p>
     )}
 
-    {result && (
+    {result && result.symbolic && (
       <>
         <p className="text-sm font-medium">
           {result.symbolic?.label ?? "Engine symbolic reading"}
@@ -478,3 +499,5 @@ export default function Page() {
     </div>
   );
 }
+
+    
