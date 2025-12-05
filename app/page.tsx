@@ -139,7 +139,7 @@ export default function Page() {
         </Card>
 
         {/* Heart summary */}
-        {result && (
+        {result && result.primaryPath && (
           <Card>
             <CardHeader>
               <CardTitle>Heart summary</CardTitle>
@@ -249,7 +249,7 @@ export default function Page() {
           </tr>
         </thead>
         <tbody>
-          {result?.languageFamilies?.map((fam) => (
+          {result?.languageFamilies?.map((fam: any) => (
             <tr key={fam.language} className="border-b border-muted/20 last:border-0">
               <td className="px-4 py-2 text-left">{fam.language}</td>
               <td className="px-4 py-2 text-left font-mono text-xs">{fam.form}</td>
@@ -287,6 +287,27 @@ export default function Page() {
   </CardContent>
 </Card>
 
+{/* WORD MATRIX CARD */}
+<Card>
+  <CardHeader>
+    <CardTitle>Word matrix (proto-root view)</CardTitle>
+    <CardDescription>
+      Shows proto-root mapping if present.
+    </CardDescription>
+  </CardHeader>
+  <CardContent className="text-sm">
+    {(result as any)?.wordMatrix ? (
+      <pre className="text-xs bg-slate-950 p-2 rounded-md overflow-x-auto">
+        {JSON.stringify((result as any).wordMatrix, null, 2)}
+      </pre>
+    ) : (
+      <p className="text-slate-400 italic">
+        No matrix attached yet. (Result has no <code>wordMatrix</code> field.)
+      </p>
+    )}
+  </CardContent>
+</Card>
+
 <Card>
   <CardHeader>
     <CardTitle>Symbolic reading (experimental)</CardTitle>
@@ -301,13 +322,13 @@ export default function Page() {
       </p>
     )}
 
-    {result && (
+    {result && (result as any).symbolic && (
       <>
         <p className="text-sm font-medium">
-          {result.symbolic?.label ?? "Engine symbolic reading"}
+          {(result as any).symbolic?.label ?? "Engine symbolic reading"}
         </p>
         <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
-          {(result.symbolic?.notes ?? []).map((note, idx) => (
+          {((result as any).symbolic?.notes ?? []).map((note: string, idx: number) => (
             <li key={idx}>{note}</li>
           ))}
         </ul>
@@ -353,13 +374,13 @@ export default function Page() {
                 </td>
                 <td className="py-1 px-4">{item.word}</td>
                 <td className="py-1 px-4 font-mono">
-                  {item.primaryPath.voicePath}
+                  {item.primaryPath?.voicePath ?? "—"}
                 </td>
                 <td className="py-1 px-4 font-mono">
-                  {item.primaryPath.levelPath}
+                  {item.primaryPath?.levelPath ?? "—"}
                 </td>
                 <td className="py-1 pl-4 font-mono">
-                  {item.primaryPath.ringPath}
+                  {item.primaryPath?.ringPath ?? "—"}
                 </td>
               </tr>
             ))}
