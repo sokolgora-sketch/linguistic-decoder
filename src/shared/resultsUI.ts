@@ -44,4 +44,17 @@ export interface AnalyzeWordResultUI {
 
   // NEW – summary used by the Engine meta card
   meta?: EngineMetaSummary;
+
+  // Debug / legacy fields used only by the main page
+  raw?: unknown;
+
+  // Original engine meta object (still present in the response)
+  engineMeta?: {
+    version?: string | null;
+    created?: string | null;
+  };
+
+  // Top-level mode / alphabet (for the Engine meta card + debug)
+  mode?: string;
+  alphabet?: string;
 }
