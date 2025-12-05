@@ -35,6 +35,8 @@ export default function Page() {
   const [alphabet, setAlphabet] = useState<"auto" | "latin" | "albanian">(
     "auto"
   );
+  const analysis = result?.analysis as any | undefined;
+  const mind = analysis?.mind;
 
   async function handleAnalyze(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -85,17 +87,15 @@ export default function Page() {
       const data = (await response.json()) as AnalyzeWordResultUI;
       
       setResult(data);
-      setHistory((prev) =>
-        [
-          {
-            word: data.word,
-            voicePath: data.primaryPath?.voicePath ?? "—",
-            levelPath: data.primaryPath?.levelPath ?? "—",
-            ringPath: data.primaryPath?.ringPath ?? "—",
-          },
-          ...prev,
-        ].slice(0, 10)
-      );
+      setHistory((prev) => [
+        {
+          word: data.word,
+          voicePath: data.primaryPath?.voicePath ?? "—",
+          levelPath: data.primaryPath?.levelPath ?? "—",
+          ringPath: data.primaryPath?.ringPath ?? "—",
+        },
+        ...prev,
+      ].slice(0, 10));
 
     } catch (err: any) {
       console.error("Error while analyzing word:", err);
@@ -150,8 +150,6 @@ export default function Page() {
     }
   };
   
-  const symbolic = result?.symbolic ?? null;
-
   return (
     <div className="min-h-screen bg-background text-foreground p-4 lg:p-8 flex flex-col items-stretch">
       <main className="max-w-5xl mx-auto w-full space-y-8 flex-1">
@@ -358,7 +356,7 @@ export default function Page() {
 
                 {result.symbolic.notes && result.symbolic.notes.length > 0 && (
                   <ul className="list-disc list-inside text-sm">
-                    {result.symbolic.notes.map((note:any, idx:number) => (
+                    {result.symbolic.notes.map((note: any, idx: number) => (
                       <li key={idx}>{note}</li>
                     ))}
                   </ul>
@@ -492,5 +490,3 @@ export default function Page() {
     </div>
   );
 }
-
-    

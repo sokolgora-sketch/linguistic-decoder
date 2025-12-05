@@ -42,8 +42,8 @@ interface WordMatrixCardProps {
   matrix: WordMatrix | null | undefined;
 }
 
-function normalizeNotes(notes?: string | string[]) {
-  if (!notes) return undefined;
+function normalizeNotes(notes?: string | string[]): string {
+  if (!notes) return "—";
   if (Array.isArray(notes)) return notes.join(" ");
   return notes;
 }
@@ -65,34 +65,32 @@ export function WordMatrixCard({ matrix }: WordMatrixCardProps) {
     );
   }
 
+  const { word, primary, canon, deepRoot } = matrix;
+
   return (
     <Card>
       <CardHeader>
         <CardTitle>Word matrix (proto-root view)</CardTitle>
-        <CardDescription>Proto-root mapping for {matrix.word}.</CardDescription>
+        <CardDescription>Proto-root mapping for {word}.</CardDescription>
       </CardHeader>
       <CardContent>
-        {!matrix ? (
-          <p className="text-sm text-muted-foreground">
-            No matrix attached yet. (Result has no proto-root mapping yet.)
-          </p>
-        ) : (
-          <div className="space-y-6 text-sm">
-            {/* Heart layer */}
+        <div className="space-y-6 text-sm">
+          {primary && (
             <section>
               <div className="mb-1 font-semibold uppercase tracking-wide text-xs text-muted-foreground">
                 HEART LAYER
               </div>
               <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,2fr)_minmax(0,2fr)] gap-4 rounded-md border border-border/60 px-4 py-3">
                 <div className="font-medium">Primary path</div>
-                <div className="font-mono">{matrix.primary.voicePath}</div>
+                <div className="font-mono">{primary.voicePath}</div>
                 <div className="text-muted-foreground">
-                  {matrix.primary.notes ?? "Placeholder note"}
+                  {normalizeNotes(primary.notes)}
                 </div>
               </div>
             </section>
+          )}
 
-            {/* Canon layer */}
+          {canon && canon.length > 0 && (
             <section>
               <div className="mb-1 font-semibold uppercase tracking-wide text-xs text-muted-foreground">
                 CANON LAYER
@@ -108,13 +106,13 @@ export function WordMatrixCard({ matrix }: WordMatrixCardProps) {
                     </tr>
                   </thead>
                   <tbody>
-                    {matrix.canon.map((row, idx) => (
+                    {canon.map((row, idx) => (
                       <tr key={idx} className="border-t border-border/40">
                         <td className="px-4 py-2">{row.language}</td>
                         <td className="px-4 py-2 font-mono">{row.form}</td>
                         <td className="px-4 py-2 font-mono">{row.voicePath}</td>
                         <td className="px-4 py-2 text-muted-foreground">
-                          {row.notes ?? "—"}
+                          {normalizeNotes(row.notes)}
                         </td>
                       </tr>
                     ))}
@@ -122,21 +120,20 @@ export function WordMatrixCard({ matrix }: WordMatrixCardProps) {
                 </table>
               </div>
             </section>
+          )}
 
-            {/* DeepRoot (experimental) */}
-            {matrix.deepRoot && (
-              <section>
-                <div className="mb-1 font-semibold uppercase tracking-wide text-xs text-muted-foreground">
-                  DEEPROOT (EXPERIMENTAL)
-                </div>
-                <div className="rounded-md border border-dashed border-border/60 px-4 py-3 text-muted-foreground">
-                  {matrix.deepRoot.notes ??
-                    "Experimental proto-root suggestions (DeepRoot v1, UI-only)."}
-                </div>
-              </section>
-            )}
-          </div>
-        )}
+          {deepRoot && (
+            <section>
+              <div className="mb-1 font-semibold uppercase tracking-wide text-xs text-muted-foreground">
+                DEEPROOT (EXPERIMENTAL)
+              </div>
+              <div className="rounded-md border border-dashed border-border/60 px-4 py-3 text-muted-foreground">
+                {normalizeNotes(deepRoot.notes) ||
+                  "Experimental proto-root suggestions (DeepRoot v1, UI-only)."}
+              </div>
+            </section>
+          )}
+        </div>
       </CardContent>
     </Card>
   );
