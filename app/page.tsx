@@ -57,6 +57,15 @@ export default function Page() {
   const [mode, setMode] = useState<"strict" | "explore">("strict");
   const [alphabet, setAlphabet] = useState<"auto" | "latin" | "albanian">("auto");
 
+  // --- Engine meta helpers (loose typing for debug fields) ---
+  const meta = result?.meta as any | undefined;
+  const analysis = result?.analysis as any | undefined;
+  const mind = analysis?.mind;
+  const cache =
+    meta?.cache as
+      | { hit?: string; elapsedMs?: number; source?: string }
+      | undefined;
+
   async function handleAnalyze(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
@@ -256,7 +265,7 @@ export default function Page() {
         )}
 
         {result && (
-          <WordMatrixCard matrix={result.wordMatrix ?? null} />
+          <WordMatrixCard matrix={(result as any).wordMatrix ?? null} />
         )}
 
         {/* Recent history (session only) */}
