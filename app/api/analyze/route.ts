@@ -33,23 +33,20 @@ export async function POST(req: Request) {
         ringPath: cand.ringPath ?? "—",
       })),
 
-      engineMeta: (() => {
-        const e = analyzed.meta ?? {};
-        return {
-          version: e.engineVersion ?? "—",
-          created: e.createdAt ?? "—",
-        };
-      })(),
+      meta: {
+        version: analyzed.meta?.engineVersion ?? "—",
+        created: analyzed.meta?.createdAt ?? "—",
+      },
 
-      wordMatrix: analyzed.wordMatrix,      // already built on the server
-      raw: analyzed,                       // full debug JSON for the bottom card
+      wordMatrix: analyzed.wordMatrix,
+      raw: analyzed,
     };
 
     return NextResponse.json(uiResult);
   } catch (err: any) {
     console.error("Analyze route error:", err);
     return NextResponse.json(
-      { error: err?.message ?? "Server error" },
+      { error: err.message || "Server error" },
       { status: 500 },
     );
   }

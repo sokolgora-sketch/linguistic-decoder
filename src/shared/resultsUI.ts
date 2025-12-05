@@ -1,0 +1,47 @@
+// src/shared/resultsUI.ts
+
+import type { EngineMetaSummary } from "./engineMetaSummary";
+
+export interface PrimaryPathSummary {
+  voicePath: string;
+  levelPath: string;
+  ringPath: string;
+}
+
+export interface FrontierCandidateSummary {
+  id: string;
+  voicePath: string;
+  levelPath: string;
+  ringPath: string;
+}
+
+// Placeholder - to be defined more fully later
+export interface CanonLanguageFamilySummary {
+  language: string;
+  form: string;
+  gloss: string;
+}
+
+// Placeholder - to be defined more fully later
+export interface HistoryItem {
+  word: string;
+  voicePath: string;
+  levelPath: string;
+  ringPath: string;
+}
+
+/**
+ * Defines the clean, UI-first result shape that the
+ * /api/analyze endpoint should return.
+ */
+export interface AnalyzeWordResultUI {
+  word: string;
+  sanitized: string;
+  primaryPath: PrimaryPathSummary | null;
+  frontier: FrontierCandidateSummary[];
+  languageFamilies: CanonLanguageFamilySummary[];
+  history: HistoryItem[];
+
+  // NEW – summary used by the Engine meta card
+  meta?: EngineMetaSummary;
+}

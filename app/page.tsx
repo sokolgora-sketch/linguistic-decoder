@@ -10,45 +10,11 @@ import {
   CardDescription,
   CardContent,
 } from "@/components/ui/card";
-import { WordMatrixCard } from "@/components/WordMatrix";
-
-// --- Types for the new UI-friendly API response ---
-
-type PrimaryPathSummary = {
-  voicePath: string;
-  levelPath: string;
-  ringPath: string;
-};
-
-type EngineMetaSummary = {
-  version: string;
-  created: string;
-};
-
-type AnalyzeWordResultUI = {
-  word: string;
-  mode: "strict" | "explore";
-  alphabet: "auto" | "latin" | "albanian";
-  primaryPath: PrimaryPathSummary | null;
-  frontier: {
-    id: string;
-    voicePath: string;
-    levelPath: string;
-    ringPath: string;
-  }[];
-  engineMeta: EngineMetaSummary;
-  wordMatrix?: any;
-  raw: any;
-  analysis?: any;
-  symbolic?: any;
-};
-
-type HistoryItem = {
-  word: string;
-  voicePath: string;
-  levelPath: string;
-  ringPath: string;
-};
+import { WordMatrixCard, type WordMatrix } from "@/components/WordMatrix";
+import type {
+  AnalyzeWordResultUI,
+  HistoryItem,
+} from "@/shared/resultsUI";
 
 export default function Page() {
   const [word, setWord] = useState("");
@@ -57,12 +23,14 @@ export default function Page() {
   const [result, setResult] = useState<AnalyzeWordResultUI | null>(null);
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [mode, setMode] = useState<"strict" | "explore">("strict");
-  const [alphabet, setAlphabet] = useState<"auto" | "latin" | "albanian">("auto");
+  const [alphabet, setAlphabet] = useState<"auto" | "latin" | "albanian">(
+    "auto"
+  );
 
   // --- Engine meta helpers (loose typing for debug fields) ---
-  const meta = result?.meta as any | undefined;
-  const analysis = result?.analysis as any | undefined;
+  const analysis = result?.raw as any | undefined;
   const mind = analysis?.mind;
+  const meta = result?.meta as any | undefined;
   const cache =
     meta?.cache as
       | { hit?: string; elapsedMs?: number; source?: string }
@@ -160,7 +128,9 @@ export default function Page() {
                 <label className="text-sm opacity-80 mr-2">Mode:</label>
                 <select
                   value={mode}
-                  onChange={(e) => setMode(e.target.value as "strict" | "explore")}
+                  onChange={(e) =>
+                    setMode(e.target.value as "strict" | "explore")
+                  }
                   className="bg-background border border-border/50 rounded-md px-2 py-1"
                 >
                   <option value="strict">strict</option>
@@ -171,7 +141,11 @@ export default function Page() {
                 <label className="text-sm opacity-80 mr-2">Alphabet:</label>
                 <select
                   value={alphabet}
-                  onChange={(e) => setAlphabet(e.target.value as "auto" | "latin" | "albanian")}
+                  onChange={(e) =>
+                    setAlphabet(
+                      e.target.value as "auto" | "latin" | "albanian"
+                    )
+                  }
                   className="bg-background border border-border/50 rounded-md px-2 py-1"
                 >
                   <option value="auto">auto</option>
@@ -233,7 +207,8 @@ export default function Page() {
             <CardHeader>
               <CardTitle>Frontier candidates</CardTitle>
               <CardDescription>
-                Alternate legal paths the Mind can explore inside the same rules.
+                Alternate legal paths the Mind can explore inside the same
+                rules.
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -267,7 +242,7 @@ export default function Page() {
             </CardContent>
           </Card>
         )}
-        
+
         {result && (
           <WordMatrixCard matrix={(result as any).wordMatrix ?? null} />
         )}
@@ -340,9 +315,15 @@ export default function Page() {
                           {idx + 1}
                         </td>
                         <td className="py-1 px-4">{item.word}</td>
-                        <td className="py-1 px-4 font-mono">{item.voicePath}</td>
-                        <td className="py-1 px-4 font-mono">{item.levelPath}</td>
-                        <td className="py-1 pl-4 font-mono">{item.ringPath}</td>
+                        <td className="py-1 px-4 font-mono">
+                          {item.voicePath}
+                        </td>
+                        <td className="py-1 px-4 font-mono">
+                          {item.levelPath}
+                        </td>
+                        <td className="py-1 pl-4 font-mono">
+                          {item.ringPath}
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -352,57 +333,57 @@ export default function Page() {
           </Card>
         )}
 
-      {/* Engine meta */}
-      {result && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Engine meta</CardTitle>
-            <CardDescription>
-              Debug info for this analysis run.
-            </CardDescription>
-          </CardHeader>
+        {/* Engine meta */}
+        {result && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Engine meta</CardTitle>
+              <CardDescription>
+                Debug info for this analysis run.
+              </CardDescription>
+            </CardHeader>
 
-          <CardContent className="grid gap-4 md:grid-cols-3 text-sm text-muted-foreground">
-            {/* Engine version / timestamp */}
-            <div>
-              <div className="font-medium text-primary-foreground/80">
-                Engine
-              </div>
-              <div className="mt-1 space-y-1">
-                <div>
-                  version{" "}
-                  <span className="font-mono">
-                    {result.engineMeta?.version ?? "—"}
-                  </span>
+            <CardContent className="grid gap-4 md:grid-cols-3 text-sm text-muted-foreground">
+              {/* Engine version / timestamp */}
+              <div>
+                <div className="font-medium text-primary-foreground/80">
+                  Engine
                 </div>
-                <div>
-                  created{" "}
-                  <span className="font-mono">
-                    {result.engineMeta?.created
-                      ? new Date(result.engineMeta.created).toLocaleString()
-                      : "—"}
-                  </span>
+                <div className="mt-1 space-y-1">
+                  <div>
+                    version{" "}
+                    <span className="font-mono">
+                      {result.engineMeta?.version ?? "—"}
+                    </span>
+                  </div>
+                  <div>
+                    created{" "}
+                    <span className="font-mono">
+                      {result.engineMeta?.created
+                        ? new Date(result.engineMeta.created).toLocaleString()
+                        : "—"}
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* Mode + alphabet */}
-            <div>
-              <div className="font-medium text-primary-foreground/80">
-                Mode
-              </div>
-              <div className="mt-1 space-y-1">
-                <div>
-                  mode <span className="font-mono">{result.mode}</span>
+              {/* Mode + alphabet */}
+              <div>
+                <div className="font-medium text-primary-foreground/80">
+                  Mode
                 </div>
-                <div>
-                  alphabet <span className="font-mono">{result.alphabet}</span>
+                <div className="mt-1 space-y-1">
+                  <div>
+                    mode <span className="font-mono">{result.mode}</span>
+                  </div>
+                  <div>
+                    alphabet <span className="font-mono">{result.alphabet}</span>
+                  </div>
                 </div>
               </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+            </CardContent>
+          </Card>
+        )}
 
         {/* Raw JSON (debug) */}
         {result?.raw && (
