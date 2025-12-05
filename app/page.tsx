@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState } from "react";
@@ -10,11 +11,8 @@ import {
   CardDescription,
   CardContent,
 } from "@/components/ui/card";
-import { WordMatrixCard, type WordMatrix } from "@/components/WordMatrix";
-import type {
-  AnalyzeWordResultUI,
-  HistoryItem,
-} from "@/shared/resultsUI";
+import { WordMatrixCard } from "@/components/WordMatrix";
+import type { AnalyzeWordResultUI, HistoryItem } from "@/shared/resultsUI";
 
 export default function Page() {
   const [word, setWord] = useState("");
@@ -34,30 +32,6 @@ export default function Page() {
     result?.meta as
       | { hit?: string; elapsedMs?: number; source?: string }
       | undefined;
-
-  // Simple symbolic summary derived from raw JSON
-  const symbolicSummary = (() => {
-    if (!result?.raw) return null;
-    const raw: any = result.raw;
-
-    const core = raw?.symbolicCore;
-    const primary = Array.isArray(raw?.candidates) ? raw.candidates[0] : null;
-
-    const tags =
-      primary && Array.isArray(primary.symbolic)
-        ? primary.symbolic.map((s: any) => s.tag).join(", ")
-        : null;
-
-    const note =
-      primary && Array.isArray(primary.symbolic) && primary.symbolic[0]?.note
-        ? primary.symbolic[0].note
-        : Array.isArray(core?.notes) && core.notes[0]
-        ? core.notes[0]
-        : null;
-
-    if (!tags && !note) return null;
-    return { tags, note };
-  })();
 
   async function handleAnalyze(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -303,34 +277,43 @@ export default function Page() {
           <CardHeader>
             <CardTitle>Symbolic reading (experimental)</CardTitle>
             <CardDescription>
-              High-level reading of this word's path. Sketch, not doctrine.
+              High-level reading of this word&apos;s path. Sketch, not doctrine.
             </CardDescription>
           </CardHeader>
-          <CardContent className="text-sm space-y-2">
-            {mind ? (
-              <>
-                <p className="font-medium">
-                  {mind.logicStatement || "Symbolic reading coming soon."}
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  Dominant principle:{" "}
-                  <span className="font-medium">
-                    {mind.dominantPrinciple || "—"}
-                  </span>{" "}
-                  · Polarity:{" "}
-                  <span className="font-medium">
-                    {mind.polarity || "—"}
-                  </span>{" "}
-                  · Pattern:{" "}
-                  <span className="font-medium">
-                    {mind.patternName || "—"}
-                  </span>
-                </p>
-              </>
-            ) : (
-              <p className="text-muted-foreground italic">
+          <CardContent>
+            {!result && (
+              <p className="text-sm text-muted-foreground">
                 Run a word to see a symbolic reading.
               </p>
+            )}
+
+            {result && !result.symbolic && (
+              <p className="text-sm text-muted-foreground">
+                No symbolic reading available for this word yet.
+              </p>
+            )}
+
+            {result?.symbolic && (
+              <div className="space-y-2">
+                <div className="text-xs text-muted-foreground">
+                  Sketch from the Seven-Voices core. Experimental, not doctrine.
+                </div>
+
+                <div>
+                  <span className="font-semibold">Label: </span>
+                  <span className="font-mono text-xs uppercase tracking-wide">
+                    {result.symbolic.label}
+                  </span>
+                </div>
+
+                {result.symbolic.notes && result.symbolic.notes.length > 0 && (
+                  <ul className="list-disc list-inside text-sm">
+                    {result.symbolic.notes.map((note, idx) => (
+                      <li key={idx}>{note}</li>
+                    ))}
+                  </ul>
+                )}
+              </div>
             )}
           </CardContent>
         </Card>
@@ -459,3 +442,5 @@ export default function Page() {
     </div>
   );
 }
+
+    
