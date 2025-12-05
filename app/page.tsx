@@ -36,21 +36,43 @@ export default function Page() {
       | { hit?: string; elapsedMs?: number; source?: string }
       | undefined;
 
+  // Simple symbolic summary derived from raw JSON
+  const symbolicSummary = (() => {
+    if (!result?.raw) return null;
+    const raw: any = result.raw;
+
+    const core = raw?.symbolicCore;
+    const primary = Array.isArray(raw?.candidates) ? raw.candidates[0] : null;
+
+    const tags =
+      primary && Array.isArray(primary.symbolic)
+        ? primary.symbolic.map((s: any) => s.tag).join(", ")
+        : null;
+
+    const note =
+      primary && Array.isArray(primary.symbolic) && primary.symbolic[0]?.note
+        ? primary.symbolic[0].note
+        : Array.isArray(core?.notes) && core.notes[0]
+        ? core.notes[0]
+        : null;
+
+    if (!tags && !note) return null;
+    return { tags, note };
+  })();
+
   async function handleAnalyze(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
     const trimmed = word.trim();
     if (!trimmed) return;
 
-    setError(null);
     setLoading(true);
+    setError(null);
 
     try {
       const response = await fetch("/api/analyze", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           word: trimmed,
           mode,
@@ -59,26 +81,51 @@ export default function Page() {
       });
 
       if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
+        // Try to read any error text from the API, fall back to a generic message
+        let message = `Server error (HTTP ${response.status})`;
+
+        try {
+          const text = await response.text();
+          if (text) {
+            // if API returns JSON { error: "msg" }, show that
+            try {
+              const parsed = JSON.parse(text);
+              if (parsed?.error) {
+                message = parsed.error as string;
+              } else {
+                message = text;
+              }
+            } catch {
+              message = text;
+            }
+          }
+        } catch {
+          // ignore, keep default message
+        }
+
+        console.error("Analyze request failed:", response.status, message);
+        setError(message);
+        return; // <-- IMPORTANT: no throw, just stop here
       }
 
       const data = (await response.json()) as AnalyzeWordResultUI;
 
       setResult(data);
-      setHistory((prev) =>
-        [
-          {
-            word: data.word,
-            voicePath: data.primaryPath?.voicePath ?? "—",
-            levelPath: data.primaryPath?.levelPath ?? "—",
-            ringPath: data.primaryPath?.ringPath ?? "—",
-          },
-          ...prev,
-        ].slice(0, 10)
-      );
+
+      setHistory((prev) => {
+        const filtered = prev.filter((item) => item.word !== data.word);
+        return [
+          { word: data.word, primaryPath: data.primaryPath },
+          ...filtered,
+        ].slice(0, 10);
+      });
     } catch (err: any) {
-      console.error(err);
-      setError(err?.message || "Something went wrong.");
+      console.error("Error while analyzing word:", err);
+      const message =
+        typeof err?.message === "string"
+          ? err.message
+          : "Something went wrong while analyzing the word.";
+      setError(message);
     } finally {
       setLoading(false);
     }
@@ -255,29 +302,23 @@ export default function Page() {
               High-level reading of this word's path. Sketch, not doctrine.
             </CardDescription>
           </CardHeader>
-          <CardContent className="text-sm space-y-2">
-            {mind ? (
-              <>
-                <p className="font-medium">
-                  {mind.logicStatement || "Symbolic reading coming soon."}
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  Dominant principle:{" "}
-                  <span className="font-medium">
-                    {mind.dominantPrinciple || "—"}
-                  </span>{" "}
-                  · Polarity:{" "}
-                  <span className="font-medium">
-                    {mind.polarity || "—"}
-                  </span>{" "}
-                  · Pattern:{" "}
-                  <span className="font-medium">
-                    {mind.patternName || "—"}
-                  </span>
-                </p>
-              </>
+          <CardContent>
+            {symbolicSummary ? (
+              <div className="space-y-2 text-sm">
+                {symbolicSummary.tags && (
+                  <div>
+                    <span className="font-semibold">Tags: </span>
+                    <span className="font-mono text-xs uppercase tracking-wide">
+                      {symbolicSummary.tags}
+                    </span>
+                  </div>
+                )}
+                {symbolicSummary.note && (
+                  <p className="text-muted-foreground">{symbolicSummary.note}</p>
+                )}
+              </div>
             ) : (
-              <p className="text-muted-foreground italic">
+              <p className="text-sm text-muted-foreground">
                 Run a word to see a symbolic reading.
               </p>
             )}

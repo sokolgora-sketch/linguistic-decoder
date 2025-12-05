@@ -135,8 +135,21 @@ function polarityOf(v: Vowel): "male" | "female" | "neutral" {
  */
 export function computeGenderFlow(summary: SevenVoicesSummary): GenderFlow {
   const path = summary.voicePath || [];
-  if (path.length <= 1) {
-    const p = path[0];
+  let pathArray: Vowel[];
+
+  if (Array.isArray(path)) {
+    pathArray = path;
+  } else if (typeof path === 'string') {
+    // handle both "UI" and "U → I" style strings
+    const cleaned = path.replace(/\s*→\s*/g, '').trim();
+    pathArray = Array.from(cleaned) as Vowel[];
+  } else {
+    // fallback – no path, avoid crashing
+    pathArray = [];
+  }
+
+  if (pathArray.length <= 1) {
+    const p = pathArray[0];
     return {
       direction: "flat",
       polarities: p ? [polarityOf(p)] : [],
@@ -147,9 +160,9 @@ export function computeGenderFlow(summary: SevenVoicesSummary): GenderFlow {
   let outward = 0;
   let inward = 0;
 
-  for (let i = 0; i < path.length - 1; i++) {
-    const r1 = ringOf(path[i]);
-    const r2 = ringOf(path[i + 1]);
+  for (let i = 0; i < pathArray.length - 1; i++) {
+    const r1 = ringOf(pathArray[i]);
+    const r2 = ringOf(pathArray[i + 1]);
     if (r2 > r1) outward++;
     else if (r2 < r1) inward++;
   }
@@ -160,7 +173,7 @@ export function computeGenderFlow(summary: SevenVoicesSummary): GenderFlow {
   else if (inward > 0 && outward === 0) direction = "inward";
   else direction = "mixed";
 
-  const polarities = Array.from(new Set(path.map(polarityOf)));
+  const polarities = Array.from(new Set(pathArray.map(polarityOf)));
 
   return {
     direction,
