@@ -1,25 +1,56 @@
 import { NextResponse } from "next/server";
 import { analyzeWord } from "@/engine/analyzeWord";
-import { enginePayloadToAnalysisResult } from "@/shared/analysisAdapter";
 
 export async function POST(req: Request) {
   try {
-    const { word, mode, alphabet } = await req.json();
+    const { word, mode } = await req.json();
 
     if (!word || typeof word !== "string") {
-      return NextResponse.json({ error: "Missing 'word' parameter" }, { status: 400 });
+      return NextResponse.json({ error: "Missing 'word' param" }, { status: 400 });
     }
 
-    // Run the engine
-    const payload = await analyzeWord(word.trim(), { mode, alphabet });
+    const analyzed = analyzeWord(word.trim(), mode ?? 'strict');
 
-    // Convert to full analysis result (adds wordMatrix, deepRoot, etc.)
-    const result = enginePayloadToAnalysisResult(payload);
+    const primary = analyzed.primaryPath ?? null;
 
-    // ✅ Return final shaped result
-    return NextResponse.json(result);
+    const uiResult = {
+      word: analyzed.word ?? word.trim(),
+      mode: analyzed.meta.mode,
+      alphabet: analyzed.meta.alphabet,
+
+      primaryPath: primary
+        ? {
+            voicePath: primary.voicePath ?? "—",
+            levelPath: primary.levelPath ?? "—",
+            ringPath: primary.ringPath ?? "—",
+          }
+        : null,
+
+      frontier: (analyzed.frontier ?? []).map((cand: any) => ({
+        id: cand.id,
+        voicePath: cand.voicePath ?? "—",
+        levelPath: cand.levelPath ?? "—",
+        ringPath: cand.ringPath ?? "—",
+      })),
+
+      engineMeta: (() => {
+        const e = analyzed.meta ?? {};
+        return {
+          version: e.engineVersion ?? "—",
+          created: e.createdAt ?? "—",
+        };
+      })(),
+
+      wordMatrix: analyzed.wordMatrix,      // already built on the server
+      raw: analyzed,                       // full debug JSON for the bottom card
+    };
+
+    return NextResponse.json(uiResult);
   } catch (err: any) {
     console.error("Analyze route error:", err);
-    return NextResponse.json({ error: err.message || "Server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: err?.message ?? "Server error" },
+      { status: 500 },
+    );
   }
 }
