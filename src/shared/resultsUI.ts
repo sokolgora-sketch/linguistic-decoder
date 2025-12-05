@@ -51,6 +51,11 @@ export interface WordMatrixUI {
   };
 }
 
+export interface SymbolicSummaryUI {
+  label?: string;
+  notes?: string[];
+}
+
 /**
  * Defines the clean, UI-first result shape that the
  * /api/analyze endpoint should return.
@@ -65,6 +70,9 @@ export interface AnalyzeWordResultUI {
 
   // NEW – summary used by the Engine meta card
   meta?: EngineMetaSummary;
+
+  // NEW
+  symbolic?: SymbolicSummaryUI | null;
 
   // Debug / legacy fields used only by the main page
   raw?: unknown;
