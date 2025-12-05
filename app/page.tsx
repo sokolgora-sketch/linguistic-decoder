@@ -12,6 +12,7 @@ import {
   CardContent,
 } from "@/components/ui/card";
 import type { AnalyzeWordResultV1 } from "@/shared/resultShape.v1";
+import { WordMatrixCard } from "@/components/WordMatrix";
 
 export default function Page() {
   const [word, setWord] = useState("");
@@ -287,26 +288,9 @@ export default function Page() {
   </CardContent>
 </Card>
 
-{/* WORD MATRIX CARD */}
-<Card>
-  <CardHeader>
-    <CardTitle>Word matrix (proto-root view)</CardTitle>
-    <CardDescription>
-      Shows proto-root mapping if present.
-    </CardDescription>
-  </CardHeader>
-  <CardContent className="text-sm">
-    {(result as any)?.wordMatrix ? (
-      <pre className="text-xs bg-slate-950 p-2 rounded-md overflow-x-auto">
-        {JSON.stringify((result as any).wordMatrix, null, 2)}
-      </pre>
-    ) : (
-      <p className="text-slate-400 italic">
-        No matrix attached yet. (Result has no <code>wordMatrix</code> field.)
-      </p>
-    )}
-  </CardContent>
-</Card>
+{result && (
+  <WordMatrixCard matrix={(result as any).wordMatrix ?? null} />
+)}
 
 <Card>
   <CardHeader>
@@ -485,7 +469,7 @@ export default function Page() {
                 Full JSON from{" "}
                 <code className="font-mono text-xs">/api/analyze</code>.
               </CardDescription>
-            </CardHeader>
+            </Header>
             <CardContent>
               <div className="rounded-md border border-border/60 bg-muted/5 max-h-80 overflow-auto">
                 <pre className="text-xs font-.mono p-4 whitespace-pre">
