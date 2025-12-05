@@ -47,8 +47,8 @@ export default function Page() {
         },
         body: JSON.stringify({
           word: trimmed,
-          mode,      // from your Mode select
-          alphabet,  // from your Alphabet select
+          mode,
+          alphabet,
         }),
       });
   
@@ -469,10 +469,10 @@ export default function Page() {
                 Full JSON from{" "}
                 <code className="font-mono text-xs">/api/analyze</code>.
               </CardDescription>
-            </Header>
+            </CardHeader>
             <CardContent>
               <div className="rounded-md border border-border/60 bg-muted/5 max-h-80 overflow-auto">
-                <pre className="text-xs font-.mono p-4 whitespace-pre">
+                <pre className="text-xs font-mono p-4 whitespace-pre">
                   {JSON.stringify(result, null, 2)}
                 </pre>
               </div>
@@ -483,3 +483,5 @@ export default function Page() {
     </div>
   );
 }
+
+    
