@@ -28,11 +28,10 @@ export default function Page() {
   );
 
   // --- Engine meta helpers (loose typing for debug fields) ---
-  const analysis = result?.raw as any | undefined;
+  const analysis = result?.analysis as any | undefined;
   const mind = analysis?.mind;
-  const meta = result?.meta as any | undefined;
   const cache =
-    meta?.cache as
+    result?.meta as
       | { hit?: string; elapsedMs?: number; source?: string }
       | undefined;
 
@@ -115,7 +114,12 @@ export default function Page() {
       setHistory((prev) => {
         const filtered = prev.filter((item) => item.word !== data.word);
         return [
-          { word: data.word, primaryPath: data.primaryPath },
+          {
+            word: data.word,
+            voicePath: data.primaryPath?.voicePath ?? "—",
+            levelPath: data.primaryPath?.levelPath ?? "—",
+            ringPath: data.primaryPath?.ringPath ?? "—",
+          },
           ...filtered,
         ].slice(0, 10);
       });
@@ -289,7 +293,7 @@ export default function Page() {
             </CardContent>
           </Card>
         )}
-
+        
         {result && (
           <WordMatrixCard matrix={(result as any).wordMatrix ?? null} />
         )}
@@ -302,23 +306,29 @@ export default function Page() {
               High-level reading of this word's path. Sketch, not doctrine.
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            {symbolicSummary ? (
-              <div className="space-y-2 text-sm">
-                {symbolicSummary.tags && (
-                  <div>
-                    <span className="font-semibold">Tags: </span>
-                    <span className="font-mono text-xs uppercase tracking-wide">
-                      {symbolicSummary.tags}
-                    </span>
-                  </div>
-                )}
-                {symbolicSummary.note && (
-                  <p className="text-muted-foreground">{symbolicSummary.note}</p>
-                )}
-              </div>
+          <CardContent className="text-sm space-y-2">
+            {mind ? (
+              <>
+                <p className="font-medium">
+                  {mind.logicStatement || "Symbolic reading coming soon."}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Dominant principle:{" "}
+                  <span className="font-medium">
+                    {mind.dominantPrinciple || "—"}
+                  </span>{" "}
+                  · Polarity:{" "}
+                  <span className="font-medium">
+                    {mind.polarity || "—"}
+                  </span>{" "}
+                  · Pattern:{" "}
+                  <span className="font-medium">
+                    {mind.patternName || "—"}
+                  </span>
+                </p>
+              </>
             ) : (
-              <p className="text-sm text-muted-foreground">
+              <p className="text-muted-foreground italic">
                 Run a word to see a symbolic reading.
               </p>
             )}
@@ -357,13 +367,13 @@ export default function Page() {
                         </td>
                         <td className="py-1 px-4">{item.word}</td>
                         <td className="py-1 px-4 font-mono">
-                          {item.voicePath}
+                          {item.voicePath ?? "—"}
                         </td>
                         <td className="py-1 px-4 font-mono">
-                          {item.levelPath}
+                          {item.levelPath ?? "—"}
                         </td>
                         <td className="py-1 pl-4 font-mono">
-                          {item.ringPath}
+                          {item.ringPath ?? "—"}
                         </td>
                       </tr>
                     ))}
@@ -394,14 +404,14 @@ export default function Page() {
                   <div>
                     version{" "}
                     <span className="font-mono">
-                      {result.engineMeta?.version ?? "—"}
+                      {result.meta?.version ?? "—"}
                     </span>
                   </div>
                   <div>
                     created{" "}
                     <span className="font-mono">
-                      {result.engineMeta?.created
-                        ? new Date(result.engineMeta.created).toLocaleString()
+                      {result.meta?.created
+                        ? new Date(result.meta.created).toLocaleString()
                         : "—"}
                     </span>
                   </div>
