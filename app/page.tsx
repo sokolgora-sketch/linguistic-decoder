@@ -32,13 +32,13 @@ export default function Page() {
 
   async function handleAnalyze(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-  
+
     const trimmed = word.trim();
     if (!trimmed) return;
-  
+
     setError(null);
     setLoading(true);
-  
+
     try {
       const response = await fetch("/api/analyze", {
         method: "POST",
@@ -51,21 +51,23 @@ export default function Page() {
           alphabet,
         }),
       });
-  
+
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}`);
       }
-  
+
       const json = (await response.json()) as AnalyzeWordResultV1;
-  
+
       setResult(json);
-      setHistory((prev) => [
-        { word: trimmed, ...json },
-        ...prev,
-      ].slice(0, 10));
+      setHistory((prev) =>
+        [
+          { word: trimmed, ...json },
+          ...prev,
+        ].slice(0, 10)
+      );
     } catch (err: any) {
       console.error(err);
-      setError(err.message || "Something went wrong.");
+      setError(err?.message || "Something went wrong.");
     } finally {
       setLoading(false);
     }
@@ -288,9 +290,26 @@ export default function Page() {
   </CardContent>
 </Card>
 
-{result && (
-  <WordMatrixCard matrix={(result as any).wordMatrix ?? null} />
-)}
+{/* WORD MATRIX CARD */}
+<Card>
+  <CardHeader>
+    <CardTitle>Word matrix (proto-root view)</CardTitle>
+    <CardDescription>
+      Shows proto-root mapping if present.
+    </CardDescription>
+  </CardHeader>
+  <CardContent className="text-sm">
+    {result?.wordMatrix ? (
+      <pre className="text-xs bg-slate-950 p-2 rounded-md overflow-x-auto">
+        {JSON.stringify(result.wordMatrix, null, 2)}
+      </pre>
+    ) : (
+      <p className="text-slate-400 italic">
+        No matrix attached yet. (Result has no <code>wordMatrix</code> field.)
+      </p>
+    )}
+  </CardContent>
+</Card>
 
 <Card>
   <CardHeader>
@@ -483,5 +502,3 @@ export default function Page() {
     </div>
   );
 }
-
-    
