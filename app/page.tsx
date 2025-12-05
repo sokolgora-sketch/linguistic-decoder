@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState } from "react";
@@ -21,14 +20,29 @@ export default function Page() {
   const [result, setResult] = useState<AnalyzeWordResultV1 | null>(null);
   const [history, setHistory] = useState<AnalyzeWordResultV1[]>([]);
   const [mode, setMode] = useState<"strict" | "explore">("strict");
-  const [alphabet, setAlphabet] = useState<"auto" | "latin" | "albanian">("auto");
+  const [alphabet, setAlphabet] = useState<"auto" | "latin" | "albanian">(
+    "auto",
+  );
+  const [showDebug, setShowDebug] = useState(false);
 
-  // --- Engine meta helpers (loose typing for debug fields) ---
-  const meta = result?.meta as any | undefined;
-  const cache =
-    meta?.cache as
-      | { hit?: string; elapsedMs?: number; source?: string }
-      | undefined;
+  const analysis = result;
+
+  // Engine meta helpers (loose typing for debug fields)
+  const meta: any | undefined = (analysis as any)?.meta ?? (result as any)?.meta;
+  const cache:
+    | {
+        hit?: string;
+        elapsedMs?: number;
+        source?: string;
+      }
+    | undefined = meta?.cache;
+
+  function formatCreated(createdAt: any): string {
+    if (!createdAt) return "—";
+    const d = createdAt instanceof Date ? createdAt : new Date(createdAt);
+    if (Number.isNaN(d.getTime())) return "—";
+    return d.toLocaleString();
+  }
 
   async function handleAnalyze(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -115,7 +129,9 @@ export default function Page() {
                 <label className="text-sm opacity-80 mr-2">Mode:</label>
                 <select
                   value={mode}
-                  onChange={(e) => setMode(e.target.value as "strict" | "explore")}
+                  onChange={(e) =>
+                    setMode(e.target.value as "strict" | "explore")
+                  }
                   className="bg-background border border-border/50 rounded-md px-2 py-1"
                 >
                   <option value="strict">strict</option>
@@ -126,7 +142,11 @@ export default function Page() {
                 <label className="text-sm opacity-80 mr-2">Alphabet:</label>
                 <select
                   value={alphabet}
-                  onChange={(e) => setAlphabet(e.target.value as "auto" | "latin" | "albanian")}
+                  onChange={(e) =>
+                    setAlphabet(
+                      e.target.value as "auto" | "latin" | "albanian",
+                    )
+                  }
                   className="bg-background border border-border/50 rounded-md px-2 py-1"
                 >
                   <option value="auto">auto</option>
@@ -135,20 +155,18 @@ export default function Page() {
                 </select>
               </div>
             </div>
-            {error && (
-              <p className="mt-2 text-sm text-destructive">{error}</p>
-            )}
+            {error && <p className="mt-2 text-sm text-destructive">{error}</p>}
           </CardContent>
         </Card>
 
         {/* Heart summary */}
-        {result && result.primaryPath && (
+        {analysis && (
           <Card>
             <CardHeader>
               <CardTitle>Heart summary</CardTitle>
               <CardDescription>
                 Primary Seven-Voices path for{" "}
-                <span className="font-mono">{result.word}</span>.
+                <span className="font-mono">{analysis.word}</span>.
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -158,7 +176,7 @@ export default function Page() {
                     Voice path
                   </div>
                   <div className="font-medium">
-                    {result.primaryPath.voicePath}
+                    {analysis.primaryPath?.voicePath ?? "—"}
                   </div>
                 </div>
                 <div>
@@ -166,7 +184,7 @@ export default function Page() {
                     Level path
                   </div>
                   <div className="font-medium">
-                    {result.primaryPath.levelPath}
+                    {analysis.primaryPath?.levelPath ?? "—"}
                   </div>
                 </div>
                 <div>
@@ -174,7 +192,7 @@ export default function Page() {
                     Ring path
                   </div>
                   <div className="font-medium">
-                    {result.primaryPath.ringPath}
+                    {analysis.primaryPath?.ringPath ?? "—"}
                   </div>
                 </div>
               </div>
@@ -183,299 +201,306 @@ export default function Page() {
         )}
 
         {/* Frontier candidates */}
-        {result && result.frontier?.length > 0 && (
-<Card>
-  <CardHeader>
-    <CardTitle>Frontier candidates</CardTitle>
-    <CardDescription>
-      Alternate legal paths the Mind can explore inside the same rules.
-    </CardDescription>
-  </CardHeader>
-  <CardContent>
-    {!result ? (
-      <p className="text-sm text-muted-foreground">
-        Run a word to see alternate paths.
-      </p>
-    ) : (
-      <div className="overflow-x-auto">
-        <table className="w-full border-collapse text-sm">
-          <thead className="border-b border-muted/40 text-xs uppercase tracking-wide text-muted-foreground">
-            <tr>
-              <th className="py-2 pr-4 text-left w-16">Alt</th>
-              <th className="py-2 px-4 text-left">Voice path</th>
-              <th className="py-2 px-4 text-left">Level path</th>
-              <th className="py-2 pl-4 text-left">Ring path</th>
-            </tr>
-          </thead>
-          <tbody>
-            {result.frontier.map((alt, idx) => (
-              <tr
-                key={alt.id ?? `alt-${idx}`}
-                className="border-b border-muted/20 last:border-b-0"
-              >
-                <td className="py-1 pr-4 text-xs text-muted-foreground">
-                  {`alt-${idx + 1}`}
-                </td>
-                <td className="py-1 px-4 font-mono">{alt.voicePath}</td>
-                <td className="py-1 px-4 font-mono">{alt.levelPath}</td>
-                <td className="py-1 pl-4 font-mono">{alt.ringPath}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    )}
-  </CardContent>
-</Card>
-        )}
-
-<Card>
-  <CardHeader>
-    <CardTitle>Language families (canon layer)</CardTitle>
-    <CardDescription>
-      How different languages carry this Seven-Voices path.
-    </CardDescription>
-  </CardHeader>
-  <CardContent>
-    <div className="overflow-x-auto">
-      <table className="min-w-full text-sm">
-        <thead>
-          <tr className="border-b border-muted/40 text-xs uppercase tracking-wide text-muted-foreground">
-            <th className="px-4 py-2 text-left">Language</th>
-            <th className="px-4 py-2 text-left">Form</th>
-            <th className="px-4 py-2 text-left">Gloss</th>
-            <th className="px-4 py-2 text-center">Passes</th>
-            <th className="px-4 py-2 text-center">Voice path</th>
-            <th className="px-4 py-2 text-center">Level path</th>
-            <th className="px-4 py-2 text-center">Ring path</th>
-            <th className="px-4 py-2 text-left">Pivot</th>
-          </tr>
-        </thead>
-        <tbody>
-          {result?.languageFamilies?.map((fam: any) => (
-            <tr key={fam.language} className="border-b border-muted/20 last:border-0">
-              <td className="px-4 py-2 text-left">{fam.language}</td>
-              <td className="px-4 py-2 text-left font-mono text-xs">{fam.form}</td>
-              <td className="px-4 py-2 text-left text-xs text-muted-foreground">
-                {fam.gloss || "—"}
-              </td>
-              <td className="px-4 py-2 text-center">
-                {fam.passes ? (
-                  <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-xs text-emerald-400">
-                    yes
-                  </span>
-                ) : (
-                  <span className="rounded-full bg-red-500/10 px-2 py-0.5 text-xs text-red-400">
-                    no
-                  </span>
-                )}
-              </td>
-              <td className="px-4 py-2 text-center font-mono text-xs">
-                {fam.voicePath}
-              </td>
-              <td className="px-4 py-2 text-center font-mono text-xs">
-                {fam.levelPath}
-              </td>
-              <td className="px-4 py-2 text-center font-mono text-xs">
-                {fam.ringPath}
-              </td>
-              <td className="px-4 py-2 text-left font-mono text-xs">
-                {fam.morphologyMatrix?.pivot ?? "—"}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  </CardContent>
-</Card>
-
-{result && (
-  <WordMatrixCard matrix={(result as any).wordMatrix ?? null} />
-)}
-
-<Card>
-  <CardHeader>
-    <CardTitle>Symbolic reading (experimental)</CardTitle>
-    <CardDescription>
-      High-level reading of this word's path. Sketch, not doctrine.
-    </CardDescription>
-  </CardHeader>
-  <CardContent className="space-y-2">
-    {!result && (
-      <p className="text-sm text-muted-foreground">
-        Run an analysis to see the symbolic reading from the Seven-Voices engine.
-      </p>
-    )}
-
-    {result && (result as any).symbolic && (
-      <>
-        <p className="text-sm font-medium">
-          {(result as any).symbolic?.label ?? "Engine symbolic reading"}
-        </p>
-        <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
-          {((result as any).symbolic?.notes ?? []).map((note: string, idx: number) => (
-            <li key={idx}>{note}</li>
-          ))}
-        </ul>
-      </>
-    )}
-  </CardContent>
-</Card>
-
-        {/* Recent history (session only) */}
-        {history.length > 0 && (
-<Card>
-  <CardHeader>
-    <CardTitle>Recent words (this session)</CardTitle>
-    <CardDescription>
-      Quick view of the last heart paths you ran.
-    </CardDescription>
-  </CardHeader>
-  <CardContent>
-    {history.length === 0 ? (
-      <p className="text-sm text-muted-foreground">
-        No history yet. Run a word to see it here.
-      </p>
-    ) : (
-      <div className="overflow-x-auto">
-        <table className="w-full border-collapse text-sm">
-          <thead className="border-b border-muted/40 text-xs uppercase tracking-wide text-muted-foreground">
-            <tr>
-              <th className="py-2 pr-4 text-left w-10">#</th>
-              <th className="py-2 px-4 text-left">Word</th>
-              <th className="py-2 px-4 text-left">Voice path</th>
-              <th className="py-2 px-4 text-left">Level path</th>
-              <th className="py-2 pl-4 text-left">Ring path</th>
-            </tr>
-          </thead>
-          <tbody>
-            {history.map((item, idx) => (
-              <tr
-                key={`${item.word}-${idx}`}
-                className="border-b border-muted/20 last:border-b-0"
-              >
-                <td className="py-1 pr-4 text-xs text-muted-foreground">
-                  {idx + 1}
-                </td>
-                <td className="py-1 px-4">{item.word}</td>
-                <td className="py-1 px-4 font-mono">
-                  {item.primaryPath?.voicePath ?? "—"}
-                </td>
-                <td className="py-1 px-4 font-mono">
-                  {item.primaryPath?.levelPath ?? "—"}
-                </td>
-                <td className="py-1 pl-4 font-mono">
-                  {item.primaryPath?.ringPath ?? "—"}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    )}
-  </CardContent>
-</Card>
-        )}
-
-      {/* Engine meta */}
-      {meta && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Engine meta</CardTitle>
-            <CardDescription>
-              Debug info for this analysis run.
-            </CardDescription>
-          </CardHeader>
-
-          <CardContent className="grid gap-4 md:grid-cols-3 text-sm text-muted-foreground">
-            {/* Engine version / timestamp */}
-            <div>
-              <div className="font-medium text-primary-foreground/80">
-                Engine
-              </div>
-              <div className="mt-1 space-y-1">
-                <div>
-                  version{" "}
-                  <span className="font-mono">
-                    {meta.engineVersion}
-                  </span>
-                </div>
-                <div>
-                  created{" "}
-                  <span className="font-mono">
-                    {new Date(meta.createdAt).toLocaleString()}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Mode + alphabet */}
-            <div>
-              <div className="font-medium text-primary-foreground/80">
-                Mode
-              </div>
-              <div className="mt-1 space-y-1">
-                <div>
-                  mode{" "}
-                  <span className="font-mono">
-                    {typeof meta.mode === "string"
-                      ? meta.mode
-                      : meta.mode?.mode ?? "strict"}
-                  </span>
-                </div>
-                <div>
-                  alphabet{" "}
-                  <span className="font-mono">
-                    {meta.alphabet ??
-                      (typeof meta.mode === "string"
-                        ? "auto"
-                        : meta.mode?.alphabet ?? "auto")}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Cache info */}
-            <div>
-              <div className="font-medium text-primary-foreground/80">
-                Cache
-              </div>
-              <div className="mt-1 space-y-1">
-                <div>
-                  hit{" "}
-                  <span className="font-mono">
-                    {cache?.hit ?? "—"}
-                  </span>
-                </div>
-                <div>
-                  elapsed{" "}
-                  <span className="font-mono">
-                    {cache?.elapsedMs != null
-                      ? `${cache.elapsedMs.toFixed(0)} ms`
-                      : "—"}
-                  </span>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-        {/* Raw JSON (debug) */}
-        {result && (
+        {analysis && analysis.frontier?.length > 0 && (
           <Card>
             <CardHeader>
-              <CardTitle>Raw result (debug view)</CardTitle>
+              <CardTitle>Frontier candidates</CardTitle>
               <CardDescription>
-                Full JSON from{" "}
-                <code className="font-mono text-xs">/api/analyze</code>.
+                Alternate legal paths the Mind can explore inside the same
+                rules.
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="rounded-md border border-border/60 bg-muted/5 max-h-80 overflow-auto">
+              <div className="overflow-x-auto">
+                <table className="w-full border-collapse text-sm">
+                  <thead className="border-b border-muted/40 text-xs uppercase tracking-wide text-muted-foreground">
+                    <tr>
+                      <th className="py-2 pr-4 text-left w-16">Alt</th>
+                      <th className="py-2 px-4 text-left">Voice path</th>
+                      <th className="py-2 px-4 text-left">Level path</th>
+                      <th className="py-2 pl-4 text-left">Ring path</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {analysis.frontier.map((alt, idx) => (
+                      <tr
+                        key={alt.id ?? `alt-${idx}`}
+                        className="border-b border-muted/20 last:border-b-0"
+                      >
+                        <td className="py-1 pr-4 text-xs text-muted-foreground">
+                          {`alt-${idx + 1}`}
+                        </td>
+                        <td className="py-1 px-4 font-mono">
+                          {alt.voicePath}
+                        </td>
+                        <td className="py-1 px-4 font-mono">
+                          {alt.levelPath}
+                        </td>
+                        <td className="py-1 pl-4 font-mono">
+                          {alt.ringPath}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Language families (canon layer) */}
+        {analysis && analysis.languageFamilies?.length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Language families (canon layer)</CardTitle>
+              <CardDescription>
+                How different languages carry this Seven-Voices path.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="overflow-x-auto">
+                <table className="min-w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-muted/40 text-xs uppercase tracking-wide text-muted-foreground">
+                      <th className="px-4 py-2 text-left">Language</th>
+                      <th className="px-4 py-2 text-left">Form</th>
+                      <th className="px-4 py-2 text-left">Gloss</th>
+                      <th className="px-4 py-2 text-center">Passes</th>
+                      <th className="px-4 py-2 text-center">Voice path</th>
+                      <th className="px-4 py-2 text-center">Level path</th>
+                      <th className="px-4 py-2 text-center">Ring path</th>
+                      <th className="px-4 py-2 text-left">Pivot</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {analysis.languageFamilies.map((fam) => (
+                      <tr
+                        key={fam.language}
+                        className="border-b border-muted/20 last:border-0"
+                      >
+                        <td className="px-4 py-2 text-left">
+                          {fam.language}
+                        </td>
+                        <td className="px-4 py-2 text-left font-mono text-xs">
+                          {fam.form}
+                        </td>
+                        <td className="px-4 py-2 text-left text-xs text-muted-foreground">
+                          {fam.gloss || "—"}
+                        </td>
+                        <td className="px-4 py-2 text-center">
+                          {fam.passes ? (
+                            <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-xs text-emerald-400">
+                              yes
+                            </span>
+                          ) : (
+                            <span className="rounded-full bg-red-500/10 px-2 py-0.5 text-xs text-red-400">
+                              no
+                            </span>
+                          )}
+                        </td>
+                        <td className="px-4 py-2 text-center font-mono text-xs">
+                          {fam.voicePath}
+                        </td>
+                        <td className="px-4 py-2 text-center font-mono text-xs">
+                          {fam.levelPath}
+                        </td>
+                        <td className="px-4 py-2 text-center font-mono text-xs">
+                          {fam.ringPath}
+                        </td>
+                        <td className="px-4 py-2 text-left font-mono text-xs">
+                          {fam.morphologyMatrix?.pivot ?? "—"}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Word matrix / proto-root view */}
+        {analysis && (
+          <WordMatrixCard matrix={(analysis as any).wordMatrix ?? null} />
+        )}
+
+        {/* Symbolic reading */}
+        {analysis && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Symbolic reading (experimental)</CardTitle>
+              <CardDescription>
+                High-level reading of this word&apos;s path. Sketch, not
+                doctrine.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              <p className="text-sm font-medium">
+                {analysis.symbolic?.label ?? "Engine symbolic reading"}
+              </p>
+              <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
+                {(analysis.symbolic?.notes ?? []).map((note, idx) => (
+                  <li key={idx}>{note}</li>
+                ))}
+              </ul>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Recent history (session only) */}
+        {history.length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Recent words (this session)</CardTitle>
+              <CardDescription>
+                Quick view of the last heart paths you ran.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="overflow-x-auto">
+                <table className="w-full border-collapse text-sm">
+                  <thead className="border-b border-muted/40 text-xs uppercase tracking-wide text-muted-foreground">
+                    <tr>
+                      <th className="py-2 pr-4 text-left w-10">#</th>
+                      <th className="py-2 px-4 text-left">Word</th>
+                      <th className="py-2 px-4 text-left">Voice path</th>
+                      <th className="py-2 px-4 text-left">Level path</th>
+                      <th className="py-2 pl-4 text-left">Ring path</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {history.map((item, idx) => (
+                      <tr
+                        key={`${item.word}-${idx}`}
+                        className="border-b border-muted/20 last:border-b-0"
+                      >
+                        <td className="py-1 pr-4 text-xs text-muted-foreground">
+                          {idx + 1}
+                        </td>
+                        <td className="py-1 px-4">{item.word}</td>
+                        <td className="py-1 px-4 font-mono">
+                          {item.primaryPath?.voicePath ?? "—"}
+                        </td>
+                        <td className="py-1 px-4 font-mono">
+                          {item.primaryPath?.levelPath ?? "—"}
+                        </td>
+                        <td className="py-1 pl-4 font-mono">
+                          {item.primaryPath?.ringPath ?? "—"}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Engine meta */}
+        {meta && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Engine meta</CardTitle>
+              <CardDescription>
+                Debug info for this analysis run.
+              </CardDescription>
+            </CardHeader>
+
+            <CardContent className="grid gap-4 md:grid-cols-3 text-sm text-muted-foreground">
+              {/* Engine version / timestamp */}
+              <div>
+                <div className="font-medium text-primary-foreground/80">
+                  Engine
+                </div>
+                <div className="mt-1 space-y-1">
+                  <div>
+                    version{" "}
+                    <span className="font-mono">
+                      {meta.engineVersion ?? "—"}
+                    </span>
+                  </div>
+                  <div>
+                    created{" "}
+                    <span className="font-mono">
+                      {formatCreated(meta.createdAt)}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Mode + alphabet */}
+              <div>
+                <div className="font-medium text-primary-foreground/80">
+                  Mode
+                </div>
+                <div className="mt-1 space-y-1">
+                  <div>
+                    mode{" "}
+                    <span className="font-mono">
+                      {typeof meta.mode === "string"
+                        ? meta.mode
+                        : meta.mode?.mode ?? "strict"}
+                    </span>
+                  </div>
+                  <div>
+                    alphabet{" "}
+                    <span className="font-mono">
+                      {meta.alphabet ??
+                        (typeof meta.mode === "string"
+                          ? "auto"
+                          : meta.mode?.alphabet ?? "auto")}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Cache info */}
+              <div>
+                <div className="font-medium text-primary-foreground/80">
+                  Cache
+                </div>
+                <div className="mt-1 space-y-1">
+                  <div>
+                    hit{" "}
+                    <span className="font-mono">{cache?.hit ?? "—"}</span>
+                  </div>
+                  <div>
+                    elapsed{" "}
+                    <span className="font-mono">
+                      {cache?.elapsedMs != null
+                        ? `${cache.elapsedMs.toFixed(0)} ms`
+                        : "—"}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Debug JSON toggle */}
+        <div className="flex justify-center">
+          <Button
+            variant="outline"
+            onClick={() => setShowDebug((prev) => !prev)}
+          >
+            {showDebug ? "Hide JSON" : "Show JSON"}
+          </Button>
+        </div>
+
+        {showDebug && analysis && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Analysis JSON (debug)</CardTitle>
+              <CardDescription>
+                Full JSON from the analysis object, including DeepRoot and
+                wordMatrix.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="rounded-md border border-border/60 bg-muted/5 max-h-96 overflow-auto">
                 <pre className="text-xs font-mono p-4 whitespace-pre">
-                  {JSON.stringify(result, null, 2)}
+                  {JSON.stringify(analysis, null, 2)}
                 </pre>
               </div>
             </CardContent>
