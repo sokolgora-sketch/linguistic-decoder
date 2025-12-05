@@ -13,6 +13,8 @@ import {
 } from "@/components/ui/card";
 import { WordMatrixCard } from "@/components/WordMatrix";
 import type { AnalyzeWordResultUI, HistoryItem } from "@/shared/resultsUI";
+import { buildShareSnippet } from "@/lib/shareSnippet";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Page() {
   const [word, setWord] = useState("");
@@ -25,13 +27,8 @@ export default function Page() {
     "auto"
   );
 
-  // --- Engine meta helpers (loose typing for debug fields) ---
   const analysis = result?.analysis as any | undefined;
   const mind = analysis?.mind;
-  const cache =
-    result?.meta as
-      | { hit?: string; elapsedMs?: number; source?: string }
-      | undefined;
 
   async function handleAnalyze(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -54,13 +51,11 @@ export default function Page() {
       });
 
       if (!response.ok) {
-        // Try to read any error text from the API, fall back to a generic message
         let message = `Server error (HTTP ${response.status})`;
 
         try {
           const text = await response.text();
           if (text) {
-            // if API returns JSON { error: "msg" }, show that
             try {
               const parsed = JSON.parse(text);
               if (parsed?.error) {
@@ -73,12 +68,12 @@ export default function Page() {
             }
           }
         } catch {
-          // ignore, keep default message
+          // ignore
         }
-
+        
         console.error("Analyze request failed:", response.status, message);
         setError(message);
-        return; // <-- IMPORTANT: no throw, just stop here
+        return; 
       }
 
       const data = (await response.json()) as AnalyzeWordResultUI;
@@ -109,7 +104,46 @@ export default function Page() {
     }
   }
 
-  const analysisResult = result;
+  const { toast } = useToast();
+
+  const handleCopySnippet = () => {
+    if (!result?.raw) return;
+
+    try {
+      const snippet = buildShareSnippet({ word: result.word, analysis: result.raw });
+
+      if (typeof navigator !== "undefined" && navigator.clipboard) {
+        navigator.clipboard
+          .writeText(snippet)
+          .then(() => {
+            toast({
+              title: "Copied",
+              description: "Summary snippet copied to clipboard.",
+            });
+          })
+          .catch(() => {
+            toast({
+              title: "Copy failed",
+              description: "Could not access the clipboard.",
+              variant: "destructive",
+            });
+          });
+      } else {
+        console.log("Share snippet:", snippet);
+        toast({
+          title: "Snippet ready",
+          description: "Clipboard not available – check console output.",
+        });
+      }
+    } catch (err) {
+      console.error("Error building share snippet:", err);
+      toast({
+        title: "Error",
+        description: "Could not build share snippet.",
+        variant: "destructive",
+      });
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background text-foreground p-4 lg:p-8 flex flex-col items-stretch">
@@ -186,14 +220,24 @@ export default function Page() {
         </Card>
 
         {/* Heart summary */}
-        {analysisResult && (
+        {result && (
           <Card>
-            <CardHeader>
-              <CardTitle>Heart summary</CardTitle>
-              <CardDescription>
-                Primary Seven-Voices path for{" "}
-                <span className="font-mono">{analysisResult.word}</span>.
-              </CardDescription>
+            <CardHeader className="flex flex-row items-center justify-between gap-2">
+              <div>
+                <CardTitle>Heart summary</CardTitle>
+                <CardDescription>
+                  Primary Seven-Voices path for {result?.word ?? "—"}.
+                </CardDescription>
+              </div>
+
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={!result?.raw}
+                onClick={handleCopySnippet}
+              >
+                Copy snippet
+              </Button>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
@@ -202,7 +246,7 @@ export default function Page() {
                     Voice path
                   </div>
                   <div className="font-medium">
-                    {analysisResult.primaryPath?.voicePath ?? "—"}
+                    {result.primaryPath?.voicePath ?? "—"}
                   </div>
                 </div>
                 <div>
@@ -210,7 +254,7 @@ export default function Page() {
                     Level path
                   </div>
                   <div className="font-medium">
-                    {analysisResult.primaryPath?.levelPath ?? "—"}
+                    {result.primaryPath?.levelPath ?? "—"}
                   </div>
                 </div>
                 <div>
@@ -218,7 +262,7 @@ export default function Page() {
                     Ring path
                   </div>
                   <div className="font-medium">
-                    {analysisResult.primaryPath?.ringPath ?? "—"}
+                    {result.primaryPath?.ringPath ?? "—"}
                   </div>
                 </div>
               </div>
@@ -268,9 +312,7 @@ export default function Page() {
           </Card>
         )}
         
-        {result && (
-          <WordMatrixCard matrix={(result as any).wordMatrix ?? null} />
-        )}
+        {result && <WordMatrixCard matrix={result.wordMatrix} />}
 
         {/* Symbolic reading */}
         <Card>

@@ -141,7 +141,7 @@ export function computeGenderFlow(summary: SevenVoicesSummary): GenderFlow {
     pathArray = path;
   } else if (typeof path === 'string') {
     // handle both "UI" and "U → I" style strings
-    const cleaned = path.replace(/\s*→\s*/g, '').trim();
+    const cleaned = (path as string).replace(/\s*→\s*/g, '').trim();
     pathArray = Array.from(cleaned) as Vowel[];
   } else {
     // fallback – no path, avoid crashing
