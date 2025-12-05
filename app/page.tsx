@@ -290,26 +290,9 @@ export default function Page() {
   </CardContent>
 </Card>
 
-{/* WORD MATRIX CARD */}
-<Card>
-  <CardHeader>
-    <CardTitle>Word matrix (proto-root view)</CardTitle>
-    <CardDescription>
-      Shows proto-root mapping if present.
-    </CardDescription>
-  </CardHeader>
-  <CardContent className="text-sm">
-    {result?.wordMatrix ? (
-      <pre className="text-xs bg-slate-950 p-2 rounded-md overflow-x-auto">
-        {JSON.stringify(result.wordMatrix, null, 2)}
-      </pre>
-    ) : (
-      <p className="text-slate-400 italic">
-        No matrix attached yet. (Result has no <code>wordMatrix</code> field.)
-      </p>
-    )}
-  </CardContent>
-</Card>
+{result && (
+  <WordMatrixCard matrix={(result as any).wordMatrix ?? null} />
+)}
 
 <Card>
   <CardHeader>
