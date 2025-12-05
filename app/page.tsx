@@ -12,6 +12,7 @@ import {
   CardContent,
 } from "@/components/ui/card";
 import type { AnalyzeWordResultV1 } from "@/shared/resultShape.v1";
+import { WordMatrixCard } from "@/components/WordMatrix";
 
 export default function Page() {
   const [word, setWord] = useState("");
@@ -31,13 +32,13 @@ export default function Page() {
 
   async function handleAnalyze(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-  
+
     const trimmed = word.trim();
     if (!trimmed) return;
-  
+
     setError(null);
     setLoading(true);
-  
+
     try {
       const response = await fetch("/api/analyze", {
         method: "POST",
@@ -46,25 +47,27 @@ export default function Page() {
         },
         body: JSON.stringify({
           word: trimmed,
-          mode,      // from your Mode select
-          alphabet,  // from your Alphabet select
+          mode,
+          alphabet,
         }),
       });
-  
+
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}`);
       }
-  
+
       const json = (await response.json()) as AnalyzeWordResultV1;
-  
+
       setResult(json);
-      setHistory((prev) => [
-        { word: trimmed, ...json },
-        ...prev,
-      ].slice(0, 10));
+      setHistory((prev) =>
+        [
+          { word: trimmed, ...json },
+          ...prev,
+        ].slice(0, 10)
+      );
     } catch (err: any) {
       console.error(err);
-      setError(err.message || "Something went wrong.");
+      setError(err?.message || "Something went wrong.");
     } finally {
       setLoading(false);
     }
@@ -287,26 +290,9 @@ export default function Page() {
   </CardContent>
 </Card>
 
-{/* WORD MATRIX CARD */}
-<Card>
-  <CardHeader>
-    <CardTitle>Word matrix (proto-root view)</CardTitle>
-    <CardDescription>
-      Shows proto-root mapping if present.
-    </CardDescription>
-  </CardHeader>
-  <CardContent className="text-sm">
-    {(result as any)?.wordMatrix ? (
-      <pre className="text-xs bg-slate-950 p-2 rounded-md overflow-x-auto">
-        {JSON.stringify((result as any).wordMatrix, null, 2)}
-      </pre>
-    ) : (
-      <p className="text-slate-400 italic">
-        No matrix attached yet. (Result has no <code>wordMatrix</code> field.)
-      </p>
-    )}
-  </CardContent>
-</Card>
+{result && (
+  <WordMatrixCard matrix={(result as any).wordMatrix ?? null} />
+)}
 
 <Card>
   <CardHeader>
@@ -488,7 +474,7 @@ export default function Page() {
             </CardHeader>
             <CardContent>
               <div className="rounded-md border border-border/60 bg-muted/5 max-h-80 overflow-auto">
-                <pre className="text-xs font-.mono p-4 whitespace-pre">
+                <pre className="text-xs font-mono p-4 whitespace-pre">
                   {JSON.stringify(result, null, 2)}
                 </pre>
               </div>
