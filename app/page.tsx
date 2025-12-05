@@ -39,6 +39,8 @@ type AnalyzeWordResultUI = {
   engineMeta: EngineMetaSummary;
   wordMatrix?: any;
   raw: any;
+  analysis?: any;
+  symbolic?: any;
 };
 
 type HistoryItem = {
@@ -114,6 +116,8 @@ export default function Page() {
     }
   }
 
+  const analysisResult = result;
+
   return (
     <div className="min-h-screen bg-background text-foreground p-4 lg:p-8 flex flex-col items-stretch">
       <main className="max-w-5xl mx-auto w-full space-y-8 flex-1">
@@ -183,13 +187,13 @@ export default function Page() {
         </Card>
 
         {/* Heart summary */}
-        {result && (
+        {analysisResult && (
           <Card>
             <CardHeader>
               <CardTitle>Heart summary</CardTitle>
               <CardDescription>
                 Primary Seven-Voices path for{" "}
-                <span className="font-mono">{result.word}</span>.
+                <span className="font-mono">{analysisResult.word}</span>.
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -199,7 +203,7 @@ export default function Page() {
                     Voice path
                   </div>
                   <div className="font-medium">
-                    {result.primaryPath?.voicePath ?? "—"}
+                    {analysisResult.primaryPath?.voicePath ?? "—"}
                   </div>
                 </div>
                 <div>
@@ -207,7 +211,7 @@ export default function Page() {
                     Level path
                   </div>
                   <div className="font-medium">
-                    {result.primaryPath?.levelPath ?? "—"}
+                    {analysisResult.primaryPath?.levelPath ?? "—"}
                   </div>
                 </div>
                 <div>
@@ -215,7 +219,7 @@ export default function Page() {
                     Ring path
                   </div>
                   <div className="font-medium">
-                    {result.primaryPath?.ringPath ?? "—"}
+                    {analysisResult.primaryPath?.ringPath ?? "—"}
                   </div>
                 </div>
               </div>
@@ -263,10 +267,47 @@ export default function Page() {
             </CardContent>
           </Card>
         )}
-
+        
         {result && (
           <WordMatrixCard matrix={(result as any).wordMatrix ?? null} />
         )}
+
+        {/* Symbolic reading */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Symbolic reading (experimental)</CardTitle>
+            <CardDescription>
+              High-level reading of this word's path. Sketch, not doctrine.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="text-sm space-y-2">
+            {mind ? (
+              <>
+                <p className="font-medium">
+                  {mind.logicStatement || "Symbolic reading coming soon."}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Dominant principle:{" "}
+                  <span className="font-medium">
+                    {mind.dominantPrinciple || "—"}
+                  </span>{" "}
+                  · Polarity:{" "}
+                  <span className="font-medium">
+                    {mind.polarity || "—"}
+                  </span>{" "}
+                  · Pattern:{" "}
+                  <span className="font-medium">
+                    {mind.patternName || "—"}
+                  </span>
+                </p>
+              </>
+            ) : (
+              <p className="text-muted-foreground italic">
+                Run a word to see a symbolic reading.
+              </p>
+            )}
+          </CardContent>
+        </Card>
 
         {/* Recent history (session only) */}
         {history.length > 0 && (
