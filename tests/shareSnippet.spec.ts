@@ -27,7 +27,7 @@ describe("buildShareSnippet", () => {
 
     expect(snippet).toContain("Linguistic Decoder — study");
     expect(snippet).toContain("Summary:");
-    expect(snippet).toContain("Engine: 2025-11-16-core-2 · strict · auto");
+    expect(snippet).toContain("Engine: core-2 · strict · auto");
   });
 
   it("is safe if heart/meta are missing", () => {

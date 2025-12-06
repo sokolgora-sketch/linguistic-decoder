@@ -1,47 +1,35 @@
 // src/lib/engineMetaSummary.ts
 
 /**
- * Minimal metadata we care about for displaying engine info.
+ * The structured summary of engine metadata, returned by the helper.
  */
-export type EngineMetaInput = {
-  engineVersion?: string | null;
-  mode?: string | null;
-  alphabet?: string | null;
-};
-
-export type EngineMetaSummary = {
-  version: string;
-  created: string;
-};
-
+export interface EngineMetaSummaryUI {
+  engineName: string;
+  versionLine: string;
+  modeLabel: string;
+  alphabetLabel: string;
+  notes?: string;
+}
 
 /**
- * Build a compact, human-friendly summary of the engine meta.
- *
- * Examples:
- *  - { engineVersion: "2025-11-16-core-2", mode: "strict", alphabet: "auto" }
- *    → "2025-11-16-core-2 · strict · auto"
- *
- *  - { engineVersion: "core-v1" }
- *    → "core-v1"
- *
- *  - {} or all fields empty
- *    → "unknown"
+ * Builds a structured, UI-friendly summary of the engine metadata.
+ * It's defensive and handles missing or partial data.
  */
-export function buildEngineMetaSummary(meta: EngineMetaInput): string {
-  const parts: string[] = [];
+export function buildEngineMetaSummary(
+  raw: any // Keep this loose to handle different analysis shapes
+): EngineMetaSummaryUI {
+  const engineVersion = raw?.engineVersion ?? raw?.meta?.engineVersion ?? 'unknown';
+  const mode = raw?.mode ?? raw?.meta?.mode ?? 'unknown';
+  const alphabet = raw?.alphabet ?? raw?.meta?.alphabet ?? 'unknown';
 
-  const v = meta.engineVersion?.trim();
-  const m = meta.mode?.trim();
-  const a = meta.alphabet?.trim();
+  const parts = engineVersion.split('-');
+  const versionLine = parts.length > 2 ? parts.slice(-2).join('-') : engineVersion;
 
-  if (v) parts.push(v);
-  if (m) parts.push(m);
-  if (a) parts.push(a);
-
-  if (parts.length === 0) {
-    return "unknown";
-  }
-
-  return parts.join(" · ");
+  return {
+    engineName: "SevenVoices Core",
+    versionLine,
+    modeLabel: mode,
+    alphabetLabel: alphabet,
+    notes: `Raw version: ${engineVersion}`,
+  };
 }
