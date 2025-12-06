@@ -23,12 +23,14 @@ export interface ZhejiSummaryUI {
   subjectRole: string;
   objectRole: string;
   modifierRole: string;
+  snippet: string; // one-line summary for the CURRENT view (normal, not inverted).
 }
 
 const VOWEL_CHARS = new Set<string>(["A", "E", "I", "O", "U", "Y", "Ë"]);
 
 function parseVowelPath(path: string | null | undefined): Vowel[] {
   if (!path) return [];
+  // This regex now correctly handles spaces around the arrow.
   const vowels = path.split("→").map((v) => v.trim());
   const result: Vowel[] = [];
   for (const ch of vowels) {
@@ -127,6 +129,8 @@ export function buildZhejiSummary(
     tensionPath
   );
 
+  const snippet = `Zheji: ${subjectRole} → ${objectRole}; ${modifierRole}; [${totalTensionScore}] total tension.`;
+
   return {
     rawVowelPath: vowelPath.join(""),
     rootPolarity,
@@ -136,6 +140,7 @@ export function buildZhejiSummary(
     subjectRole,
     objectRole,
     modifierRole,
+    snippet,
   };
 }
 
@@ -159,4 +164,16 @@ export function buildInvertedStatement(statement: string): string {
     return `The path begins with ${to}, and resolves into ${from}.`;
   }
   return `Inverted: ${statement}`;
+}
+
+export function buildZhejiSnippet(view: "normal" | "inverted", base: ZhejiSummaryUI): string {
+    if (view === 'normal') {
+        return base.snippet;
+    }
+
+    const invertedPolarity = invertRootPolarity(base.rootPolarity);
+    const invertedModifier = base.modifierRole.replace(base.rootPolarity, invertedPolarity);
+    const invertedSnippet = `Zheji: ${base.objectRole} → ${base.subjectRole}; ${invertedModifier}; [${base.totalTensionScore}] total tension.`;
+
+    return invertedSnippet;
 }
