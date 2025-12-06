@@ -10,11 +10,11 @@ import {
   CardDescription,
   CardContent,
 } from "@/components/ui/card";
-import { WordMatrixCard, type WordMatrix } from "@/components/WordMatrix";
-import type {
-  AnalyzeWordResultUI,
-  HistoryItem,
-} from "@/shared/resultsUI";
+import { WordMatrixCard } from "@/components/WordMatrix";
+import type { AnalyzeWordResultUI, HistoryItem } from "@/shared/resultsUI";
+import { buildShareSnippet } from "@/lib/shareSnippet";
+import { useToast } from "@/hooks/use-toast";
+import { buildZhejiSummary } from "@/lib/zhejiSummary";
 
 export default function Page() {
   const [word, setWord] = useState("");
@@ -27,14 +27,9 @@ export default function Page() {
     "auto"
   );
 
-  // --- Engine meta helpers (loose typing for debug fields) ---
-  const analysis = result?.raw as any | undefined;
-  const mind = analysis?.mind;
-  const meta = result?.meta as any | undefined;
-  const cache =
-    meta?.cache as
-      | { hit?: string; elapsedMs?: number; source?: string }
-      | undefined;
+  const { toast } = useToast();
+
+  const zheji = result ? buildZhejiSummary(result) : null;
 
   async function handleAnalyze(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -42,15 +37,13 @@ export default function Page() {
     const trimmed = word.trim();
     if (!trimmed) return;
 
-    setError(null);
     setLoading(true);
+    setError(null);
 
     try {
       const response = await fetch("/api/analyze", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           word: trimmed,
           mode,
@@ -59,7 +52,29 @@ export default function Page() {
       });
 
       if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
+        let message = `Server error (HTTP ${response.status})`;
+
+        try {
+          const text = await response.text();
+          if (text) {
+            try {
+              const parsed = JSON.parse(text);
+              if (parsed?.error) {
+                message = parsed.error as string;
+              } else {
+                message = text;
+              }
+            } catch {
+              message = text;
+            }
+          }
+        } catch {
+          // ignore
+        }
+
+        console.error("Analyze request failed:", response.status, message);
+        setError(message);
+        return;
       }
 
       const data = (await response.json()) as AnalyzeWordResultUI;
@@ -77,14 +92,55 @@ export default function Page() {
         ].slice(0, 10)
       );
     } catch (err: any) {
-      console.error(err);
-      setError(err?.message || "Something went wrong.");
+      console.error("Error while analyzing word:", err);
+      const message =
+        typeof err?.message === "string"
+          ? err.message
+          : "Something went wrong while analyzing the word.";
+      setError(message);
     } finally {
       setLoading(false);
     }
   }
 
-  const analysisResult = result;
+  const handleCopySnippet = () => {
+    if (!result?.raw) return;
+
+    try {
+      const snippet = buildShareSnippet({ word: result.word, analysis: result.raw });
+
+      if (typeof navigator !== "undefined" && navigator.clipboard) {
+        navigator.clipboard
+          .writeText(snippet)
+          .then(() => {
+            toast({
+              title: "Copied",
+              description: "Summary snippet copied to clipboard.",
+            });
+          })
+          .catch(() => {
+            toast({
+              title: "Copy failed",
+              description: "Could not access the clipboard.",
+              variant: "destructive",
+            });
+          });
+      } else {
+        console.log("Share snippet:", snippet);
+        toast({
+          title: "Snippet ready",
+          description: "Clipboard not available – check console output.",
+        });
+      }
+    } catch (err) {
+      console.error("Error building share snippet:", err);
+      toast({
+        title: "Error",
+        description: "Could not build share snippet.",
+        variant: "destructive",
+      });
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background text-foreground p-4 lg:p-8 flex flex-col items-stretch">
@@ -161,14 +217,24 @@ export default function Page() {
         </Card>
 
         {/* Heart summary */}
-        {analysisResult && (
+        {result ? (
           <Card>
-            <CardHeader>
-              <CardTitle>Heart summary</CardTitle>
-              <CardDescription>
-                Primary Seven-Voices path for{" "}
-                <span className="font-mono">{analysisResult.word}</span>.
-              </CardDescription>
+            <CardHeader className="flex flex-row items-center justify-between gap-2">
+              <div>
+                <CardTitle>Heart summary</CardTitle>
+                <CardDescription>
+                  Primary Seven-Voices path for {result.word ?? "—"}.
+                </CardDescription>
+              </div>
+
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={!result.raw}
+                onClick={handleCopySnippet}
+              >
+                Copy snippet
+              </Button>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
@@ -177,7 +243,7 @@ export default function Page() {
                     Voice path
                   </div>
                   <div className="font-medium">
-                    {analysisResult.primaryPath?.voicePath ?? "—"}
+                    {result.primaryPath?.voicePath ?? "—"}
                   </div>
                 </div>
                 <div>
@@ -185,7 +251,7 @@ export default function Page() {
                     Level path
                   </div>
                   <div className="font-medium">
-                    {analysisResult.primaryPath?.levelPath ?? "—"}
+                    {result.primaryPath?.levelPath ?? "—"}
                   </div>
                 </div>
                 <div>
@@ -193,16 +259,48 @@ export default function Page() {
                     Ring path
                   </div>
                   <div className="font-medium">
-                    {analysisResult.primaryPath?.ringPath ?? "—"}
+                    {result.primaryPath?.ringPath ?? "—"}
                   </div>
                 </div>
               </div>
             </CardContent>
           </Card>
-        )}
+        ) : null}
+
+        {/* Zheji structural summary */}
+        {zheji ? (
+          <Card>
+            <CardHeader>
+              <CardTitle>Zheji structural summary</CardTitle>
+              <CardDescription>
+                Structural reading of {result?.word ?? "—"} (path, polarity, tension).
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="text-sm space-y-2">
+              <div>
+                <span className="text-xs uppercase text-muted-foreground">Raw vowel path</span>
+                <div className="font-mono">{zheji.rawVowelPath}</div>
+              </div>
+              <div>
+                <span className="text-xs uppercase text-muted-foreground">Root polarity</span>
+                <div className="font-mono">{zheji.rootPolarity}</div>
+              </div>
+              <div>
+                <span className="text-xs uppercase text-muted-foreground">Tension</span>
+                <div className="font-mono">
+                  [{zheji.tensionPath.join(", ")}] → total {zheji.totalTensionScore}
+                </div>
+              </div>
+              <div>
+                <span className="text-xs uppercase text-muted-foreground">Functional statement</span>
+                <p>{zheji.functionalStatement}</p>
+              </div>
+            </CardContent>
+          </Card>
+        ) : null}
 
         {/* Frontier candidates */}
-        {result && result.frontier?.length > 0 && (
+        {result && result.frontier && result.frontier.length > 0 ? (
           <Card>
             <CardHeader>
               <CardTitle>Frontier candidates</CardTitle>
@@ -229,11 +327,17 @@ export default function Page() {
                         className="border-b border-muted/20 last:border-b-0"
                       >
                         <td className="py-1 pr-4 text-xs text-muted-foreground">
-                          {alt.id}
+                          {alt.id ?? `alt-${idx + 1}`}
                         </td>
-                        <td className="py-1 px-4 font-mono">{alt.voicePath}</td>
-                        <td className="py-1 px-4 font-mono">{alt.levelPath}</td>
-                        <td className="py-1 pl-4 font-mono">{alt.ringPath}</td>
+                        <td className="py-1 px-4 font-mono">
+                          {alt.voicePath ?? "—"}
+                        </td>
+                        <td className="py-1 px-4 font-mono">
+                          {alt.levelPath ?? "—"}
+                        </td>
+                        <td className="py-1 pl-4 font-mono">
+                          {alt.ringPath ?? "—"}
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -241,51 +345,32 @@ export default function Page() {
               </div>
             </CardContent>
           </Card>
-        )}
+        ) : null}
 
-        {result && (
-          <WordMatrixCard matrix={(result as any).wordMatrix ?? null} />
+        {/* Word matrix (proto-root view) */}
+        {result?.wordMatrix && (
+          <WordMatrixCard matrix={result.wordMatrix} />
         )}
 
         {/* Symbolic reading */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Symbolic reading (experimental)</CardTitle>
-            <CardDescription>
-              High-level reading of this word's path. Sketch, not doctrine.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="text-sm space-y-2">
-            {mind ? (
-              <>
-                <p className="font-medium">
-                  {mind.logicStatement || "Symbolic reading coming soon."}
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  Dominant principle:{" "}
-                  <span className="font-medium">
-                    {mind.dominantPrinciple || "—"}
-                  </span>{" "}
-                  · Polarity:{" "}
-                  <span className="font-medium">
-                    {mind.polarity || "—"}
-                  </span>{" "}
-                  · Pattern:{" "}
-                  <span className="font-medium">
-                    {mind.patternName || "—"}
-                  </span>
-                </p>
-              </>
-            ) : (
-              <p className="text-muted-foreground italic">
-                Run a word to see a symbolic reading.
+        {result?.symbolic ? (
+          <Card>
+            <CardHeader>
+              <CardTitle>Symbolic reading (experimental)</CardTitle>
+              <CardDescription>
+                High-level reading of this word&apos;s path.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground">
+                {result.symbolic.notes ?? "No symbolic notes yet."}
               </p>
-            )}
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        ) : null}
 
         {/* Recent history (session only) */}
-        {history.length > 0 && (
+        {history.length > 0 ? (
           <Card>
             <CardHeader>
               <CardTitle>Recent words (this session)</CardTitle>
@@ -316,13 +401,13 @@ export default function Page() {
                         </td>
                         <td className="py-1 px-4">{item.word}</td>
                         <td className="py-1 px-4 font-mono">
-                          {item.voicePath}
+                          {item.voicePath ?? "—"}
                         </td>
                         <td className="py-1 px-4 font-mono">
-                          {item.levelPath}
+                          {item.levelPath ?? "—"}
                         </td>
                         <td className="py-1 pl-4 font-mono">
-                          {item.ringPath}
+                          {item.ringPath ?? "—"}
                         </td>
                       </tr>
                     ))}
@@ -331,10 +416,10 @@ export default function Page() {
               </div>
             </CardContent>
           </Card>
-        )}
+        ) : null}
 
         {/* Engine meta */}
-        {result && (
+        {result ? (
           <Card>
             <CardHeader>
               <CardTitle>Engine meta</CardTitle>
@@ -353,14 +438,14 @@ export default function Page() {
                   <div>
                     version{" "}
                     <span className="font-mono">
-                      {result.engineMeta?.version ?? "—"}
+                      {result.meta?.version ?? "—"}
                     </span>
                   </div>
                   <div>
                     created{" "}
                     <span className="font-mono">
-                      {result.engineMeta?.created
-                        ? new Date(result.engineMeta.created).toLocaleString()
+                      {result.meta?.created
+                        ? new Date(result.meta.created).toLocaleString()
                         : "—"}
                     </span>
                   </div>
@@ -377,16 +462,75 @@ export default function Page() {
                     mode <span className="font-mono">{result.mode}</span>
                   </div>
                   <div>
-                    alphabet <span className="font-mono">{result.alphabet}</span>
+                    alphabet{" "}
+                    <span className="font-mono">{result.alphabet}</span>
                   </div>
                 </div>
+              </div>
+            </CardContent>
+          </Card>
+        ) : null}
+
+        {/* Language families (candidate roots) */}
+        {Array.isArray((result?.raw as any)?.languageFamilies) &&
+          (result!.raw as any).languageFamilies.length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Language families</CardTitle>
+              <CardDescription>
+                Candidate forms this engine considered for the proto-root.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="overflow-x-auto">
+                <table className="w-full border-collapse text-sm">
+                  <thead className="border-b border-muted/40 text-xs uppercase tracking-wide text-muted-foreground">
+                    <tr>
+                      <th className="py-2 pr-4 text-left">Language</th>
+                      <th className="py-2 px-4 text-left">Form</th>
+                      <th className="py-2 px-4 text-left">Passes</th>
+                      <th className="py-2 px-4 text-left">Pivot</th>
+                      <th className="py-2 px-4 text-left">Voice path</th>
+                      <th className="py-2 px-4 text-left">Note</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {(result!.raw as any).languageFamilies.map(
+                      (fam: any, idx: number) => (
+                        <tr
+                          key={`${fam.language}-${fam.form}-${idx}`}
+                          className="border-b border-muted/20 last:border-b-0"
+                        >
+                          <td className="py-1 pr-4 font-medium">
+                            {fam.language ?? "—"}
+                          </td>
+                          <td className="py-1 px-4 font-mono">
+                            {fam.form ?? "—"}
+                          </td>
+                          <td className="py-1 px-4">
+                            {fam.passes ? "✓" : "—"}
+                          </td>
+                          <td className="py-1 px-4 font-mono">
+                            {fam.morphologyMatrix?.pivot ?? "—"}
+                          </td>
+                          <td className="py-1 px-4 font-mono">
+                            {fam.voicePath ?? "—"}
+                          </td>
+                          <td className="py-1 px-4 text-xs text-muted-foreground">
+                            {fam.symbolic?.[0]?.note ?? ""}
+                          </td>
+                        </tr>
+                      )
+                    )}
+                  </tbody>
+                </table>
               </div>
             </CardContent>
           </Card>
         )}
 
         {/* Raw JSON (debug) */}
-        {result?.raw && (
+        {result?.raw ? (
           <Card>
             <CardHeader>
               <CardTitle>Raw result (debug view)</CardTitle>
@@ -403,7 +547,7 @@ export default function Page() {
               </div>
             </CardContent>
           </Card>
-        )}
+        ) : null}
       </main>
     </div>
   );
