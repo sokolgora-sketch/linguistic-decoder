@@ -1,26 +1,26 @@
-"use client";
+'use client';
 
-import React, { useState, type ReactNode } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import React, { useState, type ReactNode } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import {
   Card,
   CardHeader,
   CardTitle,
   CardDescription,
   CardContent,
-} from "@/components/ui/card";
-import { WordMatrixCard } from "@/components/WordMatrix";
-import type { AnalyzeWordResultUI, HistoryItem } from "@/shared/resultsUI";
-import { buildShareSnippet } from "@/lib/shareSnippet";
-import { useToast } from "@/hooks/use-toast";
+} from '@/components/ui/card';
+import { WordMatrixCard } from '@/components/WordMatrix';
+import type { AnalyzeWordResultUI, HistoryItem } from '@/shared/resultsUI';
+import { buildShareSnippet } from '@/lib/shareSnippet';
+import { useToast } from '@/hooks/use-toast';
 import {
   buildZhejiSummary,
   invertRootPolarity,
   buildInvertedStatement,
   buildZhejiSnippet,
-} from "@/lib/zhejiSummary";
-import { EngineMetaCard } from "@/components/EngineMetaCard";
+} from '@/lib/zhejiSummary';
+import { EngineMetaCard } from '@/components/EngineMetaCard';
 
 function renderWordMatrix(result: AnalyzeWordResultUI | null): React.ReactNode {
   if (!result?.wordMatrix) {
@@ -30,15 +30,15 @@ function renderWordMatrix(result: AnalyzeWordResultUI | null): React.ReactNode {
 }
 
 export default function Page() {
-  const [word, setWord] = useState("");
+  const [word, setWord] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<AnalyzeWordResultUI | null>(null);
   const [zhejiInverted, setZhejiInverted] = useState(false);
   const [history, setHistory] = useState<HistoryItem[]>([]);
-  const [mode, setMode] = useState<"strict" | "explore">("strict");
-  const [alphabet, setAlphabet] = useState<"auto" | "latin" | "albanian">(
-    "auto"
+  const [mode, setMode] = useState<'strict' | 'explore'>('strict');
+  const [alphabet, setAlphabet] = useState<'auto' | 'latin' | 'albanian'>(
+    'auto'
   );
 
   const { toast } = useToast();
@@ -48,26 +48,26 @@ export default function Page() {
   const effectivePolarity =
     zheji && zhejiInverted
       ? invertRootPolarity(zheji.rootPolarity)
-      : zheji?.rootPolarity ?? "Static";
+      : zheji?.rootPolarity ?? 'Static';
 
   const effectiveStatement =
     zheji && zhejiInverted
       ? buildInvertedStatement(zheji.functionalStatement)
-      : zheji?.functionalStatement ?? "";
+      : zheji?.functionalStatement ?? '';
 
   const effectiveSubjectRole = zheji
     ? zhejiInverted
       ? zheji.objectRole
       : zheji.subjectRole
-    : "—";
+    : '—';
   const effectiveObjectRole = zheji
     ? zhejiInverted
       ? zheji.subjectRole
       : zheji.objectRole
-    : "—";
+    : '—';
   const effectiveModifierRole = zheji
     ? zheji.modifierRole.replace(zheji.rootPolarity, effectivePolarity)
-    : "—";
+    : '—';
 
   async function handleAnalyze(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -78,9 +78,9 @@ export default function Page() {
     setError(null);
 
     try {
-      const response = await fetch("/api/analyze", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const response = await fetch('/api/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           word: trimmed,
           mode,
@@ -107,7 +107,7 @@ export default function Page() {
         } catch {
           // ignore
         }
-        console.error("Analyze request failed:", response.status, message);
+        console.error('Analyze request failed:', response.status, message);
         setError(message);
         return;
       }
@@ -120,19 +120,19 @@ export default function Page() {
         [
           {
             word: data.word,
-            voicePath: data.primaryPath?.voicePath ?? "—",
-            levelPath: data.primaryPath?.levelPath ?? "—",
-            ringPath: data.primaryPath?.ringPath ?? "—",
+            voicePath: data.primaryPath?.voicePath ?? '—',
+            levelPath: data.primaryPath?.levelPath ?? '—',
+            ringPath: data.primaryPath?.ringPath ?? '—',
           },
           ...prev,
         ].slice(0, 10)
       );
     } catch (err: any) {
-      console.error("Error while analyzing word:", err);
+      console.error('Error while analyzing word:', err);
       const message =
-        typeof err?.message === "string"
+        typeof err?.message === 'string'
           ? err.message
-          : "Something went wrong while analyzing the word.";
+          : 'Something went wrong while analyzing the word.';
       setError(message);
     } finally {
       setLoading(false);
@@ -146,35 +146,35 @@ export default function Page() {
         word: result.word,
         analysis: result.raw,
       });
-      if (typeof navigator !== "undefined" && navigator.clipboard) {
+      if (typeof navigator !== 'undefined' && navigator.clipboard) {
         navigator.clipboard
           .writeText(snippet)
           .then(() => {
             toast({
-              title: "Copied",
-              description: "Summary snippet copied to clipboard.",
+              title: 'Copied',
+              description: 'Summary snippet copied to clipboard.',
             });
           })
           .catch(() => {
             toast({
-              title: "Copy failed",
-              description: "Could not access the clipboard.",
-              variant: "destructive",
+              title: 'Copy failed',
+              description: 'Could not access the clipboard.',
+              variant: 'destructive',
             });
           });
       } else {
-        console.log("Share snippet:", snippet);
+        console.log('Share snippet:', snippet);
         toast({
-          title: "Snippet ready",
-          description: "Clipboard not available – check console output.",
+          title: 'Snippet ready',
+          description: 'Clipboard not available – check console output.',
         });
       }
     } catch (err) {
-      console.error("Error building share snippet:", err);
+      console.error('Error building share snippet:', err);
       toast({
-        title: "Error",
-        description: "Could not build share snippet.",
-        variant: "destructive",
+        title: 'Error',
+        description: 'Could not build share snippet.',
+        variant: 'destructive',
       });
     }
   };
@@ -182,33 +182,33 @@ export default function Page() {
   const handleCopyZhejiSnippet = () => {
     if (!zheji) return;
 
-    const view = zhejiInverted ? "inverted" : "normal";
+    const view = zhejiInverted ? 'inverted' : 'normal';
     const snippet = buildZhejiSnippet(view, zheji);
 
     try {
-      if (typeof navigator !== "undefined" && navigator.clipboard) {
+      if (typeof navigator !== 'undefined' && navigator.clipboard) {
         navigator.clipboard
           .writeText(snippet)
           .then(() => {
             toast({
-              title: "Zheji snippet copied",
-              description: "Summary is ready to paste.",
+              title: 'Zheji snippet copied',
+              description: 'Summary is ready to paste.',
             });
           })
           .catch(() => {
             toast({
-              title: "Copy failed",
-              description: "Could not access the clipboard.",
-              variant: "destructive",
+              title: 'Copy failed',
+              description: 'Could not access the clipboard.',
+              variant: 'destructive',
             });
           });
       }
     } catch (err) {
-      console.error("Error building Zheji share snippet:", err);
+      console.error('Error building Zheji share snippet:', err);
       toast({
-        title: "Error",
-        description: "Could not build Zheji share snippet.",
-        variant: "destructive",
+        title: 'Error',
+        description: 'Could not build Zheji share snippet.',
+        variant: 'destructive',
       });
     }
   };
@@ -247,7 +247,7 @@ export default function Page() {
                 disabled={loading}
               />
               <Button type="submit" disabled={loading}>
-                {loading ? "Analyzing..." : "Analyze"}
+                {loading ? 'Analyzing...' : 'Analyze'}
               </Button>
             </form>
             <div className="flex flex-wrap gap-4 mt-2">
@@ -256,7 +256,7 @@ export default function Page() {
                 <select
                   value={mode}
                   onChange={(e) =>
-                    setMode(e.target.value as "strict" | "explore")
+                    setMode(e.target.value as 'strict' | 'explore')
                   }
                   className="bg-background border border-border/50 rounded-md px-2 py-1"
                 >
@@ -270,7 +270,7 @@ export default function Page() {
                   value={alphabet}
                   onChange={(e) =>
                     setAlphabet(
-                      e.target.value as "auto" | "latin" | "albanian"
+                      e.target.value as 'auto' | 'latin' | 'albanian'
                     )
                   }
                   className="bg-background border border-border/50 rounded-md px-2 py-1"
@@ -300,7 +300,7 @@ export default function Page() {
               <div>
                 <CardTitle>Heart summary</CardTitle>
                 <CardDescription>
-                  Primary Seven-Voices path for {result.word ?? "—"}.
+                  Primary Seven-Voices path for {result.word ?? '—'}.
                 </CardDescription>
               </div>
 
@@ -351,7 +351,7 @@ export default function Page() {
               <div>
                 <CardTitle>Zheji structural summary</CardTitle>
                 <CardDescription>
-                  Structural reading of {result?.word ?? "this word"} (path,
+                  Structural reading of {result?.word ?? 'this word'} (path,
                   polarity, tension).
                 </CardDescription>
               </div>
@@ -369,7 +369,7 @@ export default function Page() {
                     size="sm"
                     onClick={() => setZhejiInverted((prev) => !prev)}
                     >
-                    {zhejiInverted ? "Normal view" : "Invert"}
+                    {zhejiInverted ? 'Normal view' : 'Invert'}
                     </Button>
                 </div>
               )}
@@ -414,7 +414,7 @@ export default function Page() {
                   </span>
                   <div className="font-mono">
                     {effectivePolarity}
-                    {zhejiInverted && " (inverted)"}
+                    {zhejiInverted && ' (inverted)'}
                   </div>
                 </div>
                 <div>
@@ -422,7 +422,7 @@ export default function Page() {
                     Tension
                   </span>
                   <div className="font-mono">
-                    [{zheji.tensionPath.join(", ")}] → total{" "}
+                    [{zheji.tensionPath.join(', ')}] → total{' '}
                     {zheji.totalTensionScore}
                   </div>
                 </div>
@@ -462,13 +462,13 @@ export default function Page() {
                           {alt.id ?? `alt-${idx + 1}`}
                         </td>
                         <td className="py-1 px-4 font-mono">
-                          {alt.voicePath ?? "—"}
+                          {alt.voicePath ?? '—'}
                         </td>
                         <td className="py-1 px-4 font-mono">
-                          {alt.levelPath ?? "—"}
+                          {alt.levelPath ?? '—'}
                         </td>
                         <td className="py-1 pl-4 font-mono">
-                          {alt.ringPath ?? "—"}
+                          {alt.ringPath ?? '—'}
                         </td>
                       </tr>
                     ))}
@@ -487,7 +487,7 @@ export default function Page() {
           <CardHeader>
             <CardTitle>Symbolic reading (experimental)</CardTitle>
             <CardDescription>
-              High-level reading of this word&apos;s path. Sketch, not doctrine.
+              High-level reading of this word's path. Sketch, not doctrine.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -549,20 +549,21 @@ export default function Page() {
                     {history.map((item, idx) => (
                       <tr
                         key={`${item.word}-${idx}`}
-                        className="border-b border-muted/20 last:border-b-0"
+                        onClick={() => setWord(item.word)}
+                        className="border-b border-muted/20 last:border-b-0 hover:bg-muted/20 cursor-pointer"
                       >
                         <td className="py-1 pr-4 text-xs text-muted-foreground">
                           {idx + 1}
                         </td>
                         <td className="py-1 px-4">{item.word}</td>
                         <td className="py-1 px-4 font-mono">
-                          {item.voicePath ?? "—"}
+                          {item.voicePath ?? '—'}
                         </td>
                         <td className="py-1 px-4 font-mono">
-                          {item.levelPath ?? "—"}
+                          {item.levelPath ?? '—'}
                         </td>
                         <td className="py-1 pl-4 font-mono">
-                          {item.ringPath ?? "—"}
+                          {item.ringPath ?? '—'}
                         </td>
                       </tr>
                     ))}
