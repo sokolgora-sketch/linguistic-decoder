@@ -17,7 +17,13 @@ export function buildShareSnippet(source: ShareSource): string {
     ? buildHeartSummaryText({ word, primaryPath })
     : null;
 
-  const engineLine = buildEngineMetaSummary(analysis);
+  const meta = buildEngineMetaSummary(analysis);
+  let engineLine: string | null = null;
+  if (meta && typeof meta === 'object') {
+    engineLine = `${meta.versionLine || ''} · ${meta.modeLabel || ''} · ${meta.alphabetLabel || ''}`;
+  } else if (meta) {
+    engineLine = String(meta);
+  }
 
   const header = `Linguistic Decoder — ${word}`;
 

@@ -287,7 +287,11 @@ export default function Page() {
           </CardContent>
         </Card>
 
-        {result?.engineMeta && <EngineMetaCard meta={result.engineMeta} />}
+        {result?.engineMeta && (
+          <div className="mt-6">
+            <EngineMetaCard meta={result.engineMeta} />
+          </div>
+        )}
 
         {/* Heart summary */}
         {result?.primaryPath ? (

@@ -22,7 +22,7 @@ describe("buildEngineMetaSummary", () => {
   it("handles partial or missing metadata gracefully", () => {
     const summary = buildEngineMetaSummary({ engineVersion: "test-v1" });
 
-    expect(summary.engineName).toBe("Engine");
+    expect(summary.engineName).toBe("SevenVoices Core");
     expect(summary.versionLine).toBe("test-v1");
     expect(summary.modeLabel).toBe("unknown");
     expect(summary.alphabetLabel).toBe("unknown");
@@ -31,7 +31,7 @@ describe("buildEngineMetaSummary", () => {
   it("handles completely empty metadata", () => {
     const summary = buildEngineMetaSummary({});
 
-    expect(summary.engineName).toBe("Engine");
+    expect(summary.engineName).toBe("SevenVoices Core");
     expect(summary.versionLine).toBe("unknown");
     expect(summary.modeLabel).toBe("unknown");
     expect(summary.alphabetLabel).toBe("unknown");

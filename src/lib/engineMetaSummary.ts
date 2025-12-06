@@ -23,11 +23,10 @@ export function buildEngineMetaSummary(
   const alphabet = raw?.alphabet ?? raw?.meta?.alphabet ?? 'unknown';
 
   const parts = engineVersion.split('-');
-  const engineName = parts.length > 2 ? parts.slice(0, -2).join(' ') : 'Engine';
   const versionLine = parts.length > 2 ? parts.slice(-2).join('-') : engineVersion;
 
   return {
-    engineName,
+    engineName: "SevenVoices Core",
     versionLine,
     modeLabel: mode,
     alphabetLabel: alphabet,
