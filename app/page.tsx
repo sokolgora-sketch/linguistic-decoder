@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, type ReactNode } from "react";
@@ -127,7 +126,10 @@ export default function Page() {
   const handleCopySnippet = () => {
     if (!result?.raw) return;
     try {
-      const snippet = buildShareSnippet({ word: result.word, analysis: result.raw });
+      const snippet = buildShareSnippet({
+        word: result.word,
+        analysis: result.raw,
+      });
       if (typeof navigator !== "undefined" && navigator.clipboard) {
         navigator.clipboard
           .writeText(snippet)
@@ -306,27 +308,43 @@ export default function Page() {
                 </Button>
               )}
             </CardHeader>
-            <CardContent className="text-sm space-y-2">
-              <div>
-                <span className="text-xs uppercase text-muted-foreground">Raw vowel path</span>
-                <div className="font-mono">{zheji.rawVowelPath}</div>
-              </div>
-              <div>
-                <span className="text-xs uppercase text-muted-foreground">Root polarity</span>
-                <div className="font-mono">
-                  {effectivePolarity}
-                  {zhejiInverted && " (inverted)"}
-                </div>
-              </div>
-              <div>
-                <span className="text-xs uppercase text-muted-foreground">Tension</span>
-                <div className="font-mono">
-                  [{zheji.tensionPath.join(", ")}] → total {zheji.totalTensionScore}
-                </div>
-              </div>
+            <CardContent className="text-sm space-y-4">
               <div>
                 <span className="text-xs uppercase text-muted-foreground">Functional statement</span>
-                <p>{effectiveStatement}</p>
+                <p className="mt-1">{effectiveStatement}</p>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3 border-t border-border/40">
+                  <div>
+                      <span className="text-xs uppercase text-muted-foreground">Subject</span>
+                      <p className="font-mono mt-1">{zheji.subjectRole}</p>
+                  </div>
+                  <div>
+                      <span className="text-xs uppercase text-muted-foreground">Object</span>
+                      <p className="font-mono mt-1">{zheji.objectRole}</p>
+                  </div>
+                  <div>
+                      <span className="text-xs uppercase text-muted-foreground">Modifier</span>
+                      <p className="font-mono mt-1">{zheji.modifierRole}</p>
+                  </div>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3 border-t border-border/40">
+                <div>
+                  <span className="text-xs uppercase text-muted-foreground">Raw vowel path</span>
+                  <div className="font-mono">{zheji.rawVowelPath}</div>
+                </div>
+                <div>
+                  <span className="text-xs uppercase text-muted-foreground">Root polarity</span>
+                  <div className="font-mono">
+                    {effectivePolarity}
+                    {zhejiInverted && " (inverted)"}
+                  </div>
+                </div>
+                <div>
+                  <span className="text-xs uppercase text-muted-foreground">Tension</span>
+                  <div className="font-mono">
+                    [{zheji.tensionPath.join(", ")}] → total {zheji.totalTensionScore}
+                  </div>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -549,5 +567,3 @@ export default function Page() {
     </div>
   );
 }
-
-    
