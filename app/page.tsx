@@ -14,6 +14,7 @@ import { WordMatrixCard } from "@/components/WordMatrix";
 import type { AnalyzeWordResultUI, HistoryItem } from "@/shared/resultsUI";
 import { buildShareSnippet } from "@/lib/shareSnippet";
 import { useToast } from "@/hooks/use-toast";
+import { buildZhejiSummary } from "@/lib/zhejiSummary";
 
 export default function Page() {
   const [word, setWord] = useState("");
@@ -27,6 +28,8 @@ export default function Page() {
   );
 
   const { toast } = useToast();
+
+  const zheji = result ? buildZhejiSummary(result) : null;
 
   async function handleAnalyze(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -259,6 +262,38 @@ export default function Page() {
                     {result.primaryPath?.ringPath ?? "—"}
                   </div>
                 </div>
+              </div>
+            </CardContent>
+          </Card>
+        ) : null}
+
+        {/* Zheji structural summary */}
+        {zheji ? (
+          <Card>
+            <CardHeader>
+              <CardTitle>Zheji structural summary</CardTitle>
+              <CardDescription>
+                Structural reading of {result?.word ?? "—"} (path, polarity, tension).
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="text-sm space-y-2">
+              <div>
+                <span className="text-xs uppercase text-muted-foreground">Raw vowel path</span>
+                <div className="font-mono">{zheji.rawVowelPath}</div>
+              </div>
+              <div>
+                <span className="text-xs uppercase text-muted-foreground">Root polarity</span>
+                <div className="font-mono">{zheji.rootPolarity}</div>
+              </div>
+              <div>
+                <span className="text-xs uppercase text-muted-foreground">Tension</span>
+                <div className="font-mono">
+                  [{zheji.tensionPath.join(", ")}] → total {zheji.totalTensionScore}
+                </div>
+              </div>
+              <div>
+                <span className="text-xs uppercase text-muted-foreground">Functional statement</span>
+                <p>{zheji.functionalStatement}</p>
               </div>
             </CardContent>
           </Card>
