@@ -354,7 +354,7 @@ export default function Page() {
                     </tr>
                   </thead>
                   <tbody>
-                    {result.frontier.map((alt, idx) => (
+                    {result.frontier.map((alt: any, idx: number) => (
                       <tr
                         key={alt.id ?? `alt-${idx}`}
                         className="border-b border-muted/20 last:border-b-0"
@@ -415,7 +415,7 @@ export default function Page() {
                 </div>
                 {result.symbolic.notes && result.symbolic.notes.length > 0 && (
                   <ul className="list-disc list-inside text-sm">
-                    {result.symbolic.notes.map((note, idx) => (
+                    {result.symbolic.notes.map((note: any, idx: number) => (
                       <li key={idx}>{note}</li>
                     ))}
                   </ul>
