@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { analyzeWord } from "@/engine/analyzeWord";
+import { buildEngineMetaSummary } from "@/lib/engineMetaSummary";
 
 export async function POST(req: Request) {
   try {
@@ -12,6 +13,9 @@ export async function POST(req: Request) {
     const analyzed = analyzeWord(word.trim(), mode ?? 'strict');
 
     const primary = analyzed.primaryPath ?? null;
+
+    // The adapter logic is now here in the API route
+    const engineMeta = buildEngineMetaSummary(analyzed);
 
     const uiResult = {
       word: analyzed.word ?? word.trim(),
@@ -33,12 +37,19 @@ export async function POST(req: Request) {
         ringPath: cand.ringPath ?? "—",
       })),
 
+      // Include the new structured meta object for the UI
+      engineMeta: engineMeta,
+
+      // Keep original meta for backwards compatibility / debug
       meta: {
         version: analyzed.meta?.engineVersion ?? "—",
         created: analyzed.meta?.createdAt ?? "—",
       },
-
-      wordMatrix: analyzed.wordMatrix,
+      
+      // Pass through other top-level fields from analysis
+      languageFamilies: analyzed.languageFamilies,
+      symbolic: analyzed.symbolic,
+      wordMatrix: (analyzed as any).wordMatrix,
       raw: analyzed,
     };
 

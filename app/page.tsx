@@ -20,6 +20,7 @@ import {
   buildInvertedStatement,
   buildZhejiSnippet,
 } from "@/lib/zhejiSummary";
+import { EngineMetaCard } from "@/components/EngineMetaCard";
 
 function renderWordMatrix(result: AnalyzeWordResultUI | null): React.ReactNode {
   if (!result?.wordMatrix) {
@@ -285,6 +286,8 @@ export default function Page() {
             )}
           </CardContent>
         </Card>
+
+        {result?.engineMeta && <EngineMetaCard meta={result.engineMeta} />}
 
         {/* Heart summary */}
         {result?.primaryPath ? (
@@ -561,78 +564,6 @@ export default function Page() {
                     ))}
                   </tbody>
                 </table>
-              </div>
-            </CardContent>
-          </Card>
-        ) : null}
-
-        {/* Engine meta */}
-        {result?.meta ? (
-          <Card>
-            <CardHeader>
-              <CardTitle>Engine meta</CardTitle>
-              <CardDescription>
-                Debug info for this analysis run.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="grid gap-4 md:grid-cols-3 text-sm text-muted-foreground">
-              {/* Engine version / timestamp */}
-              <div>
-                <div className="font-medium text-primary-foreground/80">
-                  Engine
-                </div>
-                <div className="mt-1 space-y-1">
-                  <div>
-                    version{" "}
-                    <span className="font-mono">
-                      {result.meta?.version ?? "—"}
-                    </span>
-                  </div>
-                  <div>
-                    created{" "}
-                    <span className="font-mono">
-                      {result.meta?.created
-                        ? new Date(result.meta.created).toLocaleString()
-                        : "—"}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Mode + alphabet */}
-              <div>
-                <div className="font-medium text-primary-foreground/80">
-                  Mode
-                </div>
-                <div className="mt-1 space-y-1">
-                  <div>
-                    mode <span className="font-mono">{result.mode}</span>
-                  </div>
-                  <div>
-                    alphabet{" "}
-                    <span className="font-mono">{result.alphabet}</span>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ) : null}
-
-        {/* Raw JSON (debug) */}
-        {result?.raw ? (
-          <Card>
-            <CardHeader>
-              <CardTitle>Raw result (debug view)</CardTitle>
-              <CardDescription>
-                Full JSON from{" "}
-                <code className="font-mono text-xs">/api/analyze</code>.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="rounded-md border border-border/60 bg-muted/5 max-h-80 overflow-auto">
-                <pre className="text-xs font-mono p-4 whitespace-pre">
-                  {JSON.stringify(result.raw, null, 2)}
-                </pre>
               </div>
             </CardContent>
           </Card>

@@ -1,6 +1,6 @@
 // src/shared/resultsUI.ts
 
-import type { EngineMetaSummary } from "./engineMetaSummary";
+import type { EngineMetaSummaryUI } from "@/lib/engineMetaSummary";
 
 export interface PrimaryPathSummary {
   voicePath: string;
@@ -42,16 +42,16 @@ export interface AnalyzeWordResultUI {
   languageFamilies: CanonLanguageFamilySummary[];
   history: HistoryItem[];
 
-  // NEW – summary used by the Engine meta card
-  meta?: EngineMetaSummary;
+  // NEW – structured summary used by the Engine meta card
+  engineMeta: EngineMetaSummaryUI;
 
   // Debug / legacy fields used only by the main page
   raw?: unknown;
 
   // Original engine meta object (still present in the response)
-  engineMeta?: {
+  meta?: {
     version?: string | null;
-    created?: string | null;
+    createdAt?: string | null;
   };
 
   // Top-level mode / alphabet (for the Engine meta card + debug)
