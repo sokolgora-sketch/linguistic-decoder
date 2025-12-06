@@ -30,32 +30,6 @@ export interface HistoryItem {
   ringPath: string;
 }
 
-export interface WordMatrixRow {
-  language: string;
-  form: string;
-  voicePath: string;
-  notes?: string;
-}
-
-export interface WordMatrixUI {
-  word: string;
-  primary: {
-    label: string;      // "Primary path"
-    voicePath: string;  // "U → I"
-    notes?: string;
-  };
-  canon: WordMatrixRow[];
-  deepRoot?: {
-    label: string;      // "Proto-root"
-    notes?: string;
-  };
-}
-
-export interface SymbolicSummaryUI {
-  label?: string;
-  notes?: string[];
-}
-
 /**
  * Defines the clean, UI-first result shape that the
  * /api/analyze endpoint should return.
@@ -71,9 +45,6 @@ export interface AnalyzeWordResultUI {
   // NEW – summary used by the Engine meta card
   meta?: EngineMetaSummary;
 
-  // NEW
-  symbolic?: SymbolicSummaryUI | null;
-
   // Debug / legacy fields used only by the main page
   raw?: unknown;
 
@@ -86,5 +57,4 @@ export interface AnalyzeWordResultUI {
   // Top-level mode / alphabet (for the Engine meta card + debug)
   mode?: string;
   alphabet?: string;
-  wordMatrix?: any | null;
 }
