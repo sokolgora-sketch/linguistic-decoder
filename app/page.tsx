@@ -213,6 +213,44 @@ export default function Page() {
     }
   };
 
+  const handleCopyJson = () => {
+    if (!result?.raw) return;
+
+    try {
+      const json = JSON.stringify(result.raw, null, 2);
+      if (typeof navigator !== 'undefined' && navigator.clipboard) {
+        navigator.clipboard
+          .writeText(json)
+          .then(() => {
+            toast({
+              title: 'Copied',
+              description: 'JSON result copied to clipboard.',
+            });
+          })
+          .catch(() => {
+            toast({
+              title: 'Copy failed',
+              description: 'Could not access the clipboard.',
+              variant: 'destructive',
+            });
+          });
+      } else {
+        console.log('JSON result:', json);
+        toast({
+          title: 'JSON ready',
+          description: 'Clipboard not available – check console output.',
+        });
+      }
+    } catch (err) {
+      console.error('Error copying JSON:', err);
+      toast({
+        title: 'Error',
+        description: 'Could not copy JSON.',
+        variant: 'destructive',
+      });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background text-foreground p-4 lg:p-8 flex flex-col items-stretch">
       <main className="max-w-5xl mx-auto w-full space-y-8 flex-1">
@@ -290,6 +328,17 @@ export default function Page() {
         {result?.engineMeta && (
           <div className="mt-6">
             <EngineMetaCard meta={result.engineMeta} />
+          </div>
+        )}
+
+        {result && (
+          <div className="mt-4 text-center">
+            <button
+              onClick={handleCopyJson}
+              className="text-xs text-muted-foreground border rounded px-2 py-1 cursor-pointer hover:bg-muted/20"
+            >
+              Copy JSON (dev)
+            </button>
           </div>
         )}
 
