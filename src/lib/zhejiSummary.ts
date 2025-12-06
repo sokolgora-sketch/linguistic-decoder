@@ -110,3 +110,33 @@ export function buildZhejiSummary(
     functionalStatement,
   };
 }
+
+// --- Inversion helpers (UI-only, pure functions) ---
+
+export function invertRootPolarity(polarity: RootPolarity): RootPolarity {
+  if (polarity === "Centripetal") return "Centrifugal";
+  if (polarity === "Centrifugal") return "Centripetal";
+  return "Static";
+}
+
+// Very simple, deterministic inversion of the sentence.
+// v1: if we recognise the "From X towards Y" or
+//     "The path begins with X, and resolves into Y." pattern, we flip.
+// otherwise: just prefix "Inverted:".
+export function buildInvertedStatement(statement: string): string {
+  const fromMatch = statement.match(/^From (.+) towards (.+)\.?$/);
+  if (fromMatch) {
+    const [, from, to] = fromMatch;
+    return `From ${to} towards ${from}.`;
+  }
+
+  const beginsMatch = statement.match(
+    /^The path begins with (.+), and resolves into (.+)\.?$/
+  );
+  if (beginsMatch) {
+    const [, from, to] = beginsMatch;
+    return `The path begins with ${to}, and resolves into ${from}.`;
+  }
+
+  return `Inverted: ${statement}`;
+}
