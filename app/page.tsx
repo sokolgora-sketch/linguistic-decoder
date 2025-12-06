@@ -1,6 +1,7 @@
+
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -14,13 +15,25 @@ import { WordMatrixCard } from "@/components/WordMatrix";
 import type { AnalyzeWordResultUI, HistoryItem } from "@/shared/resultsUI";
 import { buildShareSnippet } from "@/lib/shareSnippet";
 import { useToast } from "@/hooks/use-toast";
-import { buildZhejiSummary } from "@/lib/zhejiSummary";
+import {
+  buildZhejiSummary,
+  invertRootPolarity,
+  buildInvertedStatement,
+} from "@/lib/zhejiSummary";
+
+function renderWordMatrix(result: AnalyzeWordResultUI | null): React.ReactNode {
+  if (!result?.wordMatrix) {
+    return null;
+  }
+  return <WordMatrixCard matrix={result.wordMatrix} />;
+}
 
 export default function Page() {
   const [word, setWord] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<AnalyzeWordResultUI | null>(null);
+  const [zhejiInverted, setZhejiInverted] = useState(false);
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [mode, setMode] = useState<"strict" | "explore">("strict");
   const [alphabet, setAlphabet] = useState<"auto" | "latin" | "albanian">(
@@ -31,9 +44,18 @@ export default function Page() {
 
   const zheji = result ? buildZhejiSummary(result) : null;
 
+  const effectivePolarity =
+    zheji && zhejiInverted
+      ? invertRootPolarity(zheji.rootPolarity)
+      : zheji?.rootPolarity ?? "Static";
+
+  const effectiveStatement =
+    zheji && zhejiInverted
+      ? buildInvertedStatement(zheji.functionalStatement)
+      : zheji?.functionalStatement ?? "";
+
   async function handleAnalyze(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-
     const trimmed = word.trim();
     if (!trimmed) return;
 
@@ -53,7 +75,6 @@ export default function Page() {
 
       if (!response.ok) {
         let message = `Server error (HTTP ${response.status})`;
-
         try {
           const text = await response.text();
           if (text) {
@@ -71,7 +92,6 @@ export default function Page() {
         } catch {
           // ignore
         }
-
         console.error("Analyze request failed:", response.status, message);
         setError(message);
         return;
@@ -80,6 +100,7 @@ export default function Page() {
       const data = (await response.json()) as AnalyzeWordResultUI;
 
       setResult(data);
+      setZhejiInverted(false);
       setHistory((prev) =>
         [
           {
@@ -105,10 +126,8 @@ export default function Page() {
 
   const handleCopySnippet = () => {
     if (!result?.raw) return;
-
     try {
       const snippet = buildShareSnippet({ word: result.word, analysis: result.raw });
-
       if (typeof navigator !== "undefined" && navigator.clipboard) {
         navigator.clipboard
           .writeText(snippet)
@@ -217,7 +236,7 @@ export default function Page() {
         </Card>
 
         {/* Heart summary */}
-        {result ? (
+        {result?.primaryPath ? (
           <Card>
             <CardHeader className="flex flex-row items-center justify-between gap-2">
               <div>
@@ -243,7 +262,7 @@ export default function Page() {
                     Voice path
                   </div>
                   <div className="font-medium">
-                    {result.primaryPath?.voicePath ?? "—"}
+                    {result.primaryPath.voicePath}
                   </div>
                 </div>
                 <div>
@@ -251,7 +270,7 @@ export default function Page() {
                     Level path
                   </div>
                   <div className="font-medium">
-                    {result.primaryPath?.levelPath ?? "—"}
+                    {result.primaryPath.levelPath}
                   </div>
                 </div>
                 <div>
@@ -259,7 +278,7 @@ export default function Page() {
                     Ring path
                   </div>
                   <div className="font-medium">
-                    {result.primaryPath?.ringPath ?? "—"}
+                    {result.primaryPath.ringPath}
                   </div>
                 </div>
               </div>
@@ -270,11 +289,22 @@ export default function Page() {
         {/* Zheji structural summary */}
         {zheji ? (
           <Card>
-            <CardHeader>
-              <CardTitle>Zheji structural summary</CardTitle>
-              <CardDescription>
-                Structural reading of {result?.word ?? "—"} (path, polarity, tension).
-              </CardDescription>
+            <CardHeader className="flex flex-row items-center justify-between gap-2">
+              <div>
+                <CardTitle>Zheji structural summary</CardTitle>
+                <CardDescription>
+                  Structural reading of {result?.word ?? "this word"} (path, polarity, tension).
+                </CardDescription>
+              </div>
+              {zheji && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setZhejiInverted((prev) => !prev)}
+                >
+                  {zhejiInverted ? "Normal view" : "Invert"}
+                </Button>
+              )}
             </CardHeader>
             <CardContent className="text-sm space-y-2">
               <div>
@@ -283,7 +313,10 @@ export default function Page() {
               </div>
               <div>
                 <span className="text-xs uppercase text-muted-foreground">Root polarity</span>
-                <div className="font-mono">{zheji.rootPolarity}</div>
+                <div className="font-mono">
+                  {effectivePolarity}
+                  {zhejiInverted && " (inverted)"}
+                </div>
               </div>
               <div>
                 <span className="text-xs uppercase text-muted-foreground">Tension</span>
@@ -293,7 +326,7 @@ export default function Page() {
               </div>
               <div>
                 <span className="text-xs uppercase text-muted-foreground">Functional statement</span>
-                <p>{zheji.functionalStatement}</p>
+                <p>{effectiveStatement}</p>
               </div>
             </CardContent>
           </Card>
@@ -321,7 +354,7 @@ export default function Page() {
                     </tr>
                   </thead>
                   <tbody>
-                    {result.frontier.map((alt, idx) => (
+                    {result.frontier.map((alt: any, idx: number) => (
                       <tr
                         key={alt.id ?? `alt-${idx}`}
                         className="border-b border-muted/20 last:border-b-0"
@@ -347,27 +380,50 @@ export default function Page() {
           </Card>
         ) : null}
 
-        {/* Word matrix (proto-root view) */}
-        {result?.wordMatrix && (
-          <WordMatrixCard matrix={result.wordMatrix} />
-        )}
+        {/* Word matrix (rendered by helper) */}
+        {renderWordMatrix(result)}
 
         {/* Symbolic reading */}
-        {result?.symbolic ? (
-          <Card>
-            <CardHeader>
-              <CardTitle>Symbolic reading (experimental)</CardTitle>
-              <CardDescription>
-                High-level reading of this word&apos;s path.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
+        <Card>
+          <CardHeader>
+            <CardTitle>Symbolic reading (experimental)</CardTitle>
+            <CardDescription>
+              High-level reading of this word&apos;s path. Sketch, not doctrine.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {!result && (
               <p className="text-sm text-muted-foreground">
-                {result.symbolic.notes ?? "No symbolic notes yet."}
+                Run a word to see a symbolic reading.
               </p>
-            </CardContent>
-          </Card>
-        ) : null}
+            )}
+            {result && !result.symbolic && (
+              <p className="text-sm text-muted-foreground">
+                No symbolic reading available for this word yet.
+              </p>
+            )}
+            {result?.symbolic && (
+              <div className="space-y-2">
+                <div className="text-xs text-muted-foreground">
+                  Sketch from the Seven-Voices core. Experimental, not doctrine.
+                </div>
+                <div>
+                  <span className="font-semibold">Label: </span>
+                  <span className="font-mono text-xs uppercase tracking-wide">
+                    {result.symbolic.label}
+                  </span>
+                </div>
+                {result.symbolic.notes && result.symbolic.notes.length > 0 && (
+                  <ul className="list-disc list-inside text-sm">
+                    {result.symbolic.notes.map((note: any, idx: number) => (
+                      <li key={idx}>{note}</li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
         {/* Recent history (session only) */}
         {history.length > 0 ? (
@@ -419,7 +475,7 @@ export default function Page() {
         ) : null}
 
         {/* Engine meta */}
-        {result ? (
+        {result?.meta ? (
           <Card>
             <CardHeader>
               <CardTitle>Engine meta</CardTitle>
@@ -427,7 +483,6 @@ export default function Page() {
                 Debug info for this analysis run.
               </CardDescription>
             </CardHeader>
-
             <CardContent className="grid gap-4 md:grid-cols-3 text-sm text-muted-foreground">
               {/* Engine version / timestamp */}
               <div>
@@ -471,64 +526,6 @@ export default function Page() {
           </Card>
         ) : null}
 
-        {/* Language families (candidate roots) */}
-        {Array.isArray((result?.raw as any)?.languageFamilies) &&
-          (result!.raw as any).languageFamilies.length > 0 && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Language families</CardTitle>
-              <CardDescription>
-                Candidate forms this engine considered for the proto-root.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="overflow-x-auto">
-                <table className="w-full border-collapse text-sm">
-                  <thead className="border-b border-muted/40 text-xs uppercase tracking-wide text-muted-foreground">
-                    <tr>
-                      <th className="py-2 pr-4 text-left">Language</th>
-                      <th className="py-2 px-4 text-left">Form</th>
-                      <th className="py-2 px-4 text-left">Passes</th>
-                      <th className="py-2 px-4 text-left">Pivot</th>
-                      <th className="py-2 px-4 text-left">Voice path</th>
-                      <th className="py-2 px-4 text-left">Note</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {(result!.raw as any).languageFamilies.map(
-                      (fam: any, idx: number) => (
-                        <tr
-                          key={`${fam.language}-${fam.form}-${idx}`}
-                          className="border-b border-muted/20 last:border-b-0"
-                        >
-                          <td className="py-1 pr-4 font-medium">
-                            {fam.language ?? "—"}
-                          </td>
-                          <td className="py-1 px-4 font-mono">
-                            {fam.form ?? "—"}
-                          </td>
-                          <td className="py-1 px-4">
-                            {fam.passes ? "✓" : "—"}
-                          </td>
-                          <td className="py-1 px-4 font-mono">
-                            {fam.morphologyMatrix?.pivot ?? "—"}
-                          </td>
-                          <td className="py-1 px-4 font-mono">
-                            {fam.voicePath ?? "—"}
-                          </td>
-                          <td className="py-1 px-4 text-xs text-muted-foreground">
-                            {fam.symbolic?.[0]?.note ?? ""}
-                          </td>
-                        </tr>
-                      )
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
         {/* Raw JSON (debug) */}
         {result?.raw ? (
           <Card>
@@ -552,3 +549,5 @@ export default function Page() {
     </div>
   );
 }
+
+    

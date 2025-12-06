@@ -57,4 +57,6 @@ export interface AnalyzeWordResultUI {
   // Top-level mode / alphabet (for the Engine meta card + debug)
   mode?: string;
   alphabet?: string;
+  wordMatrix?: any;
+  symbolic?: any;
 }
