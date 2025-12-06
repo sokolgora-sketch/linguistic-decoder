@@ -1,8 +1,6 @@
-
 "use client";
 
 import React, { useState } from "react";
-import type { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -16,15 +14,6 @@ import { WordMatrixCard } from "@/components/WordMatrix";
 import type { AnalyzeWordResultUI, HistoryItem } from "@/shared/resultsUI";
 import { buildShareSnippet } from "@/lib/shareSnippet";
 import { useToast } from "@/hooks/use-toast";
-import { Header } from "@radix-ui/react-accordion";
-
-function renderWordMatrix(result: AnalyzeWordResultUI | null): ReactNode {
-  if (!result?.wordMatrix) {
-    return null;
-  }
-
-  return <WordMatrixCard matrix={result.wordMatrix} />;
-}
 
 export default function Page() {
   const [word, setWord] = useState("");
@@ -36,6 +25,8 @@ export default function Page() {
   const [alphabet, setAlphabet] = useState<"auto" | "latin" | "albanian">(
     "auto"
   );
+
+  const { toast } = useToast();
 
   async function handleAnalyze(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -77,14 +68,14 @@ export default function Page() {
         } catch {
           // ignore
         }
-        
+
         console.error("Analyze request failed:", response.status, message);
         setError(message);
-        return; 
+        return;
       }
 
       const data = (await response.json()) as AnalyzeWordResultUI;
-      
+
       setResult(data);
       setHistory((prev) =>
         [
@@ -97,7 +88,6 @@ export default function Page() {
           ...prev,
         ].slice(0, 10)
       );
-
     } catch (err: any) {
       console.error("Error while analyzing word:", err);
       const message =
@@ -109,8 +99,6 @@ export default function Page() {
       setLoading(false);
     }
   }
-
-  const { toast } = useToast();
 
   const handleCopySnippet = () => {
     if (!result?.raw) return;
@@ -150,7 +138,7 @@ export default function Page() {
       });
     }
   };
-  
+
   return (
     <div className="min-h-screen bg-background text-foreground p-4 lg:p-8 flex flex-col items-stretch">
       <main className="max-w-5xl mx-auto w-full space-y-8 flex-1">
@@ -226,20 +214,20 @@ export default function Page() {
         </Card>
 
         {/* Heart summary */}
-        {result && (
+        {result ? (
           <Card>
             <CardHeader className="flex flex-row items-center justify-between gap-2">
               <div>
                 <CardTitle>Heart summary</CardTitle>
                 <CardDescription>
-                  Primary Seven-Voices path for {result?.word ?? "—"}.
+                  Primary Seven-Voices path for {result.word ?? "—"}.
                 </CardDescription>
               </div>
 
               <Button
                 variant="outline"
                 size="sm"
-                disabled={!result?.raw}
+                disabled={!result.raw}
                 onClick={handleCopySnippet}
               >
                 Copy snippet
@@ -274,10 +262,10 @@ export default function Page() {
               </div>
             </CardContent>
           </Card>
-        )}
+        ) : null}
 
         {/* Frontier candidates */}
-        {result && result.frontier?.length > 0 && (
+        {result && result.frontier && result.frontier.length > 0 ? (
           <Card>
             <CardHeader>
               <CardTitle>Frontier candidates</CardTitle>
@@ -285,7 +273,7 @@ export default function Page() {
                 Alternate legal paths the Mind can explore inside the same
                 rules.
               </CardDescription>
-            </Header>
+            </CardHeader>
             <CardContent>
               <div className="overflow-x-auto">
                 <table className="w-full border-collapse text-sm">
@@ -304,11 +292,17 @@ export default function Page() {
                         className="border-b border-muted/20 last:border-b-0"
                       >
                         <td className="py-1 pr-4 text-xs text-muted-foreground">
-                          {alt.id}
+                          {alt.id ?? `alt-${idx + 1}`}
                         </td>
-                        <td className="py-1 px-4 font-mono">{alt.voicePath}</td>
-                        <td className="py-1 px-4 font-mono">{alt.levelPath}</td>
-                        <td className="py-1 pl-4 font-mono">{alt.ringPath}</td>
+                        <td className="py-1 px-4 font-mono">
+                          {alt.voicePath ?? "—"}
+                        </td>
+                        <td className="py-1 px-4 font-mono">
+                          {alt.levelPath ?? "—"}
+                        </td>
+                        <td className="py-1 pl-4 font-mono">
+                          {alt.ringPath ?? "—"}
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -316,47 +310,32 @@ export default function Page() {
               </div>
             </CardContent>
           </Card>
-        )}
-        
+        ) : null}
+
         {/* Word matrix (proto-root view) */}
-        {renderWordMatrix(result)}
+        {result?.wordMatrix && (
+          <WordMatrixCard matrix={result.wordMatrix} />
+        )}
 
         {/* Symbolic reading */}
-        {result?.symbolic && (
+        {result?.symbolic ? (
           <Card>
             <CardHeader>
               <CardTitle>Symbolic reading (experimental)</CardTitle>
               <CardDescription>
-                High-level reading of this word&apos;s path. Sketch, not doctrine.
+                High-level reading of this word&apos;s path.
               </CardDescription>
             </CardHeader>
             <CardContent>
-                <div className="space-y-2">
-                  <div className="text-xs text-muted-foreground">
-                    Sketch from the Seven-Voices core. Experimental, not doctrine.
-                  </div>
-
-                  <div>
-                    <span className="font-semibold">Label: </span>
-                    <span className="font-mono text-xs uppercase tracking-wide">
-                      {result.symbolic.label}
-                    </span>
-                  </div>
-
-                  {result.symbolic.notes && result.symbolic.notes.length > 0 && (
-                    <ul className="list-disc list-inside text-sm">
-                      {result.symbolic.notes.map((note: any, idx: number) => (
-                        <li key={idx}>{note}</li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
+              <p className="text-sm text-muted-foreground">
+                {result.symbolic.notes ?? "No symbolic notes yet."}
+              </p>
             </CardContent>
           </Card>
-        )}
+        ) : null}
 
         {/* Recent history (session only) */}
-        {history.length > 0 && (
+        {history.length > 0 ? (
           <Card>
             <CardHeader>
               <CardTitle>Recent words (this session)</CardTitle>
@@ -402,10 +381,10 @@ export default function Page() {
               </div>
             </CardContent>
           </Card>
-        )}
+        ) : null}
 
         {/* Engine meta */}
-        {result && (
+        {result ? (
           <Card>
             <CardHeader>
               <CardTitle>Engine meta</CardTitle>
@@ -448,16 +427,75 @@ export default function Page() {
                     mode <span className="font-mono">{result.mode}</span>
                   </div>
                   <div>
-                    alphabet <span className="font-mono">{result.alphabet}</span>
+                    alphabet{" "}
+                    <span className="font-mono">{result.alphabet}</span>
                   </div>
                 </div>
+              </div>
+            </CardContent>
+          </Card>
+        ) : null}
+
+        {/* Language families (candidate roots) */}
+        {Array.isArray((result?.raw as any)?.languageFamilies) &&
+          (result!.raw as any).languageFamilies.length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Language families</CardTitle>
+              <CardDescription>
+                Candidate forms this engine considered for the proto-root.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="overflow-x-auto">
+                <table className="w-full border-collapse text-sm">
+                  <thead className="border-b border-muted/40 text-xs uppercase tracking-wide text-muted-foreground">
+                    <tr>
+                      <th className="py-2 pr-4 text-left">Language</th>
+                      <th className="py-2 px-4 text-left">Form</th>
+                      <th className="py-2 px-4 text-left">Passes</th>
+                      <th className="py-2 px-4 text-left">Pivot</th>
+                      <th className="py-2 px-4 text-left">Voice path</th>
+                      <th className="py-2 px-4 text-left">Note</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {(result!.raw as any).languageFamilies.map(
+                      (fam: any, idx: number) => (
+                        <tr
+                          key={`${fam.language}-${fam.form}-${idx}`}
+                          className="border-b border-muted/20 last:border-b-0"
+                        >
+                          <td className="py-1 pr-4 font-medium">
+                            {fam.language ?? "—"}
+                          </td>
+                          <td className="py-1 px-4 font-mono">
+                            {fam.form ?? "—"}
+                          </td>
+                          <td className="py-1 px-4">
+                            {fam.passes ? "✓" : "—"}
+                          </td>
+                          <td className="py-1 px-4 font-mono">
+                            {fam.morphologyMatrix?.pivot ?? "—"}
+                          </td>
+                          <td className="py-1 px-4 font-mono">
+                            {fam.voicePath ?? "—"}
+                          </td>
+                          <td className="py-1 px-4 text-xs text-muted-foreground">
+                            {fam.symbolic?.[0]?.note ?? ""}
+                          </td>
+                        </tr>
+                      )
+                    )}
+                  </tbody>
+                </table>
               </div>
             </CardContent>
           </Card>
         )}
 
         {/* Raw JSON (debug) */}
-        {result?.raw && (
+        {result?.raw ? (
           <Card>
             <CardHeader>
               <CardTitle>Raw result (debug view)</CardTitle>
@@ -474,7 +512,7 @@ export default function Page() {
               </div>
             </CardContent>
           </Card>
-        )}
+        ) : null}
       </main>
     </div>
   );
