@@ -23,19 +23,24 @@ export interface ZhejiSummaryUI {
   subjectRole: string;
   objectRole: string;
   modifierRole: string;
+  snippet: string;
 }
 
 const VOWEL_CHARS = new Set<string>(["A", "E", "I", "O", "U", "Y", "Ë"]);
 
 function parseVowelPath(path: string | null | undefined): Vowel[] {
   if (!path) return [];
-  const vowels = path.split("→").map((v) => v.trim());
+
+  // This regex now correctly handles spaces around the arrow.
+  const vowels = path.split("→").map(v => v.trim());
   const result: Vowel[] = [];
+
   for (const ch of vowels) {
     if (VOWEL_CHARS.has(ch)) {
       result.push(ch as Vowel);
     }
   }
+
   return result;
 }
 
@@ -126,6 +131,8 @@ export function buildZhejiSummary(
     rootPolarity,
     tensionPath
   );
+  
+  const snippet = `Zheji: ${subjectRole} → ${objectRole}; ${modifierRole}; [${totalTensionScore}] total tension.`;
 
   return {
     rawVowelPath: vowelPath.join(""),
@@ -136,8 +143,11 @@ export function buildZhejiSummary(
     subjectRole,
     objectRole,
     modifierRole,
+    snippet,
   };
 }
+
+// --- Inversion helpers (UI-only, pure functions) ---
 
 export function invertRootPolarity(polarity: RootPolarity): RootPolarity {
   if (polarity === "Centripetal") return "Centrifugal";
@@ -145,12 +155,17 @@ export function invertRootPolarity(polarity: RootPolarity): RootPolarity {
   return "Static";
 }
 
+// Very simple, deterministic inversion of the sentence.
+// v1: if we recognise the "From X towards Y" or
+//     "The path begins with X, and resolves into Y." pattern, we flip.
+// otherwise: just prefix "Inverted:".
 export function buildInvertedStatement(statement: string): string {
   const fromMatch = statement.match(/^From (.+) towards (.+)\.?$/);
   if (fromMatch) {
     const [, from, to] = fromMatch;
     return `From ${to} towards ${from}.`;
   }
+
   const beginsMatch = statement.match(
     /^The path begins with (.+), and resolves into (.+)\.?$/
   );
@@ -158,5 +173,17 @@ export function buildInvertedStatement(statement: string): string {
     const [, from, to] = beginsMatch;
     return `The path begins with ${to}, and resolves into ${from}.`;
   }
+
   return `Inverted: ${statement}`;
+}
+
+export function buildZhejiSnippet(view: "normal" | "inverted", base: ZhejiSummaryUI): string {
+  if (view === 'normal') {
+    return base.snippet;
+  }
+  
+  const invertedPolarity = invertRootPolarity(base.rootPolarity);
+  const invertedModifier = base.modifierRole.replace(base.rootPolarity, invertedPolarity);
+  
+  return `Zheji: ${base.objectRole} → ${base.subjectRole}; ${invertedModifier}; [${base.totalTensionScore}] total tension.`;
 }

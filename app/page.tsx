@@ -18,6 +18,7 @@ import {
   buildZhejiSummary,
   invertRootPolarity,
   buildInvertedStatement,
+  buildZhejiSnippet,
 } from "@/lib/zhejiSummary";
 
 function renderWordMatrix(result: AnalyzeWordResultUI | null): React.ReactNode {
@@ -52,6 +53,20 @@ export default function Page() {
     zheji && zhejiInverted
       ? buildInvertedStatement(zheji.functionalStatement)
       : zheji?.functionalStatement ?? "";
+
+  const effectiveSubjectRole = zheji
+    ? zhejiInverted
+      ? zheji.objectRole
+      : zheji.subjectRole
+    : "—";
+  const effectiveObjectRole = zheji
+    ? zhejiInverted
+      ? zheji.subjectRole
+      : zheji.objectRole
+    : "—";
+  const effectiveModifierRole = zheji
+    ? zheji.modifierRole.replace(zheji.rootPolarity, effectivePolarity)
+    : "—";
 
   async function handleAnalyze(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -158,6 +173,40 @@ export default function Page() {
       toast({
         title: "Error",
         description: "Could not build share snippet.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleCopyZhejiSnippet = () => {
+    if (!zheji) return;
+
+    const view = zhejiInverted ? "inverted" : "normal";
+    const snippet = buildZhejiSnippet(view, zheji);
+
+    try {
+      if (typeof navigator !== "undefined" && navigator.clipboard) {
+        navigator.clipboard
+          .writeText(snippet)
+          .then(() => {
+            toast({
+              title: "Zheji snippet copied",
+              description: "Summary is ready to paste.",
+            });
+          })
+          .catch(() => {
+            toast({
+              title: "Copy failed",
+              description: "Could not access the clipboard.",
+              variant: "destructive",
+            });
+          });
+      }
+    } catch (err) {
+      console.error("Error building Zheji share snippet:", err);
+      toast({
+        title: "Error",
+        description: "Could not build Zheji share snippet.",
         variant: "destructive",
       });
     }
@@ -295,54 +344,79 @@ export default function Page() {
               <div>
                 <CardTitle>Zheji structural summary</CardTitle>
                 <CardDescription>
-                  Structural reading of {result?.word ?? "this word"} (path, polarity, tension).
+                  Structural reading of {result?.word ?? "this word"} (path,
+                  polarity, tension).
                 </CardDescription>
               </div>
               {zheji && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setZhejiInverted((prev) => !prev)}
-                >
-                  {zhejiInverted ? "Normal view" : "Invert"}
-                </Button>
+                 <div className="flex items-center gap-2">
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleCopyZhejiSnippet}
+                    >
+                        Copy snippet
+                    </Button>
+                    <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setZhejiInverted((prev) => !prev)}
+                    >
+                    {zhejiInverted ? "Normal view" : "Invert"}
+                    </Button>
+                </div>
               )}
             </CardHeader>
             <CardContent className="text-sm space-y-4">
               <div>
-                <span className="text-xs uppercase text-muted-foreground">Functional statement</span>
+                <span className="text-xs uppercase text-muted-foreground">
+                  Functional statement
+                </span>
                 <p className="mt-1">{effectiveStatement}</p>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3 border-t border-border/40">
-                  <div>
-                      <span className="text-xs uppercase text-muted-foreground">Subject</span>
-                      <p className="font-mono mt-1">{zheji.subjectRole}</p>
-                  </div>
-                  <div>
-                      <span className="text-xs uppercase text-muted-foreground">Object</span>
-                      <p className="font-mono mt-1">{zheji.objectRole}</p>
-                  </div>
-                  <div>
-                      <span className="text-xs uppercase text-muted-foreground">Modifier</span>
-                      <p className="font-mono mt-1">{zheji.modifierRole}</p>
-                  </div>
+                <div>
+                  <span className="text-xs uppercase text-muted-foreground">
+                    Subject
+                  </span>
+                  <p className="font-mono mt-1">{effectiveSubjectRole}</p>
+                </div>
+                <div>
+                  <span className="text-xs uppercase text-muted-foreground">
+                    Object
+                  </span>
+                  <p className="font-mono mt-1">{effectiveObjectRole}</p>
+                </div>
+                <div>
+                  <span className="text-xs uppercase text-muted-foreground">
+                    Modifier
+                  </span>
+                  <p className="font-mono mt-1">{effectiveModifierRole}</p>
+                </div>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3 border-t border-border/40">
                 <div>
-                  <span className="text-xs uppercase text-muted-foreground">Raw vowel path</span>
+                  <span className="text-xs uppercase text-muted-foreground">
+                    Raw vowel path
+                  </span>
                   <div className="font-mono">{zheji.rawVowelPath}</div>
                 </div>
                 <div>
-                  <span className="text-xs uppercase text-muted-foreground">Root polarity</span>
+                  <span className="text-xs uppercase text-muted-foreground">
+                    Root polarity
+                  </span>
                   <div className="font-mono">
                     {effectivePolarity}
                     {zhejiInverted && " (inverted)"}
                   </div>
                 </div>
                 <div>
-                  <span className="text-xs uppercase text-muted-foreground">Tension</span>
+                  <span className="text-xs uppercase text-muted-foreground">
+                    Tension
+                  </span>
                   <div className="font-mono">
-                    [{zheji.tensionPath.join(", ")}] → total {zheji.totalTensionScore}
+                    [{zheji.tensionPath.join(", ")}] → total{" "}
+                    {zheji.totalTensionScore}
                   </div>
                 </div>
               </div>
