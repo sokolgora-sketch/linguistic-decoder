@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, type ReactNode } from "react";
@@ -181,10 +180,11 @@ export default function Page() {
 
   const handleCopyZhejiSnippet = () => {
     if (!zheji) return;
+
+    const view = zhejiInverted ? "inverted" : "normal";
+    const snippet = buildZhejiSnippet(view, zheji);
+
     try {
-      const view = zhejiInverted ? "inverted" : "normal";
-      const snippet = buildZhejiSnippet(view, zheji);
-      
       if (typeof navigator !== "undefined" && navigator.clipboard) {
         navigator.clipboard
           .writeText(snippet)
@@ -201,18 +201,12 @@ export default function Page() {
               variant: "destructive",
             });
           });
-      } else {
-        console.log("Zheji snippet:", snippet);
-        toast({
-          title: "Snippet ready",
-          description: "Clipboard not available – check console output.",
-        });
       }
     } catch (err) {
-      console.error("Error building Zheji snippet:", err);
+      console.error("Error building Zheji share snippet:", err);
       toast({
         title: "Error",
-        description: "Could not build Zheji snippet.",
+        description: "Could not build Zheji share snippet.",
         variant: "destructive",
       });
     }
