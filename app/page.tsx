@@ -11,7 +11,11 @@ import {
   CardContent,
 } from '@/components/ui/card';
 import { WordMatrixCard } from '@/components/WordMatrix';
-import type { AnalyzeWordResultUI, HistoryItem } from '@/shared/resultsUI';
+import {
+  type AnalyzeWordResultUI,
+  type HistoryItem,
+  buildLanguageFamiliesView,
+} from '@/shared/resultsUI';
 import { buildShareSnippet } from '@/lib/shareSnippet';
 import { useToast } from '@/hooks/use-toast';
 import {
@@ -21,6 +25,7 @@ import {
   buildZhejiSnippet,
 } from '@/lib/zhejiSummary';
 import { EngineMetaCard } from '@/components/EngineMetaCard';
+import { LanguageFamiliesCard } from '@/components/LanguageFamiliesCard';
 
 function renderWordMatrix(result: AnalyzeWordResultUI | null): React.ReactNode {
   if (!result?.wordMatrix) {
@@ -44,6 +49,7 @@ export default function Page() {
   const { toast } = useToast();
 
   const zheji = result ? buildZhejiSummary(result) : null;
+  const languageFamiliesView = buildLanguageFamiliesView(result);
 
   const effectivePolarity =
     zheji && zhejiInverted
@@ -527,6 +533,8 @@ export default function Page() {
             </CardContent>
           </Card>
         ) : null}
+
+        <LanguageFamiliesCard families={languageFamiliesView} />
 
         {/* Word matrix (rendered by helper) */}
         {renderWordMatrix(result)}
