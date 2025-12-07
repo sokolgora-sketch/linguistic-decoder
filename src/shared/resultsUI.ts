@@ -112,24 +112,28 @@ export interface SymbolicSummary {
 }
 
 export function buildSymbolicSummary(
-  analysis?: AnalyzeWordResultUI | null
+  analysis?: AnalyzeWordResultUI | null,
 ): SymbolicSummary | null {
-  if (!analysis?.symbolic?.notes) {
+  const symbolic = analysis?.symbolic;
+
+  if (!symbolic || !Array.isArray(symbolic.notes)) {
     return null;
   }
 
-  const processedNotes = (analysis.symbolic.notes || [])
-    .map((note) => (typeof note === "string" ? note.trim() : null))
-    .filter((note): note is string => !!note);
+  const processedNotes = symbolic.notes
+    .map((note) => (typeof note === "string" ? note.trim() : ""))
+    .filter((note) => note.length > 0);
 
-  const uniqueNotes = [...new Set(processedNotes)].slice(0, 5);
+  const uniqueNotes = processedNotes.filter(
+    (note, index) => processedNotes.indexOf(note) === index,
+  );
 
   if (uniqueNotes.length === 0) {
     return null;
   }
 
   return {
-    label: analysis.symbolic.label || "Symbolic reading (experimental)",
-    notes: uniqueNotes,
+    label: symbolic.label || "Symbolic reading (experimental)",
+    notes: uniqueNotes.slice(0, 5),
   };
 }
