@@ -15,12 +15,20 @@ export interface FrontierCandidateSummary {
   ringPath: string;
 }
 
-// Placeholder - to be defined more fully later
-export interface CanonLanguageFamilySummary {
-  language: string;
-  form: string;
-  gloss: string;
+export interface EngineLanguageFamily {
+  language?: string;
+  form?: string;
+  passes: boolean;
+  experimental?: boolean;
+  speculative?: boolean;
+  morphologyMatrix?: {
+      pivot?: string;
+  };
+  symbolic?: {
+      tag: string;
+  }[];
 }
+
 
 // Placeholder - to be defined more fully later
 export interface HistoryItem {
@@ -39,7 +47,7 @@ export interface AnalyzeWordResultUI {
   sanitized: string;
   primaryPath: PrimaryPathSummary | null;
   frontier: FrontierCandidateSummary[];
-  languageFamilies: CanonLanguageFamilySummary[];
+  languageFamilies: EngineLanguageFamily[];
   history: HistoryItem[];
 
   // NEW – structured summary used by the Engine meta card
@@ -59,4 +67,39 @@ export interface AnalyzeWordResultUI {
   alphabet?: string;
   wordMatrix?: any;
   symbolic?: any;
+}
+
+
+export interface LanguageFamilyView {
+  language: string;
+  form: string;
+  pivot: string;
+  status: "core" | "experimental" | "speculative" | "rejected";
+  tags: string[];
+}
+
+export function buildLanguageFamiliesView(
+  analysis: AnalyzeWordResultUI | null | undefined
+): LanguageFamilyView[] {
+  if (!analysis?.languageFamilies) return [];
+  return analysis.languageFamilies.map((fam) => {
+    const pivot = fam.morphologyMatrix?.pivot ?? "";
+    const status: "core" | "experimental" | "speculative" | "rejected" = !fam.passes
+      ? "rejected"
+      : fam.experimental
+      ? "experimental"
+      : fam.speculative
+      ? "speculative"
+      : "core";
+
+    const tags = (fam.symbolic ?? []).map((s) => s.tag).filter(Boolean);
+
+    return {
+      language: fam.language ?? "",
+      form: fam.form ?? "",
+      pivot,
+      status,
+      tags,
+    };
+  });
 }
