@@ -9,7 +9,8 @@ export default {
   roots: ['<rootDir>/tests'],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
-    '^(\\.{1,2}/.*)\\.js$': '$1'
+    '^(\\.{1,2}/.*)\\.js$': '$1',
+    'lucide-react': '<rootDir>/node_modules/lucide-react/dist/cjs/lucide-react.js'
   },
   testPathIgnorePatterns: [
     "/node_modules/",
