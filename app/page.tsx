@@ -15,6 +15,7 @@ import {
   type AnalyzeWordResultUI,
   type HistoryItem,
   buildLanguageFamiliesView,
+  buildSymbolicSummary,
 } from '@/shared/resultsUI';
 import { buildShareSnippet } from '@/lib/shareSnippet';
 import { useToast } from '@/hooks/use-toast';
@@ -26,6 +27,7 @@ import {
 } from '@/lib/zhejiSummary';
 import { EngineMetaCard } from '@/components/EngineMetaCard';
 import { LanguageFamiliesCard } from '@/components/LanguageFamiliesCard';
+import { SymbolicReadingCard } from '@/components/SymbolicReadingCard';
 
 function renderWordMatrix(result: AnalyzeWordResultUI | null): React.ReactNode {
   if (!result?.wordMatrix) {
@@ -50,6 +52,7 @@ export default function Page() {
 
   const zheji = result ? buildZhejiSummary(result) : null;
   const languageFamiliesView = buildLanguageFamiliesView(result);
+  const symbolicSummary = buildSymbolicSummary(result);
 
   const effectivePolarity =
     zheji && zhejiInverted
@@ -411,21 +414,21 @@ export default function Page() {
                 </CardDescription>
               </div>
               {zheji && (
-                 <div className="flex items-center gap-2">
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={handleCopyZhejiSnippet}
-                    >
-                        Copy snippet
-                    </Button>
-                    <Button
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleCopyZhejiSnippet}
+                  >
+                    Copy snippet
+                  </Button>
+                  <Button
                     variant="outline"
                     size="sm"
                     onClick={() => setZhejiInverted((prev) => !prev)}
-                    >
+                  >
                     {zhejiInverted ? 'Normal view' : 'Invert'}
-                    </Button>
+                  </Button>
                 </div>
               )}
             </CardHeader>
@@ -539,47 +542,7 @@ export default function Page() {
         {/* Word matrix (rendered by helper) */}
         {renderWordMatrix(result)}
 
-        {/* Symbolic reading */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Symbolic reading (experimental)</CardTitle>
-            <CardDescription>
-              High-level reading of this word's path. Sketch, not doctrine.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {!result && (
-              <p className="text-sm text-muted-foreground">
-                Run a word to see a symbolic reading.
-              </p>
-            )}
-            {result && !result.symbolic && (
-              <p className="text-sm text-muted-foreground">
-                No symbolic reading available for this word yet.
-              </p>
-            )}
-            {result?.symbolic && (
-              <div className="space-y-2">
-                <div className="text-xs text-muted-foreground">
-                  Sketch from the Seven-Voices core. Experimental, not doctrine.
-                </div>
-                <div>
-                  <span className="font-semibold">Label: </span>
-                  <span className="font-mono text-xs uppercase tracking-wide">
-                    {result.symbolic.label}
-                  </span>
-                </div>
-                {result.symbolic.notes && result.symbolic.notes.length > 0 && (
-                  <ul className="list-disc list-inside text-sm">
-                    {result.symbolic.notes.map((note: any, idx: number) => (
-                      <li key={idx}>{note}</li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            )}
-          </CardContent>
-        </Card>
+        {symbolicSummary && <SymbolicReadingCard summary={symbolicSummary} />}
 
         {/* Recent history (session only) */}
         {history.length > 0 ? (

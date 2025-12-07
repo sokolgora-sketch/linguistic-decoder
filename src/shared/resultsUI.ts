@@ -22,13 +22,12 @@ export interface EngineLanguageFamily {
   experimental?: boolean;
   speculative?: boolean;
   morphologyMatrix?: {
-      pivot?: string;
+    pivot?: string;
   };
   symbolic?: {
-      tag: string;
+    tag: string;
   }[];
 }
-
 
 // Placeholder - to be defined more fully later
 export interface HistoryItem {
@@ -66,9 +65,11 @@ export interface AnalyzeWordResultUI {
   mode?: string;
   alphabet?: string;
   wordMatrix?: any;
-  symbolic?: any;
+  symbolic?: {
+    label?: string;
+    notes?: (string | null)[];
+  };
 }
-
 
 export interface LanguageFamilyView {
   language: string;
@@ -84,13 +85,14 @@ export function buildLanguageFamiliesView(
   if (!analysis?.languageFamilies) return [];
   return analysis.languageFamilies.map((fam) => {
     const pivot = fam.morphologyMatrix?.pivot ?? "";
-    const status: "core" | "experimental" | "speculative" | "rejected" = !fam.passes
-      ? "rejected"
-      : fam.experimental
-      ? "experimental"
-      : fam.speculative
-      ? "speculative"
-      : "core";
+    const status: "core" | "experimental" | "speculative" | "rejected" =
+      !fam.passes
+        ? "rejected"
+        : fam.experimental
+        ? "experimental"
+        : fam.speculative
+        ? "speculative"
+        : "core";
 
     const tags = (fam.symbolic ?? []).map((s) => s.tag).filter(Boolean);
 
@@ -102,4 +104,32 @@ export function buildLanguageFamiliesView(
       tags,
     };
   });
+}
+
+export interface SymbolicSummary {
+  label: string;
+  notes: string[];
+}
+
+export function buildSymbolicSummary(
+  analysis?: AnalyzeWordResultUI | null
+): SymbolicSummary | null {
+  if (!analysis?.symbolic?.notes) {
+    return null;
+  }
+
+  const processedNotes = (analysis.symbolic.notes || [])
+    .map((note) => (typeof note === "string" ? note.trim() : null))
+    .filter((note): note is string => !!note);
+
+  const uniqueNotes = [...new Set(processedNotes)].slice(0, 5);
+
+  if (uniqueNotes.length === 0) {
+    return null;
+  }
+
+  return {
+    label: analysis.symbolic.label || "Symbolic reading (experimental)",
+    notes: uniqueNotes,
+  };
 }
