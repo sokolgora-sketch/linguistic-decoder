@@ -3,6 +3,12 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import Page from '../app/page';
 import '@testing-library/jest-dom';
 
+jest.mock("lucide-react", () => ({
+  __esModule: true,
+  // Only the icons we actually use in the UI
+  Sparkles: () => null,
+}));
+
 // Mock the useToast hook
 jest.mock('@/hooks/use-toast', () => ({
   useToast: () => ({
