@@ -5,7 +5,8 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "./ui/
 import { Candidates } from "./Candidates";
 import { FrontierCandidates } from "./FrontierCandidates"; // ignore if missing
 import { SymbolicReadingCard } from "./SymbolicReadingCard";
-import { WordMatrixCard } from "./WordMatrix";
+import WordMatrixCard from "./WordMatrixCard";
+import { buildWordMatrixSummary } from "@/lib/wordMatrix"; 
 import type { EnginePayload } from "../shared/engineShape";
 
 type ResultsDisplayProps = {
@@ -14,6 +15,10 @@ type ResultsDisplayProps = {
 
 export function ResultsDisplay({ analysis }: ResultsDisplayProps) {
   if (!analysis) return null;
+
+  const wordMatrixSummary = analysis
+  ? buildWordMatrixSummary(analysis)
+  : null;
 
   return (
     <div className="space-y-6">
@@ -117,7 +122,9 @@ export function ResultsDisplay({ analysis }: ResultsDisplayProps) {
       )}
 
       {/* WORD MATRIX */}
-      <WordMatrixCard matrix={(analysis as any).wordMatrix ?? null} />
+      {wordMatrixSummary && (
+        <WordMatrixCard summary={wordMatrixSummary} />
+      )}
 
       {/* SYMBOLIC */}
       <SymbolicReadingCard symbolic={(analysis as any).symbolic ?? null} />
