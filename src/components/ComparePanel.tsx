@@ -1,7 +1,7 @@
 // src/components/ComparePanel.tsx
 "use client";
 
-import React, { useState, useCallback, useMemo } from "react";
+import React, { useState, useCallback } from "react";
 import {
   Card,
   CardHeader,
@@ -81,7 +81,7 @@ export default function ComparePanel({
   const [rightWord, setRightWord] = useState("study");
   const [mode, setMode] = useState<Mode>(defaultMode);
   const [alphabet] = useState(defaultAlphabet);
-  const [loading, setLoading] = useState(false);
+  const [isComparing, setIsComparing] = useState(false);
   const [validationError, setValidationError] = useState<string | null>(null);
   const [compareError, setCompareError] = useState<string | null>(null);
   const [result, setResult] = useState<CompareResult | null>(null);
@@ -107,22 +107,9 @@ export default function ComparePanel({
     });
   }, [result]);
 
-  async function analyzeRemote(word: string): Promise<AnalyzeWordResultUI> {
-    const response = await fetch("/api/analyze", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ word, mode, alphabet }),
-    });
+  const handleCompare = useCallback(async () => {
+    if (isComparing) return;
 
-    if (!response.ok) {
-      const details = await response.text();
-      console.error(`[ComparePanel] API error for word: ${word}`, details);
-      throw new Error(`API error: ${response.status} ${response.statusText}`);
-    }
-    return response.json();
-  }
-
-  async function handleCompare() {
     setValidationError(null);
     setCompareError(null);
     setResult(null);
@@ -135,9 +122,24 @@ export default function ComparePanel({
       return;
     }
 
-    setLoading(true);
+    setIsComparing(true);
 
     try {
+      const analyzeRemote = async (word: string): Promise<AnalyzeWordResultUI> => {
+        const response = await fetch("/api/analyze", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ word, mode, alphabet }),
+        });
+
+        if (!response.ok) {
+          const details = await response.text();
+          console.error(`[ComparePanel] API error for word: ${word}`, details);
+          throw new Error(`API error: ${response.status} ${response.statusText}`);
+        }
+        return response.json();
+      };
+
       const [left, right] = await Promise.all([
         analyzeRemote(trimmedLeft),
         analyzeRemote(trimmedRight),
@@ -151,9 +153,16 @@ export default function ComparePanel({
       }
       setCompareError(errorMessage);
     } finally {
-      setLoading(false);
+      setIsComparing(false);
     }
-  }
+  }, [isComparing, leftWord, rightWord, mode, alphabet]);
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleCompare();
+    }
+  };
 
   const leftEngineMeta = result?.left ? buildEngineMetaSummary(result.left.engineMeta) : null;
   const rightEngineMeta = result?.right ? buildEngineMetaSummary(result.right.engineMeta) : null;
@@ -168,27 +177,31 @@ export default function ComparePanel({
       </CardHeader>
 
       <CardContent className="space-y-4">
-        <div className="grid gap-4 md:grid-cols-2">
-          <Input
-            value={leftWord}
-            onChange={(e) => setLeftWord(e.target.value)}
-            placeholder="Left word"
-            disabled={loading}
-          />
-          <Input
-            value={rightWord}
-            onChange={(e) => setRightWord(e.target.value)}
-            placeholder="Right word"
-            disabled={loading}
-          />
-        </div>
+        <form onSubmit={(e) => { e.preventDefault(); handleCompare(); }}>
+          <div className="grid gap-4 md:grid-cols-2">
+            <Input
+              value={leftWord}
+              onChange={(e) => setLeftWord(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder="Left word"
+              disabled={isComparing}
+            />
+            <Input
+              value={rightWord}
+              onChange={(e) => setRightWord(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder="Right word"
+              disabled={isComparing}
+            />
+          </div>
 
-        <div className="flex items-center justify-between gap-4">
-          <div />
-          <Button onClick={handleCompare} disabled={loading} size="sm">
-            {loading ? "Comparing…" : "Compare"}
-          </Button>
-        </div>
+          <div className="flex items-center justify-between gap-4 mt-4">
+            <div />
+            <Button type="submit" disabled={isComparing} aria-busy={isComparing} size="sm">
+              {isComparing ? "Comparing…" : "Compare"}
+            </Button>
+          </div>
+        </form>
 
         {validationError && (
           <div className="rounded-md border border-amber-500/50 bg-amber-500/10 p-3 text-sm text-amber-600">

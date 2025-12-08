@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, type ReactNode } from 'react';
+import React, { useState, type ReactNode, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -42,7 +42,7 @@ function renderWordMatrix(result: AnalyzeWordResultUI | null): React.ReactNode {
 
 export default function Page() {
   const [word, setWord] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [validationError, setValidationError] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<AnalyzeWordResultUI | null>(null);
@@ -87,8 +87,9 @@ export default function Page() {
     ? zheji.modifierRole.replace(zheji.rootPolarity, effectivePolarity)
     : '—';
 
-  async function handleAnalyze(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
+  const handleAnalyze = useCallback(async () => {
+    if (isAnalyzing) return;
+
     setValidationError(null);
     setError(null);
     setResult(null);
@@ -99,7 +100,7 @@ export default function Page() {
       return;
     }
 
-    setLoading(true);
+    setIsAnalyzing(true);
 
     try {
       const response = await fetch('/api/analyze', {
@@ -139,9 +140,16 @@ export default function Page() {
       const message = "Network error while calling /api/analyze. Try again.";
       setError(message);
     } finally {
-      setLoading(false);
+      setIsAnalyzing(false);
     }
-  }
+  }, [isAnalyzing, word, mode, alphabet]);
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleAnalyze();
+    }
+  };
 
   const handleCopySnippet = () => {
     if (!result?.raw) return;
@@ -279,17 +287,18 @@ export default function Page() {
           </CardHeader>
           <CardContent>
             <form
-              onSubmit={handleAnalyze}
+              onSubmit={(e) => { e.preventDefault(); handleAnalyze(); }}
               className="flex flex-col gap-3 sm:flex-row"
             >
               <Input
                 value={word}
                 onChange={(e) => setWord(e.target.value)}
+                onKeyDown={handleKeyDown}
                 placeholder="study"
-                disabled={loading}
+                disabled={isAnalyzing}
               />
-              <Button type="submit" disabled={loading}>
-                {loading ? 'Analyzing...' : 'Analyze'}
+              <Button type="submit" disabled={isAnalyzing} aria-busy={isAnalyzing}>
+                {isAnalyzing ? 'Analyzing...' : 'Analyze'}
               </Button>
             </form>
             {validationError && (
