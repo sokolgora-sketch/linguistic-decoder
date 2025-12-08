@@ -27,50 +27,55 @@ What can I click?
 
 The main UI is a single page made of a few cards:
 
-Analyze a word
+- **Analyze a word**
 Type a word, pick the Mode (strict, etc.) and Alphabet (auto, latin, …),
 then click Analyze or press Enter to run the Seven-Voices engine.
 
-Engine meta
+- **Engine meta**
 Debug card that shows which engine and build were used
 (for example SevenVoices Core, 0.2.0-symbolic), plus the mode and alphabet.
 It also includes a dev button to Copy JSON with the raw analysis payload.
 
-Heart summary
+- **Heart summary**
 Shows the primary Seven-Voices path for the word:
 
-Voice path (e.g. U → I)
+- **Voice path** (e.g. U → I)
 
-Level path (low / mid / high)
+- **Level path** (low / mid / high)
 
-Ring path (1 → 1, 1 → 3, etc.)
+- **Ring path** (1 → 1, 1 → 3, etc.)
 
 When available, alternative paths are listed below the primary path.
 
-Language families (experimental)
+- **Word Matrix card** – shows a compressed view of the engine’s word matrix:
+  - Deep root (language + form + vowel path).
+  - Key windows the engine used.
+  - Short note so users know this is a *summary* of the internal matrix, not the full raw table.
+
+- **Language families (experimental)**
 Table where the engine lists plausible language families for this word, with:
 
-Language (e.g. Latin, Albanian)
+- **Language** (e.g. Latin, Albanian)
 
-Form (surface form used by the engine)
+- **Form** (surface form used by the engine)
 
-Pivot (core syllable/root)
+- **Pivot** (core syllable/root)
 
-Status (core, effort, …)
+- **Status** (core, effort, …)
 
 Optional tags describing the role of that candidate.
 
-Symbolic reading (experimental)
+- **Symbolic reading (experimental)**
 A short Zheji-inspired symbolic reading of the word.
 Shows a label and up to a handful of de-duplicated notes, for example:
 
 “Represents a conscious application of will.”
 
-Recent words (this session)
+- **Recent words (this session)**
 Lightweight history of the last heart paths you ran in this browser session:
 word, voice path, level path, and ring path.
 
-Compare two words
+- **Compare two words**
 Panel that lets you run the engine on two words side-by-side.
 
 Both inputs must be filled; otherwise you see
