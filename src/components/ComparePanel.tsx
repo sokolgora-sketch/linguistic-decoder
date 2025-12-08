@@ -12,8 +12,8 @@ import {
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { ExportJsonButton } from "./ui/ExportJsonButton";
-import { EngineMetaCard } from "./EngineMetaCard"; // Changed from EngineMetaBadge
-import type { AnalyzeWordResultUI, PrimaryPathSummary } from "@/shared/resultsUI"; // Changed from resultShape.v1
+import { EngineMetaCard } from "./EngineMetaCard";
+import type { AnalyzeWordResultUI, PrimaryPathSummary } from "@/shared/resultsUI";
 import { buildEngineMetaSummary } from "@/lib/engineMetaSummary";
 
 function buildHeartSummaryText(summary: PrimaryPathSummary | null): string | null {
@@ -82,6 +82,7 @@ export default function ComparePanel({
   const [mode, setMode] = useState<Mode>(defaultMode);
   const [alphabet] = useState(defaultAlphabet);
   const [loading, setLoading] = useState(false);
+  const [validationError, setValidationError] = useState<string | null>(null);
   const [compareError, setCompareError] = useState<string | null>(null);
   const [result, setResult] = useState<CompareResult | null>(null);
 
@@ -106,33 +107,40 @@ export default function ComparePanel({
     });
   }, [result]);
 
-  async function analyzeRemote(word: string): Promise<AnalyzeWordResultUI | null> {
-    const trimmed = word.trim();
-    if (!trimmed) return null;
-
+  async function analyzeRemote(word: string): Promise<AnalyzeWordResultUI> {
     const response = await fetch("/api/analyze", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ word: trimmed, mode, alphabet }),
+      body: JSON.stringify({ word, mode, alphabet }),
     });
 
     if (!response.ok) {
       const details = await response.text();
-      console.error(`[ComparePanel] API error for word: ${trimmed}`, details);
+      console.error(`[ComparePanel] API error for word: ${word}`, details);
       throw new Error(`API error: ${response.status} ${response.statusText}`);
     }
     return response.json();
   }
 
   async function handleCompare() {
-    setLoading(true);
+    setValidationError(null);
     setCompareError(null);
     setResult(null);
 
+    const trimmedLeft = leftWord.trim();
+    const trimmedRight = rightWord.trim();
+
+    if (!trimmedLeft || !trimmedRight) {
+      setValidationError("Enter both words before comparing.");
+      return;
+    }
+
+    setLoading(true);
+
     try {
       const [left, right] = await Promise.all([
-        analyzeRemote(leftWord),
-        analyzeRemote(rightWord),
+        analyzeRemote(trimmedLeft),
+        analyzeRemote(trimmedRight),
       ]);
       setResult({ left, right });
     } catch (e: any) {
@@ -176,13 +184,19 @@ export default function ComparePanel({
         </div>
 
         <div className="flex items-center justify-between gap-4">
-          <div /> 
+          <div />
           <Button onClick={handleCompare} disabled={loading} size="sm">
             {loading ? "Comparing…" : "Compare"}
           </Button>
         </div>
 
-        {compareError && (
+        {validationError && (
+          <div className="rounded-md border border-amber-500/50 bg-amber-500/10 p-3 text-sm text-amber-600">
+            {validationError}
+          </div>
+        )}
+
+        {compareError && !validationError && (
           <div className="rounded-md border border-destructive/50 bg-destructive/10 p-3 text-sm text-destructive">
             {compareError}
           </div>
