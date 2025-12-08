@@ -7,8 +7,9 @@
 export type HeartSummaryInput = {
   word: string;
   primaryPath: {
-    voicePath: string[];  // e.g. ["U", "I"]
-    ringPath: number[];   // e.g. [1, 1]
+    voicePath: string | string[];  // e.g. ["U", "I"]
+    ringPath: string | number[];   // e.g. [1, 1]
+    levelPath?: string;
   };
 };
 
@@ -25,12 +26,16 @@ export type HeartSummaryInput = {
  */
 export function buildHeartSummaryText(input: HeartSummaryInput): string {
   const { word, primaryPath } = input;
-  const path = (primaryPath.voicePath ?? []).join(" → ");
-  const rings = (primaryPath.ringPath ?? []).join(" → ");
+  const path = Array.isArray(primaryPath.voicePath) ? primaryPath.voicePath.join(" → ") : primaryPath.voicePath;
+  const rings = Array.isArray(primaryPath.ringPath) ? primaryPath.ringPath.join(" → ") : primaryPath.ringPath;
 
   // Very defensive; if engine ever sends something weird, we still return *something*.
   const pathPart = path ? path : "?";
   const ringPart = rings ? rings : "?";
+
+  if (primaryPath.levelPath) {
+    return `${pathPart}${primaryPath.levelPath}.${ringPart}`;
+  }
 
   return `${word}: ${pathPart} (rings ${ringPart})`;
 }

@@ -1,18 +1,20 @@
 import { buildHeartSummaryText } from "./heartSummaryText";
 import { buildEngineMetaSummary } from "./engineMetaSummary";
+import {
+  buildSymbolicSummary,
+  buildLanguageFamiliesView,
+  AnalyzeWordResultUI,
+} from "../shared/resultsUI";
 
 export type ShareSource = {
   word: string;
-  // you can tighten this later – for now "any" keeps TS happy and matches the tests
-  analysis: any;
+  analysis: AnalyzeWordResultUI;
 };
-
-// ...
 
 export function buildShareSnippet(source: ShareSource): string {
   const { word, analysis } = source;
 
-  const primaryPath = analysis?.heart?.primaryPath;
+  const primaryPath = analysis?.primaryPath;
   const heartLine = primaryPath
     ? buildHeartSummaryText({ word, primaryPath })
     : null;
@@ -20,17 +22,51 @@ export function buildShareSnippet(source: ShareSource): string {
   const meta = buildEngineMetaSummary(analysis);
   let engineLine: string | null = null;
   if (meta && typeof meta === 'object') {
-    engineLine = `${meta.versionLine || ''} · ${meta.modeLabel || ''} · ${meta.alphabetLabel || ''}`;
+    engineLine = `${meta.versionLine || ''} · ${meta.modeLabel || ''} · ${
+      meta.alphabetLabel || ''
+    }`;
   } else if (meta) {
     engineLine = String(meta);
   }
 
   const header = `Linguistic Decoder — ${word}`;
 
+  const symbolicSummary = buildSymbolicSummary(analysis);
+  let symbolicLine: string | null = null;
+  if (symbolicSummary) {
+    const { label, notes } = symbolicSummary;
+    const firstNote = notes[0];
+    if (firstNote) {
+      symbolicLine = `Symbolic (experimental): ${label} — ${firstNote}`;
+    } else {
+      symbolicLine = `Symbolic (experimental): ${label}`;
+    }
+  }
+
+  const languageFamilies = buildLanguageFamiliesView(analysis);
+  let languagesLine: string | null = null;
+  if (languageFamilies.length > 0) {
+    const families = languageFamilies.slice(0, 2).map((family) => {
+      let familyString = `${family.language} – ${family.form}`;
+      const tag = family.tags[0];
+      if (family.pivot && tag) {
+        familyString += ` (pivot: ${family.pivot}, tag: ${tag})`
+      } else if (family.pivot) {
+        familyString += ` (pivot: ${family.pivot})`
+      } else if (tag) {
+        familyString += ` (tag: ${tag})`
+      }
+      return familyString;
+    });
+    languagesLine = `Languages: ${families.join("; ")}`;
+  }
+
   return [
     header,
     heartLine ? `Summary: ${heartLine}` : null,
     engineLine ? `Engine: ${engineLine}` : null,
+    languagesLine,
+    symbolicLine,
   ]
     .filter(Boolean)
     .join("\n");
