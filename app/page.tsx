@@ -43,6 +43,7 @@ function renderWordMatrix(result: AnalyzeWordResultUI | null): React.ReactNode {
 export default function Page() {
   const [word, setWord] = useState('');
   const [loading, setLoading] = useState(false);
+  const [validationError, setValidationError] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<AnalyzeWordResultUI | null>(null);
   const [zhejiInverted, setZhejiInverted] = useState(false);
@@ -88,12 +89,17 @@ export default function Page() {
 
   async function handleAnalyze(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const trimmed = word.trim();
-    if (!trimmed) return;
-
-    setLoading(true);
+    setValidationError(null);
     setError(null);
     setResult(null);
+
+    const trimmed = word.trim();
+    if (!trimmed) {
+      setValidationError('Type a word before analyzing.');
+      return;
+    }
+
+    setLoading(true);
 
     try {
       const response = await fetch('/api/analyze', {
@@ -286,6 +292,9 @@ export default function Page() {
                 {loading ? 'Analyzing...' : 'Analyze'}
               </Button>
             </form>
+            {validationError && (
+              <p className="mt-2 text-sm text-amber-600">{validationError}</p>
+            )}
             <div className="flex flex-wrap gap-4 mt-2">
               <div>
                 <label className="text-sm opacity-80 mr-2">Mode:</label>
@@ -320,7 +329,7 @@ export default function Page() {
           </CardContent>
         </Card>
 
-        {error && (
+        {error && !validationError && (
           <Card className="border-destructive/50">
             <CardContent className="p-4">
               <p className="text-sm text-destructive">{error}</p>
