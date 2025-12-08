@@ -25,6 +25,10 @@ import {
   buildInvertedStatement,
   buildZhejiSnippet,
 } from '@/lib/zhejiSummary';
+import {
+  buildEngineMetaSummary,
+  type EngineMetaSummaryUI,
+} from '@/lib/engineMetaSummary';
 import { EngineMetaCard } from '@/components/EngineMetaCard';
 import { LanguageFamiliesCard } from '@/components/LanguageFamiliesCard';
 import { SymbolicReadingCard } from '@/components/SymbolicReadingCard';
@@ -49,6 +53,10 @@ export default function Page() {
   );
 
   const { toast } = useToast();
+
+  const engineMetaSummary: EngineMetaSummaryUI | null = result?.engineMeta
+    ? buildEngineMetaSummary(result.engineMeta)
+    : null;
 
   const zheji = result ? buildZhejiSummary(result) : null;
   const languageFamiliesView = buildLanguageFamiliesView(result);
@@ -85,6 +93,7 @@ export default function Page() {
 
     setLoading(true);
     setError(null);
+    setResult(null);
 
     try {
       const response = await fetch('/api/analyze', {
@@ -98,25 +107,8 @@ export default function Page() {
       });
 
       if (!response.ok) {
-        let message = `Server error (HTTP ${response.status})`;
-        try {
-          const text = await response.text();
-          if (text) {
-            try {
-              const parsed = JSON.parse(text);
-              if (parsed?.error) {
-                message = parsed.error as string;
-              } else {
-                message = text;
-              }
-            } catch {
-              message = text;
-            }
-          }
-        } catch {
-          // ignore
-        }
-        console.error('Analyze request failed:', response.status, message);
+        const message = `Engine error (${response.status}). Please try again.`;
+        console.error('Analyze request failed:', response.status);
         setError(message);
         return;
       }
@@ -138,10 +130,7 @@ export default function Page() {
       );
     } catch (err: any) {
       console.error('Error while analyzing word:', err);
-      const message =
-        typeof err?.message === 'string'
-          ? err.message
-          : 'Something went wrong while analyzing the word.';
+      const message = "Network error while calling /api/analyze. Try again.";
       setError(message);
     } finally {
       setLoading(false);
@@ -153,7 +142,7 @@ export default function Page() {
     try {
       const snippet = buildShareSnippet({
         word: result.word,
-        analysis: result.raw,
+        analysis: result as any, // Cast because we know `raw` is there
       });
       if (typeof navigator !== 'undefined' && navigator.clipboard) {
         navigator.clipboard
@@ -328,15 +317,20 @@ export default function Page() {
                 </select>
               </div>
             </div>
-            {error && (
-              <p className="mt-2 text-sm text-destructive">{error}</p>
-            )}
           </CardContent>
         </Card>
 
-        {result?.engineMeta && (
+        {error && (
+          <Card className="border-destructive/50">
+            <CardContent className="p-4">
+              <p className="text-sm text-destructive">{error}</p>
+            </CardContent>
+          </Card>
+        )}
+
+        {engineMetaSummary && (
           <div className="mt-6">
-            <EngineMetaCard meta={result.engineMeta} />
+            <EngineMetaCard meta={engineMetaSummary} />
           </div>
         )}
 
