@@ -2,6 +2,17 @@
 
 import type { EngineMetaSummaryUI } from "@/lib/engineMetaSummary";
 
+export interface EngineMetaRaw {
+  engineName?: string;
+  versionLine?: string;
+  modeLabel?: string;
+  alphabetLabel?: string;
+  notes?: string;
+  engineVersion?: string;
+  mode?: string;
+  alphabet?: string;
+}
+
 export interface PrimaryPathSummary {
   voicePath: string;
   levelPath: string;
@@ -50,7 +61,7 @@ export interface AnalyzeWordResultUI {
   history: HistoryItem[];
 
   // NEW – structured summary used by the Engine meta card
-  engineMeta: EngineMetaSummaryUI;
+  engineMeta: EngineMetaRaw;
 
   // Debug / legacy fields used only by the main page
   raw?: unknown;
