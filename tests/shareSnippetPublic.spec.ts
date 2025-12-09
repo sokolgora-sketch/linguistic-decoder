@@ -1,27 +1,74 @@
-import { cleanShareSnippetForPublic } from "../src/lib/shareSnippet";
+import { buildPublicSummarySnippet } from "@/lib/shareSnippetPublic";
+import type { AnalyzeWordResultUI } from "@/shared/resultsUI";
 
-describe("cleanShareSnippetForPublic", () => {
-  it("keeps core info but strips experimental noise for LOVE", () => {
-    const devSnippet = [
-      "Linguistic Decoder — love",
-      "Summary: V1.1",
-      "Engine: core-2 · strict · auto",
-      "Languages: Latin – amor (pivot: am-, tag: attraction); Albanian – dashuri (pivot: dash, tag: attraction)",
-      "Symbolic (experimental): Attraction — Attraction",
-    ].join("\n");
+describe("buildPublicSummarySnippet", () => {
+  it("includes key public fields and hides internal meta", () => {
+    const fakeResult: AnalyzeWordResultUI = {
+      word: "test",
+      engineMeta: {
+        engineLabel: "Test Engine",
+        build: "1.0.0",
+        modeLabel: "strict",
+        alphabetLabel: "auto",
+        rawVersion: "1.0.0-debug"
+      },
+      primaryPath: {
+        voicePath: ["A", "B"],
+        ringPath: [1, 2],
+      },
+      zheji: {
+        functionalStatement: "A test statement",
+        subject: "test subject",
+        object: "test object",
+        modifier: "test modifier",
+        rootPolarity: "positive",
+        tension: "high",
+      },
+      symbolic: {
+        summary: "A test summary",
+      },
+      options: {
+        mode: "strict",
+        alphabet: "auto",
+      }
+    };
 
-    const result = cleanShareSnippetForPublic(devSnippet);
+    const snippet = buildPublicSummarySnippet(fakeResult);
 
-    // Still has the core info
-    expect(result).toContain("Linguistic Decoder — love");
-    expect(result).toContain("Summary: V1.1");
-    expect(result).toContain("Engine: core-2 · strict · auto");
-    expect(result).toContain(
-      "Languages: Latin – amor (pivot: am-, tag: attraction); Albanian – dashuri (pivot: dash, tag: attraction)"
-    );
+    expect(snippet).toContain("Word: test");
+    expect(snippet).toContain("Engine: Test Engine (build 1.0.0, mode strict, alphabet auto)");
+    expect(snippet).toContain("Heart: test: A → B (rings 1 → 2)");
+    expect(snippet).toContain("Structure: A test statement [subject: test subject, object: test object, modifier: test modifier, polarity: positive, tension: high]");
+    expect(snippet).toContain("Symbolic reading: A test summary");
+    expect(snippet).not.toContain("rawVersion");
+    expect(snippet).not.toContain("debug");
+  });
 
-    // Symbolic line cleaned
-    expect(result).toContain("Symbolic: Attraction — Attraction");
-    expect(result).not.toContain("(experimental)");
+  it("handles missing optional fields gracefully", () => {
+    const fakeResult: AnalyzeWordResultUI = {
+      word: "test",
+      engineMeta: {
+        engineLabel: "Test Engine",
+        build: "1.0.0",
+        modeLabel: "strict",
+        alphabetLabel: "auto",
+      },
+      primaryPath: {
+        voicePath: "A",
+        ringPath: 1,
+      },
+      options: {
+        mode: "strict",
+        alphabet: "auto",
+      }
+    };
+
+    const snippet = buildPublicSummarySnippet(fakeResult);
+
+    expect(snippet).toContain("Word: test");
+    expect(snippet).toContain("Engine: Test Engine (build 1.0.0, mode strict, alphabet auto)");
+    expect(snippet).toContain("Heart: test: A (rings 1)");
+    expect(snippet).not.toContain("Structure:");
+    expect(snippet).not.toContain("Symbolic reading:");
   });
 });

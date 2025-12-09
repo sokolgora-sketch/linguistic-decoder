@@ -1,6 +1,6 @@
 // src/shared/resultsUI.ts
 
-import type { EngineMetaSummaryUI } from "@/lib/engineMetaSummary";
+import type { EngineMetaSummary } from "@/lib/engineMetaSummary";
 
 export interface EngineMetaRaw {
   engineName?: string;
@@ -11,12 +11,15 @@ export interface EngineMetaRaw {
   engineVersion?: string;
   mode?: string;
   alphabet?: string;
+  engineLabel?: string;
+  build?: string;
+  rawVersion?: string;
 }
 
 export interface PrimaryPathSummary {
-  voicePath: string;
+  voicePath: string[];
   levelPath: string;
-  ringPath: string;
+  ringPath: number[];
 }
 
 export interface FrontierCandidateSummary {
@@ -46,6 +49,7 @@ export interface HistoryItem {
   voicePath: string;
   levelPath: string;
   ringPath: string;
+  createdAt?: string | null;
 }
 
 /**
@@ -79,6 +83,7 @@ export interface AnalyzeWordResultUI {
   symbolic?: {
     label?: string;
     notes?: (string | null)[];
+    summary?: string;
   };
 }
 

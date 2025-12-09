@@ -1,17 +1,33 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { useToast } from '@/components/ui/use-toast';
+import type { AnalyzeWordResultUI } from '../../shared/resultsUI';
 
 export default function Page() {
   const [word, setWord] = useState('');
-  const [result, setResult] = useState<any>(null);
+  const [result, setResult] = useState<AnalyzeWordResultUI | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    if (error) {
+      toast({
+        title: "Error",
+        description: error,
+        variant: "destructive",
+      });
+    }
+  }, [error, toast]);
 
   async function handleAnalyze() {
-    if (!word.trim()) return;
+    if (!word.trim()) {
+      setError('Type a word before analyzing.');
+      return;
+    }
     setLoading(true);
     setError(null);
 
@@ -61,9 +77,6 @@ export default function Page() {
               {loading ? 'Analyzing…' : 'Analyze'}
             </Button>
           </div>
-          {error && (
-            <p className="text-xs text-destructive">Failed: {error}</p>
-          )}
         </section>
 
         {/* Heart Summary */}
@@ -75,7 +88,7 @@ export default function Page() {
                 <p className="text-xs text-muted-foreground uppercase">
                   Voice Path
                 </p>
-                <p className="font-mono">{heart.voicePath}</p>
+                <p className="font-mono">{heart.voicePath.join(' → ')}</p>
               </div>
               <div>
                 <p className="text-xs text-muted-foreground uppercase">
@@ -87,7 +100,7 @@ export default function Page() {
                 <p className="text-xs text-muted-foreground uppercase">
                   Ring
                 </p>
-                <p className="font-mono">{heart.ringPath}</p>
+                <p className="font-mono">{heart.ringPath.join(' → ')}</p>
               </div>
             </div>
           </section>

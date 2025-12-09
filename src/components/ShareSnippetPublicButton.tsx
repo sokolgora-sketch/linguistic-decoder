@@ -2,18 +2,19 @@
 
 import React from "react";
 import { Button } from "./ui/button";
-import { buildPublicShareSnippet, type ShareSource } from "../lib/shareSnippet";
-import { useToast } from "../hooks/use-toast";
+import { buildPublicSummarySnippet } from "@/lib/shareSnippetPublic";
+import { useToast } from "@/components/ui/use-toast";
+import type { AnalyzeWordResultUI } from "@/shared/resultsUI";
 
 type Props = {
-  source: ShareSource | null;
+  result: AnalyzeWordResultUI | null;
 };
 
-export default function ShareSnippetPublicButton({ source }: Props) {
+export default function ShareSnippetPublicButton({ result }: Props) {
   const { toast } = useToast();
 
   const handleClick = async () => {
-    if (!source) {
+    if (!result) {
       toast({
         title: "Nothing to share",
         description: "Run an analysis first.",
@@ -21,7 +22,7 @@ export default function ShareSnippetPublicButton({ source }: Props) {
       return;
     }
 
-    const text = buildPublicShareSnippet(source);
+    const text = buildPublicSummarySnippet(result);
 
     try {
       await navigator.clipboard.writeText(text);
