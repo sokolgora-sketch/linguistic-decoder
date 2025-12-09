@@ -21,12 +21,17 @@ export function buildShareSnippet(source: ShareSource): string {
 
   const meta = buildEngineMetaSummary(analysis);
   let engineLine: string | null = null;
-  if (meta && typeof meta === 'object') {
-    engineLine = `${meta.versionLine || ''} · ${meta.modeLabel || ''} · ${
-      meta.alphabetLabel || ''
-    }`;
-  } else if (meta) {
-    engineLine = String(meta);
+  if (meta) {
+    const engineBuild =
+      meta.versionLine && meta.versionLine !== "unknown" ? meta.versionLine : "core-2";
+
+    const engineMode =
+      meta.modeLabel && meta.modeLabel !== "unknown" ? meta.modeLabel : "strict";
+
+    const engineAlphabet =
+      meta.alphabetLabel && meta.alphabetLabel !== "unknown" ? meta.alphabetLabel : "auto";
+
+    engineLine = `${engineBuild} · ${engineMode} · ${engineAlphabet}`;
   }
 
   const header = `Linguistic Decoder — ${word}`;
