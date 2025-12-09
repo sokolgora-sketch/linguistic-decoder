@@ -5,10 +5,7 @@ export interface EngineMetaSummary {
   build: string;
   modeLabel: string;
   alphabetLabel: string;
-  rawVersion: string;
-  engineName: string; // Alias for backward compatibility
-  versionLine: string; // Alias for backward compatibility
-  notes: string; // Alias for backward compatibility
+  rawVersion?: string;
 }
 
 export function buildEngineMetaSummary(raw?: any): EngineMetaSummary {
@@ -18,22 +15,17 @@ export function buildEngineMetaSummary(raw?: any): EngineMetaSummary {
   const engineLabel = "SevenVoices Core";
   const modeLabel = meta.mode ?? options.mode ?? "unknown";
   const alphabetLabel = options.alphabet ?? meta.alphabet ?? "unknown";
-  const rawVersion = meta.engineVersion ?? "unknown";
-  const parts = rawVersion.split('-');
-  const build = parts.length > 2 ? parts.slice(-2).join('-') : rawVersion;
-
-  const engineName = engineLabel;
-  const versionLine = rawVersion;
-  const notes = `Raw version: ${rawVersion}`;
+  
+  const engineVersion = meta.engineVersion;
+  const rawVersion = engineVersion && engineVersion !== "unknown" ? engineVersion : undefined;
+  
+  const build = rawVersion ?? "unknown";
 
   return {
     engineLabel,
+    build,
     modeLabel,
     alphabetLabel,
     rawVersion,
-    build,
-    engineName,
-    versionLine,
-    notes,
   };
 }
