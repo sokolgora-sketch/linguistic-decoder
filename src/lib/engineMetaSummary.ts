@@ -18,11 +18,21 @@ export interface EngineMetaSummaryUI {
 export function buildEngineMetaSummary(
   raw: any // Keep this loose to handle different analysis shapes
 ): EngineMetaSummaryUI {
-  const engineMeta = raw?.engineMeta ?? raw;
-  const engineVersion = engineMeta?.engineVersion ?? 'unknown';
-  const mode = engineMeta?.mode ?? 'unknown';
-  const alphabet = engineMeta?.alphabet ?? 'unknown';
+  const meta = raw?.meta ?? {};
+  const options = (raw as any)?.options ?? {};
 
+  const engineVersion = meta.engineVersion ?? "unknown";
+
+  const mode =
+    meta.mode ??
+    options.mode ??
+    "unknown";
+
+  const alphabet =
+    options.alphabet ??
+    (meta as any).alphabet ??
+    "unknown";
+  
   const parts = engineVersion.split('-');
   const versionLine = parts.length > 2 ? parts.slice(-2).join('-') : engineVersion;
 
