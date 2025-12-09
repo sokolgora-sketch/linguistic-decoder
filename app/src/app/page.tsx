@@ -14,7 +14,7 @@ import {
 import { WordMatrixCard } from "@/components/WordMatrix";
 import type { AnalyzeWordResultUI, HistoryItem } from "@/shared/resultsUI";
 import { buildShareSnippet } from "@/lib/shareSnippet";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/components/ui/use-toast";
 import {
   buildZhejiSummary,
   invertRootPolarity,
@@ -119,9 +119,10 @@ export default function Page() {
         [
           {
             word: data.word,
-            voicePath: data.primaryPath?.voicePath ?? "—",
-            levelPath: data.primaryPath?.levelPath ?? "—",
-            ringPath: data.primaryPath?.ringPath ?? "—",
+            voicePath: Array.isArray(data.primaryPath?.voicePath) ? data.primaryPath.voicePath.join(' → ') : data.primaryPath?.voicePath ?? '—',
+            levelPath: data.primaryPath?.levelPath ?? '—',
+            ringPath: Array.isArray(data.primaryPath?.ringPath) ? data.primaryPath.ringPath.join(' → ') : data.primaryPath?.ringPath ?? '—',
+            createdAt: data.meta?.createdAt,
           },
           ...prev,
         ].slice(0, 10)
@@ -279,7 +280,7 @@ export default function Page() {
                     Voice path
                   </div>
                   <div className="font-medium">
-                    {result.primaryPath.voicePath}
+                    {Array.isArray(result.primaryPath.voicePath) ? result.primaryPath.voicePath.join(' → ') : result.primaryPath.voicePath}
                   </div>
                 </div>
                 <div>
@@ -295,7 +296,7 @@ export default function Page() {
                     Ring path
                   </div>
                   <div className="font-medium">
-                    {result.primaryPath.ringPath}
+                    {Array.isArray(result.primaryPath.ringPath) ? result.primaryPath.ringPath.join(' → ') : result.primaryPath.ringPath}
                   </div>
                 </div>
               </div>
@@ -550,8 +551,8 @@ export default function Page() {
                   <div>
                     created{" "}
                     <span className="font-mono">
-                      {result.meta?.created
-                        ? new Date(result.meta.created).toLocaleString()
+                      {result.meta?.createdAt
+                        ? new Date(result.meta.createdAt).toLocaleString()
                         : "—"}
                     </span>
                   </div>

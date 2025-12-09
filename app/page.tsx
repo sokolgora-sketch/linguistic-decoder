@@ -18,7 +18,7 @@ import {
   buildSymbolicSummary,
 } from '@/shared/resultsUI';
 import { buildShareSnippet } from '@/lib/shareSnippet';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@/components/ui/use-toast';
 import {
   buildZhejiSummary,
   invertRootPolarity,
@@ -128,9 +128,9 @@ export default function Page() {
         [
           {
             word: data.word,
-            voicePath: data.primaryPath?.voicePath ?? '—',
+            voicePath: Array.isArray(data.primaryPath?.voicePath) ? data.primaryPath.voicePath.join(' → ') : data.primaryPath?.voicePath ?? '—',
             levelPath: data.primaryPath?.levelPath ?? '—',
-            ringPath: data.primaryPath?.ringPath ?? '—',
+            ringPath: Array.isArray(data.primaryPath?.ringPath) ? data.primaryPath.ringPath.join(' → ') : data.primaryPath?.ringPath ?? '—',
           },
           ...prev,
         ].slice(0, 10)
@@ -142,7 +142,7 @@ export default function Page() {
     } finally {
       setIsAnalyzing(false);
     }
-  }, [isAnalyzing, word, mode, alphabet]);
+  }, [isAnalyzing, word, mode, alphabet, toast]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
@@ -207,13 +207,20 @@ export default function Page() {
               description: 'Summary is ready to paste.',
             });
           })
-          .catch(() => {
+          .catch((err) => {
+            console.error('Error copying Zheji snippet:', err);
             toast({
               title: 'Copy failed',
               description: 'Could not access the clipboard.',
               variant: 'destructive',
             });
           });
+      } else {
+        console.log('Zheji snippet:', snippet);
+        toast({
+          title: 'Snippet ready',
+          description: 'Clipboard not available – check console output.',
+        });
       }
     } catch (err) {
       console.error('Error building Zheji share snippet:', err);
@@ -390,7 +397,7 @@ export default function Page() {
                     Voice path
                   </div>
                   <div className="font-medium">
-                    {result.primaryPath.voicePath}
+                    {Array.isArray(result.primaryPath.voicePath) ? result.primaryPath.voicePath.join(' → ') : result.primaryPath.voicePath}
                   </div>
                 </div>
                 <div>
@@ -406,7 +413,7 @@ export default function Page() {
                     Ring path
                   </div>
                   <div className="font-medium">
-                    {result.primaryPath.ringPath}
+                    {Array.isArray(result.primaryPath.ringPath) ? result.primaryPath.ringPath.join(' → ') : result.primaryPath.ringPath}
                   </div>
                 </div>
               </div>
