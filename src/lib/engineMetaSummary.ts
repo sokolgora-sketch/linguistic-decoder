@@ -1,46 +1,39 @@
-// src/lib/engineMetaSummary.ts
+import type { EnginePayload } from "../shared/engineShape";
 
-/**
- * The structured summary of engine metadata, returned by the helper.
- */
-export interface EngineMetaSummaryUI {
-  engineName: string;
-  versionLine: string;
+export interface EngineMetaSummary {
+  engineLabel: string;
+  build: string;
   modeLabel: string;
   alphabetLabel: string;
-  notes?: string;
+  rawVersion: string;
+  engineName: string; // Alias for backward compatibility
+  versionLine: string; // Alias for backward compatibility
+  notes: string; // Alias for backward compatibility
 }
 
-/**
- * Builds a structured, UI-friendly summary of the engine metadata.
- * It's defensive and handles missing or partial data.
- */
-export function buildEngineMetaSummary(
-  raw: any // Keep this loose to handle different analysis shapes
-): EngineMetaSummaryUI {
+export function buildEngineMetaSummary(raw?: any): EngineMetaSummary {
   const meta = raw?.meta ?? {};
-  const options = (raw as any)?.options ?? {};
+  const options = raw?.options ?? {};
 
-  const engineVersion = meta.engineVersion ?? "unknown";
+  const engineLabel = "SevenVoices Core";
+  const modeLabel = meta.mode ?? options.mode ?? "unknown";
+  const alphabetLabel = options.alphabet ?? meta.alphabet ?? "unknown";
+  const rawVersion = meta.engineVersion ?? "unknown";
+  const parts = rawVersion.split('-');
+  const build = parts.length > 2 ? parts.slice(-2).join('-') : rawVersion;
 
-  const mode =
-    meta.mode ??
-    options.mode ??
-    "unknown";
-
-  const alphabet =
-    options.alphabet ??
-    (meta as any).alphabet ??
-    "unknown";
-  
-  const parts = engineVersion.split('-');
-  const versionLine = parts.length > 2 ? parts.slice(-2).join('-') : engineVersion;
+  const engineName = engineLabel;
+  const versionLine = rawVersion;
+  const notes = `Raw version: ${rawVersion}`;
 
   return {
-    engineName: "SevenVoices Core",
+    engineLabel,
+    modeLabel,
+    alphabetLabel,
+    rawVersion,
+    build,
+    engineName,
     versionLine,
-    modeLabel: mode,
-    alphabetLabel: alphabet,
-    notes: `Raw version: ${engineVersion}`,
+    notes,
   };
 }
