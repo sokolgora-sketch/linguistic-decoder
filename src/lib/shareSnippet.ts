@@ -8,7 +8,7 @@ import {
 
 export type ShareSource = {
   word: string;
-  analysis: AnalyzeWordResultUI;
+  analysis: AnalyzeWord_resultUI;
 };
 
 export function buildShareSnippet(source: ShareSource): string {
@@ -76,18 +76,24 @@ export function buildShareSnippet(source: ShareSource): string {
     .filter(Boolean)
     .join("\n");
 }
+
 // Public-facing snippet: strip dev noise like "(experimental)" labels,
 // but reuse the same core structure as buildShareSnippet.
 export function buildPublicShareSnippet(source: ShareSource): string {
   const devSnippet = buildShareSnippet(source);
-  const lines = devSnippet.split("\n");
+  return cleanShareSnippetForPublic(devSnippet);
+}
+
+// Pure string transformer: take a dev-style snippet and clean it for public use.
+export function cleanShareSnippetForPublic(snippet: string): string {
+  const lines = snippet.split("\n");
 
   const cleaned = lines.map((line) => {
     // Turn "Symbolic (experimental): ..." into "Symbolic: ..."
     if (line.startsWith("Symbolic (experimental):")) {
       return line.replace("Symbolic (experimental):", "Symbolic:");
     }
-    // For any other line, just remove the " (experimental)" marker if present
+    // For any other line, just remove " (experimental)" if present
     return line.replace(" (experimental)", "");
   });
 

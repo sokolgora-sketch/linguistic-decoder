@@ -1,6 +1,6 @@
-import * as shareSnippet from "../src/lib/shareSnippet";
+import { cleanShareSnippetForPublic } from "../src/lib/shareSnippet";
 
-describe("buildPublicShareSnippet", () => {
+describe("cleanShareSnippetForPublic", () => {
   it("keeps core info but strips experimental noise for LOVE", () => {
     const devSnippet = [
       "Linguistic Decoder — love",
@@ -10,11 +10,7 @@ describe("buildPublicShareSnippet", () => {
       "Symbolic (experimental): Attraction — Attraction",
     ].join("\n");
 
-    const spy = jest
-      .spyOn(shareSnippet, "buildShareSnippet")
-      .mockReturnValue(devSnippet);
-
-    const result = shareSnippet.buildPublicShareSnippet({} as any);
+    const result = cleanShareSnippetForPublic(devSnippet);
 
     // Still has the core info
     expect(result).toContain("Linguistic Decoder — love");
@@ -27,7 +23,5 @@ describe("buildPublicShareSnippet", () => {
     // Symbolic line cleaned
     expect(result).toContain("Symbolic: Attraction — Attraction");
     expect(result).not.toContain("(experimental)");
-
-    spy.mockRestore();
   });
 });
