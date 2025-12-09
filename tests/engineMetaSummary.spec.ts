@@ -25,9 +25,6 @@ describe("buildEngineMetaSummary", () => {
       modeLabel: "strict",
       alphabetLabel: "auto",
       rawVersion: "0.2.0-symbolic",
-      engineName: "SevenVoices Core",
-      versionLine: "0.2.0-symbolic",
-      notes: "Raw version: 0.2.0-symbolic",
     });
   });
 
@@ -39,10 +36,7 @@ describe("buildEngineMetaSummary", () => {
       build: "unknown",
       modeLabel: "unknown",
       alphabetLabel: "unknown",
-      rawVersion: "unknown",
-      engineName: "SevenVoices Core",
-      versionLine: "unknown",
-      notes: "Raw version: unknown",
+      rawVersion: undefined,
     });
   });
 });

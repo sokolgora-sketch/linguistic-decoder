@@ -11,9 +11,6 @@ describe('EngineMetaCard', () => {
     modeLabel: 'strict',
     alphabetLabel: 'auto',
     rawVersion: '1.2.3',
-    engineName: 'SevenVoices Core',
-    versionLine: 'v0.2.0-build.12',
-    notes: 'Raw version: 1.2.3',
   };
 
   it('renders the engine name and version', () => {
