@@ -6,8 +6,9 @@ import { Candidates } from "./Candidates";
 import { FrontierCandidates } from "./FrontierCandidates"; // ignore if missing
 import { SymbolicReadingCard } from "./SymbolicReadingCard";
 import WordMatrixCard from "./WordMatrixCard";
-import { buildWordMatrixSummary } from "@/lib/wordMatrix"; 
+import { buildWordMatrixUI } from "@/lib/wordMatrix"; 
 import type { EnginePayload } from "../shared/engineShape";
+import WordMatrixLegend from "./WordMatrixLegend";
 
 type ResultsDisplayProps = {
   analysis: EnginePayload | null;
@@ -16,9 +17,9 @@ type ResultsDisplayProps = {
 export function ResultsDisplay({ analysis }: ResultsDisplayProps) {
   if (!analysis) return null;
 
-  const wordMatrixSummary = analysis
-  ? buildWordMatrixSummary(analysis)
-  : null;
+  console.log("DEBUG–WordMatrix", { analysis, buildWordMatrixUI });
+  const wordMatrixSummary = analysis ? buildWordMatrixUI(analysis) : null;
+  console.log("DEBUG–MatrixSummary", wordMatrixSummary);
 
   return (
     <div className="space-y-6">
@@ -47,6 +48,13 @@ export function ResultsDisplay({ analysis }: ResultsDisplayProps) {
           </div>
         </CardContent>
       </Card>
+
+      {wordMatrixSummary && (
+        <>
+          <WordMatrixCard summary={wordMatrixSummary} />
+          <WordMatrixLegend />
+        </>
+      )}
 
       {/* FRONTIER */}
       <Card>
@@ -119,11 +127,6 @@ export function ResultsDisplay({ analysis }: ResultsDisplayProps) {
             </table>
           </CardContent>
         </Card>
-      )}
-
-      {/* WORD MATRIX */}
-      {wordMatrixSummary && (
-        <WordMatrixCard summary={wordMatrixSummary} />
       )}
 
       {/* SYMBOLIC */}
