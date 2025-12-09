@@ -13,6 +13,7 @@ import {
   TableHeader,
   TableRow,
 } from "./ui/table";
+import WordMatrixLegend from "./WordMatrixLegend";
 
 export type WordMatrixEntry = {
   label: string;
@@ -32,35 +33,38 @@ export default function WordMatrixCard({ summary }: WordMatrixCardProps) {
   if (!summary) return null;
 
   return (
-    <Card data-testid="word-matrix-card">
-      <CardHeader>
-        <CardTitle>Word Matrix</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <p className="mb-2 text-sm text-muted-foreground">
-          {summary.word}
-        </p>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Field</TableHead>
-              <TableHead>Value</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {summary.entries.map((row) => (
-              <TableRow key={row.label}>
-                <TableCell className="font-mono text-xs">
-                  {row.label}
-                </TableCell>
-                <TableCell className="text-xs">
-                  {row.value}
-                </TableCell>
+    <>
+      <Card data-testid="word-matrix-card">
+        <CardHeader>
+          <CardTitle>Word Matrix</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="mb-2 text-sm text-muted-foreground">
+            {summary.word}
+          </p>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Field</TableHead>
+                <TableHead>Value</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </CardContent>
-    </Card>
+            </TableHeader>
+            <TableBody>
+              {summary.entries.map((row) => (
+                <TableRow key={row.label}>
+                  <TableCell className="font-mono text-xs">
+                    {row.label}
+                  </TableCell>
+                  <TableCell className="text-xs">
+                    {row.value}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+      <WordMatrixLegend />
+    </>
   );
 }
