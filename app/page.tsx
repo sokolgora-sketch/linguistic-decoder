@@ -53,6 +53,7 @@ export default function Page() {
   const [alphabet, setAlphabet] = useState<'auto' | 'latin' | 'albanian'>(
     'auto'
   );
+  const [showAdvanced, setShowAdvanced] = useState(false);
 
   const { toast } = useToast();
 
@@ -355,22 +356,16 @@ export default function Page() {
           </Card>
         )}
 
-        {engineMetaSummary && (
-          <div className="mt-6">
-            <EngineMetaCard summary={engineMetaSummary} />
-          </div>
-        )}
-
-        {result && (
-          <div className="mt-4 text-center">
-            <button
-              onClick={handleCopyJson}
-              className="text-xs text-muted-foreground border rounded px-2 py-1 cursor-pointer hover:bg-muted/20"
-            >
-              Copy JSON (dev)
-            </button>
-          </div>
-        )}
+        <div className="mt-4 flex items-center justify-between">
+          <div className="text-sm text-muted-foreground">Results</div>
+          <button
+            type="button"
+            className="text-xs underline text-muted-foreground hover:text-foreground"
+            onClick={() => setShowAdvanced((v) => !v)}
+          >
+            {showAdvanced ? 'Hide advanced details' : 'Show advanced details'}
+          </button>
+        </div>
 
         {/* Heart summary */}
         {result?.primaryPath ? (
@@ -510,62 +505,83 @@ export default function Page() {
           </Card>
         ) : null}
 
-        {/* Frontier candidates */}
-        {result && result.frontier && result.frontier.length > 0 ? (
-          <Card>
-            <CardHeader>
-              <CardTitle>Frontier candidates</CardTitle>
-              <CardDescription>
-                Alternate legal paths the Mind can explore inside the same
-                rules.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="overflow-x-auto">
-                <table className="w-full border-collapse text-sm">
-                  <thead className="border-b border-muted/40 text-xs uppercase tracking-wide text-muted-foreground">
-                    <tr>
-                      <th className="py-2 pr-4 text-left w-16">Alt</th>
-                      <th className="py-2 px-4 text-left">Voice path</th>
-                      <th className="py-2 px-4 text-left">Level path</th>
-                      <th className="py-2 pl-4 text-left">Ring path</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {result.frontier.map((alt: any, idx: number) => (
-                      <tr
-                        key={alt.id ?? `alt-${idx}`}
-                        className="border-b border-muted/20 last:border-b-0"
-                      >
-                        <td className="py-1 pr-4 text-xs text-muted-foreground">
-                          {alt.id ?? `alt-${idx + 1}`}
-                        </td>
-                        <td className="py-1 px-4 font-mono">
-                          {alt.voicePath ?? '—'}
-                        </td>
-                        <td className="py-1 px-4 font-mono">
-                          {alt.levelPath ?? '—'}
-                        </td>
-                        <td className="py-1 pl-4 font-mono">
-                          {alt.ringPath ?? '—'}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+        {showAdvanced && (
+          <div className="mt-4 space-y-4">
+            {engineMetaSummary && (
+              <div className="mt-6">
+                <EngineMetaCard summary={engineMetaSummary} />
               </div>
-            </CardContent>
-          </Card>
-        ) : null}
+            )}
 
-        <LanguageFamiliesCard families={languageFamiliesView} />
+            {result && (
+              <div className="mt-4 text-center">
+                <button
+                  onClick={handleCopyJson}
+                  className="text-xs text-muted-foreground border rounded px-2 py-1 cursor-pointer hover:bg-muted/20"
+                >
+                  Copy JSON (dev)
+                </button>
+              </div>
+            )}
 
-        {/* Word matrix (rendered by helper) */}
-        {renderWordMatrix(result)}
+            {/* Frontier candidates */}
+            {result && result.frontier && result.frontier.length > 0 ? (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Frontier candidates</CardTitle>
+                  <CardDescription>
+                    Alternate legal paths the Mind can explore inside the same
+                    rules.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="overflow-x-auto">
+                    <table className="w-full border-collapse text-sm">
+                      <thead className="border-b border-muted/40 text-xs uppercase tracking-wide text-muted-foreground">
+                        <tr>
+                          <th className="py-2 pr-4 text-left w-16">Alt</th>
+                          <th className="py-2 px-4 text-left">Voice path</th>
+                          <th className="py-2 px-4 text-left">Level path</th>
+                          <th className="py-2 pl-4 text-left">Ring path</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {result.frontier.map((alt: any, idx: number) => (
+                          <tr
+                            key={alt.id ?? `alt-${idx}`}
+                            className="border-b border-muted/20 last:border-b-0"
+                          >
+                            <td className="py-1 pr-4 text-xs text-muted-foreground">
+                              {alt.id ?? `alt-${idx + 1}`}
+                            </td>
+                            <td className="py-1 px-4 font-mono">
+                              {alt.voicePath ?? '—'}
+                            </td>
+                            <td className="py-1 px-4 font-mono">
+                              {alt.levelPath ?? '—'}
+                            </td>
+                            <td className="py-1 pl-4 font-mono">
+                              {alt.ringPath ?? '—'}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </CardContent>
+              </Card>
+            ) : null}
 
-        {symbolicSummary && <SymbolicReadingCard summary={symbolicSummary} />}
-        
-        <PublicSummaryPreview result={result} />
+            <LanguageFamiliesCard families={languageFamiliesView} />
+
+            {/* Word matrix (rendered by helper) */}
+            {renderWordMatrix(result)}
+
+            {symbolicSummary && <SymbolicReadingCard summary={symbolicSummary} />}
+
+            <PublicSummaryPreview result={result} />
+          </div>
+        )}
 
         {/* Recent history (session only) */}
         {history.length > 0 ? (
