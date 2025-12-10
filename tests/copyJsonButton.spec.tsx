@@ -59,16 +59,22 @@ describe('CopyJsonButton', () => {
     fireEvent.change(input, { target: { value: 'test-word' } });
     fireEvent.click(analyzeButton);
 
-    // 3. Wait for the dev button to appear
+    // 3. Open advanced section so the dev button is rendered
+    const advancedToggle = await screen.findByRole("button", {
+      name: /Show advanced details/i,
+    });
+    fireEvent.click(advancedToggle);
+
+    // 4. Wait for the dev button to appear
     const copyJsonButton = await screen.findByRole('button', {
       name: /Copy JSON \(dev\)/i,
     });
     expect(copyJsonButton).toBeInTheDocument();
 
-    // 4. Click the button
+    // 5. Click the button
     fireEvent.click(copyJsonButton);
 
-    // 5. Assert that writeText was called with the correct JSON
+    // 6. Assert that writeText was called with the correct JSON
     const expectedJson = JSON.stringify(
       {
         word: 'test-word',
