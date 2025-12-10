@@ -132,6 +132,7 @@ export default function Page() {
             voicePath: Array.isArray(data.primaryPath?.voicePath) ? data.primaryPath.voicePath.join(' → ') : data.primaryPath?.voicePath ?? '—',
             levelPath: data.primaryPath?.levelPath ?? '—',
             ringPath: Array.isArray(data.primaryPath?.ringPath) ? data.primaryPath.ringPath.join(' → ') : data.primaryPath?.ringPath ?? '—',
+            createdAt: data.meta?.createdAt ?? new Date().toISOString(),
           },
           ...prev,
         ].slice(0, 10)
@@ -585,6 +586,7 @@ export default function Page() {
                       <th className="py-2 px-4 text-left">Voice path</th>
                       <th className="py-2 px-4 text-left">Level path</th>
                       <th className="py-2 pl-4 text-left">Ring path</th>
+                      <th className="py-2 pl-4 text-left">When</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -606,6 +608,9 @@ export default function Page() {
                         </td>
                         <td className="py-1 pl-4 font-mono">
                           {item.ringPath ?? '—'}
+                        </td>
+                        <td className="py-1 pl-4 text-xs text-muted-foreground">
+                          {item.createdAt ? item.createdAt : '—'}
                         </td>
                       </tr>
                     ))}
