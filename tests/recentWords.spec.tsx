@@ -30,6 +30,7 @@ describe('RecentWords', () => {
               levelPath: '1 → 1',
               ringPath: '1 → 1',
             },
+            meta: { createdAt: '2025-12-10T12:34:56Z' },
             raw: { engineVersion: 'test-v1' }, // for share snippet
             engineMeta: { versionLine: 'test-v1' }, // for meta card
           }),
@@ -65,5 +66,18 @@ describe('RecentWords', () => {
 
     // 6. Assert that the input value is now 'alpha' again
     expect(input).toHaveValue('alpha');
+  });
+
+  it('should display the createdAt time in the history table', async () => {
+    render(<Page />);
+
+    const input = screen.getByPlaceholderText('study');
+    const analyzeButton = screen.getByRole('button', { name: /Analyze/i });
+
+    fireEvent.change(input, { target: { value: 'alpha' } });
+    fireEvent.click(analyzeButton);
+
+    const createdAtCell = await screen.findByText('2025-12-10T12:34:56Z');
+    expect(createdAtCell).toBeInTheDocument();
   });
 });
