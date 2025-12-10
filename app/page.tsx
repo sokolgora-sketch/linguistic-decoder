@@ -27,11 +27,12 @@ import {
 } from '@/lib/zhejiSummary';
 import {
   buildEngineMetaSummary,
-  type EngineMetaSummaryUI,
+  type EngineMetaSummary,
 } from '@/lib/engineMetaSummary';
 import { EngineMetaCard } from '@/components/EngineMetaCard';
 import { LanguageFamiliesCard } from '@/components/LanguageFamiliesCard';
 import { SymbolicReadingCard } from '@/components/SymbolicReadingCard';
+import { PublicSummaryPreview } from '@/components/PublicSummaryPreview';
 
 function renderWordMatrix(result: AnalyzeWordResultUI | null): React.ReactNode {
   if (!result?.wordMatrix) {
@@ -55,7 +56,7 @@ export default function Page() {
 
   const { toast } = useToast();
 
-  const engineMetaSummary: EngineMetaSummaryUI | null = result?.engineMeta
+  const engineMetaSummary: EngineMetaSummary | null = result?.engineMeta
     ? buildEngineMetaSummary(result.engineMeta)
     : null;
 
@@ -355,7 +356,7 @@ export default function Page() {
 
         {engineMetaSummary && (
           <div className="mt-6">
-            <EngineMetaCard meta={engineMetaSummary} />
+            <EngineMetaCard summary={engineMetaSummary} />
           </div>
         )}
 
@@ -562,6 +563,8 @@ export default function Page() {
         {renderWordMatrix(result)}
 
         {symbolicSummary && <SymbolicReadingCard summary={symbolicSummary} />}
+        
+        <PublicSummaryPreview result={result} />
 
         {/* Recent history (session only) */}
         {history.length > 0 ? (
