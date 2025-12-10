@@ -1,7 +1,6 @@
 import type { AnalyzeWordResultUI } from "@/shared/resultsUI";
 import { buildHeartSummaryText } from "@/lib/heartSummaryText";
 
-// Temporary structural helpers until shared types are extended
 type EngineMetaShape = {
   engineLabel?: string;
   build?: string;
@@ -38,7 +37,13 @@ export function buildPublicSummarySnippet(result: AnalyzeWordResultUI): string {
   const symbolic = (result as any).symbolic as SymbolicShape | undefined;
 
   const engineLine = engine
-    ? `Engine: ${engine.engineLabel ?? "SevenVoices Core"} (build ${engine.build ?? "unknown"}, mode ${options.modeLabel ?? options.mode ?? "strict"}, alphabet ${options.alphabetLabel ?? options.alphabet ?? "auto"})`
+    ? `Engine: ${engine.engineLabel ?? "SevenVoices Core"} (build ${
+        engine.build ?? "unknown"
+      }, mode ${
+        options.modeLabel ?? options.mode ?? "strict"
+      }, alphabet ${
+        options.alphabetLabel ?? options.alphabet ?? "auto"
+      })`
     : undefined;
 
   const heartLine = result.primaryPath
@@ -49,7 +54,13 @@ export function buildPublicSummarySnippet(result: AnalyzeWordResultUI): string {
     : undefined;
 
   const zhejiLine = zheji?.functionalStatement
-    ? `Structure: ${zheji.functionalStatement} [subject: ${zheji.subject ?? "-"}, object: ${zheji.object ?? "-"}, modifier: ${zheji.modifier ?? "-"}, polarity: ${zheji.rootPolarity ?? "-"}, tension: ${zheji.tension ?? "-"}]`
+    ? `Structure: ${zheji.functionalStatement} [subject: ${
+        zheji.subject ?? "-"
+      }, object: ${zheji.object ?? "-"}, modifier: ${
+        zheji.modifier ?? "-"
+      }, polarity: ${zheji.rootPolarity ?? "-"}, tension: ${
+        zheji.tension ?? "-"
+      }]`
     : undefined;
 
   const symbolicLine = symbolic?.summary
@@ -66,5 +77,3 @@ export function buildPublicSummarySnippet(result: AnalyzeWordResultUI): string {
 
   return lines.join("\n");
 }
-
-export { buildPublicSummarySnippet as buildShareSnippetPublic };
