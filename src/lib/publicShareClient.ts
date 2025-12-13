@@ -1,17 +1,14 @@
-import type { AnalyzeWordResultUI } from '@/shared/resultsUI';
+// src/lib/publicShareClient.ts
+import type { AnalyzeWordResultUI } from "@/shared/resultsUI";
 
 export type CreatePublicShareResponse = {
   id: string;
 };
 
-export async function createPublicShare(
-  result: AnalyzeWordResultUI,
-): Promise<string> {
-  const res = await fetch('/api/public-share', {
-    method: 'POST',
-    headers: {
-      'content-type': 'application/json',
-    },
+export async function createPublicShare(result: AnalyzeWordResultUI): Promise<string> {
+  const res = await fetch("/api/public-share", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
     body: JSON.stringify({ result }),
   });
 
@@ -19,10 +16,10 @@ export async function createPublicShare(
     throw new Error(`Public share failed with status ${res.status}`);
   }
 
-  const data = (await res.json()) as CreatePublicShareResponse;
+  const data = (await res.json()) as Partial<CreatePublicShareResponse>;
 
-  if (!data || typeof data.id !== 'string') {
-    throw new Error('Public share response missing id');
+  if (!data.id) {
+    throw new Error("Public share response missing id");
   }
 
   return data.id;

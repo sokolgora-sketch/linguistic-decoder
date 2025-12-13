@@ -4,22 +4,37 @@ import { savePublicShare } from '@/lib/publicShareStore';
 import { getShareId } from '@/lib/getShareId';
 import type { AnalyzeWordResultUI } from '@/shared/resultsUI';
 
+type PublicShareRequestBody = {
+  result?: AnalyzeWordResultUI;
+};
+
 export async function POST(req: Request) {
+  let body: PublicShareRequestBody;
+
+  // Safely parse JSON body
   try {
-    const body = await req.json();
-    const result = body.result as AnalyzeWordResultUI;
-
-    if (!result || typeof result.word !== 'string') {
-      return NextResponse.json({ error: 'Invalid payload' }, { status: 400 });
-    }
-
-    const id = getShareId();
-    const record = buildPublicSharePayload(result, id);
-
-    await savePublicShare(record);
-
-    return NextResponse.json({ id: record.id }, { status: 201 });
-  } catch (error) {
-    return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
+    body = (await req.json()) as PublicShareRequestBody;
+  } catch {
+    return NextResponse.json({ error: 'Missing result' }, { status: 400 });
   }
+
+  // Validate payload
+  if (!body?.result) {
+    return NextResponse.json({ error: 'Missing result' }, { status: 400 });
+  }
+
+  // 1) Generate a new share id
+  const id = getShareId();
+
+  // 2) Build the base payload from the analysis result
+  const base = buildPublicSharePayload(body.result);
+
+  // 3) Attach the id to the record that goes into the store
+  const record = { ...base, id };
+
+  // 4) Persist
+  await savePublicShare(record);
+
+  // 5) Return the id to the client
+  return NextResponse.json({ id }, { status: 201 });
 }

@@ -1,4 +1,5 @@
-import { db } from "./firebase";
+import { getFirestore } from "firebase/firestore";
+import { firebaseApp } from "./firebase";
 import {
   collection,
   addDoc,
@@ -7,6 +8,8 @@ import {
   orderBy,
   limit,
 } from "firebase/firestore";
+
+const db = getFirestore(firebaseApp);
 
 const historyCol = collection(db, "history");
 

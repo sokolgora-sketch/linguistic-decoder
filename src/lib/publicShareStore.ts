@@ -1,29 +1,38 @@
-import type { PublicShareRecord } from "@/lib/publicShare.types";
+import { getFirestore, doc, setDoc, getDoc } from "firebase/firestore";
+import { firebaseApp } from "@/lib/firebase";
+import type { PublicShareRecord } from "@/lib/types";
 
-export interface PublicShareStore {
-  save(record: PublicShareRecord): Promise<void>;
-  get(id: string): Promise<PublicShareRecord | null>;
+const db = getFirestore(firebaseApp);
+const COLLECTION = "publicShares";
+
+export async function getPublicShare(
+  id: string
+): Promise<PublicShareRecord | null> {
+  try {
+    const docRef = doc(db, COLLECTION, id);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      return docSnap.data() as PublicShareRecord;
+    }
+    return null;
+  } catch (err) {
+    console.error("🔥 Firestore read error:", err);
+    return null;
+  }
 }
 
-/**
- * Simple in-memory store for now.
- * Later we can swap this to Firestore without touching callers.
- */
-const memory = new Map<string, PublicShareRecord>();
+export async function savePublicShare(record: PublicShareRecord): Promise<void> {
+  console.log(
+    "[publicShareStore] using projectId",
+    firebaseApp.options.projectId
+  );
 
-export const inMemoryPublicShareStore: PublicShareStore = {
-  async save(record) {
-    memory.set(record.id, record);
-  },
-  async get(id) {
-    return memory.get(id) ?? null;
-  },
-};
+  const sanitized: PublicShareRecord = {
+    ...record,
+    zhejiSummary: record.zhejiSummary ?? null,
+    symbolicSummary: record.symbolicSummary ?? null,
+  };
 
-export async function savePublicShare(record: PublicShareRecord) {
-  return inMemoryPublicShareStore.save(record);
-}
-
-export async function loadPublicShare(id: string) {
-  return inMemoryPublicShareStore.get(id);
+  await setDoc(doc(db, COLLECTION, record.id), sanitized);
+  console.log("[publicShareStore] Firestore save", record.id);
 }

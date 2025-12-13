@@ -42,13 +42,13 @@ describe('POST /api/public-share', () => {
     expect(NextResponse.json).toHaveBeenCalledWith({ id: 'share-123' }, { status: 201 });
   });
 
-  it('returns 400 for invalid payload', async () => {
+  it('returns 400 when result is missing', async () => {
     const req = {
       json: async () => ({}), // missing result
     } as any;
 
     await POST(req);
 
-    expect(NextResponse.json).toHaveBeenCalledWith({ error: 'Invalid payload' }, { status: 400 });
+    expect(NextResponse.json).toHaveBeenCalledWith({ error: 'Missing result' }, { status: 400 });
   });
 });
