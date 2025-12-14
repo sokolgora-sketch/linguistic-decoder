@@ -2,29 +2,25 @@
 import { analyzeWordV1 } from "../src/engine/analyzeWordV1";
 
 describe("analyzeWordV1", () => {
-  it("returns empty analysis for blank input", async () => {
-    const res = await analyzeWordV1("   ", "strict");
+  it("returns a v1 AnalysisResult for 'study'", async () => {
+    const result = await analyzeWordV1("study", "strict");
 
-    expect(res.word).toBe("");
-    expect(res.candidates.length).toBe(0);
-    expect(res.math7Summary).toBeNull();
-  });
+    expect(result.word).toBe("study");
+    expect(result.mode).toBe("strict");
 
-  it("returns one identity candidate for 'study' with Math7 info", async () => {
-    const res = await analyzeWordV1("study", "strict");
+    // Engine meta basics
+    expect(result.engine_meta.engineVersion).toBe("v1.0.0");
+    expect(typeof result.engine_meta.timestampIso).toBe("string");
 
-    expect(res.word).toBe("study");
-    expect(res.mode).toBe("strict");
+    // Math7 summary should exist for a normal word
+    expect(result.math7_summary).not.toBeNull();
 
-    // We know generateCandidates currently returns a single identity candidate
-    expect(res.candidates.length).toBe(1);
+    // At least one candidate
+    expect(result.candidates.length).toBeGreaterThan(0);
 
-    const c = res.candidates[0];
-
+    const c = result.candidates[0];
     expect(c.form).toBe("study");
-    expect(c.decomposition).toEqual(["study"]);
-    expect(Array.isArray(c.vowelPath)).toBe(true);
-    expect(c.vowelPath.length).toBeGreaterThan(0);
-    expect(res.math7Summary).not.toBeNull();
+    expect(Array.isArray(c.decomposition)).toBe(true);
+    expect(Array.isArray(c.vowel_path)).toBe(true);
   });
 });

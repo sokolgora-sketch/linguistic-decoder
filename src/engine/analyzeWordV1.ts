@@ -1,104 +1,81 @@
 // src/engine/analyzeWordV1.ts
 import { summarizeWordMath7 } from "../lib/sevenVowelsCore";
+import type {
+  VoicePath,
+  Ring,
+  Math7Summary,
+} from "../lib/sevenVowelsCore";
 import { generateCandidates } from "./wordCandidates";
 
-export type AnalysisMode = "strict" | "open";
+export type EngineMode = "strict" | "open";
 
-export interface FunctionalStatement {
+export type FunctionalStatement = {
   action: string;
   instrument: string;
   unit: string;
-}
+};
 
-export interface CandidateAnalysis {
-  language: string | null;
+export type CandidateAnalysis = {
+  language: string; // e.g. "unknown" for now
   form: string;
-  decomposition: string[];
-  functionalStatement: FunctionalStatement;
-  vowelPath: string[];          // Seven-Voices path for this candidate
-  math7: unknown | null;        // raw Math7 summary (keep loose for now)
-  notes: string[];              // engine comments / signals
-}
+  decomposition: string[]; // smallest pieces
+  functional_statement: FunctionalStatement;
+  vowel_path: VoicePath;
+  ring_fit: Ring | "MIXED";
+  signals: string[];
+};
 
-export interface AnalysisResult {
+export type EngineMeta = {
+  engineVersion: string;
+  timestampIso: string;
+  configHash?: string;
+  heartNotes?: string[];
+};
+
+export type AnalysisResult = {
   word: string;
-  mode: AnalysisMode;
-  languageGuess: string | null;
+  mode: EngineMode;
+  language_guess: string | null;
   candidates: CandidateAnalysis[];
-  math7Summary: unknown | null; // overall Math7 summary for the input word
-  engineMeta: {
-    engineVersion: string;
-    timestamp: string;
-  };
-}
+  math7_summary: Math7Summary | null;
+  engine_meta: EngineMeta;
+};
 
-// Keep engine version in one place
 const ENGINE_VERSION = "v1.0.0";
 
-/**
- * Pure engine entry point for v1.
- * No network calls, no Firestore – just math + structural candidates.
- */
 export async function analyzeWordV1(
   word: string,
-  mode: AnalysisMode = "strict"
+  mode: EngineMode = "strict",
 ): Promise<AnalysisResult> {
-  const trimmed = word.trim();
+  const input = word.trim();
 
-  // Empty input → empty analysis
-  if (!trimmed) {
-    return {
-      word: "",
-      mode,
-      languageGuess: null,
-      candidates: [],
-      math7Summary: null,
-      engineMeta: {
-        engineVersion: ENGINE_VERSION,
-        timestamp: new Date().toISOString(),
-      },
-    };
-  }
+  const math7_summary = summarizeWordMath7(input);
 
-  // 1) Core Math7 summary for the whole word
-  const math7 = summarizeWordMath7(trimmed);
+  const rawCandidates = generateCandidates(input);
 
-  // 2) Structural candidates from the Search-Operation engine
-  const rawCandidates = generateCandidates(trimmed) as any[];
-
-  const candidates: CandidateAnalysis[] = rawCandidates.map((c: any) => {
-    const cMath = c.math7 ?? math7;
-
-    return {
-      language: null, // we’ll fill this once language families plug in
-      form: c.form ?? trimmed,
-      decomposition: Array.isArray(c.pieces) && c.pieces.length > 0
-        ? c.pieces
-        : [c.form ?? trimmed],
-      functionalStatement: {
-        action: "",
-        instrument: "",
-        unit: "",
-      },
-      vowelPath: (cMath && Array.isArray((cMath as any).path))
-        ? (cMath as any).path
-        : [],
-      math7: cMath ?? null,
-      notes: Array.isArray(c.opsUsed)
-        ? [`ops: ${c.opsUsed.join(", ")}`]
-        : [],
-    };
-  });
+  const candidates: CandidateAnalysis[] = rawCandidates.map((c) => ({
+    language: "unknown",
+    form: c.form,
+    decomposition: c.pieces,
+    functional_statement: {
+      action: "",
+      instrument: "",
+      unit: "",
+    },
+    vowel_path: c.math7?.path ?? (math7_summary ? math7_summary.path : []),
+    ring_fit: "MIXED",
+    signals: [],
+  }));
 
   return {
-    word: trimmed,
+    word: input,
     mode,
-    languageGuess: null,
+    language_guess: null,
     candidates,
-    math7Summary: math7,
-    engineMeta: {
+    math7_summary,
+    engine_meta: {
       engineVersion: ENGINE_VERSION,
-      timestamp: new Date().toISOString(),
+      timestampIso: new Date().toISOString(),
     },
   };
 }
