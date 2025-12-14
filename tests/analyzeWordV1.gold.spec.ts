@@ -9,4 +9,10 @@ describe("analyzeWordV1 gold words v1", () => {
 
     expect(stable).toMatchSnapshot();
   });
+
+  it("matches snapshot for 'damage' (v1.0.0)", async () => {
+    const result = await analyzeWordV1("damage", "strict");
+    const { engine_meta, ...stable } = result as any;
+    expect(stable).toMatchSnapshot();
+  });
 });
