@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
 
 type Voice = "A" | "E" | "I" | "O" | "U" | "Y" | "Ë";
 
@@ -152,6 +153,17 @@ export default function WordPageV1() {
             </p>
           )}
         </section>
+
+        {result?.word && (
+          <div className="flex justify-end mt-2">
+            <Link
+              href={`/word/${encodeURIComponent(result.word)}`}
+              className="text-xs text-slate-400 hover:text-slate-100 underline underline-offset-4"
+            >
+              View full v1 summary (dev)
+            </Link>
+          </div>
+        )}
 
         {/* Math7 summary */}
         {result?.math7_summary && (
