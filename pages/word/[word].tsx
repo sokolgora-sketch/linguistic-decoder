@@ -3,7 +3,66 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 
-type AnalyzeResponse = any;
+// ---- Types for the /api/analyze UI response ----
+
+type PathValue = string | string[] | undefined;
+
+type PrimaryPath = {
+  voicePath?: PathValue;
+  levelPath?: string;
+  ringPath?: PathValue;
+};
+
+type FrontierAlt = {
+  id?: string;
+  voicePath?: PathValue;
+  levelPath?: string;
+  ringPath?: PathValue;
+};
+
+type FamilySymbolic = {
+  tag?: string;
+  note?: string;
+};
+
+type LanguageFamily = {
+  language: string;
+  form?: string;
+  gloss?: string;
+  passes?: boolean;
+  voicePath?: PathValue;
+  levelPath?: string;
+  ringPath?: PathValue;
+  symbolic?: FamilySymbolic[];
+};
+
+type SymbolicBlock = {
+  label?: string;
+  notes?: string[];
+};
+
+type Meta = {
+  engineVersion?: string;
+  mode?: string;
+  createdAt?: string;
+};
+
+type AnalyzeResponse = {
+  word: string;
+  primaryPath?: PrimaryPath;
+  frontier?: FrontierAlt[];
+  languageFamilies?: LanguageFamily[];
+  symbolic?: SymbolicBlock;
+  meta?: Meta;
+};
+
+// ---- Small helpers ----
+
+function formatPath(path: PathValue): string {
+  if (!path) return "—";
+  if (Array.isArray(path)) return path.join(" → ");
+  return path;
+}
 
 export default function WordPage() {
   const router = useRouter();
@@ -34,7 +93,7 @@ export default function WordPage() {
       setError(null);
 
       try {
-        // Use the new v1 API
+        // Uses the main Seven-Voices UI endpoint
         const res = await fetch("/api/analyze", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -69,11 +128,11 @@ export default function WordPage() {
     };
   }, [rawWord]);
 
-  const primary = (data as any)?.primaryPath ?? null;
-  const frontier = ((data as any)?.frontier ?? []) as any[];
-  const families = ((data as any)?.languageFamilies ?? []) as any[];
-  const symbolic = (data as any)?.symbolic ?? null;
-  const meta = (data as any)?.meta ?? null;
+  const primary = data?.primaryPath ?? null;
+  const frontier = data?.frontier ?? [];
+  const families = data?.languageFamilies ?? [];
+  const symbolic = data?.symbolic ?? null;
+  const meta = data?.meta ?? null;
 
   return (
     <main className="min-h-screen bg-slate-950 text-slate-50">
@@ -110,7 +169,7 @@ export default function WordPage() {
               <p className="text-slate-300">
                 Mode:{" "}
                 <span className="font-mono">
-                  {(meta?.mode as string) ?? (data as any).mode ?? "strict"}
+                  {meta?.mode ?? (data as any).mode ?? "strict"}
                 </span>
               </p>
               {meta?.createdAt && (
@@ -131,7 +190,7 @@ export default function WordPage() {
               <div>
                 <div className="text-xs uppercase text-slate-500">Voice path</div>
                 <div className="font-mono text-slate-100">
-                  {primary.voicePath ?? "—"}
+                  {formatPath(primary.voicePath)}
                 </div>
               </div>
               <div>
@@ -143,7 +202,7 @@ export default function WordPage() {
               <div>
                 <div className="text-xs uppercase text-slate-500">Ring path</div>
                 <div className="font-mono text-slate-100">
-                  {primary.ringPath ?? "—"}
+                  {formatPath(primary.ringPath)}
                 </div>
               </div>
             </div>
@@ -171,22 +230,22 @@ export default function WordPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {frontier.map((alt: any) => (
+                  {frontier.map((alt) => (
                     <tr
-                      key={alt.id ?? alt.voicePath}
+                      key={alt.id ?? String(alt.voicePath)}
                       className="border-t border-slate-900 text-slate-100"
                     >
                       <td className="px-3 py-2 font-mono">
                         {alt.id ?? "—"}
                       </td>
                       <td className="px-3 py-2 font-mono">
-                        {alt.voicePath ?? "—"}
+                        {formatPath(alt.voicePath)}
                       </td>
                       <td className="px-3 py-2 font-mono">
                         {alt.levelPath ?? "—"}
                       </td>
                       <td className="px-3 py-2 font-mono">
-                        {alt.ringPath ?? "—"}
+                        {formatPath(alt.ringPath)}
                       </td>
                     </tr>
                   ))}
@@ -202,7 +261,7 @@ export default function WordPage() {
             <h2 className="text-lg font-medium">Language families (v1)</h2>
 
             <div className="space-y-3">
-              {families.map((fam: any, idx: number) => (
+              {families.map((fam, idx) => (
                 <div
                   key={`${fam.language}-${idx}`}
                   className="rounded-xl border border-slate-800 bg-black/30 p-4 text-sm space-y-2"
@@ -216,7 +275,7 @@ export default function WordPage() {
                         </span>
                       )}
                     </div>
-                    {fam.passes === true && (
+                    {fam.passes && (
                       <span className="rounded-full border border-emerald-500/60 px-2 py-[2px] text-[10px] uppercase tracking-wide text-emerald-400">
                         passes v1
                       </span>
@@ -229,19 +288,19 @@ export default function WordPage() {
 
                   <div className="flex flex-wrap gap-4 text-xs text-slate-400">
                     {fam.voicePath && (
-                      <span>Voice: {fam.voicePath}</span>
+                      <span>Voice: {formatPath(fam.voicePath)}</span>
                     )}
                     {fam.levelPath && fam.levelPath !== "N/A" && (
                       <span>Level: {fam.levelPath}</span>
                     )}
                     {fam.ringPath && fam.ringPath !== "N/A" && (
-                      <span>Ring: {fam.ringPath}</span>
+                      <span>Ring: {formatPath(fam.ringPath)}</span>
                     )}
                   </div>
 
                   {Array.isArray(fam.symbolic) && fam.symbolic.length > 0 && (
                     <ul className="mt-1 space-y-1 text-xs text-slate-400">
-                      {fam.symbolic.map((s: any, i: number) => (
+                      {fam.symbolic.map((s, i) => (
                         <li key={i}>
                           <span className="font-semibold text-slate-200">
                             {s.tag ?? "symbolic"}
@@ -265,7 +324,7 @@ export default function WordPage() {
             </h2>
             {Array.isArray(symbolic.notes) && symbolic.notes.length > 0 && (
               <ul className="list-disc space-y-1 pl-5 text-slate-300">
-                {symbolic.notes.map((note: string, idx: number) => (
+                {symbolic.notes.map((note, idx) => (
                   <li key={idx}>{note}</li>
                 ))}
               </ul>
