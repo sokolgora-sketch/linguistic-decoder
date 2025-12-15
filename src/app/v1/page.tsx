@@ -103,7 +103,7 @@ export default function WordPageV1() {
         {/* Header */}
         <header className="space-y-1">
           <h1 className="text-2xl font-semibold tracking-tight">
-            ZË-RO · Word Page v1
+            ZË-RO · Engine v1 sandbox
           </h1>
           <p className="text-sm text-slate-400">
             Seven-Voices engine v1 · strict functional reading · no magic.
