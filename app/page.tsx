@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, type ReactNode, useCallback } from 'react';
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -34,7 +35,7 @@ import { LanguageFamiliesCard } from '@/components/LanguageFamiliesCard';
 import { SymbolicReadingCard } from '@/components/SymbolicReadingCard';
 import { PublicSummaryPreview } from '@/components/PublicSummaryPreview';
 
-function renderWordMatrix(result: AnalyzeWordResultUI | null): React.ReactNode {
+function renderWordMatrix(result: AnalyzeWordResultUI | null): ReactNode {
   if (!result?.wordMatrix) {
     return null;
   }
@@ -130,9 +131,13 @@ export default function Page() {
         [
           {
             word: data.word,
-            voicePath: Array.isArray(data.primaryPath?.voicePath) ? data.primaryPath.voicePath.join(' → ') : data.primaryPath?.voicePath ?? '—',
+            voicePath: Array.isArray(data.primaryPath?.voicePath)
+              ? data.primaryPath.voicePath.join(' → ')
+              : data.primaryPath?.voicePath ?? '—',
             levelPath: data.primaryPath?.levelPath ?? '—',
-            ringPath: Array.isArray(data.primaryPath?.ringPath) ? data.primaryPath.ringPath.join(' → ') : data.primaryPath?.ringPath ?? '—',
+            ringPath: Array.isArray(data.primaryPath?.ringPath)
+              ? data.primaryPath.ringPath.join(' → ')
+              : data.primaryPath?.ringPath ?? '—',
             createdAt: data.meta?.createdAt ?? new Date().toISOString(),
           },
           ...prev,
@@ -140,7 +145,7 @@ export default function Page() {
       );
     } catch (err: any) {
       console.error('Error while analyzing word:', err);
-      const message = "Network error while calling /api/analyze. Try again.";
+      const message = 'Network error while calling /api/analyze. Try again.';
       setError(message);
     } finally {
       setIsAnalyzing(false);
@@ -273,6 +278,9 @@ export default function Page() {
     }
   };
 
+  // This is the word we’ll use for the dev link – prefer engine result, fall back to trimmed input
+  const currentWord = result?.word ?? word.trim();
+
   return (
     <div className="min-h-screen bg-background text-foreground p-4 lg:p-8 flex flex-col items-stretch">
       <main className="max-w-5xl mx-auto w-full space-y-8 flex-1">
@@ -297,7 +305,10 @@ export default function Page() {
           </CardHeader>
           <CardContent>
             <form
-              onSubmit={(e) => { e.preventDefault(); handleAnalyze(); }}
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleAnalyze();
+              }}
               className="flex flex-col gap-3 sm:flex-row"
             >
               <Input
@@ -307,7 +318,11 @@ export default function Page() {
                 placeholder="study"
                 disabled={isAnalyzing}
               />
-              <Button type="submit" disabled={isAnalyzing} aria-busy={isAnalyzing}>
+              <Button
+                type="submit"
+                disabled={isAnalyzing}
+                aria-busy={isAnalyzing}
+              >
                 {isAnalyzing ? 'Analyzing...' : 'Analyze'}
               </Button>
             </form>
@@ -356,15 +371,27 @@ export default function Page() {
           </Card>
         )}
 
+        {/* Results header + dev link */}
         <div className="mt-4 flex items-center justify-between">
           <div className="text-sm text-muted-foreground">Results</div>
-          <button
-            type="button"
-            className="text-xs underline text-muted-foreground hover:text-foreground"
-            onClick={() => setShowAdvanced((v) => !v)}
-          >
-            {showAdvanced ? 'Hide advanced details' : 'Show advanced details'}
-          </button>
+          <div className="flex flex-col items-end gap-1">
+            <button
+              type="button"
+              className="text-xs underline text-muted-foreground hover:text-foreground"
+              onClick={() => setShowAdvanced((v) => !v)}
+            >
+              {showAdvanced ? 'Hide advanced details' : 'Show advanced details'}
+            </button>
+
+            {currentWord && (
+              <Link
+                href={`/word/${encodeURIComponent(currentWord)}`}
+                className="text-[11px] text-muted-foreground hover:text-foreground underline underline-offset-4"
+              >
+                View full v1 summary (dev)
+              </Link>
+            )}
+          </div>
         </div>
 
         {/* Heart summary */}
@@ -394,7 +421,9 @@ export default function Page() {
                     Voice path
                   </div>
                   <div className="font-medium">
-                    {Array.isArray(result.primaryPath.voicePath) ? result.primaryPath.voicePath.join(' → ') : result.primaryPath.voicePath}
+                    {Array.isArray(result.primaryPath.voicePath)
+                      ? result.primaryPath.voicePath.join(' → ')
+                      : result.primaryPath.voicePath}
                   </div>
                 </div>
                 <div>
@@ -410,7 +439,9 @@ export default function Page() {
                     Ring path
                   </div>
                   <div className="font-medium">
-                    {Array.isArray(result.primaryPath.ringPath) ? result.primaryPath.ringPath.join(' → ') : result.primaryPath.ringPath}
+                    {Array.isArray(result.primaryPath.ringPath)
+                      ? result.primaryPath.ringPath.join(' → ')
+                      : result.primaryPath.ringPath}
                   </div>
                 </div>
               </div>
@@ -577,7 +608,9 @@ export default function Page() {
             {/* Word matrix (rendered by helper) */}
             {renderWordMatrix(result)}
 
-            {symbolicSummary && <SymbolicReadingCard summary={symbolicSummary} />}
+            {symbolicSummary && (
+              <SymbolicReadingCard summary={symbolicSummary} />
+            )}
 
             <PublicSummaryPreview result={result} />
           </div>
