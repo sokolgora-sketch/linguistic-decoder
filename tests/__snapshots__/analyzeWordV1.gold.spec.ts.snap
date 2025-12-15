@@ -69,6 +69,49 @@ exports[`analyzeWordV1 gold words v1 matches snapshot for 'damage' (v1.0.0) 1`] 
     },
   },
   "mode": "strict",
+  "sevenVoices": {
+    "stressTest": {
+      "families": [
+        {
+          "family": "LIFE",
+          "patterns": [
+            "L1",
+          ],
+          "strongest": "medium",
+        },
+        {
+          "family": "SYSTEMS",
+          "patterns": [
+            "S1",
+          ],
+          "strongest": "strong",
+        },
+      ],
+      "language": "sq",
+      "matches": [
+        {
+          "family": "LIFE",
+          "patternId": "L1",
+          "reason": "Pattern template [A] is a prefix or suffix of the vowel path.",
+          "strength": "medium",
+        },
+        {
+          "family": "SYSTEMS",
+          "patternId": "S1",
+          "reason": "Vowel path exactly matches template [A → A → E].",
+          "strength": "strong",
+        },
+      ],
+      "tensions": [],
+      "vowelPath": "A → A → E",
+      "vowels": [
+        "A",
+        "A",
+        "E",
+      ],
+      "word": "damage",
+    },
+  },
   "word": "damage",
 }
 `;
@@ -140,6 +183,22 @@ exports[`analyzeWordV1 gold words v1 matches snapshot for 'study' (v1.0.0) 1`] =
     },
   },
   "mode": "strict",
+  "sevenVoices": {
+    "stressTest": {
+      "families": [],
+      "language": "sq",
+      "matches": [],
+      "tensions": [
+        "No strong pattern match found for this vowel path.",
+      ],
+      "vowelPath": "U → Y",
+      "vowels": [
+        "U",
+        "Y",
+      ],
+      "word": "study",
+    },
+  },
   "word": "study",
 }
 `;

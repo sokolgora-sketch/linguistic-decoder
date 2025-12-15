@@ -6,6 +6,7 @@ import type {
   Math7Summary,
 } from "../lib/sevenVowelsCore";
 import { generateCandidates } from "./wordCandidates";
+import { runSevenVoicesStressTest, StressTestResult } from "./sevenVoicesStressTest";
 
 export type EngineMode = "strict" | "open";
 
@@ -39,6 +40,9 @@ export type AnalysisResult = {
   candidates: CandidateAnalysis[];
   math7_summary: Math7Summary | null;
   engine_meta: EngineMeta;
+  sevenVoices?: {
+    stressTest: StressTestResult;
+  };
 };
 
 const ENGINE_VERSION = "v1.0.0";
@@ -67,6 +71,15 @@ export async function analyzeWordV1(
     signals: [],
   }));
 
+  // --- Seven Voices Stress Test ---
+  const primaryVoicePath = math7_summary ? math7_summary.path.join(" → ") : "";
+  const stressTest = runSevenVoicesStressTest({
+    word: input,
+    language: "sq", // Assuming Albanian for now
+    primaryVoicePath,
+  });
+
+
   return {
     word: input,
     mode,
@@ -76,6 +89,9 @@ export async function analyzeWordV1(
     engine_meta: {
       engineVersion: ENGINE_VERSION,
       timestampIso: new Date().toISOString(),
+    },
+    sevenVoices: {
+      stressTest,
     },
   };
 }
