@@ -1,7 +1,8 @@
-"use client";
+'use client';
 
-import React, { useEffect, useState } from "react";
-import { useRouter } from "next/router";
+import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
 
 // ---- Types for the /api/analyze UI response ----
 
@@ -59,8 +60,8 @@ type AnalyzeResponse = {
 // ---- Small helpers ----
 
 function formatPath(path: PathValue): string {
-  if (!path) return "—";
-  if (Array.isArray(path)) return path.join(" → ");
+  if (!path) return '—';
+  if (Array.isArray(path)) return path.join(' → ');
   return path;
 }
 
@@ -69,11 +70,11 @@ export default function WordPage() {
   const { word } = router.query;
 
   const rawWord =
-    typeof word === "string"
+    typeof word === 'string'
       ? word
       : Array.isArray(word)
-      ? word[0] ?? ""
-      : "";
+      ? word[0] ?? ''
+      : '';
 
   const [data, setData] = useState<AnalyzeResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -94,10 +95,10 @@ export default function WordPage() {
 
       try {
         // Uses the main Seven-Voices UI endpoint
-        const res = await fetch("/api/analyze", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ word: rawWord, mode: "strict" }),
+        const res = await fetch('/api/analyze', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ word: rawWord, mode: 'strict' }),
         });
 
         if (!res.ok) {
@@ -111,7 +112,7 @@ export default function WordPage() {
       } catch (err) {
         if (!cancelled) {
           setError(
-            err instanceof Error ? err.message : "Unknown error while loading word.",
+            err instanceof Error ? err.message : 'Unknown error while loading word.',
           );
         }
       } finally {
@@ -137,14 +138,26 @@ export default function WordPage() {
   return (
     <main className="min-h-screen bg-slate-950 text-slate-50">
       <div className="mx-auto max-w-4xl px-4 py-10 space-y-10">
+        <nav className="mb-2">
+          <Link
+            href="/"
+            className="inline-flex items-center text-xs text-slate-400 hover:text-slate-100"
+          >
+            <span aria-hidden="true" className="mr-1">
+              ←
+            </span>
+            Back to Linguistic Decoder
+          </Link>
+        </nav>
+
         {/* Header */}
         <header className="space-y-1">
           <h1 className="text-2xl font-semibold tracking-tight">
             ZË-RO · Word page v1
           </h1>
           <p className="text-sm text-slate-400">
-            Strict Seven-Voices reading for{" "}
-            <span className="font-semibold">{rawWord || "—"}</span>.
+            Strict Seven-Voices reading for{' '}
+            <span className="font-semibold">{rawWord || '—'}</span>.
           </p>
         </header>
 
@@ -161,20 +174,20 @@ export default function WordPage() {
           {!loading && !error && data && (
             <div className="space-y-1 text-sm">
               <p className="text-slate-300">
-                Engine:{" "}
+                Engine:{' '}
                 <span className="font-mono">
-                  {meta?.engineVersion ?? "SevenVoices Core v1"}
+                  {meta?.engineVersion ?? 'SevenVoices Core v1'}
                 </span>
               </p>
               <p className="text-slate-300">
-                Mode:{" "}
+                Mode:{' '}
                 <span className="font-mono">
-                  {meta?.mode ?? (data as any).mode ?? "strict"}
+                  {meta?.mode ?? (data as any).mode ?? 'strict'}
                 </span>
               </p>
               {meta?.createdAt && (
                 <p className="text-xs text-slate-500">
-                  Created at:{" "}
+                  Created at:{' '}
                   <span className="font-mono">{meta.createdAt}</span>
                 </p>
               )}
@@ -196,7 +209,7 @@ export default function WordPage() {
               <div>
                 <div className="text-xs uppercase text-slate-500">Level path</div>
                 <div className="font-mono text-slate-100">
-                  {primary.levelPath ?? "—"}
+                  {primary.levelPath ?? '—'}
                 </div>
               </div>
               <div>
@@ -236,13 +249,13 @@ export default function WordPage() {
                       className="border-t border-slate-900 text-slate-100"
                     >
                       <td className="px-3 py-2 font-mono">
-                        {alt.id ?? "—"}
+                        {alt.id ?? '—'}
                       </td>
                       <td className="px-3 py-2 font-mono">
                         {formatPath(alt.voicePath)}
                       </td>
                       <td className="px-3 py-2 font-mono">
-                        {alt.levelPath ?? "—"}
+                        {alt.levelPath ?? '—'}
                       </td>
                       <td className="px-3 py-2 font-mono">
                         {formatPath(alt.ringPath)}
@@ -290,10 +303,10 @@ export default function WordPage() {
                     {fam.voicePath && (
                       <span>Voice: {formatPath(fam.voicePath)}</span>
                     )}
-                    {fam.levelPath && fam.levelPath !== "N/A" && (
+                    {fam.levelPath && fam.levelPath !== 'N/A' && (
                       <span>Level: {fam.levelPath}</span>
                     )}
-                    {fam.ringPath && fam.ringPath !== "N/A" && (
+                    {fam.ringPath && fam.ringPath !== 'N/A' && (
                       <span>Ring: {formatPath(fam.ringPath)}</span>
                     )}
                   </div>
@@ -303,7 +316,7 @@ export default function WordPage() {
                       {fam.symbolic.map((s, i) => (
                         <li key={i}>
                           <span className="font-semibold text-slate-200">
-                            {s.tag ?? "symbolic"}
+                            {s.tag ?? 'symbolic'}
                           </span>
                           {s.note && <> — {s.note}</>}
                         </li>
@@ -320,7 +333,7 @@ export default function WordPage() {
         {!loading && !error && symbolic && (
           <section className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6 space-y-2 text-sm">
             <h2 className="text-lg font-medium">
-              {symbolic.label ?? "Symbolic reading (v1)"}
+              {symbolic.label ?? 'Symbolic reading (v1)'}
             </h2>
             {Array.isArray(symbolic.notes) && symbolic.notes.length > 0 && (
               <ul className="list-disc space-y-1 pl-5 text-slate-300">
@@ -341,13 +354,13 @@ export default function WordPage() {
               onClick={() => setShowJson((v) => !v)}
               className="rounded-md border border-slate-700 px-3 py-1 text-xs font-medium hover:bg-slate-800"
             >
-              {showJson ? "Hide JSON" : "Show JSON"}
+              {showJson ? 'Hide JSON' : 'Show JSON'}
             </button>
           </div>
 
           {showJson && (
             <pre className="max-h-[480px] overflow-auto rounded-xl bg-black/50 p-4 text-xs leading-relaxed">
-              {data ? JSON.stringify(data, null, 2) : "No data yet."}
+              {data ? JSON.stringify(data, null, 2) : 'No data yet.'}
             </pre>
           )}
         </section>
