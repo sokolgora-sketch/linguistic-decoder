@@ -10,11 +10,10 @@
   },
   "include": [
     "next-env.d.ts",
-
     "src/functions/**/*.ts",
-
     "src/engine/sevenVoicesPatterns.ts",
-    "src/engine/sevenVoicesStressTest.ts"
+    "src/engine/sevenVoicesStressTest.ts",
+    "src/app/api/seven-voices/stress-test/route.ts"
   ],
   "exclude": ["node_modules"]
 }
