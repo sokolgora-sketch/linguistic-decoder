@@ -1,0 +1,78 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`runStressHarnessV1() runs canonical words without crashing and returns stable structure 1`] = `
+[
+  {
+    "error": false,
+    "hasStress": true,
+    "ok": true,
+    "word": "study",
+  },
+  {
+    "error": false,
+    "hasStress": true,
+    "ok": true,
+    "word": "damage",
+  },
+  {
+    "error": false,
+    "hasStress": true,
+    "ok": true,
+    "word": "Love",
+  },
+  {
+    "error": false,
+    "hasStress": true,
+    "ok": true,
+    "word": "Law",
+  },
+  {
+    "error": false,
+    "hasStress": true,
+    "ok": true,
+    "word": "gjak",
+  },
+  {
+    "error": false,
+    "hasStress": true,
+    "ok": true,
+    "word": "zemër",
+  },
+  {
+    "error": false,
+    "hasStress": true,
+    "ok": true,
+    "word": "frymË",
+  },
+  {
+    "error": false,
+    "hasStress": true,
+    "ok": true,
+    "word": "Shqipëri",
+  },
+  {
+    "error": false,
+    "hasStress": true,
+    "ok": true,
+    "word": "kulturë",
+  },
+  {
+    "error": false,
+    "hasStress": true,
+    "ok": true,
+    "word": "sistem",
+  },
+  {
+    "error": false,
+    "hasStress": true,
+    "ok": true,
+    "word": "internet",
+  },
+  {
+    "error": false,
+    "hasStress": true,
+    "ok": true,
+    "word": "kriptomonedhë",
+  },
+]
+`;
