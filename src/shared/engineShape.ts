@@ -417,3 +417,20 @@ export interface Math7PathSummary {
   pairCoverage: number;     // 0–3 (A–Y, E–U, I–O)
   principlesPath: string[]; // ["Unity", "Balance", ...]
 }
+
+
+// ------------------------------
+// Stress Harness structures (v1)
+// ------------------------------
+
+export interface StressHarnessItem {
+  word: string;
+  label?: string;
+}
+
+export interface StressHarnessRow {
+  word: string;
+  ok: boolean;
+  stress: unknown;
+  error?: string;
+}
