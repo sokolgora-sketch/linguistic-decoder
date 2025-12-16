@@ -1,0 +1,15 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true
+  },
+  "include": [
+    "next-env.d.ts",
+
+    "src/functions/**/*.ts",
+
+    "src/engine/sevenVoicesPatterns.ts",
+    "src/engine/sevenVoicesStressTest.ts"
+  ],
+  "exclude": ["node_modules"]
+}
