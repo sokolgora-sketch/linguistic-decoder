@@ -11,3 +11,5 @@ out/
 npm-debug.log*
 yarn-*.log*
 pnpm-*.log*
+# TypeScript incremental build artifacts
+*.tsbuildinfo
