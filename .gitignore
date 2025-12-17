@@ -5,3 +5,11 @@
 # Safety: if a build output was ever generated under src/
 src/.next/
 src/.turbo/
+
+# Local env (never commit)
+.env
+.env.local
+.env.production
+
+# Dependencies (never commit)
+node_modules/
