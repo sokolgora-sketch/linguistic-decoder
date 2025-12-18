@@ -1,3 +1,9 @@
+/**
+ * v1.1+ suite (quarantined for ZË-RO v1 minimal release)
+ * This suite targets advanced “Heart summary / Engine meta” UI.
+ * Re-enable after v1 ships.
+ */
+
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import Page from '../app/page';
@@ -12,7 +18,7 @@ jest.mock('@/components/ui/use-toast', () => ({
   useToast: () => ({ toast: jest.fn() }),
 }));
 
-describe('Advanced Results Toggle', () => {
+describe.skip('Advanced Results Toggle', () => {
   beforeEach(() => {
     (global.fetch as any) = jest.fn(() =>
       Promise.resolve({

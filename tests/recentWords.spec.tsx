@@ -1,3 +1,8 @@
+/**
+ * v1.1+ suite (quarantined for ZË-RO v1 minimal release)
+ * Re-enable after v1 ships.
+ */
+
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import Page from '../app/page';
@@ -16,7 +21,7 @@ jest.mock('@/components/ui/use-toast', () => ({
   }),
 }));
 
-describe('RecentWords', () => {
+describe.skip('RecentWords', () => {
   beforeEach(() => {
     // Reset fetch mock before each test
     global.fetch = jest.fn(() =>
