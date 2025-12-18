@@ -88,7 +88,7 @@ export function WordMatrix({ analysis }: { analysis: AnalysisResult_DEPRECATED }
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm p-3 rounded-lg bg-muted/50">
                     <InfoPair label="Word" value={core.word} />
                     <InfoPair label="Alphabet/Mode" value={`${core.input.alphabet} / ${core.input.mode}`} />
-                    <InfoPair label="7-Voices Path" value={primary.vowelVoices.join(' → ')} />
+                    <InfoPair label="7-vowel path" value={primary.vowelVoices.join(' → ')} />
                     <InfoPair label="Ring Path" value={primary.ringPath.join(' → ')} />
                 </div>
 

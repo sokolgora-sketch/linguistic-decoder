@@ -277,7 +277,7 @@ export default function Page() {
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
                 <div>
                   <div className="text-xs uppercase text-muted-foreground tracking-wide mb-1">
-                    Voice path
+                    Vowel path
                   </div>
                   <div className="font-medium">
                     {Array.isArray(result.primaryPath.voicePath) ? result.primaryPath.voicePath.join(' → ') : result.primaryPath.voicePath}
@@ -398,7 +398,7 @@ export default function Page() {
                   <thead className="border-b border-muted/40 text-xs uppercase tracking-wide text-muted-foreground">
                     <tr>
                       <th className="py-2 pr-4 text-left w-16">Alt</th>
-                      <th className="py-2 px-4 text-left">Voice path</th>
+                      <th className="py-2 px-4 text-left">Vowel path</th>
                       <th className="py-2 px-4 text-left">Level path</th>
                       <th className="py-2 pl-4 text-left">Ring path</th>
                     </tr>
@@ -493,7 +493,7 @@ export default function Page() {
                     <tr>
                       <th className="py-2 pr-4 text-left w-10">#</th>
                       <th className="py-2 px-4 text-left">Word</th>
-                      <th className="py-2 px-4 text-left">Voice path</th>
+                      <th className="py-2 px-4 text-left">Vowel path</th>
                       <th className="py-2 px-4 text-left">Level path</th>
                       <th className="py-2 pl-4 text-left">Ring path</th>
                     </tr>
