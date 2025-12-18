@@ -37,7 +37,7 @@ export function ResultsDisplay({ analysis }: ResultsDisplayProps) {
         <CardContent className="text-sm">
           <div className="flex flex-wrap gap-6">
             <div>
-              <b>Voice path</b>
+              <b>Vowel path</b>
               <div>{analysis.primaryPath?.voicePath || "—"}</div>
             </div>
             <div>
