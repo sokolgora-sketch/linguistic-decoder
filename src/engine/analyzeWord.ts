@@ -26,9 +26,9 @@ import type {
   Vowel,
 } from "@/shared/engineShape";
 import { ENGINE_VERSION } from "./version";
-import { solveWord } from "@/functions/sevenVoicesCore";
+import { solveWord } from "@/functions/sevenVowelsCore";
 import { getManifest } from "./manifest";
-import type { SolveOptions } from "@/functions/sevenVoicesCore";
+import type { SolveOptions } from "@/functions/sevenVowelsCore";
 import { CANON_CANDIDATES } from "@/shared/canonCandidates";
 import { computeMath7ForResult, type Math7Summary } from "./math7";
 
