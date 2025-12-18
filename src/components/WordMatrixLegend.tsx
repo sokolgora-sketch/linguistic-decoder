@@ -43,7 +43,7 @@ export default function WordMatrixLegend() {
         <CardTitle className="text-sm">Matrix legend</CardTitle>
         <CardDescription className="text-xs">
           Quick map of how rows and columns in the word matrix relate to the
-          Seven-Voices model.
+          Seven-vowel model.
         </CardDescription>
       </CardHeader>
 

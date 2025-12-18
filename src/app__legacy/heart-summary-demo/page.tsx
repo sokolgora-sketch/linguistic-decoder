@@ -12,7 +12,7 @@ export default function HeartSummaryDemoPage() {
       <div className="max-w-md w-full space-y-4">
         <h1 className="text-xl font-semibold">Heart summary demo</h1>
         <p className="text-sm text-muted-foreground">
-          Static example using the Seven-Voices heart summary line.
+          Static example using the Seven-vowel heart summary line.
         </p>
         <HeartSummaryCard word="study" primaryPath={demoPrimaryPath} />
       </div>

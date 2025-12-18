@@ -25,7 +25,7 @@ export function SymbolicReadingCard({ symbolic }: SymbolicReadingCardProps) {
             <span>Symbolic Layer (experimental)</span>
         </CardTitle>
         <CardDescription>
-          This is an interpretive layer built on top of the Seven-Voices path and morphology.
+          This is an interpretive layer built on top of the Seven-vowel path and morphology.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-3 text-sm">

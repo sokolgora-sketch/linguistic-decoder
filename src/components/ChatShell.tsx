@@ -10,7 +10,7 @@ type ChatShellProps = {
 
 export default function ChatShell({
   title = "ZË-RO",
-  subtitle = "Seven-Voices word decoder.",
+  subtitle = "Seven-vowel word decoder.",
   rightSlot,
   children,
   composer,

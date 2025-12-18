@@ -9,7 +9,7 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
 export const metadata: Metadata = {
   title: "Linguistic Decoder",
-  description: "A tool for analyzing words with the Seven-Voices phonetic model.",
+  description: "A tool for analyzing words with the Seven-vowel phonetic model.",
 };
 
 export default function RootLayout({

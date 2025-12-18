@@ -1,5 +1,5 @@
 // Core candidate-engine types + a minimal v1 generator.
-// This stays strictly within the Seven-Voices / Math7 rules.
+// This stays strictly within the Seven-vowel / Math7 rules.
 
 import { summarizeWordMath7, type Math7Summary } from "../lib/sevenVowelsCore";
 

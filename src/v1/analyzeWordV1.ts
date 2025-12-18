@@ -31,7 +31,7 @@ export function normalizeWordV1(input: string): { normalizedWord: string; notes:
 }
 
 /**
- * Extracts Seven-Voices vowel path from a normalized word.
+ * Extracts Seven-vowel vowel path from a normalized word.
  * Supported vowels: A, E, I, O, U, Y, Ë (case-insensitive)
  * Output: "A-I-Ë" or "" if none.
  */
@@ -100,7 +100,7 @@ export function analyzeWordV1(word: string): AnalysisResult {
     decomposition: [normalizedWord],
     vowelPath,
     functionalStatement:
-      "v1 returns a minimal deterministic analysis: surface form is preserved, decomposition is the whole word, and the vowel path is extracted from the Seven-Voices set (A/E/I/O/U/Y/Ë).",
+      "v1 returns a minimal deterministic analysis: surface form is preserved, decomposition is the whole word, and the vowel path is extracted from the Seven-vowel set (A/E/I/O/U/Y/Ë).",
     notes: candidateNotes.length ? candidateNotes : undefined,
   };
 

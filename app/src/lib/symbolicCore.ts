@@ -1,6 +1,6 @@
 // src/lib/symbolicCore.ts
 //
-// Symbolic core layer for the Seven-Voices engine.
+// Symbolic core layer for the Seven-vowel engine.
 // This does NOT change the core path logic. It only
 // adds a higher-level, Petro-Zheji-style view:
 // - sound mutations (C↔Ç, S↔SH, G↔GJ, D↔DH, etc.)
@@ -15,7 +15,7 @@ export type Vowel = 'A' | 'E' | 'I' | 'O' | 'U' | 'Y' | 'Ë';
 
 
 /**
- * Seven-Voices summary needed for symbolic layer.
+ * Seven-vowel summary needed for symbolic layer.
  * This is intentionally minimal so it can be fed
  * from either EnginePayload or AnalysisResult.
  */
@@ -127,7 +127,7 @@ function polarityOf(v: Vowel): "male" | "female" | "neutral" {
 }
 
 /**
- * Compute gender flow from a Seven-Voices path.
+ * Compute gender flow from a Seven-vowel path.
  * v1 is intentionally simple:
  * - If most movement is from inner ring → outer ring → "outward"
  * - If most movement is from outer → inner → "inward"
@@ -265,7 +265,7 @@ export function deriveFunctionalTriplet(
     };
   }
 
-  // Generic fallback using Seven-Voices path as hint.
+  // Generic fallback using Seven-vowel path as hint.
   let action = "undefined action";
   let instrument = "undefined instrument";
   let result = "undefined result";
@@ -294,7 +294,7 @@ export function deriveFunctionalTriplet(
     action,
     instrument,
     result,
-    statement: "Generic functional triplet derived from Seven-Voices path.",
+    statement: "Generic functional triplet derived from Seven-vowel path.",
   };
 }
 
@@ -333,7 +333,7 @@ export function logProtocolRules(params: {
 
 /**
  * High-level convenience function:
- * given a word + Seven-Voices summary, compute the
+ * given a word + Seven-vowel summary, compute the
  * symbolic core view.
  */
 export function computeSymbolicCore(input: {

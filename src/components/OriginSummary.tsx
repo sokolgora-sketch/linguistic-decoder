@@ -56,7 +56,7 @@ export function OriginSummary({ analysis }: OriginSummaryProps) {
       </CardHeader>
       <CardContent className="text-sm space-y-3">
         <div>
-          <div className="font-semibold">Seven-vowel path</div>
+          <div className="font-semibold">Seven-vowel Path</div>
           <p className="text-muted-foreground">
             {voicePath.join(' → ')} ({principlePath})
           </p>
