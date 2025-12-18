@@ -18,7 +18,7 @@ import {
   type AnalysisResult as RawAnalysisResult,
 } from "../lib/runAnalysis";
 import { getManifest } from "@/engine/manifest";
-import type { SolveOptions } from "@/functions/sevenVoicesCore";
+import type { SolveOptions } from "@/functions/sevenVowelsCore";
 import type { AnalysisResult_DEPRECATED, AnalysisCore } from "@/shared/engineShape";
 import { enginePayloadToAnalysisResult } from "@/shared/analysisAdapter";
 

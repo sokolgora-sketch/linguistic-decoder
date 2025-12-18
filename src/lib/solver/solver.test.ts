@@ -4,10 +4,10 @@
  */
 
 
-import { solveWord } from "@/functions/sevenVoicesCore";
-import type { SolveOptions, Vowel } from "@/functions/sevenVoicesCore";
+import { solveWord } from "@/functions/sevenVowelsCore";
+import type { SolveOptions, Vowel } from "@/functions/sevenVowelsCore";
 import { CFG } from "./engineConfig";
-import { checksumV } from '@/functions/sevenVoicesCore'
+import { checksumV } from '@/functions/sevenVowelsCore'
 
 
 const strict: SolveOptions = { beamWidth: CFG.beamWidth, maxOps: CFG.maxOpsStrict, allowDelete: false, allowClosure: false, opCost: { sub: CFG.cost.sub, del: CFG.cost.del, insClosure: CFG.cost.insClosure } };

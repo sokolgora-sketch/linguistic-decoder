@@ -2,7 +2,7 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { runAnalysis } from '@/lib/runAnalysis';
 import { getManifest } from '@/engine/manifest';
-import type { SolveOptions } from '@/functions/sevenVoicesCore';
+import type { SolveOptions } from '@/functions/sevenVowelsCore';
 import type { Alphabet } from '@/lib/runAnalysis';
 import { analyzeWord } from '@/engine/analyzeWord';
 import { computeMath7ForResult } from '@/engine/math7';

@@ -2,7 +2,7 @@
 import { runAnalysis } from "@/lib/runAnalysis";
 import { getManifest } from "@/engine/manifest";
 import type { Alphabet } from "@/lib/runAnalysis";
-import type { SolveOptions } from "@/functions/sevenVoicesCore";
+import type { SolveOptions } from "@/functions/sevenVowelsCore";
 
 const manifest = getManifest();
 const base: SolveOptions = {

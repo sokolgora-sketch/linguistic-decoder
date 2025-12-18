@@ -1,4 +1,4 @@
-import { checksumV } from "@/functions/sevenVoicesCore";
+import { checksumV } from "@/functions/sevenVowelsCore";
 
 export type Voice = "A" | "E" | "I" | "O" | "U" | "Y" | "Ë";
 

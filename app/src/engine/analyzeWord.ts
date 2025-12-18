@@ -17,9 +17,9 @@
 // src/engine/analyzeWord.ts
 import type { AnalyzeWordResult, Candidate, LanguageFamilyCandidate, MorphologyMatrix, SymbolicLayer, SymbolicTag, Vowel } from '@/shared/engineShape';
 import { ENGINE_VERSION } from './version';
-import { solveWord } from '@/functions/sevenVoicesCore';
+import { solveWord } from '@/functions/sevenVowelsCore';
 import { getManifest } from './manifest';
-import type { SolveOptions } from '@/functions/sevenVoicesCore';
+import type { SolveOptions } from '@/functions/sevenVowelsCore';
 import { CANON_CANDIDATES } from '@/shared/canonCandidates';
 import { computeMath7ForResult } from "./math7";
 

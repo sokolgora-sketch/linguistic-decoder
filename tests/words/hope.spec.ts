@@ -2,9 +2,9 @@
 import { runAnalysis } from "@/lib/runAnalysis";
 import { chooseProfile } from "@/functions/languages";
 import { readWindowsDebug, extractBase, normalizeTerminalY } from "@/functions/sevenVoicesC";
-import { Vowel } from "@/functions/sevenVoicesCore";
+import { Vowel } from "@/functions/sevenVowelsCore";
 import type { Alphabet } from "@/lib/runAnalysis";
-import type { SolveOptions } from "@/functions/sevenVoicesCore";
+import type { SolveOptions } from "@/functions/sevenVowelsCore";
 import { getManifest } from "@/engine/manifest";
 
 describe("word: hope", () => {

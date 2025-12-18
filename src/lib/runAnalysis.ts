@@ -1,6 +1,6 @@
 // src/lib/runAnalysis.ts
-import { solveWord } from "../functions/sevenVoicesCore";
-import type { SolveOptions as SolveWordOptions } from "../functions/sevenVoicesCore";
+import { solveWord } from "../functions/sevenVowelsCore";
+import type { SolveOptions as SolveWordOptions } from "../functions/sevenVowelsCore";
 import type { EnginePayload } from "@/shared/engineShape";
 import { recordHistoryRun } from "./historyStore";
 

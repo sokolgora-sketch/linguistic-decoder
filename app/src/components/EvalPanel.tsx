@@ -1,7 +1,7 @@
 
 "use client";
 import React, { useState } from "react";
-import { solveWord } from "../functions/sevenVoicesCore";
+import { solveWord } from "../functions/sevenVowelsCore";
 import { getManifest } from "../engine/manifest";
 import { Button } from "./ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
