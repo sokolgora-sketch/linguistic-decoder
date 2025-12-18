@@ -1,64 +1,49 @@
 import { NextResponse } from "next/server";
-import { analyzeWord } from "@/engine/analyzeWord";
-import { buildEngineMetaSummary } from "@/lib/engineMetaSummary";
+import { analyzeWordV1 } from "../../../src/v1/analyzeWordV1";
+
+/**
+ * ZË-RO v1 API
+ * POST /api/analyze  { word: string }
+ * GET  /api/analyze?word=...
+ *
+ * Returns: AnalysisResult (v1 contract)
+ */
 
 export async function POST(req: Request) {
+  let body: unknown;
   try {
-    const { word, mode } = await req.json();
-
-    if (!word || typeof word !== "string") {
-      return NextResponse.json({ error: "Missing 'word' param" }, { status: 400 });
-    }
-
-    const analyzed = analyzeWord(word.trim(), mode ?? 'strict');
-
-    const primary = analyzed.primaryPath ?? null;
-
-    // The adapter logic is now here in the API route
-    const engineMeta = buildEngineMetaSummary(analyzed);
-
-    const uiResult = {
-      word: analyzed.word ?? word.trim(),
-      mode: analyzed.meta.mode,
-      alphabet: analyzed.meta.alphabet,
-
-      primaryPath: primary
-        ? {
-            voicePath: primary.voicePath ?? "—",
-            levelPath: primary.levelPath ?? "—",
-            ringPath: primary.ringPath ?? "—",
-          }
-        : null,
-
-      frontier: (analyzed.frontier ?? []).map((cand: any) => ({
-        id: cand.id,
-        voicePath: cand.voicePath ?? "—",
-        levelPath: cand.levelPath ?? "—",
-        ringPath: cand.ringPath ?? "—",
-      })),
-
-      // Include the new structured meta object for the UI
-      engineMeta: engineMeta,
-
-      // Keep original meta for backwards compatibility / debug
-      meta: {
-        version: analyzed.meta?.engineVersion ?? "—",
-        created: analyzed.meta?.createdAt ?? "—",
-      },
-      
-      // Pass through other top-level fields from analysis
-      languageFamilies: analyzed.languageFamilies,
-      symbolic: analyzed.symbolic,
-      wordMatrix: (analyzed as any).wordMatrix,
-      raw: analyzed,
-    };
-
-    return NextResponse.json(uiResult);
-  } catch (err: any) {
-    console.error("Analyze route error:", err);
+    body = await req.json();
+  } catch {
     return NextResponse.json(
-      { error: err.message || "Server error" },
-      { status: 500 },
+      { error: "Invalid JSON body. Expected: { word: string }" },
+      { status: 400 }
     );
   }
+
+  const word = typeof (body as any)?.word === "string" ? (body as any).word : "";
+
+  if (!word.trim()) {
+    return NextResponse.json(
+      { error: 'Missing "word". Expected: { word: string }' },
+      { status: 400 }
+    );
+  }
+
+  const result = analyzeWordV1(word);
+  return NextResponse.json(result);
+}
+
+export async function GET(req: Request) {
+  const url = new URL(req.url);
+  const word = url.searchParams.get("word") ?? "";
+
+  if (!word.trim()) {
+    return NextResponse.json(
+      { error: 'Missing "word" query param. Use: /api/analyze?word=study' },
+      { status: 400 }
+    );
+  }
+
+  const result = analyzeWordV1(word);
+  return NextResponse.json(result);
 }
