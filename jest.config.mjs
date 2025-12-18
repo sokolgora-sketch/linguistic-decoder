@@ -1,25 +1,34 @@
-/** @type {import('jest').Config} */
-export default {
-  preset: 'ts-jest/presets/default-esm',
+import nextJest from 'next/jest.js';
+
+// Next.js integration: load env + path aliases
+const createJestConfig = nextJest({ dir: './' });
+
+const customJestConfig = {
   testEnvironment: 'jsdom',
-  extensionsToTreatAsEsm: ['.ts', '.tsx'],
+
+  // Add TypeScript + ESM support
   transform: {
-    '^.+\\.tsx?$': ['ts-jest', { useESM: true, tsconfig: { jsx: 'react-jsx' } }],
+    '^.+\\.(ts|tsx)$': ['ts-jest', { tsconfig: 'tsconfig.json' }],
   },
-  roots: ['<rootDir>/tests'],
+
+  // Allow JSX and ESM modules (like lucide-react)
+  transformIgnorePatterns: [
+    '/node_modules/(?!(lucide-react|@radix-ui)/)',
+  ],
+
+  // Map @/ → src/
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
-    '^(\\.{1,2}/.*)\\.js$': '$1',
-    'lucide-react': '<rootDir>/node_modules/lucide-react/dist/cjs/lucide-react.js'
   },
-  testPathIgnorePatterns: [
-    "/node_modules/",
-    "<rootDir>/tests/history.firestore.spec.ts",
-    "<rootDir>/tests/mapper.spec.ts",
-    "<rootDir>/tests/engine.smoke.test.ts",
-    "<rootDir>/tests/gold.spec.ts",
-    "<rootDir>/tests/baseline.spec.ts",
-    "<rootDir>/tests/edge-guard.spec.ts",
-    "<rootDir>/tests/words/hope.spec.ts",
-  ],
+
+  moduleDirectories: ['node_modules', '<rootDir>/src'],
+
+  // Optional setup
+  setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
+
+  // Silence noisy Firebase & React warnings
+  verbose: true,
+  testPathIgnorePatterns: ['/node_modules/', '/.next/', '/out/'],
 };
+
+export default createJestConfig(customJestConfig);
