@@ -188,7 +188,7 @@ export default function Page() {
             Linguistic Decoder
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Seven-Voices prototype — analyze a word and see how the Heart and
+            Seven-vowel prototype — analyze a word and see how the Heart and
             Frontier respond.
           </p>
         </header>
@@ -198,7 +198,7 @@ export default function Page() {
           <CardHeader>
             <CardTitle>Analyze a word</CardTitle>
             <CardDescription>
-              Type a word and run the Seven-Voices engine.
+              Type a word and run the Seven-vowel engine.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -260,7 +260,7 @@ export default function Page() {
               <div>
                 <CardTitle>Heart summary</CardTitle>
                 <CardDescription>
-                  Primary Seven-Voices path for {result.word ?? "—"}.
+                  Primary Seven-vowel path for {result.word ?? "—"}.
                 </CardDescription>
               </div>
 
@@ -456,7 +456,7 @@ export default function Page() {
             {result?.symbolic && (
               <div className="space-y-2">
                 <div className="text-xs text-muted-foreground">
-                  Sketch from the Seven-Voices core. Experimental, not doctrine.
+                  Sketch from the Seven-vowel core. Experimental, not doctrine.
                 </div>
                 <div>
                   <span className="font-semibold">Label: </span>

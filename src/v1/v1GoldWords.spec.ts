@@ -18,7 +18,7 @@ describe("ZË-RO v1 gold words (minimal contract baseline)", () => {
     expect(b.normalizedWord).toBe("study");
   });
 
-  it("extractVowelPathV1 extracts Seven-Voices vowels only", () => {
+  it("extractVowelPathV1 extracts Seven-vowel vowels only", () => {
     expect(extractVowelPathV1("study")).toBe("U-Y");
     expect(extractVowelPathV1("zë")).toBe("Ë");
     expect(extractVowelPathV1("rhythm")).toBe("Y");

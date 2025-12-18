@@ -33,7 +33,7 @@ export default function AnalysisResultView({ result }: Props) {
               <div>
                 Meaning:
                 <div className="mt-1 text-muted-foreground">
-                  {c.functionalStatement?.replace("Seven-Voices set (A/E/I/O/U/Y/Ë)", `Seven-Vowels set (${vowelSet})`) ??
+                  {c.functionalStatement?.replace("Seven-vowel set (A/E/I/O/U/Y/Ë)", `Seven-Vowels set (${vowelSet})`) ??
                     "—"}
                 </div>
               </div>

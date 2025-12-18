@@ -49,7 +49,7 @@ function VoiceRow() {
           {v}
         </Badge>
       ))}
-      <span className="text-xs text-muted-foreground ml-1">Seven Voices</span>
+      <span className="text-xs text-muted-foreground ml-1">Seven-vowel</span>
     </div>
   );
 }
@@ -138,7 +138,7 @@ export default function ZroChatPage() {
   return (
     <ChatShell
       title="ZË-RO"
-      subtitle="Seven-Voices word decoder."
+      subtitle="Seven-vowel word decoder."
       composer={composer}
     >
       <div className="space-y-4">

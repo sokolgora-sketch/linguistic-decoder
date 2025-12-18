@@ -1,7 +1,7 @@
 /**
  * ❤️ ANALYZE WORD HEART (HIGH-LEVEL RESULT)
  *
- * This file wraps the Seven-Voices engine + canon candidates + symbolic layer
+ * This file wraps the Seven-vowel engine + canon candidates + symbolic layer
  * into a single AnalyzeWordResult shape used by the UI and tests.
  *
  * Contract is locked by:
@@ -33,7 +33,7 @@ import { CANON_CANDIDATES } from "@/shared/canonCandidates";
 import { computeMath7ForResult, type Math7Summary } from "./math7";
 
 /**
- * Low-level call into the Seven-Voices solver.
+ * Low-level call into the Seven-vowel solver.
  * Returns a partial engine result; canon candidates are attached later.
  */
 function runSevenVoices(word: string, opts: { mode: "strict" | "explore" }): any {

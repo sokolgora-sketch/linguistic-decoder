@@ -44,7 +44,7 @@ export function buildDeepRootSummaryV1(result: any): DeepRootSummaryV1 {
         vowelPath: "U → I",
         functionalStatement:
           "What is not yours (s'tu) → you know it (di) → you make it yours (m).",
-        notes: "Seven-Voices reading: U (breath) moving into I (focus/point).",
+        notes: "Seven-vowel reading: U (breath) moving into I (focus/point).",
       },
       {
         language: "Latin",
