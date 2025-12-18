@@ -22,7 +22,7 @@ import type { SolveOptions } from "@/functions/sevenVoicesCore";
 import type { AnalysisResult_DEPRECATED, AnalysisCore } from "@/shared/engineShape";
 import { enginePayloadToAnalysisResult } from "@/shared/analysisAdapter";
 
-// Lightweight formatter for the Seven-Voices heart
+// Lightweight formatter for the Seven-vowel heart
 function renderHeartSummary(core?: AnalysisCore) {
   if (!core) return "No heart data";
 
@@ -36,7 +36,7 @@ function renderHeartSummary(core?: AnalysisCore) {
   return `${seq} · tension: ${tension} · frontier: ${frontier}`;
 }
 
-// Small helper view: show Seven-Voices heart path for one word
+// Small helper view: show Seven-vowel heart path for one word
 type HeartCore = {
   voices?: {
     levelPath?: string[];
@@ -201,7 +201,7 @@ export default function ComparePanel({
       <CardHeader>
         <CardTitle>Compare Two Words</CardTitle>
         <CardDescription>
-          Analyze two words side by side and compare their Seven-Voices paths.
+          Analyze two words side by side and compare their Seven-vowel paths.
         </CardDescription>
       </CardHeader>
 

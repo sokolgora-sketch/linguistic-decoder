@@ -24,7 +24,7 @@ function SevenVoicesSnapshot({ analysis }: { analysis: AnalysisResult_DEPRECATED
     return (
         <Card className="bg-background/50">
             <CardHeader className="p-4">
-                <CardTitle className="text-base">Seven-Voices Core</CardTitle>
+                <CardTitle className="text-base">Seven-vowel Core</CardTitle>
             </CardHeader>
             <CardContent className="p-4 pt-0 space-y-2 text-sm">
                 <InfoPair label="Dominant Principle(s)" value={dominant.join(', ')} />

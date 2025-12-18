@@ -1,7 +1,7 @@
 /**
  * ❤️ ANALYZE WORD HEART (HIGH-LEVEL RESULT)
  *
- * This file wraps the Seven-Voices engine + canon candidates + symbolic layer
+ * This file wraps the Seven-vowel engine + canon candidates + symbolic layer
  * into a single AnalyzeWordResult shape used by the UI and tests.
  *
  * Contract is locked by:

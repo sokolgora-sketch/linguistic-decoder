@@ -20,7 +20,7 @@ export type Ring = "INNER" | "MIDDLE" | "OUTER" | "MEDIATOR";
 const VOICES: Voice[] = ["A", "E", "I", "O", "U", "Y", "Ë"];
 
 /**
- * Extract the Seven-Voices vowel path from a word.
+ * Extract the Seven-vowel vowel path from a word.
  *
  * - Keeps only {A,E,I,O,U,Y,Ë} (case-insensitive).
  * - Returns them in order of appearance.

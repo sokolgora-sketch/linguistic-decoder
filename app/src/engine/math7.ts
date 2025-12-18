@@ -1,6 +1,6 @@
 // src/engine/math7.ts
 //
-// Seven-Voices “Heart Math” over an AnalyzeWordResult.
+// Seven-vowel “Heart Math” over an AnalyzeWordResult.
 // Pure reader: it does NOT change the core solver, it just reads paths.
 
 import type { AnalyzeWordResult } from "@/shared/engineShape";

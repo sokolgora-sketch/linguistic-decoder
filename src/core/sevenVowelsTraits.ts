@@ -1,5 +1,5 @@
 // src/core/sevenVowelsTraits.ts
-// Symbolic traits for each of the Seven Voices + Zheji structural lens.
+// Symbolic traits for each of the Seven-vowel + Zheji structural lens.
 
 import { VOWELS, type Vowel, type RingIndex, ringOf } from "./sevenVowelsCore";
 
