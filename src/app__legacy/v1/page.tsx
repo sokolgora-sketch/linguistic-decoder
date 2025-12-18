@@ -106,7 +106,7 @@ export default function WordPageV1() {
             ZË-RO · Engine v1 sandbox
           </h1>
           <p className="text-sm text-slate-400">
-            Seven-Voices engine v1 · strict functional reading · no magic.
+            Seven-vowel engine v1 · strict functional reading · no magic.
           </p>
         </header>
 
@@ -171,14 +171,14 @@ export default function WordPageV1() {
             <div className="flex items-center justify-between">
               <h2 className="text-sm font-semibold tracking-tight">Math7 summary</h2>
               <span className="text-[11px] uppercase tracking-wide text-slate-500">
-                Seven-Voices core
+                Seven-vowel core
               </span>
             </div>
 
             <div className="grid gap-4 sm:grid-cols-3 text-sm">
               <div>
                 <div className="text-[11px] uppercase text-slate-500 mb-1">
-                  Voice path
+                  Vowel path
                 </div>
                 <div className="inline-flex flex-wrap gap-1">
                   {result.math7_summary.path.map((v, idx) => (

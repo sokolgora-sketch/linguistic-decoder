@@ -31,13 +31,13 @@ export function ResultsDisplay({ analysis }: ResultsDisplayProps) {
         <CardHeader>
           <CardTitle>Heart summary</CardTitle>
           <CardDescription>
-            Primary Seven-Voices path for <b>{analysis.word}</b>.
+            Primary Seven-vowel path for <b>{analysis.word}</b>.
           </CardDescription>
         </CardHeader>
         <CardContent className="text-sm">
           <div className="flex flex-wrap gap-6">
             <div>
-              <b>Voice path</b>
+              <b>Vowel path</b>
               <div>{analysis.primaryPath?.voicePath || "—"}</div>
             </div>
             <div>
@@ -105,7 +105,7 @@ export function ResultsDisplay({ analysis }: ResultsDisplayProps) {
           <CardHeader>
             <CardTitle>Language families (canon layer)</CardTitle>
             <CardDescription>
-              How different languages carry this Seven-Voices path.
+              How different languages carry this Seven-vowel path.
             </CardDescription>
           </CardHeader>
           <CardContent>

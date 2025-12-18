@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/button";
 import { downloadJson } from "@/lib/downloadJson";
 import { WordMatrix } from "./WordMatrix";
 
-// Lightweight formatter for the Seven-Voices heart
+// Lightweight formatter for the Seven-vowel heart
 function getHeartSummary(core: any) {
   if (!core) return null;
 
@@ -223,7 +223,7 @@ export function ResultsDisplay({ analysis: raw }: { analysis: EnginePayload }) {
           core && (
             <Card>
               <CardHeader>
-                <CardTitle>Seven-Voices Heart (Core)</CardTitle>
+                <CardTitle>Seven-vowel Heart (Core)</CardTitle>
                 <CardDescription>
                   Minimal heart snapshot from the engine for this word.
                 </CardDescription>
@@ -364,7 +364,7 @@ export function ResultsDisplay({ analysis: raw }: { analysis: EnginePayload }) {
         {core && (
           <section className="mt-4">
             <h3 className="text-sm font-semibold text-muted-foreground mb-1">
-              Core snapshot (Seven-Voices heart)
+              Core snapshot (Seven-vowel heart)
             </h3>
         
             <details className="bg-black/40 border border-slate-700 rounded-lg p-2">

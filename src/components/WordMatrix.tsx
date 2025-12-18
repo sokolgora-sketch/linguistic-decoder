@@ -101,7 +101,7 @@ export function WordMatrixCard({ matrix }: WordMatrixCardProps) {
                     <tr className="text-muted-foreground">
                       <th className="px-4 py-2 font-semibold">Language</th>
                       <th className="px-4 py-2 font-semibold">Form</th>
-                      <th className="px-4 py-2 font-semibold">Voice path</th>
+                      <th className="px-4 py-2 font-semibold">Vowel path</th>
                       <th className="px-4 py-2 font-semibold">Notes</th>
                     </tr>
                   </thead>

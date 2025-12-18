@@ -39,7 +39,7 @@ const prompt = ai.definePrompt({
   name: 'mapWordToLanguageFamiliesPrompt',
   input: {schema: MapWordToLanguageFamiliesInputSchema},
   output: {schema: MapWordToLanguageFamiliesOutputSchema},
-  prompt: `ROLE: Map a computed Seven-Voices path to language candidate families.
+  prompt: `ROLE: Map a computed Seven-vowel path to language candidate families.
 NEVER change the path. No rankings. No stories. Output ONLY JSON.
 
 SEVEN VOICES (for wording only)

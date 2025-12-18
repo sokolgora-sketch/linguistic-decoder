@@ -59,7 +59,7 @@ export default function Page() {
         <header>
           <h1 className="text-2xl font-semibold">Linguistic Decoder</h1>
           <p className="text-sm text-muted-foreground">
-            Seven-Voices prototype — analyze a word and see the raw result.
+            Seven-vowel prototype — analyze a word and see the raw result.
           </p>
         </header>
 

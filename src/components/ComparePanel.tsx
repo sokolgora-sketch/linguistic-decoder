@@ -22,7 +22,7 @@ function buildHeartSummaryText(summary: PrimaryPathSummary | null): string | nul
   }
 
   const lines: string[] = [
-    `Seven-Voices heart snapshot:`,
+    `Seven-vowel heart snapshot:`,
     `- Primary path: ${summary.voicePath}`,
     `- Rings: ${summary.ringPath}`,
     `- Levels: ${summary.levelPath}`,
@@ -172,7 +172,7 @@ export default function ComparePanel({
       <CardHeader>
         <CardTitle>Compare Two Words</CardTitle>
         <CardDescription>
-          Analyze two words side by side and compare their Seven-Voices paths.
+          Analyze two words side by side and compare their Seven-vowel paths.
         </CardDescription>
       </CardHeader>
 

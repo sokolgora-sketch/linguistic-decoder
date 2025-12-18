@@ -20,7 +20,7 @@ export const ENGINE_VERSION =
 export type AnalysisResult = EnginePayload;
 
 /**
- * Central wrapper for the Seven-Voices engine.
+ * Central wrapper for the Seven-vowel engine.
  * Ensures consistent metadata is attached to the raw result.
  */
 export function runAnalysis(

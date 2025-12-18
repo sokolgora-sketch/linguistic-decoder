@@ -30,7 +30,7 @@ export interface OperationSummary {
   cost?: number;
 }
 
-// Per-language candidate for a path (Seven-Voices etymology layer)
+// Per-language candidate for a path (Seven-vowel etymology layer)
 export interface CandidateLanguage {
   language: string; // "Albanian" | "Latin" | ...
   form: string; // surface form
@@ -46,7 +46,7 @@ export interface PathSummary {
   id: string; // "primary" | "cand-1" | "cand-2"
   label?: string; // human readable label
 
-  // Core Seven-Voices info
+  // Core Seven-vowel info
   voicePath: VowelId[]; // e.g. ["U", "I"]
   vowelNumber?: number[]; // base-7 digits, if you expose them
   score?: number; // if you keep any score / cost

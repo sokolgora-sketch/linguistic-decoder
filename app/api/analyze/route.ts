@@ -1,64 +1,82 @@
 import { NextResponse } from "next/server";
-import { analyzeWord } from "@/engine/analyzeWord";
-import { buildEngineMetaSummary } from "@/lib/engineMetaSummary";
+import { z } from "zod";
+import { analyzeWordV1 } from "../../../src/v1/analyzeWordV1";
+import { AnalysisResultV1Schema } from "../../../src/v1/schemaV1";
+
+/**
+ * ZË-RO v1 API
+ * POST /api/analyze  { word: string }
+ * GET  /api/analyze?word=...
+ *
+ * Returns: AnalysisResultV1 (guarded by Zod)
+ */
+
+const BodySchema = z.object({ word: z.string().min(1) }).passthrough();
+
+function validateResult(result: unknown) {
+  const parsed = AnalysisResultV1Schema.safeParse(result);
+  if (!parsed.success) {
+    return {
+      ok: false as const,
+      error: parsed.error.format(),
+    };
+  }
+  return { ok: true as const, data: parsed.data };
+}
 
 export async function POST(req: Request) {
+  let body: unknown;
   try {
-    const { word, mode } = await req.json();
-
-    if (!word || typeof word !== "string") {
-      return NextResponse.json({ error: "Missing 'word' param" }, { status: 400 });
-    }
-
-    const analyzed = analyzeWord(word.trim(), mode ?? 'strict');
-
-    const primary = analyzed.primaryPath ?? null;
-
-    // The adapter logic is now here in the API route
-    const engineMeta = buildEngineMetaSummary(analyzed);
-
-    const uiResult = {
-      word: analyzed.word ?? word.trim(),
-      mode: analyzed.meta.mode,
-      alphabet: analyzed.meta.alphabet,
-
-      primaryPath: primary
-        ? {
-            voicePath: primary.voicePath ?? "—",
-            levelPath: primary.levelPath ?? "—",
-            ringPath: primary.ringPath ?? "—",
-          }
-        : null,
-
-      frontier: (analyzed.frontier ?? []).map((cand: any) => ({
-        id: cand.id,
-        voicePath: cand.voicePath ?? "—",
-        levelPath: cand.levelPath ?? "—",
-        ringPath: cand.ringPath ?? "—",
-      })),
-
-      // Include the new structured meta object for the UI
-      engineMeta: engineMeta,
-
-      // Keep original meta for backwards compatibility / debug
-      meta: {
-        version: analyzed.meta?.engineVersion ?? "—",
-        created: analyzed.meta?.createdAt ?? "—",
-      },
-      
-      // Pass through other top-level fields from analysis
-      languageFamilies: analyzed.languageFamilies,
-      symbolic: analyzed.symbolic,
-      wordMatrix: (analyzed as any).wordMatrix,
-      raw: analyzed,
-    };
-
-    return NextResponse.json(uiResult);
-  } catch (err: any) {
-    console.error("Analyze route error:", err);
+    body = await req.json();
+  } catch {
     return NextResponse.json(
-      { error: err.message || "Server error" },
-      { status: 500 },
+      { error: "Invalid JSON body. Expected: { word: string }" },
+      { status: 400 }
     );
   }
+
+  const parsedBody = BodySchema.safeParse(body);
+  if (!parsedBody.success) {
+    return NextResponse.json(
+      { error: 'Missing "word". Expected: { word: string }' },
+      { status: 400 }
+    );
+  }
+
+  const word = parsedBody.data.word;
+  const result = analyzeWordV1(word);
+
+  const validated = validateResult(result);
+  if (!validated.ok) {
+    return NextResponse.json(
+      { error: "v1 contract validation failed", details: validated.error },
+      { status: 500 }
+    );
+  }
+
+  return NextResponse.json(validated.data);
+}
+
+export async function GET(req: Request) {
+  const url = new URL(req.url);
+  const word = url.searchParams.get("word") ?? "";
+
+  if (!word.trim()) {
+    return NextResponse.json(
+      { error: 'Missing "word" query param. Use: /api/analyze?word=study' },
+      { status: 400 }
+    );
+  }
+
+  const result = analyzeWordV1(word);
+
+  const validated = validateResult(result);
+  if (!validated.ok) {
+    return NextResponse.json(
+      { error: "v1 contract validation failed", details: validated.error },
+      { status: 500 }
+    );
+  }
+
+  return NextResponse.json(validated.data);
 }
