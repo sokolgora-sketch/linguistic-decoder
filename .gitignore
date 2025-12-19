@@ -1,13 +1,21 @@
-.DS_Store
-node_modules/
+# Next.js / Turbopack build output (ignore everywhere)
 .next/
-out/
-.firebase/
-.emulator/
+.turbo/
+
+# Safety: if a build output was ever generated under src/
+src/.next/
+src/.turbo/
+node_modules/
+.swc/
+.vercel/
+
+# Local env (never commit)
 .env
-.env.*
-!.env.example
 .env.local
-npm-debug.log*
-yarn-*.log*
-pnpm-*.log*
+.env.production
+
+# Dependencies (never commit)
+.env.*
+*.env
+*.env.*
+.DS_Store
