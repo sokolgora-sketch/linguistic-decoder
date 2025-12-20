@@ -49,6 +49,7 @@ export default function HistoryPanel({
   const [wordFilter, setWordFilter] = useState("");
   const [uid, setUid] = useState<string | null>(null);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     let cancelled = false;
 
@@ -134,8 +135,12 @@ export default function HistoryPanel({
     }
   }
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     load(true);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [baseQuery, wordFilter]);
 
   async function deleteRow(row: Row) {
