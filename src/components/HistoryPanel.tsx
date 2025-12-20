@@ -1,23 +1,34 @@
+'use client';
 
-"use client";
-
-import { useEffect, useMemo, useState } from "react";
-import { db, auth, ensureAnon } from "../lib/firebase";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { db, ensureAnon } from "../lib/firebase";
+import type { User } from "firebase/auth";
 import {
   collection,
-  query,
-  orderBy,
-  limit,
-  getDocs,
-  startAfter,
   deleteDoc,
   doc,
-  writeBatch,
-  DocumentData,
-  QueryDocumentSnapshot,
+  getDocs,
+  limit,
+  orderBy,
+  query,
+  startAfter,
   where,
+  type DocumentData,
+  type Query,
+  type QueryDocumentSnapshot,
 } from "firebase/firestore";
-import type { User } from "firebase/auth";
+
+type ModeFilter = "all" | "strict" | "open";
+type AlphabetFilter =
+  | "all"
+  | "auto"
+  | "albanian"
+  | "latin"
+  | "sanskrit"
+  | "ancient_greek"
+  | "pie"
+  | "turkish"
+  | "german";
 
 type Row = {
   id: string;
@@ -25,11 +36,19 @@ type Row = {
   word: string;
   mode: string;
   alphabet: string;
-  engineVersion: string;
-  source: string;
+  engineVersion?: string;
+  source?: string;
   primaryVoice?: string;
-  createdAt?: any; // Firestore Timestamp
+  createdAt?: any; // Firestore Timestamp-ish
 };
+
+function tsToMs(v: any): number | null {
+  if (!v) return null;
+  if (typeof v === "number") return v;
+  if (typeof v?.toMillis === "function") return v.toMillis();
+  if (typeof v?.seconds === "number") return v.seconds * 1000;
+  return null;
+}
 
 export default function HistoryPanel({
   onLoadAnalysis,
@@ -42,30 +61,25 @@ export default function HistoryPanel({
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
-  const [mode, setMode] = useState<"all" | "strict" | "open">("all");
-  const [alphabet, setAlphabet] = useState<
-    "all" | "auto" | "albanian" | "latin" | "sanskrit" | "ancient_greek" | "pie" | "turkish" | "german"
-  >("all");
+  const [mode, setMode] = useState<ModeFilter>("all");
+  const [alphabet, setAlphabet] = useState<AlphabetFilter>("all");
   const [wordFilter, setWordFilter] = useState("");
   const [uid, setUid] = useState<string | null>(null);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const [cursor, setCursor] = useState<QueryDocumentSnapshot<DocumentData> | null>(null);
+  const [hasMore, setHasMore] = useState(true);
+
+  // Ensure we have an anon user (if your firebase wiring supports it).
   useEffect(() => {
     let cancelled = false;
 
     ensureAnon()
       .then((user: User | null) => {
         if (cancelled) return;
-
-        if (user && user.uid) {
-          setUid(user.uid);
-        } else {
-          // no anon user – we can still allow “global” history or just keep uid null
-          setUid(null);
-        }
+        setUid(user?.uid ?? null);
       })
-      .catch((err) => {
-        console.error("[HistoryPanel] ensureAnon failed:", err);
+      .catch((e) => {
+        console.error("[HistoryPanel] ensureAnon failed:", e);
         if (!cancelled) setUid(null);
       });
 
@@ -77,172 +91,154 @@ export default function HistoryPanel({
   const baseQuery = useMemo(() => {
     if (!db) return null;
 
-    const col = collection(db, "history");
+    // Prefer per-user history if we have a uid; otherwise fall back to a global collection.
+    const col = uid
+      ? collection(db, "users", uid, "history")
+      : collection(db, "history");
 
     const clauses: any[] = [];
 
-    // Only filter by uid if we actually have one
-    if (uid) {
-      clauses.push(where("uid", "==", uid));
-    }
-
-    // existing filters for mode/alphabet are fine – just push them into clauses
-    if (mode && mode !== "all") {
-      clauses.push(where("mode", "==", mode));
-    }
-    if (alphabet && alphabet !== "all") {
-      clauses.push(where("alphabet", "==", alphabet));
-    }
+    if (mode !== "all") clauses.push(where("mode", "==", mode));
+    if (alphabet !== "all") clauses.push(where("alphabet", "==", alphabet));
 
     return query(col, ...clauses, orderBy("createdAt", "desc"), limit(50));
   }, [uid, mode, alphabet]);
 
-  async function load(reset = true) {
-    if (!baseQuery || !db) {
-        if (!db) console.warn("HistoryPanel: Firestore not available.");
+  const load = useCallback(
+    async (reset = true) => {
+      if (!baseQuery || !db) {
+        if (!db) console.warn("[HistoryPanel] Firestore not available.");
         return;
-    }
-    setLoading(true);
-    setErr(null);
-    try {
-      const snap = await getDocs(baseQuery);
-      const mapped: Row[] = snap.docs.map((d) => {
-        const x = d.data() as any;
-        return {
-          id: d.id,
-          cacheId: String(x.cacheId || ""),
-          word: String(x.word || ""),
-          mode: String(x.mode || ""),
-          alphabet: String(x.alphabet || ""),
-          engineVersion: String(x.engineVersion || ""),
-          source: String(x.source || ""),
-          primaryVoice: x.primaryVoice ? String(x.primaryVoice) : undefined,
-          createdAt: x.createdAt,
-        };
-      });
+      }
 
-      const filtered = mapped.filter((r) => {
-        if (wordFilter && !r.word?.toLowerCase().includes(wordFilter.toLowerCase()))
-          return false;
-        return true;
-      });
+      setLoading(true);
+      setErr(null);
 
-      setRows(reset ? filtered : filtered);
-    } catch (e: any) {
-      setErr(e?.message || String(e));
-    } finally {
-      setLoading(false);
-    }
-  }
+      try {
+        let q: Query<DocumentData> = baseQuery;
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+        if (!reset) {
+          if (!cursor) {
+            setLoading(false);
+            return;
+          }
+          q = query(baseQuery, startAfter(cursor), limit(50));
+        } else {
+          setCursor(null);
+          setHasMore(true);
+        }
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+        const snap = await getDocs(q);
+
+        let mapped: Row[] = snap.docs.map((d) => {
+          const data = d.data() as any;
+          return {
+            id: d.id,
+            cacheId: data.cacheId || d.id,
+            word: data.word || "",
+            mode: data.mode || "",
+            alphabet: data.alphabet || "",
+            engineVersion: data.engineVersion,
+            source: data.source,
+            primaryVoice: data.primaryVoice,
+            createdAt: data.createdAt,
+          };
+        });
+
+        // Lightweight client-side filter (no extra Firestore index requirements)
+        const wf = wordFilter.trim().toLowerCase();
+        if (wf) mapped = mapped.filter((r) => (r.word || "").toLowerCase().includes(wf));
+
+        const last = snap.docs.length ? snap.docs[snap.docs.length - 1] : null;
+
+        if (reset) setRows(mapped);
+        else setRows((prev) => prev.concat(mapped));
+
+        setCursor(last);
+        setHasMore(snap.docs.length === 50);
+      } catch (e: any) {
+        console.error("[HistoryPanel] load failed:", e);
+        setErr(e?.message || "Failed to load history.");
+      } finally {
+        setLoading(false);
+      }
+    },
+    [baseQuery, cursor, wordFilter]
+  );
+
+  // Load whenever the query inputs change.
   useEffect(() => {
     load(true);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [baseQuery, wordFilter]);
+  }, [load]);
 
-  async function deleteRow(row: Row) {
-    if (!uid || !db) return;
-    const ok = window.confirm(
-      `Delete history entry for "${row.word}"? This cannot be undone.`
-    );
-    if (!ok) return;
+  const deleteRow = useCallback(
+    async (row: Row) => {
+      if (!db) return;
 
-    setLoading(true);
-    setErr(null);
-    try {
-      await deleteDoc(doc(db, "users", uid, "history", row.id));
+      const ok = window.confirm(`Delete history entry for "${row.word}"? This cannot be undone.`);
+      if (!ok) return;
 
-      if (row.cacheId) {
-        const also = window.confirm(
-          "Also delete the shared cache entry (analyses) for this item?"
-        );
-        if (also) {
-          await deleteDoc(doc(db, "analyses", row.cacheId));
+      setLoading(true);
+      setErr(null);
+
+      try {
+        // If uid exists, delete from the per-user collection; otherwise fall back to global.
+        const historyDoc = uid
+          ? doc(db, "users", uid, "history", row.id)
+          : doc(db, "history", row.id);
+
+        await deleteDoc(historyDoc);
+
+        if (row.cacheId) {
+          const also = window.confirm("Also delete the shared cache entry (analyses) for this item?");
+          if (also) await deleteDoc(doc(db, "analyses", row.cacheId));
         }
+
+        setRows((prev) => prev.filter((r) => r.id !== row.id));
+      } catch (e: any) {
+        console.error("[HistoryPanel] delete failed:", e);
+        setErr(e?.message || "Failed to delete history item.");
+      } finally {
+        setLoading(false);
       }
-
-      await load(true); // refresh so UI reflects state immediately
-    } catch (e: any) {
-      setErr(e?.message || String(e));
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function clearAll() {
-    if (!uid || !db) return;
-
-    // Step 1 — explicit confirm
-    const sure = window.confirm(
-      "Delete ALL your history entries? This cannot be undone."
-    );
-    if (!sure) return;
-
-    // Step 2 — typed confirmation
-    const token = window.prompt('Type CLEAR to confirm bulk delete:');
-    if (token !== "CLEAR") return;
-
-    setLoading(true);
-    setErr(null);
-    try {
-      let last: QueryDocumentSnapshot<DocumentData> | null = null;
-      let total = 0;
-
-      while (true) {
-        const q = query(
-          collection(db, "users", uid, "history"),
-          orderBy("createdAt", "desc"),
-          ...(last ? [startAfter(last)] : []),
-          limit(200)
-        );
-        const snap = await getDocs(q);
-        if (snap.empty) break;
-
-        const batch = writeBatch(db);
-        snap.docs.forEach((d) => batch.delete(d.ref));
-        await batch.commit();
-
-        total += snap.docs.length;
-        last = snap.docs[snap.docs.length - 1];
-        if (snap.docs.length < 200) break;
-      }
-
-      setRows([]);
-      await load(true);
-      alert(`Deleted ${total} history entr${total === 1 ? "y" : "ies"}.`);
-    } catch (e: any) {
-      setErr(e?.message || String(e));
-    } finally {
-      setLoading(false);
-    }
-  }
+    },
+    [uid]
+  );
 
   return (
-    <div className="border rounded-lg p-3 bg-card">
-      <div className="flex flex-wrap gap-2 items-end mb-3">
-        <div className="flex flex-col">
-          <label className="text-xs text-muted-foreground">Mode</label>
-          <select
-            className="border rounded px-2 py-1 text-sm bg-background"
-            value={mode}
-            onChange={(e) => setMode(e.target.value as any)}
-          >
-            <option value="all">All</option>
-            <option value="strict">strict</option>
-            <option value="open">open</option>
-          </select>
+    <section className="mt-4 rounded-2xl border border-white/10 bg-white/5 p-4">
+      <div className="mb-3 flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h2 className="text-sm font-semibold text-gray-100">History</h2>
+          <p className="text-xs text-gray-400">Recent analyses cached in Firestore.</p>
         </div>
-        <div className="flex flex-col">
-          <label className="text-xs text-muted-foreground">Alphabet</label>
+
+        <div className="flex flex-wrap items-center gap-2">
+          <input
+            value={wordFilter}
+            onChange={(e) => setWordFilter(e.target.value)}
+            placeholder="Filter by word…"
+            className="w-44 rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-xs text-gray-100 placeholder:text-gray-500"
+          />
+
           <select
-            className="border rounded px-2 py-1 text-sm bg-background"
-            value={alphabet}
-            onChange={(e) => setAlphabet(e.target.value as any)}
+            value={mode}
+            onChange={(e) => setMode(e.target.value as ModeFilter)}
+            className="rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-xs text-gray-100"
+            aria-label="Mode filter"
           >
-            <option value="all">All</option>
+            <option value="all">Mode: all</option>
+            <option value="strict">Mode: strict</option>
+            <option value="open">Mode: open</option>
+          </select>
+
+          <select
+            value={alphabet}
+            onChange={(e) => setAlphabet(e.target.value as AlphabetFilter)}
+            className="rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-xs text-gray-100"
+            aria-label="Alphabet filter"
+          >
+            <option value="all">Alphabet: all</option>
             <option value="auto">auto</option>
             <option value="albanian">albanian</option>
             <option value="latin">latin</option>
@@ -252,87 +248,90 @@ export default function HistoryPanel({
             <option value="turkish">turkish</option>
             <option value="german">german</option>
           </select>
-        </div>
-        <div className="flex flex-col grow">
-          <label className="text-xs text-muted-foreground">Word</label>
-          <input
-            className="border rounded px-2 py-1 text-sm bg-background"
-            placeholder="search…"
-            value={wordFilter}
-            onChange={(e) => setWordFilter(e.target.value)}
-          />
-        </div>
 
-        <button
-          className="border rounded px-3 py-1 text-sm"
-          onClick={() => load(true)}
-          disabled={loading}
-        >
-          {loading ? "Loading…" : "Refresh"}
-        </button>
-        <button
-          className="border rounded px-3 py-1 text-sm text-red-700 border-red-300"
-          onClick={clearAll}
-          disabled={loading}
-          title="Delete ALL your history entries"
-        >
-          {loading ? "…" : "Clear All"}
-        </button>
+          <button
+            onClick={() => load(true)}
+            disabled={loading}
+            className="rounded-xl border border-white/10 bg-white/10 px-3 py-2 text-xs text-gray-100 hover:bg-white/15 disabled:opacity-60"
+          >
+            Refresh
+          </button>
+        </div>
       </div>
 
-      {err && <div className="text-red-700 text-sm mb-2">Error: {err}</div>}
+      {err ? (
+        <div className="mb-3 rounded-xl border border-red-500/20 bg-red-500/10 p-3 text-xs text-red-200">
+          {err}
+        </div>
+      ) : null}
 
-      <div className="divide-y">
-        {rows.map((r) => (
-          <div key={r.id} className="py-2 flex items-center justify-between gap-3">
-            <div className="min-w-0">
-              <div className="text-sm font-semibold truncate">
-                {r.word}{" "}
-                <span className="font-normal opacity-70">
-                  ({r.mode} · {r.alphabet})
-                </span>
+      <div className="divide-y divide-white/10 overflow-hidden rounded-2xl border border-white/10 bg-black/20">
+        {rows.length === 0 ? (
+          <div className="p-4 text-xs text-gray-400">{loading ? "Loading…" : "No history yet."}</div>
+        ) : (
+          rows.map((h) => {
+            const ms = tsToMs(h.createdAt);
+            const when = ms ? new Date(ms).toLocaleString() : "";
+            return (
+              <div key={h.id} className="flex flex-wrap items-center justify-between gap-3 p-3">
+                <div className="min-w-[220px]">
+                  <div className="text-sm text-gray-100">
+                    <span className="font-semibold">{h.word}</span>
+                    <span className="ml-2 text-xs text-gray-400">
+                      {h.mode || "—"} · {h.alphabet || "—"}
+                      {when ? ` · ${when}` : ""}
+                    </span>
+                  </div>
+                  <div className="mt-1 text-xs text-gray-400">
+                    {h.engineVersion ? `v${h.engineVersion}` : ""} {h.primaryVoice ? ` · Voice ${h.primaryVoice}` : ""}{" "}
+                    {h.source ? ` · ${h.source}` : ""}
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2">
+                  <button
+                    title="Load cached analysis"
+                    onClick={() => onLoadAnalysis(h.cacheId)}
+                    className="rounded-xl border border-white/10 bg-white/10 px-3 py-1.5 text-xs text-gray-100 hover:bg-white/15"
+                  >
+                    Load
+                  </button>
+
+                  <button
+                    title="Recompute this word"
+                    onClick={() => onRecompute(h.word, h.mode || undefined, h.alphabet || undefined)}
+                    className="rounded-xl border border-white/10 bg-white/10 px-3 py-1.5 text-xs text-gray-100 hover:bg-white/15"
+                  >
+                    Recompute
+                  </button>
+
+                  <button
+                    title="Delete this row"
+                    onClick={() => deleteRow(h)}
+                    className="rounded-xl border border-red-500/20 bg-red-500/10 px-3 py-1.5 text-xs text-red-200 hover:bg-red-500/15"
+                  >
+                    Delete
+                  </button>
+                </div>
               </div>
-              <div className="text-xs opacity-70 truncate">
-                {r.primaryVoice ? `Voice: ${r.primaryVoice}` : "—"}
-                <span className="mx-1">·</span>
-                eng {r.engineVersion}
-                {r.createdAt?.toDate && (
-                  <>
-                    <span className="mx-1">·</span>
-                    {r.createdAt.toDate().toLocaleString()}
-                  </>
-                )}
-              </div>
-            </div>
-            <div className="flex gap-2 shrink-0">
-              <button
-                className="border rounded px-2 py-1 text-xs"
-                title="Load cached analysis"
-                onClick={() => onLoadAnalysis(r.cacheId)}
-              >
-                Load
-              </button>
-              <button
-                className="border rounded px-2 py-1 text-xs"
-                title="Recompute (bypass cache)"
-                onClick={() => onRecompute(r.word, r.mode, r.alphabet)}
-              >
-                Recompute
-              </button>
-              <button
-                className="border rounded px-2 py-1 text-xs text-red-700 border-red-300"
-                title="Delete this history row"
-                onClick={() => deleteRow(r)}
-              >
-                Delete
-              </button>
-            </div>
-          </div>
-        ))}
-        {rows.length === 0 && !loading && (
-          <div className="text-xs opacity-60 py-4 text-center">No history matching filters.</div>
+            );
+          })
         )}
       </div>
-    </div>
+
+      <div className="mt-3 flex items-center justify-between">
+        <div className="text-xs text-gray-400">
+          {rows.length} row{rows.length === 1 ? "" : "s"} {hasMore ? "" : "· end"}
+        </div>
+
+        <button
+          onClick={() => load(false)}
+          disabled={loading || !hasMore}
+          className="rounded-xl border border-white/10 bg-white/10 px-3 py-2 text-xs text-gray-100 hover:bg-white/15 disabled:opacity-60"
+        >
+          Load more
+        </button>
+      </div>
+    </section>
   );
 }
