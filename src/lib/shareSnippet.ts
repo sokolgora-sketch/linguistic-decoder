@@ -8,7 +8,7 @@ import {
 
 export type ShareSource = {
   word: string;
-  analysis: AnalyzeWordResultUI;
+  analysis: AnalyzeWord_resultUI;
 };
 
 export function buildShareSnippet(source: ShareSource): string {
@@ -21,12 +21,17 @@ export function buildShareSnippet(source: ShareSource): string {
 
   const meta = buildEngineMetaSummary(analysis);
   let engineLine: string | null = null;
-  if (meta && typeof meta === 'object') {
-    engineLine = `${meta.versionLine || ''} · ${meta.modeLabel || ''} · ${
-      meta.alphabetLabel || ''
-    }`;
-  } else if (meta) {
-    engineLine = String(meta);
+  if (meta) {
+    const engineBuild =
+      meta.versionLine && meta.versionLine !== "unknown" ? meta.versionLine : "core-2";
+
+    const engineMode =
+      meta.modeLabel && meta.modeLabel !== "unknown" ? meta.modeLabel : "strict";
+
+    const engineAlphabet =
+      meta.alphabetLabel && meta.alphabetLabel !== "unknown" ? meta.alphabetLabel : "auto";
+
+    engineLine = `${engineBuild} · ${engineMode} · ${engineAlphabet}`;
   }
 
   const header = `Linguistic Decoder — ${word}`;
@@ -70,4 +75,27 @@ export function buildShareSnippet(source: ShareSource): string {
   ]
     .filter(Boolean)
     .join("\n");
+}
+
+// Public-facing snippet: strip dev noise like "(experimental)" labels,
+// but reuse the same core structure as buildShareSnippet.
+export function buildPublicShareSnippet(source: ShareSource): string {
+  const devSnippet = buildShareSnippet(source);
+  return cleanShareSnippetForPublic(devSnippet);
+}
+
+// Pure string transformer: take a dev-style snippet and clean it for public use.
+export function cleanShareSnippetForPublic(snippet: string): string {
+  const lines = snippet.split("\n");
+
+  const cleaned = lines.map((line) => {
+    // Turn "Symbolic (experimental): ..." into "Symbolic: ..."
+    if (line.startsWith("Symbolic (experimental):")) {
+      return line.replace("Symbolic (experimental):", "Symbolic:");
+    }
+    // For any other line, just remove " (experimental)" if present
+    return line.replace(" (experimental)", "");
+  });
+
+  return cleaned.join("\n");
 }

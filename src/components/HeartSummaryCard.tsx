@@ -17,7 +17,7 @@ type HeartSummaryCardProps = {
 };
 
 /**
- * Small reusable card that shows a one-line Seven-Voices "heart summary"
+ * Small reusable card that shows a one-line Seven-vowel "heart summary"
  * for a word. It stays defensive and optional:
  *
  * - If primaryPath is missing, it renders nothing.

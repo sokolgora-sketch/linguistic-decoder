@@ -25,7 +25,7 @@ export type LanguageFamily = {
     dialect?: 'geg' | 'tosk';
 };
 
-// ---------------- Heart Math (Seven-Voices cycle) ----------------
+// ---------------- Heart Math (Seven-vowel cycle) ----------------
 
 export interface Math7PrimarySummary {
   /** e.g. "open", "closed" – simple cycle state */
@@ -141,7 +141,7 @@ export type ConsonantProfile =
 export type OriginAxisStatus = 'pass' | 'weak' | 'unknown';
 
 export type CandidateOriginAxes = {
-  // Seven-Voices path + principles consistency.
+  // Seven-vowel path + principles consistency.
   principles: OriginAxisStatus;
   // Word-sum / morphology story: does it actually explain function?
   morphology: OriginAxisStatus;
@@ -416,4 +416,21 @@ export interface Math7PathSummary {
   cycleState: CycleState;   // open | balanced | overloaded
   pairCoverage: number;     // 0–3 (A–Y, E–U, I–O)
   principlesPath: string[]; // ["Unity", "Balance", ...]
+}
+
+
+// ------------------------------
+// Stress Harness structures (v1)
+// ------------------------------
+
+export interface StressHarnessItem {
+  word: string;
+  label?: string;
+}
+
+export interface StressHarnessRow {
+  word: string;
+  ok: boolean;
+  stress: unknown;
+  error?: string;
 }

@@ -5,8 +5,10 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "./ui/
 import { Candidates } from "./Candidates";
 import { FrontierCandidates } from "./FrontierCandidates"; // ignore if missing
 import { SymbolicReadingCard } from "./SymbolicReadingCard";
+import { EngineMetaCard } from "./EngineMetaCard";
 import WordMatrixCard from "./WordMatrixCard";
-import { buildWordMatrixUI } from "@/lib/wordMatrix"; 
+import { buildWordMatrixUI } from "@/lib/wordMatrix";
+import { buildEngineMetaSummary } from "../lib/engineMetaSummary";
 import type { EnginePayload } from "../shared/engineShape";
 import WordMatrixLegend from "./WordMatrixLegend";
 
@@ -20,6 +22,7 @@ export function ResultsDisplay({ analysis }: ResultsDisplayProps) {
   console.log("DEBUG–WordMatrix", { analysis, buildWordMatrixUI });
   const wordMatrixSummary = analysis ? buildWordMatrixUI(analysis) : null;
   console.log("DEBUG–MatrixSummary", wordMatrixSummary);
+  const engineMetaSummary = buildEngineMetaSummary(analysis?.meta);
 
   return (
     <div className="space-y-6">
@@ -28,13 +31,13 @@ export function ResultsDisplay({ analysis }: ResultsDisplayProps) {
         <CardHeader>
           <CardTitle>Heart summary</CardTitle>
           <CardDescription>
-            Primary Seven-Voices path for <b>{analysis.word}</b>.
+            Primary Seven-vowel path for <b>{analysis.word}</b>.
           </CardDescription>
         </CardHeader>
         <CardContent className="text-sm">
           <div className="flex flex-wrap gap-6">
             <div>
-              <b>Voice path</b>
+              <b>Vowel path</b>
               <div>{analysis.primaryPath?.voicePath || "—"}</div>
             </div>
             <div>
@@ -55,6 +58,9 @@ export function ResultsDisplay({ analysis }: ResultsDisplayProps) {
           <WordMatrixLegend />
         </>
       )}
+
+      {/* ENGINE META */}
+      <EngineMetaCard summary={engineMetaSummary} />
 
       {/* FRONTIER */}
       <Card>
@@ -99,7 +105,7 @@ export function ResultsDisplay({ analysis }: ResultsDisplayProps) {
           <CardHeader>
             <CardTitle>Language families (canon layer)</CardTitle>
             <CardDescription>
-              How different languages carry this Seven-Voices path.
+              How different languages carry this Seven-vowel path.
             </CardDescription>
           </CardHeader>
           <CardContent>

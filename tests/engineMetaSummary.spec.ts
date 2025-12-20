@@ -1,39 +1,42 @@
-// tests/engineMetaSummary.spec.ts
-
-import { buildEngineMetaSummary } from "../src/lib/engineMetaSummary";
+import { buildEngineMetaSummary } from "@/lib/engineMetaSummary";
+import type { EnginePayload } from "@/shared/engineShape";
 
 describe("buildEngineMetaSummary", () => {
-  it("builds a structured summary object from a raw analysis payload", () => {
-    const fakeRawAnalysis = {
-      engineVersion: "2025-11-16-core-2",
-      mode: "strict",
-      alphabet: "auto",
-    };
+  it("maps engine meta + options into a summary", () => {
+    const payload = {
+      word: "study",
+      meta: {
+        engineVersion: "0.2.0-symbolic",
+        createdAt: "2025-12-09T04:44:01.493Z",
+        mode: "strict",
+      },
+      // if EnginePayload needs more fields, keep them minimal + `as any`
+      options: {
+        alphabet: "auto",
+        mode: "strict",
+      },
+    } as unknown as EnginePayload;
 
-    const summary = buildEngineMetaSummary(fakeRawAnalysis);
+    const summary = buildEngineMetaSummary(payload);
 
-    expect(summary.engineName).toBe("SevenVoices Core");
-    expect(summary.versionLine).toBe("core-2");
-    expect(summary.modeLabel).toBe("strict");
-    expect(summary.alphabetLabel).toBe("auto");
-    expect(summary.notes).toContain("Raw version: 2025-11-16-core-2");
+    expect(summary).toEqual({
+      engineLabel: "SevenVoices Core",
+      build: "0.2.0-symbolic",
+      modeLabel: "strict",
+      alphabetLabel: "auto",
+      rawVersion: "0.2.0-symbolic",
+    });
   });
 
-  it("handles partial or missing metadata gracefully", () => {
-    const summary = buildEngineMetaSummary({ engineVersion: "test-v1" });
+  it("falls back to unknown when meta is missing", () => {
+    const summary = buildEngineMetaSummary({} as EnginePayload);
 
-    expect(summary.engineName).toBe("SevenVoices Core");
-    expect(summary.versionLine).toBe("test-v1");
-    expect(summary.modeLabel).toBe("unknown");
-    expect(summary.alphabetLabel).toBe("unknown");
-  });
-
-  it("handles completely empty metadata", () => {
-    const summary = buildEngineMetaSummary({});
-
-    expect(summary.engineName).toBe("SevenVoices Core");
-    expect(summary.versionLine).toBe("unknown");
-    expect(summary.modeLabel).toBe("unknown");
-    expect(summary.alphabetLabel).toBe("unknown");
+    expect(summary).toEqual({
+      engineLabel: "SevenVoices Core",
+      build: "unknown",
+      modeLabel: "unknown",
+      alphabetLabel: "unknown",
+      rawVersion: undefined,
+    });
   });
 });

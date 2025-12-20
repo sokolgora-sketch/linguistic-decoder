@@ -14,7 +14,7 @@ import {
 import { WordMatrixCard } from "@/components/WordMatrix";
 import type { AnalyzeWordResultUI, HistoryItem } from "@/shared/resultsUI";
 import { buildShareSnippet } from "@/lib/shareSnippet";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/components/ui/use-toast";
 import {
   buildZhejiSummary,
   invertRootPolarity,
@@ -119,9 +119,10 @@ export default function Page() {
         [
           {
             word: data.word,
-            voicePath: data.primaryPath?.voicePath ?? "—",
-            levelPath: data.primaryPath?.levelPath ?? "—",
-            ringPath: data.primaryPath?.ringPath ?? "—",
+            voicePath: Array.isArray(data.primaryPath?.voicePath) ? data.primaryPath.voicePath.join(' → ') : data.primaryPath?.voicePath ?? '—',
+            levelPath: data.primaryPath?.levelPath ?? '—',
+            ringPath: Array.isArray(data.primaryPath?.ringPath) ? data.primaryPath.ringPath.join(' → ') : data.primaryPath?.ringPath ?? '—',
+            createdAt: data.meta?.createdAt,
           },
           ...prev,
         ].slice(0, 10)
@@ -187,7 +188,7 @@ export default function Page() {
             Linguistic Decoder
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Seven-Voices prototype — analyze a word and see how the Heart and
+            Seven-vowel prototype — analyze a word and see how the Heart and
             Frontier respond.
           </p>
         </header>
@@ -197,7 +198,7 @@ export default function Page() {
           <CardHeader>
             <CardTitle>Analyze a word</CardTitle>
             <CardDescription>
-              Type a word and run the Seven-Voices engine.
+              Type a word and run the Seven-vowel engine.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -259,7 +260,7 @@ export default function Page() {
               <div>
                 <CardTitle>Heart summary</CardTitle>
                 <CardDescription>
-                  Primary Seven-Voices path for {result.word ?? "—"}.
+                  Primary Seven-vowel path for {result.word ?? "—"}.
                 </CardDescription>
               </div>
 
@@ -276,10 +277,10 @@ export default function Page() {
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
                 <div>
                   <div className="text-xs uppercase text-muted-foreground tracking-wide mb-1">
-                    Voice path
+                    Vowel path
                   </div>
                   <div className="font-medium">
-                    {result.primaryPath.voicePath}
+                    {Array.isArray(result.primaryPath.voicePath) ? result.primaryPath.voicePath.join(' → ') : result.primaryPath.voicePath}
                   </div>
                 </div>
                 <div>
@@ -295,7 +296,7 @@ export default function Page() {
                     Ring path
                   </div>
                   <div className="font-medium">
-                    {result.primaryPath.ringPath}
+                    {Array.isArray(result.primaryPath.ringPath) ? result.primaryPath.ringPath.join(' → ') : result.primaryPath.ringPath}
                   </div>
                 </div>
               </div>
@@ -397,7 +398,7 @@ export default function Page() {
                   <thead className="border-b border-muted/40 text-xs uppercase tracking-wide text-muted-foreground">
                     <tr>
                       <th className="py-2 pr-4 text-left w-16">Alt</th>
-                      <th className="py-2 px-4 text-left">Voice path</th>
+                      <th className="py-2 px-4 text-left">Vowel path</th>
                       <th className="py-2 px-4 text-left">Level path</th>
                       <th className="py-2 pl-4 text-left">Ring path</th>
                     </tr>
@@ -455,7 +456,7 @@ export default function Page() {
             {result?.symbolic && (
               <div className="space-y-2">
                 <div className="text-xs text-muted-foreground">
-                  Sketch from the Seven-Voices core. Experimental, not doctrine.
+                  Sketch from the Seven-vowel core. Experimental, not doctrine.
                 </div>
                 <div>
                   <span className="font-semibold">Label: </span>
@@ -492,7 +493,7 @@ export default function Page() {
                     <tr>
                       <th className="py-2 pr-4 text-left w-10">#</th>
                       <th className="py-2 px-4 text-left">Word</th>
-                      <th className="py-2 px-4 text-left">Voice path</th>
+                      <th className="py-2 px-4 text-left">Vowel path</th>
                       <th className="py-2 px-4 text-left">Level path</th>
                       <th className="py-2 pl-4 text-left">Ring path</th>
                     </tr>
@@ -550,8 +551,8 @@ export default function Page() {
                   <div>
                     created{" "}
                     <span className="font-mono">
-                      {result.meta?.created
-                        ? new Date(result.meta.created).toLocaleString()
+                      {result.meta?.createdAt
+                        ? new Date(result.meta.createdAt).toLocaleString()
                         : "—"}
                     </span>
                   </div>

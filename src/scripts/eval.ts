@@ -1,7 +1,7 @@
 #!/usr/bin/env ts-node
 
 /**
- * CLI: evaluate Seven-Voices solver over a CSV.
+ * CLI: evaluate Seven-vowel solver over a CSV.
  *
  * Input CSV columns:
  *   word, expected, mode?, alphabet?

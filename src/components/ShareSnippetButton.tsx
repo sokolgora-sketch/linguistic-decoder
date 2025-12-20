@@ -3,7 +3,7 @@
 import React from "react";
 import { Button } from "./ui/button";
 import { buildShareSnippet, type ShareSource } from "../lib/shareSnippet";
-import { useToast } from "../hooks/use-toast";
+import { useToast } from "@/components/ui/use-toast";
 
 type Props = {
   source: ShareSource | null;

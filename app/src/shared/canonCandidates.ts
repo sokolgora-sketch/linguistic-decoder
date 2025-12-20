@@ -105,7 +105,7 @@ export const CANON_CANDIDATES: Record<string, Candidate[]> = {
         truthOk: true, expansionOk: true, insightOk: true, balanceOk: true,
         unityOk: true, networkIntegrityOk: true, evolutionOk: true,
         notes: [
-          'Functional decomposition matches the Seven-Voices logic of study as making what is not yours become yours.',
+          'Functional decomposition matches the Seven-vowel logic of study as making what is not yours become yours.',
           'Presented as a functional origin, not as the exclusive historical source.',
         ],
       },
@@ -113,7 +113,7 @@ export const CANON_CANDIDATES: Record<string, Candidate[]> = {
         base: "s'tu-di-m",
         affixes: [],
         wordSums: ["s'tu + di + m → s'tu-di-m (what is not yours → know → make it yours)"],
-        notes: ['Expressed as a functional, three-part structure matching the Seven-Voices action/instrument/unit pattern.'],
+        notes: ['Expressed as a functional, three-part structure matching the Seven-vowel action/instrument/unit pattern.'],
       },
       fitTag: 'strong',
       status: 'pass',

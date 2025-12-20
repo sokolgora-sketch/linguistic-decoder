@@ -1,4 +1,6 @@
-import { db } from "./firebase";
+import { getDb } from "./firestoreDb";
+
+const db = () => getDb();
 import {
   collection,
   addDoc,
@@ -8,7 +10,7 @@ import {
   limit,
 } from "firebase/firestore";
 
-const historyCol = collection(db, "history");
+const historyCol = collection(db(), "history");
 
 export interface HistoryRecord {
   word: string;
