@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { db, ensureAnon } from "../lib/firebase";
+import type { User } from "firebase/auth";
 import {
   collection,
   deleteDoc,
@@ -12,12 +13,10 @@ import {
   query,
   startAfter,
   where,
-  writeBatch,
   type DocumentData,
-  type QueryDocumentSnapshot,
   type Query,
+  type QueryDocumentSnapshot,
 } from "firebase/firestore";
-import type { User } from "firebase/auth";
 
 type ModeFilter = "all" | "strict" | "open";
 type AlphabetFilter =
@@ -37,20 +36,18 @@ type Row = {
   word: string;
   mode: string;
   alphabet: string;
-  engineVersion: string;
-  source: string;
+  engineVersion?: string;
+  source?: string;
   primaryVoice?: string;
-  createdAt?: any; // Firestore Timestamp (kept loose to avoid dependency on firebase types here)
+  createdAt?: any; // Firestore Timestamp-ish
 };
 
-function toISO(ts: any): string {
-  try {
-    // Firestore Timestamp has .toDate()
-    const d = ts?.toDate ? ts.toDate() : ts ? new Date(ts) : null;
-    return d ? d.toISOString().replace("T", " ").slice(0, 19) : "";
-  } catch {
-    return "";
-  }
+function tsToMs(v: any): number | null {
+  if (!v) return null;
+  if (typeof v === "number") return v;
+  if (typeof v?.toMillis === "function") return v.toMillis();
+  if (typeof v?.seconds === "number") return v.seconds * 1000;
+  return null;
 }
 
 export default function HistoryPanel({
@@ -91,14 +88,15 @@ export default function HistoryPanel({
     };
   }, []);
 
-  const baseQuery: Query<DocumentData> | null = useMemo(() => {
+  const baseQuery = useMemo(() => {
     if (!db) return null;
 
-    const col = collection(db, "history");
-    const clauses: any[] = [];
+    // Prefer per-user history if we have a uid; otherwise fall back to a global collection.
+    const col = uid
+      ? collection(db, "users", uid, "history")
+      : collection(db, "history");
 
-    // Filter by uid when available
-    if (uid) clauses.push(where("uid", "==", uid));
+    const clauses: any[] = [];
 
     if (mode !== "all") clauses.push(where("mode", "==", mode));
     if (alphabet !== "all") clauses.push(where("alphabet", "==", alphabet));
@@ -124,16 +122,15 @@ export default function HistoryPanel({
             setLoading(false);
             return;
           }
-          // pagination: continue after cursor
           q = query(baseQuery, startAfter(cursor), limit(50));
         } else {
-          // reset pagination state
           setCursor(null);
           setHasMore(true);
         }
 
         const snap = await getDocs(q);
-        const mapped: Row[] = snap.docs.map((d) => {
+
+        let mapped: Row[] = snap.docs.map((d) => {
           const data = d.data() as any;
           return {
             id: d.id,
@@ -141,18 +138,24 @@ export default function HistoryPanel({
             word: data.word || "",
             mode: data.mode || "",
             alphabet: data.alphabet || "",
-            engineVersion: data.engineVersion || "",
-            source: data.source || "",
+            engineVersion: data.engineVersion,
+            source: data.source,
             primaryVoice: data.primaryVoice,
             createdAt: data.createdAt,
           };
         });
 
+        // Lightweight client-side filter (no extra Firestore index requirements)
+        const wf = wordFilter.trim().toLowerCase();
+        if (wf) mapped = mapped.filter((r) => (r.word || "").toLowerCase().includes(wf));
+
         const last = snap.docs.length ? snap.docs[snap.docs.length - 1] : null;
+
+        if (reset) setRows(mapped);
+        else setRows((prev) => prev.concat(mapped));
+
         setCursor(last);
         setHasMore(snap.docs.length === 50);
-
-        setRows((prev) => (reset ? mapped : [...prev, ...mapped]));
       } catch (e: any) {
         console.error("[HistoryPanel] load failed:", e);
         setErr(e?.message || "Failed to load history.");
@@ -160,132 +163,82 @@ export default function HistoryPanel({
         setLoading(false);
       }
     },
-    [baseQuery, cursor]
+    [baseQuery, cursor, wordFilter]
   );
 
-  // Load whenever filters/baseQuery change (proper deps, no disables).
+  // Load whenever the query inputs change.
   useEffect(() => {
-    void load(true);
+    load(true);
   }, [load]);
 
-  const filteredRows = useMemo(() => {
-    const f = wordFilter.trim().toLowerCase();
-    if (!f) return rows;
-    return rows.filter((r) => (r.word || "").toLowerCase().includes(f));
-  }, [rows, wordFilter]);
+  const deleteRow = useCallback(
+    async (row: Row) => {
+      if (!db) return;
 
-  const clearAll = useCallback(async () => {
-    if (!db) return;
-    if (!uid) {
-      setErr("No uid available; refusing to clear global history.");
-      return;
-    }
+      const ok = window.confirm(`Delete history entry for "${row.word}"? This cannot be undone.`);
+      if (!ok) return;
 
-    setLoading(true);
-    setErr(null);
+      setLoading(true);
+      setErr(null);
 
-    try {
-      const col = collection(db, "history");
-      const q = query(col, where("uid", "==", uid), orderBy("createdAt", "desc"), limit(500));
-      const snap = await getDocs(q);
+      try {
+        // If uid exists, delete from the per-user collection; otherwise fall back to global.
+        const historyDoc = uid
+          ? doc(db, "users", uid, "history", row.id)
+          : doc(db, "history", row.id);
 
-      const batch = writeBatch(db);
-      snap.docs.forEach((d) => batch.delete(d.ref));
-      await batch.commit();
+        await deleteDoc(historyDoc);
 
-      setRows([]);
-      setCursor(null);
-      setHasMore(false);
-    } catch (e: any) {
-      console.error("[HistoryPanel] clearAll failed:", e);
-      setErr(e?.message || "Failed to clear history.");
-    } finally {
-      setLoading(false);
-    }
-  }, [uid]);
+        if (row.cacheId) {
+          const also = window.confirm("Also delete the shared cache entry (analyses) for this item?");
+          if (also) await deleteDoc(doc(db, "analyses", row.cacheId));
+        }
 
-  const removeOne = useCallback(async (id: string) => {
-    if (!db) return;
-
-    try {
-      await deleteDoc(doc(db, "history", id));
-      setRows((prev) => prev.filter((r) => r.id !== id));
-    } catch (e) {
-      console.error("[HistoryPanel] delete failed:", e);
-    }
-  }, []);
+        setRows((prev) => prev.filter((r) => r.id !== row.id));
+      } catch (e: any) {
+        console.error("[HistoryPanel] delete failed:", e);
+        setErr(e?.message || "Failed to delete history item.");
+      } finally {
+        setLoading(false);
+      }
+    },
+    [uid]
+  );
 
   return (
-    <section className="rounded-xl border border-white/10 bg-black/20 p-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
+    <section className="mt-4 rounded-2xl border border-white/10 bg-white/5 p-4">
+      <div className="mb-3 flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h2 className="text-sm font-semibold text-gray-200">History</h2>
-          <p className="text-xs text-gray-400">
-            Recent analyses (filtered by uid when available).
-          </p>
+          <h2 className="text-sm font-semibold text-gray-100">History</h2>
+          <p className="text-xs text-gray-400">Recent analyses cached in Firestore.</p>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          <button
-            className="rounded-md border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-gray-200 hover:bg-white/10"
-            onClick={() => load(true)}
-            disabled={loading}
-          >
-            Reload
-          </button>
-
-          <button
-            className="rounded-md border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-gray-200 hover:bg-white/10"
-            onClick={() => load(false)}
-            disabled={loading || !hasMore}
-            title={!hasMore ? "No more results" : "Load more"}
-          >
-            Load more
-          </button>
-
-          <button
-            className="rounded-md border border-red-500/30 bg-red-500/10 px-3 py-1.5 text-xs text-red-200 hover:bg-red-500/20"
-            onClick={clearAll}
-            disabled={loading}
-            title="Clears ONLY your uid history (safety)"
-          >
-            Clear
-          </button>
-        </div>
-      </div>
-
-      <div className="mt-3 grid grid-cols-1 gap-2 md:grid-cols-3">
-        <label className="text-xs text-gray-400">
-          Word
           <input
             value={wordFilter}
             onChange={(e) => setWordFilter(e.target.value)}
-            className="mt-1 w-full rounded-md border border-white/10 bg-black/30 px-2 py-1 text-sm text-gray-200 outline-none"
-            placeholder="filter…"
+            placeholder="Filter by word…"
+            className="w-44 rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-xs text-gray-100 placeholder:text-gray-500"
           />
-        </label>
 
-        <label className="text-xs text-gray-400">
-          Mode
           <select
             value={mode}
             onChange={(e) => setMode(e.target.value as ModeFilter)}
-            className="mt-1 w-full rounded-md border border-white/10 bg-black/30 px-2 py-1 text-sm text-gray-200 outline-none"
+            className="rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-xs text-gray-100"
+            aria-label="Mode filter"
           >
-            <option value="all">all</option>
-            <option value="strict">strict</option>
-            <option value="open">open</option>
+            <option value="all">Mode: all</option>
+            <option value="strict">Mode: strict</option>
+            <option value="open">Mode: open</option>
           </select>
-        </label>
 
-        <label className="text-xs text-gray-400">
-          Alphabet
           <select
             value={alphabet}
             onChange={(e) => setAlphabet(e.target.value as AlphabetFilter)}
-            className="mt-1 w-full rounded-md border border-white/10 bg-black/30 px-2 py-1 text-sm text-gray-200 outline-none"
+            className="rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-xs text-gray-100"
+            aria-label="Alphabet filter"
           >
-            <option value="all">all</option>
+            <option value="all">Alphabet: all</option>
             <option value="auto">auto</option>
             <option value="albanian">albanian</option>
             <option value="latin">latin</option>
@@ -295,60 +248,89 @@ export default function HistoryPanel({
             <option value="turkish">turkish</option>
             <option value="german">german</option>
           </select>
-        </label>
+
+          <button
+            onClick={() => load(true)}
+            disabled={loading}
+            className="rounded-xl border border-white/10 bg-white/10 px-3 py-2 text-xs text-gray-100 hover:bg-white/15 disabled:opacity-60"
+          >
+            Refresh
+          </button>
+        </div>
       </div>
 
-      {err ? <p className="mt-3 text-xs text-red-300">{err}</p> : null}
+      {err ? (
+        <div className="mb-3 rounded-xl border border-red-500/20 bg-red-500/10 p-3 text-xs text-red-200">
+          {err}
+        </div>
+      ) : null}
 
-      <div className="mt-3 space-y-2">
-        {filteredRows.length === 0 ? (
-          <p className="text-xs text-gray-500">{loading ? "Loading…" : "No history yet."}</p>
+      <div className="divide-y divide-white/10 overflow-hidden rounded-2xl border border-white/10 bg-black/20">
+        {rows.length === 0 ? (
+          <div className="p-4 text-xs text-gray-400">{loading ? "Loading…" : "No history yet."}</div>
         ) : (
-          filteredRows.map((h) => (
-            <div
-              key={h.id}
-              className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-white/10 bg-black/30 p-3"
-            >
-              <div className="min-w-[220px]">
-                <div className="text-sm text-gray-100">
-                  <span className="font-semibold">{h.word || "(missing word)"}</span>{" "}
-                  <span className="text-xs text-gray-400">
-                    {h.mode ? `• ${h.mode}` : ""} {h.alphabet ? `• ${h.alphabet}` : ""}
-                  </span>
+          rows.map((h) => {
+            const ms = tsToMs(h.createdAt);
+            const when = ms ? new Date(ms).toLocaleString() : "";
+            return (
+              <div key={h.id} className="flex flex-wrap items-center justify-between gap-3 p-3">
+                <div className="min-w-[220px]">
+                  <div className="text-sm text-gray-100">
+                    <span className="font-semibold">{h.word}</span>
+                    <span className="ml-2 text-xs text-gray-400">
+                      {h.mode || "—"} · {h.alphabet || "—"}
+                      {when ? ` · ${when}` : ""}
+                    </span>
+                  </div>
+                  <div className="mt-1 text-xs text-gray-400">
+                    {h.engineVersion ? `v${h.engineVersion}` : ""} {h.primaryVoice ? ` · Voice ${h.primaryVoice}` : ""}{" "}
+                    {h.source ? ` · ${h.source}` : ""}
+                  </div>
                 </div>
-                <div className="mt-0.5 text-xs text-gray-400">
-                  {h.engineVersion ? `engine ${h.engineVersion}` : ""}
-                  {h.source ? ` • ${h.source}` : ""}
-                  {h.createdAt ? ` • ${toISO(h.createdAt)}` : ""}
+
+                <div className="flex flex-wrap items-center gap-2">
+                  <button
+                    title="Load cached analysis"
+                    onClick={() => onLoadAnalysis(h.cacheId)}
+                    className="rounded-xl border border-white/10 bg-white/10 px-3 py-1.5 text-xs text-gray-100 hover:bg-white/15"
+                  >
+                    Load
+                  </button>
+
+                  <button
+                    title="Recompute this word"
+                    onClick={() => onRecompute(h.word, h.mode || undefined, h.alphabet || undefined)}
+                    className="rounded-xl border border-white/10 bg-white/10 px-3 py-1.5 text-xs text-gray-100 hover:bg-white/15"
+                  >
+                    Recompute
+                  </button>
+
+                  <button
+                    title="Delete this row"
+                    onClick={() => deleteRow(h)}
+                    className="rounded-xl border border-red-500/20 bg-red-500/10 px-3 py-1.5 text-xs text-red-200 hover:bg-red-500/15"
+                  >
+                    Delete
+                  </button>
                 </div>
               </div>
-
-              <div className="flex flex-wrap items-center gap-2">
-                <button
-                  className="rounded-md border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-gray-200 hover:bg-white/10"
-                  onClick={() => onLoadAnalysis(h.cacheId)}
-                >
-                  Load
-                </button>
-
-                <button
-                  className="rounded-md border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-gray-200 hover:bg-white/10"
-                  onClick={() => onRecompute(h.word, h.mode, h.alphabet)}
-                >
-                  Recompute
-                </button>
-
-                <button
-                  className="rounded-md border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-gray-200 hover:bg-white/10"
-                  onClick={() => removeOne(h.id)}
-                  title="Delete this row"
-                >
-                  Delete
-                </button>
-              </div>
-            </div>
-          ))
+            );
+          })
         )}
+      </div>
+
+      <div className="mt-3 flex items-center justify-between">
+        <div className="text-xs text-gray-400">
+          {rows.length} row{rows.length === 1 ? "" : "s"} {hasMore ? "" : "· end"}
+        </div>
+
+        <button
+          onClick={() => load(false)}
+          disabled={loading || !hasMore}
+          className="rounded-xl border border-white/10 bg-white/10 px-3 py-2 text-xs text-gray-100 hover:bg-white/15 disabled:opacity-60"
+        >
+          Load more
+        </button>
       </div>
     </section>
   );
