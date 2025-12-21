@@ -1,12 +1,12 @@
 "use client";
 
 import React, { useState } from "react";
-import type { AnalysisResult } from "@/src/v1/types";
+import type { AnalyzeWordResultUI } from "@/shared/resultsUI";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
 interface Props {
-  result: AnalysisResult;
+  result: AnalyzeWordResultUI;
 }
 
 export default function AnalysisResultView({ result }: Props) {
@@ -28,8 +28,8 @@ export default function AnalysisResultView({ result }: Props) {
                 Candidate {i + 1} — <span className="opacity-80">{c.language || "unknown"}</span>
               </div>
               <div>Form: <span className="font-semibold">{c.form}</span></div>
-              <div>Decomposition: <span className="font-mono">{c.decomposition.join(" – ")}</span></div>
-              <div>Vowel path: <span className="font-mono">{c.vowelPath}</span></div>
+              <div>Decomposition: <span className="font-mono">{(c.decomposition ?? []).join(" – ") || "—"}</span></div>
+              <div>Vowel path: <span className="font-mono">{c.vowelPath ?? "—"}</span></div>
               <div>
                 Meaning:
                 <div className="mt-1 text-muted-foreground">

@@ -26,9 +26,14 @@ export function EngineMetaBadge({ result, className }: Props) {
       result.input?.alphabet,
   });
 
-  if (summary === "unknown") return null;
+  const label =
+    (summary as any)?.versionLine ??
+    (summary as any)?.engineVersion ??
+    (summary as any)?.engine ??
+    (typeof summary === "string" ? summary : "unknown");
 
-  return (
+  if (label === "unknown") return null;
+return (
     <div
       className={
         "inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-medium text-muted-foreground " +
@@ -36,7 +41,7 @@ export function EngineMetaBadge({ result, className }: Props) {
       }
     >
       <span className="mr-1 h-1.5 w-1.5 rounded-full bg-emerald-500" />
-      <span>{summary}</span>
+      <span>{label}</span>
     </div>
   );
 }
