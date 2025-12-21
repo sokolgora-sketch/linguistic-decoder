@@ -1,3 +1,4 @@
+
 /**
  * Engine Contract v1 (scaffold)
  *
@@ -42,11 +43,12 @@ export function stableNormalize(
   const stack = new WeakSet<object>();
 
   const norm = (x: unknown): JsonValue => {
+    if (x === undefined) return null;
     if (x === null) return null;
 
     const t = typeof x;
 
-    if (t === "string" || t === "number" || t === "boolean") return x;
+    if (t === "string" || t === "number" || t === "boolean") return x as any;
     if (t === "bigint") return `${x}n`;
     if (t === "undefined") return null;
     if (t === "function") return "[Function]";
