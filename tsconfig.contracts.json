@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true
+  },
+  "include": [
+    "src/shared/resultShape.v1.ts",
+    "src/shared/engineContract.v1.ts",
+    "src/shared/resultsUI.ts"
+  ],
+  "exclude": ["node_modules", ".next"]
+}
