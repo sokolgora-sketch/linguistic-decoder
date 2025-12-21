@@ -1,164 +1,118 @@
 /**
- * Engine Contract v1 (draft scaffold)
+ * Engine Contract v1 (scaffold)
  *
- * Goal:
- * - Define a single canonical output shape for the engine.
- * - Provide runtime validation hooks (guards/asserts).
- * - Provide stable JSON serialization for golden tests and caching.
+ * This file provides:
+ * - A version constant
+ * - Deterministic, JSON-safe normalization (stable key ordering)
+ * - Deterministic JSON stringification for goldens/caching
  *
  * IMPORTANT:
- * - This file is intentionally not wired into runtime yet.
- * - Next step will be: capture real engine output for canon words and align this contract.
+ * - stableStringify() MUST output real JSON text (no wrapper quotes).
+ * - It MUST throw on circular structures (tests rely on this).
  */
 
 export const ENGINE_CONTRACT_VERSION = "v1" as const;
 
-type UnknownRecord = Record<string, unknown>;
+export type JsonPrimitive = string | number | boolean | null;
+export type JsonValue =
+  | JsonPrimitive
+  | JsonValue[]
+  | { [k: string]: JsonValue };
 
-function isRecord(x: unknown): x is UnknownRecord {
-  return typeof x === "object" && x !== null && !Array.isArray(x);
-}
+export type StableNormalizeOptions = {
+  onCircular?: "throw" | "replace";
+  circularValue?: string; // used when onCircular="replace"
+};
 
-function isString(x: unknown): x is string {
-  return typeof x === "string";
-}
+/**
+ * Convert arbitrary JS values into JSON-safe values with:
+ * - deterministic object key ordering
+ * - safe representations for non-JSON primitives
+ * - circular handling (throw by default)
+ *
+ * Note: we detect circulars using an active recursion stack, not a global visited set,
+ * so shared references (DAG) do not falsely trigger circular errors.
+ */
+export function stableNormalize(
+  input: unknown,
+  opts: StableNormalizeOptions = {}
+): JsonValue {
+  const onCircular = opts.onCircular ?? "throw";
+  const circularValue = opts.circularValue ?? "[Circular]";
+  const stack = new WeakSet<object>();
 
-function isStringArray(x: unknown): x is string[] {
-  return Array.isArray(x) && x.every(isString);
+  const norm = (x: unknown): JsonValue => {
+    if (x === null) return null;
+
+    const t = typeof x;
+
+    if (t === "string" || t === "number" || t === "boolean") return x;
+    if (t === "bigint") return `${x}n`;
+    if (t === "undefined") return null;
+    if (t === "function") return "[Function]";
+    if (t === "symbol") return String(x);
+
+    if (x instanceof Date) return x.toISOString();
+
+    if (x instanceof Error) {
+      return {
+        name: x.name,
+        message: x.message,
+        stack: x.stack ?? null,
+      };
+    }
+
+    if (Array.isArray(x)) {
+      return x.map((v) => norm(v));
+    }
+
+    if (x instanceof Map) {
+      const entries = Array.from(x.entries()).map(([k, v]) => [norm(k), norm(v)]);
+      entries.sort((a, b) => JSON.stringify(a[0]).localeCompare(JSON.stringify(b[0])));
+      return entries as unknown as JsonValue;
+    }
+
+    if (x instanceof Set) {
+      const items = Array.from(x.values()).map((v) => norm(v));
+      items.sort((a, b) => JSON.stringify(a).localeCompare(JSON.stringify(b)));
+      return items;
+    }
+
+    if (t === "object") {
+      const obj = x as object;
+
+      if (stack.has(obj)) {
+        if (onCircular === "throw") throw new Error("circular structure");
+        return circularValue;
+      }
+
+      stack.add(obj);
+      try {
+        const rec = x as Record<string, unknown>;
+        const out: Record<string, JsonValue> = {};
+
+        for (const key of Object.keys(rec).sort()) {
+          if (key === "__proto__" || key === "constructor" || key === "prototype") continue;
+          out[key] = norm(rec[key]);
+        }
+
+        return out;
+      } finally {
+        stack.delete(obj);
+      }
+    }
+
+    return String(x);
+  };
+
+  return norm(input);
 }
 
 /**
- * Candidate-level contract (minimal fields; will be tightened after we snapshot real output).
+ * Deterministic JSON text. This is what we snapshot/cache.
+ * Throws on circulars (by design).
  */
-export type EngineCandidateV1 = {
-  language: string;
-  form: string;
-  decomposition: {
-    parts: string[];
-    ops?: string[];
-  };
-  functional: {
-    statement: string;
-    action?: string;
-    instrument?: string;
-    unit?: string;
-  };
-  vowel_path: string;
-  ring_fit?: string;
-  signals?: string[];
-  notes?: string[];
-};
-
-export type EngineResultV1 = {
-  version: typeof ENGINE_CONTRACT_VERSION;
-  word: string;
-  mode: string;
-  alphabet: string;
-  engineVersion: string;
-  candidates: EngineCandidateV1[];
-  meta?: UnknownRecord;
-};
-
-export function isEngineCandidateV1(x: unknown): x is EngineCandidateV1 {
-  if (!isRecord(x)) return false;
-
-  if (!isString(x.language)) return false;
-  if (!isString(x.form)) return false;
-
-  if (!isRecord(x.decomposition)) return false;
-  if (!isStringArray(x.decomposition.parts)) return false;
-  if (x.decomposition.ops !== undefined && !isStringArray(x.decomposition.ops)) return false;
-
-  if (!isRecord(x.functional)) return false;
-  if (!isString(x.functional.statement)) return false;
-  if (x.functional.action !== undefined && !isString(x.functional.action)) return false;
-  if (x.functional.instrument !== undefined && !isString(x.functional.instrument)) return false;
-  if (x.functional.unit !== undefined && !isString(x.functional.unit)) return false;
-
-  if (!isString(x.vowel_path)) return false;
-  if (x.ring_fit !== undefined && !isString(x.ring_fit)) return false;
-  if (x.signals !== undefined && !isStringArray(x.signals)) return false;
-  if (x.notes !== undefined && !isStringArray(x.notes)) return false;
-
-  return true;
-}
-
-export function isEngineResultV1(x: unknown): x is EngineResultV1 {
-  if (!isRecord(x)) return false;
-
-  if (x.version !== ENGINE_CONTRACT_VERSION) return false;
-  if (!isString(x.word)) return false;
-  if (!isString(x.mode)) return false;
-  if (!isString(x.alphabet)) return false;
-  if (!isString(x.engineVersion)) return false;
-
-  if (!Array.isArray(x.candidates) || !x.candidates.every(isEngineCandidateV1)) return false;
-  if (x.meta !== undefined && !isRecord(x.meta)) return false;
-
-  return true;
-}
-
-export function assertEngineResultV1(x: unknown): asserts x is EngineResultV1 {
-  if (!isEngineResultV1(x)) {
-    const preview =
-      typeof x === "string" ? x.slice(0, 200) : JSON.stringify(safeJson(x), null, 2).slice(0, 500);
-    throw new Error(`EngineResultV1 validation failed. Preview: ${preview}`);
-  }
-}
-
-/**
- * Stable JSON stringify for goldens/caching.
- * - Sorts object keys recursively.
- * - Preserves array order (engine must be deterministic).
- * - Detects cycles and throws with a clear message.
- */
-export function stableStringify(value: unknown): string {
-  return JSON.stringify(stableSort(value), null, 2);
-}
-
-function stableSort(value: unknown, seen = new WeakSet<object>()): unknown {
-  if (value === null) return null;
-
-  const t = typeof value;
-
-  if (t === "string" || t === "number" || t === "boolean") return value;
-  if (t === "bigint") return value.toString();
-  if (t === "undefined") return null;
-
-  if (Array.isArray(value)) {
-    return value.map((v) => stableSort(v, seen));
-  }
-
-  if (t === "object") {
-    const obj = value as object;
-
-    if (seen.has(obj)) {
-      throw new Error("stableStringify: circular reference detected");
-    }
-    seen.add(obj);
-
-    if (value instanceof Date) return value.toISOString();
-
-    const rec = value as UnknownRecord;
-    const keys = Object.keys(rec).sort();
-
-    const out: UnknownRecord = {};
-    for (const k of keys) {
-      const v = rec[k];
-      if (v === undefined) continue;
-      out[k] = stableSort(v, seen);
-    }
-
-    return out;
-  }
-
-  return null;
-}
-
-function safeJson(x: unknown): unknown {
-  try {
-    return stableSort(x);
-  } catch {
-    return { error: "unserializable value" };
-  }
+export function stableStringify(input: unknown, space: number = 2): string {
+  const normalized = stableNormalize(input, { onCircular: "throw" });
+  return JSON.stringify(normalized, null, space);
 }

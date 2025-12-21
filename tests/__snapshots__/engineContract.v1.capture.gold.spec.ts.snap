@@ -5,24 +5,18 @@ exports[`Engine Contract v1 — capture engine output (goldens) damage (strict, 
   "candidates": [
     {
       "decomposition": [
-        "[object"
+        "damage"
       ],
-      "form": "[object",
+      "form": "damage",
       "functionalStatement": "v1 returns a minimal deterministic analysis: surface form is preserved, decomposition is the whole word, and the vowel path is extracted from the Seven-vowel set (A/E/I/O/U/Y/Ë).",
       "language": "unknown",
-      "notes": [
-        "Input contained spaces; v1 uses the first token: \\"[object\\""
-      ],
-      "vowelPath": "O-E"
+      "notes": null,
+      "vowelPath": "A-A-E"
     }
   ],
   "engineVersion": "v1.0.0",
-  "normalizedWord": "[object",
-  "word": {
-    "alphabet": "auto",
-    "mode": "strict",
-    "word": "damage"
-  }
+  "normalizedWord": "damage",
+  "word": "damage"
 }"
 `;
 
@@ -31,24 +25,18 @@ exports[`Engine Contract v1 — capture engine output (goldens) father (strict, 
   "candidates": [
     {
       "decomposition": [
-        "[object"
+        "father"
       ],
-      "form": "[object",
+      "form": "father",
       "functionalStatement": "v1 returns a minimal deterministic analysis: surface form is preserved, decomposition is the whole word, and the vowel path is extracted from the Seven-vowel set (A/E/I/O/U/Y/Ë).",
       "language": "unknown",
-      "notes": [
-        "Input contained spaces; v1 uses the first token: \\"[object\\""
-      ],
-      "vowelPath": "O-E"
+      "notes": null,
+      "vowelPath": "A-E"
     }
   ],
   "engineVersion": "v1.0.0",
-  "normalizedWord": "[object",
-  "word": {
-    "alphabet": "auto",
-    "mode": "strict",
-    "word": "father"
-  }
+  "normalizedWord": "father",
+  "word": "father"
 }"
 `;
 
@@ -57,24 +45,18 @@ exports[`Engine Contract v1 — capture engine output (goldens) love (strict, au
   "candidates": [
     {
       "decomposition": [
-        "[object"
+        "love"
       ],
-      "form": "[object",
+      "form": "love",
       "functionalStatement": "v1 returns a minimal deterministic analysis: surface form is preserved, decomposition is the whole word, and the vowel path is extracted from the Seven-vowel set (A/E/I/O/U/Y/Ë).",
       "language": "unknown",
-      "notes": [
-        "Input contained spaces; v1 uses the first token: \\"[object\\""
-      ],
+      "notes": null,
       "vowelPath": "O-E"
     }
   ],
   "engineVersion": "v1.0.0",
-  "normalizedWord": "[object",
-  "word": {
-    "alphabet": "auto",
-    "mode": "strict",
-    "word": "love"
-  }
+  "normalizedWord": "love",
+  "word": "love"
 }"
 `;
 
@@ -83,24 +65,18 @@ exports[`Engine Contract v1 — capture engine output (goldens) mathematics (str
   "candidates": [
     {
       "decomposition": [
-        "[object"
+        "mathematics"
       ],
-      "form": "[object",
+      "form": "mathematics",
       "functionalStatement": "v1 returns a minimal deterministic analysis: surface form is preserved, decomposition is the whole word, and the vowel path is extracted from the Seven-vowel set (A/E/I/O/U/Y/Ë).",
       "language": "unknown",
-      "notes": [
-        "Input contained spaces; v1 uses the first token: \\"[object\\""
-      ],
-      "vowelPath": "O-E"
+      "notes": null,
+      "vowelPath": "A-E-A-I"
     }
   ],
   "engineVersion": "v1.0.0",
-  "normalizedWord": "[object",
-  "word": {
-    "alphabet": "auto",
-    "mode": "strict",
-    "word": "mathematics"
-  }
+  "normalizedWord": "mathematics",
+  "word": "mathematics"
 }"
 `;
 
@@ -109,23 +85,17 @@ exports[`Engine Contract v1 — capture engine output (goldens) study (strict, a
   "candidates": [
     {
       "decomposition": [
-        "[object"
+        "study"
       ],
-      "form": "[object",
+      "form": "study",
       "functionalStatement": "v1 returns a minimal deterministic analysis: surface form is preserved, decomposition is the whole word, and the vowel path is extracted from the Seven-vowel set (A/E/I/O/U/Y/Ë).",
       "language": "unknown",
-      "notes": [
-        "Input contained spaces; v1 uses the first token: \\"[object\\""
-      ],
-      "vowelPath": "O-E"
+      "notes": null,
+      "vowelPath": "U-Y"
     }
   ],
   "engineVersion": "v1.0.0",
-  "normalizedWord": "[object",
-  "word": {
-    "alphabet": "auto",
-    "mode": "strict",
-    "word": "study"
-  }
+  "normalizedWord": "study",
+  "word": "study"
 }"
 `;
