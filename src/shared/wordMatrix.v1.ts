@@ -21,7 +21,7 @@ export interface WordMatrixV1 {
 
 // Build a matrix from the *final* analysis result
 export function buildWordMatrix(result: AnalyzeWordResultV1): WordMatrixV1 {
-  const primary = result.heart;
+  const primary = (result as any).heart ?? (result as any).primaryPath;
 
   return {
     word: result.word,
@@ -42,10 +42,16 @@ export function buildWordMatrix(result: AnalyzeWordResultV1): WordMatrixV1 {
       ? {
           layer: "deeproot",
           label: "Proto-root",
-          language: result.deepRoot.language,
-          form: result.deepRoot.form,
-          voicePath: result.deepRoot.vowelPath,
-          notes: result.deepRoot.notes,
+          language: ((result.deepRoot as any)?.language ?? ""),
+          form: ((result.deepRoot as any)?.form ?? ""),
+          voicePath: [((result.deepRoot as any)?.vowelPath ?? (result.deepRoot as any)?.vowel_path)].flat().join(' → '),
+          notes: (
+  Array.isArray((result as any).deepRoot?.notes)
+    ? (result as any).deepRoot.notes
+    : typeof (result as any).deepRoot?.notes === "string"
+      ? [(result as any).deepRoot.notes]
+      : []
+).map((x: any) => String(x)).join("\n"),
         }
       : undefined,
   };
