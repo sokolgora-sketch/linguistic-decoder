@@ -6,7 +6,11 @@
   "include": [
     "src/shared/resultShape.v1.ts",
     "src/shared/engineContract.v1.ts",
-    "src/shared/resultsUI.ts"
+    "src/shared/resultsUI.ts",
+    "src/shared/wordMatrix.v1.ts"
   ],
-  "exclude": ["node_modules", ".next"]
+  "exclude": [
+    "node_modules",
+    ".next"
+  ]
 }
