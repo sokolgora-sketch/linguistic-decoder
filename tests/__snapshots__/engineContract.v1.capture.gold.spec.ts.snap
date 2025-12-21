@@ -1,0 +1,131 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Engine Contract v1 — capture engine output (goldens) damage (strict, auto) 1`] = `
+"{
+  "candidates": [
+    {
+      "decomposition": [
+        "[object"
+      ],
+      "form": "[object",
+      "functionalStatement": "v1 returns a minimal deterministic analysis: surface form is preserved, decomposition is the whole word, and the vowel path is extracted from the Seven-vowel set (A/E/I/O/U/Y/Ë).",
+      "language": "unknown",
+      "notes": [
+        "Input contained spaces; v1 uses the first token: \\"[object\\""
+      ],
+      "vowelPath": "O-E"
+    }
+  ],
+  "engineVersion": "v1.0.0",
+  "normalizedWord": "[object",
+  "word": {
+    "alphabet": "auto",
+    "mode": "strict",
+    "word": "damage"
+  }
+}"
+`;
+
+exports[`Engine Contract v1 — capture engine output (goldens) father (strict, auto) 1`] = `
+"{
+  "candidates": [
+    {
+      "decomposition": [
+        "[object"
+      ],
+      "form": "[object",
+      "functionalStatement": "v1 returns a minimal deterministic analysis: surface form is preserved, decomposition is the whole word, and the vowel path is extracted from the Seven-vowel set (A/E/I/O/U/Y/Ë).",
+      "language": "unknown",
+      "notes": [
+        "Input contained spaces; v1 uses the first token: \\"[object\\""
+      ],
+      "vowelPath": "O-E"
+    }
+  ],
+  "engineVersion": "v1.0.0",
+  "normalizedWord": "[object",
+  "word": {
+    "alphabet": "auto",
+    "mode": "strict",
+    "word": "father"
+  }
+}"
+`;
+
+exports[`Engine Contract v1 — capture engine output (goldens) love (strict, auto) 1`] = `
+"{
+  "candidates": [
+    {
+      "decomposition": [
+        "[object"
+      ],
+      "form": "[object",
+      "functionalStatement": "v1 returns a minimal deterministic analysis: surface form is preserved, decomposition is the whole word, and the vowel path is extracted from the Seven-vowel set (A/E/I/O/U/Y/Ë).",
+      "language": "unknown",
+      "notes": [
+        "Input contained spaces; v1 uses the first token: \\"[object\\""
+      ],
+      "vowelPath": "O-E"
+    }
+  ],
+  "engineVersion": "v1.0.0",
+  "normalizedWord": "[object",
+  "word": {
+    "alphabet": "auto",
+    "mode": "strict",
+    "word": "love"
+  }
+}"
+`;
+
+exports[`Engine Contract v1 — capture engine output (goldens) mathematics (strict, auto) 1`] = `
+"{
+  "candidates": [
+    {
+      "decomposition": [
+        "[object"
+      ],
+      "form": "[object",
+      "functionalStatement": "v1 returns a minimal deterministic analysis: surface form is preserved, decomposition is the whole word, and the vowel path is extracted from the Seven-vowel set (A/E/I/O/U/Y/Ë).",
+      "language": "unknown",
+      "notes": [
+        "Input contained spaces; v1 uses the first token: \\"[object\\""
+      ],
+      "vowelPath": "O-E"
+    }
+  ],
+  "engineVersion": "v1.0.0",
+  "normalizedWord": "[object",
+  "word": {
+    "alphabet": "auto",
+    "mode": "strict",
+    "word": "mathematics"
+  }
+}"
+`;
+
+exports[`Engine Contract v1 — capture engine output (goldens) study (strict, auto) 1`] = `
+"{
+  "candidates": [
+    {
+      "decomposition": [
+        "[object"
+      ],
+      "form": "[object",
+      "functionalStatement": "v1 returns a minimal deterministic analysis: surface form is preserved, decomposition is the whole word, and the vowel path is extracted from the Seven-vowel set (A/E/I/O/U/Y/Ë).",
+      "language": "unknown",
+      "notes": [
+        "Input contained spaces; v1 uses the first token: \\"[object\\""
+      ],
+      "vowelPath": "O-E"
+    }
+  ],
+  "engineVersion": "v1.0.0",
+  "normalizedWord": "[object",
+  "word": {
+    "alphabet": "auto",
+    "mode": "strict",
+    "word": "study"
+  }
+}"
+`;
