@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { db, ensureAnon } from "../lib/firebase";
+import { db, ensureAnon, firebaseEnabled } from "../lib/firebase";
 import type { User } from "firebase/auth";
 import {
   collection,

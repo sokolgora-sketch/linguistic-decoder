@@ -222,7 +222,7 @@ export default function ComparePanel({
                 <div className="mb-1 text-sm font-semibold">
                   {leftWord || "Left word"}
                 </div>
-                {leftEngineMeta && <EngineMetaCard meta={leftEngineMeta} />}
+                {leftEngineMeta && <EngineMetaCard summary={leftEngineMeta} />}
                 {result.left?.primaryPath ? (
                   <>
                     <div className="mb-2 flex items-center justify-between gap-3">
@@ -249,7 +249,7 @@ export default function ComparePanel({
                 <div className="mb-1 text-sm font-semibold">
                   {rightWord || "Right word"}
                 </div>
-                {rightEngineMeta && <EngineMetaCard meta={rightEngineMeta} />}
+                {rightEngineMeta && <EngineMetaCard summary={rightEngineMeta} />}
                 {result.right?.primaryPath ? (
                   <>
                     <div className="mb-2 flex items-center justify-between gap-3">

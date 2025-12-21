@@ -54,10 +54,25 @@ export interface HistoryItem {
 
 /**
  * Defines the clean, UI-first result shape that the
- * /api/analyze endpoint should return.
+ * /api/analyze-v1 endpoint should return.
  */
+export interface CandidateUI {
+  id: string;
+  language: string;
+  form: string;
+  functionalStatement?: string;
+  vowelPath?: string;
+  decomposition?: string[];
+  gloss?: string;
+  status?: "pass" | "fail" | "unknown";
+  confidenceTag?: string;
+  fitTag?: string;
+}
+
 export interface AnalyzeWordResultUI {
   word: string;
+  engineVersion: string;
+  candidates: CandidateUI[];
   sanitized: string;
   primaryPath: PrimaryPathSummary | null;
   frontier: FrontierCandidateSummary[];
