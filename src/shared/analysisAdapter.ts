@@ -1,5 +1,5 @@
 // src/shared/analysisAdapter.ts
-import type { AnalyzeWordResultV1, Alphabet, Mode } from "./resultShape.v1";
+import type { AnalyzeWordResultV1, Alphabet, Mode } from "./analysisResult.v1";
 import type { EnginePayload, Candidate } from "@/shared/engineShape";
 import { computeMath7ForResult } from "@/engine/math7";
 import { analyzeMind, analyzeConsonants, analyzeSymbolic } from "@/engine/mindAnalyzer";

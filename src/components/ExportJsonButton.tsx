@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Button } from "./ui/button";
-import type { AnalyzeWordResultV1 } from "@/shared/resultShape.v1";
+import type { AnalyzeWordResultV1 } from "@/shared/analysisResult.v1";
 
 type ExportJsonButtonProps = {
   analysis: AnalyzeWordResultV1 | null;

@@ -335,21 +335,6 @@ export type SymbolicLayer = {
   label?: string;
 };
 
-export type AnalysisResult_DEPRECATED = {
-  core: AnalysisCore;
-  // NEW: word-level consonant behaviour, shared by all candidates.
-  consonants?: {
-    field: ConsonantField;
-    summary: ConsonantSummary;
-  };
-  candidates: Candidate[];
-  debug?: AnalysisDebug;
-  sevenVoices?: SevenVoicesSummary;
-  symbolic?: SymbolicLayer;
-  symbolicCore?: any; // Changed from SymbolicCoreResult to any
-  math7?: Math7Summary;
-};
-
 export type AnalysisResult = {
   word: string;
   sanitized: string;

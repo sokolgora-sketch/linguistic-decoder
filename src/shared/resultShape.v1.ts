@@ -1,7 +1,12 @@
 // src/shared/resultShape.v1.ts
+//
+// Back-compat shim + shared UI path interfaces.
+// Canonical V1 result type lives in ./analysisResult.v1.ts
+
+export type { AnalyzeWordResultV1 } from "./analysisResult.v1";
+
 import type { DeepRootSummaryV1 } from "./deepRoot.v1";
 import type { WordMatrixV1 } from "./wordMatrix.v1";
-import type { AnalysisResult_DEPRECATED } from "./engineShape";
 
 // Core path types used by the Heart + Frontier UI
 
@@ -46,15 +51,8 @@ export type EngineMetaSummary = {
   created: string;
 };
 
-export type AnalyzeWordResultV1 = AnalysisResult_DEPRECATED & {
-    deepRoot?: DeepRootSummaryV1;
-    wordMatrix?: WordMatrixV1;
-    primaryPath: any;
-    frontier?: any;
-    languageFamilies?: any;
-    symbolic?: any;
-    word?: any;
-    meta?: EngineMetaSummary;
-    sanitized: string;
-  };
-  
+// NOTE: DeepRootSummaryV1 / WordMatrixV1 are still imported above because
+// other files may import those types from resultShape.v1.ts historically.
+// We are not exporting them here unless needed.
+void (0 as unknown as DeepRootSummaryV1);
+void (0 as unknown as WordMatrixV1);

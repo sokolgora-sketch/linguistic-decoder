@@ -1,6 +1,6 @@
 // src/shared/wordMatrix.v1.ts
 
-import type { AnalyzeWordResultV1 } from "./resultShape.v1";
+import type { AnalyzeWordResultV1 } from "./analysisResult.v1";
 
 // This is the compact, “engine-facing” matrix.
 export interface WordMatrixEntryV1 {
