@@ -1,5 +1,5 @@
 // src/engine/mindAnalyzer.ts
-import type { Math7Summary, MindSummary, ConsonantsSummary, SymbolicSummary } from "@/shared/resultShape.v1";
+import type { Math7Summary, MindSummary, ConsonantsSummary, SymbolicSummary } from "@/shared/analysisResult.v1";
 import type { EnginePayload } from "@/shared/engineShape";
 
 export function analyzeMind(math7: Math7Summary, payload: EnginePayload): MindSummary {
