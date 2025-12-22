@@ -12,6 +12,19 @@ import type {
   EngineMetaSummary,
 } from "./resultShape.v1";
 
+
+// Canonical V1 enums (contract-level, not UI-level)
+export type Mode = "strict" | "open";
+export type Alphabet =
+  | "auto"
+  | "albanian"
+  | "latin"
+  | "sanskrit"
+  | "ancient_greek"
+  | "pie"
+  | "turkish"
+  | "german";
+
 // Minimal shape required by current codebase (wordMatrix + UI + adapters).
 export type AnalyzeWordResultV1 = {
   // Required in existing code (wordMatrix.v1.ts expects string)
@@ -19,6 +32,11 @@ export type AnalyzeWordResultV1 = {
 
   // Required in existing code (export + caching)
   sanitized: string;
+
+  // Contract-stable identity fields
+  engineVersion: string;
+  mode: Mode;
+  alphabet: Alphabet;
 
   // Heart / Frontier primary path
   primaryPath?: SevenVoicesPath;
