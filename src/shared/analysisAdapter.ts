@@ -17,10 +17,10 @@ export function enginePayloadToAnalysisResult(payload: EnginePayload): AnalyzeWo
   const deepRoot = buildDeepRoot(payload);
 
   const result: AnalyzeWordResultV1 = {
-    word: payload.word,
-    engineVersion: payload.engineVersion,
-    mode: payload.mode as Mode,
-    alphabet: payload.alphabet as Alphabet,
+    sanitized: payload.sanitized ?? payload.word,
+    word: payload.word,    engineVersion: payload.engineVersion,
+    mode: (payload.mode as Mode) ?? "strict",
+    alphabet: (payload.alphabet as Alphabet) ?? "auto",
     heart,
     mind,
     consonants,
