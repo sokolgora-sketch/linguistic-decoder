@@ -8,19 +8,29 @@ import { buildWordMatrix } from "./wordMatrix.v1";
 import { buildDeepRootSummaryV1 } from './deepRoot.v1';
 
 export function enginePayloadToAnalysisResult(payload: EnginePayload): AnalyzeWordResultV1 {
+  const sanitized =
+    (payload as any).sanitized ??
+    (payload as any).sanitizedWord ??
+    (payload as any).normalizedWord ??
+    String(payload.word ?? "")
+      .trim()
+      .toLowerCase();
+
   const math7 = computeMath7ForResult(payload);
   const heart = buildHeartSummary(payload, math7);
   const mind = analyzeMind(math7, payload);
   const consonants = analyzeConsonants(payload);
   const symbolic = analyzeSymbolic(payload);
+
   const candidates = buildMindCandidates(payload);
   const deepRoot = buildDeepRoot(payload);
 
   const result: AnalyzeWordResultV1 = {
-    sanitized: payload.sanitized ?? payload.word,
-    word: payload.word,    engineVersion: payload.engineVersion,
-    mode: (payload.mode as Mode) ?? "strict",
-    alphabet: (payload.alphabet as Alphabet) ?? "auto",
+    word: payload.word,
+    sanitized,
+    engineVersion: payload.engineVersion,
+    mode: payload.mode as Mode,
+    alphabet: payload.alphabet as Alphabet,
     heart,
     mind,
     consonants,
@@ -41,14 +51,18 @@ export function enginePayloadToAnalysisResult(payload: EnginePayload): AnalyzeWo
 
 // --- helpers (minimal stubs; replace later if needed) ---
 function buildHeartSummary(payload: any, math7: any) {
+  const principlePath = Array.isArray(math7?.primary?.principlesPath)
+    ? [...math7.primary.principlesPath]
+    : [];
+
   return {
     word: payload.word,
     engineVersion: payload.engineVersion,
     mode: payload.mode,
     alphabet: payload.alphabet,
     math7,
-    principlePath: math7.primary.principlesPath ?? [],
-    narrative: `Word ${payload.word} follows ${math7.tensionLevel} balance.`,
+    principlePath,
+    narrative: `Word ${payload.word} follows ${math7?.tensionLevel ?? "stable"} balance.`,
   };
 }
 
@@ -113,3 +127,6 @@ export function analysisResultToEnginePayload(input: any): any {
   // Last resort: just pass it through
   return input as any;
 }
+
+// Back-compat alias used by route/tests
+export const analysisAdapter = enginePayloadToAnalysisResult;
