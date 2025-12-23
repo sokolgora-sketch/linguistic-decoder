@@ -1,6 +1,6 @@
 /**
  * ZË-RO API client (v1)
- * - Centralizes /api/analyze calls (GET or POST)
+ * - Centralizes /api/analyze-v1 calls (GET or POST)
  * - Normalizes error handling so UI doesn't get random HTML/404 payloads
  */
 
@@ -62,8 +62,8 @@ export async function analyzeWordApiV1(
   const base = (opts?.baseUrl ?? "").replace(/\/+$/, "");
   const endpoint =
     method === "GET"
-      ? `${base}/api/analyze?word=${encodeURIComponent(clean)}`
-      : `${base}/api/analyze`;
+      ? `${base}/api/analyze-v1?word=${encodeURIComponent(clean)}`
+      : `${base}/api/analyze-v1`;
 
   try {
     const res =
@@ -108,7 +108,7 @@ export async function analyzeWordApiV1(
     if (e instanceof AnalyzeClientError) throw e;
     throw new AnalyzeClientError(
       "NETWORK_ERROR",
-      "Network/client error calling /api/analyze.",
+      "Network/client error calling /api/analyze-v1.",
       { details: String(e) }
     );
   }

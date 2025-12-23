@@ -70,7 +70,7 @@ export default function DeterminismLab() {
     for (const w of words) {
       const t0 = performance.now();
       try {
-        const res = await fetch(`/api/analyze?word=${encodeURIComponent(w)}`);
+        const res = await fetch(`/api/analyze-v1?word=${encodeURIComponent(w)}`);
         const ms = Math.round(performance.now() - t0);
 
         if (!res.ok) {

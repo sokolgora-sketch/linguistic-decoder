@@ -126,7 +126,7 @@ export default function ComparePanel({
 
     try {
       const analyzeRemote = async (word: string): Promise<AnalyzeWordResultUI> => {
-        const response = await fetch("/api/analyze", {
+        const response = await fetch("/api/analyze-v1", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ word, mode, alphabet }),
