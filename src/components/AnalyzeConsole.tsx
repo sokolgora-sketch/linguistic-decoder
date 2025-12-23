@@ -26,7 +26,7 @@ export default function AnalyzeConsole() {
     setResult(null);
 
     try {
-      const res = await fetch("/api/analyze", {
+      const res = await fetch("/api/analyze-v1", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ word: q }),

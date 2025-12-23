@@ -74,7 +74,7 @@ export default function ZroChatPage() {
     setBusy(true);
 
     try {
-      const res = await fetch(`/api/analyze?word=${encodeURIComponent(word)}`, {
+      const res = await fetch(`/api/analyze-v1?word=${encodeURIComponent(word)}`, {
         method: "GET",
         headers: { "Content-Type": "application/json" },
       });
