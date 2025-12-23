@@ -51,6 +51,7 @@ export default function DeterminismLab() {
   const [wordsText, setWordsText] = useState<string>(
     ["study", "love", "hope", "damage", "father"].join("\n")
   );
+
   const words = useMemo(
     () =>
       wordsText
@@ -75,7 +76,12 @@ export default function DeterminismLab() {
 
         if (!res.ok) {
           const txt = await res.text().catch(() => "");
-          next.push({ word: w, ok: false, error: `HTTP ${res.status} ${res.statusText}${txt ? ` — ${txt}` : ""}`, ms });
+          next.push({
+            word: w,
+            ok: false,
+            error: `HTTP ${res.status} ${res.statusText}${txt ? ` — ${txt}` : ""}`,
+            ms,
+          });
           continue;
         }
 
@@ -101,78 +107,78 @@ export default function DeterminismLab() {
     setRunning(false);
   }
 
+  const okRows = rows.filter((r): r is Extract<Row, { ok: true }> => r.ok);
   const allOk = rows.length > 0 && rows.every((r) => r.ok);
-  const hashes = rows.filter((r): r is Extract<Row, { ok: true }> => r.ok).map((r) => r.hash);
+  const hashes = okRows.map((r) => r.hash);
   const uniqueHashes = new Set(hashes);
 
   return (
-    <main className="min-h-[calc(100vh-0px)] w-full">
-      <div className="mx-auto w-full max-w-5xl px-4 py-10">
-        <div className="mb-6">
-          <div className="text-2xl font-semibold tracking-tight">Determinism Lab</div>
-          <div className="text-sm text-muted-foreground">
-            Batch-run the API, compute stable SHA-256 hashes, and verify consistent outputs.
-          </div>
+    <Card className="border-white/10 bg-zinc-950/30">
+      <CardHeader>
+        <CardTitle className="text-base">Determinism Lab</CardTitle>
+        <CardDescription>
+          Batch-run <span className="font-mono">/api/analyze-v1</span>, compute stable SHA-256 hashes, and verify consistent outputs.
+        </CardDescription>
+      </CardHeader>
+
+      <CardContent className="space-y-3">
+        <div className="text-xs text-muted-foreground">One word per line.</div>
+        <Textarea
+          value={wordsText}
+          onChange={(e) => setWordsText(e.target.value)}
+          className="min-h-[120px] bg-black/30"
+          spellCheck={false}
+        />
+
+        <div className="flex flex-wrap gap-2">
+          <Button onClick={run} disabled={running || words.length === 0} aria-busy={running ? "true" : "false"}>
+            {running ? "Running…" : "Run batch"}
+          </Button>
+
+          <Button
+            variant="secondary"
+            onClick={() => downloadJson("zero-determinism-lab.json", { words, rows })}
+            disabled={rows.length === 0}
+          >
+            Export results JSON
+          </Button>
         </div>
 
-        <Card className="border-white/10 bg-zinc-950/40 backdrop-blur">
-          <CardHeader>
-            <CardTitle className="text-base">Word set</CardTitle>
-            <CardDescription>One word per line.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <Textarea
-              value={wordsText}
-              onChange={(e) => setWordsText(e.target.value)}
-              className="min-h-[120px] bg-black/30"
-              spellCheck={false}
-            />
-
-            <div className="flex flex-wrap gap-2">
-              <Button onClick={run} disabled={running || words.length === 0} aria-busy={running ? "true" : "false"}>
-                {running ? "Running…" : "Run batch"}
-              </Button>
-
-              <Button
-                variant="secondary"
-                onClick={() => downloadJson("zero-determinism-lab.json", { words, rows })}
-                disabled={rows.length === 0}
-              >
-                Export results JSON
-              </Button>
+        {rows.length > 0 && (
+          <div className="rounded-lg border border-white/10 bg-zinc-950/30 p-3 text-sm">
+            <div className="flex flex-wrap gap-3">
+              <span>
+                Words: <span className="font-semibold">{words.length}</span>
+              </span>
+              <span>
+                OK: <span className="font-semibold">{rows.filter((r) => r.ok).length}</span>
+              </span>
+              <span>
+                Errors: <span className="font-semibold">{rows.filter((r) => !r.ok).length}</span>
+              </span>
+              <span>
+                Unique hashes: <span className="font-semibold">{uniqueHashes.size}</span>
+              </span>
+              <span>
+                Verdict:{" "}
+                <span
+                  className={
+                    allOk && uniqueHashes.size === okRows.length
+                      ? "font-semibold text-emerald-300"
+                      : "font-semibold text-yellow-200"
+                  }
+                >
+                  {allOk && uniqueHashes.size === okRows.length ? "Stable per-word" : "Review"}
+                </span>
+              </span>
             </div>
-
-            {rows.length > 0 && (
-              <div className="rounded-lg border border-white/10 bg-zinc-950/30 p-3 text-sm">
-                <div className="flex flex-wrap gap-3">
-                  <span>
-                    Words: <span className="font-semibold">{words.length}</span>
-                  </span>
-                  <span>
-                    OK: <span className="font-semibold">{rows.filter((r) => r.ok).length}</span>
-                  </span>
-                  <span>
-                    Errors: <span className="font-semibold">{rows.filter((r) => !r.ok).length}</span>
-                  </span>
-                  <span>
-                    Unique hashes: <span className="font-semibold">{uniqueHashes.size}</span>
-                  </span>
-                  <span>
-                    Verdict:{" "}
-                    <span className={allOk && uniqueHashes.size === rows.length ? "font-semibold text-emerald-300" : "font-semibold text-yellow-200"}>
-                      {allOk && uniqueHashes.size === rows.length ? "Stable per-word" : "Review"}
-                    </span>
-                  </span>
-                </div>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+          </div>
+        )}
 
         {rows.length > 0 && (
-          <div className="mt-6 space-y-3">
+          <div className="mt-4 space-y-3">
             {rows.map((r) => (
-              <Card key={r.word} className="border-white/10 bg-zinc-950/30">
+              <Card key={r.word} className="border-white/10 bg-zinc-950/40">
                 <CardHeader className="py-4">
                   <CardTitle className="text-base flex items-center justify-between">
                     <span className="font-semibold">{r.word}</span>
@@ -182,7 +188,12 @@ export default function DeterminismLab() {
                     {r.ok ? (
                       <>
                         Hash: <span className="font-mono">{r.hash.slice(0, 16)}</span>
-                        {r.engineVersion ? <> · Engine: <span className="font-mono">{r.engineVersion}</span></> : null}
+                        {r.engineVersion ? (
+                          <>
+                            {" "}
+                            · Engine: <span className="font-mono">{r.engineVersion}</span>
+                          </>
+                        ) : null}
                       </>
                     ) : (
                       <span className="text-red-200">Error: {r.error}</span>
@@ -206,7 +217,7 @@ export default function DeterminismLab() {
             ))}
           </div>
         )}
-      </div>
-    </main>
+      </CardContent>
+    </Card>
   );
 }
