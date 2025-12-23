@@ -2,6 +2,7 @@
 
 import React from "react";
 import ChatShell from "@/components/ChatShell";
+import ContractDemoPanel from "@/components/ContractDemoPanel";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -243,6 +244,7 @@ export default function ZroChatPage() {
           })}
         </div>
       </div>
-    </ChatShell>
+          <ContractDemoPanel />
+</ChatShell>
   );
 }
