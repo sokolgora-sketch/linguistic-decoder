@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import DeterminismComparatorPanel from "@/components/DeterminismComparatorPanel";
 import ChatShell from "@/components/ChatShell";
 import ContractDemoPanel from "@/components/ContractDemoPanel";
 import { Button } from "@/components/ui/button";
@@ -143,6 +144,10 @@ export default function ZroChatPage() {
       composer={composer}
     >
       <div className="space-y-4">
+        <div className="mb-6">
+          <DeterminismComparatorPanel />
+        </div>
+
         <Card>
           <CardContent className="py-4 space-y-3">
             <div className="flex items-center justify-between gap-3">
@@ -244,7 +249,7 @@ export default function ZroChatPage() {
           })}
         </div>
       </div>
-          <ContractDemoPanel />
-</ChatShell>
+      <ContractDemoPanel />
+    </ChatShell>
   );
 }
