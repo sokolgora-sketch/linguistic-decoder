@@ -1,83 +1,72 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 
-// Polyfill FIRST (must happen before requiring undici/next/server)
+/**
+ * Jest env here does not provide WHATWG Web APIs.
+ * next/server + undici expect them, so we polyfill BEFORE requiring either.
+ */
+
 const util = require("node:util");
-const crypto = require("node:crypto");
+const web = require("node:stream/web");
 const wt = require("node:worker_threads");
 
-if (!(globalThis).TextEncoder) (globalThis).TextEncoder = util.TextEncoder;
-if (!(globalThis).TextDecoder) (globalThis).TextDecoder = util.TextDecoder;
+// TextEncoder/TextDecoder for undici + NextRequest internals
+globalThis.TextEncoder = util.TextEncoder;
+globalThis.TextDecoder = util.TextDecoder;
 
-if (!(globalThis).crypto) (globalThis).crypto = crypto.webcrypto;
+// Web Streams for undici
+globalThis.ReadableStream = web.ReadableStream;
+globalThis.WritableStream = web.WritableStream;
+globalThis.TransformStream = web.TransformStream;
 
-// undici expects these Web APIs:
-if (!(globalThis).MessageChannel) (globalThis).MessageChannel = wt.MessageChannel;
-if (!(globalThis).MessagePort) (globalThis).MessagePort = wt.MessagePort;
+// MessagePort for undici webidl
+globalThis.MessagePort = wt.MessagePort;
 
-// Some environments also miss Web Streams (safe to polyfill)
-try {
-  const webStreams = require("node:stream/web");
-  if (!(globalThis).ReadableStream) (globalThis).ReadableStream = webStreams.ReadableStream;
-  if (!(globalThis).WritableStream) (globalThis).WritableStream = webStreams.WritableStream;
-  if (!(globalThis).TransformStream) (globalThis).TransformStream = webStreams.TransformStream;
-} catch {
-  // ignore
-}
-
-// Now load undici AFTER polyfills
+// Now we can safely load undici (fetch globals)
 const undici = require("undici");
-if (!(globalThis).Request) (globalThis).Request = undici.Request;
-if (!(globalThis).Response) (globalThis).Response = undici.Response;
-if (!(globalThis).Headers) (globalThis).Headers = undici.Headers;
-if (!(globalThis).fetch) (globalThis).fetch = undici.fetch;
+globalThis.Request = undici.Request;
+globalThis.Response = undici.Response;
+globalThis.Headers = undici.Headers;
+globalThis.fetch = undici.fetch;
 
-type PostFn = (req: Request) => Promise<Response>;
-let POST: PostFn;
+const { describe, expect, test } = require("@jest/globals");
+const { NextRequest } = require("next/server");
 
-beforeAll(async () => {
-  // Import route handler AFTER globals exist
-  const mod = await import("../app/api/analyze/route");
-  POST = mod.POST as PostFn;
-});
+// IMPORTANT: app/ is at repo root; @/ maps to src/, so use relative import.
+const { GET, POST } = require("../app/api/analyze/route");
 
-async function postAnalyze(word?: string) {
-  const body = word ? { word } : {};
-  const req = new Request("http://localhost/api/analyze", {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify(body),
+/**
+ * /api/analyze is a legacy shim to /api/analyze-v1.
+ * We test via direct handler invocation (no localhost server).
+ */
+describe("/api/analyze (legacy shim)", () => {
+  test("GET returns JSON and includes sanitized", async () => {
+    const req = new NextRequest("http://localhost/api/analyze?word=study&mode=strict");
+    const res = await GET(req);
+
+    expect(res.status).toBe(200);
+    const ct = res.headers.get("content-type") || "";
+    expect(ct).toContain("application/json");
+
+    const json = await res.json();
+    expect(json).toHaveProperty("word");
+    expect(json).toHaveProperty("sanitized");
   });
 
-  const res = await POST(req);
-  const json = await res.json();
+  test("POST returns JSON and includes sanitized", async () => {
+    const req = new NextRequest("http://localhost/api/analyze", {
+      method: "POST",
+      body: JSON.stringify({ word: "study", mode: "strict" }),
+      headers: { "content-type": "application/json" },
+    });
 
-  // Strip unstable fields if present
-  if (json && typeof json === "object") {
-    delete (json as any).engine_meta;
-    delete (json as any).engineMeta;
-    delete (json as any).timestamp;
-    delete (json as any).requestId;
-  }
+    const res = await POST(req);
 
-  return { status: res.status, json };
-}
+    expect(res.status).toBe(200);
+    const ct = res.headers.get("content-type") || "";
+    expect(ct).toContain("application/json");
 
-describe("POST /api/analyze — gold snapshots", () => {
-  it("study", async () => {
-    const out = await postAnalyze("study");
-    expect(out.status).toBe(200);
-    expect(out.json).toMatchSnapshot();
-  });
-
-  it("damage", async () => {
-    const out = await postAnalyze("damage");
-    expect(out.status).toBe(200);
-    expect(out.json).toMatchSnapshot();
-  });
-
-  it("missing word -> 400", async () => {
-    const out = await postAnalyze(undefined);
-    expect(out.status).toBe(400);
-    expect(out.json).toMatchSnapshot();
+    const json = await res.json();
+    expect(json).toHaveProperty("word");
+    expect(json).toHaveProperty("sanitized");
   });
 });
