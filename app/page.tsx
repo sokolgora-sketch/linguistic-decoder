@@ -1,5 +1,5 @@
-import AnalyzeConsole from "@/components/AnalyzeConsole";
+import ZroChatPage from "@/components/ZroChatPage";
 
 export default function Page() {
-  return <AnalyzeConsole />;
+  return <ZroChatPage />;
 }
