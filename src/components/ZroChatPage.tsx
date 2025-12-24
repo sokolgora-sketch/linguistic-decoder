@@ -248,8 +248,9 @@ export default function ZroChatPage() {
             );
           })}
         </div>
+
+        <ContractDemoPanel />
       </div>
-      <ContractDemoPanel />
     </ChatShell>
   );
 }
