@@ -136,6 +136,12 @@ export function adaptAnalyzeV1ToUI(raw: Raw): AnalyzeWordResultUI {
     word,
     sanitized,
     engineVersion,
+      // v1 top-level sections (pass-through for compatibility)
+      heart: raw?.heart ?? null,
+      mind: raw?.mind ?? null,
+      consonants: raw?.consonants ?? null,
+      symbolicCore: raw?.symbolicCore ?? null,
+      deepRoot: raw?.deepRoot ?? null,
     candidates,
     primaryPath,
     frontier,
