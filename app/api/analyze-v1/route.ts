@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { ensurePrimaryAndCandidatePaths } from "@/shared/ensurePaths";
 import { z } from "zod";
 
 import { enginePayloadToAnalysisResult } from "@/shared/analysisAdapter";
@@ -52,8 +53,7 @@ function contractFailResponse(params: {
   issues?: unknown;
   out?: unknown;
 }) {
-  return NextResponse.json(
-    {
+  return NextResponse.json({
       error: "analyze-v1 contract failure",
       message: params.message,
       issues: params.issues ?? null,
