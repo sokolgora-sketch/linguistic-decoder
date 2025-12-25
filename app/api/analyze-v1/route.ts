@@ -1,16 +1,13 @@
 import { NextResponse } from "next/server";
-import { ensurePrimaryAndCandidatePaths } from "@/shared/ensurePaths";
 import { z } from "zod";
 
-import { enginePayloadToAnalysisResult } from "@/shared/analysisAdapter";
 import { runAnalysisDeterministic } from "@/lib/runAnalysisDeterministic";
+import { enginePayloadToAnalysisResult } from "@/shared/analysisAdapter";
+import { adaptAnalyzeV1ToUI } from "@/shared/analyzeV1Adapter";
+import { ensurePrimaryAndCandidatePaths } from "@/shared/ensurePaths";
 
-// ✅ Contract guard (must exist in your repo already because the contract test passes)
-import {
-  AnalyzeWordResultV1ContractSchema,
-  // If you have a helper, we’ll use it; if not, schema-safeParse is enough.
-  // toAnalyzeWordResultV1Contract,
-} from "@/shared/analyzeWordResult.v1.contract";
+// ✅ Contract guard
+import { AnalyzeWordResultV1ContractSchema } from "@/shared/analyzeWordResult.v1.contract";
 
 const BodySchema = z
   .object({
@@ -88,11 +85,10 @@ export async function POST(req: Request) {
     const payload = await runAnalysisDeterministic(word, { mode, alphabet });
     const out = enginePayloadToAnalysisResult(payload);
 
-    // ✅ HARD GUARD: if adapter output is off-contract, fail loudly.
-    // If you prefer your helper, replace this safeParse with:
-    // const contract = toAnalyzeWordResultV1Contract(out);
-    // return NextResponse.json(contract);
-    const checked = AnalyzeWordResultV1ContractSchema.safeParse(out);
+      const ui = adaptAnalyzeV1ToUI(out as any);
+
+      // ✅ HARD GUARD: validate the UI contract output (Step B)
+      const checked = AnalyzeWordResultV1ContractSchema.safeParse(out);
     if (!checked.success) {
       return contractFailResponse({
         message: "enginePayloadToAnalysisResult produced an off-contract V1 payload",
@@ -101,8 +97,8 @@ export async function POST(req: Request) {
       });
     }
 
-    return NextResponse.json(checked.data);
-  } catch (err: any) {
+    return NextResponse.json(ensurePrimaryAndCandidatePaths(ui));
+} catch (err: any) {
     return NextResponse.json(
       { error: "analyze-v1 failed", details: String(err?.stack ?? err?.message ?? err) },
       { status: 500 }
@@ -133,8 +129,10 @@ export async function GET(req: Request) {
     });
     const out = enginePayloadToAnalysisResult(payload);
 
-    // ✅ Same guard for GET.
-    const checked = AnalyzeWordResultV1ContractSchema.safeParse(out);
+      const ui = adaptAnalyzeV1ToUI(out as any);
+
+      // ✅ HARD GUARD: validate the UI contract output (Step B)
+      const checked = AnalyzeWordResultV1ContractSchema.safeParse(out);
     if (!checked.success) {
       return contractFailResponse({
         message: "enginePayloadToAnalysisResult produced an off-contract V1 payload",
@@ -143,8 +141,8 @@ export async function GET(req: Request) {
       });
     }
 
-    return NextResponse.json(checked.data);
-  } catch (err: any) {
+    return NextResponse.json(ensurePrimaryAndCandidatePaths(ui));
+} catch (err: any) {
     return NextResponse.json(
       { error: "analyze-v1 failed", details: String(err?.stack ?? err?.message ?? err) },
       { status: 500 }
