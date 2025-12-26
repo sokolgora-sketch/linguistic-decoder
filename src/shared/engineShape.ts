@@ -34,6 +34,15 @@ export interface Math7PrimarySummary {
   totalMod7: number;
   /** 7-Principles names along the path */
   principlesPath: string[];
+  /**
+   * Evidence fields (optional) to make Math7 derivation auditable.
+   * These fields are OPTIONAL by contract and must not break older payloads.
+   */
+  basis?: string;
+  vowels?: ("A" | "E" | "I" | "O" | "U" | "Y" | "Ë")[];
+  indices?: number[];
+  sum?: number;
+
 }
 
 export interface Math7Summary {
