@@ -25,13 +25,16 @@ export function extractMath7BasisFromPayload(payload: any): { basis: string; vow
     "";
 
   // Extract vowels from either array or string; always sanitize to AEIOUYË only.
-  const basis =
-    Array.isArray(raw)
-      ? raw.map((v) => String(v ?? "").toUpperCase()).join("").match(/[AEIOUYË]/g)?.join("") ?? ""
-      : String(raw ?? "").toUpperCase().match(/[AEIOUYË]/g)?.join("") ?? "";
+  const basis = Array.isArray(raw)
+    ? (raw
+        .map((v) => String(v ?? "").toUpperCase())
+        .join("")
+        .match(/[AEIOUYË]/g) ?? []).join("")
+    : (String(raw ?? "").toUpperCase().match(/[AEIOUYË]/g) ?? []).join("");
 
-  // Convert basis -> SevenVowel[]
-  const vowels = (basis.match(/[AEIOUYË]/g) ?? []).filter((v): v is SevenVowel => isSevenVowel(v));
+  const vowels = (basis.match(/[AEIOUYË]/g) ?? []).filter(
+    (v): v is SevenVowel => isSevenVowel(v)
+  );
 
   return { basis, vowels };
 }

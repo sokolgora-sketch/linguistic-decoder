@@ -1,13 +1,21 @@
-import { VOWEL_INDEX, isSevenVowel } from "@/shared/math7.core";
+import { VOWEL_INDEX } from "@/shared/math7.core";
+import { extractMath7BasisFromPayload } from "@/shared/math7.basis";
 import { runAnalysisDeterministic } from "@/lib/runAnalysisDeterministic";
 import { enginePayloadToAnalysisResult } from "@/shared/analysisAdapter";
-import { extractMath7BasisFromPayload } from "@/shared/math7.basis";
-
 
 describe("Math7 evidence lock (optional fields)", () => {
   it("study (strict): vowels/indices/sum are consistent with payload basis", async () => {
     const payload = await runAnalysisDeterministic("study", { mode: "strict" });
-    const basis = payloadBasisVowels(payload);
+
+    const { vowels: basisVowels } = extractMath7BasisFromPayload(payload);
+
+    // Evidence lock parity rule (keep consistent with existing tests):
+    // exclude terminal closure "Ë" from evidence comparisons.
+    const basis =
+      basisVowels.length && basisVowels[basisVowels.length - 1] === "Ë"
+        ? basisVowels.slice(0, -1)
+        : basisVowels;
+
     expect(basis.length).toBeGreaterThan(0);
 
     const r: any = enginePayloadToAnalysisResult(payload);
