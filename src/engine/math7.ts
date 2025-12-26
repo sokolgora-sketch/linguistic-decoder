@@ -1,4 +1,9 @@
-import { totalMod7FromVowels, isSevenVowel, type SevenVowel } from "@/shared/math7.core";
+import {
+  totalMod7FromVowels,
+  isSevenVowel,
+  type SevenVowel,
+  VOWEL_INDEX,
+} from "@/shared/math7.core";
 
 /**
  * Public: principle names emitted by Math7.
@@ -18,6 +23,15 @@ export type Math7Primary = {
   cycleState: "open" | "closed";
   totalMod7: number; // 0–6
   principlesPath: string[];
+
+  /**
+   * Evidence fields (optional): make Math7 auditable.
+   * These MUST NOT be required (contract stability).
+   */
+  basis?: string;           // sanitized basis used to derive vowels (not spelling)
+  vowels?: SevenVowel[];    // extracted 7-vowels
+  indices?: number[];       // VOWEL_INDEX[v]
+  sum?: number;             // indices sum
 };
 
 export type Math7Summary = {
@@ -35,8 +49,12 @@ function normalizeSevenVowels(vowelsIn: Array<string | null | undefined>): Seven
 
 /**
  * Public helper: build math7.primary from a vowel sequence.
+ * basis is optional "show your work" text (already sanitized).
  */
-export function math7PrimaryFromVowels(vowelsIn: Array<string | null | undefined>): Math7Primary {
+export function math7PrimaryFromVowels(
+  vowelsIn: Array<string | null | undefined>,
+  opts?: { basis?: string }
+): Math7Primary {
   const vowels = normalizeSevenVowels(vowelsIn);
 
   const principlesPath = vowels.map((v) => PRINCIPLE_MAP[v] ?? v);
@@ -48,7 +66,19 @@ export function math7PrimaryFromVowels(vowelsIn: Array<string | null | undefined
   const cycleState: Math7Primary["cycleState"] =
     vowels.length > 0 && vowels[vowels.length - 1] === "Ë" ? "closed" : "open";
 
-  return { cycleState, totalMod7, principlesPath };
+  // Evidence fields (optional)
+  const indices = vowels.map((v) => VOWEL_INDEX[v]);
+  const sum = indices.reduce((a, b) => a + b, 0);
+
+  return {
+    cycleState,
+    totalMod7,
+    principlesPath,
+    basis: opts?.basis,
+    vowels,
+    indices,
+    sum,
+  };
 }
 
 /**
@@ -60,10 +90,6 @@ export function math7PrimaryFromVowels(vowelsIn: Array<string | null | undefined
  */
 export function computeMath7ForResult(payload: any): Math7Summary {
   // Payload basis can live in different shapes depending on pipeline/version.
-  // We must align with the analysis adapter tests:
-  // - study basis often resolves to ["U","I"]
-  // - damage basis often resolves to ["A","I","Ë"]
-
   const raw =
     payload?.primaryPath?.voicePath ??
     payload?.sevenVoices?.primary?.voicePath ??
@@ -75,16 +101,20 @@ export function computeMath7ForResult(payload: any): Math7Summary {
     "";
 
   let vowels: Array<string | null | undefined> = [];
+  let basis: string | undefined;
 
   if (Array.isArray(raw)) {
     vowels = raw;
+    basis = raw.map((v) => String(v ?? "").toUpperCase()).join("");
   } else if (typeof raw === "string") {
     // Accept "U-I", "U→I", "U I", etc.
     vowels = raw.split(/[^AEIOUYË]+/gi).filter(Boolean);
+    // basis = sanitized 7-vowel-only string from raw
+    basis = (String(raw ?? "").toUpperCase().match(/[AEIOUYË]/g) ?? []).join("");
   } else {
     vowels = [];
+    basis = undefined;
   }
 
-  return { primary: math7PrimaryFromVowels(vowels) };
+  return { primary: math7PrimaryFromVowels(vowels, { basis }) };
 }
-
