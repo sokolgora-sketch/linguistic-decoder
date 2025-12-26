@@ -4,6 +4,7 @@ import {
   type SevenVowel,
   VOWEL_INDEX,
 } from "@/shared/math7.core";
+import { extractMath7BasisFromPayload } from "@/shared/math7.basis";
 
 /**
  * Public: principle names emitted by Math7.
@@ -89,32 +90,6 @@ export function math7PrimaryFromVowels(
  * because that is the analysis pipeline's basis.
  */
 export function computeMath7ForResult(payload: any): Math7Summary {
-  // Payload basis can live in different shapes depending on pipeline/version.
-  const raw =
-    payload?.primaryPath?.voicePath ??
-    payload?.sevenVoices?.primary?.voicePath ??
-    payload?.voicePath ??
-    payload?.vowelPath ??
-    payload?.vowel_path ??
-    payload?.vowelPathString ??
-    payload?.vowel_path_string ??
-    "";
-
-  let vowels: Array<string | null | undefined> = [];
-  let basis: string | undefined;
-
-  if (Array.isArray(raw)) {
-    vowels = raw;
-    basis = raw.map((v) => String(v ?? "").toUpperCase()).join("");
-  } else if (typeof raw === "string") {
-    // Accept "U-I", "U→I", "U I", etc.
-    vowels = raw.split(/[^AEIOUYË]+/gi).filter(Boolean);
-    // basis = sanitized 7-vowel-only string from raw
-    basis = (String(raw ?? "").toUpperCase().match(/[AEIOUYË]/g) ?? []).join("");
-  } else {
-    vowels = [];
-    basis = undefined;
-  }
-
+  const { basis, vowels } = extractMath7BasisFromPayload(payload);
   return { primary: math7PrimaryFromVowels(vowels, { basis }) };
 }
