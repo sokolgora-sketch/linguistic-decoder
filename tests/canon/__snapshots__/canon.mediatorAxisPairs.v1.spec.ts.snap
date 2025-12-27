@@ -1,0 +1,136 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`canon mediator axis pairs v1 (strict) — N4 Po/Jo lock po and jo both carry the N4 mediator-axis signal 1`] = `
+{
+  "jo": {
+    "candidates": [
+      {
+        "decomposition": [
+          "jo",
+        ],
+        "form": "jo",
+        "functional_statement": {
+          "action": "",
+          "instrument": "",
+          "unit": "",
+        },
+        "language": "unknown",
+        "ring_fit": "MIXED",
+        "signals": [
+          "pattern:N4:mediator-axis",
+        ],
+        "vowel_path": [
+          "O",
+        ],
+      },
+    ],
+    "engine_meta": {
+      "engineVersion": "v1.0.0",
+    },
+    "language_guess": null,
+    "math7_summary": {
+      "balance": {
+        "notes": [
+          "no voices in rings",
+        ],
+        "score": 0,
+      },
+      "dominantVoices": [
+        "O",
+      ],
+      "path": [
+        "O",
+      ],
+      "rings": {
+        "inner": [],
+        "mediator": "O",
+        "middle": [],
+        "outer": [],
+      },
+      "tension": {
+        "notes": [
+          "no voices in rings",
+        ],
+        "score": 0,
+      },
+      "totalVoices": 1,
+      "vector": {
+        "A": 0,
+        "E": 0,
+        "I": 0,
+        "O": 1,
+        "U": 0,
+        "Y": 0,
+        "Ë": 0,
+      },
+    },
+    "mode": "strict",
+    "word": "jo",
+  },
+  "po": {
+    "candidates": [
+      {
+        "decomposition": [
+          "po",
+        ],
+        "form": "po",
+        "functional_statement": {
+          "action": "",
+          "instrument": "",
+          "unit": "",
+        },
+        "language": "unknown",
+        "ring_fit": "MIXED",
+        "signals": [
+          "pattern:N4:mediator-axis",
+        ],
+        "vowel_path": [
+          "O",
+        ],
+      },
+    ],
+    "engine_meta": {
+      "engineVersion": "v1.0.0",
+    },
+    "language_guess": null,
+    "math7_summary": {
+      "balance": {
+        "notes": [
+          "no voices in rings",
+        ],
+        "score": 0,
+      },
+      "dominantVoices": [
+        "O",
+      ],
+      "path": [
+        "O",
+      ],
+      "rings": {
+        "inner": [],
+        "mediator": "O",
+        "middle": [],
+        "outer": [],
+      },
+      "tension": {
+        "notes": [
+          "no voices in rings",
+        ],
+        "score": 0,
+      },
+      "totalVoices": 1,
+      "vector": {
+        "A": 0,
+        "E": 0,
+        "I": 0,
+        "O": 1,
+        "U": 0,
+        "Y": 0,
+        "Ë": 0,
+      },
+    },
+    "mode": "strict",
+    "word": "po",
+  },
+}
+`;
