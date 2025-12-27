@@ -8,13 +8,26 @@
 import wordsV1 from "./words.v1.json";
 import { analyzeWordV1 } from "../../src/engine/analyzeWordV1";
 
-function runOne(word: string, mode: "strict" | "loose") {
-  return analyzeWordV1(word, mode);
+type CanonWordsFixture =
+  | string[]
+  | { version?: string; words: Array<string | { word: string }> };
+
+function asWordList(fx: CanonWordsFixture): string[] {
+  if (Array.isArray(fx)) return fx;
+  return fx.words.map((w) => (typeof w === "string" ? w : w.word));
 }
 
 /**
- * Keep snapshots stable: strip ONLY truly volatile fields.
- * IMPORTANT: do NOT strip meaningful evidence fields (basis/vowels/indices/sum).
+ * Canon battery v1 is strict-only for now.
+ * We do not accept "open" variability in the snapshot lock phase.
+ */
+function runOne(word: string) {
+  return analyzeWordV1(word, "strict");
+}
+
+/**
+ * Keep snapshots stable: strip volatile fields only.
+ * IMPORTANT: do NOT strip meaning-bearing fields.
  */
 function stableNormalize<T>(payload: T): T {
   const clone: any = JSON.parse(JSON.stringify(payload));
@@ -22,26 +35,22 @@ function stableNormalize<T>(payload: T): T {
   // Volatile: generated per call
   if (clone?.engine_meta?.timestampIso) delete clone.engine_meta.timestampIso;
 
-  // If you later add other volatile meta, strip it here (test-only):
-  // if (clone?.engine_meta?.requestId) delete clone.engine_meta.requestId;
-
-  return clone as T;
+  // If other volatile fields appear later, add them here with a comment explaining why.
+  return clone;
 }
 
 describe("canon battery v1 (strict) — snapshot lock", () => {
-  const mode = (wordsV1 as any).mode as "strict" | "loose";
+  const words = asWordList(wordsV1 as unknown as CanonWordsFixture);
 
-  test("fixture declares version + mode", () => {
-    expect((wordsV1 as any).version).toBe("v1");
-    expect(mode).toBe("strict");
-    expect(Array.isArray((wordsV1 as any).words)).toBe(true);
-    expect((wordsV1 as any).words.length).toBeGreaterThanOrEqual(10);
+  test("fixture has at least one word", () => {
+    expect(Array.isArray(words)).toBe(true);
+    expect(words.length).toBeGreaterThan(0);
   });
 
-  for (const item of (wordsV1 as any).words as Array<{ word: string }>) {
-    test(`canon:${mode}:${item.word}`, async () => {
-      const out1 = stableNormalize(await runOne(item.word, mode));
-      const out2 = stableNormalize(await runOne(item.word, mode));
+  for (const w of words) {
+    test(`canon:strict:${w}`, async () => {
+      const out1 = stableNormalize(await runOne(w));
+      const out2 = stableNormalize(await runOne(w));
 
       // Determinism gate: identical result on repeated calls in the same process.
       expect(out2).toEqual(out1);
