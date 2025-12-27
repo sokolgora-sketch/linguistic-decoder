@@ -1,0 +1,13 @@
+[
+  { "word": "study", "notes": "anchor: v1 canon" },
+  { "word": "damage", "notes": "anchor: v1 canon" },
+
+  { "word": "gjak", "notes": "alb core; diacritic-free" },
+  { "word": "gjallë", "notes": "alb core; diacritic" },
+  { "word": "frymë", "notes": "alb core; diacritic" },
+  { "word": "zemër", "notes": "alb core; diacritic" },
+  { "word": "jetë", "notes": "alb core; diacritic" },
+
+  { "word": "po", "notes": "polarity axis (PO)" },
+  { "word": "jo", "notes": "polarity axis (JO)" }
+]
