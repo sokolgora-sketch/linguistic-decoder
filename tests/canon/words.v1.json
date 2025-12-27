@@ -1,0 +1,31 @@
+{
+  "version": "v1",
+  "mode": "strict",
+  "words": [
+    { "word": "study", "langHint": "en", "note": "core English canon" },
+    { "word": "damage", "langHint": "en", "note": "core English canon" },
+
+    { "word": "gjak", "langHint": "sq", "note": "life/body" },
+    { "word": "gjallë", "langHint": "sq", "note": "life/body" },
+    { "word": "frymë", "langHint": "sq", "note": "life/body" },
+    { "word": "zemër", "langHint": "sq", "note": "life/body" },
+    { "word": "jetë", "langHint": "sq", "note": "life/body" },
+    { "word": "trup", "langHint": "sq", "note": "life/body" },
+    { "word": "shpirt", "langHint": "sq", "note": "life/body" },
+
+    { "word": "ligj", "langHint": "sq", "note": "identity/law" },
+    { "word": "emër", "langHint": "sq", "note": "identity/law" },
+    { "word": "frikë", "langHint": "sq", "note": "identity/law" },
+
+    { "word": "shoqëri", "langHint": "sq", "note": "social/culture" },
+    { "word": "kulturë", "langHint": "sq", "note": "social/culture" },
+
+    { "word": "sistem", "langHint": "sq", "note": "systems/tech" },
+    { "word": "internet", "langHint": "sq", "note": "systems/tech" },
+    { "word": "telefon", "langHint": "sq", "note": "systems/tech" },
+    { "word": "kompjuter", "langHint": "sq", "note": "systems/tech" },
+
+    { "word": "ekonomi", "langHint": "sq", "note": "value/economy" },
+    { "word": "kriptomonedhë", "langHint": "sq", "note": "value/economy" }
+  ]
+}
