@@ -381,7 +381,9 @@ exports[`canon battery v2 (strict) — Seven-Voices Math v1 lock canon:v2:strict
       },
       "language": "unknown",
       "ring_fit": "MIXED",
-      "signals": [],
+      "signals": [
+        "pattern:N4:mediator-axis",
+      ],
       "vowel_path": [
         "O",
       ],
@@ -447,7 +449,9 @@ exports[`canon battery v2 (strict) — Seven-Voices Math v1 lock canon:v2:strict
       },
       "language": "unknown",
       "ring_fit": "MIXED",
-      "signals": [],
+      "signals": [
+        "pattern:N4:mediator-axis",
+      ],
       "vowel_path": [
         "O",
       ],
