@@ -1,11 +1,8 @@
 // src/engine/analyzeWordV1.ts
 import { summarizeWordMath7 } from "../lib/sevenVowelsCore";
-import type {
-  VoicePath,
-  Ring,
-  Math7Summary,
-} from "../lib/sevenVowelsCore";
+import type { VoicePath, Ring, Math7Summary } from "../lib/sevenVowelsCore";
 import { generateCandidates } from "./wordCandidates";
+import { detectMediatorAxisPair } from "./patterns/mediatorAxisPair";
 
 export type EngineMode = "strict" | "open";
 
@@ -43,6 +40,15 @@ export type AnalysisResult = {
 
 const ENGINE_VERSION = "v1.0.0";
 
+function normWord(w: string): string {
+  return (w ?? "").trim().toLowerCase().normalize("NFC");
+}
+
+function withSignal(signals: string[], sig: string): string[] {
+  if (signals.includes(sig)) return signals;
+  return [...signals, sig];
+}
+
 export async function analyzeWordV1(
   word: string,
   mode: EngineMode = "strict",
@@ -50,7 +56,6 @@ export async function analyzeWordV1(
   const input = word.trim();
 
   const math7_summary = summarizeWordMath7(input);
-
   const rawCandidates = generateCandidates(input);
 
   const candidates: CandidateAnalysis[] = rawCandidates.map((c) => ({
@@ -66,6 +71,22 @@ export async function analyzeWordV1(
     ring_fit: "MIXED",
     signals: [],
   }));
+
+  // Phase C2: Decision Geometry tag (non-breaking).
+  // v1 strict rule: only tag when the word is part of the canonical N4 pair (po/jo).
+  if (mode === "strict") {
+    const w = normWord(input);
+    // For v1, we detect membership by checking against the known pair.
+    // The detector is order-insensitive, but we call it deterministically.
+    const n4 =
+      detectMediatorAxisPair(w, "po") ?? detectMediatorAxisPair(w, "jo");
+
+    if (n4) {
+      for (const cand of candidates) {
+        cand.signals = withSignal(cand.signals, "pattern:N4:mediator-axis");
+      }
+    }
+  }
 
   return {
     word: input,
