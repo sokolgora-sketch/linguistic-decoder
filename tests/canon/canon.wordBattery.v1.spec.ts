@@ -7,14 +7,16 @@
 
 import wordsV1 from "./words.v1.json";
 import { analyzeWordV1 } from "../../src/engine/analyzeWordV1";
+import type { EngineMode } from "../../src/engine/analyzeWordV1";
 
-function runOne(word: string, mode: "strict" | "loose") {
-  return analyzeWordV1(word, mode);
+function runOne(word: string) {
+  // Canon battery v1 is strict-only by design.
+  return analyzeWordV1(word, "strict");
 }
 
 /**
  * Keep snapshots stable: strip ONLY truly volatile fields.
- * IMPORTANT: do NOT strip meaningful evidence fields (basis/vowels/indices/sum).
+ * IMPORTANT: do NOT strip meaningful evidence fields.
  */
 function stableNormalize<T>(payload: T): T {
   const clone: any = JSON.parse(JSON.stringify(payload));
@@ -22,14 +24,11 @@ function stableNormalize<T>(payload: T): T {
   // Volatile: generated per call
   if (clone?.engine_meta?.timestampIso) delete clone.engine_meta.timestampIso;
 
-  // If you later add other volatile meta, strip it here (test-only):
-  // if (clone?.engine_meta?.requestId) delete clone.engine_meta.requestId;
-
   return clone as T;
 }
 
 describe("canon battery v1 (strict) — snapshot lock", () => {
-  const mode = (wordsV1 as any).mode as "strict" | "loose";
+  const mode = (wordsV1 as any).mode as EngineMode;
 
   test("fixture declares version + mode", () => {
     expect((wordsV1 as any).version).toBe("v1");
@@ -39,9 +38,9 @@ describe("canon battery v1 (strict) — snapshot lock", () => {
   });
 
   for (const item of (wordsV1 as any).words as Array<{ word: string }>) {
-    test(`canon:${mode}:${item.word}`, async () => {
-      const out1 = stableNormalize(await runOne(item.word, mode));
-      const out2 = stableNormalize(await runOne(item.word, mode));
+    test(`canon:strict:${item.word}`, async () => {
+      const out1 = stableNormalize(await runOne(item.word));
+      const out2 = stableNormalize(await runOne(item.word));
 
       // Determinism gate: identical result on repeated calls in the same process.
       expect(out2).toEqual(out1);

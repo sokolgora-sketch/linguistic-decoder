@@ -1,5 +1,6 @@
 import wordsV1 from "./words.v1.json";
 import { analyzeWordV1 } from "../../src/engine/analyzeWordV1";
+import type { EngineMode } from "../../src/engine/analyzeWordV1";
 import { classifyAnalysisResult } from "./canon.failureTags.v1";
 
 function runOne(word: string) {
@@ -13,7 +14,7 @@ function stableNormalize<T>(payload: T): T {
 }
 
 describe("canon failure taxonomy v1 (strict) — classify + snapshot report", () => {
-  const mode = (wordsV1 as any).mode as "strict";
+  const mode = (wordsV1 as any).mode as EngineMode;
   const ambiguousThreshold = 6;
 
   test("fixture declares version + mode", () => {
@@ -36,6 +37,7 @@ describe("canon failure taxonomy v1 (strict) — classify + snapshot report", ()
       const out1 = stableNormalize(await runOne(item.word));
       const out2 = stableNormalize(await runOne(item.word));
 
+      // Determinism check (same as battery)
       expect(out2).toEqual(out1);
 
       const cls = classifyAnalysisResult(out1, { ambiguousThreshold });
@@ -47,6 +49,7 @@ describe("canon failure taxonomy v1 (strict) — classify + snapshot report", ()
       });
     }
 
+    // Stable ordering to avoid drift.
     rows.sort((a, b) => a.word.localeCompare(b.word));
 
     const report = {
