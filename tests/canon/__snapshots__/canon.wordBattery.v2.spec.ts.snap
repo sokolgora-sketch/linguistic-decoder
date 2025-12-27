@@ -1,0 +1,647 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`canon battery v2 (strict) — Seven-Voices Math v1 lock canon:v2:strict:damage 1`] = `
+{
+  "candidates": [
+    {
+      "decomposition": [
+        "damage",
+      ],
+      "form": "damage",
+      "functional_statement": {
+        "action": "",
+        "instrument": "",
+        "unit": "",
+      },
+      "language": "unknown",
+      "ring_fit": "MIXED",
+      "signals": [],
+      "vowel_path": [
+        "A",
+        "A",
+        "E",
+      ],
+    },
+  ],
+  "engine_meta": {
+    "engineVersion": "v1.0.0",
+  },
+  "language_guess": null,
+  "math7_summary": {
+    "balance": {
+      "notes": [
+        "dominant ring: outer",
+        "strong imbalance between rings",
+      ],
+      "score": 0.33333333333333337,
+    },
+    "dominantVoices": [
+      "A",
+    ],
+    "path": [
+      "A",
+      "A",
+      "E",
+    ],
+    "rings": {
+      "inner": [],
+      "mediator": null,
+      "middle": [
+        "E",
+      ],
+      "outer": [
+        "A",
+        "A",
+      ],
+    },
+    "tension": {
+      "notes": [
+        "high tension between rings",
+      ],
+      "score": 1,
+    },
+    "totalVoices": 3,
+    "vector": {
+      "A": 2,
+      "E": 1,
+      "I": 0,
+      "O": 0,
+      "U": 0,
+      "Y": 0,
+      "Ë": 0,
+    },
+  },
+  "mode": "strict",
+  "word": "damage",
+}
+`;
+
+exports[`canon battery v2 (strict) — Seven-Voices Math v1 lock canon:v2:strict:frymë 1`] = `
+{
+  "candidates": [
+    {
+      "decomposition": [
+        "frymë",
+      ],
+      "form": "frymë",
+      "functional_statement": {
+        "action": "",
+        "instrument": "",
+        "unit": "",
+      },
+      "language": "unknown",
+      "ring_fit": "MIXED",
+      "signals": [],
+      "vowel_path": [
+        "Y",
+        "Ë",
+      ],
+    },
+  ],
+  "engine_meta": {
+    "engineVersion": "v1.0.0",
+  },
+  "language_guess": null,
+  "math7_summary": {
+    "balance": {
+      "notes": [
+        "dominant ring: middle",
+        "strong imbalance between rings",
+      ],
+      "score": 0.33333333333333326,
+    },
+    "dominantVoices": [
+      "Y",
+      "Ë",
+    ],
+    "path": [
+      "Y",
+      "Ë",
+    ],
+    "rings": {
+      "inner": [],
+      "mediator": null,
+      "middle": [
+        "Y",
+      ],
+      "outer": [
+        "Ë",
+      ],
+    },
+    "tension": {
+      "notes": [
+        "high tension between rings",
+      ],
+      "score": 1,
+    },
+    "totalVoices": 2,
+    "vector": {
+      "A": 0,
+      "E": 0,
+      "I": 0,
+      "O": 0,
+      "U": 0,
+      "Y": 1,
+      "Ë": 1,
+    },
+  },
+  "mode": "strict",
+  "word": "frymë",
+}
+`;
+
+exports[`canon battery v2 (strict) — Seven-Voices Math v1 lock canon:v2:strict:gjak 1`] = `
+{
+  "candidates": [
+    {
+      "decomposition": [
+        "gjak",
+      ],
+      "form": "gjak",
+      "functional_statement": {
+        "action": "",
+        "instrument": "",
+        "unit": "",
+      },
+      "language": "unknown",
+      "ring_fit": "MIXED",
+      "signals": [],
+      "vowel_path": [
+        "A",
+      ],
+    },
+  ],
+  "engine_meta": {
+    "engineVersion": "v1.0.0",
+  },
+  "language_guess": null,
+  "math7_summary": {
+    "balance": {
+      "notes": [
+        "dominant ring: outer",
+        "strong imbalance between rings",
+      ],
+      "score": 0,
+    },
+    "dominantVoices": [
+      "A",
+    ],
+    "path": [
+      "A",
+    ],
+    "rings": {
+      "inner": [],
+      "mediator": null,
+      "middle": [],
+      "outer": [
+        "A",
+      ],
+    },
+    "tension": {
+      "notes": [
+        "high tension between rings",
+      ],
+      "score": 1,
+    },
+    "totalVoices": 1,
+    "vector": {
+      "A": 1,
+      "E": 0,
+      "I": 0,
+      "O": 0,
+      "U": 0,
+      "Y": 0,
+      "Ë": 0,
+    },
+  },
+  "mode": "strict",
+  "word": "gjak",
+}
+`;
+
+exports[`canon battery v2 (strict) — Seven-Voices Math v1 lock canon:v2:strict:gjallë 1`] = `
+{
+  "candidates": [
+    {
+      "decomposition": [
+        "gjallë",
+      ],
+      "form": "gjallë",
+      "functional_statement": {
+        "action": "",
+        "instrument": "",
+        "unit": "",
+      },
+      "language": "unknown",
+      "ring_fit": "MIXED",
+      "signals": [],
+      "vowel_path": [
+        "A",
+        "Ë",
+      ],
+    },
+  ],
+  "engine_meta": {
+    "engineVersion": "v1.0.0",
+  },
+  "language_guess": null,
+  "math7_summary": {
+    "balance": {
+      "notes": [
+        "dominant ring: outer",
+        "strong imbalance between rings",
+      ],
+      "score": 0,
+    },
+    "dominantVoices": [
+      "A",
+      "Ë",
+    ],
+    "path": [
+      "A",
+      "Ë",
+    ],
+    "rings": {
+      "inner": [],
+      "mediator": null,
+      "middle": [],
+      "outer": [
+        "A",
+        "Ë",
+      ],
+    },
+    "tension": {
+      "notes": [
+        "high tension between rings",
+      ],
+      "score": 1,
+    },
+    "totalVoices": 2,
+    "vector": {
+      "A": 1,
+      "E": 0,
+      "I": 0,
+      "O": 0,
+      "U": 0,
+      "Y": 0,
+      "Ë": 1,
+    },
+  },
+  "mode": "strict",
+  "word": "gjallë",
+}
+`;
+
+exports[`canon battery v2 (strict) — Seven-Voices Math v1 lock canon:v2:strict:jetë 1`] = `
+{
+  "candidates": [
+    {
+      "decomposition": [
+        "jetë",
+      ],
+      "form": "jetë",
+      "functional_statement": {
+        "action": "",
+        "instrument": "",
+        "unit": "",
+      },
+      "language": "unknown",
+      "ring_fit": "MIXED",
+      "signals": [],
+      "vowel_path": [
+        "E",
+        "Ë",
+      ],
+    },
+  ],
+  "engine_meta": {
+    "engineVersion": "v1.0.0",
+  },
+  "language_guess": null,
+  "math7_summary": {
+    "balance": {
+      "notes": [
+        "dominant ring: middle",
+        "strong imbalance between rings",
+      ],
+      "score": 0.33333333333333326,
+    },
+    "dominantVoices": [
+      "E",
+      "Ë",
+    ],
+    "path": [
+      "E",
+      "Ë",
+    ],
+    "rings": {
+      "inner": [],
+      "mediator": null,
+      "middle": [
+        "E",
+      ],
+      "outer": [
+        "Ë",
+      ],
+    },
+    "tension": {
+      "notes": [
+        "high tension between rings",
+      ],
+      "score": 1,
+    },
+    "totalVoices": 2,
+    "vector": {
+      "A": 0,
+      "E": 1,
+      "I": 0,
+      "O": 0,
+      "U": 0,
+      "Y": 0,
+      "Ë": 1,
+    },
+  },
+  "mode": "strict",
+  "word": "jetë",
+}
+`;
+
+exports[`canon battery v2 (strict) — Seven-Voices Math v1 lock canon:v2:strict:jo 1`] = `
+{
+  "candidates": [
+    {
+      "decomposition": [
+        "jo",
+      ],
+      "form": "jo",
+      "functional_statement": {
+        "action": "",
+        "instrument": "",
+        "unit": "",
+      },
+      "language": "unknown",
+      "ring_fit": "MIXED",
+      "signals": [],
+      "vowel_path": [
+        "O",
+      ],
+    },
+  ],
+  "engine_meta": {
+    "engineVersion": "v1.0.0",
+  },
+  "language_guess": null,
+  "math7_summary": {
+    "balance": {
+      "notes": [
+        "no voices in rings",
+      ],
+      "score": 0,
+    },
+    "dominantVoices": [
+      "O",
+    ],
+    "path": [
+      "O",
+    ],
+    "rings": {
+      "inner": [],
+      "mediator": "O",
+      "middle": [],
+      "outer": [],
+    },
+    "tension": {
+      "notes": [
+        "no voices in rings",
+      ],
+      "score": 0,
+    },
+    "totalVoices": 1,
+    "vector": {
+      "A": 0,
+      "E": 0,
+      "I": 0,
+      "O": 1,
+      "U": 0,
+      "Y": 0,
+      "Ë": 0,
+    },
+  },
+  "mode": "strict",
+  "word": "jo",
+}
+`;
+
+exports[`canon battery v2 (strict) — Seven-Voices Math v1 lock canon:v2:strict:po 1`] = `
+{
+  "candidates": [
+    {
+      "decomposition": [
+        "po",
+      ],
+      "form": "po",
+      "functional_statement": {
+        "action": "",
+        "instrument": "",
+        "unit": "",
+      },
+      "language": "unknown",
+      "ring_fit": "MIXED",
+      "signals": [],
+      "vowel_path": [
+        "O",
+      ],
+    },
+  ],
+  "engine_meta": {
+    "engineVersion": "v1.0.0",
+  },
+  "language_guess": null,
+  "math7_summary": {
+    "balance": {
+      "notes": [
+        "no voices in rings",
+      ],
+      "score": 0,
+    },
+    "dominantVoices": [
+      "O",
+    ],
+    "path": [
+      "O",
+    ],
+    "rings": {
+      "inner": [],
+      "mediator": "O",
+      "middle": [],
+      "outer": [],
+    },
+    "tension": {
+      "notes": [
+        "no voices in rings",
+      ],
+      "score": 0,
+    },
+    "totalVoices": 1,
+    "vector": {
+      "A": 0,
+      "E": 0,
+      "I": 0,
+      "O": 1,
+      "U": 0,
+      "Y": 0,
+      "Ë": 0,
+    },
+  },
+  "mode": "strict",
+  "word": "po",
+}
+`;
+
+exports[`canon battery v2 (strict) — Seven-Voices Math v1 lock canon:v2:strict:study 1`] = `
+{
+  "candidates": [
+    {
+      "decomposition": [
+        "study",
+      ],
+      "form": "study",
+      "functional_statement": {
+        "action": "",
+        "instrument": "",
+        "unit": "",
+      },
+      "language": "unknown",
+      "ring_fit": "MIXED",
+      "signals": [],
+      "vowel_path": [
+        "U",
+        "Y",
+      ],
+    },
+  ],
+  "engine_meta": {
+    "engineVersion": "v1.0.0",
+  },
+  "language_guess": null,
+  "math7_summary": {
+    "balance": {
+      "notes": [
+        "dominant ring: inner",
+        "strong imbalance between rings",
+      ],
+      "score": 0.33333333333333326,
+    },
+    "dominantVoices": [
+      "U",
+      "Y",
+    ],
+    "path": [
+      "U",
+      "Y",
+    ],
+    "rings": {
+      "inner": [
+        "U",
+      ],
+      "mediator": null,
+      "middle": [
+        "Y",
+      ],
+      "outer": [],
+    },
+    "tension": {
+      "notes": [
+        "high tension between rings",
+      ],
+      "score": 1,
+    },
+    "totalVoices": 2,
+    "vector": {
+      "A": 0,
+      "E": 0,
+      "I": 0,
+      "O": 0,
+      "U": 1,
+      "Y": 1,
+      "Ë": 0,
+    },
+  },
+  "mode": "strict",
+  "word": "study",
+}
+`;
+
+exports[`canon battery v2 (strict) — Seven-Voices Math v1 lock canon:v2:strict:zemër 1`] = `
+{
+  "candidates": [
+    {
+      "decomposition": [
+        "zemër",
+      ],
+      "form": "zemër",
+      "functional_statement": {
+        "action": "",
+        "instrument": "",
+        "unit": "",
+      },
+      "language": "unknown",
+      "ring_fit": "MIXED",
+      "signals": [],
+      "vowel_path": [
+        "E",
+        "Ë",
+      ],
+    },
+  ],
+  "engine_meta": {
+    "engineVersion": "v1.0.0",
+  },
+  "language_guess": null,
+  "math7_summary": {
+    "balance": {
+      "notes": [
+        "dominant ring: middle",
+        "strong imbalance between rings",
+      ],
+      "score": 0.33333333333333326,
+    },
+    "dominantVoices": [
+      "E",
+      "Ë",
+    ],
+    "path": [
+      "E",
+      "Ë",
+    ],
+    "rings": {
+      "inner": [],
+      "mediator": null,
+      "middle": [
+        "E",
+      ],
+      "outer": [
+        "Ë",
+      ],
+    },
+    "tension": {
+      "notes": [
+        "high tension between rings",
+      ],
+      "score": 1,
+    },
+    "totalVoices": 2,
+    "vector": {
+      "A": 0,
+      "E": 1,
+      "I": 0,
+      "O": 0,
+      "U": 0,
+      "Y": 0,
+      "Ë": 1,
+    },
+  },
+  "mode": "strict",
+  "word": "zemër",
+}
+`;
