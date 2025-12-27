@@ -1,0 +1,237 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`canon failure taxonomy v1 (strict) — classify + snapshot report taxonomy report (snapshot) 1`] = `
+{
+  "ambiguousThreshold": 6,
+  "mode": "strict",
+  "rows": [
+    {
+      "counts": {
+        "candidates": 1,
+        "errors": 0,
+        "warnings": 0,
+      },
+      "tags": [
+        "OK",
+      ],
+      "word": "damage",
+    },
+    {
+      "counts": {
+        "candidates": 1,
+        "errors": 0,
+        "warnings": 0,
+      },
+      "tags": [
+        "OK",
+      ],
+      "word": "ekonomi",
+    },
+    {
+      "counts": {
+        "candidates": 1,
+        "errors": 0,
+        "warnings": 0,
+      },
+      "tags": [
+        "OK",
+      ],
+      "word": "emër",
+    },
+    {
+      "counts": {
+        "candidates": 1,
+        "errors": 0,
+        "warnings": 0,
+      },
+      "tags": [
+        "OK",
+      ],
+      "word": "frikë",
+    },
+    {
+      "counts": {
+        "candidates": 1,
+        "errors": 0,
+        "warnings": 0,
+      },
+      "tags": [
+        "OK",
+      ],
+      "word": "frymë",
+    },
+    {
+      "counts": {
+        "candidates": 1,
+        "errors": 0,
+        "warnings": 0,
+      },
+      "tags": [
+        "OK",
+      ],
+      "word": "gjak",
+    },
+    {
+      "counts": {
+        "candidates": 1,
+        "errors": 0,
+        "warnings": 0,
+      },
+      "tags": [
+        "OK",
+      ],
+      "word": "gjallë",
+    },
+    {
+      "counts": {
+        "candidates": 1,
+        "errors": 0,
+        "warnings": 0,
+      },
+      "tags": [
+        "OK",
+      ],
+      "word": "internet",
+    },
+    {
+      "counts": {
+        "candidates": 1,
+        "errors": 0,
+        "warnings": 0,
+      },
+      "tags": [
+        "OK",
+      ],
+      "word": "jetë",
+    },
+    {
+      "counts": {
+        "candidates": 1,
+        "errors": 0,
+        "warnings": 0,
+      },
+      "tags": [
+        "OK",
+      ],
+      "word": "kompjuter",
+    },
+    {
+      "counts": {
+        "candidates": 1,
+        "errors": 0,
+        "warnings": 0,
+      },
+      "tags": [
+        "OK",
+      ],
+      "word": "kriptomonedhë",
+    },
+    {
+      "counts": {
+        "candidates": 1,
+        "errors": 0,
+        "warnings": 0,
+      },
+      "tags": [
+        "OK",
+      ],
+      "word": "kulturë",
+    },
+    {
+      "counts": {
+        "candidates": 1,
+        "errors": 0,
+        "warnings": 0,
+      },
+      "tags": [
+        "OK",
+      ],
+      "word": "ligj",
+    },
+    {
+      "counts": {
+        "candidates": 1,
+        "errors": 0,
+        "warnings": 0,
+      },
+      "tags": [
+        "OK",
+      ],
+      "word": "shoqëri",
+    },
+    {
+      "counts": {
+        "candidates": 1,
+        "errors": 0,
+        "warnings": 0,
+      },
+      "tags": [
+        "OK",
+      ],
+      "word": "shpirt",
+    },
+    {
+      "counts": {
+        "candidates": 1,
+        "errors": 0,
+        "warnings": 0,
+      },
+      "tags": [
+        "OK",
+      ],
+      "word": "sistem",
+    },
+    {
+      "counts": {
+        "candidates": 1,
+        "errors": 0,
+        "warnings": 0,
+      },
+      "tags": [
+        "OK",
+      ],
+      "word": "study",
+    },
+    {
+      "counts": {
+        "candidates": 1,
+        "errors": 0,
+        "warnings": 0,
+      },
+      "tags": [
+        "OK",
+      ],
+      "word": "telefon",
+    },
+    {
+      "counts": {
+        "candidates": 1,
+        "errors": 0,
+        "warnings": 0,
+      },
+      "tags": [
+        "OK",
+      ],
+      "word": "trup",
+    },
+    {
+      "counts": {
+        "candidates": 1,
+        "errors": 0,
+        "warnings": 0,
+      },
+      "tags": [
+        "OK",
+      ],
+      "word": "zemër",
+    },
+  ],
+  "totals": {
+    "byTag": {
+      "OK": 20,
+    },
+    "words": 20,
+  },
+  "version": "v1",
+}
+`;
