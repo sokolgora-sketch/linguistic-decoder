@@ -1,0 +1,1482 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`canon battery v1 (strict) — snapshot lock canon:strict:damage 1`] = `
+{
+  "candidates": [
+    {
+      "decomposition": [
+        "damage",
+      ],
+      "form": "damage",
+      "functional_statement": {
+        "action": "",
+        "instrument": "",
+        "unit": "",
+      },
+      "language": "unknown",
+      "ring_fit": "MIXED",
+      "signals": [],
+      "vowel_path": [
+        "A",
+        "A",
+        "E",
+      ],
+    },
+  ],
+  "engine_meta": {
+    "engineVersion": "v1.0.0",
+  },
+  "language_guess": null,
+  "math7_summary": {
+    "balance": {
+      "notes": [
+        "dominant ring: outer",
+        "strong imbalance between rings",
+      ],
+      "score": 0.33333333333333337,
+    },
+    "dominantVoices": [
+      "A",
+    ],
+    "path": [
+      "A",
+      "A",
+      "E",
+    ],
+    "rings": {
+      "inner": [],
+      "mediator": null,
+      "middle": [
+        "E",
+      ],
+      "outer": [
+        "A",
+        "A",
+      ],
+    },
+    "tension": {
+      "notes": [
+        "high tension between rings",
+      ],
+      "score": 1,
+    },
+    "totalVoices": 3,
+    "vector": {
+      "A": 2,
+      "E": 1,
+      "I": 0,
+      "O": 0,
+      "U": 0,
+      "Y": 0,
+      "Ë": 0,
+    },
+  },
+  "mode": "strict",
+  "word": "damage",
+}
+`;
+
+exports[`canon battery v1 (strict) — snapshot lock canon:strict:ekonomi 1`] = `
+{
+  "candidates": [
+    {
+      "decomposition": [
+        "ekonomi",
+      ],
+      "form": "ekonomi",
+      "functional_statement": {
+        "action": "",
+        "instrument": "",
+        "unit": "",
+      },
+      "language": "unknown",
+      "ring_fit": "MIXED",
+      "signals": [],
+      "vowel_path": [
+        "E",
+        "O",
+        "O",
+        "I",
+      ],
+    },
+  ],
+  "engine_meta": {
+    "engineVersion": "v1.0.0",
+  },
+  "language_guess": null,
+  "math7_summary": {
+    "balance": {
+      "notes": [
+        "dominant ring: inner",
+        "strong imbalance between rings",
+      ],
+      "score": 0.33333333333333326,
+    },
+    "dominantVoices": [
+      "O",
+    ],
+    "path": [
+      "E",
+      "O",
+      "O",
+      "I",
+    ],
+    "rings": {
+      "inner": [
+        "I",
+      ],
+      "mediator": "O",
+      "middle": [
+        "E",
+      ],
+      "outer": [],
+    },
+    "tension": {
+      "notes": [
+        "high tension between rings",
+      ],
+      "score": 1,
+    },
+    "totalVoices": 4,
+    "vector": {
+      "A": 0,
+      "E": 1,
+      "I": 1,
+      "O": 2,
+      "U": 0,
+      "Y": 0,
+      "Ë": 0,
+    },
+  },
+  "mode": "strict",
+  "word": "ekonomi",
+}
+`;
+
+exports[`canon battery v1 (strict) — snapshot lock canon:strict:emër 1`] = `
+{
+  "candidates": [
+    {
+      "decomposition": [
+        "emër",
+      ],
+      "form": "emër",
+      "functional_statement": {
+        "action": "",
+        "instrument": "",
+        "unit": "",
+      },
+      "language": "unknown",
+      "ring_fit": "MIXED",
+      "signals": [],
+      "vowel_path": [
+        "E",
+        "Ë",
+      ],
+    },
+  ],
+  "engine_meta": {
+    "engineVersion": "v1.0.0",
+  },
+  "language_guess": null,
+  "math7_summary": {
+    "balance": {
+      "notes": [
+        "dominant ring: middle",
+        "strong imbalance between rings",
+      ],
+      "score": 0.33333333333333326,
+    },
+    "dominantVoices": [
+      "E",
+      "Ë",
+    ],
+    "path": [
+      "E",
+      "Ë",
+    ],
+    "rings": {
+      "inner": [],
+      "mediator": null,
+      "middle": [
+        "E",
+      ],
+      "outer": [
+        "Ë",
+      ],
+    },
+    "tension": {
+      "notes": [
+        "high tension between rings",
+      ],
+      "score": 1,
+    },
+    "totalVoices": 2,
+    "vector": {
+      "A": 0,
+      "E": 1,
+      "I": 0,
+      "O": 0,
+      "U": 0,
+      "Y": 0,
+      "Ë": 1,
+    },
+  },
+  "mode": "strict",
+  "word": "emër",
+}
+`;
+
+exports[`canon battery v1 (strict) — snapshot lock canon:strict:frikë 1`] = `
+{
+  "candidates": [
+    {
+      "decomposition": [
+        "frikë",
+      ],
+      "form": "frikë",
+      "functional_statement": {
+        "action": "",
+        "instrument": "",
+        "unit": "",
+      },
+      "language": "unknown",
+      "ring_fit": "MIXED",
+      "signals": [],
+      "vowel_path": [
+        "I",
+        "Ë",
+      ],
+    },
+  ],
+  "engine_meta": {
+    "engineVersion": "v1.0.0",
+  },
+  "language_guess": null,
+  "math7_summary": {
+    "balance": {
+      "notes": [
+        "dominant ring: inner",
+        "strong imbalance between rings",
+      ],
+      "score": 0.33333333333333326,
+    },
+    "dominantVoices": [
+      "I",
+      "Ë",
+    ],
+    "path": [
+      "I",
+      "Ë",
+    ],
+    "rings": {
+      "inner": [
+        "I",
+      ],
+      "mediator": null,
+      "middle": [],
+      "outer": [
+        "Ë",
+      ],
+    },
+    "tension": {
+      "notes": [
+        "high tension between rings",
+      ],
+      "score": 1,
+    },
+    "totalVoices": 2,
+    "vector": {
+      "A": 0,
+      "E": 0,
+      "I": 1,
+      "O": 0,
+      "U": 0,
+      "Y": 0,
+      "Ë": 1,
+    },
+  },
+  "mode": "strict",
+  "word": "frikë",
+}
+`;
+
+exports[`canon battery v1 (strict) — snapshot lock canon:strict:frymë 1`] = `
+{
+  "candidates": [
+    {
+      "decomposition": [
+        "frymë",
+      ],
+      "form": "frymë",
+      "functional_statement": {
+        "action": "",
+        "instrument": "",
+        "unit": "",
+      },
+      "language": "unknown",
+      "ring_fit": "MIXED",
+      "signals": [],
+      "vowel_path": [
+        "Y",
+        "Ë",
+      ],
+    },
+  ],
+  "engine_meta": {
+    "engineVersion": "v1.0.0",
+  },
+  "language_guess": null,
+  "math7_summary": {
+    "balance": {
+      "notes": [
+        "dominant ring: middle",
+        "strong imbalance between rings",
+      ],
+      "score": 0.33333333333333326,
+    },
+    "dominantVoices": [
+      "Y",
+      "Ë",
+    ],
+    "path": [
+      "Y",
+      "Ë",
+    ],
+    "rings": {
+      "inner": [],
+      "mediator": null,
+      "middle": [
+        "Y",
+      ],
+      "outer": [
+        "Ë",
+      ],
+    },
+    "tension": {
+      "notes": [
+        "high tension between rings",
+      ],
+      "score": 1,
+    },
+    "totalVoices": 2,
+    "vector": {
+      "A": 0,
+      "E": 0,
+      "I": 0,
+      "O": 0,
+      "U": 0,
+      "Y": 1,
+      "Ë": 1,
+    },
+  },
+  "mode": "strict",
+  "word": "frymë",
+}
+`;
+
+exports[`canon battery v1 (strict) — snapshot lock canon:strict:gjak 1`] = `
+{
+  "candidates": [
+    {
+      "decomposition": [
+        "gjak",
+      ],
+      "form": "gjak",
+      "functional_statement": {
+        "action": "",
+        "instrument": "",
+        "unit": "",
+      },
+      "language": "unknown",
+      "ring_fit": "MIXED",
+      "signals": [],
+      "vowel_path": [
+        "A",
+      ],
+    },
+  ],
+  "engine_meta": {
+    "engineVersion": "v1.0.0",
+  },
+  "language_guess": null,
+  "math7_summary": {
+    "balance": {
+      "notes": [
+        "dominant ring: outer",
+        "strong imbalance between rings",
+      ],
+      "score": 0,
+    },
+    "dominantVoices": [
+      "A",
+    ],
+    "path": [
+      "A",
+    ],
+    "rings": {
+      "inner": [],
+      "mediator": null,
+      "middle": [],
+      "outer": [
+        "A",
+      ],
+    },
+    "tension": {
+      "notes": [
+        "high tension between rings",
+      ],
+      "score": 1,
+    },
+    "totalVoices": 1,
+    "vector": {
+      "A": 1,
+      "E": 0,
+      "I": 0,
+      "O": 0,
+      "U": 0,
+      "Y": 0,
+      "Ë": 0,
+    },
+  },
+  "mode": "strict",
+  "word": "gjak",
+}
+`;
+
+exports[`canon battery v1 (strict) — snapshot lock canon:strict:gjallë 1`] = `
+{
+  "candidates": [
+    {
+      "decomposition": [
+        "gjallë",
+      ],
+      "form": "gjallë",
+      "functional_statement": {
+        "action": "",
+        "instrument": "",
+        "unit": "",
+      },
+      "language": "unknown",
+      "ring_fit": "MIXED",
+      "signals": [],
+      "vowel_path": [
+        "A",
+        "Ë",
+      ],
+    },
+  ],
+  "engine_meta": {
+    "engineVersion": "v1.0.0",
+  },
+  "language_guess": null,
+  "math7_summary": {
+    "balance": {
+      "notes": [
+        "dominant ring: outer",
+        "strong imbalance between rings",
+      ],
+      "score": 0,
+    },
+    "dominantVoices": [
+      "A",
+      "Ë",
+    ],
+    "path": [
+      "A",
+      "Ë",
+    ],
+    "rings": {
+      "inner": [],
+      "mediator": null,
+      "middle": [],
+      "outer": [
+        "A",
+        "Ë",
+      ],
+    },
+    "tension": {
+      "notes": [
+        "high tension between rings",
+      ],
+      "score": 1,
+    },
+    "totalVoices": 2,
+    "vector": {
+      "A": 1,
+      "E": 0,
+      "I": 0,
+      "O": 0,
+      "U": 0,
+      "Y": 0,
+      "Ë": 1,
+    },
+  },
+  "mode": "strict",
+  "word": "gjallë",
+}
+`;
+
+exports[`canon battery v1 (strict) — snapshot lock canon:strict:internet 1`] = `
+{
+  "candidates": [
+    {
+      "decomposition": [
+        "internet",
+      ],
+      "form": "internet",
+      "functional_statement": {
+        "action": "",
+        "instrument": "",
+        "unit": "",
+      },
+      "language": "unknown",
+      "ring_fit": "MIXED",
+      "signals": [],
+      "vowel_path": [
+        "I",
+        "E",
+        "E",
+      ],
+    },
+  ],
+  "engine_meta": {
+    "engineVersion": "v1.0.0",
+  },
+  "language_guess": null,
+  "math7_summary": {
+    "balance": {
+      "notes": [
+        "dominant ring: middle",
+        "strong imbalance between rings",
+      ],
+      "score": 0.33333333333333337,
+    },
+    "dominantVoices": [
+      "E",
+    ],
+    "path": [
+      "I",
+      "E",
+      "E",
+    ],
+    "rings": {
+      "inner": [
+        "I",
+      ],
+      "mediator": null,
+      "middle": [
+        "E",
+        "E",
+      ],
+      "outer": [],
+    },
+    "tension": {
+      "notes": [
+        "high tension between rings",
+      ],
+      "score": 1,
+    },
+    "totalVoices": 3,
+    "vector": {
+      "A": 0,
+      "E": 2,
+      "I": 1,
+      "O": 0,
+      "U": 0,
+      "Y": 0,
+      "Ë": 0,
+    },
+  },
+  "mode": "strict",
+  "word": "internet",
+}
+`;
+
+exports[`canon battery v1 (strict) — snapshot lock canon:strict:jetë 1`] = `
+{
+  "candidates": [
+    {
+      "decomposition": [
+        "jetë",
+      ],
+      "form": "jetë",
+      "functional_statement": {
+        "action": "",
+        "instrument": "",
+        "unit": "",
+      },
+      "language": "unknown",
+      "ring_fit": "MIXED",
+      "signals": [],
+      "vowel_path": [
+        "E",
+        "Ë",
+      ],
+    },
+  ],
+  "engine_meta": {
+    "engineVersion": "v1.0.0",
+  },
+  "language_guess": null,
+  "math7_summary": {
+    "balance": {
+      "notes": [
+        "dominant ring: middle",
+        "strong imbalance between rings",
+      ],
+      "score": 0.33333333333333326,
+    },
+    "dominantVoices": [
+      "E",
+      "Ë",
+    ],
+    "path": [
+      "E",
+      "Ë",
+    ],
+    "rings": {
+      "inner": [],
+      "mediator": null,
+      "middle": [
+        "E",
+      ],
+      "outer": [
+        "Ë",
+      ],
+    },
+    "tension": {
+      "notes": [
+        "high tension between rings",
+      ],
+      "score": 1,
+    },
+    "totalVoices": 2,
+    "vector": {
+      "A": 0,
+      "E": 1,
+      "I": 0,
+      "O": 0,
+      "U": 0,
+      "Y": 0,
+      "Ë": 1,
+    },
+  },
+  "mode": "strict",
+  "word": "jetë",
+}
+`;
+
+exports[`canon battery v1 (strict) — snapshot lock canon:strict:kompjuter 1`] = `
+{
+  "candidates": [
+    {
+      "decomposition": [
+        "kompjuter",
+      ],
+      "form": "kompjuter",
+      "functional_statement": {
+        "action": "",
+        "instrument": "",
+        "unit": "",
+      },
+      "language": "unknown",
+      "ring_fit": "MIXED",
+      "signals": [],
+      "vowel_path": [
+        "O",
+        "U",
+        "E",
+      ],
+    },
+  ],
+  "engine_meta": {
+    "engineVersion": "v1.0.0",
+  },
+  "language_guess": null,
+  "math7_summary": {
+    "balance": {
+      "notes": [
+        "dominant ring: inner",
+        "strong imbalance between rings",
+      ],
+      "score": 0.33333333333333326,
+    },
+    "dominantVoices": [
+      "E",
+      "O",
+      "U",
+    ],
+    "path": [
+      "O",
+      "U",
+      "E",
+    ],
+    "rings": {
+      "inner": [
+        "U",
+      ],
+      "mediator": "O",
+      "middle": [
+        "E",
+      ],
+      "outer": [],
+    },
+    "tension": {
+      "notes": [
+        "high tension between rings",
+      ],
+      "score": 1,
+    },
+    "totalVoices": 3,
+    "vector": {
+      "A": 0,
+      "E": 1,
+      "I": 0,
+      "O": 1,
+      "U": 1,
+      "Y": 0,
+      "Ë": 0,
+    },
+  },
+  "mode": "strict",
+  "word": "kompjuter",
+}
+`;
+
+exports[`canon battery v1 (strict) — snapshot lock canon:strict:kriptomonedhë 1`] = `
+{
+  "candidates": [
+    {
+      "decomposition": [
+        "kriptomonedhë",
+      ],
+      "form": "kriptomonedhë",
+      "functional_statement": {
+        "action": "",
+        "instrument": "",
+        "unit": "",
+      },
+      "language": "unknown",
+      "ring_fit": "MIXED",
+      "signals": [],
+      "vowel_path": [
+        "I",
+        "O",
+        "O",
+        "E",
+        "Ë",
+      ],
+    },
+  ],
+  "engine_meta": {
+    "engineVersion": "v1.0.0",
+  },
+  "language_guess": null,
+  "math7_summary": {
+    "balance": {
+      "notes": [
+        "dominant ring: inner",
+        "overall balanced",
+      ],
+      "score": 1,
+    },
+    "dominantVoices": [
+      "O",
+    ],
+    "path": [
+      "I",
+      "O",
+      "O",
+      "E",
+      "Ë",
+    ],
+    "rings": {
+      "inner": [
+        "I",
+      ],
+      "mediator": "O",
+      "middle": [
+        "E",
+      ],
+      "outer": [
+        "Ë",
+      ],
+    },
+    "tension": {
+      "notes": [
+        "low tension",
+      ],
+      "score": 0,
+    },
+    "totalVoices": 5,
+    "vector": {
+      "A": 0,
+      "E": 1,
+      "I": 1,
+      "O": 2,
+      "U": 0,
+      "Y": 0,
+      "Ë": 1,
+    },
+  },
+  "mode": "strict",
+  "word": "kriptomonedhë",
+}
+`;
+
+exports[`canon battery v1 (strict) — snapshot lock canon:strict:kulturë 1`] = `
+{
+  "candidates": [
+    {
+      "decomposition": [
+        "kulturë",
+      ],
+      "form": "kulturë",
+      "functional_statement": {
+        "action": "",
+        "instrument": "",
+        "unit": "",
+      },
+      "language": "unknown",
+      "ring_fit": "MIXED",
+      "signals": [],
+      "vowel_path": [
+        "U",
+        "U",
+        "Ë",
+      ],
+    },
+  ],
+  "engine_meta": {
+    "engineVersion": "v1.0.0",
+  },
+  "language_guess": null,
+  "math7_summary": {
+    "balance": {
+      "notes": [
+        "dominant ring: inner",
+        "strong imbalance between rings",
+      ],
+      "score": 0.33333333333333337,
+    },
+    "dominantVoices": [
+      "U",
+    ],
+    "path": [
+      "U",
+      "U",
+      "Ë",
+    ],
+    "rings": {
+      "inner": [
+        "U",
+        "U",
+      ],
+      "mediator": null,
+      "middle": [],
+      "outer": [
+        "Ë",
+      ],
+    },
+    "tension": {
+      "notes": [
+        "high tension between rings",
+      ],
+      "score": 1,
+    },
+    "totalVoices": 3,
+    "vector": {
+      "A": 0,
+      "E": 0,
+      "I": 0,
+      "O": 0,
+      "U": 2,
+      "Y": 0,
+      "Ë": 1,
+    },
+  },
+  "mode": "strict",
+  "word": "kulturë",
+}
+`;
+
+exports[`canon battery v1 (strict) — snapshot lock canon:strict:ligj 1`] = `
+{
+  "candidates": [
+    {
+      "decomposition": [
+        "ligj",
+      ],
+      "form": "ligj",
+      "functional_statement": {
+        "action": "",
+        "instrument": "",
+        "unit": "",
+      },
+      "language": "unknown",
+      "ring_fit": "MIXED",
+      "signals": [],
+      "vowel_path": [
+        "I",
+      ],
+    },
+  ],
+  "engine_meta": {
+    "engineVersion": "v1.0.0",
+  },
+  "language_guess": null,
+  "math7_summary": {
+    "balance": {
+      "notes": [
+        "dominant ring: inner",
+        "strong imbalance between rings",
+      ],
+      "score": 0,
+    },
+    "dominantVoices": [
+      "I",
+    ],
+    "path": [
+      "I",
+    ],
+    "rings": {
+      "inner": [
+        "I",
+      ],
+      "mediator": null,
+      "middle": [],
+      "outer": [],
+    },
+    "tension": {
+      "notes": [
+        "high tension between rings",
+      ],
+      "score": 1,
+    },
+    "totalVoices": 1,
+    "vector": {
+      "A": 0,
+      "E": 0,
+      "I": 1,
+      "O": 0,
+      "U": 0,
+      "Y": 0,
+      "Ë": 0,
+    },
+  },
+  "mode": "strict",
+  "word": "ligj",
+}
+`;
+
+exports[`canon battery v1 (strict) — snapshot lock canon:strict:shoqëri 1`] = `
+{
+  "candidates": [
+    {
+      "decomposition": [
+        "shoqëri",
+      ],
+      "form": "shoqëri",
+      "functional_statement": {
+        "action": "",
+        "instrument": "",
+        "unit": "",
+      },
+      "language": "unknown",
+      "ring_fit": "MIXED",
+      "signals": [],
+      "vowel_path": [
+        "O",
+        "Ë",
+        "I",
+      ],
+    },
+  ],
+  "engine_meta": {
+    "engineVersion": "v1.0.0",
+  },
+  "language_guess": null,
+  "math7_summary": {
+    "balance": {
+      "notes": [
+        "dominant ring: inner",
+        "strong imbalance between rings",
+      ],
+      "score": 0.33333333333333326,
+    },
+    "dominantVoices": [
+      "I",
+      "O",
+      "Ë",
+    ],
+    "path": [
+      "O",
+      "Ë",
+      "I",
+    ],
+    "rings": {
+      "inner": [
+        "I",
+      ],
+      "mediator": "O",
+      "middle": [],
+      "outer": [
+        "Ë",
+      ],
+    },
+    "tension": {
+      "notes": [
+        "high tension between rings",
+      ],
+      "score": 1,
+    },
+    "totalVoices": 3,
+    "vector": {
+      "A": 0,
+      "E": 0,
+      "I": 1,
+      "O": 1,
+      "U": 0,
+      "Y": 0,
+      "Ë": 1,
+    },
+  },
+  "mode": "strict",
+  "word": "shoqëri",
+}
+`;
+
+exports[`canon battery v1 (strict) — snapshot lock canon:strict:shpirt 1`] = `
+{
+  "candidates": [
+    {
+      "decomposition": [
+        "shpirt",
+      ],
+      "form": "shpirt",
+      "functional_statement": {
+        "action": "",
+        "instrument": "",
+        "unit": "",
+      },
+      "language": "unknown",
+      "ring_fit": "MIXED",
+      "signals": [],
+      "vowel_path": [
+        "I",
+      ],
+    },
+  ],
+  "engine_meta": {
+    "engineVersion": "v1.0.0",
+  },
+  "language_guess": null,
+  "math7_summary": {
+    "balance": {
+      "notes": [
+        "dominant ring: inner",
+        "strong imbalance between rings",
+      ],
+      "score": 0,
+    },
+    "dominantVoices": [
+      "I",
+    ],
+    "path": [
+      "I",
+    ],
+    "rings": {
+      "inner": [
+        "I",
+      ],
+      "mediator": null,
+      "middle": [],
+      "outer": [],
+    },
+    "tension": {
+      "notes": [
+        "high tension between rings",
+      ],
+      "score": 1,
+    },
+    "totalVoices": 1,
+    "vector": {
+      "A": 0,
+      "E": 0,
+      "I": 1,
+      "O": 0,
+      "U": 0,
+      "Y": 0,
+      "Ë": 0,
+    },
+  },
+  "mode": "strict",
+  "word": "shpirt",
+}
+`;
+
+exports[`canon battery v1 (strict) — snapshot lock canon:strict:sistem 1`] = `
+{
+  "candidates": [
+    {
+      "decomposition": [
+        "sistem",
+      ],
+      "form": "sistem",
+      "functional_statement": {
+        "action": "",
+        "instrument": "",
+        "unit": "",
+      },
+      "language": "unknown",
+      "ring_fit": "MIXED",
+      "signals": [],
+      "vowel_path": [
+        "I",
+        "E",
+      ],
+    },
+  ],
+  "engine_meta": {
+    "engineVersion": "v1.0.0",
+  },
+  "language_guess": null,
+  "math7_summary": {
+    "balance": {
+      "notes": [
+        "dominant ring: inner",
+        "strong imbalance between rings",
+      ],
+      "score": 0.33333333333333326,
+    },
+    "dominantVoices": [
+      "E",
+      "I",
+    ],
+    "path": [
+      "I",
+      "E",
+    ],
+    "rings": {
+      "inner": [
+        "I",
+      ],
+      "mediator": null,
+      "middle": [
+        "E",
+      ],
+      "outer": [],
+    },
+    "tension": {
+      "notes": [
+        "high tension between rings",
+      ],
+      "score": 1,
+    },
+    "totalVoices": 2,
+    "vector": {
+      "A": 0,
+      "E": 1,
+      "I": 1,
+      "O": 0,
+      "U": 0,
+      "Y": 0,
+      "Ë": 0,
+    },
+  },
+  "mode": "strict",
+  "word": "sistem",
+}
+`;
+
+exports[`canon battery v1 (strict) — snapshot lock canon:strict:study 1`] = `
+{
+  "candidates": [
+    {
+      "decomposition": [
+        "study",
+      ],
+      "form": "study",
+      "functional_statement": {
+        "action": "",
+        "instrument": "",
+        "unit": "",
+      },
+      "language": "unknown",
+      "ring_fit": "MIXED",
+      "signals": [],
+      "vowel_path": [
+        "U",
+        "Y",
+      ],
+    },
+  ],
+  "engine_meta": {
+    "engineVersion": "v1.0.0",
+  },
+  "language_guess": null,
+  "math7_summary": {
+    "balance": {
+      "notes": [
+        "dominant ring: inner",
+        "strong imbalance between rings",
+      ],
+      "score": 0.33333333333333326,
+    },
+    "dominantVoices": [
+      "U",
+      "Y",
+    ],
+    "path": [
+      "U",
+      "Y",
+    ],
+    "rings": {
+      "inner": [
+        "U",
+      ],
+      "mediator": null,
+      "middle": [
+        "Y",
+      ],
+      "outer": [],
+    },
+    "tension": {
+      "notes": [
+        "high tension between rings",
+      ],
+      "score": 1,
+    },
+    "totalVoices": 2,
+    "vector": {
+      "A": 0,
+      "E": 0,
+      "I": 0,
+      "O": 0,
+      "U": 1,
+      "Y": 1,
+      "Ë": 0,
+    },
+  },
+  "mode": "strict",
+  "word": "study",
+}
+`;
+
+exports[`canon battery v1 (strict) — snapshot lock canon:strict:telefon 1`] = `
+{
+  "candidates": [
+    {
+      "decomposition": [
+        "telefon",
+      ],
+      "form": "telefon",
+      "functional_statement": {
+        "action": "",
+        "instrument": "",
+        "unit": "",
+      },
+      "language": "unknown",
+      "ring_fit": "MIXED",
+      "signals": [],
+      "vowel_path": [
+        "E",
+        "E",
+        "O",
+      ],
+    },
+  ],
+  "engine_meta": {
+    "engineVersion": "v1.0.0",
+  },
+  "language_guess": null,
+  "math7_summary": {
+    "balance": {
+      "notes": [
+        "dominant ring: middle",
+        "strong imbalance between rings",
+      ],
+      "score": 0,
+    },
+    "dominantVoices": [
+      "E",
+    ],
+    "path": [
+      "E",
+      "E",
+      "O",
+    ],
+    "rings": {
+      "inner": [],
+      "mediator": "O",
+      "middle": [
+        "E",
+        "E",
+      ],
+      "outer": [],
+    },
+    "tension": {
+      "notes": [
+        "high tension between rings",
+      ],
+      "score": 1,
+    },
+    "totalVoices": 3,
+    "vector": {
+      "A": 0,
+      "E": 2,
+      "I": 0,
+      "O": 1,
+      "U": 0,
+      "Y": 0,
+      "Ë": 0,
+    },
+  },
+  "mode": "strict",
+  "word": "telefon",
+}
+`;
+
+exports[`canon battery v1 (strict) — snapshot lock canon:strict:trup 1`] = `
+{
+  "candidates": [
+    {
+      "decomposition": [
+        "trup",
+      ],
+      "form": "trup",
+      "functional_statement": {
+        "action": "",
+        "instrument": "",
+        "unit": "",
+      },
+      "language": "unknown",
+      "ring_fit": "MIXED",
+      "signals": [],
+      "vowel_path": [
+        "U",
+      ],
+    },
+  ],
+  "engine_meta": {
+    "engineVersion": "v1.0.0",
+  },
+  "language_guess": null,
+  "math7_summary": {
+    "balance": {
+      "notes": [
+        "dominant ring: inner",
+        "strong imbalance between rings",
+      ],
+      "score": 0,
+    },
+    "dominantVoices": [
+      "U",
+    ],
+    "path": [
+      "U",
+    ],
+    "rings": {
+      "inner": [
+        "U",
+      ],
+      "mediator": null,
+      "middle": [],
+      "outer": [],
+    },
+    "tension": {
+      "notes": [
+        "high tension between rings",
+      ],
+      "score": 1,
+    },
+    "totalVoices": 1,
+    "vector": {
+      "A": 0,
+      "E": 0,
+      "I": 0,
+      "O": 0,
+      "U": 1,
+      "Y": 0,
+      "Ë": 0,
+    },
+  },
+  "mode": "strict",
+  "word": "trup",
+}
+`;
+
+exports[`canon battery v1 (strict) — snapshot lock canon:strict:zemër 1`] = `
+{
+  "candidates": [
+    {
+      "decomposition": [
+        "zemër",
+      ],
+      "form": "zemër",
+      "functional_statement": {
+        "action": "",
+        "instrument": "",
+        "unit": "",
+      },
+      "language": "unknown",
+      "ring_fit": "MIXED",
+      "signals": [],
+      "vowel_path": [
+        "E",
+        "Ë",
+      ],
+    },
+  ],
+  "engine_meta": {
+    "engineVersion": "v1.0.0",
+  },
+  "language_guess": null,
+  "math7_summary": {
+    "balance": {
+      "notes": [
+        "dominant ring: middle",
+        "strong imbalance between rings",
+      ],
+      "score": 0.33333333333333326,
+    },
+    "dominantVoices": [
+      "E",
+      "Ë",
+    ],
+    "path": [
+      "E",
+      "Ë",
+    ],
+    "rings": {
+      "inner": [],
+      "mediator": null,
+      "middle": [
+        "E",
+      ],
+      "outer": [
+        "Ë",
+      ],
+    },
+    "tension": {
+      "notes": [
+        "high tension between rings",
+      ],
+      "score": 1,
+    },
+    "totalVoices": 2,
+    "vector": {
+      "A": 0,
+      "E": 1,
+      "I": 0,
+      "O": 0,
+      "U": 0,
+      "Y": 0,
+      "Ë": 1,
+    },
+  },
+  "mode": "strict",
+  "word": "zemër",
+}
+`;
