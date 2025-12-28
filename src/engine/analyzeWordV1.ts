@@ -6,6 +6,7 @@ import { detectMediatorAxisPair } from "./patterns/mediatorAxisPair";
 import { decisionGeometryForWord, type DecisionGeometryTag } from "../shared/decisionGeometry.v1";
 import { trustGeometryForWord, type TrustGeometryTag } from "../shared/trustGeometry.v1";
 import { oEdgePolarityForWord, type OEdgePolarityTag } from "../shared/oEdgePolarity.v1";
+import { sClusterVisionForWord, type SClusterTag } from "../shared/sClusterVision.v1";
 
 export type EngineMode = "strict" | "open";
 
@@ -97,7 +98,7 @@ export async function analyzeWordV1(
   }
 
   return {
-    word: input,
+word: input,
     mode,
     language_guess: null,
     candidates,
@@ -106,5 +107,6 @@ export async function analyzeWordV1(
       engineVersion: ENGINE_VERSION,
       timestampIso: new Date().toISOString(),
     },
+    s_cluster_vision: sClusterVisionForWord(word),
   };
 }
