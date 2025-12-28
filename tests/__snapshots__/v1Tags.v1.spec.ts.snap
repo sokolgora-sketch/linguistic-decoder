@@ -1,0 +1,28 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`v1Tags v1 — buildV1Tags detects Z cluster where applicable 1`] = `
+{
+  "o_edge_polarity": null,
+  "s_cluster_vision": {
+    "cluster": "Z",
+    "vision": "VIBRATION",
+  },
+}
+`;
+
+exports[`v1Tags v1 — buildV1Tags returns both tags (stable shape) 1`] = `
+{
+  "o_edge_polarity": null,
+  "s_cluster_vision": {
+    "cluster": "ST",
+    "vision": "PRESSURE",
+  },
+}
+`;
+
+exports[`v1Tags v1 — buildV1Tags returns nulls when no cluster applies 1`] = `
+{
+  "o_edge_polarity": null,
+  "s_cluster_vision": null,
+}
+`;
