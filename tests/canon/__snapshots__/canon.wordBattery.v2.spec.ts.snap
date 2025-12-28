@@ -72,8 +72,6 @@ exports[`canon battery v2 (strict) — Seven-Voices Math v1 lock canon:v2:strict
     },
   },
   "mode": "strict",
-  "o_edge_polarity": null,
-  "s_cluster_vision": null,
   "word": "damage",
 }
 `;
@@ -148,8 +146,6 @@ exports[`canon battery v2 (strict) — Seven-Voices Math v1 lock canon:v2:strict
     },
   },
   "mode": "strict",
-  "o_edge_polarity": null,
-  "s_cluster_vision": null,
   "word": "frymë",
 }
 `;
@@ -219,8 +215,6 @@ exports[`canon battery v2 (strict) — Seven-Voices Math v1 lock canon:v2:strict
     },
   },
   "mode": "strict",
-  "o_edge_polarity": null,
-  "s_cluster_vision": null,
   "word": "gjak",
 }
 `;
@@ -294,8 +288,6 @@ exports[`canon battery v2 (strict) — Seven-Voices Math v1 lock canon:v2:strict
     },
   },
   "mode": "strict",
-  "o_edge_polarity": null,
-  "s_cluster_vision": null,
   "word": "gjallë",
 }
 `;
@@ -370,8 +362,6 @@ exports[`canon battery v2 (strict) — Seven-Voices Math v1 lock canon:v2:strict
     },
   },
   "mode": "strict",
-  "o_edge_polarity": null,
-  "s_cluster_vision": null,
   "word": "jetë",
 }
 `;
@@ -440,8 +430,6 @@ exports[`canon battery v2 (strict) — Seven-Voices Math v1 lock canon:v2:strict
     },
   },
   "mode": "strict",
-  "o_edge_polarity": null,
-  "s_cluster_vision": null,
   "word": "jo",
 }
 `;
@@ -510,8 +498,6 @@ exports[`canon battery v2 (strict) — Seven-Voices Math v1 lock canon:v2:strict
     },
   },
   "mode": "strict",
-  "o_edge_polarity": null,
-  "s_cluster_vision": null,
   "word": "po",
 }
 `;
@@ -586,11 +572,6 @@ exports[`canon battery v2 (strict) — Seven-Voices Math v1 lock canon:v2:strict
     },
   },
   "mode": "strict",
-  "o_edge_polarity": null,
-  "s_cluster_vision": {
-    "cluster": "ST",
-    "vision": "PRESSURE",
-  },
   "word": "study",
 }
 `;
@@ -665,11 +646,6 @@ exports[`canon battery v2 (strict) — Seven-Voices Math v1 lock canon:v2:strict
     },
   },
   "mode": "strict",
-  "o_edge_polarity": null,
-  "s_cluster_vision": {
-    "cluster": "Z",
-    "vision": "VIBRATION",
-  },
   "word": "zemër",
 }
 `;

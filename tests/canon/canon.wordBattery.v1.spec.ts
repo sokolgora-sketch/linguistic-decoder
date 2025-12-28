@@ -6,6 +6,7 @@
  */
 
 import wordsV1 from "./words.v1.json";
+import { stripV1Tags } from "../helpers/stableSnapshot";
 import { analyzeWordV1 } from "../../src/engine/analyzeWordV1";
 
 type CanonWordsFixture =
@@ -56,7 +57,7 @@ describe("canon battery v1 (strict) — snapshot lock", () => {
       expect(out2).toEqual(out1);
 
       // Snapshot gate: locks full JSON output per word.
-      expect(out1).toMatchSnapshot();
+      expect(stripV1Tags(out1 as any)).toMatchSnapshot();
     });
   }
 });

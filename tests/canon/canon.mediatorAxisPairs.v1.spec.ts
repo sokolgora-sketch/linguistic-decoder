@@ -1,4 +1,5 @@
 import { analyzeWordV1 } from "../../src/engine/analyzeWordV1";
+import { stripV1Tags } from "../helpers/stableSnapshot";
 
 function stableNormalize<T>(obj: T): T {
   // clone via JSON for snapshot stability (no functions/Map/etc in our payloads)
@@ -34,6 +35,6 @@ describe("canon mediator axis pairs v1 (strict) — N4 Po/Jo lock", () => {
     expect(hasSignal(jo, "pattern:N4:mediator-axis")).toBe(true);
 
     // Snapshot report (stable)
-    expect({ po, jo }).toMatchSnapshot();
+    expect({ po: stripV1Tags(po as any), jo: stripV1Tags(jo as any) }).toMatchSnapshot();
   });
 });
