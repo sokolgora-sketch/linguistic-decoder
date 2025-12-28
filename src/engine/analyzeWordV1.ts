@@ -5,6 +5,7 @@ import { generateCandidates } from "./wordCandidates";
 import { detectMediatorAxisPair } from "./patterns/mediatorAxisPair";
 import { decisionGeometryForWord, type DecisionGeometryTag } from "../shared/decisionGeometry.v1";
 import { trustGeometryForWord, type TrustGeometryTag } from "../shared/trustGeometry.v1";
+import { oEdgePolarityForWord, type OEdgePolarityTag } from "../shared/oEdgePolarity.v1";
 
 export type EngineMode = "strict" | "open";
 
@@ -41,6 +42,8 @@ export type AnalysisResult = {
   trust_geometry,
     engine_meta: EngineMeta;
   decision_geometry?: DecisionGeometryTag | null;
+
+  o_edge_polarity: OEdgePolarityTag | null;
 };
 
 const ENGINE_VERSION = "v1.0.0";
