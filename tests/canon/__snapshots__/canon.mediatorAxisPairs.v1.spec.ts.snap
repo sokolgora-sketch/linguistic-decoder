@@ -65,6 +65,7 @@ exports[`canon mediator axis pairs v1 (strict) — N4 Po/Jo lock po and jo both 
       },
     },
     "mode": "strict",
+    "s_cluster_vision": null,
     "word": "jo",
   },
   "po": {
@@ -130,6 +131,7 @@ exports[`canon mediator axis pairs v1 (strict) — N4 Po/Jo lock po and jo both 
       },
     },
     "mode": "strict",
+    "s_cluster_vision": null,
     "word": "po",
   },
 }
