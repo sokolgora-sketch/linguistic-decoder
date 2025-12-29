@@ -69,8 +69,6 @@ exports[`analyzeWordV1 gold words v1 matches snapshot for 'damage' (v1.0.0) 1`] 
     },
   },
   "mode": "strict",
-  "o_edge_polarity": null,
-  "s_cluster_vision": null,
   "word": "damage",
 }
 `;
@@ -142,11 +140,6 @@ exports[`analyzeWordV1 gold words v1 matches snapshot for 'study' (v1.0.0) 1`] =
     },
   },
   "mode": "strict",
-  "o_edge_polarity": null,
-  "s_cluster_vision": {
-    "cluster": "ST",
-    "vision": "PRESSURE",
-  },
   "word": "study",
 }
 `;

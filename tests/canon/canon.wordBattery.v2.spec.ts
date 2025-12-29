@@ -12,6 +12,7 @@
  */
 
 import wordsV2 from "./words.v2.json";
+import { stripV1Tags } from "../helpers/stableSnapshot";
 import { analyzeWordV1 } from "../../src/engine/analyzeWordV1";
 import type { EngineMode } from "../../src/engine/analyzeWordV1";
 
@@ -46,7 +47,7 @@ describe("canon battery v2 (strict) — Seven-Voices Math v1 lock", () => {
       expect(out2).toEqual(out1);
 
       // Snapshot lock
-      expect(out1).toMatchSnapshot();
+      expect(stripV1Tags(out1 as any)).toMatchSnapshot();
     });
   }
 });

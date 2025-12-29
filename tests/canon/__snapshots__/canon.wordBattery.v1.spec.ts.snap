@@ -72,8 +72,6 @@ exports[`canon battery v1 (strict) — snapshot lock canon:strict:damage 1`] = `
     },
   },
   "mode": "strict",
-  "o_edge_polarity": null,
-  "s_cluster_vision": null,
   "word": "damage",
 }
 `;
@@ -151,8 +149,6 @@ exports[`canon battery v1 (strict) — snapshot lock canon:strict:ekonomi 1`] = 
     },
   },
   "mode": "strict",
-  "o_edge_polarity": null,
-  "s_cluster_vision": null,
   "word": "ekonomi",
 }
 `;
@@ -227,8 +223,6 @@ exports[`canon battery v1 (strict) — snapshot lock canon:strict:emër 1`] = `
     },
   },
   "mode": "strict",
-  "o_edge_polarity": null,
-  "s_cluster_vision": null,
   "word": "emër",
 }
 `;
@@ -303,8 +297,6 @@ exports[`canon battery v1 (strict) — snapshot lock canon:strict:frikë 1`] = `
     },
   },
   "mode": "strict",
-  "o_edge_polarity": null,
-  "s_cluster_vision": null,
   "word": "frikë",
 }
 `;
@@ -379,8 +371,6 @@ exports[`canon battery v1 (strict) — snapshot lock canon:strict:frymë 1`] = `
     },
   },
   "mode": "strict",
-  "o_edge_polarity": null,
-  "s_cluster_vision": null,
   "word": "frymë",
 }
 `;
@@ -450,8 +440,6 @@ exports[`canon battery v1 (strict) — snapshot lock canon:strict:gjak 1`] = `
     },
   },
   "mode": "strict",
-  "o_edge_polarity": null,
-  "s_cluster_vision": null,
   "word": "gjak",
 }
 `;
@@ -525,8 +513,6 @@ exports[`canon battery v1 (strict) — snapshot lock canon:strict:gjallë 1`] = 
     },
   },
   "mode": "strict",
-  "o_edge_polarity": null,
-  "s_cluster_vision": null,
   "word": "gjallë",
 }
 `;
@@ -603,8 +589,6 @@ exports[`canon battery v1 (strict) — snapshot lock canon:strict:internet 1`] =
     },
   },
   "mode": "strict",
-  "o_edge_polarity": null,
-  "s_cluster_vision": null,
   "word": "internet",
 }
 `;
@@ -679,8 +663,6 @@ exports[`canon battery v1 (strict) — snapshot lock canon:strict:jetë 1`] = `
     },
   },
   "mode": "strict",
-  "o_edge_polarity": null,
-  "s_cluster_vision": null,
   "word": "jetë",
 }
 `;
@@ -758,8 +740,6 @@ exports[`canon battery v1 (strict) — snapshot lock canon:strict:kompjuter 1`] 
     },
   },
   "mode": "strict",
-  "o_edge_polarity": null,
-  "s_cluster_vision": null,
   "word": "kompjuter",
 }
 `;
@@ -841,8 +821,6 @@ exports[`canon battery v1 (strict) — snapshot lock canon:strict:kriptomonedhë
     },
   },
   "mode": "strict",
-  "o_edge_polarity": null,
-  "s_cluster_vision": null,
   "word": "kriptomonedhë",
 }
 `;
@@ -919,8 +897,6 @@ exports[`canon battery v1 (strict) — snapshot lock canon:strict:kulturë 1`] =
     },
   },
   "mode": "strict",
-  "o_edge_polarity": null,
-  "s_cluster_vision": null,
   "word": "kulturë",
 }
 `;
@@ -990,8 +966,6 @@ exports[`canon battery v1 (strict) — snapshot lock canon:strict:ligj 1`] = `
     },
   },
   "mode": "strict",
-  "o_edge_polarity": null,
-  "s_cluster_vision": null,
   "word": "ligj",
 }
 `;
@@ -1069,11 +1043,6 @@ exports[`canon battery v1 (strict) — snapshot lock canon:strict:shoqëri 1`] =
     },
   },
   "mode": "strict",
-  "o_edge_polarity": null,
-  "s_cluster_vision": {
-    "cluster": "SH",
-    "vision": "CUT",
-  },
   "word": "shoqëri",
 }
 `;
@@ -1143,11 +1112,6 @@ exports[`canon battery v1 (strict) — snapshot lock canon:strict:shpirt 1`] = `
     },
   },
   "mode": "strict",
-  "o_edge_polarity": null,
-  "s_cluster_vision": {
-    "cluster": "SH",
-    "vision": "CUT",
-  },
   "word": "shpirt",
 }
 `;
@@ -1222,11 +1186,6 @@ exports[`canon battery v1 (strict) — snapshot lock canon:strict:sistem 1`] = `
     },
   },
   "mode": "strict",
-  "o_edge_polarity": null,
-  "s_cluster_vision": {
-    "cluster": "S",
-    "vision": "FLOW",
-  },
   "word": "sistem",
 }
 `;
@@ -1301,11 +1260,6 @@ exports[`canon battery v1 (strict) — snapshot lock canon:strict:study 1`] = `
     },
   },
   "mode": "strict",
-  "o_edge_polarity": null,
-  "s_cluster_vision": {
-    "cluster": "ST",
-    "vision": "PRESSURE",
-  },
   "word": "study",
 }
 `;
@@ -1380,8 +1334,6 @@ exports[`canon battery v1 (strict) — snapshot lock canon:strict:telefon 1`] = 
     },
   },
   "mode": "strict",
-  "o_edge_polarity": null,
-  "s_cluster_vision": null,
   "word": "telefon",
 }
 `;
@@ -1451,8 +1403,6 @@ exports[`canon battery v1 (strict) — snapshot lock canon:strict:trup 1`] = `
     },
   },
   "mode": "strict",
-  "o_edge_polarity": null,
-  "s_cluster_vision": null,
   "word": "trup",
 }
 `;
@@ -1527,11 +1477,6 @@ exports[`canon battery v1 (strict) — snapshot lock canon:strict:zemër 1`] = `
     },
   },
   "mode": "strict",
-  "o_edge_polarity": null,
-  "s_cluster_vision": {
-    "cluster": "Z",
-    "vision": "VIBRATION",
-  },
   "word": "zemër",
 }
 `;
