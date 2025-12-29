@@ -6,6 +6,7 @@ import { analyzeMind, analyzeConsonants, analyzeSymbolic } from "@/engine/mindAn
 import { CANON_CANDIDATES } from "./canonCandidates";
 import { buildWordMatrix } from "./wordMatrix.v1";
 import { buildDeepRootSummaryV1 } from './deepRoot.v1';
+import { buildDeepRootOutputV1 } from "./deepRoot.output.v1";
 
 export function enginePayloadToAnalysisResult(payload: EnginePayload): AnalyzeWordResultV1 {
   const sanitized =
@@ -104,7 +105,23 @@ function buildMindCandidates(payload: EnginePayload): Candidate[] {
 }
 
 function buildDeepRoot(payload: any) {
-  return buildDeepRootSummaryV1({word: payload.word}) ?? undefined;
+  const basis =
+    (payload as any).sanitized ??
+    (payload as any).sanitizedWord ??
+    (payload as any).normalizedWord ??
+    String(payload.word ?? "").trim().toLowerCase();
+
+  // DR4: DeepRoot minimal roots output (optional)
+  const out = buildDeepRootOutputV1({
+    basis,
+    mode: String(payload.mode ?? "strict"),
+    allowSSh: true,
+    langAllowList: ["sq"],
+    maxHypotheses: 25,
+  });
+
+  // Keep legacy (if it exists) as fallback — but prefer minroots output.
+  return out ?? (buildDeepRootSummaryV1({ word: payload.word }) ?? undefined);
 }
 
 // --- Legacy helper: convert whatever we stored into EnginePayload shape ---
