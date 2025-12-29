@@ -1,0 +1,27 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Public contract v1 — JSON shape lock (no ad-hoc fields) locks top-level keys for a representative strict run (study) 1`] = `
+[
+  "candidates",
+  "engine_meta",
+  "language_guess",
+  "math7_summary",
+  "mode",
+  "o_edge_polarity",
+  "s_cluster_vision",
+  "word",
+]
+`;
+
+exports[`Public contract v1 — JSON shape lock (no ad-hoc fields) locks top-level keys for a second word (damage) 1`] = `
+[
+  "candidates",
+  "engine_meta",
+  "language_guess",
+  "math7_summary",
+  "mode",
+  "o_edge_polarity",
+  "s_cluster_vision",
+  "word",
+]
+`;
