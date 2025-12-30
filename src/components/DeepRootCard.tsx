@@ -21,9 +21,21 @@ type HypothesisLike = {
   opsCount?: number;
 };
 
+type FunctionalRootHypothesisLike = {
+  id: string;
+  language: string;
+  surfaceForms?: string[];
+  roots: string[];
+  gloss: string;
+  opsUsed?: string[];
+  vowelPath: string;
+  notes?: string[];
+};
+
 type DeepRootLike = {
   hypotheses?: HypothesisLike[];
   candidates?: HypothesisLike[];
+  functionalRoots?: FunctionalRootHypothesisLike[];
 };
 
 function pickRows(deepRoot?: DeepRootLike | null): HypothesisLike[] {
@@ -44,7 +56,9 @@ function boolTag(label: string, value: unknown) {
 
 export default function DeepRootCard({ deepRoot }: { deepRoot?: DeepRootLike | null }) {
   const rows = pickRows(deepRoot);
-  if (rows.length === 0) return null;
+  const functional = Array.isArray(deepRoot?.functionalRoots) ? deepRoot!.functionalRoots! : [];
+
+  if (rows.length === 0 && functional.length === 0) return null;
 
   return (
     <Card className="border-white/10 bg-zinc-950/30">
@@ -158,6 +172,53 @@ export default function DeepRootCard({ deepRoot }: { deepRoot?: DeepRootLike | n
             </div>
           );
         })}
+
+        {functional.length > 0 ? (
+          <div className="rounded-lg border border-white/10 bg-black/20 p-3">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="font-semibold">Functional Roots</span>
+              <span className="font-mono text-xs opacity-70">
+                micro-root hypotheses (no winner)
+              </span>
+            </div>
+
+            <div className="mt-3 space-y-2">
+              {functional.map((f, i) => {
+                const roots = (f.roots ?? []).filter(Boolean).join(" + ");
+                const lang = f.language ?? "";
+                const vp = f.vowelPath ?? "";
+
+                return (
+                  <div
+                    key={f.id || `functional-${i}`}
+                    className="rounded-md border border-white/10 bg-black/10 p-2"
+                    data-testid={`deeproot-functional-${i + 1}`}
+                  >
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="font-semibold">{roots || f.id}</span>
+                      {lang ? (
+                        <span className="font-mono text-xs opacity-70">({lang})</span>
+                      ) : null}
+                      {vp ? (
+                        <span className="font-mono text-xs opacity-70">vowelPath:{vp}</span>
+                      ) : null}
+                    </div>
+
+                    {f.gloss ? <div className="mt-1 text-sm">{f.gloss}</div> : null}
+
+                    {Array.isArray(f.notes) && f.notes.length > 0 ? (
+                      <ul className="mt-2 list-disc pl-5 text-xs opacity-80">
+                        {f.notes.slice(0, 6).map((n, j) => (
+                          <li key={j}>{n}</li>
+                        ))}
+                      </ul>
+                    ) : null}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        ) : null}
       </CardContent>
     </Card>
   );
