@@ -11,11 +11,18 @@
  *
  * v1.1 addition:
  * - rootFamilies?: RootFamilyV1[] (optional, non-breaking)
+ *
+ * v1.2 addition (this change):
+ * - functionalRoots?: FunctionalRootHypothesisV1[] (optional, conservative)
  */
 
 import type { DeepRootMinRootsV1 } from "./deepRoot.minRoots.v1";
 import type { RootFamilyV1 } from "./rootFamily.v1";
 import { buildRootFamiliesV1 } from "./rootFamily.v1";
+import {
+  extractFunctionalRootsV1,
+  type FunctionalRootHypothesisV1,
+} from "./deepRoot.functional.v1";
 
 export interface DeepRootOutputV1 {
   hypotheses: DeepRootMinRootsV1[];
@@ -27,6 +34,12 @@ export interface DeepRootOutputV1 {
   candidates?: DeepRootMinRootsV1[];
 
   rootFamilies?: RootFamilyV1[];
+
+  /**
+   * Functional micro-root hypotheses (no winner, no scores).
+   * Omit when empty for payload hygiene.
+   */
+  functionalRoots?: FunctionalRootHypothesisV1[];
 }
 
 /**
@@ -77,6 +90,10 @@ export function buildDeepRootOutputV1(params: {
 
   const families = buildRootFamiliesV1({ basis, deepRoot });
   if (families.length > 0) deepRoot.rootFamilies = families;
+
+  // Functional micro-roots (v1: study only)
+  const functionalRoots = extractFunctionalRootsV1({ basis });
+  if (functionalRoots.length > 0) deepRoot.functionalRoots = functionalRoots;
 
   return deepRoot;
 }
