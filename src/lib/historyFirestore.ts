@@ -1,108 +1,64 @@
-import { getDb } from "./firestoreDb";
-import {
-  collection,
-  deleteDoc,
-  doc,
-  getDocs,
-  limit,
-  orderBy,
-  query,
-  startAfter,
-  where,
-  type DocumentData,
-  type QueryDocumentSnapshot,
-} from "firebase/firestore";
+/**
+ * History <-> Firestore mapping (stable adapter surface)
+ *
+ * This file is the contract used by tests:
+ *   tests/history.firestore.spec.ts
+ *
+ * Firestore doc is FLAT (engine meta fields top-level):
+ *   { word, mode, alphabet, engineVersion, solveMs, createdAt, payloadVersion }
+ */
 
-const db = () => getDb();
+import type { HistoryItemCore, HistoryEngineMeta } from "./history";
 
-export interface HistoryRecord {
+export type HistoryDocData = {
   word: string;
-  mode: string;
-  alphabet: string;
+  mode: HistoryEngineMeta["mode"];
+  alphabet: HistoryEngineMeta["alphabet"];
   engineVersion: string;
-  heartSummary?: string;
-  createdAt: number;
-
-  // optional fields used by the HistoryPanel UI (if present)
-  cacheId?: string;
-  source?: string;
-  primaryVoice?: string;
-}
-
-export type HistoryRow = HistoryRecord & {
-  id: string; // Firestore doc id
+  solveMs: number | null;
+  createdAt: string;
+  payloadVersion: 1;
 };
 
-function historyCollection(uid?: string | null) {
-  const d = db();
-  if (!d) throw new Error("Firestore not available");
-  return uid
-    ? collection(d, "users", uid, "history")
-    : collection(d, "history");
+const PAYLOAD_VERSION: 1 = 1;
+
+function normalizeSolveMs(input: unknown): number | null {
+  return typeof input === "number" && Number.isFinite(input) ? input : null;
 }
 
-export async function saveHistoryRecord(record: HistoryRecord, uid?: string | null) {
-  const col = historyCollection(uid);
-  // lazy import to keep signature compatible with existing callers
-  const { addDoc } = await import("firebase/firestore");
-  await addDoc(col, record);
-}
-
-export async function loadHistoryPage(params: {
-  uid?: string | null;
-  mode?: string | null;
-  alphabet?: string | null;
-  limitCount?: number;
-  cursor?: QueryDocumentSnapshot<DocumentData> | null;
-}): Promise<{
-  rows: HistoryRow[];
-  cursor: QueryDocumentSnapshot<DocumentData> | null;
-  hasMore: boolean;
-}> {
-  const {
-    uid,
-    mode = null,
-    alphabet = null,
-    limitCount = 50,
-    cursor = null,
-  } = params;
-
-  const col = historyCollection(uid);
-
-  const clauses: any[] = [];
-  if (mode) clauses.push(where("mode", "==", mode));
-  if (alphabet) clauses.push(where("alphabet", "==", alphabet));
-
-  let q = query(col, ...clauses, orderBy("createdAt", "desc"), limit(limitCount));
-  if (cursor) q = query(col, ...clauses, orderBy("createdAt", "desc"), startAfter(cursor), limit(limitCount));
-
-  const snap = await getDocs(q);
-
-  const rows: HistoryRow[] = snap.docs.map((d) => ({
-    id: d.id,
-    ...(d.data() as HistoryRecord),
-  }));
-
-  const nextCursor = snap.docs.length ? snap.docs[snap.docs.length - 1] : null;
+/**
+ * Convert app history item -> Firestore flat doc
+ */
+export function historyItemToDoc(item: HistoryItemCore): HistoryDocData {
+  const meta = item.engineMeta;
 
   return {
-    rows,
-    cursor: nextCursor,
-    hasMore: snap.docs.length === limitCount,
+    word: item.word,
+    mode: item.mode,
+    alphabet: item.alphabet,
+    engineVersion: meta.engineVersion,
+    solveMs: normalizeSolveMs(meta.solveMs),
+    createdAt: item.createdAt,
+    payloadVersion: PAYLOAD_VERSION,
   };
 }
 
-export async function deleteHistoryDoc(params: { uid?: string | null; id: string }) {
-  const d = db();
-  if (!d) throw new Error("Firestore not available");
-  const ref = params.uid
-    ? doc(d, "users", params.uid, "history", params.id)
-    : doc(d, "history", params.id);
-  await deleteDoc(ref);
-}
+/**
+ * Convert Firestore flat doc -> app history item
+ */
+export function docToHistoryItem(doc: HistoryDocData): HistoryItemCore {
+  const engineMeta: HistoryEngineMeta = {
+    engineVersion: doc.engineVersion,
+    mode: doc.mode,
+    alphabet: doc.alphabet,
+    solveMs: normalizeSolveMs(doc.solveMs),
+  };
 
-export async function deleteAnalysisCacheDoc(cacheId: string) {
-  const d = db();
-  if (!d) throw new Error("Firestore not available");
-  await deleteDoc(doc(d, "analyses", cacheId));
+  return {
+    word: doc.word,
+    mode: doc.mode,
+    alphabet: doc.alphabet,
+    engineMeta,
+    createdAt: doc.createdAt,
+  };
 }
