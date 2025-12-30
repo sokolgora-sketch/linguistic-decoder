@@ -5,7 +5,7 @@
 
 export type { AnalyzeWordResultV1 } from "./analysisResult.v1";
 
-import type { DeepRootSummaryV1 } from "./deepRoot.v1";
+import type { DeepRootOutputV1 } from "./deepRoot.output.v1";
 import type { WordMatrixV1 } from "./wordMatrix.v1";
 
 // Core path types used by the Heart + Frontier UI

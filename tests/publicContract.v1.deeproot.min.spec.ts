@@ -48,6 +48,13 @@ function expectNonEmptyObject(x: any, label: string) {
   }
 }
 
+function pickMinRootsArray(deepRoot: any): any[] | undefined {
+  if (!deepRoot || typeof deepRoot !== "object") return undefined;
+  if (Array.isArray(deepRoot.hypotheses)) return deepRoot.hypotheses;
+  if (Array.isArray(deepRoot.candidates)) return deepRoot.candidates; // legacy fallback
+  return undefined;
+}
+
 describe("Public contract v1 — minimal DeepRoot guarantees (analysisAdapter)", () => {
   const adapt = pickAdapterFn();
 
@@ -60,9 +67,13 @@ describe("Public contract v1 — minimal DeepRoot guarantees (analysisAdapter)",
 
     if (typeof deepRoot === "undefined") return;
 
-    // If present, it must be JSON-safe and meaningful.
     assertJsonSafe(deepRoot);
     expectNonEmptyObject(deepRoot, "adapted.deepRoot");
+
+    const arr = pickMinRootsArray(deepRoot);
+    if (typeof arr !== "undefined") {
+      assertJsonSafe(arr);
+    }
 
     if (!hasAnyNonEmptyStringDeep(deepRoot)) {
       throw new Error("adapted.deepRoot is present but contains no non-empty string payload");
@@ -84,6 +95,11 @@ describe("Public contract v1 — minimal DeepRoot guarantees (analysisAdapter)",
 
     assertJsonSafe(deepRoot);
     expectNonEmptyObject(deepRoot, "adapted.deepRoot");
+
+    const arr = pickMinRootsArray(deepRoot);
+    if (typeof arr !== "undefined") {
+      assertJsonSafe(arr);
+    }
 
     if (!hasAnyNonEmptyStringDeep(deepRoot)) {
       throw new Error("adapted.deepRoot is present but contains no non-empty string payload");

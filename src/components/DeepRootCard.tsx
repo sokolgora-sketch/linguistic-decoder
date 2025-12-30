@@ -3,68 +3,103 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-type AnyDeepRoot = any;
+type Carrier = {
+  protoRootId?: string;
+  segment?: string;
+  carrierForm?: string;
+  lang?: string;
+  ops?: string[];
+};
 
-function safeArr(x: any): any[] {
-  return Array.isArray(x) ? x : [];
-}
+type HypothesisLike = {
+  id?: string;
+  protoRoots?: string[];
+  segments?: string[];
+  carriers?: Carrier[];
+  decomposition?: { action?: string; function?: string; unit?: string };
+  checks?: { opsWithinLimits?: boolean; skeletonExplained?: boolean };
+  opsCount?: number;
+};
 
-function pickHypotheses(deepRoot: AnyDeepRoot): any[] {
-  // hypotheses-first (new contract), fall back to candidates (legacy)
-  const h = safeArr(deepRoot?.hypotheses);
+type DeepRootLike = {
+  hypotheses?: HypothesisLike[];
+  candidates?: HypothesisLike[];
+};
+
+function pickRows(deepRoot?: DeepRootLike | null): HypothesisLike[] {
+  if (!deepRoot) return [];
+  const h = Array.isArray(deepRoot.hypotheses) ? deepRoot.hypotheses : [];
   if (h.length > 0) return h;
-  const c = safeArr(deepRoot?.candidates);
+  const c = Array.isArray(deepRoot.candidates) ? deepRoot.candidates : [];
   return c;
 }
 
-export default function DeepRootCard({ deepRoot }: { deepRoot?: AnyDeepRoot | null }) {
-  const list = pickHypotheses(deepRoot);
-  if (!deepRoot || list.length === 0) return null;
+function boolTag(label: string, value: unknown) {
+  return (
+    <span className="rounded-md border border-white/10 bg-black/20 px-2 py-1">
+      {label}: <span className="font-mono">{String(!!value)}</span>
+    </span>
+  );
+}
+
+export default function DeepRootCard({ deepRoot }: { deepRoot?: DeepRootLike | null }) {
+  const rows = pickRows(deepRoot);
+  if (rows.length === 0) return null;
 
   return (
     <Card className="border-white/10 bg-zinc-950/30">
       <CardHeader>
-        <CardTitle className="text-base font-semibold">DeepRoot (proto-root hypotheses)</CardTitle>
+        <CardTitle className="text-base font-semibold">
+          DeepRoot (proto-root hypotheses)
+        </CardTitle>
       </CardHeader>
 
       <CardContent className="space-y-4 text-sm">
-        {list.slice(0, 4).map((h: any, idx: number) => {
-          const protoRoots = safeArr(h?.protoRoots).filter((x) => typeof x === "string" && x.trim().length > 0);
-          const segments = safeArr(h?.segments).filter((x) => typeof x === "string" && x.trim().length > 0);
+        {rows.map((h, idx) => {
+          const proto = (h.protoRoots ?? []).filter(Boolean);
+          const segs = (h.segments ?? []).filter(Boolean);
+          const carriers = (h.carriers ?? []).filter(Boolean);
 
-          const carriers = safeArr(h?.carriers).map((c: any) => ({
-            protoRootId: typeof c?.protoRootId === "string" ? c.protoRootId : "",
-            segment: typeof c?.segment === "string" ? c.segment : "",
-            carrierForm: typeof c?.carrierForm === "string" ? c.carrierForm : "",
-            lang: typeof c?.lang === "string" ? c.lang : "",
-            ops: safeArr(c?.ops).filter((x) => typeof x === "string"),
-          }));
-
-          const dec = h?.decomposition ?? {};
-          const action = typeof dec?.action === "string" ? dec.action : "";
-          const fn = typeof dec?.function === "string" ? dec.function : "";
-          const unit = typeof dec?.unit === "string" ? dec.unit : "";
-
-          const checks = h?.checks ?? {};
-          const opsWithinLimits = !!checks?.opsWithinLimits;
-          const skeletonExplained = !!checks?.skeletonExplained;
+          const header = proto.length ? proto.join(" + ") : "—";
+          const segLine = segs.length ? `segments: ${segs.join(" · ")}` : "";
 
           return (
-            <div key={h?.id ?? idx} className="rounded-lg border border-white/10 bg-black/20 p-3">
+            <div
+              key={h.id ?? `row-${idx}`}
+              className="rounded-lg border border-white/10 bg-black/20 p-3"
+              data-testid={`deeproot-row-${idx + 1}`}
+            >
               <div className="flex flex-wrap items-center gap-2">
                 <span className="font-mono text-xs opacity-80">#{idx + 1}</span>
-                <span className="font-semibold">{(protoRoots.join(" + ") || "—")}</span>
-                {segments.length > 0 ? (
-                  <span className="font-mono text-xs opacity-70">segments: {segments.join(" · ")}</span>
+                <span className="font-semibold" data-testid={`deeproot-header-${idx + 1}`}>
+                  {header}
+                </span>
+                {segLine ? (
+                  <span className="font-mono text-xs opacity-70">{segLine}</span>
                 ) : null}
               </div>
 
-              {(action || fn || unit) ? (
+              {h.decomposition?.action || h.decomposition?.function || h.decomposition?.unit ? (
                 <div className="mt-2">
                   <div className="text-muted-foreground">
-                    {action ? <span><span className="opacity-70">action:</span> <span className="font-mono">{action}</span></span> : null}
-                    {fn ? <span className="ml-3"><span className="opacity-70">function:</span> <span className="font-mono">{fn}</span></span> : null}
-                    {unit ? <span className="ml-3"><span className="opacity-70">unit:</span> <span className="font-mono">{unit}</span></span> : null}
+                    {h.decomposition?.action ? (
+                      <span>
+                        <span className="opacity-70">action:</span>{" "}
+                        <span className="font-mono">{h.decomposition.action}</span>
+                      </span>
+                    ) : null}
+                    {h.decomposition?.function ? (
+                      <span className="ml-3">
+                        <span className="opacity-70">function:</span>{" "}
+                        <span className="font-mono">{h.decomposition.function}</span>
+                      </span>
+                    ) : null}
+                    {h.decomposition?.unit ? (
+                      <span className="ml-3">
+                        <span className="opacity-70">unit:</span>{" "}
+                        <span className="font-mono">{h.decomposition.unit}</span>
+                      </span>
+                    ) : null}
                   </div>
                 </div>
               ) : null}
@@ -73,43 +108,56 @@ export default function DeepRootCard({ deepRoot }: { deepRoot?: AnyDeepRoot | nu
                 <div className="mt-3 space-y-1">
                   <div className="text-xs font-semibold opacity-80">Carriers</div>
                   <div className="space-y-1">
-                    {carriers.map((c, i) => (
-                      <div key={i} className="font-mono text-xs opacity-80">
-                        <span className="opacity-70">{c.protoRootId || "?"}</span>
-                        <span className="opacity-50"> @ </span>
-                        <span>{c.segment || "—"}</span>
-                        <span className="opacity-50"> → </span>
-                        <span>{c.carrierForm || "—"}</span>
-                        {c.lang ? <span className="opacity-50"> ({c.lang})</span> : null}
-                        {c.ops.length ? <span className="opacity-50"> ops:{c.ops.join(",")}</span> : null}
-                      </div>
-                    ))}
+                    {carriers.map((c, j) => {
+                      const protoRootId = c.protoRootId ?? "";
+                      const segment = c.segment ?? "";
+                      const carrierForm = c.carrierForm ?? "";
+                      const lang = c.lang ?? "";
+                      const ops = (c.ops ?? []).filter(Boolean).join(",");
+
+                      // Stable, unique test hook per carrier line
+                      const tid = `deeproot-carrier-${idx + 1}-${protoRootId || "x"}-${segment || "y"}`;
+
+                      return (
+                        <div
+                          key={`${protoRootId}-${segment}-${j}`}
+                          className="font-mono text-xs opacity-80"
+                          data-testid={tid}
+                        >
+                          <span className="opacity-70">{protoRootId}</span>
+                          <span className="opacity-50"> @ </span>
+                          <span>{segment}</span>
+                          <span className="opacity-50"> → </span>
+                          <span>{carrierForm}</span>
+                          {lang ? <span className="opacity-50"> ({lang})</span> : null}
+                          {ops ? <span className="opacity-50"> ops:{ops}</span> : null}
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               ) : null}
 
-              <div className="mt-3 flex flex-wrap gap-2 text-xs">
-                <span className="rounded-md border border-white/10 bg-black/20 px-2 py-1">
-                  opsWithinLimits: <span className="font-mono">{String(opsWithinLimits)}</span>
-                </span>
-                <span className="rounded-md border border-white/10 bg-black/20 px-2 py-1">
-                  skeletonExplained: <span className="font-mono">{String(skeletonExplained)}</span>
-                </span>
-                {typeof h?.opsCount === "number" ? (
-                  <span className="rounded-md border border-white/10 bg-black/20 px-2 py-1">
-                    opsCount: <span className="font-mono">{h.opsCount}</span>
-                  </span>
-                ) : null}
-              </div>
+              {(h.checks?.opsWithinLimits !== undefined ||
+                h.checks?.skeletonExplained !== undefined ||
+                h.opsCount !== undefined) && (
+                <div className="mt-3 flex flex-wrap gap-2 text-xs">
+                  {h.checks?.opsWithinLimits !== undefined
+                    ? boolTag("opsWithinLimits", h.checks.opsWithinLimits)
+                    : null}
+                  {h.checks?.skeletonExplained !== undefined
+                    ? boolTag("skeletonExplained", h.checks.skeletonExplained)
+                    : null}
+                  {h.opsCount !== undefined ? (
+                    <span className="rounded-md border border-white/10 bg-black/20 px-2 py-1">
+                      opsCount: <span className="font-mono">{String(h.opsCount)}</span>
+                    </span>
+                  ) : null}
+                </div>
+              )}
             </div>
           );
         })}
-
-        {safeArr(deepRoot?.rootFamilies).length > 0 ? (
-          <div className="text-xs text-muted-foreground">
-            rootFamilies detected: <span className="font-mono">{safeArr(deepRoot?.rootFamilies).length}</span>
-          </div>
-        ) : null}
       </CardContent>
     </Card>
   );

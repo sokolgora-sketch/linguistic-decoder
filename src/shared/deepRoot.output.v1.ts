@@ -1,110 +1,82 @@
 /**
- * DR4 — DeepRoot output integration (v1)
+ * DeepRoot Output v1
+ * - Public-facing, JSON-safe.
+ * - Deterministic, contract-first.
  *
- * Turns DR3 hypotheses into a stable, public-facing DeepRoot payload.
- * No scores. Deterministic ordering inherited from DR3.
+ * Canonical field:
+ * - hypotheses: DeepRootMinRootsV1[]
+ *
+ * Back-compat alias (temporary):
+ * - candidates?: DeepRootMinRootsV1[]
+ *
+ * v1.1 addition:
+ * - rootFamilies?: RootFamilyV1[] (optional, non-breaking)
  */
 
-import { buildMinRootHypotheses } from "./deepRoot.minRoots.v1";
-import { PROTO_ROOTS_V1 } from "./protoRoots.v1";
-import { selectHighlightedHypotheses } from "./deepRoot.verdict.v1";
+import type { DeepRootMinRootsV1 } from "./deepRoot.minRoots.v1";
+import type { RootFamilyV1 } from "./rootFamily.v1";
+import { buildRootFamiliesV1 } from "./rootFamily.v1";
 
-export type DeepRootOutputV1 = {
-  version: "deeproot-output-v1";
-  basis: string;
-  mode: string;
-  verdict: {
-    label: "closest_under_rules";
-    highlighted: string[];
-    reasons: string[];
+export interface DeepRootOutputV1 {
+  hypotheses: DeepRootMinRootsV1[];
+
+  /**
+   * Legacy alias for older UI/tests.
+   * Keep during migration; remove in Phase 3.
+   */
+  candidates?: DeepRootMinRootsV1[];
+
+  rootFamilies?: RootFamilyV1[];
+}
+
+/**
+ * Contract safety: DeepRoot output must be JSON-safe.
+ * - No undefined anywhere (especially inside arrays).
+ * - Ensure carriers[].segment is always a string.
+ */
+function sanitizeMinRoots(minRoots: DeepRootMinRootsV1[]): DeepRootMinRootsV1[] {
+  return (minRoots as any[]).map((cand) => {
+    const c: any = { ...cand };
+
+    if (Array.isArray(c.carriers)) {
+      c.carriers = c.carriers.map((car: any) => ({
+        ...car,
+        segment: typeof car?.segment === "string" ? car.segment : "",
+        ops: Array.isArray(car?.ops) ? car.ops : [],
+      }));
+    }
+
+    // Final JSON-safety guard: strips any undefined in nested structures.
+    return JSON.parse(JSON.stringify(c));
+  }) as any;
+}
+
+/**
+ * Build DeepRoot output from already-computed minRoots.
+ * We dual-write hypotheses + candidates for zero-break migration.
+ */
+export function buildDeepRootOutputV1(params: {
+  basis: { word: string; normalizedWord: string };
+  minRoots: DeepRootMinRootsV1[] | null | undefined;
+  legacyCandidates?: boolean;
+}): DeepRootOutputV1 | null {
+  const { basis, minRoots } = params;
+
+  if (!minRoots || minRoots.length === 0) return null;
+
+  const sanitized = sanitizeMinRoots(minRoots);
+
+  const deepRoot: DeepRootOutputV1 = {
+    hypotheses: sanitized,
   };
-  protoRoots: {
-    id: string;
-    gloss: string;
-    roleHint: string;
-    carriers: { lang: string; form: string; gloss?: string }[];
-  }[];
-  hypotheses: {
-    id: string;
-    protoRoots: string[]; // ids
-    segments: string[];
-    carriers: {
-      protoRootId: string;
-      segment: string;
-      carrierForm: string;
-      lang: string;
-      ops: string[];
-    }[];
-    decomposition: { action?: string; function?: string; unit?: string };
-    checks: { opsWithinLimits: boolean; skeletonExplained: boolean };
-    opsCount: number;
-  }[];
-};
 
-export function buildDeepRootOutputV1(args: {
-  basis: string;
-  mode: string;
-  allowSSh?: boolean;
-  langAllowList?: string[];
-  maxHypotheses?: number;
-}): DeepRootOutputV1 | undefined {
-  const basis = String(args.basis ?? "").trim().toLowerCase();
-  if (!basis) return undefined;
+  // Back-compat alias (default ON)
+  if (params.legacyCandidates !== false) {
+    deepRoot.candidates = sanitized;
+  }
 
-  // Keep v1 bounded and cheap.
-  const hypotheses = buildMinRootHypotheses(basis, {
-    allowSSh: args.allowSSh ?? true,
-    langAllowList: args.langAllowList ?? ["sq"],
-    maxHypotheses: args.maxHypotheses ?? 25,
-    maxSegments: 5,
-  });
+  const families = buildRootFamiliesV1({ basis, deepRoot });
+  if (families.length > 0) deepRoot.rootFamilies = families;
 
-  const verdict = selectHighlightedHypotheses(hypotheses);
-
-  if (!hypotheses || hypotheses.length === 0) return undefined;
-
-  // Collect protoRoot ids used
-  const used = new Set<string>();
-  for (const h of hypotheses) for (const id of h.protoRoots) used.add(id);
-
-  const protoRoots = PROTO_ROOTS_V1.filter((r) => used.has(r.id)).map((r) => ({
-    id: r.id,
-    gloss: r.gloss,
-    roleHint: r.roleHint,
-    carriers: r.carriers.map((c) => ({ lang: c.lang, form: c.form, gloss: c.gloss })),
-  }));
-
-  return {
-    version: "deeproot-output-v1",
-    basis,
-    mode: args.mode,
-    protoRoots,
-    hypotheses: hypotheses.map((h) => {
-      const segs = Array.isArray(h.segments) ? h.segments.map((s) => String(s ?? "")) : [];
-
-      const carriers = Array.isArray(h.carriers)
-        ? h.carriers.map((c, i) => ({
-            protoRootId: String(c?.protoRootId ?? ""),
-            // IMPORTANT: segment must never be undefined (public contract)
-            segment: String(c?.segment ?? segs[i] ?? ""),
-            carrierForm: String(c?.carrierForm ?? ""),
-            lang: String(c?.lang ?? ""),
-            ops: Array.isArray(c?.ops) ? c.ops.map((x) => String(x ?? "")) : [],
-          }))
-        : [];
-
-      return {
-        id: String(h.id ?? ""),
-        protoRoots: Array.isArray(h.protoRoots) ? h.protoRoots.map((x) => String(x ?? "")) : [],
-        segments: segs,
-        carriers,
-        decomposition: h.decomposition ?? {},
-        checks: {
-          opsWithinLimits: Boolean(h?.checks?.opsWithinLimits),
-          skeletonExplained: Boolean(h?.checks?.skeletonExplained),
-        },
-        opsCount: Number.isFinite(h.opsCount) ? h.opsCount : 0,
-      };
-    }),
-  };
+  return deepRoot;
 }

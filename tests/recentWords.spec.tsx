@@ -6,7 +6,6 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import Page from '../app/page';
-import '@testing-library/jest-dom';
 
 jest.mock("lucide-react", () => ({
   __esModule: true,
