@@ -7,11 +7,17 @@
 
 import { buildMinRootHypotheses } from "./deepRoot.minRoots.v1";
 import { PROTO_ROOTS_V1 } from "./protoRoots.v1";
+import { selectHighlightedHypotheses } from "./deepRoot.verdict.v1";
 
 export type DeepRootOutputV1 = {
   version: "deeproot-output-v1";
   basis: string;
   mode: string;
+  verdict: {
+    label: "closest_under_rules";
+    highlighted: string[];
+    reasons: string[];
+  };
   protoRoots: {
     id: string;
     gloss: string;
@@ -52,6 +58,8 @@ export function buildDeepRootOutputV1(args: {
     maxHypotheses: args.maxHypotheses ?? 25,
     maxSegments: 5,
   });
+
+  const verdict = selectHighlightedHypotheses(hypotheses);
 
   if (!hypotheses || hypotheses.length === 0) return undefined;
 
