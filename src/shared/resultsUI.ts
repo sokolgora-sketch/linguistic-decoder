@@ -100,6 +100,9 @@ export interface AnalyzeWordResultUI {
     notes?: (string | null)[];
     summary?: string;
   };
+  /** DeepRoot (public, JSON-safe). hypotheses-first. */
+  deepRoot?: any;
+
 }
 
 export interface LanguageFamilyView {

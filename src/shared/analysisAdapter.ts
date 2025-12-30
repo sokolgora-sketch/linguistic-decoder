@@ -5,9 +5,9 @@ import { computeMath7ForResult } from "@/engine/math7";
 import { analyzeMind, analyzeConsonants, analyzeSymbolic } from "@/engine/mindAnalyzer";
 import { CANON_CANDIDATES } from "./canonCandidates";
 import { buildWordMatrix } from "./wordMatrix.v1";
-import { buildDeepRootSummaryV1 } from './deepRoot.v1';
 import { buildDeepRootOutputV1 } from "./deepRoot.output.v1";
 
+import { buildMinRootHypotheses } from "./deepRoot.minRoots.v1";
 export function enginePayloadToAnalysisResult(payload: EnginePayload): AnalyzeWordResultV1 {
   const sanitized =
     (payload as any).sanitized ??
@@ -37,12 +37,15 @@ export function enginePayloadToAnalysisResult(payload: EnginePayload): AnalyzeWo
     consonants,
     symbolicCore: symbolic,
     candidates,
-    deepRoot,
     meta: {
       cache: payload.cacheHit ? "hit" : "miss",
       source: "live",
     },
   };
+
+  if (deepRoot !== undefined) {
+    (result as any).deepRoot = deepRoot;
+  }
 
   const wordMatrix = buildWordMatrix(result);
   result.wordMatrix = wordMatrix;
@@ -105,24 +108,28 @@ function buildMindCandidates(payload: EnginePayload): Candidate[] {
 }
 
 function buildDeepRoot(payload: any) {
-  const basis =
+  const normalizedWord =
     (payload as any).sanitized ??
     (payload as any).sanitizedWord ??
     (payload as any).normalizedWord ??
     String(payload.word ?? "").trim().toLowerCase();
 
-  // DR4: DeepRoot minimal roots output (optional)
-  const out = buildDeepRootOutputV1({
-    basis,
-    mode: String(payload.mode ?? "strict"),
+  // DR3 min-roots
+  // (Adjust opts to your current policy)
+  const minRoots = buildMinRootHypotheses(normalizedWord, {
     allowSSh: true,
     langAllowList: ["sq"],
     maxHypotheses: 25,
+    maxSegments: 5,
   });
 
-  // Keep legacy (if it exists) as fallback — but prefer minroots output.
-  return out ?? (buildDeepRootSummaryV1({ word: payload.word }) ?? undefined);
+  // DR4/DR5 output (hypotheses + optional rootFamilies; plus legacy alias candidates)
+  return buildDeepRootOutputV1({
+    basis: { word: String(payload.word ?? normalizedWord), normalizedWord },
+    minRoots,
+  }) ?? undefined;
 }
+
 
 // --- Legacy helper: convert whatever we stored into EnginePayload shape ---
 // Used by src/app/page.ts when loading old history entries.

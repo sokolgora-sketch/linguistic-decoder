@@ -3,7 +3,7 @@
 // Canonical V1 analysis result shape.
 // IMPORTANT: Do NOT reference deprecated legacy types here.
 
-import type { DeepRootSummaryV1 } from "./deepRoot.v1";
+import type { DeepRootOutputV1 } from "./deepRoot.output.v1";
 import type { WordMatrixV1 } from "./wordMatrix.v1";
 import type {
   SevenVoicesPath,
@@ -45,7 +45,7 @@ export type AnalyzeWordResultV1 = {
   frontier?: FrontierCandidate[];
 
   // Optional analysis layers
-  deepRoot?: DeepRootSummaryV1;
+  deepRoot?: DeepRootOutputV1 | null;
   wordMatrix?: WordMatrixV1;
 
   // Existing code references result.candidates (canon list)

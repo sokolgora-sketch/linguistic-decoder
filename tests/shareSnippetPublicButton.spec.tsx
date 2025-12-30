@@ -1,5 +1,4 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import '@testing-library/jest-dom';
 import ShareSnippetPublicButton from '@/components/ShareSnippetPublicButton';
 import { createPublicShare } from '@/lib/publicShareClient';
 import type { AnalyzeWordResultUI } from '@/shared/resultsUI';

@@ -11,7 +11,6 @@
 
 import { segmentBasis } from "./segmenter.v1";
 import { matchSegmentToProtoRoots } from "./carrierMatcher.v1";
-import type { ProtoRoot } from "./protoRoots.v1";
 
 export type MinRootHypothesis = {
   id: string;
@@ -20,7 +19,7 @@ export type MinRootHypothesis = {
   protoRoots: string[]; // protoRoot ids, in order
   carriers: {
     protoRootId: string;
-    segment: string;
+    segment: string; // MUST be the actual matched basis segment
     carrierForm: string;
     lang: string;
     ops: string[];
@@ -36,6 +35,11 @@ export type MinRootHypothesis = {
   };
   opsCount: number;
 };
+
+/**
+ * Public contract alias — keep stable.
+ */
+export type DeepRootMinRootsV1 = MinRootHypothesis;
 
 export type BuildMinRootOpts = {
   maxSegments?: number;
@@ -68,14 +72,14 @@ export function buildMinRootHypotheses(
       })
     );
 
-    // If any segment has zero matches → cannot form hypothesis
     if (matchesPerSegment.some((m) => m.length === 0)) continue;
 
-    // Cartesian product (bounded, deterministic)
-    const stack: {
-      idx: number;
-      carriers: any[];
-    }[] = [{ idx: 0, carriers: [] }];
+    /**
+     * Cartesian product (bounded, deterministic).
+     * IMPORTANT: we stamp the actual basis segment onto each chosen carrier
+     * at selection time to avoid any reliance on matcher internals.
+     */
+    const stack: { idx: number; carriers: any[] }[] = [{ idx: 0, carriers: [] }];
 
     while (stack.length > 0 && out.length < maxHypotheses) {
       const cur = stack.pop()!;
@@ -83,7 +87,7 @@ export function buildMinRootHypotheses(
 
       if (idx === matchesPerSegment.length) {
         const protoRoots = carriers.map((c) => c.protoRootId);
-        const opsCount = carriers.reduce((n, c) => n + c.ops.length, 0);
+        const opsCount = carriers.reduce((n, c) => n + (c.ops?.length ?? 0), 0);
 
         const hypothesis: MinRootHypothesis = {
           id: `${basis}:${protoRoots.join("+")}:${out.length}`,
@@ -92,15 +96,15 @@ export function buildMinRootHypotheses(
           protoRoots,
           carriers: carriers.map((c) => ({
             protoRootId: c.protoRootId,
-            segment: c.segment,
+            segment: typeof c.segment === "string" ? c.segment : "",
             carrierForm: c.carrier.form,
             lang: c.carrier.lang,
-            ops: c.ops,
+            ops: Array.isArray(c.ops) ? c.ops : [],
           })),
           decomposition: deriveDecomposition(carriers),
           checks: {
             opsWithinLimits: opsCount <= 5,
-            skeletonExplained: true, // v1: always true if matched
+            skeletonExplained: true,
           },
           opsCount,
         };
@@ -109,13 +113,23 @@ export function buildMinRootHypotheses(
         continue;
       }
 
+      const basisSegment = seg.segments[idx];
       const candidates = matchesPerSegment[idx];
 
       // push in reverse to preserve stable order
       for (let i = candidates.length - 1; i >= 0; i--) {
+        const chosen = candidates[i];
+
+        // Stamp the segment explicitly (truth source: segmentation, not matcher).
         stack.push({
           idx: idx + 1,
-          carriers: [...carriers, candidates[i]],
+          carriers: [
+            ...carriers,
+            {
+              ...chosen,
+              segment: basisSegment,
+            },
+          ],
         });
       }
     }
@@ -125,8 +139,6 @@ export function buildMinRootHypotheses(
 }
 
 function deriveDecomposition(carriers: any[]) {
-  const roles = carriers.map((c) => c.roleHint);
-
   const out: any = {};
   for (const c of carriers) {
     if (c.roleHint === "Action" && !out.action) out.action = c.protoRootId;

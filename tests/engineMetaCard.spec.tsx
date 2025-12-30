@@ -2,7 +2,6 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { EngineMetaCard } from '@/components/EngineMetaCard';
 import type { EngineMetaSummary } from '@/lib/engineMetaSummary';
-import '@testing-library/jest-dom';
 
 describe('EngineMetaCard', () => {
   const mockSummary: EngineMetaSummary = {

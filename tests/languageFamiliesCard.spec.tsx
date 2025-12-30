@@ -2,7 +2,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { LanguageFamiliesCard, type LanguageFamilyView } from '@/components/LanguageFamiliesCard';
-import '@testing-library/jest-dom';
 
 describe('LanguageFamiliesCard', () => {
   const mockFamilies: LanguageFamilyView[] = [
