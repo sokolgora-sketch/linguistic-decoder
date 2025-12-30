@@ -25,20 +25,13 @@ import {
 } from "./deepRoot.functional.v1";
 
 export interface DeepRootOutputV1 {
+  version: "deeproot-output-v1";
+  basis: string;
+  protoRoots: string[];
+
   hypotheses: DeepRootMinRootsV1[];
-
-  /**
-   * Legacy alias for older UI/tests.
-   * Keep during migration; remove in Phase 3.
-   */
   candidates?: DeepRootMinRootsV1[];
-
   rootFamilies?: RootFamilyV1[];
-
-  /**
-   * Functional micro-root hypotheses (no winner, no scores).
-   * Omit when empty for payload hygiene.
-   */
   functionalRoots?: FunctionalRootHypothesisV1[];
 }
 
@@ -69,19 +62,52 @@ function sanitizeMinRoots(minRoots: DeepRootMinRootsV1[]): DeepRootMinRootsV1[] 
  * We dual-write hypotheses + candidates for zero-break migration.
  */
 export function buildDeepRootOutputV1(params: {
-  basis: { word: string; normalizedWord: string };
+  basis: { word: string; normalizedWord: string } | string;
   minRoots: DeepRootMinRootsV1[] | null | undefined;
   legacyCandidates?: boolean;
 }): DeepRootOutputV1 | null {
-  const { basis, minRoots } = params;
+  const { basis: rawBasis, minRoots } = params;
 
-  if (!minRoots || minRoots.length === 0) return null;
+  const basis =
+    typeof rawBasis === "string"
+      ? { word: rawBasis, normalizedWord: rawBasis }
+      : rawBasis;
 
-  const sanitized = sanitizeMinRoots(minRoots);
+  const safeMinRoots = Array.isArray(minRoots) ? minRoots : [];
+  const sanitized = sanitizeMinRoots(safeMinRoots);
 
+  const protoRoots = Array.from(
+    new Set(
+      sanitized.flatMap((h: any) => (Array.isArray(h?.protoRoots) ? h.protoRoots : [])).filter(Boolean)
+    )
+  );
+
+  const first = (sanitized as any)?.[0];
+
+  const basisFromMinRoot =
+    (typeof first?.basis === "string" && first.basis.trim()) ? first.basis.trim() : "";
+
+  const basisFromId = (() => {
+    const id = typeof first?.id === "string" ? first.id : "";
+    if (!id) return "";
+    if (id.includes(":")) return id.split(":")[0].trim();   // study:SHTU+DA:0
+    if (id.includes(".")) return id.split(".")[0].trim();   // legacy fallback
+    return "";
+  })();
+
+  const basisWord =
+    (typeof basis?.word === "string" && basis.word.trim()) ? basis.word.trim()
+    : (typeof basis?.normalizedWord === "string" && basis.normalizedWord.trim()) ? basis.normalizedWord.trim()
+    : basisFromMinRoot || basisFromId || "";
+
+  // IMPORTANT: use basisWord here (NOT basis.normalizedWord||basis.word)
   const deepRoot: DeepRootOutputV1 = {
+    version: "deeproot-output-v1",
+    basis: basisWord,
+    protoRoots,
     hypotheses: sanitized,
   };
+
 
   // Back-compat alias (default ON)
   if (params.legacyCandidates !== false) {
