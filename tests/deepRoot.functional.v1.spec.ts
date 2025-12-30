@@ -1,46 +1,66 @@
-import { buildDeepRootOutputV1 } from "../src/shared/deepRoot.output.v1";
-import type { DeepRootMinRootsV1 } from "../src/shared/deepRoot.minRoots.v1";
-
-function fakeMinRoots(): DeepRootMinRootsV1[] {
-  // Minimal, JSON-safe placeholder. We are not testing minRoots logic here.
-  return [
-    {
-      id: "minroot.fake.v1",
-      language: "en",
-      form: "study",
-      decomposition: ["stu", "dy"],
-      vowelPath: "U-Y",
-      ringFit: "unknown",
-      carriers: [],
-      signals: [],
-      notes: [],
-    } as any,
-  ];
-}
+import { buildDeepRootOutputV1 } from "@/shared/deepRoot.output.v1";
 
 describe("DeepRoot functional roots v1 (conservative)", () => {
-  test("study emits functionalRoots with canon shtu+di hypothesis", () => {
+  it("study emits functionalRoots", () => {
     const deepRoot = buildDeepRootOutputV1({
-      basis: { word: "study", normalizedWord: "study" },
-      minRoots: fakeMinRoots(),
+      basis: { word: "study", normalizedWord: "study" } as any,
+      deepRoot: { hypotheses: [] } as any,
     });
 
     expect(deepRoot).not.toBeNull();
-    expect(deepRoot?.functionalRoots).toBeDefined();
-    expect(Array.isArray(deepRoot?.functionalRoots)).toBe(true);
-
-    const ids = (deepRoot!.functionalRoots || []).map((h) => h.id);
-    expect(ids).toContain("sq.shtu+di.v1");
-
-    const h = deepRoot!.functionalRoots!.find((x) => x.id === "sq.shtu+di.v1")!;
-    expect(h.roots).toEqual(["shtu", "di"]);
-    expect(h.vowelPath).toBe("U→I");
+    expect((deepRoot as any).functionalRoots).toEqual([
+      {
+        id: "sq.shtu+di.v1",
+        language: "sq",
+        surfaceForms: ["study", "studim"],
+        roots: ["shtu", "di"],
+        gloss:
+          "Functional reading: shtu (not yours / added-on) + di (know) → making knowledge yours through learning.",
+        opsUsed: [
+          "english carrier → sq functional reading",
+          "note: studim treated as nominal closure of the same carrier family",
+        ],
+        vowelPath: "U→I",
+        notes: [
+          "Deterministic pilot hypothesis (v1).",
+          "No historical-chain claim; functional decomposition only.",
+        ],
+      },
+    ]);
   });
 
-  test("non-supported words omit functionalRoots (no empty arrays)", () => {
+  it("damage emits functionalRoots (v1.1)", () => {
     const deepRoot = buildDeepRootOutputV1({
-      basis: { word: "damage", normalizedWord: "damage" },
-      minRoots: fakeMinRoots(),
+      basis: { word: "damage", normalizedWord: "damage" } as any,
+      deepRoot: { hypotheses: [] } as any,
+    });
+
+    expect(deepRoot).not.toBeNull();
+    expect((deepRoot as any).functionalRoots).toEqual([
+      {
+        id: "sq.dem.v1",
+        language: "sq",
+        surfaceForms: ["damage", "dëm"],
+        roots: ["dëm"],
+        gloss:
+          "Functional reading: dëm (harm / loss / injury) as a minimal carrier for the damage concept.",
+        opsUsed: [
+          "english surface → sq carrier (short form)",
+          "note: this is a minimal-root hypothesis, not a historical-chain claim",
+        ],
+        vowelPath: "A→Ë",
+        notes: [
+          "Deterministic pilot hypothesis (v1.1).",
+          "No winner; functional carrier only.",
+        ],
+      },
+    ]);
+  });
+
+  it("non-supported words omit functionalRoots (no empty arrays)", () => {
+    const deepRoot = buildDeepRootOutputV1({
+      basis: { word: "hope", normalizedWord: "hope" } as any,
+      deepRoot: { hypotheses: [] } as any,
     });
 
     expect(deepRoot).not.toBeNull();
