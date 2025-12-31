@@ -1,6 +1,7 @@
 // src/shared/resultsUI.ts
 
 import type { EngineMetaSummary } from "@/lib/engineMetaSummary";
+import type { HeartInstrumentV1 } from "@/v1/heartInstrument.v1";
 
 export interface EngineMetaRaw {
   engineName?: string;
@@ -81,6 +82,8 @@ export interface AnalyzeWordResultUI {
 
   // NEW – structured summary used by the Engine meta card
   engineMeta: EngineMetaRaw;
+
+  heartInstrumentV1: HeartInstrumentV1;
 
   // Debug / legacy fields used only by the main page
   raw?: unknown;

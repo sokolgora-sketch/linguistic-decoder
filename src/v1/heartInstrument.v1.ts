@@ -56,6 +56,8 @@ export function buildHeartInstrumentV1(basis: string): HeartInstrumentV1Packet {
   };
 }
 
+export type HeartInstrumentV1 = ReturnType<typeof buildHeartInstrumentV1>;
+
 // Re-export low-level primitives (useful in tests/callers)
 export {
   normalizeBasis,

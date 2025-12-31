@@ -9,6 +9,9 @@ import { ensurePrimaryAndCandidatePaths } from "@/shared/ensurePaths";
 // ✅ Contract guard
 import { AnalyzeWordResultV1ContractSchema } from "@/shared/analyzeWordResult.v1.contract";
 
+// ✅ Heart Instrument v1 (stable sub-object)
+import { buildHeartInstrumentV1 } from "@/v1/heartInstrument.v1";
+
 const BodySchema = z
   .object({
     word: z.string().min(1),
@@ -18,7 +21,6 @@ const BodySchema = z
   .passthrough();
 
 function safeJsonPreview(value: unknown, maxChars = 6000) {
-  // Never throw while trying to format an error response.
   try {
     const seen = new WeakSet<object>();
     const json = JSON.stringify(
@@ -45,12 +47,9 @@ function safeJsonPreview(value: unknown, maxChars = 6000) {
   }
 }
 
-function contractFailResponse(params: {
-  message: string;
-  issues?: unknown;
-  out?: unknown;
-}) {
-  return NextResponse.json({
+function contractFailResponse(params: { message: string; issues?: unknown; out?: unknown }) {
+  return NextResponse.json(
+    {
       error: "analyze-v1 contract failure",
       message: params.message,
       issues: params.issues ?? null,
@@ -66,7 +65,10 @@ export async function POST(req: Request) {
     body = await req.json();
   } catch {
     return NextResponse.json(
-      { error: 'Invalid JSON body. Expected: { word: string, mode?: "strict"|"open", alphabet?: string }' },
+      {
+        error:
+          'Invalid JSON body. Expected: { word: string, mode?: "strict"|"open", alphabet?: string }',
+      },
       { status: 400 }
     );
   }
@@ -82,13 +84,16 @@ export async function POST(req: Request) {
   const { word, mode, alphabet } = parsed.data;
 
   try {
+    // Stable instrument derived directly from the authority basis (word → NFC inside builder).
+    const heartInstrumentV1 = buildHeartInstrumentV1(word);
+
     const payload = await runAnalysisDeterministic(word, { mode, alphabet });
     const out = enginePayloadToAnalysisResult(payload);
 
-      const ui = adaptAnalyzeV1ToUI(out as any);
+    const ui = adaptAnalyzeV1ToUI(out as any);
 
-      // ✅ HARD GUARD: validate the UI contract output (Step B)
-      const checked = AnalyzeWordResultV1ContractSchema.safeParse(out);
+    // ✅ HARD GUARD: validate the engine V1 payload (not the UI adapter output)
+    const checked = AnalyzeWordResultV1ContractSchema.safeParse(out);
     if (!checked.success) {
       return contractFailResponse({
         message: "enginePayloadToAnalysisResult produced an off-contract V1 payload",
@@ -97,8 +102,11 @@ export async function POST(req: Request) {
       });
     }
 
-    return NextResponse.json(ensurePrimaryAndCandidatePaths(ui));
-} catch (err: any) {
+    const ensured = ensurePrimaryAndCandidatePaths(ui);
+
+    // Add as a stable sub-object at the top-level (do NOT let ensurePaths drop it).
+    return NextResponse.json({ ...ensured, heartInstrumentV1 });
+  } catch (err: any) {
     return NextResponse.json(
       { error: "analyze-v1 failed", details: String(err?.stack ?? err?.message ?? err) },
       { status: 500 }
@@ -123,16 +131,17 @@ export async function GET(req: Request) {
     mode === "strict" || mode === "open" ? (mode as "strict" | "open") : undefined;
 
   try {
+    const heartInstrumentV1 = buildHeartInstrumentV1(word);
+
     const payload = await runAnalysisDeterministic(word, {
       mode: modeParsed,
       alphabet: alphabet || undefined,
     });
     const out = enginePayloadToAnalysisResult(payload);
 
-      const ui = adaptAnalyzeV1ToUI(out as any);
+    const ui = adaptAnalyzeV1ToUI(out as any);
 
-      // ✅ HARD GUARD: validate the UI contract output (Step B)
-      const checked = AnalyzeWordResultV1ContractSchema.safeParse(out);
+    const checked = AnalyzeWordResultV1ContractSchema.safeParse(out);
     if (!checked.success) {
       return contractFailResponse({
         message: "enginePayloadToAnalysisResult produced an off-contract V1 payload",
@@ -141,8 +150,9 @@ export async function GET(req: Request) {
       });
     }
 
-    return NextResponse.json(ensurePrimaryAndCandidatePaths(ui));
-} catch (err: any) {
+    const ensured = ensurePrimaryAndCandidatePaths(ui);
+    return NextResponse.json({ ...ensured, heartInstrumentV1 });
+  } catch (err: any) {
     return NextResponse.json(
       { error: "analyze-v1 failed", details: String(err?.stack ?? err?.message ?? err) },
       { status: 500 }
