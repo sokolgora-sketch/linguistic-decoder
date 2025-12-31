@@ -15,7 +15,37 @@ exports[`Engine Contract v1 — capture engine output (goldens) damage (strict, 
     }
   ],
   "engineVersion": "v1.0.0",
+  "evidence": {
+    "basis": "damage",
+    "math7": {
+      "indices": [
+        0,
+        0,
+        1
+      ],
+      "sum": 1,
+      "totalMod7": 1,
+      "vowels": [
+        "A",
+        "A",
+        "E"
+      ]
+    },
+    "surfacePath": "A-A-E",
+    "surfaceVowels": [
+      "A",
+      "A",
+      "E"
+    ]
+  },
+  "meta": {
+    "canonVersion": "canon-v1.0",
+    "contractVersion": "scientific-output-v1.1",
+    "engineVersion": "v1.0.0",
+    "rulesetVersion": "ruleset-v1.2"
+  },
   "normalizedWord": "damage",
+  "warnings": null,
   "word": "damage"
 }"
 `;
@@ -35,7 +65,34 @@ exports[`Engine Contract v1 — capture engine output (goldens) father (strict, 
     }
   ],
   "engineVersion": "v1.0.0",
+  "evidence": {
+    "basis": "father",
+    "math7": {
+      "indices": [
+        0,
+        1
+      ],
+      "sum": 1,
+      "totalMod7": 1,
+      "vowels": [
+        "A",
+        "E"
+      ]
+    },
+    "surfacePath": "A-E",
+    "surfaceVowels": [
+      "A",
+      "E"
+    ]
+  },
+  "meta": {
+    "canonVersion": "canon-v1.0",
+    "contractVersion": "scientific-output-v1.1",
+    "engineVersion": "v1.0.0",
+    "rulesetVersion": "ruleset-v1.2"
+  },
   "normalizedWord": "father",
+  "warnings": null,
   "word": "father"
 }"
 `;
@@ -55,7 +112,34 @@ exports[`Engine Contract v1 — capture engine output (goldens) love (strict, au
     }
   ],
   "engineVersion": "v1.0.0",
+  "evidence": {
+    "basis": "love",
+    "math7": {
+      "indices": [
+        3,
+        1
+      ],
+      "sum": 4,
+      "totalMod7": 4,
+      "vowels": [
+        "O",
+        "E"
+      ]
+    },
+    "surfacePath": "O-E",
+    "surfaceVowels": [
+      "O",
+      "E"
+    ]
+  },
+  "meta": {
+    "canonVersion": "canon-v1.0",
+    "contractVersion": "scientific-output-v1.1",
+    "engineVersion": "v1.0.0",
+    "rulesetVersion": "ruleset-v1.2"
+  },
   "normalizedWord": "love",
+  "warnings": null,
   "word": "love"
 }"
 `;
@@ -75,7 +159,40 @@ exports[`Engine Contract v1 — capture engine output (goldens) mathematics (str
     }
   ],
   "engineVersion": "v1.0.0",
+  "evidence": {
+    "basis": "mathematics",
+    "math7": {
+      "indices": [
+        0,
+        1,
+        0,
+        2
+      ],
+      "sum": 3,
+      "totalMod7": 3,
+      "vowels": [
+        "A",
+        "E",
+        "A",
+        "I"
+      ]
+    },
+    "surfacePath": "A-E-A-I",
+    "surfaceVowels": [
+      "A",
+      "E",
+      "A",
+      "I"
+    ]
+  },
+  "meta": {
+    "canonVersion": "canon-v1.0",
+    "contractVersion": "scientific-output-v1.1",
+    "engineVersion": "v1.0.0",
+    "rulesetVersion": "ruleset-v1.2"
+  },
   "normalizedWord": "mathematics",
+  "warnings": null,
   "word": "mathematics"
 }"
 `;
@@ -95,7 +212,34 @@ exports[`Engine Contract v1 — capture engine output (goldens) study (strict, a
     }
   ],
   "engineVersion": "v1.0.0",
+  "evidence": {
+    "basis": "study",
+    "math7": {
+      "indices": [
+        4,
+        5
+      ],
+      "sum": 9,
+      "totalMod7": 2,
+      "vowels": [
+        "U",
+        "Y"
+      ]
+    },
+    "surfacePath": "U-Y",
+    "surfaceVowels": [
+      "U",
+      "Y"
+    ]
+  },
+  "meta": {
+    "canonVersion": "canon-v1.0",
+    "contractVersion": "scientific-output-v1.1",
+    "engineVersion": "v1.0.0",
+    "rulesetVersion": "ruleset-v1.2"
+  },
   "normalizedWord": "study",
+  "warnings": null,
   "word": "study"
 }"
 `;
