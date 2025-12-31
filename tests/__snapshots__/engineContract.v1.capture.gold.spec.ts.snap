@@ -1,5 +1,55 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`Engine Contract v1 — capture engine output (goldens) algorithm (strict, auto) 1`] = `
+"{
+  "candidates": [
+    {
+      "decomposition": [
+        "algorithm"
+      ],
+      "form": "algorithm",
+      "functionalStatement": "v1 returns a minimal deterministic analysis: surface form is preserved, decomposition is the whole word, and the vowel path is extracted from the Seven-vowel set (A/E/I/O/U/Y/Ë).",
+      "language": "unknown",
+      "notes": null,
+      "vowelPath": "A-O-I"
+    }
+  ],
+  "engineVersion": "v1.0.0",
+  "evidence": {
+    "basis": "algorithm",
+    "math7": {
+      "indices": [
+        0,
+        3,
+        2
+      ],
+      "sum": 5,
+      "totalMod7": 5,
+      "vowels": [
+        "A",
+        "O",
+        "I"
+      ]
+    },
+    "surfacePath": "A-O-I",
+    "surfaceVowels": [
+      "A",
+      "O",
+      "I"
+    ]
+  },
+  "meta": {
+    "canonVersion": "canon-v1.0",
+    "contractVersion": "scientific-output-v1.1",
+    "engineVersion": "v1.0.0",
+    "rulesetVersion": "ruleset-v1.2"
+  },
+  "normalizedWord": "algorithm",
+  "warnings": null,
+  "word": "algorithm"
+}"
+`;
+
 exports[`Engine Contract v1 — capture engine output (goldens) damage (strict, auto) 1`] = `
 "{
   "candidates": [
@@ -288,6 +338,103 @@ exports[`Engine Contract v1 — capture engine output (goldens) mathematics (str
   "normalizedWord": "mathematics",
   "warnings": null,
   "word": "mathematics"
+}"
+`;
+
+exports[`Engine Contract v1 — capture engine output (goldens) philosophy (strict, auto) 1`] = `
+"{
+  "candidates": [
+    {
+      "decomposition": [
+        "philosophy"
+      ],
+      "form": "philosophy",
+      "functionalStatement": "v1 returns a minimal deterministic analysis: surface form is preserved, decomposition is the whole word, and the vowel path is extracted from the Seven-vowel set (A/E/I/O/U/Y/Ë).",
+      "language": "unknown",
+      "notes": null,
+      "vowelPath": "I-O-O-Y"
+    }
+  ],
+  "engineVersion": "v1.0.0",
+  "evidence": {
+    "basis": "philosophy",
+    "math7": {
+      "indices": [
+        2,
+        3,
+        3,
+        5
+      ],
+      "sum": 13,
+      "totalMod7": 6,
+      "vowels": [
+        "I",
+        "O",
+        "O",
+        "Y"
+      ]
+    },
+    "surfacePath": "I-O-O-Y",
+    "surfaceVowels": [
+      "I",
+      "O",
+      "O",
+      "Y"
+    ]
+  },
+  "meta": {
+    "canonVersion": "canon-v1.0",
+    "contractVersion": "scientific-output-v1.1",
+    "engineVersion": "v1.0.0",
+    "rulesetVersion": "ruleset-v1.2"
+  },
+  "normalizedWord": "philosophy",
+  "warnings": null,
+  "word": "philosophy"
+}"
+`;
+
+exports[`Engine Contract v1 — capture engine output (goldens) shter (strict, auto) 1`] = `
+"{
+  "candidates": [
+    {
+      "decomposition": [
+        "shter"
+      ],
+      "form": "shter",
+      "functionalStatement": "v1 returns a minimal deterministic analysis: surface form is preserved, decomposition is the whole word, and the vowel path is extracted from the Seven-vowel set (A/E/I/O/U/Y/Ë).",
+      "language": "unknown",
+      "notes": null,
+      "vowelPath": "E"
+    }
+  ],
+  "engineVersion": "v1.0.0",
+  "evidence": {
+    "basis": "shter",
+    "math7": {
+      "indices": [
+        1
+      ],
+      "sum": 1,
+      "totalMod7": 1,
+      "vowels": [
+        "E"
+      ]
+    },
+    "surfacePath": "E",
+    "surfaceVowels": [
+      "E"
+    ]
+  },
+  "meta": {
+    "canonVersion": "canon-v1.0",
+    "contractVersion": "scientific-output-v1.1",
+    "engineVersion": "v1.0.0",
+    "rulesetVersion": "ruleset-v1.2"
+  },
+  "normalizedWord": "shter",
+  "warnings": null,
+  "word": "shter"
 }"
 `;
 
