@@ -1,0 +1,5 @@
+Building: freebsd 386
+Building: linux ppc64le
+Building: freebsd amd64
+Building: solaris amd64
+build is not installed, but available in the following packages, pick one to run it, Ctrl+C to cancel.
