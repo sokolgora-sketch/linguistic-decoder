@@ -2,7 +2,15 @@ import { analyzeWordV1 } from "../../src/v1/analyzeWordV1";
 import { CONTRACT_VERSION_V1, CANON_VERSION_V1 } from "../../src/v1/versions.v1";
 
 describe("Canon Battery v1 — expansion invariants", () => {
-  const words = ["gjak", "zemër", "internet"] as const;
+  const words = [
+    "gjak",
+    "zemër",
+    "internet",
+    // v2 expansion
+    "shter",
+    "algorithm",
+    "philosophy",
+  ] as const;
 
   for (const word of words) {
     it(`${word}: minimal invariants hold`, () => {
