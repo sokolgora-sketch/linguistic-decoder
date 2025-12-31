@@ -97,6 +97,100 @@ exports[`Engine Contract v1 — capture engine output (goldens) father (strict, 
 }"
 `;
 
+exports[`Engine Contract v1 — capture engine output (goldens) gjak (strict, auto) 1`] = `
+"{
+  "candidates": [
+    {
+      "decomposition": [
+        "gjak"
+      ],
+      "form": "gjak",
+      "functionalStatement": "v1 returns a minimal deterministic analysis: surface form is preserved, decomposition is the whole word, and the vowel path is extracted from the Seven-vowel set (A/E/I/O/U/Y/Ë).",
+      "language": "unknown",
+      "notes": null,
+      "vowelPath": "A"
+    }
+  ],
+  "engineVersion": "v1.0.0",
+  "evidence": {
+    "basis": "gjak",
+    "math7": {
+      "indices": [
+        0
+      ],
+      "sum": 0,
+      "totalMod7": 0,
+      "vowels": [
+        "A"
+      ]
+    },
+    "surfacePath": "A",
+    "surfaceVowels": [
+      "A"
+    ]
+  },
+  "meta": {
+    "canonVersion": "canon-v1.0",
+    "contractVersion": "scientific-output-v1.1",
+    "engineVersion": "v1.0.0",
+    "rulesetVersion": "ruleset-v1.2"
+  },
+  "normalizedWord": "gjak",
+  "warnings": null,
+  "word": "gjak"
+}"
+`;
+
+exports[`Engine Contract v1 — capture engine output (goldens) internet (strict, auto) 1`] = `
+"{
+  "candidates": [
+    {
+      "decomposition": [
+        "internet"
+      ],
+      "form": "internet",
+      "functionalStatement": "v1 returns a minimal deterministic analysis: surface form is preserved, decomposition is the whole word, and the vowel path is extracted from the Seven-vowel set (A/E/I/O/U/Y/Ë).",
+      "language": "unknown",
+      "notes": null,
+      "vowelPath": "I-E-E"
+    }
+  ],
+  "engineVersion": "v1.0.0",
+  "evidence": {
+    "basis": "internet",
+    "math7": {
+      "indices": [
+        2,
+        1,
+        1
+      ],
+      "sum": 4,
+      "totalMod7": 4,
+      "vowels": [
+        "I",
+        "E",
+        "E"
+      ]
+    },
+    "surfacePath": "I-E-E",
+    "surfaceVowels": [
+      "I",
+      "E",
+      "E"
+    ]
+  },
+  "meta": {
+    "canonVersion": "canon-v1.0",
+    "contractVersion": "scientific-output-v1.1",
+    "engineVersion": "v1.0.0",
+    "rulesetVersion": "ruleset-v1.2"
+  },
+  "normalizedWord": "internet",
+  "warnings": null,
+  "word": "internet"
+}"
+`;
+
 exports[`Engine Contract v1 — capture engine output (goldens) love (strict, auto) 1`] = `
 "{
   "candidates": [
@@ -241,5 +335,52 @@ exports[`Engine Contract v1 — capture engine output (goldens) study (strict, a
   "normalizedWord": "study",
   "warnings": null,
   "word": "study"
+}"
+`;
+
+exports[`Engine Contract v1 — capture engine output (goldens) zemër (strict, auto) 1`] = `
+"{
+  "candidates": [
+    {
+      "decomposition": [
+        "zemër"
+      ],
+      "form": "zemër",
+      "functionalStatement": "v1 returns a minimal deterministic analysis: surface form is preserved, decomposition is the whole word, and the vowel path is extracted from the Seven-vowel set (A/E/I/O/U/Y/Ë).",
+      "language": "unknown",
+      "notes": null,
+      "vowelPath": "E-Ë"
+    }
+  ],
+  "engineVersion": "v1.0.0",
+  "evidence": {
+    "basis": "zemër",
+    "math7": {
+      "indices": [
+        1,
+        6
+      ],
+      "sum": 7,
+      "totalMod7": 0,
+      "vowels": [
+        "E",
+        "Ë"
+      ]
+    },
+    "surfacePath": "E-Ë",
+    "surfaceVowels": [
+      "E",
+      "Ë"
+    ]
+  },
+  "meta": {
+    "canonVersion": "canon-v1.0",
+    "contractVersion": "scientific-output-v1.1",
+    "engineVersion": "v1.0.0",
+    "rulesetVersion": "ruleset-v1.2"
+  },
+  "normalizedWord": "zemër",
+  "warnings": null,
+  "word": "zemër"
 }"
 `;
