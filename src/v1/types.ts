@@ -1,42 +1,45 @@
-/**
- * ZË-RO v1 Contract Types
- * - Deterministic output shape
- * - No scores, no modes
- * - candidates[0] is primary by ordering only
- */
+export type SevenVowel = "A" | "E" | "I" | "O" | "U" | "Y" | "Ë";
 
-export type EngineVersion = string; // e.g. "v1.0.0"
+export type EvidenceMath7V1 = {
+  vowels: SevenVowel[];
+  indices: number[]; // 0..6
+  sum: number;
+  totalMod7: number; // sum % 7
+};
 
-export interface AnalysisResult {
-  /** Original user input (unmodified) */
-  word: string;
+export type EvidenceV1 = {
+  basis: string; // exact string used for surface analysis
+  surfaceVowels: SevenVowel[];
+  surfacePath: string; // "A-E-Ë" (or "")
+  math7: EvidenceMath7V1;
+};
 
-  /** Cleaned/normalized word used internally */
-  normalizedWord: string;
-
-  /** Ordered list of candidates (no numeric ranking exposed) */
-  candidates: Candidate[];
-
-  /** Engine contract version */
-  engineVersion: EngineVersion;
-}
+export type MetaV1 = {
+  engineVersion: string;
+  contractVersion: string;
+  rulesetVersion: string;
+  canonVersion: string;
+};
 
 export interface Candidate {
-  /** Language code: "sq", "la", "en", "unknown", etc. */
-  language: string;
+  language: string;            // e.g. "sq", "la", "en", "unknown"
+  form: string;                // candidate surface form
+  decomposition: string[];     // minimal parts after allowed ops
+  vowelPath: string;           // e.g. "E-Ë", "A-Ë"
+  functionalStatement: string; // 1–2 sentence explanation
+  notes?: string[];            // optional short bullets
+}
 
-  /** Candidate surface form */
-  form: string;
+export interface AnalysisResult {
+  word: string;           // original input from user
+  normalizedWord: string; // cleaned form used internally
+  candidates: Candidate[];
+  engineVersion: string;  // e.g. "v1.0.0"
 
-  /** Minimal parts after allowed ops */
-  decomposition: string[];
+  // Scientific Output Package v1 — Phase 1 evidence
+  evidence: EvidenceV1;
+  meta: MetaV1;
 
-  /** Vowel path string, e.g. "U-I", "A-I-Ë" */
-  vowelPath: string;
-
-  /** 1–2 sentence functional explanation */
-  functionalStatement: string;
-
-  /** Optional short bullets (debug/notes) */
-  notes?: string[];
+  // Optional; omit when empty
+  warnings?: string[];
 }
