@@ -53,6 +53,11 @@ describe("Engine Contract v1 — capture engine output (goldens)", () => {
     { word: "damage", mode: "strict", alphabet: "auto" },
     { word: "mathematics", mode: "strict", alphabet: "auto" },
     { word: "father", mode: "strict", alphabet: "auto" },
+
+    // Canon Battery Expansion v1
+    { word: "gjak", mode: "strict", alphabet: "auto" },
+    { word: "zemër", mode: "strict", alphabet: "auto" },
+    { word: "internet", mode: "strict", alphabet: "auto" },
   ] as const;
 
   for (const c of cases) {
