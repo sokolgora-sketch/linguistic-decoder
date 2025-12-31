@@ -24,3 +24,8 @@ node_modules/
 
 # local backups
 src/lib/*.bak.*
+
+# accidental terminal artifacts
+NODE_ENV=production
+nextn@0.1.0
+tsc
