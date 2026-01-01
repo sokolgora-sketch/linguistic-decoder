@@ -1,15 +1,11 @@
+
 import { initializeApp, getApps, type FirebaseApp } from "firebase/app";
-import { getAuth, signInAnonymously, type User } from "firebase/auth";
+import { getAuth, signInAnonymously, type User, type Auth } from "firebase/auth";
 import { getFirestore, type Firestore } from "firebase/firestore";
 
-/**
- * Firebase wiring (shared by client components like HistoryPanel).
- *
- * Exports expected by existing UI code:
- * - db (Firestore)
- * - ensureAnon() (anonymous auth helper)
- * - getFirebaseApp() (app accessor)
- */
+let _app: FirebaseApp | null = null;
+let _auth: Auth | null = null;
+let _db: Firestore | null = null;
 
 function getFirebaseConfig() {
   return {
@@ -23,25 +19,41 @@ function getFirebaseConfig() {
 }
 
 export function getFirebaseApp(): FirebaseApp {
-  if (getApps().length) return getApps()[0]!;
-  return initializeApp(getFirebaseConfig());
+  if (process.env.NODE_ENV === "test") {
+    throw new Error("Firebase app should not be initialized in unit tests");
+  }
+  if (_app) return _app;
+
+  _app = initializeApp(getFirebaseConfig());
+  return _app;
 }
 
-export const auth = getAuth(getFirebaseApp());
-export const db: Firestore = getFirestore(getFirebaseApp());
+export function getAuthClient(): Auth {
+  if (process.env.NODE_ENV === "test") {
+    throw new Error("Firebase auth should not be initialized in unit tests");
+  }
+  if (_auth) return _auth;
+  _auth = getAuth(getFirebaseApp());
+  return _auth;
+}
 
-/**
- * Ensure we have an authenticated user (anonymous).
- * Returns the Firebase User (or throws if auth fails).
- */
+export function getFirestoreClient(): Firestore {
+  if (process.env.NODE_ENV === "test") {
+    throw new Error("Firebase firestore should not be initialized in unit tests");
+  }
+  if (_db) return _db;
+  _db = getFirestore(getFirebaseApp());
+  return _db;
+}
+
 export async function ensureAnon(): Promise<User> {
+  const auth = getAuthClient();
   if (auth.currentUser) return auth.currentUser;
 
   try {
     const cred = await signInAnonymously(auth);
     return cred.user;
   } catch (err) {
-    // If something races and we got a user anyway, accept it.
     if (auth.currentUser) return auth.currentUser;
     throw err;
   }

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { db, auth, ensureAnon } from "@/lib/firebase";
+import { getFirestoreClient, getAuthClient, ensureAnon } from "@/lib/firebase";
 import { collection, query, orderBy, limit, onSnapshot } from "firebase/firestore";
 
 export type HistoryItem = { id: string; word: string; mode: string; alphabet: string; createdAt?: any };
@@ -12,6 +12,8 @@ export function useHistory(max = 12) {
     const setupListener = async () => {
       try {
         await ensureAnon();
+        const auth = getAuthClient();
+        const db = getFirestoreClient();
         const uid = auth.currentUser!.uid;
         const q = query(
           collection(db, "users", uid, "history"),

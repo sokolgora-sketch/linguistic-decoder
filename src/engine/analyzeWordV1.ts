@@ -4,7 +4,6 @@ import type { VoicePath, Ring, Math7Summary } from "../lib/sevenVowelsCore";
 import { generateCandidates } from "./wordCandidates";
 import { detectMediatorAxisPair } from "./patterns/mediatorAxisPair";
 import { decisionGeometryForWord, type DecisionGeometryTag } from "../shared/decisionGeometry.v1";
-import { trustGeometryForWord, type TrustGeometryTag } from "../shared/trustGeometry.v1";
 import { buildV1Tags } from "../shared/v1Tags.v1";
 import type { OEdgePolarityTag } from "@/shared/oEdgePolarity.v1";
 
@@ -39,7 +38,6 @@ export type AnalysisResult = {
   language_guess: string | null;
   candidates: CandidateAnalysis[];
   math7_summary: Math7Summary | null;
-  trust_geometry: TrustGeometryTag | null;
 
     engine_meta: EngineMeta;
   decision_geometry?: DecisionGeometryTag | null;
@@ -100,7 +98,6 @@ export async function analyzeWordV1(
   return {
     word: input,
     mode,
-    trust_geometry: null,
     ...buildV1Tags(input),
     language_guess: null,
     candidates,
