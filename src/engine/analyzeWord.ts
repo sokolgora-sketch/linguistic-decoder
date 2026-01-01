@@ -74,22 +74,41 @@ function runSevenVoices(word: string, opts: { mode: "strict" | "explore" }): any
 /**
  * Auto-build a morphology matrix for candidates that lack a manual one.
  * v1: simple, deterministic, based on decomposition.
+ * This function is designed to be robust against variations in the candidate data,
+ * which may have 'parts' as an array of strings or an array of objects.
  */
 function buildGeneratedWordMatrix(candidate: Candidate): MorphologyMatrix {
   const parts = candidate.decomposition?.parts ?? [];
   const root = parts[0];
 
-  return {
-    pivot: root?.form ?? candidate.form,
-    meaning: candidate.decomposition?.functionalStatement ?? "",
-    morphemes: parts.map((p: any) => ({
+  // Determine the pivot. If the root is a string, use it directly.
+  // If it's an object with a 'form' property, use that. Otherwise, fall back to the candidate's form.
+  const pivot = typeof root === "string" ? root : root?.form ?? candidate.form;
+
+  const morphemes = parts.map((p: any) => {
+    // Handle both string and object parts for morphemes.
+    if (typeof p === "string") {
+      return { form: p, role: "morpheme", gloss: "" }; // Default role and gloss for string parts.
+    }
+    return {
       form: p.form,
       role: p.role,
       gloss: p.gloss,
-    })),
+    };
+  });
+
+  const wordSumParts = parts.map((p: any) => {
+    // Handle both string and object parts for word sums.
+    return typeof p === "string" ? p : p.form;
+  });
+
+  return {
+    pivot,
+    meaning: candidate.decomposition?.functionalStatement ?? "",
+    morphemes,
     wordSums: [
       {
-        parts: parts.map((p: any) => p.form),
+        parts: wordSumParts,
         result: candidate.form,
         gloss: candidate.decomposition?.functionalStatement ?? "",
       },
@@ -97,6 +116,7 @@ function buildGeneratedWordMatrix(candidate: Candidate): MorphologyMatrix {
     source: "auto",
   };
 }
+
 
 /**
  * Attach canon candidates to the base engine result and
