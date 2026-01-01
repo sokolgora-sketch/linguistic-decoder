@@ -428,3 +428,7 @@ export interface StressHarnessRow {
   stress: unknown;
   error?: string;
 }
+
+
+// Back-compat alias (keeps older imports working)
+export type AnalyzeWordResult = AnalysisResult;

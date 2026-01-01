@@ -8,7 +8,7 @@ import {
 
 export type ShareSource = {
   word: string;
-  analysis: AnalyzeWord_resultUI;
+  analysis: AnalyzeWordResultUI;
 };
 
 export function buildShareSnippet(source: ShareSource): string {
@@ -23,10 +23,10 @@ export function buildShareSnippet(source: ShareSource): string {
   let engineLine: string | null = null;
   if (meta) {
     const engineBuild =
-      meta.versionLine && meta.versionLine !== "unknown" ? meta.versionLine : "core-2";
+      (meta as any).versionLine && (meta as any).versionLine !== "unknown" ? (meta as any).versionLine : "core-2";
 
     const engineMode =
-      meta.modeLabel && meta.modeLabel !== "unknown" ? meta.modeLabel : "strict";
+      (meta as any).modeLabel && (meta as any).modeLabel !== "unknown" ? (meta as any).modeLabel : "strict";
 
     const engineAlphabet =
       meta.alphabetLabel && meta.alphabetLabel !== "unknown" ? meta.alphabetLabel : "auto";

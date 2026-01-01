@@ -117,7 +117,11 @@ export function buildZhejiSummary(
 ): ZhejiSummaryUI | null {
   if (!result?.primaryPath?.voicePath) return null;
 
-  const vowelPath = parseVowelPath(result.primaryPath.voicePath);
+  const vowelPath = (() => {
+    const vp: any = (result as any).primaryPath?.voicePath;
+    const vps = Array.isArray(vp) ? vp.join("") : (typeof vp === "string" ? vp : "");
+    return parseVowelPath(vps);
+  })();
   if (vowelPath.length === 0) return null;
 
   const { traits } = SEVEN_VOWELS_MANIFEST;

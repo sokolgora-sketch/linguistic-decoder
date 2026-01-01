@@ -17,6 +17,7 @@
 
 // src/engine/analyzeWord.ts
 import type {
+
   AnalyzeWordResult,
   Candidate,
   LanguageFamilyCandidate,
@@ -24,12 +25,14 @@ import type {
   SymbolicLayer,
   SymbolicTag,
   Vowel,
+
 } from "@/shared/engineShape";
 import { ENGINE_VERSION } from "./version";
 import { solveWord } from "@/functions/sevenVoicesCore";
 import { getManifest } from "./manifest";
 import type { SolveOptions } from "@/functions/sevenVoicesCore";
 import { CANON_CANDIDATES } from "@/shared/canonCandidates";
+
 import { computeMath7ForResult, type Math7Summary } from "./math7";
 
 /**
@@ -107,13 +110,13 @@ function attachCanonCandidates(base: any): any {
   const MANUAL_MATRIX_WORDS = new Set(["study", "damage"]);
 
   const languageFamilies: LanguageFamilyCandidate[] = canon.map(
-    (c: Candidate): LanguageFamilyCandidate => {
+    (c): LanguageFamilyCandidate => {
       const treatAsManual =
         MANUAL_MATRIX_WORDS.has(word) && !!c.morphologyMatrix;
 
       const matrix: MorphologyMatrix = treatAsManual
         ? { ...c.morphologyMatrix, source: "manual" as const }
-        : buildGeneratedWordMatrix(c);
+        : buildGeneratedWordMatrix(c as unknown as Candidate);
 
       return {
         language: c.language,

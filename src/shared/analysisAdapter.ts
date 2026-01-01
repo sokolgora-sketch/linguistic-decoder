@@ -38,8 +38,14 @@ export function enginePayloadToAnalysisResult(payload: EnginePayload): AnalyzeWo
     symbolicCore: symbolic,
     candidates,
     meta: {
-      cache: payload.cacheHit ? "hit" : "miss",
-      source: "live",
+      version:
+        (payload as any)?.engineVersion ??
+        (payload as any)?.engine_meta?.engineVersion ??
+        "unknown",
+      created:
+        (payload as any)?.createdAt ??
+        (payload as any)?.engine_meta?.timestampIso ??
+        new Date().toISOString(),
     },
   };
 
@@ -72,7 +78,7 @@ function buildHeartSummary(payload: any, math7: any) {
 
 function buildMindCandidates(payload: EnginePayload): Candidate[] {
   if (CANON_CANDIDATES[payload.word]) {
-    return CANON_CANDIDATES[payload.word];
+    return CANON_CANDIDATES[payload.word] as unknown as Candidate[];
   }
 
   if (payload.languageFamilies && payload.languageFamilies.length > 0) {

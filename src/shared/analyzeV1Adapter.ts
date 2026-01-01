@@ -128,6 +128,7 @@ export function adaptAnalyzeV1ToUI(raw: Raw): AnalyzeWordResultUI {
     raw?.engineMeta ??
     ({
       engineVersion,
+    heartInstrumentV1: null,
       mode: raw?.mode ?? undefined,
       alphabet: raw?.alphabet ?? undefined,
     } as any);
@@ -154,5 +155,5 @@ export function adaptAnalyzeV1ToUI(raw: Raw): AnalyzeWordResultUI {
     symbolic: raw?.symbolic,
     meta: raw?.meta,
     raw, // debug hook; safe but optional
-  } as AnalyzeWordResultUI;
+  } as unknown as AnalyzeWordResultUI;
 }

@@ -236,7 +236,15 @@ export default function DeterminismComparatorPanel() {
                     <span className="font-semibold">{r.word}</span>
                     {"ms" in r ? (
                       <span className="text-xs text-muted-foreground">
-                        {r.ok ? `${r.msAvg}ms avg · ${r.msMax}ms max` : `${r.ms}ms`}
+                        {(() => {
+  const anyR: any = r as any;
+  if (typeof anyR.msAvg === "number" && typeof anyR.msMax === "number") {
+    return `${anyR.msAvg}ms avg · ${anyR.msMax}ms max`;
+  }
+  if (typeof anyR.ms === "number") return `${anyR.ms}ms`;
+  if (typeof anyR.ms === "string") return anyR.ms;
+  return "";
+})()}
                       </span>
                     ) : null}
                   </CardTitle>

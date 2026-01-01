@@ -4,16 +4,16 @@ import * as React from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "./ui/card";
 import { Candidates } from "./Candidates";
 import { FrontierCandidates } from "./FrontierCandidates"; // ignore if missing
-import { SymbolicReadingCard } from "./SymbolicReadingCard";
 import { EngineMetaCard } from "./EngineMetaCard";
 import WordMatrixCard from "./WordMatrixCard";
 import { buildWordMatrixUI } from "@/lib/wordMatrix";
 import { buildEngineMetaSummary } from "../lib/engineMetaSummary";
-import type { EnginePayload } from "../shared/engineShape";
+import type { AnalyzeWordResultUI } from "../shared/resultsUI";
 import WordMatrixLegend from "./WordMatrixLegend";
+import { HeartInstrumentV1Section } from "@/components/heart/HeartInstrumentV1Section";
 
 type ResultsDisplayProps = {
-  analysis: EnginePayload | null;
+  analysis: AnalyzeWordResultUI | null;
 };
 
 export function ResultsDisplay({ analysis }: ResultsDisplayProps) {
@@ -61,6 +61,11 @@ export function ResultsDisplay({ analysis }: ResultsDisplayProps) {
 
       {/* ENGINE META */}
       <EngineMetaCard summary={engineMetaSummary} />
+
+      {/* HEART INSTRUMENT */}
+      {analysis?.heartInstrumentV1 ? (
+        <HeartInstrumentV1Section data={analysis.heartInstrumentV1} />
+      ) : null}
 
       {/* FRONTIER */}
       <Card>
@@ -121,7 +126,7 @@ export function ResultsDisplay({ analysis }: ResultsDisplayProps) {
               </thead>
               <tbody>
                 {analysis.languageFamilies.map((f: any, i: number) => (
-                  <tr key={i} className="border-b border-slate-900/40 last:border-none">
+                  <tr key={i} className="border-b border-slate-900/4d last:border-none">
                     <td className="py-2 pr-4">{f.language || "—"}</td>
                     <td className="py-2 pr-4">{f.form || "—"}</td>
                     <td className="py-2 pr-4">{f.gloss || "—"}</td>
@@ -134,9 +139,6 @@ export function ResultsDisplay({ analysis }: ResultsDisplayProps) {
           </CardContent>
         </Card>
       )}
-
-      {/* SYMBOLIC */}
-      <SymbolicReadingCard symbolic={(analysis as any).symbolic ?? null} />
     </div>
   );
 }

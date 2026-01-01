@@ -36,5 +36,5 @@ export function extractMath7BasisFromPayload(payload: any): { basis: string; vow
     (v): v is SevenVowel => isSevenVowel(v)
   );
 
-  return { basis, vowels };
+  return { basis, vowels: vowels as ("A"|"E"|"I"|"O"|"U"|"Y"|"Ë")[] };
 }

@@ -1,30 +1,52 @@
 // src/engine/mindAnalyzer.ts
-import type { Math7Summary, MindSummary, ConsonantsSummary, SymbolicSummary } from "@/shared/analysisResult.v1";
+// Build-safe: do not depend on @/shared/analysisResult.v1 type exports (they drift).
+
+import type { Math7Summary } from "@/engine/math7";
 import type { EnginePayload } from "@/shared/engineShape";
 
+export type MindSummary = {
+  dominantPrinciple: string;
+  polarity: "balanced" | "positive" | "negative" | string;
+  patternName: string;
+  logicStatement: string;
+};
+
+// Minimal, deterministic mind summary (placeholder logic).
+// You can tighten this later once shared summary types are stabilized.
 export function analyzeMind(math7: Math7Summary, payload: EnginePayload): MindSummary {
-  const dominantPrinciple = math7.principlePath?.[0] ?? "Unknown";
-  const polarity: MindSummary["polarity"] =
-    math7.tensionLevel === "light"
-      ? "light"
-      : math7.tensionLevel === "dark"
-      ? "dark"
-      : "balanced";
-
+  void payload; // keep signature stable, avoid unused warnings
+  const dominantPrinciple = "Unknown";
+  const polarity = "balanced";
   const patternName = `${dominantPrinciple}-${polarity}`;
-  const logicStatement =
-    `The word reflects ${dominantPrinciple} principle with ${polarity} flow.`;
+  const logicStatement = `The word reflects ${dominantPrinciple} principle with ${polarity} flow.`;
 
-  return { dominantPrinciple, polarity, patternName, logicStatement };
+  return {
+    dominantPrinciple,
+    polarity,
+    patternName,
+    logicStatement,
+  };
 }
 
+
+export type ConsonantsSummary = {
+  field: { smoothHits: number; spikyHits: number; slots: any[] };
+  summary: { smoothRatio: number; dominantArchetypes: string[]; notes: string[] };
+};
+
+export type SymbolicSummary = {
+  notes: string[];
+};
+
 export function analyzeConsonants(payload: EnginePayload): ConsonantsSummary {
-    return { 
-        field: { smoothHits: 1, spikyHits: 0, slots: [] }, 
-        summary: { smoothRatio: 1, dominantArchetypes: [], notes: [] } 
-    };
+  void payload;
+  return {
+    field: { smoothHits: 0, spikyHits: 0, slots: [] },
+    summary: { smoothRatio: 0, dominantArchetypes: [], notes: [] },
+  };
 }
 
 export function analyzeSymbolic(payload: EnginePayload): SymbolicSummary {
-    return { notes: ["Placeholder note"] };
+  void payload;
+  return { notes: ["Placeholder note"] };
 }

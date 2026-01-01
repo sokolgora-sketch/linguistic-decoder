@@ -1,25 +1,28 @@
-import type { AnalyzeWordResult } from "@/lib/schema";
-import type { WordMatrixUI } from "@/shared/resultsUI";
+import type { AnalyzeWordResultUI } from "@/shared/resultsUI";
+import type { WordMatrixSummary } from "@/components/WordMatrixCard";
 
-export function buildWordMatrixUI(analysis: AnalyzeWordResult): WordMatrixUI | undefined {
-  if (!analysis.primaryPath || !analysis.languageFamilies?.length) return undefined;
+/**
+ * Build-safe WordMatrix adapter.
+ * Accepts the UI analysis shape and returns the exact summary shape required by WordMatrixCard.
+ * Defensive by design: repo has multiple drifting result shapes.
+ */
+export function buildWordMatrixUI(
+  analysis: AnalyzeWordResultUI | null | undefined
+): WordMatrixSummary | undefined {
+  if (!analysis) return;
+
+  const anyA: any = analysis as any;
+  const word: string = anyA.word ?? "";
+
+  // primaryPath.voicePath sometimes is string[], sometimes string, sometimes null.
+  const vp = anyA?.primaryPath?.voicePath;
+  const voicePath =
+    Array.isArray(vp) ? vp.join("") : typeof vp === "string" ? vp : "";
 
   return {
-    word: analysis.word,
-    primary: {
-      label: "Primary path",
-      voicePath: analysis.primaryPath.voicePath,
-      notes: "Placeholder note",
-    },
-    canon: analysis.languageFamilies.map(fam => ({
-      language: fam.language,
-      form: fam.form,
-      voicePath: fam.voicePath,
-      notes: "—",
-    })),
-    deepRoot: {
-      label: "Proto-root",
-      notes: "Experimental proto-root suggestions (DeepRoot v1, UI-only).",
-    },
+    word,
+    entries: [
+      { label: "primary.voicePath", value: voicePath || "—" },
+    ],
   };
 }

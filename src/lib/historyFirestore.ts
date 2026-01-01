@@ -1,64 +1,165 @@
+import "server-only";
+
+import type { QueryDocumentSnapshot, DocumentData } from "firebase/firestore";
+import {
+  collection,
+  deleteDoc,
+  doc,
+  getDocs,
+  limit,
+  orderBy,
+  query,
+  setDoc,
+  startAfter,
+} from "firebase/firestore";
+
+import type { EnginePayload } from "@/shared/engineShape";
+import { db } from "./firebase";
+
+const COL_HISTORY = "history";
+const COL_ANALYSIS_CACHE = "analysisCache";
+
 /**
- * History <-> Firestore mapping (stable adapter surface)
- *
- * This file is the contract used by tests:
- *   tests/history.firestore.spec.ts
- *
- * Firestore doc is FLAT (engine meta fields top-level):
- *   { word, mode, alphabet, engineVersion, solveMs, createdAt, payloadVersion }
+ * Types expected by src/lib/history.firestore.ts re-export file.
+ * Keep these stable even if the underlying storage changes.
  */
-
-import type { HistoryItemCore, HistoryEngineMeta } from "./history";
-
-export type HistoryDocData = {
-  word: string;
-  mode: HistoryEngineMeta["mode"];
-  alphabet: HistoryEngineMeta["alphabet"];
-  engineVersion: string;
-  solveMs: number | null;
-  createdAt: string;
-  payloadVersion: 1;
+export type HistoryItem = {
+  cacheId?: string;
+  word?: string;
+  mode?: string;
+  engineVersion?: string | null;
+  createdAt?: number; // millis
 };
 
-const PAYLOAD_VERSION: 1 = 1;
+// Back-compat alias for older code (historyStore.ts)
+export type HistoryRow = HistoryItem;
 
-function normalizeSolveMs(input: unknown): number | null {
-  return typeof input === "number" && Number.isFinite(input) ? input : null;
-}
+
+export type HistoryDocData = {
+  cacheId: string;
+  word?: string;
+  mode?: string;
+  engineVersion?: string | null;
+  createdAt: number;
+  heartSummary?: string;
+  extra?: Record<string, unknown>;
+};
 
 /**
- * Convert app history item -> Firestore flat doc
+ * Adapter helpers expected by history.firestore.ts
  */
-export function historyItemToDoc(item: HistoryItemCore): HistoryDocData {
-  const meta = item.engineMeta;
-
+export function historyItemToDoc(item: HistoryItem): HistoryDocData {
   return {
+    cacheId: item.cacheId ?? "",
     word: item.word,
     mode: item.mode,
-    alphabet: item.alphabet,
-    engineVersion: meta.engineVersion,
-    solveMs: normalizeSolveMs(meta.solveMs),
-    createdAt: item.createdAt,
-    payloadVersion: PAYLOAD_VERSION,
+    engineVersion: item.engineVersion ?? null,
+    createdAt: item.createdAt ?? Date.now(),
+  };
+}
+
+export function docToHistoryItem(id: string, data: Partial<HistoryDocData>): HistoryItem {
+  return {
+    cacheId: data.cacheId ?? id,
+    word: data.word,
+    mode: data.mode,
+    engineVersion: data.engineVersion ?? null,
+    createdAt: data.createdAt,
   };
 }
 
 /**
- * Convert Firestore flat doc -> app history item
+ * Exports expected by src/lib/historyStore.ts
  */
-export function docToHistoryItem(doc: HistoryDocData): HistoryItemCore {
-  const engineMeta: HistoryEngineMeta = {
-    engineVersion: doc.engineVersion,
-    mode: doc.mode,
-    alphabet: doc.alphabet,
-    solveMs: normalizeSolveMs(doc.solveMs),
-  };
+export async function saveHistoryRecord(
+  args: {
+    cacheId: string;
+    payload: EnginePayload;
+    createdAt?: number;
+    word?: string;
+    engineVersion?: string;
+    mode?: string;
+    alphabet?: string;
+    heartSummary?: string;
+    // Future-proofing: optional bag for new metadata without breaking build again.
+    extra?: Record<string, unknown>;
+  },
+  _uid?: string,
+): Promise<void> {
+  void _uid;
+  const { cacheId, payload } = args;
+  const createdAt = args.createdAt ?? Date.now();
 
-  return {
-    word: doc.word,
-    mode: doc.mode,
-    alphabet: doc.alphabet,
-    engineMeta,
-    createdAt: doc.createdAt,
-  };
+  const word =
+    args.word ??
+    (payload as any)?.word ??
+    (payload as any)?.sanitized ??
+    (payload as any)?.basis ??
+    "";
+
+  const mode = args.mode ?? (payload as any)?.mode ?? "strict";
+
+  const alphabet = args.alphabet ?? (payload as any)?.alphabet ?? "auto";
+
+  const heartSummary = args.heartSummary ?? (payload as any)?.heart?.narrative ?? (payload as any)?.heartSummary ?? "";
+
+  const engineVersion =
+    args.engineVersion ??
+    (payload as any)?.engineVersion ??
+    (payload as any)?.engine_meta?.engineVersion ??
+    null;
+
+
+  const ref = doc(db, COL_HISTORY, cacheId);
+
+  const docData: HistoryDocData = {
+    cacheId,
+    word,
+    mode,
+    engineVersion,
+    createdAt,
+    // extra metadata (kept optional/loose on purpose)
+    alphabet: (typeof alphabet === "string" ? alphabet : undefined),
+    heartSummary: (typeof heartSummary === "string" ? heartSummary : undefined),
+    uid: (typeof _uid === "string" ? _uid : undefined),
+    extra: (args.extra && typeof args.extra === "object" ? args.extra : undefined),
+  } as any;
+
+  await setDoc(ref, docData, { merge: true });
+}
+
+export async function loadHistoryPage(args: {
+  limit?: number;
+  cursor?: QueryDocumentSnapshot<DocumentData> | null;
+}): Promise<{
+  items: HistoryItem[];
+  cursor: QueryDocumentSnapshot<DocumentData> | null;
+}> {
+  const pageSize = Math.max(1, Math.min(50, args.limit ?? 20));
+
+  const base = query(
+    collection(db, COL_HISTORY),
+    orderBy("createdAt", "desc"),
+    limit(pageSize),
+  );
+
+  const q = args.cursor ? query(base, startAfter(args.cursor)) : base;
+
+  const snap = await getDocs(q);
+
+  const items: HistoryItem[] = snap.docs.map((d) => {
+    const x = d.data() as Partial<HistoryDocData>;
+    return docToHistoryItem(d.id, x);
+  });
+
+  const nextCursor = snap.docs.length ? snap.docs[snap.docs.length - 1] : null;
+  return { items, cursor: nextCursor };
+}
+
+export async function deleteHistoryDoc(cacheId: string): Promise<void> {
+  await deleteDoc(doc(db, COL_HISTORY, cacheId));
+}
+
+export async function deleteAnalysisCacheDoc(cacheId: string): Promise<void> {
+  await deleteDoc(doc(db, COL_ANALYSIS_CACHE, cacheId));
 }
