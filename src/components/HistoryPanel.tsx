@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { db, ensureAnon} from "../lib/firebase";
+import { ensureAnon} from "../lib/firebase";
 import { loadHistoryPage, deleteHistoryItem } from "../lib/historyStore";
 import type { User } from "firebase/auth";
 import type { QueryDocumentSnapshot, DocumentData } from "firebase/firestore";
