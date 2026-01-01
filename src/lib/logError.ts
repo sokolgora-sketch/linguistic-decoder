@@ -1,20 +1,24 @@
-import { getFirestore, collection, addDoc, serverTimestamp } from "firebase/firestore";
-import { getAuth } from "firebase/auth";
-import { app, auth, db } from "./firebase";
+import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import { getFirestoreClient } from "./firebase";
 
-export async function logError(ev: { where: string; message: string; detail?: any }) {
+/**
+ * Lightweight error logger.
+ * Build-safe: depends only on ./firebase exports that we actually provide.
+ */
+export async function logError(ev: {
+  where: string;
+  message: string;
+  detail?: unknown;
+}): Promise<void> {
   try {
-    if (!db || !auth) return; // Do not log if firebase is not initialized
-    const uid = (auth.currentUser && auth.currentUser.uid) || "anon";
-    const ref = collection(db, "users", uid, "errors");
-    await addDoc(ref, {
+    const db = getFirestoreClient();
+    await addDoc(collection(db, "errors"), {
       where: ev.where,
-      message: ev.message?.toString().slice(0, 500),
-      detail: ev.detail ? JSON.stringify(ev.detail).slice(0, 2000) : null,
+      message: ev.message,
+      detail: ev.detail ?? null,
       ts: serverTimestamp(),
-      engine: process.env.NEXT_PUBLIC_ENGINE_VERSION || "dev"
     });
   } catch {
-    // swallow errors, especially in test env
+    // Never throw from logging.
   }
 }

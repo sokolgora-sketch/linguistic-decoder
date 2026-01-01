@@ -20,9 +20,9 @@ export interface HistoryRunInput {
 }
 
 export type HistoryQuery = {
-  uid?: string | null;
-  mode?: "strict" | "open" | null;
-  alphabet?: string | null;
+  uid?: string | null; // currently ignored by historyFirestore.ts
+  mode?: "strict" | "open" | null; // currently ignored by historyFirestore.ts
+  alphabet?: string | null; // currently ignored by historyFirestore.ts
   limitCount?: number;
   cursor?: any | null; // Firestore QueryDocumentSnapshot; kept as any for UI boundary
   wordFilter?: string;
@@ -45,12 +45,18 @@ export async function recordHistoryRun(input: HistoryRunInput): Promise<void> {
 
   const payload = input.result as EnginePayload;
 
+  const cacheId =
+    (payload as any)?.cacheId ??
+    (payload as any)?.meta?.cacheId ??
+    (payload as any)?.raw?.meta?.cacheId ??
+    undefined;
+
   const heartSummary = extractHeartSummary(payload);
 
-  // cacheId: if your engine stores analyses separately, you can set this later.
-  // leaving undefined is fine; UI will fall back to doc id.
   await saveHistoryRecord(
     {
+      cacheId: cacheId ?? "",
+      payload,
       word: input.word,
       engineVersion: input.engineVersion,
       mode: input.mode || "strict",
@@ -58,47 +64,60 @@ export async function recordHistoryRun(input: HistoryRunInput): Promise<void> {
       heartSummary: heartSummary || "",
       createdAt: Date.now(),
     },
-    input.uid
+    input.uid ?? undefined
   );
 }
 
 function extractHeartSummary(payload: EnginePayload): string | undefined {
-  if (!payload?.primaryPath?.voicePath) return;
-  return payload.primaryPath.voicePath.map((v) => v.symbol).join("");
+  const hs = (payload as any)?.heart?.narrative;
+  if (typeof hs === "string" && hs.trim()) return hs;
+
+  const vp = (payload as any)?.primaryPath?.voicePath;
+  if (Array.isArray(vp)) {
+    return vp
+      .map((v: any) => (typeof v === "string" ? v : v?.symbol ?? ""))
+      .filter(Boolean)
+      .join("");
+  }
+
+  return;
 }
 
 /**
  * Canonical read used by HistoryPanel.
- * Applies a lightweight client-side wordFilter (no index required).
+ * historyFirestore.ts currently supports only {limit,cursor}.
+ * Everything else is filtered client-side here.
  */
 export async function loadHistoryPage(q: HistoryQuery): Promise<{
   rows: HistoryRow[];
   cursor: any | null;
   hasMore: boolean;
 }> {
+  const limitCount = q.limitCount ?? 50;
+
   const res = await loadPageFirestore({
-    uid: q.uid ?? null,
-    mode: q.mode ?? null,
-    alphabet: q.alphabet ?? null,
-    limitCount: q.limitCount ?? 50,
+    limit: limitCount,
     cursor: q.cursor ?? null,
   });
 
-  let rows = res.rows;
+  let rows = res.items as HistoryRow[];
 
   const wf = (q.wordFilter ?? "").trim().toLowerCase();
   if (wf) rows = rows.filter((r) => (r.word || "").toLowerCase().includes(wf));
 
-  return { rows, cursor: res.cursor as any, hasMore: res.hasMore };
+  const hasMore = rows.length >= limitCount;
+
+  return { rows, cursor: res.cursor as any, hasMore };
 }
 
 export async function deleteHistoryItem(params: {
-  uid?: string | null;
+  uid?: string | null; // currently ignored by historyFirestore.ts
   id: string;
   cacheId?: string | null;
   alsoDeleteCache?: boolean;
 }): Promise<void> {
-  await deleteHistoryDoc({ uid: params.uid ?? null, id: params.id });
+  // historyFirestore.ts delete expects cacheId/id string (doc id)
+  await deleteHistoryDoc(params.id);
 
   if (params.alsoDeleteCache && params.cacheId) {
     await deleteAnalysisCacheDoc(params.cacheId);

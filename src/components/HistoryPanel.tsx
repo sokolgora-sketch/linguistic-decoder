@@ -1,9 +1,10 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { db, ensureAnon} from "../lib/firebase";
+import { ensureAnon} from "../lib/firebase";
 import { loadHistoryPage, deleteHistoryItem } from "../lib/historyStore";
 import type { User } from "firebase/auth";
+import type { QueryDocumentSnapshot, DocumentData } from "firebase/firestore";
 type ModeFilter = "all" | "strict" | "open";
 type AlphabetFilter =
   | "all"
@@ -245,7 +246,7 @@ export default function HistoryPanel({
                 <div className="flex flex-wrap items-center gap-2">
                   <button
                     title="Load cached analysis"
-                    onClick={() => onLoadAnalysis(h.cacheId)}
+                    onClick={() => { if (h.cacheId) onLoadAnalysis(h.cacheId); }}
                     className="rounded-xl border border-white/10 bg-white/10 px-3 py-1.5 text-xs text-gray-100 hover:bg-white/15"
                   >
                     Load

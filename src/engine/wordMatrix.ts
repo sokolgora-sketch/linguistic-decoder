@@ -1,33 +1,74 @@
-import { WordMatrix } from "./types";
+import type { WordMatrixV1 } from "@/shared/wordMatrix.v1";
 
-export const wordMatrixExamples: WordMatrix[] = [
+/**
+ * Dev-only examples used by cards/tests in some branches.
+ * Keep these aligned with WordMatrixV1 (the UI summary shape).
+ */
+export const wordMatrixExamples: WordMatrixV1[] = [
   {
     word: "study",
-    languageFamily: "Latin",
-    morphology: {
-      root: "stud",
-      suffixes: ["ium", "ens"],
-      gloss: "deliberate effort / inner state of focus"
+    primary: {
+      layer: "heart",
+      label: "Primary path",
+      voicePath: "Unity → > Insight",
+      notes: "Example only (dev fixture).",
     },
-    meaning: "A deliberate effort of knowing that leads to an inner state of focus.",
-    wordSums: ["stud + ium → studium", "stud + ens → students"],
-    consonantPattern: "st (plosive + sibilant) supports focused effort",
-    principles: ["Expansion", "Insight", "Balance"],
-    symbolicNotes:
-      "U–I path suggests unified insight; consonants 'st' and 'd' create a focused inner process."
+    canon: [
+      {
+        layer: "canon",
+        label: "Latin",
+        language: "Latin",
+        form: "studium",
+        voicePath: "U → I",
+      },
+      {
+        layer: "canon",
+        label: "Albanian",
+        language: "Albanian",
+        form: "studim",
+        voicePath: "U → I",
+      },
+    ],
+    deepRoot: {
+      layer: "deeproot",
+      label: "Proto-root",
+      language: "",
+      form: "",
+      voicePath: "",
+      notes: "",
+    },
   },
   {
     word: "damage",
-    languageFamily: "Latin",
-    morphology: {
-      root: "dam",
-      suffixes: ["num", "atio"],
-      gloss: "cut / act that leaves something in a harmed state"
+    primary: {
+      layer: "heart",
+      label: "Primary path",
+      voicePath: "Truth → > Truth",
+      notes: "Example only (dev fixture).",
     },
-    meaning: "An act that breaks or reduces something, leaving it harmed.",
-    wordSums: ["dam + num → damnum", "dam + atio → damatio"],
-    consonantPattern: "Plosive + nasal (d + m) = 'cut that leaves a harmed state'",
-    principles: ["Action", "Evolution"],
-    symbolicNotes: "A–Ë path suggests a cut in matter that becomes new condition."
-  }
+    canon: [
+      {
+        layer: "canon",
+        label: "Latin",
+        language: "Latin",
+        form: "damnum",
+        voicePath: "A → A",
+      },
+      {
+        layer: "canon",
+        label: "Albanian",
+        language: "Albanian",
+        form: "dë",
+        voicePath: "Ë",
+      },
+    ],
+    deepRoot: {
+      layer: "deeproot",
+      label: "Proto-root",
+      language: "",
+      form: "",
+      voicePath: "",
+      notes: "",
+    },
+  },
 ];

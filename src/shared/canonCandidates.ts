@@ -158,10 +158,11 @@ export const CANON_CANDIDATES: Record<string, CanonCandidate[]> = {
       },
       morphology: { root: "am-", suffixes: ["-or"] },
       morphologyMatrix: {
-        pivot: "am",
+        pivot: "am-",
+        source: "auto"
       },
       decomposition: {
-        parts: [{ form: "am-" }, { form: "or" }],
+        parts: ["am-", "or"],
       },
       symbolic: [
         {
@@ -189,7 +190,7 @@ export const CANON_CANDIDATES: Record<string, CanonCandidate[]> = {
         pivot: "dash",
       },
       decomposition: {
-        parts: [{ form: "dash" }, { form: "-uri" }],
+        parts: ["dash", "-uri"],
       },
       symbolic: [
         {

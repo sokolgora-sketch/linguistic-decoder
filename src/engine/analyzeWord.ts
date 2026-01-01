@@ -17,6 +17,7 @@
 
 // src/engine/analyzeWord.ts
 import type {
+
   AnalyzeWordResult,
   Candidate,
   LanguageFamilyCandidate,
@@ -24,12 +25,14 @@ import type {
   SymbolicLayer,
   SymbolicTag,
   Vowel,
+
 } from "@/shared/engineShape";
 import { ENGINE_VERSION } from "./version";
 import { solveWord } from "@/functions/sevenVoicesCore";
 import { getManifest } from "./manifest";
 import type { SolveOptions } from "@/functions/sevenVoicesCore";
 import { CANON_CANDIDATES } from "@/shared/canonCandidates";
+
 import { computeMath7ForResult, type Math7Summary } from "./math7";
 
 /**
@@ -71,22 +74,41 @@ function runSevenVoices(word: string, opts: { mode: "strict" | "explore" }): any
 /**
  * Auto-build a morphology matrix for candidates that lack a manual one.
  * v1: simple, deterministic, based on decomposition.
+ * This function is designed to be robust against variations in the candidate data,
+ * which may have 'parts' as an array of strings or an array of objects.
  */
 function buildGeneratedWordMatrix(candidate: Candidate): MorphologyMatrix {
   const parts = candidate.decomposition?.parts ?? [];
   const root = parts[0];
 
-  return {
-    pivot: root?.form ?? candidate.form,
-    meaning: candidate.decomposition?.functionalStatement ?? "",
-    morphemes: parts.map((p: any) => ({
+  // Determine the pivot. If the root is a string, use it directly.
+  // If it's an object with a 'form' property, use that. Otherwise, fall back to the candidate's form.
+  const pivot = typeof root === "string" ? root : root?.form ?? candidate.form;
+
+  const morphemes = parts.map((p: any) => {
+    // Handle both string and object parts for morphemes.
+    if (typeof p === "string") {
+      return { form: p, role: "morpheme", gloss: "" }; // Default role and gloss for string parts.
+    }
+    return {
       form: p.form,
       role: p.role,
       gloss: p.gloss,
-    })),
+    };
+  });
+
+  const wordSumParts = parts.map((p: any) => {
+    // Handle both string and object parts for word sums.
+    return typeof p === "string" ? p : p.form;
+  });
+
+  return {
+    pivot,
+    meaning: candidate.decomposition?.functionalStatement ?? "",
+    morphemes,
     wordSums: [
       {
-        parts: parts.map((p: any) => p.form),
+        parts: wordSumParts,
         result: candidate.form,
         gloss: candidate.decomposition?.functionalStatement ?? "",
       },
@@ -94,6 +116,7 @@ function buildGeneratedWordMatrix(candidate: Candidate): MorphologyMatrix {
     source: "auto",
   };
 }
+
 
 /**
  * Attach canon candidates to the base engine result and
@@ -107,13 +130,13 @@ function attachCanonCandidates(base: any): any {
   const MANUAL_MATRIX_WORDS = new Set(["study", "damage"]);
 
   const languageFamilies: LanguageFamilyCandidate[] = canon.map(
-    (c: Candidate): LanguageFamilyCandidate => {
+    (c): LanguageFamilyCandidate => {
       const treatAsManual =
         MANUAL_MATRIX_WORDS.has(word) && !!c.morphologyMatrix;
 
       const matrix: MorphologyMatrix = treatAsManual
         ? { ...c.morphologyMatrix, source: "manual" as const }
-        : buildGeneratedWordMatrix(c);
+        : buildGeneratedWordMatrix(c as unknown as Candidate);
 
       return {
         language: c.language,

@@ -13,7 +13,7 @@ export type V1Tags = {
 
 export function buildV1Tags(word: string): V1Tags {
   return {
-    o_edge_polarity: oEdgePolarityForWord(word),
+    o_edge_polarity: oEdgePolarityForWord({ word, vowel_path: null }),
     s_cluster_vision: sClusterVisionForWord(word),
   };
 }
