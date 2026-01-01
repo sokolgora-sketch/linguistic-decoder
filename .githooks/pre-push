@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Bypass when you need it:
+#   SKIP_PREPUSH=1 git push
+if [[ "${SKIP_PREPUSH:-0}" == "1" ]]; then
+  echo "pre-push: SKIP_PREPUSH=1 set — skipping gate."
+  exit 0
+fi
+
+echo "pre-push: running npm run gate:quick (lint + test)"
+npm run gate:quick
