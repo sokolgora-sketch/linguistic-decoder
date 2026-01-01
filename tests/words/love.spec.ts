@@ -43,7 +43,7 @@ describe('word: love', () => {
     const sq = r.candidates.find((c: any) => c.language === 'Albanian');
 
     expect(latin?.consonantProfileOk).toBe(true);
-    expect(latin?.morphologyMatrix?.pivot).toBe("am");
+    expect(latin?.morphologyMatrix?.pivot).toBe("am-");
 
     expect(sq?.consonantProfileOk).toBe(true);
     expect(sq?.morphologyMatrix?.pivot).toBe('dash');
