@@ -1,5 +1,5 @@
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
-import { db } from "./firebase";
+import { getFirestoreClient } from "./firebase";
 
 /**
  * Lightweight error logger.
@@ -11,6 +11,7 @@ export async function logError(ev: {
   detail?: unknown;
 }): Promise<void> {
   try {
+    const db = getFirestoreClient();
     await addDoc(collection(db, "errors"), {
       where: ev.where,
       message: ev.message,

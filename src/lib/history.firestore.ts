@@ -1,5 +1,5 @@
 export {
-  historyItemToDoc,
+  historyItemToDocData,
   docToHistoryItem,
   type HistoryDocData,
   type HistoryItem,

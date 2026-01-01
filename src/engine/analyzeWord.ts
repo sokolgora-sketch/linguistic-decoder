@@ -80,16 +80,16 @@ function buildGeneratedWordMatrix(candidate: Candidate): MorphologyMatrix {
   const root = parts[0];
 
   return {
-    pivot: root ?? candidate.form,
+    pivot: root?.form ?? candidate.form,
     meaning: candidate.decomposition?.functionalStatement ?? "",
     morphemes: parts.map((p: any) => ({
-      form: p,
+      form: p.form,
       role: p.role,
       gloss: p.gloss,
     })),
     wordSums: [
       {
-        parts: parts.map((p: any) => p),
+        parts: parts.map((p: any) => p.form),
         result: candidate.form,
         gloss: candidate.decomposition?.functionalStatement ?? "",
       },
