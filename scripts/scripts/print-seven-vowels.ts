@@ -1,8 +1,5 @@
 // src/scripts/print-seven-vowels.ts
 // Debug helper: print all seven vowels with index, ring, and traits.
-
-/* eslint-disable no-console */
-
 import { sevenVowelsClient, getVowelView } from "../lib/sevenVowelsClient";
 
 function main() {

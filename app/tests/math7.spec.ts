@@ -16,11 +16,8 @@ describe("math7 layer sanity", () => {
     expect(love).toBeDefined();
 
     // TEMP: inspect in console (delete later if noisy)
-    // eslint-disable-next-line no-console
     console.log("STUDY math7:", JSON.stringify(study, null, 2));
-    // eslint-disable-next-line no-console
     console.log("DAMAGE math7:", JSON.stringify(damage, null, 2));
-    // eslint-disable-next-line no-console
     console.log("LOVE math7:", JSON.stringify(love, null, 2));
   });
 });
