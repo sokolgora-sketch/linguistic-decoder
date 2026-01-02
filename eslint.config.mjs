@@ -18,8 +18,31 @@ const legacy = JSON.parse(
   fs.readFileSync(path.join(__dirname, ".eslintrc.json"), "utf8")
 );
 
+/**
+ * ESLint v9 + newer @typescript-eslint removed some legacy rules.
+ * FlatCompat will still emit them if they exist in .eslintrc.json,
+ * and ESLint will hard-error on unknown rule names even if "off".
+ * So we delete them from the legacy object before compat runs.
+ */
+function stripMissingTypeScriptEslintRules(cfg) {
+  const missing = ["@typescript-eslint/no-var-requires"];
+
+  if (cfg && cfg.rules) {
+    for (const r of missing) delete cfg.rules[r];
+  }
+  if (cfg && Array.isArray(cfg.overrides)) {
+    for (const ov of cfg.overrides) {
+      if (ov && ov.rules) {
+        for (const r of missing) delete ov.rules[r];
+      }
+    }
+  }
+  return cfg;
+}
+
+stripMissingTypeScriptEslintRules(legacy);
+
 export default [
-  // ESLint v9 replacement for .eslintignore
   {
     ignores: [
       "**/node_modules/**",
@@ -33,4 +56,15 @@ export default [
   },
 
   ...compat.config(legacy),
+
+  // Force TS-ESLint type-aware project to include tests/scripts/app/etc.
+  {
+    files: ["**/*.{ts,tsx,cts,mts}"],
+    languageOptions: {
+      parserOptions: {
+        project: ["./tsconfig.eslint.json"],
+        tsconfigRootDir: __dirname,
+      },
+    },
+  },
 ];
