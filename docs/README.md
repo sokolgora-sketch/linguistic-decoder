@@ -1,5 +1,27 @@
 # ZË-RO Docs Index
 
+
+## Authority & Stability
+
+### Authoritative (Locked)
+- Reality Guide — defines epistemic posture and limits.
+- Recovery Playbook — defines how reality is repaired.
+- Engine Contract (`analyzeWordV1`) — JSON shape + determinism.
+- Canon snapshots — changes require explicit rationale and version bump.
+
+### Evolving (Allowed to Change)
+- UI / visualizations.
+- Explanatory text and copy.
+- Pattern Atlas expansion (new patterns only; no rewrites).
+- Non-canon word coverage.
+
+### Explicitly Not Authoritative
+- Experiments.
+- Loose mode output.
+- Narrative / mythic interpretations.
+- External commentary.
+
+If something conflicts with the Reality Guide or the Recovery Playbook, it is wrong by definition.
 This folder contains the canonical, versioned documentation that defines ZË-RO as a deterministic instrument.
 
 ## Core
