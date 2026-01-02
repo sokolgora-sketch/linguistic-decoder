@@ -25,6 +25,7 @@ If something conflicts with the Reality Guide or the Recovery Playbook, it is wr
 This folder contains the canonical, versioned documentation that defines ZË-RO as a deterministic instrument.
 
 ## Core
+- [v1.0 Boundary](./ROADMAP_V1_BOUNDARY.md) — what ships in v1.0 vs post-v1.
 - [Engine Contract Freeze](./ENGINE_CONTRACT_FREEZE.md) — frozen JSON contract for analyzeWordV1 (v1).
 - [Reality Guide v1](./ZERO_REALITY_GUIDE.md) — deterministic authority chain, layer separation, success conditions.
 
