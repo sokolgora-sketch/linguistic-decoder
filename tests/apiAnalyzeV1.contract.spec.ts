@@ -18,7 +18,6 @@ describe("analyze-v1 contract (seam test)", () => {
     // Assert with schema again (explicit)
     const parsed = AnalyzeWordResultV1ContractSchema.safeParse(out);
     if (!parsed.success) {
-      // eslint-disable-next-line no-console
       console.error(parsed.error.format());
     }
     expect(parsed.success).toBe(true);

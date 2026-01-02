@@ -42,7 +42,7 @@ function stripMissingTypeScriptEslintRules(cfg) {
 
 stripMissingTypeScriptEslintRules(legacy);
 
-export default [
+const eslintConfig = [
   {
     ignores: [
       "**/node_modules/**",
@@ -68,3 +68,5 @@ export default [
     },
   },
 ];
+
+export default eslintConfig;

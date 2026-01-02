@@ -23,7 +23,6 @@ export function toast(input: ToastInput) {
   _toasts = [item, ..._toasts].slice(0, 5);
 
   if (process.env.NODE_ENV !== "production") {
-    // eslint-disable-next-line no-console
     console.log("[toast]", item);
   }
 
