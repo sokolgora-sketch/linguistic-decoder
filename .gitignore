@@ -29,3 +29,7 @@ src/lib/*.bak.*
 NODE_ENV=production
 nextn@0.1.0
 tsc
+
+# DF / experiments
+eslint.config.js.GEMINI_BACKUP.*
+scripts/tmp/

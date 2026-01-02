@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
-
 /**
  * Jest env here does not provide WHATWG Web APIs.
  * next/server + undici expect them, so we polyfill BEFORE requiring either.
