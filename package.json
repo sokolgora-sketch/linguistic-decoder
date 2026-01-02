@@ -8,7 +8,7 @@
     "genkit:watch": "genkit start -- tsx --watch srcai/dev.ts",
     "build": "NODE_ENV=production next build",
     "start": "next start",
-    "lint": "eslint -c eslint.config.mjs \"src/**/*.{js,jsx,ts,tsx}\" \"app/**/*.{js,jsx,ts,tsx}\" \"tests/**/*.{js,jsx,ts,tsx}\" \"scripts/**/*.{js,jsx,ts,tsx,mjs}\"",
+    "lint": "eslint -c eslint.config.mjs .",
     "typecheck": "tsc -p tsconfig.stress.json --noEmit",
     "typecheck:full": "tsc --noEmit",
     "test": "jest -c jest.config.mjs",
