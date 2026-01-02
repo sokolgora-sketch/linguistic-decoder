@@ -7,3 +7,6 @@ This folder contains the canonical, versioned documentation that defines ZË-RO 
 
 ## Notes
 - Docs are treated as part of the contract: if it matters, it lives here and is reviewable via PR.
+
+## Changelog
+- [CHANGELOG](./CHANGELOG.md)
