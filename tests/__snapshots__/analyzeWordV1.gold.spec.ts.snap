@@ -23,6 +23,7 @@ exports[`analyzeWordV1 gold words v1 matches snapshot for 'damage' (v1.0.0) 1`] 
       ],
     },
   ],
+  "decision_geometry": null,
   "language_guess": null,
   "math7_summary": {
     "balance": {
@@ -69,6 +70,40 @@ exports[`analyzeWordV1 gold words v1 matches snapshot for 'damage' (v1.0.0) 1`] 
     },
   },
   "mode": "strict",
+  "stress_test_v1": {
+    "classification": {
+      "from": "A",
+      "label": "Inward move",
+      "normalized": "A → A → E",
+      "polarity": "centripetal",
+      "raw": "A → A → E",
+      "ringDelta": -1,
+      "ringFrom": 3,
+      "ringTo": 2,
+      "steps": 2,
+      "summary": "Moves centripetal from ring 3 to ring 2 (A → E).",
+      "to": "E",
+      "voices": [
+        "A",
+        "A",
+        "E",
+      ],
+    },
+    "ui": {
+      "label": "Inward move",
+      "summary": "Moves centripetal from ring 3 to ring 2 (A → E).",
+      "title": "Seven-Voices Pattern Map (v1)",
+      "voicePath": "A → A → E",
+    },
+    "voicePath": "A → A → E",
+    "voicePathRaw": "A → A → E",
+    "voices": [
+      "A",
+      "A",
+      "E",
+    ],
+    "word": "damage",
+  },
   "word": "damage",
 }
 `;
@@ -95,6 +130,7 @@ exports[`analyzeWordV1 gold words v1 matches snapshot for 'study' (v1.0.0) 1`] =
       ],
     },
   ],
+  "decision_geometry": null,
   "language_guess": null,
   "math7_summary": {
     "balance": {
@@ -140,6 +176,38 @@ exports[`analyzeWordV1 gold words v1 matches snapshot for 'study' (v1.0.0) 1`] =
     },
   },
   "mode": "strict",
+  "stress_test_v1": {
+    "classification": {
+      "from": "U",
+      "label": "Outward move",
+      "normalized": "U → Y",
+      "polarity": "centrifugal",
+      "raw": "U → Y",
+      "ringDelta": 1,
+      "ringFrom": 1,
+      "ringTo": 2,
+      "steps": 1,
+      "summary": "Moves centrifugal from ring 1 to ring 2 (U → Y).",
+      "to": "Y",
+      "voices": [
+        "U",
+        "Y",
+      ],
+    },
+    "ui": {
+      "label": "Outward move",
+      "summary": "Moves centrifugal from ring 1 to ring 2 (U → Y).",
+      "title": "Seven-Voices Pattern Map (v1)",
+      "voicePath": "U → Y",
+    },
+    "voicePath": "U → Y",
+    "voicePathRaw": "U → Y",
+    "voices": [
+      "U",
+      "Y",
+    ],
+    "word": "study",
+  },
   "word": "study",
 }
 `;

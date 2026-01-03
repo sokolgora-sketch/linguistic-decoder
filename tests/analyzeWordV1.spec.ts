@@ -9,7 +9,7 @@ describe("analyzeWordV1", () => {
     expect(result.mode).toBe("strict");
 
     // Engine meta basics
-    expect(result.engine_meta.engineVersion).toBe("v1.0.0");
+    expect(result.engine_meta.engineVersion).toBe("v1.1.0");
     expect(typeof result.engine_meta.timestampIso).toBe("string");
 
     // Math7 summary should exist for a normal word

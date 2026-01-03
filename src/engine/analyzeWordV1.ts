@@ -5,6 +5,7 @@ import { generateCandidates } from "./wordCandidates";
 import { detectMediatorAxisPair } from "./patterns/mediatorAxisPair";
 import { decisionGeometryForWord, type DecisionGeometryTag } from "../shared/decisionGeometry.v1";
 import { buildV1Tags } from "../shared/v1Tags.v1";
+import { runSevenVoicesStressTestV1, type SevenVoicesStressTestV1 } from "../shared/sevenVoicesStressTest.v1";
 import type { OEdgePolarityTag } from "@/shared/oEdgePolarity.v1";
 
 export type EngineMode = "strict" | "open";
@@ -39,13 +40,15 @@ export type AnalysisResult = {
   candidates: CandidateAnalysis[];
   math7_summary: Math7Summary | null;
 
-    engine_meta: EngineMeta;
-  decision_geometry?: DecisionGeometryTag | null;
+  // Additive, versioned, deterministic.
+  stress_test_v1: SevenVoicesStressTestV1 | null;
 
+  engine_meta: EngineMeta;
+  decision_geometry?: DecisionGeometryTag | null;
   o_edge_polarity: OEdgePolarityTag | null;
 };
 
-const ENGINE_VERSION = "v1.0.0";
+const ENGINE_VERSION = "v1.1.0";
 
 function normWord(w: string): string {
   return (w ?? "").trim().toLowerCase().normalize("NFC");
@@ -54,6 +57,11 @@ function normWord(w: string): string {
 function withSignal(signals: string[], sig: string): string[] {
   if (signals.includes(sig)) return signals;
   return [...signals, sig];
+}
+
+function voicePathRawFromMath7Path(path: VoicePath | null | undefined): string {
+  if (!path || path.length === 0) return "";
+  return path.join(" → ");
 }
 
 export async function analyzeWordV1(
@@ -79,21 +87,22 @@ export async function analyzeWordV1(
     signals: [],
   }));
 
-  // Phase C2: Decision Geometry tag (non-breaking).
-  // v1 strict rule: only tag when the word is part of the canonical N4 pair (po/jo).
+  // v1 strict rule: tag when word is part of canonical N4 pair (po/jo).
   if (mode === "strict") {
     const w = normWord(input);
-    // For v1, we detect membership by checking against the known pair.
-    // The detector is order-insensitive, but we call it deterministically.
-    const n4 =
-      detectMediatorAxisPair(w, "po") ?? detectMediatorAxisPair(w, "jo");
-
+    const n4 = detectMediatorAxisPair(w, "po") ?? detectMediatorAxisPair(w, "jo");
     if (n4) {
       for (const cand of candidates) {
         cand.signals = withSignal(cand.signals, "pattern:N4:mediator-axis");
       }
     }
   }
+
+  const decision_geometry = decisionGeometryForWord(input);
+
+  const voicePathRaw = voicePathRawFromMath7Path(math7_summary?.path ?? null);
+  const stress_test_v1 =
+    voicePathRaw.length === 0 ? null : runSevenVoicesStressTestV1({ word: input, voicePathRaw });
 
   return {
     word: input,
@@ -102,10 +111,11 @@ export async function analyzeWordV1(
     language_guess: null,
     candidates,
     math7_summary,
+    stress_test_v1,
     engine_meta: {
       engineVersion: ENGINE_VERSION,
       timestampIso: new Date().toISOString(),
     },
+    decision_geometry,
   };
-
 }
