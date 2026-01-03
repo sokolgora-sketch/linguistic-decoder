@@ -1,0 +1,65 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`PatternAtlas IO — contract lock (v1) snapshots a small IO battery for drift detection 1`] = `
+[
+  {
+    "normalized": "O",
+    "raw": "O",
+    "voices": [
+      "O",
+    ],
+  },
+  {
+    "normalized": "O → E",
+    "raw": "O→E",
+    "voices": [
+      "O",
+      "E",
+    ],
+  },
+  {
+    "normalized": "O → E",
+    "raw": "O → E",
+    "voices": [
+      "O",
+      "E",
+    ],
+  },
+  {
+    "normalized": "Y → Ë",
+    "raw": "YË",
+    "voices": [
+      "Y",
+      "Ë",
+    ],
+  },
+  {
+    "normalized": "Ë",
+    "raw": "ë",
+    "voices": [
+      "Ë",
+    ],
+  },
+  {
+    "normalized": "A → E → I",
+    "raw": "a-e-i",
+    "voices": [
+      "A",
+      "E",
+      "I",
+    ],
+  },
+  {
+    "normalized": "Y",
+    "raw": "xyz",
+    "voices": [
+      "Y",
+    ],
+  },
+  {
+    "normalized": "",
+    "raw": "123-_=+!!",
+    "voices": [],
+  },
+]
+`;
