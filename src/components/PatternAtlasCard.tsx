@@ -31,7 +31,10 @@ export default function PatternAtlasCard({
 
   const st = (stress_test_v1 ?? derived) as StressTestV1;
 
-  const polarity = st?.classification?.polarity ?? "orbital";
+  const polarity: "centrifugal" | "centripetal" | "orbital" | "unknown" =
+    st?.classification?.polarity ?? "unknown";
+
+  const isUnknown = polarity === "unknown";
 
   return (
     <div className="rounded-xl border p-4">
@@ -47,8 +50,17 @@ export default function PatternAtlasCard({
         <div className="mt-4 rounded-lg bg-muted/40 p-3">
           <div className="flex items-center justify-between gap-3">
             <div className="text-sm font-semibold">{st.ui.label}</div>
-            <div className="text-xs opacity-80">{polarity}</div>
+
+            <div className="flex items-center gap-2">
+              <div className="text-xs opacity-80">{polarity}</div>
+              {isUnknown ? (
+                <div className="text-[11px] rounded-md border px-2 py-0.5 opacity-80">
+                  incomplete stress test
+                </div>
+              ) : null}
+            </div>
           </div>
+
           <div className="mt-2 text-sm opacity-80">{st.ui.summary}</div>
         </div>
       ) : null}
