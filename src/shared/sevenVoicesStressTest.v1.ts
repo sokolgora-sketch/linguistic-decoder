@@ -3,8 +3,8 @@ import {
   type PatternAtlasClassification,
   classifyVoicePath,
   normalizeVoicePath,
-  parseVoicePath,
 } from "./patternAtlas.v1";
+import { extractVoicesForStressTestV1 } from "./patternAtlasInputPolicy.v1";
 
 /**
  * Seven-Voices Stress Test (v1)
@@ -17,9 +17,9 @@ import {
 
 export type SevenVoicesStressTestV1 = {
   word: string;
-  voicePathRaw: string;      // e.g. "YË" or "Y→Ë" or "Y → Ë"
-  voicePath: string;         // normalized "Y → Ë" (or "Y")
-  voices: Voice[];           // parsed voices in order
+  voicePathRaw: string; // e.g. "YË" or "Y→Ë" or "Y → Ë"
+  voicePath: string; // normalized "Y → Ë" (or "Y")
+  voices: Voice[]; // parsed voices in order
   classification: PatternAtlasClassification | null;
   ui: {
     title: string;
@@ -33,18 +33,33 @@ export type StressTestInputV1 = {
   word: string;
   // Accept anything: full text, vowels only, arrow path; we normalize internally.
   voicePathRaw: string;
+
+  /**
+   * When true, only accept explicit voice-path-like inputs (AEIOUYË + separators).
+   * This prevents accidental parsing of plain words (e.g., "xyz" -> Y).
+   *
+   * Default: false (preserve legacy reality).
+   */
+  strictInput?: boolean;
 };
 
-export function runSevenVoicesStressTestV1(input: StressTestInputV1): SevenVoicesStressTestV1 {
+export function runSevenVoicesStressTestV1(
+  input: StressTestInputV1
+): SevenVoicesStressTestV1 {
   const raw = String(input.voicePathRaw ?? "");
-  const voices = parseVoicePath(raw);
+
+  const voices = extractVoicesForStressTestV1(raw, {
+    strictInput: Boolean(input.strictInput),
+  });
+
   const voicePath = normalizeVoicePath(raw);
 
   const classification: PatternAtlasClassification | null =
     voices.length === 0 ? null : classifyVoicePath(raw);
 
   const label = classification?.label ?? "No voice path detected";
-  const summary = classification?.summary ?? "No vowels (A,E,I,O,U,Y,Ë) found in this input.";
+  const summary =
+    classification?.summary ?? "No vowels (A,E,I,O,U,Y,Ë) found in this input.";
   const title = "Seven-Voices Pattern Map (v1)";
 
   return {
