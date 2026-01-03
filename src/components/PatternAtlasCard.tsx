@@ -1,44 +1,43 @@
-'use client';
+// src/components/PatternAtlasCard.tsx
 
-import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { classifyVoicePath } from "@/shared/patternAtlas.v1";
+import {
+  runSevenVoicesStressTestV1,
+  type SevenVoicesStressTestV1,
+} from "@/shared/sevenVoicesStressTest.v1";
 
-export default function PatternAtlasCard({ voicePath }: { voicePath: string }) {
-  const c = classifyVoicePath(voicePath);
+export default function PatternAtlasCard({
+  voicePath,
+  stress_test_v1,
+}: {
+  voicePath: string;
+  stress_test_v1?: SevenVoicesStressTestV1 | null;
+}) {
+  const derived: SevenVoicesStressTestV1 | null =
+    voicePath && voicePath.trim().length > 0
+      ? runSevenVoicesStressTestV1({ word: "", voicePathRaw: voicePath })
+      : null;
+
+  const st = (stress_test_v1 ?? derived) as SevenVoicesStressTestV1 | null;
 
   return (
-    <Card>
-      <CardHeader className="space-y-2">
-        <div className="flex items-center justify-between gap-3">
-          <CardTitle className="text-base">Pattern Atlas (v1)</CardTitle>
-          <Badge variant="secondary">{c.polarity}</Badge>
-        </div>
-        <div className="text-sm opacity-80">{c.normalized}</div>
-      </CardHeader>
+    <div className="rounded-xl border p-4">
+      {/* Keep exact title string for existing tests + UX consistency */}
+      <div className="text-sm font-semibold">Pattern Atlas (v1)</div>
 
-      <CardContent className="text-sm space-y-2">
-        <div className="grid grid-cols-3 gap-3">
-          <div>
-            <div className="opacity-70">From</div>
-            <div className="font-mono">{c.from} (ring {c.ringFrom})</div>
-          </div>
-          <div>
-            <div className="opacity-70">To</div>
-            <div className="font-mono">{c.to} (ring {c.ringTo})</div>
-          </div>
-          <div>
-            <div className="opacity-70">Steps</div>
-            <div className="font-mono">{c.steps}</div>
-          </div>
-        </div>
+      <div className="mt-2 text-sm">
+        <div className="opacity-70">Voice path</div>
+        <div className="font-mono">{voicePath}</div>
+      </div>
 
-        <div className="pt-2 border-t border-border/60">
-          <div className="opacity-70">Summary</div>
-          <div>{c.summary}</div>
+      {st ? (
+        <div className="mt-4 rounded-lg bg-muted/40 p-3">
+          <div className="flex items-center justify-between gap-3">
+            <div className="text-sm font-semibold">{st.ui.label}</div>
+            <div className="text-xs opacity-80">{st.classification.polarity}</div>
+          </div>
+          <div className="mt-2 text-sm opacity-80">{st.ui.summary}</div>
         </div>
-      </CardContent>
-    </Card>
+      ) : null}
+    </div>
   );
 }
