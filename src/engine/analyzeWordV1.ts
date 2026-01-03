@@ -98,7 +98,7 @@ export async function analyzeWordV1(
     }
   }
 
-  const decision_geometry = decisionGeometryForWord(input);
+  const decision_geometry = decisionGeometryForWord({ word: input, vowel_path: math7_summary?.path });
 
   const voicePathRaw = voicePathRawFromMath7Path(math7_summary?.path ?? null);
   const stress_test_v1 =
