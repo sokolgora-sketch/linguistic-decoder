@@ -1,22 +1,27 @@
 // src/components/PatternAtlasCard.tsx
 
-import React from "react";
 import {
   runSevenVoicesStressTestV1,
   type SevenVoicesStressTestV1,
 } from "@/shared/sevenVoicesStressTest.v1";
 
-export default function PatternAtlasCard({
-  voicePath,
-  stress_test_v1,
-}: {
+type PatternAtlasCardProps = {
   voicePath: string;
   stress_test_v1?: SevenVoicesStressTestV1 | null;
-}) {
+  strictInput?: boolean;
+};
+
+export default function PatternAtlasCard(props: PatternAtlasCardProps) {
+  const { voicePath, stress_test_v1, strictInput } = props;
+
   // Back-compat: if caller didn’t pass stress_test_v1, derive it deterministically from voicePath.
   const derived: SevenVoicesStressTestV1 | null =
     voicePath && voicePath.trim().length > 0
-      ? runSevenVoicesStressTestV1({ word: "", voicePathRaw: voicePath })
+      ? runSevenVoicesStressTestV1({
+          word: "",
+          voicePathRaw: voicePath,
+          strictInput: strictInput ?? true,
+        })
       : null;
 
   const st: SevenVoicesStressTestV1 | null = stress_test_v1 ?? derived;
@@ -42,7 +47,9 @@ export default function PatternAtlasCard({
           </div>
 
           {classificationIsNull ? (
-            <div className="mt-2 text-xs opacity-80">incomplete stress test</div>
+            <div className="mt-2 text-xs opacity-80">
+              incomplete stress test
+            </div>
           ) : null}
 
           <div className="mt-2 text-sm opacity-80">{st.ui.summary}</div>
