@@ -3,12 +3,14 @@
 exports[`Public contract v1 — JSON shape lock (no ad-hoc fields) locks top-level keys for a representative strict run (study) 1`] = `
 [
   "candidates",
+  "decision_geometry",
   "engine_meta",
   "language_guess",
   "math7_summary",
   "mode",
   "o_edge_polarity",
   "s_cluster_vision",
+  "stress_test_v1",
   "word",
 ]
 `;
@@ -16,12 +18,14 @@ exports[`Public contract v1 — JSON shape lock (no ad-hoc fields) locks top-lev
 exports[`Public contract v1 — JSON shape lock (no ad-hoc fields) locks top-level keys for a second word (damage) 1`] = `
 [
   "candidates",
+  "decision_geometry",
   "engine_meta",
   "language_guess",
   "math7_summary",
   "mode",
   "o_edge_polarity",
   "s_cluster_vision",
+  "stress_test_v1",
   "word",
 ]
 `;

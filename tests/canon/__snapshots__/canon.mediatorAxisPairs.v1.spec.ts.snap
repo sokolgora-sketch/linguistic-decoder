@@ -24,8 +24,9 @@ exports[`canon mediator axis pairs v1 (strict) — N4 Po/Jo lock po and jo both 
         ],
       },
     ],
+    "decision_geometry": null,
     "engine_meta": {
-      "engineVersion": "v1.0.0",
+      "engineVersion": "v1.1.0",
     },
     "language_guess": null,
     "math7_summary": {
@@ -65,6 +66,36 @@ exports[`canon mediator axis pairs v1 (strict) — N4 Po/Jo lock po and jo both 
       },
     },
     "mode": "strict",
+    "stress_test_v1": {
+      "classification": {
+        "from": "O",
+        "label": "Single voice (O)",
+        "normalized": "O",
+        "polarity": "orbital",
+        "raw": "O",
+        "ringDelta": 0,
+        "ringFrom": 0,
+        "ringTo": 0,
+        "steps": 0,
+        "summary": "Static on ring 0.",
+        "to": "O",
+        "voices": [
+          "O",
+        ],
+      },
+      "ui": {
+        "label": "Single voice (O)",
+        "summary": "Static on ring 0.",
+        "title": "Seven-Voices Pattern Map (v1)",
+        "voicePath": "O",
+      },
+      "voicePath": "O",
+      "voicePathRaw": "O",
+      "voices": [
+        "O",
+      ],
+      "word": "jo",
+    },
     "word": "jo",
   },
   "po": {
@@ -89,8 +120,9 @@ exports[`canon mediator axis pairs v1 (strict) — N4 Po/Jo lock po and jo both 
         ],
       },
     ],
+    "decision_geometry": null,
     "engine_meta": {
-      "engineVersion": "v1.0.0",
+      "engineVersion": "v1.1.0",
     },
     "language_guess": null,
     "math7_summary": {
@@ -130,6 +162,36 @@ exports[`canon mediator axis pairs v1 (strict) — N4 Po/Jo lock po and jo both 
       },
     },
     "mode": "strict",
+    "stress_test_v1": {
+      "classification": {
+        "from": "O",
+        "label": "Single voice (O)",
+        "normalized": "O",
+        "polarity": "orbital",
+        "raw": "O",
+        "ringDelta": 0,
+        "ringFrom": 0,
+        "ringTo": 0,
+        "steps": 0,
+        "summary": "Static on ring 0.",
+        "to": "O",
+        "voices": [
+          "O",
+        ],
+      },
+      "ui": {
+        "label": "Single voice (O)",
+        "summary": "Static on ring 0.",
+        "title": "Seven-Voices Pattern Map (v1)",
+        "voicePath": "O",
+      },
+      "voicePath": "O",
+      "voicePathRaw": "O",
+      "voices": [
+        "O",
+      ],
+      "word": "po",
+    },
     "word": "po",
   },
 }

@@ -23,8 +23,9 @@ exports[`canon battery v2 (strict) — Seven-Voices Math v1 lock canon:v2:strict
       ],
     },
   ],
+  "decision_geometry": null,
   "engine_meta": {
-    "engineVersion": "v1.0.0",
+    "engineVersion": "v1.1.0",
   },
   "language_guess": null,
   "math7_summary": {
@@ -72,6 +73,40 @@ exports[`canon battery v2 (strict) — Seven-Voices Math v1 lock canon:v2:strict
     },
   },
   "mode": "strict",
+  "stress_test_v1": {
+    "classification": {
+      "from": "A",
+      "label": "Inward move",
+      "normalized": "A → A → E",
+      "polarity": "centripetal",
+      "raw": "A → A → E",
+      "ringDelta": -1,
+      "ringFrom": 3,
+      "ringTo": 2,
+      "steps": 2,
+      "summary": "Moves centripetal from ring 3 to ring 2 (A → E).",
+      "to": "E",
+      "voices": [
+        "A",
+        "A",
+        "E",
+      ],
+    },
+    "ui": {
+      "label": "Inward move",
+      "summary": "Moves centripetal from ring 3 to ring 2 (A → E).",
+      "title": "Seven-Voices Pattern Map (v1)",
+      "voicePath": "A → A → E",
+    },
+    "voicePath": "A → A → E",
+    "voicePathRaw": "A → A → E",
+    "voices": [
+      "A",
+      "A",
+      "E",
+    ],
+    "word": "damage",
+  },
   "word": "damage",
 }
 `;
@@ -98,8 +133,9 @@ exports[`canon battery v2 (strict) — Seven-Voices Math v1 lock canon:v2:strict
       ],
     },
   ],
+  "decision_geometry": null,
   "engine_meta": {
-    "engineVersion": "v1.0.0",
+    "engineVersion": "v1.1.0",
   },
   "language_guess": null,
   "math7_summary": {
@@ -146,6 +182,38 @@ exports[`canon battery v2 (strict) — Seven-Voices Math v1 lock canon:v2:strict
     },
   },
   "mode": "strict",
+  "stress_test_v1": {
+    "classification": {
+      "from": "Y",
+      "label": "Outward move",
+      "normalized": "Y → Ë",
+      "polarity": "centrifugal",
+      "raw": "Y → Ë",
+      "ringDelta": 1,
+      "ringFrom": 2,
+      "ringTo": 3,
+      "steps": 1,
+      "summary": "Moves centrifugal from ring 2 to ring 3 (Y → Ë).",
+      "to": "Ë",
+      "voices": [
+        "Y",
+        "Ë",
+      ],
+    },
+    "ui": {
+      "label": "Outward move",
+      "summary": "Moves centrifugal from ring 2 to ring 3 (Y → Ë).",
+      "title": "Seven-Voices Pattern Map (v1)",
+      "voicePath": "Y → Ë",
+    },
+    "voicePath": "Y → Ë",
+    "voicePathRaw": "Y → Ë",
+    "voices": [
+      "Y",
+      "Ë",
+    ],
+    "word": "frymë",
+  },
   "word": "frymë",
 }
 `;
@@ -171,8 +239,9 @@ exports[`canon battery v2 (strict) — Seven-Voices Math v1 lock canon:v2:strict
       ],
     },
   ],
+  "decision_geometry": null,
   "engine_meta": {
-    "engineVersion": "v1.0.0",
+    "engineVersion": "v1.1.0",
   },
   "language_guess": null,
   "math7_summary": {
@@ -215,6 +284,36 @@ exports[`canon battery v2 (strict) — Seven-Voices Math v1 lock canon:v2:strict
     },
   },
   "mode": "strict",
+  "stress_test_v1": {
+    "classification": {
+      "from": "A",
+      "label": "Single voice (A)",
+      "normalized": "A",
+      "polarity": "orbital",
+      "raw": "A",
+      "ringDelta": 0,
+      "ringFrom": 3,
+      "ringTo": 3,
+      "steps": 0,
+      "summary": "Static on ring 3.",
+      "to": "A",
+      "voices": [
+        "A",
+      ],
+    },
+    "ui": {
+      "label": "Single voice (A)",
+      "summary": "Static on ring 3.",
+      "title": "Seven-Voices Pattern Map (v1)",
+      "voicePath": "A",
+    },
+    "voicePath": "A",
+    "voicePathRaw": "A",
+    "voices": [
+      "A",
+    ],
+    "word": "gjak",
+  },
   "word": "gjak",
 }
 `;
@@ -241,8 +340,9 @@ exports[`canon battery v2 (strict) — Seven-Voices Math v1 lock canon:v2:strict
       ],
     },
   ],
+  "decision_geometry": null,
   "engine_meta": {
-    "engineVersion": "v1.0.0",
+    "engineVersion": "v1.1.0",
   },
   "language_guess": null,
   "math7_summary": {
@@ -288,6 +388,38 @@ exports[`canon battery v2 (strict) — Seven-Voices Math v1 lock canon:v2:strict
     },
   },
   "mode": "strict",
+  "stress_test_v1": {
+    "classification": {
+      "from": "A",
+      "label": "Same-ring move",
+      "normalized": "A → Ë",
+      "polarity": "orbital",
+      "raw": "A → Ë",
+      "ringDelta": 0,
+      "ringFrom": 3,
+      "ringTo": 3,
+      "steps": 1,
+      "summary": "Moves orbital from ring 3 to ring 3 (A → Ë).",
+      "to": "Ë",
+      "voices": [
+        "A",
+        "Ë",
+      ],
+    },
+    "ui": {
+      "label": "Same-ring move",
+      "summary": "Moves orbital from ring 3 to ring 3 (A → Ë).",
+      "title": "Seven-Voices Pattern Map (v1)",
+      "voicePath": "A → Ë",
+    },
+    "voicePath": "A → Ë",
+    "voicePathRaw": "A → Ë",
+    "voices": [
+      "A",
+      "Ë",
+    ],
+    "word": "gjallë",
+  },
   "word": "gjallë",
 }
 `;
@@ -314,8 +446,9 @@ exports[`canon battery v2 (strict) — Seven-Voices Math v1 lock canon:v2:strict
       ],
     },
   ],
+  "decision_geometry": null,
   "engine_meta": {
-    "engineVersion": "v1.0.0",
+    "engineVersion": "v1.1.0",
   },
   "language_guess": null,
   "math7_summary": {
@@ -362,6 +495,38 @@ exports[`canon battery v2 (strict) — Seven-Voices Math v1 lock canon:v2:strict
     },
   },
   "mode": "strict",
+  "stress_test_v1": {
+    "classification": {
+      "from": "E",
+      "label": "Outward move",
+      "normalized": "E → Ë",
+      "polarity": "centrifugal",
+      "raw": "E → Ë",
+      "ringDelta": 1,
+      "ringFrom": 2,
+      "ringTo": 3,
+      "steps": 1,
+      "summary": "Moves centrifugal from ring 2 to ring 3 (E → Ë).",
+      "to": "Ë",
+      "voices": [
+        "E",
+        "Ë",
+      ],
+    },
+    "ui": {
+      "label": "Outward move",
+      "summary": "Moves centrifugal from ring 2 to ring 3 (E → Ë).",
+      "title": "Seven-Voices Pattern Map (v1)",
+      "voicePath": "E → Ë",
+    },
+    "voicePath": "E → Ë",
+    "voicePathRaw": "E → Ë",
+    "voices": [
+      "E",
+      "Ë",
+    ],
+    "word": "jetë",
+  },
   "word": "jetë",
 }
 `;
@@ -389,8 +554,9 @@ exports[`canon battery v2 (strict) — Seven-Voices Math v1 lock canon:v2:strict
       ],
     },
   ],
+  "decision_geometry": null,
   "engine_meta": {
-    "engineVersion": "v1.0.0",
+    "engineVersion": "v1.1.0",
   },
   "language_guess": null,
   "math7_summary": {
@@ -430,6 +596,36 @@ exports[`canon battery v2 (strict) — Seven-Voices Math v1 lock canon:v2:strict
     },
   },
   "mode": "strict",
+  "stress_test_v1": {
+    "classification": {
+      "from": "O",
+      "label": "Single voice (O)",
+      "normalized": "O",
+      "polarity": "orbital",
+      "raw": "O",
+      "ringDelta": 0,
+      "ringFrom": 0,
+      "ringTo": 0,
+      "steps": 0,
+      "summary": "Static on ring 0.",
+      "to": "O",
+      "voices": [
+        "O",
+      ],
+    },
+    "ui": {
+      "label": "Single voice (O)",
+      "summary": "Static on ring 0.",
+      "title": "Seven-Voices Pattern Map (v1)",
+      "voicePath": "O",
+    },
+    "voicePath": "O",
+    "voicePathRaw": "O",
+    "voices": [
+      "O",
+    ],
+    "word": "jo",
+  },
   "word": "jo",
 }
 `;
@@ -457,8 +653,9 @@ exports[`canon battery v2 (strict) — Seven-Voices Math v1 lock canon:v2:strict
       ],
     },
   ],
+  "decision_geometry": null,
   "engine_meta": {
-    "engineVersion": "v1.0.0",
+    "engineVersion": "v1.1.0",
   },
   "language_guess": null,
   "math7_summary": {
@@ -498,6 +695,36 @@ exports[`canon battery v2 (strict) — Seven-Voices Math v1 lock canon:v2:strict
     },
   },
   "mode": "strict",
+  "stress_test_v1": {
+    "classification": {
+      "from": "O",
+      "label": "Single voice (O)",
+      "normalized": "O",
+      "polarity": "orbital",
+      "raw": "O",
+      "ringDelta": 0,
+      "ringFrom": 0,
+      "ringTo": 0,
+      "steps": 0,
+      "summary": "Static on ring 0.",
+      "to": "O",
+      "voices": [
+        "O",
+      ],
+    },
+    "ui": {
+      "label": "Single voice (O)",
+      "summary": "Static on ring 0.",
+      "title": "Seven-Voices Pattern Map (v1)",
+      "voicePath": "O",
+    },
+    "voicePath": "O",
+    "voicePathRaw": "O",
+    "voices": [
+      "O",
+    ],
+    "word": "po",
+  },
   "word": "po",
 }
 `;
@@ -524,8 +751,9 @@ exports[`canon battery v2 (strict) — Seven-Voices Math v1 lock canon:v2:strict
       ],
     },
   ],
+  "decision_geometry": null,
   "engine_meta": {
-    "engineVersion": "v1.0.0",
+    "engineVersion": "v1.1.0",
   },
   "language_guess": null,
   "math7_summary": {
@@ -572,6 +800,38 @@ exports[`canon battery v2 (strict) — Seven-Voices Math v1 lock canon:v2:strict
     },
   },
   "mode": "strict",
+  "stress_test_v1": {
+    "classification": {
+      "from": "U",
+      "label": "Outward move",
+      "normalized": "U → Y",
+      "polarity": "centrifugal",
+      "raw": "U → Y",
+      "ringDelta": 1,
+      "ringFrom": 1,
+      "ringTo": 2,
+      "steps": 1,
+      "summary": "Moves centrifugal from ring 1 to ring 2 (U → Y).",
+      "to": "Y",
+      "voices": [
+        "U",
+        "Y",
+      ],
+    },
+    "ui": {
+      "label": "Outward move",
+      "summary": "Moves centrifugal from ring 1 to ring 2 (U → Y).",
+      "title": "Seven-Voices Pattern Map (v1)",
+      "voicePath": "U → Y",
+    },
+    "voicePath": "U → Y",
+    "voicePathRaw": "U → Y",
+    "voices": [
+      "U",
+      "Y",
+    ],
+    "word": "study",
+  },
   "word": "study",
 }
 `;
@@ -598,8 +858,9 @@ exports[`canon battery v2 (strict) — Seven-Voices Math v1 lock canon:v2:strict
       ],
     },
   ],
+  "decision_geometry": null,
   "engine_meta": {
-    "engineVersion": "v1.0.0",
+    "engineVersion": "v1.1.0",
   },
   "language_guess": null,
   "math7_summary": {
@@ -646,6 +907,38 @@ exports[`canon battery v2 (strict) — Seven-Voices Math v1 lock canon:v2:strict
     },
   },
   "mode": "strict",
+  "stress_test_v1": {
+    "classification": {
+      "from": "E",
+      "label": "Outward move",
+      "normalized": "E → Ë",
+      "polarity": "centrifugal",
+      "raw": "E → Ë",
+      "ringDelta": 1,
+      "ringFrom": 2,
+      "ringTo": 3,
+      "steps": 1,
+      "summary": "Moves centrifugal from ring 2 to ring 3 (E → Ë).",
+      "to": "Ë",
+      "voices": [
+        "E",
+        "Ë",
+      ],
+    },
+    "ui": {
+      "label": "Outward move",
+      "summary": "Moves centrifugal from ring 2 to ring 3 (E → Ë).",
+      "title": "Seven-Voices Pattern Map (v1)",
+      "voicePath": "E → Ë",
+    },
+    "voicePath": "E → Ë",
+    "voicePathRaw": "E → Ë",
+    "voices": [
+      "E",
+      "Ë",
+    ],
+    "word": "zemër",
+  },
   "word": "zemër",
 }
 `;
