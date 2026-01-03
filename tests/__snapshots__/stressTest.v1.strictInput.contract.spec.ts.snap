@@ -1,0 +1,120 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SevenVoicesStressTestV1 — strictInput policy contract (v1) strictInput=false preserves legacy reality (xyz includes Y) 1`] = `
+{
+  "classification": {
+    "from": "Y",
+    "label": "Single voice (Y)",
+    "normalized": "Y",
+    "polarity": "orbital",
+    "raw": "xyz",
+    "ringDelta": 0,
+    "ringFrom": 2,
+    "ringTo": 2,
+    "steps": 0,
+    "summary": "Static on ring 2.",
+    "to": "Y",
+    "voices": [
+      "Y",
+    ],
+  },
+  "ui": {
+    "label": "Single voice (Y)",
+    "summary": "Static on ring 2.",
+    "title": "Seven-Voices Pattern Map (v1)",
+    "voicePath": "Y",
+  },
+  "voicePath": "Y",
+  "voicePathRaw": "xyz",
+  "voices": [
+    "Y",
+  ],
+  "word": "",
+}
+`;
+
+exports[`SevenVoicesStressTestV1 — strictInput policy contract (v1) strictInput=true accepts explicit voice paths 1`] = `
+{
+  "classification": {
+    "from": "Y",
+    "label": "Outward move",
+    "normalized": "Y → Ë",
+    "polarity": "centrifugal",
+    "raw": "Y → Ë",
+    "ringDelta": 1,
+    "ringFrom": 2,
+    "ringTo": 3,
+    "steps": 1,
+    "summary": "Moves centrifugal from ring 2 to ring 3 (Y → Ë).",
+    "to": "Ë",
+    "voices": [
+      "Y",
+      "Ë",
+    ],
+  },
+  "ui": {
+    "label": "Outward move",
+    "summary": "Moves centrifugal from ring 2 to ring 3 (Y → Ë).",
+    "title": "Seven-Voices Pattern Map (v1)",
+    "voicePath": "Y → Ë",
+  },
+  "voicePath": "Y → Ë",
+  "voicePathRaw": "Y → Ë",
+  "voices": [
+    "Y",
+    "Ë",
+  ],
+  "word": "",
+}
+`;
+
+exports[`SevenVoicesStressTestV1 — strictInput policy contract (v1) strictInput=true is case-insensitive for voice letters 1`] = `
+{
+  "classification": {
+    "from": "Y",
+    "label": "Outward move",
+    "normalized": "Y → Ë",
+    "polarity": "centrifugal",
+    "raw": "yë",
+    "ringDelta": 1,
+    "ringFrom": 2,
+    "ringTo": 3,
+    "steps": 1,
+    "summary": "Moves centrifugal from ring 2 to ring 3 (Y → Ë).",
+    "to": "Ë",
+    "voices": [
+      "Y",
+      "Ë",
+    ],
+  },
+  "ui": {
+    "label": "Outward move",
+    "summary": "Moves centrifugal from ring 2 to ring 3 (Y → Ë).",
+    "title": "Seven-Voices Pattern Map (v1)",
+    "voicePath": "Y → Ë",
+  },
+  "voicePath": "Y → Ë",
+  "voicePathRaw": "yë",
+  "voices": [
+    "Y",
+    "Ë",
+  ],
+  "word": "",
+}
+`;
+
+exports[`SevenVoicesStressTestV1 — strictInput policy contract (v1) strictInput=true rejects plain text letters (xyz -> no voices) 1`] = `
+{
+  "classification": null,
+  "ui": {
+    "label": "No voice path detected",
+    "summary": "No vowels (A,E,I,O,U,Y,Ë) found in this input.",
+    "title": "Seven-Voices Pattern Map (v1)",
+    "voicePath": "Y",
+  },
+  "voicePath": "Y",
+  "voicePathRaw": "xyz",
+  "voices": [],
+  "word": "",
+}
+`;
