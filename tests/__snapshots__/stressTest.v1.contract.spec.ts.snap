@@ -116,36 +116,3 @@ exports[`SevenVoicesStressTestV1 — contract lock (v1) locks output when input 
   "word": "",
 }
 `;
-
-exports[`SevenVoicesStressTestV1 — contract lock (v1) locks output when no vowels exist (classification must be null, no hiding) 1`] = `
-{
-  "classification": {
-    "from": "Y",
-    "label": "Single voice (Y)",
-    "normalized": "Y",
-    "polarity": "orbital",
-    "raw": "xyz",
-    "ringDelta": 0,
-    "ringFrom": 2,
-    "ringTo": 2,
-    "steps": 0,
-    "summary": "Static on ring 2.",
-    "to": "Y",
-    "voices": [
-      "Y",
-    ],
-  },
-  "ui": {
-    "label": "Single voice (Y)",
-    "summary": "Static on ring 2.",
-    "title": "Seven-Voices Pattern Map (v1)",
-    "voicePath": "Y",
-  },
-  "voicePath": "Y",
-  "voicePathRaw": "xyz",
-  "voices": [
-    "Y",
-  ],
-  "word": "",
-}
-`;
