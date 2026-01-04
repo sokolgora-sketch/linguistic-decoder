@@ -108,6 +108,9 @@ export function ReadoutCard({
             voicePath:{" "}
             {renderPOM(
               readout.voicePath,
+
+
+                
               (path) => (
                 <span className="ml-2 inline-flex flex-wrap gap-1 align-middle">
                   {path.map((v, idx) => (
@@ -117,9 +120,35 @@ export function ReadoutCard({
               ),
               "No voice path detected"
             )}
-          </div>
 
-          <div className="mt-3 text-sm font-mono">
+            {/* Voice path (surface vs functional) */}
+            <div className="mt-2 text-xs opacity-80 space-y-1">
+              <div>
+                Voice path (surface):{" "}
+                {readout.voicePathSurface?.kind === "present"
+                  ? readout.voicePathSurface.value.join("-")
+                  : "not_emitted"}
+              </div>
+              <div>
+                Voice path (functional):{" "}
+                {readout.voicePathFunctional?.kind === "present"
+                  ? readout.voicePathFunctional.value.join("-")
+                  : "not_emitted"}
+              </div>
+              <div>
+                Delta:{" "}
+                {readout.voicePathSurface?.kind === "present" &&
+                readout.voicePathFunctional?.kind === "present"
+                  ? (readout.voicePathSurface.value.join("-") ===
+                    readout.voicePathFunctional.value.join("-")
+                      ? "MATCH"
+                      : "DIVERGE")
+                  : "—"}
+              </div>
+            </div>
+            </div>
+
+            <div className="mt-3 text-sm font-mono">
             principles:{" "}
             {renderPOM(
               readout.principlesPath,
