@@ -31,8 +31,8 @@ export interface TelemetryReadout {
   principlesPath: PresentOrMissing<string[]>;
 
   voicePath: PresentOrMissing<Vowel[]>;
-  voicePathSurface?: string | null;
-  voicePathFunctional?: string | null;
+  voicePathSurface?: PresentOrMissing<Vowel[]>;
+  voicePathFunctional?: PresentOrMissing<Vowel[]>;
   status: "detected" | "none" | "error";
 
   counts: {
