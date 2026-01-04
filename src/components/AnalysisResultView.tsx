@@ -5,6 +5,7 @@ import type { AnalyzeWordResultUI } from "@/shared/resultsUI";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import DeepRootCard from "@/components/DeepRootCard";
+import PatternAtlasCard from "@/components/PatternAtlasCard";
 
 interface Props {
   result: AnalyzeWordResultUI;
@@ -13,6 +14,15 @@ interface Props {
 export default function AnalysisResultView({ result }: Props) {
   const [showJson, setShowJson] = useState(false);
   const vowelSet = "O/I/U/E/Y/A/Ë"; // reordered & renamed
+
+  const anyResult: any = result as any;
+
+  const voicePath =
+    result?.candidates?.[0]?.vowelPath ??
+    anyResult?.candidates?.[0]?.vowel_path ??
+    anyResult?.vowelPath ??
+    anyResult?.vowel_path ??
+    "";
 
   return (
     <div className="mt-6 space-y-6">
@@ -60,6 +70,13 @@ export default function AnalysisResultView({ result }: Props) {
         </CardContent>
       </Card>
 
+      {voicePath ? (
+        <PatternAtlasCard
+          voicePath={voicePath}
+          strictInput={true}
+        />
+      ) : null}
+
       {/* DeepRoot is NOT raw JSON — show it as a real card */}
       <DeepRootCard deepRoot={(result as any).deepRoot} />
 
@@ -78,7 +95,7 @@ export default function AnalysisResultView({ result }: Props) {
 
           {showJson && (
             <pre className="max-w-full overflow-x-auto break-words whitespace-pre-wrap rounded-lg border border-white/10 bg-black/40 p-3 text-xs leading-relaxed">
-{JSON.stringify(result, null, 2)}
+              {JSON.stringify(result, null, 2)}
             </pre>
           )}
         </CardContent>
