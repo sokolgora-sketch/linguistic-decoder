@@ -33,6 +33,37 @@ export type CanonCandidate = {
 };
 
 export const CANON_CANDIDATES: Record<string, CanonCandidate[]> = {
+  "father": [
+    {
+      id: "latin-pater",
+      language: "Latin",
+      form: "pater",
+      status: "pass",
+      confidenceTag: "strong",
+      fitTag: "strong",
+      morphology: { root: "pat-", suffixes: ["-er"] },
+      morphologyMatrix: { pivot: "pat" },
+      consonantProfile: "cut",
+      consonantProfileOk: true,
+      consonantSignals: ["plosive"],
+      axes: { principles: "pass", morphology: "pass", consonants: "pass" },
+      symbolic: [{ tag: "lineage", note: "Authority/lineage carrier (reference).", axis: "function" }],
+    },
+    {
+      id: "albanian-atë",
+      language: "Albanian",
+      form: "atë",
+      status: "pass",
+      confidenceTag: "strong",
+      fitTag: "strong",
+      morphology: { root: "atë", suffixes: [] },
+      morphologyMatrix: { pivot: "atë" },
+      consonantProfile: "build",
+      consonantProfileOk: true,
+      consonantSignals: ["dental"],
+      axes: { principles: "pass", morphology: "pass", consonants: "pass" },
+    },
+  ],
   study: [
     {
       id: "latin-studium",
