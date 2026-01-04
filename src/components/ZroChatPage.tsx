@@ -8,6 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { InstrumentPanel } from "@/ui/instrument/InstrumentPanel";
 
 type Msg =
   | { id: string; role: "user"; text: string }
@@ -235,6 +236,7 @@ export default function ZroChatPage() {
                       {m.role === "assistant" && result ? (
                         <>
                           <Separator />
+                          <InstrumentPanel payload={result} />
                           <div className="grid gap-3">
                             <div className="flex flex-wrap items-center gap-2">
                               <Badge variant="secondary" className="text-xs">
