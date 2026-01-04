@@ -32,6 +32,13 @@ function asBool(x: unknown): boolean | null {
 function asStringArray(x: unknown): string[] | null {
   return Array.isArray(x) && x.every((v) => typeof v === "string") ? x : null;
 }
+
+function asArray(x: unknown): unknown[] | null {
+  return Array.isArray(x) ? x : null;
+}
+function countOrMissing(arr: unknown[] | null): PresentOrMissing<number> {
+  return arr ? present(arr.length) : missing("not_emitted");
+}
 function normalizeMode(x: unknown): Mode | null {
   const s = asString(x);
   return s === "strict" || s === "open" ? (s as Mode) : null;
@@ -170,10 +177,35 @@ export function adaptAnalysisToTelemetryVM(raw: unknown): TelemetryViewModel {
   const status: "detected" | "none" | "error" =
     voicePath && voicePath.length ? "detected" : "none";
 
-  const normalizationSteps: unknown[] | null = null;
-  const ops: unknown[] | null = null;
-  const notes: unknown[] | null = null;
-  const signals: unknown[] | null = null;
+  const evidence = isRecord(root["evidence"]) ? root["evidence"] : null;
+const heartEvidence =
+  heart && isRecord((heart as any)["evidence"])
+    ? (((heart as any)["evidence"] as any) as Record<string, unknown>)
+    : null;
+
+const normalizationSteps =
+  asArray(evidence?.["normalizationSteps"]) ??
+  asArray(heartEvidence?.["normalizationSteps"]) ??
+  null;
+
+const ops =
+  asArray(evidence?.["ops"]) ??
+  asArray((root as any)["ops"]) ??
+  asArray(heartEvidence?.["ops"]) ??
+  null;
+
+const notes =
+  asArray(evidence?.["notes"]) ??
+  asArray((root as any)["notes"]) ??
+  asArray(heartEvidence?.["notes"]) ??
+  null;
+
+const signals =
+  asArray(evidence?.["signals"]) ??
+  asArray((root as any)["signals"]) ??
+  asArray(heartEvidence?.["signals"]) ??
+  null;
+
 
   return {
     readout: {
@@ -189,9 +221,9 @@ export function adaptAnalysisToTelemetryVM(raw: unknown): TelemetryViewModel {
       status,
       counts: {
         candidates: candidates.length,
-        ops: missing("not_emitted"),
-        notes: missing("not_emitted"),
-        signals: missing("not_emitted"),
+        ops: countOrMissing(ops),
+        notes: countOrMissing(notes),
+        signals: countOrMissing(signals),
         rejections: missing("not_emitted"),
       },
     },
@@ -201,9 +233,9 @@ export function adaptAnalysisToTelemetryVM(raw: unknown): TelemetryViewModel {
       ops: missing("not_emitted"),
       notes: missing("not_emitted"),
       signals: missing("not_emitted"),
-    },
+      },
 
-    candidates,
+      candidates,
     math,
     rejections: { items: rejectionItems },
     raw,
