@@ -18,6 +18,10 @@ describe("/api/analyze-v1 evidence wiring (unit)", () => {
 
     // Core fields must exist
     expect(typeof json.evidence.basis).toBe("string");
+
+    // math7 must be wired (this catches regressions)
+    expect(json.evidence.math7).toBeTruthy();
+    expect(json.evidence.math7).toEqual(json.heart.math7);
     expect(Array.isArray(json.evidence.surfaceVowels)).toBe(true);
 
     // math7 may be null in some runtime paths; if present, it must be an object
