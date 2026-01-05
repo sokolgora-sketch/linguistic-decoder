@@ -1,11 +1,9 @@
-"use client";
-
-import React, { useState } from "react";
-import type { AnalyzeWordResultUI } from "@/shared/resultsUI";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import DeepRootCard from "@/components/DeepRootCard";
-import PatternAtlasCard from "@/components/PatternAtlasCard";
+import React, { useState } from 'react';
+import type { AnalyzeWordResultUI } from '@/shared/resultsUI';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import DeepRootCard from '@/components/DeepRootCard';
+import PatternAtlasCard from '@/components/PatternAtlasCard';
 
 interface Props {
   result: AnalyzeWordResultUI;
@@ -13,7 +11,7 @@ interface Props {
 
 export default function AnalysisResultView({ result }: Props) {
   const [showJson, setShowJson] = useState(false);
-  const vowelSet = "O/I/U/E/Y/A/Ë"; // reordered & renamed
+  const vowelSet = 'O/I/U/E/Y/A/Ë'; // reordered & renamed
 
   const anyResult: any = result as any;
 
@@ -22,14 +20,14 @@ export default function AnalysisResultView({ result }: Props) {
     anyResult?.candidates?.[0]?.vowel_path ??
     anyResult?.vowelPath ??
     anyResult?.vowel_path ??
-    "";
+    '';
 
   return (
     <div className="mt-6 space-y-6">
       <Card className="border-white/10 bg-zinc-950/30">
         <CardHeader>
           <CardTitle className="text-base font-semibold">
-            {result.word}{" "}
+            {result.word}{' '}
             <span className="text-xs text-muted-foreground">
               Engine: {result.engineVersion}
             </span>
@@ -40,29 +38,29 @@ export default function AnalysisResultView({ result }: Props) {
           {result.candidates.map((c, i) => (
             <div key={i} className="space-y-2 text-sm">
               <div>
-                Candidate {i + 1} —{" "}
-                <span className="opacity-80">{c.language || "unknown"}</span>
+                Candidate {i + 1} —{' '}
+                <span className="opacity-80">{c.language || 'unknown'}</span>
               </div>
               <div>
                 Form: <span className="font-semibold">{c.form}</span>
               </div>
               <div>
-                Decomposition:{" "}
+                Decomposition:{' '}
                 <span className="font-mono">
-                  {(c.decomposition ?? []).join(" – ") || "—"}
+                  {(c.decomposition ?? []).join(' – ') || '—'}
                 </span>
               </div>
               <div>
-                Vowel path:{" "}
-                <span className="font-mono">{c.vowelPath ?? "—"}</span>
+                Vowel path:{' '}
+                <span className="font-mono">{c.vowelPath ?? '—'}</span>
               </div>
               <div>
                 Meaning:
                 <div className="mt-1 text-muted-foreground">
                   {c.functionalStatement?.replace(
-                    "Seven-vowel set (A/E/I/O/U/Y/Ë)",
+                    'Seven-vowel set (A/E/I/O/U/Y/Ë)',
                     `Seven-Vowels set (${vowelSet})`,
-                  ) ?? "—"}
+                  ) ?? '—'}
                 </div>
               </div>
             </div>
@@ -90,7 +88,7 @@ export default function AnalysisResultView({ result }: Props) {
             size="sm"
             onClick={() => setShowJson(!showJson)}
           >
-            {showJson ? "Hide raw JSON" : "Show raw JSON"}
+            {showJson ? 'Hide raw JSON' : 'Show raw JSON'}
           </Button>
 
           {showJson && (
