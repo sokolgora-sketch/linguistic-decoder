@@ -9,6 +9,7 @@ import type {
   Vowel,
   MathTelemetryVM,
 } from "./types";
+import { pickVoicePaths } from "./voicePathPicker";
 
 function present<T>(value: T): PresentOrMissing<T> {
   return { kind: "present", value };
@@ -80,71 +81,46 @@ function stableCandidateId(index: number, lang: string | null, form: string | nu
   return `cand_${index}_${(lang ?? "xx").toLowerCase()}_${(form ?? "form").toLowerCase()}`.replace(/[^a-z0-9_]/g, "_");
 }
 
-
-// --- voicePath helpers (deterministic) ---
-const SEVEN_VOWELS = new Set(["A","E","I","O","U","Y","Ë"]);
-
-function normalizeVoicePath(input: unknown): string | null {
-  if (typeof input !== "string") return null;
-
-  // Normalize arrows/dashes to "-"
-  const t = input
-    .replace(/[→–—]/g, "-")
-    .replace(/\s+/g, "")
-    .toUpperCase();
-
-  // Expect "X-Y"
-  const m = /^([AEIOUYË])-([AEIOUYË])$/.exec(t);
-  if (!m) return null;
-
-  const a = m[1]!;
-  const b = m[2]!;
-  if (!SEVEN_VOWELS.has(a) || !SEVEN_VOWELS.has(b)) return null;
-
-  return `${a}-${b}`;
-}
-
-function toVoicePathMaybe(normalized: string | null, presentFn: any, missingFn: any) {
-  if (!normalized) return missingFn("not_emitted");
-  const parts = normalized.split("-");
-  if (parts.length !== 2) return missingFn("not_emitted");
-  return presentFn(parts);
-}
 export function adaptAnalysisToTelemetryVM(raw: unknown): TelemetryViewModel {
-  // --- voicePath split (surface vs functional) ---
   const payload = arguments[0] as any;
 
-  // Surface source preference:
-  // 1) heartInstrumentV1.surfaceVowels (if present)
-  // 2) heart.math7.primary.basis (fallback, e.g. "AE")
-  const surfaceFromInstrument =
-    Array.isArray((payload as any)?.heartInstrumentV1?.surfaceVowels)
-      ? ((payload as any).heartInstrumentV1.surfaceVowels as unknown[])
-          .map((v) => String(v).toUpperCase())
-          .filter((v) => ["A","E","I","O","U","Y","Ë"].includes(v))
-          .join("-")
-      : null;
+  const vp = pickVoicePaths(payload);
 
-  const surfaceFromBasis =
-    typeof (payload as any)?.heart?.math7?.primary?.basis === "string"
-      ? normalizeVoicePath(
-          ((payload as any).heart.math7.primary.basis as string)
-            .split("")
-            .filter((ch) => ["A","E","I","O","U","Y","Ë"].includes(ch.toUpperCase()))
-            .join("-")
-        )
-      : null;
+  const voicePathDetectedNormalized = vp.detected;
+  const voicePathSurfaceNormalized  = vp.surface;
+  const voicePathFunctionalNormalized = vp.functional;
 
-  const voicePathSurfaceNormalized =
-    normalizeVoicePath(surfaceFromInstrument) ??
-    surfaceFromBasis;
+  // Convert "U-I" into typed vowels (Vowel[]) or null if invalid.
+  const toVoiceParts = (s: string | null): Vowel[] | null => {
+    if (!s) return null;
+    const parts = s.split("-").map((t) => t.trim()).filter(Boolean);
+    const out: Vowel[] = [];
+    for (const p of parts) {
+      const vv = normalizeVowelChar(p);
+      if (!vv) return null;
+      out.push(vv);
+    }
+    return out.length ? out : null;
+  };
 
-  const voicePathFunctionalNormalized =
-    normalizeVoicePath((payload as any)?.deepRoot?.functionalRoots?.[0]?.vowelPath);
+  const detectedParts = toVoiceParts(voicePathDetectedNormalized);
+  const surfaceParts = toVoiceParts(voicePathSurfaceNormalized);
+  const functionalParts = toVoiceParts(voicePathFunctionalNormalized);
 
-  // present()/missing() already exist in this module; we reuse them.
-  const voicePathSurfaceMaybe = toVoicePathMaybe(voicePathSurfaceNormalized, present, missing);
-  const voicePathFunctionalMaybe = toVoicePathMaybe(voicePathFunctionalNormalized, present, missing);
+  const voicePathDetectedMaybe: PresentOrMissing<Vowel[]> =
+    detectedParts ? present(detectedParts) : missing<Vowel[]>("not_emitted");
+
+  const voicePathSurfaceMaybe: PresentOrMissing<Vowel[]> =
+    surfaceParts ? present(surfaceParts) : missing<Vowel[]>("not_emitted");
+
+  const voicePathFunctionalMaybe: PresentOrMissing<Vowel[]> =
+    functionalParts ? present(functionalParts) : missing<Vowel[]>("not_emitted");
+
+
+  const voicePathDelta =
+    vp.surface && vp.functional
+      ? (vp.surface === vp.functional ? "MATCH" : "DIVERGE")
+      : "NOT_EMITTED";
 
   const root = isRecord(raw) ? raw : {};
   const heart = isRecord(root["heart"]) ? root["heart"] : null;
@@ -177,7 +153,6 @@ export function adaptAnalysisToTelemetryVM(raw: unknown): TelemetryViewModel {
       (heart ? asBool((heart as any)["strictInput"]) : null) ??
       asBool((root as any)["strictInput"]);
 
-    // If not emitted, derive from mode (strict => true, open => false).
     const strictInput: PresentOrMissing<boolean> =
       strictInputEmitted !== null
         ? presentBool(strictInputEmitted)
@@ -256,7 +231,6 @@ const heartEvidence =
     ? (((heart as any)["evidence"] as any) as Record<string, unknown>)
     : null;
 
-// Prefer root.evidence; fall back to raw.evidence; then heart.evidence.
 const evidence = rootEvidence ?? rawEvidence ?? heartEvidence ?? null;
 
 const normalizationSteps =
@@ -285,10 +259,10 @@ const signals =
 
   return {
     readout: {
-    // voice paths (explicit)
-    voicePath: voicePathSurfaceMaybe,           // backward-compatible alias (surface)
+    voicePath: voicePathDetectedMaybe,
     voicePathSurface: voicePathSurfaceMaybe,
     voicePathFunctional: voicePathFunctionalMaybe,
+    voicePathDelta,
 
       word,
       normalizedWord: sanitized ? present(sanitized) : missing("not_emitted", "sanitized"),
