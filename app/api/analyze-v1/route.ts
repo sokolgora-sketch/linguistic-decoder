@@ -22,22 +22,22 @@ const BodySchema = z
 
 
 function buildEvidenceV1FromPayload(payload: any) {
-  const voicePath = Array.isArray(payload?.primaryPath?.voicePath) ? [...payload.primaryPath.voicePath] : [];
-  const ringPath = Array.isArray(payload?.primaryPath?.ringPath) ? [...payload.primaryPath.ringPath] : [];
-  const levelPath = Array.isArray(payload?.primaryPath?.levelPath) ? [...payload.primaryPath.levelPath] : [];
+  const voicePath = Array.isArray(payload?.primaryPath?.voicePath)
+    ? [...payload.primaryPath.voicePath]
+    : [];
+  const ringPath = Array.isArray(payload?.primaryPath?.ringPath)
+    ? [...payload.primaryPath.ringPath]
+    : [];
+  const levelPath = Array.isArray(payload?.primaryPath?.levelPath)
+    ? [...payload.primaryPath.levelPath]
+    : [];
   const ops = Array.isArray(payload?.primaryPath?.ops) ? [...payload.primaryPath.ops] : [];
 
-  const sig = new Set(Array.isArray(payload?.signals) ? payload.signals : []);
+  const sig = new Set<string>(Array.isArray(payload?.signals) ? payload.signals : []);
   sig.add("EVIDENCE_V1");
   sig.delete("EVIDENCE_MISSING_FALLBACK");
 
-  return {
-    basis: String(payload?.word ?? ""),
-    surfaceVowels: voicePath,
-    ringPath,
-    levelPath,
-    ops,
-    math7: (
+  const math7 =
     payload?.math7 ??
     payload?.math7Summary ??
     payload?.primaryPath?.math7 ??
@@ -45,20 +45,55 @@ function buildEvidenceV1FromPayload(payload: any) {
     payload?.engine?.math7 ??
     payload?.heart?.math7 ??
     payload?.raw?.heart?.math7 ??
-    null
-  ),
-  solveMs: (
+    null;
+
+  const solveMs =
     payload?.solveMs ??
     payload?.data?.solveMs ??
     payload?.engine?.solveMs ??
-    null
-  ),
+    null;
+
+  return {
+    basis: String(payload?.word ?? ""),
+    surfaceVowels: voicePath,
+    ringPath,
+    levelPath,
+    ops,
+    math7,
+    solveMs,
     cacheHit: payload?.cacheHit ?? null,
     recomputed: payload?.recomputed ?? null,
     normalizationSteps: [],
     notes: [],
     signals: Array.from(sig),
   };
+}
+function backfillEvidenceMath7(params: {
+  evidence: any;
+  ensured: any;
+  out: any;
+  heartInstrumentV1?: any;
+}) {
+  const { evidence, ensured, out, heartInstrumentV1 } = params;
+
+  const math7 =
+    evidence?.math7 ??
+    ensured?.heart?.math7 ??
+    ensured?.raw?.heart?.math7 ??
+    out?.heart?.math7 ??
+    out?.raw?.heart?.math7 ??
+    heartInstrumentV1?.math7 ??
+    null;
+
+  if (math7 != null && evidence?.math7 == null) {
+    evidence.math7 = math7;
+    evidence.signals = Array.isArray(evidence.signals) ? evidence.signals : [];
+    if (!evidence.signals.includes("EVIDENCE_MATH7_BACKFILL")) {
+      evidence.signals.push("EVIDENCE_MATH7_BACKFILL");
+    }
+  }
+
+  return evidence;
 }
 
 function safeJsonPreview(value: unknown, maxChars = 6000) {
@@ -149,49 +184,19 @@ export async function POST(req: Request) {
 
     const ensured = ensurePrimaryAndCandidatePaths(ui);
 
-    // Add as a stable sub-object at the top-level (do NOT let ensurePaths drop it).
-      const evidence = buildEvidenceV1FromPayload(payload);
-    // Backfill: EvidenceV1 should carry math7 when Heart has it (payload may not expose it).
-    if ((evidence as any).math7 == null) {
-      const heartMath7 =
-        (ensured as any)?.heart?.math7 ??
-        (ensured as any)?.raw?.heart?.math7 ??
-        null;
+    let evidence = buildEvidenceV1FromPayload(payload);
+    evidence = backfillEvidenceMath7({ evidence, ensured, out, heartInstrumentV1 });
 
-      if (heartMath7 != null) {
-        (evidence as any).math7 = heartMath7;
-      }
-    }
+    const finalEvidence = { ...evidence };
 
-
-      // Backfill evidence math7 from shaped output (authoritative) if payload-derived evidence missed it.
-      // This keeps EvidenceV1 aligned with what the UI actually renders (heart/math7).
-      if (!evidence.math7) {
-        const m =
-          (ensured as any)?.heart?.math7 ??
-          (ensured as any)?.raw?.heart?.math7 ??
-          (ensured as any)?.heartInstrumentV1?.math7 ??
-          null;
-
-        if (m) {
-          evidence.math7 = m;
-          evidence.signals = Array.isArray(evidence.signals) ? evidence.signals : [];
-          evidence.signals.push("EVIDENCE_MATH7_FROM_SHAPED");
-        }
-      }
-
-
-      const finalEvidence = {
-        ...evidence,
-        math7: evidence?.math7 ?? (out as any)?.heart?.math7 ?? (out as any)?.raw?.heart?.math7 ?? null,
-      };
-
-      return NextResponse.json({
-        ...ensured,
-        evidence,
-        raw: (ensured as any).raw ? { ...((ensured as any).raw as any), evidence } : (ensured as any).raw,
-        heartInstrumentV1,
-      });
+    return NextResponse.json({
+      ...ensured,
+      evidence: finalEvidence,
+      raw: (ensured as any).raw
+        ? { ...((ensured as any).raw as any), evidence: finalEvidence }
+        : (ensured as any).raw,
+      heartInstrumentV1,
+    });
   } catch (err: any) {
     return NextResponse.json(
       { error: "analyze-v1 failed", details: String(err?.stack ?? err?.message ?? err) },
@@ -237,26 +242,19 @@ export async function GET(req: Request) {
     }
 
     const ensured = ensurePrimaryAndCandidatePaths(ui);
+    let evidence = buildEvidenceV1FromPayload(payload);
+    evidence = backfillEvidenceMath7({ evidence, ensured, out, heartInstrumentV1 });
 
-    // Evidence is derived from engine payload (raw), but some signals (math7) may only exist in shaped output.
-    const evidence = buildEvidenceV1FromPayload(payload);
+    const finalEvidence = { ...evidence };
 
-    // Backfill: EvidenceV1 must carry math7 when Heart has it (payload may not expose it).
-    const heartMath7 =
-      (ensured as any)?.heart?.math7 ??
-      (ensured as any)?.raw?.heart?.math7 ??
-      null;
-
-    if ((evidence as any).math7 == null && heartMath7 != null) {
-      (evidence as any).math7 = heartMath7;
-    }
-
-return NextResponse.json({
-        ...ensured,
-        evidence,
-        raw: (ensured as any).raw ? { ...((ensured as any).raw as any), evidence } : (ensured as any).raw,
-        heartInstrumentV1,
-      });
+    return NextResponse.json({
+      ...ensured,
+      evidence: finalEvidence,
+      raw: (ensured as any).raw
+        ? { ...((ensured as any).raw as any), evidence: finalEvidence }
+        : (ensured as any).raw,
+      heartInstrumentV1,
+    });
   } catch (err: any) {
     return NextResponse.json(
       { error: "analyze-v1 failed", details: String(err?.stack ?? err?.message ?? err) },
