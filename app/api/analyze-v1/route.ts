@@ -105,11 +105,11 @@ export async function POST(req: Request) {
     const ensured = ensurePrimaryAndCandidatePaths(ui);
 
     // Add as a stable sub-object at the top-level (do NOT let ensurePaths drop it).
-      const evidence = {
+      const evidence = (out as any).evidence ?? {
         normalizationSteps: [],
         ops: [],
         notes: [],
-        signals: ["EVIDENCE_V1"],
+        signals: ["EVIDENCE_V1", "EVIDENCE_MISSING_FALLBACK"],
       };
 
       return NextResponse.json({
@@ -163,11 +163,11 @@ export async function GET(req: Request) {
     }
 
     const ensured = ensurePrimaryAndCandidatePaths(ui);
-      const evidence = {
+      const evidence = (out as any).evidence ?? {
         normalizationSteps: [],
         ops: [],
         notes: [],
-        signals: ["EVIDENCE_V1"],
+        signals: ["EVIDENCE_V1", "EVIDENCE_MISSING_FALLBACK"],
       };
 
       return NextResponse.json({
