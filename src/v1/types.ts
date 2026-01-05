@@ -12,6 +12,12 @@ export type EvidenceV1 = {
   surfaceVowels: SevenVowel[];
   surfacePath: string; // "A-E-Ë" (or "")
   math7: EvidenceMath7V1;
+
+  /** Evidence ledger (UI instrument contract v0.1) */
+  normalizationSteps: string[];
+  ops: string[];
+  notes: string[];
+  signals: string[];
 };
 
 export type MetaV1 = {
