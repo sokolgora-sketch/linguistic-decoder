@@ -37,8 +37,22 @@ function buildEvidenceV1FromPayload(payload: any) {
     ringPath,
     levelPath,
     ops,
-    math7: (payload?.math7 ?? (payload as any)?.math7Summary ?? (payload as any)?.primaryPath?.math7 ?? null),
-    solveMs: payload?.solveMs ?? null,
+    math7: (
+    payload?.math7 ??
+    payload?.math7Summary ??
+    payload?.primaryPath?.math7 ??
+    payload?.data?.math7 ??
+    payload?.engine?.math7 ??
+    payload?.heart?.math7 ??
+    payload?.raw?.heart?.math7 ??
+    null
+  ),
+  solveMs: (
+    payload?.solveMs ??
+    payload?.data?.solveMs ??
+    payload?.engine?.solveMs ??
+    null
+  ),
     cacheHit: payload?.cacheHit ?? null,
     recomputed: payload?.recomputed ?? null,
     normalizationSteps: [],
@@ -117,6 +131,10 @@ export async function POST(req: Request) {
     const payload = await runAnalysisDeterministic(word, { mode, alphabet });
     const out = enginePayloadToAnalysisResult(payload);
 
+    // DF_EVIDENCE_MATH7_BACKFILL
+    // If engine payload doesn't carry math7 but adapter output does, align evidence to the same truth.
+    // This keeps Evidence as "instrument readout" rather than leaving nulls that confuse UI.
+    // NOTE: evidence is built from payload earlier; we can adjust it later just before returning.
     const ui = adaptAnalyzeV1ToUI(out as any);
 
     // ✅ HARD GUARD: validate the engine V1 payload (not the UI adapter output)
@@ -133,6 +151,40 @@ export async function POST(req: Request) {
 
     // Add as a stable sub-object at the top-level (do NOT let ensurePaths drop it).
       const evidence = buildEvidenceV1FromPayload(payload);
+    // Backfill: EvidenceV1 should carry math7 when Heart has it (payload may not expose it).
+    if ((evidence as any).math7 == null) {
+      const heartMath7 =
+        (ensured as any)?.heart?.math7 ??
+        (ensured as any)?.raw?.heart?.math7 ??
+        null;
+
+      if (heartMath7 != null) {
+        (evidence as any).math7 = heartMath7;
+      }
+    }
+
+
+      // Backfill evidence math7 from shaped output (authoritative) if payload-derived evidence missed it.
+      // This keeps EvidenceV1 aligned with what the UI actually renders (heart/math7).
+      if (!evidence.math7) {
+        const m =
+          (ensured as any)?.heart?.math7 ??
+          (ensured as any)?.raw?.heart?.math7 ??
+          (ensured as any)?.heartInstrumentV1?.math7 ??
+          null;
+
+        if (m) {
+          evidence.math7 = m;
+          evidence.signals = Array.isArray(evidence.signals) ? evidence.signals : [];
+          evidence.signals.push("EVIDENCE_MATH7_FROM_SHAPED");
+        }
+      }
+
+
+      const finalEvidence = {
+        ...evidence,
+        math7: evidence?.math7 ?? (out as any)?.heart?.math7 ?? (out as any)?.raw?.heart?.math7 ?? null,
+      };
 
       return NextResponse.json({
         ...ensured,
@@ -185,9 +237,21 @@ export async function GET(req: Request) {
     }
 
     const ensured = ensurePrimaryAndCandidatePaths(ui);
-      const evidence = buildEvidenceV1FromPayload(payload);
 
-      return NextResponse.json({
+    // Evidence is derived from engine payload (raw), but some signals (math7) may only exist in shaped output.
+    const evidence = buildEvidenceV1FromPayload(payload);
+
+    // Backfill: EvidenceV1 must carry math7 when Heart has it (payload may not expose it).
+    const heartMath7 =
+      (ensured as any)?.heart?.math7 ??
+      (ensured as any)?.raw?.heart?.math7 ??
+      null;
+
+    if ((evidence as any).math7 == null && heartMath7 != null) {
+      (evidence as any).math7 = heartMath7;
+    }
+
+return NextResponse.json({
         ...ensured,
         evidence,
         raw: (ensured as any).raw ? { ...((ensured as any).raw as any), evidence } : (ensured as any).raw,
