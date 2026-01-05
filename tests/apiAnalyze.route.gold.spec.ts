@@ -1,3 +1,4 @@
+require("./helpers/whatwgGlobals.cjs");
 /**
  * Jest env here does not provide WHATWG Web APIs.
  * next/server + undici expect them, so we polyfill BEFORE requiring either.
