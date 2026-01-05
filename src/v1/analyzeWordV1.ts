@@ -43,17 +43,24 @@ function extractSevenVowelsV1(normalizedWord: string): SevenVowel[] {
   return out;
 }
 
-function buildEvidenceV1(basis: string): EvidenceV1 {
+function buildEvidenceV1(basis: string, normalizationSteps: string[]): EvidenceV1 {
   const surfaceVowels = extractSevenVowelsV1(basis);
   const indices = surfaceVowels.map((v) => VOWEL_INDEX[v]);
   const sum = indices.reduce((a, b) => a + b, 0);
   const totalMod7 = ((sum % 7) + 7) % 7;
+
+  const signals: string[] = ["EVIDENCE_V1"];
+  if (!basis) signals.push("EMPTY_BASIS");
 
   return {
     basis,
     surfaceVowels,
     surfacePath: surfaceVowels.join("-"),
     math7: { vowels: surfaceVowels, indices, sum, totalMod7 },
+    normalizationSteps: normalizationSteps ?? [],
+    ops: [],
+    notes: [],
+    signals,
   };
 }
 
@@ -120,7 +127,7 @@ const emptyCandidate: Candidate = {
       normalizedWord: "",
       candidates: [emptyCandidate],
       engineVersion: ENGINE_VERSION_V1,
-      evidence: buildEvidenceV1(""), // stable, deterministic
+      evidence: buildEvidenceV1("", notes), // stable, deterministic
       meta,
 
       warnings: warnings.length ? warnings : undefined,
@@ -128,7 +135,7 @@ const emptyCandidate: Candidate = {
   }
 
   const basis = normalizedWord; // Phase 1: exact basis used for surface analysis
-  const evidence = buildEvidenceV1(basis);
+  const evidence = buildEvidenceV1(basis, notes);
 
   const c0: Candidate = {
     language: "unknown",

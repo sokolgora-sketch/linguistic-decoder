@@ -105,7 +105,19 @@ export async function POST(req: Request) {
     const ensured = ensurePrimaryAndCandidatePaths(ui);
 
     // Add as a stable sub-object at the top-level (do NOT let ensurePaths drop it).
-    return NextResponse.json({ ...ensured, heartInstrumentV1 });
+      const evidence = {
+        normalizationSteps: [],
+        ops: [],
+        notes: [],
+        signals: ["EVIDENCE_V1"],
+      };
+
+      return NextResponse.json({
+        ...ensured,
+        evidence,
+        raw: (ensured as any).raw ? { ...((ensured as any).raw as any), evidence } : (ensured as any).raw,
+        heartInstrumentV1,
+      });
   } catch (err: any) {
     return NextResponse.json(
       { error: "analyze-v1 failed", details: String(err?.stack ?? err?.message ?? err) },
@@ -151,7 +163,19 @@ export async function GET(req: Request) {
     }
 
     const ensured = ensurePrimaryAndCandidatePaths(ui);
-    return NextResponse.json({ ...ensured, heartInstrumentV1 });
+      const evidence = {
+        normalizationSteps: [],
+        ops: [],
+        notes: [],
+        signals: ["EVIDENCE_V1"],
+      };
+
+      return NextResponse.json({
+        ...ensured,
+        evidence,
+        raw: (ensured as any).raw ? { ...((ensured as any).raw as any), evidence } : (ensured as any).raw,
+        heartInstrumentV1,
+      });
   } catch (err: any) {
     return NextResponse.json(
       { error: "analyze-v1 failed", details: String(err?.stack ?? err?.message ?? err) },

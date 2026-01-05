@@ -242,11 +242,22 @@ export function adaptAnalysisToTelemetryVM(raw: unknown): TelemetryViewModel {
   const status: "detected" | "none" | "error" =
     voicePath && voicePath.length ? "detected" : "none";
 
-  const evidence = isRecord(root["evidence"]) ? root["evidence"] : null;
+  const rootEvidence = isRecord(root["evidence"])
+  ? (root["evidence"] as Record<string, unknown>)
+  : null;
+
+const rawEvidence =
+  isRecord((root as any)["raw"]) && isRecord(((root as any)["raw"] as any)["evidence"])
+    ? ((((root as any)["raw"] as any)["evidence"] as any) as Record<string, unknown>)
+    : null;
+
 const heartEvidence =
   heart && isRecord((heart as any)["evidence"])
     ? (((heart as any)["evidence"] as any) as Record<string, unknown>)
     : null;
+
+// Prefer root.evidence; fall back to raw.evidence; then heart.evidence.
+const evidence = rootEvidence ?? rawEvidence ?? heartEvidence ?? null;
 
 const normalizationSteps =
   asArray(evidence?.["normalizationSteps"]) ??

@@ -31,6 +31,12 @@ exports[`Engine Contract v1 — capture engine output (goldens) algorithm (stric
         "I"
       ]
     },
+    "normalizationSteps": [],
+    "notes": [],
+    "ops": [],
+    "signals": [
+      "EVIDENCE_V1"
+    ],
     "surfacePath": "A-O-I",
     "surfaceVowels": [
       "A",
@@ -81,6 +87,12 @@ exports[`Engine Contract v1 — capture engine output (goldens) damage (strict, 
         "E"
       ]
     },
+    "normalizationSteps": [],
+    "notes": [],
+    "ops": [],
+    "signals": [
+      "EVIDENCE_V1"
+    ],
     "surfacePath": "A-A-E",
     "surfaceVowels": [
       "A",
@@ -129,6 +141,12 @@ exports[`Engine Contract v1 — capture engine output (goldens) father (strict, 
         "E"
       ]
     },
+    "normalizationSteps": [],
+    "notes": [],
+    "ops": [],
+    "signals": [
+      "EVIDENCE_V1"
+    ],
     "surfacePath": "A-E",
     "surfaceVowels": [
       "A",
@@ -174,6 +192,12 @@ exports[`Engine Contract v1 — capture engine output (goldens) gjak (strict, au
         "A"
       ]
     },
+    "normalizationSteps": [],
+    "notes": [],
+    "ops": [],
+    "signals": [
+      "EVIDENCE_V1"
+    ],
     "surfacePath": "A",
     "surfaceVowels": [
       "A"
@@ -222,6 +246,12 @@ exports[`Engine Contract v1 — capture engine output (goldens) internet (strict
         "E"
       ]
     },
+    "normalizationSteps": [],
+    "notes": [],
+    "ops": [],
+    "signals": [
+      "EVIDENCE_V1"
+    ],
     "surfacePath": "I-E-E",
     "surfaceVowels": [
       "I",
@@ -270,6 +300,12 @@ exports[`Engine Contract v1 — capture engine output (goldens) love (strict, au
         "E"
       ]
     },
+    "normalizationSteps": [],
+    "notes": [],
+    "ops": [],
+    "signals": [
+      "EVIDENCE_V1"
+    ],
     "surfacePath": "O-E",
     "surfaceVowels": [
       "O",
@@ -321,6 +357,12 @@ exports[`Engine Contract v1 — capture engine output (goldens) mathematics (str
         "I"
       ]
     },
+    "normalizationSteps": [],
+    "notes": [],
+    "ops": [],
+    "signals": [
+      "EVIDENCE_V1"
+    ],
     "surfacePath": "A-E-A-I",
     "surfaceVowels": [
       "A",
@@ -374,6 +416,12 @@ exports[`Engine Contract v1 — capture engine output (goldens) philosophy (stri
         "Y"
       ]
     },
+    "normalizationSteps": [],
+    "notes": [],
+    "ops": [],
+    "signals": [
+      "EVIDENCE_V1"
+    ],
     "surfacePath": "I-O-O-Y",
     "surfaceVowels": [
       "I",
@@ -421,6 +469,12 @@ exports[`Engine Contract v1 — capture engine output (goldens) shter (strict, a
         "E"
       ]
     },
+    "normalizationSteps": [],
+    "notes": [],
+    "ops": [],
+    "signals": [
+      "EVIDENCE_V1"
+    ],
     "surfacePath": "E",
     "surfaceVowels": [
       "E"
@@ -467,6 +521,12 @@ exports[`Engine Contract v1 — capture engine output (goldens) study (strict, a
         "Y"
       ]
     },
+    "normalizationSteps": [],
+    "notes": [],
+    "ops": [],
+    "signals": [
+      "EVIDENCE_V1"
+    ],
     "surfacePath": "U-Y",
     "surfaceVowels": [
       "U",
@@ -514,6 +574,12 @@ exports[`Engine Contract v1 — capture engine output (goldens) zemër (strict, 
         "Ë"
       ]
     },
+    "normalizationSteps": [],
+    "notes": [],
+    "ops": [],
+    "signals": [
+      "EVIDENCE_V1"
+    ],
     "surfacePath": "E-Ë",
     "surfaceVowels": [
       "E",
