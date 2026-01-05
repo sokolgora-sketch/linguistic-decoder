@@ -151,6 +151,18 @@ export async function POST(req: Request) {
 
     // Add as a stable sub-object at the top-level (do NOT let ensurePaths drop it).
       const evidence = buildEvidenceV1FromPayload(payload);
+    // Backfill: EvidenceV1 should carry math7 when Heart has it (payload may not expose it).
+    if ((evidence as any).math7 == null) {
+      const heartMath7 =
+        (ensured as any)?.heart?.math7 ??
+        (ensured as any)?.raw?.heart?.math7 ??
+        null;
+
+      if (heartMath7 != null) {
+        (evidence as any).math7 = heartMath7;
+      }
+    }
+
 
       // Backfill evidence math7 from shaped output (authoritative) if payload-derived evidence missed it.
       // This keeps EvidenceV1 aligned with what the UI actually renders (heart/math7).
@@ -225,9 +237,21 @@ export async function GET(req: Request) {
     }
 
     const ensured = ensurePrimaryAndCandidatePaths(ui);
-      const evidence = buildEvidenceV1FromPayload(payload);
 
-      return NextResponse.json({
+    // Evidence is derived from engine payload (raw), but some signals (math7) may only exist in shaped output.
+    const evidence = buildEvidenceV1FromPayload(payload);
+
+    // Backfill: EvidenceV1 must carry math7 when Heart has it (payload may not expose it).
+    const heartMath7 =
+      (ensured as any)?.heart?.math7 ??
+      (ensured as any)?.raw?.heart?.math7 ??
+      null;
+
+    if ((evidence as any).math7 == null && heartMath7 != null) {
+      (evidence as any).math7 = heartMath7;
+    }
+
+return NextResponse.json({
         ...ensured,
         evidence,
         raw: (ensured as any).raw ? { ...((ensured as any).raw as any), evidence } : (ensured as any).raw,

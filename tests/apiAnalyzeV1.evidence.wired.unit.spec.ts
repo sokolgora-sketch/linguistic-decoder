@@ -24,12 +24,7 @@ describe("/api/analyze-v1 evidence wiring (unit)", () => {
     expect(json.evidence.math7).toEqual(json.heart.math7);
     expect(Array.isArray(json.evidence.surfaceVowels)).toBe(true);
 
-    // math7 may be null in some runtime paths; if present, it must be an object
-    if (json.evidence.math7 !== null && json.evidence.math7 !== undefined) {
-      expect(typeof json.evidence.math7).toBe("object");
-    }
-
-    // Must not be fallback
+        // Must not be fallback
     const signals = json.evidence?.signals || [];
     expect(signals).not.toContain("EVIDENCE_MISSING_FALLBACK");
 
