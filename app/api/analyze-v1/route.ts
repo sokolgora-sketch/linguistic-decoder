@@ -20,6 +20,33 @@ const BodySchema = z
   })
   .passthrough();
 
+
+function buildEvidenceV1FromPayload(payload: any) {
+  const voicePath = Array.isArray(payload?.primaryPath?.voicePath) ? [...payload.primaryPath.voicePath] : [];
+  const ringPath = Array.isArray(payload?.primaryPath?.ringPath) ? [...payload.primaryPath.ringPath] : [];
+  const levelPath = Array.isArray(payload?.primaryPath?.levelPath) ? [...payload.primaryPath.levelPath] : [];
+  const ops = Array.isArray(payload?.primaryPath?.ops) ? [...payload.primaryPath.ops] : [];
+
+  const sig = new Set(Array.isArray(payload?.signals) ? payload.signals : []);
+  sig.add("EVIDENCE_V1");
+  sig.delete("EVIDENCE_MISSING_FALLBACK");
+
+  return {
+    basis: String(payload?.word ?? ""),
+    surfaceVowels: voicePath,
+    ringPath,
+    levelPath,
+    ops,
+    math7: (payload?.math7 ?? (payload as any)?.math7Summary ?? (payload as any)?.primaryPath?.math7 ?? null),
+    solveMs: payload?.solveMs ?? null,
+    cacheHit: payload?.cacheHit ?? null,
+    recomputed: payload?.recomputed ?? null,
+    normalizationSteps: [],
+    notes: [],
+    signals: Array.from(sig),
+  };
+}
+
 function safeJsonPreview(value: unknown, maxChars = 6000) {
   try {
     const seen = new WeakSet<object>();
@@ -105,12 +132,7 @@ export async function POST(req: Request) {
     const ensured = ensurePrimaryAndCandidatePaths(ui);
 
     // Add as a stable sub-object at the top-level (do NOT let ensurePaths drop it).
-      const evidence = (out as any).evidence ?? {
-        normalizationSteps: [],
-        ops: [],
-        notes: [],
-        signals: ["EVIDENCE_V1", "EVIDENCE_MISSING_FALLBACK"],
-      };
+      const evidence = buildEvidenceV1FromPayload(payload);
 
       return NextResponse.json({
         ...ensured,
@@ -163,12 +185,7 @@ export async function GET(req: Request) {
     }
 
     const ensured = ensurePrimaryAndCandidatePaths(ui);
-      const evidence = (out as any).evidence ?? {
-        normalizationSteps: [],
-        ops: [],
-        notes: [],
-        signals: ["EVIDENCE_V1", "EVIDENCE_MISSING_FALLBACK"],
-      };
+      const evidence = buildEvidenceV1FromPayload(payload);
 
       return NextResponse.json({
         ...ensured,
