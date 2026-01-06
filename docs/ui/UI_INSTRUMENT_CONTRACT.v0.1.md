@@ -96,3 +96,11 @@ The UI must prefer:
 over silence or placeholder graphics.
 
 This is what makes it a scientific instrument.
+
+---
+
+## Dev Server Hygiene (Non-Negotiable)
+
+- exactly one next dev process
+- no parallel 9002 preview server during contract validation
+- if jq ever shows “Invalid numeric literal”, first check ps aux | grep next
