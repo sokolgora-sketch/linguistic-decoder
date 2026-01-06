@@ -1,29 +1,39 @@
 // src/ui/ledger/EvidenceLedgerCard.tsx
-import React from "react";
+import * as React from "react";
 import type { EvidenceLedgerModel, LedgerSection } from "./ledgerModel";
 
-function renderStateLine(section: LedgerSection, engineVersion?: string | null) {
-  if (section.state === "present") return null;
-  if (section.state === "none") return <div className="text-sm opacity-70">None emitted.</div>;
-
+function stateLabel(section: LedgerSection, engineVersion?: string | null) {
+  if (section.state === "present") return "present";
+  if (section.state === "none") return "none emitted";
   // missing
-  return (
-    <div className="text-sm opacity-70">
-      Not emitted by engine (yet).
-      {engineVersion ? ` (engine ${engineVersion})` : ""}
-    </div>
-  );
+  if (engineVersion) return `not available (${engineVersion})`;
+  return "not available";
 }
 
-function List({ items }: { items: string[] }) {
+function renderSection(section: LedgerSection, engineVersion?: string | null) {
   return (
-    <ul className="mt-2 space-y-1 font-mono text-sm">
-      {items.map((x, idx) => (
-        <li key={`${idx}-${x}`} className="break-words">
-          • {x}
-        </li>
-      ))}
-    </ul>
+    <div key={section.key} className="space-y-2">
+      <div className="flex items-center justify-between">
+        <div className="text-sm font-medium">{section.title}</div>
+        <div className="text-xs text-muted-foreground">{stateLabel(section, engineVersion)}</div>
+      </div>
+
+      {section.state === "present" ? (
+        <ul className="list-disc pl-5 text-sm">
+          {section.items.map((x, i) => (
+            <li key={`${section.key}-${i}`}>{x}</li>
+          ))}
+        </ul>
+      ) : (
+        <div className="text-sm text-muted-foreground">
+          {section.state === "none" ? "None emitted." : "Not available in this engine version."}
+        </div>
+      )}
+
+      {section.source ? (
+        <div className="text-xs text-muted-foreground">source: {section.source}</div>
+      ) : null}
+    </div>
   );
 }
 
@@ -35,25 +45,14 @@ export function EvidenceLedgerCard({
   engineVersion?: string | null;
 }) {
   return (
-    <section className="rounded-xl border p-4">
-      <div className="mb-3 flex items-baseline justify-between">
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
         <h2 className="text-base font-semibold">Evidence / Ops Ledger</h2>
-        <div className="text-xs opacity-60">Reproducibility panel</div>
       </div>
 
       <div className="space-y-4">
-        {model.sections.map((s) => (
-          <div key={s.key}>            <div className="flex items-baseline justify-between">
-              <h3 className="text-sm font-semibold">{s.title}</h3>
-              {/* keep source hidden for now; only show it later behind a Debug toggle */}
-            </div>
-
-            {renderStateLine(s, engineVersion)}
-
-            {s.state === "present" ? <List items={s.items} /> : null}
-          </div>
-        ))}
+        {model.sections.map((s) => renderSection(s, engineVersion))}
       </div>
-    </section>
+    </div>
   );
 }
