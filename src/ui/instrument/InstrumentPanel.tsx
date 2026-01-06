@@ -7,9 +7,9 @@ import { useToast } from '@/hooks/use-toast';
 
 import { adaptAnalysisToTelemetryVM } from './contractAdapter';
 import { ReadoutCard } from './sections/ReadoutCard';
-import { buildEvidenceLedgerModel } from '../ledger/ledgerModel';
+import { buildEvidenceLedgerModelFromVM } from '../ledger/ledgerModel';
 import { EvidenceLedgerCard } from '../ledger/EvidenceLedgerCard';
-import { buildCandidateRows } from '../candidates/candidateModel';
+import { buildCandidateRowsFromVM } from '../candidates/candidateModel';
 import { CandidatesAccordion } from '../candidates/CandidatesAccordion';
 
 type Props = {
@@ -32,8 +32,8 @@ function fmt<T>(x: { kind: 'present'; value: T } | { kind: 'missing'; missing: s
 export function InstrumentPanel({ payload }: Props) {
   const { toast } = useToast();
   const vm = React.useMemo(() => adaptAnalysisToTelemetryVM(payload), [payload]);
-  const ledgerModel = React.useMemo(() => buildEvidenceLedgerModel(payload), [payload]);
-  const candidateRows = React.useMemo(() => buildCandidateRows(payload), [payload]);
+  const ledgerModel = React.useMemo(() => buildEvidenceLedgerModelFromVM(vm), [vm]);
+  const candidateRows = React.useMemo(() => buildCandidateRowsFromVM(vm), [vm]);
 
   async function copyText(label: string, text: string) {
     try {
