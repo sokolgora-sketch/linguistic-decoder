@@ -162,3 +162,10 @@ export function buildEvidenceLedgerModel(result: any): EvidenceLedgerModel {
     ],
   };
 }
+
+/**
+ * NOTE (instrument contract):
+ * Signals + Notes are rendered as a combined ledger section.
+ * If the combined list is empty, the section state is "none" (None emitted),
+ * even if one of the sources (e.g. signals) is missing.
+ */
