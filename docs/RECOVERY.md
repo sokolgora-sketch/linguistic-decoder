@@ -60,6 +60,27 @@ git ls-remote --heads origin <branch> | grep -q . && git push origin --delete <b
 
 ---
 
+## Repo rule (GH013): main is PR-only
+
+This repo enforces **“Changes must be made through a pull request.”**
+Direct pushes to `main` will be rejected (GH013), even if tests pass.
+
+### Correct workflow (always)
+```bash
+git switch main
+git fetch origin
+git reset --hard origin/main
+
+git switch -c <branch-name>
+# edit files
+npm run gate:quick
+
+git push -u origin <branch-name>
+# open PR on GitHub, merge PR
+```
+
+---
+
 ## C) PR-only rule blocks pushing to main
 
 **Symptom**
