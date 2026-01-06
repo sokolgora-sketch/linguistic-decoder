@@ -283,15 +283,22 @@ const signals =
     },
 
     evidence: {
-      normalizationSteps: missing("not_emitted"),
-      ops: missing("not_emitted"),
-      notes: missing("not_emitted"),
-      signals: missing("not_emitted"),
-      },
+      normalizationSteps: presentStringArray(normalizationSteps),
+      ops: presentStringArray(ops),
+      notes: presentStringArray(notes),
+      signals: presentStringArray(signals),
+    },
 
       candidates,
     math,
     rejections: { items: rejectionItems },
     raw,
   };
+}
+
+// --- v0.1.1: Evidence Ledger VM population ----------------------------
+
+function presentStringArray(arr: unknown[] | null): PresentOrMissing<string[]> {
+  if (!arr) return missing("not_emitted");
+  return present(arr.map((v) => String(v)));
 }
