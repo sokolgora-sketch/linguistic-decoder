@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 
 import { adaptAnalysisToTelemetryVM } from "@/ui/instrument/contractAdapter";
+import { toPrettyJson } from "@/ui/instrument/prettyJson";
 import { ReadoutCard } from './sections/ReadoutCard';
 import { MeaningCard } from "./sections/MeaningCard";
 import { buildEvidenceLedgerModelFromVM } from '../ledger/ledgerModel';
@@ -17,14 +18,6 @@ type Props = {
   /** Raw /api/analyze-v1 payload (unknown shape). We adapt it, never trust it. */
   payload: unknown;
 };
-
-function toPrettyJson(x: unknown) {
-  try {
-    return JSON.stringify(x, null, 2);
-  } catch {
-    return String(x);
-  }
-}
 
 function fmt<T>(x: { kind: 'present'; value: T } | { kind: 'missing'; missing: string; note?: string }) {
   return x.kind === 'present' ? String(x.value) : 'not_emitted';
