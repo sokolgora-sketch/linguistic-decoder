@@ -2,6 +2,7 @@
 
 import type { PrincipleV2, PrincipleId } from "@/engine/principles.v2";
 import type { SymbolicCoreResult } from "@/lib/symbolicCore";
+import type { OriginClaimV1 } from "./originClaim.v1";
 
 // Canonical shape your UI will use everywhere.
 export type Vowel = 'A' | 'E' | 'I' | 'O' | 'U' | 'Y' | 'Ë';
@@ -351,7 +352,7 @@ export type AnalysisResult = {
     voicePath: string;
     levelPath: string;
     ringPath: string;
-  };
+};
   frontier: {
     id: string;
     voicePath: string;
@@ -368,7 +369,10 @@ export type AnalysisResult = {
   },
   symbolic?: SymbolicLayer;
   wordMatrix?: WordMatrix | null;
-  // Optional Heart Math (Seven-Principles) layer
+  
+    // Origin Claim Protocol (V1)
+    originClaim?: OriginClaimV1;
+// Optional Heart Math (Seven-Principles) layer
   math7?: Math7Summary;
 }
 

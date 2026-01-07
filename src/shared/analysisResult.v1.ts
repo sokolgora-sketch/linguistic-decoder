@@ -12,6 +12,31 @@ import type {
   EngineMetaSummary,
 } from "./resultShape.v1";
 
+// -------------------- Origin Claim Protocol (V1) --------------------
+
+// Contract-level status (no UI semantics)
+export type OriginClaimStatusV1 =
+  | "insufficient_evidence"
+  | "hypothesis"
+  | "supported"
+  | "rejected";
+
+// Minimal contract shape (keep stable; expand later via [k: string]: unknown)
+export type OriginClaimV1 = {
+  version: "v1";
+  status: OriginClaimStatusV1;
+
+  // Optional: when hypothesis/supported, identify the claim target
+  claimedLanguage?: string | null;
+
+  // Optional: short human-readable rationale
+  rationale?: string[]; // small bullets, stable ordering
+
+  // Always allowed for forward compatibility
+  [k: string]: unknown;
+};
+
+// -------------------- Canonical V1 enums --------------------
 
 // Canonical V1 enums (contract-level, not UI-level)
 export type Mode = "strict" | "open";
@@ -47,6 +72,9 @@ export type AnalyzeWordResultV1 = {
   // Optional analysis layers
   deepRoot?: DeepRootOutputV1 | null;
   wordMatrix?: WordMatrixV1;
+
+  // Origin Claim Protocol (always present once wired; keep optional for backward fixtures)
+  originClaim?: OriginClaimV1;
 
   // Existing code references result.candidates (canon list)
   // wordMatrix.v1.ts reads: fam.language, fam.form, fam.voices?.voiceSequence
