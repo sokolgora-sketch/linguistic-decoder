@@ -11,6 +11,7 @@ import type {
   LanguageFamilySummary,
   EngineMetaSummary,
 } from "./resultShape.v1";
+import type { OriginClaimV1 as OriginClaimProtocolV1 } from "./originClaim.v1";
 
 // -------------------- Origin Claim Protocol (V1) --------------------
 
@@ -22,7 +23,7 @@ export type OriginClaimStatusV1 =
   | "rejected";
 
 // Minimal contract shape (keep stable; expand later via [k: string]: unknown)
-export type OriginClaimV1 = {
+export type LegacyOriginClaimV1 = {
   version: "v1";
   status: OriginClaimStatusV1;
 
@@ -74,7 +75,7 @@ export type AnalyzeWordResultV1 = {
   wordMatrix?: WordMatrixV1;
 
   // Origin Claim Protocol (always present once wired; keep optional for backward fixtures)
-  originClaim?: OriginClaimV1;
+  originClaim?: OriginClaimProtocolV1;
 
   // Existing code references result.candidates (canon list)
   // wordMatrix.v1.ts reads: fam.language, fam.form, fam.voices?.voiceSequence
