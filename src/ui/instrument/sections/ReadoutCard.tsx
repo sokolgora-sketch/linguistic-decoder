@@ -33,7 +33,7 @@ export function ReadoutCard({
 }: {
   readout: TelemetryReadout;
   onCopySummary: () => void;
-  onCopyFullJson: () => void;
+  onCopyFullJson?: () => void;
 }) {
   const statusBadge =
     readout.status === "detected"
@@ -59,9 +59,11 @@ export function ReadoutCard({
           <button className="rounded-md border px-3 py-1 text-sm" onClick={onCopySummary}>
             Copy Summary
           </button>
-          <button className="rounded-md border px-3 py-1 text-sm" onClick={onCopyFullJson}>
-            Copy Full JSON
-          </button>
+          {onCopyFullJson ? (
+            <button className="rounded-md border px-3 py-1 text-sm" onClick={onCopyFullJson}>
+              Copy Full JSON
+            </button>
+          ) : null}
         </div>
       </div>
 
