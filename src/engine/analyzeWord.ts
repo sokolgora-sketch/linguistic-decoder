@@ -32,8 +32,11 @@ import { solveWord } from "@/functions/sevenVoicesCore";
 import { getManifest } from "./manifest";
 import type { SolveOptions } from "@/functions/sevenVoicesCore";
 import { CANON_CANDIDATES } from "@/shared/canonCandidates";
+import { buildOriginClaimV1 } from "./originClaim.builder.v1";
+
 
 import { computeMath7ForResult, type Math7Summary } from "./math7";
+import type { AnalyzeWordResultV1 } from "@/shared/analysisResult.v1";
 
 /**
  * Low-level call into the Seven-vowel solver.
@@ -239,6 +242,14 @@ export function analyzeWord(
     },
 
     symbolic,
+    // 🔒 Origin Claim (stub, always present)
+    originClaim: buildOriginClaimV1({
+      word,
+      sanitized: withCanon.sanitized,
+      engineVersion: withCanon.meta.engineVersion,
+      mode,
+      alphabet: withCanon.rawPayload.alphabet,
+    } as any),
   };
 
   return result;

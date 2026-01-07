@@ -1,0 +1,13 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`originClaim.v1 — default behavior defaults to insufficient_evidence 1`] = `
+{
+  "candidates": [],
+  "policy": "no_single_winner",
+  "summary": {
+    "confidence": "insufficient_evidence",
+    "note": "Origin Claim Protocol v1 is wired but intentionally logic-free (no hypotheses emitted yet).",
+  },
+  "version": "v1",
+}
+`;
