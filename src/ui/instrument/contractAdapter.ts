@@ -1,62 +1,92 @@
+"use client";
+
+/**
+ * UI contract adapter: raw analyze-v1 payload → TelemetryViewModel (VM).
+ *
+ * Rules:
+ * - UI must consume ONLY the VM (no raw payload parsing in components).
+ * - Keep adapters deterministic + defensive.
+ * - PresentOrMissing prevents silent emptiness.
+ */
+
 import type {
   CandidateRowVM,
   DecompositionItemVM,
-  MissingState,
-  Mode,
+  MathTelemetryVM,
   PresentOrMissing,
   RejectionItemVM,
   TelemetryViewModel,
   Vowel,
-  MathTelemetryVM,
 } from "./types";
-import { pickVoicePaths } from "./voicePathPicker";
 
-function present<T>(value: T): PresentOrMissing<T> {
+// ----------------------- small helpers -----------------------
+
+function isRecord(v: unknown): v is Record<string, unknown> {
+  return !!v && typeof v === "object" && !Array.isArray(v);
+}
+
+function asString(v: unknown): string | null {
+  return typeof v === "string" ? v : null;
+}
+
+function asBool(v: unknown): boolean | null {
+  return typeof v === "boolean" ? v : null;
+}
+
+function asArray(v: unknown): unknown[] | null {
+  return Array.isArray(v) ? v : null;
+}
+
+function asStringArray(v: unknown): string[] | null {
+  const arr = asArray(v);
+  if (!arr) return null;
+  const out: string[] = [];
+  for (const x of arr) out.push(String(x));
+  return out;
+}
+
+export function present<T>(value: T): PresentOrMissing<T> {
   return { kind: "present", value };
 }
-function presentBool(value: boolean): PresentOrMissing<boolean> {
-  return { kind: "present", value };
+
+export function missing<T>(missingState: "none" | "not_emitted", note?: string): PresentOrMissing<T> {
+  return { kind: "missing", missing: missingState, note };
 }
 
-function missing<T>(missing: MissingState, note?: string): PresentOrMissing<T> {
-  return { kind: "missing", missing, note };
-}
-function isRecord(x: unknown): x is Record<string, unknown> {
-  return typeof x === "object" && x !== null && !Array.isArray(x);
-}
-function asString(x: unknown): string | null {
-  return typeof x === "string" ? x : null;
-}
-function asBool(x: unknown): boolean | null {
-  return typeof x === "boolean" ? x : null;
-}
-function asStringArray(x: unknown): string[] | null {
-  return Array.isArray(x) && x.every((v) => typeof v === "string") ? x : null;
+function presentBool(v: boolean): PresentOrMissing<boolean> {
+  return present(v);
 }
 
-function asArray(x: unknown): unknown[] | null {
-  return Array.isArray(x) ? x : null;
-}
 function countOrMissing(arr: unknown[] | null): PresentOrMissing<number> {
-  return arr ? present(arr.length) : missing("not_emitted");
+  if (!arr) return missing("not_emitted");
+  return present(arr.length);
 }
-function normalizeMode(x: unknown): Mode | null {
-  const s = asString(x);
-  return s === "strict" || s === "open" ? (s as Mode) : null;
+
+function presentStringArray(arr: unknown[] | null): PresentOrMissing<string[]> {
+  if (!arr) return missing("not_emitted");
+  return present(arr.map((v) => String(v)));
 }
-function normalizeVowelChar(ch: string): Vowel | null {
-  const up = ch.toUpperCase();
-  if (up === "A" || up === "E" || up === "I" || up === "O" || up === "U" || up === "Y" || up === "Ë") {
-    return up as Vowel;
-  }
-  if (ch === "ë") return "Ë";
+
+// ----------------------- vowel path helpers -----------------------
+
+function normalizeMode(v: unknown): "strict" | "open" | null {
+  const s = asString(v);
+  if (s === "strict" || s === "open") return s;
   return null;
 }
-function normalizeVowelPathArray(x: unknown): Vowel[] | null {
-  if (!Array.isArray(x)) return null;
+
+function normalizeVowelChar(s: string): Vowel | null {
+  const t = s.trim().toUpperCase();
+  if (t === "A" || t === "E" || t === "I" || t === "O" || t === "U" || t === "Y" || t === "Ë") return t as Vowel;
+  return null;
+}
+
+function normalizeVowelPathArray(v: unknown): Vowel[] | null {
+  const arr = asArray(v);
+  if (!arr) return null;
   const out: Vowel[] = [];
-  for (const v of x) {
-    const s = asString(v);
+  for (const x of arr) {
+    const s = asString(x);
     if (!s) return null;
     const vv = normalizeVowelChar(s);
     if (!vv) return null;
@@ -64,9 +94,11 @@ function normalizeVowelPathArray(x: unknown): Vowel[] | null {
   }
   return out.length ? out : null;
 }
-function normalizeVowelPathString(x: unknown): Vowel[] | null {
-  const s = asString(x);
+
+function normalizeVowelPathString(v: unknown): Vowel[] | null {
+  const s = asString(v);
   if (!s) return null;
+  // Accept "U-I" or "U→I" or "UI"
   const parts = s.includes("-") ? s.split("-") : s.includes("→") ? s.split("→") : s.split("");
   const out: Vowel[] = [];
   for (const p of parts.map((t) => t.trim()).filter(Boolean)) {
@@ -77,25 +109,63 @@ function normalizeVowelPathString(x: unknown): Vowel[] | null {
   return out.length ? out : null;
 }
 
+// ----------------------- voice path selection -----------------------
+
+function pickVoicePaths(payload: any): { detected: string | null; surface: string | null; functional: string | null } {
+  // detected (primary)
+  const primaryPath = isRecord(payload?.primaryPath) ? payload.primaryPath : null;
+  const detectedArr = primaryPath ? normalizeVowelPathArray(primaryPath["voicePath"]) : null;
+
+  // surface/functional (optional)
+  const detected = detectedArr ? detectedArr.join("-") : null;
+
+  const surface =
+    (normalizeVowelPathString(payload?.evidence?.surfaceVowels?.join?.("-"))?.join("-") ?? null) ??
+    (normalizeVowelPathArray(payload?.evidence?.surfaceVowels)?.join("-") ?? null);
+
+  const functional =
+    (normalizeVowelPathString(payload?.deepRoot?.functionalRoots?.[0]?.vowelPath)?.join("-") ?? null) ??
+    (normalizeVowelPathString(payload?.candidates?.[0]?.vowelPath)?.join("-") ?? null) ??
+    null;
+
+  return { detected, surface, functional };
+}
+
 function stableCandidateId(index: number, lang: string | null, form: string | null): string {
   return `cand_${index}_${(lang ?? "xx").toLowerCase()}_${(form ?? "form").toLowerCase()}`.replace(/[^a-z0-9_]/g, "_");
 }
+
+// ----------------------- adapter -----------------------
 
 export function adaptAnalysisToTelemetryVM(raw: unknown): TelemetryViewModel {
   const payload = arguments[0] as any;
 
   const vp = pickVoicePaths(payload);
 
-  const voicePathDetectedNormalized = vp.detected;
-  const voicePathSurfaceNormalized  = vp.surface;
-  const voicePathFunctionalNormalized = vp.functional;
+  // Accept unknown input, normalize to a dash-delimited string, then parse.
+  // This avoids runtime crashes when upstream emits arrays or non-strings.
+  const toVoiceParts = (v: unknown): Vowel[] | null => {
+    if (!v) return null;
 
-  // Convert "U-I" into typed vowels (Vowel[]) or null if invalid.
-  const toVoiceParts = (s: string | null): Vowel[] | null => {
-    if (!s) return null;
-    const parts = s.split("-").map((t) => t.trim()).filter(Boolean);
+    // If we got ["U","I"] etc.
+    if (Array.isArray(v)) {
+      const parts = v.map((x) => (typeof x === "string" ? x : String(x))).map((t) => t.trim()).filter(Boolean);
+      const out: Vowel[] = [];
+      for (const p of parts) {
+        const vv = normalizeVowelChar(p);
+        if (!vv) return null;
+        out.push(vv);
+      }
+      return out.length ? out : null;
+    }
+
+    // If we got "U-I" or "U→I" or "UI"
+    if (typeof v !== "string") return null;
+    const str = v;
+
+    const parts = str.includes("-") ? str.split("-") : str.includes("→") ? str.split("→") : str.split("");
     const out: Vowel[] = [];
-    for (const p of parts) {
+    for (const p of parts.map((t) => t.trim()).filter(Boolean)) {
       const vv = normalizeVowelChar(p);
       if (!vv) return null;
       out.push(vv);
@@ -103,9 +173,14 @@ export function adaptAnalysisToTelemetryVM(raw: unknown): TelemetryViewModel {
     return out.length ? out : null;
   };
 
-  const detectedParts = toVoiceParts(voicePathDetectedNormalized);
-  const surfaceParts = toVoiceParts(voicePathSurfaceNormalized);
-  const functionalParts = toVoiceParts(voicePathFunctionalNormalized);
+  const detectedParts = toVoiceParts(vp.detected);
+    // v0.1 contract: surface must represent RAW surface vowels (e.g. U-Y for 'study').
+  // Prefer payload.heartInstrumentV1.surfaceVowels if present.
+  const hiRoot = isRecord(payload) && isRecord((payload as any)["heartInstrumentV1"]) ? ((payload as any)["heartInstrumentV1"] as any) : null;
+  const hiSurfaceArr = hiRoot ? asStringArray(hiRoot["surfaceVowels"]) : null;
+  const surfaceForParts = hiSurfaceArr ? hiSurfaceArr.join("-") : vp.surface;
+  const surfaceParts = toVoiceParts(surfaceForParts);
+  const functionalParts = toVoiceParts(vp.functional);
 
   const voicePathDetectedMaybe: PresentOrMissing<Vowel[]> =
     detectedParts ? present(detectedParts) : missing<Vowel[]>("not_emitted");
@@ -115,7 +190,6 @@ export function adaptAnalysisToTelemetryVM(raw: unknown): TelemetryViewModel {
 
   const voicePathFunctionalMaybe: PresentOrMissing<Vowel[]> =
     functionalParts ? present(functionalParts) : missing<Vowel[]>("not_emitted");
-
 
   const voicePathDelta =
     vp.surface && vp.functional
@@ -144,24 +218,62 @@ export function adaptAnalysisToTelemetryVM(raw: unknown): TelemetryViewModel {
   const math7PrinciplesPath = heartMath7Primary ? asStringArray(heartMath7Primary["principlesPath"]) : null;
   const principlesPath = heartPrinciplePath ?? math7PrinciplesPath;
 
-    const primaryPath = isRecord(root["primaryPath"]) ? root["primaryPath"] : null;
-    const voicePath =
-      (primaryPath ? normalizeVowelPathArray(primaryPath["voicePath"]) : null) ??
-      (heartMath7Primary ? normalizeVowelPathArray(heartMath7Primary["vowels"]) : null);
+  const primaryPath = isRecord(root["primaryPath"]) ? root["primaryPath"] : null;
+  const detectedVoicePath =
+    (primaryPath ? normalizeVowelPathArray(primaryPath["voicePath"]) : null) ??
+    (heartMath7Primary ? normalizeVowelPathArray(heartMath7Primary["vowels"]) : null);
 
-    const strictInputEmitted =
-      (heart ? asBool((heart as any)["strictInput"]) : null) ??
-      asBool((root as any)["strictInput"]);
+  const strictInputEmitted =
+    (heart ? asBool((heart as any)["strictInput"]) : null) ??
+    asBool((root as any)["strictInput"]);
 
-    const strictInput: PresentOrMissing<boolean> =
-      strictInputEmitted !== null
-        ? presentBool(strictInputEmitted)
-        : mode
-          ? presentBool(mode === "strict")
-          : missing("not_emitted", "Expected strictInput; derive requires mode");
+  const strictInput: PresentOrMissing<boolean> =
+    strictInputEmitted !== null
+      ? presentBool(strictInputEmitted)
+      : mode
+        ? presentBool(mode === "strict")
+        : missing("not_emitted", "Expected strictInput; derive requires mode");
 
-    const candRaw = Array.isArray(root["candidates"]) ? root["candidates"] : null;
+  // Evidence ledger sources (root -> raw.evidence -> heart.evidence)
+  const rootEvidence = isRecord(root["evidence"]) ? (root["evidence"] as Record<string, unknown>) : null;
 
+  const rawEvidence =
+    isRecord((root as any)["raw"]) && isRecord(((root as any)["raw"] as any)["evidence"])
+      ? ((((root as any)["raw"] as any)["evidence"] as any) as Record<string, unknown>)
+      : null;
+
+  const heartEvidence =
+    heart && isRecord((heart as any)["evidence"])
+      ? (((heart as any)["evidence"] as any) as Record<string, unknown>)
+      : null;
+
+  const evidence = rootEvidence ?? rawEvidence ?? heartEvidence ?? null;
+
+  const normalizationSteps =
+    asArray(evidence?.["normalizationSteps"]) ??
+    asArray(heartEvidence?.["normalizationSteps"]) ??
+    null;
+
+  const ops =
+    asArray(evidence?.["ops"]) ??
+    asArray((root as any)["ops"]) ??
+    asArray(heartEvidence?.["ops"]) ??
+    null;
+
+  const notes =
+    asArray(evidence?.["notes"]) ??
+    asArray((root as any)["notes"]) ??
+    asArray(heartEvidence?.["notes"]) ??
+    null;
+
+  const signals =
+    asArray(evidence?.["signals"]) ??
+    asArray((root as any)["signals"]) ??
+    asArray(heartEvidence?.["signals"]) ??
+    null;
+
+  // Candidates
+  const candRaw = Array.isArray(root["candidates"]) ? root["candidates"] : null;
   const candidates: CandidateRowVM[] = [];
 
   if (candRaw) {
@@ -181,6 +293,11 @@ export function adaptAnalysisToTelemetryVM(raw: unknown): TelemetryViewModel {
         normalizeVowelPathArray(rec["voicePath"]) ??
         null;
 
+      // v0.1.1: populate per-candidate lists when present (no heuristics).
+      const candOps = asArray(rec["ops"]);
+      const candNotes = asArray(rec["notes"]) ?? asArray(rec["note"]) ?? null; // note may be string; handled by presentStringArray via String()
+      const candSignals = asArray(rec["signals"]);
+
       candidates.push({
         index: i,
         id,
@@ -188,10 +305,14 @@ export function adaptAnalysisToTelemetryVM(raw: unknown): TelemetryViewModel {
         form: form ? present(form) : missing("not_emitted"),
         functionalStatement: functionalStatement ? present(functionalStatement) : missing("not_emitted"),
         vowelPath: candVowelPath ? present(candVowelPath) : missing("not_emitted"),
+
+        // leave decomposition for later (shape varies too much right now)
         decomposition: missing("not_emitted") as PresentOrMissing<DecompositionItemVM[]>,
-        ops: missing("not_emitted"),
-        notes: missing("not_emitted"),
-        signals: missing("not_emitted"),
+
+        ops: candOps ? presentStringArray(candOps) : missing("not_emitted"),
+        notes: candNotes ? presentStringArray(candNotes) : missing("not_emitted"),
+        signals: candSignals ? presentStringArray(candSignals) : missing("not_emitted"),
+
         raw: c,
       });
     });
@@ -215,54 +336,14 @@ export function adaptAnalysisToTelemetryVM(raw: unknown): TelemetryViewModel {
   const rejectionItems: PresentOrMissing<RejectionItemVM[]> = missing("not_emitted");
 
   const status: "detected" | "none" | "error" =
-    voicePath && voicePath.length ? "detected" : "none";
-
-  const rootEvidence = isRecord(root["evidence"])
-  ? (root["evidence"] as Record<string, unknown>)
-  : null;
-
-const rawEvidence =
-  isRecord((root as any)["raw"]) && isRecord(((root as any)["raw"] as any)["evidence"])
-    ? ((((root as any)["raw"] as any)["evidence"] as any) as Record<string, unknown>)
-    : null;
-
-const heartEvidence =
-  heart && isRecord((heart as any)["evidence"])
-    ? (((heart as any)["evidence"] as any) as Record<string, unknown>)
-    : null;
-
-const evidence = rootEvidence ?? rawEvidence ?? heartEvidence ?? null;
-
-const normalizationSteps =
-  asArray(evidence?.["normalizationSteps"]) ??
-  asArray(heartEvidence?.["normalizationSteps"]) ??
-  null;
-
-const ops =
-  asArray(evidence?.["ops"]) ??
-  asArray((root as any)["ops"]) ??
-  asArray(heartEvidence?.["ops"]) ??
-  null;
-
-const notes =
-  asArray(evidence?.["notes"]) ??
-  asArray((root as any)["notes"]) ??
-  asArray(heartEvidence?.["notes"]) ??
-  null;
-
-const signals =
-  asArray(evidence?.["signals"]) ??
-  asArray((root as any)["signals"]) ??
-  asArray(heartEvidence?.["signals"]) ??
-  null;
-
+    detectedVoicePath && detectedVoicePath.length ? "detected" : "none";
 
   return {
     readout: {
-    voicePath: voicePathDetectedMaybe,
-    voicePathSurface: voicePathSurfaceMaybe,
-    voicePathFunctional: voicePathFunctionalMaybe,
-    voicePathDelta,
+      voicePath: voicePathDetectedMaybe,
+      voicePathSurface: voicePathSurfaceMaybe,
+      voicePathFunctional: voicePathFunctionalMaybe,
+      voicePathDelta,
 
       word,
       normalizedWord: sanitized ? present(sanitized) : missing("not_emitted", "sanitized"),
@@ -271,7 +352,9 @@ const signals =
       engineVersion: engineVersion ? present(engineVersion) : missing("not_emitted", "engineVersion"),
       alphabet: alphabet ? present(alphabet) : missing("not_emitted", "alphabet"),
       createdAt: createdAt ? present(createdAt) : missing("not_emitted", "meta.created"),
-      principlesPath: principlesPath ? present(principlesPath) : missing("not_emitted", "heart.principlePath | heart.math7.primary.principlesPath"),
+      principlesPath: principlesPath
+        ? present(principlesPath)
+        : missing("not_emitted", "heart.principlePath | heart.math7.primary.principlesPath"),
       status,
       counts: {
         candidates: candidates.length,
@@ -289,16 +372,9 @@ const signals =
       signals: presentStringArray(signals),
     },
 
-      candidates,
+    candidates,
     math,
     rejections: { items: rejectionItems },
     raw,
   };
-}
-
-// --- v0.1.1: Evidence Ledger VM population ----------------------------
-
-function presentStringArray(arr: unknown[] | null): PresentOrMissing<string[]> {
-  if (!arr) return missing("not_emitted");
-  return present(arr.map((v) => String(v)));
 }
