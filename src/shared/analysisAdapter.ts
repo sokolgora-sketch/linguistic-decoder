@@ -8,6 +8,8 @@ import { buildWordMatrix } from "./wordMatrix.v1";
 import { buildDeepRootOutputV1 } from "./deepRoot.output.v1";
 
 import { buildMinRootHypotheses } from "./deepRoot.minRoots.v1";
+import { buildOriginClaimV1 } from "./originClaim.builder.v1";
+
 export function enginePayloadToAnalysisResult(payload: EnginePayload): AnalyzeWordResultV1 {
   const sanitized =
     (payload as any).sanitized ??
@@ -48,6 +50,10 @@ export function enginePayloadToAnalysisResult(payload: EnginePayload): AnalyzeWo
         new Date().toISOString(),
     },
   };
+
+  // Origin Claim Protocol (V1)
+  result.originClaim = buildOriginClaimV1(result);
+
 
   if (deepRoot !== undefined) {
     (result as any).deepRoot = deepRoot;
