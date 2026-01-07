@@ -13,30 +13,6 @@ import type {
 } from "./resultShape.v1";
 import type { OriginClaimV1 as OriginClaimProtocolV1 } from "./originClaim.v1";
 
-// -------------------- Origin Claim Protocol (V1) --------------------
-
-// Contract-level status (no UI semantics)
-export type OriginClaimStatusV1 =
-  | "insufficient_evidence"
-  | "hypothesis"
-  | "supported"
-  | "rejected";
-
-// Minimal contract shape (keep stable; expand later via [k: string]: unknown)
-export type LegacyOriginClaimV1 = {
-  version: "v1";
-  status: OriginClaimStatusV1;
-
-  // Optional: when hypothesis/supported, identify the claim target
-  claimedLanguage?: string | null;
-
-  // Optional: short human-readable rationale
-  rationale?: string[]; // small bullets, stable ordering
-
-  // Always allowed for forward compatibility
-  [k: string]: unknown;
-};
-
 // -------------------- Canonical V1 enums --------------------
 
 // Canonical V1 enums (contract-level, not UI-level)
