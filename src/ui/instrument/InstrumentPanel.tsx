@@ -5,8 +5,9 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 
-import { adaptAnalysisToTelemetryVM } from './contractAdapter';
+import { adaptAnalysisToTelemetryVM } from "@/ui/instrument/contractAdapter";
 import { ReadoutCard } from './sections/ReadoutCard';
+import { MeaningCard } from "./sections/MeaningCard";
 import { buildEvidenceLedgerModelFromVM } from '../ledger/ledgerModel';
 import { EvidenceLedgerCard } from '../ledger/EvidenceLedgerCard';
 import { buildCandidateRowsFromVM } from '../candidates/candidateModel';
@@ -62,7 +63,9 @@ export function InstrumentPanel({ payload }: Props) {
   return (
     <div className="space-y-3">
       {/* Readout (Telemetry Core) */}
-      <ReadoutCard readout={vm.readout} onCopySummary={() => void copyText('Summary copied.', summaryLines.join('\n'))} onCopyFullJson={() => void copyText('Full JSON copied.', toPrettyJson(payload))} />
+      <ReadoutCard readout={vm.readout} onCopySummary={() => void copyText('Summary copied.', summaryLines.join('\n'))} onCopyFullJson={() => void copyText('Full JSON copied.', toPrettyJson(vm.raw))} />
+
+      <MeaningCard available={false} />
 
       <EvidenceLedgerCard model={ledgerModel} engineVersion={engineVersion} />
 
@@ -84,7 +87,7 @@ export function InstrumentPanel({ payload }: Props) {
               <Button
                 size="sm"
                 variant="outline"
-                onClick={() => void copyText('Full JSON copied.', toPrettyJson(payload))}
+                onClick={() => void copyText('Full JSON copied.', toPrettyJson(vm.raw))}
               >
                 Copy Full JSON
             </Button>

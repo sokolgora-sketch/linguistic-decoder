@@ -10,25 +10,8 @@ export interface UICandidateRow {
   raw: any; // for Copy Candidate JSON
 }
 
-function str(v: unknown): string | null {
-  return typeof v === "string" ? v : null;
-}
+// --- v0.1.1+: VM-first adapter lock ---
 
-// --- v0.1 (legacy): raw payload parsing (kept for now, but InstrumentPanel should use VM variant) ---
-export function buildCandidateRows(result: any): UICandidateRow[] {
-  const arr = Array.isArray(result?.candidates) ? result.candidates : [];
-  return arr.map((c: any, idx: number) => ({
-    id: str(c?.id) ?? `cand_${idx}`,
-    language: str(c?.language) ?? "Unknown",
-    form: str(c?.form) ?? "—",
-    status: str(c?.status),
-    vowelPath: str(c?.vowelPath),
-    functionalStatement: str(c?.functionalStatement) ?? str(c?.function),
-    raw: c,
-  }));
-}
-
-// --- v0.1.1: VM-first adapter lock ---
 function pomStr(x: { kind: "present"; value: string } | { kind: "missing"; missing: string; note?: string }): string | null {
   return x.kind === "present" ? x.value : null;
 }
