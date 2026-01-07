@@ -1,0 +1,231 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ui telemetry vm contract v0.1 adapts analyze-v1 payload into stable Telemetry VM (study strict) 1`] = `
+{
+  "candidates": [
+    {
+      "decomposition": {
+        "kind": "missing",
+        "missing": "not_emitted",
+      },
+      "form": {
+        "kind": "present",
+        "value": "studium",
+      },
+      "functionalStatement": {
+        "kind": "present",
+        "value": "Deliberate effort of knowing that leads to a formed inner state.",
+      },
+      "id": "latin-studium",
+      "index": 0,
+      "language": {
+        "kind": "present",
+        "value": "Latin",
+      },
+      "notes": {
+        "kind": "missing",
+        "missing": "not_emitted",
+      },
+      "ops": {
+        "kind": "missing",
+        "missing": "not_emitted",
+      },
+      "signals": {
+        "kind": "missing",
+        "missing": "not_emitted",
+      },
+      "vowelPath": {
+        "kind": "present",
+        "value": [
+          "U",
+          "I",
+        ],
+      },
+    },
+    {
+      "decomposition": {
+        "kind": "missing",
+        "missing": "not_emitted",
+      },
+      "form": {
+        "kind": "present",
+        "value": "studim",
+      },
+      "functionalStatement": {
+        "kind": "missing",
+        "missing": "not_emitted",
+      },
+      "id": "albanian-studim",
+      "index": 1,
+      "language": {
+        "kind": "present",
+        "value": "Albanian",
+      },
+      "notes": {
+        "kind": "missing",
+        "missing": "not_emitted",
+      },
+      "ops": {
+        "kind": "missing",
+        "missing": "not_emitted",
+      },
+      "signals": {
+        "kind": "missing",
+        "missing": "not_emitted",
+      },
+      "vowelPath": {
+        "kind": "present",
+        "value": [
+          "U",
+          "I",
+        ],
+      },
+    },
+  ],
+  "evidence": {
+    "normalizationSteps": {
+      "kind": "present",
+      "value": [],
+    },
+    "notes": {
+      "kind": "present",
+      "value": [],
+    },
+    "ops": {
+      "kind": "present",
+      "value": [],
+    },
+    "signals": {
+      "kind": "present",
+      "value": [
+        "base_raw=UY",
+        "base_norm=UI",
+        "cons_windows=-",
+        "prefix 'st' → Plosive",
+        "alphabet=german",
+        "EVIDENCE_V1",
+        "EVIDENCE_MATH7_BACKFILL",
+      ],
+    },
+  },
+  "math": {
+    "kind": "present",
+    "value": {
+      "L": {
+        "kind": "missing",
+        "missing": "not_emitted",
+      },
+      "OI": {
+        "kind": "missing",
+        "missing": "not_emitted",
+      },
+      "bridge": {
+        "kind": "missing",
+        "missing": "not_emitted",
+      },
+      "levelSummary": {
+        "kind": "missing",
+        "missing": "not_emitted",
+      },
+      "light": {
+        "kind": "missing",
+        "missing": "not_emitted",
+      },
+      "ringSummary": {
+        "kind": "missing",
+        "missing": "not_emitted",
+      },
+      "shadow": {
+        "kind": "missing",
+        "missing": "not_emitted",
+      },
+      "verdict": {
+        "kind": "missing",
+        "missing": "not_emitted",
+      },
+    },
+  },
+  "readout": {
+    "alphabet": {
+      "kind": "present",
+      "value": "auto",
+    },
+    "counts": {
+      "candidates": 2,
+      "notes": {
+        "kind": "present",
+        "value": 0,
+      },
+      "ops": {
+        "kind": "present",
+        "value": 0,
+      },
+      "rejections": {
+        "kind": "missing",
+        "missing": "not_emitted",
+      },
+      "signals": {
+        "kind": "present",
+        "value": 7,
+      },
+    },
+    "createdAt": {
+      "kind": "present",
+      "value": "<createdAt>",
+    },
+    "engineVersion": {
+      "kind": "present",
+      "value": "0.2.0-symbolic",
+    },
+    "mode": {
+      "kind": "present",
+      "value": "strict",
+    },
+    "normalizedWord": {
+      "kind": "present",
+      "value": "study",
+    },
+    "principlesPath": {
+      "kind": "present",
+      "value": [
+        "Unity",
+        "Insight",
+      ],
+    },
+    "status": "detected",
+    "strictInput": {
+      "kind": "present",
+      "value": true,
+    },
+    "voicePath": {
+      "kind": "present",
+      "value": [
+        "U",
+        "I",
+      ],
+    },
+    "voicePathDelta": "DIVERGE",
+    "voicePathFunctional": {
+      "kind": "present",
+      "value": [
+        "U",
+        "I",
+      ],
+    },
+    "voicePathSurface": {
+      "kind": "present",
+      "value": [
+        "U",
+        "Y",
+      ],
+    },
+    "word": "study",
+  },
+  "rejections": {
+    "items": {
+      "kind": "missing",
+      "missing": "not_emitted",
+    },
+  },
+}
+`;
