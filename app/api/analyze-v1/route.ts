@@ -191,6 +191,9 @@ export async function POST(req: Request) {
 
     return NextResponse.json({
       ...ensured,
+        // Origin Claim Protocol (V1) — passthrough from engine V1 result
+        originClaim: (out as any).originClaim,
+
       evidence: finalEvidence,
       raw: (ensured as any).raw
         ? { ...((ensured as any).raw as any), evidence: finalEvidence }
@@ -249,6 +252,9 @@ export async function GET(req: Request) {
 
     return NextResponse.json({
       ...ensured,
+        // Origin Claim Protocol (V1) — passthrough from engine V1 result
+        originClaim: (out as any).originClaim,
+
       evidence: finalEvidence,
       raw: (ensured as any).raw
         ? { ...((ensured as any).raw as any), evidence: finalEvidence }
