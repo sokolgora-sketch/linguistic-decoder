@@ -369,10 +369,11 @@ export type AnalysisResult = {
   },
   symbolic?: SymbolicLayer;
   wordMatrix?: WordMatrix | null;
-  
-    // Origin Claim Protocol (V1)
-    originClaim?: OriginClaimV1;
 // Optional Heart Math (Seven-Principles) layer
+  // Origin Claim Protocol (V1)
+  originClaim?: OriginClaimV1;
+
+  // Optional Heart Math (Seven-Principles) layer
   math7?: Math7Summary;
 }
 
