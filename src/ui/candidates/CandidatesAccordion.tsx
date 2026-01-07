@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
 import type { UICandidateRow } from "./candidateModel";
+import { toPrettyJson } from "@/ui/instrument/prettyJson";
 
 function CopyButton({ text, label }: { text: string; label: string }) {
   return (
@@ -78,12 +79,12 @@ export function CandidatesAccordion({ rows }: { rows: UICandidateRow[] }) {
                     </div>
                     <CopyButton
                       label="Copy Candidate JSON"
-                      text={JSON.stringify(c.raw, null, 2)}
+                      text={toPrettyJson(c.raw)}
                     />
                   </div>
 
                   <pre className="mt-3 max-h-80 overflow-auto rounded-md border p-2 text-xs">
-{JSON.stringify(c.raw, null, 2)}
+{toPrettyJson(c.raw)}
                   </pre>
                 </div>
               ) : null}
