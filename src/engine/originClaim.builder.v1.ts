@@ -6,6 +6,7 @@
 
 import type { AnalyzeWordResultV1 } from "@/shared/analysisResult.v1";
 import type { OriginClaimV1 } from "@/shared/originClaim.v1";
+import { maybeApplyOriginClaimGatesV1_1 } from "@/shared/originClaim.gatesWire.v1_1";
 
 export function buildOriginClaimV1(result: AnalyzeWordResultV1): OriginClaimV1 {
     const inputs =
@@ -18,6 +19,9 @@ export function buildOriginClaimV1(result: AnalyzeWordResultV1): OriginClaimV1 {
   const mode = inputs?.mode ?? (result as any).mode ?? "strict";
   const alphabet = inputs?.alphabet ?? (result as any).alphabet ?? "auto";
 
+  let candidates: any[] = [];
+  candidates = maybeApplyOriginClaimGatesV1_1(candidates);
+
   return {
     version: "v1",
 
@@ -25,7 +29,7 @@ export function buildOriginClaimV1(result: AnalyzeWordResultV1): OriginClaimV1 {
     policy: "no_single_winner",
 
     // Stub: no candidates asserted yet
-    candidates: [],
+    candidates: candidates,
 
     meta: {
       engineVersion: (result as any).meta?.engineVersion ?? (result as any).engineVersion ?? "unknown",
