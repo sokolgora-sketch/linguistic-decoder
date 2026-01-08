@@ -13,6 +13,7 @@ import { buildEvidenceLedgerModelFromVM } from '../ledger/ledgerModel';
 import { EvidenceLedgerCard } from '../ledger/EvidenceLedgerCard';
 import { buildCandidateRowsFromVM } from '../candidates/candidateModel';
 import { CandidatesAccordion } from '../candidates/CandidatesAccordion';
+import { OriginClaimCard } from '@/components/OriginClaimCard';
 
 type Props = {
   /** Raw /api/analyze-v1 payload (unknown shape). We adapt it, never trust it. */
@@ -61,6 +62,9 @@ export function InstrumentPanel({ payload }: Props) {
       <MeaningCard available={false} />
 
       <EvidenceLedgerCard model={ledgerModel} engineVersion={engineVersion} />
+
+      {/* Origin Claim (computed, auditable) */}
+      <OriginClaimCard originClaim={(vm.raw as any)?.originClaim ?? null} />
 
       <CandidatesAccordion rows={candidateRows} />
 
