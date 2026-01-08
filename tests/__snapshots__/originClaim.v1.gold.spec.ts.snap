@@ -2,15 +2,53 @@
 
 exports[`originClaim v1 — gold snapshots (originClaim block only) gold:damage 1`] = `
 {
-  "candidates": [],
+  "candidates": [
+    {
+      "confidence": "weak",
+      "evidenceRefs": [
+        "heart.math7.primary",
+        "candidates[albanian-dëm]",
+      ],
+      "form": "dëm",
+      "id": "oc:albanian-dëm",
+      "language": "Albanian",
+      "reasons": [
+        "Candidate marked pass by engine candidate layer.",
+        "Voice path alignment cannot be determined from available fields.",
+        "Candidate lacks detectable morphological structure.",
+      ],
+      "status": "pass",
+    },
+    {
+      "confidence": "weak",
+      "evidenceRefs": [
+        "heart.math7.primary",
+        "candidates[latin-damnum]",
+      ],
+      "form": "damnum",
+      "id": "oc:latin-damnum",
+      "language": "Latin",
+      "reasons": [
+        "Candidate marked pass by engine candidate layer.",
+        "Voice path alignment cannot be determined from available fields.",
+        "Candidate lacks detectable morphological structure.",
+      ],
+      "status": "pass",
+    },
+  ],
   "meta": {
     "engineVersion": "0.2.0-symbolic",
     "generatedAt": "<iso>",
+    "inputs": {
+      "alphabet": "auto",
+      "mode": "strict",
+      "word": "damage",
+    },
   },
   "policy": "no_single_winner",
   "summary": {
-    "confidence": "insufficient_evidence",
-    "note": "Origin analysis not yet computed. This result exposes the contract only.",
+    "confidence": "weak",
+    "note": "Computed from candidate/deepRoot/voice-path/morphology signals. Passing: 2; strong: 0; medium: 0.",
   },
   "version": "v1",
 }
@@ -18,15 +56,53 @@ exports[`originClaim v1 — gold snapshots (originClaim block only) gold:damage 
 
 exports[`originClaim v1 — gold snapshots (originClaim block only) gold:father 1`] = `
 {
-  "candidates": [],
+  "candidates": [
+    {
+      "confidence": "weak",
+      "evidenceRefs": [
+        "heart.math7.primary",
+        "candidates[albanian-atë]",
+      ],
+      "form": "atë",
+      "id": "oc:albanian-atë",
+      "language": "Albanian",
+      "reasons": [
+        "Candidate marked pass by engine candidate layer.",
+        "Voice path alignment cannot be determined from available fields.",
+        "Candidate lacks detectable morphological structure.",
+      ],
+      "status": "pass",
+    },
+    {
+      "confidence": "weak",
+      "evidenceRefs": [
+        "heart.math7.primary",
+        "candidates[latin-pater]",
+      ],
+      "form": "pater",
+      "id": "oc:latin-pater",
+      "language": "Latin",
+      "reasons": [
+        "Candidate marked pass by engine candidate layer.",
+        "Voice path alignment cannot be determined from available fields.",
+        "Candidate lacks detectable morphological structure.",
+      ],
+      "status": "pass",
+    },
+  ],
   "meta": {
     "engineVersion": "0.2.0-symbolic",
     "generatedAt": "<iso>",
+    "inputs": {
+      "alphabet": "auto",
+      "mode": "strict",
+      "word": "father",
+    },
   },
   "policy": "no_single_winner",
   "summary": {
-    "confidence": "insufficient_evidence",
-    "note": "Origin analysis not yet computed. This result exposes the contract only.",
+    "confidence": "weak",
+    "note": "Computed from candidate/deepRoot/voice-path/morphology signals. Passing: 2; strong: 0; medium: 0.",
   },
   "version": "v1",
 }
@@ -38,11 +114,16 @@ exports[`originClaim v1 — gold snapshots (originClaim block only) gold:hope 1`
   "meta": {
     "engineVersion": "0.2.0-symbolic",
     "generatedAt": "<iso>",
+    "inputs": {
+      "alphabet": "auto",
+      "mode": "strict",
+      "word": "hope",
+    },
   },
   "policy": "no_single_winner",
   "summary": {
     "confidence": "insufficient_evidence",
-    "note": "Origin analysis not yet computed. This result exposes the contract only.",
+    "note": "No passing candidates with sufficient computed support in the current result layers.",
   },
   "version": "v1",
 }
@@ -50,15 +131,53 @@ exports[`originClaim v1 — gold snapshots (originClaim block only) gold:hope 1`
 
 exports[`originClaim v1 — gold snapshots (originClaim block only) gold:love 1`] = `
 {
-  "candidates": [],
+  "candidates": [
+    {
+      "confidence": "weak",
+      "evidenceRefs": [
+        "heart.math7.primary",
+        "candidates[albanian-dashuri]",
+      ],
+      "form": "dashuri",
+      "id": "oc:albanian-dashuri",
+      "language": "Albanian",
+      "reasons": [
+        "Candidate marked pass by engine candidate layer.",
+        "Voice path alignment cannot be determined from available fields.",
+        "Candidate lacks detectable morphological structure.",
+      ],
+      "status": "pass",
+    },
+    {
+      "confidence": "weak",
+      "evidenceRefs": [
+        "heart.math7.primary",
+        "candidates[latin-amor]",
+      ],
+      "form": "amor",
+      "id": "oc:latin-amor",
+      "language": "Latin",
+      "reasons": [
+        "Candidate marked pass by engine candidate layer.",
+        "Voice path alignment cannot be determined from available fields.",
+        "Candidate lacks detectable morphological structure.",
+      ],
+      "status": "pass",
+    },
+  ],
   "meta": {
     "engineVersion": "0.2.0-symbolic",
     "generatedAt": "<iso>",
+    "inputs": {
+      "alphabet": "auto",
+      "mode": "strict",
+      "word": "love",
+    },
   },
   "policy": "no_single_winner",
   "summary": {
-    "confidence": "insufficient_evidence",
-    "note": "Origin analysis not yet computed. This result exposes the contract only.",
+    "confidence": "weak",
+    "note": "Computed from candidate/deepRoot/voice-path/morphology signals. Passing: 2; strong: 0; medium: 0.",
   },
   "version": "v1",
 }
@@ -66,15 +185,53 @@ exports[`originClaim v1 — gold snapshots (originClaim block only) gold:love 1`
 
 exports[`originClaim v1 — gold snapshots (originClaim block only) gold:study 1`] = `
 {
-  "candidates": [],
+  "candidates": [
+    {
+      "confidence": "weak",
+      "evidenceRefs": [
+        "heart.math7.primary",
+        "candidates[albanian-studim]",
+      ],
+      "form": "studim",
+      "id": "oc:albanian-studim",
+      "language": "Albanian",
+      "reasons": [
+        "Candidate marked pass by engine candidate layer.",
+        "Voice path alignment cannot be determined from available fields.",
+        "Candidate lacks detectable morphological structure.",
+      ],
+      "status": "pass",
+    },
+    {
+      "confidence": "weak",
+      "evidenceRefs": [
+        "heart.math7.primary",
+        "candidates[latin-studium]",
+      ],
+      "form": "studium",
+      "id": "oc:latin-studium",
+      "language": "Latin",
+      "reasons": [
+        "Candidate marked pass by engine candidate layer.",
+        "Voice path alignment cannot be determined from available fields.",
+        "Candidate lacks detectable morphological structure.",
+      ],
+      "status": "pass",
+    },
+  ],
   "meta": {
     "engineVersion": "0.2.0-symbolic",
     "generatedAt": "<iso>",
+    "inputs": {
+      "alphabet": "auto",
+      "mode": "strict",
+      "word": "study",
+    },
   },
   "policy": "no_single_winner",
   "summary": {
-    "confidence": "insufficient_evidence",
-    "note": "Origin analysis not yet computed. This result exposes the contract only.",
+    "confidence": "weak",
+    "note": "Computed from candidate/deepRoot/voice-path/morphology signals. Passing: 2; strong: 0; medium: 0.",
   },
   "version": "v1",
 }
