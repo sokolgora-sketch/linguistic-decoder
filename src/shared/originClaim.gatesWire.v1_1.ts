@@ -65,7 +65,7 @@ export function maybeApplyOriginClaimGatesV1_1(
   passing.sort((a: any, b: any) => {
     const ga = toGateCandidateV1_1(a, getSupport(a));
     const gb = toGateCandidateV1_1(b, getSupport(b));
-    return compareOriginClaimCandidatesV1_1(ga, gb, cfg);
+    return compareOriginClaimCandidatesV1_1(ga, gb);
   });
 
   return passing;
