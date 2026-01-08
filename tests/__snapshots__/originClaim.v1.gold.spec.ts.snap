@@ -1,0 +1,81 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`originClaim v1 — gold snapshots (originClaim block only) gold:damage 1`] = `
+{
+  "candidates": [],
+  "meta": {
+    "engineVersion": "0.2.0-symbolic",
+    "generatedAt": "<iso>",
+  },
+  "policy": "no_single_winner",
+  "summary": {
+    "confidence": "insufficient_evidence",
+    "note": "Origin analysis not yet computed. This result exposes the contract only.",
+  },
+  "version": "v1",
+}
+`;
+
+exports[`originClaim v1 — gold snapshots (originClaim block only) gold:father 1`] = `
+{
+  "candidates": [],
+  "meta": {
+    "engineVersion": "0.2.0-symbolic",
+    "generatedAt": "<iso>",
+  },
+  "policy": "no_single_winner",
+  "summary": {
+    "confidence": "insufficient_evidence",
+    "note": "Origin analysis not yet computed. This result exposes the contract only.",
+  },
+  "version": "v1",
+}
+`;
+
+exports[`originClaim v1 — gold snapshots (originClaim block only) gold:hope 1`] = `
+{
+  "candidates": [],
+  "meta": {
+    "engineVersion": "0.2.0-symbolic",
+    "generatedAt": "<iso>",
+  },
+  "policy": "no_single_winner",
+  "summary": {
+    "confidence": "insufficient_evidence",
+    "note": "Origin analysis not yet computed. This result exposes the contract only.",
+  },
+  "version": "v1",
+}
+`;
+
+exports[`originClaim v1 — gold snapshots (originClaim block only) gold:love 1`] = `
+{
+  "candidates": [],
+  "meta": {
+    "engineVersion": "0.2.0-symbolic",
+    "generatedAt": "<iso>",
+  },
+  "policy": "no_single_winner",
+  "summary": {
+    "confidence": "insufficient_evidence",
+    "note": "Origin analysis not yet computed. This result exposes the contract only.",
+  },
+  "version": "v1",
+}
+`;
+
+exports[`originClaim v1 — gold snapshots (originClaim block only) gold:study 1`] = `
+{
+  "candidates": [],
+  "meta": {
+    "engineVersion": "0.2.0-symbolic",
+    "generatedAt": "<iso>",
+  },
+  "policy": "no_single_winner",
+  "summary": {
+    "confidence": "insufficient_evidence",
+    "note": "Origin analysis not yet computed. This result exposes the contract only.",
+  },
+  "version": "v1",
+}
+`;
