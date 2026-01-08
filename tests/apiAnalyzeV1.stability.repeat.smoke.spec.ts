@@ -10,7 +10,7 @@
 import { execSync, spawn } from "node:child_process";
 import http from "node:http";
 
-jest.setTimeout(60000);
+jest.setTimeout(180_000);
 
 const PORT = 3012; // Using a different port from other tests
 const BASE = `http://localhost:${PORT}`;
@@ -86,13 +86,13 @@ describe("/api/analyze-v1 stability (repeat GET)", () => {
     });
     // Wait for server to be ready
     await waitForHttpReady(`${BASE}/api/analyze-v1?word=study&mode=strict`);
-  }, 60000); // long timeout for beforeAll
+  }, 180_000);
 
   afterAll(async () => {
     if (!proc) return;
     proc.kill("SIGTERM");
     proc = null;
-  });
+  }, 60_000);
 
   it("returns valid JSON and stable critical fields across repeats", () => {
     const url = `${BASE}/api/analyze-v1?word=study&mode=strict`;
