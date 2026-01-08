@@ -3,10 +3,19 @@
 exports[`originClaim.v1 — default behavior defaults to insufficient_evidence 1`] = `
 {
   "candidates": [],
+  "meta": {
+    "engineVersion": "0.2.0-symbolic",
+    "generatedAt": "2026-01-08T06:38:32.440Z",
+    "inputs": {
+      "alphabet": "auto",
+      "mode": "strict",
+      "word": "study",
+    },
+  },
   "policy": "no_single_winner",
   "summary": {
     "confidence": "insufficient_evidence",
-    "note": "Origin Claim Protocol v1 is wired but intentionally logic-free (no hypotheses emitted yet).",
+    "note": "No passing candidates with sufficient computed support in the current result layers.",
   },
   "version": "v1",
 }
