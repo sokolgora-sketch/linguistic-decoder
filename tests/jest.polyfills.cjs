@@ -20,14 +20,12 @@ try {
 
 // MessagePort (needed by undici WebIDL)
 // IMPORTANT: do NOT polyfill MessageChannel in Jest.
-// If MessageChannel exists, React scheduler will use it and keep ports open,
-// causing Jest "open handles" warnings.
+// If MessageChannel exists, React scheduler may use it and keep ports open.
 try {
   const wt = require("worker_threads");
   if (!globalThis.MessagePort && wt.MessagePort) {
     globalThis.MessagePort = wt.MessagePort;
   }
-  // Intentionally do not set globalThis.MessageChannel.
 } catch {
   // ignore
 }
