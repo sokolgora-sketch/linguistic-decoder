@@ -2,25 +2,25 @@ import React from "react";
 import { render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
-import { InstrumentPanel } from "../src/ui/instrument/InstrumentPanel";
+import { InstrumentPanel } from "@/ui/instrument/InstrumentPanel";
 
 jest.mock("@/hooks/use-toast", () => ({
   useToast: () => ({ toast: jest.fn() }),
 }));
 
 // This test is ONLY about Evidence / Ops Ledger rendering.
-jest.mock("../src/ui/instrument/sections/ReadoutCard", () => ({
+jest.mock("@/ui/instrument/sections/ReadoutCard", () => ({
   ReadoutCard: () => null,
 }));
 
-jest.mock("../src/ui/candidates/candidateModel", () => ({
+jest.mock("@/ui/candidates/candidateModel", () => ({
   buildCandidateRowsFromVM: () => [],
 }));
-jest.mock("../src/ui/candidates/CandidatesAccordion", () => ({
+jest.mock("@/ui/candidates/CandidatesAccordion", () => ({
   CandidatesAccordion: () => null,
 }));
 
-jest.mock("../src/ui/instrument/contractAdapter", () => ({
+jest.mock("@/ui/instrument/contractAdapter", () => ({
   adaptAnalysisToTelemetryVM: () => ({
     evidence: {
       normalizationSteps: { kind: "present", value: ["S1"] },
