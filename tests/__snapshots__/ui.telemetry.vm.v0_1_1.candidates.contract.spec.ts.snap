@@ -146,7 +146,7 @@ exports[`ui telemetry vm contract v0.1.1 (candidates evidence lists) adapts cand
     },
   },
   "originClaimGates": {
-    "active": null,
+    "active": false,
     "candidateCount": 0,
     "flag": "ocg",
     "reasonCounts": {},
