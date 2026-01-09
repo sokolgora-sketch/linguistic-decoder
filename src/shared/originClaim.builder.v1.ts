@@ -417,7 +417,9 @@ export function buildOriginClaimV1(result: AnalyzeWordResultV1Like): OriginClaim
 
     // Support is structural-only (no inference). Always deterministic.
     // claimId is a stable anchor derived from the request word.
-    support: buildOriginClaimSupportStub(`oc:${word}`),
+
+    // Support is structural-only (no inference). Always deterministic.
+    // claimId is a stable anchor derived from the request word.
 
     candidates: built,
     summary: {
