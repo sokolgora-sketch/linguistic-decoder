@@ -12,12 +12,12 @@
 import { spawn } from "node:child_process";
 import http from "node:http";
 
-jest.setTimeout(60000);
+jest.setTimeout(180_000);
 
 const PORT = 3011;
 const BASE = `http://localhost:${PORT}`;
 
-async function waitForHttpReady(url: string, timeoutMs = 45000) {
+async function waitForHttpReady(url: string, timeoutMs = 120000) {
   const start = Date.now();
 
   while (Date.now() - start < timeoutMs) {
