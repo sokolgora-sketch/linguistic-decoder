@@ -338,7 +338,8 @@ export function adaptAnalysisToTelemetryVM(raw: unknown): TelemetryViewModel {
   const status: "detected" | "none" | "error" =
     detectedVoicePath && detectedVoicePath.length ? "detected" : "none";
 
-  const oc = isRecord(payload.originClaim) ? payload.originClaim : null;
+  const p = isRecord(payload) ? payload : null;
+  const oc = p && isRecord(p.originClaim) ? p.originClaim : null;
 
   const reasonCounts: Record<string, number> = {};
   if (oc && Array.isArray(oc.candidates)) {

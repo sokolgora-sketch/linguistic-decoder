@@ -5,13 +5,13 @@ import { runAnalysisDeterministic } from "@/lib/runAnalysisDeterministic";
 import { enginePayloadToAnalysisResult } from "@/shared/analysisAdapter";
 import { adaptAnalyzeV1ToUI } from "@/shared/analyzeV1Adapter";
 import { ensurePrimaryAndCandidatePaths } from "@/shared/ensurePaths";
+import { devFlagOriginClaimGatesFromUrl } from "@/shared/devFlags";
 
 // ✅ Contract guard
 import { AnalyzeWordResultV1ContractSchema } from "@/shared/analyzeWordResult.v1.contract";
 
 // ✅ Heart Instrument v1 (stable sub-object)
 import { buildHeartInstrumentV1 } from "@/v1/heartInstrument.v1";
-import { devFlagOriginClaimGatesFromUrl } from "@/shared/devFlags";
 
 const BodySchema = z
   .object({
@@ -220,7 +220,7 @@ export async function POST(req: Request) {
 export async function GET(req: Request) {
   applyDevOriginClaimGates(req.url);
 
-  const url = new URL(.url);
+  const url = new URL(req.url);
   const word = (url.searchParams.get("word") ?? "").trim();
   const mode = (url.searchParams.get("mode") ?? "").trim();
   const alphabet = (url.searchParams.get("alphabet") ?? "").trim();

@@ -2,38 +2,55 @@ import React from "react";
 import { render, screen } from "@testing-library/react";
 import { InstrumentPanel } from "@/ui/instrument/InstrumentPanel";
 
+// InstrumentPanel uses the useToast hook, which we need to mock for tests.
+jest.mock('@/hooks/use-toast', () => ({
+  useToast: () => ({
+    toast: jest.fn(),
+  }),
+}));
+
 describe("ui instrument: originClaim gates renders from VM", () => {
   test("shows ON/OFF and counts from VM only", () => {
-    const vm: any = {
-      originClaimGates: {
-        active: true,
-        flag: "ocg",
-        candidateCount: 3,
-        reasonCounts: { KEEP: 2, DROP: 1 },
+    // This payload will be adapted into a VM by the InstrumentPanel.
+    // We are testing that the panel correctly renders the data from the *adapted VM*.
+    const payload = {
+      word: "test-word",
+      originClaim: {
+        policy: { gatesActive: true },
+        candidates: [
+          { reasonCodes: ["KEEP", "A"] },
+          { reasonCodes: ["KEEP", "B"] },
+          { reasonCodes: ["DROP"] },
+        ],
       },
     };
 
-    render(<InstrumentPanel vm={vm} /> as any);
+    render(<InstrumentPanel payload={payload} />);
 
-    expect(screen.getByText(/OriginClaim Gates/i)).toBeInTheDocument();
-    expect(screen.getByText(/Status:/i)).toBeInTheDocument();
-    expect(screen.getByText("ON")).toBeInTheDocument();
-    expect(screen.getByText(/Candidates:/i)).toBeInTheDocument();
-    expect(screen.getByText("3")).toBeInTheDocument();
-    expect(screen.getByText(/Reason code counts/i)).toBeInTheDocument();
+    // Assertions are based on the expected VM state derived from the payload above.
+    expect(screen.getByText("OriginClaim Gates")).toBeInTheDocument();
+    expect(screen.getByText(/Status:/)).toHaveTextContent("Status: ON");
+    expect(screen.getByText(/Candidates:/)).toHaveTextContent("Candidates: 3");
+    expect(screen.getByText("Reason code counts")).toBeInTheDocument();
+
+    const reasonCountsPre = screen.getByText(/{/i).closest('pre');
+    expect(reasonCountsPre).toHaveTextContent(/"KEEP": 2/);
+    expect(reasonCountsPre).toHaveTextContent(/"A": 1/);
+    expect(reasonCountsPre).toHaveTextContent(/"B": 1/);
+    expect(reasonCountsPre).toHaveTextContent(/"DROP": 1/);
   });
 
   test("OFF renders when active=false", () => {
-    const vm: any = {
-      originClaimGates: {
-        active: false,
-        flag: "ocg",
-        candidateCount: 7,
-        reasonCounts: {},
+    const payload = {
+       word: "test-word",
+      originClaim: {
+        policy: { gatesActive: false },
+        candidates: [{}, {}, {}, {}, {}, {}, {}],
       },
     };
 
-    render(<InstrumentPanel vm={vm} /> as any);
-    expect(screen.getByText("OFF")).toBeInTheDocument();
+    render(<InstrumentPanel payload={payload} />);
+    expect(screen.getByText(/Status:/)).toHaveTextContent("Status: OFF");
+    expect(screen.getByText(/Candidates:/)).toHaveTextContent("Candidates: 7");
   });
 });
