@@ -50,6 +50,10 @@ exports[`originClaim v1 — gold snapshots (originClaim block only) gold:damage 
     "confidence": "weak",
     "note": "Computed from candidate/deepRoot/voice-path/morphology signals. Passing: 2; strong: 0; medium: 0.",
   },
+  "support": {
+    "claimId": "oc:damage",
+    "refs": [],
+  },
   "version": "v1",
 }
 `;
@@ -104,6 +108,10 @@ exports[`originClaim v1 — gold snapshots (originClaim block only) gold:father 
     "confidence": "weak",
     "note": "Computed from candidate/deepRoot/voice-path/morphology signals. Passing: 2; strong: 0; medium: 0.",
   },
+  "support": {
+    "claimId": "oc:father",
+    "refs": [],
+  },
   "version": "v1",
 }
 `;
@@ -124,6 +132,10 @@ exports[`originClaim v1 — gold snapshots (originClaim block only) gold:hope 1`
   "summary": {
     "confidence": "insufficient_evidence",
     "note": "No passing candidates with sufficient computed support in the current result layers.",
+  },
+  "support": {
+    "claimId": "oc:hope",
+    "refs": [],
   },
   "version": "v1",
 }
@@ -179,6 +191,10 @@ exports[`originClaim v1 — gold snapshots (originClaim block only) gold:love 1`
     "confidence": "weak",
     "note": "Computed from candidate/deepRoot/voice-path/morphology signals. Passing: 2; strong: 0; medium: 0.",
   },
+  "support": {
+    "claimId": "oc:love",
+    "refs": [],
+  },
   "version": "v1",
 }
 `;
@@ -232,6 +248,10 @@ exports[`originClaim v1 — gold snapshots (originClaim block only) gold:study 1
   "summary": {
     "confidence": "weak",
     "note": "Computed from candidate/deepRoot/voice-path/morphology signals. Passing: 2; strong: 0; medium: 0.",
+  },
+  "support": {
+    "claimId": "oc:study",
+    "refs": [],
   },
   "version": "v1",
 }
