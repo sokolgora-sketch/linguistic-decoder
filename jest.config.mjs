@@ -1,22 +1,22 @@
 import nextJest from "next/jest.js";
 
-const createJestConfig = nextJest({
-  dir: "./",
-});
+const createJestConfig = nextJest({ dir: "./" });
 
 /** @type {import('jest').Config} */
 const customJestConfig = {
   testEnvironment: "jsdom",
 
-  // Load jest-dom once for all tests
-  setupFilesAfterEnv: ["<rootDir>/tests/setupTests.ts"],
+  // Must run BEFORE test files + before modules import undici/next/server.
+  setupFiles: ["<rootDir>/tests/jest.polyfills.cjs"],
 
-  // Support your @/ alias
+  // If you have jest-dom etc, keep it here (optional).
+  setupFilesAfterEnv: ["<rootDir>/tests/jest.setup.ts"],
+
   moduleNameMapper: {
+    "^@/app/(.*)$": "<rootDir>/app/$1",
     "^@/(.*)$": "<rootDir>/src/$1",
   },
 
-  // Keep tests in /tests
   testMatch: ["<rootDir>/tests/**/*.spec.(ts|tsx)"],
 };
 

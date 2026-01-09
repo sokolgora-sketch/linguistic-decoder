@@ -13,6 +13,7 @@ import type {
   CandidateRowVM,
   DecompositionItemVM,
   MathTelemetryVM,
+  OriginClaimGatesVM,
   PresentOrMissing,
   RejectionItemVM,
   TelemetryViewModel,
@@ -338,6 +339,30 @@ export function adaptAnalysisToTelemetryVM(raw: unknown): TelemetryViewModel {
   const status: "detected" | "none" | "error" =
     detectedVoicePath && detectedVoicePath.length ? "detected" : "none";
 
+  const p = isRecord(payload) ? payload : null;
+  const oc = p && isRecord(p.originClaim) ? p.originClaim : null;
+
+  const reasonCounts: Record<string, number> = {};
+  if (oc && Array.isArray(oc.candidates)) {
+    for (const c of (oc.candidates as any[])) {
+        if (isRecord(c) && Array.isArray(c.reasonCodes)) {
+            for (const code of (c.reasonCodes as any[])) {
+                const codeStr = String(code);
+                reasonCounts[codeStr] = (reasonCounts[codeStr] ?? 0) + 1;
+            }
+        }
+    }
+  }
+
+  const gatesActive = (oc && isRecord(oc.policy) && oc.policy.gatesActive === true) || (oc && oc.policy === "gates-v1.1");
+
+  const originClaimGates: OriginClaimGatesVM = {
+    active: gatesActive ?? false,
+    flag: "ocg" as const,
+    candidateCount: (oc && Array.isArray(oc.candidates)) ? oc.candidates.length : 0,
+    reasonCounts,
+  };
+
   return {
     readout: {
       voicePath: voicePathDetectedMaybe,
@@ -375,6 +400,7 @@ export function adaptAnalysisToTelemetryVM(raw: unknown): TelemetryViewModel {
     candidates,
     math,
     rejections: { items: rejectionItems },
+    originClaimGates,
     raw,
   };
 }

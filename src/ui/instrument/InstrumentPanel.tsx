@@ -66,6 +66,29 @@ export function InstrumentPanel({ payload }: Props) {
       {/* Origin Claim (computed, auditable) */}
       <OriginClaimCard originClaim={(vm.raw as any)?.originClaim ?? null} />
 
+      {vm.originClaimGates ? (
+        <div className="rounded-xl border p-3">
+          <div className="text-sm font-semibold">OriginClaim Gates</div>
+          <div className="mt-1 text-sm">
+            Status:{" "}
+            <span className="font-mono">
+              {vm.originClaimGates.active ? "ON" : "OFF"}
+            </span>{" "}
+            <span className="text-xs opacity-70">
+              (dev flag: ?{vm.originClaimGates.flag}=1)
+            </span>
+          </div>
+          <div className="mt-1 text-sm">
+            Candidates: <span className="font-mono">{vm.originClaimGates.candidateCount}</span>
+          </div>
+
+          <div className="mt-2 text-xs opacity-70">Reason code counts</div>
+          <pre className="mt-1 overflow-auto rounded-lg bg-black/5 p-2 text-xs">
+            {JSON.stringify(vm.originClaimGates.reasonCounts, null, 2)}
+          </pre>
+        </div>
+      ) : null}
+
       <CandidatesAccordion rows={candidateRows} />
 
       {/* Minimal controls (copy evidence package) */}

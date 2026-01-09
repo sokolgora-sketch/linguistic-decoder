@@ -1,6 +1,6 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
-import { InstrumentPanel } from "../src/ui/instrument/InstrumentPanel";
+import { InstrumentPanel } from "@/ui/instrument/InstrumentPanel";
 
 describe("ui: InstrumentPanel renders Origin Claim from VM", () => {
   test("shows Origin Claim card when originClaim exists", () => {

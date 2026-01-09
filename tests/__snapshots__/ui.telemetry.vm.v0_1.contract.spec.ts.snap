@@ -145,6 +145,12 @@ exports[`ui telemetry vm contract v0.1 adapts analyze-v1 payload into stable Tel
       },
     },
   },
+  "originClaimGates": {
+    "active": false,
+    "candidateCount": 0,
+    "flag": "ocg",
+    "reasonCounts": {},
+  },
   "readout": {
     "alphabet": {
       "kind": "present",

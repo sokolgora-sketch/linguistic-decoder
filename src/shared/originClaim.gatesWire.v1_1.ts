@@ -16,10 +16,6 @@ import {
 } from "./originClaim.gates.v1_1";
 import { ORIGIN_CLAIM_GATES_DEFAULT_V1_1, toGateCandidateV1_1 } from "./originClaim.gatesBridge.v1_1";
 
-function isEnabled(): boolean {
-  return process.env.ORIGIN_CLAIM_GATES_V1_1 === "1";
-}
-
 function getSupport(c: any): { positives: number; negatives: number } {
   // Prefer explicit fields if present (we keep fallbacks to avoid tight coupling).
   const pos =
@@ -46,8 +42,9 @@ function getSupport(c: any): { positives: number; negatives: number } {
  */
 export function maybeApplyOriginClaimGatesV1_1(
   candidates: OriginClaimCandidateV1[],
+  gatesActive: boolean,
 ): OriginClaimCandidateV1[] {
-  if (!isEnabled()) return candidates;
+  if (!gatesActive) return candidates;
 
   const cfg = ORIGIN_CLAIM_GATES_DEFAULT_V1_1;
 

@@ -19,8 +19,11 @@ export function buildOriginClaimV1(result: AnalyzeWordResultV1): OriginClaimV1 {
   const mode = inputs?.mode ?? (result as any).mode ?? "strict";
   const alphabet = inputs?.alphabet ?? (result as any).alphabet ?? "auto";
 
+  const policy = (result as any)?.originClaim?.policy;
+  const gatesActive = policy?.gatesActive ?? false;
+
   let candidates: any[] = [];
-  candidates = maybeApplyOriginClaimGatesV1_1(candidates);
+  candidates = maybeApplyOriginClaimGatesV1_1(candidates, gatesActive);
 
   return {
     version: "v1",

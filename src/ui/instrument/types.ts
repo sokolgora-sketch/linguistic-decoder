@@ -1,3 +1,4 @@
+
 export type Mode = "strict" | "open";
 
 /**
@@ -101,11 +102,19 @@ export interface RejectionLogVM {
   items: PresentOrMissing<RejectionItemVM[]>;
 }
 
+export interface OriginClaimGatesVM {
+  active: boolean;
+  flag: "ocg";
+  candidateCount: number;
+  reasonCounts: Record<string, number>;
+}
+
 export interface TelemetryViewModel {
   readout: TelemetryReadout;
   evidence: EvidenceLedger;
   candidates: CandidateRowVM[];
   math: PresentOrMissing<MathTelemetryVM>;
   rejections: RejectionLogVM;
+  originClaimGates: OriginClaimGatesVM;
   raw: unknown;
 }

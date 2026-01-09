@@ -20,6 +20,22 @@ const BodySchema = z
   })
   .passthrough();
 
+function applyDevOriginClaimGates(reqUrl?: string): boolean | null {
+  if (process.env.NODE_ENV === "production") return null;
+  if (!reqUrl) return null;
+
+  try {
+    const url = new URL(reqUrl, "http://localhost");
+    const ocg = url.searchParams.get("ocg");
+
+    if (ocg === "1") return true;
+    if (ocg === "0") return false;
+  } catch (e) {
+    return null;
+  }
+
+  return null;
+}
 
 function buildEvidenceV1FromPayload(payload: any) {
   const voicePath = Array.isArray(payload?.primaryPath?.voicePath)
@@ -136,6 +152,8 @@ function contractFailResponse(params: { message: string; issues?: unknown; out?:
 }
 
 export async function POST(req: Request) {
+  const gatesOn = applyDevOriginClaimGates(req.url);
+
   let body: unknown;
   try {
     body = await req.json();
@@ -160,19 +178,13 @@ export async function POST(req: Request) {
   const { word, mode, alphabet } = parsed.data;
 
   try {
-    // Stable instrument derived directly from the authority basis (word → NFC inside builder).
     const heartInstrumentV1 = buildHeartInstrumentV1(word);
 
     const payload = await runAnalysisDeterministic(word, { mode, alphabet });
     const out = enginePayloadToAnalysisResult(payload);
 
-    // DF_EVIDENCE_MATH7_BACKFILL
-    // If engine payload doesn't carry math7 but adapter output does, align evidence to the same truth.
-    // This keeps Evidence as "instrument readout" rather than leaving nulls that confuse UI.
-    // NOTE: evidence is built from payload earlier; we can adjust it later just before returning.
     const ui = adaptAnalyzeV1ToUI(out as any);
 
-    // ✅ HARD GUARD: validate the engine V1 payload (not the UI adapter output)
     const checked = AnalyzeWordResultV1ContractSchema.safeParse(out);
     if (!checked.success) {
       return contractFailResponse({
@@ -191,9 +203,11 @@ export async function POST(req: Request) {
 
     return NextResponse.json({
       ...ensured,
-        // Origin Claim Protocol (V1) — passthrough from engine V1 result
-        originClaim: (out as any).originClaim,
-
+      originClaim: (out as any).originClaim,
+      originClaimGates: {
+        flag: "ocg",
+        active: gatesOn,
+      },
       evidence: finalEvidence,
       raw: (ensured as any).raw
         ? { ...((ensured as any).raw as any), evidence: finalEvidence }
@@ -209,6 +223,8 @@ export async function POST(req: Request) {
 }
 
 export async function GET(req: Request) {
+  const gatesOn = applyDevOriginClaimGates(req.url);
+
   const url = new URL(req.url);
   const word = (url.searchParams.get("word") ?? "").trim();
   const mode = (url.searchParams.get("mode") ?? "").trim();
@@ -252,9 +268,11 @@ export async function GET(req: Request) {
 
     return NextResponse.json({
       ...ensured,
-        // Origin Claim Protocol (V1) — passthrough from engine V1 result
-        originClaim: (out as any).originClaim,
-
+      originClaim: (out as any).originClaim,
+      originClaimGates: {
+        flag: "ocg",
+        active: gatesOn,
+      },
       evidence: finalEvidence,
       raw: (ensured as any).raw
         ? { ...((ensured as any).raw as any), evidence: finalEvidence }
