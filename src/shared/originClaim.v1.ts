@@ -63,12 +63,15 @@ export interface OriginClaimMetaV1 {
 
 import type { OriginClaimSupportBundle } from "./originClaimSupport.v1";
 
+import type { OriginClaimSupportBundle } from "./originClaimSupport.v1";
+
 export interface OriginClaimV1 {
   version: OriginClaimVersion;
   policy: OriginClaimPolicy;
 
   support?: OriginClaimSupportBundle; // structural-only refs (no inference)
 
+  support?: OriginClaimSupportBundle; // structural-only refs (no inference)
 
   candidates: OriginClaimCandidateV1[];
 

@@ -1,6 +1,7 @@
 // src/shared/originClaim.builder.v1.ts
 import { buildOriginClaimSupportStub } from "@/engine/originClaimSupport.stub";
 
+
 import {
   OriginClaimV1,
   OriginClaimCandidateV1,
@@ -410,6 +411,10 @@ export function buildOriginClaimV1(result: AnalyzeWordResultV1Like): OriginClaim
   const originClaim: OriginClaimV1 = {
     version: "v1",
     policy: "no_single_winner",
+    // Support is structural-only (no inference). Always deterministic.
+    // claimId is a stable anchor derived from the request word.
+    support: buildOriginClaimSupportStub(`oc:${word}`),
+
     // Support is structural-only (no inference). Always deterministic.
     // claimId is a stable anchor derived from the request word.
     support: buildOriginClaimSupportStub(`oc:${word}`),
