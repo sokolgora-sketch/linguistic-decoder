@@ -2,16 +2,13 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@/*": [
-        "src/*"
-      ]
+      "@/*": ["src/*"],
+      "@/app/*": ["app/*"],
+      "@/tests/*": ["tests/*"],
+      "@/scripts/*": ["scripts/*"]
     },
     "target": "ES2017",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -23,11 +20,10 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
-    "plugins": [
-      {
-        "name": "next"
-      }
-    ]
+
+    "types": ["jest", "node", "@testing-library/jest-dom"],
+
+    "plugins": [{ "name": "next" }]
   },
   "ts-node": {
     "compilerOptions": {
@@ -38,18 +34,14 @@
     "next-env.d.ts",
     "src/**/*.ts",
     "src/**/*.tsx",
+    "app/**/*.ts",
+    "app/**/*.tsx",
+    "tests/**/*.ts",
+    "tests/**/*.tsx",
+    "tests/**/*.d.ts",
+    "scripts/**/*.ts",
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts"
   ],
-  "exclude": [
-    "node_modules",
-    "app/**",
-    "tests/**",
-    "scripts/**",
-    "**/*.spec.ts",
-    "**/*.spec.tsx",
-    "**/*.test.ts",
-    "**/*.test.tsx",
-    "src/shared/legacy/**"
-  ]
+  "exclude": ["node_modules", "src/shared/legacy/**"]
 }
