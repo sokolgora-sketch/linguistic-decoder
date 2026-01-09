@@ -1,35 +1,21 @@
+// src/shared/originClaimSupport.v1.ts
+// OriginClaim Support Bundle v1 — structural refs only (no inference)
+
 /**
- * Origin Claim Support — v1
- *
- * Purpose:
- * - Attach evidence references to origin claims
- * - NO scoring, NO ranking, NO confidence math
- * - Structural only
+ * A minimal, deterministic "wiring surface" for future evidence linkage.
+ * - MUST remain structural-only: references, ids, pointers.
+ * - MUST NOT contain computed scores, rankings, or inferred claims.
  */
-
-export type SupportRefKind =
-  | "phonetic"
-  | "morphological"
-  | "functional"
-  | "historical"
-  | "comparative"
-  | "symbolic"
-  | "unknown";
-
-export interface OriginClaimSupportRef {
-  id: string;                 // stable, deterministic id
-  kind: SupportRefKind;       // what type of support this is
-  source: string;             // e.g. "engine", "canon", "cross-lang"
-  note?: string;              // human-readable note (non-conclusive)
-}
-
 export interface OriginClaimSupportBundle {
-  claimId: string;            // ties to originClaim.id
-  refs: OriginClaimSupportRef[];
-}
+  /**
+   * Stable anchor id for the claim block, derived from request word
+   * (e.g. "oc:study"). This is NOT a candidate id.
+   */
+  claimId: string;
 
-/**
- * Hard rule:
- * - Empty refs[] is VALID.
- * - Support does NOT imply truth.
- */
+  /**
+   * Stable pointers to existing evidence nodes already present in the result model.
+   * v1 starts empty; later milestones will populate.
+   */
+  refs: string[];
+}
