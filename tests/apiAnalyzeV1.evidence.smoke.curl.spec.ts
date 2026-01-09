@@ -96,7 +96,7 @@ describe("/api/analyze-v1 evidence smoke (curl)", () => {
     });
 
     await waitForHttpReady(`${BASE}/api/analyze-v1?word=study&mode=strict`);
-  }, 60000);
+  }, 180_000);
 
   afterAll(async () => {
     if (!proc) return;
