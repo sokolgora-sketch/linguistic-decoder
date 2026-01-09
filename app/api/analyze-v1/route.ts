@@ -23,8 +23,14 @@ const BodySchema = z
 
 function applyDevOriginClaimGates(reqUrl: string) {
   if (process.env.NODE_ENV === "production") return;
-  const on = devFlagOriginClaimGatesFromUrl(reqUrl);
-  if (on) process.env.ORIGIN_CLAIM_GATES_V1_1 = "1";
+  const ocg = new URL(reqUrl).searchParams.get("ocg");
+const gatesOn =
+  ocg === "1"
+    ? true
+    : ocg === "0"
+    ? false
+    : process.env.ORIGIN_CLAIM_GATES_V1_1 === "1";
+  if (gatesOn) process.env.ORIGIN_CLAIM_GATES_V1_1 = "1";
   else delete process.env.ORIGIN_CLAIM_GATES_V1_1;
 }
 

@@ -1,40 +1,37 @@
-import http from "node:http";
+import { GET } from "@/app/api/analyze-v1/route";
+import { NextRequest } from "next/server";
 
-function get(url: string): Promise<{ status: number; body: any }> {
-  return new Promise((resolve, reject) => {
-    http.get(url, (res) => {
-      const status = res.statusCode ?? 0;
-      let data = "";
-      res.on("data", (d) => (data += d));
-      res.on("end", () => {
-        try {
-          resolve({ status, body: JSON.parse(data) });
-        } catch (e) {
-          reject(e);
-        }
-      });
-    }).on("error", reject);
-  });
+function req(url: string) {
+  // NextRequest accepts a URL string in Node test env (Node 18+).
+  return new NextRequest(url);
 }
 
 describe("/api/analyze-v1 originClaim gates — query flag", () => {
-  test("ocg=1 enables gates for the request", async () => {
-    const base = "http://localhost:3000";
-    // assumes dev server is already running in this repo’s test harness,
-    // but if not, switch this to your existing spawn harness pattern.
-    const rOff = await get(`${base}/api/analyze-v1?word=father&mode=strict`);
-    const rOn = await get(`${base}/api/analyze-v1?word=father&mode=strict&ocg=1`);
+  it("ocg=1 enables gates for the request", async () => {
+    const r = req("http://localhost/api/analyze-v1?word=study&mode=strict&ocg=1");
+    const res = await GET(r);
 
-    expect(rOff.status).toBe(200);
-    expect(rOn.status).toBe(200);
+    expect(res.status).toBe(200);
 
-    // We only assert observables that exist in the contract:
-    expect(rOff.body.originClaim).toBeTruthy();
-    expect(rOn.body.originClaim).toBeTruthy();
+    const json = await res.json();
 
-    // Gates ON should be visible in policy (or any field you already expose)
-    // Adjust to your exact contract field:
-    const pOn = rOn.body.originClaim?.policy;
-    expect(pOn).toBeTruthy();
+    // Keep assertions minimal + stable.
+    // We only care that the request-level ocg flag flips gates ON in the response.
+    expect(json?.originClaimGates).toBeDefined();
+    expect(json.originClaimGates.flag).toBe("ocg");
+    expect(json.originClaimGates.active).toBe(true);
+  });
+
+  it("default (no ocg) keeps gates OFF", async () => {
+    const r = req("http://localhost/api/analyze-v1?word=study&mode=strict");
+    const res = await GET(r);
+
+    expect(res.status).toBe(200);
+
+    const json = await res.json();
+
+    expect(json?.originClaimGates).toBeDefined();
+    expect(json.originClaimGates.flag).toBe("ocg");
+    expect(json.originClaimGates.active === false || json.originClaimGates.active === null).toBe(true);
   });
 });
