@@ -13,6 +13,7 @@ import type {
   CandidateRowVM,
   DecompositionItemVM,
   MathTelemetryVM,
+  OriginClaimGatesVM,
   PresentOrMissing,
   RejectionItemVM,
   TelemetryViewModel,
@@ -355,8 +356,8 @@ export function adaptAnalysisToTelemetryVM(raw: unknown): TelemetryViewModel {
 
   const gatesActive = (oc && isRecord(oc.policy) && oc.policy.gatesActive === true) || (oc && oc.policy === "gates-v1.1");
 
-  const originClaimGates = {
-    active: gatesActive,
+  const originClaimGates: OriginClaimGatesVM = {
+    active: gatesActive ?? false,
     flag: "ocg" as const,
     candidateCount: (oc && Array.isArray(oc.candidates)) ? oc.candidates.length : 0,
     reasonCounts,
