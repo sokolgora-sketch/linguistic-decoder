@@ -11,6 +11,7 @@ import { AnalyzeWordResultV1ContractSchema } from "@/shared/analyzeWordResult.v1
 
 // ✅ Heart Instrument v1 (stable sub-object)
 import { buildHeartInstrumentV1 } from "@/v1/heartInstrument.v1";
+import { devFlagOriginClaimGatesFromUrl } from "@/shared/devFlags";
 
 const BodySchema = z
   .object({
@@ -20,6 +21,12 @@ const BodySchema = z
   })
   .passthrough();
 
+function applyDevOriginClaimGates(reqUrl: string) {
+  if (process.env.NODE_ENV === "production") return;
+  const on = devFlagOriginClaimGatesFromUrl(reqUrl);
+  if (on) process.env.ORIGIN_CLAIM_GATES_V1_1 = "1";
+  else delete process.env.ORIGIN_CLAIM_GATES_V1_1;
+}
 
 function buildEvidenceV1FromPayload(payload: any) {
   const voicePath = Array.isArray(payload?.primaryPath?.voicePath)
@@ -136,6 +143,8 @@ function contractFailResponse(params: { message: string; issues?: unknown; out?:
 }
 
 export async function POST(req: Request) {
+  applyDevOriginClaimGates(req.url);
+
   let body: unknown;
   try {
     body = await req.json();
@@ -209,7 +218,9 @@ export async function POST(req: Request) {
 }
 
 export async function GET(req: Request) {
-  const url = new URL(req.url);
+  applyDevOriginClaimGates(req.url);
+
+  const url = new URL(.url);
   const word = (url.searchParams.get("word") ?? "").trim();
   const mode = (url.searchParams.get("mode") ?? "").trim();
   const alphabet = (url.searchParams.get("alphabet") ?? "").trim();
