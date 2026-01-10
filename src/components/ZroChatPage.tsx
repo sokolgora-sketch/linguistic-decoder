@@ -68,6 +68,23 @@ export default function ZroChatPage() {
     { id: uid(), role: "assistant", text: "Type a word and press Analyze." },
   ]);
 
+  const errMsg = (e: unknown, fallback = "Request failed.") =>
+    e instanceof Error ? e.message : fallback;
+
+  const safeString = (v: unknown) => {
+    try {
+      return typeof v === "string" ? v : JSON.stringify(v, null, 2);
+    } catch {
+      return String(v);
+    }
+  };
+
+  const pickErr = (j: unknown): unknown => {
+    if (!j || typeof j !== "object") return null;
+    const o = j as Record<string, unknown>;
+    return o.error ?? o.message ?? null;
+  };
+
   async function run(wordRaw: string) {
     if (busy) return;
 
@@ -96,73 +113,40 @@ export default function ZroChatPage() {
       const res = await fetch(url, { method: "GET" });
       setDebug((d) => `${d}\nstatus=${res.status}`);
 
-
-      // Some tests/mock fetches don't implement res.text(); be defensive.
-
-
       let text = "";
-
-
       try {
-
-
         if (typeof res.text === "function") {
-
-
           text = await res.text();
-
-
         } else if (typeof res.json === "function") {
-
-
           const j = await res.json();
-
-
           text = JSON.stringify(j);
-
-
         } else {
-
-
           text = "";
-
-
         }
-
-
-      } catch (e) {
-
-
+      } catch (e: unknown) {
         text = "";
-
-
-        setDebug((d) => `${d}\nREAD BODY ERROR: ${String(e?.message || e)}`);
-
-
+        setDebug((d) => `${d}\nREAD BODY ERROR: ${errMsg(e, String(e))}`);
       }
 
+      setDebug((d) => `${d}\nbody[0..200]=${safeString(text).slice(0, 200).replace(/\s+/g, " ")}...`);
 
-      setDebug((d) => `${d}\nbody[0..200]=${String(text).slice(0, 200).replace(/\s+/g, " ")}...`);
-
-      let json: any = null;
+      let json: unknown = null;
       try {
         json = text ? JSON.parse(text) : null;
-      } catch (e: any) {
+      } catch (e: unknown) {
         json = null;
-        setDebug((d) => `${d}\nJSON.parse ERROR: ${String(e?.message || e)}`);
+        setDebug((d) => `${d}\nJSON.parse ERROR: ${errMsg(e, String(e))}`);
       }
 
       if (!res.ok) {
         setStatusBanner("Engine error");
 
-        const err =
-          (json && (json.error || json.message)) ||
-          `HTTP ${res.status}`;
+        const err = pickErr(json) ?? `HTTP ${res.status}`;
 
         setMessages((m) =>
           m.map((x) =>
             x.id === assistantMsg.id
-              ? { ...x, text: "Request failed.", error: String(err), result: json ?? undefined }
+              ? { ...x, text: "Request failed.", error: safeString(err), result: json ?? undefined }
               : x
           )
         );
@@ -176,14 +160,14 @@ export default function ZroChatPage() {
       );
 
       setDebug((d) => `${d}\nsetMessages(result)=ok`);
-    } catch (e: any) {
+    } catch (e: unknown) {
       setStatusBanner("Network error");
-      setDebug(`NET_ERR: ${String(e?.message || e)}`);
+      setDebug(`NET_ERR: ${errMsg(e, String(e))}`);
 
       setMessages((m) =>
         m.map((x) =>
           x.id === assistantMsg.id
-            ? { ...x, text: "Request failed.", error: e?.message || "Request failed." }
+            ? { ...x, text: "Request failed.", error: errMsg(e) }
             : x
         )
       );
@@ -325,7 +309,7 @@ export default function ZroChatPage() {
                             </div>
                             <CollapsibleContent>
                               <pre className="mt-2 text-xs whitespace-pre-wrap opacity-90">
-                                {JSON.stringify(result, null, 2)}
+                                {safeString(result)}
                               </pre>
                             </CollapsibleContent>
                           </Collapsible>
