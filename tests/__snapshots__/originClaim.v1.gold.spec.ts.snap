@@ -52,7 +52,11 @@ exports[`originClaim v1 — gold snapshots (originClaim block only) gold:damage 
   },
   "support": {
     "claimId": "oc:damage",
-    "refs": [],
+    "refs": [
+      "ref:candidates[albanian-dëm]",
+      "ref:candidates[latin-damnum]",
+      "ref:heart.math7.primary",
+    ],
   },
   "version": "v1",
 }
@@ -110,7 +114,11 @@ exports[`originClaim v1 — gold snapshots (originClaim block only) gold:father 
   },
   "support": {
     "claimId": "oc:father",
-    "refs": [],
+    "refs": [
+      "ref:candidates[albanian-atë]",
+      "ref:candidates[latin-pater]",
+      "ref:heart.math7.primary",
+    ],
   },
   "version": "v1",
 }
@@ -135,7 +143,9 @@ exports[`originClaim v1 — gold snapshots (originClaim block only) gold:hope 1`
   },
   "support": {
     "claimId": "oc:hope",
-    "refs": [],
+    "refs": [
+      "ref:heart.math7.primary",
+    ],
   },
   "version": "v1",
 }
@@ -193,7 +203,11 @@ exports[`originClaim v1 — gold snapshots (originClaim block only) gold:love 1`
   },
   "support": {
     "claimId": "oc:love",
-    "refs": [],
+    "refs": [
+      "ref:candidates[albanian-dashuri]",
+      "ref:candidates[latin-amor]",
+      "ref:heart.math7.primary",
+    ],
   },
   "version": "v1",
 }
@@ -251,7 +265,11 @@ exports[`originClaim v1 — gold snapshots (originClaim block only) gold:study 1
   },
   "support": {
     "claimId": "oc:study",
-    "refs": [],
+    "refs": [
+      "ref:candidates[albanian-studim]",
+      "ref:candidates[latin-studium]",
+      "ref:heart.math7.primary",
+    ],
   },
   "version": "v1",
 }
