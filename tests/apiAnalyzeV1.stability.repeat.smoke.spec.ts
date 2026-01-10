@@ -102,6 +102,7 @@ describe("/api/analyze-v1 stability (repeat GET)", () => {
     try {
       await waitForHttpReady(`${BASE}/api/analyze-v1?word=study&mode=strict`);
     } catch (e) {
+      // eslint-disable-next-line no-console
       console.error("Dev server failed to become ready. Last logs:\n", logs.slice(-4000));
       throw e;
     }
