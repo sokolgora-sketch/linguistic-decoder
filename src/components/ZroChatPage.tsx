@@ -12,13 +12,67 @@ import { InstrumentPanel } from "@/ui/instrument/InstrumentPanel";
 
 type Msg =
   | { id: string; role: "user"; text: string }
-  | { id: string; role: "assistant"; text: string; result?: any; error?: string };
+  | { id: string; role: "assistant"; text: string; result?: unknown; error?: string };
 
 function uid() {
   return Math.random().toString(16).slice(2) + Date.now().toString(16);
 }
 
-function splitVowelPath(vowelPath: unknown): string[] {
+type Obj = Record<string, unknown>;
+
+function asObj(v: unknown): Obj | null {
+  return v && typeof v === "object" ? (v as Obj) : null;
+}
+
+function get(o: Obj | null, key: string): unknown {
+  return o ? o[key] : undefined;
+}
+
+function getStr(o: Obj | null, key: string): string | null {
+  const v = get(o, key);
+  return typeof v === "string" ? v : null;
+}
+
+function firstCandidate(result: unknown): Obj | null {
+  const r = asObj(result);
+  const cands = get(r, "candidates");
+  if (!Array.isArray(cands) || cands.length < 1) return null;
+  return asObj(cands[0]);
+}
+
+function pickVowelPath(result: unknown): string | null {
+  const r = asObj(result);
+  const c0 = firstCandidate(result);
+  return (
+    getStr(r, "vowelPath") ??
+    getStr(r, "vowel_path") ??
+    getStr(c0, "vowelPath") ??
+    getStr(c0, "vowel_path")
+  );
+}
+
+function pickEngineVersion(result: unknown): string | null {
+  const r = asObj(result);
+  const meta = asObj(get(r, "meta"));
+  return (
+    getStr(r, "engineVersion") ??
+    getStr(r, "engine_version") ??
+    getStr(meta, "engineVersion")
+  );
+}
+
+function pickTopCandidateLang(result: unknown): string {
+  const c0 = firstCandidate(result);
+  return getStr(c0, "language") ?? getStr(c0, "lang") ?? "unknown";
+}
+
+function pickWordShown(result: unknown): string {
+  const r = asObj(result);
+  return getStr(r, "word") ?? getStr(r, "normalizedWord") ?? "";
+}
+
+
+function splitVowelPath(vowelPath: string | null): string[] {
   if (typeof vowelPath !== "string") return [];
   return vowelPath
     .split(/[-–—→\s]+/g)
@@ -244,19 +298,10 @@ export default function ZroChatPage() {
             const isUser = m.role === "user";
             const result = m.role === "assistant" ? m.result : undefined;
 
-            const vowelPath =
-              result?.candidates?.[0]?.vowelPath ??
-              result?.candidates?.[0]?.vowel_path ??
-              result?.vowelPath ??
-              result?.vowel_path;
-
-            const engineVersion =
-              result?.engineVersion ?? result?.engine_version ?? result?.meta?.engineVersion;
-
-            const candidateLang =
-              result?.candidates?.[0]?.language ?? result?.candidates?.[0]?.lang ?? "unknown";
-
-            const wordShown = result?.word ?? result?.normalizedWord ?? "";
+            const vowelPath = pickVowelPath(result);
+            const engineVersion = pickEngineVersion(result);
+            const candidateLang = pickTopCandidateLang(result);
+            const wordShown = pickWordShown(result);
 
             const chips = splitVowelPath(vowelPath);
 
