@@ -1,6 +1,6 @@
 // src/shared/originClaim.builder.v1.ts
 import { buildOriginClaimSupportStub } from "@/engine/originClaimSupport.stub";
-
+import type { OriginClaimSupportSeedV1 } from "./originClaimSupport.v1";
 
 import {
   OriginClaimV1,
@@ -408,19 +408,20 @@ export function buildOriginClaimV1(result: AnalyzeWordResultV1Like): OriginClaim
   built.sort(sortCandidates);
 
   const conf = summaryConfidence(built);
+
+  const supportSeed: OriginClaimSupportSeedV1 = {
+    hasHeartMath7Primary: !!result?.heart?.math7?.primary,
+    hasEvidenceSignals: Array.isArray((result as any)?.evidence?.signals) && (result as any).evidence.signals.length > 0,
+    candidateIds: rawCandidates.map((c: any) => safeStr(c.id)).filter(Boolean),
+    deepRootFunctionalRootIds: Array.isArray((result as any)?.deepRoot?.functionalRoots)
+      ? (result as any).deepRoot.functionalRoots.map((fr: any) => String(fr.id)).filter(Boolean)
+      : [],
+  };
+
   const originClaim: OriginClaimV1 = {
     version: "v1",
     policy: "no_single_winner",
-    // Support is structural-only (no inference). Always deterministic.
-    // claimId is a stable anchor derived from the request word.
-    support: buildOriginClaimSupportStub(`oc:${word}`),
-
-    // Support is structural-only (no inference). Always deterministic.
-    // claimId is a stable anchor derived from the request word.
-
-    // Support is structural-only (no inference). Always deterministic.
-    // claimId is a stable anchor derived from the request word.
-
+    support: buildOriginClaimSupportStub(`oc:${word}`, supportSeed),
     candidates: built,
     summary: {
       confidence: conf,

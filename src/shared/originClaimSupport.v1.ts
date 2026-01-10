@@ -1,21 +1,24 @@
 // src/shared/originClaimSupport.v1.ts
-// OriginClaim Support Bundle v1 — structural refs only (no inference)
+
+export type OriginClaimSupportRef = `ref:${string}`;
+
+export interface OriginClaimSupportBundle {
+  claimId: string;
+  refs: OriginClaimSupportRef[];
+}
 
 /**
- * A minimal, deterministic "wiring surface" for future evidence linkage.
- * - MUST remain structural-only: references, ids, pointers.
- * - MUST NOT contain computed scores, rankings, or inferred claims.
+ * Minimal, structural seed. No inference.
+ * The builder decides refs purely from presence/ids.
  */
-export interface OriginClaimSupportBundle {
-  /**
-   * Stable anchor id for the claim block, derived from request word
-   * (e.g. "oc:study"). This is NOT a candidate id.
-   */
-  claimId: string;
+export interface OriginClaimSupportSeedV1 {
+  hasHeartMath7Primary: boolean;
+  hasEvidenceSignals: boolean;
+  candidateIds: string[];              // e.g. ["latin-studium", "albanian-studim"]
+  deepRootFunctionalRootIds: string[]; // e.g. ["sq.shtu+di.v1"]
+}
 
-  /**
-   * Stable pointers to existing evidence nodes already present in the result model.
-   * v1 starts empty; later milestones will populate.
-   */
-  refs: string[];
+export function ocRef(path: string): OriginClaimSupportRef {
+  // Normalize to "ref:<path>" exactly once.
+  return (`ref:${path.replace(/^ref:/, "")}`) as OriginClaimSupportRef;
 }

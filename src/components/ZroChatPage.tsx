@@ -21,7 +21,7 @@ function uid() {
 function splitVowelPath(vowelPath: unknown): string[] {
   if (typeof vowelPath !== "string") return [];
   return vowelPath
-    .split(/[-–—\s]+/g)
+    .split(/[-–—→\s]+/g)
     .map((s) => s.trim())
     .filter(Boolean);
 }
@@ -61,6 +61,9 @@ export default function ZroChatPage() {
   const [validation, setValidation] = React.useState<string | null>(null);
   const [statusBanner, setStatusBanner] = React.useState<string | null>(null);
 
+  // proof-of-life debug (visible in UI)
+  const [debug, setDebug] = React.useState<string>("");
+
   const [messages, setMessages] = React.useState<Msg[]>([
     { id: uid(), role: "assistant", text: "Type a word and press Analyze." },
   ]);
@@ -73,6 +76,7 @@ export default function ZroChatPage() {
     if (!word) {
       setValidation("Type a word before analyzing.");
       setStatusBanner(null);
+      setDebug("validation: empty word");
       return;
     }
 
@@ -85,16 +89,67 @@ export default function ZroChatPage() {
     setMessages((m) => [...m, userMsg, assistantMsg]);
     setBusy(true);
 
+    const url = `/api/analyze-v1?word=${encodeURIComponent(word)}&mode=strict`;
+    setDebug(`clicked → url=${url}`);
+
     try {
-      const res = await fetch(`/api/analyze-v1?word=${encodeURIComponent(word)}`, {
-        method: "GET",
-      });
+      const res = await fetch(url, { method: "GET" });
+      setDebug((d) => `${d}\nstatus=${res.status}`);
+
+
+      // Some tests/mock fetches don't implement res.text(); be defensive.
+
+
+      let text = "";
+
+
+      try {
+
+
+        if (typeof res.text === "function") {
+
+
+          text = await res.text();
+
+
+        } else if (typeof res.json === "function") {
+
+
+          const j = await res.json();
+
+
+          text = JSON.stringify(j);
+
+
+        } else {
+
+
+          text = "";
+
+
+        }
+
+
+      } catch (e) {
+
+
+        text = "";
+
+
+        setDebug((d) => `${d}\nREAD BODY ERROR: ${String(e?.message || e)}`);
+
+
+      }
+
+
+      setDebug((d) => `${d}\nbody[0..200]=${String(text).slice(0, 200).replace(/\s+/g, " ")}...`);
 
       let json: any = null;
       try {
-        json = await res.json();
-      } catch {
+        json = text ? JSON.parse(text) : null;
+      } catch (e: any) {
         json = null;
+        setDebug((d) => `${d}\nJSON.parse ERROR: ${String(e?.message || e)}`);
       }
 
       if (!res.ok) {
@@ -119,8 +174,11 @@ export default function ZroChatPage() {
           x.id === assistantMsg.id ? { ...x, text: "Result:", result: json ?? undefined } : x
         )
       );
+
+      setDebug((d) => `${d}\nsetMessages(result)=ok`);
     } catch (e: any) {
       setStatusBanner("Network error");
+      setDebug(`NET_ERR: ${String(e?.message || e)}`);
 
       setMessages((m) =>
         m.map((x) =>
@@ -145,19 +203,21 @@ export default function ZroChatPage() {
             setInput(e.target.value);
             setValidation(null);
             setStatusBanner(null);
+            setDebug("");
           }}
           placeholder="study"
           onKeyDown={(e) => {
             if (e.key === "Enter") {
               e.preventDefault();
-              run(input);
+              void run(input);
             }
           }}
           className="h-11"
         />
         <Button
+          type="button"
           className="h-11"
-          onClick={() => run(input)}
+          onClick={() => void run(input)}
           disabled={busy}
           aria-busy={busy ? "true" : "false"}
         >
@@ -170,17 +230,16 @@ export default function ZroChatPage() {
   return (
     <ChatShell title="ZË-RO" subtitle="Seven-vowel word decoder." composer={composer}>
       <div className="space-y-4">
-        {validation && (
+        {(validation || statusBanner) && (
           <div role="alert" className="text-sm text-red-400">
-            {validation}
+            {validation || statusBanner}
           </div>
         )}
 
-        {statusBanner && (
-          <div role="alert" className="text-sm text-red-400">
-            {statusBanner}
-          </div>
-        )}
+        {/* proof-of-life debug output */}
+        {debug ? (
+          <pre className="mt-2 text-xs opacity-80 whitespace-pre-wrap">{debug}</pre>
+        ) : null}
 
         <div className="mb-6" />
 
@@ -188,7 +247,9 @@ export default function ZroChatPage() {
           <CardContent className="py-4 space-y-3">
             <div className="flex items-center justify-between gap-3">
               <div className="text-sm font-medium">Voices</div>
-              <div className="text-xs text-muted-foreground">Shown in ring order (not A/E/I/O/U/Y/Ë)</div>
+              <div className="text-xs text-muted-foreground">
+                Shown in ring order (not A/E/I/O/U/Y/Ë)
+              </div>
             </div>
             <VoiceRow />
           </CardContent>
@@ -213,60 +274,61 @@ export default function ZroChatPage() {
 
             const wordShown = result?.word ?? result?.normalizedWord ?? "";
 
+            const chips = splitVowelPath(vowelPath);
+
             return (
               <div key={m.id} className={isUser ? "flex justify-end" : "flex justify-start"}>
-                <div className="w-full max-w-3xl">
+                <div className="w-full max-w-6xl">
                   <Card className={isUser ? "border-muted" : ""}>
                     <CardContent className="py-4 space-y-3">
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="text-xs text-muted-foreground">{isUser ? "You" : "ZË-RO"}</div>
-                        {engineVersion ? (
-                          <Badge variant="outline" className="text-[11px]">
-                            {String(engineVersion)}
-                          </Badge>
-                        ) : null}
-                      </div>
+                      <div className="text-sm whitespace-pre-wrap">{m.text}</div>
 
-                      <div className={isUser ? "text-base font-medium" : "text-sm"}>{m.text}</div>
-
-                      {m.role === "assistant" && (m as any).error ? (
-                        <div className="text-sm text-red-400">{(m as any).error}</div>
+                      {m.role === "assistant" && m.error ? (
+                        <div className="text-sm text-red-400 whitespace-pre-wrap">{m.error}</div>
                       ) : null}
 
-                      {m.role === "assistant" && result ? (
+                      {result ? (
                         <>
                           <Separator />
+
+                          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <div>
+                              <div className="text-xs text-muted-foreground">Word</div>
+                              <div className="text-sm font-medium">{wordShown || "—"}</div>
+                            </div>
+                            <div>
+                              <div className="text-xs text-muted-foreground">Engine</div>
+                              <div className="text-sm font-medium">{engineVersion || "—"}</div>
+                            </div>
+                            <div>
+                              <div className="text-xs text-muted-foreground">Top candidate</div>
+                              <div className="text-sm font-medium">{candidateLang || "—"}</div>
+                            </div>
+                          </div>
+
+                          <div>
+                            <div className="text-xs text-muted-foreground">Vowel path</div>
+                            <VowelChips path={chips} />
+                          </div>
+
+                          <Separator />
+
                           <InstrumentPanel payload={result} />
-                          <div className="grid gap-3">
-                            <div className="flex flex-wrap items-center gap-2">
-                              <Badge variant="secondary" className="text-xs">
-                                Candidate: {String(candidateLang)}
-                              </Badge>
-                              {wordShown ? (
-                                <Badge variant="secondary" className="text-xs">
-                                  Word: {String(wordShown)}
-                                </Badge>
-                              ) : null}
-                            </div>
 
-                            <div className="space-y-1">
-                              <div className="text-xs text-muted-foreground">Vowel path</div>
-                              <VowelChips path={splitVowelPath(vowelPath)} />
-                            </div>
-
-                            <Collapsible open={showRaw} onOpenChange={setShowRaw}>
+                          <Collapsible open={showRaw} onOpenChange={setShowRaw}>
+                            <div className="flex items-center justify-between">
                               <CollapsibleTrigger asChild>
-                                <Button variant="ghost" size="sm" className="justify-start px-0">
-                                  {showRaw ? "Hide raw JSON" : "Show raw JSON"}
+                                <Button type="button" variant="secondary" size="sm">
+                                  {showRaw ? "Hide raw" : "Show raw"}
                                 </Button>
                               </CollapsibleTrigger>
-                              <CollapsibleContent>
-                                <pre className="mt-2 rounded-md border bg-muted/20 p-3 text-xs overflow-auto">
-{JSON.stringify(result, null, 2)}
-                                </pre>
-                              </CollapsibleContent>
-                            </Collapsible>
-                          </div>
+                            </div>
+                            <CollapsibleContent>
+                              <pre className="mt-2 text-xs whitespace-pre-wrap opacity-90">
+                                {JSON.stringify(result, null, 2)}
+                              </pre>
+                            </CollapsibleContent>
+                          </Collapsible>
                         </>
                       ) : null}
                     </CardContent>
