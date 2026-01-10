@@ -13,7 +13,7 @@ import http from "node:http";
 jest.setTimeout(180_000);
 
 const PORT = 3012; // Using a different port from other tests
-const BASE = `http://localhost:${PORT}`;
+const BASE = `http://127.0.0.1:${PORT}`;
 
 // Helper to make HTTP requests and parse JSON, adapted from other tests
 async function getJson(url: string, method = "GET", body: any = null) {
@@ -76,6 +76,7 @@ function curlJson(url: string) {
 
 describe("/api/analyze-v1 stability (repeat GET)", () => {
   let proc: ReturnType<typeof spawn> | null = null;
+  let logs = "";
 
   beforeAll(async () => {
     // Use "next start" on a built app if you want max realism.
@@ -83,18 +84,53 @@ describe("/api/analyze-v1 stability (repeat GET)", () => {
     proc = spawn("npm", ["run", "dev", "--", "-p", String(PORT)], {
       env: { ...process.env, PORT: String(PORT) },
       stdio: ["ignore", "pipe", "pipe"],
+      detached: process.platform !== "win32",
+    });
+
+    // IMPORTANT: drain pipes or the child can stall and never become ready.
+    proc.stdout?.setEncoding("utf8");
+    proc.stderr?.setEncoding("utf8");
+    proc.stdout?.on("data", (d) => {
+      logs += d;
+      if (logs.length > 200000) logs = logs.slice(-200000);
+    });
+    proc.stderr?.on("data", (d) => {
+      logs += d;
+      if (logs.length > 200000) logs = logs.slice(-200000);
     });
     // Wait for server to be ready
-    await waitForHttpReady(`${BASE}/api/analyze-v1?word=study&mode=strict`);
+    try {
+      await waitForHttpReady(`${BASE}/api/analyze-v1?word=study&mode=strict`);
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error("Dev server failed to become ready. Last logs:\n", logs.slice(-4000));
+      throw e;
+    }
   }, 180_000);
 
   afterAll(async () => {
     if (!proc) return;
-    proc.kill("SIGTERM");
+
+    // Graceful stop first
+    try { proc.kill("SIGTERM"); } catch {}
+
+    // Give it a moment to exit
+    await new Promise((r) => setTimeout(r, 1500));
+
+    // If still alive, kill hard. On *nix, kill the whole process group.
+    if (proc.exitCode == null) {
+      try {
+        if (process.platform !== "win32" && proc.pid) {
+          process.kill(-proc.pid, "SIGKILL");
+        } else {
+          proc.kill("SIGKILL");
+        }
+      } catch {}
+    }
+
     proc = null;
   }, 60_000);
-
-  it("returns valid JSON and stable critical fields across repeats", () => {
+it("returns valid JSON and stable critical fields across repeats", () => {
     const url = `${BASE}/api/analyze-v1?word=study&mode=strict`;
 
     const N = 10;
