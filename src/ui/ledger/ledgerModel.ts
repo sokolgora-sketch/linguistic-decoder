@@ -49,7 +49,7 @@ function mergeSignalsAndNotes(
   return { state: 'missing', items: [] };
 }
 
-const MISSING_UNAVAILABLE: PresentOrMissing<string[]> = { kind: 'missing', missing: 'unavailable' };
+const MISSING_UNAVAILABLE: PresentOrMissing<string[]> = { kind: 'missing', missing: 'none' };
 
 /**
  * v0.1.1: Build the Evidence/Ops ledger model from the Telemetry VM only.

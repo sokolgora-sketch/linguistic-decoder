@@ -12,7 +12,7 @@ import { Separator } from '@/components/ui/separator';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { InstrumentPanel } from '@/ui/instrument/InstrumentPanel';
 
-function safeBuildTelemetryVm(result: unknown): TelemetryViewModel | null {
+function safeBuildTelemetryVm(result: unknown): unknown {
   try {
     return buildInstrumentVmV1(result as any);
   } catch {
@@ -33,14 +33,7 @@ function isTelemetryVmWithEvidence(vm: unknown): vm is TelemetryViewModel {
 
 type Msg =
   | { id: string; role: 'user'; text: string }
-  | {
-      id: string;
-      role: 'assistant';
-      text: string;
-      result?: unknown;
-      error?: string;
-      telemetryVm?: TelemetryViewModel | null;
-    };
+  | { id: string; role: 'assistant'; text: string; result?: unknown; error?: string; telemetryVm?: unknown };
 
 function uid() {
   return Math.random().toString(16).slice(2) + Date.now().toString(16);
