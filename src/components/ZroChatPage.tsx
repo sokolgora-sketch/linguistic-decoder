@@ -1,7 +1,8 @@
 'use client';
 
 import React from 'react';
-import { adaptAnalysisToTelemetryVM } from '@/ui/instrument/contractAdapter';
+import { buildInstrumentVmV1 } from '@/ui/instrument/instrumentVm.v1';
+import type { TelemetryViewModel } from '@/ui/instrument/types';
 import ChatShell from '@/components/ChatShell';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,6 +11,25 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { InstrumentPanel } from '@/ui/instrument/InstrumentPanel';
+
+function safeBuildTelemetryVm(result: unknown): unknown {
+  try {
+    return buildInstrumentVmV1(result as any);
+  } catch {
+    return null;
+  }
+}
+
+function isTelemetryVmWithEvidence(vm: unknown): vm is TelemetryViewModel {
+  const v = vm as any;
+  return (
+    !!v &&
+    typeof v === 'object' &&
+    !!v.evidence &&
+    Array.isArray(v.evidence.normalizationSteps) &&
+    Array.isArray(v.evidence.ops)
+  );
+}
 
 type Msg =
   | { id: string; role: 'user'; text: string }
@@ -180,7 +200,13 @@ export default function ZroChatPage() {
         setMessages(m =>
           m.map(x =>
             x.id === assistantMsg.id
-              ? { ...x, text: 'Request failed.', error: safeString(err), result: json ?? undefined, telemetryVm: adaptAnalysisToTelemetryVM(json) }
+              ? {
+                  ...x,
+                  text: 'Request failed.',
+                  error: safeString(err),
+                  result: json ?? undefined,
+                  telemetryVm: json ? safeBuildTelemetryVm(json) : null,
+                }
               : x
           )
         );
@@ -194,7 +220,7 @@ export default function ZroChatPage() {
                 ...x,
                 text: 'Result:',
                 result: json ?? undefined,
-                telemetryVm: adaptAnalysisToTelemetryVM(json),
+                telemetryVm: json ? safeBuildTelemetryVm(json) : null,
               }
             : x
         )
@@ -278,24 +304,36 @@ export default function ZroChatPage() {
 
         <div className='space-y-3'>
           {messages.map(m => {
-            const isUser = m.role === 'user';
-            const result = m.role === 'assistant' ? m.result : undefined;
+            if (m.role === 'user') {
+              return (
+                <div key={m.id} className='flex justify-end'>
+                  <div className='w-full max-w-6xl'>
+                    <Card className='border-muted'>
+                      <CardContent className='py-4 space-y-3'>
+                        <div className='text-sm whitespace-pre-wrap'>{m.text}</div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </div>
+              );
+            }
 
+            // Assistant messages
+            const result = m.result;
             const vowelPath = pickVowelPath(result);
             const engineVersion = pickEngineVersion(result);
             const candidateLang = pickTopCandidateLang(result);
             const wordShown = pickWordShown(result);
-
             const chips = splitVowelPath(vowelPath);
 
             return (
-              <div key={m.id} className={isUser ? 'flex justify-end' : 'flex justify-start'}>
+              <div key={m.id} className='flex justify-start'>
                 <div className='w-full max-w-6xl'>
-                  <Card className={isUser ? 'border-muted' : ''}>
+                  <Card>
                     <CardContent className='py-4 space-y-3'>
                       <div className='text-sm whitespace-pre-wrap'>{m.text}</div>
 
-                      {m.role === 'assistant' && m.error ? (
+                      {m.error ? (
                         <div className='text-sm text-red-400 whitespace-pre-wrap'>{m.error}</div>
                       ) : null}
 
@@ -324,8 +362,8 @@ export default function ZroChatPage() {
 
                           <Separator />
 
-                          {m.role === 'assistant' && 'telemetryVm' in m && m.telemetryVm ? (
-                            <InstrumentPanel vm={m.telemetryVm as any} />
+                          {isTelemetryVmWithEvidence(m.telemetryVm) ? (
+                            <InstrumentPanel vm={m.telemetryVm} />
                           ) : null}
 
                           <Collapsible open={showRaw} onOpenChange={setShowRaw}>

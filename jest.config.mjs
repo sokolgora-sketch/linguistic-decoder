@@ -18,6 +18,12 @@ const customJestConfig = {
   },
 
   testMatch: ["<rootDir>/tests/**/*.spec.(ts|tsx)"],
+
+  // CI safety: exclude the two Next spin-up smoke tests from unit test runs.
+  // They still run under `npm run test:integration`.
+  testPathIgnorePatterns: [
+    "<rootDir>/tests/apiAnalyzeV1\\.(evidence\\.smoke\\.curl|stability\\.repeat\\.smoke)\\.spec\\.ts$",
+  ],
 };
 
 export default createJestConfig(customJestConfig);

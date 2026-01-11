@@ -12,6 +12,7 @@
     "typecheck": "tsc -p tsconfig.stress.json --noEmit",
     "typecheck:full": "tsc --noEmit",
     "test": "jest -c jest.config.mjs",
+    "test:integration": "jest -c jest.integration.config.mjs",
     "test:auth": "tsx src/scripts/test-firebase-auth.ts",
     "eval": "tsx scripts/eval.ts --file=data/gold/dialect.json",
     "eval:gold": "tsx scripts/eval-gold.ts",
