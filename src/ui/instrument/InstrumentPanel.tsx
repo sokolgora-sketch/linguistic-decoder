@@ -1,11 +1,10 @@
 'use client';
 
 import React from 'react';
+import { adaptAnalysisToTelemetryVM } from "@/ui/instrument/contractAdapter";
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-
-import { adaptAnalysisToTelemetryVM } from "@/ui/instrument/contractAdapter";
 import { toPrettyJson } from "@/ui/instrument/prettyJson";
 import { ReadoutCard } from './sections/ReadoutCard';
 import { MeaningCard } from "./sections/MeaningCard";
@@ -15,18 +14,34 @@ import { buildCandidateRowsFromVM } from '../candidates/candidateModel';
 import { CandidatesAccordion } from '../candidates/CandidatesAccordion';
 import { OriginClaimCard } from '@/components/OriginClaimCard';
 
-type Props = {
-  /** Raw /api/analyze-v1 payload (unknown shape). We adapt it, never trust it. */
-  payload: unknown;
-};
+type Props =
+  | {
+      /** Raw /api/analyze-v1 payload (unknown shape). We adapt it, never trust it. */
+      payload: unknown;
+      vm?: never;
+    }
+  | {
+      /** Telemetry VM (already adapted). VM-only boundary for callers like ZroChatPage. */
+      vm: any;
+      payload?: never;
+    };
 
 function fmt<T>(x: { kind: 'present'; value: T } | { kind: 'missing'; missing: string; note?: string }) {
   return x.kind === 'present' ? String(x.value) : 'not_emitted';
 }
 
-export function InstrumentPanel({ payload }: Props) {
+export function InstrumentPanel(props: Props) {
   const { toast } = useToast();
-  const vm = React.useMemo(() => adaptAnalysisToTelemetryVM(payload), [payload]);
+
+  
+  const inputVm = "vm" in props ? props.vm : undefined;
+  const inputPayload = "payload" in props ? props.payload : undefined;
+
+  const vm = React.useMemo(() => {
+    if (inputVm) return inputVm;
+    return adaptAnalysisToTelemetryVM(inputPayload);
+  }, [inputVm, inputPayload]);
+
   const ledgerModel = React.useMemo(() => buildEvidenceLedgerModelFromVM(vm), [vm]);
   const candidateRows = React.useMemo(() => buildCandidateRowsFromVM(vm), [vm]);
 
