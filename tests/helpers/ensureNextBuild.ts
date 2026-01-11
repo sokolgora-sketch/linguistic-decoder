@@ -1,33 +1,40 @@
-
-import fs from "node:fs";
-import path from "node:path";
-import process from "node:process";
-import { execSync } from "node:child_process";
-
 /**
- * CI-safe preflight for tests that spawn `next start`.
+ * Helper to ensure a valid Next.js production build exists for `next start`.
  *
- * In clean CI checkouts, `.next/` often does not exist, so `next start`
- * crashes (ENOENT) looking for build manifests (e.g. pages-manifest.json).
- *
- * This helper ensures a production build exists before starting the server.
+ * IMPORTANT:
+ * - `next start` requires `.next/BUILD_ID`.
+ * - `.next/build-manifest.json` alone is NOT sufficient (can exist from partial/incomplete builds).
  */
-export function ensureNextBuild(cwd: string) {
-  const nextDir = path.join(cwd, ".next");
-  const pagesManifest = path.join(nextDir, "server", "pages-manifest.json");
-  const appBuildManifest = path.join(nextDir, "app-build-manifest.json");
-  const buildManifest = path.join(nextDir, "build-manifest.json");
 
-  const hasBuild =
-    fs.existsSync(pagesManifest) ||
-    fs.existsSync(appBuildManifest) ||
-    fs.existsSync(buildManifest);
+import { execSync } from "node:child_process";
+import { statSync } from "node:fs";
 
-  if (hasBuild) return;
+let hasBuilt = false;
 
-  execSync("npm run build", {
-    cwd,
-    stdio: "inherit",
-    env: { ...process.env, NODE_ENV: "production" },
-  });
+function exists(p: string): boolean {
+  try {
+    statSync(p);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export async function ensureNextBuild() {
+  if (hasBuilt) return;
+
+  const ok = exists(".next/BUILD_ID") && exists(".next/build-manifest.json");
+
+  if (ok) {
+    console.log("Skipping build, .next/BUILD_ID + build-manifest.json already exist.");
+  } else {
+    console.log("Running `npm run build` for integration tests...");
+    execSync("npm run build", { stdio: "inherit" });
+
+    if (!exists(".next/BUILD_ID")) {
+      throw new Error("next build completed but .next/BUILD_ID is missing");
+    }
+  }
+
+  hasBuilt = true;
 }
