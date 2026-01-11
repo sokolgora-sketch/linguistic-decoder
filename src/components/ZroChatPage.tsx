@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { buildInstrumentVmV1 } from "@/ui/instrument/instrumentVm.v1";
 import ChatShell from "@/components/ChatShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -299,8 +300,14 @@ export default function ZroChatPage() {
             const result = m.role === "assistant" ? m.result : undefined;
 
             const vowelPath = pickVowelPath(result);
+
             const engineVersion = pickEngineVersion(result);
+
+            const instrumentVm = buildInstrumentVmV1(result);
+            void instrumentVm;
+
             const candidateLang = pickTopCandidateLang(result);
+
             const wordShown = pickWordShown(result);
 
             const chips = splitVowelPath(vowelPath);
