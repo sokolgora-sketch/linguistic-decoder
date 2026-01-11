@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { InstrumentPanel } from "@/ui/instrument/InstrumentPanel";
+import { adaptAnalysisToTelemetryVM } from "@/ui/instrument/contractAdapter";
 
 type Msg =
   | { id: string; role: "user"; text: string }
@@ -304,7 +305,7 @@ export default function ZroChatPage() {
             const engineVersion = pickEngineVersion(result);
 
             const instrumentVm = buildInstrumentVmV1(result);
-            void instrumentVm;
+            const telemetryVm = adaptAnalysisToTelemetryVM(result);
 
             const candidateLang = pickTopCandidateLang(result);
 
@@ -349,7 +350,7 @@ export default function ZroChatPage() {
 
                           <Separator />
 
-                          <InstrumentPanel payload={result} />
+                          <InstrumentPanel vm={telemetryVm} />
 
                           <Collapsible open={showRaw} onOpenChange={setShowRaw}>
                             <div className="flex items-center justify-between">
