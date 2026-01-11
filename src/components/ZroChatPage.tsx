@@ -299,19 +299,16 @@ export default function ZroChatPage() {
             const isUser = m.role === "user";
             const result = m.role === "assistant" ? m.result : undefined;
 
-            const vowelPath =
-              result?.candidates?.[0]?.vowelPath ??
-              result?.candidates?.[0]?.vowel_path ??
-              result?.vowelPath ??
-              result?.vowel_path;
+            const vowelPath = pickVowelPath(result);
 
-            const engineVersion =
-              result?.engineVersion ?? result?.engine_version ?? result?.meta?.engineVersion;
+            const engineVersion = pickEngineVersion(result);
 
-            const candidateLang =
-              result?.candidates?.[0]?.language ?? result?.candidates?.[0]?.lang ?? "unknown";
+            const instrumentVm = buildInstrumentVmV1(result);
+            void instrumentVm;
 
-            const wordShown = result?.word ?? result?.normalizedWord ?? "";
+            const candidateLang = pickTopCandidateLang(result);
+
+            const wordShown = pickWordShown(result);
 
             const chips = splitVowelPath(vowelPath);
 
