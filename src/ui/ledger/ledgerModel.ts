@@ -1,9 +1,9 @@
 // src/ui/ledger/ledgerModel.ts
-import type { PresentOrMissing, TelemetryViewModel } from "../instrument/types";
+import type { PresentOrMissing, TelemetryViewModel } from '../instrument/types';
 
-export type LedgerState = "present" | "none" | "missing";
+export type LedgerState = 'present' | 'none' | 'missing';
 
-export type LedgerSectionKey = "normalization" | "ops" | "signals";
+export type LedgerSectionKey = 'normalization' | 'ops' | 'signals';
 
 export interface LedgerSection {
   key: LedgerSectionKey;
@@ -21,14 +21,12 @@ export interface EvidenceLedgerModel {
 // ---- helpers (VM-first) ----
 
 function stateFromPOMArray(x: PresentOrMissing<string[]>): { state: LedgerState; items: string[] } {
-  if (x.kind === "present") {
-    if (x.value.length === 0) return { state: "none", items: [] };
-    return { state: "present", items: x.value };
+  if (x.kind === 'present') {
+    if (x.value.length === 0) return { state: 'none', items: [] };
+    return { state: 'present', items: x.value };
   }
   // missing
-  return x.missing === "none"
-    ? { state: "none", items: [] }
-    : { state: "missing", items: [] };
+  return x.missing === 'none' ? { state: 'none', items: [] } : { state: 'missing', items: [] };
 }
 
 /**
@@ -43,45 +41,49 @@ function mergeSignalsAndNotes(
   const n = stateFromPOMArray(notes);
 
   // If either is present with items, present wins.
-  const items = [...(s.state === "present" ? s.items : []), ...(n.state === "present" ? n.items : [])];
-  if (items.length > 0) return { state: "present", items };
+  const items = [...(s.state === 'present' ? s.items : []), ...(n.state === 'present' ? n.items : [])];
+  if (items.length > 0) return { state: 'present', items };
 
   // If neither present: if either is "none", treat as none; else missing.
-  if (s.state === "none" || n.state === "none") return { state: "none", items: [] };
-  return { state: "missing", items: [] };
+  if (s.state === 'none' || n.state === 'none') return { state: 'none', items: [] };
+  return { state: 'missing', items: [] };
 }
+
+const MISSING_UNAVAILABLE: PresentOrMissing<string[]> = { kind: 'missing', missing: 'unavailable' };
 
 /**
  * v0.1.1: Build the Evidence/Ops ledger model from the Telemetry VM only.
  * This enforces: evidence is authority, and missing is explicit.
  */
 export function buildEvidenceLedgerModelFromVM(vm: TelemetryViewModel): EvidenceLedgerModel {
-  const norm = stateFromPOMArray(vm.evidence.normalizationSteps);
-  const ops = stateFromPOMArray(vm.evidence.ops);
-  const sig = mergeSignalsAndNotes(vm.evidence.signals, vm.evidence.notes);
+  const e = vm.evidence;
+
+  const norm = stateFromPOMArray(e?.normalizationSteps ?? MISSING_UNAVAILABLE);
+  const ops = stateFromPOMArray(e?.ops ?? MISSING_UNAVAILABLE);
+  const sig = mergeSignalsAndNotes(e?.signals ?? MISSING_UNAVAILABLE, e?.notes ?? MISSING_UNAVAILABLE);
 
   return {
     sections: [
       {
-        key: "normalization",
-        title: "Normalization",
+        key: 'normalization',
+        title: 'Normalization',
         state: norm.state,
         items: norm.items,
-        source: "vm.evidence.normalizationSteps",
+        source: 'vm.evidence.normalizationSteps',
       },
       {
-        key: "ops",
-        title: "Ops / Transforms",
+        key: 'ops',
+        title: 'Ops / Transforms',
         state: ops.state,
         items: ops.items,
-        source: "vm.evidence.ops",
+        source: 'vm.evidence.ops',
       },
       {
-        key: "signals",
-        title: "Signals / Notes",
+        key: 'signals',
+        title: 'Signals / Notes',
         state: sig.state,
         items: sig.items,
-        source: "vm.evidence.signals+notes",
+        source: 'vm.evidence.signals+notes',
       },
     ],
   };
