@@ -67,4 +67,25 @@ describe('Analyze form error handling', () => {
     fireEvent.change(input, { target: { value: 'another test' } });
     expect(input).toHaveValue('another test');
   });
+
+  it('shows a network error message when fetch rejects with a non-Error value', async () => {
+    // This covers the real-world case where something rejects with `{}` / string / etc.
+    // We must NOT assume `.message` exists.
+    global.fetch = jest.fn().mockRejectedValue({});
+
+    render(<Page />);
+
+    const input = screen.getByPlaceholderText('study');
+    const button = screen.getByText('Analyze');
+
+    fireEvent.change(input, { target: { value: 'test' } });
+    fireEvent.click(button);
+
+    const errorMessage = await screen.findByText(/network error/i);
+    expect(errorMessage).toBeInTheDocument();
+
+    // Input should still be editable after the error
+    fireEvent.change(input, { target: { value: 'another test' } });
+    expect(input).toHaveValue('another test');
+  });
 });
