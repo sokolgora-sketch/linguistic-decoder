@@ -7,10 +7,15 @@ import ChatShell from '@/components/ChatShell';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { InstrumentPanel } from '@/ui/instrument/InstrumentPanel';
+import ReadoutCard from "@/components/instrument/ReadoutCard";
+import MeaningCard from "@/components/instrument/MeaningCard";
+import EvidenceCard from "@/components/instrument/EvidenceCard";
+import CandidatesCard from "@/components/instrument/CandidatesCard";
+import MathLensesCard from "@/components/instrument/MathLensesCard";
+import RawJsonCard from "@/components/instrument/RawJsonCard";
 
 function safeBuildTelemetryVm(result: unknown): unknown {
   try {
@@ -69,11 +74,6 @@ function pickEngineVersion(r: unknown): string | null {
   return pickString(o, ['engineVersion', 'engine_version']) ?? pickString(o.meta, ['engineVersion']);
 }
 
-function pickTopCandidateLang(r: unknown): string {
-  const candidate = pickFirstCandidate(r);
-  return pickString(candidate, ['language', 'lang']) ?? 'unknown';
-}
-
 function pickWordShown(r: unknown): string {
   return pickString(r, ['word', 'normalizedWord']) ?? '';
 }
@@ -81,33 +81,6 @@ function pickWordShown(r: unknown): string {
 function splitVowelPath(vowelPath: string | null): string[] {
   if (typeof vowelPath !== 'string') return [];
   return vowelPath.split(/[-–—→\s]+/g).map(s => s.trim()).filter(Boolean);
-}
-
-function VowelChips({ path }: { path: string[] }) {
-  if (!path.length) return <span className='text-muted-foreground'>—</span>;
-  return (
-    <div className='flex flex-wrap gap-2'>
-      {path.map((v, i) => (
-        <Badge key={`${v}-${i}`} variant='secondary' className='text-xs'>
-          {v}
-        </Badge>
-      ))}
-    </div>
-  );
-}
-
-function VoiceRow() {
-  const order = ['O', 'I', 'U', 'E', 'Y', 'A', 'Ë'];
-  return (
-    <div className='flex flex-wrap items-center gap-2'>
-      {order.map(v => (
-        <Badge key={v} variant='outline' className='text-xs'>
-          {v}
-        </Badge>
-      ))}
-      <span className='text-xs text-muted-foreground ml-1'>Seven-vowel</span>
-    </div>
-  );
 }
 
 export default function ZroChatPage() {
@@ -120,9 +93,7 @@ export default function ZroChatPage() {
 
   const [debug, setDebug] = React.useState<string>('');
 
-  const [messages, setMessages] = React.useState<Msg[]>([
-    { id: uid(), role: 'assistant', text: 'Type a word and press Analyze.' },
-  ]);
+  const [messages, setMessages] = React.useState<Msg[]>([]);
 
   const errMsg = (e: unknown, fallback = 'Request failed.') =>
     e instanceof Error ? e.message : fallback;
@@ -277,9 +248,40 @@ export default function ZroChatPage() {
     </div>
   );
 
+  const latestResult =
+    messages
+      .slice()
+      .reverse()
+      .find((m): m is Msg & { result: unknown } => typeof (m as any)?.result !== "undefined")
+      ?.result;
+
   return (
     <ChatShell title='ZË-RO' subtitle='Seven-vowel word decoder.' composer={composer}>
       <div className='space-y-4'>
+        <div className="mb-4">
+          <ReadoutCard result={latestResult as any} />
+        </div>
+
+        <div className="mb-4">
+          <MeaningCard result={latestResult as any} />
+        </div>
+
+        <div className="mb-4">
+          <CandidatesCard result={latestResult as any} />
+        </div>
+
+        <div className="mb-4">
+          <MathLensesCard result={latestResult as any} />
+        </div>
+
+        <div className="mb-4">
+          <EvidenceCard result={latestResult as any} />
+        </div>
+
+        <div className="mb-4">
+          <RawJsonCard result={latestResult as any} />
+        </div>
+
         {(validation || statusBanner) && (
           <div role='alert' className='text-sm text-red-400'>
             {validation || statusBanner}
@@ -287,108 +289,6 @@ export default function ZroChatPage() {
         )}
 
         {debug ? <pre className='mt-2 text-xs opacity-80 whitespace-pre-wrap'>{debug}</pre> : null}
-
-        <div className='mb-6' />
-
-        <Card>
-          <CardContent className='py-4 space-y-3'>
-            <div className='flex items-center justify-between gap-3'>
-              <div className='text-sm font-medium'>Voices</div>
-              <div className='text-xs text-muted-foreground'>
-                Shown in ring order (not A/E/I/O/U/Y/Ë)
-              </div>
-            </div>
-            <VoiceRow />
-          </CardContent>
-        </Card>
-
-        <div className='space-y-3'>
-          {messages.map(m => {
-            if (m.role === 'user') {
-              return (
-                <div key={m.id} className='flex justify-end'>
-                  <div className='w-full max-w-6xl'>
-                    <Card className='border-muted'>
-                      <CardContent className='py-4 space-y-3'>
-                        <div className='text-sm whitespace-pre-wrap'>{m.text}</div>
-                      </CardContent>
-                    </Card>
-                  </div>
-                </div>
-              );
-            }
-
-            // Assistant messages
-            const result = m.result;
-            const vowelPath = pickVowelPath(result);
-            const engineVersion = pickEngineVersion(result);
-            const candidateLang = pickTopCandidateLang(result);
-            const wordShown = pickWordShown(result);
-            const chips = splitVowelPath(vowelPath);
-
-            return (
-              <div key={m.id} className='flex justify-start'>
-                <div className='w-full max-w-6xl'>
-                  <Card>
-                    <CardContent className='py-4 space-y-3'>
-                      <div className='text-sm whitespace-pre-wrap'>{m.text}</div>
-
-                      {m.error ? (
-                        <div className='text-sm text-red-400 whitespace-pre-wrap'>{m.error}</div>
-                      ) : null}
-
-                      {result ? (
-                        <>
-                          <Separator />
-                          <div className='grid grid-cols-1 sm:grid-cols-3 gap-3'>
-                            <div>
-                              <div className='text-xs text-muted-foreground'>Word</div>
-                              <div className='text-sm font-medium'>{wordShown || '—'}</div>
-                            </div>
-                            <div>
-                              <div className='text-xs text-muted-foreground'>Engine</div>
-                              <div className='text-sm font-medium'>{engineVersion || '—'}</div>
-                            </div>
-                            <div>
-                              <div className='text-xs text-muted-foreground'>Top candidate</div>
-                              <div className='text-sm font-medium'>{candidateLang || '—'}</div>
-                            </div>
-                          </div>
-
-                          <div>
-                            <div className='text-xs text-muted-foreground'>Vowel path</div>
-                            <VowelChips path={chips} />
-                          </div>
-
-                          <Separator />
-
-                          {isTelemetryVmWithEvidence(m.telemetryVm) ? (
-                            <InstrumentPanel vm={m.telemetryVm} />
-                          ) : null}
-
-                          <Collapsible open={showRaw} onOpenChange={setShowRaw}>
-                            <div className='flex items-center justify-between'>
-                              <CollapsibleTrigger asChild>
-                                <Button type='button' variant='secondary' size='sm'>
-                                  {showRaw ? 'Hide raw' : 'Show raw'}
-                                </Button>
-                              </CollapsibleTrigger>
-                            </div>
-                            <CollapsibleContent>
-                              <pre className='mt-2 text-xs whitespace-pre-wrap opacity-90'>
-                                {safeString(result)}
-                              </pre>
-                            </CollapsibleContent>
-                          </Collapsible>
-                        </>
-                      ) : null}
-                    </CardContent>
-                  </Card>
-                </div>
-              </div>
-            );
-          })}
-        </div>
       </div>
     </ChatShell>
   );
