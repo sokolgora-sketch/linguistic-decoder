@@ -44,6 +44,18 @@ export default function ZroChatPage() {
     { id: uid(), role: 'assistant', text: 'Type a word and press Enter.' },
   ]);
 
+  const debugEnabled =
+    typeof window !== 'undefined' &&
+    new URLSearchParams(window.location.search).get('debug') === '1';
+
+  const bottomRef = React.useRef<HTMLDivElement | null>(null);
+
+  React.useEffect(() => {
+    const el = bottomRef.current;
+    const fn = (el as any)?.scrollIntoView;
+    if (typeof fn === 'function') fn.call(el, { behavior: 'smooth', block: 'end' });
+  }, [messages.length]);
+
   async function runAnalysis(word: string) {
     const w = word.trim();
     if (!w) {
@@ -171,7 +183,8 @@ export default function ZroChatPage() {
           </div>
         )}
 
-        {debug ? <pre className="mt-2 text-xs opacity-80 whitespace-pre-wrap">{debug}</pre> : null}
+        {debugEnabled && debug ? <pre className="mt-2 text-xs opacity-80 whitespace-pre-wrap">{debug}</pre> : null}
+        <div ref={bottomRef} />
       </div>
     </ChatShell>
   );
