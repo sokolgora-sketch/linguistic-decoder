@@ -4,7 +4,7 @@
  * This test ensures that for a given input, critical fields
  * in the response remain stable across multiple identical requests.
  *
- * Runs a real Next dev server on a test port, calls it, then shuts it down.
+ * Runs a real Next server on a test port, calls it, then shuts it down.
  *
  * NOTE:
  * - We intentionally use `next dev` here for CI reliability.
@@ -84,11 +84,22 @@ describe("/api/analyze-v1 stability (repeat GET)", () => {
   let logs = "";
 
   beforeAll(async () => {
-    proc = spawn("npm", ["run", "dev", "--", "-p", String(PORT)], {
+    // CI reliability: `next dev` can race on manifests (pages-manifest.json).
+    // Use production build + `next start` for determinism.
+    execSync("npm run build", {
+      stdio: "inherit",
+      env: {
+        ...process.env,
+        NEXT_TELEMETRY_DISABLED: "1",
+      },
+    });
+
+    proc = spawn("npm", ["run", "start", "--", "-p", String(PORT)], {
       env: {
         ...process.env,
         PORT: String(PORT),
         NEXT_TELEMETRY_DISABLED: "1",
+        NODE_ENV: "production",
       },
       stdio: ["ignore", "pipe", "pipe"],
       detached: process.platform !== "win32",
