@@ -33,7 +33,6 @@ function fmt<T>(x: { kind: 'present'; value: T } | { kind: 'missing'; missing: s
 export function InstrumentPanel(props: Props) {
   const { toast } = useToast();
 
-  
   const inputVm = "vm" in props ? props.vm : undefined;
   const inputPayload = "payload" in props ? props.payload : undefined;
 
@@ -42,8 +41,18 @@ export function InstrumentPanel(props: Props) {
     return adaptAnalysisToTelemetryVM(inputPayload);
   }, [inputVm, inputPayload]);
 
-  const ledgerModel = React.useMemo(() => buildEvidenceLedgerModelFromVM(vm), [vm]);
-  const candidateRows = React.useMemo(() => buildCandidateRowsFromVM(vm), [vm]);
+  const isValidVm =
+    !!vm && typeof vm === 'object' && (vm as any).readout && typeof (vm as any).readout === 'object';
+
+  const ledgerModel = React.useMemo(() => {
+    if (!isValidVm) return null;
+    return buildEvidenceLedgerModelFromVM(vm);
+  }, [isValidVm, vm]);
+
+  const candidateRows = React.useMemo(() => {
+    if (!isValidVm) return null;
+    return buildCandidateRowsFromVM(vm);
+  }, [isValidVm, vm]);
 
   async function copyText(label: string, text: string) {
     try {
@@ -54,20 +63,25 @@ export function InstrumentPanel(props: Props) {
     }
   }
 
-  const summaryLines = [
-    'ZË-RO Instrument Summary',
-    `word=${String(vm.readout.word)}`,
-    `mode=${fmt(vm.readout.mode)}`,
-    `strictInput=${fmt(vm.readout.strictInput)}`,
-    `engine=${fmt(vm.readout.engineVersion)}`,
-    `voicePath=${vm.readout.voicePath.kind === 'present' ? vm.readout.voicePath.value.join('-') : 'not_emitted'}`,
-    `candidates=${String(vm.readout.counts.candidates)}`,
-    `ops=${fmt(vm.readout.counts.ops)}`,
-    `notes=${fmt(vm.readout.counts.notes)}`,
-    `signals=${fmt(vm.readout.counts.signals)}`,
-  ];
+  const summaryLines = React.useMemo(() => {
+    if (!isValidVm) return [];
+    return [
+      'ZË-RO Instrument Summary',
+      `word=${String(vm.readout.word)}`,
+      `mode=${fmt(vm.readout.mode)}`,
+      `strictInput=${fmt(vm.readout.strictInput)}`,
+      `engine=${fmt(vm.readout.engineVersion)}`,
+      `voicePath=${vm.readout.voicePath.kind === 'present' ? vm.readout.voicePath.value.join('-') : 'not_emitted'}`,
+      `candidates=${String(vm.readout.counts.candidates)}`,
+      `ops=${fmt(vm.readout.counts.ops)}`,
+      `notes=${fmt(vm.readout.counts.notes)}`,
+      `signals=${fmt(vm.readout.counts.signals)}`,
+    ];
+  }, [isValidVm, vm]);
 
-  const engineVersion = vm.readout.engineVersion.kind === 'present' ? vm.readout.engineVersion.value : null;
+  const engineVersion = isValidVm && vm.readout.engineVersion.kind === 'present' ? vm.readout.engineVersion.value : null;
+
+  if (!isValidVm) return null;
 
   return (
     <div className="space-y-3">
@@ -76,7 +90,7 @@ export function InstrumentPanel(props: Props) {
 
       <MeaningCard available={false} />
 
-      <EvidenceLedgerCard model={ledgerModel} engineVersion={engineVersion} />
+      {ledgerModel ? <EvidenceLedgerCard model={ledgerModel} engineVersion={engineVersion} /> : null}
 
       {/* Origin Claim (computed, auditable) */}
       <OriginClaimCard originClaim={(vm.raw as any)?.originClaim ?? null} />
@@ -104,7 +118,7 @@ export function InstrumentPanel(props: Props) {
         </div>
       ) : null}
 
-      <CandidatesAccordion rows={candidateRows} />
+      {candidateRows ? <CandidatesAccordion rows={candidateRows} /> : null}
 
       {/* Minimal controls (copy evidence package) */}
       <Card>
