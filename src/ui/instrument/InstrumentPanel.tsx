@@ -90,7 +90,7 @@ export function InstrumentPanel(props: Props) {
 
       <MeaningCard available={false} />
 
-      <EvidenceLedgerCard model={ledgerModel} engineVersion={engineVersion} />
+      {ledgerModel ? <EvidenceLedgerCard model={ledgerModel} engineVersion={engineVersion} /> : null}
 
       {/* Origin Claim (computed, auditable) */}
       <OriginClaimCard originClaim={(vm.raw as any)?.originClaim ?? null} />
@@ -118,7 +118,7 @@ export function InstrumentPanel(props: Props) {
         </div>
       ) : null}
 
-      <CandidatesAccordion rows={candidateRows} />
+      {candidateRows ? <CandidatesAccordion rows={candidateRows} /> : null}
 
       {/* Minimal controls (copy evidence package) */}
       <Card>
