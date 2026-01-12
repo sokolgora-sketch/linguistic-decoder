@@ -10,31 +10,6 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { InstrumentPanel } from '@/ui/instrument/InstrumentPanel';
-import ReadoutCard from "@/components/instrument/ReadoutCard";
-import MeaningCard from "@/components/instrument/MeaningCard";
-import EvidenceCard from "@/components/instrument/EvidenceCard";
-import CandidatesCard from "@/components/instrument/CandidatesCard";
-import MathLensesCard from "@/components/instrument/MathLensesCard";
-import RawJsonCard from "@/components/instrument/RawJsonCard";
-
-function safeBuildTelemetryVm(result: unknown): unknown {
-  try {
-    return buildInstrumentVmV1(result as any);
-  } catch {
-    return null;
-  }
-}
-
-function isTelemetryVmWithEvidence(vm: unknown): vm is TelemetryViewModel {
-  const v = vm as any;
-  return (
-    !!v &&
-    typeof v === 'object' &&
-    !!v.evidence &&
-    Array.isArray(v.evidence.normalizationSteps) &&
-    Array.isArray(v.evidence.ops)
-  );
-}
 
 type Msg =
   | { id: string; role: 'user'; text: string }
@@ -289,6 +264,96 @@ export default function ZroChatPage() {
         )}
 
         {debug ? <pre className='mt-2 text-xs opacity-80 whitespace-pre-wrap'>{debug}</pre> : null}
+
+        <div className='mb-6' />
+
+        <Card>
+          <CardContent className='py-4 space-y-3'>
+            <div className='flex items-center justify-between gap-3'>
+              <div className='text-sm font-medium'>Voices</div>
+              <div className='text-xs text-muted-foreground'>
+                Shown in ring order (not A/E/I/O/U/Y/Ë)
+              </div>
+            </div>
+            <VoiceRow />
+          </CardContent>
+        </Card>
+
+        <div className='space-y-3'>
+          {messages.map(m => {
+            const isUser = m.role === 'user';
+            const result = m.role === 'assistant' ? m.result : undefined;
+
+            const vowelPath = pickVowelPath(result);
+            const engineVersion = pickEngineVersion(result);
+            const candidateLang = pickTopCandidateLang(result);
+            const wordShown = pickWordShown(result);
+
+            const chips = splitVowelPath(vowelPath);
+
+            return (
+              <div key={m.id} className={isUser ? 'flex justify-end' : 'flex justify-start'}>
+                <div className='w-full max-w-6xl'>
+                  <Card className={isUser ? 'border-muted' : ''}>
+                    <CardContent className='py-4 space-y-3'>
+                      <div className='text-sm whitespace-pre-wrap'>{m.text}</div>
+
+                      {m.role === 'assistant' && m.error ? (
+                        <div className='text-sm text-red-400 whitespace-pre-wrap'>{m.error}</div>
+                      ) : null}
+
+                      {result ? (
+                        <>
+                          <Separator />
+                          <div className='grid grid-cols-1 sm:grid-cols-3 gap-3'>
+                            <div>
+                              <div className='text-xs text-muted-foreground'>Word</div>
+                              <div className='text-sm font-medium'>{wordShown || '—'}</div>
+                            </div>
+                            <div>
+                              <div className='text-xs text-muted-foreground'>Engine</div>
+                              <div className='text-sm font-medium'>{engineVersion || '—'}</div>
+                            </div>
+                            <div>
+                              <div className='text-xs text-muted-foreground'>Top candidate</div>
+                              <div className='text-sm font-medium'>{candidateLang || '—'}</div>
+                            </div>
+                          </div>
+
+                          <div>
+                            <div className='text-xs text-muted-foreground'>Vowel path</div>
+                            <VowelChips path={chips} />
+                          </div>
+
+                          <Separator />
+
+                          {m.role === 'assistant' && 'telemetryVm' in m && m.telemetryVm ? (
+                            <InstrumentPanel vm={m.telemetryVm as any} />
+                          ) : null}
+
+                          <Collapsible open={showRaw} onOpenChange={setShowRaw}>
+                            <div className='flex items-center justify-between'>
+                              <CollapsibleTrigger asChild>
+                                <Button type='button' variant='secondary' size='sm'>
+                                  {showRaw ? 'Hide raw' : 'Show raw'}
+                                </Button>
+                              </CollapsibleTrigger>
+                            </div>
+                            <CollapsibleContent>
+                              <pre className='mt-2 text-xs whitespace-pre-wrap opacity-90'>
+                                {safeString(result)}
+                              </pre>
+                            </CollapsibleContent>
+                          </Collapsible>
+                        </>
+                      ) : null}
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
     </ChatShell>
   );
