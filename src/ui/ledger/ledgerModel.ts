@@ -1,5 +1,5 @@
 // src/ui/ledger/ledgerModel.ts
-import type { PresentOrMissing, TelemetryViewModel } from '../instrument/types';
+import type { PresentOrMissing, TelemetryViewModel } from '../telemetry/types';
 
 export type LedgerState = 'present' | 'none' | 'missing';
 

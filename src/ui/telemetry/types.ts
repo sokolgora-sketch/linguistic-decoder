@@ -1,4 +1,3 @@
-
 export type Mode = "strict" | "open";
 
 /**
@@ -9,10 +8,12 @@ export type Vowel = "A" | "E" | "I" | "O" | "U" | "Y" | "Ë";
 
 /**
  * Why something is missing.
- * - "none": engine emitted an explicit empty/none
- * - "not_emitted": engine simply did not emit the field
+ * - "none": engine emitted an explicit empty/none (i.e., present but empty list)
+ * - "not_emitted": engine did not emit the field
+ * - "malformed": engine emitted the field but with an unexpected type/shape
+ * - "unknown": fallback when we cannot categorize
  */
-export type MissingState = "none" | "not_emitted";
+export type MissingState = "none" | "not_emitted" | "malformed" | "unknown";
 
 /**
  * Generic "present or missing" wrapper used to avoid silent emptiness.

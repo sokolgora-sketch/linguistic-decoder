@@ -18,7 +18,7 @@ import type {
   RejectionItemVM,
   TelemetryViewModel,
   Vowel,
-} from "./types";
+} from "../telemetry/types";
 
 // ----------------------- small helpers -----------------------
 
@@ -50,7 +50,10 @@ export function present<T>(value: T): PresentOrMissing<T> {
   return { kind: "present", value };
 }
 
-export function missing<T>(missingState: "none" | "not_emitted", note?: string): PresentOrMissing<T> {
+export function missing<T>(
+  missingState: "none" | "not_emitted" | "malformed" | "unknown",
+  note?: string
+): PresentOrMissing<T> {
   return { kind: "missing", missing: missingState, note };
 }
 
@@ -396,10 +399,10 @@ export function adaptAnalysisToTelemetryVM(raw: unknown): TelemetryViewModel {
     },
 
     evidence: {
-      normalizationSteps: presentStringArray(normalizationSteps),
-      ops: presentStringArray(ops),
-      notes: presentStringArray(notes),
-      signals: presentStringArray(signals),
+      normalizationSteps: pomStringListFromEvidenceField(evidence, "normalizationSteps"),
+      ops: pomStringListFromEvidenceField(evidence, "ops"),
+      notes: pomStringListFromEvidenceField(evidence, "notes"),
+      signals: pomStringListFromEvidenceField(evidence, "signals"),
     },
 
     candidates,
@@ -409,3 +412,25 @@ export function adaptAnalysisToTelemetryVM(raw: unknown): TelemetryViewModel {
     raw,
   };
 }
+
+// ----------------------- malformed-aware array extraction -----------------------
+
+function pomStringListFromEvidenceField(
+  parent: Record<string, unknown> | null,
+  key: string
+): PresentOrMissing<string[]> {
+  if (!parent) return missing("not_emitted", `evidence.${key}`);
+
+  // distinguish absent vs present-but-wrong-type
+  if (!(key in parent)) return missing("not_emitted", `evidence.${key}`);
+
+  const v = (parent as any)[key];
+
+  if (v == null) return missing("not_emitted", `evidence.${key}`);
+
+  if (!Array.isArray(v)) return missing("malformed", `evidence.${key} expected array`);
+
+  // present (including empty => MeaningPanel will show "none")
+  return present(v.map((x) => String(x)));
+}
+
