@@ -82,14 +82,6 @@ export default function ZroChatPage() {
       // ignore
     }
   }, []);
-React.useEffect(() => {
-    try {
-      setDebugEnabled(new URLSearchParams(window.location.search).get('debug') === '1');
-    } catch {
-      setDebugEnabled(false);
-    }
-  }, []);
-
   const bottomRef = React.useRef<HTMLDivElement | null>(null);
 
   React.useEffect(() => {
