@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { VowelPathTimeline } from "./VowelPathTimeline";
 import { adaptAnalysisToTelemetryVM } from "@/ui/instrument/contractAdapter";
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -119,6 +120,24 @@ export function InstrumentPanel(props: Props) {
 ) : null}
       {/* Readout (Telemetry Core) */}
       <ReadoutCard readout={vm.readout} onCopySummary={() => void copyText('Summary copied.', summaryLines.join('\n'))} onCopyFullJson={() => void copyText('Full JSON copied.', toPrettyJson(vm.raw))} />
+
+      <VowelPathTimeline
+
+
+        detected={vm.readout.voicePath}
+
+
+        surface={vm.readout.voicePathSurface}
+
+
+        functional={vm.readout.voicePathFunctional}
+
+
+        delta={vm.readout.voicePathDelta}
+
+
+      />
+
 
       <MeaningPanel vm={vm} />
 
