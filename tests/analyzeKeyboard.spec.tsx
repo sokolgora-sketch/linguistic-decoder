@@ -23,7 +23,7 @@ describe('Analyze keyboard interactions', () => {
 
   it('triggers analysis with Enter key', async () => {
     render(<Page />);
-    const input = screen.getByPlaceholderText('study');
+    const input = screen.getByLabelText('Word');
     fireEvent.change(input, { target: { value: 'test' } });
     fireEvent.keyDown(input, { key: 'Enter', code: 'Enter' });
 
@@ -34,7 +34,7 @@ describe('Analyze keyboard interactions', () => {
 
   it('shows validation on Enter with empty input and does not call fetch', async () => {
     render(<Page />);
-    const input = screen.getByPlaceholderText('study');
+    const input = screen.getByLabelText('Word');
     fireEvent.change(input, { target: { value: ' ' } });
     fireEvent.keyDown(input, { key: 'Enter', code: 'Enter' });
 
@@ -46,7 +46,7 @@ describe('Analyze keyboard interactions', () => {
 
   it('disables button and prevents extra calls while analyzing', async () => {
     render(<Page />);
-    const input = screen.getByPlaceholderText('study');
+    const input = screen.getByLabelText('Word');
     const analyzeButton = screen.getByText('Analyze');
 
     fireEvent.change(input, { target: { value: 'test' } });

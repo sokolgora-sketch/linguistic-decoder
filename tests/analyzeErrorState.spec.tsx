@@ -32,7 +32,7 @@ describe('Analyze form error handling', () => {
 
     render(<Page />);
 
-    const input = screen.getByPlaceholderText('study');
+    const input = screen.getByLabelText('Word');
     const button = screen.getByText('Analyze');
 
     fireEvent.change(input, { target: { value: 'test' } });
@@ -53,7 +53,7 @@ describe('Analyze form error handling', () => {
 
     render(<Page />);
 
-    const input = screen.getByPlaceholderText('study');
+    const input = screen.getByLabelText('Word');
     const button = screen.getByText('Analyze');
 
     fireEvent.change(input, { target: { value: 'test' } });
@@ -75,7 +75,7 @@ describe('Analyze form error handling', () => {
 
     render(<Page />);
 
-    const input = screen.getByPlaceholderText('study');
+    const input = screen.getByLabelText('Word');
     const button = screen.getByText('Analyze');
 
     fireEvent.change(input, { target: { value: 'test' } });

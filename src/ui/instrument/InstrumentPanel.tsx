@@ -19,11 +19,13 @@ type Props =
       /** Raw /api/analyze-v1 payload (unknown shape). We adapt it, never trust it. */
       payload: unknown;
       vm?: never;
+      debug?: boolean;
     }
   | {
       /** Telemetry VM (already adapted). VM-only boundary for callers like ZroChatPage. */
       vm: any;
       payload?: never;
+      debug?: boolean;
     };
 
 function fmt<T>(x: { kind: 'present'; value: T } | { kind: 'missing'; missing: string; note?: string }) {
@@ -81,10 +83,40 @@ export function InstrumentPanel(props: Props) {
 
   const engineVersion = isValidVm && vm.readout.engineVersion.kind === 'present' ? vm.readout.engineVersion.value : null;
 
-  if (!isValidVm) return null;
+  if (!isValidVm) {
+    const vmAny = vm as any;
+    const vmType = vmAny === null ? "null" : Array.isArray(vmAny) ? "array" : typeof vmAny;
+    const vmKeys = vmAny && typeof vmAny === "object" ? Object.keys(vmAny).slice(0, 40).join(", ") : "";
+    const hasReadout = !!(vmAny && typeof vmAny === "object" && vmAny.readout && typeof vmAny.readout === "object");
+
+    return (
+      <div className="rounded-lg border border-red-500/40 bg-red-950/20 p-4 text-sm">
+        <div className="font-semibold text-red-200">InstrumentPanel blocked: invalid Telemetry VM</div>
+        <div className="mt-2 text-red-100/90">
+          Fail-visible guard. The panel refused to render because the Telemetry VM shape is invalid.
+          Fix the VM adapter or payload wiring (do not silence this).
+        </div>
+        <div className="mt-3 grid gap-1 font-mono text-xs text-red-100/80">
+          <div>vmType: {vmType}</div>
+          <div>vmKeys: {vmKeys || "—"}</div>
+          <div>hasReadout: {String(hasReadout)}</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-3">
+{props.debug ? (
+<div className="mb-4 rounded border border-emerald-500 bg-black p-3 text-xs text-emerald-400">
+  <div>InstrumentPanel ACTIVE</div>
+  <div>word: {vm.wordShown}</div>
+  <div>engine: {vm.engineVersion}</div>
+  <div>mode: {vm.mode}</div>
+  <div>vowelPath: {vm.vowelPath?.join(" → ")}</div>
+  <div>signals: {vm.signals?.length ?? 0}</div>
+</div>
+) : null}
       {/* Readout (Telemetry Core) */}
       <ReadoutCard readout={vm.readout} onCopySummary={() => void copyText('Summary copied.', summaryLines.join('\n'))} onCopyFullJson={() => void copyText('Full JSON copied.', toPrettyJson(vm.raw))} />
 
