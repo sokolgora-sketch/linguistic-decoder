@@ -63,7 +63,7 @@ export function VowelPathTimeline(props: Props) {
   return (
     <div className="rounded-xl border border-neutral-700 bg-neutral-900/40 p-4">
       <div className="mb-3 flex items-center justify-between">
-        <div className="text-sm font-semibold text-neutral-100">Vowel Path Timeline</div>
+        <div className="text-sm font-semibold text-neutral-100">Vowel Path Timeline (Detected vs Interpreted)</div>
         <DeltaBadge delta={deltaComputed} />
       </div>
 

@@ -22,7 +22,7 @@ describe('VowelPathTimeline (v0.1)', () => {
       />
     );
 
-    expect(screen.getByText('Vowel Path Timeline')).toBeInTheDocument();
+    expect(screen.getByText(/Vowel Path Timeline/)).toBeInTheDocument();
     expect(screen.getByText('DIVERGE')).toBeInTheDocument();
 
     expect(screen.getByText('Detected')).toBeInTheDocument();
