@@ -1,4 +1,4 @@
-import type { TelemetryViewModel, CandidateRowVM } from "../instrument/types";
+import type { TelemetryViewModel, CandidateRowVM } from "../telemetry/types";
 
 export interface UICandidateRow {
   id: string;

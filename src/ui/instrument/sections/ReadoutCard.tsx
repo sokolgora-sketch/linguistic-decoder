@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import type { TelemetryReadout, PresentOrMissing, Vowel } from "../types";
+import type { TelemetryReadout, PresentOrMissing, Vowel } from "../../telemetry/types";
 import { VoicePathCompare } from "../VoicePathCompare";
 
 function renderPOM<T>(

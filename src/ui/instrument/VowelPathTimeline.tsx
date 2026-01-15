@@ -1,5 +1,5 @@
 import React from 'react';
-import type { PresentOrMissing, Vowel } from './types';
+import type { PresentOrMissing, Vowel } from '../telemetry/types';
 
 type Props = {
   detected: PresentOrMissing<Vowel[]>;
