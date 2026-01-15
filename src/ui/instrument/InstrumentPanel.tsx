@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { toPrettyJson } from "@/ui/instrument/prettyJson";
 import { ReadoutCard } from './sections/ReadoutCard';
-import { MeaningCard } from "./sections/MeaningCard";
+import MeaningPanel from './MeaningPanel';
 import { buildEvidenceLedgerModelFromVM } from '../ledger/ledgerModel';
 import { EvidenceLedgerCard } from '../ledger/EvidenceLedgerCard';
 import { buildCandidateRowsFromVM } from '../candidates/candidateModel';
@@ -120,7 +120,7 @@ export function InstrumentPanel(props: Props) {
       {/* Readout (Telemetry Core) */}
       <ReadoutCard readout={vm.readout} onCopySummary={() => void copyText('Summary copied.', summaryLines.join('\n'))} onCopyFullJson={() => void copyText('Full JSON copied.', toPrettyJson(vm.raw))} />
 
-      <MeaningCard available={false} />
+      <MeaningPanel vm={vm} />
 
       {ledgerModel ? <EvidenceLedgerCard model={ledgerModel} engineVersion={engineVersion} /> : null}
 
