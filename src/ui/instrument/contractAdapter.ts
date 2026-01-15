@@ -191,10 +191,15 @@ export function adaptAnalysisToTelemetryVM(raw: unknown): TelemetryViewModel {
 
   const voicePathFunctionalMaybe: PresentOrMissing<Vowel[]> =
     functionalParts ? present(functionalParts) : missing<Vowel[]>("not_emitted");
+  // Delta must be computed from the SAME sources the UI renders:
+  // - surfaceParts uses heartInstrumentV1.surfaceVowels when present
+  // - functionalParts uses deepRoot/candidate fallbacks
+  const surfaceNorm = surfaceParts ? surfaceParts.join("-") : null;
+  const functionalNorm = functionalParts ? functionalParts.join("-") : null;
 
   const voicePathDelta =
-    vp.surface && vp.functional
-      ? (vp.surface === vp.functional ? "MATCH" : "DIVERGE")
+    surfaceNorm && functionalNorm
+      ? (surfaceNorm === functionalNorm ? "MATCH" : "DIVERGE")
       : "NOT_EMITTED";
 
   const root = isRecord(raw) ? raw : {};
