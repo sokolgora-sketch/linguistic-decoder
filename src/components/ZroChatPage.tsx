@@ -1,15 +1,54 @@
 'use client';
 
 import React from 'react';
-import { buildInstrumentVmV1, type InstrumentVmV1 } from '@/ui/instrument/instrumentVm.v1';
 import ChatShell from '@/components/ChatShell';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { InstrumentPanel } from '@/ui/instrument/InstrumentPanel';
 
+class UiErrorBoundary extends React.Component<
+  { children: React.ReactNode; label?: string },
+  { error: Error | null }
+> {
+  constructor(props: any) {
+    super(props);
+    this.state = { error: null };
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    return { error };
+  }
+
+  componentDidCatch(error: Error, info: any) {
+    console.error(`[${this.props.label ?? "UI"}] crashed:`, error, info);
+  }
+
+  render() {
+    if (this.state.error) {
+      return (
+        <div className="mt-4 p-3 border border-red-500 text-red-400 text-xs whitespace-pre-wrap">
+          {this.props.label ?? "UI"} crashed:
+          {"\n\n"}
+          {this.state.error.message}
+          {"\n\n"}
+          {this.state.error.stack}
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
 type Msg =
   | { id: string; role: 'user'; text: string }
-  | { id: string; role: 'assistant'; text: string; result?: unknown; error?: string; instrumentVm?: InstrumentVmV1 | null };
+  | {
+      id: string;
+      role: 'assistant';
+      text: string;
+      result?: unknown;
+      error?: string;
+      instrumentPayload?: unknown | null;
+    };
 
 function uid() {
   return Math.random().toString(16).slice(2) + Date.now().toString(16);
@@ -24,30 +63,25 @@ function safeString(e: unknown): string {
   }
 }
 
-function safeBuildInstrumentVm(result: unknown): InstrumentVmV1 | null {
-  try {
-    return result ? buildInstrumentVmV1(result) : null;
-  } catch (e) {
-    console.error(`Error building instrument VM:`, e);
-    return null;
-  }
-}
-
 export default function ZroChatPage() {
   const [input, setInput] = React.useState('');
   const [busy, setBusy] = React.useState(false);
   const [validation, setValidation] = React.useState<string | null>(null);
   const [statusBanner, setStatusBanner] = React.useState<string | null>(null);
   const [debug, setDebug] = React.useState<string | null>(null);
-
   const [messages, setMessages] = React.useState<Msg[]>([
-    { id: uid(), role: 'assistant', text: 'Type a word and press Enter.' },
-  ]);
+      { id: 'init', role: 'assistant', text: 'Type a word and press Enter.' },
+    ]);
 
-  const debugEnabled =
-    typeof window !== 'undefined' &&
-    new URLSearchParams(window.location.search).get('debug') === '1';
-
+  const [debugEnabled, setDebugEnabled] = React.useState(false);
+  React.useEffect(() => {
+    try {
+      const p = new URLSearchParams(window.location.search);
+      setDebugEnabled(p.get("debug") === "1");
+    } catch {
+      // ignore
+    }
+  }, []);
   const bottomRef = React.useRef<HTMLDivElement | null>(null);
 
   React.useEffect(() => {
@@ -98,7 +132,7 @@ export default function ZroChatPage() {
                   text: 'Request failed.',
                   error: statusText || `HTTP ${status}`,
                   result: json ?? undefined,
-                  instrumentVm: json ? safeBuildInstrumentVm(json) : null,
+                  instrumentPayload: json,
                 }
               : x
           )
@@ -116,7 +150,7 @@ export default function ZroChatPage() {
                 ...x,
                 text: '',
                 result: json ?? undefined,
-                instrumentVm: json ? safeBuildInstrumentVm(json) : null,
+                instrumentPayload: json,
               }
             : x
         )
@@ -155,7 +189,7 @@ export default function ZroChatPage() {
         value={input}
         onChange={e => setInput(e.target.value)}
         onKeyDown={onKeyDown}
-        placeholder="study"
+        placeholder="gjuha"
         aria-label="Word"
         disabled={busy}
       />
@@ -165,17 +199,21 @@ export default function ZroChatPage() {
     </div>
   );
 
-  const latestInstrumentVm =
+  const latestInstrumentPayload =
     messages
       .slice()
       .reverse()
-      .find((m): m is Msg & { instrumentVm: InstrumentVmV1 } => (m as any)?.instrumentVm != null)
-      ?.instrumentVm ?? null;
+      .find((m): m is Msg & { instrumentPayload: unknown } => (m as any)?.instrumentPayload != null)
+      ?.instrumentPayload ?? null;
 
   return (
     <ChatShell title="ZË-RO" subtitle="Seven-vowel word decoder." composer={composer}>
       <div className="space-y-4">
-        {latestInstrumentVm ? <InstrumentPanel vm={latestInstrumentVm} /> : null}
+        {latestInstrumentPayload ? (
+          <UiErrorBoundary label="InstrumentPanel">
+            <InstrumentPanel payload={latestInstrumentPayload} debug={debugEnabled} />
+          </UiErrorBoundary>
+        ) : null}
 
         {(validation || statusBanner) && (
           <div role="alert" className="text-sm text-red-400">
@@ -183,7 +221,13 @@ export default function ZroChatPage() {
           </div>
         )}
 
-        {debugEnabled && debug ? <pre className="mt-2 text-xs opacity-80 whitespace-pre-wrap">{debug}</pre> : null}
+          {debugEnabled ? (
+            <div className="mt-2 text-xs opacity-80 whitespace-pre-wrap">
+              debug: messages={messages.length} latestInstrumentPayload={latestInstrumentPayload ? "YES" : "NO"}
+            </div>
+          ) : null}
+
+          {debugEnabled && debug ? <pre className="mt-2 text-xs opacity-80 whitespace-pre-wrap">{debug}</pre> : null}
         <div ref={bottomRef} />
       </div>
     </ChatShell>
