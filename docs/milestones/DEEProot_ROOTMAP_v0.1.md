@@ -1,0 +1,68 @@
+# Milestone — DeepRoot RootMap v0.1 (Functional Key Decoder)
+
+Status: DRAFT  
+Owner: DF + Sokol  
+Scope: Engine + contract + minimal UI hook (optional)
+
+---
+
+## 0) Purpose
+
+Add a **root-first** analysis layer that decomposes a word into minimal functional pieces (“roots/tokens”), then reports:
+
+- **Keys (explainers):** languages where a token has **standalone functional meaning** (supported).
+- **Carriers:** languages that carry the form but do **not** internally explain the token (optional).
+- **ComposedMeaning:** a short functional statement built from the supported keys.
+
+This is **not** “winner/loser.” It is **explainers vs carriers**, with strict guardrails to avoid coincidence.
+
+---
+
+## 1) Where this fits in ZË-RO pipeline
+
+Order (high-level):
+1. **Heart / Seven-Voices**
+2. **Math7 / PrinciplesPath**
+3. **DeepRoot RootMap (NEW)**
+4. Candidates (may reference RootMap, but RootMap does not crown a winner)
+5. OriginClaim gates remain separate (policy/meta)
+
+RootMap is an additional section; it does not break existing output.
+
+---
+
+## 2) Contract: `rootMap?: RootMapV1` (optional, v0.1)
+
+### Types (conceptual; mirror exactly in TS types)
+
+```ts
+type RootToken = {
+  token: string; // e.g. "DA"
+  role?: "action" | "instrument" | "unit" | "modifier" | "unknown";
+  vowel_path?: string; // optional (if token contains vowels)
+};
+
+type RootKey = {
+  token: string;            // must match a token in tokens[]
+  language: string;         // "Albanian" | "Latin" | ...
+  gloss: string;            // "split / divide"
+  evidence: string[];       // short bullets, no essays
+  status: "supported" | "speculative";
+  ops?: string[];           // transforms used to align form
+};
+
+type RootCarrier = {
+  token: string;
+  language: string;
+  carrierForm: string;      // e.g. "dam-" / "pater"
+  note?: string;            // "form carrier; no internal breakdown"
+};
+
+type RootMapV1 = {
+  tokens: RootToken[];
+  keys: RootKey[];
+  carriers?: RootCarrier[];
+  composedMeaning: string;  // short compositional statement
+  notes?: string[];         // guardrail notes / why something is missing
+};
+```
