@@ -134,7 +134,7 @@ export default function MeaningPanel({ vm }: Props) {
 
       <div className="mt-3 whitespace-pre-wrap text-xs opacity-70">{evidenceLines}</div>
 
-      <div className="mt-2 text-[11px] opacity-50">source: telemetry VM (read-only)</div>
+      <div className="mt-2 text-[11px] opacity-50">source: telemetry VM</div>
     </div>
   );
 }

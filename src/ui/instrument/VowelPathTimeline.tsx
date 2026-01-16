@@ -79,7 +79,7 @@ export function VowelPathTimeline(props: Props) {
         <PathRow label="Functional" maybe={functional} />
       </div>
 
-      <div className="mt-3 text-xs text-neutral-500">source: telemetry VM (read-only)</div>
+      <div className="mt-3 text-xs text-neutral-500">source: telemetry VM</div>
     </div>
   );
 }

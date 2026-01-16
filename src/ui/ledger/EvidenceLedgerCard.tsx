@@ -4,7 +4,7 @@ import type { EvidenceLedgerModel, LedgerSection } from "./ledgerModel";
 
 function stateLabel(section: LedgerSection, engineVersion?: string | null) {
   if (section.state === "present") return "present";
-  if (section.state === "none") return "none emitted";
+  if (section.state === "none") return "not emitted";
   // missing
   if (engineVersion) return `not available (${engineVersion})`;
   return "not available";
@@ -26,7 +26,7 @@ function renderSection(section: LedgerSection, engineVersion?: string | null) {
         </ul>
       ) : (
         <div className="text-sm text-muted-foreground">
-          {section.state === "none" ? "None emitted." : "Not available in this engine version."}
+          {section.state === "none" ? "Not emitted." : "Not available in this engine version."}
         </div>
       )}
 

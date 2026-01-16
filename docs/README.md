@@ -29,6 +29,9 @@ This folder contains the canonical, versioned documentation that defines ZË-RO 
 - [Engine Contract Freeze](./ENGINE_CONTRACT_FREEZE.md) — frozen JSON contract for analyzeWordV1 (v1).
 - [Reality Guide v1](./ZERO_REALITY_GUIDE.md) — deterministic authority chain, layer separation, success conditions.
 
+## Milestones
+- [UI Telemetry v0.1.2 — FROZEN](./milestones/UI_TELEMETRY_v0.1.2_FROZEN.md)
+
 ## Notes
 - Docs are treated as part of the contract: if it matters, it lives here and is reviewable via PR.
 
