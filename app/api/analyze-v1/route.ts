@@ -4,6 +4,7 @@ import { z } from "zod";
 import { runAnalysisDeterministic } from "@/lib/runAnalysisDeterministic";
 import { enginePayloadToAnalysisResult } from "@/shared/analysisAdapter";
 import { adaptAnalyzeV1ToUI } from "@/shared/analyzeV1Adapter";
+import { toAnalyzeWordResultV1Contract } from "@/shared/analyzeWordResult.v1.contract";
 import { ensurePrimaryAndCandidatePaths } from "@/shared/ensurePaths";
 
 // ✅ Contract guard
@@ -201,19 +202,29 @@ export async function POST(req: Request) {
 
     const finalEvidence = { ...evidence };
 
-    return NextResponse.json({
+    let final: any = {
       ...ensured,
       originClaim: (out as any).originClaim,
-      originClaimGates: {
-        flag: "ocg",
-        active: gatesOn,
-      },
+      originClaimGates: { flag: "ocg", active: gatesOn },
       evidence: finalEvidence,
       raw: (ensured as any).raw
         ? { ...((ensured as any).raw as any), evidence: finalEvidence }
         : (ensured as any).raw,
       heartInstrumentV1,
-    });
+    };
+
+    // ✅ Contract check should validate ONLY the contract-picked projection
+    try {
+      toAnalyzeWordResultV1Contract(final);
+    } catch (e: any) {
+      return contractFailResponse({
+        message: "final /api/analyze-v1 response failed V1 contract projection",
+        issues: e?.issues ?? e?.message ?? String(e),
+        out: final,
+      });
+    }
+
+    return NextResponse.json(final);
   } catch (err: any) {
     return NextResponse.json(
       { error: "analyze-v1 failed", details: String(err?.stack ?? err?.message ?? err) },
@@ -266,19 +277,29 @@ export async function GET(req: Request) {
 
     const finalEvidence = { ...evidence };
 
-    return NextResponse.json({
+    let final: any = {
       ...ensured,
       originClaim: (out as any).originClaim,
-      originClaimGates: {
-        flag: "ocg",
-        active: gatesOn,
-      },
+      originClaimGates: { flag: "ocg", active: gatesOn },
       evidence: finalEvidence,
       raw: (ensured as any).raw
         ? { ...((ensured as any).raw as any), evidence: finalEvidence }
         : (ensured as any).raw,
       heartInstrumentV1,
-    });
+    };
+
+    // ✅ Contract check should validate ONLY the contract-picked projection
+    try {
+      toAnalyzeWordResultV1Contract(final);
+    } catch (e: any) {
+      return contractFailResponse({
+        message: "final /api/analyze-v1 response failed V1 contract projection",
+        issues: e?.issues ?? e?.message ?? String(e),
+        out: final,
+      });
+    }
+
+    return NextResponse.json(final);
   } catch (err: any) {
     return NextResponse.json(
       { error: "analyze-v1 failed", details: String(err?.stack ?? err?.message ?? err) },
