@@ -1,5 +1,13 @@
+
+import { buildDeepRoot } from "../shared/deepRoot.v1";
 import type { AnalysisResult, Candidate, EvidenceV1, SevenVowel } from "./types";
-import { ENGINE_VERSION_V1, CONTRACT_VERSION_V1, RULESET_VERSION_V1, CANON_VERSION_V1 } from "./versions.v1";
+import { buildRootMapV1 } from "@/shared/deepRoot.rootMap.builder.v1";
+import {
+  CANON_VERSION_V1,
+  CONTRACT_VERSION_V1,
+  ENGINE_VERSION_V1,
+  RULESET_VERSION_V1,
+} from "./versions.v1";
 const VOWEL_INDEX: Record<SevenVowel, number> = {
   A: 0,
   E: 1,
@@ -43,7 +51,10 @@ function extractSevenVowelsV1(normalizedWord: string): SevenVowel[] {
   return out;
 }
 
-function buildEvidenceV1(basis: string, normalizationSteps: string[]): EvidenceV1 {
+function buildEvidenceV1(
+  basis: string,
+  normalizationSteps: string[]
+): EvidenceV1 {
   const surfaceVowels = extractSevenVowelsV1(basis);
   const indices = surfaceVowels.map((v) => VOWEL_INDEX[v]);
   const sum = indices.reduce((a, b) => a + b, 0);
@@ -71,7 +82,9 @@ function buildEvidenceV1(basis: string, normalizationSteps: string[]): EvidenceV
  * - collapses whitespace
  * - if multiple tokens, uses the first token (v1 is single-word)
  */
-export function normalizeWordV1(input: string): { normalizedWord: string; notes: string[] } {
+export function normalizeWordV1(
+  input: string
+): { normalizedWord: string; notes: string[] } {
   const notes: string[] = [];
 
   const raw = String(input ?? "");
@@ -83,7 +96,9 @@ export function normalizeWordV1(input: string): { normalizedWord: string; notes:
   const tokens = collapsed.split(" ").filter(Boolean);
 
   if (tokens.length > 1) {
-    notes.push(`Input contained spaces; v1 uses the first token: "${tokens[0]}"`);
+    notes.push(
+      `Input contained spaces; v1 uses the first token: "${tokens[0]}"`
+    );
   }
 
   // Keep diacritics (ë stays ë). Normalize Unicode form to reduce weird edge cases.
@@ -104,7 +119,6 @@ export function analyzeWordV1(word: string): AnalysisResult {
   const warnings: string[] = [];
   if (notes.length) warnings.push(...notes);
 
-
   const meta = {
     engineVersion: ENGINE_VERSION_V1,
     contractVersion: CONTRACT_VERSION_V1,
@@ -112,7 +126,7 @@ export function analyzeWordV1(word: string): AnalysisResult {
     canonVersion: CANON_VERSION_V1,
   };
   if (!normalizedWord) {
-const emptyCandidate: Candidate = {
+    const emptyCandidate: Candidate = {
       language: "unknown",
       form: "",
       decomposition: [],
@@ -137,6 +151,38 @@ const emptyCandidate: Candidate = {
   const basis = normalizedWord; // Phase 1: exact basis used for surface analysis
   const evidence = buildEvidenceV1(basis, notes);
 
+  const result: AnalysisResult = {
+    word,
+    normalizedWord,
+    candidates: [],
+    engineVersion: ENGINE_VERSION_V1,
+    evidence,
+    meta,
+
+    warnings: warnings.length ? warnings : undefined,
+  };
+
+  const payload = { basis: normalizedWord, evidence };
+  const deepRoot = buildDeepRoot(payload);
+  if (deepRoot) {
+    (result as any).deepRoot = deepRoot;
+  }
+
+  const minRootsForRootMap =
+    Array.isArray((deepRoot as any)?.hypotheses)
+      ? (deepRoot as any).hypotheses
+      : [];
+
+  const rootMap = buildRootMapV1({
+    basis: normalizedWord, // stable basis
+    minRoots: minRootsForRootMap,
+  });
+
+  // Emit at top-level (contract field)
+  if (rootMap) {
+    (result as any).rootMap = rootMap;
+  }
+
   const c0: Candidate = {
     language: "unknown",
     form: normalizedWord,
@@ -147,14 +193,7 @@ const emptyCandidate: Candidate = {
     notes: warnings.length ? warnings : undefined,
   };
 
-  return {
-    word,
-    normalizedWord,
-    candidates: [c0],
-    engineVersion: ENGINE_VERSION_V1,
-    evidence,
-    meta,
+  result.candidates.push(c0);
 
-    warnings: warnings.length ? warnings : undefined,
-  };
+  return result;
 }

@@ -25,6 +25,7 @@ export const AnalyzeWordResultV1ContractSchema = z
     symbolicCore: z.unknown().optional(),
     candidates: z.array(z.unknown()).optional(),
     deepRoot: z.unknown().optional(),
+    rootMap: z.unknown().optional(),
     // Origin Claim Protocol (V1) — keep loose until protocol stabilizes
     originClaim: z.unknown().optional(),
     wordMatrix: z.unknown().optional(),
@@ -67,12 +68,14 @@ export function toAnalyzeWordResultV1Contract(input: unknown): AnalyzeWordResult
     symbolicCore: o.symbolicCore,
     candidates: o.candidates,
     deepRoot: o.deepRoot,
+    rootMap: o.rootMap,
     wordMatrix: o.wordMatrix,
     languageFamilies: o.languageFamilies,
     meta: o.meta,
     debug: o.debug,
 
     evidence: o.evidence,
+    originClaim: o.originClaim,
     originClaimGates: o.originClaimGates,
     raw: o.raw,
     heartInstrumentV1: o.heartInstrumentV1,

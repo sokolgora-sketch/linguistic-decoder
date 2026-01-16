@@ -6,6 +6,7 @@ import { analyzeMind, analyzeConsonants, analyzeSymbolic } from "@/engine/mindAn
 import { CANON_CANDIDATES } from "./canonCandidates";
 import { buildWordMatrix } from "./wordMatrix.v1";
 import { buildDeepRootOutputV1 } from "./deepRoot.output.v1";
+import { buildRootMapV1 } from "./deepRoot.rootMap.builder.v1";
 
 import { buildMinRootHypotheses } from "./deepRoot.minRoots.v1";
 import { buildOriginClaimV1 } from "./originClaim.builder.v1";
@@ -61,6 +62,25 @@ export function enginePayloadToAnalysisResult(payload: EnginePayload): AnalyzeWo
 
   const wordMatrix = buildWordMatrix(result);
   result.wordMatrix = wordMatrix;
+
+  // RootMap v0.1 — ALWAYS emit top-level key (scientific instrument rule)
+  // Uses DeepRoot hypotheses (minRoots) as input. If none exist, builder returns an empty RootMap with a note.
+  const rootMap =
+    buildRootMapV1({
+      basis: String((result as any)?.deepRoot?.basis ?? (result as any)?.sanitized ?? (result as any)?.word ?? "").trim(),
+      minRoots:
+        (result as any)?.deepRoot?.hypotheses ??
+        (result as any)?.deepRoot?.candidates ??
+        [],
+    }) ??
+    {
+      tokens: [],
+      keys: [],
+      composedMeaning: "",
+      notes: ["RootMap unavailable; builder returned null."],
+    };
+
+  (result as any).rootMap = rootMap;
 
   return result;
 }
