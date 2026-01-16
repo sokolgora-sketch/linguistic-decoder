@@ -58,7 +58,7 @@ describe("InstrumentPanel — EvidenceLedgerCard", () => {
     expect(screen.getByText("OP1")).toBeInTheDocument();
 
     // Combined Signals/Notes section shows none emitted.
-    expect(screen.getByText("None emitted.")).toBeInTheDocument();
+    expect(screen.getByText("Not emitted.")).toBeInTheDocument();
 
     // Sources are part of the contract.
     expect(screen.getByText(/source:\s*vm\.evidence\.normalizationSteps/i)).toBeInTheDocument();
