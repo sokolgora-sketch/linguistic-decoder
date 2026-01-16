@@ -204,6 +204,7 @@ export async function POST(req: Request) {
 
     let final: any = {
       ...ensured,
+      rootMap: (out as any).rootMap,
       originClaim: (out as any).originClaim,
       originClaimGates: { flag: "ocg", active: gatesOn },
       evidence: finalEvidence,
@@ -279,6 +280,7 @@ export async function GET(req: Request) {
 
     let final: any = {
       ...ensured,
+      rootMap: (out as any).rootMap,
       originClaim: (out as any).originClaim,
       originClaimGates: { flag: "ocg", active: gatesOn },
       evidence: finalEvidence,

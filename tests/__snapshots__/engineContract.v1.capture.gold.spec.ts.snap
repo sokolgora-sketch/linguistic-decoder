@@ -14,6 +14,13 @@ exports[`Engine Contract v1 — capture engine output (goldens) algorithm (stric
       "vowelPath": "A-O-I"
     }
   ],
+  "deepRoot": {
+    "basis": "algorithm",
+    "candidates": [],
+    "hypotheses": [],
+    "protoRoots": [],
+    "version": "deeproot-output-v1"
+  },
   "engineVersion": "v1.0.0",
   "evidence": {
     "basis": "algorithm",
@@ -51,6 +58,14 @@ exports[`Engine Contract v1 — capture engine output (goldens) algorithm (stric
     "rulesetVersion": "ruleset-v1.2"
   },
   "normalizedWord": "algorithm",
+  "rootMap": {
+    "composedMeaning": "",
+    "keys": [],
+    "notes": [
+      "No minRoots hypotheses available; RootMap not emitted."
+    ],
+    "tokens": []
+  },
   "warnings": null,
   "word": "algorithm"
 }"
@@ -70,6 +85,36 @@ exports[`Engine Contract v1 — capture engine output (goldens) damage (strict, 
       "vowelPath": "A-A-E"
     }
   ],
+  "deepRoot": {
+    "basis": "damage",
+    "candidates": [],
+    "functionalRoots": [
+      {
+        "gloss": "Functional reading: dëm (harm / loss / injury) as a minimal carrier for the damage concept.",
+        "id": "sq.dem.v1",
+        "language": "sq",
+        "notes": [
+          "Deterministic pilot hypothesis (v1.1).",
+          "No winner; functional carrier only."
+        ],
+        "opsUsed": [
+          "english surface → sq carrier (short form)",
+          "note: this is a minimal-root hypothesis, not a historical-chain claim"
+        ],
+        "roots": [
+          "dëm"
+        ],
+        "surfaceForms": [
+          "damage",
+          "dëm"
+        ],
+        "vowelPath": "A→Ë"
+      }
+    ],
+    "hypotheses": [],
+    "protoRoots": [],
+    "version": "deeproot-output-v1"
+  },
   "engineVersion": "v1.0.0",
   "evidence": {
     "basis": "damage",
@@ -107,6 +152,14 @@ exports[`Engine Contract v1 — capture engine output (goldens) damage (strict, 
     "rulesetVersion": "ruleset-v1.2"
   },
   "normalizedWord": "damage",
+  "rootMap": {
+    "composedMeaning": "",
+    "keys": [],
+    "notes": [
+      "No minRoots hypotheses available; RootMap not emitted."
+    ],
+    "tokens": []
+  },
   "warnings": null,
   "word": "damage"
 }"
@@ -126,6 +179,38 @@ exports[`Engine Contract v1 — capture engine output (goldens) father (strict, 
       "vowelPath": "A-E"
     }
   ],
+  "deepRoot": {
+    "basis": "father",
+    "candidates": [],
+    "functionalRoots": [
+      {
+        "gloss": "Functional root AT / PAT: origin, projection, source of lineage and authority.",
+        "id": "proto.at.pat.v1",
+        "language": "proto",
+        "notes": [
+          "Proto functional family (non-historical claim).",
+          "Carrier across IE and Albanian."
+        ],
+        "opsUsed": [
+          "surface → proto carrier",
+          "no winner; family-level functional root"
+        ],
+        "roots": [
+          "AT",
+          "PAT"
+        ],
+        "surfaceForms": [
+          "father",
+          "pater",
+          "atë"
+        ],
+        "vowelPath": "A→Ë"
+      }
+    ],
+    "hypotheses": [],
+    "protoRoots": [],
+    "version": "deeproot-output-v1"
+  },
   "engineVersion": "v1.0.0",
   "evidence": {
     "basis": "father",
@@ -160,6 +245,14 @@ exports[`Engine Contract v1 — capture engine output (goldens) father (strict, 
     "rulesetVersion": "ruleset-v1.2"
   },
   "normalizedWord": "father",
+  "rootMap": {
+    "composedMeaning": "",
+    "keys": [],
+    "notes": [
+      "No minRoots hypotheses available; RootMap not emitted."
+    ],
+    "tokens": []
+  },
   "warnings": null,
   "word": "father"
 }"
@@ -179,6 +272,13 @@ exports[`Engine Contract v1 — capture engine output (goldens) gjak (strict, au
       "vowelPath": "A"
     }
   ],
+  "deepRoot": {
+    "basis": "gjak",
+    "candidates": [],
+    "hypotheses": [],
+    "protoRoots": [],
+    "version": "deeproot-output-v1"
+  },
   "engineVersion": "v1.0.0",
   "evidence": {
     "basis": "gjak",
@@ -210,6 +310,14 @@ exports[`Engine Contract v1 — capture engine output (goldens) gjak (strict, au
     "rulesetVersion": "ruleset-v1.2"
   },
   "normalizedWord": "gjak",
+  "rootMap": {
+    "composedMeaning": "",
+    "keys": [],
+    "notes": [
+      "No minRoots hypotheses available; RootMap not emitted."
+    ],
+    "tokens": []
+  },
   "warnings": null,
   "word": "gjak"
 }"
@@ -229,6 +337,13 @@ exports[`Engine Contract v1 — capture engine output (goldens) internet (strict
       "vowelPath": "I-E-E"
     }
   ],
+  "deepRoot": {
+    "basis": "internet",
+    "candidates": [],
+    "hypotheses": [],
+    "protoRoots": [],
+    "version": "deeproot-output-v1"
+  },
   "engineVersion": "v1.0.0",
   "evidence": {
     "basis": "internet",
@@ -266,6 +381,14 @@ exports[`Engine Contract v1 — capture engine output (goldens) internet (strict
     "rulesetVersion": "ruleset-v1.2"
   },
   "normalizedWord": "internet",
+  "rootMap": {
+    "composedMeaning": "",
+    "keys": [],
+    "notes": [
+      "No minRoots hypotheses available; RootMap not emitted."
+    ],
+    "tokens": []
+  },
   "warnings": null,
   "word": "internet"
 }"
@@ -285,6 +408,13 @@ exports[`Engine Contract v1 — capture engine output (goldens) love (strict, au
       "vowelPath": "O-E"
     }
   ],
+  "deepRoot": {
+    "basis": "love",
+    "candidates": [],
+    "hypotheses": [],
+    "protoRoots": [],
+    "version": "deeproot-output-v1"
+  },
   "engineVersion": "v1.0.0",
   "evidence": {
     "basis": "love",
@@ -319,6 +449,14 @@ exports[`Engine Contract v1 — capture engine output (goldens) love (strict, au
     "rulesetVersion": "ruleset-v1.2"
   },
   "normalizedWord": "love",
+  "rootMap": {
+    "composedMeaning": "",
+    "keys": [],
+    "notes": [
+      "No minRoots hypotheses available; RootMap not emitted."
+    ],
+    "tokens": []
+  },
   "warnings": null,
   "word": "love"
 }"
@@ -338,6 +476,13 @@ exports[`Engine Contract v1 — capture engine output (goldens) mathematics (str
       "vowelPath": "A-E-A-I"
     }
   ],
+  "deepRoot": {
+    "basis": "mathematics",
+    "candidates": [],
+    "hypotheses": [],
+    "protoRoots": [],
+    "version": "deeproot-output-v1"
+  },
   "engineVersion": "v1.0.0",
   "evidence": {
     "basis": "mathematics",
@@ -378,6 +523,14 @@ exports[`Engine Contract v1 — capture engine output (goldens) mathematics (str
     "rulesetVersion": "ruleset-v1.2"
   },
   "normalizedWord": "mathematics",
+  "rootMap": {
+    "composedMeaning": "",
+    "keys": [],
+    "notes": [
+      "No minRoots hypotheses available; RootMap not emitted."
+    ],
+    "tokens": []
+  },
   "warnings": null,
   "word": "mathematics"
 }"
@@ -397,6 +550,13 @@ exports[`Engine Contract v1 — capture engine output (goldens) philosophy (stri
       "vowelPath": "I-O-O-Y"
     }
   ],
+  "deepRoot": {
+    "basis": "philosophy",
+    "candidates": [],
+    "hypotheses": [],
+    "protoRoots": [],
+    "version": "deeproot-output-v1"
+  },
   "engineVersion": "v1.0.0",
   "evidence": {
     "basis": "philosophy",
@@ -437,6 +597,14 @@ exports[`Engine Contract v1 — capture engine output (goldens) philosophy (stri
     "rulesetVersion": "ruleset-v1.2"
   },
   "normalizedWord": "philosophy",
+  "rootMap": {
+    "composedMeaning": "",
+    "keys": [],
+    "notes": [
+      "No minRoots hypotheses available; RootMap not emitted."
+    ],
+    "tokens": []
+  },
   "warnings": null,
   "word": "philosophy"
 }"
@@ -456,6 +624,13 @@ exports[`Engine Contract v1 — capture engine output (goldens) shter (strict, a
       "vowelPath": "E"
     }
   ],
+  "deepRoot": {
+    "basis": "shter",
+    "candidates": [],
+    "hypotheses": [],
+    "protoRoots": [],
+    "version": "deeproot-output-v1"
+  },
   "engineVersion": "v1.0.0",
   "evidence": {
     "basis": "shter",
@@ -487,6 +662,14 @@ exports[`Engine Contract v1 — capture engine output (goldens) shter (strict, a
     "rulesetVersion": "ruleset-v1.2"
   },
   "normalizedWord": "shter",
+  "rootMap": {
+    "composedMeaning": "",
+    "keys": [],
+    "notes": [
+      "No minRoots hypotheses available; RootMap not emitted."
+    ],
+    "tokens": []
+  },
   "warnings": null,
   "word": "shter"
 }"
@@ -506,6 +689,37 @@ exports[`Engine Contract v1 — capture engine output (goldens) study (strict, a
       "vowelPath": "U-Y"
     }
   ],
+  "deepRoot": {
+    "basis": "study",
+    "candidates": [],
+    "functionalRoots": [
+      {
+        "gloss": "Functional reading: shtu (not yours / added-on) + di (know) → making knowledge yours through learning.",
+        "id": "sq.shtu+di.v1",
+        "language": "sq",
+        "notes": [
+          "Deterministic pilot hypothesis (v1).",
+          "No historical-chain claim; functional decomposition only."
+        ],
+        "opsUsed": [
+          "english carrier → sq functional reading",
+          "note: studim treated as nominal closure of the same carrier family"
+        ],
+        "roots": [
+          "shtu",
+          "di"
+        ],
+        "surfaceForms": [
+          "study",
+          "studim"
+        ],
+        "vowelPath": "U→I"
+      }
+    ],
+    "hypotheses": [],
+    "protoRoots": [],
+    "version": "deeproot-output-v1"
+  },
   "engineVersion": "v1.0.0",
   "evidence": {
     "basis": "study",
@@ -540,6 +754,14 @@ exports[`Engine Contract v1 — capture engine output (goldens) study (strict, a
     "rulesetVersion": "ruleset-v1.2"
   },
   "normalizedWord": "study",
+  "rootMap": {
+    "composedMeaning": "",
+    "keys": [],
+    "notes": [
+      "No minRoots hypotheses available; RootMap not emitted."
+    ],
+    "tokens": []
+  },
   "warnings": null,
   "word": "study"
 }"
@@ -559,6 +781,13 @@ exports[`Engine Contract v1 — capture engine output (goldens) zemër (strict, 
       "vowelPath": "E-Ë"
     }
   ],
+  "deepRoot": {
+    "basis": "zemër",
+    "candidates": [],
+    "hypotheses": [],
+    "protoRoots": [],
+    "version": "deeproot-output-v1"
+  },
   "engineVersion": "v1.0.0",
   "evidence": {
     "basis": "zemër",
@@ -593,6 +822,14 @@ exports[`Engine Contract v1 — capture engine output (goldens) zemër (strict, 
     "rulesetVersion": "ruleset-v1.2"
   },
   "normalizedWord": "zemër",
+  "rootMap": {
+    "composedMeaning": "",
+    "keys": [],
+    "notes": [
+      "No minRoots hypotheses available; RootMap not emitted."
+    ],
+    "tokens": []
+  },
   "warnings": null,
   "word": "zemër"
 }"
