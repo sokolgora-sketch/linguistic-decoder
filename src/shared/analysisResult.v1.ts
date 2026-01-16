@@ -4,6 +4,7 @@
 // IMPORTANT: Do NOT reference deprecated legacy types here.
 
 import type { DeepRootOutputV1 } from "./deepRoot.output.v1";
+import type { RootMapV1 } from "./deepRoot.rootMap.v1";
 import type { WordMatrixV1 } from "./wordMatrix.v1";
 import type {
   SevenVoicesPath,
@@ -48,6 +49,9 @@ export type AnalyzeWordResultV1 = {
 
   // Optional analysis layers
   deepRoot?: DeepRootOutputV1 | null;
+
+  // DeepRoot RootMap (optional; v0.1)
+  rootMap?: RootMapV1;
   wordMatrix?: WordMatrixV1;
 
   // Origin Claim Protocol (always present once wired; keep optional for backward fixtures)

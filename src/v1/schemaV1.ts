@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { RootMapV1Schema } from "./rootMap.v1.schema";
 
 /**
  * v1 Contract Guard
@@ -23,6 +24,9 @@ export const AnalysisResultV1Schema = z
     normalizedWord: z.string(),
     candidates: z.array(AnalysisCandidateV1Schema),
     engineVersion: z.string(),
+
+    // DeepRoot RootMap (optional; v0.1)
+    rootMap: RootMapV1Schema.optional(),
   })
   .passthrough();
 
