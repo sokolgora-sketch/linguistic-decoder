@@ -31,6 +31,12 @@ export const AnalyzeWordResultV1ContractSchema = z
     languageFamilies: z.array(z.unknown()).optional(),
     meta: z.unknown().optional(),
     debug: z.unknown().optional(),
+
+    // Route-provided telemetry / debug blocks (stable shape at top-level; inner kept loose)
+    evidence: z.unknown().optional(),
+    originClaimGates: z.unknown().optional(),
+    raw: z.unknown().optional(),
+    heartInstrumentV1: z.unknown().optional(),
   })
   .strict();
 
@@ -65,6 +71,11 @@ export function toAnalyzeWordResultV1Contract(input: unknown): AnalyzeWordResult
     languageFamilies: o.languageFamilies,
     meta: o.meta,
     debug: o.debug,
+
+    evidence: o.evidence,
+    originClaimGates: o.originClaimGates,
+    raw: o.raw,
+    heartInstrumentV1: o.heartInstrumentV1,
   };
 
   return AnalyzeWordResultV1ContractSchema.parse(picked);
