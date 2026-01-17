@@ -18,6 +18,7 @@ import type {
   RootKeyV1,
   RootCarrierV1,
   RootKeyStatusV1,
+  RootSpanV1,
 } from "./deepRoot.rootMap.v1";
 import { getProtoRootV1 } from "./protoRoots.v1";
 
@@ -52,6 +53,84 @@ function keyStatusForCarrier(carrier: { lang?: string; ops?: string[] } | null):
   // - speculative: missing carrier
   if (!carrier) return "speculative";
   return "supported";
+}
+
+function buildSpansOrNull(params: {
+  basis: string;
+  protoRoots: string[];
+  carriers: any[]; // upstream may include segment, but TS type may not
+}): RootSpanV1[] | null {
+  const basis = String(params.basis ?? "");
+  const basisLower = basis.toLowerCase();
+  if (!basisLower) return null;
+
+  // Need a segment for every protoRoot (all-or-nothing).
+  const segmentsByRoot = new Map<string, string>();
+  for (const r of params.protoRoots) {
+    const hit = Array.isArray(params.carriers)
+      ? params.carriers.find((c) => c && c.protoRootId === r)
+      : null;
+
+    const seg = String(hit?.segment ?? "").trim();
+    if (!seg) return null;
+    segmentsByRoot.set(r, seg);
+  }
+
+  const spans: RootSpanV1[] = [];
+  let cursor = 0;
+
+  for (const r of params.protoRoots) {
+    const seg = segmentsByRoot.get(r);
+    if (!seg) return null;
+
+    const segLower = seg.toLowerCase();
+
+    // Deterministic cursor walk: search from cursor only.
+    const idx = basisLower.indexOf(segLower, cursor);
+
+      // v0.1 spans policy (deterministic):
+      // - normal case: segment must be found left-to-right within basis
+      // - special-case: if the *final* segment is not found, allow an "implied trailing"
+      //   span at the current cursor. This supports decompositions where a final unit
+      //   marker is conceptually present but not literally present in the surface basis.
+      if (idx < 0) {
+        const isLast = r === params.protoRoots[params.protoRoots.length - 1];
+        const isSingleChar = segLower.length === 1;
+        if (!isLast || !isSingleChar) return null;
+
+        const start = cursor;
+        const end = cursor + 1;
+
+        {
+      const span: any = { token: r, start, end, source: "surface" };
+        // implied trailing span: do not emit note
+        spans.push(span);
+}
+
+        cursor = end;
+        continue;
+      }
+    const start = idx;
+    const end = idx + seg.length;
+
+    // note policy: emit when segment differs from token (case-sensitive)
+    const note = seg !== String(r) ? `segment=${segLower}` : undefined;
+
+    // Enforce left-to-right monotonicity.
+    if (start < cursor) return null;
+
+    // Optional note: only when segment meaningfully differs from token (case-insensitive).
+
+    {
+      const span: any = { token: r, start, end, source: "surface" };
+      if (note) span.note = note;
+      spans.push(span);
+    }
+
+    cursor = end;
+  }
+
+  return spans.length > 0 ? spans : null;
 }
 
 export function buildRootMapV1(params: {
@@ -153,10 +232,18 @@ export function buildRootMapV1(params: {
   if (!h.checks?.opsWithinLimits) notes.push("Hypothesis opsWithinLimits=false (unexpected); check upstream guardrails.");
   if (!h.checks?.skeletonExplained) notes.push("Hypothesis skeletonExplained=false (unexpected); check upstream guardrails.");
 
+  // Spans: only emit if we can do it deterministically (all-or-nothing).
+  const spans = buildSpansOrNull({
+    basis,
+    protoRoots: h.protoRoots,
+    carriers: Array.isArray(h.carriers) ? (h.carriers as any[]) : [],
+  });
+
   return {
     tokens,
     keys,
     carriers: carriersOut.length > 0 ? carriersOut : undefined,
+    spans: spans ?? undefined,
     composedMeaning,
     notes: notes.length > 0 ? notes : undefined,
   };
