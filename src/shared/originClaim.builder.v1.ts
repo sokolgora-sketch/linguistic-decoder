@@ -93,22 +93,55 @@ function extractPrimaryVoicePath(result: AnalyzeWordResultV1Like): string[] | nu
   const p2 = result?.voices?.primaryPath;
   if (Array.isArray(p2)) return p2.map(String);
 
-  // fallback: if you store heart.math7 vowels as the primary “surface” vowels
-  const p3 = result?.heart?.math7?.vowels;
+  // Preferred: heart.math7.primary.vowels (this exists in your output)
+  const p3 = result?.heart?.math7?.primary?.vowels;
   if (Array.isArray(p3)) return p3.map(String);
+
+  // Fallback: older/alternate placements
+  const p4 = result?.heart?.math7?.vowels;
+  if (Array.isArray(p4)) return p4.map(String);
+
+  const p5 = result?.evidence?.surfaceVowels;
+  if (Array.isArray(p5)) return p5.map(String);
 
   return null;
 }
 
 function extractCandidateVoiceSeq(cand: any): string[] | null {
-  const v1 = cand?.voices?.voiceSequence;
-  if (Array.isArray(v1)) return v1.map(String);
+  const fromArray = (v: any): string[] | null =>
+    Array.isArray(v) ? v.map(String).filter(Boolean) : null;
 
+  const fromString = (s: any): string[] | null => {
+    if (typeof s !== "string") return null;
+    // Extract only the seven vowels, in order, from strings like:
+    // "U-I", "U → I", "U → I (note)", "U I"
+    const m = s.match(/[AEIOUYË]/gi);
+    if (!m || m.length === 0) return null;
+    return m.map((x) => x.toLocaleUpperCase());
+  };
+
+  // 1) canonical array
+  const v1 = cand?.voices?.voiceSequence;
+  const a1 = fromArray(v1);
+  if (a1) return a1;
+
+  // 2) other plausible string slots
+  const v1s = cand?.voices?.voicePath;
+  const s1 = fromString(v1s);
+  if (s1) return s1;
+
+  // 3) candidate-level fields (array or string)
   const v2 = cand?.vowel_path;
-  if (Array.isArray(v2)) return v2.map(String);
+  const a2 = fromArray(v2);
+  if (a2) return a2;
+  const s2 = fromString(v2);
+  if (s2) return s2;
 
   const v3 = cand?.vowelPath;
-  if (Array.isArray(v3)) return v3.map(String);
+  const a3 = fromArray(v3);
+  if (a3) return a3;
+  const s3 = fromString(v3);
+  if (s3) return s3;
 
   return null;
 }

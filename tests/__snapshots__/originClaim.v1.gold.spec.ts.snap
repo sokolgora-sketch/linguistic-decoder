@@ -6,6 +6,7 @@ exports[`originClaim v1 — gold snapshots (originClaim block only) gold:damage 
     {
       "confidence": "weak",
       "evidenceRefs": [
+        "voices.primaryPath",
         "heart.math7.primary",
         "candidates[albanian-dëm]",
       ],
@@ -22,6 +23,7 @@ exports[`originClaim v1 — gold snapshots (originClaim block only) gold:damage 
     {
       "confidence": "weak",
       "evidenceRefs": [
+        "voices.primaryPath",
         "heart.math7.primary",
         "candidates[latin-damnum]",
       ],
@@ -68,6 +70,7 @@ exports[`originClaim v1 — gold snapshots (originClaim block only) gold:father 
     {
       "confidence": "weak",
       "evidenceRefs": [
+        "voices.primaryPath",
         "heart.math7.primary",
         "candidates[albanian-atë]",
       ],
@@ -84,6 +87,7 @@ exports[`originClaim v1 — gold snapshots (originClaim block only) gold:father 
     {
       "confidence": "weak",
       "evidenceRefs": [
+        "voices.primaryPath",
         "heart.math7.primary",
         "candidates[latin-pater]",
       ],
@@ -157,6 +161,7 @@ exports[`originClaim v1 — gold snapshots (originClaim block only) gold:love 1`
     {
       "confidence": "weak",
       "evidenceRefs": [
+        "voices.primaryPath",
         "heart.math7.primary",
         "candidates[albanian-dashuri]",
       ],
@@ -173,6 +178,7 @@ exports[`originClaim v1 — gold snapshots (originClaim block only) gold:love 1`
     {
       "confidence": "weak",
       "evidenceRefs": [
+        "voices.primaryPath",
         "heart.math7.primary",
         "candidates[latin-amor]",
       ],
@@ -219,6 +225,7 @@ exports[`originClaim v1 — gold snapshots (originClaim block only) gold:study 1
     {
       "confidence": "weak",
       "evidenceRefs": [
+        "voices.primaryPath",
         "heart.math7.primary",
         "candidates[albanian-studim]",
       ],
@@ -227,7 +234,7 @@ exports[`originClaim v1 — gold snapshots (originClaim block only) gold:study 1
       "language": "Albanian",
       "reasons": [
         "Candidate marked pass by engine candidate layer.",
-        "Voice path alignment cannot be determined from available fields.",
+        "Candidate voice path aligns with primary voice path.",
         "Candidate lacks detectable morphological structure.",
       ],
       "status": "pass",
@@ -235,6 +242,7 @@ exports[`originClaim v1 — gold snapshots (originClaim block only) gold:study 1
     {
       "confidence": "weak",
       "evidenceRefs": [
+        "voices.primaryPath",
         "heart.math7.primary",
         "candidates[latin-studium]",
       ],
@@ -243,7 +251,7 @@ exports[`originClaim v1 — gold snapshots (originClaim block only) gold:study 1
       "language": "Latin",
       "reasons": [
         "Candidate marked pass by engine candidate layer.",
-        "Voice path alignment cannot be determined from available fields.",
+        "Candidate voice path aligns with primary voice path.",
         "Candidate lacks detectable morphological structure.",
       ],
       "status": "pass",
