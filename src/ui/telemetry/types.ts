@@ -1,5 +1,7 @@
 export type Mode = "strict" | "open";
 
+import type { RootMapV1 } from "@/shared/deepRoot.rootMap.v1";
+
 /**
  * UI contract for vowel chips. Keep this as the only allowed vowel set.
  * (If engine emits lowercase or other symbols, normalize in adapter.)
@@ -22,7 +24,7 @@ export type PresentOrMissing<T> =
   | { kind: "present"; value: T }
   | { kind: "missing"; missing: MissingState; note?: string };
 
-export type RootMapVM = unknown;
+export type RootMapVM = RootMapV1;
 
 export interface TelemetryReadout {
   word: string;
@@ -113,7 +115,7 @@ export interface OriginClaimGatesVM {
 }
 
 export interface TelemetryViewModel {
-readout: TelemetryReadout;
+  readout: TelemetryReadout;
   evidence: EvidenceLedger;
   candidates: CandidateRowVM[];
   math: PresentOrMissing<MathTelemetryVM>;
