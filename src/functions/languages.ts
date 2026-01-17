@@ -68,7 +68,7 @@ export const Latin: LangProfile = {
 
 export const Turkish: LangProfile = {
   id: "turkish",
-  detect: (w) => /[çğşıöü]|sch|tsch|ç|ş|c(?!h)|j/i.test(w),
+  detect: (w) => /[çğşıöü]|ç|ş|c(?!h)|j/i.test(w),
   DIGRAPH: {
     "ch": "Affricate",
     "sch": "SibilantFricative", "tsch": "Affricate",
@@ -89,7 +89,7 @@ export const Turkish: LangProfile = {
 
 export const German: LangProfile = {
   id: "german",
-  detect: (w) => /sch|tsch|qu|pf|sp|st|ä|ö|ü|ß/i.test(w),
+  detect: (w) => /sch|tsch|pf|ä|ö|ü|ß/i.test(w),
   DIGRAPH: {
     "sch": "SibilantFricative",
     "tsch": "Affricate",
@@ -113,7 +113,7 @@ export const German: LangProfile = {
 export const Sanskrit: LangProfile = {
   id: "sanskrit",
   // IAST markers or common ASCII surrogates
-  detect: (w) => /[āīūṛṝḷḹṅñṇṭḍśṣḥṃṁ]|kh|gh|ch|jh|ṭ|ḍ|ś|ṣ/i.test(w),
+    detect: (w) => /[āīūṛṝḷḹṅñṇṭḍśṣḥṃṁ]/i.test(w),
   DIGRAPH: {
     // aspirated plosives → Plosive
     kh:"Plosive", gh:"Plosive", th:"Plosive", dh:"Plosive", ph:"Plosive", bh:"Plosive",
