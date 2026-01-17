@@ -3,7 +3,12 @@
 // DeepRoot RootMap v0.1 — Functional Key Decoder
 // Contract types only (no runtime logic).
 
-export type RootTokenRoleV1 = "action" | "instrument" | "unit" | "modifier" | "unknown";
+export type RootTokenRoleV1 =
+  | "action"
+  | "instrument"
+  | "unit"
+  | "modifier"
+  | "unknown";
 
 export type RootTokenV1 = {
   token: string; // e.g. "DA"
@@ -29,10 +34,25 @@ export type RootCarrierV1 = {
   note?: string; // "form carrier; no internal breakdown"
 };
 
+// NEW: spans (for UI highlighting)
+export type RootSpanSourceV1 = "surface" | "normalized";
+
+export type RootSpanV1 = {
+  token: string; // must match tokens[].token
+  start: number; // inclusive
+  end: number; // exclusive
+  source: RootSpanSourceV1; // which string the indices refer to
+  note?: string;
+};
+
 export type RootMapV1 = {
   tokens: RootTokenV1[];
   keys: RootKeyV1[];
   carriers?: RootCarrierV1[];
+
+  // Optional highlight spans; when absent, UI must not highlight.
+  spans?: RootSpanV1[];
+
   composedMeaning: string; // short compositional statement
   notes?: string[]; // guardrails / why something is missing
 };
