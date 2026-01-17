@@ -22,6 +22,8 @@ export type PresentOrMissing<T> =
   | { kind: "present"; value: T }
   | { kind: "missing"; missing: MissingState; note?: string };
 
+export type RootMapVM = unknown;
+
 export interface TelemetryReadout {
   word: string;
   normalizedWord: PresentOrMissing<string>;
@@ -111,11 +113,12 @@ export interface OriginClaimGatesVM {
 }
 
 export interface TelemetryViewModel {
-  readout: TelemetryReadout;
+readout: TelemetryReadout;
   evidence: EvidenceLedger;
   candidates: CandidateRowVM[];
   math: PresentOrMissing<MathTelemetryVM>;
   rejections: RejectionLogVM;
   originClaimGates: OriginClaimGatesVM;
+  rootMap: PresentOrMissing<RootMapVM>;
   raw: unknown;
 }

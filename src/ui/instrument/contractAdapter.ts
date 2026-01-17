@@ -17,6 +17,7 @@ import type {
   PresentOrMissing,
   RejectionItemVM,
   TelemetryViewModel,
+  RootMapVM,
   Vowel,
 } from "../telemetry/types";
 
@@ -409,6 +410,18 @@ export function adaptAnalysisToTelemetryVM(raw: unknown): TelemetryViewModel {
     math,
     rejections: { items: rejectionItems },
     originClaimGates,
+
+    // RootMap (v0.1): VM-only. Present if emitted; missing if absent; malformed if wrong type.
+    rootMap: (() => {
+      const src = payload as any;
+      if (!src || typeof src !== "object") return missing("not_emitted", "rootMap");
+      if (!("rootMap" in src)) return missing("not_emitted", "rootMap");
+      const v = src.rootMap;
+      if (v == null) return missing("not_emitted", "rootMap");
+      if (!isRecord(v)) return missing("malformed", "rootMap expected object");
+      return present(v as any);
+    })(),
+
     raw,
   };
 }

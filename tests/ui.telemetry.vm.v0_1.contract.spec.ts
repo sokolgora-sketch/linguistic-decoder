@@ -52,7 +52,7 @@ describe("ui telemetry vm contract v0.1", () => {
   it("keeps required top-level keys", () => {
     const vm = adaptAnalysisToTelemetryVM(studyStrict as any) as any;
     expect(Object.keys(vm).sort()).toEqual(
-      ["candidates", "evidence", "math", "originClaimGates", "raw", "readout", "rejections"].sort()
+      ["candidates", "evidence", "math", "originClaimGates", "raw", "readout", "rejections", "rootMap"].sort()
     );
   });
 });
