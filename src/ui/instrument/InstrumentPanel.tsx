@@ -3,6 +3,7 @@
 import React from 'react';
 import { VowelPathTimeline } from "./VowelPathTimeline";
 import { adaptAnalysisToTelemetryVM } from "@/ui/instrument/contractAdapter";
+import { RootMapCard } from "@/ui/instrument/RootMapCard";
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
@@ -108,38 +109,39 @@ export function InstrumentPanel(props: Props) {
 
   return (
     <div className="space-y-3">
-{props.debug ? (
-<div className="mb-4 rounded border border-emerald-500 bg-black p-3 text-xs text-emerald-400">
-  <div>InstrumentPanel ACTIVE</div>
-  <div>word: {vm.wordShown}</div>
-  <div>engine: {vm.engineVersion}</div>
-  <div>mode: {vm.mode}</div>
-  <div>vowelPath: {vm.vowelPath?.join(" → ")}</div>
-  <div>signals: {vm.signals?.length ?? 0}</div>
-</div>
-) : null}
+      {props.debug ? (
+        <div className="mb-4 rounded border border-emerald-500 bg-black p-3 text-xs text-emerald-400">
+          <div>InstrumentPanel ACTIVE</div>
+          <div>word: {vm.wordShown}</div>
+          <div>engine: {vm.engineVersion}</div>
+          <div>mode: {vm.mode}</div>
+          <div>vowelPath: {vm.vowelPath?.join(" → ")}</div>
+          <div>signals: {vm.signals?.length ?? 0}</div>
+        </div>
+      ) : null}
       {/* Readout (Telemetry Core) */}
       <ReadoutCard readout={vm.readout} onCopySummary={() => void copyText('Summary copied.', summaryLines.join('\n'))} onCopyFullJson={() => void copyText('Full JSON copied.', toPrettyJson(vm.raw))} />
 
       <VowelPathTimeline
-
-
         detected={vm.readout.voicePath}
-
-
         surface={vm.readout.voicePathSurface}
-
-
         functional={vm.readout.voicePathFunctional}
-
-
         delta={vm.readout.voicePathDelta}
-
-
       />
 
-
-      <MeaningPanel vm={vm} />
+      <RootMapCard
+        rootMap={vm.rootMap ?? ({ kind: "missing", missing: "not_emitted", note: "rootMap" } as any)}
+        word={String((vm.readout as any)?.word ?? (vm.readout as any)?.inputWord ?? "")}
+        normalizedWord={(() => {
+          const r: any = (vm.readout as any) ?? {};
+          const n = r.normalizedWord ?? r.normalized ?? r.basisNormalized ?? "";
+          if (n && typeof n === "object" && (n.kind === "present" || n.kind === "missing")) {
+            return n.kind === "present" ? String(n.value ?? "") : "";
+          }
+          return String(n ?? "");
+        })()}
+      />
+<MeaningPanel vm={vm} />
 
       {ledgerModel ? <EvidenceLedgerCard model={ledgerModel} engineVersion={engineVersion} /> : null}
 
@@ -190,13 +192,13 @@ export function InstrumentPanel(props: Props) {
                 onClick={() => void copyText('Full JSON copied.', toPrettyJson(vm.raw))}
               >
                 Copy Full JSON
-            </Button>
+              </Button>
             </div>
           </div>
         </CardHeader>
         <CardContent className="py-3">
           <pre className="whitespace-pre-wrap rounded-md border bg-muted/20 p-3 text-xs font-mono leading-relaxed">
-{summaryLines.join('\n')}
+            {summaryLines.join('\n')}
           </pre>
           <div className="mt-2 text-xs text-muted-foreground">
             This is UI-only. No invented metrics. Missing fields are reported as “not emitted”.

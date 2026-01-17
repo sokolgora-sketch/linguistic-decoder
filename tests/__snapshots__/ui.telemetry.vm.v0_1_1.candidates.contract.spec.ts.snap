@@ -233,5 +233,10 @@ exports[`ui telemetry vm contract v0.1.1 (candidates evidence lists) adapts cand
       "missing": "not_emitted",
     },
   },
+  "rootMap": {
+    "kind": "missing",
+    "missing": "not_emitted",
+    "note": "rootMap",
+  },
 }
 `;
