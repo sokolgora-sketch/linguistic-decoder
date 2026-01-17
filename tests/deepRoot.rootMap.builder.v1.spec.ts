@@ -83,3 +83,79 @@ describe("buildRootMapV1", () => {
     expect(rm?.keys[1].ops).toBeUndefined(); // empty ops should be undefined
   });
 });
+
+describe("buildRootMapV1 (spans)", () => {
+  it("does not emit spans when hypothesis segments are missing (all-or-nothing)", () => {
+    const { buildRootMapV1 } = require("@/shared/deepRoot.rootMap.builder.v1");
+
+    const out = buildRootMapV1({
+      basis: "study",
+      minRoots: [
+        {
+          protoRoots: ["ST", "DI", "M"],
+          carriers: [], // no carrier.segment
+          // no segments[] fallback either
+          decomposition: {},
+          checks: { opsWithinLimits: true, skeletonExplained: true },
+        },
+      ],
+    });
+
+    expect(out).toBeTruthy();
+    expect(out.spans).toBeUndefined();
+  });
+
+  it("emits spans when carrier segments are present and match basis left-to-right", () => {
+    const { buildRootMapV1 } = require("@/shared/deepRoot.rootMap.builder.v1");
+
+    const out = buildRootMapV1({
+      basis: "study",
+      minRoots: [
+        {
+          protoRoots: ["ST", "U", "DI", "M"],
+          carriers: [
+            { protoRootId: "ST", lang: "latin", carrierForm: "st", ops: [], segment: "st" },
+            { protoRootId: "U", lang: "latin", carrierForm: "u", ops: [], segment: "u" },
+            { protoRootId: "DI", lang: "latin", carrierForm: "di", ops: [], segment: "dy" }, // normalized-ish segment
+            { protoRootId: "M", lang: 'latin', carrierForm: 'm', ops: [], segment: 'm' },
+          ],
+          decomposition: {},
+          checks: { opsWithinLimits: true, skeletonExplained: true },
+        },
+      ],
+    });
+
+    expect(out).toBeTruthy();
+    expect(Array.isArray(out.spans)).toBe(true);
+
+    // Deterministic cursor-walk: st u dy m within "study"
+    expect(out.spans).toEqual([
+      { token: "ST", start: 0, end: 2, source: "surface", note: "segment=st" },
+      { token: "U", start: 2, end: 3, source: "surface", note: "segment=u" },
+      { token: "DI", start: 3, end: 5, source: "surface", note: "segment=dy" },
+      { token: "M", start: 5, end: 6, source: "surface" },
+    ]);
+  });
+
+  it("does not emit spans if any segment cannot be found deterministically", () => {
+    const { buildRootMapV1 } = require("@/shared/deepRoot.rootMap.builder.v1");
+
+    const out = buildRootMapV1({
+      basis: "study",
+      minRoots: [
+        {
+          protoRoots: ["ST", "X"],
+          carriers: [
+            { protoRootId: "ST", lang: "latin", carrierForm: "st", ops: [], segment: "st" },
+            { protoRootId: "X", lang: "latin", carrierForm: "x", ops: [], segment: "zz" }, // not in basis
+          ],
+          decomposition: {},
+          checks: { opsWithinLimits: true, skeletonExplained: true },
+        },
+      ],
+    });
+
+    expect(out).toBeTruthy();
+    expect(out.spans).toBeUndefined();
+  });
+});
