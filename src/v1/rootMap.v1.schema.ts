@@ -37,10 +37,25 @@ export const RootCarrierV1Schema = z.object({
   note: z.string().optional(),
 });
 
+// NEW: spans (for UI highlighting)
+export const RootSpanSourceV1Schema = z.enum(["surface", "normalized"]);
+
+export const RootSpanV1Schema = z.object({
+  token: z.string(),
+  start: z.number().int().nonnegative(),
+  end: z.number().int().nonnegative(),
+  source: RootSpanSourceV1Schema,
+  note: z.string().optional(),
+});
+
 export const RootMapV1Schema = z.object({
   tokens: z.array(RootTokenV1Schema),
   keys: z.array(RootKeyV1Schema),
   carriers: z.array(RootCarrierV1Schema).optional(),
+
+  // optional highlight spans (basis indexing)
+  spans: z.array(RootSpanV1Schema).optional(),
+
   composedMeaning: z.string(),
   notes: z.array(z.string()).optional(),
 });
