@@ -86,23 +86,49 @@ function extractCandidates(result: AnalyzeWordResultV1Like): any[] {
 }
 
 function extractPrimaryVoicePath(result: AnalyzeWordResultV1Like): string[] | null {
-  // Try a few known-ish slots without depending on raw payload.
+  const fromArray = (v: any): string[] | null =>
+    Array.isArray(v) ? v.map(String).filter(Boolean) : null;
+
+  const fromString = (s: any): string[] | null => {
+    if (typeof s !== "string") return null;
+    const m = s.match(/[AEIOUYË]/gi);
+    if (!m || m.length === 0) return null;
+    return m.map((x) => x.toLocaleUpperCase());
+  };
+
+  // 0) Most stable v1 slot (public contract)
+  const p0 = result?.primaryPath?.voicePath;
+  const a0 = fromArray(p0);
+  if (a0) return a0;
+  const s0 = fromString(p0);
+  if (s0) return s0;
+
+  // 1) Evidence math7 (common stable emitter)
+  const pE = result?.evidence?.math7?.primary?.vowels;
+  const aE = fromArray(pE);
+  if (aE) return aE;
+
+  // 2) Heart math7 primary (actual engine slot in current JSON)
+  const pH = result?.heart?.math7?.primary?.vowels;
+  const aH = fromArray(pH);
+  if (aH) return aH;
+
+  // 3) Legacy-ish fallbacks (arrays or strings)
   const p1 = result?.heart?.voices?.primaryPath;
-  if (Array.isArray(p1)) return p1.map(String);
+  const a1 = fromArray(p1);
+  if (a1) return a1;
+  const s1 = fromString(p1);
+  if (s1) return s1;
 
   const p2 = result?.voices?.primaryPath;
-  if (Array.isArray(p2)) return p2.map(String);
+  const a2 = fromArray(p2);
+  if (a2) return a2;
+  const s2 = fromString(p2);
+  if (s2) return s2;
 
-  // Preferred: heart.math7.primary.vowels (this exists in your output)
-  const p3 = result?.heart?.math7?.primary?.vowels;
-  if (Array.isArray(p3)) return p3.map(String);
-
-  // Fallback: older/alternate placements
-  const p4 = result?.heart?.math7?.vowels;
-  if (Array.isArray(p4)) return p4.map(String);
-
-  const p5 = result?.evidence?.surfaceVowels;
-  if (Array.isArray(p5)) return p5.map(String);
+  const p3 = result?.heart?.math7?.vowels;
+  const a3 = fromArray(p3);
+  if (a3) return a3;
 
   return null;
 }
@@ -257,7 +283,7 @@ function computeSupportVector(result: AnalyzeWordResultV1Like, cand: any): Suppo
   };
 
   // Evidence anchors (stable strings)
-  if (primary) out.evidenceRefs.push("voices.primaryPath");
+  if (primary) out.evidenceRefs.push("primaryPath.voicePath");
   if (result?.heart?.math7?.primary) out.evidenceRefs.push("heart.math7.primary");
 
   // C1 status
