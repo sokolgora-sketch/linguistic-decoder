@@ -3,7 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { PresentOrMissing, RootMapVM } from "@/ui/telemetry/types";
 
-type Span = { start: number; end: number; label?: string; token?: string };
+type Span = { start: number; end: number; label?: string; token?: string; source?: "surface" | "normalized"; note?: string };
 
 function isRecord(x: unknown): x is Record<string, unknown> {
   return !!x && typeof x === "object" && !Array.isArray(x);
@@ -36,20 +36,58 @@ function collectSpans(rootMap: unknown): Span[] {
   return out;
 }
 
-function validateSpans(normalized: string, spans: Span[]): { ok: true; spans: Span[] } | { ok: false; reason: string } {
-  const n = normalized.length;
+function validateSpans(
+  inputs: { surface: string; normalized: string },
+  spans: Span[]
+): { ok: true; spans: Span[]; source: "surface" | "normalized" } | { ok: false; reason: string } {
+  const surface = String(inputs.surface ?? "");
+  const normalized = String(inputs.normalized ?? "");
+
+  // Determine a single source for the whole span set.
+  let source: "surface" | "normalized" | null = null;
+
   for (const s of spans) {
-    // Bounds guard: 0 <= start < end <= normalizedWord.length
+    const sSource = (s.source ?? "normalized") as any;
+    if (sSource !== "surface" && sSource !== "normalized") {
+      return { ok: false, reason: `invalid span.source: ${String(s.source)}` };
+    }
+    if (!source) source = sSource;
+    if (source !== sSource) {
+      return { ok: false, reason: "mixed span sources (surface + normalized) are not supported" };
+    }
+  }
+
+  const base = source === "surface" ? surface : normalized;
+  const n = base.length;
+
+  for (const s of spans) {
     if (!(Number.isFinite(s.start) && Number.isFinite(s.end))) {
       return { ok: false, reason: "span start/end not finite numbers" };
     }
     if (!(s.start >= 0 && s.start < s.end && s.end <= n)) {
-      return { ok: false, reason: `span out of bounds: start=${s.start} end=${s.end} len=${n}` };
+      return { ok: false, reason: `span out of bounds for ${source}: start=${s.start} end=${s.end} len=${n}` };
     }
   }
+
   // Deterministic ordering: stable left-to-right
-  const sorted = [...spans].sort((a, b) => (a.start - b.start) || (a.end - b.end) || String(a.token ?? "").localeCompare(String(b.token ?? "")));
-  return { ok: true, spans: sorted };
+  const sorted = [...spans].sort(
+    (a, b) =>
+      a.start - b.start ||
+      a.end - b.end ||
+      String(a.token ?? "").localeCompare(String(b.token ?? "")) ||
+      String(a.label ?? "").localeCompare(String(b.label ?? ""))
+  );
+
+  // Non-overlap monotonicity guard
+  let cursor = 0;
+  for (const s of sorted) {
+    if (s.start < cursor) {
+      return { ok: false, reason: `span overlap/non-monotonic: start=${s.start} cursor=${cursor}` };
+    }
+    cursor = s.end;
+  }
+
+  return { ok: true, spans: sorted, source: source || "normalized" };
 }
 
 function renderHighlights(normalized: string, spans: Span[]) {
@@ -157,7 +195,7 @@ export function RootMapCard({ rootMap, word, normalizedWord }: Props) {
   }
 
   // MALFORMED: spans exist but cannot be trusted
-  const v = validateSpans(norm, spans);
+  const v = validateSpans({ surface: w, normalized: norm }, spans);
   if (v.ok === false) {
     const reason = v.ok === false ? v.reason : "unknown";
     return (
@@ -222,9 +260,11 @@ export function RootMapCard({ rootMap, word, normalizedWord }: Props) {
         </div>
 
         <div>
-          <div className="text-xs text-zinc-500 mb-1">HIGHLIGHTS (NORMALIZED ONLY)</div>
-          {renderHighlights(norm, v.spans)}
-        </div>
+            <div className="text-xs text-zinc-500 mb-1">
+              HIGHLIGHTS ({v.source === "surface" ? "WORD" : "NORMALIZED"})
+            </div>
+            {renderHighlights(v.source === "surface" ? w : norm, v.spans)}
+          </div>
 
         <div className="text-sm">
           <div className="text-xs text-zinc-500">TOKENS</div>
