@@ -20,6 +20,70 @@ import type {
   RootMapVM,
   Vowel,
 } from "../telemetry/types";
+import type { RootMapV1 } from "@/shared/deepRoot.rootMap.v1";
+
+type ParseRootMapResult = { ok: true; value: RootMapV1 } | { ok: false; reason: string };
+
+function parseRootMapV1(v: unknown): ParseRootMapResult {
+  if (!isRecord(v)) return { ok: false, reason: "rootMap expected object" };
+
+  const tokens = (v as any).tokens;
+  const keys = (v as any).keys;
+  const composedMeaning = (v as any).composedMeaning;
+
+  if (!Array.isArray(tokens)) return { ok: false, reason: "rootMap.tokens expected array" };
+  if (!Array.isArray(keys)) return { ok: false, reason: "rootMap.keys expected array" };
+  if (typeof composedMeaning !== "string") return { ok: false, reason: "rootMap.composedMeaning expected string" };
+
+  // tokens: [{ token: string, role?: string, vowel_path?: string }]
+  for (const t of tokens) {
+    if (!isRecord(t)) return { ok: false, reason: "rootMap.tokens item expected object" };
+    if (typeof (t as any).token !== "string") return { ok: false, reason: "rootMap.tokens[].token expected string" };
+    if ("role" in t && (t as any).role != null && typeof (t as any).role !== "string")
+      return { ok: false, reason: "rootMap.tokens[].role expected string" };
+    if ("vowel_path" in t && (t as any).vowel_path != null && typeof (t as any).vowel_path !== "string")
+      return { ok: false, reason: "rootMap.tokens[].vowel_path expected string" };
+  }
+
+  // keys: [{ token, language, gloss, evidence[], status, ops?[] }]
+  for (const k of keys) {
+    if (!isRecord(k)) return { ok: false, reason: "rootMap.keys item expected object" };
+    if (typeof (k as any).token !== "string") return { ok: false, reason: "rootMap.keys[].token expected string" };
+    if (typeof (k as any).language !== "string") return { ok: false, reason: "rootMap.keys[].language expected string" };
+    if (typeof (k as any).gloss !== "string") return { ok: false, reason: "rootMap.keys[].gloss expected string" };
+    if (!Array.isArray((k as any).evidence) || !(k as any).evidence.every((x: any) => typeof x === "string"))
+      return { ok: false, reason: "rootMap.keys[].evidence expected string[]" };
+    if (typeof (k as any).status !== "string") return { ok: false, reason: "rootMap.keys[].status expected string" };
+    if ("ops" in k && (k as any).ops != null) {
+      if (!Array.isArray((k as any).ops) || !(k as any).ops.every((x: any) => typeof x === "string"))
+        return { ok: false, reason: "rootMap.keys[].ops expected string[]" };
+    }
+  }
+
+  // carriers?: [{ token, language, carrierForm, note? }]
+  const carriers = (v as any).carriers;
+  if (carriers != null) {
+    if (!Array.isArray(carriers)) return { ok: false, reason: "rootMap.carriers expected array" };
+    for (const c of carriers) {
+      if (!isRecord(c)) return { ok: false, reason: "rootMap.carriers item expected object" };
+      if (typeof (c as any).token !== "string") return { ok: false, reason: "rootMap.carriers[].token expected string" };
+      if (typeof (c as any).language !== "string") return { ok: false, reason: "rootMap.carriers[].language expected string" };
+      if (typeof (c as any).carrierForm !== "string")
+        return { ok: false, reason: "rootMap.carriers[].carrierForm expected string" };
+      if ("note" in c && (c as any).note != null && typeof (c as any).note !== "string")
+        return { ok: false, reason: "rootMap.carriers[].note expected string" };
+    }
+  }
+
+  // notes?: string[]
+  const notes = (v as any).notes;
+  if (notes != null) {
+    if (!Array.isArray(notes) || !notes.every((x: any) => typeof x === "string"))
+      return { ok: false, reason: "rootMap.notes expected string[]" };
+  }
+
+  return { ok: true, value: v as RootMapV1 };
+}
 
 // ----------------------- small helpers -----------------------
 
@@ -179,7 +243,7 @@ export function adaptAnalysisToTelemetryVM(raw: unknown): TelemetryViewModel {
   };
 
   const detectedParts = toVoiceParts(vp.detected);
-    // v0.1 contract: surface must represent RAW surface vowels (e.g. U-Y for 'study').
+    // v0.1 contract: surface must represent RAW surface vowels (e.g. U-Y for \'study\').
   // Prefer payload.heartInstrumentV1.surfaceVowels if present.
   const hiRoot = isRecord(payload) && isRecord((payload as any)["heartInstrumentV1"]) ? ((payload as any)["heartInstrumentV1"] as any) : null;
   const hiSurfaceArr = hiRoot ? asStringArray(hiRoot["surfaceVowels"]) : null;
@@ -411,15 +475,17 @@ export function adaptAnalysisToTelemetryVM(raw: unknown): TelemetryViewModel {
     rejections: { items: rejectionItems },
     originClaimGates,
 
-    // RootMap (v0.1): VM-only. Present if emitted; missing if absent; malformed if wrong type.
     rootMap: (() => {
-      const src = payload as any;
-      if (!src || typeof src !== "object") return missing("not_emitted", "rootMap");
-      if (!("rootMap" in src)) return missing("not_emitted", "rootMap");
-      const v = src.rootMap;
+      if (!isRecord(payload)) return missing("not_emitted", "rootMap");
+      if (!("rootMap" in payload)) return missing("not_emitted", "rootMap");
+
+      const v = (payload as any).rootMap;
       if (v == null) return missing("not_emitted", "rootMap");
-      if (!isRecord(v)) return missing("malformed", "rootMap expected object");
-      return present(v as any);
+
+      const parsed = parseRootMapV1(v);
+      if (parsed.ok === false) return missing("malformed", parsed.reason);
+
+      return present(parsed.value);
     })(),
 
     raw,
@@ -446,4 +512,3 @@ function pomStringListFromEvidenceField(
   // present (including empty => MeaningPanel will show "none")
   return present(v.map((x) => String(x)));
 }
-
