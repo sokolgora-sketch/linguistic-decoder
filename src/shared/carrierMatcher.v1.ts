@@ -196,10 +196,9 @@ function tryMatch(
     return finalizeMatch(
       (() => {
         const nextOps = [...a.ops];
-
-        const seg = String(segment ?? "").toLowerCase();
-        const form = String((a as any)?.carrierForm ?? "").toLowerCase();
-
+          // IMPORTANT: use the attempt segment + the actual target carrier string.
+          const seg = String(a.segment ?? "").toLowerCase();
+          const form = String(carrier ?? "").toLowerCase();
         // No transform happened: do NOT add an op.
         if (seg && form && seg === form) return nextOps;
 
