@@ -1,6 +1,7 @@
 export type Mode = "strict" | "open";
 
 import type { RootMapV1 } from "@/shared/deepRoot.rootMap.v1";
+import type { DeepRootHeartGateV01 } from "@/shared/deepRootHeartGate.v0.1";
 
 /**
  * UI contract for vowel chips. Keep this as the only allowed vowel set.
@@ -73,6 +74,7 @@ export interface CandidateRowVM {
 
   functionalStatement: PresentOrMissing<string>;
   vowelPath: PresentOrMissing<Vowel[]>;
+  deepRootHeartGate: PresentOrMissing<DeepRootHeartGateV01>;
 
   decomposition: PresentOrMissing<DecompositionItemVM[]>;
   ops: PresentOrMissing<string[]>;

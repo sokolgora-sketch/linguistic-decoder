@@ -21,6 +21,7 @@ import type {
   Vowel,
 } from "../telemetry/types";
 import type { RootMapV1 } from "@/shared/deepRoot.rootMap.v1";
+import { computeDeepRootHeartGateV01 } from "@/shared/deepRootHeartGate.v0.1.compute";
 
 type ParseRootMapResult = { ok: true; value: RootMapV1 } | { ok: false; reason: string };
 
@@ -211,6 +212,10 @@ export function adaptAnalysisToTelemetryVM(raw: unknown): TelemetryViewModel {
 
   const vp = pickVoicePaths(payload);
 
+  // DeepRoot–Heart Alignment Gate v0.1 (adapter-first): use the detected primary path string.
+  const heartPrimaryPathForGate: string | null = vp.detected ?? null;
+
+
   // Accept unknown input, normalize to a dash-delimited string, then parse.
   // This avoids runtime crashes when upstream emits arrays or non-strings.
   const toVoiceParts = (v: unknown): Vowel[] | null => {
@@ -379,6 +384,18 @@ export function adaptAnalysisToTelemetryVM(raw: unknown): TelemetryViewModel {
         form: form ? present(form) : missing("not_emitted"),
         functionalStatement: functionalStatement ? present(functionalStatement) : missing("not_emitted"),
         vowelPath: candVowelPath ? present(candVowelPath) : missing("not_emitted"),
+
+          deepRootHeartGate: present(
+            computeDeepRootHeartGateV01({
+              heartPrimaryPath: heartPrimaryPathForGate,
+              candidateResolvedPath: candVowelPath ? candVowelPath.join("-") : null,
+              evidenceRefs: [
+                "primaryPath.voicePath",
+                // Candidate-local anchor (string only; UI treats as reference label)
+                `candidates[${i}].vowelPath`,
+              ],
+            })
+          ),
 
         // leave decomposition for later (shape varies too much right now)
         decomposition: missing("not_emitted") as PresentOrMissing<DecompositionItemVM[]>,
