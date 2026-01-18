@@ -72,7 +72,11 @@ export function enginePayloadToAnalysisResult(payload: EnginePayload): AnalyzeWo
         (result as any)?.deepRoot?.hypotheses ??
         (result as any)?.deepRoot?.candidates ??
         [],
-    }) ??
+      heartPrimaryPath:
+    (result as any)?.heart?.math7?.primary?.vowels ??
+    (result as any)?.primaryPath?.voicePath ??
+    null,
+}) ??
     {
       tokens: [],
       keys: [],
