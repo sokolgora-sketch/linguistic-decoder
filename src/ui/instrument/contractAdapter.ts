@@ -430,7 +430,14 @@ export function adaptAnalysisToTelemetryVM(raw: unknown): TelemetryViewModel {
   const gatesActive = (oc && isRecord(oc.policy) && oc.policy.gatesActive === true) || (oc && oc.policy === "gates-v1.1");
 
   const originClaimGates: OriginClaimGatesVM = {
-    active: gatesActive ?? false,
+    active: (() => {
+      // VM-only: NEVER override with dev flags / URL params.
+      const a = (raw as any)?.originClaimGates?.active;
+      if (typeof a === "boolean") return a;
+
+      // Fallback: derive from OriginClaim policy gates indicator.
+      return !!gatesActive;
+    })(),
     flag: "ocg" as const,
     candidateCount: (oc && Array.isArray(oc.candidates)) ? oc.candidates.length : 0,
     reasonCounts,
