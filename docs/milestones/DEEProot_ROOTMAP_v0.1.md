@@ -91,3 +91,18 @@ type RootMapV1 = {
   composedMeaning: string;
   notes?: string[];
 };
+<<<<<<< HEAD
+
+---
+
+## RootMap (DeepRoot) — current behavior (v0.1.1)
+
+- RootMap selection is deterministic and Heart-aligned when Heart primary path is available.
+- Selection rule:
+  1) If Heart primary path exists, select the first DeepRoot minRoots hypothesis whose terminal vowel matches Heart’s terminal vowel.
+  2) Else fallback to minRoots[0].
+- RootMap remains “keys vs carriers” (no ranking / no winner).
+- Canon check: `study` -> tokens `SHTU | DI` (not `DA`).
+
+=======
+>>>>>>> origin/main
