@@ -4,7 +4,9 @@ import { PROTO_ROOTS_V1 } from "./protoRoots.v1";
 export type AllowedOp =
   | "exact"
   | "vowel_swap"
-  | "s_to_sh"
+  
+  | "y_to_i"
+  | "final_swap"| "s_to_sh"
   | "sh_to_s"
   | "g_to_gj"
   | "gj_to_g"
@@ -192,7 +194,43 @@ function tryMatch(
     if (!vs) continue;
 
     return finalizeMatch(
-      [...a.ops, "vowel_swap"],
+      (() => {
+        const nextOps = [...a.ops];
+
+        const seg = String(segment ?? "").toLowerCase();
+        const form = String((a as any)?.carrierForm ?? "").toLowerCase();
+
+        // No transform happened: do NOT add an op.
+        if (seg && form && seg === form) return nextOps;
+
+        // Terminal -a/-ë/-e swap (final marker)
+        const segStem = seg.length > 1 ? seg.slice(0, -1) : "";
+        const formStem = form.length > 1 ? form.slice(0, -1) : "";
+        const segLast = seg.slice(-1);
+        const formLast = form.slice(-1);
+
+        const isFinalSwap =
+          segStem &&
+          formStem &&
+          segStem === formStem &&
+          segLast !== formLast &&
+          (segLast === "a" || segLast === "ë" || segLast === "e") &&
+          (formLast === "a" || formLast === "ë" || formLast === "e");
+
+        if (isFinalSwap) {
+          nextOps.push("final_swap");
+          return nextOps;
+        }
+
+        // y -> i evidence (e.g. dy vs di)
+        if (seg.includes("y") && form.includes("i")) {
+          nextOps.push("y_to_i");
+          return nextOps;
+        }
+
+        nextOps.push("vowel_swap");
+        return nextOps;
+      })(),
       [...a.reasonCodes, "VOWEL_SWAP"],
       a.cost + vs.cost,
       false
