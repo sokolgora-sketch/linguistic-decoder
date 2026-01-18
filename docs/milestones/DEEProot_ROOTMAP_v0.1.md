@@ -91,6 +91,7 @@ type RootMapV1 = {
   composedMeaning: string;
   notes?: string[];
 };
+<<<<<<< HEAD
 
 ---
 
@@ -103,3 +104,5 @@ type RootMapV1 = {
 - RootMap remains “keys vs carriers” (no ranking / no winner).
 - Canon check: `study` -> tokens `SHTU | DI` (not `DA`).
 
+=======
+>>>>>>> origin/main
