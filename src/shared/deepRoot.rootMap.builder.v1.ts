@@ -39,6 +39,31 @@ function roleHintToTokenRole(roleHint?: string): RootTokenRoleV1 {
   }
 }
 
+
+function lastVowelFromAnyPath(v: unknown): string | null {
+  // Accept: ["U","I"], "U-I", "U→I", "UI"
+  if (Array.isArray(v)) {
+    const last = v[v.length - 1];
+    const s = String(last ?? "").toUpperCase();
+    return s && /^[AEIOUYË]$/.test(s) ? s : null;
+  }
+  const s = String(v ?? "").toUpperCase();
+  const m = s.match(/[AEIOUYË]/g);
+  if (!m || m.length === 0) return null;
+  return m[m.length - 1] ?? null;
+}
+
+function hypothesisTerminalVowel(h: any): string | null {
+  // Prefer decomposition.function if present; else use last protoRoot vowel.
+  const func = h?.decomposition?.function;
+  const fromFunc = func ? lastVowelFromAnyPath(func) : null;
+  if (fromFunc) return fromFunc;
+
+  const roots = Array.isArray(h?.protoRoots) ? h.protoRoots : [];
+  if (!roots.length) return null;
+  return lastVowelFromAnyPath(roots[roots.length - 1]);
+}
+
 function extractVowelPath(s: string): string | undefined {
   // Keep it simple + deterministic: uppercase, scan for the canonical vowels.
   const up = String(s ?? "").toUpperCase();
@@ -134,8 +159,9 @@ function buildSpansOrNull(params: {
 }
 
 export function buildRootMapV1(params: {
-  basis: string;
+basis: string;
   minRoots: MinRootHypothesis[] | null | undefined;
+  heartPrimaryPath?: unknown; // optional: prefer Heart-aligned hypothesis
 }): RootMapV1 | null {
   const basis = String(params.basis ?? "").trim();
   const minRoots = Array.isArray(params.minRoots) ? params.minRoots : [];
@@ -150,10 +176,31 @@ export function buildRootMapV1(params: {
     };
   }
 
-  // Deterministic choice: first hypothesis only.
-  const h = minRoots[0];
 
-  const tokens: RootTokenV1[] = [];
+  // Deterministic choice (v0.1.1):
+
+
+  // Prefer the first hypothesis whose terminal vowel matches Heart primary terminal vowel.
+
+
+  // Fallback: first hypothesis (stable order).
+
+
+  const heartTerm = lastVowelFromAnyPath(params.heartPrimaryPath);
+
+
+  const h =
+
+
+    (heartTerm
+
+
+      ? (minRoots.find((hh) => hypothesisTerminalVowel(hh) === heartTerm) ?? minRoots[0])
+
+
+      : minRoots[0]);
+
+const tokens: RootTokenV1[] = [];
   const keys: RootKeyV1[] = [];
   const carriersOut: RootCarrierV1[] = [];
 

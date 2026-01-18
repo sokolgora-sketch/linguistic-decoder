@@ -176,7 +176,13 @@ export function analyzeWordV1(word: string): AnalysisResult {
   const rootMap = buildRootMapV1({
     basis: normalizedWord, // stable basis
     minRoots: minRootsForRootMap,
-  });
+    heartPrimaryPath:
+    // Prefer canonical Heart math7 primary vowels (stable contract)
+    // Fallback: primaryPath.voicePath (if present in this pipeline layer)
+    (result as any)?.heart?.math7?.primary?.vowels ??
+    (result as any)?.primaryPath?.voicePath ??
+    null,
+});
 
   // Emit at top-level (contract field)
   if (rootMap) {
