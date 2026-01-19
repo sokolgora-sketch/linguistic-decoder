@@ -1,4 +1,4 @@
-import { adaptRootMapToVM } from "../srcShimRootMapVM";
+import { adaptRootMapToVM } from "../src/ui/telemetry/rootMapVM.v0.1";
 
 /**
  * NOTE:
