@@ -1,4 +1,4 @@
-// RootMap Panel (v0.1)
+// RootMap Panel (v0.1.x)
 // Goal: render RootMap as a scientific instrument view (VM-only, no raw payload access).
 
 'use client';
@@ -11,17 +11,36 @@ type Props = {
   rootMap: Maybe<RootMapVM>;
 };
 
-function MissingView({ note }: { note?: string }) {
+function MissingView({
+  missing,
+  detail,
+  note,
+}: {
+  missing: string;
+  detail?: string;
+  note?: string;
+}) {
   return (
-    <div className="text-sm text-muted-foreground">
-      RootMap not available{note ? `: ${note}` : ""}
+    <div className="text-sm text-muted-foreground space-y-1">
+      <div>
+        <span className="font-medium">RootMap</span>: not available{" "}
+        <span className="text-xs">({missing})</span>
+      </div>
+      {detail ? <div className="text-xs">{detail}</div> : null}
+      {note ? <div className="text-xs">note: {note}</div> : null}
     </div>
   );
 }
 
 export function RootMapPanelV01({ rootMap }: Props) {
   if (rootMap.kind !== "present") {
-    return <MissingView note={rootMap.note} />;
+    return (
+      <MissingView
+        missing={rootMap.missing}
+        detail={rootMap.detail}
+        note={rootMap.note}
+      />
+    );
   }
 
   const { tokens, keys, carriers, spans, composedMeaning } = rootMap.value;
