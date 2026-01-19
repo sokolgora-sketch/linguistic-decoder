@@ -1,10 +1,26 @@
-// RootMap VM adapter (v0.1)
+
+
+// RootMap VM adapter (v0.1.x)
 // Goal: stable, defensive, never-throw VM for UI consumption.
 
 export type MissingReason = "not_emitted" | "malformed" | "unknown";
 
+export type MissingDetailCode =
+  | "NULL_INPUT"
+  | "NOT_OBJECT"
+  | "NO_ROOTMAP_SHAPE"
+  | "ABSENT_ROOTMAP"
+  | "UNKNOWN_ERROR";
+
 export type Present<T> = { kind: "present"; value: T };
-export type Missing = { kind: "missing"; missing: MissingReason; note?: string };
+export type Missing = {
+  kind: "missing";
+  missing: MissingReason;
+  note?: string;
+  // v0.1.x: deterministic, UI-friendly explanation for why it's missing
+  detailCode?: MissingDetailCode;
+  detail?: string;
+};
 export type Maybe<T> = Present<T> | Missing;
 
 export type RootMapTokenVM = {
@@ -64,31 +80,52 @@ function asStringArray(v: unknown): string[] | undefined {
   return out.length ? out : [];
 }
 
-export function adaptRootMapToVM(input: unknown): Maybe<RootMapVM> {
-  try {
-    if (input == null) return { kind: "missing", missing: "not_emitted" };
-    if (!isPlainObject(input)) return { kind: "missing", missing: "malformed" };
-
-    // Accept either the full payload ({ rootMap: {...} }) or a raw rootMap object.
-// IMPORTANT: If input is a full payload WITHOUT rootMap, return missing:not_emitted.
-// Only treat input as a raw rootMap when it actually looks like one.
-const hasRootMapKey = ("rootMap" in input);
-const looksLikeRootMap =
-  ("tokens" in input) ||
-  ("keys" in input) ||
-  ("spans" in input) ||
-  ("carriers" in input) ||
-  ("composedMeaning" in input);
-
-if (!hasRootMapKey && !looksLikeRootMap) {
-  return { kind: "missing", missing: "not_emitted" };
+function missing(
+  missingReason: MissingReason,
+  detailCode: MissingDetailCode,
+  detail: string,
+  note?: string
+): Missing {
+  return { kind: "missing", missing: missingReason, detailCode, detail, note };
 }
 
-const rootMap = hasRootMapKey ? (input as any).rootMap : input;
-if (rootMap == null) return { kind: "missing", missing: "not_emitted" };
-if (!isPlainObject(rootMap)) return { kind: "missing", missing: "malformed" };
+export function adaptRootMapToVM(input: unknown): Maybe<RootMapVM> {
+  try {
+    if (input == null) {
+      return missing("not_emitted", "NULL_INPUT", "RootMap not emitted (null/undefined input).");
+    }
+    if (!isPlainObject(input)) {
+      return missing("malformed", "NOT_OBJECT", "RootMap payload malformed (expected object).");
+    }
 
-const tokensRaw = (rootMap as any).tokens;
+    // Accept either the full payload ({ rootMap: {...} }) or a raw rootMap object.
+    // IMPORTANT: If input is a full payload WITHOUT rootMap, return missing:not_emitted.
+    // Only treat input as a raw rootMap when it actually looks like one.
+    const hasRootMapKey = "rootMap" in input;
+    const looksLikeRootMap =
+      "tokens" in input ||
+      "keys" in input ||
+      "spans" in input ||
+      "carriers" in input ||
+      "composedMeaning" in input;
+
+    if (!hasRootMapKey && !looksLikeRootMap) {
+      return missing(
+        "not_emitted",
+        "NO_ROOTMAP_SHAPE",
+        "RootMap not emitted (payload does not include rootMap or rootMap-shaped fields)."
+      );
+    }
+
+    const rootMap = hasRootMapKey ? (input as any).rootMap : input;
+    if (rootMap == null) {
+      return missing("not_emitted", "ABSENT_ROOTMAP", "RootMap not emitted (rootMap is null/undefined).");
+    }
+    if (!isPlainObject(rootMap)) {
+      return missing("malformed", "NOT_OBJECT", "RootMap payload malformed (rootMap is not an object).");
+    }
+
+    const tokensRaw = (rootMap as any).tokens;
     const keysRaw = (rootMap as any).keys;
     const carriersRaw = (rootMap as any).carriers;
     const spansRaw = (rootMap as any).spans;
@@ -168,10 +205,14 @@ const tokensRaw = (rootMap as any).tokens;
       },
     };
   } catch (e) {
-    return { kind: "missing", missing: "unknown", note: String(e) };
+    return missing(
+      "unknown",
+      "UNKNOWN_ERROR",
+      "RootMap adapter threw unexpectedly (caught).",
+      String(e)
+    );
   }
 }
-
 
 // Compatibility alias for tests / callers
 export const rootMapMaybe = adaptRootMapToVM;
