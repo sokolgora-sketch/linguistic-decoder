@@ -7,6 +7,29 @@ import { CANON_CANDIDATES } from "./canonCandidates";
 import { buildWordMatrix } from "./wordMatrix.v1";
 import { buildDeepRootOutputV1 } from "./deepRoot.output.v1";
 import { buildRootMapV1 } from "./deepRoot.rootMap.builder.v1";
+import { pickHeartPrimaryPathForRootMap } from "./heartPrimaryPathForRootMap.v0.1.2";
+
+function pickHeartPrimaryPath(payload: any): unknown {
+  // Canonical precedence (v0.1.2 intent):
+  // 1) primaryPath.voicePath (preferred)
+  // 2) evidence.math7.primary.vowels
+  // 3) heart.math7.primary.vowels
+  //
+  // Keep permissive (unknown) because buildRootMapV1 parses defensively.
+  const p = payload ?? {};
+
+  const vp = p?.primaryPath?.voicePath;
+  if (vp != null) return vp;
+
+  const ev = p?.evidence?.math7?.primary?.vowels;
+  if (ev != null) return ev;
+
+  const hv = p?.heart?.math7?.primary?.vowels;
+  if (hv != null) return hv;
+
+  return undefined;
+}
+
 
 import { buildMinRootHypotheses } from "./deepRoot.minRoots.v1";
 import { buildOriginClaimV1 } from "./originClaim.builder.v1";
@@ -65,6 +88,8 @@ export function enginePayloadToAnalysisResult(payload: EnginePayload): AnalyzeWo
 
   // RootMap v0.1 — ALWAYS emit top-level key (scientific instrument rule)
   // Uses DeepRoot hypotheses (minRoots) as input. If none exist, builder returns an empty RootMap with a note.
+  const heartPrimaryPath = pickHeartPrimaryPathForRootMap(payload as any);
+
   const rootMap =
     buildRootMapV1({
       basis: String((result as any)?.deepRoot?.basis ?? (result as any)?.sanitized ?? (result as any)?.word ?? "").trim(),
@@ -72,10 +97,7 @@ export function enginePayloadToAnalysisResult(payload: EnginePayload): AnalyzeWo
         (result as any)?.deepRoot?.hypotheses ??
         (result as any)?.deepRoot?.candidates ??
         [],
-      heartPrimaryPath:
-    (result as any)?.heart?.math7?.primary?.vowels ??
-    (result as any)?.primaryPath?.voicePath ??
-    null,
+      heartPrimaryPath: heartPrimaryPath ?? null,
 }) ??
     {
       tokens: [],
