@@ -1,4 +1,4 @@
-import { rootMapMaybe } from "../srcShimRootMapVM";
+import { rootMapMaybe } from "../src/ui/telemetry/rootMapVM.v0.1";
 
 describe("RootMap VM (v0.1) — defensive adapter", () => {
   test("missing: not_emitted when rootMap absent", () => {
