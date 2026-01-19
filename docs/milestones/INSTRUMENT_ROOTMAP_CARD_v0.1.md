@@ -32,3 +32,10 @@ Make RootMap visible in the Scientific Instrument UI as a VM-driven readout (no 
 
 ## Cleanup
 - Removed temporary RootMap test shim; tests now import the real module: `../src/ui/telemetry/rootMapVM.v0.1`.
+
+## Patch notes
+
+### v0.1.1 — NONE explanation via VM missing detail
+- RootMap VM distinguishes `not_emitted` (NONE) vs `malformed` more explicitly and can carry a stable missing `note`.
+- RootMap instrument panel renders the missing detail note (still VM-only).
+- Proof: existing RootMap VM + instrument tests remain green; `npm run gate:quick` passes.
