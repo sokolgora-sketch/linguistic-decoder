@@ -200,6 +200,46 @@ export async function POST(req: Request) {
     let evidence = buildEvidenceV1FromPayload(payload);
     evidence = backfillEvidenceMath7({ evidence, ensured, out, heartInstrumentV1 });
 
+      // Milestone B — auditable surface vs functional vowel path (evidence-level truth)
+      // - surfaceVowels MUST remain the true raw surface (heartInstrumentV1)
+      // - vowelPath MUST carry the functional truth (heart.math7.primary.vowels)
+      // - normalizationSteps MUST prove SHIFT when surface != functional
+      {
+        const surface = Array.isArray((heartInstrumentV1 as any)?.surfaceVowels)
+          ? (heartInstrumentV1 as any).surfaceVowels
+          : null;
+
+        const functional =
+          Array.isArray((out as any)?.heart?.math7?.primary?.vowels)
+            ? (out as any).heart.math7.primary.vowels
+            : (Array.isArray((out as any)?.primaryPath?.voicePath) ? (out as any).primaryPath.voicePath : null);
+
+        // Always emit vowelPath (null allowed)
+        (evidence as any).vowelPath = functional ?? null;
+
+        // Prefer true surface if available
+        if (surface) (evidence as any).surfaceVowels = surface;
+
+        const same =
+          Array.isArray(surface) &&
+          Array.isArray(functional) &&
+          surface.length === functional.length &&
+          surface.every((v: any, i: number) => String(v) === String(functional[i]));
+
+        (evidence as any).normalizationSteps =
+          surface && functional && !same
+            ? [
+                {
+                  op: "vowel_normalize",
+                  from: surface.join(""),
+                  to: functional.join(""),
+                  reason: "functional_equivalence",
+                },
+              ]
+            : [];
+      }
+
+
     const finalEvidence = { ...evidence };
 
     let final: any = {
@@ -275,6 +315,46 @@ export async function GET(req: Request) {
     const ensured = ensurePrimaryAndCandidatePaths(ui);
     let evidence = buildEvidenceV1FromPayload(payload);
     evidence = backfillEvidenceMath7({ evidence, ensured, out, heartInstrumentV1 });
+
+      // Milestone B — auditable surface vs functional vowel path (evidence-level truth)
+      // - surfaceVowels MUST remain the true raw surface (heartInstrumentV1)
+      // - vowelPath MUST carry the functional truth (heart.math7.primary.vowels)
+      // - normalizationSteps MUST prove SHIFT when surface != functional
+      {
+        const surface = Array.isArray((heartInstrumentV1 as any)?.surfaceVowels)
+          ? (heartInstrumentV1 as any).surfaceVowels
+          : null;
+
+        const functional =
+          Array.isArray((out as any)?.heart?.math7?.primary?.vowels)
+            ? (out as any).heart.math7.primary.vowels
+            : (Array.isArray((out as any)?.primaryPath?.voicePath) ? (out as any).primaryPath.voicePath : null);
+
+        // Always emit vowelPath (null allowed)
+        (evidence as any).vowelPath = functional ?? null;
+
+        // Prefer true surface if available
+        if (surface) (evidence as any).surfaceVowels = surface;
+
+        const same =
+          Array.isArray(surface) &&
+          Array.isArray(functional) &&
+          surface.length === functional.length &&
+          surface.every((v: any, i: number) => String(v) === String(functional[i]));
+
+        (evidence as any).normalizationSteps =
+          surface && functional && !same
+            ? [
+                {
+                  op: "vowel_normalize",
+                  from: surface.join(""),
+                  to: functional.join(""),
+                  reason: "functional_equivalence",
+                },
+              ]
+            : [];
+      }
+
 
     const finalEvidence = { ...evidence };
 

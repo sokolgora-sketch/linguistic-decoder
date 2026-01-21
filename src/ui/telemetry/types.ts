@@ -61,7 +61,7 @@ export interface TelemetryReadout {
   voicePath: PresentOrMissing<Vowel[]>;
   voicePathSurface?: PresentOrMissing<Vowel[]>;
   voicePathFunctional?: PresentOrMissing<Vowel[]>;
-  voicePathDelta: "MATCH" | "DIVERGE" | "NOT_EMITTED";
+  voicePathDelta: "MATCH" | "SHIFT" | "DIVERGE" | "NOT_EMITTED";
   status: "detected" | "none" | "error";
 
   counts: {
