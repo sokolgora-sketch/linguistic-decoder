@@ -1,3 +1,6 @@
+# Deploy to the live channel on push to main.
+# If the service account secret is missing, deploy is skipped (CI still passes).
+
 name: Deploy to Firebase Hosting (Live)
 
 on:
@@ -16,13 +19,14 @@ jobs:
           node-version: 20
 
       - run: npm ci
-
-      - run: npm test --if-present
-
+      - run: npm run test --if-present
       - run: npm run build --if-present
 
-      - uses: FirebaseExtended/action-hosting-deploy@v0
+      - name: Deploy to Firebase Hosting (live)
+        if: ${{ secrets.FIREBASE_SERVICE_ACCOUNT != '' }}
+        uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: "${{ secrets.GITHUB_TOKEN }}"
           firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}"
+          projectId: linguistic-decoder-7b1c3
           channelId: live
