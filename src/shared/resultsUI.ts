@@ -104,6 +104,7 @@ export interface AnalyzeWordResultUI {
     summary?: string;
   };
   /** DeepRoot (public, JSON-safe). hypotheses-first. */
+  resonanceProfileV1?: unknown;
   deepRoot?: any;
 
 }

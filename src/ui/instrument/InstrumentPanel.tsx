@@ -1,6 +1,7 @@
 'use client';
 
-import React from 'react';
+import React from "react";
+import { ResonancePanelV01 } from "./ResonancePanel.v0.1";
 import { VowelPathTimeline } from "./VowelPathTimeline";
 import { adaptAnalysisToTelemetryVM } from "@/ui/instrument/contractAdapter";
 import { RootMapCard } from "@/ui/instrument/RootMapCard";
@@ -86,22 +87,14 @@ export function InstrumentPanel(props: Props) {
   const engineVersion = isValidVm && vm.readout.engineVersion.kind === 'present' ? vm.readout.engineVersion.value : null;
 
   if (!isValidVm) {
-    const vmAny = vm as any;
-    const vmType = vmAny === null ? "null" : Array.isArray(vmAny) ? "array" : typeof vmAny;
-    const vmKeys = vmAny && typeof vmAny === "object" ? Object.keys(vmAny).slice(0, 40).join(", ") : "";
-    const hasReadout = !!(vmAny && typeof vmAny === "object" && vmAny.readout && typeof vmAny.readout === "object");
-
     return (
       <div className="rounded-lg border border-red-500/40 bg-red-950/20 p-4 text-sm">
-        <div className="font-semibold text-red-200">InstrumentPanel blocked: invalid Telemetry VM</div>
+        <div className="font-semibold text-red-200">
+          InstrumentPanel blocked: invalid Telemetry VM
+        </div>
         <div className="mt-2 text-red-100/90">
           Fail-visible guard. The panel refused to render because the Telemetry VM shape is invalid.
           Fix the VM adapter or payload wiring (do not silence this).
-        </div>
-        <div className="mt-3 grid gap-1 font-mono text-xs text-red-100/80">
-          <div>vmType: {vmType}</div>
-          <div>vmKeys: {vmKeys || "—"}</div>
-          <div>hasReadout: {String(hasReadout)}</div>
         </div>
       </div>
     );
@@ -129,6 +122,8 @@ export function InstrumentPanel(props: Props) {
         delta={vm.readout.voicePathDelta}
       />
 
+      <ResonancePanelV01 resonanceProfileV1={vm.resonanceProfileV1} />
+
       <RootMapCard
         rootMap={vm.rootMap ?? ({ kind: "missing", missing: "not_emitted", note: "rootMap" } as any)}
         word={String((vm.readout as any)?.word ?? (vm.readout as any)?.inputWord ?? "")}
@@ -141,7 +136,8 @@ export function InstrumentPanel(props: Props) {
           return String(n ?? "");
         })()}
       />
-<MeaningPanel vm={vm} />
+
+      <MeaningPanel vm={vm} />
 
       {ledgerModel ? <EvidenceLedgerCard model={ledgerModel} engineVersion={engineVersion} /> : null}
 
