@@ -9,7 +9,7 @@ type Maybe<T> = Present<T> | Missing;
 
 type RootMapSpanVM = { token: string; start?: number; end?: number; note?: string };
 type RootMapTokenVM = { token: string; role?: string; vowel_path?: string };
-type RootMapKeyVM = { token: string; language?: string; gloss?: string; status?: string; ops?: string[]; evidence?: string[] };
+type RootMapKeyVM = { token: string; language?: string; gloss?: string; status?: string; ops?: unknown; evidence?: unknown };
 type RootMapCarrierVM = { token: string; language?: string; carrierForm?: string; note?: string };
 
 type RootMapVM = {
@@ -28,6 +28,21 @@ type Props = {
 
 function spanTitle(s: { token: string; start: number; end: number }) {
   return `${s.token} [${s.start},${s.end})`;
+}
+
+/**
+ * Defensive: accept only strings, or primitive values convertible to string.
+ * Reject objects to avoid "[object Object]" in the UI.
+ */
+function safeStringList(v: unknown): string[] {
+  if (!Array.isArray(v)) return [];
+  const out: string[] = [];
+  for (const x of v) {
+    if (typeof x === "string") out.push(x);
+    else if (typeof x === "number" || typeof x === "boolean" || typeof x === "bigint") out.push(String(x));
+    // ignore objects/functions/symbols/null/undefined
+  }
+  return out;
 }
 
 function validateSpans(norm: string, spans: RootMapSpanVM[] | undefined) {
@@ -77,6 +92,22 @@ function renderHighlights(norm: string, spans: RootMapSpanVM[] | undefined) {
 
   if (cursor < norm.length) out.push(<span key={`t:${cursor}:end`}>{norm.slice(cursor)}</span>);
   return <div className="mt-2 text-sm text-neutral-200">{out}</div>;
+}
+
+function renderInlineChips(items: string[]) {
+  if (!items.length) return null;
+  return (
+    <div className="mt-1 flex flex-wrap gap-1">
+      {items.map((op, i) => (
+        <span
+          key={`${op}:${i}`}
+          className="rounded border border-neutral-800 bg-neutral-950/30 px-1.5 py-0.5 font-mono text-[11px] text-neutral-200"
+        >
+          {op}
+        </span>
+      ))}
+    </div>
+  );
 }
 
 export function RootMapCard(props: Props) {
@@ -139,22 +170,47 @@ export function RootMapCard(props: Props) {
             <div className="mt-1 text-sm text-neutral-300">—</div>
           ) : (
             <ul className="mt-2 space-y-2">
-              {keysArr.map((k, idx) => (
-                <li
-                  key={`${k.token}:${k.language ?? "?"}:${idx}`}
-                  className="rounded-lg border border-neutral-800 bg-neutral-950/30 p-2"
-                >
-                  <div className="flex flex-wrap items-baseline justify-between gap-2">
-                    <div className="text-sm text-neutral-100">
-                      <span className="font-mono">{k.token}</span>
-                      {k.status ? <span className="ml-2 text-xs text-neutral-400">({k.status})</span> : null}
-                    </div>
-                    <div className="text-xs text-neutral-400">{k.language ?? "unknown"}</div>
-                  </div>
+              {keysArr.map((k, idx) => {
+                const ops = safeStringList((k as any).ops);
+                const evidence = safeStringList((k as any).evidence);
 
-                  {k.gloss ? <div className="mt-1 text-sm text-neutral-200">{k.gloss}</div> : null}
-                </li>
-              ))}
+                return (
+                  <li
+                    key={`${k.token}:${k.language ?? "?"}:${idx}`}
+                    className="rounded-lg border border-neutral-800 bg-neutral-950/30 p-2"
+                  >
+                    <div className="flex flex-wrap items-baseline justify-between gap-2">
+                      <div className="text-sm text-neutral-100">
+                        <span className="font-mono">{k.token}</span>
+                        {k.status ? <span className="ml-2 text-xs text-neutral-400">({k.status})</span> : null}
+                      </div>
+                      <div className="text-xs text-neutral-400">{k.language ?? "unknown"}</div>
+                    </div>
+
+                    {k.gloss ? <div className="mt-1 text-sm text-neutral-200">{k.gloss}</div> : null}
+
+                    {ops.length ? (
+                      <div className="mt-2">
+                        <div className="text-[11px] uppercase tracking-wide text-neutral-500">ops</div>
+                        {renderInlineChips(ops)}
+                      </div>
+                    ) : null}
+
+                    {evidence.length ? (
+                      <div className="mt-2">
+                        <div className="text-[11px] uppercase tracking-wide text-neutral-500">evidence</div>
+                        <ul className="mt-1 space-y-0.5 text-xs text-neutral-300">
+                          {evidence.map((e, i) => (
+                            <li key={`e:${k.token}:${i}`} className="font-mono">
+                              {e}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ) : null}
+                  </li>
+                );
+              })}
             </ul>
           )}
         </div>
