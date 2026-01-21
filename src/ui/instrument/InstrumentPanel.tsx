@@ -23,12 +23,14 @@ type Props =
       payload: unknown;
       vm?: never;
       debug?: boolean;
+      onCopyFullJson?: () => void;
     }
   | {
       /** Telemetry VM (already adapted). VM-only boundary for callers like ZroChatPage. */
       vm: any;
       payload?: never;
       debug?: boolean;
+      onCopyFullJson?: () => void;
     };
 
 function fmt<T>(x: { kind: 'present'; value: T } | { kind: 'missing'; missing: string; note?: string }) {
@@ -113,7 +115,7 @@ export function InstrumentPanel(props: Props) {
         </div>
       ) : null}
       {/* Readout (Telemetry Core) */}
-      <ReadoutCard readout={vm.readout} onCopySummary={() => void copyText('Summary copied.', summaryLines.join('\n'))} onCopyFullJson={() => void copyText('Full JSON copied.', toPrettyJson(vm.raw))} />
+      <ReadoutCard readout={vm.readout} onCopySummary={() => void copyText('Summary copied.', summaryLines.join('\n'))} onCopyFullJson={() => (props.onCopyFullJson ? props.onCopyFullJson() : void 0)} />
 
       <VowelPathTimeline
         detected={vm.readout.voicePath}
@@ -142,7 +144,7 @@ export function InstrumentPanel(props: Props) {
       {ledgerModel ? <EvidenceLedgerCard model={ledgerModel} engineVersion={engineVersion} /> : null}
 
       {/* Origin Claim (computed, auditable) */}
-      <OriginClaimCard originClaim={(vm.raw as any)?.originClaim ?? null} />
+      <OriginClaimCard originClaim={vm.originClaim?.kind === 'present' ? (vm.originClaim as any).value : null} />
 
       {vm.originClaimGates ? (
         <div className="rounded-xl border p-3">
@@ -185,7 +187,7 @@ export function InstrumentPanel(props: Props) {
               <Button
                 size="sm"
                 variant="outline"
-                onClick={() => void copyText('Full JSON copied.', toPrettyJson(vm.raw))}
+                disabled={!props.onCopyFullJson} onClick={() => (props.onCopyFullJson ? props.onCopyFullJson() : void 0)}
               >
                 Copy Full JSON
               </Button>

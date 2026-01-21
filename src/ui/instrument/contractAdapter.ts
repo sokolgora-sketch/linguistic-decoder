@@ -431,6 +431,7 @@ export function adaptAnalysisToTelemetryVM(raw: unknown): TelemetryViewModel {
 
   const p = isRecord(payload) ? payload : null;
   const oc = p && isRecord(p.originClaim) ? p.originClaim : null;
+    const originClaim: PresentOrMissing<unknown> = oc ? present(oc as unknown) : missing('not_emitted', 'originClaim');
 
   const reasonCounts: Record<string, number> = {};
   if (oc && Array.isArray(oc.candidates)) {
@@ -519,6 +520,7 @@ const originClaimGates: OriginClaimGatesVM = {
     math,
     rejections: { items: rejectionItems },
     originClaimGates,
+      originClaim,
 
       resonanceProfileV1,
 
