@@ -433,6 +433,20 @@ export function adaptAnalysisToTelemetryVM(raw: unknown): TelemetryViewModel {
   const oc = p && isRecord(p.originClaim) ? p.originClaim : null;
     const originClaim: PresentOrMissing<unknown> = oc ? present(oc as unknown) : missing('not_emitted', 'originClaim');
 
+    // ----------------------- rootMap v0.1 -----------------------
+    const rootMap: PresentOrMissing<RootMapVM> = (() => {
+      if (!isRecord(payload)) return missing("not_emitted", "rootMap");
+      if (!("rootMap" in payload)) return missing("not_emitted", "rootMap");
+
+      const v = (payload as any).rootMap;
+      if (v == null) return missing("not_emitted", "rootMap");
+
+      const parsed = parseRootMapV1(v);
+      if (!parsed.ok) return missing("malformed", parsed.reason);
+
+      return present(parsed.value as any);
+    })();
+
   const reasonCounts: Record<string, number> = {};
   if (oc && Array.isArray(oc.candidates)) {
     for (const c of (oc.candidates as any[])) {
@@ -521,22 +535,9 @@ const originClaimGates: OriginClaimGatesVM = {
     rejections: { items: rejectionItems },
     originClaimGates,
       originClaim,
+      rootMap,
 
       resonanceProfileV1,
-
-    rootMap: (() => {
-      if (!isRecord(payload)) return missing("not_emitted", "rootMap");
-      if (!("rootMap" in payload)) return missing("not_emitted", "rootMap");
-
-      const v = (payload as any).rootMap;
-      if (v == null) return missing("not_emitted", "rootMap");
-
-      const parsed = parseRootMapV1(v);
-      if (parsed.ok === false) return missing("malformed", parsed.reason);
-
-      return present(parsed.value);
-    })(),
-
     raw,
   };
 }
