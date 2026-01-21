@@ -27,6 +27,27 @@ export type PresentOrMissing<T> =
 
 export type RootMapVM = RootMapV1;
 
+export type ResonanceBucket = "source" | "boundary" | "manifest" | "mixed" | "none";
+
+export type ResonanceReadoutV1 = {
+  vowels: string[]; // keep loose; adapter guarantees only Seven-Vowels symbols when present
+  bucketCounts: { source: number; boundary: number; manifest: number };
+  dominantBucket: ResonanceBucket;
+  signature: string;
+  polaritySymbol: string;
+  colorBand: string[];
+  dominantColor: string;
+  transitions: string[];
+  notes: string[];
+};
+
+export type ResonanceProfileV1VM = {
+  version: string;
+  surface: ResonanceReadoutV1;
+  normalized: ResonanceReadoutV1;
+};
+
+
 export interface TelemetryReadout {
   word: string;
   normalizedWord: PresentOrMissing<string>;
@@ -124,5 +145,6 @@ export interface TelemetryViewModel {
   rejections: RejectionLogVM;
   originClaimGates: OriginClaimGatesVM;
   rootMap: PresentOrMissing<RootMapVM>;
+  resonanceProfileV1: PresentOrMissing<ResonanceProfileV1VM>;
   raw: unknown;
 }

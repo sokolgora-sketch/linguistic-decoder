@@ -8,6 +8,7 @@ import { buildWordMatrix } from "./wordMatrix.v1";
 import { buildDeepRootOutputV1 } from "./deepRoot.output.v1";
 import { buildRootMapV1 } from "./deepRoot.rootMap.builder.v1";
 import { pickHeartPrimaryPathForRootMap } from "./heartPrimaryPathForRootMap.v0.1.2";
+import { buildResonanceProfileV1 } from "@/shared/resonanceProfile.v1";
 
 function pickHeartPrimaryPath(payload: any): unknown {
   // Canonical precedence (v0.1.2 intent):
@@ -62,6 +63,16 @@ export function enginePayloadToAnalysisResult(payload: EnginePayload): AnalyzeWo
     mind,
     consonants,
     symbolicCore: symbolic,
+            resonanceProfileV1: buildResonanceProfileV1({
+        surfaceWord: sanitized,
+        normalizedBasis: (math7 as any)?.primary?.basis ?? undefined,
+        primaryVoices:
+          ((payload as any)?.primaryPath?.voicePath ??
+            (payload as any)?.evidence?.math7?.primary?.vowels ??
+            (payload as any)?.heart?.math7?.primary?.vowels ??
+            (math7 as any)?.primary?.vowels) ??
+          undefined,
+      }),
     candidates,
     meta: {
       version:

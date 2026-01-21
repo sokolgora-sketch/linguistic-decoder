@@ -446,7 +446,28 @@ export function adaptAnalysisToTelemetryVM(raw: unknown): TelemetryViewModel {
 
   const gatesActive = (oc && isRecord(oc.policy) && oc.policy.gatesActive === true) || (oc && oc.policy === "gates-v1.1");
 
-  const originClaimGates: OriginClaimGatesVM = {
+  
+  // ----------------------- resonance profile v0.1 -----------------------
+
+  const resonanceProfileV1: PresentOrMissing<any> = (() => {
+    if (!isRecord(payload)) return missing("not_emitted", "resonanceProfileV1");
+    if (!("resonanceProfileV1" in payload)) return missing("not_emitted", "resonanceProfileV1");
+
+    const v = (payload as any).resonanceProfileV1;
+    if (v == null) return missing("not_emitted", "resonanceProfileV1");
+
+    if (!isRecord(v)) return missing("malformed", "resonanceProfileV1 expected object");
+
+    const version = asString((v as any).version);
+    if (!version) return missing("malformed", "resonanceProfileV1.version expected string");
+
+    if (!("surface" in v)) return missing("malformed", "resonanceProfileV1.surface missing");
+    if (!("normalized" in v)) return missing("malformed", "resonanceProfileV1.normalized missing");
+
+    return present(v);
+  })();
+
+const originClaimGates: OriginClaimGatesVM = {
     active: (() => {
       // VM-only: NEVER override with dev flags / URL params.
       const a = (raw as any)?.originClaimGates?.active;
@@ -498,6 +519,8 @@ export function adaptAnalysisToTelemetryVM(raw: unknown): TelemetryViewModel {
     math,
     rejections: { items: rejectionItems },
     originClaimGates,
+
+      resonanceProfileV1,
 
     rootMap: (() => {
       if (!isRecord(payload)) return missing("not_emitted", "rootMap");

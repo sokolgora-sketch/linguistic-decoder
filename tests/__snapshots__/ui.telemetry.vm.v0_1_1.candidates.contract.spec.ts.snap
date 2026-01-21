@@ -255,6 +255,11 @@ exports[`ui telemetry vm contract v0.1.1 (candidates evidence lists) adapts cand
       "missing": "not_emitted",
     },
   },
+  "resonanceProfileV1": {
+    "kind": "missing",
+    "missing": "not_emitted",
+    "note": "resonanceProfileV1",
+  },
   "rootMap": {
     "kind": "missing",
     "missing": "not_emitted",

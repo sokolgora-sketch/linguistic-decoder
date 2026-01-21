@@ -143,6 +143,7 @@ export function adaptAnalyzeV1ToUI(raw: Raw): AnalyzeWordResultUI {
       consonants: raw?.consonants ?? null,
       symbolicCore: raw?.symbolicCore ?? null,
       deepRoot: raw?.deepRoot ?? null,
+      resonanceProfileV1: raw?.resonanceProfileV1 ?? null,
     candidates,
     primaryPath,
     frontier,
