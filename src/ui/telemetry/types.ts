@@ -144,6 +144,7 @@ export interface TelemetryViewModel {
   math: PresentOrMissing<MathTelemetryVM>;
   rejections: RejectionLogVM;
   originClaimGates: OriginClaimGatesVM;
+    originClaim: PresentOrMissing<unknown>;
   rootMap: PresentOrMissing<RootMapVM>;
   resonanceProfileV1: PresentOrMissing<ResonanceProfileV1VM>;
   raw: unknown;
