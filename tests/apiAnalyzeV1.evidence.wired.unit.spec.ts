@@ -24,6 +24,19 @@ describe("/api/analyze-v1 evidence wiring (unit)", () => {
     expect(json.evidence.math7).toEqual(json.heart.math7);
     expect(Array.isArray(json.evidence.surfaceVowels)).toBe(true);
 
+      // Milestone B — auditable surface vs functional vowel path
+      expect(json.heartInstrumentV1).toBeTruthy();
+      expect(json.heartInstrumentV1.surfaceVowels).toEqual(["U", "Y"]);
+
+      // Evidence must carry TRUE surface (not collapsed) + functional truth
+      expect(json.evidence.surfaceVowels).toEqual(json.heartInstrumentV1.surfaceVowels);
+      expect(json.evidence.vowelPath).toEqual(["U", "I"]);
+
+      // Evidence must prove the normalization (SHIFT) deterministically
+      expect(json.evidence.normalizationSteps).toEqual([
+        { op: "vowel_normalize", from: "UY", to: "UI", reason: "functional_equivalence" },
+      ]);
+
         // Must not be fallback
     const signals = json.evidence?.signals || [];
     expect(signals).not.toContain("EVIDENCE_MISSING_FALLBACK");

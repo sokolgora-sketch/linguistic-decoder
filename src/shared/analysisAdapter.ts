@@ -35,6 +35,34 @@ function pickHeartPrimaryPath(payload: any): unknown {
 import { buildMinRootHypotheses } from "./deepRoot.minRoots.v1";
 import { buildOriginClaimV1 } from "./originClaim.builder.v1";
 
+function sameStringArray(a: any, b: any): boolean {
+  if (!Array.isArray(a) || !Array.isArray(b)) return false;
+  if (a.length !== b.length) return false;
+  for (let i = 0; i < a.length; i++) if (String(a[i]) !== String(b[i])) return false;
+  return true;
+}
+
+function pickSurfaceVowels(payload: any, math7: any): string[] | null {
+  return (
+    (Array.isArray(payload?.heartInstrumentV1?.surfaceVowels) ? payload.heartInstrumentV1.surfaceVowels : null) ??
+    (Array.isArray(payload?.evidence?.surfaceVowels) ? payload.evidence.surfaceVowels : null) ??
+    (Array.isArray(payload?.surfaceVowels) ? payload.surfaceVowels : null) ??
+    (Array.isArray(math7?.surface?.vowels) ? math7.surface.vowels : null) ??
+    null
+  );
+}
+
+function pickFunctionalVowelPath(payload: any, math7: any): string[] | null {
+  return (
+    (Array.isArray(payload?.primaryPath?.voicePath) ? payload.primaryPath.voicePath : null) ??
+    (Array.isArray(payload?.heart?.math7?.primary?.vowels) ? payload.heart.math7.primary.vowels : null) ??
+    (Array.isArray(payload?.evidence?.math7?.primary?.vowels) ? payload.evidence.math7.primary.vowels : null) ??
+    (Array.isArray(math7?.primary?.vowels) ? math7.primary.vowels : null) ??
+    null
+  );
+}
+
+
 export function enginePayloadToAnalysisResult(payload: EnginePayload): AnalyzeWordResultV1 {
   const sanitized =
     (payload as any).sanitized ??
@@ -85,6 +113,38 @@ export function enginePayloadToAnalysisResult(payload: EnginePayload): AnalyzeWo
         new Date().toISOString(),
     },
   };
+
+
+    // Evidence v0.1.x — emit auditable surface vs functional vowel path (Milestone B)
+    // Functional truth MUST be carried into evidence (no UI inference).
+    const surfaceVowels = pickSurfaceVowels(payload as any, math7);
+    const functionalVowelPath = pickFunctionalVowelPath(payload as any, math7);
+
+    const normalizationSteps =
+      surfaceVowels && functionalVowelPath && !sameStringArray(surfaceVowels, functionalVowelPath)
+        ? [
+            {
+              op: "vowel_normalize",
+              from: surfaceVowels.join(""),
+              to: functionalVowelPath.join(""),
+              reason: "functional_equivalence",
+            },
+          ]
+        : [];
+
+    const prevEvidence =
+      (payload as any)?.evidence && typeof (payload as any).evidence === "object"
+        ? (payload as any).evidence
+        : {};
+
+    // IMPORTANT: surfaceVowels must reflect true raw surface when available (heartInstrumentV1),
+    // NOT legacy evidence that may already be normalized.
+    (result as any).evidence = {
+      ...prevEvidence,
+      surfaceVowels: surfaceVowels ?? prevEvidence.surfaceVowels ?? null,
+      vowelPath: functionalVowelPath ?? null,
+      normalizationSteps,
+    };
 
   // Origin Claim Protocol (V1)
   result.originClaim = buildOriginClaimV1(result);
