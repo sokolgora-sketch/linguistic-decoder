@@ -12,6 +12,7 @@ exports[`ui telemetry vm contract v0.1.1 (candidates evidence lists) adapts cand
         "kind": "present",
         "value": {
           "evidenceRefs": [
+            "heartPrimaryPath",
             "primaryPath.voicePath",
             "candidates[0].vowelPath",
           ],
@@ -62,6 +63,7 @@ exports[`ui telemetry vm contract v0.1.1 (candidates evidence lists) adapts cand
         "kind": "present",
         "value": {
           "evidenceRefs": [
+            "heartPrimaryPath",
             "primaryPath.voicePath",
             "candidates[1].vowelPath",
           ],
