@@ -248,15 +248,56 @@ export function adaptAnalysisToTelemetryVM(raw: unknown): TelemetryViewModel {
   };
 
   const detectedParts = toVoiceParts(vp.detected);
-    // v0.1 contract: surface must represent RAW surface vowels (e.g. U-Y for \'study\').
-  // Prefer payload.heartInstrumentV1.surfaceVowels if present.
-  const hiRoot = isRecord(payload) && isRecord((payload as any)["heartInstrumentV1"]) ? ((payload as any)["heartInstrumentV1"] as any) : null;
-  const hiSurfaceArr = hiRoot ? asStringArray(hiRoot["surfaceVowels"]) : null;
-  const surfaceForParts = hiSurfaceArr ? hiSurfaceArr.join("-") : vp.surface;
-  const surfaceParts = toVoiceParts(surfaceForParts);
-  const functionalParts = toVoiceParts(vp.functional);
 
-  const voicePathDetectedMaybe: PresentOrMissing<Vowel[]> =
+// v0.1.x semantics (Milestone B):
+// - evidence.surfaceVowels       = authoritative functional/detected path (instrument truth)
+// - evidence.surfaceVowelsRaw    = true raw surface path
+// - evidence.vowelPath           = legacy duplicate of functional path
+//
+// Adapter rules:
+// - Surface path uses evidence.surfaceVowelsRaw (fallback: heartInstrumentV1.surfaceVowels, then vp.surface)
+// - Functional path uses evidence.surfaceVowels (fallback: evidence.vowelPath, then vp.functional)
+
+const hiRoot =
+  isRecord(payload) && isRecord((payload as any)["heartInstrumentV1"])
+    ? ((payload as any)["heartInstrumentV1"] as any)
+    : null;
+const hiSurfaceArr = hiRoot ? asStringArray(hiRoot["surfaceVowels"]) : null;
+
+// Evidence may exist at root or mirrored in raw.evidence (adapter must not touch later bindings).
+const evRootEvidence =
+  isRecord(payload) && isRecord((payload as any)["evidence"]) ? ((payload as any)["evidence"] as any) : null;
+
+const evRawEvidence =
+  isRecord(payload) && isRecord((payload as any)["raw"]) && isRecord(((payload as any)["raw"] as any)["evidence"])
+    ? (((payload as any)["raw"] as any)["evidence"] as any)
+    : null;
+
+const evPick = evRootEvidence ?? evRawEvidence ?? null;
+
+const evSurfaceRawArr = evPick ? asStringArray(evPick["surfaceVowelsRaw"]) : null;
+const evFunctionalArr = evPick ? asStringArray(evPick["surfaceVowels"]) : null;
+const evVowelPathArr = evPick ? asStringArray(evPick["vowelPath"]) : null;
+
+// Prefer arrays; otherwise fall back to legacy string sources.
+const surfaceForParts =
+  evSurfaceRawArr
+    ? evSurfaceRawArr.join("-")
+    : hiSurfaceArr
+      ? hiSurfaceArr.join("-")
+      : vp.surface;
+
+const functionalForParts =
+  evFunctionalArr
+    ? evFunctionalArr.join("-")
+    : evVowelPathArr
+      ? evVowelPathArr.join("-")
+      : vp.functional;
+
+const surfaceParts = toVoiceParts(surfaceForParts);
+const functionalParts = toVoiceParts(functionalForParts);
+
+const voicePathDetectedMaybe: PresentOrMissing<Vowel[]> =
     detectedParts ? present(detectedParts) : missing<Vowel[]>("not_emitted");
 
   const voicePathSurfaceMaybe: PresentOrMissing<Vowel[]> =
@@ -265,8 +306,8 @@ export function adaptAnalysisToTelemetryVM(raw: unknown): TelemetryViewModel {
   const voicePathFunctionalMaybe: PresentOrMissing<Vowel[]> =
     functionalParts ? present(functionalParts) : missing<Vowel[]>("not_emitted");
   // Delta must be computed from the SAME sources the UI renders:
-  // - surfaceParts uses heartInstrumentV1.surfaceVowels when present
-  // - functionalParts uses deepRoot/candidate fallbacks
+// - surfaceParts uses evidence.surfaceVowelsRaw (fallback: heartInstrumentV1.surfaceVowels, then vp.surface)
+// - functionalParts uses evidence.surfaceVowels (fallback: evidence.vowelPath, then vp.functional)
   const surfaceNorm = surfaceParts ? surfaceParts.join("-") : null;
   const functionalNorm = functionalParts ? functionalParts.join("-") : null;
 
