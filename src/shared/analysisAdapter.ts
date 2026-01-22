@@ -43,14 +43,16 @@ function sameStringArray(a: any, b: any): boolean {
 }
 
 function pickSurfaceVowels(payload: any, math7: any): string[] | null {
-  return (
-    (Array.isArray(payload?.heartInstrumentV1?.surfaceVowels) ? payload.heartInstrumentV1.surfaceVowels : null) ??
-    (Array.isArray(payload?.evidence?.surfaceVowels) ? payload.evidence.surfaceVowels : null) ??
-    (Array.isArray(payload?.surfaceVowels) ? payload.surfaceVowels : null) ??
-    (Array.isArray(math7?.surface?.vowels) ? math7.surface.vowels : null) ??
-    null
-  );
-}
+    return (
+      // Contract surface (preferred): evidence.surfaceVowels
+      (Array.isArray(payload?.evidence?.surfaceVowels) ? payload.evidence.surfaceVowels : null) ??
+      // Raw surface (may differ by layer): heartInstrumentV1.surfaceVowels
+      (Array.isArray(payload?.heartInstrumentV1?.surfaceVowels) ? payload.heartInstrumentV1.surfaceVowels : null) ??
+      (Array.isArray(payload?.surfaceVowels) ? payload.surfaceVowels : null) ??
+      (Array.isArray(math7?.surface?.vowels) ? math7.surface.vowels : null) ??
+      null
+    );
+  }
 
 function pickFunctionalVowelPath(payload: any, math7: any): string[] | null {
   return (
