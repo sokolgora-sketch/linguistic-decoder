@@ -26,6 +26,17 @@ type Props = {
   normalizedWord: string;
 };
 
+function safeText(x: unknown): string {
+  if (x == null) return "—";
+  if (typeof x === "string") return x.length ? x : "—";
+  if (typeof x === "number" || typeof x === "boolean") return String(x);
+  try {
+    return JSON.stringify(x);
+  } catch {
+    return String(x);
+  }
+}
+
 function spanTitle(s: { token: string; start: number; end: number }) {
   return `${s.token} [${s.start},${s.end})`;
 }
@@ -217,7 +228,7 @@ export function RootMapCard(props: Props) {
 
         <div>
           <div className="text-[11px] uppercase tracking-wide text-neutral-400">Composed meaning</div>
-          <div className="mt-1 text-sm text-neutral-200">{v?.composedMeaning ?? "—"}</div>
+          <div className="mt-1 text-sm text-neutral-200">{safeText(v?.composedMeaning)}</div>
         </div>
 
         {rootMap.kind === "present" && state === "PRESENT" ? (
