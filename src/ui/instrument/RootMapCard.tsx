@@ -1,6 +1,8 @@
 'use client';
 
 import React from "react";
+import { safeText } from "./safeText";
+
 
 type MissingReason = "not_emitted" | "malformed" | "unknown";
 type Present<T> = { kind: "present"; value: T };
@@ -25,17 +27,6 @@ type Props = {
   word: string;
   normalizedWord: string;
 };
-
-function safeText(x: unknown): string {
-  if (x == null) return "—";
-  if (typeof x === "string") return x.length ? x : "—";
-  if (typeof x === "number" || typeof x === "boolean") return String(x);
-  try {
-    return JSON.stringify(x);
-  } catch {
-    return String(x);
-  }
-}
 
 function spanTitle(s: { token: string; start: number; end: number }) {
   return `${s.token} [${s.start},${s.end})`;
