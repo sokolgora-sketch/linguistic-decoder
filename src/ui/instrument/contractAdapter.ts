@@ -437,7 +437,9 @@ const voicePathDetectedMaybe: PresentOrMissing<Vowel[]> =
               heartPrimaryPath: heartPrimaryPathForGate,
               candidateResolvedPath: candVowelPath ? candVowelPath.join("-") : null,
               evidenceRefs: [
-                "primaryPath.voicePath",
+                // Canonical Heart anchor (preferred when emitted)
+                  "heartPrimaryPath",
+                  "primaryPath.voicePath",
                 // Candidate-local anchor (string only; UI treats as reference label)
                 `candidates[${i}].vowelPath`,
               ],
