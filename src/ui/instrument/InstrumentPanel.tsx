@@ -16,6 +16,7 @@ import { EvidenceLedgerCard } from '../ledger/EvidenceLedgerCard';
 import { buildCandidateRowsFromVM } from '../candidates/candidateModel';
 import { CandidatesAccordion } from '../candidates/CandidatesAccordion';
 import { OriginClaimCard } from '@/components/OriginClaimCard';
+import { safeText } from "./safeText";
 
 type Props =
   | {
@@ -107,10 +108,10 @@ export function InstrumentPanel(props: Props) {
       {props.debug ? (
         <div className="mb-4 rounded border border-emerald-500 bg-black p-3 text-xs text-emerald-400">
           <div>InstrumentPanel ACTIVE</div>
-          <div>word: {vm.wordShown}</div>
-          <div>engine: {vm.engineVersion}</div>
-          <div>mode: {vm.mode}</div>
-          <div>vowelPath: {vm.vowelPath?.join(" → ")}</div>
+          <div>word: {safeText(vm.wordShown)}</div>
+          <div>engine: {safeText(vm.engineVersion)}</div>
+          <div>mode: {safeText(vm.mode)}</div>
+          <div>vowelPath: {safeText(vm.vowelPath?.join(" → "))}</div>
           <div>signals: {vm.signals?.length ?? 0}</div>
         </div>
       ) : null}
