@@ -29,8 +29,9 @@ describe("/api/analyze-v1 evidence wiring (unit)", () => {
       expect(json.heartInstrumentV1.surfaceVowels).toEqual(["U", "Y"]);
 
       // Evidence must carry TRUE surface (not collapsed) + functional truth
-      expect(json.evidence.surfaceVowels).toEqual(json.heartInstrumentV1.surfaceVowels);
-      expect(json.evidence.vowelPath).toEqual(["U", "I"]);
+      expect(json.evidence.surfaceVowels).toEqual(["U", "I"]);
+expect(json.evidence.surfaceVowelsRaw).toEqual(json.heartInstrumentV1.surfaceVowels);
+expect(json.evidence.vowelPath).toEqual(["U", "I"]);
 
       // Evidence must prove the normalization (SHIFT) deterministically
       expect(json.evidence.normalizationSteps).toEqual([
