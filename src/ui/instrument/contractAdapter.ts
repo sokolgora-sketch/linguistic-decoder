@@ -212,8 +212,14 @@ export function adaptAnalysisToTelemetryVM(raw: unknown): TelemetryViewModel {
 
   const vp = pickVoicePaths(payload);
 
-  // DeepRoot–Heart Alignment Gate v0.1 (adapter-first): use the detected primary path string.
-  const heartPrimaryPathForGate: string | null = vp.detected ?? null;
+  // DeepRoot–Heart Alignment Gate v0.1 (adapter-first)
+  // Prefer emitted Heart primary path when available (more canonical than UI-detected fallback).
+  // Accept both string and array-ish shapes; normalize to dash-delimited.
+  const heartPrimaryPathForGate: string | null =
+    (normalizeVowelPathString((payload as any)?.heartPrimaryPath)?.join("-") ??
+      normalizeVowelPathArray((payload as any)?.heartPrimaryPath)?.join("-") ??
+      null) ??
+    (vp.detected ?? null);
 
 
   // Accept unknown input, normalize to a dash-delimited string, then parse.
