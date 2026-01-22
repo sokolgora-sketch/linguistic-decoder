@@ -32,6 +32,14 @@ function MissingView({
   );
 }
 
+
+function safeText(x: unknown): string {
+  if (x == null) return "—";
+  if (typeof x === "string") return x.length ? x : "—";
+  if (typeof x === "number" || typeof x === "boolean") return String(x);
+  try { return JSON.stringify(x); } catch { return String(x); }
+}
+
 export function RootMapPanelV01({ rootMap }: Props) {
   if (rootMap.kind !== "present") {
     return (
@@ -122,7 +130,7 @@ export function RootMapPanelV01({ rootMap }: Props) {
           <h4 className="text-xs font-medium text-muted-foreground">
             Composed Meaning
           </h4>
-          <div className="mt-1 text-sm">{composedMeaning}</div>
+          <div className="mt-1 text-sm">{safeText(composedMeaning)}</div>
         </section>
       )}
     </div>
