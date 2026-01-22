@@ -1,10 +1,10 @@
 # ZË-RO Stable Baseline
 
 ## Tag
-zro-stable-baseline-__DATE__
+zro-stable-baseline-2026-01-22
 
 ## Commit
-__SHA__
+e328f450682b5448189dc89bbb47592471d562a8
 
 ## Proof gates (must pass on this commit)
 - npm run gate:quick
