@@ -1,6 +1,18 @@
 import React from "react";
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import { InstrumentPanel } from "@/ui/instrument/InstrumentPanel";
+
+function findNearestAncestorWithText(
+  start: HTMLElement,
+  re: RegExp
+): HTMLElement | null {
+  let el: HTMLElement | null = start;
+  while (el) {
+    if (re.test(el.textContent ?? "")) return el;
+    el = el.parentElement;
+  }
+  return null;
+}
 
 describe("ui: InstrumentPanel renders Origin Claim from VM", () => {
   test("shows Origin Claim card when originClaim exists", () => {
@@ -24,20 +36,48 @@ describe("ui: InstrumentPanel renders Origin Claim from VM", () => {
           },
         ],
         summary: { confidence: "weak", note: "test" },
-        meta: { engineVersion: "test", generatedAt: "2026-01-01T00:00:00.000Z", inputs: { word: "study", mode: "strict", alphabet: null } },
+        meta: {
+          engineVersion: "test",
+          generatedAt: "2026-01-01T00:00:00.000Z",
+          inputs: { word: "study", mode: "strict", alphabet: null },
+        },
       },
       // Provide minimal readout scaffolding so ReadoutCard doesn't crash if adapter expects it.
-      heart: { math7: { primary: { mode: "strict", word: "study", vowels: ["U","Y"], counts: { A:0,E:0,I:0,O:0,U:1,Y:1,"Ë":0 } } } },
+      heart: {
+        math7: {
+          primary: {
+            mode: "strict",
+            word: "study",
+            vowels: ["U", "Y"],
+            counts: { A: 0, E: 0, I: 0, O: 0, U: 1, Y: 1, "Ë": 0 },
+          },
+        },
+      },
       candidates: [],
       deepRoot: null,
       languageFamilies: null,
-      evidence: { math7: { primary: { mode: "strict", word: "study", vowels: ["U","Y"], counts: { A:0,E:0,I:0,O:0,U:1,Y:1,"Ë":0 } } } },
+      evidence: {
+        math7: {
+          primary: {
+            mode: "strict",
+            word: "study",
+            vowels: ["U", "Y"],
+            counts: { A: 0, E: 0, I: 0, O: 0, U: 1, Y: 1, "Ë": 0 },
+          },
+        },
+      },
       raw: { evidence: {} },
     };
 
     render(<InstrumentPanel payload={payload} />);
 
-    expect(screen.getByText("Origin Claim")).toBeInTheDocument();
-    expect(screen.getByText(/no_single_winner/i)).toBeInTheDocument();
+    const title = screen.getByText("Origin Claim");
+    expect(title).toBeInTheDocument();
+
+    // Raw JSON card may also include the policy string; scope to the nearest ancestor that actually contains it.
+    const cardRoot = findNearestAncestorWithText(title as HTMLElement, /no_single_winner/i);
+    expect(cardRoot).toBeTruthy();
+
+    expect(within(cardRoot as HTMLElement).getByText(/no_single_winner/i)).toBeInTheDocument();
   });
 });

@@ -10,6 +10,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { toPrettyJson } from "@/ui/instrument/prettyJson";
 import { ReadoutCard } from './sections/ReadoutCard';
+import { CountsRatiosCard } from './sections/CountsRatiosCard';
+import { RawJsonCard } from './sections/RawJsonCard';
 import MeaningPanel from './MeaningPanel';
 import { buildEvidenceLedgerModelFromVM } from '../ledger/ledgerModel';
 import { EvidenceLedgerCard } from '../ledger/EvidenceLedgerCard';
@@ -89,6 +91,17 @@ export function InstrumentPanel(props: Props) {
 
   const engineVersion = isValidVm && vm.readout.engineVersion.kind === 'present' ? vm.readout.engineVersion.value : null;
 
+  const rawPretty = React.useMemo(() => {
+    // Only pretty-print the raw payload when it is actually provided.
+    // If the caller passes VM-only, Raw JSON is explicitly "not available".
+    if (!inputPayload) return null;
+    try {
+      return toPrettyJson(inputPayload);
+    } catch {
+      return null;
+    }
+  }, [inputPayload]);
+
   if (!isValidVm) {
     return (
       <div className="rounded-lg border border-red-500/40 bg-red-950/20 p-4 text-sm">
@@ -149,41 +162,50 @@ export function InstrumentPanel(props: Props) {
             ) : null}
           </div>
 
-          {/* RIGHT: telemetry stream */}
-          <div className="space-y-3 lg:col-span-7">
-            <VowelPathTimeline
-              detected={vm.readout.voicePath}
-              surface={vm.readout.voicePathSurface}
-              functional={vm.readout.voicePathFunctional}
-              delta={vm.readout.voicePathDelta}
-            />
+                      {/* RIGHT: telemetry stream (contract order) */}
+            <div className="space-y-3 lg:col-span-7">
+              <CountsRatiosCard readout={vm.readout} engineVersion={engineVersion} />
 
-            <ResonancePanelV01 resonanceProfileV1={vm.resonanceProfileV1} />
+              {ledgerModel ? <EvidenceLedgerCard model={ledgerModel} engineVersion={engineVersion} /> : null}
 
-            <RootMapCard
-              rootMap={vm.rootMap ?? ({ kind: "missing", missing: "not_emitted", note: "rootMap" } as any)}
-              word={String((vm.readout as any)?.word ?? (vm.readout as any)?.inputWord ?? "")}
-              normalizedWord={(() => {
-                const r: any = (vm.readout as any) ?? {};
-                const n = r.normalizedWord ?? r.normalized ?? r.basisNormalized ?? "";
-                if (n && typeof n === "object" && (n.kind === "present" || n.kind === "missing")) {
-                  return n.kind === "present" ? String(n.value ?? "") : "";
-                }
-                return String(n ?? "");
-              })()}
-            />
+              {candidateRows ? <CandidatesAccordion rows={candidateRows} /> : null}
 
-            <MeaningPanel vm={vm} />
+              {/* MATH / LENSES (optional telemetry) */}
+              <VowelPathTimeline
+                detected={vm.readout.voicePath}
+                surface={vm.readout.voicePathSurface}
+                functional={vm.readout.voicePathFunctional}
+                delta={vm.readout.voicePathDelta}
+              />
 
-            {ledgerModel ? <EvidenceLedgerCard model={ledgerModel} engineVersion={engineVersion} /> : null}
+              <ResonancePanelV01 resonanceProfileV1={vm.resonanceProfileV1} />
 
-            {/* Origin Claim (computed, auditable) */}
-            <OriginClaimCard
-              originClaim={vm.originClaim?.kind === "present" ? (vm.originClaim as any).value : null}
-            />
+              <RootMapCard
+                rootMap={vm.rootMap ?? ({ kind: "missing", missing: "not_emitted", note: "rootMap" } as any)}
+                word={String((vm.readout as any)?.word ?? (vm.readout as any)?.inputWord ?? "")}
+                normalizedWord={(() => {
+                  const r: any = (vm.readout as any) ?? {};
+                  const n = r.normalizedWord ?? r.normalized ?? r.basisNormalized ?? "";
+                  if (n && typeof n === "object" && (n.kind === "present" || n.kind === "missing")) {
+                    return n.kind === "present" ? String(n.value ?? "") : "";
+                  }
+                  return String(n ?? "");
+                })()}
+              />
 
-            {candidateRows ? <CandidatesAccordion rows={candidateRows} /> : null}
-          </div>
+              <MeaningPanel vm={vm} />
+
+              {/* Origin Claim (computed, auditable) */}
+              <OriginClaimCard
+                originClaim={vm.originClaim?.kind === "present" ? (vm.originClaim as any).value : null}
+              />
+
+              <RawJsonCard
+                pretty={rawPretty}
+                onCopyFullJson={props.onCopyFullJson}
+                engineVersion={engineVersion}
+              />
+            </div>
         </div>
       </div>
     );
