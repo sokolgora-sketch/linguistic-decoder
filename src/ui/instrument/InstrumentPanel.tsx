@@ -141,28 +141,9 @@ export function InstrumentPanel(props: Props) {
 
             {/* Minimal controls (copy evidence package) */}
 
-            {/* OriginClaim Gates (status / switch posture) */}
-            {vm.originClaimGates ? (
-              <div className="rounded-xl border p-3">
-                <div className="text-sm font-semibold">OriginClaim Gates</div>
-                <div className="mt-1 text-sm">
-                  Status:{" "}
-                  <span className="font-mono">{vm.originClaimGates.active ? "ON" : "OFF"}</span>{" "}
-                  <span className="text-xs opacity-70">(dev flag: ?{vm.originClaimGates.flag}=1)</span>
-                </div>
-                <div className="mt-1 text-sm">
-                  Candidates: <span className="font-mono">{vm.originClaimGates.candidateCount}</span>
-                </div>
+</div>
 
-                <div className="mt-2 text-xs opacity-70">Reason code counts</div>
-                <pre className="mt-1 overflow-auto rounded-lg bg-black/5 p-2 text-xs">
-                  {JSON.stringify(vm.originClaimGates.reasonCounts, null, 2)}
-                </pre>
-              </div>
-            ) : null}
-          </div>
-
-                      {/* RIGHT: telemetry stream (contract order) */}
+            {/* RIGHT: telemetry stream (contract order) */}
             <div className="space-y-3 lg:col-span-7">
               <CountsRatiosCard readout={vm.readout} engineVersion={engineVersion} />
 
@@ -170,7 +151,27 @@ export function InstrumentPanel(props: Props) {
 
               {candidateRows ? <CandidatesAccordion rows={candidateRows} /> : null}
 
-              {/* MATH / LENSES (optional telemetry) */}
+
+                {/* OriginClaim Gates (status / switch posture) */}
+                {vm.originClaimGates ? (
+                  <div className="rounded-xl border p-3">
+                    <div className="text-sm font-semibold">OriginClaim Gates</div>
+                    <div className="mt-1 text-sm">
+                      Status:{" "}
+                      <span className="font-mono">{vm.originClaimGates.active ? "ON" : "OFF"}</span>{" "}
+                      <span className="text-xs opacity-70">(dev flag: ?{vm.originClaimGates.flag}=1)</span>
+                    </div>
+                    <div className="mt-1 text-sm">
+                      Candidates: <span className="font-mono">{vm.originClaimGates.candidateCount}</span>
+                    </div>
+
+                    <div className="mt-2 text-xs opacity-70">Reason code counts</div>
+                    <pre className="mt-1 overflow-auto rounded-lg bg-black/5 p-2 text-xs">
+                      {JSON.stringify(vm.originClaimGates.reasonCounts, null, 2)}
+                    </pre>
+                  </div>
+                ) : null}
+                        {/* MATH / LENSES (optional telemetry) */}
               <VowelPathTimeline
                 detected={vm.readout.voicePath}
                 surface={vm.readout.voicePathSurface}
