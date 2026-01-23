@@ -25,4 +25,7 @@ test("InstrumentPanel derives ops/notes/signals counts from emitted evidence arr
   expect(text).toContain("ops=3");
   expect(text).toContain("notes=2");
   expect(text).toContain("signals=4");
+
+  // Guard: never leak object stringification into UI
+  expect(document.body.textContent || "").not.toMatch(/\[object Object\]/);
 });
