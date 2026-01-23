@@ -26,7 +26,18 @@ jest.mock("../src/hooks/use-toast", () => ({
 
 // --- 2) Mock ReadoutCard (we don't want its internal requirements here)
 jest.mock("../src/ui/instrument/sections/ReadoutCard", () => ({
-  ReadoutCard: () => <div data-testid="readout-card-mock" />,
+  ReadoutCard: (props: any) => (
+    <div data-testid="readout-card-mock">
+      <button type="button" onClick={props.onCopySummary}>
+        Copy Summary
+      </button>
+      {props.onCopyFullJson ? (
+        <button type="button" onClick={props.onCopyFullJson}>
+          Copy Full JSON
+        </button>
+      ) : null}
+    </div>
+  ),
 }));
 
 // --- 3) Mock ledger + candidates: keep this test focused
