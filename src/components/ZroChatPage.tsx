@@ -207,7 +207,7 @@ export default function ZroChatPage() {
       ?.instrumentPayload ?? null;
 
   return (
-    <ChatShell title="ZË-RO" subtitle="Seven-vowel word decoder." composer={composer}>
+    <ChatShell title="ZË-RO" subtitle="Seven-vowel word decoder." composer={composer} maxWidthClass="max-w-screen-2xl">
       <div className="space-y-4">
         {latestInstrumentPayload ? (
           <UiErrorBoundary label="InstrumentPanel">
