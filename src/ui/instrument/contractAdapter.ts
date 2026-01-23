@@ -609,5 +609,15 @@ function pomStringListFromEvidenceField(
   if (!Array.isArray(v)) return missing("malformed", `evidence.${key} expected array`);
 
   // present (including empty => MeaningPanel will show "none")
-  return present(v.map((x) => String(x)));
+  return present(
+  v.map((x) => {
+    if (typeof x === "string") return x;
+    if (x === null) return "null";
+    if (x === undefined) return "undefined";
+    const ty = typeof x;
+    if (ty === "number" || ty === "boolean" || ty === "bigint") return String(x);
+    // Deterministic stringify for objects/arrays (avoids "[object Object]")
+    try { return JSON.stringify(x); } catch { return String(x); }
+  })
+);
 }
