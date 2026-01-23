@@ -9,6 +9,7 @@ export interface UICandidateRow {
   functionalStatement?: string | null;
   deepRootHeartGateStatus?: string | null;
   deepRootHeartGateReasons?: string[] | null;
+  deepRootHeartGateEvidenceRefs?: string[] | null;
   raw: any; // for Copy Candidate JSON
 }
 
@@ -38,6 +39,15 @@ function pomGateReasons(x: any): string[] | null {
   return r.map((v: any) => String(v));
 }
 
+function pomGateEvidenceRefs(g: any): string[] | null {
+  // VM shape: PresentOrMissing<DeepRootHeartGateV01>
+  // We only accept a string[]; otherwise null.
+  const refs = g?.kind === "present" ? g?.value?.evidenceRefs : null;
+  if (!Array.isArray(refs)) return null;
+  const out = refs.map((x) => String(x)).map((s) => s.trim()).filter(Boolean);
+  return out.length ? out : null;
+}
+
 export function buildCandidateRowsFromVM(vm: TelemetryViewModel): UICandidateRow[] {
   return (vm.candidates ?? []).map((c: CandidateRowVM) => ({
     id: c.id,
@@ -48,6 +58,7 @@ export function buildCandidateRowsFromVM(vm: TelemetryViewModel): UICandidateRow
     functionalStatement: pomStr(c.functionalStatement),
       deepRootHeartGateStatus: pomGateStatus((c as any).deepRootHeartGate),
       deepRootHeartGateReasons: pomGateReasons((c as any).deepRootHeartGate),
+      deepRootHeartGateEvidenceRefs: pomGateEvidenceRefs((c as any).deepRootHeartGate),
     raw: c.raw,
   }));
 }

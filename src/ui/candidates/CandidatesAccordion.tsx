@@ -67,6 +67,11 @@ export function CandidatesAccordion({ rows }: { rows: UICandidateRow[] }) {
                       <div className="flex flex-col gap-0.5">
                         <span className="rounded-md border px-2 py-0.5 text-xs opacity-80 font-mono">
                           {`Gate: ${c.deepRootHeartGateStatus}`}
+                        {Array.isArray(c.deepRootHeartGateEvidenceRefs) && c.deepRootHeartGateEvidenceRefs.length ? (
+                          <div className="mt-1 text-xs opacity-70">
+                            Evidence: {c.deepRootHeartGateEvidenceRefs.join(", ")}
+                          </div>
+                        ) : null}
                         </span>
 
                         {c.deepRootHeartGateStatus === "misaligned" &&
