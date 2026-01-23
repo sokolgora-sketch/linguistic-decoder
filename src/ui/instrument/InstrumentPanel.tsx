@@ -127,38 +127,6 @@ export function InstrumentPanel(props: Props) {
             />
 
             {/* Minimal controls (copy evidence package) */}
-            <Card>
-              <CardHeader className="py-3">
-                <div className="flex items-center justify-between gap-3">
-                  <CardTitle className="text-sm">Evidence Package</CardTitle>
-                  <div className="flex flex-wrap gap-2">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => void copyText("Summary copied.", summaryLines.join("\n"))}
-                    >
-                      Copy Summary
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      disabled={!props.onCopyFullJson}
-                      onClick={() => (props.onCopyFullJson ? props.onCopyFullJson() : void 0)}
-                    >
-                      Copy Full JSON
-                    </Button>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="py-3">
-                <pre className="whitespace-pre-wrap rounded-md border bg-muted/20 p-3 text-xs font-mono leading-relaxed">
-                  {summaryLines.join("\n")}
-                </pre>
-                <div className="mt-2 text-xs text-muted-foreground">
-                  This is UI-only. No invented metrics. Missing fields are reported as “not emitted”.
-                </div>
-              </CardContent>
-            </Card>
 
             {/* OriginClaim Gates (status / switch posture) */}
             {vm.originClaimGates ? (
