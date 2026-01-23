@@ -28,7 +28,7 @@ describe('MeaningPanel (v0.1.1) — evidence summary renders present/none/missin
 
     render(<MeaningPanel vm={vm} />);
 
-    expect(screen.getByText(/Normalization: NFC, trim\./)).toBeInTheDocument();
+    expect(screen.getByText(/Normalization \(2\): NFC, trim\./)).toBeInTheDocument();
     expect(screen.getByText(/Ops: none\./)).toBeInTheDocument();
     expect(screen.getByText(/Signals: missing \(not_emitted\)\./)).toBeInTheDocument();
     expect(

@@ -34,7 +34,12 @@ function renderMaybeList(label: string, m: any): string {
   if (isPresent<string[]>(m)) {
     const v = Array.isArray(m.value) ? m.value : [];
     if (v.length === 0) return `${label}: none.`;
-    return `${label}: ${v.map(String).join(', ')}.`;
+    const PREVIEW_N = 3;
+      const items = v.map(String);
+      const preview = items.slice(0, PREVIEW_N);
+      const remaining = items.length - preview.length;
+      const suffix = remaining > 0 ? ` (+${remaining} more)` : '';
+      return `${label} (${items.length}): ${preview.join(', ')}${suffix}.`;
   }
   if (isMissing(m)) {
     const reason = asText(m.missing) ?? 'unknown';
