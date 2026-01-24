@@ -227,6 +227,69 @@ exports[`ui telemetry vm contract v0.1.1 (candidates evidence lists) adapts cand
         "Insight",
       ],
     },
+    "sevenPrinciplesSpectrum": {
+      "delta": {
+        "functional": "U-I",
+        "same": false,
+        "surface": "U-Y",
+      },
+      "functional": {
+        "kind": "present",
+        "value": {
+          "colors": [
+            "blue",
+            "yellow",
+          ],
+          "crossesCenter": false,
+          "drift": "mostly_decreasing",
+          "endsOnE": false,
+          "indices1": [
+            5,
+            3,
+          ],
+          "notes": [
+            "G",
+            "E",
+          ],
+          "ringIndex": [
+            1,
+            1,
+          ],
+          "vowels": [
+            "U",
+            "I",
+          ],
+        },
+      },
+      "surface": {
+        "kind": "present",
+        "value": {
+          "colors": [
+            "blue",
+            "indigo",
+          ],
+          "crossesCenter": false,
+          "drift": "mostly_increasing",
+          "endsOnE": false,
+          "indices1": [
+            5,
+            6,
+          ],
+          "notes": [
+            "G",
+            "A",
+          ],
+          "ringIndex": [
+            1,
+            2,
+          ],
+          "vowels": [
+            "U",
+            "Y",
+          ],
+        },
+      },
+    },
     "status": "detected",
     "strictInput": {
       "kind": "present",

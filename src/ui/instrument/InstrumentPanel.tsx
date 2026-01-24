@@ -3,6 +3,7 @@
 import React from "react";
 import { ResonancePanelV01 } from "./ResonancePanel.v0.1";
 import { VowelPathTimeline } from "./VowelPathTimeline";
+import { SevenPrinciplesSpectrumCard } from "./sections/SevenPrinciplesSpectrumCard";
 import { adaptAnalysisToTelemetryVM } from "@/ui/instrument/contractAdapter";
 import { RootMapCard } from "@/ui/instrument/RootMapCard";
 import { Button } from '@/components/ui/button';
@@ -178,7 +179,11 @@ export function InstrumentPanel(props: Props) {
                   </div>
                 ) : null}
               {/* MATH / LENSES (optional telemetry) */}
-              <VowelPathTimeline
+              {vm.readout && (vm.readout as any).sevenPrinciplesSpectrum ? (
+                  <SevenPrinciplesSpectrumCard spectrum={(vm.readout as any).sevenPrinciplesSpectrum} />
+                ) : null}
+
+                <VowelPathTimeline
                 detected={vm.readout.voicePath}
                 surface={vm.readout.voicePathSurface}
                 functional={vm.readout.voicePathFunctional}
