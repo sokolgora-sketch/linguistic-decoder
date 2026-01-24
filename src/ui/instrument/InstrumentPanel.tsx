@@ -141,7 +141,7 @@ export function InstrumentPanel(props: Props) {
 
             {/* Minimal controls (copy evidence package) */}
 
-</div>
+            </div>
 
             {/* RIGHT: telemetry stream (contract order) */}
             <div className="space-y-3 lg:col-span-7">
@@ -171,7 +171,7 @@ export function InstrumentPanel(props: Props) {
                     </pre>
                   </div>
                 ) : null}
-                        {/* MATH / LENSES (optional telemetry) */}
+              {/* MATH / LENSES (optional telemetry) */}
               <VowelPathTimeline
                 detected={vm.readout.voicePath}
                 surface={vm.readout.voicePathSurface}
