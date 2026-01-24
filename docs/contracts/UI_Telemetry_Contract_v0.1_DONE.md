@@ -45,3 +45,27 @@ Recommended smoke words for visible behavior checks:
 - yë (strict) — Y→Ë behavior; deterministic output
 - study (strict) — detected path + telemetry visible
 - damage (strict) — detected path + telemetry visible
+
+---
+
+## DONE — OriginClaim Gates placement + contract order (v0.1)
+
+### Outcome
+- OriginClaim Gates panel is rendered from the Telemetry VM and placed in the RIGHT telemetry column.
+- InstrumentPanel retains VM-only purity and contract-order rendering for the telemetry stream.
+
+### Acceptance checks
+- UI shows: Readout (left), telemetry stream (right) in contract order.
+- OriginClaim Gates:
+  - Displays Status (ON/OFF) + dev flag hint.
+  - Displays candidateCount and reasonCounts from VM.
+  - Does not toggle/drive OriginClaim computation; it is observational UI.
+
+### Proof refs
+- PR #296: `fix(ui): place OriginClaim Gates in right column; normalize InstrumentPanel JSX`
+- Tests:
+  - `tests/ui.instrument.originClaimGates.rendersFromVM.spec.tsx`
+  - `tests/ui.instrument.originClaim.rendersFromVM.spec.tsx`
+  - `tests/ui.instrument.vmOnly.guard.spec.tsx`
+  - `tests/ui.instrument.noRawAccess.guard.spec.tsx`
+
