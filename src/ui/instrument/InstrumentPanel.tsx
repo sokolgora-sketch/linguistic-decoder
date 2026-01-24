@@ -9,9 +9,11 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { toPrettyJson } from "@/ui/instrument/prettyJson";
+import { buildEvidencePackageFromVM } from "@/ui/telemetry/buildEvidencePackageFromVM";
 import { ReadoutCard } from './sections/ReadoutCard';
 import { CountsRatiosCard } from './sections/CountsRatiosCard';
 import { RawJsonCard } from './sections/RawJsonCard';
+import { EvidencePackageCard } from './sections/EvidencePackageCard';
 import MeaningPanel from './MeaningPanel';
 import { buildEvidenceLedgerModelFromVM } from '../ledger/ledgerModel';
 import { EvidenceLedgerCard } from '../ledger/EvidenceLedgerCard';
@@ -138,10 +140,14 @@ export function InstrumentPanel(props: Props) {
               onCopySummary={() => void copyText("Summary copied.", summaryLines.join("\n"))}
               onCopyFullJson={() => (props.onCopyFullJson ? props.onCopyFullJson() : void 0)}
             />
-
-            {/* Minimal controls (copy evidence package) */}
-
-            </div>
+              {/* Minimal controls (copy evidence package) */}
+              <EvidencePackageCard
+                onCopyEvidencePackage={() => {
+                  const pkg = buildEvidencePackageFromVM(vm as any, { ledgerModel });
+                  void copyText("Evidence package copied.", toPrettyJson(pkg));
+                }}
+              />
+</div>
 
             {/* RIGHT: telemetry stream (contract order) */}
             <div className="space-y-3 lg:col-span-7">
