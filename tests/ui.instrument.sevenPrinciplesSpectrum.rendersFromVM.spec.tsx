@@ -40,7 +40,7 @@ describe("SevenPrinciplesSpectrumCard renders from VM", () => {
     );
 
     expect(screen.getByText("Seven Principles Spectrum")).toBeTruthy();
-    expect(screen.getByText("Surface")).toBeTruthy();
-    expect(screen.getByText("Functional")).toBeTruthy();
+    expect(screen.getByText("surface")).toBeTruthy();
+    expect(screen.getByText("functional")).toBeTruthy();
   });
 });
