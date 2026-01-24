@@ -48,6 +48,28 @@ export type ResonanceProfileV1VM = {
 };
 
 
+
+export type SevenPrinciplesSpectrumSectionVM = {
+  vowels: Vowel[];
+  indices1: number[];   // 1..7
+  ringIndex: number[];  // 0..3 (heart rings)
+  colors: string[];
+  notes: string[];
+  crossesCenter?: boolean; // includes O(4) in 1..7 indexing
+  endsOnE?: boolean;       // ends on Ë(7)
+  drift?: "mostly_increasing" | "mostly_decreasing" | "mixed" | "static";
+};
+
+export type SevenPrinciplesSpectrumVM = {
+  surface: PresentOrMissing<SevenPrinciplesSpectrumSectionVM>;
+  functional: PresentOrMissing<SevenPrinciplesSpectrumSectionVM>;
+  delta?: {
+    same: boolean;
+    surface?: string;
+    functional?: string;
+  };
+};
+
 export interface TelemetryReadout {
   word: string;
   normalizedWord: PresentOrMissing<string>;
@@ -62,6 +84,7 @@ export interface TelemetryReadout {
   voicePathSurface?: PresentOrMissing<Vowel[]>;
   voicePathFunctional?: PresentOrMissing<Vowel[]>;
   voicePathDelta: "MATCH" | "SHIFT" | "DIVERGE" | "NOT_EMITTED";
+    sevenPrinciplesSpectrum?: SevenPrinciplesSpectrumVM;
   status: "detected" | "none" | "error";
 
   counts: {

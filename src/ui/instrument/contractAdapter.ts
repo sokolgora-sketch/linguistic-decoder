@@ -22,6 +22,7 @@ import type {
 } from "../telemetry/types";
 import type { RootMapV1 } from "@/shared/deepRoot.rootMap.v1";
 import { computeDeepRootHeartGateV01 } from "@/shared/deepRootHeartGate.v0.1.compute";
+import { vowelToIndex1, vowelToRingIndex, vowelToColor, vowelToNote } from "@/shared/sevenPrinciples.v1";
 
 type ParseRootMapResult = { ok: true; value: RootMapV1 } | { ok: false; reason: string };
 
@@ -317,6 +318,71 @@ const voicePathDetectedMaybe: PresentOrMissing<Vowel[]> =
   const surfaceNorm = surfaceParts ? surfaceParts.join("-") : null;
   const functionalNorm = functionalParts ? functionalParts.join("-") : null;
 
+  
+  function buildSpectrumSection(m: PresentOrMissing<Vowel[]>): PresentOrMissing<any> {
+    if (m && m.kind === "present" && Array.isArray(m.value)) {
+      const vowels = m.value;
+      const indices1 = vowels.map((v) => vowelToIndex1(v));
+      const ringIndex = vowels.map((v) => vowelToRingIndex(v));
+      const colors = vowels.map((v) => vowelToColor(v));
+      const notes = vowels.map((v) => vowelToNote(v));
+
+      const crossesCenter = indices1.includes(4);
+      const endsOnE = indices1.length ? indices1[indices1.length - 1] === 7 : false;
+
+      let inc = 0, dec = 0;
+      for (let i = 1; i < indices1.length; i++) {
+        if (indices1[i] > indices1[i - 1]) inc++;
+        else if (indices1[i] < indices1[i - 1]) dec++;
+      }
+      const drift =
+        indices1.length <= 1 ? "static" :
+        inc > dec ? "mostly_increasing" :
+        dec > inc ? "mostly_decreasing" :
+        "mixed";
+
+      return present({
+        vowels,
+        indices1,
+        ringIndex,
+        colors,
+        notes,
+        crossesCenter,
+        endsOnE,
+        drift,
+      });
+    }
+
+    // Preserve original missing reason if present
+    return missing((m as any)?.missing ?? "unknown", (m as any)?.note);
+  }
+
+const sevenPrinciplesSpectrum = (() => {
+    const surface = buildSpectrumSection(voicePathSurfaceMaybe);
+    const functional = buildSpectrumSection(voicePathFunctionalMaybe);
+
+    const surfaceStr =
+        surface.kind === "present" && surface.value?.vowels
+          ? surface.value.vowels.join("-")
+          : "";
+
+      const functionalStr =
+        functional.kind === "present" && functional.value?.vowels
+          ? functional.value.vowels.join("-")
+          : "";
+
+    return {
+      surface,
+      functional,
+      delta: {
+        same: surfaceStr === functionalStr,
+        surface: surfaceStr || undefined,
+        functional: functionalStr || undefined,
+      },
+    };
+  })();
+
+
   const voicePathDelta =
     surfaceNorm && functionalNorm
       ? (surfaceNorm === functionalNorm ? "MATCH" : "DIVERGE")
@@ -552,6 +618,7 @@ const originClaimGates: OriginClaimGatesVM = {
       voicePathFunctional: voicePathFunctionalMaybe,
       voicePathDelta,
 
+        sevenPrinciplesSpectrum,
       word,
       normalizedWord: sanitized ? present(sanitized) : missing("not_emitted", "sanitized"),
       mode: mode ? present(mode) : missing("not_emitted", "mode"),
