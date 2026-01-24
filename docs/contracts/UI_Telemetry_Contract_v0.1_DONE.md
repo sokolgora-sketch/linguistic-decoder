@@ -69,3 +69,25 @@ Recommended smoke words for visible behavior checks:
   - `tests/ui.instrument.vmOnly.guard.spec.tsx`
   - `tests/ui.instrument.noRawAccess.guard.spec.tsx`
 
+
+---
+
+## DONE — Evidence Package copy (VM-only) (v0.1)
+
+### Outcome
+- InstrumentPanel exposes a **Copy Evidence Package** control (left column).
+- Package is built **only from Telemetry VM** (and optional ledgerModel), never from raw payload.
+- Copy uses deterministic pretty JSON.
+
+### Acceptance checks
+- Button exists under Readout in the left column.
+- Copy result includes `version: "evidence_package.v0.1"`.
+- No raw payload access is introduced.
+
+### Proof refs
+- PR #298: `feat(ui): VM-only Evidence Package copy (v0.1)`
+- Tests:
+  - `tests/ui.telemetry.evidencePackage.v0.1.spec.ts`
+  - `tests/ui.instrument.evidencePackage.vmOnly.guard.spec.tsx`
+  - `tests/ui.instrument.vmOnly.guard.spec.tsx`
+
