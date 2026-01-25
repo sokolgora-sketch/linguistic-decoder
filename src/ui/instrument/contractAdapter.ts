@@ -1,5 +1,6 @@
 "use client";
 
+import { normalizePrinciplesToLabels } from "@/v1/principles.vocab.v0.1";
 /**
  * UI contract adapter: raw analyze-v1 payload → TelemetryViewModel (VM).
  *
@@ -420,7 +421,8 @@ const voicePathDetectedMaybe: PresentOrMissing<Vowel[]> =
       : null;
 
   const math7PrinciplesPath = heartMath7Primary ? asStringArray(heartMath7Primary["principlesPath"]) : null;
-  const principlesPath = heartPrinciplePath ?? math7PrinciplesPath;
+  const principlesPathRaw = heartPrinciplePath ?? math7PrinciplesPath;
+  const principlesPath = principlesPathRaw ? normalizePrinciplesToLabels(principlesPathRaw) : null;
 
   const primaryPath = isRecord(root["primaryPath"]) ? root["primaryPath"] : null;
   const detectedVoicePath =

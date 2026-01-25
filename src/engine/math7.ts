@@ -12,13 +12,13 @@ import { applyStrictTerminalYHint } from "@/shared/math7.basis";
  * Keep stable — tests and UI depend on this wording.
  */
 export const PRINCIPLE_MAP: Record<SevenVowel, string> = {
-  A: "Truth",
-  E: "Expansion",
-  I: "Insight",
-  O: "Balance",
-  U: "Unity",
+  A: "TRUTH",
+  E: "EXPANSION",
+  I: "INSIGHT",
+  O: "BALANCE",
+  U: "UNITY",
   Y: "Network Integrity",
-  "Ë": "Evolution",
+  "Ë": "EVOLUTION",
 };
 
 export type Math7Primary = {

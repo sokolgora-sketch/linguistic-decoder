@@ -212,7 +212,7 @@ exports[`ui telemetry vm contract v0.1.1 (candidates evidence lists) adapts cand
       ],
       "meta": {
         "engineVersion": "0.2.0-symbolic",
-        "generatedAt": "2026-01-25T16:18:23.881Z",
+        "generatedAt": "<generatedAt>",
         "inputs": {
           "alphabet": "auto",
           "mode": "strict",
