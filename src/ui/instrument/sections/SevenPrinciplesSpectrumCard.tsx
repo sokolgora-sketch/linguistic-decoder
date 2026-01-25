@@ -2,17 +2,30 @@
 
 import React from "react";
 
-type PomLike = {
+type MissingReason = "not_emitted" | "malformed" | "unknown";
+type Present<T> = { kind: "present"; value: T };
+type Missing = { kind: "missing"; missing: MissingReason; note?: string };
+type PresentOrMissing<T> = Present<T> | Missing;
+
+type SpectrumSection = {
   vowels?: unknown;
   colors?: unknown;
   notes?: unknown;
   roles?: unknown;
-  genders?: unknown;
+  polarities?: unknown;
+  rings?: unknown;
+  indices1?: unknown;
+  ringIndex?: unknown;
+  crossesCenter?: unknown;
+  endsOnE?: unknown;
+  endsOnË?: unknown;
+  drift?: unknown;
 };
 
-type SpectrumLike = {
+type SpectrumVM = {
   surface?: unknown;
   functional?: unknown;
+  delta?: unknown;
 };
 
 function asStringArray(x: unknown): string[] {
@@ -20,52 +33,93 @@ function asStringArray(x: unknown): string[] {
   return x.map((v) => (v == null ? "" : String(v))).filter((s) => s.length > 0);
 }
 
-function asPom(x: unknown): PomLike | null {
-  if (!x || typeof x !== "object") return null;
-  return x as PomLike;
+function unwrapSection(x: unknown): { section: SpectrumSection | null; state: "present" | "missing" | "malformed" } {
+  if (!x || typeof x !== "object") return { section: null, state: "missing" };
+
+  const r = x as any;
+
+  // PresentOrMissing wrapper case
+  if (r.kind === "present" && r.value && typeof r.value === "object") {
+    return { section: r.value as SpectrumSection, state: "present" };
+  }
+  if (r.kind === "missing") {
+    return { section: null, state: "missing" };
+  }
+
+  // Legacy / direct section object case
+  if (r.vowels || r.colors || r.notes) {
+    return { section: r as SpectrumSection, state: "present" };
+  }
+
+  return { section: null, state: "malformed" };
 }
 
-function asSpectrum(x: unknown): SpectrumLike {
-  if (!x || typeof x !== "object") return {};
-  return x as SpectrumLike;
+function ChipRow(props: { label: string; values: string[]; fallback?: string }) {
+  const v = props.values.length ? props.values : [props.fallback ?? "—"];
+  return (
+    <div className="flex flex-wrap gap-2">
+      {v.map((s, i) => (
+        <span key={i} className="inline-flex items-center rounded-md border bg-white/50 px-2 py-1 text-xs">
+          {s}
+        </span>
+      ))}
+    </div>
+  );
 }
 
-function Row(props: { label: string; pom: unknown }) {
-  const p = asPom(props.pom);
+function SectionCard(props: { label: string; data: unknown }) {
+  const { section, state } = unwrapSection(props.data);
 
-  const vowels = asStringArray(p?.vowels);
-  const colors = asStringArray(p?.colors);
-  const notes = asStringArray(p?.notes);
-  const roles = asStringArray(p?.roles);
-  const genders = asStringArray(p?.genders);
+  const vowels = asStringArray(section?.vowels);
+  const colors = asStringArray(section?.colors);
+  const notes = asStringArray(section?.notes);
+  const roles = asStringArray(section?.roles);
+  const polarities = asStringArray(section?.polarities);
+  const rings = asStringArray(section?.rings);
+
+  const meta: string[] = [];
+  const drift = section?.drift != null ? String(section.drift) : "";
+  const crossesCenter = section?.crossesCenter === true ? "crosses O" : "";
+  const endsOnE = section?.endsOnE === true ? "ends on E" : "";
+  const endsOnË = section?.endsOnË === true ? "ends on Ë" : "";
+  [drift, crossesCenter, endsOnE, endsOnË].filter(Boolean).forEach((s) => meta.push(s));
 
   const hasAny =
-    vowels.length ||
-    colors.length ||
-    notes.length ||
-    roles.length ||
-    genders.length;
+    vowels.length || colors.length || notes.length || roles.length || polarities.length || rings.length;
 
   return (
     <div className="rounded-xl border bg-white/50 p-3">
-      <div className="text-sm font-semibold">{props.label}</div>
+      <div className="flex items-baseline justify-between gap-2">
+        <div className="text-sm font-semibold">{props.label}</div>
+        {state !== "present" ? <div className="text-xs opacity-70">{state}</div> : null}
+      </div>
 
       {!hasAny ? (
         <div className="mt-2 text-xs opacity-70">—</div>
       ) : (
-        <div className="mt-2 flex flex-wrap gap-2">
-          {(vowels.length ? vowels : ["—"]).map((v, i) => (
-            <span
-              key={i}
-              className="inline-flex items-center gap-2 rounded-md border bg-white/50 px-2 py-1 text-xs"
-            >
-              <span className="font-mono text-sm">{v}</span>
-              <span className="opacity-70">{colors[i] ?? "—"}</span>
-              <span className="opacity-70">{notes[i] ?? "—"}</span>
-              <span className="opacity-70">{roles[i] ?? "—"}</span>
-              <span className="opacity-70">{genders[i] ?? "—"}</span>
-            </span>
-          ))}
+        <div className="mt-2 space-y-2">
+          <ChipRow label="Vowels" values={vowels} />
+          {roles.length ? <ChipRow label="Roles" values={roles} /> : null}
+          {polarities.length ? <ChipRow label="Polarities" values={polarities} /> : null}
+          {rings.length ? <ChipRow label="Rings" values={rings} /> : null}
+
+          {/* compact per-vowel detail line */}
+          <div className="mt-1 flex flex-wrap gap-2">
+            {vowels.map((v, i) => (
+              <span
+                key={i}
+                className="inline-flex items-center gap-2 rounded-md border bg-white/50 px-2 py-1 text-xs"
+              >
+                <span className="font-mono text-sm">{v}</span>
+                <span className="opacity-70">{colors[i] ?? "—"}</span>
+                <span className="opacity-70">{notes[i] ?? "—"}</span>
+              </span>
+            ))}
+          </div>
+
+          {meta.length ? (
+            <div className="text-xs opacity-70">{meta.join(" · ")}</div>
+          ) : null}
         </div>
       )}
     </div>
@@ -73,26 +127,26 @@ function Row(props: { label: string; pom: unknown }) {
 }
 
 export function SevenPrinciplesSpectrumCard(props: { spectrum: unknown }) {
-  const spectrum = asSpectrum(props?.spectrum);
+  const s = (props?.spectrum && typeof props.spectrum === "object") ? (props.spectrum as SpectrumVM) : {};
 
-  const surface = spectrum.surface;
-  const functional = spectrum.functional;
+  const surface = s.surface;
+  const functional = s.functional;
 
-  const hasSurface = !!asPom(surface);
-  const hasFunctional = !!asPom(functional);
+  const surfaceState = unwrapSection(surface).state;
+  const functionalState = unwrapSection(functional).state;
+
+  const notEmitted = surfaceState !== "present" && functionalState !== "present";
 
   return (
     <div className="rounded-2xl border bg-white/70 p-4">
       <div className="flex items-baseline justify-between gap-2">
         <div className="text-base font-semibold">Seven Principles Spectrum</div>
-        {!hasSurface && !hasFunctional ? (
-          <div className="text-xs opacity-70">not emitted</div>
-        ) : null}
+        {notEmitted ? <div className="text-xs opacity-70">not emitted</div> : null}
       </div>
 
       <div className="mt-3 space-y-2">
-        <Row label="Surface" pom={surface} />
-        <Row label="Functional" pom={functional} />
+        <SectionCard label="Surface" data={surface} />
+        <SectionCard label="Functional" data={functional} />
       </div>
     </div>
   );
