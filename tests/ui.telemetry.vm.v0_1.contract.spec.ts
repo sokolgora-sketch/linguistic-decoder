@@ -4,9 +4,39 @@ import { adaptAnalysisToTelemetryVM } from "@/ui/instrument/contractAdapter";
 // We snapshot the UI Telemetry VM AFTER stripping dev/raw surfaces.
 import studyStrict from "./__fixtures__/analyzeV1.study.strict.json";
 
+function stripVolatileFields(x: any) {
+  // Recursively delete volatile keys that should never be snapshotted.
+  const seen = new Set<any>();
+  const walk = (o: any) => {
+    if (!o || typeof o !== "object") return;
+    if (seen.has(o)) return;
+    seen.add(o);
+
+    if (Object.prototype.hasOwnProperty.call(o, "generatedAt")) {
+      o.generatedAt = "<generatedAt>";
+    }
+
+    if (Array.isArray(o)) {
+      for (const v of o) walk(v);
+      return;
+    }
+
+    for (const k of Object.keys(o)) walk(o[k]);
+  };
+
+  walk(x);
+}
+
 function stripVmForSnapshot(vm: any) {
   // Deep clone to avoid mutations leaking between tests.
   const x = JSON.parse(JSON.stringify(vm));
+
+  // Remove volatile timestamps anywhere in the snapshot tree.
+  stripVolatileFields(x);
+
+  // Volatile fields: never snapshot timestamps.
+  if (x?.originClaim?.meta && typeof x.originClaim.meta === "object") {
+}
 
   // Strip ALL raw surfaces (dev-only / non-contract / unstable).
   delete x.raw;

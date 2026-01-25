@@ -36,6 +36,39 @@ function stripVolatile(vm: any) {
     for (const r of out.rejections.items.value) delete r.raw;
   }
 
+  // Canonicalize volatile timestamps anywhere in the snapshot tree.
+
+  const scrubGeneratedAt = (root) => {
+
+    const seen = new Set();
+
+    const walk = (o) => {
+
+      if (!o || typeof o !== "object") return;
+
+      if (seen.has(o)) return;
+
+      seen.add(o);
+
+      if (Object.prototype.hasOwnProperty.call(o, "generatedAt")) {
+
+        o.generatedAt = "<generatedAt>";
+
+      }
+
+      if (Array.isArray(o)) { for (const v of o) walk(v); return; }
+
+      for (const k of Object.keys(o)) walk(o[k]);
+
+    };
+
+    walk(root);
+
+  };
+
+  scrubGeneratedAt(out);
+
+
   return out;
 }
 
@@ -59,6 +92,11 @@ describe("ui telemetry vm contract v0.1.1 (candidates evidence lists)", () => {
      * or "functional" vowels, to avoid conflating layers in the instrument UI.
      */
     // Snapshot locks the VM shape (v0.1.1)
+    // Volatile fields: never snapshot timestamps.
+    if (stable?.originClaim?.meta && typeof stable.originClaim.meta === "object") {
+
+    }
+
     expect(stable).toMatchSnapshot();
 
     // Sanity: candidates exist
