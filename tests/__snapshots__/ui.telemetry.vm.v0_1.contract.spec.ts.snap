@@ -243,6 +243,7 @@ exports[`ui telemetry vm contract v0.1 adapts analyze-v1 payload into stable Tel
           "crossesCenter": false,
           "drift": "mostly_decreasing",
           "endsOnE": false,
+          "endsOnË": false,
           "indices1": [
             5,
             3,
@@ -271,6 +272,7 @@ exports[`ui telemetry vm contract v0.1 adapts analyze-v1 payload into stable Tel
           "crossesCenter": false,
           "drift": "mostly_increasing",
           "endsOnE": false,
+          "endsOnË": false,
           "indices1": [
             5,
             6,
