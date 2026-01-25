@@ -56,7 +56,8 @@ export type SevenPrinciplesSpectrumSectionVM = {
   colors: string[];
   notes: string[];
   crossesCenter?: boolean; // includes O(4) in 1..7 indexing
-  endsOnE?: boolean;       // ends on Ë(7)
+  endsOnE?: boolean;       // ends on E (index1=2)
+  endsOnË?: boolean;      // ends on Ë (index1=7)
   drift?: "mostly_increasing" | "mostly_decreasing" | "mixed" | "static";
 };
 
