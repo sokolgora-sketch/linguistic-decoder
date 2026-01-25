@@ -1,3 +1,16 @@
+export type Note = "C" | "D" | "E" | "F" | "G" | "A" | "B";
+
+export const VOWEL_TO_NOTE_V0_1: Record<Vowel, Note> = {
+  A: "C",
+  E: "D",
+  I: "E",
+  O: "F",
+  U: "G",
+  Y: "A",
+  "Ë": "B",
+};
+
+
 /**
  * Seven Principles Law v1 (Prism Constitution)
  *
