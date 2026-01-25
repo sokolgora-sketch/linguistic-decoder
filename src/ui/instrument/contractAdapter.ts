@@ -467,6 +467,11 @@ const sevenPrinciplesSpectrum = (() => {
     asArray(heartEvidence?.["signals"]) ??
     null;
 
+    // Canonical DeepRoot functional vowel path (if emitted)
+    // Prefer this for DeepRoot–Heart gate comparisons; fall back per-candidate otherwise.
+    const deepRootFunctionalPathStr: string | null =
+      (normalizeVowelPathString((payload as any)?.deepRoot?.functionalRoots?.[0]?.vowelPath)?.join("-") ?? null);
+
   // Candidates
   const candRaw = Array.isArray(root["candidates"]) ? root["candidates"] : null;
   const candidates: CandidateRowVM[] = [];
@@ -501,19 +506,20 @@ const sevenPrinciplesSpectrum = (() => {
         functionalStatement: functionalStatement ? present(functionalStatement) : missing("not_emitted"),
         vowelPath: candVowelPath ? present(candVowelPath) : missing("not_emitted"),
 
-          deepRootHeartGate: present(
-            computeDeepRootHeartGateV01({
-              heartPrimaryPath: heartPrimaryPathForGate,
-              candidateResolvedPath: candVowelPath ? candVowelPath.join("-") : null,
-              evidenceRefs: [
-                // Canonical Heart anchor (preferred when emitted)
-                "heartPrimaryPath",
-                "primaryPath.voicePath",
-                // Candidate-local anchor (string only; UI treats as reference label)
-                `candidates[${i}].vowelPath`,
-              ],
-            })
-          ),
+        deepRootHeartGate: present(
+          computeDeepRootHeartGateV01({
+            heartPrimaryPath: heartPrimaryPathForGate,
+            candidateResolvedPath:
+              deepRootFunctionalPathStr ?? (candVowelPath ? candVowelPath.join("-") : null),
+            evidenceRefs: [
+              "heartPrimaryPath",
+              "primaryPath.voicePath",
+              ...(deepRootFunctionalPathStr
+                ? ["deepRoot.functionalRoots[0].vowelPath"]
+                : ["candidates[" + i + "].vowelPath"]),
+            ],
+          })
+        ),
 
         // leave decomposition for later (shape varies too much right now)
         decomposition: missing("not_emitted") as PresentOrMissing<DecompositionItemVM[]>,
