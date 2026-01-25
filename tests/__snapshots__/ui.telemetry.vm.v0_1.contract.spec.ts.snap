@@ -109,7 +109,9 @@ exports[`ui telemetry vm contract v0.1 adapts analyze-v1 payload into stable Tel
   "evidence": {
     "normalizationSteps": {
       "kind": "present",
-      "value": [],
+      "value": [
+        "{"op":"vowel_normalize","from":"UY","to":"UI","reason":"functional_equivalence"}",
+      ],
     },
     "notes": {
       "kind": "present",
@@ -126,7 +128,7 @@ exports[`ui telemetry vm contract v0.1 adapts analyze-v1 payload into stable Tel
         "base_norm=UI",
         "cons_windows=-",
         "prefix 'st' → Plosive",
-        "alphabet=german",
+        "alphabet=latin",
         "EVIDENCE_V1",
         "EVIDENCE_MATH7_BACKFILL",
       ],
@@ -170,13 +172,72 @@ exports[`ui telemetry vm contract v0.1 adapts analyze-v1 payload into stable Tel
     },
   },
   "originClaim": {
-    "kind": "missing",
-    "missing": "not_emitted",
-    "note": "originClaim",
+    "kind": "present",
+    "value": {
+      "candidates": [
+        {
+          "confidence": "weak",
+          "evidenceRefs": [
+            "primaryPath.voicePath",
+            "heart.math7.primary",
+            "candidates[albanian-studim]",
+          ],
+          "form": "studim",
+          "id": "oc:albanian-studim",
+          "language": "Albanian",
+          "reasons": [
+            "Candidate marked pass by engine candidate layer.",
+            "Candidate voice path aligns with primary voice path.",
+            "Candidate lacks detectable morphological structure.",
+          ],
+          "status": "pass",
+        },
+        {
+          "confidence": "weak",
+          "evidenceRefs": [
+            "primaryPath.voicePath",
+            "heart.math7.primary",
+            "candidates[latin-studium]",
+          ],
+          "form": "studium",
+          "id": "oc:latin-studium",
+          "language": "Latin",
+          "reasons": [
+            "Candidate marked pass by engine candidate layer.",
+            "Candidate voice path aligns with primary voice path.",
+            "Candidate lacks detectable morphological structure.",
+          ],
+          "status": "pass",
+        },
+      ],
+      "meta": {
+        "engineVersion": "0.2.0-symbolic",
+        "generatedAt": "2026-01-25T16:18:23.881Z",
+        "inputs": {
+          "alphabet": "auto",
+          "mode": "strict",
+          "word": "study",
+        },
+      },
+      "policy": "no_single_winner",
+      "summary": {
+        "confidence": "weak",
+        "note": "Computed from candidate/deepRoot/voice-path/morphology signals. Passing: 2; strong: 0; medium: 0.",
+      },
+      "support": {
+        "claimId": "oc:study",
+        "refs": [
+          "ref:candidates[albanian-studim]",
+          "ref:candidates[latin-studium]",
+          "ref:heart.math7.primary",
+        ],
+      },
+      "version": "v1",
+    },
   },
   "originClaimGates": {
     "active": false,
-    "candidateCount": 0,
+    "candidateCount": 2,
     "flag": "ocg",
     "reasonCounts": {},
   },
@@ -352,14 +413,166 @@ exports[`ui telemetry vm contract v0.1 adapts analyze-v1 payload into stable Tel
     },
   },
   "resonanceProfileV1": {
-    "kind": "missing",
-    "missing": "not_emitted",
-    "note": "resonanceProfileV1",
+    "kind": "present",
+    "value": {
+      "normalized": {
+        "bucketCounts": {
+          "boundary": 0,
+          "manifest": 1,
+          "source": 1,
+        },
+        "colorBand": [
+          "blue",
+          "yellow",
+        ],
+        "dominantBucket": "mixed",
+        "dominantColor": "mixed",
+        "notes": [
+          "mixed buckets: source+manifest",
+        ],
+        "polaritySymbol": "◐",
+        "signature": "MIXED_SOURCE_MANIFEST",
+        "transitions": [
+          "source→manifest",
+        ],
+        "vowels": [
+          "U",
+          "I",
+        ],
+      },
+      "surface": {
+        "bucketCounts": {
+          "boundary": 0,
+          "manifest": 0,
+          "source": 2,
+        },
+        "colorBand": [
+          "blue",
+          "indigo",
+        ],
+        "dominantBucket": "source",
+        "dominantColor": "mixed",
+        "notes": [
+          "pure bucket: source",
+        ],
+        "polaritySymbol": "♀",
+        "signature": "PURE_SOURCE",
+        "transitions": [],
+        "vowels": [
+          "U",
+          "Y",
+        ],
+      },
+      "version": "resonance-profile-v1",
+    },
   },
   "rootMap": {
-    "kind": "missing",
-    "missing": "not_emitted",
-    "note": "rootMap",
+    "kind": "present",
+    "value": {
+      "carriers": [
+        {
+          "carrierForm": "shtoj",
+          "language": "sq",
+          "note": "gloss: to add",
+          "token": "SHTU",
+        },
+        {
+          "carrierForm": "shtim",
+          "language": "sq",
+          "note": "gloss: addition / increase",
+          "token": "SHTU",
+        },
+        {
+          "carrierForm": "shtue",
+          "language": "sq",
+          "note": "gloss: added (participle)",
+          "token": "SHTU",
+        },
+        {
+          "carrierForm": "stu",
+          "language": "en",
+          "note": "gloss: surface segment carrier (study)",
+          "token": "SHTU",
+        },
+        {
+          "carrierForm": "dij",
+          "language": "sq",
+          "note": "gloss: I know",
+          "token": "DI",
+        },
+        {
+          "carrierForm": "dije",
+          "language": "sq",
+          "note": "gloss: knowledge",
+          "token": "DI",
+        },
+        {
+          "carrierForm": "dit",
+          "language": "sq",
+          "note": "gloss: day (carrier; semantic drift possible)",
+          "token": "DI",
+        },
+      ],
+      "composedMeaning": "add / increase / put-on + know / knowledge",
+      "keys": [
+        {
+          "evidence": [
+            "sq: shtu",
+            "ops: s_to_sh",
+            "gloss: add / increased",
+          ],
+          "gloss": "add / increase / put-on",
+          "language": "sq",
+          "ops": [
+            "s_to_sh",
+          ],
+          "status": "supported",
+          "token": "SHTU",
+        },
+        {
+          "evidence": [
+            "sq: di",
+            "ops: y_to_i",
+            "gloss: I know",
+          ],
+          "gloss": "know / knowledge",
+          "language": "sq",
+          "ops": [
+            "y_to_i",
+          ],
+          "status": "supported",
+          "token": "DI",
+        },
+      ],
+      "spans": [
+        {
+          "end": 3,
+          "note": "segment=stu",
+          "source": "surface",
+          "start": 0,
+          "token": "SHTU",
+        },
+        {
+          "end": 5,
+          "note": "segment=dy",
+          "source": "surface",
+          "start": 3,
+          "token": "DI",
+        },
+      ],
+      "tokens": [
+        {
+          "role": "action",
+          "token": "SHTU",
+          "vowel_path": "U",
+        },
+        {
+          "role": "instrument",
+          "token": "DI",
+          "vowel_path": "I",
+        },
+      ],
+    },
   },
 }
 `;
