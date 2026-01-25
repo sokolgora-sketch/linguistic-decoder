@@ -22,7 +22,7 @@ import type {
 } from "../telemetry/types";
 import type { RootMapV1 } from "@/shared/deepRoot.rootMap.v1";
 import { computeDeepRootHeartGateV01 } from "@/shared/deepRootHeartGate.v0.1.compute";
-import { vowelToIndex1, vowelToRingIndex, vowelToColor, vowelToNote } from "@/shared/sevenPrinciples.v1";
+import { SEVEN_PRINCIPLES, vowelToIndex1, vowelToRingIndex, vowelToColor, vowelToNote } from "@/shared/sevenPrinciples.v1";
 
 type ParseRootMapResult = { ok: true; value: RootMapV1 } | { ok: false; reason: string };
 
@@ -320,47 +320,56 @@ const voicePathDetectedMaybe: PresentOrMissing<Vowel[]> =
 
   
   function buildSpectrumSection(m: PresentOrMissing<Vowel[]>): PresentOrMissing<any> {
-    if (m && m.kind === "present" && Array.isArray(m.value)) {
-      const vowels = m.value;
-      const indices1 = vowels.map((v) => vowelToIndex1(v));
-      const ringIndex = vowels.map((v) => vowelToRingIndex(v));
-      const colors = vowels.map((v) => vowelToColor(v));
-      const notes = vowels.map((v) => vowelToNote(v));
+      if (m && m.kind === "present" && Array.isArray(m.value)) {
+        const vowels = m.value;
 
-      const crossesCenter = indices1.includes(4);
-      const last = indices1.length ? indices1[indices1.length - 1] : null;
+        const indices1 = vowels.map((v) => vowelToIndex1(v));
+        const ringIndex = vowels.map((v) => vowelToRingIndex(v));
+        const colors = vowels.map((v) => vowelToColor(v));
+        const notes = vowels.map((v) => vowelToNote(v));
+
+        // doctrine (SSOT): role / polarity / ring label
+        const roles = vowels.map((v) => SEVEN_PRINCIPLES[v].role);
+        const polarities = vowels.map((v) => SEVEN_PRINCIPLES[v].polarity);
+        const rings = vowels.map((v) => SEVEN_PRINCIPLES[v].ring);
+
+        const crossesCenter = indices1.includes(4);
+        const last = indices1.length ? indices1[indices1.length - 1] : null;
         const endsOnE = last === 2;
         const endsOnË = last === 7;
 
-      let inc = 0, dec = 0;
-      for (let i = 1; i < indices1.length; i++) {
-        if (indices1[i] > indices1[i - 1]) inc++;
-        else if (indices1[i] < indices1[i - 1]) dec++;
-      }
-      const drift =
-        indices1.length <= 1 ? "static" :
-        inc > dec ? "mostly_increasing" :
-        dec > inc ? "mostly_decreasing" :
-        "mixed";
+        let inc = 0, dec = 0;
+        for (let i = 1; i < indices1.length; i++) {
+          if (indices1[i] > indices1[i - 1]) inc++;
+          else if (indices1[i] < indices1[i - 1]) dec++;
+        }
+        const drift =
+          indices1.length <= 1 ? "static" :
+          inc > dec ? "mostly_increasing" :
+          dec > inc ? "mostly_decreasing" :
+          "mixed";
 
-      return present({
-        vowels,
-        indices1,
-        ringIndex,
-        colors,
-        notes,
-        crossesCenter,
-        endsOnE,
+        return present({
+          vowels,
+          indices1,
+          ringIndex,
+          colors,
+          notes,
+          roles,
+          polarities,
+          rings,
+          crossesCenter,
+          endsOnE,
           endsOnË,
-        drift,
-      });
+          drift,
+        });
+      }
+
+      // Preserve original missing reason if present
+      return missing((m as any)?.missing ?? "unknown", (m as any)?.note);
     }
 
-    // Preserve original missing reason if present
-    return missing((m as any)?.missing ?? "unknown", (m as any)?.note);
-  }
-
-const sevenPrinciplesSpectrum = (() => {
+  const sevenPrinciplesSpectrum = (() => {
     const surface = buildSpectrumSection(voicePathSurfaceMaybe);
     const functional = buildSpectrumSection(voicePathFunctionalMaybe);
 
