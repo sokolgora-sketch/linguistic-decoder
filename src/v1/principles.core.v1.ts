@@ -10,7 +10,7 @@ export type PrincipleId =
   | "INSIGHT"          // I (3)
   | "BALANCE"          // O (4)
   | "UNITY"            // U (5)
-  | "NETWORK_INTEGRITY"// Y (6)
+  | "REFLECTION"       // Y (6)
   | "EVOLUTION";       // Ë (7)
 
 export function principleFromVowel(v: SevenVowel): PrincipleId {
@@ -20,7 +20,7 @@ export function principleFromVowel(v: SevenVowel): PrincipleId {
     case "I": return "INSIGHT";
     case "O": return "BALANCE";
     case "U": return "UNITY";
-    case "Y": return "NETWORK_INTEGRITY";
+    case "Y": return "REFLECTION";
     case "Ë": return "EVOLUTION";
   }
 }
