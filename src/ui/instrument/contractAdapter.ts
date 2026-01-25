@@ -328,7 +328,9 @@ const voicePathDetectedMaybe: PresentOrMissing<Vowel[]> =
       const notes = vowels.map((v) => vowelToNote(v));
 
       const crossesCenter = indices1.includes(4);
-      const endsOnE = indices1.length ? indices1[indices1.length - 1] === 7 : false;
+      const last = indices1.length ? indices1[indices1.length - 1] : null;
+        const endsOnE = last === 2;
+        const endsOnË = last === 7;
 
       let inc = 0, dec = 0;
       for (let i = 1; i < indices1.length; i++) {
@@ -349,6 +351,7 @@ const voicePathDetectedMaybe: PresentOrMissing<Vowel[]> =
         notes,
         crossesCenter,
         endsOnE,
+          endsOnË,
         drift,
       });
     }
