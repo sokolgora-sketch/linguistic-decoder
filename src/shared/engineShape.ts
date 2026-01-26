@@ -335,7 +335,7 @@ export type PrincipleName =
 
 export type SevenVoicesSummary = {
   voicePath: Vowel[];              // e.g. ['U', 'I']
-  principlesPath: PrincipleName[]; // e.g. ['Unity', 'Insight']
+  principlesPath: PrincipleName[]; // e.g. ['UNITY', 'INSIGHT']
   dominant: PrincipleName[];       // sorted by frequency, e.g. ['Insight', 'Unity']
   sevenWords: string[];            // 7-word sentence in principle order
 };
@@ -402,7 +402,7 @@ export interface WordMatrix {
   meaning: string;                         // compact functional meaning
   wordSums?: string[];                     // morphological expansions
   consonantPattern?: string;               // optional pattern logic e.g. "plosive + nasal"
-  principles: string[];                    // e.g. ["Truth", "Expansion", "Balance"]
+  principles: string[];                    // e.g. ["TRUTH", "EXPANSION", "BALANCE"]
   symbolicNotes?: string;                  // interpretive note or Zheji-style insight
 }
 
@@ -414,7 +414,7 @@ export interface Math7PathSummary {
   totalMod7: number;        // 0–6
   cycleState: CycleState;   // open | balanced | overloaded
   pairCoverage: number;     // 0–3 (A–Y, E–U, I–O)
-  principlesPath: string[]; // ["Unity", "Balance", ...]
+  principlesPath: string[]; // ["UNITY", "BALANCE", ...]
 }
 
 
