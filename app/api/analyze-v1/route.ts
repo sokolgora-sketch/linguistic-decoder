@@ -422,7 +422,6 @@ export async function GET(req: Request) {
       // Mind MUST obey prism surface math (heartInstrumentV1)
       overrideMindFromHeartInstrumentV1(final);
 
-
     // ✅ Contract check should validate ONLY the contract-picked projection
     try {
       toAnalyzeWordResultV1Contract(final);
