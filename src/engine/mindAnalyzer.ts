@@ -2,12 +2,13 @@
 // Build-safe: do not depend on @/shared/analysisResult.v1 type exports (they drift).
 
 import type { Math7Summary } from "@/engine/math7";
+import { normalizePrinciplesToLabels } from "@/v1/principles.vocab.v0.1";
 import type { EnginePayload } from "@/shared/engineShape";
 
 export type MindSummary = {
-  dominantPrinciple: string;
-  polarity: "balanced" | "positive" | "negative" | string;
-  patternName: string;
+  dominantPrincipleId: string;     // canonical ID (e.g. BALANCE)
+  dominantPrincipleLabel: string;  // UI label (e.g. Balance)
+  dominantPrinciple: string;       // backwards-compat alias (label)
   logicStatement: string;
 };
 
@@ -15,10 +16,48 @@ export type MindSummary = {
 // You can tighten this later once shared summary types are stabilized.
 export function analyzeMind(math7: Math7Summary, payload: EnginePayload): MindSummary {
   void payload; // keep signature stable, avoid unused warnings
-  const dominantPrinciple = "Unknown";
-  const polarity = "balanced";
-  const patternName = `${dominantPrinciple}-${polarity}`;
-  const logicStatement = `The word reflects ${dominantPrinciple} principle with ${polarity} flow.`;
+  function idFromTotal1to7(n: unknown): string | null {
+  if (typeof n !== "number" || !Number.isFinite(n)) return null;
+  // total1to7 is doctrine-indexed: A=1..Ë=7
+  switch (Math.trunc(n)) {
+    case 1: return "TRUTH";
+    case 2: return "EXPANSION";
+    case 3: return "INSIGHT";
+    case 4: return "BALANCE";
+    case 5: return "UNITY";
+    case 6: return "REFLECTION";
+    case 7: return "EVOLUTION";
+    default: return null;
+  }
+}
+
+function pickDominantPrincipleId(math7: any): string | null {
+  // Prefer total1to7 (single dominant) if present
+  const total1to7 = math7?.primary?.total1to7 ?? math7?.primary?.total1to7;
+  const fromTotal = idFromTotal1to7(total1to7);
+  if (fromTotal) return fromTotal;
+
+  // Fallback: last element of principlesPath if present
+  const path = Array.isArray(math7?.primary?.principlesPath) ? math7.primary.principlesPath : null;
+  if (path && path.length) {
+    const last = path[path.length - 1];
+    return typeof last === "string" && last.trim() ? last.trim() : null;
+  }
+
+  return null;
+}
+
+const dominantPrincipleId = pickDominantPrincipleId(math7) ?? "UNKNOWN";
+
+// Convert ID/label/vowel -> label for UI text (safe normalizer ignores unknown)
+const dominantPrincipleLabel = (() => {
+  if (dominantPrincipleId === "UNKNOWN") return "Unknown";
+  const labels = normalizePrinciplesToLabels([dominantPrincipleId]);
+  return labels.length ? labels[0] : "Unknown";
+})();
+
+const dominantPrinciple = dominantPrincipleLabel;
+const logicStatement = `The word reflects ${dominantPrincipleLabel} principle with ${polarity} flow.`;
 
   return {
     dominantPrinciple,
