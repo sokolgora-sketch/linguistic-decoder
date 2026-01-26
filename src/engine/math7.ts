@@ -17,7 +17,7 @@ export const PRINCIPLE_MAP: Record<SevenVowel, string> = {
   I: "INSIGHT",
   O: "BALANCE",
   U: "UNITY",
-  Y: "Network Integrity",
+  Y: "REFLECTION",
   "Ë": "EVOLUTION",
 };
 
