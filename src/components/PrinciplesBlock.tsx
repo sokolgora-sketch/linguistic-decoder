@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { normalizePrinciplesToLabels } from "@/v1/principles.vocab.v0.1";
 
 type AnyObj = Record<string, unknown>;
 
@@ -53,7 +54,9 @@ export function PrinciplesBlock({ analysis }: PrinciplesBlockProps) {
       ? (analysis as AnalysisLike)
       : null;
 
-  const principles = pickPrinciples(a);
+  const principlesRaw = pickPrinciples(a);
+
+    const principles = normalizePrinciplesToLabels(principlesRaw);
 
   if (!principles.length) {
     return (

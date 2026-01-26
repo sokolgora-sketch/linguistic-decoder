@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { normalizePrinciplesToLabels } from "@/v1/principles.vocab.v0.1";
 
 type AnyObj = Record<string, unknown>;
 
@@ -35,8 +36,12 @@ function getVoicePathText(a: OriginAnalysis | null): string {
   const heartLike = getHeartLike(a);
 
   // v1: heart.principlePath: string[]
-  const p1 = joinStrings((heartLike as any)?.principlePath);
-  if (p1) return p1;
+  const p1arr = Array.isArray((heartLike as any)?.principlePath) ? (heartLike as any).principlePath : null;
+    if (p1arr && p1arr.length) {
+      const labels = normalizePrinciplesToLabels(p1arr.filter((v: any) => typeof v === "string"));
+      const p1 = labels.join(" → ");
+      if (p1) return p1;
+    }
 
   // other modern: primaryPath.voicePath: string[]
   const p2 = joinStrings((a as any)?.primaryPath?.voicePath);
