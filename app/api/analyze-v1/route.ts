@@ -30,21 +30,6 @@ function idFromTotal1to7(n: unknown): string | null {
 
 function overrideMindFromHeartInstrumentV1(final: any): void {
   const total1to7 = final?.heartInstrumentV1?.surfaceMath7?.total1to7 ?? null;
-
-  function idFromTotal1to7(n: unknown): string | null {
-    if (typeof n !== "number" || !Number.isFinite(n)) return null;
-    switch (Math.trunc(n)) {
-      case 1: return "TRUTH";
-      case 2: return "EXPANSION";
-      case 3: return "INSIGHT";
-      case 4: return "BALANCE";
-      case 5: return "UNITY";
-      case 6: return "REFLECTION";
-      case 7: return "EVOLUTION";
-      default: return null;
-    }
-  }
-
   const id = idFromTotal1to7(total1to7);
   if (!id) return;
 
@@ -55,7 +40,7 @@ function overrideMindFromHeartInstrumentV1(final: any): void {
     ...(final?.mind && typeof final.mind === "object" ? final.mind : {}),
     dominantPrincipleId: id,
     dominantPrincipleLabel: label,
-    dominantPrinciple: label, // keep back-compat alias stable
+    dominantPrinciple: label,
     polarity,
     patternName: `${id}-${polarity}`,
     logicStatement: `The word reflects ${label} principle with ${polarity} flow.`,
@@ -310,8 +295,7 @@ export async function POST(req: Request) {
         : (ensured as any).raw,
       heartInstrumentV1,
     };
-
-  overrideMindFromHeartInstrumentV1(final);
+      overrideMindFromHeartInstrumentV1(final);
 
 // ✅ Contract check should validate ONLY the contract-picked projection
     try {
@@ -435,9 +419,8 @@ export async function GET(req: Request) {
         : (ensured as any).raw,
       heartInstrumentV1,
     };
-
-  // Mind MUST obey prism surface math (heartInstrumentV1)
-  overrideMindFromHeartInstrumentV1(final);
+      // Mind MUST obey prism surface math (heartInstrumentV1)
+      overrideMindFromHeartInstrumentV1(final);
 
 
     // ✅ Contract check should validate ONLY the contract-picked projection
