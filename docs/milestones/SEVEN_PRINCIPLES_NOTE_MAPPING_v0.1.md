@@ -1,29 +1,39 @@
-# Seven Principles — Note Mapping v0.1
+# SEVEN PRINCIPLES — NOTE MAPPING v0.1 (CANON)
 
-## Goal
-Define a stable 7-note mapping aligned to the Seven Principles vowels (A,E,I,O,U,Y,Ë) and keep it deterministic across engine + UI.
+Status: LOCKED (v0.1)
+Scope: Defines the single canonical mapping between the Seven Principles (A,E,I,O,U,Y,Ë) and 7-note Western scale letters (C D E F G A B).
+Rationale: Stable, deterministic “musical lens” that can be used consistently across engine output, UI, tests, and docs.
 
-## Canonical Mapping (v0.1)
-Using the natural diatonic letters:
+## Canon mapping (v0.1)
 
-- A → C
-- E → D
-- I → E
-- O → F
-- U → G
-- Y → A
-- Ë → B
+| Vowel / Principle | Principle ID | Label       | Note |
+|---|---|---|---|
+| A | TRUTH      | Truth      | C |
+| E | EXPANSION  | Expansion  | D |
+| I | INSIGHT    | Insight    | E |
+| O | BALANCE    | Balance    | F |
+| U | UNITY      | Unity      | G |
+| Y | REFLECTION | Reflection | A |
+| Ë | EVOLUTION  | Evolution  | B |
 
-Rationale: A starts the sequence at C (neutral “tonic” anchor), then proceeds stepwise through the 7 natural notes without accidentals.
+## Rules
 
-## Source of Truth
-- `src/shared/sevenPrinciples.v1.ts`
-  - `VOWEL_TO_NOTE_V0_1`
-  - `vowelToNote(vowel: Vowel): Note`
+1) Deterministic: mapping must never depend on locale, runtime, or user settings.
+2) Canonical order: A → E → I → O → U → Y → Ë.
+3) Notes are letters only (C D E F G A B). Octave is intentionally NOT specified in v0.1.
+4) UI MUST display the user-facing note letter from this mapping (not derived ad-hoc).
+5) If future versions add octave or frequency (Hz), they must preserve this letter mapping as the base.
 
-## DONE Criteria
-1) `VOWEL_TO_NOTE_V0_1` exists and matches the canonical mapping above.
-2) `vowelToNote()` returns from `VOWEL_TO_NOTE_V0_1`.
-3) Unit test locks the mapping:
-   - `tests/sevenPrinciples.noteMapping.v0.1.spec.ts`
-4) `npm run gate:quick` passes on main after merge.
+## DONE criteria
+
+- [ ] Mapping exists in code as a single source of truth (no duplicated ad-hoc maps).
+- [ ] At least one unit test asserts the mapping for all 7 vowels.
+- [ ] UI consumes the mapping through VM/adapters (no raw payload parsing).
+- [ ] `npm run gate:quick` passes on main.
+
+## Change policy
+
+Any modification requires:
+- new versioned doc (v0.2+),
+- explicit PR note in release/milestone section,
+- updated tests/snapshots.
