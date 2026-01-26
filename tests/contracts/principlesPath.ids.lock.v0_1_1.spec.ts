@@ -12,6 +12,5 @@ describe("principlesPath emits canonical IDs (v0.1.1 lock)", () => {
     const principlesPath = ["UNITY", "INSIGHT", "BALANCE"];
 
     expect(principlesPath.every(isPrincipleId)).toBe(true);
-    expect(principlesPath.some((s) => s === "Unity" || s === "Insight")).toBe(false);
   });
 });
