@@ -104,7 +104,7 @@ export const getVoiceMeta = (vowel: Vowel): VoiceMeta => {
 };
 
 export type PrinciplesSummary = {
-  principlePath: string[];   // e.g. ['Unity', 'Insight']
+  principlePath: string[];   // e.g. ['UNITY', 'INSIGHT']
   dominantVoices: Vowel[];   // vowels that appear most often
   dominantPrinciples: string[];
   sevenWords: string[];      // always SEVEN_PRINCIPLES_WORDS

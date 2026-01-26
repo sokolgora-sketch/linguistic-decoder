@@ -9,8 +9,8 @@ describe("analysisAdapter narrative", () => {
       mode: "strict",
       alphabet: "auto",
       heart: {
-        math7: { primary: { cycleState: "open", totalMod7: 2, principlesPath: ["Unity", "Insight"] } },
-        principlePath: ["Unity", "Insight"],
+        math7: { primary: { cycleState: "open", totalMod7: 2, principlesPath: ["UNITY", "INSIGHT"] } },
+        principlePath: ["UNITY", "INSIGHT"],
       },
       meta: { cache: "miss", source: "live" },
     };
