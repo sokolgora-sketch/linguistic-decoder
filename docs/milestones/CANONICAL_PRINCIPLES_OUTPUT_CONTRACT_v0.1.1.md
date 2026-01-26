@@ -33,6 +33,19 @@ We must avoid contract ambiguity (sometimes "Truth", sometimes "TRUTH") which br
 - Contract lock test present:
   - `tests/contracts/principlesPath.ids.lock.v0_1_1.spec.ts`
 
+- Math7 emits canonical IDs (engine truth source):
+  - `src/engine/math7.ts` (`PRINCIPLE_MAP` includes `Y: "REFLECTION"`)
+- All UI entrypoints normalize IDs → Labels before rendering (no raw ID leakage in UI text):
+  - Instrument VM adapter: `src/ui/instrument/contractAdapter.ts` (`normalizePrinciplesToLabels`)
+  - Non-instrument components: `src/components/**` (`MathLensesCard`, `HeartInstrumentV1Section`, `PrinciplesBlock`, `OriginSummary`)
+
 ## Evidence
 - CI: `npm run gate:quick`
+
+- Engine mapping fix merged:
+  - PR #314 (Y → REFLECTION): `src/engine/math7.ts`
+- UI normalization coverage merged:
+  - PR #315 (normalize IDs across non-instrument components): `src/components/**`
+
+
 - Lock test: `tests/contracts/principlesPath.ids.lock.v0_1_1.spec.ts`
