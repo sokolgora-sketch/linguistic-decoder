@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { normalizePrinciplesToLabels } from "@/v1/principles.vocab.v0.1";
 
 type AnyRecord = Record<string, unknown>;
 
@@ -30,7 +31,8 @@ export function HeartInstrumentV1Section(props: { data: unknown }) {
 
   const basis = asString(rec.basisNfc) || asString(rec.basis) || "—";
   const surfaceVowels = asStringArray(rec.surfaceVowels) || [];
-  const principlesPath = asStringArray(rec.principlesPath) || [];
+  const principlesPathRaw = asStringArray(rec.principlesPath) || [];
+    const principlesPath = normalizePrinciplesToLabels(principlesPathRaw);
 
   const math7 = isRecord(rec.math7) ? rec.math7 : (isRecord(rec.surfaceMath7) ? rec.surfaceMath7 : null);
   const values1to7 = math7 ? (asNumberArray(math7.values1to7) || []) : [];

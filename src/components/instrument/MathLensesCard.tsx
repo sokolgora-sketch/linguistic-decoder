@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { normalizePrinciplesToLabels } from '@/v1/principles.vocab.v0.1';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 type Props = {
@@ -19,6 +20,14 @@ function fmt(v: any): string {
   } catch {
     return String(v);
   }
+}
+
+function fmtPrinciplesPath(v: any): string {
+  if (!Array.isArray(v)) return 'N/A';
+  const xs = v.filter((x) => typeof x === 'string');
+  const labels = normalizePrinciplesToLabels(xs);
+  if (!labels.length) return 'N/A';
+  return labels.join(' → ');
 }
 
 export default function MathLensesCard({ result }: Props) {
@@ -73,7 +82,7 @@ export default function MathLensesCard({ result }: Props) {
                   <div className="font-mono">{fmt(evidenceMath7.totalMod7)}</div>
 
                   <div className="text-muted-foreground">principlesPath</div>
-                  <div className="font-mono">{fmt(evidenceMath7.principlesPath)}</div>
+                  <div className="font-mono">{fmtPrinciplesPath(evidenceMath7.principlesPath)}</div>
                 </div>
               </div>
             )}
@@ -89,7 +98,7 @@ export default function MathLensesCard({ result }: Props) {
                   <div className="font-mono">{fmt(heartInstrumentV1.surfaceVowels)}</div>
 
                   <div className="text-muted-foreground">principlesPath</div>
-                  <div className="font-mono">{fmt(heartInstrumentV1.principlesPath)}</div>
+                  <div className="font-mono">{fmtPrinciplesPath(heartInstrumentV1.principlesPath)}</div>
 
                   <div className="text-muted-foreground">values1to7</div>
                   <div className="font-mono">{fmt(heartInstrumentV1.values1to7)}</div>
