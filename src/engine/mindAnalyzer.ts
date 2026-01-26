@@ -39,20 +39,30 @@ export function analyzeMind(math7: Math7Summary, payload: EnginePayload): MindSu
   }
 
   function pickDominantPrincipleId(m: any): string | null {
-    // Prefer total1to7 (single dominant) if present
-    const total1to7 = m?.primary?.total1to7;
-    const fromTotal = idFromTotal1to7(total1to7);
-    if (fromTotal) return fromTotal;
+      // Prefer Prism/SURFACE doctrine when available (HeartInstrumentV1 emits surfaceMath7).
+      // This aligns Mind with the user's visible "surface" reading (e.g., UY → total1to7=4 → BALANCE).
+      const surfaceTotal1to7 =
+        (payload as any)?.heartInstrumentV1?.surfaceMath7?.total1to7 ??
+        (payload as any)?.heartInstrumentV1?.math7?.total1to7 ??
+        null;
 
-    // Fallback: last element of principlesPath if present
-    const path = Array.isArray(m?.primary?.principlesPath) ? m.primary.principlesPath : null;
-    if (path && path.length) {
-      const last = path[path.length - 1];
-      return typeof last === "string" && last.trim() ? last.trim() : null;
+      const fromSurface = idFromTotal1to7(surfaceTotal1to7);
+      if (fromSurface) return fromSurface;
+
+      // Fallback: normalized heart.math7.primary.total1to7
+      const total1to7 = m?.primary?.total1to7;
+      const fromTotal = idFromTotal1to7(total1to7);
+      if (fromTotal) return fromTotal;
+
+      // Fallback: last element of principlesPath if present
+      const path = Array.isArray(m?.primary?.principlesPath) ? m.primary.principlesPath : null;
+      if (path && path.length) {
+        const last = path[path.length - 1];
+        return typeof last === "string" && last.trim() ? last.trim() : null;
+      }
+
+      return null;
     }
-
-    return null;
-  }
 
   const polarity = "balanced";
 
