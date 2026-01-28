@@ -114,6 +114,42 @@ function asStringArray(v: unknown): string[] | null {
   return out;
 }
 
+function formatNormalizationStep(x: unknown): string {
+  // Contract: never throw; always return a string.
+  if (typeof x === "string") return x;
+  if (!x || typeof x !== "object") return String(x);
+
+  const o = x as any;
+  const from = typeof o.from === "string" ? o.from : "";
+  const to = typeof o.to === "string" ? o.to : "";
+  const reason = typeof o.reason === "string" ? o.reason : "";
+
+  // { from:"UY", to:"UI", reason:"functional_equivalence" }
+  // -> "UY → UI (functional_equivalence)"
+  if (from && to) {
+    const tail = reason ? ` (${reason})` : "";
+    return `${from} → ${to}${tail}`;
+  }
+
+  try {
+    return JSON.stringify(o);
+  } catch {
+    return String(o);
+  }
+}
+
+function formatEvidenceItem(x: unknown): string {
+  // Never leak "[object Object]" into UI.
+  if (typeof x === "string") return x;
+  if (x == null) return "";
+  if (typeof x === "object") {
+    try { return JSON.stringify(x); } catch { return String(x); }
+  }
+  return String(x);
+}
+
+
+
 export function present<T>(value: T): PresentOrMissing<T> {
   return { kind: "present", value };
 }
@@ -682,29 +718,20 @@ const originClaimGates: OriginClaimGatesVM = {
 
 function pomStringListFromEvidenceField(
   parent: Record<string, unknown> | null,
-  key: string
+  field: "normalizationSteps" | "ops" | "notes" | "signals"
 ): PresentOrMissing<string[]> {
-  if (!parent) return missing("not_emitted", `evidence.${key}`);
+  if (!parent) return missing("not_emitted", `evidence.${field}`);
+  if (!(field in parent)) return missing("not_emitted", `evidence.${field}`);
 
-  // distinguish absent vs present-but-wrong-type
-  if (!(key in parent)) return missing("not_emitted", `evidence.${key}`);
+  const v = (parent as any)[field];
+  if (v == null) return missing("not_emitted", `evidence.${field}`);
+  if (!Array.isArray(v)) return missing("malformed", `evidence.${field} expected array`);
 
-  const v = (parent as any)[key];
+  const mapped =
+    field === "normalizationSteps"
+      ? v.map((x: unknown) => formatNormalizationStep(x))
+      : v.map((x: unknown) => formatEvidenceItem(x));
 
-  if (v == null) return missing("not_emitted", `evidence.${key}`);
-
-  if (!Array.isArray(v)) return missing("malformed", `evidence.${key} expected array`);
-
-  // present (including empty => MeaningPanel will show "none")
-  return present(
-  v.map((x) => {
-    if (typeof x === "string") return x;
-    if (x === null) return "null";
-    if (x === undefined) return "undefined";
-    const ty = typeof x;
-    if (ty === "number" || ty === "boolean" || ty === "bigint") return String(x);
-    // Deterministic stringify for objects/arrays (avoids "[object Object]")
-    try { return JSON.stringify(x); } catch { return String(x); }
-  })
-);
+  return present(mapped);
 }
+

@@ -110,7 +110,7 @@ exports[`ui telemetry vm contract v0.1.1 (candidates evidence lists) adapts cand
     "normalizationSteps": {
       "kind": "present",
       "value": [
-        "{"op":"vowel_normalize","from":"UY","to":"UI","reason":"functional_equivalence"}",
+        "UY → UI (functional_equivalence)",
       ],
     },
     "notes": {
