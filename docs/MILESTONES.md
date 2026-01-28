@@ -69,3 +69,8 @@ This file is the canonical “DONE criteria” ledger for UI milestones.
   - tests/ui.instrument.rootmap.spans.spec.tsx
 - Gate:
   - npm run gate:quick ✅
+
+## Mind obeys HeartInstrumentV1 surface math v0.1.1 — DONE
+- Spec/proof: `docs/milestones/MIND_OBEYS_HEARTINSTRUMENT_SURFACE_MATH_v0.1.1.md`
+- ✅ `npm run gate:quick`
+- ✅ GET+POST sanity: `study` strict returns `mind.dominantPrincipleId = BALANCE` when surface total1to7 = 4
