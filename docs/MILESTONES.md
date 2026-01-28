@@ -74,3 +74,15 @@ This file is the canonical “DONE criteria” ledger for UI milestones.
 - Spec/proof: `docs/milestones/MIND_OBEYS_HEARTINSTRUMENT_SURFACE_MATH_v0.1.1.md`
 - ✅ `npm run gate:quick`
 - ✅ GET+POST sanity: `study` strict returns `mind.dominantPrincipleId = BALANCE` when surface total1to7 = 4
+
+## RootMap Spans Highlight Gate v0.1.5 — DONE
+
+**Proof**
+- Tests:
+  - `tests/ui.instrument.rootmap.spans.spec.tsx`
+- Gate:
+  - `npm run gate:quick` ✅
+- Behavior:
+  - PRESENT spans render `<mark>` segments
+  - NONE/MALFORMED spans render fail-visible state and never highlight
+
