@@ -94,6 +94,11 @@ export function InstrumentPanel(props: Props) {
 
   const engineVersion = isValidVm && vm.readout.engineVersion.kind === 'present' ? vm.readout.engineVersion.value : null;
 
+    const normalizedWord =
+  isValidVm && vm.readout.normalizedWord && vm.readout.normalizedWord.kind === "present"
+    ? vm.readout.normalizedWord.value
+    : "";
+
   const rawPretty = React.useMemo(() => {
     // Only pretty-print the raw payload when it is actually provided.
     // If the caller passes VM-only, Raw JSON is explicitly "not available".
@@ -195,14 +200,7 @@ export function InstrumentPanel(props: Props) {
               <RootMapCard
                 rootMap={vm.rootMap ?? ({ kind: "missing", missing: "not_emitted", note: "rootMap" } as any)}
                 word={String((vm.readout as any)?.word ?? (vm.readout as any)?.inputWord ?? "")}
-                normalizedWord={(() => {
-                  const r: any = (vm.readout as any) ?? {};
-                  const n = r.normalizedWord ?? r.normalized ?? r.basisNormalized ?? "";
-                  if (n && typeof n === "object" && (n.kind === "present" || n.kind === "missing")) {
-                    return n.kind === "present" ? String(n.value ?? "") : "";
-                  }
-                  return String(n ?? "");
-                })()}
+                normalizedWord={normalizedWord}
               />
 
               <MeaningPanel vm={vm} />
