@@ -86,3 +86,35 @@ This file is the canonical “DONE criteria” ledger for UI milestones.
   - PRESENT spans render `<mark>` segments
   - NONE/MALFORMED spans render fail-visible state and never highlight
 
+
+## Milestone: DeepRoot–Heart Gate — No Global Fallback (v0.1.2)
+
+### Problem
+The per-candidate DeepRoot–Heart gate could incorrectly report `aligned` by falling back to a global DeepRoot path (e.g. `deepRoot.functionalRoots[0].vowelPath`) when a candidate’s own `vowelPath` was missing or different. This breaks the “instrument truth” principle: a candidate gate must describe *that candidate’s evidence only*.
+
+### Contract / Rule
+For each candidate, the gate must be computed using **per-candidate** data only:
+
+- `candidateResolvedPath` is derived from `candidates[i].vowelPath` only.
+- If `candidates[i].vowelPath` is missing → gate must surface `insufficient_data` (no global fallback).
+- Evidence references must reflect the real source:
+  - `candidates[i].vowelPath` if present
+  - `candidatePath.missing` if absent
+- DeepRoot global path (`deepRoot.functionalRoots[0].vowelPath`) is **not allowed** as a fallback for candidate gating.
+
+### Implementation
+- Updated gate wiring in `src/ui/instrument/contractAdapter.ts` to remove global fallback and emit accurate `evidenceRefs`.
+
+### Proof (DONE criteria)
+This milestone is DONE when:
+
+- `npm run gate:quick` passes
+- `npm run build` passes
+- Candidate UI gate continues to render from VM only (no raw inference):
+  - `tests/ui.candidates.deepRootHeartGate.rendersFromVM.spec.tsx` passes
+- Telemetry VM contract snapshots match the new evidence refs:
+  - `tests/ui.telemetry.vm.v0_1.contract.spec.ts` snapshot updated
+  - `tests/ui.telemetry.vm.v0_1_1.candidates.contract.spec.ts` snapshot updated
+
+### PR
+- PR #331 — `fix(deeproot-heart-gate-no-global-fallback-v0.1.2)`
