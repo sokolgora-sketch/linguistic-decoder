@@ -557,16 +557,15 @@ const voicePathDetectedMaybe: PresentOrMissing<Vowel[]> =
           computeDeepRootHeartGateV01({
             heartPrimaryPath: heartPrimaryPathForGate,
               candidateResolvedPath:
-                (candVowelPath ? candVowelPath.join('-') : null) ?? deepRootFunctionalPathStr,
-            evidenceRefs: [
+                (candVowelPath ? candVowelPath.join("-") : null),
+              evidenceRefs: [
               "heartPrimaryPath",
               "primaryPath.voicePath",
                 ...(candVowelPath
                   ? ["candidates[" + i + "].vowelPath"]
-                  : deepRootFunctionalPathStr
-                  ? ["deepRoot.functionalRoots[0].vowelPath"]
                   : ["candidatePath.missing"]),
-            ],
+              ],
+
           })
         )
 ,
