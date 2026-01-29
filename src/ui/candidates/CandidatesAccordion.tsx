@@ -104,20 +104,21 @@ export function CandidatesAccordion({ rows }: { rows: UICandidateRow[] }) {
                     />
                   </div>
 
-                    {c.deepRootHeartGateStatus === "misaligned" ? (
-                      <div className="mt-2 rounded-md border p-2 text-xs">
-                        <div className="opacity-70">
-                          Gate: <span className="font-mono">misaligned</span>
-                        </div>
-                        {Array.isArray(c.deepRootHeartGateReasons) && c.deepRootHeartGateReasons.length ? (
-                          <div className="mt-1 font-mono">
-                            {c.deepRootHeartGateReasons.join(", ")}
+                    {(c.deepRootHeartGateStatus === "misaligned" || c.deepRootHeartGateStatus === "insufficient_data") ? (
+                        <div className="mt-2 rounded-md border p-2 text-xs">
+                          <div className="opacity-70">
+                            Gate: <span className="font-mono">{c.deepRootHeartGateStatus}</span>
                           </div>
-                        ) : (
-                          <div className="mt-1 opacity-60">No reason codes emitted.</div>
-                        )}
-                      </div>
-                    ) : null}
+
+                          {Array.isArray(c.deepRootHeartGateReasons) && c.deepRootHeartGateReasons.length ? (
+                            <div className="mt-1 font-mono">
+                              {c.deepRootHeartGateReasons.join(", ")}
+                            </div>
+                          ) : (
+                            <div className="mt-1 opacity-60">No reason codes emitted.</div>
+                          )}
+                        </div>
+                      ) : null}
 
                   <pre className="mt-3 max-h-80 overflow-auto rounded-md border p-2 text-xs">
 {toPrettyJson(c.raw)}
