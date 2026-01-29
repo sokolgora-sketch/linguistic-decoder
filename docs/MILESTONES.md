@@ -117,4 +117,6 @@ This milestone is DONE when:
   - `tests/ui.telemetry.vm.v0_1_1.candidates.contract.spec.ts` snapshot updated
 
 ### PR
-- PR #331 — `fix(deeproot-heart-gate-no-global-fallback-v0.1.2)`
+- PR #331 — `fix(deeproot-heart-gate-no-global-fallback-v0.1.2)` (code)
+- PR #332 — `docs(milestones): add DeepRoot–Heart gate no-global-fallback v0.1.2` (docs)
+
