@@ -33,3 +33,6 @@ tsc
 # DF / experiments
 eslint.config.js.GEMINI_BACKUP.*
 scripts/tmp/
+
+# Local DF memory (never commit)
+DF_BRAIN/
