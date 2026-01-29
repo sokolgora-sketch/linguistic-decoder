@@ -56,29 +56,34 @@ export default function MeaningPanel({ vm }: Props) {
   const evidence = vm?.evidence ?? {};
 
       // --- Principles ---
-  // Preferred (real VM):
-  // - readout.principlesPathFunctional = PresentOrMissing<string[]>
-  // - readout.principlesPathSurface    = PresentOrMissing<string[]>
-  // Back-compat:
-  // - readout.principlesPath           = PresentOrMissing<string[]> (currently functional-preferred)
-  const principlesPathFunctional = readout.principlesPathFunctional ?? null;
-  const principlesPathSurface = readout.principlesPathSurface ?? null;
+  // --- Principles ---
+  // Contract-safe dual reality:
+  // - Surface principles come from readout.sevenPrinciplesSpectrum.surface.value.vowels
+  // - Functional principles come from readout.sevenPrinciplesSpectrum.functional.value.vowels
+  // Back-compat headline uses readout.principlesPath when present.
+
+  const spectrum = readout?.sevenPrinciplesSpectrum ?? null;
+
+  const spectrumSurfaceVowels =
+    isPresent<any>(spectrum?.surface) && Array.isArray(spectrum.surface.value?.vowels)
+      ? (spectrum.surface.value.vowels as any[]).map(String)
+      : null;
+
+  const spectrumFunctionalVowels =
+    isPresent<any>(spectrum?.functional) && Array.isArray(spectrum.functional.value?.vowels)
+      ? (spectrum.functional.value.vowels as any[]).map(String)
+      : null;
+
+  const principlesSurface = spectrumSurfaceVowels && spectrumSurfaceVowels.length
+    ? formatArrowPath(spectrumSurfaceVowels)
+    : null;
+
+  const principlesFunctional = spectrumFunctionalVowels && spectrumFunctionalVowels.length
+    ? formatArrowPath(spectrumFunctionalVowels)
+    : null;
+
+  // Back-compat: readout.principlesPath = PresentOrMissing<string[]>
   const principlesPathLegacy = readout.principlesPath ?? null;
-
-  const principlesFunctional =
-    isPresent<string[]>(principlesPathFunctional) &&
-    Array.isArray(principlesPathFunctional.value) &&
-    principlesPathFunctional.value.length
-      ? formatArrowPath(principlesPathFunctional.value)
-      : null;
-
-  const principlesSurface =
-    isPresent<string[]>(principlesPathSurface) &&
-    Array.isArray(principlesPathSurface.value) &&
-    principlesPathSurface.value.length
-      ? formatArrowPath(principlesPathSurface.value)
-      : null;
-
   const principlesFromLegacy =
     isPresent<string[]>(principlesPathLegacy) &&
     Array.isArray(principlesPathLegacy.value) &&
