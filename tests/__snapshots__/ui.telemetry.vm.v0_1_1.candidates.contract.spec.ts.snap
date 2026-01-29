@@ -14,7 +14,7 @@ exports[`ui telemetry vm contract v0.1.1 (candidates evidence lists) adapts cand
           "evidenceRefs": [
             "heartPrimaryPath",
             "primaryPath.voicePath",
-            "deepRoot.functionalRoots[0].vowelPath",
+            "candidates[0].vowelPath",
           ],
           "reasonCodes": [],
           "status": "aligned",
@@ -65,7 +65,7 @@ exports[`ui telemetry vm contract v0.1.1 (candidates evidence lists) adapts cand
           "evidenceRefs": [
             "heartPrimaryPath",
             "primaryPath.voicePath",
-            "deepRoot.functionalRoots[0].vowelPath",
+            "candidates[1].vowelPath",
           ],
           "reasonCodes": [],
           "status": "aligned",
