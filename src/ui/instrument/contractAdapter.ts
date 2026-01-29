@@ -556,17 +556,20 @@ const voicePathDetectedMaybe: PresentOrMissing<Vowel[]> =
         deepRootHeartGate: present(
           computeDeepRootHeartGateV01({
             heartPrimaryPath: heartPrimaryPathForGate,
-            candidateResolvedPath:
-              deepRootFunctionalPathStr ?? (candVowelPath ? candVowelPath.join("-") : null),
+              candidateResolvedPath:
+                (candVowelPath ? candVowelPath.join('-') : null) ?? deepRootFunctionalPathStr,
             evidenceRefs: [
               "heartPrimaryPath",
               "primaryPath.voicePath",
-              ...(deepRootFunctionalPathStr
-                ? ["deepRoot.functionalRoots[0].vowelPath"]
-                : ["candidates[" + i + "].vowelPath"]),
+                ...(candVowelPath
+                  ? ["candidates[" + i + "].vowelPath"]
+                  : deepRootFunctionalPathStr
+                  ? ["deepRoot.functionalRoots[0].vowelPath"]
+                  : ["candidatePath.missing"]),
             ],
           })
-        ),
+        )
+,
 
         // leave decomposition for later (shape varies too much right now)
         decomposition: missing("not_emitted") as PresentOrMissing<DecompositionItemVM[]>,
