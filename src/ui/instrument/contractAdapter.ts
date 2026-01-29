@@ -456,9 +456,23 @@ const voicePathDetectedMaybe: PresentOrMissing<Vowel[]> =
       ? (((heart as any)["math7"] as any)["primary"] as Record<string, unknown>)
       : null;
 
+  // --- Principles path (dual reality) ---
+  // Surface principles should come from heartInstrumentV1 when present.
+  const heartInstrumentV1 =
+    isRecord((root as any)["heartInstrumentV1"]) ? ((root as any)["heartInstrumentV1"] as Record<string, unknown>) : null;
+
+  const surfacePrinciplesPathRaw =
+    heartInstrumentV1 ? (asStringArray((heartInstrumentV1 as any)["principlesPath"]) ?? null) : null;
+
+  // Functional principles should come from math7 primary (or legacy heart.principlePath).
   const math7PrinciplesPath = heartMath7Primary ? asStringArray(heartMath7Primary["principlesPath"]) : null;
-  const principlesPathRaw = heartPrinciplePath ?? math7PrinciplesPath;
-  const principlesPath = principlesPathRaw ? normalizePrinciplesToLabels(principlesPathRaw) : null;
+  const functionalPrinciplesPathRaw = math7PrinciplesPath ?? heartPrinciplePath ?? null;
+
+  const principlesPathSurface = surfacePrinciplesPathRaw ? normalizePrinciplesToLabels(surfacePrinciplesPathRaw) : null;
+  const principlesPathFunctional = functionalPrinciplesPathRaw ? normalizePrinciplesToLabels(functionalPrinciplesPathRaw) : null;
+
+  // Back-compat: single "principlesPath" remains functional-preferred.
+  const principlesPath = principlesPathFunctional ?? principlesPathSurface ?? null;
 
   const primaryPath = isRecord(root["primaryPath"]) ? root["primaryPath"] : null;
   const detectedVoicePath =
@@ -685,6 +699,7 @@ const originClaimGates: OriginClaimGatesVM = {
       principlesPath: principlesPath
         ? present(principlesPath)
         : missing("not_emitted", "heart.principlePath | heart.math7.primary.principlesPath"),
+
       status,
       counts: {
         candidates: candidates.length,

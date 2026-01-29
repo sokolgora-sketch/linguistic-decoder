@@ -55,18 +55,42 @@ export default function MeaningPanel({ vm }: Props) {
   const detection = vm?.detection ?? {};
   const evidence = vm?.evidence ?? {};
 
-  // --- Principles ---
-  // Preferred (real VM): readout.principlesPath = PresentOrMissing<string[]>
-  const principlesPath = readout.principlesPath;
-  const principlesFromReadout =
-    isPresent<string[]>(principlesPath) && Array.isArray(principlesPath.value) && principlesPath.value.length
-      ? formatArrowPath(principlesPath.value)
+      // --- Principles ---
+  // Preferred (real VM):
+  // - readout.principlesPathFunctional = PresentOrMissing<string[]>
+  // - readout.principlesPathSurface    = PresentOrMissing<string[]>
+  // Back-compat:
+  // - readout.principlesPath           = PresentOrMissing<string[]> (currently functional-preferred)
+  const principlesPathFunctional = readout.principlesPathFunctional ?? null;
+  const principlesPathSurface = readout.principlesPathSurface ?? null;
+  const principlesPathLegacy = readout.principlesPath ?? null;
+
+  const principlesFunctional =
+    isPresent<string[]>(principlesPathFunctional) &&
+    Array.isArray(principlesPathFunctional.value) &&
+    principlesPathFunctional.value.length
+      ? formatArrowPath(principlesPathFunctional.value)
+      : null;
+
+  const principlesSurface =
+    isPresent<string[]>(principlesPathSurface) &&
+    Array.isArray(principlesPathSurface.value) &&
+    principlesPathSurface.value.length
+      ? formatArrowPath(principlesPathSurface.value)
+      : null;
+
+  const principlesFromLegacy =
+    isPresent<string[]>(principlesPathLegacy) &&
+    Array.isArray(principlesPathLegacy.value) &&
+    principlesPathLegacy.value.length
+      ? formatArrowPath(principlesPathLegacy.value)
       : null;
 
   // Fallback (minimal test stub): detection.principles = string
   const principlesFromDetection = asText(detection.principles);
 
-  const principles = principlesFromReadout ?? principlesFromDetection;
+  // Choose a "primary" string for the headline sentence, but keep both lines for clarity.
+  const principles = principlesFunctional ?? principlesFromLegacy ?? principlesSurface ?? principlesFromDetection;
 
   // --- Counts / delta ---
   const candidatesCount =
@@ -114,14 +138,19 @@ export default function MeaningPanel({ vm }: Props) {
       ])
     : 'Meaning v1 (minimal): insufficient telemetry emitted.';
 
-  const sub = joinParts([
-    functionalLine,
-    surfaceLine,
-    // only show detected if functional+surface absent
-    !functionalLine && !surfaceLine ? detectedLine : null,
-  ]);
+  const principlesFunctionalLine = principlesFunctional ? `Principles (functional): ${principlesFunctional}.` : null;
+    const principlesSurfaceLine = principlesSurface ? `Principles (surface): ${principlesSurface}.` : null;
 
-  // --- Evidence summary (truth posture) ---
+    const sub = joinParts([
+      principlesFunctionalLine,
+      principlesSurfaceLine,
+      functionalLine,
+      surfaceLine,
+      // only show detected if functional+surface absent
+      !functionalLine && !surfaceLine ? detectedLine : null,
+    ]);
+
+    // --- Evidence summary (truth posture) ---
   const evidenceLines = joinParts([
     renderMaybeList('Normalization', evidence.normalizationSteps),
     renderMaybeList('Ops', evidence.ops),
