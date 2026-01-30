@@ -21,6 +21,12 @@ describe("evidence package v0.1 (VM-only)", () => {
 
     const pkg = buildEvidencePackageFromVM(vm, { ledgerModel: { entries: [{ k: "e1" }] } });
 
+    // sevenPrinciplesSpectrum must be consumer-safe: no POM wrappers leaked
+    if ((pkg as any).sevenPrinciplesSpectrum) {
+      expect((pkg as any).sevenPrinciplesSpectrum.surface?.kind).toBeUndefined();
+      expect((pkg as any).sevenPrinciplesSpectrum.functional?.kind).toBeUndefined();
+    }
+
     expect(pkg.version).toBe("evidence_package.v0.1");
     expect(pkg.word).toBe("study");
     expect(pkg.engineVersion).toBe("v0.1.2");
