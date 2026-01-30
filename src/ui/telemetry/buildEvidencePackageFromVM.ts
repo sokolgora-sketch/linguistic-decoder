@@ -81,6 +81,27 @@ export function buildEvidencePackageFromVM(vm: any, opts?: { ledgerModel?: any }
       vm?.resonanceProfileV1?.kind === "present"
         ? (vm.resonanceProfileV1 as any).value
         : vm?.resonanceProfileV1 ?? undefined,
+    sevenPrinciplesSpectrum: (() => {
+      const sps = vm?.sevenPrinciplesSpectrum;
+      if (!sps || typeof sps !== "object") return undefined;
+
+      const surface =
+        (sps as any).surface && (sps as any).surface.kind === "present"
+          ? (sps as any).surface.value
+          : undefined;
+
+      const functional =
+        (sps as any).functional && (sps as any).functional.kind === "present"
+          ? (sps as any).functional.value
+          : undefined;
+
+      const delta = (sps as any).delta;
+
+      // Omit if totally empty
+      if (!surface && !functional && !delta) return undefined;
+
+      return { surface, functional, delta };
+    })(),
     notes: [],
   };
 
