@@ -25,6 +25,7 @@ export type EvidencePackageV01 = {
   originClaim?: any;
   rootMap?: any;
   resonanceProfileV1?: any;
+  sevenPrinciplesSpectrum?: any;
 
   // Diagnostics
   notes?: string[];
