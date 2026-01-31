@@ -361,7 +361,7 @@ export async function POST(req: Request) {
       // EvidencePackage is optional and must never break /api/analyze-v1.
       // Build it ONLY from UI VM (VM-only) and swallow errors defensively.
       let evidencePackage: any = {
-          version: "v0.1",
+          version: "evidence_package.v0.1",
           sevenPrinciplesSpectrum: null,
         };
       try {
@@ -385,17 +385,9 @@ export async function POST(req: Request) {
             tvm?.readout?.sevenPrinciplesSpectrum ??
             null;
         }
-          // Backfill: ensure sevenPrinciplesSpectrum is always present (null allowed)
-          if ((evidencePackage as any)?.sevenPrinciplesSpectrum === undefined) {
-            const tvm: any = telemetryVm as any;
-            (evidencePackage as any).sevenPrinciplesSpectrum =
-              tvm?.sevenPrinciplesSpectrum ??
-              tvm?.readout?.sevenPrinciplesSpectrum ??
-              null;
-          }
       } catch (_e) {
           evidencePackage = {
-            version: "v0.1",
+            version: "evidence_package.v0.1",
             sevenPrinciplesSpectrum: null,
             signals: ["EVIDENCE_PACKAGE_BUILD_FAILED"],
           };
@@ -527,43 +519,51 @@ export async function GET(req: Request) {
     const out = enginePayloadToAnalysisResult(payload);
 
     const ui = adaptAnalyzeV1ToUI(out as any);
-    // EvidencePackage must be derived from Instrument VM (VM-only), not raw out/payload.
-    const telemetryVm =
-      (ui as any)?.vm ??
-      (ui as any)?.telemetryVm ??
-      (ui as any)?.telemetry ??
-      (ui as any)?.instrumentVm ??
-      null;
 
+    // EvidencePackage is optional and must never break /api/analyze-v1.
+    // Build it ONLY from Telemetry VM (VM-only) and swallow errors defensively.
     let evidencePackage: any = {
-        version: "v0.1",
-        sevenPrinciplesSpectrum: null,
-      };
+      version: "evidence_package.v0.1",
+      sevenPrinciplesSpectrum: null,
+    };
+    try {
+      const telemetryVm = buildTelemetryVmForEvidencePackage({
+        word,
+        mode: modeParsed ?? mode,
+        out,
+        heartInstrumentV1,
+      });
 
-      try {
-        if (telemetryVm != null) {
-          evidencePackage = buildEvidencePackageFromVM(telemetryVm as any, {
-            ledgerModel: (ui as any)?.ledgerModel ?? undefined,
-          });
-          // If adapter returns undefined/null, keep minimal object
-          if (!evidencePackage || typeof evidencePackage !== "object") {
-            evidencePackage = {
-              version: "v0.1",
-              sevenPrinciplesSpectrum: null,
-              signals: ["EVIDENCE_PACKAGE_MALFORMED"],
-            };
-          }
-        }
-      } catch (_e) {
-        evidencePackage = {
-          version: "v0.1",
-          sevenPrinciplesSpectrum: null,
-          signals: ["EVIDENCE_PACKAGE_BUILD_FAILED"],
-        };
+      evidencePackage = buildEvidencePackageFromVM(telemetryVm as any, {
+        ledgerModel: (ui as any)?.ledgerModel ?? undefined,
+      });
+
+      // Backfill: ensure sevenPrinciplesSpectrum is always present (null allowed)
+      if ((evidencePackage as any)?.sevenPrinciplesSpectrum === undefined) {
+        const tvm: any = telemetryVm as any;
+        (evidencePackage as any).sevenPrinciplesSpectrum =
+          tvm?.sevenPrinciplesSpectrum ??
+          tvm?.readout?.sevenPrinciplesSpectrum ??
+          null;
       }
 
+      // If adapter returns undefined/null/non-object, keep minimal object
+      if (!evidencePackage || typeof evidencePackage !== "object") {
+        evidencePackage = {
+          version: "evidence_package.v0.1",
+          sevenPrinciplesSpectrum: null,
+          signals: ["EVIDENCE_PACKAGE_MALFORMED"],
+        };
+      }
+    } catch (_e) {
+      evidencePackage = {
+        version: "evidence_package.v0.1",
+        sevenPrinciplesSpectrum: null,
+        signals: ["EVIDENCE_PACKAGE_BUILD_FAILED"],
+      };
+    }
 
-    const checked = AnalyzeWordResultV1ContractSchema.safeParse(out);
+const checked = AnalyzeWordResultV1ContractSchema.safeParse(out);
     if (!checked.success) {
       return contractFailResponse({
         message: "enginePayloadToAnalysisResult produced an off-contract V1 payload",
