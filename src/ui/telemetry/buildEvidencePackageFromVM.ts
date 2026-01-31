@@ -1,42 +1,124 @@
-import { buildEvidencePackageFromVM } from "@/ui/telemetry/buildEvidencePackageFromVM";
+// VM-only export bundle for sharing / audit.
+// Must NOT read raw payload. Only consume Telemetry VM + already-VM-shaped models.
 
-describe("evidence package v0.1 (VM-only)", () => {
-  it("builds a stable minimal bundle from VM", () => {
-    const vm: any = {
-      wordShown: "study",
-      engineVersion: "v0.1.2",
-      mode: "strict",
-      signals: [{}, {}],
-      readout: {
-        word: "study",
-        normalizedWord: "study",
-        voicePath: ["U", "I"],
-        voicePathSurface: ["U", "Y"],
-        voicePathFunctional: ["U", "I"],
-        voicePathDelta: "U→Y vs U→I",
-      },
-      originClaim: { kind: "missing", missing: "not_emitted" },
-      rootMap: { kind: "missing", missing: "not_emitted", note: "rootMap" },
-    };
+export type EvidencePackageV01 = {
+  version: "evidence_package.v0.1";
+  word: string;
+  normalizedWord?: string;
+  mode?: string;
+  engineVersion?: string;
 
-    const pkg = buildEvidencePackageFromVM(vm, { ledgerModel: { entries: [{ k: "e1" }] } });
+  // Minimal, human+machine useful summary
+  summary?: {
+    voicePath?: string;
+    voicePathSurface?: string;
+    voicePathFunctional?: string;
+    voicePathDelta?: string;
+    signalsCount?: number;
+  };
 
-    // sevenPrinciplesSpectrum must be consumer-safe: no POM wrappers leaked
-    if ((pkg as any).sevenPrinciplesSpectrum) {
-      expect((pkg as any).sevenPrinciplesSpectrum.surface?.kind).toBeUndefined();
-      expect((pkg as any).sevenPrinciplesSpectrum.functional?.kind).toBeUndefined();
+  // Telemetry excerpts (already VM-only)
+  counts?: any;
+  ledger?: any;
+
+  // Optional sections
+  originClaim?: any;
+  rootMap?: any;
+  resonanceProfileV1?: any;
+  sevenPrinciplesSpectrum?: any;
+
+  // Diagnostics
+  notes?: string[];
+};
+
+function safeStr(x: any): string {
+  if (x == null) return "";
+  if (typeof x === "string") return x;
+  if (typeof x === "number" || typeof x === "boolean") return String(x);
+  if (typeof x === "object" && (x.kind === "present" || x.kind === "missing")) {
+    return x.kind === "present" ? safeStr(x.value) : "";
+  }
+  return "";
+}
+
+export function buildEvidencePackageFromVM(vm: any, opts?: { ledgerModel?: any }): EvidencePackageV01 {
+  const r: any = vm?.readout ?? {};
+
+  const word = safeStr(vm?.wordShown) || safeStr(r?.word) || safeStr(r?.inputWord) || "";
+  const normalizedWord =
+    safeStr(r?.normalizedWord) || safeStr(r?.normalized) || safeStr(r?.basisNormalized) || "";
+
+  const engineVersion = safeStr(vm?.engineVersion) || safeStr(r?.engineVersion) || "";
+  const mode = safeStr(vm?.mode) || safeStr(r?.mode) || "";
+
+  const pkg: EvidencePackageV01 = {
+    version: "evidence_package.v0.1",
+    word,
+    normalizedWord: normalizedWord || undefined,
+    mode: mode || undefined,
+    engineVersion: engineVersion || undefined,
+    summary: {
+      voicePath: Array.isArray(r?.voicePath) ? r.voicePath.join(" → ") : safeStr(r?.voicePath),
+      voicePathSurface: Array.isArray(r?.voicePathSurface)
+        ? r.voicePathSurface.join(" → ")
+        : safeStr(r?.voicePathSurface),
+      voicePathFunctional: Array.isArray(r?.voicePathFunctional)
+        ? r.voicePathFunctional.join(" → ")
+        : safeStr(r?.voicePathFunctional),
+      voicePathDelta: safeStr(r?.voicePathDelta),
+      signalsCount: typeof vm?.signals?.length === "number" ? vm.signals.length : undefined,
+    },
+    counts: vm?.readout ? { ...(vm?.readout as any) }?.counts : undefined, // defensive; may be undefined
+    ledger: opts?.ledgerModel ?? undefined,
+    originClaim: vm?.originClaim?.kind === "present" ? (vm.originClaim as any).value : undefined,
+    rootMap:
+      vm?.rootMap?.kind === "present"
+        ? (vm.rootMap as any).value
+        : vm?.rootMap?.kind === "missing"
+          ? { missing: (vm.rootMap as any).missing, note: (vm.rootMap as any).note }
+          : undefined,
+    resonanceProfileV1:
+      vm?.resonanceProfileV1?.kind === "present"
+        ? (vm.resonanceProfileV1 as any).value
+        : vm?.resonanceProfileV1 ?? undefined,
+    sevenPrinciplesSpectrum: (() => {
+      // Spectrum currently lives on readout in the Instrument VM,
+      // but allow future top-level placement too.
+      const sps =
+        (vm as any)?.sevenPrinciplesSpectrum ??
+        (vm as any)?.readout?.sevenPrinciplesSpectrum;
+
+      if (!sps || typeof sps !== "object") return undefined;
+
+      const surface =
+        (sps as any).surface && (sps as any).surface.kind === "present"
+          ? (sps as any).surface.value
+          : undefined;
+
+      const functional =
+        (sps as any).functional && (sps as any).functional.kind === "present"
+          ? (sps as any).functional.value
+          : undefined;
+
+      const delta = (sps as any).delta;
+
+      // Omit if totally empty
+      if (!surface && !functional && !delta) return undefined;
+
+      return { surface, functional, delta };
+    })(),
+    notes: [],
+  };
+
+  // Light cleanup: remove empty summary keys
+  if (pkg.summary) {
+    for (const k of Object.keys(pkg.summary)) {
+      if ((pkg.summary as any)[k] == null || (pkg.summary as any)[k] === "") delete (pkg.summary as any)[k];
     }
+    if (Object.keys(pkg.summary).length === 0) delete pkg.summary;
+  }
 
-    expect(pkg.version).toBe("evidence_package.v0.1");
-    expect(pkg.word).toBe("study");
-    expect(pkg.engineVersion).toBe("v0.1.2");
-    expect(pkg.mode).toBe("strict");
-    expect(pkg.summary?.voicePath).toBe("U → I");
-    expect(pkg.summary?.signalsCount).toBe(2);
-    expect(pkg.ledger).toEqual({ entries: [{ k: "e1" }] });
+  if (!pkg.normalizedWord) delete pkg.normalizedWord;
 
-    // Hard rule: must not invent raw payload fields
-    expect((pkg as any).raw).toBeUndefined();
-    expect((pkg as any).payload).toBeUndefined();
-  });
-});
+  return pkg;
+}
