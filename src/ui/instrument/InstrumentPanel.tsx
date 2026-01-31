@@ -57,6 +57,7 @@ export function InstrumentPanel(props: Props) {
   }, [inputVm, inputPayload]);
 
   const isValidVm =
+    !!vm && typeof vm === "object" && (vm as any).readout && typeof (vm as any).readout === "object";
 
   const lightMap = React.useMemo(() => {
     try {
@@ -66,8 +67,6 @@ export function InstrumentPanel(props: Props) {
       return null;
     }
   }, [vm]);
-
-    !!vm && typeof vm === 'object' && (vm as any).readout && typeof (vm as any).readout === 'object';
 
   const ledgerModel = React.useMemo(() => {
     if (!isValidVm) return null;
