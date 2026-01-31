@@ -3,6 +3,10 @@ import { resolveWorldLangNodeId, WORLD_LANGUAGE_TREE_V01 } from "@/shared/worldL
 export type RootLightReason =
   | "origin_claim_candidate"
   | "rootmap_carrier"
+  | "language_families"
+  | "top_candidates"
+  | "primary_path"
+  | "deeproot_hint"
   | "explicit_language"
   | "ancestor_path"
   | "unknown";
@@ -41,6 +45,23 @@ function safeArray(x: any): any[] {
 
 function safeStr(x: any): string {
   return typeof x === "string" ? x : "";
+}
+
+function asLangString(x: any): string {
+  // Accept: "Albanian", "sq", { language: "Latin" }, { lang: "en" }, { label: "Germanic" }
+  if (typeof x === "string") return x;
+  if (x && typeof x === "object") {
+    return (
+      safeStr(x.language) ||
+      safeStr(x.lang) ||
+      safeStr(x.locale) ||
+      safeStr(x.label) ||
+      safeStr(x.family) ||
+      safeStr(x.name) ||
+      safeStr(x.code)
+    );
+  }
+  return "";
 }
 
 function getChildIds(node: any): string[] {
@@ -120,6 +141,83 @@ export function buildRootLightMapV01(input: any): RootLightMapV01 {
       reason: "origin_claim_candidate",
       source: `originClaim.candidates.language=${lang}`,
     });
+  }
+
+
+  // 2) languageFamilies (stable summary)
+  // Accept: string[], { families: [...] }, { items: [...] }, or array of objects.
+  const lf =
+    (safeArray(input?.languageFamilies).length ? safeArray(input?.languageFamilies) : []) ||
+    (safeArray(input?.languageFamilies?.families).length ? safeArray(input?.languageFamilies?.families) : []) ||
+    (safeArray(input?.languageFamilies?.items).length ? safeArray(input?.languageFamilies?.items) : []) ||
+    (safeArray(input?.ui?.languageFamilies).length ? safeArray(input?.ui?.languageFamilies) : []);
+
+  for (const item of lf) {
+    const lang = asLangString(item);
+    if (!lang) continue;
+    const nodeId = resolveWorldLangNodeId(lang);
+    rawLights.push({
+      nodeId,
+      label: nodeLabel(nodeId),
+      reason: "language_families",
+      source: `languageFamilies=${lang}`,
+    });
+  }
+
+  // 3) top-level candidates (stable, even when OriginClaim is absent)
+  const topCandidates =
+    (safeArray(input?.candidates).length ? safeArray(input?.candidates) : []) ||
+    (safeArray(input?.ui?.candidates).length ? safeArray(input?.ui?.candidates) : []);
+
+  for (const c of topCandidates) {
+    const lang = asLangString(c);
+    if (!lang) continue;
+    const nodeId = resolveWorldLangNodeId(lang);
+    rawLights.push({
+      nodeId,
+      label: nodeLabel(nodeId),
+      reason: "top_candidates",
+      source: `candidates=${lang}`,
+    });
+  }
+
+  // 4) primaryPath hints (optional)
+  const pp = input?.primaryPath ?? input?.ui?.primaryPath ?? null;
+  const ppLang =
+    asLangString(pp?.language) ||
+    asLangString(pp?.family) ||
+    asLangString(pp?.meta?.language) ||
+    asLangString(pp?.meta?.family);
+
+  if (ppLang) {
+    const nodeId = resolveWorldLangNodeId(ppLang);
+    rawLights.push({
+      nodeId,
+      label: nodeLabel(nodeId),
+      reason: "primary_path",
+      source: `primaryPath=${ppLang}`,
+    });
+  }
+
+  // 5) deepRoot hints (optional; engine evolving)
+  const dr = input?.deepRoot ?? input?.ui?.deepRoot ?? null;
+  const drBuckets = [dr, dr?.rootMap, dr?.functionalRoots, dr?.protoRoots, dr?.carriers, dr?.families]
+    .flat()
+    .filter(Boolean);
+
+  for (const b of drBuckets) {
+    const items = Array.isArray(b) ? b : [b];
+    for (const it of items) {
+      const lang = asLangString(it);
+      if (!lang) continue;
+      const nodeId = resolveWorldLangNodeId(lang);
+      rawLights.push({
+        nodeId,
+        label: nodeLabel(nodeId),
+        reason: "deeproot_hint",
+        source: `deepRootHint=${lang}`,
+      });
+    }
   }
 
   // 2) RootMap carriers (optional, engine evolving)
