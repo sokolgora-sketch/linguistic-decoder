@@ -22,4 +22,27 @@ describe("buildRootLightMapV01", () => {
 
     expect(out.lights.some((l) => l.nodeId === "ie.albanian")).toBe(true);
   });
+  it("harvests languageFamilies into tree nodes", () => {
+    const input: any = {
+      languageFamilies: ["Indo-European", "Albanian", "Semitic"],
+      originClaim: { candidates: [] },
+    };
+    const lm = buildRootLightMapV01(input);
+    const ids = lm.lights.map((l) => l.nodeId);
+    expect(ids).toContain("fam.ie");
+    expect(ids).toContain("ie.albanian");
+    expect(ids).toContain("afro_asiatic.semitic");
+  });
+
+  it("harvests top-level candidates into tree nodes", () => {
+    const input: any = {
+      candidates: [{ language: "Latin" }, { lang: "en" }, { label: "Greek" }],
+      originClaim: { candidates: [] },
+    };
+    const lm = buildRootLightMapV01(input);
+    const ids = lm.lights.map((l) => l.nodeId);
+    expect(ids).toContain("ie.italic");
+    expect(ids).toContain("ie.germanic");
+    expect(ids).toContain("ie.hellenic");
+  });
 });
