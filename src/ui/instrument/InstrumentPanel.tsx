@@ -15,6 +15,8 @@ import { ReadoutCard } from './sections/ReadoutCard';
 import { CountsRatiosCard } from './sections/CountsRatiosCard';
 import { RawJsonCard } from './sections/RawJsonCard';
 import { EvidencePackageCard } from './sections/EvidencePackageCard';
+import { WorldLanguageTreeCard } from './sections/WorldLanguageTreeCard';
+import { buildRootLightMapV01 } from '@/shared/rootLightMap.v0.1';
 import MeaningPanel from './MeaningPanel';
 import { buildEvidenceLedgerModelFromVM } from '../ledger/ledgerModel';
 import { EvidenceLedgerCard } from '../ledger/EvidenceLedgerCard';
@@ -55,7 +57,16 @@ export function InstrumentPanel(props: Props) {
   }, [inputVm, inputPayload]);
 
   const isValidVm =
-    !!vm && typeof vm === 'object' && (vm as any).readout && typeof (vm as any).readout === 'object';
+    !!vm && typeof vm === "object" && (vm as any).readout && typeof (vm as any).readout === "object";
+
+  const lightMap = React.useMemo(() => {
+    try {
+      // VM-only for v0.1 (taxonomy scaffold)
+      return buildRootLightMapV01(vm);
+    } catch {
+      return null;
+    }
+  }, [vm]);
 
   const ledgerModel = React.useMemo(() => {
     if (!isValidVm) return null;
@@ -201,7 +212,10 @@ export function InstrumentPanel(props: Props) {
 
               <ResonancePanelV01 resonanceProfileV1={vm.resonanceProfileV1} />
 
-              <RootMapCard
+              
+                <WorldLanguageTreeCard lightMap={lightMap} />
+
+<RootMapCard
                 rootMap={vm.rootMap ?? ({ kind: "missing", missing: "not_emitted", note: "rootMap" } as any)}
                 word={String((vm.readout as any)?.word ?? (vm.readout as any)?.inputWord ?? "")}
                 normalizedWord={normalizedWord}
