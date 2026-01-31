@@ -184,9 +184,13 @@ export function InstrumentPanel(props: Props) {
                   </div>
                 ) : null}
               {/* MATH / LENSES (optional telemetry) */}
-              {vm.readout && (vm.readout as any).sevenPrinciplesSpectrum ? (
-                  <SevenPrinciplesSpectrumCard spectrum={(vm.readout as any).sevenPrinciplesSpectrum} />
-                ) : null}
+              {(() => {
+                const spectrum =
+                  (vm as any)?.sevenPrinciplesSpectrum ??
+                  (vm as any)?.readout?.sevenPrinciplesSpectrum ??
+                  null;
+                return spectrum ? <SevenPrinciplesSpectrumCard spectrum={spectrum} /> : null;
+              })()}
 
                 <VowelPathTimeline
                 detected={vm.readout.voicePath}
