@@ -82,7 +82,12 @@ export function buildEvidencePackageFromVM(vm: any, opts?: { ledgerModel?: any }
         ? (vm.resonanceProfileV1 as any).value
         : vm?.resonanceProfileV1 ?? undefined,
     sevenPrinciplesSpectrum: (() => {
-      const sps = vm?.sevenPrinciplesSpectrum;
+      // Spectrum currently lives on readout in the Instrument VM,
+      // but allow future top-level placement too.
+      const sps =
+        (vm as any)?.sevenPrinciplesSpectrum ??
+        (vm as any)?.readout?.sevenPrinciplesSpectrum;
+
       if (!sps || typeof sps !== "object") return undefined;
 
       const surface =

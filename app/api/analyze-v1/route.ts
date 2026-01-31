@@ -5,6 +5,7 @@ import { z } from "zod";
 import { runAnalysisDeterministic } from "@/lib/runAnalysisDeterministic";
 import { enginePayloadToAnalysisResult } from "@/shared/analysisAdapter";
 import { adaptAnalyzeV1ToUI } from "@/shared/analyzeV1Adapter";
+import { buildEvidencePackageFromVM } from "@/ui/telemetry/buildEvidencePackageFromVM";
 import { toAnalyzeWordResultV1Contract } from "@/shared/analyzeWordResult.v1.contract";
 import { ensurePrimaryAndCandidatePaths } from "@/shared/ensurePaths";
 
@@ -29,7 +30,7 @@ function idFromTotal1to7(n: unknown): string | null {
 }
 
 function overrideMindFromHeartInstrumentV1(final: any): void {
-  const total1to7 = final?.heartInstrumentV1?.surfaceMath7?.total1to7 ?? null;
+  const total1to7 = (final as any)?.heartInstrumentV1?.surfaceMath7?.total1to7 ?? null;
 
   function idFromTotal1to7(n: unknown): string | null {
     if (typeof n !== "number" || !Number.isFinite(n)) return null;
@@ -80,11 +81,131 @@ function applyDevOriginClaimGates(reqUrl?: string): boolean | null {
 
     if (ocg === "1") return true;
     if (ocg === "0") return false;
-  } catch (e) {
+  } catch (_e) {
     return null;
   }
 
   return null;
+}
+
+ // --- EvidencePackage helpers (server-safe) ---
+type Vowel = "A"|"E"|"I"|"O"|"U"|"Y"|"Ë";
+
+
+  type BuildTelemetryVmForEvidencePackageParams = {
+    word: string;
+    mode: unknown;
+    out: unknown;
+    heartInstrumentV1: unknown;
+  };
+
+function vowelToIndex1(v: unknown): number | null {
+  switch (String(v)) {
+    case "A": return 1;
+    case "E": return 2;
+    case "I": return 3;
+    case "O": return 4;
+    case "U": return 5;
+    case "Y": return 6;
+    case "Ë": return 7;
+    default: return null;
+  }
+}
+
+function vowelToRingIndex(v: unknown): number | null {
+  // rings: O=0; I/U=1; E/Y=2; A/Ë=3
+  switch (String(v)) {
+    case "O": return 0;
+    case "I":
+    case "U": return 1;
+    case "E":
+    case "Y": return 2;
+    case "A":
+    case "Ë": return 3;
+    default: return null;
+  }
+}
+
+function driftFrom(indices1: unknown): "mostly_increasing"|"mostly_decreasing"|"mixed"|"static" {
+  if (!Array.isArray(indices1) || indices1.length <= 1) return "static";
+  let inc = 0, dec = 0;
+  for (let i = 1; i < indices1.length; i++) {
+    if (indices1[i] > indices1[i-1]) inc++;
+    else if (indices1[i] < indices1[i-1]) dec++;
+  }
+  if (inc === 0 && dec === 0) return "static";
+  if (inc > dec) return "mostly_increasing";
+  if (dec > inc) return "mostly_decreasing";
+  return "mixed";
+}
+
+function sectionFromVowels(vowels: unknown) {
+  const v = Array.isArray(vowels) ? vowels : [];
+  const indices1 = v.map(vowelToIndex1).filter((x) => typeof x === "number");
+  const ringIndex = v.map(vowelToRingIndex).filter((x) => typeof x === "number");
+  const crossesCenter = indices1.includes(4);
+  const last = indices1.length ? indices1[indices1.length - 1] : null;
+  const endsOnE = last === 2;
+  const endsOnË = last === 7;
+  const drift = driftFrom(indices1);
+  return { indices1, ringIndex, crossesCenter, endsOnE, endsOnË, drift };
+}
+
+function buildSpectrumVM(surfaceVowels: unknown, functionalVowels: unknown) {
+  const surface = sectionFromVowels(surfaceVowels);
+  const functional = sectionFromVowels(functionalVowels);
+
+  const delta = {
+    surfaceIndices1: surface.indices1,
+    functionalIndices1: functional.indices1,
+    surfaceRings: surface.ringIndex,
+    functionalRings: functional.ringIndex,
+  };
+
+  return {
+    surface: { kind: "present", value: surface },
+    functional: { kind: "present", value: functional },
+    delta,
+  };
+}
+
+function buildTelemetryVmForEvidencePackage(params: BuildTelemetryVmForEvidencePackageParams): any {
+  const { word, mode, out, heartInstrumentV1 } = params;
+
+
+  const outAny: any = out as any;
+  const heartAny: any = heartInstrumentV1 as any;
+  const surfaceVowels =
+      Array.isArray(heartAny?.surfaceVowels) ? heartAny.surfaceVowels : null;
+
+  const functionalVowels =
+      Array.isArray(outAny?.heart?.math7?.primary?.vowels)
+        ? outAny.heart.math7.primary.vowels
+        : (Array.isArray(outAny?.primaryPath?.voicePath) ? outAny.primaryPath.voicePath : null);
+
+  const spectrum = buildSpectrumVM(surfaceVowels, functionalVowels);
+
+  return {
+    wordShown: String(word ?? ""),
+    engineVersion: String(outAny?.engineVersion ?? ""),
+    mode: String(mode ?? ""),
+    signals: [],
+    readout: {
+      word: String(word ?? ""),
+      normalizedWord: String(outAny?.sanitized ?? word ?? ""),
+      voicePath: Array.isArray(functionalVowels) ? functionalVowels : [],
+      voicePathSurface: Array.isArray(surfaceVowels) ? surfaceVowels : [],
+      voicePathFunctional: Array.isArray(functionalVowels) ? functionalVowels : [],
+      voicePathDelta:
+        Array.isArray(surfaceVowels) && Array.isArray(functionalVowels)
+          ? (surfaceVowels.join("") + " vs " + functionalVowels.join(""))
+          : "",
+      // IMPORTANT: instrument currently renders spectrum from readout
+      sevenPrinciplesSpectrum: spectrum,
+    },
+    // ALSO expose top-level for future callers
+    sevenPrinciplesSpectrum: spectrum,
+  };
 }
 
 function buildEvidenceV1FromPayload(payload: any) {
@@ -227,6 +348,9 @@ export async function POST(req: Request) {
 
   const { word, mode, alphabet } = parsed.data;
 
+  const modeParsed =
+    mode === "strict" || mode === "open" ? (mode as "strict" | "open") : undefined;
+
   try {
     const heartInstrumentV1 = buildHeartInstrumentV1(word);
 
@@ -234,8 +358,49 @@ export async function POST(req: Request) {
     const out = enginePayloadToAnalysisResult(payload);
 
     const ui = adaptAnalyzeV1ToUI(out as any);
+      // EvidencePackage is optional and must never break /api/analyze-v1.
+      // Build it ONLY from UI VM (VM-only) and swallow errors defensively.
+      let evidencePackage: any = {
+          version: "v0.1",
+          sevenPrinciplesSpectrum: null,
+        };
+      try {
+        const telemetryVm = buildTelemetryVmForEvidencePackage({
+          word,
+          mode: modeParsed ?? mode,
+          out,
+          heartInstrumentV1,
+        });
 
-    const checked = AnalyzeWordResultV1ContractSchema.safeParse(out);
+        evidencePackage = buildEvidencePackageFromVM(telemetryVm as any, {
+          ledgerModel: (ui as any)?.ledgerModel ?? undefined,
+        });
+
+
+        // Backfill: ensure sevenPrinciplesSpectrum is always present (null allowed)
+        if ((evidencePackage as any)?.sevenPrinciplesSpectrum === undefined) {
+          const tvm: any = telemetryVm as any;
+          (evidencePackage as any).sevenPrinciplesSpectrum =
+            tvm?.sevenPrinciplesSpectrum ??
+            tvm?.readout?.sevenPrinciplesSpectrum ??
+            null;
+        }
+          // Backfill: ensure sevenPrinciplesSpectrum is always present (null allowed)
+          if ((evidencePackage as any)?.sevenPrinciplesSpectrum === undefined) {
+            const tvm: any = telemetryVm as any;
+            (evidencePackage as any).sevenPrinciplesSpectrum =
+              tvm?.sevenPrinciplesSpectrum ??
+              tvm?.readout?.sevenPrinciplesSpectrum ??
+              null;
+          }
+      } catch (_e) {
+          evidencePackage = {
+            version: "v0.1",
+            sevenPrinciplesSpectrum: null,
+            signals: ["EVIDENCE_PACKAGE_BUILD_FAILED"],
+          };
+        }
+const checked = AnalyzeWordResultV1ContractSchema.safeParse(out);
     if (!checked.success) {
 
       return contractFailResponse({
@@ -324,6 +489,7 @@ export async function POST(req: Request) {
       });
     }
 
+    if (final && typeof final === "object") (final as any).evidencePackage = evidencePackage;
     return NextResponse.json(final);
   } catch (err: any) {
     return NextResponse.json(
@@ -361,6 +527,41 @@ export async function GET(req: Request) {
     const out = enginePayloadToAnalysisResult(payload);
 
     const ui = adaptAnalyzeV1ToUI(out as any);
+    // EvidencePackage must be derived from Instrument VM (VM-only), not raw out/payload.
+    const telemetryVm =
+      (ui as any)?.vm ??
+      (ui as any)?.telemetryVm ??
+      (ui as any)?.telemetry ??
+      (ui as any)?.instrumentVm ??
+      null;
+
+    let evidencePackage: any = {
+        version: "v0.1",
+        sevenPrinciplesSpectrum: null,
+      };
+
+      try {
+        if (telemetryVm != null) {
+          evidencePackage = buildEvidencePackageFromVM(telemetryVm as any, {
+            ledgerModel: (ui as any)?.ledgerModel ?? undefined,
+          });
+          // If adapter returns undefined/null, keep minimal object
+          if (!evidencePackage || typeof evidencePackage !== "object") {
+            evidencePackage = {
+              version: "v0.1",
+              sevenPrinciplesSpectrum: null,
+              signals: ["EVIDENCE_PACKAGE_MALFORMED"],
+            };
+          }
+        }
+      } catch (_e) {
+        evidencePackage = {
+          version: "v0.1",
+          sevenPrinciplesSpectrum: null,
+          signals: ["EVIDENCE_PACKAGE_BUILD_FAILED"],
+        };
+      }
+
 
     const checked = AnalyzeWordResultV1ContractSchema.safeParse(out);
     if (!checked.success) {
@@ -451,6 +652,7 @@ export async function GET(req: Request) {
       });
     }
 
+    if (final && typeof final === "object") (final as any).evidencePackage = evidencePackage;
     return NextResponse.json(final);
   } catch (err: any) {
     return NextResponse.json(
