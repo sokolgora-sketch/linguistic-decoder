@@ -82,25 +82,23 @@ export function buildEvidencePackageFromVM(vm: any, opts?: { ledgerModel?: any }
         ? (vm.resonanceProfileV1 as any).value
         : vm?.resonanceProfileV1 ?? undefined,
     sevenPrinciplesSpectrum: (() => {
-      const sps = vm?.sevenPrinciplesSpectrum;
-      if (!sps || typeof sps !== "object") return undefined;
+      const s = (vm as any)?.sevenPrinciplesSpectrum;
+      if (!s || typeof s !== "object") return undefined;
 
-      const surface =
-        (sps as any).surface && (sps as any).surface.kind === "present"
-          ? (sps as any).surface.value
-          : undefined;
+      const unwrap = (pom: any) =>
+        pom && typeof pom === "object" && pom.kind === "present" ? pom.value : undefined;
 
-      const functional =
-        (sps as any).functional && (sps as any).functional.kind === "present"
-          ? (sps as any).functional.value
-          : undefined;
+      const surface = unwrap((s as any).surface);
+      const functional = unwrap((s as any).functional);
+      const delta = (s as any).delta;
 
-      const delta = (sps as any).delta;
-
-      // Omit if totally empty
+      // Only include if there's something real to export
       if (!surface && !functional && !delta) return undefined;
 
-      return { surface, functional, delta };
+      const out: any = { delta };
+      if (surface) out.surface = surface;
+      if (functional) out.functional = functional;
+      return out;
     })(),
     notes: [],
   };
