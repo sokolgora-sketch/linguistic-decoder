@@ -140,7 +140,7 @@ function renderNode(params: {
 }
 
 export function WorldLanguageTreeCard(props: Props) {
-  const lights = props.lightMap?.lights ?? [];
+  const lights = React.useMemo(() => props.lightMap?.lights ?? [], [props.lightMap]);
   const [showAll, setShowAll] = React.useState(false);
 
   const visibleSet = React.useMemo(() => {
