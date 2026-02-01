@@ -26,8 +26,8 @@ function mod(n: number, m: number) {
  * Canonical engine standard:
  * - indices0to6 = values1to7 - 1
  * - sum0to6 = Σ(indices0to6)
- * - totalMod7 = sum0to6 % 7  (0..6)
- * - total1to7 = totalMod7 + 1 (1..7)
+ * - totalMod7 = totalMod7FromSum0to6(sum0to6)  (0..6)
+* - total1to7 = totalMod7 + 1 (1..7)
  *
  * NOTE: We still compute rawSum (Σ values1to7) for wrap/events storytelling,
  * but totals must be derived from sum0to6 to stay consistent with src/engine/math7.ts.
