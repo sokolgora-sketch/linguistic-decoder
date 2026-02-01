@@ -25,6 +25,10 @@ function asNumberArray(x: unknown): number[] | null {
   return x as number[];
 }
 
+function asNumber(x: unknown): number | null {
+  return typeof x === "number" && Number.isFinite(x) ? x : null;
+}
+
 export function HeartInstrumentV1Section(props: { data: unknown }) {
   const rec = isRecord(props.data) ? props.data : null;
   if (!rec) return null;
@@ -32,22 +36,32 @@ export function HeartInstrumentV1Section(props: { data: unknown }) {
   const basis = asString(rec.basisNfc) || asString(rec.basis) || "—";
   const surfaceVowels = asStringArray(rec.surfaceVowels) || [];
   const principlesPathRaw = asStringArray(rec.principlesPath) || [];
-    const principlesPath = normalizePrinciplesToLabels(principlesPathRaw);
+  const principlesPath = normalizePrinciplesToLabels(principlesPathRaw);
 
-  const math7 = isRecord(rec.math7) ? rec.math7 : (isRecord(rec.surfaceMath7) ? rec.surfaceMath7 : null);
-  const values1to7 = math7 ? (asNumberArray(math7.values1to7) || []) : [];
-  const total1to7 = math7 && typeof math7.total1to7 === "number" ? math7.total1to7 : null;
-  const totalMod7 = math7 && typeof math7.totalMod7 === "number" ? math7.totalMod7 : null;
-  const wrapCount = math7 && typeof math7.wrapCount === "number" ? math7.wrapCount : null;
-  const jumps = math7 ? (asNumberArray(math7.jumps) || []) : [];
-  const events = math7 ? (asStringArray(math7.events) || []) : [];
+  const math7 = isRecord(rec.math7) ? rec.math7 : isRecord(rec.surfaceMath7) ? rec.surfaceMath7 : null;
+
+  const values1to7 = math7 ? asNumberArray(math7.values1to7) || [] : [];
+
+  // These come from the embedded math7 packet (surface-derived)
+  const total1to7 = math7 ? asNumber((math7 as any).total1to7) : null;
+  const totalMod7 = math7 ? asNumber((math7 as any).totalMod7) : null;
+
+  // Explicit surface totals on the packet (preferred if present)
+  const surfaceTotalMod7 = asNumber(rec.surfaceTotalMod7);
+  const surfaceTotal1to7 = asNumber(rec.surfaceTotal1to7);
+
+  const wrapCount = math7 ? asNumber((math7 as any).wrapCount) : null;
+  const jumps = math7 ? asNumberArray((math7 as any).jumps) || [] : [];
+  const events = math7 ? asStringArray((math7 as any).events) || [] : [];
 
   return (
     <section className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-gray-100">
       <div className="flex items-start justify-between gap-4">
         <div>
           <div className="text-base font-semibold">Heart Instrument</div>
-          <div className="mt-1 text-xs text-gray-400">Basis: <span className="text-gray-200">{basis}</span></div>
+          <div className="mt-1 text-xs text-gray-400">
+            Basis: <span className="text-gray-200">{basis}</span>
+          </div>
         </div>
       </div>
 
@@ -55,11 +69,15 @@ export function HeartInstrumentV1Section(props: { data: unknown }) {
         <div className="rounded-xl border border-white/10 bg-black/20 p-3">
           <div className="text-xs text-gray-400">Surface vowels</div>
           <div className="mt-1 flex flex-wrap gap-2">
-            {surfaceVowels.length ? surfaceVowels.map((v, i) => (
-              <span key={i} className="rounded-full border border-white/10 bg-white/10 px-2 py-0.5 text-xs">
-                {v}
-              </span>
-            )) : <span className="text-gray-500">—</span>}
+            {surfaceVowels.length ? (
+              surfaceVowels.map((v, i) => (
+                <span key={i} className="rounded-full border border-white/10 bg-white/10 px-2 py-0.5 text-xs">
+                  {v}
+                </span>
+              ))
+            ) : (
+              <span className="text-gray-500">—</span>
+            )}
           </div>
         </div>
 
@@ -76,22 +94,35 @@ export function HeartInstrumentV1Section(props: { data: unknown }) {
       </div>
 
       <div className="mt-3 rounded-xl border border-white/10 bg-black/20 p-3">
-        <div className="text-xs text-gray-400">Math7</div>
+        <div className="text-xs text-gray-400">Math7 (surface-derived)</div>
 
         <div className="mt-2 flex flex-wrap gap-x-6 gap-y-2 text-xs">
-          <div><span className="text-gray-400">total1to7:</span> <span className="text-gray-200">{total1to7 ?? "—"}</span></div>
-          <div><span className="text-gray-400">totalMod7:</span> <span className="text-gray-200">{totalMod7 ?? "—"}</span></div>
-          <div><span className="text-gray-400">wrapCount:</span> <span className="text-gray-200">{wrapCount ?? "—"}</span></div>
+          <div>
+            <span className="text-gray-400">surfaceTotal1to7:</span>{" "}
+            <span className="text-gray-200">{surfaceTotal1to7 ?? total1to7 ?? "—"}</span>
+          </div>
+          <div>
+            <span className="text-gray-400">surfaceTotalMod7:</span>{" "}
+            <span className="text-gray-200">{surfaceTotalMod7 ?? totalMod7 ?? "—"}</span>
+          </div>
+          <div>
+            <span className="text-gray-400">wrapCount:</span>{" "}
+            <span className="text-gray-200">{wrapCount ?? "—"}</span>
+          </div>
         </div>
 
         <div className="mt-2">
           <div className="text-xs text-gray-400">values1to7</div>
           <div className="mt-1 flex flex-wrap gap-2">
-            {values1to7.length ? values1to7.map((n, i) => (
-              <span key={i} className="rounded-full border border-white/10 bg-white/10 px-2 py-0.5 text-xs">
-                {n}
-              </span>
-            )) : <span className="text-gray-500">—</span>}
+            {values1to7.length ? (
+              values1to7.map((n, i) => (
+                <span key={i} className="rounded-full border border-white/10 bg-white/10 px-2 py-0.5 text-xs">
+                  {n}
+                </span>
+              ))
+            ) : (
+              <span className="text-gray-500">—</span>
+            )}
           </div>
         </div>
 
@@ -99,21 +130,29 @@ export function HeartInstrumentV1Section(props: { data: unknown }) {
           <div>
             <div className="text-xs text-gray-400">jumps</div>
             <div className="mt-1 flex flex-wrap gap-2">
-              {jumps.length ? jumps.map((n, i) => (
-                <span key={i} className="rounded-full border border-white/10 bg-white/10 px-2 py-0.5 text-xs">
-                  {n}
-                </span>
-              )) : <span className="text-gray-500">—</span>}
+              {jumps.length ? (
+                jumps.map((n, i) => (
+                  <span key={i} className="rounded-full border border-white/10 bg-white/10 px-2 py-0.5 text-xs">
+                    {n}
+                  </span>
+                ))
+              ) : (
+                <span className="text-gray-500">—</span>
+              )}
             </div>
           </div>
           <div>
             <div className="text-xs text-gray-400">events</div>
             <div className="mt-1 flex flex-wrap gap-2">
-              {events.length ? events.map((e, i) => (
-                <span key={i} className="rounded-full border border-white/10 bg-white/10 px-2 py-0.5 text-xs">
-                  {e}
-                </span>
-              )) : <span className="text-gray-500">—</span>}
+              {events.length ? (
+                events.map((e, i) => (
+                  <span key={i} className="rounded-full border border-white/10 bg-white/10 px-2 py-0.5 text-xs">
+                    {e}
+                  </span>
+                ))
+              ) : (
+                <span className="text-gray-500">—</span>
+              )}
             </div>
           </div>
         </div>
