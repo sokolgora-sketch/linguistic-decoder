@@ -1,3 +1,4 @@
+import { totalMod7FromSum0to6 } from "@/shared/math7.core";
 import { analyzeWordV1 } from "../src/v1/analyzeWordV1";
 import { CONTRACT_VERSION_V1 } from "../src/v1/versions.v1";
 
@@ -13,7 +14,7 @@ describe("Evidence v1 invariants", () => {
 
     const e = out.evidence;
     const sum = e.math7.indices.reduce((a, b) => a + b, 0);
-    const totalMod7 = ((sum % 7) + 7) % 7;
+    const totalMod7 = totalMod7FromSum0to6(sum);
 
     expect(e.math7.sum).toBe(sum);
     expect(e.math7.totalMod7).toBe(totalMod7);

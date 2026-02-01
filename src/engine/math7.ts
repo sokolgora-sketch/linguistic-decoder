@@ -1,9 +1,4 @@
-import {
-  totalMod7FromVowels,
-  isSevenVowel,
-  type SevenVowel,
-  VOWEL_INDEX,
-} from "@/shared/math7.core";
+import { totalMod7FromVowels, isSevenVowel, type SevenVowel, VOWEL_INDEX, totalMod7FromSum0to6 } from "@/shared/math7.core";
 import { extractMath7BasisFromPayload } from "@/shared/math7.basis";
 import { applyStrictTerminalYHint } from "@/shared/math7.basis";
 
@@ -70,8 +65,8 @@ function normalizeSevenVowels(vowelsIn: Array<string | null | undefined>): Seven
 function total1to7FromSum0to6(sum0to6: number): number {
   // Map sum0to6 to a 1..7 ring total deterministically.
   // We use safe modulo and then +1.
-  const mod = ((sum0to6 % 7) + 7) % 7; // 0..6
-  return mod + 1; // 1..7
+  const mod0to6 = totalMod7FromSum0to6(sum0to6);
+  return mod0to6 + 1; // 1..7
 }
 
 /**
