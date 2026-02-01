@@ -22,6 +22,29 @@ function mod(n: number, m: number) {
   return ((n % m) + m) % m;
 }
 
+/**
+ * Canonical engine standard:
+ * - indices0to6 = values1to7 - 1
+ * - sum0to6 = Σ(indices0to6)
+ * - totalMod7 = sum0to6 % 7  (0..6)
+ * - total1to7 = totalMod7 + 1 (1..7)
+ *
+ * NOTE: We still compute rawSum (Σ values1to7) for wrap/events storytelling,
+ * but totals must be derived from sum0to6 to stay consistent with src/engine/math7.ts.
+ */
+export function sum0to6FromValues1to7(values1to7: number[]): number {
+  return values1to7.reduce((a, b) => a + (b - 1), 0);
+}
+
+export function totalMod7FromSum0to6(sum0to6: number): number {
+  return mod(sum0to6, 7);
+}
+
+export function total1to7FromSum0to6(sum0to6: number): number {
+  return mod(sum0to6, 7) + 1;
+}
+
+
 /** Clock modulo that returns 1..7 (never 0). */
 export function total1to7FromSum(sum: number): number {
   // ((sum - 1) % 7) + 1, with safe modulo
@@ -80,8 +103,12 @@ export type Math7Packet = {
 
 export function computeMath7(values1to7: number[]): Math7Packet {
   const rawSum = values1to7.reduce((a, b) => a + b, 0);
-  const totalMod7 = totalMod7FromSum(rawSum);
-  const total1to7 = total1to7FromSum(rawSum);
+
+  // Canonical totals (match src/engine/math7.ts):
+  // derive totals from 0..6 index sum, not from raw 1..7 sum.
+  const sum0to6 = sum0to6FromValues1to7(values1to7);
+  const totalMod7 = totalMod7FromSum0to6(sum0to6);
+  const total1to7 = total1to7FromSum0to6(sum0to6);
 
   const wrapCount = rawSum > 0 ? Math.floor((rawSum - 1) / 7) : 0;
 
