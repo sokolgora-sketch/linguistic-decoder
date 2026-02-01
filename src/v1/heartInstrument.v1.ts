@@ -21,6 +21,14 @@ export type HeartInstrumentV1Packet = {
 
   principlesPath: string[];
 
+  /**
+   * Explicit surface totals (derived from *surface* vowels only).
+   * This prevents confusion with heart.math7.primary totals, which may be
+   * computed from hinted/normalized vowel paths.
+   */
+  surfaceTotalMod7: number; // 0..6
+  surfaceTotal1to7: number; // 1..7
+
   // what tests currently read
   math7: ReturnType<typeof computeMath7>;
 
@@ -48,6 +56,10 @@ export function buildHeartInstrumentV1(basis: string): HeartInstrumentV1Packet {
     basisNfc,
     surfaceVowels,
     principlesPath,
+
+    surfaceTotalMod7: math7.totalMod7,
+    surfaceTotal1to7: math7.total1to7,
+
     math7,
 
     // convenience aliases
