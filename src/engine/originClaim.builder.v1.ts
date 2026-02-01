@@ -6,6 +6,7 @@
 
 import type { AnalyzeWordResultV1 } from "@/shared/analysisResult.v1";
 import type { OriginClaimV1 } from "@/shared/originClaim.v1";
+import { normalizeCandidateRecord } from "@/shared/brain/candidateRecord.normalize.v0.1";
 import { maybeApplyOriginClaimGatesV1_1 } from "@/shared/originClaim.gatesWire.v1_1";
 
 export function buildOriginClaimV1(result: AnalyzeWordResultV1): OriginClaimV1 {
@@ -25,7 +26,32 @@ export function buildOriginClaimV1(result: AnalyzeWordResultV1): OriginClaimV1 {
   let candidates: any[] = [];
   candidates = maybeApplyOriginClaimGatesV1_1(candidates, gatesActive);
 
-  return {
+  // BRAIN-0.1 — CandidateRecord side-channel (engine)
+  // Additive only. Does NOT change stub candidates output.
+  const rawCandidates: any[] = Array.isArray((result as any).candidates) ? ((result as any).candidates as any[]) : [];
+  const brainCandidates: any[] = [];
+  for (const c of rawCandidates) {
+    const maybeRecord =
+      (c && typeof c === "object" && ((c as any).brainCandidateRecord || (c as any).candidateRecord)) ||
+      (c && typeof c === "object" && {
+        v: (c as any).v,
+        languageId: (c as any).languageId,
+        languageName: (c as any).languageName ?? (c as any).language,
+        form: (c as any).form,
+        gloss: (c as any).gloss,
+        roots: (c as any).roots,
+        explains: (c as any).explains,
+        opsUsed: (c as any).opsUsed,
+        functionTag: (c as any).functionTag,
+        source: (c as any).source,
+      });
+
+    const norm = normalizeCandidateRecord(maybeRecord);
+    if (norm.ok) brainCandidates.push(norm.record);
+  }
+
+
+  const originClaim: OriginClaimV1 = {
     version: "v1",
 
     // Protocol rule: never a single absolute winner
@@ -47,4 +73,21 @@ export function buildOriginClaimV1(result: AnalyzeWordResultV1): OriginClaimV1 {
         "No passing candidates with sufficient computed support in the current result layers.",
     },
   };
+  
+  // BRAIN-0.1 — Attach brainCandidates (engine)
+  // Only attach when present (snapshot-safe).
+  if (Array.isArray(brainCandidates) && brainCandidates.length) {
+    try {
+      const meta = (originClaim as any).meta;
+      const inputs = meta && typeof meta === "object" ? (meta as any).inputs : null;
+      if (inputs && typeof inputs === "object" && !(inputs as any).brainCandidates) {
+        (inputs as any).brainCandidates = brainCandidates;
+      }
+    } catch {
+      // never throw from side-channel
+    }
+  }
+
+  return originClaim;
+
 }
