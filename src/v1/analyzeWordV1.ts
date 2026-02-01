@@ -59,7 +59,7 @@ function buildEvidenceV1(
   const surfaceVowels = extractSevenVowelsV1(basis);
   const indices = surfaceVowels.map((v) => VOWEL_INDEX[v]);
   const sum0to6 = indices.reduce((a, b) => a + b, 0);
-    const totalMod7 = totalMod7FromSum0to6(sum0to6);
+  const totalMod7 = totalMod7FromSum0to6(sum0to6);
 
   const signals: string[] = ["EVIDENCE_V1"];
   if (!basis) signals.push("EMPTY_BASIS");
