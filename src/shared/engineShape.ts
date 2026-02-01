@@ -31,7 +31,7 @@ export type LanguageFamily = {
 export interface Math7PrimarySummary {
   /** e.g. "open", "closed" – simple cycle state */
   cycleState: string;
-  /** total count reduced mod 7 */
+  /** canonical totalMod7 derived from sum0to6 (A=0..Ë=6), in range 0–6 */
   totalMod7: number;
   /** 7-Principles names along the path */
   principlesPath: string[];
