@@ -47,7 +47,7 @@ export function total1to7FromSum0to6(sum0to6: number): number {
 
 /** Clock modulo that returns 1..7 (never 0). */
 export function total1to7FromSum(sum: number): number {
-  // ((sum - 1) % 7) + 1, with safe modulo
+  // (sum shifted into 1..7 ring, safe-mod), with safe modulo
   return mod(sum - 1, 7) + 1;
 }
 
