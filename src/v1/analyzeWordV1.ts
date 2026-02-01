@@ -8,6 +8,7 @@ import {
   ENGINE_VERSION_V1,
   RULESET_VERSION_V1,
 } from "./versions.v1";
+import { totalMod7FromSum0to6 } from "./math7.core.v1";
 const VOWEL_INDEX: Record<SevenVowel, number> = {
   A: 0,
   E: 1,
@@ -57,8 +58,8 @@ function buildEvidenceV1(
 ): EvidenceV1 {
   const surfaceVowels = extractSevenVowelsV1(basis);
   const indices = surfaceVowels.map((v) => VOWEL_INDEX[v]);
-  const sum = indices.reduce((a, b) => a + b, 0);
-  const totalMod7 = ((sum % 7) + 7) % 7;
+  const sum0to6 = indices.reduce((a, b) => a + b, 0);
+  const totalMod7 = totalMod7FromSum0to6(sum0to6);
 
   const signals: string[] = ["EVIDENCE_V1"];
   if (!basis) signals.push("EMPTY_BASIS");
@@ -67,7 +68,7 @@ function buildEvidenceV1(
     basis,
     surfaceVowels,
     surfacePath: surfaceVowels.join("-"),
-    math7: { vowels: surfaceVowels, indices, sum, totalMod7 },
+    math7: { vowels: surfaceVowels, indices, sum: sum0to6, totalMod7 },
     normalizationSteps: normalizationSteps ?? [],
     ops: [],
     notes: [],
