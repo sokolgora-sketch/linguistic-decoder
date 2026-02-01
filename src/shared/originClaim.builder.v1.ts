@@ -1,5 +1,6 @@
 // src/shared/originClaim.builder.v1.ts
 import { buildOriginClaimSupportStub } from "@/engine/originClaimSupport.stub";
+import { normalizeCandidateRecord } from "./brain/candidateRecord.normalize.v0.1";
 import type { OriginClaimSupportSeedV1 } from "./originClaimSupport.v1";
 
 import {
@@ -435,6 +436,31 @@ export function buildOriginClaimV1(result: AnalyzeWordResultV1Like): OriginClaim
 
   const rawCandidates = extractCandidates(result);
 
+  // BRAIN-0.1 — CandidateRecord side-channel (shared)
+  // Additive only. No filtering/deletion/ranking of OriginClaim candidates.
+  // We normalize CandidateRecord-like payloads ONLY if upstream provided them.
+  const brainCandidates: any[] = [];
+  for (const c of rawCandidates as any[]) {
+    const maybeRecord =
+      (c && typeof c === "object" && ((c as any).brainCandidateRecord || (c as any).candidateRecord)) ||
+      (c && typeof c === "object" && {
+        v: (c as any).v,
+        languageId: (c as any).languageId,
+        languageName: (c as any).languageName ?? (c as any).language,
+        form: (c as any).form,
+        gloss: (c as any).gloss,
+        roots: (c as any).roots,
+        explains: (c as any).explains,
+        opsUsed: (c as any).opsUsed,
+        functionTag: (c as any).functionTag,
+        source: (c as any).source,
+      });
+
+    const norm = normalizeCandidateRecord(maybeRecord);
+    if (norm.ok) brainCandidates.push(norm.record);
+  }
+
+
   const built: OriginClaimCandidateV1[] = rawCandidates.map((cand: any) => {
     const language = safeStr(cand?.language || cand?.lang || cand?.languageCode || "unknown");
     const form = (cand?.form ?? cand?.surface ?? cand?.value ?? null) as string | null;
@@ -496,6 +522,20 @@ export function buildOriginClaimV1(result: AnalyzeWordResultV1Like): OriginClaim
       },
     },
   };
+
+    // BRAIN-0.1 — Attach brainCandidates (shared)
+  // Only attach when present, to keep existing gold snapshots stable.
+  if (Array.isArray(brainCandidates) && brainCandidates.length) {
+    try {
+      const meta = (originClaim as any).meta;
+      const inputs = meta && typeof meta === "object" ? (meta as any).inputs : null;
+      if (inputs && typeof inputs === "object" && !(inputs as any).brainCandidates) {
+        (inputs as any).brainCandidates = brainCandidates;
+      }
+    } catch {
+      // never throw from side-channel
+    }
+  }
 
   return originClaim;
 }
