@@ -41,10 +41,16 @@ export function extractSevenVowelsFromString(input: string): SevenVowel[] {
   return out;
 }
 
+export function totalMod7FromSum0to6(sum0to6: number): number {
+  // canonical safe modulo: 0..6
+  return ((sum0to6 % 7) + 7) % 7;
+}
+
+
 export function totalMod7FromVowels(vowels: SevenVowel[]): number {
   let sum = 0;
   for (const v of vowels) sum += VOWEL_INDEX[v];
-  return ((sum % 7) + 7) % 7;
+  return totalMod7FromSum0to6(sum);
 }
 
 export function totalMod7FromString(input: string): number {
