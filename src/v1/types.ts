@@ -4,7 +4,7 @@ export type EvidenceMath7V1 = {
   vowels: SevenVowel[];
   indices: number[]; // 0..6
   sum: number;
-  totalMod7: number; // sum % 7
+  totalMod7: number; // totalMod7FromSum0to6(sum0to6)  (0..6)
 };
 
 export type EvidenceV1 = {
