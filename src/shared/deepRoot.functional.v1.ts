@@ -35,12 +35,11 @@ export function extractFunctionalRootsV1(params: {
       roots: ["shtu", "di"],
       gloss:
         "Functional reading: shtu (not yours / added-on) + di (know) → making knowledge yours through learning.",
-      opsUsed: [
-        "english carrier → sq functional reading",
-        "note: studim treated as nominal closure of the same carrier family",
-      ],
+      opsUsed: ["s_to_sh", "y_to_i"],
       vowelPath: "U→I",
       notes: [
+        "english carrier → sq functional reading",
+        "note: studim treated as nominal closure of the same carrier family",
         "Deterministic pilot hypothesis (v1).",
         "No historical-chain claim; functional decomposition only.",
       ],
@@ -55,12 +54,11 @@ export function extractFunctionalRootsV1(params: {
       roots: ["dëm"],
       gloss:
         "Functional reading: dëm (harm / loss / injury) as a minimal carrier for the damage concept.",
-      opsUsed: [
-        "english surface → sq carrier (short form)",
-        "note: this is a minimal-root hypothesis, not a historical-chain claim",
-      ],
+      opsUsed: [],
       vowelPath: "A→Ë",
       notes: [
+        "english surface → sq carrier (short form)",
+        "note: this is a minimal-root hypothesis, not a historical-chain claim",
         "Deterministic pilot hypothesis (v1.1).",
         "No winner; functional carrier only.",
       ],
@@ -76,12 +74,11 @@ export function extractFunctionalRootsV1(params: {
       roots: ["AT", "PAT"],
       gloss:
         "Functional root AT / PAT: origin, projection, source of lineage and authority.",
-      opsUsed: [
-        "surface → proto carrier",
-        "no winner; family-level functional root",
-      ],
+      opsUsed: [],
       vowelPath: "A→Ë",
       notes: [
+        "surface → proto carrier",
+        "no winner; family-level functional root",
         "Proto functional family (non-historical claim).",
         "Carrier across IE and Albanian.",
       ],

@@ -14,12 +14,14 @@ describe("DeepRoot functionalRoots v1.2 (father)", () => {
         roots: ["AT", "PAT"],
         gloss:
           "Functional root AT / PAT: origin, projection, source of lineage and authority.",
-        opsUsed: ["surface → proto carrier", "no winner; family-level functional root"],
-        vowelPath: "A→Ë",
-        notes: [
-          "Proto functional family (non-historical claim).",
-          "Carrier across IE and Albanian.",
-        ],
+        opsUsed: [],
+          vowelPath: "A→Ë",
+          notes: [
+            "surface → proto carrier",
+            "no winner; family-level functional root",
+            "Proto functional family (non-historical claim).",
+            "Carrier across IE and Albanian.",
+          ],
       },
     ]);
   });

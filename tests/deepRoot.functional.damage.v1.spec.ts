@@ -14,15 +14,14 @@ describe("DeepRoot functionalRoots v1.1 (damage)", () => {
         roots: ["dëm"],
         gloss:
           "Functional reading: dëm (harm / loss / injury) as a minimal carrier for the damage concept.",
-        opsUsed: [
-          "english surface → sq carrier (short form)",
-          "note: this is a minimal-root hypothesis, not a historical-chain claim",
-        ],
-        vowelPath: "A→Ë",
-        notes: [
-          "Deterministic pilot hypothesis (v1.1).",
-          "No winner; functional carrier only.",
-        ],
+        opsUsed: [],
+          vowelPath: "A→Ë",
+          notes: [
+            "english surface → sq carrier (short form)",
+            "note: this is a minimal-root hypothesis, not a historical-chain claim",
+            "Deterministic pilot hypothesis (v1.1).",
+            "No winner; functional carrier only.",
+          ],
       },
     ]);
 
