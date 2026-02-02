@@ -6,7 +6,7 @@ describe("wordCandidates.generateCandidates", () => {
     expect(generateCandidates("   ")).toEqual([]);
   });
 
-  it("returns an identity candidate with Math7 summary for 'study'", () => {
+  it("returns an exact candidate with Math7 summary for 'study'", () => {
     const candidates = generateCandidates("study");
 
     expect(candidates.length).toBe(1);
