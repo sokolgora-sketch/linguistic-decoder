@@ -251,7 +251,7 @@ export function analyzeWord(
       sanitized: withCanon.sanitized,
       engineVersion: withCanon.meta.engineVersion,
       mode,
-        brainCandidatesSeedFallback: seedFallbackEnabled,
+        meta: { inputs: { brainCandidatesSeedFallback: seedFallbackEnabled } },
       alphabet: withCanon.rawPayload.alphabet,
     } as any),
   };
