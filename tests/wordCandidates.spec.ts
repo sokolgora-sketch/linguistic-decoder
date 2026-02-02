@@ -17,7 +17,8 @@ describe("wordCandidates.generateCandidates", () => {
     expect(c.input).toBe("study");
     expect(c.form).toBe("study");
     expect(c.pieces).toEqual(["study"]);
-    expect(c.opsUsed).toEqual(["identity"]);
+    expect(c.opsUsed).toEqual(["exact"]);
+
 
     // Math7 invariants; we know from existing tests that
     // extractVowelPath('study') = ["U", "Y"] and totalVoices = 2
