@@ -1,3 +1,5 @@
+import { CANDIDATE_RECORD_VERSION } from "./brain/candidateRecord.v0.1";
+
 export type CanonCandidate = {
   id: string;
   language: string;
@@ -30,7 +32,35 @@ export type CanonCandidate = {
     parts?: string[];
   };
   symbolic?: any;
+  candidateRecord?: unknown;
 };
+
+/* BRAIN-0: canon emits CandidateRecord */
+function mkCanonCandidateRecord(c: CanonCandidate) {
+  // CandidateRecord.v0.1 requires:
+  // source.kind ∈ {"SEED","DATASET"} and all required strings non-empty.
+  return {
+    v: CANDIDATE_RECORD_VERSION,
+    languageId: `wlt:canon.${String(c.language || "unknown").toLowerCase()}`,
+    languageName: c.language || "Unknown",
+    form: c.form || "∅",
+    gloss: c.gloss || c.function || c.note || c.form || "canon candidate",
+    roots: [String(c.morphology?.root || "CANON").replace(/\s+/g, "").toUpperCase()],
+    opsUsed: [],
+    explains: [],
+    functionTag: "UNKNOWN",
+    source: {
+      kind: "SEED",
+      ref: "canonCandidates.ts",
+      version: "canon.v0.1",
+    },
+  };
+}
+
+const withCR = (c: CanonCandidate) => ({
+  ...c,
+  candidateRecord: (c as any).candidateRecord ?? mkCanonCandidateRecord(c),
+});
 
 export const CANON_CANDIDATES: Record<string, CanonCandidate[]> = {
   "father": [
@@ -245,3 +275,10 @@ export const CANON_CANDIDATES: Record<string, CanonCandidate[]> = {
     },
   ],
 };
+
+
+/* BRAIN-0: decorate all canon entries */
+for (const k of Object.keys(CANON_CANDIDATES)) {
+  const list = CANON_CANDIDATES[k] || [];
+  CANON_CANDIDATES[k] = list.map(withCR);
+}

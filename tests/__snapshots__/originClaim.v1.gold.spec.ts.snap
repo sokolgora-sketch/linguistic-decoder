@@ -43,6 +43,25 @@ exports[`originClaim v1 — gold snapshots (originClaim block only) gold:damage 
     "generatedAt": "<iso>",
     "inputs": {
       "alphabet": "auto",
+      "brainCandidates": [
+        {
+          "form": "damnum",
+          "functionTag": "UNKNOWN",
+          "gloss": "damnum",
+          "languageId": "wlt:canon.latin",
+          "languageName": "Latin",
+          "opsUsed": [],
+          "roots": [
+            "DAM-",
+          ],
+          "source": {
+            "kind": "SEED",
+            "ref": "canonCandidates.ts",
+            "version": "canon.v0.1",
+          },
+          "v": "brain.candidateRecord.v0.1",
+        },
+      ],
       "mode": "strict",
       "word": "damage",
     },
@@ -107,6 +126,25 @@ exports[`originClaim v1 — gold snapshots (originClaim block only) gold:father 
     "generatedAt": "<iso>",
     "inputs": {
       "alphabet": "auto",
+      "brainCandidates": [
+        {
+          "form": "pater",
+          "functionTag": "UNKNOWN",
+          "gloss": "pater",
+          "languageId": "wlt:canon.latin",
+          "languageName": "Latin",
+          "opsUsed": [],
+          "roots": [
+            "PAT-",
+          ],
+          "source": {
+            "kind": "SEED",
+            "ref": "canonCandidates.ts",
+            "version": "canon.v0.1",
+          },
+          "v": "brain.candidateRecord.v0.1",
+        },
+      ],
       "mode": "strict",
       "word": "father",
     },
@@ -198,6 +236,42 @@ exports[`originClaim v1 — gold snapshots (originClaim block only) gold:love 1`
     "generatedAt": "<iso>",
     "inputs": {
       "alphabet": "auto",
+      "brainCandidates": [
+        {
+          "form": "amor",
+          "functionTag": "UNKNOWN",
+          "gloss": "amor",
+          "languageId": "wlt:canon.latin",
+          "languageName": "Latin",
+          "opsUsed": [],
+          "roots": [
+            "AM-",
+          ],
+          "source": {
+            "kind": "SEED",
+            "ref": "canonCandidates.ts",
+            "version": "canon.v0.1",
+          },
+          "v": "brain.candidateRecord.v0.1",
+        },
+        {
+          "form": "dashuri",
+          "functionTag": "UNKNOWN",
+          "gloss": "dashuri",
+          "languageId": "wlt:canon.albanian",
+          "languageName": "Albanian",
+          "opsUsed": [],
+          "roots": [
+            "DASH-",
+          ],
+          "source": {
+            "kind": "SEED",
+            "ref": "canonCandidates.ts",
+            "version": "canon.v0.1",
+          },
+          "v": "brain.candidateRecord.v0.1",
+        },
+      ],
       "mode": "strict",
       "word": "love",
     },
@@ -262,6 +336,42 @@ exports[`originClaim v1 — gold snapshots (originClaim block only) gold:study 1
     "generatedAt": "<iso>",
     "inputs": {
       "alphabet": "auto",
+      "brainCandidates": [
+        {
+          "form": "studium",
+          "functionTag": "UNKNOWN",
+          "gloss": "study, zeal, pursuit",
+          "languageId": "wlt:canon.latin",
+          "languageName": "Latin",
+          "opsUsed": [],
+          "roots": [
+            "STUD-",
+          ],
+          "source": {
+            "kind": "SEED",
+            "ref": "canonCandidates.ts",
+            "version": "canon.v0.1",
+          },
+          "v": "brain.candidateRecord.v0.1",
+        },
+        {
+          "form": "studim",
+          "functionTag": "UNKNOWN",
+          "gloss": "studim",
+          "languageId": "wlt:canon.albanian",
+          "languageName": "Albanian",
+          "opsUsed": [],
+          "roots": [
+            "STUD-",
+          ],
+          "source": {
+            "kind": "SEED",
+            "ref": "canonCandidates.ts",
+            "version": "canon.v0.1",
+          },
+          "v": "brain.candidateRecord.v0.1",
+        },
+      ],
       "mode": "strict",
       "word": "study",
     },
