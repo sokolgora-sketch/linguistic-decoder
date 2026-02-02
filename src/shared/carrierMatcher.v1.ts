@@ -1,21 +1,8 @@
 import type { ProtoCarrier } from "./protoRoots.v1";
 import { PROTO_ROOTS_V1 } from "./protoRoots.v1";
+import type { AllowedOpId } from "./ops/allowedOps.v0.1";
 
-export type AllowedOp =
-  | "exact"
-  | "vowel_swap"
-  
-  | "y_to_i"
-  | "final_swap"| "s_to_sh"
-  | "sh_to_s"
-  | "g_to_gj"
-  | "gj_to_g"
-  | "final_a_to_e"
-  | "final_e_to_a"
-  | "optional_h_removed"
-  | "optional_h_added"
-  | "optional_j_removed"
-  | "optional_j_added";
+export type AllowedOp = AllowedOpId;
 
 export type ReasonCode =
   | "EXACT"
