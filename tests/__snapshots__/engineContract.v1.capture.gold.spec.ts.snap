@@ -94,13 +94,12 @@ exports[`Engine Contract v1 — capture engine output (goldens) damage (strict, 
         "id": "sq.dem.v1",
         "language": "sq",
         "notes": [
+          "english surface → sq carrier (short form)",
+          "note: this is a minimal-root hypothesis, not a historical-chain claim",
           "Deterministic pilot hypothesis (v1.1).",
           "No winner; functional carrier only."
         ],
-        "opsUsed": [
-          "english surface → sq carrier (short form)",
-          "note: this is a minimal-root hypothesis, not a historical-chain claim"
-        ],
+        "opsUsed": [],
         "roots": [
           "dëm"
         ],
@@ -188,13 +187,12 @@ exports[`Engine Contract v1 — capture engine output (goldens) father (strict, 
         "id": "proto.at.pat.v1",
         "language": "proto",
         "notes": [
+          "surface → proto carrier",
+          "no winner; family-level functional root",
           "Proto functional family (non-historical claim).",
           "Carrier across IE and Albanian."
         ],
-        "opsUsed": [
-          "surface → proto carrier",
-          "no winner; family-level functional root"
-        ],
+        "opsUsed": [],
         "roots": [
           "AT",
           "PAT"
@@ -698,12 +696,14 @@ exports[`Engine Contract v1 — capture engine output (goldens) study (strict, a
         "id": "sq.shtu+di.v1",
         "language": "sq",
         "notes": [
+          "english carrier → sq functional reading",
+          "note: studim treated as nominal closure of the same carrier family",
           "Deterministic pilot hypothesis (v1).",
           "No historical-chain claim; functional decomposition only."
         ],
         "opsUsed": [
-          "english carrier → sq functional reading",
-          "note: studim treated as nominal closure of the same carrier family"
+          "s_to_sh",
+          "y_to_i"
         ],
         "roots": [
           "shtu",

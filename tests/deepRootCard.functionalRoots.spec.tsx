@@ -17,10 +17,8 @@ describe("DeepRootCard (functionalRoots)", () => {
           roots: ["shtu", "di"],
           gloss:
             "Functional reading: shtu (not yours / added-on) + di (know) → making knowledge yours through learning.",
-          opsUsed: [
-            "english carrier → sq functional reading",
-            "note: studim treated as nominal closure of the same carrier family",
-          ],
+          opsUsed: ["s_to_sh", "y_to_i"],
+          notes: ["english carrier → sq functional reading", "note: studim treated as nominal closure of the same carrier family"],
           vowelPath: "U→I",
           notes: [
             "Deterministic pilot hypothesis (v1).",
