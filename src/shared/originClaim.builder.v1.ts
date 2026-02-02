@@ -434,41 +434,54 @@ export function buildOriginClaimV1(result: AnalyzeWordResultV1Like): OriginClaim
   const engineVersion = safeStr(result?.engine_meta?.version || result?.engineVersion || "unknown");
   const mode = safeStr(result?.engine_meta?.mode || result?.mode || null) || null;
   const word = safeStr(result?.word || result?.basis || result?.input?.word || "");
-  const seedFallbackEnabled = !!(
-    // NOTE: shared builder has NO 'inputs' param — do not reference it.
-    // 1) flag carried on the result object itself
-    ((result as any) && typeof (result as any) === "object" &&
-      (((result as any).brainCandidatesSeedFallback || (result as any).seedBrainCandidates))) ||
-    // 2) flag nested under result.inputs (some call sites may pass it this way)
-    ((result as any)?.inputs && typeof (result as any).inputs === "object" &&
-      ((((result as any).inputs as any).brainCandidatesSeedFallback || ((result as any).inputs as any).seedBrainCandidates)))
-  );
-  const rawCandidates = extractCandidates(result);
+
+    // BRAIN-0.2 — Seed fallback flag (shared)
+    // Accept from either top-level inputs (legacy) or meta.inputs (contract-safe).
+    function readBrainSeedFallbackFlag(result: any): boolean {
+      const a = (result && typeof result === "object") ? (result as any) : {};
+      const top = a?.inputs && typeof a.inputs === "object" ? a.inputs : null;
+      const metaInputs =
+        a?.meta && typeof a.meta === "object" &&
+        (a.meta as any).inputs && typeof (a.meta as any).inputs === "object"
+          ? (a.meta as any).inputs
+          : null;
+
+      const v =
+        (top?.brainCandidatesSeedFallback ?? top?.seedBrainCandidates) ??
+        (metaInputs?.brainCandidatesSeedFallback ?? metaInputs?.seedBrainCandidates) ??
+        false;
+
+      return !!v;
+    }
+
+    const seedFallbackEnabled = readBrainSeedFallbackFlag(result);
+    const rawCandidates = extractCandidates(result);
 
   // BRAIN-0.1 — CandidateRecord side-channel (shared)
   // Additive only. No filtering/deletion/ranking of OriginClaim candidates.
   // We normalize CandidateRecord-like payloads ONLY if upstream provided them.
   const brainCandidates: any[] = [];
-  for (const c of rawCandidates as any[]) {
-    const maybeRecord =
-      (c && typeof c === "object" && ((c as any).brainCandidateRecord || (c as any).candidateRecord)) ||
-      (c && typeof c === "object" && {
-        v: (c as any).v,
-        languageId: (c as any).languageId,
-        languageName: (c as any).languageName ?? (c as any).language,
-        form: (c as any).form,
-        gloss: (c as any).gloss,
-        roots: (c as any).roots,
-        explains: (c as any).explains,
-        opsUsed: (c as any).opsUsed,
-        functionTag: (c as any).functionTag,
-        source: (c as any).source,
-      });
+    for (const c of rawCandidates as any[]) {
+      const maybeRecord =
+        (c && typeof c === "object" && ((c as any).brainCandidateRecord || (c as any).candidateRecord)) ||
+        (c && typeof c === "object" && {
+          v: (c as any).v,
+          languageId: (c as any).languageId,
+          languageName: (c as any).languageName ?? (c as any).language,
+          form: (c as any).form,
+          gloss: (c as any).gloss,
+          roots: (c as any).roots,
+          explains: (c as any).explains,
+          opsUsed: (c as any).opsUsed,
+          functionTag: (c as any).functionTag,
+          source: (c as any).source,
+        });
 
-    const norm = normalizeCandidateRecord(maybeRecord);
-    if (norm.ok) brainCandidates.push(norm.record);
+      const norm = normalizeCandidateRecord(maybeRecord);
+      if (norm.ok) brainCandidates.push(norm.record);
+    }
 
-    // BRAIN-0.2 — Seed fallback (shared)
+// BRAIN-0.2 — Seed fallback (shared)
     // If nothing upstream provided a valid CandidateRecord, inject deterministic seed records
     // so OriginClaim can always expose brainCandidates for non-canon words.
     if (seedFallbackEnabled && !brainCandidates.length) {
@@ -479,10 +492,7 @@ export function buildOriginClaimV1(result: AnalyzeWordResultV1Like): OriginClaim
       }
     }
 
-}
-
-
-  const built: OriginClaimCandidateV1[] = rawCandidates.map((cand: any) => {
+    const built: OriginClaimCandidateV1[] = rawCandidates.map((cand: any) => {
     const language = safeStr(cand?.language || cand?.lang || cand?.languageCode || "unknown");
     const form = (cand?.form ?? cand?.surface ?? cand?.value ?? null) as string | null;
 
