@@ -351,10 +351,42 @@ export async function POST(req: Request) {
   const modeParsed =
     mode === "strict" || mode === "open" ? (mode as "strict" | "open") : undefined;
 
-  try {
+  
+
+    // Seed fallback flag (BRAIN-0.2)
+    // Accept via POST body opts (preferred) and also via query params for dev testing.
+    let seedFallbackEnabled = false;
+    try {
+      const url = new URL(req.url, "http://localhost");
+      const qSeed = url.searchParams.get("seed");
+      const qSeedBrain = url.searchParams.get("seedBrainCandidates");
+      const qSeedFallback = url.searchParams.get("brainCandidatesSeedFallback");
+      seedFallbackEnabled =
+        qSeed === "1" ||
+        qSeedBrain === "1" ||
+        qSeedFallback === "1";
+    } catch (_e) {}
+
+    const bodyAny: any = parsed.data as any;
+    const bodyOpts: any = bodyAny?.opts && typeof bodyAny.opts === "object" ? bodyAny.opts : null;
+    if (bodyOpts) {
+      seedFallbackEnabled =
+        !!(bodyOpts.brainCandidatesSeedFallback || bodyOpts.seedBrainCandidates) ||
+        seedFallbackEnabled;
+    }
+try {
     const heartInstrumentV1 = buildHeartInstrumentV1(word);
 
     const payload = await runAnalysisDeterministic(word, { mode, alphabet });
+      // Attach request-ish inputs so downstream (OriginClaim) can see seedFallbackEnabled.
+      // Additive only; does not change deterministic solver output.
+      (payload as any).inputs = {
+        word,
+        mode: modeParsed ?? mode ?? "strict",
+        alphabet: alphabet ?? "auto",
+        brainCandidatesSeedFallback: seedFallbackEnabled,
+      };
+
     const out = enginePayloadToAnalysisResult(payload);
 
     const ui = adaptAnalyzeV1ToUI(out as any);
@@ -499,7 +531,14 @@ export async function GET(req: Request) {
   const mode = (url.searchParams.get("mode") ?? "").trim();
   const alphabet = (url.searchParams.get("alphabet") ?? "").trim();
 
-  if (!word) {
+  
+
+    // Seed fallback flag (BRAIN-0.2)
+    const seedFallbackEnabled =
+      url.searchParams.get("seed") === "1" ||
+      url.searchParams.get("seedBrainCandidates") === "1" ||
+      url.searchParams.get("brainCandidatesSeedFallback") === "1";
+if (!word) {
     return NextResponse.json(
       { error: 'Missing "word" query param. Use: /api/analyze-v1?word=study' },
       { status: 400 }
@@ -516,6 +555,14 @@ export async function GET(req: Request) {
       mode: modeParsed,
       alphabet: alphabet || undefined,
     });
+      // Attach request-ish inputs so downstream (OriginClaim) can see seedFallbackEnabled.
+      (payload as any).inputs = {
+        word,
+        mode: modeParsed ?? (mode as any) ?? "strict",
+        alphabet: alphabet || "auto",
+        brainCandidatesSeedFallback: seedFallbackEnabled,
+      };
+
     const out = enginePayloadToAnalysisResult(payload);
 
     const ui = adaptAnalyzeV1ToUI(out as any);

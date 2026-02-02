@@ -148,6 +148,21 @@ export function enginePayloadToAnalysisResult(payload: EnginePayload): AnalyzeWo
       normalizationSteps,
     };
 
+    // Forward request-ish inputs (BRAIN-0.2 seed fallback + future request flags)
+  // Route may attach (payload as any).inputs; shared builders only see the adapted "result".
+  // IMPORTANT: do NOT add new top-level keys (contract). Merge into result.meta.inputs instead.
+  {
+    const pInputs =
+      ((payload as any)?.inputs && typeof (payload as any).inputs === "object" ? (payload as any).inputs : null) ??
+      ((payload as any)?.request && typeof (payload as any).request === "object" ? (payload as any).request : null);
+
+    if (pInputs) {
+      const meta = ((result as any)?.meta && typeof (result as any).meta === "object") ? (result as any).meta : {};
+      const prevInputs = (meta as any)?.inputs && typeof (meta as any).inputs === "object" ? (meta as any).inputs : {};
+      (result as any).meta = { ...meta, inputs: { ...prevInputs, ...(pInputs as any) } };
+    }
+  }
+
   // Origin Claim Protocol (V1)
   result.originClaim = buildOriginClaimV1(result);
 
