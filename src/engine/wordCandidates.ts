@@ -2,23 +2,13 @@
 // This stays strictly within the Seven-vowel / Math7 rules.
 
 import { summarizeWordMath7, type Math7Summary } from "../lib/sevenVowelsCore";
+import type { AllowedOpId } from "@/shared/ops/allowedOps.v0.1";
 
 /**
- * IDs for the allowed transform operations.
- * For now we only use "identity", but the rest are reserved
- * for future strict Search-Operation logic.
+ * Single-source policy:
+ * Candidate ops MUST use the canonical AllowedOpId vocabulary.
  */
-export type CandidateOpId =
-  | "identity"
-  | "final-a-to-ë"
-  | "final-ë-to-a"
-  | "s-to-sh"
-  | "sh-to-s"
-  | "g-to-gj"
-  | "gj-to-g"
-  | "insert-h-around-gu"
-  | "insert-j-around-gi"
-  | "compound";
+export type CandidateOpId = AllowedOpId;
 
 /**
  * Structural representation of one candidate form of a word.
@@ -40,11 +30,11 @@ export interface CandidateForm {
  * Very small, deterministic v1 generator.
  *
  * For now:
- * - returns a single "identity" candidate
+ * - returns a single "exact" candidate
  * - uses summarizeWordMath7 to attach the Math7 summary
  *
  * Later we will expand this to explore other legal transforms
- * (vowel swaps, s↔sh, g↔gj, final -a/-ë, compounding, etc.).
+ * (vowel swaps, s↔sh, g↔gj, final swaps, compounding, etc.).
  */
 export function generateCandidates(word: string): CandidateForm[] {
   const trimmed = word.trim();
@@ -62,7 +52,7 @@ export function generateCandidates(word: string): CandidateForm[] {
       input: trimmed,
       form: normalized,
       pieces: [normalized],
-      opsUsed: ["identity"],
+      opsUsed: ["exact"],
       math7,
     },
   ];
