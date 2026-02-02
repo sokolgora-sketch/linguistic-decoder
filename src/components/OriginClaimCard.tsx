@@ -36,7 +36,18 @@ export function OriginClaimCard(props: { originClaim?: any }) {
       ? (policy as any).gatesActive
       : oc?.gatesActive ?? oc?.gates?.active ?? null;
 
-  return (
+  
+
+    // BRAIN-0.2 audit: show seed-fallback posture + brainCandidates count (if enabled)
+    const metaInputs =
+      oc?.meta?.inputs && typeof oc?.meta?.inputs === "object" ? (oc.meta.inputs as any) : null;
+
+    const seedFallbackOn = metaInputs?.brainCandidatesSeedFallback === true;
+
+    const brainCandidatesCount = Array.isArray(metaInputs?.brainCandidates)
+      ? metaInputs.brainCandidates.length
+      : 0;
+return (
     <section>
       <div className="text-sm font-semibold">Origin Claim</div>
 
@@ -50,6 +61,17 @@ export function OriginClaimCard(props: { originClaim?: any }) {
           <span className="font-medium">Gates active:</span>{" "}
           <span>{toFlatText(gatesActive)}</span>
         </div>
+
+          {seedFallbackOn ? (
+            <div>
+              <span className="font-medium">Brain seed fallback:</span>{" "}
+              <span className="font-mono">ON</span>{" "}
+              <span className="opacity-70">·</span>{" "}
+              <span className="font-mono">{toFlatText(brainCandidatesCount)}</span>{" "}
+              <span className="opacity-70">records</span>
+            </div>
+          ) : null}
+
       </div>
     </section>
   );
