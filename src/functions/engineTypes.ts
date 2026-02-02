@@ -17,8 +17,14 @@ export type LangId = string;
 /** Engine modes you already use conceptually: Basic / Go Deeper / Find Origin */
 export type EngineMode = "basic" | "deeper" | "origin";
 
-/** Small, explicit transform ops (for auditability). */
-export type TransformOp =
+/**
+ * LEGACY CONTRACT NOTE:
+ * - The canonical transform vocabulary for the current ZË-RO engine is AllowedOpId
+ *   in src/shared/ops/allowedOps.v0.1.ts.
+ * - This structured op union is kept only as a legacy/draft contract shape for
+ *   older Functions payloads and is NOT consumed by the current engine pipeline.
+ */
+export type LegacyTransformOp =
   | { op: "vowel_swap"; from: Voice; to: Voice; note?: string }
   | { op: "vowel_insert"; v: Voice; note?: string }
   | { op: "vowel_delete"; v: Voice; note?: string }
@@ -48,7 +54,7 @@ export type EngineCandidate = {
    * Keep them as strings; ops describe transformations.
    */
   decomposition: string[];
-  ops: TransformOp[];
+  ops: LegacyTransformOp[];
 
   /** Action | Instrument/Function | Unit/Result statement (no scoring). */
   functional: FunctionalDecomposition;
