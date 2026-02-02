@@ -6,7 +6,7 @@ describe("wordCandidates.generateCandidates", () => {
     expect(generateCandidates("   ")).toEqual([]);
   });
 
-  it("returns an identity candidate with Math7 summary for 'study'", () => {
+  it("returns an exact candidate with Math7 summary for 'study'", () => {
     const candidates = generateCandidates("study");
 
     expect(candidates.length).toBe(1);
@@ -17,7 +17,8 @@ describe("wordCandidates.generateCandidates", () => {
     expect(c.input).toBe("study");
     expect(c.form).toBe("study");
     expect(c.pieces).toEqual(["study"]);
-    expect(c.opsUsed).toEqual(["identity"]);
+    expect(c.opsUsed).toEqual(["exact"]);
+
 
     // Math7 invariants; we know from existing tests that
     // extractVowelPath('study') = ["U", "Y"] and totalVoices = 2

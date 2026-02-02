@@ -16,5 +16,6 @@ exports[`allowed ops v0.1 — lock op id list is stable (snapshot) 1`] = `
   "optional_h_added",
   "optional_j_removed",
   "optional_j_added",
+  "compound",
 ]
 `;
