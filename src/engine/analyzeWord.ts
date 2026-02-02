@@ -197,13 +197,16 @@ function buildSymbolicLayer(base: any): SymbolicLayer | undefined {
  */
 export function analyzeWord(
   word: string,
-  mode: "strict" | "explore" = "strict"
+  mode: "strict" | "explore" = "strict",
+  opts?: { brainCandidatesSeedFallback?: boolean }
 ): AnalyzeWordResult {
   const base = runSevenVoices(word, { mode });
   const withCanon = attachCanonCandidates(base);
   const withMorph = attachMorphology(withCanon); // reserved for future; currently passthrough
   const symbolic = buildSymbolicLayer(withMorph);
 
+
+    const seedFallbackEnabled = !!opts?.brainCandidatesSeedFallback;
   const join = (arr: any[]) => (arr || []).join(" → ");
 
   const result: AnalyzeWordResult = {
@@ -248,6 +251,7 @@ export function analyzeWord(
       sanitized: withCanon.sanitized,
       engineVersion: withCanon.meta.engineVersion,
       mode,
+        brainCandidatesSeedFallback: seedFallbackEnabled,
       alphabet: withCanon.rawPayload.alphabet,
     } as any),
   };
@@ -261,9 +265,20 @@ export function analyzeWord(
  */
 export function analyzeWordWithMath7(
   word: string,
-  mode: "strict" | "explore" = "strict"
+  mode: "strict" | "explore" = "strict",
+  alphabetOrOpts?: "auto" | any,
+  maybeOpts?: { brainCandidatesSeedFallback?: boolean }
 ): AnalyzeWordResult & { math7: Math7Summary } {
-  const base = analyzeWord(word, mode);
+  // Back-compat:
+  // - old calls: (word, mode, "auto")
+  // - new calls: (word, mode, opts)
+  // - full calls: (word, mode, "auto", opts)
+  const opts =
+    alphabetOrOpts && typeof alphabetOrOpts === "object" && !Array.isArray(alphabetOrOpts)
+      ? (alphabetOrOpts as { brainCandidatesSeedFallback?: boolean })
+      : (maybeOpts as { brainCandidatesSeedFallback?: boolean } | undefined);
+
+  const base = analyzeWord(word, mode, opts);
   const math7 = computeMath7ForResult(base);
   return { ...base, math7 };
 }

@@ -1,6 +1,7 @@
 // src/shared/originClaim.builder.v1.ts
 import { buildOriginClaimSupportStub } from "@/engine/originClaimSupport.stub";
 import { normalizeCandidateRecord } from "./brain/candidateRecord.normalize.v0.1";
+import { getSeedCandidateRecordsV0_1 } from "./brain/seedLexicon.v0.1";
 import type { OriginClaimSupportSeedV1 } from "./originClaimSupport.v1";
 
 import {
@@ -433,7 +434,15 @@ export function buildOriginClaimV1(result: AnalyzeWordResultV1Like): OriginClaim
   const engineVersion = safeStr(result?.engine_meta?.version || result?.engineVersion || "unknown");
   const mode = safeStr(result?.engine_meta?.mode || result?.mode || null) || null;
   const word = safeStr(result?.word || result?.basis || result?.input?.word || "");
-
+  const seedFallbackEnabled = !!(
+    // NOTE: shared builder has NO 'inputs' param — do not reference it.
+    // 1) flag carried on the result object itself
+    ((result as any) && typeof (result as any) === "object" &&
+      (((result as any).brainCandidatesSeedFallback || (result as any).seedBrainCandidates))) ||
+    // 2) flag nested under result.inputs (some call sites may pass it this way)
+    ((result as any)?.inputs && typeof (result as any).inputs === "object" &&
+      ((((result as any).inputs as any).brainCandidatesSeedFallback || ((result as any).inputs as any).seedBrainCandidates)))
+  );
   const rawCandidates = extractCandidates(result);
 
   // BRAIN-0.1 — CandidateRecord side-channel (shared)
@@ -458,7 +467,19 @@ export function buildOriginClaimV1(result: AnalyzeWordResultV1Like): OriginClaim
 
     const norm = normalizeCandidateRecord(maybeRecord);
     if (norm.ok) brainCandidates.push(norm.record);
-  }
+
+    // BRAIN-0.2 — Seed fallback (shared)
+    // If nothing upstream provided a valid CandidateRecord, inject deterministic seed records
+    // so OriginClaim can always expose brainCandidates for non-canon words.
+    if (seedFallbackEnabled && !brainCandidates.length) {
+      const seeds = getSeedCandidateRecordsV0_1(word);
+      for (const s of seeds as any[]) {
+        const norm = normalizeCandidateRecord(s);
+        if (norm.ok) brainCandidates.push(norm.record);
+      }
+    }
+
+}
 
 
   const built: OriginClaimCandidateV1[] = rawCandidates.map((cand: any) => {
