@@ -1,3 +1,5 @@
+import type { AllowedOpId } from "../ops/allowedOps.v0.1";
+
 // BRAIN-0 — CandidateRecord Contract v0.1
 // The only shape the Brain is allowed to hand to the Heart (after normalization).
 // No ranking. No scoring. No UI concerns.
@@ -67,7 +69,7 @@ export type CandidateRecord = Readonly<{
    * Example: ["y_to_i", "s_to_sh"].
    * Heart will validate these against allowed ops (canonical op IDs only).
    */
-  opsUsed: readonly string[];
+  opsUsed: readonly AllowedOpId[];
 
   /** Optional functional role hint (Heart may ignore) */
   functionTag?: CandidateFunctionTag;

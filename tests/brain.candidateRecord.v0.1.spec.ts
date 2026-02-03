@@ -25,7 +25,7 @@ describe("BRAIN-0 CandidateRecord v0.1", () => {
     if (a.ok && b.ok) {
       expect(a.record).toEqual(b.record);
       expect(a.record.roots).toEqual(["DI"]); // canonical + uniqStable
-      expect(a.record.opsUsed).toEqual(["Y↔I"]);
+      expect(a.record.opsUsed).toEqual(["y_to_i"]);
       expect(a.record.explains?.[0].segment).toBe("dy");
       expect(a.record.explains?.[0].note).toBe("Y↔I");
     }
@@ -53,4 +53,20 @@ describe("BRAIN-0 CandidateRecord v0.1", () => {
     const res = normalizeCandidateRecord({ v: CANDIDATE_RECORD_VERSION });
     expect(res.ok).toBe(false);
   });
+});
+
+it("rejects non-AllowedOpId opsUsed tokens", () => {
+  const bad = normalizeCandidateRecord({
+    v: CANDIDATE_RECORD_VERSION,
+    languageId: "wlt:test",
+    languageName: "Test",
+    form: "x",
+    gloss: "x",
+    roots: ["X"],
+    opsUsed: ["definitely_not_an_op"], // unmapped => must reject
+    source: { kind: "SEED", ref: "test", version: "v0" },
+  });
+
+  expect(bad.ok).toBe(false);
+  expect((bad as any).errors.join("|")).toContain("candidateRecord:ops_bad_token");
 });
