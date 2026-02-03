@@ -37,6 +37,15 @@ export type CanonCandidate = {
 
 /* BRAIN-0: canon emits CandidateRecord */
 function mkCanonCandidateRecord(c: CanonCandidate) {
+  // Canon root tags MUST obey CandidateRecord token law: ^[A-Z0-9_-]{1,24}$.
+  // We strip diacritics (NFD) + drop non-token chars to keep determinism.
+  function canonRootToken(x: unknown): string {
+    const raw = String(x ?? "CANON").replace(/\s+/g, "");
+    const ascii = raw.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    const up = ascii.toUpperCase();
+    const cleaned = up.replace(/[^A-Z0-9_-]/g, "");
+    return cleaned || "CANON";
+  }
   // CandidateRecord.v0.1 requires:
   // source.kind ∈ {"SEED","DATASET"} and all required strings non-empty.
   return {
@@ -45,7 +54,7 @@ function mkCanonCandidateRecord(c: CanonCandidate) {
     languageName: c.language || "Unknown",
     form: c.form || "∅",
     gloss: c.gloss || c.function || c.note || c.form || "canon candidate",
-    roots: [String(c.morphology?.root || "CANON").replace(/\s+/g, "").toUpperCase()],
+    roots: [canonRootToken(c.morphology?.root || "CANON")],
     opsUsed: [],
     explains: [],
     functionTag: "UNKNOWN",
