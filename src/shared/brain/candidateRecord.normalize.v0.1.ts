@@ -9,6 +9,8 @@ import type {
 } from "./candidateRecord.v0.1";
 import { CANDIDATE_RECORD_VERSION } from "./candidateRecord.v0.1";
 import { CR_ERR } from "./candidateRecord.errors.v0.1";
+import type { AllowedOpId } from "../ops/allowedOps.v0.1";
+import { normalizeToAllowedOpId } from "../ops/allowedOps.v0.1";
 
 function isPlainObject(x: unknown): x is Record<string, unknown> {
   return !!x && typeof x === "object" && !Array.isArray(x);
@@ -29,17 +31,18 @@ function canonicalTag(x: unknown): string {
 }
 
 /**
- * Canonical op token: trim + space squeeze.
- * v0.1: we do not enforce legality of ops here; Heart will.
+ * Canonical op token -> AllowedOpId
+ * - Accepts legacy spellings via normalizeToAllowedOpId()
+ * - Returns null if unmapped (=> reject)
  */
-function canonicalOp(x: unknown): string {
-  return cleanText(x);
+function canonicalOpId(x: unknown): AllowedOpId | null {
+  return normalizeToAllowedOpId(x);
 }
 
 /** stable unique (keeps first occurrence order) */
-function uniqStable(arr: readonly string[]): string[] {
-  const seen = new Set<string>();
-  const out: string[] = [];
+function uniqStable<T>(arr: readonly T[]): T[] {
+  const seen = new Set<T>();
+  const out: T[] = [];
   for (const v of arr) {
     if (!seen.has(v)) {
       seen.add(v);
@@ -86,17 +89,22 @@ export function normalizeCandidateRecord(input: unknown): CandidateRecordNormali
     if (!/^[A-Z0-9_-]{1,24}$/.test(r)) {
       errors.push(`${CR_ERR.ROOT_BAD_TOKEN}:${r}`);
     }
-  }
-
-  // opsUsed (optional array; validated if present)
-  const opsRaw = Array.isArray(input.opsUsed) ? (input.opsUsed as unknown[]) : [];
-  const opsUsed = uniqStable(opsRaw.map(canonicalOp)).filter(Boolean);
-
-  for (const op of opsUsed) {
-    if (op.length > 64 || /[\r\n]/.test(op)) {
-      errors.push(`${CR_ERR.OPS_BAD_TOKEN}:${op}`);
+  }    // opsUsed (optional array; enforced AllowedOpId vocabulary if present)
+  const opsRaw = Array.isArray((input as any).opsUsed) ? ((input as any).opsUsed as unknown[]) : [];
+  const opsTmp: AllowedOpId[] = [];
+  for (const raw of opsRaw) {
+    const mapped = canonicalOpId(raw);
+    if (!mapped) {
+      const bad = cleanText(raw);
+      errors.push(`${CR_ERR.OPS_BAD_TOKEN}:${bad.slice(0, 64)}`);
+      continue;
     }
+    opsTmp.push(mapped);
   }
+  const opsUsed = uniqStable(opsTmp);
+
+
+
 
   // explains (optional)
   let explains: CandidateRecord["explains"] | undefined = undefined;
