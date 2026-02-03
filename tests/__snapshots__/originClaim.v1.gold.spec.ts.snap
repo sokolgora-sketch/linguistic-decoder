@@ -61,6 +61,23 @@ exports[`originClaim v1 — gold snapshots (originClaim block only) gold:damage 
           },
           "v": "brain.candidateRecord.v0.1",
         },
+        {
+          "form": "dëm",
+          "functionTag": "UNKNOWN",
+          "gloss": "dëm",
+          "languageId": "wlt:canon.albanian",
+          "languageName": "Albanian",
+          "opsUsed": [],
+          "roots": [
+            "DEM",
+          ],
+          "source": {
+            "kind": "SEED",
+            "ref": "canonCandidates.ts",
+            "version": "canon.v0.1",
+          },
+          "v": "brain.candidateRecord.v0.1",
+        },
       ],
       "mode": "strict",
       "word": "damage",
@@ -136,6 +153,23 @@ exports[`originClaim v1 — gold snapshots (originClaim block only) gold:father 
           "opsUsed": [],
           "roots": [
             "PAT-",
+          ],
+          "source": {
+            "kind": "SEED",
+            "ref": "canonCandidates.ts",
+            "version": "canon.v0.1",
+          },
+          "v": "brain.candidateRecord.v0.1",
+        },
+        {
+          "form": "atë",
+          "functionTag": "UNKNOWN",
+          "gloss": "atë",
+          "languageId": "wlt:canon.albanian",
+          "languageName": "Albanian",
+          "opsUsed": [],
+          "roots": [
+            "ATE",
           ],
           "source": {
             "kind": "SEED",
