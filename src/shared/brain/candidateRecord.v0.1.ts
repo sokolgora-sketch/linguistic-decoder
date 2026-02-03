@@ -64,8 +64,8 @@ export type CandidateRecord = Readonly<{
 
   /**
    * Declared operations used to connect segment↔carrier.
-   * Example: ["Y↔I", "S↔SH"].
-   * Heart will validate these against allowed ops.
+   * Example: ["y_to_i", "s_to_sh"].
+   * Heart will validate these against allowed ops (canonical op IDs only).
    */
   opsUsed: readonly string[];
 
