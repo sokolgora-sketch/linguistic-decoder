@@ -44,6 +44,10 @@ export type AnalyzeWordResultV1 = {
   // Heart / Frontier primary path
   primaryPath?: SevenVoicesPath;
 
+    // Heart primary path (adapter-safe): used for RootMap preference + DeepRoot↔Heart gate wiring.
+    // Keep unknown because upstream may emit string/array/arrow/dash formats; normalization happens elsewhere.
+    heartPrimaryPath?: unknown;
+
   // Frontier alternatives (if present)
   frontier?: FrontierCandidate[];
 
