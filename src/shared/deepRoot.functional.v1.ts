@@ -1,3 +1,4 @@
+import type { AllowedOpId } from "./ops/allowedOps.v0.1";
 /**
  * DeepRoot Functional Roots v1
  * Deterministic, conservative micro-root hypotheses.
@@ -15,7 +16,7 @@ export type FunctionalRootHypothesisV1 = {
   surfaceForms: string[]; // which surface words this applies to
   roots: string[]; // functional micro-roots (lowercase)
   gloss: string; // short functional reading
-  opsUsed: string[]; // explanation of mapping/allowed transforms
+  opsUsed: AllowedOpId[]; // explanation of mapping/allowed transforms
   vowelPath?: string; // optional, UI hint (stable string)
   notes?: string[]; // optional
 };
