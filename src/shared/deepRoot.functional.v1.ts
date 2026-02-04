@@ -36,7 +36,7 @@ export function extractFunctionalRootsV1(params: {
       roots: ["shtu", "di"],
       gloss:
         "Functional reading: shtu (not yours / added-on) + di (know) → making knowledge yours through learning.",
-      opsUsed: ["s_to_sh", "y_to_i"],
+      opsUsed: ["s_to_sh", "y_to_i"],,
       vowelPath: "U→I",
       notes: [
         "english carrier → sq functional reading",
