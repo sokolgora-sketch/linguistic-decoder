@@ -26,7 +26,8 @@ export const AnalyzeWordResultV1ContractSchema = z
     candidates: z.array(z.unknown()).optional(),
     deepRoot: z.unknown().optional(),
     rootMap: z.unknown().optional(),
-  resonanceProfileV1: z.unknown().optional(),
+      heartPrimaryPath: z.unknown().optional(),
+      resonanceProfileV1: z.unknown().optional(),
     // Origin Claim Protocol (V1) — keep loose until protocol stabilizes
     originClaim: z.unknown().optional(),
     wordMatrix: z.unknown().optional(),
@@ -70,6 +71,7 @@ export function toAnalyzeWordResultV1Contract(input: unknown): AnalyzeWordResult
     candidates: o.candidates,
     deepRoot: o.deepRoot,
     rootMap: o.rootMap,
+      heartPrimaryPath: o.heartPrimaryPath,
       resonanceProfileV1: o.resonanceProfileV1,
     wordMatrix: o.wordMatrix,
     languageFamilies: o.languageFamilies,

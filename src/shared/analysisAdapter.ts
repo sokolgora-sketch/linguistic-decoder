@@ -178,6 +178,13 @@ export function enginePayloadToAnalysisResult(payload: EnginePayload): AnalyzeWo
   // Uses DeepRoot hypotheses (minRoots) as input. If none exist, builder returns an empty RootMap with a note.
   const heartPrimaryPath = pickHeartPrimaryPathForRootMap(payload as any);
 
+    // Emit heartPrimaryPath at top-level for UI + DeepRoot↔Heart gate (adapter-safe).
+    // IMPORTANT: do not invent; only emit when we have a real upstream path.
+    if (heartPrimaryPath != null) {
+      (result as any).heartPrimaryPath = heartPrimaryPath;
+    }
+
+
   const rootMap =
     buildRootMapV1({
       basis: String((result as any)?.deepRoot?.basis ?? (result as any)?.sanitized ?? (result as any)?.word ?? "").trim(),
