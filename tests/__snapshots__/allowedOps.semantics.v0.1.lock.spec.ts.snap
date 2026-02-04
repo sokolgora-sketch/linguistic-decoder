@@ -1,0 +1,155 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`allowed ops semantics v0.1 lock locks semantics snapshot (prevent silent drift) 1`] = `
+{
+  "table": {
+    "compound": {
+      "class": "morph",
+      "id": "compound",
+      "label": "Compound join",
+      "meaningRisk": "high",
+      "notes": [
+        "Structural operation: combines multiple units.",
+        "High risk of meaning inflation unless decomposition is explicitly evidenced.",
+      ],
+      "preservesMeaning": false,
+      "reversible": false,
+    },
+    "exact": {
+      "class": "identity",
+      "id": "exact",
+      "label": "Exact match",
+      "meaningRisk": "low",
+      "preservesMeaning": true,
+      "reversible": true,
+    },
+    "final_a_to_e": {
+      "class": "final",
+      "id": "final_a_to_e",
+      "label": "final a→e",
+      "meaningRisk": "low",
+      "preservesMeaning": true,
+      "reversible": true,
+    },
+    "final_e_to_a": {
+      "class": "final",
+      "id": "final_e_to_a",
+      "label": "final e→a",
+      "meaningRisk": "low",
+      "preservesMeaning": true,
+      "reversible": true,
+    },
+    "final_swap": {
+      "class": "final",
+      "id": "final_swap",
+      "label": "Final swap (a↔ë bucket)",
+      "meaningRisk": "medium",
+      "notes": [
+        "Terminal marker swap; treated as a morphological surface variance bucket.",
+      ],
+      "preservesMeaning": true,
+      "reversible": true,
+    },
+    "g_to_gj": {
+      "class": "phonetic",
+      "id": "g_to_gj",
+      "label": "g→gj palatalization",
+      "meaningRisk": "low",
+      "preservesMeaning": true,
+      "reversible": true,
+    },
+    "gj_to_g": {
+      "class": "phonetic",
+      "id": "gj_to_g",
+      "label": "gj→g depalatalization",
+      "meaningRisk": "low",
+      "preservesMeaning": true,
+      "reversible": true,
+    },
+    "optional_h_added": {
+      "class": "phonetic",
+      "id": "optional_h_added",
+      "label": "optional h added",
+      "meaningRisk": "medium",
+      "notes": [
+        "Only valid in constrained gu/gi neighborhoods per law.",
+      ],
+      "preservesMeaning": true,
+      "reversible": true,
+    },
+    "optional_h_removed": {
+      "class": "phonetic",
+      "id": "optional_h_removed",
+      "label": "optional h removed",
+      "meaningRisk": "medium",
+      "notes": [
+        "Only valid in constrained gu/gi neighborhoods per law.",
+      ],
+      "preservesMeaning": true,
+      "reversible": true,
+    },
+    "optional_j_added": {
+      "class": "phonetic",
+      "id": "optional_j_added",
+      "label": "optional j added",
+      "meaningRisk": "medium",
+      "notes": [
+        "Only valid in constrained gu/gi neighborhoods per law.",
+      ],
+      "preservesMeaning": true,
+      "reversible": true,
+    },
+    "optional_j_removed": {
+      "class": "phonetic",
+      "id": "optional_j_removed",
+      "label": "optional j removed",
+      "meaningRisk": "medium",
+      "notes": [
+        "Only valid in constrained gu/gi neighborhoods per law.",
+      ],
+      "preservesMeaning": true,
+      "reversible": true,
+    },
+    "s_to_sh": {
+      "class": "phonetic",
+      "id": "s_to_sh",
+      "label": "s→sh softening",
+      "meaningRisk": "low",
+      "preservesMeaning": true,
+      "reversible": true,
+    },
+    "sh_to_s": {
+      "class": "phonetic",
+      "id": "sh_to_s",
+      "label": "sh→s hardening",
+      "meaningRisk": "low",
+      "preservesMeaning": true,
+      "reversible": true,
+    },
+    "vowel_swap": {
+      "class": "vowel",
+      "id": "vowel_swap",
+      "label": "Vowel swap (generic)",
+      "meaningRisk": "high",
+      "notes": [
+        "Broad vowel substitution can jump between unrelated roots.",
+        "Only acceptable when constrained by additional evidence (skeleton + carriers).",
+      ],
+      "preservesMeaning": false,
+      "reversible": false,
+    },
+    "y_to_i": {
+      "class": "vowel",
+      "id": "y_to_i",
+      "label": "Y↔I normalization",
+      "meaningRisk": "low",
+      "notes": [
+        "Dialect/orthography normalization (tight mapping).",
+      ],
+      "preservesMeaning": true,
+      "reversible": true,
+    },
+  },
+  "v": "ops.semantics.v0.1",
+}
+`;
