@@ -15,6 +15,7 @@ exports[`originClaim v1 — gold snapshots (originClaim block only) gold:damage 
       "language": "Albanian",
       "reasons": [
         "Candidate marked pass by engine candidate layer.",
+        "DeepRoot–Heart gate insufficient data (missing heart or candidate path).",
         "Voice path alignment cannot be determined from available fields.",
         "Candidate lacks detectable morphological structure.",
       ],
@@ -32,6 +33,7 @@ exports[`originClaim v1 — gold snapshots (originClaim block only) gold:damage 
       "language": "Latin",
       "reasons": [
         "Candidate marked pass by engine candidate layer.",
+        "DeepRoot–Heart gate insufficient data (missing heart or candidate path).",
         "Voice path alignment cannot be determined from available fields.",
         "Candidate lacks detectable morphological structure.",
       ],
@@ -115,6 +117,7 @@ exports[`originClaim v1 — gold snapshots (originClaim block only) gold:father 
       "language": "Albanian",
       "reasons": [
         "Candidate marked pass by engine candidate layer.",
+        "DeepRoot–Heart gate insufficient data (missing heart or candidate path).",
         "Voice path alignment cannot be determined from available fields.",
         "Candidate lacks detectable morphological structure.",
       ],
@@ -132,6 +135,7 @@ exports[`originClaim v1 — gold snapshots (originClaim block only) gold:father 
       "language": "Latin",
       "reasons": [
         "Candidate marked pass by engine candidate layer.",
+        "DeepRoot–Heart gate insufficient data (missing heart or candidate path).",
         "Voice path alignment cannot be determined from available fields.",
         "Candidate lacks detectable morphological structure.",
       ],
@@ -242,6 +246,7 @@ exports[`originClaim v1 — gold snapshots (originClaim block only) gold:love 1`
       "language": "Albanian",
       "reasons": [
         "Candidate marked pass by engine candidate layer.",
+        "DeepRoot–Heart gate insufficient data (missing heart or candidate path).",
         "Voice path alignment cannot be determined from available fields.",
         "Candidate lacks detectable morphological structure.",
       ],
@@ -259,6 +264,7 @@ exports[`originClaim v1 — gold snapshots (originClaim block only) gold:love 1`
       "language": "Latin",
       "reasons": [
         "Candidate marked pass by engine candidate layer.",
+        "DeepRoot–Heart gate insufficient data (missing heart or candidate path).",
         "Voice path alignment cannot be determined from available fields.",
         "Candidate lacks detectable morphological structure.",
       ],
@@ -336,12 +342,14 @@ exports[`originClaim v1 — gold snapshots (originClaim block only) gold:study 1
         "primaryPath.voicePath",
         "heart.math7.primary",
         "candidates[albanian-studim]",
+        "candidates[albanian-studim].vowelPath",
       ],
       "form": "studim",
       "id": "oc:albanian-studim",
       "language": "Albanian",
       "reasons": [
         "Candidate marked pass by engine candidate layer.",
+        "DeepRoot–Heart gate aligned (terminal vowel agreement).",
         "Candidate voice path aligns with primary voice path.",
         "Candidate lacks detectable morphological structure.",
       ],
@@ -353,12 +361,14 @@ exports[`originClaim v1 — gold snapshots (originClaim block only) gold:study 1
         "primaryPath.voicePath",
         "heart.math7.primary",
         "candidates[latin-studium]",
+        "candidates[latin-studium].vowelPath",
       ],
       "form": "studium",
       "id": "oc:latin-studium",
       "language": "Latin",
       "reasons": [
         "Candidate marked pass by engine candidate layer.",
+        "DeepRoot–Heart gate aligned (terminal vowel agreement).",
         "Candidate voice path aligns with primary voice path.",
         "Candidate lacks detectable morphological structure.",
       ],

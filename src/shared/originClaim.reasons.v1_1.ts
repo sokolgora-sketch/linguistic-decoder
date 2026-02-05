@@ -4,6 +4,12 @@
  */
 
 export type OriginClaimReasonCodeV1_1 =
+  | "OC_G5_DR_HEART_INSUFFICIENT"
+
+  | "OC_G5_DR_HEART_MISALIGNED"
+
+  | "OC_C5_DR_HEART_ALIGNED"
+
   | "include_passes_min_support"
   | "exclude_missing_decomposition"
   | "exclude_missing_vowel_path"

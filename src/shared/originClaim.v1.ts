@@ -104,6 +104,9 @@ export type OriginClaimReasonCode =
   | "OC_C3_VOICEPATH_UNKNOWN"
   | "OC_C4_MORPH_PRESENT"
   | "OC_C4_MORPH_MISSING"
+  | "OC_C5_DR_HEART_ALIGNED"
+  | "OC_G5_DR_HEART_MISALIGNED"
+  | "OC_G5_DR_HEART_INSUFFICIENT"
   | "OC_STRICT_REQUIRES_DEEPROOT_FOR_MEDIUM";
 
 export const ORIGIN_CLAIM_REASON_TEXT: Record<OriginClaimReasonCode, string> = {
@@ -122,6 +125,9 @@ export const ORIGIN_CLAIM_REASON_TEXT: Record<OriginClaimReasonCode, string> = {
   OC_C4_MORPH_PRESENT: "Candidate shows non-empty morphological structure (root/suffix parts).",
   OC_C4_MORPH_MISSING: "Candidate lacks detectable morphological structure.",
 
+  OC_C5_DR_HEART_ALIGNED: "DeepRoot–Heart gate aligned (terminal vowel agreement).",
+  OC_G5_DR_HEART_MISALIGNED: "DeepRoot–Heart gate misaligned (terminal vowel conflict).",
+  OC_G5_DR_HEART_INSUFFICIENT: "DeepRoot–Heart gate insufficient data (missing heart or candidate path).",
   OC_STRICT_REQUIRES_DEEPROOT_FOR_MEDIUM:
     "Strict mode: medium+ confidence requires DeepRoot carrier alignment.",
 };
