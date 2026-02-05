@@ -254,10 +254,15 @@ export function adaptAnalysisToTelemetryVM(raw: unknown): TelemetryViewModel {
   // Prefer emitted Heart primary path when available (more canonical than UI-detected fallback).
   // Accept both string and array-ish shapes; normalize to dash-delimited.
   const heartPrimaryPathForGate: string | null =
-    (normalizeVowelPathString((payload as any)?.heartPrimaryPath)?.join("-") ??
-      normalizeVowelPathArray((payload as any)?.heartPrimaryPath)?.join("-") ??
-      null) ??
-    (vp.detected ?? null);
+    (() => {
+      const s =
+        normalizeVowelPathString((payload as any)?.heartPrimaryPath)?.join("-") ??
+        normalizeVowelPathArray((payload as any)?.heartPrimaryPath)?.join("-") ??
+        null;
+
+      const cleaned = typeof s === "string" && s.trim() ? s.trim() : null;
+      return cleaned ?? (vp.detected ?? null);
+    })();
 
 
   // Accept unknown input, normalize to a dash-delimited string, then parse.
@@ -517,7 +522,10 @@ const voicePathDetectedMaybe: PresentOrMissing<Vowel[]> =
     // Canonical DeepRoot functional vowel path (if emitted)
     // Prefer this for DeepRoot–Heart gate comparisons; fall back per-candidate otherwise.
     const deepRootFunctionalPathStr: string | null =
-      (normalizeVowelPathString((payload as any)?.deepRoot?.functionalRoots?.[0]?.vowelPath)?.join("-") ?? null);
+      (() => {
+        const s = normalizeVowelPathString((payload as any)?.deepRoot?.functionalRoots?.[0]?.vowelPath)?.join("-") ?? null;
+        return typeof s === "string" && s.trim() ? s.trim() : null;
+      })();
 
   // Candidates
   const candRaw = Array.isArray(root["candidates"]) ? root["candidates"] : null;
@@ -557,15 +565,16 @@ const voicePathDetectedMaybe: PresentOrMissing<Vowel[]> =
           computeDeepRootHeartGateV01({
             heartPrimaryPath: heartPrimaryPathForGate,
               candidateResolvedPath:
-                (candVowelPath ? candVowelPath.join('-') : null) ?? deepRootFunctionalPathStr,
+                  (candVowelPath && candVowelPath.length ? candVowelPath.join("-") : null) ??
+                  deepRootFunctionalPathStr,
             evidenceRefs: [
               "heartPrimaryPath",
               "primaryPath.voicePath",
-                ...(candVowelPath
-                  ? ["candidates[" + i + "].vowelPath"]
-                  : deepRootFunctionalPathStr
-                  ? ["deepRoot.functionalRoots[0].vowelPath"]
-                  : ["candidatePath.missing"]),
+                ...(candVowelPath && candVowelPath.length
+                    ? ["candidates[" + i + "].vowelPath"]
+                    : deepRootFunctionalPathStr
+                      ? ["deepRoot.functionalRoots[0].vowelPath"]
+                      : ["candidatePath.missing"]),
             ],
           })
         )
