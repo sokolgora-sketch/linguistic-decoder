@@ -39,51 +39,34 @@ export function OriginClaimCard(props: { originClaim?: any }) {
   
 
     // BRAIN-0.2 audit: show seed-fallback posture + brainCandidates count (if enabled)
-    const metaInputs =
-      oc?.meta?.inputs && typeof oc?.meta?.inputs === "object" ? (oc.meta.inputs as any) : null;
+const metaInputs =
+  oc?.meta?.inputs && typeof oc?.meta?.inputs === "object" ? (oc.meta.inputs as any) : null;
 
-    const seedFallbackOn = metaInputs?.brainCandidatesSeedFallback === true;
+const seedFallbackOn = metaInputs?.brainCandidatesSeedFallback === true;
 
-      const brainCandidates0 =
-        metaInputs && Array.isArray((metaInputs as any).brainCandidates)
-          ? ((metaInputs as any).brainCandidates as any[])
-          : null;
+// Canonical brainCandidates: always an array (never null)
+const brainCandidates: any[] = Array.isArray(metaInputs?.brainCandidates)
+  ? (metaInputs.brainCandidates as any[])
+  : [];
 
-      function flatJoin0(arr: any): string {
-        return Array.isArray(arr) ? arr.map((x) => toFlatText(x)).filter(Boolean).join(", ") : "—";
-      }
+function safeText(x: any): string {
+  return String(x ?? "").replace(/\s+/g, " ").trim();
+}
+function safeRoots(x: any): string {
+  return Array.isArray(x) ? x.map((v) => safeText(v)).filter(Boolean).join(", ") : "";
+}
+function safeOps(x: any): string {
+  return Array.isArray(x) ? x.map((v) => safeText(v)).filter(Boolean).join(", ") : "";
+}
+function safeSource(x: any): string {
+  const k = safeText(x?.kind);
+  const r = safeText(x?.ref);
+  const v = safeText(x?.version);
+  const head = k || r || v ? [k, r].filter(Boolean).join(" ") : "";
+  return head && v ? head + "@" + v : head || (v ? "@" + v : "");
+}
 
-      function sourceLine0(src: any): string {
-        const kind = toFlatText(src?.kind);
-        const ref = toFlatText(src?.ref);
-        const ver = toFlatText(src?.version);
-        const head = [kind, ref].filter((x) => x && x !== "—" && x !== "object").join(" ");
-        if (!head && (!ver || ver === "—" || ver === "object")) return "—";
-        if (head && ver && ver !== "—" && ver !== "object") return head + "@" + ver;
-        return head || (ver && ver !== "—" && ver !== "object" ? "@" + ver : "—");
-      }
-
-
-    const brainCandidates = Array.isArray((metaInputs as any)?.brainCandidates)
-      ? ((metaInputs as any).brainCandidates as any[])
-      : null;
-    function safeText(x: any): string {
-      return String(x ?? "").replace(/\s+/g, " ").trim();
-    }
-    function safeRoots(x: any): string {
-      return Array.isArray(x) ? x.map((v) => safeText(v)).filter(Boolean).join(", ") : "";
-    }
-    function safeOps(x: any): string {
-      return Array.isArray(x) ? x.map((v) => safeText(v)).filter(Boolean).join(", ") : "";
-    }
-    function safeSource(x: any): string {
-      const k = safeText(x?.kind);
-      const r = safeText(x?.ref);
-      const v = safeText(x?.version);
-      const head = k || r || v ? [k, r].filter(Boolean).join(" ") : "";
-      return head && v ? head + "@" + v : (head || (v ? "@" + v : ""));
-    }
-    const brainCandidatesCount0 = Array.isArray(brainCandidates0) ? brainCandidates0.length : 0;
+const brainCandidatesCount = brainCandidates.length;
 return (
     <section>
       <div className="text-sm font-semibold">Origin Claim</div>
@@ -102,10 +85,10 @@ return (
           {seedFallbackOn ? (
             <div>
               <span className="font-medium">Brain seed fallback:</span>{" "}
-              {brainCandidatesCount0 > 0 ? (
+              {brainCandidatesCount > 0 ? (
                 <div className="mt-1 text-xs">
                   <span className="font-medium">Brain candidates:</span>{" "}
-                  <span className="font-mono">{brainCandidatesCount0}</span>
+                  <span className="font-mono">{brainCandidatesCount}</span>
                   <details className="mt-1">
                     <summary className="cursor-pointer opacity-80">show</summary>
                     <div className="mt-2 space-y-2">
@@ -139,7 +122,7 @@ return (
               ) : null}
 <span className="font-mono">ON</span>{" "}
               <span className="opacity-70">·</span>{" "}
-              <span className="font-mono">count={toFlatText(brainCandidatesCount0)}</span>{" "}
+              <span className="font-mono">count={toFlatText(brainCandidatesCount)}</span>{" "}
               <span className="opacity-70">records</span>
             </div>
           ) : null}
