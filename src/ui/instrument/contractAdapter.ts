@@ -561,26 +561,24 @@ const voicePathDetectedMaybe: PresentOrMissing<Vowel[]> =
         functionalStatement: functionalStatement ? present(functionalStatement) : missing("not_emitted"),
         vowelPath: candVowelPath ? present(candVowelPath) : missing("not_emitted"),
 
-        deepRootHeartGate: present(
+                        deepRootHeartGate: present(
           computeDeepRootHeartGateV01({
             heartPrimaryPath: heartPrimaryPathForGate,
-              candidateResolvedPath:
-                  (candVowelPath && candVowelPath.length ? candVowelPath.join("-") : null) ??
-                  deepRootFunctionalPathStr,
+            candidateResolvedPath:
+              (candVowelPath && candVowelPath.length ? candVowelPath.join("-") : null) ??
+              deepRootFunctionalPathStr,
             evidenceRefs: [
               "heartPrimaryPath",
               "primaryPath.voicePath",
-                ...(candVowelPath && candVowelPath.length
-                    ? ["candidates[" + i + "].vowelPath"]
-                    : deepRootFunctionalPathStr
-                      ? ["deepRoot.functionalRoots[0].vowelPath"]
-                      : ["candidatePath.missing"]),
+              ...(candVowelPath && candVowelPath.length
+                ? ["candidates[" + i + "].vowelPath"]
+                : deepRootFunctionalPathStr
+                ? ["deepRoot.functionalRoots[0].vowelPath"]
+                : []),
             ],
           })
-        )
-,
-
-        // leave decomposition for later (shape varies too much right now)
+        ),
+// leave decomposition for later (shape varies too much right now)
         decomposition: missing("not_emitted") as PresentOrMissing<DecompositionItemVM[]>,
 
         ops: candOps ? presentStringArray(candOps) : missing("not_emitted"),

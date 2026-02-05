@@ -18,11 +18,8 @@ type ResultsDisplayProps = {
 
 export function ResultsDisplay({ analysis }: ResultsDisplayProps) {
   if (!analysis) return null;
-
-  console.log("DEBUG–WordMatrix", { analysis, buildWordMatrixUI });
-  const wordMatrixSummary = analysis ? buildWordMatrixUI(analysis) : null;
-  console.log("DEBUG–MatrixSummary", wordMatrixSummary);
-  const engineMetaSummary = buildEngineMetaSummary(analysis?.meta);
+const wordMatrixSummary = analysis ? buildWordMatrixUI(analysis) : null;
+const engineMetaSummary = buildEngineMetaSummary(analysis?.meta);
 
   return (
     <div className="space-y-6">
