@@ -23,8 +23,7 @@ export function toast(input: ToastInput) {
   _toasts = [item, ..._toasts].slice(0, 5);
 
   if (process.env.NODE_ENV !== "production") {
-    console.log("[toast]", item);
-  }
+}
 
   return {
     id: item.id,

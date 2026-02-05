@@ -10,7 +10,7 @@
     "start": "next start",
     "lint": "eslint -c eslint.config.mjs .",
     "typecheck": "tsc -p tsconfig.stress.json --noEmit",
-    "typecheck:full": "tsc --noEmit",
+    "typecheck:full": "tsc -p tsconfig.typecheck.full.json --noEmit",
     "test": "jest -c jest.config.mjs",
     "test:integration": "jest -c jest.integration.config.mjs",
     "test:auth": "tsx src/scripts/test-firebase-auth.ts",

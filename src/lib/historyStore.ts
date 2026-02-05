@@ -32,14 +32,7 @@ export async function recordHistoryRun(input: HistoryRunInput): Promise<void> {
   // Guard: history off by default; flip when we actually wire Firestore.
   if (process.env.NEXT_PUBLIC_HISTORY_ENABLED !== "1") {
     if (process.env.NODE_ENV === "development") {
-      console.debug(
-        "[history] disabled; would record:",
-        input.word,
-        input.engineVersion,
-        input.mode,
-        input.alphabet
-      );
-    }
+}
     return;
   }
 
