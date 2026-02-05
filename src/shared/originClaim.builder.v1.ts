@@ -13,6 +13,7 @@ import {
   OriginClaimStatus,
 } from "./originClaim.v1";
 
+import { computeDeepRootHeartGateV01 } from "./deepRootHeartGate.v0.1.compute";
 /**
  * Minimal adapter interface to keep builder decoupled.
  * Replace `any` with your real AnalyzeWordResultV1 type when wiring.
@@ -24,6 +25,7 @@ type SupportSignal = {
   negatives: number;
   hasC1Pass: boolean;
   hasDeepRootAlign: boolean;
+  hasDeepRootHeartGateAligned: boolean;
   reasonCodes: OriginClaimReasonCode[];
   evidenceRefs: string[];
 };
@@ -280,6 +282,7 @@ function computeSupportVector(result: AnalyzeWordResultV1Like, cand: any): Suppo
     negatives: 0,
     hasC1Pass: false,
     hasDeepRootAlign: false,
+      hasDeepRootHeartGateAligned: false,
     reasonCodes: [],
     evidenceRefs: [],
   };
@@ -306,6 +309,67 @@ function computeSupportVector(result: AnalyzeWordResultV1Like, cand: any): Suppo
   const candLang = safeStr(cand?.language || cand?.lang || cand?.languageCode);
   const candForm = safeStr(cand?.form || cand?.surface || cand?.value);
   out.evidenceRefs.push(candId ? `candidates[${candId}]` : `candidates[${candLang}:${candForm || "∅"}]`);
+
+    // C5 DeepRoot–Heart Alignment Gate v0.1 (strict-mode requirement for medium+)
+    // Adapter-safe: uses emitted/derived vowel sequences; NEVER reads raw payload.
+    {
+      const fromArray = (v: any): string[] | null =>
+        Array.isArray(v) ? v.map(String).map((s: string) => s.trim()).filter(Boolean) : null;
+
+      const fromString = (s: any): string[] | null => {
+        if (typeof s !== "string") return null;
+        const m = s.match(/[AEIOUYË]/gi);
+        if (!m || m.length === 0) return null;
+        return m.map((x) => x.toLocaleUpperCase());
+      };
+
+      const seqFromAny = (v: any): string[] | null => fromArray(v) ?? fromString(v);
+
+      const heartExplicit = seqFromAny((result as any)?.heartPrimaryPath);
+      const heartForGateSeq = heartExplicit ?? primary;
+
+      const fr0 = (result as any)?.deepRoot?.functionalRoots?.[0] ?? null;
+      const deepRootFunctionalForGateSeq = fr0
+        ? (seqFromAny(fr0?.vowelPath ?? fr0?.vowel_path ?? fr0?.voicePath ?? fr0?.voice_path ?? null))
+        : null;
+
+      const candSeqForGate = extractCandidateVoiceSeq(cand);
+      const candidateResolvedForGateSeq =
+        (candSeqForGate && candSeqForGate.length ? candSeqForGate : null) ??
+        (deepRootFunctionalForGateSeq && deepRootFunctionalForGateSeq.length ? deepRootFunctionalForGateSeq : null);
+
+      const gateEvidenceRefs: string[] = [];
+
+      // Heart path source
+      if (heartExplicit && heartExplicit.length) gateEvidenceRefs.push("heartPrimaryPath");
+      else if (primary && primary.length) gateEvidenceRefs.push("primaryPath.voicePath");
+      else { /* noop: no evidenceRef when missing */ }
+// Candidate path source
+      if (candSeqForGate && candSeqForGate.length) {
+        gateEvidenceRefs.push(
+          candId
+            ? `candidates[${candId}].vowelPath`
+            : `candidates[${candLang}:${candForm || "∅"}].vowelPath`
+        );
+      } else if (deepRootFunctionalForGateSeq && deepRootFunctionalForGateSeq.length) {
+        gateEvidenceRefs.push("deepRoot.functionalRoots[0].vowelPath");
+      } else {
+        /* noop: no evidenceRef when missing */
+      }
+const gate = computeDeepRootHeartGateV01({
+        heartPrimaryPath: heartForGateSeq ? heartForGateSeq.join("-") : null,
+        candidateResolvedPath: candidateResolvedForGateSeq ? candidateResolvedForGateSeq.join("-") : null,
+        evidenceRefs: gateEvidenceRefs,
+      });
+
+      out.evidenceRefs.push(...gateEvidenceRefs);
+      out.hasDeepRootHeartGateAligned = gate.status === "aligned";
+
+      if (gate.status === "aligned") out.reasonCodes.push("OC_C5_DR_HEART_ALIGNED");
+      else if (gate.status === "misaligned") out.reasonCodes.push("OC_G5_DR_HEART_MISALIGNED");
+      else out.reasonCodes.push("OC_G5_DR_HEART_INSUFFICIENT");
+    }
+
 
   // C2 deepRoot alignment
   const align = detectDeepRootAlign(deepRoot, cand);
@@ -354,8 +418,7 @@ function mapConfidence(
 
   // Strict-mode gate: medium+ requires DeepRoot alignment.
   const strict = (mode ?? "").toLocaleLowerCase() === "strict";
-  const strictGateBlocksMedium = strict && !s.hasDeepRootAlign;
-
+  const strictGateBlocksMedium = strict && (!s.hasDeepRootAlign || !s.hasDeepRootHeartGateAligned);
   const noNeg = s.negatives === 0;
   const extraPos = Math.max(0, s.positives - 1); // beyond C1
 
