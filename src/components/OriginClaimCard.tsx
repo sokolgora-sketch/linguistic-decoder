@@ -39,14 +39,34 @@ export function OriginClaimCard(props: { originClaim?: any }) {
   
 
     // BRAIN-0.2 audit: show seed-fallback posture + brainCandidates count (if enabled)
-    const metaInputs =
-      oc?.meta?.inputs && typeof oc?.meta?.inputs === "object" ? (oc.meta.inputs as any) : null;
+const metaInputs =
+  oc?.meta?.inputs && typeof oc?.meta?.inputs === "object" ? (oc.meta.inputs as any) : null;
 
-    const seedFallbackOn = metaInputs?.brainCandidatesSeedFallback === true;
+const seedFallbackOn = metaInputs?.brainCandidatesSeedFallback === true;
 
-    const brainCandidatesCount = Array.isArray(metaInputs?.brainCandidates)
-      ? metaInputs.brainCandidates.length
-      : 0;
+// Canonical brainCandidates: always an array (never null)
+const brainCandidates: any[] = Array.isArray(metaInputs?.brainCandidates)
+  ? (metaInputs.brainCandidates as any[])
+  : [];
+
+function safeText(x: any): string {
+  return String(x ?? "").replace(/\s+/g, " ").trim();
+}
+function safeRoots(x: any): string {
+  return Array.isArray(x) ? x.map((v) => safeText(v)).filter(Boolean).join(", ") : "";
+}
+function safeOps(x: any): string {
+  return Array.isArray(x) ? x.map((v) => safeText(v)).filter(Boolean).join(", ") : "";
+}
+function safeSource(x: any): string {
+  const k = safeText(x?.kind);
+  const r = safeText(x?.ref);
+  const v = safeText(x?.version);
+  const head = k || r || v ? [k, r].filter(Boolean).join(" ") : "";
+  return head && v ? head + "@" + v : head || (v ? "@" + v : "");
+}
+
+const brainCandidatesCount = brainCandidates.length;
 return (
     <section>
       <div className="text-sm font-semibold">Origin Claim</div>
@@ -65,9 +85,44 @@ return (
           {seedFallbackOn ? (
             <div>
               <span className="font-medium">Brain seed fallback:</span>{" "}
-              <span className="font-mono">ON</span>{" "}
+              {brainCandidatesCount > 0 ? (
+                <div className="mt-1 text-xs">
+                  <span className="font-medium">Brain candidates:</span>{" "}
+                  <span className="font-mono">{brainCandidatesCount}</span>
+                  <details className="mt-1">
+                    <summary className="cursor-pointer opacity-80">show</summary>
+                    <div className="mt-2 space-y-2">
+                      {(brainCandidates || []).map((c: any, i: number) => (
+                        <div key={i} className="rounded border border-black/10 px-2 py-2">
+                          <div className="text-xs">
+                            <span className="font-mono">{safeText(c.languageName) || "Unknown"}</span>{" "}
+                            <span className="opacity-60">({safeText(c.languageId) || "wlt:unknown"})</span>
+                          </div>
+                          <div className="mt-1 text-xs">
+                            <span className="opacity-70">form:</span>{" "}
+                            <span className="font-mono">{safeText(c.form) || "∅"}</span>
+                          </div>
+                          <div className="mt-1 text-xs">
+                            <span className="opacity-70">roots:</span>{" "}
+                            <span className="font-mono">{safeRoots(c.roots) || "∅"}</span>
+                          </div>
+                          <div className="mt-1 text-xs">
+                            <span className="opacity-70">opsUsed:</span>{" "}
+                            <span className="font-mono">{safeOps(c.opsUsed) || "∅"}</span>
+                          </div>
+                          <div className="mt-1 text-xs">
+                            <span className="opacity-70">source:</span>{" "}
+                            <span className="font-mono">{safeSource(c.source) || "∅"}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </details>
+                </div>
+              ) : null}
+<span className="font-mono">ON</span>{" "}
               <span className="opacity-70">·</span>{" "}
-              <span className="font-mono">{toFlatText(brainCandidatesCount)}</span>{" "}
+              <span className="font-mono">count={toFlatText(brainCandidatesCount)}</span>{" "}
               <span className="opacity-70">records</span>
             </div>
           ) : null}

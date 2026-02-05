@@ -100,7 +100,7 @@ describe("ui: OriginClaimCard brain seed fallback audit", () => {
 
     expect(screen.getByText("Brain seed fallback:")).toBeTruthy();
     expect(screen.getByText("ON")).toBeTruthy();
-    expect(screen.getByText("1")).toBeTruthy();
+    expect(screen.getByText("count=1")).toBeTruthy();
   });
 
   it("does not render Brain seed fallback line when disabled/absent", () => {
