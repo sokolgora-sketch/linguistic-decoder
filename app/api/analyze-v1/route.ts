@@ -632,8 +632,8 @@ const checked = AnalyzeWordResultV1ContractSchema.safeParse(out);
       heartInstrumentV1,
     };
 
-  // Mind MUST obey prism surface math (heartInstrumentV1)
-    // ✅ Contract check should validate ONLY the contract-picked projection
+  // Mind derives from heart.math7.primary (single source of truth)
+// ✅ Contract check should validate ONLY the contract-picked projection
     try {
       toAnalyzeWordResultV1Contract(final);
     } catch (e: any) {

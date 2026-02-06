@@ -122,7 +122,7 @@ export const ORIGIN_CLAIM_REASON_TEXT: Record<OriginClaimReasonCode, string> = {
   OC_C3_VOICEPATH_MISMATCH: "Candidate voice path conflicts with primary voice path.",
   OC_C3_VOICEPATH_UNKNOWN: "Voice path alignment cannot be determined from available fields.",
 
-  OC_C4_MORPH_PRESENT: "Candidate shows non-empty morphological structure (root/suffix parts).",
+  OC_C4_MORPH_PRESENT: "Candidate shows non-empty morphological structure (prefix/root/suffix parts).",
   OC_C4_MORPH_MISSING: "Candidate lacks detectable morphological structure.",
 
   OC_C5_DR_HEART_ALIGNED: "DeepRoot–Heart gate aligned (terminal vowel agreement).",
