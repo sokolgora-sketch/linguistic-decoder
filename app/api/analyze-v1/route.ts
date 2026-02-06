@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { normalizePrinciplesToLabels } from "@/v1/principles.vocab.v0.1";
 import { z } from "zod";
 
 import { runAnalysisDeterministic } from "@/lib/runAnalysisDeterministic";
@@ -14,54 +13,6 @@ import { AnalyzeWordResultV1ContractSchema } from "@/shared/analyzeWordResult.v1
 
 // ✅ Heart Instrument v1 (stable sub-object)
 import { buildHeartInstrumentV1 } from "@/v1/heartInstrument.v1";
-
-function idFromTotal1to7(n: unknown): string | null {
-  if (typeof n !== "number" || !Number.isFinite(n)) return null;
-  switch (Math.trunc(n)) {
-    case 1: return "TRUTH";
-    case 2: return "EXPANSION";
-    case 3: return "INSIGHT";
-    case 4: return "BALANCE";
-    case 5: return "UNITY";
-    case 6: return "REFLECTION";
-    case 7: return "EVOLUTION";
-    default: return null;
-  }
-}
-
-function overrideMindFromHeartInstrumentV1(final: any): void {
-  const total1to7 = (final as any)?.heartInstrumentV1?.surfaceMath7?.total1to7 ?? null;
-
-  function idFromTotal1to7(n: unknown): string | null {
-    if (typeof n !== "number" || !Number.isFinite(n)) return null;
-    switch (Math.trunc(n)) {
-      case 1: return "TRUTH";
-      case 2: return "EXPANSION";
-      case 3: return "INSIGHT";
-      case 4: return "BALANCE";
-      case 5: return "UNITY";
-      case 6: return "REFLECTION";
-      case 7: return "EVOLUTION";
-      default: return null;
-    }
-  }
-
-  const id = idFromTotal1to7(total1to7);
-  if (!id) return;
-
-  const polarity = "balanced";
-  const label = normalizePrinciplesToLabels([id])?.[0] ?? "Unknown";
-
-  final.mind = {
-    ...(final?.mind && typeof final.mind === "object" ? final.mind : {}),
-    dominantPrincipleId: id,
-    dominantPrincipleLabel: label,
-    dominantPrinciple: label, // keep back-compat alias stable
-    polarity,
-    patternName: `${id}-${polarity}`,
-    logicStatement: `The word reflects ${label} principle with ${polarity} flow.`,
-  };
-}
 
 const BodySchema = z
   .object({
@@ -499,9 +450,6 @@ const checked = AnalyzeWordResultV1ContractSchema.safeParse(out);
         : (ensured as any).raw,
       heartInstrumentV1,
     };
-
-  overrideMindFromHeartInstrumentV1(final);
-
 // ✅ Contract check should validate ONLY the contract-picked projection
     try {
       toAnalyzeWordResultV1Contract(final);
@@ -685,9 +633,6 @@ const checked = AnalyzeWordResultV1ContractSchema.safeParse(out);
     };
 
   // Mind MUST obey prism surface math (heartInstrumentV1)
-  overrideMindFromHeartInstrumentV1(final);
-
-
     // ✅ Contract check should validate ONLY the contract-picked projection
     try {
       toAnalyzeWordResultV1Contract(final);
