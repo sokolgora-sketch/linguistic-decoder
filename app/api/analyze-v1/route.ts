@@ -631,9 +631,8 @@ const checked = AnalyzeWordResultV1ContractSchema.safeParse(out);
         : (ensured as any).raw,
       heartInstrumentV1,
     };
-
-  // Mind derives from heart.math7.primary (single source of truth)
-// ✅ Contract check should validate ONLY the contract-picked projection
+      // Mind derives from heart.math7.primary (single source of truth)
+      // ✅ Contract check should validate ONLY the contract-picked projection
     try {
       toAnalyzeWordResultV1Contract(final);
     } catch (e: any) {
