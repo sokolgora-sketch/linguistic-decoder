@@ -214,21 +214,20 @@ function detectDeepRootAlign(
   if (carriers) refs.push("deepRoot.(present)");
   return { aligned: false, evidenceRefs: refs };
 }
-
 function detectMorphologyPresent(cand: any): boolean {
-  const parts =
-    cand?.morphology?.parts ??
-    cand?.morph?.parts ??
-    cand?.decomposition ??
-    cand?.roots ??
-    null;
+  const m: any = (cand as any)?.morphology ?? null;
+  if (!m) return false;
 
-  if (Array.isArray(parts)) return parts.filter((x) => String(x).trim()).length > 0;
+  // Preferred: explicit parts array
+  if (Array.isArray(m.parts)) return m.parts.filter(Boolean).length > 0;
 
-  // If you store suffix/root strings, count them.
-  const root = safeStr(cand?.root);
-  const suffix = safeStr(cand?.suffix);
-  return !!(root || suffix);
+  // Fallback: structured fields
+  if (typeof m.root === "string" && m.root.trim()) return true;
+
+  if (Array.isArray(m.prefixes) && m.prefixes.filter(Boolean).length > 0) return true;
+  if (Array.isArray(m.suffixes) && m.suffixes.filter(Boolean).length > 0) return true;
+
+  return false;
 }
 
 function detectCandidateStatus(cand: any): OriginClaimStatus {
