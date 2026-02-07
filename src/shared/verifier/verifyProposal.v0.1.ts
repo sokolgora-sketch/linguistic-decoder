@@ -3,11 +3,9 @@
 // No bespoke basis/vowel/math7 logic lives here.
 
 import type { SevenVowel } from "@/shared/math7.core";
-import { VOWEL_INDEX, isSevenVowel } from "@/shared/math7.core";
+import { VOWEL_INDEX } from "@/shared/math7.core";
 import { applyStrictTerminalYHint } from "@/shared/math7.basis";
 import { PRINCIPLE_MAP } from "@/engine/math7";
-
-import { normalizeWordV1 } from "../../v1/analyzeWordV1";
 import { computeMath7 } from "@/v1/math7.core.v1";
 
 import {
@@ -65,28 +63,20 @@ function normalizeMode(x: unknown): VerifierModeV0_1 {
   return x === "open" ? "open" : "strict";
 }
 
-function canonicalBasisV0_1(word: string): string {
-  // SSOT normalizer (v1). Fallback kept only for safety (should never hit).
-  try {
-    const out: any = normalizeWordV1(word as any);
-    if (out && typeof out.normalizedWord === "string") return out.normalizedWord;
-    if (typeof out === "string") return out;
-  } catch {
-    // ignore
-  }
-  return String(word ?? "").trim().toLowerCase();
+function normalizeWordBasisV0_1(input: string): string {
+  const raw = String(input ?? "");
+  const trimmed = raw.trim();
+  if (!trimmed) return "";
+
+  const collapsed = trimmed.replace(/\s+/g, " ");
+  const tokens = collapsed.split(" ").filter(Boolean);
+
+  // Keep diacritics (ë stays ë). Normalize Unicode form to reduce weird edge cases.
+  return tokens[0].normalize("NFKC").toLowerCase();
 }
 
-function splitVowelPathTextV0_1(pathText: unknown): SevenVowel[] {
-  const s = String(pathText ?? "").trim();
-  if (!s) return [];
-  // v1 emits "A-E-I" (dash). Keep parsing strict.
-  const parts = s.split("-").map((p) => p.trim().toUpperCase());
-  const out: SevenVowel[] = [];
-  for (const p of parts) {
-    if (isSevenVowel(p)) out.push(p);
-  }
-  return out;
+function canonicalBasisV0_1(word: string): string {
+  return normalizeWordBasisV0_1(word);
 }
 
 function extractSevenVowelsFromBasisV0_1(basis: string): SevenVowel[] {
