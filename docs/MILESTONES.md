@@ -124,6 +124,7 @@ This milestone is DONE when:
 ## Verifier
 
 - ✅ VERIFIER_API_v0.1 — `docs/milestones/VERIFIER_API_v0.1.md`
+- ✅ VERIFIER_SURFACE_PARITY_v0.1.1 — `docs/milestones/VERIFIER_SURFACE_PARITY_v0.1.1_DONE.md`
 
 ## Verifier Canon
 
