@@ -120,3 +120,7 @@ This milestone is DONE when:
 - PR #331 — `fix(deeproot-heart-gate-no-global-fallback-v0.1.2)` (code)
 - PR #332 — `docs(milestones): add DeepRoot–Heart gate no-global-fallback v0.1.2` (docs)
 
+
+## Verifier
+
+- ✅ VERIFIER_API_v0.1 — `docs/milestones/VERIFIER_API_v0.1.md`
