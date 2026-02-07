@@ -4,6 +4,11 @@ export type ProposerRequestV0_2 = {
   word: string;
   mode: "strict" | "open";
   systemPrompt: string;
+  /**
+   * Optional: structured user payload. If omitted, {word, mode} is used.
+   * Used by v0.3 loop to send repair failReasons deterministically.
+   */
+  userPayload?: unknown;
 };
 
 export type ProposerResultV0_2 = {
@@ -26,7 +31,7 @@ async function proposeMock(req: ProposerRequestV0_2): Promise<ProposerResultV0_2
       { form: req.word, opsUsed: [], decomposition: { statement: "mock proposer v0.2" } },
     ],
   };
-  return { provider: "mock", rawText: JSON.stringify(proposal, null, 2) };
+  return { provider: "mock", rawText: JSON.stringify(proposal, null, 2), meta: { model: "mock" } };
 }
 
 async function proposeOpenAICompat(req: ProposerRequestV0_2): Promise<ProposerResultV0_2> {
@@ -44,12 +49,14 @@ async function proposeOpenAICompat(req: ProposerRequestV0_2): Promise<ProposerRe
     throw new Error("openai_compat not configured (need OPENAI_API_KEY + OPENAI_MODEL)");
   }
 
+  const userPayload = req.userPayload ?? { word: req.word, mode: req.mode };
+
   const body = {
     model,
     temperature: 0,
     messages: [
       { role: "system", content: req.systemPrompt },
-      { role: "user", content: JSON.stringify({ word: req.word, mode: req.mode }) },
+      { role: "user", content: JSON.stringify(userPayload) },
     ],
   };
 
