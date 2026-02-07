@@ -19,6 +19,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         "smoothRatio": 0,
       },
     },
+    "debug": undefined,
     "deepRoot": {
       "basis": "123",
       "candidates": [],
@@ -154,6 +155,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
       "surfaceVowels": [],
       "values1to7": [],
     },
+    "heartPrimaryPath": undefined,
     "languageFamilies": [],
     "meta": {
       "inputs": {
@@ -550,6 +552,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         "smoothRatio": 1,
       },
     },
+    "debug": undefined,
     "deepRoot": {
       "basis": "O'Neill",
       "candidates": [],
@@ -745,6 +748,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         3,
       ],
     },
+    "heartPrimaryPath": undefined,
     "languageFamilies": [],
     "meta": {
       "inputs": {
@@ -1218,6 +1222,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         "smoothRatio": 0.25,
       },
     },
+    "debug": undefined,
     "deepRoot": {
       "basis": "co-operate",
       "candidates": [],
@@ -1449,6 +1454,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         2,
       ],
     },
+    "heartPrimaryPath": undefined,
     "languageFamilies": [],
     "meta": {
       "inputs": {
@@ -1976,6 +1982,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         "smoothRatio": 0.3333333333333333,
       },
     },
+    "debug": undefined,
     "deepRoot": {
       "basis": "damage",
       "candidates": [],
@@ -2181,6 +2188,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         2,
       ],
     },
+    "heartPrimaryPath": undefined,
     "languageFamilies": [],
     "meta": {
       "inputs": {
@@ -2924,6 +2932,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         "smoothRatio": 0,
       },
     },
+    "debug": undefined,
     "deepRoot": {
       "basis": "diet",
       "candidates": [],
@@ -3085,6 +3094,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         2,
       ],
     },
+    "heartPrimaryPath": undefined,
     "languageFamilies": [],
     "meta": {
       "inputs": {
@@ -3526,6 +3536,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         "smoothRatio": 0.5,
       },
     },
+    "debug": undefined,
     "deepRoot": {
       "basis": "father",
       "candidates": [],
@@ -3719,6 +3730,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         2,
       ],
     },
+    "heartPrimaryPath": undefined,
     "languageFamilies": [],
     "meta": {
       "inputs": {
@@ -4460,6 +4472,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         "smoothRatio": 0,
       },
     },
+    "debug": undefined,
     "deepRoot": {
       "basis": "gjak",
       "candidates": [],
@@ -4604,6 +4617,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         1,
       ],
     },
+    "heartPrimaryPath": undefined,
     "languageFamilies": [],
     "meta": {
       "inputs": {
@@ -5024,6 +5038,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         "smoothRatio": 0.6,
       },
     },
+    "debug": undefined,
     "deepRoot": {
       "basis": "internet",
       "candidates": [],
@@ -5207,6 +5222,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         2,
       ],
     },
+    "heartPrimaryPath": undefined,
     "languageFamilies": [],
     "meta": {
       "inputs": {
@@ -5667,6 +5683,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         "smoothRatio": 0.5,
       },
     },
+    "debug": undefined,
     "deepRoot": {
       "basis": "language",
       "candidates": [],
@@ -5885,6 +5902,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         2,
       ],
     },
+    "heartPrimaryPath": undefined,
     "languageFamilies": [],
     "meta": {
       "inputs": {
@@ -6400,6 +6418,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         "smoothRatio": 0.5,
       },
     },
+    "debug": undefined,
     "deepRoot": {
       "basis": "love",
       "candidates": [],
@@ -6568,6 +6587,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         2,
       ],
     },
+    "heartPrimaryPath": undefined,
     "languageFamilies": [],
     "meta": {
       "inputs": {
@@ -7314,6 +7334,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         "smoothRatio": 0.42857142857142855,
       },
     },
+    "debug": undefined,
     "deepRoot": {
       "basis": "mathematics",
       "candidates": [],
@@ -7529,6 +7550,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         3,
       ],
     },
+    "heartPrimaryPath": undefined,
     "languageFamilies": [],
     "meta": {
       "inputs": {
@@ -8028,6 +8050,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         "smoothRatio": 0.5,
       },
     },
+    "debug": undefined,
     "deepRoot": {
       "basis": "naïve",
       "candidates": [],
@@ -8196,6 +8219,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         2,
       ],
     },
+    "heartPrimaryPath": undefined,
     "languageFamilies": [],
     "meta": {
       "inputs": {
@@ -8640,6 +8664,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         "smoothRatio": 0.5,
       },
     },
+    "debug": undefined,
     "deepRoot": {
       "basis": "philosophy",
       "candidates": [],
@@ -8848,6 +8873,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         6,
       ],
     },
+    "heartPrimaryPath": undefined,
     "languageFamilies": [],
     "meta": {
       "inputs": {
@@ -9345,6 +9371,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         "smoothRatio": 0.6666666666666666,
       },
     },
+    "debug": undefined,
     "deepRoot": {
       "basis": "résumé",
       "candidates": [],
@@ -9489,6 +9516,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         5,
       ],
     },
+    "heartPrimaryPath": undefined,
     "languageFamilies": [],
     "meta": {
       "inputs": {
@@ -9905,6 +9933,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         "smoothRatio": 0.5,
       },
     },
+    "debug": undefined,
     "deepRoot": {
       "basis": "sterile",
       "candidates": [],
@@ -10096,6 +10125,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         2,
       ],
     },
+    "heartPrimaryPath": undefined,
     "languageFamilies": [],
     "meta": {
       "inputs": {
@@ -10582,6 +10612,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         "smoothRatio": 0,
       },
     },
+    "debug": undefined,
     "deepRoot": {
       "basis": "study",
       "candidates": [
@@ -10981,6 +11012,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         6,
       ],
     },
+    "heartPrimaryPath": undefined,
     "languageFamilies": [],
     "meta": {
       "inputs": {
@@ -12138,6 +12170,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         "smoothRatio": 0,
       },
     },
+    "debug": undefined,
     "deepRoot": {
       "basis": "y",
       "candidates": [],
@@ -12287,6 +12320,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         6,
       ],
     },
+    "heartPrimaryPath": undefined,
     "languageFamilies": [],
     "meta": {
       "inputs": {
@@ -12678,6 +12712,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         "smoothRatio": 0,
       },
     },
+    "debug": undefined,
     "deepRoot": {
       "basis": "ë",
       "candidates": [],
@@ -12820,6 +12855,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         7,
       ],
     },
+    "heartPrimaryPath": undefined,
     "languageFamilies": [],
     "meta": {
       "inputs": {
