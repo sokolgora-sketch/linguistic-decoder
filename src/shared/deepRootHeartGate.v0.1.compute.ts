@@ -19,8 +19,10 @@ function terminalVowel(path: string): string | null {
     s.includes("->") ? s.split("->") :
     s.includes("-") ? s.split("-") :
     [s];
-  const last = parts[parts.length - 1]?.trim();
-  return last ? last : null;
+  const lastRaw = parts[parts.length - 1]?.trim();
+    const last = lastRaw ? lastRaw.toLocaleUpperCase() : "";
+    if (!last) return null;
+    return /^(A|E|I|O|U|Y|Ë)$/.test(last) ? last : null;
 }
 
 function stableUniq(arr: string[]): string[] {

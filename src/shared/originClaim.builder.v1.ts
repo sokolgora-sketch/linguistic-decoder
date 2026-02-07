@@ -14,6 +14,7 @@ import {
 } from "./originClaim.v1";
 
 import { computeDeepRootHeartGateV01 } from "./deepRootHeartGate.v0.1.compute";
+import { resolveVoiceSeqV0_1 } from "./voiceSeq.resolve.v0.1";
 /**
  * Minimal adapter interface to keep builder decoupled.
  * Replace `any` with your real AnalyzeWordResultV1 type when wiring.
@@ -90,88 +91,55 @@ function extractCandidates(result: AnalyzeWordResultV1Like): any[] {
 }
 
 function extractPrimaryVoicePath(result: AnalyzeWordResultV1Like): string[] | null {
-  const fromArray = (v: any): string[] | null =>
-    Array.isArray(v) ? v.map(String).filter(Boolean) : null;
-
-  const fromString = (s: any): string[] | null => {
-    if (typeof s !== "string") return null;
-    const m = s.match(/[AEIOUYË]/gi);
-    if (!m || m.length === 0) return null;
-    return m.map((x) => x.toLocaleUpperCase());
-  };
-
   // 0) Most stable v1 slot (public contract)
   const p0 = result?.primaryPath?.voicePath;
-  const a0 = fromArray(p0);
-  if (a0) return a0;
-  const s0 = fromString(p0);
-  if (s0) return s0;
+  const r0 = resolveVoiceSeqV0_1(p0);
+  if (r0) return r0;
 
   // 1) Evidence math7 (common stable emitter)
   const pE = result?.evidence?.math7?.primary?.vowels;
-  const aE = fromArray(pE);
-  if (aE) return aE;
+  const rE = resolveVoiceSeqV0_1(pE);
+  if (rE) return rE;
 
   // 2) Heart math7 primary (actual engine slot in current JSON)
   const pH = result?.heart?.math7?.primary?.vowels;
-  const aH = fromArray(pH);
-  if (aH) return aH;
+  const rH = resolveVoiceSeqV0_1(pH);
+  if (rH) return rH;
 
   // 3) Legacy-ish fallbacks (arrays or strings)
   const p1 = result?.heart?.voices?.primaryPath;
-  const a1 = fromArray(p1);
-  if (a1) return a1;
-  const s1 = fromString(p1);
-  if (s1) return s1;
+  const r1 = resolveVoiceSeqV0_1(p1);
+  if (r1) return r1;
 
   const p2 = result?.voices?.primaryPath;
-  const a2 = fromArray(p2);
-  if (a2) return a2;
-  const s2 = fromString(p2);
-  if (s2) return s2;
+  const r2 = resolveVoiceSeqV0_1(p2);
+  if (r2) return r2;
 
   const p3 = result?.heart?.math7?.vowels;
-  const a3 = fromArray(p3);
-  if (a3) return a3;
+  const r3 = resolveVoiceSeqV0_1(p3);
+  if (r3) return r3;
 
   return null;
 }
 
 function extractCandidateVoiceSeq(cand: any): string[] | null {
-  const fromArray = (v: any): string[] | null =>
-    Array.isArray(v) ? v.map(String).filter(Boolean) : null;
-
-  const fromString = (s: any): string[] | null => {
-    if (typeof s !== "string") return null;
-    // Extract only the seven vowels, in order, from strings like:
-    // "U-I", "U → I", "U → I (note)", "U I"
-    const m = s.match(/[AEIOUYË]/gi);
-    if (!m || m.length === 0) return null;
-    return m.map((x) => x.toLocaleUpperCase());
-  };
-
   // 1) canonical array
-  const v1 = cand?.voices?.voiceSequence;
-  const a1 = fromArray(v1);
-  if (a1) return a1;
+  const v1 = resolveVoiceSeqV0_1(cand?.voices?.voiceSequence);
+  if (v1) return v1;
 
-  // 2) other plausible string slots
-  const v1s = cand?.voices?.voicePath;
-  const s1 = fromString(v1s);
-  if (s1) return s1;
+  // 2) plausible string slot
+  const v1s = resolveVoiceSeqV0_1(cand?.voices?.voicePath);
+  if (v1s) return v1s;
 
   // 3) candidate-level fields (array or string)
-  const v2 = cand?.vowel_path;
-  const a2 = fromArray(v2);
-  if (a2) return a2;
-  const s2 = fromString(v2);
-  if (s2) return s2;
+  const v2 = resolveVoiceSeqV0_1(cand?.vowel_path);
+  if (v2) return v2;
 
-  const v3 = cand?.vowelPath;
-  const a3 = fromArray(v3);
-  if (a3) return a3;
-  const s3 = fromString(v3);
-  if (s3) return s3;
+  const v3 = resolveVoiceSeqV0_1(cand?.vowelPath);
+  if (v3) return v3;
+
+  const v4 = resolveVoiceSeqV0_1(cand?.voicePath ?? cand?.voice_path);
+  if (v4) return v4;
 
   return null;
 }
@@ -312,27 +280,15 @@ function computeSupportVector(result: AnalyzeWordResultV1Like, cand: any): Suppo
     // C5 DeepRoot–Heart Alignment Gate v0.1 (strict-mode requirement for medium+)
     // Adapter-safe: uses emitted/derived vowel sequences; NEVER reads raw payload.
     {
-      const fromArray = (v: any): string[] | null =>
-        Array.isArray(v) ? v.map(String).map((s: string) => s.trim()).filter(Boolean) : null;
+        const heartExplicit = resolveVoiceSeqV0_1((result as any)?.heartPrimaryPath);
+        const heartForGateSeq = heartExplicit ?? primary;
 
-      const fromString = (s: any): string[] | null => {
-        if (typeof s !== "string") return null;
-        const m = s.match(/[AEIOUYË]/gi);
-        if (!m || m.length === 0) return null;
-        return m.map((x) => x.toLocaleUpperCase());
-      };
+        const fr0 = (result as any)?.deepRoot?.functionalRoots?.[0] ?? null;
+        const deepRootFunctionalForGateSeq = fr0
+          ? resolveVoiceSeqV0_1(fr0?.vowelPath ?? fr0?.vowel_path ?? fr0?.voicePath ?? fr0?.voice_path ?? null)
+          : null;
 
-      const seqFromAny = (v: any): string[] | null => fromArray(v) ?? fromString(v);
-
-      const heartExplicit = seqFromAny((result as any)?.heartPrimaryPath);
-      const heartForGateSeq = heartExplicit ?? primary;
-
-      const fr0 = (result as any)?.deepRoot?.functionalRoots?.[0] ?? null;
-      const deepRootFunctionalForGateSeq = fr0
-        ? (seqFromAny(fr0?.vowelPath ?? fr0?.vowel_path ?? fr0?.voicePath ?? fr0?.voice_path ?? null))
-        : null;
-
-      const candSeqForGate = extractCandidateVoiceSeq(cand);
+        const candSeqForGate = extractCandidateVoiceSeq(cand);
       const candidateResolvedForGateSeq =
         (candSeqForGate && candSeqForGate.length ? candSeqForGate : null) ??
         (deepRootFunctionalForGateSeq && deepRootFunctionalForGateSeq.length ? deepRootFunctionalForGateSeq : null);
