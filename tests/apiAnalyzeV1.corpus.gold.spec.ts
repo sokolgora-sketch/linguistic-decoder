@@ -25,9 +25,6 @@ const CORPUS = [
   "y",
 ] as const;
 
-// Doctrine v0.1: normalize ONLY meta.created / meta.generatedAt via normalizeForSnapshotV0_1.
-// Any other volatile fields must be removed/fixed at the source (contract projection), not normalized away.
-
 describe("apiAnalyzeV1 — corpus gold (contract projection)", () => {
   jest.setTimeout(180_000);
 
@@ -46,9 +43,10 @@ describe("apiAnalyzeV1 — corpus gold (contract projection)", () => {
       const json = await res.json();
       const contract = toAnalyzeWordResultV1Contract(json);
 
-      out[word] = normalizeForSnapshotV0_1(contract);
-}
+      // Doctrine v0.1: ONLY strip meta.created/meta.generatedAt via normalizeForSnapshotV0_1 at snapshot boundary.
+      out[word] = contract;
+    }
 
-    expect(out).toMatchSnapshot();
-});
+    expect(normalizeForSnapshotV0_1(out)).toMatchSnapshot();
+  });
 });
