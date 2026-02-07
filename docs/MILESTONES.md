@@ -124,3 +124,7 @@ This milestone is DONE when:
 ## Verifier
 
 - ✅ VERIFIER_API_v0.1 — `docs/milestones/VERIFIER_API_v0.1.md`
+
+## Verifier Canon
+
+- ⏳ CANON_VERIFIER_BATTERY_v0.1 — `docs/milestones/CANON_VERIFIER_BATTERY_v0.1.md`

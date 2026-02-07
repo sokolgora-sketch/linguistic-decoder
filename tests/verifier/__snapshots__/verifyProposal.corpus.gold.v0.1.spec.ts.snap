@@ -1,0 +1,369 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Verifier API: corpus gold (v0.1) fixture: damage.json 1`] = `
+{
+  "mode": "strict",
+  "overallPass": true,
+  "results": [
+    {
+      "checks": [
+        {
+          "id": "OPS_ALLOWED",
+          "pass": true,
+          "reason": "No opsUsed tokens provided.",
+        },
+        {
+          "id": "DECOMP_PRESENT",
+          "pass": true,
+          "reason": "Decomposition present.",
+        },
+        {
+          "id": "PATH_MATCH",
+          "pass": true,
+          "reason": "No vowelPath provided (not checked in v0.1).",
+        },
+      ],
+      "extractedVowelPath": [
+        "A",
+        "A",
+        "E",
+      ],
+      "form": "damage",
+      "normalizedOpsUsed": [],
+      "pass": true,
+    },
+  ],
+  "rulesVersion": "v0.1",
+  "surface": {
+    "basis": "damage",
+    "math7": {
+      "events": [],
+      "jumps": [],
+      "rawSum": 4,
+      "total1to7": 4,
+      "values1to7": [
+        1,
+        1,
+        2,
+      ],
+      "wrapCount": 0,
+    },
+    "principlesPath": [
+      "A",
+      "A",
+      "E",
+    ],
+    "vowels": [
+      "A",
+      "A",
+      "E",
+    ],
+  },
+  "verifierVersion": "v0.1",
+  "word": "damage",
+}
+`;
+
+exports[`Verifier API: corpus gold (v0.1) fixture: dem_albanian.json 1`] = `
+{
+  "mode": "strict",
+  "overallPass": true,
+  "results": [
+    {
+      "checks": [
+        {
+          "id": "OPS_ALLOWED",
+          "pass": true,
+          "reason": "No opsUsed tokens provided.",
+        },
+        {
+          "id": "DECOMP_PRESENT",
+          "pass": true,
+          "reason": "Decomposition present.",
+        },
+        {
+          "id": "PATH_MATCH",
+          "pass": true,
+          "reason": "No vowelPath provided (not checked in v0.1).",
+        },
+      ],
+      "extractedVowelPath": [
+        "Ë",
+      ],
+      "form": "dëm",
+      "normalizedOpsUsed": [],
+      "pass": true,
+    },
+  ],
+  "rulesVersion": "v0.1",
+  "surface": {
+    "basis": "dëm",
+    "math7": {
+      "events": [],
+      "jumps": [],
+      "rawSum": 7,
+      "total1to7": 7,
+      "values1to7": [
+        7,
+      ],
+      "wrapCount": 0,
+    },
+    "principlesPath": [
+      "Ë",
+    ],
+    "vowels": [
+      "Ë",
+    ],
+  },
+  "verifierVersion": "v0.1",
+  "word": "dëm",
+}
+`;
+
+exports[`Verifier API: corpus gold (v0.1) fixture: father.json 1`] = `
+{
+  "mode": "strict",
+  "overallPass": true,
+  "results": [
+    {
+      "checks": [
+        {
+          "id": "OPS_ALLOWED",
+          "pass": true,
+          "reason": "No opsUsed tokens provided.",
+        },
+        {
+          "id": "DECOMP_PRESENT",
+          "pass": true,
+          "reason": "Decomposition present.",
+        },
+        {
+          "id": "PATH_MATCH",
+          "pass": true,
+          "reason": "No vowelPath provided (not checked in v0.1).",
+        },
+      ],
+      "extractedVowelPath": [
+        "A",
+        "E",
+      ],
+      "form": "father",
+      "normalizedOpsUsed": [],
+      "pass": true,
+    },
+  ],
+  "rulesVersion": "v0.1",
+  "surface": {
+    "basis": "father",
+    "math7": {
+      "events": [],
+      "jumps": [],
+      "rawSum": 3,
+      "total1to7": 3,
+      "values1to7": [
+        1,
+        2,
+      ],
+      "wrapCount": 0,
+    },
+    "principlesPath": [
+      "A",
+      "E",
+    ],
+    "vowels": [
+      "A",
+      "E",
+    ],
+  },
+  "verifierVersion": "v0.1",
+  "word": "father",
+}
+`;
+
+exports[`Verifier API: corpus gold (v0.1) fixture: language.json 1`] = `
+{
+  "mode": "strict",
+  "overallPass": true,
+  "results": [
+    {
+      "checks": [
+        {
+          "id": "OPS_ALLOWED",
+          "pass": true,
+          "reason": "No opsUsed tokens provided.",
+        },
+        {
+          "id": "DECOMP_PRESENT",
+          "pass": true,
+          "reason": "Decomposition present.",
+        },
+        {
+          "id": "PATH_MATCH",
+          "pass": true,
+          "reason": "No vowelPath provided (not checked in v0.1).",
+        },
+      ],
+      "extractedVowelPath": [
+        "A",
+        "U",
+        "A",
+        "E",
+      ],
+      "form": "language",
+      "normalizedOpsUsed": [],
+      "pass": true,
+    },
+  ],
+  "rulesVersion": "v0.1",
+  "surface": {
+    "basis": "language",
+    "math7": {
+      "events": [],
+      "jumps": [],
+      "rawSum": 9,
+      "total1to7": 2,
+      "values1to7": [
+        1,
+        5,
+        1,
+        2,
+      ],
+      "wrapCount": 1,
+    },
+    "principlesPath": [
+      "A",
+      "U",
+      "A",
+      "E",
+    ],
+    "vowels": [
+      "A",
+      "U",
+      "A",
+      "E",
+    ],
+  },
+  "verifierVersion": "v0.1",
+  "word": "language",
+}
+`;
+
+exports[`Verifier API: corpus gold (v0.1) fixture: mother.json 1`] = `
+{
+  "mode": "strict",
+  "overallPass": true,
+  "results": [
+    {
+      "checks": [
+        {
+          "id": "OPS_ALLOWED",
+          "pass": true,
+          "reason": "No opsUsed tokens provided.",
+        },
+        {
+          "id": "DECOMP_PRESENT",
+          "pass": true,
+          "reason": "Decomposition present.",
+        },
+        {
+          "id": "PATH_MATCH",
+          "pass": true,
+          "reason": "No vowelPath provided (not checked in v0.1).",
+        },
+      ],
+      "extractedVowelPath": [
+        "O",
+        "E",
+      ],
+      "form": "mother",
+      "normalizedOpsUsed": [],
+      "pass": true,
+    },
+  ],
+  "rulesVersion": "v0.1",
+  "surface": {
+    "basis": "mother",
+    "math7": {
+      "events": [],
+      "jumps": [],
+      "rawSum": 6,
+      "total1to7": 6,
+      "values1to7": [
+        4,
+        2,
+      ],
+      "wrapCount": 0,
+    },
+    "principlesPath": [
+      "O",
+      "E",
+    ],
+    "vowels": [
+      "O",
+      "E",
+    ],
+  },
+  "verifierVersion": "v0.1",
+  "word": "mother",
+}
+`;
+
+exports[`Verifier API: corpus gold (v0.1) fixture: study.json 1`] = `
+{
+  "mode": "strict",
+  "overallPass": true,
+  "results": [
+    {
+      "checks": [
+        {
+          "id": "OPS_ALLOWED",
+          "pass": true,
+          "reason": "No opsUsed tokens provided.",
+        },
+        {
+          "id": "DECOMP_PRESENT",
+          "pass": true,
+          "reason": "Decomposition present.",
+        },
+        {
+          "id": "PATH_MATCH",
+          "pass": true,
+          "reason": "No vowelPath provided (not checked in v0.1).",
+        },
+      ],
+      "extractedVowelPath": [
+        "U",
+        "Y",
+      ],
+      "form": "study",
+      "normalizedOpsUsed": [],
+      "pass": true,
+    },
+  ],
+  "rulesVersion": "v0.1",
+  "surface": {
+    "basis": "study",
+    "math7": {
+      "events": [],
+      "jumps": [],
+      "rawSum": 11,
+      "total1to7": 4,
+      "values1to7": [
+        5,
+        6,
+      ],
+      "wrapCount": 1,
+    },
+    "principlesPath": [
+      "U",
+      "Y",
+    ],
+    "vowels": [
+      "U",
+      "Y",
+    ],
+  },
+  "verifierVersion": "v0.1",
+  "word": "study",
+}
+`;
