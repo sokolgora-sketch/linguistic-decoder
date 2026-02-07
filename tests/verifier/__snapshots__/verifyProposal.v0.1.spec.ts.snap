@@ -1,0 +1,92 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Verifier API: verifyProposal v0.1 rejects illegal opsUsed deterministically + reports checks 1`] = `
+{
+  "mode": "strict",
+  "overallPass": true,
+  "results": [
+    {
+      "checks": [
+        {
+          "id": "OPS_ALLOWED",
+          "pass": false,
+          "reason": "Illegal opsUsed token(s): OP_NOT_REAL___ILLEGAL",
+        },
+        {
+          "id": "DECOMP_PRESENT",
+          "pass": true,
+          "reason": "Decomposition present.",
+        },
+        {
+          "id": "PATH_MATCH",
+          "pass": true,
+          "reason": "Provided vowelPath matches extracted path.",
+        },
+      ],
+      "extractedVowelPath": [
+        "A",
+        "A",
+        "E",
+      ],
+      "form": "damage",
+      "normalizedOpsUsed": [],
+      "pass": false,
+    },
+    {
+      "checks": [
+        {
+          "id": "OPS_ALLOWED",
+          "pass": true,
+          "reason": "No opsUsed tokens provided.",
+        },
+        {
+          "id": "DECOMP_PRESENT",
+          "pass": true,
+          "reason": "Decomposition present.",
+        },
+        {
+          "id": "PATH_MATCH",
+          "pass": true,
+          "reason": "No vowelPath provided (not checked in v0.1).",
+        },
+      ],
+      "extractedVowelPath": [
+        "A",
+        "A",
+        "E",
+      ],
+      "form": "damage",
+      "normalizedOpsUsed": [],
+      "pass": true,
+    },
+  ],
+  "rulesVersion": "v0.1",
+  "surface": {
+    "basis": "damage",
+    "math7": {
+      "events": [],
+      "jumps": [],
+      "rawSum": 4,
+      "total1to7": 4,
+      "values1to7": [
+        1,
+        1,
+        2,
+      ],
+      "wrapCount": 0,
+    },
+    "principlesPath": [
+      "A",
+      "A",
+      "E",
+    ],
+    "vowels": [
+      "A",
+      "A",
+      "E",
+    ],
+  },
+  "verifierVersion": "v0.1",
+  "word": "damage",
+}
+`;
