@@ -8,6 +8,7 @@
  */
 
 import { TextEncoder, TextDecoder } from "node:util";
+import { normalizeForSnapshotV0_1 } from "./_helpers/snapshotNormalize.v0.1";
 import { ReadableStream, TransformStream, WritableStream } from "node:stream/web";
 import { MessageChannel, MessagePort } from "node:worker_threads";
 import { buildOriginClaimV1 } from "../src/shared/originClaim.builder.v1";

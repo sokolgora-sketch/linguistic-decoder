@@ -1,4 +1,5 @@
 import { NextRequest } from "next/server";
+import { normalizeForSnapshotV0_1 } from "./_helpers/snapshotNormalize.v0.1";
 import { GET } from "@/app/api/analyze-v1/route";
 import { toAnalyzeWordResultV1Contract } from "@/shared/analyzeWordResult.v1.contract";
 
@@ -89,6 +90,6 @@ describe("apiAnalyzeV1 — corpus gold (contract projection)", () => {
       out[word] = normalizeForSnapshot(contract);
     }
 
-    expect(out).toMatchSnapshot();
+    expect(normalizeForSnapshotV0_1(out)).toMatchSnapshot();
   });
 });

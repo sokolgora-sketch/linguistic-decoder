@@ -1,4 +1,5 @@
 import { analyzeWordV1 } from "../src/engine/analyzeWordV1";
+import { normalizeForSnapshotV0_1 } from "./_helpers/snapshotNormalize.v0.1";
 
 /**
  * Snapshot must not include time-varying fields.
