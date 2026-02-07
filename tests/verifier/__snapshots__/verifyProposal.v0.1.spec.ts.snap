@@ -64,10 +64,15 @@ exports[`Verifier API: verifyProposal v0.1 rejects illegal opsUsed deterministic
   "surface": {
     "basis": "damage",
     "math7": {
-      "events": [],
-      "jumps": [],
+      "events": [
+        "COMPLETION",
+      ],
+      "jumps": [
+        0,
+        1,
+      ],
       "rawSum": 4,
-      "total1to7": 4,
+      "total1to7": 2,
       "values1to7": [
         1,
         1,
@@ -76,9 +81,9 @@ exports[`Verifier API: verifyProposal v0.1 rejects illegal opsUsed deterministic
       "wrapCount": 0,
     },
     "principlesPath": [
-      "A",
-      "A",
-      "E",
+      "TRUTH",
+      "TRUTH",
+      "EXPANSION",
     ],
     "vowels": [
       "A",

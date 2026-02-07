@@ -37,10 +37,15 @@ exports[`Verifier API: corpus gold (v0.1) fixture: damage.json 1`] = `
   "surface": {
     "basis": "damage",
     "math7": {
-      "events": [],
-      "jumps": [],
+      "events": [
+        "COMPLETION",
+      ],
+      "jumps": [
+        0,
+        1,
+      ],
       "rawSum": 4,
-      "total1to7": 4,
+      "total1to7": 2,
       "values1to7": [
         1,
         1,
@@ -49,9 +54,9 @@ exports[`Verifier API: corpus gold (v0.1) fixture: damage.json 1`] = `
       "wrapCount": 0,
     },
     "principlesPath": [
-      "A",
-      "A",
-      "E",
+      "TRUTH",
+      "TRUTH",
+      "EXPANSION",
     ],
     "vowels": [
       "A",
@@ -99,7 +104,9 @@ exports[`Verifier API: corpus gold (v0.1) fixture: dem_albanian.json 1`] = `
   "surface": {
     "basis": "dëm",
     "math7": {
-      "events": [],
+      "events": [
+        "COMPLETION",
+      ],
       "jumps": [],
       "rawSum": 7,
       "total1to7": 7,
@@ -109,7 +116,7 @@ exports[`Verifier API: corpus gold (v0.1) fixture: dem_albanian.json 1`] = `
       "wrapCount": 0,
     },
     "principlesPath": [
-      "Ë",
+      "EVOLUTION",
     ],
     "vowels": [
       "Ë",
@@ -156,10 +163,14 @@ exports[`Verifier API: corpus gold (v0.1) fixture: father.json 1`] = `
   "surface": {
     "basis": "father",
     "math7": {
-      "events": [],
-      "jumps": [],
+      "events": [
+        "COMPLETION",
+      ],
+      "jumps": [
+        1,
+      ],
       "rawSum": 3,
-      "total1to7": 3,
+      "total1to7": 2,
       "values1to7": [
         1,
         2,
@@ -167,8 +178,8 @@ exports[`Verifier API: corpus gold (v0.1) fixture: father.json 1`] = `
       "wrapCount": 0,
     },
     "principlesPath": [
-      "A",
-      "E",
+      "TRUTH",
+      "EXPANSION",
     ],
     "vowels": [
       "A",
@@ -218,10 +229,18 @@ exports[`Verifier API: corpus gold (v0.1) fixture: language.json 1`] = `
   "surface": {
     "basis": "language",
     "math7": {
-      "events": [],
-      "jumps": [],
+      "events": [
+        "WRAP_GATE",
+        "COMPLETION",
+        "NEW_CYCLE",
+      ],
+      "jumps": [
+        4,
+        3,
+        1,
+      ],
       "rawSum": 9,
-      "total1to7": 2,
+      "total1to7": 6,
       "values1to7": [
         1,
         5,
@@ -231,10 +250,10 @@ exports[`Verifier API: corpus gold (v0.1) fixture: language.json 1`] = `
       "wrapCount": 1,
     },
     "principlesPath": [
-      "A",
-      "U",
-      "A",
-      "E",
+      "TRUTH",
+      "UNITY",
+      "TRUTH",
+      "EXPANSION",
     ],
     "vowels": [
       "A",
@@ -284,10 +303,14 @@ exports[`Verifier API: corpus gold (v0.1) fixture: mother.json 1`] = `
   "surface": {
     "basis": "mother",
     "math7": {
-      "events": [],
-      "jumps": [],
+      "events": [
+        "COMPLETION",
+      ],
+      "jumps": [
+        5,
+      ],
       "rawSum": 6,
-      "total1to7": 6,
+      "total1to7": 5,
       "values1to7": [
         4,
         2,
@@ -295,8 +318,8 @@ exports[`Verifier API: corpus gold (v0.1) fixture: mother.json 1`] = `
       "wrapCount": 0,
     },
     "principlesPath": [
-      "O",
-      "E",
+      "BALANCE",
+      "EXPANSION",
     ],
     "vowels": [
       "O",
@@ -333,7 +356,7 @@ exports[`Verifier API: corpus gold (v0.1) fixture: study.json 1`] = `
       ],
       "extractedVowelPath": [
         "U",
-        "Y",
+        "I",
       ],
       "form": "study",
       "normalizedOpsUsed": [],
@@ -344,23 +367,29 @@ exports[`Verifier API: corpus gold (v0.1) fixture: study.json 1`] = `
   "surface": {
     "basis": "study",
     "math7": {
-      "events": [],
-      "jumps": [],
-      "rawSum": 11,
-      "total1to7": 4,
+      "events": [
+        "WRAP_GATE",
+        "COMPLETION",
+        "INFINITE_PEACE",
+      ],
+      "jumps": [
+        5,
+      ],
+      "rawSum": 8,
+      "total1to7": 7,
       "values1to7": [
         5,
-        6,
+        3,
       ],
       "wrapCount": 1,
     },
     "principlesPath": [
-      "U",
-      "Y",
+      "UNITY",
+      "INSIGHT",
     ],
     "vowels": [
       "U",
-      "Y",
+      "I",
     ],
   },
   "verifierVersion": "v0.1",
