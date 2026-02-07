@@ -129,3 +129,4 @@ This milestone is DONE when:
 ## Verifier Canon
 
 - ✅ CANON_VERIFIER_BATTERY_v0.1 — `docs/milestones/CANON_VERIFIER_BATTERY_v0.1.md`
+- ⏳ PROPOSER_LOOP_ORCHESTRATOR_v0.2 — `docs/milestones/PROPOSER_LOOP_ORCHESTRATOR_v0.2.md`
