@@ -128,4 +128,4 @@ This milestone is DONE when:
 
 ## Verifier Canon
 
-- ⏳ CANON_VERIFIER_BATTERY_v0.1 — `docs/milestones/CANON_VERIFIER_BATTERY_v0.1.md`
+- ✅ CANON_VERIFIER_BATTERY_v0.1 — `docs/milestones/CANON_VERIFIER_BATTERY_v0.1.md`
