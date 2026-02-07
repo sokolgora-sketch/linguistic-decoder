@@ -1,4 +1,5 @@
 import { stableStringify } from "../src/shared/engineContract.v1";
+import { normalizeForSnapshotV0_1 } from "./_helpers/snapshotNormalize.v0.1";
 import { analyzeWordV1 } from "../src/v1/analyzeWordV1";
 
 type Mode = string;
@@ -68,7 +69,8 @@ describe("Engine Contract v1 — capture engine output (goldens)", () => {
       const out = await runAnalyzeWordV1(c.word, c.mode, c.alphabet);
       const json = stableStringify(out);
       expect(() => JSON.parse(json)).not.toThrow();
-      expect(json).toMatchSnapshot();
+      expect(normalizeForSnapshotV0_1(json)).toMatchSnapshot();
     });
   }
 });
+
