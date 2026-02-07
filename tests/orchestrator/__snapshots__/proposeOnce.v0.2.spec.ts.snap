@@ -1,0 +1,100 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Proposer loop: proposeOnce v0.2 (mock) returns proposal + verification deterministically (mock provider) 1`] = `
+{
+  "mode": "strict",
+  "ok": true,
+  "proposal": {
+    "candidates": [
+      {
+        "decomposition": {
+          "statement": "mock proposer v0.2",
+        },
+        "form": "study",
+        "opsUsed": [],
+        "vowelPath": undefined,
+      },
+    ],
+    "mode": "strict",
+    "word": "study",
+  },
+  "proposerRawText": "{
+  "word": "study",
+  "mode": "strict",
+  "candidates": [
+    {
+      "form": "study",
+      "opsUsed": [],
+      "decomposition": {
+        "statement": "mock proposer v0.2"
+      }
+    }
+  ]
+}",
+  "provider": "mock",
+  "verification": {
+    "mode": "strict",
+    "overallPass": true,
+    "results": [
+      {
+        "checks": [
+          {
+            "id": "OPS_ALLOWED",
+            "pass": true,
+            "reason": "No opsUsed tokens provided.",
+          },
+          {
+            "id": "DECOMP_PRESENT",
+            "pass": true,
+            "reason": "Decomposition present.",
+          },
+          {
+            "id": "PATH_MATCH",
+            "pass": true,
+            "reason": "No vowelPath provided (not checked in v0.1).",
+          },
+        ],
+        "extractedVowelPath": [
+          "U",
+          "I",
+        ],
+        "form": "study",
+        "normalizedOpsUsed": [],
+        "pass": true,
+      },
+    ],
+    "rulesVersion": "v0.1",
+    "surface": {
+      "basis": "study",
+      "math7": {
+        "events": [
+          "WRAP_GATE",
+          "COMPLETION",
+          "INFINITE_PEACE",
+        ],
+        "jumps": [
+          5,
+        ],
+        "rawSum": 8,
+        "total1to7": 7,
+        "values1to7": [
+          5,
+          3,
+        ],
+        "wrapCount": 1,
+      },
+      "principlesPath": [
+        "UNITY",
+        "INSIGHT",
+      ],
+      "vowels": [
+        "U",
+        "I",
+      ],
+    },
+    "verifierVersion": "v0.1",
+    "word": "study",
+  },
+  "word": "study",
+}
+`;
