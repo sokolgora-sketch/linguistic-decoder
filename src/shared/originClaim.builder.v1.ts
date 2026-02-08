@@ -373,7 +373,7 @@ function mapConfidence(
 
   // Strict-mode gate: medium+ requires DeepRoot alignment.
   const strict = (mode ?? "").toLocaleLowerCase() === "strict";
-  const strictGateBlocksMedium = strict && (!s.hasDeepRootAlign || !s.hasDeepRootHeartGateAligned);
+  const strictGateBlocksMedium = strict && !s.hasDeepRootHeartGateAligned;
   const noNeg = s.negatives === 0;
   const extraPos = Math.max(0, s.positives - 1); // beyond C1
 

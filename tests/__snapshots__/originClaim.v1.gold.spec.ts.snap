@@ -337,7 +337,7 @@ exports[`originClaim v1 — gold snapshots (originClaim block only) gold:study 1
 {
   "candidates": [
     {
-      "confidence": "weak",
+      "confidence": "strong",
       "evidenceRefs": [
         "primaryPath.voicePath",
         "heart.math7.primary",
@@ -356,7 +356,7 @@ exports[`originClaim v1 — gold snapshots (originClaim block only) gold:study 1
       "status": "pass",
     },
     {
-      "confidence": "weak",
+      "confidence": "strong",
       "evidenceRefs": [
         "primaryPath.voicePath",
         "heart.math7.primary",
@@ -422,8 +422,8 @@ exports[`originClaim v1 — gold snapshots (originClaim block only) gold:study 1
   },
   "policy": "no_single_winner",
   "summary": {
-    "confidence": "weak",
-    "note": "Computed from candidate/deepRoot/voice-path/morphology signals. Passing: 2; strong: 0; medium: 0.",
+    "confidence": "strong",
+    "note": "Computed from candidate/deepRoot/voice-path/morphology signals. Passing: 2; strong: 2; medium: 0.",
   },
   "support": {
     "claimId": "oc:study",
