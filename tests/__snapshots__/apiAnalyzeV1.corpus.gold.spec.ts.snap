@@ -11035,7 +11035,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
     "originClaim": {
       "candidates": [
         {
-          "confidence": "weak",
+          "confidence": "strong",
           "evidenceRefs": [
             "primaryPath.voicePath",
             "heart.math7.primary",
@@ -11054,7 +11054,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
           "status": "pass",
         },
         {
-          "confidence": "weak",
+          "confidence": "strong",
           "evidenceRefs": [
             "primaryPath.voicePath",
             "heart.math7.primary",
@@ -11119,8 +11119,8 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
       },
       "policy": "no_single_winner",
       "summary": {
-        "confidence": "weak",
-        "note": "Computed from candidate/deepRoot/voice-path/morphology signals. Passing: 2; strong: 0; medium: 0.",
+        "confidence": "strong",
+        "note": "Computed from candidate/deepRoot/voice-path/morphology signals. Passing: 2; strong: 2; medium: 0.",
       },
       "support": {
         "claimId": "oc:study",
@@ -11662,7 +11662,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
       "originClaim": {
         "candidates": [
           {
-            "confidence": "weak",
+            "confidence": "strong",
             "evidenceRefs": [
               "primaryPath.voicePath",
               "heart.math7.primary",
@@ -11681,7 +11681,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
             "status": "pass",
           },
           {
-            "confidence": "weak",
+            "confidence": "strong",
             "evidenceRefs": [
               "primaryPath.voicePath",
               "heart.math7.primary",
@@ -11746,8 +11746,8 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         },
         "policy": "no_single_winner",
         "summary": {
-          "confidence": "weak",
-          "note": "Computed from candidate/deepRoot/voice-path/morphology signals. Passing: 2; strong: 0; medium: 0.",
+          "confidence": "strong",
+          "note": "Computed from candidate/deepRoot/voice-path/morphology signals. Passing: 2; strong: 2; medium: 0.",
         },
         "support": {
           "claimId": "oc:study",
