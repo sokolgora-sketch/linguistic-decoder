@@ -371,7 +371,7 @@ function mapConfidence(
   // If nothing passes C1, always insufficient.
   if (!s.hasC1Pass) return "insufficient_evidence";
 
-  // Strict-mode gate: medium+ requires DeepRoot alignment.
+  // Strict-mode gate: medium+ requires DeepRoot–Heart Gate alignment.
   const strict = (mode ?? "").toLocaleLowerCase() === "strict";
   const strictGateBlocksMedium = strict && !s.hasDeepRootHeartGateAligned;
   const noNeg = s.negatives === 0;
