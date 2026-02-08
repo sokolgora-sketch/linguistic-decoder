@@ -584,6 +584,43 @@ exports[`C2 canon diff report v0.1 (snapshot) train + holdout report 1`] = `
     },
   },
   {
+    "id": "xx_empty_candidates_recover_v0_1",
+    "result": {
+      "final": {
+        "acceptedCandidateForms": [
+          "empty_candidates",
+        ],
+      },
+      "meta": {
+        "attemptsUsed": 2,
+        "cacheHit": false,
+        "maxAttempts": 2,
+        "model": "canon-mock",
+        "promptVersion": "v0.2",
+        "provider": "mock",
+        "rulesVersion": "v0.1",
+        "verifierVersion": "v0.1",
+      },
+      "mode": "strict",
+      "status": "PASS",
+      "trace": [
+        {
+          "attempt": 1,
+          "failReasons": [],
+          "parseOk": false,
+          "status": "PARSE_ERROR",
+        },
+        {
+          "attempt": 2,
+          "failReasons": [],
+          "parseOk": true,
+          "status": "PASS",
+        },
+      ],
+      "word": "empty_candidates",
+    },
+  },
+  {
     "id": "xx_forced_llm_error_v0_1",
     "result": {
       "final": null,
@@ -614,6 +651,37 @@ exports[`C2 canon diff report v0.1 (snapshot) train + holdout report 1`] = `
         },
       ],
       "word": "llm_error",
+    },
+  },
+  {
+    "id": "xx_open_mode_pass_v0_1",
+    "result": {
+      "final": {
+        "acceptedCandidateForms": [
+          "open",
+        ],
+      },
+      "meta": {
+        "attemptsUsed": 1,
+        "cacheHit": false,
+        "maxAttempts": 1,
+        "model": "canon-mock",
+        "promptVersion": "v0.2",
+        "provider": "mock",
+        "rulesVersion": "v0.1",
+        "verifierVersion": "v0.1",
+      },
+      "mode": "open",
+      "status": "PASS",
+      "trace": [
+        {
+          "attempt": 1,
+          "failReasons": [],
+          "parseOk": true,
+          "status": "PASS",
+        },
+      ],
+      "word": "open",
     },
   },
 ]
