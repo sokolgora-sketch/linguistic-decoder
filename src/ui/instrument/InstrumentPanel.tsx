@@ -6,6 +6,7 @@ import { VowelPathTimeline } from "./VowelPathTimeline";
 import { SevenPrinciplesSpectrumCard } from "./sections/SevenPrinciplesSpectrumCard";
 import { adaptAnalysisToTelemetryVM } from "@/ui/instrument/contractAdapter";
 import { RootMapCard } from "@/ui/instrument/RootMapCard";
+import { SoundRootsCard } from "@/ui/instrument/SoundRootsCard";
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
@@ -215,7 +216,13 @@ export function InstrumentPanel(props: Props) {
               
                 <WorldLanguageTreeCard lightMap={lightMap} />
 
-<RootMapCard
+<SoundRootsCard
+                  soundRoots={vm.soundRoots ?? ({ kind: "missing", missing: "not_emitted", note: "soundRoots" } as any)}
+                  word={String((vm.readout as any)?.word ?? (vm.readout as any)?.inputWord ?? "")}
+                  normalizedWord={normalizedWord}
+                />
+
+                <RootMapCard
                 rootMap={vm.rootMap ?? ({ kind: "missing", missing: "not_emitted", note: "rootMap" } as any)}
                 word={String((vm.readout as any)?.word ?? (vm.readout as any)?.inputWord ?? "")}
                 normalizedWord={normalizedWord}
