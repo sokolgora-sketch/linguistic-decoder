@@ -215,4 +215,42 @@ export const proposerCanonTrainV0_1: readonly CanonCaseV0_1[] = [
     expect: { status: "PASS", minAccepted: 1 },
   }
 
+,
+
+
+  {
+    id: "xx_valid_json_wrong_shape_recover_v0_1",
+    input: { word: "shape", mode: "strict", maxAttempts: 2, provider: "mock" },
+    attempts: [
+      // Valid JSON, WRONG top-level shape -> should FAIL schema/shape validation (NOT parse error)
+      JSON.stringify({ not: "a proposer response" }),
+
+      // Recover to PASS
+      mkPassAttempt("shape", "strict", "canon pass: shape (recovered after wrong top-level shape)"),
+    ],
+    expect: { status: "PASS", traceStatuses: ["PARSE_ERROR", "PASS"], minAccepted: 1 },
+  }
+
+,
+
+
+  {
+    id: "xx_candidate_missing_fields_recover_v0_1",
+    input: { word: "missing_fields", mode: "strict", maxAttempts: 2, provider: "mock" },
+    attempts: [
+      // Valid JSON + correct top-level keys, but candidate is missing required fields -> should FAIL
+      JSON.stringify({
+        word: "missing_fields",
+        mode: "strict",
+        candidates: [
+          { opsUsed: [], decomposition: { statement: "missing form should FAIL" } }, // missing `form`
+        ],
+      }),
+
+      // Recover to PASS
+      mkPassAttempt("missing_fields", "strict", "canon pass: missing_fields (recovered after missing candidate fields)"),
+    ],
+    expect: { status: "PASS", traceStatuses: ["PARSE_ERROR", "PASS"], minAccepted: 1 },
+  }
+
 ] as const;
