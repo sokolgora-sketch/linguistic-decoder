@@ -27,6 +27,27 @@ export type PresentOrMissing<T> =
 
 export type RootMapVM = RootMapV1;
 
+export type SoundRootsWarningVM = {
+  code: string;
+  domain: string;
+};
+
+export type SoundRootsMatchVM = {
+  domain: string;
+  root?: string;
+  carrier?: string;
+  gloss?: string;
+  note?: string;
+};
+
+export type SoundRootsVM = {
+  matches: SoundRootsMatchVM[];
+  domains: string[];
+  claimedDomains: string[];
+  missingDomains: string[];
+  warnings: SoundRootsWarningVM[];
+};
+
 export type ResonanceBucket = "source" | "boundary" | "manifest" | "mixed" | "none";
 
 export type ResonanceReadoutV1 = {
@@ -170,6 +191,7 @@ export interface TelemetryViewModel {
   originClaimGates: OriginClaimGatesVM;
     originClaim: PresentOrMissing<unknown>;
   rootMap: PresentOrMissing<RootMapVM>;
+  soundRoots: PresentOrMissing<SoundRootsVM>;
   resonanceProfileV1: PresentOrMissing<ResonanceProfileV1VM>;
   raw: unknown;
 }

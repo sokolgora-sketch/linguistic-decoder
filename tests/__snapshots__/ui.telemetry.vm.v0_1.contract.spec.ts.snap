@@ -574,5 +574,10 @@ exports[`ui telemetry vm contract v0.1 adapts analyze-v1 payload into stable Tel
       ],
     },
   },
+  "soundRoots": {
+    "kind": "missing",
+    "missing": "not_emitted",
+    "note": "soundRoots",
+  },
 }
 `;

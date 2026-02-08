@@ -10,6 +10,8 @@ import { normalizePrinciplesToLabels } from "@/v1/principles.vocab.v0.1";
  * - PresentOrMissing prevents silent emptiness.
  */
 
+import { adaptSoundRootsToVM } from "@/ui/telemetry/soundRootsVM.v0.1";
+
 import type {
   CandidateRowVM,
   DecompositionItemVM,
@@ -718,6 +720,7 @@ const originClaimGates: OriginClaimGatesVM = {
     originClaimGates,
       originClaim,
       rootMap,
+      soundRoots: adaptSoundRootsToVM(payload),
 
       resonanceProfileV1,
     raw,
