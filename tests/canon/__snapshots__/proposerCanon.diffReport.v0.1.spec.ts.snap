@@ -77,6 +77,37 @@ exports[`C2 canon diff report v0.1 (snapshot) train + holdout report 1`] = `
     },
   },
   {
+    "id": "en_mother_pass_v0_1",
+    "result": {
+      "final": {
+        "acceptedCandidateForms": [
+          "mother",
+        ],
+      },
+      "meta": {
+        "attemptsUsed": 1,
+        "cacheHit": false,
+        "maxAttempts": 1,
+        "model": "canon-mock",
+        "promptVersion": "v0.2",
+        "provider": "mock",
+        "rulesVersion": "v0.1",
+        "verifierVersion": "v0.1",
+      },
+      "mode": "strict",
+      "status": "PASS",
+      "trace": [
+        {
+          "attempt": 1,
+          "failReasons": [],
+          "parseOk": true,
+          "status": "PASS",
+        },
+      ],
+      "word": "mother",
+    },
+  },
+  {
     "id": "en_sterile_illegal_ops_v0_1",
     "result": {
       "final": {
@@ -398,6 +429,68 @@ exports[`C2 canon diff report v0.1 (snapshot) train + holdout report 1`] = `
     },
   },
   {
+    "id": "sq_moter_pass_v0_1",
+    "result": {
+      "final": {
+        "acceptedCandidateForms": [
+          "motër",
+        ],
+      },
+      "meta": {
+        "attemptsUsed": 1,
+        "cacheHit": false,
+        "maxAttempts": 1,
+        "model": "canon-mock",
+        "promptVersion": "v0.2",
+        "provider": "mock",
+        "rulesVersion": "v0.1",
+        "verifierVersion": "v0.1",
+      },
+      "mode": "strict",
+      "status": "PASS",
+      "trace": [
+        {
+          "attempt": 1,
+          "failReasons": [],
+          "parseOk": true,
+          "status": "PASS",
+        },
+      ],
+      "word": "motër",
+    },
+  },
+  {
+    "id": "sq_nate_pass_v0_1",
+    "result": {
+      "final": {
+        "acceptedCandidateForms": [
+          "natë",
+        ],
+      },
+      "meta": {
+        "attemptsUsed": 1,
+        "cacheHit": false,
+        "maxAttempts": 1,
+        "model": "canon-mock",
+        "promptVersion": "v0.2",
+        "provider": "mock",
+        "rulesVersion": "v0.1",
+        "verifierVersion": "v0.1",
+      },
+      "mode": "strict",
+      "status": "PASS",
+      "trace": [
+        {
+          "attempt": 1,
+          "failReasons": [],
+          "parseOk": true,
+          "status": "PASS",
+        },
+      ],
+      "word": "natë",
+    },
+  },
+  {
     "id": "sq_shtepi_pass_v0_1",
     "result": {
       "final": {
@@ -457,6 +550,70 @@ exports[`C2 canon diff report v0.1 (snapshot) train + holdout report 1`] = `
         },
       ],
       "word": "sy",
+    },
+  },
+  {
+    "id": "sq_zemer_pass_v0_1",
+    "result": {
+      "final": {
+        "acceptedCandidateForms": [
+          "zemër",
+        ],
+      },
+      "meta": {
+        "attemptsUsed": 1,
+        "cacheHit": false,
+        "maxAttempts": 1,
+        "model": "canon-mock",
+        "promptVersion": "v0.2",
+        "provider": "mock",
+        "rulesVersion": "v0.1",
+        "verifierVersion": "v0.1",
+      },
+      "mode": "strict",
+      "status": "PASS",
+      "trace": [
+        {
+          "attempt": 1,
+          "failReasons": [],
+          "parseOk": true,
+          "status": "PASS",
+        },
+      ],
+      "word": "zemër",
+    },
+  },
+  {
+    "id": "xx_forced_llm_error_v0_1",
+    "result": {
+      "final": null,
+      "meta": {
+        "attemptsUsed": 1,
+        "cacheHit": false,
+        "maxAttempts": 1,
+        "model": "mock",
+        "promptVersion": "v0.2",
+        "provider": "mock",
+        "rulesVersion": "v0.1",
+        "verifierVersion": "v0.1",
+      },
+      "mode": "strict",
+      "status": "LLM_ERROR",
+      "trace": [
+        {
+          "attempt": 1,
+          "failReasons": [
+            {
+              "checkId": "LLM_ERROR",
+              "form": "",
+              "reason": "canon: forced LLM_ERROR",
+            },
+          ],
+          "parseOk": false,
+          "status": "LLM_ERROR",
+        },
+      ],
+      "word": "llm_error",
     },
   },
 ]
