@@ -1,0 +1,66 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`soundRoots.match.v0.1 dru → SR9 (dr) 1`] = `
+[
+  {
+    "at": 0,
+    "cluster": "dr",
+    "domain": "impact_wood",
+    "gloss": "wood contact / strike (carrier: dr-)",
+    "id": "SR9",
+    "strength": "soft",
+  },
+]
+`;
+
+exports[`soundRoots.match.v0.1 gurë → SR10 (gur) 1`] = `
+[
+  {
+    "at": 0,
+    "cluster": "gur",
+    "domain": "impact_stone",
+    "gloss": "stone clack / strike (carrier: gur-/gr-)",
+    "id": "SR10",
+    "strength": "medium",
+  },
+]
+`;
+
+exports[`soundRoots.match.v0.1 kuzhinë → SR2 (zhi...) 1`] = `
+[
+  {
+    "at": 2,
+    "cluster": "zhi",
+    "domain": "fire_cook",
+    "gloss": "sizzle / fry / cook",
+    "id": "SR2",
+    "strength": "medium",
+  },
+]
+`;
+
+exports[`soundRoots.match.v0.1 shi → SR1 1`] = `
+[
+  {
+    "at": 0,
+    "cluster": "shi",
+    "domain": "rain_water",
+    "gloss": "rain / water hiss",
+    "id": "SR1",
+    "strength": "medium",
+  },
+]
+`;
+
+exports[`soundRoots.match.v0.1 trokas → SR6 (trok) 1`] = `
+[
+  {
+    "at": 0,
+    "cluster": "trok",
+    "domain": "impact_generic",
+    "gloss": "impact / knock / tap",
+    "id": "SR6",
+    "strength": "medium",
+  },
+]
+`;
