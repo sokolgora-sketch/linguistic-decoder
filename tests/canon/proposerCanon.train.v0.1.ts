@@ -193,4 +193,26 @@ export const proposerCanonTrainV0_1: readonly CanonCaseV0_1[] = [
   expect: { status: "LLM_ERROR", traceStatuses: ["LLM_ERROR"] },
 }
 
+,
+
+
+  {
+    id: "xx_open_mode_pass_v0_1",
+    input: { word: "open", mode: "open", provider: "mock" },
+    attempts: [mkPassAttempt("open", "open", "open-mode PASS (canon v0.1.3)")],
+    expect: { status: "PASS", minAccepted: 1 },
+  },
+
+  {
+    id: "xx_empty_candidates_recover_v0_1",
+    input: { word: "empty_candidates", mode: "strict", maxAttempts: 2, provider: "mock" },
+    attempts: [
+      // parseOk=true, but candidates=[]
+      JSON.stringify({ word: "empty_candidates", mode: "strict", candidates: [] }),
+      // recovery PASS
+      mkPassAttempt("empty_candidates", "strict", "recovered after empty candidates (canon v0.1.3)"),
+    ],
+    expect: { status: "PASS", minAccepted: 1 },
+  }
+
 ] as const;
