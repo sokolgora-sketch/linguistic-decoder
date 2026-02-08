@@ -34,6 +34,92 @@ exports[`C2 canon diff report v0.1 (snapshot) train + holdout report 1`] = `
     },
   },
   {
+    "id": "en_damage_path_mismatch_v0_1",
+    "result": {
+      "final": {
+        "acceptedCandidateForms": [
+          "damage",
+        ],
+      },
+      "meta": {
+        "attemptsUsed": 2,
+        "cacheHit": false,
+        "maxAttempts": 3,
+        "model": "canon-mock",
+        "promptVersion": "v0.2",
+        "provider": "mock",
+        "rulesVersion": "v0.1",
+        "verifierVersion": "v0.1",
+      },
+      "mode": "strict",
+      "status": "PASS",
+      "trace": [
+        {
+          "attempt": 1,
+          "failReasons": [
+            {
+              "checkId": "PATH_MATCH",
+              "form": "damage",
+              "reason": "vowelPath mismatch. provided=U extracted=A→A→E",
+            },
+          ],
+          "parseOk": true,
+          "status": "FAIL",
+        },
+        {
+          "attempt": 2,
+          "failReasons": [],
+          "parseOk": true,
+          "status": "PASS",
+        },
+      ],
+      "word": "damage",
+    },
+  },
+  {
+    "id": "en_sterile_illegal_ops_v0_1",
+    "result": {
+      "final": {
+        "acceptedCandidateForms": [
+          "sterile",
+        ],
+      },
+      "meta": {
+        "attemptsUsed": 2,
+        "cacheHit": false,
+        "maxAttempts": 3,
+        "model": "canon-mock",
+        "promptVersion": "v0.2",
+        "provider": "mock",
+        "rulesVersion": "v0.1",
+        "verifierVersion": "v0.1",
+      },
+      "mode": "strict",
+      "status": "PASS",
+      "trace": [
+        {
+          "attempt": 1,
+          "failReasons": [
+            {
+              "checkId": "OPS_ALLOWED",
+              "form": "sterile",
+              "reason": "Illegal opsUsed token(s): E_INSERT_NOT_ALLOWED",
+            },
+          ],
+          "parseOk": true,
+          "status": "FAIL",
+        },
+        {
+          "attempt": 2,
+          "failReasons": [],
+          "parseOk": true,
+          "status": "PASS",
+        },
+      ],
+      "word": "sterile",
+    },
+  },
+  {
     "id": "en_study_pass_v0_1",
     "result": {
       "final": {
@@ -62,6 +148,68 @@ exports[`C2 canon diff report v0.1 (snapshot) train + holdout report 1`] = `
         },
       ],
       "word": "study",
+    },
+  },
+  {
+    "id": "sq_bukuri_pass_v0_1",
+    "result": {
+      "final": {
+        "acceptedCandidateForms": [
+          "bukuri",
+        ],
+      },
+      "meta": {
+        "attemptsUsed": 1,
+        "cacheHit": false,
+        "maxAttempts": 2,
+        "model": "canon-mock",
+        "promptVersion": "v0.2",
+        "provider": "mock",
+        "rulesVersion": "v0.1",
+        "verifierVersion": "v0.1",
+      },
+      "mode": "strict",
+      "status": "PASS",
+      "trace": [
+        {
+          "attempt": 1,
+          "failReasons": [],
+          "parseOk": true,
+          "status": "PASS",
+        },
+      ],
+      "word": "bukuri",
+    },
+  },
+  {
+    "id": "sq_drite_pass_v0_1",
+    "result": {
+      "final": {
+        "acceptedCandidateForms": [
+          "dritë",
+        ],
+      },
+      "meta": {
+        "attemptsUsed": 1,
+        "cacheHit": false,
+        "maxAttempts": 2,
+        "model": "canon-mock",
+        "promptVersion": "v0.2",
+        "provider": "mock",
+        "rulesVersion": "v0.1",
+        "verifierVersion": "v0.1",
+      },
+      "mode": "strict",
+      "status": "PASS",
+      "trace": [
+        {
+          "attempt": 1,
+          "failReasons": [],
+          "parseOk": true,
+          "status": "PASS",
+        },
+      ],
+      "word": "dritë",
     },
   },
   {
@@ -145,6 +293,80 @@ exports[`C2 canon diff report v0.1 (snapshot) train + holdout report 1`] = `
     },
   },
   {
+    "id": "sq_matematike_pass_v0_1",
+    "result": {
+      "final": {
+        "acceptedCandidateForms": [
+          "matematikë",
+        ],
+      },
+      "meta": {
+        "attemptsUsed": 1,
+        "cacheHit": false,
+        "maxAttempts": 2,
+        "model": "canon-mock",
+        "promptVersion": "v0.2",
+        "provider": "mock",
+        "rulesVersion": "v0.1",
+        "verifierVersion": "v0.1",
+      },
+      "mode": "strict",
+      "status": "PASS",
+      "trace": [
+        {
+          "attempt": 1,
+          "failReasons": [],
+          "parseOk": true,
+          "status": "PASS",
+        },
+      ],
+      "word": "matematikë",
+    },
+  },
+  {
+    "id": "sq_mesim_missing_decomp_v0_1",
+    "result": {
+      "final": {
+        "acceptedCandidateForms": [
+          "mësim",
+        ],
+      },
+      "meta": {
+        "attemptsUsed": 2,
+        "cacheHit": false,
+        "maxAttempts": 3,
+        "model": "canon-mock",
+        "promptVersion": "v0.2",
+        "provider": "mock",
+        "rulesVersion": "v0.1",
+        "verifierVersion": "v0.1",
+      },
+      "mode": "strict",
+      "status": "PASS",
+      "trace": [
+        {
+          "attempt": 1,
+          "failReasons": [
+            {
+              "checkId": "DECOMP_PRESENT",
+              "form": "mësim",
+              "reason": "Missing decomposition (action/instrument/unit/statement).",
+            },
+          ],
+          "parseOk": true,
+          "status": "FAIL",
+        },
+        {
+          "attempt": 2,
+          "failReasons": [],
+          "parseOk": true,
+          "status": "PASS",
+        },
+      ],
+      "word": "mësim",
+    },
+  },
+  {
     "id": "sq_mesim_pass_v0_1",
     "result": {
       "final": {
@@ -204,6 +426,37 @@ exports[`C2 canon diff report v0.1 (snapshot) train + holdout report 1`] = `
         },
       ],
       "word": "shtëpi",
+    },
+  },
+  {
+    "id": "sq_sy_pass_v0_1",
+    "result": {
+      "final": {
+        "acceptedCandidateForms": [
+          "sy",
+        ],
+      },
+      "meta": {
+        "attemptsUsed": 1,
+        "cacheHit": false,
+        "maxAttempts": 2,
+        "model": "canon-mock",
+        "promptVersion": "v0.2",
+        "provider": "mock",
+        "rulesVersion": "v0.1",
+        "verifierVersion": "v0.1",
+      },
+      "mode": "strict",
+      "status": "PASS",
+      "trace": [
+        {
+          "attempt": 1,
+          "failReasons": [],
+          "parseOk": true,
+          "status": "PASS",
+        },
+      ],
+      "word": "sy",
     },
   },
 ]
