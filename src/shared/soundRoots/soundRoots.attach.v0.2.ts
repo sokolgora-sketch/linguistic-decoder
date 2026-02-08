@@ -56,11 +56,18 @@ export function attachSoundRootsV0_2(result: any): void {
   const dr = (result as any)?.deepRoot;
   if (!dr || typeof dr !== "object") return;
 
-  const wordRaw =
-    (typeof (result as any)?.sanitized === "string" ? (result as any).sanitized : null) ??
-    (typeof (result as any)?.word === "string" ? (result as any).word : null) ??
-    "";
-  const word = String(wordRaw);
+  function safeStr(x: unknown): string {
+  return typeof x === "string" ? x : "";
+}
+
+const word =
+  safeStr((result as any).normalized) ||
+  safeStr((result as any).norm) ||
+  safeStr((result as any).normalizedWord) ||
+  safeStr((result as any).sanitized) ||
+  safeStr((result as any).basis) ||
+  safeStr((result as any).word) ||
+  safeStr((result as any)?.input?.word);
 
   const matches = matchSoundRootsV0_1(word);
   const domains = uniqSorted(matches.map((m: any) => String(m?.domain ?? "")).filter(Boolean));
