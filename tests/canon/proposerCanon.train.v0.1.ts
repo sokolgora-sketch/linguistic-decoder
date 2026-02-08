@@ -68,4 +68,95 @@ export const proposerCanonTrainV0_1: readonly CanonCaseV0_1[] = [
     attempts: [mkPassAttempt("gjuh\u00eb", "strict", "language/tongue (canon pass v0.1)")],
     expect: { status: "PASS", minAccepted: 1 },
   },
+
+
+
+  {
+    id: "sq_drite_pass_v0_1",
+    input: { word: "drit\u00eb", mode: "strict", maxAttempts: 2, provider: "mock" },
+    attempts: [
+      JSON.stringify({
+        word: "drit\u00eb",
+        mode: "strict",
+        candidates: [
+          { form: "drit\u00eb", opsUsed: [], decomposition: { statement: "canon pass: dritë" } },
+        ],
+      }),
+    ],
+    expect: { status: "PASS", minAccepted: 1 },
+  },
+
+
+  {
+    id: "sq_mesim_missing_decomp_v0_1",
+    input: { word: "m\u00ebsim", mode: "strict", maxAttempts: 3, provider: "mock" },
+    attempts: [
+      // FAIL: missing decomposition entirely
+      JSON.stringify({
+        word: "m\u00ebsim",
+        mode: "strict",
+        candidates: [{ form: "m\u00ebsim", opsUsed: [] }],
+      }),
+      // PASS
+      JSON.stringify({
+        word: "m\u00ebsim",
+        mode: "strict",
+        candidates: [
+          { form: "m\u00ebsim", opsUsed: [], decomposition: { statement: "canon pass: mësim" } },
+        ],
+      }),
+    ],
+    expect: { status: "PASS", traceStatuses: ["FAIL", "PASS"], mustIncludeFailCheckIds: ["DECOMP_PRESENT"], minAccepted: 1 },
+  },
+
+
+  {
+    id: "en_damage_path_mismatch_v0_1",
+    input: { word: "damage", mode: "strict", maxAttempts: 3, provider: "mock" },
+    attempts: [
+      // FAIL: vowelPath provided but wrong -> PATH_MATCH should fail
+      JSON.stringify({
+        word: "damage",
+        mode: "strict",
+        candidates: [
+          { form: "damage", opsUsed: [], vowelPath: ["U"], decomposition: { statement: "bad vowelPath on purpose" } },
+        ],
+      }),
+      // PASS: omit vowelPath entirely (v0.1 allows this)
+      JSON.stringify({
+        word: "damage",
+        mode: "strict",
+        candidates: [
+          { form: "damage", opsUsed: [], decomposition: { statement: "canon pass: damage" } },
+        ],
+      }),
+    ],
+    expect: { status: "PASS", traceStatuses: ["FAIL", "PASS"], mustIncludeFailCheckIds: ["PATH_MATCH"], minAccepted: 1 },
+  },
+
+
+  {
+    id: "en_sterile_illegal_ops_v0_1",
+    input: { word: "sterile", mode: "strict", maxAttempts: 3, provider: "mock" },
+    attempts: [
+      // FAIL: illegal op token
+      JSON.stringify({
+        word: "sterile",
+        mode: "strict",
+        candidates: [
+          { form: "sterile", opsUsed: ["E_INSERT_NOT_ALLOWED"], decomposition: { statement: "illegal op token" } },
+        ],
+      }),
+      // PASS
+      JSON.stringify({
+        word: "sterile",
+        mode: "strict",
+        candidates: [
+          { form: "sterile", opsUsed: [], decomposition: { statement: "canon pass: sterile" } },
+        ],
+      }),
+    ],
+    expect: { status: "PASS", traceStatuses: ["FAIL", "PASS"], mustIncludeFailCheckIds: ["OPS_ALLOWED"], minAccepted: 1 },
+  },
+
 ] as const;
