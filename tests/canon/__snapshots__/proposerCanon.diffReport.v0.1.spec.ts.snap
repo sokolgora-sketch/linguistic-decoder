@@ -584,6 +584,43 @@ exports[`C2 canon diff report v0.1 (snapshot) train + holdout report 1`] = `
     },
   },
   {
+    "id": "xx_candidate_missing_fields_recover_v0_1",
+    "result": {
+      "final": {
+        "acceptedCandidateForms": [
+          "missing_fields",
+        ],
+      },
+      "meta": {
+        "attemptsUsed": 2,
+        "cacheHit": false,
+        "maxAttempts": 2,
+        "model": "canon-mock",
+        "promptVersion": "v0.2",
+        "provider": "mock",
+        "rulesVersion": "v0.1",
+        "verifierVersion": "v0.1",
+      },
+      "mode": "strict",
+      "status": "PASS",
+      "trace": [
+        {
+          "attempt": 1,
+          "failReasons": [],
+          "parseOk": false,
+          "status": "PARSE_ERROR",
+        },
+        {
+          "attempt": 2,
+          "failReasons": [],
+          "parseOk": true,
+          "status": "PASS",
+        },
+      ],
+      "word": "missing_fields",
+    },
+  },
+  {
     "id": "xx_empty_candidates_recover_v0_1",
     "result": {
       "final": {
@@ -682,6 +719,43 @@ exports[`C2 canon diff report v0.1 (snapshot) train + holdout report 1`] = `
         },
       ],
       "word": "open",
+    },
+  },
+  {
+    "id": "xx_valid_json_wrong_shape_recover_v0_1",
+    "result": {
+      "final": {
+        "acceptedCandidateForms": [
+          "shape",
+        ],
+      },
+      "meta": {
+        "attemptsUsed": 2,
+        "cacheHit": false,
+        "maxAttempts": 2,
+        "model": "canon-mock",
+        "promptVersion": "v0.2",
+        "provider": "mock",
+        "rulesVersion": "v0.1",
+        "verifierVersion": "v0.1",
+      },
+      "mode": "strict",
+      "status": "PASS",
+      "trace": [
+        {
+          "attempt": 1,
+          "failReasons": [],
+          "parseOk": false,
+          "status": "PARSE_ERROR",
+        },
+        {
+          "attempt": 2,
+          "failReasons": [],
+          "parseOk": true,
+          "status": "PASS",
+        },
+      ],
+      "word": "shape",
     },
   },
 ]
