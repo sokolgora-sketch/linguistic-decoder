@@ -1,0 +1,210 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`C2 canon diff report v0.1 (snapshot) train + holdout report 1`] = `
+[
+  {
+    "id": "en_damage_pass_v0_1",
+    "result": {
+      "final": {
+        "acceptedCandidateForms": [
+          "damage",
+        ],
+      },
+      "meta": {
+        "attemptsUsed": 1,
+        "cacheHit": false,
+        "maxAttempts": 1,
+        "model": "canon-mock",
+        "promptVersion": "v0.2",
+        "provider": "mock",
+        "rulesVersion": "v0.1",
+        "verifierVersion": "v0.1",
+      },
+      "mode": "strict",
+      "status": "PASS",
+      "trace": [
+        {
+          "attempt": 1,
+          "failReasons": [],
+          "parseOk": true,
+          "status": "PASS",
+        },
+      ],
+      "word": "damage",
+    },
+  },
+  {
+    "id": "en_study_pass_v0_1",
+    "result": {
+      "final": {
+        "acceptedCandidateForms": [
+          "study",
+        ],
+      },
+      "meta": {
+        "attemptsUsed": 1,
+        "cacheHit": false,
+        "maxAttempts": 1,
+        "model": "canon-mock",
+        "promptVersion": "v0.2",
+        "provider": "mock",
+        "rulesVersion": "v0.1",
+        "verifierVersion": "v0.1",
+      },
+      "mode": "strict",
+      "status": "PASS",
+      "trace": [
+        {
+          "attempt": 1,
+          "failReasons": [],
+          "parseOk": true,
+          "status": "PASS",
+        },
+      ],
+      "word": "study",
+    },
+  },
+  {
+    "id": "sq_gjuhe_pass_v0_1",
+    "result": {
+      "final": {
+        "acceptedCandidateForms": [
+          "gjuhë",
+        ],
+      },
+      "meta": {
+        "attemptsUsed": 1,
+        "cacheHit": false,
+        "maxAttempts": 1,
+        "model": "canon-mock",
+        "promptVersion": "v0.2",
+        "provider": "mock",
+        "rulesVersion": "v0.1",
+        "verifierVersion": "v0.1",
+      },
+      "mode": "strict",
+      "status": "PASS",
+      "trace": [
+        {
+          "attempt": 1,
+          "failReasons": [],
+          "parseOk": true,
+          "status": "PASS",
+        },
+      ],
+      "word": "gjuhë",
+    },
+  },
+  {
+    "id": "sq_kuzhine_loop_v0_1",
+    "result": {
+      "final": {
+        "acceptedCandidateForms": [
+          "kuzhinë",
+        ],
+      },
+      "meta": {
+        "attemptsUsed": 3,
+        "cacheHit": false,
+        "maxAttempts": 4,
+        "model": "canon-mock",
+        "promptVersion": "v0.2",
+        "provider": "mock",
+        "rulesVersion": "v0.1",
+        "verifierVersion": "v0.1",
+      },
+      "mode": "strict",
+      "status": "PASS",
+      "trace": [
+        {
+          "attempt": 1,
+          "failReasons": [],
+          "parseOk": false,
+          "status": "PARSE_ERROR",
+        },
+        {
+          "attempt": 2,
+          "failReasons": [
+            {
+              "checkId": "OPS_ALLOWED",
+              "form": "kuzhinë",
+              "reason": "Illegal opsUsed token(s): E_INSERT_NOT_ALLOWED",
+            },
+          ],
+          "parseOk": true,
+          "status": "FAIL",
+        },
+        {
+          "attempt": 3,
+          "failReasons": [],
+          "parseOk": true,
+          "status": "PASS",
+        },
+      ],
+      "word": "kuzhinë",
+    },
+  },
+  {
+    "id": "sq_mesim_pass_v0_1",
+    "result": {
+      "final": {
+        "acceptedCandidateForms": [
+          "mësim",
+        ],
+      },
+      "meta": {
+        "attemptsUsed": 1,
+        "cacheHit": false,
+        "maxAttempts": 1,
+        "model": "canon-mock",
+        "promptVersion": "v0.2",
+        "provider": "mock",
+        "rulesVersion": "v0.1",
+        "verifierVersion": "v0.1",
+      },
+      "mode": "strict",
+      "status": "PASS",
+      "trace": [
+        {
+          "attempt": 1,
+          "failReasons": [],
+          "parseOk": true,
+          "status": "PASS",
+        },
+      ],
+      "word": "mësim",
+    },
+  },
+  {
+    "id": "sq_shtepi_pass_v0_1",
+    "result": {
+      "final": {
+        "acceptedCandidateForms": [
+          "shtëpi",
+        ],
+      },
+      "meta": {
+        "attemptsUsed": 1,
+        "cacheHit": false,
+        "maxAttempts": 1,
+        "model": "canon-mock",
+        "promptVersion": "v0.2",
+        "provider": "mock",
+        "rulesVersion": "v0.1",
+        "verifierVersion": "v0.1",
+      },
+      "mode": "strict",
+      "status": "PASS",
+      "trace": [
+        {
+          "attempt": 1,
+          "failReasons": [],
+          "parseOk": true,
+          "status": "PASS",
+        },
+      ],
+      "word": "shtëpi",
+    },
+  },
+]
+`;
