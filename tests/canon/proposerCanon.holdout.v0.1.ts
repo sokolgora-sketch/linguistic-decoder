@@ -77,4 +77,14 @@ export const proposerCanonHoldoutV0_1: readonly CanonCaseV0_1[] = [
     expect: { status: "PASS", minAccepted: 1 },
   },
 
+
+
+
+{
+  id: "en_mother_pass_v0_1",
+  input: { word: "mother", mode: "strict", provider: "mock" },
+  attempts: [mkPassAttempt("mother", "strict", "canon holdout pass v0.1.2 (O coverage)")],
+  expect: { status: "PASS", minAccepted: 1 },
+}
+
 ] as const;

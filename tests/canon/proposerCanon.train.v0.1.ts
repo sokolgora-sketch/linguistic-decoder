@@ -159,4 +159,38 @@ export const proposerCanonTrainV0_1: readonly CanonCaseV0_1[] = [
     expect: { status: "PASS", traceStatuses: ["FAIL", "PASS"], mustIncludeFailCheckIds: ["OPS_ALLOWED"], minAccepted: 1 },
   },
 
+
+
+
+{
+  id: "sq_moter_pass_v0_1",
+  input: { word: "mot\u00ebr", mode: "strict", provider: "mock" },
+  attempts: [mkPassAttempt("mot\u00ebr", "strict", "mot\u00ebr = mother/sister figure (canon pass v0.1.2)")],
+  expect: { status: "PASS", minAccepted: 1 },
+},
+
+
+{
+  id: "sq_zemer_pass_v0_1",
+  input: { word: "zem\u00ebr", mode: "strict", provider: "mock" },
+  attempts: [mkPassAttempt("zem\u00ebr", "strict", "zem\u00ebr = heart (canon pass v0.1.2)")],
+  expect: { status: "PASS", minAccepted: 1 },
+},
+
+
+{
+  id: "sq_nate_pass_v0_1",
+  input: { word: "nat\u00eb", mode: "strict", provider: "mock" },
+  attempts: [mkPassAttempt("nat\u00eb", "strict", "nat\u00eb = night (canon pass v0.1.2)")],
+  expect: { status: "PASS", minAccepted: 1 },
+},
+
+
+{
+  id: "xx_forced_llm_error_v0_1",
+  input: { word: "llm_error", mode: "strict", maxAttempts: 1, provider: "mock" },
+  attempts: ["__THROW__"],
+  expect: { status: "LLM_ERROR", traceStatuses: ["LLM_ERROR"] },
+}
+
 ] as const;
