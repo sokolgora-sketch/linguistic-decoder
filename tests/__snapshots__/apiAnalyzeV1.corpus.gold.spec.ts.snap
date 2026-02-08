@@ -25,6 +25,9 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
       "candidates": [],
       "hypotheses": [],
       "protoRoots": [],
+      "soundRoots": {
+        "matches": [],
+      },
       "version": "deeproot-output-v1",
     },
     "engineVersion": "0.2.0-symbolic",
@@ -224,6 +227,9 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         "candidates": [],
         "hypotheses": [],
         "protoRoots": [],
+        "soundRoots": {
+          "matches": [],
+        },
         "version": "deeproot-output-v1",
       },
       "engineVersion": "0.2.0-symbolic",
@@ -558,6 +564,9 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
       "candidates": [],
       "hypotheses": [],
       "protoRoots": [],
+      "soundRoots": {
+        "matches": [],
+      },
       "version": "deeproot-output-v1",
     },
     "engineVersion": "0.2.0-symbolic",
@@ -830,6 +839,9 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         "candidates": [],
         "hypotheses": [],
         "protoRoots": [],
+        "soundRoots": {
+          "matches": [],
+        },
         "version": "deeproot-output-v1",
       },
       "engineVersion": "0.2.0-symbolic",
@@ -1228,6 +1240,9 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
       "candidates": [],
       "hypotheses": [],
       "protoRoots": [],
+      "soundRoots": {
+        "matches": [],
+      },
       "version": "deeproot-output-v1",
     },
     "engineVersion": "0.2.0-symbolic",
@@ -1540,6 +1555,9 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         "candidates": [],
         "hypotheses": [],
         "protoRoots": [],
+        "soundRoots": {
+          "matches": [],
+        },
         "version": "deeproot-output-v1",
       },
       "engineVersion": "0.2.0-symbolic",
@@ -2010,6 +2028,9 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
       ],
       "hypotheses": [],
       "protoRoots": [],
+      "soundRoots": {
+        "matches": [],
+      },
       "version": "deeproot-output-v1",
     },
     "engineVersion": "0.2.0-symbolic",
@@ -2464,6 +2485,9 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         ],
         "hypotheses": [],
         "protoRoots": [],
+        "soundRoots": {
+          "matches": [],
+        },
         "version": "deeproot-output-v1",
       },
       "engineVersion": "0.2.0-symbolic",
@@ -2938,6 +2962,9 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
       "candidates": [],
       "hypotheses": [],
       "protoRoots": [],
+      "soundRoots": {
+        "matches": [],
+      },
       "version": "deeproot-output-v1",
     },
     "engineVersion": "0.2.0-symbolic",
@@ -3172,6 +3199,9 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         "candidates": [],
         "hypotheses": [],
         "protoRoots": [],
+        "soundRoots": {
+          "matches": [],
+        },
         "version": "deeproot-output-v1",
       },
       "engineVersion": "0.2.0-symbolic",
@@ -3566,6 +3596,9 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
       ],
       "hypotheses": [],
       "protoRoots": [],
+      "soundRoots": {
+        "matches": [],
+      },
       "version": "deeproot-output-v1",
     },
     "engineVersion": "0.2.0-symbolic",
@@ -4011,6 +4044,9 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         ],
         "hypotheses": [],
         "protoRoots": [],
+        "soundRoots": {
+          "matches": [],
+        },
         "version": "deeproot-output-v1",
       },
       "engineVersion": "0.2.0-symbolic",
@@ -4478,6 +4514,9 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
       "candidates": [],
       "hypotheses": [],
       "protoRoots": [],
+      "soundRoots": {
+        "matches": [],
+      },
       "version": "deeproot-output-v1",
     },
     "engineVersion": "0.2.0-symbolic",
@@ -4699,6 +4738,9 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         "candidates": [],
         "hypotheses": [],
         "protoRoots": [],
+        "soundRoots": {
+          "matches": [],
+        },
         "version": "deeproot-output-v1",
       },
       "engineVersion": "0.2.0-symbolic",
@@ -5044,6 +5086,9 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
       "candidates": [],
       "hypotheses": [],
       "protoRoots": [],
+      "soundRoots": {
+        "matches": [],
+      },
       "version": "deeproot-output-v1",
     },
     "engineVersion": "0.2.0-symbolic",
@@ -5312,6 +5357,9 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         "candidates": [],
         "hypotheses": [],
         "protoRoots": [],
+        "soundRoots": {
+          "matches": [],
+        },
         "version": "deeproot-output-v1",
       },
       "engineVersion": "0.2.0-symbolic",
@@ -5689,6 +5737,9 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
       "candidates": [],
       "hypotheses": [],
       "protoRoots": [],
+      "soundRoots": {
+        "matches": [],
+      },
       "version": "deeproot-output-v1",
     },
     "engineVersion": "0.2.0-symbolic",
@@ -5988,6 +6039,9 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         "candidates": [],
         "hypotheses": [],
         "protoRoots": [],
+        "soundRoots": {
+          "matches": [],
+        },
         "version": "deeproot-output-v1",
       },
       "engineVersion": "0.2.0-symbolic",
@@ -6424,6 +6478,9 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
       "candidates": [],
       "hypotheses": [],
       "protoRoots": [],
+      "soundRoots": {
+        "matches": [],
+      },
       "version": "deeproot-output-v1",
     },
     "engineVersion": "0.2.0-symbolic",
@@ -6850,6 +6907,9 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         "candidates": [],
         "hypotheses": [],
         "protoRoots": [],
+        "soundRoots": {
+          "matches": [],
+        },
         "version": "deeproot-output-v1",
       },
       "engineVersion": "0.2.0-symbolic",
@@ -7340,6 +7400,9 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
       "candidates": [],
       "hypotheses": [],
       "protoRoots": [],
+      "soundRoots": {
+        "matches": [],
+      },
       "version": "deeproot-output-v1",
     },
     "engineVersion": "0.2.0-symbolic",
@@ -7648,6 +7711,9 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         "candidates": [],
         "hypotheses": [],
         "protoRoots": [],
+        "soundRoots": {
+          "matches": [],
+        },
         "version": "deeproot-output-v1",
       },
       "engineVersion": "0.2.0-symbolic",
@@ -8056,6 +8122,9 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
       "candidates": [],
       "hypotheses": [],
       "protoRoots": [],
+      "soundRoots": {
+        "matches": [],
+      },
       "version": "deeproot-output-v1",
     },
     "engineVersion": "0.2.0-symbolic",
@@ -8297,6 +8366,9 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         "candidates": [],
         "hypotheses": [],
         "protoRoots": [],
+        "soundRoots": {
+          "matches": [],
+        },
         "version": "deeproot-output-v1",
       },
       "engineVersion": "0.2.0-symbolic",
@@ -8670,6 +8742,9 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
       "candidates": [],
       "hypotheses": [],
       "protoRoots": [],
+      "soundRoots": {
+        "matches": [],
+      },
       "version": "deeproot-output-v1",
     },
     "engineVersion": "0.2.0-symbolic",
@@ -8967,6 +9042,9 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         "candidates": [],
         "hypotheses": [],
         "protoRoots": [],
+        "soundRoots": {
+          "matches": [],
+        },
         "version": "deeproot-output-v1",
       },
       "engineVersion": "0.2.0-symbolic",
@@ -9377,6 +9455,9 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
       "candidates": [],
       "hypotheses": [],
       "protoRoots": [],
+      "soundRoots": {
+        "matches": [],
+      },
       "version": "deeproot-output-v1",
     },
     "engineVersion": "0.2.0-symbolic",
@@ -9598,6 +9679,9 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         "candidates": [],
         "hypotheses": [],
         "protoRoots": [],
+        "soundRoots": {
+          "matches": [],
+        },
         "version": "deeproot-output-v1",
       },
       "engineVersion": "0.2.0-symbolic",
@@ -9939,6 +10023,9 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
       "candidates": [],
       "hypotheses": [],
       "protoRoots": [],
+      "soundRoots": {
+        "matches": [],
+      },
       "version": "deeproot-output-v1",
     },
     "engineVersion": "0.2.0-symbolic",
@@ -10211,6 +10298,9 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         "candidates": [],
         "hypotheses": [],
         "protoRoots": [],
+        "soundRoots": {
+          "matches": [],
+        },
         "version": "deeproot-output-v1",
       },
       "engineVersion": "0.2.0-symbolic",
@@ -10840,6 +10930,9 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
           ],
         },
       ],
+      "soundRoots": {
+        "matches": [],
+      },
       "version": "deeproot-output-v1",
     },
     "engineVersion": "0.2.0-symbolic",
@@ -11516,6 +11609,9 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
             ],
           },
         ],
+        "soundRoots": {
+          "matches": [],
+        },
         "version": "deeproot-output-v1",
       },
       "engineVersion": "0.2.0-symbolic",
@@ -12176,6 +12272,9 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
       "candidates": [],
       "hypotheses": [],
       "protoRoots": [],
+      "soundRoots": {
+        "matches": [],
+      },
       "version": "deeproot-output-v1",
     },
     "engineVersion": "0.2.0-symbolic",
@@ -12389,6 +12488,9 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         "candidates": [],
         "hypotheses": [],
         "protoRoots": [],
+        "soundRoots": {
+          "matches": [],
+        },
         "version": "deeproot-output-v1",
       },
       "engineVersion": "0.2.0-symbolic",
@@ -12718,6 +12820,9 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
       "candidates": [],
       "hypotheses": [],
       "protoRoots": [],
+      "soundRoots": {
+        "matches": [],
+      },
       "version": "deeproot-output-v1",
     },
     "engineVersion": "0.2.0-symbolic",
@@ -12924,6 +13029,9 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         "candidates": [],
         "hypotheses": [],
         "protoRoots": [],
+        "soundRoots": {
+          "matches": [],
+        },
         "version": "deeproot-output-v1",
       },
       "engineVersion": "0.2.0-symbolic",

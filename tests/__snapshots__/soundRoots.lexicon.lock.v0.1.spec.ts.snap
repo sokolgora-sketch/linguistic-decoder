@@ -1,0 +1,115 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`soundRoots.lexicon.v0.1 — lock SOUND_ROOTS_V0_1 locked 1`] = `
+[
+  {
+    "clusters": [
+      "shi",
+      "shii",
+    ],
+    "domain": "rain_water",
+    "gloss": "rain / water hiss",
+    "id": "SR1",
+    "strength": "medium",
+  },
+  {
+    "clusters": [
+      "zhii",
+      "zhi",
+      "zh",
+      "zii",
+      "zi",
+    ],
+    "domain": "fire_cook",
+    "gloss": "sizzle / fry / cook",
+    "id": "SR2",
+    "strength": "medium",
+  },
+  {
+    "clusters": [
+      "shush",
+      "shh",
+    ],
+    "domain": "silence_wind",
+    "gloss": "hush / silence",
+    "id": "SR3",
+    "strength": "medium",
+  },
+  {
+    "clusters": [
+      "fëshfësh",
+      "fshh",
+      "fësh",
+      "fsh",
+    ],
+    "domain": "wind_air",
+    "gloss": "wind / rustle / whoosh",
+    "id": "SR4",
+    "strength": "medium",
+  },
+  {
+    "clusters": [
+      "plash",
+      "plap",
+      "plup",
+    ],
+    "domain": "water_splash",
+    "gloss": "splash / plop / pour",
+    "id": "SR5",
+    "strength": "soft",
+  },
+  {
+    "clusters": [
+      "trok",
+      "tok",
+      "tak",
+      "tuk",
+    ],
+    "domain": "impact_generic",
+    "gloss": "impact / knock / tap",
+    "id": "SR6",
+    "strength": "medium",
+  },
+  {
+    "clusters": [
+      "bum",
+      "bam",
+    ],
+    "domain": "impact_heavy",
+    "gloss": "heavy impact / bang",
+    "id": "SR7",
+    "strength": "soft",
+  },
+  {
+    "clusters": [
+      "krrak",
+      "krak",
+      "krr",
+      "kr",
+    ],
+    "domain": "break_crack",
+    "gloss": "break / crack / snap",
+    "id": "SR8",
+    "strength": "medium",
+  },
+  {
+    "clusters": [
+      "dr",
+    ],
+    "domain": "impact_wood",
+    "gloss": "wood contact / strike (carrier: dr-)",
+    "id": "SR9",
+    "strength": "soft",
+  },
+  {
+    "clusters": [
+      "gur",
+      "gr",
+    ],
+    "domain": "impact_stone",
+    "gloss": "stone clack / strike (carrier: gur-/gr-)",
+    "id": "SR10",
+    "strength": "medium",
+  },
+]
+`;

@@ -165,14 +165,14 @@ export function enginePayloadToAnalysisResult(payload: EnginePayload): AnalyzeWo
   }
 
   // Origin Claim Protocol (V1)
-  attachSoundRootsV0_1(result);
-
   result.originClaim = buildOriginClaimV1(result);
 
 
   if (deepRoot !== undefined) {
     (result as any).deepRoot = deepRoot;
+    attachSoundRootsV0_1(result);
   }
+
 
   const wordMatrix = buildWordMatrix(result);
   result.wordMatrix = wordMatrix;
