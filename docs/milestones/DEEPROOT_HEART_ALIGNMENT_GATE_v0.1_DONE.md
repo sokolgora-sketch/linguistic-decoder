@@ -25,6 +25,13 @@ This is **not** a rejection system (yet). It is a deterministic signal + explana
   - Shows `Evidence: ...` if present
   - Shows reason codes for `misaligned`
 
+- `src/ui/instrument/DeepRootHeartGateSummaryCard.tsx`
+  - Aggregates per-candidate gate statuses into totals + top misalignment reasons.
+- `src/ui/instrument/InstrumentPanel.tsx`
+  - Renders the Gate Summary card from VM-derived candidate rows (no raw payload access).
+- Test: `tests/ui.instrument.deepRootHeartGate.summaryCard.spec.tsx`
+
+
 ## Contract shape
 - Candidate field:
   - `candidates[i].deepRootHeartGate: PresentOrMissing<DeepRootHeartGateV01>`
@@ -48,3 +55,11 @@ This is **not** a rejection system (yet). It is a deterministic signal + explana
 - Snapshots:
   - `tests/__snapshots__/ui.telemetry.vm.v0_1.contract.spec.ts.snap`
   - `tests/__snapshots__/ui.telemetry.vm.v0_1_1.candidates.contract.spec.ts.snap`
+
+## Proof (tests)
+Run these as the “DONE proof set”:
+- `tests/deepRootHeartGate.v0.1.spec.ts`
+- `tests/ui.instrument.deepRootHeartGate.vm.spec.ts`
+- `tests/ui.candidates.deepRootHeartGate.rendersFromVM.spec.tsx`
+- `tests/ui.telemetry.deepRootHeartGate.fallback.v0.1.spec.ts`
+- `tests/ui.instrument.deepRootHeartGate.summaryCard.spec.tsx`
