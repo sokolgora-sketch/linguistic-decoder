@@ -106,8 +106,8 @@ function pickFromRootMetaContract(root: any, key: string): string | null {
   const contract = root && typeof root === "object" ? (root as any).contract : null;
   return (
     asString(root?.[key]) ??
-    asString(meta?.[key]) ??
     asString(contract?.[key]) ??
+    asString(meta?.[key]) ??
     null
   );
 }
@@ -116,13 +116,14 @@ function pickMetaCreated(root: any): string | null {
   const meta = root && typeof root === "object" ? (root as any).meta : null;
   const contract = root && typeof root === "object" ? (root as any).contract : null;
   return (
-    asString(meta?.created) ??
-    asString(meta?.createdAt) ??
     asString(contract?.meta?.created) ??
     asString(contract?.meta?.createdAt) ??
+    asString(meta?.created) ??
+    asString(meta?.createdAt) ??
     null
   );
 }
+
 
 function asBool(v: unknown): boolean | null {
   return typeof v === "boolean" ? v : null;
