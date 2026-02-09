@@ -14,6 +14,7 @@ import {
 } from "./originClaim.v1";
 
 import { computeDeepRootHeartGateV01 } from "./deepRootHeartGate.v0.1.compute";
+import { decideDeepRootHeartGatePolicyV01 } from "./originClaim.deepRootHeartGatePolicy.v0.1";
 import { resolveVoiceSeqV0_1 } from "./voiceSeq.resolve.v0.1";
 /**
  * Minimal adapter interface to keep builder decoupled.
@@ -316,7 +317,6 @@ const gate = computeDeepRootHeartGateV01({
         candidateResolvedPath: candidateResolvedForGateSeq ? candidateResolvedForGateSeq.join("-") : null,
         evidenceRefs: gateEvidenceRefs,
       });
-
       out.evidenceRefs.push(...gateEvidenceRefs);
       out.hasDeepRootHeartGateAligned = gate.status === "aligned";
 
@@ -373,7 +373,15 @@ function mapConfidence(
 
   // Strict-mode gate: medium+ requires DeepRoot–Heart Gate alignment.
   const strict = (mode ?? "").toLocaleLowerCase() === "strict";
-  const strictGateBlocksMedium = strict && !s.hasDeepRootHeartGateAligned;
+  const gatePolicy = decideDeepRootHeartGatePolicyV01({
+      strictMediumPlus: strict,
+      gate: {
+        status: s.hasDeepRootHeartGateAligned ? "aligned" : "misaligned",
+        reasonCodes: [],
+        evidenceRefs: [],
+      } as any,
+    });
+    const strictGateBlocksMedium = gatePolicy.action === "block";
   const noNeg = s.negatives === 0;
   const extraPos = Math.max(0, s.positives - 1); // beyond C1
 
