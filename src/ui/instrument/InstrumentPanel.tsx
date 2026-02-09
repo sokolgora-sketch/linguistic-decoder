@@ -23,6 +23,7 @@ import { buildEvidenceLedgerModelFromVM } from '../ledger/ledgerModel';
 import { EvidenceLedgerCard } from '../ledger/EvidenceLedgerCard';
 import { buildCandidateRowsFromVM } from '../candidates/candidateModel';
 import { CandidatesAccordion } from '../candidates/CandidatesAccordion';
+import { DeepRootHeartGateSummaryCard } from "./DeepRootHeartGateSummaryCard";
 import { OriginClaimCard } from '@/components/OriginClaimCard';
 import { safeText } from "./safeText";
 
@@ -173,6 +174,7 @@ export function InstrumentPanel(props: Props) {
 
               {ledgerModel ? <EvidenceLedgerCard model={ledgerModel} engineVersion={engineVersion} /> : null}
 
+              {candidateRows ? <DeepRootHeartGateSummaryCard rows={candidateRows as any} /> : null}
               {candidateRows ? <CandidatesAccordion rows={candidateRows} /> : null}
 
 
