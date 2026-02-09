@@ -100,6 +100,30 @@ function asString(v: unknown): string | null {
   return typeof v === "string" ? v : null;
 }
 
+// Pick helpers (Instrument contract adapter)
+function pickFromRootMetaContract(root: any, key: string): string | null {
+  const meta = root && typeof root === "object" ? (root as any).meta : null;
+  const contract = root && typeof root === "object" ? (root as any).contract : null;
+  return (
+    asString(root?.[key]) ??
+    asString(meta?.[key]) ??
+    asString(contract?.[key]) ??
+    null
+  );
+}
+
+function pickMetaCreated(root: any): string | null {
+  const meta = root && typeof root === "object" ? (root as any).meta : null;
+  const contract = root && typeof root === "object" ? (root as any).contract : null;
+  return (
+    asString(meta?.created) ??
+    asString(meta?.createdAt) ??
+    asString(contract?.meta?.created) ??
+    asString(contract?.meta?.createdAt) ??
+    null
+  );
+}
+
 function asBool(v: unknown): boolean | null {
   return typeof v === "boolean" ? v : null;
 }
@@ -449,9 +473,13 @@ const voicePathDetectedMaybe: PresentOrMissing<Vowel[]> =
 
   const word = asString(root["word"]) ?? "(missing word)";
   const sanitized = asString(root["sanitized"]);
-  const engineVersion = asString(root["engineVersion"]);
-  const mode = normalizeMode(root["mode"]) ?? (heart ? normalizeMode(heart["mode"]) : null);
-  const alphabet = asString(root["alphabet"]) ?? (heart ? asString(heart["alphabet"]) : null);
+  const engineVersion = pickFromRootMetaContract(root as any, "engineVersion");
+  const mode =
+      normalizeMode(pickFromRootMetaContract(root as any, "mode") ?? root["mode"]) ??
+      (heart ? normalizeMode(heart["mode"]) : null);
+  const alphabet =
+    pickFromRootMetaContract(root as any, "alphabet") ??
+    (heart ? asString((heart as any)["alphabet"]) : null);
 
   const meta = isRecord(root["meta"]) ? root["meta"] : null;
   const createdAt = meta ? asString(meta["created"]) : null;
@@ -472,18 +500,31 @@ const voicePathDetectedMaybe: PresentOrMissing<Vowel[]> =
     (primaryPath ? normalizeVowelPathArray(primaryPath["voicePath"]) : null) ??
     (heartMath7Primary ? normalizeVowelPathArray(heartMath7Primary["vowels"]) : null);
 
-  const strictInputEmitted =
-    (heart ? asBool((heart as any)["strictInput"]) : null) ??
-    asBool((root as any)["strictInput"]);
+  const strictInputEmittedRaw =
+      (heart ? (heart as any)["strictInput"] : null) ??
+      (root as any)["strictInput"] ??
+      pickFromRootMetaContract(root as any, "strictInput") ??
+      null;
 
-  const strictInput: PresentOrMissing<boolean> =
-    strictInputEmitted !== null
-      ? presentBool(strictInputEmitted)
-      : mode
-        ? presentBool(mode === "strict")
-        : missing("not_emitted", "Expected strictInput; derive requires mode");
+    const strictInputEmittedBool: boolean | null =
+      (() => {
+        if (typeof strictInputEmittedRaw === "boolean") return strictInputEmittedRaw;
+        const s = asString(strictInputEmittedRaw);
+        if (!s) return null;
+        const nm = normalizeMode(s);
+        if (nm === "strict") return true;
+        if (nm === "open") return false;
+        return null;
+      })();
 
-  // Evidence ledger sources (root -> raw.evidence -> heart.evidence)
+    const strictInput: PresentOrMissing<boolean> =
+      strictInputEmittedBool !== null
+        ? presentBool(strictInputEmittedBool)
+        : mode
+          ? presentBool(mode === "strict")
+          : missing("not_emitted", "Expected strictInput; derive requires mode");
+
+// Evidence ledger sources (root -> raw.evidence -> heart.evidence)
   const rootEvidence = isRecord(root["evidence"]) ? (root["evidence"] as Record<string, unknown>) : null;
 
   const rawEvidence =
