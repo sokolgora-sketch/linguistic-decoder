@@ -5,6 +5,7 @@ import { runAnalysisDeterministic } from "@/lib/runAnalysisDeterministic";
 import { enginePayloadToAnalysisResult } from "@/shared/analysisAdapter";
 import { adaptAnalyzeV1ToUI } from "@/shared/analyzeV1Adapter";
 import { buildEvidencePackageFromVM } from "@/ui/telemetry/buildEvidencePackageFromVM";
+import { backfillEvidencePackageSignalsCountV01 } from "./evidencePackage.signalsCount.backfill.v0.1";
 import { toAnalyzeWordResultV1Contract } from "@/shared/analyzeWordResult.v1.contract";
 import { ensurePrimaryAndCandidatePaths } from "@/shared/ensurePaths";
 
@@ -462,43 +463,13 @@ const checked = AnalyzeWordResultV1ContractSchema.safeParse(out);
     }
 
     if (evidencePackage && typeof evidencePackage === "object") {
-      const unwrap = (x: any) =>
-        x && typeof x === "object" && (x.kind === "present" || x.kind === "missing")
-          ? x.kind === "present"
-            ? x.value
-            : undefined
-          : x;
+      const n =
+        Array.isArray((final as any)?.evidence?.signals) ? (final as any).evidence.signals.length : undefined;
 
-      // Prefer counts.signals if present (wrapped or raw)
-      const countsSignalsRaw = unwrap((evidencePackage as any)?.counts?.signals);
-      let n: any =
-        typeof countsSignalsRaw === "number"
-          ? countsSignalsRaw
-          : typeof countsSignalsRaw === "string"
-            ? Number(countsSignalsRaw)
-            : undefined;
-
-      // Fallback: final.evidence.signals (authoritative in analyze-v1 response)
-      if (!Number.isFinite(n)) {
-        const evSignals = (final as any)?.evidence?.signals;
-        if (Array.isArray(evSignals)) n = evSignals.length;
-      }
-
-      if (Number.isFinite(n)) {
-        // Ensure counts exists; set counts.signals if missing
-        if (!(evidencePackage as any).counts || typeof (evidencePackage as any).counts !== "object") {
-          (evidencePackage as any).counts = {};
-        }
-        if ((evidencePackage as any).counts.signals == null) {
-          (evidencePackage as any).counts.signals = { kind: "present", value: n };
-        }
-
-        // Ensure summary exists; always set summary.signalsCount
-        if (!(evidencePackage as any).summary || typeof (evidencePackage as any).summary !== "object") {
-          (evidencePackage as any).summary = {};
-        }
-        (evidencePackage as any).summary.signalsCount = n;
-      }
+      backfillEvidencePackageSignalsCountV01({
+        evidencePackage,
+        finalEvidenceSignalsLen: n,
+      });
     }
     if (final && typeof final === "object") (final as any).evidencePackage = evidencePackage;
     return NextResponse.json(final);
@@ -683,43 +654,13 @@ const checked = AnalyzeWordResultV1ContractSchema.safeParse(out);
     }
 
     if (evidencePackage && typeof evidencePackage === "object") {
-      const unwrap = (x: any) =>
-        x && typeof x === "object" && (x.kind === "present" || x.kind === "missing")
-          ? x.kind === "present"
-            ? x.value
-            : undefined
-          : x;
+      const n =
+        Array.isArray((final as any)?.evidence?.signals) ? (final as any).evidence.signals.length : undefined;
 
-      // Prefer counts.signals if present (wrapped or raw)
-      const countsSignalsRaw = unwrap((evidencePackage as any)?.counts?.signals);
-      let n: any =
-        typeof countsSignalsRaw === "number"
-          ? countsSignalsRaw
-          : typeof countsSignalsRaw === "string"
-            ? Number(countsSignalsRaw)
-            : undefined;
-
-      // Fallback: final.evidence.signals (authoritative in analyze-v1 response)
-      if (!Number.isFinite(n)) {
-        const evSignals = (final as any)?.evidence?.signals;
-        if (Array.isArray(evSignals)) n = evSignals.length;
-      }
-
-      if (Number.isFinite(n)) {
-        // Ensure counts exists; set counts.signals if missing
-        if (!(evidencePackage as any).counts || typeof (evidencePackage as any).counts !== "object") {
-          (evidencePackage as any).counts = {};
-        }
-        if ((evidencePackage as any).counts.signals == null) {
-          (evidencePackage as any).counts.signals = { kind: "present", value: n };
-        }
-
-        // Ensure summary exists; always set summary.signalsCount
-        if (!(evidencePackage as any).summary || typeof (evidencePackage as any).summary !== "object") {
-          (evidencePackage as any).summary = {};
-        }
-        (evidencePackage as any).summary.signalsCount = n;
-      }
+      backfillEvidencePackageSignalsCountV01({
+        evidencePackage,
+        finalEvidenceSignalsLen: n,
+      });
     }
     if (final && typeof final === "object") (final as any).evidencePackage = evidencePackage;
     return NextResponse.json(final);
