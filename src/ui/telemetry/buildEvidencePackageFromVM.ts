@@ -41,6 +41,18 @@ function safeStr(x: any): string {
   return "";
 }
 
+function pickSignalsCountFromVM(vm: any): number | undefined {
+  // Keep backward compat with older VM shape + unit tests
+  if (Array.isArray(vm?.signals)) return vm.signals.length;
+
+  const n = vm?.readout?.counts?.signals;
+  if (Number.isFinite(n)) return n;
+
+  if (Array.isArray(vm?.evidence?.signals)) return vm.evidence.signals.length;
+
+  return undefined;
+}
+
 export function buildEvidencePackageFromVM(vm: any, opts?: { ledgerModel?: any }): EvidencePackageV01 {
   const r: any = vm?.readout ?? {};
 
@@ -66,7 +78,7 @@ export function buildEvidencePackageFromVM(vm: any, opts?: { ledgerModel?: any }
         ? r.voicePathFunctional.join(" → ")
         : safeStr(r?.voicePathFunctional),
       voicePathDelta: safeStr(r?.voicePathDelta),
-      signalsCount: typeof vm?.signals?.length === "number" ? vm.signals.length : undefined,
+      signalsCount: pickSignalsCountFromVM(vm),
     },
     counts: vm?.readout ? { ...(vm?.readout as any) }?.counts : undefined, // defensive; may be undefined
     ledger: opts?.ledgerModel ?? undefined,
