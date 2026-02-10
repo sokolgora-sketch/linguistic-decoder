@@ -42,16 +42,39 @@ function safeStr(x: any): string {
 }
 
 function pickSignalsCountFromVM(vm: any): number | undefined {
-  // Keep backward compat with older VM shape + unit tests
-  if (Array.isArray(vm?.signals)) return vm.signals.length;
+  const unwrap = (x: any) =>
+    x && typeof x === "object" && (x.kind === "present" || x.kind === "missing")
+      ? x.kind === "present"
+        ? x.value
+        : undefined
+      : x;
 
-  const n = vm?.readout?.counts?.signals;
-  if (Number.isFinite(n)) return n;
+  // 1) SSOT: readout.counts.signals (often wrapped: {kind,value})
+  const cRaw = unwrap(vm?.readout?.counts?.signals);
+  if (typeof cRaw === "number" && Number.isFinite(cRaw)) return cRaw;
+  if (typeof cRaw === "string") {
+    const n = Number(cRaw);
+    if (Number.isFinite(n)) return n;
+  }
 
-  if (Array.isArray(vm?.evidence?.signals)) return vm.evidence.signals.length;
+  // 2) Back-compat: vm.signals (older VM/tests)
+  const topSignals = unwrap(vm?.signals);
+  if (Array.isArray(topSignals)) return topSignals.length;
+
+  // 3) Evidence fallbacks (vm.evidence or vm.readout.evidence)
+  const ev0 = unwrap(vm?.evidence);
+  const ev1 = unwrap(vm?.readout?.evidence);
+  const ev = ev0 ?? ev1;
+
+  const evSignals = ev ? unwrap(ev.signals) : undefined;
+  if (Array.isArray(evSignals)) return evSignals.length;
+
+  const evSignalsNotes = ev ? unwrap(ev["signals+notes"]) : undefined;
+  if (Array.isArray(evSignalsNotes)) return evSignalsNotes.length;
 
   return undefined;
 }
+
 
 export function buildEvidencePackageFromVM(vm: any, opts?: { ledgerModel?: any }): EvidencePackageV01 {
   const r: any = vm?.readout ?? {};
