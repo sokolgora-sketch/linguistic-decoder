@@ -39,4 +39,34 @@ describe("evidence package v0.1 (VM-only)", () => {
     expect((pkg as any).raw).toBeUndefined();
     expect((pkg as any).payload).toBeUndefined();
   });
+
+  it("unwraps wrapped readout.counts.signals for signalsCount", () => {
+    const vm: any = {
+      wordShown: "résumé",
+      mode: "strict",
+      engineVersion: "0.2.0-symbolic",
+      // If unwrap breaks, function would incorrectly fall back to these:
+      signals: ["wrong_fallback_should_not_win"],
+      evidence: {
+        signals: ["a", "b", "c", "d"], // wrong (4)
+        "signals+notes": ["s1","s2","s3","s4","s5","s6","s7","s8"], // wrong (8)
+      },
+      readout: {
+        word: "résumé",
+        mode: "strict",
+        engineVersion: "0.2.0-symbolic",
+        voicePath: ["U"],
+        voicePathSurface: ["E","U","E"],
+        voicePathFunctional: ["U"],
+        voicePathDelta: "EUE vs U",
+        counts: {
+          signals: { kind: "present", value: 2 }, // ✅ this must win
+        },
+      },
+    };
+
+    const pkg = buildEvidencePackageFromVM(vm, { ledgerModel: { entries: [{ k: "e1" }] } });
+    expect(pkg.summary?.signalsCount).toBe(2);
+  });
+
 });
