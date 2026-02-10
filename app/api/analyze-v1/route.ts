@@ -469,22 +469,37 @@ const checked = AnalyzeWordResultV1ContractSchema.safeParse(out);
             : undefined
           : x;
 
-      const expectedRaw = unwrap((evidencePackage as any)?.counts?.signals);
-      const expected =
-        typeof expectedRaw === "number"
-          ? expectedRaw
-          : typeof expectedRaw === "string"
-            ? Number(expectedRaw)
+      // Prefer counts.signals if present (wrapped or raw)
+      const countsSignalsRaw = unwrap((evidencePackage as any)?.counts?.signals);
+      let n: any =
+        typeof countsSignalsRaw === "number"
+          ? countsSignalsRaw
+          : typeof countsSignalsRaw === "string"
+            ? Number(countsSignalsRaw)
             : undefined;
 
-      if (Number.isFinite(expected as any)) {
+      // Fallback: final.evidence.signals (authoritative in analyze-v1 response)
+      if (!Number.isFinite(n)) {
+        const evSignals = (final as any)?.evidence?.signals;
+        if (Array.isArray(evSignals)) n = evSignals.length;
+      }
+
+      if (Number.isFinite(n)) {
+        // Ensure counts exists; set counts.signals if missing
+        if (!(evidencePackage as any).counts || typeof (evidencePackage as any).counts !== "object") {
+          (evidencePackage as any).counts = {};
+        }
+        if ((evidencePackage as any).counts.signals == null) {
+          (evidencePackage as any).counts.signals = { kind: "present", value: n };
+        }
+
+        // Ensure summary exists; always set summary.signalsCount
         if (!(evidencePackage as any).summary || typeof (evidencePackage as any).summary !== "object") {
           (evidencePackage as any).summary = {};
         }
-        (evidencePackage as any).summary.signalsCount = expected as any;
+        (evidencePackage as any).summary.signalsCount = n;
       }
     }
-
     if (final && typeof final === "object") (final as any).evidencePackage = evidencePackage;
     return NextResponse.json(final);
   } catch (err: any) {
@@ -675,22 +690,37 @@ const checked = AnalyzeWordResultV1ContractSchema.safeParse(out);
             : undefined
           : x;
 
-      const expectedRaw = unwrap((evidencePackage as any)?.counts?.signals);
-      const expected =
-        typeof expectedRaw === "number"
-          ? expectedRaw
-          : typeof expectedRaw === "string"
-            ? Number(expectedRaw)
+      // Prefer counts.signals if present (wrapped or raw)
+      const countsSignalsRaw = unwrap((evidencePackage as any)?.counts?.signals);
+      let n: any =
+        typeof countsSignalsRaw === "number"
+          ? countsSignalsRaw
+          : typeof countsSignalsRaw === "string"
+            ? Number(countsSignalsRaw)
             : undefined;
 
-      if (Number.isFinite(expected as any)) {
+      // Fallback: final.evidence.signals (authoritative in analyze-v1 response)
+      if (!Number.isFinite(n)) {
+        const evSignals = (final as any)?.evidence?.signals;
+        if (Array.isArray(evSignals)) n = evSignals.length;
+      }
+
+      if (Number.isFinite(n)) {
+        // Ensure counts exists; set counts.signals if missing
+        if (!(evidencePackage as any).counts || typeof (evidencePackage as any).counts !== "object") {
+          (evidencePackage as any).counts = {};
+        }
+        if ((evidencePackage as any).counts.signals == null) {
+          (evidencePackage as any).counts.signals = { kind: "present", value: n };
+        }
+
+        // Ensure summary exists; always set summary.signalsCount
         if (!(evidencePackage as any).summary || typeof (evidencePackage as any).summary !== "object") {
           (evidencePackage as any).summary = {};
         }
-        (evidencePackage as any).summary.signalsCount = expected as any;
+        (evidencePackage as any).summary.signalsCount = n;
       }
     }
-
     if (final && typeof final === "object") (final as any).evidencePackage = evidencePackage;
     return NextResponse.json(final);
   } catch (err: any) {
