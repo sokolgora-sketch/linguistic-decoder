@@ -8281,7 +8281,14 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
           ],
         },
       },
-      "normalizationSteps": [],
+      "normalizationSteps": [
+        {
+          "from": "AIE",
+          "op": "vowel_normalize",
+          "reason": "functional_equivalence",
+          "to": "AE",
+        },
+      ],
       "notes": [],
       "ops": [],
       "recomputed": true,
@@ -8305,6 +8312,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
       ],
       "surfaceVowelsRaw": [
         "A",
+        "I",
         "E",
       ],
       "vowelPath": [
@@ -8361,19 +8369,22 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
           "COMPLETION",
         ],
         "jumps": [
-          1,
+          2,
+          6,
         ],
-        "rawSum": 3,
-        "total1to7": 2,
-        "totalMod7": 1,
+        "rawSum": 6,
+        "total1to7": 4,
+        "totalMod7": 3,
         "values1to7": [
           1,
+          3,
           2,
         ],
         "wrapCount": 0,
       },
       "principlesPath": [
         "TRUTH",
+        "INSIGHT",
         "EXPANSION",
       ],
       "surfaceMath7": {
@@ -8381,25 +8392,29 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
           "COMPLETION",
         ],
         "jumps": [
-          1,
+          2,
+          6,
         ],
-        "rawSum": 3,
-        "total1to7": 2,
-        "totalMod7": 1,
+        "rawSum": 6,
+        "total1to7": 4,
+        "totalMod7": 3,
         "values1to7": [
           1,
+          3,
           2,
         ],
         "wrapCount": 0,
       },
-      "surfaceTotal1to7": 2,
-      "surfaceTotalMod7": 1,
+      "surfaceTotal1to7": 4,
+      "surfaceTotalMod7": 3,
       "surfaceVowels": [
         "A",
+        "I",
         "E",
       ],
       "values1to7": [
         1,
+        3,
         2,
       ],
     },
@@ -8530,7 +8545,14 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
             ],
           },
         },
-        "normalizationSteps": [],
+        "normalizationSteps": [
+          {
+            "from": "AIE",
+            "op": "vowel_normalize",
+            "reason": "functional_equivalence",
+            "to": "AE",
+          },
+        ],
         "notes": [],
         "ops": [],
         "recomputed": true,
@@ -8554,6 +8576,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         ],
         "surfaceVowelsRaw": [
           "A",
+          "I",
           "E",
         ],
         "vowelPath": [
@@ -8675,11 +8698,12 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         "surface": {
           "bucketCounts": {
             "boundary": 0,
-            "manifest": 2,
+            "manifest": 3,
             "source": 0,
           },
           "colorBand": [
             "red",
+            "yellow",
             "orange",
           ],
           "dominantBucket": "manifest",
@@ -8692,6 +8716,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
           "transitions": [],
           "vowels": [
             "A",
+            "I",
             "E",
           ],
         },
@@ -8758,11 +8783,12 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
       "surface": {
         "bucketCounts": {
           "boundary": 0,
-          "manifest": 2,
+          "manifest": 3,
           "source": 0,
         },
         "colorBand": [
           "red",
+          "yellow",
           "orange",
         ],
         "dominantBucket": "manifest",
@@ -8775,6 +8801,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         "transitions": [],
         "vowels": [
           "A",
+          "I",
           "E",
         ],
       },
@@ -9628,7 +9655,14 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
           ],
         },
       },
-      "normalizationSteps": [],
+      "normalizationSteps": [
+        {
+          "from": "EUE",
+          "op": "vowel_normalize",
+          "reason": "functional_equivalence",
+          "to": "U",
+        },
+      ],
       "notes": [],
       "ops": [],
       "recomputed": true,
@@ -9650,7 +9684,9 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         "U",
       ],
       "surfaceVowelsRaw": [
+        "E",
         "U",
+        "E",
       ],
       "vowelPath": [
         "U",
@@ -9696,40 +9732,60 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
       "basisNfc": "résumé",
       "math7": {
         "events": [
+          "WRAP_GATE",
           "COMPLETION",
+          "NEW_CYCLE",
         ],
-        "jumps": [],
-        "rawSum": 5,
-        "total1to7": 5,
-        "totalMod7": 4,
+        "jumps": [
+          3,
+          4,
+        ],
+        "rawSum": 9,
+        "total1to7": 7,
+        "totalMod7": 6,
         "values1to7": [
+          2,
           5,
+          2,
         ],
-        "wrapCount": 0,
+        "wrapCount": 1,
       },
       "principlesPath": [
+        "EXPANSION",
         "UNITY",
+        "EXPANSION",
       ],
       "surfaceMath7": {
         "events": [
+          "WRAP_GATE",
           "COMPLETION",
+          "NEW_CYCLE",
         ],
-        "jumps": [],
-        "rawSum": 5,
-        "total1to7": 5,
-        "totalMod7": 4,
+        "jumps": [
+          3,
+          4,
+        ],
+        "rawSum": 9,
+        "total1to7": 7,
+        "totalMod7": 6,
         "values1to7": [
+          2,
           5,
+          2,
         ],
-        "wrapCount": 0,
+        "wrapCount": 1,
       },
-      "surfaceTotal1to7": 5,
-      "surfaceTotalMod7": 4,
+      "surfaceTotal1to7": 7,
+      "surfaceTotalMod7": 6,
       "surfaceVowels": [
+        "E",
         "U",
+        "E",
       ],
       "values1to7": [
+        2,
         5,
+        2,
       ],
     },
     "heartPrimaryPath": undefined,
@@ -9857,7 +9913,14 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
             ],
           },
         },
-        "normalizationSteps": [],
+        "normalizationSteps": [
+          {
+            "from": "EUE",
+            "op": "vowel_normalize",
+            "reason": "functional_equivalence",
+            "to": "U",
+          },
+        ],
         "notes": [],
         "ops": [],
         "recomputed": true,
@@ -9879,7 +9942,9 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
           "U",
         ],
         "surfaceVowelsRaw": [
+          "E",
           "U",
+          "E",
         ],
         "vowelPath": [
           "U",
@@ -9990,22 +10055,29 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         "surface": {
           "bucketCounts": {
             "boundary": 0,
-            "manifest": 0,
+            "manifest": 2,
             "source": 1,
           },
           "colorBand": [
+            "orange",
             "blue",
+            "orange",
           ],
-          "dominantBucket": "source",
-          "dominantColor": "blue",
+          "dominantBucket": "mixed",
+          "dominantColor": "mixed",
           "notes": [
-            "pure bucket: source",
+            "mixed buckets: source+manifest",
           ],
-          "polaritySymbol": "♀",
-          "signature": "PURE_SOURCE",
-          "transitions": [],
+          "polaritySymbol": "◐",
+          "signature": "MIXED_SOURCE_MANIFEST",
+          "transitions": [
+            "manifest→source",
+            "source→manifest",
+          ],
           "vowels": [
+            "E",
             "U",
+            "E",
           ],
         },
         "version": "resonance-profile-v1",
@@ -10069,22 +10141,29 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
       "surface": {
         "bucketCounts": {
           "boundary": 0,
-          "manifest": 0,
+          "manifest": 2,
           "source": 1,
         },
         "colorBand": [
+          "orange",
           "blue",
+          "orange",
         ],
-        "dominantBucket": "source",
-        "dominantColor": "blue",
+        "dominantBucket": "mixed",
+        "dominantColor": "mixed",
         "notes": [
-          "pure bucket: source",
+          "mixed buckets: source+manifest",
         ],
-        "polaritySymbol": "♀",
-        "signature": "PURE_SOURCE",
-        "transitions": [],
+        "polaritySymbol": "◐",
+        "signature": "MIXED_SOURCE_MANIFEST",
+        "transitions": [
+          "manifest→source",
+          "source→manifest",
+        ],
         "vowels": [
+          "E",
           "U",
+          "E",
         ],
       },
       "version": "resonance-profile-v1",

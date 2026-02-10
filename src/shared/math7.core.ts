@@ -13,6 +13,8 @@
  * - Any mod7 computations should import from here.
  */
 
+import { mapVowelsV0_1 } from "./vowels/mapVowels.v0.1";
+
 export const SEVEN_VOWELS = ["A", "E", "I", "O", "U", "Y", "Ë"] as const;
 export type SevenVowel = (typeof SEVEN_VOWELS)[number];
 
@@ -32,13 +34,14 @@ export function isSevenVowel(x: string): x is SevenVowel {
 }
 
 export function extractSevenVowelsFromString(input: string): SevenVowel[] {
-  // Intentionally dumb + stable: scan characters only.
-  const s = String(input ?? "").toUpperCase();
-  const out: SevenVowel[] = [];
-  for (const ch of s) {
-    if (isSevenVowel(ch)) out.push(ch);
+  // Orthography SSOT: Universal Vowel Mapper v0.1 (Latin + diacritics → Seven Voices).
+  // Deterministic; never throws.
+  try {
+    const out = mapVowelsV0_1({ word: String(input ?? "") });
+    return out.voices as unknown as SevenVowel[];
+  } catch {
+    return [];
   }
-  return out;
 }
 
 export function totalMod7FromSum0to6(sum0to6: number): number {
