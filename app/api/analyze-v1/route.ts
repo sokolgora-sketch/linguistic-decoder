@@ -461,6 +461,30 @@ const checked = AnalyzeWordResultV1ContractSchema.safeParse(out);
       });
     }
 
+    if (evidencePackage && typeof evidencePackage === "object") {
+      const unwrap = (x: any) =>
+        x && typeof x === "object" && (x.kind === "present" || x.kind === "missing")
+          ? x.kind === "present"
+            ? x.value
+            : undefined
+          : x;
+
+      const expectedRaw = unwrap((evidencePackage as any)?.counts?.signals);
+      const expected =
+        typeof expectedRaw === "number"
+          ? expectedRaw
+          : typeof expectedRaw === "string"
+            ? Number(expectedRaw)
+            : undefined;
+
+      if (Number.isFinite(expected as any)) {
+        if (!(evidencePackage as any).summary || typeof (evidencePackage as any).summary !== "object") {
+          (evidencePackage as any).summary = {};
+        }
+        (evidencePackage as any).summary.signalsCount = expected as any;
+      }
+    }
+
     if (final && typeof final === "object") (final as any).evidencePackage = evidencePackage;
     return NextResponse.json(final);
   } catch (err: any) {
@@ -641,6 +665,30 @@ const checked = AnalyzeWordResultV1ContractSchema.safeParse(out);
         issues: e?.issues ?? e?.message ?? String(e),
         out: final,
       });
+    }
+
+    if (evidencePackage && typeof evidencePackage === "object") {
+      const unwrap = (x: any) =>
+        x && typeof x === "object" && (x.kind === "present" || x.kind === "missing")
+          ? x.kind === "present"
+            ? x.value
+            : undefined
+          : x;
+
+      const expectedRaw = unwrap((evidencePackage as any)?.counts?.signals);
+      const expected =
+        typeof expectedRaw === "number"
+          ? expectedRaw
+          : typeof expectedRaw === "string"
+            ? Number(expectedRaw)
+            : undefined;
+
+      if (Number.isFinite(expected as any)) {
+        if (!(evidencePackage as any).summary || typeof (evidencePackage as any).summary !== "object") {
+          (evidencePackage as any).summary = {};
+        }
+        (evidencePackage as any).summary.signalsCount = expected as any;
+      }
     }
 
     if (final && typeof final === "object") (final as any).evidencePackage = evidencePackage;
