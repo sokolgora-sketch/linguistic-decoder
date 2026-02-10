@@ -21,6 +21,7 @@ import type {
   RootSpanV1,
 } from "./deepRoot.rootMap.v1";
 import { getProtoRootV1 } from "./protoRoots.v1";
+import { extractSevenVowelsFromString } from "@/shared/math7.core";
 
 function roleHintToTokenRole(roleHint?: string): RootTokenRoleV1 {
   switch (roleHint) {
@@ -48,7 +49,7 @@ function lastVowelFromAnyPath(v: unknown): string | null {
     return s && /^[AEIOUYË]$/.test(s) ? s : null;
   }
   const s = String(v ?? "").toUpperCase();
-  const m = s.match(/[AEIOUYË]/g);
+  const m = extractSevenVowelsFromString(String(s ?? ""));
   if (!m || m.length === 0) return null;
   return m[m.length - 1] ?? null;
 }
@@ -67,7 +68,7 @@ function hypothesisTerminalVowel(h: any): string | null {
 function extractVowelPath(s: string): string | undefined {
   // Keep it simple + deterministic: uppercase, scan for the canonical vowels.
   const up = String(s ?? "").toUpperCase();
-  const m = up.match(/[AEIOUYË]/g);
+  const m = extractSevenVowelsFromString(String(up ?? ""));
   if (!m || m.length === 0) return undefined;
   return m.join("-");
 }

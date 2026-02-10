@@ -7,7 +7,7 @@
 // - This chooses the *vowel sequence basis* for Math7.
 // - It does not mutate spelling; it only selects which already-computed path to trust.
 
-import { isSevenVowel, type SevenVowel } from "@/shared/math7.core";
+import { isSevenVowel, type SevenVowel, extractSevenVowelsFromString } from "@/shared/math7.core";
 
 function normalizeSevenVowels(vowelsIn: Array<string | null | undefined>): SevenVowel[] {
   return vowelsIn
@@ -55,7 +55,7 @@ function replaceTerminalYWithI(v: SevenVowel[]): SevenVowel[] {
 
 function parseVoicePathString(s: unknown): SevenVowel[] {
   const up = String(s ?? "").toUpperCase();
-  const m = up.match(/[AEIOUYË]/g) ?? [];
+  const m = extractSevenVowelsFromString(String(up ?? ""));
   return normalizeSevenVowels(m);
 }
 
