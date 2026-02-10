@@ -41,6 +41,41 @@ function safeStr(x: any): string {
   return "";
 }
 
+function pickSignalsCountFromVM(vm: any): number | undefined {
+  const unwrap = (x: any) =>
+    x && typeof x === "object" && (x.kind === "present" || x.kind === "missing")
+      ? x.kind === "present"
+        ? x.value
+        : undefined
+      : x;
+
+  // 1) SSOT: readout.counts.signals (often wrapped: {kind,value})
+  const cRaw = unwrap(vm?.readout?.counts?.signals);
+  if (typeof cRaw === "number" && Number.isFinite(cRaw)) return cRaw;
+  if (typeof cRaw === "string") {
+    const n = Number(cRaw);
+    if (Number.isFinite(n)) return n;
+  }
+
+  // 2) Back-compat: vm.signals (older VM/tests)
+  const topSignals = unwrap(vm?.signals);
+  if (Array.isArray(topSignals)) return topSignals.length;
+
+  // 3) Evidence fallbacks (vm.evidence or vm.readout.evidence)
+  const ev0 = unwrap(vm?.evidence);
+  const ev1 = unwrap(vm?.readout?.evidence);
+  const ev = ev0 ?? ev1;
+
+  const evSignals = ev ? unwrap(ev.signals) : undefined;
+  if (Array.isArray(evSignals)) return evSignals.length;
+
+  const evSignalsNotes = ev ? unwrap(ev["signals+notes"]) : undefined;
+  if (Array.isArray(evSignalsNotes)) return evSignalsNotes.length;
+
+  return undefined;
+}
+
+
 export function buildEvidencePackageFromVM(vm: any, opts?: { ledgerModel?: any }): EvidencePackageV01 {
   const r: any = vm?.readout ?? {};
 
@@ -66,7 +101,7 @@ export function buildEvidencePackageFromVM(vm: any, opts?: { ledgerModel?: any }
         ? r.voicePathFunctional.join(" → ")
         : safeStr(r?.voicePathFunctional),
       voicePathDelta: safeStr(r?.voicePathDelta),
-      signalsCount: typeof vm?.signals?.length === "number" ? vm.signals.length : undefined,
+      signalsCount: pickSignalsCountFromVM(vm),
     },
     counts: vm?.readout ? { ...(vm?.readout as any) }?.counts : undefined, // defensive; may be undefined
     ledger: opts?.ledgerModel ?? undefined,
