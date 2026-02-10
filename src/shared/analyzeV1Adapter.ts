@@ -1,4 +1,5 @@
 import type { AnalyzeWordResultUI, CandidateUI, PrimaryPathSummary } from "@/shared/resultsUI";
+import { extractSevenVowelsFromString } from "@/shared/math7.core";
 
 /**
  * analyze-v1 Adapter (UI-first contract)
@@ -29,7 +30,7 @@ function splitVoicePath(path: unknown): string[] {
 function normalizeArrowPath(s: string): string {
   // Canonicalize ANY visual formatting ("U → I", "U - I", "U–I") to "U-I"
   // by extracting only valid Seven-Vowels symbols and joining with "-".
-  const hits = String(s).toUpperCase().match(/[AEIOUYË]/g) ?? [];
+  const hits = extractSevenVowelsFromString(String(s ?? ""));
   return hits.join("-");
 }
 

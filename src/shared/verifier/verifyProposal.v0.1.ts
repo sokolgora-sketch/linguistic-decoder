@@ -3,7 +3,7 @@
 // No bespoke basis/vowel/math7 logic lives here.
 
 import type { SevenVowel } from "@/shared/math7.core";
-import { VOWEL_INDEX } from "@/shared/math7.core";
+import { VOWEL_INDEX, extractSevenVowelsFromString } from "@/shared/math7.core";
 import { applyStrictTerminalYHint } from "@/shared/math7.basis";
 import { PRINCIPLE_MAP } from "@/engine/math7";
 import { computeMath7 } from "@/v1/math7.core.v1";
@@ -80,21 +80,7 @@ function canonicalBasisV0_1(word: string): string {
 }
 
 function extractSevenVowelsFromBasisV0_1(basis: string): SevenVowel[] {
-  const out: SevenVowel[] = [];
-  const s = String(basis ?? "");
-  for (const ch of s) {
-    switch (ch) {
-      case "a": out.push("A"); break;
-      case "e": out.push("E"); break;
-      case "i": out.push("I"); break;
-      case "o": out.push("O"); break;
-      case "u": out.push("U"); break;
-      case "y": out.push("Y"); break;
-      case "ë": out.push("Ë"); break;
-      default: break;
-    }
-  }
-  return out;
+  return extractSevenVowelsFromString(String(basis ?? ""));
 }
 
 function extractVowelsForWordV0_1(word: string, mode: VerifierModeV0_1): SevenVowel[] {
