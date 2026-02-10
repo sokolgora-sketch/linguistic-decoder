@@ -1,3 +1,5 @@
+import { extractSevenVowelsFromString } from "@/shared/math7.core";
+
 export type SevenVowel = "A" | "E" | "I" | "O" | "U" | "Y" | "Ë";
 
 export const SEVEN_VOWELS: ReadonlyArray<SevenVowel> = ["A", "E", "I", "O", "U", "Y", "Ë"];
@@ -63,14 +65,8 @@ export function normalizeBasis(input: string): string {
 
 /** Strict vowel extraction: only A,E,I,O,U,Y,Ë. Everything else is ignored. */
 export function extractSevenVowels(basisNfc: string): SevenVowel[] {
-  const up = basisNfc.toUpperCase();
-  const out: SevenVowel[] = [];
-  for (const ch of up) {
-    if (ch === "A" || ch === "E" || ch === "I" || ch === "O" || ch === "U" || ch === "Y" || ch === "Ë") {
-      out.push(ch);
-    }
-  }
-  return out;
+  // Delegate to shared SSOT (now backed by Universal Vowel Mapper v0.1).
+  return extractSevenVowelsFromString(String(basisNfc ?? "")) as unknown as SevenVowel[];
 }
 
 /**

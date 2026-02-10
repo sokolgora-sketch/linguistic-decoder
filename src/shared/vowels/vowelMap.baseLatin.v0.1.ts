@@ -1,0 +1,131 @@
+// src/shared/vowels/vowelMap.baseLatin.v0.1.ts
+// Universal Vowel Mapper v0.1 — base Latin + common diacritics → Seven Voices.
+// Contract: keys are single Unicode characters (NFC). Mapper will NFC + lowercase,
+// so this table is primarily lowercase, but we include a few uppercase for safety.
+
+import type { VowelVoice } from "./vowelVoices.v0.1";
+
+export const VOWEL_MAP_BASE_LATIN_V0_1: Readonly<Record<string, VowelVoice>> = Object.freeze({
+  // --- A family -----------------------------------------------------------
+  "a": "A",
+  "á": "A",
+  "à": "A",
+  "â": "A",
+  "ã": "A",
+  "ä": "A",
+  "å": "A",
+  "ā": "A",
+  "ă": "A",
+  "ą": "A",
+  "A": "A",
+  "Á": "A",
+  "À": "A",
+  "Â": "A",
+  "Ã": "A",
+  "Ä": "A",
+  "Å": "A",
+  "Ā": "A",
+  "Ă": "A",
+  "Ą": "A",
+
+  // --- E family -----------------------------------------------------------
+  "e": "E",
+  "é": "E",
+  "è": "E",
+  "ê": "E",
+  "ē": "E",
+  "ĕ": "E",
+  "ė": "E",
+  "ę": "E",
+  "ě": "E",
+  "E": "E",
+  "É": "E",
+  "È": "E",
+  "Ê": "E",
+  "Ē": "E",
+  "Ĕ": "E",
+  "Ė": "E",
+  "Ę": "E",
+  "Ě": "E",
+
+  // --- I family -----------------------------------------------------------
+  "i": "I",
+  "í": "I",
+  "ì": "I",
+  "î": "I",
+  "ï": "I",
+  "ī": "I",
+  "ĭ": "I",
+  "į": "I",
+  "ı": "I", // dotless i
+  "I": "I",
+  "Í": "I",
+  "Ì": "I",
+  "Î": "I",
+  "Ï": "I",
+  "Ī": "I",
+  "Ĭ": "I",
+  "Į": "I",
+  "İ": "I",
+
+  // --- O family -----------------------------------------------------------
+  "o": "O",
+  "ó": "O",
+  "ò": "O",
+  "ô": "O",
+  "ö": "O",
+  "õ": "O",
+  "ō": "O",
+  "ŏ": "O",
+  "ő": "O",
+  "ø": "O",
+  // Decision for v0.1: treat French œ / Œ as O-family (orthography baseline).
+  "œ": "O",
+  "Œ": "O",
+  "O": "O",
+  "Ó": "O",
+  "Ò": "O",
+  "Ô": "O",
+  "Ö": "O",
+  "Õ": "O",
+  "Ō": "O",
+  "Ŏ": "O",
+  "Ő": "O",
+  "Ø": "O",
+
+  // --- U family -----------------------------------------------------------
+  "u": "U",
+  "ú": "U",
+  "ù": "U",
+  "û": "U",
+  "ū": "U",
+  "ŭ": "U",
+  "ů": "U",
+  "ű": "U",
+  "ų": "U",
+  "U": "U",
+  "Ú": "U",
+  "Ù": "U",
+  "Û": "U",
+  "Ū": "U",
+  "Ŭ": "U",
+  "Ů": "U",
+  "Ű": "U",
+  "Ų": "U",
+
+  // --- Y family -----------------------------------------------------------
+  "y": "Y",
+  "ý": "Y",
+  "ÿ": "Y",
+  "Y": "Y",
+  "Ý": "Y",
+  "Ÿ": "Y",
+  // Special law (v0.1): ü / Ü → Y (NOT U)
+  "ü": "Y",
+  "Ü": "Y",
+
+  // --- Albanian Ë ---------------------------------------------------------
+  // Note: mapper lowercases, but we still include uppercase for safety.
+  "ë": "Ë",
+  "Ë": "Ë",
+});

@@ -9,6 +9,7 @@ import {
   RULESET_VERSION_V1,
 } from "./versions.v1";
 import { totalMod7FromSum0to6 } from "./math7.core.v1";
+import { extractSevenVowelsFromString } from "@/shared/math7.core";
 const VOWEL_INDEX: Record<SevenVowel, number> = {
   A: 0,
   E: 1,
@@ -20,36 +21,8 @@ const VOWEL_INDEX: Record<SevenVowel, number> = {
 };
 
 function extractSevenVowelsV1(normalizedWord: string): SevenVowel[] {
-  // Uses same logic as extractVowelPathV1 but returns typed vowels
-  const out: SevenVowel[] = [];
-  for (const ch of normalizedWord) {
-    switch (ch) {
-      case "a":
-        out.push("A");
-        break;
-      case "e":
-        out.push("E");
-        break;
-      case "i":
-        out.push("I");
-        break;
-      case "o":
-        out.push("O");
-        break;
-      case "u":
-        out.push("U");
-        break;
-      case "y":
-        out.push("Y");
-        break;
-      case "ë":
-        out.push("Ë");
-        break;
-      default:
-        break;
-    }
-  }
-  return out;
+  // Orthography SSOT: shared extractor (Universal Vowel Mapper v0.1).
+  return extractSevenVowelsFromString(String(normalizedWord ?? "")) as unknown as SevenVowel[];
 }
 
 function buildEvidenceV1(
