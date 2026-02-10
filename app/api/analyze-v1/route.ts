@@ -8,6 +8,7 @@ import { buildEvidencePackageFromVM } from "@/ui/telemetry/buildEvidencePackageF
 import { backfillEvidencePackageSignalsCountV01 } from "./evidencePackage.signalsCount.backfill.v0.1";
 import { toAnalyzeWordResultV1Contract } from "@/shared/analyzeWordResult.v1.contract";
 import { ensurePrimaryAndCandidatePaths } from "@/shared/ensurePaths";
+import { parseIpaVowelsV0_1 } from "@/shared/vowels/parseIpaVowels.v0.1";
 
 // ✅ Contract guard
 import { AnalyzeWordResultV1ContractSchema } from "@/shared/analyzeWordResult.v1.contract";
@@ -20,6 +21,7 @@ const BodySchema = z
     word: z.string().min(1),
     mode: z.enum(["strict", "open"]).optional(),
     alphabet: z.string().optional(),
+      ipa: z.string().optional(),
   })
   .passthrough();
 
@@ -298,9 +300,11 @@ export async function POST(req: Request) {
     );
   }
 
-  const { word, mode, alphabet } = parsed.data;
+  const { word, mode, alphabet, ipa: ipaRaw } = parsed.data;
 
-  const modeParsed =
+  const ipa = typeof ipaRaw === "string" ? ipaRaw.trim() : "";
+
+const modeParsed =
     mode === "strict" || mode === "open" ? (mode as "strict" | "open") : undefined;
 
   
@@ -462,6 +466,16 @@ const checked = AnalyzeWordResultV1ContractSchema.safeParse(out);
       });
     }
 
+    const phoneticIpa = ipa ? parseIpaVowelsV0_1(ipa) : null;
+
+    if (final && typeof final === "object" && ipa && phoneticIpa) {
+
+      (final as any).phoneticIpaV0_1 = { ipa, ...phoneticIpa };
+
+    }
+
+
+
     if (evidencePackage && typeof evidencePackage === "object") {
       const n =
         Array.isArray((final as any)?.evidence?.signals) ? (final as any).evidence.signals.length : undefined;
@@ -491,7 +505,8 @@ export async function GET(req: Request) {
 
   
 
-    // Seed fallback flag (BRAIN-0.2)
+    const ipa = (url.searchParams.get("ipa") ?? "").trim();
+// Seed fallback flag (BRAIN-0.2)
     const seedFallbackEnabled =
       url.searchParams.get("seed") === "1" ||
       url.searchParams.get("seedBrainCandidates") === "1" ||
@@ -518,7 +533,8 @@ if (!word) {
         word,
         mode: modeParsed ?? (mode as any) ?? "strict",
         alphabet: alphabet || "auto",
-        brainCandidatesSeedFallback: seedFallbackEnabled,
+        ipa: ipa || undefined,
+          brainCandidatesSeedFallback: seedFallbackEnabled,
       };
 
     const out = enginePayloadToAnalysisResult(payload);
@@ -652,6 +668,16 @@ const checked = AnalyzeWordResultV1ContractSchema.safeParse(out);
         out: final,
       });
     }
+
+    const phoneticIpa = ipa ? parseIpaVowelsV0_1(ipa) : null;
+
+    if (final && typeof final === "object" && ipa && phoneticIpa) {
+
+      (final as any).phoneticIpaV0_1 = { ipa, ...phoneticIpa };
+
+    }
+
+
 
     if (evidencePackage && typeof evidencePackage === "object") {
       const n =
