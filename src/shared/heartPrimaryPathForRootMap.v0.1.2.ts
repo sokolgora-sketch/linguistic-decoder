@@ -1,3 +1,4 @@
+import { extractSevenVowelsFromString } from "@/shared/math7.core";
 // src/shared/heartPrimaryPathForRootMap.v0.1.2.ts
 //
 // v0.1.2 — Heart-primary RootMap audit hint.
@@ -13,7 +14,7 @@ function lastVowelFromAnyPath(v: unknown): string | null {
     return s && /^[AEIOUYË]$/.test(s) ? s : null;
   }
   const s = String(v ?? "").toUpperCase();
-  const m = s.match(/[AEIOUYË]/g);
+  const m = extractSevenVowelsFromString(String(s ?? ""));
   if (!m || m.length === 0) return null;
   return m[m.length - 1] ?? null;
 }
@@ -31,7 +32,7 @@ function replaceTerminalVowelWithI(v: unknown): unknown {
 
   // Replace only the LAST vowel occurrence if it's Y.
   const up = s.toUpperCase();
-  const vowels = up.match(/[AEIOUYË]/g);
+  const vowels = extractSevenVowelsFromString(String(up ?? ""));
   if (!vowels || vowels.length === 0) return v;
 
   const last = vowels[vowels.length - 1];

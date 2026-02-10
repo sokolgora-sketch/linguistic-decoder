@@ -1,3 +1,4 @@
+import { extractSevenVowelsFromString } from "@/shared/math7.core";
 export type Voice = "A" | "E" | "I" | "O" | "U" | "Y" | "Ë";
 export type PatternPolarity = "centrifugal" | "centripetal" | "orbital";
 
@@ -46,7 +47,7 @@ export function parseVoicePath(raw: string): Voice[] {
   // Uppercase so "ë" becomes "Ë" reliably.
   const upper = s.toUpperCase();
 
-  const matches = upper.match(/[AEIOUYË]/g) ?? [];
+  const matches = extractSevenVowelsFromString(String(upper ?? ""));
   const voices: Voice[] = [];
   for (const m of matches) {
     const v = m as Voice;
