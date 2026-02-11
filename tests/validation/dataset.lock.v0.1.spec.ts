@@ -34,13 +34,33 @@ function dist(items: string[]): Array<{ key: string; count: number }> {
     .sort((a, b) => (b.count - a.count) || (a.key < b.key ? -1 : a.key > b.key ? 1 : 0));
 }
 
+function fnv1a32(s: string): number {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < s.length; i++) {
+    h ^= s.charCodeAt(i);
+    h = Math.imul(h, 0x01000193);
+  }
+  return h >>> 0;
+}
+
 test("validation dataset lock v0.1 (invariants + snapshot)", () => {
   const ds = readJson<ValidationRecordV01[]>("tests/validation/datasets/validation.dataset.v0.1.json");
   const trainRaw = readJson<unknown>("tests/validation/datasets/validation.train.v0.1.json");
   const holdRaw = readJson<unknown>("tests/validation/datasets/validation.holdout.v0.1.json");
 
-  const trainIds = asIdList(trainRaw);
-  const holdIds = asIdList(holdRaw);
+  const trainIds = asIdList(trainRaw).slice().sort((a, b) => a.localeCompare(b));
+const holdIds = asIdList(holdRaw).slice().sort((a, b) => a.localeCompare(b));
+
+const expectedTrainIds: string[] = [];
+const expectedHoldIds: string[] = [];
+for (const id of ids) {
+  const h = fnv1a32(id);
+  (h % 10 < 8 ? expectedTrainIds : expectedHoldIds).push(id);
+}
+
+expect(trainIds).toEqual(expectedTrainIds);
+expect(holdIds).toEqual(expectedHoldIds);
+
 
   // invariant: ids are unique + non-empty
   const ids = ds.map((r) => r.id);
