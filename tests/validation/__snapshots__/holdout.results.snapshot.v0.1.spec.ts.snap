@@ -1,0 +1,94 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`validation v0.1 — holdout results snapshot 1`] = `
+{
+  "clustering": {
+    "baselines": {
+      "orthography": {
+        "acrossAvg": 1,
+        "delta": 1,
+        "pairs": {
+          "across": 1,
+          "within": 0,
+        },
+        "withinAvg": 0,
+      },
+      "shuffledTagsControl": {
+        "acrossAvg": 2,
+        "delta": 2,
+        "pairs": {
+          "across": 1,
+          "within": 0,
+        },
+        "withinAvg": 0,
+      },
+      "vowelCount": {
+        "acrossAvg": 1,
+        "delta": 1,
+        "pairs": {
+          "across": 1,
+          "within": 0,
+        },
+        "withinAvg": 0,
+      },
+    },
+    "voiceSpace": {
+      "acrossAvg": 2,
+      "delta": 2,
+      "pairs": {
+        "across": 1,
+        "within": 0,
+      },
+      "withinAvg": 0,
+    },
+  },
+  "dataset": {
+    "count": 2,
+    "langDist": [
+      {
+        "count": 1,
+        "lang": "el",
+      },
+      {
+        "count": 1,
+        "lang": "sa",
+      },
+    ],
+    "tagDist": [
+      {
+        "count": 1,
+        "tag": "kinship",
+      },
+      {
+        "count": 1,
+        "tag": "measure",
+      },
+    ],
+    "withIpa": 2,
+  },
+  "diagnostics": {
+    "ipaUnmappedTop": [],
+    "notesCount": 0,
+    "orthographyUnmappedTop": [],
+  },
+  "mismatch": {
+    "mismatchCount": 1,
+    "mismatchRate": 0.5,
+  },
+  "topMismatches": [
+    {
+      "distance": 2,
+      "id": "el_metra_v0_1",
+      "ipa": "/ˈme.tro/",
+      "lang": "el",
+      "orthographyVoices": [],
+      "phoneticVoices": [
+        "E",
+        "O",
+      ],
+      "word": "μέτρο",
+    },
+  ],
+  "version": "0.1",
+}
+`;
