@@ -10,10 +10,10 @@ function present<T>(value: T): PresentOrMissing<T> {
   return { kind: "present", value };
 }
 function missing(m: MissingState, note: string): PresentOrMissing<never> {
-  return { kind: "missing", missing: m as any, note };
+  return { kind: "missing", missing: m, note };
 }
 
-function isPlainObject(v: unknown): v is Record<string, any> {
+function isPlainObject(v: unknown): v is Record<string, unknown> {
   return !!v && typeof v === "object" && !Array.isArray(v);
 }
 function asString(v: unknown): string | undefined {
