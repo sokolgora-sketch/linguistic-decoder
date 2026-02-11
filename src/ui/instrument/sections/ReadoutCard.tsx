@@ -3,6 +3,7 @@
 import React from "react";
 import type { TelemetryReadout, PresentOrMissing, Vowel } from "../../telemetry/types";
 import { VoicePathCompare } from "../VoicePathCompare";
+import { PhoneticIpaPanelV0_1 } from "./PhoneticIpaPanel.v0.1";
 
 function renderPOM<T>(
   pom: PresentOrMissing<T>,
@@ -36,26 +37,18 @@ export function ReadoutCard({
   onCopyFullJson?: () => void;
 }) {
   const statusBadge =
-    readout.status === "detected"
-      ? "Detected"
-      : readout.status === "none"
-        ? "None"
-        : "Error";
+    readout.status === "detected" ? "Detected" : readout.status === "none" ? "None" : "Error";
 
-  
-    const phoneticIpaPOM: PresentOrMissing<{ ipa: string; voices: Vowel[]; unmapped: string[] }> =
-      ((readout as any).phoneticIpaV0_1 as any) ?? (
-        { kind: "missing", missing: "not_emitted", note: "phoneticIpaV0_1" } as any
-      );
-return (
+  const phoneticIpaPOM = readout.phoneticIpaV0_1;
+
+  return (
     <div className="rounded-xl border p-4 shadow-sm">
       <div className="flex items-start justify-between gap-4">
         <div>
           <div className="text-sm text-muted-foreground">Readout</div>
           <div className="text-lg font-semibold">{readout.word}</div>
           <div className="mt-1 text-sm font-mono">
-            normalized:{" "}
-            {renderPOM(readout.normalizedWord, (v) => <span>{String(v)}</span>)}
+            normalized: {renderPOM(readout.normalizedWord, (v) => <span>{String(v)}</span>)}
           </div>
         </div>
 
@@ -76,9 +69,7 @@ return (
         <div className="rounded-lg border p-3">
           <div className="text-xs text-muted-foreground">Run context</div>
           <div className="mt-2 space-y-1 text-sm font-mono">
-            <div>
-              mode: {renderPOM(readout.mode, (v) => <span>{String(v)}</span>)}
-            </div>
+            <div>mode: {renderPOM(readout.mode, (v) => <span>{String(v)}</span>)}</div>
             <div>
               strictInput:{" "}
               {renderPOM(
@@ -87,15 +78,9 @@ return (
                 "Not emitted by engine (yet). (UI may derive from mode)"
               )}
             </div>
-            <div>
-              alphabet: {renderPOM(readout.alphabet, (v) => <span>{String(v)}</span>)}
-            </div>
-            <div>
-              engine: {renderPOM(readout.engineVersion, (v) => <span>{String(v)}</span>)}
-            </div>
-            <div>
-              created: {renderPOM(readout.createdAt, (v) => <span>{String(v)}</span>)}
-            </div>
+            <div>alphabet: {renderPOM(readout.alphabet, (v) => <span>{String(v)}</span>)}</div>
+            <div>engine: {renderPOM(readout.engineVersion, (v) => <span>{String(v)}</span>)}</div>
+            <div>created: {renderPOM(readout.createdAt, (v) => <span>{String(v)}</span>)}</div>
           </div>
         </div>
 
@@ -117,44 +102,24 @@ return (
               )}
             </div>
 
-            <VoicePathCompare
-              surface={readout.voicePathSurface}
-              functional={readout.voicePathFunctional}
-            />
+            <VoicePathCompare surface={readout.voicePathSurface} functional={readout.voicePathFunctional} />
 
             <div className="mt-3">
-              principles:{" "}
-              {renderPOM(readout.principlesPath, (arr) => <span>{arr.join(" → ")}</span>)}
+              principles: {renderPOM(readout.principlesPath, (arr) => <span>{arr.join(" → ")}</span>)}
+            </div>
 
-              <div className="mt-3">
-  phoneticIpa:{" "}
-  {renderPOM(
-    phoneticIpaPOM,
-    (p) => (
-      <span>
-        <span>{p.ipa}</span>
-        <span className="ml-2 inline-flex flex-wrap gap-1 align-middle">
-          {p.voices.map((v, idx) => (
-            <VowelChip key={`p-${v}-${idx}`} v={v} />
-          ))}
-        </span>
-        {p.unmapped.length ? (
-          <span className="ml-2 text-muted-foreground">unmapped: {p.unmapped.join(", ")}</span>
-        ) : null}
-      </span>
-    ),
-    "Not provided."
-  )}
-</div>
+            <div className="mt-3">
+              <div className="text-xs text-muted-foreground">Phonetic IPA</div>
+              <div className="mt-2">
+                <PhoneticIpaPanelV0_1 pom={phoneticIpaPOM} />
+              </div>
             </div>
 
             <div className="mt-3 grid grid-cols-2 gap-2">
               <div>candidates: {readout.counts.candidates}</div>
               <div>ops: {renderPOM(readout.counts.ops, (n) => <span>{n}</span>)}</div>
               <div>notes: {renderPOM(readout.counts.notes, (n) => <span>{n}</span>)}</div>
-              <div>
-                signals: {renderPOM(readout.counts.signals, (n) => <span>{n}</span>)}
-              </div>
+              <div>signals: {renderPOM(readout.counts.signals, (n) => <span>{n}</span>)}</div>
             </div>
           </div>
         </div>
