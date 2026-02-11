@@ -92,6 +92,12 @@ export type SevenPrinciplesSpectrumVM = {
   };
 };
 
+export type PhoneticIpaV0_1VM = {
+  ipa: string;
+  voices: Vowel[];
+  unmapped: string[];
+};
+
 export interface TelemetryReadout {
   word: string;
   normalizedWord: PresentOrMissing<string>;
@@ -102,7 +108,9 @@ export interface TelemetryReadout {
   createdAt: PresentOrMissing<string>;
   principlesPath: PresentOrMissing<string[]>;
 
-  voicePath: PresentOrMissing<Vowel[]>;
+    phoneticIpaV0_1: PresentOrMissing<PhoneticIpaV0_1VM>;
+
+voicePath: PresentOrMissing<Vowel[]>;
   voicePathSurface?: PresentOrMissing<Vowel[]>;
   voicePathFunctional?: PresentOrMissing<Vowel[]>;
   voicePathDelta: "MATCH" | "SHIFT" | "DIVERGE" | "NOT_EMITTED";

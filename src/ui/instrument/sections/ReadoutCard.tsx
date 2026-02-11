@@ -42,7 +42,12 @@ export function ReadoutCard({
         ? "None"
         : "Error";
 
-  return (
+  
+    const phoneticIpaPOM: PresentOrMissing<{ ipa: string; voices: Vowel[]; unmapped: string[] }> =
+      ((readout as any).phoneticIpaV0_1 as any) ?? (
+        { kind: "missing", missing: "not_emitted", note: "phoneticIpaV0_1" } as any
+      );
+return (
     <div className="rounded-xl border p-4 shadow-sm">
       <div className="flex items-start justify-between gap-4">
         <div>
@@ -120,6 +125,27 @@ export function ReadoutCard({
             <div className="mt-3">
               principles:{" "}
               {renderPOM(readout.principlesPath, (arr) => <span>{arr.join(" → ")}</span>)}
+
+              <div className="mt-3">
+  phoneticIpa:{" "}
+  {renderPOM(
+    phoneticIpaPOM,
+    (p) => (
+      <span>
+        <span>{p.ipa}</span>
+        <span className="ml-2 inline-flex flex-wrap gap-1 align-middle">
+          {p.voices.map((v, idx) => (
+            <VowelChip key={`p-${v}-${idx}`} v={v} />
+          ))}
+        </span>
+        {p.unmapped.length ? (
+          <span className="ml-2 text-muted-foreground">unmapped: {p.unmapped.join(", ")}</span>
+        ) : null}
+      </span>
+    ),
+    "Not provided."
+  )}
+</div>
             </div>
 
             <div className="mt-3 grid grid-cols-2 gap-2">
