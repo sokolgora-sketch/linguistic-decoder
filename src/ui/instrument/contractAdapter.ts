@@ -23,6 +23,7 @@ import type {
   RootMapVM,
   Vowel,
   PhoneticIpaV0_1VM,
+  ResonanceProfileV1VM,
 } from "../telemetry/types";
 import type { RootMapV1 } from "@/shared/deepRoot.rootMap.v1";
 import { computeDeepRootHeartGateV01 } from "@/shared/deepRootHeartGate.v0.1.compute";
@@ -690,7 +691,7 @@ const voicePathDetectedMaybe: PresentOrMissing<Vowel[]> =
   
   // ----------------------- resonance profile v0.1 -----------------------
 
-  const resonanceProfileV1: PresentOrMissing<any> = (() => {
+    const resonanceProfileV1: PresentOrMissing<ResonanceProfileV1VM> = (() => {
     if (!isRecord(payload)) return missing("not_emitted", "resonanceProfileV1");
     if (!("resonanceProfileV1" in payload)) return missing("not_emitted", "resonanceProfileV1");
 
@@ -705,7 +706,7 @@ const voicePathDetectedMaybe: PresentOrMissing<Vowel[]> =
     if (!("surface" in v)) return missing("malformed", "resonanceProfileV1.surface missing");
     if (!("normalized" in v)) return missing("malformed", "resonanceProfileV1.normalized missing");
 
-    return present(v);
+    return present(v as ResonanceProfileV1VM);
   })();
 
 
