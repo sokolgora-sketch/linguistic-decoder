@@ -36,18 +36,18 @@ function asStringArray(x: unknown): string[] {
 function unwrapSection(x: unknown): { section: SpectrumSection | null; state: "present" | "missing" | "malformed" } {
   if (!x || typeof x !== "object") return { section: null, state: "missing" };
 
-  const r = x as any;
+  const r = x as Record<string, unknown>;
 
   // PresentOrMissing wrapper case
-  if (r.kind === "present" && r.value && typeof r.value === "object") {
-    return { section: r.value as SpectrumSection, state: "present" };
+  if (r["kind"] === "present" && r["value"] && typeof r["value"] === "object") {
+    return { section: r["value"] as SpectrumSection, state: "present" };
   }
-  if (r.kind === "missing") {
+  if (r["kind"] === "missing") {
     return { section: null, state: "missing" };
   }
 
   // Legacy / direct section object case
-  if (r.vowels || r.colors || r.notes) {
+  if (r["vowels"] || r["colors"] || r["notes"]) {
     return { section: r as SpectrumSection, state: "present" };
   }
 

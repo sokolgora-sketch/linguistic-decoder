@@ -15,10 +15,12 @@ function pickCounts(readout: unknown): KV | null {
   if (!r) return null;
 
   // Try the likely shapes without assuming one is canonical.
+  const countsRatios = asKV(r["countsRatios"]);
+
   return (
-    asKV((r as any).counts) ||
-    asKV((r as any).countsRatios?.counts) ||
-    asKV((r as any).summaryCounts) ||
+    asKV(r["counts"]) ||
+    (countsRatios ? asKV(countsRatios["counts"]) : null) ||
+    asKV(r["summaryCounts"]) ||
     null
   );
 }
@@ -27,10 +29,12 @@ function pickRatios(readout: unknown): KV | null {
   const r = asKV(readout);
   if (!r) return null;
 
+  const countsRatios = asKV(r["countsRatios"]);
+
   return (
-    asKV((r as any).ratios) ||
-    asKV((r as any).countsRatios?.ratios) ||
-    asKV((r as any).summaryRatios) ||
+    asKV(r["ratios"]) ||
+    (countsRatios ? asKV(countsRatios["ratios"]) : null) ||
+    asKV(r["summaryRatios"]) ||
     null
   );
 }
@@ -50,12 +54,12 @@ function renderValue(v: unknown): string {
 
   // PresentOrMissing (POM) humanization
   if (typeof v === 'object') {
-    const o = v as any;
-    if (o && typeof o.kind === 'string') {
-      if (o.kind === 'present') return String(o.value ?? '—');
-      if (o.kind === 'missing') {
-        const miss = typeof o.missing === 'string' ? o.missing : 'unknown';
-        const note = typeof o.note === 'string' && o.note ? ` — ${o.note}` : '';
+    const o = v as Record<string, unknown>;
+    if (o && typeof o["kind"] === 'string') {
+      if (o["kind"] === 'present') return String(o["value"] ?? '—');
+      if (o["kind"] === 'missing') {
+        const miss = typeof o["missing"] === 'string' ? o["missing"] : 'unknown';
+        const note = typeof o["note"] === 'string' && o["note"] ? ` — ${o["note"]}` : '';
         return `missing (${miss})${note}`;
       }
     }

@@ -173,8 +173,8 @@ export function RootMapCard(props: Props) {
           ) : (
             <ul className="mt-2 space-y-2">
               {keysArr.map((k, idx) => {
-                const ops = safeStringList((k as any).ops);
-                const evidence = safeStringList((k as any).evidence);
+                const ops = safeStringList((k as { ops?: unknown }).ops);
+                const evidence = safeStringList((k as { evidence?: unknown }).evidence);
 
                 return (
                   <li
