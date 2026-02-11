@@ -11,41 +11,76 @@ type ValidationRecordV01 = {
   notes?: string;
 };
 
-function loadJson<T>(rel: string): T {
-  const p = path.join(process.cwd(), "tests/validation/datasets", rel);
+function readJson<T>(rel: string): T {
+  const p = path.join(process.cwd(), rel);
   return JSON.parse(readFileSync(p, "utf8")) as T;
 }
 
-test("validation dataset lock v0.1", () => {
-  const ds = loadJson<ValidationRecordV01[]>("validation.dataset.v0.1.json");
-  const train = loadJson<string[]>("validation.train.v0.1.json");
-  const holdout = loadJson<string[]>("validation.holdout.v0.1.json");
+function asIdList(raw: unknown): string[] {
+  // split can be ["id1","id2"] or full records
+  if (Array.isArray(raw) && raw.length && typeof raw[0] === "string") return raw as string[];
+  if (Array.isArray(raw) && raw.length && typeof (raw as any)[0] === "object") {
+    return (raw as Array<{ id?: unknown }>).map((r) => String(r.id ?? "")).filter(Boolean);
+  }
+  return [];
+}
 
-  // Phase-0 sanity (we will expand later)
-  expect(ds).toHaveLength(10);
-  expect(train).toHaveLength(8);
-  expect(holdout).toHaveLength(2);
+function dist(items: string[]): Array<{ key: string; count: number }> {
+  const m: Record<string, number> = {};
+  for (const k of items) m[k] = (m[k] || 0) + 1;
+  return Object.entries(m)
+    .map(([key, count]) => ({ key, count }))
+    .sort((a, b) => (b.count - a.count) || (a.key < b.key ? -1 : a.key > b.key ? 1 : 0));
+}
 
-  const ids = ds.map((r) => r.id).slice().sort();
-  expect(ids).toMatchSnapshot("sorted-ids");
+test("validation dataset lock v0.1 (invariants + snapshot)", () => {
+  const ds = readJson<ValidationRecordV01[]>("tests/validation/datasets/validation.dataset.v0.1.json");
+  const trainRaw = readJson<unknown>("tests/validation/datasets/validation.train.v0.1.json");
+  const holdRaw = readJson<unknown>("tests/validation/datasets/validation.holdout.v0.1.json");
 
-  const tagCounts = ds.reduce<Record<string, number>>((acc, r) => {
-    acc[r.semanticTag] = (acc[r.semanticTag] ?? 0) + 1;
-    return acc;
-  }, {});
-  expect(tagCounts).toMatchSnapshot("tag-counts");
+  // basic schema sanity
+  expect(Array.isArray(ds)).toBe(true);
+  expect(ds.length).toBeGreaterThanOrEqual(5);
 
-  const langCounts = ds.reduce<Record<string, number>>((acc, r) => {
-    acc[r.lang] = (acc[r.lang] ?? 0) + 1;
-    return acc;
-  }, {});
-  expect(langCounts).toMatchSnapshot("lang-counts");
+  for (const r of ds) {
+    expect(typeof r.id).toBe("string");
+    expect(r.id.length).toBeGreaterThan(3);
+    expect(typeof r.lang).toBe("string");
+    expect(r.lang.length).toBeGreaterThanOrEqual(2);
+    expect(typeof r.word).toBe("string");
+    expect(r.word.length).toBeGreaterThan(0);
+    expect(typeof r.semanticTag).toBe("string");
+    expect(r.semanticTag.length).toBeGreaterThan(0);
+    expect(typeof r.knownEtymology).toBe("string");
+  }
 
-  // Split integrity: every split id must exist; splits must be disjoint.
-  const set = new Set(ids);
-  for (const id of train) expect(set.has(id)).toBe(true);
-  for (const id of holdout) expect(set.has(id)).toBe(true);
+  // ids must be unique + stable sorted snapshot
+  const ids = ds.map((r) => r.id).slice().sort((a, b) => a.localeCompare(b));
+  expect(new Set(ids).size).toBe(ids.length);
 
-  const overlap = train.filter((id) => new Set(holdout).has(id));
-  expect(overlap).toEqual([]);
+  const trainIds = asIdList(trainRaw).slice().sort((a, b) => a.localeCompare(b));
+  const holdIds = asIdList(holdRaw).slice().sort((a, b) => a.localeCompare(b));
+
+  // splits must be disjoint and cover dataset exactly
+  const trainSet = new Set(trainIds);
+  const holdSet = new Set(holdIds);
+  for (const id of trainIds) expect(holdSet.has(id)).toBe(false);
+  for (const id of holdIds) expect(trainSet.has(id)).toBe(false);
+
+  const union = new Set([...trainIds, ...holdIds]);
+  expect(union.size).toBe(ids.length);
+  for (const id of ids) expect(union.has(id)).toBe(true);
+
+  // distributions snapshot (stable + falsifiable)
+  const tagDist = dist(ds.map((r) => r.semanticTag));
+  const langDist = dist(ds.map((r) => r.lang));
+
+  expect({
+    counts: { dataset: ds.length, train: trainIds.length, holdout: holdIds.length },
+    ids,
+    trainIds,
+    holdIds,
+    tagDist,
+    langDist,
+  }).toMatchSnapshot();
 });

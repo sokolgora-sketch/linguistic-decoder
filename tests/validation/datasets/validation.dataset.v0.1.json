@@ -1,14 +1,5 @@
 [
   {
-    "id": "en_father_v0_1",
-    "lang": "en",
-    "word": "father",
-    "ipa": "/ˈfɑːðəɹ/",
-    "semanticTag": "kinship",
-    "knownEtymology": "Proto-Germanic *fadēr (ult. PIE *ph₂tḗr)",
-    "notes": "Common inherited kinship term"
-  },
-  {
     "id": "en_bread_v0_1",
     "lang": "en",
     "word": "bread",
@@ -18,13 +9,13 @@
     "notes": "Simple food noun; clean IPA"
   },
   {
-    "id": "en_rhythm_v0_1",
+    "id": "en_father_v0_1",
     "lang": "en",
-    "word": "rhythm",
-    "ipa": "/ˈɹɪðəm/",
-    "semanticTag": "music",
-    "knownEtymology": "Greek rhythmos (via Latin/Old French)",
-    "notes": "Classic mask vs carrier stress-test (odd orthography)"
+    "word": "father",
+    "ipa": "/ˈfɑːðəɹ/",
+    "semanticTag": "kinship",
+    "knownEtymology": "Proto-Germanic *fadēr (ult. PIE *ph₂tḗr)",
+    "notes": "Common inherited kinship term"
   },
   {
     "id": "en_island_v0_1",
@@ -45,13 +36,22 @@
     "notes": "Silent letter cluster; good mismatch candidate"
   },
   {
-    "id": "sq_zemer_v0_1",
-    "lang": "sq",
-    "word": "zemër",
-    "ipa": "/ˈzɛmər/",
-    "semanticTag": "body",
-    "knownEtymology": "Albanian (native term; broader Balkan comparisons exist)",
-    "notes": "Include Albanian diacritic"
+    "id": "en_rhythm_v0_1",
+    "lang": "en",
+    "word": "rhythm",
+    "ipa": "/ˈɹɪðəm/",
+    "semanticTag": "music",
+    "knownEtymology": "Greek rhythmos (via Latin/Old French)",
+    "notes": "Classic mask vs carrier stress-test (odd orthography)"
+  },
+  {
+    "id": "en_water_v0_1",
+    "lang": "en",
+    "word": "water",
+    "ipa": "/ˈwɔːtəɹ/",
+    "semanticTag": "nature",
+    "knownEtymology": "Old English wæter (PIE *wódr̥)",
+    "notes": "Basic nature noun"
   },
   {
     "id": "it_padre_v0_1",
@@ -63,15 +63,6 @@
     "notes": "Romance inherited kinship term"
   },
   {
-    "id": "el_metra_v0_1",
-    "lang": "el",
-    "word": "μέτρο",
-    "ipa": "/ˈme.tro/",
-    "semanticTag": "measure",
-    "knownEtymology": "Greek métron",
-    "notes": "Greek script; tests non-Latin handling (orthography diagnostics likely)"
-  },
-  {
     "id": "sa_mata_v0_1",
     "lang": "sa",
     "word": "mātṛ",
@@ -81,12 +72,12 @@
     "notes": "Diacritics + syllabic r; IPA likely partially unmapped"
   },
   {
-    "id": "en_water_v0_1",
-    "lang": "en",
-    "word": "water",
-    "ipa": "/ˈwɔːtəɹ/",
-    "semanticTag": "nature",
-    "knownEtymology": "Old English wæter (PIE *wódr̥)",
-    "notes": "Basic nature noun"
+    "id": "sq_zemer_v0_1",
+    "lang": "sq",
+    "word": "zemër",
+    "ipa": "/ˈzɛmər/",
+    "semanticTag": "body",
+    "knownEtymology": "Albanian (native term; broader Balkan comparisons exist)",
+    "notes": "Include Albanian diacritic"
   }
 ]

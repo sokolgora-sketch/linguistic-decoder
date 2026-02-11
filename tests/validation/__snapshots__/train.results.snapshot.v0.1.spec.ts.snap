@@ -5,31 +5,31 @@ exports[`validation v0.1 — train results snapshot 1`] = `
   "clustering": {
     "baselines": {
       "orthography": {
-        "acrossAvg": 1.615385,
-        "delta": 0.615385,
+        "acrossAvg": 1.576923,
+        "delta": 0.076923,
+        "pairs": {
+          "across": 26,
+          "within": 2,
+        },
+        "withinAvg": 1.5,
+      },
+      "shuffledTagsControl": {
+        "acrossAvg": 1.576923,
+        "delta": 0.576923,
         "pairs": {
           "across": 26,
           "within": 2,
         },
         "withinAvg": 1,
       },
-      "shuffledTagsControl": {
-        "acrossAvg": 1.5,
-        "delta": -0.5,
-        "pairs": {
-          "across": 26,
-          "within": 2,
-        },
-        "withinAvg": 2,
-      },
       "vowelCount": {
-        "acrossAvg": 0.5,
-        "delta": 0,
+        "acrossAvg": 0.653846,
+        "delta": -0.346154,
         "pairs": {
           "across": 26,
           "within": 2,
         },
-        "withinAvg": 0.5,
+        "withinAvg": 1,
       },
     },
     "voiceSpace": {
@@ -51,7 +51,7 @@ exports[`validation v0.1 — train results snapshot 1`] = `
       },
       {
         "count": 1,
-        "lang": "it",
+        "lang": "sa",
       },
       {
         "count": 1,
