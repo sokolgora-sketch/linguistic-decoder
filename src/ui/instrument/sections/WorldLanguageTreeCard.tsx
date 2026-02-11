@@ -10,19 +10,24 @@ type Props = {
   lightMap: RootLightMapV01 | null;
 };
 
-function safeChildIds(node: any): string[] {
-  return (
-    (Array.isArray(node?.children) ? node.children : null) ??
-    (Array.isArray(node?.childIds) ? node.childIds : null) ??
-    (Array.isArray(node?.childrenIds) ? node.childrenIds : null) ??
-    []
-  );
+function isRecord(v: unknown): v is Record<string, unknown> {
+  return !!v && typeof v === "object" && !Array.isArray(v);
+}
+
+function safeChildIds(node: unknown): string[] {
+  const n = isRecord(node) ? node : null;
+  const raw =
+    n && Array.isArray(n["children"]) ? (n["children"] as unknown[]) :
+    n && Array.isArray(n["childIds"]) ? (n["childIds"] as unknown[]) :
+    n && Array.isArray(n["childrenIds"]) ? (n["childrenIds"] as unknown[]) :
+    [];
+  return raw.filter((x): x is string => typeof x === "string");
 }
 
 function buildParentMap(): Map<string, string> {
   // child -> parent (single parent, tree assumption for v0.1)
   const parentById = new Map<string, string>();
-  const nodes = WORLD_LANGUAGE_TREE_V01.nodes as any;
+  const nodes = WORLD_LANGUAGE_TREE_V01.nodes as Record<string, unknown>;
 
   for (const parentId of Object.keys(nodes)) {
     const parent = nodes[parentId];
@@ -90,8 +95,13 @@ function renderNode(params: {
 }) {
   const { nodeId, depth, lights, visibleSet } = params;
 
-  const node = (WORLD_LANGUAGE_TREE_V01.nodes as any)[nodeId];
+  const node = (WORLD_LANGUAGE_TREE_V01.nodes as Record<string, unknown>)[nodeId];
   if (!node) return null;
+
+    const label =
+      isRecord(node) && typeof node["label"] === "string"
+        ? (node["label"] as string)
+        : String(nodeId);
 
   if (visibleSet && !visibleSet.has(nodeId)) return null;
 
@@ -105,7 +115,7 @@ function renderNode(params: {
     <div key={nodeId} style={{ paddingLeft: pad }} className="py-1">
       <div className="flex items-start gap-2">
         <span className={lit ? "font-semibold" : ""}>
-          {lit ? "●" : "○"} {node.label}
+          {lit ? "●" : "○"} {label}
         </span>
         <span className="text-xs text-neutral-500">{nodeId}</span>
 

@@ -8,8 +8,12 @@ type Props = {
   delta: 'MATCH' | 'DIVERGE' | 'NOT_EMITTED';
 };
 
-function isPresent<T>(m: PresentOrMissing<T>): m is { kind: 'present'; value: T } {
-  return (m as any)?.kind === 'present';
+function isPresent<T>(
+  m: PresentOrMissing<T> | null | undefined
+): m is { kind: 'present'; value: T } {
+  if (!m || typeof m !== 'object') return false;
+  const r = m as Record<string, unknown>;
+  return r['kind'] === 'present';
 }
 
 function formatPath(path: Vowel[]): string {

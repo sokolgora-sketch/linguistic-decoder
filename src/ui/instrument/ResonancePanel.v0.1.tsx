@@ -6,7 +6,21 @@ type Maybe<T> =
   | { kind: "present"; value: T }
   | { kind: "missing"; missing: "not_emitted" | "malformed" | "unknown"; note?: string };
 
-type ResonanceProfileV1 = any;
+type ResonanceBucketCounts = { source?: unknown; boundary?: unknown; manifest?: unknown };
+
+type ResonanceSection = {
+  vowels?: unknown;
+  signature?: unknown;
+  polaritySymbol?: unknown;
+  bucketCounts?: ResonanceBucketCounts;
+  transitions?: unknown;
+};
+
+type ResonanceProfileV1 = {
+  version?: unknown;
+  surface?: ResonanceSection;
+  normalized?: ResonanceSection;
+};
 
 function Chip({ label }: { label: string }) {
   return (
@@ -26,9 +40,9 @@ function Row({ k, v }: { k: string; v: React.ReactNode }) {
 }
 
 export function ResonancePanelV01(props: { resonanceProfileV1: Maybe<ResonanceProfileV1> }) {
-  const m =
-    (props.resonanceProfileV1 as any) ??
-    ({ kind: "missing", missing: "not_emitted", note: "resonanceProfileV1" } as any);
+  const m: Maybe<ResonanceProfileV1> =
+      props.resonanceProfileV1 ??
+      { kind: "missing", missing: "not_emitted", note: "resonanceProfileV1" };
 
   if (m.kind !== "present") {
     return (
