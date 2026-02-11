@@ -1,0 +1,92 @@
+[
+  {
+    "id": "en_father_v0_1",
+    "lang": "en",
+    "word": "father",
+    "ipa": "/ˈfɑːðəɹ/",
+    "semanticTag": "kinship",
+    "knownEtymology": "Proto-Germanic *fadēr (ult. PIE *ph₂tḗr)",
+    "notes": "Common inherited kinship term"
+  },
+  {
+    "id": "en_bread_v0_1",
+    "lang": "en",
+    "word": "bread",
+    "ipa": "/bɹɛd/",
+    "semanticTag": "food",
+    "knownEtymology": "Old English brēad",
+    "notes": "Simple food noun; clean IPA"
+  },
+  {
+    "id": "en_rhythm_v0_1",
+    "lang": "en",
+    "word": "rhythm",
+    "ipa": "/ˈɹɪðəm/",
+    "semanticTag": "music",
+    "knownEtymology": "Greek rhythmos (via Latin/Old French)",
+    "notes": "Classic mask vs carrier stress-test (odd orthography)"
+  },
+  {
+    "id": "en_island_v0_1",
+    "lang": "en",
+    "word": "island",
+    "ipa": "/ˈaɪlənd/",
+    "semanticTag": "nature",
+    "knownEtymology": "Old English īgland; later spelling influenced by 'isle'",
+    "notes": "Orthography historically contaminated"
+  },
+  {
+    "id": "en_knife_v0_1",
+    "lang": "en",
+    "word": "knife",
+    "ipa": "/naɪf/",
+    "semanticTag": "tool",
+    "knownEtymology": "Old English cnīf",
+    "notes": "Silent letter cluster; good mismatch candidate"
+  },
+  {
+    "id": "sq_zemer_v0_1",
+    "lang": "sq",
+    "word": "zemër",
+    "ipa": "/ˈzɛmər/",
+    "semanticTag": "body",
+    "knownEtymology": "Albanian (native term; broader Balkan comparisons exist)",
+    "notes": "Include Albanian diacritic"
+  },
+  {
+    "id": "it_padre_v0_1",
+    "lang": "it",
+    "word": "padre",
+    "ipa": "/ˈpa.dre/",
+    "semanticTag": "kinship",
+    "knownEtymology": "Latin pater",
+    "notes": "Romance inherited kinship term"
+  },
+  {
+    "id": "el_metra_v0_1",
+    "lang": "el",
+    "word": "μέτρο",
+    "ipa": "/ˈme.tro/",
+    "semanticTag": "measure",
+    "knownEtymology": "Greek métron",
+    "notes": "Greek script; tests non-Latin handling (orthography diagnostics likely)"
+  },
+  {
+    "id": "sa_mata_v0_1",
+    "lang": "sa",
+    "word": "mātṛ",
+    "ipa": "/ˈmaː.t̪r̩/",
+    "semanticTag": "kinship",
+    "knownEtymology": "Sanskrit mātṛ (PIE *méh₂tēr)",
+    "notes": "Diacritics + syllabic r; IPA likely partially unmapped"
+  },
+  {
+    "id": "en_water_v0_1",
+    "lang": "en",
+    "word": "water",
+    "ipa": "/ˈwɔːtəɹ/",
+    "semanticTag": "nature",
+    "knownEtymology": "Old English wæter (PIE *wódr̥)",
+    "notes": "Basic nature noun"
+  }
+]
