@@ -707,6 +707,26 @@ const voicePathDetectedMaybe: PresentOrMissing<Vowel[]> =
     return present(v);
   })();
 
+
+  // ----------------------- phonetic IPA v0.1 -----------------------
+  const phoneticIpaV0_1: PresentOrMissing<any> = (() => {
+    if (!isRecord(payload)) return missing("not_emitted", "phoneticIpaV0_1");
+    if (!("phoneticIpaV0_1" in payload)) return missing("not_emitted", "phoneticIpaV0_1");
+
+    const v = (payload as any).phoneticIpaV0_1;
+    if (v == null) return missing("not_emitted", "phoneticIpaV0_1");
+    if (!isRecord(v)) return missing("malformed", "phoneticIpaV0_1 expected object");
+
+    const ipa = asString((v as any).ipa);
+    const voices = asVowelArray2((v as any).voices);
+    const unmappedRaw = (v as any)?.diagnostics?.unmapped;
+    const unmapped = Array.isArray(unmappedRaw) ? unmappedRaw.map((x: any) => String(x)) : [];
+
+    if (!ipa) return missing("malformed", "phoneticIpaV0_1.ipa expected string");
+    if (!voices) return missing("malformed", "phoneticIpaV0_1.voices expected Vowel[]");
+
+    return present({ ipa, voices, unmapped });
+  })();
 const originClaimGates: OriginClaimGatesVM = {
     active: (() => {
       // VM-only: NEVER override with dev flags / URL params.
@@ -739,6 +759,7 @@ const originClaimGates: OriginClaimGatesVM = {
       principlesPath: principlesPath
         ? present(principlesPath)
         : missing("not_emitted", "heart.principlePath | heart.math7.primary.principlesPath"),
+      phoneticIpaV0_1,
       status,
       counts: {
         candidates: candidates.length,
@@ -769,6 +790,24 @@ const originClaimGates: OriginClaimGatesVM = {
   };
 }
 
+
+  // ----------------------- helpers: vowel arrays -----------------------
+  function isVowelSymbol(s: string): s is import("../telemetry/types").Vowel {
+    return s === "A" || s === "E" || s === "I" || s === "O" || s === "U" || s === "Y" || s === "Ë";
+  }
+
+  function asVowelArray2(v: unknown): import("../telemetry/types").Vowel[] | null {
+    if (!Array.isArray(v)) return null;
+    const out: import("../telemetry/types").Vowel[] = [];
+    for (const x of v) {
+      const s = asString(x);
+      if (!s) return null;
+      const up = s.toUpperCase();
+      if (!isVowelSymbol(up)) return null;
+      out.push(up);
+    }
+    return out;
+  }
 // ----------------------- malformed-aware array extraction -----------------------
 
 function pomStringListFromEvidenceField(
