@@ -7,6 +7,9 @@ exports[`validation dataset lock v0.1 (invariants + snapshot) 1`] = `
     "holdout": 1,
     "train": 8,
   },
+  "holdoutIds": [
+    "it_padre_v0_1",
+  ],
   "idsSorted": [
     "en_bread_v0_1",
     "en_father_v0_1",
@@ -61,6 +64,16 @@ exports[`validation dataset lock v0.1 (invariants + snapshot) 1`] = `
       "count": 1,
       "tag": "tool",
     },
+  ],
+  "trainIds": [
+    "en_bread_v0_1",
+    "en_father_v0_1",
+    "en_island_v0_1",
+    "en_knife_v0_1",
+    "en_rhythm_v0_1",
+    "en_water_v0_1",
+    "sa_mata_v0_1",
+    "sq_zemer_v0_1",
   ],
 }
 `;
