@@ -2,222 +2,11 @@
   "version": "0.1",
   "datasetId": "validation.dataset.v0.1",
   "splits": {
-    "trainCount": 8,
-    "holdoutCount": 2,
-    "fullCount": 10
+    "trainCount": 7,
+    "holdoutCount": 1,
+    "fullCount": 8
   },
   "full": {
-    "version": "0.1",
-    "dataset": {
-      "count": 10,
-      "withIpa": 10,
-      "tagDist": [
-        {
-          "tag": "kinship",
-          "count": 3
-        },
-        {
-          "tag": "nature",
-          "count": 2
-        },
-        {
-          "tag": "body",
-          "count": 1
-        },
-        {
-          "tag": "food",
-          "count": 1
-        },
-        {
-          "tag": "measure",
-          "count": 1
-        },
-        {
-          "tag": "music",
-          "count": 1
-        },
-        {
-          "tag": "tool",
-          "count": 1
-        }
-      ],
-      "langDist": [
-        {
-          "lang": "en",
-          "count": 6
-        },
-        {
-          "lang": "el",
-          "count": 1
-        },
-        {
-          "lang": "it",
-          "count": 1
-        },
-        {
-          "lang": "sa",
-          "count": 1
-        },
-        {
-          "lang": "sq",
-          "count": 1
-        }
-      ]
-    },
-    "mismatch": {
-      "mismatchCount": 7,
-      "mismatchRate": 0.7
-    },
-    "clustering": {
-      "voiceSpace": {
-        "withinAvg": 1.25,
-        "acrossAvg": 1.634146,
-        "delta": 0.384146,
-        "pairs": {
-          "within": 4,
-          "across": 41
-        }
-      },
-      "baselines": {
-        "vowelCount": {
-          "withinAvg": 0.75,
-          "acrossAvg": 0.536585,
-          "delta": -0.213415,
-          "pairs": {
-            "within": 4,
-            "across": 41
-          }
-        },
-        "orthography": {
-          "withinAvg": 1,
-          "acrossAvg": 1.609756,
-          "delta": 0.609756,
-          "pairs": {
-            "within": 4,
-            "across": 41
-          }
-        },
-        "shuffledTagsControl": {
-          "withinAvg": 1.75,
-          "acrossAvg": 1.585366,
-          "delta": -0.164634,
-          "pairs": {
-            "within": 4,
-            "across": 41
-          }
-        }
-      }
-    },
-    "topMismatches": [
-      {
-        "id": "el_metra_v0_1",
-        "lang": "el",
-        "word": "μέτρο",
-        "ipa": "/ˈme.tro/",
-        "orthographyVoices": [],
-        "phoneticVoices": [
-          "E",
-          "O"
-        ],
-        "distance": 2
-      },
-      {
-        "id": "en_island_v0_1",
-        "lang": "en",
-        "word": "island",
-        "ipa": "/ˈaɪlənd/",
-        "orthographyVoices": [
-          "I",
-          "A"
-        ],
-        "phoneticVoices": [
-          "A",
-          "I",
-          "Ë"
-        ],
-        "distance": 2
-      },
-      {
-        "id": "en_knife_v0_1",
-        "lang": "en",
-        "word": "knife",
-        "ipa": "/naɪf/",
-        "orthographyVoices": [
-          "I",
-          "E"
-        ],
-        "phoneticVoices": [
-          "A",
-          "I"
-        ],
-        "distance": 2
-      },
-      {
-        "id": "en_rhythm_v0_1",
-        "lang": "en",
-        "word": "rhythm",
-        "ipa": "/ˈɹɪðəm/",
-        "orthographyVoices": [
-          "Y"
-        ],
-        "phoneticVoices": [
-          "I",
-          "Ë"
-        ],
-        "distance": 2
-      },
-      {
-        "id": "en_water_v0_1",
-        "lang": "en",
-        "word": "water",
-        "ipa": "/ˈwɔːtəɹ/",
-        "orthographyVoices": [
-          "A",
-          "E"
-        ],
-        "phoneticVoices": [
-          "O",
-          "Ë"
-        ],
-        "distance": 2
-      },
-      {
-        "id": "en_bread_v0_1",
-        "lang": "en",
-        "word": "bread",
-        "ipa": "/bɹɛd/",
-        "orthographyVoices": [
-          "E",
-          "A"
-        ],
-        "phoneticVoices": [
-          "E"
-        ],
-        "distance": 1
-      },
-      {
-        "id": "en_father_v0_1",
-        "lang": "en",
-        "word": "father",
-        "ipa": "/ˈfɑːðəɹ/",
-        "orthographyVoices": [
-          "A",
-          "E"
-        ],
-        "phoneticVoices": [
-          "A",
-          "Ë"
-        ],
-        "distance": 1
-      }
-    ],
-    "diagnostics": {
-      "orthographyUnmappedTop": [],
-      "ipaUnmappedTop": [],
-      "notesCount": 0
-    }
-  },
-  "train": {
     "version": "0.1",
     "dataset": {
       "count": 8,
@@ -404,90 +193,252 @@
       "notesCount": 0
     }
   },
-  "holdout": {
+  "train": {
     "version": "0.1",
     "dataset": {
-      "count": 2,
-      "withIpa": 2,
+      "count": 7,
+      "withIpa": 7,
       "tagDist": [
+        {
+          "tag": "nature",
+          "count": 2
+        },
+        {
+          "tag": "body",
+          "count": 1
+        },
+        {
+          "tag": "food",
+          "count": 1
+        },
         {
           "tag": "kinship",
           "count": 1
         },
         {
-          "tag": "measure",
+          "tag": "music",
+          "count": 1
+        },
+        {
+          "tag": "tool",
           "count": 1
         }
       ],
       "langDist": [
         {
-          "lang": "el",
-          "count": 1
+          "lang": "en",
+          "count": 6
         },
         {
-          "lang": "sa",
+          "lang": "sq",
           "count": 1
         }
       ]
     },
     "mismatch": {
-      "mismatchCount": 1,
-      "mismatchRate": 0.5
+      "mismatchCount": 6,
+      "mismatchRate": 0.857143
     },
     "clustering": {
       "voiceSpace": {
-        "withinAvg": 0,
-        "acrossAvg": 2,
-        "delta": 2,
+        "withinAvg": 2,
+        "acrossAvg": 1.5,
+        "delta": -0.5,
         "pairs": {
-          "within": 0,
-          "across": 1
+          "within": 1,
+          "across": 20
         }
       },
       "baselines": {
         "vowelCount": {
-          "withinAvg": 0,
-          "acrossAvg": 1,
-          "delta": 1,
+          "withinAvg": 1,
+          "acrossAvg": 0.55,
+          "delta": -0.45,
           "pairs": {
-            "within": 0,
-            "across": 1
+            "within": 1,
+            "across": 20
           }
         },
         "orthography": {
-          "withinAvg": 0,
-          "acrossAvg": 1,
-          "delta": 1,
+          "withinAvg": 2,
+          "acrossAvg": 1.65,
+          "delta": -0.35,
           "pairs": {
-            "within": 0,
-            "across": 1
+            "within": 1,
+            "across": 20
           }
         },
         "shuffledTagsControl": {
-          "withinAvg": 0,
-          "acrossAvg": 2,
-          "delta": 2,
+          "withinAvg": 2,
+          "acrossAvg": 1.5,
+          "delta": -0.5,
           "pairs": {
-            "within": 0,
-            "across": 1
+            "within": 1,
+            "across": 20
           }
         }
       }
     },
     "topMismatches": [
       {
-        "id": "el_metra_v0_1",
-        "lang": "el",
-        "word": "μέτρο",
-        "ipa": "/ˈme.tro/",
-        "orthographyVoices": [],
+        "id": "en_island_v0_1",
+        "lang": "en",
+        "word": "island",
+        "ipa": "/ˈaɪlənd/",
+        "orthographyVoices": [
+          "I",
+          "A"
+        ],
         "phoneticVoices": [
-          "E",
-          "O"
+          "A",
+          "I",
+          "Ë"
         ],
         "distance": 2
+      },
+      {
+        "id": "en_knife_v0_1",
+        "lang": "en",
+        "word": "knife",
+        "ipa": "/naɪf/",
+        "orthographyVoices": [
+          "I",
+          "E"
+        ],
+        "phoneticVoices": [
+          "A",
+          "I"
+        ],
+        "distance": 2
+      },
+      {
+        "id": "en_rhythm_v0_1",
+        "lang": "en",
+        "word": "rhythm",
+        "ipa": "/ˈɹɪðəm/",
+        "orthographyVoices": [
+          "Y"
+        ],
+        "phoneticVoices": [
+          "I",
+          "Ë"
+        ],
+        "distance": 2
+      },
+      {
+        "id": "en_water_v0_1",
+        "lang": "en",
+        "word": "water",
+        "ipa": "/ˈwɔːtəɹ/",
+        "orthographyVoices": [
+          "A",
+          "E"
+        ],
+        "phoneticVoices": [
+          "O",
+          "Ë"
+        ],
+        "distance": 2
+      },
+      {
+        "id": "en_bread_v0_1",
+        "lang": "en",
+        "word": "bread",
+        "ipa": "/bɹɛd/",
+        "orthographyVoices": [
+          "E",
+          "A"
+        ],
+        "phoneticVoices": [
+          "E"
+        ],
+        "distance": 1
+      },
+      {
+        "id": "en_father_v0_1",
+        "lang": "en",
+        "word": "father",
+        "ipa": "/ˈfɑːðəɹ/",
+        "orthographyVoices": [
+          "A",
+          "E"
+        ],
+        "phoneticVoices": [
+          "A",
+          "Ë"
+        ],
+        "distance": 1
       }
     ],
+    "diagnostics": {
+      "orthographyUnmappedTop": [],
+      "ipaUnmappedTop": [],
+      "notesCount": 0
+    }
+  },
+  "holdout": {
+    "version": "0.1",
+    "dataset": {
+      "count": 1,
+      "withIpa": 1,
+      "tagDist": [
+        {
+          "tag": "kinship",
+          "count": 1
+        }
+      ],
+      "langDist": [
+        {
+          "lang": "it",
+          "count": 1
+        }
+      ]
+    },
+    "mismatch": {
+      "mismatchCount": 0,
+      "mismatchRate": 0
+    },
+    "clustering": {
+      "voiceSpace": {
+        "withinAvg": 0,
+        "acrossAvg": 0,
+        "delta": 0,
+        "pairs": {
+          "within": 0,
+          "across": 0
+        }
+      },
+      "baselines": {
+        "vowelCount": {
+          "withinAvg": 0,
+          "acrossAvg": 0,
+          "delta": 0,
+          "pairs": {
+            "within": 0,
+            "across": 0
+          }
+        },
+        "orthography": {
+          "withinAvg": 0,
+          "acrossAvg": 0,
+          "delta": 0,
+          "pairs": {
+            "within": 0,
+            "across": 0
+          }
+        },
+        "shuffledTagsControl": {
+          "withinAvg": 0,
+          "acrossAvg": 0,
+          "delta": 0,
+          "pairs": {
+            "within": 0,
+            "across": 0
+          }
+        }
+      }
+    },
+    "topMismatches": [],
     "diagnostics": {
       "orthographyUnmappedTop": [],
       "ipaUnmappedTop": [],
