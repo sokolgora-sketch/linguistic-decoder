@@ -9,7 +9,7 @@ type MissingState = "not_emitted" | "malformed" | "unknown";
 function present<T>(value: T): PresentOrMissing<T> {
   return { kind: "present", value };
 }
-function missing(m: MissingState, note: string): PresentOrMissing<any> {
+function missing(m: MissingState, note: string): PresentOrMissing<never> {
   return { kind: "missing", missing: m as any, note };
 }
 

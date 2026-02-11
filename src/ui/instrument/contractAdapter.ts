@@ -390,7 +390,22 @@ const voicePathDetectedMaybe: PresentOrMissing<Vowel[]> =
   const functionalNorm = functionalParts ? functionalParts.join("-") : null;
 
   
-  function buildSpectrumSection(m: PresentOrMissing<Vowel[]>): PresentOrMissing<any> {
+      type SpectrumSectionVM = {
+      vowels: Vowel[];
+      indices1: number[];
+      ringIndex: number[];
+      colors: string[];
+      notes: string[];
+      roles: string[];
+      polarities: string[];
+      rings: string[];
+      crossesCenter: boolean;
+      endsOnE: boolean;
+      endsOnË: boolean;
+      drift: "static" | "mostly_increasing" | "mostly_decreasing" | "mixed";
+    };
+
+function buildSpectrumSection(m: PresentOrMissing<Vowel[]>): PresentOrMissing<SpectrumSectionVM> {
       if (m && m.kind === "present" && Array.isArray(m.value)) {
         const vowels = m.value;
 
