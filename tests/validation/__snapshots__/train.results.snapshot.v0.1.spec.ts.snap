@@ -5,45 +5,45 @@ exports[`validation v0.1 — train results snapshot 1`] = `
   "clustering": {
     "baselines": {
       "orthography": {
-        "acrossAvg": 1.615385,
-        "delta": 0.615385,
+        "acrossAvg": 1.65,
+        "delta": -0.35,
         "pairs": {
-          "across": 26,
-          "within": 2,
+          "across": 20,
+          "within": 1,
         },
-        "withinAvg": 1,
+        "withinAvg": 2,
       },
       "shuffledTagsControl": {
         "acrossAvg": 1.5,
         "delta": -0.5,
         "pairs": {
-          "across": 26,
-          "within": 2,
+          "across": 20,
+          "within": 1,
         },
         "withinAvg": 2,
       },
       "vowelCount": {
-        "acrossAvg": 0.5,
-        "delta": 0,
+        "acrossAvg": 0.55,
+        "delta": -0.45,
         "pairs": {
-          "across": 26,
-          "within": 2,
+          "across": 20,
+          "within": 1,
         },
-        "withinAvg": 0.5,
+        "withinAvg": 1,
       },
     },
     "voiceSpace": {
-      "acrossAvg": 1.538462,
-      "delta": 0.038462,
+      "acrossAvg": 1.5,
+      "delta": -0.5,
       "pairs": {
-        "across": 26,
-        "within": 2,
+        "across": 20,
+        "within": 1,
       },
-      "withinAvg": 1.5,
+      "withinAvg": 2,
     },
   },
   "dataset": {
-    "count": 8,
+    "count": 7,
     "langDist": [
       {
         "count": 6,
@@ -51,18 +51,10 @@ exports[`validation v0.1 — train results snapshot 1`] = `
       },
       {
         "count": 1,
-        "lang": "it",
-      },
-      {
-        "count": 1,
         "lang": "sq",
       },
     ],
     "tagDist": [
-      {
-        "count": 2,
-        "tag": "kinship",
-      },
       {
         "count": 2,
         "tag": "nature",
@@ -77,6 +69,10 @@ exports[`validation v0.1 — train results snapshot 1`] = `
       },
       {
         "count": 1,
+        "tag": "kinship",
+      },
+      {
+        "count": 1,
         "tag": "music",
       },
       {
@@ -84,7 +80,7 @@ exports[`validation v0.1 — train results snapshot 1`] = `
         "tag": "tool",
       },
     ],
-    "withIpa": 8,
+    "withIpa": 7,
   },
   "diagnostics": {
     "ipaUnmappedTop": [],
@@ -93,7 +89,7 @@ exports[`validation v0.1 — train results snapshot 1`] = `
   },
   "mismatch": {
     "mismatchCount": 6,
-    "mismatchRate": 0.75,
+    "mismatchRate": 0.857143,
   },
   "topMismatches": [
     {

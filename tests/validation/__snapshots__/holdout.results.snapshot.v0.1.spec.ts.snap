@@ -5,53 +5,49 @@ exports[`validation v0.1 — holdout results snapshot 1`] = `
   "clustering": {
     "baselines": {
       "orthography": {
-        "acrossAvg": 1,
-        "delta": 1,
+        "acrossAvg": 0,
+        "delta": 0,
         "pairs": {
-          "across": 1,
+          "across": 0,
           "within": 0,
         },
         "withinAvg": 0,
       },
       "shuffledTagsControl": {
-        "acrossAvg": 2,
-        "delta": 2,
+        "acrossAvg": 0,
+        "delta": 0,
         "pairs": {
-          "across": 1,
+          "across": 0,
           "within": 0,
         },
         "withinAvg": 0,
       },
       "vowelCount": {
-        "acrossAvg": 1,
-        "delta": 1,
+        "acrossAvg": 0,
+        "delta": 0,
         "pairs": {
-          "across": 1,
+          "across": 0,
           "within": 0,
         },
         "withinAvg": 0,
       },
     },
     "voiceSpace": {
-      "acrossAvg": 2,
-      "delta": 2,
+      "acrossAvg": 0,
+      "delta": 0,
       "pairs": {
-        "across": 1,
+        "across": 0,
         "within": 0,
       },
       "withinAvg": 0,
     },
   },
   "dataset": {
-    "count": 2,
+    "count": 1,
     "langDist": [
       {
         "count": 1,
-        "lang": "el",
-      },
-      {
-        "count": 1,
-        "lang": "sa",
+        "lang": "it",
       },
     ],
     "tagDist": [
@@ -59,12 +55,8 @@ exports[`validation v0.1 — holdout results snapshot 1`] = `
         "count": 1,
         "tag": "kinship",
       },
-      {
-        "count": 1,
-        "tag": "measure",
-      },
     ],
-    "withIpa": 2,
+    "withIpa": 1,
   },
   "diagnostics": {
     "ipaUnmappedTop": [],
@@ -72,23 +64,10 @@ exports[`validation v0.1 — holdout results snapshot 1`] = `
     "orthographyUnmappedTop": [],
   },
   "mismatch": {
-    "mismatchCount": 1,
-    "mismatchRate": 0.5,
+    "mismatchCount": 0,
+    "mismatchRate": 0,
   },
-  "topMismatches": [
-    {
-      "distance": 2,
-      "id": "el_metra_v0_1",
-      "ipa": "/ˈme.tro/",
-      "lang": "el",
-      "orthographyVoices": [],
-      "phoneticVoices": [
-        "E",
-        "O",
-      ],
-      "word": "μέτρο",
-    },
-  ],
+  "topMismatches": [],
   "version": "0.1",
 }
 `;
