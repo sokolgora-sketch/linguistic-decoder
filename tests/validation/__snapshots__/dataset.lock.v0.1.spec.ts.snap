@@ -7,10 +7,7 @@ exports[`validation dataset lock v0.1 (invariants + snapshot) 1`] = `
     "holdout": 1,
     "train": 8,
   },
-  "holdIds": [
-    "it_padre_v0_1",
-  ],
-  "ids": [
+  "idsSorted": [
     "en_bread_v0_1",
     "en_father_v0_1",
     "en_island_v0_1",
@@ -21,59 +18,49 @@ exports[`validation dataset lock v0.1 (invariants + snapshot) 1`] = `
     "sa_mata_v0_1",
     "sq_zemer_v0_1",
   ],
-  "langDist": [
+  "langs": [
     {
       "count": 6,
-      "key": "en",
+      "lang": "en",
     },
     {
       "count": 1,
-      "key": "it",
+      "lang": "it",
     },
     {
       "count": 1,
-      "key": "sa",
+      "lang": "sa",
     },
     {
       "count": 1,
-      "key": "sq",
+      "lang": "sq",
     },
   ],
-  "tagDist": [
+  "tags": [
     {
       "count": 3,
-      "key": "kinship",
+      "tag": "kinship",
     },
     {
       "count": 2,
-      "key": "nature",
+      "tag": "nature",
     },
     {
       "count": 1,
-      "key": "body",
+      "tag": "body",
     },
     {
       "count": 1,
-      "key": "food",
+      "tag": "food",
     },
     {
       "count": 1,
-      "key": "music",
+      "tag": "music",
     },
     {
       "count": 1,
-      "key": "tool",
+      "tag": "tool",
     },
-  ],
-  "trainIds": [
-    "en_bread_v0_1",
-    "en_father_v0_1",
-    "en_island_v0_1",
-    "en_knife_v0_1",
-    "en_rhythm_v0_1",
-    "en_water_v0_1",
-    "sa_mata_v0_1",
-    "sq_zemer_v0_1",
   ],
 }
 `;
