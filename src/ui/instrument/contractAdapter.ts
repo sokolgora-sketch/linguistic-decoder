@@ -22,6 +22,7 @@ import type {
   TelemetryViewModel,
   RootMapVM,
   Vowel,
+  PhoneticIpaV0_1VM,
 } from "../telemetry/types";
 import type { RootMapV1 } from "@/shared/deepRoot.rootMap.v1";
 import { computeDeepRootHeartGateV01 } from "@/shared/deepRootHeartGate.v0.1.compute";
@@ -709,7 +710,7 @@ const voicePathDetectedMaybe: PresentOrMissing<Vowel[]> =
 
 
   // ----------------------- phonetic IPA v0.1 -----------------------
-  const phoneticIpaV0_1: PresentOrMissing<any> = (() => {
+    const phoneticIpaV0_1: PresentOrMissing<PhoneticIpaV0_1VM> = (() => {
     if (!isRecord(payload)) return missing("not_emitted", "phoneticIpaV0_1");
     if (!("phoneticIpaV0_1" in payload)) return missing("not_emitted", "phoneticIpaV0_1");
 
