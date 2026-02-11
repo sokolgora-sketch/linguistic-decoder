@@ -3,9 +3,9 @@
 exports[`validation dataset lock v0.1 (invariants + snapshot) 1`] = `
 {
   "counts": {
-    "dataset": 9,
+    "dataset": 8,
     "holdout": 1,
-    "train": 8,
+    "train": 7,
   },
   "holdoutIds": [
     "it_padre_v0_1",
@@ -18,7 +18,6 @@ exports[`validation dataset lock v0.1 (invariants + snapshot) 1`] = `
     "en_rhythm_v0_1",
     "en_water_v0_1",
     "it_padre_v0_1",
-    "sa_mata_v0_1",
     "sq_zemer_v0_1",
   ],
   "langs": [
@@ -32,16 +31,12 @@ exports[`validation dataset lock v0.1 (invariants + snapshot) 1`] = `
     },
     {
       "count": 1,
-      "lang": "sa",
-    },
-    {
-      "count": 1,
       "lang": "sq",
     },
   ],
   "tags": [
     {
-      "count": 3,
+      "count": 2,
       "tag": "kinship",
     },
     {
@@ -72,7 +67,6 @@ exports[`validation dataset lock v0.1 (invariants + snapshot) 1`] = `
     "en_knife_v0_1",
     "en_rhythm_v0_1",
     "en_water_v0_1",
-    "sa_mata_v0_1",
     "sq_zemer_v0_1",
   ],
 }

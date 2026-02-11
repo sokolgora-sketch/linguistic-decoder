@@ -63,15 +63,6 @@
     "notes": "Romance inherited kinship term"
   },
   {
-    "id": "sa_mata_v0_1",
-    "lang": "sa",
-    "word": "mātṛ",
-    "ipa": "/ˈmaː.t̪r̩/",
-    "semanticTag": "kinship",
-    "knownEtymology": "Sanskrit mātṛ (PIE *méh₂tēr)",
-    "notes": "Diacritics + syllabic r; IPA likely partially unmapped"
-  },
-  {
     "id": "sq_zemer_v0_1",
     "lang": "sq",
     "word": "zemër",
