@@ -1,0 +1,30 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`validation v0.2 dashboard snapshot (mask vs carrier) 1`] = `
+{
+  "dataset": {
+    "count": 50,
+    "langs": [
+      "el",
+      "en",
+      "it",
+      "sq",
+    ],
+    "tags": [
+      "body",
+      "culture",
+      "emotion",
+      "food",
+      "kinship",
+      "law",
+      "music",
+      "nature",
+      "systems",
+      "tool",
+    ],
+  },
+  "diagnostics": null,
+  "mismatch": null,
+  "topMismatches": [],
+}
+`;
