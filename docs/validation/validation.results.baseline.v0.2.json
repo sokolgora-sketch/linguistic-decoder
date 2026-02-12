@@ -1,0 +1,477 @@
+{
+  "version": "0.2",
+  "datasetId": "validation.dataset.v0.2",
+  "splits": {
+    "trainCount": 9,
+    "holdoutCount": 3,
+    "fullCount": 12
+  },
+  "full": {
+    "version": "0.1",
+    "dataset": {
+      "count": 12,
+      "withIpa": 12,
+      "tagDist": [
+        {
+          "tag": "nature",
+          "count": 3
+        },
+        {
+          "tag": "body",
+          "count": 2
+        },
+        {
+          "tag": "kinship",
+          "count": 2
+        },
+        {
+          "tag": "tool",
+          "count": 2
+        },
+        {
+          "tag": "food",
+          "count": 1
+        },
+        {
+          "tag": "music",
+          "count": 1
+        },
+        {
+          "tag": "systems",
+          "count": 1
+        }
+      ],
+      "langDist": [
+        {
+          "lang": "en",
+          "count": 6
+        },
+        {
+          "lang": "el",
+          "count": 4
+        },
+        {
+          "lang": "it",
+          "count": 1
+        },
+        {
+          "lang": "sq",
+          "count": 1
+        }
+      ]
+    },
+    "mismatch": {
+      "mismatchCount": 6,
+      "mismatchRate": 0.5
+    },
+    "clustering": {
+      "voiceSpace": {
+        "withinAvg": 2.166667,
+        "acrossAvg": 1.783333,
+        "delta": -0.383333,
+        "pairs": {
+          "within": 6,
+          "across": 60
+        }
+      },
+      "baselines": {
+        "vowelCount": {
+          "withinAvg": 0.5,
+          "acrossAvg": 0.466667,
+          "delta": -0.033333,
+          "pairs": {
+            "within": 6,
+            "across": 60
+          }
+        },
+        "orthography": {
+          "withinAvg": 1.833333,
+          "acrossAvg": 1.783333,
+          "delta": -0.05,
+          "pairs": {
+            "within": 6,
+            "across": 60
+          }
+        },
+        "shuffledTagsControl": {
+          "withinAvg": 2,
+          "acrossAvg": 1.8,
+          "delta": -0.2,
+          "pairs": {
+            "within": 6,
+            "across": 60
+          }
+        }
+      }
+    },
+    "topMismatches": [
+      {
+        "id": "en_island_v0_2",
+        "lang": "en",
+        "word": "island",
+        "ipa": "/ˈaɪlənd/",
+        "orthographyVoices": [
+          "I",
+          "A"
+        ],
+        "phoneticVoices": [
+          "A",
+          "I",
+          "Ë"
+        ],
+        "distance": 2
+      },
+      {
+        "id": "en_knife_v0_2",
+        "lang": "en",
+        "word": "knife",
+        "ipa": "/naɪf/",
+        "orthographyVoices": [
+          "I",
+          "E"
+        ],
+        "phoneticVoices": [
+          "A",
+          "I"
+        ],
+        "distance": 2
+      },
+      {
+        "id": "en_rhythm_v0_2",
+        "lang": "en",
+        "word": "rhythm",
+        "ipa": "/ˈɹɪðəm/",
+        "orthographyVoices": [
+          "Y"
+        ],
+        "phoneticVoices": [
+          "I",
+          "Ë"
+        ],
+        "distance": 2
+      },
+      {
+        "id": "en_water_v0_2",
+        "lang": "en",
+        "word": "water",
+        "ipa": "/ˈwɔːtəɹ/",
+        "orthographyVoices": [
+          "A",
+          "E"
+        ],
+        "phoneticVoices": [
+          "O",
+          "Ë"
+        ],
+        "distance": 2
+      },
+      {
+        "id": "en_bread_v0_2",
+        "lang": "en",
+        "word": "bread",
+        "ipa": "/bɹɛd/",
+        "orthographyVoices": [
+          "E",
+          "A"
+        ],
+        "phoneticVoices": [
+          "E"
+        ],
+        "distance": 1
+      },
+      {
+        "id": "en_father_v0_2",
+        "lang": "en",
+        "word": "father",
+        "ipa": "/ˈfɑːðəɹ/",
+        "orthographyVoices": [
+          "A",
+          "E"
+        ],
+        "phoneticVoices": [
+          "A",
+          "Ë"
+        ],
+        "distance": 1
+      }
+    ],
+    "diagnostics": {
+      "orthographyUnmappedTop": [],
+      "ipaUnmappedTop": [],
+      "notesCount": 0
+    }
+  },
+  "train": {
+    "version": "0.1",
+    "dataset": {
+      "count": 9,
+      "withIpa": 9,
+      "tagDist": [
+        {
+          "tag": "nature",
+          "count": 2
+        },
+        {
+          "tag": "tool",
+          "count": 2
+        },
+        {
+          "tag": "body",
+          "count": 1
+        },
+        {
+          "tag": "food",
+          "count": 1
+        },
+        {
+          "tag": "kinship",
+          "count": 1
+        },
+        {
+          "tag": "music",
+          "count": 1
+        },
+        {
+          "tag": "systems",
+          "count": 1
+        }
+      ],
+      "langDist": [
+        {
+          "lang": "en",
+          "count": 5
+        },
+        {
+          "lang": "el",
+          "count": 4
+        }
+      ]
+    },
+    "mismatch": {
+      "mismatchCount": 5,
+      "mismatchRate": 0.555556
+    },
+    "clustering": {
+      "voiceSpace": {
+        "withinAvg": 2.5,
+        "acrossAvg": 1.882353,
+        "delta": -0.617647,
+        "pairs": {
+          "within": 2,
+          "across": 34
+        }
+      },
+      "baselines": {
+        "vowelCount": {
+          "withinAvg": 0.5,
+          "acrossAvg": 0.617647,
+          "delta": 0.117647,
+          "pairs": {
+            "within": 2,
+            "across": 34
+          }
+        },
+        "orthography": {
+          "withinAvg": 2,
+          "acrossAvg": 1.852941,
+          "delta": -0.147059,
+          "pairs": {
+            "within": 2,
+            "across": 34
+          }
+        },
+        "shuffledTagsControl": {
+          "withinAvg": 1,
+          "acrossAvg": 1.970588,
+          "delta": 0.970588,
+          "pairs": {
+            "within": 2,
+            "across": 34
+          }
+        }
+      }
+    },
+    "topMismatches": [
+      {
+        "id": "en_island_v0_2",
+        "lang": "en",
+        "word": "island",
+        "ipa": "/ˈaɪlənd/",
+        "orthographyVoices": [
+          "I",
+          "A"
+        ],
+        "phoneticVoices": [
+          "A",
+          "I",
+          "Ë"
+        ],
+        "distance": 2
+      },
+      {
+        "id": "en_knife_v0_2",
+        "lang": "en",
+        "word": "knife",
+        "ipa": "/naɪf/",
+        "orthographyVoices": [
+          "I",
+          "E"
+        ],
+        "phoneticVoices": [
+          "A",
+          "I"
+        ],
+        "distance": 2
+      },
+      {
+        "id": "en_rhythm_v0_2",
+        "lang": "en",
+        "word": "rhythm",
+        "ipa": "/ˈɹɪðəm/",
+        "orthographyVoices": [
+          "Y"
+        ],
+        "phoneticVoices": [
+          "I",
+          "Ë"
+        ],
+        "distance": 2
+      },
+      {
+        "id": "en_bread_v0_2",
+        "lang": "en",
+        "word": "bread",
+        "ipa": "/bɹɛd/",
+        "orthographyVoices": [
+          "E",
+          "A"
+        ],
+        "phoneticVoices": [
+          "E"
+        ],
+        "distance": 1
+      },
+      {
+        "id": "en_father_v0_2",
+        "lang": "en",
+        "word": "father",
+        "ipa": "/ˈfɑːðəɹ/",
+        "orthographyVoices": [
+          "A",
+          "E"
+        ],
+        "phoneticVoices": [
+          "A",
+          "Ë"
+        ],
+        "distance": 1
+      }
+    ],
+    "diagnostics": {
+      "orthographyUnmappedTop": [],
+      "ipaUnmappedTop": [],
+      "notesCount": 0
+    }
+  },
+  "holdout": {
+    "version": "0.1",
+    "dataset": {
+      "count": 3,
+      "withIpa": 3,
+      "tagDist": [
+        {
+          "tag": "body",
+          "count": 1
+        },
+        {
+          "tag": "kinship",
+          "count": 1
+        },
+        {
+          "tag": "nature",
+          "count": 1
+        }
+      ],
+      "langDist": [
+        {
+          "lang": "en",
+          "count": 1
+        },
+        {
+          "lang": "it",
+          "count": 1
+        },
+        {
+          "lang": "sq",
+          "count": 1
+        }
+      ]
+    },
+    "mismatch": {
+      "mismatchCount": 1,
+      "mismatchRate": 0.333333
+    },
+    "clustering": {
+      "voiceSpace": {
+        "withinAvg": 0,
+        "acrossAvg": 1.666667,
+        "delta": 1.666667,
+        "pairs": {
+          "within": 0,
+          "across": 3
+        }
+      },
+      "baselines": {
+        "vowelCount": {
+          "withinAvg": 0,
+          "acrossAvg": 0,
+          "delta": 0,
+          "pairs": {
+            "within": 0,
+            "across": 3
+          }
+        },
+        "orthography": {
+          "withinAvg": 0,
+          "acrossAvg": 1.333333,
+          "delta": 1.333333,
+          "pairs": {
+            "within": 0,
+            "across": 3
+          }
+        },
+        "shuffledTagsControl": {
+          "withinAvg": 0,
+          "acrossAvg": 1.666667,
+          "delta": 1.666667,
+          "pairs": {
+            "within": 0,
+            "across": 3
+          }
+        }
+      }
+    },
+    "topMismatches": [
+      {
+        "id": "en_water_v0_2",
+        "lang": "en",
+        "word": "water",
+        "ipa": "/ˈwɔːtəɹ/",
+        "orthographyVoices": [
+          "A",
+          "E"
+        ],
+        "phoneticVoices": [
+          "O",
+          "Ë"
+        ],
+        "distance": 2
+      }
+    ],
+    "diagnostics": {
+      "orthographyUnmappedTop": [],
+      "ipaUnmappedTop": [],
+      "notesCount": 0
+    }
+  }
+}

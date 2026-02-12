@@ -1,0 +1,73 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`validation dataset lock v0.2 (Greek+Latin orthography + IPA tokens) 1`] = `
+{
+  "counts": {
+    "dataset": 12,
+    "holdout": 3,
+    "train": 9,
+  },
+  "idsSorted": [
+    "el_hydor_v0_2",
+    "el_kardia_v0_2",
+    "el_logos_v0_2",
+    "el_metro_v0_2",
+    "en_bread_v0_2",
+    "en_father_v0_2",
+    "en_island_v0_2",
+    "en_knife_v0_2",
+    "en_rhythm_v0_2",
+    "en_water_v0_2",
+    "it_padre_v0_2",
+    "sq_zemer_v0_2",
+  ],
+  "langs": [
+    {
+      "count": 6,
+      "lang": "en",
+    },
+    {
+      "count": 4,
+      "lang": "el",
+    },
+    {
+      "count": 1,
+      "lang": "it",
+    },
+    {
+      "count": 1,
+      "lang": "sq",
+    },
+  ],
+  "tags": [
+    {
+      "count": 3,
+      "tag": "nature",
+    },
+    {
+      "count": 2,
+      "tag": "body",
+    },
+    {
+      "count": 2,
+      "tag": "kinship",
+    },
+    {
+      "count": 2,
+      "tag": "tool",
+    },
+    {
+      "count": 1,
+      "tag": "food",
+    },
+    {
+      "count": 1,
+      "tag": "music",
+    },
+    {
+      "count": 1,
+      "tag": "systems",
+    },
+  ],
+}
+`;

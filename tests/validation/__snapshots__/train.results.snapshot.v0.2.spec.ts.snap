@@ -1,0 +1,176 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`validation v0.2 — train results snapshot 1`] = `
+{
+  "clustering": {
+    "baselines": {
+      "orthography": {
+        "acrossAvg": 1.852941,
+        "delta": -0.147059,
+        "pairs": {
+          "across": 34,
+          "within": 2,
+        },
+        "withinAvg": 2,
+      },
+      "shuffledTagsControl": {
+        "acrossAvg": 1.970588,
+        "delta": 0.970588,
+        "pairs": {
+          "across": 34,
+          "within": 2,
+        },
+        "withinAvg": 1,
+      },
+      "vowelCount": {
+        "acrossAvg": 0.617647,
+        "delta": 0.117647,
+        "pairs": {
+          "across": 34,
+          "within": 2,
+        },
+        "withinAvg": 0.5,
+      },
+    },
+    "voiceSpace": {
+      "acrossAvg": 1.882353,
+      "delta": -0.617647,
+      "pairs": {
+        "across": 34,
+        "within": 2,
+      },
+      "withinAvg": 2.5,
+    },
+  },
+  "dataset": {
+    "count": 9,
+    "langDist": [
+      {
+        "count": 5,
+        "lang": "en",
+      },
+      {
+        "count": 4,
+        "lang": "el",
+      },
+    ],
+    "tagDist": [
+      {
+        "count": 2,
+        "tag": "nature",
+      },
+      {
+        "count": 2,
+        "tag": "tool",
+      },
+      {
+        "count": 1,
+        "tag": "body",
+      },
+      {
+        "count": 1,
+        "tag": "food",
+      },
+      {
+        "count": 1,
+        "tag": "kinship",
+      },
+      {
+        "count": 1,
+        "tag": "music",
+      },
+      {
+        "count": 1,
+        "tag": "systems",
+      },
+    ],
+    "withIpa": 9,
+  },
+  "diagnostics": {
+    "ipaUnmappedTop": [],
+    "notesCount": 0,
+    "orthographyUnmappedTop": [],
+  },
+  "mismatch": {
+    "mismatchCount": 5,
+    "mismatchRate": 0.555556,
+  },
+  "topMismatches": [
+    {
+      "distance": 2,
+      "id": "en_island_v0_2",
+      "ipa": "/ˈaɪlənd/",
+      "lang": "en",
+      "orthographyVoices": [
+        "I",
+        "A",
+      ],
+      "phoneticVoices": [
+        "A",
+        "I",
+        "Ë",
+      ],
+      "word": "island",
+    },
+    {
+      "distance": 2,
+      "id": "en_knife_v0_2",
+      "ipa": "/naɪf/",
+      "lang": "en",
+      "orthographyVoices": [
+        "I",
+        "E",
+      ],
+      "phoneticVoices": [
+        "A",
+        "I",
+      ],
+      "word": "knife",
+    },
+    {
+      "distance": 2,
+      "id": "en_rhythm_v0_2",
+      "ipa": "/ˈɹɪðəm/",
+      "lang": "en",
+      "orthographyVoices": [
+        "Y",
+      ],
+      "phoneticVoices": [
+        "I",
+        "Ë",
+      ],
+      "word": "rhythm",
+    },
+    {
+      "distance": 1,
+      "id": "en_bread_v0_2",
+      "ipa": "/bɹɛd/",
+      "lang": "en",
+      "orthographyVoices": [
+        "E",
+        "A",
+      ],
+      "phoneticVoices": [
+        "E",
+      ],
+      "word": "bread",
+    },
+    {
+      "distance": 1,
+      "id": "en_father_v0_2",
+      "ipa": "/ˈfɑːðəɹ/",
+      "lang": "en",
+      "orthographyVoices": [
+        "A",
+        "E",
+      ],
+      "phoneticVoices": [
+        "A",
+        "Ë",
+      ],
+      "word": "father",
+    },
+  ],
+  "version": "0.1",
+}
+`;
