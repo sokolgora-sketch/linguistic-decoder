@@ -65,6 +65,8 @@ function safeString(e: unknown): string {
 
 export default function ZroChatPage() {
   const [input, setInput] = React.useState('');
+  const [ipa, setIpa] = React.useState('');
+  const [lastRun, setLastRun] = React.useState<{ word: string; ipa?: string } | null>(null);
   const [busy, setBusy] = React.useState(false);
   const [validation, setValidation] = React.useState<string | null>(null);
   const [statusBanner, setStatusBanner] = React.useState<string | null>(null);
@@ -90,8 +92,10 @@ export default function ZroChatPage() {
     if (typeof fn === 'function') fn.call(el, { behavior: 'smooth', block: 'end' });
   }, [messages.length]);
 
-  async function runAnalysis(word: string) {
+  async function runAnalysis(word: string, ipaRaw?: string) {
     const w = word.trim();
+    const ipaTrim = (ipaRaw ?? "").trim();
+    const runMeta = { word: w, ipa: ipaTrim || undefined };
     if (!w) {
       setValidation('Type a word before analyzing.');
       return;
@@ -111,7 +115,7 @@ export default function ZroChatPage() {
     let json: any = null;
 
     try {
-      const url = `/api/analyze-v1?word=${encodeURIComponent(w)}&mode=strict`;
+      const url = `/api/analyze-v1?word=${encodeURIComponent(w)}&mode=strict${ipaTrim ? `&ipa=${encodeURIComponent(ipaTrim)}` : ""}`;
       res = await fetch(url, { method: 'GET' });
 
       if (res && typeof res.json === 'function') {
@@ -123,6 +127,8 @@ export default function ZroChatPage() {
       if (!res?.ok) {
         const status = typeof res?.status === 'number' ? res.status : 0;
         const statusText = typeof res?.statusText === 'string' ? res.statusText : '';
+    setLastRun(runMeta);
+
 
         setMessages(prev =>
           prev.map(x =>
@@ -142,6 +148,7 @@ export default function ZroChatPage() {
         setDebug(statusText || (json ? JSON.stringify(json, null, 2) : '') || `HTTP ${status}` || '');
         return;
       }
+    setLastRun(runMeta);
 
       setMessages(prev =>
         prev.map(x =>
@@ -173,7 +180,7 @@ export default function ZroChatPage() {
 
   function onSubmit() {
     if (busy) return;
-    void runAnalysis(input);
+    void runAnalysis(input, ipa);
   }
 
   function onKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
@@ -184,6 +191,7 @@ export default function ZroChatPage() {
   }
 
   const composer = (
+  <div className="flex flex-col gap-2">
     <div className="flex gap-2">
       <Input
         value={input}
@@ -197,6 +205,19 @@ export default function ZroChatPage() {
         {busy ? 'Analyzing…' : 'Analyze'}
       </Button>
     </div>
+  
+    {debugEnabled ? (
+      <div className="flex gap-2">
+        <Input
+          value={ipa}
+          onChange={e => setIpa(e.target.value)}
+          placeholder="IPA (optional) e.g. /ˈfɑːðə/"
+          aria-label="IPA"
+          disabled={busy}
+        />
+      </div>
+    ) : null}
+  </div>
   );
 
   const latestInstrumentPayload =
@@ -211,7 +232,12 @@ export default function ZroChatPage() {
       <div className="space-y-4">
         {latestInstrumentPayload ? (
           <UiErrorBoundary label="InstrumentPanel">
-            <InstrumentPanel payload={latestInstrumentPayload} debug={debugEnabled} />
+            <InstrumentPanel
+              payload={latestInstrumentPayload}
+              debug={debugEnabled}
+              wordForMask={lastRun?.word}
+              carrierIpa={lastRun?.ipa}
+            />
           </UiErrorBoundary>
         ) : null}
 
