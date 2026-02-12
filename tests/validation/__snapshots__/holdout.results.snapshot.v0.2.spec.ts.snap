@@ -1,0 +1,105 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`validation v0.2 — holdout results snapshot 1`] = `
+{
+  "clustering": {
+    "baselines": {
+      "orthography": {
+        "acrossAvg": 1.333333,
+        "delta": 1.333333,
+        "pairs": {
+          "across": 3,
+          "within": 0,
+        },
+        "withinAvg": 0,
+      },
+      "shuffledTagsControl": {
+        "acrossAvg": 1.666667,
+        "delta": 1.666667,
+        "pairs": {
+          "across": 3,
+          "within": 0,
+        },
+        "withinAvg": 0,
+      },
+      "vowelCount": {
+        "acrossAvg": 0,
+        "delta": 0,
+        "pairs": {
+          "across": 3,
+          "within": 0,
+        },
+        "withinAvg": 0,
+      },
+    },
+    "voiceSpace": {
+      "acrossAvg": 1.666667,
+      "delta": 1.666667,
+      "pairs": {
+        "across": 3,
+        "within": 0,
+      },
+      "withinAvg": 0,
+    },
+  },
+  "dataset": {
+    "count": 3,
+    "langDist": [
+      {
+        "count": 1,
+        "lang": "en",
+      },
+      {
+        "count": 1,
+        "lang": "it",
+      },
+      {
+        "count": 1,
+        "lang": "sq",
+      },
+    ],
+    "tagDist": [
+      {
+        "count": 1,
+        "tag": "body",
+      },
+      {
+        "count": 1,
+        "tag": "kinship",
+      },
+      {
+        "count": 1,
+        "tag": "nature",
+      },
+    ],
+    "withIpa": 3,
+  },
+  "diagnostics": {
+    "ipaUnmappedTop": [],
+    "notesCount": 0,
+    "orthographyUnmappedTop": [],
+  },
+  "mismatch": {
+    "mismatchCount": 1,
+    "mismatchRate": 0.333333,
+  },
+  "topMismatches": [
+    {
+      "distance": 2,
+      "id": "en_water_v0_2",
+      "ipa": "/ˈwɔːtəɹ/",
+      "lang": "en",
+      "orthographyVoices": [
+        "A",
+        "E",
+      ],
+      "phoneticVoices": [
+        "O",
+        "Ë",
+      ],
+      "word": "water",
+    },
+  ],
+  "version": "0.1",
+}
+`;
