@@ -17,116 +17,43 @@ if (!Array.isArray(ds)) {
   process.exit(1);
 }
 
+/**
+ * Batch38 v0.2 (38 new records):
+ * - 12 el, 12 en, 7 it, 7 sq
+ *
+ * IMPORTANT:
+ * Your dataset already contains these IDs, so we DO NOT reuse them:
+ * - el_logos_v0_2
+ * - el_kardia_v0_2
+ * - it_padre_v0_2
+ * - sq_zemer_v0_2
+ *
+ * We replace them with:
+ * - el_fos_v0_2 (φως)
+ * - el_aima_v0_2 (αίμα)
+ * - it_fratello_v0_2 (fratello)
+ * - sq_shpirt_v0_2 (shpirt)
+ */
 const additions = [
   // -------------------- GREEK (el) --------------------
-  {
-    id: "el_kyklos_v0_2",
-    lang: "el",
-    word: "κύκλος",
-    ipa: "/ˈciklos/",
-    semanticTag: "tool",
-    knownEtymology: "Greek κύκλος (circle).",
-    notes: "Orthography expects Y,O (υ,ο). IPA uses i,o."
-  },
-  {
-    id: "el_mythos_v0_2",
-    lang: "el",
-    word: "μύθος",
-    ipa: "/ˈmiθos/",
-    semanticTag: "culture",
-    knownEtymology: "Greek μῦθος (myth).",
-    notes: "Orthography expects Y,O. IPA uses i,o."
-  },
-  {
-    id: "el_logos_v0_2",
-    lang: "el",
-    word: "λόγος",
-    ipa: "/ˈloɣos/",
-    semanticTag: "systems",
-    knownEtymology: "Greek λόγος (word/reason).",
-    notes: "Orthography O,O. IPA uses o,o."
-  },
-  {
-    id: "el_nomos_v0_2",
-    lang: "el",
-    word: "νόμος",
-    ipa: "/ˈnomos/",
-    semanticTag: "law",
-    knownEtymology: "Greek νόμος (law).",
-    notes: "Orthography O,O. IPA uses o,o."
-  },
-  {
-    id: "el_psyche_v0_2",
-    lang: "el",
-    word: "ψυχή",
-    ipa: "/psiˈçi/",
-    semanticTag: "emotion",
-    knownEtymology: "Greek ψυχή (soul).",
-    notes: "Orthography Y,E (υ,ή). IPA uses i,i (Modern Greek)."
-  },
-  {
-    id: "el_kardia_v0_2",
-    lang: "el",
-    word: "καρδία",
-    ipa: "/karˈði.a/",
-    semanticTag: "body",
-    knownEtymology: "Greek καρδία (heart).",
-    notes: "Orthography A,I,A. IPA uses a,i,a."
-  },
-  {
-    id: "el_soma_v0_2",
-    lang: "el",
-    word: "σώμα",
-    ipa: "/ˈsoma/",
-    semanticTag: "body",
-    knownEtymology: "Greek σῶμα (body).",
-    notes: "Orthography O,A. IPA uses o,a."
-  },
-  {
-    id: "el_gaia_poly_v0_2",
-    lang: "el",
-    word: "γαῖα",
-    ipa: "/ˈɣaia/",
-    semanticTag: "nature",
-    knownEtymology: "Greek γαῖα (earth).",
-    notes: "Polytonic; exercises NFD fallback. Orthography A,A. IPA a,i,a."
-  },
-  {
-    id: "el_thalassa_v0_2",
-    lang: "el",
-    word: "θάλασσα",
-    ipa: "/ˈθalasa/",
-    semanticTag: "nature",
-    knownEtymology: "Greek θάλασσα (sea).",
-    notes: "Orthography A,A,A. IPA a,a,a."
-  },
-  {
-    id: "el_ouranos_poly_v0_2",
-    lang: "el",
-    word: "οὐρανός",
-    ipa: "/u.raˈnos/",
-    semanticTag: "nature",
-    knownEtymology: "Greek οὐρανός (sky).",
-    notes: "Polytonic digraph οὐ. Orthography O,A,O. IPA u,a,o."
-  },
-  {
-    id: "el_meli_v0_2",
-    lang: "el",
-    word: "μέλι",
-    ipa: "/ˈmeli/",
-    semanticTag: "food",
-    knownEtymology: "Greek μέλι (honey).",
-    notes: "Orthography E,I. IPA e,i."
-  },
-  {
-    id: "el_oinos_poly_v0_2",
-    lang: "el",
-    word: "οἶνος",
-    ipa: "/ˈinos/",
-    semanticTag: "food",
-    knownEtymology: "Greek οἶνος (wine).",
-    notes: "Polytonic; orthography O,I,O. IPA i,o."
-  },
+  { id: "el_kyklos_v0_2", lang: "el", word: "κύκλος", ipa: "/ˈciklos/", semanticTag: "tool", knownEtymology: "Greek κύκλος (circle).", notes: "Orthography expects Y,O (υ,ο). IPA uses i,o." },
+  { id: "el_mythos_v0_2", lang: "el", word: "μύθος", ipa: "/ˈmiθos/", semanticTag: "culture", knownEtymology: "Greek μῦθος (myth).", notes: "Orthography expects Y,O. IPA uses i,o." },
+
+  // REPLACEMENT for el_logos_v0_2
+  { id: "el_fos_v0_2", lang: "el", word: "φως", ipa: "/fos/", semanticTag: "nature", knownEtymology: "Greek φῶς (light).", notes: "Orthography O. IPA o." },
+
+  { id: "el_nomos_v0_2", lang: "el", word: "νόμος", ipa: "/ˈnomos/", semanticTag: "law", knownEtymology: "Greek νόμος (law).", notes: "Orthography O,O. IPA o,o." },
+  { id: "el_psyche_v0_2", lang: "el", word: "ψυχή", ipa: "/psiˈçi/", semanticTag: "emotion", knownEtymology: "Greek ψυχή (soul).", notes: "Orthography Y,E (υ,ή). IPA i,i (Modern Greek)." },
+
+  // REPLACEMENT for el_kardia_v0_2
+  { id: "el_aima_v0_2", lang: "el", word: "αίμα", ipa: "/ˈema/", semanticTag: "body", knownEtymology: "Greek αἷμα (blood).", notes: "Orthography likely A,I,A. IPA e,a." },
+
+  { id: "el_soma_v0_2", lang: "el", word: "σώμα", ipa: "/ˈsoma/", semanticTag: "body", knownEtymology: "Greek σῶμα (body).", notes: "Orthography O,A. IPA o,a." },
+  { id: "el_gaia_poly_v0_2", lang: "el", word: "γαῖα", ipa: "/ˈɣaia/", semanticTag: "nature", knownEtymology: "Greek γαῖα (earth).", notes: "Polytonic; exercises NFD fallback." },
+  { id: "el_thalassa_v0_2", lang: "el", word: "θάλασσα", ipa: "/ˈθalasa/", semanticTag: "nature", knownEtymology: "Greek θάλασσα (sea).", notes: "Orthography A,A,A. IPA a,a,a." },
+  { id: "el_ouranos_poly_v0_2", lang: "el", word: "οὐρανός", ipa: "/u.raˈnos/", semanticTag: "nature", knownEtymology: "Greek οὐρανός (sky).", notes: "Polytonic digraph οὐ; exercises NFD/script handling." },
+  { id: "el_meli_v0_2", lang: "el", word: "μέλι", ipa: "/ˈmeli/", semanticTag: "food", knownEtymology: "Greek μέλι (honey).", notes: "Orthography E,I. IPA e,i." },
+  { id: "el_oinos_poly_v0_2", lang: "el", word: "οἶνος", ipa: "/ˈinos/", semanticTag: "food", knownEtymology: "Greek οἶνος (wine).", notes: "Polytonic; exercises NFD fallback." },
 
   // -------------------- ENGLISH (en) --------------------
   { id: "en_mother_v0_2", lang: "en", word: "mother", ipa: "/ˈmʌðər/", semanticTag: "kinship", knownEtymology: "TODO: verify.", notes: "ʌ + ə only." },
@@ -144,7 +71,10 @@ const additions = [
 
   // -------------------- ITALIAN (it) --------------------
   { id: "it_madre_v0_2", lang: "it", word: "madre", ipa: "/ˈma.dre/", semanticTag: "kinship", knownEtymology: "TODO: verify.", notes: "a,e." },
-  { id: "it_padre_v0_2", lang: "it", word: "padre", ipa: "/ˈpa.dre/", semanticTag: "kinship", knownEtymology: "TODO: verify.", notes: "a,e." },
+
+  // REPLACEMENT for it_padre_v0_2
+  { id: "it_fratello_v0_2", lang: "it", word: "fratello", ipa: "/fraˈtɛl.lo/", semanticTag: "kinship", knownEtymology: "TODO: verify.", notes: "a,ɛ,o." },
+
   { id: "it_acqua_v0_2", lang: "it", word: "acqua", ipa: "/ˈak.kwa/", semanticTag: "nature", knownEtymology: "TODO: verify.", notes: "a,a." },
   { id: "it_mare_v0_2", lang: "it", word: "mare", ipa: "/ˈma.re/", semanticTag: "nature", knownEtymology: "TODO: verify.", notes: "a,e." },
   { id: "it_pane_v0_2", lang: "it", word: "pane", ipa: "/ˈpa.ne/", semanticTag: "food", knownEtymology: "TODO: verify.", notes: "a,e." },
@@ -154,7 +84,10 @@ const additions = [
   // -------------------- ALBANIAN (sq) --------------------
   { id: "sq_nene_v0_2", lang: "sq", word: "nënë", ipa: "/ˈnənə/", semanticTag: "kinship", knownEtymology: "TODO: verify.", notes: "ë -> ə." },
   { id: "sq_babe_v0_2", lang: "sq", word: "babë", ipa: "/babə/", semanticTag: "kinship", knownEtymology: "TODO: verify.", notes: "ë -> ə." },
-  { id: "sq_zemer_v0_2", lang: "sq", word: "zemër", ipa: "/ˈzɛmər/", semanticTag: "body", knownEtymology: "TODO: verify.", notes: "ɛ + ə." },
+
+  // REPLACEMENT for sq_zemer_v0_2
+  { id: "sq_shpirt_v0_2", lang: "sq", word: "shpirt", ipa: "/ʃpiɾt/", semanticTag: "emotion", knownEtymology: "TODO: verify.", notes: "i only." },
+
   { id: "sq_gjak_v0_2", lang: "sq", word: "gjak", ipa: "/ɟak/", semanticTag: "body", knownEtymology: "TODO: verify.", notes: "a only." },
   { id: "sq_uje_v0_2", lang: "sq", word: "ujë", ipa: "/ˈujə/", semanticTag: "nature", knownEtymology: "TODO: verify.", notes: "u + ə." },
   { id: "sq_diell_v0_2", lang: "sq", word: "diell", ipa: "/diˈɛl/", semanticTag: "nature", knownEtymology: "TODO: verify.", notes: "i + ɛ." },
