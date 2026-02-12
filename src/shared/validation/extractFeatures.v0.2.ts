@@ -1,5 +1,5 @@
 import { mapVowelsV0_2 } from "../vowels/mapVowels.v0.2";
-import { parseIpaVowelsV0_1 } from "../vowels/parseIpaVowels.v0.1";
+import { parseIpaVowelsV0_2 } from "../vowels/parseIpaVowels.v0.2";
 import type { VowelVoice } from "../vowels/vowelVoices.v0.1";
 
 export type ExtractFeaturesInputV01 = {
@@ -108,7 +108,7 @@ export function extractFeaturesV0_1(input: ExtractFeaturesInputV01): ExtractFeat
   let ipaUnmapped: string[] | undefined;
   if (typeof input.ipa === "string" && input.ipa.trim().length) {
     try {
-      const out = parseIpaVowelsV0_1(input.ipa);
+      const out = parseIpaVowelsV0_2(input.ipa);
       ipaVoices = pickVoices(out);
       ipaUnmapped = pickUnmapped(out);
     } catch (e) {
