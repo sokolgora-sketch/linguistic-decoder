@@ -13,6 +13,7 @@ import { useToast } from '@/hooks/use-toast';
 import { toPrettyJson } from "@/ui/instrument/prettyJson";
 import { buildEvidencePackageFromVM } from "@/ui/telemetry/buildEvidencePackageFromVM";
 import { ReadoutCard } from './sections/ReadoutCard';
+import { MaskCarrierCard } from "@/ui/instrument/sections/MaskCarrierCard.v0.1";
 import { CountsRatiosCard } from './sections/CountsRatiosCard';
 import { RawJsonCard } from './sections/RawJsonCard';
 import { EvidencePackageCard } from './sections/EvidencePackageCard';
@@ -32,6 +33,8 @@ type Props =
       /** Raw /api/analyze-v1 payload (unknown shape). We adapt it, never trust it. */
       payload: unknown;
       vm?: never;
+        wordForMask?: string;
+        carrierIpa?: string;
       debug?: boolean;
       onCopyFullJson?: () => void;
     }
@@ -39,6 +42,8 @@ type Props =
       /** Telemetry VM (already adapted). VM-only boundary for callers like ZroChatPage. */
       vm: any;
       payload?: never;
+        wordForMask?: string;
+        carrierIpa?: string;
       debug?: boolean;
       onCopyFullJson?: () => void;
     };
@@ -159,6 +164,9 @@ export function InstrumentPanel(props: Props) {
               onCopySummary={() => void copyText("Summary copied.", summaryLines.join("\n"))}
               onCopyFullJson={() => (props.onCopyFullJson ? props.onCopyFullJson() : void 0)}
             />
+            <div className="mt-3">
+              <MaskCarrierCard word={String(props.wordForMask ?? vm.readout?.word ?? "").trim()} ipa={props.carrierIpa} />
+            </div>
               {/* Minimal controls (copy evidence package) */}
               <EvidencePackageCard
                 onCopyEvidencePackage={() => {
