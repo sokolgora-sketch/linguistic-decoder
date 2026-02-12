@@ -5,86 +5,106 @@ exports[`validation v0.2 — train results snapshot 1`] = `
   "clustering": {
     "baselines": {
       "orthography": {
-        "acrossAvg": 1.852941,
-        "delta": -0.147059,
+        "acrossAvg": 2,
+        "delta": 0.07,
         "pairs": {
-          "across": 34,
-          "within": 2,
+          "across": 641,
+          "within": 100,
         },
-        "withinAvg": 2,
+        "withinAvg": 1.93,
       },
       "shuffledTagsControl": {
-        "acrossAvg": 1.970588,
-        "delta": 0.970588,
+        "acrossAvg": 1.822153,
+        "delta": -0.127847,
         "pairs": {
-          "across": 34,
-          "within": 2,
+          "across": 641,
+          "within": 100,
         },
-        "withinAvg": 1,
+        "withinAvg": 1.95,
       },
       "vowelCount": {
-        "acrossAvg": 0.617647,
-        "delta": 0.117647,
+        "acrossAvg": 0.560062,
+        "delta": -0.069938,
         "pairs": {
-          "across": 34,
-          "within": 2,
+          "across": 641,
+          "within": 100,
         },
-        "withinAvg": 0.5,
+        "withinAvg": 0.63,
       },
     },
     "voiceSpace": {
-      "acrossAvg": 1.882353,
-      "delta": -0.617647,
+      "acrossAvg": 1.850234,
+      "delta": 0.080234,
       "pairs": {
-        "across": 34,
-        "within": 2,
+        "across": 641,
+        "within": 100,
       },
-      "withinAvg": 2.5,
+      "withinAvg": 1.77,
     },
   },
   "dataset": {
-    "count": 9,
+    "count": 39,
     "langDist": [
       {
-        "count": 5,
+        "count": 14,
+        "lang": "el",
+      },
+      {
+        "count": 14,
         "lang": "en",
       },
       {
-        "count": 4,
-        "lang": "el",
+        "count": 6,
+        "lang": "it",
+      },
+      {
+        "count": 5,
+        "lang": "sq",
       },
     ],
     "tagDist": [
       {
-        "count": 2,
+        "count": 9,
         "tag": "nature",
       },
       {
-        "count": 2,
-        "tag": "tool",
+        "count": 8,
+        "tag": "kinship",
       },
       {
-        "count": 1,
+        "count": 7,
         "tag": "body",
       },
       {
-        "count": 1,
+        "count": 5,
         "tag": "food",
       },
       {
+        "count": 3,
+        "tag": "tool",
+      },
+      {
+        "count": 2,
+        "tag": "emotion",
+      },
+      {
+        "count": 2,
+        "tag": "systems",
+      },
+      {
         "count": 1,
-        "tag": "kinship",
+        "tag": "culture",
+      },
+      {
+        "count": 1,
+        "tag": "law",
       },
       {
         "count": 1,
         "tag": "music",
       },
-      {
-        "count": 1,
-        "tag": "systems",
-      },
     ],
-    "withIpa": 9,
+    "withIpa": 39,
   },
   "diagnostics": {
     "ipaUnmappedTop": [],
@@ -92,10 +112,104 @@ exports[`validation v0.2 — train results snapshot 1`] = `
     "orthographyUnmappedTop": [],
   },
   "mismatch": {
-    "mismatchCount": 5,
-    "mismatchRate": 0.555556,
+    "mismatchCount": 21,
+    "mismatchRate": 0.538462,
   },
   "topMismatches": [
+    {
+      "distance": 3,
+      "id": "en_daughter_v0_2",
+      "ipa": "/ˈdɔːtər/",
+      "lang": "en",
+      "orthographyVoices": [
+        "A",
+        "U",
+        "E",
+      ],
+      "phoneticVoices": [
+        "O",
+        "Ë",
+      ],
+      "word": "daughter",
+    },
+    {
+      "distance": 2,
+      "id": "el_aima_v0_2",
+      "ipa": "/ˈema/",
+      "lang": "el",
+      "orthographyVoices": [
+        "A",
+        "I",
+        "A",
+      ],
+      "phoneticVoices": [
+        "E",
+        "A",
+      ],
+      "word": "αίμα",
+    },
+    {
+      "distance": 2,
+      "id": "el_ouranos_poly_v0_2",
+      "ipa": "/u.raˈnos/",
+      "lang": "el",
+      "orthographyVoices": [
+        "O",
+        "Y",
+        "A",
+        "O",
+      ],
+      "phoneticVoices": [
+        "U",
+        "A",
+        "O",
+      ],
+      "word": "οὐρανός",
+    },
+    {
+      "distance": 2,
+      "id": "el_psyche_v0_2",
+      "ipa": "/psiˈçi/",
+      "lang": "el",
+      "orthographyVoices": [
+        "Y",
+        "E",
+      ],
+      "phoneticVoices": [
+        "I",
+        "I",
+      ],
+      "word": "ψυχή",
+    },
+    {
+      "distance": 2,
+      "id": "en_blood_v0_2",
+      "ipa": "/blʌd/",
+      "lang": "en",
+      "orthographyVoices": [
+        "O",
+        "O",
+      ],
+      "phoneticVoices": [
+        "Ë",
+      ],
+      "word": "blood",
+    },
+    {
+      "distance": 2,
+      "id": "en_brother_v0_2",
+      "ipa": "/ˈbrʌðər/",
+      "lang": "en",
+      "orthographyVoices": [
+        "O",
+        "E",
+      ],
+      "phoneticVoices": [
+        "Ë",
+        "Ë",
+      ],
+      "word": "brother",
+    },
     {
       "distance": 2,
       "id": "en_island_v0_2",
@@ -129,6 +243,20 @@ exports[`validation v0.2 — train results snapshot 1`] = `
     },
     {
       "distance": 2,
+      "id": "en_moon_v0_2",
+      "ipa": "/muːn/",
+      "lang": "en",
+      "orthographyVoices": [
+        "O",
+        "O",
+      ],
+      "phoneticVoices": [
+        "U",
+      ],
+      "word": "moon",
+    },
+    {
+      "distance": 2,
       "id": "en_rhythm_v0_2",
       "ipa": "/ˈɹɪðəm/",
       "lang": "en",
@@ -140,35 +268,6 @@ exports[`validation v0.2 — train results snapshot 1`] = `
         "Ë",
       ],
       "word": "rhythm",
-    },
-    {
-      "distance": 1,
-      "id": "en_bread_v0_2",
-      "ipa": "/bɹɛd/",
-      "lang": "en",
-      "orthographyVoices": [
-        "E",
-        "A",
-      ],
-      "phoneticVoices": [
-        "E",
-      ],
-      "word": "bread",
-    },
-    {
-      "distance": 1,
-      "id": "en_father_v0_2",
-      "ipa": "/ˈfɑːðəɹ/",
-      "lang": "en",
-      "orthographyVoices": [
-        "A",
-        "E",
-      ],
-      "phoneticVoices": [
-        "A",
-        "Ë",
-      ],
-      "word": "father",
     },
   ],
   "version": "0.1",

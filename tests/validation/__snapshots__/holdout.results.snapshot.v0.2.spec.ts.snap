@@ -5,74 +5,78 @@ exports[`validation v0.2 — holdout results snapshot 1`] = `
   "clustering": {
     "baselines": {
       "orthography": {
-        "acrossAvg": 1.333333,
-        "delta": 1.333333,
+        "acrossAvg": 1.692308,
+        "delta": -0.307692,
         "pairs": {
-          "across": 3,
-          "within": 0,
+          "across": 39,
+          "within": 16,
         },
-        "withinAvg": 0,
+        "withinAvg": 2,
       },
       "shuffledTagsControl": {
-        "acrossAvg": 1.666667,
-        "delta": 1.666667,
+        "acrossAvg": 1.769231,
+        "delta": -0.043269,
         "pairs": {
-          "across": 3,
-          "within": 0,
+          "across": 39,
+          "within": 16,
         },
-        "withinAvg": 0,
+        "withinAvg": 1.8125,
       },
       "vowelCount": {
-        "acrossAvg": 0,
-        "delta": 0,
+        "acrossAvg": 0.615385,
+        "delta": -0.259615,
         "pairs": {
-          "across": 3,
-          "within": 0,
+          "across": 39,
+          "within": 16,
         },
-        "withinAvg": 0,
+        "withinAvg": 0.875,
       },
     },
     "voiceSpace": {
-      "acrossAvg": 1.666667,
-      "delta": 1.666667,
+      "acrossAvg": 1.692308,
+      "delta": -0.307692,
       "pairs": {
-        "across": 3,
-        "within": 0,
+        "across": 39,
+        "within": 16,
       },
-      "withinAvg": 0,
+      "withinAvg": 2,
     },
   },
   "dataset": {
-    "count": 3,
+    "count": 11,
     "langDist": [
       {
-        "count": 1,
+        "count": 4,
         "lang": "en",
       },
       {
-        "count": 1,
-        "lang": "it",
+        "count": 3,
+        "lang": "sq",
       },
       {
-        "count": 1,
-        "lang": "sq",
+        "count": 2,
+        "lang": "el",
+      },
+      {
+        "count": 2,
+        "lang": "it",
       },
     ],
     "tagDist": [
       {
-        "count": 1,
+        "count": 5,
+        "tag": "nature",
+      },
+      {
+        "count": 3,
         "tag": "body",
       },
       {
-        "count": 1,
+        "count": 3,
         "tag": "kinship",
       },
-      {
-        "count": 1,
-        "tag": "nature",
-      },
     ],
-    "withIpa": 3,
+    "withIpa": 11,
   },
   "diagnostics": {
     "ipaUnmappedTop": [],
@@ -80,10 +84,39 @@ exports[`validation v0.2 — holdout results snapshot 1`] = `
     "orthographyUnmappedTop": [],
   },
   "mismatch": {
-    "mismatchCount": 1,
-    "mismatchRate": 0.333333,
+    "mismatchCount": 5,
+    "mismatchRate": 0.454545,
   },
   "topMismatches": [
+    {
+      "distance": 2,
+      "id": "en_mother_v0_2",
+      "ipa": "/ˈmʌðər/",
+      "lang": "en",
+      "orthographyVoices": [
+        "O",
+        "E",
+      ],
+      "phoneticVoices": [
+        "Ë",
+        "Ë",
+      ],
+      "word": "mother",
+    },
+    {
+      "distance": 2,
+      "id": "en_tree_v0_2",
+      "ipa": "/triː/",
+      "lang": "en",
+      "orthographyVoices": [
+        "E",
+        "E",
+      ],
+      "phoneticVoices": [
+        "I",
+      ],
+      "word": "tree",
+    },
     {
       "distance": 2,
       "id": "en_water_v0_2",
@@ -98,6 +131,35 @@ exports[`validation v0.2 — holdout results snapshot 1`] = `
         "Ë",
       ],
       "word": "water",
+    },
+    {
+      "distance": 1,
+      "id": "en_son_v0_2",
+      "ipa": "/sʌn/",
+      "lang": "en",
+      "orthographyVoices": [
+        "O",
+      ],
+      "phoneticVoices": [
+        "Ë",
+      ],
+      "word": "son",
+    },
+    {
+      "distance": 1,
+      "id": "it_cuore_v0_2",
+      "ipa": "/ˈkwɔ.re/",
+      "lang": "it",
+      "orthographyVoices": [
+        "U",
+        "O",
+        "E",
+      ],
+      "phoneticVoices": [
+        "O",
+        "E",
+      ],
+      "word": "cuore",
     },
   ],
   "version": "0.1",
