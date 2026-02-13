@@ -128,6 +128,13 @@ export function InstrumentPanel(props: Props) {
     }
   }, [inputPayload]);
 
+  const handleCopyFullJson =
+    props.onCopyFullJson
+      ? () => void props.onCopyFullJson!()
+      : inputPayload
+        ? () => void copyText("Full JSON copied.", toPrettyJson(inputPayload))
+        : undefined;
+
   if (!isValidVm) {
     return (
       <div className="rounded-lg border border-red-500/40 bg-red-950/20 p-4 text-sm">
@@ -162,7 +169,7 @@ export function InstrumentPanel(props: Props) {
             <ReadoutCard
               readout={vm.readout}
               onCopySummary={() => void copyText("Summary copied.", summaryLines.join("\n"))}
-              onCopyFullJson={() => (props.onCopyFullJson ? props.onCopyFullJson() : void 0)}
+              onCopyFullJson={handleCopyFullJson}
             />
             <div className="mt-3">
               <MaskCarrierCard word={String(props.wordForMask ?? vm.readout?.word ?? "").trim()} ipa={props.carrierIpa} />
@@ -247,7 +254,7 @@ export function InstrumentPanel(props: Props) {
 
               <RawJsonCard
                 pretty={rawPretty}
-                onCopyFullJson={props.onCopyFullJson}
+                onCopyFullJson={handleCopyFullJson}
                 engineVersion={engineVersion}
               />
             </div>
