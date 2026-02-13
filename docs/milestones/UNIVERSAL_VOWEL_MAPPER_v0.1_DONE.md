@@ -1,14 +1,15 @@
 # Universal Vowel Mapper v0.1 — DONE Criteria
 
-Goal: deterministic **orthography → Seven Voices** mapping (Latin + diacritics + Greek), with mapping tables + overrides contract-locked so drift can’t happen silently.
+Goal: deterministic **orthography → Seven Voices** mapping (Latin + diacritics + Greek),
+with mapping tables + overrides contract-locked so drift can’t happen silently.
 
 ## Scope
 - Input: written word (Unicode), optional `langHint`
 - Output: `{ voices[], tokens[], diagnostics{ unmapped[], usedOverrides } }`
 - Deterministic, no I/O, no network, no G2P
 - Policy:
-  - Latin base map v0.1 stays stable (foundation)
-  - v0.2 extends orthography support (Greek + registry overrides + mapper behavior)
+  - v0.1 Latin foundation stays stable
+  - v0.2 extends orthography support (Greek + override registry + mapper behavior)
 
 ## SSOT Modules (Orthography)
 - Mapper (SSOT): `src/shared/vowels/mapVowels.v0.2.ts`
@@ -20,14 +21,14 @@ Goal: deterministic **orthography → Seven Voices** mapping (Latin + diacritics
 
 ### A) Latin foundation is locked
 - Test: `tests/vowels/vowelMap.baseLatin.v0.1.lock.spec.ts`
-- Guarantee: the v0.1 Latin mapping table cannot change without an explicit snapshot diff.
+- Guarantee: v0.1 Latin base mapping cannot change without an explicit snapshot diff.
 
-### B) v0.2 mapper behavior is deterministic and stable
+### B) v0.2 mapper behavior is deterministic + stable
 - Test: `tests/vowels/mapVowels.v0.2.spec.ts`
 - Guarantees:
   - deterministic tokenization + mapping
   - parity with v0.1 for Latin canon samples
-  - Greek mapping works for monotonic + polytonic (via NFD base fallback)
+  - Greek mapping works for monotonic + polytonic (via Greek-script NFD base fallback)
 
 ### C) v0.2 tables + overrides are contract-locked (anti-drift)
 - Lock tests:
@@ -35,8 +36,8 @@ Goal: deterministic **orthography → Seven Voices** mapping (Latin + diacritics
   - `tests/vowels/vowelMap.baseGreek.v0.2.lock.spec.ts`
   - `tests/vowels/vowelMap.registry.v0.2.lock.spec.ts`
 - Guarantees:
-  - any change to mapper tables/behavior/overrides becomes a visible snapshot diff
-  - review must be intentional
+  - changes to mapper/tables/overrides produce reviewable snapshot diffs
+  - no silent drift in SSOT rails
 
 ## Proof Command
 Run:
