@@ -1,0 +1,451 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`vowels/mapVowels v0.2 (lock) locks outputs for representative latin+diacritics + greek samples 1`] = `
+[
+  {
+    "in": {
+      "word": "résumé",
+    },
+    "out": {
+      "diagnostics": {
+        "unmapped": [],
+        "usedOverrides": false,
+      },
+      "tokens": [
+        {
+          "norm": "r",
+          "raw": "r",
+          "voice": null,
+        },
+        {
+          "norm": "é",
+          "note": "base",
+          "raw": "é",
+          "voice": "E",
+        },
+        {
+          "norm": "s",
+          "raw": "s",
+          "voice": null,
+        },
+        {
+          "norm": "u",
+          "note": "base",
+          "raw": "u",
+          "voice": "U",
+        },
+        {
+          "norm": "m",
+          "raw": "m",
+          "voice": null,
+        },
+        {
+          "norm": "é",
+          "note": "base",
+          "raw": "é",
+          "voice": "E",
+        },
+      ],
+      "voices": [
+        "E",
+        "U",
+        "E",
+      ],
+    },
+  },
+  {
+    "in": {
+      "word": "naïve",
+    },
+    "out": {
+      "diagnostics": {
+        "unmapped": [],
+        "usedOverrides": false,
+      },
+      "tokens": [
+        {
+          "norm": "n",
+          "raw": "n",
+          "voice": null,
+        },
+        {
+          "norm": "a",
+          "note": "base",
+          "raw": "a",
+          "voice": "A",
+        },
+        {
+          "norm": "ï",
+          "note": "base",
+          "raw": "ï",
+          "voice": "I",
+        },
+        {
+          "norm": "v",
+          "raw": "v",
+          "voice": null,
+        },
+        {
+          "norm": "e",
+          "note": "base",
+          "raw": "e",
+          "voice": "E",
+        },
+      ],
+      "voices": [
+        "A",
+        "I",
+        "E",
+      ],
+    },
+  },
+  {
+    "in": {
+      "word": "français",
+    },
+    "out": {
+      "diagnostics": {
+        "unmapped": [],
+        "usedOverrides": false,
+      },
+      "tokens": [
+        {
+          "norm": "f",
+          "raw": "f",
+          "voice": null,
+        },
+        {
+          "norm": "r",
+          "raw": "r",
+          "voice": null,
+        },
+        {
+          "norm": "a",
+          "note": "base",
+          "raw": "a",
+          "voice": "A",
+        },
+        {
+          "norm": "n",
+          "raw": "n",
+          "voice": null,
+        },
+        {
+          "norm": "ç",
+          "raw": "ç",
+          "voice": null,
+        },
+        {
+          "norm": "a",
+          "note": "base",
+          "raw": "a",
+          "voice": "A",
+        },
+        {
+          "norm": "i",
+          "note": "base",
+          "raw": "i",
+          "voice": "I",
+        },
+        {
+          "norm": "s",
+          "raw": "s",
+          "voice": null,
+        },
+      ],
+      "voices": [
+        "A",
+        "A",
+        "I",
+      ],
+    },
+  },
+  {
+    "in": {
+      "word": "Über",
+    },
+    "out": {
+      "diagnostics": {
+        "unmapped": [],
+        "usedOverrides": false,
+      },
+      "tokens": [
+        {
+          "norm": "ü",
+          "note": "base",
+          "raw": "Ü",
+          "voice": "Y",
+        },
+        {
+          "norm": "b",
+          "raw": "b",
+          "voice": null,
+        },
+        {
+          "norm": "e",
+          "note": "base",
+          "raw": "e",
+          "voice": "E",
+        },
+        {
+          "norm": "r",
+          "raw": "r",
+          "voice": null,
+        },
+      ],
+      "voices": [
+        "Y",
+        "E",
+      ],
+    },
+  },
+  {
+    "in": {
+      "word": "coöperate",
+    },
+    "out": {
+      "diagnostics": {
+        "unmapped": [],
+        "usedOverrides": false,
+      },
+      "tokens": [
+        {
+          "norm": "c",
+          "raw": "c",
+          "voice": null,
+        },
+        {
+          "norm": "o",
+          "note": "base",
+          "raw": "o",
+          "voice": "O",
+        },
+        {
+          "norm": "ö",
+          "note": "base",
+          "raw": "ö",
+          "voice": "O",
+        },
+        {
+          "norm": "p",
+          "raw": "p",
+          "voice": null,
+        },
+        {
+          "norm": "e",
+          "note": "base",
+          "raw": "e",
+          "voice": "E",
+        },
+        {
+          "norm": "r",
+          "raw": "r",
+          "voice": null,
+        },
+        {
+          "norm": "a",
+          "note": "base",
+          "raw": "a",
+          "voice": "A",
+        },
+        {
+          "norm": "t",
+          "raw": "t",
+          "voice": null,
+        },
+        {
+          "norm": "e",
+          "note": "base",
+          "raw": "e",
+          "voice": "E",
+        },
+      ],
+      "voices": [
+        "O",
+        "O",
+        "E",
+        "A",
+        "E",
+      ],
+    },
+  },
+  {
+    "in": {
+      "word": "Çalışma",
+    },
+    "out": {
+      "diagnostics": {
+        "unmapped": [],
+        "usedOverrides": false,
+      },
+      "tokens": [
+        {
+          "norm": "ç",
+          "raw": "Ç",
+          "voice": null,
+        },
+        {
+          "norm": "a",
+          "note": "base",
+          "raw": "a",
+          "voice": "A",
+        },
+        {
+          "norm": "l",
+          "raw": "l",
+          "voice": null,
+        },
+        {
+          "norm": "ı",
+          "note": "base",
+          "raw": "ı",
+          "voice": "I",
+        },
+        {
+          "norm": "ş",
+          "raw": "ş",
+          "voice": null,
+        },
+        {
+          "norm": "m",
+          "raw": "m",
+          "voice": null,
+        },
+        {
+          "norm": "a",
+          "note": "base",
+          "raw": "a",
+          "voice": "A",
+        },
+      ],
+      "voices": [
+        "A",
+        "I",
+        "A",
+      ],
+    },
+  },
+  {
+    "in": {
+      "word": "Łódź",
+    },
+    "out": {
+      "diagnostics": {
+        "unmapped": [],
+        "usedOverrides": false,
+      },
+      "tokens": [
+        {
+          "norm": "ł",
+          "raw": "Ł",
+          "voice": null,
+        },
+        {
+          "norm": "ó",
+          "note": "base",
+          "raw": "ó",
+          "voice": "O",
+        },
+        {
+          "norm": "d",
+          "raw": "d",
+          "voice": null,
+        },
+        {
+          "norm": "ź",
+          "raw": "ź",
+          "voice": null,
+        },
+      ],
+      "voices": [
+        "O",
+      ],
+    },
+  },
+  {
+    "in": {
+      "langHint": "el",
+      "word": "μέτρο",
+    },
+    "out": {
+      "diagnostics": {
+        "unmapped": [],
+        "usedOverrides": false,
+      },
+      "tokens": [
+        {
+          "norm": "μ",
+          "raw": "μ",
+          "voice": null,
+        },
+        {
+          "norm": "έ",
+          "note": "base",
+          "raw": "έ",
+          "voice": "E",
+        },
+        {
+          "norm": "τ",
+          "raw": "τ",
+          "voice": null,
+        },
+        {
+          "norm": "ρ",
+          "raw": "ρ",
+          "voice": null,
+        },
+        {
+          "norm": "ο",
+          "note": "base",
+          "raw": "ο",
+          "voice": "O",
+        },
+      ],
+      "voices": [
+        "E",
+        "O",
+      ],
+    },
+  },
+  {
+    "in": {
+      "langHint": "el",
+      "word": "ὕδωρ",
+    },
+    "out": {
+      "diagnostics": {
+        "unmapped": [],
+        "usedOverrides": false,
+      },
+      "tokens": [
+        {
+          "norm": "ὕ",
+          "note": "greek-base-nfd",
+          "raw": "ὕ",
+          "voice": "Y",
+        },
+        {
+          "norm": "δ",
+          "raw": "δ",
+          "voice": null,
+        },
+        {
+          "norm": "ω",
+          "note": "base",
+          "raw": "ω",
+          "voice": "O",
+        },
+        {
+          "norm": "ρ",
+          "raw": "ρ",
+          "voice": null,
+        },
+      ],
+      "voices": [
+        "Y",
+        "O",
+      ],
+    },
+  },
+]
+`;
