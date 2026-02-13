@@ -30,6 +30,7 @@ export async function ensureNextBuild() {
     console.log("Skipping build, .next/BUILD_ID already exists.");
   } else {
     console.log("Running `npm run build` for integration tests...");
+    execSync("rm -rf .next", { stdio: "inherit" });
     execSync("npm run build", { stdio: "inherit" });
 
     if (!exists(".next/BUILD_ID")) {
