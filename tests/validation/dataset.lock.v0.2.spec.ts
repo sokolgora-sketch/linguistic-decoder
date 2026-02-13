@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { mapVowelsV0_2 } from "../../src/shared/vowels/mapVowels.v0.2";
-import { parseIpaVowelsV0_2 } from "../../src/shared/vowels/parseIpaVowels.v0.2";
+import { extractCarrierVoicesFromIpaV0_1 } from "../../src/shared/vowels/extractCarrierVoicesFromIpa.v0.1";
 
 type ValidationRecord = {
   id: string;
@@ -63,7 +63,7 @@ test("validation dataset lock v0.2 (Greek+Latin orthography + IPA tokens)", () =
     }
 
     if (typeof r.ipa === "string" && r.ipa.trim()) {
-      const ipa = parseIpaVowelsV0_2(r.ipa);
+            const ipa = extractCarrierVoicesFromIpaV0_1(r.ipa);
       if (ipa.diagnostics.unmapped.length) {
         badIpa.push({ id: r.id, ipa: r.ipa, unmapped: ipa.diagnostics.unmapped });
       }
