@@ -1,7 +1,7 @@
 # Universal Vowel Mapper v0.1 — DONE Criteria
 
 Goal: deterministic **orthography → Seven Voices** mapping (Latin + diacritics + Greek),
-with mapping tables + overrides contract-locked so drift can’t happen silently.
+with mapping tables + overrides **contract-locked** so drift can’t happen silently.
 
 ## Scope
 - Input: written word (Unicode), optional `langHint`
@@ -39,7 +39,11 @@ with mapping tables + overrides contract-locked so drift can’t happen silently
   - changes to mapper/tables/overrides produce reviewable snapshot diffs
   - no silent drift in SSOT rails
 
+### D) Dataset lock enforces “no unmapped orthography” (v0.2)
+- Test: `tests/validation/dataset.lock.v0.2.spec.ts`
+- Guarantee: train/holdout words do not contain unmapped vowel-like orthography for v0.2.
+
 ## Proof Command
 Run:
-- `npm test -- tests/vowels/vowelMap.baseLatin.v0.1.lock.spec.ts tests/vowels/mapVowels.v0.2.spec.ts tests/vowels/mapVowels.v0.2.lock.spec.ts tests/vowels/vowelMap.baseGreek.v0.2.lock.spec.ts tests/vowels/vowelMap.registry.v0.2.lock.spec.ts`
+- `npm test -- tests/vowels/vowelMap.baseLatin.v0.1.lock.spec.ts tests/vowels/mapVowels.v0.2.spec.ts tests/vowels/mapVowels.v0.2.lock.spec.ts tests/vowels/vowelMap.baseGreek.v0.2.lock.spec.ts tests/vowels/vowelMap.registry.v0.2.lock.spec.ts tests/validation/dataset.lock.v0.2.spec.ts`
 - `npm run gate:quick`
