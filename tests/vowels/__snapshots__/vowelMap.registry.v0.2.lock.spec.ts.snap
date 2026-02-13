@@ -1,0 +1,60 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`vowels: registry overrides v0.2 locked hints + per-hint override tables snapshot (sorted, deterministic) 1`] = `
+[
+  "el",
+  "en",
+  "fr",
+  "sq",
+  "sv",
+  "zh-pinyin",
+]
+`;
+
+exports[`vowels: registry overrides v0.2 locked hints + per-hint override tables snapshot (sorted, deterministic) 2`] = `
+{
+  "hint": "el",
+  "keys": [],
+  "pairs": [],
+}
+`;
+
+exports[`vowels: registry overrides v0.2 locked hints + per-hint override tables snapshot (sorted, deterministic) 3`] = `
+{
+  "hint": "en",
+  "keys": [],
+  "pairs": [],
+}
+`;
+
+exports[`vowels: registry overrides v0.2 locked hints + per-hint override tables snapshot (sorted, deterministic) 4`] = `
+{
+  "hint": "fr",
+  "keys": [],
+  "pairs": [],
+}
+`;
+
+exports[`vowels: registry overrides v0.2 locked hints + per-hint override tables snapshot (sorted, deterministic) 5`] = `
+{
+  "hint": "sq",
+  "keys": [],
+  "pairs": [],
+}
+`;
+
+exports[`vowels: registry overrides v0.2 locked hints + per-hint override tables snapshot (sorted, deterministic) 6`] = `
+{
+  "hint": "sv",
+  "keys": [],
+  "pairs": [],
+}
+`;
+
+exports[`vowels: registry overrides v0.2 locked hints + per-hint override tables snapshot (sorted, deterministic) 7`] = `
+{
+  "hint": "zh-pinyin",
+  "keys": [],
+  "pairs": [],
+}
+`;
