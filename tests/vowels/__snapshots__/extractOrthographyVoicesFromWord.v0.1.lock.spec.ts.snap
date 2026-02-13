@@ -1,0 +1,326 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`orthography SSOT v0.1 (Latin + diacritics) lock 1`] = `
+[
+  {
+    "diagnostics": {
+      "notes": undefined,
+      "unmapped": [],
+    },
+    "tokens": [
+      {
+        "kind": "other",
+        "note": undefined,
+        "raw": "f",
+        "voice": undefined,
+      },
+      {
+        "kind": "other",
+        "note": "base",
+        "raw": "a",
+        "voice": "A",
+      },
+      {
+        "kind": "other",
+        "note": undefined,
+        "raw": "t",
+        "voice": undefined,
+      },
+      {
+        "kind": "other",
+        "note": undefined,
+        "raw": "h",
+        "voice": undefined,
+      },
+      {
+        "kind": "other",
+        "note": "base",
+        "raw": "e",
+        "voice": "E",
+      },
+      {
+        "kind": "other",
+        "note": undefined,
+        "raw": "r",
+        "voice": undefined,
+      },
+    ],
+    "voices": [
+      "A",
+      "E",
+    ],
+    "word": "father",
+  },
+  {
+    "diagnostics": {
+      "notes": undefined,
+      "unmapped": [],
+    },
+    "tokens": [
+      {
+        "kind": "other",
+        "note": undefined,
+        "raw": "b",
+        "voice": undefined,
+      },
+      {
+        "kind": "other",
+        "note": undefined,
+        "raw": "r",
+        "voice": undefined,
+      },
+      {
+        "kind": "other",
+        "note": "base",
+        "raw": "e",
+        "voice": "E",
+      },
+      {
+        "kind": "other",
+        "note": "base",
+        "raw": "a",
+        "voice": "A",
+      },
+      {
+        "kind": "other",
+        "note": undefined,
+        "raw": "d",
+        "voice": undefined,
+      },
+    ],
+    "voices": [
+      "E",
+      "A",
+    ],
+    "word": "bread",
+  },
+  {
+    "diagnostics": {
+      "notes": undefined,
+      "unmapped": [],
+    },
+    "tokens": [
+      {
+        "kind": "other",
+        "note": undefined,
+        "raw": "s",
+        "voice": undefined,
+      },
+      {
+        "kind": "other",
+        "note": undefined,
+        "raw": "t",
+        "voice": undefined,
+      },
+      {
+        "kind": "other",
+        "note": "base",
+        "raw": "u",
+        "voice": "U",
+      },
+      {
+        "kind": "other",
+        "note": undefined,
+        "raw": "d",
+        "voice": undefined,
+      },
+      {
+        "kind": "other",
+        "note": "base",
+        "raw": "y",
+        "voice": "Y",
+      },
+    ],
+    "voices": [
+      "U",
+      "Y",
+    ],
+    "word": "study",
+  },
+  {
+    "diagnostics": {
+      "notes": undefined,
+      "unmapped": [],
+    },
+    "tokens": [
+      {
+        "kind": "other",
+        "note": undefined,
+        "raw": "z",
+        "voice": undefined,
+      },
+      {
+        "kind": "other",
+        "note": "base",
+        "raw": "ë",
+        "voice": "Ë",
+      },
+    ],
+    "voices": [
+      "Ë",
+    ],
+    "word": "zë",
+  },
+  {
+    "diagnostics": {
+      "notes": undefined,
+      "unmapped": [],
+    },
+    "tokens": [
+      {
+        "kind": "other",
+        "note": "base",
+        "raw": "ë",
+        "voice": "Ë",
+      },
+      {
+        "kind": "other",
+        "note": undefined,
+        "raw": "n",
+        "voice": undefined,
+      },
+      {
+        "kind": "other",
+        "note": undefined,
+        "raw": "d",
+        "voice": undefined,
+      },
+      {
+        "kind": "other",
+        "note": "base",
+        "raw": "ë",
+        "voice": "Ë",
+      },
+      {
+        "kind": "other",
+        "note": undefined,
+        "raw": "r",
+        "voice": undefined,
+      },
+      {
+        "kind": "other",
+        "note": undefined,
+        "raw": "r",
+        "voice": undefined,
+      },
+    ],
+    "voices": [
+      "Ë",
+      "Ë",
+    ],
+    "word": "ëndërr",
+  },
+  {
+    "diagnostics": {
+      "notes": undefined,
+      "unmapped": [],
+    },
+    "tokens": [
+      {
+        "kind": "other",
+        "note": undefined,
+        "raw": "ç",
+        "voice": undefined,
+      },
+      {
+        "kind": "other",
+        "note": "base",
+        "raw": "i",
+        "voice": "I",
+      },
+      {
+        "kind": "other",
+        "note": undefined,
+        "raw": "f",
+        "voice": undefined,
+      },
+      {
+        "kind": "other",
+        "note": undefined,
+        "raw": "t",
+        "voice": undefined,
+      },
+    ],
+    "voices": [
+      "I",
+    ],
+    "word": "çift",
+  },
+  {
+    "diagnostics": {
+      "notes": undefined,
+      "unmapped": [],
+    },
+    "tokens": [
+      {
+        "kind": "other",
+        "note": undefined,
+        "raw": "m",
+        "voice": undefined,
+      },
+      {
+        "kind": "other",
+        "note": "base",
+        "raw": "a",
+        "voice": "A",
+      },
+      {
+        "kind": "other",
+        "note": undefined,
+        "raw": "t",
+        "voice": undefined,
+      },
+      {
+        "kind": "other",
+        "note": "base",
+        "raw": "e",
+        "voice": "E",
+      },
+      {
+        "kind": "other",
+        "note": undefined,
+        "raw": "m",
+        "voice": undefined,
+      },
+      {
+        "kind": "other",
+        "note": "base",
+        "raw": "a",
+        "voice": "A",
+      },
+      {
+        "kind": "other",
+        "note": undefined,
+        "raw": "t",
+        "voice": undefined,
+      },
+      {
+        "kind": "other",
+        "note": "base",
+        "raw": "i",
+        "voice": "I",
+      },
+      {
+        "kind": "other",
+        "note": undefined,
+        "raw": "k",
+        "voice": undefined,
+      },
+      {
+        "kind": "other",
+        "note": "base",
+        "raw": "ë",
+        "voice": "Ë",
+      },
+    ],
+    "voices": [
+      "A",
+      "E",
+      "A",
+      "I",
+      "Ë",
+    ],
+    "word": "matematikë",
+  },
+]
+`;
