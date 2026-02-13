@@ -11,9 +11,18 @@ function joinFlags(s: { noCarrier?: boolean; usedImplicit?: boolean; usedSyllabi
 
 function traceString(trace?: Array<{ kind: string; raw: string; voice: string }>): string {
   if (!trace || !trace.length) return "";
+
+  function mark(kind: string): string {
+    // v = explicit vowel nucleus, i = implicit injection, s = syllabic nucleus
+    if (kind === "vowel") return "v";
+    if (kind === "implicit") return "i";
+    if (kind === "syllabic") return "s";
+    return "?";
+  }
+
   return trace
-    .map((t) => `${t.kind}:${String(t.raw ?? "")}→${String(t.voice ?? "")}`)
-    .join(" | ");
+    .map((t) => `${String(t.voice ?? "")}[${mark(String(t.kind ?? ""))}]`)
+    .join(" ");
 }
 
 export function MaskCarrierCard(props: { word: string; ipa?: string }) {
