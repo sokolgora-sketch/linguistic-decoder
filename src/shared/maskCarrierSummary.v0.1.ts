@@ -7,6 +7,7 @@
  */
 
 import type { VowelVoice } from "@/shared/vowels/vowelVoices.v0.1";
+import type { CarrierTraceTokenV0_1 } from "@/shared/vowels/extractCarrierVoicesFromIpa.v0.1";
 import { mapVowelsV0_2 } from "@/shared/vowels/mapVowels.v0.2";
 import { extractCarrierVoicesFromIpaV0_1 } from "@/shared/vowels/extractCarrierVoicesFromIpa.v0.1";
 import { VOWEL_INDEX, totalMod7FromSum0to6 } from "@/shared/math7.core";
@@ -38,6 +39,10 @@ function asRecord(x: unknown): Record<string, unknown> {
   return x && typeof x === "object" ? (x as Record<string, unknown>) : {};
 }
 
+function pickBool(x: unknown): boolean | undefined {
+  return typeof x === "boolean" ? x : undefined;
+}
+
 function pickVoices(result: unknown): VowelVoice[] {
   const r = asRecord(result);
   return safeVoiceList(
@@ -63,6 +68,41 @@ function pickUnmapped(result: unknown): string[] {
       diag["unmapped"] ??
       diag["unmappedChars"]
   );
+}
+
+function pickCarrierFlags(result: unknown): {
+  noCarrier?: boolean;
+  usedImplicit?: boolean;
+  usedSyllabic?: boolean;
+} {
+  const r = asRecord(result);
+  const diag = asRecord(r["diagnostics"]);
+  return {
+    noCarrier: pickBool(diag["noCarrier"]),
+    usedImplicit: pickBool(diag["usedImplicit"]),
+    usedSyllabic: pickBool(diag["usedSyllabic"]),
+  };
+}
+
+function pickTraceTokens(result: unknown): CarrierTraceTokenV0_1[] {
+  const r = asRecord(result);
+  const xs = r["traceTokens"];
+  if (!Array.isArray(xs)) return [];
+
+  const out: CarrierTraceTokenV0_1[] = [];
+  for (const it of xs) {
+    const t = asRecord(it);
+    const kind = String(t["kind"] ?? "");
+    const raw = String(t["raw"] ?? "");
+    const note = String(t["note"] ?? "");
+    const voiceRaw = t["voice"];
+    const voice = typeof voiceRaw === "string" ? voiceRaw : String(voiceRaw ?? "");
+
+    if ((kind === "vowel" || kind === "syllabic" || kind === "implicit") && isVoice(voice)) {
+      out.push({ kind, raw, voice, note } as CarrierTraceTokenV0_1);
+    }
+  }
+  return out;
 }
 
 function sumIndex(voices: readonly VowelVoice[]): number {
@@ -100,7 +140,16 @@ function levenshteinVoices(a: readonly VowelVoice[], b: readonly VowelVoice[]): 
 export type MaskCarrierSummaryV0_1 = {
   word: string;
   mask: { voices: VowelVoice[]; totalMod7: number; unmapped: string[] };
-  carrier?: { ipa: string; voices: VowelVoice[]; totalMod7: number; unmapped: string[] };
+  carrier?: {
+    ipa: string;
+    voices: VowelVoice[];
+    totalMod7: number;
+    unmapped: string[];
+    noCarrier?: boolean;
+    usedImplicit?: boolean;
+    usedSyllabic?: boolean;
+    traceTokens?: CarrierTraceTokenV0_1[];
+  };
   distance?: number;
   mismatch?: boolean;
 };
@@ -124,12 +173,16 @@ export function buildMaskCarrierSummaryV0_1(input: { word: string; ipa?: string 
   const carrierOut = extractCarrierVoicesFromIpaV0_1(ipaRaw);
   const carrierVoices = pickVoices(carrierOut);
   const carrierUnmapped = pickUnmapped(carrierOut);
+  const flags = pickCarrierFlags(carrierOut);
+  const trace = pickTraceTokens(carrierOut);
 
   const carrier = {
     ipa: ipaRaw,
     voices: carrierVoices,
     totalMod7: mod7Total(carrierVoices),
     unmapped: carrierUnmapped,
+    ...flags,
+    traceTokens: trace.length ? trace : undefined,
   };
 
   const distance = levenshteinVoices(maskVoices, carrierVoices);

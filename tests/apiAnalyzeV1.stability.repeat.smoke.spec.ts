@@ -86,6 +86,7 @@ describe("/api/analyze-v1 stability (repeat GET)", () => {
   beforeAll(async () => {
     // CI reliability: `next dev` can race on manifests (pages-manifest.json).
     // Use production build + `next start` for determinism.
+    execSync("rm -rf .next", { stdio: "inherit" });
     execSync("npm run build", {
       stdio: "inherit",
       env: {
