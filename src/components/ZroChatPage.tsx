@@ -206,17 +206,16 @@ export default function ZroChatPage() {
       </Button>
     </div>
   
-    {debugEnabled ? (
-      <div className="flex gap-2">
-        <Input
-          value={ipa}
-          onChange={e => setIpa(e.target.value)}
-          placeholder="IPA (optional) e.g. /ˈfɑːðə/"
-          aria-label="IPA"
-          disabled={busy}
-        />
-      </div>
-    ) : null}
+    <div className="flex gap-2">
+  <Input
+    value={ipa}
+    onChange={e => setIpa(e.target.value)}
+    onKeyDown={onKeyDown}
+    placeholder="IPA (optional) e.g. /ˈfɑːðər/"
+    aria-label="IPA"
+    disabled={busy}
+  />
+</div>
   </div>
   );
 
