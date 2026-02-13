@@ -2,13 +2,13 @@
 /**
  * Mask vs Carrier summary (v0.1)
  * - Mask = orthography SSOT (mapVowels v0.2)
- * - Carrier = IPA SSOT (parseIpaVowels v0.2), if provided
+ * - Carrier = IPA carrier SSOT (extractCarrierVoicesFromIpa v0.1), if provided
  * - Deterministic, no I/O, no network.
  */
 
 import type { VowelVoice } from "@/shared/vowels/vowelVoices.v0.1";
 import { mapVowelsV0_2 } from "@/shared/vowels/mapVowels.v0.2";
-import { parseIpaVowelsV0_2 } from "@/shared/vowels/parseIpaVowels.v0.2";
+import { extractCarrierVoicesFromIpaV0_1 } from "@/shared/vowels/extractCarrierVoicesFromIpa.v0.1";
 import { VOWEL_INDEX, totalMod7FromSum0to6 } from "@/shared/math7.core";
 
 const VOICES: readonly VowelVoice[] = ["A", "E", "I", "O", "U", "Y", "Ë"] as const;
@@ -90,11 +90,7 @@ function levenshteinVoices(a: readonly VowelVoice[], b: readonly VowelVoice[]): 
     for (let j = 1; j <= m; j++) {
       const tmp = dp[j];
       const cost = a[i - 1] === b[j - 1] ? 0 : 1;
-      dp[j] = Math.min(
-        dp[j] + 1,
-        dp[j - 1] + 1,
-        prev + cost
-      );
+      dp[j] = Math.min(dp[j] + 1, dp[j - 1] + 1, prev + cost);
       prev = tmp;
     }
   }
@@ -125,7 +121,7 @@ export function buildMaskCarrierSummaryV0_1(input: { word: string; ipa?: string 
   const ipaRaw = typeof input.ipa === "string" ? input.ipa.trim() : "";
   if (!ipaRaw) return { word, mask };
 
-  const carrierOut = parseIpaVowelsV0_2(ipaRaw);
+  const carrierOut = extractCarrierVoicesFromIpaV0_1(ipaRaw);
   const carrierVoices = pickVoices(carrierOut);
   const carrierUnmapped = pickUnmapped(carrierOut);
 
@@ -137,9 +133,7 @@ export function buildMaskCarrierSummaryV0_1(input: { word: string; ipa?: string 
   };
 
   const distance = levenshteinVoices(maskVoices, carrierVoices);
-  const mismatch =
-    maskVoices.length !== carrierVoices.length ||
-    distance !== 0;
+  const mismatch = maskVoices.length !== carrierVoices.length || distance !== 0;
 
   return { word, mask, carrier, distance, mismatch };
 }
