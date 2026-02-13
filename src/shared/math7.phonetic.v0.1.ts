@@ -8,7 +8,7 @@
  * - Deterministic, no I/O, no G2P.
  */
 
-import { parseIpaVowelsV0_2 } from "./vowels/parseIpaVowels.v0.2";
+import { extractCarrierVoicesFromIpaV0_1 } from "./vowels/extractCarrierVoicesFromIpa.v0.1";
 import { type SevenVowel, VOWEL_INDEX, totalMod7FromSum0to6 } from "./math7.core";
 
 function asSevenVowels(x: unknown): SevenVowel[] {
@@ -20,7 +20,7 @@ function asSevenVowels(x: unknown): SevenVowel[] {
 
 export function extractSevenVowelsFromIpa(input: string): SevenVowel[] {
   try {
-    const out = parseIpaVowelsV0_2(String(input ?? ""));
+    const out = extractCarrierVoicesFromIpaV0_1(String(input ?? ""));
     return asSevenVowels(out);
   } catch {
     return [];

@@ -8,8 +8,7 @@ import { buildEvidencePackageFromVM } from "@/ui/telemetry/buildEvidencePackageF
 import { backfillEvidencePackageSignalsCountV01 } from "./evidencePackage.signalsCount.backfill.v0.1";
 import { toAnalyzeWordResultV1Contract } from "@/shared/analyzeWordResult.v1.contract";
 import { ensurePrimaryAndCandidatePaths } from "@/shared/ensurePaths";
-import { parseIpaVowelsV0_2 } from "@/shared/vowels/parseIpaVowels.v0.2";
-
+import { extractCarrierVoicesFromIpaV0_1 } from "@/shared/vowels/extractCarrierVoicesFromIpa.v0.1";
 // ✅ Contract guard
 import { AnalyzeWordResultV1ContractSchema } from "@/shared/analyzeWordResult.v1.contract";
 
@@ -466,7 +465,7 @@ const checked = AnalyzeWordResultV1ContractSchema.safeParse(out);
       });
     }
 
-    const phoneticIpa = ipa ? parseIpaVowelsV0_2(ipa) : null;
+    const phoneticIpa = ipa ? extractCarrierVoicesFromIpaV0_1(ipa) : null;
 
     if (final && typeof final === "object" && ipa && phoneticIpa) {
 
@@ -669,7 +668,7 @@ const checked = AnalyzeWordResultV1ContractSchema.safeParse(out);
       });
     }
 
-    const phoneticIpa = ipa ? parseIpaVowelsV0_2(ipa) : null;
+    const phoneticIpa = ipa ? extractCarrierVoicesFromIpaV0_1(ipa) : null;
 
     if (final && typeof final === "object" && ipa && phoneticIpa) {
 
