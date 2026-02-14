@@ -1,4 +1,4 @@
-import { mapVowelsV0_1 } from "../vowels/mapVowels.v0.1";
+import { extractOrthographyVoicesFromWordV0_1 } from "../vowels/extractOrthographyVoicesFromWord.v0.1";
 import { extractCarrierVoicesFromIpaV0_1 } from "../vowels/extractCarrierVoicesFromIpa.v0.1";
 
 
@@ -115,7 +115,7 @@ export function extractFeaturesV0_1(input: ExtractFeaturesInputV01): ExtractFeat
   let orthoVoices: VowelVoice[] = [];
   let orthoUnmapped: string[] = [];
   try {
-    const out = mapVowelsV0_1({ word: String(input.word ?? "") });
+    const out = extractOrthographyVoicesFromWordV0_1({ word: String(input.word ?? ""), langHint: input.lang });
     orthoVoices = pickVoices(out);
     orthoUnmapped = pickUnmapped(out);
   } catch (e) {
