@@ -21,9 +21,9 @@ test("guard: orthography extraction must go through SSOT (no direct mapVowels us
 
   const offenders: string[] = [];
 
-  // Any import that ends with mapVowels.v0.2 (relative or aliased), OR symbol usage.
-  const reImport = /\bfrom\s+["'][^"']*mapVowels\.v0\.2["']/;
-  const reSymbol = /\bmapVowelsV0_2\b/;
+  // Any import referencing mapVowels.v0.* OR symbol usage (mapVowelsV0_1, mapVowelsV0_2, etc.)
+  const reImport = /\bfrom\s+["'][^"']*mapVowels\.v0\.[^"']*["']/;
+  const reSymbol = /\bmapVowelsV0_\d+\b/;
 
   for (const f of files) {
     const rel = f.replace(/\\/g, "/");
