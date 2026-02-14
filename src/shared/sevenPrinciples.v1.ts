@@ -1,14 +1,7 @@
 export type Note = "C" | "D" | "E" | "F" | "G" | "A" | "B";
 
-export const VOWEL_TO_NOTE_V0_1: Record<Vowel, Note> = {
-  A: "C",
-  E: "D",
-  I: "E",
-  O: "F",
-  U: "G",
-  Y: "A",
-  "Ë": "B",
-};
+export const VOWEL_TO_NOTE_V0_1: Record<Vowel, Note> =
+  NOTES_ABC_BY_VOICE_V0_1 as unknown as Record<Vowel, Note>;
 
 
 /**
@@ -29,6 +22,7 @@ import {
 } from "@/core/sevenVowelsCore";
 import { SEVEN_VOWELS, VOWEL_INDEX as M7_INDEX } from "@/shared/math7.core";
 import { value1to7 } from "@/v1/math7.core.v1";
+import { NOTES_ABC_BY_VOICE_V0_1 } from "@/shared/doctrine/voiceDoctrine.v0.1";
 
 export const VOWELS_7 = VOWELS; // tuple: ["A","E","I","O","U","Y","Ë"]
 

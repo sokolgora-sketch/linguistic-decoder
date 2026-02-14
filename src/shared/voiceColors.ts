@@ -1,23 +1,17 @@
 // src/shared/voiceColors.ts
 import type { Vowel } from "./engineShape";
+import {
+  COLORS_HEX_BY_VOICE_V0_1,
+  LABELS_BY_VOICE_V0_1,
+} from "./doctrine/voiceDoctrine.v0.1";
 
-export const VOICE_COLOR_MAP: Record<Vowel, string> = {
-  A: "#EF4444",  // red
-  E: "#F59E0B",  // orange
-  I: "#EAB308",  // yellow
-  O: "#10B981",  // green
-  U: "#3B82F6",  // blue
-  Y: "#6366F1",  // indigo
-  "Ë": "#8B5CF6", // violet
-};
+/**
+ * Back-compat shim.
+ * Symbolic SSOT lives in `src/shared/doctrine/voiceDoctrine.v0.1.ts`.
+ */
 
-// Short principle labels for each Voice (Seven Principles).
-export const VOICE_LABEL_MAP: Record<Vowel, string> = {
-  A: "Truth / Source / Action",
-  E: "Expansion / Flow",
-  I: "Insight / Pattern",
-  O: "Balance / Heart / Mediator",
-  U: "Unity / Field",
-  Y: "Network Integrity",
-  "Ë": "Evolution / Completion",
-};
+export const VOICE_COLOR_MAP: Record<Vowel, string> =
+  COLORS_HEX_BY_VOICE_V0_1 as unknown as Record<Vowel, string>;
+
+export const VOICE_LABEL_MAP: Record<Vowel, string> =
+  LABELS_BY_VOICE_V0_1 as unknown as Record<Vowel, string>;

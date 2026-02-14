@@ -1,9 +1,8 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`voice doctrine v0.1 — snapshot lock 1`] = `
+exports[`voice doctrine v0.1 — snapshot lock (full export surface) 1`] = `
 {
-  "category": "symbolic_doctrine",
-  "colorsByVoice": {
+  "COLORS_BY_VOICE_V0_1": {
     "A": "Red",
     "E": "Orange",
     "I": "Yellow",
@@ -12,7 +11,35 @@ exports[`voice doctrine v0.1 — snapshot lock 1`] = `
     "Y": "Indigo",
     "Ë": "Violet",
   },
-  "notesByVoice": {
+  "COLORS_HEX_BY_VOICE_V0_1": {
+    "A": "#EF4444",
+    "E": "#F59E0B",
+    "I": "#EAB308",
+    "O": "#10B981",
+    "U": "#3B82F6",
+    "Y": "#6366F1",
+    "Ë": "#8B5CF6",
+  },
+  "DEFAULT_PRINCIPLES_SET_KEY_V0_1": "modern",
+  "LABELS_BY_VOICE_V0_1": {
+    "A": "Truth / Source / Action",
+    "E": "Expansion / Flow",
+    "I": "Insight / Pattern",
+    "O": "Balance / Heart / Mediator",
+    "U": "Unity / Field",
+    "Y": "Network Integrity",
+    "Ë": "Evolution / Completion",
+  },
+  "NOTES_ABC_BY_VOICE_V0_1": {
+    "A": "C",
+    "E": "D",
+    "I": "E",
+    "O": "F",
+    "U": "G",
+    "Y": "A",
+    "Ë": "B",
+  },
+  "NOTES_BY_VOICE_V0_1": {
     "A": "Do",
     "E": "Re",
     "I": "Mi",
@@ -21,21 +48,18 @@ exports[`voice doctrine v0.1 — snapshot lock 1`] = `
     "Y": "La",
     "Ë": "Ti",
   },
-  "principles": {
-    "defaultSet": "modern",
-    "sets": {
-      "modern": {
-        "A": "Truth",
-        "E": "Expansion",
-        "I": "Insight",
-        "O": "Balance",
-        "U": "Unity",
-        "Y": "Network Integrity",
-        "Ë": "Evolution",
-      },
+  "PRINCIPLES_SETS_V0_1": {
+    "modern": {
+      "A": "Truth",
+      "E": "Expansion",
+      "I": "Insight",
+      "O": "Balance",
+      "U": "Unity",
+      "Y": "Network Integrity",
+      "Ë": "Evolution",
     },
   },
-  "symbolicOrder": [
+  "VOICES_V0_1": [
     "A",
     "E",
     "I",
@@ -44,15 +68,59 @@ exports[`voice doctrine v0.1 — snapshot lock 1`] = `
     "Y",
     "Ë",
   ],
-  "version": "v0.1",
-  "voices": [
-    "A",
-    "E",
-    "I",
-    "O",
-    "U",
-    "Y",
-    "Ë",
-  ],
+  "VOICE_DOCTRINE_V0_1": {
+    "category": "symbolic_doctrine",
+    "colorsByVoice": {
+      "A": "Red",
+      "E": "Orange",
+      "I": "Yellow",
+      "O": "Green",
+      "U": "Blue",
+      "Y": "Indigo",
+      "Ë": "Violet",
+    },
+    "notesByVoice": {
+      "A": "Do",
+      "E": "Re",
+      "I": "Mi",
+      "O": "Fa",
+      "U": "Sol",
+      "Y": "La",
+      "Ë": "Ti",
+    },
+    "principles": {
+      "defaultSet": "modern",
+      "sets": {
+        "modern": {
+          "A": "Truth",
+          "E": "Expansion",
+          "I": "Insight",
+          "O": "Balance",
+          "U": "Unity",
+          "Y": "Network Integrity",
+          "Ë": "Evolution",
+        },
+      },
+    },
+    "symbolicOrder": [
+      "A",
+      "E",
+      "I",
+      "O",
+      "U",
+      "Y",
+      "Ë",
+    ],
+    "version": "v0.1",
+    "voices": [
+      "A",
+      "E",
+      "I",
+      "O",
+      "U",
+      "Y",
+      "Ë",
+    ],
+  },
 }
 `;

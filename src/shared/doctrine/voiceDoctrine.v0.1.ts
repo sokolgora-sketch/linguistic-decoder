@@ -18,6 +18,33 @@ export const COLORS_BY_VOICE_V0_1: Record<VowelVoice, string> = {
   Ë: "Violet",
 } as const;
 
+/**
+ * UI-friendly hex palette (optional, but recommended for consistent rendering).
+ * Uses existing palette already present in the repo (pre-doctrine voiceColors.ts).
+ */
+export const COLORS_HEX_BY_VOICE_V0_1: Record<VowelVoice, string> = {
+  A: "#EF4444", // red
+  E: "#F59E0B", // orange
+  I: "#EAB308", // yellow
+  O: "#10B981", // green
+  U: "#3B82F6", // blue
+  Y: "#6366F1", // indigo
+  "Ë": "#8B5CF6", // violet
+} as const;
+
+/**
+ * Short UI labels (human-facing). Keep these stable to avoid UI/doc drift.
+ */
+export const LABELS_BY_VOICE_V0_1: Record<VowelVoice, string> = {
+  A: "Truth / Source / Action",
+  E: "Expansion / Flow",
+  I: "Insight / Pattern",
+  O: "Balance / Heart / Mediator",
+  U: "Unity / Field",
+  Y: "Network Integrity",
+  "Ë": "Evolution / Completion",
+} as const;
+
 // Notes doctrine (symbolic correspondence; NOT acoustic truth)
 export const NOTES_BY_VOICE_V0_1: Record<VowelVoice, string> = {
   A: "Do",
@@ -27,6 +54,20 @@ export const NOTES_BY_VOICE_V0_1: Record<VowelVoice, string> = {
   U: "Sol",
   Y: "La",
   Ë: "Ti",
+} as const;
+
+/**
+ * Musical notes (ABC) correspondence used by Seven Principles Law.
+ * (Symbolic mapping; not acoustic truth.)
+ */
+export const NOTES_ABC_BY_VOICE_V0_1: Record<VowelVoice, "C"|"D"|"E"|"F"|"G"|"A"|"B"> = {
+  A: "C",
+  E: "D",
+  I: "E",
+  O: "F",
+  U: "G",
+  Y: "A",
+  "Ë": "B",
 } as const;
 
 // Project principles (your modern set, locked as symbolic doctrine)
