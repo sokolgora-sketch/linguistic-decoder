@@ -8,7 +8,7 @@
 
 import type { VowelVoice } from "@/shared/vowels/vowelVoices.v0.1";
 import type { CarrierTraceTokenV0_1 } from "@/shared/vowels/extractCarrierVoicesFromIpa.v0.1";
-import { mapVowelsV0_2 } from "@/shared/vowels/mapVowels.v0.2";
+import { extractOrthographyVoicesFromWordV0_1 } from "@/shared/vowels/extractOrthographyVoicesFromWord.v0.1";
 import { extractCarrierVoicesFromIpaV0_1 } from "@/shared/vowels/extractCarrierVoicesFromIpa.v0.1";
 import { VOWEL_INDEX, totalMod7FromSum0to6 } from "@/shared/math7.core";
 
@@ -157,7 +157,7 @@ export type MaskCarrierSummaryV0_1 = {
 export function buildMaskCarrierSummaryV0_1(input: { word: string; ipa?: string | null }): MaskCarrierSummaryV0_1 {
   const word = String(input.word ?? "").trim();
 
-  const maskOut = mapVowelsV0_2({ word });
+    const maskOut = extractOrthographyVoicesFromWordV0_1({ word });
   const maskVoices = pickVoices(maskOut);
   const maskUnmapped = pickUnmapped(maskOut);
 

@@ -1,0 +1,333 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`orthography SSOT v0.1 (Latin + diacritics) lock 1`] = `
+[
+  {
+    "diagnostics": {
+      "notes": undefined,
+      "unmapped": [],
+      "usedOverrides": false,
+    },
+    "tokens": [
+      {
+        "norm": "f",
+        "note": undefined,
+        "raw": "f",
+        "voice": null,
+      },
+      {
+        "norm": "a",
+        "note": "base",
+        "raw": "a",
+        "voice": "A",
+      },
+      {
+        "norm": "t",
+        "note": undefined,
+        "raw": "t",
+        "voice": null,
+      },
+      {
+        "norm": "h",
+        "note": undefined,
+        "raw": "h",
+        "voice": null,
+      },
+      {
+        "norm": "e",
+        "note": "base",
+        "raw": "e",
+        "voice": "E",
+      },
+      {
+        "norm": "r",
+        "note": undefined,
+        "raw": "r",
+        "voice": null,
+      },
+    ],
+    "voices": [
+      "A",
+      "E",
+    ],
+    "word": "father",
+  },
+  {
+    "diagnostics": {
+      "notes": undefined,
+      "unmapped": [],
+      "usedOverrides": false,
+    },
+    "tokens": [
+      {
+        "norm": "b",
+        "note": undefined,
+        "raw": "b",
+        "voice": null,
+      },
+      {
+        "norm": "r",
+        "note": undefined,
+        "raw": "r",
+        "voice": null,
+      },
+      {
+        "norm": "e",
+        "note": "base",
+        "raw": "e",
+        "voice": "E",
+      },
+      {
+        "norm": "a",
+        "note": "base",
+        "raw": "a",
+        "voice": "A",
+      },
+      {
+        "norm": "d",
+        "note": undefined,
+        "raw": "d",
+        "voice": null,
+      },
+    ],
+    "voices": [
+      "E",
+      "A",
+    ],
+    "word": "bread",
+  },
+  {
+    "diagnostics": {
+      "notes": undefined,
+      "unmapped": [],
+      "usedOverrides": false,
+    },
+    "tokens": [
+      {
+        "norm": "s",
+        "note": undefined,
+        "raw": "s",
+        "voice": null,
+      },
+      {
+        "norm": "t",
+        "note": undefined,
+        "raw": "t",
+        "voice": null,
+      },
+      {
+        "norm": "u",
+        "note": "base",
+        "raw": "u",
+        "voice": "U",
+      },
+      {
+        "norm": "d",
+        "note": undefined,
+        "raw": "d",
+        "voice": null,
+      },
+      {
+        "norm": "y",
+        "note": "base",
+        "raw": "y",
+        "voice": "Y",
+      },
+    ],
+    "voices": [
+      "U",
+      "Y",
+    ],
+    "word": "study",
+  },
+  {
+    "diagnostics": {
+      "notes": undefined,
+      "unmapped": [],
+      "usedOverrides": false,
+    },
+    "tokens": [
+      {
+        "norm": "z",
+        "note": undefined,
+        "raw": "z",
+        "voice": null,
+      },
+      {
+        "norm": "ë",
+        "note": "base",
+        "raw": "ë",
+        "voice": "Ë",
+      },
+    ],
+    "voices": [
+      "Ë",
+    ],
+    "word": "zë",
+  },
+  {
+    "diagnostics": {
+      "notes": undefined,
+      "unmapped": [],
+      "usedOverrides": false,
+    },
+    "tokens": [
+      {
+        "norm": "ë",
+        "note": "base",
+        "raw": "ë",
+        "voice": "Ë",
+      },
+      {
+        "norm": "n",
+        "note": undefined,
+        "raw": "n",
+        "voice": null,
+      },
+      {
+        "norm": "d",
+        "note": undefined,
+        "raw": "d",
+        "voice": null,
+      },
+      {
+        "norm": "ë",
+        "note": "base",
+        "raw": "ë",
+        "voice": "Ë",
+      },
+      {
+        "norm": "r",
+        "note": undefined,
+        "raw": "r",
+        "voice": null,
+      },
+      {
+        "norm": "r",
+        "note": undefined,
+        "raw": "r",
+        "voice": null,
+      },
+    ],
+    "voices": [
+      "Ë",
+      "Ë",
+    ],
+    "word": "ëndërr",
+  },
+  {
+    "diagnostics": {
+      "notes": undefined,
+      "unmapped": [],
+      "usedOverrides": false,
+    },
+    "tokens": [
+      {
+        "norm": "ç",
+        "note": undefined,
+        "raw": "ç",
+        "voice": null,
+      },
+      {
+        "norm": "i",
+        "note": "base",
+        "raw": "i",
+        "voice": "I",
+      },
+      {
+        "norm": "f",
+        "note": undefined,
+        "raw": "f",
+        "voice": null,
+      },
+      {
+        "norm": "t",
+        "note": undefined,
+        "raw": "t",
+        "voice": null,
+      },
+    ],
+    "voices": [
+      "I",
+    ],
+    "word": "çift",
+  },
+  {
+    "diagnostics": {
+      "notes": undefined,
+      "unmapped": [],
+      "usedOverrides": false,
+    },
+    "tokens": [
+      {
+        "norm": "m",
+        "note": undefined,
+        "raw": "m",
+        "voice": null,
+      },
+      {
+        "norm": "a",
+        "note": "base",
+        "raw": "a",
+        "voice": "A",
+      },
+      {
+        "norm": "t",
+        "note": undefined,
+        "raw": "t",
+        "voice": null,
+      },
+      {
+        "norm": "e",
+        "note": "base",
+        "raw": "e",
+        "voice": "E",
+      },
+      {
+        "norm": "m",
+        "note": undefined,
+        "raw": "m",
+        "voice": null,
+      },
+      {
+        "norm": "a",
+        "note": "base",
+        "raw": "a",
+        "voice": "A",
+      },
+      {
+        "norm": "t",
+        "note": undefined,
+        "raw": "t",
+        "voice": null,
+      },
+      {
+        "norm": "i",
+        "note": "base",
+        "raw": "i",
+        "voice": "I",
+      },
+      {
+        "norm": "k",
+        "note": undefined,
+        "raw": "k",
+        "voice": null,
+      },
+      {
+        "norm": "ë",
+        "note": "base",
+        "raw": "ë",
+        "voice": "Ë",
+      },
+    ],
+    "voices": [
+      "A",
+      "E",
+      "A",
+      "I",
+      "Ë",
+    ],
+    "word": "matematikë",
+  },
+]
+`;

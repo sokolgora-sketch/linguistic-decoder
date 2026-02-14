@@ -13,8 +13,7 @@
  * - Any mod7 computations should import from here.
  */
 
-import { mapVowelsV0_2 } from "./vowels/mapVowels.v0.2";
-
+import { extractOrthographyVoicesFromWordV0_1 } from "./vowels/extractOrthographyVoicesFromWord.v0.1";
 export const SEVEN_VOWELS = ["A", "E", "I", "O", "U", "Y", "Ë"] as const;
 export type SevenVowel = (typeof SEVEN_VOWELS)[number];
 
@@ -37,7 +36,7 @@ export function extractSevenVowelsFromString(input: string): SevenVowel[] {
   // Orthography SSOT: Universal Vowel Mapper v0.1 (Latin + diacritics → Seven Voices).
   // Deterministic; never throws.
   try {
-    const out = mapVowelsV0_2({ word: String(input ?? "") });
+      const out = extractOrthographyVoicesFromWordV0_1({ word: String(input ?? "") });
     return out.voices as unknown as SevenVowel[];
   } catch {
     return [];
