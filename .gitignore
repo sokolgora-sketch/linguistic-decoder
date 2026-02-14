@@ -39,3 +39,6 @@ DF_BRAIN/
 
 # local fixture backups
 tests/__fixtures__/*.bak.*
+
+# flake-hunt artifacts
+/test-run-*.log
