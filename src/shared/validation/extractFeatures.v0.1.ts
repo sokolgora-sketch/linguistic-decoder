@@ -1,5 +1,26 @@
 import { mapVowelsV0_1 } from "../vowels/mapVowels.v0.1";
-import { parseIpaVowelsV0_1 } from "../vowels/parseIpaVowels.v0.1";
+import { extractCarrierVoicesFromIpaV0_1 } from "../vowels/extractCarrierVoicesFromIpa.v0.1";
+
+
+// PHONETIC_IPA_SSOT_SHIMS_V0_1
+// Validation feature extraction must NOT import IPA parser/map internals directly.
+// We route everything through the phonetic SSOT: extractCarrierVoicesFromIpaV0_1().
+function __phoneticOutV0_1(ipa: unknown): { voices: VowelVoice[]; tokens: unknown[]; diagnostics: any } {
+  try {
+    const out = extractCarrierVoicesFromIpaV0_1(ipa);
+    const voices = Array.isArray((out as any)?.voices) ? ((out as any).voices as VowelVoice[]) : [];
+    const tokens = Array.isArray((out as any)?.tokens) ? ((out as any).tokens as unknown[]) : [];
+    const diagnostics = (out as any)?.diagnostics ?? {};
+    return { voices, tokens, diagnostics };
+  } catch {
+    return { voices: [], tokens: [], diagnostics: {} };
+  }
+}
+const parseIpaVowelsV0_1 = (ipa: any) => {
+  const o = __phoneticOutV0_1(ipa);
+  return { vowels: o.voices, voices: o.voices, tokens: o.tokens, diagnostics: o.diagnostics };
+};
+
 import type { VowelVoice } from "../vowels/vowelVoices.v0.1";
 
 export type ExtractFeaturesInputV01 = {
