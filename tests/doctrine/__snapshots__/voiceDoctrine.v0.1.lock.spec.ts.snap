@@ -1,0 +1,58 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`voice doctrine v0.1 — snapshot lock 1`] = `
+{
+  "category": "symbolic_doctrine",
+  "colorsByVoice": {
+    "A": "Red",
+    "E": "Orange",
+    "I": "Yellow",
+    "O": "Green",
+    "U": "Blue",
+    "Y": "Indigo",
+    "Ë": "Violet",
+  },
+  "notesByVoice": {
+    "A": "Do",
+    "E": "Re",
+    "I": "Mi",
+    "O": "Fa",
+    "U": "Sol",
+    "Y": "La",
+    "Ë": "Ti",
+  },
+  "principles": {
+    "defaultSet": "modern",
+    "sets": {
+      "modern": {
+        "A": "Truth",
+        "E": "Expansion",
+        "I": "Insight",
+        "O": "Balance",
+        "U": "Unity",
+        "Y": "Network Integrity",
+        "Ë": "Evolution",
+      },
+    },
+  },
+  "symbolicOrder": [
+    "A",
+    "E",
+    "I",
+    "O",
+    "U",
+    "Y",
+    "Ë",
+  ],
+  "version": "v0.1",
+  "voices": [
+    "A",
+    "E",
+    "I",
+    "O",
+    "U",
+    "Y",
+    "Ë",
+  ],
+}
+`;
