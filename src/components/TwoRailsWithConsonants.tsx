@@ -1,3 +1,4 @@
+import { COLORS_HEX_BY_VOICE_V0_1 } from "@/shared/doctrine/voiceDoctrine.v0.1";
 
 "use client";
 
@@ -6,15 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 type Vowel = "A" | "E" | "I" | "O" | "U" | "Y" | "Ë";
 const ORDER: Vowel[] = ["A", "E", "I", "O", "U", "Y", "Ë"];
-const VOICE_COLOR: Record<Vowel, string> = {
-  A: "#EF4444",
-  E: "#F59E0B",
-  I: "#EAB308",
-  O: "#10B981",
-  U: "#3B82F6",
-  Y: "#6366F1",
-  "Ë": "#8B5CF6",
-};
+const VOICE_COLOR = COLORS_HEX_BY_VOICE_V0_1 as unknown as Record<string, string>;
 
 const PALETTE = { 
   rail:"#4b5563", 
