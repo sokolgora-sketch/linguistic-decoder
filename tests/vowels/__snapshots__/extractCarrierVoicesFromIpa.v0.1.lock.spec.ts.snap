@@ -1,0 +1,281 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`phonetic SSOT v0.1 (IPA → carrier voices) lock 1`] = `
+[
+  {
+    "in": "tɪp",
+    "out": {
+      "diagnostics": {
+        "noCarrier": false,
+        "unmapped": [],
+        "usedImplicit": false,
+        "usedSyllabic": false,
+      },
+      "tokens": [
+        {
+          "raw": "ɪ",
+          "voice": "I",
+        },
+      ],
+      "traceTokens": [
+        {
+          "kind": "vowel",
+          "note": "explicit vowel (parseIpaVowels v0.2)",
+          "raw": "ɪ",
+          "voice": "I",
+        },
+      ],
+      "voices": [
+        "I",
+      ],
+    },
+  },
+  {
+    "in": "/ɹɪðəm/",
+    "out": {
+      "diagnostics": {
+        "noCarrier": false,
+        "unmapped": [],
+        "usedImplicit": false,
+        "usedSyllabic": false,
+      },
+      "tokens": [
+        {
+          "raw": "ɪ",
+          "voice": "I",
+        },
+        {
+          "raw": "ə",
+          "voice": "Ë",
+        },
+      ],
+      "traceTokens": [
+        {
+          "kind": "vowel",
+          "note": "explicit vowel (parseIpaVowels v0.2)",
+          "raw": "ɪ",
+          "voice": "I",
+        },
+        {
+          "kind": "vowel",
+          "note": "explicit vowel (parseIpaVowels v0.2)",
+          "raw": "ə",
+          "voice": "Ë",
+        },
+      ],
+      "voices": [
+        "I",
+        "Ë",
+      ],
+    },
+  },
+  {
+    "in": "str",
+    "out": {
+      "diagnostics": {
+        "noCarrier": true,
+        "unmapped": [],
+        "usedImplicit": false,
+        "usedSyllabic": false,
+      },
+      "tokens": [],
+      "traceTokens": [],
+      "voices": [],
+    },
+  },
+  {
+    "in": "ˈəndəɾ",
+    "out": {
+      "diagnostics": {
+        "noCarrier": false,
+        "unmapped": [],
+        "usedImplicit": false,
+        "usedSyllabic": false,
+      },
+      "tokens": [
+        {
+          "raw": "ə",
+          "voice": "Ë",
+        },
+        {
+          "raw": "ə",
+          "voice": "Ë",
+        },
+      ],
+      "traceTokens": [
+        {
+          "kind": "vowel",
+          "note": "explicit vowel (parseIpaVowels v0.2)",
+          "raw": "ə",
+          "voice": "Ë",
+        },
+        {
+          "kind": "vowel",
+          "note": "explicit vowel (parseIpaVowels v0.2)",
+          "raw": "ə",
+          "voice": "Ë",
+        },
+      ],
+      "voices": [
+        "Ë",
+        "Ë",
+      ],
+    },
+  },
+  {
+    "in": "məˈtæmətɪks",
+    "out": {
+      "diagnostics": {
+        "noCarrier": false,
+        "unmapped": [],
+        "usedImplicit": false,
+        "usedSyllabic": false,
+      },
+      "tokens": [
+        {
+          "raw": "ə",
+          "voice": "Ë",
+        },
+        {
+          "raw": "æ",
+          "voice": "A",
+        },
+        {
+          "raw": "ə",
+          "voice": "Ë",
+        },
+        {
+          "raw": "ɪ",
+          "voice": "I",
+        },
+      ],
+      "traceTokens": [
+        {
+          "kind": "vowel",
+          "note": "explicit vowel (parseIpaVowels v0.2)",
+          "raw": "ə",
+          "voice": "Ë",
+        },
+        {
+          "kind": "vowel",
+          "note": "explicit vowel (parseIpaVowels v0.2)",
+          "raw": "æ",
+          "voice": "A",
+        },
+        {
+          "kind": "vowel",
+          "note": "explicit vowel (parseIpaVowels v0.2)",
+          "raw": "ə",
+          "voice": "Ë",
+        },
+        {
+          "kind": "vowel",
+          "note": "explicit vowel (parseIpaVowels v0.2)",
+          "raw": "ɪ",
+          "voice": "I",
+        },
+      ],
+      "voices": [
+        "Ë",
+        "A",
+        "Ë",
+        "I",
+      ],
+    },
+  },
+  {
+    "in": "",
+    "out": {
+      "diagnostics": {
+        "noCarrier": true,
+        "unmapped": [],
+        "usedImplicit": false,
+        "usedSyllabic": false,
+      },
+      "tokens": [],
+      "traceTokens": [],
+      "voices": [],
+    },
+  },
+  {
+    "in": null,
+    "out": {
+      "diagnostics": {
+        "noCarrier": true,
+        "unmapped": [],
+        "usedImplicit": false,
+        "usedSyllabic": false,
+      },
+      "tokens": [],
+      "traceTokens": [],
+      "voices": [],
+    },
+  },
+  {
+    "in": 123,
+    "out": {
+      "diagnostics": {
+        "noCarrier": true,
+        "unmapped": [],
+        "usedImplicit": false,
+        "usedSyllabic": false,
+      },
+      "tokens": [],
+      "traceTokens": [],
+      "voices": [],
+    },
+  },
+  {
+    "in": {
+      "ipa": "tɪp",
+    },
+    "out": {
+      "diagnostics": {
+        "noCarrier": false,
+        "unmapped": [],
+        "usedImplicit": false,
+        "usedSyllabic": false,
+      },
+      "tokens": [
+        {
+          "raw": "o",
+          "voice": "O",
+        },
+        {
+          "raw": "e",
+          "voice": "E",
+        },
+        {
+          "raw": "e",
+          "voice": "E",
+        },
+      ],
+      "traceTokens": [
+        {
+          "kind": "vowel",
+          "note": "explicit vowel (parseIpaVowels v0.2)",
+          "raw": "o",
+          "voice": "O",
+        },
+        {
+          "kind": "vowel",
+          "note": "explicit vowel (parseIpaVowels v0.2)",
+          "raw": "e",
+          "voice": "E",
+        },
+        {
+          "kind": "vowel",
+          "note": "explicit vowel (parseIpaVowels v0.2)",
+          "raw": "e",
+          "voice": "E",
+        },
+      ],
+      "voices": [
+        "O",
+        "E",
+        "E",
+      ],
+    },
+  },
+]
+`;
