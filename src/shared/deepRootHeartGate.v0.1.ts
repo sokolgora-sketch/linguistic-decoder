@@ -1,5 +1,5 @@
 // DeepRoot–Heart Alignment Gate v0.1
-// Contract-first: types + reason codes only (behavior implemented later).
+// Contract-first: types + reason codes only (behavior implemented in compute.ts)
 
 export type DeepRootHeartGateStatus =
   | "aligned"
@@ -8,7 +8,7 @@ export type DeepRootHeartGateStatus =
 
 export type DeepRootHeartGateReasonCode =
   | "HEART_PRIMARY_PATH_MISSING"
-  | "CANDIDATE_PATH_MISSING"
+  | "DEEPROOT_FUNCTIONAL_PATH_MISSING"
   | "TERMINAL_VOWEL_CONFLICT";
 
 export type DeepRootHeartGateV01 = {

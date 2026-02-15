@@ -282,7 +282,7 @@ function computeSupportVector(result: AnalyzeWordResultV1Like, cand: any): Suppo
     // Adapter-safe: uses emitted/derived vowel sequences; NEVER reads raw payload.
     {
         const heartExplicit = resolveVoiceSeqV0_1((result as any)?.heartPrimaryPath);
-        const heartForGateSeq = heartExplicit ?? primary;
+        const heartForGateSeq = heartExplicit && heartExplicit.length ? heartExplicit : primary;
 
         const fr0 = (result as any)?.deepRoot?.functionalRoots?.[0] ?? null;
         const deepRootFunctionalForGateSeq = fr0
@@ -314,7 +314,7 @@ function computeSupportVector(result: AnalyzeWordResultV1Like, cand: any): Suppo
       }
 const gate = computeDeepRootHeartGateV01({
         heartPrimaryPath: heartForGateSeq ? heartForGateSeq.join("-") : null,
-        candidateResolvedPath: candidateResolvedForGateSeq ? candidateResolvedForGateSeq.join("-") : null,
+        deepRootFunctionalPath: candidateResolvedForGateSeq ? candidateResolvedForGateSeq.join("-") : null,
         evidenceRefs: gateEvidenceRefs,
       });
       out.evidenceRefs.push(...gateEvidenceRefs);
