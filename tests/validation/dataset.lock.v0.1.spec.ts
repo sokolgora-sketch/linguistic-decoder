@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
-import { mapVowelsV0_1 } from "../../src/shared/vowels/mapVowels.v0.1";
-import { parseIpaVowelsV0_1 } from "../../src/shared/vowels/parseIpaVowels.v0.1";
+import { extractOrthographyVoicesFromWordV0_1 } from "../../src/shared/vowels/extractOrthographyVoicesFromWord.v0.1";
+import { extractCarrierVoicesFromIpaV0_1 } from "../../src/shared/vowels/extractCarrierVoicesFromIpa.v0.1";
 
 type ValidationRecordV01 = {
   id: string;
@@ -103,12 +103,12 @@ test("validation dataset lock v0.1 (invariants + snapshot)", () => {
   const badIpa: Array<{ id: string; ipa: string; unmapped: string[] }> = [];
 
   for (const r of ds) {
-    const ortho = mapVowelsV0_1({ word: r.word, langHint: r.lang });
+          const ortho = extractOrthographyVoicesFromWordV0_1({ word: r.word, langHint: r.lang });
     if (ortho.diagnostics.unmapped.length) {
       badOrtho.push({ id: r.id, word: r.word, unmapped: ortho.diagnostics.unmapped });
     }
 
-    const ipa = parseIpaVowelsV0_1(String(r.ipa ?? ""));
+        const ipa = extractCarrierVoicesFromIpaV0_1(String(r.ipa ?? ""));
     if (ipa.diagnostics.unmapped.length) {
       badIpa.push({ id: r.id, ipa: String(r.ipa ?? ""), unmapped: ipa.diagnostics.unmapped });
     }
