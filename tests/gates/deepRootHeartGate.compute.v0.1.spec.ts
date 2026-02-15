@@ -4,7 +4,7 @@ describe("DeepRoot–Heart Gate v0.1 — compute", () => {
   test("aligned when terminal vowel matches", () => {
     const g = computeDeepRootHeartGateV01({
       heartPrimaryPath: "U→I",
-      candidateResolvedPath: "U→I",
+      deepRootFunctionalPath: "U→I",
       evidenceRefs: ["heart.math7.primary", "deepRoot.functionalRoots[0].vowelPath", "heart.math7.primary"],
     });
 
@@ -16,7 +16,7 @@ describe("DeepRoot–Heart Gate v0.1 — compute", () => {
   test("misaligned when terminal vowel conflicts", () => {
     const g = computeDeepRootHeartGateV01({
       heartPrimaryPath: "U→I",
-      candidateResolvedPath: "U→A",
+      deepRootFunctionalPath: "U→A",
       evidenceRefs: ["heart.math7.primary"],
     });
 
@@ -28,7 +28,7 @@ describe("DeepRoot–Heart Gate v0.1 — compute", () => {
   test("insufficient_data when heart path missing or invalid", () => {
     const g = computeDeepRootHeartGateV01({
       heartPrimaryPath: null,
-      candidateResolvedPath: "U→I",
+      deepRootFunctionalPath: "U→I",
       evidenceRefs: ["x"],
     });
 
@@ -37,21 +37,21 @@ describe("DeepRoot–Heart Gate v0.1 — compute", () => {
     expect(g.evidenceRefs).toEqual(["x"]);
   });
 
-  test("insufficient_data when candidate path missing or invalid", () => {
+  test("insufficient_data when deepRoot path missing or invalid", () => {
     const g = computeDeepRootHeartGateV01({
       heartPrimaryPath: "U→I",
-      candidateResolvedPath: "",
+      deepRootFunctionalPath: "",
       evidenceRefs: [],
     });
 
     expect(g.status).toBe("insufficient_data");
-    expect(g.reasonCodes).toEqual(["CANDIDATE_PATH_MISSING"]);
+    expect(g.reasonCodes).toEqual(["DEEPROOT_FUNCTIONAL_PATH_MISSING"]);
     expect(g.evidenceRefs).toEqual([]);
   });
 
   test("defensive parsing accepts U->I and U-I", () => {
-    const a = computeDeepRootHeartGateV01({ heartPrimaryPath: "U->I", candidateResolvedPath: "U->I" });
-    const b = computeDeepRootHeartGateV01({ heartPrimaryPath: "U-I", candidateResolvedPath: "U-I" });
+    const a = computeDeepRootHeartGateV01({ heartPrimaryPath: "U->I", deepRootFunctionalPath: "U->I" });
+    const b = computeDeepRootHeartGateV01({ heartPrimaryPath: "U-I", deepRootFunctionalPath: "U-I" });
     expect(a.status).toBe("aligned");
     expect(b.status).toBe("aligned");
   });

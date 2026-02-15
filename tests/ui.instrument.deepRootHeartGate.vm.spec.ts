@@ -40,6 +40,6 @@ describe("TelemetryVM: DeepRoot–Heart Alignment Gate v0.1 (adapter wiring)", (
     const gate = vm.candidates[0].deepRootHeartGate.value;
 
     expect(gate.status).toBe("insufficient_data");
-    expect(gate.reasonCodes).toEqual(["CANDIDATE_PATH_MISSING"]);
+    expect(gate.reasonCodes).toEqual(["DEEPROOT_FUNCTIONAL_PATH_MISSING"]);
   });
 });

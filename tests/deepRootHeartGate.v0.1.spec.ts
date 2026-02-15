@@ -4,7 +4,7 @@ describe("DeepRoot–Heart Alignment Gate v0.1", () => {
   test("aligned: terminal vowel matches", () => {
     const out = computeDeepRootHeartGateV01({
       heartPrimaryPath: "U→I",
-      candidateResolvedPath: "U→I",
+      deepRootFunctionalPath: "U→I",
       evidenceRefs: ["primaryPath.voicePath", "heart.math7.primary"],
     });
 
@@ -16,7 +16,7 @@ describe("DeepRoot–Heart Alignment Gate v0.1", () => {
   test("misaligned: terminal vowel differs", () => {
     const out = computeDeepRootHeartGateV01({
       heartPrimaryPath: "U→I",
-      candidateResolvedPath: "U→A",
+      deepRootFunctionalPath: "U→A",
       evidenceRefs: ["primaryPath.voicePath", "deepRoot.candidates[0].vowelPath"],
     });
 
@@ -27,7 +27,7 @@ describe("DeepRoot–Heart Alignment Gate v0.1", () => {
   test("insufficient_data: missing heart path", () => {
     const out = computeDeepRootHeartGateV01({
       heartPrimaryPath: null,
-      candidateResolvedPath: "U→I",
+      deepRootFunctionalPath: "U→I",
       evidenceRefs: ["deepRoot.candidates[0].vowelPath"],
     });
 
@@ -38,18 +38,18 @@ describe("DeepRoot–Heart Alignment Gate v0.1", () => {
   test("insufficient_data: missing candidate path", () => {
     const out = computeDeepRootHeartGateV01({
       heartPrimaryPath: "U→I",
-      candidateResolvedPath: undefined,
+      deepRootFunctionalPath: undefined,
       evidenceRefs: ["primaryPath.voicePath"],
     });
 
     expect(out.status).toBe("insufficient_data");
-    expect(out.reasonCodes).toEqual(["CANDIDATE_PATH_MISSING"]);
+    expect(out.reasonCodes).toEqual(["DEEPROOT_FUNCTIONAL_PATH_MISSING"]);
   });
 
   test("accepts dash-delimited paths (adapter format)", () => {
     const out = computeDeepRootHeartGateV01({
       heartPrimaryPath: "U-I",
-      candidateResolvedPath: "X-Y-I",
+      deepRootFunctionalPath: "X-Y-I",
       evidenceRefs: ["primaryPath.voicePath"],
     });
 
@@ -60,7 +60,7 @@ describe("DeepRoot–Heart Alignment Gate v0.1", () => {
   test("determinism: repeated calls return identical object (including ordering)", () => {
     const input = {
       heartPrimaryPath: "U->I", // alternate arrow accepted
-      candidateResolvedPath: "X→Y→I",
+      deepRootFunctionalPath: "X→Y→I",
       evidenceRefs: ["a", "b", "a", "  ", "b", "c"],
     };
 

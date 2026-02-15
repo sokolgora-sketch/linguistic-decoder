@@ -261,9 +261,15 @@ function pickVoicePaths(payload: any): { detected: string | null; surface: strin
     (normalizeVowelPathArray(payload?.evidence?.surfaceVowels)?.join("-") ?? null);
 
   const functional =
-    (normalizeVowelPathString(payload?.deepRoot?.functionalRoots?.[0]?.vowelPath)?.join("-") ?? null) ??
-    (normalizeVowelPathString(payload?.candidates?.[0]?.vowelPath)?.join("-") ?? null) ??
-    null;
+  (normalizeVowelPathString(payload?.deepRoot?.functionalRoots?.[0]?.vowelPath)?.join("-") ?? null) ??
+  (normalizeVowelPathArray(payload?.deepRoot?.functionalRoots?.[0]?.vowelPath)?.join("-") ?? null) ??
+  (normalizeVowelPathString(payload?.deepRoot?.functionalRoots?.[0]?.vowel_path)?.join("-") ?? null) ??
+  (normalizeVowelPathArray(payload?.deepRoot?.functionalRoots?.[0]?.vowel_path)?.join("-") ?? null) ??
+  (normalizeVowelPathString(payload?.candidates?.[0]?.vowelPath)?.join("-") ?? null) ??
+  (normalizeVowelPathArray(payload?.candidates?.[0]?.vowelPath)?.join("-") ?? null) ??
+  (normalizeVowelPathString(payload?.candidates?.[0]?.vowel_path)?.join("-") ?? null) ??
+  (normalizeVowelPathArray(payload?.candidates?.[0]?.vowel_path)?.join("-") ?? null) ??
+  null;
 
   return { detected, surface, functional };
 }
@@ -599,15 +605,24 @@ function buildSpectrumSection(m: PresentOrMissing<Vowel[]>): PresentOrMissing<Sp
       const form = asString(rec["form"]);
       const id = asString(rec["id"]) ?? stableCandidateId(i, lang, form);
 
+// EvidenceRefs should be stable and filesystem-safe (no ":" etc.)
+const evidenceId = String(id).toLowerCase().replace(/[^a-z0-9_]/g, "_");
+
       const functionalStatement =
         asString(rec["functionalStatement"]) ??
         asString(rec["function"]) ??
         null;
 
       const candVowelPath =
-        normalizeVowelPathString(rec["vowelPath"]) ??
-        normalizeVowelPathArray(rec["voicePath"]) ??
-        null;
+  normalizeVowelPathArray(rec["vowelPath"]) ??
+  normalizeVowelPathString(rec["vowelPath"]) ??
+  normalizeVowelPathArray(rec["vowel_path"]) ??
+  normalizeVowelPathString(rec["vowel_path"]) ??
+  normalizeVowelPathArray(rec["voicePath"]) ??
+  normalizeVowelPathString(rec["voicePath"]) ??
+  normalizeVowelPathArray(rec["voice_path"]) ??
+  normalizeVowelPathString(rec["voice_path"]) ??
+  null;
 
       // v0.1.1: populate per-candidate lists when present (no heuristics).
       const candOps = asArray(rec["ops"]);
@@ -625,14 +640,14 @@ function buildSpectrumSection(m: PresentOrMissing<Vowel[]>): PresentOrMissing<Sp
                         deepRootHeartGate: present(
           computeDeepRootHeartGateV01({
             heartPrimaryPath: heartPrimaryPathForGate,
-            candidateResolvedPath:
+            deepRootFunctionalPath:
               (candVowelPath && candVowelPath.length ? candVowelPath.join("-") : null) ??
               deepRootFunctionalPathStr,
             evidenceRefs: [
               "heartPrimaryPath",
               "primaryPath.voicePath",
               ...(candVowelPath && candVowelPath.length
-                ? ["candidates[" + i + "].vowelPath"]
+                ? ["candidates[" + evidenceId + "].vowelPath"]
                 : deepRootFunctionalPathStr
                 ? ["deepRoot.functionalRoots[0].vowelPath"]
                 : []),

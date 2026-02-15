@@ -10,11 +10,10 @@ export type DeepRootHeartGatePolicyDecisionV01 = {
 /**
  * DeepRoot–Heart Gate → OriginClaim policy (v0.1)
  *
- * This policy matches existing OriginClaim behavior:
- * - strict mode: medium+ confidence requires gate alignment (anything non-aligned caps)
- * - loose mode: gate is a soft warning only
- *
- * Meaning of "block" here is "cap medium+ to weak" (NOT candidate rejection).
+ * v0.1 rule:
+ * - aligned      => allow
+ * - misaligned   => strict: block (cap medium+ to weak), loose: warn
+ * - insufficient/missing => warn (never hard-cap on missing DeepRoot)
  */
 export function decideDeepRootHeartGatePolicyV01(args: {
   strictMediumPlus: boolean;
@@ -32,9 +31,9 @@ export function decideDeepRootHeartGatePolicyV01(args: {
 
   if (status === "aligned") return { action: "allow", reasonCodes: [] };
 
-  // strict: anything non-aligned caps medium+ (block)
-  if (args.strictMediumPlus) return { action: "block", reasonCodes };
+  if (status === "misaligned") {
+    return args.strictMediumPlus ? { action: "block", reasonCodes } : { action: "warn", reasonCodes };
+  }
 
-  // loose: warning only
   return { action: "warn", reasonCodes };
 }

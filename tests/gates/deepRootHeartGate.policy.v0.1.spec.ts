@@ -27,12 +27,12 @@ describe("DeepRoot–Heart Gate v0.1 — policy", () => {
     expect(d.reasonCodes).toEqual(["TERMINAL_VOWEL_CONFLICT"]);
   });
 
-  test("strict blocks on insufficient_data (current v0.1 behavior)", () => {
+  test("strict warns on insufficient_data (do not hard-cap on missing DeepRoot)", () => {
     const d = decideDeepRootHeartGatePolicyV01({
       strictMediumPlus: true,
-      gate: { status: "insufficient_data", reasonCodes: ["HEART_PRIMARY_PATH_MISSING"], evidenceRefs: [] },
+      gate: { status: "insufficient_data", reasonCodes: ["DEEPROOT_FUNCTIONAL_PATH_MISSING"], evidenceRefs: [] },
     });
-    expect(d.action).toBe("block");
-    expect(d.reasonCodes).toEqual(["HEART_PRIMARY_PATH_MISSING"]);
+    expect(d.action).toBe("warn");
+    expect(d.reasonCodes).toEqual(["DEEPROOT_FUNCTIONAL_PATH_MISSING"]);
   });
 });
