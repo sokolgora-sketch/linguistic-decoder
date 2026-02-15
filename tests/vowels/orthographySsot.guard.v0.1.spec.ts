@@ -1,35 +1,57 @@
-import { execFileSync } from "node:child_process";
+import fs from "node:fs";
+import path from "node:path";
 
-function rg(pattern: string): string[] {
-  const paths = ["src", "tests", "scripts", "app"];
-  const globs = [
-    "--glob", "!**/node_modules/**",
-    "--glob", "!**/.next/**",
-    "--glob", "!**/dist/**",
-    "--glob", "!**/coverage/**",
-    "--glob", "!docs/**",
-    // allow SSOT implementation + its own tests
-    "--glob", "!src/shared/vowels/**",
-    "--glob", "!tests/vowels/**",
-  ];
+const ROOTS = ["src", "tests", "scripts", "app"];
+const IGNORE_DIRS = new Set(["node_modules", ".next", "dist", "coverage", "docs"]);
 
-  try {
-    const out = execFileSync("rg", ["-n", pattern, ...paths, ...globs], { encoding: "utf8" });
-    return out.trim().split("\n").filter(Boolean);
-  } catch (e: any) {
-    // rg exit code 1 => no matches
-    if (e?.status === 1) return [];
-    throw e;
+function walk(dir: string): string[] {
+  const out: string[] = [];
+  if (!fs.existsSync(dir)) return out;
+
+  for (const ent of fs.readdirSync(dir, { withFileTypes: true })) {
+    const p = path.join(dir, ent.name);
+    if (ent.isDirectory()) {
+      if (IGNORE_DIRS.has(ent.name)) continue;
+      out.push(...walk(p));
+    } else {
+      out.push(p);
+    }
   }
+  return out;
 }
 
-test("guard: orthography extraction must go through SSOT (no direct mapVowels usage outside vowels/)", () => {
-  const hits = rg(String.raw`\bmapVowels\s*\(`);
-  expect(hits).toEqual([]);
-});
+function isCodeFile(p: string): boolean {
+  return (
+    p.endsWith(".ts") ||
+    p.endsWith(".tsx") ||
+    p.endsWith(".js") ||
+    p.endsWith(".mjs") ||
+    p.endsWith(".cjs")
+  );
+}
 
-test("guard: no direct vowelMap table imports outside vowels/ (base/registry bypass)", () => {
-  // blocks imports like: from "@/shared/vowels/vowelMap.baseLatin.v0.1"
-  const hits = rg(String.raw`\bfrom\s+["'][^"']*vowelMap\.(?:base|registry)[^"']*["']`);
-  expect(hits).toEqual([]);
+test("guard: orthography extraction must go through SSOT (no mapVowels/mapVowels.v0.x outside vowels/)", () => {
+  const files = ROOTS.flatMap((r) => walk(r)).filter(isCodeFile);
+
+  const offenders: Array<{ file: string; why: string }> = [];
+
+  const reCall = /\bmapVowels\s*\(/;
+  const reImportMap = /\bfrom\s+["'][^"']*mapVowels\.v0\.[^"']*["']/;
+  const reImportTables = /\bfrom\s+["'][^"']*vowelMap\.(?:base|registry)[^"']*["']/;
+
+  for (const f of files) {
+    const rel = f.replace(/\\/g, "/");
+
+    // Allowed: internal vowels implementation + its own tests
+    if (rel.startsWith("src/shared/vowels/")) continue;
+    if (rel.startsWith("tests/vowels/")) continue;
+
+    const t = fs.readFileSync(f, "utf8");
+
+    if (reCall.test(t)) offenders.push({ file: rel, why: "mapVowels(" });
+    if (reImportMap.test(t)) offenders.push({ file: rel, why: "import mapVowels.v0.x" });
+    if (reImportTables.test(t)) offenders.push({ file: rel, why: "import vowelMap.(base|registry)" });
+  }
+
+  expect(offenders).toEqual([]);
 });
