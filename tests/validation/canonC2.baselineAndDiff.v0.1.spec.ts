@@ -106,14 +106,34 @@ function computeNow(): unknown {
 
 const BASELINE_REL = "tests/validation/baselines/canonC2.baseline.v0.1.v0.2.json";
 
+const ARTIFACTS_DIR_REL = "docs/validation";
+const CURRENT_REL = "docs/validation/canonC2.current.v0.2.json";
+const REPORT_REL = "docs/validation/CANON_C2_DIFF_LATEST_v0.2.md";
+
+function maybeWriteArtifacts(now: unknown) {
+  if (process.env.CANON_C2_WRITE_ARTIFACTS !== "1") return;
+
+  mkdirSync(path.join(process.cwd(), ARTIFACTS_DIR_REL), { recursive: true });
+  writeFileSync(path.join(process.cwd(), CURRENT_REL), JSON.stringify(now, null, 2) + "\n", "utf8");
+
+  const baselinePath = path.join(process.cwd(), BASELINE_REL);
+  const baseline = existsSync(baselinePath) ? readJson<unknown>(BASELINE_REL) : null;
+  const diffs = baseline ? diff(baseline, now) : [];
+  const report = renderMd(diffs, BASELINE_REL);
+
+  writeFileSync(path.join(process.cwd(), REPORT_REL), report + "\n", "utf8");
+}
+
 test("canonC2 baseline v0.1 (v0.2 dataset) matches current output", () => {
   const now = computeNow();
+    maybeWriteArtifacts(now);
 
   if (process.env.CANON_C2_WRITE_BASELINE === "1") {
     mkdirSync(path.join(process.cwd(), "tests/validation/baselines"), { recursive: true });
     writeFileSync(path.join(process.cwd(), BASELINE_REL), JSON.stringify(now, null, 2) + "\n", "utf8");
-    expect(true).toBe(true);
-    return;
+      maybeWriteArtifacts(now);
+      expect(true).toBe(true);
+      return;
   }
 
   if (!existsSync(path.join(process.cwd(), BASELINE_REL))) {
