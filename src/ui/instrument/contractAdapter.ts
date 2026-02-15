@@ -589,10 +589,23 @@ function buildSpectrumSection(m: PresentOrMissing<Vowel[]>): PresentOrMissing<Sp
     // Canonical DeepRoot functional vowel path (if emitted)
     // Prefer this for DeepRoot–Heart gate comparisons; fall back per-candidate otherwise.
     const deepRootFunctionalPathStr: string | null =
-      (() => {
-        const s = normalizeVowelPathString((payload as any)?.deepRoot?.functionalRoots?.[0]?.vowelPath)?.join("-") ?? null;
-        return typeof s === "string" && s.trim() ? s.trim() : null;
-      })();
+  (() => {
+    const fr0 = (payload as any)?.deepRoot?.functionalRoots?.[0] ?? null;
+
+    const arr =
+      normalizeVowelPathArray(fr0?.vowelPath) ??
+      normalizeVowelPathString(fr0?.vowelPath) ??
+      normalizeVowelPathArray(fr0?.vowel_path) ??
+      normalizeVowelPathString(fr0?.vowel_path) ??
+      normalizeVowelPathArray(fr0?.voicePath) ??
+      normalizeVowelPathString(fr0?.voicePath) ??
+      normalizeVowelPathArray(fr0?.voice_path) ??
+      normalizeVowelPathString(fr0?.voice_path) ??
+      null;
+
+    const s = arr ? arr.join("-") : null;
+    return typeof s === "string" && s.trim() ? s.trim() : null;
+  })();
 
   // Candidates
   const candRaw = Array.isArray(root["candidates"]) ? root["candidates"] : null;
