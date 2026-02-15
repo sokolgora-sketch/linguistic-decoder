@@ -27,3 +27,9 @@ test("guard: orthography extraction must go through SSOT (no direct mapVowels us
   const hits = rg(String.raw`\bmapVowels\s*\(`);
   expect(hits).toEqual([]);
 });
+
+test("guard: no direct vowelMap table imports outside vowels/ (base/registry bypass)", () => {
+  // blocks imports like: from "@/shared/vowels/vowelMap.baseLatin.v0.1"
+  const hits = rg(String.raw`\bfrom\s+["'][^"']*vowelMap\.(?:base|registry)[^"']*["']`);
+  expect(hits).toEqual([]);
+});

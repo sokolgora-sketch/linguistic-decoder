@@ -1,38 +1,28 @@
-import fs from "fs";
-import path from "path";
+import { execFileSync } from "node:child_process";
 
-function walk(dir: string): string[] {
-  const out: string[] = [];
-  for (const ent of fs.readdirSync(dir, { withFileTypes: true })) {
-    const p = path.join(dir, ent.name);
-    if (ent.isDirectory()) out.push(...walk(p));
-    else out.push(p);
+function rg(pattern: string): string[] {
+  const paths = ["src", "tests", "scripts", "app"];
+  const globs = [
+    "--glob", "!**/node_modules/**",
+    "--glob", "!**/.next/**",
+    "--glob", "!**/dist/**",
+    "--glob", "!**/coverage/**",
+    "--glob", "!docs/**",
+    // allow SSOT implementation + its own tests
+    "--glob", "!src/shared/vowels/**",
+    "--glob", "!tests/vowels/**",
+  ];
+
+  try {
+    const out = execFileSync("rg", ["-n", pattern, ...paths, ...globs], { encoding: "utf8" });
+    return out.trim().split("\n").filter(Boolean);
+  } catch (e: any) {
+    if (e?.status === 1) return [];
+    throw e;
   }
-  return out;
 }
 
-function isTsFile(p: string): boolean {
-  return p.endsWith(".ts") || p.endsWith(".tsx");
-}
-
-test("guard: phonetic IPA extraction must go through SSOT (no direct parseIpaVowels/ipaVowelMap usage outside vowels/)", () => {
-  const roots = ["src", "app"];
-  const files = roots.flatMap((r) => (fs.existsSync(r) ? walk(r) : [])).filter(isTsFile);
-
-  const offenders: string[] = [];
-
-  // Any import that references parseIpaVowels.* or ipaVowelMap.* (any v0.x), outside vowels/
-  const reImport = /\bfrom\s+["'][^"']*(?:parseIpaVowels|ipaVowelMap)\.v0\.[^"']*["']/;
-
-  for (const f of files) {
-    const rel = f.replace(/\\/g, "/");
-
-    // Allowed: internal vowels module implementation details
-    if (rel.startsWith("src/shared/vowels/")) continue;
-
-    const t = fs.readFileSync(f, "utf8");
-    if (reImport.test(t)) offenders.push(rel);
-  }
-
-  expect(offenders).toEqual([]);
+test("guard: phonetic IPA extraction must go through SSOT (no direct parseIpaVowels/ipaVowelMap imports outside vowels/)", () => {
+  const hits = rg(String.raw`\bfrom\s+["'][^"']*(?:parseIpaVowels|ipaVowelMap)\.v0\.[^"']*["']`);
+  expect(hits).toEqual([]);
 });
