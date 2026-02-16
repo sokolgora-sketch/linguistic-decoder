@@ -28,5 +28,5 @@ jobs:
         with:
           repoToken: "${{ secrets.GITHUB_TOKEN }}"
           firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}"
-          projectId: linguistic-decoder-7b1c3
+          projectId: studio-9091923245-2991d
           channelId: live
