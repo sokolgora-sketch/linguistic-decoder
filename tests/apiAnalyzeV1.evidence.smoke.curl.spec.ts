@@ -148,4 +148,51 @@ describe("/api/analyze-v1 evidence smoke (curl)", () => {
     },
     30000
   );
+
+
+  test(
+    "GET carrier lane: EvidencePackage summary includes voicePathCarrier + DIVERGE when ipa is provided",
+    async () => {
+      const ipa = encodeURIComponent("/ˈrɪð(ə)m/");
+      const { status, json, raw } = await getJson(
+        `${BASE}/api/analyze-v1?word=rhythm&mode=strict&ipa=${ipa}`
+      );
+
+      expect(status).toBe(200);
+
+      const sum: any = json?.evidencePackage?.summary;
+      expect(sum).toBeTruthy();
+
+      // Lock: carrier must be emitted and delta must be MATCH|DIVERGE (rhythm should DIVERGE: Y vs I→Ë)
+      expect(sum.voicePathCarrier).toBe("I → Ë");
+      expect(sum.voicePathDelta).toBe("DIVERGE");
+
+      // sanity: response wasn't HTML
+      expect(raw.trim().startsWith("{")).toBe(true);
+    },
+    30000
+  );
+
+  test(
+    "POST carrier lane: EvidencePackage summary includes voicePathCarrier + DIVERGE when ipa is provided",
+    async () => {
+      const { status, json, raw } = await postJson(`${BASE}/api/analyze-v1`, {
+        word: "rhythm",
+        mode: "strict",
+        ipa: "/ˈrɪð(ə)m/",
+      });
+
+      expect(status).toBe(200);
+
+      const sum: any = json?.evidencePackage?.summary;
+      expect(sum).toBeTruthy();
+
+      expect(sum.voicePathCarrier).toBe("I → Ë");
+      expect(sum.voicePathDelta).toBe("DIVERGE");
+
+      // sanity: response wasn't HTML
+      expect(raw.trim().startsWith("{")).toBe(true);
+    },
+    30000
+  );
 });
