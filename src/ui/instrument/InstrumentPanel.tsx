@@ -17,6 +17,7 @@ import { MaskCarrierCard } from "@/ui/instrument/sections/MaskCarrierCard.v0.1";
 import { CountsRatiosCard } from './sections/CountsRatiosCard';
 import { RawJsonCard } from './sections/RawJsonCard';
 import { EvidencePackageCard } from './sections/EvidencePackageCard';
+import { OracleProposeWithEngineOracleCardV01 } from "./sections/OracleProposeWithEngineOracleCard.v0.1";
 import { WorldLanguageTreeCard } from './sections/WorldLanguageTreeCard';
 import { buildRootLightMapV01 } from '@/shared/rootLightMap.v0.1';
 import MeaningPanel from './MeaningPanel';
@@ -180,6 +181,12 @@ export function InstrumentPanel(props: Props) {
                   const pkg = buildEvidencePackageFromVM(vm as any, { ledgerModel });
                   void copyText("Evidence package copied.", toPrettyJson(pkg));
                 }}
+              />
+
+              <OracleProposeWithEngineOracleCardV01
+                word={String((vm as any)?.readout?.word ?? "").trim()}
+                mode={vm.readout.mode && vm.readout.mode.kind === "present" && vm.readout.mode.value === "open" ? "open" : "strict"}
+                onCopy={copyText}
               />
 </div>
 
