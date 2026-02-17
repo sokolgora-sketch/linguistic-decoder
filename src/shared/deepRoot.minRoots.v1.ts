@@ -155,3 +155,60 @@ function deriveDecomposition(carriers: any[]) {
   }
   return out;
 }
+
+// --- Compatibility exports (DeepRoot v1 facade + Next static export analysis) ---
+// Next.js treats `import * as MinRoots` + `MinRoots.buildMinRootsV1` as a required export,
+// even if it is guarded by ?? / optional chaining. Provide deterministic wrappers.
+//
+// Also: src/shared/deepRoot.v1.ts calls the chosen function with legacy payload shapes like:
+//   fn({ basis, evidence })
+//   fn({ basis: { word, normalizedWord }, evidence })
+// This wrapper accepts both payload shapes and forwards to buildMinRootHypotheses(basis, opts).
+
+type LegacyMinRootsPayloadV1 = {
+  basis?: unknown;
+  evidence?: unknown;
+  opts?: BuildMinRootOpts;
+};
+
+function basisFromLegacyPayloadV1(x: unknown): string {
+  if (typeof x === "string") return x;
+
+  const o = x as any;
+  const b = o?.basis;
+
+  if (typeof b === "string") return b;
+
+  // historical shapes seen in the repo:
+  if (typeof b?.word === "string") return b.word;
+  if (typeof b?.normalizedWord === "string") return b.normalizedWord;
+
+  return "";
+}
+
+function optsFromLegacyPayloadV1(x: unknown, fallback: BuildMinRootOpts): BuildMinRootOpts {
+  const o = x as any;
+  const maybe = o?.opts;
+  return (maybe && typeof maybe === "object" ? maybe : fallback) ?? {};
+}
+
+/**
+ * Back-compat export expected by src/shared/deepRoot.v1.ts
+ * Accepts either:
+ * - (basis: string, opts?)
+ * - ({ basis, evidence, opts })
+ */
+export function buildMinRootsV1(
+  basisOrPayload: string | LegacyMinRootsPayloadV1,
+  opts: BuildMinRootOpts = {}
+): MinRootHypothesis[] {
+  const basis = basisFromLegacyPayloadV1(basisOrPayload);
+  const o = optsFromLegacyPayloadV1(basisOrPayload, opts);
+  return buildMinRootHypotheses(basis, o);
+}
+
+// Legacy aliases (same behavior, different historical names)
+export const extractMinRootsV1 = buildMinRootsV1;
+export const computeMinRootsV1 = buildMinRootsV1;
+export const minRootsV1 = buildMinRootsV1;
+

@@ -689,7 +689,170 @@ exports[`Engine Contract v1 — capture engine output (goldens) study (strict, a
   ],
   "deepRoot": {
     "basis": "study",
-    "candidates": [],
+    "candidates": [
+      {
+        "basis": "study",
+        "carriers": [
+          {
+            "carrierForm": "stu",
+            "lang": "en",
+            "ops": [
+              "exact"
+            ],
+            "protoRootId": "SHTU",
+            "segment": "stu"
+          },
+          {
+            "carrierForm": "da",
+            "lang": "sq",
+            "ops": [
+              "vowel_swap"
+            ],
+            "protoRootId": "DA",
+            "segment": "dy"
+          }
+        ],
+        "checks": {
+          "opsWithinLimits": true,
+          "skeletonExplained": true
+        },
+        "decomposition": {
+          "action": "SHTU"
+        },
+        "id": "study:SHTU+DA:0",
+        "opsCount": 2,
+        "protoRoots": [
+          "SHTU",
+          "DA"
+        ],
+        "segments": [
+          "stu",
+          "dy"
+        ]
+      },
+      {
+        "basis": "study",
+        "carriers": [
+          {
+            "carrierForm": "stu",
+            "lang": "en",
+            "ops": [
+              "exact"
+            ],
+            "protoRootId": "SHTU",
+            "segment": "stu"
+          },
+          {
+            "carrierForm": "di",
+            "lang": "sq",
+            "ops": [
+              "y_to_i"
+            ],
+            "protoRootId": "DI",
+            "segment": "dy"
+          }
+        ],
+        "checks": {
+          "opsWithinLimits": true,
+          "skeletonExplained": true
+        },
+        "decomposition": {
+          "action": "SHTU",
+          "function": "DI"
+        },
+        "id": "study:SHTU+DI:1",
+        "opsCount": 2,
+        "protoRoots": [
+          "SHTU",
+          "DI"
+        ],
+        "segments": [
+          "stu",
+          "dy"
+        ]
+      },
+      {
+        "basis": "study",
+        "carriers": [
+          {
+            "carrierForm": "shtu",
+            "lang": "sq",
+            "ops": [
+              "s_to_sh"
+            ],
+            "protoRootId": "SHTU",
+            "segment": "stu"
+          },
+          {
+            "carrierForm": "da",
+            "lang": "sq",
+            "ops": [
+              "vowel_swap"
+            ],
+            "protoRootId": "DA",
+            "segment": "dy"
+          }
+        ],
+        "checks": {
+          "opsWithinLimits": true,
+          "skeletonExplained": true
+        },
+        "decomposition": {
+          "action": "SHTU"
+        },
+        "id": "study:SHTU+DA:2",
+        "opsCount": 2,
+        "protoRoots": [
+          "SHTU",
+          "DA"
+        ],
+        "segments": [
+          "stu",
+          "dy"
+        ]
+      },
+      {
+        "basis": "study",
+        "carriers": [
+          {
+            "carrierForm": "shtu",
+            "lang": "sq",
+            "ops": [
+              "s_to_sh"
+            ],
+            "protoRootId": "SHTU",
+            "segment": "stu"
+          },
+          {
+            "carrierForm": "di",
+            "lang": "sq",
+            "ops": [
+              "y_to_i"
+            ],
+            "protoRootId": "DI",
+            "segment": "dy"
+          }
+        ],
+        "checks": {
+          "opsWithinLimits": true,
+          "skeletonExplained": true
+        },
+        "decomposition": {
+          "action": "SHTU",
+          "function": "DI"
+        },
+        "id": "study:SHTU+DI:3",
+        "opsCount": 2,
+        "protoRoots": [
+          "SHTU",
+          "DI"
+        ],
+        "segments": [
+          "stu",
+          "dy"
+        ]
+      }
+    ],
     "functionalRoots": [
       {
         "gloss": "Functional reading: shtu (not yours / added-on) + di (know) → making knowledge yours through learning.",
@@ -716,8 +879,203 @@ exports[`Engine Contract v1 — capture engine output (goldens) study (strict, a
         "vowelPath": "U→I"
       }
     ],
-    "hypotheses": [],
-    "protoRoots": [],
+    "hypotheses": [
+      {
+        "basis": "study",
+        "carriers": [
+          {
+            "carrierForm": "stu",
+            "lang": "en",
+            "ops": [
+              "exact"
+            ],
+            "protoRootId": "SHTU",
+            "segment": "stu"
+          },
+          {
+            "carrierForm": "da",
+            "lang": "sq",
+            "ops": [
+              "vowel_swap"
+            ],
+            "protoRootId": "DA",
+            "segment": "dy"
+          }
+        ],
+        "checks": {
+          "opsWithinLimits": true,
+          "skeletonExplained": true
+        },
+        "decomposition": {
+          "action": "SHTU"
+        },
+        "id": "study:SHTU+DA:0",
+        "opsCount": 2,
+        "protoRoots": [
+          "SHTU",
+          "DA"
+        ],
+        "segments": [
+          "stu",
+          "dy"
+        ]
+      },
+      {
+        "basis": "study",
+        "carriers": [
+          {
+            "carrierForm": "stu",
+            "lang": "en",
+            "ops": [
+              "exact"
+            ],
+            "protoRootId": "SHTU",
+            "segment": "stu"
+          },
+          {
+            "carrierForm": "di",
+            "lang": "sq",
+            "ops": [
+              "y_to_i"
+            ],
+            "protoRootId": "DI",
+            "segment": "dy"
+          }
+        ],
+        "checks": {
+          "opsWithinLimits": true,
+          "skeletonExplained": true
+        },
+        "decomposition": {
+          "action": "SHTU",
+          "function": "DI"
+        },
+        "id": "study:SHTU+DI:1",
+        "opsCount": 2,
+        "protoRoots": [
+          "SHTU",
+          "DI"
+        ],
+        "segments": [
+          "stu",
+          "dy"
+        ]
+      },
+      {
+        "basis": "study",
+        "carriers": [
+          {
+            "carrierForm": "shtu",
+            "lang": "sq",
+            "ops": [
+              "s_to_sh"
+            ],
+            "protoRootId": "SHTU",
+            "segment": "stu"
+          },
+          {
+            "carrierForm": "da",
+            "lang": "sq",
+            "ops": [
+              "vowel_swap"
+            ],
+            "protoRootId": "DA",
+            "segment": "dy"
+          }
+        ],
+        "checks": {
+          "opsWithinLimits": true,
+          "skeletonExplained": true
+        },
+        "decomposition": {
+          "action": "SHTU"
+        },
+        "id": "study:SHTU+DA:2",
+        "opsCount": 2,
+        "protoRoots": [
+          "SHTU",
+          "DA"
+        ],
+        "segments": [
+          "stu",
+          "dy"
+        ]
+      },
+      {
+        "basis": "study",
+        "carriers": [
+          {
+            "carrierForm": "shtu",
+            "lang": "sq",
+            "ops": [
+              "s_to_sh"
+            ],
+            "protoRootId": "SHTU",
+            "segment": "stu"
+          },
+          {
+            "carrierForm": "di",
+            "lang": "sq",
+            "ops": [
+              "y_to_i"
+            ],
+            "protoRootId": "DI",
+            "segment": "dy"
+          }
+        ],
+        "checks": {
+          "opsWithinLimits": true,
+          "skeletonExplained": true
+        },
+        "decomposition": {
+          "action": "SHTU",
+          "function": "DI"
+        },
+        "id": "study:SHTU+DI:3",
+        "opsCount": 2,
+        "protoRoots": [
+          "SHTU",
+          "DI"
+        ],
+        "segments": [
+          "stu",
+          "dy"
+        ]
+      }
+    ],
+    "protoRoots": [
+      "SHTU",
+      "DA",
+      "DI"
+    ],
+    "rootFamilies": [
+      {
+        "carriers": [],
+        "id": "family_shtu_da_v1_1",
+        "label": "SHTU + DA",
+        "protoRoots": [
+          {
+            "root": "SHTU"
+          },
+          {
+            "root": "DA"
+          }
+        ]
+      },
+      {
+        "carriers": [],
+        "id": "family_shtu_di_v1_2",
+        "label": "SHTU + DI",
+        "protoRoots": [
+          {
+            "root": "SHTU"
+          },
+          {
+            "root": "DI"
+          }
+        ]
+      }
+    ],
     "version": "deeproot-output-v1"
   },
   "engineVersion": "v1.0.0",
@@ -755,12 +1113,104 @@ exports[`Engine Contract v1 — capture engine output (goldens) study (strict, a
   },
   "normalizedWord": "study",
   "rootMap": {
-    "composedMeaning": "",
-    "keys": [],
-    "notes": [
-      "No minRoots hypotheses available; RootMap not emitted."
+    "carriers": [
+      {
+        "carrierForm": "shtu",
+        "language": "sq",
+        "note": "gloss: add / increased",
+        "token": "SHTU"
+      },
+      {
+        "carrierForm": "shtoj",
+        "language": "sq",
+        "note": "gloss: to add",
+        "token": "SHTU"
+      },
+      {
+        "carrierForm": "shtim",
+        "language": "sq",
+        "note": "gloss: addition / increase",
+        "token": "SHTU"
+      },
+      {
+        "carrierForm": "shtue",
+        "language": "sq",
+        "note": "gloss: added (participle)",
+        "token": "SHTU"
+      },
+      {
+        "carrierForm": "ndaj",
+        "language": "sq",
+        "note": "gloss: divide / share",
+        "token": "DA"
+      },
+      {
+        "carrierForm": "ndarë",
+        "language": "sq",
+        "note": "gloss: divided",
+        "token": "DA"
+      }
     ],
-    "tokens": []
+    "composedMeaning": "add / increase / put-on + divide / cut / separate",
+    "keys": [
+      {
+        "evidence": [
+          "en: stu",
+          "ops: exact",
+          "gloss: surface segment carrier (study)"
+        ],
+        "gloss": "add / increase / put-on",
+        "language": "en",
+        "ops": [
+          "exact"
+        ],
+        "status": "supported",
+        "token": "SHTU"
+      },
+      {
+        "evidence": [
+          "sq: da",
+          "ops: vowel_swap",
+          "gloss: gave (aorist/part)"
+        ],
+        "gloss": "divide / cut / separate",
+        "language": "sq",
+        "ops": [
+          "vowel_swap"
+        ],
+        "status": "supported",
+        "token": "DA"
+      }
+    ],
+    "notes": null,
+    "spans": [
+      {
+        "end": 3,
+        "note": "segment=stu",
+        "source": "surface",
+        "start": 0,
+        "token": "SHTU"
+      },
+      {
+        "end": 5,
+        "note": "segment=dy",
+        "source": "surface",
+        "start": 3,
+        "token": "DA"
+      }
+    ],
+    "tokens": [
+      {
+        "role": "action",
+        "token": "SHTU",
+        "vowel_path": "U"
+      },
+      {
+        "role": "action",
+        "token": "DA",
+        "vowel_path": "A"
+      }
+    ]
   },
   "warnings": null,
   "word": "study"
