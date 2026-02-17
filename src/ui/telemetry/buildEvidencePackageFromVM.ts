@@ -13,6 +13,7 @@ export type EvidencePackageV01 = {
     voicePath?: string;
     voicePathSurface?: string;
     voicePathFunctional?: string;
+    voicePathCarrier?: string;
     voicePathDelta?: string;
     signalsCount?: number;
   };
@@ -39,6 +40,40 @@ function safeStr(x: any): string {
     return x.kind === "present" ? safeStr(x.value) : "";
   }
   return "";
+}
+
+function unwrapPOM(x: any): any {
+  if (x && typeof x === "object" && (x.kind === "present" || x.kind === "missing")) {
+    return x.kind === "present" ? x.value : undefined;
+  }
+  return x;
+}
+
+function joinVoicesArrow(xs: any): string | undefined {
+  const v = unwrapPOM(xs);
+  if (!v) return undefined;
+  if (Array.isArray(v)) {
+    const parts = v.map((x) => safeStr(x)).filter(Boolean);
+    return parts.length ? parts.join(" → ") : undefined;
+  }
+  const s = safeStr(v);
+  return s ? s : undefined;
+}
+
+function deriveMaskVoicePath(readout: any): string | undefined {
+  const r = readout ?? {};
+  return (
+    joinVoicesArrow(r?.voicePathSurface) ??
+    joinVoicesArrow(r?.heartInstrumentV1?.surfaceVowels) ??
+    joinVoicesArrow(r?.evidence?.surfaceVowelsRaw) ??
+    joinVoicesArrow(r?.evidence?.surfaceVowels)
+  );
+}
+
+function deriveCarrierVoicePath(readout: any): string | undefined {
+  const r = readout ?? {};
+  const phon = unwrapPOM(r?.phoneticIpaV0_1);
+  return joinVoicesArrow(phon?.voices);
 }
 
 function pickSignalsCountFromVM(vm: any): number | undefined {
@@ -144,6 +179,15 @@ export function buildEvidencePackageFromVM(vm: any, opts?: { ledgerModel?: any }
     })(),
     notes: [],
   };
+
+  // If IPA carrier voices exist, compute mask vs carrier delta for the export bundle.
+  const maskPath = deriveMaskVoicePath(r);
+  const carrierPath = deriveCarrierVoicePath(r);
+  if (pkg.summary && carrierPath) {
+    (pkg.summary as any).voicePathCarrier = carrierPath;
+    if (!pkg.summary.voicePathSurface && maskPath) pkg.summary.voicePathSurface = maskPath;
+    if (maskPath) pkg.summary.voicePathDelta = maskPath === carrierPath ? "MATCH" : "DIVERGE";
+  }
 
   // Light cleanup: remove empty summary keys
   if (pkg.summary) {
