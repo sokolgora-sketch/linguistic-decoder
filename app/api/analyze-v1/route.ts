@@ -358,6 +358,14 @@ try {
           out,
           heartInstrumentV1,
         });
+        const phoneticIpaForPkg = ipa ? extractCarrierVoicesFromIpaV0_1(ipa) : null;
+        if (ipa && phoneticIpaForPkg && telemetryVm && typeof telemetryVm === "object") {
+          (telemetryVm as any).readout = (telemetryVm as any).readout ?? {};
+          (telemetryVm as any).readout.phoneticIpaV0_1 = {
+            kind: "present",
+            value: { ipa, voices: (phoneticIpaForPkg as any).voices },
+          };
+        }
 
         evidencePackage = buildEvidencePackageFromVM(telemetryVm as any, {
           ledgerModel: (ui as any)?.ledgerModel ?? undefined,
@@ -553,6 +561,14 @@ if (!word) {
         out,
         heartInstrumentV1,
       });
+      const phoneticIpaForPkg = ipa ? extractCarrierVoicesFromIpaV0_1(ipa) : null;
+      if (ipa && phoneticIpaForPkg && telemetryVm && typeof telemetryVm === "object") {
+        (telemetryVm as any).readout = (telemetryVm as any).readout ?? {};
+        (telemetryVm as any).readout.phoneticIpaV0_1 = {
+          kind: "present",
+          value: { ipa, voices: (phoneticIpaForPkg as any).voices },
+        };
+      }
 
       evidencePackage = buildEvidencePackageFromVM(telemetryVm as any, {
         ledgerModel: (ui as any)?.ledgerModel ?? undefined,
