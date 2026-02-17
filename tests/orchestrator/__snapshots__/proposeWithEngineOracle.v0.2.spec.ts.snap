@@ -1,0 +1,270 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`proposeWithEngineOracle.v0.2 (engine v1 snapshot oracle) smoke: builds ClaimPacket (engine snapshot) + runs truth-check verifier (mock proposer) 1`] = `
+{
+  "claimPacket": {
+    "claimPacketVersion": "v0.1",
+    "oracle": {
+      "engineV1": {
+        "canonVersion": "canon-v1.0",
+        "contractVersion": "scientific-output-v1.1",
+        "engineVersion": "v1.0.0",
+        "evidence": {
+          "basis": "study",
+          "surfacePath": "U-Y",
+          "surfaceVowels": [
+            "U",
+            "Y",
+          ],
+        },
+        "normalizedWord": "study",
+        "rulesetVersion": "ruleset-v1.2",
+        "source": "v1/analyzeWordV1",
+        "warnings": undefined,
+        "word": "study",
+      },
+      "evidenceRefs": [
+        "oracle.word",
+        "oracle.mode",
+        "engineV1:src/v1/analyzeWordV1",
+        "engineV1.evidence.basis",
+        "engineV1.evidence.surfaceVowels",
+        "oracle.primaryVoicePath:applyStrictTerminalYHint",
+      ],
+      "mode": "strict",
+      "primaryVoicePath": [
+        "U",
+        "I",
+      ],
+      "word": "study",
+    },
+    "proposal": {
+      "candidates": [
+        {
+          "decomposition": {
+            "statement": "mock proposer v0.2",
+          },
+          "form": "study",
+          "opsUsed": [],
+          "vowelPath": undefined,
+        },
+      ],
+      "mode": "strict",
+      "word": "study",
+    },
+    "proposalVerification": {
+      "mode": "strict",
+      "overallPass": true,
+      "results": [
+        {
+          "checks": [
+            {
+              "id": "OPS_ALLOWED",
+              "pass": true,
+              "reason": "No opsUsed tokens provided.",
+            },
+            {
+              "id": "DECOMP_PRESENT",
+              "pass": true,
+              "reason": "Decomposition present.",
+            },
+            {
+              "id": "PATH_MATCH",
+              "pass": true,
+              "reason": "No vowelPath provided (not checked in v0.1).",
+            },
+          ],
+          "extractedVowelPath": [
+            "U",
+            "I",
+          ],
+          "form": "study",
+          "normalizedOpsUsed": [],
+          "pass": true,
+        },
+      ],
+      "rulesVersion": "v0.1",
+      "surface": {
+        "basis": "study",
+        "math7": {
+          "events": [
+            "WRAP_GATE",
+            "COMPLETION",
+            "INFINITE_PEACE",
+          ],
+          "jumps": [
+            5,
+          ],
+          "rawSum": 8,
+          "total1to7": 7,
+          "values1to7": [
+            5,
+            3,
+          ],
+          "wrapCount": 1,
+        },
+        "principlesPath": [
+          "UNITY",
+          "INSIGHT",
+        ],
+        "vowels": [
+          "U",
+          "I",
+        ],
+      },
+      "verifierVersion": "v0.1",
+      "word": "study",
+    },
+  },
+  "claimVerification": {
+    "evidenceRefs": [
+      "oracle.word",
+      "oracle.mode",
+      "oracle.primaryVoicePath",
+      "oracle.word",
+      "oracle.mode",
+      "engineV1:src/v1/analyzeWordV1",
+      "engineV1.evidence.basis",
+      "engineV1.evidence.surfaceVowels",
+      "oracle.primaryVoicePath:applyStrictTerminalYHint",
+      "proposalVerification.results[0].extractedVowelPath",
+    ],
+    "mismatches": [],
+    "passed": true,
+    "reasonCodes": [
+      "CP_C1_WORD_MATCH",
+      "CP_C2_MODE_MATCH",
+      "CP_C3_PRIMARY_PATH_HAS_MATCHING_CANDIDATE",
+    ],
+    "verifierVersion": "v0.1",
+  },
+  "mode": "strict",
+  "ok": true,
+  "oracle": {
+    "engineV1": {
+      "canonVersion": "canon-v1.0",
+      "contractVersion": "scientific-output-v1.1",
+      "engineVersion": "v1.0.0",
+      "evidence": {
+        "basis": "study",
+        "surfacePath": "U-Y",
+        "surfaceVowels": [
+          "U",
+          "Y",
+        ],
+      },
+      "normalizedWord": "study",
+      "rulesetVersion": "ruleset-v1.2",
+      "source": "v1/analyzeWordV1",
+      "warnings": undefined,
+      "word": "study",
+    },
+    "evidenceRefs": [
+      "oracle.word",
+      "oracle.mode",
+      "engineV1:src/v1/analyzeWordV1",
+      "engineV1.evidence.basis",
+      "engineV1.evidence.surfaceVowels",
+      "oracle.primaryVoicePath:applyStrictTerminalYHint",
+    ],
+    "mode": "strict",
+    "primaryVoicePath": [
+      "U",
+      "I",
+    ],
+    "word": "study",
+  },
+  "proposal": {
+    "candidates": [
+      {
+        "decomposition": {
+          "statement": "mock proposer v0.2",
+        },
+        "form": "study",
+        "opsUsed": [],
+        "vowelPath": undefined,
+      },
+    ],
+    "mode": "strict",
+    "word": "study",
+  },
+  "proposalVerification": {
+    "mode": "strict",
+    "overallPass": true,
+    "results": [
+      {
+        "checks": [
+          {
+            "id": "OPS_ALLOWED",
+            "pass": true,
+            "reason": "No opsUsed tokens provided.",
+          },
+          {
+            "id": "DECOMP_PRESENT",
+            "pass": true,
+            "reason": "Decomposition present.",
+          },
+          {
+            "id": "PATH_MATCH",
+            "pass": true,
+            "reason": "No vowelPath provided (not checked in v0.1).",
+          },
+        ],
+        "extractedVowelPath": [
+          "U",
+          "I",
+        ],
+        "form": "study",
+        "normalizedOpsUsed": [],
+        "pass": true,
+      },
+    ],
+    "rulesVersion": "v0.1",
+    "surface": {
+      "basis": "study",
+      "math7": {
+        "events": [
+          "WRAP_GATE",
+          "COMPLETION",
+          "INFINITE_PEACE",
+        ],
+        "jumps": [
+          5,
+        ],
+        "rawSum": 8,
+        "total1to7": 7,
+        "values1to7": [
+          5,
+          3,
+        ],
+        "wrapCount": 1,
+      },
+      "principlesPath": [
+        "UNITY",
+        "INSIGHT",
+      ],
+      "vowels": [
+        "U",
+        "I",
+      ],
+    },
+    "verifierVersion": "v0.1",
+    "word": "study",
+  },
+  "proposerRawText": "{
+  "word": "study",
+  "mode": "strict",
+  "candidates": [
+    {
+      "form": "study",
+      "opsUsed": [],
+      "decomposition": {
+        "statement": "mock proposer v0.2"
+      }
+    }
+  ]
+}",
+  "provider": "mock",
+  "word": "study",
+}
+`;
