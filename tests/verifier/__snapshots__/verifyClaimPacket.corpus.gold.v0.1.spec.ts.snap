@@ -1,0 +1,78 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`verifyClaimPacket v0.1 — gold corpus gold: fail: insufficient oracle primaryVoicePath 1`] = `
+{
+  "evidenceRefs": [
+    "oracle.word",
+    "oracle.mode",
+    "oracle.primaryVoicePath",
+    "oracle.primaryVoicePath:empty",
+  ],
+  "mismatches": [
+    {
+      "fact": "primaryVoicePath",
+      "oracleSource": "oracle.primaryVoicePath",
+      "oracleValue": [],
+      "proposalSource": "proposal.candidates[*].vowelPath | proposalVerification.results[*].extractedVowelPath",
+      "proposalValue": null,
+      "reasonCode": "CP_I1_INSUFFICIENT_ORACLE_PRIMARY_PATH",
+    },
+  ],
+  "passed": false,
+  "reasonCodes": [
+    "CP_C1_WORD_MATCH",
+    "CP_C2_MODE_MATCH",
+    "CP_I1_INSUFFICIENT_ORACLE_PRIMARY_PATH",
+  ],
+  "verifierVersion": "v0.1",
+}
+`;
+
+exports[`verifyClaimPacket v0.1 — gold corpus gold: fail: word mismatch 1`] = `
+{
+  "evidenceRefs": [
+    "oracle.word",
+    "oracle.mode",
+    "oracle.primaryVoicePath",
+    "oracle.word:gold",
+    "proposal.candidates[0].vowelPath",
+  ],
+  "mismatches": [
+    {
+      "fact": "word",
+      "oracleSource": "oracle.word",
+      "oracleValue": "damages",
+      "proposalSource": "proposal.word",
+      "proposalValue": "damage",
+      "reasonCode": "CP_G1_WORD_MISMATCH",
+    },
+  ],
+  "passed": false,
+  "reasonCodes": [
+    "CP_G1_WORD_MISMATCH",
+    "CP_C2_MODE_MATCH",
+    "CP_C3_PRIMARY_PATH_HAS_MATCHING_CANDIDATE",
+  ],
+  "verifierVersion": "v0.1",
+}
+`;
+
+exports[`verifyClaimPacket v0.1 — gold corpus gold: pass: candidate claimed vowelPath matches oracle primary 1`] = `
+{
+  "evidenceRefs": [
+    "oracle.word",
+    "oracle.mode",
+    "oracle.primaryVoicePath",
+    "oracle.primaryVoicePath:gold",
+    "proposal.candidates[0].vowelPath",
+  ],
+  "mismatches": [],
+  "passed": true,
+  "reasonCodes": [
+    "CP_C1_WORD_MATCH",
+    "CP_C2_MODE_MATCH",
+    "CP_C3_PRIMARY_PATH_HAS_MATCHING_CANDIDATE",
+  ],
+  "verifierVersion": "v0.1",
+}
+`;
