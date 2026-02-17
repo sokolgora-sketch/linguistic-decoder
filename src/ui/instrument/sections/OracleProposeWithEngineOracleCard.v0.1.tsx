@@ -65,8 +65,12 @@ function buildVM(raw: unknown, fallbackWord: string, fallbackMode: Mode): VM {
 
   const proposerRawText = typeof r?.proposerRawText === "string" ? r.proposerRawText : "";
 
-  const responsePretty = pretty(r);
-  const claimPacketPretty = r?.claimPacket ? pretty(r.claimPacket) : "";
+  const responsePretty = pretty(
+    r && typeof r === "object"
+      ? { ...(r as any), proposerRawText: typeof (r as any)?.proposerRawText === "string" ? "[omitted: see proposerRawText section]" : (r as any)?.proposerRawText }
+      : r
+  );
+const claimPacketPretty = r?.claimPacket ? pretty(r.claimPacket) : "";
 
   const error = typeof r?.error === "string" ? r.error : undefined;
 
@@ -138,7 +142,7 @@ export function OracleProposeWithEngineOracleCardV01(props: Props) {
           Builds an oracle from engine v1 (surface vowels → strict terminal-Y hint), runs proposer once, then verifies the ClaimPacket.
         </div>
       </CardHeader>
-      <CardContent className="space-y-3">
+      <CardContent className="space-y-3 min-w-0">
         <div className="grid gap-2">
           <div className="text-xs opacity-70">Provider</div>
           <input
@@ -208,7 +212,7 @@ export function OracleProposeWithEngineOracleCardV01(props: Props) {
         {vm?.proposerRawText ? (
           <div>
             <div className="text-xs opacity-70">proposerRawText</div>
-            <pre className="mt-1 max-h-48 overflow-auto rounded-lg border bg-black/10 p-2 text-xs">
+            <pre className="mt-1 max-h-48 max-w-full overflow-auto whitespace-pre-wrap break-words rounded-lg border bg-black/10 p-2 text-xs">
 {vm.proposerRawText}
             </pre>
           </div>
@@ -218,7 +222,7 @@ export function OracleProposeWithEngineOracleCardV01(props: Props) {
         {vm?.responsePretty ? (
           <div>
             <div className="text-xs opacity-70">response</div>
-            <pre className="mt-1 max-h-64 overflow-auto rounded-lg border bg-black/10 p-2 text-xs">
+            <pre className="mt-1 max-h-64 max-w-full overflow-auto whitespace-pre-wrap break-words rounded-lg border bg-black/10 p-2 text-xs">
 {vm.responsePretty}
             </pre>
           </div>
