@@ -42,3 +42,6 @@ tests/__fixtures__/*.bak.*
 
 # flake-hunt artifacts
 /test-run-*.log
+
+# integration Next distDir
+.next-int/

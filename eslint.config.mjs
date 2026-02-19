@@ -45,6 +45,8 @@ stripMissingTypeScriptEslintRules(legacy);
 const eslintConfig = [
   {
     ignores: [
+    ".next-int/**",
+    ".next/**",
       "**/node_modules/**",
       "**/.next/**",
       "**/out/**",

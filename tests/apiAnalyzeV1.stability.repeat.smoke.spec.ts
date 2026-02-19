@@ -13,7 +13,13 @@
  */
 
 import { execSync, spawn } from "node:child_process";
+import { rmSync } from "node:fs";
 import http from "node:http";
+
+function nextDistDir(): string {
+  const v = (process.env.NEXT_DIST_DIR ?? "").trim();
+  return v.length ? v : ".next";
+}
 
 jest.setTimeout(180_000);
 
@@ -86,7 +92,7 @@ describe("/api/analyze-v1 stability (repeat GET)", () => {
   beforeAll(async () => {
     // CI reliability: `next dev` can race on manifests (pages-manifest.json).
     // Use production build + `next start` for determinism.
-    execSync("rm -rf .next", { stdio: "inherit" });
+    rmSync(nextDistDir(), { recursive: true, force: true });
     execSync("npm run build", {
       stdio: "inherit",
       env: {

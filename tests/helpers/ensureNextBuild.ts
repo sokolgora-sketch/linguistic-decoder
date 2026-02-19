@@ -2,14 +2,19 @@
  * Helper to ensure a valid Next.js production build exists for `next start`.
  *
  * IMPORTANT:
- * - `next start` requires `.next/BUILD_ID`.
+ * - `next start` requires `${distDir}/BUILD_ID`.
  * - Other manifests (like build-manifest.json) are NOT sufficient (can exist from partial/incomplete builds).
  */
 
 import { execSync } from "node:child_process";
-import { statSync } from "node:fs";
+import { rmSync, statSync } from "node:fs";
 
 let hasBuilt = false;
+
+function nextDistDir(): string {
+  const v = (process.env.NEXT_DIST_DIR ?? "").trim();
+  return v.length ? v : ".next";
+}
 
 function exists(p: string): boolean {
   try {
@@ -23,19 +28,21 @@ function exists(p: string): boolean {
 export async function ensureNextBuild() {
   if (hasBuilt) return;
 
-  // With App Router, .next/BUILD_ID is the only reliable sentinel for a complete build.
-  const ok = exists(".next/BUILD_ID");
+  const distDir = nextDistDir();
+  const buildIdPath = `${distDir}/BUILD_ID`;
 
-  if (ok) {
-    console.log("Skipping build, .next/BUILD_ID already exists.");
-  } else {
-    console.log("Running `npm run build` for integration tests...");
-    execSync("rm -rf .next", { stdio: "inherit" });
-    execSync("npm run build", { stdio: "inherit" });
+  if (exists(buildIdPath)) {
+    console.log(`Skipping build, ${buildIdPath} already exists.`);
+    hasBuilt = true;
+    return;
+  }
 
-    if (!exists(".next/BUILD_ID")) {
-      throw new Error("next build completed but .next/BUILD_ID is missing");
-    }
+  console.log("Running `npm run build` for integration tests...");
+  rmSync(distDir, { recursive: true, force: true });
+  execSync("npm run build", { stdio: "inherit" });
+
+  if (!exists(buildIdPath)) {
+    throw new Error(`next build completed but ${buildIdPath} is missing`);
   }
 
   hasBuilt = true;

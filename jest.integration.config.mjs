@@ -2,6 +2,10 @@ import nextJest from "next/jest.js";
 
 const createJestConfig = nextJest({ dir: "./" });
 
+// Integration isolation: build/start must not touch dev's .next
+process.env.NEXT_DIST_DIR = (process.env.NEXT_DIST_DIR ?? "").trim() || ".next-int";
+process.env.NEXT_TELEMETRY_DISABLED = (process.env.NEXT_TELEMETRY_DISABLED ?? "").trim() || "1";
+
 /** @type {import('jest').Config} */
 const customJestConfig = {
   testEnvironment: "node",
