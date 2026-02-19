@@ -13,34 +13,39 @@ export const SYLLABIC_MARK_V0_1 = "\u0329"; // ̩
 
 // Core sets (expand only via tests + explicit commit)
 const VOWELS = new Set([
-  "a","ɑ","ɒ","æ","e","ɛ","ə","ɚ","ɜ","ɝ","i","ɪ","o","ɔ","ø","œ","u","ʊ","ʌ","y",
-  "ɨ","ʉ","ɯ","ɶ","ɐ",
+  "i","y","ɨ","ʉ","ɯ","u",
+  "ɪ","ʏ","ʊ",
+  "e","ø","ɘ","ɵ","ɤ","o",
+  "ɛ","œ","ɜ","ɞ","ʌ","ɔ",
+  "æ","ɐ",
+  "a","ɶ","ɑ","ɒ",
+  "ə","ɚ","ɝ",
 ]);
 
 const SONORANTS = new Set([
   "m","n","ŋ","ɲ","ɳ","ɴ",
-  "l","ɫ","ɬ", // NOTE: ɬ is often fricative; keep under review (tests decide)
+  "l","ɫ",
   "r","ɹ","ɾ","ɻ","ʀ",
   "j","w","ʋ","ɰ","ɥ",
 ]);
 
 const OBSTRUENTS = new Set([
-  // stops/affricate bases
+  // stops / affricate bases
   "p","b","t","d","ʈ","ɖ","c","ɟ","k","g","q","ɢ","ʔ",
-  // fricatives
-  "f","v","θ","ð","s","z","ʃ","ʒ","ʂ","ʐ","ç","ʝ","x","ɣ","χ","ʁ","h","ɦ",
+  // fricatives (includes ɬ as voiceless lateral fricative)
+  "f","v","θ","ð","s","z","ʃ","ʒ","ʂ","ʐ","ç","ʝ","x","ɣ","χ","ʁ","h","ɦ","ɬ",
 ]);
 
 function isCombiningMark(ch: string): boolean {
-  // unicode marks category
   return /\p{M}/u.test(ch);
 }
 
 export function classifyIpaBaseV0_1(base: string): IpaBaseClassV0_1 {
   if (!base) return "other";
-  if (VOWELS.has(base)) return "vowel";
-  if (SONORANTS.has(base)) return "sonorant";
-  if (OBSTRUENTS.has(base)) return "obstruent";
+  const b = base.normalize("NFC");
+  if (VOWELS.has(b)) return "vowel";
+  if (SONORANTS.has(b)) return "sonorant";
+  if (OBSTRUENTS.has(b)) return "obstruent";
   return "other";
 }
 
@@ -48,7 +53,9 @@ export function classifyIpaBaseV0_1(base: string): IpaBaseClassV0_1 {
  * Deterministic segment tokenizer:
  * groups base char + any following combining marks into a single segment.
  */
-export function tokenizeIpaSegmentsV0_1(raw: unknown): Array<{ raw: string; base: string; marks: string[] }> {
+export function tokenizeIpaSegmentsV0_1(
+  raw: unknown
+): Array<{ raw: string; base: string; marks: string[] }> {
   const s = normalizeIpaV0_1(raw);
   const segs: Array<{ raw: string; base: string; marks: string[] }> = [];
 
@@ -66,10 +73,9 @@ export function tokenizeIpaSegmentsV0_1(raw: unknown): Array<{ raw: string; base
   for (const ch of s) {
     if (isCombiningMark(ch)) {
       if (curBase) curMarks.push(ch);
-      // if no base, drop stray marks deterministically
+      // drop stray marks deterministically
       continue;
     }
-    // new base => flush previous
     flush();
     curBase = ch;
     curMarks = [];

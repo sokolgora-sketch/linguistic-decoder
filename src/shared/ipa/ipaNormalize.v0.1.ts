@@ -28,6 +28,7 @@ export function normalizeIpaV0_1(raw: unknown): string {
     "ː", // length
     "ˑ", // half-length
     ".", // syllable break
+    "·", // alt syllable dot
     "‿", // liaison
     "|", // prosodic break
     "‖",
