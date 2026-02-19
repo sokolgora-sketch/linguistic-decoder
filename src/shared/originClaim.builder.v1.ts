@@ -14,6 +14,7 @@ import {
 } from "./originClaim.v1";
 
 import { computeDeepRootHeartGateV01 } from "./deepRootHeartGate.v0.1.compute";
+import type { DeepRootHeartGateV01 } from "./deepRootHeartGate.v0.1";
 import { decideDeepRootHeartGatePolicyV01 } from "./originClaim.deepRootHeartGatePolicy.v0.1";
 import { resolveVoiceSeqV0_1 } from "./voiceSeq.resolve.v0.1";
 /**
@@ -30,6 +31,7 @@ type SupportSignal = {
   hasDeepRootHeartGateAligned: boolean;
   reasonCodes: OriginClaimReasonCode[];
   evidenceRefs: string[];
+  deepRootHeartGate: DeepRootHeartGateV01 | null;
 };
 
 function isoNow(): string {
@@ -251,6 +253,7 @@ function computeSupportVector(result: AnalyzeWordResultV1Like, cand: any): Suppo
     hasC1Pass: false,
     hasDeepRootAlign: false,
       hasDeepRootHeartGateAligned: false,
+    deepRootHeartGate: null,
     reasonCodes: [],
     evidenceRefs: [],
   };
@@ -317,6 +320,7 @@ const gate = computeDeepRootHeartGateV01({
         deepRootFunctionalPath: candidateResolvedForGateSeq ? candidateResolvedForGateSeq.join("-") : null,
         evidenceRefs: gateEvidenceRefs,
       });
+        out.deepRootHeartGate = gate;
       out.evidenceRefs.push(...gateEvidenceRefs);
       out.hasDeepRootHeartGateAligned = gate.status === "aligned";
 
@@ -375,11 +379,7 @@ function mapConfidence(
   const strict = (mode ?? "").toLocaleLowerCase() === "strict";
   const gatePolicy = decideDeepRootHeartGatePolicyV01({
       strictMediumPlus: strict,
-      gate: {
-        status: s.hasDeepRootHeartGateAligned ? "aligned" : "misaligned",
-        reasonCodes: [],
-        evidenceRefs: [],
-      } as any,
+      gate: s.deepRootHeartGate,
     });
     const strictGateBlocksMedium = gatePolicy.action === "block";
   const noNeg = s.negatives === 0;
