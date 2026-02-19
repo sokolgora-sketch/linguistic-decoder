@@ -17,7 +17,7 @@ const customJestConfig = {
     "^@/app/(.*)$": "<rootDir>/app/$1",
     "^@/(.*)$": "<rootDir>/src/$1",
   },
-  setupFiles: ["<rootDir>/tests/jest.polyfills.cjs"],
+  setupFiles: ["<rootDir>/tests/jest.integration.env.cjs", "<rootDir>/tests/jest.polyfills.cjs"],
 };
 
 export default createJestConfig(customJestConfig);

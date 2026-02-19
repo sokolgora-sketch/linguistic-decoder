@@ -5,9 +5,15 @@
  * - `next start` requires `.next/BUILD_ID`.
  * - Other manifests (like build-manifest.json) are NOT sufficient (can exist from partial/incomplete builds).
  */
+function nextDistDir(): string {
+  const v = (process.env.NEXT_DIST_DIR ?? "").trim();
+  return v.length ? v : ".next";
+}
+
 
 import { execSync } from "node:child_process";
 import { statSync } from "node:fs";
+import { rmSync } from "node:fs";
 
 let hasBuilt = false;
 
@@ -30,7 +36,7 @@ export async function ensureNextBuild() {
     console.log("Skipping build, .next/BUILD_ID already exists.");
   } else {
     console.log("Running `npm run build` for integration tests...");
-    execSync("rm -rf .next", { stdio: "inherit" });
+    rmSync(nextDistDir(), { recursive: true, force: true });
     execSync("npm run build", { stdio: "inherit" });
 
     if (!exists(".next/BUILD_ID")) {
