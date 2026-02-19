@@ -1,0 +1,166 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`VectorDelta (Geometry) v0.1 lock 1`] = `
+[
+  {
+    "id": "O->A",
+    "out": {
+      "path": [
+        "O",
+        "A",
+      ],
+      "signature": "O→A:d3,r+3,outward",
+      "steps": [
+        {
+          "dist": 3,
+          "from": "O",
+          "radialDelta": 3,
+          "radialFrom": 0,
+          "radialTo": 3,
+          "to": "A",
+          "turnKind": "outward",
+        },
+      ],
+      "totals": {
+        "circularCount": 0,
+        "inwardCount": 0,
+        "netRadial": 3,
+        "outwardCount": 1,
+        "totalDist": 3,
+      },
+    },
+    "path": [
+      "O",
+      "A",
+    ],
+  },
+  {
+    "id": "I->Ë",
+    "out": {
+      "path": [
+        "I",
+        "Ë",
+      ],
+      "signature": "I→Ë:d4,r+2,outward",
+      "steps": [
+        {
+          "dist": 4,
+          "from": "I",
+          "radialDelta": 2,
+          "radialFrom": 1,
+          "radialTo": 3,
+          "to": "Ë",
+          "turnKind": "outward",
+        },
+      ],
+      "totals": {
+        "circularCount": 0,
+        "inwardCount": 0,
+        "netRadial": 2,
+        "outwardCount": 1,
+        "totalDist": 4,
+      },
+    },
+    "path": [
+      "I",
+      "Ë",
+    ],
+  },
+  {
+    "id": "E->Y",
+    "out": {
+      "path": [
+        "E",
+        "Y",
+      ],
+      "signature": "E→Y:d4,r+0,circular",
+      "steps": [
+        {
+          "dist": 4,
+          "from": "E",
+          "radialDelta": 0,
+          "radialFrom": 2,
+          "radialTo": 2,
+          "to": "Y",
+          "turnKind": "circular",
+        },
+      ],
+      "totals": {
+        "circularCount": 1,
+        "inwardCount": 0,
+        "netRadial": 0,
+        "outwardCount": 0,
+        "totalDist": 4,
+      },
+    },
+    "path": [
+      "E",
+      "Y",
+    ],
+  },
+  {
+    "id": "mask-ish",
+    "out": {
+      "path": [
+        "E",
+        "A",
+      ],
+      "signature": "E→A:d3,r+1,outward",
+      "steps": [
+        {
+          "dist": 3,
+          "from": "E",
+          "radialDelta": 1,
+          "radialFrom": 2,
+          "radialTo": 3,
+          "to": "A",
+          "turnKind": "outward",
+        },
+      ],
+      "totals": {
+        "circularCount": 0,
+        "inwardCount": 0,
+        "netRadial": 1,
+        "outwardCount": 1,
+        "totalDist": 3,
+      },
+    },
+    "path": [
+      "E",
+      "A",
+    ],
+  },
+  {
+    "id": "carrier-ish",
+    "out": {
+      "path": [
+        "I",
+        "Ë",
+      ],
+      "signature": "I→Ë:d4,r+2,outward",
+      "steps": [
+        {
+          "dist": 4,
+          "from": "I",
+          "radialDelta": 2,
+          "radialFrom": 1,
+          "radialTo": 3,
+          "to": "Ë",
+          "turnKind": "outward",
+        },
+      ],
+      "totals": {
+        "circularCount": 0,
+        "inwardCount": 0,
+        "netRadial": 2,
+        "outwardCount": 1,
+        "totalDist": 4,
+      },
+    },
+    "path": [
+      "I",
+      "Ë",
+    ],
+  },
+]
+`;
