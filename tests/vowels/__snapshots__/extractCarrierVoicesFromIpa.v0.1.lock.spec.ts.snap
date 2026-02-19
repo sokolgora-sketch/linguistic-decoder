@@ -231,28 +231,14 @@ exports[`phonetic SSOT v0.1 (IPA → carrier voices) lock 1`] = `
     },
     "out": {
       "diagnostics": {
-        "noCarrier": false,
+        "noCarrier": true,
         "unmapped": [],
         "usedImplicit": false,
         "usedSyllabic": false,
       },
-      "tokens": [
-        {
-          "raw": "ɪ",
-          "voice": "I",
-        },
-      ],
-      "traceTokens": [
-        {
-          "kind": "vowel",
-          "note": "explicit vowel (parseIpaVowels v0.2)",
-          "raw": "ɪ",
-          "voice": "I",
-        },
-      ],
-      "voices": [
-        "I",
-      ],
+      "tokens": [],
+      "traceTokens": [],
+      "voices": [],
     },
   },
 ]

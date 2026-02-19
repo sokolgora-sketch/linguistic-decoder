@@ -13,6 +13,6 @@ test("phonetic SSOT v0.1 (IPA → carrier voices) lock", () => {
     { ipa: "tɪp" },
   ];
 
-  const view = cases.map((ipa) => ({ in: ipa, out: extractCarrierVoicesFromIpaV0_1((ipa as any)?.ipa ?? ipa) }));
+  const view = cases.map((ipa) => ({ in: ipa, out: extractCarrierVoicesFromIpaV0_1(ipa) }));
   expect(view).toMatchSnapshot();
 });
