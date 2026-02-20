@@ -2,9 +2,9 @@
 
 *A deterministic phonetic analysis engine testing vowel-meaning relationships*
 
-[![Tests](https://img.shields.io/badge/tests-661%20passing-brightgreen)](https://github.com/sokolgora-sketch/linguistic-decoder)
-[![TypeScript](https://img.shields.io/badge/TypeScript-96.6%25-blue)](https://github.com/sokolgora-sketch/linguistic-decoder)
-[![License](https://img.shields.io/badge/license-AGPL--3.0-blue)](LICENSE)
+[![CI](https://github.com/sokolgora-sketch/linguistic-decoder/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/sokolgora-sketch/linguistic-decoder/actions/workflows/ci.yml)
+[![License: AGPL-3.0](https://img.shields.io/badge/license-AGPL--3.0-blue)](LICENSE)
+
 
 ---
 
