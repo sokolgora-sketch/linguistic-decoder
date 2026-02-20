@@ -1,0 +1,814 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Mask vs Carrier Geometry Battery v0.2 (snapshot lock) 1`] = `
+[
+  {
+    "carrier": {
+      "signature": "I→Ë:d4,r+2,outward",
+      "totals": {
+        "circularCount": 0,
+        "inwardCount": 0,
+        "netRadial": 2,
+        "outwardCount": 1,
+        "totalDist": 4,
+      },
+      "voices": [
+        "I",
+        "Ë",
+      ],
+    },
+    "id": "rhythm",
+    "in": {
+      "ipa": "/ˈɹɪðəm/",
+      "word": "rhythm",
+    },
+    "mask": {
+      "signature": "∅",
+      "totals": {
+        "circularCount": 0,
+        "inwardCount": 0,
+        "netRadial": 0,
+        "outwardCount": 0,
+        "totalDist": 0,
+      },
+      "voices": [],
+    },
+  },
+  {
+    "carrier": {
+      "signature": "∅",
+      "totals": {
+        "circularCount": 0,
+        "inwardCount": 0,
+        "netRadial": 0,
+        "outwardCount": 0,
+        "totalDist": 0,
+      },
+      "voices": [
+        "I",
+      ],
+    },
+    "id": "tip",
+    "in": {
+      "ipa": "tɪp",
+      "word": "tip",
+    },
+    "mask": {
+      "signature": "∅",
+      "totals": {
+        "circularCount": 0,
+        "inwardCount": 0,
+        "netRadial": 0,
+        "outwardCount": 0,
+        "totalDist": 0,
+      },
+      "voices": [],
+    },
+  },
+  {
+    "carrier": {
+      "signature": "Ë→A:d6,r+0,circular | A→Ë:d6,r+0,circular | Ë→I:d4,r-2,inward",
+      "totals": {
+        "circularCount": 2,
+        "inwardCount": 1,
+        "netRadial": -2,
+        "outwardCount": 0,
+        "totalDist": 16,
+      },
+      "voices": [
+        "Ë",
+        "A",
+        "Ë",
+        "I",
+      ],
+    },
+    "id": "mathematics",
+    "in": {
+      "ipa": "məˈtæmətɪks",
+      "word": "mathematics",
+    },
+    "mask": {
+      "signature": "∅",
+      "totals": {
+        "circularCount": 0,
+        "inwardCount": 0,
+        "netRadial": 0,
+        "outwardCount": 0,
+        "totalDist": 0,
+      },
+      "voices": [],
+    },
+  },
+  {
+    "carrier": {
+      "signature": "O→U:d1,r+1,outward | U→Ë:d2,r+2,outward",
+      "totals": {
+        "circularCount": 0,
+        "inwardCount": 0,
+        "netRadial": 3,
+        "outwardCount": 2,
+        "totalDist": 3,
+      },
+      "voices": [
+        "O",
+        "U",
+        "Ë",
+      ],
+    },
+    "id": "open",
+    "in": {
+      "ipa": "/ˈoʊpən/",
+      "word": "open",
+    },
+    "mask": {
+      "signature": "∅",
+      "totals": {
+        "circularCount": 0,
+        "inwardCount": 0,
+        "netRadial": 0,
+        "outwardCount": 0,
+        "totalDist": 0,
+      },
+      "voices": [],
+    },
+  },
+  {
+    "carrier": {
+      "signature": "∅",
+      "totals": {
+        "circularCount": 0,
+        "inwardCount": 0,
+        "netRadial": 0,
+        "outwardCount": 0,
+        "totalDist": 0,
+      },
+      "voices": [
+        "A",
+      ],
+    },
+    "id": "hap-sq",
+    "in": {
+      "ipa": "/hap/",
+      "word": "hap",
+    },
+    "mask": {
+      "signature": "∅",
+      "totals": {
+        "circularCount": 0,
+        "inwardCount": 0,
+        "netRadial": 0,
+        "outwardCount": 0,
+        "totalDist": 0,
+      },
+      "voices": [],
+    },
+  },
+  {
+    "carrier": {
+      "signature": "I→Ë:d4,r+2,outward",
+      "totals": {
+        "circularCount": 0,
+        "inwardCount": 0,
+        "netRadial": 2,
+        "outwardCount": 1,
+        "totalDist": 4,
+      },
+      "voices": [
+        "I",
+        "Ë",
+      ],
+    },
+    "id": "system",
+    "in": {
+      "ipa": "/ˈsɪstəm/",
+      "word": "system",
+    },
+    "mask": {
+      "signature": "∅",
+      "totals": {
+        "circularCount": 0,
+        "inwardCount": 0,
+        "netRadial": 0,
+        "outwardCount": 0,
+        "totalDist": 0,
+      },
+      "voices": [],
+    },
+  },
+  {
+    "carrier": {
+      "signature": "O→U:d1,r+1,outward | U→Ë:d2,r+2,outward",
+      "totals": {
+        "circularCount": 0,
+        "inwardCount": 0,
+        "netRadial": 3,
+        "outwardCount": 2,
+        "totalDist": 3,
+      },
+      "voices": [
+        "O",
+        "U",
+        "Ë",
+      ],
+    },
+    "id": "focus",
+    "in": {
+      "ipa": "/ˈfoʊkəs/",
+      "word": "focus",
+    },
+    "mask": {
+      "signature": "∅",
+      "totals": {
+        "circularCount": 0,
+        "inwardCount": 0,
+        "netRadial": 0,
+        "outwardCount": 0,
+        "totalDist": 0,
+      },
+      "voices": [],
+    },
+  },
+  {
+    "carrier": {
+      "signature": "A→Ë:d6,r+0,circular",
+      "totals": {
+        "circularCount": 1,
+        "inwardCount": 0,
+        "netRadial": 0,
+        "outwardCount": 0,
+        "totalDist": 6,
+      },
+      "voices": [
+        "A",
+        "Ë",
+      ],
+    },
+    "id": "balance",
+    "in": {
+      "ipa": "/ˈbæl.əns/",
+      "word": "balance",
+    },
+    "mask": {
+      "signature": "∅",
+      "totals": {
+        "circularCount": 0,
+        "inwardCount": 0,
+        "netRadial": 0,
+        "outwardCount": 0,
+        "totalDist": 0,
+      },
+      "voices": [],
+    },
+  },
+  {
+    "carrier": {
+      "signature": "E→Ë:d5,r+1,outward | Ë→U:d2,r-2,inward | U→Ë:d2,r+2,outward",
+      "totals": {
+        "circularCount": 0,
+        "inwardCount": 1,
+        "netRadial": 1,
+        "outwardCount": 2,
+        "totalDist": 9,
+      },
+      "voices": [
+        "E",
+        "Ë",
+        "U",
+        "Ë",
+      ],
+    },
+    "id": "evolution",
+    "in": {
+      "ipa": "/ˌɛvəˈluːʃən/",
+      "word": "evolution",
+    },
+    "mask": {
+      "signature": "∅",
+      "totals": {
+        "circularCount": 0,
+        "inwardCount": 0,
+        "netRadial": 0,
+        "outwardCount": 0,
+        "totalDist": 0,
+      },
+      "voices": [],
+    },
+  },
+  {
+    "carrier": {
+      "signature": "U→I:d2,r+0,circular | I→I:d0,r+0,circular",
+      "totals": {
+        "circularCount": 2,
+        "inwardCount": 0,
+        "netRadial": 0,
+        "outwardCount": 0,
+        "totalDist": 2,
+      },
+      "voices": [
+        "U",
+        "I",
+        "I",
+      ],
+    },
+    "id": "unity",
+    "in": {
+      "ipa": "/ˈjuːnɪti/",
+      "word": "unity",
+    },
+    "mask": {
+      "signature": "∅",
+      "totals": {
+        "circularCount": 0,
+        "inwardCount": 0,
+        "netRadial": 0,
+        "outwardCount": 0,
+        "totalDist": 0,
+      },
+      "voices": [],
+    },
+  },
+  {
+    "carrier": {
+      "signature": "E→Ë:d5,r+1,outward",
+      "totals": {
+        "circularCount": 0,
+        "inwardCount": 0,
+        "netRadial": 1,
+        "outwardCount": 1,
+        "totalDist": 5,
+      },
+      "voices": [
+        "E",
+        "Ë",
+      ],
+    },
+    "id": "network",
+    "in": {
+      "ipa": "/ˈnɛtˌwɜːrk/",
+      "word": "network",
+    },
+    "mask": {
+      "signature": "∅",
+      "totals": {
+        "circularCount": 0,
+        "inwardCount": 0,
+        "netRadial": 0,
+        "outwardCount": 0,
+        "totalDist": 0,
+      },
+      "voices": [],
+    },
+  },
+  {
+    "carrier": {
+      "signature": "∅",
+      "totals": {
+        "circularCount": 0,
+        "inwardCount": 0,
+        "netRadial": 0,
+        "outwardCount": 0,
+        "totalDist": 0,
+      },
+      "voices": [
+        "U",
+      ],
+    },
+    "id": "truth",
+    "in": {
+      "ipa": "/truːθ/",
+      "word": "truth",
+    },
+    "mask": {
+      "signature": "∅",
+      "totals": {
+        "circularCount": 0,
+        "inwardCount": 0,
+        "netRadial": 0,
+        "outwardCount": 0,
+        "totalDist": 0,
+      },
+      "voices": [],
+    },
+  },
+  {
+    "carrier": {
+      "signature": "I→A:d2,r+2,outward | A→Ë:d6,r+0,circular",
+      "totals": {
+        "circularCount": 1,
+        "inwardCount": 0,
+        "netRadial": 2,
+        "outwardCount": 1,
+        "totalDist": 8,
+      },
+      "voices": [
+        "I",
+        "A",
+        "Ë",
+      ],
+    },
+    "id": "expansion",
+    "in": {
+      "ipa": "/ɪkˈspænʃən/",
+      "word": "expansion",
+    },
+    "mask": {
+      "signature": "∅",
+      "totals": {
+        "circularCount": 0,
+        "inwardCount": 0,
+        "netRadial": 0,
+        "outwardCount": 0,
+        "totalDist": 0,
+      },
+      "voices": [],
+    },
+  },
+  {
+    "carrier": {
+      "signature": "I→A:d2,r+2,outward | A→I:d2,r-2,inward",
+      "totals": {
+        "circularCount": 0,
+        "inwardCount": 1,
+        "netRadial": 0,
+        "outwardCount": 1,
+        "totalDist": 4,
+      },
+      "voices": [
+        "I",
+        "A",
+        "I",
+      ],
+    },
+    "id": "insight",
+    "in": {
+      "ipa": "/ˈɪnsaɪt/",
+      "word": "insight",
+    },
+    "mask": {
+      "signature": "∅",
+      "totals": {
+        "circularCount": 0,
+        "inwardCount": 0,
+        "netRadial": 0,
+        "outwardCount": 0,
+        "totalDist": 0,
+      },
+      "voices": [],
+    },
+  },
+  {
+    "carrier": {
+      "signature": "I→E:d2,r+1,outward | E→I:d2,r-1,inward | I→I:d0,r+0,circular",
+      "totals": {
+        "circularCount": 1,
+        "inwardCount": 1,
+        "netRadial": 0,
+        "outwardCount": 1,
+        "totalDist": 4,
+      },
+      "voices": [
+        "I",
+        "E",
+        "I",
+        "I",
+      ],
+    },
+    "id": "integrity",
+    "in": {
+      "ipa": "/ɪnˈtɛɡrɪti/",
+      "word": "integrity",
+    },
+    "mask": {
+      "signature": "∅",
+      "totals": {
+        "circularCount": 0,
+        "inwardCount": 0,
+        "netRadial": 0,
+        "outwardCount": 0,
+        "totalDist": 0,
+      },
+      "voices": [],
+    },
+  },
+  {
+    "carrier": {
+      "signature": "E→I:d2,r-1,inward | I→Ë:d4,r+2,outward",
+      "totals": {
+        "circularCount": 0,
+        "inwardCount": 1,
+        "netRadial": 1,
+        "outwardCount": 1,
+        "totalDist": 6,
+      },
+      "voices": [
+        "E",
+        "I",
+        "Ë",
+      ],
+    },
+    "id": "evidence",
+    "in": {
+      "ipa": "/ˈɛvɪdəns/",
+      "word": "evidence",
+    },
+    "mask": {
+      "signature": "∅",
+      "totals": {
+        "circularCount": 0,
+        "inwardCount": 0,
+        "netRadial": 0,
+        "outwardCount": 0,
+        "totalDist": 0,
+      },
+      "voices": [],
+    },
+  },
+  {
+    "carrier": {
+      "signature": "O→Ë:d3,r+3,outward | Ë→Ë:d0,r+0,circular",
+      "totals": {
+        "circularCount": 1,
+        "inwardCount": 0,
+        "netRadial": 3,
+        "outwardCount": 1,
+        "totalDist": 3,
+      },
+      "voices": [
+        "O",
+        "Ë",
+        "Ë",
+      ],
+    },
+    "id": "oracle",
+    "in": {
+      "ipa": "/ˈɔrəkəl/",
+      "word": "oracle",
+    },
+    "mask": {
+      "signature": "∅",
+      "totals": {
+        "circularCount": 0,
+        "inwardCount": 0,
+        "netRadial": 0,
+        "outwardCount": 0,
+        "totalDist": 0,
+      },
+      "voices": [],
+    },
+  },
+  {
+    "carrier": {
+      "signature": "A→I:d2,r-2,inward | I→Ë:d4,r+2,outward",
+      "totals": {
+        "circularCount": 0,
+        "inwardCount": 1,
+        "netRadial": 0,
+        "outwardCount": 1,
+        "totalDist": 6,
+      },
+      "voices": [
+        "A",
+        "I",
+        "Ë",
+      ],
+    },
+    "id": "carrier",
+    "in": {
+      "ipa": "/ˈkæriər/",
+      "word": "carrier",
+    },
+    "mask": {
+      "signature": "∅",
+      "totals": {
+        "circularCount": 0,
+        "inwardCount": 0,
+        "netRadial": 0,
+        "outwardCount": 0,
+        "totalDist": 0,
+      },
+      "voices": [],
+    },
+  },
+  {
+    "carrier": {
+      "signature": "∅",
+      "totals": {
+        "circularCount": 0,
+        "inwardCount": 0,
+        "netRadial": 0,
+        "outwardCount": 0,
+        "totalDist": 0,
+      },
+      "voices": [
+        "A",
+      ],
+    },
+    "id": "mask",
+    "in": {
+      "ipa": "/mæsk/",
+      "word": "mask",
+    },
+    "mask": {
+      "signature": "∅",
+      "totals": {
+        "circularCount": 0,
+        "inwardCount": 0,
+        "netRadial": 0,
+        "outwardCount": 0,
+        "totalDist": 0,
+      },
+      "voices": [],
+    },
+  },
+  {
+    "carrier": {
+      "signature": "I→A:d2,r+2,outward | A→I:d2,r-2,inward | I→I:d0,r+0,circular",
+      "totals": {
+        "circularCount": 1,
+        "inwardCount": 1,
+        "netRadial": 0,
+        "outwardCount": 1,
+        "totalDist": 4,
+      },
+      "voices": [
+        "I",
+        "A",
+        "I",
+        "I",
+      ],
+    },
+    "id": "geometry",
+    "in": {
+      "ipa": "/dʒiˈɑmɪtri/",
+      "word": "geometry",
+    },
+    "mask": {
+      "signature": "∅",
+      "totals": {
+        "circularCount": 0,
+        "inwardCount": 0,
+        "netRadial": 0,
+        "outwardCount": 0,
+        "totalDist": 0,
+      },
+      "voices": [],
+    },
+  },
+  {
+    "carrier": {
+      "signature": "∅",
+      "totals": {
+        "circularCount": 0,
+        "inwardCount": 0,
+        "netRadial": 0,
+        "outwardCount": 0,
+        "totalDist": 0,
+      },
+      "voices": [
+        "Ë",
+      ],
+    },
+    "id": "dem-sq",
+    "in": {
+      "ipa": "/dəm/",
+      "word": "dëm",
+    },
+    "mask": {
+      "signature": "∅",
+      "totals": {
+        "circularCount": 0,
+        "inwardCount": 0,
+        "netRadial": 0,
+        "outwardCount": 0,
+        "totalDist": 0,
+      },
+      "voices": [],
+    },
+  },
+  {
+    "carrier": {
+      "signature": "∅",
+      "totals": {
+        "circularCount": 0,
+        "inwardCount": 0,
+        "netRadial": 0,
+        "outwardCount": 0,
+        "totalDist": 0,
+      },
+      "voices": [
+        "Y",
+      ],
+    },
+    "id": "mbyll-sq",
+    "in": {
+      "ipa": "/mbyl/",
+      "word": "mbyll",
+    },
+    "mask": {
+      "signature": "∅",
+      "totals": {
+        "circularCount": 0,
+        "inwardCount": 0,
+        "netRadial": 0,
+        "outwardCount": 0,
+        "totalDist": 0,
+      },
+      "voices": [],
+    },
+  },
+  {
+    "carrier": {
+      "signature": "∅",
+      "totals": {
+        "circularCount": 0,
+        "inwardCount": 0,
+        "netRadial": 0,
+        "outwardCount": 0,
+        "totalDist": 0,
+      },
+      "voices": [
+        "A",
+      ],
+    },
+    "id": "gjaku-sq",
+    "in": {
+      "ipa": "/ɟak/",
+      "word": "gjak",
+    },
+    "mask": {
+      "signature": "∅",
+      "totals": {
+        "circularCount": 0,
+        "inwardCount": 0,
+        "netRadial": 0,
+        "outwardCount": 0,
+        "totalDist": 0,
+      },
+      "voices": [],
+    },
+  },
+  {
+    "carrier": {
+      "signature": "∅",
+      "totals": {
+        "circularCount": 0,
+        "inwardCount": 0,
+        "netRadial": 0,
+        "outwardCount": 0,
+        "totalDist": 0,
+      },
+      "voices": [
+        "E",
+      ],
+    },
+    "id": "shter-sq",
+    "in": {
+      "ipa": "/ʃtɛr/",
+      "word": "shter",
+    },
+    "mask": {
+      "signature": "∅",
+      "totals": {
+        "circularCount": 0,
+        "inwardCount": 0,
+        "netRadial": 0,
+        "outwardCount": 0,
+        "totalDist": 0,
+      },
+      "voices": [],
+    },
+  },
+  {
+    "carrier": {
+      "signature": "E→O:d2,r-2,inward",
+      "totals": {
+        "circularCount": 0,
+        "inwardCount": 1,
+        "netRadial": -2,
+        "outwardCount": 0,
+        "totalDist": 2,
+      },
+      "voices": [
+        "E",
+        "O",
+      ],
+    },
+    "id": "zero-sq",
+    "in": {
+      "ipa": "/ˈzɛro/",
+      "word": "zero",
+    },
+    "mask": {
+      "signature": "∅",
+      "totals": {
+        "circularCount": 0,
+        "inwardCount": 0,
+        "netRadial": 0,
+        "outwardCount": 0,
+        "totalDist": 0,
+      },
+      "voices": [],
+    },
+  },
+]
+`;

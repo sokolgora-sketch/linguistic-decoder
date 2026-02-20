@@ -1,0 +1,31 @@
+[
+  { "id": "rhythm",        "word": "rhythm",        "ipa": "/ˈɹɪðəm/" },
+  { "id": "tip",           "word": "tip",           "ipa": "tɪp" },
+  { "id": "mathematics",   "word": "mathematics",   "ipa": "məˈtæmətɪks" },
+  { "id": "open",          "word": "open",          "ipa": "/ˈoʊpən/" },
+  { "id": "hap-sq",        "word": "hap",           "ipa": "/hap/" },
+
+  { "id": "system",        "word": "system",        "ipa": "/ˈsɪstəm/" },
+  { "id": "focus",         "word": "focus",         "ipa": "/ˈfoʊkəs/" },
+  { "id": "balance",       "word": "balance",       "ipa": "/ˈbæl.əns/" },
+  { "id": "evolution",     "word": "evolution",     "ipa": "/ˌɛvəˈluːʃən/" },
+  { "id": "unity",         "word": "unity",         "ipa": "/ˈjuːnɪti/" },
+
+  { "id": "network",       "word": "network",       "ipa": "/ˈnɛtˌwɜːrk/" },
+  { "id": "truth",         "word": "truth",         "ipa": "/truːθ/" },
+  { "id": "expansion",     "word": "expansion",     "ipa": "/ɪkˈspænʃən/" },
+  { "id": "insight",       "word": "insight",       "ipa": "/ˈɪnsaɪt/" },
+  { "id": "integrity",     "word": "integrity",     "ipa": "/ɪnˈtɛɡrɪti/" },
+
+  { "id": "evidence",      "word": "evidence",      "ipa": "/ˈɛvɪdəns/" },
+  { "id": "oracle",        "word": "oracle",        "ipa": "/ˈɔrəkəl/" },
+  { "id": "carrier",       "word": "carrier",       "ipa": "/ˈkæriər/" },
+  { "id": "mask",          "word": "mask",          "ipa": "/mæsk/" },
+  { "id": "geometry",      "word": "geometry",      "ipa": "/dʒiˈɑmɪtri/" },
+
+  { "id": "dem-sq",        "word": "dëm",           "ipa": "/dəm/" },
+  { "id": "mbyll-sq",      "word": "mbyll",         "ipa": "/mbyl/" },
+  { "id": "gjaku-sq",      "word": "gjak",          "ipa": "/ɟak/" },
+  { "id": "shter-sq",      "word": "shter",         "ipa": "/ʃtɛr/" },
+  { "id": "zero-sq",       "word": "zero",          "ipa": "/ˈzɛro/" }
+]
