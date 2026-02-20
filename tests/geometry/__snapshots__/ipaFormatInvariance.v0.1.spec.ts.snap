@@ -1,0 +1,61 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`IPA format invariance v0.1 (wrappers/diacritics must not change carriers) empty/null/non-string are safe and stable 1`] = `
+[
+  {
+    "diagnostics": {
+      "noCarrier": true,
+      "unmapped": [],
+      "usedImplicit": false,
+      "usedSyllabic": false,
+    },
+    "tokens": [],
+    "traceTokens": [],
+    "voices": [],
+  },
+  {
+    "diagnostics": {
+      "noCarrier": true,
+      "unmapped": [],
+      "usedImplicit": false,
+      "usedSyllabic": false,
+    },
+    "tokens": [],
+    "traceTokens": [],
+    "voices": [],
+  },
+  {
+    "diagnostics": {
+      "noCarrier": true,
+      "unmapped": [],
+      "usedImplicit": false,
+      "usedSyllabic": false,
+    },
+    "tokens": [],
+    "traceTokens": [],
+    "voices": [],
+  },
+  {
+    "diagnostics": {
+      "noCarrier": true,
+      "unmapped": [],
+      "usedImplicit": false,
+      "usedSyllabic": false,
+    },
+    "tokens": [],
+    "traceTokens": [],
+    "voices": [],
+  },
+  {
+    "diagnostics": {
+      "noCarrier": true,
+      "unmapped": [],
+      "usedImplicit": false,
+      "usedSyllabic": false,
+    },
+    "tokens": [],
+    "traceTokens": [],
+    "voices": [],
+  },
+]
+`;
