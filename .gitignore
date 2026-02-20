@@ -45,3 +45,6 @@ tests/__fixtures__/*.bak.*
 
 # integration Next distDir
 .next-int/
+
+# Canon C2 outputs
+/tests/validation/out/
