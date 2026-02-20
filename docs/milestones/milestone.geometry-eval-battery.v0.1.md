@@ -1,7 +1,7 @@
 # Milestone: Geometry Eval Battery v0.1 — deception rails (mask + carrier + VectorDelta)
 
 ## Goal
-Lock a defendable, deterministic evaluation battery that prevents ZË-RO from becoming a "meaning-hallucination machine".
+Lock a defendable, deterministic evaluation battery that prevents ZË-RO from becoming a meaning-hallucination machine.
 
 This milestone tests:
 1) IPA format invariance (wrappers/diacritics do not change carriers)
@@ -15,14 +15,15 @@ File:
 - `tests/geometry/ipaFormatInvariance.v0.1.spec.ts`
 
 DONE when:
-- multiple representations of the *same* IPA return identical carrier voices.
+- multiple representations of the same IPA return identical carrier extraction output (strict raw input rules apply).
 
 ### 2) IPA noise rejection battery
 File:
 - `tests/geometry/ipaNoiseRejection.v0.1.spec.ts`
 
 DONE when:
-- consonant-only strings never invent carriers (`voices=[]`).
+- consonant-only strings never invent carrier voices (`voices=[]`)
+- resulting VectorDelta signature is `∅`
 
 ### 3) Mask vs Carrier geometry battery (snapshot lock)
 Files:
@@ -37,5 +38,6 @@ DONE when:
 
 ## DONE criteria (non-negotiable)
 - All tests exist and are deterministic
-- Snapshot lock exists and is stable
+- Snapshot locks exist and are stable
 - `npm run gate:quick` is green
+- PR merged
