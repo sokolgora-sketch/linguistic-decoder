@@ -1,0 +1,16 @@
+{
+  "version": "canonC2.holdout.v0.1",
+  "cases": [
+    { "id": "holdout.en.father", "word": "father" },
+    { "id": "holdout.en.language", "word": "language" },
+    { "id": "holdout.en.mathematics", "word": "mathematics" },
+    { "id": "holdout.en.philosophy", "word": "philosophy" },
+    { "id": "holdout.en.sterile", "word": "sterile" },
+
+    { "id": "holdout.sq.diete", "word": "dietë" },
+    { "id": "holdout.sq.drite", "word": "dritë" },
+    { "id": "holdout.sq.shqip", "word": "shqip" },
+    { "id": "holdout.sq.studim", "word": "studim" },
+    { "id": "holdout.sq.dam", "word": "dam" }
+  ]
+}
