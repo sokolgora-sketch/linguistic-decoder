@@ -27,7 +27,7 @@
     "canon:c2:update": "CANON_C2_WRITE_BASELINE=1 CANON_C2_WRITE_ARTIFACTS=1 npm test -- tests/validation/canonC2.baselineAndDiff.v0.1.spec.ts -u"
   },
   "dependencies": {
-    "@genkit-ai/google-genai": "^1.20.0",
+    "@genkit-ai/google-genai": "^1.28.0",
     "@genkit-ai/next": "^1.20.0",
     "@hookform/resolvers": "^4.1.3",
     "@radix-ui/react-accordion": "^1.2.3",
