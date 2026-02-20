@@ -1,0 +1,167 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Mask vs Carrier Geometry Battery v0.1 (snapshot lock) 1`] = `
+[
+  {
+    "carrier": {
+      "signature": "I→Ë:d4,r+2,outward",
+      "totals": {
+        "circularCount": 0,
+        "inwardCount": 0,
+        "netRadial": 2,
+        "outwardCount": 1,
+        "totalDist": 4,
+      },
+      "voices": [
+        "I",
+        "Ë",
+      ],
+    },
+    "id": "rhythm",
+    "in": {
+      "ipa": "/ˈɹɪðəm/",
+      "word": "rhythm",
+    },
+    "mask": {
+      "signature": "∅",
+      "totals": {
+        "circularCount": 0,
+        "inwardCount": 0,
+        "netRadial": 0,
+        "outwardCount": 0,
+        "totalDist": 0,
+      },
+      "voices": [],
+    },
+  },
+  {
+    "carrier": {
+      "signature": "∅",
+      "totals": {
+        "circularCount": 0,
+        "inwardCount": 0,
+        "netRadial": 0,
+        "outwardCount": 0,
+        "totalDist": 0,
+      },
+      "voices": [
+        "I",
+      ],
+    },
+    "id": "tip",
+    "in": {
+      "ipa": "tɪp",
+      "word": "tip",
+    },
+    "mask": {
+      "signature": "∅",
+      "totals": {
+        "circularCount": 0,
+        "inwardCount": 0,
+        "netRadial": 0,
+        "outwardCount": 0,
+        "totalDist": 0,
+      },
+      "voices": [],
+    },
+  },
+  {
+    "carrier": {
+      "signature": "Ë→A:d6,r+0,circular | A→Ë:d6,r+0,circular | Ë→I:d4,r-2,inward",
+      "totals": {
+        "circularCount": 2,
+        "inwardCount": 1,
+        "netRadial": -2,
+        "outwardCount": 0,
+        "totalDist": 16,
+      },
+      "voices": [
+        "Ë",
+        "A",
+        "Ë",
+        "I",
+      ],
+    },
+    "id": "mathematics",
+    "in": {
+      "ipa": "məˈtæmətɪks",
+      "word": "mathematics",
+    },
+    "mask": {
+      "signature": "∅",
+      "totals": {
+        "circularCount": 0,
+        "inwardCount": 0,
+        "netRadial": 0,
+        "outwardCount": 0,
+        "totalDist": 0,
+      },
+      "voices": [],
+    },
+  },
+  {
+    "carrier": {
+      "signature": "O→U:d1,r+1,outward | U→Ë:d2,r+2,outward",
+      "totals": {
+        "circularCount": 0,
+        "inwardCount": 0,
+        "netRadial": 3,
+        "outwardCount": 2,
+        "totalDist": 3,
+      },
+      "voices": [
+        "O",
+        "U",
+        "Ë",
+      ],
+    },
+    "id": "open",
+    "in": {
+      "ipa": "/ˈoʊpən/",
+      "word": "open",
+    },
+    "mask": {
+      "signature": "∅",
+      "totals": {
+        "circularCount": 0,
+        "inwardCount": 0,
+        "netRadial": 0,
+        "outwardCount": 0,
+        "totalDist": 0,
+      },
+      "voices": [],
+    },
+  },
+  {
+    "carrier": {
+      "signature": "∅",
+      "totals": {
+        "circularCount": 0,
+        "inwardCount": 0,
+        "netRadial": 0,
+        "outwardCount": 0,
+        "totalDist": 0,
+      },
+      "voices": [
+        "A",
+      ],
+    },
+    "id": "hap-sq",
+    "in": {
+      "ipa": "/hap/",
+      "word": "hap",
+    },
+    "mask": {
+      "signature": "∅",
+      "totals": {
+        "circularCount": 0,
+        "inwardCount": 0,
+        "netRadial": 0,
+        "outwardCount": 0,
+        "totalDist": 0,
+      },
+      "voices": [],
+    },
+  },
+]
+`;
