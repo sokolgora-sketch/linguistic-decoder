@@ -1,6 +1,6 @@
 # DONE: VectorDelta (Geometry) v0.1
 
-Merged via: PR #TBD
+Merged via: PR #486
 
 ## Shipped
 - SSOT 7-voice axial coords + ring radius:

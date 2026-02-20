@@ -9,22 +9,22 @@ Expressed as math over {A,E,I,O,U,Y,Ë} paths, not audio science.
 ## Deliverables
 
 ### 1) SSOT 7-voice coordinates (integer geometry)
-Add a single source of truth for coordinates and ring radius:
+Single source of truth:
 
 - `src/shared/geometry/voiceCoordsHex.v0.1.ts`
 
 Requirements:
-- deterministic, integer-only coords
-- includes:
+- deterministic, integer-only ops
+- exports:
   - `voiceToAxialV0_1(v): { q: number; r: number }`
   - `voiceRadiusV0_1(v): 0|1|2|3` (O=0, I/U=1, E/Y=2, A/Ë=3)
   - `hexDistanceVoiceV0_1(a,b): number` using axial hex distance
 
-Coordinate doctrine (axial coords, integer):
+Coordinate doctrine:
 - O = (0, 0)
-- Inner ring (radius 1): I, U
-- Middle ring (radius 2): E, Y
-- Outer ring (radius 3): A, Ë
+- Ring 1 (radius 1): I, U
+- Ring 2 (radius 2): E, Y
+- Ring 3 (radius 3): A, Ë
 
 Exact placement must be locked by tests; do not improvise later.
 
@@ -50,18 +50,17 @@ Output:
 
 Constraints:
 - deterministic
-- integer ops only (no float logic)
-- safe defaults: empty or length<2 returns zeroed summary
+- integer-only logic (no float-based heuristics)
+- safe defaults: empty/length<2 returns zeroed summary
 
 ### 3) Tests (the “proof”)
-Add:
 - `tests/geometry/vectorDeltaSummary.v0.1.spec.ts` (behavior tests)
 - `tests/geometry/vectorDeltaSummary.v0.1.lock.spec.ts` (snapshot lock)
-- `tests/geometry/voiceCoordsHex.v0.1.lock.spec.ts` (snapshot lock of coordinate doctrine)
+- `tests/geometry/voiceCoordsHex.v0.1.lock.spec.ts` (coords + radius + distance matrix lock)
 
 ## DONE criteria (non-negotiable)
-- New SSOT coords module exists and is used by VectorDelta (no duplicate mappings)
+- SSOT coords module exists and is used by VectorDelta (no duplicate mappings)
 - VectorDelta summary module exists + deterministic output
 - Lock snapshots exist and are stable
 - `npm run gate:quick` green
-- PR merged; then add `docs/milestones/milestone.vector-delta-geometry.v0.1.DONE.md`
+- PR merged; `milestone.vector-delta-geometry.v0.1.DONE.md` updated with PR number
