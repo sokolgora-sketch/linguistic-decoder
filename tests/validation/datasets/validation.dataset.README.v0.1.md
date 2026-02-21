@@ -22,3 +22,27 @@ Each record is:
 - Inputs are fixtures only (no external IO).
 - IDs must remain stable once introduced.
 - Splits are locked by explicit id lists (v0.1); later versions may move to hash-split.
+
+---
+
+## Canon C2 v0.3 — Corpus70 (DONE)
+
+**Goal:** lock a larger, realistic corpus so any engine change produces measurable drift.
+
+**Artifacts**
+- Train dataset: `tests/validation/datasets/canonC2.train.v0.3.json` (35 cases)
+- Holdout dataset: `tests/validation/datasets/canonC2.holdout.v0.3.json` (35 cases)
+- Runner: `tests/validation/canonC2.runner.v0.3.spec.ts`
+- Baseline: `tests/validation/baselines/canonC2.baseline.v0.3.json` (generated via update)
+
+**Commands**
+- `npm run canon:c2` — drift check vs baseline (fails on unexpected change)
+- `npm run canon:c2:update` — regenerate baseline after intentional change
+
+**DONE proof**
+- `npm run canon:c2` passes on `main`
+- `npm run gate:quick` passes on `main`
+
+**Notes**
+- `tests/validation/out/` is still gitignored (diff reports + current projections are not committed).
+
