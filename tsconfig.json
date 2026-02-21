@@ -47,6 +47,8 @@
     ".next/dev/types/**/*.ts",
     ".next/types/**/*.ts",
     "app/**/*.ts",
+    "pages/**/*.ts",
+    "pages/**/*.tsx",
     "app/**/*.tsx",
     "next-env.d.ts",
     "src/**/*.ts",
