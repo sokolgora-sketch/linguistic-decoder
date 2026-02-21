@@ -1,0 +1,56 @@
+{
+  "version": "canonC2.train.v0.2",
+  "cases": [
+    {
+      "id": "train.en.study",
+      "word": "study",
+      "mode": "strict"
+    },
+    {
+      "id": "train.en.damage",
+      "word": "damage",
+      "mode": "strict"
+    },
+    {
+      "id": "train.en.rhythm",
+      "word": "rhythm",
+      "mode": "strict",
+      "ipa": "/ˈrɓ(ɕ)m/"
+    },
+    {
+      "id": "train.en.unity",
+      "word": "unity",
+      "mode": "strict"
+    },
+    {
+      "id": "train.en.origin",
+      "word": "origin",
+      "mode": "strict"
+    },
+    {
+      "id": "train.sq.uje",
+      "word": "ujë",
+      "mode": "strict"
+    },
+    {
+      "id": "train.sq.dem",
+      "word": "dëm",
+      "mode": "strict"
+    },
+    {
+      "id": "train.sq.matematike",
+      "word": "matematikë",
+      "mode": "strict"
+    },
+    {
+      "id": "train.sq.filozofi",
+      "word": "filozofi",
+      "mode": "strict"
+    },
+    {
+      "id": "train.sq.gjuhe",
+      "word": "gjuhå",
+      "mode": "strict"
+    }
+  ]
+}

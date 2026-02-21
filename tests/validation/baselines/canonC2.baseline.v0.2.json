@@ -1,0 +1,405 @@
+{
+  "cases": {
+    "holdout.en.father": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "father",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "A-E"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "father"
+    },
+    "holdout.en.language": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "language",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "A-U-A-E"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "language"
+    },
+    "holdout.en.mathematics": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "mathematics",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "A-E-A-I"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "mathematics"
+    },
+    "holdout.en.philosophy": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "philosophy",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "I-O-O-Y"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "philosophy"
+    },
+    "holdout.en.sterile": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "sterile",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "E-I-E"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "sterile"
+    },
+    "holdout.sq.dam": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "dam",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "A"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "dam"
+    },
+    "holdout.sq.diete": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "dietå",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "I-E-A"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "dietå"
+    },
+    "holdout.sq.drite": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "dritë",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "I-Ë"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "dritë"
+    },
+    "holdout.sq.shqip": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "shqip",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "I"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "shqip"
+    },
+    "holdout.sq.studim": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "studim",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "U-I"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "studim"
+    },
+    "train.en.damage": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "damage",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "A-A-E"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "damage"
+    },
+    "train.en.origin": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "origin",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "O-I-I"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "origin"
+    },
+    "train.en.rhythm": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "rhythm",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "Y"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "rhythm"
+    },
+    "train.en.study": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "study",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "U-Y"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "study"
+    },
+    "train.en.unity": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "unity",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "U-I-Y"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "unity"
+    },
+    "train.sq.dem": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "dëm",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "Ë"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "dëm"
+    },
+    "train.sq.filozofi": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "filozofi",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "I-O-O-I"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "filozofi"
+    },
+    "train.sq.gjuhe": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "gjuhå",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "U-A"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "gjuhå"
+    },
+    "train.sq.matematike": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "matematikë",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "A-E-A-I-Ë"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "matematikë"
+    },
+    "train.sq.uje": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "ujë",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "U-Ë"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "ujë"
+    }
+  },
+  "version": "canonC2.baseline.v0.2"
+}
