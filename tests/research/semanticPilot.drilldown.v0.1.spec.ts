@@ -36,155 +36,257 @@ function statusOf(mask: string[], carrier: string[]): "NO_PHONETIC" | "SYNC" | "
   return arrEq(mask, carrier) ? "SYNC" : "DIVERGE";
 }
 
-function loadCorpusV0_3(): CanonCase[] {
-  const root = process.cwd();
-  const trainPath = path.join(root, "tests/validation/datasets/canonC2.train.v0.3.json");
-  const holdPath = path.join(root, "tests/validation/datasets/canonC2.holdout.v0.3.json");
-
-  const train = readJson<Dataset>(trainPath);
-  const hold = readJson<Dataset>(holdPath);
-
-  const cases = [...(train.cases ?? []), ...(hold.cases ?? [])];
-  if (cases.length !== 70) throw new Error(`Expected 70 cases; got ${cases.length}`);
-
-  cases.sort((a, b) => String(a.id).localeCompare(String(b.id)));
-  return cases;
+function pct(n: number, d: number): string {
+  if (!d) return "0.0%";
+  return ((n / d) * 100).toFixed(1) + "%";
 }
 
-function parseLowPTagsFromCompare(compareMd: string, metaVersion: string, pThresh: number): Array<{ tag: string; p: number }> {
-  const lines = compareMd.split("\n");
+// deterministic RNG (mulberry32)
+function rng(seed: number) {
+  let t = seed >>> 0;
+  return () => {
+    t += 0x6d2b79f5;
+    let r = Math.imul(t ^ (t >>> 15), 1 | t);
+    r ^= r + Math.imul(r ^ (r >>> 7), 61 | r);
+    return ((r ^ (r >>> 14)) >>> 0) / 4294967296;
+  };
+}
 
-  // find section header: "## Meta: <metaVersion>"
-  const head = `## Meta: ${metaVersion}`;
-  const start = lines.findIndex((l) => l.trim() === head);
-  if (start < 0) return [];
+function shuffleInPlace<T>(a: T[], rand: () => number) {
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(rand() * (i + 1));
+    const tmp = a[i];
+    a[i] = a[j];
+    a[j] = tmp;
+  }
+}
 
-  // scan forward to find the table header row containing "p("
-  let headerRow = -1;
-  for (let i = start; i < Math.min(lines.length, start + 200); i++) {
-    const l = lines[i];
-    if (l.startsWith("| Tag |") && l.includes("p(")) {
-      headerRow = i;
-      break;
+type Row = {
+  id: string;
+  word: string;
+  tags: string[];
+  maskVoices: string[];
+  carrierVoices: string[];
+  maskP: string;
+  carrierP: string;
+  status: "NO_PHONETIC" | "SYNC" | "DIVERGE";
+};
+
+type CompareRow = {
+  tag: string;
+  n: number;
+  carrierN: number;
+  topVowel: string;
+  topPurity: number; // 0..1
+  p: number; // p(max>=obs)
+  divergeN: number;
+};
+
+function computeCompare(rows: Row[], allowedTags: string[], iters: number, seed = 12345): CompareRow[] {
+  // only consider rows with carrier present for permutation pool
+  const carrierIdx: number[] = [];
+  const carrierPrimaries: string[] = [];
+  for (let i = 0; i < rows.length; i++) {
+    if (rows[i].carrierVoices.length > 0) {
+      carrierIdx.push(i);
+      carrierPrimaries.push(rows[i].carrierP);
     }
   }
-  if (headerRow < 0) return [];
 
-  const headerCols = lines[headerRow]
-    .split("|")
-    .map((x) => x.trim())
-    .filter(Boolean);
+  // observed per-tag counts
+  const tagMembers: Record<string, number[]> = {};
+  for (const t of allowedTags) tagMembers[t] = [];
 
-  const tagIdx = headerCols.findIndex((c) => c.toLowerCase() === "tag");
-  const pIdx = headerCols.findIndex((c) => c.toLowerCase().startsWith("p("));
-  if (tagIdx < 0 || pIdx < 0) return [];
-
-  const out: Array<{ tag: string; p: number }> = [];
-
-  // rows start after separator line
-  for (let i = headerRow + 2; i < Math.min(lines.length, headerRow + 200); i++) {
-    const l = lines[i];
-    if (!l.startsWith("|")) break; // end of table
-    const cols = l
-      .split("|")
-      .map((x) => x.trim())
-      .filter(Boolean);
-
-    if (cols.length !== headerCols.length) continue;
-
-    const tag = cols[tagIdx];
-    const pRaw = cols[pIdx];
-    const p = Number.parseFloat(pRaw);
-    if (!Number.isFinite(p)) continue;
-
-    if (p <= pThresh) out.push({ tag, p });
+  for (let i = 0; i < rows.length; i++) {
+    for (const t of rows[i].tags) {
+      if (t in tagMembers) tagMembers[t].push(i);
+    }
   }
 
-  out.sort((a, b) => a.p - b.p || a.tag.localeCompare(b.tag));
-  return out;
+  function observedForTag(t: string) {
+    const members = tagMembers[t] || [];
+    const counts = new Map<string, number>();
+    let carrierN = 0;
+    let divergeN = 0;
+    for (const i of members) {
+      const r = rows[i];
+      if (r.carrierVoices.length === 0) continue;
+      carrierN++;
+      counts.set(r.carrierP, (counts.get(r.carrierP) ?? 0) + 1);
+      if (r.status === "DIVERGE") divergeN++;
+    }
+    let topVowel = "NONE";
+    let topCount = 0;
+    for (const [k, v] of counts.entries()) {
+      if (v > topCount || (v === topCount && String(k) < String(topVowel))) {
+        topVowel = k;
+        topCount = v;
+      }
+    }
+    const topPurity = carrierN ? topCount / carrierN : 0;
+    return { carrierN, divergeN, topVowel, topPurity };
+  }
+
+  const observed: Record<string, { carrierN: number; divergeN: number; topVowel: string; topPurity: number }> = {};
+  for (const t of allowedTags) observed[t] = observedForTag(t);
+
+  // permutation p(max>=obs)
+  const hits: Record<string, number> = {};
+  for (const t of allowedTags) hits[t] = 0;
+
+  const rand = rng(seed);
+  const pool = carrierPrimaries.slice();
+
+  // Map from carrier row index -> pool position (for assignment)
+  // We'll shuffle pool and assign pool[k] to carrierIdx[k]
+  for (let iter = 0; iter < iters; iter++) {
+    shuffleInPlace(pool, rand);
+
+    // build assigned carrier primary per row (only for carrier rows)
+    const assigned = new Map<number, string>();
+    for (let k = 0; k < carrierIdx.length; k++) assigned.set(carrierIdx[k], pool[k]);
+
+    for (const t of allowedTags) {
+      const obs = observed[t];
+      if (!obs.carrierN) continue;
+
+      const counts = new Map<string, number>();
+      let carrierN = 0;
+
+      for (const i of tagMembers[t] || []) {
+        if (!assigned.has(i)) continue;
+        carrierN++;
+        const v = assigned.get(i)!;
+        counts.set(v, (counts.get(v) ?? 0) + 1);
+      }
+
+      if (!carrierN) continue;
+
+      let topCount = 0;
+      for (const v of counts.values()) topCount = Math.max(topCount, v);
+      const maxPurity = topCount / carrierN;
+
+      if (maxPurity >= obs.topPurity) hits[t] += 1;
+    }
+  }
+
+  const out: CompareRow[] = [];
+  for (const t of allowedTags) {
+    const n = (tagMembers[t] || []).length;
+    const obs = observed[t];
+    const p = iters ? hits[t] / iters : 1;
+    out.push({
+      tag: t,
+      n,
+      carrierN: obs.carrierN,
+      topVowel: obs.topVowel,
+      topPurity: obs.topPurity,
+      p,
+      divergeN: obs.divergeN,
+    });
+  }
+  return out.sort((a, b) => a.p - b.p || b.carrierN - a.carrierN || a.tag.localeCompare(b.tag));
 }
 
 describe("Semantic Pilot drilldown v0.1 — list cases for low-p tags", () => {
   it("writes tests/validation/out/semanticPilot.drilldown.v0.1.md", () => {
     const root = process.cwd();
+    const outDir = path.join(root, "tests/validation/out");
+    const outMd = path.join(outDir, "semanticPilot.drilldown.v0.1.md");
 
-    const comparePath = path.join(root, "tests/validation/out/semanticPilot.compare.v0.1.md");
-    if (!fs.existsSync(comparePath)) {
-      throw new Error(`Missing compare report: ${comparePath}. Run: npm run research:semantic-pilot:compare`);
-    }
-    const compareMd = fs.readFileSync(comparePath, "utf8");
+    const train = readJson<Dataset>(path.join(root, "tests/validation/datasets/canonC2.train.v0.3.json"));
+    const hold = readJson<Dataset>(path.join(root, "tests/validation/datasets/canonC2.holdout.v0.3.json"));
+    const allCases = [...(train.cases || []), ...(hold.cases || [])].map((c) => ({
+      id: String(c.id),
+      word: String(c.word),
+      ipa: typeof c.ipa === "string" ? c.ipa : undefined,
+    }));
 
-    const corpus = loadCorpusV0_3();
-    const byId: Record<string, CanonCase> = {};
-    for (const c of corpus) byId[String(c.id)] = c;
-
-    const metaPaths = [
-      path.join(root, "tests/research/corpus70.meta.v0.1.gemini.json"),
-      path.join(root, "tests/research/corpus70.meta.v0.1.autotag.json"),
+    // metas we drill (snapshots)
+    const metas: Array<{ label: string; meta: Meta }> = [
+      {
+        label: "corpus70.meta.v0.1.gemini-blind",
+        meta: readJson<Meta>(path.join(root, "tests/research/corpus70.meta.v0.1.gemini.json")),
+      },
+      {
+        label: "corpus70.meta.v0.1.autotag",
+        meta: readJson<Meta>(path.join(root, "tests/research/corpus70.meta.v0.1.autotag.json")),
+      },
     ];
 
-    const pThresh = 0.1;
+    // build rows (mask + carrier derived from SSOT extractors)
+    const rows: Row[] = allCases
+      .slice()
+      .sort((a, b) => a.id.localeCompare(b.id))
+      .map((c) => {
+        const ortho = extractOrthographyVoicesFromWordV0_1({ word: c.word });
+        const maskVoices = arr(ortho.voices);
+        const carrierVoices = c.ipa ? arr(extractCarrierVoicesFromIpaV0_1(c.ipa).voices) : [];
+        const maskP = primaryOf(maskVoices);
+        const carrierP = primaryOf(carrierVoices);
+        return {
+          id: c.id,
+          word: c.word,
+          tags: [],
+          maskVoices,
+          carrierVoices,
+          maskP,
+          carrierP,
+          status: statusOf(maskVoices, carrierVoices),
+        };
+      });
 
-    const outLines: string[] = [];
-    outLines.push("# Semantic Pilot drilldown v0.1 — Low-p tag microscope");
-    outLines.push("");
-    outLines.push(`- p-threshold: **<= ${pThresh.toFixed(2)}** (from compare report)`);
-    outLines.push(`- source: \`tests/validation/out/semanticPilot.compare.v0.1.md\``);
-    outLines.push("");
+    const P_THRESH = 0.10;
+    const ITERS = 2000;
 
-    for (const mp of metaPaths) {
-      if (!fs.existsSync(mp)) continue;
-      const meta = readJson<Meta>(mp);
+    const lines: string[] = [];
+    lines.push("# Semantic Pilot drilldown v0.1 — Low-p tag microscope");
+    lines.push("");
+    lines.push(`- p-threshold: **<= ${P_THRESH.toFixed(2)}**`);
+    lines.push(`- permutation iters: ${ITERS}`);
+    lines.push("");
 
-      const lowP = parseLowPTagsFromCompare(compareMd, meta.version, pThresh);
+    for (const { label, meta } of metas) {
+      // attach tags from meta
+      const tagMap = meta.tags || {};
+      for (const r of rows) r.tags = Array.isArray(tagMap[r.id]) ? tagMap[r.id].map(String) : [];
 
-      outLines.push(`## Meta: ${meta.version}`);
-      outLines.push("");
+      const allowedTags = Array.isArray(meta.allowedTags) ? meta.allowedTags.map(String) : [];
+      const compare = computeCompare(rows, allowedTags, ITERS, 12345);
 
-      if (!lowP.length) {
-        outLines.push("_No tags under threshold in compare report._");
-        outLines.push("");
+      const low = compare.filter((x) => x.carrierN > 0 && x.p <= P_THRESH);
+
+      lines.push(`## Meta: ${label}`);
+      lines.push("");
+
+      if (!low.length) {
+        lines.push("_No tags met the low-p threshold._");
+        lines.push("");
         continue;
       }
 
-      for (const { tag, p } of lowP) {
-        // collect cases with this tag
-        const ids = Object.keys(meta.tags ?? {}).filter((id) => (meta.tags[id] ?? []).includes(tag));
-        ids.sort((a, b) => a.localeCompare(b));
+      for (const t of low) {
+        lines.push(`### Tag: ${t.tag} (p=${t.p.toFixed(3)})`);
+        lines.push("");
+        lines.push("| ID | Word | Tags | Mask voices | Carrier voices | Mask P | Carrier P | Status |");
+        lines.push("|---:|------|------|------------|---------------|--------|-----------|--------|");
 
-        outLines.push(`### Tag: ${tag} (p=${p.toFixed(3)})`);
-        outLines.push("");
-        outLines.push("| ID | Word | Tags | Mask voices | Carrier voices | Mask P | Carrier P | Status |");
-        outLines.push("|---:|------|------|------------|---------------|--------|-----------|--------|");
-
-        for (const id of ids) {
-          const c = byId[id];
-          const word = c?.word ?? "(missing)";
-          const ipa = c?.ipa;
-
-          const mask = extractOrthographyVoicesFromWordV0_1({ word }).voices ?? [];
-          const carrier = ipa ? extractCarrierVoicesFromIpaV0_1(ipa).voices ?? [] : [];
-
-          const st = statusOf(mask, carrier);
-
-          const tags = (meta.tags[id] ?? []).join(", ");
-          const maskS = arr(mask).join(" ");
-          const carS = arr(carrier).join(" ");
-
-          outLines.push(
-            `| ${id} | **${word}** | ${tags || "-"} | ${maskS || "-"} | ${carS || "-"} | ${primaryOf(mask)} | ${primaryOf(carrier)} | ${st} |`
+        for (const r of rows) {
+          if (!r.tags.includes(t.tag)) continue;
+          const tagsS = r.tags.join(", ");
+          const maskS = r.maskVoices.join(" ");
+          const carS = r.carrierVoices.join(" ");
+          lines.push(
+            `| ${r.id} | **${r.word}** | ${tagsS} | ${maskS || "-"} | ${carS || "-"} | ${r.maskP} | ${r.carrierP} | ${r.status} |`
           );
         }
 
-        outLines.push("");
+        lines.push("");
       }
     }
 
-    const outDir = path.join(root, "tests/validation/out");
-    const outMd = path.join(outDir, "semanticPilot.drilldown.v0.1.md");
     fs.mkdirSync(outDir, { recursive: true });
-    fs.writeFileSync(outMd, outLines.join("\n") + "\n", "utf8");
-
+    fs.writeFileSync(outMd, lines.join("\n") + "\n", "utf8");
     expect(fs.existsSync(outMd)).toBe(true);
   });
 });
