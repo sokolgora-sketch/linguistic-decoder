@@ -23,8 +23,8 @@
     "lint:fix": "eslint -c eslint.config.mjs \"src/**/*.{js,jsx,ts,tsx}\" \"app/**/*.{js,jsx,ts,tsx}\" \"tests/**/*.{js,jsx,ts,tsx}\" \"scripts/**/*.{js,jsx,ts,tsx,mjs}\" --fix",
     "typecheck:prod": "tsc -p tsconfig.typecheck.prod.json --noEmit",
     "canon:c2:test": "npm test -- tests/validation/canonC2.baselineAndDiff.v0.1.spec.ts",
-    "canon:c2": "npm test -- tests/validation/canonC2.runner.v0.2.spec.ts",
-    "canon:c2:update": "CANON_C2_UPDATE=1 npm test -- tests/validation/canonC2.runner.v0.2.spec.ts"
+    "canon:c2": "npm test -- tests/validation/canonC2.runner.v0.3.spec.ts",
+    "canon:c2:update": "CANON_C2_UPDATE=1 npm test -- tests/validation/canonC2.runner.v0.3.spec.ts"
   },
   "dependencies": {
     "@genkit-ai/google-genai": "^1.20.0",
