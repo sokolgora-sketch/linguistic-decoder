@@ -24,6 +24,7 @@
     "typecheck:prod": "tsc -p tsconfig.typecheck.prod.json --noEmit",
     "canon:c2:test": "npm test -- tests/validation/canonC2.baselineAndDiff.v0.1.spec.ts",
     "canon:c2": "npm test -- tests/validation/canonC2.runner.v0.3.spec.ts",
+    "canon:c2:report": "npm test -- tests/validation/canonC2.report.v0.1.spec.ts",
     "canon:c2:update": "CANON_C2_UPDATE=1 npm test -- tests/validation/canonC2.runner.v0.3.spec.ts"
   },
   "dependencies": {
