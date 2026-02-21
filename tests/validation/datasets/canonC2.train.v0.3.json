@@ -1,0 +1,215 @@
+{
+  "version": "canonC2.train.v0.3",
+  "cases": [
+    {
+      "id": "train.c70.a01",
+      "word": "father",
+      "mode": "strict",
+      "ipa": "/ˈfɑːðər/"
+    },
+    {
+      "id": "train.c70.a02",
+      "word": "water",
+      "mode": "strict",
+      "ipa": "/ˈwɔːtər/"
+    },
+    {
+      "id": "train.c70.a03",
+      "word": "star",
+      "mode": "strict",
+      "ipa": "/stɑːr/"
+    },
+    {
+      "id": "train.c70.a04",
+      "word": "art",
+      "mode": "strict",
+      "ipa": "/ɑːrt/"
+    },
+    {
+      "id": "train.c70.a09",
+      "word": "start",
+      "mode": "strict",
+      "ipa": "/stɑːrt/"
+    },
+    {
+      "id": "train.c70.e01",
+      "word": "energy",
+      "mode": "strict",
+      "ipa": "/ˈɛnərdʒi/"
+    },
+    {
+      "id": "train.c70.e02",
+      "word": "enter",
+      "mode": "strict",
+      "ipa": "/ˈɛntər/"
+    },
+    {
+      "id": "train.c70.e03",
+      "word": "edge",
+      "mode": "strict",
+      "ipa": "/ɛdʒ/"
+    },
+    {
+      "id": "train.c70.e04",
+      "word": "emerge",
+      "mode": "strict",
+      "ipa": "/iˈmɜːrdʒ/"
+    },
+    {
+      "id": "train.c70.e05",
+      "word": "effort",
+      "mode": "strict",
+      "ipa": "/ˈɛfərt/"
+    },
+    {
+      "id": "train.c70.i01",
+      "word": "idea",
+      "mode": "strict",
+      "ipa": "/aɪˈdiːə/"
+    },
+    {
+      "id": "train.c70.i02",
+      "word": "vision",
+      "mode": "strict",
+      "ipa": "/ˈvɪʒən/"
+    },
+    {
+      "id": "train.c70.i03",
+      "word": "direct",
+      "mode": "strict",
+      "ipa": "/dɪˈrɛkt/"
+    },
+    {
+      "id": "train.c70.i04",
+      "word": "tip",
+      "mode": "strict",
+      "ipa": "/tɪp/"
+    },
+    {
+      "id": "train.c70.i05",
+      "word": "rise",
+      "mode": "strict",
+      "ipa": "/raɪz/"
+    },
+    {
+      "id": "train.c70.o01",
+      "word": "order",
+      "mode": "strict",
+      "ipa": "/ˈɔːrdər/"
+    },
+    {
+      "id": "train.c70.o02",
+      "word": "open",
+      "mode": "strict",
+      "ipa": "/ˈoʊpən/"
+    },
+    {
+      "id": "train.c70.o03",
+      "word": "orbit",
+      "mode": "strict",
+      "ipa": "/ˈɔːrbɪt/"
+    },
+    {
+      "id": "train.c70.o04",
+      "word": "whole",
+      "mode": "strict",
+      "ipa": "/hoʊl/"
+    },
+    {
+      "id": "train.c70.o05",
+      "word": "old",
+      "mode": "strict",
+      "ipa": "/oʊld/"
+    },
+    {
+      "id": "train.c70.u01",
+      "word": "under",
+      "mode": "strict",
+      "ipa": "/ˈʌndər/"
+    },
+    {
+      "id": "train.c70.u02",
+      "word": "blue",
+      "mode": "strict",
+      "ipa": "/bluː/"
+    },
+    {
+      "id": "train.c70.u03",
+      "word": "push",
+      "mode": "strict",
+      "ipa": "/pʊʃ/"
+    },
+    {
+      "id": "train.c70.u04",
+      "word": "pull",
+      "mode": "strict",
+      "ipa": "/pʊl/"
+    },
+    {
+      "id": "train.c70.u07",
+      "word": "truth",
+      "mode": "strict",
+      "ipa": "/truːθ/"
+    },
+    {
+      "id": "train.c70.y01",
+      "word": "rhythm",
+      "mode": "strict",
+      "ipa": "/ˈrɪð(ə)m/"
+    },
+    {
+      "id": "train.c70.y02",
+      "word": "symbol",
+      "mode": "strict",
+      "ipa": "/ˈsɪmbəl/"
+    },
+    {
+      "id": "train.c70.y03",
+      "word": "mystery",
+      "mode": "strict",
+      "ipa": "/ˈmɪstəri/"
+    },
+    {
+      "id": "train.c70.y07",
+      "word": "system",
+      "mode": "strict",
+      "ipa": "/ˈsɪstəm/"
+    },
+    {
+      "id": "train.c70.y09",
+      "word": "cycle",
+      "mode": "strict",
+      "ipa": "/ˈsaɪkəl/"
+    },
+    {
+      "id": "train.c70.sch01",
+      "word": "the",
+      "mode": "strict",
+      "ipa": "/ðə/"
+    },
+    {
+      "id": "train.c70.sch02",
+      "word": "about",
+      "mode": "strict",
+      "ipa": "/əˈbaʊt/"
+    },
+    {
+      "id": "train.c70.sch03",
+      "word": "upon",
+      "mode": "strict",
+      "ipa": "/əˈpɒn/"
+    },
+    {
+      "id": "train.c70.sch06",
+      "word": "another",
+      "mode": "strict",
+      "ipa": "/əˈnʌðər/"
+    },
+    {
+      "id": "train.c70.sch07",
+      "word": "above",
+      "mode": "strict",
+      "ipa": "/əˈbʌv/"
+    }
+  ]
+}

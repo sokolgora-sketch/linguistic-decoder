@@ -1,0 +1,1405 @@
+{
+  "cases": {
+    "holdout.c70.a05": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "alba",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "A-A"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "alba"
+    },
+    "holdout.c70.a06": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "alma",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "A-A"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "alma"
+    },
+    "holdout.c70.a07": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "atë",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "A-Ë"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "atë"
+    },
+    "holdout.c70.a08": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "amë",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "A-Ë"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "amë"
+    },
+    "holdout.c70.a10": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "charge",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "A-E"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "charge"
+    },
+    "holdout.c70.e06": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "send",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "E"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "send"
+    },
+    "holdout.c70.e07": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "erë",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "E-Ë"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "erë"
+    },
+    "holdout.c70.e08": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "emër",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "E-Ë"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "emër"
+    },
+    "holdout.c70.e09": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "express",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "E-E"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "express"
+    },
+    "holdout.c70.e10": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "echo",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "E-O"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "echo"
+    },
+    "holdout.c70.i06": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "lite",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "I-E"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "lite"
+    },
+    "holdout.c70.i07": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "bind",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "I"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "bind"
+    },
+    "holdout.c70.i08": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "fire",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "I-E"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "fire"
+    },
+    "holdout.c70.i09": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "bit",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "I"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "bit"
+    },
+    "holdout.c70.i10": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "wire",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "I-E"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "wire"
+    },
+    "holdout.c70.o06": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "ora",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "O-A"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "ora"
+    },
+    "holdout.c70.o07": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "or",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "O"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "or"
+    },
+    "holdout.c70.o08": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "omë",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "O-Ë"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "omë"
+    },
+    "holdout.c70.o09": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "hold",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "O"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "hold"
+    },
+    "holdout.c70.o10": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "go",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "O"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "go"
+    },
+    "holdout.c70.sch04": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "ëndërr",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "Ë-Ë"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "ëndërr"
+    },
+    "holdout.c70.sch05": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "ënjtë",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "Ë-Ë"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "ënjtë"
+    },
+    "holdout.c70.sch08": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "allow",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "A-O"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "allow"
+    },
+    "holdout.c70.sch09": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "support",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "U-O"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "support"
+    },
+    "holdout.c70.sch10": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "balance",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "A-A-E"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "balance"
+    },
+    "holdout.c70.u05": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "ujë",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "U-Ë"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "ujë"
+    },
+    "holdout.c70.u06": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "udhë",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "U-Ë"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "udhë"
+    },
+    "holdout.c70.u08": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "rune",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "U-E"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "rune"
+    },
+    "holdout.c70.u09": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "pool",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "O-O"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "pool"
+    },
+    "holdout.c70.u10": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "rule",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "U-E"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "rule"
+    },
+    "holdout.c70.y04": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "yll",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "Y"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "yll"
+    },
+    "holdout.c70.y05": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "yje",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "Y-E"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "yje"
+    },
+    "holdout.c70.y06": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "synergy",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "Y-E-Y"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "synergy"
+    },
+    "holdout.c70.y08": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "crystal",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "Y-A"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "crystal"
+    },
+    "holdout.c70.y10": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "hymn",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "Y"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "hymn"
+    },
+    "train.c70.a01": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "father",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "A-E"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "father"
+    },
+    "train.c70.a02": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "water",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "A-E"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "water"
+    },
+    "train.c70.a03": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "star",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "A"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "star"
+    },
+    "train.c70.a04": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "art",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "A"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "art"
+    },
+    "train.c70.a09": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "start",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "A"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "start"
+    },
+    "train.c70.e01": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "energy",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "E-E-Y"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "energy"
+    },
+    "train.c70.e02": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "enter",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "E-E"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "enter"
+    },
+    "train.c70.e03": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "edge",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "E-E"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "edge"
+    },
+    "train.c70.e04": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "emerge",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "E-E-E"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "emerge"
+    },
+    "train.c70.e05": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "effort",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "E-O"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "effort"
+    },
+    "train.c70.i01": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "idea",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "I-E-A"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "idea"
+    },
+    "train.c70.i02": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "vision",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "I-I-O"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "vision"
+    },
+    "train.c70.i03": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "direct",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "I-E"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "direct"
+    },
+    "train.c70.i04": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "tip",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "I"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "tip"
+    },
+    "train.c70.i05": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "rise",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "I-E"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "rise"
+    },
+    "train.c70.o01": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "order",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "O-E"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "order"
+    },
+    "train.c70.o02": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "open",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "O-E"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "open"
+    },
+    "train.c70.o03": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "orbit",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "O-I"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "orbit"
+    },
+    "train.c70.o04": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "whole",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "O-E"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "whole"
+    },
+    "train.c70.o05": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "old",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "O"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "old"
+    },
+    "train.c70.sch01": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "the",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "E"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "the"
+    },
+    "train.c70.sch02": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "about",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "A-O-U"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "about"
+    },
+    "train.c70.sch03": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "upon",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "U-O"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "upon"
+    },
+    "train.c70.sch06": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "another",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "A-O-E"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "another"
+    },
+    "train.c70.sch07": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "above",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "A-O-E"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "above"
+    },
+    "train.c70.u01": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "under",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "U-E"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "under"
+    },
+    "train.c70.u02": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "blue",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "U-E"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "blue"
+    },
+    "train.c70.u03": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "push",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "U"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "push"
+    },
+    "train.c70.u04": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "pull",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "U"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "pull"
+    },
+    "train.c70.u07": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "truth",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "U"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "truth"
+    },
+    "train.c70.y01": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "rhythm",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "Y"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "rhythm"
+    },
+    "train.c70.y02": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "symbol",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "Y-O"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "symbol"
+    },
+    "train.c70.y03": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "mystery",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "Y-E-Y"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "mystery"
+    },
+    "train.c70.y07": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "system",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "Y-E"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "system"
+    },
+    "train.c70.y09": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "cycle",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "Y-E"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "cycle"
+    }
+  },
+  "version": "canonC2.baseline.v0.3"
+}

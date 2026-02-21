@@ -1,0 +1,199 @@
+{
+  "version": "canonC2.holdout.v0.3",
+  "cases": [
+    {
+      "id": "holdout.c70.a10",
+      "word": "charge",
+      "mode": "strict",
+      "ipa": "/tʃɑːrdʒ/"
+    },
+    {
+      "id": "holdout.c70.a05",
+      "word": "alba",
+      "mode": "strict"
+    },
+    {
+      "id": "holdout.c70.a06",
+      "word": "alma",
+      "mode": "strict"
+    },
+    {
+      "id": "holdout.c70.a07",
+      "word": "atë",
+      "mode": "strict"
+    },
+    {
+      "id": "holdout.c70.a08",
+      "word": "amë",
+      "mode": "strict"
+    },
+    {
+      "id": "holdout.c70.e06",
+      "word": "send",
+      "mode": "strict",
+      "ipa": "/sɛnd/"
+    },
+    {
+      "id": "holdout.c70.e07",
+      "word": "erë",
+      "mode": "strict"
+    },
+    {
+      "id": "holdout.c70.e08",
+      "word": "emër",
+      "mode": "strict"
+    },
+    {
+      "id": "holdout.c70.e09",
+      "word": "express",
+      "mode": "strict",
+      "ipa": "/ɪkˈsprɛs/"
+    },
+    {
+      "id": "holdout.c70.e10",
+      "word": "echo",
+      "mode": "strict",
+      "ipa": "/ˈɛkoʊ/"
+    },
+    {
+      "id": "holdout.c70.i06",
+      "word": "lite",
+      "mode": "strict"
+    },
+    {
+      "id": "holdout.c70.i07",
+      "word": "bind",
+      "mode": "strict",
+      "ipa": "/baɪnd/"
+    },
+    {
+      "id": "holdout.c70.i08",
+      "word": "fire",
+      "mode": "strict",
+      "ipa": "/ˈfaɪər/"
+    },
+    {
+      "id": "holdout.c70.i09",
+      "word": "bit",
+      "mode": "strict",
+      "ipa": "/bɪt/"
+    },
+    {
+      "id": "holdout.c70.i10",
+      "word": "wire",
+      "mode": "strict",
+      "ipa": "/ˈwaɪər/"
+    },
+    {
+      "id": "holdout.c70.o06",
+      "word": "ora",
+      "mode": "strict"
+    },
+    {
+      "id": "holdout.c70.o07",
+      "word": "or",
+      "mode": "strict"
+    },
+    {
+      "id": "holdout.c70.o08",
+      "word": "omë",
+      "mode": "strict"
+    },
+    {
+      "id": "holdout.c70.o09",
+      "word": "hold",
+      "mode": "strict",
+      "ipa": "/hoʊld/"
+    },
+    {
+      "id": "holdout.c70.o10",
+      "word": "go",
+      "mode": "strict",
+      "ipa": "/ɡoʊ/"
+    },
+    {
+      "id": "holdout.c70.u05",
+      "word": "ujë",
+      "mode": "strict"
+    },
+    {
+      "id": "holdout.c70.u06",
+      "word": "udhë",
+      "mode": "strict"
+    },
+    {
+      "id": "holdout.c70.u08",
+      "word": "rune",
+      "mode": "strict",
+      "ipa": "/ruːn/"
+    },
+    {
+      "id": "holdout.c70.u09",
+      "word": "pool",
+      "mode": "strict",
+      "ipa": "/puːl/"
+    },
+    {
+      "id": "holdout.c70.u10",
+      "word": "rule",
+      "mode": "strict",
+      "ipa": "/ruːl/"
+    },
+    {
+      "id": "holdout.c70.y04",
+      "word": "yll",
+      "mode": "strict"
+    },
+    {
+      "id": "holdout.c70.y05",
+      "word": "yje",
+      "mode": "strict"
+    },
+    {
+      "id": "holdout.c70.y06",
+      "word": "synergy",
+      "mode": "strict",
+      "ipa": "/ˈsɪnərdʒi/"
+    },
+    {
+      "id": "holdout.c70.y08",
+      "word": "crystal",
+      "mode": "strict",
+      "ipa": "/ˈkrɪstəl/"
+    },
+    {
+      "id": "holdout.c70.y10",
+      "word": "hymn",
+      "mode": "strict",
+      "ipa": "/hɪm/"
+    },
+    {
+      "id": "holdout.c70.sch04",
+      "word": "ëndërr",
+      "mode": "strict"
+    },
+    {
+      "id": "holdout.c70.sch05",
+      "word": "ënjtë",
+      "mode": "strict"
+    },
+    {
+      "id": "holdout.c70.sch08",
+      "word": "allow",
+      "mode": "strict",
+      "ipa": "/əˈlaʊ/"
+    },
+    {
+      "id": "holdout.c70.sch09",
+      "word": "support",
+      "mode": "strict",
+      "ipa": "/səˈpɔːrt/"
+    },
+    {
+      "id": "holdout.c70.sch10",
+      "word": "balance",
+      "mode": "strict",
+      "ipa": "/ˈbæləns/"
+    }
+  ]
+}
