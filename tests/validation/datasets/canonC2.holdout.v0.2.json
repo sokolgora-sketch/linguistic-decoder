@@ -1,0 +1,55 @@
+{
+  "version": "canonC2.holdout.v0.2",
+  "cases": [
+    {
+      "id": "holdout.en.father",
+      "word": "father",
+      "mode": "strict"
+    },
+    {
+      "id": "holdout.en.language",
+      "word": "language",
+      "mode": "strict"
+    },
+    {
+      "id": "holdout.en.mathematics",
+      "word": "mathematics",
+      "mode": "strict"
+    },
+    {
+      "id": "holdout.en.philosophy",
+      "word": "philosophy",
+      "mode": "strict"
+    },
+    {
+      "id": "holdout.en.sterile",
+      "word": "sterile",
+      "mode": "strict"
+    },
+    {
+      "id": "holdout.sq.diete",
+      "word": "dietå",
+      "mode": "strict"
+    },
+    {
+      "id": "holdout.sq.drite",
+      "word": "dritë",
+      "mode": "strict"
+    },
+    {
+      "id": "holdout.sq.shqip",
+      "word": "shqip",
+      "mode": "strict"
+    },
+    {
+      "id": "holdout.sq.studim",
+      "word": "studim",
+      "mode": "strict"
+    },
+    {
+      "id": "holdout.sq.dam",
+      "word": "dam",
+      "mode": "strict"
+    }
+  ]
+}
