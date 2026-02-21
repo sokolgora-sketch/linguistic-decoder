@@ -1,106 +1,69 @@
-# Linguistic Decoder
+# ZË-RO — Linguistic Decoder
 
-This is an application for linguistic analysis based on the **Seven-Voices** model.  
-It decodes words into their primary and frontier phonetic paths by analyzing vowel
-levels and rings. The engine is particularly aware of Albanian phonology and can
-provide dialect-specific insights.
+*A deterministic seven-vowel analysis instrument (orthography + optional IPA) with evidence-first telemetry.*
 
-## How to run it
-
-To get started with the project, run:
-
-```bash
-# Install dependencies
-npm ci
-
-# Start the development server
-npm run dev
-
-# Run the test suite
-npm test
-
-# Run the parameter sweep evaluation script
-npx tsx scripts/sweep.ts
-```
-
-What can I click?
-
-The main UI is a single page made of a few cards:
-
-- **Analyze a word**
-Type a word, pick the Mode (strict, etc.) and Alphabet (auto, latin, …),
-then click Analyze or press Enter to run the Seven-Voices engine.
-
-- **Engine meta**
-Debug card that shows which engine and build were used
-(for example SevenVoices Core, 0.2.0-symbolic), plus the mode and alphabet.
-It also includes a dev button to Copy JSON with the raw analysis payload.
-
-- **Heart summary**
-Shows the primary Seven-Voices path for the word:
-
-- **Voice path** (e.g. U → I)
-
-- **Level path** (low / mid / high)
-
-- **Ring path** (1 → 1, 1 → 3, etc.)
-
-When available, alternative paths are listed below the primary path.
-
-- **Word Matrix card** – shows a compressed view of the engine’s word matrix:
-  - Deep root (language + form + vowel path).
-  - Key windows the engine used.
-  - Short note so users know this is a *summary* of the internal matrix, not the full raw table.
-
-- **Language families (experimental)**
-Table where the engine lists plausible language families for this word, with:
-
-- **Language** (e.g. Latin, Albanian)
-
-- **Form** (surface form used by the engine)
-
-- **Pivot** (core syllable/root)
-
-- **Status** (core, effort, …)
-
-Optional tags describing the role of that candidate.
-
-- **Symbolic reading (experimental)**
-A short Zheji-inspired symbolic reading of the word.
-Shows a label and up to a handful of de-duplicated notes, for example:
-
-“Represents a conscious application of will.”
-
-- **Recent words (this session)**
-Lightweight history of the last heart paths you ran in this browser session:
-word, voice path, level path, and ring path.
-
-- **Compare two words**
-Panel that lets you run the engine on two words side-by-side.
-
-Both inputs must be filled; otherwise you see
-“Enter both words before comparing.”
-
-Each side shows its own loading and error state.
-
-Results are rendered with the same engine meta + heart logic as the single
-analysis view, but in a compact compare layout.
-
-Keyboard & validation behaviour
-
-Press Enter in the Analyze a word input to trigger analysis
-(same as clicking Analyze).
-
-In Compare two words, pressing Enter in either input runs the comparison
-when both fields are non-empty.
-
-Empty inputs surface friendly validation messages instead of sending
-empty requests to the API.
-
+[![CI](https://github.com/sokolgora-sketch/linguistic-decoder/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/sokolgora-sketch/linguistic-decoder/actions/workflows/ci.yml)
+[![License: AGPL-3.0](https://img.shields.io/badge/license-AGPL--3.0-blue)](LICENSE)
 
 ---
 
-Next steps for you:
+## What is this?
 
-1. Open `README.md` in VS Code.
-2. Select all, paste this version over it.
+ZË-RO (in this repo) is a **calibrated decoder** for vowel-carrier structure in words.
+
+It does three things, deterministically:
+
+1) **Extracts a 7-vowel “voice path”** using the vowels **A, E, I, O, U, Y, Ë**
+   - From **orthography** (spelling)
+   - From **phonetics** when an **IPA string** is provided
+
+2) **Detects Mask vs Carrier divergence**
+   - When spelling path ≠ spoken (IPA) path, the UI marks **DIVERGE**.
+
+3) **Emits audit-friendly telemetry**
+   - Evidence-first output (stable references, explicit “not emitted”)
+   - Deterministic gates make disagreements visible and testable
+
+This is a research instrument: it helps test hypotheses about vowel structure and meaning. It does **not** claim conclusions by default.
+
+---
+
+## Example: “rhythm” (mask vs carrier)
+
+```ts
+analyzeWord("rhythm", { mode: "strict", ipa: "/ˈrɪð(ə)m/" });
+```
+
+Typical behavior:
+- **Orthography (spelling):** `Y`
+- **Phonetics (IPA carriers):** `I → Ë`
+- **Status:** `DIVERGE`
+
+---
+
+## Determinism & anti-regression
+
+- **SSOT vowel extraction** (one authoritative mapper)
+- **Evidence-first contracts** (UI reads VM; missing data is explicit)
+- **Canon C2** drift harness (baseline + diff report)
+
+Commands:
+- `npm run gate:quick` — lint + unit tests + integration + build
+- `npm run canon:c2` — detect drift vs baseline (fails on unexpected change)
+- `npm run canon:c2:update` — refresh baseline after an intentional change
+
+---
+
+## Run locally
+
+```bash
+npm install
+npm run dev
+# http://localhost:3000
+```
+
+---
+
+## License
+
+GNU Affero General Public License v3.0 (AGPL-3.0). See `LICENSE`.

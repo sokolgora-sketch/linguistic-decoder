@@ -48,3 +48,6 @@ tests/__fixtures__/*.bak.*
 
 # Canon C2 outputs
 /tests/validation/out/
+
+# local helper (do not commit)
+scripts/df_run.sh
