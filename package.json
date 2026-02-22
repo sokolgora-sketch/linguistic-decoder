@@ -31,6 +31,8 @@
     "research:classical100:pilot": "npm test -- tests/research/semanticPilot.classical100.v0.1.spec.ts",
     "research:classical100:pilot:split": "npm test -- tests/research/semanticPilot.classical100.split.v0.1.spec.ts",
     "research:spectrogram": "npm test -- tests/research/spectrogram.v0.1.spec.ts",
+    "research:albanian100:pilot": "npm test -- tests/research/semanticPilot.albanian100.v0.1.spec.ts",
+    "research:spectrogram:v0.2": "npm test -- tests/research/spectrogram.v0.2.spec.ts",
     "canon:c2:update": "CANON_C2_UPDATE=1 npm test -- tests/validation/canonC2.runner.v0.3.spec.ts"
   },
   "dependencies": {
