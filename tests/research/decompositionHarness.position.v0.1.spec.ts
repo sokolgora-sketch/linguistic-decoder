@@ -263,7 +263,15 @@ describe("Decomposition Harness (Position-scoped) v0.1 — prereg + negative con
     const negRateCases = negN ? negA / negN : 0;
 
     const medPosLift = median(reportRows.filter((x) => x.kind === "positive").map((x) => x.liftA_case));
-    const maxNegLift = Math.max(...reportRows.filter((x) => x.kind === "negative").map((x) => x.liftA_case), 0);
+      const medNegLift = median(reportRows.filter((x) => x.kind === "negative").map((x) => x.liftA_case));
+      const maxNegLift = Math.max(...reportRows.filter((x) => x.kind === "negative").map((x) => x.liftA_case), 0);
+
+      // Prereg gate (v0.1): baseline must show lift>1 and p<=0.10, and negatives must not match positives on MEDIAN.
+      const PASS =
+        liftA > 1 &&
+        perm.p <= 0.10 &&
+        medPosLift > medNegLift &&
+        posRateCases > negRateCases;
 
     // Stable sort
     reportRows.sort(
@@ -294,12 +302,21 @@ describe("Decomposition Harness (Position-scoped) v0.1 — prereg + negative con
     lines.push(`- lift_A = obs/permMean: **${liftA.toFixed(3)}**`);
     lines.push(`- permutation p-value (max>=obs): **${perm.p.toFixed(3)}**`);
     lines.push("");
-    lines.push("## Positives vs negatives (sanity separation)");
+    lines.push("## Result (prereg gate)");
+      lines.push("");
+      lines.push(`- gate: **${PASS ? "PASS" : "FAIL"}**`);
+      lines.push(`- criteria: lift_A>1, p<=0.10, medianLift(pos)>medianLift(neg), posA-rate>negA-rate`);
+      lines.push(`- med lift pos: **${medPosLift.toFixed(3)}**`);
+      lines.push(`- med lift neg: **${medNegLift.toFixed(3)}**`);
+      lines.push(`- max lift neg: **${maxNegLift.toFixed(3)}** (info only; collisions allowed)`);
+      lines.push("");
+      lines.push("## Positives vs negatives (sanity separation)");
     lines.push("");
     lines.push(`- positives A-rate: **${(posRateCases * 100).toFixed(1)}%** (${posA}/${posN})`);
     lines.push(`- negatives A-rate: **${(negRateCases * 100).toFixed(1)}%** (${negA}/${negN})`);
     lines.push(`- median liftA_case (positives): **${medPosLift.toFixed(3)}**`);
-    lines.push(`- max liftA_case (negatives): **${maxNegLift.toFixed(3)}**`);
+      lines.push(`- median liftA_case (negatives): **${medNegLift.toFixed(3)}**`);
+      lines.push(`- max liftA_case (negatives): **${maxNegLift.toFixed(3)}** (info)`);
     lines.push("");
     lines.push("## Cases (prereg positives + prereg negatives)");
     lines.push("");
