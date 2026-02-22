@@ -335,7 +335,6 @@ function writeCorpusBlock(lines: string[], block: CorpusBlock) {
   if (!low.length) {
     lines.push("_none_");
     lines.push("");
-    return;
   }
 
   for (const tag of low) {
@@ -345,6 +344,62 @@ function writeCorpusBlock(lines: string[], block: CorpusBlock) {
     lines.push(`- **${tag}**: top=${top.topVowel} (${pct(top.topCount, top.total)}), p=${p.toFixed(3)}, carrierN=${agg.carrierN}`);
   }
   lines.push("");
+
+  // --- Divergence Microscope v0.1 -----------------------------------------
+  const MAX_ROWS = 12;
+
+  const divergeItems = block.items
+    .filter((x) => x.status === "DIVERGE")
+    .slice()
+    .sort(
+      (a, b) =>
+        String(a.carrierP).localeCompare(String(b.carrierP)) ||
+        String(a.maskP).localeCompare(String(b.maskP)) ||
+        String(a.word).localeCompare(String(b.word)) ||
+        String(a.id).localeCompare(String(b.id))
+    )
+    .slice(0, MAX_ROWS);
+
+  const noPhonItems = block.items
+    .filter((x) => x.status === "NO_PHONETIC")
+    .slice()
+    .sort((a, b) => String(a.id).localeCompare(String(b.id)) || String(a.word).localeCompare(String(b.word)))
+    .slice(0, MAX_ROWS);
+
+  lines.push("### Divergence microscope");
+  lines.push("");
+
+  lines.push("#### DIVERGE cases (mask ≠ carrier)");
+  lines.push("");
+  if (!divergeItems.length) {
+    lines.push("_none_");
+    lines.push("");
+  } else {
+    lines.push("| ID | Word | IPA | Tags | Mask | Carrier | MaskP | CarrierP |");
+    lines.push("|---:|------|-----|------|------|---------|-------|----------|");
+    for (const r of divergeItems) {
+      lines.push(
+        `| ${r.id} | **${r.word}** | ${r.ipa ?? "-"} | ${(r.tags.join(", ") || "-")} | ${(r.maskVoices.join(" ") || "-")} | ${(r.carrierVoices.join(" ") || "-")} | ${r.maskP} | ${r.carrierP} |`
+      );
+    }
+    lines.push("");
+  }
+
+  lines.push("#### NO_PHONETIC cases (no carrier vowels found)");
+  lines.push("");
+  if (!noPhonItems.length) {
+    lines.push("_none_");
+    lines.push("");
+  } else {
+    lines.push("| ID | Word | IPA | Tags | Mask | MaskP |");
+    lines.push("|---:|------|-----|------|------|-------|");
+    for (const r of noPhonItems) {
+      lines.push(
+        `| ${r.id} | **${r.word}** | ${r.ipa ?? "-"} | ${(r.tags.join(", ") || "-")} | ${(r.maskVoices.join(" ") || "-")} | ${r.maskP} |`
+      );
+    }
+    lines.push("");
+  }
 }
 
 describe("Comparative Spectrogram v0.2 — Corpus70 vs Classical100 (+ Albanian100) (and Latin/Greek split)", () => {
