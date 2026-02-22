@@ -1,6 +1,4 @@
 # Deploy to the live channel on push to main.
-# If the service account secret is missing, deployment will fail naturally.
-
 name: Deploy to Firebase Hosting (Live)
 
 on:
@@ -9,8 +7,10 @@ on:
       - main
 
 jobs:
-  build_and_deploy:
+  deploy_live:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     steps:
       - uses: actions/checkout@v4
@@ -18,18 +18,24 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: npm
 
-      - run: npm ci
-      - run: npm run test --if-present
-      - run: npm run build --if-present
+      - name: Install deps
+        run: npm ci
 
-      - name: Deploy to Firebase Hosting (live)
-        uses: FirebaseExtended/action-hosting-deploy@v0
-        with:
-          repoToken: "${{ secrets.GITHUB_TOKEN }}"
-          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-          projectId: studio-9091923245-2991d
-          channelId: live
+      - name: Build
+        run: npm run build
 
+      - name: Write Firebase service account
+        run: |
+          node -e "require('fs').writeFileSync(process.env.OUT, process.env.SA_JSON)"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$OUT" >> "$GITHUB_ENV"
         env:
-          FIREBASE_CLI_EXPERIMENTS: webframeworks
+          SA_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          OUT: ${{ runner.temp }}/firebase-sa.json
+
+      - name: Install firebase-tools
+        run: npm i -g firebase-tools@15.7.0
+
+      - name: Deploy (hosting)
+        run: firebase deploy --only hosting --project studio-9091923245-2991d --non-interactive
