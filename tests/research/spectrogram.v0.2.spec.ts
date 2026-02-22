@@ -462,7 +462,6 @@ describe("Comparative Spectrogram v0.2 — Corpus70 vs Classical100 (+ Albanian1
           iters: ITERS,
           seed: 444444,
         },
-
       {
         key: "latin",
         title: "Classical100 split — Latin-only",
