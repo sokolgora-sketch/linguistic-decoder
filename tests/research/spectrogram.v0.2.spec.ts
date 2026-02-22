@@ -335,7 +335,6 @@ function writeCorpusBlock(lines: string[], block: CorpusBlock) {
   if (!low.length) {
     lines.push("_none_");
     lines.push("");
-    return;
   }
 
   for (const tag of low) {
@@ -345,6 +344,62 @@ function writeCorpusBlock(lines: string[], block: CorpusBlock) {
     lines.push(`- **${tag}**: top=${top.topVowel} (${pct(top.topCount, top.total)}), p=${p.toFixed(3)}, carrierN=${agg.carrierN}`);
   }
   lines.push("");
+
+  // --- Divergence Microscope v0.1 -----------------------------------------
+  const MAX_ROWS = 12;
+
+  const divergeItems = block.items
+    .filter((x) => x.status === "DIVERGE")
+    .slice()
+    .sort(
+      (a, b) =>
+        String(a.carrierP).localeCompare(String(b.carrierP)) ||
+        String(a.maskP).localeCompare(String(b.maskP)) ||
+        String(a.word).localeCompare(String(b.word)) ||
+        String(a.id).localeCompare(String(b.id))
+    )
+    .slice(0, MAX_ROWS);
+
+  const noPhonItems = block.items
+    .filter((x) => x.status === "NO_PHONETIC")
+    .slice()
+    .sort((a, b) => String(a.id).localeCompare(String(b.id)) || String(a.word).localeCompare(String(b.word)))
+    .slice(0, MAX_ROWS);
+
+  lines.push("### Divergence microscope");
+  lines.push("");
+
+  lines.push("#### DIVERGE cases (mask ≠ carrier)");
+  lines.push("");
+  if (!divergeItems.length) {
+    lines.push("_none_");
+    lines.push("");
+  } else {
+    lines.push("| ID | Word | IPA | Tags | Mask | Carrier | MaskP | CarrierP |");
+    lines.push("|---:|------|-----|------|------|---------|-------|----------|");
+    for (const r of divergeItems) {
+      lines.push(
+        `| ${r.id} | **${r.word}** | ${r.ipa ?? "-"} | ${(r.tags.join(", ") || "-")} | ${(r.maskVoices.join(" ") || "-")} | ${(r.carrierVoices.join(" ") || "-")} | ${r.maskP} | ${r.carrierP} |`
+      );
+    }
+    lines.push("");
+  }
+
+  lines.push("#### NO_PHONETIC cases (no carrier vowels found)");
+  lines.push("");
+  if (!noPhonItems.length) {
+    lines.push("_none_");
+    lines.push("");
+  } else {
+    lines.push("| ID | Word | IPA | Tags | Mask | MaskP |");
+    lines.push("|---:|------|-----|------|------|-------|");
+    for (const r of noPhonItems) {
+      lines.push(
+        `| ${r.id} | **${r.word}** | ${r.ipa ?? "-"} | ${(r.tags.join(", ") || "-")} | ${(r.maskVoices.join(" ") || "-")} | ${r.maskP} |`
+      );
+    }
+    lines.push("");
+  }
 }
 
 describe("Comparative Spectrogram v0.2 — Corpus70 vs Classical100 (+ Albanian100) (and Latin/Greek split)", () => {
@@ -355,32 +410,32 @@ describe("Comparative Spectrogram v0.2 — Corpus70 vs Classical100 (+ Albanian1
 
     const corpus70MetaPath = path.join(root, "tests/research/corpus70.meta.v0.1.gemini.json");
     const classicalMetaPath = path.join(root, "tests/research/classical100.meta.v0.1.gemini-blind.json");
-      const albanianMetaPath = path.join(root, "tests/research/albanian100.meta.v0.1.gemini-blind.json");
+    const albanianMetaPath = path.join(root, "tests/research/albanian100.meta.v0.1.gemini-blind.json");
 
     if (!fs.existsSync(corpus70MetaPath)) throw new Error(`Missing: ${corpus70MetaPath}`);
     if (!fs.existsSync(classicalMetaPath)) throw new Error(`Missing: ${classicalMetaPath}`);
-      if (!fs.existsSync(albanianMetaPath)) throw new Error(`Missing: ${albanianMetaPath}`);
+    if (!fs.existsSync(albanianMetaPath)) throw new Error(`Missing: ${albanianMetaPath}`);
 
     const meta70 = readJson<Meta>(corpus70MetaPath);
     const metaC = readJson<Meta>(classicalMetaPath);
-      const metaSq = readJson<Meta>(albanianMetaPath);
+    const metaSq = readJson<Meta>(albanianMetaPath);
 
     const items70 = buildCorpus70Items(root, meta70);
     const itemsC = buildClassicalItems(root, metaC);
-      const itemsSq = buildAlbanianItems(root, metaSq);
+    const itemsSq = buildAlbanianItems(root, metaSq);
 
     const itemsLat = itemsC.filter((x) => x.id.startsWith("c3.lat."));
     const itemsGrk = itemsC.filter((x) => x.id.startsWith("c3.grk."));
 
     const tags = Array.isArray(metaC.allowedTags) ? metaC.allowedTags.map(String) : [];
-      const tagsSq = Array.isArray(metaSq.allowedTags) ? metaSq.allowedTags.map(String) : [];
+    const tagsSq = Array.isArray(metaSq.allowedTags) ? metaSq.allowedTags.map(String) : [];
     if (!tags.length) throw new Error("classical meta allowedTags missing");
-      if (!arrEq(tagsSq, tags)) throw new Error("albanian meta allowedTags mismatch vs classical");
+    if (!arrEq(tagsSq, tags)) throw new Error("albanian meta allowedTags mismatch vs classical");
 
     const ITERS = 2000;
 
     const blocks: CorpusBlock[] = [
-      {
+        {
         key: "corpus70",
         title: "Corpus70 (English-heavy) — Gemini-blind tags",
         metaVersion: String(meta70.version ?? "unknown"),
@@ -388,8 +443,8 @@ describe("Comparative Spectrogram v0.2 — Corpus70 vs Classical100 (+ Albanian1
         items: items70,
         iters: ITERS,
         seed: 7007007,
-      },
-      {
+        },
+        {
         key: "classical100",
         title: "Classical100 (Latin+Greek) — Gemini-blind tags",
         metaVersion: String(metaC.version ?? "unknown"),
@@ -397,7 +452,7 @@ describe("Comparative Spectrogram v0.2 — Corpus70 vs Classical100 (+ Albanian1
         items: itemsC,
         iters: ITERS,
         seed: 1001001,
-      },
+        },
         {
           key: "albanian100",
           title: "Albanian100 (sq) — IPA-required, Gemini-blind tags",
@@ -407,8 +462,7 @@ describe("Comparative Spectrogram v0.2 — Corpus70 vs Classical100 (+ Albanian1
           iters: ITERS,
           seed: 444444,
         },
-
-      {
+        {
         key: "latin",
         title: "Classical100 split — Latin-only",
         metaVersion: String(metaC.version ?? "unknown"),
@@ -416,8 +470,8 @@ describe("Comparative Spectrogram v0.2 — Corpus70 vs Classical100 (+ Albanian1
         items: itemsLat,
         iters: ITERS,
         seed: 222222,
-      },
-      {
+        },
+        {
         key: "greek",
         title: "Classical100 split — Greek-only",
         metaVersion: String(metaC.version ?? "unknown"),
@@ -425,7 +479,7 @@ describe("Comparative Spectrogram v0.2 — Corpus70 vs Classical100 (+ Albanian1
         items: itemsGrk,
         iters: ITERS,
         seed: 333333,
-      },
+        },
     ];
 
     const lines: string[] = [];
