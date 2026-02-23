@@ -218,8 +218,8 @@ describe("Compound Stress Albanian200 v0.1 — durability probe (Position→A, O
     lines.push("");
     lines.push("| Anchor | Core N | Core obs/p | Stress N | Stress obs/p |");
     lines.push("|--------|-------:|------------|---------:|--------------|");
-    lines.push(`| position→A | ${corePos.n} | ${corePos.obs}/${corePos.p.toFixed(3)} | ${stressPos.n} | ${stressPos.obs}/${stressPos.p.toFixed(3)} |`);
-    lines.push(`| order→I | ${coreOrd.n} | ${coreOrd.obs}/${coreOrd.p.toFixed(3)} | ${stressOrd.n} | ${stressOrd.obs}/${stressOrd.p.toFixed(3)} |`);
+    lines.push(`| position→A | ${corePos.n} | ${corePos.obs}/${corePos.p === 0 ? "<0.001" : corePos.p.toFixed(3)} | ${stressPos.n} | ${stressPos.obs}/${stressPos.p === 0 ? "<0.001" : stressPos.p.toFixed(3)} |`);
+    lines.push(`| order→I | ${coreOrd.n} | ${coreOrd.obs}/${coreOrd.p === 0 ? "<0.001" : coreOrd.p.toFixed(3)} | ${stressOrd.n} | ${stressOrd.obs}/${stressOrd.p === 0 ? "<0.001" : stressOrd.p.toFixed(3)} |`);
     lines.push("");
 
     lines.push("## Core distributions (carrierP)");
