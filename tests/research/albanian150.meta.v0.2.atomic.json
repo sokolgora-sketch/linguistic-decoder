@@ -1,0 +1,465 @@
+{
+  "version": "albanian150.meta.v0.2.atomic",
+  "allowedTags": [
+    "substance",
+    "motion",
+    "position",
+    "order",
+    "identity",
+    "cognition",
+    "expression",
+    "time"
+  ],
+  "tags": {
+    "sq.01": [
+      "substance"
+    ],
+    "sq.02": [
+      "substance"
+    ],
+    "sq.03": [
+      "substance"
+    ],
+    "sq.04": [
+      "substance"
+    ],
+    "sq.05": [
+      "substance"
+    ],
+    "sq.06": [
+      "substance"
+    ],
+    "sq.07": [
+      "substance"
+    ],
+    "sq.08": [
+      "substance"
+    ],
+    "sq.09": [
+      "substance"
+    ],
+    "sq.10": [
+      "substance"
+    ],
+    "sq.11": [
+      "substance"
+    ],
+    "sq.12": [
+      "substance"
+    ],
+    "sq.13": [
+      "substance"
+    ],
+    "sq.14": [
+      "substance"
+    ],
+    "sq.15": [
+      "time"
+    ],
+    "sq.16": [
+      "time"
+    ],
+    "sq.17": [
+      "substance"
+    ],
+    "sq.18": [
+      "position"
+    ],
+    "sq.19": [
+      "substance"
+    ],
+    "sq.20": [
+      "substance"
+    ],
+    "sq.21": [
+      "position"
+    ],
+    "sq.22": [
+      "position"
+    ],
+    "sq.23": [
+      "position"
+    ],
+    "sq.24": [
+      "position"
+    ],
+    "sq.25": [
+      "identity"
+    ],
+    "sq.26": [
+      "identity"
+    ],
+    "sq.27": [
+      "cognition"
+    ],
+    "sq.28": [
+      "cognition"
+    ],
+    "sq.29": [
+      "order"
+    ],
+    "sq.30": [
+      "order"
+    ],
+    "sq.31": [
+      "order"
+    ],
+    "sq.32": [
+      "order"
+    ],
+    "sq.33": [
+      "expression"
+    ],
+    "sq.34": [
+      "expression"
+    ],
+    "sq.35": [
+      "motion"
+    ],
+    "sq.36": [
+      "identity"
+    ],
+    "sq.37": [
+      "identity"
+    ],
+    "sq.38": [
+      "identity"
+    ],
+    "sq.39": [
+      "identity"
+    ],
+    "sq.40": [
+      "identity"
+    ],
+    "sq.41": [
+      "identity"
+    ],
+    "sq.42": [
+      "identity"
+    ],
+    "sq.43": [
+      "identity"
+    ],
+    "sq.44": [
+      "identity"
+    ],
+    "sq.45": [
+      "identity"
+    ],
+    "sq.46": [
+      "identity"
+    ],
+    "sq.47": [
+      "cognition"
+    ],
+    "sq.48": [
+      "cognition"
+    ],
+    "sq.49": [
+      "cognition"
+    ],
+    "sq.50": [
+      "cognition"
+    ],
+    "sq.51": [
+      "cognition"
+    ],
+    "sq.52": [
+      "cognition"
+    ],
+    "sq.53": [
+      "cognition"
+    ],
+    "sq.54": [
+      "expression"
+    ],
+    "sq.55": [
+      "expression"
+    ],
+    "sq.56": [
+      "expression"
+    ],
+    "sq.57": [
+      "expression"
+    ],
+    "sq.58": [
+      "expression"
+    ],
+    "sq.59": [
+      "cognition"
+    ],
+    "sq.60": [
+      "expression"
+    ],
+    "sq.61": [
+      "expression"
+    ],
+    "sq.62": [
+      "expression"
+    ],
+    "sq.63": [
+      "expression"
+    ],
+    "sq.64": [
+      "expression"
+    ],
+    "sq.65": [
+      "cognition"
+    ],
+    "sq.66": [
+      "motion"
+    ],
+    "sq.67": [
+      "motion"
+    ],
+    "sq.68": [
+      "motion"
+    ],
+    "sq.69": [
+      "motion"
+    ],
+    "sq.70": [
+      "motion"
+    ],
+    "sq.71": [
+      "motion"
+    ],
+    "sq.72": [
+      "motion"
+    ],
+    "sq.73": [
+      "motion"
+    ],
+    "sq.74": [
+      "motion"
+    ],
+    "sq.75": [
+      "motion"
+    ],
+    "sq.76": [
+      "motion"
+    ],
+    "sq.77": [
+      "motion"
+    ],
+    "sq.78": [
+      "motion"
+    ],
+    "sq.79": [
+      "motion"
+    ],
+    "sq.80": [
+      "motion"
+    ],
+    "sq.81": [
+      "position"
+    ],
+    "sq.82": [
+      "position"
+    ],
+    "sq.83": [
+      "position"
+    ],
+    "sq.84": [
+      "position"
+    ],
+    "sq.85": [
+      "position"
+    ],
+    "sq.86": [
+      "position"
+    ],
+    "sq.87": [
+      "position"
+    ],
+    "sq.88": [
+      "position"
+    ],
+    "sq.89": [
+      "position"
+    ],
+    "sq.90": [
+      "position"
+    ],
+    "sq.91": [
+      "time"
+    ],
+    "sq.92": [
+      "time"
+    ],
+    "sq.93": [
+      "time"
+    ],
+    "sq.94": [
+      "time"
+    ],
+    "sq.95": [
+      "time"
+    ],
+    "sq.96": [
+      "time"
+    ],
+    "sq.97": [
+      "time"
+    ],
+    "sq.98": [
+      "time"
+    ],
+    "sq.99": [
+      "time"
+    ],
+    "sq.100": [
+      "time"
+    ],
+    "sq.101": [
+      "motion"
+    ],
+    "sq.102": [
+      "cognition"
+    ],
+    "sq.103": [
+      "substance"
+    ],
+    "sq.104": [
+      "cognition"
+    ],
+    "sq.105": [
+      "motion"
+    ],
+    "sq.106": [
+      "cognition"
+    ],
+    "sq.107": [
+      "motion"
+    ],
+    "sq.108": [
+      "substance"
+    ],
+    "sq.109": [
+      "cognition"
+    ],
+    "sq.110": [
+      "motion"
+    ],
+    "sq.111": [
+      "substance"
+    ],
+    "sq.112": [
+      "cognition"
+    ],
+    "sq.113": [
+      "motion"
+    ],
+    "sq.114": [
+      "substance"
+    ],
+    "sq.115": [
+      "cognition"
+    ],
+    "sq.116": [
+      "motion"
+    ],
+    "sq.117": [
+      "motion"
+    ],
+    "sq.118": [
+      "motion"
+    ],
+    "sq.119": [
+      "motion"
+    ],
+    "sq.120": [
+      "motion"
+    ],
+    "sq.121": [
+      "motion"
+    ],
+    "sq.122": [
+      "motion"
+    ],
+    "sq.123": [
+      "motion"
+    ],
+    "sq.124": [
+      "motion"
+    ],
+    "sq.125": [
+      "motion"
+    ],
+    "sq.126": [
+      "motion"
+    ],
+    "sq.127": [
+      "motion"
+    ],
+    "sq.128": [
+      "motion"
+    ],
+    "sq.129": [
+      "motion"
+    ],
+    "sq.130": [
+      "motion"
+    ],
+    "sq.131": [
+      "cognition"
+    ],
+    "sq.132": [
+      "cognition"
+    ],
+    "sq.133": [
+      "cognition"
+    ],
+    "sq.134": [
+      "cognition"
+    ],
+    "sq.135": [
+      "cognition"
+    ],
+    "sq.136": [
+      "cognition"
+    ],
+    "sq.137": [
+      "cognition"
+    ],
+    "sq.138": [
+      "cognition"
+    ],
+    "sq.139": [
+      "cognition"
+    ],
+    "sq.140": [
+      "cognition"
+    ],
+    "sq.141": [
+      "substance"
+    ],
+    "sq.142": [
+      "substance"
+    ],
+    "sq.143": [
+      "substance"
+    ],
+    "sq.144": [
+      "substance"
+    ],
+    "sq.145": [
+      "substance"
+    ],
+    "sq.146": [
+      "substance"
+    ],
+    "sq.147": [
+      "substance"
+    ],
+    "sq.148": [
+      "expression"
+    ],
+    "sq.149": [
+      "expression"
+    ],
+    "sq.150": [
+      "expression"
+    ]
+  }
+}
