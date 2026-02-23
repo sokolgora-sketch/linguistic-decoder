@@ -36,7 +36,8 @@
     "canon:c2:update": "CANON_C2_UPDATE=1 npm test -- tests/validation/canonC2.runner.v0.3.spec.ts",
     "research:decomp:harness:position": "npm test -- tests/research/decompositionHarness.position.v0.1.spec.ts",
     "research:albanian150:pilot": "npm test -- tests/research/semanticPilot.albanian150.v0.1.spec.ts",
-    "research:albanian150:audit": "npm test -- tests/research/tagAudit.albanian150.v0.1.spec.ts"
+    "research:albanian150:audit": "npm test -- tests/research/tagAudit.albanian150.v0.1.spec.ts",
+    "research:albanian150:pilot:pure": "npm test -- tests/research/semanticPilot.albanian150.pure.v0.1.spec.ts"
   },
   "dependencies": {
     "@genkit-ai/google-genai": "^1.20.0",
