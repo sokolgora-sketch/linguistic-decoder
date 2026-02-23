@@ -88,9 +88,8 @@ describe("Tag Audit Albanian200 v0.1 — tag pollution + carrier distributions",
     if (!fs.existsSync(metaPath)) throw new Error(`Missing: ${metaPath}`);
 
     const words = parseWordsFile(fs.readFileSync(wordsPath, "utf8"));
-    if (words.length !== 150) throw new Error(`Expected 150 words, got ${words.length}`);
-
-    const meta = readJson<Meta>(metaPath);
+    if (words.length !== 200) throw new Error(`Expected 200 words, got ${words.length}`);
+const meta = readJson<Meta>(metaPath);
     const allowedTags = Array.isArray(meta.allowedTags) ? meta.allowedTags.map(String) : [];
     if (!allowedTags.length) throw new Error("Meta.allowedTags missing/empty");
     const tagMap = meta.tags && typeof meta.tags === "object" ? meta.tags : {};
@@ -112,7 +111,7 @@ describe("Tag Audit Albanian200 v0.1 — tag pollution + carrier distributions",
     });
 
     const noCarrier = items.filter((x) => x.carrierVoices.length === 0).length;
-    if (noCarrier) throw new Error(`Expected 0 NO_PHONETIC in Albanian150, got ${noCarrier}`);
+    if (noCarrier) throw new Error(`Expected 0 NO_PHONETIC in Albanian200, got ${noCarrier}`);
 
     const multiTagged = items.filter((x) => x.tags.length > 1);
     const diverge = items.filter((x) => x.status === "DIVERGE");
