@@ -41,7 +41,8 @@
     "research:albanian150:pilot:matrix": "npm test -- tests/research/semanticPilot.albanian150.matrix.v0.1.spec.ts",
     "research:albanian200:pilot": "npm test -- tests/research/semanticPilot.albanian200.v0.1.spec.ts",
     "research:albanian200:pilot:matrix": "npm test -- tests/research/semanticPilot.albanian200.matrix.v0.1.spec.ts",
-    "research:albanian200:audit": "npm test -- tests/research/tagAudit.albanian200.v0.1.spec.ts"
+    "research:albanian200:audit": "npm test -- tests/research/tagAudit.albanian200.v0.1.spec.ts",
+    "research:albanian200:compoundStress": "npm test -- tests/research/compoundStress.albanian200.v0.1.spec.ts"
   },
   "dependencies": {
     "@genkit-ai/google-genai": "^1.20.0",
