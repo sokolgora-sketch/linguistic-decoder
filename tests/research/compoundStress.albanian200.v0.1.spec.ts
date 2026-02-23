@@ -59,22 +59,46 @@ function shuffleInPlace<T>(xs: T[], rnd: () => number) {
 
 // p(count>=obs) by permutation of carrier primaries inside the tag bucket
 function anchorPvalue(items: Item[], tag: string, anchor: Vowel, iters: number, seed: number) {
-  const bucket = items.filter((x) => x.tags.includes(tag));
-  const primaries = bucket.map((b) => b.carrierP).filter((p) => p !== "NONE");
-  const obs = primaries.filter((p) => p === anchor).length;
-  const n = primaries.length;
+  // Correct null: shuffle carrier primaries ACROSS all items (within this set),
+  // then recompute how many anchors land in the tag bucket.
+  const bucketIdx: number[] = [];
+  for (let i = 0; i < items.length; i++) {
+    if (items[i].tags.includes(tag)) bucketIdx.push(i);
+  }
+
+  const permIdx: number[] = [];
+  for (let i = 0; i < items.length; i++) {
+    if (items[i].carrierP !== "NONE") permIdx.push(i);
+  }
+
+  const primaries = permIdx.map((i) => items[i].carrierP);
+  const obs = bucketIdx.filter((i) => items[i].carrierP === anchor).length;
+
+  const n = bucketIdx.length;
   if (!n) return { n: 0, obs: 0, p: 1 };
+
+  const pos = new Map<number, number>();
+  for (let k = 0; k < permIdx.length; k++) pos.set(permIdx[k], k);
 
   const rnd = mulberry32(seed);
   let ge = 0;
+
   for (let k = 0; k < iters; k++) {
     const tmp = primaries.slice();
     shuffleInPlace(tmp, rnd);
-    const c = tmp.filter((p) => p === anchor).length;
+
+    let c = 0;
+    for (const i of bucketIdx) {
+      const pk = pos.get(i);
+      if (pk == null) continue;
+      if (tmp[pk] === anchor) c++;
+    }
     if (c >= obs) ge++;
   }
+
   return { n, obs, p: ge / iters };
 }
+
 
 function parseCoreWordsFile(text: string): CoreWord[] {
   const out: CoreWord[] = [];
