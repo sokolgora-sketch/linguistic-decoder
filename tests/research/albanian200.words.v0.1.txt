@@ -160,7 +160,7 @@ sq.158  rreth       /rreth/
 sq.159  fillim      /fillim/
 sq.160  fund        /fund/
 sq.161  radhë       /radə/
-sq.162  rregull  /rɛˈɡuɫ/
+sq.162  shkallë  /ʃkaɫə/
 sq.163  seri        /seri/
 sq.164  fazë        /fazə/
 sq.165  vijë        /vijə/
