@@ -120,7 +120,7 @@ const meta = readJson<Meta>(metaPath);
     lines.push("# Tag Audit Albanian200 v0.1");
     lines.push("");
     lines.push("- Purpose: identify tag pollution (carrierP spread) before Albanian200.");
-    lines.push(`- corpus: \`tests/research/albanian200.words.v0.1.txt\` (150)`);
+    lines.push(`- corpus: \`tests/research/albanian200.words.v0.1.txt\` (${words.length})`);
     lines.push(`- meta: \`${String(meta.version ?? "unknown")}\``);
     lines.push(`- allowedTags: ${allowedTags.join(", ")}`);
     lines.push("");
