@@ -38,7 +38,9 @@
     "research:albanian150:pilot": "npm test -- tests/research/semanticPilot.albanian150.v0.1.spec.ts",
     "research:albanian150:audit": "npm test -- tests/research/tagAudit.albanian150.v0.1.spec.ts",
     "research:albanian150:pilot:pure": "npm test -- tests/research/semanticPilot.albanian150.pure.v0.1.spec.ts",
-    "research:albanian150:pilot:matrix": "npm test -- tests/research/semanticPilot.albanian150.matrix.v0.1.spec.ts"
+    "research:albanian150:pilot:matrix": "npm test -- tests/research/semanticPilot.albanian150.matrix.v0.1.spec.ts",
+    "research:albanian200:pilot": "npm test -- tests/research/semanticPilot.albanian200.v0.1.spec.ts",
+    "research:albanian200:pilot:matrix": "npm test -- tests/research/semanticPilot.albanian200.matrix.v0.1.spec.ts"
   },
   "dependencies": {
     "@genkit-ai/google-genai": "^1.20.0",
