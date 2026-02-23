@@ -184,7 +184,7 @@ describe("Compound Stress Albanian200 v0.2 — root-anchored retention (Position
     const ord = byTag("order");
 
     const posPv = matchPvalue(pos, ITERS, SEED ^ 0xA11CE);
-    const ordPv = matchPvalue(ord, ITERS, SEED ^ 0x0RD3R);
+    const ordPv = matchPvalue(ord, ITERS, SEED ^ 0x0D3D3);
 
     const fmt = (x: { obs: number; p: number }) => `${x.obs}/${x.p === 0 ? "<0.001" : x.p.toFixed(3)}`;
     const rate = (xs: Item[]) => {
