@@ -235,7 +235,8 @@ describe("Semantic Pilot Albanian150 MATRIX v0.1 — Tag×Vowel p-matrix (Albani
     lines.push("");
 
     fs.mkdirSync(outDir, { recursive: true });
-    fs.writeFileSync(outMd, lines.join("\\n") + "\\n", "utf8");
-    expect(fs.existsSync(outMd)).toBe(true);
+    const outText = lines.join("\n").replace(/\\n/g, "\n");
+      fs.writeFileSync(outMd, outText + "\n", "utf8");
+expect(fs.existsSync(outMd)).toBe(true);
   });
 });
