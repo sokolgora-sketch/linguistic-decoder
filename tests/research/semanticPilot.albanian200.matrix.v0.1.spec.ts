@@ -191,9 +191,8 @@ describe("Semantic Pilot Albanian200 MATRIX v0.1 — Tag×Vowel p-matrix (Albani
     if (!fs.existsSync(metaPath)) throw new Error(`Missing meta file: ${metaPath}`);
 
     const words = parseWordsFile(fs.readFileSync(wordsPath, "utf8"));
-    if (words.length !== 150) throw new Error(`Expected 150 albanian words, got ${words.length}`);
-
-    const meta = readJson<Meta>(metaPath);
+    if (words.length !== 200) throw new Error(`Expected 200 albanian words, got ${words.length}`);
+const meta = readJson<Meta>(metaPath);
     const allowedTags = Array.isArray(meta.allowedTags) ? meta.allowedTags.map(String) : [];
     if (!allowedTags.length) throw new Error("Meta.allowedTags missing/empty");
 

@@ -160,7 +160,7 @@ sq.158  rreth       /rreth/
 sq.159  fillim      /fillim/
 sq.160  fund        /fund/
 sq.161  radhë       /radə/
-sq.162  rend        /rend/
+sq.162  rregull  /rɛˈɡuɫ/
 sq.163  seri        /seri/
 sq.164  fazë        /fazə/
 sq.165  vijë        /vijə/
@@ -184,10 +184,10 @@ sq.180  rrëshqitje  /rəʃqitje/
 sq.181  kërcim      /kərcim/
 sq.182  kthesë      /kthesə/
 
-sq.183  sot         /sot/
-sq.184  nesër       /nesər/
-sq.185  dje         /dje/
-sq.186  tani        /tani/
+sq.183  orë  /oɾə/
+sq.184  çast  /tʃast/
+sq.185  shekull  /ʃekuɫ/
+sq.186  pranverë  /pɾanˈverə/
 sq.187  vonë        /vonə/
 sq.188  herët       /herət/
 sq.189  javë        /javə/
