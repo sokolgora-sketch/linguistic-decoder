@@ -218,3 +218,18 @@ cw.47  深紅    ㄕㄣㄏㄨㄥˊ         control_color
 cw.48  亮橘    ㄌㄧㄤˋㄐㄩˊ         control_color
 cw.49  土黃    ㄊㄨˇㄏㄨㄤˊ         control_color
 cw.50  暗灰    ㄢˋㄏㄨㄟ           control_color
+
+# ------------------------------------------------------------
+# CONTROL_MISC — v0.4-controlMisc10
+# Non-color negative control bucket (common nouns/pronouns), explicit nuclei only.
+# ------------------------------------------------------------
+cm.01  人  ㄖㄣˊ    control_misc
+cm.02  我  ㄨㄛˇ    control_misc
+cm.03  你  ㄋㄧˇ    control_misc
+cm.04  他  ㄊㄚ     control_misc
+cm.05  家  ㄐㄧㄚ   control_misc
+cm.06  書  ㄕㄨ     control_misc
+cm.07  車  ㄔㄜ     control_misc
+cm.08  飯  ㄈㄢˋ    control_misc
+cm.09  水  ㄕㄨㄟˇ  control_misc
+cm.10  錢  ㄑㄧㄢˊ  control_misc
