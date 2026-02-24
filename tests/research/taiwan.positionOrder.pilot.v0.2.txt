@@ -88,7 +88,49 @@ cw.03  藍  ㄌㄢˊ    control_color
 cw.04  黃  ㄏㄨㄤˊ  control_color
 cw.05  黑  ㄏㄟ     control_color
 cw.06  白  ㄅㄞˊ    control_color
-cw.07  紫  ㄗˇ      control_color
+cw.07  咖啡色  ㄎㄚㄈㄟㄙㄜˋ  control_color
 cw.08  灰  ㄏㄨㄟ   control_color
 cw.09  橘  ㄐㄩˊ    control_color
 cw.10  靛  ㄉㄧㄢˋ  control_color
+
+# ------------------------------------------------------------
+# ORDER — v0.2-order10c (tw.41–tw.50)
+# ------------------------------------------------------------
+tw.41  流程    ㄌㄧㄡˊㄔㄥˊ        order
+tw.42  步驟表  ㄅㄨˋㄗㄡˋㄅㄧㄠˇ     order
+tw.43  連接    ㄌㄧㄢˊㄐㄧㄝ         order
+tw.44  連結    ㄌㄧㄢˊㄐㄧㄝˊ        order
+tw.45  依照    ㄧㄓㄠˋ              order
+tw.46  依循    ㄧㄒㄩㄣˊ             order
+tw.47  按序    ㄢˋㄒㄩˋ              order
+tw.48  排序    ㄆㄞˊㄒㄩˋ            order
+tw.49  排程    ㄆㄞˊㄔㄥˊ            order
+tw.50  逐步    ㄓㄨˊㄅㄨˋ            order
+
+# ------------------------------------------------------------
+# POSITION — v0.2-position10c (tw.51–tw.60)
+# ------------------------------------------------------------
+tw.51  這裡    ㄓㄜˋㄌㄧˇ            position
+tw.52  那裡    ㄋㄚˋㄌㄧˇ            position
+tw.53  附近    ㄈㄨˋㄐㄧㄣˋ           position
+tw.54  之間    ㄓㄐㄧㄢ               position
+tw.55  周圍    ㄓㄡㄨㄟˊ             position
+tw.56  上面    ㄕㄤˋㄇㄧㄢˋ           position
+tw.57  下面    ㄒㄧㄚˋㄇㄧㄢˋ          position
+tw.58  旁邊    ㄆㄤˊㄅㄧㄢ            position
+tw.59  中間    ㄓㄨㄥㄐㄧㄢ            position
+tw.60  遠方    ㄩㄢˇㄈㄤ             position
+
+# ------------------------------------------------------------
+# CONTROL_COLOR — v0.2-control10c (cw.21–cw.30)
+# ------------------------------------------------------------
+cw.21  天藍      ㄊㄧㄢㄌㄢˊ           control_color
+cw.22  草綠      ㄘㄠˇㄌㄩˋ            control_color
+cw.23  墨綠      ㄇㄛˋㄌㄩˋ            control_color
+cw.24  卡其色    ㄎㄚˇㄑㄧˊㄙㄜˋ         control_color
+cw.25  奶油色    ㄋㄞˇㄧㄡˊㄙㄜˋ         control_color
+cw.26  珊瑚色    ㄕㄢㄏㄨˊㄙㄜˋ         control_color
+cw.27  橄欖綠    ㄍㄢˇㄌㄢˇㄌㄩˋ         control_color
+cw.28  寶藍      ㄅㄠˇㄌㄢˊ            control_color
+cw.29  淺灰      ㄑㄧㄢˇㄏㄨㄟ          control_color
+cw.30  米白      ㄇㄧˇㄅㄞˊ            control_color
