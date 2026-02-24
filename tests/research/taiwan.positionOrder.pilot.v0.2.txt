@@ -46,3 +46,33 @@ tw.17  高    ㄍㄠ         position
 tw.18  低    ㄉㄧ         position
 tw.19  上方  ㄕㄤˋㄈㄤ     position
 tw.20  下方  ㄒㄧㄚˋㄈㄤ    position
+
+# ------------------------------------------------------------
+# ORDER — v0.2-order10 (additional)
+# NOTE: no apical/implicit nucleus syllables (ㄙˋ/ㄘˋ/ㄗˋ etc).
+# ------------------------------------------------------------
+tw.31  開始  ㄎㄞㄕˇ        order
+tw.32  結束  ㄐㄧㄝˊㄕㄨˋ    order
+tw.33  順序  ㄕㄨㄣˋㄒㄩˋ    order
+tw.34  依序  ㄧㄒㄩˋ        order
+tw.35  階段  ㄐㄧㄝㄉㄨㄢˋ    order
+tw.36  程序  ㄔㄥˊㄒㄩˋ      order
+tw.37  步驟  ㄅㄨˋㄗㄡˋ      order
+tw.38  序號  ㄒㄩˋㄏㄠˋ      order
+tw.39  連續  ㄌㄧㄢˊㄒㄩˋ     order
+tw.40  段落  ㄉㄨㄢˋㄌㄨㄛˋ    order
+
+# ------------------------------------------------------------
+# CONTROL_COLOR — v0.2-control10b (additional)
+# Negative control bucket (should stay closer to “noise”).
+# ------------------------------------------------------------
+cw.11  棕    ㄗㄨㄥ         control_color
+cw.12  金    ㄐㄧㄣ         control_color
+cw.13  銀    ㄧㄣˊ         control_color
+cw.14  粉紅  ㄈㄣˇㄏㄨㄥˊ     control_color
+cw.15  米色  ㄇㄧˇㄙㄜˋ       control_color
+cw.16  褐色  ㄏㄜˊㄙㄜˋ       control_color
+cw.17  淡藍  ㄉㄢˋㄌㄢˊ      control_color
+cw.18  深綠  ㄕㄣㄌㄩˋ       control_color
+cw.19  亮黃  ㄌㄧㄤˋㄏㄨㄤˊ    control_color
+cw.20  乳白  ㄖㄨˇㄅㄞˊ       control_color
