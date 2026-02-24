@@ -31,3 +31,18 @@ tw.30     順      ㄕㄨㄣˋ      order
 # cw.01   紅   ㄏㄨㄥˊ   control_color
 # cw.02   藍   ㄌㄢˊ     control_color
 # ... add more (verify Zhuyin from a trusted source)
+
+# ------------------------------------------------------------
+# POSITION — v0.2-position10 (additional)
+# NOTE: verify Zhuyin quickly if you want (MOE / your IME), but these are standard.
+# ------------------------------------------------------------
+tw.11  東    ㄉㄨㄥ       position
+tw.12  西    ㄒㄧ         position
+tw.13  南    ㄋㄢˊ       position
+tw.14  北    ㄅㄟˇ       position
+tw.15  近    ㄐㄧㄣˋ      position
+tw.16  遠    ㄩㄢˇ       position
+tw.17  高    ㄍㄠ         position
+tw.18  低    ㄉㄧ         position
+tw.19  上方  ㄕㄤˋㄈㄤ     position
+tw.20  下方  ㄒㄧㄚˋㄈㄤ    position

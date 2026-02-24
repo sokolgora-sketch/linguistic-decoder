@@ -54,21 +54,45 @@ function distPrimaries(items: Item[]) {
   return parts.join(", ") || "NONE:0";
 }
 
-// p(count>=obs) by permutation of primaries within the tag bucket
-function anchorPvalue(items: Item[], anchor: Vowel, iters: number, seed: number) {
-  const primaries = items.map((x) => x.primary).filter((p) => p !== "NONE") as Vowel[];
-  const obs = primaries.filter((p) => p === anchor).length;
-  const n = primaries.length;
+// p(count>=obs) under null where primaries are exchangeable across items (within this set).
+function anchorPvalue(allItems: Item[], tag: string, anchor: Vowel, iters: number, seed: number) {
+  // Tag bucket indices (test statistic computed on these)
+  const bucketIdx: number[] = [];
+  // Indices of items that have a primary (we permute these)
+  const permIdx: number[] = [];
+
+  for (let k = 0; k < allItems.length; k++) {
+    if (allItems[k].tag === tag) bucketIdx.push(k);
+    if (allItems[k].primary !== "NONE") permIdx.push(k);
+  }
+
+  const obs = bucketIdx.filter((k) => allItems[k].primary === anchor).length;
+  const n = bucketIdx.filter((k) => allItems[k].primary !== "NONE").length;
   if (!n) return { n: 0, obs: 0, p: 1 };
+
+  const primaries = permIdx.map((k) => allItems[k].primary as Vowel);
 
   const rnd = mulberry32(seed);
   let ge = 0;
-  for (let k = 0; k < iters; k++) {
+
+  for (let iter = 0; iter < iters; iter++) {
     const tmp = primaries.slice();
     shuffleInPlace(tmp, rnd);
-    const c = tmp.filter((p) => p === anchor).length;
+
+    // map item index -> shuffled primary
+    const map = new Map<number, Vowel>();
+    for (let j = 0; j < permIdx.length; j++) map.set(permIdx[j], tmp[j]);
+
+    let c = 0;
+    for (const k of bucketIdx) {
+      if (allItems[k].primary === "NONE") continue;
+      const p1 = map.get(k) ?? (allItems[k].primary as Vowel);
+      if (p1 === anchor) c++;
+    }
+
     if (c >= obs) ge++;
   }
+
   return { n, obs, p: ge / iters };
 }
 
@@ -133,7 +157,7 @@ describe("Taiwan Position/Order Pilot v0.2 — Zhuyin distribution + anchors + c
 
     for (const [tag, anchor] of Object.entries(anchors)) {
       const bucket = items.filter((x) => x.tag === tag);
-      const pv = anchorPvalue(bucket, anchor, ITERS, (SEED ^ (tag === "position" ? 0xA11CE : 0x0D3D3)) >>> 0);
+      const pv = anchorPvalue(items, tag, anchor, ITERS, (SEED ^ (tag === "position" ? 0xA11CE : 0x0D3D3)) >>> 0);
       lines.push(`| ${tag}→${anchor} | ${bucket.length} | ${fmt(pv)} |`);
     }
 
