@@ -134,3 +134,45 @@ cw.27  橄欖綠    ㄍㄢˇㄌㄢˇㄌㄩˋ         control_color
 cw.28  寶藍      ㄅㄠˇㄌㄢˊ            control_color
 cw.29  淺灰      ㄑㄧㄢˇㄏㄨㄟ          control_color
 cw.30  米白      ㄇㄧˇㄅㄞˊ            control_color
+
+# ------------------------------------------------------------
+# POSITION — v0.2-step40 (+10)
+# ------------------------------------------------------------
+tw.61  上面    ㄕㄤˋㄇㄧㄢˋ     position
+tw.62  下面    ㄒㄧㄚˋㄇㄧㄢˋ     position
+tw.63  前面    ㄑㄧㄢˊㄇㄧㄢˋ     position
+tw.64  後面    ㄏㄡˋㄇㄧㄢˋ       position
+tw.65  裡面    ㄌㄧˇㄇㄧㄢˋ       position
+tw.66  外面    ㄨㄞˋㄇㄧㄢˋ       position
+tw.67  左邊    ㄗㄨㄛˇㄅㄧㄢ       position
+tw.68  右邊    ㄧㄡˋㄅㄧㄢ         position
+tw.69  中間    ㄓㄨㄥㄐㄧㄢ         position
+tw.70  附近    ㄈㄨˋㄐㄧㄣˋ       position
+
+# ------------------------------------------------------------
+# ORDER — v0.2-step40 (+10)
+# ------------------------------------------------------------
+tw.71  規則    ㄍㄨㄟㄗㄜˊ       order
+tw.72  規範    ㄍㄨㄟㄈㄢˋ       order
+tw.73  進度    ㄐㄧㄣˋㄉㄨˋ       order
+tw.74  流程    ㄌㄧㄡˊㄔㄥˊ       order
+tw.75  排列    ㄆㄞˊㄌㄧㄝˋ       order
+tw.76  順番    ㄕㄨㄣˋㄈㄢ         order
+tw.77  依照    ㄧㄓㄠˋ            order
+tw.78  計畫    ㄐㄧˋㄏㄨㄚˋ       order
+tw.79  方案    ㄈㄤㄢˋ            order
+tw.80  記錄    ㄐㄧˋㄌㄨˋ         order
+
+# ------------------------------------------------------------
+# CONTROL_COLOR — v0.2-step40 (+10)
+# ------------------------------------------------------------
+cw.31  彩色      ㄘㄞˇㄙㄜˋ         control_color
+cw.32  奶油色    ㄋㄞˇㄧㄡˊㄙㄜˋ     control_color
+cw.33  天藍色    ㄊㄧㄢㄌㄢˊㄙㄜˋ     control_color
+cw.34  淺灰      ㄑㄧㄢˇㄏㄨㄟ        control_color
+cw.35  深灰      ㄕㄣㄏㄨㄟ           control_color
+cw.36  草綠      ㄘㄠˇㄌㄩˋ           control_color
+cw.37  桃紅      ㄊㄠˊㄏㄨㄥˊ         control_color
+cw.38  墨綠      ㄇㄛˋㄌㄩˋ           control_color
+cw.39  銀灰      ㄧㄣˊㄏㄨㄟ          control_color
+cw.40  金黃      ㄐㄧㄣㄏㄨㄤˊ         control_color
