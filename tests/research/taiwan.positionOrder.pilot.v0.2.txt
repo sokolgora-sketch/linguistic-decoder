@@ -76,3 +76,4 @@ cw.17  淡藍  ㄉㄢˋㄌㄢˊ      control_color
 cw.18  深綠  ㄕㄣㄌㄩˋ       control_color
 cw.19  亮黃  ㄌㄧㄤˋㄏㄨㄤˊ    control_color
 cw.20  乳白  ㄖㄨˇㄅㄞˊ       control_color
+
