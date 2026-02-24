@@ -176,3 +176,45 @@ cw.37  桃紅      ㄊㄠˊㄏㄨㄥˊ         control_color
 cw.38  墨綠      ㄇㄛˋㄌㄩˋ           control_color
 cw.39  銀灰      ㄧㄣˊㄏㄨㄟ          control_color
 cw.40  金黃      ㄐㄧㄣㄏㄨㄤˊ         control_color
+
+# ------------------------------------------------------------
+# POSITION — v0.2-step50 (+10)
+# ------------------------------------------------------------
+tw.81  內側    ㄋㄟˋㄘㄜˋ        position
+tw.82  外側    ㄨㄞˋㄘㄜˋ        position
+tw.83  左側    ㄗㄨㄛˇㄘㄜˋ       position
+tw.84  右側    ㄧㄡˋㄘㄜˋ        position
+tw.85  前方    ㄑㄧㄢˊㄈㄤ        position
+tw.86  後方    ㄏㄡˋㄈㄤ          position
+tw.87  近處    ㄐㄧㄣˋㄔㄨˋ       position
+tw.88  遠處    ㄩㄢˇㄔㄨˋ         position
+tw.89  周圍    ㄓㄡㄨㄟˊ          position
+tw.90  對面    ㄉㄨㄟˋㄇㄧㄢˋ      position
+
+# ------------------------------------------------------------
+# ORDER — v0.2-step50 (+10)
+# ------------------------------------------------------------
+tw.91   編號    ㄅㄧㄢㄏㄠˋ         order
+tw.92   代碼    ㄉㄞˋㄇㄚˇ          order
+tw.93   索引    ㄙㄨㄛˇㄧㄣˇ         order
+tw.94   目錄    ㄇㄨˋㄌㄨˋ          order
+tw.95   清單    ㄑㄧㄥㄉㄢ           order
+tw.96   排序    ㄆㄞˊㄒㄩˋ           order
+tw.97   章節    ㄓㄤㄐㄧㄝˊ          order
+tw.98   序列    ㄒㄩˋㄌㄧㄝˋ         order
+tw.99   順序表  ㄕㄨㄣˋㄒㄩˋㄅㄧㄠˇ    order
+tw.100  優先    ㄧㄡㄒㄧㄢ           order
+
+# ------------------------------------------------------------
+# CONTROL_COLOR — v0.2-step50 (+10)
+# ------------------------------------------------------------
+cw.41  橙色    ㄔㄥˊㄙㄜˋ         control_color
+cw.42  赭色    ㄓㄜˇㄙㄜˋ          control_color
+cw.43  米白    ㄇㄧˇㄅㄞˊ          control_color
+cw.44  淺藍    ㄑㄧㄢˇㄌㄢˊ         control_color
+cw.45  深藍    ㄕㄣㄌㄢˊ           control_color
+cw.46  淺綠    ㄑㄧㄢˇㄌㄩˋ         control_color
+cw.47  深紅    ㄕㄣㄏㄨㄥˊ         control_color
+cw.48  亮橘    ㄌㄧㄤˋㄐㄩˊ         control_color
+cw.49  土黃    ㄊㄨˇㄏㄨㄤˊ         control_color
+cw.50  暗灰    ㄢˋㄏㄨㄟ           control_color
