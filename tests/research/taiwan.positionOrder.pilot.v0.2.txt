@@ -31,3 +31,18 @@ tw.30     順      ㄕㄨㄣˋ      order
 # cw.01   紅   ㄏㄨㄥˊ   control_color
 # cw.02   藍   ㄌㄢˊ     control_color
 # ... add more (verify Zhuyin from a trusted source)
+
+# ------------------------------------------------------------
+# CONTROL_COLOR — v0.2-control10
+# Added as a negative control bucket (should look closer to random).
+# ------------------------------------------------------------
+cw.01  紅  ㄏㄨㄥˊ  control_color
+cw.02  綠  ㄌㄩˋ    control_color
+cw.03  藍  ㄌㄢˊ    control_color
+cw.04  黃  ㄏㄨㄤˊ  control_color
+cw.05  黑  ㄏㄟ     control_color
+cw.06  白  ㄅㄞˊ    control_color
+cw.07  灰  ㄏㄨㄟ   control_color
+cw.08  橘  ㄐㄩˊ    control_color
+cw.09  靛  ㄉㄧㄢˋ  control_color
+cw.10  青  ㄑㄧㄥ   control_color
