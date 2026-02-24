@@ -46,7 +46,8 @@
     "research:albanian200:compoundStress:v0.2": "npm test -- tests/research/compoundStress.albanian200.v0.2.spec.ts",
     "research:albanian200:gegProbe": "npm test -- tests/research/gegProbe.albanian200.v0.1.spec.ts",
     "research:taiwan:positionOrder:pilot:v0.1": "npm test -- tests/research/taiwan.positionOrder.pilot.v0.1.spec.ts",
-    "research:taiwan:positionOrder:pilot:v0.2": "npm test -- tests/research/taiwan.positionOrder.pilot.v0.2.spec.ts"
+    "research:taiwan:positionOrder:pilot:v0.2": "npm test -- tests/research/taiwan.positionOrder.pilot.v0.2.spec.ts",
+    "research:taiwan:positionOrder:pilot:v0.3": "npm test -- tests/research/taiwan.positionOrder.pilot.v0.3.spec.ts"
   },
   "dependencies": {
     "@genkit-ai/google-genai": "^1.20.0",
