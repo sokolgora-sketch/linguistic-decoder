@@ -1,0 +1,32 @@
+# Albanian200 Gegë Probe v0.1 (Geg-sim IPA derived from v0.2 stress set)
+# rules: ^/pə([rɾ])/ -> /p$1/ ; terminal /ə/ drop
+# columns: id word ipa tag anchor anchor_ipa
+
+cs.01  afërsi  /aˈfəɾsi/  position  afër  /ˈafəɾ/
+cs.02  afërsisht  /aˈfəɾsiʃt/  position  afër  /ˈafəɾ/
+cs.03  largësi  /laɾˈɡəsi/  position  larg  /laɾg/
+cs.04  largët  /laɾˈɡət/  position  larg  /laɾg/
+cs.05  lartësi  /laɾˈtəsi/  position  lart  /laɾt/
+cs.06  lartësor  /laɾtəˈsoɾ/  position  lart  /laɾt/
+cs.07  jashtëm  /jaʃˈtəm/  position  jashtë  /jaʃt/
+cs.08  brendësi  /bɾɛnˈdəsi/  position  brenda  /bɾenˈda/
+cs.09  brendshëm  /bɾɛnˈdʃəm/  position  brenda  /bɾenˈda/
+cs.10  përballë  /pɾˈbaɫ/  position  ballë  /ˈbaɫ/
+cs.11  përtej  /pɾˈtɛj/  position  tej  /tɛj/
+cs.12  përreth  /pɾˈɾɛθ/  position  rreth  /rreth/
+cs.13  përparim  /prpaˈɾim/  position  para  /ˈpaɾa/
+cs.14  përparësi  /prpaˈɾəsi/  position  para  /ˈpaɾa/
+cs.21  fillestar  /filˈɛstaɾ/  order  fillim  /fillim/
+cs.22  fillimisht  /filiˈmiʃt/  order  fillim  /fillim/
+cs.23  fillimtar  /filimˈtaɾ/  order  fillim  /fillim/
+cs.24  sistematik  /sistɛˈmatik/  order  sistem  /sistɛm/
+cs.25  sistemim  /sisˈtɛmim/  order  sistem  /sistɛm/
+cs.26  disiplinë  /disiˈplin/  order  disiplinë  /disiˈplin/
+cs.27  kriter  /kɾiˈtɛɾ/  order  kriter  /kɾiˈtɛɾ/
+cs.28  hierarki  /hieɾaɾˈki/  order  hierarki  /hieɾaɾˈki/
+cs.29  renditje  /rɛnˈditjɛ/  order  rend  /rend/
+cs.30  rregullim  /rɛɡuˈlim/  order  rregull  /rɛˈɡuɫ/
+cs.31  rregullisht  /rɛɡuˈliʃt/  order  rregull  /rɛˈɡuɫ/
+cs.32  rregullore  /rɛɡuˈɫoɾɛ/  order  rregull  /rɛˈɡuɫ/
+cs.33  renditës  /rɛnˈditəs/  order  rend  /rend/
+cs.34  sistemor  /sistɛˈmoɾ/  order  sistem  /sistɛm/
