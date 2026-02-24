@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import { applySchwaDropV0_1 } from "./ipaTransforms/schwaDrop.v0.1";
 
 import { extractOrthographyVoicesFromWordV0_1 } from "@/shared/vowels/extractOrthographyVoicesFromWord.v0.1";
 import { extractCarrierVoicesFromIpaV0_1 } from "@/shared/vowels/extractCarrierVoicesFromIpa.v0.1";
