@@ -1,0 +1,22 @@
+# id      hanzi   zhuyin       tag
+tw.01     上      ㄕㄤˋ        position
+tw.02     下      ㄒㄧㄚˋ      position
+tw.03     前      ㄑㄧㄢˊ      position
+tw.04     後      ㄏㄡˋ        position
+tw.05     內      ㄋㄟˋ        position
+tw.06     外      ㄨㄞˋ        position
+tw.07     左      ㄗㄨㄛˇ      position
+tw.08     右      ㄧㄡˋ        position
+tw.09     中      ㄓㄨㄥ       position
+tw.10     旁      ㄆㄤˊ        position
+
+tw.21     一      ㄧ           order
+tw.22     第      ㄉㄧˋ        order
+tw.23     先      ㄒㄧㄢ       order
+tw.24     初      ㄔㄨ         order
+tw.25     終      ㄓㄨㄥ       order
+tw.26     序      ㄒㄩˋ        order
+tw.27     列      ㄌㄧㄝˋ      order
+tw.28     級      ㄐㄧˊ        order
+tw.29     排      ㄆㄞˊ        order
+tw.30     順      ㄕㄨㄣˋ      order
