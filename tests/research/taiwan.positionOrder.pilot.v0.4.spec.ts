@@ -210,7 +210,7 @@ describe("Taiwan Position/Order Pilot v0.4 — enrichment vs multiple controls (
         const tagItems = items.filter((x) => x.tag === tag);
         for (const ctrlTag of controls) {
           const ctrlItems = items.filter((x) => x.tag === ctrlTag);
-          const r = enrichmentPvalue(tagItems, ctrlItems, anchor, ITERS_ENRICH, (SEED ^ (ctrlTag === "control_misc" ? 0xC0FFEE : 0xC0110R)) >>> 0);
+          const r = enrichmentPvalue(tagItems, ctrlItems, anchor, ITERS_ENRICH, (SEED ^ (ctrlTag === "control_misc" ? 0xC0FFEE : 0xC01107)) >>> 0);
           const tagRate = r.nt ? (r.tObs / r.nt) : 0;
           const ctrlRate = r.nc ? (r.cObs / r.nc) : 0;
           lines.push(
