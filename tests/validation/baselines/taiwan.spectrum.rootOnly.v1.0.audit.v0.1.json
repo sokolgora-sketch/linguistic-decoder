@@ -1,0 +1,1095 @@
+{
+  "version": "v1.0",
+  "corpus": "tests/research/taiwan.spectrum.rootOnly.v1.0.txt",
+  "n_total": 140,
+  "n10": {
+    "n": 70
+  },
+  "step20": {
+    "n": 70
+  },
+  "bucketDrift": [
+    {
+      "tag": "v1",
+      "n10_n": 10,
+      "step20_n": 10,
+      "all_n": 20,
+      "n10_presenceMean": 0.665,
+      "step20_presenceMean": 0.7,
+      "all_presenceMean": 0.6825,
+      "d_step20_minus_n10": 0.03499999999999992,
+      "d_all_minus_n10": 0.01749999999999996
+    },
+    {
+      "tag": "v2",
+      "n10_n": 10,
+      "step20_n": 10,
+      "all_n": 20,
+      "n10_presenceMean": 0.4716666666666667,
+      "step20_presenceMean": 0.7166666666666668,
+      "all_presenceMean": 0.5941666666666667,
+      "d_step20_minus_n10": 0.2450000000000001,
+      "d_all_minus_n10": 0.12250000000000005
+    },
+    {
+      "tag": "v3",
+      "n10_n": 10,
+      "step20_n": 10,
+      "all_n": 20,
+      "n10_presenceMean": 0.49333333333333335,
+      "step20_presenceMean": 0.3916666666666667,
+      "all_presenceMean": 0.4425,
+      "d_step20_minus_n10": -0.10166666666666663,
+      "d_all_minus_n10": -0.05083333333333334
+    },
+    {
+      "tag": "v4",
+      "n10_n": 10,
+      "step20_n": 10,
+      "all_n": 20,
+      "n10_presenceMean": 0.33,
+      "step20_presenceMean": 0.36,
+      "all_presenceMean": 0.34500000000000003,
+      "d_step20_minus_n10": 0.02999999999999997,
+      "d_all_minus_n10": 0.015000000000000013
+    },
+    {
+      "tag": "v5",
+      "n10_n": 10,
+      "step20_n": 10,
+      "all_n": 20,
+      "n10_presenceMean": 0.4083333333333334,
+      "step20_presenceMean": 0.4766666666666667,
+      "all_presenceMean": 0.44250000000000006,
+      "d_step20_minus_n10": 0.0683333333333333,
+      "d_all_minus_n10": 0.03416666666666668
+    },
+    {
+      "tag": "v6",
+      "n10_n": 10,
+      "step20_n": 10,
+      "all_n": 20,
+      "n10_presenceMean": 0.41500000000000004,
+      "step20_presenceMean": 0.5016666666666667,
+      "all_presenceMean": 0.4583333333333333,
+      "d_step20_minus_n10": 0.08666666666666667,
+      "d_all_minus_n10": 0.04333333333333328
+    },
+    {
+      "tag": "v7",
+      "n10_n": 10,
+      "step20_n": 10,
+      "all_n": 20,
+      "n10_presenceMean": 0.31500000000000006,
+      "step20_presenceMean": 0.4733333333333333,
+      "all_presenceMean": 0.3941666666666667,
+      "d_step20_minus_n10": 0.15833333333333321,
+      "d_all_minus_n10": 0.07916666666666666
+    }
+  ],
+  "outliers": {
+    "step20_global_widest": [
+      {
+        "id": "tv20.V1.03",
+        "cohort": "step20",
+        "tag": "v1",
+        "hanzi": "長",
+        "zhuyin": "ㄔㄤˊ",
+        "tone": 2,
+        "primary": "A",
+        "voices": [
+          "A"
+        ],
+        "aperturePrimary": 1,
+        "aperturePresenceMean": 1
+      },
+      {
+        "id": "tv20.V1.06",
+        "cohort": "step20",
+        "tag": "v1",
+        "hanzi": "展",
+        "zhuyin": "ㄓㄢˇ",
+        "tone": 3,
+        "primary": "A",
+        "voices": [
+          "A"
+        ],
+        "aperturePrimary": 1,
+        "aperturePresenceMean": 1
+      },
+      {
+        "id": "tv20.V1.10",
+        "cohort": "step20",
+        "tag": "v1",
+        "hanzi": "滿",
+        "zhuyin": "ㄇㄢˇ",
+        "tone": 3,
+        "primary": "A",
+        "voices": [
+          "A"
+        ],
+        "aperturePrimary": 1,
+        "aperturePresenceMean": 1
+      },
+      {
+        "id": "tv20.V2.04",
+        "cohort": "step20",
+        "tag": "v2",
+        "hanzi": "撼",
+        "zhuyin": "ㄏㄢˋ",
+        "tone": 4,
+        "primary": "A",
+        "voices": [
+          "A"
+        ],
+        "aperturePrimary": 1,
+        "aperturePresenceMean": 1
+      },
+      {
+        "id": "tv20.V2.05",
+        "cohort": "step20",
+        "tag": "v2",
+        "hanzi": "砸",
+        "zhuyin": "ㄗㄚˊ",
+        "tone": 2,
+        "primary": "A",
+        "voices": [
+          "A"
+        ],
+        "aperturePrimary": 1,
+        "aperturePresenceMean": 1
+      },
+      {
+        "id": "tv20.V2.06",
+        "cohort": "step20",
+        "tag": "v2",
+        "hanzi": "抗",
+        "zhuyin": "ㄎㄤˋ",
+        "tone": 4,
+        "primary": "A",
+        "voices": [
+          "A"
+        ],
+        "aperturePrimary": 1,
+        "aperturePresenceMean": 1
+      },
+      {
+        "id": "tv20.V2.07",
+        "cohort": "step20",
+        "tag": "v2",
+        "hanzi": "擋",
+        "zhuyin": "ㄉㄤˇ",
+        "tone": 3,
+        "primary": "A",
+        "voices": [
+          "A"
+        ],
+        "aperturePrimary": 1,
+        "aperturePresenceMean": 1
+      },
+      {
+        "id": "tv20.V2.10",
+        "cohort": "step20",
+        "tag": "v2",
+        "hanzi": "拉",
+        "zhuyin": "ㄌㄚ",
+        "tone": 1,
+        "primary": "A",
+        "voices": [
+          "A"
+        ],
+        "aperturePrimary": 1,
+        "aperturePresenceMean": 1
+      },
+      {
+        "id": "tv20.V3.09",
+        "cohort": "step20",
+        "tag": "v3",
+        "hanzi": "藏",
+        "zhuyin": "ㄘㄤˊ",
+        "tone": 2,
+        "primary": "A",
+        "voices": [
+          "A"
+        ],
+        "aperturePrimary": 1,
+        "aperturePresenceMean": 1
+      },
+      {
+        "id": "tv20.V5.05",
+        "cohort": "step20",
+        "tag": "v5",
+        "hanzi": "返",
+        "zhuyin": "ㄈㄢˇ",
+        "tone": 3,
+        "primary": "A",
+        "voices": [
+          "A"
+        ],
+        "aperturePrimary": 1,
+        "aperturePresenceMean": 1
+      },
+      {
+        "id": "tv20.V5.06",
+        "cohort": "step20",
+        "tag": "v5",
+        "hanzi": "趕",
+        "zhuyin": "ㄍㄢˇ",
+        "tone": 3,
+        "primary": "A",
+        "voices": [
+          "A"
+        ],
+        "aperturePrimary": 1,
+        "aperturePresenceMean": 1
+      },
+      {
+        "id": "tv20.V1.01",
+        "cohort": "step20",
+        "tag": "v1",
+        "hanzi": "寬",
+        "zhuyin": "ㄎㄨㄢ",
+        "tone": 1,
+        "primary": "A",
+        "voices": [
+          "U",
+          "A"
+        ],
+        "aperturePrimary": 1,
+        "aperturePresenceMean": 0.7
+      }
+    ],
+    "step20_by_bucket_widest": {
+      "v1": [
+        {
+          "id": "tv20.V1.03",
+          "cohort": "step20",
+          "tag": "v1",
+          "hanzi": "長",
+          "zhuyin": "ㄔㄤˊ",
+          "tone": 2,
+          "primary": "A",
+          "voices": [
+            "A"
+          ],
+          "aperturePrimary": 1,
+          "aperturePresenceMean": 1
+        },
+        {
+          "id": "tv20.V1.06",
+          "cohort": "step20",
+          "tag": "v1",
+          "hanzi": "展",
+          "zhuyin": "ㄓㄢˇ",
+          "tone": 3,
+          "primary": "A",
+          "voices": [
+            "A"
+          ],
+          "aperturePrimary": 1,
+          "aperturePresenceMean": 1
+        },
+        {
+          "id": "tv20.V1.10",
+          "cohort": "step20",
+          "tag": "v1",
+          "hanzi": "滿",
+          "zhuyin": "ㄇㄢˇ",
+          "tone": 3,
+          "primary": "A",
+          "voices": [
+            "A"
+          ],
+          "aperturePrimary": 1,
+          "aperturePresenceMean": 1
+        },
+        {
+          "id": "tv20.V1.01",
+          "cohort": "step20",
+          "tag": "v1",
+          "hanzi": "寬",
+          "zhuyin": "ㄎㄨㄢ",
+          "tone": 1,
+          "primary": "A",
+          "voices": [
+            "U",
+            "A"
+          ],
+          "aperturePrimary": 1,
+          "aperturePresenceMean": 0.7
+        },
+        {
+          "id": "tv20.V1.02",
+          "cohort": "step20",
+          "tag": "v1",
+          "hanzi": "遠",
+          "zhuyin": "ㄩㄢˇ",
+          "tone": 3,
+          "primary": "A",
+          "voices": [
+            "Y",
+            "A"
+          ],
+          "aperturePrimary": 1,
+          "aperturePresenceMean": 0.65
+        },
+        {
+          "id": "tv20.V1.07",
+          "cohort": "step20",
+          "tag": "v1",
+          "hanzi": "擴",
+          "zhuyin": "ㄎㄨㄛˋ",
+          "tone": 4,
+          "primary": "O",
+          "voices": [
+            "U",
+            "O"
+          ],
+          "aperturePrimary": 0.8,
+          "aperturePresenceMean": 0.6000000000000001
+        },
+        {
+          "id": "tv20.V1.09",
+          "cohort": "step20",
+          "tag": "v1",
+          "hanzi": "宙",
+          "zhuyin": "ㄓㄡˋ",
+          "tone": 4,
+          "primary": "O",
+          "voices": [
+            "O",
+            "U"
+          ],
+          "aperturePrimary": 0.8,
+          "aperturePresenceMean": 0.6000000000000001
+        },
+        {
+          "id": "tv20.V1.04",
+          "cohort": "step20",
+          "tag": "v1",
+          "hanzi": "延",
+          "zhuyin": "ㄧㄢˊ",
+          "tone": 2,
+          "primary": "A",
+          "voices": [
+            "I",
+            "A"
+          ],
+          "aperturePrimary": 1,
+          "aperturePresenceMean": 0.55
+        }
+      ],
+      "v2": [
+        {
+          "id": "tv20.V2.04",
+          "cohort": "step20",
+          "tag": "v2",
+          "hanzi": "撼",
+          "zhuyin": "ㄏㄢˋ",
+          "tone": 4,
+          "primary": "A",
+          "voices": [
+            "A"
+          ],
+          "aperturePrimary": 1,
+          "aperturePresenceMean": 1
+        },
+        {
+          "id": "tv20.V2.05",
+          "cohort": "step20",
+          "tag": "v2",
+          "hanzi": "砸",
+          "zhuyin": "ㄗㄚˊ",
+          "tone": 2,
+          "primary": "A",
+          "voices": [
+            "A"
+          ],
+          "aperturePrimary": 1,
+          "aperturePresenceMean": 1
+        },
+        {
+          "id": "tv20.V2.06",
+          "cohort": "step20",
+          "tag": "v2",
+          "hanzi": "抗",
+          "zhuyin": "ㄎㄤˋ",
+          "tone": 4,
+          "primary": "A",
+          "voices": [
+            "A"
+          ],
+          "aperturePrimary": 1,
+          "aperturePresenceMean": 1
+        },
+        {
+          "id": "tv20.V2.07",
+          "cohort": "step20",
+          "tag": "v2",
+          "hanzi": "擋",
+          "zhuyin": "ㄉㄤˇ",
+          "tone": 3,
+          "primary": "A",
+          "voices": [
+            "A"
+          ],
+          "aperturePrimary": 1,
+          "aperturePresenceMean": 1
+        },
+        {
+          "id": "tv20.V2.10",
+          "cohort": "step20",
+          "tag": "v2",
+          "hanzi": "拉",
+          "zhuyin": "ㄌㄚ",
+          "tone": 1,
+          "primary": "A",
+          "voices": [
+            "A"
+          ],
+          "aperturePrimary": 1,
+          "aperturePresenceMean": 1
+        },
+        {
+          "id": "tv20.V2.08",
+          "cohort": "step20",
+          "tag": "v2",
+          "hanzi": "拳",
+          "zhuyin": "ㄑㄩㄢˊ",
+          "tone": 2,
+          "primary": "A",
+          "voices": [
+            "Y",
+            "A"
+          ],
+          "aperturePrimary": 1,
+          "aperturePresenceMean": 0.65
+        },
+        {
+          "id": "tv20.V2.02",
+          "cohort": "step20",
+          "tag": "v2",
+          "hanzi": "強",
+          "zhuyin": "ㄑㄧㄤˊ",
+          "tone": 2,
+          "primary": "A",
+          "voices": [
+            "I",
+            "A"
+          ],
+          "aperturePrimary": 1,
+          "aperturePresenceMean": 0.55
+        },
+        {
+          "id": "tv20.V2.03",
+          "cohort": "step20",
+          "tag": "v2",
+          "hanzi": "震",
+          "zhuyin": "ㄓㄣˋ",
+          "tone": 4,
+          "primary": "Ë",
+          "voices": [
+            "Ë"
+          ],
+          "aperturePrimary": 0.5,
+          "aperturePresenceMean": 0.5
+        }
+      ],
+      "v3": [
+        {
+          "id": "tv20.V3.09",
+          "cohort": "step20",
+          "tag": "v3",
+          "hanzi": "藏",
+          "zhuyin": "ㄘㄤˊ",
+          "tone": 2,
+          "primary": "A",
+          "voices": [
+            "A"
+          ],
+          "aperturePrimary": 1,
+          "aperturePresenceMean": 1
+        },
+        {
+          "id": "tv20.V3.03",
+          "cohort": "step20",
+          "tag": "v3",
+          "hanzi": "脈",
+          "zhuyin": "ㄇㄞˋ",
+          "tone": 4,
+          "primary": "A",
+          "voices": [
+            "A",
+            "I"
+          ],
+          "aperturePrimary": 1,
+          "aperturePresenceMean": 0.55
+        },
+        {
+          "id": "tv20.V3.04",
+          "cohort": "step20",
+          "tag": "v3",
+          "hanzi": "腔",
+          "zhuyin": "ㄑㄧㄤ",
+          "tone": 1,
+          "primary": "A",
+          "voices": [
+            "I",
+            "A"
+          ],
+          "aperturePrimary": 1,
+          "aperturePresenceMean": 0.55
+        },
+        {
+          "id": "tv20.V3.07",
+          "cohort": "step20",
+          "tag": "v3",
+          "hanzi": "潛",
+          "zhuyin": "ㄑㄧㄢˊ",
+          "tone": 2,
+          "primary": "A",
+          "voices": [
+            "I",
+            "A"
+          ],
+          "aperturePrimary": 1,
+          "aperturePresenceMean": 0.55
+        },
+        {
+          "id": "tv20.V3.02",
+          "cohort": "step20",
+          "tag": "v3",
+          "hanzi": "核",
+          "zhuyin": "ㄏㄜˊ",
+          "tone": 2,
+          "primary": "Ë",
+          "voices": [
+            "Ë"
+          ],
+          "aperturePrimary": 0.5,
+          "aperturePresenceMean": 0.5
+        },
+        {
+          "id": "tv20.V3.05",
+          "cohort": "step20",
+          "tag": "v3",
+          "hanzi": "髓",
+          "zhuyin": "ㄙㄨㄟˇ",
+          "tone": 3,
+          "primary": "E",
+          "voices": [
+            "U",
+            "E",
+            "I"
+          ],
+          "aperturePrimary": 0.6,
+          "aperturePresenceMean": 0.3666666666666667
+        },
+        {
+          "id": "tv20.V3.01",
+          "cohort": "step20",
+          "tag": "v3",
+          "hanzi": "心",
+          "zhuyin": "ㄒㄧㄣ",
+          "tone": 1,
+          "primary": "I",
+          "voices": [
+            "I"
+          ],
+          "aperturePrimary": 0.1,
+          "aperturePresenceMean": 0.1
+        },
+        {
+          "id": "tv20.V3.06",
+          "cohort": "step20",
+          "tag": "v3",
+          "hanzi": "隱",
+          "zhuyin": "ㄧㄣˇ",
+          "tone": 3,
+          "primary": "I",
+          "voices": [
+            "I"
+          ],
+          "aperturePrimary": 0.1,
+          "aperturePresenceMean": 0.1
+        }
+      ],
+      "v4": [
+        {
+          "id": "tv20.V4.02",
+          "cohort": "step20",
+          "tag": "v4",
+          "hanzi": "根",
+          "zhuyin": "ㄍㄣ",
+          "tone": 1,
+          "primary": "Ë",
+          "voices": [
+            "Ë"
+          ],
+          "aperturePrimary": 0.5,
+          "aperturePresenceMean": 0.5
+        },
+        {
+          "id": "tv20.V4.06",
+          "cohort": "step20",
+          "tag": "v4",
+          "hanzi": "衡",
+          "zhuyin": "ㄏㄥˊ",
+          "tone": 2,
+          "primary": "Ë",
+          "voices": [
+            "Ë"
+          ],
+          "aperturePrimary": 0.5,
+          "aperturePresenceMean": 0.5
+        },
+        {
+          "id": "tv20.V4.07",
+          "cohort": "step20",
+          "tag": "v4",
+          "hanzi": "正",
+          "zhuyin": "ㄓㄥˋ",
+          "tone": 4,
+          "primary": "Ë",
+          "voices": [
+            "Ë"
+          ],
+          "aperturePrimary": 0.5,
+          "aperturePresenceMean": 0.5
+        },
+        {
+          "id": "tv20.V4.01",
+          "cohort": "step20",
+          "tag": "v4",
+          "hanzi": "中",
+          "zhuyin": "ㄓㄨㄥ",
+          "tone": 1,
+          "primary": "U",
+          "voices": [
+            "U"
+          ],
+          "aperturePrimary": 0.4,
+          "aperturePresenceMean": 0.4
+        },
+        {
+          "id": "tv20.V4.04",
+          "cohort": "step20",
+          "tag": "v4",
+          "hanzi": "穩",
+          "zhuyin": "ㄨㄣˇ",
+          "tone": 3,
+          "primary": "U",
+          "voices": [
+            "U"
+          ],
+          "aperturePrimary": 0.4,
+          "aperturePresenceMean": 0.4
+        },
+        {
+          "id": "tv20.V4.09",
+          "cohort": "step20",
+          "tag": "v4",
+          "hanzi": "固",
+          "zhuyin": "ㄍㄨˋ",
+          "tone": 4,
+          "primary": "U",
+          "voices": [
+            "U"
+          ],
+          "aperturePrimary": 0.4,
+          "aperturePresenceMean": 0.4
+        },
+        {
+          "id": "tv20.V4.10",
+          "cohort": "step20",
+          "tag": "v4",
+          "hanzi": "準",
+          "zhuyin": "ㄓㄨㄣˇ",
+          "tone": 3,
+          "primary": "U",
+          "voices": [
+            "U"
+          ],
+          "aperturePrimary": 0.4,
+          "aperturePresenceMean": 0.4
+        },
+        {
+          "id": "tv20.V4.05",
+          "cohort": "step20",
+          "tag": "v4",
+          "hanzi": "均",
+          "zhuyin": "ㄐㄩㄣ",
+          "tone": 1,
+          "primary": "Y",
+          "voices": [
+            "Y"
+          ],
+          "aperturePrimary": 0.3,
+          "aperturePresenceMean": 0.3
+        }
+      ],
+      "v5": [
+        {
+          "id": "tv20.V5.05",
+          "cohort": "step20",
+          "tag": "v5",
+          "hanzi": "返",
+          "zhuyin": "ㄈㄢˇ",
+          "tone": 3,
+          "primary": "A",
+          "voices": [
+            "A"
+          ],
+          "aperturePrimary": 1,
+          "aperturePresenceMean": 1
+        },
+        {
+          "id": "tv20.V5.06",
+          "cohort": "step20",
+          "tag": "v5",
+          "hanzi": "趕",
+          "zhuyin": "ㄍㄢˇ",
+          "tone": 3,
+          "primary": "A",
+          "voices": [
+            "A"
+          ],
+          "aperturePrimary": 1,
+          "aperturePresenceMean": 1
+        },
+        {
+          "id": "tv20.V5.04",
+          "cohort": "step20",
+          "tag": "v5",
+          "hanzi": "來",
+          "zhuyin": "ㄌㄞˊ",
+          "tone": 2,
+          "primary": "A",
+          "voices": [
+            "A",
+            "I"
+          ],
+          "aperturePrimary": 1,
+          "aperturePresenceMean": 0.55
+        },
+        {
+          "id": "tv20.V5.10",
+          "cohort": "step20",
+          "tag": "v5",
+          "hanzi": "躍",
+          "zhuyin": "ㄩㄝˋ",
+          "tone": 4,
+          "primary": "E",
+          "voices": [
+            "Y",
+            "E"
+          ],
+          "aperturePrimary": 0.6,
+          "aperturePresenceMean": 0.44999999999999996
+        },
+        {
+          "id": "tv20.V5.02",
+          "cohort": "step20",
+          "tag": "v5",
+          "hanzi": "出",
+          "zhuyin": "ㄔㄨ",
+          "tone": 1,
+          "primary": "U",
+          "voices": [
+            "U"
+          ],
+          "aperturePrimary": 0.4,
+          "aperturePresenceMean": 0.4
+        },
+        {
+          "id": "tv20.V5.07",
+          "cohort": "step20",
+          "tag": "v5",
+          "hanzi": "追",
+          "zhuyin": "ㄓㄨㄟ",
+          "tone": 1,
+          "primary": "E",
+          "voices": [
+            "U",
+            "E",
+            "I"
+          ],
+          "aperturePrimary": 0.6,
+          "aperturePresenceMean": 0.3666666666666667
+        },
+        {
+          "id": "tv20.V5.03",
+          "cohort": "step20",
+          "tag": "v5",
+          "hanzi": "去",
+          "zhuyin": "ㄑㄩˋ",
+          "tone": 4,
+          "primary": "Y",
+          "voices": [
+            "Y"
+          ],
+          "aperturePrimary": 0.3,
+          "aperturePresenceMean": 0.3
+        },
+        {
+          "id": "tv20.V5.08",
+          "cohort": "step20",
+          "tag": "v5",
+          "hanzi": "趨",
+          "zhuyin": "ㄑㄩ",
+          "tone": 1,
+          "primary": "Y",
+          "voices": [
+            "Y"
+          ],
+          "aperturePrimary": 0.3,
+          "aperturePresenceMean": 0.3
+        }
+      ],
+      "v6": [
+        {
+          "id": "tv20.V6.10",
+          "cohort": "step20",
+          "tag": "v6",
+          "hanzi": "懸",
+          "zhuyin": "ㄒㄩㄢˊ",
+          "tone": 2,
+          "primary": "A",
+          "voices": [
+            "Y",
+            "A"
+          ],
+          "aperturePrimary": 1,
+          "aperturePresenceMean": 0.65
+        },
+        {
+          "id": "tv20.V6.09",
+          "cohort": "step20",
+          "tag": "v6",
+          "hanzi": "峭",
+          "zhuyin": "ㄑㄧㄠˋ",
+          "tone": 4,
+          "primary": "A",
+          "voices": [
+            "I",
+            "A",
+            "O"
+          ],
+          "aperturePrimary": 1,
+          "aperturePresenceMean": 0.6333333333333334
+        },
+        {
+          "id": "tv20.V6.08",
+          "cohort": "step20",
+          "tag": "v6",
+          "hanzi": "陡",
+          "zhuyin": "ㄉㄡˇ",
+          "tone": 3,
+          "primary": "O",
+          "voices": [
+            "O",
+            "U"
+          ],
+          "aperturePrimary": 0.8,
+          "aperturePresenceMean": 0.6000000000000001
+        },
+        {
+          "id": "tv20.V6.03",
+          "cohort": "step20",
+          "tag": "v6",
+          "hanzi": "窄",
+          "zhuyin": "ㄓㄞˇ",
+          "tone": 3,
+          "primary": "A",
+          "voices": [
+            "A",
+            "I"
+          ],
+          "aperturePrimary": 1,
+          "aperturePresenceMean": 0.55
+        },
+        {
+          "id": "tv20.V6.01",
+          "cohort": "step20",
+          "tag": "v6",
+          "hanzi": "峰",
+          "zhuyin": "ㄈㄥ",
+          "tone": 1,
+          "primary": "Ë",
+          "voices": [
+            "Ë"
+          ],
+          "aperturePrimary": 0.5,
+          "aperturePresenceMean": 0.5
+        },
+        {
+          "id": "tv20.V6.04",
+          "cohort": "step20",
+          "tag": "v6",
+          "hanzi": "冷",
+          "zhuyin": "ㄌㄥˇ",
+          "tone": 3,
+          "primary": "Ë",
+          "voices": [
+            "Ë"
+          ],
+          "aperturePrimary": 0.5,
+          "aperturePresenceMean": 0.5
+        },
+        {
+          "id": "tv20.V6.07",
+          "cohort": "step20",
+          "tag": "v6",
+          "hanzi": "繃",
+          "zhuyin": "ㄅㄥ",
+          "tone": 1,
+          "primary": "Ë",
+          "voices": [
+            "Ë"
+          ],
+          "aperturePrimary": 0.5,
+          "aperturePresenceMean": 0.5
+        },
+        {
+          "id": "tv20.V6.02",
+          "cohort": "step20",
+          "tag": "v6",
+          "hanzi": "銳",
+          "zhuyin": "ㄖㄨㄟˋ",
+          "tone": 4,
+          "primary": "E",
+          "voices": [
+            "U",
+            "E",
+            "I"
+          ],
+          "aperturePrimary": 0.6,
+          "aperturePresenceMean": 0.3666666666666667
+        }
+      ],
+      "v7": [
+        {
+          "id": "tv20.V7.04",
+          "cohort": "step20",
+          "tag": "v7",
+          "hanzi": "端",
+          "zhuyin": "ㄉㄨㄢ",
+          "tone": 1,
+          "primary": "A",
+          "voices": [
+            "U",
+            "A"
+          ],
+          "aperturePrimary": 1,
+          "aperturePresenceMean": 0.7
+        },
+        {
+          "id": "tv20.V7.06",
+          "cohort": "step20",
+          "tag": "v7",
+          "hanzi": "選",
+          "zhuyin": "ㄒㄩㄢˇ",
+          "tone": 3,
+          "primary": "A",
+          "voices": [
+            "Y",
+            "A"
+          ],
+          "aperturePrimary": 1,
+          "aperturePresenceMean": 0.65
+        },
+        {
+          "id": "tv20.V7.02",
+          "cohort": "step20",
+          "tag": "v7",
+          "hanzi": "焦",
+          "zhuyin": "ㄐㄧㄠ",
+          "tone": 1,
+          "primary": "A",
+          "voices": [
+            "I",
+            "A",
+            "O"
+          ],
+          "aperturePrimary": 1,
+          "aperturePresenceMean": 0.6333333333333334
+        },
+        {
+          "id": "tv20.V7.09",
+          "cohort": "step20",
+          "tag": "v7",
+          "hanzi": "瞄",
+          "zhuyin": "ㄇㄧㄠˊ",
+          "tone": 2,
+          "primary": "A",
+          "voices": [
+            "I",
+            "A",
+            "O"
+          ],
+          "aperturePrimary": 1,
+          "aperturePresenceMean": 0.6333333333333334
+        },
+        {
+          "id": "tv20.V7.03",
+          "cohort": "step20",
+          "tag": "v7",
+          "hanzi": "央",
+          "zhuyin": "ㄧㄤ",
+          "tone": 1,
+          "primary": "A",
+          "voices": [
+            "I",
+            "A"
+          ],
+          "aperturePrimary": 1,
+          "aperturePresenceMean": 0.55
+        },
+        {
+          "id": "tv20.V7.01",
+          "cohort": "step20",
+          "tag": "v7",
+          "hanzi": "目",
+          "zhuyin": "ㄇㄨˋ",
+          "tone": 4,
+          "primary": "U",
+          "voices": [
+            "U"
+          ],
+          "aperturePrimary": 0.4,
+          "aperturePresenceMean": 0.4
+        },
+        {
+          "id": "tv20.V7.08",
+          "cohort": "step20",
+          "tag": "v7",
+          "hanzi": "準",
+          "zhuyin": "ㄓㄨㄣˇ",
+          "tone": 3,
+          "primary": "U",
+          "voices": [
+            "U"
+          ],
+          "aperturePrimary": 0.4,
+          "aperturePresenceMean": 0.4
+        },
+        {
+          "id": "tv20.V7.10",
+          "cohort": "step20",
+          "tag": "v7",
+          "hanzi": "對",
+          "zhuyin": "ㄉㄨㄟˋ",
+          "tone": 4,
+          "primary": "E",
+          "voices": [
+            "U",
+            "E",
+            "I"
+          ],
+          "aperturePrimary": 0.6,
+          "aperturePresenceMean": 0.3666666666666667
+        }
+      ]
+    }
+  }
+}
