@@ -289,10 +289,9 @@ describe("Taiwan Spectrum Root-Only v1.0 — slope + tone diagnostics (Zhuyin)",
           };
         });
 
-        const slopePrimary = slopePvalue({ items: xs, scoreKey: "aperturePrimary", iters: ITERS, seed: SEED });
-        const slopePresence = slopePvalue({ items: xs, scoreKey: "aperturePresenceMean", iters: ITERS, seed: SEED });
-
-        return { buckets, slopePrimary, slopePresence };
+        const slopePrimary = slopePvalue({ items: xs, scoreKey: "aperturePrimary", iters: ITERS, seed: (SEED ^ 0xA11CE) >>> 0 });
+const slopePresence = slopePvalue({ items: xs, scoreKey: "aperturePresenceMean", iters: ITERS, seed: (SEED ^ 0xBADA55) >>> 0 });
+return { buckets, slopePrimary, slopePresence };
       }
 
       const s10 = summarize(cohortN10);
@@ -301,12 +300,18 @@ describe("Taiwan Spectrum Root-Only v1.0 — slope + tone diagnostics (Zhuyin)",
       const outCompareMd = path.join(outDir, "taiwan.spectrum.rootOnly.v1.0.compare.md");
       const outCompareJson = path.join(outDir, "taiwan.spectrum.rootOnly.v1.0.compare.json");
 
+
+        const outBaselineDir = path.join(root, "tests/validation/baselines");
+        const baseCompareMd = path.join(outBaselineDir, "taiwan.spectrum.rootOnly.v1.0.compare.v0.1.md");
+        const baseCompareJson = path.join(outBaselineDir, "taiwan.spectrum.rootOnly.v1.0.compare.v0.1.json");
       const cmp: string[] = [];
       cmp.push("# Taiwan Spectrum Root-Only v1.0 — compare N=10 vs N=20 (Zhuyin)");
       cmp.push("");
       cmp.push("- corpus: `" + path.relative(root, inPath) + "`");
       cmp.push("- permutation iters: " + ITERS);
-      cmp.push("- seed: " + SEED);
+      cmp.push("- seed(base): " + SEED);
+        cmp.push("- seed_primary: " + (((SEED ^ 0xA11CE) >>> 0)));
+        cmp.push("- seed_presence: " + (((SEED ^ 0xBADA55) >>> 0)));
       cmp.push('- cohort rule: N=10 = ids starting with "v" or "tv10."; N=20 = all rows.');
       cmp.push("");
 
@@ -397,8 +402,9 @@ describe("Taiwan Spectrum Root-Only v1.0 — slope + tone diagnostics (Zhuyin)",
       );
       cmp.push("");
 
-      fs.writeFileSync(outCompareMd, cmp.join("\n"), "utf8");
-
+      fs.mkdirSync(outBaselineDir, { recursive: true });
+        fs.writeFileSync(outCompareMd, cmp.join("\n"), "utf8");
+        fs.writeFileSync(baseCompareMd, cmp.join("\n"), "utf8");
       function deltaBuckets(b20: any[], b10: any[]) {
         return TAGS.map((tag, i) => {
           const a = b20[i];
@@ -420,6 +426,8 @@ describe("Taiwan Spectrum Root-Only v1.0 — slope + tone diagnostics (Zhuyin)",
         corpus: path.relative(root, inPath),
         iters: ITERS,
         seed: SEED,
+          seed_primary: (SEED ^ 0xA11CE) >>> 0,
+          seed_presence: (SEED ^ 0xBADA55) >>> 0,
         cohorts: {
           n10: {
             n: cohortN10.length,
@@ -458,6 +466,6 @@ describe("Taiwan Spectrum Root-Only v1.0 — slope + tone diagnostics (Zhuyin)",
       };
 
       fs.writeFileSync(outCompareJson, JSON.stringify(payload, null, 2) + "\n", "utf8");
-
+        fs.writeFileSync(baseCompareJson, JSON.stringify(payload, null, 2) + "\n", "utf8");
   });
 });
