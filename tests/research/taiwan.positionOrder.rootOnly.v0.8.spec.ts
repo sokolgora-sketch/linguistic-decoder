@@ -1,7 +1,8 @@
 import { describe, it, expect } from "@jest/globals";
 import fs from "fs";
 import path from "path";
-import { extractToneFromZhuyinV0_1, ZhuyinToneV0_1 } from "@/shared/vowels/extractToneFromZhuyin.v0.1";
+import { extractZhuyinSignalV0_1 } from "@/shared/vowels/extractZhuyinSignal.v0.1";
+import { ZhuyinToneV0_1 } from "@/shared/vowels/extractToneFromZhuyin.v0.1";
 
 type Row = { id: string; hanzi: string; zhuyin: string; tag: string };
 type Item = Row & { tone: ZhuyinToneV0_1 };

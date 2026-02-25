@@ -1,8 +1,8 @@
 import { describe, it, expect } from "@jest/globals";
 import fs from "fs";
 import path from "path";
-import { extractCarrierVoicesFromZhuyinV0_1 } from "@/shared/vowels/extractCarrierVoicesFromZhuyin.v0.1";
-import { extractToneFromZhuyinV0_1, ZhuyinToneV0_1 } from "@/shared/vowels/extractToneFromZhuyin.v0.1";
+import { extractZhuyinSignalV0_1 } from "@/shared/vowels/extractZhuyinSignal.v0.1";
+import { ZhuyinToneV0_1 } from "@/shared/vowels/extractToneFromZhuyin.v0.1";
 
 type Vowel = "A" | "E" | "I" | "O" | "U" | "Y" | "Ë";
 type Primary = Vowel | "NONE";
