@@ -98,8 +98,7 @@ describe("Taiwan Root-Only v0.8 — tone enrichment matrix vs control_root (Zhuy
 
     const rows = parseRows(fs.readFileSync(inPath, "utf8"));
     expect(rows.length).toBeGreaterThan(0);
-
-        const items: Item[] = rows.map((r) => {
+      const items: Item[] = rows.map((r) => {
       const sig = extractZhuyinSignalV0_1(r.zhuyin);
       if (sig.tone === 0) throw new Error(`Unexpected tone=0 id=${r.id} zhuyin=${r.zhuyin}`);
       return { ...r, tone: sig.tone };
@@ -129,7 +128,6 @@ describe("Taiwan Root-Only v0.8 — tone enrichment matrix vs control_root (Zhuy
     lines.push("");
     lines.push("| Tag | N |");
     lines.push("|-----|--:|");
-    const tags = ["position_root", "order_root", "control_root"] as const;
 
     for (const tag of tags) lines.push(`| ${tag} | ${items.filter((x) => x.tag === tag).length} |`);
     lines.push("");
