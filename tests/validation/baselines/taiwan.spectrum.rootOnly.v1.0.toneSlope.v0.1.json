@@ -1,0 +1,26 @@
+{
+  "version": "v1.0",
+  "corpus": "tests/research/taiwan.spectrum.rootOnly.v1.0.txt",
+  "iters": 12000,
+  "seed_base": 90924101,
+  "toneSlope": {
+    "tone4Rate": {
+      "pearson_r": -0.7178049194865025,
+      "p_perm": 0.06916666666666667,
+      "spearman_rho": -0.7671932182792477,
+      "p_perm_s": 0.0525
+    },
+    "tone3Rate": {
+      "pearson_r": 0.7219948723811553,
+      "p_perm": 0.06841666666666667,
+      "spearman_rho": 0.727392967453308,
+      "p_perm_s": 0.0715
+    },
+    "toneMean": {
+      "pearson_r": -0.5539117094069971,
+      "p_perm": 0.192,
+      "spearman_rho": -0.504524979109513,
+      "p_perm_s": 0.24433333333333335
+    }
+  }
+}

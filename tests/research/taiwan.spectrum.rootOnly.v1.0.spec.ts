@@ -10,6 +10,9 @@ type Tag = "v1" | "v2" | "v3" | "v4" | "v5" | "v6" | "v7";
 type Row = { id: string; hanzi: string; zhuyin: string; tag: Tag };
 type Item = Row & {
   tone: Tone;
+    toneMean: number;
+    tone4Flag: number;
+    tone3Flag: number;
   primary: Vowel;
   voices: Vowel[];
   presMask: number; // 7-bit mask over VOX
@@ -123,7 +126,7 @@ function fmtPct(n: number, d: number) {
 // permutation p-value for correlation across bucket means
 function slopePvalue(opts: {
   items: Item[];
-  scoreKey: "aperturePrimary" | "aperturePresenceMean";
+  scoreKey: "aperturePrimary" | "aperturePresenceMean" | "toneMean" | "tone4Flag" | "tone3Flag";
   iters: number;
   seed: number;
 }) {
@@ -187,6 +190,10 @@ describe("Taiwan Spectrum Root-Only v1.0 — slope + tone diagnostics (Zhuyin)",
       if (sig.primary === "NONE") throw new Error(`Unexpected primary=NONE (implicit/apical?) id=${r.id} zhuyin=${r.zhuyin}`);
 
       const tone = sig.tone as Tone;
+
+        const toneMean = tone;
+        const tone4Flag = tone === 4 ? 1 : 0;
+        const tone3Flag = tone === 3 ? 1 : 0;
       const primary = sig.primary as Vowel;
       const voices = (sig.voices ?? []) as Vowel[];
 
@@ -201,7 +208,7 @@ describe("Taiwan Spectrum Root-Only v1.0 — slope + tone diagnostics (Zhuyin)",
       const aperturePrimary = APERTURE[primary];
       const aperturePresenceMean = uniq.length ? mean(uniq.map((v) => APERTURE[v])) : aperturePrimary;
 
-      return { ...r, tone, primary, voices: uniq, presMask, aperturePrimary, aperturePresenceMean };
+      return { ...r, tone, toneMean, tone4Flag, tone3Flag, primary, voices: uniq, presMask, aperturePrimary, aperturePresenceMean };
     });
 
     fs.mkdirSync(outDir, { recursive: true });
@@ -247,13 +254,27 @@ describe("Taiwan Spectrum Root-Only v1.0 — slope + tone diagnostics (Zhuyin)",
     const slopePrimary = slopePvalue({ items, scoreKey: "aperturePrimary", iters: ITERS, seed: (SEED ^ 0xA11CE) >>> 0 });
     const slopePresence = slopePvalue({ items, scoreKey: "aperturePresenceMean", iters: ITERS, seed: (SEED ^ 0xBADA55) >>> 0 });
 
+      // Tone slope probes (v0.1)
+      const slopeTone4 = slopePvalue({ items, scoreKey: "tone4Flag", iters: ITERS, seed: (SEED ^ 0x704E4) >>> 0 });
+      const slopeTone3 = slopePvalue({ items, scoreKey: "tone3Flag", iters: ITERS, seed: (SEED ^ 0x703E3) >>> 0 });
+      const slopeToneMean = slopePvalue({ items, scoreKey: "toneMean", iters: ITERS, seed: (SEED ^ 0x70E) >>> 0 });
+
     lines.push("## Slope test (bucket means vs semantic index 1..7)");
     lines.push("");
     lines.push("| Score | Pearson r | p (perm, two-sided) | Spearman ρ | p (perm, two-sided) |");
     lines.push("|-------|----------:|-------------------:|-----------:|---------------------:|");
     lines.push(`| aperture(primary) | ${fmt(slopePrimary.obsR, 3)} | ${fmt(slopePrimary.pR, 3)} | ${fmt(slopePrimary.obsRs, 3)} | ${fmt(slopePrimary.pRs, 3)} |`);
     lines.push(`| aperture(presence mean) | ${fmt(slopePresence.obsR, 3)} | ${fmt(slopePresence.pR, 3)} | ${fmt(slopePresence.obsRs, 3)} | ${fmt(slopePresence.pRs, 3)} |`);
-    lines.push("");
+      lines.push("");
+
+      lines.push("## Tone slope test (bucket means vs semantic index 1..7)");
+      lines.push("");
+      lines.push("| Score | Pearson r | p (perm, two-sided) | Spearman ρ | p (perm, two-sided) |");
+      lines.push("|-------|----------:|-------------------:|-----------:|---------------------:|");
+      lines.push(`| tone4 rate | ${fmt(slopeTone4.obsR, 3)} | ${fmt(slopeTone4.pR, 3)} | ${fmt(slopeTone4.obsRs, 3)} | ${fmt(slopeTone4.pRs, 3)} |`);
+      lines.push(`| tone3 rate | ${fmt(slopeTone3.obsR, 3)} | ${fmt(slopeTone3.pR, 3)} | ${fmt(slopeTone3.obsRs, 3)} | ${fmt(slopeTone3.pRs, 3)} |`);
+      lines.push(`| mean(tone) | ${fmt(slopeToneMean.obsR, 3)} | ${fmt(slopeToneMean.pR, 3)} | ${fmt(slopeToneMean.obsRs, 3)} | ${fmt(slopeToneMean.pRs, 3)} |`);
+      lines.push("");
     lines.push("## Notes");
     lines.push("");
     lines.push("- This harness is a **calibration probe**, not a published claim: it measures slope directionality under strict parsing.");
@@ -262,6 +283,41 @@ describe("Taiwan Spectrum Root-Only v1.0 — slope + tone diagnostics (Zhuyin)",
     lines.push("");
 
     fs.writeFileSync(outMd, lines.join("\n") + "\n", "utf8");
+
+      // Tracked baselines for tone slope (v0.1)
+      const outBaselineDir = path.join(root, "tests/validation/baselines");
+      const baseToneMd = path.join(outBaselineDir, "taiwan.spectrum.rootOnly.v1.0.toneSlope.v0.1.md");
+      const baseToneJson = path.join(outBaselineDir, "taiwan.spectrum.rootOnly.v1.0.toneSlope.v0.1.json");
+
+      const toneLines: string[] = [];
+      toneLines.push("# Taiwan Spectrum Root-Only v1.0 — tone slope v0.1 (Zhuyin)");
+      toneLines.push("");
+      toneLines.push(`- corpus: \`${path.relative(root, inPath)}\` (${items.length})`);
+      toneLines.push(`- permutation iters: ${ITERS}`);
+      toneLines.push(`- seed(base): ${SEED}`);
+      toneLines.push("");
+      toneLines.push("| Score | Pearson r | p (perm, two-sided) | Spearman ρ | p (perm, two-sided) |");
+      toneLines.push("|-------|----------:|-------------------:|-----------:|---------------------:|");
+      toneLines.push(`| tone4 rate | ${fmt(slopeTone4.obsR, 3)} | ${fmt(slopeTone4.pR, 3)} | ${fmt(slopeTone4.obsRs, 3)} | ${fmt(slopeTone4.pRs, 3)} |`);
+      toneLines.push(`| tone3 rate | ${fmt(slopeTone3.obsR, 3)} | ${fmt(slopeTone3.pR, 3)} | ${fmt(slopeTone3.obsRs, 3)} | ${fmt(slopeTone3.pRs, 3)} |`);
+      toneLines.push(`| mean(tone) | ${fmt(slopeToneMean.obsR, 3)} | ${fmt(slopeToneMean.pR, 3)} | ${fmt(slopeToneMean.obsRs, 3)} | ${fmt(slopeToneMean.pRs, 3)} |`);
+      toneLines.push("");
+
+      const tonePayload = {
+        version: "v1.0",
+        corpus: path.relative(root, inPath),
+        iters: ITERS,
+        seed_base: SEED,
+        toneSlope: {
+          tone4Rate: { pearson_r: slopeTone4.obsR, p_perm: slopeTone4.pR, spearman_rho: slopeTone4.obsRs, p_perm_s: slopeTone4.pRs },
+          tone3Rate: { pearson_r: slopeTone3.obsR, p_perm: slopeTone3.pR, spearman_rho: slopeTone3.obsRs, p_perm_s: slopeTone3.pRs },
+          toneMean: { pearson_r: slopeToneMean.obsR, p_perm: slopeToneMean.pR, spearman_rho: slopeToneMean.obsRs, p_perm_s: slopeToneMean.pRs },
+        },
+      };
+
+      fs.mkdirSync(outBaselineDir, { recursive: true });
+      fs.writeFileSync(baseToneMd, toneLines.join("\n") + "\n", "utf8");
+      fs.writeFileSync(baseToneJson, JSON.stringify(tonePayload, null, 2) + "\n", "utf8");
 
 
       // ------------------------------------------------------------
@@ -290,7 +346,7 @@ describe("Taiwan Spectrum Root-Only v1.0 — slope + tone diagnostics (Zhuyin)",
         });
 
         const slopePrimary = slopePvalue({ items: xs, scoreKey: "aperturePrimary", iters: ITERS, seed: (SEED ^ 0xA11CE) >>> 0 });
-const slopePresence = slopePvalue({ items: xs, scoreKey: "aperturePresenceMean", iters: ITERS, seed: (SEED ^ 0xBADA55) >>> 0 });
+        const slopePresence = slopePvalue({ items: xs, scoreKey: "aperturePresenceMean", iters: ITERS, seed: (SEED ^ 0xBADA55) >>> 0 });
 return { buckets, slopePrimary, slopePresence };
       }
 
@@ -301,9 +357,9 @@ return { buckets, slopePrimary, slopePresence };
       const outCompareJson = path.join(outDir, "taiwan.spectrum.rootOnly.v1.0.compare.json");
 
 
-        const outBaselineDir = path.join(root, "tests/validation/baselines");
-        const baseCompareMd = path.join(outBaselineDir, "taiwan.spectrum.rootOnly.v1.0.compare.v0.1.md");
-        const baseCompareJson = path.join(outBaselineDir, "taiwan.spectrum.rootOnly.v1.0.compare.v0.1.json");
+        const outBaselineDirTone = path.join(root, "tests/validation/baselines");
+        const baseCompareMd = path.join(outBaselineDirTone, "taiwan.spectrum.rootOnly.v1.0.compare.v0.1.md");
+        const baseCompareJson = path.join(outBaselineDirTone, "taiwan.spectrum.rootOnly.v1.0.compare.v0.1.json");
       const cmp: string[] = [];
       cmp.push("# Taiwan Spectrum Root-Only v1.0 — compare N=10 vs N=20 (Zhuyin)");
       cmp.push("");
@@ -402,7 +458,7 @@ return { buckets, slopePrimary, slopePresence };
       );
       cmp.push("");
 
-      fs.mkdirSync(outBaselineDir, { recursive: true });
+      fs.mkdirSync(outBaselineDirTone, { recursive: true });
         fs.writeFileSync(outCompareMd, cmp.join("\n"), "utf8");
         fs.writeFileSync(baseCompareMd, cmp.join("\n"), "utf8");
       function deltaBuckets(b20: any[], b10: any[]) {
@@ -475,8 +531,8 @@ return { buckets, slopePrimary, slopePresence };
       // ------------------------------------------------------------
       const outAuditMd = path.join(outDir, "taiwan.spectrum.rootOnly.v1.0.audit.md");
       const outAuditJson = path.join(outDir, "taiwan.spectrum.rootOnly.v1.0.audit.json");
-      const baseAuditMd = path.join(outBaselineDir, "taiwan.spectrum.rootOnly.v1.0.audit.v0.1.md");
-      const baseAuditJson = path.join(outBaselineDir, "taiwan.spectrum.rootOnly.v1.0.audit.v0.1.json");
+      const baseAuditMd = path.join(outBaselineDirTone, "taiwan.spectrum.rootOnly.v1.0.audit.v0.1.md");
+      const baseAuditJson = path.join(outBaselineDirTone, "taiwan.spectrum.rootOnly.v1.0.audit.v0.1.json");
 
       type Cohort = "n10" | "step20" | "other";
       function cohortFor(id: string): Cohort {
@@ -585,7 +641,7 @@ return { buckets, slopePrimary, slopePresence };
         md.push("");
       }
 
-      fs.mkdirSync(outBaselineDir, { recursive: true });
+      fs.mkdirSync(outBaselineDirTone, { recursive: true });
       fs.writeFileSync(outAuditMd, md.join("\n") + "\n", "utf8");
       fs.writeFileSync(baseAuditMd, md.join("\n") + "\n", "utf8");
       fs.writeFileSync(outAuditJson, JSON.stringify(auditPayload, null, 2) + "\n", "utf8");
