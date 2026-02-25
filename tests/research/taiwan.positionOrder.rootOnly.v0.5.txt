@@ -103,3 +103,79 @@ cr.27    狗      ㄍㄡˇ        control_root
 cr.28    貓      ㄇㄠ         control_root
 cr.29    心      ㄒㄧㄣ        control_root
 cr.30    夢      ㄇㄥˋ        control_root
+
+# --------------------------
+# POSITION_ROOT (add 20) — pr.31..pr.50
+# --------------------------
+pr.31    遠      ㄩㄢˇ       position_root
+pr.32    近      ㄐㄧㄣˋ      position_root
+pr.33    區      ㄑㄩ         position_root
+pr.34    域      ㄩˋ         position_root
+pr.35    圈      ㄑㄩㄢ       position_root
+pr.36    洲      ㄓㄡ         position_root
+pr.37    座      ㄗㄨㄛˋ      position_root
+pr.38    層      ㄘㄥˊ       position_root
+pr.39    排      ㄆㄞˊ       position_root
+pr.40    列      ㄌㄧㄝˋ      position_root
+pr.41    軸      ㄓㄡˊ       position_root
+pr.42    路      ㄌㄨˋ       position_root
+pr.43    口      ㄎㄡˇ       position_root
+pr.44    門      ㄇㄣˊ       position_root
+pr.45    村      ㄘㄨㄣ       position_root
+pr.46    城      ㄔㄥˊ       position_root
+pr.47    鄉      ㄒㄧㄤ       position_root
+pr.48    京      ㄐㄧㄥ       position_root
+pr.49    站      ㄓㄢˋ       position_root
+pr.50    邑      ㄧˋ         position_root
+
+# --------------------------
+# ORDER_ROOT (add 22) — or.31..or.52
+# (avoid implicit/apical; keep explicit vowels)
+# --------------------------
+or.31    甲      ㄐㄧㄚˇ      order_root
+or.32    兩      ㄌㄧㄤˇ      order_root
+or.33    乙      ㄧˇ         order_root
+or.34    五      ㄨˇ         order_root
+or.35    六      ㄌㄧㄡˋ      order_root
+or.36    七      ㄑㄧ         order_root
+or.37    八      ㄅㄚ         order_root
+or.38    九      ㄐㄧㄡˇ      order_root
+or.39    丙      ㄅㄧㄥˇ      order_root
+or.40    百      ㄅㄞˇ       order_root
+or.41    千      ㄑㄧㄢ       order_root
+or.42    萬      ㄨㄢˋ       order_root
+or.43    單      ㄉㄢ         order_root
+or.44    雙      ㄕㄨㄤ       order_root
+or.45    並      ㄅㄧㄥˋ      order_root
+or.46    續      ㄒㄩˋ        order_root
+or.47    連      ㄌㄧㄢˊ      order_root
+or.48    排      ㄆㄞˊ        order_root
+or.49    序      ㄒㄩˋ        order_root
+or.50    段      ㄉㄨㄢˋ      order_root
+or.51    期      ㄑㄧˊ        order_root
+or.52    篇      ㄆㄧㄢ       order_root
+
+# --------------------------
+# CONTROL_ROOT (add 20) — cr.31..cr.50
+# (common concrete nouns; not position/order semantics)
+# --------------------------
+cr.31    茶      ㄔㄚ         control_root
+cr.32    米      ㄇㄧˇ       control_root
+cr.33    麵      ㄇㄧㄢˋ      control_root
+cr.34    蛋      ㄉㄢˋ       control_root
+cr.35    鹽      ㄧㄢˊ       control_root
+cr.36    糖      ㄊㄤˊ       control_root
+cr.37    酒      ㄐㄧㄡˇ      control_root
+cr.38    盆      ㄆㄣˊ       control_root
+cr.39    碗      ㄨㄢˇ       control_root
+cr.40    桌      ㄓㄨㄛ       control_root
+cr.41    椅      ㄧˇ         control_root
+cr.42    眼      ㄧㄢˇ       control_root
+cr.43    手      ㄕㄡˇ       control_root
+cr.44    腳      ㄐㄧㄠˇ      control_root
+cr.45    頭      ㄊㄡˊ       control_root
+cr.46    臉      ㄌㄧㄢˇ      control_root
+cr.47    衣      ㄧ          control_root
+cr.48    鞋      ㄒㄧㄝˊ      control_root
+cr.49    袋      ㄉㄞˋ       control_root
+cr.50    燈      ㄉㄥ        control_root
