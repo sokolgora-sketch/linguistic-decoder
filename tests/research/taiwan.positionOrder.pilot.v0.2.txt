@@ -233,3 +233,48 @@ cm.07  車  ㄔㄜ     control_misc
 cm.08  飯  ㄈㄢˋ    control_misc
 cm.09  水  ㄕㄨㄟˇ  control_misc
 cm.10  錢  ㄑㄧㄢˊ  control_misc
+
+# ------------------------------------------------------------
+# CONTROL_MISC — v0.4-controlMisc40 (cm.11..cm.50)
+# Explicit nuclei only (no apical/implicit cases like ㄗˇ / ㄘˋ / ㄙˋ).
+# ------------------------------------------------------------
+cm.11  的    ㄉㄜ˙          control_misc
+cm.12  這    ㄓㄜˋ          control_misc
+cm.13  那    ㄋㄚˋ          control_misc
+cm.14  哪    ㄋㄚˇ          control_misc
+cm.15  也    ㄧㄝˇ          control_misc
+cm.16  再    ㄗㄞˋ          control_misc
+cm.17  早    ㄗㄠˇ          control_misc
+cm.18  晚    ㄨㄢˇ          control_misc
+cm.19  今天  ㄐㄧㄣㄊㄧㄢ    control_misc
+cm.20  明天  ㄇㄧㄥˊㄊㄧㄢ   control_misc
+cm.21  昨天  ㄗㄨㄛˊㄊㄧㄢ   control_misc
+cm.22  現在  ㄒㄧㄢˋㄗㄞˋ    control_misc
+cm.23  朋友  ㄆㄥˊㄧㄡˇ      control_misc
+cm.24  學校  ㄒㄩㄝˊㄒㄧㄠˋ   control_misc
+cm.25  工作  ㄍㄨㄥㄗㄨㄛˋ    control_misc
+cm.26  電話  ㄉㄧㄢˋㄏㄨㄚˋ   control_misc
+cm.27  名稱  ㄇㄧㄥˊㄔㄥ      control_misc
+cm.28  東西  ㄉㄨㄥㄒㄧ       control_misc
+cm.29  飲料  ㄧㄣˇㄌㄧㄠˋ     control_misc
+cm.30  咖啡  ㄎㄚㄈㄟ         control_misc
+cm.31  牛奶  ㄋㄧㄡˊㄋㄞˇ      control_misc
+cm.32  茶    ㄔㄚˊ           control_misc
+cm.33  米飯  ㄇㄧˇㄈㄢˋ       control_misc
+cm.34  水果  ㄕㄨㄟˇㄍㄨㄛˇ    control_misc
+cm.35  房間  ㄈㄤˊㄐㄧㄢ      control_misc
+cm.36  桌面  ㄓㄨㄛㄇㄧㄢˋ     control_misc
+cm.37  椅背  ㄧˇㄅㄟˋ         control_misc
+cm.38  眼睛  ㄧㄢˇㄐㄧㄥ       control_misc
+cm.39  耳朵  ㄦˇㄉㄨㄛˇ       control_misc
+cm.40  手機  ㄕㄡˇㄐㄧ        control_misc
+cm.41  電腦  ㄉㄧㄢˋㄋㄠˇ      control_misc
+cm.42  開門  ㄎㄞㄇㄣˊ         control_misc
+cm.43  東邊  ㄉㄨㄥㄅㄧㄢ      control_misc
+cm.44  西邊  ㄒㄧㄅㄧㄢ        control_misc
+cm.45  南邊  ㄋㄢˊㄅㄧㄢ       control_misc
+cm.46  北邊  ㄅㄟˇㄅㄧㄢ       control_misc
+cm.47  休息  ㄒㄧㄡㄒㄧˊ       control_misc
+cm.48  喜歡  ㄒㄧˇㄏㄨㄢ       control_misc
+cm.49  需要  ㄒㄩㄧㄠˋ        control_misc
+cm.50  簡單  ㄐㄧㄢˇㄉㄢ       control_misc
