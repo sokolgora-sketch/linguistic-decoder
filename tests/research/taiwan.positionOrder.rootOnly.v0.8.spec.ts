@@ -98,17 +98,24 @@ describe("Taiwan Root-Only v0.8 — tone enrichment matrix vs control_root (Zhuy
 
     const rows = parseRows(fs.readFileSync(inPath, "utf8"));
     expect(rows.length).toBeGreaterThan(0);
+      const items: Item[] = rows.map((r) => {
+      const sig = extractZhuyinSignalV0_1(r.zhuyin);
+      if (sig.tone === 0) throw new Error(`Unexpected tone=0 id=${r.id} zhuyin=${r.zhuyin}`);
+      return { ...r, tone: sig.tone };
+    });
 
-    const items: Item[] = rows.map((r) => {
-        const sig = extractZhuyinSignalV0_1(r.zhuyin);
-        if (sig.tone === 0) throw new Error(`Unexpected tone=0 id=${r.id} zhuyin=${r.zhuyin}`);
-        return { ...r, tone: sig.tone };
-      });
+    const tags = ["position_root", "order_root", "control_root"] as const;
+    for (const tag of tags) {
+      expect(items.filter((x) => x.tag === tag).length).toBe(50);
+    }
+
+    const ITERS = 12000;
+    const SEED = 90924081;
 
     const ctrl = items.filter((x) => x.tag === "control_root").map((x) => x.tone);
-      const ITERS = 12000;
-      const SEED = 90924081;
-      const lines: string[] = [];
+
+    const lines: string[] = [];
+
     lines.push("# Taiwan Root-Only v0.8 — tone enrichment matrix vs control_root");
     lines.push("");
     lines.push("- Purpose: test whether tones (1–5) differentiate semantic tags after vowel-only probes went flat.");
@@ -121,7 +128,6 @@ describe("Taiwan Root-Only v0.8 — tone enrichment matrix vs control_root (Zhuy
     lines.push("");
     lines.push("| Tag | N |");
     lines.push("|-----|--:|");
-    const tags = ["position_root", "order_root", "control_root"] as const;
 
     for (const tag of tags) lines.push(`| ${tag} | ${items.filter((x) => x.tag === tag).length} |`);
     lines.push("");
