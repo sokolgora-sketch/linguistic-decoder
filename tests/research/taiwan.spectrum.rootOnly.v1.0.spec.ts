@@ -1,0 +1,266 @@
+import { describe, it, expect } from "@jest/globals";
+import fs from "fs";
+import path from "path";
+import { extractZhuyinSignalV0_1 } from "@/shared/vowels/extractZhuyinSignal.v0.1";
+
+type Vowel = "A" | "E" | "I" | "O" | "U" | "Y" | "Ë";
+type Tone = 1 | 2 | 3 | 4 | 5;
+type Tag = "v1" | "v2" | "v3" | "v4" | "v5" | "v6" | "v7";
+
+type Row = { id: string; hanzi: string; zhuyin: string; tag: Tag };
+type Item = Row & {
+  tone: Tone;
+  primary: Vowel;
+  voices: Vowel[];
+  presMask: number; // 7-bit mask over VOX
+  aperturePrimary: number;
+  aperturePresenceMean: number;
+};
+
+const TAGS: Tag[] = ["v1", "v2", "v3", "v4", "v5", "v6", "v7"];
+const VOX: Vowel[] = ["A", "O", "E", "Ë", "U", "Y", "I"]; // ordered open -> closed (for readability)
+
+const APERTURE: Record<Vowel, number> = {
+  A: 1.0,
+  O: 0.8,
+  E: 0.6,
+  "Ë": 0.5,
+  U: 0.4,
+  Y: 0.3,
+  I: 0.1,
+};
+
+function mulberry32(seed: number) {
+  let a = seed >>> 0;
+  return function () {
+    a |= 0;
+    a = (a + 0x6d2b79f5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t ^= t + Math.imul(t ^ (t >>> 7), 61 | t);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+function shuffleInPlace<T>(xs: T[], rnd: () => number) {
+  for (let i = xs.length - 1; i > 0; i--) {
+    const j = Math.floor(rnd() * (i + 1));
+    [xs[i], xs[j]] = [xs[j], xs[i]];
+  }
+}
+
+function parseRows(text: string): Row[] {
+  const out: Row[] = [];
+  for (const raw of text.split("\n")) {
+    const line = raw.trim();
+    if (!line || line.startsWith("#")) continue;
+    const m = line.match(/^(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s*$/u);
+    if (!m) continue;
+    const tag = m[4] as Tag;
+    if (!TAGS.includes(tag)) throw new Error(`Bad tag '${m[4]}' in row: ${line}`);
+    out.push({ id: m[1], hanzi: m[2], zhuyin: m[3], tag });
+  }
+  return out;
+}
+
+function bitFor(v: Vowel) {
+  const i = VOX.indexOf(v);
+  return i < 0 ? 0 : (1 << i);
+}
+
+function mean(xs: number[]) {
+  if (!xs.length) return NaN;
+  return xs.reduce((a, b) => a + b, 0) / xs.length;
+}
+
+function pearson(xs: number[], ys: number[]) {
+  if (xs.length !== ys.length || xs.length < 2) return NaN;
+  const mx = mean(xs);
+  const my = mean(ys);
+  let num = 0;
+  let dx = 0;
+  let dy = 0;
+  for (let i = 0; i < xs.length; i++) {
+    const a = xs[i] - mx;
+    const b = ys[i] - my;
+    num += a * b;
+    dx += a * a;
+    dy += b * b;
+  }
+  if (dx === 0 || dy === 0) return NaN;
+  return num / Math.sqrt(dx * dy);
+}
+
+function rank(xs: number[]) {
+  const pairs = xs.map((x, i) => ({ x, i })).sort((a, b) => a.x - b.x);
+  const r = new Array<number>(xs.length).fill(0);
+  // simple average ranks for ties
+  let k = 0;
+  while (k < pairs.length) {
+    let j = k + 1;
+    while (j < pairs.length && pairs[j].x === pairs[k].x) j++;
+    const avg = (k + 1 + j) / 2; // ranks are 1-based
+    for (let t = k; t < j; t++) r[pairs[t].i] = avg;
+    k = j;
+  }
+  return r;
+}
+
+function spearman(xs: number[], ys: number[]) {
+  return pearson(rank(xs), rank(ys));
+}
+
+function fmt(x: number, digits = 3) {
+  if (!Number.isFinite(x)) return "NA";
+  const s = x.toFixed(digits);
+  // avoid "-0.000"
+  return s === "-0.000" ? "0.000" : s;
+}
+
+function fmtPct(n: number, d: number) {
+  if (!d) return `0.0% (0/0)`;
+  return `${(100 * (n / d)).toFixed(1)}% (${n}/${d})`;
+}
+
+// permutation p-value for correlation across bucket means
+function slopePvalue(opts: {
+  items: Item[];
+  scoreKey: "aperturePrimary" | "aperturePresenceMean";
+  iters: number;
+  seed: number;
+}) {
+  const { items, scoreKey, iters, seed } = opts;
+
+  // observed means per bucket in fixed TAGS order
+  const obsMeans = TAGS.map((tag) => mean(items.filter((x) => x.tag === tag).map((x) => x[scoreKey])));
+  const xs = TAGS.map((_, i) => i + 1); // semantic axis 1..7
+  const obsR = pearson(xs, obsMeans);
+  const obsRs = spearman(xs, obsMeans);
+
+  // permute tags across items (preserve bucket sizes)
+  const labels = items.map((x) => x.tag);
+  const rnd = mulberry32(seed);
+  let geR = 0;
+  let geRs = 0;
+
+  for (let k = 0; k < iters; k++) {
+    const tmp = labels.slice();
+    shuffleInPlace(tmp, rnd);
+
+    const means = TAGS.map((tag) => {
+      const scores: number[] = [];
+      for (let i = 0; i < items.length; i++) {
+        if (tmp[i] === tag) scores.push(items[i][scoreKey]);
+      }
+      return mean(scores);
+    });
+
+    const r = pearson(xs, means);
+    const rs = spearman(xs, means);
+
+    if (Number.isFinite(obsR) && Number.isFinite(r) && Math.abs(r) >= Math.abs(obsR)) geR++;
+    if (Number.isFinite(obsRs) && Number.isFinite(rs) && Math.abs(rs) >= Math.abs(obsRs)) geRs++;
+  }
+
+  const pR = Number.isFinite(obsR) ? geR / iters : 1;
+  const pRs = Number.isFinite(obsRs) ? geRs / iters : 1;
+  return { obsMeans, obsR, obsRs, pR, pRs };
+}
+
+describe("Taiwan Spectrum Root-Only v1.0 — slope + tone diagnostics (Zhuyin)", () => {
+  it("writes tests/validation/out/taiwan.spectrum.rootOnly.v1.0.md", () => {
+    const root = process.cwd();
+    const inPath = path.join(root, "tests/research/taiwan.spectrum.rootOnly.v1.0.txt");
+    const outDir = path.join(root, "tests/validation/out");
+    const outMd = path.join(outDir, "taiwan.spectrum.rootOnly.v1.0.md");
+
+    if (!fs.existsSync(inPath)) throw new Error(`Missing: ${inPath}`);
+
+    const rows = parseRows(fs.readFileSync(inPath, "utf8"));
+    expect(rows.length).toBeGreaterThan(0);
+
+    const items: Item[] = rows.map((r) => {
+      // single-character guard (hard fail)
+      if ([...r.hanzi].length !== 1) throw new Error(`Non-atomic hanzi (must be 1 char): id=${r.id} hanzi=${r.hanzi}`);
+
+      const sig = extractZhuyinSignalV0_1(r.zhuyin);
+
+      if (![1, 2, 3, 4, 5].includes(sig.tone as any)) throw new Error(`Unexpected tone: id=${r.id} zhuyin=${r.zhuyin} tone=${sig.tone}`);
+      if (sig.primary === "NONE") throw new Error(`Unexpected primary=NONE (implicit/apical?) id=${r.id} zhuyin=${r.zhuyin}`);
+
+      const tone = sig.tone as Tone;
+      const primary = sig.primary as Vowel;
+      const voices = (sig.voices ?? []) as Vowel[];
+
+      let presMask = 0;
+      const uniq: Vowel[] = [];
+      for (const v of voices) {
+        if (!APERTURE[v]) continue;
+        if (!uniq.includes(v)) uniq.push(v);
+        presMask |= bitFor(v);
+      }
+
+      const aperturePrimary = APERTURE[primary];
+      const aperturePresenceMean = uniq.length ? mean(uniq.map((v) => APERTURE[v])) : aperturePrimary;
+
+      return { ...r, tone, primary, voices: uniq, presMask, aperturePrimary, aperturePresenceMean };
+    });
+
+    fs.mkdirSync(outDir, { recursive: true });
+
+    const TARGET = 20;
+    const ITERS = 12000;
+    const SEED = 90924101;
+
+    const lines: string[] = [];
+    lines.push("# Taiwan Spectrum Root-Only v1.0 — slope + tone diagnostics (Zhuyin)");
+    lines.push("");
+    lines.push("- Purpose: measure *directionality* across 7 semantic buckets (V1→V7) using aperture + tone, not single anchors.");
+    lines.push(`- corpus: \`${path.relative(root, inPath)}\` (${items.length})`);
+    lines.push(`- target per bucket: ${TARGET} (power table is informational)`);
+    lines.push(`- permutation iters: ${ITERS}`);
+    lines.push(`- seed: ${SEED}`);
+    lines.push("");
+    lines.push("## Power check (non-failing)");
+    lines.push("");
+    lines.push("| Bucket | N | Missing to target |");
+    lines.push("|--------|--:|------------------:|");
+    for (const tag of TAGS) {
+      const n = items.filter((x) => x.tag === tag).length;
+      lines.push(`| ${tag.toUpperCase()} | ${n} | ${Math.max(0, TARGET - n)} |`);
+    }
+    lines.push("");
+
+    lines.push("## Bucket means (aperture + tone)");
+    lines.push("");
+    lines.push("| Bucket | N | aperture(primary) | aperture(presence mean) | tone4 | tone3 |");
+    lines.push("|--------|--:|------------------:|------------------------:|------:|------:|");
+    for (const tag of TAGS) {
+      const b = items.filter((x) => x.tag === tag);
+      const n = b.length;
+      const aP = mean(b.map((x) => x.aperturePrimary));
+      const aM = mean(b.map((x) => x.aperturePresenceMean));
+      const t4 = b.filter((x) => x.tone === 4).length;
+      const t3 = b.filter((x) => x.tone === 3).length;
+      lines.push(`| ${tag.toUpperCase()} | ${n} | ${fmt(aP, 3)} | ${fmt(aM, 3)} | ${fmtPct(t4, n)} | ${fmtPct(t3, n)} |`);
+    }
+    lines.push("");
+
+    const slopePrimary = slopePvalue({ items, scoreKey: "aperturePrimary", iters: ITERS, seed: (SEED ^ 0xA11CE) >>> 0 });
+    const slopePresence = slopePvalue({ items, scoreKey: "aperturePresenceMean", iters: ITERS, seed: (SEED ^ 0xBADA55) >>> 0 });
+
+    lines.push("## Slope test (bucket means vs semantic index 1..7)");
+    lines.push("");
+    lines.push("| Score | Pearson r | p (perm, two-sided) | Spearman ρ | p (perm, two-sided) |");
+    lines.push("|-------|----------:|-------------------:|-----------:|---------------------:|");
+    lines.push(`| aperture(primary) | ${fmt(slopePrimary.obsR, 3)} | ${fmt(slopePrimary.pR, 3)} | ${fmt(slopePrimary.obsRs, 3)} | ${fmt(slopePrimary.pRs, 3)} |`);
+    lines.push(`| aperture(presence mean) | ${fmt(slopePresence.obsR, 3)} | ${fmt(slopePresence.pR, 3)} | ${fmt(slopePresence.obsRs, 3)} | ${fmt(slopePresence.pRs, 3)} |`);
+    lines.push("");
+    lines.push("## Notes");
+    lines.push("");
+    lines.push("- This harness is a **calibration probe**, not a published claim: it measures slope directionality under strict parsing.");
+    lines.push("- Hard-fails on: multi-character hanzi, tone=0, primary=NONE, or unknown tag.");
+    lines.push("- If Gemini/LLM provides candidates, use this harness to reject/replace failing rows until the dataset is clean.");
+    lines.push("");
+
+    fs.writeFileSync(outMd, lines.join("\n") + "\n", "utf8");
+  });
+});

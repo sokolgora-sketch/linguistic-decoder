@@ -1,0 +1,33 @@
+# id      hanzi   zhuyin       tag
+# RULES:
+# - hanzi must be single-character
+# - zhuyin must yield: tone 1..5 AND primary != NONE via extractZhuyinSignalV0_1
+# - tags must be one of: v1 v2 v3 v4 v5 v6 v7
+
+# V1 — Expansion / Space
+v1.01    大      ㄉㄚˋ        v1
+v1.02    開      ㄎㄞ         v1
+
+# V2 — Force / Mass
+v2.01    重      ㄓㄨㄥˋ      v2
+v2.02    攻      ㄍㄨㄥ       v2
+
+# V3 — Interior / Depth
+v3.01    內      ㄋㄟˋ        v3
+v3.02    深      ㄕㄣ         v3
+
+# V4 — Ground / Balance
+v4.01    土      ㄊㄨˇ        v4
+v4.02    平      ㄆㄧㄥˊ      v4
+
+# V5 — Activity / Direction
+v5.01    行      ㄒㄧㄥˊ      v5
+v5.02    動      ㄉㄨㄥˋ      v5
+
+# V6 — Tension / High / Thin
+v6.01    高      ㄍㄠ         v6
+v6.02    緊      ㄐㄧㄣˇ      v6
+
+# V7 — Focus / Linearity
+v7.01    一      ㄧ           v7
+v7.02    點      ㄉㄧㄢˇ      v7
