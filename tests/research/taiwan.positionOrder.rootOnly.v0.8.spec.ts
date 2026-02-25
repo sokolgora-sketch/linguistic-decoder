@@ -106,10 +106,8 @@ describe("Taiwan Root-Only v0.8 — tone enrichment matrix vs control_root (Zhuy
       });
 
     const ctrl = items.filter((x) => x.tag === "control_root").map((x) => x.tone);
-
-          const ITERS = 12000;
+      const ITERS = 12000;
       const SEED = 90924081;
-
       const lines: string[] = [];
     lines.push("# Taiwan Root-Only v0.8 — tone enrichment matrix vs control_root");
     lines.push("");
@@ -123,6 +121,8 @@ describe("Taiwan Root-Only v0.8 — tone enrichment matrix vs control_root (Zhuy
     lines.push("");
     lines.push("| Tag | N |");
     lines.push("|-----|--:|");
+    const tags = ["position_root", "order_root", "control_root"] as const;
+
     for (const tag of tags) lines.push(`| ${tag} | ${items.filter((x) => x.tag === tag).length} |`);
     lines.push("");
 
