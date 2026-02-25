@@ -107,7 +107,10 @@ describe("Taiwan Root-Only v0.8 — tone enrichment matrix vs control_root (Zhuy
 
     const ctrl = items.filter((x) => x.tag === "control_root").map((x) => x.tone);
 
-    const lines: string[] = [];
+          const ITERS = 12000;
+      const SEED = 90924081;
+
+      const lines: string[] = [];
     lines.push("# Taiwan Root-Only v0.8 — tone enrichment matrix vs control_root");
     lines.push("");
     lines.push("- Purpose: test whether tones (1–5) differentiate semantic tags after vowel-only probes went flat.");

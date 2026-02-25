@@ -272,6 +272,8 @@ describe("Taiwan Root-Only v0.9 — joint (Tone × Vowel) matrix vs control_root
     lines.push("");
     lines.push("| Tag | N |");
     lines.push("|-----|--:|");
+    const want = ["position_root", "order_root", "control_root"] as const;
+
     for (const t of want) lines.push(`| ${t} | ${items.filter((x) => x.tag === t).length} |`);
     lines.push("");
 
