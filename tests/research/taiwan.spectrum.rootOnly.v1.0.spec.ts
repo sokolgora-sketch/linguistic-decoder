@@ -467,5 +467,128 @@ return { buckets, slopePrimary, slopePresence };
 
       fs.writeFileSync(outCompareJson, JSON.stringify(payload, null, 2) + "\n", "utf8");
         fs.writeFileSync(baseCompareJson, JSON.stringify(payload, null, 2) + "\n", "utf8");
+
+      // ------------------------------------------------------------
+      // Outlier audit baseline (v0.1)
+      // Purpose: expose which exact rows (esp tv20.*) raise/lower bucket means.
+      // Tracked outputs: tests/validation/baselines/*.audit.v0.1.(md|json)
+      // ------------------------------------------------------------
+      const outAuditMd = path.join(outDir, "taiwan.spectrum.rootOnly.v1.0.audit.md");
+      const outAuditJson = path.join(outDir, "taiwan.spectrum.rootOnly.v1.0.audit.json");
+      const baseAuditMd = path.join(outBaselineDir, "taiwan.spectrum.rootOnly.v1.0.audit.v0.1.md");
+      const baseAuditJson = path.join(outBaselineDir, "taiwan.spectrum.rootOnly.v1.0.audit.v0.1.json");
+
+      type Cohort = "n10" | "step20" | "other";
+      function cohortFor(id: string): Cohort {
+        if (id.startsWith("tv20.")) return "step20";
+        if (id.startsWith("tv10.") || id.startsWith("v")) return "n10";
+        return "other";
+      }
+
+      const auditItems = items.map((x) => ({
+        id: x.id,
+        cohort: cohortFor(x.id),
+        tag: x.tag,
+        hanzi: x.hanzi,
+        zhuyin: x.zhuyin,
+        tone: x.tone,
+        primary: x.primary,
+        voices: x.voices,
+        aperturePrimary: x.aperturePrimary,
+        aperturePresenceMean: x.aperturePresenceMean,
+      }));
+
+      const n10Items = auditItems.filter((x) => x.cohort === "n10");
+      const step20Items = auditItems.filter((x) => x.cohort === "step20");
+
+      function meanPresence(xs: any[]) {
+        return mean(xs.map((x) => x.aperturePresenceMean));
+      }
+
+      function sortByPresenceDesc(xs: any[]) {
+        return xs
+          .slice()
+          .sort((a, b) => (b.aperturePresenceMean - a.aperturePresenceMean) || String(a.id).localeCompare(String(b.id)));
+      }
+
+      const bucketDrift = TAGS.map((tag) => {
+        const n10 = n10Items.filter((x) => x.tag === tag);
+        const s20 = step20Items.filter((x) => x.tag === tag);
+        const all = auditItems.filter((x) => x.tag === tag);
+        const n10m = meanPresence(n10);
+        const s20m = meanPresence(s20);
+        const allm = meanPresence(all);
+        return {
+          tag,
+          n10_n: n10.length,
+          step20_n: s20.length,
+          all_n: all.length,
+          n10_presenceMean: n10m,
+          step20_presenceMean: s20m,
+          all_presenceMean: allm,
+          d_step20_minus_n10: s20m - n10m,
+          d_all_minus_n10: allm - n10m,
+        };
+      });
+
+      const outliers = {
+        step20_global_widest: sortByPresenceDesc(step20Items).slice(0, 12),
+        step20_by_bucket_widest: Object.fromEntries(
+          TAGS.map((tag) => [tag, sortByPresenceDesc(step20Items.filter((x) => x.tag === tag)).slice(0, 8)])
+        ),
+      };
+
+      const auditPayload = {
+        version: "v1.0",
+        corpus: path.relative(root, inPath),
+        n_total: auditItems.length,
+        n10: { n: n10Items.length },
+        step20: { n: step20Items.length },
+        bucketDrift,
+        outliers,
+      };
+
+      const md: string[] = [];
+      md.push("# Taiwan Spectrum Root-Only v1.0 — outlier audit v0.1 (Zhuyin)");
+      md.push("");
+      md.push(`- corpus: \`${path.relative(root, inPath)}\``);
+      md.push(`- N10 cohort: ${n10Items.length} (ids starting with "v" or "tv10.")`);
+      md.push(`- STEP20 cohort: ${step20Items.length} (ids starting with "tv20.")`);
+      md.push("");
+
+      md.push("## Bucket drift (presence mean)");
+      md.push("");
+      md.push("| Bucket | N10 mean | STEP20 mean | ALL mean | Δ(STEP20−N10) |");
+      md.push("|--------|---------:|------------:|---------:|--------------:|");
+      for (const b of bucketDrift) {
+        md.push(`| ${String(b.tag).toUpperCase()} | ${fmt(b.n10_presenceMean, 3)} | ${fmt(b.step20_presenceMean, 3)} | ${fmt(b.all_presenceMean, 3)} | ${fmt(b.d_step20_minus_n10, 3)} |`);
+      }
+      md.push("");
+
+      md.push("## STEP20 widest global (top 12 by aperturePresenceMean)");
+      md.push("");
+      md.push("| id | bucket | hanzi | zhuyin | tone | primary | voices | a_presence |");
+      md.push("|----|--------|-------|--------|-----:|--------|--------|----------:|");
+      for (const x of outliers.step20_global_widest) {
+        md.push(`| ${x.id} | ${String(x.tag).toUpperCase()} | ${x.hanzi} | ${x.zhuyin} | ${x.tone} | ${x.primary} | ${(x.voices ?? []).join(",")} | ${fmt(x.aperturePresenceMean, 3)} |`);
+      }
+      md.push("");
+
+      for (const tag of TAGS) {
+        md.push(`## STEP20 widest — bucket ${tag.toUpperCase()} (top 8)`);
+        md.push("");
+        md.push("| id | hanzi | zhuyin | tone | primary | voices | a_presence |");
+        md.push("|----|-------|--------|-----:|--------|--------|----------:|");
+        for (const x of outliers.step20_by_bucket_widest[tag]) {
+          md.push(`| ${x.id} | ${x.hanzi} | ${x.zhuyin} | ${x.tone} | ${x.primary} | ${(x.voices ?? []).join(",")} | ${fmt(x.aperturePresenceMean, 3)} |`);
+        }
+        md.push("");
+      }
+
+      fs.mkdirSync(outBaselineDir, { recursive: true });
+      fs.writeFileSync(outAuditMd, md.join("\n") + "\n", "utf8");
+      fs.writeFileSync(baseAuditMd, md.join("\n") + "\n", "utf8");
+      fs.writeFileSync(outAuditJson, JSON.stringify(auditPayload, null, 2) + "\n", "utf8");
+      fs.writeFileSync(baseAuditJson, JSON.stringify(auditPayload, null, 2) + "\n", "utf8");
   });
 });
