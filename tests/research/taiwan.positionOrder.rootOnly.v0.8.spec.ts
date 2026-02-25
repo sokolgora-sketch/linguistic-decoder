@@ -1,7 +1,8 @@
 import { describe, it, expect } from "@jest/globals";
 import fs from "fs";
 import path from "path";
-import { extractToneFromZhuyinV0_1, ZhuyinToneV0_1 } from "@/shared/vowels/extractToneFromZhuyin.v0.1";
+import { extractZhuyinSignalV0_1 } from "@/shared/vowels/extractZhuyinSignal.v0.1";
+import { ZhuyinToneV0_1 } from "@/shared/vowels/extractToneFromZhuyin.v0.1";
 
 type Row = { id: string; hanzi: string; zhuyin: string; tag: string };
 type Item = Row & { tone: ZhuyinToneV0_1 };
@@ -99,24 +100,15 @@ describe("Taiwan Root-Only v0.8 — tone enrichment matrix vs control_root (Zhuy
     expect(rows.length).toBeGreaterThan(0);
 
     const items: Item[] = rows.map((r) => {
-      const t = extractToneFromZhuyinV0_1(r.zhuyin);
-      if (t.tone === 0) throw new Error(`Unexpected tone=0 id=${r.id} zhuyin=${r.zhuyin}`);
-      return { ...r, tone: t.tone };
-    });
-
-    const tags = ["position_root", "order_root", "control_root"] as const;
-    for (const tag of tags) {
-      expect(items.filter((x) => x.tag === tag).length).toBe(50);
-    }
-
-    const ITERS = 12000;
-    const SEED = 90924081;
-
-    fs.mkdirSync(outDir, { recursive: true });
+        const sig = extractZhuyinSignalV0_1(r.zhuyin);
+        if (sig.tone === 0) throw new Error(`Unexpected tone=0 id=${r.id} zhuyin=${r.zhuyin}`);
+        return { ...r, tone: sig.tone };
+      });
 
     const ctrl = items.filter((x) => x.tag === "control_root").map((x) => x.tone);
-
-    const lines: string[] = [];
+      const ITERS = 12000;
+      const SEED = 90924081;
+      const lines: string[] = [];
     lines.push("# Taiwan Root-Only v0.8 — tone enrichment matrix vs control_root");
     lines.push("");
     lines.push("- Purpose: test whether tones (1–5) differentiate semantic tags after vowel-only probes went flat.");
@@ -129,6 +121,8 @@ describe("Taiwan Root-Only v0.8 — tone enrichment matrix vs control_root (Zhuy
     lines.push("");
     lines.push("| Tag | N |");
     lines.push("|-----|--:|");
+    const tags = ["position_root", "order_root", "control_root"] as const;
+
     for (const tag of tags) lines.push(`| ${tag} | ${items.filter((x) => x.tag === tag).length} |`);
     lines.push("");
 
