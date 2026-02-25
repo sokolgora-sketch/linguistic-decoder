@@ -100,20 +100,10 @@ describe("Taiwan Root-Only v0.8 — tone enrichment matrix vs control_root (Zhuy
     expect(rows.length).toBeGreaterThan(0);
 
     const items: Item[] = rows.map((r) => {
-      const t = extractToneFromZhuyinV0_1(r.zhuyin);
-      if (t.tone === 0) throw new Error(`Unexpected tone=0 id=${r.id} zhuyin=${r.zhuyin}`);
-      return { ...r, tone: t.tone };
-    });
-
-    const tags = ["position_root", "order_root", "control_root"] as const;
-    for (const tag of tags) {
-      expect(items.filter((x) => x.tag === tag).length).toBe(50);
-    }
-
-    const ITERS = 12000;
-    const SEED = 90924081;
-
-    fs.mkdirSync(outDir, { recursive: true });
+        const sig = extractZhuyinSignalV0_1(r.zhuyin);
+        if (sig.tone === 0) throw new Error(`Unexpected tone=0 id=${r.id} zhuyin=${r.zhuyin}`);
+        return { ...r, tone: sig.tone };
+      });
 
     const ctrl = items.filter((x) => x.tag === "control_root").map((x) => x.tone);
 

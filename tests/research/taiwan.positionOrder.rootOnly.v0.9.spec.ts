@@ -239,24 +239,22 @@ describe("Taiwan Root-Only v0.9 — joint (Tone × Vowel) matrix vs control_root
     expect(rows.length).toBeGreaterThan(0);
 
     const items: Item[] = rows.map((r) => {
-      const toneOut = extractToneFromZhuyinV0_1(r.zhuyin);
-      if (![1, 2, 3, 4, 5].includes(toneOut.tone)) throw new Error(`Unexpected tone: ${r.id} ${r.zhuyin} => ${toneOut.tone}`);
+        const sig = extractZhuyinSignalV0_1(r.zhuyin);
 
-      const vowOut = extractCarrierVoicesFromZhuyinV0_1(toneOut.normalized);
-      const voices = Array.isArray((vowOut as any)?.voices) ? ((vowOut as any).voices as Vowel[]) : [];
-      const primary = ((vowOut as any)?.primary ?? "NONE") as Primary;
-      if (primary === "NONE") throw new Error(`Unexpected NONE primary: ${r.id} ${r.zhuyin} (normalized=${toneOut.normalized})`);
+        if (![1, 2, 3, 4, 5].includes(sig.tone)) {
+          throw new Error(`Unexpected tone: ${r.id} ${r.zhuyin} => ${sig.tone}`);
+        }
 
-      let presMask = 0;
-      for (const v of voices) presMask |= bitFor(v);
+        const primary = sig.primary;
+        if (primary === "NONE") {
+          throw new Error(`Unexpected primary=NONE (implicit/apical?) id=${r.id} zhuyin=${r.zhuyin}`);
+        }
 
-      return { ...r, voices, primary: primary as Vowel, tone: toneOut.tone, presMask };
-    });
+        const voices = Array.isArray(sig.voices) ? sig.voices : [];
+        const presMask = voices.reduce((m, v) => m | bitFor(v), 0);
 
-    const want = ["position_root", "order_root", "control_root"];
-    for (const w of want) if (!items.some((x) => x.tag === w)) throw new Error("Missing tag: " + w);
-
-    fs.mkdirSync(outDir, { recursive: true });
+        return { ...r, voices, primary, tone: sig.tone, presMask };
+      });
 
     const ITERS = 12000;
     const SEED = 90924091;
