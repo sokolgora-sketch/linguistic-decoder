@@ -31,3 +31,78 @@ v6.02    緊      ㄐㄧㄣˇ      v6
 # V7 — Focus / Linearity
 v7.01    一      ㄧ           v7
 v7.02    點      ㄉㄧㄢˇ      v7
+
+# ------------------------------------------------------------
+# v1.0 STEP10 — add 8 per bucket (single-char roots; explicit nuclei only)
+# IDs use prefix tv10.* to avoid collisions with scaffold ids.
+# ------------------------------------------------------------
+
+# V1 Expansion (add 8)
+tv10.V1.01  大   ㄉㄚˋ     v1
+tv10.V1.02  廣  ㄍㄨㄤˇ    v1
+tv10.V1.03  闊  ㄎㄨㄛˋ    v1
+tv10.V1.04  開  ㄎㄞ      v1
+tv10.V1.05  天  ㄊㄧㄢ     v1
+tv10.V1.06  放  ㄈㄤˋ     v1
+tv10.V1.07  空  ㄎㄨㄥ     v1
+tv10.V1.08  巨  ㄐㄩˋ     v1
+
+# V2 Force (add 8)
+tv10.V2.01  重  ㄓㄨㄥˋ    v2
+tv10.V2.02  撞  ㄓㄨㄤˋ    v2
+tv10.V2.03  推  ㄊㄨㄟ     v2
+tv10.V2.04  擊  ㄐㄧˊ     v2
+tv10.V2.05  爆  ㄅㄠˋ     v2
+tv10.V2.06  猛  ㄇㄥˇ     v2
+tv10.V2.07  壓  ㄧㄚ      v2
+tv10.V2.08  攻  ㄍㄨㄥ     v2
+
+# V3 Interior (add 8)
+tv10.V3.01  深  ㄕㄣ      v3
+tv10.V3.02  入  ㄖㄨˋ     v3
+tv10.V3.03  內  ㄋㄟˋ     v3
+tv10.V3.04  洞  ㄉㄨㄥˋ    v3
+tv10.V3.05  幽  ㄧㄡ      v3
+tv10.V3.06  暗  ㄢˋ      v3
+tv10.V3.07  冥  ㄇㄧㄥˊ    v3
+tv10.V3.08  奧  ㄠˋ      v3
+
+# V4 Ground (add 8)
+tv10.V4.01  地  ㄉㄧˋ     v4
+tv10.V4.02  平  ㄆㄧㄥˊ    v4
+tv10.V4.03  土  ㄊㄨˇ     v4
+tv10.V4.04  靜  ㄐㄧㄥˋ    v4
+tv10.V4.05  安  ㄢ        v4
+tv10.V4.06  定  ㄉㄧㄥˋ    v4
+tv10.V4.07  和  ㄏㄜˊ     v4
+tv10.V4.08  沉  ㄔㄣˊ     v4
+
+# V5 Activity (add 8)
+tv10.V5.01  行  ㄒㄧㄥˊ    v5
+tv10.V5.02  走  ㄗㄡˇ     v5
+tv10.V5.03  跑  ㄆㄠˇ     v5
+tv10.V5.04  飛  ㄈㄟ      v5
+tv10.V5.05  轉  ㄓㄨㄢˇ    v5
+tv10.V5.06  動  ㄉㄨㄥˋ    v5
+tv10.V5.07  啟  ㄑㄧˇ     v5
+tv10.V5.08  流  ㄌㄧㄡˊ    v5
+
+# V6 Tension (add 8)
+tv10.V6.01  高  ㄍㄠ      v6
+tv10.V6.02  尖  ㄐㄧㄢ     v6
+tv10.V6.03  緊  ㄐㄧㄣˇ    v6
+tv10.V6.04  風  ㄈㄥ      v6
+tv10.V6.05  雲  ㄩㄣˊ     v6
+tv10.V6.06  氣  ㄑㄧˋ     v6
+tv10.V6.07  虛  ㄒㄩ      v6
+tv10.V6.08  聳  ㄙㄨㄥˇ    v6
+
+# V7 Focus (add 8)
+tv10.V7.01  一  ㄧ        v7
+tv10.V7.02  點  ㄉㄧㄢˇ    v7
+tv10.V7.03  線  ㄒㄧㄢˋ    v7
+tv10.V7.04  針  ㄓㄣ      v7
+tv10.V7.05  刻  ㄎㄜˋ     v7
+tv10.V7.06  細  ㄒㄧˋ     v7
+tv10.V7.07  精  ㄐㄧㄥ     v7
+tv10.V7.08  極  ㄐㄧˊ     v7
