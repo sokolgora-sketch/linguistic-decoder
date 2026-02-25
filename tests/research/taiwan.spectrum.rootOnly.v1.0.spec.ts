@@ -262,5 +262,202 @@ describe("Taiwan Spectrum Root-Only v1.0 — slope + tone diagnostics (Zhuyin)",
     lines.push("");
 
     fs.writeFileSync(outMd, lines.join("\n") + "\n", "utf8");
+
+
+      // ------------------------------------------------------------
+      // Compare report: N=10 (base + STEP10) vs N=20 (base + STEP10 + STEP20)
+      // Cohort rule: N=10 includes ids starting with "v" or "tv10." ; N=20 includes all rows.
+      // ------------------------------------------------------------
+      const cohortN10 = items.filter((x) => x.id.startsWith("v") || x.id.startsWith("tv10."));
+      const cohortN20 = items;
+
+      function summarize(xs: Item[]) {
+        const buckets = TAGS.map((tag) => {
+          const ys = xs.filter((x) => x.tag === tag);
+          const n = ys.length;
+          const t4 = ys.filter((x) => x.tone === 4).length;
+          const t3 = ys.filter((x) => x.tone === 3).length;
+          const aP = mean(ys.map((x) => x.aperturePrimary));
+          const aM = mean(ys.map((x) => x.aperturePresenceMean));
+          return {
+            tag,
+            n,
+            aperturePrimary: aP,
+            aperturePresenceMean: aM,
+            tone4: t4,
+            tone3: t3,
+          };
+        });
+
+        const slopePrimary = slopePvalue({ items: xs, scoreKey: "aperturePrimary", iters: ITERS, seed: SEED });
+        const slopePresence = slopePvalue({ items: xs, scoreKey: "aperturePresenceMean", iters: ITERS, seed: SEED });
+
+        return { buckets, slopePrimary, slopePresence };
+      }
+
+      const s10 = summarize(cohortN10);
+      const s20 = summarize(cohortN20);
+
+      const outCompareMd = path.join(outDir, "taiwan.spectrum.rootOnly.v1.0.compare.md");
+      const outCompareJson = path.join(outDir, "taiwan.spectrum.rootOnly.v1.0.compare.json");
+
+      const cmp: string[] = [];
+      cmp.push("# Taiwan Spectrum Root-Only v1.0 — compare N=10 vs N=20 (Zhuyin)");
+      cmp.push("");
+      cmp.push("- corpus: `" + path.relative(root, inPath) + "`");
+      cmp.push("- permutation iters: " + ITERS);
+      cmp.push("- seed: " + SEED);
+      cmp.push('- cohort rule: N=10 = ids starting with "v" or "tv10."; N=20 = all rows.');
+      cmp.push("");
+
+      function emit(label: string, target: number, sum: ReturnType<typeof summarize>) {
+        cmp.push("## " + label);
+        cmp.push("");
+        cmp.push("| Bucket | N | Missing to target |");
+        cmp.push("|--------|--:|------------------:|");
+        for (const b of sum.buckets) {
+          cmp.push("| " + b.tag.toUpperCase() + " | " + b.n + " | " + Math.max(0, target - b.n) + " |");
+        }
+        cmp.push("");
+        cmp.push("| Bucket | N | aperture(primary) | aperture(presence mean) | tone4 | tone3 |");
+        cmp.push("|--------|--:|------------------:|------------------------:|------:|------:|");
+        for (const b of sum.buckets) {
+          cmp.push(
+            "| " +
+              b.tag.toUpperCase() +
+              " | " +
+              b.n +
+              " | " +
+              fmt(b.aperturePrimary, 3) +
+              " | " +
+              fmt(b.aperturePresenceMean, 3) +
+              " | " +
+              fmtPct(b.tone4, b.n) +
+              " | " +
+              fmtPct(b.tone3, b.n) +
+              " |"
+          );
+        }
+        cmp.push("");
+        cmp.push("| Score | Pearson r | p (perm, two-sided) | Spearman ρ | p (perm, two-sided) |");
+        cmp.push("|-------|----------:|-------------------:|-----------:|---------------------:|");
+        cmp.push(
+          "| aperture(primary) | " +
+            fmt(sum.slopePrimary.obsR, 3) +
+            " | " +
+            fmt(sum.slopePrimary.pR, 3) +
+            " | " +
+            fmt(sum.slopePrimary.obsRs, 3) +
+            " | " +
+            fmt(sum.slopePrimary.pRs, 3) +
+            " |"
+        );
+        cmp.push(
+          "| aperture(presence mean) | " +
+            fmt(sum.slopePresence.obsR, 3) +
+            " | " +
+            fmt(sum.slopePresence.pR, 3) +
+            " | " +
+            fmt(sum.slopePresence.obsRs, 3) +
+            " | " +
+            fmt(sum.slopePresence.pRs, 3) +
+            " |"
+        );
+        cmp.push("");
+      }
+
+      emit("N=10 (base + STEP10)", 10, s10);
+      emit("N=20 (base + STEP10 + STEP20)", 20, s20);
+
+      cmp.push("## Delta (N20 − N10)");
+      cmp.push("");
+      cmp.push("| Score | Δ Pearson r | Δ p | Δ Spearman ρ | Δ p |");
+      cmp.push("|-------|------------:|----:|-------------:|----:|");
+      cmp.push(
+        "| aperture(primary) | " +
+          fmt(s20.slopePrimary.obsR - s10.slopePrimary.obsR, 3) +
+          " | " +
+          fmt(s20.slopePrimary.pR - s10.slopePrimary.pR, 3) +
+          " | " +
+          fmt(s20.slopePrimary.obsRs - s10.slopePrimary.obsRs, 3) +
+          " | " +
+          fmt(s20.slopePrimary.pRs - s10.slopePrimary.pRs, 3) +
+          " |"
+      );
+      cmp.push(
+        "| aperture(presence mean) | " +
+          fmt(s20.slopePresence.obsR - s10.slopePresence.obsR, 3) +
+          " | " +
+          fmt(s20.slopePresence.pR - s10.slopePresence.pR, 3) +
+          " | " +
+          fmt(s20.slopePresence.obsRs - s10.slopePresence.obsRs, 3) +
+          " | " +
+          fmt(s20.slopePresence.pRs - s10.slopePresence.pRs, 3) +
+          " |"
+      );
+      cmp.push("");
+
+      fs.writeFileSync(outCompareMd, cmp.join("\n"), "utf8");
+
+      function deltaBuckets(b20: any[], b10: any[]) {
+        return TAGS.map((tag, i) => {
+          const a = b20[i];
+          const b = b10[i];
+          return {
+            tag,
+            n10: b?.n ?? 0,
+            n20: a?.n ?? 0,
+            d_aperturePrimary: (a?.aperturePrimary ?? 0) - (b?.aperturePrimary ?? 0),
+            d_aperturePresenceMean: (a?.aperturePresenceMean ?? 0) - (b?.aperturePresenceMean ?? 0),
+            d_tone4: (a?.tone4 ?? 0) - (b?.tone4 ?? 0),
+            d_tone3: (a?.tone3 ?? 0) - (b?.tone3 ?? 0),
+          };
+        });
+      }
+
+      const payload = {
+        version: "v1.0",
+        corpus: path.relative(root, inPath),
+        iters: ITERS,
+        seed: SEED,
+        cohorts: {
+          n10: {
+            n: cohortN10.length,
+            buckets: s10.buckets,
+            slope: {
+              primary: { pearson_r: s10.slopePrimary.obsR, p_perm: s10.slopePrimary.pR, spearman_rho: s10.slopePrimary.obsRs, p_perm_s: s10.slopePrimary.pRs },
+              presenceMean: { pearson_r: s10.slopePresence.obsR, p_perm: s10.slopePresence.pR, spearman_rho: s10.slopePresence.obsRs, p_perm_s: s10.slopePresence.pRs },
+            },
+          },
+          n20: {
+            n: cohortN20.length,
+            buckets: s20.buckets,
+            slope: {
+              primary: { pearson_r: s20.slopePrimary.obsR, p_perm: s20.slopePrimary.pR, spearman_rho: s20.slopePrimary.obsRs, p_perm_s: s20.slopePrimary.pRs },
+              presenceMean: { pearson_r: s20.slopePresence.obsR, p_perm: s20.slopePresence.pR, spearman_rho: s20.slopePresence.obsRs, p_perm_s: s20.slopePresence.pRs },
+            },
+          },
+          delta: {
+            buckets: deltaBuckets(s20.buckets, s10.buckets),
+            slope: {
+              primary: {
+                d_pearson_r: s20.slopePrimary.obsR - s10.slopePrimary.obsR,
+                d_p_perm: s20.slopePrimary.pR - s10.slopePrimary.pR,
+                d_spearman_rho: s20.slopePrimary.obsRs - s10.slopePrimary.obsRs,
+                d_p_perm_s: s20.slopePrimary.pRs - s10.slopePrimary.pRs,
+              },
+              presenceMean: {
+                d_pearson_r: s20.slopePresence.obsR - s10.slopePresence.obsR,
+                d_p_perm: s20.slopePresence.pR - s10.slopePresence.pR,
+                d_spearman_rho: s20.slopePresence.obsRs - s10.slopePresence.obsRs,
+                d_p_perm_s: s20.slopePresence.pRs - s10.slopePresence.pRs,
+              },
+            },
+          },
+        },
+      };
+
+      fs.writeFileSync(outCompareJson, JSON.stringify(payload, null, 2) + "\n", "utf8");
+
   });
 });
