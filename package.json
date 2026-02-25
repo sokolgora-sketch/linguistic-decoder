@@ -50,7 +50,8 @@
     "research:taiwan:positionOrder:pilot:v0.3": "npm test -- tests/research/taiwan.positionOrder.pilot.v0.3.spec.ts",
     "research:taiwan:positionOrder:pilot:v0.4": "npm test -- tests/research/taiwan.positionOrder.pilot.v0.4.spec.ts",
     "research:taiwan:positionOrder:rootOnly:v0.5": "npm test -- tests/research/taiwan.positionOrder.rootOnly.v0.5.spec.ts",
-    "research:taiwan:positionOrder:rootOnly:v0.6": "npm test -- tests/research/taiwan.positionOrder.rootOnly.v0.6.spec.ts"
+    "research:taiwan:positionOrder:rootOnly:v0.6": "npm test -- tests/research/taiwan.positionOrder.rootOnly.v0.6.spec.ts",
+    "research:taiwan:positionOrder:rootOnly:v0.7": "npm test -- tests/research/taiwan.positionOrder.rootOnly.v0.7.spec.ts"
   },
   "dependencies": {
     "@genkit-ai/google-genai": "^1.20.0",
