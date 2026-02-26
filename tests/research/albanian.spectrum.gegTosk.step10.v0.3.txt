@@ -159,14 +159,14 @@ agts7.G.V7.01  pik     geg   v7
 # agts10.G.V5.10  <word>  geg   v5
 
 # V6 (add 9)
-# agts10.T.V6.02  <word>  tosk  v6
-# agts10.G.V6.02  <word>  geg   v6
-# agts10.T.V6.03  <word>  tosk  v6
-# agts10.G.V6.03  <word>  geg   v6
-# agts10.T.V6.04  <word>  tosk  v6
-# agts10.G.V6.04  <word>  geg   v6
-# agts10.T.V6.05  <word>  tosk  v6
-# agts10.G.V6.05  <word>  geg   v6
+agts10.T.V6.02  lidhje  tosk  v6
+agts10.G.V6.02  lidhje  geg   v6
+agts10.T.V6.03  imët    tosk  v6
+agts10.G.V6.03  imët    geg   v6
+agts10.T.V6.04  nyjë    tosk  v6
+agts10.G.V6.04  nyjë    geg   v6
+agts10.T.V6.05  dyshe   tosk  v6
+agts10.G.V6.05  dyshe   geg   v6
 # agts10.T.V6.06  <word>  tosk  v6
 # agts10.G.V6.06  <word>  geg   v6
 # agts10.T.V6.07  <word>  tosk  v6
@@ -179,14 +179,14 @@ agts7.G.V7.01  pik     geg   v7
 # agts10.G.V6.10  <word>  geg   v6
 
 # V7 (add 9) — be strict if possible (prefer I/Y/Ë-dominant carriers)
-# agts10.T.V7.02  <word>  tosk  v7
-# agts10.G.V7.02  <word>  geg   v7
-# agts10.T.V7.03  <word>  tosk  v7
-# agts10.G.V7.03  <word>  geg   v7
-# agts10.T.V7.04  <word>  tosk  v7
-# agts10.G.V7.04  <word>  geg   v7
-# agts10.T.V7.05  <word>  tosk  v7
-# agts10.G.V7.05  <word>  geg   v7
+agts10.T.V7.02  sy      tosk  v7
+agts10.G.V7.02  sy      geg   v7
+agts10.T.V7.03  vijë    tosk  v7
+agts10.G.V7.03  vijë    geg   v7
+agts10.T.V7.04  si      tosk  v7
+agts10.G.V7.04  si      geg   v7
+agts10.T.V7.05  ti      tosk  v7
+agts10.G.V7.05  ti      geg   v7
 # agts10.T.V7.06  <word>  tosk  v7
 # agts10.G.V7.06  <word>  geg   v7
 # agts10.T.V7.07  <word>  tosk  v7
