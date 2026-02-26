@@ -1,0 +1,41 @@
+# Albanian Spectrum Gegë vs Tosk Pilot v0.2 (ORTHOGRAPHY-ONLY)
+#
+# Columns:
+#   id    word    dialect   tag
+#
+# Rules:
+# - word: single token (no spaces). Diacritics allowed (ë, ç).
+# - dialect: geg | tosk  (NOTE: research label; verify forms)
+# - tag: v1..v7 (same semantic buckets as Taiwan spectrum v1.0)
+#
+# Purpose (v0.2):
+# - Physical-first ladder: choose roots whose vowel carriers follow a monotonic aperture descent V1→V7.
+# - Keep semantic tags, but do not let semantics contradict phonetic/orthographic physics.
+
+# V1 Expansion/Space
+agts2.T.v1  hap     tosk  v1
+agts2.G.v1  hap     geg   v1
+
+# V2 Force/Mass
+agts2.T.v2  forcë   tosk  v2
+agts2.G.v2  forcë   geg   v2
+
+# V3 Interior/Depth
+agts2.T.v3  thellë  tosk  v3
+agts2.G.v3  thellë  geg   v3
+
+# V4 Ground/Balance
+agts2.T.v4  rrënjë  tosk  v4
+agts2.G.v4  rrënjë  geg   v4
+
+# V5 Activity/Direction
+agts2.T.v5  udhë    tosk  v5
+agts2.G.v5  udhë    geg   v5
+
+# V6 Tension/High/Thin
+agts2.T.v6  fije    tosk  v6
+agts2.G.v6  fije    geg   v6
+
+# V7 Focus/Linearity (final-ë drop probe: tosk vs geg)
+agts2.T.v7  pikë    tosk  v7
+agts2.G.v7  pik     geg   v7
