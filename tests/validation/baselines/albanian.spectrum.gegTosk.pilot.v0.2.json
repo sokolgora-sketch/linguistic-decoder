@@ -1,0 +1,398 @@
+{
+  "version": "v0.2",
+  "corpus": "tests/research/albanian.spectrum.gegTosk.pilot.v0.2.txt",
+  "iters": 12000,
+  "seed": 90924101,
+  "cohorts": {
+    "all": {
+      "n": 14,
+      "buckets": [
+        {
+          "tag": "v1",
+          "n": 2,
+          "aperturePrimary": 1,
+          "aperturePresenceMean": 1
+        },
+        {
+          "tag": "v2",
+          "n": 2,
+          "aperturePrimary": 0.8,
+          "aperturePresenceMean": 0.65
+        },
+        {
+          "tag": "v3",
+          "n": 2,
+          "aperturePrimary": 0.6,
+          "aperturePresenceMean": 0.55
+        },
+        {
+          "tag": "v4",
+          "n": 2,
+          "aperturePrimary": 0.5,
+          "aperturePresenceMean": 0.5
+        },
+        {
+          "tag": "v5",
+          "n": 2,
+          "aperturePrimary": 0.4,
+          "aperturePresenceMean": 0.45
+        },
+        {
+          "tag": "v6",
+          "n": 2,
+          "aperturePrimary": 0.1,
+          "aperturePresenceMean": 0.35
+        },
+        {
+          "tag": "v7",
+          "n": 2,
+          "aperturePrimary": 0.1,
+          "aperturePresenceMean": 0.2
+        }
+      ],
+      "slope": {
+        "label": "ALL",
+        "sP": {
+          "obsMeans": [
+            1,
+            0.8,
+            0.6,
+            0.5,
+            0.4,
+            0.1,
+            0.1
+          ],
+          "obsR": -0.9854508843053272,
+          "obsRs": -0.9642857142857143,
+          "pR": 0.00008333333333333333,
+          "pRs": 0.0035
+        },
+        "sM": {
+          "obsMeans": [
+            1,
+            0.65,
+            0.55,
+            0.5,
+            0.45,
+            0.35,
+            0.2
+          ],
+          "obsR": -0.9450516793170229,
+          "obsRs": -1,
+          "pR": 0.0015,
+          "pRs": 0.0005833333333333334
+        }
+      }
+    },
+    "tosk": {
+      "n": 7,
+      "buckets": [
+        {
+          "tag": "v1",
+          "n": 1,
+          "aperturePrimary": 1,
+          "aperturePresenceMean": 1
+        },
+        {
+          "tag": "v2",
+          "n": 1,
+          "aperturePrimary": 0.8,
+          "aperturePresenceMean": 0.65
+        },
+        {
+          "tag": "v3",
+          "n": 1,
+          "aperturePrimary": 0.6,
+          "aperturePresenceMean": 0.55
+        },
+        {
+          "tag": "v4",
+          "n": 1,
+          "aperturePrimary": 0.5,
+          "aperturePresenceMean": 0.5
+        },
+        {
+          "tag": "v5",
+          "n": 1,
+          "aperturePrimary": 0.4,
+          "aperturePresenceMean": 0.45
+        },
+        {
+          "tag": "v6",
+          "n": 1,
+          "aperturePrimary": 0.1,
+          "aperturePresenceMean": 0.35
+        },
+        {
+          "tag": "v7",
+          "n": 1,
+          "aperturePrimary": 0.1,
+          "aperturePresenceMean": 0.3
+        }
+      ],
+      "slope": {
+        "label": "Tosk",
+        "sP": {
+          "obsMeans": [
+            1,
+            0.8,
+            0.6,
+            0.5,
+            0.4,
+            0.1,
+            0.1
+          ],
+          "obsR": -0.9854508843053272,
+          "obsRs": -0.9642857142857143,
+          "pR": 0.0005,
+          "pRs": 0.0026666666666666666
+        },
+        "sM": {
+          "obsMeans": [
+            1,
+            0.65,
+            0.55,
+            0.5,
+            0.45,
+            0.35,
+            0.3
+          ],
+          "obsR": -0.9251460406371257,
+          "obsRs": -1,
+          "pR": 0.0004166666666666667,
+          "pRs": 0.0004166666666666667
+        }
+      }
+    },
+    "geg": {
+      "n": 7,
+      "buckets": [
+        {
+          "tag": "v1",
+          "n": 1,
+          "aperturePrimary": 1,
+          "aperturePresenceMean": 1
+        },
+        {
+          "tag": "v2",
+          "n": 1,
+          "aperturePrimary": 0.8,
+          "aperturePresenceMean": 0.65
+        },
+        {
+          "tag": "v3",
+          "n": 1,
+          "aperturePrimary": 0.6,
+          "aperturePresenceMean": 0.55
+        },
+        {
+          "tag": "v4",
+          "n": 1,
+          "aperturePrimary": 0.5,
+          "aperturePresenceMean": 0.5
+        },
+        {
+          "tag": "v5",
+          "n": 1,
+          "aperturePrimary": 0.4,
+          "aperturePresenceMean": 0.45
+        },
+        {
+          "tag": "v6",
+          "n": 1,
+          "aperturePrimary": 0.1,
+          "aperturePresenceMean": 0.35
+        },
+        {
+          "tag": "v7",
+          "n": 1,
+          "aperturePrimary": 0.1,
+          "aperturePresenceMean": 0.1
+        }
+      ],
+      "slope": {
+        "label": "Gegë",
+        "sP": {
+          "obsMeans": [
+            1,
+            0.8,
+            0.6,
+            0.5,
+            0.4,
+            0.1,
+            0.1
+          ],
+          "obsR": -0.9854508843053272,
+          "obsRs": -0.9642857142857143,
+          "pR": 0.0005,
+          "pRs": 0.0026666666666666666
+        },
+        "sM": {
+          "obsMeans": [
+            1,
+            0.65,
+            0.55,
+            0.5,
+            0.45,
+            0.35,
+            0.1
+          ],
+          "obsR": -0.9488474727161107,
+          "obsRs": -1,
+          "pR": 0.0004166666666666667,
+          "pRs": 0.0004166666666666667
+        }
+      }
+    }
+  },
+  "drift_presenceMean": [
+    {
+      "tag": "v1",
+      "nT": 1,
+      "nG": 1,
+      "meanT": 1,
+      "meanG": 1,
+      "d": 0
+    },
+    {
+      "tag": "v2",
+      "nT": 1,
+      "nG": 1,
+      "meanT": 0.65,
+      "meanG": 0.65,
+      "d": 0
+    },
+    {
+      "tag": "v3",
+      "nT": 1,
+      "nG": 1,
+      "meanT": 0.55,
+      "meanG": 0.55,
+      "d": 0
+    },
+    {
+      "tag": "v4",
+      "nT": 1,
+      "nG": 1,
+      "meanT": 0.5,
+      "meanG": 0.5,
+      "d": 0
+    },
+    {
+      "tag": "v5",
+      "nT": 1,
+      "nG": 1,
+      "meanT": 0.45,
+      "meanG": 0.45,
+      "d": 0
+    },
+    {
+      "tag": "v6",
+      "nT": 1,
+      "nG": 1,
+      "meanT": 0.35,
+      "meanG": 0.35,
+      "d": 0
+    },
+    {
+      "tag": "v7",
+      "nT": 1,
+      "nG": 1,
+      "meanT": 0.3,
+      "meanG": 0.1,
+      "d": -0.19999999999999998
+    }
+  ],
+  "widest_top10": [
+    {
+      "id": "agts2.G.v1",
+      "dialect": "geg",
+      "tag": "V1",
+      "word": "hap",
+      "primary": "A",
+      "voices": "A",
+      "a_presence": 1
+    },
+    {
+      "id": "agts2.T.v1",
+      "dialect": "tosk",
+      "tag": "V1",
+      "word": "hap",
+      "primary": "A",
+      "voices": "A",
+      "a_presence": 1
+    },
+    {
+      "id": "agts2.G.v2",
+      "dialect": "geg",
+      "tag": "V2",
+      "word": "forcë",
+      "primary": "O",
+      "voices": "O,Ë",
+      "a_presence": 0.65
+    },
+    {
+      "id": "agts2.T.v2",
+      "dialect": "tosk",
+      "tag": "V2",
+      "word": "forcë",
+      "primary": "O",
+      "voices": "O,Ë",
+      "a_presence": 0.65
+    },
+    {
+      "id": "agts2.G.v3",
+      "dialect": "geg",
+      "tag": "V3",
+      "word": "thellë",
+      "primary": "E",
+      "voices": "E,Ë",
+      "a_presence": 0.55
+    },
+    {
+      "id": "agts2.T.v3",
+      "dialect": "tosk",
+      "tag": "V3",
+      "word": "thellë",
+      "primary": "E",
+      "voices": "E,Ë",
+      "a_presence": 0.55
+    },
+    {
+      "id": "agts2.G.v4",
+      "dialect": "geg",
+      "tag": "V4",
+      "word": "rrënjë",
+      "primary": "Ë",
+      "voices": "Ë",
+      "a_presence": 0.5
+    },
+    {
+      "id": "agts2.T.v4",
+      "dialect": "tosk",
+      "tag": "V4",
+      "word": "rrënjë",
+      "primary": "Ë",
+      "voices": "Ë",
+      "a_presence": 0.5
+    },
+    {
+      "id": "agts2.G.v5",
+      "dialect": "geg",
+      "tag": "V5",
+      "word": "udhë",
+      "primary": "U",
+      "voices": "U,Ë",
+      "a_presence": 0.45
+    },
+    {
+      "id": "agts2.T.v5",
+      "dialect": "tosk",
+      "tag": "V5",
+      "word": "udhë",
+      "primary": "U",
+      "voices": "U,Ë",
+      "a_presence": 0.45
+    }
+  ]
+}
