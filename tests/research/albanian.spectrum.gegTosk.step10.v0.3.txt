@@ -123,10 +123,10 @@ agts10.T.V4.02  nën     tosk  v4
 agts10.G.V4.02  nën     geg   v4
 agts10.T.V4.03  kënd    tosk  v4
 agts10.G.V4.03  kënd    geg   v4
-# agts10.T.V4.04  <word>  tosk  v4
-# agts10.G.V4.04  <word>  geg   v4
-# agts10.T.V4.05  <word>  tosk  v4
-# agts10.G.V4.05  <word>  geg   v4
+agts10.T.V4.04  dheu    tosk  v4
+agts10.G.V4.04  dheu    geg   v4
+agts10.T.V4.05  qetë    tosk  v4
+agts10.G.V4.05  qetë    geg   v4
 # agts10.T.V4.06  <word>  tosk  v4
 # agts10.G.V4.06  <word>  geg   v4
 # agts10.T.V4.07  <word>  tosk  v4
@@ -143,10 +143,10 @@ agts10.T.V5.02  rrugë   tosk  v5
 agts10.G.V5.02  rrugë   geg   v5
 agts10.T.V5.03  punë    tosk  v5
 agts10.G.V5.03  punë    geg   v5
-# agts10.T.V5.04  <word>  tosk  v5
-# agts10.G.V5.04  <word>  geg   v5
-# agts10.T.V5.05  <word>  tosk  v5
-# agts10.G.V5.05  <word>  geg   v5
+agts10.T.V5.04  ujë     tosk  v5
+agts10.G.V5.04  ujë     geg   v5
+agts10.T.V5.05  shumë   tosk  v5
+agts10.G.V5.05  shumë   geg   v5
 # agts10.T.V5.06  <word>  tosk  v5
 # agts10.G.V5.06  <word>  geg   v5
 # agts10.T.V5.07  <word>  tosk  v5
@@ -167,8 +167,8 @@ agts10.T.V6.04  nyjë    tosk  v6
 agts10.G.V6.04  nyjë    geg   v6
 agts10.T.V6.05  dyshe   tosk  v6
 agts10.G.V6.05  dyshe   geg   v6
-# agts10.T.V6.06  <word>  tosk  v6
-# agts10.G.V6.06  <word>  geg   v6
+agts10.T.V6.06  thikë   tosk  v6
+agts10.G.V6.06  thikë   geg   v6
 # agts10.T.V6.07  <word>  tosk  v6
 # agts10.G.V6.07  <word>  geg   v6
 # agts10.T.V6.08  <word>  tosk  v6
@@ -187,8 +187,8 @@ agts10.T.V7.04  si      tosk  v7
 agts10.G.V7.04  si      geg   v7
 agts10.T.V7.05  ti      tosk  v7
 agts10.G.V7.05  ti      geg   v7
-# agts10.T.V7.06  <word>  tosk  v7
-# agts10.G.V7.06  <word>  geg   v7
+agts10.T.V7.06  ik      tosk  v7
+agts10.G.V7.06  ik      geg   v7
 # agts10.T.V7.07  <word>  tosk  v7
 # agts10.G.V7.07  <word>  geg   v7
 # agts10.T.V7.08  <word>  tosk  v7
