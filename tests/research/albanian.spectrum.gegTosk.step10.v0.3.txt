@@ -1,0 +1,199 @@
+# Albanian Spectrum Gegë vs Tosk — STEP10 v0.3 (ORTHOGRAPHY-ONLY)
+#
+# Columns:
+#   id    word    dialect   tag
+#
+# Rules:
+# - word: single token (no spaces). Diacritics allowed (ë, ç).
+# - dialect: geg | tosk (research label; verify forms)
+# - tag: v1..v7 (same 7 semantic buckets)
+#
+# Cohorts:
+# - N=7 cohort: ids starting with "agts7."
+# - N=10 cohort: all active rows (after you un-comment STEP10)
+#
+# Pairing:
+# - PairKey is derived from id by replacing ".T." / ".G." with ".X."
+# - If only one dialect exists for a PairKey, audit will flag it as UNPAIRED.
+#
+# Workflow:
+# - Keep STEP10 rows commented until verified.
+# - Un-comment in pairs (T+G) when possible.
+# - After edits: npm test -- tests/research/albanian.spectrum.gegTosk.step10.v0.3.spec.ts
+
+# ------------------------------------------------------------
+# N=7 CORE (1 per bucket per dialect) — intentionally physics-clean
+# ------------------------------------------------------------
+
+# V1 Expansion/Space
+agts7.T.V1.01  hap     tosk  v1
+agts7.G.V1.01  hap     geg   v1
+
+# V2 Force/Mass
+agts7.T.V2.01  forcë   tosk  v2
+agts7.G.V2.01  forcë   geg   v2
+
+# V3 Interior/Depth
+agts7.T.V3.01  thellë  tosk  v3
+agts7.G.V3.01  thellë  geg   v3
+
+# V4 Ground/Balance
+agts7.T.V4.01  rrënjë  tosk  v4
+agts7.G.V4.01  rrënjë  geg   v4
+
+# V5 Activity/Direction
+agts7.T.V5.01  udhë    tosk  v5
+agts7.G.V5.01  udhë    geg   v5
+
+# V6 Tension/High/Thin
+agts7.T.V6.01  fije    tosk  v6
+agts7.G.V6.01  fije    geg   v6
+
+# V7 Focus/Linearity (final-ë drop probe)
+agts7.T.V7.01  pikë    tosk  v7
+agts7.G.V7.01  pik     geg   v7
+
+# ------------------------------------------------------------
+# STEP10 SCAFFOLD (add 9 more per bucket per dialect)
+# Keep commented until verified.
+# ------------------------------------------------------------
+
+# V1 (add 9)
+# agts10.T.V1.02  <word>  tosk  v1
+# agts10.G.V1.02  <word>  geg   v1
+# agts10.T.V1.03  <word>  tosk  v1
+# agts10.G.V1.03  <word>  geg   v1
+# agts10.T.V1.04  <word>  tosk  v1
+# agts10.G.V1.04  <word>  geg   v1
+# agts10.T.V1.05  <word>  tosk  v1
+# agts10.G.V1.05  <word>  geg   v1
+# agts10.T.V1.06  <word>  tosk  v1
+# agts10.G.V1.06  <word>  geg   v1
+# agts10.T.V1.07  <word>  tosk  v1
+# agts10.G.V1.07  <word>  geg   v1
+# agts10.T.V1.08  <word>  tosk  v1
+# agts10.G.V1.08  <word>  geg   v1
+# agts10.T.V1.09  <word>  tosk  v1
+# agts10.G.V1.09  <word>  geg   v1
+# agts10.T.V1.10  <word>  tosk  v1
+# agts10.G.V1.10  <word>  geg   v1
+
+# V2 (add 9)
+# agts10.T.V2.02  <word>  tosk  v2
+# agts10.G.V2.02  <word>  geg   v2
+# agts10.T.V2.03  <word>  tosk  v2
+# agts10.G.V2.03  <word>  geg   v2
+# agts10.T.V2.04  <word>  tosk  v2
+# agts10.G.V2.04  <word>  geg   v2
+# agts10.T.V2.05  <word>  tosk  v2
+# agts10.G.V2.05  <word>  geg   v2
+# agts10.T.V2.06  <word>  tosk  v2
+# agts10.G.V2.06  <word>  geg   v2
+# agts10.T.V2.07  <word>  tosk  v2
+# agts10.G.V2.07  <word>  geg   v2
+# agts10.T.V2.08  <word>  tosk  v2
+# agts10.G.V2.08  <word>  geg   v2
+# agts10.T.V2.09  <word>  tosk  v2
+# agts10.G.V2.09  <word>  geg   v2
+# agts10.T.V2.10  <word>  tosk  v2
+# agts10.G.V2.10  <word>  geg   v2
+
+# V3 (add 9)
+# agts10.T.V3.02  <word>  tosk  v3
+# agts10.G.V3.02  <word>  geg   v3
+# agts10.T.V3.03  <word>  tosk  v3
+# agts10.G.V3.03  <word>  geg   v3
+# agts10.T.V3.04  <word>  tosk  v3
+# agts10.G.V3.04  <word>  geg   v3
+# agts10.T.V3.05  <word>  tosk  v3
+# agts10.G.V3.05  <word>  geg   v3
+# agts10.T.V3.06  <word>  tosk  v3
+# agts10.G.V3.06  <word>  geg   v3
+# agts10.T.V3.07  <word>  tosk  v3
+# agts10.G.V3.07  <word>  geg   v3
+# agts10.T.V3.08  <word>  tosk  v3
+# agts10.G.V3.08  <word>  geg   v3
+# agts10.T.V3.09  <word>  tosk  v3
+# agts10.G.V3.09  <word>  geg   v3
+# agts10.T.V3.10  <word>  tosk  v3
+# agts10.G.V3.10  <word>  geg   v3
+
+# V4 (add 9)
+# agts10.T.V4.02  <word>  tosk  v4
+# agts10.G.V4.02  <word>  geg   v4
+# agts10.T.V4.03  <word>  tosk  v4
+# agts10.G.V4.03  <word>  geg   v4
+# agts10.T.V4.04  <word>  tosk  v4
+# agts10.G.V4.04  <word>  geg   v4
+# agts10.T.V4.05  <word>  tosk  v4
+# agts10.G.V4.05  <word>  geg   v4
+# agts10.T.V4.06  <word>  tosk  v4
+# agts10.G.V4.06  <word>  geg   v4
+# agts10.T.V4.07  <word>  tosk  v4
+# agts10.G.V4.07  <word>  geg   v4
+# agts10.T.V4.08  <word>  tosk  v4
+# agts10.G.V4.08  <word>  geg   v4
+# agts10.T.V4.09  <word>  tosk  v4
+# agts10.G.V4.09  <word>  geg   v4
+# agts10.T.V4.10  <word>  tosk  v4
+# agts10.G.V4.10  <word>  geg   v4
+
+# V5 (add 9)
+# agts10.T.V5.02  <word>  tosk  v5
+# agts10.G.V5.02  <word>  geg   v5
+# agts10.T.V5.03  <word>  tosk  v5
+# agts10.G.V5.03  <word>  geg   v5
+# agts10.T.V5.04  <word>  tosk  v5
+# agts10.G.V5.04  <word>  geg   v5
+# agts10.T.V5.05  <word>  tosk  v5
+# agts10.G.V5.05  <word>  geg   v5
+# agts10.T.V5.06  <word>  tosk  v5
+# agts10.G.V5.06  <word>  geg   v5
+# agts10.T.V5.07  <word>  tosk  v5
+# agts10.G.V5.07  <word>  geg   v5
+# agts10.T.V5.08  <word>  tosk  v5
+# agts10.G.V5.08  <word>  geg   v5
+# agts10.T.V5.09  <word>  tosk  v5
+# agts10.G.V5.09  <word>  geg   v5
+# agts10.T.V5.10  <word>  tosk  v5
+# agts10.G.V5.10  <word>  geg   v5
+
+# V6 (add 9)
+# agts10.T.V6.02  <word>  tosk  v6
+# agts10.G.V6.02  <word>  geg   v6
+# agts10.T.V6.03  <word>  tosk  v6
+# agts10.G.V6.03  <word>  geg   v6
+# agts10.T.V6.04  <word>  tosk  v6
+# agts10.G.V6.04  <word>  geg   v6
+# agts10.T.V6.05  <word>  tosk  v6
+# agts10.G.V6.05  <word>  geg   v6
+# agts10.T.V6.06  <word>  tosk  v6
+# agts10.G.V6.06  <word>  geg   v6
+# agts10.T.V6.07  <word>  tosk  v6
+# agts10.G.V6.07  <word>  geg   v6
+# agts10.T.V6.08  <word>  tosk  v6
+# agts10.G.V6.08  <word>  geg   v6
+# agts10.T.V6.09  <word>  tosk  v6
+# agts10.G.V6.09  <word>  geg   v6
+# agts10.T.V6.10  <word>  tosk  v6
+# agts10.G.V6.10  <word>  geg   v6
+
+# V7 (add 9) — be strict if possible (prefer I/Y/Ë-dominant carriers)
+# agts10.T.V7.02  <word>  tosk  v7
+# agts10.G.V7.02  <word>  geg   v7
+# agts10.T.V7.03  <word>  tosk  v7
+# agts10.G.V7.03  <word>  geg   v7
+# agts10.T.V7.04  <word>  tosk  v7
+# agts10.G.V7.04  <word>  geg   v7
+# agts10.T.V7.05  <word>  tosk  v7
+# agts10.G.V7.05  <word>  geg   v7
+# agts10.T.V7.06  <word>  tosk  v7
+# agts10.G.V7.06  <word>  geg   v7
+# agts10.T.V7.07  <word>  tosk  v7
+# agts10.G.V7.07  <word>  geg   v7
+# agts10.T.V7.08  <word>  tosk  v7
+# agts10.G.V7.08  <word>  geg   v7
+# agts10.T.V7.09  <word>  tosk  v7
+# agts10.G.V7.09  <word>  geg   v7
+# agts10.T.V7.10  <word>  tosk  v7
+# agts10.G.V7.10  <word>  geg   v7
