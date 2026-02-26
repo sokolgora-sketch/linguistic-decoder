@@ -59,10 +59,10 @@ agts7.G.V7.01  pik     geg   v7
 # ------------------------------------------------------------
 
 # V1 (add 9)
-# agts10.T.V1.02  <word>  tosk  v1
-# agts10.G.V1.02  <word>  geg   v1
-# agts10.T.V1.03  <word>  tosk  v1
-# agts10.G.V1.03  <word>  geg   v1
+agts10.T.V1.02  dal     tosk  v1
+agts10.G.V1.02  dal     geg   v1
+agts10.T.V1.03  anë     tosk  v1
+agts10.G.V1.03  anë     geg   v1
 # agts10.T.V1.04  <word>  tosk  v1
 # agts10.G.V1.04  <word>  geg   v1
 # agts10.T.V1.05  <word>  tosk  v1
@@ -79,10 +79,10 @@ agts7.G.V7.01  pik     geg   v7
 # agts10.G.V1.10  <word>  geg   v1
 
 # V2 (add 9)
-# agts10.T.V2.02  <word>  tosk  v2
-# agts10.G.V2.02  <word>  geg   v2
-# agts10.T.V2.03  <word>  tosk  v2
-# agts10.G.V2.03  <word>  geg   v2
+agts10.T.V2.02  barrë   tosk  v2
+agts10.G.V2.02  barrë   geg   v2
+agts10.T.V2.03  gropë   tosk  v2
+agts10.G.V2.03  gropë   geg   v2
 # agts10.T.V2.04  <word>  tosk  v2
 # agts10.G.V2.04  <word>  geg   v2
 # agts10.T.V2.05  <word>  tosk  v2
@@ -99,10 +99,10 @@ agts7.G.V7.01  pik     geg   v7
 # agts10.G.V2.10  <word>  geg   v2
 
 # V3 (add 9)
-# agts10.T.V3.02  <word>  tosk  v3
-# agts10.G.V3.02  <word>  geg   v3
-# agts10.T.V3.03  <word>  tosk  v3
-# agts10.G.V3.03  <word>  geg   v3
+agts10.T.V3.02  zemër   tosk  v3
+agts10.G.V3.02  zemër   geg   v3
+agts10.T.V3.03  shpellë tosk  v3
+agts10.G.V3.03  shpellë geg   v3
 # agts10.T.V3.04  <word>  tosk  v3
 # agts10.G.V3.04  <word>  geg   v3
 # agts10.T.V3.05  <word>  tosk  v3
