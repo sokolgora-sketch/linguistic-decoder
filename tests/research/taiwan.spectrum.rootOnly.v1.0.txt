@@ -195,3 +195,98 @@ tv20.V7.07  取  ㄑㄩˇ      v7
 tv20.V7.08  準  ㄓㄨㄣˇ     v7
 tv20.V7.09  瞄  ㄇㄧㄠˊ     v7
 tv20.V7.10  對  ㄉㄨㄟˋ     v7
+
+# ------------------------------------------------------------
+# v1.0 STEP30 — add 10 per bucket (single-char roots; explicit nuclei only)
+# IDs use prefix tv30.* to avoid collisions.
+#
+# IMPORTANT:
+# - Keep rows commented (#) until each Hanzi+Zhuyin is verified.
+# - When ready: remove leading "# " on a row to activate it.
+# - Then run: npm run research:taiwan:spectrum:rootOnly:v1.0 (hard-fails on any bad row)
+# ------------------------------------------------------------
+
+# V1 Expansion (add 10)
+# tv30.V1.01  <Hanzi>  <Zhuyin>  v1
+# tv30.V1.02  <Hanzi>  <Zhuyin>  v1
+# tv30.V1.03  <Hanzi>  <Zhuyin>  v1
+# tv30.V1.04  <Hanzi>  <Zhuyin>  v1
+# tv30.V1.05  <Hanzi>  <Zhuyin>  v1
+# tv30.V1.06  <Hanzi>  <Zhuyin>  v1
+# tv30.V1.07  <Hanzi>  <Zhuyin>  v1
+# tv30.V1.08  <Hanzi>  <Zhuyin>  v1
+# tv30.V1.09  <Hanzi>  <Zhuyin>  v1
+# tv30.V1.10  <Hanzi>  <Zhuyin>  v1
+
+# V2 Force (add 10) — avoid A-only if possible; prefer Ë/U/O mixes
+# tv30.V2.01  <Hanzi>  <Zhuyin>  v2
+# tv30.V2.02  <Hanzi>  <Zhuyin>  v2
+# tv30.V2.03  <Hanzi>  <Zhuyin>  v2
+# tv30.V2.04  <Hanzi>  <Zhuyin>  v2
+# tv30.V2.05  <Hanzi>  <Zhuyin>  v2
+# tv30.V2.06  <Hanzi>  <Zhuyin>  v2
+# tv30.V2.07  <Hanzi>  <Zhuyin>  v2
+# tv30.V2.08  <Hanzi>  <Zhuyin>  v2
+# tv30.V2.09  <Hanzi>  <Zhuyin>  v2
+# tv30.V2.10  <Hanzi>  <Zhuyin>  v2
+
+# V3 Interior (add 10)
+# tv30.V3.01  <Hanzi>  <Zhuyin>  v3
+# tv30.V3.02  <Hanzi>  <Zhuyin>  v3
+# tv30.V3.03  <Hanzi>  <Zhuyin>  v3
+# tv30.V3.04  <Hanzi>  <Zhuyin>  v3
+# tv30.V3.05  <Hanzi>  <Zhuyin>  v3
+# tv30.V3.06  <Hanzi>  <Zhuyin>  v3
+# tv30.V3.07  <Hanzi>  <Zhuyin>  v3
+# tv30.V3.08  <Hanzi>  <Zhuyin>  v3
+# tv30.V3.09  <Hanzi>  <Zhuyin>  v3
+# tv30.V3.10  <Hanzi>  <Zhuyin>  v3
+
+# V4 Ground (add 10)
+# tv30.V4.01  <Hanzi>  <Zhuyin>  v4
+# tv30.V4.02  <Hanzi>  <Zhuyin>  v4
+# tv30.V4.03  <Hanzi>  <Zhuyin>  v4
+# tv30.V4.04  <Hanzi>  <Zhuyin>  v4
+# tv30.V4.05  <Hanzi>  <Zhuyin>  v4
+# tv30.V4.06  <Hanzi>  <Zhuyin>  v4
+# tv30.V4.07  <Hanzi>  <Zhuyin>  v4
+# tv30.V4.08  <Hanzi>  <Zhuyin>  v4
+# tv30.V4.09  <Hanzi>  <Zhuyin>  v4
+# tv30.V4.10  <Hanzi>  <Zhuyin>  v4
+
+# V5 Activity (add 10)
+# tv30.V5.01  <Hanzi>  <Zhuyin>  v5
+# tv30.V5.02  <Hanzi>  <Zhuyin>  v5
+# tv30.V5.03  <Hanzi>  <Zhuyin>  v5
+# tv30.V5.04  <Hanzi>  <Zhuyin>  v5
+# tv30.V5.05  <Hanzi>  <Zhuyin>  v5
+# tv30.V5.06  <Hanzi>  <Zhuyin>  v5
+# tv30.V5.07  <Hanzi>  <Zhuyin>  v5
+# tv30.V5.08  <Hanzi>  <Zhuyin>  v5
+# tv30.V5.09  <Hanzi>  <Zhuyin>  v5
+# tv30.V5.10  <Hanzi>  <Zhuyin>  v5
+
+# V6 Tension (add 10) — avoid A-heavy finals; prefer I/Y/Ë/U carriers
+# tv30.V6.01  <Hanzi>  <Zhuyin>  v6
+# tv30.V6.02  <Hanzi>  <Zhuyin>  v6
+# tv30.V6.03  <Hanzi>  <Zhuyin>  v6
+# tv30.V6.04  <Hanzi>  <Zhuyin>  v6
+# tv30.V6.05  <Hanzi>  <Zhuyin>  v6
+# tv30.V6.06  <Hanzi>  <Zhuyin>  v6
+# tv30.V6.07  <Hanzi>  <Zhuyin>  v6
+# tv30.V6.08  <Hanzi>  <Zhuyin>  v6
+# tv30.V6.09  <Hanzi>  <Zhuyin>  v6
+# tv30.V6.10  <Hanzi>  <Zhuyin>  v6
+
+# V7 Focus (add 10) — be strict: prefer I/Y/Ë primaries; avoid UA/YA/IAO clusters
+# tv30.V7.01  <Hanzi>  <Zhuyin>  v7
+# tv30.V7.02  <Hanzi>  <Zhuyin>  v7
+# tv30.V7.03  <Hanzi>  <Zhuyin>  v7
+# tv30.V7.04  <Hanzi>  <Zhuyin>  v7
+# tv30.V7.05  <Hanzi>  <Zhuyin>  v7
+# tv30.V7.06  <Hanzi>  <Zhuyin>  v7
+# tv30.V7.07  <Hanzi>  <Zhuyin>  v7
+# tv30.V7.08  <Hanzi>  <Zhuyin>  v7
+# tv30.V7.09  <Hanzi>  <Zhuyin>  v7
+# tv30.V7.10  <Hanzi>  <Zhuyin>  v7
+
