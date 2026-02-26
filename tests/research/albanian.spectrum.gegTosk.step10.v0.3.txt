@@ -131,13 +131,12 @@ agts10.T.V4.06  këmbë   tosk  v4
 agts10.G.V4.06  këmbë   geg   v4
 agts10.T.V4.07  vend    tosk  v4
 agts10.G.V4.07  vend    geg   v4
-# agts10.T.V4.08  <word>  tosk  v4
-# agts10.G.V4.08  <word>  geg   v4
-# agts10.T.V4.09  <word>  tosk  v4
-# agts10.G.V4.09  <word>  geg   v4
-# agts10.T.V4.10  <word>  tosk  v4
-# agts10.G.V4.10  <word>  geg   v4
-
+agts10.T.V4.08  themël  tosk  v4
+agts10.G.V4.08  themël  geg   v4
+agts10.T.V4.09  mes     tosk  v4
+agts10.G.V4.09  mes     geg   v4
+agts10.T.V4.10  tërë    tosk  v4
+agts10.G.V4.10  tërë    geg   v4
 # V5 (add 9)
 agts10.T.V5.02  rrugë   tosk  v5
 agts10.G.V5.02  rrugë   geg   v5
@@ -151,13 +150,12 @@ agts10.T.V5.06  kurrë   tosk  v5
 agts10.G.V5.06  kurrë   geg   v5
 agts10.T.V5.07  udhëzim tosk  v5
 agts10.G.V5.07  udhëzim geg   v5
-# agts10.T.V5.08  <word>  tosk  v5
-# agts10.G.V5.08  <word>  geg   v5
-# agts10.T.V5.09  <word>  tosk  v5
-# agts10.G.V5.09  <word>  geg   v5
-# agts10.T.V5.10  <word>  tosk  v5
-# agts10.G.V5.10  <word>  geg   v5
-
+agts10.T.V5.08  kur     tosk  v5
+agts10.G.V5.08  kur     geg   v5
+agts10.T.V5.09  tund    tosk  v5
+agts10.G.V5.09  tund    geg   v5
+agts10.T.V5.10  tutje   tosk  v5
+agts10.G.V5.10  tutje   geg   v5
 # V6 (add 9)
 agts10.T.V6.02  lidhje  tosk  v6
 agts10.G.V6.02  lidhje  geg   v6
@@ -171,13 +169,12 @@ agts10.T.V6.06  thikë   tosk  v6
 agts10.G.V6.06  thikë   geg   v6
 agts10.T.V6.07  fytyrë  tosk  v6
 agts10.G.V6.07  fytyrë  geg   v6
-# agts10.T.V6.08  <word>  tosk  v6
-# agts10.G.V6.08  <word>  geg   v6
-# agts10.T.V6.09  <word>  tosk  v6
-# agts10.G.V6.09  <word>  geg   v6
-# agts10.T.V6.10  <word>  tosk  v6
-# agts10.G.V6.10  <word>  geg   v6
-
+agts10.T.V6.08  gjilpërë tosk  v6
+agts10.G.V6.08  gjilpërë geg   v6
+agts10.T.V6.09  cikë     tosk  v6
+agts10.G.V6.09  cikë     geg   v6
+agts10.T.V6.10  kripë    tosk  v6
+agts10.G.V6.10  kripë    geg   v6
 # V7 (add 9) — be strict if possible (prefer I/Y/Ë-dominant carriers)
 agts10.T.V7.02  sy      tosk  v7
 agts10.G.V7.02  sy      geg   v7
@@ -191,9 +188,9 @@ agts10.T.V7.06  ik      tosk  v7
 agts10.G.V7.06  ik      geg   v7
 agts10.T.V7.07  shi     tosk  v7
 agts10.G.V7.07  shi     geg   v7
-# agts10.T.V7.08  <word>  tosk  v7
-# agts10.G.V7.08  <word>  geg   v7
-# agts10.T.V7.09  <word>  tosk  v7
-# agts10.G.V7.09  <word>  geg   v7
-# agts10.T.V7.10  <word>  tosk  v7
-# agts10.G.V7.10  <word>  geg   v7
+agts10.T.V7.08  di      tosk  v7
+agts10.G.V7.08  di      geg   v7
+agts10.T.V7.09  pi      tosk  v7
+agts10.G.V7.09  pi      geg   v7
+agts10.T.V7.10  hi      tosk  v7
+agts10.G.V7.10  hi      geg   v7
