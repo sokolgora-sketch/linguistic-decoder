@@ -119,10 +119,10 @@ agts7.G.V7.01  pik     geg   v7
 # agts10.G.V3.10  <word>  geg   v3
 
 # V4 (add 9)
-# agts10.T.V4.02  <word>  tosk  v4
-# agts10.G.V4.02  <word>  geg   v4
-# agts10.T.V4.03  <word>  tosk  v4
-# agts10.G.V4.03  <word>  geg   v4
+agts10.T.V4.02  nën     tosk  v4
+agts10.G.V4.02  nën     geg   v4
+agts10.T.V4.03  kënd    tosk  v4
+agts10.G.V4.03  kënd    geg   v4
 # agts10.T.V4.04  <word>  tosk  v4
 # agts10.G.V4.04  <word>  geg   v4
 # agts10.T.V4.05  <word>  tosk  v4
@@ -139,10 +139,10 @@ agts7.G.V7.01  pik     geg   v7
 # agts10.G.V4.10  <word>  geg   v4
 
 # V5 (add 9)
-# agts10.T.V5.02  <word>  tosk  v5
-# agts10.G.V5.02  <word>  geg   v5
-# agts10.T.V5.03  <word>  tosk  v5
-# agts10.G.V5.03  <word>  geg   v5
+agts10.T.V5.02  rrugë   tosk  v5
+agts10.G.V5.02  rrugë   geg   v5
+agts10.T.V5.03  punë    tosk  v5
+agts10.G.V5.03  punë    geg   v5
 # agts10.T.V5.04  <word>  tosk  v5
 # agts10.G.V5.04  <word>  geg   v5
 # agts10.T.V5.05  <word>  tosk  v5
