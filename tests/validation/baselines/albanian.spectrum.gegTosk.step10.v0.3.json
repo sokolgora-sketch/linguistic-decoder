@@ -1,0 +1,456 @@
+{
+  "version": "v0.3",
+  "corpus": "tests/research/albanian.spectrum.gegTosk.step10.v0.3.txt",
+  "iters": 12000,
+  "seed": 90924101,
+  "targetPerBucketPerDialect": 10,
+  "baselineReady": true,
+  "counts": {
+    "v1:tosk": 10,
+    "v1:geg": 10,
+    "v2:tosk": 10,
+    "v2:geg": 10,
+    "v3:tosk": 10,
+    "v3:geg": 10,
+    "v4:tosk": 10,
+    "v4:geg": 10,
+    "v5:tosk": 10,
+    "v5:geg": 10,
+    "v6:tosk": 10,
+    "v6:geg": 10,
+    "v7:tosk": 10,
+    "v7:geg": 10
+  },
+  "cohorts": {
+    "all": {
+      "n": 140,
+      "buckets": [
+        {
+          "tag": "v1",
+          "n": 20,
+          "aperturePrimary": 1,
+          "aperturePresenceMean": 0.875
+        },
+        {
+          "tag": "v2",
+          "n": 20,
+          "aperturePrimary": 0.8600000000000003,
+          "aperturePresenceMean": 0.7350000000000002
+        },
+        {
+          "tag": "v3",
+          "n": 20,
+          "aperturePrimary": 0.5999999999999999,
+          "aperturePresenceMean": 0.55
+        },
+        {
+          "tag": "v4",
+          "n": 20,
+          "aperturePrimary": 0.5499999999999999,
+          "aperturePresenceMean": 0.5299999999999999
+        },
+        {
+          "tag": "v5",
+          "n": 20,
+          "aperturePrimary": 0.4000000000000001,
+          "aperturePresenceMean": 0.4333333333333334
+        },
+        {
+          "tag": "v6",
+          "n": 20,
+          "aperturePrimary": 0.16,
+          "aperturePresenceMean": 0.345
+        },
+        {
+          "tag": "v7",
+          "n": 20,
+          "aperturePrimary": 0.12000000000000006,
+          "aperturePresenceMean": 0.15000000000000008
+        }
+      ],
+      "slope": {
+        "primary": {
+          "obsMeans": [
+            1,
+            0.8600000000000003,
+            0.5999999999999999,
+            0.5499999999999999,
+            0.4000000000000001,
+            0.16,
+            0.12000000000000006
+          ],
+          "obsR": -0.9886055481577142,
+          "obsRs": -1,
+          "pR": 0.00008333333333333333,
+          "pRs": 0.0004166666666666667
+        },
+        "presenceMean": {
+          "obsMeans": [
+            0.875,
+            0.7350000000000002,
+            0.55,
+            0.5299999999999999,
+            0.4333333333333334,
+            0.345,
+            0.15000000000000008
+          ],
+          "obsR": -0.9837138986500348,
+          "obsRs": -1,
+          "pR": 0,
+          "pRs": 0
+        }
+      }
+    },
+    "n7": {
+      "n": 14,
+      "buckets": [
+        {
+          "tag": "v1",
+          "n": 2,
+          "aperturePrimary": 1,
+          "aperturePresenceMean": 1
+        },
+        {
+          "tag": "v2",
+          "n": 2,
+          "aperturePrimary": 0.8,
+          "aperturePresenceMean": 0.65
+        },
+        {
+          "tag": "v3",
+          "n": 2,
+          "aperturePrimary": 0.6,
+          "aperturePresenceMean": 0.55
+        },
+        {
+          "tag": "v4",
+          "n": 2,
+          "aperturePrimary": 0.5,
+          "aperturePresenceMean": 0.5
+        },
+        {
+          "tag": "v5",
+          "n": 2,
+          "aperturePrimary": 0.4,
+          "aperturePresenceMean": 0.45
+        },
+        {
+          "tag": "v6",
+          "n": 2,
+          "aperturePrimary": 0.1,
+          "aperturePresenceMean": 0.35
+        },
+        {
+          "tag": "v7",
+          "n": 2,
+          "aperturePrimary": 0.1,
+          "aperturePresenceMean": 0.2
+        }
+      ],
+      "slope": {
+        "primary": {
+          "obsMeans": [
+            1,
+            0.8,
+            0.6,
+            0.5,
+            0.4,
+            0.1,
+            0.1
+          ],
+          "obsR": -0.9854508843053272,
+          "obsRs": -0.9642857142857143,
+          "pR": 0,
+          "pRs": 0.0036666666666666666
+        },
+        "presenceMean": {
+          "obsMeans": [
+            1,
+            0.65,
+            0.55,
+            0.5,
+            0.45,
+            0.35,
+            0.2
+          ],
+          "obsR": -0.9450516793170229,
+          "obsRs": -1,
+          "pR": 0.0016666666666666668,
+          "pRs": 0.0008333333333333334
+        }
+      }
+    },
+    "tosk": {
+      "n": 70,
+      "buckets": [
+        {
+          "tag": "v1",
+          "n": 10,
+          "aperturePrimary": 1,
+          "aperturePresenceMean": 0.875
+        },
+        {
+          "tag": "v2",
+          "n": 10,
+          "aperturePrimary": 0.86,
+          "aperturePresenceMean": 0.735
+        },
+        {
+          "tag": "v3",
+          "n": 10,
+          "aperturePrimary": 0.5999999999999999,
+          "aperturePresenceMean": 0.55
+        },
+        {
+          "tag": "v4",
+          "n": 10,
+          "aperturePrimary": 0.55,
+          "aperturePresenceMean": 0.53
+        },
+        {
+          "tag": "v5",
+          "n": 10,
+          "aperturePrimary": 0.39999999999999997,
+          "aperturePresenceMean": 0.4333333333333334
+        },
+        {
+          "tag": "v6",
+          "n": 10,
+          "aperturePrimary": 0.16000000000000006,
+          "aperturePresenceMean": 0.3449999999999999
+        },
+        {
+          "tag": "v7",
+          "n": 10,
+          "aperturePrimary": 0.12,
+          "aperturePresenceMean": 0.16000000000000003
+        }
+      ],
+      "slope": {
+        "primary": {
+          "obsMeans": [
+            1,
+            0.86,
+            0.5999999999999999,
+            0.55,
+            0.39999999999999997,
+            0.16000000000000006,
+            0.12
+          ],
+          "obsR": -0.9886055481577144,
+          "obsRs": -1,
+          "pR": 0,
+          "pRs": 0.0004166666666666667
+        },
+        "presenceMean": {
+          "obsMeans": [
+            0.875,
+            0.735,
+            0.55,
+            0.53,
+            0.4333333333333334,
+            0.3449999999999999,
+            0.16000000000000003
+          ],
+          "obsR": -0.9844114144516604,
+          "obsRs": -1,
+          "pR": 0,
+          "pRs": 0.0004166666666666667
+        }
+      }
+    },
+    "geg": {
+      "n": 70,
+      "buckets": [
+        {
+          "tag": "v1",
+          "n": 10,
+          "aperturePrimary": 1,
+          "aperturePresenceMean": 0.875
+        },
+        {
+          "tag": "v2",
+          "n": 10,
+          "aperturePrimary": 0.86,
+          "aperturePresenceMean": 0.735
+        },
+        {
+          "tag": "v3",
+          "n": 10,
+          "aperturePrimary": 0.5999999999999999,
+          "aperturePresenceMean": 0.55
+        },
+        {
+          "tag": "v4",
+          "n": 10,
+          "aperturePrimary": 0.55,
+          "aperturePresenceMean": 0.53
+        },
+        {
+          "tag": "v5",
+          "n": 10,
+          "aperturePrimary": 0.39999999999999997,
+          "aperturePresenceMean": 0.4333333333333334
+        },
+        {
+          "tag": "v6",
+          "n": 10,
+          "aperturePrimary": 0.16000000000000006,
+          "aperturePresenceMean": 0.3449999999999999
+        },
+        {
+          "tag": "v7",
+          "n": 10,
+          "aperturePrimary": 0.12,
+          "aperturePresenceMean": 0.14
+        }
+      ],
+      "slope": {
+        "primary": {
+          "obsMeans": [
+            1,
+            0.86,
+            0.5999999999999999,
+            0.55,
+            0.39999999999999997,
+            0.16000000000000006,
+            0.12
+          ],
+          "obsR": -0.9886055481577144,
+          "obsRs": -1,
+          "pR": 0,
+          "pRs": 0.0004166666666666667
+        },
+        "presenceMean": {
+          "obsMeans": [
+            0.875,
+            0.735,
+            0.55,
+            0.53,
+            0.4333333333333334,
+            0.3449999999999999,
+            0.14
+          ],
+          "obsR": -0.9828993814864481,
+          "obsRs": -1,
+          "pR": 0,
+          "pRs": 0.0005
+        }
+      }
+    }
+  },
+  "pairing": {
+    "pairKeys": 70,
+    "unpairedCount": 0
+  },
+  "widest_top12": [
+    {
+      "id": "agts10.G.V1.02",
+      "dialect": "geg",
+      "tag": "V1",
+      "word": "dal",
+      "primary": "A",
+      "voices": "A",
+      "a_presence": 1
+    },
+    {
+      "id": "agts10.G.V1.07",
+      "dialect": "geg",
+      "tag": "V1",
+      "word": "larg",
+      "primary": "A",
+      "voices": "A",
+      "a_presence": 1
+    },
+    {
+      "id": "agts10.G.V1.08",
+      "dialect": "geg",
+      "tag": "V1",
+      "word": "skaj",
+      "primary": "A",
+      "voices": "A",
+      "a_presence": 1
+    },
+    {
+      "id": "agts10.G.V1.09",
+      "dialect": "geg",
+      "tag": "V1",
+      "word": "qark",
+      "primary": "A",
+      "voices": "A",
+      "a_presence": 1
+    },
+    {
+      "id": "agts10.G.V2.06",
+      "dialect": "geg",
+      "tag": "V2",
+      "word": "rrah",
+      "primary": "A",
+      "voices": "A",
+      "a_presence": 1
+    },
+    {
+      "id": "agts10.T.V1.02",
+      "dialect": "tosk",
+      "tag": "V1",
+      "word": "dal",
+      "primary": "A",
+      "voices": "A",
+      "a_presence": 1
+    },
+    {
+      "id": "agts10.T.V1.07",
+      "dialect": "tosk",
+      "tag": "V1",
+      "word": "larg",
+      "primary": "A",
+      "voices": "A",
+      "a_presence": 1
+    },
+    {
+      "id": "agts10.T.V1.08",
+      "dialect": "tosk",
+      "tag": "V1",
+      "word": "skaj",
+      "primary": "A",
+      "voices": "A",
+      "a_presence": 1
+    },
+    {
+      "id": "agts10.T.V1.09",
+      "dialect": "tosk",
+      "tag": "V1",
+      "word": "qark",
+      "primary": "A",
+      "voices": "A",
+      "a_presence": 1
+    },
+    {
+      "id": "agts10.T.V2.06",
+      "dialect": "tosk",
+      "tag": "V2",
+      "word": "rrah",
+      "primary": "A",
+      "voices": "A",
+      "a_presence": 1
+    },
+    {
+      "id": "agts7.G.V1.01",
+      "dialect": "geg",
+      "tag": "V1",
+      "word": "hap",
+      "primary": "A",
+      "voices": "A",
+      "a_presence": 1
+    },
+    {
+      "id": "agts7.T.V1.01",
+      "dialect": "tosk",
+      "tag": "V1",
+      "word": "hap",
+      "primary": "A",
+      "voices": "A",
+      "a_presence": 1
+    }
+  ]
+}

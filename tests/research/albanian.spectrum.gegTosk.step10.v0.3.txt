@@ -67,17 +67,16 @@ agts10.T.V1.04  arë     tosk  v1
 agts10.G.V1.04  arë     geg   v1
 agts10.T.V1.05  afër    tosk  v1
 agts10.G.V1.05  afër    geg   v1
-# agts10.T.V1.06  <word>  tosk  v1
-# agts10.G.V1.06  <word>  geg   v1
-# agts10.T.V1.07  <word>  tosk  v1
-# agts10.G.V1.07  <word>  geg   v1
-# agts10.T.V1.08  <word>  tosk  v1
-# agts10.G.V1.08  <word>  geg   v1
-# agts10.T.V1.09  <word>  tosk  v1
-# agts10.G.V1.09  <word>  geg   v1
-# agts10.T.V1.10  <word>  tosk  v1
-# agts10.G.V1.10  <word>  geg   v1
-
+agts10.T.V1.06  ajër    tosk  v1
+agts10.G.V1.06  ajër    geg   v1
+agts10.T.V1.07  larg    tosk  v1
+agts10.G.V1.07  larg    geg   v1
+agts10.T.V1.08  skaj    tosk  v1
+agts10.G.V1.08  skaj    geg   v1
+agts10.T.V1.09  qark    tosk  v1
+agts10.G.V1.09  qark    geg   v1
+agts10.T.V1.10  gjatë   tosk  v1
+agts10.G.V1.10  gjatë   geg   v1
 # V2 (add 9)
 agts10.T.V2.02  barrë   tosk  v2
 agts10.G.V2.02  barrë   geg   v2
@@ -87,17 +86,16 @@ agts10.T.V2.04  armë    tosk  v2
 agts10.G.V2.04  armë    geg   v2
 agts10.T.V2.05  bombë   tosk  v2
 agts10.G.V2.05  bombë   geg   v2
-# agts10.T.V2.06  <word>  tosk  v2
-# agts10.G.V2.06  <word>  geg   v2
-# agts10.T.V2.07  <word>  tosk  v2
-# agts10.G.V2.07  <word>  geg   v2
-# agts10.T.V2.08  <word>  tosk  v2
-# agts10.G.V2.08  <word>  geg   v2
-# agts10.T.V2.09  <word>  tosk  v2
-# agts10.G.V2.09  <word>  geg   v2
-# agts10.T.V2.10  <word>  tosk  v2
-# agts10.G.V2.10  <word>  geg   v2
-
+agts10.T.V2.06  rrah    tosk  v2
+agts10.G.V2.06  rrah    geg   v2
+agts10.T.V2.07  kokë    tosk  v2
+agts10.G.V2.07  kokë    geg   v2
+agts10.T.V2.08  kockë   tosk  v2
+agts10.G.V2.08  kockë   geg   v2
+agts10.T.V2.09  bllok   tosk  v2
+agts10.G.V2.09  bllok   geg   v2
+agts10.T.V2.10  top     tosk  v2
+agts10.G.V2.10  top     geg   v2
 # V3 (add 9)
 agts10.T.V3.02  zemër   tosk  v3
 agts10.G.V3.02  zemër   geg   v3
@@ -107,17 +105,16 @@ agts10.T.V3.04  qendër  tosk  v3
 agts10.G.V3.04  qendër  geg   v3
 agts10.T.V3.05  thelb   tosk  v3
 agts10.G.V3.05  thelb   geg   v3
-# agts10.T.V3.06  <word>  tosk  v3
-# agts10.G.V3.06  <word>  geg   v3
-# agts10.T.V3.07  <word>  tosk  v3
-# agts10.G.V3.07  <word>  geg   v3
-# agts10.T.V3.08  <word>  tosk  v3
-# agts10.G.V3.08  <word>  geg   v3
-# agts10.T.V3.09  <word>  tosk  v3
-# agts10.G.V3.09  <word>  geg   v3
-# agts10.T.V3.10  <word>  tosk  v3
-# agts10.G.V3.10  <word>  geg   v3
-
+agts10.T.V3.06  mendje   tosk  v3
+agts10.G.V3.06  mendje   geg   v3
+agts10.T.V3.07  fshehtë  tosk  v3
+agts10.G.V3.07  fshehtë  geg   v3
+agts10.T.V3.08  sekret   tosk  v3
+agts10.G.V3.08  sekret   geg   v3
+agts10.T.V3.09  thellësi tosk  v3
+agts10.G.V3.09  thellësi geg   v3
+agts10.T.V3.10  brendshëm tosk  v3
+agts10.G.V3.10  brendshëm geg   v3
 # V4 (add 9)
 agts10.T.V4.02  nën     tosk  v4
 agts10.G.V4.02  nën     geg   v4
