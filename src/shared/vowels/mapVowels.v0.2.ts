@@ -113,8 +113,12 @@ function isVowelLikeCharV0_2(ch: string): boolean {
   const base = nfd[0] || "";
 
   // Latin
-  if (base === "a" || base === "e" || base === "i" || base === "o" || base === "u" || base === "y") return true;
-  if (base === "æ" || base === "œ") return true;
+    if (base === "a" || base === "e" || base === "i" || base === "o" || base === "u" || base === "y") return true;
+    if (base === "æ" || base === "œ") return true;
+
+    // Turkish dotless i (close back unrounded). If it ever falls through mapping,
+    // it must be reported as vowel-like (unmapped) rather than silently treated as consonant.
+    if (base === "ı") return true;
 
   // Greek
   if (base === "α" || base === "ε" || base === "η" || base === "ι" || base === "ο" || base === "υ" || base === "ω") return true;
