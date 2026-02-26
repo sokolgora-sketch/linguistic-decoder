@@ -4,7 +4,7 @@
 
 import type { VowelVoice } from "./vowelVoices.v0.1";
 
-export type LangHintV0_2 = "sq" | "en" | "fr" | "sv" | "zh-pinyin" | "el";
+export type LangHintV0_2 = "sq" | "en" | "fr" | "sv" | "zh-pinyin" | "el" | "tr";
 
 export const VOWEL_MAP_OVERRIDES_V0_2: Readonly<
   Record<LangHintV0_2, Partial<Record<string, VowelVoice>>>
@@ -15,4 +15,5 @@ export const VOWEL_MAP_OVERRIDES_V0_2: Readonly<
   sv: Object.freeze({}),
   "zh-pinyin": Object.freeze({}),
   el: Object.freeze({}),
+  tr: Object.freeze({}),
 });

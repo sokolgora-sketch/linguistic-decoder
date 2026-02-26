@@ -38,6 +38,14 @@ export function mapVowelsV0_2(input: {
   for (const ch of wordNfc) {
     const norm = ch.toLowerCase();
 
+
+      // Turkish: 'y' is a consonant. When langHint=tr, do NOT treat it as vowel voice Y.
+      // This prevents false carriers in common roots (e.g., "yol").
+      if (hint === "tr" && norm === "y") {
+        tokens.push({ raw: ch, norm, voice: null, note: "tr-consonant-y" });
+        continue;
+      }
+
     // 1) override (if any)
     const ov = overrides ? (overrides[norm] ?? overrides[ch]) : undefined;
     if (ov) {
@@ -92,7 +100,7 @@ export function mapVowelsV0_2(input: {
 function normalizeLangHintV0_2(x: unknown): LangHintV0_2 | null {
   if (typeof x !== "string") return null;
   const v = x.trim();
-  if (v === "sq" || v === "en" || v === "fr" || v === "sv" || v === "zh-pinyin" || v === "el") return v;
+  if (v === "sq" || v === "en" || v === "fr" || v === "sv" || v === "zh-pinyin" || v === "el" || v === "tr") return v;
   return null;
 }
 

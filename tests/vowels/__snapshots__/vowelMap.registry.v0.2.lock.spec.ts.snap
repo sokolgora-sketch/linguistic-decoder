@@ -7,6 +7,7 @@ exports[`vowels: registry overrides v0.2 locked hints + per-hint override tables
   "fr",
   "sq",
   "sv",
+  "tr",
   "zh-pinyin",
 ]
 `;
@@ -52,6 +53,14 @@ exports[`vowels: registry overrides v0.2 locked hints + per-hint override tables
 `;
 
 exports[`vowels: registry overrides v0.2 locked hints + per-hint override tables snapshot (sorted, deterministic) 7`] = `
+{
+  "hint": "tr",
+  "keys": [],
+  "pairs": [],
+}
+`;
+
+exports[`vowels: registry overrides v0.2 locked hints + per-hint override tables snapshot (sorted, deterministic) 8`] = `
 {
   "hint": "zh-pinyin",
   "keys": [],
