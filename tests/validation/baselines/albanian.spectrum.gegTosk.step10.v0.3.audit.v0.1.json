@@ -1,0 +1,231 @@
+{
+  "version": "v0.3",
+  "corpus": "tests/research/albanian.spectrum.gegTosk.step10.v0.3.txt",
+  "unpaired": [],
+  "widest_top20": [
+    {
+      "id": "agts10.G.V1.02",
+      "dialect": "geg",
+      "tag": "v1",
+      "word": "dal",
+      "primary": "A",
+      "voices": [
+        "A"
+      ],
+      "a_presence": 1
+    },
+    {
+      "id": "agts10.G.V1.07",
+      "dialect": "geg",
+      "tag": "v1",
+      "word": "larg",
+      "primary": "A",
+      "voices": [
+        "A"
+      ],
+      "a_presence": 1
+    },
+    {
+      "id": "agts10.G.V1.08",
+      "dialect": "geg",
+      "tag": "v1",
+      "word": "skaj",
+      "primary": "A",
+      "voices": [
+        "A"
+      ],
+      "a_presence": 1
+    },
+    {
+      "id": "agts10.G.V1.09",
+      "dialect": "geg",
+      "tag": "v1",
+      "word": "qark",
+      "primary": "A",
+      "voices": [
+        "A"
+      ],
+      "a_presence": 1
+    },
+    {
+      "id": "agts10.G.V2.06",
+      "dialect": "geg",
+      "tag": "v2",
+      "word": "rrah",
+      "primary": "A",
+      "voices": [
+        "A"
+      ],
+      "a_presence": 1
+    },
+    {
+      "id": "agts10.T.V1.02",
+      "dialect": "tosk",
+      "tag": "v1",
+      "word": "dal",
+      "primary": "A",
+      "voices": [
+        "A"
+      ],
+      "a_presence": 1
+    },
+    {
+      "id": "agts10.T.V1.07",
+      "dialect": "tosk",
+      "tag": "v1",
+      "word": "larg",
+      "primary": "A",
+      "voices": [
+        "A"
+      ],
+      "a_presence": 1
+    },
+    {
+      "id": "agts10.T.V1.08",
+      "dialect": "tosk",
+      "tag": "v1",
+      "word": "skaj",
+      "primary": "A",
+      "voices": [
+        "A"
+      ],
+      "a_presence": 1
+    },
+    {
+      "id": "agts10.T.V1.09",
+      "dialect": "tosk",
+      "tag": "v1",
+      "word": "qark",
+      "primary": "A",
+      "voices": [
+        "A"
+      ],
+      "a_presence": 1
+    },
+    {
+      "id": "agts10.T.V2.06",
+      "dialect": "tosk",
+      "tag": "v2",
+      "word": "rrah",
+      "primary": "A",
+      "voices": [
+        "A"
+      ],
+      "a_presence": 1
+    },
+    {
+      "id": "agts7.G.V1.01",
+      "dialect": "geg",
+      "tag": "v1",
+      "word": "hap",
+      "primary": "A",
+      "voices": [
+        "A"
+      ],
+      "a_presence": 1
+    },
+    {
+      "id": "agts7.T.V1.01",
+      "dialect": "tosk",
+      "tag": "v1",
+      "word": "hap",
+      "primary": "A",
+      "voices": [
+        "A"
+      ],
+      "a_presence": 1
+    },
+    {
+      "id": "agts10.G.V2.09",
+      "dialect": "geg",
+      "tag": "v2",
+      "word": "bllok",
+      "primary": "O",
+      "voices": [
+        "O"
+      ],
+      "a_presence": 0.8
+    },
+    {
+      "id": "agts10.G.V2.10",
+      "dialect": "geg",
+      "tag": "v2",
+      "word": "top",
+      "primary": "O",
+      "voices": [
+        "O"
+      ],
+      "a_presence": 0.8
+    },
+    {
+      "id": "agts10.T.V2.09",
+      "dialect": "tosk",
+      "tag": "v2",
+      "word": "bllok",
+      "primary": "O",
+      "voices": [
+        "O"
+      ],
+      "a_presence": 0.8
+    },
+    {
+      "id": "agts10.T.V2.10",
+      "dialect": "tosk",
+      "tag": "v2",
+      "word": "top",
+      "primary": "O",
+      "voices": [
+        "O"
+      ],
+      "a_presence": 0.8
+    },
+    {
+      "id": "agts10.G.V1.03",
+      "dialect": "geg",
+      "tag": "v1",
+      "word": "anë",
+      "primary": "A",
+      "voices": [
+        "A",
+        "Ë"
+      ],
+      "a_presence": 0.75
+    },
+    {
+      "id": "agts10.G.V1.04",
+      "dialect": "geg",
+      "tag": "v1",
+      "word": "arë",
+      "primary": "A",
+      "voices": [
+        "A",
+        "Ë"
+      ],
+      "a_presence": 0.75
+    },
+    {
+      "id": "agts10.G.V1.05",
+      "dialect": "geg",
+      "tag": "v1",
+      "word": "afër",
+      "primary": "A",
+      "voices": [
+        "A",
+        "Ë"
+      ],
+      "a_presence": 0.75
+    },
+    {
+      "id": "agts10.G.V1.06",
+      "dialect": "geg",
+      "tag": "v1",
+      "word": "ajër",
+      "primary": "A",
+      "voices": [
+        "A",
+        "Ë"
+      ],
+      "a_presence": 0.75
+    }
+  ]
+}
