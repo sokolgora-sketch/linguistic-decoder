@@ -63,10 +63,10 @@ agts10.T.V1.02  dal     tosk  v1
 agts10.G.V1.02  dal     geg   v1
 agts10.T.V1.03  anë     tosk  v1
 agts10.G.V1.03  anë     geg   v1
-# agts10.T.V1.04  <word>  tosk  v1
-# agts10.G.V1.04  <word>  geg   v1
-# agts10.T.V1.05  <word>  tosk  v1
-# agts10.G.V1.05  <word>  geg   v1
+agts10.T.V1.04  arë     tosk  v1
+agts10.G.V1.04  arë     geg   v1
+agts10.T.V1.05  afër    tosk  v1
+agts10.G.V1.05  afër    geg   v1
 # agts10.T.V1.06  <word>  tosk  v1
 # agts10.G.V1.06  <word>  geg   v1
 # agts10.T.V1.07  <word>  tosk  v1
@@ -83,10 +83,10 @@ agts10.T.V2.02  barrë   tosk  v2
 agts10.G.V2.02  barrë   geg   v2
 agts10.T.V2.03  gropë   tosk  v2
 agts10.G.V2.03  gropë   geg   v2
-# agts10.T.V2.04  <word>  tosk  v2
-# agts10.G.V2.04  <word>  geg   v2
-# agts10.T.V2.05  <word>  tosk  v2
-# agts10.G.V2.05  <word>  geg   v2
+agts10.T.V2.04  armë    tosk  v2
+agts10.G.V2.04  armë    geg   v2
+agts10.T.V2.05  bombë   tosk  v2
+agts10.G.V2.05  bombë   geg   v2
 # agts10.T.V2.06  <word>  tosk  v2
 # agts10.G.V2.06  <word>  geg   v2
 # agts10.T.V2.07  <word>  tosk  v2
@@ -103,10 +103,10 @@ agts10.T.V3.02  zemër   tosk  v3
 agts10.G.V3.02  zemër   geg   v3
 agts10.T.V3.03  shpellë tosk  v3
 agts10.G.V3.03  shpellë geg   v3
-# agts10.T.V3.04  <word>  tosk  v3
-# agts10.G.V3.04  <word>  geg   v3
-# agts10.T.V3.05  <word>  tosk  v3
-# agts10.G.V3.05  <word>  geg   v3
+agts10.T.V3.04  qendër  tosk  v3
+agts10.G.V3.04  qendër  geg   v3
+agts10.T.V3.05  thelb   tosk  v3
+agts10.G.V3.05  thelb   geg   v3
 # agts10.T.V3.06  <word>  tosk  v3
 # agts10.G.V3.06  <word>  geg   v3
 # agts10.T.V3.07  <word>  tosk  v3
@@ -127,10 +127,10 @@ agts10.T.V4.04  dheu    tosk  v4
 agts10.G.V4.04  dheu    geg   v4
 agts10.T.V4.05  qetë    tosk  v4
 agts10.G.V4.05  qetë    geg   v4
-# agts10.T.V4.06  <word>  tosk  v4
-# agts10.G.V4.06  <word>  geg   v4
-# agts10.T.V4.07  <word>  tosk  v4
-# agts10.G.V4.07  <word>  geg   v4
+agts10.T.V4.06  këmbë   tosk  v4
+agts10.G.V4.06  këmbë   geg   v4
+agts10.T.V4.07  vend    tosk  v4
+agts10.G.V4.07  vend    geg   v4
 # agts10.T.V4.08  <word>  tosk  v4
 # agts10.G.V4.08  <word>  geg   v4
 # agts10.T.V4.09  <word>  tosk  v4
@@ -147,10 +147,10 @@ agts10.T.V5.04  ujë     tosk  v5
 agts10.G.V5.04  ujë     geg   v5
 agts10.T.V5.05  shumë   tosk  v5
 agts10.G.V5.05  shumë   geg   v5
-# agts10.T.V5.06  <word>  tosk  v5
-# agts10.G.V5.06  <word>  geg   v5
-# agts10.T.V5.07  <word>  tosk  v5
-# agts10.G.V5.07  <word>  geg   v5
+agts10.T.V5.06  kurrë   tosk  v5
+agts10.G.V5.06  kurrë   geg   v5
+agts10.T.V5.07  udhëzim tosk  v5
+agts10.G.V5.07  udhëzim geg   v5
 # agts10.T.V5.08  <word>  tosk  v5
 # agts10.G.V5.08  <word>  geg   v5
 # agts10.T.V5.09  <word>  tosk  v5
@@ -169,8 +169,8 @@ agts10.T.V6.05  dyshe   tosk  v6
 agts10.G.V6.05  dyshe   geg   v6
 agts10.T.V6.06  thikë   tosk  v6
 agts10.G.V6.06  thikë   geg   v6
-# agts10.T.V6.07  <word>  tosk  v6
-# agts10.G.V6.07  <word>  geg   v6
+agts10.T.V6.07  fytyrë  tosk  v6
+agts10.G.V6.07  fytyrë  geg   v6
 # agts10.T.V6.08  <word>  tosk  v6
 # agts10.G.V6.08  <word>  geg   v6
 # agts10.T.V6.09  <word>  tosk  v6
@@ -189,8 +189,8 @@ agts10.T.V7.05  ti      tosk  v7
 agts10.G.V7.05  ti      geg   v7
 agts10.T.V7.06  ik      tosk  v7
 agts10.G.V7.06  ik      geg   v7
-# agts10.T.V7.07  <word>  tosk  v7
-# agts10.G.V7.07  <word>  geg   v7
+agts10.T.V7.07  shi     tosk  v7
+agts10.G.V7.07  shi     geg   v7
 # agts10.T.V7.08  <word>  tosk  v7
 # agts10.G.V7.08  <word>  geg   v7
 # agts10.T.V7.09  <word>  tosk  v7
