@@ -40,9 +40,29 @@ This is a research instrument. It helps test hypotheses about vowel structure an
 Commands:
 
 - `npm run gate:quick` — lint + unit tests + integration + build
-- `npm test` — full suite (as of baseline lock: **294 passed, 3 skipped**; **732 tests**, **146 snapshots**)
+- `npm test` — full suite
 - `npm run canon:c2` — detect drift vs baseline (fails on unexpected change)
 - `npm run canon:c2:update` — refresh baseline after an intentional change
+
+---
+
+## Deterministic aperture model
+
+ZË-RO reduces vowel carriers to 7 categories and assigns a fixed **aperture proxy**:
+
+| Voice | Aperture |
+|------:|--------:|
+| A | 1.0 |
+| O | 0.8 |
+| E | 0.6 |
+| Ë | 0.5 |
+| U | 0.4 |
+| Y | 0.3 |
+| I | 0.1 |
+
+Two readouts are computed per item:
+- **primary** = first carrier
+- **presence mean** = mean aperture over unique carriers (in order)
 
 ---
 
@@ -57,90 +77,23 @@ Typical behavior:
 - **Phonetics (IPA carriers):** `I → Ë`
 - **Status:** `DIVERGE`
 
----
-
-## Deterministic aperture proxy (fixed meter)
-
-ZË-RO uses a fixed, deterministic aperture proxy per voice (a calibration scale, not a claim about acoustics):
-
-| Voice | A | O | E | Ë | U | Y | I |
-|------:|--:|--:|--:|--:|--:|--:|--:|
-| Aperture | 1.0 | 0.8 | 0.6 | 0.5 | 0.4 | 0.3 | 0.1 |
-
-Two readouts are used in research harnesses:
-- **primary** = aperture of the first carrier
-- **presence mean** = mean aperture over carriers present in-order
+This example exists to show the instrument is honest about spelling vs spoken carriers.
 
 ---
 
-## Benchmark: Albanian STEP10 v0.3 (baseline-locked)
+## Benchmarks (baseline-locked)
 
-Baseline lock: committed under `tests/validation/baselines/` (Feb 2026).
+These are committed baselines used for drift detection.
 
-**Files**
-- Corpus: `tests/research/albanian.spectrum.gegTosk.step10.v0.3.txt` (**N=140**, 10/bucket/dialect)
-- Harness: `tests/research/albanian.spectrum.gegTosk.step10.v0.3.spec.ts`
-- Baselines:
-  - `tests/validation/baselines/albanian.spectrum.gegTosk.step10.v0.3.md`
-  - `tests/validation/baselines/albanian.spectrum.gegTosk.step10.v0.3.json`
-  - plus `*.audit.v0.1.*` and `*.compare.v0.1.*`
+- **Albanian (Gegë/Tosk) STEP10 v0.3:** `tests/validation/baselines/albanian.spectrum.gegTosk.step10.v0.3.md|json`
+- **Turkish STEP10 v0.1 (langHint=tr):** `tests/validation/baselines/turkish.spectrum.step10.v0.1.md|json`
+- **Turkish STEP20 v0.1 (langHint=tr):** `tests/validation/baselines/turkish.spectrum.step20.v0.1.md|json`
+- **Turkish STEP10→STEP20 compare v0.1:** `tests/validation/baselines/turkish.spectrum.step20.v0.1.compare.v0.1.md|json`
+- **Taiwan Zhuyin suite (compare + audit + toneSlope):** `tests/validation/baselines/taiwan.spectrum.rootOnly.v1.0.compare.v0.1.md|json`
 
-### Bucket means — ALL (N=140)
-(From `tests/validation/baselines/albanian.spectrum.gegTosk.step10.v0.3.md`)
-
-| Bucket | N | aperture(primary) | aperture(presence mean) |
-|--------|--:|------------------:|------------------------:|
-| V1 | 20 | 1.000 | 0.875 |
-| V2 | 20 | 0.860 | 0.735 |
-| V3 | 20 | 0.600 | 0.550 |
-| V4 | 20 | 0.550 | 0.530 |
-| V5 | 20 | 0.400 | 0.433 |
-| V6 | 20 | 0.160 | 0.345 |
-| V7 | 20 | 0.120 | 0.150 |
-
-V7 presence-mean by dialect (from JSON baseline):
-- **Tosk V7:** 0.160
-- **Gegë V7:** 0.140
-
-### Slope test (12,000-iteration permutation; bucket means vs semantic index 1..7)
-(From `tests/validation/baselines/albanian.spectrum.gegTosk.step10.v0.3.md`)
-
-| Cohort | Score | Pearson r | p (perm) | Spearman ρ | p (perm) |
-|--------|-------|----------:|---------:|-----------:|---------:|
-| ALL | aperture(primary) | -0.989 | 0.000 | -1.000 | 0.000 |
-| ALL | aperture(presence mean) | -0.984 | 0.000 | -1.000 | 0.000 |
-| Tosk | aperture(primary) | -0.989 | 0.000 | -1.000 | 0.000 |
-| Tosk | aperture(presence mean) | -0.984 | 0.000 | -1.000 | 0.000 |
-| Gegë | aperture(primary) | -0.989 | 0.000 | -1.000 | 0.000 |
-| Gegë | aperture(presence mean) | -0.983 | 0.000 | -1.000 | 0.001 |
-
-Instrument-level interpretation:
-- Rank ordering across V1→V7 bucket means is strictly descending (ρ = -1.000).
-- This baseline is the meter reference to detect drift during refactors or dataset changes.
-
----
-
-## Honest null / drift visibility: Taiwan (Mandarin Zhuyin) suite
-
-This suite exists to prove the instrument does **not** force-fit correlations.
-
-**Files**
-- Corpus: `tests/research/taiwan.spectrum.rootOnly.v1.0.txt`
-- Harness: `tests/research/taiwan.spectrum.rootOnly.v1.0.spec.ts`
-- Baselines:
-  - `tests/validation/baselines/taiwan.spectrum.rootOnly.v1.0.compare.v0.1.md|json`
-  - `tests/validation/baselines/taiwan.spectrum.rootOnly.v1.0.audit.v0.1.md|json`
-  - `tests/validation/baselines/taiwan.spectrum.rootOnly.v1.0.toneSlope.v0.1.md|json`
-
-Key result (from compare baseline):
-- **N=10:** aperture(presence mean) shows signal — **r = -0.815**, **p = 0.026**
-- **N=20:** signal degrades under expansion — **r = -0.746**, **p = 0.056**
-
-Expected instrument behavior:
-- stable signal should persist/strengthen with expansion
-- fragile signal should weaken (drift / selection bias becomes visible)
-
-Tone diagnostics are tracked separately in `toneSlope.v0.1.*`.
+High-level notes:
+- Turkish presence-mean slope remains extremely strong at STEP10 and STEP20, and strengthens under expansion.
+- Taiwan suite is designed to show fragile signal weakening under expansion (null / drift visibility).
 
 ---
 
@@ -149,21 +102,18 @@ Tone diagnostics are tracked separately in `toneSlope.v0.1.*`.
 - Orthography SSOT: `src/shared/vowels/extractOrthographyVoicesFromWord.v0.1.ts`
 - Zhuyin SSOT: `src/shared/vowels/extractZhuyinSignal.v0.1.ts`
 
-Orthography mapper supports Latin diacritics (incl. `ë`, `ç`) and Turkish vowel letters (`ö`, `ü`, `ı`, `İ`) and includes Greek support in v0.2.
+Orthography mapper supports Latin diacritics (incl. `ë`, `ç`), Turkish vowel letters (`ö`, `ü`, `ı`, `İ`), and includes Greek support in v0.2.
 
 ---
 
 ## Reproduce
 
 ```bash
-# full gate
+npm install
 npm run gate:quick
 
-# Albanian STEP10 baseline suite
-npm test -- tests/research/albanian.spectrum.gegTosk.step10.v0.3.spec.ts
-
-# Taiwan suite
-npm test -- tests/research/taiwan.spectrum.rootOnly.v1.0.spec.ts
+# example: Turkish STEP20 suite
+npm test -- tests/research/turkish.spectrum.step20.v0.1.spec.ts
 ```
 
 Outputs:
