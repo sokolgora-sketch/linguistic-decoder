@@ -57,8 +57,7 @@ trst10.V1.06  ana   tr  v1
 trst10.V1.07  ağaç  tr  v1
 trst10.V1.08  açmak  tr  v1
 trst10.V1.09  ara    tr  v1
-# trst10.V1.10  <word>  tr  v1
-
+trst10.V1.10  açık   tr  v1
 # V2 (add 9)
 trst10.V2.02  top    tr  v2
 trst10.V2.03  kol    tr  v2
@@ -68,8 +67,7 @@ trst10.V2.06  ok    tr  v2
 trst10.V2.07  ok    tr  v2
 trst10.V2.08  ok     tr  v2
 trst10.V2.09  dolu   tr  v2
-# trst10.V2.10  <word>  tr  v2
-
+trst10.V2.10  omuz   tr  v2
 # V3 (add 9)
 trst10.V3.02  nefes  tr  v3
 trst10.V3.03  ses    tr  v3
@@ -79,8 +77,7 @@ trst10.V3.06  el    tr  v3
 trst10.V3.07  sen   tr  v3
 trst10.V3.08  nefes  tr  v3
 trst10.V3.09  derin  tr  v3
-# trst10.V3.10  <word>  tr  v3
-
+trst10.V3.10  gece   tr  v3
 # V4 (add 9)
 trst10.V4.02  akıl   tr  v4
 trst10.V4.03  adım   tr  v4
@@ -90,8 +87,7 @@ trst10.V4.06  akıl  tr  v4
 trst10.V4.07  akıl  tr  v4
 trst10.V4.08  ağır   tr  v4
 trst10.V4.09  adım   tr  v4
-# trst10.V4.10  <word>  tr  v4
-
+trst10.V4.10  adalet tr  v4
 # V5 (add 9)
 trst10.V5.02  su     tr  v5
 trst10.V5.03  bul    tr  v5
@@ -101,8 +97,7 @@ trst10.V5.06  kul   tr  v5
 trst10.V5.07  kum   tr  v5
 trst10.V5.08  bul    tr  v5
 trst10.V5.09  kum    tr  v5
-# trst10.V5.10  <word>  tr  v5
-
+trst10.V5.10  dur    tr  v5
 # V6 (add 9)
 trst10.V6.02  süt    tr  v6
 trst10.V6.03  gün    tr  v6
@@ -112,8 +107,7 @@ trst10.V6.06  süt   tr  v6
 trst10.V6.07  süt   tr  v6
 trst10.V6.08  süt    tr  v6
 trst10.V6.09  yüz    tr  v6
-# trst10.V6.10  <word>  tr  v6
-
+trst10.V6.10  güç    tr  v6
 # V7 (add 9)
 trst10.V7.02  dil    tr  v7
 trst10.V7.03  bir    tr  v7
@@ -123,4 +117,4 @@ trst10.V7.06  iç    tr  v7
 trst10.V7.07  il    tr  v7
 trst10.V7.08  çizgi  tr  v7
 trst10.V7.09  ince   tr  v7
-# trst10.V7.10  <word>  tr  v7
+trst10.V7.10  iğne   tr  v7
