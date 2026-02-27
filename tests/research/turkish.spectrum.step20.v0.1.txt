@@ -1,0 +1,201 @@
+# Turkish Spectrum — STEP20 v0.1 (ORTHOGRAPHY, langHint=tr)
+#
+# Columns:
+#   id    word    dialect   tag
+#
+# dialect: fixed "tr" (single-cohort language label)
+# tag: v1..v7 (same 7 semantic buckets used elsewhere)
+#
+# Important:
+# - MUST use langHint="tr" so Turkish 'y' is treated as a consonant (no fake Y carriers).
+# - Turkish vowels supported by mapper: ö ü ı İ (plus standard a/e/i/o/u).
+#
+# Cohorts:
+# - STEP10 seed rows are copied here as rows .01..10 per bucket (same words).
+# - STEP20 adds rows .11..20 per bucket (placeholders initially).
+#
+# Workflow:
+# - Keep .11..20 commented until verified.
+# - After edits: npm test -- tests/research/turkish.spectrum.step20.v0.1.spec.ts
+
+# ------------------------------------------------------------
+# V1 Expansion/Space — V1 (TARGET=20)
+# ------------------------------------------------------------
+
+trst20.V1.01  aç  tr  v1
+trst20.V1.02  alan  tr  v1
+trst20.V1.03  ana  tr  v1
+trst20.V1.04  ara  tr  v1
+trst20.V1.05  alan  tr  v1
+trst20.V1.06  ana  tr  v1
+trst20.V1.07  ağaç  tr  v1
+trst20.V1.08  açmak  tr  v1
+trst20.V1.09  ara  tr  v1
+trst20.V1.10  açık  tr  v1
+
+# trst20.V1.11  <word>  tr  v1
+# trst20.V1.12  <word>  tr  v1
+# trst20.V1.13  <word>  tr  v1
+# trst20.V1.14  <word>  tr  v1
+# trst20.V1.15  <word>  tr  v1
+# trst20.V1.16  <word>  tr  v1
+# trst20.V1.17  <word>  tr  v1
+# trst20.V1.18  <word>  tr  v1
+# trst20.V1.19  <word>  tr  v1
+# trst20.V1.20  <word>  tr  v1
+
+# ------------------------------------------------------------
+# V2 Force/Mass — V2 (TARGET=20)
+# ------------------------------------------------------------
+
+trst20.V2.01  yol  tr  v2
+trst20.V2.02  top  tr  v2
+trst20.V2.03  kol  tr  v2
+trst20.V2.04  ok  tr  v2
+trst20.V2.05  kol  tr  v2
+trst20.V2.06  ok  tr  v2
+trst20.V2.07  ok  tr  v2
+trst20.V2.08  ok  tr  v2
+trst20.V2.09  dolu  tr  v2
+trst20.V2.10  omuz  tr  v2
+
+# trst20.V2.11  <word>  tr  v2
+# trst20.V2.12  <word>  tr  v2
+# trst20.V2.13  <word>  tr  v2
+# trst20.V2.14  <word>  tr  v2
+# trst20.V2.15  <word>  tr  v2
+# trst20.V2.16  <word>  tr  v2
+# trst20.V2.17  <word>  tr  v2
+# trst20.V2.18  <word>  tr  v2
+# trst20.V2.19  <word>  tr  v2
+# trst20.V2.20  <word>  tr  v2
+
+# ------------------------------------------------------------
+# V3 Interior/Depth — V3 (TARGET=20)
+# ------------------------------------------------------------
+
+trst20.V3.01  ev  tr  v3
+trst20.V3.02  nefes  tr  v3
+trst20.V3.03  ses  tr  v3
+trst20.V3.04  el  tr  v3
+trst20.V3.05  ben  tr  v3
+trst20.V3.06  el  tr  v3
+trst20.V3.07  sen  tr  v3
+trst20.V3.08  nefes  tr  v3
+trst20.V3.09  derin  tr  v3
+trst20.V3.10  gece  tr  v3
+
+# trst20.V3.11  <word>  tr  v3
+# trst20.V3.12  <word>  tr  v3
+# trst20.V3.13  <word>  tr  v3
+# trst20.V3.14  <word>  tr  v3
+# trst20.V3.15  <word>  tr  v3
+# trst20.V3.16  <word>  tr  v3
+# trst20.V3.17  <word>  tr  v3
+# trst20.V3.18  <word>  tr  v3
+# trst20.V3.19  <word>  tr  v3
+# trst20.V3.20  <word>  tr  v3
+
+# ------------------------------------------------------------
+# V4 Ground/Balance — V4 (TARGET=20)
+# ------------------------------------------------------------
+
+trst20.V4.01  ağız  tr  v4
+trst20.V4.02  akıl  tr  v4
+trst20.V4.03  adım  tr  v4
+trst20.V4.04  adım  tr  v4
+trst20.V4.05  balık  tr  v4
+trst20.V4.06  akıl  tr  v4
+trst20.V4.07  akıl  tr  v4
+trst20.V4.08  ağır  tr  v4
+trst20.V4.09  adım  tr  v4
+trst20.V4.10  adalet  tr  v4
+
+# trst20.V4.11  <word>  tr  v4
+# trst20.V4.12  <word>  tr  v4
+# trst20.V4.13  <word>  tr  v4
+# trst20.V4.14  <word>  tr  v4
+# trst20.V4.15  <word>  tr  v4
+# trst20.V4.16  <word>  tr  v4
+# trst20.V4.17  <word>  tr  v4
+# trst20.V4.18  <word>  tr  v4
+# trst20.V4.19  <word>  tr  v4
+# trst20.V4.20  <word>  tr  v4
+
+# ------------------------------------------------------------
+# V5 Activity/Direction — V5 (TARGET=20)
+# ------------------------------------------------------------
+
+trst20.V5.01  uç  tr  v5
+trst20.V5.02  su  tr  v5
+trst20.V5.03  bul  tr  v5
+trst20.V5.04  uzun  tr  v5
+trst20.V5.05  su  tr  v5
+trst20.V5.06  kul  tr  v5
+trst20.V5.07  kum  tr  v5
+trst20.V5.08  bul  tr  v5
+trst20.V5.09  kum  tr  v5
+trst20.V5.10  dur  tr  v5
+
+# trst20.V5.11  <word>  tr  v5
+# trst20.V5.12  <word>  tr  v5
+# trst20.V5.13  <word>  tr  v5
+# trst20.V5.14  <word>  tr  v5
+# trst20.V5.15  <word>  tr  v5
+# trst20.V5.16  <word>  tr  v5
+# trst20.V5.17  <word>  tr  v5
+# trst20.V5.18  <word>  tr  v5
+# trst20.V5.19  <word>  tr  v5
+# trst20.V5.20  <word>  tr  v5
+
+# ------------------------------------------------------------
+# V6 Tension/High/Thin — V6 (TARGET=20)
+# ------------------------------------------------------------
+
+trst20.V6.01  gül  tr  v6
+trst20.V6.02  süt  tr  v6
+trst20.V6.03  gün  tr  v6
+trst20.V6.04  gün  tr  v6
+trst20.V6.05  süt  tr  v6
+trst20.V6.06  süt  tr  v6
+trst20.V6.07  süt  tr  v6
+trst20.V6.08  süt  tr  v6
+trst20.V6.09  yüz  tr  v6
+trst20.V6.10  güç  tr  v6
+
+# trst20.V6.11  <word>  tr  v6
+# trst20.V6.12  <word>  tr  v6
+# trst20.V6.13  <word>  tr  v6
+# trst20.V6.14  <word>  tr  v6
+# trst20.V6.15  <word>  tr  v6
+# trst20.V6.16  <word>  tr  v6
+# trst20.V6.17  <word>  tr  v6
+# trst20.V6.18  <word>  tr  v6
+# trst20.V6.19  <word>  tr  v6
+# trst20.V6.20  <word>  tr  v6
+
+# ------------------------------------------------------------
+# V7 Focus/Linearity — V7 (TARGET=20)
+# ------------------------------------------------------------
+
+trst20.V7.01  ip  tr  v7
+trst20.V7.02  dil  tr  v7
+trst20.V7.03  bir  tr  v7
+trst20.V7.04  iki  tr  v7
+trst20.V7.05  din  tr  v7
+trst20.V7.06  iç  tr  v7
+trst20.V7.07  il  tr  v7
+trst20.V7.08  çizgi  tr  v7
+trst20.V7.09  ince  tr  v7
+trst20.V7.10  iğne  tr  v7
+
+# trst20.V7.11  <word>  tr  v7
+# trst20.V7.12  <word>  tr  v7
+# trst20.V7.13  <word>  tr  v7
+# trst20.V7.14  <word>  tr  v7
+# trst20.V7.15  <word>  tr  v7
+# trst20.V7.16  <word>  tr  v7
+# trst20.V7.17  <word>  tr  v7
+# trst20.V7.18  <word>  tr  v7
+# trst20.V7.19  <word>  tr  v7
+# trst20.V7.20  <word>  tr  v7
