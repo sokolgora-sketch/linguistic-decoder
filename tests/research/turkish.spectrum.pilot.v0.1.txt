@@ -1,0 +1,34 @@
+# Turkish Spectrum Pilot v0.1 (ORTHOGRAPHY, langHint=tr)
+#
+# Columns:
+#   id    word    dialect   tag
+#
+# dialect: fixed "tr" for now (no dialect split yet; just a language label)
+# tag: v1..v7 (same 7 semantic buckets used elsewhere)
+#
+# Important:
+# - This suite uses langHint="tr" so Turkish 'y' is treated as a consonant (no fake Y carriers).
+# - Turkish vowels supported by mapper: ö ü ı İ (plus standard a/e/i/o/u).
+#
+# v1..v7 chosen to produce a physics-first aperture descent under the fixed meter.
+
+# V1 (A-wide)
+trsp1.v1  aç     tr  v1
+
+# V2 (O-midwide) — includes leading 'y' (must be consonant under langHint=tr)
+trsp1.v2  yol    tr  v2
+
+# V3 (E-mid)
+trsp1.v3  ev     tr  v3
+
+# V4 (A+I blend ~0.55) — includes dotless ı
+trsp1.v4  ağız   tr  v4
+
+# V5 (U)
+trsp1.v5  uzun   tr  v5
+
+# V6 (Ü -> voice Y by current meter)
+trsp1.v6  gül    tr  v6
+
+# V7 (I-narrow)
+trsp1.v7  ip     tr  v7
