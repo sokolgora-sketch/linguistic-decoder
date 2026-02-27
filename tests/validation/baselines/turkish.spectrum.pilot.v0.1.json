@@ -1,0 +1,167 @@
+{
+  "meta": {
+    "version": "turkish.spectrum.pilot.v0.1",
+    "langHint": "tr",
+    "corpus": "tests/research/turkish.spectrum.pilot.v0.1.txt",
+    "iters": 12000,
+    "seedBase": 90924101,
+    "seedPrimary": 90273163,
+    "seedPresence": 97631760
+  },
+  "buckets": [
+    {
+      "tag": "v1",
+      "n": 1,
+      "aperturePrimary": 1,
+      "aperturePresenceMean": 1
+    },
+    {
+      "tag": "v2",
+      "n": 1,
+      "aperturePrimary": 0.8,
+      "aperturePresenceMean": 0.8
+    },
+    {
+      "tag": "v3",
+      "n": 1,
+      "aperturePrimary": 0.6,
+      "aperturePresenceMean": 0.6
+    },
+    {
+      "tag": "v4",
+      "n": 1,
+      "aperturePrimary": 1,
+      "aperturePresenceMean": 0.55
+    },
+    {
+      "tag": "v5",
+      "n": 1,
+      "aperturePrimary": 0.4,
+      "aperturePresenceMean": 0.4
+    },
+    {
+      "tag": "v6",
+      "n": 1,
+      "aperturePrimary": 0.3,
+      "aperturePresenceMean": 0.3
+    },
+    {
+      "tag": "v7",
+      "n": 1,
+      "aperturePrimary": 0.1,
+      "aperturePresenceMean": 0.1
+    }
+  ],
+  "slope": {
+    "primary": {
+      "r": -0.8567808115693062,
+      "p": 0.02375,
+      "rho": -0.7857142857142857,
+      "pRho": 0.04791666666666667,
+      "means": [
+        1,
+        0.8,
+        0.6,
+        1,
+        0.4,
+        0.3,
+        0.1
+      ]
+    },
+    "presenceMean": {
+      "r": -0.990600990601486,
+      "p": 0.0004166666666666667,
+      "rho": -1,
+      "pRho": 0.0004166666666666667,
+      "means": [
+        1,
+        0.8,
+        0.6,
+        0.55,
+        0.4,
+        0.3,
+        0.1
+      ]
+    }
+  },
+  "items": [
+    {
+      "id": "trsp1.v1",
+      "word": "aç",
+      "tag": "v1",
+      "voices": [
+        "A"
+      ],
+      "primary": "A",
+      "aperturePrimary": 1,
+      "aperturePresenceMean": 1
+    },
+    {
+      "id": "trsp1.v2",
+      "word": "yol",
+      "tag": "v2",
+      "voices": [
+        "O"
+      ],
+      "primary": "O",
+      "aperturePrimary": 0.8,
+      "aperturePresenceMean": 0.8
+    },
+    {
+      "id": "trsp1.v3",
+      "word": "ev",
+      "tag": "v3",
+      "voices": [
+        "E"
+      ],
+      "primary": "E",
+      "aperturePrimary": 0.6,
+      "aperturePresenceMean": 0.6
+    },
+    {
+      "id": "trsp1.v4",
+      "word": "ağız",
+      "tag": "v4",
+      "voices": [
+        "A",
+        "I"
+      ],
+      "primary": "A",
+      "aperturePrimary": 1,
+      "aperturePresenceMean": 0.55
+    },
+    {
+      "id": "trsp1.v5",
+      "word": "uzun",
+      "tag": "v5",
+      "voices": [
+        "U"
+      ],
+      "primary": "U",
+      "aperturePrimary": 0.4,
+      "aperturePresenceMean": 0.4
+    },
+    {
+      "id": "trsp1.v6",
+      "word": "gül",
+      "tag": "v6",
+      "voices": [
+        "Y"
+      ],
+      "primary": "Y",
+      "aperturePrimary": 0.3,
+      "aperturePresenceMean": 0.3
+    },
+    {
+      "id": "trsp1.v7",
+      "word": "ip",
+      "tag": "v7",
+      "voices": [
+        "I"
+      ],
+      "primary": "I",
+      "aperturePrimary": 0.1,
+      "aperturePresenceMean": 0.1
+    }
+  ]
+}
