@@ -1,0 +1,106 @@
+# Pseudowords Spectrum — STEP10 v0.1 (ORTHOGRAPHY, negative control)
+#
+# Columns:
+#   id    word    dialect   tag
+#
+# dialect: fixed "pw" (pseudo-word cohort label)
+# tag: v1..v7 (same 7 semantic buckets used elsewhere)
+#
+# Purpose:
+# - negative control: pseudo-words have no semantic intent
+# - bucket assignment MUST be independent of aperture/vowel content
+#
+# Constraints:
+# - committed corpus (no runtime randomness)
+# - every word must contain at least one carrier among {a,e,i,o,u,y,ë}
+#
+# After edits:
+#   npm test -- tests/research/pseudowords.spectrum.step10.v0.1.spec.ts
+
+# ------------------------------------------------------------
+# STEP10 (TARGET=10 per bucket)
+# ------------------------------------------------------------
+
+# V1
+pwst10.V1.01  bapata   pw  v1
+pwst10.V1.02  doloko   pw  v1
+pwst10.V1.03  feneke   pw  v1
+pwst10.V1.04  tëpëlë   pw  v1
+pwst10.V1.05  kupulu   pw  v1
+pwst10.V1.06  ybyty    pw  v1
+pwst10.V1.07  rikiti   pw  v1
+pwst10.V1.08  narote   pw  v1
+pwst10.V1.09  yrafe    pw  v1
+pwst10.V1.10  sudimo   pw  v1
+
+# V2
+pwst10.V2.01  katara   pw  v2
+pwst10.V2.02  molono   pw  v2
+pwst10.V2.03  nevene   pw  v2
+pwst10.V2.04  bërëlë   pw  v2
+pwst10.V2.05  dumuru   pw  v2
+pwst10.V2.06  ykyly    pw  v2
+pwst10.V2.07  sikiri   pw  v2
+pwst10.V2.08  itako    pw  v2
+pwst10.V2.09  yremu    pw  v2
+pwst10.V2.10  olëmi    pw  v2
+
+# V3
+pwst10.V3.01  lapana   pw  v3
+pwst10.V3.02  toroko   pw  v3
+pwst10.V3.03  kesete   pw  v3
+pwst10.V3.04  pëzëlë   pw  v3
+pwst10.V3.05  furunu   pw  v3
+pwst10.V3.06  yzyry    pw  v3
+pwst10.V3.07  mipini   pw  v3
+pwst10.V3.08  oreki    pw  v3
+pwst10.V3.09  amëtu    pw  v3
+pwst10.V3.10  yokari   pw  v3
+
+# V4
+pwst10.V4.01  damaka   pw  v4
+pwst10.V4.02  volovo   pw  v4
+pwst10.V4.03  sebere   pw  v4
+pwst10.V4.04  gëpëkë   pw  v4
+pwst10.V4.05  lupuku   pw  v4
+pwst10.V4.06  ybyzy    pw  v4
+pwst10.V4.07  dilimi   pw  v4
+pwst10.V4.08  umëri    pw  v4
+pwst10.V4.09  ekoya    pw  v4
+pwst10.V4.10  ipanu    pw  v4
+
+# V5
+pwst10.V5.01  parasa   pw  v5
+pwst10.V5.02  konoro   pw  v5
+pwst10.V5.03  verene   pw  v5
+pwst10.V5.04  mëfëlë   pw  v5
+pwst10.V5.05  sufuru   pw  v5
+pwst10.V5.06  ytry     pw  v5
+pwst10.V5.07  zikiri   pw  v5
+pwst10.V5.08  aferu    pw  v5
+pwst10.V5.09  oyimu    pw  v5
+pwst10.V5.10  ëkatu    pw  v5
+
+# V6
+pwst10.V6.01  salaka   pw  v6
+pwst10.V6.02  doromo   pw  v6
+pwst10.V6.03  refene   pw  v6
+pwst10.V6.04  tëvëlë   pw  v6
+pwst10.V6.05  gurumu   pw  v6
+pwst10.V6.06  yryny    pw  v6
+pwst10.V6.07  pikili   pw  v6
+pwst10.V6.08  aoyei    pw  v6
+pwst10.V6.09  imëlo    pw  v6
+pwst10.V6.10  uayëmu   pw  v6
+
+# V7
+pwst10.V7.01  bakada   pw  v7
+pwst10.V7.02  soloso   pw  v7
+pwst10.V7.03  neneme   pw  v7
+pwst10.V7.04  dëpëlë   pw  v7
+pwst10.V7.05  lulunu   pw  v7
+pwst10.V7.06  yxyzy    pw  v7
+pwst10.V7.07  filiri   pw  v7
+pwst10.V7.08  yëbai    pw  v7
+pwst10.V7.09  uomëri   pw  v7
+pwst10.V7.10  eiyoa    pw  v7

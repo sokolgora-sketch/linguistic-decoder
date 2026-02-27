@@ -1,0 +1,180 @@
+# Pseudowords Spectrum — STEP20 v0.1 (ORTHOGRAPHY, negative control)
+#
+# Columns:
+#   id    word    dialect   tag
+#
+# dialect: fixed "pw"
+# tag: v1..v7
+#
+# STEP20 includes STEP10 rows (.01..10) plus add-ons (.11..20).
+#
+# After edits:
+#   npm test -- tests/research/pseudowords.spectrum.step20.v0.1.spec.ts
+
+# ------------------------------------------------------------
+# V1 (TARGET=20)
+# ------------------------------------------------------------
+pwst20.V1.01  bapata   pw  v1
+pwst20.V1.02  doloko   pw  v1
+pwst20.V1.03  feneke   pw  v1
+pwst20.V1.04  tëpëlë   pw  v1
+pwst20.V1.05  kupulu   pw  v1
+pwst20.V1.06  ybyty    pw  v1
+pwst20.V1.07  rikiti   pw  v1
+pwst20.V1.08  narote   pw  v1
+pwst20.V1.09  yrafe    pw  v1
+pwst20.V1.10  sudimo   pw  v1
+pwst20.V1.11  bapara  pw  v1
+pwst20.V1.12  bomoro  pw  v1
+pwst20.V1.13  benere  pw  v1
+pwst20.V1.14  bepete  pw  v1
+pwst20.V1.15  bëpëlë  pw  v1
+pwst20.V1.16  bëkëlë  pw  v1
+pwst20.V1.17  bupulu  pw  v1
+pwst20.V1.18  burugu  pw  v1
+pwst20.V1.19  bybyty  pw  v1
+pwst20.V1.20  bikiti  pw  v1
+
+# ------------------------------------------------------------
+# V2 (TARGET=20)
+# ------------------------------------------------------------
+pwst20.V2.01  katara   pw  v2
+pwst20.V2.02  molono   pw  v2
+pwst20.V2.03  nevene   pw  v2
+pwst20.V2.04  bërëlë   pw  v2
+pwst20.V2.05  dumuru   pw  v2
+pwst20.V2.06  ykyly    pw  v2
+pwst20.V2.07  sikiri   pw  v2
+pwst20.V2.08  itako    pw  v2
+pwst20.V2.09  yremu    pw  v2
+pwst20.V2.10  olëmi    pw  v2
+pwst20.V2.11  dapara  pw  v2
+pwst20.V2.12  domoro  pw  v2
+pwst20.V2.13  denere  pw  v2
+pwst20.V2.14  depete  pw  v2
+pwst20.V2.15  dëpëlë  pw  v2
+pwst20.V2.16  dëkëlë  pw  v2
+pwst20.V2.17  dupulu  pw  v2
+pwst20.V2.18  durugu  pw  v2
+pwst20.V2.19  dybyty  pw  v2
+pwst20.V2.20  dikiti  pw  v2
+
+# ------------------------------------------------------------
+# V3 (TARGET=20)
+# ------------------------------------------------------------
+pwst20.V3.01  lapana   pw  v3
+pwst20.V3.02  toroko   pw  v3
+pwst20.V3.03  kesete   pw  v3
+pwst20.V3.04  pëzëlë   pw  v3
+pwst20.V3.05  furunu   pw  v3
+pwst20.V3.06  yzyry    pw  v3
+pwst20.V3.07  mipini   pw  v3
+pwst20.V3.08  oreki    pw  v3
+pwst20.V3.09  amëtu    pw  v3
+pwst20.V3.10  yokari   pw  v3
+pwst20.V3.11  gapara  pw  v3
+pwst20.V3.12  gomoro  pw  v3
+pwst20.V3.13  genere  pw  v3
+pwst20.V3.14  gepete  pw  v3
+pwst20.V3.15  gëpëlë  pw  v3
+pwst20.V3.16  gëkëlë  pw  v3
+pwst20.V3.17  gupulu  pw  v3
+pwst20.V3.18  gurugu  pw  v3
+pwst20.V3.19  gybyty  pw  v3
+pwst20.V3.20  gikiti  pw  v3
+
+# ------------------------------------------------------------
+# V4 (TARGET=20)
+# ------------------------------------------------------------
+pwst20.V4.01  damaka   pw  v4
+pwst20.V4.02  volovo   pw  v4
+pwst20.V4.03  sebere   pw  v4
+pwst20.V4.04  gëpëkë   pw  v4
+pwst20.V4.05  lupuku   pw  v4
+pwst20.V4.06  ybyzy    pw  v4
+pwst20.V4.07  dilimi   pw  v4
+pwst20.V4.08  umëri    pw  v4
+pwst20.V4.09  ekoya    pw  v4
+pwst20.V4.10  ipanu    pw  v4
+pwst20.V4.11  lapara  pw  v4
+pwst20.V4.12  lomoro  pw  v4
+pwst20.V4.13  lenere  pw  v4
+pwst20.V4.14  lepete  pw  v4
+pwst20.V4.15  lëpëlë  pw  v4
+pwst20.V4.16  lëkëlë  pw  v4
+pwst20.V4.17  lupulu  pw  v4
+pwst20.V4.18  lurugu  pw  v4
+pwst20.V4.19  lybyty  pw  v4
+pwst20.V4.20  likiti  pw  v4
+
+# ------------------------------------------------------------
+# V5 (TARGET=20)
+# ------------------------------------------------------------
+pwst20.V5.01  parasa   pw  v5
+pwst20.V5.02  konoro   pw  v5
+pwst20.V5.03  verene   pw  v5
+pwst20.V5.04  mëfëlë   pw  v5
+pwst20.V5.05  sufuru   pw  v5
+pwst20.V5.06  ytry     pw  v5
+pwst20.V5.07  zikiri   pw  v5
+pwst20.V5.08  aferu    pw  v5
+pwst20.V5.09  oyimu    pw  v5
+pwst20.V5.10  ëkatu    pw  v5
+pwst20.V5.11  mapara  pw  v5
+pwst20.V5.12  momoro  pw  v5
+pwst20.V5.13  menere  pw  v5
+pwst20.V5.14  mepete  pw  v5
+pwst20.V5.15  mëpëlë  pw  v5
+pwst20.V5.16  mëkëlë  pw  v5
+pwst20.V5.17  mupulu  pw  v5
+pwst20.V5.18  murugu  pw  v5
+pwst20.V5.19  mybyty  pw  v5
+pwst20.V5.20  mikiti  pw  v5
+
+# ------------------------------------------------------------
+# V6 (TARGET=20)
+# ------------------------------------------------------------
+pwst20.V6.01  salaka   pw  v6
+pwst20.V6.02  doromo   pw  v6
+pwst20.V6.03  refene   pw  v6
+pwst20.V6.04  tëvëlë   pw  v6
+pwst20.V6.05  gurumu   pw  v6
+pwst20.V6.06  yryny    pw  v6
+pwst20.V6.07  pikili   pw  v6
+pwst20.V6.08  aoyei    pw  v6
+pwst20.V6.09  imëlo    pw  v6
+pwst20.V6.10  uayëmu   pw  v6
+pwst20.V6.11  napara  pw  v6
+pwst20.V6.12  nomoro  pw  v6
+pwst20.V6.13  nenere  pw  v6
+pwst20.V6.14  nepete  pw  v6
+pwst20.V6.15  nëpëlë  pw  v6
+pwst20.V6.16  nëkëlë  pw  v6
+pwst20.V6.17  nupulu  pw  v6
+pwst20.V6.18  nurugu  pw  v6
+pwst20.V6.19  nybyty  pw  v6
+pwst20.V6.20  nikiti  pw  v6
+
+# ------------------------------------------------------------
+# V7 (TARGET=20)
+# ------------------------------------------------------------
+pwst20.V7.01  bakada   pw  v7
+pwst20.V7.02  soloso   pw  v7
+pwst20.V7.03  neneme   pw  v7
+pwst20.V7.04  dëpëlë   pw  v7
+pwst20.V7.05  lulunu   pw  v7
+pwst20.V7.06  yxyzy    pw  v7
+pwst20.V7.07  filiri   pw  v7
+pwst20.V7.08  yëbai    pw  v7
+pwst20.V7.09  uomëri   pw  v7
+pwst20.V7.10  eiyoa    pw  v7
+pwst20.V7.11  rapara  pw  v7
+pwst20.V7.12  romoro  pw  v7
+pwst20.V7.13  renere  pw  v7
+pwst20.V7.14  repete  pw  v7
+pwst20.V7.15  rëpëlë  pw  v7
+pwst20.V7.16  rëkëlë  pw  v7
+pwst20.V7.17  rupulu  pw  v7
+pwst20.V7.18  rurugu  pw  v7
+pwst20.V7.19  rybyty  pw  v7
+pwst20.V7.20  rikiti  pw  v7
