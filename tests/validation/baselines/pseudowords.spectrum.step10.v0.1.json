@@ -1,0 +1,87 @@
+{
+  "version": "pseudowords.spectrum.step10.v0.1",
+  "corpus": "tests/research/pseudowords.spectrum.step10.v0.1.txt",
+  "iters": 12000,
+  "seed": 90924101,
+  "baselineReady": true,
+  "cohorts": {
+    "all": {
+      "buckets": [
+        {
+          "tag": "v1",
+          "n": 10,
+          "aperturePrimary": 0.5399999999999999,
+          "aperturePresenceMean": 0.5566666666666666
+        },
+        {
+          "tag": "v2",
+          "n": 10,
+          "aperturePrimary": 0.48999999999999994,
+          "aperturePresenceMean": 0.5233333333333333
+        },
+        {
+          "tag": "v3",
+          "n": 10,
+          "aperturePrimary": 0.58,
+          "aperturePresenceMean": 0.5383333333333332
+        },
+        {
+          "tag": "v4",
+          "n": 10,
+          "aperturePrimary": 0.47999999999999987,
+          "aperturePresenceMean": 0.5208333333333333
+        },
+        {
+          "tag": "v5",
+          "n": 10,
+          "aperturePrimary": 0.5999999999999999,
+          "aperturePresenceMean": 0.54
+        },
+        {
+          "tag": "v6",
+          "n": 10,
+          "aperturePrimary": 0.5199999999999999,
+          "aperturePresenceMean": 0.5276666666666666
+        },
+        {
+          "tag": "v7",
+          "n": 10,
+          "aperturePrimary": 0.4999999999999999,
+          "aperturePresenceMean": 0.5185
+        }
+      ],
+      "slope": {
+        "sP": {
+          "obsMeans": [
+            0.5399999999999999,
+            0.48999999999999994,
+            0.58,
+            0.47999999999999987,
+            0.5999999999999999,
+            0.5199999999999999,
+            0.4999999999999999
+          ],
+          "obsR": -0.06734350297014782,
+          "obsRs": -0.03571428571428571,
+          "pR": 0.8845833333333334,
+          "pRs": 0.9655
+        },
+        "sM": {
+          "obsMeans": [
+            0.5566666666666666,
+            0.5233333333333333,
+            0.5383333333333332,
+            0.5208333333333333,
+            0.54,
+            0.5276666666666666,
+            0.5185
+          ],
+          "obsR": -0.5900323826210233,
+          "obsRs": -0.5357142857142857,
+          "pR": 0.16575,
+          "pRs": 0.23908333333333334
+        }
+      }
+    }
+  }
+}
