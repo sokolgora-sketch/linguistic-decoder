@@ -17,11 +17,9 @@
 # Workflow:
 # - Keep .11..20 commented until verified.
 # - After edits: npm test -- tests/research/turkish.spectrum.step20.v0.1.spec.ts
-
 # ------------------------------------------------------------
 # V1 Expansion/Space — V1 (TARGET=20)
 # ------------------------------------------------------------
-
 trst20.V1.01  aç  tr  v1
 trst20.V1.02  alan  tr  v1
 trst20.V1.03  ana  tr  v1
@@ -32,7 +30,6 @@ trst20.V1.07  ağaç  tr  v1
 trst20.V1.08  açmak  tr  v1
 trst20.V1.09  ara  tr  v1
 trst20.V1.10  açık  tr  v1
-
 trst20.V1.11  araba  tr  v1
 trst20.V1.12  ada  tr  v1
 trst20.V1.13  ana  tr  v1
@@ -42,12 +39,10 @@ trst20.V1.16  aralık  tr  v1
 trst20.V1.17  anlam  tr  v1
 trst20.V1.18  anahtar  tr  v1
 trst20.V1.19  atlas  tr  v1
-# trst20.V1.20  <word>  tr  v1
-
+trst20.V1.20  açma  tr  v1
 # ------------------------------------------------------------
 # V2 Force/Mass — V2 (TARGET=20)
 # ------------------------------------------------------------
-
 trst20.V2.01  yol  tr  v2
 trst20.V2.02  top  tr  v2
 trst20.V2.03  kol  tr  v2
@@ -58,7 +53,6 @@ trst20.V2.07  ok  tr  v2
 trst20.V2.08  ok  tr  v2
 trst20.V2.09  dolu  tr  v2
 trst20.V2.10  omuz  tr  v2
-
 trst20.V2.11  ot  tr  v2
 trst20.V2.12  ok  tr  v2
 trst20.V2.13  kol  tr  v2
@@ -68,12 +62,10 @@ trst20.V2.16  orman  tr  v2
 trst20.V2.17  top  tr  v2
 trst20.V2.18  korku  tr  v2
 trst20.V2.19  odun  tr  v2
-# trst20.V2.20  <word>  tr  v2
-
+trst20.V2.20  odak  tr  v2
 # ------------------------------------------------------------
 # V3 Interior/Depth — V3 (TARGET=20)
 # ------------------------------------------------------------
-
 trst20.V3.01  ev  tr  v3
 trst20.V3.02  nefes  tr  v3
 trst20.V3.03  ses  tr  v3
@@ -84,7 +76,6 @@ trst20.V3.07  sen  tr  v3
 trst20.V3.08  nefes  tr  v3
 trst20.V3.09  derin  tr  v3
 trst20.V3.10  gece  tr  v3
-
 trst20.V3.11  el  tr  v3
 trst20.V3.12  ek  tr  v3
 trst20.V3.13  sen  tr  v3
@@ -94,12 +85,10 @@ trst20.V3.16  erek  tr  v3
 trst20.V3.17  ben  tr  v3
 trst20.V3.18  gece  tr  v3
 trst20.V3.19  erken  tr  v3
-# trst20.V3.20  <word>  tr  v3
-
+trst20.V3.20  etek  tr  v3
 # ------------------------------------------------------------
 # V4 Ground/Balance — V4 (TARGET=20)
 # ------------------------------------------------------------
-
 trst20.V4.01  ağız  tr  v4
 trst20.V4.02  akıl  tr  v4
 trst20.V4.03  adım  tr  v4
@@ -110,7 +99,6 @@ trst20.V4.07  akıl  tr  v4
 trst20.V4.08  ağır  tr  v4
 trst20.V4.09  adım  tr  v4
 trst20.V4.10  adalet  tr  v4
-
 trst20.V4.11  akıl  tr  v4
 trst20.V4.12  kapı  tr  v4
 trst20.V4.13  adım  tr  v4
@@ -120,12 +108,10 @@ trst20.V4.16  alın  tr  v4
 trst20.V4.17  asıl  tr  v4
 trst20.V4.18  akış  tr  v4
 trst20.V4.19  anıt  tr  v4
-# trst20.V4.20  <word>  tr  v4
-
+trst20.V4.20  asır  tr  v4
 # ------------------------------------------------------------
 # V5 Activity/Direction — V5 (TARGET=20)
 # ------------------------------------------------------------
-
 trst20.V5.01  uç  tr  v5
 trst20.V5.02  su  tr  v5
 trst20.V5.03  bul  tr  v5
@@ -136,7 +122,6 @@ trst20.V5.07  kum  tr  v5
 trst20.V5.08  bul  tr  v5
 trst20.V5.09  kum  tr  v5
 trst20.V5.10  dur  tr  v5
-
 trst20.V5.11  su  tr  v5
 trst20.V5.12  umut  tr  v5
 trst20.V5.13  kum  tr  v5
@@ -146,12 +131,10 @@ trst20.V5.16  durum  tr  v5
 trst20.V5.17  bulut  tr  v5
 trst20.V5.18  uzun  tr  v5
 trst20.V5.19  usul  tr  v5
-# trst20.V5.20  <word>  tr  v5
-
+trst20.V5.20  ufuk  tr  v5
 # ------------------------------------------------------------
 # V6 Tension/High/Thin — V6 (TARGET=20)
 # ------------------------------------------------------------
-
 trst20.V6.01  gül  tr  v6
 trst20.V6.02  süt  tr  v6
 trst20.V6.03  gün  tr  v6
@@ -162,7 +145,6 @@ trst20.V6.07  süt  tr  v6
 trst20.V6.08  süt  tr  v6
 trst20.V6.09  yüz  tr  v6
 trst20.V6.10  güç  tr  v6
-
 trst20.V6.11  tüp  tr  v6
 trst20.V6.12  güç  tr  v6
 trst20.V6.13  süt  tr  v6
@@ -172,12 +154,10 @@ trst20.V6.16  gülüş  tr  v6
 trst20.V6.17  gün  tr  v6
 trst20.V6.18  ülke  tr  v6
 trst20.V6.19  sürü  tr  v6
-# trst20.V6.20  <word>  tr  v6
-
+trst20.V6.20  üzüm  tr  v6
 # ------------------------------------------------------------
 # V7 Focus/Linearity — V7 (TARGET=20)
 # ------------------------------------------------------------
-
 trst20.V7.01  ip  tr  v7
 trst20.V7.02  dil  tr  v7
 trst20.V7.03  bir  tr  v7
@@ -188,7 +168,6 @@ trst20.V7.07  il  tr  v7
 trst20.V7.08  çizgi  tr  v7
 trst20.V7.09  ince  tr  v7
 trst20.V7.10  iğne  tr  v7
-
 trst20.V7.11  kil  tr  v7
 trst20.V7.12  iş  tr  v7
 trst20.V7.13  diş  tr  v7
@@ -198,4 +177,4 @@ trst20.V7.16  iç  tr  v7
 trst20.V7.17  dil  tr  v7
 trst20.V7.18  ilk  tr  v7
 trst20.V7.19  ikiz  tr  v7
-# trst20.V7.20  <word>  tr  v7
+trst20.V7.20  iz  tr  v7
