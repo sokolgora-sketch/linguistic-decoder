@@ -41,7 +41,7 @@ trst20.V1.15  araç  tr  v1
 trst20.V1.16  aralık  tr  v1
 trst20.V1.17  anlam  tr  v1
 trst20.V1.18  anahtar  tr  v1
-# trst20.V1.19  <word>  tr  v1
+trst20.V1.19  atlas  tr  v1
 # trst20.V1.20  <word>  tr  v1
 
 # ------------------------------------------------------------
@@ -67,7 +67,7 @@ trst20.V2.15  son  tr  v2
 trst20.V2.16  orman  tr  v2
 trst20.V2.17  top  tr  v2
 trst20.V2.18  korku  tr  v2
-# trst20.V2.19  <word>  tr  v2
+trst20.V2.19  odun  tr  v2
 # trst20.V2.20  <word>  tr  v2
 
 # ------------------------------------------------------------
@@ -93,7 +93,7 @@ trst20.V3.15  kek  tr  v3
 trst20.V3.16  erek  tr  v3
 trst20.V3.17  ben  tr  v3
 trst20.V3.18  gece  tr  v3
-# trst20.V3.19  <word>  tr  v3
+trst20.V3.19  erken  tr  v3
 # trst20.V3.20  <word>  tr  v3
 
 # ------------------------------------------------------------
@@ -119,7 +119,7 @@ trst20.V4.15  ağır  tr  v4
 trst20.V4.16  alın  tr  v4
 trst20.V4.17  asıl  tr  v4
 trst20.V4.18  akış  tr  v4
-# trst20.V4.19  <word>  tr  v4
+trst20.V4.19  anıt  tr  v4
 # trst20.V4.20  <word>  tr  v4
 
 # ------------------------------------------------------------
@@ -145,7 +145,7 @@ trst20.V5.15  kuru  tr  v5
 trst20.V5.16  durum  tr  v5
 trst20.V5.17  bulut  tr  v5
 trst20.V5.18  uzun  tr  v5
-# trst20.V5.19  <word>  tr  v5
+trst20.V5.19  usul  tr  v5
 # trst20.V5.20  <word>  tr  v5
 
 # ------------------------------------------------------------
@@ -171,7 +171,7 @@ trst20.V6.15  düş  tr  v6
 trst20.V6.16  gülüş  tr  v6
 trst20.V6.17  gün  tr  v6
 trst20.V6.18  ülke  tr  v6
-# trst20.V6.19  <word>  tr  v6
+trst20.V6.19  sürü  tr  v6
 # trst20.V6.20  <word>  tr  v6
 
 # ------------------------------------------------------------
@@ -197,5 +197,5 @@ trst20.V7.15  bir  tr  v7
 trst20.V7.16  iç  tr  v7
 trst20.V7.17  dil  tr  v7
 trst20.V7.18  ilk  tr  v7
-# trst20.V7.19  <word>  tr  v7
+trst20.V7.19  ikiz  tr  v7
 # trst20.V7.20  <word>  tr  v7
