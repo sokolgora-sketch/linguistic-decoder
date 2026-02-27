@@ -51,7 +51,7 @@ trst7.V7.01  ip     tr  v7
 # V1 (add 9)
 trst10.V1.02  alan   tr  v1
 trst10.V1.03  ana    tr  v1
-# trst10.V1.04  <word>  tr  v1
+trst10.V1.04  ara   tr  v1
 # trst10.V1.05  <word>  tr  v1
 # trst10.V1.06  <word>  tr  v1
 # trst10.V1.07  <word>  tr  v1
@@ -62,7 +62,7 @@ trst10.V1.03  ana    tr  v1
 # V2 (add 9)
 trst10.V2.02  top    tr  v2
 trst10.V2.03  kol    tr  v2
-# trst10.V2.04  <word>  tr  v2
+trst10.V2.04  ok    tr  v2
 # trst10.V2.05  <word>  tr  v2
 # trst10.V2.06  <word>  tr  v2
 # trst10.V2.07  <word>  tr  v2
@@ -73,7 +73,7 @@ trst10.V2.03  kol    tr  v2
 # V3 (add 9)
 trst10.V3.02  nefes  tr  v3
 trst10.V3.03  ses    tr  v3
-# trst10.V3.04  <word>  tr  v3
+trst10.V3.04  el    tr  v3
 # trst10.V3.05  <word>  tr  v3
 # trst10.V3.06  <word>  tr  v3
 # trst10.V3.07  <word>  tr  v3
@@ -84,7 +84,7 @@ trst10.V3.03  ses    tr  v3
 # V4 (add 9)
 trst10.V4.02  akıl   tr  v4
 trst10.V4.03  adım   tr  v4
-# trst10.V4.04  <word>  tr  v4
+trst10.V4.04  adım  tr  v4
 # trst10.V4.05  <word>  tr  v4
 # trst10.V4.06  <word>  tr  v4
 # trst10.V4.07  <word>  tr  v4
@@ -95,7 +95,7 @@ trst10.V4.03  adım   tr  v4
 # V5 (add 9)
 trst10.V5.02  su     tr  v5
 trst10.V5.03  bul    tr  v5
-# trst10.V5.04  <word>  tr  v5
+trst10.V5.04  uzun  tr  v5
 # trst10.V5.05  <word>  tr  v5
 # trst10.V5.06  <word>  tr  v5
 # trst10.V5.07  <word>  tr  v5
@@ -106,7 +106,7 @@ trst10.V5.03  bul    tr  v5
 # V6 (add 9)
 trst10.V6.02  süt    tr  v6
 trst10.V6.03  gün    tr  v6
-# trst10.V6.04  <word>  tr  v6
+trst10.V6.04  gün   tr  v6
 # trst10.V6.05  <word>  tr  v6
 # trst10.V6.06  <word>  tr  v6
 # trst10.V6.07  <word>  tr  v6
@@ -117,7 +117,7 @@ trst10.V6.03  gün    tr  v6
 # V7 (add 9)
 trst10.V7.02  dil    tr  v7
 trst10.V7.03  bir    tr  v7
-# trst10.V7.04  <word>  tr  v7
+trst10.V7.04  iki   tr  v7
 # trst10.V7.05  <word>  tr  v7
 # trst10.V7.06  <word>  tr  v7
 # trst10.V7.07  <word>  tr  v7
