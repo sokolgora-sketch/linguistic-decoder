@@ -1,0 +1,126 @@
+# Turkish Spectrum — STEP10 v0.1 (ORTHOGRAPHY, langHint=tr)
+#
+# Columns:
+#   id    word    dialect   tag
+#
+# dialect: fixed "tr" (single-cohort language label)
+# tag: v1..v7 (same 7 semantic buckets used elsewhere)
+#
+# Important:
+# - This suite MUST use langHint="tr" so Turkish 'y' is treated as a consonant (no fake Y carriers).
+# - Turkish vowels supported by mapper: ö ü ı İ (plus standard a/e/i/o/u).
+#
+# Cohorts:
+# - N=7 cohort: ids starting with "trst7."
+# - STEP10 cohort: all active rows once you fill to TARGET=10 per bucket (and un-comment placeholders).
+#
+# Workflow:
+# - Keep STEP10 rows commented until verified.
+# - After edits: npm test -- tests/research/turkish.spectrum.step10.v0.1.spec.ts
+
+# ------------------------------------------------------------
+# N=7 CORE (1 per bucket) — physics-first ladder starter
+# ------------------------------------------------------------
+
+# V1 Expansion/Space (A-wide)
+trst7.V1.01  aç     tr  v1
+
+# V2 Force/Mass (O-midwide) — leading 'y' must be consonant under langHint=tr
+trst7.V2.01  yol    tr  v2
+
+# V3 Interior/Depth (E-mid)
+trst7.V3.01  ev     tr  v3
+
+# V4 Ground/Balance (A+ı blend ~0.55 presence mean)
+trst7.V4.01  ağız   tr  v4
+
+# V5 Activity/Direction (U)
+trst7.V5.01  uç     tr  v5
+
+# V6 Tension/High/Thin (ü -> Y-voice)
+trst7.V6.01  gül    tr  v6
+
+# V7 Focus/Linearity (i -> I-voice)
+trst7.V7.01  ip     tr  v7
+
+# ------------------------------------------------------------
+# STEP10 SCAFFOLD (add 9 more per bucket)
+# Keep commented until verified.
+# ------------------------------------------------------------
+
+# V1 (add 9)
+# trst10.V1.02  <word>  tr  v1
+# trst10.V1.03  <word>  tr  v1
+# trst10.V1.04  <word>  tr  v1
+# trst10.V1.05  <word>  tr  v1
+# trst10.V1.06  <word>  tr  v1
+# trst10.V1.07  <word>  tr  v1
+# trst10.V1.08  <word>  tr  v1
+# trst10.V1.09  <word>  tr  v1
+# trst10.V1.10  <word>  tr  v1
+
+# V2 (add 9)
+# trst10.V2.02  <word>  tr  v2
+# trst10.V2.03  <word>  tr  v2
+# trst10.V2.04  <word>  tr  v2
+# trst10.V2.05  <word>  tr  v2
+# trst10.V2.06  <word>  tr  v2
+# trst10.V2.07  <word>  tr  v2
+# trst10.V2.08  <word>  tr  v2
+# trst10.V2.09  <word>  tr  v2
+# trst10.V2.10  <word>  tr  v2
+
+# V3 (add 9)
+# trst10.V3.02  <word>  tr  v3
+# trst10.V3.03  <word>  tr  v3
+# trst10.V3.04  <word>  tr  v3
+# trst10.V3.05  <word>  tr  v3
+# trst10.V3.06  <word>  tr  v3
+# trst10.V3.07  <word>  tr  v3
+# trst10.V3.08  <word>  tr  v3
+# trst10.V3.09  <word>  tr  v3
+# trst10.V3.10  <word>  tr  v3
+
+# V4 (add 9)
+# trst10.V4.02  <word>  tr  v4
+# trst10.V4.03  <word>  tr  v4
+# trst10.V4.04  <word>  tr  v4
+# trst10.V4.05  <word>  tr  v4
+# trst10.V4.06  <word>  tr  v4
+# trst10.V4.07  <word>  tr  v4
+# trst10.V4.08  <word>  tr  v4
+# trst10.V4.09  <word>  tr  v4
+# trst10.V4.10  <word>  tr  v4
+
+# V5 (add 9)
+# trst10.V5.02  <word>  tr  v5
+# trst10.V5.03  <word>  tr  v5
+# trst10.V5.04  <word>  tr  v5
+# trst10.V5.05  <word>  tr  v5
+# trst10.V5.06  <word>  tr  v5
+# trst10.V5.07  <word>  tr  v5
+# trst10.V5.08  <word>  tr  v5
+# trst10.V5.09  <word>  tr  v5
+# trst10.V5.10  <word>  tr  v5
+
+# V6 (add 9)
+# trst10.V6.02  <word>  tr  v6
+# trst10.V6.03  <word>  tr  v6
+# trst10.V6.04  <word>  tr  v6
+# trst10.V6.05  <word>  tr  v6
+# trst10.V6.06  <word>  tr  v6
+# trst10.V6.07  <word>  tr  v6
+# trst10.V6.08  <word>  tr  v6
+# trst10.V6.09  <word>  tr  v6
+# trst10.V6.10  <word>  tr  v6
+
+# V7 (add 9)
+# trst10.V7.02  <word>  tr  v7
+# trst10.V7.03  <word>  tr  v7
+# trst10.V7.04  <word>  tr  v7
+# trst10.V7.05  <word>  tr  v7
+# trst10.V7.06  <word>  tr  v7
+# trst10.V7.07  <word>  tr  v7
+# trst10.V7.08  <word>  tr  v7
+# trst10.V7.09  <word>  tr  v7
+# trst10.V7.10  <word>  tr  v7
