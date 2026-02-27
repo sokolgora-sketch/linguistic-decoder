@@ -1,0 +1,28 @@
+{
+  "version": "turkish.spectrum.step20.v0.1.compare.v0.1",
+  "step10": {
+    "baselineJson": "tests/validation/baselines/turkish.spectrum.step10.v0.1.json"
+  },
+  "step20": {
+    "corpus": "tests/research/turkish.spectrum.step20.v0.1.txt",
+    "baselineReady": true
+  },
+  "delta": {
+    "primary": {
+      "absR10": 0.8567808115693062,
+      "absR20": 0.8567808115693063,
+      "dAbsR": 1.1102230246251565e-16,
+      "absRho10": 0.7857142857142857,
+      "absRho20": 0.7857142857142857,
+      "dAbsRho": 0
+    },
+    "presenceMean": {
+      "absR10": 0.9868899358640453,
+      "absR20": 0.9893427158104111,
+      "dAbsR": 0.002452779946365835,
+      "absRho10": 0.9642857142857143,
+      "absRho20": 1,
+      "dAbsRho": 0.0357142857142857
+    }
+  }
+}
