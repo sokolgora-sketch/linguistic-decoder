@@ -1,0 +1,16 @@
+{
+  "indexVersion": "evals.index.v0.1",
+  "rows": [
+    {
+      "file": "evalRun.public-grounding-probe.v0.1.gold.synthetic.full.v0.1.json",
+      "runId": "gold.synthetic.full",
+      "provider": "synthetic",
+      "model": "none",
+      "label": "calibration",
+      "t2_p_spearman": "0.000",
+      "t2_p_pearson": "0.000",
+      "t3_p_spearman": "0.349",
+      "t3_p_pearson": "0.588"
+    }
+  ]
+}
