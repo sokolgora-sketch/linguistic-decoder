@@ -72,6 +72,17 @@ function renderTask(t: EvalTaskReportV0_1): string[] {
   return lines;
 }
 
+function ensureSingleTrailingNewline(s: string): string {
+  // Linear-time trim of trailing CR/LF, then force exactly one \n.
+  let end = s.length;
+  while (end > 0) {
+    const c = s.charCodeAt(end - 1);
+    if (c === 10 /* \n */ || c === 13 /* \r */) end--;
+    else break;
+  }
+  return s.slice(0, end) + "\n";
+}
+
 export function renderEvalReportMdV0_1(report: EvalReportBundleV0_1): string {
   const lines: string[] = [];
   lines.push(`# ZË-RO Evals Report v0.1`);
@@ -92,5 +103,6 @@ export function renderEvalReportMdV0_1(report: EvalReportBundleV0_1): string {
     lines.push(...renderTask(t));
   }
 
-  return lines.join("\n").replace(/\n+$/g, "\n");
+  const out = lines.join("\n");
+  return ensureSingleTrailingNewline(out);
 }

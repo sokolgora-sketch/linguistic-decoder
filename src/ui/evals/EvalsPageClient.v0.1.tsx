@@ -1,0 +1,407 @@
+"use client";
+
+import React, { useMemo, useState } from "react";
+
+import { EVAL_SPEC_V0_1 } from "@/shared/evals/spec.v0.1";
+import type { EvalReportBundleV0_1, EvalTaskReportV0_1 } from "@/shared/evals/report.v0.1";
+
+type ApiOk = { ok: true; report: EvalReportBundleV0_1; md: string };
+type ApiErr = { ok: false; code: string; message: string };
+
+function fmt(x: number, d = 3) {
+  if (!Number.isFinite(x)) return "NaN";
+  return x.toFixed(d);
+}
+
+function joinList(xs: string[]) {
+  return xs.length ? xs.join(", ") : "(none)";
+}
+
+function TaskCard({ t }: { t: EvalTaskReportV0_1 }) {
+  return (
+    <section className="rounded-lg border p-4 space-y-3">
+      <div className="space-y-1">
+        <div className="text-sm text-neutral-500">{t.taskId}</div>
+        <h2 className="text-lg font-semibold">{t.title}</h2>
+        <div className="text-sm text-neutral-600">
+          kind: <span className="font-mono">{t.kind}</span> · langHint:{" "}
+          <span className="font-mono">{t.languageHint}</span> · targetBuckets:{" "}
+          <span className="font-mono">{t.targetBuckets.join(", ")}</span> · nPerBucket:{" "}
+          <span className="font-mono">{t.nPerBucket}</span>
+        </div>
+      </div>
+
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm border">
+          <thead>
+            <tr className="bg-neutral-50">
+              <th className="text-left p-2 border">Bucket</th>
+              <th className="text-right p-2 border">expected</th>
+              <th className="text-right p-2 border">provided</th>
+              <th className="text-right p-2 border">valid</th>
+              <th className="text-right p-2 border">invalid</th>
+              <th className="text-right p-2 border">dup</th>
+              <th className="text-right p-2 border">mean(primary)</th>
+              <th className="text-right p-2 border">mean(presenceMean)</th>
+            </tr>
+          </thead>
+          <tbody>
+            {t.buckets.map((b) => (
+              <tr key={b.bucket}>
+                <td className="p-2 border font-mono">{b.bucket}</td>
+                <td className="p-2 border text-right">{b.expectedN}</td>
+                <td className="p-2 border text-right">{b.providedN}</td>
+                <td className="p-2 border text-right">{b.validN}</td>
+                <td className="p-2 border text-right">{b.invalidN}</td>
+                <td className="p-2 border text-right">{b.duplicateN}</td>
+                <td className="p-2 border text-right">{fmt(b.mean_aperturePrimary)}</td>
+                <td className="p-2 border text-right">{fmt(b.mean_aperturePresenceMean)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="grid gap-3 md:grid-cols-2">
+        <div className="rounded-md border p-3">
+          <div className="font-semibold">Slope — aperturePrimary</div>
+          {t.slope_aperturePrimary ? (
+            <ul className="text-sm mt-2 space-y-1">
+              <li>pearson r: <span className="font-mono">{fmt(t.slope_aperturePrimary.pearson_r)}</span> (p=<span className="font-mono">{fmt(t.slope_aperturePrimary.p_pearson)}</span>)</li>
+              <li>spearman ρ: <span className="font-mono">{fmt(t.slope_aperturePrimary.spearman_rho)}</span> (p=<span className="font-mono">{fmt(t.slope_aperturePrimary.p_spearman)}</span>)</li>
+              <li>perm: iters=<span className="font-mono">{t.slope_aperturePrimary.iters}</span>, seed=<span className="font-mono">{t.slope_aperturePrimary.seed}</span></li>
+            </ul>
+          ) : (
+            <div className="text-sm mt-2 text-neutral-500">not computed</div>
+          )}
+        </div>
+
+        <div className="rounded-md border p-3">
+          <div className="font-semibold">Slope — aperturePresenceMean</div>
+          {t.slope_aperturePresenceMean ? (
+            <ul className="text-sm mt-2 space-y-1">
+              <li>pearson r: <span className="font-mono">{fmt(t.slope_aperturePresenceMean.pearson_r)}</span> (p=<span className="font-mono">{fmt(t.slope_aperturePresenceMean.p_pearson)}</span>)</li>
+              <li>spearman ρ: <span className="font-mono">{fmt(t.slope_aperturePresenceMean.spearman_rho)}</span> (p=<span className="font-mono">{fmt(t.slope_aperturePresenceMean.p_spearman)}</span>)</li>
+              <li>perm: iters=<span className="font-mono">{t.slope_aperturePresenceMean.iters}</span>, seed=<span className="font-mono">{t.slope_aperturePresenceMean.seed}</span></li>
+            </ul>
+          ) : (
+            <div className="text-sm mt-2 text-neutral-500">not computed</div>
+          )}
+        </div>
+      </div>
+
+      <details className="rounded-md border p-3">
+        <summary className="cursor-pointer font-semibold">Diagnostics</summary>
+        <div className="text-sm mt-2 space-y-1">
+          <div>missingBuckets: <span className="font-mono">{joinList(t.diagnostics.missingBuckets)}</span></div>
+          <div>extraBuckets: <span className="font-mono">{joinList(t.diagnostics.extraBuckets)}</span></div>
+          <div>emptyTokenCount: <span className="font-mono">{t.diagnostics.emptyTokenCount}</span></div>
+          <div>whitespaceTokenCount: <span className="font-mono">{t.diagnostics.whitespaceTokenCount}</span></div>
+          <div>noVowelTokenCount: <span className="font-mono">{t.diagnostics.noVowelTokenCount}</span></div>
+          <div>totalInvalidTokenCount: <span className="font-mono">{t.diagnostics.totalInvalidTokenCount}</span></div>
+          <div>notes: <span className="font-mono">{t.diagnostics.notes.length ? t.diagnostics.notes.join(" | ") : "(none)"}</span></div>
+        </div>
+      </details>
+    </section>
+  );
+}
+
+export function EvalsPageClientV0_1() {
+  const byoTasks = useMemo(
+    () => EVAL_SPEC_V0_1.tasks.filter((t) => t.kind === "byo"),
+    []
+  );
+
+  const [mode, setMode] = useState<"run_bundle" | "task_buckets">("run_bundle");
+  const [taskId, setTaskId] = useState<string>(byoTasks[0]?.taskId ?? "T2_LADDER_V0_1");
+
+  const [runId, setRunId] = useState<string>("ui.run.v0.1");
+  const [provider, setProvider] = useState<string>("");
+  const [model, setModel] = useState<string>("");
+  const [label, setLabel] = useState<string>("");
+
+  const [inputText, setInputText] = useState<string>("");
+  const [busy, setBusy] = useState(false);
+
+  const [apiErr, setApiErr] = useState<ApiErr | null>(null);
+  const [report, setReport] = useState<EvalReportBundleV0_1 | null>(null);
+  const [md, setMd] = useState<string>("");
+
+  const selectedTask = useMemo(
+    () => byoTasks.find((t) => t.taskId === taskId) ?? byoTasks[0],
+    [byoTasks, taskId]
+  );
+
+  async function onPickFile(f: File | null) {
+    if (!f) return;
+    const txt = await f.text();
+    setInputText(txt);
+  }
+
+  function buildRunJsonFromUi(): unknown {
+    const rid = runId.trim() || "ui.run.v0.1";
+
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(inputText);
+    } catch (e) {
+      throw new Error((e as Error)?.message ?? "Invalid JSON");
+    }
+
+    if (mode === "run_bundle") {
+      // Patch meta if provided (best-effort)
+      if (provider || model || label) {
+        const obj = parsed as any;
+        if (typeof obj !== "object" || obj === null) return parsed;
+        obj.meta = {
+          ...(obj.meta ?? {}),
+          ...(provider ? { provider } : {}),
+          ...(model ? { model } : {}),
+          ...(label ? { label } : {}),
+        };
+        if (!obj.runId) obj.runId = rid;
+        return obj;
+      }
+      return parsed;
+    }
+
+    // mode === task_buckets (wrap raw buckets -> full run bundle)
+    if (!selectedTask) throw new Error("No task selected");
+    return {
+      evalRunVersion: "evalRun.v0.1",
+      evalSpecVersion: "evalSpec.v0.1",
+      specId: "public-grounding-probe.v0.1",
+      runId: rid,
+      meta: {
+        ...(provider ? { provider } : {}),
+        ...(model ? { model } : {}),
+        ...(label ? { label } : {}),
+      },
+      tasks: [
+        {
+          taskId: selectedTask.taskId,
+          inputShape: "bucketed_single_tokens",
+          buckets: parsed,
+        },
+      ],
+    };
+  }
+
+  async function onScore() {
+    setApiErr(null);
+    setReport(null);
+    setMd("");
+    setBusy(true);
+    try {
+      const runJson = buildRunJsonFromUi();
+      const body = JSON.stringify(runJson);
+
+      const res = await fetch("/api/evals/score", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body,
+      });
+
+      const data: unknown = await res.json();
+
+      if (!data || typeof data !== "object") {
+        setApiErr({ ok: false, code: "BAD_JSON", message: "Server returned non-object JSON." });
+        return;
+      }
+
+      if ((data as any).ok !== true) {
+        const e = data as any;
+        setApiErr({
+          ok: false,
+          code: String(e?.code ?? "UNKNOWN"),
+          message: String(e?.message ?? "Unknown error"),
+        });
+        return;
+      }
+
+      const j = data as ApiOk;
+      setReport(j.report);
+      setMd(j.md);
+    } catch (e) {
+      setApiErr({ ok: false, code: "CLIENT_ERROR", message: (e as Error)?.message ?? "Client error" });
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  function loadExample() {
+      // Synthetic calibration ladder (non-semantic): each bucket is dominated by one vowel carrier.
+      setMode("task_buckets");
+      setTaskId("T2_LADDER_V0_1");
+      setRunId("example.synthetic.ladder.v0.1");
+      setInputText(
+        JSON.stringify(
+          {
+            V1: ["a","aa","aaa","aaaa","aaaaa","aaaaaa","aaaaaaa","aaaaaaaa","aaaaaaaaa","aaaaaaaaaa"],
+            V2: ["o","oo","ooo","oooo","ooooo","oooooo","ooooooo","oooooooo","ooooooooo","oooooooooo"],
+            V3: ["e","ee","eee","eeee","eeeee","eeeeee","eeeeeee","eeeeeeee","eeeeeeeee","eeeeeeeeee"],
+            V4: ["ë","ëë","ëëë","ëëëë","ëëëëë","ëëëëëë","ëëëëëëë","ëëëëëëëë","ëëëëëëëëë","ëëëëëëëëëë"],
+            V5: ["u","uu","uuu","uuuu","uuuuu","uuuuuu","uuuuuuu","uuuuuuuu","uuuuuuuuu","uuuuuuuuuu"],
+            V6: ["y","yy","yyy","yyyy","yyyyy","yyyyyy","yyyyyyy","yyyyyyyy","yyyyyyyyy","yyyyyyyyyy"],
+            V7: ["i","ii","iii","iiii","iiiii","iiiiii","iiiiiii","iiiiiiii","iiiiiiiii","iiiiiiiiii"]
+          },
+          null,
+          2
+        )
+      );
+    }
+
+  return (
+    <main className="mx-auto max-w-5xl p-6 space-y-6">
+      <header className="space-y-2">
+        <h1 className="text-2xl font-bold">ZË-RO Evals v0.1 — BYO Outputs</h1>
+        <div className="text-sm text-neutral-600">
+          This page scores a pasted run against the deterministic aperture proxy (orthography SSOT). No API keys. No model calls.
+        </div>
+      </header>
+
+      <section className="rounded-lg border p-4 space-y-4">
+        <div className="flex flex-col gap-3 md:flex-row md:items-end">
+          <div className="flex-1">
+            <label className="text-sm font-semibold">Input mode</label>
+            <select
+              className="mt-1 w-full border rounded p-2"
+              value={mode}
+              onChange={(e) => setMode(e.target.value as any)}
+            >
+              <option value="run_bundle">Full run bundle (evalRun.v0.1)</option>
+              <option value="task_buckets">Buckets only (wrap into a run)</option>
+            </select>
+          </div>
+
+          <div className="flex-1">
+            <label className="text-sm font-semibold">Task (only used for “Buckets only”)</label>
+            <select
+              className="mt-1 w-full border rounded p-2"
+              value={taskId}
+              onChange={(e) => setTaskId(e.target.value)}
+              disabled={mode !== "task_buckets"}
+            >
+              {byoTasks.map((t) => (
+                <option key={t.taskId} value={t.taskId}>
+                  {t.taskId} — {t.title}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        <details className="rounded-md border p-3">
+          <summary className="cursor-pointer font-semibold">Task prompt (copy/paste to model)</summary>
+          <pre className="mt-3 whitespace-pre-wrap text-xs bg-neutral-50 p-3 rounded border">
+            {selectedTask?.prompt ?? "(no task selected)"}
+          </pre>
+        </details>
+
+        <div className="grid gap-3 md:grid-cols-4">
+          <div>
+            <label className="text-sm font-semibold">runId</label>
+            <input className="mt-1 w-full border rounded p-2" value={runId} onChange={(e) => setRunId(e.target.value)} />
+          </div>
+          <div>
+            <label className="text-sm font-semibold">provider</label>
+            <input className="mt-1 w-full border rounded p-2" value={provider} onChange={(e) => setProvider(e.target.value)} />
+          </div>
+          <div>
+            <label className="text-sm font-semibold">model</label>
+            <input className="mt-1 w-full border rounded p-2" value={model} onChange={(e) => setModel(e.target.value)} />
+          </div>
+          <div>
+            <label className="text-sm font-semibold">label</label>
+            <input className="mt-1 w-full border rounded p-2" value={label} onChange={(e) => setLabel(e.target.value)} />
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-3 md:flex-row md:items-center">
+          <div className="flex items-center gap-3">
+            <label className="text-sm font-semibold">Upload JSON</label>
+            <input
+              type="file"
+              accept=".json,application/json"
+              onChange={(e) => void onPickFile(e.target.files?.[0] ?? null)}
+            />
+          </div>
+
+          <div className="flex gap-2 md:ml-auto">
+            <button className="border rounded px-3 py-2 text-sm" onClick={loadExample} type="button">
+              Load example
+            </button>
+            <button
+              className="border rounded px-3 py-2 text-sm"
+              onClick={() => {
+                setInputText("");
+                setApiErr(null);
+                setReport(null);
+                setMd("");
+              }}
+              type="button"
+            >
+              Clear
+            </button>
+            <button
+              className="bg-black text-white rounded px-3 py-2 text-sm disabled:opacity-50"
+              onClick={() => void onScore()}
+              disabled={busy || !inputText.trim()}
+              type="button"
+            >
+              {busy ? "Scoring…" : "Score"}
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <label className="text-sm font-semibold">Paste JSON</label>
+          <textarea
+            className="mt-1 w-full min-h-[220px] border rounded p-2 font-mono text-xs"
+            value={inputText}
+            onChange={(e) => setInputText(e.target.value)}
+            placeholder={mode === "run_bundle" ? '{ "evalRunVersion": "evalRun.v0.1", ... }' : '{ "V1": ["token1", ...], "V2": [...], ... }'}
+          />
+        </div>
+
+        {apiErr ? (
+          <div className="rounded-md border border-red-300 bg-red-50 p-3 text-sm">
+            <div className="font-semibold">Error: <span className="font-mono">{apiErr.code}</span></div>
+            <div className="mt-1">{apiErr.message}</div>
+          </div>
+        ) : null}
+      </section>
+
+      {report ? (
+        <section className="space-y-4">
+          <div className="rounded-lg border p-4 space-y-2">
+            <div className="text-sm text-neutral-600">Report</div>
+            <div className="text-sm">
+              specId: <span className="font-mono">{report.specId}</span> · evalSpecVersion:{" "}
+              <span className="font-mono">{report.evalSpecVersion}</span> · runId:{" "}
+              <span className="font-mono">{report.runId}</span>
+            </div>
+            {report.meta ? (
+              <div className="text-sm text-neutral-700">
+                provider: <span className="font-mono">{report.meta.provider ?? ""}</span> · model:{" "}
+                <span className="font-mono">{report.meta.model ?? ""}</span> · label:{" "}
+                <span className="font-mono">{report.meta.label ?? ""}</span>
+              </div>
+            ) : null}
+
+            <details className="rounded-md border p-3 mt-2">
+              <summary className="cursor-pointer font-semibold">Markdown report (from renderer)</summary>
+              <pre className="mt-3 whitespace-pre-wrap text-xs bg-neutral-50 p-3 rounded border">{md}</pre>
+            </details>
+          </div>
+
+          <div className="space-y-4">
+            {report.tasks.map((t) => (
+              <TaskCard key={t.taskId} t={t} />
+            ))}
+          </div>
+        </section>
+      ) : null}
+    </main>
+  );
+}
