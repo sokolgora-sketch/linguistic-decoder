@@ -1,0 +1,43 @@
+{
+  "evalRunVersion": "evalRun.v0.1",
+  "evalSpecVersion": "evalSpec.v0.1",
+  "specId": "public-grounding-probe.v0.1",
+  "runId": "gold.synthetic.full",
+  "meta": { "provider": "synthetic", "model": "none", "label": "calibration" },
+  "tasks": [
+    {
+      "taskId": "T1_BUCKET_V1_V0_1",
+      "inputShape": "bucketed_single_tokens",
+      "buckets": {
+        "V1": ["a","aa","aaa","aaaa","aaaaa","aaaaaa","aaaaaaa","aaaaaaaa","aaaaaaaaa","aaaaaaaaaa","aaaaaaaaaaa","aaaaaaaaaaaa","aaaaaaaaaaaaa","aaaaaaaaaaaaaa","aaaaaaaaaaaaaaa","aaaaaaaaaaaaaaaa","aaaaaaaaaaaaaaaaa","aaaaaaaaaaaaaaaaaa","aaaaaaaaaaaaaaaaaaa","aaaaaaaaaaaaaaaaaaaa"]
+      }
+    },
+    {
+      "taskId": "T1_BUCKET_V4_V0_1",
+      "inputShape": "bucketed_single_tokens",
+      "buckets": {
+        "V4": ["ë","ëë","ëëë","ëëëë","ëëëëë","ëëëëëë","ëëëëëëë","ëëëëëëëë","ëëëëëëëëë","ëëëëëëëëëë","ëëëëëëëëëëë","ëëëëëëëëëëëë","ëëëëëëëëëëëëë","ëëëëëëëëëëëëëë","ëëëëëëëëëëëëëëë","ëëëëëëëëëëëëëëëë","ëëëëëëëëëëëëëëëëë","ëëëëëëëëëëëëëëëëëëë","ëëëëëëëëëëëëëëëëëëëë","ëëëëëëëëëëëëëëëëëëëëë"]
+      }
+    },
+    {
+      "taskId": "T1_BUCKET_V7_V0_1",
+      "inputShape": "bucketed_single_tokens",
+      "buckets": {
+        "V7": ["i","ii","iii","iiii","iiiii","iiiiii","iiiiiii","iiiiiiii","iiiiiiiii","iiiiiiiiii","iiiiiiiiiii","iiiiiiiiiiii","iiiiiiiiiiiii","iiiiiiiiiiiiii","iiiiiiiiiiiiiii","iiiiiiiiiiiiiiii","iiiiiiiiiiiiiiiii","iiiiiiiiiiiiiiiiii","iiiiiiiiiiiiiiiiiii","iiiiiiiiiiiiiiiiiiii"]
+      }
+    },
+    {
+      "taskId": "T2_LADDER_V0_1",
+      "inputShape": "bucketed_single_tokens",
+      "buckets": {
+        "V1": ["a","aa","aaa","aaaa","aaaaa","aaaaaa","aaaaaaa","aaaaaaaa","aaaaaaaaa","aaaaaaaaaa"],
+        "V2": ["o","oo","ooo","oooo","ooooo","oooooo","ooooooo","oooooooo","ooooooooo","oooooooooo"],
+        "V3": ["e","ee","eee","eeee","eeeee","eeeeee","eeeeeee","eeeeeeee","eeeeeeeee","eeeeeeeeee"],
+        "V4": ["ë","ëë","ëëë","ëëëë","ëëëëë","ëëëëëë","ëëëëëëë","ëëëëëëëë","ëëëëëëëëë","ëëëëëëëëëë"],
+        "V5": ["u","uu","uuu","uuuu","uuuuu","uuuuuu","uuuuuuu","uuuuuuuu","uuuuuuuuu","uuuuuuuuuu"],
+        "V6": ["y","yy","yyy","yyyy","yyyyy","yyyyyy","yyyyyyy","yyyyyyyy","yyyyyyyyy","yyyyyyyyyy"],
+        "V7": ["i","ii","iii","iiii","iiiii","iiiiii","iiiiiii","iiiiiiii","iiiiiiiii","iiiiiiiiii"]
+      }
+    }
+  ]
+}
