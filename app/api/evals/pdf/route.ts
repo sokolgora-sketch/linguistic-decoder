@@ -152,7 +152,7 @@ async function renderPdfFromText(text: string): Promise<Uint8Array> {
   const pageSize: [number, number] = [612, 792]; // US Letter-ish
   let page = pdf.addPage(pageSize);
 
-  const [w, h] = page.getSize();
+  const { width: w, height: h } = page.getSize();
   const maxWidth = w - margin * 2;
 
   let y = h - margin;
