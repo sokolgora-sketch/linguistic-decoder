@@ -209,6 +209,51 @@ export function EvalsPageClientV0_1() {
         return;
       }
 
+    async function onDownloadPdf() {
+      setApiErr(null);
+      setBusy(true);
+      try {
+        const runJson = buildRunJsonFromUi();
+        const body = JSON.stringify(runJson);
+
+        const res = await fetch("/api/evals/pdf", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body,
+        });
+
+        if (!res.ok) {
+          const data = await res.json().catch(() => null);
+          setApiErr({
+            ok: false,
+            code: String(data?.code ?? "PDF_ERROR"),
+            message: String(data?.message ?? `HTTP ${res.status}`),
+          });
+          return;
+        }
+
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+
+        const rid = String((runJson && runJson.runId) ? runJson.runId : "run")
+          .replace(/[^a-zA-Z0-9._-]+/g, "_")
+          .slice(0, 120);
+
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `evals.${rid}.v0.1.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+
+        URL.revokeObjectURL(url);
+      } catch (e) {
+        setApiErr({ ok: false, code: "CLIENT_ERROR", message: (e?.message ?? String(e)) });
+      } finally {
+        setBusy(false);
+      }
+    }
+
       if ((data as any).ok !== true) {
         const e = data as any;
         setApiErr({
@@ -351,6 +396,15 @@ export function EvalsPageClientV0_1() {
             >
               {busy ? "Scoring…" : "Score"}
             </button>
+              <button
+                className="border rounded px-3 py-2 text-sm disabled:opacity-50"
+                onClick={() => void onDownloadPdf()}
+                disabled={busy || !inputText.trim()}
+                type="button"
+              >
+                Download PDF
+              </button>
+
           </div>
         </div>
 
