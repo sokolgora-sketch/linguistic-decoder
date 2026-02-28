@@ -230,26 +230,26 @@ export function EvalsPageClientV0_1() {
   }
 
   function loadExample() {
-    // Minimal “buckets-only” ladder example
-    setMode("task_buckets");
-    setTaskId("T2_LADDER_V0_1");
-    setRunId("example.ladder.v0.1");
-    setInputText(
-      JSON.stringify(
-        {
-          V1: ["open", "wide", "space", "broad", "expand", "outer", "large", "field", "world", "horizon"],
-          V2: ["force", "mass", "push", "weight", "strike", "impact", "stone", "press", "heavy", "power"],
-          V3: ["inside", "inner", "depth", "cave", "core", "within", "center", "hidden", "under", "interior"],
-          V4: ["ground", "base", "root", "balance", "stable", "level", "earth", "floor", "support", "anchor"],
-          V5: ["move", "path", "route", "walk", "flow", "go", "drive", "turn", "shift", "travel"],
-          V6: ["thin", "tight", "high", "tension", "wire", "string", "narrow", "edge", "sharp", "strain"],
-          V7: ["point", "line", "pin", "dot", "aim", "precise", "focus", "axis", "ray", "tip"],
-        },
-        null,
-        2
-      )
-    );
-  }
+      // Synthetic calibration ladder (non-semantic): each bucket is dominated by one vowel carrier.
+      setMode("task_buckets");
+      setTaskId("T2_LADDER_V0_1");
+      setRunId("example.synthetic.ladder.v0.1");
+      setInputText(
+        JSON.stringify(
+          {
+            V1: ["a","aa","aaa","aaaa","aaaaa","aaaaaa","aaaaaaa","aaaaaaaa","aaaaaaaaa","aaaaaaaaaa"],
+            V2: ["o","oo","ooo","oooo","ooooo","oooooo","ooooooo","oooooooo","ooooooooo","oooooooooo"],
+            V3: ["e","ee","eee","eeee","eeeee","eeeeee","eeeeeee","eeeeeeee","eeeeeeeee","eeeeeeeeee"],
+            V4: ["ë","ëë","ëëë","ëëëë","ëëëëë","ëëëëëë","ëëëëëëë","ëëëëëëëë","ëëëëëëëëë","ëëëëëëëëëë"],
+            V5: ["u","uu","uuu","uuuu","uuuuu","uuuuuu","uuuuuuu","uuuuuuuu","uuuuuuuuu","uuuuuuuuuu"],
+            V6: ["y","yy","yyy","yyyy","yyyyy","yyyyyy","yyyyyyy","yyyyyyyy","yyyyyyyyy","yyyyyyyyyy"],
+            V7: ["i","ii","iii","iiii","iiiii","iiiiii","iiiiiii","iiiiiiii","iiiiiiiii","iiiiiiiiii"]
+          },
+          null,
+          2
+        )
+      );
+    }
 
   return (
     <main className="mx-auto max-w-5xl p-6 space-y-6">
