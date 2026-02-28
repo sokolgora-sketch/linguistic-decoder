@@ -17,7 +17,13 @@ type ApiErr = {
 function err(code: ApiErr["code"], message: string, status = 400) {
   return NextResponse.json(
     { ok: false, code, message } satisfies ApiErr,
-    { status, headers: { "cache-control": "no-store" } }
+    {
+      status,
+      headers: {
+        "cache-control": "no-store",
+        "content-type": "application/json",
+      },
+    }
   );
 }
 
@@ -38,54 +44,95 @@ function safeFilename(input: string): string {
   return out || "run";
 }
 
-function wrapLine(line: string, maxChars: number): string[] {
-  if (line.length <= maxChars) return [line];
+function wrapLine(font: any, fontSize: number, line: string, maxWidth: number): string[] {
   const out: string[] = [];
-  for (let i = 0; i < line.length; i += maxChars) out.push(line.slice(i, i + maxChars));
-  return out;
-}
 
-function wrapText(text: string, maxChars: number): string[] {
-  const raw = String(text ?? "").replaceAll("\r\n", "\n").replaceAll("\r", "\n");
-  const lines = raw.split("\n");
-  const out: string[] = [];
-  for (const l of lines) out.push(...wrapLine(l, maxChars));
-  return out;
+  // Fast path
+  if (font.widthOfTextAtSize(line, fontSize) <= maxWidth) return [line];
+
+  // Word wrap
+  const words = line.split(/\s+/g).filter(Boolean);
+  if (!words.length) return [""];
+
+  let cur = words[0];
+  for (let i = 1; i < words.length; i++) {
+    const next = cur + " " + words[i];
+    if (font.widthOfTextAtSize(next, fontSize) <= maxWidth) {
+      cur = next;
+    } else {
+      out.push(cur);
+      cur = words[i];
+    }
+  }
+  out.push(cur);
+
+  // If any “word” is too long, fallback to char wrap for that segment
+  const final: string[] = [];
+  for (const seg of out) {
+    if (font.widthOfTextAtSize(seg, fontSize) <= maxWidth) {
+      final.push(seg);
+      continue;
+    }
+    let buf = "";
+    for (const ch of seg) {
+      const test = buf + ch;
+      if (font.widthOfTextAtSize(test, fontSize) <= maxWidth) {
+        buf = test;
+      } else {
+        if (buf) final.push(buf);
+        buf = ch;
+      }
+    }
+    if (buf) final.push(buf);
+  }
+
+  return final;
 }
 
 async function renderPdfFromText(text: string): Promise<Uint8Array> {
-  const doc = await PDFDocument.create();
-  const font = await doc.embedFont(StandardFonts.Courier);
+  const pdf = await PDFDocument.create();
+  const font = await pdf.embedFont(StandardFonts.Courier);
 
-  const pageW = 612;
-  const pageH = 792;
+  // A4 portrait
+  const pageWidth = 595.28;
+  const pageHeight = 841.89;
 
   const margin = 48;
   const fontSize = 10;
-  const lineH = 12;
-  const maxChars = 95;
+  const lineHeight = 12;
 
-  const lines = wrapText(text, maxChars);
+  const maxWidth = pageWidth - margin * 2;
 
-  let page = doc.addPage([pageW, pageH]);
-  let y = pageH - margin;
+  let page = pdf.addPage([pageWidth, pageHeight]);
+  let y = pageHeight - margin;
 
-  for (const line of lines) {
-    if (y < margin) {
-      page = doc.addPage([pageW, pageH]);
-      y = pageH - margin;
+  const rawLines = String(text ?? "").replace(/\r\n/g, "\n").split("\n");
+
+  for (const raw of rawLines) {
+    const wrapped = wrapLine(font, fontSize, raw, maxWidth);
+    for (const line of wrapped) {
+      if (y - lineHeight < margin) {
+        page = pdf.addPage([pageWidth, pageHeight]);
+        y = pageHeight - margin;
+      }
+      page.drawText(line, {
+        x: margin,
+        y: y - fontSize,
+        size: fontSize,
+        font,
+      });
+      y -= lineHeight;
     }
-    page.drawText(line, { x: margin, y, size: fontSize, font });
-    y -= lineH;
   }
 
-  return await doc.save();
+  return await pdf.save();
 }
 
 export async function POST(req: Request) {
   try {
     const raw = await req.text();
 
+    // Minimal abuse gate (v0.1): hard payload cap (bytes, not characters)
     const MAX_BYTES = 300_000; // 300 KB
     const rawBytes = Buffer.byteLength(raw, "utf8");
     if (rawBytes > MAX_BYTES) {
@@ -118,7 +165,11 @@ export async function POST(req: Request) {
 
     const fname = `evals.${safeFilename(report.runId)}.v0.1.pdf`;
 
-    return new NextResponse(pdfBytes, {
+    // Use ArrayBuffer to satisfy BodyInit types cleanly.
+    const body = new ArrayBuffer(pdfBytes.byteLength);
+    new Uint8Array(body).set(pdfBytes);
+
+    return new NextResponse(body, {
       status: 200,
       headers: {
         "cache-control": "no-store",
