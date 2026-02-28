@@ -280,8 +280,8 @@
           "validN": 10,
           "invalidN": 0,
           "duplicateN": 0,
-          "mean_aperturePrimary": 0.5,
-          "mean_aperturePresenceMean": 0.5
+          "mean_aperturePrimary": 0.58,
+          "mean_aperturePresenceMean": 0.58
         },
         {
           "bucket": "V2",
@@ -290,8 +290,8 @@
           "validN": 10,
           "invalidN": 0,
           "duplicateN": 0,
-          "mean_aperturePrimary": 0.39999999999999997,
-          "mean_aperturePresenceMean": 0.39999999999999997
+          "mean_aperturePrimary": 0.55,
+          "mean_aperturePresenceMean": 0.55
         },
         {
           "bucket": "V3",
@@ -300,8 +300,8 @@
           "validN": 10,
           "invalidN": 0,
           "duplicateN": 0,
-          "mean_aperturePrimary": 0.29999999999999993,
-          "mean_aperturePresenceMean": 0.29999999999999993
+          "mean_aperturePrimary": 0.55,
+          "mean_aperturePresenceMean": 0.55
         },
         {
           "bucket": "V4",
@@ -310,8 +310,8 @@
           "validN": 10,
           "invalidN": 0,
           "duplicateN": 0,
-          "mean_aperturePrimary": 0.09999999999999999,
-          "mean_aperturePresenceMean": 0.09999999999999999
+          "mean_aperturePrimary": 0.36,
+          "mean_aperturePresenceMean": 0.36
         },
         {
           "bucket": "V5",
@@ -320,8 +320,8 @@
           "validN": 10,
           "invalidN": 0,
           "duplicateN": 0,
-          "mean_aperturePrimary": 1,
-          "mean_aperturePresenceMean": 1
+          "mean_aperturePrimary": 0.71,
+          "mean_aperturePresenceMean": 0.71
         },
         {
           "bucket": "V6",
@@ -330,8 +330,8 @@
           "validN": 10,
           "invalidN": 0,
           "duplicateN": 0,
-          "mean_aperturePrimary": 0.7999999999999999,
-          "mean_aperturePresenceMean": 0.7999999999999999
+          "mean_aperturePrimary": 0.5399999999999999,
+          "mean_aperturePresenceMean": 0.5399999999999999
         },
         {
           "bucket": "V7",
@@ -340,8 +340,8 @@
           "validN": 10,
           "invalidN": 0,
           "duplicateN": 0,
-          "mean_aperturePrimary": 0.5999999999999999,
-          "mean_aperturePresenceMean": 0.5999999999999999
+          "mean_aperturePrimary": 0.41,
+          "mean_aperturePresenceMean": 0.41
         }
       ],
       "slope_aperturePrimary": {
@@ -355,18 +355,18 @@
           "V7"
         ],
         "means": [
-          0.5,
-          0.39999999999999997,
-          0.29999999999999993,
-          0.09999999999999999,
-          1,
-          0.7999999999999999,
-          0.5999999999999999
+          0.58,
+          0.55,
+          0.55,
+          0.36,
+          0.71,
+          0.5399999999999999,
+          0.41
         ],
-        "pearson_r": 0.4569057743101285,
-        "spearman_rho": 0.5,
-        "p_pearson": 0.30233333333333334,
-        "p_spearman": 0.26608333333333334,
+        "pearson_r": -0.24864154038884276,
+        "spearman_rho": -0.42857142857142855,
+        "p_pearson": 0.5935833333333334,
+        "p_spearman": 0.3601666666666667,
         "iters": 12000,
         "seed": 90273163
       },
@@ -381,18 +381,18 @@
           "V7"
         ],
         "means": [
-          0.5,
-          0.39999999999999997,
-          0.29999999999999993,
-          0.09999999999999999,
-          1,
-          0.7999999999999999,
-          0.5999999999999999
+          0.58,
+          0.55,
+          0.55,
+          0.36,
+          0.71,
+          0.5399999999999999,
+          0.41
         ],
-        "pearson_r": 0.4569057743101285,
-        "spearman_rho": 0.5,
-        "p_pearson": 0.29883333333333334,
-        "p_spearman": 0.2624166666666667,
+        "pearson_r": -0.24864154038884276,
+        "spearman_rho": -0.42857142857142855,
+        "p_pearson": 0.5879166666666666,
+        "p_spearman": 0.3491666666666667,
         "iters": 12000,
         "seed": 97631760
       },

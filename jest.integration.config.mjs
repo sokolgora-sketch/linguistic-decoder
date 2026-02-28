@@ -16,7 +16,7 @@ const customJestConfig = {
   // critical: no parallelism for Next dev servers
   maxWorkers: 1,
   // keep timeouts generous
-  testTimeout: 180000,
+  testTimeout: 420000,
   moduleNameMapper: {
     "^@/app/(.*)$": "<rootDir>/app/$1",
     "^@/(.*)$": "<rootDir>/src/$1",

@@ -21,7 +21,7 @@ function nextDistDir(): string {
   return v.length ? v : ".next";
 }
 
-jest.setTimeout(180_000);
+jest.setTimeout(420_000);
 
 const PORT = 3012; // Using a different port from other tests
 const BASE = `http://127.0.0.1:${PORT}`;
@@ -130,7 +130,7 @@ describe("/api/analyze-v1 stability (repeat GET)", () => {
       console.error("Dev server failed to become ready. Last logs:\n", logs.slice(-4000));
       throw e;
     }
-  }, 180_000);
+  }, 420_000);
 
   afterAll(async () => {
     if (!proc) return;

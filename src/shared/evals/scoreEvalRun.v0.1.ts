@@ -3,7 +3,7 @@
 
 import { extractOrthographyVoicesFromWordV0_1 } from "@/shared/vowels/extractOrthographyVoicesFromWord.v0.1";
 
-import { slopePermutationV0_1, mean } from "./stats.v0.1";
+import { slopePermutationV0_1, mean, mulberry32, shuffleInPlace } from "./stats.v0.1";
 import type { EvalRunBundleV0_1 } from "./run.v0.1";
 import { BUCKETS_V0_1, type BucketId, type EvalSpecV0_1 } from "./spec.v0.1";
 import type { EvalReportBundleV0_1, EvalTaskReportV0_1, BucketReportV0_1, SlopeReportV0_1 } from "./report.v0.1";
@@ -66,33 +66,43 @@ function flattenRunBuckets(buckets: Partial<Record<BucketId, string[]>>, order: 
 // Deterministic negative control (no randomness):
 // Interleave tokens by original bucket index, then assign sequentially to bucketOrder.
 // Requires equal counts per bucket to fully "mix".
-function deriveShuffleBucketLabelsV0_1(params: { baseBuckets: Partial<Record<BucketId, string[]>>; bucketOrder: BucketId[]; seed: number }): Partial<Record<BucketId, string[]>> | null {
+function deriveShuffleBucketLabelsV0_1(params: {
+  baseBuckets: Partial<Record<BucketId, string[]>>;
+  bucketOrder: BucketId[];
+  seed: number;
+}): Partial<Record<BucketId, string[]>> | null {
   const { baseBuckets, bucketOrder, seed } = params;
 
+  // Require equal counts so the derived control preserves label counts exactly.
   const lens = bucketOrder.map((b) => (baseBuckets[b] ?? []).length);
   const min = Math.min(...lens);
   const max = Math.max(...lens);
   if (!Number.isFinite(min) || !Number.isFinite(max) || min <= 0) return null;
-
-  // Require equal counts for v0.1 derived control (so mixing is guaranteed).
   if (min !== max) return null;
 
   const n = min;
-  const stream: string[] = [];
+
+  // Stable token stream: interleave buckets by index (ensures mixing independent of bucketOrder concat).
+  const tokens: string[] = [];
+  const labels: BucketId[] = [];
   for (let i = 0; i < n; i++) {
     for (const b of bucketOrder) {
       const tok = (baseBuckets[b] ?? [])[i];
-      if (typeof tok === "string") stream.push(tok);
+      if (typeof tok === "string") {
+        tokens.push(tok);
+        labels.push(b); // exact counts preserved
+      }
     }
   }
 
+  // Deterministic Fisher–Yates shuffle of labels (tokens fixed, label counts preserved).
+  const rnd = mulberry32(seed >>> 0);
+  shuffleInPlace(labels, rnd);
+
   const out: Partial<Record<BucketId, string[]>> = {};
   for (const b of bucketOrder) out[b] = [];
-
-  const offset = (seed >>> 0) % bucketOrder.length;
-  for (let i = 0; i < stream.length; i++) {
-    const b = bucketOrder[(i + offset) % bucketOrder.length];
-    out[b]!.push(stream[i]);
+  for (let i = 0; i < tokens.length; i++) {
+    out[labels[i]]!.push(tokens[i]);
   }
 
   return out;
