@@ -44,95 +44,147 @@ function safeFilename(input: string): string {
   return out || "run";
 }
 
-function wrapLine(font: any, fontSize: number, line: string, maxWidth: number): string[] {
-  const out: string[] = [];
+// pdf-lib StandardFonts use WinAnsi (not full Unicode). Sanitize markdown to avoid hard failures.
+function pdfSafeText(input: string): string {
+  const s = String(input ?? "");
 
-  // Fast path
-  if (font.widthOfTextAtSize(line, fontSize) <= maxWidth) return [line];
+  const map: Record<string, string> = {
+    "ρ": "rho",
+    "—": "-",
+    "–": "-",
+    "→": "->",
+    "·": "*",
+    "•": "*",
+    "“": '"',
+    "”": '"',
+    "‘": "'",
+    "’": "'",
+    "\u00A0": " ", // nbsp
+  };
 
-  // Word wrap
-  const words = line.split(/\s+/g).filter(Boolean);
-  if (!words.length) return [""];
-
-  let cur = words[0];
-  for (let i = 1; i < words.length; i++) {
-    const next = cur + " " + words[i];
-    if (font.widthOfTextAtSize(next, fontSize) <= maxWidth) {
-      cur = next;
-    } else {
-      out.push(cur);
-      cur = words[i];
-    }
-  }
-  out.push(cur);
-
-  // If any “word” is too long, fallback to char wrap for that segment
-  const final: string[] = [];
-  for (const seg of out) {
-    if (font.widthOfTextAtSize(seg, fontSize) <= maxWidth) {
-      final.push(seg);
+  let out = "";
+  for (const ch of s) {
+    const rep = map[ch];
+    if (rep !== undefined) {
+      out += rep;
       continue;
     }
-    let buf = "";
-    for (const ch of seg) {
-      const test = buf + ch;
-      if (font.widthOfTextAtSize(test, fontSize) <= maxWidth) {
-        buf = test;
-      } else {
-        if (buf) final.push(buf);
-        buf = ch;
-      }
+
+    const code = ch.codePointAt(0) ?? 0;
+
+    // keep tabs/newlines
+    if (code === 9 || code === 10 || code === 13) {
+      out += ch;
+      continue;
     }
-    if (buf) final.push(buf);
+
+    // ASCII printable
+    if (code >= 32 && code <= 126) {
+      out += ch;
+      continue;
+    }
+
+    // Latin-1 printable (WinAnsi-ish)
+    if (code >= 160 && code <= 255) {
+      out += ch;
+      continue;
+    }
+
+    out += "?";
   }
 
-  return final;
+  return out;
+}
+
+function wrapLine(params: {
+  line: string;
+  maxWidth: number;
+  font: any;
+  size: number;
+}): string[] {
+  const { line, maxWidth, font, size } = params;
+
+  if (!line) return [""];
+  if (font.widthOfTextAtSize(line, size) <= maxWidth) return [line];
+
+  const words = line.split(/\s+/g);
+  const out: string[] = [];
+  let cur = "";
+
+  for (const w of words) {
+    const next = cur ? `${cur} ${w}` : w;
+    if (font.widthOfTextAtSize(next, size) <= maxWidth) {
+      cur = next;
+      continue;
+    }
+    if (cur) out.push(cur);
+
+    // If a single word is too long, hard-split it.
+    if (font.widthOfTextAtSize(w, size) > maxWidth) {
+      let chunk = "";
+      for (const ch of w) {
+        const tryChunk = chunk + ch;
+        if (font.widthOfTextAtSize(tryChunk, size) <= maxWidth) {
+          chunk = tryChunk;
+        } else {
+          if (chunk) out.push(chunk);
+          chunk = ch;
+        }
+      }
+      cur = chunk;
+    } else {
+      cur = w;
+    }
+  }
+
+  if (cur) out.push(cur);
+  return out.length ? out : [line];
 }
 
 async function renderPdfFromText(text: string): Promise<Uint8Array> {
   const pdf = await PDFDocument.create();
-  const font = await pdf.embedFont(StandardFonts.Courier);
+  const font = await pdf.embedFont(StandardFonts.Helvetica);
 
-  // A4 portrait
-  const pageWidth = 595.28;
-  const pageHeight = 841.89;
-
-  const margin = 48;
   const fontSize = 10;
-  const lineHeight = 12;
+  const lineHeight = 14;
+  const margin = 40;
 
-  const maxWidth = pageWidth - margin * 2;
+  const pageSize: [number, number] = [612, 792]; // US Letter-ish
+  let page = pdf.addPage(pageSize);
 
-  let page = pdf.addPage([pageWidth, pageHeight]);
-  let y = pageHeight - margin;
+  const [w, h] = page.getSize();
+  const maxWidth = w - margin * 2;
 
-  const rawLines = String(text ?? "").replace(/\r\n/g, "\n").split("\n");
+  let y = h - margin;
 
-  for (const raw of rawLines) {
-    const wrapped = wrapLine(font, fontSize, raw, maxWidth);
-    for (const line of wrapped) {
-      if (y - lineHeight < margin) {
-        page = pdf.addPage([pageWidth, pageHeight]);
-        y = pageHeight - margin;
+  const lines = String(text ?? "").split(/\r?\n/g);
+  for (const rawLine of lines) {
+    const wrapped = wrapLine({ line: rawLine, maxWidth, font, size: fontSize });
+
+    for (const l of wrapped) {
+      if (y < margin + lineHeight) {
+        page = pdf.addPage(pageSize);
+        y = h - margin;
       }
-      page.drawText(line, {
+
+      page.drawText(l, {
         x: margin,
-        y: y - fontSize,
+        y,
         size: fontSize,
         font,
       });
+
       y -= lineHeight;
     }
   }
 
-  return await pdf.save();
+  return pdf.save();
 }
 
 export async function POST(req: Request) {
   try {
     const raw = await req.text();
 
-    // Minimal abuse gate (v0.1): hard payload cap (bytes, not characters)
     const MAX_BYTES = 300_000; // 300 KB
     const rawBytes = Buffer.byteLength(raw, "utf8");
     if (rawBytes > MAX_BYTES) {
@@ -158,14 +210,14 @@ export async function POST(req: Request) {
 
     let pdfBytes: Uint8Array;
     try {
-      pdfBytes = await renderPdfFromText(md);
+      pdfBytes = await renderPdfFromText(pdfSafeText(md));
     } catch (e) {
       return err("PDF_RENDER_FAILED", (e as Error)?.message ?? "PDF render failed.", 500);
     }
 
     const fname = `evals.${safeFilename(report.runId)}.v0.1.pdf`;
 
-    // Use ArrayBuffer to satisfy BodyInit types cleanly.
+    // Force a real ArrayBuffer body to satisfy Next/TS BodyInit typing.
     const body = new ArrayBuffer(pdfBytes.byteLength);
     new Uint8Array(body).set(pdfBytes);
 
