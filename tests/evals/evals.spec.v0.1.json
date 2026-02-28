@@ -1,0 +1,66 @@
+{
+  "evalSpecVersion": "evalSpec.v0.1",
+  "specId": "public-grounding-probe.v0.1",
+  "title": "ZË-RO Evals v0.1 — Public Grounding Probe (BYO Outputs)",
+  "description": "Controlled tasks for measuring aperture–semantics consistency (orthography) with deterministic scoring and baseline-lockable reports.",
+  "scoring": {
+    "engine": "orthography",
+    "apertureModel": "apertureProxy.v0.1",
+    "scoreKeys": ["aperturePrimary", "aperturePresenceMean"],
+    "permutation": { "iters": 12000, "seed": 90924101 }
+  },
+  "tasks": [
+    {
+      "taskId": "T1_BUCKET_V1_V0_1",
+      "kind": "byo",
+      "title": "Bucket Targeting — V1 (Expansion/Space)",
+      "prompt": "Return STRICT JSON only. No prose.\n\nGoal: produce 20 SINGLE-TOKEN words that best match semantic bucket V1 (Expansion/Space).\nRules: each entry must be a single orthographic token (no spaces). Avoid punctuation.\n\nOutput shape:\n{ \"V1\": [\"token1\", \"token2\", ... 20 total] }",
+      "targetBuckets": ["V1"],
+      "nPerBucket": 20,
+      "languageHint": "en",
+      "inputShape": "bucketed_single_tokens"
+    },
+    {
+      "taskId": "T1_BUCKET_V4_V0_1",
+      "kind": "byo",
+      "title": "Bucket Targeting — V4 (Ground/Balance)",
+      "prompt": "Return STRICT JSON only. No prose.\n\nGoal: produce 20 SINGLE-TOKEN words that best match semantic bucket V4 (Ground/Balance).\nRules: each entry must be a single orthographic token (no spaces). Avoid punctuation.\n\nOutput shape:\n{ \"V4\": [\"token1\", \"token2\", ... 20 total] }",
+      "targetBuckets": ["V4"],
+      "nPerBucket": 20,
+      "languageHint": "en",
+      "inputShape": "bucketed_single_tokens"
+    },
+    {
+      "taskId": "T1_BUCKET_V7_V0_1",
+      "kind": "byo",
+      "title": "Bucket Targeting — V7 (Focus/Linearity)",
+      "prompt": "Return STRICT JSON only. No prose.\n\nGoal: produce 20 SINGLE-TOKEN words that best match semantic bucket V7 (Focus/Linearity).\nRules: each entry must be a single orthographic token (no spaces). Avoid punctuation.\n\nOutput shape:\n{ \"V7\": [\"token1\", \"token2\", ... 20 total] }",
+      "targetBuckets": ["V7"],
+      "nPerBucket": 20,
+      "languageHint": "en",
+      "inputShape": "bucketed_single_tokens"
+    },
+    {
+      "taskId": "T2_LADDER_V0_1",
+      "kind": "byo",
+      "title": "Full Ladder — V1..V7",
+      "prompt": "Return STRICT JSON only. No prose.\n\nGoal: produce a full ladder: 10 SINGLE-TOKEN words per bucket V1..V7.\nRules: each entry must be a single orthographic token (no spaces). Avoid punctuation.\n\nOutput shape:\n{\n  \"V1\": [\"...\"],\n  \"V2\": [\"...\"],\n  \"V3\": [\"...\"],\n  \"V4\": [\"...\"],\n  \"V5\": [\"...\"],\n  \"V6\": [\"...\"],\n  \"V7\": [\"...\"]\n}",
+      "targetBuckets": ["V1", "V2", "V3", "V4", "V5", "V6", "V7"],
+      "nPerBucket": 10,
+      "languageHint": "en",
+      "inputShape": "bucketed_single_tokens"
+    },
+    {
+      "taskId": "T3_NEGATIVE_CONTROL_SHUFFLE_V0_1",
+      "kind": "derived",
+      "title": "Negative Control — Deterministic Label Shuffle (tokens fixed)",
+      "prompt": "This task is derived automatically from T2 by deterministically shuffling bucket labels while keeping tokens fixed.\nExpected behavior: slope collapses (false-positive detector).",
+      "targetBuckets": ["V1", "V2", "V3", "V4", "V5", "V6", "V7"],
+      "nPerBucket": 10,
+      "languageHint": "en",
+      "inputShape": "bucketed_single_tokens",
+      "derivedFromTaskId": "T2_LADDER_V0_1",
+      "derivedOp": "shuffle_bucket_labels"
+    }
+  ]
+}

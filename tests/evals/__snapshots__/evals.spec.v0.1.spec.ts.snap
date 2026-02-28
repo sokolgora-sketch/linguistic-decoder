@@ -1,0 +1,139 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Eval Spec Contract v0.1 snapshot: spec is stable (drift visible) 1`] = `
+{
+  "description": "Controlled tasks for measuring aperture–semantics consistency (orthography) with deterministic scoring and baseline-lockable reports.",
+  "evalSpecVersion": "evalSpec.v0.1",
+  "scoring": {
+    "apertureModel": "apertureProxy.v0.1",
+    "engine": "orthography",
+    "permutation": {
+      "iters": 12000,
+      "seed": 90924101,
+    },
+    "scoreKeys": [
+      "aperturePrimary",
+      "aperturePresenceMean",
+    ],
+  },
+  "specId": "public-grounding-probe.v0.1",
+  "tasks": [
+    {
+      "derivedFromTaskId": undefined,
+      "derivedOp": undefined,
+      "inputShape": "bucketed_single_tokens",
+      "kind": "byo",
+      "languageHint": "en",
+      "nPerBucket": 20,
+      "prompt": "Return STRICT JSON only. No prose.
+
+Goal: produce 20 SINGLE-TOKEN words that best match semantic bucket V1 (Expansion/Space).
+Rules: each entry must be a single orthographic token (no spaces). Avoid punctuation.
+
+Output shape:
+{ "V1": ["token1", "token2", ... 20 total] }",
+      "targetBuckets": [
+        "V1",
+      ],
+      "taskId": "T1_BUCKET_V1_V0_1",
+      "title": "Bucket Targeting — V1 (Expansion/Space)",
+    },
+    {
+      "derivedFromTaskId": undefined,
+      "derivedOp": undefined,
+      "inputShape": "bucketed_single_tokens",
+      "kind": "byo",
+      "languageHint": "en",
+      "nPerBucket": 20,
+      "prompt": "Return STRICT JSON only. No prose.
+
+Goal: produce 20 SINGLE-TOKEN words that best match semantic bucket V4 (Ground/Balance).
+Rules: each entry must be a single orthographic token (no spaces). Avoid punctuation.
+
+Output shape:
+{ "V4": ["token1", "token2", ... 20 total] }",
+      "targetBuckets": [
+        "V4",
+      ],
+      "taskId": "T1_BUCKET_V4_V0_1",
+      "title": "Bucket Targeting — V4 (Ground/Balance)",
+    },
+    {
+      "derivedFromTaskId": undefined,
+      "derivedOp": undefined,
+      "inputShape": "bucketed_single_tokens",
+      "kind": "byo",
+      "languageHint": "en",
+      "nPerBucket": 20,
+      "prompt": "Return STRICT JSON only. No prose.
+
+Goal: produce 20 SINGLE-TOKEN words that best match semantic bucket V7 (Focus/Linearity).
+Rules: each entry must be a single orthographic token (no spaces). Avoid punctuation.
+
+Output shape:
+{ "V7": ["token1", "token2", ... 20 total] }",
+      "targetBuckets": [
+        "V7",
+      ],
+      "taskId": "T1_BUCKET_V7_V0_1",
+      "title": "Bucket Targeting — V7 (Focus/Linearity)",
+    },
+    {
+      "derivedFromTaskId": undefined,
+      "derivedOp": undefined,
+      "inputShape": "bucketed_single_tokens",
+      "kind": "byo",
+      "languageHint": "en",
+      "nPerBucket": 10,
+      "prompt": "Return STRICT JSON only. No prose.
+
+Goal: produce a full ladder: 10 SINGLE-TOKEN words per bucket V1..V7.
+Rules: each entry must be a single orthographic token (no spaces). Avoid punctuation.
+
+Output shape:
+{
+  "V1": ["..."],
+  "V2": ["..."],
+  "V3": ["..."],
+  "V4": ["..."],
+  "V5": ["..."],
+  "V6": ["..."],
+  "V7": ["..."]
+}",
+      "targetBuckets": [
+        "V1",
+        "V2",
+        "V3",
+        "V4",
+        "V5",
+        "V6",
+        "V7",
+      ],
+      "taskId": "T2_LADDER_V0_1",
+      "title": "Full Ladder — V1..V7",
+    },
+    {
+      "derivedFromTaskId": "T2_LADDER_V0_1",
+      "derivedOp": "shuffle_bucket_labels",
+      "inputShape": "bucketed_single_tokens",
+      "kind": "derived",
+      "languageHint": "en",
+      "nPerBucket": 10,
+      "prompt": "This task is derived automatically from T2 by deterministically shuffling bucket labels while keeping tokens fixed.
+Expected behavior: slope collapses (false-positive detector).",
+      "targetBuckets": [
+        "V1",
+        "V2",
+        "V3",
+        "V4",
+        "V5",
+        "V6",
+        "V7",
+      ],
+      "taskId": "T3_NEGATIVE_CONTROL_SHUFFLE_V0_1",
+      "title": "Negative Control — Deterministic Label Shuffle (tokens fixed)",
+    },
+  ],
+  "title": "ZË-RO Evals v0.1 — Public Grounding Probe (BYO Outputs)",
+}
+`;
