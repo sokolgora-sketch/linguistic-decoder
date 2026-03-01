@@ -34,6 +34,8 @@
     "research:albanian100:pilot": "npm test -- tests/research/semanticPilot.albanian100.v0.1.spec.ts",
     "research:spectrogram:v0.2": "npm test -- tests/research/spectrogram.v0.2.spec.ts",
     "canon:c2:update": "CANON_C2_UPDATE=1 npm test -- tests/validation/canonC2.runner.v0.3.spec.ts",
+    "canon:c2:v0.4": "npm test -- tests/validation/canonC2.runner.v0.4.spec.ts",
+    "canon:c2:v0.4:update": "CANON_C2_UPDATE=1 npm test -- tests/validation/canonC2.runner.v0.4.spec.ts",
     "research:decomp:harness:position": "npm test -- tests/research/decompositionHarness.position.v0.1.spec.ts",
     "research:albanian150:pilot": "npm test -- tests/research/semanticPilot.albanian150.v0.1.spec.ts",
     "research:albanian150:audit": "npm test -- tests/research/tagAudit.albanian150.v0.1.spec.ts",

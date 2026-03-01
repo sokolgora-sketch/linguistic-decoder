@@ -1,0 +1,89 @@
+{
+  "version": "canonC2.holdout.v0.4",
+  "cases": [
+    {
+      "id": "holdout.cs.02",
+      "word": "afërsisht",
+      "mode": "strict",
+      "ipa": "/aˈfəɾsiʃt/"
+    },
+    {
+      "id": "holdout.cs.04",
+      "word": "largët",
+      "mode": "strict",
+      "ipa": "/laɾˈɡət/"
+    },
+    {
+      "id": "holdout.cs.06",
+      "word": "lartësor",
+      "mode": "strict",
+      "ipa": "/laɾtəˈsoɾ/"
+    },
+    {
+      "id": "holdout.cs.08",
+      "word": "brendësi",
+      "mode": "strict",
+      "ipa": "/bɾɛnˈdəsi/"
+    },
+    {
+      "id": "holdout.cs.10",
+      "word": "përballë",
+      "mode": "strict",
+      "ipa": "/pəɾˈbaɫə/"
+    },
+    {
+      "id": "holdout.cs.12",
+      "word": "përreth",
+      "mode": "strict",
+      "ipa": "/pəɾˈɾɛθ/"
+    },
+    {
+      "id": "holdout.cs.14",
+      "word": "përparësi",
+      "mode": "strict",
+      "ipa": "/pərpaˈɾəsi/"
+    },
+    {
+      "id": "holdout.cs.22",
+      "word": "fillimisht",
+      "mode": "strict",
+      "ipa": "/filiˈmiʃt/"
+    },
+    {
+      "id": "holdout.cs.24",
+      "word": "sistematik",
+      "mode": "strict",
+      "ipa": "/sistɛˈmatik/"
+    },
+    {
+      "id": "holdout.cs.26",
+      "word": "disiplinë",
+      "mode": "strict",
+      "ipa": "/disiˈplinə/"
+    },
+    {
+      "id": "holdout.cs.28",
+      "word": "hierarki",
+      "mode": "strict",
+      "ipa": "/hieɾaɾˈki/"
+    },
+    {
+      "id": "holdout.cs.30",
+      "word": "rregullim",
+      "mode": "strict",
+      "ipa": "/rɛɡuˈlim/"
+    },
+    {
+      "id": "holdout.cs.32",
+      "word": "rregullore",
+      "mode": "strict",
+      "ipa": "/rɛɡuˈɫoɾɛ/"
+    },
+    {
+      "id": "holdout.cs.34",
+      "word": "sistemor",
+      "mode": "strict",
+      "ipa": "/sistɛˈmoɾ/"
+    }
+  ]
+}

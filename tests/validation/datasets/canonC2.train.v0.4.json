@@ -1,0 +1,89 @@
+{
+  "version": "canonC2.train.v0.4",
+  "cases": [
+    {
+      "id": "train.cs.01",
+      "word": "afërsi",
+      "mode": "strict",
+      "ipa": "/aˈfəɾsi/"
+    },
+    {
+      "id": "train.cs.03",
+      "word": "largësi",
+      "mode": "strict",
+      "ipa": "/laɾˈɡəsi/"
+    },
+    {
+      "id": "train.cs.05",
+      "word": "lartësi",
+      "mode": "strict",
+      "ipa": "/laɾˈtəsi/"
+    },
+    {
+      "id": "train.cs.07",
+      "word": "jashtëm",
+      "mode": "strict",
+      "ipa": "/jaʃˈtəm/"
+    },
+    {
+      "id": "train.cs.09",
+      "word": "brendshëm",
+      "mode": "strict",
+      "ipa": "/bɾɛnˈdʃəm/"
+    },
+    {
+      "id": "train.cs.11",
+      "word": "përtej",
+      "mode": "strict",
+      "ipa": "/pəɾˈtɛj/"
+    },
+    {
+      "id": "train.cs.13",
+      "word": "përparim",
+      "mode": "strict",
+      "ipa": "/pərpaˈɾim/"
+    },
+    {
+      "id": "train.cs.21",
+      "word": "fillestar",
+      "mode": "strict",
+      "ipa": "/filˈɛstaɾ/"
+    },
+    {
+      "id": "train.cs.23",
+      "word": "fillimtar",
+      "mode": "strict",
+      "ipa": "/filimˈtaɾ/"
+    },
+    {
+      "id": "train.cs.25",
+      "word": "sistemim",
+      "mode": "strict",
+      "ipa": "/sisˈtɛmim/"
+    },
+    {
+      "id": "train.cs.27",
+      "word": "kriter",
+      "mode": "strict",
+      "ipa": "/kɾiˈtɛɾ/"
+    },
+    {
+      "id": "train.cs.29",
+      "word": "renditje",
+      "mode": "strict",
+      "ipa": "/rɛnˈditjɛ/"
+    },
+    {
+      "id": "train.cs.31",
+      "word": "rregullisht",
+      "mode": "strict",
+      "ipa": "/rɛɡuˈliʃt/"
+    },
+    {
+      "id": "train.cs.33",
+      "word": "renditës",
+      "mode": "strict",
+      "ipa": "/rɛnˈditəs/"
+    }
+  ]
+}
