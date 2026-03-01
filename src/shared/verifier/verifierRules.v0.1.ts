@@ -45,6 +45,45 @@ export function normalizeOpsUsedV0_1(x: unknown): string[] {
   return [];
 }
 
+function splitVowelPathTokensV0_1(input: string): string[] {
+  const out: string[] = [];
+  let cur = "";
+
+  const push = () => {
+    const s = cur.trim();
+    if (s) out.push(s);
+    cur = "";
+  };
+
+  for (let i = 0; i < input.length; i++) {
+    const ch = input[i];
+
+    const isWs =
+      ch === " " || ch === "\t" || ch === "\n" || ch === "\r" || ch === "\f" || ch === "\v";
+
+    const isSep =
+      isWs ||
+      ch === "→" ||
+      ch === "-" ||
+      ch === "—" ||
+      ch === "–" ||
+      ch === ">" ||     // supports "->"
+      ch === "|" ||
+      ch === "/" ||
+      ch === "\\";
+
+    if (isSep) {
+      push();
+      continue;
+    }
+
+    cur += ch;
+  }
+
+  push();
+  return out;
+}
+
 export function normalizeVowelPathV0_1(x: unknown): string[] | null {
   if (Array.isArray(x)) {
     const out = x
@@ -53,12 +92,22 @@ export function normalizeVowelPathV0_1(x: unknown): string[] | null {
       .filter((t) => t.length > 0);
     return out.length ? out : null;
   }
+
   if (typeof x === "string") {
-    const t = x.trim();
-    return t.length ? t.split(/\s*→\s*|\s*-\s*|\s+/g).filter(Boolean) : null;
+    const raw = x.trim();
+    if (!raw) return null;
+
+    const MAX = 4096;
+    const s = raw.length > MAX ? raw.slice(0, MAX) : raw;
+
+    // O(n) split; avoids regex backtracking on adversarial input.
+    const out = splitVowelPathTokensV0_1(s);
+    return out.length ? out : null;
   }
+
   return null;
 }
+
 
 export function canonicalizeOpsUsedV0_1(tokens: string[]): {
   canonical: AllowedOpId[];
