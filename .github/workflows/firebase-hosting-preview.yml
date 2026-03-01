@@ -30,7 +30,7 @@ jobs:
 
       - name: Skip deploy (no secrets for this PR actor)
         if: secrets.FIREBASE_SERVICE_ACCOUNT == '' || github.actor == 'dependabot[bot]'
-        run: echo "Skipping Firebase preview deploy: secrets unavailable for this PR actor."
+        run: 'echo "Skipping Firebase preview deploy: secrets unavailable for this PR actor."'
 
       - name: Write Firebase service account
         if: secrets.FIREBASE_SERVICE_ACCOUNT != '' && github.actor != 'dependabot[bot]'
