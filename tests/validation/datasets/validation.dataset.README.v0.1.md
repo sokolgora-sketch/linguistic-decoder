@@ -46,3 +46,27 @@ Each record is:
 **Notes**
 - `tests/validation/out/` is still gitignored (diff reports + current projections are not committed).
 
+---
+
+## Canon C2 v0.4 — Albanian200 Compound Stress (DONE)
+
+**Goal:** extend Canon C2 with Albanian compound/stress-derived forms (IPA present) to stress-test phonetic rails + morphology sensitivity under deterministic locking.
+
+**Source**
+- `tests/research/albanian200.compoundStress.v0.2.txt`
+
+**Artifacts**
+- Train dataset: `tests/validation/datasets/canonC2.train.v0.4.json`
+- Holdout dataset: `tests/validation/datasets/canonC2.holdout.v0.4.json`
+- Runner: `tests/validation/canonC2.runner.v0.4.spec.ts`
+- Baseline: `tests/validation/baselines/canonC2.baseline.v0.4.json` (generated via update)
+- Dataset builder: `scripts/canonC2.buildCompoundStress.v0.4.mjs`
+
+**Commands**
+- `npm run canon:c2:v0.4` — drift check vs baseline (fails on unexpected change)
+- `npm run canon:c2:v0.4:update` — regenerate baseline after intentional change
+
+**DONE proof**
+- `npm run canon:c2:v0.4` passes on `main`
+- `npm run gate:quick` passes on `main`
+
