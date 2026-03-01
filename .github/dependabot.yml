@@ -4,3 +4,10 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+
+    # Next's eslint-config currently does NOT accept ESLint v10 (peer range is ^7.23 || ^8 || ^9).
+    # So major bumps to eslint will fail npm ci and make Dependabot PRs red.
+    # When you upgrade Next / eslint-config-next to a version that supports ESLint 10+, remove this ignore.
+    ignore:
+      - dependency-name: "eslint"
+        update-types: ["version-update:semver-major"]
