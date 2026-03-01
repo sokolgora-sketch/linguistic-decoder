@@ -1,0 +1,565 @@
+{
+  "cases": {
+    "holdout.cs.02": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "afërsisht",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "A-Ë-I"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "afërsisht"
+    },
+    "holdout.cs.04": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "largët",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "A-Ë"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "largët"
+    },
+    "holdout.cs.06": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "lartësor",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "A-Ë-O"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "lartësor"
+    },
+    "holdout.cs.08": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "brendësi",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "E-Ë-I"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "brendësi"
+    },
+    "holdout.cs.10": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "përballë",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "Ë-A-Ë"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "përballë"
+    },
+    "holdout.cs.12": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "përreth",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "Ë-E"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "përreth"
+    },
+    "holdout.cs.14": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "përparësi",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "Ë-A-Ë-I"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "përparësi"
+    },
+    "holdout.cs.22": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "fillimisht",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "I-I-I"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "fillimisht"
+    },
+    "holdout.cs.24": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "sistematik",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "I-E-A-I"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "sistematik"
+    },
+    "holdout.cs.26": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "disiplinë",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "I-I-I-Ë"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "disiplinë"
+    },
+    "holdout.cs.28": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "hierarki",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "I-E-A-I"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "hierarki"
+    },
+    "holdout.cs.30": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "rregullim",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "E-U-I"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "rregullim"
+    },
+    "holdout.cs.32": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "rregullore",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "E-U-O-E"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "rregullore"
+    },
+    "holdout.cs.34": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "sistemor",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "I-E-O"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "sistemor"
+    },
+    "train.cs.01": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "afërsi",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "A-Ë-I"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "afërsi"
+    },
+    "train.cs.03": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "largësi",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "A-Ë-I"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "largësi"
+    },
+    "train.cs.05": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "lartësi",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "A-Ë-I"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "lartësi"
+    },
+    "train.cs.07": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "jashtëm",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "A-Ë"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "jashtëm"
+    },
+    "train.cs.09": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "brendshëm",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "E-Ë"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "brendshëm"
+    },
+    "train.cs.11": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "përtej",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "Ë-E"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "përtej"
+    },
+    "train.cs.13": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "përparim",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "Ë-A-I"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "përparim"
+    },
+    "train.cs.21": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "fillestar",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "I-E-A"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "fillestar"
+    },
+    "train.cs.23": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "fillimtar",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "I-I-A"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "fillimtar"
+    },
+    "train.cs.25": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "sistemim",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "I-E-I"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "sistemim"
+    },
+    "train.cs.27": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "kriter",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "I-E"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "kriter"
+    },
+    "train.cs.29": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "renditje",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "E-I-E"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "renditje"
+    },
+    "train.cs.31": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "rregullisht",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "E-U-I"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "rregullisht"
+    },
+    "train.cs.33": {
+      "candidates": [
+        {
+          "deepRootHeartGateReasonCodes": [],
+          "deepRootHeartGateStatus": null,
+          "form": "renditës",
+          "id": null,
+          "language": "unknown",
+          "status": null,
+          "vowelPath": "E-I-Ë"
+        }
+      ],
+      "deepRootFunctionalVowelPath": null,
+      "engineVersion": "v1.0.0",
+      "heartPrimaryVowelPath": null,
+      "norm": null,
+      "orthographyVoices": [],
+      "phoneticVoices": [],
+      "word": "renditës"
+    }
+  },
+  "version": "canonC2.baseline.v0.4"
+}
