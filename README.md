@@ -7,6 +7,20 @@
 
 ---
 
+## 📄 Published Research
+
+**Paper:** [ZË-RO v0.1: A Deterministic Orthography Aperture Meter with Baseline-Locked Drift Detection](https://ling.auf.net/lingbuzz/009799)  
+**Author:** Sokol Gora  
+**Published:** LingBuzz, February 2026  
+**Reference:** lingbuzz/009799
+
+This repository contains the implementation, datasets, and reproducibility infrastructure described in the paper.
+
+---
+```
+
+---
+
 ## What this repo is
 
 ZË-RO is a **calibration-grade decoder** for vowel-carrier structure in words.
