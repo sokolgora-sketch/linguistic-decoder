@@ -408,7 +408,9 @@ describe("Comparative Spectrogram v0.2 — Corpus70 vs Classical100 (+ Albanian1
     const outDir = path.join(root, "tests/validation/out");
     const outMd = path.join(outDir, "spectrogram.v0.2.md");
 
-    const corpus70MetaPath = path.join(root, "tests/research/corpus70.meta.v0.1.gemini.json");
+    const corpus70MetaPath = process.env.SPECTROGRAM_CORPUS70_META
+  ? path.join(root, String(process.env.SPECTROGRAM_CORPUS70_META))
+  : path.join(root, "tests/research/corpus70.meta.v0.1.gemini.json");
     const classicalMetaPath = path.join(root, "tests/research/classical100.meta.v0.1.gemini-blind.json");
     const albanianMetaPath = path.join(root, "tests/research/albanian100.meta.v0.1.gemini-blind.json");
 
