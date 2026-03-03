@@ -149,3 +149,16 @@ npm run dev
 ## License
 
 GNU Affero General Public License v3.0 (AGPL-3.0). See `LICENSE`.
+
+<!-- DF_PUBLICATIONS_START -->
+## Publications / Preprints
+- LingBuzz 009799 — ZË-RO v0.1 baseline report (deterministic orthography aperture meter + baseline-lock drift workflow): https://ling.auf.net/lingbuzz/009799
+- LingBuzz 009808 — ZË-RO v0.2 Note: Morphological Masking & Recovery in Albanian200 (Controlled Ablation): https://ling.auf.net/lingbuzz/009808
+
+## Research Controls
+- Corpus70 tagger-sensitivity control (Gemini-blind vs Claude-blind):
+  - note: docs/lingbuzz/spectrogram.corpus70.ab.v0.1.md
+  - fixtures: tests/research/corpus70.meta.v0.1.gemini.json; tests/research/corpus70.meta.v0.1.claude-blind.json
+  - spectrogram override: SPECTROGRAM_CORPUS70_META (tests/research/spectrogram.v0.2.spec.ts)
+<!-- DF_PUBLICATIONS_END -->
+
