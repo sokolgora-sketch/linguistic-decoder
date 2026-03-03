@@ -5,6 +5,7 @@ import { EVAL_SPEC_V0_1 } from "@/shared/evals/spec.v0.1";
 import { parseEvalRunBundleV0_1 } from "@/shared/evals/run.v0.1";
 import { scoreEvalRunBundleV0_1 } from "@/shared/evals/scoreEvalRun.v0.1";
 import { renderEvalReportMdV0_1 } from "@/shared/evals/renderEvalReportMd.v0.1";
+import { renderMarkdownToPdfV0_2 } from "@/shared/evals/renderMarkdownToPdf.v0.2";
 
 export const runtime = "nodejs";
 
@@ -210,7 +211,11 @@ export async function POST(req: Request) {
 
     let pdfBytes: Uint8Array;
     try {
-      pdfBytes = await renderPdfFromText(pdfSafeText(md));
+      try {
+              pdfBytes = await renderMarkdownToPdfV0_2(md);
+            } catch {
+              pdfBytes = await renderPdfFromText(pdfSafeText(md));
+            }
     } catch (e) {
       return err("PDF_RENDER_FAILED", (e as Error)?.message ?? "PDF render failed.", 500);
     }
