@@ -31,8 +31,8 @@ function err(code: ApiErr["code"], message: string, status = 400) {
       headers: {
         "cache-control": "no-store",
       },
-    }
-  );
+      }
+        );
 }
 
 export async function POST(req: Request) {
@@ -42,9 +42,9 @@ export async function POST(req: Request) {
     // Minimal abuse gate (v0.1): hard payload cap
     // (UI sends only a run bundle; no baselines; no huge logs.)
     const MAX_BYTES = 300_000; // 300 KB
-            const rawBytes = Buffer.byteLength(raw, "utf8");
-            if (rawBytes > MAX_BYTES) {
-              return err(
+      const rawBytes = Buffer.byteLength(raw, "utf8");
+      if (rawBytes > MAX_BYTES) {
+        return err(
                 "PAYLOAD_TOO_LARGE",
                 `Payload too large (${rawBytes} bytes; max ${MAX_BYTES} bytes).`,
                 413
