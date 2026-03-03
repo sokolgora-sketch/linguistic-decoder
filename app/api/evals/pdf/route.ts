@@ -211,12 +211,12 @@ export async function POST(req: Request) {
 
     let pdfBytes: Uint8Array;
     try {
-      try {
-              pdfBytes = await renderMarkdownToPdfV0_2(md);
-            } catch {
-              pdfBytes = await renderPdfFromText(pdfSafeText(md));
-            }
-    } catch (e) {
+        try {
+          pdfBytes = await renderMarkdownToPdfV0_2(md);
+        } catch {
+          pdfBytes = await renderPdfFromText(pdfSafeText(md));
+        }
+      } catch (e) {
       return err("PDF_RENDER_FAILED", (e as Error)?.message ?? "PDF render failed.", 500);
     }
 
