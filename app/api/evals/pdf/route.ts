@@ -203,7 +203,7 @@ export async function POST(req: Request) {
     try {
       run = parseEvalRunBundleV0_1(json);
     } catch (e) {
-      return err("INVALID_RUN", (e as Error)?.message ?? "Invalid eval run bundle.", 400);
+      return err("INVALID_RUN", ((e as Error)?.message ?? "Invalid eval run bundle.") + " Hint: expected run.evalRunVersion=\"evalRun.v0.1\" and run.evalSpecVersion=\"evalSpec.v0.1\". If you pasted a Corpus70 meta JSON (version/allowedTags/tags), that is NOT an eval run bundle.", 400);
     }
 
     const report = scoreEvalRunBundleV0_1({ spec: EVAL_SPEC_V0_1, run });
