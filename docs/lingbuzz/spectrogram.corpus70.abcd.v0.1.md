@@ -26,7 +26,6 @@ Corpus70 tables depend on tags. If different taggers assign different tags (and 
 | expression | 11 | **I (62.5%)** | 0.115 | I:5, A:1, E:1, U:1 | 87.5% (7/8) |
 | time | 7 | **A (50.0%)** | 0.995 | A:2, I:1, O:1 | 75.0% (3/4) |
 
-
 ## B — Claude-blind
 - meta: `corpus70.meta.v0.1.claude-blind`
 - N: **70** (carrier=54, NO_PHONETIC=16, diverge=79.6% (43/54))
@@ -41,7 +40,6 @@ Corpus70 tables depend on tags. If different taggers assign different tags (and 
 | cognition | 7 | **I (33.3%)** | 0.997 | I:2, U:2, A:1, Ë:1 | 83.3% (5/6) |
 | expression | 6 | **I (50.0%)** | 0.308 | I:3, A:1, E:1, U:1 | 83.3% (5/6) |
 | time | 6 | **A (33.3%)** | 1.000 | A:1, I:1, O:1 | 100.0% (3/3) |
-
 
 ## C — ChatGPT-blind
 - meta: `corpus70.meta.v0.1.chatgpt-blind`
@@ -58,7 +56,6 @@ Corpus70 tables depend on tags. If different taggers assign different tags (and 
 | expression | 7 | **I (50.0%)** | 0.467 | I:3, A:1, E:1, U:1 | 83.3% (5/6) |
 | time | 6 | **A (50.0%)** | 0.960 | A:2, I:1, O:1 | 75.0% (3/4) |
 
-
 ## D — Grok-blind
 - meta: `corpus70.meta.v0.1.grok-blind`
 - N: **70** (carrier=54, NO_PHONETIC=16, diverge=79.6% (43/54))
@@ -74,7 +71,6 @@ Corpus70 tables depend on tags. If different taggers assign different tags (and 
 | expression | 6 | **I (50.0%)** | 0.315 | I:3, A:1, E:1, Ë:1 | 83.3% (5/6) |
 | time | 3 | **A (50.0%)** | 1.000 | A:1, O:1 | 100.0% (2/2) |
 
-
 ## Cross-tagger summary
 
 | tagger | ids | total tag assignments | multi-tag ids | avg tags/id |
@@ -85,8 +81,6 @@ Corpus70 tables depend on tags. If different taggers assign different tags (and 
 | grok | 70 | 70 | 0 | 1.000 |
 
 ## Interpretation
-
 - The tagger changes the **tag distribution** (N per tag) and often which items belong to each tag.
 - Because the spectrogram tables are computed *by tag*, Corpus70 is best treated as a **tagger-sensitivity control** rather than a stable universal mapping proof.
-- Grok assigns **single tags only** in this run (avg tags/id ≈ 1.0), which materially changes the tag-count totals and downstream tables.
-
+- If a tagger assigns **single tags only** (avg tags/id ≈ 1.0), that materially changes tag-count totals and downstream tables.
