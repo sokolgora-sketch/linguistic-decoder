@@ -23,7 +23,10 @@ function linearRegression(xs: number[], ys: number[]) {
   const n = xs.length;
   if (n === 0) return { slope: 0, intercept: 0 };
 
-  let sumX = 0, sumY = 0, sumXX = 0, sumXY = 0;
+  let sumX = 0,
+    sumY = 0,
+    sumXX = 0,
+    sumXY = 0;
   for (let i = 0; i < n; i++) {
     const x = xs[i];
     const y = ys[i];
@@ -39,7 +42,10 @@ function linearRegression(xs: number[], ys: number[]) {
 }
 
 export function TurkishBaselineChartV0_1({ points }: Props) {
+  // NOTE: This component is now loaded via dynamic(..., { ssr:false }) in Hero.
+  // So hydration mismatch is avoided. We keep a ResizeObserver fallback for safety.
   const canUseResponsive = typeof (globalThis as any).ResizeObserver !== "undefined";
+
   const data = useMemo(
     () =>
       points
@@ -72,70 +78,76 @@ export function TurkishBaselineChartV0_1({ points }: Props) {
 
       {canUseResponsive ? (
         <ResponsiveContainer width="100%" height="100%">
-        <ComposedChart data={data} margin={{ top: 8, right: 8, bottom: 8, left: 8 }}>
-          <CartesianGrid strokeDasharray="4 4" opacity={0.2} />
-          <XAxis
-            dataKey="idx"
-            type="number"
-            domain={[1, 7]}
-            ticks={[1, 2, 3, 4, 5, 6, 7]}
-            tickFormatter={(v) => `V${v}`}
-            stroke="rgba(255,255,255,0.35)"
-          />
-          <YAxis
-            dataKey="y"
-            type="number"
-            domain={[0, 1]}
-            ticks={[0, 0.2, 0.4, 0.6, 0.8, 1.0]}
-            tickFormatter={(v) => v.toFixed(1)}
-            stroke="rgba(255,255,255,0.35)"
-          />
-          <Tooltip
-            formatter={(value: any, name: any) => [String(value), name]}
-            labelFormatter={(label: any) => `Bucket V${label}`}
-            contentStyle={{ background: "rgba(10,10,10,0.9)", border: "1px solid rgba(255,255,255,0.15)" }}
-            labelStyle={{ color: "rgba(255,255,255,0.8)" }}
-          />
-          <Scatter dataKey="y" name="mean (presence mean)" />
-          <Line
-            data={line.linePts}
-            dataKey="yhat"
-            name="fit"
-            dot={false}
-            strokeWidth={2}
-            stroke="rgba(255,255,255,0.55)"
-          />
-        </ComposedChart>
-      </ResponsiveContainer>
+          <ComposedChart data={data} margin={{ top: 8, right: 8, bottom: 8, left: 8 }}>
+            <CartesianGrid strokeDasharray="4 4" opacity={0.2} />
+            <XAxis
+              dataKey="idx"
+              type="number"
+              domain={[1, 7]}
+              ticks={[1, 2, 3, 4, 5, 6, 7]}
+              tickFormatter={(v) => `V${v}`}
+              stroke="rgba(255,255,255,0.35)"
+            />
+            <YAxis
+              dataKey="y"
+              type="number"
+              domain={[0, 1]}
+              ticks={[0, 0.2, 0.4, 0.6, 0.8, 1.0]}
+              tickFormatter={(v) => v.toFixed(1)}
+              stroke="rgba(255,255,255,0.35)"
+            />
+            <Tooltip
+              formatter={(value: any, name: any) => [String(value), name]}
+              labelFormatter={(label: any) => `Bucket V${label}`}
+              contentStyle={{
+                background: "rgba(10,10,10,0.9)",
+                border: "1px solid rgba(255,255,255,0.15)",
+              }}
+              labelStyle={{ color: "rgba(255,255,255,0.8)" }}
+            />
+            <Scatter dataKey="y" name="mean (presence mean)" />
+            <Line
+              data={line.linePts}
+              dataKey="yhat"
+              name="fit"
+              dot={false}
+              strokeWidth={2}
+              stroke="rgba(255,255,255,0.55)"
+            />
+          </ComposedChart>
+        </ResponsiveContainer>
       ) : (
         <div className="overflow-x-auto">
           <ComposedChart width={520} height={210} data={data} margin={{ top: 8, right: 8, bottom: 8, left: 8 }}>
-          <CartesianGrid strokeDasharray="4 4" opacity={0.2} />
-          <XAxis
-            dataKey="idx"
-            type="number"
-            domain={[1, 7]}
-            ticks={[1, 2, 3, 4, 5, 6, 7]}
-            tickFormatter={(v) => `V${v}`}
-            stroke="rgba(255,255,255,0.35)"
-          />
-          <YAxis
-            dataKey="y"
-            type="number"
-            domain={[0, 1]}
-            ticks={[0, 0.2, 0.4, 0.6, 0.8, 1.0]}
-            tickFormatter={(v) => v.toFixed(1)}
-            stroke="rgba(255,255,255,0.35)"
-          />
-          <Tooltip
-            formatter={(value: any, name: any) => [String(value), name]}
-            labelFormatter={(label: any) => `Bucket V${label}`}
-            contentStyle={{ background: "rgba(10,10,10,0.9)", border: "1px solid rgba(255,255,255,0.15)" }}
-            labelStyle={{ color: "rgba(255,255,255,0.8)" }}
-          />
-          <Scatter dataKey="y" name="mean (presence mean)" />
-          <Line data={line.linePts} dataKey="yhat" name="fit" dot={false} strokeWidth={2} stroke="rgba(255,255,255,0.55)" />
-        </ComposedChart>
+            <CartesianGrid strokeDasharray="4 4" opacity={0.2} />
+            <XAxis
+              dataKey="idx"
+              type="number"
+              domain={[1, 7]}
+              ticks={[1, 2, 3, 4, 5, 6, 7]}
+              tickFormatter={(v) => `V${v}`}
+              stroke="rgba(255,255,255,0.35)"
+            />
+            <YAxis
+              dataKey="y"
+              type="number"
+              domain={[0, 1]}
+              ticks={[0, 0.2, 0.4, 0.6, 0.8, 1.0]}
+              tickFormatter={(v) => v.toFixed(1)}
+              stroke="rgba(255,255,255,0.35)"
+            />
+            <Tooltip
+              formatter={(value: any, name: any) => [String(value), name]}
+              labelFormatter={(label: any) => `Bucket V${label}`}
+              contentStyle={{
+                background: "rgba(10,10,10,0.9)",
+                border: "1px solid rgba(255,255,255,0.15)",
+              }}
+              labelStyle={{ color: "rgba(255,255,255,0.8)" }}
+            />
+            <Scatter dataKey="y" name="mean (presence mean)" />
+            <Line data={line.linePts} dataKey="yhat" name="fit" dot={false} strokeWidth={2} stroke="rgba(255,255,255,0.55)" />
+          </ComposedChart>
         </div>
       )}
 

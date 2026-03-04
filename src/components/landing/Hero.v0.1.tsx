@@ -1,6 +1,33 @@
+"use client";
+
 import Link from "next/link";
-import { TurkishBaselineChartV0_1 } from "@/components/landing/TurkishBaselineChart.v0.1";
+import dynamic from "next/dynamic";
 import { LANDING_BASELINES_V0_1 } from "@/shared/landing/landingBaselines.v0.1";
+
+
+const TurkishBaselineChartV0_1 = dynamic(
+  () =>
+    import("@/components/landing/TurkishBaselineChart.v0.1").then(
+      (m) => m.TurkishBaselineChartV0_1
+    ),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-[260px] w-full rounded-xl border border-neutral-800 bg-neutral-950/40 p-3">
+        <div className="mb-2 flex items-center justify-between">
+          <div className="text-sm font-semibold text-neutral-100">Turkish baseline — bucket means</div>
+          <div className="text-xs font-mono text-neutral-400">loading…</div>
+        </div>
+        <div className="flex h-[210px] items-center justify-center text-xs text-neutral-500">
+          Chart loads on client
+        </div>
+        <div className="mt-2 text-[11px] text-neutral-500">
+          x-axis = bucket index (1..7), y-axis = mean aperture (presence mean)
+        </div>
+      </div>
+    ),
+  }
+);
 
 function fmt3(x: number) {
   if (!Number.isFinite(x)) return "NaN";
