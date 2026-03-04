@@ -13,6 +13,10 @@ export function FAQV0_1() {
       a: "They are a negative control: bucket assignment has no semantic intent. The instrument should not produce strong correlations there.",
     },
     {
+      q: "Does this work for Japanese/Korean/Arabic/Devanagari/Chinese?",
+      a: "Today, orthography scoring is Latin-vowel oriented (A, E, I, O, U, Y, Ë). If you paste non-Latin script tokens, you will typically see noVowelTokenCount spike and slopes may become NaN — that is expected and should be treated as out-of-scope/compliance, not a model failure. For non-Latin languages, use transliteration or IPA (future work: native-script carrier mappers).",
+    },
+    {
       q: "Do you call an LLM API?",
       a: "No. You run the model yourself. ZË-RO only scores pasted outputs and exports a PDF.",
     },
