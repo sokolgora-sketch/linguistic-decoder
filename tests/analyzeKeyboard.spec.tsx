@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import Page from '../app/page';
+import ZroChatPage from "@/components/ZroChatPage";
 
 global.fetch = jest.fn(() =>
   Promise.resolve({
@@ -22,7 +22,7 @@ describe('Analyze keyboard interactions', () => {
   });
 
   it('triggers analysis with Enter key', async () => {
-    render(<Page />);
+    render(<ZroChatPage />);
     const input = screen.getByLabelText('Word');
     fireEvent.change(input, { target: { value: 'test' } });
     fireEvent.keyDown(input, { key: 'Enter', code: 'Enter' });
@@ -33,7 +33,7 @@ describe('Analyze keyboard interactions', () => {
   });
 
   it('shows validation on Enter with empty input and does not call fetch', async () => {
-    render(<Page />);
+    render(<ZroChatPage />);
     const input = screen.getByLabelText('Word');
     fireEvent.change(input, { target: { value: ' ' } });
     fireEvent.keyDown(input, { key: 'Enter', code: 'Enter' });
@@ -45,7 +45,7 @@ describe('Analyze keyboard interactions', () => {
   });
 
   it('disables button and prevents extra calls while analyzing', async () => {
-    render(<Page />);
+    render(<ZroChatPage />);
     const input = screen.getByLabelText('Word');
     const analyzeButton = screen.getByText('Analyze');
 

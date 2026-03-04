@@ -6,8 +6,7 @@
 
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import Page from '../app/page';
-
+import ZroChatPage from "@/components/ZroChatPage";
 jest.mock('lucide-react', () => ({
   __esModule: true,
   Sparkles: () => null,
@@ -42,7 +41,7 @@ describe.skip('Advanced Results Toggle', () => {
   });
 
   it('hides advanced details by default and shows them after toggle', async () => {
-    render(<Page />);
+    render(<ZroChatPage />);
 
     const input = screen.getByPlaceholderText('study');
     const analyzeButton = screen.getByRole('button', { name: /Analyze/i });

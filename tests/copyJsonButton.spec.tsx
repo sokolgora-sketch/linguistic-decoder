@@ -5,8 +5,7 @@
 
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import Page from '../app/page';
-
+import ZroChatPage from "@/components/ZroChatPage";
 jest.mock("lucide-react", () => ({
   __esModule: true,
   // Only the icons we actually use in the UI
@@ -53,7 +52,7 @@ describe.skip('CopyJsonButton', () => {
   });
 
   it('clicking the button should copy the raw JSON to the clipboard', async () => {
-    render(<Page />);
+    render(<ZroChatPage />);
 
     // 1. Get elements
     const input = screen.getByPlaceholderText('study');

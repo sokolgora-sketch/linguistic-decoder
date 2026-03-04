@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import Page from '../app/page';
+import ZroChatPage from "@/components/ZroChatPage";
 
 global.fetch = jest.fn();
 
@@ -17,7 +17,7 @@ describe('Analyze validation', () => {
   });
 
   it('shows a validation message and does not call fetch when the input is empty', async () => {
-    render(<Page />);
+    render(<ZroChatPage />);
 
     const analyzeButton = screen.getByText('Analyze');
     fireEvent.click(analyzeButton);
