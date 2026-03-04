@@ -5,8 +5,7 @@
 
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import Page from '../app/page';
-
+import ZroChatPage from "@/components/ZroChatPage";
 jest.mock("lucide-react", () => ({
   __esModule: true,
   // Only the icons we actually use in the UI
@@ -43,7 +42,7 @@ describe.skip('RecentWords', () => {
   });
 
   it('clicking a history item should update the input field', async () => {
-    render(<Page />);
+    render(<ZroChatPage />);
 
     // 1. Get elements
     const input = screen.getByPlaceholderText('study');
@@ -73,7 +72,7 @@ describe.skip('RecentWords', () => {
   });
 
   it('should display the createdAt time in the history table', async () => {
-    render(<Page />);
+    render(<ZroChatPage />);
 
     const input = screen.getByPlaceholderText('study');
     const analyzeButton = screen.getByRole('button', { name: /Analyze/i });

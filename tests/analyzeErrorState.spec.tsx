@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import Page from '../app/page';
+import ZroChatPage from "@/components/ZroChatPage";
 
 describe('Analyze form error handling', () => {
   let consoleErrorSpy: jest.SpyInstance;
@@ -30,7 +30,7 @@ describe('Analyze form error handling', () => {
       status: 500,
     } as Response);
 
-    render(<Page />);
+    render(<ZroChatPage />);
 
     const input = screen.getByLabelText('Word');
     const button = screen.getByText('Analyze');
@@ -51,7 +51,7 @@ describe('Analyze form error handling', () => {
     // Mock fetch to reject the promise
     global.fetch = jest.fn().mockRejectedValue(new Error('Network down'));
 
-    render(<Page />);
+    render(<ZroChatPage />);
 
     const input = screen.getByLabelText('Word');
     const button = screen.getByText('Analyze');
@@ -73,7 +73,7 @@ describe('Analyze form error handling', () => {
     // We must NOT assume `.message` exists.
     global.fetch = jest.fn().mockRejectedValue({});
 
-    render(<Page />);
+    render(<ZroChatPage />);
 
     const input = screen.getByLabelText('Word');
     const button = screen.getByText('Analyze');
