@@ -8,6 +8,56 @@ import type { EvalReportBundleV0_1, EvalTaskReportV0_1 } from "@/shared/evals/re
 type ApiOk = { ok: true; report: EvalReportBundleV0_1; md: string };
 type ApiErr = { ok: false; code: string; message: string };
 
+
+type InputProbe =
+  | { kind: "empty" }
+  | { kind: "invalid_json"; error: string }
+  | { kind: "bucket_only"; parsed: Record<string, string[]> }
+  | { kind: "corpus70_meta"; parsed: any }
+  | { kind: "other_json"; parsed: unknown };
+
+function isPlainObject(x: unknown): x is Record<string, unknown> {
+  return typeof x === "object" && x !== null && !Array.isArray(x);
+}
+
+function looksLikeBucketsOnly(x: unknown): x is Record<string, string[]> {
+  if (!isPlainObject(x)) return false;
+  const keys = Object.keys(x).sort();
+  const want = ["V1", "V2", "V3", "V4", "V5", "V6", "V7"];
+  if (keys.length !== want.length) return false;
+  for (let i = 0; i < want.length; i++) if (keys[i] !== want[i]) return false;
+
+  for (const k of want) {
+    const v = (x as any)[k];
+    if (!Array.isArray(v)) return false;
+    for (const it of v) if (typeof it !== "string") return false;
+  }
+  return true;
+}
+
+function looksLikeCorpus70Meta(x: unknown): boolean {
+  if (!isPlainObject(x)) return false;
+  if (typeof (x as any).version !== "string") return false;
+  if (!Array.isArray((x as any).allowedTags)) return false;
+  if (!isPlainObject((x as any).tags)) return false;
+  return true;
+}
+
+function probeInput(text: string): InputProbe {
+  const raw = text.trim();
+  if (!raw) return { kind: "empty" };
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(raw);
+  } catch (e) {
+    return { kind: "invalid_json", error: (e instanceof Error ? e.message : String(e)) };
+  }
+  if (looksLikeBucketsOnly(parsed)) return { kind: "bucket_only", parsed };
+  if (looksLikeCorpus70Meta(parsed)) return { kind: "corpus70_meta", parsed: parsed as any };
+  return { kind: "other_json", parsed };
+}
+
+
 function fmt(x: number, d = 3) {
   if (!Number.isFinite(x)) return "NaN";
   return x.toFixed(d);
@@ -127,10 +177,14 @@ export function EvalsPageClientV0_1() {
   const [report, setReport] = useState<EvalReportBundleV0_1 | null>(null);
   const [md, setMd] = useState<string>("");
 
+  const [notice, setNotice] = useState<string | null>(null);
+
   const selectedTask = useMemo(
     () => byoTasks.find((t) => t.taskId === taskId) ?? byoTasks[0],
     [byoTasks, taskId]
   );
+
+  const inputProbe = useMemo(() => probeInput(inputText), [inputText]);
 
   async function onPickFile(f: File | null) {
     if (!f) return;
@@ -138,17 +192,47 @@ export function EvalsPageClientV0_1() {
     setInputText(txt);
   }
 
-  function buildRunJsonFromUi(): unknown {
+  function buildRunJsonFromUi(opts?: { forceMode?: "run_bundle" | "task_buckets"; parsed?: unknown }): unknown {
     const rid = runId.trim() || "ui.run.v0.1";
 
-    let parsed: unknown;
-    try {
-      parsed = JSON.parse(inputText);
-    } catch (e) {
-      throw new Error((e as Error)?.message ?? "Invalid JSON");
+    const prob: InputProbe =
+      opts?.parsed !== undefined
+        ? { kind: "other_json", parsed: opts.parsed }
+        : probeInput(inputText);
+
+    if (prob.kind === "invalid_json") throw new Error(prob.error);
+    if (prob.kind === "empty") throw new Error("Empty input");
+    if (mode === "run_bundle" && prob.kind === "corpus70_meta") {
+      throw new Error("This looks like a Corpus70 meta-tags JSON (version/allowedTags/tags). Evals expects evalRun.v0.1 or buckets V1..V7.");
     }
 
-    if (mode === "run_bundle") {
+    const parsed = (prob as any).parsed as unknown;
+    const effectiveMode = opts?.forceMode ?? mode;
+
+    // Auto-wrap only when the input is strictly buckets-only.
+    if (effectiveMode === "run_bundle" && looksLikeBucketsOnly(parsed)) {
+      if (!selectedTask) throw new Error("No task selected");
+      return {
+        evalRunVersion: "evalRun.v0.1",
+        evalSpecVersion: "evalSpec.v0.1",
+        specId: "public-grounding-probe.v0.1",
+        runId: rid,
+        meta: {
+          ...(provider ? { provider } : {}),
+          ...(model ? { model } : {}),
+          ...(label ? { label } : {}),
+        },
+        tasks: [
+          {
+            taskId: selectedTask.taskId,
+            inputShape: "bucketed_single_tokens",
+            buckets: parsed,
+          },
+        ],
+      };
+    }
+
+    if (effectiveMode === "run_bundle") {
       // Patch meta if provided (best-effort)
       if (provider || model || label) {
         const obj = parsed as any;
@@ -165,7 +249,10 @@ export function EvalsPageClientV0_1() {
       return parsed;
     }
 
-    // mode === task_buckets (wrap raw buckets -> full run bundle)
+    // effectiveMode === task_buckets (wrap raw buckets -> full run bundle)
+    if (!looksLikeBucketsOnly(parsed)) {
+      throw new Error("Buckets-only mode expects exactly keys V1..V7 with string arrays.");
+    }
     if (!selectedTask) throw new Error("No task selected");
     return {
       evalRunVersion: "evalRun.v0.1",
@@ -189,11 +276,17 @@ export function EvalsPageClientV0_1() {
 
   async function onScore() {
     setApiErr(null);
+    setNotice(null);
     setReport(null);
     setMd("");
     setBusy(true);
     try {
-      const runJson = buildRunJsonFromUi();
+      const shouldAutoWrap = mode === "run_bundle" && probeInput(inputText).kind === "bucket_only";
+      if (shouldAutoWrap) {
+        setNotice("Detected buckets-only JSON while in Full run bundle mode. Auto-wrapping into evalRun.v0.1.");
+        setMode("task_buckets");
+      }
+      const runJson = buildRunJsonFromUi({ forceMode: shouldAutoWrap ? "task_buckets" : undefined });
       const body = JSON.stringify(runJson);
 
       const res = await fetch("/api/evals/score", {
@@ -208,8 +301,7 @@ export function EvalsPageClientV0_1() {
         setApiErr({ ok: false, code: "BAD_JSON", message: "Server returned non-object JSON." });
         return;
       }
-
-if ((data as any).ok !== true) {
+      if ((data as any).ok !== true) {
         const e = data as any;
         setApiErr({
           ok: false,
@@ -232,9 +324,15 @@ if ((data as any).ok !== true) {
 
   async function onDownloadPdf() {
     setApiErr(null);
+    setNotice(null);
     setBusy(true);
     try {
-      const runJson = buildRunJsonFromUi();
+      const shouldAutoWrap = mode === "run_bundle" && probeInput(inputText).kind === "bucket_only";
+      if (shouldAutoWrap) {
+        setNotice("Detected buckets-only JSON while in Full run bundle mode. Auto-wrapping into evalRun.v0.1.");
+        setMode("task_buckets");
+      }
+      const runJson = buildRunJsonFromUi({ forceMode: shouldAutoWrap ? "task_buckets" : undefined });
       const body = JSON.stringify(runJson);
 
       const res = await fetch("/api/evals/pdf", {
@@ -419,6 +517,42 @@ if ((data as any).ok !== true) {
             placeholder={mode === "run_bundle" ? '{ "evalRunVersion": "evalRun.v0.1", ... }' : '{ "V1": ["token1", ...], "V2": [...], ... }'}
           />
         </div>
+
+        {mode === "run_bundle" && inputProbe.kind === "bucket_only" ? (
+          <div className="rounded-md border border-amber-300 bg-amber-50 p-3 text-sm">
+            <div className="font-semibold">Detected buckets-only JSON</div>
+            <div className="mt-1 text-neutral-700">
+              You are in <span className="font-mono">run_bundle</span> mode, but the input looks like bucketed tokens (keys V1..V7).
+              Scoring/PDF will auto-wrap into <span className="font-mono">evalRun.v0.1</span>.
+            </div>
+            <div className="mt-2">
+              <button
+                className="border rounded px-3 py-2 text-sm"
+                type="button"
+                onClick={() => setMode("task_buckets")}
+              >
+                Switch to “Buckets only”
+              </button>
+            </div>
+          </div>
+        ) : null}
+
+        {inputProbe.kind === "corpus70_meta" ? (
+          <div className="rounded-md border border-red-300 bg-red-50 p-3 text-sm">
+            <div className="font-semibold">This looks like a Corpus70 meta-tags JSON</div>
+            <div className="mt-1 text-neutral-700">
+              Evals expects either a full <span className="font-mono">evalRun.v0.1</span> bundle or buckets keys V1..V7.
+              Corpus70 meta JSON (version/allowedTags/tags) is not scorable here.
+            </div>
+          </div>
+        ) : null}
+
+        {notice ? (
+          <div className="rounded-md border border-neutral-200 bg-neutral-50 p-3 text-sm">
+            <div className="font-semibold">Note</div>
+            <div className="mt-1 text-neutral-700">{notice}</div>
+          </div>
+        ) : null}
 
         {apiErr ? (
           <div className="rounded-md border border-red-300 bg-red-50 p-3 text-sm">
