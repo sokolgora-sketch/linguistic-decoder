@@ -101,7 +101,25 @@ export function HeroV0_1() {
         ) : null}
       </div>
 
+      
       <TurkishBaselineChartV0_1 points={tr.points} />
+
+      <div className="mt-3 rounded-lg border border-neutral-800 bg-neutral-950/30 p-3 text-xs text-neutral-300">
+        <div className="text-xs font-semibold text-neutral-100">What this chart shows</div>
+        <div className="mt-1 space-y-2 leading-relaxed">
+          <p>
+            These are bucket means from the Turkish STEP20 baseline. As buckets move from V1 → V7, the mean aperture decreases,
+            producing a strong negative ordering signal in this baseline dataset (Spearman ρ = -1.000; Pearson r = -0.989;
+            permutation p_perm = 0.000; iters = 12000).
+          </p>
+          <p>
+            When testing LLM outputs, we report two things: <span className="font-mono">compliance</span> (did the output contain scorable
+            tokens with detectable vowel carriers?) and <span className="font-mono">signal</span> (r/ρ computed on compliant runs).
+            High variance across repeated runs indicates instability.
+          </p>
+        </div>
+      </div>
+
     </section>
   );
 }
