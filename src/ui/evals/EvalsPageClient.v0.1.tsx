@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
+import Link from "next/link";
 
 import { EVAL_SPEC_V0_1 } from "@/shared/evals/spec.v0.1";
 import type { EvalReportBundleV0_1, EvalTaskReportV0_1 } from "@/shared/evals/report.v0.1";
@@ -398,6 +399,17 @@ export function EvalsPageClientV0_1() {
 
   return (
     <main className="mx-auto max-w-5xl p-6 space-y-6">
+
+      <div className="mb-2">
+        <Link
+          href="/"
+          className="inline-flex items-center gap-2 text-sm text-neutral-600 hover:text-neutral-900"
+        >
+          <span aria-hidden="true">←</span>
+          <span>Back to Home</span>
+        </Link>
+      </div>
+
       <header className="space-y-2">
         <h1 className="text-2xl font-bold">ZË-RO Evals v0.1 — BYO Outputs</h1>
         <div className="text-sm text-neutral-600">
