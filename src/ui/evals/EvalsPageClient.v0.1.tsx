@@ -397,6 +397,122 @@ export function EvalsPageClientV0_1() {
       );
     }
 
+
+  // ---- Clipboard helpers (battery logging) ----
+  const dfNowIso = () => new Date().toISOString();
+
+  const dfSplitCsvSafe = (s: any) =>
+    String(s ?? "").replaceAll("\n", " ").replaceAll("\r", " ").replaceAll(",", " ");
+
+  const dfTryParseBucketsOnly = (raw: any) => {
+    try {
+      const j = JSON.parse(String(raw ?? ""));
+      const keys = ["V1","V2","V3","V4","V5","V6","V7"];
+      for (const k of keys) {
+        if (!Array.isArray(j?.[k])) return null;
+      }
+      // Preserve key order
+      return {
+        V1: j.V1, V2: j.V2, V3: j.V3, V4: j.V4, V5: j.V5, V6: j.V6, V7: j.V7,
+      };
+    } catch {
+      return null;
+    }
+  };
+
+  const dfCopyText = async (labelMsg: string, text: string) => {
+    try {
+      if (!globalThis?.navigator?.clipboard?.writeText) {
+        setNotice("Clipboard unavailable in this browser.");
+        return;
+      }
+      await navigator.clipboard.writeText(String(text ?? ""));
+      setNotice(labelMsg);
+      setTimeout(() => setNotice(null), 1800);
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e);
+      setNotice("Copy failed: " + msg);
+    }
+  };
+
+  const dfGetPrimaryTask = () => {
+    const ts = (report && (report).tasks) ? (report).tasks : [];
+    // Prefer a by-run task if present; else first task.
+    const byo = Array.isArray(ts) ? ts.find((x) => x?.kind === "byo" || String(x?.taskId ?? "").includes("LADDER")) : null;
+    return byo ?? (Array.isArray(ts) ? ts[0] : null);
+  };
+
+  const dfGetSlopePresence = (task: any) => {
+    // Try a few likely shapes (defensive).
+    const s =
+      task?.slopes?.aperturePresenceMean ??
+      task?.slope_aperturePresenceMean ??
+      task?.aperturePresenceMean ??
+      null;
+    return s;
+  };
+
+  const dfSumValidInvalid = (task: any) => {
+    const bs = task?.buckets ?? task?.bucketReports ?? task?.bucketStats ?? [];
+    let validN = 0;
+    let invalidN = 0;
+    if (Array.isArray(bs)) {
+      for (const b of bs) {
+        validN += Number(b?.validN ?? 0);
+        invalidN += Number(b?.invalidN ?? 0);
+      }
+    }
+    return { validN, invalidN };
+  };
+
+  const onCopyRawJson = async () => {
+    const b = dfTryParseBucketsOnly(inputText);
+    if (!b) {
+      setNotice("Copy Raw JSON: input is not buckets-only JSON (V1..V7).");
+      setTimeout(() => setNotice(null), 2200);
+      return;
+    }
+    await dfCopyText("Copied buckets JSON (V1..V7).", JSON.stringify(b, null, 2));
+  };
+
+  const onCopyCsvRow = async () => {
+    if (!report) {
+      setNotice("Copy CSV Row: score first.");
+      setTimeout(() => setNotice(null), 1800);
+      return;
+    }
+    const task = dfGetPrimaryTask();
+    const slope = dfGetSlopePresence(task);
+
+    // Pull the *displayed* numbers (best-effort).
+    const pearson_r = slope?.pearson?.r ?? slope?.pearson_r ?? null;
+    const pearson_p = slope?.pearson?.p ?? slope?.pearson_p ?? null;
+    const spearman_rho = slope?.spearman?.rho ?? slope?.spearman_rho ?? slope?.spearman?.r ?? null;
+    const spearman_p = slope?.spearman?.p ?? slope?.spearman_p ?? null;
+
+    const diag = (task as any)?.diagnostics ?? (task as any)?.diag ?? {};
+    const noVowelTokenCount = diag?.noVowelTokenCount ?? diag?.no_vowel_token_count ?? "";
+
+    const { validN, invalidN } = dfSumValidInvalid(task);
+
+    // NOTE: p_value = pearson_p (aperturePresenceMean). spearman_p is included in notes column.
+    const row = [
+      dfNowIso(),
+      dfSplitCsvSafe(runId),
+      dfSplitCsvSafe(provider),
+      dfSplitCsvSafe(model),
+      (pearson_r ?? ""),
+      (spearman_rho ?? ""),
+      (pearson_p ?? ""),
+      (validN ?? ""),
+      (invalidN ?? ""),
+      (noVowelTokenCount ?? ""),
+      "spearman_p=" + (spearman_p ?? "")
+    ].join(",");
+
+    await dfCopyText("Copied CSV row.", row);
+  };
+
   return (
     <main className="mx-auto max-w-5xl p-6 space-y-6">
 
@@ -516,6 +632,24 @@ export function EvalsPageClientV0_1() {
               >
                 Download PDF
               </button>
+
+              <button
+                className="border rounded px-3 py-2 text-sm disabled:opacity-50"
+                onClick={() => void onCopyRawJson()}
+                disabled={busy || !inputText.trim()}
+                type="button"
+              >
+                Copy Raw JSON
+              </button>
+              <button
+                className="border rounded px-3 py-2 text-sm disabled:opacity-50"
+                onClick={() => void onCopyCsvRow()}
+                disabled={busy || !report}
+                type="button"
+              >
+                Copy CSV Row
+              </button>
+
 
           </div>
         </div>
