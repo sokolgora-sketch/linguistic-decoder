@@ -1,0 +1,86 @@
+{
+  "V1": [
+    "horizon",
+    "expanse",
+    "meadow",
+    "cosmos",
+    "canopy",
+    "prairie",
+    "skyline",
+    "openness",
+    "ether",
+    "panorama"
+  ],
+  "V2": [
+    "granite",
+    "boulder",
+    "hammer",
+    "anvil",
+    "titan",
+    "fortress",
+    "ballast",
+    "thunder",
+    "ironclad",
+    "colossus"
+  ],
+  "V3": [
+    "cavern",
+    "nucleus",
+    "kernel",
+    "abyss",
+    "chamber",
+    "recess",
+    "marrow",
+    "grotto",
+    "enclave",
+    "sanctum"
+  ],
+  "V4": [
+    "foundation",
+    "pedestal",
+    "balance",
+    "footing",
+    "bedrock",
+    "anchor",
+    "platform",
+    "baseline",
+    "stability",
+    "rooted"
+  ],
+  "V5": [
+    "current",
+    "vector",
+    "motion",
+    "stream",
+    "drift",
+    "journey",
+    "surge",
+    "passage",
+    "orbit",
+    "advance"
+  ],
+  "V6": [
+    "tension",
+    "needle",
+    "tautness",
+    "razor",
+    "spindle",
+    "strain",
+    "sliver",
+    "piercing",
+    "narrowness",
+    "edged"
+  ],
+  "V7": [
+    "pinpoint",
+    "vertex",
+    "apex",
+    "target",
+    "focus",
+    "tip",
+    "dot",
+    "centerline",
+    "bullseye",
+    "precision"
+  ]
+}
