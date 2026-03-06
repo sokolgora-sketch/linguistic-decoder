@@ -257,6 +257,8 @@ export const EVAL_SPEC_V0_1: EvalSpecV0_1 = parseEvalSpecV0_1({
         "Return STRICT JSON only. No prose.\n\n" +
         "Goal: produce a full ladder: 10 SINGLE-TOKEN words per bucket V1..V7.\n" +
         "Rules: each entry must be a single orthographic token (no spaces). Avoid punctuation.\n\n" +
+        "STRICT CONSTRAINT: Each of the 70 tokens must be a unique, single-word entry. Do not repeat any word across different buckets.\n" +
+        "Before outputting the final JSON, perform a self-audit to ensure zero duplicates.\n\n" +
         "Output shape:\n" +
         "{\n" +
         "  \"V1\": [\"...\"],\n" +

@@ -482,20 +482,21 @@ export function EvalsPageClientV0_1() {
       return;
     }
     const task = dfGetPrimaryTask();
-    const slope = dfGetSlopePresence(task);
+    const slope = dfGetSlopePresence(task);    // aperturePresenceMean block shown in UI.
+    const pearson_r = (slope as any)?.pearson_r ?? (slope as any)?.pearson?.r ?? null;
+    const spearman_rho = (slope as any)?.spearman_rho ?? (slope as any)?.spearman?.rho ?? (slope as any)?.spearman?.r ?? null;
 
-    // Pull the *displayed* numbers (best-effort).
-    const pearson_r = slope?.pearson?.r ?? slope?.pearson_r ?? null;
-    const pearson_p = slope?.pearson?.p ?? slope?.pearson_p ?? null;
-    const spearman_rho = slope?.spearman?.rho ?? slope?.spearman_rho ?? slope?.spearman?.r ?? null;
-    const spearman_p = slope?.spearman?.p ?? slope?.spearman_p ?? null;
+    // IMPORTANT: battery CSV p_perm comes from aperturePresenceMean.p_spearman.
+    const p_perm = (slope as any)?.p_spearman ?? (slope as any)?.p_perm_spearman ?? null;
+
+    const iters = (slope as any)?.iters ?? null;
+    const seed = (slope as any)?.seed ?? null;
 
     const diag = (task as any)?.diagnostics ?? (task as any)?.diag ?? {};
     const noVowelTokenCount = diag?.noVowelTokenCount ?? diag?.no_vowel_token_count ?? "";
 
     const { validN, invalidN } = dfSumValidInvalid(task);
 
-    // NOTE: p_value = pearson_p (aperturePresenceMean). spearman_p is included in notes column.
     const row = [
       dfNowIso(),
       dfSplitCsvSafe(runId),
@@ -503,11 +504,11 @@ export function EvalsPageClientV0_1() {
       dfSplitCsvSafe(model),
       (pearson_r ?? ""),
       (spearman_rho ?? ""),
-      (pearson_p ?? ""),
+      (p_perm ?? ""),
       (validN ?? ""),
       (invalidN ?? ""),
       (noVowelTokenCount ?? ""),
-      "spearman_p=" + (spearman_p ?? "")
+      `iters=${iters ?? ""}; seed=${seed ?? ""}; p_perm_src=p_spearman`
     ].join(",");
 
     await dfCopyText("Copied CSV row.", row);
@@ -600,58 +601,62 @@ export function EvalsPageClientV0_1() {
             />
           </div>
 
-          <div className="flex gap-2 md:ml-auto">
-            <button className="border rounded px-3 py-2 text-sm" onClick={loadExample} type="button">
-              Load example
-            </button>
-            <button
-              className="border rounded px-3 py-2 text-sm"
-              onClick={() => {
-                setInputText("");
-                setApiErr(null);
-                setReport(null);
-                setMd("");
-              }}
-              type="button"
-            >
-              Clear
-            </button>
-            <button
-              className="bg-black text-white rounded px-3 py-2 text-sm disabled:opacity-50"
-              onClick={() => void onScore()}
-              disabled={busy || !inputText.trim()}
-              type="button"
-            >
-              {busy ? "Scoring…" : "Score"}
-            </button>
+            <div className="flex flex-wrap gap-2 md:ml-auto">
               <button
-                className="border rounded px-3 py-2 text-sm disabled:opacity-50"
+                type="button"
+                className="rounded border px-3 py-2 text-sm hover:bg-neutral-50"
+                onClick={loadExample}
+                disabled={busy}
+              >
+                Load example
+              </button>
+              <button
+                type="button"
+                className="rounded border px-3 py-2 text-sm hover:bg-neutral-50"
+                onClick={() => {
+                  setInputText("");
+                  setApiErr(null);
+                  setReport(null);
+                  setMd("");
+                  setNotice(null);
+                }}
+                disabled={busy}
+              >
+                Clear
+              </button>
+              <button
+                type="button"
+                className="rounded bg-black px-3 py-2 text-sm text-white disabled:opacity-50"
+                onClick={() => void onScore()}
+                disabled={busy || !inputText.trim()}
+              >
+                {busy ? "Scoring…" : "Score"}
+              </button>
+              <button
+                type="button"
+                className="rounded border px-3 py-2 text-sm hover:bg-neutral-50 disabled:opacity-50"
                 onClick={() => void onDownloadPdf()}
                 disabled={busy || !inputText.trim()}
-                type="button"
               >
                 Download PDF
               </button>
-
               <button
-                className="border rounded px-3 py-2 text-sm disabled:opacity-50"
+                type="button"
+                className="rounded border px-3 py-2 text-sm hover:bg-neutral-50 disabled:opacity-50"
                 onClick={() => void onCopyRawJson()}
                 disabled={busy || !inputText.trim()}
-                type="button"
               >
                 Copy Raw JSON
               </button>
               <button
-                className="border rounded px-3 py-2 text-sm disabled:opacity-50"
+                type="button"
+                className="rounded border px-3 py-2 text-sm hover:bg-neutral-50 disabled:opacity-50"
                 onClick={() => void onCopyCsvRow()}
                 disabled={busy || !report}
-                type="button"
               >
                 Copy CSV Row
               </button>
-
-
-          </div>
+            </div>
         </div>
 
         <div>
