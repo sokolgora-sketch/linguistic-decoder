@@ -1,0 +1,13 @@
+timestamp,runId,provider,model,pearson_r,spearman_rho,p_perm,validN,invalidN,noVowelTokenCount,notes
+2026-03-06T13:42:51.859Z,battery.v0.1.openai.chatgpt52thinking.r01,openai,chatgpt52thinking,-0.6985999779291087,-0.7857142857142857,0.04683333333333333,70,0,0,iters=12000; seed=97631760; p_perm_src=p_spearman
+2026-03-06T13:57:20.969Z,battery.v0.1.openai.chatgpt52thinking.r02,openai,chatgpt52thinking,-0.772980588019436,-0.6785714285714286,0.10833333333333334,70,0,0,iters=12000; seed=97631760; p_perm_src=p_spearman
+2026-03-06T14:10:21.392Z,battery.v0.1.openai.chatgpt52thinking.r03,openai,chatgpt52thinking,-0.7540188165788649,-0.6785714285714286,0.10975,70,0,0,iters=12000; seed=97631760; p_perm_src=p_spearman
+2026-03-06T14:16:29.310Z,battery.v0.1.openai.chatgpt52thinking.r04,openai,chatgpt52thinking,-0.6414132941238632,-0.6428571428571429,0.14233333333333334,70,0,0,iters=12000; seed=97631760; p_perm_src=p_spearman
+2026-03-06T14:22:50.623Z,battery.v0.1.openai.chatgpt52thinking.r05,openai,chatgpt52thinking,-0.8713406361008039,-0.8214285714285714,0.036333333333333336,70,0,0,iters=12000; seed=97631760; p_perm_src=p_spearman
+2026-03-06T14:29:36.698Z,battery.v0.1.openai.chatgpt52thinking.r06,openai,chatgpt52thinking,-0.86274611892878,-0.8214285714285714,0.033,70,0,0,iters=12000; seed=97631760; p_perm_src=p_spearman
+2026-03-06T14:33:23.381Z,battery.v0.1.openai.chatgpt52thinking.r07,openai,chatgpt52thinking,-0.8038361880432633,-0.7857142857142857,0.04575,70,0,0,iters=12000; seed=97631760; p_perm_src=p_spearman
+2026-03-06T14:37:39.894Z,battery.v0.1.openai.chatgpt52thinking.r08,openai,chatgpt52thinking,-0.805273494716685,-0.7142857142857143,0.08758333333333333,70,0,0,iters=12000; seed=97631760; p_perm_src=p_spearman
+2026-03-06T14:45:30.491Z,battery.v0.1.openai.chatgpt52thinking.r09,openai,chatgpt52thinking,-0.7816946163176297,-0.6785714285714286,0.11008333333333334,70,0,0,iters=12000; seed=97631760; p_perm_src=p_spearman
+2026-03-06T14:53:22.214Z,battery.v0.1.openai.chatgpt52thinking.r10,openai,chatgpt52thinking,-0.6710850954058116,-0.42857142857142855,0.35675,70,0,0,iters=12000; seed=97631760; p_perm_src=p_spearman
+2026-03-06T15:00:46.018Z,battery.v0.1.openai.chatgpt52thinking.r11,openai,chatgpt52thinking,-0.8290632317862136,-0.8214285714285714,0.0365,70,0,0,iters=12000; seed=97631760; p_perm_src=p_spearman
+2026-03-06T15:04:18.046Z,battery.v0.1.openai.chatgpt52thinking.r12,openai,chatgpt52thinking,-0.8033279012463437,-0.7142857142857143,0.08791666666666667,70,0,0,iters=12000; seed=97631760; p_perm_src=p_spearman
