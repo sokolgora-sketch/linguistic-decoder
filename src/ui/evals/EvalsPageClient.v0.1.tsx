@@ -397,6 +397,123 @@ export function EvalsPageClientV0_1() {
       );
     }
 
+
+  // ---- Clipboard helpers (battery logging) ----
+  const dfNowIso = () => new Date().toISOString();
+
+  const dfSplitCsvSafe = (s: any) =>
+    String(s ?? "").replaceAll("\n", " ").replaceAll("\r", " ").replaceAll(",", " ");
+
+  const dfTryParseBucketsOnly = (raw: any) => {
+    try {
+      const j = JSON.parse(String(raw ?? ""));
+      const keys = ["V1","V2","V3","V4","V5","V6","V7"];
+      for (const k of keys) {
+        if (!Array.isArray(j?.[k])) return null;
+      }
+      // Preserve key order
+      return {
+        V1: j.V1, V2: j.V2, V3: j.V3, V4: j.V4, V5: j.V5, V6: j.V6, V7: j.V7,
+      };
+    } catch {
+      return null;
+    }
+  };
+
+  const dfCopyText = async (labelMsg: string, text: string) => {
+    try {
+      if (!globalThis?.navigator?.clipboard?.writeText) {
+        setNotice("Clipboard unavailable in this browser.");
+        return;
+      }
+      await navigator.clipboard.writeText(String(text ?? ""));
+      setNotice(labelMsg);
+      setTimeout(() => setNotice(null), 1800);
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e);
+      setNotice("Copy failed: " + msg);
+    }
+  };
+
+  const dfGetPrimaryTask = () => {
+    const ts = (report && (report).tasks) ? (report).tasks : [];
+    // Prefer a by-run task if present; else first task.
+    const byo = Array.isArray(ts) ? ts.find((x) => x?.kind === "byo" || String(x?.taskId ?? "").includes("LADDER")) : null;
+    return byo ?? (Array.isArray(ts) ? ts[0] : null);
+  };
+
+  const dfGetSlopePresence = (task: any) => {
+    // Try a few likely shapes (defensive).
+    const s =
+      task?.slopes?.aperturePresenceMean ??
+      task?.slope_aperturePresenceMean ??
+      task?.aperturePresenceMean ??
+      null;
+    return s;
+  };
+
+  const dfSumValidInvalid = (task: any) => {
+    const bs = task?.buckets ?? task?.bucketReports ?? task?.bucketStats ?? [];
+    let validN = 0;
+    let invalidN = 0;
+    if (Array.isArray(bs)) {
+      for (const b of bs) {
+        validN += Number(b?.validN ?? 0);
+        invalidN += Number(b?.invalidN ?? 0);
+      }
+    }
+    return { validN, invalidN };
+  };
+
+  const onCopyRawJson = async () => {
+    const b = dfTryParseBucketsOnly(inputText);
+    if (!b) {
+      setNotice("Copy Raw JSON: input is not buckets-only JSON (V1..V7).");
+      setTimeout(() => setNotice(null), 2200);
+      return;
+    }
+    await dfCopyText("Copied buckets JSON (V1..V7).", JSON.stringify(b, null, 2));
+  };
+
+  const onCopyCsvRow = async () => {
+    if (!report) {
+      setNotice("Copy CSV Row: score first.");
+      setTimeout(() => setNotice(null), 1800);
+      return;
+    }
+    const task = dfGetPrimaryTask();
+    const slope = dfGetSlopePresence(task);    // aperturePresenceMean block shown in UI.
+    const pearson_r = (slope as any)?.pearson_r ?? (slope as any)?.pearson?.r ?? null;
+    const spearman_rho = (slope as any)?.spearman_rho ?? (slope as any)?.spearman?.rho ?? (slope as any)?.spearman?.r ?? null;
+
+    // IMPORTANT: battery CSV p_perm comes from aperturePresenceMean.p_spearman.
+    const p_perm = (slope as any)?.p_spearman ?? (slope as any)?.p_perm_spearman ?? null;
+
+    const iters = (slope as any)?.iters ?? null;
+    const seed = (slope as any)?.seed ?? null;
+
+    const diag = (task as any)?.diagnostics ?? (task as any)?.diag ?? {};
+    const noVowelTokenCount = diag?.noVowelTokenCount ?? diag?.no_vowel_token_count ?? "";
+
+    const { validN, invalidN } = dfSumValidInvalid(task);
+
+    const row = [
+      dfNowIso(),
+      dfSplitCsvSafe(runId),
+      dfSplitCsvSafe(provider),
+      dfSplitCsvSafe(model),
+      (pearson_r ?? ""),
+      (spearman_rho ?? ""),
+      (p_perm ?? ""),
+      (validN ?? ""),
+      (invalidN ?? ""),
+      (noVowelTokenCount ?? ""),
+      `iters=${iters ?? ""}; seed=${seed ?? ""}; p_perm_src=p_spearman`
+    ].join(",");
+
+    await dfCopyText("Copied CSV row.", row);
+  };
+
   return (
     <main className="mx-auto max-w-5xl p-6 space-y-6">
 
@@ -484,40 +601,62 @@ export function EvalsPageClientV0_1() {
             />
           </div>
 
-          <div className="flex gap-2 md:ml-auto">
-            <button className="border rounded px-3 py-2 text-sm" onClick={loadExample} type="button">
-              Load example
-            </button>
-            <button
-              className="border rounded px-3 py-2 text-sm"
-              onClick={() => {
-                setInputText("");
-                setApiErr(null);
-                setReport(null);
-                setMd("");
-              }}
-              type="button"
-            >
-              Clear
-            </button>
-            <button
-              className="bg-black text-white rounded px-3 py-2 text-sm disabled:opacity-50"
-              onClick={() => void onScore()}
-              disabled={busy || !inputText.trim()}
-              type="button"
-            >
-              {busy ? "Scoring…" : "Score"}
-            </button>
+            <div className="flex flex-wrap gap-2 md:ml-auto">
               <button
-                className="border rounded px-3 py-2 text-sm disabled:opacity-50"
+                type="button"
+                className="rounded border px-3 py-2 text-sm hover:bg-neutral-50"
+                onClick={loadExample}
+                disabled={busy}
+              >
+                Load example
+              </button>
+              <button
+                type="button"
+                className="rounded border px-3 py-2 text-sm hover:bg-neutral-50"
+                onClick={() => {
+                  setInputText("");
+                  setApiErr(null);
+                  setReport(null);
+                  setMd("");
+                  setNotice(null);
+                }}
+                disabled={busy}
+              >
+                Clear
+              </button>
+              <button
+                type="button"
+                className="rounded bg-black px-3 py-2 text-sm text-white disabled:opacity-50"
+                onClick={() => void onScore()}
+                disabled={busy || !inputText.trim()}
+              >
+                {busy ? "Scoring…" : "Score"}
+              </button>
+              <button
+                type="button"
+                className="rounded border px-3 py-2 text-sm hover:bg-neutral-50 disabled:opacity-50"
                 onClick={() => void onDownloadPdf()}
                 disabled={busy || !inputText.trim()}
-                type="button"
               >
                 Download PDF
               </button>
-
-          </div>
+              <button
+                type="button"
+                className="rounded border px-3 py-2 text-sm hover:bg-neutral-50 disabled:opacity-50"
+                onClick={() => void onCopyRawJson()}
+                disabled={busy || !inputText.trim()}
+              >
+                Copy Raw JSON
+              </button>
+              <button
+                type="button"
+                className="rounded border px-3 py-2 text-sm hover:bg-neutral-50 disabled:opacity-50"
+                onClick={() => void onCopyCsvRow()}
+                disabled={busy || !report}
+              >
+                Copy CSV Row
+              </button>
+            </div>
         </div>
 
         <div>

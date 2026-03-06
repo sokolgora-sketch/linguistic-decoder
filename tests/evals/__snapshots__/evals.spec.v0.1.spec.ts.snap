@@ -90,6 +90,9 @@ Output shape:
 Goal: produce a full ladder: 10 SINGLE-TOKEN words per bucket V1..V7.
 Rules: each entry must be a single orthographic token (no spaces). Avoid punctuation.
 
+STRICT CONSTRAINT: Each of the 70 tokens must be a unique, single-word entry. Do not repeat any word across different buckets.
+Before outputting the final JSON, perform a self-audit to ensure zero duplicates.
+
 Output shape:
 {
   "V1": ["..."],
