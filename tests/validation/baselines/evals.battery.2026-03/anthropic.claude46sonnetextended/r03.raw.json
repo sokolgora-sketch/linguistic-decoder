@@ -1,0 +1,86 @@
+{
+  "V1": [
+    "stone",
+    "iron",
+    "clay",
+    "ash",
+    "bone",
+    "dust",
+    "salt",
+    "bark",
+    "seed",
+    "flesh"
+  ],
+  "V2": [
+    "flow",
+    "drift",
+    "surge",
+    "leap",
+    "spin",
+    "fall",
+    "rush",
+    "crawl",
+    "glide",
+    "thrust"
+  ],
+  "V3": [
+    "void",
+    "depth",
+    "ridge",
+    "hollow",
+    "expanse",
+    "arc",
+    "fringe",
+    "core",
+    "rim",
+    "gulf"
+  ],
+  "V4": [
+    "dawn",
+    "dusk",
+    "cycle",
+    "pulse",
+    "epoch",
+    "lapse",
+    "onset",
+    "phase",
+    "rift",
+    "span"
+  ],
+  "V5": [
+    "thought",
+    "grasp",
+    "recall",
+    "infer",
+    "weigh",
+    "probe",
+    "map",
+    "trace",
+    "gauge",
+    "parse"
+  ],
+  "V6": [
+    "grief",
+    "rage",
+    "dread",
+    "longing",
+    "joy",
+    "shame",
+    "awe",
+    "spite",
+    "calm",
+    "zeal"
+  ],
+  "V7": [
+    "voice",
+    "echo",
+    "cry",
+    "chant",
+    "hum",
+    "word",
+    "tone",
+    "mark",
+    "sign",
+    "glyph"
+  ]
+}

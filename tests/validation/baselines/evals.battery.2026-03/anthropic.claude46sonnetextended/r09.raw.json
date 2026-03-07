@@ -1,0 +1,86 @@
+{
+  "V1": [
+    "stone",
+    "iron",
+    "bone",
+    "clay",
+    "ash",
+    "dust",
+    "bark",
+    "salt",
+    "coal",
+    "glass"
+  ],
+  "V2": [
+    "surge",
+    "thrust",
+    "strike",
+    "heave",
+    "drive",
+    "hurl",
+    "slam",
+    "rush",
+    "shove",
+    "lunge"
+  ],
+  "V3": [
+    "bloom",
+    "spread",
+    "swell",
+    "burst",
+    "widen",
+    "reach",
+    "pour",
+    "spill",
+    "flare",
+    "fan"
+  ],
+  "V4": [
+    "think",
+    "know",
+    "grasp",
+    "sense",
+    "judge",
+    "weigh",
+    "trace",
+    "map",
+    "hold",
+    "read"
+  ],
+  "V5": [
+    "speak",
+    "call",
+    "sing",
+    "name",
+    "cry",
+    "tell",
+    "mark",
+    "write",
+    "shout",
+    "echo"
+  ],
+  "V6": [
+    "frame",
+    "bind",
+    "link",
+    "tie",
+    "chain",
+    "lock",
+    "knot",
+    "mesh",
+    "join",
+    "wrap"
+  ],
+  "V7": [
+    "fade",
+    "crack",
+    "break",
+    "fall",
+    "split",
+    "wear",
+    "rot",
+    "wane",
+    "sink",
+    "melt"
+  ]
+}

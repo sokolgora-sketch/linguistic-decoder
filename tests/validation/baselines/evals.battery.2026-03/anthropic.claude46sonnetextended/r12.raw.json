@@ -1,0 +1,86 @@
+{
+  "V1": [
+    "stone",
+    "clay",
+    "bone",
+    "iron",
+    "grain",
+    "salt",
+    "ash",
+    "wood",
+    "root",
+    "soil"
+  ],
+  "V2": [
+    "weight",
+    "thrust",
+    "crush",
+    "press",
+    "dense",
+    "bulk",
+    "load",
+    "pull",
+    "drive",
+    "mass"
+  ],
+  "V3": [
+    "drift",
+    "surge",
+    "flow",
+    "pour",
+    "rush",
+    "sweep",
+    "glide",
+    "wave",
+    "stream",
+    "roll"
+  ],
+  "V4": [
+    "arc",
+    "line",
+    "mesh",
+    "grid",
+    "ring",
+    "frame",
+    "edge",
+    "curve",
+    "knot",
+    "spine"
+  ],
+  "V5": [
+    "spread",
+    "bloom",
+    "rise",
+    "grow",
+    "reach",
+    "widen",
+    "branch",
+    "swell",
+    "burst",
+    "extend"
+  ],
+  "V6": [
+    "sense",
+    "think",
+    "dream",
+    "judge",
+    "know",
+    "feel",
+    "grasp",
+    "infer",
+    "watch",
+    "seek"
+  ],
+  "V7": [
+    "speak",
+    "call",
+    "name",
+    "sound",
+    "echo",
+    "chant",
+    "mark",
+    "signal",
+    "word",
+    "voice"
+  ]
+}

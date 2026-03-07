@@ -1,0 +1,86 @@
+{
+  "V1": [
+    "grow",
+    "spread",
+    "vast",
+    "wide",
+    "open",
+    "bloom",
+    "stretch",
+    "broad",
+    "expand",
+    "unfold"
+  ],
+  "V2": [
+    "push",
+    "strike",
+    "break",
+    "crush",
+    "drive",
+    "thrust",
+    "burst",
+    "shatter",
+    "slam",
+    "forge"
+  ],
+  "V3": [
+    "stone",
+    "iron",
+    "dense",
+    "solid",
+    "bulk",
+    "weight",
+    "thick",
+    "block",
+    "mass",
+    "core"
+  ],
+  "V4": [
+    "flow",
+    "drift",
+    "rush",
+    "spin",
+    "glide",
+    "sweep",
+    "surge",
+    "roll",
+    "leap",
+    "stream"
+  ],
+  "V5": [
+    "think",
+    "know",
+    "grasp",
+    "sense",
+    "feel",
+    "trace",
+    "mark",
+    "read",
+    "learn",
+    "deduce"
+  ],
+  "V6": [
+    "speak",
+    "name",
+    "call",
+    "voice",
+    "sing",
+    "echo",
+    "sound",
+    "shout",
+    "tell",
+    "chant"
+  ],
+  "V7": [
+    "bind",
+    "link",
+    "join",
+    "weave",
+    "knot",
+    "hold",
+    "bridge",
+    "touch",
+    "meet",
+    "merge"
+  ]
+}

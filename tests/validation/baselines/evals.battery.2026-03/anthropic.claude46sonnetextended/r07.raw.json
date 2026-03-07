@@ -1,0 +1,86 @@
+{
+  "V1": [
+    "core",
+    "seed",
+    "root",
+    "stem",
+    "base",
+    "well",
+    "birth",
+    "dawn",
+    "ground",
+    "source"
+  ],
+  "V2": [
+    "spread",
+    "bloom",
+    "reach",
+    "rise",
+    "surge",
+    "swell",
+    "widen",
+    "fan",
+    "grow",
+    "branch"
+  ],
+  "V3": [
+    "drive",
+    "push",
+    "thrust",
+    "strike",
+    "burst",
+    "blast",
+    "crack",
+    "pound",
+    "smash",
+    "force"
+  ],
+  "V4": [
+    "bulk",
+    "dense",
+    "thick",
+    "solid",
+    "stone",
+    "flesh",
+    "mass",
+    "clay",
+    "iron",
+    "weight"
+  ],
+  "V5": [
+    "flow",
+    "drift",
+    "glide",
+    "rush",
+    "sweep",
+    "spin",
+    "roll",
+    "stream",
+    "pour",
+    "slide"
+  ],
+  "V6": [
+    "think",
+    "know",
+    "sense",
+    "grasp",
+    "judge",
+    "learn",
+    "find",
+    "hold",
+    "read",
+    "feel"
+  ],
+  "V7": [
+    "speak",
+    "call",
+    "sing",
+    "name",
+    "tell",
+    "voice",
+    "sound",
+    "cry",
+    "say",
+    "chant"
+  ]
+}
