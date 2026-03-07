@@ -1,0 +1,86 @@
+{
+  "V1": [
+    "breath",
+    "air",
+    "sigh",
+    "gasp",
+    "cry",
+    "howl",
+    "moan",
+    "hum",
+    "hush",
+    "mute"
+  ],
+  "V2": [
+    "word",
+    "noun",
+    "verb",
+    "talk",
+    "speak",
+    "tell",
+    "say",
+    "oral",
+    "tongue",
+    "lip"
+  ],
+  "V3": [
+    "tone",
+    "pitch",
+    "chord",
+    "song",
+    "hymn",
+    "chant",
+    "lyric",
+    "melody",
+    "rhythm",
+    "beat"
+  ],
+  "V4": [
+    "root",
+    "stem",
+    "seed",
+    "base",
+    "form",
+    "morph",
+    "glyph",
+    "sign",
+    "code",
+    "law"
+  ],
+  "V5": [
+    "story",
+    "myth",
+    "tale",
+    "saga",
+    "epic",
+    "lore",
+    "fable",
+    "mythos",
+    "drama",
+    "prose"
+  ],
+  "V6": [
+    "logic",
+    "truth",
+    "mind",
+    "thought",
+    "reason",
+    "idea",
+    "concept",
+    "theory",
+    "axiom",
+    "proof"
+  ],
+  "V7": [
+    "spirit",
+    "soul",
+    "light",
+    "void",
+    "space",
+    "time",
+    "cosmic",
+    "divine",
+    "eternal",
+    "omega"
+  ]
+}

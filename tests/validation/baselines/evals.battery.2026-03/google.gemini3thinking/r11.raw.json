@@ -1,0 +1,86 @@
+{
+  "V1": [
+    "Sun",
+    "Moon",
+    "Star",
+    "Earth",
+    "Fire",
+    "Water",
+    "Wind",
+    "Life",
+    "Death",
+    "Soul"
+  ],
+  "V2": [
+    "Tree",
+    "River",
+    "Stone",
+    "Mountain",
+    "Cloud",
+    "Rain",
+    "Storm",
+    "Forest",
+    "Ocean",
+    "Desert"
+  ],
+  "V3": [
+    "Speak",
+    "Think",
+    "Build",
+    "Create",
+    "Learn",
+    "Fight",
+    "Sleep",
+    "Dream",
+    "Love",
+    "Hate"
+  ],
+  "V4": [
+    "Truth",
+    "Power",
+    "Light",
+    "Dark",
+    "Time",
+    "Space",
+    "Force",
+    "Sound",
+    "Shape",
+    "Color"
+  ],
+  "V5": [
+    "Logic",
+    "Pattern",
+    "Reason",
+    "Method",
+    "Theory",
+    "System",
+    "Order",
+    "Chaos",
+    "Change",
+    "Growth"
+  ],
+  "V6": [
+    "Wisdom",
+    "Spirit",
+    "Essence",
+    "Being",
+    "Void",
+    "Energy",
+    "Motion",
+    "Nature",
+    "Origin",
+    "Future"
+  ],
+  "V7": [
+    "Root",
+    "Stem",
+    "Glyph",
+    "Symbol",
+    "Cipher",
+    "Lexis",
+    "Phonic",
+    "Syntax",
+    "Semantic",
+    "Morph"
+  ]
+}

@@ -1,0 +1,86 @@
+{
+  "V1": [
+    "Bone",
+    "Flesh",
+    "Skin",
+    "Blood",
+    "Nerve",
+    "Vein",
+    "Cell",
+    "Pore",
+    "Hair",
+    "Nail"
+  ],
+  "V2": [
+    "Sight",
+    "Sound",
+    "Smell",
+    "Taste",
+    "Touch",
+    "Echo",
+    "Glare",
+    "Scent",
+    "Flavor",
+    "Feel"
+  ],
+  "V3": [
+    "Love",
+    "Hate",
+    "Fear",
+    "Joy",
+    "Rage",
+    "Grief",
+    "Calm",
+    "Hope",
+    "Dread",
+    "Pride"
+  ],
+  "V4": [
+    "Walk",
+    "Run",
+    "Leap",
+    "Fall",
+    "Give",
+    "Take",
+    "Hold",
+    "Keep",
+    "Make",
+    "Break"
+  ],
+  "V5": [
+    "Tool",
+    "Gear",
+    "Bolt",
+    "Wire",
+    "Lens",
+    "Pipe",
+    "Tube",
+    "Vent",
+    "Pump",
+    "Tank"
+  ],
+  "V6": [
+    "Myth",
+    "Law",
+    "Fact",
+    "Lie",
+    "Truth",
+    "Fate",
+    "Luck",
+    "Debt",
+    "Gift",
+    "Rite"
+  ],
+  "V7": [
+    "Atom",
+    "Quark",
+    "Void",
+    "Nova",
+    "Core",
+    "Zero",
+    "Mass",
+    "Spin",
+    "Wave",
+    "Flux"
+  ]
+}

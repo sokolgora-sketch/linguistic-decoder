@@ -1,0 +1,86 @@
+{
+  "V1": [
+    "Stone",
+    "Fire",
+    "Water",
+    "Wind",
+    "Earth",
+    "Seed",
+    "Root",
+    "Leaf",
+    "Sun",
+    "Moon"
+  ],
+  "V2": [
+    "Run",
+    "Kill",
+    "Grow",
+    "Burn",
+    "Flow",
+    "Rise",
+    "Fall",
+    "Break",
+    "Build",
+    "Bind"
+  ],
+  "V3": [
+    "Wall",
+    "Bone",
+    "Skin",
+    "Door",
+    "Path",
+    "Arch",
+    "Gate",
+    "Core",
+    "Frame",
+    "Shell"
+  ],
+  "V4": [
+    "Idea",
+    "Soul",
+    "Mind",
+    "Dream",
+    "Truth",
+    "Myth",
+    "Code",
+    "Law",
+    "Sign",
+    "Word"
+  ],
+  "V5": [
+    "King",
+    "Clan",
+    "Tribe",
+    "Folk",
+    "City",
+    "War",
+    "Peace",
+    "Love",
+    "Hate",
+    "Bond"
+  ],
+  "V6": [
+    "Logic",
+    "Nerve",
+    "Grid",
+    "Cell",
+    "Pulse",
+    "Gear",
+    "Flux",
+    "Data",
+    "Link",
+    "Mesh"
+  ],
+  "V7": [
+    "Void",
+    "Light",
+    "Dark",
+    "Time",
+    "Fate",
+    "God",
+    "End",
+    "Pure",
+    "One",
+    "All"
+  ]
+}
