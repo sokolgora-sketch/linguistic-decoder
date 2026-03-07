@@ -1,0 +1,86 @@
+{
+  "V1": [
+    "Stone",
+    "Door",
+    "Key",
+    "Lamp",
+    "Book",
+    "Wall",
+    "Chair",
+    "Table",
+    "Ring",
+    "Mask"
+  ],
+  "V2": [
+    "Run",
+    "Leap",
+    "Sing",
+    "Write",
+    "Build",
+    "Break",
+    "Hold",
+    "Find",
+    "Seek",
+    "Wait"
+  ],
+  "V3": [
+    "Dark",
+    "Cold",
+    "Fast",
+    "Slow",
+    "Hard",
+    "Soft",
+    "Blue",
+    "Red",
+    "Loud",
+    "Calm"
+  ],
+  "V4": [
+    "Truth",
+    "Love",
+    "Hate",
+    "Fear",
+    "Hope",
+    "Soul",
+    "Mind",
+    "Life",
+    "Death",
+    "Fate"
+  ],
+  "V5": [
+    "Fire",
+    "Water",
+    "Wind",
+    "Earth",
+    "Star",
+    "Moon",
+    "Sun",
+    "Leaf",
+    "Rain",
+    "Snow"
+  ],
+  "V6": [
+    "Code",
+    "Data",
+    "Link",
+    "Grid",
+    "Node",
+    "Byte",
+    "Flow",
+    "Core",
+    "Chip",
+    "Port"
+  ],
+  "V7": [
+    "Year",
+    "Hour",
+    "Past",
+    "Soon",
+    "Near",
+    "Far",
+    "Void",
+    "Edge",
+    "Peak",
+    "Deep"
+  ]
+}

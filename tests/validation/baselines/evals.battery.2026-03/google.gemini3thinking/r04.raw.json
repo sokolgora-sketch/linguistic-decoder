@@ -1,0 +1,86 @@
+{
+  "V1": [
+    "root",
+    "seed",
+    "source",
+    "birth",
+    "flow",
+    "light",
+    "breath",
+    "stone",
+    "wind",
+    "fire"
+  ],
+  "V2": [
+    "shape",
+    "bone",
+    "frame",
+    "line",
+    "edge",
+    "wall",
+    "cell",
+    "grid",
+    "node",
+    "arch"
+  ],
+  "V3": [
+    "build",
+    "move",
+    "grow",
+    "break",
+    "join",
+    "melt",
+    "turn",
+    "hold",
+    "give",
+    "take"
+  ],
+  "V4": [
+    "sight",
+    "sound",
+    "touch",
+    "smell",
+    "taste",
+    "cold",
+    "heat",
+    "dark",
+    "loud",
+    "soft"
+  ],
+  "V5": [
+    "logic",
+    "dream",
+    "truth",
+    "doubt",
+    "faith",
+    "myth",
+    "word",
+    "sign",
+    "code",
+    "idea"
+  ],
+  "V6": [
+    "law",
+    "king",
+    "war",
+    "peace",
+    "gold",
+    "city",
+    "folk",
+    "bond",
+    "rule",
+    "rank"
+  ],
+  "V7": [
+    "time",
+    "space",
+    "soul",
+    "void",
+    "fate",
+    "star",
+    "ghost",
+    "wild",
+    "deep",
+    "high"
+  ]
+}

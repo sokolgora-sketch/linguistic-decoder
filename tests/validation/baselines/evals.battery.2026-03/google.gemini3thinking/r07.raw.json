@@ -1,0 +1,86 @@
+{
+  "V1": [
+    "earth",
+    "fire",
+    "water",
+    "air",
+    "stone",
+    "sun",
+    "moon",
+    "star",
+    "wind",
+    "rain"
+  ],
+  "V2": [
+    "breath",
+    "blood",
+    "bone",
+    "seed",
+    "root",
+    "leaf",
+    "walk",
+    "sleep",
+    "eat",
+    "kill"
+  ],
+  "V3": [
+    "light",
+    "dark",
+    "cold",
+    "heat",
+    "loud",
+    "soft",
+    "red",
+    "blue",
+    "green",
+    "salt"
+  ],
+  "V4": [
+    "house",
+    "path",
+    "wall",
+    "door",
+    "gate",
+    "bridge",
+    "center",
+    "edge",
+    "north",
+    "south"
+  ],
+  "V5": [
+    "mother",
+    "father",
+    "child",
+    "friend",
+    "enemy",
+    "king",
+    "law",
+    "gift",
+    "war",
+    "peace"
+  ],
+  "V6": [
+    "mind",
+    "soul",
+    "thought",
+    "dream",
+    "truth",
+    "myth",
+    "word",
+    "sign",
+    "time",
+    "reason"
+  ],
+  "V7": [
+    "cosmos",
+    "system",
+    "logic",
+    "essence",
+    "theory",
+    "machine",
+    "void",
+    "spirit",
+    "rhythm",
+    "zero"
+  ]
+}

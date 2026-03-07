@@ -1,0 +1,86 @@
+{
+  "V1": [
+    "Root",
+    "Seed",
+    "Soil",
+    "Bone",
+    "Blood",
+    "Salt",
+    "Dark",
+    "Light",
+    "Cold",
+    "Heat"
+  ],
+  "V2": [
+    "River",
+    "Forest",
+    "Mountain",
+    "Valley",
+    "Animal",
+    "Season",
+    "Harvest",
+    "Hunter",
+    "Gather",
+    "Nomad"
+  ],
+  "V3": [
+    "Village",
+    "Kingdom",
+    "Border",
+    "Currency",
+    "Language",
+    "Custom",
+    "Ritual",
+    "Law",
+    "Weapon",
+    "Craft"
+  ],
+  "V4": [
+    "Science",
+    "History",
+    "Philosophy",
+    "Grammar",
+    "Music",
+    "Poetry",
+    "Ethics",
+    "Geometry",
+    "Physics",
+    "Alchemy"
+  ],
+  "V5": [
+    "Industry",
+    "Factory",
+    "Capital",
+    "Battery",
+    "Engine",
+    "Turbine",
+    "Camera",
+    "Cinema",
+    "Radio",
+    "Rocket"
+  ],
+  "V6": [
+    "Software",
+    "Hardware",
+    "Database",
+    "Compiler",
+    "Interface",
+    "Algorithm",
+    "Graphics",
+    "Password",
+    "Browser",
+    "Server"
+  ],
+  "V7": [
+    "Singularity",
+    "Metaverse",
+    "Cybernetic",
+    "Automation",
+    "Neural",
+    "Quantum",
+    "Hologram",
+    "Paradox",
+    "Universe",
+    "Infinity"
+  ]
+}
