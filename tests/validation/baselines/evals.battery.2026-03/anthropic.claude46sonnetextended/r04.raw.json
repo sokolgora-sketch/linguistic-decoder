@@ -1,0 +1,86 @@
+{
+  "V1": [
+    "is",
+    "am",
+    "be",
+    "exist",
+    "live",
+    "stand",
+    "rest",
+    "dwell",
+    "abide",
+    "remain"
+  ],
+  "V2": [
+    "run",
+    "push",
+    "flow",
+    "drive",
+    "pull",
+    "throw",
+    "strike",
+    "rush",
+    "leap",
+    "surge"
+  ],
+  "V3": [
+    "stone",
+    "earth",
+    "clay",
+    "bone",
+    "wood",
+    "iron",
+    "flesh",
+    "dust",
+    "ash",
+    "salt"
+  ],
+  "V4": [
+    "wide",
+    "vast",
+    "deep",
+    "far",
+    "open",
+    "broad",
+    "spread",
+    "reach",
+    "span",
+    "stretch"
+  ],
+  "V5": [
+    "grow",
+    "shift",
+    "turn",
+    "fade",
+    "burn",
+    "break",
+    "melt",
+    "bloom",
+    "wane",
+    "rise"
+  ],
+  "V6": [
+    "think",
+    "know",
+    "dream",
+    "sense",
+    "feel",
+    "grasp",
+    "mark",
+    "see",
+    "read",
+    "hold"
+  ],
+  "V7": [
+    "speak",
+    "call",
+    "name",
+    "sing",
+    "tell",
+    "cry",
+    "write",
+    "sound",
+    "word",
+    "voice"
+  ]
+}

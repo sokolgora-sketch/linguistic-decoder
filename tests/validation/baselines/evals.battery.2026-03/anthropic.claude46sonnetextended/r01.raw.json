@@ -1,0 +1,9 @@
+{
+  "V1": ["expand", "bloom", "grow", "spread", "widen", "swell", "extend", "unfold", "stretch", "amplify"],
+  "V2": ["force", "push", "drive", "thrust", "strike", "press", "surge", "impact", "crush", "pound"],
+  "V3": ["mass", "bulk", "weight", "dense", "thick", "solid", "heavy", "stone", "block", "core"],
+  "V4": ["flow", "drift", "glide", "spin", "leap", "rush", "crawl", "swing", "roll", "bounce"],
+  "V5": ["think", "know", "grasp", "sense", "recall", "judge", "reason", "infer", "ponder", "weigh"],
+  "V6": ["speak", "call", "name", "voice", "sing", "tell", "shout", "whisper", "echo", "declare"],
+  "V7": ["bind", "link", "join", "hold", "merge", "connect", "fuse", "attach", "knit", "weave"]
+}

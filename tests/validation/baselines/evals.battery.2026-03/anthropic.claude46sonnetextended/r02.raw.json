@@ -1,0 +1,86 @@
+{
+  "V1": [
+    "stone",
+    "clay",
+    "iron",
+    "wood",
+    "glass",
+    "bone",
+    "flesh",
+    "silk",
+    "dust",
+    "salt"
+  ],
+  "V2": [
+    "drift",
+    "glide",
+    "rush",
+    "crawl",
+    "spin",
+    "leap",
+    "flow",
+    "surge",
+    "roll",
+    "dart"
+  ],
+  "V3": [
+    "thrust",
+    "smash",
+    "strike",
+    "crush",
+    "rend",
+    "tear",
+    "drive",
+    "slam",
+    "shove",
+    "blast"
+  ],
+  "V4": [
+    "bloom",
+    "spread",
+    "swell",
+    "grow",
+    "burst",
+    "widen",
+    "unfold",
+    "stretch",
+    "open",
+    "rise"
+  ],
+  "V5": [
+    "bulk",
+    "weight",
+    "lump",
+    "heap",
+    "chunk",
+    "dense",
+    "thick",
+    "heavy",
+    "load",
+    "block"
+  ],
+  "V6": [
+    "think",
+    "grasp",
+    "know",
+    "sense",
+    "judge",
+    "doubt",
+    "recall",
+    "learn",
+    "reason",
+    "ponder"
+  ],
+  "V7": [
+    "cry",
+    "shout",
+    "sing",
+    "speak",
+    "call",
+    "whisper",
+    "laugh",
+    "moan",
+    "hum",
+    "roar"
+  ]
+}

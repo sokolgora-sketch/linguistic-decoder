@@ -1,0 +1,86 @@
+{
+  "V1": [
+    "expand",
+    "grow",
+    "rise",
+    "bloom",
+    "surge",
+    "spread",
+    "widen",
+    "swell",
+    "extend",
+    "stretch"
+  ],
+  "V2": [
+    "force",
+    "push",
+    "drive",
+    "thrust",
+    "strike",
+    "press",
+    "shove",
+    "kick",
+    "hurl",
+    "propel"
+  ],
+  "V3": [
+    "mass",
+    "bulk",
+    "weight",
+    "dense",
+    "thick",
+    "heavy",
+    "solid",
+    "stone",
+    "block",
+    "mound"
+  ],
+  "V4": [
+    "flow",
+    "drift",
+    "glide",
+    "slip",
+    "slide",
+    "stream",
+    "pour",
+    "leak",
+    "seep",
+    "trickle"
+  ],
+  "V5": [
+    "mind",
+    "think",
+    "know",
+    "grasp",
+    "sense",
+    "feel",
+    "judge",
+    "doubt",
+    "trust",
+    "believe"
+  ],
+  "V6": [
+    "speak",
+    "voice",
+    "call",
+    "shout",
+    "whisper",
+    "say",
+    "tell",
+    "name",
+    "claim",
+    "declare"
+  ],
+  "V7": [
+    "light",
+    "glow",
+    "shine",
+    "flash",
+    "spark",
+    "gleam",
+    "bright",
+    "beam",
+    "blaze",
+    "flicker"
+  ]
+}

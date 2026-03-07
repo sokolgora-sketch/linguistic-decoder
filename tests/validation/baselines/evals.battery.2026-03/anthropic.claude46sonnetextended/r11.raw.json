@@ -1,0 +1,86 @@
+{
+  "V1": [
+    "fire",
+    "stone",
+    "root",
+    "bone",
+    "seed",
+    "blood",
+    "earth",
+    "bark",
+    "ash",
+    "clay"
+  ],
+  "V2": [
+    "strike",
+    "pull",
+    "push",
+    "flow",
+    "break",
+    "fall",
+    "rise",
+    "burst",
+    "cut",
+    "throw"
+  ],
+  "V3": [
+    "mass",
+    "body",
+    "shell",
+    "core",
+    "edge",
+    "skin",
+    "grain",
+    "dust",
+    "vein",
+    "node"
+  ],
+  "V4": [
+    "bond",
+    "link",
+    "fork",
+    "join",
+    "chain",
+    "knot",
+    "loop",
+    "bridge",
+    "bind",
+    "weave"
+  ],
+  "V5": [
+    "see",
+    "hear",
+    "feel",
+    "know",
+    "mark",
+    "sense",
+    "read",
+    "trace",
+    "grasp",
+    "hold"
+  ],
+  "V6": [
+    "word",
+    "sign",
+    "sound",
+    "name",
+    "call",
+    "voice",
+    "tongue",
+    "code",
+    "glyph",
+    "signal"
+  ],
+  "V7": [
+    "void",
+    "null",
+    "whole",
+    "truth",
+    "pure",
+    "still",
+    "deep",
+    "open",
+    "bright",
+    "free"
+  ]
+}
