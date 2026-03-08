@@ -1,0 +1,86 @@
+{
+  "V1": [
+    "cat",
+    "dog",
+    "house",
+    "tree",
+    "car",
+    "book",
+    "pen",
+    "apple",
+    "ball",
+    "chair"
+  ],
+  "V2": [
+    "elephant",
+    "giraffe",
+    "monkey",
+    "tiger",
+    "lion",
+    "bird",
+    "fish",
+    "snake",
+    "frog",
+    "rabbit"
+  ],
+  "V3": [
+    "computer",
+    "keyboard",
+    "mouse",
+    "screen",
+    "printer",
+    "laptop",
+    "phone",
+    "tablet",
+    "camera",
+    "speaker"
+  ],
+  "V4": [
+    "mountain",
+    "river",
+    "ocean",
+    "forest",
+    "desert",
+    "island",
+    "valley",
+    "hill",
+    "lake",
+    "stream"
+  ],
+  "V5": [
+    "happy",
+    "sad",
+    "angry",
+    "joyful",
+    "excited",
+    "bored",
+    "tired",
+    "hungry",
+    "thirsty",
+    "sleepy"
+  ],
+  "V6": [
+    "run",
+    "jump",
+    "walk",
+    "swim",
+    "fly",
+    "eat",
+    "drink",
+    "sleep",
+    "read",
+    "write"
+  ],
+  "V7": [
+    "democracy",
+    "philosophy",
+    "science",
+    "mathematics",
+    "history",
+    "geography",
+    "biology",
+    "chemistry",
+    "physics",
+    "astronomy"
+  ]
+}

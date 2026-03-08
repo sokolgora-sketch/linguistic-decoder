@@ -1,0 +1,86 @@
+{
+  "V1": [
+    "apple",
+    "banana",
+    "cherry",
+    "date",
+    "elder",
+    "fig",
+    "grape",
+    "honey",
+    "ice",
+    "jam"
+  ],
+  "V2": [
+    "king",
+    "lemon",
+    "mango",
+    "nut",
+    "orange",
+    "pear",
+    "quince",
+    "raspberry",
+    "strawberry",
+    "tomato"
+  ],
+  "V3": [
+    "umbrella",
+    "violet",
+    "watermelon",
+    "xylophone",
+    "yam",
+    "zucchini",
+    "ant",
+    "bee",
+    "cat",
+    "dog"
+  ],
+  "V4": [
+    "elephant",
+    "fox",
+    "goat",
+    "horse",
+    "iguana",
+    "jaguar",
+    "kangaroo",
+    "lion",
+    "monkey",
+    "newt"
+  ],
+  "V5": [
+    "octopus",
+    "panda",
+    "quail",
+    "rabbit",
+    "snake",
+    "tiger",
+    "unicorn",
+    "vulture",
+    "whale",
+    "xenopus"
+  ],
+  "V6": [
+    "yak",
+    "zebra",
+    "airplane",
+    "boat",
+    "car",
+    "drum",
+    "egg",
+    "fish",
+    "guitar",
+    "hat"
+  ],
+  "V7": [
+    "ink",
+    "juice",
+    "kite",
+    "lamp",
+    "moon",
+    "nest",
+    "onion",
+    "pencil",
+    "queen",
+    "ring"
+  ]
+}

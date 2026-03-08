@@ -1,0 +1,86 @@
+{
+  "V1": [
+    "sunny",
+    "breeze",
+    "ocean",
+    "forest",
+    "valley",
+    "canyon",
+    "desert",
+    "island",
+    "meadow",
+    "prairie"
+  ],
+  "V2": [
+    "thunder",
+    "lightning",
+    "rainbow",
+    "snowflake",
+    "volcano",
+    "glacier",
+    "waterfall",
+    "horizon",
+    "twilight",
+    "aurora"
+  ],
+  "V3": [
+    "falcon",
+    "panther",
+    "cobra",
+    "raven",
+    "bison",
+    "whale",
+    "octopus",
+    "jaguar",
+    "lynx",
+    "condor"
+  ],
+  "V4": [
+    "marble",
+    "bronze",
+    "crystal",
+    "velvet",
+    "canvas",
+    "parchment",
+    "bamboo",
+    "cedar",
+    "ivory",
+    "ebony"
+  ],
+  "V5": [
+    "joyful",
+    "gloomy",
+    "fierce",
+    "peaceful",
+    "fearless",
+    "timid",
+    "boisterous",
+    "silent",
+    "curious",
+    "proud"
+  ],
+  "V6": [
+    "climb",
+    "swim",
+    "fly",
+    "crawl",
+    "sprint",
+    "wander",
+    "whisper",
+    "shout",
+    "create",
+    "destroy"
+  ],
+  "V7": [
+    "crimson",
+    "indigo",
+    "emerald",
+    "amber",
+    "violet",
+    "turquoise",
+    "magenta",
+    "onyx",
+    "ivory",
+    "slate"
+  ]
+}
