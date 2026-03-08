@@ -1,0 +1,86 @@
+{
+  "V1": [
+    "the",
+    "a",
+    "an",
+    "in",
+    "on",
+    "at",
+    "to",
+    "for",
+    "and",
+    "but"
+  ],
+  "V2": [
+    "cat",
+    "dog",
+    "house",
+    "car",
+    "book",
+    "tree",
+    "sun",
+    "moon",
+    "star",
+    "water"
+  ],
+  "V3": [
+    "run",
+    "jump",
+    "eat",
+    "drink",
+    "sleep",
+    "walk",
+    "talk",
+    "see",
+    "hear",
+    "feel"
+  ],
+  "V4": [
+    "big",
+    "small",
+    "red",
+    "blue",
+    "happy",
+    "sad",
+    "fast",
+    "slow",
+    "hot",
+    "cold"
+  ],
+  "V5": [
+    "love",
+    "hate",
+    "peace",
+    "war",
+    "life",
+    "death",
+    "time",
+    "space",
+    "energy",
+    "matter"
+  ],
+  "V6": [
+    "atom",
+    "molecule",
+    "cell",
+    "gene",
+    "quantum",
+    "photon",
+    "electron",
+    "proton",
+    "neutron",
+    "nucleus"
+  ],
+  "V7": [
+    "abnegation",
+    "abrogate",
+    "abstemious",
+    "abstruse",
+    "accede",
+    "accelerando",
+    "accolade",
+    "accordion",
+    "accost",
+    "accredit"
+  ]
+}

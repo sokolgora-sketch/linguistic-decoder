@@ -1,0 +1,86 @@
+{
+  "V1": [
+    "the",
+    "and",
+    "for",
+    "you",
+    "are",
+    "can",
+    "has",
+    "not",
+    "but",
+    "with"
+  ],
+  "V2": [
+    "cat",
+    "dog",
+    "run",
+    "jump",
+    "blue",
+    "red",
+    "big",
+    "small",
+    "happy",
+    "sad"
+  ],
+  "V3": [
+    "house",
+    "car",
+    "tree",
+    "book",
+    "water",
+    "fire",
+    "earth",
+    "wind",
+    "love",
+    "hate"
+  ],
+  "V4": [
+    "apple",
+    "bird",
+    "fish",
+    "moon",
+    "sun",
+    "star",
+    "cloud",
+    "rain",
+    "snow",
+    "ice"
+  ],
+  "V5": [
+    "quick",
+    "slow",
+    "high",
+    "low",
+    "loud",
+    "soft",
+    "bright",
+    "dark",
+    "sweet",
+    "sour"
+  ],
+  "V6": [
+    "time",
+    "space",
+    "mind",
+    "soul",
+    "peace",
+    "war",
+    "life",
+    "death",
+    "hope",
+    "fear"
+  ],
+  "V7": [
+    "galaxy",
+    "quantum",
+    "nebula",
+    "echo",
+    "phantom",
+    "mystic",
+    "cryptic",
+    "zenith",
+    "abyss",
+    "oracle"
+  ]
+}

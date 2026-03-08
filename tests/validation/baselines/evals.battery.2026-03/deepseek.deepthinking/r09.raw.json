@@ -1,0 +1,86 @@
+{
+  "V1": [
+    "cat",
+    "dog",
+    "bird",
+    "fish",
+    "lion",
+    "tiger",
+    "bear",
+    "wolf",
+    "fox",
+    "deer"
+  ],
+  "V2": [
+    "frog",
+    "snake",
+    "mouse",
+    "rat",
+    "rabbit",
+    "horse",
+    "cow",
+    "pig",
+    "sheep",
+    "goat"
+  ],
+  "V3": [
+    "duck",
+    "hen",
+    "chick",
+    "bee",
+    "ant",
+    "spider",
+    "fly",
+    "bug",
+    "worm",
+    "tree"
+  ],
+  "V4": [
+    "flower",
+    "grass",
+    "leaf",
+    "root",
+    "stem",
+    "branch",
+    "bush",
+    "vine",
+    "fruit",
+    "apple"
+  ],
+  "V5": [
+    "banana",
+    "orange",
+    "grape",
+    "berry",
+    "peach",
+    "pear",
+    "plum",
+    "lemon",
+    "lime",
+    "cherry"
+  ],
+  "V6": [
+    "melon",
+    "water",
+    "fire",
+    "earth",
+    "wind",
+    "air",
+    "sky",
+    "cloud",
+    "rain",
+    "snow"
+  ],
+  "V7": [
+    "ice",
+    "sun",
+    "moon",
+    "star",
+    "planet",
+    "rock",
+    "stone",
+    "sand",
+    "dirt",
+    "mud"
+  ]
+}
