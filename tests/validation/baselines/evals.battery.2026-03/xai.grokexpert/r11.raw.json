@@ -1,0 +1,86 @@
+{
+  "V1": [
+    "apple",
+    "zebra",
+    "quick",
+    "brown",
+    "fox",
+    "jumps",
+    "over",
+    "lazy",
+    "dog",
+    "river"
+  ],
+  "V2": [
+    "cloud",
+    "storm",
+    "thunder",
+    "lightning",
+    "rain",
+    "wind",
+    "snow",
+    "frost",
+    "mist",
+    "fog"
+  ],
+  "V3": [
+    "mountain",
+    "valley",
+    "ocean",
+    "forest",
+    "desert",
+    "island",
+    "canyon",
+    "glacier",
+    "volcano",
+    "plain"
+  ],
+  "V4": [
+    "happy",
+    "sad",
+    "angry",
+    "calm",
+    "brave",
+    "scared",
+    "proud",
+    "shy",
+    "wild",
+    "gentle"
+  ],
+  "V5": [
+    "fire",
+    "water",
+    "earth",
+    "air",
+    "metal",
+    "wood",
+    "stone",
+    "glass",
+    "gold",
+    "silver"
+  ],
+  "V6": [
+    "night",
+    "dawn",
+    "dusk",
+    "noon",
+    "midnight",
+    "sunrise",
+    "sunset",
+    "twilight",
+    "morning",
+    "evening"
+  ],
+  "V7": [
+    "dream",
+    "hope",
+    "fear",
+    "love",
+    "hate",
+    "trust",
+    "doubt",
+    "truth",
+    "lie",
+    "fate"
+  ]
+}

@@ -1,0 +1,86 @@
+{
+  "V1": [
+    "cat",
+    "dog",
+    "run",
+    "jump",
+    "eat",
+    "sleep",
+    "house",
+    "tree",
+    "car",
+    "book"
+  ],
+  "V2": [
+    "apple",
+    "banana",
+    "chair",
+    "table",
+    "window",
+    "door",
+    "bird",
+    "fish",
+    "sun",
+    "moon"
+  ],
+  "V3": [
+    "mountain",
+    "river",
+    "ocean",
+    "forest",
+    "animal",
+    "plant",
+    "flower",
+    "grass",
+    "sky",
+    "cloud"
+  ],
+  "V4": [
+    "computer",
+    "internet",
+    "phone",
+    "music",
+    "movie",
+    "game",
+    "sport",
+    "team",
+    "player",
+    "coach"
+  ],
+  "V5": [
+    "government",
+    "economy",
+    "society",
+    "culture",
+    "history",
+    "science",
+    "math",
+    "physics",
+    "chemistry",
+    "biology"
+  ],
+  "V6": [
+    "philosophy",
+    "psychology",
+    "sociology",
+    "anthropology",
+    "archaeology",
+    "astronomy",
+    "geology",
+    "meteorology",
+    "oceanography",
+    "paleontology"
+  ],
+  "V7": [
+    "epistemology",
+    "ontology",
+    "metaphysics",
+    "phenomenology",
+    "existentialism",
+    "utilitarianism",
+    "deontology",
+    "nihilism",
+    "absurdism",
+    "stoicism"
+  ]
+}

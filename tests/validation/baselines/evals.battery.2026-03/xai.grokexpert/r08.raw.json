@@ -1,0 +1,86 @@
+{
+  "V1": [
+    "apple",
+    "zebra",
+    "quick",
+    "fox",
+    "jump",
+    "over",
+    "lazy",
+    "dog",
+    "bright",
+    "moon"
+  ],
+  "V2": [
+    "river",
+    "stone",
+    "cloud",
+    "wind",
+    "flame",
+    "shadow",
+    "spark",
+    "dust",
+    "wave",
+    "peak"
+  ],
+  "V3": [
+    "tiger",
+    "eagle",
+    "whale",
+    "snake",
+    "bear",
+    "wolf",
+    "hawk",
+    "deer",
+    "crow",
+    "lynx"
+  ],
+  "V4": [
+    "gold",
+    "silver",
+    "copper",
+    "iron",
+    "steel",
+    "bronze",
+    "platinum",
+    "nickel",
+    "titanium",
+    "mercury"
+  ],
+  "V5": [
+    "blue",
+    "crimson",
+    "violet",
+    "emerald",
+    "amber",
+    "indigo",
+    "scarlet",
+    "turquoise",
+    "ochre",
+    "sable"
+  ],
+  "V6": [
+    "forge",
+    "carve",
+    "weave",
+    "grind",
+    "shape",
+    "build",
+    "paint",
+    "write",
+    "dance",
+    "sing"
+  ],
+  "V7": [
+    "truth",
+    "honor",
+    "valor",
+    "grace",
+    "faith",
+    "hope",
+    "love",
+    "peace",
+    "wisdom",
+    "courage"
+  ]
+}
