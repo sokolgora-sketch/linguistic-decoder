@@ -1,0 +1,86 @@
+{
+  "V1": [
+    "cat",
+    "dog",
+    "sun",
+    "moon",
+    "tree",
+    "car",
+    "book",
+    "house",
+    "water",
+    "fire"
+  ],
+  "V2": [
+    "bird",
+    "fish",
+    "horse",
+    "flower",
+    "cloud",
+    "rain",
+    "snow",
+    "wind",
+    "earth",
+    "star"
+  ],
+  "V3": [
+    "ocean",
+    "mountain",
+    "river",
+    "forest",
+    "desert",
+    "island",
+    "volcano",
+    "valley",
+    "cave",
+    "cliff"
+  ],
+  "V4": [
+    "courage",
+    "wisdom",
+    "justice",
+    "freedom",
+    "mercy",
+    "honor",
+    "glory",
+    "peace",
+    "truth",
+    "love"
+  ],
+  "V5": [
+    "atom",
+    "molecule",
+    "cell",
+    "gene",
+    "quantum",
+    "photon",
+    "electron",
+    "proton",
+    "neutron",
+    "nucleus"
+  ],
+  "V6": [
+    "syzygy",
+    "zephyr",
+    "myriad",
+    "ephemeral",
+    "ethereal",
+    "luminous",
+    "incandescent",
+    "iridescent",
+    "opalescent",
+    "translucent"
+  ],
+  "V7": [
+    "quintessential",
+    "ubiquitous",
+    "cacophony",
+    "serendipity",
+    "melancholy",
+    "nostalgia",
+    "euphoria",
+    "labyrinth",
+    "mosaic",
+    "paradox"
+  ]
+}

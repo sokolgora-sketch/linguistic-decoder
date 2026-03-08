@@ -1,0 +1,86 @@
+{
+  "V1": [
+    "the",
+    "a",
+    "is",
+    "in",
+    "on",
+    "at",
+    "for",
+    "to",
+    "and",
+    "but"
+  ],
+  "V2": [
+    "cat",
+    "dog",
+    "house",
+    "car",
+    "book",
+    "tree",
+    "sun",
+    "moon",
+    "star",
+    "water"
+  ],
+  "V3": [
+    "happy",
+    "sad",
+    "big",
+    "small",
+    "fast",
+    "slow",
+    "hot",
+    "cold",
+    "new",
+    "old"
+  ],
+  "V4": [
+    "run",
+    "walk",
+    "jump",
+    "talk",
+    "see",
+    "hear",
+    "eat",
+    "drink",
+    "sleep",
+    "wake"
+  ],
+  "V5": [
+    "beautiful",
+    "intelligent",
+    "creative",
+    "diligent",
+    "patient",
+    "gentle",
+    "honest",
+    "loyal",
+    "brave",
+    "kind"
+  ],
+  "V6": [
+    "algorithm",
+    "quantum",
+    "photosynthesis",
+    "metamorphosis",
+    "heterogeneous",
+    "homogeneous",
+    "synchronization",
+    "implementation",
+    "collaboration",
+    "innovation"
+  ],
+  "V7": [
+    "xenophobia",
+    "zeitgeist",
+    "sycophant",
+    "oligarchy",
+    "plutocracy",
+    "anachronism",
+    "juxtaposition",
+    "quintessential",
+    "ubiquitous",
+    "vernacular"
+  ]
+}

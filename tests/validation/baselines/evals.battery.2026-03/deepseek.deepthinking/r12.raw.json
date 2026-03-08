@@ -1,0 +1,86 @@
+{
+  "V1": [
+    "cat",
+    "dog",
+    "sun",
+    "car",
+    "book",
+    "house",
+    "tree",
+    "water",
+    "fire",
+    "air"
+  ],
+  "V2": [
+    "man",
+    "woman",
+    "child",
+    "bird",
+    "fish",
+    "flower",
+    "grass",
+    "rock",
+    "sand",
+    "cloud"
+  ],
+  "V3": [
+    "apple",
+    "orange",
+    "banana",
+    "grape",
+    "lemon",
+    "peach",
+    "pear",
+    "plum",
+    "berry",
+    "melon"
+  ],
+  "V4": [
+    "red",
+    "blue",
+    "green",
+    "yellow",
+    "black",
+    "white",
+    "purple",
+    "brown",
+    "pink",
+    "gray"
+  ],
+  "V5": [
+    "run",
+    "jump",
+    "walk",
+    "sit",
+    "stand",
+    "eat",
+    "drink",
+    "sleep",
+    "talk",
+    "listen"
+  ],
+  "V6": [
+    "happy",
+    "sad",
+    "angry",
+    "tired",
+    "hungry",
+    "thirsty",
+    "scared",
+    "brave",
+    "calm",
+    "silly"
+  ],
+  "V7": [
+    "computer",
+    "telephone",
+    "television",
+    "refrigerator",
+    "automobile",
+    "helicopter",
+    "submarine",
+    "microscope",
+    "telescope",
+    "dictionary"
+  ]
+}
