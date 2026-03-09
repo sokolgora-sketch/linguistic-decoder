@@ -1,4 +1,4 @@
-# ZË-RO — Linguistic Decoder
+# ZË-RO — Linguistic Analysis Instrument
 
 *A deterministic seven-vowel analysis instrument (orthography + optional IPA) with evidence-first telemetry and baseline-locked research harnesses.*
 
@@ -7,37 +7,56 @@
 
 ---
 
-## 📄 Published Research
+## Published Research
 
 **Paper:** [ZË-RO v0.1: A Deterministic Orthography Aperture Meter with Baseline-Locked Drift Detection](https://ling.auf.net/lingbuzz/009799)  
 **Author:** Sokol Gora  
 **Published:** LingBuzz, February 2026  
-**Reference:** lingbuzz/009799
+**Reference:** `lingbuzz/009799`
 
-This repository contains the implementation, datasets, and reproducibility infrastructure described in the paper.
+**Note:** [ZË-RO v0.2 Note: Morphological Masking & Recovery in Albanian200 (Controlled Ablation)](https://ling.auf.net/lingbuzz/009808)  
+**Author:** Sokol Gora  
+**Published:** LingBuzz, March 2026  
+**Reference:** `lingbuzz/009808`
+
+This repository contains the implementation, datasets, and reproducibility infrastructure described in those releases.
 
 ---
-```
+
+## Start here
+
+If you are new to the repo, read in this order:
+
+1. `docs/README.md`
+2. `docs/constitution/README.md`
+3. `docs/research/README.md`
+4. `docs/evals/`
+
+This is the shortest path to understanding:
+- what ZË-RO is
+- what is governed as stable
+- what is research-facing
+- what is eval-harness output
 
 ---
 
 ## What this repo is
 
-ZË-RO is a **calibration-grade decoder** for vowel-carrier structure in words.
+ZË-RO is a **calibration-grade linguistic analysis instrument** for vowel-carrier structure in words.
 
-It is designed to **measure**, **reproduce**, and **catch drift** — not to “sound right”.
+It is designed to **measure**, **reproduce**, and **catch drift** — not to merely “sound right”.
 
 Deterministic core behaviors:
 
-1) **Extract a 7-vowel “voice path”** using only: **A, E, I, O, U, Y, Ë**
+1. **Extract a 7-vowel voice path** using only: **A, E, I, O, U, Y, Ë**
    - from **orthography** (spelling)
    - from **phonetics** when an **IPA string** is provided (optional)
 
-2) **Detect Mask vs Carrier divergence**
+2. **Detect Mask vs Carrier divergence**
    - if spelling path ≠ IPA carrier path, the UI marks **DIVERGE**
 
-3) **Emit audit-friendly telemetry**
-   - evidence-first output (stable references)
+3. **Emit audit-friendly telemetry**
+   - evidence-first output
    - explicit “not emitted” instead of silent nulls
    - research harnesses write **MD + JSON** reports
 
@@ -107,7 +126,7 @@ These are committed baselines used for drift detection.
 
 High-level notes:
 - Turkish presence-mean slope remains extremely strong at STEP10 and STEP20, and strengthens under expansion.
-- Taiwan suite is designed to show fragile signal weakening under expansion (null / drift visibility).
+- Taiwan suite is designed to show fragile signal weakening under expansion.
 
 ---
 
@@ -161,4 +180,3 @@ GNU Affero General Public License v3.0 (AGPL-3.0). See `LICENSE`.
   - fixtures: tests/research/corpus70.meta.v0.1.gemini.json; tests/research/corpus70.meta.v0.1.claude-blind.json
   - spectrogram override: SPECTROGRAM_CORPUS70_META (tests/research/spectrogram.v0.2.spec.ts)
 <!-- DF_PUBLICATIONS_END -->
-
