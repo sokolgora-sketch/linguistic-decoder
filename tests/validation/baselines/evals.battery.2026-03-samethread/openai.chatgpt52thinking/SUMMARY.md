@@ -50,6 +50,37 @@ This gives a same-thread battery where every run is conditioned on the previous 
 
 ---
 
+## Exact thread initialization prompt
+
+Before `r01`, the provider chat was initialized with this exact message:
+
+> OpenAI same-thread feedback adaptation battery.  
+> This thread is dedicated to runs r01–r10 for `T2_LADDER_V0_1` only.  
+> After each run, I will paste back the previous scored result and previous JSON, then request the same task again.  
+> You must return STRICT JSON only when the test prompt is given.  
+> Do not explain.
+
+This message was **not** the eval task itself. It only established the protocol for the thread.
+
+Immediately after that, `r01` used the **actual task prompt copied from `/evals`**.
+
+So the thread structure was:
+
+1. Protocol banner (the message above)
+2. Exact `T2_LADDER_V0_1` task prompt from `/evals`
+3. Model returns JSON
+4. JSON is scored in `/evals`
+5. For `r02+`, the previous score block and previous JSON are fed back into the same chat, followed by the same task request again
+
+This distinction matters:
+
+- the **banner** defines the conversation contract
+- the **task prompt** defines the semantic ladder task being scored
+
+The same structure was used for all same-thread provider batteries, with only the provider name changed in the banner.
+
+---
+
 ## Why we used one continuing thread
 
 We intentionally reused **one single conversation thread** for all 10 runs.
