@@ -21,6 +21,10 @@ For governing rules, read:
 ### Evaluation summaries
 - [Cross-Provider Comparison — March 2026](../evals/battery.2026-03.cross-provider-comparison.md)
 
+### Control / sensitivity notes
+- [Corpus70 A/B — Tagger Sensitivity Check (Gemini-blind vs Claude-blind)](../lingbuzz/spectrogram.corpus70.ab.v0.1.md)
+- [Corpus70 A/B/C/D — Multi-tagger Sensitivity (Gemini vs Claude vs ChatGPT vs Grok)](../lingbuzz/spectrogram.corpus70.abcd.v0.1.md)
+
 ## Publication lock records
 
 These stay under `docs/lingbuzz/` because they are release-lock metadata, not the research note itself:
