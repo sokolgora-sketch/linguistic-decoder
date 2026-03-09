@@ -48,9 +48,27 @@ At the current stage of the repo, the constitutional direction is:
 5. Heart / instrument truth outranks downstream interpretation layers when they disagree.
 6. Research notes are descriptive artifacts, not engine law.
 
-## Current source candidates
+## Current governing reference docs
 
-The following existing repo docs contain constitutional material and should later be consolidated or promoted into this folder:
+These are the current repo-native governing docs and should be read first:
+
+- [`docs/ZERO_REALITY_GUIDE.md`](../ZERO_REALITY_GUIDE.md)  
+  Defines the deterministic posture, authority chain, layer separation, and success conditions.
+
+- [`docs/ENGINE_CONTRACT_FREEZE.md`](../ENGINE_CONTRACT_FREEZE.md)  
+  Defines the frozen public engine contract, evidence-chain rules, and canon lock policy.
+
+- [`docs/ROADMAP_V1_BOUNDARY.md`](../ROADMAP_V1_BOUNDARY.md)  
+  Defines what counts as ZË-RO v1.0 and what is explicitly post-v1.
+
+## Supporting but non-constitutional reference
+
+- [`docs/CHANGELOG.md`](../CHANGELOG.md)  
+  Historical record of changes affecting determinism posture, contract shape, and canon/testing expectations.
+
+## Candidate constitutional material still living outside this folder
+
+The following existing repo docs contain constitutional material and may later be consolidated or promoted into this folder:
 
 - `docs/milestones/CANONICAL_PRINCIPLES_OUTPUT_CONTRACT_v0.1.1.md`
 - `docs/milestones/MIND_OBEYS_HEARTINSTRUMENT_SURFACE_MATH_v0.1.1.md`
@@ -58,4 +76,4 @@ The following existing repo docs contain constitutional material and should late
 ## Status
 
 This folder is being established as canonical structure.  
-Additional stable constitution docs will be added here in later cleanup steps.
+For now, this README acts as the constitution index and points to the current governing documents already present in the repo.
