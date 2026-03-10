@@ -133,6 +133,12 @@ This docs tree is being cleaned so that:
 
 - constitutional truth lives in `docs/constitution/`
 - research notes live in `docs/research/`
+- UI contract docs live in `docs/ui/`
+- validation artifacts live in `docs/validation/`
+- canon battery references live in `docs/canon/`
+- contract-facing achieved records live in `docs/contracts/`
+- active spec/reference docs live in `docs/specs/`
+- workflow/process guidance lives in `docs/process/`
 - generated eval summaries live in `docs/evals/`
 - milestone delivery history stays in `docs/milestones/`
 - historical drafts move to `docs/archive/`
@@ -145,6 +151,14 @@ At this stage, the repo should be read in this order:
 2. `docs/README.md`
 3. `docs/constitution/README.md`
 4. core reference docs (`ROADMAP_V1_BOUNDARY.md`, `ENGINE_CONTRACT_FREEZE.md`, `ZERO_REALITY_GUIDE.md`, `RECOVERY.md`)
-5. `docs/evals/`
-6. `docs/milestones/` as implementation history
-7. `docs/archive/` only when historical context is needed
+5. lane indexes relevant to your question:
+   - `docs/research/README.md`
+   - `docs/ui/README.md`
+   - `docs/validation/README.md`
+   - `docs/canon/README.md`
+   - `docs/contracts/README.md`
+   - `docs/specs/README.md`
+   - `docs/process/README.md`
+6. `docs/evals/`
+7. `docs/milestones/` as implementation history
+8. `docs/archive/` only when historical context is needed
