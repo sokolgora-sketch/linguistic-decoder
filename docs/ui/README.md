@@ -38,7 +38,12 @@ Use this for:
 These are important, but they are not the primary entrypoint for UI contract reading:
 
 - `../UI_TELEMETRY_CONTRACT_v0.1_DONE.md`
+  - older DONE-criteria / final-checklist style record
+
 - `../contracts/UI_Telemetry_Contract_v0.1_DONE.md`
+  - achieved-state / proof-oriented DONE record
+  - currently the more complete historical proof doc of the two
+
 - `../milestones/ui-telemetry-contract-v0.1.md`
 - `../milestones/UI_TELEMETRY_v0.1.2_FROZEN.md`
 - `UI_INSTRUMENT_CONTRACT.v0.1.md`
@@ -55,11 +60,12 @@ If you need to understand the UI contract surface, read in this order:
 
 1. `../ui-telemetry-contract.v0.1.md`
 2. `./UI_INSTRUMENT_CONTRACT.v0.1.1.md`
-3. historical proof / milestone docs only if needed
+3. `../contracts/UI_Telemetry_Contract_v0.1_DONE.md`
+4. other historical proof / milestone docs only if needed
 
 ## Rule
 
 When a UI doc conflict appears:
 - prefer the current contract doc over milestone prose
-- prefer semantic contract over “DONE” records
+- prefer semantic contract over DONE records
 - prefer adapter/VM discipline over older ad-hoc UI notes
