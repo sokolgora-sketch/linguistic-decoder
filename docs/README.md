@@ -104,6 +104,15 @@ Use this for:
 - structural and subsystem design references
 - implementation-facing technical definitions
 
+### `docs/process/`
+Workflow, versioning, and operational-process docs for safe and repeatable repo work.
+
+Use this for:
+- dev workflow guidance
+- versioning and snapshot policy
+- change-control habits
+- operational anti-drift process
+
 ### `docs/milestones/`
 Implementation milestones, frozen milestone notes, and delivery checkpoints.
 
