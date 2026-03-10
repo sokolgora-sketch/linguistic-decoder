@@ -78,6 +78,23 @@ Use this for:
 - baseline vs current artifact inspection
 - drift / regression checkpoints
 
+### `docs/canon/`
+Canon-battery specs and deterministic small-battery drift references.
+
+Use this for:
+- canon battery specs
+- train / holdout canon references
+- canon-specific diff expectations
+- deterministic small-battery regression tripwires
+
+### `docs/contracts/`
+Achieved or locked contract-facing reference records.
+
+Use this for:
+- achieved contract records
+- locked done-state contract references
+- contract-facing proof records preserved outside milestone prose
+
 ### `docs/milestones/`
 Implementation milestones, frozen milestone notes, and delivery checkpoints.
 
