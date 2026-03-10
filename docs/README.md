@@ -69,6 +69,15 @@ Use this for:
 - instrument rendering / adapter discipline
 - UI safety / UI-specific contract rules
 
+### `docs/validation/`
+Validation-facing reports, canon diffs, and baseline/current artifact checks.
+
+Use this for:
+- latest validation reports
+- canon diff reports
+- baseline vs current artifact inspection
+- drift / regression checkpoints
+
 ### `docs/milestones/`
 Implementation milestones, frozen milestone notes, and delivery checkpoints.
 
