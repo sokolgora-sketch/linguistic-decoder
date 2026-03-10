@@ -95,6 +95,15 @@ Use this for:
 - locked done-state contract references
 - contract-facing proof records preserved outside milestone prose
 
+### `docs/specs/`
+Active specification and reference-design docs for system structure, engine surfaces, and subsystem behavior.
+
+Use this for:
+- active spec/reference docs
+- engine/export/reference-design surfaces
+- structural and subsystem design references
+- implementation-facing technical definitions
+
 ### `docs/milestones/`
 Implementation milestones, frozen milestone notes, and delivery checkpoints.
 
