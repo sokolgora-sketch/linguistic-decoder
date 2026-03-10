@@ -61,6 +61,9 @@ These are the current repo-native governing docs and should be read first:
 - [`docs/ROADMAP_V1_BOUNDARY.md`](../ROADMAP_V1_BOUNDARY.md)  
   Defines what counts as ZË-RO v1.0 and what is explicitly post-v1.
 
+- [`docs/RECOVERY.md`](../RECOVERY.md)  
+  Defines the PR-only recovery playbook and safe repo repair moves when local Git state becomes misleading.
+
 ## Supporting but non-constitutional reference
 
 - [`docs/CHANGELOG.md`](../CHANGELOG.md)  

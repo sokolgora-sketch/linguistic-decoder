@@ -72,6 +72,7 @@ Historical or superseded docs kept for reference but no longer treated as canoni
 - [v1.0 Boundary](./ROADMAP_V1_BOUNDARY.md)
 - [Engine Contract Freeze](./ENGINE_CONTRACT_FREEZE.md)
 - [Reality Guide v1](./ZERO_REALITY_GUIDE.md)
+- [Recovery Playbook](./RECOVERY.md)
 - [CHANGELOG](./CHANGELOG.md)
 
 ## Current cleanup direction
@@ -91,7 +92,7 @@ At this stage, the repo should be read in this order:
 1. `README.md`
 2. `docs/README.md`
 3. `docs/constitution/README.md`
-4. core reference docs (`ROADMAP_V1_BOUNDARY.md`, `ENGINE_CONTRACT_FREEZE.md`, `ZERO_REALITY_GUIDE.md`)
+4. core reference docs (`ROADMAP_V1_BOUNDARY.md`, `ENGINE_CONTRACT_FREEZE.md`, `ZERO_REALITY_GUIDE.md`, `RECOVERY.md`)
 5. `docs/evals/`
 6. `docs/milestones/` as implementation history
 7. `docs/archive/` only when historical context is needed
