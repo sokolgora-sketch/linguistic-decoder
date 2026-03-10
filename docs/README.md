@@ -61,6 +61,14 @@ Use this for:
 - comparative findings
 - controlled experiments
 
+### `docs/ui/`
+UI-facing contracts and instrument rendering rules.
+
+Use this for:
+- UI telemetry contract docs
+- instrument rendering / adapter discipline
+- UI safety / UI-specific contract rules
+
 ### `docs/milestones/`
 Implementation milestones, frozen milestone notes, and delivery checkpoints.
 
