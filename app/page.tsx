@@ -1,4 +1,4 @@
-import { LandingPageV0_1 } from "@/components/landing/LandingPage.v0.1";
+import { LandingPageV0_2 } from "@/components/landing/LandingPage.v0.2";
 
 export const metadata = {
   title: "ZË-RO — Deterministic Vowel-Aperture Grounding Probe",
@@ -7,5 +7,5 @@ export const metadata = {
 };
 
 export default function Page() {
-  return <LandingPageV0_1 />;
+  return <LandingPageV0_2 />;
 }
