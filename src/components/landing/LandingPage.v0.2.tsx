@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { ArrowRight, ChevronRight, ExternalLink, Lock } from "lucide-react";
+import { ArrowRight, ExternalLink, Lock } from "lucide-react";
 
 import {
   Accordion,
@@ -56,9 +56,9 @@ type LlmProviderRow = {
 
 type LlmPaper = {
   id: string;
-  tab: string;
+  tabLabel: string;
+  tabDetail: string;
   title: string;
-  subtitle: string;
   note?: string;
   badges: string[];
   summary: string;
@@ -131,10 +131,10 @@ const BASELINES: BaselineCard[] = [
     subtitle: "Gegë vs Tosk replication (baseline-locked)",
     tone: "red",
     rows: [
-      { key: "Bucket means", value: "committed" },
-      { key: "Dialect pairing", value: "70 pairs" },
-      { key: "Slope stats", value: "add next" },
-    ],
+        { key: "Pearson r", value: "−0.989" },
+        { key: "Spearman ρ", value: "−1.000" },
+        { key: "p_perm", value: "< 0.001" },
+      ],
     note: "N=140 (paired; baseline-locked)",
   },
   {
@@ -155,9 +155,9 @@ const BASELINES: BaselineCard[] = [
 const LLM_PAPERS: LlmPaper[] = [
   {
     id: "paper1",
-    tab: "Paper 1",
-    title: "Fresh-chat · n=12 runs each",
-    subtitle: "Paper v0.1 snapshot · not live data",
+      tabLabel: "FRESH-CHAT",
+      tabDetail: "12 independent sessions per provider",
+      title: "Fresh-chat · n=12 runs each",
     summary: "Source: LingBuzz/009799",
     badges: ["fresh-chat", "paper v0.1", "snapshot"],
     providers: [
@@ -200,9 +200,9 @@ const LLM_PAPERS: LlmPaper[] = [
   },
   {
     id: "paper2",
-    tab: "Paper 2",
-    title: "Same-thread · n=10 runs each",
-    subtitle: "Paper v0.1 snapshot · not live data",
+      tabLabel: "SAME-THREAD",
+      tabDetail: "10 sequential turns per provider",
+      title: "Same-thread · n=10 runs each",
     summary: "Source: LingBuzz/009808",
     badges: ["same-thread", "paper v0.1", "snapshot"],
     providers: [
@@ -361,9 +361,9 @@ function LandingButton(props: {
       type="button"
       disabled
       className={cn(
-        "inline-flex items-center gap-2 rounded-md border px-4 py-2 text-sm uppercase tracking-[0.12em] transition",
+        "inline-flex w-full items-center justify-center gap-2 rounded-md border px-4 py-2 text-sm uppercase tracking-[0.12em] transition sm:w-auto",
         "font-mono",
-        "border-[#686868] bg-[#232323] text-neutral-500"
+        "border-[#686868] bg-[#232323] text-neutral-300"
       )}
     >
       {props.label}
@@ -375,7 +375,7 @@ function LandingButton(props: {
       target="_blank"
       rel="noreferrer"
       className={cn(
-        "inline-flex items-center gap-2 rounded-md border px-4 py-2 text-sm uppercase tracking-[0.12em] transition",
+        "inline-flex w-full items-center justify-center gap-2 rounded-md border px-4 py-2 text-sm uppercase tracking-[0.12em] transition sm:w-auto",
         "font-mono border-[#686868] bg-[#232323] text-[#f5f5f5] hover:border-[#d93333]"
       )}
     >
@@ -386,7 +386,7 @@ function LandingButton(props: {
     <Link
       href={props.href ?? "#"}
       className={cn(
-        "inline-flex items-center gap-2 rounded-md border px-4 py-2 text-sm uppercase tracking-[0.12em] transition",
+        "inline-flex w-full items-center justify-center gap-2 rounded-md border px-4 py-2 text-sm uppercase tracking-[0.12em] transition sm:w-auto",
         "font-mono",
         props.label === "Try Evals"
           ? "border-[#d93333] bg-[#d93333] text-white hover:opacity-90"
@@ -405,10 +405,19 @@ function LandingButton(props: {
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <span>{buttonBody}</span>
+        <span
+          tabIndex={props.disabled ? 0 : undefined}
+          aria-label={props.tooltip}
+          className="inline-flex w-full sm:w-auto"
+        >
+          {buttonBody}
+        </span>
       </TooltipTrigger>
       <TooltipContent
-        className="border-[#686868] bg-[#232323] text-[11px] font-mono uppercase tracking-[0.12em] text-neutral-200"
+        side="top"
+        align="center"
+        sideOffset={10}
+        className="max-w-[260px] border-[#686868] bg-[#1a1a1a] px-3 py-2 text-[0.75rem] leading-5 font-mono normal-case tracking-normal text-neutral-300"
       >
         {props.tooltip}
       </TooltipContent>
@@ -422,7 +431,7 @@ function StatsTicker() {
   return (
     <div className="overflow-hidden rounded-md border border-[#686868] bg-[#232323]">
       <div
-        className="flex min-w-max gap-10 px-5 py-3 text-[11px] uppercase tracking-[0.14em] text-neutral-300"
+        className="flex min-w-max gap-6 px-4 py-2.5 text-[10px] uppercase tracking-[0.14em] text-neutral-300 sm:gap-10 sm:px-5 sm:py-3 sm:text-[11px]"
         style={{
           fontFamily: 'Courier New, monospace',
           animation: "ticker-slide 28s linear infinite",
@@ -441,15 +450,15 @@ function StatsTicker() {
 function ApertureBar({ mounted }: { mounted: boolean }) {
   return (
     <div className="rounded-md border border-[#686868] bg-[#232323] p-4">
-      <div className="mb-3 flex items-center justify-between gap-3">
+      <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div
-          className="text-[11px] uppercase tracking-[0.14em] text-neutral-400"
+          className="text-[11px] uppercase tracking-[0.14em] text-neutral-300"
           style={{ fontFamily: "Courier New, monospace" }}
         >
           7-voice aperture scale — open → closed
         </div>
         <div
-          className="text-[11px] uppercase tracking-[0.14em] text-neutral-500"
+          className="text-[11px] uppercase tracking-[0.14em] text-neutral-300"
           style={{ fontFamily: "Courier New, monospace" }}
         >
           A, O, E, Ë, U, Y, I
@@ -457,13 +466,14 @@ function ApertureBar({ mounted }: { mounted: boolean }) {
       </div>
 
       <TooltipProvider delayDuration={80}>
-        <div className="grid grid-cols-7 overflow-hidden rounded-md border border-[#686868]">
+          <div className="overflow-x-auto">
+            <div className="grid min-w-[560px] grid-cols-7 overflow-hidden rounded-md border border-[#686868] sm:min-w-0">
           {VOICES.map((voice, index) => (
             <Tooltip key={voice.id}>
               <TooltipTrigger asChild>
                 <button
                   type="button"
-                  className="group relative flex min-h-[112px] flex-col items-center justify-center gap-2 border-r border-[#686868] px-2 py-3 last:border-r-0"
+                  className="group relative flex min-h-[104px] flex-col items-center justify-center gap-2 border-r border-[#686868] px-1.5 py-2.5 last:border-r-0 sm:min-h-[112px] sm:px-2 sm:py-3"
                   style={{
                     background:
                       voice.id === "A"
@@ -482,7 +492,7 @@ function ApertureBar({ mounted }: { mounted: boolean }) {
                   }}
                 >
                   <span
-                    className="text-lg font-black"
+                    className="text-base font-black sm:text-lg"
                     style={{ color: voice.color, fontFamily: "Courier New, monospace" }}
                   >
                     {voice.id}
@@ -501,7 +511,7 @@ function ApertureBar({ mounted }: { mounted: boolean }) {
                   </div>
 
                   <span
-                    className="text-[10px] text-neutral-500"
+                    className="text-[10px] text-neutral-300"
                     style={{ fontFamily: "Courier New, monospace" }}
                   >
                     {voice.weight.toFixed(1)}
@@ -511,23 +521,24 @@ function ApertureBar({ mounted }: { mounted: boolean }) {
 
               <TooltipContent
                 side="top"
-                className="w-[170px] border-[#686868] bg-[#222] px-3 py-2 text-[11px] text-neutral-200"
+                className="w-[160px] border-[#686868] bg-[#222] px-3 py-2 text-[11px] text-neutral-200 sm:w-[170px]"
                 style={{ fontFamily: "Courier New, monospace" }}
               >
                 <div className="mb-1 text-base font-bold text-neutral-100">
                   {voice.ipa}
                 </div>
-                <div className="mb-1 text-neutral-400">
+                <div className="mb-1 text-neutral-300">
                   Aperture: <span className="text-neutral-200">{voice.weight.toFixed(1)}</span>
                 </div>
-                <div className="border-t border-[#333] pt-1 text-neutral-500">
+                <div className="border-t border-[#333] pt-1 text-neutral-300">
                   e.g. {voice.examples.join(", ")}
                 </div>
               </TooltipContent>
             </Tooltip>
           ))}
         </div>
-      </TooltipProvider>
+          </div>
+        </TooltipProvider>
     </div>
   );
 }
@@ -554,15 +565,15 @@ function HeroChart({ mounted }: { mounted: boolean }) {
   return (
     <div className="rounded-md border border-[#686868] bg-[#232323] p-4">
       <div className="mb-3 flex items-center justify-between gap-3">
-        <div className="text-[11px] uppercase tracking-[0.14em] text-neutral-400" style={{ fontFamily: 'Courier New, monospace' }}>
+        <div className="text-[11px] uppercase tracking-[0.14em] text-neutral-300" style={{ fontFamily: 'Courier New, monospace' }}>
           Turkish STEP20 baseline
         </div>
-        <div className="text-[11px] uppercase tracking-[0.14em] text-neutral-500" style={{ fontFamily: 'Courier New, monospace' }}>
+        <div className="text-[11px] uppercase tracking-[0.14em] text-neutral-300" style={{ fontFamily: 'Courier New, monospace' }}>
           bucket means
         </div>
       </div>
 
-      <svg viewBox={`0 0 ${width} ${height}`} className="h-[250px] w-full">
+      <svg viewBox={`0 0 ${width} ${height}`} className="h-[220px] w-full sm:h-[240px] md:h-[250px]">
         {[0, 0.25, 0.5, 0.75, 1].map((tick, index) => {
           const y = padding + (1 - tick) * (height - padding * 2);
           return (
@@ -660,24 +671,24 @@ function HeroChart({ mounted }: { mounted: boolean }) {
 function HeroStatsCard() {
   return (
     <div className="rounded-md border border-[#686868] bg-[#232323] p-4">
-      <div className="mb-3 text-[11px] uppercase tracking-[0.14em] text-neutral-400" style={{ fontFamily: 'Courier New, monospace' }}>
+      <div className="mb-3 text-[11px] uppercase tracking-[0.14em] text-neutral-300" style={{ fontFamily: 'Courier New, monospace' }}>
         slope summary
       </div>
       <div className="space-y-3 text-sm text-neutral-200">
         <div className="flex items-center justify-between gap-4">
-          <span className="uppercase tracking-[0.10em] text-neutral-400" style={{ fontFamily: 'Courier New, monospace' }}>Pearson r</span>
+          <span className="uppercase tracking-[0.10em] text-neutral-300" style={{ fontFamily: 'Courier New, monospace' }}>Pearson r</span>
           <span style={{ fontFamily: 'Courier New, monospace' }}>−0.989</span>
         </div>
         <div className="flex items-center justify-between gap-4">
-          <span className="uppercase tracking-[0.10em] text-neutral-400" style={{ fontFamily: 'Courier New, monospace' }}>Spearman ρ</span>
+          <span className="uppercase tracking-[0.10em] text-neutral-300" style={{ fontFamily: 'Courier New, monospace' }}>Spearman ρ</span>
           <span style={{ fontFamily: 'Courier New, monospace' }}>−1.000</span>
         </div>
         <div className="flex items-center justify-between gap-4">
-          <span className="uppercase tracking-[0.10em] text-neutral-400" style={{ fontFamily: 'Courier New, monospace' }}>p_perm</span>
+          <span className="uppercase tracking-[0.10em] text-neutral-300" style={{ fontFamily: 'Courier New, monospace' }}>p_perm</span>
           <span style={{ fontFamily: 'Courier New, monospace', color: COLORS.green }}>{"< 0.001"}</span>
         </div>
         <div className="flex items-center justify-between gap-4">
-          <span className="uppercase tracking-[0.10em] text-neutral-400" style={{ fontFamily: 'Courier New, monospace' }}>iters</span>
+          <span className="uppercase tracking-[0.10em] text-neutral-300" style={{ fontFamily: 'Courier New, monospace' }}>iters</span>
           <span style={{ fontFamily: 'Courier New, monospace' }}>12,000</span>
         </div>
       </div>
@@ -688,7 +699,7 @@ function HeroStatsCard() {
 function HeroExplainCard() {
   return (
     <div className="rounded-md border border-[#686868] bg-[#232323] p-4">
-      <div className="mb-3 text-[11px] uppercase tracking-[0.14em] text-neutral-400" style={{ fontFamily: 'Courier New, monospace' }}>
+      <div className="mb-3 text-[11px] uppercase tracking-[0.14em] text-neutral-300" style={{ fontFamily: 'Courier New, monospace' }}>
         what this chart shows
       </div>
       <div className="space-y-3 text-sm leading-6 text-neutral-300">
@@ -711,16 +722,16 @@ function HeroSection({ mounted }: { mounted: boolean }) {
   return (
     <section className="grid gap-6 lg:grid-cols-[1.05fr_1fr]">
       <div className="space-y-5">
-        <div className="inline-flex items-center gap-2 rounded-md border border-[#686868] bg-[#232323] px-3 py-2 text-[11px] uppercase tracking-[0.14em] text-neutral-300" style={{ fontFamily: 'Courier New, monospace' }}>
+        <div className="inline-flex flex-wrap items-center gap-2 rounded-md border border-[#686868] bg-[#232323] px-3 py-2 text-[11px] uppercase tracking-[0.14em] text-neutral-300" style={{ fontFamily: 'Courier New, monospace' }}>
           <span>deterministic</span>
-          <span className="text-neutral-500">•</span>
+          <span className="text-neutral-300">•</span>
           <span>baseline-locked</span>
-          <span className="text-neutral-500">•</span>
+          <span className="text-neutral-300">•</span>
           <span>scientific instrument</span>
         </div>
 
           <div>
-            <h1 className="text-4xl font-bold tracking-tight text-white md:text-5xl">
+            <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl md:text-5xl">
               ZË-RO
             </h1>
             <p className="mt-2 max-w-xl text-base leading-7 text-neutral-300">
@@ -735,17 +746,17 @@ function HeroSection({ mounted }: { mounted: boolean }) {
         </div>
 
         <TooltipProvider delayDuration={80}>
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
             <LandingButton href="/evals" label="Try Evals" />
             <LandingButton
               label="Open Instrument"
               disabled
-              tooltip="coming later"
+              tooltip="Interactive vowel-aperture instrument. Input a word or sequence and explore its phonetic grounding across the 7-voice scale in real time. In development."
             />
             <LandingButton
               label="Voice Lab"
               disabled
-              tooltip="coming later"
+              tooltip="Record your voice and extract acoustic features such as F1, aperture, and duration against the ZË-RO baseline. Requires microphone access. In development."
             />
           </div>
         </TooltipProvider>
@@ -764,7 +775,7 @@ function HeroSection({ mounted }: { mounted: boolean }) {
 
 function BaselineGrid() {
   return (
-    <section className="grid gap-4 lg:grid-cols-3">
+    <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {BASELINES.map((card) => (
         <div
           key={card.id}
@@ -777,12 +788,12 @@ function BaselineGrid() {
             <span>{card.emoji}</span>
             <span className="text-sm font-semibold">{card.title}</span>
           </div>
-          <div className="mb-4 text-sm text-neutral-400">{card.subtitle}</div>
+          <div className="mb-4 text-sm text-neutral-300">{card.subtitle}</div>
           <div className="space-y-2">
             {card.rows.map((row) => (
-              <div key={row.key} className="flex items-center justify-between gap-4 text-sm">
+              <div key={row.key} className="flex items-start justify-between gap-4 text-sm">
                 <span
-                  className="uppercase tracking-[0.12em] text-neutral-400"
+                  className="uppercase tracking-[0.12em] text-neutral-300"
                   style={{ fontFamily: 'Courier New, monospace' }}
                 >
                   {row.key}
@@ -793,7 +804,7 @@ function BaselineGrid() {
               </div>
             ))}
           </div>
-          <div className="mt-4 text-xs text-neutral-500">{card.note}</div>
+          <div className="mt-4 text-xs text-neutral-300">{card.note}</div>
         </div>
       ))}
     </section>
@@ -824,7 +835,7 @@ function LlmProviderRows(props: {
       {props.providers.map((row, index) => (
         <div
           key={`${row.provider}-${row.model}`}
-          className="grid items-center gap-4 rounded-md border border-[#686868] bg-[#232323] px-4 py-3 md:grid-cols-[200px_1fr_120px]"
+          className="grid items-center gap-4 rounded-md border border-[#686868] bg-[#232323] px-3 py-3 sm:px-4 md:grid-cols-[180px_1fr_110px] lg:grid-cols-[200px_1fr_120px]"
         >
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
@@ -838,7 +849,7 @@ function LlmProviderRows(props: {
                 </span>
               ) : null}
             </div>
-            <div className="mt-1 text-[10px] text-neutral-500">{row.model}</div>
+            <div className="mt-1 text-[10px] text-neutral-300">{row.model}</div>
           </div>
 
           <div className="space-y-2">
@@ -855,7 +866,7 @@ function LlmProviderRows(props: {
             </div>
           </div>
 
-          <div className="text-right">
+          <div className="text-left md:text-right">
             <div
               className="text-lg font-bold text-neutral-100"
               style={{ fontFamily: "Courier New, monospace" }}
@@ -863,7 +874,7 @@ function LlmProviderRows(props: {
               {row.bestDisplay}
             </div>
             <div
-              className="text-[10px] text-neutral-500"
+              className="text-[10px] text-neutral-300"
               style={{ fontFamily: "Courier New, monospace" }}
             >
               mean {row.meanDisplay}
@@ -887,7 +898,7 @@ function LlmResultsSection() {
         <AccordionItem value="llm-results" className="border-b-0">
           <AccordionTrigger className="py-0 hover:no-underline">
             <div className="text-left">
-              <div className="text-[11px] uppercase tracking-[0.14em] text-neutral-400" style={{ fontFamily: 'Courier New, monospace' }}>
+              <div className="text-[11px] uppercase tracking-[0.14em] text-neutral-300" style={{ fontFamily: 'Courier New, monospace' }}>
                 llm results
               </div>
               <div className="mt-1 text-lg font-semibold text-white">
@@ -897,52 +908,64 @@ function LlmResultsSection() {
           </AccordionTrigger>
           <AccordionContent className="pt-5">
             <Tabs defaultValue="paper1">
-              <TabsList className="h-auto rounded-md border border-[#686868] bg-[#181818] p-1">
-                {LLM_PAPERS.map((paper) => (
-                  <TabsTrigger
-                    key={paper.id}
-                    value={paper.id}
-                    className="rounded-sm px-3 py-2 text-[11px] uppercase tracking-[0.12em] text-neutral-300 data-[state=active]:bg-[#232323] data-[state=active]:text-white"
-                    style={{ fontFamily: 'Courier New, monospace' }}
-                  >
-                    {paper.tab}
-                  </TabsTrigger>
-                ))}
-              </TabsList>
+              <TabsList className="h-auto w-full justify-start overflow-x-auto rounded-md border border-[#686868] bg-[#181818] p-1">
+                  {LLM_PAPERS.map((paper) => (
+                    <TabsTrigger
+                      key={paper.id}
+                      value={paper.id}
+                      className="shrink-0 rounded-sm border border-[#686868] bg-[#181818] px-3 py-2 text-left text-neutral-300 data-[state=active]:border-[#16a34a] data-[state=active]:bg-[#1a3a2a] data-[state=active]:text-[#16a34a]"
+                      style={{ fontFamily: 'Courier New, monospace' }}
+                    >
+                      <div className="flex flex-col items-start">
+                        <span className="text-[11px] uppercase tracking-[0.12em]">
+                          {paper.tabLabel}
+                        </span>
+                        <span className="mt-1 text-[10px] normal-case tracking-normal opacity-75">
+                          {paper.tabDetail}
+                        </span>
+                      </div>
+                    </TabsTrigger>
+                  ))}
+                </TabsList>
 
               {LLM_PAPERS.map((paper) => (
                 <TabsContent key={paper.id} value={paper.id} className="mt-4">
                   <div className="rounded-md border border-[#686868] bg-[#181818] p-4">
-                    <div className="flex flex-wrap items-start justify-between gap-3">
-                      <div>
-                        <div className="text-sm font-semibold text-white">{paper.title}</div>
-                        <div className="mt-1 text-sm text-neutral-400">{paper.subtitle}</div>
+                      <div
+                        className="text-sm text-neutral-300"
+                        style={{ fontFamily: 'Courier New, monospace' }}
+                      >
+                        {paper.id === "paper1"
+                          ? "n=12 independent sessions · source: LingBuzz/009799"
+                          : "n=10 sequential turns · source: LingBuzz/009808"}
                       </div>
-                      <div className="flex flex-wrap gap-2">
-                        {paper.badges.map((badge) => (
-                          <span
-                            key={badge}
-                            className="rounded-sm border border-[#686868] px-2 py-1 text-[11px] uppercase tracking-[0.12em] text-neutral-300"
-                            style={{ fontFamily: 'Courier New, monospace' }}
-                          >
-                            {badge}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
 
                       <div className="mt-5">
                         <LlmProviderRows providers={paper.providers} animate={visible} />
                       </div>
 
-                      <div className="mt-5 grid gap-3 md:grid-cols-[1fr_auto]">
-                        <p className="text-sm leading-6 text-neutral-300">{paper.summary}</p>
+                      <div className="mt-5 grid gap-3 lg:grid-cols-[1fr_auto]">
+                        <div className="flex items-center gap-2 text-sm text-neutral-100">
+                            <ExternalLink className="h-4 w-4 text-[#d93333]" />
+                            <Link
+                              href={paper.id === "paper1"
+                                ? "https://ling.auf.net/lingbuzz/009799"
+                                : "https://ling.auf.net/lingbuzz/009808"}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="underline-offset-4 hover:underline"
+                            >
+                              {paper.id === "paper1"
+                                ? "Source: LingBuzz/009799"
+                                : "Source: LingBuzz/009808"}
+                            </Link>
+                          </div>
                         {paper.note ? (
-                          <div className="text-xs text-neutral-500">{paper.note}</div>
+                          <div className="text-xs text-neutral-300">{paper.note}</div>
                         ) : null}
                       </div>
                       {paper.emphasisNote ? (
-                        <div className="mt-3 text-xs italic text-neutral-500">
+                        <div className="mt-3 text-xs italic text-neutral-300">
                           {paper.emphasisNote}
                         </div>
                       ) : null}
@@ -960,11 +983,11 @@ function LlmResultsSection() {
 function HowItWorksSection() {
   return (
     <section className="rounded-md border border-[#686868] bg-[#232323] p-5">
-      <div className="text-[11px] uppercase tracking-[0.14em] text-neutral-400" style={{ fontFamily: 'Courier New, monospace' }}>
+      <div className="text-[11px] uppercase tracking-[0.14em] text-neutral-300" style={{ fontFamily: 'Courier New, monospace' }}>
         how it works
       </div>
       <div className="mt-1 text-lg font-semibold text-white">Three-step scoring loop</div>
-      <div className="mt-5 grid gap-4 md:grid-cols-3">
+      <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {HOW_IT_WORKS.map((item) => (
           <div key={item.step} className="rounded-md border border-[#686868] bg-[#181818] p-4">
             <div className="text-[11px] uppercase tracking-[0.14em] text-[#d93333]" style={{ fontFamily: 'Courier New, monospace' }}>
@@ -982,7 +1005,7 @@ function HowItWorksSection() {
 function ScientificFoundationSection() {
   return (
     <section className="rounded-md border border-[#686868] bg-[#232323] p-5">
-      <div className="text-[11px] uppercase tracking-[0.14em] text-neutral-400" style={{ fontFamily: 'Courier New, monospace' }}>
+      <div className="text-[11px] uppercase tracking-[0.14em] text-neutral-300" style={{ fontFamily: 'Courier New, monospace' }}>
         scientific foundation
       </div>
       <div className="mt-1 text-lg font-semibold text-white">Published references and method posture</div>
@@ -1031,7 +1054,7 @@ function ScientificFoundationSection() {
 function FAQSection() {
   return (
     <section className="rounded-md border border-[#686868] bg-[#232323] p-5">
-      <div className="text-[11px] uppercase tracking-[0.14em] text-neutral-400" style={{ fontFamily: 'Courier New, monospace' }}>
+      <div className="text-[11px] uppercase tracking-[0.14em] text-neutral-300" style={{ fontFamily: 'Courier New, monospace' }}>
         faq
       </div>
       <div className="mt-1 text-lg font-semibold text-white">Common questions</div>
@@ -1057,10 +1080,10 @@ function Footer() {
     <footer className="rounded-md border border-[#686868] bg-[#232323] px-5 py-4">
       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div className="text-sm text-neutral-300">
-          ZË-RO — deterministic vowel-aperture grounding probe.
+          ZË-RO — deterministic vowel-aperture grounding probe. Built by Sokol Gora.
         </div>
         <div
-          className="flex flex-wrap items-center gap-4 text-[11px] uppercase tracking-[0.14em] text-neutral-500"
+          className="flex flex-wrap items-center gap-4 text-[11px] uppercase tracking-[0.14em] text-neutral-300"
           style={{ fontFamily: 'Courier New, monospace' }}
         >
           <span>paper v0.1 snapshot</span>
@@ -1096,11 +1119,6 @@ export function LandingPageV0_2() {
         `}</style>
 
         <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-6 md:px-6 lg:px-8">
-          <nav className="flex items-center gap-2 text-[11px] uppercase tracking-[0.14em] text-neutral-500" style={{ fontFamily: 'Courier New, monospace' }}>
-            <span>home</span>
-            <ChevronRight className="h-3.5 w-3.5" />
-            <span className="text-neutral-300">landing</span>
-          </nav>
 
           <StatsTicker />
           <ApertureBar mounted={mounted} />
