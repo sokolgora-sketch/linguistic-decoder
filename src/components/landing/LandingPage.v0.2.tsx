@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import { ArrowRight, ExternalLink, Lock } from "lucide-react";
 
@@ -1072,6 +1073,35 @@ function FAQSection() {
         ))}
       </Accordion>
     </section>
+  );
+}
+
+function StickyNav() {
+  return (
+    <header
+      className="sticky top-0 z-50 border-b border-[#333333]"
+      style={{ background: "#111111" }}
+    >
+      <div className="mx-auto flex h-12 w-full max-w-7xl items-center justify-between px-6">
+        <Link href="/" aria-label="ZË-RO home" className="inline-flex items-center">
+          <Image
+            src="/zero_logo_dark_nav.svg"
+            alt="ZË-RO"
+            width={140}
+            height={28}
+            priority
+          />
+        </Link>
+
+        <Link
+          href="/evals"
+          className="text-sm uppercase tracking-[0.12em] text-neutral-300 hover:text-white"
+          style={{ fontFamily: "Courier New, monospace" }}
+        >
+          EVALS →
+        </Link>
+      </div>
+    </header>
   );
 }
 
