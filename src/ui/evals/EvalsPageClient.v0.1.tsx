@@ -723,7 +723,7 @@ export function EvalsPageClientV0_1() {
         {mode === "run_bundle" && inputProbe.kind === "bucket_only" ? (
           <div className="rounded-md border border-amber-300 bg-amber-50 p-3 text-sm">
             <div className="font-semibold">Detected buckets-only JSON</div>
-            <div className="mt-1 text-neutral-700">
+            <div className="mt-1 text-neutral-300">
               You are in <span className="font-mono">run_bundle</span> mode, but the input looks like bucketed tokens (keys V1..V7).
               Scoring/PDF will auto-wrap into <span className="font-mono">evalRun.v0.1</span>.
             </div>
@@ -742,7 +742,7 @@ export function EvalsPageClientV0_1() {
         {inputProbe.kind === "corpus70_meta" ? (
           <div className="rounded-md border border-red-300 bg-red-50 p-3 text-sm">
             <div className="font-semibold">This looks like a Corpus70 meta-tags JSON</div>
-            <div className="mt-1 text-neutral-700">
+            <div className="mt-1 text-neutral-300">
               Evals expects either a full <span className="font-mono">evalRun.v0.1</span> bundle or buckets keys V1..V7.
               Corpus70 meta JSON (version/allowedTags/tags) is not scorable here.
             </div>
@@ -774,7 +774,7 @@ export function EvalsPageClientV0_1() {
               <span className="font-mono">{report.runId}</span>
             </div>
             {report.meta ? (
-              <div className="text-sm text-neutral-700">
+              <div className="text-sm text-neutral-300">
                 provider: <span className="font-mono">{report.meta.provider ?? ""}</span> · model:{" "}
                 <span className="font-mono">{report.meta.model ?? ""}</span> · label:{" "}
                 <span className="font-mono">{report.meta.label ?? ""}</span>
