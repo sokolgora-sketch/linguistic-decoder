@@ -161,7 +161,7 @@ function TaskCard({ t }: { t: EvalTaskReportV0_1 }) {
 function StickyNav() {
   return (
     <div className="sticky top-0 z-50 border-b border-[#333333] bg-[#111111]">
-      <div className="mx-auto flex h-12 w-full max-w-7xl items-center justify-between px-4 md:px-6 lg:px-8">
+      <div className="mx-auto flex h-12 w-full max-w-[1200px] items-center justify-between px-10">
         <Link href="/" aria-label="ZË-RO home" className="inline-flex items-center">
           <Image
             src="/zero_logo_hero_white.svg"
@@ -549,25 +549,27 @@ export function EvalsPageClientV0_1() {
     >
       <StickyNav />
 
-      <main className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-6 md:px-6 lg:px-8">
+      <main className="mx-auto flex w-full max-w-[1200px] flex-col gap-0 px-10 pt-11 pb-20">
         <header className="space-y-2">
-          <div className="text-[11px] uppercase tracking-[0.14em] text-neutral-300">
-            evals
+          <div className="text-[11px] uppercase tracking-[0.16em] text-neutral-300">
+            instrument · evals
           </div>
-          <h1 className="text-3xl font-bold tracking-tight text-white md:text-4xl">
+          <h1 className="text-[30px] font-bold tracking-[-0.02em] text-[#f0f0f0]">
             ZË-RO Evals v0.1
           </h1>
-          <p className="max-w-3xl text-sm leading-7 text-neutral-300">
-            Score your model output against the deterministic aperture proxy. No API keys. No model calls.
+          <p className="max-w-[560px] text-[14px] leading-[1.7] text-[#aaa]">
+            Score your model output against the deterministic aperture proxy. No API keys. No model calls. Paste output, get a Pearson r.
           </p>
         </header>
 
-      <section className="rounded-md border border-[#383838] bg-[#111111] p-5 space-y-4">
-        <div className="flex flex-col gap-3 md:flex-row md:items-end">
-          <div className="flex-1">
-            <label className="text-[11px] uppercase tracking-[0.14em] text-neutral-300">Input mode</label>
+      <section className="mt-10 rounded-[8px] border border-[#333] bg-[#141414] px-7 pt-7 pb-6 space-y-[18px]">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div>
+            <label className="mb-1.5 block text-[12px] font-semibold uppercase tracking-[0.1em] text-[#d0d0d0]">
+              Input mode
+            </label>
             <select
-              className="mt-1 w-full rounded-md border border-[#383838] bg-[#0d0d0d] px-3 py-2 text-white outline-none transition placeholder:text-neutral-500 focus:border-[#686868]"
+              className="w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[9px] font-mono text-[12px] text-[#d8d8d8] outline-none transition focus:border-[#666]"
               value={mode}
               onChange={(e) => setMode(e.target.value as any)}
             >
@@ -576,10 +578,12 @@ export function EvalsPageClientV0_1() {
             </select>
           </div>
 
-          <div className="flex-1">
-            <label className="text-[11px] uppercase tracking-[0.14em] text-neutral-300">Task (only used for “Buckets only”)</label>
+          <div>
+            <label className="mb-1.5 block text-[12px] font-semibold uppercase tracking-[0.1em] text-[#d0d0d0]">
+              Task (Buckets only mode)
+            </label>
             <select
-              className="mt-1 w-full rounded-md border border-[#383838] bg-[#0d0d0d] px-3 py-2 text-white outline-none transition placeholder:text-neutral-500 focus:border-[#686868]"
+              className="w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[9px] font-mono text-[12px] text-[#d8d8d8] outline-none transition focus:border-[#666] disabled:opacity-35"
               value={taskId}
               onChange={(e) => setTaskId(e.target.value)}
               disabled={mode !== "task_buckets"}
@@ -593,143 +597,169 @@ export function EvalsPageClientV0_1() {
           </div>
         </div>
 
-        <details className="rounded-md border p-3">
-          <summary className="cursor-pointer font-semibold text-white">Task prompt (copy/paste to model)</summary>
-          <pre className="mt-3 overflow-x-auto whitespace-pre-wrap rounded-md border border-[#383838] bg-[#0d0d0d] p-3 text-xs text-neutral-300">
+        <details className="overflow-hidden rounded-[5px] border border-[#3a3a3a]">
+          <summary className="flex cursor-pointer list-none items-center gap-2 bg-[#1e1e1e] px-[14px] py-[10px] text-[11px] uppercase tracking-[0.1em] text-[#aaa] transition hover:text-[#888] [&::-webkit-details-marker]:hidden">
+            <span className="text-[9px] text-[#cc0000]">▶</span>
+            Task prompt — copy/paste to model
+          </summary>
+          <pre className="whitespace-pre-wrap border-t border-[#3a3a3a] bg-[#181818] p-[14px] text-[11px] leading-[1.7] text-[#bbb]">
             {selectedTask?.prompt ?? "(no task selected)"}
           </pre>
         </details>
 
-        <div className="grid gap-3 md:grid-cols-4">
+        <div className="grid grid-cols-1 gap-[14px] md:grid-cols-2 xl:grid-cols-4">
           <div>
-            <label className="text-[11px] uppercase tracking-[0.14em] text-neutral-300">runId</label>
-            <input className="mt-1 w-full rounded-md border border-[#383838] bg-[#0d0d0d] px-3 py-2 text-white outline-none transition placeholder:text-neutral-500 focus:border-[#686868]" value={runId} onChange={(e) => setRunId(e.target.value)} />
+            <label className="mb-1.5 block text-[12px] font-semibold uppercase tracking-[0.1em] text-[#d0d0d0]">
+              runId
+            </label>
+            <input
+              className="w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[9px] font-mono text-[12px] text-[#d8d8d8] outline-none transition focus:border-[#666]"
+              value={runId}
+              onChange={(e) => setRunId(e.target.value)}
+            />
           </div>
+
           <div>
-            <label className="text-[11px] uppercase tracking-[0.14em] text-neutral-300">provider</label>
-            <input className="mt-1 w-full rounded-md border border-[#383838] bg-[#0d0d0d] px-3 py-2 text-white outline-none transition placeholder:text-neutral-500 focus:border-[#686868]" value={provider} onChange={(e) => setProvider(e.target.value)} />
+            <label className="mb-1.5 block text-[12px] font-semibold uppercase tracking-[0.1em] text-[#d0d0d0]">
+              provider
+            </label>
+            <input
+              className="w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[9px] font-mono text-[12px] text-[#d8d8d8] outline-none transition focus:border-[#666]"
+              value={provider}
+              onChange={(e) => setProvider(e.target.value)}
+              placeholder="e.g. openai"
+            />
           </div>
+
           <div>
-            <label className="text-[11px] uppercase tracking-[0.14em] text-neutral-300">model</label>
-            <input className="mt-1 w-full rounded-md border border-[#383838] bg-[#0d0d0d] px-3 py-2 text-white outline-none transition placeholder:text-neutral-500 focus:border-[#686868]" value={model} onChange={(e) => setModel(e.target.value)} />
+            <label className="mb-1.5 block text-[12px] font-semibold uppercase tracking-[0.1em] text-[#d0d0d0]">
+              model
+            </label>
+            <input
+              className="w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[9px] font-mono text-[12px] text-[#d8d8d8] outline-none transition focus:border-[#666]"
+              value={model}
+              onChange={(e) => setModel(e.target.value)}
+              placeholder="e.g. gpt-4o"
+            />
           </div>
+
           <div>
-            <label className="text-[11px] uppercase tracking-[0.14em] text-neutral-300">label</label>
-            <input className="mt-1 w-full rounded-md border border-[#383838] bg-[#0d0d0d] px-3 py-2 text-white outline-none transition placeholder:text-neutral-500 focus:border-[#686868]" value={label} onChange={(e) => setLabel(e.target.value)} />
+            <label className="mb-1.5 block text-[12px] font-semibold uppercase tracking-[0.1em] text-[#d0d0d0]">
+              label
+            </label>
+            <input
+              className="w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[9px] font-mono text-[12px] text-[#d8d8d8] outline-none transition focus:border-[#666]"
+              value={label}
+              onChange={(e) => setLabel(e.target.value)}
+              placeholder="e.g. fresh-chat"
+            />
           </div>
         </div>
 
-        <div className="rounded-md border border-[#383838] bg-[#1a1a1a] p-3">
-          <div className="grid gap-3 xl:grid-cols-[minmax(320px,1fr)_auto] xl:items-end">
-            <div>
-              <label className="text-[11px] uppercase tracking-[0.14em] text-neutral-300">
-                Upload JSON
-              </label>
-              <div className="mt-2">
-                <input
-                  type="file"
-                  accept=".json,application/json"
-                  onChange={(e) => void onPickFile(e.target.files?.[0] ?? null)}
-                  className="block w-full text-sm text-neutral-300 file:mr-3 file:rounded-md file:border file:border-[#383838] file:bg-[#111111] file:px-3 file:py-2 file:text-[11px] file:uppercase file:tracking-[0.12em] file:text-neutral-300 hover:file:border-[#686868] hover:file:bg-[#0d0d0d]"
-                />
-              </div>
-            </div>
-
-            <div className="grid gap-3 md:grid-cols-2 xl:min-w-[620px]">
-              <div className="rounded-md border border-[#383838] bg-[#111111] p-3">
-                <div className="mb-2 text-[10px] uppercase tracking-[0.14em] text-neutral-300">
-                  run
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  <button
-                    type="button"
-                    className="rounded-md border border-[#383838] bg-[#111111] px-3 py-2 text-sm text-neutral-300 transition hover:border-[#686868] hover:bg-[#0d0d0d] hover:text-white"
-                    onClick={loadExample}
-                    disabled={busy}
-                  >
-                    Load example
-                  </button>
-                  <button
-                    type="button"
-                    className="rounded-md border border-[#383838] bg-[#111111] px-3 py-2 text-sm text-neutral-300 transition hover:border-[#686868] hover:bg-[#0d0d0d] hover:text-white"
-                    onClick={() => {
-                      setInputText("");
-                      setApiErr(null);
-                      setReport(null);
-                      setMd("");
-                      setNotice(null);
-                    }}
-                    disabled={busy}
-                  >
-                    Clear
-                  </button>
-                  <button
-                    type="button"
-                    className="rounded-md border border-[#16a34a] bg-[#16a34a] px-3 py-2 text-sm text-white transition hover:bg-[#15803d] disabled:opacity-50"
-                    onClick={() => void onScore()}
-                    disabled={busy || !inputText.trim()}
-                  >
-                    {busy ? "Scoring…" : "Score"}
-                  </button>
-                </div>
-              </div>
-
-              <div className="rounded-md border border-[#383838] bg-[#111111] p-3">
-                <div className="mb-2 text-[10px] uppercase tracking-[0.14em] text-neutral-300">
-                  export
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  <button
-                    type="button"
-                    className="rounded-md border border-[#383838] bg-[#111111] px-3 py-2 text-sm text-neutral-300 transition hover:border-[#686868] hover:bg-[#0d0d0d] hover:text-white disabled:opacity-50"
-                    onClick={() => void onDownloadPdf()}
-                    disabled={busy || !inputText.trim()}
-                  >
-                    Download PDF
-                  </button>
-                  <button
-                    type="button"
-                    className="rounded-md border border-[#383838] bg-[#111111] px-3 py-2 text-sm text-neutral-300 transition hover:border-[#686868] hover:bg-[#0d0d0d] hover:text-white disabled:opacity-50"
-                    onClick={() => void onCopyRawJson()}
-                    disabled={busy || !inputText.trim()}
-                  >
-                    Copy Raw JSON
-                  </button>
-                  <button
-                    type="button"
-                    className="rounded-md border border-[#383838] bg-[#111111] px-3 py-2 text-sm text-neutral-300 transition hover:border-[#686868] hover:bg-[#0d0d0d] hover:text-white disabled:opacity-50"
-                    onClick={() => void onCopyCsvRow()}
-                    disabled={busy || !report}
-                  >
-                    Copy CSV Row
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
+        <div className="flex flex-wrap items-center gap-[14px] rounded-[5px] border border-[#3a3a3a] bg-[#1a1a1a] px-4 py-[14px]">
+          <span className="text-[12px] font-semibold uppercase tracking-[0.1em] text-[#d0d0d0]">
+            Upload JSON
+          </span>
+          <input
+            type="file"
+            accept=".json,application/json"
+            onChange={(e) => void onPickFile(e.target.files?.[0] ?? null)}
+            className="block text-sm text-neutral-300 file:mr-3 file:rounded-[4px] file:border file:border-[#3a3a3a] file:bg-[#141414] file:px-3 file:py-1.5 file:font-mono file:text-[11px] file:text-[#555] hover:file:border-[#666] hover:file:text-[#eee]"
+          />
         </div>
-
 
         <div>
-          <label className="text-[11px] uppercase tracking-[0.14em] text-neutral-300">Paste JSON</label>
+          <label className="mb-2 block text-[12px] font-semibold uppercase tracking-[0.1em] text-[#d0d0d0]">
+            Paste JSON
+          </label>
           <textarea
-            className="mt-1 min-h-[220px] w-full rounded-md border border-[#383838] bg-[#0d0d0d] p-3 font-mono text-xs text-white outline-none transition placeholder:text-neutral-500 focus:border-[#686868]"
+            className="min-h-[180px] w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] p-[14px] font-mono text-[12px] leading-[1.6] text-[#d8d8d8] outline-none transition focus:border-[#333]"
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
             placeholder={mode === "run_bundle" ? '{ "evalRunVersion": "evalRun.v0.1", ... }' : '{ "V1": ["token1", ...], "V2": [...], ... }'}
           />
+
+          {inputText.trim() && inputProbe.kind !== "invalid_json" ? (
+            <div className="mt-2 flex items-center gap-2 text-[11px] text-[#16a34a]">
+              <span className="h-[6px] w-[6px] rounded-full bg-[#16a34a]" />
+              JSON detected — ready to score
+            </div>
+          ) : null}
         </div>
 
+        <div className="flex flex-wrap items-center gap-2 pt-1">
+          <button
+            type="button"
+            className="rounded-[5px] border border-[#16a34a] bg-[#16a34a] px-6 py-2.5 font-mono text-[12px] font-bold uppercase tracking-[0.06em] text-white transition hover:bg-[#15803d] hover:shadow-[0_0_0_1px_rgba(22,163,74,0.4),0_4px_16px_rgba(22,163,74,0.33)] disabled:cursor-not-allowed disabled:border-[#333] disabled:bg-[#111] disabled:text-[#333] disabled:shadow-none"
+            onClick={() => void onScore()}
+            disabled={busy || !inputText.trim()}
+          >
+            {busy ? "Scoring…" : report ? "Scored" : "Score"}
+          </button>
+
+          <button
+            type="button"
+            className="rounded-[5px] border border-[#5a2a2a] bg-transparent px-4 py-2.5 font-mono text-[11px] uppercase tracking-[0.06em] text-[#cc6666] transition hover:border-[#cc0000] hover:bg-[#cc000010] hover:text-[#e05555] disabled:opacity-50"
+            onClick={() => void onDownloadPdf()}
+            disabled={busy || !inputText.trim()}
+          >
+            Download PDF
+          </button>
+
+          <button
+            type="button"
+            className="rounded-[5px] border border-[#333] bg-transparent px-4 py-2.5 font-mono text-[11px] uppercase tracking-[0.06em] text-[#777] transition hover:border-[#777] hover:text-[#eee] disabled:opacity-50"
+            onClick={() => void onCopyRawJson()}
+            disabled={busy || !inputText.trim()}
+          >
+            Copy Raw JSON
+          </button>
+
+          <button
+            type="button"
+            className="rounded-[5px] border border-[#333] bg-transparent px-4 py-2.5 font-mono text-[11px] uppercase tracking-[0.06em] text-[#777] transition hover:border-[#777] hover:text-[#eee] disabled:opacity-50"
+            onClick={() => void onCopyCsvRow()}
+            disabled={busy || !report}
+          >
+            Copy CSV Row
+          </button>
+
+          <div className="min-w-0 flex-1" />
+
+          <button
+            type="button"
+            className="rounded-[5px] border border-dashed border-[#333] bg-transparent px-4 py-2.5 font-mono text-[11px] uppercase tracking-[0.06em] text-[#888] transition hover:border-[#555] hover:text-[#bbb]"
+            onClick={loadExample}
+            disabled={busy}
+          >
+            Load example
+          </button>
+
+          <button
+            type="button"
+            className="border-0 bg-transparent px-3 py-2.5 font-mono text-[11px] uppercase tracking-[0.06em] text-[#555] transition hover:text-[#cc0000]"
+            onClick={() => {
+              setInputText("");
+              setApiErr(null);
+              setReport(null);
+              setMd("");
+              setNotice(null);
+            }}
+            disabled={busy}
+          >
+            Clear
+          </button>
+        </div>
         {mode === "run_bundle" && inputProbe.kind === "bucket_only" ? (
-          <div className="rounded-md border border-amber-300 bg-amber-50 p-3 text-sm">
-            <div className="font-semibold">Detected buckets-only JSON</div>
+          <div className="rounded-md border border-[#686868] bg-[#1a1a1a] p-3 text-sm text-neutral-300">
+            <div className="text-[11px] uppercase tracking-[0.14em] text-neutral-300">Detected buckets-only JSON</div>
             <div className="mt-1 text-neutral-300">
-              You are in <span className="font-mono">run_bundle</span> mode, but the input looks like bucketed tokens (keys V1..V7).
-              Scoring/PDF will auto-wrap into <span className="font-mono">evalRun.v0.1</span>.
+              You are in <span className="font-mono text-neutral-100">run_bundle</span> mode, but the input looks like bucketed tokens (keys V1..V7).
+              Scoring/PDF will auto-wrap into <span className="font-mono text-neutral-100">evalRun.v0.1</span>.
             </div>
             <div className="mt-2">
               <button
-                className="border rounded px-3 py-2 text-sm"
+                className="rounded-md border border-[#383838] bg-[#111111] px-3 py-2 text-sm text-neutral-300 transition hover:border-[#686868] hover:bg-[#0d0d0d] hover:text-white"
                 type="button"
                 onClick={() => setMode("task_buckets")}
               >
@@ -740,10 +770,10 @@ export function EvalsPageClientV0_1() {
         ) : null}
 
         {inputProbe.kind === "corpus70_meta" ? (
-          <div className="rounded-md border border-red-300 bg-red-50 p-3 text-sm">
-            <div className="font-semibold">This looks like a Corpus70 meta-tags JSON</div>
+          <div className="rounded-md border border-[#686868] bg-[#1a1a1a] p-3 text-sm text-neutral-300">
+            <div className="text-[11px] uppercase tracking-[0.14em] text-neutral-300">This looks like a Corpus70 meta-tags JSON</div>
             <div className="mt-1 text-neutral-300">
-              Evals expects either a full <span className="font-mono">evalRun.v0.1</span> bundle or buckets keys V1..V7.
+              Evals expects either a full <span className="font-mono text-neutral-100">evalRun.v0.1</span> bundle or buckets keys V1..V7.
               Corpus70 meta JSON (version/allowedTags/tags) is not scorable here.
             </div>
           </div>
@@ -757,9 +787,9 @@ export function EvalsPageClientV0_1() {
         ) : null}
 
         {apiErr ? (
-          <div className="rounded-md border border-red-300 bg-red-50 p-3 text-sm">
-            <div className="font-semibold">Error: <span className="font-mono">{apiErr.code}</span></div>
-            <div className="mt-1">{apiErr.message}</div>
+          <div className="rounded-md border border-[#686868] bg-[#1a1a1a] p-3 text-sm text-neutral-300">
+            <div className="text-[11px] uppercase tracking-[0.14em] text-neutral-300">Error: <span className="font-mono text-neutral-100">{apiErr.code}</span></div>
+            <div className="mt-1 text-neutral-300">{apiErr.message}</div>
           </div>
         ) : null}
       </section>
