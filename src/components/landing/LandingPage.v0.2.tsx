@@ -361,7 +361,7 @@ function LandingButton(props: {
       type="button"
       disabled
       className={cn(
-        "inline-flex items-center gap-2 rounded-md border px-4 py-2 text-sm uppercase tracking-[0.12em] transition",
+        "inline-flex w-full items-center justify-center gap-2 rounded-md border px-4 py-2 text-sm uppercase tracking-[0.12em] transition sm:w-auto",
         "font-mono",
         "border-[#686868] bg-[#232323] text-neutral-500"
       )}
@@ -375,7 +375,7 @@ function LandingButton(props: {
       target="_blank"
       rel="noreferrer"
       className={cn(
-        "inline-flex items-center gap-2 rounded-md border px-4 py-2 text-sm uppercase tracking-[0.12em] transition",
+        "inline-flex w-full items-center justify-center gap-2 rounded-md border px-4 py-2 text-sm uppercase tracking-[0.12em] transition sm:w-auto",
         "font-mono border-[#686868] bg-[#232323] text-[#f5f5f5] hover:border-[#d93333]"
       )}
     >
@@ -386,7 +386,7 @@ function LandingButton(props: {
     <Link
       href={props.href ?? "#"}
       className={cn(
-        "inline-flex items-center gap-2 rounded-md border px-4 py-2 text-sm uppercase tracking-[0.12em] transition",
+        "inline-flex w-full items-center justify-center gap-2 rounded-md border px-4 py-2 text-sm uppercase tracking-[0.12em] transition sm:w-auto",
         "font-mono",
         props.label === "Try Evals"
           ? "border-[#d93333] bg-[#d93333] text-white hover:opacity-90"
@@ -422,7 +422,7 @@ function StatsTicker() {
   return (
     <div className="overflow-hidden rounded-md border border-[#686868] bg-[#232323]">
       <div
-        className="flex min-w-max gap-10 px-5 py-3 text-[11px] uppercase tracking-[0.14em] text-neutral-300"
+        className="flex min-w-max gap-6 px-4 py-2.5 text-[10px] uppercase tracking-[0.14em] text-neutral-300 sm:gap-10 sm:px-5 sm:py-3 sm:text-[11px]"
         style={{
           fontFamily: 'Courier New, monospace',
           animation: "ticker-slide 28s linear infinite",
@@ -441,7 +441,7 @@ function StatsTicker() {
 function ApertureBar({ mounted }: { mounted: boolean }) {
   return (
     <div className="rounded-md border border-[#686868] bg-[#232323] p-4">
-      <div className="mb-3 flex items-center justify-between gap-3">
+      <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div
           className="text-[11px] uppercase tracking-[0.14em] text-neutral-400"
           style={{ fontFamily: "Courier New, monospace" }}
@@ -457,13 +457,14 @@ function ApertureBar({ mounted }: { mounted: boolean }) {
       </div>
 
       <TooltipProvider delayDuration={80}>
-        <div className="grid grid-cols-7 overflow-hidden rounded-md border border-[#686868]">
+          <div className="overflow-x-auto">
+            <div className="grid min-w-[560px] grid-cols-7 overflow-hidden rounded-md border border-[#686868] sm:min-w-0">
           {VOICES.map((voice, index) => (
             <Tooltip key={voice.id}>
               <TooltipTrigger asChild>
                 <button
                   type="button"
-                  className="group relative flex min-h-[112px] flex-col items-center justify-center gap-2 border-r border-[#686868] px-2 py-3 last:border-r-0"
+                  className="group relative flex min-h-[104px] flex-col items-center justify-center gap-2 border-r border-[#686868] px-1.5 py-2.5 last:border-r-0 sm:min-h-[112px] sm:px-2 sm:py-3"
                   style={{
                     background:
                       voice.id === "A"
@@ -482,7 +483,7 @@ function ApertureBar({ mounted }: { mounted: boolean }) {
                   }}
                 >
                   <span
-                    className="text-lg font-black"
+                    className="text-base font-black sm:text-lg"
                     style={{ color: voice.color, fontFamily: "Courier New, monospace" }}
                   >
                     {voice.id}
@@ -511,7 +512,7 @@ function ApertureBar({ mounted }: { mounted: boolean }) {
 
               <TooltipContent
                 side="top"
-                className="w-[170px] border-[#686868] bg-[#222] px-3 py-2 text-[11px] text-neutral-200"
+                className="w-[160px] border-[#686868] bg-[#222] px-3 py-2 text-[11px] text-neutral-200 sm:w-[170px]"
                 style={{ fontFamily: "Courier New, monospace" }}
               >
                 <div className="mb-1 text-base font-bold text-neutral-100">
@@ -527,7 +528,8 @@ function ApertureBar({ mounted }: { mounted: boolean }) {
             </Tooltip>
           ))}
         </div>
-      </TooltipProvider>
+          </div>
+        </TooltipProvider>
     </div>
   );
 }
@@ -562,7 +564,7 @@ function HeroChart({ mounted }: { mounted: boolean }) {
         </div>
       </div>
 
-      <svg viewBox={`0 0 ${width} ${height}`} className="h-[250px] w-full">
+      <svg viewBox={`0 0 ${width} ${height}`} className="h-[220px] w-full sm:h-[240px] md:h-[250px]">
         {[0, 0.25, 0.5, 0.75, 1].map((tick, index) => {
           const y = padding + (1 - tick) * (height - padding * 2);
           return (
@@ -711,7 +713,7 @@ function HeroSection({ mounted }: { mounted: boolean }) {
   return (
     <section className="grid gap-6 lg:grid-cols-[1.05fr_1fr]">
       <div className="space-y-5">
-        <div className="inline-flex items-center gap-2 rounded-md border border-[#686868] bg-[#232323] px-3 py-2 text-[11px] uppercase tracking-[0.14em] text-neutral-300" style={{ fontFamily: 'Courier New, monospace' }}>
+        <div className="inline-flex flex-wrap items-center gap-2 rounded-md border border-[#686868] bg-[#232323] px-3 py-2 text-[11px] uppercase tracking-[0.14em] text-neutral-300" style={{ fontFamily: 'Courier New, monospace' }}>
           <span>deterministic</span>
           <span className="text-neutral-500">•</span>
           <span>baseline-locked</span>
@@ -720,7 +722,7 @@ function HeroSection({ mounted }: { mounted: boolean }) {
         </div>
 
           <div>
-            <h1 className="text-4xl font-bold tracking-tight text-white md:text-5xl">
+            <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl md:text-5xl">
               ZË-RO
             </h1>
             <p className="mt-2 max-w-xl text-base leading-7 text-neutral-300">
@@ -735,7 +737,7 @@ function HeroSection({ mounted }: { mounted: boolean }) {
         </div>
 
         <TooltipProvider delayDuration={80}>
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
             <LandingButton href="/evals" label="Try Evals" />
             <LandingButton
               label="Open Instrument"
@@ -764,7 +766,7 @@ function HeroSection({ mounted }: { mounted: boolean }) {
 
 function BaselineGrid() {
   return (
-    <section className="grid gap-4 lg:grid-cols-3">
+    <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {BASELINES.map((card) => (
         <div
           key={card.id}
@@ -780,7 +782,7 @@ function BaselineGrid() {
           <div className="mb-4 text-sm text-neutral-400">{card.subtitle}</div>
           <div className="space-y-2">
             {card.rows.map((row) => (
-              <div key={row.key} className="flex items-center justify-between gap-4 text-sm">
+              <div key={row.key} className="flex items-start justify-between gap-4 text-sm">
                 <span
                   className="uppercase tracking-[0.12em] text-neutral-400"
                   style={{ fontFamily: 'Courier New, monospace' }}
@@ -824,7 +826,7 @@ function LlmProviderRows(props: {
       {props.providers.map((row, index) => (
         <div
           key={`${row.provider}-${row.model}`}
-          className="grid items-center gap-4 rounded-md border border-[#686868] bg-[#232323] px-4 py-3 md:grid-cols-[200px_1fr_120px]"
+          className="grid items-center gap-4 rounded-md border border-[#686868] bg-[#232323] px-3 py-3 sm:px-4 md:grid-cols-[180px_1fr_110px] lg:grid-cols-[200px_1fr_120px]"
         >
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
@@ -855,7 +857,7 @@ function LlmProviderRows(props: {
             </div>
           </div>
 
-          <div className="text-right">
+          <div className="text-left md:text-right">
             <div
               className="text-lg font-bold text-neutral-100"
               style={{ fontFamily: "Courier New, monospace" }}
@@ -897,12 +899,12 @@ function LlmResultsSection() {
           </AccordionTrigger>
           <AccordionContent className="pt-5">
             <Tabs defaultValue="paper1">
-              <TabsList className="h-auto rounded-md border border-[#686868] bg-[#181818] p-1">
+              <TabsList className="h-auto w-full overflow-x-auto rounded-md border border-[#686868] bg-[#181818] p-1">
                 {LLM_PAPERS.map((paper) => (
                   <TabsTrigger
                     key={paper.id}
                     value={paper.id}
-                    className="rounded-sm px-3 py-2 text-[11px] uppercase tracking-[0.12em] text-neutral-300 data-[state=active]:bg-[#232323] data-[state=active]:text-white"
+                    className="shrink-0 rounded-sm px-3 py-2 text-[11px] uppercase tracking-[0.12em] text-neutral-300 data-[state=active]:bg-[#232323] data-[state=active]:text-white"
                     style={{ fontFamily: 'Courier New, monospace' }}
                   >
                     {paper.tab}
@@ -935,7 +937,7 @@ function LlmResultsSection() {
                         <LlmProviderRows providers={paper.providers} animate={visible} />
                       </div>
 
-                      <div className="mt-5 grid gap-3 md:grid-cols-[1fr_auto]">
+                      <div className="mt-5 grid gap-3 lg:grid-cols-[1fr_auto]">
                         <p className="text-sm leading-6 text-neutral-300">{paper.summary}</p>
                         {paper.note ? (
                           <div className="text-xs text-neutral-500">{paper.note}</div>
@@ -964,7 +966,7 @@ function HowItWorksSection() {
         how it works
       </div>
       <div className="mt-1 text-lg font-semibold text-white">Three-step scoring loop</div>
-      <div className="mt-5 grid gap-4 md:grid-cols-3">
+      <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {HOW_IT_WORKS.map((item) => (
           <div key={item.step} className="rounded-md border border-[#686868] bg-[#181818] p-4">
             <div className="text-[11px] uppercase tracking-[0.14em] text-[#d93333]" style={{ fontFamily: 'Courier New, monospace' }}>
