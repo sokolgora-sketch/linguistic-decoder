@@ -732,9 +732,14 @@ function HeroSection({ mounted }: { mounted: boolean }) {
         </div>
 
           <div>
-            <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl md:text-5xl">
-              ZË-RO
-            </h1>
+            <Image
+                src="/zero_logo_hero_white.svg"
+                alt="ZË-RO"
+                width={520}
+                height={130}
+                priority
+                className="h-auto w-full max-w-[520px]"
+              />
             <p className="mt-2 max-w-xl text-base leading-7 text-neutral-300">
               Deterministic vowel-aperture grounding probe for baseline-locked evaluation,
               drift checks, and reproducible scoring.

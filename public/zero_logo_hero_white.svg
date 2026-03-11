@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 200" width="800" height="200">
+  <rect width="800" height="200" fill="transparent"/>
+
+  <text x="78" y="158" font-family="Arial, Helvetica, sans-serif" font-weight="300" font-size="138" fill="#ffffff" letter-spacing="-2">Z</text>
+
+  <text x="170" y="158" font-family="Arial, Helvetica, sans-serif" font-weight="300" font-size="138" fill="#ffffff">E</text>
+  <circle cx="198" cy="20" r="9" fill="#ffffff"/>
+  <circle cx="234" cy="20" r="9" fill="#ffffff"/>
+
+  <polygon points="370,59 457,100 370,141 283,100"
+           fill="rgba(255,255,255,0.06)"
+           stroke="#ffffff"
+           stroke-width="5"/>
+
+  <path d="M 283,100
+           C 294,100 299,73 311,73
+           C 324,73 328,127 341,127
+           C 353,127 357,73 370,73
+           C 383,73 387,127 399,127
+           C 412,127 416,73 429,73
+           C 441,73 446,100 457,100"
+        fill="none"
+        stroke="#d93333"
+        stroke-width="3.2"
+        stroke-linecap="round"
+        stroke-linejoin="round"/>
+
+  <text x="482" y="158" font-family="Arial, Helvetica, sans-serif" font-weight="300" font-size="138" fill="#ffffff" letter-spacing="-2">RO</text>
+</svg>
