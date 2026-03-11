@@ -2,6 +2,7 @@
 
 import React, { useMemo, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 
 import { EVAL_SPEC_V0_1 } from "@/shared/evals/spec.v0.1";
 import type { EvalReportBundleV0_1, EvalTaskReportV0_1 } from "@/shared/evals/report.v0.1";
@@ -141,7 +142,7 @@ function TaskCard({ t }: { t: EvalTaskReportV0_1 }) {
         </div>
       </div>
 
-      <details className="rounded-md border p-3">
+      <details className="rounded-md border border-[#383838] bg-[#1a1a1a] p-3">
         <summary className="cursor-pointer font-semibold">Diagnostics</summary>
         <div className="text-sm mt-2 space-y-1">
           <div>missingBuckets: <span className="font-mono">{joinList(t.diagnostics.missingBuckets)}</span></div>
@@ -154,6 +155,33 @@ function TaskCard({ t }: { t: EvalTaskReportV0_1 }) {
         </div>
       </details>
     </section>
+  );
+}
+
+function StickyNav() {
+  return (
+    <div className="sticky top-0 z-50 border-b border-[#333333] bg-[#111111]">
+      <div className="mx-auto flex h-12 w-full max-w-7xl items-center justify-between px-4 md:px-6 lg:px-8">
+        <Link href="/" aria-label="ZË-RO home" className="inline-flex items-center">
+          <Image
+            src="/zero_logo_hero_white.svg"
+            alt="ZË-RO"
+            width={140}
+            height={28}
+            className="h-7 w-auto"
+            priority
+          />
+        </Link>
+
+        <Link
+          href="/"
+          className="text-[11px] uppercase tracking-[0.14em] text-neutral-300 transition hover:text-white"
+          style={{ fontFamily: "Courier New, monospace" }}
+        >
+          ← home
+        </Link>
+      </div>
+    </div>
   );
 }
 
@@ -515,31 +543,31 @@ export function EvalsPageClientV0_1() {
   };
 
   return (
-    <main className="mx-auto max-w-5xl p-6 space-y-6">
+    <div
+      className="min-h-screen bg-[#181818] text-white"
+      style={{ fontFamily: "Courier New, monospace" }}
+    >
+      <StickyNav />
 
-      <div className="mb-2">
-        <Link
-          href="/"
-          className="inline-flex items-center gap-2 text-sm text-neutral-600 hover:text-neutral-900"
-        >
-          <span aria-hidden="true">←</span>
-          <span>Back to Home</span>
-        </Link>
-      </div>
+      <main className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-6 md:px-6 lg:px-8">
+        <header className="space-y-2">
+          <div className="text-[11px] uppercase tracking-[0.14em] text-neutral-300">
+            evals
+          </div>
+          <h1 className="text-3xl font-bold tracking-tight text-white md:text-4xl">
+            ZË-RO Evals v0.1
+          </h1>
+          <p className="max-w-3xl text-sm leading-7 text-neutral-300">
+            Score your model output against the deterministic aperture proxy. No API keys. No model calls.
+          </p>
+        </header>
 
-      <header className="space-y-2">
-        <h1 className="text-2xl font-bold">ZË-RO Evals v0.1 — BYO Outputs</h1>
-        <div className="text-sm text-neutral-600">
-          This page scores a pasted run against the deterministic aperture proxy (orthography SSOT). No API keys. No model calls.
-        </div>
-      </header>
-
-      <section className="rounded-lg border p-4 space-y-4">
+      <section className="rounded-md border border-[#383838] bg-[#111111] p-5 space-y-4">
         <div className="flex flex-col gap-3 md:flex-row md:items-end">
           <div className="flex-1">
-            <label className="text-sm font-semibold">Input mode</label>
+            <label className="text-[11px] uppercase tracking-[0.14em] text-neutral-300">Input mode</label>
             <select
-              className="mt-1 w-full border rounded p-2"
+              className="mt-1 w-full rounded-md border border-[#383838] bg-[#0d0d0d] px-3 py-2 text-white outline-none transition placeholder:text-neutral-500 focus:border-[#686868]"
               value={mode}
               onChange={(e) => setMode(e.target.value as any)}
             >
@@ -549,9 +577,9 @@ export function EvalsPageClientV0_1() {
           </div>
 
           <div className="flex-1">
-            <label className="text-sm font-semibold">Task (only used for “Buckets only”)</label>
+            <label className="text-[11px] uppercase tracking-[0.14em] text-neutral-300">Task (only used for “Buckets only”)</label>
             <select
-              className="mt-1 w-full border rounded p-2"
+              className="mt-1 w-full rounded-md border border-[#383838] bg-[#0d0d0d] px-3 py-2 text-white outline-none transition placeholder:text-neutral-500 focus:border-[#686868]"
               value={taskId}
               onChange={(e) => setTaskId(e.target.value)}
               disabled={mode !== "task_buckets"}
@@ -566,103 +594,126 @@ export function EvalsPageClientV0_1() {
         </div>
 
         <details className="rounded-md border p-3">
-          <summary className="cursor-pointer font-semibold">Task prompt (copy/paste to model)</summary>
-          <pre className="mt-3 whitespace-pre-wrap text-xs bg-neutral-50 p-3 rounded border">
+          <summary className="cursor-pointer font-semibold text-white">Task prompt (copy/paste to model)</summary>
+          <pre className="mt-3 overflow-x-auto whitespace-pre-wrap rounded-md border border-[#383838] bg-[#0d0d0d] p-3 text-xs text-neutral-300">
             {selectedTask?.prompt ?? "(no task selected)"}
           </pre>
         </details>
 
         <div className="grid gap-3 md:grid-cols-4">
           <div>
-            <label className="text-sm font-semibold">runId</label>
-            <input className="mt-1 w-full border rounded p-2" value={runId} onChange={(e) => setRunId(e.target.value)} />
+            <label className="text-[11px] uppercase tracking-[0.14em] text-neutral-300">runId</label>
+            <input className="mt-1 w-full rounded-md border border-[#383838] bg-[#0d0d0d] px-3 py-2 text-white outline-none transition placeholder:text-neutral-500 focus:border-[#686868]" value={runId} onChange={(e) => setRunId(e.target.value)} />
           </div>
           <div>
-            <label className="text-sm font-semibold">provider</label>
-            <input className="mt-1 w-full border rounded p-2" value={provider} onChange={(e) => setProvider(e.target.value)} />
+            <label className="text-[11px] uppercase tracking-[0.14em] text-neutral-300">provider</label>
+            <input className="mt-1 w-full rounded-md border border-[#383838] bg-[#0d0d0d] px-3 py-2 text-white outline-none transition placeholder:text-neutral-500 focus:border-[#686868]" value={provider} onChange={(e) => setProvider(e.target.value)} />
           </div>
           <div>
-            <label className="text-sm font-semibold">model</label>
-            <input className="mt-1 w-full border rounded p-2" value={model} onChange={(e) => setModel(e.target.value)} />
+            <label className="text-[11px] uppercase tracking-[0.14em] text-neutral-300">model</label>
+            <input className="mt-1 w-full rounded-md border border-[#383838] bg-[#0d0d0d] px-3 py-2 text-white outline-none transition placeholder:text-neutral-500 focus:border-[#686868]" value={model} onChange={(e) => setModel(e.target.value)} />
           </div>
           <div>
-            <label className="text-sm font-semibold">label</label>
-            <input className="mt-1 w-full border rounded p-2" value={label} onChange={(e) => setLabel(e.target.value)} />
+            <label className="text-[11px] uppercase tracking-[0.14em] text-neutral-300">label</label>
+            <input className="mt-1 w-full rounded-md border border-[#383838] bg-[#0d0d0d] px-3 py-2 text-white outline-none transition placeholder:text-neutral-500 focus:border-[#686868]" value={label} onChange={(e) => setLabel(e.target.value)} />
           </div>
         </div>
 
-        <div className="flex flex-col gap-3 md:flex-row md:items-center">
-          <div className="flex items-center gap-3">
-            <label className="text-sm font-semibold">Upload JSON</label>
-            <input
-              type="file"
-              accept=".json,application/json"
-              onChange={(e) => void onPickFile(e.target.files?.[0] ?? null)}
-            />
-          </div>
-
-            <div className="flex flex-wrap gap-2 md:ml-auto">
-              <button
-                type="button"
-                className="rounded border px-3 py-2 text-sm hover:bg-neutral-50"
-                onClick={loadExample}
-                disabled={busy}
-              >
-                Load example
-              </button>
-              <button
-                type="button"
-                className="rounded border px-3 py-2 text-sm hover:bg-neutral-50"
-                onClick={() => {
-                  setInputText("");
-                  setApiErr(null);
-                  setReport(null);
-                  setMd("");
-                  setNotice(null);
-                }}
-                disabled={busy}
-              >
-                Clear
-              </button>
-              <button
-                type="button"
-                className="rounded bg-black px-3 py-2 text-sm text-white disabled:opacity-50"
-                onClick={() => void onScore()}
-                disabled={busy || !inputText.trim()}
-              >
-                {busy ? "Scoring…" : "Score"}
-              </button>
-              <button
-                type="button"
-                className="rounded border px-3 py-2 text-sm hover:bg-neutral-50 disabled:opacity-50"
-                onClick={() => void onDownloadPdf()}
-                disabled={busy || !inputText.trim()}
-              >
-                Download PDF
-              </button>
-              <button
-                type="button"
-                className="rounded border px-3 py-2 text-sm hover:bg-neutral-50 disabled:opacity-50"
-                onClick={() => void onCopyRawJson()}
-                disabled={busy || !inputText.trim()}
-              >
-                Copy Raw JSON
-              </button>
-              <button
-                type="button"
-                className="rounded border px-3 py-2 text-sm hover:bg-neutral-50 disabled:opacity-50"
-                onClick={() => void onCopyCsvRow()}
-                disabled={busy || !report}
-              >
-                Copy CSV Row
-              </button>
+        <div className="rounded-md border border-[#383838] bg-[#1a1a1a] p-3">
+          <div className="grid gap-3 xl:grid-cols-[minmax(320px,1fr)_auto] xl:items-end">
+            <div>
+              <label className="text-[11px] uppercase tracking-[0.14em] text-neutral-300">
+                Upload JSON
+              </label>
+              <div className="mt-2">
+                <input
+                  type="file"
+                  accept=".json,application/json"
+                  onChange={(e) => void onPickFile(e.target.files?.[0] ?? null)}
+                  className="block w-full text-sm text-neutral-300 file:mr-3 file:rounded-md file:border file:border-[#383838] file:bg-[#111111] file:px-3 file:py-2 file:text-[11px] file:uppercase file:tracking-[0.12em] file:text-neutral-300 hover:file:border-[#686868] hover:file:bg-[#0d0d0d]"
+                />
+              </div>
             </div>
+
+            <div className="grid gap-3 md:grid-cols-2 xl:min-w-[620px]">
+              <div className="rounded-md border border-[#383838] bg-[#111111] p-3">
+                <div className="mb-2 text-[10px] uppercase tracking-[0.14em] text-neutral-300">
+                  run
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    className="rounded-md border border-[#383838] bg-[#111111] px-3 py-2 text-sm text-neutral-300 transition hover:border-[#686868] hover:bg-[#0d0d0d] hover:text-white"
+                    onClick={loadExample}
+                    disabled={busy}
+                  >
+                    Load example
+                  </button>
+                  <button
+                    type="button"
+                    className="rounded-md border border-[#383838] bg-[#111111] px-3 py-2 text-sm text-neutral-300 transition hover:border-[#686868] hover:bg-[#0d0d0d] hover:text-white"
+                    onClick={() => {
+                      setInputText("");
+                      setApiErr(null);
+                      setReport(null);
+                      setMd("");
+                      setNotice(null);
+                    }}
+                    disabled={busy}
+                  >
+                    Clear
+                  </button>
+                  <button
+                    type="button"
+                    className="rounded-md border border-[#16a34a] bg-[#16a34a] px-3 py-2 text-sm text-white transition hover:bg-[#15803d] disabled:opacity-50"
+                    onClick={() => void onScore()}
+                    disabled={busy || !inputText.trim()}
+                  >
+                    {busy ? "Scoring…" : "Score"}
+                  </button>
+                </div>
+              </div>
+
+              <div className="rounded-md border border-[#383838] bg-[#111111] p-3">
+                <div className="mb-2 text-[10px] uppercase tracking-[0.14em] text-neutral-300">
+                  export
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    className="rounded-md border border-[#383838] bg-[#111111] px-3 py-2 text-sm text-neutral-300 transition hover:border-[#686868] hover:bg-[#0d0d0d] hover:text-white disabled:opacity-50"
+                    onClick={() => void onDownloadPdf()}
+                    disabled={busy || !inputText.trim()}
+                  >
+                    Download PDF
+                  </button>
+                  <button
+                    type="button"
+                    className="rounded-md border border-[#383838] bg-[#111111] px-3 py-2 text-sm text-neutral-300 transition hover:border-[#686868] hover:bg-[#0d0d0d] hover:text-white disabled:opacity-50"
+                    onClick={() => void onCopyRawJson()}
+                    disabled={busy || !inputText.trim()}
+                  >
+                    Copy Raw JSON
+                  </button>
+                  <button
+                    type="button"
+                    className="rounded-md border border-[#383838] bg-[#111111] px-3 py-2 text-sm text-neutral-300 transition hover:border-[#686868] hover:bg-[#0d0d0d] hover:text-white disabled:opacity-50"
+                    onClick={() => void onCopyCsvRow()}
+                    disabled={busy || !report}
+                  >
+                    Copy CSV Row
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
+
 
         <div>
-          <label className="text-sm font-semibold">Paste JSON</label>
+          <label className="text-[11px] uppercase tracking-[0.14em] text-neutral-300">Paste JSON</label>
           <textarea
-            className="mt-1 w-full min-h-[220px] border rounded p-2 font-mono text-xs"
+            className="mt-1 min-h-[220px] w-full rounded-md border border-[#383838] bg-[#0d0d0d] p-3 font-mono text-xs text-white outline-none transition placeholder:text-neutral-500 focus:border-[#686868]"
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
             placeholder={mode === "run_bundle" ? '{ "evalRunVersion": "evalRun.v0.1", ... }' : '{ "V1": ["token1", ...], "V2": [...], ... }'}
@@ -743,6 +794,7 @@ export function EvalsPageClientV0_1() {
           </div>
         </section>
       ) : null}
-    </main>
+      </main>
+    </div>
   );
 }
