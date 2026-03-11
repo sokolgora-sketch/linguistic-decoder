@@ -71,43 +71,43 @@ function joinList(xs: string[]) {
 
 function TaskCard({ t }: { t: EvalTaskReportV0_1 }) {
   return (
-    <section className="rounded-lg border p-4 space-y-3">
+    <section className="rounded-md border border-[#383838] bg-[#111111] p-5 space-y-4">
       <div className="space-y-1">
-        <div className="text-sm text-neutral-500">{t.taskId}</div>
-        <h2 className="text-lg font-semibold">{t.title}</h2>
-        <div className="text-sm text-neutral-600">
-          kind: <span className="font-mono">{t.kind}</span> · langHint:{" "}
-          <span className="font-mono">{t.languageHint}</span> · targetBuckets:{" "}
-          <span className="font-mono">{t.targetBuckets.join(", ")}</span> · nPerBucket:{" "}
-          <span className="font-mono">{t.nPerBucket}</span>
+        <div className="text-[11px] uppercase tracking-[0.14em] text-neutral-300">{t.taskId}</div>
+        <h2 className="text-lg font-semibold text-white">{t.title}</h2>
+        <div className="text-sm text-neutral-300">
+          kind: <span className="font-mono text-neutral-100">{t.kind}</span> · langHint:{" "}
+          <span className="font-mono text-neutral-100">{t.languageHint}</span> · targetBuckets:{" "}
+          <span className="font-mono text-neutral-100">{t.targetBuckets.join(", ")}</span> · nPerBucket:{" "}
+          <span className="font-mono text-neutral-100">{t.nPerBucket}</span>
         </div>
       </div>
 
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm border">
-          <thead>
-            <tr className="bg-neutral-50">
-              <th className="text-left p-2 border">Bucket</th>
-              <th className="text-right p-2 border">expected</th>
-              <th className="text-right p-2 border">provided</th>
-              <th className="text-right p-2 border">valid</th>
-              <th className="text-right p-2 border">invalid</th>
-              <th className="text-right p-2 border">dup</th>
-              <th className="text-right p-2 border">mean(primary)</th>
-              <th className="text-right p-2 border">mean(presenceMean)</th>
+      <div className="overflow-x-auto rounded-md border border-[#383838]">
+        <table className="w-full border-collapse text-sm">
+          <thead className="bg-[#111111]">
+            <tr>
+              <th className="border-b border-[#383838] px-3 py-2 text-left text-[11px] uppercase tracking-[0.14em] text-neutral-300">Bucket</th>
+              <th className="border-b border-[#383838] px-3 py-2 text-right text-[11px] uppercase tracking-[0.14em] text-neutral-300">Expected</th>
+              <th className="border-b border-[#383838] px-3 py-2 text-right text-[11px] uppercase tracking-[0.14em] text-neutral-300">Provided</th>
+              <th className="border-b border-[#383838] px-3 py-2 text-right text-[11px] uppercase tracking-[0.14em] text-neutral-300">Valid</th>
+              <th className="border-b border-[#383838] px-3 py-2 text-right text-[11px] uppercase tracking-[0.14em] text-neutral-300">Invalid</th>
+              <th className="border-b border-[#383838] px-3 py-2 text-right text-[11px] uppercase tracking-[0.14em] text-neutral-300">Dup</th>
+              <th className="border-b border-[#383838] px-3 py-2 text-right text-[11px] uppercase tracking-[0.14em] text-neutral-300">Mean Primary</th>
+              <th className="border-b border-[#383838] px-3 py-2 text-right text-[11px] uppercase tracking-[0.14em] text-neutral-300">Mean Presence</th>
             </tr>
           </thead>
           <tbody>
             {t.buckets.map((b) => (
-              <tr key={b.bucket}>
-                <td className="p-2 border font-mono">{b.bucket}</td>
-                <td className="p-2 border text-right">{b.expectedN}</td>
-                <td className="p-2 border text-right">{b.providedN}</td>
-                <td className="p-2 border text-right">{b.validN}</td>
-                <td className="p-2 border text-right">{b.invalidN}</td>
-                <td className="p-2 border text-right">{b.duplicateN}</td>
-                <td className="p-2 border text-right">{fmt(b.mean_aperturePrimary)}</td>
-                <td className="p-2 border text-right">{fmt(b.mean_aperturePresenceMean)}</td>
+              <tr key={b.bucket} className="border-t border-[#383838]">
+                <td className="px-3 py-2 font-mono text-white">{b.bucket}</td>
+                <td className="px-3 py-2 text-right font-mono text-white">{b.expectedN}</td>
+                <td className="px-3 py-2 text-right font-mono text-white">{b.providedN}</td>
+                <td className="px-3 py-2 text-right font-mono text-white">{b.validN}</td>
+                <td className="px-3 py-2 text-right font-mono text-white">{b.invalidN}</td>
+                <td className="px-3 py-2 text-right font-mono text-white">{b.duplicateN}</td>
+                <td className="px-3 py-2 text-right font-mono text-white">{fmt(b.mean_aperturePrimary)}</td>
+                <td className="px-3 py-2 text-right font-mono text-white">{fmt(b.mean_aperturePresenceMean)}</td>
               </tr>
             ))}
           </tbody>
@@ -115,43 +115,43 @@ function TaskCard({ t }: { t: EvalTaskReportV0_1 }) {
       </div>
 
       <div className="grid gap-3 md:grid-cols-2">
-        <div className="rounded-md border p-3">
-          <div className="font-semibold">Slope — aperturePrimary</div>
+        <div className="rounded-md border border-[#383838] bg-[#111111] p-4">
+          <div className="font-semibold text-white">Slope — aperturePrimary</div>
           {t.slope_aperturePrimary ? (
-            <ul className="text-sm mt-2 space-y-1">
-              <li>pearson r: <span className="font-mono">{fmt(t.slope_aperturePrimary.pearson_r)}</span> (p=<span className="font-mono">{fmt(t.slope_aperturePrimary.p_pearson)}</span>)</li>
-              <li>spearman ρ: <span className="font-mono">{fmt(t.slope_aperturePrimary.spearman_rho)}</span> (p=<span className="font-mono">{fmt(t.slope_aperturePrimary.p_spearman)}</span>)</li>
-              <li>perm: iters=<span className="font-mono">{t.slope_aperturePrimary.iters}</span>, seed=<span className="font-mono">{t.slope_aperturePrimary.seed}</span></li>
+            <ul className="mt-2 space-y-1 text-sm text-neutral-300">
+              <li>pearson r: <span className="font-mono text-neutral-100">{fmt(t.slope_aperturePrimary.pearson_r)}</span> (p=<span className="font-mono text-neutral-100">{fmt(t.slope_aperturePrimary.p_pearson)}</span>)</li>
+              <li>spearman ρ: <span className="font-mono text-neutral-100">{fmt(t.slope_aperturePrimary.spearman_rho)}</span> (p=<span className="font-mono text-neutral-100">{fmt(t.slope_aperturePrimary.p_spearman)}</span>)</li>
+              <li>perm: iters=<span className="font-mono text-neutral-100">{t.slope_aperturePrimary.iters}</span>, seed=<span className="font-mono text-neutral-100">{t.slope_aperturePrimary.seed}</span></li>
             </ul>
           ) : (
-            <div className="text-sm mt-2 text-neutral-500">not computed</div>
+            <div className="mt-2 text-sm text-neutral-400">not computed</div>
           )}
         </div>
 
-        <div className="rounded-md border p-3">
-          <div className="font-semibold">Slope — aperturePresenceMean</div>
+        <div className="rounded-md border border-[#383838] bg-[#111111] p-4">
+          <div className="font-semibold text-white">Slope — aperturePresenceMean</div>
           {t.slope_aperturePresenceMean ? (
-            <ul className="text-sm mt-2 space-y-1">
-              <li>pearson r: <span className="font-mono">{fmt(t.slope_aperturePresenceMean.pearson_r)}</span> (p=<span className="font-mono">{fmt(t.slope_aperturePresenceMean.p_pearson)}</span>)</li>
-              <li>spearman ρ: <span className="font-mono">{fmt(t.slope_aperturePresenceMean.spearman_rho)}</span> (p=<span className="font-mono">{fmt(t.slope_aperturePresenceMean.p_spearman)}</span>)</li>
-              <li>perm: iters=<span className="font-mono">{t.slope_aperturePresenceMean.iters}</span>, seed=<span className="font-mono">{t.slope_aperturePresenceMean.seed}</span></li>
+            <ul className="mt-2 space-y-1 text-sm text-neutral-300">
+              <li>pearson r: <span className="font-mono text-neutral-100">{fmt(t.slope_aperturePresenceMean.pearson_r)}</span> (p=<span className="font-mono text-neutral-100">{fmt(t.slope_aperturePresenceMean.p_pearson)}</span>)</li>
+              <li>spearman ρ: <span className="font-mono text-neutral-100">{fmt(t.slope_aperturePresenceMean.spearman_rho)}</span> (p=<span className="font-mono text-neutral-100">{fmt(t.slope_aperturePresenceMean.p_spearman)}</span>)</li>
+              <li>perm: iters=<span className="font-mono text-neutral-100">{t.slope_aperturePresenceMean.iters}</span>, seed=<span className="font-mono text-neutral-100">{t.slope_aperturePresenceMean.seed}</span></li>
             </ul>
           ) : (
-            <div className="text-sm mt-2 text-neutral-500">not computed</div>
+            <div className="mt-2 text-sm text-neutral-400">not computed</div>
           )}
         </div>
       </div>
 
       <details className="rounded-md border border-[#383838] bg-[#1a1a1a] p-3">
-        <summary className="cursor-pointer font-semibold">Diagnostics</summary>
-        <div className="text-sm mt-2 space-y-1">
-          <div>missingBuckets: <span className="font-mono">{joinList(t.diagnostics.missingBuckets)}</span></div>
-          <div>extraBuckets: <span className="font-mono">{joinList(t.diagnostics.extraBuckets)}</span></div>
-          <div>emptyTokenCount: <span className="font-mono">{t.diagnostics.emptyTokenCount}</span></div>
-          <div>whitespaceTokenCount: <span className="font-mono">{t.diagnostics.whitespaceTokenCount}</span></div>
-          <div>noVowelTokenCount: <span className="font-mono">{t.diagnostics.noVowelTokenCount}</span></div>
-          <div>totalInvalidTokenCount: <span className="font-mono">{t.diagnostics.totalInvalidTokenCount}</span></div>
-          <div>notes: <span className="font-mono">{t.diagnostics.notes.length ? t.diagnostics.notes.join(" | ") : "(none)"}</span></div>
+        <summary className="cursor-pointer font-semibold text-white">Diagnostics</summary>
+        <div className="mt-2 space-y-1 text-sm text-neutral-300">
+          <div>missingBuckets: <span className="font-mono text-neutral-100">{joinList(t.diagnostics.missingBuckets)}</span></div>
+          <div>extraBuckets: <span className="font-mono text-neutral-100">{joinList(t.diagnostics.extraBuckets)}</span></div>
+          <div>emptyTokenCount: <span className="font-mono text-neutral-100">{t.diagnostics.emptyTokenCount}</span></div>
+          <div>whitespaceTokenCount: <span className="font-mono text-neutral-100">{t.diagnostics.whitespaceTokenCount}</span></div>
+          <div>noVowelTokenCount: <span className="font-mono text-neutral-100">{t.diagnostics.noVowelTokenCount}</span></div>
+          <div>totalInvalidTokenCount: <span className="font-mono text-neutral-100">{t.diagnostics.totalInvalidTokenCount}</span></div>
+          <div>notes: <span className="font-mono text-neutral-100">{t.diagnostics.notes.length ? t.diagnostics.notes.join(" | ") : "(none)"}</span></div>
         </div>
       </details>
     </section>
