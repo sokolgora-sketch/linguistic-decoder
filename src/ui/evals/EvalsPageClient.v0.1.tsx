@@ -750,9 +750,9 @@ export function EvalsPageClientV0_1() {
         ) : null}
 
         {notice ? (
-          <div className="rounded-md border border-neutral-200 bg-neutral-50 p-3 text-sm">
-            <div className="font-semibold">Note</div>
-            <div className="mt-1 text-neutral-700">{notice}</div>
+          <div className="rounded-md border border-[#383838] bg-[#1a1a1a] p-3 text-sm text-neutral-300">
+            <div className="text-[11px] uppercase tracking-[0.14em] text-neutral-300">Note</div>
+            <div className="mt-1 text-neutral-300">{notice}</div>
           </div>
         ) : null}
 
@@ -781,9 +781,9 @@ export function EvalsPageClientV0_1() {
               </div>
             ) : null}
 
-            <details className="rounded-md border p-3 mt-2">
-              <summary className="cursor-pointer font-semibold">Markdown report (from renderer)</summary>
-              <pre className="mt-3 whitespace-pre-wrap text-xs bg-neutral-50 p-3 rounded border">{md}</pre>
+            <details className="rounded-md border border-[#383838] bg-[#1a1a1a] p-3 mt-2">
+              <summary className="cursor-pointer font-semibold text-white">Markdown report (from renderer)</summary>
+              <pre className="mt-3 overflow-x-auto whitespace-pre-wrap rounded-md border border-[#383838] bg-[#0d0d0d] p-3 text-xs text-neutral-300">{md}</pre>
             </details>
           </div>
 
