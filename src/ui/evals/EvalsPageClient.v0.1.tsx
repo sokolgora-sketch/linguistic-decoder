@@ -795,7 +795,7 @@ export function EvalsPageClientV0_1() {
               <span className="text-[12px] font-semibold uppercase tracking-[0.1em] text-[#e2e2e2]">
                 Upload JSON
               </span>
-              <span className="text-[11px] text-[#c8c8c8]">
+              <span className="text-[11px] leading-6 text-[#d2d2d2]">
                 bundle or buckets-only input
               </span>
             </div>
@@ -955,32 +955,33 @@ export function EvalsPageClientV0_1() {
           </div>
         </section>
         {(busy || apiErr || report || readyToScore) ? (
-          <section className="mb-4 space-y-4">
-            <div className={`rounded-[8px] border px-5 py-4 ${stateToneClass}`}>
+            <section className="mb-6 space-y-6">
+            <div className={`rounded-[12px] border px-5 py-4 shadow-[0_10px_30px_rgba(0,0,0,0.18)] ${stateToneClass}`}>
               <div className="flex flex-wrap items-center gap-4">
                 <div className="inline-flex items-center gap-2 text-[12px] font-bold uppercase tracking-[0.08em] text-white">
                   <span className={`h-2.5 w-2.5 rounded-full ${stateDotClass}`} />
                   {stateLabel}
                 </div>
 
-                {report ? (
-                  <>
-                    <div className="h-4 w-px bg-[#2a2a2a]" />
-                    <div className="font-mono text-[12px] text-[#d6d6d6]">
-                      provider: <span className="text-white">{report.meta?.provider ?? "-"}</span>
-                    </div>
-                    <div className="font-mono text-[12px] text-[#d6d6d6]">
-                      model: <span className="text-white">{report.meta?.model ?? "-"}</span>
-                    </div>
-                    <div className="font-mono text-[12px] text-[#d6d6d6]">
-                      label: <span className="text-white">{report.meta?.label ?? "-"}</span>
-                    </div>
-                    <div className="min-w-0 flex-1" />
-                    <div className="font-mono text-[12px] text-[#dddddd]">
-                      runId: <span className="text-[#d8d8d8]">{report.runId}</span>
-                    </div>
-                  </>
-                ) : null}
+                  {report ? (
+                    <>
+                      <div className="flex flex-wrap items-center gap-2 text-[11px]">
+                        <span className="rounded-full border border-[#4a4a4a] bg-[#0f0f0f] px-3 py-1.5 text-[#ededed]">
+                          provider <span className="font-mono text-white">{report.meta?.provider ?? "-"}</span>
+                        </span>
+                        <span className="rounded-full border border-[#4a4a4a] bg-[#0f0f0f] px-3 py-1.5 text-[#ededed]">
+                          model <span className="font-mono text-white">{report.meta?.model ?? "-"}</span>
+                        </span>
+                        <span className="rounded-full border border-[#4a4a4a] bg-[#0f0f0f] px-3 py-1.5 text-[#ededed]">
+                          label <span className="font-mono text-white">{report.meta?.label ?? "-"}</span>
+                        </span>
+                      </div>
+                      <div className="min-w-0 flex-1" />
+                      <div className="rounded-full border border-[#4a4a4a] bg-[#0f0f0f] px-3 py-1.5 font-mono text-[11px] text-[#f2f2f2]">
+                        runId <span className="text-white">{report.runId}</span>
+                      </div>
+                    </>
+                  ) : null}
               </div>
             </div>
 
@@ -1003,7 +1004,7 @@ export function EvalsPageClientV0_1() {
                   </div>
                 </div>
 
-                <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+                <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
                   {[
                     {
                       key: "Pearson r",
@@ -1035,15 +1036,15 @@ export function EvalsPageClientV0_1() {
                   ].map((card) => (
                     <div
                       key={card.key}
-                      className={`rounded-[8px] border border-[#2d2d2d] border-t-2 bg-[#111111] p-4 ${card.tone}`}
+                      className={`rounded-[10px] border border-[#3a3a3a] border-t-[3px] bg-[#161616] p-4 shadow-[0_6px_20px_rgba(0,0,0,0.12)] ${card.tone}`}
                     >
-                      <div className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[#bdbdbd]">
+                      <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#e0e0e0]">
                         {card.key}
                       </div>
                       <div className="mt-3 font-mono text-[22px] font-bold text-white">
                         {card.value}
                       </div>
-                      <div className="mt-2 text-[11px] text-[#e2e2e2]">
+                      <div className="mt-2 text-[11px] leading-6 text-[#d0d0d0]">
                         {card.note}
                       </div>
                     </div>
@@ -1059,9 +1060,9 @@ export function EvalsPageClientV0_1() {
                       "stable";
 
                     const diagnosisLabel =
-                      diagnosisKind === "inversion" ? "Logic inversion" :
-                      diagnosisKind === "weak" ? "Inconsistent" :
-                      "Stable";
+                      diagnosisKind === "inversion" ? "Order inverted" :
+                      diagnosisKind === "weak" ? "Weak alignment" :
+                      "Aligned";
 
                     const diagnosisColor =
                       diagnosisKind === "inversion" ? "#f87171" :
@@ -1070,14 +1071,14 @@ export function EvalsPageClientV0_1() {
 
                     const diagnosisHint =
                       diagnosisKind === "inversion"
-                        ? "Spearman ρ < 0 — output inverts the expected aperture order."
+                        ? "Spearman ρ is below zero, so the output reverses the expected aperture order."
                         : diagnosisKind === "weak"
-                          ? "Spearman ρ ∈ [0, 0.7) — partial ordering detected, but not strong monotonic alignment."
-                          : "Spearman ρ ≥ 0.7 — strong monotonic alignment.";
+                          ? "Spearman ρ is positive but not yet strong enough for stable monotonic alignment."
+                          : "Spearman ρ is strong, so the bucket order is aligned with the expected aperture slope.";
 
                     return (
                       <div
-                        className="mt-4 flex items-center gap-3 rounded-[8px] border border-[#2d2d2d] bg-[#111111] px-4 py-3"
+                        className="mt-4 flex flex-wrap items-center gap-3 rounded-[10px] border border-[#3a3a3a] bg-[#161616] px-4 py-4 shadow-[0_6px_20px_rgba(0,0,0,0.12)]"
                         title={diagnosisHint}
                       >
                         <span
@@ -1090,7 +1091,7 @@ export function EvalsPageClientV0_1() {
                         >
                           {diagnosisLabel}
                         </span>
-                        <span className="text-[11px] text-[#c8c8c8]">
+                        <span className="text-[11px] leading-6 text-[#e0e0e0]">
                           {diagnosisHint}
                         </span>
                       </div>
@@ -1129,10 +1130,13 @@ export function EvalsPageClientV0_1() {
                     const x2 = pts[pts.length - 1]?.x ?? 96;
 
                     return (
-                      <div className="mt-5 rounded-[10px] border border-[#2d2d2d] bg-[#111111] px-4 py-4">
-                        <div className="mb-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#8a8a8a]">
-                          Mean aperture score — V1 → V7
-                        </div>
+                      <div className="mt-6 rounded-[12px] border border-[#3a3a3a] bg-[#101010] px-5 py-5 shadow-[0_6px_20px_rgba(0,0,0,0.12)]">
+                          <div className="mb-1 text-[12px] font-semibold uppercase tracking-[0.14em] text-[#dddddd]">
+                            Aperture trend by bucket
+                          </div>
+                          <div className="mb-4 text-[12px] leading-6 text-[#a8a8a8]">
+                            Mean aperture score from V1 to V7.
+                          </div>
 
                         <svg viewBox="0 0 560 220" className="w-full">
                           <line x1="58" y1="20" x2="58" y2="182" stroke="#333" strokeWidth="1" />
@@ -1164,9 +1168,9 @@ export function EvalsPageClientV0_1() {
                                 x="50"
                                 y={174 - v * 140}
                                 textAnchor="end"
-                                fill="#555"
+                                fill="#8a8a8a"
                                 fontSize="10"
-                                fontFamily="Courier New"
+                                fontFamily="Inter, sans-serif"
                               >
                                 {v.toFixed(1)}
                               </text>
@@ -1186,9 +1190,9 @@ export function EvalsPageClientV0_1() {
                                   x={p.x}
                                   y={p.y - 11}
                                   textAnchor="middle"
-                                  fill="#a3a3a3"
+                                  fill="#d0d0d0"
                                   fontSize="10"
-                                  fontFamily="Courier New"
+                                  fontFamily="Inter, sans-serif"
                                 >
                                   {p.mean.toFixed(3)}
                                 </text>
@@ -1196,9 +1200,9 @@ export function EvalsPageClientV0_1() {
                                   x={p.x}
                                   y="202"
                                   textAnchor="middle"
-                                  fill="#666"
+                                  fill="#8f8f8f"
                                   fontSize="10"
-                                  fontFamily="Courier New"
+                                  fontFamily="Inter, sans-serif"
                                 >
                                   {p.label}
                                 </text>
@@ -1210,9 +1214,9 @@ export function EvalsPageClientV0_1() {
                             x="294"
                             y="216"
                             textAnchor="middle"
-                            fill="#666"
+                            fill="#8f8f8f"
                             fontSize="11"
-                            fontFamily="Courier New"
+                            fontFamily="Inter, sans-serif"
                           >
                             Bucket rank
                           </text>
@@ -1227,7 +1231,7 @@ export function EvalsPageClientV0_1() {
 
 
       {report ? (
-          <section className="space-y-5 pt-1">
+            <section className="space-y-7 pt-3">
             <div className="rounded-[10px] border border-[#2a2a2a] bg-[#151515] px-5 py-5">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="space-y-1">
@@ -1287,7 +1291,7 @@ export function EvalsPageClientV0_1() {
               </div>
             </div>
 
-              <div className="space-y-4">
+              <div className="space-y-6">
                 {report.tasks
                   .filter((t) => t.kind === "byo")
                   .map((t) => (
@@ -1296,7 +1300,7 @@ export function EvalsPageClientV0_1() {
 
 
               {report.tasks.some((t) => t.kind !== "byo") ? (
-                  <section className="rounded-[8px] border border-[#262626] bg-[#171717] px-4 py-4 space-y-3">
+                <section className="mt-2 rounded-[10px] border border-[#303030] bg-[#171717] px-4 py-4 space-y-3">
                     <div className="space-y-1">
                       <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#9a9a9a]">
                         Validation controls
