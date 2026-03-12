@@ -790,17 +790,29 @@ export function EvalsPageClientV0_1() {
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-[14px] rounded-[5px] border border-[#3a3a3a] bg-[#1a1a1a] px-4 py-[14px]">
-          <span className="text-[12px] font-semibold uppercase tracking-[0.1em] text-[#e2e2e2]">
-            Upload JSON
-          </span>
-          <input
-            type="file"
-            accept=".json,application/json"
-            onChange={(e) => void onPickFile(e.target.files?.[0] ?? null)}
-            className="block text-sm text-neutral-300 file:mr-3 file:rounded-[4px] file:border file:border-[#3a3a3a] file:bg-[#141414] file:px-3 file:py-1.5 file:text-[11px] file:text-[#555] hover:file:border-[#666] hover:file:text-[#eee]"
-          />
-        </div>
+          <div className="rounded-[8px] border border-[#3a3a3a] bg-[#1a1a1a] px-4 py-4">
+            <div className="flex flex-wrap items-center gap-3">
+              <span className="text-[12px] font-semibold uppercase tracking-[0.1em] text-[#e2e2e2]">
+                Upload JSON
+              </span>
+              <span className="text-[11px] text-[#c8c8c8]">
+                bundle or buckets-only input
+              </span>
+            </div>
+
+            <div className="mt-3">
+              <input
+                type="file"
+                accept=".json,application/json"
+                onChange={(e) => void onPickFile(e.target.files?.[0] ?? null)}
+                className="block w-full text-sm text-neutral-300 file:mr-3 file:rounded-[6px] file:border file:border-[#555] file:bg-[#242424] file:px-4 file:py-2.5 file:text-[11px] file:font-semibold file:uppercase file:tracking-[0.08em] file:text-[#f2f2f2] hover:file:border-[#777] hover:file:bg-[#2b2b2b]"
+              />
+            </div>
+
+            <div className="mt-2 text-[11px] text-[#b8b8b8]">
+              Upload a full <span className="font-mono text-[#f2f2f2]">evalRun.v0.1</span> bundle or a buckets-only JSON file.
+            </div>
+          </div>
 
         <div>
           <label className="mb-2 block text-[12px] font-semibold uppercase tracking-[0.1em] text-[#e2e2e2]">
@@ -821,69 +833,70 @@ export function EvalsPageClientV0_1() {
           ) : null}
         </div>
 
-        <div className="flex flex-wrap items-center gap-2 pt-1">
-          <button
-            type="button"
-            className="rounded-[5px] border border-[#16a34a] bg-[#16a34a] px-6 py-2.5 text-[12px] font-bold uppercase tracking-[0.06em] text-white transition hover:bg-[#15803d] hover:shadow-[0_0_0_1px_rgba(22,163,74,0.4),0_4px_16px_rgba(22,163,74,0.33)] disabled:cursor-not-allowed disabled:border-[#333] disabled:bg-[#111] disabled:text-[#333] disabled:shadow-none"
-            onClick={() => void onScore()}
-            disabled={busy || !inputText.trim()}
-          >
-            {busy ? "Scoring…" : report ? "Scored" : "Score"}
-          </button>
+          <div className="flex flex-wrap items-center gap-2 pt-2">
+            <button
+              type="button"
+              className="rounded-[6px] border border-[#16a34a] bg-[#16a34a] px-6 py-2.5 text-[12px] font-bold uppercase tracking-[0.06em] text-white transition hover:bg-[#15803d] hover:shadow-[0_0_0_1px_rgba(22,163,74,0.4),0_4px_16px_rgba(22,163,74,0.33)] disabled:cursor-not-allowed disabled:border-[#333] disabled:bg-[#111] disabled:text-[#333] disabled:shadow-none"
+              onClick={() => void onScore()}
+              disabled={busy || !inputText.trim()}
+            >
+              {busy ? "Scoring…" : report ? "Scored ✓" : "Score run"}
+            </button>
 
-          <button
-            type="button"
-            className="rounded-[5px] border border-[#5a2a2a] bg-transparent px-4 py-2.5 text-[11px] uppercase tracking-[0.06em] text-[#cc6666] transition hover:border-[#cc0000] hover:bg-[#cc000010] hover:text-[#e05555] disabled:opacity-50"
-            onClick={() => void onDownloadPdf()}
-            disabled={busy || !inputText.trim()}
-          >
-            Download PDF
-          </button>
+            <button
+              type="button"
+              className="rounded-[6px] border border-[#555] bg-[#1a1a1a] px-4 py-2.5 text-[11px] font-semibold uppercase tracking-[0.06em] text-[#e2e2e2] transition hover:border-[#777] hover:bg-[#202020] hover:text-white"
+              onClick={() => {
+                setInputText("");
+                setApiErr(null);
+                setReport(null);
+                setMd("");
+                setNotice(null);
+              }}
+              disabled={busy}
+            >
+              Clear / new run
+            </button>
 
-          <button
-            type="button"
-            className="rounded-[5px] border border-[#333] bg-transparent px-4 py-2.5 text-[11px] uppercase tracking-[0.06em] text-[#777] transition hover:border-[#777] hover:text-[#eee] disabled:opacity-50"
-            onClick={() => void onCopyRawJson()}
-            disabled={busy || !inputText.trim()}
-          >
-            Copy Raw JSON
-          </button>
+            <button
+              type="button"
+              className="rounded-[6px] border border-[#5a2a2a] bg-transparent px-4 py-2.5 text-[11px] uppercase tracking-[0.06em] text-[#cc6666] transition hover:border-[#cc0000] hover:bg-[#cc000010] hover:text-[#e05555] disabled:opacity-50"
+              onClick={() => void onDownloadPdf()}
+              disabled={busy || !inputText.trim()}
+            >
+              Download PDF
+            </button>
 
-          <button
-            type="button"
-            className="rounded-[5px] border border-[#333] bg-transparent px-4 py-2.5 text-[11px] uppercase tracking-[0.06em] text-[#777] transition hover:border-[#777] hover:text-[#eee] disabled:opacity-50"
-            onClick={() => void onCopyCsvRow()}
-            disabled={busy || !report}
-          >
-            Copy CSV Row
-          </button>
+            <button
+              type="button"
+              className="rounded-[6px] border border-[#444] bg-transparent px-4 py-2.5 text-[11px] uppercase tracking-[0.06em] text-[#b8b8b8] transition hover:border-[#777] hover:text-[#f2f2f2] disabled:opacity-50"
+              onClick={() => void onCopyRawJson()}
+              disabled={busy || !inputText.trim()}
+            >
+              Copy Raw JSON
+            </button>
 
-          <div className="min-w-0 flex-1" />
+            <button
+              type="button"
+              className="rounded-[6px] border border-[#444] bg-transparent px-4 py-2.5 text-[11px] uppercase tracking-[0.06em] text-[#b8b8b8] transition hover:border-[#777] hover:text-[#f2f2f2] disabled:opacity-50"
+              onClick={() => void onCopyCsvRow()}
+              disabled={busy || !report}
+            >
+              Copy CSV Row
+            </button>
 
-          <button
-            type="button"
-            className="rounded-[5px] border border-dashed border-[#333] bg-transparent px-4 py-2.5 text-[11px] uppercase tracking-[0.06em] text-[#888] transition hover:border-[#555] hover:text-[#bbb]"
-            onClick={loadExample}
-            disabled={busy}
-          >
-            Load example
-          </button>
+            <div className="min-w-0 flex-1" />
 
-          <button
-            type="button"
-            className="border-0 bg-transparent px-3 py-2.5 text-[11px] uppercase tracking-[0.06em] text-[#555] transition hover:text-[#cc0000]"
-            onClick={() => {
-              setInputText("");
-              setApiErr(null);
-              setReport(null);
-              setMd("");
-              setNotice(null);
-            }}
-            disabled={busy}
-          >
-            Clear
-          </button>
-        </div>
+            <button
+              type="button"
+              className="rounded-[6px] border border-dashed border-[#4a4a4a] bg-transparent px-4 py-2.5 text-[11px] uppercase tracking-[0.06em] text-[#c8c8c8] transition hover:border-[#777] hover:bg-[#1f1f1f] hover:text-white"
+              onClick={loadExample}
+              disabled={busy}
+            >
+              Load example
+            </button>
+          </div>
+
         {mode === "run_bundle" && inputProbe.kind === "bucket_only" ? (
           <div className="rounded-md border border-[#686868] bg-[#1a1a1a] p-3 text-sm text-neutral-300">
             <div className="text-[11px] uppercase tracking-[0.14em] text-neutral-300">Detected buckets-only JSON</div>
