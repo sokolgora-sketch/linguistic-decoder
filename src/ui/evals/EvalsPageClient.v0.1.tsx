@@ -65,6 +65,11 @@ function fmt(x: number, d = 3) {
   return x.toFixed(d);
 }
 
+function fmtP(x: number) {
+  if (!Number.isFinite(x)) return "NaN";
+  return x < 0.001 ? "< 0.001" : x.toFixed(3);
+}
+
 function joinList(xs: string[]) {
   return xs.length ? xs.join(", ") : "(none)";
 }
@@ -142,16 +147,35 @@ function TaskCard({ t }: { t: EvalTaskReportV0_1 }) {
         </div>
       </div>
 
-      <details className="rounded-md border border-[#383838] bg-[#1a1a1a] p-3">
-        <summary className="cursor-pointer font-semibold text-white">Diagnostics</summary>
-        <div className="mt-2 space-y-1 text-sm text-neutral-300">
-          <div>missingBuckets: <span className="font-mono text-neutral-100">{joinList(t.diagnostics.missingBuckets)}</span></div>
-          <div>extraBuckets: <span className="font-mono text-neutral-100">{joinList(t.diagnostics.extraBuckets)}</span></div>
-          <div>emptyTokenCount: <span className="font-mono text-neutral-100">{t.diagnostics.emptyTokenCount}</span></div>
-          <div>whitespaceTokenCount: <span className="font-mono text-neutral-100">{t.diagnostics.whitespaceTokenCount}</span></div>
-          <div>noVowelTokenCount: <span className="font-mono text-neutral-100">{t.diagnostics.noVowelTokenCount}</span></div>
-          <div>totalInvalidTokenCount: <span className="font-mono text-neutral-100">{t.diagnostics.totalInvalidTokenCount}</span></div>
-          <div>notes: <span className="font-mono text-neutral-100">{t.diagnostics.notes.length ? t.diagnostics.notes.join(" | ") : "(none)"}</span></div>
+            <details className="overflow-hidden rounded-[8px] border border-[#262626] bg-[#101010]">
+        <summary className="cursor-pointer px-4 py-3 font-mono text-[11px] font-semibold uppercase tracking-[0.1em] text-[#d6d6d6]">
+          Diagnostics
+        </summary>
+        <div className="border-t border-[#262626] bg-[#0c0c0c] px-4 py-4">
+          <div className="grid gap-y-2 text-[12px] leading-6 md:grid-cols-[180px_minmax(0,1fr)]">
+            <div className="text-[#7f7f7f]">missingBuckets</div>
+            <div className="font-mono text-[#f2f2f2]">{joinList(t.diagnostics.missingBuckets)}</div>
+
+            <div className="text-[#7f7f7f]">extraBuckets</div>
+            <div className="font-mono text-[#f2f2f2]">{joinList(t.diagnostics.extraBuckets)}</div>
+
+            <div className="text-[#7f7f7f]">emptyTokenCount</div>
+            <div className="font-mono text-[#f2f2f2]">{t.diagnostics.emptyTokenCount}</div>
+
+            <div className="text-[#7f7f7f]">whitespaceTokenCount</div>
+            <div className="font-mono text-[#f2f2f2]">{t.diagnostics.whitespaceTokenCount}</div>
+
+            <div className="text-[#7f7f7f]">noVowelTokenCount</div>
+            <div className="font-mono text-[#f2f2f2]">{t.diagnostics.noVowelTokenCount}</div>
+
+            <div className="text-[#7f7f7f]">totalInvalidTokenCount</div>
+            <div className="font-mono text-[#f2f2f2]">{t.diagnostics.totalInvalidTokenCount}</div>
+
+            <div className="text-[#7f7f7f]">notes</div>
+            <div className="font-mono text-[#f2f2f2]">
+              {t.diagnostics.notes.length ? t.diagnostics.notes.join(" | ") : "(none)"}
+            </div>
+          </div>
         </div>
       </details>
     </section>
@@ -160,7 +184,7 @@ function TaskCard({ t }: { t: EvalTaskReportV0_1 }) {
 
 function StickyNav() {
   return (
-    <div className="sticky top-0 z-50 border-b border-[#333333] bg-[#111111]">
+    <div className="sticky top-0 z-50 border-b border-[#333333] bg-[#1a1a1a]">
       <div className="mx-auto flex h-12 w-full max-w-[1200px] items-center justify-between px-10">
         <Link href="/" aria-label="ZË-RO home" className="inline-flex items-center">
           <Image
@@ -214,6 +238,116 @@ export function EvalsPageClientV0_1() {
   );
 
   const inputProbe = useMemo(() => probeInput(inputText), [inputText]);
+
+  const readyToScore =
+    Boolean(inputText.trim()) &&
+    inputProbe.kind !== "invalid_json" &&
+    inputProbe.kind !== "corpus70_meta";
+
+  const summaryTask: any =
+    report?.tasks?.find(
+      (x: any) => x?.kind === "byo" || String(x?.taskId ?? "").includes("LADDER")
+    ) ??
+    report?.tasks?.[0] ??
+    null;
+
+  const summarySlopePrimary: any = summaryTask?.slope_aperturePrimary ?? null;
+
+  const summarySlopePresence: any =
+    summaryTask?.slope_aperturePresenceMean ??
+    summaryTask?.slopes?.aperturePresenceMean ??
+    summaryTask?.aperturePresenceMean ??
+    null;
+
+  const summaryPearson =
+    typeof summarySlopePrimary?.pearson_r === "number"
+      ? summarySlopePrimary.pearson_r
+      : null;
+
+  const summarySpearman =
+    typeof summarySlopePrimary?.spearman_rho === "number"
+      ? summarySlopePrimary.spearman_rho
+      : null;
+
+  const summaryPPerm =
+    typeof summarySlopePresence?.p_spearman === "number"
+      ? summarySlopePresence.p_spearman
+      : typeof summarySlopePresence?.p_perm_spearman === "number"
+        ? summarySlopePresence.p_perm_spearman
+        : typeof summarySlopePrimary?.p_spearman === "number"
+          ? summarySlopePrimary.p_spearman
+          : null;
+
+  const summaryPermIters =
+    summarySlopePresence?.iters ??
+    summarySlopePrimary?.iters ??
+    null;
+
+  const summaryPermSeed =
+    summarySlopePresence?.seed ??
+    summarySlopePrimary?.seed ??
+    null;
+
+  const summaryBuckets: any[] = Array.isArray(summaryTask?.buckets)
+    ? summaryTask.buckets
+    : [];
+
+  const compliantBuckets = summaryBuckets.filter(
+    (b: any) => Number(b?.invalidN ?? 0) === 0 && Number(b?.duplicateN ?? 0) === 0
+  ).length;
+
+  const complianceText = summaryBuckets.length
+    ? `${compliantBuckets} / ${summaryBuckets.length}`
+    : "—";
+
+  const summaryCounts = summaryBuckets.reduce(
+    (acc: { validN: number; invalidN: number }, b: any) => {
+      acc.validN += Number(b?.validN ?? 0);
+      acc.invalidN += Number(b?.invalidN ?? 0);
+      return acc;
+    },
+    { validN: 0, invalidN: 0 }
+  );
+
+  const stateLabel = busy
+    ? "SCORING"
+    : apiErr
+      ? "ERROR"
+      : report
+        ? "RUN SCORED"
+        : readyToScore
+          ? "READY TO SCORE"
+          : "IDLE";
+
+  const stateToneClass = busy
+    ? "border-[#666] bg-[#1a1a1a]"
+    : apiErr
+      ? "border-[#6b2a2a] bg-[#221313]"
+      : report
+        ? "border-[#14532d] bg-[#052e16]"
+        : readyToScore
+          ? "border-[#1f4d2e] bg-[#0d1f14]"
+          : "border-[#383838] bg-[#111111]";
+
+  const stateDotClass = busy
+    ? "bg-[#999]"
+    : apiErr
+      ? "bg-[#ef4444]"
+      : report
+        ? "bg-[#22c55e]"
+        : readyToScore
+          ? "bg-[#16a34a]"
+          : "bg-[#666]";
+
+  const consistencyBarWidth =
+    typeof summarySpearman === "number"
+      ? Math.max(0, Math.min(100, Math.abs(summarySpearman) * 100))
+      : 0;
+
+  const consistencyBarClass =
+    typeof summarySpearman === "number" && summarySpearman < 0
+      ? "bg-[#ff6b6b]"
+      : "bg-[#22c55e]";
 
   async function onPickFile(f: File | null) {
     if (!f) return;
@@ -544,7 +678,7 @@ export function EvalsPageClientV0_1() {
 
   return (
     <div
-      className="min-h-screen bg-[#181818] text-white"
+      className="min-h-screen bg-[#242424] text-white"
       style={{ fontFamily: "Courier New, monospace" }}
     >
       <StickyNav />
@@ -565,7 +699,7 @@ export function EvalsPageClientV0_1() {
       <section className="mt-10 rounded-[8px] border border-[#333] bg-[#141414] px-7 pt-7 pb-6 space-y-[18px]">
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <div>
-            <label className="mb-1.5 block text-[12px] font-semibold uppercase tracking-[0.1em] text-[#d0d0d0]">
+            <label className="mb-1.5 block text-[12px] font-semibold uppercase tracking-[0.1em] text-[#e2e2e2]">
               Input mode
             </label>
             <select
@@ -579,7 +713,7 @@ export function EvalsPageClientV0_1() {
           </div>
 
           <div>
-            <label className="mb-1.5 block text-[12px] font-semibold uppercase tracking-[0.1em] text-[#d0d0d0]">
+            <label className="mb-1.5 block text-[12px] font-semibold uppercase tracking-[0.1em] text-[#e2e2e2]">
               Task (Buckets only mode)
             </label>
             <select
@@ -609,7 +743,7 @@ export function EvalsPageClientV0_1() {
 
         <div className="grid grid-cols-1 gap-[14px] md:grid-cols-2 xl:grid-cols-4">
           <div>
-            <label className="mb-1.5 block text-[12px] font-semibold uppercase tracking-[0.1em] text-[#d0d0d0]">
+            <label className="mb-1.5 block text-[12px] font-semibold uppercase tracking-[0.1em] text-[#e2e2e2]">
               runId
             </label>
             <input
@@ -620,7 +754,7 @@ export function EvalsPageClientV0_1() {
           </div>
 
           <div>
-            <label className="mb-1.5 block text-[12px] font-semibold uppercase tracking-[0.1em] text-[#d0d0d0]">
+            <label className="mb-1.5 block text-[12px] font-semibold uppercase tracking-[0.1em] text-[#e2e2e2]">
               provider
             </label>
             <input
@@ -632,7 +766,7 @@ export function EvalsPageClientV0_1() {
           </div>
 
           <div>
-            <label className="mb-1.5 block text-[12px] font-semibold uppercase tracking-[0.1em] text-[#d0d0d0]">
+            <label className="mb-1.5 block text-[12px] font-semibold uppercase tracking-[0.1em] text-[#e2e2e2]">
               model
             </label>
             <input
@@ -644,7 +778,7 @@ export function EvalsPageClientV0_1() {
           </div>
 
           <div>
-            <label className="mb-1.5 block text-[12px] font-semibold uppercase tracking-[0.1em] text-[#d0d0d0]">
+            <label className="mb-1.5 block text-[12px] font-semibold uppercase tracking-[0.1em] text-[#e2e2e2]">
               label
             </label>
             <input
@@ -657,7 +791,7 @@ export function EvalsPageClientV0_1() {
         </div>
 
         <div className="flex flex-wrap items-center gap-[14px] rounded-[5px] border border-[#3a3a3a] bg-[#1a1a1a] px-4 py-[14px]">
-          <span className="text-[12px] font-semibold uppercase tracking-[0.1em] text-[#d0d0d0]">
+          <span className="text-[12px] font-semibold uppercase tracking-[0.1em] text-[#e2e2e2]">
             Upload JSON
           </span>
           <input
@@ -669,7 +803,7 @@ export function EvalsPageClientV0_1() {
         </div>
 
         <div>
-          <label className="mb-2 block text-[12px] font-semibold uppercase tracking-[0.1em] text-[#d0d0d0]">
+          <label className="mb-2 block text-[12px] font-semibold uppercase tracking-[0.1em] text-[#e2e2e2]">
             Paste JSON
           </label>
           <textarea
@@ -793,35 +927,378 @@ export function EvalsPageClientV0_1() {
           </div>
         ) : null}
       </section>
+        {(busy || apiErr || report || readyToScore) ? (
+          <section className="mb-4 space-y-4">
+            <div className={`rounded-[8px] border px-5 py-4 ${stateToneClass}`}>
+              <div className="flex flex-wrap items-center gap-4">
+                <div className="inline-flex items-center gap-2 font-mono text-[12px] font-bold uppercase tracking-[0.08em] text-white">
+                  <span className={`h-2.5 w-2.5 rounded-full ${stateDotClass}`} />
+                  {stateLabel}
+                </div>
+
+                {report ? (
+                  <>
+                    <div className="h-4 w-px bg-[#2a2a2a]" />
+                    <div className="font-mono text-[12px] text-[#d6d6d6]">
+                      provider: <span className="text-white">{report.meta?.provider ?? "-"}</span>
+                    </div>
+                    <div className="font-mono text-[12px] text-[#d6d6d6]">
+                      model: <span className="text-white">{report.meta?.model ?? "-"}</span>
+                    </div>
+                    <div className="font-mono text-[12px] text-[#d6d6d6]">
+                      label: <span className="text-white">{report.meta?.label ?? "-"}</span>
+                    </div>
+                    <div className="min-w-0 flex-1" />
+                    <div className="font-mono text-[12px] text-[#dddddd]">
+                      runId: <span className="text-[#d8d8d8]">{report.runId}</span>
+                    </div>
+                  </>
+                ) : null}
+              </div>
+            </div>
+
+            {report && summaryTask ? (
+              <>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="text-[12px] font-semibold uppercase tracking-[0.1em] text-[#e2e2e2]">
+                      Consistency (Spearman ρ)
+                    </div>
+                    <div className="font-mono text-[14px] text-white">
+                      {typeof summarySpearman === "number" ? fmt(summarySpearman) : "—"}
+                    </div>
+                  </div>
+                  <div className="h-[6px] overflow-hidden rounded-full bg-[#252525]">
+                    <div
+                      className={`h-full rounded-full ${consistencyBarClass}`}
+                      style={{ width: `${consistencyBarWidth}%` }}
+                    />
+                  </div>
+                </div>
+
+                <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+                  {[
+                    {
+                      key: "Pearson r",
+                      value: typeof summaryPearson === "number" ? fmt(summaryPearson) : "—",
+                      note: "aperture primary",
+                      tone: "border-t-[#16a34a]",
+                    },
+                    {
+                      key: "Spearman ρ",
+                      value: typeof summarySpearman === "number" ? fmt(summarySpearman) : "—",
+                      note: "aperture primary",
+                      tone: "border-t-[#22c55e]",
+                    },
+                    {
+                      key: "p_perm",
+                      value: typeof summaryPPerm === "number" ? fmtP(summaryPPerm) : "—",
+                      note:
+                        summaryPermIters || summaryPermSeed
+                          ? `${summaryPermIters ?? "—"} iters · seed ${summaryPermSeed ?? "—"}`
+                          : "permutation",
+                      tone: "border-t-[#f59e0b]",
+                    },
+                    {
+                      key: "Compliance",
+                      value: complianceText,
+                      note: `${summaryCounts.validN} valid · ${summaryCounts.invalidN} invalid`,
+                      tone: "border-t-[#3b82f6]",
+                    },
+                  ].map((card) => (
+                    <div
+                      key={card.key}
+                      className={`rounded-[8px] border border-[#2d2d2d] border-t-2 bg-[#111111] p-4 ${card.tone}`}
+                    >
+                      <div className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[#bdbdbd]">
+                        {card.key}
+                      </div>
+                      <div className="mt-3 font-mono text-[22px] font-bold text-white">
+                        {card.value}
+                      </div>
+                      <div className="mt-2 text-[11px] text-[#e2e2e2]">
+                        {card.note}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                  {(() => {
+                    if (typeof summarySpearman !== "number") return null;
+
+                    const diagnosisKind =
+                      summarySpearman < 0 ? "inversion" :
+                      summarySpearman < 0.7 ? "weak" :
+                      "stable";
+
+                    const diagnosisLabel =
+                      diagnosisKind === "inversion" ? "Logic inversion" :
+                      diagnosisKind === "weak" ? "Inconsistent" :
+                      "Stable";
+
+                    const diagnosisColor =
+                      diagnosisKind === "inversion" ? "#f87171" :
+                      diagnosisKind === "weak" ? "#f59e0b" :
+                      "#22c55e";
+
+                    const diagnosisHint =
+                      diagnosisKind === "inversion"
+                        ? "Spearman ρ < 0 — output inverts the expected aperture order."
+                        : diagnosisKind === "weak"
+                          ? "Spearman ρ ∈ [0, 0.7) — partial ordering detected, but not strong monotonic alignment."
+                          : "Spearman ρ ≥ 0.7 — strong monotonic alignment.";
+
+                    return (
+                      <div
+                        className="mt-4 flex items-center gap-3 rounded-[8px] border border-[#2d2d2d] bg-[#111111] px-4 py-3"
+                        title={diagnosisHint}
+                      >
+                        <span
+                          className="inline-block h-[8px] w-[8px] rounded-full"
+                          style={{ backgroundColor: diagnosisColor }}
+                        />
+                        <span
+                          className="text-[11px] font-semibold uppercase tracking-[0.12em]"
+                          style={{ color: diagnosisColor }}
+                        >
+                          {diagnosisLabel}
+                        </span>
+                        <span className="text-[11px] text-[#c8c8c8]">
+                          {diagnosisHint}
+                        </span>
+                      </div>
+                    );
+                  })()}
+
+                  {summaryTask?.buckets?.length ? (() => {
+                    const buckets = summaryTask.buckets as Array<{
+                      bucket: string;
+                      mean_aperturePrimary?: number;
+                    }>;
+
+                    const pts = buckets.map((b, i) => {
+                      const mean =
+                        typeof b.mean_aperturePrimary === "number"
+                          ? b.mean_aperturePrimary
+                          : 0;
+
+                      return {
+                        label: b.bucket || `V${i + 1}`,
+                        x: 96 + i * 68,
+                        y: 170 - mean * 140,
+                        mean,
+                      };
+                    });
+
+                    const n = pts.length;
+                    const sumX = pts.reduce((a, p) => a + p.x, 0);
+                    const sumY = pts.reduce((a, p) => a + p.y, 0);
+                    const sumXY = pts.reduce((a, p) => a + p.x * p.y, 0);
+                    const sumXX = pts.reduce((a, p) => a + p.x * p.x, 0);
+                    const denom = n * sumXX - sumX * sumX;
+                    const m = denom !== 0 ? (n * sumXY - sumX * sumY) / denom : 0;
+                    const b0 = (sumY - m * sumX) / n;
+                    const x1 = 96;
+                    const x2 = pts[pts.length - 1]?.x ?? 96;
+
+                    return (
+                      <div className="mt-5 rounded-[10px] border border-[#2d2d2d] bg-[#111111] px-4 py-4">
+                        <div className="mb-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#8a8a8a]">
+                          Mean aperture score — V1 → V7
+                        </div>
+
+                        <svg viewBox="0 0 560 220" className="w-full">
+                          <line x1="58" y1="20" x2="58" y2="182" stroke="#333" strokeWidth="1" />
+                          <line x1="58" y1="182" x2="530" y2="182" stroke="#333" strokeWidth="1" />
+
+                          <line
+                            x1={x1}
+                            y1={m * x1 + b0}
+                            x2={x2}
+                            y2={m * x2 + b0}
+                            stroke="#f87171"
+                            strokeWidth="1.5"
+                            strokeDasharray="5 4"
+                            opacity="0.8"
+                          />
+
+                          {[0, 0.5, 1.0].map((v) => (
+                            <g key={v}>
+                              <line
+                                x1="58"
+                                y1={170 - v * 140}
+                                x2="530"
+                                y2={170 - v * 140}
+                                stroke="#1f1f1f"
+                                strokeWidth="1"
+                                strokeDasharray="3 4"
+                              />
+                              <text
+                                x="50"
+                                y={174 - v * 140}
+                                textAnchor="end"
+                                fill="#555"
+                                fontSize="10"
+                                fontFamily="Courier New"
+                              >
+                                {v.toFixed(1)}
+                              </text>
+                            </g>
+                          ))}
+
+                          {pts.map((p, i) => {
+                            const dotColor =
+                              i < 3 ? "#4ade80" :
+                              i === 3 ? "#facc15" :
+                              "#f87171";
+
+                            return (
+                              <g key={p.label}>
+                                <circle cx={p.x} cy={p.y} r="6" fill={dotColor} opacity="0.95" />
+                                <text
+                                  x={p.x}
+                                  y={p.y - 11}
+                                  textAnchor="middle"
+                                  fill="#a3a3a3"
+                                  fontSize="10"
+                                  fontFamily="Courier New"
+                                >
+                                  {p.mean.toFixed(3)}
+                                </text>
+                                <text
+                                  x={p.x}
+                                  y="202"
+                                  textAnchor="middle"
+                                  fill="#666"
+                                  fontSize="10"
+                                  fontFamily="Courier New"
+                                >
+                                  {p.label}
+                                </text>
+                              </g>
+                            );
+                          })}
+
+                          <text
+                            x="294"
+                            y="216"
+                            textAnchor="middle"
+                            fill="#666"
+                            fontSize="11"
+                            fontFamily="Courier New"
+                          >
+                            Bucket rank
+                          </text>
+                        </svg>
+                      </div>
+                    );
+                  })() : null}
+              </>
+            ) : null}
+          </section>
+        ) : null}
+
 
       {report ? (
         <section className="space-y-4">
-          <div className="rounded-lg border p-4 space-y-2">
-            <div className="text-sm text-neutral-600">Report</div>
-            <div className="text-sm">
-              specId: <span className="font-mono">{report.specId}</span> · evalSpecVersion:{" "}
-              <span className="font-mono">{report.evalSpecVersion}</span> · runId:{" "}
-              <span className="font-mono">{report.runId}</span>
+          <div className="rounded-[10px] border border-[#2a2a2a] bg-[#151515] px-5 py-4">
+
+            <div className="text-[11px] uppercase tracking-[0.12em] text-[#6f6f6f]">
+
+              Report
+
             </div>
-            {report.meta ? (
-              <div className="text-sm text-neutral-300">
-                provider: <span className="font-mono">{report.meta.provider ?? ""}</span> · model:{" "}
-                <span className="font-mono">{report.meta.model ?? ""}</span> · label:{" "}
-                <span className="font-mono">{report.meta.label ?? ""}</span>
+
+
+            <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-[12px] text-[#e2e2e2]">
+
+              <span>
+
+                specId: <span className="font-mono text-[#e5e5e5]">{report.specId}</span>
+
+              </span>
+
+              <span>
+
+                evalSpecVersion: <span className="font-mono text-[#e5e5e5]">{report.evalSpecVersion}</span>
+
+              </span>
+
+              <span>
+
+                runId: <span className="font-mono text-[#e5e5e5]">{report.runId}</span>
+
+              </span>
+
+            </div>
+
+
+            <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-[12px] text-[#e2e2e2]">
+
+              <span>
+
+                provider: <span className="font-mono text-[#f2f2f2]">{report.meta?.provider ?? "-"}</span>
+
+              </span>
+
+              <span>
+
+                model: <span className="font-mono text-[#f2f2f2]">{report.meta?.model ?? "-"}</span>
+
+              </span>
+
+              <span>
+
+                label: <span className="font-mono text-[#f2f2f2]">{report.meta?.label ?? "-"}</span>
+
+              </span>
+
+            </div>
+
+
+                          <div className="mt-4 overflow-hidden rounded-[8px] border border-[#262626] bg-[#101010]">
+                <div className="flex items-center justify-between border-b border-[#262626] px-4 py-3">
+                  <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.1em] text-[#d6d6d6]">
+                    Markdown export preview
+                  </div>
+                  <button
+                    type="button"
+                    className="rounded-[4px] border border-[#333] bg-transparent px-2 py-1 font-mono text-[10px] uppercase tracking-[0.08em] text-[#8a8a8a] transition hover:border-[#666] hover:text-white disabled:opacity-40"
+                    onClick={() => void dfCopyText("Copied markdown report.", md || "")}
+                    disabled={!md}
+                  >
+                    copy
+                  </button>
+                </div>
+                <pre className="overflow-x-auto whitespace-pre-wrap bg-[#0c0c0c] px-4 py-4 text-[12px] leading-6 text-[#cfcfcf]">{md || "(empty)"}</pre>
               </div>
-            ) : null}
 
-            <details className="rounded-md border border-[#383838] bg-[#1a1a1a] p-3 mt-2">
-              <summary className="cursor-pointer font-semibold text-white">Markdown report (from renderer)</summary>
-              <pre className="mt-3 overflow-x-auto whitespace-pre-wrap rounded-md border border-[#383838] bg-[#0d0d0d] p-3 text-xs text-neutral-300">{md}</pre>
-            </details>
           </div>
 
-          <div className="space-y-4">
-            {report.tasks.map((t) => (
-              <TaskCard key={t.taskId} t={t} />
-            ))}
-          </div>
+            <div className="space-y-4">
+              <div className="space-y-4">
+                {report.tasks
+                  .filter((t) => t.kind === "byo")
+                  .map((t) => (
+                    <TaskCard key={t.taskId} t={t} />
+                  ))}
+              </div>
+
+              {report.tasks.some((t) => t.kind !== "byo") ? (
+                <section className="space-y-3 pt-2">
+                  <div className="text-[11px] uppercase tracking-[0.12em] text-[#7f7f7f]">
+                    Validation controls
+                  </div>
+                  <div className="space-y-4">
+                    {report.tasks
+                      .filter((t) => t.kind !== "byo")
+                      .map((t) => (
+                        <TaskCard key={t.taskId} t={t} />
+                      ))}
+                  </div>
+                </section>
+              ) : null}
+            </div>
         </section>
       ) : null}
       </main>
