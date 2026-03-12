@@ -897,49 +897,63 @@ export function EvalsPageClientV0_1() {
             </button>
           </div>
 
-        {mode === "run_bundle" && inputProbe.kind === "bucket_only" ? (
-          <div className="rounded-md border border-[#686868] bg-[#1a1a1a] p-3 text-sm text-neutral-300">
-            <div className="text-[11px] uppercase tracking-[0.14em] text-neutral-300">Detected buckets-only JSON</div>
-            <div className="mt-1 text-neutral-300">
-              You are in <span className="font-mono text-neutral-100">run_bundle</span> mode, but the input looks like bucketed tokens (keys V1..V7).
-              Scoring/PDF will auto-wrap into <span className="font-mono text-neutral-100">evalRun.v0.1</span>.
-            </div>
-            <div className="mt-2">
-              <button
-                className="rounded-md border border-[#383838] bg-[#111111] px-3 py-2 text-sm text-neutral-300 transition hover:border-[#686868] hover:bg-[#0d0d0d] hover:text-white"
-                type="button"
-                onClick={() => setMode("task_buckets")}
-              >
-                Switch to “Buckets only”
-              </button>
-            </div>
-          </div>
-        ) : null}
+          <div className="space-y-2 pt-3">
+            {mode === "run_bundle" && inputProbe.kind === "bucket_only" ? (
+              <div className="rounded-[8px] border border-[#5b4a20] bg-[#1d1a12] px-4 py-3">
+                <div className="flex flex-wrap items-start gap-3">
+                  <div className="min-w-0 flex-1">
+                    <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#f3d38b]">
+                      Input mismatch
+                    </div>
+                    <div className="mt-1 text-[12px] leading-6 text-[#d7cfbb]">
+                      You are in <span className="font-mono text-[#fff1c2]">run_bundle</span> mode, but the input looks like bucketed tokens.
+                      Scoring and PDF export will auto-wrap into <span className="font-mono text-[#fff1c2]">evalRun.v0.1</span>.
+                    </div>
+                  </div>
 
-        {inputProbe.kind === "corpus70_meta" ? (
-          <div className="rounded-md border border-[#686868] bg-[#1a1a1a] p-3 text-sm text-neutral-300">
-            <div className="text-[11px] uppercase tracking-[0.14em] text-neutral-300">This looks like a Corpus70 meta-tags JSON</div>
-            <div className="mt-1 text-neutral-300">
-              Evals expects either a full <span className="font-mono text-neutral-100">evalRun.v0.1</span> bundle or buckets keys V1..V7.
-              Corpus70 meta JSON (version/allowedTags/tags) is not scorable here.
-            </div>
-          </div>
-        ) : null}
+                  <button
+                    className="rounded-[6px] border border-[#6a5a2a] bg-[#242016] px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.06em] text-[#f3d38b] transition hover:border-[#8a7636] hover:bg-[#2a2418] hover:text-[#fff1c2]"
+                    type="button"
+                    onClick={() => setMode("task_buckets")}
+                  >
+                    Switch mode
+                  </button>
+                </div>
+              </div>
+            ) : null}
 
-        {notice ? (
-          <div className="rounded-md border border-[#383838] bg-[#1a1a1a] p-3 text-sm text-neutral-300">
-            <div className="text-[11px] uppercase tracking-[0.14em] text-neutral-300">Note</div>
-            <div className="mt-1 text-neutral-300">{notice}</div>
-          </div>
-        ) : null}
+            {inputProbe.kind === "corpus70_meta" ? (
+              <div className="rounded-[8px] border border-[#5b3b3b] bg-[#1d1515] px-4 py-3">
+                <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#f1b4b4]">
+                  Unsupported input
+                </div>
+                <div className="mt-1 text-[12px] leading-6 text-[#d8c0c0]">
+                  This looks like a Corpus70 meta-tags JSON. Evals expects either a full
+                  <span className="font-mono text-[#ffe0e0]"> evalRun.v0.1 </span>
+                  bundle or buckets keys V1..V7.
+                </div>
+              </div>
+            ) : null}
 
-        {apiErr ? (
-          <div className="rounded-md border border-[#686868] bg-[#1a1a1a] p-3 text-sm text-neutral-300">
-            <div className="text-[11px] uppercase tracking-[0.14em] text-neutral-300">Error: <span className="font-mono text-neutral-100">{apiErr.code}</span></div>
-            <div className="mt-1 text-neutral-300">{apiErr.message}</div>
+            {notice ? (
+              <div className="rounded-[8px] border border-[#3e4a5b] bg-[#171b22] px-4 py-3">
+                <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#b8c7e8]">
+                  Note
+                </div>
+                <div className="mt-1 text-[12px] leading-6 text-[#d2d9e6]">{notice}</div>
+              </div>
+            ) : null}
+
+            {apiErr ? (
+              <div className="rounded-[8px] border border-[#6a3d3d] bg-[#211717] px-4 py-3">
+                <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#f2b0b0]">
+                  Error <span className="font-mono text-[#ffe4e4]">{apiErr.code}</span>
+                </div>
+                <div className="mt-1 text-[12px] leading-6 text-[#e0c7c7]">{apiErr.message}</div>
+              </div>
+            ) : null}
           </div>
-        ) : null}
-      </section>
+        </section>
         {(busy || apiErr || report || readyToScore) ? (
           <section className="mb-4 space-y-4">
             <div className={`rounded-[8px] border px-5 py-4 ${stateToneClass}`}>
@@ -1298,11 +1312,16 @@ export function EvalsPageClientV0_1() {
               </div>
 
               {report.tasks.some((t) => t.kind !== "byo") ? (
-                <section className="space-y-3 pt-2">
-                  <div className="text-[11px] uppercase tracking-[0.12em] text-[#7f7f7f]">
-                    Validation controls
-                  </div>
-                  <div className="space-y-4">
+                  <section className="rounded-[8px] border border-[#262626] bg-[#171717] px-4 py-4 space-y-3">
+                    <div className="space-y-1">
+                      <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#9a9a9a]">
+                        Validation controls
+                      </div>
+                      <div className="text-[12px] leading-6 text-[#b8b8b8]">
+                        Derived checks and negative controls stay visible here as supporting evidence.
+                      </div>
+                    </div>
+                    <div className="space-y-3">
                     {report.tasks
                       .filter((t) => t.kind !== "byo")
                       .map((t) => (
