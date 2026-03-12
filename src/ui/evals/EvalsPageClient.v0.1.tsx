@@ -154,25 +154,25 @@ function TaskCard({ t }: { t: EvalTaskReportV0_1 }) {
         <div className="border-t border-[#262626] bg-[#0c0c0c] px-4 py-4">
           <div className="grid gap-y-2 text-[12px] leading-6 md:grid-cols-[180px_minmax(0,1fr)]">
             <div className="text-[#7f7f7f]">missingBuckets</div>
-            <div className="font-mono text-[#d7d7d7]">{joinList(t.diagnostics.missingBuckets)}</div>
+            <div className="font-mono text-[#f2f2f2]">{joinList(t.diagnostics.missingBuckets)}</div>
 
             <div className="text-[#7f7f7f]">extraBuckets</div>
-            <div className="font-mono text-[#d7d7d7]">{joinList(t.diagnostics.extraBuckets)}</div>
+            <div className="font-mono text-[#f2f2f2]">{joinList(t.diagnostics.extraBuckets)}</div>
 
             <div className="text-[#7f7f7f]">emptyTokenCount</div>
-            <div className="font-mono text-[#d7d7d7]">{t.diagnostics.emptyTokenCount}</div>
+            <div className="font-mono text-[#f2f2f2]">{t.diagnostics.emptyTokenCount}</div>
 
             <div className="text-[#7f7f7f]">whitespaceTokenCount</div>
-            <div className="font-mono text-[#d7d7d7]">{t.diagnostics.whitespaceTokenCount}</div>
+            <div className="font-mono text-[#f2f2f2]">{t.diagnostics.whitespaceTokenCount}</div>
 
             <div className="text-[#7f7f7f]">noVowelTokenCount</div>
-            <div className="font-mono text-[#d7d7d7]">{t.diagnostics.noVowelTokenCount}</div>
+            <div className="font-mono text-[#f2f2f2]">{t.diagnostics.noVowelTokenCount}</div>
 
             <div className="text-[#7f7f7f]">totalInvalidTokenCount</div>
-            <div className="font-mono text-[#d7d7d7]">{t.diagnostics.totalInvalidTokenCount}</div>
+            <div className="font-mono text-[#f2f2f2]">{t.diagnostics.totalInvalidTokenCount}</div>
 
             <div className="text-[#7f7f7f]">notes</div>
-            <div className="font-mono text-[#d7d7d7]">
+            <div className="font-mono text-[#f2f2f2]">
               {t.diagnostics.notes.length ? t.diagnostics.notes.join(" | ") : "(none)"}
             </div>
           </div>
@@ -184,7 +184,7 @@ function TaskCard({ t }: { t: EvalTaskReportV0_1 }) {
 
 function StickyNav() {
   return (
-    <div className="sticky top-0 z-50 border-b border-[#333333] bg-[#111111]">
+    <div className="sticky top-0 z-50 border-b border-[#333333] bg-[#1a1a1a]">
       <div className="mx-auto flex h-12 w-full max-w-[1200px] items-center justify-between px-10">
         <Link href="/" aria-label="ZË-RO home" className="inline-flex items-center">
           <Image
@@ -678,7 +678,7 @@ export function EvalsPageClientV0_1() {
 
   return (
     <div
-      className="min-h-screen bg-[#181818] text-white"
+      className="min-h-screen bg-[#242424] text-white"
       style={{ fontFamily: "Courier New, monospace" }}
     >
       <StickyNav />
@@ -699,7 +699,7 @@ export function EvalsPageClientV0_1() {
       <section className="mt-10 rounded-[8px] border border-[#333] bg-[#141414] px-7 pt-7 pb-6 space-y-[18px]">
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <div>
-            <label className="mb-1.5 block text-[12px] font-semibold uppercase tracking-[0.1em] text-[#d0d0d0]">
+            <label className="mb-1.5 block text-[12px] font-semibold uppercase tracking-[0.1em] text-[#e2e2e2]">
               Input mode
             </label>
             <select
@@ -713,7 +713,7 @@ export function EvalsPageClientV0_1() {
           </div>
 
           <div>
-            <label className="mb-1.5 block text-[12px] font-semibold uppercase tracking-[0.1em] text-[#d0d0d0]">
+            <label className="mb-1.5 block text-[12px] font-semibold uppercase tracking-[0.1em] text-[#e2e2e2]">
               Task (Buckets only mode)
             </label>
             <select
@@ -743,7 +743,7 @@ export function EvalsPageClientV0_1() {
 
         <div className="grid grid-cols-1 gap-[14px] md:grid-cols-2 xl:grid-cols-4">
           <div>
-            <label className="mb-1.5 block text-[12px] font-semibold uppercase tracking-[0.1em] text-[#d0d0d0]">
+            <label className="mb-1.5 block text-[12px] font-semibold uppercase tracking-[0.1em] text-[#e2e2e2]">
               runId
             </label>
             <input
@@ -754,7 +754,7 @@ export function EvalsPageClientV0_1() {
           </div>
 
           <div>
-            <label className="mb-1.5 block text-[12px] font-semibold uppercase tracking-[0.1em] text-[#d0d0d0]">
+            <label className="mb-1.5 block text-[12px] font-semibold uppercase tracking-[0.1em] text-[#e2e2e2]">
               provider
             </label>
             <input
@@ -766,7 +766,7 @@ export function EvalsPageClientV0_1() {
           </div>
 
           <div>
-            <label className="mb-1.5 block text-[12px] font-semibold uppercase tracking-[0.1em] text-[#d0d0d0]">
+            <label className="mb-1.5 block text-[12px] font-semibold uppercase tracking-[0.1em] text-[#e2e2e2]">
               model
             </label>
             <input
@@ -778,7 +778,7 @@ export function EvalsPageClientV0_1() {
           </div>
 
           <div>
-            <label className="mb-1.5 block text-[12px] font-semibold uppercase tracking-[0.1em] text-[#d0d0d0]">
+            <label className="mb-1.5 block text-[12px] font-semibold uppercase tracking-[0.1em] text-[#e2e2e2]">
               label
             </label>
             <input
@@ -791,7 +791,7 @@ export function EvalsPageClientV0_1() {
         </div>
 
         <div className="flex flex-wrap items-center gap-[14px] rounded-[5px] border border-[#3a3a3a] bg-[#1a1a1a] px-4 py-[14px]">
-          <span className="text-[12px] font-semibold uppercase tracking-[0.1em] text-[#d0d0d0]">
+          <span className="text-[12px] font-semibold uppercase tracking-[0.1em] text-[#e2e2e2]">
             Upload JSON
           </span>
           <input
@@ -803,7 +803,7 @@ export function EvalsPageClientV0_1() {
         </div>
 
         <div>
-          <label className="mb-2 block text-[12px] font-semibold uppercase tracking-[0.1em] text-[#d0d0d0]">
+          <label className="mb-2 block text-[12px] font-semibold uppercase tracking-[0.1em] text-[#e2e2e2]">
             Paste JSON
           </label>
           <textarea
@@ -949,7 +949,7 @@ export function EvalsPageClientV0_1() {
                       label: <span className="text-white">{report.meta?.label ?? "-"}</span>
                     </div>
                     <div className="min-w-0 flex-1" />
-                    <div className="font-mono text-[12px] text-[#9ca3af]">
+                    <div className="font-mono text-[12px] text-[#dddddd]">
                       runId: <span className="text-[#d8d8d8]">{report.runId}</span>
                     </div>
                   </>
@@ -961,7 +961,7 @@ export function EvalsPageClientV0_1() {
               <>
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <div className="text-[12px] font-semibold uppercase tracking-[0.1em] text-[#d0d0d0]">
+                    <div className="text-[12px] font-semibold uppercase tracking-[0.1em] text-[#e2e2e2]">
                       Consistency (Spearman ρ)
                     </div>
                     <div className="font-mono text-[14px] text-white">
@@ -1016,7 +1016,7 @@ export function EvalsPageClientV0_1() {
                       <div className="mt-3 font-mono text-[22px] font-bold text-white">
                         {card.value}
                       </div>
-                      <div className="mt-2 text-[11px] text-[#8f8f8f]">
+                      <div className="mt-2 text-[11px] text-[#e2e2e2]">
                         {card.note}
                       </div>
                     </div>
@@ -1063,7 +1063,7 @@ export function EvalsPageClientV0_1() {
                         >
                           {diagnosisLabel}
                         </span>
-                        <span className="text-[11px] text-[#777]">
+                        <span className="text-[11px] text-[#c8c8c8]">
                           {diagnosisHint}
                         </span>
                       </div>
@@ -1210,7 +1210,7 @@ export function EvalsPageClientV0_1() {
             </div>
 
 
-            <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-[12px] text-[#b6b6b6]">
+            <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-[12px] text-[#e2e2e2]">
 
               <span>
 
@@ -1233,23 +1233,23 @@ export function EvalsPageClientV0_1() {
             </div>
 
 
-            <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-[12px] text-[#9a9a9a]">
+            <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-[12px] text-[#e2e2e2]">
 
               <span>
 
-                provider: <span className="font-mono text-[#d7d7d7]">{report.meta?.provider ?? "-"}</span>
+                provider: <span className="font-mono text-[#f2f2f2]">{report.meta?.provider ?? "-"}</span>
 
               </span>
 
               <span>
 
-                model: <span className="font-mono text-[#d7d7d7]">{report.meta?.model ?? "-"}</span>
+                model: <span className="font-mono text-[#f2f2f2]">{report.meta?.model ?? "-"}</span>
 
               </span>
 
               <span>
 
-                label: <span className="font-mono text-[#d7d7d7]">{report.meta?.label ?? "-"}</span>
+                label: <span className="font-mono text-[#f2f2f2]">{report.meta?.label ?? "-"}</span>
 
               </span>
 
