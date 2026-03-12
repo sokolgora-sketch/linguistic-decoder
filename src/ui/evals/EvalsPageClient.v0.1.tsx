@@ -74,6 +74,111 @@ function joinList(xs: string[]) {
   return xs.length ? xs.join(", ") : "(none)";
 }
 
+const EVALS_PAPER_SNAPSHOTS = [
+  {
+    id: "paper1",
+      tabLabel: "FRESH-CHAT",
+      tabDetail: "12 independent sessions per provider",
+      title: "Fresh-chat · n=12 runs each",
+    summary: "Source: LingBuzz/009799",
+    badges: ["fresh-chat", "paper v0.1", "snapshot"],
+    providers: [
+      {
+        provider: "OpenAI",
+        model: "chatgpt-5-2-thinking",
+        bestDisplay: "−0.871",
+        bestMagnitude: 0.871,
+        meanDisplay: "−0.775",
+      },
+      {
+        provider: "DeepSeek",
+        model: "deepseek-thinking",
+        bestDisplay: "−0.808",
+        bestMagnitude: 0.808,
+        meanDisplay: "−0.362",
+      },
+      {
+        provider: "xAI",
+        model: "grok-expert",
+        bestDisplay: "−0.759",
+        bestMagnitude: 0.759,
+        meanDisplay: "−0.225",
+      },
+      {
+        provider: "Google",
+        model: "gemini-3-thinking",
+        bestDisplay: "−0.706",
+        bestMagnitude: 0.706,
+        meanDisplay: "−0.238",
+      },
+      {
+        provider: "Anthropic",
+        model: "claude-4.6-sonnet-extended",
+        bestDisplay: "−0.393",
+        bestMagnitude: 0.393,
+        meanDisplay: "−0.096",
+      },
+    ],
+  },
+  {
+    id: "paper2",
+      tabLabel: "SAME-THREAD",
+      tabDetail: "10 sequential turns per provider",
+      title: "Same-thread · n=10 runs each",
+    summary: "Source: LingBuzz/009808",
+    badges: ["same-thread", "paper v0.1", "snapshot"],
+    providers: [
+      {
+        provider: "xAI",
+        model: "grok-expert",
+        bestDisplay: "−0.917",
+        bestMagnitude: 0.917,
+        meanDisplay: "−0.559",
+        regimeLabel: "stabilization/re-lock",
+        regimeTone: "good",
+      },
+      {
+        provider: "OpenAI",
+        model: "chatgpt-5-2-thinking",
+        bestDisplay: "−0.758",
+        bestMagnitude: 0.758,
+        meanDisplay: "−0.391",
+        regimeLabel: "oscillatory recovery",
+        regimeTone: "mid",
+      },
+      {
+        provider: "DeepSeek",
+        model: "deepseek-thinking",
+        bestDisplay: "−0.527",
+        bestMagnitude: 0.527,
+        meanDisplay: "−0.059",
+        regimeLabel: "recovery w/o retention",
+        regimeTone: "mid",
+      },
+      {
+        provider: "Anthropic",
+        model: "claude-4.6-sonnet-extended",
+        bestDisplay: "−0.310",
+        bestMagnitude: 0.310,
+        meanDisplay: "−0.019",
+        regimeLabel: "weak mixed",
+        regimeTone: "weak",
+      },
+      {
+        provider: "Google",
+        model: "gemini-3-thinking",
+        bestDisplay: "−0.479",
+        bestMagnitude: 0.479,
+        meanDisplay: "+0.485",
+        regimeLabel: "⚠ inversion/lock",
+        regimeTone: "inverted",
+      },
+    ],
+    emphasisNote:
+      "Google is the only provider where mean r went positive (+0.485) under same-thread feedback — the only direction inversion in the battery.",
+  },
+];
+
 function TaskCard({ t }: { t: EvalTaskReportV0_1 }) {
   return (
     <section className="rounded-[10px] border border-[#3a3a3a] bg-[#151515] px-5 py-5 space-y-5">
@@ -229,6 +334,146 @@ function StickyNav() {
   );
 }
 
+function PaperSnapshotReferenceSection({
+  paperSnapshotTab,
+  setPaperSnapshotTab,
+}: {
+  paperSnapshotTab: "paper1" | "paper2";
+  setPaperSnapshotTab: (value: "paper1" | "paper2") => void;
+}) {
+  const activePaper =
+    EVALS_PAPER_SNAPSHOTS.find((p) => p.id === paperSnapshotTab) ?? EVALS_PAPER_SNAPSHOTS[0];
+
+  const activeProviders = activePaper.providers as Array<{
+    provider: string;
+    model: string;
+    bestDisplay: string;
+    meanDisplay: string;
+    regimeLabel?: string;
+  }>;
+
+  const sourceHref =
+    activePaper.id === "paper1"
+      ? "https://ling.auf.net/lingbuzz/009799"
+      : "https://ling.auf.net/lingbuzz/009808";
+
+  const sourceLabel =
+    activePaper.id === "paper1"
+      ? "Source: LingBuzz/009799"
+      : "Source: LingBuzz/009808";
+
+  return (
+    <details className="group mt-8 overflow-hidden rounded-[8px] border border-[#333] bg-[#141414]">
+      <summary className="flex cursor-pointer list-none items-center justify-between gap-4 bg-[#161616] px-5 py-4 text-left transition hover:bg-[#1a1a1a] [&::-webkit-details-marker]:hidden">
+        <div className="min-w-0">
+          <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#d6d6d6]">
+            Paper snapshots
+          </div>
+          <div className="mt-1 text-[16px] font-semibold text-white">
+            Paper v0.1 snapshot · not live data
+          </div>
+          <div className="mt-1 text-[12px] leading-6 text-[#9a9a9a]">
+            Reference results from LingBuzz/009799 and 009808.
+          </div>
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            <span className="rounded-full border border-[#21452a] bg-[#112017] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#4ade80]">
+              Fresh-chat
+            </span>
+            <span className="rounded-full border border-[#3a3a3a] bg-[#101010] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#b8b8b8]">
+              Same-thread
+            </span>
+            <span className="rounded-full border border-[#5b4a20] bg-[#1d1a12] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#f3d38b]">
+              Click to expand
+            </span>
+          </div>
+        </div>
+
+        <div className="shrink-0 rounded-full border border-[#3a3a3a] bg-[#101010] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#d8d8d8] transition group-hover:border-[#666] group-hover:text-white">
+          Open ↓
+        </div>
+      </summary>
+
+      <div className="border-t border-[#2b2b2b] px-5 py-5 space-y-4">
+        <div className="flex flex-wrap items-center gap-2">
+          {EVALS_PAPER_SNAPSHOTS.map((paper) => {
+            const active = paper.id === paperSnapshotTab;
+            return (
+              <button
+                key={paper.id}
+                type="button"
+                className={
+                  active
+                    ? "rounded-[6px] border border-[#16a34a] bg-[#1a3a2a] px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#4ade80] transition"
+                    : "rounded-[6px] border border-[#3a3a3a] bg-[#101010] px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#b8b8b8] transition hover:border-[#666] hover:text-white"
+                }
+                onClick={(e) => {
+                  e.preventDefault();
+                  setPaperSnapshotTab(paper.id as "paper1" | "paper2");
+                }}
+              >
+                {paper.tabLabel}
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="rounded-[8px] border border-[#2f2f2f] bg-[#101010] p-4">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div className="space-y-1">
+              <div className="text-[13px] font-semibold text-white">{activePaper.title}</div>
+              <div className="text-[11px] leading-6 text-[#9a9a9a]">{activePaper.tabDetail}</div>
+            </div>
+            <a
+              href={sourceHref}
+              target="_blank"
+              rel="noreferrer"
+              className="text-[11px] leading-6 text-[#d8d8d8] underline-offset-4 hover:underline"
+            >
+              {sourceLabel}
+            </a>
+          </div>
+
+          <div className="mt-4 overflow-x-auto rounded-[6px] border border-[#262626]">
+            <table className="w-full border-collapse text-[12px]">
+              <thead>
+                <tr className="border-b border-[#262626] bg-[#121212]">
+                  <th className="px-3 py-2 text-left text-[10px] font-semibold uppercase tracking-[0.12em] text-[#8f8f8f]">Provider</th>
+                  <th className="px-3 py-2 text-left text-[10px] font-semibold uppercase tracking-[0.12em] text-[#8f8f8f]">Model / regime</th>
+                  <th className="px-3 py-2 text-right text-[10px] font-semibold uppercase tracking-[0.12em] text-[#8f8f8f]">Best ρ</th>
+                  <th className="px-3 py-2 text-right text-[10px] font-semibold uppercase tracking-[0.12em] text-[#8f8f8f]">Mean ρ</th>
+                </tr>
+              </thead>
+              <tbody>
+                {activeProviders.map((row) => (
+                  <tr key={`${row.provider}-${row.model}`} className="border-t border-[#262626]">
+                    <td className="px-3 py-2.5 text-[#f2f2f2]">{row.provider}</td>
+                    <td className="px-3 py-2.5">
+                      <div className="text-[#d8d8d8]">{row.model}</div>
+                      {typeof row.regimeLabel === "string" && row.regimeLabel.length > 0 ? (
+                        <div className="mt-0.5 text-[11px] text-[#8f8f8f]">{row.regimeLabel}</div>
+                      ) : null}
+                    </td>
+                    <td className="px-3 py-2.5 text-right font-mono text-[#f2f2f2]">{row.bestDisplay}</td>
+                    <td className="px-3 py-2.5 text-right font-mono text-[#cfcfcf]">{row.meanDisplay}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {"emphasisNote" in activePaper &&
+          typeof activePaper.emphasisNote === "string" &&
+          activePaper.emphasisNote.length > 0 ? (
+            <div className="mt-3 text-[11px] italic leading-6 text-[#b8b8b8]">
+              {activePaper.emphasisNote}
+            </div>
+          ) : null}
+        </div>
+      </div>
+    </details>
+  );
+}
+
 export function EvalsPageClientV0_1() {
   const byoTasks = useMemo(
     () => EVAL_SPEC_V0_1.tasks.filter((t) => t.kind === "byo"),
@@ -251,6 +496,7 @@ export function EvalsPageClientV0_1() {
   const [md, setMd] = useState<string>("");
 
   const [notice, setNotice] = useState<string | null>(null);
+  const [paperSnapshotTab, setPaperSnapshotTab] = useState<"paper1" | "paper2">("paper1");
 
   const selectedTask = useMemo(
     () => byoTasks.find((t) => t.taskId === taskId) ?? byoTasks[0],
@@ -715,6 +961,8 @@ export function EvalsPageClientV0_1() {
             Score your model output against the deterministic aperture proxy. No API keys. No model calls. Paste output, get a Pearson r.
           </p>
         </header>
+
+        <PaperSnapshotReferenceSection paperSnapshotTab={paperSnapshotTab} setPaperSnapshotTab={setPaperSnapshotTab} />
 
       <section className="mt-10 rounded-[8px] border border-[#333] bg-[#141414] px-7 pt-7 pb-6 space-y-[18px]">
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">

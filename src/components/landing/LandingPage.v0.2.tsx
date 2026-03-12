@@ -153,6 +153,8 @@ const BASELINES: BaselineCard[] = [
   },
 ];
 
+const SHOW_LLM_RESULTS_ON_LANDING = false;
+
 const LLM_PAPERS: LlmPaper[] = [
   {
     id: "paper1",
@@ -986,6 +988,36 @@ function LlmResultsSection() {
   );
 }
 
+function EvalsReferenceTeaser() {
+  return (
+    <section className="rounded-md border border-[#686868] bg-[#232323] p-5">
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div className="space-y-1">
+          <div
+            className="text-[11px] uppercase tracking-[0.14em] text-neutral-300"
+            style={{ fontFamily: "Courier New, monospace" }}
+          >
+            evals reference
+          </div>
+          <div className="text-lg font-semibold text-white">Paper snapshots moved to Evals</div>
+          <div className="max-w-[720px] text-sm leading-6 text-neutral-300">
+            Fresh-chat and same-thread paper snapshots now live on the Evals page, next to live scoring,
+            report export, and validation context.
+          </div>
+        </div>
+
+        <Link
+          href="/evals"
+          className="inline-flex items-center rounded-md border border-[#686868] bg-[#181818] px-4 py-2 text-[11px] uppercase tracking-[0.12em] text-neutral-100 transition hover:border-[#16a34a] hover:text-[#16a34a]"
+          style={{ fontFamily: "Courier New, monospace" }}
+        >
+          Open Evals →
+        </Link>
+      </div>
+    </section>
+  );
+}
+
 function HowItWorksSection() {
   return (
     <section className="rounded-md border border-[#686868] bg-[#232323] p-5">
@@ -1121,8 +1153,8 @@ function Footer() {
           className="flex flex-wrap items-center gap-4 text-[11px] uppercase tracking-[0.14em] text-neutral-300"
           style={{ fontFamily: 'Courier New, monospace' }}
         >
-          <span>paper v0.1 snapshot</span>
-          <span>not live data</span>
+          <span>deterministic instrument</span>
+          <span>paper evidence in evals</span>
           <span>baseline-locked</span>
         </div>
       </div>
@@ -1159,7 +1191,7 @@ export function LandingPageV0_2() {
           <ApertureBar mounted={mounted} />
           <HeroSection mounted={mounted} />
           <BaselineGrid />
-          <LlmResultsSection />
+          {SHOW_LLM_RESULTS_ON_LANDING ? <LlmResultsSection /> : <EvalsReferenceTeaser />}
           <HowItWorksSection />
           <ScientificFoundationSection />
           <FAQSection />
