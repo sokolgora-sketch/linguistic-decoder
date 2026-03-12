@@ -148,7 +148,7 @@ function TaskCard({ t }: { t: EvalTaskReportV0_1 }) {
       </div>
 
             <details className="overflow-hidden rounded-[8px] border border-[#262626] bg-[#101010]">
-        <summary className="cursor-pointer px-4 py-3 font-mono text-[11px] font-semibold uppercase tracking-[0.1em] text-[#d6d6d6]">
+        <summary className="cursor-pointer px-4 py-3 text-[11px] font-semibold uppercase tracking-[0.1em] text-[#d6d6d6]">
           Diagnostics
         </summary>
         <div className="border-t border-[#262626] bg-[#0c0c0c] px-4 py-4">
@@ -200,7 +200,7 @@ function StickyNav() {
         <Link
           href="/"
           className="text-[11px] uppercase tracking-[0.14em] text-neutral-300 transition hover:text-white"
-          style={{ fontFamily: "Courier New, monospace" }}
+          
         >
           ← home
         </Link>
@@ -679,7 +679,7 @@ export function EvalsPageClientV0_1() {
   return (
     <div
       className="min-h-screen bg-[#242424] text-white"
-      style={{ fontFamily: "Courier New, monospace" }}
+      
     >
       <StickyNav />
 
@@ -798,7 +798,7 @@ export function EvalsPageClientV0_1() {
             type="file"
             accept=".json,application/json"
             onChange={(e) => void onPickFile(e.target.files?.[0] ?? null)}
-            className="block text-sm text-neutral-300 file:mr-3 file:rounded-[4px] file:border file:border-[#3a3a3a] file:bg-[#141414] file:px-3 file:py-1.5 file:font-mono file:text-[11px] file:text-[#555] hover:file:border-[#666] hover:file:text-[#eee]"
+            className="block text-sm text-neutral-300 file:mr-3 file:rounded-[4px] file:border file:border-[#3a3a3a] file:bg-[#141414] file:px-3 file:py-1.5 file:text-[11px] file:text-[#555] hover:file:border-[#666] hover:file:text-[#eee]"
           />
         </div>
 
@@ -824,7 +824,7 @@ export function EvalsPageClientV0_1() {
         <div className="flex flex-wrap items-center gap-2 pt-1">
           <button
             type="button"
-            className="rounded-[5px] border border-[#16a34a] bg-[#16a34a] px-6 py-2.5 font-mono text-[12px] font-bold uppercase tracking-[0.06em] text-white transition hover:bg-[#15803d] hover:shadow-[0_0_0_1px_rgba(22,163,74,0.4),0_4px_16px_rgba(22,163,74,0.33)] disabled:cursor-not-allowed disabled:border-[#333] disabled:bg-[#111] disabled:text-[#333] disabled:shadow-none"
+            className="rounded-[5px] border border-[#16a34a] bg-[#16a34a] px-6 py-2.5 text-[12px] font-bold uppercase tracking-[0.06em] text-white transition hover:bg-[#15803d] hover:shadow-[0_0_0_1px_rgba(22,163,74,0.4),0_4px_16px_rgba(22,163,74,0.33)] disabled:cursor-not-allowed disabled:border-[#333] disabled:bg-[#111] disabled:text-[#333] disabled:shadow-none"
             onClick={() => void onScore()}
             disabled={busy || !inputText.trim()}
           >
@@ -833,7 +833,7 @@ export function EvalsPageClientV0_1() {
 
           <button
             type="button"
-            className="rounded-[5px] border border-[#5a2a2a] bg-transparent px-4 py-2.5 font-mono text-[11px] uppercase tracking-[0.06em] text-[#cc6666] transition hover:border-[#cc0000] hover:bg-[#cc000010] hover:text-[#e05555] disabled:opacity-50"
+            className="rounded-[5px] border border-[#5a2a2a] bg-transparent px-4 py-2.5 text-[11px] uppercase tracking-[0.06em] text-[#cc6666] transition hover:border-[#cc0000] hover:bg-[#cc000010] hover:text-[#e05555] disabled:opacity-50"
             onClick={() => void onDownloadPdf()}
             disabled={busy || !inputText.trim()}
           >
@@ -842,7 +842,7 @@ export function EvalsPageClientV0_1() {
 
           <button
             type="button"
-            className="rounded-[5px] border border-[#333] bg-transparent px-4 py-2.5 font-mono text-[11px] uppercase tracking-[0.06em] text-[#777] transition hover:border-[#777] hover:text-[#eee] disabled:opacity-50"
+            className="rounded-[5px] border border-[#333] bg-transparent px-4 py-2.5 text-[11px] uppercase tracking-[0.06em] text-[#777] transition hover:border-[#777] hover:text-[#eee] disabled:opacity-50"
             onClick={() => void onCopyRawJson()}
             disabled={busy || !inputText.trim()}
           >
@@ -851,7 +851,7 @@ export function EvalsPageClientV0_1() {
 
           <button
             type="button"
-            className="rounded-[5px] border border-[#333] bg-transparent px-4 py-2.5 font-mono text-[11px] uppercase tracking-[0.06em] text-[#777] transition hover:border-[#777] hover:text-[#eee] disabled:opacity-50"
+            className="rounded-[5px] border border-[#333] bg-transparent px-4 py-2.5 text-[11px] uppercase tracking-[0.06em] text-[#777] transition hover:border-[#777] hover:text-[#eee] disabled:opacity-50"
             onClick={() => void onCopyCsvRow()}
             disabled={busy || !report}
           >
@@ -862,7 +862,7 @@ export function EvalsPageClientV0_1() {
 
           <button
             type="button"
-            className="rounded-[5px] border border-dashed border-[#333] bg-transparent px-4 py-2.5 font-mono text-[11px] uppercase tracking-[0.06em] text-[#888] transition hover:border-[#555] hover:text-[#bbb]"
+            className="rounded-[5px] border border-dashed border-[#333] bg-transparent px-4 py-2.5 text-[11px] uppercase tracking-[0.06em] text-[#888] transition hover:border-[#555] hover:text-[#bbb]"
             onClick={loadExample}
             disabled={busy}
           >
@@ -871,7 +871,7 @@ export function EvalsPageClientV0_1() {
 
           <button
             type="button"
-            className="border-0 bg-transparent px-3 py-2.5 font-mono text-[11px] uppercase tracking-[0.06em] text-[#555] transition hover:text-[#cc0000]"
+            className="border-0 bg-transparent px-3 py-2.5 text-[11px] uppercase tracking-[0.06em] text-[#555] transition hover:text-[#cc0000]"
             onClick={() => {
               setInputText("");
               setApiErr(null);
@@ -931,7 +931,7 @@ export function EvalsPageClientV0_1() {
           <section className="mb-4 space-y-4">
             <div className={`rounded-[8px] border px-5 py-4 ${stateToneClass}`}>
               <div className="flex flex-wrap items-center gap-4">
-                <div className="inline-flex items-center gap-2 font-mono text-[12px] font-bold uppercase tracking-[0.08em] text-white">
+                <div className="inline-flex items-center gap-2 text-[12px] font-bold uppercase tracking-[0.08em] text-white">
                   <span className={`h-2.5 w-2.5 rounded-full ${stateDotClass}`} />
                   {stateLabel}
                 </div>
@@ -1258,7 +1258,7 @@ export function EvalsPageClientV0_1() {
 
                           <div className="mt-4 overflow-hidden rounded-[8px] border border-[#262626] bg-[#101010]">
                 <div className="flex items-center justify-between border-b border-[#262626] px-4 py-3">
-                  <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.1em] text-[#d6d6d6]">
+                  <div className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[#d6d6d6]">
                     Markdown export preview
                   </div>
                   <button
