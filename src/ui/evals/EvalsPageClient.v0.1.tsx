@@ -1003,6 +1003,177 @@ export function EvalsPageClientV0_1() {
                     </div>
                   ))}
                 </div>
+
+                  {(() => {
+                    if (typeof summarySpearman !== "number") return null;
+
+                    const diagnosisKind =
+                      summarySpearman < 0 ? "inversion" :
+                      summarySpearman < 0.7 ? "weak" :
+                      "stable";
+
+                    const diagnosisLabel =
+                      diagnosisKind === "inversion" ? "Logic inversion" :
+                      diagnosisKind === "weak" ? "Inconsistent" :
+                      "Stable";
+
+                    const diagnosisColor =
+                      diagnosisKind === "inversion" ? "#f87171" :
+                      diagnosisKind === "weak" ? "#f59e0b" :
+                      "#22c55e";
+
+                    const diagnosisHint =
+                      diagnosisKind === "inversion"
+                        ? "Spearman ρ < 0 — output inverts the expected aperture order."
+                        : diagnosisKind === "weak"
+                          ? "Spearman ρ ∈ [0, 0.7) — partial ordering detected, but not strong monotonic alignment."
+                          : "Spearman ρ ≥ 0.7 — strong monotonic alignment.";
+
+                    return (
+                      <div
+                        className="mt-4 flex items-center gap-3 rounded-[8px] border border-[#2d2d2d] bg-[#111111] px-4 py-3"
+                        title={diagnosisHint}
+                      >
+                        <span
+                          className="inline-block h-[8px] w-[8px] rounded-full"
+                          style={{ backgroundColor: diagnosisColor }}
+                        />
+                        <span
+                          className="text-[11px] font-semibold uppercase tracking-[0.12em]"
+                          style={{ color: diagnosisColor }}
+                        >
+                          {diagnosisLabel}
+                        </span>
+                        <span className="text-[11px] text-[#777]">
+                          {diagnosisHint}
+                        </span>
+                      </div>
+                    );
+                  })()}
+
+                  {summaryTask?.buckets?.length ? (() => {
+                    const buckets = summaryTask.buckets as Array<{
+                      bucket: string;
+                      mean_aperturePrimary?: number;
+                    }>;
+
+                    const pts = buckets.map((b, i) => {
+                      const mean =
+                        typeof b.mean_aperturePrimary === "number"
+                          ? b.mean_aperturePrimary
+                          : 0;
+
+                      return {
+                        label: b.bucket || `V${i + 1}`,
+                        x: 96 + i * 68,
+                        y: 170 - mean * 140,
+                        mean,
+                      };
+                    });
+
+                    const n = pts.length;
+                    const sumX = pts.reduce((a, p) => a + p.x, 0);
+                    const sumY = pts.reduce((a, p) => a + p.y, 0);
+                    const sumXY = pts.reduce((a, p) => a + p.x * p.y, 0);
+                    const sumXX = pts.reduce((a, p) => a + p.x * p.x, 0);
+                    const denom = n * sumXX - sumX * sumX;
+                    const m = denom !== 0 ? (n * sumXY - sumX * sumY) / denom : 0;
+                    const b0 = (sumY - m * sumX) / n;
+                    const x1 = 96;
+                    const x2 = pts[pts.length - 1]?.x ?? 96;
+
+                    return (
+                      <div className="mt-5 rounded-[10px] border border-[#2d2d2d] bg-[#111111] px-4 py-4">
+                        <div className="mb-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#8a8a8a]">
+                          Mean aperture score — V1 → V7
+                        </div>
+
+                        <svg viewBox="0 0 560 220" className="w-full">
+                          <line x1="58" y1="20" x2="58" y2="182" stroke="#333" strokeWidth="1" />
+                          <line x1="58" y1="182" x2="530" y2="182" stroke="#333" strokeWidth="1" />
+
+                          <line
+                            x1={x1}
+                            y1={m * x1 + b0}
+                            x2={x2}
+                            y2={m * x2 + b0}
+                            stroke="#f87171"
+                            strokeWidth="1.5"
+                            strokeDasharray="5 4"
+                            opacity="0.8"
+                          />
+
+                          {[0, 0.5, 1.0].map((v) => (
+                            <g key={v}>
+                              <line
+                                x1="58"
+                                y1={170 - v * 140}
+                                x2="530"
+                                y2={170 - v * 140}
+                                stroke="#1f1f1f"
+                                strokeWidth="1"
+                                strokeDasharray="3 4"
+                              />
+                              <text
+                                x="50"
+                                y={174 - v * 140}
+                                textAnchor="end"
+                                fill="#555"
+                                fontSize="10"
+                                fontFamily="Courier New"
+                              >
+                                {v.toFixed(1)}
+                              </text>
+                            </g>
+                          ))}
+
+                          {pts.map((p, i) => {
+                            const dotColor =
+                              i < 3 ? "#4ade80" :
+                              i === 3 ? "#facc15" :
+                              "#f87171";
+
+                            return (
+                              <g key={p.label}>
+                                <circle cx={p.x} cy={p.y} r="6" fill={dotColor} opacity="0.95" />
+                                <text
+                                  x={p.x}
+                                  y={p.y - 11}
+                                  textAnchor="middle"
+                                  fill="#a3a3a3"
+                                  fontSize="10"
+                                  fontFamily="Courier New"
+                                >
+                                  {p.mean.toFixed(3)}
+                                </text>
+                                <text
+                                  x={p.x}
+                                  y="202"
+                                  textAnchor="middle"
+                                  fill="#666"
+                                  fontSize="10"
+                                  fontFamily="Courier New"
+                                >
+                                  {p.label}
+                                </text>
+                              </g>
+                            );
+                          })}
+
+                          <text
+                            x="294"
+                            y="216"
+                            textAnchor="middle"
+                            fill="#666"
+                            fontSize="11"
+                            fontFamily="Courier New"
+                          >
+                            Bucket rank
+                          </text>
+                        </svg>
+                      </div>
+                    );
+                  })() : null}
               </>
             ) : null}
           </section>
