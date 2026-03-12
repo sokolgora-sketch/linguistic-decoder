@@ -65,6 +65,11 @@ function fmt(x: number, d = 3) {
   return x.toFixed(d);
 }
 
+function fmtP(x: number) {
+  if (!Number.isFinite(x)) return "NaN";
+  return x < 0.001 ? "< 0.001" : x.toFixed(3);
+}
+
 function joinList(xs: string[]) {
   return xs.length ? xs.join(", ") : "(none)";
 }
@@ -214,6 +219,116 @@ export function EvalsPageClientV0_1() {
   );
 
   const inputProbe = useMemo(() => probeInput(inputText), [inputText]);
+
+  const readyToScore =
+    Boolean(inputText.trim()) &&
+    inputProbe.kind !== "invalid_json" &&
+    inputProbe.kind !== "corpus70_meta";
+
+  const summaryTask: any =
+    report?.tasks?.find(
+      (x: any) => x?.kind === "byo" || String(x?.taskId ?? "").includes("LADDER")
+    ) ??
+    report?.tasks?.[0] ??
+    null;
+
+  const summarySlopePrimary: any = summaryTask?.slope_aperturePrimary ?? null;
+
+  const summarySlopePresence: any =
+    summaryTask?.slope_aperturePresenceMean ??
+    summaryTask?.slopes?.aperturePresenceMean ??
+    summaryTask?.aperturePresenceMean ??
+    null;
+
+  const summaryPearson =
+    typeof summarySlopePrimary?.pearson_r === "number"
+      ? summarySlopePrimary.pearson_r
+      : null;
+
+  const summarySpearman =
+    typeof summarySlopePrimary?.spearman_rho === "number"
+      ? summarySlopePrimary.spearman_rho
+      : null;
+
+  const summaryPPerm =
+    typeof summarySlopePresence?.p_spearman === "number"
+      ? summarySlopePresence.p_spearman
+      : typeof summarySlopePresence?.p_perm_spearman === "number"
+        ? summarySlopePresence.p_perm_spearman
+        : typeof summarySlopePrimary?.p_spearman === "number"
+          ? summarySlopePrimary.p_spearman
+          : null;
+
+  const summaryPermIters =
+    summarySlopePresence?.iters ??
+    summarySlopePrimary?.iters ??
+    null;
+
+  const summaryPermSeed =
+    summarySlopePresence?.seed ??
+    summarySlopePrimary?.seed ??
+    null;
+
+  const summaryBuckets: any[] = Array.isArray(summaryTask?.buckets)
+    ? summaryTask.buckets
+    : [];
+
+  const compliantBuckets = summaryBuckets.filter(
+    (b: any) => Number(b?.invalidN ?? 0) === 0 && Number(b?.duplicateN ?? 0) === 0
+  ).length;
+
+  const complianceText = summaryBuckets.length
+    ? `${compliantBuckets} / ${summaryBuckets.length}`
+    : "—";
+
+  const summaryCounts = summaryBuckets.reduce(
+    (acc: { validN: number; invalidN: number }, b: any) => {
+      acc.validN += Number(b?.validN ?? 0);
+      acc.invalidN += Number(b?.invalidN ?? 0);
+      return acc;
+    },
+    { validN: 0, invalidN: 0 }
+  );
+
+  const stateLabel = busy
+    ? "SCORING"
+    : apiErr
+      ? "ERROR"
+      : report
+        ? "RUN SCORED"
+        : readyToScore
+          ? "READY TO SCORE"
+          : "IDLE";
+
+  const stateToneClass = busy
+    ? "border-[#666] bg-[#1a1a1a]"
+    : apiErr
+      ? "border-[#6b2a2a] bg-[#221313]"
+      : report
+        ? "border-[#14532d] bg-[#052e16]"
+        : readyToScore
+          ? "border-[#1f4d2e] bg-[#0d1f14]"
+          : "border-[#383838] bg-[#111111]";
+
+  const stateDotClass = busy
+    ? "bg-[#999]"
+    : apiErr
+      ? "bg-[#ef4444]"
+      : report
+        ? "bg-[#22c55e]"
+        : readyToScore
+          ? "bg-[#16a34a]"
+          : "bg-[#666]";
+
+  const consistencyBarWidth =
+    typeof summarySpearman === "number"
+      ? Math.max(0, Math.min(100, Math.abs(summarySpearman) * 100))
+      : 0;
+
+  const consistencyBarClass =
+    typeof summarySpearman === "number" && summarySpearman < 0
+      ? "bg-[#ff6b6b]"
+      : "bg-[#22c55e]";
 
   async function onPickFile(f: File | null) {
     if (!f) return;
@@ -793,28 +908,176 @@ export function EvalsPageClientV0_1() {
           </div>
         ) : null}
       </section>
+        {(busy || apiErr || report || readyToScore) ? (
+          <section className="mb-4 space-y-4">
+            <div className={`rounded-[8px] border px-5 py-4 ${stateToneClass}`}>
+              <div className="flex flex-wrap items-center gap-4">
+                <div className="inline-flex items-center gap-2 font-mono text-[12px] font-bold uppercase tracking-[0.08em] text-white">
+                  <span className={`h-2.5 w-2.5 rounded-full ${stateDotClass}`} />
+                  {stateLabel}
+                </div>
+
+                {report ? (
+                  <>
+                    <div className="h-4 w-px bg-[#2a2a2a]" />
+                    <div className="font-mono text-[12px] text-[#d6d6d6]">
+                      provider: <span className="text-white">{report.meta?.provider ?? "-"}</span>
+                    </div>
+                    <div className="font-mono text-[12px] text-[#d6d6d6]">
+                      model: <span className="text-white">{report.meta?.model ?? "-"}</span>
+                    </div>
+                    <div className="font-mono text-[12px] text-[#d6d6d6]">
+                      label: <span className="text-white">{report.meta?.label ?? "-"}</span>
+                    </div>
+                    <div className="min-w-0 flex-1" />
+                    <div className="font-mono text-[12px] text-[#9ca3af]">
+                      runId: <span className="text-[#d8d8d8]">{report.runId}</span>
+                    </div>
+                  </>
+                ) : null}
+              </div>
+            </div>
+
+            {report && summaryTask ? (
+              <>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="text-[12px] font-semibold uppercase tracking-[0.1em] text-[#d0d0d0]">
+                      Consistency (Spearman ρ)
+                    </div>
+                    <div className="font-mono text-[14px] text-white">
+                      {typeof summarySpearman === "number" ? fmt(summarySpearman) : "—"}
+                    </div>
+                  </div>
+                  <div className="h-[6px] overflow-hidden rounded-full bg-[#252525]">
+                    <div
+                      className={`h-full rounded-full ${consistencyBarClass}`}
+                      style={{ width: `${consistencyBarWidth}%` }}
+                    />
+                  </div>
+                </div>
+
+                <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+                  {[
+                    {
+                      key: "Pearson r",
+                      value: typeof summaryPearson === "number" ? fmt(summaryPearson) : "—",
+                      note: "aperture primary",
+                      tone: "border-t-[#16a34a]",
+                    },
+                    {
+                      key: "Spearman ρ",
+                      value: typeof summarySpearman === "number" ? fmt(summarySpearman) : "—",
+                      note: "aperture primary",
+                      tone: "border-t-[#22c55e]",
+                    },
+                    {
+                      key: "p_perm",
+                      value: typeof summaryPPerm === "number" ? fmtP(summaryPPerm) : "—",
+                      note:
+                        summaryPermIters || summaryPermSeed
+                          ? `${summaryPermIters ?? "—"} iters · seed ${summaryPermSeed ?? "—"}`
+                          : "permutation",
+                      tone: "border-t-[#f59e0b]",
+                    },
+                    {
+                      key: "Compliance",
+                      value: complianceText,
+                      note: `${summaryCounts.validN} valid · ${summaryCounts.invalidN} invalid`,
+                      tone: "border-t-[#3b82f6]",
+                    },
+                  ].map((card) => (
+                    <div
+                      key={card.key}
+                      className={`rounded-[8px] border border-[#2d2d2d] border-t-2 bg-[#111111] p-4 ${card.tone}`}
+                    >
+                      <div className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[#bdbdbd]">
+                        {card.key}
+                      </div>
+                      <div className="mt-3 font-mono text-[22px] font-bold text-white">
+                        {card.value}
+                      </div>
+                      <div className="mt-2 text-[11px] text-[#8f8f8f]">
+                        {card.note}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>
+            ) : null}
+          </section>
+        ) : null}
+
 
       {report ? (
         <section className="space-y-4">
-          <div className="rounded-lg border p-4 space-y-2">
-            <div className="text-sm text-neutral-600">Report</div>
-            <div className="text-sm">
-              specId: <span className="font-mono">{report.specId}</span> · evalSpecVersion:{" "}
-              <span className="font-mono">{report.evalSpecVersion}</span> · runId:{" "}
-              <span className="font-mono">{report.runId}</span>
-            </div>
-            {report.meta ? (
-              <div className="text-sm text-neutral-300">
-                provider: <span className="font-mono">{report.meta.provider ?? ""}</span> · model:{" "}
-                <span className="font-mono">{report.meta.model ?? ""}</span> · label:{" "}
-                <span className="font-mono">{report.meta.label ?? ""}</span>
-              </div>
-            ) : null}
+          <div className="rounded-[10px] border border-[#2a2a2a] bg-[#151515] px-5 py-4">
 
-            <details className="rounded-md border border-[#383838] bg-[#1a1a1a] p-3 mt-2">
-              <summary className="cursor-pointer font-semibold text-white">Markdown report (from renderer)</summary>
-              <pre className="mt-3 overflow-x-auto whitespace-pre-wrap rounded-md border border-[#383838] bg-[#0d0d0d] p-3 text-xs text-neutral-300">{md}</pre>
+            <div className="text-[11px] uppercase tracking-[0.12em] text-[#6f6f6f]">
+
+              Report
+
+            </div>
+
+
+            <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-[12px] text-[#b6b6b6]">
+
+              <span>
+
+                specId: <span className="font-mono text-[#e5e5e5]">{report.specId}</span>
+
+              </span>
+
+              <span>
+
+                evalSpecVersion: <span className="font-mono text-[#e5e5e5]">{report.evalSpecVersion}</span>
+
+              </span>
+
+              <span>
+
+                runId: <span className="font-mono text-[#e5e5e5]">{report.runId}</span>
+
+              </span>
+
+            </div>
+
+
+            <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-[12px] text-[#9a9a9a]">
+
+              <span>
+
+                provider: <span className="font-mono text-[#d7d7d7]">{report.meta?.provider ?? "-"}</span>
+
+              </span>
+
+              <span>
+
+                model: <span className="font-mono text-[#d7d7d7]">{report.meta?.model ?? "-"}</span>
+
+              </span>
+
+              <span>
+
+                label: <span className="font-mono text-[#d7d7d7]">{report.meta?.label ?? "-"}</span>
+
+              </span>
+
+            </div>
+
+
+            <details className="mt-4 overflow-hidden rounded-[8px] border border-[#262626] bg-[#101010]">
+
+              <summary className="cursor-pointer px-4 py-3 font-mono text-[11px] font-semibold uppercase tracking-[0.1em] text-[#d6d6d6]">
+
+                Markdown report (from renderer)
+
+              </summary>
+
+              <pre className="overflow-x-auto whitespace-pre-wrap border-t border-[#262626] bg-[#0c0c0c] px-4 py-4 text-[12px] leading-6 text-[#cfcfcf]">{md}</pre>
+
             </details>
+
           </div>
 
           <div className="space-y-4">
