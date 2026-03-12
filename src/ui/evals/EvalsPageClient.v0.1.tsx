@@ -76,103 +76,123 @@ function joinList(xs: string[]) {
 
 function TaskCard({ t }: { t: EvalTaskReportV0_1 }) {
   return (
-    <section className="rounded-md border border-[#383838] bg-[#111111] p-5 space-y-4">
-      <div className="space-y-1">
-        <div className="text-[11px] uppercase tracking-[0.14em] text-neutral-300">{t.taskId}</div>
-        <h2 className="text-lg font-semibold text-white">{t.title}</h2>
-        <div className="text-sm text-neutral-300">
-          kind: <span className="font-mono text-neutral-100">{t.kind}</span> · langHint:{" "}
-          <span className="font-mono text-neutral-100">{t.languageHint}</span> · targetBuckets:{" "}
-          <span className="font-mono text-neutral-100">{t.targetBuckets.join(", ")}</span> · nPerBucket:{" "}
-          <span className="font-mono text-neutral-100">{t.nPerBucket}</span>
+    <section className="rounded-[10px] border border-[#3a3a3a] bg-[#151515] px-5 py-5 space-y-5">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div className="space-y-1">
+          <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#b8b8b8]">{t.taskId}</div>
+          <h2 className="text-[18px] font-semibold leading-tight text-white">{t.title}</h2>
+        </div>
+
+        <div className="flex flex-wrap gap-2 text-[11px]">
+          <span className="rounded-full border border-[#3a3a3a] bg-[#101010] px-3 py-1.5 text-[#d8d8d8]">
+            kind <span className="font-mono text-white">{t.kind}</span>
+          </span>
+          <span className="rounded-full border border-[#3a3a3a] bg-[#101010] px-3 py-1.5 text-[#d8d8d8]">
+            lang <span className="font-mono text-white">{t.languageHint}</span>
+          </span>
+          <span className="rounded-full border border-[#3a3a3a] bg-[#101010] px-3 py-1.5 text-[#d8d8d8]">
+            buckets <span className="font-mono text-white">{t.targetBuckets.join(", ")}</span>
+          </span>
+          <span className="rounded-full border border-[#3a3a3a] bg-[#101010] px-3 py-1.5 text-[#d8d8d8]">
+            nPerBucket <span className="font-mono text-white">{t.nPerBucket}</span>
+          </span>
         </div>
       </div>
 
-      <div className="overflow-x-auto rounded-md border border-[#383838]">
-        <table className="w-full border-collapse text-sm">
-          <thead className="bg-[#111111]">
-            <tr>
-              <th className="border-b border-[#383838] px-3 py-2 text-left text-[11px] uppercase tracking-[0.14em] text-neutral-300">Bucket</th>
-              <th className="border-b border-[#383838] px-3 py-2 text-right text-[11px] uppercase tracking-[0.14em] text-neutral-300">Expected</th>
-              <th className="border-b border-[#383838] px-3 py-2 text-right text-[11px] uppercase tracking-[0.14em] text-neutral-300">Provided</th>
-              <th className="border-b border-[#383838] px-3 py-2 text-right text-[11px] uppercase tracking-[0.14em] text-neutral-300">Valid</th>
-              <th className="border-b border-[#383838] px-3 py-2 text-right text-[11px] uppercase tracking-[0.14em] text-neutral-300">Invalid</th>
-              <th className="border-b border-[#383838] px-3 py-2 text-right text-[11px] uppercase tracking-[0.14em] text-neutral-300">Dup</th>
-              <th className="border-b border-[#383838] px-3 py-2 text-right text-[11px] uppercase tracking-[0.14em] text-neutral-300">Mean Primary</th>
-              <th className="border-b border-[#383838] px-3 py-2 text-right text-[11px] uppercase tracking-[0.14em] text-neutral-300">Mean Presence</th>
+      <div className="overflow-x-auto rounded-[8px] border border-[#303030] bg-[#101010]">
+        <table className="w-full border-collapse text-[12px]">
+          <thead>
+            <tr className="border-b border-[#303030] bg-[#121212]">
+              <th className="px-3 py-3 text-left text-[10px] font-semibold uppercase tracking-[0.12em] text-[#9a9a9a]">Bucket</th>
+              <th className="px-3 py-3 text-right text-[10px] font-semibold uppercase tracking-[0.12em] text-[#9a9a9a]">Expected</th>
+              <th className="px-3 py-3 text-right text-[10px] font-semibold uppercase tracking-[0.12em] text-[#9a9a9a]">Provided</th>
+              <th className="px-3 py-3 text-right text-[10px] font-semibold uppercase tracking-[0.12em] text-[#9a9a9a]">Valid</th>
+              <th className="px-3 py-3 text-right text-[10px] font-semibold uppercase tracking-[0.12em] text-[#9a9a9a]">Invalid</th>
+              <th className="px-3 py-3 text-right text-[10px] font-semibold uppercase tracking-[0.12em] text-[#9a9a9a]">Dup</th>
+              <th className="px-3 py-3 text-right text-[10px] font-semibold uppercase tracking-[0.12em] text-[#9a9a9a]">Mean primary</th>
+              <th className="px-3 py-3 text-right text-[10px] font-semibold uppercase tracking-[0.12em] text-[#9a9a9a]">Mean presence</th>
             </tr>
           </thead>
           <tbody>
             {t.buckets.map((b) => (
-              <tr key={b.bucket} className="border-t border-[#383838]">
-                <td className="px-3 py-2 font-mono text-white">{b.bucket}</td>
-                <td className="px-3 py-2 text-right font-mono text-white">{b.expectedN}</td>
-                <td className="px-3 py-2 text-right font-mono text-white">{b.providedN}</td>
-                <td className="px-3 py-2 text-right font-mono text-white">{b.validN}</td>
-                <td className="px-3 py-2 text-right font-mono text-white">{b.invalidN}</td>
-                <td className="px-3 py-2 text-right font-mono text-white">{b.duplicateN}</td>
-                <td className="px-3 py-2 text-right font-mono text-white">{fmt(b.mean_aperturePrimary)}</td>
-                <td className="px-3 py-2 text-right font-mono text-white">{fmt(b.mean_aperturePresenceMean)}</td>
+              <tr key={b.bucket} className="border-t border-[#262626] hover:bg-[#141414]">
+                <td className="px-3 py-2.5 font-mono text-white">{b.bucket}</td>
+                <td className="px-3 py-2.5 text-right font-mono text-[#f2f2f2]">{b.expectedN}</td>
+                <td className="px-3 py-2.5 text-right font-mono text-[#f2f2f2]">{b.providedN}</td>
+                <td className="px-3 py-2.5 text-right font-mono text-[#f2f2f2]">{b.validN}</td>
+                <td className="px-3 py-2.5 text-right font-mono text-[#f2f2f2]">{b.invalidN}</td>
+                <td className="px-3 py-2.5 text-right font-mono text-[#f2f2f2]">{b.duplicateN}</td>
+                <td className="px-3 py-2.5 text-right font-mono text-[#f2f2f2]">{fmt(b.mean_aperturePrimary)}</td>
+                <td className="px-3 py-2.5 text-right font-mono text-[#f2f2f2]">{fmt(b.mean_aperturePresenceMean)}</td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
 
-      <div className="grid gap-3 md:grid-cols-2">
-        <div className="rounded-md border border-[#383838] bg-[#111111] p-4">
-          <div className="font-semibold text-white">Slope — aperturePrimary</div>
+      <div className="grid gap-3 lg:grid-cols-2">
+        <div className="rounded-[8px] border border-[#303030] bg-[#101010] px-4 py-4">
+          <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#d6d6d6]">Slope — aperturePrimary</div>
           {t.slope_aperturePrimary ? (
-            <ul className="mt-2 space-y-1 text-sm text-neutral-300">
-              <li>pearson r: <span className="font-mono text-neutral-100">{fmt(t.slope_aperturePrimary.pearson_r)}</span> (p=<span className="font-mono text-neutral-100">{fmt(t.slope_aperturePrimary.p_pearson)}</span>)</li>
-              <li>spearman ρ: <span className="font-mono text-neutral-100">{fmt(t.slope_aperturePrimary.spearman_rho)}</span> (p=<span className="font-mono text-neutral-100">{fmt(t.slope_aperturePrimary.p_spearman)}</span>)</li>
-              <li>perm: iters=<span className="font-mono text-neutral-100">{t.slope_aperturePrimary.iters}</span>, seed=<span className="font-mono text-neutral-100">{t.slope_aperturePrimary.seed}</span></li>
-            </ul>
+            <div className="mt-3 space-y-2 text-[12px] leading-6 text-[#cfcfcf]">
+              <div>pearson r <span className="font-mono text-white">{fmt(t.slope_aperturePrimary.pearson_r)}</span> <span className="text-[#8a8a8a]">(p={fmt(t.slope_aperturePrimary.p_pearson)})</span></div>
+              <div>spearman ρ <span className="font-mono text-white">{fmt(t.slope_aperturePrimary.spearman_rho)}</span> <span className="text-[#8a8a8a]">(p={fmt(t.slope_aperturePrimary.p_spearman)})</span></div>
+              <div className="text-[#a8a8a8]">perm <span className="font-mono text-white">iters={t.slope_aperturePrimary.iters}</span> <span className="text-[#666]">·</span> <span className="font-mono text-white">seed={t.slope_aperturePrimary.seed}</span></div>
+            </div>
           ) : (
-            <div className="mt-2 text-sm text-neutral-400">not computed</div>
+            <div className="mt-3 text-[12px] text-[#8a8a8a]">not computed</div>
           )}
         </div>
 
-        <div className="rounded-md border border-[#383838] bg-[#111111] p-4">
-          <div className="font-semibold text-white">Slope — aperturePresenceMean</div>
+        <div className="rounded-[8px] border border-[#303030] bg-[#101010] px-4 py-4">
+          <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#d6d6d6]">Slope — aperturePresenceMean</div>
           {t.slope_aperturePresenceMean ? (
-            <ul className="mt-2 space-y-1 text-sm text-neutral-300">
-              <li>pearson r: <span className="font-mono text-neutral-100">{fmt(t.slope_aperturePresenceMean.pearson_r)}</span> (p=<span className="font-mono text-neutral-100">{fmt(t.slope_aperturePresenceMean.p_pearson)}</span>)</li>
-              <li>spearman ρ: <span className="font-mono text-neutral-100">{fmt(t.slope_aperturePresenceMean.spearman_rho)}</span> (p=<span className="font-mono text-neutral-100">{fmt(t.slope_aperturePresenceMean.p_spearman)}</span>)</li>
-              <li>perm: iters=<span className="font-mono text-neutral-100">{t.slope_aperturePresenceMean.iters}</span>, seed=<span className="font-mono text-neutral-100">{t.slope_aperturePresenceMean.seed}</span></li>
-            </ul>
+            <div className="mt-3 space-y-2 text-[12px] leading-6 text-[#cfcfcf]">
+              <div>pearson r <span className="font-mono text-white">{fmt(t.slope_aperturePresenceMean.pearson_r)}</span> <span className="text-[#8a8a8a]">(p={fmt(t.slope_aperturePresenceMean.p_pearson)})</span></div>
+              <div>spearman ρ <span className="font-mono text-white">{fmt(t.slope_aperturePresenceMean.spearman_rho)}</span> <span className="text-[#8a8a8a]">(p={fmt(t.slope_aperturePresenceMean.p_spearman)})</span></div>
+              <div className="text-[#a8a8a8]">perm <span className="font-mono text-white">iters={t.slope_aperturePresenceMean.iters}</span> <span className="text-[#666]">·</span> <span className="font-mono text-white">seed={t.slope_aperturePresenceMean.seed}</span></div>
+            </div>
           ) : (
-            <div className="mt-2 text-sm text-neutral-400">not computed</div>
+            <div className="mt-3 text-[12px] text-[#8a8a8a]">not computed</div>
           )}
         </div>
       </div>
 
-            <details className="overflow-hidden rounded-[8px] border border-[#262626] bg-[#101010]">
-        <summary className="cursor-pointer px-4 py-3 text-[11px] font-semibold uppercase tracking-[0.1em] text-[#d6d6d6]">
+      <details className="overflow-hidden rounded-[8px] border border-[#2f2f2f] bg-[#101010]">
+        <summary className="cursor-pointer px-4 py-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#d6d6d6]">
           Diagnostics
         </summary>
         <div className="border-t border-[#262626] bg-[#0c0c0c] px-4 py-4">
-          <div className="grid gap-y-2 text-[12px] leading-6 md:grid-cols-[180px_minmax(0,1fr)]">
-            <div className="text-[#7f7f7f]">missingBuckets</div>
-            <div className="font-mono text-[#f2f2f2]">{joinList(t.diagnostics.missingBuckets)}</div>
+          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+            <div className="rounded-[6px] border border-[#242424] bg-[#111111] px-3 py-3">
+              <div className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#8a8a8a]">Missing buckets</div>
+              <div className="mt-2 font-mono text-[12px] leading-6 text-[#f2f2f2]">{joinList(t.diagnostics.missingBuckets)}</div>
+            </div>
+            <div className="rounded-[6px] border border-[#242424] bg-[#111111] px-3 py-3">
+              <div className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#8a8a8a]">Extra buckets</div>
+              <div className="mt-2 font-mono text-[12px] leading-6 text-[#f2f2f2]">{joinList(t.diagnostics.extraBuckets)}</div>
+            </div>
+            <div className="rounded-[6px] border border-[#242424] bg-[#111111] px-3 py-3">
+              <div className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#8a8a8a]">Empty tokens</div>
+              <div className="mt-2 font-mono text-[12px] text-[#f2f2f2]">{t.diagnostics.emptyTokenCount}</div>
+            </div>
+            <div className="rounded-[6px] border border-[#242424] bg-[#111111] px-3 py-3">
+              <div className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#8a8a8a]">Whitespace tokens</div>
+              <div className="mt-2 font-mono text-[12px] text-[#f2f2f2]">{t.diagnostics.whitespaceTokenCount}</div>
+            </div>
+            <div className="rounded-[6px] border border-[#242424] bg-[#111111] px-3 py-3">
+              <div className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#8a8a8a]">No-vowel tokens</div>
+              <div className="mt-2 font-mono text-[12px] text-[#f2f2f2]">{t.diagnostics.noVowelTokenCount}</div>
+            </div>
+            <div className="rounded-[6px] border border-[#242424] bg-[#111111] px-3 py-3">
+              <div className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#8a8a8a]">Total invalid</div>
+              <div className="mt-2 font-mono text-[12px] text-[#f2f2f2]">{t.diagnostics.totalInvalidTokenCount}</div>
+            </div>
+          </div>
 
-            <div className="text-[#7f7f7f]">extraBuckets</div>
-            <div className="font-mono text-[#f2f2f2]">{joinList(t.diagnostics.extraBuckets)}</div>
-
-            <div className="text-[#7f7f7f]">emptyTokenCount</div>
-            <div className="font-mono text-[#f2f2f2]">{t.diagnostics.emptyTokenCount}</div>
-
-            <div className="text-[#7f7f7f]">whitespaceTokenCount</div>
-            <div className="font-mono text-[#f2f2f2]">{t.diagnostics.whitespaceTokenCount}</div>
-
-            <div className="text-[#7f7f7f]">noVowelTokenCount</div>
-            <div className="font-mono text-[#f2f2f2]">{t.diagnostics.noVowelTokenCount}</div>
-
-            <div className="text-[#7f7f7f]">totalInvalidTokenCount</div>
-            <div className="font-mono text-[#f2f2f2]">{t.diagnostics.totalInvalidTokenCount}</div>
-
-            <div className="text-[#7f7f7f]">notes</div>
-            <div className="font-mono text-[#f2f2f2]">
+          <div className="mt-3 rounded-[6px] border border-[#242424] bg-[#111111] px-3 py-3">
+            <div className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#8a8a8a]">Notes</div>
+            <div className="mt-2 font-mono text-[12px] leading-6 text-[#f2f2f2]">
               {t.diagnostics.notes.length ? t.diagnostics.notes.join(" | ") : "(none)"}
             </div>
           </div>
@@ -790,13 +810,13 @@ export function EvalsPageClientV0_1() {
           </div>
         </div>
 
-          <div className="rounded-[8px] border border-[#3a3a3a] bg-[#1a1a1a] px-4 py-4">
+          <div className="rounded-[10px] border border-[#3a3a3a] bg-[#171717] px-5 py-4">
             <div className="flex flex-wrap items-center gap-3">
-              <span className="text-[12px] font-semibold uppercase tracking-[0.1em] text-[#e2e2e2]">
+              <span className="text-[12px] font-semibold uppercase tracking-[0.12em] text-[#e2e2e2]">
                 Upload JSON
               </span>
-              <span className="text-[11px] leading-6 text-[#d2d2d2]">
-                bundle or buckets-only input
+              <span className="text-[12px] leading-6 text-[#9a9a9a]">
+                Use a saved eval bundle or buckets-only file.
               </span>
             </div>
 
@@ -805,33 +825,39 @@ export function EvalsPageClientV0_1() {
                 type="file"
                 accept=".json,application/json"
                 onChange={(e) => void onPickFile(e.target.files?.[0] ?? null)}
-                className="block w-full text-sm text-neutral-300 file:mr-3 file:rounded-[6px] file:border file:border-[#555] file:bg-[#242424] file:px-4 file:py-2.5 file:text-[11px] file:font-semibold file:uppercase file:tracking-[0.08em] file:text-[#f2f2f2] hover:file:border-[#777] hover:file:bg-[#2b2b2b]"
+                className="block w-full text-sm text-neutral-300 file:mr-3 file:rounded-[8px] file:border file:border-[#4a4a4a] file:bg-[#101010] file:px-4 file:py-2.5 file:text-[11px] file:font-semibold file:uppercase file:tracking-[0.08em] file:text-[#ededed] hover:file:border-[#777] hover:file:bg-[#1a1a1a]"
               />
             </div>
 
-            <div className="mt-2 text-[11px] text-[#b8b8b8]">
+            <div className="mt-2 text-[11px] leading-6 text-[#b8b8b8]">
               Upload a full <span className="font-mono text-[#f2f2f2]">evalRun.v0.1</span> bundle or a buckets-only JSON file.
             </div>
           </div>
 
-        <div>
-          <label className="mb-2 block text-[12px] font-semibold uppercase tracking-[0.1em] text-[#e2e2e2]">
-            Paste JSON
-          </label>
-          <textarea
-            className="min-h-[180px] w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] p-[14px] font-mono text-[12px] leading-[1.6] text-[#d8d8d8] outline-none transition focus:border-[#333]"
-            value={inputText}
-            onChange={(e) => setInputText(e.target.value)}
-            placeholder={mode === "run_bundle" ? '{ "evalRunVersion": "evalRun.v0.1", ... }' : '{ "V1": ["token1", ...], "V2": [...], ... }'}
-          />
-
-          {inputText.trim() && inputProbe.kind !== "invalid_json" ? (
-            <div className="mt-2 flex items-center gap-2 text-[11px] text-[#16a34a]">
-              <span className="h-[6px] w-[6px] rounded-full bg-[#16a34a]" />
-              JSON detected — ready to score
+          <div className="rounded-[10px] border border-[#3a3a3a] bg-[#131313] px-5 py-5">
+            <div className="space-y-1">
+              <label className="block text-[12px] font-semibold uppercase tracking-[0.12em] text-[#e2e2e2]">
+                Paste JSON
+              </label>
+              <div className="text-[12px] leading-6 text-[#9a9a9a]">
+                Paste a full <span className="font-mono text-[#d8d8d8]">evalRun.v0.1</span> bundle or buckets-only <span className="font-mono text-[#d8d8d8]">V1..V7</span> JSON.
+              </div>
             </div>
-          ) : null}
-        </div>
+
+            <textarea
+              className="mt-3 min-h-[220px] w-full rounded-[8px] border border-[#3a3a3a] bg-[#101010] p-4 font-mono text-[12px] leading-[1.7] text-[#e0e0e0] outline-none transition focus:border-[#555]"
+              value={inputText}
+              onChange={(e) => setInputText(e.target.value)}
+              placeholder={mode === "run_bundle" ? '{ "evalRunVersion": "evalRun.v0.1", ... }' : '{ "V1": ["token1", ...], "V2": [...], ... }'}
+            />
+
+            {inputText.trim() && inputProbe.kind !== "invalid_json" ? (
+              <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-[#21452a] bg-[#112017] px-3 py-1.5 text-[11px] text-[#4ade80]">
+                <span className="h-[6px] w-[6px] rounded-full bg-[#16a34a]" />
+                JSON detected — ready to score
+              </div>
+            ) : null}
+          </div>
 
           <div className="flex flex-wrap items-center gap-2 pt-2">
             <button
