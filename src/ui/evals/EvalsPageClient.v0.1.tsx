@@ -147,16 +147,35 @@ function TaskCard({ t }: { t: EvalTaskReportV0_1 }) {
         </div>
       </div>
 
-      <details className="rounded-md border border-[#383838] bg-[#1a1a1a] p-3">
-        <summary className="cursor-pointer font-semibold text-white">Diagnostics</summary>
-        <div className="mt-2 space-y-1 text-sm text-neutral-300">
-          <div>missingBuckets: <span className="font-mono text-neutral-100">{joinList(t.diagnostics.missingBuckets)}</span></div>
-          <div>extraBuckets: <span className="font-mono text-neutral-100">{joinList(t.diagnostics.extraBuckets)}</span></div>
-          <div>emptyTokenCount: <span className="font-mono text-neutral-100">{t.diagnostics.emptyTokenCount}</span></div>
-          <div>whitespaceTokenCount: <span className="font-mono text-neutral-100">{t.diagnostics.whitespaceTokenCount}</span></div>
-          <div>noVowelTokenCount: <span className="font-mono text-neutral-100">{t.diagnostics.noVowelTokenCount}</span></div>
-          <div>totalInvalidTokenCount: <span className="font-mono text-neutral-100">{t.diagnostics.totalInvalidTokenCount}</span></div>
-          <div>notes: <span className="font-mono text-neutral-100">{t.diagnostics.notes.length ? t.diagnostics.notes.join(" | ") : "(none)"}</span></div>
+            <details className="overflow-hidden rounded-[8px] border border-[#262626] bg-[#101010]">
+        <summary className="cursor-pointer px-4 py-3 font-mono text-[11px] font-semibold uppercase tracking-[0.1em] text-[#d6d6d6]">
+          Diagnostics
+        </summary>
+        <div className="border-t border-[#262626] bg-[#0c0c0c] px-4 py-4">
+          <div className="grid gap-y-2 text-[12px] leading-6 md:grid-cols-[180px_minmax(0,1fr)]">
+            <div className="text-[#7f7f7f]">missingBuckets</div>
+            <div className="font-mono text-[#d7d7d7]">{joinList(t.diagnostics.missingBuckets)}</div>
+
+            <div className="text-[#7f7f7f]">extraBuckets</div>
+            <div className="font-mono text-[#d7d7d7]">{joinList(t.diagnostics.extraBuckets)}</div>
+
+            <div className="text-[#7f7f7f]">emptyTokenCount</div>
+            <div className="font-mono text-[#d7d7d7]">{t.diagnostics.emptyTokenCount}</div>
+
+            <div className="text-[#7f7f7f]">whitespaceTokenCount</div>
+            <div className="font-mono text-[#d7d7d7]">{t.diagnostics.whitespaceTokenCount}</div>
+
+            <div className="text-[#7f7f7f]">noVowelTokenCount</div>
+            <div className="font-mono text-[#d7d7d7]">{t.diagnostics.noVowelTokenCount}</div>
+
+            <div className="text-[#7f7f7f]">totalInvalidTokenCount</div>
+            <div className="font-mono text-[#d7d7d7]">{t.diagnostics.totalInvalidTokenCount}</div>
+
+            <div className="text-[#7f7f7f]">notes</div>
+            <div className="font-mono text-[#d7d7d7]">
+              {t.diagnostics.notes.length ? t.diagnostics.notes.join(" | ") : "(none)"}
+            </div>
+          </div>
         </div>
       </details>
     </section>
@@ -1237,17 +1256,22 @@ export function EvalsPageClientV0_1() {
             </div>
 
 
-            <details className="mt-4 overflow-hidden rounded-[8px] border border-[#262626] bg-[#101010]">
-
-              <summary className="cursor-pointer px-4 py-3 font-mono text-[11px] font-semibold uppercase tracking-[0.1em] text-[#d6d6d6]">
-
-                Markdown report (from renderer)
-
-              </summary>
-
-              <pre className="overflow-x-auto whitespace-pre-wrap border-t border-[#262626] bg-[#0c0c0c] px-4 py-4 text-[12px] leading-6 text-[#cfcfcf]">{md}</pre>
-
-            </details>
+                          <div className="mt-4 overflow-hidden rounded-[8px] border border-[#262626] bg-[#101010]">
+                <div className="flex items-center justify-between border-b border-[#262626] px-4 py-3">
+                  <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.1em] text-[#d6d6d6]">
+                    Markdown export preview
+                  </div>
+                  <button
+                    type="button"
+                    className="rounded-[4px] border border-[#333] bg-transparent px-2 py-1 font-mono text-[10px] uppercase tracking-[0.08em] text-[#8a8a8a] transition hover:border-[#666] hover:text-white disabled:opacity-40"
+                    onClick={() => void dfCopyText("Copied markdown report.", md || "")}
+                    disabled={!md}
+                  >
+                    copy
+                  </button>
+                </div>
+                <pre className="overflow-x-auto whitespace-pre-wrap bg-[#0c0c0c] px-4 py-4 text-[12px] leading-6 text-[#cfcfcf]">{md || "(empty)"}</pre>
+              </div>
 
           </div>
 
