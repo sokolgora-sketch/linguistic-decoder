@@ -1251,11 +1251,30 @@ export function EvalsPageClientV0_1() {
 
           </div>
 
-          <div className="space-y-4">
-            {report.tasks.map((t) => (
-              <TaskCard key={t.taskId} t={t} />
-            ))}
-          </div>
+            <div className="space-y-4">
+              <div className="space-y-4">
+                {report.tasks
+                  .filter((t) => t.kind === "byo")
+                  .map((t) => (
+                    <TaskCard key={t.taskId} t={t} />
+                  ))}
+              </div>
+
+              {report.tasks.some((t) => t.kind !== "byo") ? (
+                <section className="space-y-3 pt-2">
+                  <div className="text-[11px] uppercase tracking-[0.12em] text-[#7f7f7f]">
+                    Validation controls
+                  </div>
+                  <div className="space-y-4">
+                    {report.tasks
+                      .filter((t) => t.kind !== "byo")
+                      .map((t) => (
+                        <TaskCard key={t.taskId} t={t} />
+                      ))}
+                  </div>
+                </section>
+              ) : null}
+            </div>
         </section>
       ) : null}
       </main>
