@@ -1227,89 +1227,73 @@ export function EvalsPageClientV0_1() {
 
 
       {report ? (
-        <section className="space-y-4">
-          <div className="rounded-[10px] border border-[#2a2a2a] bg-[#151515] px-5 py-4">
+          <section className="space-y-5 pt-1">
+            <div className="rounded-[10px] border border-[#2a2a2a] bg-[#151515] px-5 py-5">
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div className="space-y-1">
+                  <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#8f8f8f]">
+                    Report
+                  </div>
+                  <div className="text-[12px] leading-6 text-[#9a9a9a]">
+                    Bundle metadata and markdown export.
+                  </div>
+                </div>
+              </div>
 
-            <div className="text-[11px] uppercase tracking-[0.12em] text-[#6f6f6f]">
+              <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-[12px] text-[#d8d8d8]">
+                <span>
+                  specId: <span className="font-mono text-[#e5e5e5]">{report.specId}</span>
+                </span>
+                <span>
+                  evalSpecVersion: <span className="font-mono text-[#e5e5e5]">{report.evalSpecVersion}</span>
+                </span>
+                <span>
+                  runId: <span className="font-mono text-[#e5e5e5]">{report.runId}</span>
+                </span>
+              </div>
 
-              Report
+              <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-[12px] text-[#c8c8c8]">
+                <span>
+                  provider: <span className="font-mono text-[#f2f2f2]">{report.meta?.provider ?? "-"}</span>
+                </span>
+                <span>
+                  model: <span className="font-mono text-[#f2f2f2]">{report.meta?.model ?? "-"}</span>
+                </span>
+                <span>
+                  label: <span className="font-mono text-[#f2f2f2]">{report.meta?.label ?? "-"}</span>
+                </span>
+              </div>
 
-            </div>
-
-
-            <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-[12px] text-[#e2e2e2]">
-
-              <span>
-
-                specId: <span className="font-mono text-[#e5e5e5]">{report.specId}</span>
-
-              </span>
-
-              <span>
-
-                evalSpecVersion: <span className="font-mono text-[#e5e5e5]">{report.evalSpecVersion}</span>
-
-              </span>
-
-              <span>
-
-                runId: <span className="font-mono text-[#e5e5e5]">{report.runId}</span>
-
-              </span>
-
-            </div>
-
-
-            <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-[12px] text-[#e2e2e2]">
-
-              <span>
-
-                provider: <span className="font-mono text-[#f2f2f2]">{report.meta?.provider ?? "-"}</span>
-
-              </span>
-
-              <span>
-
-                model: <span className="font-mono text-[#f2f2f2]">{report.meta?.model ?? "-"}</span>
-
-              </span>
-
-              <span>
-
-                label: <span className="font-mono text-[#f2f2f2]">{report.meta?.label ?? "-"}</span>
-
-              </span>
-
-            </div>
-
-
-                          <div className="mt-4 overflow-hidden rounded-[8px] border border-[#262626] bg-[#101010]">
-                <div className="flex items-center justify-between border-b border-[#262626] px-4 py-3">
-                  <div className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[#d6d6d6]">
-                    Markdown export preview
+              <div className="mt-4 overflow-hidden rounded-[8px] border border-[#262626] bg-[#101010]">
+                <div className="flex items-center justify-between gap-3 border-b border-[#262626] px-4 py-3">
+                  <div className="space-y-1">
+                    <div className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[#d6d6d6]">
+                      Markdown export preview
+                    </div>
+                    <div className="text-[11px] text-[#8a8a8a]">
+                      Rendered report text ready to copy.
+                    </div>
                   </div>
                   <button
                     type="button"
-                    className="rounded-[4px] border border-[#333] bg-transparent px-2 py-1 font-mono text-[10px] uppercase tracking-[0.08em] text-[#8a8a8a] transition hover:border-[#666] hover:text-white disabled:opacity-40"
+                    className="rounded-[4px] border border-[#333] bg-transparent px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#b8b8b8] transition hover:border-[#666] hover:text-white disabled:opacity-40"
                     onClick={() => void dfCopyText("Copied markdown report.", md || "")}
                     disabled={!md}
                   >
-                    copy
+                    Copy
                   </button>
                 </div>
                 <pre className="overflow-x-auto whitespace-pre-wrap bg-[#0c0c0c] px-4 py-4 text-[12px] leading-6 text-[#cfcfcf]">{md || "(empty)"}</pre>
               </div>
+            </div>
 
-          </div>
-
-            <div className="space-y-4">
               <div className="space-y-4">
                 {report.tasks
                   .filter((t) => t.kind === "byo")
                   .map((t) => (
                     <TaskCard key={t.taskId} t={t} />
                   ))}
-              </div>
+
 
               {report.tasks.some((t) => t.kind !== "byo") ? (
                   <section className="rounded-[8px] border border-[#262626] bg-[#171717] px-4 py-4 space-y-3">
