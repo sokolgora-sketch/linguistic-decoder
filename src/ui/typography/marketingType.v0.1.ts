@@ -18,6 +18,10 @@ export const MT = {
 
   actionSm: "text-[11px] font-semibold uppercase tracking-[0.08em]",
   actionMd: "text-[13px] font-semibold uppercase tracking-[0.06em]",
+  actionPrimary: "rounded-[8px] border px-6 py-3 text-[13px] font-semibold uppercase tracking-[0.06em]",
+  actionSecondary: "rounded-[8px] border px-5 py-3 text-[13px] font-semibold uppercase tracking-[0.06em]",
+  actionUtility: "rounded-[8px] border px-4 py-3 text-[12px] font-semibold uppercase tracking-[0.06em]",
+  actionWarn: "rounded-[8px] border px-4 py-3 text-[12px] font-semibold uppercase tracking-[0.06em]",
 
   chipText: "text-[12px]",
   statKey: "text-[13px] font-semibold uppercase tracking-[0.12em]",

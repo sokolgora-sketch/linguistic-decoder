@@ -1250,7 +1250,7 @@ export function EvalsPageClientV0_1() {
           <div className="flex flex-wrap items-center gap-3 pt-4">
             <button
               type="button"
-              className={`rounded-[6px] border border-[#16a34a] bg-[#16a34a] px-6 py-3 ${MT.actionMd} text-white transition hover:bg-[#15803d] hover:shadow-[0_0_0_1px_rgba(22,163,74,0.4),0_4px_16px_rgba(22,163,74,0.33)] disabled:cursor-not-allowed disabled:border-[#333] disabled:bg-[#111] disabled:text-[#333] disabled:shadow-none`}
+              className={`${MT.actionPrimary} border-[#16a34a] bg-[#16a34a] text-white transition hover:border-[#15803d] hover:bg-[#15803d] hover:shadow-[0_0_0_1px_rgba(22,163,74,0.4),0_4px_16px_rgba(22,163,74,0.33)] disabled:cursor-not-allowed disabled:border-[#333] disabled:bg-[#111] disabled:text-[#333] disabled:shadow-none`}
               onClick={() => void onScore()}
               disabled={busy || !inputText.trim()}
             >
@@ -1259,7 +1259,7 @@ export function EvalsPageClientV0_1() {
 
             <button
               type="button"
-              className={`rounded-[6px] border border-[#555] bg-[#1a1a1a] px-4 py-3 ${MT.actionMd} text-[#e2e2e2] transition hover:border-[#777] hover:bg-[#202020] hover:text-white`}
+              className={`${MT.actionSecondary} border-[#555] bg-[#1a1a1a] text-[#e2e2e2] transition hover:border-[#777] hover:bg-[#202020] hover:text-white disabled:opacity-50`}
               onClick={() => {
                 setInputText("");
                 setApiErr(null);
@@ -1274,7 +1274,7 @@ export function EvalsPageClientV0_1() {
 
             <button
               type="button"
-              className="rounded-[6px] border border-[#5a2a2a] bg-transparent px-4 py-3 text-[12px] uppercase tracking-[0.06em] text-[#cc6666] transition hover:border-[#cc0000] hover:bg-[#cc000010] hover:text-[#e05555] disabled:opacity-50"
+              className={`${MT.actionWarn} border-[#6b3737] bg-[#211717] text-[#e6a0a0] transition hover:border-[#cc0000] hover:bg-[#2a1616] hover:text-[#ffc1c1] disabled:opacity-50`}
               onClick={() => void onDownloadPdf()}
               disabled={busy || !inputText.trim()}
             >
@@ -1283,7 +1283,7 @@ export function EvalsPageClientV0_1() {
 
             <button
               type="button"
-              className="rounded-[6px] border border-[#444] bg-transparent px-4 py-3 text-[12px] uppercase tracking-[0.06em] text-[#b8b8b8] transition hover:border-[#777] hover:text-[#f2f2f2] disabled:opacity-50"
+              className={`${MT.actionUtility} border-[#444] bg-transparent text-[#b8b8b8] transition hover:border-[#777] hover:bg-[#1f1f1f] hover:text-[#f2f2f2] disabled:opacity-50`}
               onClick={() => void onCopyRawJson()}
               disabled={busy || !inputText.trim()}
             >
@@ -1292,7 +1292,7 @@ export function EvalsPageClientV0_1() {
 
             <button
               type="button"
-              className="rounded-[6px] border border-[#444] bg-transparent px-4 py-3 text-[12px] uppercase tracking-[0.06em] text-[#b8b8b8] transition hover:border-[#777] hover:text-[#f2f2f2] disabled:opacity-50"
+              className={`${MT.actionUtility} border-[#444] bg-transparent text-[#b8b8b8] transition hover:border-[#777] hover:bg-[#1f1f1f] hover:text-[#f2f2f2] disabled:opacity-50`}
               onClick={() => void onCopyCsvRow()}
               disabled={busy || !report}
             >
@@ -1303,7 +1303,7 @@ export function EvalsPageClientV0_1() {
 
             <button
               type="button"
-              className="rounded-[6px] border border-dashed border-[#4a4a4a] bg-transparent px-4 py-3 text-[12px] uppercase tracking-[0.06em] text-[#c8c8c8] transition hover:border-[#777] hover:bg-[#1f1f1f] hover:text-white"
+              className={`${MT.actionUtility} border-dashed border-[#4a4a4a] bg-transparent text-[#c8c8c8] transition hover:border-[#777] hover:bg-[#1f1f1f] hover:text-white`}
               onClick={loadExample}
               disabled={busy}
             >
