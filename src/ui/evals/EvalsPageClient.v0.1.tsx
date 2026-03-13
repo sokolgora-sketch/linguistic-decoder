@@ -1173,7 +1173,7 @@ export function EvalsPageClientV0_1() {
         </div>
           <div className="rounded-[10px] border border-[#3a3a3a] bg-[#171717] px-5 py-4">
             <div className="flex flex-wrap items-center gap-3">
-              <span className={`${MT.fieldLabel.replace("mb-2 block ","")} text-[#ededed]`}>
+              <span className={`${MT.fieldLabelInline} text-[#ededed]`}>
                 Upload JSON
               </span>
               <span className={`${MT.helper} text-[#a9a9a9]`}>
@@ -1658,7 +1658,7 @@ export function EvalsPageClientV0_1() {
                 </div>
               </div>
 
-              <div className={`mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 ${MT.markdownBody.replace("leading-8","")} text-[#d8d8d8]`}>
+              <div className={`mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 ${MT.markdownMeta} text-[#d8d8d8]`}>
                 <span>
                   specId: <span className="font-mono text-[#e5e5e5]">{report.specId}</span>
                 </span>
@@ -1670,7 +1670,7 @@ export function EvalsPageClientV0_1() {
                 </span>
               </div>
 
-              <div className={`mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 ${MT.markdownBody.replace("leading-8","")} text-[#d0d0d0]`}>
+              <div className={`mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 ${MT.markdownMeta} text-[#d0d0d0]`}>
                 <span>
                   provider: <span className="font-mono text-[#f2f2f2]">{report.meta?.provider ?? "-"}</span>
                 </span>
@@ -1688,7 +1688,7 @@ export function EvalsPageClientV0_1() {
                     <div className={`${MT.sectionLabel} text-[#dfdfdf]`}>
                       Markdown export preview
                     </div>
-                    <div className={`${MT.helper.replace(" leading-7","")} text-[#9c9c9c]`}>
+                    <div className={`${MT.helperCompact} text-[#9c9c9c]`}>
                       Rendered report text ready to copy.
                     </div>
                   </div>

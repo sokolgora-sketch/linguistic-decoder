@@ -4,8 +4,10 @@ export const MT = {
   heroBody: "text-[17px] leading-[1.9]",
 
   fieldLabel: "mb-2 block text-[14px] font-semibold uppercase tracking-[0.1em]",
+  fieldLabelInline: "text-[14px] font-semibold uppercase tracking-[0.1em]",
   fieldControl: "font-mono text-[14px]",
   helper: "text-[13px] leading-7",
+  helperCompact: "text-[13px]",
 
   sectionLabel: "text-[13px] font-semibold uppercase tracking-[0.12em]",
   microLabel: "text-[12px] uppercase tracking-[0.14em]",
@@ -23,5 +25,6 @@ export const MT = {
   statNote: "text-[13px] leading-7",
 
   markdownBody: "text-[14px] leading-8",
+  markdownMeta: "text-[14px]",
   ticker: "text-[12px] uppercase tracking-[0.14em]",
 } as const;
