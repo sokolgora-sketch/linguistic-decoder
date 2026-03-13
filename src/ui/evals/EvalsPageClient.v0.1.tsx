@@ -218,20 +218,35 @@ function TaskCard({ t }: { t: EvalTaskReportV0_1 }) {
               <th className="px-3 py-3 text-right text-[10px] font-semibold uppercase tracking-[0.12em] text-[#9a9a9a]">Mean presence</th>
             </tr>
           </thead>
-          <tbody>
-            {t.buckets.map((b) => (
-              <tr key={b.bucket} className="border-t border-[#262626] hover:bg-[#141414]">
-                <td className="px-3 py-2.5 font-mono text-white">{b.bucket}</td>
-                <td className="px-3 py-2.5 text-right font-mono text-[#f2f2f2]">{b.expectedN}</td>
-                <td className="px-3 py-2.5 text-right font-mono text-[#f2f2f2]">{b.providedN}</td>
-                <td className="px-3 py-2.5 text-right font-mono text-[#f2f2f2]">{b.validN}</td>
-                <td className="px-3 py-2.5 text-right font-mono text-[#f2f2f2]">{b.invalidN}</td>
-                <td className="px-3 py-2.5 text-right font-mono text-[#f2f2f2]">{b.duplicateN}</td>
-                <td className="px-3 py-2.5 text-right font-mono text-[#f2f2f2]">{fmt(b.mean_aperturePrimary)}</td>
-                <td className="px-3 py-2.5 text-right font-mono text-[#f2f2f2]">{fmt(b.mean_aperturePresenceMean)}</td>
-              </tr>
-            ))}
-          </tbody>
+            <tbody>
+              {t.buckets.map((b) => {
+                const validToneClass =
+                  Number(b.validN ?? 0) === Number(b.expectedN ?? 0) ? "text-[#4ade80]" : "text-[#fbbf24]";
+                const invalidToneClass =
+                  Number(b.invalidN ?? 0) === 0 ? "text-[#555]" : "text-[#f87171]";
+                const dupToneClass =
+                  Number(b.duplicateN ?? 0) === 0 ? "text-[#555]" : "text-[#f59e0b]";
+                const meanPrimaryToneClass =
+                  Number(b.mean_aperturePrimary ?? 0) >= 0.7
+                    ? "text-[#4ade80]"
+                    : Number(b.mean_aperturePrimary ?? 0) >= 0.4
+                      ? "text-[#fbbf24]"
+                      : "text-[#f87171]";
+
+                return (
+                  <tr key={b.bucket} className="border-t border-[#262626] hover:bg-[#141414]">
+                    <td className="px-3 py-2.5 font-mono text-white">{b.bucket}</td>
+                    <td className="px-3 py-2.5 text-right font-mono text-[#f2f2f2]">{b.expectedN}</td>
+                    <td className="px-3 py-2.5 text-right font-mono text-[#f2f2f2]">{b.providedN}</td>
+                    <td className={`px-3 py-2.5 text-right font-mono ${validToneClass}`}>{b.validN}</td>
+                    <td className={`px-3 py-2.5 text-right font-mono ${invalidToneClass}`}>{b.invalidN}</td>
+                    <td className={`px-3 py-2.5 text-right font-mono ${dupToneClass}`}>{b.duplicateN}</td>
+                    <td className={`px-3 py-2.5 text-right font-mono ${meanPrimaryToneClass}`}>{fmt(b.mean_aperturePrimary)}</td>
+                    <td className="px-3 py-2.5 text-right font-mono text-[#f2f2f2]">{fmt(b.mean_aperturePresenceMean)}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
         </table>
       </div>
 
@@ -348,8 +363,10 @@ function PaperSnapshotReferenceSection({
     provider: string;
     model: string;
     bestDisplay: string;
+    bestMagnitude: number;
     meanDisplay: string;
     regimeLabel?: string;
+    regimeTone?: "good" | "mid" | "weak" | "inverted";
   }>;
 
   const sourceHref =
@@ -362,101 +379,177 @@ function PaperSnapshotReferenceSection({
       ? "Source: LingBuzz/009799"
       : "Source: LingBuzz/009808";
 
+  const activeBatteryTone =
+    activePaper.id === "paper1"
+      ? "border-[#21452a] bg-[#112017] text-[#4ade80]"
+      : "border-[#5b4a20] bg-[#1d1a12] text-[#f3d38b]";
+
   return (
-    <details className="group mt-8 overflow-hidden rounded-[8px] border border-[#333] bg-[#141414]">
+    <details className="group mt-8 overflow-hidden rounded-[10px] border border-[#333] bg-[#141414]">
       <summary className="flex cursor-pointer list-none items-center justify-between gap-4 bg-[#161616] px-5 py-4 text-left transition hover:bg-[#1a1a1a] [&::-webkit-details-marker]:hidden">
         <div className="min-w-0">
           <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#d6d6d6]">
             Paper snapshots
           </div>
           <div className="mt-1 text-[16px] font-semibold text-white">
-            Paper v0.1 snapshot · not live data
+            Paper v0.1 snapshot · reference only
           </div>
           <div className="mt-1 text-[12px] leading-6 text-[#9a9a9a]">
-            Reference results from LingBuzz/009799 and 009808.
+            Fresh-chat and same-thread battery results from LingBuzz/009799 and 009808.
           </div>
-          <div className="mt-3 flex flex-wrap items-center gap-2">
-            <span className="rounded-full border border-[#21452a] bg-[#112017] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#4ade80]">
-              Fresh-chat
-            </span>
-            <span className="rounded-full border border-[#3a3a3a] bg-[#101010] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#b8b8b8]">
-              Same-thread
-            </span>
-            <span className="rounded-full border border-[#5b4a20] bg-[#1d1a12] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#f3d38b]">
-              Click to expand
-            </span>
+          <div className="mt-3 flex flex-wrap items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.1em] text-[#9a9a9a]">
+            <span className="text-[#d6d6d6]">2 reference batteries</span>
+            <span className="h-1 w-1 rounded-full bg-[#4a4a4a]" />
+            <span>paper v0.1</span>
+            <span className="h-1 w-1 rounded-full bg-[#4a4a4a]" />
+            <span>not live data</span>
           </div>
         </div>
 
-        <div className="shrink-0 rounded-full border border-[#3a3a3a] bg-[#101010] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#d8d8d8] transition group-hover:border-[#666] group-hover:text-white">
-          Open ↓
+        <div className="shrink-0 rounded-full border border-[#5b4a20] bg-[#1d1a12] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#f3d38b] transition group-hover:border-[#8a6d2f] group-hover:text-[#ffe3a3]">
+          Expand reference ↓
         </div>
       </summary>
 
-      <div className="border-t border-[#2b2b2b] px-5 py-5 space-y-4">
-        <div className="flex flex-wrap items-center gap-2">
+      <div className="space-y-4 border-t border-[#2b2b2b] px-5 py-5">
+        <div className="grid gap-2 md:grid-cols-2">
           {EVALS_PAPER_SNAPSHOTS.map((paper) => {
             const active = paper.id === paperSnapshotTab;
+            const activeClass =
+              paper.id === "paper1"
+                ? "border-[#21452a] bg-[#112017] text-[#4ade80]"
+                : "border-[#5b4a20] bg-[#1d1a12] text-[#f3d38b]";
+
             return (
               <button
                 key={paper.id}
                 type="button"
                 className={
                   active
-                    ? "rounded-[6px] border border-[#16a34a] bg-[#1a3a2a] px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#4ade80] transition"
-                    : "rounded-[6px] border border-[#3a3a3a] bg-[#101010] px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#b8b8b8] transition hover:border-[#666] hover:text-white"
+                    ? `rounded-[8px] border px-3 py-3 text-left transition ${activeClass}`
+                    : "rounded-[8px] border border-[#3a3a3a] bg-[#101010] px-3 py-3 text-left text-[#b8b8b8] transition hover:border-[#666] hover:text-white"
                 }
                 onClick={(e) => {
                   e.preventDefault();
                   setPaperSnapshotTab(paper.id as "paper1" | "paper2");
                 }}
               >
-                {paper.tabLabel}
+                <div className="text-[11px] font-semibold uppercase tracking-[0.08em]">{paper.tabLabel}</div>
+                <div className={`mt-1 text-[11px] leading-5 ${active ? "opacity-80" : "text-[#8f8f8f]"}`}>
+                  {paper.tabDetail}
+                </div>
               </button>
             );
           })}
         </div>
 
-        <div className="rounded-[8px] border border-[#2f2f2f] bg-[#101010] p-4">
+        <div className="rounded-[10px] border border-[#2f2f2f] bg-[#101010] p-4">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div className="space-y-1">
               <div className="text-[13px] font-semibold text-white">{activePaper.title}</div>
               <div className="text-[11px] leading-6 text-[#9a9a9a]">{activePaper.tabDetail}</div>
             </div>
-            <a
-              href={sourceHref}
-              target="_blank"
-              rel="noreferrer"
-              className="text-[11px] leading-6 text-[#d8d8d8] underline-offset-4 hover:underline"
-            >
-              {sourceLabel}
-            </a>
+
+            <div className="flex flex-wrap items-center gap-2">
+              <span
+                className={`rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.08em] ${activeBatteryTone}`}
+              >
+                {activePaper.tabLabel}
+              </span>
+              <a
+                href={sourceHref}
+                target="_blank"
+                rel="noreferrer"
+                className="rounded-full border border-[#3a3a3a] bg-[#141414] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#d8d8d8] transition hover:border-[#666] hover:text-white"
+              >
+                {sourceLabel}
+              </a>
+            </div>
           </div>
 
-          <div className="mt-4 overflow-x-auto rounded-[6px] border border-[#262626]">
+          <div className="mt-4 overflow-x-auto rounded-[8px] border border-[#262626]">
             <table className="w-full border-collapse text-[12px]">
               <thead>
                 <tr className="border-b border-[#262626] bg-[#121212]">
-                  <th className="px-3 py-2 text-left text-[10px] font-semibold uppercase tracking-[0.12em] text-[#8f8f8f]">Provider</th>
-                  <th className="px-3 py-2 text-left text-[10px] font-semibold uppercase tracking-[0.12em] text-[#8f8f8f]">Model / regime</th>
-                  <th className="px-3 py-2 text-right text-[10px] font-semibold uppercase tracking-[0.12em] text-[#8f8f8f]">Best ρ</th>
-                  <th className="px-3 py-2 text-right text-[10px] font-semibold uppercase tracking-[0.12em] text-[#8f8f8f]">Mean ρ</th>
+                  <th className="px-3 py-2 text-left text-[10px] font-semibold uppercase tracking-[0.12em] text-[#8f8f8f]">
+                    Provider
+                  </th>
+                  <th className="px-3 py-2 text-left text-[10px] font-semibold uppercase tracking-[0.12em] text-[#8f8f8f]">
+                    Model / regime
+                  </th>
+                  <th className="px-3 py-2 text-right text-[10px] font-semibold uppercase tracking-[0.12em] text-[#8f8f8f]">
+                    Best ρ
+                  </th>
+                  <th className="px-3 py-2 text-right text-[10px] font-semibold uppercase tracking-[0.12em] text-[#8f8f8f]">
+                    Mean ρ
+                  </th>
                 </tr>
               </thead>
               <tbody>
-                {activeProviders.map((row) => (
-                  <tr key={`${row.provider}-${row.model}`} className="border-t border-[#262626]">
-                    <td className="px-3 py-2.5 text-[#f2f2f2]">{row.provider}</td>
-                    <td className="px-3 py-2.5">
-                      <div className="text-[#d8d8d8]">{row.model}</div>
-                      {typeof row.regimeLabel === "string" && row.regimeLabel.length > 0 ? (
-                        <div className="mt-0.5 text-[11px] text-[#8f8f8f]">{row.regimeLabel}</div>
-                      ) : null}
-                    </td>
-                    <td className="px-3 py-2.5 text-right font-mono text-[#f2f2f2]">{row.bestDisplay}</td>
-                    <td className="px-3 py-2.5 text-right font-mono text-[#cfcfcf]">{row.meanDisplay}</td>
-                  </tr>
-                ))}
+                {activeProviders.map((row) => {
+                  const regimeToneClass =
+                    row.regimeTone === "good"
+                      ? "border-[#21452a] bg-[#112017] text-[#4ade80]"
+                      : row.regimeTone === "mid"
+                        ? "border-[#5b4a20] bg-[#1d1a12] text-[#f3d38b]"
+                        : row.regimeTone === "inverted"
+                          ? "border-[#5a2424] bg-[#1f1010] text-[#fca5a5]"
+                          : "border-[#3f3f3f] bg-[#161616] text-[#c4c4c4]";
+
+                  const barFillClass =
+                    row.regimeTone === "good"
+                      ? "bg-[#22c55e]"
+                      : row.regimeTone === "mid"
+                        ? "bg-[#d97706]"
+                        : row.regimeTone === "inverted"
+                          ? "bg-[#ef4444]"
+                          : activePaper.id === "paper1"
+                            ? "bg-[#22c55e]"
+                            : "bg-[#a3a3a3]";
+
+                  const meanToneClass = row.meanDisplay.startsWith("+")
+                    ? "text-[#fca5a5]"
+                    : "text-[#d7d7d7]";
+
+                  return (
+                    <tr key={`${row.provider}-${row.model}`} className="border-t border-[#262626] hover:bg-[#131313]">
+                      <td className="px-3 py-3 align-top">
+                        <div className="font-semibold text-white">{row.provider}</div>
+                      </td>
+
+                      <td className="px-3 py-3 align-top">
+                        <div className="text-[#d8d8d8]">{row.model}</div>
+                        {typeof row.regimeLabel === "string" && row.regimeLabel.length > 0 ? (
+                          <div className="mt-2">
+                            <span
+                              className={`rounded-full border px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.08em] ${regimeToneClass}`}
+                            >
+                              {row.regimeLabel}
+                            </span>
+                          </div>
+                        ) : (
+                          <div className="mt-2 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#6f6f6f]">
+                            independent fresh-chat runs
+                          </div>
+                        )}
+                      </td>
+
+                      <td className="px-3 py-3 text-right align-top">
+                        <div className="font-mono text-[#f2f2f2]">{row.bestDisplay}</div>
+                        <div className="mt-2 ml-auto h-1.5 w-20 overflow-hidden rounded-full bg-[#1a1a1a]">
+                          <div
+                            className={`h-full rounded-full ${barFillClass}`}
+                            style={{ width: `${Math.max(10, Math.round(row.bestMagnitude * 100))}%` }}
+                          />
+                        </div>
+                      </td>
+
+                      <td className={`px-3 py-3 text-right font-mono align-top ${meanToneClass}`}>
+                        {row.meanDisplay}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
@@ -464,7 +557,7 @@ function PaperSnapshotReferenceSection({
           {"emphasisNote" in activePaper &&
           typeof activePaper.emphasisNote === "string" &&
           activePaper.emphasisNote.length > 0 ? (
-            <div className="mt-3 text-[11px] italic leading-6 text-[#b8b8b8]">
+            <div className="mt-4 rounded-[8px] border border-[#5a2424] bg-[#1a0f0f] px-3 py-2 text-[11px] leading-6 text-[#e5b4b4]">
               {activePaper.emphasisNote}
             </div>
           ) : null}
@@ -489,6 +582,7 @@ export function EvalsPageClientV0_1() {
   const [label, setLabel] = useState<string>("");
 
   const [inputText, setInputText] = useState<string>("");
+  const [pickedFileName, setPickedFileName] = useState<string>("");
   const [busy, setBusy] = useState(false);
 
   const [apiErr, setApiErr] = useState<ApiErr | null>(null);
@@ -999,15 +1093,29 @@ export function EvalsPageClientV0_1() {
           </div>
         </div>
 
-        <details className="overflow-hidden rounded-[5px] border border-[#3a3a3a]">
-          <summary className="flex cursor-pointer list-none items-center gap-2 bg-[#1e1e1e] px-[14px] py-[10px] text-[11px] uppercase tracking-[0.1em] text-[#aaa] transition hover:text-[#888] [&::-webkit-details-marker]:hidden">
-            <span className="text-[9px] text-[#cc0000]">▶</span>
-            Task prompt — copy/paste to model
-          </summary>
-          <pre className="whitespace-pre-wrap border-t border-[#3a3a3a] bg-[#181818] p-[14px] text-[11px] leading-[1.7] text-[#bbb]">
-            {selectedTask?.prompt ?? "(no task selected)"}
-          </pre>
-        </details>
+          <details className="group overflow-hidden rounded-[5px] border border-[#6a5a2a] bg-[#1d1a12] transition hover:border-[#8a7636] open:border-l-2 open:border-l-[#d93333]">
+            <summary className="flex cursor-pointer list-none items-center justify-between gap-3 bg-[#221d14] px-[14px] py-[10px] text-[11px] uppercase tracking-[0.1em] text-[#d7cfbb] transition hover:bg-[#2a2418] hover:text-[#fff1c2] [&::-webkit-details-marker]:hidden">
+              <div className="flex items-center gap-2">
+                <span className="text-[9px] text-[#cc0000]">▶</span>
+                <span>TASK PROMPT — CLICK TO EXPAND & COPY TO MODEL</span>
+              </div>
+              <span className="text-[11px] text-[#b8a97a] transition-transform duration-200 group-open:rotate-180">▼</span>
+            </summary>
+            <div className="border-t border-[#6a5a2a] bg-[#1d1a12] p-[14px]">
+              <div className="mb-3 flex items-center justify-end">
+                <button
+                  type="button"
+                  onClick={() => void dfCopyText("Copied task prompt.", selectedTask?.prompt ?? "(no task selected)")}
+                  className="rounded-[4px] border border-[#6a5a2a] bg-transparent px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#f3d38b] transition hover:border-[#8a7636] hover:bg-[#2a2418] hover:text-[#fff1c2]"
+                >
+                  Copy
+                </button>
+              </div>
+              <pre className="whitespace-pre-wrap text-[11px] leading-[1.7] text-[#d7cfbb]">
+                {selectedTask?.prompt ?? "(no task selected)"}
+              </pre>
+            </div>
+          </details>
 
         <div className="grid grid-cols-1 gap-[14px] md:grid-cols-2 xl:grid-cols-4">
           <div>
@@ -1057,7 +1165,6 @@ export function EvalsPageClientV0_1() {
             />
           </div>
         </div>
-
           <div className="rounded-[10px] border border-[#3a3a3a] bg-[#171717] px-5 py-4">
             <div className="flex flex-wrap items-center gap-3">
               <span className="text-[12px] font-semibold uppercase tracking-[0.12em] text-[#e2e2e2]">
@@ -1068,20 +1175,29 @@ export function EvalsPageClientV0_1() {
               </span>
             </div>
 
-            <div className="mt-3">
-              <input
-                type="file"
-                accept=".json,application/json"
-                onChange={(e) => void onPickFile(e.target.files?.[0] ?? null)}
-                className="block w-full text-sm text-neutral-300 file:mr-3 file:rounded-[8px] file:border file:border-[#4a4a4a] file:bg-[#101010] file:px-4 file:py-2.5 file:text-[11px] file:font-semibold file:uppercase file:tracking-[0.08em] file:text-[#ededed] hover:file:border-[#777] hover:file:bg-[#1a1a1a]"
-              />
+            <div className="mt-3 flex flex-wrap items-center gap-3">
+              <label className="inline-flex cursor-pointer items-center rounded-[6px] border border-[#3a3a3a] bg-[#1e1e1e] px-4 py-2 text-[11px] font-bold uppercase tracking-[0.12em] text-[#d0d0d0] transition hover:border-[#666] hover:bg-[#252525] hover:text-white">
+                <input
+                  type="file"
+                  accept=".json,application/json"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0] ?? null;
+                    setPickedFileName(file?.name ?? "");
+                    void onPickFile(file);
+                  }}
+                  className="sr-only"
+                />
+                📎 Choose file
+              </label>
+              <span className={`text-[12px] leading-6 ${pickedFileName ? "text-[#666]" : "italic text-[#444]"}`}>
+                {pickedFileName || "no file chosen"}
+              </span>
             </div>
 
             <div className="mt-2 text-[11px] leading-6 text-[#b8b8b8]">
               Upload a full <span className="font-mono text-[#f2f2f2]">evalRun.v0.1</span> bundle or a buckets-only JSON file.
             </div>
           </div>
-
           <div className="rounded-[10px] border border-[#3a3a3a] bg-[#131313] px-5 py-5">
             <div className="space-y-1">
               <label className="block text-[12px] font-semibold uppercase tracking-[0.12em] text-[#e2e2e2]">
@@ -1094,6 +1210,24 @@ export function EvalsPageClientV0_1() {
 
             <textarea
               className="mt-3 min-h-[220px] w-full rounded-[8px] border border-[#3a3a3a] bg-[#101010] p-4 font-mono text-[12px] leading-[1.7] text-[#e0e0e0] outline-none transition focus:border-[#555]"
+              style={{
+                borderColor:
+                  inputText.trim().length === 0
+                    ? "#3a3a3a"
+                    : inputProbe.kind === "invalid_json"
+                      ? "#d93333"
+                      : inputProbe.kind
+                        ? "#16a34a"
+                        : "#3a3a3a",
+                boxShadow:
+                  inputText.trim().length === 0
+                    ? "none"
+                    : inputProbe.kind === "invalid_json"
+                      ? "0 0 0 1px #d9333344"
+                      : inputProbe.kind
+                        ? "0 0 0 1px #16a34a44"
+                        : "none",
+              }}
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
               placeholder={mode === "run_bundle" ? '{ "evalRunVersion": "evalRun.v0.1", ... }' : '{ "V1": ["token1", ...], "V2": [...], ... }'}
