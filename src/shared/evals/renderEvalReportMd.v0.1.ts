@@ -22,9 +22,9 @@ function renderSlope(label: string, s: SlopeReportV0_1 | null): string[] {
   return [
     `### Slope — ${label}`,
     "",
-    `- pearson r: ${fmt(s.pearson_r)} (${fmtP(s.p_pearson)})`,
-    `- spearman ρ: ${fmt(s.spearman_rho)} (${fmtP(s.p_spearman)})`,
-    `- permutation: iters=${s.iters}, seed=${s.seed}`,
+    `- pearson r: ${fmt(s.pearson_r)} (parametric ${fmtP(s.p_pearson)})`,
+    `- spearman ρ: ${fmt(s.spearman_rho)} (parametric ${fmtP(s.p_spearman)})`,
+    `- permutation test: iters=${s.iters}, seed=${s.seed}`,
     "",
   ];
 }

@@ -123,15 +123,15 @@ _not computed (needs >= 2 buckets)_
 
 ### Slope — aperturePrimary
 
-- pearson r: -0.990 (p < 0.001)
-- spearman ρ: -1.000 (p < 0.001)
-- permutation: iters=12000, seed=90273163
+- pearson r: -0.990 (parametric p < 0.001)
+- spearman ρ: -1.000 (parametric p < 0.001)
+- permutation test: iters=12000, seed=90273163
 
 ### Slope — aperturePresenceMean
 
-- pearson r: -0.990 (p < 0.001)
-- spearman ρ: -1.000 (p < 0.001)
-- permutation: iters=12000, seed=97631760
+- pearson r: -0.990 (parametric p < 0.001)
+- spearman ρ: -1.000 (parametric p < 0.001)
+- permutation test: iters=12000, seed=97631760
 
 ### Diagnostics
 
@@ -164,15 +164,15 @@ _not computed (needs >= 2 buckets)_
 
 ### Slope — aperturePrimary
 
-- pearson r: -0.249 (p=0.594)
-- spearman ρ: -0.429 (p=0.360)
-- permutation: iters=12000, seed=90273163
+- pearson r: -0.249 (parametric p=0.594)
+- spearman ρ: -0.429 (parametric p=0.360)
+- permutation test: iters=12000, seed=90273163
 
 ### Slope — aperturePresenceMean
 
-- pearson r: -0.249 (p=0.588)
-- spearman ρ: -0.429 (p=0.349)
-- permutation: iters=12000, seed=97631760
+- pearson r: -0.249 (parametric p=0.588)
+- spearman ρ: -0.429 (parametric p=0.349)
+- permutation test: iters=12000, seed=97631760
 
 ### Diagnostics
 
