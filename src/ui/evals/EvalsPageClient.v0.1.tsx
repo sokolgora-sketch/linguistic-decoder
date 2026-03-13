@@ -187,24 +187,24 @@ const EVALS_PAPER_SNAPSHOTS = [
 
 function TaskCard({ t }: { t: EvalTaskReportV0_1 }) {
   return (
-    <section className="rounded-[10px] border border-[#3a3a3a] bg-[#151515] px-5 py-5 space-y-5">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div className="space-y-1">
+    <section className="rounded-[12px] border border-[#3a3a3a] bg-[#151515] px-6 py-6 space-y-6">
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div className="space-y-2">
           <div className="text-[12px] font-semibold uppercase tracking-[0.12em] text-[#b8b8b8]">{t.taskId}</div>
           <h2 className="text-[20px] font-semibold leading-tight text-white">{t.title}</h2>
         </div>
 
-        <div className="flex flex-wrap gap-2 text-[11px]">
-          <span className="rounded-full border border-[#3a3a3a] bg-[#101010] px-3 py-1.5 text-[#d8d8d8]">
+        <div className="flex flex-wrap gap-3 text-[12px]">
+          <span className="rounded-full border border-[#3a3a3a] bg-[#101010] px-3.5 py-2 text-[#d8d8d8]">
             kind <span className="font-mono text-white">{t.kind}</span>
           </span>
-          <span className="rounded-full border border-[#3a3a3a] bg-[#101010] px-3 py-1.5 text-[#d8d8d8]">
+          <span className="rounded-full border border-[#3a3a3a] bg-[#101010] px-3.5 py-2 text-[#d8d8d8]">
             lang <span className="font-mono text-white">{t.languageHint}</span>
           </span>
-          <span className="rounded-full border border-[#3a3a3a] bg-[#101010] px-3 py-1.5 text-[#d8d8d8]">
+          <span className="rounded-full border border-[#3a3a3a] bg-[#101010] px-3.5 py-2 text-[#d8d8d8]">
             buckets <span className="font-mono text-white">{t.targetBuckets.join(", ")}</span>
           </span>
-          <span className="rounded-full border border-[#3a3a3a] bg-[#101010] px-3 py-1.5 text-[#d8d8d8]">
+          <span className="rounded-full border border-[#3a3a3a] bg-[#101010] px-3.5 py-2 text-[#d8d8d8]">
             nPerBucket <span className="font-mono text-white">{t.nPerBucket}</span>
           </span>
         </div>
@@ -256,11 +256,11 @@ function TaskCard({ t }: { t: EvalTaskReportV0_1 }) {
         </table>
       </div>
 
-      <div className="grid gap-3 lg:grid-cols-2">
-        <div className="rounded-[8px] border border-[#303030] bg-[#101010] px-4 py-4">
+      <div className="grid gap-4 lg:grid-cols-2">
+        <div className="rounded-[10px] border border-[#303030] bg-[#101010] px-5 py-5">
           <div className="text-[12px] font-semibold uppercase tracking-[0.12em] text-[#dcdcdc]">Slope — aperturePrimary</div>
           {t.slope_aperturePrimary ? (
-            <div className="mt-3 space-y-2 text-[12px] leading-6 text-[#cfcfcf]">
+            <div className="mt-4 space-y-3 text-[12px] leading-7 text-[#cfcfcf]">
               <div>pearson r <span className="font-mono text-white">{fmt(t.slope_aperturePrimary.pearson_r)}</span> <span className="text-[#8a8a8a]">(parametric {fmtPLabel(t.slope_aperturePrimary.p_pearson)})</span></div>
               <div>spearman ρ <span className="font-mono text-white">{fmt(t.slope_aperturePrimary.spearman_rho)}</span> <span className="text-[#8a8a8a]">(parametric {fmtPLabel(t.slope_aperturePrimary.p_spearman)})</span></div>
               <div className="text-[#a8a8a8]">permutation test <span className="font-mono text-white">iters={t.slope_aperturePrimary.iters}</span> <span className="text-[#666]">·</span> <span className="font-mono text-white">seed={t.slope_aperturePrimary.seed}</span></div>
@@ -270,10 +270,10 @@ function TaskCard({ t }: { t: EvalTaskReportV0_1 }) {
           )}
         </div>
 
-        <div className="rounded-[8px] border border-[#303030] bg-[#101010] px-4 py-4">
+        <div className="rounded-[10px] border border-[#303030] bg-[#101010] px-5 py-5">
           <div className="text-[12px] font-semibold uppercase tracking-[0.12em] text-[#dcdcdc]">Slope — aperturePresenceMean</div>
           {t.slope_aperturePresenceMean ? (
-            <div className="mt-3 space-y-2 text-[12px] leading-6 text-[#cfcfcf]">
+            <div className="mt-4 space-y-3 text-[12px] leading-7 text-[#cfcfcf]">
               <div>pearson r <span className="font-mono text-white">{fmt(t.slope_aperturePresenceMean.pearson_r)}</span> <span className="text-[#8a8a8a]">(parametric {fmtPLabel(t.slope_aperturePresenceMean.p_pearson)})</span></div>
               <div>spearman ρ <span className="font-mono text-white">{fmt(t.slope_aperturePresenceMean.spearman_rho)}</span> <span className="text-[#8a8a8a]">(parametric {fmtPLabel(t.slope_aperturePresenceMean.p_spearman)})</span></div>
               <div className="text-[#a8a8a8]">permutation test <span className="font-mono text-white">iters={t.slope_aperturePresenceMean.iters}</span> <span className="text-[#666]">·</span> <span className="font-mono text-white">seed={t.slope_aperturePresenceMean.seed}</span></div>
@@ -284,39 +284,39 @@ function TaskCard({ t }: { t: EvalTaskReportV0_1 }) {
         </div>
       </div>
 
-      <details className="overflow-hidden rounded-[8px] border border-[#2f2f2f] bg-[#101010]">
-        <summary className="cursor-pointer px-4 py-3 text-[12px] font-semibold uppercase tracking-[0.12em] text-[#dcdcdc]">
+      <details className="overflow-hidden rounded-[10px] border border-[#2f2f2f] bg-[#101010]">
+        <summary className="cursor-pointer px-5 py-4 text-[12px] font-semibold uppercase tracking-[0.12em] text-[#dcdcdc]">
           Diagnostics
         </summary>
-        <div className="border-t border-[#262626] bg-[#0c0c0c] px-4 py-4">
-          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-            <div className="rounded-[6px] border border-[#242424] bg-[#111111] px-3 py-3">
+        <div className="border-t border-[#262626] bg-[#0c0c0c] px-5 py-5">
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            <div className="rounded-[8px] border border-[#242424] bg-[#111111] px-4 py-4">
               <div className={`${MT.sectionLabel} text-[#b3b3b3]`}>Missing buckets</div>
               <div className="mt-2 font-mono text-[14px] leading-7 text-[#f2f2f2]">{joinList(t.diagnostics.missingBuckets)}</div>
             </div>
-            <div className="rounded-[6px] border border-[#242424] bg-[#111111] px-3 py-3">
+            <div className="rounded-[8px] border border-[#242424] bg-[#111111] px-4 py-4">
               <div className={`${MT.sectionLabel} text-[#b3b3b3]`}>Extra buckets</div>
               <div className="mt-2 font-mono text-[14px] leading-7 text-[#f2f2f2]">{joinList(t.diagnostics.extraBuckets)}</div>
             </div>
-            <div className="rounded-[6px] border border-[#242424] bg-[#111111] px-3 py-3">
+            <div className="rounded-[8px] border border-[#242424] bg-[#111111] px-4 py-4">
               <div className={`${MT.sectionLabel} text-[#b3b3b3]`}>Empty tokens</div>
               <div className="mt-2 font-mono text-[14px] text-[#f2f2f2]">{t.diagnostics.emptyTokenCount}</div>
             </div>
-            <div className="rounded-[6px] border border-[#242424] bg-[#111111] px-3 py-3">
+            <div className="rounded-[8px] border border-[#242424] bg-[#111111] px-4 py-4">
               <div className={`${MT.sectionLabel} text-[#b3b3b3]`}>Whitespace tokens</div>
               <div className="mt-2 font-mono text-[14px] text-[#f2f2f2]">{t.diagnostics.whitespaceTokenCount}</div>
             </div>
-            <div className="rounded-[6px] border border-[#242424] bg-[#111111] px-3 py-3">
+            <div className="rounded-[8px] border border-[#242424] bg-[#111111] px-4 py-4">
               <div className={`${MT.sectionLabel} text-[#b3b3b3]`}>No-vowel tokens</div>
               <div className="mt-2 font-mono text-[14px] text-[#f2f2f2]">{t.diagnostics.noVowelTokenCount}</div>
             </div>
-            <div className="rounded-[6px] border border-[#242424] bg-[#111111] px-3 py-3">
+            <div className="rounded-[8px] border border-[#242424] bg-[#111111] px-4 py-4">
               <div className={`${MT.sectionLabel} text-[#b3b3b3]`}>Total invalid</div>
               <div className="mt-2 font-mono text-[14px] text-[#f2f2f2]">{t.diagnostics.totalInvalidTokenCount}</div>
             </div>
           </div>
 
-          <div className="mt-3 rounded-[6px] border border-[#242424] bg-[#111111] px-3 py-3">
+          <div className="mt-4 rounded-[8px] border border-[#242424] bg-[#111111] px-4 py-4">
             <div className={`${MT.sectionLabel} text-[#b3b3b3]`}>Notes</div>
             <div className="mt-2 font-mono text-[14px] leading-7 text-[#f2f2f2]">
               {t.diagnostics.notes.length ? t.diagnostics.notes.join(" | ") : "(none)"}
@@ -1049,8 +1049,8 @@ export function EvalsPageClientV0_1() {
     >
       <StickyNav />
 
-      <main className="mx-auto flex w-full max-w-[1200px] flex-col gap-0 px-10 pt-11 pb-20">
-        <header className="space-y-2">
+      <main className="mx-auto flex w-full max-w-[1200px] flex-col gap-8 px-10 pt-12 pb-24">
+        <header className="space-y-3">
           <div className={`${MT.eyebrow} text-neutral-300`}>
             instrument · evals
           </div>
@@ -1064,8 +1064,8 @@ export function EvalsPageClientV0_1() {
 
         <PaperSnapshotReferenceSection paperSnapshotTab={paperSnapshotTab} setPaperSnapshotTab={setPaperSnapshotTab} />
 
-      <section className="mt-10 rounded-[8px] border border-[#333] bg-[#141414] px-7 pt-7 pb-6 space-y-[18px]">
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+      <section className="rounded-[10px] border border-[#333] bg-[#141414] px-8 py-8 space-y-6">
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
           <div>
             <label className={`${MT.fieldLabel} text-[#ededed]`}>
               Input mode
@@ -1099,16 +1099,16 @@ export function EvalsPageClientV0_1() {
           </div>
         </div>
 
-          <details className="group overflow-hidden rounded-[5px] border border-[#6a5a2a] bg-[#1d1a12] transition hover:border-[#8a7636] open:border-l-2 open:border-l-[#d93333]">
-            <summary className={`flex cursor-pointer list-none items-center justify-between gap-3 bg-[#221d14] px-[14px] py-[12px] ${MT.promptSummary} text-[#d7cfbb] transition hover:bg-[#2a2418] hover:text-[#fff1c2] [&::-webkit-details-marker]:hidden`}>
+          <details className="group overflow-hidden rounded-[8px] border border-[#6a5a2a] bg-[#1d1a12] transition hover:border-[#8a7636] open:border-l-2 open:border-l-[#d93333]">
+            <summary className={`flex cursor-pointer list-none items-center justify-between gap-4 bg-[#221d14] px-[18px] py-[15px] ${MT.promptSummary} text-[#d7cfbb] transition hover:bg-[#2a2418] hover:text-[#fff1c2] [&::-webkit-details-marker]:hidden`}>
               <div className="flex items-center gap-2">
                 <span className="text-[11px] text-[#cc0000]">▶</span>
                 <span>TASK PROMPT — CLICK TO EXPAND & COPY TO MODEL</span>
               </div>
               <span className="text-[12px] text-[#b8a97a] transition-transform duration-200 group-open:rotate-180">▼</span>
             </summary>
-            <div className="border-t border-[#6a5a2a] bg-[#1d1a12] p-[14px]">
-              <div className="mb-3 flex items-center justify-end">
+            <div className="border-t border-[#6a5a2a] bg-[#1d1a12] px-5 py-5">
+              <div className="mb-4 flex items-center justify-end">
                 <button
                   type="button"
                   onClick={() => void dfCopyText("Copied task prompt.", selectedTask?.prompt ?? "(no task selected)")}
@@ -1123,7 +1123,7 @@ export function EvalsPageClientV0_1() {
             </div>
           </details>
 
-        <div className="grid grid-cols-1 gap-[14px] md:grid-cols-2 xl:grid-cols-4">
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
           <div>
             <label className={`${MT.fieldLabel} text-[#ededed]`}>
               runId
@@ -1171,7 +1171,7 @@ export function EvalsPageClientV0_1() {
             />
           </div>
         </div>
-          <div className="rounded-[10px] border border-[#3a3a3a] bg-[#171717] px-5 py-4">
+          <div className="rounded-[12px] border border-[#3a3a3a] bg-[#171717] px-6 py-5">
             <div className="flex flex-wrap items-center gap-3">
               <span className={`${MT.fieldLabelInline} text-[#ededed]`}>
                 Upload JSON
@@ -1181,7 +1181,7 @@ export function EvalsPageClientV0_1() {
               </span>
             </div>
 
-            <div className="mt-3 flex flex-wrap items-center gap-3">
+            <div className="mt-4 flex flex-wrap items-center gap-4">
               <label className={`inline-flex cursor-pointer items-center rounded-[6px] border border-[#3a3a3a] bg-[#1e1e1e] px-4 py-3 ${MT.actionMd} text-[#dfdfdf] transition hover:border-[#666] hover:bg-[#252525] hover:text-white`}>
                 <input
                   type="file"
@@ -1204,7 +1204,7 @@ export function EvalsPageClientV0_1() {
               Upload a full <span className="font-mono text-[#f2f2f2]">evalRun.v0.1</span> bundle or a buckets-only JSON file.
             </div>
           </div>
-          <div className="rounded-[10px] border border-[#3a3a3a] bg-[#131313] px-5 py-5">
+          <div className="rounded-[12px] border border-[#3a3a3a] bg-[#131313] px-6 py-6">
             <div className="space-y-1">
               <label className="block text-[14px] font-semibold uppercase tracking-[0.12em] text-[#ededed]">
                 Paste JSON
@@ -1247,7 +1247,7 @@ export function EvalsPageClientV0_1() {
             ) : null}
           </div>
 
-          <div className="flex flex-wrap items-center gap-2 pt-2">
+          <div className="flex flex-wrap items-center gap-3 pt-4">
             <button
               type="button"
               className={`rounded-[6px] border border-[#16a34a] bg-[#16a34a] px-6 py-3 ${MT.actionMd} text-white transition hover:bg-[#15803d] hover:shadow-[0_0_0_1px_rgba(22,163,74,0.4),0_4px_16px_rgba(22,163,74,0.33)] disabled:cursor-not-allowed disabled:border-[#333] disabled:bg-[#111] disabled:text-[#333] disabled:shadow-none`}
@@ -1274,7 +1274,7 @@ export function EvalsPageClientV0_1() {
 
             <button
               type="button"
-              className="rounded-[6px] border border-[#5a2a2a] bg-transparent px-4 py-2.5 text-[11px] uppercase tracking-[0.06em] text-[#cc6666] transition hover:border-[#cc0000] hover:bg-[#cc000010] hover:text-[#e05555] disabled:opacity-50"
+              className="rounded-[6px] border border-[#5a2a2a] bg-transparent px-4 py-3 text-[12px] uppercase tracking-[0.06em] text-[#cc6666] transition hover:border-[#cc0000] hover:bg-[#cc000010] hover:text-[#e05555] disabled:opacity-50"
               onClick={() => void onDownloadPdf()}
               disabled={busy || !inputText.trim()}
             >
@@ -1283,7 +1283,7 @@ export function EvalsPageClientV0_1() {
 
             <button
               type="button"
-              className="rounded-[6px] border border-[#444] bg-transparent px-4 py-2.5 text-[11px] uppercase tracking-[0.06em] text-[#b8b8b8] transition hover:border-[#777] hover:text-[#f2f2f2] disabled:opacity-50"
+              className="rounded-[6px] border border-[#444] bg-transparent px-4 py-3 text-[12px] uppercase tracking-[0.06em] text-[#b8b8b8] transition hover:border-[#777] hover:text-[#f2f2f2] disabled:opacity-50"
               onClick={() => void onCopyRawJson()}
               disabled={busy || !inputText.trim()}
             >
@@ -1292,7 +1292,7 @@ export function EvalsPageClientV0_1() {
 
             <button
               type="button"
-              className="rounded-[6px] border border-[#444] bg-transparent px-4 py-2.5 text-[11px] uppercase tracking-[0.06em] text-[#b8b8b8] transition hover:border-[#777] hover:text-[#f2f2f2] disabled:opacity-50"
+              className="rounded-[6px] border border-[#444] bg-transparent px-4 py-3 text-[12px] uppercase tracking-[0.06em] text-[#b8b8b8] transition hover:border-[#777] hover:text-[#f2f2f2] disabled:opacity-50"
               onClick={() => void onCopyCsvRow()}
               disabled={busy || !report}
             >
@@ -1303,7 +1303,7 @@ export function EvalsPageClientV0_1() {
 
             <button
               type="button"
-              className="rounded-[6px] border border-dashed border-[#4a4a4a] bg-transparent px-4 py-2.5 text-[11px] uppercase tracking-[0.06em] text-[#c8c8c8] transition hover:border-[#777] hover:bg-[#1f1f1f] hover:text-white"
+              className="rounded-[6px] border border-dashed border-[#4a4a4a] bg-transparent px-4 py-3 text-[12px] uppercase tracking-[0.06em] text-[#c8c8c8] transition hover:border-[#777] hover:bg-[#1f1f1f] hover:text-white"
               onClick={loadExample}
               disabled={busy}
             >
@@ -1311,9 +1311,9 @@ export function EvalsPageClientV0_1() {
             </button>
           </div>
 
-          <div className="space-y-2 pt-3">
+          <div className="space-y-3 pt-4">
             {mode === "run_bundle" && inputProbe.kind === "bucket_only" ? (
-              <div className="rounded-[8px] border border-[#5b4a20] bg-[#1d1a12] px-4 py-3">
+              <div className="rounded-[10px] border border-[#5b4a20] bg-[#1d1a12] px-5 py-4">
                 <div className="flex flex-wrap items-start gap-3">
                   <div className="min-w-0 flex-1">
                     <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#f3d38b]">
@@ -1337,7 +1337,7 @@ export function EvalsPageClientV0_1() {
             ) : null}
 
             {inputProbe.kind === "corpus70_meta" ? (
-              <div className="rounded-[8px] border border-[#5b3b3b] bg-[#1d1515] px-4 py-3">
+              <div className="rounded-[10px] border border-[#5b3b3b] bg-[#1d1515] px-5 py-4">
                 <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#f1b4b4]">
                   Unsupported input
                 </div>
@@ -1350,7 +1350,7 @@ export function EvalsPageClientV0_1() {
             ) : null}
 
             {notice ? (
-              <div className="rounded-[8px] border border-[#3e4a5b] bg-[#171b22] px-4 py-3">
+              <div className="rounded-[10px] border border-[#3e4a5b] bg-[#171b22] px-5 py-4">
                 <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#b8c7e8]">
                   Note
                 </div>
@@ -1359,7 +1359,7 @@ export function EvalsPageClientV0_1() {
             ) : null}
 
             {apiErr ? (
-              <div className="rounded-[8px] border border-[#6a3d3d] bg-[#211717] px-4 py-3">
+              <div className="rounded-[10px] border border-[#6a3d3d] bg-[#211717] px-5 py-4">
                 <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#f2b0b0]">
                   Error <span className="font-mono text-[#ffe4e4]">{apiErr.code}</span>
                 </div>
@@ -1369,9 +1369,9 @@ export function EvalsPageClientV0_1() {
           </div>
         </section>
         {(busy || apiErr || report || readyToScore) ? (
-            <section className="mb-6 space-y-6">
-            <div className={`rounded-[12px] border px-5 py-4 shadow-[0_10px_30px_rgba(0,0,0,0.18)] ${stateToneClass}`}>
-              <div className="flex flex-wrap items-center gap-4">
+            <section className="space-y-8">
+            <div className={`rounded-[12px] border px-6 py-5 shadow-[0_10px_30px_rgba(0,0,0,0.18)] ${stateToneClass}`}>
+              <div className="flex flex-wrap items-center gap-5">
                 <div className={`${MT.actionMd} inline-flex items-center gap-2 text-white`}>
                   <span className={`h-2.5 w-2.5 rounded-full ${stateDotClass}`} />
                   {stateLabel}
@@ -1401,7 +1401,7 @@ export function EvalsPageClientV0_1() {
 
             {report && summaryTask ? (
               <>
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <div className={`${MT.sectionLabel} text-[#ededed]`}>
                       Consistency (Spearman ρ)
@@ -1418,7 +1418,7 @@ export function EvalsPageClientV0_1() {
                   </div>
                 </div>
 
-                <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+                <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
                   {[
                     {
                       key: "Pearson r",
@@ -1450,7 +1450,7 @@ export function EvalsPageClientV0_1() {
                   ].map((card) => (
                     <div
                       key={card.key}
-                      className={`rounded-[10px] border border-[#3a3a3a] border-t-[3px] bg-[#161616] p-4 shadow-[0_6px_20px_rgba(0,0,0,0.12)] ${card.tone}`}
+                      className={`rounded-[12px] border border-[#3a3a3a] border-t-[3px] bg-[#161616] p-5 shadow-[0_8px_24px_rgba(0,0,0,0.14)] ${card.tone}`}
                     >
                       <div className={`${MT.statKey} text-[#e6e6e6]`}>
                         {card.key}
@@ -1492,7 +1492,7 @@ export function EvalsPageClientV0_1() {
 
                     return (
                       <div
-                        className="mt-4 flex flex-wrap items-center gap-3 rounded-[10px] border border-[#3a3a3a] bg-[#161616] px-4 py-4 shadow-[0_6px_20px_rgba(0,0,0,0.12)]"
+                        className="mt-5 flex flex-wrap items-center gap-4 rounded-[12px] border border-[#3a3a3a] bg-[#161616] px-5 py-5 shadow-[0_8px_24px_rgba(0,0,0,0.14)]"
                         title={diagnosisHint}
                       >
                         <span
@@ -1544,7 +1544,7 @@ export function EvalsPageClientV0_1() {
                     const x2 = pts[pts.length - 1]?.x ?? 96;
 
                     return (
-                      <div className="mt-6 rounded-[12px] border border-[#3a3a3a] bg-[#101010] px-5 py-5 shadow-[0_6px_20px_rgba(0,0,0,0.12)]">
+                      <div className="mt-7 rounded-[12px] border border-[#3a3a3a] bg-[#101010] px-6 py-6 shadow-[0_8px_24px_rgba(0,0,0,0.14)]">
                           <div className="mb-1 text-[12px] font-semibold uppercase tracking-[0.14em] text-[#dddddd]">
                             Aperture trend by bucket
                           </div>
@@ -1645,8 +1645,8 @@ export function EvalsPageClientV0_1() {
 
 
       {report ? (
-            <section className="space-y-7 pt-3">
-            <div className="rounded-[10px] border border-[#2a2a2a] bg-[#151515] px-5 py-5">
+            <section className="space-y-8 pt-4">
+            <div className="rounded-[12px] border border-[#2a2a2a] bg-[#151515] px-6 py-6">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="space-y-1">
                   <div className={`${MT.sectionLabel} text-[#adadad]`}>
@@ -1658,7 +1658,7 @@ export function EvalsPageClientV0_1() {
                 </div>
               </div>
 
-              <div className={`mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 ${MT.markdownMeta} text-[#d8d8d8]`}>
+              <div className={`mt-5 flex flex-wrap items-center gap-x-6 gap-y-3 ${MT.markdownMeta} text-[#d8d8d8]`}>
                 <span>
                   specId: <span className="font-mono text-[#e5e5e5]">{report.specId}</span>
                 </span>
@@ -1670,7 +1670,7 @@ export function EvalsPageClientV0_1() {
                 </span>
               </div>
 
-              <div className={`mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 ${MT.markdownMeta} text-[#d0d0d0]`}>
+              <div className={`mt-4 flex flex-wrap items-center gap-x-6 gap-y-3 ${MT.markdownMeta} text-[#d0d0d0]`}>
                 <span>
                   provider: <span className="font-mono text-[#f2f2f2]">{report.meta?.provider ?? "-"}</span>
                 </span>
@@ -1682,8 +1682,8 @@ export function EvalsPageClientV0_1() {
                 </span>
               </div>
 
-              <div className="mt-4 overflow-hidden rounded-[8px] border border-[#262626] bg-[#101010]">
-                <div className="flex items-center justify-between gap-3 border-b border-[#262626] px-4 py-3">
+              <div className="mt-5 overflow-hidden rounded-[10px] border border-[#262626] bg-[#101010]">
+                <div className="flex items-center justify-between gap-4 border-b border-[#262626] px-5 py-4">
                   <div className="space-y-1">
                     <div className={`${MT.sectionLabel} text-[#dfdfdf]`}>
                       Markdown export preview
@@ -1701,11 +1701,11 @@ export function EvalsPageClientV0_1() {
                     Copy
                   </button>
                 </div>
-                <pre className={`overflow-x-auto whitespace-pre-wrap bg-[#0c0c0c] px-4 py-4 ${MT.markdownBody} text-[#d7d7d7]`}>{md || "(empty)"}</pre>
+                <pre className={`overflow-x-auto whitespace-pre-wrap bg-[#0c0c0c] px-5 py-5 ${MT.markdownBody} text-[#d7d7d7]`}>{md || "(empty)"}</pre>
               </div>
             </div>
 
-              <div className="space-y-6">
+              <div className="space-y-7">
                 {report.tasks
                   .filter((t) => t.kind === "byo")
                   .map((t) => (
@@ -1714,7 +1714,7 @@ export function EvalsPageClientV0_1() {
 
 
               {report.tasks.some((t) => t.kind !== "byo") ? (
-                <section className="mt-2 rounded-[10px] border border-[#303030] bg-[#171717] px-4 py-4 space-y-3">
+                <section className="mt-3 rounded-[12px] border border-[#303030] bg-[#171717] px-5 py-5 space-y-4">
                     <div className="space-y-1">
                       <div className={`${MT.sectionLabel} text-[#b3b3b3]`}>
                         Validation controls
