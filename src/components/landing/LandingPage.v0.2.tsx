@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import { ArrowRight, ExternalLink, Lock } from "lucide-react";
+import { MT } from "@/ui/typography/marketingType.v0.1";
 
 import {
   Accordion,
@@ -434,7 +435,7 @@ function StatsTicker() {
   return (
     <div className="overflow-hidden rounded-md border border-[#686868] bg-[#232323]">
       <div
-        className="flex min-w-max gap-6 px-4 py-2.5 text-[11px] uppercase tracking-[0.14em] text-neutral-300 sm:gap-10 sm:px-5 sm:py-3 sm:text-[12px]"
+        className={`flex min-w-max gap-6 px-4 py-2.5 ${MT.ticker} text-neutral-300 sm:gap-10 sm:px-5 sm:py-3`}
         style={{
           fontFamily: 'Inter, sans-serif',
           animation: "ticker-slide 28s linear infinite",
@@ -455,13 +456,13 @@ function ApertureBar({ mounted }: { mounted: boolean }) {
     <div className="rounded-md border border-[#686868] bg-[#232323] p-4">
       <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div
-          className="text-[12px] uppercase tracking-[0.14em] text-neutral-300"
+          className={`${MT.microLabel} text-neutral-300`}
           style={{ fontFamily: "Inter, sans-serif" }}
         >
           7-voice aperture scale — open → closed
         </div>
         <div
-          className="text-[12px] uppercase tracking-[0.14em] text-neutral-300"
+          className={`${MT.microLabel} text-neutral-300`}
           style={{ fontFamily: "Inter, sans-serif" }}
         >
           A, O, E, Ë, U, Y, I
@@ -568,10 +569,10 @@ function HeroChart({ mounted }: { mounted: boolean }) {
   return (
     <div className="rounded-md border border-[#686868] bg-[#232323] p-4">
       <div className="mb-3 flex items-center justify-between gap-3">
-        <div className="text-[12px] uppercase tracking-[0.14em] text-neutral-300" style={{ fontFamily: 'Inter, sans-serif' }}>
+        <div className={`${MT.microLabel} text-neutral-300`} style={{ fontFamily: 'Inter, sans-serif' }}>
           Turkish STEP20 baseline
         </div>
-        <div className="text-[12px] uppercase tracking-[0.14em] text-neutral-300" style={{ fontFamily: 'Inter, sans-serif' }}>
+        <div className={`${MT.microLabel} text-neutral-300`} style={{ fontFamily: 'Inter, sans-serif' }}>
           bucket means
         </div>
       </div>
@@ -674,7 +675,7 @@ function HeroChart({ mounted }: { mounted: boolean }) {
 function HeroStatsCard() {
   return (
     <div className="rounded-md border border-[#686868] bg-[#232323] p-4">
-      <div className="mb-3 text-[12px] uppercase tracking-[0.14em] text-neutral-300" style={{ fontFamily: 'Inter, sans-serif' }}>
+      <div className={`mb-3 ${MT.microLabel} text-neutral-300`} style={{ fontFamily: 'Inter, sans-serif' }}>
         slope summary
       </div>
       <div className="space-y-3 text-sm text-neutral-200">
@@ -702,7 +703,7 @@ function HeroStatsCard() {
 function HeroExplainCard() {
   return (
     <div className="rounded-md border border-[#686868] bg-[#232323] p-4">
-      <div className="mb-3 text-[12px] uppercase tracking-[0.14em] text-neutral-300" style={{ fontFamily: 'Inter, sans-serif' }}>
+      <div className={`mb-3 ${MT.microLabel} text-neutral-300`} style={{ fontFamily: 'Inter, sans-serif' }}>
         what this chart shows
       </div>
       <div className="space-y-3 text-sm leading-6 text-neutral-300">
@@ -725,7 +726,7 @@ function HeroSection({ mounted }: { mounted: boolean }) {
   return (
     <section className="grid gap-6 lg:grid-cols-[1.05fr_1fr]">
       <div className="space-y-5">
-        <div className="inline-flex flex-wrap items-center gap-2 rounded-md border border-[#686868] bg-[#232323] px-3 py-2.5 text-[12px] uppercase tracking-[0.14em] text-neutral-300" style={{ fontFamily: 'Inter, sans-serif' }}>
+        <div className={`inline-flex flex-wrap items-center gap-2 rounded-md border border-[#686868] bg-[#232323] px-3 py-2.5 ${MT.microLabel} text-neutral-300`} style={{ fontFamily: 'Inter, sans-serif' }}>
           <span>deterministic</span>
           <span className="text-neutral-300">•</span>
           <span>baseline-locked</span>
@@ -906,7 +907,7 @@ function LlmResultsSection() {
         <AccordionItem value="llm-results" className="border-b-0">
           <AccordionTrigger className="py-0 hover:no-underline">
             <div className="text-left">
-              <div className="text-[12px] uppercase tracking-[0.14em] text-neutral-300" style={{ fontFamily: 'Inter, sans-serif' }}>
+              <div className={`${MT.microLabel} text-neutral-300`} style={{ fontFamily: 'Inter, sans-serif' }}>
                 llm results
               </div>
               <div className="mt-1 text-lg font-semibold text-white">
@@ -994,7 +995,7 @@ function EvalsReferenceTeaser() {
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div className="space-y-1">
           <div
-            className="text-[12px] uppercase tracking-[0.14em] text-neutral-300"
+            className={`${MT.microLabel} text-neutral-300`}
             style={{ fontFamily: "Inter, sans-serif" }}
           >
             evals reference
@@ -1008,7 +1009,7 @@ function EvalsReferenceTeaser() {
 
         <Link
           href="/evals"
-          className="inline-flex items-center rounded-md border border-[#686868] bg-[#181818] px-4 py-2.5 text-[12px] uppercase tracking-[0.12em] text-neutral-100 transition hover:border-[#16a34a] hover:text-[#16a34a]"
+          className={`inline-flex items-center rounded-md border border-[#686868] bg-[#181818] px-4 py-2.5 ${MT.microLabel} text-neutral-100 transition hover:border-[#16a34a] hover:text-[#16a34a]`}
           style={{ fontFamily: "Inter, sans-serif" }}
         >
           Open Evals →
@@ -1021,7 +1022,7 @@ function EvalsReferenceTeaser() {
 function HowItWorksSection() {
   return (
     <section className="rounded-md border border-[#686868] bg-[#232323] p-5">
-      <div className="text-[12px] uppercase tracking-[0.14em] text-neutral-300" style={{ fontFamily: 'Inter, sans-serif' }}>
+      <div className={`${MT.microLabel} text-neutral-300`} style={{ fontFamily: 'Inter, sans-serif' }}>
         how it works
       </div>
       <div className="mt-1 text-lg font-semibold text-white">Three-step scoring loop</div>
@@ -1043,7 +1044,7 @@ function HowItWorksSection() {
 function ScientificFoundationSection() {
   return (
     <section className="rounded-md border border-[#686868] bg-[#232323] p-5">
-      <div className="text-[12px] uppercase tracking-[0.14em] text-neutral-300" style={{ fontFamily: 'Inter, sans-serif' }}>
+      <div className={`${MT.microLabel} text-neutral-300`} style={{ fontFamily: 'Inter, sans-serif' }}>
         scientific foundation
       </div>
       <div className="mt-1 text-lg font-semibold text-white">Published references and method posture</div>
@@ -1092,7 +1093,7 @@ function ScientificFoundationSection() {
 function FAQSection() {
   return (
     <section className="rounded-md border border-[#686868] bg-[#232323] p-5">
-      <div className="text-[12px] uppercase tracking-[0.14em] text-neutral-300" style={{ fontFamily: 'Inter, sans-serif' }}>
+      <div className={`${MT.microLabel} text-neutral-300`} style={{ fontFamily: 'Inter, sans-serif' }}>
         faq
       </div>
       <div className="mt-1 text-lg font-semibold text-white">Common questions</div>
