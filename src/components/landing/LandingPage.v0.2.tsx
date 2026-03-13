@@ -434,9 +434,9 @@ function StatsTicker() {
   return (
     <div className="overflow-hidden rounded-md border border-[#686868] bg-[#232323]">
       <div
-        className="flex min-w-max gap-6 px-4 py-2.5 text-[10px] uppercase tracking-[0.14em] text-neutral-300 sm:gap-10 sm:px-5 sm:py-3 sm:text-[11px]"
+        className="flex min-w-max gap-6 px-4 py-2.5 text-[11px] uppercase tracking-[0.14em] text-neutral-300 sm:gap-10 sm:px-5 sm:py-3 sm:text-[12px]"
         style={{
-          fontFamily: 'Courier New, monospace',
+          fontFamily: 'Inter, sans-serif',
           animation: "ticker-slide 28s linear infinite",
         }}
       >
@@ -455,14 +455,14 @@ function ApertureBar({ mounted }: { mounted: boolean }) {
     <div className="rounded-md border border-[#686868] bg-[#232323] p-4">
       <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div
-          className="text-[11px] uppercase tracking-[0.14em] text-neutral-300"
-          style={{ fontFamily: "Courier New, monospace" }}
+          className="text-[12px] uppercase tracking-[0.14em] text-neutral-300"
+          style={{ fontFamily: "Inter, sans-serif" }}
         >
           7-voice aperture scale — open → closed
         </div>
         <div
-          className="text-[11px] uppercase tracking-[0.14em] text-neutral-300"
-          style={{ fontFamily: "Courier New, monospace" }}
+          className="text-[12px] uppercase tracking-[0.14em] text-neutral-300"
+          style={{ fontFamily: "Inter, sans-serif" }}
         >
           A, O, E, Ë, U, Y, I
         </div>
@@ -496,7 +496,7 @@ function ApertureBar({ mounted }: { mounted: boolean }) {
                 >
                   <span
                     className="text-base font-black sm:text-lg"
-                    style={{ color: voice.color, fontFamily: "Courier New, monospace" }}
+                    style={{ color: voice.color, fontFamily: "Inter, sans-serif" }}
                   >
                     {voice.id}
                   </span>
@@ -514,8 +514,8 @@ function ApertureBar({ mounted }: { mounted: boolean }) {
                   </div>
 
                   <span
-                    className="text-[10px] text-neutral-300"
-                    style={{ fontFamily: "Courier New, monospace" }}
+                    className="text-[12px] text-neutral-300"
+                    style={{ fontFamily: "Inter, sans-serif" }}
                   >
                     {voice.weight.toFixed(1)}
                   </span>
@@ -524,8 +524,8 @@ function ApertureBar({ mounted }: { mounted: boolean }) {
 
               <TooltipContent
                 side="top"
-                className="w-[160px] border-[#686868] bg-[#222] px-3 py-2 text-[11px] text-neutral-200 sm:w-[170px]"
-                style={{ fontFamily: "Courier New, monospace" }}
+                className="w-[170px] border-[#686868] bg-[#222] px-3 py-2 text-[12px] text-neutral-200 sm:w-[180px]"
+                style={{ fontFamily: "Inter, sans-serif" }}
               >
                 <div className="mb-1 text-base font-bold text-neutral-100">
                   {voice.ipa}
@@ -568,10 +568,10 @@ function HeroChart({ mounted }: { mounted: boolean }) {
   return (
     <div className="rounded-md border border-[#686868] bg-[#232323] p-4">
       <div className="mb-3 flex items-center justify-between gap-3">
-        <div className="text-[11px] uppercase tracking-[0.14em] text-neutral-300" style={{ fontFamily: 'Courier New, monospace' }}>
+        <div className="text-[12px] uppercase tracking-[0.14em] text-neutral-300" style={{ fontFamily: 'Inter, sans-serif' }}>
           Turkish STEP20 baseline
         </div>
-        <div className="text-[11px] uppercase tracking-[0.14em] text-neutral-300" style={{ fontFamily: 'Courier New, monospace' }}>
+        <div className="text-[12px] uppercase tracking-[0.14em] text-neutral-300" style={{ fontFamily: 'Inter, sans-serif' }}>
           bucket means
         </div>
       </div>
@@ -593,8 +593,8 @@ function HeroChart({ mounted }: { mounted: boolean }) {
                 x={8}
                 y={y + 4}
                 fill="rgba(255,255,255,0.45)"
-                fontSize="11"
-                style={{ fontFamily: 'Courier New, monospace' }}
+                fontSize="12"
+                style={{ fontFamily: 'Inter, sans-serif' }}
               >
                 {tick.toFixed(2)}
               </text>
@@ -616,8 +616,8 @@ function HeroChart({ mounted }: { mounted: boolean }) {
               y={height - 6}
               textAnchor="middle"
               fill="rgba(255,255,255,0.55)"
-              fontSize="11"
-              style={{ fontFamily: 'Courier New, monospace' }}
+              fontSize="12"
+              style={{ fontFamily: 'Inter, sans-serif' }}
             >
               {point.bucket}
             </text>
@@ -659,8 +659,8 @@ function HeroChart({ mounted }: { mounted: boolean }) {
               y={point.y - 12}
               textAnchor="middle"
               fill="rgba(255,255,255,0.7)"
-              fontSize="11"
-              style={{ fontFamily: 'Courier New, monospace' }}
+              fontSize="12"
+              style={{ fontFamily: 'Inter, sans-serif' }}
             >
               {point.mean.toFixed(3)}
             </text>
@@ -674,25 +674,25 @@ function HeroChart({ mounted }: { mounted: boolean }) {
 function HeroStatsCard() {
   return (
     <div className="rounded-md border border-[#686868] bg-[#232323] p-4">
-      <div className="mb-3 text-[11px] uppercase tracking-[0.14em] text-neutral-300" style={{ fontFamily: 'Courier New, monospace' }}>
+      <div className="mb-3 text-[12px] uppercase tracking-[0.14em] text-neutral-300" style={{ fontFamily: 'Inter, sans-serif' }}>
         slope summary
       </div>
       <div className="space-y-3 text-sm text-neutral-200">
         <div className="flex items-center justify-between gap-4">
-          <span className="uppercase tracking-[0.10em] text-neutral-300" style={{ fontFamily: 'Courier New, monospace' }}>Pearson r</span>
-          <span style={{ fontFamily: 'Courier New, monospace' }}>−0.989</span>
+          <span className="uppercase tracking-[0.10em] text-neutral-300" style={{ fontFamily: 'Inter, sans-serif' }}>Pearson r</span>
+          <span style={{ fontFamily: 'Inter, sans-serif' }}>−0.989</span>
         </div>
         <div className="flex items-center justify-between gap-4">
-          <span className="uppercase tracking-[0.10em] text-neutral-300" style={{ fontFamily: 'Courier New, monospace' }}>Spearman ρ</span>
-          <span style={{ fontFamily: 'Courier New, monospace' }}>−1.000</span>
+          <span className="uppercase tracking-[0.10em] text-neutral-300" style={{ fontFamily: 'Inter, sans-serif' }}>Spearman ρ</span>
+          <span style={{ fontFamily: 'Inter, sans-serif' }}>−1.000</span>
         </div>
         <div className="flex items-center justify-between gap-4">
-          <span className="uppercase tracking-[0.10em] text-neutral-300" style={{ fontFamily: 'Courier New, monospace' }}>p_perm</span>
-          <span style={{ fontFamily: 'Courier New, monospace', color: COLORS.green }}>{"< 0.001"}</span>
+          <span className="uppercase tracking-[0.10em] text-neutral-300" style={{ fontFamily: 'Inter, sans-serif' }}>p_perm</span>
+          <span style={{ fontFamily: 'Inter, sans-serif', color: COLORS.green }}>{"< 0.001"}</span>
         </div>
         <div className="flex items-center justify-between gap-4">
-          <span className="uppercase tracking-[0.10em] text-neutral-300" style={{ fontFamily: 'Courier New, monospace' }}>iters</span>
-          <span style={{ fontFamily: 'Courier New, monospace' }}>12,000</span>
+          <span className="uppercase tracking-[0.10em] text-neutral-300" style={{ fontFamily: 'Inter, sans-serif' }}>iters</span>
+          <span style={{ fontFamily: 'Inter, sans-serif' }}>12,000</span>
         </div>
       </div>
     </div>
@@ -702,7 +702,7 @@ function HeroStatsCard() {
 function HeroExplainCard() {
   return (
     <div className="rounded-md border border-[#686868] bg-[#232323] p-4">
-      <div className="mb-3 text-[11px] uppercase tracking-[0.14em] text-neutral-300" style={{ fontFamily: 'Courier New, monospace' }}>
+      <div className="mb-3 text-[12px] uppercase tracking-[0.14em] text-neutral-300" style={{ fontFamily: 'Inter, sans-serif' }}>
         what this chart shows
       </div>
       <div className="space-y-3 text-sm leading-6 text-neutral-300">
@@ -725,7 +725,7 @@ function HeroSection({ mounted }: { mounted: boolean }) {
   return (
     <section className="grid gap-6 lg:grid-cols-[1.05fr_1fr]">
       <div className="space-y-5">
-        <div className="inline-flex flex-wrap items-center gap-2 rounded-md border border-[#686868] bg-[#232323] px-3 py-2 text-[11px] uppercase tracking-[0.14em] text-neutral-300" style={{ fontFamily: 'Courier New, monospace' }}>
+        <div className="inline-flex flex-wrap items-center gap-2 rounded-md border border-[#686868] bg-[#232323] px-3 py-2.5 text-[12px] uppercase tracking-[0.14em] text-neutral-300" style={{ fontFamily: 'Inter, sans-serif' }}>
           <span>deterministic</span>
           <span className="text-neutral-300">•</span>
           <span>baseline-locked</span>
@@ -802,11 +802,11 @@ function BaselineGrid() {
               <div key={row.key} className="flex items-start justify-between gap-4 text-sm">
                 <span
                   className="uppercase tracking-[0.12em] text-neutral-300"
-                  style={{ fontFamily: 'Courier New, monospace' }}
+                  style={{ fontFamily: 'Inter, sans-serif' }}
                 >
                   {row.key}
                 </span>
-                <span className="text-neutral-100" style={{ fontFamily: 'Courier New, monospace' }}>
+                <span className="text-neutral-100" style={{ fontFamily: 'Inter, sans-serif' }}>
                   {row.value}
                 </span>
               </div>
@@ -850,14 +850,14 @@ function LlmProviderRows(props: {
               <div className="text-sm font-semibold text-neutral-100">{row.provider}</div>
               {row.regimeLabel ? (
                 <span
-                  className={`inline-flex rounded-sm border px-2 py-1 text-[9px] font-semibold uppercase tracking-[0.06em] ${regimeClass(row.regimeTone)}`}
-                  style={{ fontFamily: "Courier New, monospace" }}
+                  className={`inline-flex rounded-sm border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.06em] ${regimeClass(row.regimeTone)}`}
+                  style={{ fontFamily: "Inter, sans-serif" }}
                 >
                   {row.regimeLabel}
                 </span>
               ) : null}
             </div>
-            <div className="mt-1 text-[10px] text-neutral-300">{row.model}</div>
+            <div className="mt-1 text-[11px] text-neutral-300">{row.model}</div>
           </div>
 
           <div className="space-y-2">
@@ -877,13 +877,13 @@ function LlmProviderRows(props: {
           <div className="text-left md:text-right">
             <div
               className="text-lg font-bold text-neutral-100"
-              style={{ fontFamily: "Courier New, monospace" }}
+              style={{ fontFamily: "Inter, sans-serif" }}
             >
               {row.bestDisplay}
             </div>
             <div
-              className="text-[10px] text-neutral-300"
-              style={{ fontFamily: "Courier New, monospace" }}
+              className="text-[12px] text-neutral-300"
+              style={{ fontFamily: "Inter, sans-serif" }}
             >
               mean {row.meanDisplay}
             </div>
@@ -906,7 +906,7 @@ function LlmResultsSection() {
         <AccordionItem value="llm-results" className="border-b-0">
           <AccordionTrigger className="py-0 hover:no-underline">
             <div className="text-left">
-              <div className="text-[11px] uppercase tracking-[0.14em] text-neutral-300" style={{ fontFamily: 'Courier New, monospace' }}>
+              <div className="text-[12px] uppercase tracking-[0.14em] text-neutral-300" style={{ fontFamily: 'Inter, sans-serif' }}>
                 llm results
               </div>
               <div className="mt-1 text-lg font-semibold text-white">
@@ -922,13 +922,13 @@ function LlmResultsSection() {
                       key={paper.id}
                       value={paper.id}
                       className="shrink-0 rounded-sm border border-[#686868] bg-[#181818] px-3 py-2 text-left text-neutral-300 data-[state=active]:border-[#16a34a] data-[state=active]:bg-[#1a3a2a] data-[state=active]:text-[#16a34a]"
-                      style={{ fontFamily: 'Courier New, monospace' }}
+                      style={{ fontFamily: 'Inter, sans-serif' }}
                     >
                       <div className="flex flex-col items-start">
-                        <span className="text-[11px] uppercase tracking-[0.12em]">
+                        <span className="text-[12px] uppercase tracking-[0.12em]">
                           {paper.tabLabel}
                         </span>
-                        <span className="mt-1 text-[10px] normal-case tracking-normal opacity-75">
+                        <span className="mt-1 text-[11px] normal-case tracking-normal opacity-80">
                           {paper.tabDetail}
                         </span>
                       </div>
@@ -941,7 +941,7 @@ function LlmResultsSection() {
                   <div className="rounded-md border border-[#686868] bg-[#181818] p-4">
                       <div
                         className="text-sm text-neutral-300"
-                        style={{ fontFamily: 'Courier New, monospace' }}
+                        style={{ fontFamily: 'Inter, sans-serif' }}
                       >
                         {paper.id === "paper1"
                           ? "n=12 independent sessions · source: LingBuzz/009799"
@@ -994,8 +994,8 @@ function EvalsReferenceTeaser() {
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div className="space-y-1">
           <div
-            className="text-[11px] uppercase tracking-[0.14em] text-neutral-300"
-            style={{ fontFamily: "Courier New, monospace" }}
+            className="text-[12px] uppercase tracking-[0.14em] text-neutral-300"
+            style={{ fontFamily: "Inter, sans-serif" }}
           >
             evals reference
           </div>
@@ -1008,8 +1008,8 @@ function EvalsReferenceTeaser() {
 
         <Link
           href="/evals"
-          className="inline-flex items-center rounded-md border border-[#686868] bg-[#181818] px-4 py-2 text-[11px] uppercase tracking-[0.12em] text-neutral-100 transition hover:border-[#16a34a] hover:text-[#16a34a]"
-          style={{ fontFamily: "Courier New, monospace" }}
+          className="inline-flex items-center rounded-md border border-[#686868] bg-[#181818] px-4 py-2.5 text-[12px] uppercase tracking-[0.12em] text-neutral-100 transition hover:border-[#16a34a] hover:text-[#16a34a]"
+          style={{ fontFamily: "Inter, sans-serif" }}
         >
           Open Evals →
         </Link>
@@ -1021,14 +1021,14 @@ function EvalsReferenceTeaser() {
 function HowItWorksSection() {
   return (
     <section className="rounded-md border border-[#686868] bg-[#232323] p-5">
-      <div className="text-[11px] uppercase tracking-[0.14em] text-neutral-300" style={{ fontFamily: 'Courier New, monospace' }}>
+      <div className="text-[12px] uppercase tracking-[0.14em] text-neutral-300" style={{ fontFamily: 'Inter, sans-serif' }}>
         how it works
       </div>
       <div className="mt-1 text-lg font-semibold text-white">Three-step scoring loop</div>
       <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {HOW_IT_WORKS.map((item) => (
           <div key={item.step} className="rounded-md border border-[#686868] bg-[#181818] p-4">
-            <div className="text-[11px] uppercase tracking-[0.14em] text-[#d93333]" style={{ fontFamily: 'Courier New, monospace' }}>
+            <div className="text-[11px] uppercase tracking-[0.14em] text-[#d93333]" style={{ fontFamily: 'Inter, sans-serif' }}>
               {item.step}
             </div>
             <div className="mt-2 text-sm font-semibold text-white">{item.title}</div>
@@ -1043,7 +1043,7 @@ function HowItWorksSection() {
 function ScientificFoundationSection() {
   return (
     <section className="rounded-md border border-[#686868] bg-[#232323] p-5">
-      <div className="text-[11px] uppercase tracking-[0.14em] text-neutral-300" style={{ fontFamily: 'Courier New, monospace' }}>
+      <div className="text-[12px] uppercase tracking-[0.14em] text-neutral-300" style={{ fontFamily: 'Inter, sans-serif' }}>
         scientific foundation
       </div>
       <div className="mt-1 text-lg font-semibold text-white">Published references and method posture</div>
@@ -1092,7 +1092,7 @@ function ScientificFoundationSection() {
 function FAQSection() {
   return (
     <section className="rounded-md border border-[#686868] bg-[#232323] p-5">
-      <div className="text-[11px] uppercase tracking-[0.14em] text-neutral-300" style={{ fontFamily: 'Courier New, monospace' }}>
+      <div className="text-[12px] uppercase tracking-[0.14em] text-neutral-300" style={{ fontFamily: 'Inter, sans-serif' }}>
         faq
       </div>
       <div className="mt-1 text-lg font-semibold text-white">Common questions</div>
@@ -1133,7 +1133,7 @@ function StickyNav() {
         <Link
           href="/evals"
           className="text-sm uppercase tracking-[0.12em] text-neutral-300 hover:text-white"
-          style={{ fontFamily: "Courier New, monospace" }}
+          style={{ fontFamily: "Inter, sans-serif" }}
         >
           EVALS →
         </Link>
@@ -1150,8 +1150,8 @@ function Footer() {
           ZË-RO — deterministic vowel-aperture grounding probe. Built by Sokol Gora.
         </div>
         <div
-          className="flex flex-wrap items-center gap-4 text-[11px] uppercase tracking-[0.14em] text-neutral-300"
-          style={{ fontFamily: 'Courier New, monospace' }}
+          className="flex flex-wrap items-center gap-4 text-[12px] uppercase tracking-[0.14em] text-neutral-300"
+          style={{ fontFamily: 'Inter, sans-serif' }}
         >
           <span>deterministic instrument</span>
           <span>paper evidence in evals</span>
@@ -1171,7 +1171,7 @@ export function LandingPageV0_2() {
         className="min-h-screen w-full text-white"
         style={{
           background: COLORS.bg,
-          fontFamily: 'Courier New, monospace',
+          fontFamily: 'Inter, sans-serif',
         }}
       >
         <style jsx global>{`

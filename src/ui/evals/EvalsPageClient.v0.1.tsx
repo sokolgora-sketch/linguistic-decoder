@@ -189,8 +189,8 @@ function TaskCard({ t }: { t: EvalTaskReportV0_1 }) {
     <section className="rounded-[10px] border border-[#3a3a3a] bg-[#151515] px-5 py-5 space-y-5">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="space-y-1">
-          <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#b8b8b8]">{t.taskId}</div>
-          <h2 className="text-[18px] font-semibold leading-tight text-white">{t.title}</h2>
+          <div className="text-[12px] font-semibold uppercase tracking-[0.12em] text-[#b8b8b8]">{t.taskId}</div>
+          <h2 className="text-[20px] font-semibold leading-tight text-white">{t.title}</h2>
         </div>
 
         <div className="flex flex-wrap gap-2 text-[11px]">
@@ -213,14 +213,14 @@ function TaskCard({ t }: { t: EvalTaskReportV0_1 }) {
         <table className="w-full border-collapse text-[12px]">
           <thead>
             <tr className="border-b border-[#303030] bg-[#121212]">
-              <th className="px-3 py-3 text-left text-[10px] font-semibold uppercase tracking-[0.12em] text-[#9a9a9a]">Bucket</th>
-              <th className="px-3 py-3 text-right text-[10px] font-semibold uppercase tracking-[0.12em] text-[#9a9a9a]">Expected</th>
-              <th className="px-3 py-3 text-right text-[10px] font-semibold uppercase tracking-[0.12em] text-[#9a9a9a]">Provided</th>
-              <th className="px-3 py-3 text-right text-[10px] font-semibold uppercase tracking-[0.12em] text-[#9a9a9a]">Valid</th>
-              <th className="px-3 py-3 text-right text-[10px] font-semibold uppercase tracking-[0.12em] text-[#9a9a9a]">Invalid</th>
-              <th className="px-3 py-3 text-right text-[10px] font-semibold uppercase tracking-[0.12em] text-[#9a9a9a]">Dup</th>
-              <th className="px-3 py-3 text-right text-[10px] font-semibold uppercase tracking-[0.12em] text-[#9a9a9a]">Mean primary</th>
-              <th className="px-3 py-3 text-right text-[10px] font-semibold uppercase tracking-[0.12em] text-[#9a9a9a]">Mean presence</th>
+              <th className="px-3 py-3 text-left text-[11px] font-semibold uppercase tracking-[0.12em] text-[#b0b0b0]">Bucket</th>
+              <th className="px-3 py-3 text-right text-[11px] font-semibold uppercase tracking-[0.12em] text-[#b0b0b0]">Expected</th>
+              <th className="px-3 py-3 text-right text-[11px] font-semibold uppercase tracking-[0.12em] text-[#b0b0b0]">Provided</th>
+              <th className="px-3 py-3 text-right text-[11px] font-semibold uppercase tracking-[0.12em] text-[#b0b0b0]">Valid</th>
+              <th className="px-3 py-3 text-right text-[11px] font-semibold uppercase tracking-[0.12em] text-[#b0b0b0]">Invalid</th>
+              <th className="px-3 py-3 text-right text-[11px] font-semibold uppercase tracking-[0.12em] text-[#b0b0b0]">Dup</th>
+              <th className="px-3 py-3 text-right text-[11px] font-semibold uppercase tracking-[0.12em] text-[#b0b0b0]">Mean primary</th>
+              <th className="px-3 py-3 text-right text-[11px] font-semibold uppercase tracking-[0.12em] text-[#b0b0b0]">Mean presence</th>
             </tr>
           </thead>
             <tbody>
@@ -257,12 +257,12 @@ function TaskCard({ t }: { t: EvalTaskReportV0_1 }) {
 
       <div className="grid gap-3 lg:grid-cols-2">
         <div className="rounded-[8px] border border-[#303030] bg-[#101010] px-4 py-4">
-          <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#d6d6d6]">Slope — aperturePrimary</div>
+          <div className="text-[12px] font-semibold uppercase tracking-[0.12em] text-[#dcdcdc]">Slope — aperturePrimary</div>
           {t.slope_aperturePrimary ? (
             <div className="mt-3 space-y-2 text-[12px] leading-6 text-[#cfcfcf]">
-              <div>pearson r <span className="font-mono text-white">{fmt(t.slope_aperturePrimary.pearson_r)}</span> <span className="text-[#8a8a8a]">({fmtPLabel(t.slope_aperturePrimary.p_pearson)})</span></div>
-              <div>spearman ρ <span className="font-mono text-white">{fmt(t.slope_aperturePrimary.spearman_rho)}</span> <span className="text-[#8a8a8a]">({fmtPLabel(t.slope_aperturePrimary.p_spearman)})</span></div>
-              <div className="text-[#a8a8a8]">perm <span className="font-mono text-white">iters={t.slope_aperturePrimary.iters}</span> <span className="text-[#666]">·</span> <span className="font-mono text-white">seed={t.slope_aperturePrimary.seed}</span></div>
+              <div>pearson r <span className="font-mono text-white">{fmt(t.slope_aperturePrimary.pearson_r)}</span> <span className="text-[#8a8a8a]">(parametric {fmtPLabel(t.slope_aperturePrimary.p_pearson)})</span></div>
+              <div>spearman ρ <span className="font-mono text-white">{fmt(t.slope_aperturePrimary.spearman_rho)}</span> <span className="text-[#8a8a8a]">(parametric {fmtPLabel(t.slope_aperturePrimary.p_spearman)})</span></div>
+              <div className="text-[#a8a8a8]">permutation test <span className="font-mono text-white">iters={t.slope_aperturePrimary.iters}</span> <span className="text-[#666]">·</span> <span className="font-mono text-white">seed={t.slope_aperturePrimary.seed}</span></div>
             </div>
           ) : (
             <div className="mt-3 text-[12px] text-[#8a8a8a]">not computed</div>
@@ -270,12 +270,12 @@ function TaskCard({ t }: { t: EvalTaskReportV0_1 }) {
         </div>
 
         <div className="rounded-[8px] border border-[#303030] bg-[#101010] px-4 py-4">
-          <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#d6d6d6]">Slope — aperturePresenceMean</div>
+          <div className="text-[12px] font-semibold uppercase tracking-[0.12em] text-[#dcdcdc]">Slope — aperturePresenceMean</div>
           {t.slope_aperturePresenceMean ? (
             <div className="mt-3 space-y-2 text-[12px] leading-6 text-[#cfcfcf]">
-              <div>pearson r <span className="font-mono text-white">{fmt(t.slope_aperturePresenceMean.pearson_r)}</span> <span className="text-[#8a8a8a]">({fmtPLabel(t.slope_aperturePresenceMean.p_pearson)})</span></div>
-              <div>spearman ρ <span className="font-mono text-white">{fmt(t.slope_aperturePresenceMean.spearman_rho)}</span> <span className="text-[#8a8a8a]">({fmtPLabel(t.slope_aperturePresenceMean.p_spearman)})</span></div>
-              <div className="text-[#a8a8a8]">perm <span className="font-mono text-white">iters={t.slope_aperturePresenceMean.iters}</span> <span className="text-[#666]">·</span> <span className="font-mono text-white">seed={t.slope_aperturePresenceMean.seed}</span></div>
+              <div>pearson r <span className="font-mono text-white">{fmt(t.slope_aperturePresenceMean.pearson_r)}</span> <span className="text-[#8a8a8a]">(parametric {fmtPLabel(t.slope_aperturePresenceMean.p_pearson)})</span></div>
+              <div>spearman ρ <span className="font-mono text-white">{fmt(t.slope_aperturePresenceMean.spearman_rho)}</span> <span className="text-[#8a8a8a]">(parametric {fmtPLabel(t.slope_aperturePresenceMean.p_spearman)})</span></div>
+              <div className="text-[#a8a8a8]">permutation test <span className="font-mono text-white">iters={t.slope_aperturePresenceMean.iters}</span> <span className="text-[#666]">·</span> <span className="font-mono text-white">seed={t.slope_aperturePresenceMean.seed}</span></div>
             </div>
           ) : (
             <div className="mt-3 text-[12px] text-[#8a8a8a]">not computed</div>
@@ -284,39 +284,39 @@ function TaskCard({ t }: { t: EvalTaskReportV0_1 }) {
       </div>
 
       <details className="overflow-hidden rounded-[8px] border border-[#2f2f2f] bg-[#101010]">
-        <summary className="cursor-pointer px-4 py-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#d6d6d6]">
+        <summary className="cursor-pointer px-4 py-3 text-[12px] font-semibold uppercase tracking-[0.12em] text-[#dcdcdc]">
           Diagnostics
         </summary>
         <div className="border-t border-[#262626] bg-[#0c0c0c] px-4 py-4">
           <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
             <div className="rounded-[6px] border border-[#242424] bg-[#111111] px-3 py-3">
-              <div className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#8a8a8a]">Missing buckets</div>
+              <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#9a9a9a]">Missing buckets</div>
               <div className="mt-2 font-mono text-[12px] leading-6 text-[#f2f2f2]">{joinList(t.diagnostics.missingBuckets)}</div>
             </div>
             <div className="rounded-[6px] border border-[#242424] bg-[#111111] px-3 py-3">
-              <div className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#8a8a8a]">Extra buckets</div>
+              <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#9a9a9a]">Extra buckets</div>
               <div className="mt-2 font-mono text-[12px] leading-6 text-[#f2f2f2]">{joinList(t.diagnostics.extraBuckets)}</div>
             </div>
             <div className="rounded-[6px] border border-[#242424] bg-[#111111] px-3 py-3">
-              <div className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#8a8a8a]">Empty tokens</div>
+              <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#9a9a9a]">Empty tokens</div>
               <div className="mt-2 font-mono text-[12px] text-[#f2f2f2]">{t.diagnostics.emptyTokenCount}</div>
             </div>
             <div className="rounded-[6px] border border-[#242424] bg-[#111111] px-3 py-3">
-              <div className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#8a8a8a]">Whitespace tokens</div>
+              <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#9a9a9a]">Whitespace tokens</div>
               <div className="mt-2 font-mono text-[12px] text-[#f2f2f2]">{t.diagnostics.whitespaceTokenCount}</div>
             </div>
             <div className="rounded-[6px] border border-[#242424] bg-[#111111] px-3 py-3">
-              <div className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#8a8a8a]">No-vowel tokens</div>
+              <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#9a9a9a]">No-vowel tokens</div>
               <div className="mt-2 font-mono text-[12px] text-[#f2f2f2]">{t.diagnostics.noVowelTokenCount}</div>
             </div>
             <div className="rounded-[6px] border border-[#242424] bg-[#111111] px-3 py-3">
-              <div className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#8a8a8a]">Total invalid</div>
+              <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#9a9a9a]">Total invalid</div>
               <div className="mt-2 font-mono text-[12px] text-[#f2f2f2]">{t.diagnostics.totalInvalidTokenCount}</div>
             </div>
           </div>
 
           <div className="mt-3 rounded-[6px] border border-[#242424] bg-[#111111] px-3 py-3">
-            <div className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#8a8a8a]">Notes</div>
+            <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#9a9a9a]">Notes</div>
             <div className="mt-2 font-mono text-[12px] leading-6 text-[#f2f2f2]">
               {t.diagnostics.notes.length ? t.diagnostics.notes.join(" | ") : "(none)"}
             </div>
@@ -393,7 +393,7 @@ function PaperSnapshotReferenceSection({
     <details className="group mt-8 overflow-hidden rounded-[10px] border border-[#333] bg-[#141414]">
       <summary className="flex cursor-pointer list-none items-center justify-between gap-4 bg-[#161616] px-5 py-4 text-left transition hover:bg-[#1a1a1a] [&::-webkit-details-marker]:hidden">
         <div className="min-w-0">
-          <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#d6d6d6]">
+          <div className="text-[12px] font-semibold uppercase tracking-[0.12em] text-[#dcdcdc]">
             Paper snapshots
           </div>
           <div className="mt-1 text-[16px] font-semibold text-white">
@@ -1053,10 +1053,10 @@ export function EvalsPageClientV0_1() {
           <div className="text-[11px] uppercase tracking-[0.16em] text-neutral-300">
             instrument · evals
           </div>
-          <h1 className="text-[30px] font-bold tracking-[-0.02em] text-[#f0f0f0]">
+          <h1 className="text-[34px] font-bold tracking-[-0.02em] text-[#f0f0f0]">
             ZË-RO Evals v0.1
           </h1>
-          <p className="max-w-[560px] text-[14px] leading-[1.7] text-[#aaa]">
+          <p className="max-w-[620px] text-[15px] leading-[1.8] text-[#b6b6b6]">
             Score your model output against the deterministic aperture proxy. No API keys. No model calls. Paste output, get a Pearson r.
           </p>
         </header>
@@ -1066,11 +1066,11 @@ export function EvalsPageClientV0_1() {
       <section className="mt-10 rounded-[8px] border border-[#333] bg-[#141414] px-7 pt-7 pb-6 space-y-[18px]">
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <div>
-            <label className="mb-1.5 block text-[12px] font-semibold uppercase tracking-[0.1em] text-[#e2e2e2]">
+            <label className="mb-1.5 block text-[13px] font-semibold uppercase tracking-[0.1em] text-[#e6e6e6]">
               Input mode
             </label>
             <select
-              className="w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[9px] font-mono text-[12px] text-[#d8d8d8] outline-none transition focus:border-[#666]"
+              className="w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[10px] font-mono text-[13px] text-[#e0e0e0] outline-none transition focus:border-[#666]"
               value={mode}
               onChange={(e) => setMode(e.target.value as any)}
             >
@@ -1080,11 +1080,11 @@ export function EvalsPageClientV0_1() {
           </div>
 
           <div>
-            <label className="mb-1.5 block text-[12px] font-semibold uppercase tracking-[0.1em] text-[#e2e2e2]">
+            <label className="mb-1.5 block text-[13px] font-semibold uppercase tracking-[0.1em] text-[#e6e6e6]">
               Task (Buckets only mode)
             </label>
             <select
-              className="w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[9px] font-mono text-[12px] text-[#d8d8d8] outline-none transition focus:border-[#666] disabled:opacity-35"
+              className="w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[10px] font-mono text-[13px] text-[#e0e0e0] outline-none transition focus:border-[#666] disabled:opacity-35"
               value={taskId}
               onChange={(e) => setTaskId(e.target.value)}
               disabled={mode !== "task_buckets"}
@@ -1124,22 +1124,22 @@ export function EvalsPageClientV0_1() {
 
         <div className="grid grid-cols-1 gap-[14px] md:grid-cols-2 xl:grid-cols-4">
           <div>
-            <label className="mb-1.5 block text-[12px] font-semibold uppercase tracking-[0.1em] text-[#e2e2e2]">
+            <label className="mb-1.5 block text-[13px] font-semibold uppercase tracking-[0.1em] text-[#e6e6e6]">
               runId
             </label>
             <input
-              className="w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[9px] font-mono text-[12px] text-[#d8d8d8] outline-none transition focus:border-[#666]"
+              className="w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[10px] font-mono text-[13px] text-[#e0e0e0] outline-none transition focus:border-[#666]"
               value={runId}
               onChange={(e) => setRunId(e.target.value)}
             />
           </div>
 
           <div>
-            <label className="mb-1.5 block text-[12px] font-semibold uppercase tracking-[0.1em] text-[#e2e2e2]">
+            <label className="mb-1.5 block text-[13px] font-semibold uppercase tracking-[0.1em] text-[#e6e6e6]">
               provider
             </label>
             <input
-              className="w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[9px] font-mono text-[12px] text-[#d8d8d8] outline-none transition focus:border-[#666]"
+              className="w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[10px] font-mono text-[13px] text-[#e0e0e0] outline-none transition focus:border-[#666]"
               value={provider}
               onChange={(e) => setProvider(e.target.value)}
               placeholder="e.g. openai"
@@ -1147,11 +1147,11 @@ export function EvalsPageClientV0_1() {
           </div>
 
           <div>
-            <label className="mb-1.5 block text-[12px] font-semibold uppercase tracking-[0.1em] text-[#e2e2e2]">
+            <label className="mb-1.5 block text-[13px] font-semibold uppercase tracking-[0.1em] text-[#e6e6e6]">
               model
             </label>
             <input
-              className="w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[9px] font-mono text-[12px] text-[#d8d8d8] outline-none transition focus:border-[#666]"
+              className="w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[10px] font-mono text-[13px] text-[#e0e0e0] outline-none transition focus:border-[#666]"
               value={model}
               onChange={(e) => setModel(e.target.value)}
               placeholder="e.g. gpt-4o"
@@ -1159,11 +1159,11 @@ export function EvalsPageClientV0_1() {
           </div>
 
           <div>
-            <label className="mb-1.5 block text-[12px] font-semibold uppercase tracking-[0.1em] text-[#e2e2e2]">
+            <label className="mb-1.5 block text-[13px] font-semibold uppercase tracking-[0.1em] text-[#e6e6e6]">
               label
             </label>
             <input
-              className="w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[9px] font-mono text-[12px] text-[#d8d8d8] outline-none transition focus:border-[#666]"
+              className="w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[10px] font-mono text-[13px] text-[#e0e0e0] outline-none transition focus:border-[#666]"
               value={label}
               onChange={(e) => setLabel(e.target.value)}
               placeholder="e.g. fresh-chat"
@@ -1172,7 +1172,7 @@ export function EvalsPageClientV0_1() {
         </div>
           <div className="rounded-[10px] border border-[#3a3a3a] bg-[#171717] px-5 py-4">
             <div className="flex flex-wrap items-center gap-3">
-              <span className="text-[12px] font-semibold uppercase tracking-[0.12em] text-[#e2e2e2]">
+              <span className="text-[13px] font-semibold uppercase tracking-[0.12em] text-[#e6e6e6]">
                 Upload JSON
               </span>
               <span className="text-[12px] leading-6 text-[#9a9a9a]">
@@ -1181,7 +1181,7 @@ export function EvalsPageClientV0_1() {
             </div>
 
             <div className="mt-3 flex flex-wrap items-center gap-3">
-              <label className="inline-flex cursor-pointer items-center rounded-[6px] border border-[#3a3a3a] bg-[#1e1e1e] px-4 py-2 text-[11px] font-bold uppercase tracking-[0.12em] text-[#d0d0d0] transition hover:border-[#666] hover:bg-[#252525] hover:text-white">
+              <label className="inline-flex cursor-pointer items-center rounded-[6px] border border-[#3a3a3a] bg-[#1e1e1e] px-4 py-2.5 text-[12px] font-bold uppercase tracking-[0.12em] text-[#d8d8d8] transition hover:border-[#666] hover:bg-[#252525] hover:text-white">
                 <input
                   type="file"
                   accept=".json,application/json"
@@ -1214,7 +1214,7 @@ export function EvalsPageClientV0_1() {
             </div>
 
             <textarea
-              className="mt-3 min-h-[220px] w-full rounded-[8px] border border-[#3a3a3a] bg-[#101010] p-4 font-mono text-[12px] leading-[1.7] text-[#e0e0e0] outline-none transition focus:border-[#555]"
+              className="mt-3 min-h-[240px] w-full rounded-[8px] border border-[#3a3a3a] bg-[#101010] p-4 font-mono text-[13px] leading-[1.8] text-[#e6e6e6] outline-none transition focus:border-[#555]"
               style={{
                 borderColor:
                   inputText.trim().length === 0
@@ -1249,7 +1249,7 @@ export function EvalsPageClientV0_1() {
           <div className="flex flex-wrap items-center gap-2 pt-2">
             <button
               type="button"
-              className="rounded-[6px] border border-[#16a34a] bg-[#16a34a] px-6 py-2.5 text-[12px] font-bold uppercase tracking-[0.06em] text-white transition hover:bg-[#15803d] hover:shadow-[0_0_0_1px_rgba(22,163,74,0.4),0_4px_16px_rgba(22,163,74,0.33)] disabled:cursor-not-allowed disabled:border-[#333] disabled:bg-[#111] disabled:text-[#333] disabled:shadow-none"
+              className="rounded-[6px] border border-[#16a34a] bg-[#16a34a] px-6 py-2.5 text-[13px] font-bold uppercase tracking-[0.06em] text-white transition hover:bg-[#15803d] hover:shadow-[0_0_0_1px_rgba(22,163,74,0.4),0_4px_16px_rgba(22,163,74,0.33)] disabled:cursor-not-allowed disabled:border-[#333] disabled:bg-[#111] disabled:text-[#333] disabled:shadow-none"
               onClick={() => void onScore()}
               disabled={busy || !inputText.trim()}
             >
@@ -1258,7 +1258,7 @@ export function EvalsPageClientV0_1() {
 
             <button
               type="button"
-              className="rounded-[6px] border border-[#555] bg-[#1a1a1a] px-4 py-2.5 text-[11px] font-semibold uppercase tracking-[0.06em] text-[#e2e2e2] transition hover:border-[#777] hover:bg-[#202020] hover:text-white"
+              className="rounded-[6px] border border-[#555] bg-[#1a1a1a] px-4 py-2.5 text-[12px] font-semibold uppercase tracking-[0.06em] text-[#e2e2e2] transition hover:border-[#777] hover:bg-[#202020] hover:text-white"
               onClick={() => {
                 setInputText("");
                 setApiErr(null);
@@ -1451,10 +1451,10 @@ export function EvalsPageClientV0_1() {
                       key={card.key}
                       className={`rounded-[10px] border border-[#3a3a3a] border-t-[3px] bg-[#161616] p-4 shadow-[0_6px_20px_rgba(0,0,0,0.12)] ${card.tone}`}
                     >
-                      <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#e0e0e0]">
+                      <div className="text-[12px] font-semibold uppercase tracking-[0.12em] text-[#e6e6e6]">
                         {card.key}
                       </div>
-                      <div className="mt-3 font-mono text-[22px] font-bold text-white">
+                      <div className="mt-3 font-mono text-[24px] font-bold text-white">
                         {card.value}
                       </div>
                       <div className="mt-2 text-[11px] leading-6 text-[#d0d0d0]">
