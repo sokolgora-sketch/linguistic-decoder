@@ -3,6 +3,7 @@
 import React, { useMemo, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { MT } from "@/ui/typography/marketingType.v0.1";
 
 import { EVAL_SPEC_V0_1 } from "@/shared/evals/spec.v0.1";
 import type { EvalReportBundleV0_1, EvalTaskReportV0_1 } from "@/shared/evals/report.v0.1";
@@ -290,33 +291,33 @@ function TaskCard({ t }: { t: EvalTaskReportV0_1 }) {
         <div className="border-t border-[#262626] bg-[#0c0c0c] px-4 py-4">
           <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
             <div className="rounded-[6px] border border-[#242424] bg-[#111111] px-3 py-3">
-              <div className="text-[13px] font-semibold uppercase tracking-[0.12em] text-[#b3b3b3]">Missing buckets</div>
+              <div className={`${MT.sectionLabel} text-[#b3b3b3]`}>Missing buckets</div>
               <div className="mt-2 font-mono text-[14px] leading-7 text-[#f2f2f2]">{joinList(t.diagnostics.missingBuckets)}</div>
             </div>
             <div className="rounded-[6px] border border-[#242424] bg-[#111111] px-3 py-3">
-              <div className="text-[13px] font-semibold uppercase tracking-[0.12em] text-[#b3b3b3]">Extra buckets</div>
+              <div className={`${MT.sectionLabel} text-[#b3b3b3]`}>Extra buckets</div>
               <div className="mt-2 font-mono text-[14px] leading-7 text-[#f2f2f2]">{joinList(t.diagnostics.extraBuckets)}</div>
             </div>
             <div className="rounded-[6px] border border-[#242424] bg-[#111111] px-3 py-3">
-              <div className="text-[13px] font-semibold uppercase tracking-[0.12em] text-[#b3b3b3]">Empty tokens</div>
+              <div className={`${MT.sectionLabel} text-[#b3b3b3]`}>Empty tokens</div>
               <div className="mt-2 font-mono text-[14px] text-[#f2f2f2]">{t.diagnostics.emptyTokenCount}</div>
             </div>
             <div className="rounded-[6px] border border-[#242424] bg-[#111111] px-3 py-3">
-              <div className="text-[13px] font-semibold uppercase tracking-[0.12em] text-[#b3b3b3]">Whitespace tokens</div>
+              <div className={`${MT.sectionLabel} text-[#b3b3b3]`}>Whitespace tokens</div>
               <div className="mt-2 font-mono text-[14px] text-[#f2f2f2]">{t.diagnostics.whitespaceTokenCount}</div>
             </div>
             <div className="rounded-[6px] border border-[#242424] bg-[#111111] px-3 py-3">
-              <div className="text-[13px] font-semibold uppercase tracking-[0.12em] text-[#b3b3b3]">No-vowel tokens</div>
+              <div className={`${MT.sectionLabel} text-[#b3b3b3]`}>No-vowel tokens</div>
               <div className="mt-2 font-mono text-[14px] text-[#f2f2f2]">{t.diagnostics.noVowelTokenCount}</div>
             </div>
             <div className="rounded-[6px] border border-[#242424] bg-[#111111] px-3 py-3">
-              <div className="text-[13px] font-semibold uppercase tracking-[0.12em] text-[#b3b3b3]">Total invalid</div>
+              <div className={`${MT.sectionLabel} text-[#b3b3b3]`}>Total invalid</div>
               <div className="mt-2 font-mono text-[14px] text-[#f2f2f2]">{t.diagnostics.totalInvalidTokenCount}</div>
             </div>
           </div>
 
           <div className="mt-3 rounded-[6px] border border-[#242424] bg-[#111111] px-3 py-3">
-            <div className="text-[13px] font-semibold uppercase tracking-[0.12em] text-[#b3b3b3]">Notes</div>
+            <div className={`${MT.sectionLabel} text-[#b3b3b3]`}>Notes</div>
             <div className="mt-2 font-mono text-[14px] leading-7 text-[#f2f2f2]">
               {t.diagnostics.notes.length ? t.diagnostics.notes.join(" | ") : "(none)"}
             </div>
@@ -1050,13 +1051,13 @@ export function EvalsPageClientV0_1() {
 
       <main className="mx-auto flex w-full max-w-[1200px] flex-col gap-0 px-10 pt-11 pb-20">
         <header className="space-y-2">
-          <div className="text-[13px] uppercase tracking-[0.16em] text-neutral-300">
+          <div className={`${MT.eyebrow} text-neutral-300`}>
             instrument · evals
           </div>
-          <h1 className="text-[36px] font-bold tracking-[-0.02em] text-[#f0f0f0]">
+          <h1 className={`${MT.heroTitle} text-[#f0f0f0]`}>
             ZË-RO Evals v0.1
           </h1>
-          <p className="max-w-[680px] text-[17px] leading-[1.9] text-[#c2c2c2]">
+          <p className={`max-w-[680px] ${MT.heroBody} text-[#c2c2c2]`}>
             Score your model output against the deterministic aperture proxy. No API keys. No model calls. Paste output, get a Pearson r.
           </p>
         </header>
@@ -1066,11 +1067,11 @@ export function EvalsPageClientV0_1() {
       <section className="mt-10 rounded-[8px] border border-[#333] bg-[#141414] px-7 pt-7 pb-6 space-y-[18px]">
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <div>
-            <label className="mb-2 block text-[14px] font-semibold uppercase tracking-[0.1em] text-[#ededed]">
+            <label className={`${MT.fieldLabel} text-[#ededed]`}>
               Input mode
             </label>
             <select
-              className="w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[11px] font-mono text-[14px] text-[#e6e6e6] outline-none transition focus:border-[#666]"
+              className={`w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[11px] ${MT.fieldControl} text-[#e6e6e6] outline-none transition focus:border-[#666]`}
               value={mode}
               onChange={(e) => setMode(e.target.value as any)}
             >
@@ -1080,11 +1081,11 @@ export function EvalsPageClientV0_1() {
           </div>
 
           <div>
-            <label className="mb-2 block text-[14px] font-semibold uppercase tracking-[0.1em] text-[#ededed]">
+            <label className={`${MT.fieldLabel} text-[#ededed]`}>
               Task (Buckets only mode)
             </label>
             <select
-              className="w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[11px] font-mono text-[14px] text-[#e6e6e6] outline-none transition focus:border-[#666] disabled:opacity-35"
+              className={`w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[11px] ${MT.fieldControl} text-[#e6e6e6] outline-none transition focus:border-[#666] disabled:opacity-35`}
               value={taskId}
               onChange={(e) => setTaskId(e.target.value)}
               disabled={mode !== "task_buckets"}
@@ -1099,7 +1100,7 @@ export function EvalsPageClientV0_1() {
         </div>
 
           <details className="group overflow-hidden rounded-[5px] border border-[#6a5a2a] bg-[#1d1a12] transition hover:border-[#8a7636] open:border-l-2 open:border-l-[#d93333]">
-            <summary className="flex cursor-pointer list-none items-center justify-between gap-3 bg-[#221d14] px-[14px] py-[12px] text-[12px] uppercase tracking-[0.1em] text-[#d7cfbb] transition hover:bg-[#2a2418] hover:text-[#fff1c2] [&::-webkit-details-marker]:hidden">
+            <summary className={`flex cursor-pointer list-none items-center justify-between gap-3 bg-[#221d14] px-[14px] py-[12px] ${MT.promptSummary} text-[#d7cfbb] transition hover:bg-[#2a2418] hover:text-[#fff1c2] [&::-webkit-details-marker]:hidden`}>
               <div className="flex items-center gap-2">
                 <span className="text-[11px] text-[#cc0000]">▶</span>
                 <span>TASK PROMPT — CLICK TO EXPAND & COPY TO MODEL</span>
@@ -1111,12 +1112,12 @@ export function EvalsPageClientV0_1() {
                 <button
                   type="button"
                   onClick={() => void dfCopyText("Copied task prompt.", selectedTask?.prompt ?? "(no task selected)")}
-                  className="rounded-[4px] border border-[#6a5a2a] bg-transparent px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#f3d38b] transition hover:border-[#8a7636] hover:bg-[#2a2418] hover:text-[#fff1c2]"
+                  className={`rounded-[4px] border border-[#6a5a2a] bg-transparent px-3 py-1.5 ${MT.actionSm} text-[#f3d38b] transition hover:border-[#8a7636] hover:bg-[#2a2418] hover:text-[#fff1c2]`}
                 >
                   Copy
                 </button>
               </div>
-              <pre className="whitespace-pre-wrap text-[13px] leading-[1.9] text-[#d7cfbb]">
+              <pre className={`${MT.promptBody} whitespace-pre-wrap text-[#d7cfbb]`}>
                 {selectedTask?.prompt ?? "(no task selected)"}
               </pre>
             </div>
@@ -1124,22 +1125,22 @@ export function EvalsPageClientV0_1() {
 
         <div className="grid grid-cols-1 gap-[14px] md:grid-cols-2 xl:grid-cols-4">
           <div>
-            <label className="mb-2 block text-[14px] font-semibold uppercase tracking-[0.1em] text-[#ededed]">
+            <label className={`${MT.fieldLabel} text-[#ededed]`}>
               runId
             </label>
             <input
-              className="w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[11px] font-mono text-[14px] text-[#e6e6e6] outline-none transition focus:border-[#666]"
+              className={`w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[11px] ${MT.fieldControl} text-[#e6e6e6] outline-none transition focus:border-[#666]`}
               value={runId}
               onChange={(e) => setRunId(e.target.value)}
             />
           </div>
 
           <div>
-            <label className="mb-2 block text-[14px] font-semibold uppercase tracking-[0.1em] text-[#ededed]">
+            <label className={`${MT.fieldLabel} text-[#ededed]`}>
               provider
             </label>
             <input
-              className="w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[11px] font-mono text-[14px] text-[#e6e6e6] outline-none transition focus:border-[#666]"
+              className={`w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[11px] ${MT.fieldControl} text-[#e6e6e6] outline-none transition focus:border-[#666]`}
               value={provider}
               onChange={(e) => setProvider(e.target.value)}
               placeholder="e.g. openai"
@@ -1147,11 +1148,11 @@ export function EvalsPageClientV0_1() {
           </div>
 
           <div>
-            <label className="mb-2 block text-[14px] font-semibold uppercase tracking-[0.1em] text-[#ededed]">
+            <label className={`${MT.fieldLabel} text-[#ededed]`}>
               model
             </label>
             <input
-              className="w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[11px] font-mono text-[14px] text-[#e6e6e6] outline-none transition focus:border-[#666]"
+              className={`w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[11px] ${MT.fieldControl} text-[#e6e6e6] outline-none transition focus:border-[#666]`}
               value={model}
               onChange={(e) => setModel(e.target.value)}
               placeholder="e.g. gpt-4o"
@@ -1159,11 +1160,11 @@ export function EvalsPageClientV0_1() {
           </div>
 
           <div>
-            <label className="mb-2 block text-[14px] font-semibold uppercase tracking-[0.1em] text-[#ededed]">
+            <label className={`${MT.fieldLabel} text-[#ededed]`}>
               label
             </label>
             <input
-              className="w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[11px] font-mono text-[14px] text-[#e6e6e6] outline-none transition focus:border-[#666]"
+              className={`w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[11px] ${MT.fieldControl} text-[#e6e6e6] outline-none transition focus:border-[#666]`}
               value={label}
               onChange={(e) => setLabel(e.target.value)}
               placeholder="e.g. fresh-chat"
@@ -1172,16 +1173,16 @@ export function EvalsPageClientV0_1() {
         </div>
           <div className="rounded-[10px] border border-[#3a3a3a] bg-[#171717] px-5 py-4">
             <div className="flex flex-wrap items-center gap-3">
-              <span className="text-[14px] font-semibold uppercase tracking-[0.12em] text-[#ededed]">
+              <span className={`${MT.fieldLabel.replace("mb-2 block ","")} text-[#ededed]`}>
                 Upload JSON
               </span>
-              <span className="text-[13px] leading-7 text-[#a9a9a9]">
+              <span className={`${MT.helper} text-[#a9a9a9]`}>
                 Use a saved eval bundle or buckets-only file.
               </span>
             </div>
 
             <div className="mt-3 flex flex-wrap items-center gap-3">
-              <label className="inline-flex cursor-pointer items-center rounded-[6px] border border-[#3a3a3a] bg-[#1e1e1e] px-4 py-3 text-[13px] font-bold uppercase tracking-[0.12em] text-[#dfdfdf] transition hover:border-[#666] hover:bg-[#252525] hover:text-white">
+              <label className={`inline-flex cursor-pointer items-center rounded-[6px] border border-[#3a3a3a] bg-[#1e1e1e] px-4 py-3 ${MT.actionMd} text-[#dfdfdf] transition hover:border-[#666] hover:bg-[#252525] hover:text-white`}>
                 <input
                   type="file"
                   accept=".json,application/json"
@@ -1199,7 +1200,7 @@ export function EvalsPageClientV0_1() {
               </span>
             </div>
 
-            <div className="mt-2 text-[13px] leading-7 text-[#c8c8c8]">
+            <div className={`${MT.helper} mt-2 text-[#c8c8c8]`}>
               Upload a full <span className="font-mono text-[#f2f2f2]">evalRun.v0.1</span> bundle or a buckets-only JSON file.
             </div>
           </div>
@@ -1208,7 +1209,7 @@ export function EvalsPageClientV0_1() {
               <label className="block text-[14px] font-semibold uppercase tracking-[0.12em] text-[#ededed]">
                 Paste JSON
               </label>
-              <div className="text-[13px] leading-7 text-[#a9a9a9]">
+              <div className={`${MT.helper} text-[#a9a9a9]`}>
                 Paste a full <span className="font-mono text-[#d8d8d8]">evalRun.v0.1</span> bundle or buckets-only <span className="font-mono text-[#d8d8d8]">V1..V7</span> JSON.
               </div>
             </div>
@@ -1239,7 +1240,7 @@ export function EvalsPageClientV0_1() {
             />
 
             {inputText.trim() && inputProbe.kind !== "invalid_json" ? (
-              <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-[#21452a] bg-[#112017] px-3 py-2 text-[12px] text-[#4ade80]">
+              <div className={`mt-3 inline-flex items-center gap-2 rounded-full border border-[#21452a] bg-[#112017] px-3 py-2 ${MT.chipText} text-[#4ade80]`}>
                 <span className="h-[6px] w-[6px] rounded-full bg-[#16a34a]" />
                 JSON detected — ready to score
               </div>
@@ -1249,7 +1250,7 @@ export function EvalsPageClientV0_1() {
           <div className="flex flex-wrap items-center gap-2 pt-2">
             <button
               type="button"
-              className="rounded-[6px] border border-[#16a34a] bg-[#16a34a] px-6 py-3 text-[14px] font-bold uppercase tracking-[0.06em] text-white transition hover:bg-[#15803d] hover:shadow-[0_0_0_1px_rgba(22,163,74,0.4),0_4px_16px_rgba(22,163,74,0.33)] disabled:cursor-not-allowed disabled:border-[#333] disabled:bg-[#111] disabled:text-[#333] disabled:shadow-none"
+              className={`rounded-[6px] border border-[#16a34a] bg-[#16a34a] px-6 py-3 ${MT.actionMd} text-white transition hover:bg-[#15803d] hover:shadow-[0_0_0_1px_rgba(22,163,74,0.4),0_4px_16px_rgba(22,163,74,0.33)] disabled:cursor-not-allowed disabled:border-[#333] disabled:bg-[#111] disabled:text-[#333] disabled:shadow-none`}
               onClick={() => void onScore()}
               disabled={busy || !inputText.trim()}
             >
@@ -1258,7 +1259,7 @@ export function EvalsPageClientV0_1() {
 
             <button
               type="button"
-              className="rounded-[6px] border border-[#555] bg-[#1a1a1a] px-4 py-3 text-[13px] font-semibold uppercase tracking-[0.06em] text-[#e2e2e2] transition hover:border-[#777] hover:bg-[#202020] hover:text-white"
+              className={`rounded-[6px] border border-[#555] bg-[#1a1a1a] px-4 py-3 ${MT.actionMd} text-[#e2e2e2] transition hover:border-[#777] hover:bg-[#202020] hover:text-white`}
               onClick={() => {
                 setInputText("");
                 setApiErr(null);
@@ -1371,7 +1372,7 @@ export function EvalsPageClientV0_1() {
             <section className="mb-6 space-y-6">
             <div className={`rounded-[12px] border px-5 py-4 shadow-[0_10px_30px_rgba(0,0,0,0.18)] ${stateToneClass}`}>
               <div className="flex flex-wrap items-center gap-4">
-                <div className="inline-flex items-center gap-2 text-[13px] font-bold uppercase tracking-[0.08em] text-white">
+                <div className={`${MT.actionMd} inline-flex items-center gap-2 text-white`}>
                   <span className={`h-2.5 w-2.5 rounded-full ${stateDotClass}`} />
                   {stateLabel}
                 </div>
@@ -1402,7 +1403,7 @@ export function EvalsPageClientV0_1() {
               <>
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <div className="text-[13px] font-semibold uppercase tracking-[0.1em] text-[#ededed]">
+                    <div className={`${MT.sectionLabel} text-[#ededed]`}>
                       Consistency (Spearman ρ)
                     </div>
                     <div className="font-mono text-[20px] text-white">
@@ -1451,13 +1452,13 @@ export function EvalsPageClientV0_1() {
                       key={card.key}
                       className={`rounded-[10px] border border-[#3a3a3a] border-t-[3px] bg-[#161616] p-4 shadow-[0_6px_20px_rgba(0,0,0,0.12)] ${card.tone}`}
                     >
-                      <div className="text-[12px] font-semibold uppercase tracking-[0.12em] text-[#e6e6e6]">
+                      <div className={`${MT.statKey} text-[#e6e6e6]`}>
                         {card.key}
                       </div>
-                      <div className="mt-3 font-mono text-[32px] font-bold text-white">
+                      <div className={`${MT.statValue} mt-3 text-white`}>
                         {card.value}
                       </div>
-                      <div className="mt-2 text-[13px] leading-7 text-[#d9d9d9]">
+                      <div className={`${MT.statNote} mt-2 text-[#d9d9d9]`}>
                         {card.note}
                       </div>
                     </div>
@@ -1499,12 +1500,12 @@ export function EvalsPageClientV0_1() {
                           style={{ backgroundColor: diagnosisColor }}
                         />
                         <span
-                          className="text-[13px] font-semibold uppercase tracking-[0.12em]"
+                          className={MT.statKey}
                           style={{ color: diagnosisColor }}
                         >
                           {diagnosisLabel}
                         </span>
-                        <span className="text-[13px] leading-7 text-[#ebebeb]">
+                        <span className={`${MT.helper} text-[#ebebeb]`}>
                           {diagnosisHint}
                         </span>
                       </div>
@@ -1648,16 +1649,16 @@ export function EvalsPageClientV0_1() {
             <div className="rounded-[10px] border border-[#2a2a2a] bg-[#151515] px-5 py-5">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="space-y-1">
-                  <div className="text-[13px] font-semibold uppercase tracking-[0.12em] text-[#adadad]">
+                  <div className={`${MT.sectionLabel} text-[#adadad]`}>
                     Report
                   </div>
-                  <div className="text-[13px] leading-7 text-[#a9a9a9]">
+                  <div className={`${MT.helper} text-[#a9a9a9]`}>
                     Bundle metadata and markdown export.
                   </div>
                 </div>
               </div>
 
-              <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-[14px] text-[#d8d8d8]">
+              <div className={`mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 ${MT.markdownBody.replace("leading-8","")} text-[#d8d8d8]`}>
                 <span>
                   specId: <span className="font-mono text-[#e5e5e5]">{report.specId}</span>
                 </span>
@@ -1669,7 +1670,7 @@ export function EvalsPageClientV0_1() {
                 </span>
               </div>
 
-              <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-[14px] text-[#d0d0d0]">
+              <div className={`mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 ${MT.markdownBody.replace("leading-8","")} text-[#d0d0d0]`}>
                 <span>
                   provider: <span className="font-mono text-[#f2f2f2]">{report.meta?.provider ?? "-"}</span>
                 </span>
@@ -1684,23 +1685,23 @@ export function EvalsPageClientV0_1() {
               <div className="mt-4 overflow-hidden rounded-[8px] border border-[#262626] bg-[#101010]">
                 <div className="flex items-center justify-between gap-3 border-b border-[#262626] px-4 py-3">
                   <div className="space-y-1">
-                    <div className="text-[13px] font-semibold uppercase tracking-[0.1em] text-[#dfdfdf]">
+                    <div className={`${MT.sectionLabel} text-[#dfdfdf]`}>
                       Markdown export preview
                     </div>
-                    <div className="text-[13px] text-[#9c9c9c]">
+                    <div className={`${MT.helper.replace(" leading-7","")} text-[#9c9c9c]`}>
                       Rendered report text ready to copy.
                     </div>
                   </div>
                   <button
                     type="button"
-                    className="rounded-[4px] border border-[#333] bg-transparent px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#b8b8b8] transition hover:border-[#666] hover:text-white disabled:opacity-40"
+                    className={`rounded-[4px] border border-[#333] bg-transparent px-3 py-1.5 ${MT.actionSm} text-[#b8b8b8] transition hover:border-[#666] hover:text-white disabled:opacity-40`}
                     onClick={() => void dfCopyText("Copied markdown report.", md || "")}
                     disabled={!md}
                   >
                     Copy
                   </button>
                 </div>
-                <pre className="overflow-x-auto whitespace-pre-wrap bg-[#0c0c0c] px-4 py-4 text-[14px] leading-8 text-[#d7d7d7]">{md || "(empty)"}</pre>
+                <pre className={`overflow-x-auto whitespace-pre-wrap bg-[#0c0c0c] px-4 py-4 ${MT.markdownBody} text-[#d7d7d7]`}>{md || "(empty)"}</pre>
               </div>
             </div>
 
@@ -1715,7 +1716,7 @@ export function EvalsPageClientV0_1() {
               {report.tasks.some((t) => t.kind !== "byo") ? (
                 <section className="mt-2 rounded-[10px] border border-[#303030] bg-[#171717] px-4 py-4 space-y-3">
                     <div className="space-y-1">
-                      <div className="text-[13px] font-semibold uppercase tracking-[0.12em] text-[#b3b3b3]">
+                      <div className={`${MT.sectionLabel} text-[#b3b3b3]`}>
                         Validation controls
                       </div>
                       <div className="text-[12px] leading-6 text-[#b8b8b8]">
