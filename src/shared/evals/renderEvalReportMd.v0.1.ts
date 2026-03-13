@@ -8,6 +8,11 @@ function fmt(x: number, d = 3): string {
   return x.toFixed(d);
 }
 
+function fmtP(x: number): string {
+  if (!Number.isFinite(x)) return "p=NaN";
+  return x < 0.001 ? "p < 0.001" : `p=${x.toFixed(3)}`;
+}
+
 function joinList(xs: string[]): string {
   return xs.length ? xs.join(", ") : "(none)";
 }
@@ -17,8 +22,8 @@ function renderSlope(label: string, s: SlopeReportV0_1 | null): string[] {
   return [
     `### Slope — ${label}`,
     "",
-    `- pearson r: ${fmt(s.pearson_r)} (p=${fmt(s.p_pearson)})`,
-    `- spearman ρ: ${fmt(s.spearman_rho)} (p=${fmt(s.p_spearman)})`,
+    `- pearson r: ${fmt(s.pearson_r)} (${fmtP(s.p_pearson)})`,
+    `- spearman ρ: ${fmt(s.spearman_rho)} (${fmtP(s.p_spearman)})`,
     `- permutation: iters=${s.iters}, seed=${s.seed}`,
     "",
   ];

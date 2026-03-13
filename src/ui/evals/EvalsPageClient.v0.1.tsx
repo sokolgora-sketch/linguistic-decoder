@@ -70,6 +70,11 @@ function fmtP(x: number) {
   return x < 0.001 ? "< 0.001" : x.toFixed(3);
 }
 
+function fmtPLabel(x: number) {
+  if (!Number.isFinite(x)) return "p=NaN";
+  return x < 0.001 ? "p < 0.001" : `p=${x.toFixed(3)}`;
+}
+
 function joinList(xs: string[]) {
   return xs.length ? xs.join(", ") : "(none)";
 }
@@ -255,8 +260,8 @@ function TaskCard({ t }: { t: EvalTaskReportV0_1 }) {
           <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#d6d6d6]">Slope — aperturePrimary</div>
           {t.slope_aperturePrimary ? (
             <div className="mt-3 space-y-2 text-[12px] leading-6 text-[#cfcfcf]">
-              <div>pearson r <span className="font-mono text-white">{fmt(t.slope_aperturePrimary.pearson_r)}</span> <span className="text-[#8a8a8a]">(p={fmt(t.slope_aperturePrimary.p_pearson)})</span></div>
-              <div>spearman ρ <span className="font-mono text-white">{fmt(t.slope_aperturePrimary.spearman_rho)}</span> <span className="text-[#8a8a8a]">(p={fmt(t.slope_aperturePrimary.p_spearman)})</span></div>
+              <div>pearson r <span className="font-mono text-white">{fmt(t.slope_aperturePrimary.pearson_r)}</span> <span className="text-[#8a8a8a]">({fmtPLabel(t.slope_aperturePrimary.p_pearson)})</span></div>
+              <div>spearman ρ <span className="font-mono text-white">{fmt(t.slope_aperturePrimary.spearman_rho)}</span> <span className="text-[#8a8a8a]">({fmtPLabel(t.slope_aperturePrimary.p_spearman)})</span></div>
               <div className="text-[#a8a8a8]">perm <span className="font-mono text-white">iters={t.slope_aperturePrimary.iters}</span> <span className="text-[#666]">·</span> <span className="font-mono text-white">seed={t.slope_aperturePrimary.seed}</span></div>
             </div>
           ) : (
@@ -268,8 +273,8 @@ function TaskCard({ t }: { t: EvalTaskReportV0_1 }) {
           <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#d6d6d6]">Slope — aperturePresenceMean</div>
           {t.slope_aperturePresenceMean ? (
             <div className="mt-3 space-y-2 text-[12px] leading-6 text-[#cfcfcf]">
-              <div>pearson r <span className="font-mono text-white">{fmt(t.slope_aperturePresenceMean.pearson_r)}</span> <span className="text-[#8a8a8a]">(p={fmt(t.slope_aperturePresenceMean.p_pearson)})</span></div>
-              <div>spearman ρ <span className="font-mono text-white">{fmt(t.slope_aperturePresenceMean.spearman_rho)}</span> <span className="text-[#8a8a8a]">(p={fmt(t.slope_aperturePresenceMean.p_spearman)})</span></div>
+              <div>pearson r <span className="font-mono text-white">{fmt(t.slope_aperturePresenceMean.pearson_r)}</span> <span className="text-[#8a8a8a]">({fmtPLabel(t.slope_aperturePresenceMean.p_pearson)})</span></div>
+              <div>spearman ρ <span className="font-mono text-white">{fmt(t.slope_aperturePresenceMean.spearman_rho)}</span> <span className="text-[#8a8a8a]">({fmtPLabel(t.slope_aperturePresenceMean.p_spearman)})</span></div>
               <div className="text-[#a8a8a8]">perm <span className="font-mono text-white">iters={t.slope_aperturePresenceMean.iters}</span> <span className="text-[#666]">·</span> <span className="font-mono text-white">seed={t.slope_aperturePresenceMean.seed}</span></div>
             </div>
           ) : (
