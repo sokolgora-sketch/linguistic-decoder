@@ -1,17 +1,16 @@
-# Deploy a preview channel for PRs (same-repo only).
-# Dependabot PRs do NOT receive secrets; deploy must skip cleanly.
+# Deploy and clean up Firebase Hosting preview channels for PRs.
+# Same-repo PRs only. Dependabot/forks skip cleanly when secrets are unavailable.
 name: Deploy to Firebase Hosting (Preview)
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened]
+    types: [opened, synchronize, reopened, closed]
 
 jobs:
   build_and_preview:
+    name: build_and_preview
     runs-on: ubuntu-latest
-    # same-repo PRs only (no forks). Dependabot is allowed to run build,
-    # but deploy will be skipped if the secret is unavailable.
-    if: github.event.pull_request.head.repo.full_name == github.repository
+    if: github.event.action != 'closed' && github.event.pull_request.head.repo.full_name == github.repository
     permissions:
       contents: read
 
@@ -29,9 +28,7 @@ jobs:
       - name: Build
         run: npm run build
 
-      # IMPORTANT:
-      # GitHub Actions does not allow `secrets.*` inside `if:` expressions.
-      # So we read the secret into env, then decide in bash and emit an output flag.
+      # GitHub Actions does not allow secrets.* directly in if: expressions.
       - name: Prepare Firebase service account (optional)
         id: sa
         env:
@@ -60,6 +57,46 @@ jobs:
 
       - name: Deploy preview channel (hosting)
         if: steps.sa.outputs.has_sa == 'true'
-        run: firebase hosting:channel:deploy "pr-${{ github.event.pull_request.number }}" --project studio-9091923245-2991d --expires 7d --non-interactive
+        run: firebase hosting:channel:deploy "pr-${{ github.event.pull_request.number }}" --project studio-9091923245-2991d --expires 3d --non-interactive
+        env:
+          FIREBASE_CLI_EXPERIMENTS: webframeworks
+
+  cleanup_preview:
+    name: cleanup_preview
+    runs-on: ubuntu-latest
+    if: github.event.action == 'closed' && github.event.pull_request.head.repo.full_name == github.repository
+    permissions:
+      contents: read
+
+    steps:
+      - name: Prepare Firebase service account (optional)
+        id: sa
+        env:
+          SA_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          OUT: ${{ runner.temp }}/firebase-sa.json
+        run: |
+          if [ "${GITHUB_ACTOR}" = "dependabot[bot]" ]; then
+            echo "has_sa=false" >> "$GITHUB_OUTPUT"
+            echo "Skipping Firebase preview cleanup: dependabot PR actor."
+            exit 0
+          fi
+
+          if [ -z "${SA_JSON:-}" ]; then
+            echo "has_sa=false" >> "$GITHUB_OUTPUT"
+            echo "Skipping Firebase preview cleanup: FIREBASE_SERVICE_ACCOUNT secret not available."
+            exit 0
+          fi
+
+          node -e "require('fs').writeFileSync(process.env.OUT, process.env.SA_JSON)"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$OUT" >> "$GITHUB_ENV"
+          echo "has_sa=true" >> "$GITHUB_OUTPUT"
+
+      - name: Install firebase-tools
+        if: steps.sa.outputs.has_sa == 'true'
+        run: npm i -g firebase-tools@15.7.0
+
+      - name: Delete preview channel (hosting)
+        if: steps.sa.outputs.has_sa == 'true'
+        run: firebase hosting:channel:delete "pr-${{ github.event.pull_request.number }}" --project studio-9091923245-2991d --force
         env:
           FIREBASE_CLI_EXPERIMENTS: webframeworks
