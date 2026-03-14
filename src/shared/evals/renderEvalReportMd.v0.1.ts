@@ -95,16 +95,32 @@ export function renderEvalReportMdV0_1(report: EvalReportBundleV0_1): string {
   lines.push(`- evalSpecVersion: ${report.evalSpecVersion}`);
 
   const devicePlateTask = report.tasks.find((t) => t.kind === "byo") ?? report.tasks[0];
-  const devicePlateSlope =
-    (devicePlateTask as any)?.slope_aperturePresenceMean ??
-    (devicePlateTask as any)?.slope_aperturePrimary ??
-    null;
 
-  const devicePlateSeed =
-    typeof devicePlateSlope?.seed === "number" ? String(devicePlateSlope.seed) : "—";
+  const devicePlateSlopePrimary =
+    (devicePlateTask as any)?.slope_aperturePrimary ?? null;
 
-  const devicePlatePermIters =
-    typeof devicePlateSlope?.iters === "number" ? String(devicePlateSlope.iters) : "—";
+  const devicePlateSlopePresence =
+    (devicePlateTask as any)?.slope_aperturePresenceMean ?? null;
+
+  const devicePlateSeedPrimary =
+    typeof devicePlateSlopePrimary?.seed === "number"
+      ? String(devicePlateSlopePrimary.seed)
+      : "—";
+
+  const devicePlateSeedPresence =
+    typeof devicePlateSlopePresence?.seed === "number"
+      ? String(devicePlateSlopePresence.seed)
+      : "—";
+
+  const devicePlatePermItersPrimary =
+    typeof devicePlateSlopePrimary?.iters === "number"
+      ? String(devicePlateSlopePrimary.iters)
+      : "—";
+
+  const devicePlatePermItersPresence =
+    typeof devicePlateSlopePresence?.iters === "number"
+      ? String(devicePlateSlopePresence.iters)
+      : "—";
 
   const scorerBuildRaw =
     process.env.NEXT_PUBLIC_GIT_SHA ??
@@ -117,8 +133,10 @@ export function renderEvalReportMdV0_1(report: EvalReportBundleV0_1): string {
     scorerBuildRaw === "unknown" ? "unknown" : String(scorerBuildRaw).trim().slice(0, 7);
 
   lines.push(`- engineVersion: scoreEvalRun.v0.1`);
-  lines.push(`- seed: ${devicePlateSeed}`);
-  lines.push(`- permIters: ${devicePlatePermIters}`);
+  lines.push(`- seedPrimary: ${devicePlateSeedPrimary}`);
+  lines.push(`- seedPresenceMean: ${devicePlateSeedPresence}`);
+  lines.push(`- permItersPrimary: ${devicePlatePermItersPrimary}`);
+  lines.push(`- permItersPresenceMean: ${devicePlatePermItersPresence}`);
   lines.push(`- scorerBuild: ${scorerBuild}`);
   lines.push(`- baselineRef: paper.v0.1 · LingBuzz/009799 · LingBuzz/009808`);
   lines.push(`- specId: ${report.specId}`);
