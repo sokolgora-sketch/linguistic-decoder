@@ -106,12 +106,15 @@ export function renderEvalReportMdV0_1(report: EvalReportBundleV0_1): string {
   const devicePlatePermIters =
     typeof devicePlateSlope?.iters === "number" ? String(devicePlateSlope.iters) : "—";
 
-  const scorerBuild =
-    process.env.GIT_SHA ??
+  const scorerBuildRaw =
     process.env.NEXT_PUBLIC_GIT_SHA ??
     process.env.VERCEL_GIT_COMMIT_SHA ??
+    process.env.GIT_SHA ??
     process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA ??
     "unknown";
+
+  const scorerBuild =
+    scorerBuildRaw === "unknown" ? "unknown" : String(scorerBuildRaw).trim().slice(0, 7);
 
   lines.push(`- engineVersion: scoreEvalRun.v0.1`);
   lines.push(`- seed: ${devicePlateSeed}`);

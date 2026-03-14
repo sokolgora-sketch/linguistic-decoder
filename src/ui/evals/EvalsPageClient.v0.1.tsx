@@ -1712,7 +1712,7 @@ export function EvalsPageClientV0_1() {
                       permIters: <span className="font-mono text-[#f2f2f2]">{summaryPermIters ?? "—"}</span>
                     </span>
                     <span>
-                      scorerBuild: <span className="font-mono text-[#f2f2f2]">{process.env.NEXT_PUBLIC_GIT_SHA ?? process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA ?? "unknown"}</span>
+                      scorerBuild: <span className="font-mono text-[#f2f2f2]">{process.env.NEXT_PUBLIC_GIT_SHA ? String(process.env.NEXT_PUBLIC_GIT_SHA).trim().slice(0, 7) : "unknown"}</span>
                     </span>
                     <span>
                       baselineRef: <span className="font-mono text-[#f2f2f2]">paper.v0.1 · LingBuzz/009799 · LingBuzz/009808</span>
