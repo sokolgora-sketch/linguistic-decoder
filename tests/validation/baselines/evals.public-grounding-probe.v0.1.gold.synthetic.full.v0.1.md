@@ -2,8 +2,10 @@
 
 - evalSpecVersion: evalSpec.v0.1
 - engineVersion: scoreEvalRun.v0.1
-- seed: —
-- permIters: —
+- seedPrimary: —
+- seedPresenceMean: —
+- permItersPrimary: —
+- permItersPresenceMean: —
 - scorerBuild: unknown
 - baselineRef: paper.v0.1 · LingBuzz/009799 · LingBuzz/009808
 - specId: public-grounding-probe.v0.1

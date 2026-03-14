@@ -646,14 +646,34 @@ export function EvalsPageClientV0_1() {
           ? summarySlopePrimary.p_spearman
           : null;
 
+  const summaryPermItersPrimary =
+    typeof summarySlopePrimary?.iters === "number"
+      ? summarySlopePrimary.iters
+      : null;
+
+  const summaryPermItersPresence =
+    typeof summarySlopePresence?.iters === "number"
+      ? summarySlopePresence.iters
+      : null;
+
+  const summaryPermSeedPrimary =
+    typeof summarySlopePrimary?.seed === "number"
+      ? summarySlopePrimary.seed
+      : null;
+
+  const summaryPermSeedPresence =
+    typeof summarySlopePresence?.seed === "number"
+      ? summarySlopePresence.seed
+      : null;
+
   const summaryPermIters =
-    summarySlopePresence?.iters ??
-    summarySlopePrimary?.iters ??
+    summaryPermItersPresence ??
+    summaryPermItersPrimary ??
     null;
 
   const summaryPermSeed =
-    summarySlopePresence?.seed ??
-    summarySlopePrimary?.seed ??
+    summaryPermSeedPresence ??
+    summaryPermSeedPrimary ??
     null;
 
   const summaryBuckets: any[] = Array.isArray(summaryTask?.buckets)
@@ -713,9 +733,13 @@ export function EvalsPageClientV0_1() {
       : 0;
 
   const consistencyBarClass =
-    typeof summarySpearman === "number" && summarySpearman < 0
-      ? "bg-[#ff6b6b]"
-      : "bg-[#22c55e]";
+    typeof summarySpearman !== "number"
+      ? "bg-[#666]"
+      : summarySpearman > 0
+        ? "bg-[#d93333]"
+        : summarySpearman <= -0.7
+          ? "bg-[#22c55e]"
+          : "bg-[#f59e0b]";
 
   async function onPickFile(f: File | null) {
     if (!f) return;
@@ -1420,43 +1444,44 @@ export function EvalsPageClientV0_1() {
                   </div>
                 </div>
 
-                
-
                   <div className="inline-flex w-fit items-center gap-2 rounded-full border border-[#5a2424] bg-[#1b1111] px-4 py-2 text-[12px] uppercase tracking-[0.08em] text-[#f3b3b3]">
                     <span className="h-[7px] w-[7px] rounded-full bg-[#d93333]" />
                     <span>Expected direction</span>
                     <span className="font-mono text-[#ffe1e1]">negative (V1→V7)</span>
                   </div>
-<div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-                  {[
-                    {
-                      key: "Pearson r",
-                      value: typeof summaryPearson === "number" ? fmt(summaryPearson) : "—",
-                      note: "aperture primary",
-                      tone: "border-t-[#16a34a]",
-                    },
-                    {
-                      key: "Spearman ρ",
-                      value: typeof summarySpearman === "number" ? fmt(summarySpearman) : "—",
-                      note: "aperture primary",
-                      tone: "border-t-[#22c55e]",
-                    },
-                    {
-                      key: "p_perm",
-                      value: typeof summaryPPerm === "number" ? fmtP(summaryPPerm) : "—",
-                      note:
-                        summaryPermIters || summaryPermSeed
-                          ? `${summaryPermIters ?? "—"} iters · seed ${summaryPermSeed ?? "—"}`
-                          : "permutation",
-                      tone: "border-t-[#f59e0b]",
-                    },
-                    {
-                      key: "Compliance",
-                      value: complianceText,
-                      note: `${summaryCounts.validN} valid · ${summaryCounts.invalidN} invalid`,
-                      tone: "border-t-[#3b82f6]",
-                    },
-                  ].map((card) => (
+
+                  <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+                    {[
+                      {
+                        key: "Pearson r",
+                        value: typeof summaryPearson === "number" ? fmt(summaryPearson) : "—",
+                        note: "aperture primary",
+                        tone: "border-t-[#16a34a]",
+                      },
+                      {
+                        key: "Spearman ρ",
+                        value: typeof summarySpearman === "number" ? fmt(summarySpearman) : "—",
+                        note: "aperture primary",
+                        tone: "border-t-[#22c55e]",
+                      },
+                      {
+                        key: "p_perm",
+                        value: typeof summaryPPerm === "number" ? fmtP(summaryPPerm) : "—",
+                        note:
+                          summaryPermItersPresence || summaryPermSeedPresence
+                            ? `presenceMean · ${summaryPermItersPresence ?? "—"} iters · seed ${summaryPermSeedPresence ?? "—"}`
+                            : summaryPermItersPrimary || summaryPermSeedPrimary
+                              ? `primary · ${summaryPermItersPrimary ?? "—"} iters · seed ${summaryPermSeedPrimary ?? "—"}`
+                              : "permutation",
+                        tone: "border-t-[#f59e0b]",
+                      },
+                      {
+                        key: "Compliance",
+                        value: complianceText,
+                        note: `${summaryCounts.validN} valid · ${summaryCounts.invalidN} invalid`,
+                        tone: "border-t-[#3b82f6]",
+                      },
+                    ].map((card) => (
                     <div
                       key={card.key}
                       className={`rounded-[12px] border border-[#3a3a3a] border-t-[3px] bg-[#161616] p-5 shadow-[0_8px_24px_rgba(0,0,0,0.14)] ${card.tone}`}
@@ -1689,35 +1714,42 @@ export function EvalsPageClientV0_1() {
                 <span>
                   label: <span className="font-mono text-[#f2f2f2]">{report.meta?.label ?? "-"}</span>
                 </span>
-              </div>
+                </div>
+
                 <div className="mt-5 rounded-[10px] border border-[#2f2f2f] bg-[#101010] px-5 py-5">
                   <div className={`${MT.sectionLabel} text-[#dfdfdf]`}>
                     Device plate
                   </div>
 
-                  <div className={`mt-4 flex flex-wrap items-center gap-x-6 gap-y-3 ${MT.markdownMeta} text-[#d8d8d8]`}>
-                    <span>
-                      engineVersion: <span className="font-mono text-[#f2f2f2]">scoreEvalRun.v0.1</span>
-                    </span>
-                    <span>
-                      evalSpecVersion: <span className="font-mono text-[#f2f2f2]">{report.evalSpecVersion}</span>
-                    </span>
-                    <span>
-                      seed: <span className="font-mono text-[#f2f2f2]">{summaryPermSeed ?? "—"}</span>
-                    </span>
-                  </div>
+                    <div className={`mt-4 flex flex-wrap items-center gap-x-6 gap-y-3 ${MT.markdownMeta} text-[#d8d8d8]`}>
+                      <span>
+                        engineVersion: <span className="font-mono text-[#f2f2f2]">scoreEvalRun.v0.1</span>
+                      </span>
+                      <span>
+                        evalSpecVersion: <span className="font-mono text-[#f2f2f2]">{report.evalSpecVersion}</span>
+                      </span>
+                      <span>
+                        seedPrimary: <span className="font-mono text-[#f2f2f2]">{summaryPermSeedPrimary ?? "—"}</span>
+                      </span>
+                      <span>
+                        seedPresenceMean: <span className="font-mono text-[#f2f2f2]">{summaryPermSeedPresence ?? "—"}</span>
+                      </span>
+                    </div>
 
-                  <div className={`mt-3 flex flex-wrap items-center gap-x-6 gap-y-3 ${MT.markdownMeta} text-[#d0d0d0]`}>
-                    <span>
-                      permIters: <span className="font-mono text-[#f2f2f2]">{summaryPermIters ?? "—"}</span>
-                    </span>
-                    <span>
-                      scorerBuild: <span className="font-mono text-[#f2f2f2]">{process.env.NEXT_PUBLIC_GIT_SHA ? String(process.env.NEXT_PUBLIC_GIT_SHA).trim().slice(0, 7) : "unknown"}</span>
-                    </span>
-                    <span>
-                      baselineRef: <span className="font-mono text-[#f2f2f2]">paper.v0.1 · LingBuzz/009799 · LingBuzz/009808</span>
-                    </span>
-                  </div>
+                    <div className={`mt-3 flex flex-wrap items-center gap-x-6 gap-y-3 ${MT.markdownMeta} text-[#d0d0d0]`}>
+                      <span>
+                        permItersPrimary: <span className="font-mono text-[#f2f2f2]">{summaryPermItersPrimary ?? "—"}</span>
+                      </span>
+                      <span>
+                        permItersPresenceMean: <span className="font-mono text-[#f2f2f2]">{summaryPermItersPresence ?? "—"}</span>
+                      </span>
+                      <span>
+                        scorerBuild: <span className="font-mono text-[#f2f2f2]">{process.env.NEXT_PUBLIC_GIT_SHA ? String(process.env.NEXT_PUBLIC_GIT_SHA).trim().slice(0, 7) : "unknown"}</span>
+                      </span>
+                      <span>
+                        baselineRef: <span className="font-mono text-[#f2f2f2]">paper.v0.1 · LingBuzz/009799 · LingBuzz/009808</span>
+                      </span>
+                    </div>
                 </div>
 
               <div className="mt-5 overflow-hidden rounded-[10px] border border-[#262626] bg-[#101010]">
