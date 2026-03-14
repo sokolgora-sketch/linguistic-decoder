@@ -93,6 +93,31 @@ export function renderEvalReportMdV0_1(report: EvalReportBundleV0_1): string {
   lines.push(`# ZË-RO Evals Report v0.1`);
   lines.push("");
   lines.push(`- evalSpecVersion: ${report.evalSpecVersion}`);
+
+  const devicePlateTask = report.tasks.find((t) => t.kind === "byo") ?? report.tasks[0];
+  const devicePlateSlope =
+    (devicePlateTask as any)?.slope_aperturePresenceMean ??
+    (devicePlateTask as any)?.slope_aperturePrimary ??
+    null;
+
+  const devicePlateSeed =
+    typeof devicePlateSlope?.seed === "number" ? String(devicePlateSlope.seed) : "—";
+
+  const devicePlatePermIters =
+    typeof devicePlateSlope?.iters === "number" ? String(devicePlateSlope.iters) : "—";
+
+  const scorerBuild =
+    process.env.GIT_SHA ??
+    process.env.NEXT_PUBLIC_GIT_SHA ??
+    process.env.VERCEL_GIT_COMMIT_SHA ??
+    process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA ??
+    "unknown";
+
+  lines.push(`- engineVersion: scoreEvalRun.v0.1`);
+  lines.push(`- seed: ${devicePlateSeed}`);
+  lines.push(`- permIters: ${devicePlatePermIters}`);
+  lines.push(`- scorerBuild: ${scorerBuild}`);
+  lines.push(`- baselineRef: paper.v0.1 · LingBuzz/009799 · LingBuzz/009808`);
   lines.push(`- specId: ${report.specId}`);
   lines.push(`- runId: ${report.runId}`);
   if (report.meta) {

@@ -1060,7 +1060,7 @@ export function EvalsPageClientV0_1() {
             ZË-RO Evals v0.1
           </h1>
           <p className={`max-w-[680px] ${MT.heroBody} text-[#c2c2c2]`}>
-            Score your model output against the deterministic aperture proxy. No API keys. No model calls. Paste output, get a Pearson r.
+            Deterministic scorer. Bring model outputs; ZË-RO scores them. No model calls.
           </p>
         </header>
 
@@ -1420,7 +1420,14 @@ export function EvalsPageClientV0_1() {
                   </div>
                 </div>
 
-                <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+                
+
+                  <div className="inline-flex w-fit items-center gap-2 rounded-full border border-[#5a2424] bg-[#1b1111] px-4 py-2 text-[12px] uppercase tracking-[0.08em] text-[#f3b3b3]">
+                    <span className="h-[7px] w-[7px] rounded-full bg-[#d93333]" />
+                    <span>Expected direction</span>
+                    <span className="font-mono text-[#ffe1e1]">negative (V1→V7)</span>
+                  </div>
+<div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
                   {[
                     {
                       key: "Pearson r",
@@ -1655,7 +1662,7 @@ export function EvalsPageClientV0_1() {
                     Report
                   </div>
                   <div className={`${MT.helper} text-[#a9a9a9]`}>
-                    Bundle metadata and markdown export.
+                    Bundle metadata, device plate, and markdown export.
                   </div>
                 </div>
               </div>
@@ -1683,6 +1690,35 @@ export function EvalsPageClientV0_1() {
                   label: <span className="font-mono text-[#f2f2f2]">{report.meta?.label ?? "-"}</span>
                 </span>
               </div>
+                <div className="mt-5 rounded-[10px] border border-[#2f2f2f] bg-[#101010] px-5 py-5">
+                  <div className={`${MT.sectionLabel} text-[#dfdfdf]`}>
+                    Device plate
+                  </div>
+
+                  <div className={`mt-4 flex flex-wrap items-center gap-x-6 gap-y-3 ${MT.markdownMeta} text-[#d8d8d8]`}>
+                    <span>
+                      engineVersion: <span className="font-mono text-[#f2f2f2]">scoreEvalRun.v0.1</span>
+                    </span>
+                    <span>
+                      evalSpecVersion: <span className="font-mono text-[#f2f2f2]">{report.evalSpecVersion}</span>
+                    </span>
+                    <span>
+                      seed: <span className="font-mono text-[#f2f2f2]">{summaryPermSeed ?? "—"}</span>
+                    </span>
+                  </div>
+
+                  <div className={`mt-3 flex flex-wrap items-center gap-x-6 gap-y-3 ${MT.markdownMeta} text-[#d0d0d0]`}>
+                    <span>
+                      permIters: <span className="font-mono text-[#f2f2f2]">{summaryPermIters ?? "—"}</span>
+                    </span>
+                    <span>
+                      scorerBuild: <span className="font-mono text-[#f2f2f2]">{process.env.NEXT_PUBLIC_GIT_SHA ?? process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA ?? "unknown"}</span>
+                    </span>
+                    <span>
+                      baselineRef: <span className="font-mono text-[#f2f2f2]">paper.v0.1 · LingBuzz/009799 · LingBuzz/009808</span>
+                    </span>
+                  </div>
+                </div>
 
               <div className="mt-5 overflow-hidden rounded-[10px] border border-[#262626] bg-[#101010]">
                 <div className="flex items-center justify-between gap-4 border-b border-[#262626] px-5 py-4">
