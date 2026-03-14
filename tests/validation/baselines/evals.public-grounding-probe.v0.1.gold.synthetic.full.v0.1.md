@@ -1,6 +1,11 @@
 # ZË-RO Evals Report v0.1
 
 - evalSpecVersion: evalSpec.v0.1
+- engineVersion: scoreEvalRun.v0.1
+- seed: —
+- permIters: —
+- scorerBuild: unknown
+- baselineRef: paper.v0.1 · LingBuzz/009799 · LingBuzz/009808
 - specId: public-grounding-probe.v0.1
 - runId: gold.synthetic.full
 - provider: synthetic
