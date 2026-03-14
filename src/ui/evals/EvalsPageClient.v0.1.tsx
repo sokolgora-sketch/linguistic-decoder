@@ -231,13 +231,18 @@ function TaskCard({ t }: { t: EvalTaskReportV0_1 }) {
                 const invalidToneClass =
                   Number(b.invalidN ?? 0) === 0 ? "text-[#555]" : "text-[#f87171]";
                 const dupToneClass =
-                  Number(b.duplicateN ?? 0) === 0 ? "text-[#555]" : "text-[#f59e0b]";
-                const meanPrimaryToneClass =
-                  Number(b.mean_aperturePrimary ?? 0) >= 0.7
-                    ? "text-[#4ade80]"
-                    : Number(b.mean_aperturePrimary ?? 0) >= 0.4
-                      ? "text-[#fbbf24]"
-                      : "text-[#f87171]";
+                    Number(b.duplicateN ?? 0) === 0 ? "text-[#555]" : "text-[#f59e0b]";
+                  const isNegativeControl = /^T3\b/i.test(t.taskId);
+                  const meanPrimaryToneClass =
+                    isNegativeControl
+                      ? "text-[#a3a3a3]"
+                      : Number(b.mean_aperturePrimary ?? 0) >= 0.7
+                        ? "text-[#4ade80]"
+                        : Number(b.mean_aperturePrimary ?? 0) >= 0.4
+                          ? "text-[#fbbf24]"
+                          : "text-[#f87171]";
+                  const meanPresenceToneClass =
+                    isNegativeControl ? "text-[#a3a3a3]" : "text-[#f2f2f2]";
 
                 return (
                   <tr key={b.bucket} className="border-t border-[#262626] hover:bg-[#141414]">
@@ -248,7 +253,7 @@ function TaskCard({ t }: { t: EvalTaskReportV0_1 }) {
                     <td className={`px-3 py-2.5 text-right font-mono ${invalidToneClass}`}>{b.invalidN}</td>
                     <td className={`px-3 py-2.5 text-right font-mono ${dupToneClass}`}>{b.duplicateN}</td>
                     <td className={`px-3 py-2.5 text-right font-mono ${meanPrimaryToneClass}`}>{fmt(b.mean_aperturePrimary)}</td>
-                    <td className="px-3 py-2.5 text-right font-mono text-[#f2f2f2]">{fmt(b.mean_aperturePresenceMean)}</td>
+                    <td className={`px-3 py-2.5 text-right font-mono ${meanPresenceToneClass}`}>{fmt(b.mean_aperturePresenceMean)}</td>
                   </tr>
                 );
               })}
@@ -385,13 +390,29 @@ function PaperSnapshotReferenceSection({
       ? "Source: LingBuzz/009799"
       : "Source: LingBuzz/009808";
 
-  const activeBatteryTone =
-    activePaper.id === "paper1"
-      ? "border-[#21452a] bg-[#112017] text-[#4ade80]"
-      : "border-[#5b4a20] bg-[#1d1a12] text-[#f3d38b]";
+  const activeRefClass = "border-[#5a2424] bg-[#1f1010] text-[#fca5a5]";
+
+  function parseSignedDisplay(value: string) {
+    const n = Number(value.replace(/−/g, "-").trim());
+    return Number.isFinite(n) ? n : 0;
+  }
+
+  function magnitudeBarClass(magnitude: number) {
+    if (magnitude >= 0.8) return "bg-[#d93333]";
+    if (magnitude >= 0.6) return "bg-[#e0622a]";
+    if (magnitude >= 0.4) return "bg-[#d49b17]";
+    return "bg-[#737373]";
+  }
+
+  function regimeToneClass(tone?: "good" | "mid" | "weak" | "inverted") {
+    if (tone === "good") return "border-[#21452a] bg-[#112017] text-[#4ade80]";
+    if (tone === "mid") return "border-[#5b4a20] bg-[#1d1a12] text-[#f3d38b]";
+    if (tone === "inverted") return "border-[#6a2e2e] bg-[#261515] text-[#ffb4b4]";
+    return "border-[#3f3f3f] bg-[#161616] text-[#c4c4c4]";
+  }
 
   return (
-    <details className="group mt-8 overflow-hidden rounded-[10px] border border-[#333] bg-[#141414]">
+    <details className="group mt-8 overflow-hidden rounded-[12px] border border-[#333] bg-[#141414]">
       <summary className="flex cursor-pointer list-none items-center justify-between gap-4 bg-[#161616] px-5 py-4 text-left transition hover:bg-[#1a1a1a] [&::-webkit-details-marker]:hidden">
         <div className="min-w-0">
           <div className="text-[12px] font-semibold uppercase tracking-[0.12em] text-[#dcdcdc]">
@@ -412,19 +433,15 @@ function PaperSnapshotReferenceSection({
           </div>
         </div>
 
-        <div className="shrink-0 rounded-full border border-[#5b4a20] bg-[#1d1a12] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#f3d38b] transition group-hover:border-[#8a6d2f] group-hover:text-[#ffe3a3]">
-          Expand reference ↓
+        <div className="shrink-0 text-[12px] text-[#8f8f8f] transition group-hover:text-white group-open:rotate-180">
+          ▼
         </div>
       </summary>
 
-      <div className="space-y-4 border-t border-[#2b2b2b] px-5 py-5">
-        <div className="grid gap-2 md:grid-cols-2">
+      <div className="space-y-5 border-t border-[#2b2b2b] px-5 py-5">
+        <div className="grid gap-3 md:grid-cols-2">
           {EVALS_PAPER_SNAPSHOTS.map((paper) => {
             const active = paper.id === paperSnapshotTab;
-            const activeClass =
-              paper.id === "paper1"
-                ? "border-[#21452a] bg-[#112017] text-[#4ade80]"
-                : "border-[#5b4a20] bg-[#1d1a12] text-[#f3d38b]";
 
             return (
               <button
@@ -432,16 +449,18 @@ function PaperSnapshotReferenceSection({
                 type="button"
                 className={
                   active
-                    ? `rounded-[8px] border px-3 py-3 text-left transition ${activeClass}`
-                    : "rounded-[8px] border border-[#3a3a3a] bg-[#101010] px-3 py-3 text-left text-[#b8b8b8] transition hover:border-[#666] hover:text-white"
+                    ? `rounded-[10px] border px-4 py-4 text-left transition ${activeRefClass}`
+                    : "rounded-[10px] border border-[#3a3a3a] bg-[#101010] px-4 py-4 text-left text-[#b8b8b8] transition hover:border-[#666] hover:text-white"
                 }
                 onClick={(e) => {
                   e.preventDefault();
                   setPaperSnapshotTab(paper.id as "paper1" | "paper2");
                 }}
               >
-                <div className="text-[11px] font-semibold uppercase tracking-[0.08em]">{paper.tabLabel}</div>
-                <div className={`mt-1 text-[11px] leading-5 ${active ? "opacity-80" : "text-[#8f8f8f]"}`}>
+                <div className="text-[12px] font-semibold uppercase tracking-[0.1em]">
+                  {paper.tabLabel}
+                </div>
+                <div className={`mt-2 text-[12px] leading-6 ${active ? "opacity-90" : "text-[#8f8f8f]"}`}>
                   {paper.tabDetail}
                 </div>
               </button>
@@ -449,16 +468,16 @@ function PaperSnapshotReferenceSection({
           })}
         </div>
 
-        <div className="rounded-[10px] border border-[#2f2f2f] bg-[#101010] p-4">
+        <div className="rounded-[12px] border border-[#2f2f2f] bg-[#101010] px-5 py-5">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div className="space-y-1">
-              <div className="text-[13px] font-semibold text-white">{activePaper.title}</div>
-              <div className="text-[11px] leading-6 text-[#9a9a9a]">{activePaper.tabDetail}</div>
+              <div className="text-[14px] font-semibold text-white">{activePaper.title}</div>
+              <div className="text-[12px] leading-6 text-[#9a9a9a]">{activePaper.tabDetail}</div>
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
               <span
-                className={`rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.08em] ${activeBatteryTone}`}
+                className={`rounded-full border px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.08em] ${activeRefClass}`}
               >
                 {activePaper.tabLabel}
               </span>
@@ -466,104 +485,87 @@ function PaperSnapshotReferenceSection({
                 href={sourceHref}
                 target="_blank"
                 rel="noreferrer"
-                className="rounded-full border border-[#3a3a3a] bg-[#141414] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#d8d8d8] transition hover:border-[#666] hover:text-white"
+                className="rounded-full border border-[#3a3a3a] bg-[#141414] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#d8d8d8] transition hover:border-[#666] hover:text-white"
               >
                 {sourceLabel}
               </a>
             </div>
           </div>
 
-          <div className="mt-4 overflow-x-auto rounded-[8px] border border-[#262626]">
-            <table className="w-full border-collapse text-[12px]">
-              <thead>
-                <tr className="border-b border-[#262626] bg-[#121212]">
-                  <th className="px-3 py-2 text-left text-[10px] font-semibold uppercase tracking-[0.12em] text-[#8f8f8f]">
-                    Provider
-                  </th>
-                  <th className="px-3 py-2 text-left text-[10px] font-semibold uppercase tracking-[0.12em] text-[#8f8f8f]">
-                    Model / regime
-                  </th>
-                  <th className="px-3 py-2 text-right text-[10px] font-semibold uppercase tracking-[0.12em] text-[#8f8f8f]">
-                    Best ρ
-                  </th>
-                  <th className="px-3 py-2 text-right text-[10px] font-semibold uppercase tracking-[0.12em] text-[#8f8f8f]">
-                    Mean ρ
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {activeProviders.map((row) => {
-                  const regimeToneClass =
-                    row.regimeTone === "good"
-                      ? "border-[#21452a] bg-[#112017] text-[#4ade80]"
-                      : row.regimeTone === "mid"
-                        ? "border-[#5b4a20] bg-[#1d1a12] text-[#f3d38b]"
-                        : row.regimeTone === "inverted"
-                          ? "border-[#5a2424] bg-[#1f1010] text-[#fca5a5]"
-                          : "border-[#3f3f3f] bg-[#161616] text-[#c4c4c4]";
+          <div className="mt-5 space-y-3">
+            {activeProviders.map((row) => {
+              const meanValue = parseSignedDisplay(row.meanDisplay);
+              const meanMagnitude = Math.abs(meanValue);
 
-                  const barFillClass =
-                    row.regimeTone === "good"
-                      ? "bg-[#22c55e]"
-                      : row.regimeTone === "mid"
-                        ? "bg-[#d97706]"
-                        : row.regimeTone === "inverted"
-                          ? "bg-[#ef4444]"
-                          : activePaper.id === "paper1"
-                            ? "bg-[#22c55e]"
-                            : "bg-[#a3a3a3]";
+              const bestBarClass = magnitudeBarClass(row.bestMagnitude);
+              const meanBarClass =
+                meanValue > 0 ? "bg-[#ef4444]" : magnitudeBarClass(meanMagnitude);
 
-                  const meanToneClass = row.meanDisplay.startsWith("+")
-                    ? "text-[#fca5a5]"
-                    : "text-[#d7d7d7]";
+              const meanToneClass =
+                meanValue > 0 ? "text-[#fca5a5]" : "text-[#d7d7d7]";
 
-                  return (
-                    <tr key={`${row.provider}-${row.model}`} className="border-t border-[#262626] hover:bg-[#131313]">
-                      <td className="px-3 py-3 align-top">
-                        <div className="font-semibold text-white">{row.provider}</div>
-                      </td>
+              return (
+                <div
+                  key={`${row.provider}-${row.model}`}
+                  className="rounded-[10px] border border-[#262626] bg-[#121212] px-4 py-4 transition hover:border-[#3a3a3a] hover:bg-[#151515]"
+                >
+                  <div className="grid gap-4 lg:grid-cols-[minmax(0,1.15fr)_minmax(260px,0.95fr)]">
+                    <div className="min-w-0">
+                      <div className="text-[14px] font-semibold text-white">{row.provider}</div>
+                      <div className="mt-1 text-[12px] leading-6 text-[#cfcfcf]">{row.model}</div>
 
-                      <td className="px-3 py-3 align-top">
-                        <div className="text-[#d8d8d8]">{row.model}</div>
+                      <div className="mt-3">
                         {typeof row.regimeLabel === "string" && row.regimeLabel.length > 0 ? (
-                          <div className="mt-2">
-                            <span
-                              className={`rounded-full border px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.08em] ${regimeToneClass}`}
-                            >
-                              {row.regimeLabel}
-                            </span>
-                          </div>
+                          <span
+                            className={`rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.08em] ${regimeToneClass(row.regimeTone)}`}
+                          >
+                            {row.regimeLabel}
+                          </span>
                         ) : (
-                          <div className="mt-2 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#6f6f6f]">
+                          <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-[#6f6f6f]">
                             independent fresh-chat runs
-                          </div>
+                          </span>
                         )}
-                      </td>
+                      </div>
+                    </div>
 
-                      <td className="px-3 py-3 text-right align-top">
-                        <div className="font-mono text-[#f2f2f2]">{row.bestDisplay}</div>
-                        <div className="mt-2 ml-auto h-1.5 w-20 overflow-hidden rounded-full bg-[#1a1a1a]">
+                    <div className="grid gap-3 md:grid-cols-2">
+                      <div className="rounded-[8px] border border-[#242424] bg-[#0f0f0f] px-3 py-3">
+                        <div className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#8f8f8f]">
+                          Best ρ
+                        </div>
+                        <div className="mt-2 font-mono text-[18px] text-white">{row.bestDisplay}</div>
+                        <div className="mt-3 h-2 overflow-hidden rounded-full bg-[#1a1a1a]">
                           <div
-                            className={`h-full rounded-full ${barFillClass}`}
+                            className={`h-full rounded-full ${bestBarClass}`}
                             style={{ width: `${Math.max(10, Math.round(row.bestMagnitude * 100))}%` }}
                           />
                         </div>
-                      </td>
+                      </div>
 
-                      <td className={`px-3 py-3 text-right font-mono align-top ${meanToneClass}`}>
-                        {row.meanDisplay}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+                      <div className="rounded-[8px] border border-[#242424] bg-[#0f0f0f] px-3 py-3">
+                        <div className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#8f8f8f]">
+                          Mean ρ
+                        </div>
+                        <div className={`mt-2 font-mono text-[18px] ${meanToneClass}`}>
+                          {row.meanDisplay}
+                        </div>
+                        <div className="mt-3 h-2 overflow-hidden rounded-full bg-[#1a1a1a]">
+                          <div
+                            className={`h-full rounded-full ${meanBarClass}`}
+                            style={{ width: `${Math.max(10, Math.round(meanMagnitude * 100))}%` }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
 
-          {"emphasisNote" in activePaper &&
-          typeof activePaper.emphasisNote === "string" &&
-          activePaper.emphasisNote.length > 0 ? (
-            <div className="mt-4 rounded-[8px] border border-[#5a2424] bg-[#1a0f0f] px-3 py-2 text-[11px] leading-6 text-[#e5b4b4]">
+          {"emphasisNote" in activePaper && typeof activePaper.emphasisNote === "string" ? (
+            <div className="mt-4 rounded-[10px] border border-[#5a2424] bg-[#1b1111] px-4 py-4 text-[12px] leading-6 text-[#e1b4b4]">
               {activePaper.emphasisNote}
             </div>
           ) : null}
@@ -1469,26 +1471,26 @@ export function EvalsPageClientV0_1() {
                     if (typeof summarySpearman !== "number") return null;
 
                     const diagnosisKind =
-                      summarySpearman < 0 ? "inversion" :
-                      summarySpearman < 0.7 ? "weak" :
-                      "stable";
+                        summarySpearman > 0 ? "inversion" :
+                        summarySpearman <= -0.7 ? "stable" :
+                        "weak";
 
-                    const diagnosisLabel =
-                      diagnosisKind === "inversion" ? "Order inverted" :
-                      diagnosisKind === "weak" ? "Weak alignment" :
-                      "Aligned";
+                      const diagnosisLabel =
+                        diagnosisKind === "inversion" ? "Order inverted" :
+                        diagnosisKind === "weak" ? "Weak alignment" :
+                        "Aligned";
 
-                    const diagnosisColor =
-                      diagnosisKind === "inversion" ? "#f87171" :
-                      diagnosisKind === "weak" ? "#f59e0b" :
-                      "#22c55e";
+                      const diagnosisColor =
+                        diagnosisKind === "inversion" ? "#f87171" :
+                        diagnosisKind === "weak" ? "#f59e0b" :
+                        "#22c55e";
 
-                    const diagnosisHint =
-                      diagnosisKind === "inversion"
-                        ? "Spearman ρ is below zero, so the output reverses the expected aperture order."
-                        : diagnosisKind === "weak"
-                          ? "Spearman ρ is positive but not yet strong enough for stable monotonic alignment."
-                          : "Spearman ρ is strong, so the bucket order is aligned with the expected aperture slope.";
+                      const diagnosisHint =
+                        diagnosisKind === "inversion"
+                          ? "Spearman ρ is above zero, so the output reverses the expected negative aperture order."
+                          : diagnosisKind === "weak"
+                            ? "Spearman ρ is not yet negative enough for strong monotonic alignment."
+                            : "Spearman ρ is strongly negative, so the bucket order is aligned with the expected aperture slope.";
 
                     return (
                       <div
