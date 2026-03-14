@@ -86,12 +86,12 @@ const COLORS = {
 
 const VOICES: VoiceSpec[] = [
   { id: "A", weight: 1.0, ipa: "/a/", examples: ["vast", "broad", "open"], color: "#d93333" },
-  { id: "O", weight: 0.82, ipa: "/o/", examples: ["orb", "whole", "round"], color: "#e0622a" },
-  { id: "E", weight: 0.68, ipa: "/e/", examples: ["spread", "field", "reach"], color: "#d49b17" },
-  { id: "Ë", weight: 0.56, ipa: "/ə/", examples: ["state", "unit", "named"], color: "#7ab83b" },
-  { id: "U", weight: 0.42, ipa: "/u/", examples: ["flow", "move", "channel"], color: "#1f9d8b" },
-  { id: "Y", weight: 0.26, ipa: "/y/", examples: ["thin", "tense", "narrow"], color: "#2f6fd6" },
-  { id: "I", weight: 0.12, ipa: "/i/", examples: ["tip", "focus", "precise"], color: "#7c3aed" },
+  { id: "O", weight: 0.8, ipa: "/o/", examples: ["orb", "whole", "round"], color: "#e0622a" },
+  { id: "E", weight: 0.6, ipa: "/e/", examples: ["spread", "field", "reach"], color: "#d49b17" },
+  { id: "Ë", weight: 0.5, ipa: "/ə/", examples: ["state", "unit", "named"], color: "#7ab83b" },
+  { id: "U", weight: 0.4, ipa: "/u/", examples: ["flow", "move", "channel"], color: "#1f9d8b" },
+  { id: "Y", weight: 0.3, ipa: "/y/", examples: ["thin", "tense", "narrow"], color: "#2f6fd6" },
+  { id: "I", weight: 0.1, ipa: "/i/", examples: ["tip", "focus", "precise"], color: "#7c3aed" },
 ];
 
 const TICKER_ITEMS = [
@@ -821,10 +821,10 @@ function BaselineGrid() {
 }
 
 function bestSignalColor(bestMagnitude: number) {
-  if (bestMagnitude >= 0.8) return "#16a34a";
-  if (bestMagnitude >= 0.6) return "#7a8a40";
-  if (bestMagnitude >= 0.4) return "#aa8030";
-  return "#d93333";
+  if (bestMagnitude >= 0.8) return "#d93333";
+  if (bestMagnitude >= 0.6) return "#e0622a";
+  if (bestMagnitude >= 0.4) return "#d49b17";
+  return "#737373";
 }
 
 function LlmProviderRows(props: {
@@ -903,7 +903,7 @@ function LlmResultsSection() {
       ref={setNode}
       className="rounded-md border border-[#686868] bg-[#232323] p-5"
     >
-      <Accordion type="single" collapsible defaultValue="llm-results">
+      <Accordion type="single" collapsible>
         <AccordionItem value="llm-results" className="border-b-0">
           <AccordionTrigger className="py-0 hover:no-underline">
             <div className="text-left">
@@ -922,7 +922,7 @@ function LlmResultsSection() {
                     <TabsTrigger
                       key={paper.id}
                       value={paper.id}
-                      className="shrink-0 rounded-sm border border-[#686868] bg-[#181818] px-3 py-2 text-left text-neutral-300 data-[state=active]:border-[#16a34a] data-[state=active]:bg-[#1a3a2a] data-[state=active]:text-[#16a34a]"
+                      className="shrink-0 rounded-sm border border-[#686868] bg-[#181818] px-3 py-2 text-left text-neutral-300 data-[state=active]:border-[#d93333] data-[state=active]:bg-[#2a1414] data-[state=active]:text-[#fca5a5]"
                       style={{ fontFamily: 'Inter, sans-serif' }}
                     >
                       <div className="flex flex-col items-start">
