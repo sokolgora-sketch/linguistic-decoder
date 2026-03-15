@@ -351,7 +351,7 @@ function StickyNav() {
         <Link
           href="/"
           className="text-[11px] uppercase tracking-[0.14em] text-neutral-300 transition hover:text-white"
-          
+
         >
           ← home
         </Link>
@@ -532,7 +532,7 @@ function PaperSnapshotReferenceSection({
                     <div className="grid gap-3 md:grid-cols-2">
                       <div className="rounded-[8px] border border-[#242424] bg-[#0f0f0f] px-3 py-3">
                         <div className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#8f8f8f]">
-                          Best ρ
+                          Best <span className="normal-case">ρ</span>
                         </div>
                         <div className="mt-2 font-mono text-[18px] text-white">{row.bestDisplay}</div>
                         <div className="mt-3 h-2 overflow-hidden rounded-full bg-[#1a1a1a]">
@@ -545,7 +545,7 @@ function PaperSnapshotReferenceSection({
 
                       <div className="rounded-[8px] border border-[#242424] bg-[#0f0f0f] px-3 py-3">
                         <div className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#8f8f8f]">
-                          Mean ρ
+                          Mean <span className="normal-case">ρ</span>
                         </div>
                         <div className={`mt-2 font-mono text-[18px] ${meanToneClass}`}>
                           {row.meanDisplay}
@@ -1071,7 +1071,7 @@ export function EvalsPageClientV0_1() {
   return (
     <div
       className="min-h-screen bg-[#242424] text-white"
-      
+
     >
       <StickyNav />
 
@@ -1108,7 +1108,7 @@ export function EvalsPageClientV0_1() {
 
           <div>
             <label className={`${MT.fieldLabel} text-[#ededed]`}>
-              Task (Buckets only mode)
+              {mode === "task_buckets" ? "Task (Buckets only mode)" : "Task source"}
             </label>
             <select
               className={`w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[11px] ${MT.fieldControl} text-[#e6e6e6] outline-none transition focus:border-[#666] disabled:opacity-35`}
@@ -1122,6 +1122,11 @@ export function EvalsPageClientV0_1() {
                 </option>
               ))}
             </select>
+                <div className={`${MT.helper} mt-2 text-[#a9a9a9]`}>
+                  {mode === "task_buckets"
+                    ? "Select the task used to wrap V1..V7 bucket JSON into evalRun.v0.1."
+                    : "Task comes from bundle. This selector is only used when wrapping buckets-only JSON."}
+                </div>
           </div>
         </div>
 
@@ -1129,7 +1134,7 @@ export function EvalsPageClientV0_1() {
             <summary className={`flex cursor-pointer list-none items-center justify-between gap-4 bg-[#221d14] px-[18px] py-[15px] ${MT.promptSummary} text-[#d7cfbb] transition hover:bg-[#2a2418] hover:text-[#fff1c2] [&::-webkit-details-marker]:hidden`}>
               <div className="flex items-center gap-2">
                 <span className="text-[11px] text-[#cc0000]">▶</span>
-                <span>TASK PROMPT — CLICK TO EXPAND & COPY TO MODEL</span>
+                <span>{mode === "task_buckets" ? "TASK PROMPT — CLICK TO EXPAND & COPY TO MODEL" : "TASK PROMPT — USED ONLY FOR BUCKETS-ONLY MODE"}</span>
               </div>
               <span className="text-[12px] text-[#b8a97a] transition-transform duration-200 group-open:rotate-180">▼</span>
             </summary>
@@ -1137,14 +1142,15 @@ export function EvalsPageClientV0_1() {
               <div className="mb-4 flex items-center justify-end">
                 <button
                   type="button"
-                  onClick={() => void dfCopyText("Copied task prompt.", selectedTask?.prompt ?? "(no task selected)")}
-                  className={`rounded-[4px] border border-[#6a5a2a] bg-transparent px-3 py-1.5 ${MT.actionSm} text-[#f3d38b] transition hover:border-[#8a7636] hover:bg-[#2a2418] hover:text-[#fff1c2]`}
+                      disabled={mode !== "task_buckets"}
+                      onClick={() => void dfCopyText("Copied task prompt.", selectedTask?.prompt ?? "(no task selected)")}
+                  className={`rounded-[4px] border border-[#6a5a2a] bg-transparent px-3 py-1.5 ${MT.actionSm} text-[#f3d38b] transition hover:border-[#8a7636] hover:bg-[#2a2418] hover:text-[#fff1c2] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-[#6a5a2a] disabled:hover:bg-transparent disabled:hover:text-[#f3d38b]`}
                 >
                   Copy
                 </button>
               </div>
               <pre className={`${MT.promptBody} whitespace-pre-wrap text-[#d7cfbb]`}>
-                {selectedTask?.prompt ?? "(no task selected)"}
+                {mode === "task_buckets" ? selectedTask?.prompt ?? "(no task selected)" : "Full run bundle mode expects task provenance to come from the uploaded evalRun.v0.1 bundle. Switch to Buckets only mode to copy a ZË-RO task prompt."}
               </pre>
             </div>
           </details>
@@ -1407,13 +1413,13 @@ export function EvalsPageClientV0_1() {
                     <>
                       <div className="flex flex-wrap items-center gap-2 text-[12px]">
                         <span className="rounded-full border border-[#4a4a4a] bg-[#0f0f0f] px-3 py-1.5 text-[#ededed]">
-                          provider <span className="font-mono text-white">{report.meta?.provider ?? "-"}</span>
+                          provider <span className={`font-mono ${report.meta?.provider?.trim() ? "text-white" : "text-[#8f8f8f]"}`}>{report.meta?.provider?.trim() ? report.meta.provider : "not set"}</span>
                         </span>
                         <span className="rounded-full border border-[#4a4a4a] bg-[#0f0f0f] px-3 py-1.5 text-[#ededed]">
-                          model <span className="font-mono text-white">{report.meta?.model ?? "-"}</span>
+                          model <span className={`font-mono ${report.meta?.model?.trim() ? "text-white" : "text-[#8f8f8f]"}`}>{report.meta?.model?.trim() ? report.meta.model : "not set"}</span>
                         </span>
                         <span className="rounded-full border border-[#4a4a4a] bg-[#0f0f0f] px-3 py-1.5 text-[#ededed]">
-                          label <span className="font-mono text-white">{report.meta?.label ?? "-"}</span>
+                          label <span className={`font-mono ${report.meta?.label?.trim() ? "text-white" : "text-[#8f8f8f]"}`}>{report.meta?.label?.trim() ? report.meta.label : "not set"}</span>
                         </span>
                       </div>
                       <div className="min-w-0 flex-1" />
@@ -1430,7 +1436,7 @@ export function EvalsPageClientV0_1() {
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <div className={`${MT.sectionLabel} text-[#ededed]`}>
-                      Consistency (Spearman ρ)
+                      Consistency (Spearman <span className="normal-case">ρ</span>)
                     </div>
                     <div className="font-mono text-[20px] text-white">
                       {typeof summarySpearman === "number" ? fmt(summarySpearman) : "—"}
@@ -1487,8 +1493,8 @@ export function EvalsPageClientV0_1() {
                       className={`rounded-[12px] border border-[#3a3a3a] border-t-[3px] bg-[#161616] p-5 shadow-[0_8px_24px_rgba(0,0,0,0.14)] ${card.tone}`}
                     >
                       <div className={`${MT.statKey} text-[#e6e6e6]`}>
-                        {card.key}
-                      </div>
+                          {card.key === "Spearman ρ" ? <>Spearman <span className="normal-case">ρ</span></> : card.key}
+                        </div>
                       <div className={`${MT.statValue} mt-3 text-white`}>
                         {card.value}
                       </div>
@@ -1706,13 +1712,13 @@ export function EvalsPageClientV0_1() {
 
               <div className={`mt-4 flex flex-wrap items-center gap-x-6 gap-y-3 ${MT.markdownMeta} text-[#d0d0d0]`}>
                 <span>
-                  provider: <span className="font-mono text-[#f2f2f2]">{report.meta?.provider ?? "-"}</span>
+                  provider: <span className={`font-mono ${report.meta?.provider?.trim() ? "text-[#f2f2f2]" : "text-[#8f8f8f]"}`}>{report.meta?.provider?.trim() ? report.meta.provider : "not set"}</span>
                 </span>
                 <span>
-                  model: <span className="font-mono text-[#f2f2f2]">{report.meta?.model ?? "-"}</span>
+                  model: <span className={`font-mono ${report.meta?.model?.trim() ? "text-[#f2f2f2]" : "text-[#8f8f8f]"}`}>{report.meta?.model?.trim() ? report.meta.model : "not set"}</span>
                 </span>
                 <span>
-                  label: <span className="font-mono text-[#f2f2f2]">{report.meta?.label ?? "-"}</span>
+                  label: <span className={`font-mono ${report.meta?.label?.trim() ? "text-[#f2f2f2]" : "text-[#8f8f8f]"}`}>{report.meta?.label?.trim() ? report.meta.label : "not set"}</span>
                 </span>
                 </div>
 

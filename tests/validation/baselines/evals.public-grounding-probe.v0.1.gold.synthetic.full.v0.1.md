@@ -2,6 +2,7 @@
 
 - evalSpecVersion: evalSpec.v0.1
 - engineVersion: scoreEvalRun.v0.1
+- taskId: T1_BUCKET_V1_V0_1
 - seedPrimary: —
 - seedPresenceMean: —
 - permItersPrimary: —
