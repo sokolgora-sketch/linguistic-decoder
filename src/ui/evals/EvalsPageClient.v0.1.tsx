@@ -1456,6 +1456,10 @@ export function EvalsPageClientV0_1() {
                     <span className="font-mono text-[#ffe1e1]">negative (V1→V7)</span>
                   </div>
 
+                  <div className={`${MT.helper} text-[#a9a9a9]`}>
+                    Interpretation: more negative = stronger grounding · near 0 = flat · positive = inversion.
+                  </div>
+
                   <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
                     {[
                       {
@@ -1734,6 +1738,9 @@ export function EvalsPageClientV0_1() {
                       <span>
                         evalSpecVersion: <span className="font-mono text-[#f2f2f2]">{report.evalSpecVersion}</span>
                       </span>
+                        <span>
+                          taskId: <span className="font-mono text-[#f2f2f2]">{summaryTask?.taskId ?? "—"}</span>
+                        </span>
                       <span>
                         seedPrimary: <span className="font-mono text-[#f2f2f2]">{summaryPermSeedPrimary ?? "—"}</span>
                       </span>

@@ -17,6 +17,12 @@ function joinList(xs: string[]): string {
   return xs.length ? xs.join(", ") : "(none)";
 }
 
+function fmtMetaText(x: unknown): string {
+  if (typeof x !== "string") return "not set";
+  const v = x.trim();
+  return v.length ? v : "not set";
+}
+
 function renderSlope(label: string, s: SlopeReportV0_1 | null): string[] {
   if (!s) return [`### Slope — ${label}`, "", "_not computed (needs >= 2 buckets)_", ""];
   return [
@@ -96,6 +102,11 @@ export function renderEvalReportMdV0_1(report: EvalReportBundleV0_1): string {
 
   const devicePlateTask = report.tasks.find((t) => t.kind === "byo") ?? report.tasks[0];
 
+  const devicePlateTaskId =
+    typeof (devicePlateTask as any)?.taskId === "string"
+      ? String((devicePlateTask as any).taskId)
+      : "—";
+
   const devicePlateSlopePrimary =
     (devicePlateTask as any)?.slope_aperturePrimary ?? null;
 
@@ -133,6 +144,7 @@ export function renderEvalReportMdV0_1(report: EvalReportBundleV0_1): string {
     scorerBuildRaw === "unknown" ? "unknown" : String(scorerBuildRaw).trim().slice(0, 7);
 
   lines.push(`- engineVersion: scoreEvalRun.v0.1`);
+  lines.push(`- taskId: ${devicePlateTaskId}`);
   lines.push(`- seedPrimary: ${devicePlateSeedPrimary}`);
   lines.push(`- seedPresenceMean: ${devicePlateSeedPresence}`);
   lines.push(`- permItersPrimary: ${devicePlatePermItersPrimary}`);
@@ -142,9 +154,9 @@ export function renderEvalReportMdV0_1(report: EvalReportBundleV0_1): string {
   lines.push(`- specId: ${report.specId}`);
   lines.push(`- runId: ${report.runId}`);
   if (report.meta) {
-    lines.push(`- provider: ${report.meta.provider ?? ""}`);
-    lines.push(`- model: ${report.meta.model ?? ""}`);
-    lines.push(`- label: ${report.meta.label ?? ""}`);
+    lines.push(`- provider: ${fmtMetaText(report.meta.provider)}`);
+    lines.push(`- model: ${fmtMetaText(report.meta.model)}`);
+    lines.push(`- label: ${fmtMetaText(report.meta.label)}`);
   }
   lines.push("");
   lines.push("Aperture proxy (fixed): A=1.0, O=0.8, E=0.6, Ë=0.5, U=0.4, Y=0.3, I=0.1.");
