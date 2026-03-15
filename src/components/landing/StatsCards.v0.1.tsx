@@ -77,7 +77,7 @@ export function StatsCardsV0_1() {
           { k: "Spearman ρ", v: pwS ? fmt3(pwS.spearman_rho) : "—" },
           { k: "p_perm", v: pwS ? fmt3(pwS.p_perm) : "—" },
         ]}
-        foot={`N=${pw.nTotal} (control; should be weak/flat)`}
+        foot={`N=${pw.nTotal} (control; expected non-significant (p_perm > 0.05))`}
       />
     </section>
   );
