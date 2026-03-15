@@ -150,7 +150,7 @@ const BASELINES: BaselineCard[] = [
       { key: "Spearman ρ", value: "−0.536" },
       { key: "p_perm", value: "0.158" },
     ],
-    note: "N=140 (control; should be weak/flat)",
+    note: "N=140 (control; expected non-significant (p_perm > 0.05))",
   },
 ];
 
