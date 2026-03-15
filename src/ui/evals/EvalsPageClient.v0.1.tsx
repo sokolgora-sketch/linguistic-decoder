@@ -600,10 +600,15 @@ export function EvalsPageClientV0_1() {
   const [notice, setNotice] = useState<string | null>(null);
   const [paperSnapshotTab, setPaperSnapshotTab] = useState<"paper1" | "paper2">("paper1");
 
-  const selectedTask = useMemo(
-    () => byoTasks.find((t) => t.taskId === taskId) ?? byoTasks[0],
-    [byoTasks, taskId]
+  const bucketsOnlyTasks = useMemo(
+    () => byoTasks.filter((t) => t.taskId === "T2_LADDER_V0_1"),
+    [byoTasks]
   );
+
+  const selectedTask = useMemo(() => {
+    const pool = mode === "task_buckets" ? bucketsOnlyTasks : byoTasks;
+    return pool.find((t) => t.taskId === taskId) ?? pool[0] ?? null;
+  }, [mode, taskId, byoTasks, bucketsOnlyTasks]);
 
   const inputProbe = useMemo(() => probeInput(inputText), [inputText]);
 
@@ -763,10 +768,14 @@ export function EvalsPageClientV0_1() {
 
     const parsed = (prob as any).parsed as unknown;
     const effectiveMode = opts?.forceMode ?? mode;
-
+    const taskPool =
+      effectiveMode === "task_buckets" || looksLikeBucketsOnly(parsed)
+        ? bucketsOnlyTasks
+        : byoTasks;
+    const taskForMode = taskPool.find((t) => t.taskId === taskId) ?? taskPool[0] ?? null;
     // Auto-wrap only when the input is strictly buckets-only.
     if (effectiveMode === "run_bundle" && looksLikeBucketsOnly(parsed)) {
-      if (!selectedTask) throw new Error("No task selected");
+      if (!taskForMode) throw new Error("No task selected");
       return {
         evalRunVersion: "evalRun.v0.1",
         evalSpecVersion: "evalSpec.v0.1",
@@ -779,7 +788,7 @@ export function EvalsPageClientV0_1() {
         },
         tasks: [
           {
-            taskId: selectedTask.taskId,
+            taskId: taskForMode.taskId,
             inputShape: "bucketed_single_tokens",
             buckets: parsed,
           },
@@ -808,7 +817,7 @@ export function EvalsPageClientV0_1() {
     if (!looksLikeBucketsOnly(parsed)) {
       throw new Error("Buckets-only mode expects exactly keys V1..V7 with string arrays.");
     }
-    if (!selectedTask) throw new Error("No task selected");
+    if (!taskForMode) throw new Error("No task selected");
     return {
       evalRunVersion: "evalRun.v0.1",
       evalSpecVersion: "evalSpec.v0.1",
@@ -821,7 +830,7 @@ export function EvalsPageClientV0_1() {
       },
       tasks: [
         {
-          taskId: selectedTask.taskId,
+          taskId: taskForMode.taskId,
           inputShape: "bucketed_single_tokens",
           buckets: parsed,
         },
@@ -1112,11 +1121,11 @@ export function EvalsPageClientV0_1() {
             </label>
             <select
               className={`w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[11px] ${MT.fieldControl} text-[#e6e6e6] outline-none transition focus:border-[#666] disabled:opacity-35`}
-              value={taskId}
+              value={mode === "task_buckets" ? (selectedTask?.taskId ?? "") : taskId}
               onChange={(e) => setTaskId(e.target.value)}
               disabled={mode !== "task_buckets"}
             >
-              {byoTasks.map((t) => (
+              {(mode === "task_buckets" ? bucketsOnlyTasks : byoTasks).map((t) => (
                 <option key={t.taskId} value={t.taskId}>
                   {t.taskId} — {t.title}
                 </option>
