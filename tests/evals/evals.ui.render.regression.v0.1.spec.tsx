@@ -1,0 +1,78 @@
+import { describe, it, expect } from "@jest/globals";
+import { fireEvent, render, screen } from "@testing-library/react";
+
+import { EvalsPageClientV0_1 } from "@/ui/evals/EvalsPageClient.v0.1";
+
+function getModeSelect(): HTMLSelectElement {
+  return screen.getAllByRole("combobox")[0] as HTMLSelectElement;
+}
+
+function getTaskSelect(): HTMLSelectElement {
+  return screen.getAllByRole("combobox")[1] as HTMLSelectElement;
+}
+
+function forceOpenDetails(summaryText: string) {
+  const summary = screen.getByText(summaryText).closest("summary");
+  if (!summary) throw new Error(`Missing summary for: ${summaryText}`);
+
+  const details = summary.closest("details");
+  if (!details) throw new Error(`Missing details for: ${summaryText}`);
+
+  details.setAttribute("open", "");
+}
+
+describe("Evals UI rendered mode regression v0.1", () => {
+  it("defaults to full run bundle mode with source-only prompt copy disabled", () => {
+    render(<EvalsPageClientV0_1 />);
+
+    expect(getModeSelect()).toHaveValue("run_bundle");
+    expect(getTaskSelect()).toBeDisabled();
+
+    expect(
+      screen.getByText("Task comes from bundle. This selector is only used when wrapping buckets-only JSON.")
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByText("TASK PROMPT — USED ONLY FOR BUCKETS-ONLY MODE")
+    ).toBeInTheDocument();
+
+    forceOpenDetails("TASK PROMPT — USED ONLY FOR BUCKETS-ONLY MODE");
+
+    expect(screen.getByRole("button", { name: "Copy" })).toBeDisabled();
+
+    expect(
+      screen.getByText(
+        "Full run bundle mode expects task provenance to come from the uploaded evalRun.v0.1 bundle. Switch to Buckets only mode to copy a ZË-RO task prompt."
+      )
+    ).toBeInTheDocument();
+  });
+
+  it("switches to buckets-only mode and enables task prompt copy", () => {
+    render(<EvalsPageClientV0_1 />);
+
+    fireEvent.change(getModeSelect(), {
+      target: { value: "task_buckets" },
+    });
+
+    expect(getModeSelect()).toHaveValue("task_buckets");
+    expect(getTaskSelect()).toBeEnabled();
+
+    expect(
+      screen.getByText("Select the task used to wrap V1..V7 bucket JSON into evalRun.v0.1.")
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByText("TASK PROMPT — CLICK TO EXPAND & COPY TO MODEL")
+    ).toBeInTheDocument();
+
+    forceOpenDetails("TASK PROMPT — CLICK TO EXPAND & COPY TO MODEL");
+
+    expect(screen.getByRole("button", { name: "Copy" })).toBeEnabled();
+
+    expect(
+      screen.queryByText(
+        "Full run bundle mode expects task provenance to come from the uploaded evalRun.v0.1 bundle. Switch to Buckets only mode to copy a ZË-RO task prompt."
+      )
+    ).not.toBeInTheDocument();
+  });
+});
