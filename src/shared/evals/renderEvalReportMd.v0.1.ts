@@ -1,3 +1,5 @@
+import { EVAL_SPEC_V0_1 } from "@/shared/evals/spec.v0.1";
+import { createHash } from "node:crypto";
 // EVALS-5 — Markdown renderer v0.1
 // Used by baseline-lock runner. Deterministic formatting.
 
@@ -94,6 +96,18 @@ function ensureSingleTrailingNewline(s: string): string {
   return s.slice(0, end) + "\n";
 }
 
+function taskVersionFromTaskIdV0_1(taskId: string): string {
+  const m = /_(V\d+_\d+)$/.exec(String(taskId ?? ""));
+  return m ? m[1].toLowerCase().replace("_", ".") : "—";
+}
+
+function promptHashFromTaskIdV0_1(taskId: string): string {
+  const prompt = EVAL_SPEC_V0_1.tasks.find((t) => t.taskId === taskId)?.prompt ?? "";
+  return String(prompt).trim()
+    ? createHash("sha256").update(prompt).digest("hex")
+    : "not available";
+}
+
 export function renderEvalReportMdV0_1(report: EvalReportBundleV0_1): string {
   const lines: string[] = [];
   lines.push(`# ZË-RO Evals Report v0.1`);
@@ -145,6 +159,8 @@ export function renderEvalReportMdV0_1(report: EvalReportBundleV0_1): string {
 
   lines.push(`- engineVersion: scoreEvalRun.v0.1`);
   lines.push(`- taskId: ${devicePlateTaskId}`);
+  lines.push(`- taskVersion: ${taskVersionFromTaskIdV0_1(devicePlateTaskId)}`);
+  lines.push(`- promptHash: ${promptHashFromTaskIdV0_1(devicePlateTaskId)}`);
   lines.push(`- seedPrimary: ${devicePlateSeedPrimary}`);
   lines.push(`- seedPresenceMean: ${devicePlateSeedPresence}`);
   lines.push(`- permItersPrimary: ${devicePlatePermItersPrimary}`);

@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { describe, it, expect } from "@jest/globals";
 import fs from "fs";
 import path from "path";
@@ -19,6 +20,10 @@ function findExisting(paths: string[]): string {
   throw new Error(`Could not find any existing path from:\n- ${paths.join("\n- ")}`);
 }
 
+const T1_PROMPT_HASH = createHash("sha256")
+  .update(EVAL_SPEC_V0_1.tasks.find((t) => t.taskId === "T1_BUCKET_V1_V0_1")?.prompt ?? "")
+  .digest("hex");
+
 describe("Evals export parity guard v0.1", () => {
   it("locks markdown export contract for taskId and blank-meta normalization", () => {
     const raw = JSON.parse(
@@ -38,6 +43,8 @@ describe("Evals export parity guard v0.1", () => {
 
     expect(md).toContain("# ZË-RO Evals Report v0.1");
     expect(md).toContain("- taskId: T1_BUCKET_V1_V0_1");
+    expect(md).toContain("- taskVersion: v0.1");
+    expect(md).toContain(`- promptHash: ${T1_PROMPT_HASH}`);
     expect(md).toContain("- provider: not set");
     expect(md).toContain("- model: not set");
     expect(md).toContain("- label: not set");
@@ -50,6 +57,8 @@ describe("Evals export parity guard v0.1", () => {
 
     expect(md).toContain("# ZË-RO Evals Report v0.1");
     expect(md).toContain("- taskId: T1_BUCKET_V1_V0_1");
+    expect(md).toContain("- taskVersion: v0.1");
+    expect(md).toContain(`- promptHash: ${T1_PROMPT_HASH}`);
     expect(md).toContain("- provider: synthetic");
     expect(md).toContain("- model: none");
     expect(md).toContain("- label: calibration");
