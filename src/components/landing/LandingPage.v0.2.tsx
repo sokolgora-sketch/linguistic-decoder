@@ -430,22 +430,29 @@ function LandingButton(props: {
 }
 
 function StatsTicker() {
-  const loop = [...TICKER_ITEMS, ...TICKER_ITEMS];
+  const [index, setIndex] = useState(0);
+  const [visible, setVisible] = useState(true);
+
+  useEffect(() => {
+    const fadeId = window.setTimeout(() => setVisible(false), 5200);
+    const swapId = window.setTimeout(() => {
+      setIndex((prev) => (prev + 1) % TICKER_ITEMS.length);
+      setVisible(true);
+    }, 5800);
+
+    return () => {
+      window.clearTimeout(fadeId);
+      window.clearTimeout(swapId);
+    };
+  }, [index]);
 
   return (
     <div className="overflow-hidden rounded-md border border-[#686868] bg-[#232323]">
       <div
-        className={`flex min-w-max gap-6 px-4 py-2.5 ${MT.ticker} text-neutral-300 sm:gap-10 sm:px-5 sm:py-3`}
-        style={{
-          fontFamily: 'Inter, sans-serif',
-          animation: "ticker-slide 28s linear infinite",
-        }}
+        className={`px-4 py-2.5 ${MT.ticker} text-neutral-300 transition-all duration-500 ease-out sm:px-5 sm:py-3 ${visible ? "translate-y-0 opacity-100" : "-translate-y-1 opacity-0"}`}
+        style={{ fontFamily: "Inter, sans-serif" }}
       >
-        {loop.map((item, index) => (
-          <span key={`${item}-${index}`} className="whitespace-nowrap">
-            {item}
-          </span>
-        ))}
+        <span className="whitespace-nowrap">{TICKER_ITEMS[index]}</span>
       </div>
     </div>
   );
@@ -1175,16 +1182,6 @@ export function LandingPageV0_2() {
           fontFamily: 'Inter, sans-serif',
         }}
       >
-        <style jsx global>{`
-          @keyframes ticker-slide {
-            0% {
-              transform: translateX(0);
-            }
-            100% {
-              transform: translateX(-50%);
-            }
-          }
-        `}</style>
 
         <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-6 md:px-6 lg:px-8">
 
