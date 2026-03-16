@@ -587,6 +587,12 @@ function taskVersionFromTaskIdV0_1(taskId: string | null | undefined): string {
   const m = /_(V\d+_\d+)$/.exec(String(taskId ?? ""));
   return m ? m[1].toLowerCase().replace("_", ".") : "—";
 }
+function extractMdFrontMatterValueV0_1(md: string, key: string): string {
+  const prefix = "- " + String(key ?? "") + ": ";
+  const line = String(md ?? "").split(/\r?\n/g).find((x) => x.startsWith(prefix));
+  return line ? line.slice(prefix.length).trim() : "—";
+}
+
 export function EvalsPageClientV0_1() {
   const byoTasks = useMemo(
     () => EVAL_SPEC_V0_1.tasks.filter((t) => t.kind === "byo"),
@@ -1032,6 +1038,11 @@ export function EvalsPageClientV0_1() {
       active = false;
     };
   }, [devicePlateTaskId]);
+  const devicePlateExportedAtUtc = useMemo(
+    () => extractMdFrontMatterValueV0_1(md, "exportedAtUtc"),
+    [md]
+  );
+
   function loadExample() {
       // Synthetic calibration ladder (non-semantic): each bucket is dominated by one vowel carrier.
       setMode("task_buckets");
@@ -1882,6 +1893,9 @@ export function EvalsPageClientV0_1() {
 
                           promptHash: <span className="font-mono text-[#f2f2f2]">{devicePlatePromptHash}</span>
 
+                        </span>
+                        <span>
+                          exportedAtUtc: <span className="font-mono text-[#f2f2f2]">{devicePlateExportedAtUtc}</span>
                         </span>
                       <span>
                         seedPrimary: <span className="font-mono text-[#f2f2f2]">{summaryPermSeedPrimary ?? "—"}</span>

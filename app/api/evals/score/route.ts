@@ -66,7 +66,8 @@ export async function POST(req: Request) {
     }
 
     const report = scoreEvalRunBundleV0_1({ spec: EVAL_SPEC_V0_1, run });
-    const md = renderEvalReportMdV0_1(report);
+    const exportedAtUtc = new Date().toISOString();
+        const md = renderEvalReportMdV0_1(report, { exportedAtUtc });
 
     return NextResponse.json(
       { ok: true, report, md } satisfies ApiOk,

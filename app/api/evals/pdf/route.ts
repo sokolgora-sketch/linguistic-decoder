@@ -458,6 +458,12 @@ async function stampPdfProvenanceFooter(pdfBytes: Uint8Array, md: string): Promi
   const taskId = extractMdFrontMatterValue(md, "taskId");
   const taskVersion = extractMdFrontMatterValue(md, "taskVersion");
   const scorerBuild = extractMdFrontMatterValue(md, "scorerBuild");
+  const exportedAtUtc = extractMdFrontMatterValue(md, "exportedAtUtc");
+  const exportedAtUtcCompact =
+    exportedAtUtc === "—"
+      ? exportedAtUtc
+      : String(exportedAtUtc).replace(/\.\d{3}Z$/, "Z");
+
   const seedPrimary = extractMdFrontMatterValue(md, "seedPrimary");
   const seedPresenceMean = extractMdFrontMatterValue(md, "seedPresenceMean");
   const permItersPrimary = extractMdFrontMatterValue(md, "permItersPrimary");
@@ -481,18 +487,16 @@ async function stampPdfProvenanceFooter(pdfBytes: Uint8Array, md: string): Promi
       taskVersion;
 
     const footer2 =
-      "build " +
-      scorerBuild +
-      " · seedP " +
-      seedPrimary +
-      " · seedPM " +
-      seedPresenceMean +
-      " · itP " +
-      permItersPrimary +
-      " · itPM " +
-      permItersPresenceMean +
-      " · pHash " +
-      promptHashShort;
+          "utc " +
+          exportedAtUtcCompact +
+          " · seedPrimary " +
+          seedPrimary +
+          " · iters " +
+          permItersPrimary +
+          "/" +
+          permItersPresenceMean +
+          " · promptHash " +
+          promptHashShort;
 
     page.drawLine({
       start: { x: 36, y: 28 },
@@ -546,7 +550,8 @@ export async function POST(req: Request) {
     }
 
     const report = scoreEvalRunBundleV0_1({ spec: EVAL_SPEC_V0_1, run });
-    const md = renderEvalReportMdV0_1(report);
+    const exportedAtUtc = new Date().toISOString();
+    const md = renderEvalReportMdV0_1(report, { exportedAtUtc });
 
     let pdfBytes: Uint8Array;
     try {
