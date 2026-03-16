@@ -886,6 +886,54 @@ export function EvalsPageClientV0_1() {
   }
 
 
+  async function onDownloadBundle() {
+    setApiErr(null);
+    setNotice(null);
+
+    try {
+      const shouldAutoWrap = mode === "run_bundle" && probeInput(inputText).kind === "bucket_only";
+      if (shouldAutoWrap) {
+        setMode("task_buckets");
+      }
+
+      const runJson = buildRunJsonFromUi({
+        forceMode: shouldAutoWrap ? "task_buckets" : undefined,
+      });
+
+      const blob = new Blob([JSON.stringify(runJson, null, 2) + "\n"], {
+        type: "application/json",
+      });
+
+      const url = URL.createObjectURL(blob);
+
+      const effectiveRunId =
+        typeof (runJson as any)?.runId === "string" && (runJson as any).runId.trim()
+          ? String((runJson as any).runId)
+          : String(runId || "run");
+
+      const rid = effectiveRunId.replace(/[^a-zA-Z0-9._-]+/g, "_").slice(0, 120);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `evals.${rid}.v0.1.json`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+
+      URL.revokeObjectURL(url);
+
+      setNotice(
+        shouldAutoWrap
+          ? "Downloaded evalRun bundle. Raw V1..V7 input was auto-wrapped through T2_LADDER_V0_1."
+          : "Downloaded evalRun bundle."
+      );
+      setTimeout(() => setNotice(null), 1800);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      setApiErr({ ok: false, code: "CLIENT_ERROR", message: msg });
+    }
+  }
+
   async function onDownloadPdf() {
     setApiErr(null);
     setNotice(null);
@@ -1320,7 +1368,16 @@ export function EvalsPageClientV0_1() {
               disabled={busy || !inputText.trim()}
             >
               Download PDF
-            </button>
+            </button>              <button
+                type="button"
+                className={`${MT.actionUtility} border-[#444] bg-transparent text-[#b8b8b8] transition hover:border-[#777] hover:bg-[#1f1f1f] hover:text-[#f2f2f2] disabled:opacity-50`}
+                onClick={() => void onDownloadBundle()}
+                disabled={busy || !inputText.trim()}
+              >
+                Download Bundle
+              </button>
+
+
 
             <button
               type="button"
