@@ -443,6 +443,84 @@ async function appendTrendChartPage(pdfBytes: Uint8Array, md: string): Promise<U
   return pdf.save();
 }
 
+function extractMdFrontMatterValue(md: string, key: string): string {
+  const escaped = key.replace(/[.*+?^${}()|[\]\\]/g, "\\export async function POST(req: Request) {");
+  const m = new RegExp("^- " + escaped + ":\\s*(.+)$", "m").exec(md);
+  return m ? m[1].trim() : "—";
+}
+
+async function stampPdfProvenanceFooter(pdfBytes: Uint8Array, md: string): Promise<Uint8Array> {
+  const pdf = await PDFDocument.load(pdfBytes);
+  const font = await pdf.embedFont(StandardFonts.Helvetica);
+
+  const specId = extractMdFrontMatterValue(md, "specId");
+  const runId = extractMdFrontMatterValue(md, "runId");
+  const taskId = extractMdFrontMatterValue(md, "taskId");
+  const taskVersion = extractMdFrontMatterValue(md, "taskVersion");
+  const scorerBuild = extractMdFrontMatterValue(md, "scorerBuild");
+  const seedPrimary = extractMdFrontMatterValue(md, "seedPrimary");
+  const seedPresenceMean = extractMdFrontMatterValue(md, "seedPresenceMean");
+  const permItersPrimary = extractMdFrontMatterValue(md, "permItersPrimary");
+  const permItersPresenceMean = extractMdFrontMatterValue(md, "permItersPresenceMean");
+  const promptHash = extractMdFrontMatterValue(md, "promptHash");
+  const promptHashShort =
+    promptHash === "—" || promptHash === "not available"
+      ? promptHash
+      : String(promptHash).slice(0, 16);
+
+  for (const page of pdf.getPages()) {
+    const pageWidth = page.getWidth();
+    const footer1 =
+      "specId " +
+      specId +
+      " · runId " +
+      runId +
+      " · taskId " +
+      taskId +
+      " · taskVersion " +
+      taskVersion;
+
+    const footer2 =
+      "build " +
+      scorerBuild +
+      " · seedP " +
+      seedPrimary +
+      " · seedPM " +
+      seedPresenceMean +
+      " · itP " +
+      permItersPrimary +
+      " · itPM " +
+      permItersPresenceMean +
+      " · pHash " +
+      promptHashShort;
+
+    page.drawLine({
+      start: { x: 36, y: 28 },
+      end: { x: pageWidth - 36, y: 28 },
+      thickness: 0.6,
+      color: rgb(0.82, 0.82, 0.82),
+    });
+
+    page.drawText(footer1, {
+      x: 36,
+      y: 16,
+      size: 7,
+      font,
+      color: rgb(0.42, 0.42, 0.42),
+    });
+
+    page.drawText(footer2, {
+      x: 36,
+      y: 8,
+      size: 7,
+      font,
+      color: rgb(0.42, 0.42, 0.42),
+    });
+  }
+
+  return pdf.save();
+}
+
 export async function POST(req: Request) {
   try {
     const raw = await req.text();
@@ -478,6 +556,7 @@ export async function POST(req: Request) {
         pdfBytes = await renderPdfFromText(pdfSafeText(md));
       }
       pdfBytes = await appendTrendChartPage(pdfBytes, md);
+        pdfBytes = await stampPdfProvenanceFooter(pdfBytes, md);
     } catch (e) {
       return err("PDF_RENDER_FAILED", (e as Error)?.message ?? "PDF render failed.", 500);
     }
