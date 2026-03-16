@@ -1595,30 +1595,23 @@ export function EvalsPageClientV0_1() {
                     const b0 = (sumY - m * sumX) / n;
                     const x1 = 96;
                     const x2 = pts[pts.length - 1]?.x ?? 96;
+                    const pathD = pts.map((p, i) => (i === 0 ? "M " : "L ") + p.x + " " + p.y).join(" ");
 
                     return (
                       <div className="mt-7 rounded-[12px] border border-[#3a3a3a] bg-[#101010] px-6 py-6 shadow-[0_8px_24px_rgba(0,0,0,0.14)]">
-                          <div className="mb-1 text-[12px] font-semibold uppercase tracking-[0.14em] text-[#dddddd]">
-                            Aperture trend by bucket
-                          </div>
-                          <div className="mb-4 text-[12px] leading-6 text-[#a8a8a8]">
-                            Mean aperture score from V1 to V7.
-                          </div>
+                        <div className="mb-1 text-[12px] font-semibold uppercase tracking-[0.14em] text-[#dddddd]">
+                          Aperture trend by bucket
+                        </div>
+                        <div className="mb-1 text-[12px] leading-6 text-[#a8a8a8]">
+                          Mean aperture score from V1 to V7.
+                        </div>
+                        <div className="mb-4 text-[11px] leading-6 text-[#8e8e8e]">
+                          Solid path = bucket means · dashed path = linear trend.
+                        </div>
 
                         <svg viewBox="0 0 560 220" className="w-full">
                           <line x1="58" y1="20" x2="58" y2="182" stroke="#333" strokeWidth="1" />
                           <line x1="58" y1="182" x2="530" y2="182" stroke="#333" strokeWidth="1" />
-
-                          <line
-                            x1={x1}
-                            y1={m * x1 + b0}
-                            x2={x2}
-                            y2={m * x2 + b0}
-                            stroke="#f87171"
-                            strokeWidth="1.5"
-                            strokeDasharray="5 4"
-                            opacity="0.8"
-                          />
 
                           {[0, 0.5, 1.0].map((v) => (
                             <g key={v}>
@@ -1643,6 +1636,27 @@ export function EvalsPageClientV0_1() {
                               </text>
                             </g>
                           ))}
+
+                          <path
+                            d={pathD}
+                            fill="none"
+                            stroke="#f59aa4"
+                            strokeWidth="1.75"
+                            strokeLinejoin="round"
+                            strokeLinecap="round"
+                            opacity="0.95"
+                          />
+
+                          <line
+                            x1={x1}
+                            y1={m * x1 + b0}
+                            x2={x2}
+                            y2={m * x2 + b0}
+                            stroke="#f87171"
+                            strokeWidth="1.5"
+                            strokeDasharray="5 4"
+                            opacity="0.8"
+                          />
 
                           {pts.map((p, i) => {
                             const dotColor =

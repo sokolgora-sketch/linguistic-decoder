@@ -258,6 +258,23 @@ function drawDashedLine(params: {
   }
 }
 
+function drawPolyline(params: {
+  page: any;
+  points: Array<{ x: number; y: number }>;
+  thickness: number;
+  color: any;
+}) {
+  const { page, points, thickness, color } = params;
+  for (let i = 0; i < points.length - 1; i += 1) {
+    page.drawLine({
+      start: { x: points[i].x, y: points[i].y },
+      end: { x: points[i + 1].x, y: points[i + 1].y },
+      thickness,
+      color,
+    });
+  }
+}
+
 async function appendTrendChartPage(pdfBytes: Uint8Array, md: string): Promise<Uint8Array> {
   const trend = extractT2TrendFromMarkdown(md);
   if (trend.length !== 7) return pdfBytes;
@@ -289,6 +306,14 @@ async function appendTrendChartPage(pdfBytes: Uint8Array, md: string): Promise<U
     size: 10,
     font,
     color: rgb(0.38, 0.38, 0.38),
+  });
+
+  page.drawText("Solid path = bucket means · dashed path = linear trend.", {
+    x: margin,
+    y: height - 108,
+    size: 9,
+    font,
+    color: rgb(0.48, 0.48, 0.48),
   });
 
   page.drawLine({
@@ -336,19 +361,35 @@ async function appendTrendChartPage(pdfBytes: Uint8Array, md: string): Promise<U
     y: chartY + chartH * p.meanPrimary,
   }));
 
-  for (let i = 0; i < points.length - 1; i += 1) {
-    drawDashedLine({
-      page,
-      x1: points[i].x,
-      y1: points[i].y,
-      x2: points[i + 1].x,
-      y2: points[i + 1].y,
-      dash: 7,
-      gap: 5,
-      thickness: 2.2,
-      color: rgb(0.88, 0.44, 0.48),
-    });
-  }
+  const n = points.length;
+  const sumX = points.reduce((a, p) => a + p.x, 0);
+  const sumY = points.reduce((a, p) => a + p.y, 0);
+  const sumXY = points.reduce((a, p) => a + p.x * p.y, 0);
+  const sumXX = points.reduce((a, p) => a + p.x * p.x, 0);
+  const denom = n * sumXX - sumX * sumX;
+  const m = denom !== 0 ? (n * sumXY - sumX * sumY) / denom : 0;
+  const b0 = (sumY - m * sumX) / n;
+  const x1 = chartX;
+  const x2 = points[points.length - 1]?.x ?? chartX;
+
+  drawPolyline({
+    page,
+    points,
+    thickness: 2.2,
+    color: rgb(0.96, 0.66, 0.70),
+  });
+
+  drawDashedLine({
+    page,
+    x1,
+    y1: m * x1 + b0,
+    x2,
+    y2: m * x2 + b0,
+    dash: 7,
+    gap: 5,
+    thickness: 2.2,
+    color: rgb(0.88, 0.44, 0.48),
+  });
 
   for (const p of points) {
     const color = trendPointColor(p.bucket);
