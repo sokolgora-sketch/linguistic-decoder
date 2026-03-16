@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { MT } from "@/ui/typography/marketingType.v0.1";
@@ -575,6 +575,18 @@ function PaperSnapshotReferenceSection({
   );
 }
 
+async function sha256HexV0_1(text: string): Promise<string> {
+  const data = new TextEncoder().encode(text);
+  const hash = await crypto.subtle.digest("SHA-256", data);
+  return Array.from(new Uint8Array(hash))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+}
+
+function taskVersionFromTaskIdV0_1(taskId: string | null | undefined): string {
+  const m = /_(V\d+_\d+)$/.exec(String(taskId ?? ""));
+  return m ? m[1].toLowerCase().replace("_", ".") : "—";
+}
 export function EvalsPageClientV0_1() {
   const byoTasks = useMemo(
     () => EVAL_SPEC_V0_1.tasks.filter((t) => t.kind === "byo"),
@@ -986,6 +998,40 @@ export function EvalsPageClientV0_1() {
     }
   }
 
+  const devicePlateTaskId =
+    report?.tasks?.find((t) => t.kind === "byo")?.taskId ??
+    report?.tasks?.[0]?.taskId ??
+    null;
+  const devicePlateTaskVersion = taskVersionFromTaskIdV0_1(devicePlateTaskId);
+  const [devicePlatePromptHash, setDevicePlatePromptHash] = useState("—");
+
+  useEffect(() => {
+    let active = true;
+
+    const promptText =
+      EVAL_SPEC_V0_1.tasks.find((t) => t.taskId === devicePlateTaskId)?.prompt ?? "";
+
+    if (!String(promptText).trim()) {
+      setDevicePlatePromptHash("not available");
+      return () => {
+        active = false;
+      };
+    }
+
+    void sha256HexV0_1(String(promptText))
+      .then((hex) => {
+        if (!active) return;
+        setDevicePlatePromptHash(hex.slice(0, 16));
+      })
+      .catch(() => {
+        if (!active) return;
+        setDevicePlatePromptHash("hash error");
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [devicePlateTaskId]);
   function loadExample() {
       // Synthetic calibration ladder (non-semantic): each bucket is dominated by one vowel carrier.
       setMode("task_buckets");
@@ -1821,7 +1867,21 @@ export function EvalsPageClientV0_1() {
                         evalSpecVersion: <span className="font-mono text-[#f2f2f2]">{report.evalSpecVersion}</span>
                       </span>
                         <span>
-                          taskId: <span className="font-mono text-[#f2f2f2]">{summaryTask?.taskId ?? "—"}</span>
+
+                          taskId: <span className="font-mono text-[#f2f2f2]">{devicePlateTaskId ?? "—"}</span>
+
+                        </span>
+
+                        <span>
+
+                          taskVersion: <span className="font-mono text-[#f2f2f2]">{devicePlateTaskVersion}</span>
+
+                        </span>
+
+                        <span>
+
+                          promptHash: <span className="font-mono text-[#f2f2f2]">{devicePlatePromptHash}</span>
+
                         </span>
                       <span>
                         seedPrimary: <span className="font-mono text-[#f2f2f2]">{summaryPermSeedPrimary ?? "—"}</span>

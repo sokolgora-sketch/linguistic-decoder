@@ -77,7 +77,7 @@ describe("Evals/Landing copy regression guard v0.1", () => {
     );
 
     expect(ui).toContain(
-      `taskId: <span className="font-mono text-[#f2f2f2]">{summaryTask?.taskId ?? "—"}</span>`
+      `taskId: <span className="font-mono text-[#f2f2f2]">{devicePlateTaskId ?? "—"}</span>`
     );
   });
 });
