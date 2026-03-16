@@ -108,7 +108,11 @@ function promptHashFromTaskIdV0_1(taskId: string): string {
     : "not available";
 }
 
-export function renderEvalReportMdV0_1(report: EvalReportBundleV0_1): string {
+type RenderEvalReportMdOptionsV0_1 = {
+  exportedAtUtc?: string;
+};
+
+export function renderEvalReportMdV0_1(report: EvalReportBundleV0_1, opts: RenderEvalReportMdOptionsV0_1 = {}): string {
   const lines: string[] = [];
   lines.push(`# ZË-RO Evals Report v0.1`);
   lines.push("");
@@ -158,9 +162,12 @@ export function renderEvalReportMdV0_1(report: EvalReportBundleV0_1): string {
     scorerBuildRaw === "unknown" ? "unknown" : String(scorerBuildRaw).trim().slice(0, 7);
 
   lines.push(`- engineVersion: scoreEvalRun.v0.1`);
-  lines.push(`- taskId: ${devicePlateTaskId}`);
+    const exportedAtUtc = String(opts.exportedAtUtc ?? "—");
+
+lines.push(`- taskId: ${devicePlateTaskId}`);
   lines.push(`- taskVersion: ${taskVersionFromTaskIdV0_1(devicePlateTaskId)}`);
   lines.push(`- promptHash: ${promptHashFromTaskIdV0_1(devicePlateTaskId)}`);
+  lines.push(`- exportedAtUtc: ${exportedAtUtc}`);
   lines.push(`- seedPrimary: ${devicePlateSeedPrimary}`);
   lines.push(`- seedPresenceMean: ${devicePlateSeedPresence}`);
   lines.push(`- permItersPrimary: ${devicePlatePermItersPrimary}`);
