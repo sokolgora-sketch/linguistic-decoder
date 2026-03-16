@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { PDFDocument, StandardFonts } from "pdf-lib";
+import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 
 import { EVAL_SPEC_V0_1 } from "@/shared/evals/spec.v0.1";
 import { parseEvalRunBundleV0_1 } from "@/shared/evals/run.v0.1";
@@ -182,6 +182,226 @@ async function renderPdfFromText(text: string): Promise<Uint8Array> {
   return pdf.save();
 }
 
+type TrendPoint = { bucket: string; meanPrimary: number };
+
+function extractT2TrendFromMarkdown(md: string): TrendPoint[] {
+  const lines = String(md ?? "").split(/\r?\n/g);
+  const start = lines.findIndex(
+    (line) => line.trim() === "## T2_LADDER_V0_1 — Full Ladder — V1..V7"
+  );
+  if (start < 0) return [];
+
+  const out: TrendPoint[] = [];
+  for (let i = start + 1; i < lines.length; i += 1) {
+    const line = lines[i].trim();
+    if (line.startsWith("## ")) break;
+
+    const m =
+      /^\|\s*(V[1-7])\s*\|\s*\d+\s*\|\s*\d+\s*\|\s*\d+\s*\|\s*\d+\s*\|\s*\d+\s*\|\s*([0-9.]+)\s*\|\s*([0-9.]+)\s*\|$/.exec(
+        line
+      );
+
+    if (m) {
+      out.push({
+        bucket: m[1],
+        meanPrimary: Number(m[2]),
+      });
+    }
+  }
+
+  return out.length === 7 ? out : [];
+}
+
+function trendPointColor(bucket: string) {
+  if (bucket === "V4") return rgb(0.95, 0.78, 0.18);
+  if (bucket === "V5" || bucket === "V6" || bucket === "V7") return rgb(0.94, 0.44, 0.44);
+  return rgb(0.28, 0.82, 0.50);
+}
+
+function drawDashedLine(params: {
+  page: any;
+  x1: number;
+  y1: number;
+  x2: number;
+  y2: number;
+  dash: number;
+  gap: number;
+  thickness: number;
+  color: any;
+}) {
+  const { page, x1, y1, x2, y2, dash, gap, thickness, color } = params;
+
+  const dx = x2 - x1;
+  const dy = y2 - y1;
+  const len = Math.sqrt(dx * dx + dy * dy);
+  if (!len) return;
+
+  const ux = dx / len;
+  const uy = dy / len;
+
+  let pos = 0;
+  while (pos < len) {
+    const seg = Math.min(dash, len - pos);
+    const sx = x1 + ux * pos;
+    const sy = y1 + uy * pos;
+    const ex = x1 + ux * (pos + seg);
+    const ey = y1 + uy * (pos + seg);
+
+    page.drawLine({
+      start: { x: sx, y: sy },
+      end: { x: ex, y: ey },
+      thickness,
+      color,
+    });
+
+    pos += dash + gap;
+  }
+}
+
+async function appendTrendChartPage(pdfBytes: Uint8Array, md: string): Promise<Uint8Array> {
+  const trend = extractT2TrendFromMarkdown(md);
+  if (trend.length !== 7) return pdfBytes;
+
+  const pdf = await PDFDocument.load(pdfBytes);
+  const font = await pdf.embedFont(StandardFonts.Helvetica);
+  const bold = await pdf.embedFont(StandardFonts.HelveticaBold);
+
+  const page = pdf.addPage([612, 792]);
+  const { width, height } = page.getSize();
+
+  const margin = 48;
+  const chartX = 96;
+  const chartY = 180;
+  const chartW = 440;
+  const chartH = 350;
+
+  page.drawText("Aperture trend by bucket", {
+    x: margin,
+    y: height - 72,
+    size: 18,
+    font: bold,
+    color: rgb(0.1, 0.1, 0.1),
+  });
+
+  page.drawText("Mean aperture score from V1 to V7.", {
+    x: margin,
+    y: height - 94,
+    size: 10,
+    font,
+    color: rgb(0.38, 0.38, 0.38),
+  });
+
+  page.drawLine({
+    start: { x: chartX, y: chartY },
+    end: { x: chartX, y: chartY + chartH },
+    thickness: 1,
+    color: rgb(0.45, 0.45, 0.45),
+  });
+
+  page.drawLine({
+    start: { x: chartX, y: chartY },
+    end: { x: chartX + chartW, y: chartY },
+    thickness: 1,
+    color: rgb(0.45, 0.45, 0.45),
+  });
+
+  for (const tick of [0, 0.5, 1.0]) {
+    const y = chartY + chartH * tick;
+    drawDashedLine({
+      page,
+      x1: chartX,
+      y1: y,
+      x2: chartX + chartW,
+      y2: y,
+      dash: 4,
+      gap: 6,
+      thickness: 0.8,
+      color: rgb(0.82, 0.82, 0.82),
+    });
+
+    const label = tick.toFixed(1);
+    page.drawText(label, {
+      x: chartX - font.widthOfTextAtSize(label, 10) - 16,
+      y: y - 4,
+      size: 10,
+      font,
+      color: rgb(0.38, 0.38, 0.38),
+    });
+  }
+
+  const points = trend.map((p, idx) => ({
+    bucket: p.bucket,
+    meanPrimary: p.meanPrimary,
+    x: chartX + (chartW / 6) * idx,
+    y: chartY + chartH * p.meanPrimary,
+  }));
+
+  for (let i = 0; i < points.length - 1; i += 1) {
+    drawDashedLine({
+      page,
+      x1: points[i].x,
+      y1: points[i].y,
+      x2: points[i + 1].x,
+      y2: points[i + 1].y,
+      dash: 7,
+      gap: 5,
+      thickness: 2.2,
+      color: rgb(0.88, 0.44, 0.48),
+    });
+  }
+
+  for (const p of points) {
+    const color = trendPointColor(p.bucket);
+
+    page.drawCircle({
+      x: p.x,
+      y: p.y,
+      size: 7,
+      color,
+      borderColor: color,
+      borderWidth: 1,
+    });
+
+    const value = p.meanPrimary.toFixed(3);
+    page.drawText(value, {
+      x: p.x - font.widthOfTextAtSize(value, 12) / 2,
+      y: p.y + 18,
+      size: 12,
+      font,
+      color: rgb(0.18, 0.18, 0.18),
+    });
+
+    page.drawText(p.bucket, {
+      x: p.x - font.widthOfTextAtSize(p.bucket, 11) / 2,
+      y: chartY - 32,
+      size: 11,
+      font,
+      color: rgb(0.35, 0.35, 0.35),
+    });
+  }
+
+  const xLabel = "Bucket rank";
+  page.drawText(xLabel, {
+    x: chartX + chartW / 2 - font.widthOfTextAtSize(xLabel, 12) / 2,
+    y: chartY - 64,
+    size: 12,
+    font,
+    color: rgb(0.35, 0.35, 0.35),
+  });
+
+  const note =
+    "Chart page added from markdown export for T2_LADDER_V0_1 using mean(primary) values.";
+  page.drawText(note, {
+    x: margin,
+    y: 92,
+    size: 9,
+    font,
+    color: rgb(0.45, 0.45, 0.45),
+  });
+
+  return pdf.save();
+}
+
 export async function POST(req: Request) {
   try {
     const raw = await req.text();
@@ -211,12 +431,13 @@ export async function POST(req: Request) {
 
     let pdfBytes: Uint8Array;
     try {
-        try {
-          pdfBytes = await renderMarkdownToPdfV0_2(md);
-        } catch {
-          pdfBytes = await renderPdfFromText(pdfSafeText(md));
-        }
-      } catch (e) {
+      try {
+        pdfBytes = await renderMarkdownToPdfV0_2(md);
+      } catch {
+        pdfBytes = await renderPdfFromText(pdfSafeText(md));
+      }
+      pdfBytes = await appendTrendChartPage(pdfBytes, md);
+    } catch (e) {
       return err("PDF_RENDER_FAILED", (e as Error)?.message ?? "PDF render failed.", 500);
     }
 
