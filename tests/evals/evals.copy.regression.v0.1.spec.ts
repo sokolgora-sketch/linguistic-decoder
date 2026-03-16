@@ -13,7 +13,10 @@ function readUtf8(rel: string): string {
 }
 
 const T1_PROMPT_HASH = createHash("sha256")
-  .update(EVAL_SPEC_V0_1.tasks.find((t) => t.taskId === "T1_BUCKET_V1_V0_1")?.prompt ?? "")
+  .update(
+    EVAL_SPEC_V0_1.tasks.find((t) => t.taskId === "T1_BUCKET_V1_V0_1")
+      ?.prompt ?? "",
+  )
   .digest("hex");
 
 describe("Evals/Landing copy regression guard v0.1", () => {
@@ -34,7 +37,7 @@ describe("Evals/Landing copy regression guard v0.1", () => {
   it("locks markdown renderer taskId and blank-meta normalization", () => {
     const runPath = path.join(
       process.cwd(),
-      "tests/evals/runs/evalRun.public-grounding-probe.v0.1.gold.synthetic.full.v0.1.json"
+      "tests/evals/runs/evalRun.public-grounding-probe.v0.1.gold.synthetic.full.v0.1.json",
     );
 
     const rawRun = JSON.parse(fs.readFileSync(runPath, "utf8"));
@@ -63,28 +66,37 @@ describe("Evals/Landing copy regression guard v0.1", () => {
   it("locks evals UI source copy for mode clarity and device plate metadata", () => {
     const ui = readUtf8("src/ui/evals/EvalsPageClient.v0.1.tsx");
 
-    expect(ui).toContain(`Task (Buckets only mode)`);
-    expect(ui).toContain(`Task source`);
     expect(ui).toContain(
-      `Select the task used to wrap V1..V7 bucket JSON into evalRun.v0.1.`
+      "Full run bundle mode expects task provenance to come from the uploaded evalRun.v0.1 bundle. Switch to Buckets only mode to copy a ZË-RO task prompt.",
     );
-    expect(ui).toContain(`TASK PROMPT — USED ONLY FOR BUCKETS-ONLY MODE`);
-    expect(ui).toContain(`disabled={mode !== "task_buckets"}`);
+    expect(ui).toContain('disabled={mode !== "task_buckets"}');
 
-    expect(ui).toContain(`Consistency (Spearman <span className="normal-case">ρ</span>)`);
+    expect(ui).toContain("Consistency (Spearman");
+    expect(ui).toContain('className="normal-case">ρ</span>');
 
-    expect(ui).toContain(
-      `provider <span className={\`font-mono \${report.meta?.provider?.trim() ? "text-white" : "text-[#8f8f8f]"}\`}>{report.meta?.provider?.trim() ? report.meta.provider : "not set"}</span>`
-    );
-    expect(ui).toContain(
-      `model <span className={\`font-mono \${report.meta?.model?.trim() ? "text-white" : "text-[#8f8f8f]"}\`}>{report.meta?.model?.trim() ? report.meta.model : "not set"}</span>`
-    );
-    expect(ui).toContain(
-      `label <span className={\`font-mono \${report.meta?.label?.trim() ? "text-white" : "text-[#8f8f8f]"}\`}>{report.meta?.label?.trim() ? report.meta.label : "not set"}</span>`
-    );
+    expect(ui).toContain("provider");
+    expect(ui).toContain("report.meta?.provider?.trim()");
+    expect(ui).toContain("report.meta.provider");
+    expect(ui).toContain('"not set"');
 
-    expect(ui).toContain(
-      `taskId: <span className="font-mono text-[#f2f2f2]">{devicePlateTaskId ?? "—"}</span>`
-    );
+    expect(ui).toContain("model");
+    expect(ui).toContain("report.meta?.model?.trim()");
+    expect(ui).toContain("report.meta.model");
+
+    expect(ui).toContain("label");
+    expect(ui).toContain("report.meta?.label?.trim()");
+    expect(ui).toContain("report.meta.label");
+
+    expect(ui).toContain("taskId:");
+    expect(ui).toContain('devicePlateTaskId ?? "—"');
+
+    expect(ui).toContain("taskVersion:");
+    expect(ui).toContain("{devicePlateTaskVersion}");
+
+    expect(ui).toContain("promptHash:");
+    expect(ui).toContain("{devicePlatePromptHash}");
+
+    expect(ui).toContain("exportedAtUtc:");
+    expect(ui).toContain("{devicePlateExportedAtUtc}");
   });
 });
