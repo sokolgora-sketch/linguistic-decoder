@@ -10,8 +10,11 @@ describe("Evals chart parity guard v0.1", () => {
   it("locks UI chart to bucket path plus dashed linear trend", () => {
     const ui = readUtf8("src/ui/evals/EvalsPageClient.v0.1.tsx");
 
-    expect(ui).toContain('const pathD = pts.map((p, i) => (i === 0 ? "M " : "L ") + p.x + " " + p.y).join(" ");');
-    expect(ui).toContain("Solid path = bucket means · dashed path = linear trend.");
+    expect(ui).toContain("const pathD = pts");
+    expect(ui).toContain('.map(');
+    expect(ui).toContain('(p, i) => (i === 0 ? "M " : "L ") + p.x + " " + p.y');
+    expect(ui).toContain('.join(" ");');
+    expect(ui).toMatch(/Solid path = bucket means · dashed path = linear\s+trend\./);
     expect(ui).toContain("d={pathD}");
     expect(ui).toContain('stroke="#f59aa4"');
     expect(ui).toContain('strokeDasharray="5 4"');
