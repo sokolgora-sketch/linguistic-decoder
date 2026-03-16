@@ -3,6 +3,8 @@
 - evalSpecVersion: evalSpec.v0.1
 - engineVersion: scoreEvalRun.v0.1
 - taskId: T1_BUCKET_V1_V0_1
+- taskVersion: v0.1
+- promptHash: 9489bffdf9d1fa4a65e248fbb5f1a4f069122f9a40612a4087d9702cde84e892
 - seedPrimary: —
 - seedPresenceMean: —
 - permItersPrimary: —

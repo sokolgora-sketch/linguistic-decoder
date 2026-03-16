@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { describe, it, expect } from "@jest/globals";
 import fs from "fs";
 import path from "path";
@@ -10,6 +11,10 @@ import { renderEvalReportMdV0_1 } from "@/shared/evals/renderEvalReportMd.v0.1";
 function readUtf8(rel: string): string {
   return fs.readFileSync(path.join(process.cwd(), rel), "utf8");
 }
+
+const T1_PROMPT_HASH = createHash("sha256")
+  .update(EVAL_SPEC_V0_1.tasks.find((t) => t.taskId === "T1_BUCKET_V1_V0_1")?.prompt ?? "")
+  .digest("hex");
 
 describe("Evals/Landing copy regression guard v0.1", () => {
   it("locks landing pseudoword note wording", () => {
@@ -48,6 +53,8 @@ describe("Evals/Landing copy regression guard v0.1", () => {
     const md = renderEvalReportMdV0_1(report);
 
     expect(md).toContain("- taskId: T1_BUCKET_V1_V0_1");
+    expect(md).toContain("- taskVersion: v0.1");
+    expect(md).toContain(`- promptHash: ${T1_PROMPT_HASH}`);
     expect(md).toContain("- provider: not set");
     expect(md).toContain("- model: not set");
     expect(md).toContain("- label: not set");
