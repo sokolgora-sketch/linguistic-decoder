@@ -1323,7 +1323,7 @@ export function EvalsPageClientV0_1() {
                 Upload JSON
               </span>
               <span className={`${MT.helper} text-[#a9a9a9]`}>
-                Use a saved eval bundle or buckets-only file.
+                Use a saved eval bundle or buckets-only JSON file.
               </span>
             </div>
 
@@ -1339,10 +1339,10 @@ export function EvalsPageClientV0_1() {
                   }}
                   className="sr-only"
                 />
-                📎 Choose file
+                Choose JSON file
               </label>
               <span className={`text-[12px] leading-6 ${pickedFileName ? "text-[#666]" : "italic text-[#444]"}`}>
-                {pickedFileName || "no file chosen"}
+                {pickedFileName || "No JSON file selected"}
               </span>
             </div>
 
