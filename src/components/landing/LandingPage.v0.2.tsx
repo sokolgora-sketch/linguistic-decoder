@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import { ArrowRight, ExternalLink, Lock } from "lucide-react";
 import { MT } from "@/ui/typography/marketingType.v0.1";
+import { COLORS_HEX_BY_VOICE_V0_1 } from "@/shared/doctrine/voiceDoctrine.v0.1";
 
 import {
   Accordion,
@@ -85,13 +86,55 @@ const COLORS = {
 };
 
 const VOICES: VoiceSpec[] = [
-  { id: "A", weight: 1.0, ipa: "/a/", examples: ["vast", "broad", "open"], color: "#d93333" },
-  { id: "O", weight: 0.8, ipa: "/o/", examples: ["orb", "whole", "round"], color: "#e0622a" },
-  { id: "E", weight: 0.6, ipa: "/e/", examples: ["spread", "field", "reach"], color: "#d49b17" },
-  { id: "Ë", weight: 0.5, ipa: "/ə/", examples: ["state", "unit", "named"], color: "#7ab83b" },
-  { id: "U", weight: 0.4, ipa: "/u/", examples: ["flow", "move", "channel"], color: "#1f9d8b" },
-  { id: "Y", weight: 0.3, ipa: "/y/", examples: ["thin", "tense", "narrow"], color: "#2f6fd6" },
-  { id: "I", weight: 0.1, ipa: "/i/", examples: ["tip", "focus", "precise"], color: "#7c3aed" },
+  {
+    id: "A",
+    weight: 1.0,
+    ipa: "/a/",
+    examples: ["vast", "broad", "open"],
+    color: COLORS_HEX_BY_VOICE_V0_1.A,
+  },
+  {
+    id: "O",
+    weight: 0.8,
+    ipa: "/o/",
+    examples: ["orb", "whole", "round"],
+    color: COLORS_HEX_BY_VOICE_V0_1.O,
+  },
+  {
+    id: "E",
+    weight: 0.6,
+    ipa: "/e/",
+    examples: ["spread", "field", "reach"],
+    color: COLORS_HEX_BY_VOICE_V0_1.E,
+  },
+  {
+    id: "Ë",
+    weight: 0.5,
+    ipa: "/ə/",
+    examples: ["state", "unit", "named"],
+    color: COLORS_HEX_BY_VOICE_V0_1["Ë"],
+  },
+  {
+    id: "U",
+    weight: 0.4,
+    ipa: "/u/",
+    examples: ["flow", "move", "channel"],
+    color: COLORS_HEX_BY_VOICE_V0_1.U,
+  },
+  {
+    id: "Y",
+    weight: 0.3,
+    ipa: "/y/",
+    examples: ["thin", "tense", "narrow"],
+    color: COLORS_HEX_BY_VOICE_V0_1.Y,
+  },
+  {
+    id: "I",
+    weight: 0.1,
+    ipa: "/i/",
+    examples: ["tip", "focus", "precise"],
+    color: COLORS_HEX_BY_VOICE_V0_1.I,
+  },
 ];
 
 const TICKER_ITEMS = [
@@ -104,10 +147,10 @@ const TICKER_ITEMS = [
 
 const CHART_POINTS: ChartPoint[] = [
   { bucket: "V1", idx: 1, mean: 0.955 },
-  { bucket: "V2", idx: 2, mean: 0.760 },
+  { bucket: "V2", idx: 2, mean: 0.76 },
   { bucket: "V3", idx: 3, mean: 0.587 },
   { bucket: "V4", idx: 4, mean: 0.563 },
-  { bucket: "V5", idx: 5, mean: 0.400 },
+  { bucket: "V5", idx: 5, mean: 0.4 },
   { bucket: "V6", idx: 6, mean: 0.307 },
   { bucket: "V7", idx: 7, mean: 0.125 },
 ];
@@ -133,10 +176,10 @@ const BASELINES: BaselineCard[] = [
     subtitle: "Gegë vs Tosk replication (baseline-locked)",
     tone: "red",
     rows: [
-        { key: "Pearson r", value: "−0.989" },
-        { key: "Spearman ρ", value: "−1.000" },
-        { key: "p_perm", value: "< 0.001" },
-      ],
+      { key: "Pearson r", value: "−0.989" },
+      { key: "Spearman ρ", value: "−1.000" },
+      { key: "p_perm", value: "< 0.001" },
+    ],
     note: "N=140 (paired; baseline-locked)",
   },
   {
@@ -159,9 +202,9 @@ const SHOW_LLM_RESULTS_ON_LANDING = false;
 const LLM_PAPERS: LlmPaper[] = [
   {
     id: "paper1",
-      tabLabel: "FRESH-CHAT",
-      tabDetail: "12 independent sessions per provider",
-      title: "Fresh-chat · n=12 runs each",
+    tabLabel: "FRESH-CHAT",
+    tabDetail: "12 independent sessions per provider",
+    title: "Fresh-chat · n=12 runs each",
     summary: "Source: LingBuzz/009799",
     badges: ["fresh-chat", "paper v0.1", "snapshot"],
     providers: [
@@ -204,9 +247,9 @@ const LLM_PAPERS: LlmPaper[] = [
   },
   {
     id: "paper2",
-      tabLabel: "SAME-THREAD",
-      tabDetail: "10 sequential turns per provider",
-      title: "Same-thread · n=10 runs each",
+    tabLabel: "SAME-THREAD",
+    tabDetail: "10 sequential turns per provider",
+    title: "Same-thread · n=10 runs each",
     summary: "Source: LingBuzz/009808",
     badges: ["same-thread", "paper v0.1", "snapshot"],
     providers: [
@@ -241,7 +284,7 @@ const LLM_PAPERS: LlmPaper[] = [
         provider: "Anthropic",
         model: "claude-4.6-sonnet-extended",
         bestDisplay: "−0.310",
-        bestMagnitude: 0.310,
+        bestMagnitude: 0.31,
         meanDisplay: "−0.019",
         regimeLabel: "weak mixed",
         regimeTone: "weak",
@@ -344,7 +387,7 @@ function useRevealOnScreen() {
           observer.disconnect();
         }
       },
-      { threshold: 0.2 }
+      { threshold: 0.2 },
     );
     observer.observe(node);
     return () => observer.disconnect();
@@ -367,7 +410,7 @@ function LandingButton(props: {
       className={cn(
         "inline-flex w-full items-center justify-center gap-2 rounded-md border px-4 py-2 text-sm uppercase tracking-[0.12em] transition sm:w-auto",
         "font-mono",
-        "border-[#686868] bg-[#232323] text-neutral-300"
+        "border-[#686868] bg-[#232323] text-neutral-300",
       )}
     >
       {props.label}
@@ -380,7 +423,7 @@ function LandingButton(props: {
       rel="noreferrer"
       className={cn(
         "inline-flex w-full items-center justify-center gap-2 rounded-md border px-4 py-2 text-sm uppercase tracking-[0.12em] transition sm:w-auto",
-        "font-mono border-[#686868] bg-[#232323] text-[#f5f5f5] hover:border-[#d93333]"
+        "font-mono border-[#686868] bg-[#232323] text-[#f5f5f5] hover:border-[#d93333]",
       )}
     >
       {props.label}
@@ -394,11 +437,13 @@ function LandingButton(props: {
         "font-mono",
         props.label === "Try Evals"
           ? "border-[#d93333] bg-[#d93333] text-white hover:opacity-90"
-          : "border-[#686868] bg-[#232323] text-[#f5f5f5] hover:border-[#d93333]"
+          : "border-[#686868] bg-[#232323] text-[#f5f5f5] hover:border-[#d93333]",
       )}
     >
       {props.label}
-      {props.label === "Try Evals" ? <ArrowRight className="h-3.5 w-3.5" /> : null}
+      {props.label === "Try Evals" ? (
+        <ArrowRight className="h-3.5 w-3.5" />
+      ) : null}
     </Link>
   );
 
@@ -477,79 +522,87 @@ function ApertureBar({ mounted }: { mounted: boolean }) {
       </div>
 
       <TooltipProvider delayDuration={80}>
-          <div className="overflow-x-auto">
-            <div className="grid min-w-[560px] grid-cols-7 overflow-hidden rounded-md border border-[#686868] sm:min-w-0">
-          {VOICES.map((voice, index) => (
-            <Tooltip key={voice.id}>
-              <TooltipTrigger asChild>
-                <button
-                  type="button"
-                  className="group relative flex min-h-[104px] flex-col items-center justify-center gap-2 border-r border-[#686868] px-1.5 py-2.5 last:border-r-0 sm:min-h-[112px] sm:px-2 sm:py-3"
-                  style={{
-                    background:
-                      voice.id === "A"
-                        ? "#1f1212"
-                        : voice.id === "O"
-                        ? "#1c1414"
-                        : voice.id === "E"
-                        ? "#1a1616"
-                        : voice.id === "Ë"
-                        ? "#181818"
-                        : voice.id === "U"
-                        ? "#161818"
-                        : voice.id === "Y"
-                        ? "#141618"
-                        : "#12141a",
-                  }}
-                >
-                  <span
-                    className="text-base font-black sm:text-lg"
-                    style={{ color: voice.color, fontFamily: "Inter, sans-serif" }}
+        <div className="overflow-x-auto">
+          <div className="grid min-w-[560px] grid-cols-7 overflow-hidden rounded-md border border-[#686868] sm:min-w-0">
+            {VOICES.map((voice, index) => (
+              <Tooltip key={voice.id}>
+                <TooltipTrigger asChild>
+                  <button
+                    type="button"
+                    className="group relative flex min-h-[104px] flex-col items-center justify-center gap-2 border-r border-[#686868] px-1.5 py-2.5 last:border-r-0 sm:min-h-[112px] sm:px-2 sm:py-3"
+                    style={{
+                      background:
+                        voice.id === "A"
+                          ? "#1f1212"
+                          : voice.id === "O"
+                            ? "#1c1414"
+                            : voice.id === "E"
+                              ? "#1a1616"
+                              : voice.id === "Ë"
+                                ? "#181818"
+                                : voice.id === "U"
+                                  ? "#161818"
+                                  : voice.id === "Y"
+                                    ? "#141618"
+                                    : "#12141a",
+                    }}
                   >
-                    {voice.id}
-                  </span>
-
-                  <div className="h-[3px] w-[70%] overflow-hidden rounded-sm bg-[#333]">
-                    <div
-                      className="h-full rounded-sm"
+                    <span
+                      className="text-base font-black sm:text-lg"
                       style={{
-                        background: voice.color,
-                        transformOrigin: "left",
-                        transform: mounted ? `scaleX(${voice.weight})` : "scaleX(0)",
-                        transition: `transform 0.6s cubic-bezier(0.4,0,0.2,1) ${index * 60}ms`,
+                        color: voice.color,
+                        fontFamily: "Inter, sans-serif",
                       }}
-                    />
+                    >
+                      {voice.id}
+                    </span>
+
+                    <div className="h-[3px] w-[70%] overflow-hidden rounded-sm bg-[#333]">
+                      <div
+                        className="h-full rounded-sm"
+                        style={{
+                          background: voice.color,
+                          transformOrigin: "left",
+                          transform: mounted
+                            ? `scaleX(${voice.weight})`
+                            : "scaleX(0)",
+                          transition: `transform 0.6s cubic-bezier(0.4,0,0.2,1) ${index * 60}ms`,
+                        }}
+                      />
+                    </div>
+
+                    <span
+                      className="text-[12px] text-neutral-300"
+                      style={{ fontFamily: "Inter, sans-serif" }}
+                    >
+                      {voice.weight.toFixed(1)}
+                    </span>
+                  </button>
+                </TooltipTrigger>
+
+                <TooltipContent
+                  side="top"
+                  className="w-[170px] border-[#686868] bg-[#222] px-3 py-2 text-[12px] text-neutral-200 sm:w-[180px]"
+                  style={{ fontFamily: "Inter, sans-serif" }}
+                >
+                  <div className="mb-1 text-base font-bold text-neutral-100">
+                    {voice.ipa}
                   </div>
-
-                  <span
-                    className="text-[12px] text-neutral-300"
-                    style={{ fontFamily: "Inter, sans-serif" }}
-                  >
-                    {voice.weight.toFixed(1)}
-                  </span>
-                </button>
-              </TooltipTrigger>
-
-              <TooltipContent
-                side="top"
-                className="w-[170px] border-[#686868] bg-[#222] px-3 py-2 text-[12px] text-neutral-200 sm:w-[180px]"
-                style={{ fontFamily: "Inter, sans-serif" }}
-              >
-                <div className="mb-1 text-base font-bold text-neutral-100">
-                  {voice.ipa}
-                </div>
-                <div className="mb-1 text-neutral-300">
-                  Aperture: <span className="text-neutral-200">{voice.weight.toFixed(1)}</span>
-                </div>
-                <div className="border-t border-[#333] pt-1 text-neutral-300">
-                  e.g. {voice.examples.join(", ")}
-                </div>
-              </TooltipContent>
-            </Tooltip>
-          ))}
-        </div>
+                  <div className="mb-1 text-neutral-300">
+                    Aperture:{" "}
+                    <span className="text-neutral-200">
+                      {voice.weight.toFixed(1)}
+                    </span>
+                  </div>
+                  <div className="border-t border-[#333] pt-1 text-neutral-300">
+                    e.g. {voice.examples.join(", ")}
+                  </div>
+                </TooltipContent>
+              </Tooltip>
+            ))}
           </div>
-        </TooltipProvider>
+        </div>
+      </TooltipProvider>
     </div>
   );
 }
@@ -563,8 +616,7 @@ function HeroChart({ mounted }: { mounted: boolean }) {
     return CHART_POINTS.map((point, index) => {
       const x =
         padding + (index / (CHART_POINTS.length - 1)) * (width - padding * 2);
-      const y =
-        padding + (1 - point.mean) * (height - padding * 2);
+      const y = padding + (1 - point.mean) * (height - padding * 2);
       return { ...point, x, y };
     });
   }, []);
@@ -576,15 +628,24 @@ function HeroChart({ mounted }: { mounted: boolean }) {
   return (
     <div className="rounded-md border border-[#686868] bg-[#232323] p-4">
       <div className="mb-3 flex items-center justify-between gap-3">
-        <div className={`${MT.microLabel} text-neutral-300`} style={{ fontFamily: 'Inter, sans-serif' }}>
+        <div
+          className={`${MT.microLabel} text-neutral-300`}
+          style={{ fontFamily: "Inter, sans-serif" }}
+        >
           Turkish STEP20 baseline
         </div>
-        <div className={`${MT.microLabel} text-neutral-300`} style={{ fontFamily: 'Inter, sans-serif' }}>
+        <div
+          className={`${MT.microLabel} text-neutral-300`}
+          style={{ fontFamily: "Inter, sans-serif" }}
+        >
           bucket means
         </div>
       </div>
 
-      <svg viewBox={`0 0 ${width} ${height}`} className="h-[220px] w-full sm:h-[240px] md:h-[250px]">
+      <svg
+        viewBox={`0 0 ${width} ${height}`}
+        className="h-[220px] w-full sm:h-[240px] md:h-[250px]"
+      >
         {[0, 0.25, 0.5, 0.75, 1].map((tick, index) => {
           const y = padding + (1 - tick) * (height - padding * 2);
           return (
@@ -602,7 +663,7 @@ function HeroChart({ mounted }: { mounted: boolean }) {
                 y={y + 4}
                 fill="rgba(255,255,255,0.45)"
                 fontSize="12"
-                style={{ fontFamily: 'Inter, sans-serif' }}
+                style={{ fontFamily: "Inter, sans-serif" }}
               >
                 {tick.toFixed(2)}
               </text>
@@ -625,7 +686,7 @@ function HeroChart({ mounted }: { mounted: boolean }) {
               textAnchor="middle"
               fill="rgba(255,255,255,0.55)"
               fontSize="12"
-              style={{ fontFamily: 'Inter, sans-serif' }}
+              style={{ fontFamily: "Inter, sans-serif" }}
             >
               {point.bucket}
             </text>
@@ -668,7 +729,7 @@ function HeroChart({ mounted }: { mounted: boolean }) {
               textAnchor="middle"
               fill="rgba(255,255,255,0.7)"
               fontSize="12"
-              style={{ fontFamily: 'Inter, sans-serif' }}
+              style={{ fontFamily: "Inter, sans-serif" }}
             >
               {point.mean.toFixed(3)}
             </text>
@@ -682,25 +743,52 @@ function HeroChart({ mounted }: { mounted: boolean }) {
 function HeroStatsCard() {
   return (
     <div className="rounded-md border border-[#686868] bg-[#232323] p-4">
-      <div className={`mb-3 ${MT.microLabel} text-neutral-300`} style={{ fontFamily: 'Inter, sans-serif' }}>
+      <div
+        className={`mb-3 ${MT.microLabel} text-neutral-300`}
+        style={{ fontFamily: "Inter, sans-serif" }}
+      >
         slope summary
       </div>
       <div className="space-y-3 text-sm text-neutral-200">
         <div className="flex items-center justify-between gap-4">
-          <span className="uppercase tracking-[0.10em] text-neutral-300" style={{ fontFamily: 'Inter, sans-serif' }}>Pearson r</span>
-          <span style={{ fontFamily: 'Inter, sans-serif' }}>−0.989</span>
+          <span
+            className="uppercase tracking-[0.10em] text-neutral-300"
+            style={{ fontFamily: "Inter, sans-serif" }}
+          >
+            Pearson r
+          </span>
+          <span style={{ fontFamily: "Inter, sans-serif" }}>−0.989</span>
         </div>
         <div className="flex items-center justify-between gap-4">
-          <span className="uppercase tracking-[0.10em] text-neutral-300" style={{ fontFamily: 'Inter, sans-serif' }}>Spearman ρ</span>
-          <span style={{ fontFamily: 'Inter, sans-serif' }}>−1.000</span>
+          <span
+            className="uppercase tracking-[0.10em] text-neutral-300"
+            style={{ fontFamily: "Inter, sans-serif" }}
+          >
+            Spearman ρ
+          </span>
+          <span style={{ fontFamily: "Inter, sans-serif" }}>−1.000</span>
         </div>
         <div className="flex items-center justify-between gap-4">
-          <span className="uppercase tracking-[0.10em] text-neutral-300" style={{ fontFamily: 'Inter, sans-serif' }}>p_perm</span>
-          <span style={{ fontFamily: 'Inter, sans-serif', color: COLORS.green }}>{"< 0.001"}</span>
+          <span
+            className="uppercase tracking-[0.10em] text-neutral-300"
+            style={{ fontFamily: "Inter, sans-serif" }}
+          >
+            p_perm
+          </span>
+          <span
+            style={{ fontFamily: "Inter, sans-serif", color: COLORS.green }}
+          >
+            {"< 0.001"}
+          </span>
         </div>
         <div className="flex items-center justify-between gap-4">
-          <span className="uppercase tracking-[0.10em] text-neutral-300" style={{ fontFamily: 'Inter, sans-serif' }}>iters</span>
-          <span style={{ fontFamily: 'Inter, sans-serif' }}>12,000</span>
+          <span
+            className="uppercase tracking-[0.10em] text-neutral-300"
+            style={{ fontFamily: "Inter, sans-serif" }}
+          >
+            iters
+          </span>
+          <span style={{ fontFamily: "Inter, sans-serif" }}>12,000</span>
         </div>
       </div>
     </div>
@@ -710,19 +798,25 @@ function HeroStatsCard() {
 function HeroExplainCard() {
   return (
     <div className="rounded-md border border-[#686868] bg-[#232323] p-4">
-      <div className={`mb-3 ${MT.microLabel} text-neutral-300`} style={{ fontFamily: 'Inter, sans-serif' }}>
+      <div
+        className={`mb-3 ${MT.microLabel} text-neutral-300`}
+        style={{ fontFamily: "Inter, sans-serif" }}
+      >
         what this chart shows
       </div>
       <div className="space-y-3 text-sm leading-6 text-neutral-300">
         <p>
-          Bucket means from the Turkish STEP20 baseline. As buckets move from V1→V7,
-          mean aperture decreases — strong negative ordering signal
-          (Spearman ρ=−1.000; Pearson r=−0.989; p_perm {"<"} 0.001; iters=12,000).
+          Bucket means from the Turkish STEP20 baseline. As buckets move from
+          V1→V7, mean aperture decreases — strong negative ordering signal
+          (Spearman ρ=−1.000; Pearson r=−0.989; p_perm {"<"} 0.001;
+          iters=12,000).
         </p>
         <p>
-          When testing LLM outputs, we report <span className="font-mono text-neutral-100">compliance</span>{" "}
-          and <span className="font-mono text-neutral-100">signal</span> (r/ρ on compliant runs).
-          High variance across repeated runs indicates instability.
+          When testing LLM outputs, we report{" "}
+          <span className="font-mono text-neutral-100">compliance</span> and{" "}
+          <span className="font-mono text-neutral-100">signal</span> (r/ρ on
+          compliant runs). High variance across repeated runs indicates
+          instability.
         </p>
       </div>
     </div>
@@ -733,7 +827,10 @@ function HeroSection({ mounted }: { mounted: boolean }) {
   return (
     <section className="grid gap-6 lg:grid-cols-[1.05fr_1fr]">
       <div className="space-y-5">
-        <div className={`inline-flex flex-wrap items-center gap-2 rounded-md border border-[#686868] bg-[#232323] px-3 py-2.5 ${MT.microLabel} text-neutral-300`} style={{ fontFamily: 'Inter, sans-serif' }}>
+        <div
+          className={`inline-flex flex-wrap items-center gap-2 rounded-md border border-[#686868] bg-[#232323] px-3 py-2.5 ${MT.microLabel} text-neutral-300`}
+          style={{ fontFamily: "Inter, sans-serif" }}
+        >
           <span>deterministic</span>
           <span className="text-neutral-300">•</span>
           <span>baseline-locked</span>
@@ -741,24 +838,25 @@ function HeroSection({ mounted }: { mounted: boolean }) {
           <span>scientific instrument</span>
         </div>
 
-          <div>
-            <Image
-                src="/zero_logo_hero_white.svg"
-                alt="ZË-RO"
-                width={520}
-                height={130}
-                priority
-                className="h-auto w-full max-w-[520px]"
-              />
-            <p className="mt-2 max-w-xl text-base leading-7 text-neutral-300">
-              Deterministic vowel-aperture grounding probe for baseline-locked evaluation,
-              drift checks, and reproducible scoring.
-            </p>
-          </div>
+        <div>
+          <Image
+            src="/zero_logo_hero_white.svg"
+            alt="ZË-RO"
+            width={520}
+            height={130}
+            priority
+            className="h-auto w-full max-w-[520px]"
+          />
+          <p className="mt-2 max-w-xl text-base leading-7 text-neutral-300">
+            Deterministic vowel-aperture grounding probe for baseline-locked
+            evaluation, drift checks, and reproducible scoring.
+          </p>
+        </div>
 
         <div className="max-w-xl rounded-md border border-[#686868] bg-[#232323] p-4 text-sm leading-6 text-neutral-300">
-          Use ZË-RO to test whether model outputs preserve a stable vowel-aperture ↔ semantic ordering.
-          Bring your own model output, score it deterministically, and export the result.
+          Use ZË-RO to test whether model outputs preserve a stable
+          vowel-aperture ↔ semantic ordering. Bring your own model output, score
+          it deterministically, and export the result.
         </div>
 
         <TooltipProvider delayDuration={80}>
@@ -797,7 +895,8 @@ function BaselineGrid() {
           key={card.id}
           className="rounded-md border bg-[#232323] p-4"
           style={{
-            borderColor: card.tone === "red" ? "rgba(217,51,51,0.75)" : "#686868",
+            borderColor:
+              card.tone === "red" ? "rgba(217,51,51,0.75)" : "#686868",
           }}
         >
           <div className="mb-2 flex items-center gap-2 text-white">
@@ -807,14 +906,20 @@ function BaselineGrid() {
           <div className="mb-4 text-sm text-neutral-300">{card.subtitle}</div>
           <div className="space-y-2">
             {card.rows.map((row) => (
-              <div key={row.key} className="flex items-start justify-between gap-4 text-sm">
+              <div
+                key={row.key}
+                className="flex items-start justify-between gap-4 text-sm"
+              >
                 <span
                   className="uppercase tracking-[0.12em] text-neutral-300"
-                  style={{ fontFamily: 'Inter, sans-serif' }}
+                  style={{ fontFamily: "Inter, sans-serif" }}
                 >
                   {row.key}
                 </span>
-                <span className="text-neutral-100" style={{ fontFamily: 'Inter, sans-serif' }}>
+                <span
+                  className="text-neutral-100"
+                  style={{ fontFamily: "Inter, sans-serif" }}
+                >
                   {row.value}
                 </span>
               </div>
@@ -839,10 +944,13 @@ function LlmProviderRows(props: {
   animate: boolean;
 }) {
   const regimeClass = (tone?: LlmProviderRow["regimeTone"]) => {
-    if (tone === "good") return "border-[#16a34a44] bg-[#0d2010] text-[#16a34a]";
+    if (tone === "good")
+      return "border-[#16a34a44] bg-[#0d2010] text-[#16a34a]";
     if (tone === "mid") return "border-[#a08f2044] bg-[#1b1a0d] text-[#d3c35d]";
-    if (tone === "weak") return "border-[#d9333344] bg-[#1a0a0a] text-[#e57a7a]";
-    if (tone === "inverted") return "border-[#d93333aa] bg-[#2a0808] text-[#ff8e8e]";
+    if (tone === "weak")
+      return "border-[#d9333344] bg-[#1a0a0a] text-[#e57a7a]";
+    if (tone === "inverted")
+      return "border-[#d93333aa] bg-[#2a0808] text-[#ff8e8e]";
     return "";
   };
 
@@ -855,7 +963,9 @@ function LlmProviderRows(props: {
         >
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
-              <div className="text-sm font-semibold text-neutral-100">{row.provider}</div>
+              <div className="text-sm font-semibold text-neutral-100">
+                {row.provider}
+              </div>
               {row.regimeLabel ? (
                 <span
                   className={`inline-flex rounded-sm border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.06em] ${regimeClass(row.regimeTone)}`}
@@ -914,7 +1024,10 @@ function LlmResultsSection() {
         <AccordionItem value="llm-results" className="border-b-0">
           <AccordionTrigger className="py-0 hover:no-underline">
             <div className="text-left">
-              <div className={`${MT.microLabel} text-neutral-300`} style={{ fontFamily: 'Inter, sans-serif' }}>
+              <div
+                className={`${MT.microLabel} text-neutral-300`}
+                style={{ fontFamily: "Inter, sans-serif" }}
+              >
                 llm results
               </div>
               <div className="mt-1 text-lg font-semibold text-white">
@@ -925,66 +1038,73 @@ function LlmResultsSection() {
           <AccordionContent className="pt-5">
             <Tabs defaultValue="paper1">
               <TabsList className="h-auto w-full justify-start overflow-x-auto rounded-md border border-[#686868] bg-[#181818] p-1">
-                  {LLM_PAPERS.map((paper) => (
-                    <TabsTrigger
-                      key={paper.id}
-                      value={paper.id}
-                      className="shrink-0 rounded-sm border border-[#686868] bg-[#181818] px-3 py-2 text-left text-neutral-300 data-[state=active]:border-[#d93333] data-[state=active]:bg-[#2a1414] data-[state=active]:text-[#fca5a5]"
-                      style={{ fontFamily: 'Inter, sans-serif' }}
-                    >
-                      <div className="flex flex-col items-start">
-                        <span className="text-[12px] uppercase tracking-[0.12em]">
-                          {paper.tabLabel}
-                        </span>
-                        <span className="mt-1 text-[11px] normal-case tracking-normal opacity-80">
-                          {paper.tabDetail}
-                        </span>
-                      </div>
-                    </TabsTrigger>
-                  ))}
-                </TabsList>
+                {LLM_PAPERS.map((paper) => (
+                  <TabsTrigger
+                    key={paper.id}
+                    value={paper.id}
+                    className="shrink-0 rounded-sm border border-[#686868] bg-[#181818] px-3 py-2 text-left text-neutral-300 data-[state=active]:border-[#d93333] data-[state=active]:bg-[#2a1414] data-[state=active]:text-[#fca5a5]"
+                    style={{ fontFamily: "Inter, sans-serif" }}
+                  >
+                    <div className="flex flex-col items-start">
+                      <span className="text-[12px] uppercase tracking-[0.12em]">
+                        {paper.tabLabel}
+                      </span>
+                      <span className="mt-1 text-[11px] normal-case tracking-normal opacity-80">
+                        {paper.tabDetail}
+                      </span>
+                    </div>
+                  </TabsTrigger>
+                ))}
+              </TabsList>
 
               {LLM_PAPERS.map((paper) => (
                 <TabsContent key={paper.id} value={paper.id} className="mt-4">
                   <div className="rounded-md border border-[#686868] bg-[#181818] p-4">
-                      <div
-                        className="text-sm text-neutral-300"
-                        style={{ fontFamily: 'Inter, sans-serif' }}
-                      >
-                        {paper.id === "paper1"
-                          ? "n=12 independent sessions · source: LingBuzz/009799"
-                          : "n=10 sequential turns · source: LingBuzz/009808"}
-                      </div>
+                    <div
+                      className="text-sm text-neutral-300"
+                      style={{ fontFamily: "Inter, sans-serif" }}
+                    >
+                      {paper.id === "paper1"
+                        ? "n=12 independent sessions · source: LingBuzz/009799"
+                        : "n=10 sequential turns · source: LingBuzz/009808"}
+                    </div>
 
-                      <div className="mt-5">
-                        <LlmProviderRows providers={paper.providers} animate={visible} />
-                      </div>
+                    <div className="mt-5">
+                      <LlmProviderRows
+                        providers={paper.providers}
+                        animate={visible}
+                      />
+                    </div>
 
-                      <div className="mt-5 grid gap-3 lg:grid-cols-[1fr_auto]">
-                        <div className="flex items-center gap-2 text-sm text-neutral-100">
-                            <ExternalLink className="h-4 w-4 text-[#d93333]" />
-                            <Link
-                              href={paper.id === "paper1"
-                                ? "https://ling.auf.net/lingbuzz/009799"
-                                : "https://ling.auf.net/lingbuzz/009808"}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="underline-offset-4 hover:underline"
-                            >
-                              {paper.id === "paper1"
-                                ? "Source: LingBuzz/009799"
-                                : "Source: LingBuzz/009808"}
-                            </Link>
-                          </div>
-                        {paper.note ? (
-                          <div className="text-xs text-neutral-300">{paper.note}</div>
-                        ) : null}
+                    <div className="mt-5 grid gap-3 lg:grid-cols-[1fr_auto]">
+                      <div className="flex items-center gap-2 text-sm text-neutral-100">
+                        <ExternalLink className="h-4 w-4 text-[#d93333]" />
+                        <Link
+                          href={
+                            paper.id === "paper1"
+                              ? "https://ling.auf.net/lingbuzz/009799"
+                              : "https://ling.auf.net/lingbuzz/009808"
+                          }
+                          target="_blank"
+                          rel="noreferrer"
+                          className="underline-offset-4 hover:underline"
+                        >
+                          {paper.id === "paper1"
+                            ? "Source: LingBuzz/009799"
+                            : "Source: LingBuzz/009808"}
+                        </Link>
                       </div>
-                      {paper.emphasisNote ? (
-                        <div className="mt-3 text-xs italic text-neutral-300">
-                          {paper.emphasisNote}
+                      {paper.note ? (
+                        <div className="text-xs text-neutral-300">
+                          {paper.note}
                         </div>
                       ) : null}
+                    </div>
+                    {paper.emphasisNote ? (
+                      <div className="mt-3 text-xs italic text-neutral-300">
+                        {paper.emphasisNote}
+                      </div>
+                    ) : null}
                   </div>
                 </TabsContent>
               ))}
@@ -1007,10 +1127,12 @@ function EvalsReferenceTeaser() {
           >
             evals reference
           </div>
-          <div className="text-lg font-semibold text-white">Paper snapshots moved to Evals</div>
+          <div className="text-lg font-semibold text-white">
+            Paper snapshots moved to Evals
+          </div>
           <div className="max-w-[720px] text-sm leading-6 text-neutral-300">
-            Fresh-chat and same-thread paper snapshots now live on the Evals page, next to live scoring,
-            report export, and validation context.
+            Fresh-chat and same-thread paper snapshots now live on the Evals
+            page, next to live scoring, report export, and validation context.
           </div>
         </div>
 
@@ -1029,18 +1151,33 @@ function EvalsReferenceTeaser() {
 function HowItWorksSection() {
   return (
     <section className="rounded-md border border-[#686868] bg-[#232323] p-5">
-      <div className={`${MT.microLabel} text-neutral-300`} style={{ fontFamily: 'Inter, sans-serif' }}>
+      <div
+        className={`${MT.microLabel} text-neutral-300`}
+        style={{ fontFamily: "Inter, sans-serif" }}
+      >
         how it works
       </div>
-      <div className="mt-1 text-lg font-semibold text-white">Three-step scoring loop</div>
+      <div className="mt-1 text-lg font-semibold text-white">
+        Three-step scoring loop
+      </div>
       <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {HOW_IT_WORKS.map((item) => (
-          <div key={item.step} className="rounded-md border border-[#686868] bg-[#181818] p-4">
-            <div className="text-[11px] uppercase tracking-[0.14em] text-[#d93333]" style={{ fontFamily: 'Inter, sans-serif' }}>
+          <div
+            key={item.step}
+            className="rounded-md border border-[#686868] bg-[#181818] p-4"
+          >
+            <div
+              className="text-[11px] uppercase tracking-[0.14em] text-[#d93333]"
+              style={{ fontFamily: "Inter, sans-serif" }}
+            >
               {item.step}
             </div>
-            <div className="mt-2 text-sm font-semibold text-white">{item.title}</div>
-            <div className="mt-2 text-sm leading-6 text-neutral-300">{item.body}</div>
+            <div className="mt-2 text-sm font-semibold text-white">
+              {item.title}
+            </div>
+            <div className="mt-2 text-sm leading-6 text-neutral-300">
+              {item.body}
+            </div>
           </div>
         ))}
       </div>
@@ -1051,14 +1188,21 @@ function HowItWorksSection() {
 function ScientificFoundationSection() {
   return (
     <section className="rounded-md border border-[#686868] bg-[#232323] p-5">
-      <div className={`${MT.microLabel} text-neutral-300`} style={{ fontFamily: 'Inter, sans-serif' }}>
+      <div
+        className={`${MT.microLabel} text-neutral-300`}
+        style={{ fontFamily: "Inter, sans-serif" }}
+      >
         scientific foundation
       </div>
-      <div className="mt-1 text-lg font-semibold text-white">Published references and method posture</div>
+      <div className="mt-1 text-lg font-semibold text-white">
+        Published references and method posture
+      </div>
 
       <div className="mt-5 grid gap-4 lg:grid-cols-2">
         <div className="rounded-md border border-[#686868] bg-[#181818] p-4">
-          <div className="text-sm font-semibold text-white">Published research</div>
+          <div className="text-sm font-semibold text-white">
+            Published research
+          </div>
           <div className="mt-4 space-y-3 text-sm text-neutral-300">
             <Link
               href="https://ling.auf.net/lingbuzz/009799"
@@ -1082,7 +1226,9 @@ function ScientificFoundationSection() {
         </div>
 
         <div className="rounded-md border border-[#686868] bg-[#181818] p-4">
-          <div className="text-sm font-semibold text-white">Methodology checklist</div>
+          <div className="text-sm font-semibold text-white">
+            Methodology checklist
+          </div>
           <div className="mt-4 space-y-2 text-sm text-neutral-300">
             {FOUNDATION_POINTS.map((point) => (
               <div key={point} className="flex items-start gap-3">
@@ -1100,14 +1246,23 @@ function ScientificFoundationSection() {
 function FAQSection() {
   return (
     <section className="rounded-md border border-[#686868] bg-[#232323] p-5">
-      <div className={`${MT.microLabel} text-neutral-300`} style={{ fontFamily: 'Inter, sans-serif' }}>
+      <div
+        className={`${MT.microLabel} text-neutral-300`}
+        style={{ fontFamily: "Inter, sans-serif" }}
+      >
         faq
       </div>
-      <div className="mt-1 text-lg font-semibold text-white">Common questions</div>
+      <div className="mt-1 text-lg font-semibold text-white">
+        Common questions
+      </div>
 
       <Accordion type="single" collapsible className="mt-5">
         {FAQ_ITEMS.map((item) => (
-          <AccordionItem key={item.q} value={item.q} className="border-[#686868]">
+          <AccordionItem
+            key={item.q}
+            value={item.q}
+            className="border-[#686868]"
+          >
             <AccordionTrigger className="py-4 text-left text-sm text-white hover:no-underline">
               {item.q}
             </AccordionTrigger>
@@ -1128,7 +1283,11 @@ function StickyNav() {
       style={{ background: "#111111" }}
     >
       <div className="mx-auto flex h-12 w-full max-w-7xl items-center justify-between px-6">
-        <Link href="/" aria-label="ZË-RO home" className="inline-flex items-center">
+        <Link
+          href="/"
+          aria-label="ZË-RO home"
+          className="inline-flex items-center"
+        >
           <Image
             src="/zero_logo_dark_nav.svg"
             alt="ZË-RO"
@@ -1155,11 +1314,12 @@ function Footer() {
     <footer className="rounded-md border border-[#686868] bg-[#232323] px-5 py-4">
       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div className="text-sm text-neutral-300">
-          ZË-RO — deterministic vowel-aperture grounding probe. Built by Sokol Gora.
+          ZË-RO — deterministic vowel-aperture grounding probe. Built by Sokol
+          Gora.
         </div>
         <div
           className="flex flex-wrap items-center gap-4 text-[12px] uppercase tracking-[0.14em] text-neutral-300"
-          style={{ fontFamily: 'Inter, sans-serif' }}
+          style={{ fontFamily: "Inter, sans-serif" }}
         >
           <span>deterministic instrument</span>
           <span>paper evidence in evals</span>
@@ -1179,17 +1339,19 @@ export function LandingPageV0_2() {
         className="min-h-screen w-full text-white"
         style={{
           background: COLORS.bg,
-          fontFamily: 'Inter, sans-serif',
+          fontFamily: "Inter, sans-serif",
         }}
       >
-
         <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-6 md:px-6 lg:px-8">
-
           <StatsTicker />
           <ApertureBar mounted={mounted} />
           <HeroSection mounted={mounted} />
           <BaselineGrid />
-          {SHOW_LLM_RESULTS_ON_LANDING ? <LlmResultsSection /> : <EvalsReferenceTeaser />}
+          {SHOW_LLM_RESULTS_ON_LANDING ? (
+            <LlmResultsSection />
+          ) : (
+            <EvalsReferenceTeaser />
+          )}
           <HowItWorksSection />
           <ScientificFoundationSection />
           <FAQSection />

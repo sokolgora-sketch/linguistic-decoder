@@ -13,12 +13,12 @@ const ALLOW_HEX_FILES = new Set<string>([
 
 const FORBIDDEN_HEX = [
   "#EF4444",
-  "#F59E0B",
   "#EAB308",
-  "#10B981",
+  "#C026D3",
+  "#F97316",
   "#3B82F6",
-  "#6366F1",
-  "#8B5CF6",
+  "#4F46E5",
+  "#22C55E",
 ];
 
 const EXT_OK = new Set([".ts", ".tsx", ".js", ".jsx"]);
@@ -32,7 +32,13 @@ function walk(dirAbs: string): string[] {
     const p = path.join(dirAbs, e.name);
     if (e.isDirectory()) {
       // skip common noise
-      if (e.name === "node_modules" || e.name === ".next" || e.name === "dist" || e.name === ".git") continue;
+      if (
+        e.name === "node_modules" ||
+        e.name === ".next" ||
+        e.name === "dist" ||
+        e.name === ".git"
+      )
+        continue;
       out.push(...walk(p));
     } else if (e.isFile()) {
       if (EXT_OK.has(path.extname(p))) out.push(p);
