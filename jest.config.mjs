@@ -24,6 +24,8 @@ const customJestConfig = {
   testPathIgnorePatterns: [
     "<rootDir>/tests/apiAnalyzeV1\\.(evidence\\.smoke\\.curl|stability\\.repeat\\.smoke)\\.spec\\.ts$",
   ],
+  modulePathIgnorePatterns: ["<rootDir>/.firebase/"],
+  watchPathIgnorePatterns: ["<rootDir>/.firebase/"],
 };
 
 export default createJestConfig(customJestConfig);
