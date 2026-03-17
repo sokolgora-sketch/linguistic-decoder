@@ -10,12 +10,12 @@ export const SYMBOLIC_ORDER_V0_1 = VOICES_V0_1;
 // Color doctrine (rainbow ladder)
 export const COLORS_BY_VOICE_V0_1: Record<VowelVoice, string> = {
   A: "Red",
-  E: "Orange",
-  I: "Yellow",
-  O: "Green",
+  E: "Yellow",
+  I: "Violet",
+  O: "Orange",
   U: "Blue",
   Y: "Indigo",
-  Ë: "Violet",
+  Ë: "Green",
 } as const;
 
 /**
@@ -23,13 +23,13 @@ export const COLORS_BY_VOICE_V0_1: Record<VowelVoice, string> = {
  * Uses existing palette already present in the repo (pre-doctrine voiceColors.ts).
  */
 export const COLORS_HEX_BY_VOICE_V0_1: Record<VowelVoice, string> = {
-  A: "#EF4444", // red
-  E: "#F59E0B", // orange
-  I: "#EAB308", // yellow
-  O: "#10B981", // green
-  U: "#3B82F6", // blue
-  Y: "#6366F1", // indigo
-  "Ë": "#8B5CF6", // violet
+  A: "#EF4444",
+  E: "#EAB308",
+  I: "#C026D3",
+  O: "#F97316",
+  U: "#3B82F6",
+  Y: "#4F46E5",
+  Ë: "#22C55E",
 } as const;
 
 /**
@@ -42,7 +42,7 @@ export const LABELS_BY_VOICE_V0_1: Record<VowelVoice, string> = {
   O: "Balance / Heart / Mediator",
   U: "Unity / Field",
   Y: "Network Integrity",
-  "Ë": "Evolution / Completion",
+  Ë: "Evolution / Completion",
 } as const;
 
 // Notes doctrine (symbolic correspondence; NOT acoustic truth)
@@ -60,14 +60,17 @@ export const NOTES_BY_VOICE_V0_1: Record<VowelVoice, string> = {
  * Musical notes (ABC) correspondence used by Seven Principles Law.
  * (Symbolic mapping; not acoustic truth.)
  */
-export const NOTES_ABC_BY_VOICE_V0_1: Record<VowelVoice, "C"|"D"|"E"|"F"|"G"|"A"|"B"> = {
+export const NOTES_ABC_BY_VOICE_V0_1: Record<
+  VowelVoice,
+  "C" | "D" | "E" | "F" | "G" | "A" | "B"
+> = {
   A: "C",
   E: "D",
   I: "E",
   O: "F",
   U: "G",
   Y: "A",
-  "Ë": "B",
+  Ë: "B",
 } as const;
 
 // Project principles (your modern set, locked as symbolic doctrine)
@@ -91,7 +94,7 @@ export type PrinciplesSetKeyV0_1 = keyof typeof PRINCIPLES_SETS_V0_1;
 export const DEFAULT_PRINCIPLES_SET_KEY_V0_1: PrinciplesSetKeyV0_1 = "modern";
 
 export function getPrinciplesByVoiceV0_1(
-  key: PrinciplesSetKeyV0_1 = DEFAULT_PRINCIPLES_SET_KEY_V0_1
+  key: PrinciplesSetKeyV0_1 = DEFAULT_PRINCIPLES_SET_KEY_V0_1,
 ): Record<VowelVoice, string> {
   return PRINCIPLES_SETS_V0_1[key];
 }
