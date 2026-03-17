@@ -6,6 +6,7 @@ import Image from "next/image";
 import { MT } from "@/ui/typography/marketingType.v0.1";
 
 import { EVAL_SPEC_V0_1 } from "@/shared/evals/spec.v0.1";
+import { getSpearmanDiagnosisMeta } from "@/shared/evals/getSpearmanDiagnosis.v0.1";
 import type {
   EvalReportBundleV0_1,
   EvalTaskReportV0_1,
@@ -2078,51 +2079,26 @@ export function EvalsPageClientV0_1() {
                 {(() => {
                   if (typeof summarySpearman !== "number") return null;
 
-                  const diagnosisKind =
-                    summarySpearman > 0
-                      ? "inversion"
-                      : summarySpearman <= -0.7
-                        ? "stable"
-                        : "weak";
-
-                  const diagnosisLabel =
-                    diagnosisKind === "inversion"
-                      ? "Order inverted"
-                      : diagnosisKind === "weak"
-                        ? "Weak alignment"
-                        : "Aligned";
-
-                  const diagnosisColor =
-                    diagnosisKind === "inversion"
-                      ? "#f87171"
-                      : diagnosisKind === "weak"
-                        ? "#f59e0b"
-                        : "#22c55e";
-
-                  const diagnosisHint =
-                    diagnosisKind === "inversion"
-                      ? "Spearman ρ is above zero, so the output reverses the expected negative aperture order."
-                      : diagnosisKind === "weak"
-                        ? "Spearman ρ is not yet negative enough for strong monotonic alignment."
-                        : "Spearman ρ is strongly negative, so the bucket order is aligned with the expected aperture slope.";
+                  const diagnosis = getSpearmanDiagnosisMeta(summarySpearman);
+                  if (!diagnosis) return null;
 
                   return (
                     <div
                       className="mt-5 flex flex-wrap items-center gap-4 rounded-[12px] border border-[#3a3a3a] bg-[#161616] px-5 py-5 shadow-[0_8px_24px_rgba(0,0,0,0.14)]"
-                      title={diagnosisHint}
+                      title={diagnosis.hint}
                     >
                       <span
                         className="inline-block h-[8px] w-[8px] rounded-full"
-                        style={{ backgroundColor: diagnosisColor }}
+                        style={{ backgroundColor: diagnosis.color }}
                       />
                       <span
                         className={MT.statKey}
-                        style={{ color: diagnosisColor }}
+                        style={{ color: diagnosis.color }}
                       >
-                        {diagnosisLabel}
+                        {diagnosis.label}
                       </span>
                       <span className={`${MT.helper} text-[#ebebeb]`}>
-                        {diagnosisHint}
+                        {diagnosis.hint}
                       </span>
                     </div>
                   );
