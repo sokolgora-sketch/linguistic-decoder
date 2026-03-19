@@ -2347,6 +2347,40 @@ export function EvalsPageClientV0_1() {
                   </span>
                 </span>
               </div>
+              <div
+                className={`mt-2 flex flex-wrap items-center gap-x-6 gap-y-3 ${MT.markdownMeta} text-[#d0d0d0]`}
+              >
+                <span>
+                  sourceEngineId:{" "}
+                  <span
+                    className={`font-mono ${report.meta?.sourceEngineId?.trim() ? "text-[#f2f2f2]" : "text-[#8f8f8f]"}`}
+                  >
+                    {report.meta?.sourceEngineId?.trim()
+                      ? report.meta.sourceEngineId
+                      : "not set"}
+                  </span>
+                </span>
+                <span>
+                  sourceEngineVersion:{" "}
+                  <span
+                    className={`font-mono ${report.meta?.sourceEngineVersion?.trim() ? "text-[#f2f2f2]" : "text-[#8f8f8f]"}`}
+                  >
+                    {report.meta?.sourceEngineVersion?.trim()
+                      ? report.meta.sourceEngineVersion
+                      : "not set"}
+                  </span>
+                </span>
+                <span>
+                  sourceEngineBuild:{" "}
+                  <span
+                    className={`font-mono ${report.meta?.sourceEngineBuild?.trim() ? "text-[#f2f2f2]" : "text-[#8f8f8f]"}`}
+                  >
+                    {report.meta?.sourceEngineBuild?.trim()
+                      ? report.meta.sourceEngineBuild
+                      : "not set"}
+                  </span>
+                </span>
+              </div>
 
               <div className="mt-5 rounded-[10px] border border-[#2f2f2f] bg-[#101010] px-5 py-5">
                 <div className={`${MT.sectionLabel} text-[#dfdfdf]`}>

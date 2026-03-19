@@ -17,6 +17,9 @@
 - provider: synthetic
 - model: none
 - label: calibration
+- sourceEngineId: not set
+- sourceEngineVersion: not set
+- sourceEngineBuild: not set
 
 Aperture proxy (fixed): A=1.0, O=0.8, E=0.6, Ë=0.5, U=0.4, Y=0.3, I=0.1.
 

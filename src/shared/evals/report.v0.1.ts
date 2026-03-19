@@ -13,8 +13,8 @@ export type BucketReportV0_1 = {
   invalidN: number;
   duplicateN: number;
 
-  mean_aperturePrimary: number;        // NaN if no valid
-  mean_aperturePresenceMean: number;   // NaN if no valid
+  mean_aperturePrimary: number; // NaN if no valid
+  mean_aperturePresenceMean: number; // NaN if no valid
 };
 
 export type SlopeReportV0_1 = {
@@ -71,6 +71,9 @@ export type EvalReportBundleV0_1 = {
     provider?: string;
     model?: string;
     label?: string;
+    sourceEngineId?: string;
+    sourceEngineVersion?: string;
+    sourceEngineBuild?: string;
   };
 
   tasks: EvalTaskReportV0_1[];

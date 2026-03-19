@@ -3,7 +3,12 @@ import { createHash } from "node:crypto";
 // EVALS-5 — Markdown renderer v0.1
 // Used by baseline-lock runner. Deterministic formatting.
 
-import type { EvalReportBundleV0_1, EvalTaskReportV0_1, BucketReportV0_1, SlopeReportV0_1 } from "./report.v0.1";
+import type {
+  EvalReportBundleV0_1,
+  EvalTaskReportV0_1,
+  BucketReportV0_1,
+  SlopeReportV0_1,
+} from "./report.v0.1";
 
 function fmt(x: number, d = 3): string {
   if (!Number.isFinite(x)) return "NaN";
@@ -26,7 +31,13 @@ function fmtMetaText(x: unknown): string {
 }
 
 function renderSlope(label: string, s: SlopeReportV0_1 | null): string[] {
-  if (!s) return [`### Slope — ${label}`, "", "_not computed (needs >= 2 buckets)_", ""];
+  if (!s)
+    return [
+      `### Slope — ${label}`,
+      "",
+      "_not computed (needs >= 2 buckets)_",
+      "",
+    ];
   return [
     `### Slope — ${label}`,
     "",
@@ -39,11 +50,13 @@ function renderSlope(label: string, s: SlopeReportV0_1 | null): string[] {
 
 function renderBuckets(buckets: BucketReportV0_1[]): string[] {
   const lines: string[] = [];
-  lines.push("| Bucket | expectedN | providedN | validN | invalidN | dupN | mean(primary) | mean(presenceMean) |");
+  lines.push(
+    "| Bucket | expectedN | providedN | validN | invalidN | dupN | mean(primary) | mean(presenceMean) |",
+  );
   lines.push("|---|---:|---:|---:|---:|---:|---:|---:|");
   for (const b of buckets) {
     lines.push(
-      `| ${b.bucket} | ${b.expectedN} | ${b.providedN} | ${b.validN} | ${b.invalidN} | ${b.duplicateN} | ${fmt(b.mean_aperturePrimary)} | ${fmt(b.mean_aperturePresenceMean)} |`
+      `| ${b.bucket} | ${b.expectedN} | ${b.providedN} | ${b.validN} | ${b.invalidN} | ${b.duplicateN} | ${fmt(b.mean_aperturePrimary)} | ${fmt(b.mean_aperturePresenceMean)} |`,
     );
   }
   return lines;
@@ -65,7 +78,9 @@ function renderTask(t: EvalTaskReportV0_1): string[] {
   lines.push("");
 
   lines.push(...renderSlope("aperturePrimary", t.slope_aperturePrimary));
-  lines.push(...renderSlope("aperturePresenceMean", t.slope_aperturePresenceMean));
+  lines.push(
+    ...renderSlope("aperturePresenceMean", t.slope_aperturePresenceMean),
+  );
 
   lines.push("### Diagnostics");
   lines.push("");
@@ -74,9 +89,13 @@ function renderTask(t: EvalTaskReportV0_1): string[] {
   lines.push(`- emptyTokenCount: ${t.diagnostics.emptyTokenCount}`);
   lines.push(`- whitespaceTokenCount: ${t.diagnostics.whitespaceTokenCount}`);
   lines.push(`- noVowelTokenCount: ${t.diagnostics.noVowelTokenCount}`);
-  lines.push(`- totalInvalidTokenCount: ${t.diagnostics.totalInvalidTokenCount}`);
+  lines.push(
+    `- totalInvalidTokenCount: ${t.diagnostics.totalInvalidTokenCount}`,
+  );
   if (t.diagnostics.notes.length) {
-    lines.push(`- notes: ${t.diagnostics.notes.map((x) => String(x)).join(" | ")}`);
+    lines.push(
+      `- notes: ${t.diagnostics.notes.map((x) => String(x)).join(" | ")}`,
+    );
   } else {
     lines.push(`- notes: (none)`);
   }
@@ -102,7 +121,8 @@ function taskVersionFromTaskIdV0_1(taskId: string): string {
 }
 
 function promptHashFromTaskIdV0_1(taskId: string): string {
-  const prompt = EVAL_SPEC_V0_1.tasks.find((t) => t.taskId === taskId)?.prompt ?? "";
+  const prompt =
+    EVAL_SPEC_V0_1.tasks.find((t) => t.taskId === taskId)?.prompt ?? "";
   return String(prompt).trim()
     ? createHash("sha256").update(prompt).digest("hex")
     : "not available";
@@ -112,13 +132,17 @@ type RenderEvalReportMdOptionsV0_1 = {
   exportedAtUtc?: string;
 };
 
-export function renderEvalReportMdV0_1(report: EvalReportBundleV0_1, opts: RenderEvalReportMdOptionsV0_1 = {}): string {
+export function renderEvalReportMdV0_1(
+  report: EvalReportBundleV0_1,
+  opts: RenderEvalReportMdOptionsV0_1 = {},
+): string {
   const lines: string[] = [];
   lines.push(`# ZË-RO Evals Report v0.1`);
   lines.push("");
   lines.push(`- evalSpecVersion: ${report.evalSpecVersion}`);
 
-  const devicePlateTask = report.tasks.find((t) => t.kind === "byo") ?? report.tasks[0];
+  const devicePlateTask =
+    report.tasks.find((t) => t.kind === "byo") ?? report.tasks[0];
 
   const devicePlateTaskId =
     typeof (devicePlateTask as any)?.taskId === "string"
@@ -159,12 +183,14 @@ export function renderEvalReportMdV0_1(report: EvalReportBundleV0_1, opts: Rende
     "unknown";
 
   const scorerBuild =
-    scorerBuildRaw === "unknown" ? "unknown" : String(scorerBuildRaw).trim().slice(0, 7);
+    scorerBuildRaw === "unknown"
+      ? "unknown"
+      : String(scorerBuildRaw).trim().slice(0, 7);
 
   lines.push(`- engineVersion: scoreEvalRun.v0.1`);
-    const exportedAtUtc = String(opts.exportedAtUtc ?? "—");
+  const exportedAtUtc = String(opts.exportedAtUtc ?? "—");
 
-lines.push(`- taskId: ${devicePlateTaskId}`);
+  lines.push(`- taskId: ${devicePlateTaskId}`);
   lines.push(`- taskVersion: ${taskVersionFromTaskIdV0_1(devicePlateTaskId)}`);
   lines.push(`- promptHash: ${promptHashFromTaskIdV0_1(devicePlateTaskId)}`);
   lines.push(`- exportedAtUtc: ${exportedAtUtc}`);
@@ -180,9 +206,18 @@ lines.push(`- taskId: ${devicePlateTaskId}`);
     lines.push(`- provider: ${fmtMetaText(report.meta.provider)}`);
     lines.push(`- model: ${fmtMetaText(report.meta.model)}`);
     lines.push(`- label: ${fmtMetaText(report.meta.label)}`);
+    lines.push(`- sourceEngineId: ${fmtMetaText(report.meta.sourceEngineId)}`);
+    lines.push(
+      `- sourceEngineVersion: ${fmtMetaText(report.meta.sourceEngineVersion)}`,
+    );
+    lines.push(
+      `- sourceEngineBuild: ${fmtMetaText(report.meta.sourceEngineBuild)}`,
+    );
   }
   lines.push("");
-  lines.push("Aperture proxy (fixed): A=1.0, O=0.8, E=0.6, Ë=0.5, U=0.4, Y=0.3, I=0.1.");
+  lines.push(
+    "Aperture proxy (fixed): A=1.0, O=0.8, E=0.6, Ë=0.5, U=0.4, Y=0.3, I=0.1.",
+  );
   lines.push("");
 
   for (const t of report.tasks) {
