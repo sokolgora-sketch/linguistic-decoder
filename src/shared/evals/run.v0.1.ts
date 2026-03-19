@@ -20,6 +20,9 @@ export type EvalRunBundleV0_1 = {
     provider?: string;
     model?: string;
     label?: string;
+    sourceEngineId?: string;
+    sourceEngineVersion?: string;
+    sourceEngineBuild?: string;
   };
   tasks: EvalRunTaskPayloadV0_1[];
 };
@@ -39,13 +42,18 @@ function asString(x: unknown, path: string): string {
 
 function asStringArray(x: unknown, path: string): string[] {
   assert(Array.isArray(x), `${path}: expected array`);
-  x.forEach((v, i) => assert(typeof v === "string", `${path}[${i}]: expected string`));
+  x.forEach((v, i) =>
+    assert(typeof v === "string", `${path}[${i}]: expected string`),
+  );
   return x as string[];
 }
 
 function asBucketId(x: unknown, path: string): BucketId {
   const s = asString(x, path);
-  assert((BUCKETS_V0_1 as string[]).includes(s), `${path}: invalid bucket '${s}'`);
+  assert(
+    (BUCKETS_V0_1 as string[]).includes(s),
+    `${path}: invalid bucket '${s}'`,
+  );
   return s as BucketId;
 }
 
@@ -53,13 +61,25 @@ export function parseEvalRunBundleV0_1(input: unknown): EvalRunBundleV0_1 {
   assert(isRecord(input), "run: expected object");
 
   const evalRunVersion = asString(input.evalRunVersion, "run.evalRunVersion");
-  assert(evalRunVersion === "evalRun.v0.1", "run.evalRunVersion: expected 'evalRun.v0.1'");
+  assert(
+    evalRunVersion === "evalRun.v0.1",
+    "run.evalRunVersion: expected 'evalRun.v0.1'",
+  );
 
-  const evalSpecVersion = asString(input.evalSpecVersion, "run.evalSpecVersion");
-  assert(evalSpecVersion === "evalSpec.v0.1", "run.evalSpecVersion: expected 'evalSpec.v0.1'");
+  const evalSpecVersion = asString(
+    input.evalSpecVersion,
+    "run.evalSpecVersion",
+  );
+  assert(
+    evalSpecVersion === "evalSpec.v0.1",
+    "run.evalSpecVersion: expected 'evalSpec.v0.1'",
+  );
 
   const specId = asString(input.specId, "run.specId");
-  assert(specId === "public-grounding-probe.v0.1", "run.specId: expected 'public-grounding-probe.v0.1'");
+  assert(
+    specId === "public-grounding-probe.v0.1",
+    "run.specId: expected 'public-grounding-probe.v0.1'",
+  );
 
   const runId = asString(input.runId, "run.runId");
   assert(runId.trim().length > 0, "run.runId: must be non-empty");
@@ -70,9 +90,26 @@ export function parseEvalRunBundleV0_1(input: unknown): EvalRunBundleV0_1 {
     assert(isRecord(input.meta), "run.meta: expected object");
     const m = input.meta;
     meta = {
-      provider: m.provider === undefined ? undefined : asString(m.provider, "run.meta.provider"),
-      model: m.model === undefined ? undefined : asString(m.model, "run.meta.model"),
-      label: m.label === undefined ? undefined : asString(m.label, "run.meta.label"),
+      provider:
+        m.provider === undefined
+          ? undefined
+          : asString(m.provider, "run.meta.provider"),
+      model:
+        m.model === undefined ? undefined : asString(m.model, "run.meta.model"),
+      label:
+        m.label === undefined ? undefined : asString(m.label, "run.meta.label"),
+      sourceEngineId:
+        m.sourceEngineId === undefined
+          ? undefined
+          : asString(m.sourceEngineId, "run.meta.sourceEngineId"),
+      sourceEngineVersion:
+        m.sourceEngineVersion === undefined
+          ? undefined
+          : asString(m.sourceEngineVersion, "run.meta.sourceEngineVersion"),
+      sourceEngineBuild:
+        m.sourceEngineBuild === undefined
+          ? undefined
+          : asString(m.sourceEngineBuild, "run.meta.sourceEngineBuild"),
     };
   }
 
@@ -81,7 +118,10 @@ export function parseEvalRunBundleV0_1(input: unknown): EvalRunBundleV0_1 {
     assert(isRecord(t), `run.tasks[${i}]: expected object`);
     const taskId = asString(t.taskId, `run.tasks[${i}].taskId`);
     const inputShape = asString(t.inputShape, `run.tasks[${i}].inputShape`);
-    assert(inputShape === "bucketed_single_tokens", `run.tasks[${i}].inputShape: expected 'bucketed_single_tokens'`);
+    assert(
+      inputShape === "bucketed_single_tokens",
+      `run.tasks[${i}].inputShape: expected 'bucketed_single_tokens'`,
+    );
 
     assert(isRecord(t.buckets), `run.tasks[${i}].buckets: expected object`);
     const bucketsRaw = t.buckets;

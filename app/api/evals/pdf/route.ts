@@ -11,21 +11,23 @@ export const runtime = "nodejs";
 
 type ApiErr = {
   ok: false;
-  code: "BAD_JSON" | "PAYLOAD_TOO_LARGE" | "INVALID_RUN" | "PDF_RENDER_FAILED" | "INTERNAL_ERROR";
+  code:
+    | "BAD_JSON"
+    | "PAYLOAD_TOO_LARGE"
+    | "INVALID_RUN"
+    | "PDF_RENDER_FAILED"
+    | "INTERNAL_ERROR";
   message: string;
 };
 
 function err(code: ApiErr["code"], message: string, status = 400) {
-  return NextResponse.json(
-    { ok: false, code, message } satisfies ApiErr,
-    {
-      status,
-      headers: {
-        "cache-control": "no-store",
-        "content-type": "application/json",
-      },
-    }
-  );
+  return NextResponse.json({ ok: false, code, message } satisfies ApiErr, {
+    status,
+    headers: {
+      "cache-control": "no-store",
+      "content-type": "application/json",
+    },
+  });
 }
 
 function safeFilename(input: string): string {
@@ -50,7 +52,7 @@ function pdfSafeText(input: string): string {
   const s = String(input ?? "");
 
   const map: Record<string, string> = {
-    "ρ": "rho",
+    ρ: "rho",
     "—": "-",
     "–": "-",
     "→": "->",
@@ -187,7 +189,7 @@ type TrendPoint = { bucket: string; meanPrimary: number };
 function extractT2TrendFromMarkdown(md: string): TrendPoint[] {
   const lines = String(md ?? "").split(/\r?\n/g);
   const start = lines.findIndex(
-    (line) => line.trim() === "## T2_LADDER_V0_1 — Full Ladder — V1..V7"
+    (line) => line.trim() === "## T2_LADDER_V0_1 — Full Ladder — V1..V7",
   );
   if (start < 0) return [];
 
@@ -198,7 +200,7 @@ function extractT2TrendFromMarkdown(md: string): TrendPoint[] {
 
     const m =
       /^\|\s*(V[1-7])\s*\|\s*\d+\s*\|\s*\d+\s*\|\s*\d+\s*\|\s*\d+\s*\|\s*\d+\s*\|\s*([0-9.]+)\s*\|\s*([0-9.]+)\s*\|$/.exec(
-        line
+        line,
       );
 
     if (m) {
@@ -214,8 +216,9 @@ function extractT2TrendFromMarkdown(md: string): TrendPoint[] {
 
 function trendPointColor(bucket: string) {
   if (bucket === "V4") return rgb(0.95, 0.78, 0.18);
-  if (bucket === "V5" || bucket === "V6" || bucket === "V7") return rgb(0.94, 0.44, 0.44);
-  return rgb(0.28, 0.82, 0.50);
+  if (bucket === "V5" || bucket === "V6" || bucket === "V7")
+    return rgb(0.94, 0.44, 0.44);
+  return rgb(0.28, 0.82, 0.5);
 }
 
 function drawDashedLine(params: {
@@ -275,7 +278,10 @@ function drawPolyline(params: {
   }
 }
 
-async function appendTrendChartPage(pdfBytes: Uint8Array, md: string): Promise<Uint8Array> {
+async function appendTrendChartPage(
+  pdfBytes: Uint8Array,
+  md: string,
+): Promise<Uint8Array> {
   const trend = extractT2TrendFromMarkdown(md);
   if (trend.length !== 7) return pdfBytes;
 
@@ -376,7 +382,7 @@ async function appendTrendChartPage(pdfBytes: Uint8Array, md: string): Promise<U
     page,
     points,
     thickness: 2.2,
-    color: rgb(0.96, 0.66, 0.70),
+    color: rgb(0.96, 0.66, 0.7),
   });
 
   drawDashedLine({
@@ -444,12 +450,18 @@ async function appendTrendChartPage(pdfBytes: Uint8Array, md: string): Promise<U
 }
 
 function extractMdFrontMatterValue(md: string, key: string): string {
-  const escaped = key.replace(/[.*+?^${}()|[\]\\]/g, "\\export async function POST(req: Request) {");
+  const escaped = key.replace(
+    /[.*+?^${}()|[\]\\]/g,
+    "\\export async function POST(req: Request) {",
+  );
   const m = new RegExp("^- " + escaped + ":\\s*(.+)$", "m").exec(md);
   return m ? m[1].trim() : "—";
 }
 
-async function stampPdfProvenanceFooter(pdfBytes: Uint8Array, md: string): Promise<Uint8Array> {
+async function stampPdfProvenanceFooter(
+  pdfBytes: Uint8Array,
+  md: string,
+): Promise<Uint8Array> {
   const pdf = await PDFDocument.load(pdfBytes);
   const font = await pdf.embedFont(StandardFonts.Helvetica);
 
@@ -458,6 +470,10 @@ async function stampPdfProvenanceFooter(pdfBytes: Uint8Array, md: string): Promi
   const taskId = extractMdFrontMatterValue(md, "taskId");
   const taskVersion = extractMdFrontMatterValue(md, "taskVersion");
   const scorerBuild = extractMdFrontMatterValue(md, "scorerBuild");
+  const sourceEngineVersion = extractMdFrontMatterValue(
+    md,
+    "sourceEngineVersion",
+  );
   const exportedAtUtc = extractMdFrontMatterValue(md, "exportedAtUtc");
   const exportedAtUtcCompact =
     exportedAtUtc === "—"
@@ -467,7 +483,10 @@ async function stampPdfProvenanceFooter(pdfBytes: Uint8Array, md: string): Promi
   const seedPrimary = extractMdFrontMatterValue(md, "seedPrimary");
   const seedPresenceMean = extractMdFrontMatterValue(md, "seedPresenceMean");
   const permItersPrimary = extractMdFrontMatterValue(md, "permItersPrimary");
-  const permItersPresenceMean = extractMdFrontMatterValue(md, "permItersPresenceMean");
+  const permItersPresenceMean = extractMdFrontMatterValue(
+    md,
+    "permItersPresenceMean",
+  );
   const promptHash = extractMdFrontMatterValue(md, "promptHash");
   const promptHashShort =
     promptHash === "—" || promptHash === "not available"
@@ -487,16 +506,18 @@ async function stampPdfProvenanceFooter(pdfBytes: Uint8Array, md: string): Promi
       taskVersion;
 
     const footer2 =
-          "utc " +
-          exportedAtUtcCompact +
-          " · seedPrimary " +
-          seedPrimary +
-          " · iters " +
-          permItersPrimary +
-          "/" +
-          permItersPresenceMean +
-          " · promptHash " +
-          promptHashShort;
+      "utc " +
+      exportedAtUtcCompact +
+      " · seedPrimary " +
+      seedPrimary +
+      " · iters " +
+      permItersPrimary +
+      "/" +
+      permItersPresenceMean +
+      " · sourceEngineVersion " +
+      sourceEngineVersion +
+      " · promptHash " +
+      promptHashShort;
 
     page.drawLine({
       start: { x: 36, y: 28 },
@@ -532,7 +553,11 @@ export async function POST(req: Request) {
     const MAX_BYTES = 300_000; // 300 KB
     const rawBytes = Buffer.byteLength(raw, "utf8");
     if (rawBytes > MAX_BYTES) {
-      return err("PAYLOAD_TOO_LARGE", `Payload too large (${rawBytes} bytes; max ${MAX_BYTES} bytes).`, 413);
+      return err(
+        "PAYLOAD_TOO_LARGE",
+        `Payload too large (${rawBytes} bytes; max ${MAX_BYTES} bytes).`,
+        413,
+      );
     }
 
     let json: unknown;
@@ -546,7 +571,12 @@ export async function POST(req: Request) {
     try {
       run = parseEvalRunBundleV0_1(json);
     } catch (e) {
-      return err("INVALID_RUN", ((e as Error)?.message ?? "Invalid eval run bundle.") + " Hint: expected run.evalRunVersion=\"evalRun.v0.1\" and run.evalSpecVersion=\"evalSpec.v0.1\". If you pasted a Corpus70 meta JSON (version/allowedTags/tags), that is NOT an eval run bundle.", 400);
+      return err(
+        "INVALID_RUN",
+        ((e as Error)?.message ?? "Invalid eval run bundle.") +
+          ' Hint: expected run.evalRunVersion="evalRun.v0.1" and run.evalSpecVersion="evalSpec.v0.1". If you pasted a Corpus70 meta JSON (version/allowedTags/tags), that is NOT an eval run bundle.',
+        400,
+      );
     }
 
     const report = scoreEvalRunBundleV0_1({ spec: EVAL_SPEC_V0_1, run });
@@ -561,9 +591,13 @@ export async function POST(req: Request) {
         pdfBytes = await renderPdfFromText(pdfSafeText(md));
       }
       pdfBytes = await appendTrendChartPage(pdfBytes, md);
-        pdfBytes = await stampPdfProvenanceFooter(pdfBytes, md);
+      pdfBytes = await stampPdfProvenanceFooter(pdfBytes, md);
     } catch (e) {
-      return err("PDF_RENDER_FAILED", (e as Error)?.message ?? "PDF render failed.", 500);
+      return err(
+        "PDF_RENDER_FAILED",
+        (e as Error)?.message ?? "PDF render failed.",
+        500,
+      );
     }
 
     const fname = `evals.${safeFilename(report.runId)}.v0.1.pdf`;
@@ -581,6 +615,10 @@ export async function POST(req: Request) {
       },
     });
   } catch (e) {
-    return err("INTERNAL_ERROR", (e as Error)?.message ?? "Unknown error.", 500);
+    return err(
+      "INTERNAL_ERROR",
+      (e as Error)?.message ?? "Unknown error.",
+      500,
+    );
   }
 }
