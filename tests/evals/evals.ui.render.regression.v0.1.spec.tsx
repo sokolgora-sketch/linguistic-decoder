@@ -29,7 +29,9 @@ describe("Evals UI rendered mode regression v0.1", () => {
     expect(getTaskSelect()).toBeDisabled();
 
     expect(
-      screen.getByText("Task comes from bundle. This selector is only used when wrapping buckets-only JSON.")
+      screen.getByText(
+        "Task comes from bundle. This selector is only used when wrapping buckets-only JSON."
+      )
     ).toBeInTheDocument();
 
     expect(
@@ -43,6 +45,18 @@ describe("Evals UI rendered mode regression v0.1", () => {
     expect(
       screen.getByText(
         "Full run bundle mode expects task provenance to come from the uploaded evalRun.v0.1 bundle. Switch to Buckets only mode to copy a ZË-RO task prompt."
+      )
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByText(
+        "Optional report metadata. sourceEngine* is only for upstream ZË-RO engine provenance when this input already came from another engine/export."
+      )
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByText(
+        "Leave sourceEngine* blank for hand-pasted buckets, external model outputs, or synthetic examples. The scorer shows its own build below, but it cannot infer upstream engine details by itself."
       )
     ).toBeInTheDocument();
   });

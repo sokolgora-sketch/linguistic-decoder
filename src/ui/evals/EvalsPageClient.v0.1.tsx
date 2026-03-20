@@ -1659,7 +1659,7 @@ export function EvalsPageClientV0_1() {
               Run metadata
             </div>
             <div className={`${MT.helper} text-[#a9a9a9]`}>
-              Optional provenance fields shown in the report header and exports.
+              Optional report metadata. sourceEngine* is only for upstream ZË-RO engine provenance when this input already came from another engine/export.
             </div>
           </div>
 
@@ -1704,6 +1704,11 @@ export function EvalsPageClientV0_1() {
                 placeholder="e.g. fresh-chat"
               />
             </div>
+              <div className="md:col-span-2 xl:col-span-4 rounded-[8px] border border-[#2f3b46] bg-[#12181d] px-4 py-3">
+                <div className={`${MT.helper} text-[#b8c7d9]`}>
+                  Leave sourceEngine* blank for hand-pasted buckets, external model outputs, or synthetic examples. The scorer shows its own build below, but it cannot infer upstream engine details by itself.
+                </div>
+              </div>
 
             <div>
               <label className={`${MT.fieldLabel} text-[#ededed]`}>
@@ -2057,14 +2062,14 @@ export function EvalsPageClientV0_1() {
                       Run context
                     </span>
                     <span className="rounded-full border border-[#3f3f3f] bg-[#0f0f0f] px-3 py-1.5 text-[#d7d7d7]">
-                      sourceEngineVersion{" "}
-                      <span
-                        className={`font-mono ${report.meta?.sourceEngineVersion?.trim() ? "text-white" : "text-[#8f8f8f]"}`}
-                      >
-                        {report.meta?.sourceEngineVersion?.trim()
-                          ? report.meta.sourceEngineVersion
-                          : "not set"}
-                      </span>
+                      upstreamEngine{" "}
+                        <span
+                          className={`font-mono ${report.meta?.sourceEngineVersion?.trim() ? "text-white" : "text-[#8f8f8f]"}`}
+                        >
+                          {report.meta?.sourceEngineVersion?.trim()
+                            ? report.meta.sourceEngineVersion
+                            : "not provided"}
+                        </span>
                     </span>
                     <span className="rounded-full border border-[#3f3f3f] bg-[#0f0f0f] px-3 py-1.5 text-[#d7d7d7]">
                       taskId{" "}
