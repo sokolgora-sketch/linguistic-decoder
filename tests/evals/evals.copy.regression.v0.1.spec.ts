@@ -48,6 +48,9 @@ describe("Evals/Landing copy regression guard v0.1", () => {
         provider: "   ",
         model: "",
         label: "   ",
+        sourceEngineId: "   ",
+        sourceEngineVersion: "",
+        sourceEngineBuild: "   ",
       },
     };
 
@@ -61,6 +64,9 @@ describe("Evals/Landing copy regression guard v0.1", () => {
     expect(md).toContain("- provider: not set");
     expect(md).toContain("- model: not set");
     expect(md).toContain("- label: not set");
+    expect(md).toContain("- sourceEngineId: not set");
+    expect(md).toContain("- sourceEngineVersion: not set");
+    expect(md).toContain("- sourceEngineBuild: not set");
   });
 
   it("locks evals UI source copy for mode clarity and device plate metadata", () => {
@@ -87,6 +93,18 @@ describe("Evals/Landing copy regression guard v0.1", () => {
     expect(ui).toContain("report.meta?.label?.trim()");
     expect(ui).toContain("report.meta.label");
 
+    expect(ui).toContain("sourceEngineId");
+    expect(ui).toContain("report.meta?.sourceEngineId?.trim()");
+    expect(ui).toContain("report.meta.sourceEngineId");
+
+    expect(ui).toContain("sourceEngineVersion");
+    expect(ui).toContain("report.meta?.sourceEngineVersion?.trim()");
+    expect(ui).toContain("report.meta.sourceEngineVersion");
+
+    expect(ui).toContain("sourceEngineBuild");
+    expect(ui).toContain("report.meta?.sourceEngineBuild?.trim()");
+    expect(ui).toContain("report.meta.sourceEngineBuild");
+
     expect(ui).toContain("taskId:");
     expect(ui).toContain('devicePlateTaskId ?? "—"');
 
@@ -98,5 +116,9 @@ describe("Evals/Landing copy regression guard v0.1", () => {
 
     expect(ui).toContain("exportedAtUtc:");
     expect(ui).toContain("{devicePlateExportedAtUtc}");
+
+    expect(ui).toContain("dfSplitCsvSafe(sourceEngineVersion.trim())");
+    expect(ui).toContain('sourceEngineId=${sourceEngineId.trim() || ""}');
+    expect(ui).toContain('sourceEngineBuild=${sourceEngineBuild.trim() || ""}');
   });
 });
