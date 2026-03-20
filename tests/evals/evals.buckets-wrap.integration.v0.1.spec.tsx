@@ -25,13 +25,50 @@ function getTaskSelect(): HTMLSelectElement {
   return screen.getAllByRole("combobox")[1] as HTMLSelectElement;
 }
 
+function getRunIdInput(): HTMLInputElement {
+  return screen.getByDisplayValue("ui.run.v0.1") as HTMLInputElement;
+}
+
+function getProviderInput(): HTMLInputElement {
+  return screen.getByPlaceholderText("e.g. openai") as HTMLInputElement;
+}
+
+function getModelInput(): HTMLInputElement {
+  return screen.getByPlaceholderText("e.g. gpt-4o") as HTMLInputElement;
+}
+
+function getLabelInput(): HTMLInputElement {
+  return screen.getByPlaceholderText("e.g. fresh-chat") as HTMLInputElement;
+}
+
+function getJsonTextarea(): HTMLTextAreaElement {
+  const box = screen
+    .getAllByRole("textbox")
+    .find((el) => el.tagName.toLowerCase() === "textarea");
+
+  if (!(box instanceof HTMLTextAreaElement)) {
+    throw new Error("Paste JSON textarea not found");
+  }
+
+  return box;
+}
+
 function fillUi() {
-  const boxes = screen.getAllByRole("textbox") as HTMLInputElement[];
-  fireEvent.change(boxes[0], { target: { value: "wrap.integration.v0.1" } });
-  fireEvent.change(boxes[1], { target: { value: "openai" } });
-  fireEvent.change(boxes[2], { target: { value: "gpt-4o" } });
-  fireEvent.change(boxes[3], { target: { value: "fresh-chat" } });
-  fireEvent.change(boxes[4], { target: { value: JSON.stringify(BUCKETS, null, 2) } });
+  fireEvent.change(getRunIdInput(), {
+    target: { value: "wrap.integration.v0.1" },
+  });
+  fireEvent.change(getProviderInput(), {
+    target: { value: "openai" },
+  });
+  fireEvent.change(getModelInput(), {
+    target: { value: "gpt-4o" },
+  });
+  fireEvent.change(getLabelInput(), {
+    target: { value: "fresh-chat" },
+  });
+  fireEvent.change(getJsonTextarea(), {
+    target: { value: JSON.stringify(BUCKETS, null, 2) },
+  });
 }
 
 describe("Evals buckets-wrap integration v0.1", () => {
@@ -106,7 +143,9 @@ describe("Evals buckets-wrap integration v0.1", () => {
     });
 
     expect(
-      screen.getByText("Detected buckets-only JSON while in Full run bundle mode. Auto-wrapping into evalRun.v0.1.")
+      screen.getByText(
+        "Detected buckets-only JSON while in Full run bundle mode. Auto-wrapping into evalRun.v0.1."
+      )
     ).toBeInTheDocument();
   });
 
