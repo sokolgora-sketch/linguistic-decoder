@@ -6,7 +6,6 @@ import Image from "next/image";
 import { MT } from "@/ui/typography/marketingType.v0.1";
 
 import { EVAL_SPEC_V0_1 } from "@/shared/evals/spec.v0.1";
-import { ENGINE_VERSION_V1 } from "@/v1/versions.v1";
 import { COLORS_HEX_BY_VOICE_V0_1 } from "@/shared/doctrine/voiceDoctrine.v0.1";
 import { getSpearmanDiagnosisMeta } from "@/shared/evals/getSpearmanDiagnosis.v0.1";
 import type {
@@ -822,13 +821,6 @@ export function EvalsPageClientV0_1() {
   const [sourceEngineId, setSourceEngineId] = useState<string>("");
   const [sourceEngineVersion, setSourceEngineVersion] = useState<string>("");
   const [sourceEngineBuild, setSourceEngineBuild] = useState<string>("");
-  const autofillSourceEngineBuild = useMemo(
-    () =>
-      process.env.NEXT_PUBLIC_GIT_SHA
-        ? String(process.env.NEXT_PUBLIC_GIT_SHA).trim().slice(0, 7)
-        : "unknown",
-    [],
-  );
 
   const [inputText, setInputText] = useState<string>("");
   const [pickedFileName, setPickedFileName] = useState<string>("");
@@ -1337,11 +1329,35 @@ export function EvalsPageClientV0_1() {
     () => extractMdFrontMatterValueV0_1(md, "scorerBuild") || "unknown",
     [md],
   );
-  function autofillAnalyzeV1SourceEngine() {
-    setSourceEngineId("analyze-v1");
-    setSourceEngineVersion(ENGINE_VERSION_V1);
-    setSourceEngineBuild(autofillSourceEngineBuild);
-    setNotice("Filled sourceEngine* from current /api/analyze-v1 provenance.");
+  async function autofillAnalyzeV1SourceEngine() {
+    try {
+      const res = await fetch("/api/evals/source-engine-provenance", {
+        method: "GET",
+        cache: "no-store",
+      });
+      const data = (await res.json()) as {
+        ok?: boolean;
+        sourceEngineId?: string;
+        sourceEngineVersion?: string;
+        sourceEngineBuild?: string;
+        message?: string;
+      };
+
+      if (!res.ok || !data?.ok) {
+        throw new Error(data?.message || "Could not load analyze-v1 provenance.");
+      }
+
+      setSourceEngineId(String(data.sourceEngineId ?? "analyze-v1"));
+      setSourceEngineVersion(String(data.sourceEngineVersion ?? ""));
+      setSourceEngineBuild(String(data.sourceEngineBuild ?? ""));
+      setNotice("Filled sourceEngine* from live /api/analyze-v1 provenance.");
+    } catch (err) {
+      setNotice(
+        err instanceof Error
+          ? err.message
+          : "Could not autofill /api/analyze-v1 provenance."
+      );
+    }
   }
 
   function loadExample() {
