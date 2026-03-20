@@ -15,6 +15,12 @@ describe("Evals PDF API contract v0.1", () => {
     );
 
     raw.runId = "weird run/id";
+    raw.meta = {
+      ...(raw.meta ?? {}),
+      sourceEngineId: "zero-api",
+      sourceEngineVersion: "analyze-v1",
+      sourceEngineBuild: "845bb5a",
+    };
 
     const req = new Request("http://localhost/api/evals/pdf", {
       method: "POST",
