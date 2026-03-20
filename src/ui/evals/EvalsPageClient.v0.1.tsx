@@ -1325,11 +1325,10 @@ export function EvalsPageClientV0_1() {
     () => extractMdFrontMatterValueV0_1(md, "exportedAtUtc"),
     [md],
   );
-  const devicePlateScorerBuild = process.env.NEXT_PUBLIC_GIT_SHA
-    ? String(process.env.NEXT_PUBLIC_GIT_SHA)
-        .trim()
-        .slice(0, 7)
-    : "unknown";
+  const devicePlateScorerBuild = useMemo(
+    () => extractMdFrontMatterValueV0_1(md, "scorerBuild") || "unknown",
+    [md],
+  );
 
   function loadExample() {
     // Synthetic calibration ladder (non-semantic): each bucket is dominated by one vowel carrier.

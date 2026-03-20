@@ -1,3 +1,4 @@
+import { execSync } from "node:child_process";
 import { EVAL_SPEC_V0_1 } from "@/shared/evals/spec.v0.1";
 import { createHash } from "node:crypto";
 // EVALS-5 — Markdown renderer v0.1
@@ -175,17 +176,37 @@ export function renderEvalReportMdV0_1(
       ? String(devicePlateSlopePresence.iters)
       : "—";
 
-  const scorerBuildRaw =
-    process.env.NEXT_PUBLIC_GIT_SHA ??
-    process.env.VERCEL_GIT_COMMIT_SHA ??
-    process.env.GIT_SHA ??
-    process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA ??
-    "unknown";
+  function resolveScorerBuildV0_1() {
+  const short = (value: unknown) => {
+    const s = String(value ?? "").trim();
+    return s ? s.slice(0, 7) : "";
+  };
 
-  const scorerBuild =
-    scorerBuildRaw === "unknown"
-      ? "unknown"
-      : String(scorerBuildRaw).trim().slice(0, 7);
+  const isTest =
+    process.env.NODE_ENV === "test" || Boolean(process.env.JEST_WORKER_ID);
+
+  if (isTest) return "unknown";
+
+  try {
+    return (
+      short(
+        execSync("git rev-parse --short HEAD", {
+          stdio: ["ignore", "pipe", "ignore"],
+        }).toString("utf8")
+      ) || "unknown"
+    );
+  } catch {}
+
+  return (
+    short(process.env.VERCEL_GIT_COMMIT_SHA) ||
+    short(process.env.GIT_SHA) ||
+    short(process.env.NEXT_PUBLIC_GIT_SHA) ||
+    short(process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA) ||
+    "unknown"
+  );
+}
+
+  const scorerBuild = resolveScorerBuildV0_1();
 
   lines.push(`- engineVersion: scoreEvalRun.v0.1`);
   const exportedAtUtc = String(opts.exportedAtUtc ?? "—");
