@@ -786,6 +786,9 @@ export function EvalsPageClientV0_1() {
   const [provider, setProvider] = useState<string>("");
   const [model, setModel] = useState<string>("");
   const [label, setLabel] = useState<string>("");
+  const [sourceEngineId, setSourceEngineId] = useState<string>("");
+  const [sourceEngineVersion, setSourceEngineVersion] = useState<string>("");
+  const [sourceEngineBuild, setSourceEngineBuild] = useState<string>("");
 
   const [inputText, setInputText] = useState<string>("");
   const [pickedFileName, setPickedFileName] = useState<string>("");
@@ -955,6 +958,12 @@ export function EvalsPageClientV0_1() {
     parsed?: unknown;
   }): unknown {
     const rid = runId.trim() || "ui.run.v0.1";
+    const providerValue = provider.trim();
+    const modelValue = model.trim();
+    const labelValue = label.trim();
+    const sourceEngineIdValue = sourceEngineId.trim();
+    const sourceEngineVersionValue = sourceEngineVersion.trim();
+    const sourceEngineBuildValue = sourceEngineBuild.trim();
 
     const prob: InputProbe =
       opts?.parsed !== undefined
@@ -986,9 +995,18 @@ export function EvalsPageClientV0_1() {
         specId: "public-grounding-probe.v0.1",
         runId: rid,
         meta: {
-          ...(provider ? { provider } : {}),
-          ...(model ? { model } : {}),
-          ...(label ? { label } : {}),
+          ...(providerValue ? { provider: providerValue } : {}),
+          ...(modelValue ? { model: modelValue } : {}),
+          ...(labelValue ? { label: labelValue } : {}),
+          ...(sourceEngineIdValue
+            ? { sourceEngineId: sourceEngineIdValue }
+            : {}),
+          ...(sourceEngineVersionValue
+            ? { sourceEngineVersion: sourceEngineVersionValue }
+            : {}),
+          ...(sourceEngineBuildValue
+            ? { sourceEngineBuild: sourceEngineBuildValue }
+            : {}),
         },
         tasks: [
           {
@@ -1002,14 +1020,30 @@ export function EvalsPageClientV0_1() {
 
     if (effectiveMode === "run_bundle") {
       // Patch meta if provided (best-effort)
-      if (provider || model || label) {
+      if (
+        providerValue ||
+        modelValue ||
+        labelValue ||
+        sourceEngineIdValue ||
+        sourceEngineVersionValue ||
+        sourceEngineBuildValue
+      ) {
         const obj = parsed as any;
         if (typeof obj !== "object" || obj === null) return parsed;
         obj.meta = {
           ...(obj.meta ?? {}),
-          ...(provider ? { provider } : {}),
-          ...(model ? { model } : {}),
-          ...(label ? { label } : {}),
+          ...(providerValue ? { provider: providerValue } : {}),
+          ...(modelValue ? { model: modelValue } : {}),
+          ...(labelValue ? { label: labelValue } : {}),
+          ...(sourceEngineIdValue
+            ? { sourceEngineId: sourceEngineIdValue }
+            : {}),
+          ...(sourceEngineVersionValue
+            ? { sourceEngineVersion: sourceEngineVersionValue }
+            : {}),
+          ...(sourceEngineBuildValue
+            ? { sourceEngineBuild: sourceEngineBuildValue }
+            : {}),
         };
         if (!obj.runId) obj.runId = rid;
         return obj;
@@ -1030,9 +1064,16 @@ export function EvalsPageClientV0_1() {
       specId: "public-grounding-probe.v0.1",
       runId: rid,
       meta: {
-        ...(provider ? { provider } : {}),
-        ...(model ? { model } : {}),
-        ...(label ? { label } : {}),
+        ...(providerValue ? { provider: providerValue } : {}),
+        ...(modelValue ? { model: modelValue } : {}),
+        ...(labelValue ? { label: labelValue } : {}),
+        ...(sourceEngineIdValue ? { sourceEngineId: sourceEngineIdValue } : {}),
+        ...(sourceEngineVersionValue
+          ? { sourceEngineVersion: sourceEngineVersionValue }
+          : {}),
+        ...(sourceEngineBuildValue
+          ? { sourceEngineBuild: sourceEngineBuildValue }
+          : {}),
       },
       tasks: [
         {
@@ -1477,16 +1518,17 @@ export function EvalsPageClientV0_1() {
 
     const row = [
       dfNowIso(),
-      dfSplitCsvSafe(runId),
-      dfSplitCsvSafe(provider),
-      dfSplitCsvSafe(model),
+      dfSplitCsvSafe(runId.trim()),
+      dfSplitCsvSafe(provider.trim()),
+      dfSplitCsvSafe(model.trim()),
+      dfSplitCsvSafe(sourceEngineVersion.trim()),
       pearson_r ?? "",
       spearman_rho ?? "",
       p_perm ?? "",
       validN ?? "",
       invalidN ?? "",
       noVowelTokenCount ?? "",
-      `iters=${iters ?? ""}; seed=${seed ?? ""}; p_perm_src=p_spearman`,
+      `iters=${iters ?? ""}; seed=${seed ?? ""}; p_perm_src=p_spearman; sourceEngineId=${sourceEngineId.trim() || ""}; sourceEngineBuild=${sourceEngineBuild.trim() || ""}`,
     ].join(",");
 
     await dfCopyText("Copied CSV row.", row);
@@ -1655,6 +1697,42 @@ export function EvalsPageClientV0_1() {
                 value={label}
                 onChange={(e) => setLabel(e.target.value)}
                 placeholder="e.g. fresh-chat"
+              />
+            </div>
+
+            <div>
+              <label className={`${MT.fieldLabel} text-[#ededed]`}>
+                sourceEngineId
+              </label>
+              <input
+                className={`w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[11px] ${MT.fieldControl} text-[#e6e6e6] outline-none transition focus:border-[#666]`}
+                value={sourceEngineId}
+                onChange={(e) => setSourceEngineId(e.target.value)}
+                placeholder="e.g. zero-api"
+              />
+            </div>
+
+            <div>
+              <label className={`${MT.fieldLabel} text-[#ededed]`}>
+                sourceEngineVersion
+              </label>
+              <input
+                className={`w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[11px] ${MT.fieldControl} text-[#e6e6e6] outline-none transition focus:border-[#666]`}
+                value={sourceEngineVersion}
+                onChange={(e) => setSourceEngineVersion(e.target.value)}
+                placeholder="e.g. analyze-v1"
+              />
+            </div>
+
+            <div>
+              <label className={`${MT.fieldLabel} text-[#ededed]`}>
+                sourceEngineBuild
+              </label>
+              <input
+                className={`w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[11px] ${MT.fieldControl} text-[#e6e6e6] outline-none transition focus:border-[#666]`}
+                value={sourceEngineBuild}
+                onChange={(e) => setSourceEngineBuild(e.target.value)}
+                placeholder="e.g. 845bb5a"
               />
             </div>
           </div>
