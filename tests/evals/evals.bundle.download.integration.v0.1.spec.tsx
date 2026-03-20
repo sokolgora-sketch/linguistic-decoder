@@ -7,6 +7,18 @@ function getModeSelect(): HTMLSelectElement {
   return screen.getAllByRole("combobox")[0] as HTMLSelectElement;
 }
 
+function getSourceEngineIdInput(): HTMLInputElement {
+  return screen.getByPlaceholderText("e.g. zero-api") as HTMLInputElement;
+}
+
+function getSourceEngineVersionInput(): HTMLInputElement {
+  return screen.getByPlaceholderText("e.g. analyze-v1") as HTMLInputElement;
+}
+
+function getSourceEngineBuildInput(): HTMLInputElement {
+  return screen.getByPlaceholderText("e.g. 845bb5a") as HTMLInputElement;
+}
+
 async function blobToText(blob: Blob): Promise<string> {
   if (typeof (blob as Blob & { text?: () => Promise<string> }).text === "function") {
     return await (blob as Blob & { text: () => Promise<string> }).text();
@@ -158,6 +170,44 @@ describe("Evals bundle download integration v0.1", () => {
       expect(lastAnchor?.download).toContain("evals.example.synthetic.ladder.v0.1");
       expect(lastAnchor?.download).toContain(".json");
 
+      expect(screen.getByText("Downloaded evalRun bundle.")).toBeInTheDocument();
+    } finally {
+      harness.restore();
+    }
+  });
+
+  it("preserves source-engine provenance in the downloaded bundle", async () => {
+    render(<EvalsPageClientV0_1 />);
+    const harness = installDownloadHarness();
+
+    try {
+      fireEvent.click(screen.getByRole("button", { name: "Load example" }));
+      expect(getModeSelect()).toHaveValue("task_buckets");
+
+      fireEvent.change(getSourceEngineIdInput(), {
+        target: { value: "zero-api" },
+      });
+      fireEvent.change(getSourceEngineVersionInput(), {
+        target: { value: "analyze-v1" },
+      });
+      fireEvent.change(getSourceEngineBuildInput(), {
+        target: { value: "845bb5a" },
+      });
+
+      fireEvent.click(screen.getByRole("button", { name: "Download Bundle" }));
+
+      await waitFor(() => expect(harness.getBlob()).not.toBeNull());
+
+      const text = await blobToText(harness.getBlob() as Blob);
+      const bundle = JSON.parse(text);
+
+      expect(bundle.meta).toEqual({
+        sourceEngineId: "zero-api",
+        sourceEngineVersion: "analyze-v1",
+        sourceEngineBuild: "845bb5a",
+      });
+
+      expect(bundle.tasks[0]?.taskId).toBe("T2_LADDER_V0_1");
       expect(screen.getByText("Downloaded evalRun bundle.")).toBeInTheDocument();
     } finally {
       harness.restore();
