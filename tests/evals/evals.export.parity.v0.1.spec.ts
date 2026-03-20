@@ -35,6 +35,9 @@ describe("Evals export parity guard v0.1", () => {
       provider: "",
       model: "",
       label: "",
+      sourceEngineId: "   ",
+      sourceEngineVersion: "",
+      sourceEngineBuild: "   ",
     };
 
     const run = parseEvalRunBundleV0_1(raw);
@@ -48,6 +51,9 @@ describe("Evals export parity guard v0.1", () => {
     expect(md).toContain("- provider: not set");
     expect(md).toContain("- model: not set");
     expect(md).toContain("- label: not set");
+    expect(md).toContain("- sourceEngineId: not set");
+    expect(md).toContain("- sourceEngineVersion: not set");
+    expect(md).toContain("- sourceEngineBuild: not set");
   });
 
   it("locks committed baseline markdown header to the same export contract", () => {
@@ -62,6 +68,9 @@ describe("Evals export parity guard v0.1", () => {
     expect(md).toContain("- provider: synthetic");
     expect(md).toContain("- model: none");
     expect(md).toContain("- label: calibration");
+    expect(md).toContain("- sourceEngineId: not set");
+    expect(md).toContain("- sourceEngineVersion: not set");
+    expect(md).toContain("- sourceEngineBuild: not set");
   });
 
   it("locks PDF route to the shared markdown renderer contract", () => {
@@ -76,5 +85,7 @@ describe("Evals export parity guard v0.1", () => {
 
     expect(src).toContain("renderEvalReportMdV0_1");
     expect(src).toMatch(/renderEvalReportMdV0_1\s*\(/);
+    expect(src).toContain("const sourceEngineVersion = extractMdFrontMatterValue(");
+    expect(src).toContain('"sourceEngineVersion"');
   });
 });
