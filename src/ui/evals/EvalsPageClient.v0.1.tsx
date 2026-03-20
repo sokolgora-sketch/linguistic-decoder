@@ -207,13 +207,13 @@ function TaskCard({ t }: { t: EvalTaskReportV0_1 }) {
 
         <div className="flex flex-wrap gap-3 text-[12px]">
           <span className="rounded-full border border-[#3a3a3a] bg-[#101010] px-3.5 py-2 text-[#d8d8d8]">
-            kind <span className="font-mono text-white">{t.kind}</span>
+            taskType <span className="font-mono text-white">{t.kind}</span>
           </span>
           <span className="rounded-full border border-[#3a3a3a] bg-[#101010] px-3.5 py-2 text-[#d8d8d8]">
-            lang <span className="font-mono text-white">{t.languageHint}</span>
+            language <span className="font-mono text-white">{t.languageHint}</span>
           </span>
           <span className="rounded-full border border-[#3a3a3a] bg-[#101010] px-3.5 py-2 text-[#d8d8d8]">
-            buckets{" "}
+            targetBuckets{" "}
             <span className="font-mono text-white">
               {t.targetBuckets.join(", ")}
             </span>
@@ -224,6 +224,14 @@ function TaskCard({ t }: { t: EvalTaskReportV0_1 }) {
           </span>
         </div>
       </div>
+        <div className="space-y-1">
+          <div className="text-[12px] font-semibold uppercase tracking-[0.12em] text-[#dcdcdc]">
+            Bucket ledger
+          </div>
+          <div className="text-[12px] leading-6 text-[#8f8f8f]">
+            Expected versus provided tokens, validity counts, and mean aperture values.
+          </div>
+        </div>
 
       <div className="overflow-x-auto rounded-[8px] border border-[#303030] bg-[#101010]">
         <table className="w-full border-collapse text-[12px]">
@@ -326,6 +334,14 @@ function TaskCard({ t }: { t: EvalTaskReportV0_1 }) {
           </tbody>
         </table>
       </div>
+        <div className="space-y-1">
+          <div className="text-[12px] font-semibold uppercase tracking-[0.12em] text-[#dcdcdc]">
+            Slope diagnostics
+          </div>
+          <div className="text-[12px] leading-6 text-[#8f8f8f]">
+            Correlation strength and permutation details for both aperture views.
+          </div>
+        </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
         <div className="rounded-[10px] border border-[#303030] bg-[#101010] px-5 py-5">
