@@ -193,8 +193,18 @@ const EVALS_PAPER_SNAPSHOTS = [
 ];
 
 function TaskCard({ t }: { t: EvalTaskReportV0_1 }) {
+  const isDerived = t.kind !== "byo";
+  const cardToneClass = isDerived
+    ? "border-[#4a3b25] bg-[#171411]"
+    : "border-[#274436] bg-[#131914]";
+  const hierarchyToneClass = isDerived ? "text-[#f3d38b]" : "text-[#86efac]";
+  const hierarchyLabel = isDerived ? "Validation control" : "Primary scored task";
+  const hierarchyNote = isDerived
+    ? "Derived control used to sanity-check bucket behavior and scorer stability."
+    : "Direct score report for the user-supplied task.";
+
   return (
-    <section className="rounded-[12px] border border-[#3a3a3a] bg-[#151515] px-6 py-6 space-y-6">
+    <section className={`rounded-[12px] border px-6 py-6 space-y-6 ${cardToneClass}`}>
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="space-y-2">
           <div className="text-[12px] font-semibold uppercase tracking-[0.12em] text-[#b8b8b8]">
@@ -203,7 +213,13 @@ function TaskCard({ t }: { t: EvalTaskReportV0_1 }) {
           <h2 className="text-[20px] font-semibold leading-tight text-white">
             {t.title}
           </h2>
-        </div>
+            <div className={`text-[11px] font-semibold uppercase tracking-[0.12em] ${hierarchyToneClass}`}>
+              {hierarchyLabel}
+            </div>
+            <div className="text-[12px] leading-6 text-[#9f9f9f]">
+              {hierarchyNote}
+            </div>
+          </div>
 
         <div className="flex flex-wrap gap-3 text-[12px]">
           <span className="rounded-full border border-[#3a3a3a] bg-[#101010] px-3.5 py-2 text-[#d8d8d8]">
@@ -2651,11 +2667,21 @@ export function EvalsPageClientV0_1() {
             </div>
 
             <div className="space-y-7">
-              {report.tasks
-                .filter((t) => t.kind === "byo")
-                .map((t) => (
-                  <TaskCard key={t.taskId} t={t} />
-                ))}
+                <section className="space-y-3">
+                  <div className="space-y-1">
+                    <div className={`${MT.sectionLabel} text-[#d6eadb]`}>
+                      Primary scored tasks
+                    </div>
+                    <div className="text-[12px] leading-6 text-[#9bb5aa]">
+                      Direct reports for the uploaded or wrapped task input.
+                    </div>
+                  </div>
+                  {report.tasks
+                    .filter((t) => t.kind === "byo")
+                    .map((t) => (
+                      <TaskCard key={t.taskId} t={t} />
+                    ))}
+                </section>
 
               {report.tasks.some((t) => t.kind !== "byo") ? (
                 <section className="mt-3 rounded-[12px] border border-[#303030] bg-[#171717] px-5 py-5 space-y-4">
