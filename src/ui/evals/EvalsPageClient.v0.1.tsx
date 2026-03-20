@@ -6,6 +6,7 @@ import Image from "next/image";
 import { MT } from "@/ui/typography/marketingType.v0.1";
 
 import { EVAL_SPEC_V0_1 } from "@/shared/evals/spec.v0.1";
+import { ENGINE_VERSION_V1 } from "@/v1/versions.v1";
 import { COLORS_HEX_BY_VOICE_V0_1 } from "@/shared/doctrine/voiceDoctrine.v0.1";
 import { getSpearmanDiagnosisMeta } from "@/shared/evals/getSpearmanDiagnosis.v0.1";
 import type {
@@ -821,6 +822,13 @@ export function EvalsPageClientV0_1() {
   const [sourceEngineId, setSourceEngineId] = useState<string>("");
   const [sourceEngineVersion, setSourceEngineVersion] = useState<string>("");
   const [sourceEngineBuild, setSourceEngineBuild] = useState<string>("");
+  const autofillSourceEngineBuild = useMemo(
+    () =>
+      process.env.NEXT_PUBLIC_GIT_SHA
+        ? String(process.env.NEXT_PUBLIC_GIT_SHA).trim().slice(0, 7)
+        : "unknown",
+    [],
+  );
 
   const [inputText, setInputText] = useState<string>("");
   const [pickedFileName, setPickedFileName] = useState<string>("");
@@ -1329,6 +1337,12 @@ export function EvalsPageClientV0_1() {
     () => extractMdFrontMatterValueV0_1(md, "scorerBuild") || "unknown",
     [md],
   );
+  function autofillAnalyzeV1SourceEngine() {
+    setSourceEngineId("analyze-v1");
+    setSourceEngineVersion(ENGINE_VERSION_V1);
+    setSourceEngineBuild(autofillSourceEngineBuild);
+    setNotice("Filled sourceEngine* from current /api/analyze-v1 provenance.");
+  }
 
   function loadExample() {
     // Synthetic calibration ladder (non-semantic): each bucket is dominated by one vowel carrier.
@@ -1685,14 +1699,24 @@ export function EvalsPageClientV0_1() {
             </div>
           </details>
 
-          <div className="space-y-2">
-            <div className={`${MT.sectionLabel} text-[#ededed]`}>
-              Run metadata
+          <div className="flex flex-wrap items-start justify-between gap-3">
+              <div className="space-y-2">
+                <div className={`${MT.sectionLabel} text-[#ededed]`}>
+                  Run metadata
+                </div>
+                <div className={`${MT.helper} text-[#a9a9a9]`}>
+                  Optional report metadata. sourceEngine* is only for upstream ZË-RO engine provenance when this input already came from another engine/export.
+                </div>
+              </div>
+              <button
+                type="button"
+                className={`${MT.actionUtility} border-[#444] bg-transparent text-[#b8b8b8] transition hover:border-[#777] hover:bg-[#1f1f1f] hover:text-[#f2f2f2]`}
+                onClick={autofillAnalyzeV1SourceEngine}
+                disabled={busy}
+              >
+                Autofill analyze-v1
+              </button>
             </div>
-            <div className={`${MT.helper} text-[#a9a9a9]`}>
-              Optional report metadata. sourceEngine* is only for upstream ZË-RO engine provenance when this input already came from another engine/export.
-            </div>
-          </div>
 
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
             <div>
