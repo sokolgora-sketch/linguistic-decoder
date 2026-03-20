@@ -1293,6 +1293,11 @@ export function EvalsPageClientV0_1() {
     () => extractMdFrontMatterValueV0_1(md, "exportedAtUtc"),
     [md],
   );
+  const devicePlateScorerBuild = process.env.NEXT_PUBLIC_GIT_SHA
+    ? String(process.env.NEXT_PUBLIC_GIT_SHA)
+        .trim()
+        .slice(0, 7)
+    : "unknown";
 
   function loadExample() {
     // Synthetic calibration ladder (non-semantic): each bucket is dominated by one vowel carrier.
@@ -2040,12 +2045,48 @@ export function EvalsPageClientV0_1() {
                     </div>
                     <div className="min-w-0 flex-1" />
                     <div className="rounded-full border border-[#4a4a4a] bg-[#0f0f0f] px-3 py-2 font-mono text-[12px] text-[#f2f2f2]">
-                      runId <span className="text-white">{report.runId}</span>
-                    </div>
-                  </>
+                        runId <span className="text-white">{report.runId}</span>
+                      </div>
+                    </>
+                  ) : null}
+                </div>
+
+                {report ? (
+                  <div className="mt-3 flex flex-wrap items-center gap-2 text-[11px]">
+                    <span className="text-[11px] uppercase tracking-[0.12em] text-[#9f9f9f]">
+                      Run context
+                    </span>
+                    <span className="rounded-full border border-[#3f3f3f] bg-[#0f0f0f] px-3 py-1.5 text-[#d7d7d7]">
+                      sourceEngineVersion{" "}
+                      <span
+                        className={`font-mono ${report.meta?.sourceEngineVersion?.trim() ? "text-white" : "text-[#8f8f8f]"}`}
+                      >
+                        {report.meta?.sourceEngineVersion?.trim()
+                          ? report.meta.sourceEngineVersion
+                          : "not set"}
+                      </span>
+                    </span>
+                    <span className="rounded-full border border-[#3f3f3f] bg-[#0f0f0f] px-3 py-1.5 text-[#d7d7d7]">
+                      taskId{" "}
+                      <span className="font-mono text-white">
+                        {devicePlateTaskId ?? "—"}
+                      </span>
+                    </span>
+                    <span className="rounded-full border border-[#3f3f3f] bg-[#0f0f0f] px-3 py-1.5 text-[#d7d7d7]">
+                      scorerBuild{" "}
+                      <span className="font-mono text-white">
+                        {devicePlateScorerBuild}
+                      </span>
+                    </span>
+                    <span className="rounded-full border border-[#3f3f3f] bg-[#0f0f0f] px-3 py-1.5 text-[#d7d7d7]">
+                      exportedAtUtc{" "}
+                      <span className="font-mono text-white">
+                        {devicePlateExportedAtUtc || "—"}
+                      </span>
+                    </span>
+                  </div>
                 ) : null}
               </div>
-            </div>
 
             <div className="space-y-1">
               <div className={`${MT.sectionLabel} text-[#adadad]`}>
@@ -2538,11 +2579,7 @@ export function EvalsPageClientV0_1() {
                   <span>
                     scorerBuild:{" "}
                     <span className="font-mono text-[#f2f2f2]">
-                      {process.env.NEXT_PUBLIC_GIT_SHA
-                        ? String(process.env.NEXT_PUBLIC_GIT_SHA)
-                            .trim()
-                            .slice(0, 7)
-                        : "unknown"}
+                      {devicePlateScorerBuild}
                     </span>
                   </span>
                   <span>
