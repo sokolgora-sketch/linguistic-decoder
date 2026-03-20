@@ -7,18 +7,20 @@ function readUtf8(rel: string): string {
 }
 
 describe("Evals source-engine autofill guard v0.1", () => {
-  it("locks analyze-v1 autofill provenance wiring", () => {
+  it("locks runtime-backed analyze-v1 autofill wiring", () => {
     const ui = readUtf8("src/ui/evals/EvalsPageClient.v0.1.tsx");
+    const route = readUtf8("app/api/evals/source-engine-provenance/route.ts");
 
-    expect(ui).toContain('import { ENGINE_VERSION_V1 } from "@/v1/versions.v1";');
-    expect(ui).toContain("const autofillSourceEngineBuild = useMemo(");
-    expect(ui).toContain('process.env.NEXT_PUBLIC_GIT_SHA');
-    expect(ui).toContain("function autofillAnalyzeV1SourceEngine() {");
-    expect(ui).toContain('setSourceEngineId("analyze-v1");');
-    expect(ui).toContain("setSourceEngineVersion(ENGINE_VERSION_V1);");
-    expect(ui).toContain("setSourceEngineBuild(autofillSourceEngineBuild);");
-    expect(ui).toContain('Filled sourceEngine* from current /api/analyze-v1 provenance.');
-    expect(ui).toContain("Autofill analyze-v1");
-    expect(ui).toContain("disabled={busy}");
+    expect(ui).toContain('fetch("/api/evals/source-engine-provenance"');
+    expect(ui).toContain('setSourceEngineId(String(data.sourceEngineId ?? "analyze-v1"))');
+    expect(ui).toContain('setSourceEngineVersion(String(data.sourceEngineVersion ?? ""))');
+    expect(ui).toContain('setSourceEngineBuild(String(data.sourceEngineBuild ?? ""))');
+
+    expect(ui).not.toContain("const autofillSourceEngineBuild = useMemo(");
+    expect(ui).not.toContain("process.env.NEXT_PUBLIC_GIT_SHA");
+
+    expect(route).toContain('sourceEngineId: "analyze-v1"');
+    expect(route).toContain("sourceEngineVersion: ENGINE_VERSION_V1");
+    expect(route).toContain('execSync("git rev-parse --short HEAD"');
   });
 });
