@@ -13,6 +13,10 @@ describe("Evals source-engine autofill guard v0.1", () => {
 
     expect(ui).toContain('const showAnalyzeV1Autofill = mode === "run_bundle";');
     expect(ui).toContain("const hasSourceEngineMeta = Boolean(");
+    expect(ui).toContain("Upstream engine provenance");
+    expect(ui).toContain(
+      "Only fill sourceEngine* when the JSON being scored already came from an upstream ZË-RO engine/export."
+    );
     expect(ui).toContain('fetch("/api/evals/source-engine-provenance"');
     expect(ui).toContain('setSourceEngineId(String(data.sourceEngineId ?? "analyze-v1"))');
     expect(ui).toContain('setSourceEngineVersion(String(data.sourceEngineVersion ?? ""))');

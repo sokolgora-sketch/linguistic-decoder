@@ -1726,13 +1726,65 @@ export function EvalsPageClientV0_1() {
             </div>
           </details>
 
-          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div className="space-y-2">
+              <div className={`${MT.sectionLabel} text-[#ededed]`}>
+                Run metadata
+              </div>
+              <div className={`${MT.helper} text-[#a9a9a9]`}>
+                Optional report metadata for this scored run.
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
+              <div>
+                <label className={`${MT.fieldLabel} text-[#ededed]`}>runId</label>
+                <input
+                  className={`w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[11px] ${MT.fieldControl} text-[#e6e6e6] outline-none transition focus:border-[#666]`}
+                  value={runId}
+                  onChange={(e) => setRunId(e.target.value)}
+                />
+              </div>
+
+              <div>
+                <label className={`${MT.fieldLabel} text-[#ededed]`}>
+                  provider
+                </label>
+                <input
+                  className={`w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[11px] ${MT.fieldControl} text-[#e6e6e6] outline-none transition focus:border-[#666]`}
+                  value={provider}
+                  onChange={(e) => setProvider(e.target.value)}
+                  placeholder="e.g. openai"
+                />
+              </div>
+
+              <div>
+                <label className={`${MT.fieldLabel} text-[#ededed]`}>model</label>
+                <input
+                  className={`w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[11px] ${MT.fieldControl} text-[#e6e6e6] outline-none transition focus:border-[#666]`}
+                  value={model}
+                  onChange={(e) => setModel(e.target.value)}
+                  placeholder="e.g. gpt-4o"
+                />
+              </div>
+
+              <div>
+                <label className={`${MT.fieldLabel} text-[#ededed]`}>label</label>
+                <input
+                  className={`w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[11px] ${MT.fieldControl} text-[#e6e6e6] outline-none transition focus:border-[#666]`}
+                  value={label}
+                  onChange={(e) => setLabel(e.target.value)}
+                  placeholder="e.g. fresh-chat"
+                />
+              </div>
+            </div>
+
+            <div className="mt-6 flex flex-wrap items-start justify-between gap-3">
               <div className="space-y-2">
                 <div className={`${MT.sectionLabel} text-[#ededed]`}>
-                  Run metadata
+                  Upstream engine provenance
                 </div>
                 <div className={`${MT.helper} text-[#a9a9a9]`}>
-                  Optional report metadata. sourceEngine* is only for upstream ZË-RO engine provenance when this input already came from another engine/export.
+                  Only fill sourceEngine* when the JSON being scored already came from an upstream ZË-RO engine/export.
                 </div>
               </div>
               {showAnalyzeV1Autofill ? (
@@ -1762,89 +1814,49 @@ export function EvalsPageClientV0_1() {
               ) : null}
             </div>
 
-          <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
-            <div>
-              <label className={`${MT.fieldLabel} text-[#ededed]`}>runId</label>
-              <input
-                className={`w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[11px] ${MT.fieldControl} text-[#e6e6e6] outline-none transition focus:border-[#666]`}
-                value={runId}
-                onChange={(e) => setRunId(e.target.value)}
-              />
-            </div>
-
-            <div>
-              <label className={`${MT.fieldLabel} text-[#ededed]`}>
-                provider
-              </label>
-              <input
-                className={`w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[11px] ${MT.fieldControl} text-[#e6e6e6] outline-none transition focus:border-[#666]`}
-                value={provider}
-                onChange={(e) => setProvider(e.target.value)}
-                placeholder="e.g. openai"
-              />
-            </div>
-
-            <div>
-              <label className={`${MT.fieldLabel} text-[#ededed]`}>model</label>
-              <input
-                className={`w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[11px] ${MT.fieldControl} text-[#e6e6e6] outline-none transition focus:border-[#666]`}
-                value={model}
-                onChange={(e) => setModel(e.target.value)}
-                placeholder="e.g. gpt-4o"
-              />
-            </div>
-
-            <div>
-              <label className={`${MT.fieldLabel} text-[#ededed]`}>label</label>
-              <input
-                className={`w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[11px] ${MT.fieldControl} text-[#e6e6e6] outline-none transition focus:border-[#666]`}
-                value={label}
-                onChange={(e) => setLabel(e.target.value)}
-                placeholder="e.g. fresh-chat"
-              />
-            </div>
+            <div className="mt-4 grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
               <div className="md:col-span-2 xl:col-span-4 rounded-[8px] border border-[#2f3b46] bg-[#12181d] px-4 py-3">
                 <div className={`${MT.helper} text-[#b8c7d9]`}>
-                  Leave sourceEngine* blank for hand-pasted buckets, external model outputs, or synthetic examples. The scorer shows its own build below, but it cannot infer upstream engine details by itself.
+                  Leave sourceEngine* blank for hand-pasted buckets, external model outputs, or synthetic examples. The scorer cannot infer upstream engine provenance by itself.
                 </div>
               </div>
 
-            <div>
-              <label className={`${MT.fieldLabel} text-[#ededed]`}>
-                sourceEngineId
-              </label>
-              <input
-                className={`w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[11px] ${MT.fieldControl} text-[#e6e6e6] outline-none transition focus:border-[#666]`}
-                value={sourceEngineId}
-                onChange={(e) => setSourceEngineId(e.target.value)}
-                placeholder="e.g. zero-api"
-              />
-            </div>
+              <div>
+                <label className={`${MT.fieldLabel} text-[#ededed]`}>
+                  sourceEngineId
+                </label>
+                <input
+                  className={`w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[11px] ${MT.fieldControl} text-[#e6e6e6] outline-none transition focus:border-[#666]`}
+                  value={sourceEngineId}
+                  onChange={(e) => setSourceEngineId(e.target.value)}
+                  placeholder="e.g. zero-api"
+                />
+              </div>
 
-            <div>
-              <label className={`${MT.fieldLabel} text-[#ededed]`}>
-                sourceEngineVersion
-              </label>
-              <input
-                className={`w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[11px] ${MT.fieldControl} text-[#e6e6e6] outline-none transition focus:border-[#666]`}
-                value={sourceEngineVersion}
-                onChange={(e) => setSourceEngineVersion(e.target.value)}
-                placeholder="e.g. analyze-v1"
-              />
-            </div>
+              <div>
+                <label className={`${MT.fieldLabel} text-[#ededed]`}>
+                  sourceEngineVersion
+                </label>
+                <input
+                  className={`w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[11px] ${MT.fieldControl} text-[#e6e6e6] outline-none transition focus:border-[#666]`}
+                  value={sourceEngineVersion}
+                  onChange={(e) => setSourceEngineVersion(e.target.value)}
+                  placeholder="e.g. analyze-v1"
+                />
+              </div>
 
-            <div>
-              <label className={`${MT.fieldLabel} text-[#ededed]`}>
-                sourceEngineBuild
-              </label>
-              <input
-                className={`w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[11px] ${MT.fieldControl} text-[#e6e6e6] outline-none transition focus:border-[#666]`}
-                value={sourceEngineBuild}
-                onChange={(e) => setSourceEngineBuild(e.target.value)}
-                placeholder="e.g. 845bb5a"
-              />
+              <div>
+                <label className={`${MT.fieldLabel} text-[#ededed]`}>
+                  sourceEngineBuild
+                </label>
+                <input
+                  className={`w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[11px] ${MT.fieldControl} text-[#e6e6e6] outline-none transition focus:border-[#666]`}
+                  value={sourceEngineBuild}
+                  onChange={(e) => setSourceEngineBuild(e.target.value)}
+                  placeholder="e.g. 845bb5a"
+                />
+              </div>
             </div>
-          </div>
           <div className="space-y-2">
             <div className={`${MT.sectionLabel} text-[#ededed]`}>
               Input source
