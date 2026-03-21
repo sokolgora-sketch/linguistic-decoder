@@ -847,6 +847,9 @@ export function EvalsPageClientV0_1() {
 
   const inputProbe = useMemo(() => probeInput(inputText), [inputText]);
   const showAnalyzeV1Autofill = mode === "run_bundle";
+  const hasSourceEngineMeta = Boolean(
+    sourceEngineId.trim() || sourceEngineVersion.trim() || sourceEngineBuild.trim(),
+  );
 
   const readyToScore =
     Boolean(inputText.trim()) &&
@@ -1361,6 +1364,13 @@ export function EvalsPageClientV0_1() {
     }
   }
 
+  function clearSourceEngineProvenance() {
+    setSourceEngineId("");
+    setSourceEngineVersion("");
+    setSourceEngineBuild("");
+    setNotice("Cleared sourceEngine* metadata.");
+  }
+
   function loadExample() {
     // Synthetic calibration ladder (non-semantic): each bucket is dominated by one vowel carrier.
     setMode("task_buckets");
@@ -1727,14 +1737,24 @@ export function EvalsPageClientV0_1() {
               </div>
               {showAnalyzeV1Autofill ? (
                 <div className="flex flex-col items-start gap-2">
-                  <button
-                    type="button"
-                    className={`${MT.actionUtility} border-[#444] bg-transparent text-[#b8b8b8] transition hover:border-[#777] hover:bg-[#1f1f1f] hover:text-[#f2f2f2]`}
-                    onClick={autofillAnalyzeV1SourceEngine}
-                    disabled={busy}
-                  >
-                    Autofill analyze-v1
-                  </button>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <button
+                      type="button"
+                      className={`${MT.actionUtility} border-[#444] bg-transparent text-[#b8b8b8] transition hover:border-[#777] hover:bg-[#1f1f1f] hover:text-[#f2f2f2]`}
+                      onClick={autofillAnalyzeV1SourceEngine}
+                      disabled={busy}
+                    >
+                      Autofill analyze-v1
+                    </button>
+                    <button
+                      type="button"
+                      className={`${MT.actionUtility} border-[#3a3a3a] bg-transparent text-[#9f9f9f] transition hover:border-[#666] hover:bg-[#171717] hover:text-[#f2f2f2] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-[#3a3a3a] disabled:hover:bg-transparent disabled:hover:text-[#9f9f9f]`}
+                      onClick={clearSourceEngineProvenance}
+                      disabled={busy || !hasSourceEngineMeta}
+                    >
+                      Clear sourceEngine*
+                    </button>
+                  </div>
                   <div className={`${MT.helper} max-w-[340px] text-[#8f8f8f]`}>
                     Only use this when the JSON being scored was produced by the current /api/analyze-v1 route.
                   </div>
