@@ -48,15 +48,21 @@ describe("Evals UI rendered mode regression v0.1", () => {
       )
     ).toBeInTheDocument();
 
+    expect(screen.getByText("Run metadata")).toBeInTheDocument();
+    expect(
+      screen.getByText("Optional report metadata for this scored run.")
+    ).toBeInTheDocument();
+
+    expect(screen.getByText("Upstream engine provenance")).toBeInTheDocument();
     expect(
       screen.getByText(
-        "Optional report metadata. sourceEngine* is only for upstream ZË-RO engine provenance when this input already came from another engine/export."
+        "Only fill sourceEngine* when the JSON being scored already came from an upstream ZË-RO engine/export."
       )
     ).toBeInTheDocument();
 
     expect(
       screen.getByText(
-        "Leave sourceEngine* blank for hand-pasted buckets, external model outputs, or synthetic examples. The scorer shows its own build below, but it cannot infer upstream engine details by itself."
+        "Leave sourceEngine* blank for hand-pasted buckets, external model outputs, or synthetic examples. The scorer cannot infer upstream engine provenance by itself."
       )
     ).toBeInTheDocument();
 
@@ -73,9 +79,15 @@ describe("Evals UI rendered mode regression v0.1", () => {
         "Only use this when the JSON being scored was produced by the current /api/analyze-v1 route."
       )
     ).toBeInTheDocument();
+
+    expect(
+      screen.queryByText(
+        "Optional report metadata. sourceEngine* is only for upstream ZË-RO engine provenance when this input already came from another engine/export."
+      )
+    ).not.toBeInTheDocument();
   });
 
-  it("switches to buckets-only mode and enables task prompt copy", () => {
+  it("switches to buckets-only mode and keeps upstream provenance manual-only", () => {
     render(<EvalsPageClientV0_1 />);
 
     fireEvent.change(getModeSelect(), {
@@ -102,6 +114,13 @@ describe("Evals UI rendered mode regression v0.1", () => {
         "Full run bundle mode expects task provenance to come from the uploaded evalRun.v0.1 bundle. Switch to Buckets only mode to copy a ZË-RO task prompt."
       )
     ).not.toBeInTheDocument();
+
+    expect(screen.getByText("Upstream engine provenance")).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "Only fill sourceEngine* when the JSON being scored already came from an upstream ZË-RO engine/export."
+      )
+    ).toBeInTheDocument();
 
     expect(
       screen.queryByRole("button", { name: "Autofill analyze-v1" })
