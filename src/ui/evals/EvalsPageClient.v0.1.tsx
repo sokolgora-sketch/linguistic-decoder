@@ -846,6 +846,7 @@ export function EvalsPageClientV0_1() {
   }, [mode, taskId, byoTasks, bucketsOnlyTasks]);
 
   const inputProbe = useMemo(() => probeInput(inputText), [inputText]);
+  const showAnalyzeV1Autofill = mode === "run_bundle";
 
   const readyToScore =
     Boolean(inputText.trim()) &&
@@ -1724,14 +1725,21 @@ export function EvalsPageClientV0_1() {
                   Optional report metadata. sourceEngine* is only for upstream ZË-RO engine provenance when this input already came from another engine/export.
                 </div>
               </div>
-              <button
-                type="button"
-                className={`${MT.actionUtility} border-[#444] bg-transparent text-[#b8b8b8] transition hover:border-[#777] hover:bg-[#1f1f1f] hover:text-[#f2f2f2]`}
-                onClick={autofillAnalyzeV1SourceEngine}
-                disabled={busy}
-              >
-                Autofill analyze-v1
-              </button>
+              {showAnalyzeV1Autofill ? (
+                <div className="flex flex-col items-start gap-2">
+                  <button
+                    type="button"
+                    className={`${MT.actionUtility} border-[#444] bg-transparent text-[#b8b8b8] transition hover:border-[#777] hover:bg-[#1f1f1f] hover:text-[#f2f2f2]`}
+                    onClick={autofillAnalyzeV1SourceEngine}
+                    disabled={busy}
+                  >
+                    Autofill analyze-v1
+                  </button>
+                  <div className={`${MT.helper} max-w-[340px] text-[#8f8f8f]`}>
+                    Only use this when the JSON being scored was produced by the current /api/analyze-v1 route.
+                  </div>
+                </div>
+              ) : null}
             </div>
 
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
