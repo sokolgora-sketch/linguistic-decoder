@@ -12,10 +12,18 @@ describe("Evals source-engine autofill guard v0.1", () => {
     const route = readUtf8("app/api/evals/source-engine-provenance/route.ts");
 
     expect(ui).toContain('const showAnalyzeV1Autofill = mode === "run_bundle";');
+    expect(ui).toContain("const hasSourceEngineMeta = Boolean(");
     expect(ui).toContain('fetch("/api/evals/source-engine-provenance"');
     expect(ui).toContain('setSourceEngineId(String(data.sourceEngineId ?? "analyze-v1"))');
     expect(ui).toContain('setSourceEngineVersion(String(data.sourceEngineVersion ?? ""))');
     expect(ui).toContain('setSourceEngineBuild(String(data.sourceEngineBuild ?? ""))');
+    expect(ui).toContain("function clearSourceEngineProvenance() {");
+    expect(ui).toContain('setSourceEngineId("");');
+    expect(ui).toContain('setSourceEngineVersion("");');
+    expect(ui).toContain('setSourceEngineBuild("");');
+    expect(ui).toContain("Cleared sourceEngine* metadata.");
+    expect(ui).toContain("Clear sourceEngine*");
+    expect(ui).toContain("disabled={busy || !hasSourceEngineMeta}");
     expect(ui).toContain(
       "Only use this when the JSON being scored was produced by the current /api/analyze-v1 route."
     );

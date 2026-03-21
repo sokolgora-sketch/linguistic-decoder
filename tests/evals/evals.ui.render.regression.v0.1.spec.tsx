@@ -59,6 +59,20 @@ describe("Evals UI rendered mode regression v0.1", () => {
         "Leave sourceEngine* blank for hand-pasted buckets, external model outputs, or synthetic examples. The scorer shows its own build below, but it cannot infer upstream engine details by itself."
       )
     ).toBeInTheDocument();
+
+    expect(
+      screen.getByRole("button", { name: "Autofill analyze-v1" })
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByRole("button", { name: "Clear sourceEngine*" })
+    ).toBeDisabled();
+
+    expect(
+      screen.getByText(
+        "Only use this when the JSON being scored was produced by the current /api/analyze-v1 route."
+      )
+    ).toBeInTheDocument();
   });
 
   it("switches to buckets-only mode and enables task prompt copy", () => {
@@ -86,6 +100,20 @@ describe("Evals UI rendered mode regression v0.1", () => {
     expect(
       screen.queryByText(
         "Full run bundle mode expects task provenance to come from the uploaded evalRun.v0.1 bundle. Switch to Buckets only mode to copy a ZË-RO task prompt."
+      )
+    ).not.toBeInTheDocument();
+
+    expect(
+      screen.queryByRole("button", { name: "Autofill analyze-v1" })
+    ).not.toBeInTheDocument();
+
+    expect(
+      screen.queryByRole("button", { name: "Clear sourceEngine*" })
+    ).not.toBeInTheDocument();
+
+    expect(
+      screen.queryByText(
+        "Only use this when the JSON being scored was produced by the current /api/analyze-v1 route."
       )
     ).not.toBeInTheDocument();
   });
