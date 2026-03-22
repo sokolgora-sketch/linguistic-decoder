@@ -199,6 +199,14 @@ const BASELINES: BaselineCard[] = [
 
 const SHOW_LLM_RESULTS_ON_LANDING = false;
 
+const LANDING_BETA_STRIP_TITLE = "ZË-RO Public Beta";
+const LANDING_BETA_STRIP_BODY =
+  "Deterministic evals now live. Open Instrument and Voice Lab are intentionally closed for now.";
+const LANDING_HERO_SENTENCE =
+  "ZË-RO is a deterministic eval instrument for testing whether model outputs preserve a seven-voice vowel-aperture ladder.";
+const LANDING_HERO_SUPPORT =
+  "No model calls happen inside /evals. You bring model outputs, ZË-RO scores them.";
+
 const LLM_PAPERS: LlmPaper[] = [
   {
     id: "paper1",
@@ -435,13 +443,13 @@ function LandingButton(props: {
       className={cn(
         "inline-flex w-full items-center justify-center gap-2 rounded-md border px-4 py-2 text-sm uppercase tracking-[0.12em] transition sm:w-auto",
         "font-mono",
-        props.label === "Try Evals"
+        (props.label === "Try Evals" || props.label === "Open Evals Beta")
           ? "border-[#d93333] bg-[#d93333] text-white hover:opacity-90"
           : "border-[#686868] bg-[#232323] text-[#f5f5f5] hover:border-[#d93333]",
       )}
     >
       {props.label}
-      {props.label === "Try Evals" ? (
+      {(props.label === "Try Evals" || props.label === "Open Evals Beta") ? (
         <ArrowRight className="h-3.5 w-3.5" />
       ) : null}
     </Link>
@@ -861,7 +869,7 @@ function HeroSection({ mounted }: { mounted: boolean }) {
 
         <TooltipProvider delayDuration={80}>
           <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-            <LandingButton href="/evals" label="Try Evals" />
+            <LandingButton href="/evals" label="Open Evals Beta" />
             <LandingButton
               label="Open Instrument"
               disabled
@@ -1343,6 +1351,24 @@ export function LandingPageV0_2() {
         }}
       >
         <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-6 md:px-6 lg:px-8">
+          <div className="rounded-md border border-[#d93333] bg-[#261515] px-4 py-3">
+            <div className={`${MT.microLabel} text-[#ffd6d6]`}>
+              {LANDING_BETA_STRIP_TITLE}
+            </div>
+            <div className="mt-1 text-[13px] leading-6 text-[#f1c1c1] sm:text-[14px]">
+              {LANDING_BETA_STRIP_BODY}
+            </div>
+          </div>
+
+          <div className="max-w-[760px] space-y-2">
+            <div className="text-[15px] leading-7 text-neutral-200 sm:text-[16px]">
+              {LANDING_HERO_SENTENCE}
+            </div>
+            <div className="text-[13px] leading-6 text-neutral-400 sm:text-[14px]">
+              {LANDING_HERO_SUPPORT}
+            </div>
+          </div>
+
           <StatsTicker />
           <ApertureBar mounted={mounted} />
           <HeroSection mounted={mounted} />
