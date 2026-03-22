@@ -3,6 +3,16 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 
 import { EvalsPageClientV0_1 } from "@/ui/evals/EvalsPageClient.v0.1";
 
+function forceOpenDetails(summaryText: string) {
+  const summary = screen.getByText(summaryText).closest("summary");
+  if (!summary) throw new Error(`Missing summary for: ${summaryText}`);
+
+  const details = summary.closest("details");
+  if (!details) throw new Error(`Missing details for: ${summaryText}`);
+
+  details.setAttribute("open", "");
+}
+
 describe("Evals source-engine autofill render v0.1", () => {
   afterEach(() => {
     jest.restoreAllMocks();
@@ -20,6 +30,7 @@ describe("Evals source-engine autofill render v0.1", () => {
     } as Response);
 
     render(<EvalsPageClientV0_1 />);
+    forceOpenDetails("Upstream engine provenance");
 
     fireEvent.click(screen.getByRole("button", { name: "Autofill analyze-v1" }));
 
@@ -51,6 +62,7 @@ describe("Evals source-engine autofill render v0.1", () => {
     } as Response);
 
     render(<EvalsPageClientV0_1 />);
+    forceOpenDetails("Upstream engine provenance");
 
     const clearBtn = screen.getByRole("button", { name: "Clear sourceEngine*" });
     expect(clearBtn).toBeDisabled();

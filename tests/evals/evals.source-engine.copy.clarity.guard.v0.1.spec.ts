@@ -7,7 +7,7 @@ function readUtf8(rel: string): string {
 }
 
 describe("Evals source-engine copy clarity guard v0.1", () => {
-  it("locks split run metadata vs upstream provenance wording", () => {
+  it("locks split run metadata vs collapsed upstream provenance wording", () => {
     const ui = readUtf8("src/ui/evals/EvalsPageClient.v0.1.tsx");
 
     expect(ui).toContain("Run metadata");
