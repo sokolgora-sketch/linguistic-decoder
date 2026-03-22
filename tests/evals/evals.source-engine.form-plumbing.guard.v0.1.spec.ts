@@ -40,10 +40,13 @@ describe("Evals source-engine form plumbing guard v0.1", () => {
     expect(uiSrc).toContain("...(sourceEngineVersionValue");
     expect(uiSrc).toContain("...(sourceEngineBuildValue");
 
-    expect(uiSrc).toContain("dfSplitCsvSafe(sourceEngineVersion.trim())");
-    expect(uiSrc).toContain('sourceEngineId=${sourceEngineId.trim() || ""}');
+    expect(uiSrc).toContain("const reportMeta = report.meta ?? {};");
+    expect(uiSrc).toContain('const csvLabel = String(reportMeta?.label ?? "").trim();');
+    expect(uiSrc).toContain("dfSplitCsvSafe(csvLabel)");
+    expect(uiSrc).toContain('sourceEngineId=${csvSourceEngineId || ""}');
     expect(uiSrc).toContain(
-      'sourceEngineBuild=${sourceEngineBuild.trim() || ""}',
+      'sourceEngineBuild=${csvSourceEngineBuild || ""}',
     );
+    expect(uiSrc).not.toContain("dfSplitCsvSafe(sourceEngineVersion.trim())");
   });
 });
