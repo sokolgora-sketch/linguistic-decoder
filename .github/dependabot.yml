@@ -1,13 +1,49 @@
 version: 2
+
 updates:
   - package-ecosystem: "npm"
     directory: "/"
+
     schedule:
       interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Asia/Taipei"
 
-    # Next's eslint-config currently does NOT accept ESLint v10 (peer range is ^7.23 || ^8 || ^9).
-    # So major bumps to eslint will fail npm ci and make Dependabot PRs red.
-    # When you upgrade Next / eslint-config-next to a version that supports ESLint 10+, remove this ignore.
+    open-pull-requests-limit: 2
+
+    groups:
+      prod-minor-patch:
+        dependency-type: "production"
+        update-types:
+          - "minor"
+          - "patch"
+        patterns:
+          - "*"
+
+      dev-minor-patch:
+        dependency-type: "development"
+        update-types:
+          - "minor"
+          - "patch"
+        patterns:
+          - "*"
+
     ignore:
+      # Keep this from your current file
       - dependency-name: "eslint"
-        update-types: ["version-update:semver-major"]
+        update-types:
+          - "version-update:semver-major"
+
+      # Reduce noisy toolchain major-jump PRs
+      - dependency-name: "@typescript-eslint/*"
+        update-types:
+          - "version-update:semver-major"
+
+      - dependency-name: "@testing-library/*"
+        update-types:
+          - "version-update:semver-major"
+
+      - dependency-name: "genkit-cli"
+        update-types:
+          - "version-update:semver-major"
