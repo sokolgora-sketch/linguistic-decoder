@@ -1593,19 +1593,27 @@ export function EvalsPageClientV0_1() {
 
     const { validN, invalidN } = dfSumValidInvalid(task);
 
+    const reportMeta = report.meta ?? {};
+    const csvRunId = String((report as any)?.runId ?? "").trim();
+    const csvProvider = String(reportMeta?.provider ?? "").trim();
+    const csvModel = String(reportMeta?.model ?? "").trim();
+    const csvLabel = String(reportMeta?.label ?? "").trim();
+    const csvSourceEngineId = String(reportMeta?.sourceEngineId ?? "").trim();
+    const csvSourceEngineBuild = String(reportMeta?.sourceEngineBuild ?? "").trim();
+
     const row = [
       dfNowIso(),
-      dfSplitCsvSafe(runId.trim()),
-      dfSplitCsvSafe(provider.trim()),
-      dfSplitCsvSafe(model.trim()),
-      dfSplitCsvSafe(sourceEngineVersion.trim()),
+      dfSplitCsvSafe(csvRunId),
+      dfSplitCsvSafe(csvProvider),
+      dfSplitCsvSafe(csvModel),
+      dfSplitCsvSafe(csvLabel),
       pearson_r ?? "",
       spearman_rho ?? "",
       p_perm ?? "",
       validN ?? "",
       invalidN ?? "",
       noVowelTokenCount ?? "",
-      `iters=${iters ?? ""}; seed=${seed ?? ""}; p_perm_src=p_spearman; sourceEngineId=${sourceEngineId.trim() || ""}; sourceEngineBuild=${sourceEngineBuild.trim() || ""}`,
+      `iters=${iters ?? ""}; seed=${seed ?? ""}; p_perm_src=p_spearman; sourceEngineId=${csvSourceEngineId || ""}; sourceEngineBuild=${csvSourceEngineBuild || ""}`,
     ].join(",");
 
     await dfCopyText("Copied CSV row.", row);

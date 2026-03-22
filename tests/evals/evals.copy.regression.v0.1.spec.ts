@@ -117,8 +117,11 @@ describe("Evals/Landing copy regression guard v0.1", () => {
     expect(ui).toContain("exportedAtUtc:");
     expect(ui).toContain("{devicePlateExportedAtUtc}");
 
-    expect(ui).toContain("dfSplitCsvSafe(sourceEngineVersion.trim())");
-    expect(ui).toContain('sourceEngineId=${sourceEngineId.trim() || ""}');
-    expect(ui).toContain('sourceEngineBuild=${sourceEngineBuild.trim() || ""}');
+    expect(ui).toContain("const reportMeta = report.meta ?? {};");
+      expect(ui).toContain('const csvLabel = String(reportMeta?.label ?? "").trim();');
+      expect(ui).toContain("dfSplitCsvSafe(csvLabel)");
+      expect(ui).toContain('sourceEngineId=${csvSourceEngineId || ""}');
+      expect(ui).toContain('sourceEngineBuild=${csvSourceEngineBuild || ""}');
+      expect(ui).not.toContain("dfSplitCsvSafe(sourceEngineVersion.trim())");
   });
 });
