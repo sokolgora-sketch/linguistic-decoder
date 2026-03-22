@@ -1778,85 +1778,93 @@ export function EvalsPageClientV0_1() {
               </div>
             </div>
 
-            <div className="mt-6 flex flex-wrap items-start justify-between gap-3">
-              <div className="space-y-2">
-                <div className={`${MT.sectionLabel} text-[#ededed]`}>
-                  Upstream engine provenance
-                </div>
-                <div className={`${MT.helper} text-[#a9a9a9]`}>
-                  Only fill sourceEngine* when the JSON being scored already came from an upstream ZË-RO engine/export.
-                </div>
-              </div>
-              {showAnalyzeV1Autofill ? (
-                <div className="flex flex-col items-start gap-2">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <button
-                      type="button"
-                      className={`${MT.actionUtility} border-[#444] bg-transparent text-[#b8b8b8] transition hover:border-[#777] hover:bg-[#1f1f1f] hover:text-[#f2f2f2]`}
-                      onClick={autofillAnalyzeV1SourceEngine}
-                      disabled={busy}
-                    >
-                      Autofill analyze-v1
-                    </button>
-                    <button
-                      type="button"
-                      className={`${MT.actionUtility} border-[#3a3a3a] bg-transparent text-[#9f9f9f] transition hover:border-[#666] hover:bg-[#171717] hover:text-[#f2f2f2] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-[#3a3a3a] disabled:hover:bg-transparent disabled:hover:text-[#9f9f9f]`}
-                      onClick={clearSourceEngineProvenance}
-                      disabled={busy || !hasSourceEngineMeta}
-                    >
-                      Clear sourceEngine*
-                    </button>
+            <details className="group mt-6 overflow-hidden rounded-[8px] border border-[#2f3b46] bg-[#12181d]">
+              <summary className="flex cursor-pointer list-none items-start justify-between gap-3 px-4 py-4">
+                <div className="space-y-2">
+                  <div className={`${MT.sectionLabel} text-[#ededed]`}>
+                    Upstream engine provenance
                   </div>
-                  <div className={`${MT.helper} max-w-[340px] text-[#8f8f8f]`}>
-                    Only use this when the JSON being scored was produced by the current /api/analyze-v1 route.
+                  <div className={`${MT.helper} text-[#a9a9a9]`}>
+                    Only fill sourceEngine* when the JSON being scored already came from an upstream ZË-RO engine/export.
                   </div>
                 </div>
-              ) : null}
-            </div>
+                <span className="text-[12px] text-[#b8a97a] transition-transform duration-200 group-open:rotate-180">
+                  ▼
+                </span>
+              </summary>
 
-            <div className="mt-4 grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
-              <div className="md:col-span-2 xl:col-span-4 rounded-[8px] border border-[#2f3b46] bg-[#12181d] px-4 py-3">
-                <div className={`${MT.helper} text-[#b8c7d9]`}>
-                  Leave sourceEngine* blank for hand-pasted buckets, external model outputs, or synthetic examples. The scorer cannot infer upstream engine provenance by itself.
+              <div className="border-t border-[#2f3b46] px-4 py-4">
+                {showAnalyzeV1Autofill ? (
+                  <div className="flex flex-col items-start gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <button
+                        type="button"
+                        className={`${MT.actionUtility} border-[#444] bg-transparent text-[#b8b8b8] transition hover:border-[#777] hover:bg-[#1f1f1f] hover:text-[#f2f2f2]`}
+                        onClick={autofillAnalyzeV1SourceEngine}
+                        disabled={busy}
+                      >
+                        Autofill analyze-v1
+                      </button>
+                      <button
+                        type="button"
+                        className={`${MT.actionUtility} border-[#3a3a3a] bg-transparent text-[#9f9f9f] transition hover:border-[#666] hover:bg-[#171717] hover:text-[#f2f2f2] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-[#3a3a3a] disabled:hover:bg-transparent disabled:hover:text-[#9f9f9f]`}
+                        onClick={clearSourceEngineProvenance}
+                        disabled={busy || !hasSourceEngineMeta}
+                      >
+                        Clear sourceEngine*
+                      </button>
+                    </div>
+                    <div className={`${MT.helper} max-w-[340px] text-[#8f8f8f]`}>
+                      Only use this when the JSON being scored was produced by the current /api/analyze-v1 route.
+                    </div>
+                  </div>
+                ) : null}
+
+                <div className="mt-4 grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
+                  <div className="md:col-span-2 xl:col-span-4 rounded-[8px] border border-[#2f3b46] bg-[#12181d] px-4 py-3">
+                    <div className={`${MT.helper} text-[#b8c7d9]`}>
+                      Leave sourceEngine* blank for hand-pasted buckets, external model outputs, or synthetic examples. The scorer cannot infer upstream engine provenance by itself.
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className={`${MT.fieldLabel} text-[#ededed]`}>
+                      sourceEngineId
+                    </label>
+                    <input
+                      className={`w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[11px] ${MT.fieldControl} text-[#e6e6e6] outline-none transition focus:border-[#666]`}
+                      value={sourceEngineId}
+                      onChange={(e) => setSourceEngineId(e.target.value)}
+                      placeholder="e.g. zero-api"
+                    />
+                  </div>
+
+                  <div>
+                    <label className={`${MT.fieldLabel} text-[#ededed]`}>
+                      sourceEngineVersion
+                    </label>
+                    <input
+                      className={`w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[11px] ${MT.fieldControl} text-[#e6e6e6] outline-none transition focus:border-[#666]`}
+                      value={sourceEngineVersion}
+                      onChange={(e) => setSourceEngineVersion(e.target.value)}
+                      placeholder="e.g. analyze-v1"
+                    />
+                  </div>
+
+                  <div>
+                    <label className={`${MT.fieldLabel} text-[#ededed]`}>
+                      sourceEngineBuild
+                    </label>
+                    <input
+                      className={`w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[11px] ${MT.fieldControl} text-[#e6e6e6] outline-none transition focus:border-[#666]`}
+                      value={sourceEngineBuild}
+                      onChange={(e) => setSourceEngineBuild(e.target.value)}
+                      placeholder="e.g. 845bb5a"
+                    />
+                  </div>
                 </div>
               </div>
-
-              <div>
-                <label className={`${MT.fieldLabel} text-[#ededed]`}>
-                  sourceEngineId
-                </label>
-                <input
-                  className={`w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[11px] ${MT.fieldControl} text-[#e6e6e6] outline-none transition focus:border-[#666]`}
-                  value={sourceEngineId}
-                  onChange={(e) => setSourceEngineId(e.target.value)}
-                  placeholder="e.g. zero-api"
-                />
-              </div>
-
-              <div>
-                <label className={`${MT.fieldLabel} text-[#ededed]`}>
-                  sourceEngineVersion
-                </label>
-                <input
-                  className={`w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[11px] ${MT.fieldControl} text-[#e6e6e6] outline-none transition focus:border-[#666]`}
-                  value={sourceEngineVersion}
-                  onChange={(e) => setSourceEngineVersion(e.target.value)}
-                  placeholder="e.g. analyze-v1"
-                />
-              </div>
-
-              <div>
-                <label className={`${MT.fieldLabel} text-[#ededed]`}>
-                  sourceEngineBuild
-                </label>
-                <input
-                  className={`w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[11px] ${MT.fieldControl} text-[#e6e6e6] outline-none transition focus:border-[#666]`}
-                  value={sourceEngineBuild}
-                  onChange={(e) => setSourceEngineBuild(e.target.value)}
-                  placeholder="e.g. 845bb5a"
-                />
-              </div>
-            </div>
+            </details>
           <div className="space-y-2">
             <div className={`${MT.sectionLabel} text-[#ededed]`}>
               Input source
