@@ -32,6 +32,18 @@ describe("Evals/Landing copy regression guard v0.1", () => {
 
     expect(landing).not.toContain(stale);
     expect(stats).not.toContain(stale);
+
+    expect(landing).toContain("ZË-RO Public Beta");
+    expect(landing).toContain(
+      "Deterministic evals now live. Open Instrument and Voice Lab are intentionally closed for now."
+    );
+    expect(landing).toContain(
+      "ZË-RO is a deterministic eval instrument for testing whether model outputs preserve a seven-voice vowel-aperture ladder."
+    );
+    expect(landing).toContain(
+      "No model calls happen inside /evals. You bring model outputs, ZË-RO scores them."
+    );
+    expect(landing).toContain("Open Evals Beta");
   });
 
   it("locks markdown renderer taskId and blank-meta normalization", () => {
