@@ -21,8 +21,18 @@ function forceOpenDetails(summaryText: string) {
   details.setAttribute("open", "");
 }
 
+function getDetailsBySummaryText(summaryText: string): HTMLDetailsElement {
+  const summary = screen.getByText(summaryText).closest("summary");
+  if (!summary) throw new Error(`Missing summary for: ${summaryText}`);
+
+  const details = summary.closest("details");
+  if (!details) throw new Error(`Missing details for: ${summaryText}`);
+
+  return details as HTMLDetailsElement;
+}
+
 describe("Evals UI rendered mode regression v0.1", () => {
-  it("defaults to full run bundle mode with source-only prompt copy disabled", () => {
+  it("defaults to full run bundle mode with collapsed upstream provenance", () => {
     render(<EvalsPageClientV0_1 />);
 
     expect(getModeSelect()).toHaveValue("run_bundle");
@@ -39,7 +49,6 @@ describe("Evals UI rendered mode regression v0.1", () => {
     ).toBeInTheDocument();
 
     forceOpenDetails("TASK PROMPT — USED ONLY FOR BUCKETS-ONLY MODE");
-
     expect(screen.getByRole("button", { name: "Copy" })).toBeDisabled();
 
     expect(
@@ -53,18 +62,17 @@ describe("Evals UI rendered mode regression v0.1", () => {
       screen.getByText("Optional report metadata for this scored run.")
     ).toBeInTheDocument();
 
-    expect(screen.getByText("Upstream engine provenance")).toBeInTheDocument();
+    const upstreamPanel = getDetailsBySummaryText("Upstream engine provenance");
+    expect(upstreamPanel).not.toHaveAttribute("open");
+
     expect(
       screen.getByText(
         "Only fill sourceEngine* when the JSON being scored already came from an upstream ZË-RO engine/export."
       )
     ).toBeInTheDocument();
 
-    expect(
-      screen.getByText(
-        "Leave sourceEngine* blank for hand-pasted buckets, external model outputs, or synthetic examples. The scorer cannot infer upstream engine provenance by itself."
-      )
-    ).toBeInTheDocument();
+    forceOpenDetails("Upstream engine provenance");
+    expect(upstreamPanel).toHaveAttribute("open");
 
     expect(
       screen.getByRole("button", { name: "Autofill analyze-v1" })
@@ -81,13 +89,13 @@ describe("Evals UI rendered mode regression v0.1", () => {
     ).toBeInTheDocument();
 
     expect(
-      screen.queryByText(
-        "Optional report metadata. sourceEngine* is only for upstream ZË-RO engine provenance when this input already came from another engine/export."
+      screen.getByText(
+        "Leave sourceEngine* blank for hand-pasted buckets, external model outputs, or synthetic examples. The scorer cannot infer upstream engine provenance by itself."
       )
-    ).not.toBeInTheDocument();
+    ).toBeInTheDocument();
   });
 
-  it("switches to buckets-only mode and keeps upstream provenance manual-only", () => {
+  it("switches to buckets-only mode and keeps upstream provenance manual-only behind the collapsed panel", () => {
     render(<EvalsPageClientV0_1 />);
 
     fireEvent.change(getModeSelect(), {
@@ -106,16 +114,14 @@ describe("Evals UI rendered mode regression v0.1", () => {
     ).toBeInTheDocument();
 
     forceOpenDetails("TASK PROMPT — CLICK TO EXPAND & COPY TO MODEL");
-
     expect(screen.getByRole("button", { name: "Copy" })).toBeEnabled();
 
-    expect(
-      screen.queryByText(
-        "Full run bundle mode expects task provenance to come from the uploaded evalRun.v0.1 bundle. Switch to Buckets only mode to copy a ZË-RO task prompt."
-      )
-    ).not.toBeInTheDocument();
+    const upstreamPanel = getDetailsBySummaryText("Upstream engine provenance");
+    expect(upstreamPanel).not.toHaveAttribute("open");
 
-    expect(screen.getByText("Upstream engine provenance")).toBeInTheDocument();
+    forceOpenDetails("Upstream engine provenance");
+    expect(upstreamPanel).toHaveAttribute("open");
+
     expect(
       screen.getByText(
         "Only fill sourceEngine* when the JSON being scored already came from an upstream ZË-RO engine/export."
@@ -131,9 +137,13 @@ describe("Evals UI rendered mode regression v0.1", () => {
     ).not.toBeInTheDocument();
 
     expect(
-      screen.queryByText(
-        "Only use this when the JSON being scored was produced by the current /api/analyze-v1 route."
+      screen.getByText(
+        "Leave sourceEngine* blank for hand-pasted buckets, external model outputs, or synthetic examples. The scorer cannot infer upstream engine provenance by itself."
       )
-    ).not.toBeInTheDocument();
+    ).toBeInTheDocument();
+
+    expect(screen.getByPlaceholderText("e.g. zero-api")).toBeInTheDocument();
+    expect(screen.getByPlaceholderText("e.g. analyze-v1")).toBeInTheDocument();
+    expect(screen.getByPlaceholderText("e.g. 845bb5a")).toBeInTheDocument();
   });
 });
