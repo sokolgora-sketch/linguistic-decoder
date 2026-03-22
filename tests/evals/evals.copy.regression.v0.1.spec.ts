@@ -44,6 +44,11 @@ describe("Evals/Landing copy regression guard v0.1", () => {
       "No model calls happen inside /evals. You bring model outputs, ZË-RO scores them."
     );
     expect(landing).toContain("Open Evals Beta");
+    expect(landing).toContain("Open Instrument · Coming Soon");
+    expect(landing).toContain("Voice Lab · Coming Soon");
+    expect(landing).toContain(
+      "Open Instrument and Voice Lab are planned next. They stay closed during the Evals beta so the live surface remains stable and testable."
+    );
   });
 
   it("locks markdown renderer taskId and blank-meta normalization", () => {

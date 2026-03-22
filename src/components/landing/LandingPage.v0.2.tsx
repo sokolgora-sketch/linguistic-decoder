@@ -206,6 +206,8 @@ const LANDING_HERO_SENTENCE =
   "ZË-RO is a deterministic eval instrument for testing whether model outputs preserve a seven-voice vowel-aperture ladder.";
 const LANDING_HERO_SUPPORT =
   "No model calls happen inside /evals. You bring model outputs, ZË-RO scores them.";
+const LANDING_COMING_SOON_NOTE =
+  "Open Instrument and Voice Lab are planned next. They stay closed during the Evals beta so the live surface remains stable and testable.";
 
 const LLM_PAPERS: LlmPaper[] = [
   {
@@ -871,15 +873,19 @@ function HeroSection({ mounted }: { mounted: boolean }) {
           <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
             <LandingButton href="/evals" label="Open Evals Beta" />
             <LandingButton
-              label="Open Instrument"
+              label="Open Instrument · Coming Soon"
               disabled
               tooltip="Interactive vowel-aperture instrument. Input a word or sequence and explore its phonetic grounding across the 7-voice scale in real time. In development."
             />
             <LandingButton
-              label="Voice Lab"
+              label="Voice Lab · Coming Soon"
               disabled
               tooltip="Record your voice and extract acoustic features such as F1, aperture, and duration against the ZË-RO baseline. Requires microphone access. In development."
             />
+          </div>
+
+          <div className="max-w-[760px] text-[12px] leading-6 text-neutral-500 sm:text-[13px]">
+            {LANDING_COMING_SOON_NOTE}
           </div>
         </TooltipProvider>
       </div>
