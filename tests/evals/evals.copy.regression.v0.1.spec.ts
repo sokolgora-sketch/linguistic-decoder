@@ -49,7 +49,18 @@ describe("Evals/Landing copy regression guard v0.1", () => {
     expect(landing).toContain(
       "Open Instrument and Voice Lab are planned next. They stay closed during the Evals beta so the live surface remains stable and testable."
     );
-  });
+
+      expect(landing).toContain("Research snapshots and live evals");
+      expect(landing).toContain(
+        "Reference fresh-chat and same-thread snapshots now sit beside live"
+      );
+      expect(landing).toContain(
+        "scoring, export, and validation tools."
+      );
+      expect(landing).not.toContain("Paper snapshots moved to Evals");
+      expect(landing).not.toContain(
+        "Fresh-chat and same-thread paper snapshots now live on the Evals"
+      );  });
 
   it("locks markdown renderer taskId and blank-meta normalization", () => {
     const runPath = path.join(
