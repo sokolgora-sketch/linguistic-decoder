@@ -23,6 +23,7 @@ describe("Evals/Landing copy regression guard v0.1", () => {
   it("locks landing pseudoword note wording", () => {
     const landing = readUtf8("src/components/landing/LandingPage.v0.2.tsx");
     const stats = readUtf8("src/components/landing/StatsCards.v0.1.tsx");
+    const evalsPage = readUtf8("app/evals/page.tsx");
 
     const good = "expected non-significant (p_perm > 0.05)";
     const stale = "should be weak/flat";
@@ -32,6 +33,11 @@ describe("Evals/Landing copy regression guard v0.1", () => {
 
     expect(landing).not.toContain(stale);
     expect(stats).not.toContain(stale);
+
+    expect(evalsPage).toContain('title: "ZË-RO — Evals"');
+    expect(evalsPage).toContain(
+      "Deterministic scorer for evalRun and V1..V7 bucket JSON. Bring model outputs, score them, inspect the signal, and export the report."
+    );
 
     expect(landing).toContain("ZË-RO Public Beta");
     expect(landing).toContain(
@@ -44,26 +50,36 @@ describe("Evals/Landing copy regression guard v0.1", () => {
       "No model calls happen inside /evals. You bring model outputs, ZË-RO scores them."
     );
     expect(landing).toContain("Open Evals Beta");
-      expect(landing).toContain("Report Feedback");
-      expect(landing).toContain("https://github.com/sokolgora-sketch/linguistic-decoder/issues/new");
+    expect(landing).toContain("Report Feedback");
+    expect(landing).toContain("https://github.com/sokolgora-sketch/linguistic-decoder/issues/new");
     expect(landing).toContain("Open Instrument · Coming Soon");
     expect(landing).toContain("Voice Lab · Coming Soon");
     expect(landing).toContain(
       "Open Instrument and Voice Lab are planned next. They stay closed during the Evals beta so the live surface remains stable and testable."
     );
 
-      expect(landing).toContain("Research snapshots and live evals");
-      expect(landing).toContain(
-        "Reference fresh-chat and same-thread snapshots now sit beside live"
-      );
-      expect(landing).toContain(
-        "scoring, export, and validation tools."
-      );
-      expect(landing).not.toContain("Paper snapshots moved to Evals");
-      expect(landing).not.toContain(
-        "Fresh-chat and same-thread paper snapshots now live on the Evals"
-      );  });
+    expect(landing).toContain("Research snapshots and live evals");
+    expect(landing).toContain(
+      "Reference fresh-chat and same-thread snapshots now sit beside live"
+    );
+    expect(landing).toContain(
+      "scoring, export, and validation tools."
+    );
+    expect(landing).not.toContain("Paper snapshots moved to Evals");
+    expect(landing).not.toContain(
+      "Fresh-chat and same-thread paper snapshots now live on the Evals"
+    );
 
+    expect(landing).toContain("What ZË-RO means");
+    expect(landing).toContain(
+      "ZË-RO draws from Albanian: ZË means voice, and RO points to living continuity. The name reflects the project's aim: to return attention to voice, follow it toward deeper structural patterns, and examine those patterns through a clear, repeatable, evidence-based instrument."
+    );
+    expect(landing).toContain("function MeaningSection() {");
+    const meaningIndex = landing.indexOf("<MeaningSection />");
+    const faqIndex = landing.indexOf("<FAQSection />");
+    expect(meaningIndex).toBeGreaterThan(-1);
+    expect(faqIndex).toBeGreaterThan(meaningIndex);
+  });
   it("locks markdown renderer taskId and blank-meta normalization", () => {
     const runPath = path.join(
       process.cwd(),
