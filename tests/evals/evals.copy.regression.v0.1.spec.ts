@@ -52,8 +52,8 @@ describe("Evals/Landing copy regression guard v0.1", () => {
     expect(landing).toContain("Open Evals Beta");
     expect(landing).toContain("Report Feedback");
     expect(landing).toContain("https://github.com/sokolgora-sketch/linguistic-decoder/issues/new");
-    expect(landing).toContain("Open Instrument · Coming Soon");
-    expect(landing).toContain("Voice Lab · Coming Soon");
+    expect(landing).toContain("Instrument Preview");
+    expect(landing).toContain("Voice Lab Preview");
     expect(landing).toContain(
       "Open Instrument and Voice Lab are planned next. They stay closed during the Evals beta so the live surface remains stable and testable."
     );
