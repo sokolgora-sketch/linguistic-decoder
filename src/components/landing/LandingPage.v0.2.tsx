@@ -206,6 +206,9 @@ const LANDING_HERO_SENTENCE =
   "ZË-RO is a deterministic eval instrument for testing whether model outputs preserve a seven-voice vowel-aperture ladder.";
 const LANDING_HERO_SUPPORT =
   "No model calls happen inside /evals. You bring model outputs, ZË-RO scores them.";
+const LANDING_ZERO_MEANING_TITLE = "What ZË-RO means";
+const LANDING_ZERO_MEANING_BODY =
+  "ZË-RO draws from Albanian: zë means voice, and ro points to living continuity. The name reflects the project's aim: to return attention to voice, follow it toward deeper structural patterns, and examine those patterns through a clear, repeatable, evidence-based instrument.";
 const LANDING_COMING_SOON_NOTE =
   "Open Instrument and Voice Lab are planned next. They stay closed during the Evals beta so the live surface remains stable and testable.";
 
@@ -868,6 +871,18 @@ function HeroSection({ mounted }: { mounted: boolean }) {
           vowel-aperture ↔ semantic ordering. Bring your own model output, score
           it deterministically, and export the result.
         </div>
+
+          <div className="max-w-xl rounded-md border border-[#4f4633] bg-[#1f1b14] p-4">
+            <div
+              className={`${MT.microLabel} text-[#d8c49a]`}
+              style={{ fontFamily: "Inter, sans-serif" }}
+            >
+              {LANDING_ZERO_MEANING_TITLE}
+            </div>
+            <div className="mt-2 text-sm leading-6 text-neutral-300">
+              {LANDING_ZERO_MEANING_BODY}
+            </div>
+          </div>
 
         <TooltipProvider delayDuration={80}>
           <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
