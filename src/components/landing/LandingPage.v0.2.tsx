@@ -890,14 +890,12 @@ function HeroSection({ mounted }: { mounted: boolean }) {
 
                 <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
                   <LandingButton
-                    label="Open Instrument · Coming Soon"
-                    disabled
-                    tooltip="Interactive vowel-aperture instrument. Input a word or sequence and explore its phonetic grounding across the 7-voice scale in real time. In development."
+                    href="/instrument-preview"
+                    label="Instrument Preview"
                   />
                   <LandingButton
-                    label="Voice Lab · Coming Soon"
-                    disabled
-                    tooltip="Record your voice and extract acoustic features such as F1, aperture, and duration against the ZË-RO baseline. Requires microphone access. In development."
+                    href="/voice-lab-preview"
+                    label="Voice Lab Preview"
                   />
                 </div>
               </div>
