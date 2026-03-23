@@ -1142,11 +1142,11 @@ function EvalsReferenceTeaser() {
             evals reference
           </div>
           <div className="text-lg font-semibold text-white">
-            Paper snapshots moved to Evals
+            Research snapshots and live evals
           </div>
           <div className="max-w-[720px] text-sm leading-6 text-neutral-300">
-            Fresh-chat and same-thread paper snapshots now live on the Evals
-            page, next to live scoring, report export, and validation context.
+            Reference fresh-chat and same-thread snapshots now sit beside live
+            scoring, export, and validation tools.
           </div>
         </div>
 
