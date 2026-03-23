@@ -16,6 +16,16 @@ import type {
 type ApiOk = { ok: true; report: EvalReportBundleV0_1; md: string };
 type ApiErr = { ok: false; code: string; message: string };
 
+const EVALS_BETA_INTRO_TITLE = "Public beta — bring model outputs, not prompts";
+const EVALS_BETA_INTRO_BODY =
+  "Use this page to score model-generated ladder or evalRun JSON against ZË-RO's deterministic eval instrument.";
+const EVALS_BETA_INTRO_HELP_1 =
+  "Paste either a full evalRun.v0.1 bundle or raw V1..V7 bucket JSON.";
+const EVALS_BETA_INTRO_HELP_2 =
+  "Do not paste private data, secrets, or anything you would not want copied into exports.";
+const EVALS_BETA_INTRO_HELP_3 =
+  "ZË-RO does not call models from this page. You generate outputs elsewhere, then score them here.";
+
 type InputProbe =
   | { kind: "empty" }
   | { kind: "invalid_json"; error: string }
@@ -1634,6 +1644,46 @@ export function EvalsPageClientV0_1() {
             model calls.
           </p>
         </header>
+          <div className="rounded-[10px] border border-[#3b2f1a] bg-[#17130d] px-6 py-5">
+            <div className="space-y-2">
+              <div className={`${MT.sectionLabel} text-[#f3d38b]`}>
+                {EVALS_BETA_INTRO_TITLE}
+              </div>
+              <div className={`${MT.helper} text-[#d7cfbb]`}>
+                {EVALS_BETA_INTRO_BODY}
+              </div>
+            </div>
+
+            <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-3">
+              <div className="rounded-[8px] border border-[#4a3a1b] bg-[#1d1810] px-4 py-3">
+                <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#f3d38b]">
+                  What to paste
+                </div>
+                <div className="mt-1 text-[12px] leading-6 text-[#d7cfbb]">
+                  {EVALS_BETA_INTRO_HELP_1}
+                </div>
+              </div>
+
+              <div className="rounded-[8px] border border-[#4a3a1b] bg-[#1d1810] px-4 py-3">
+                <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#f3d38b]">
+                  Privacy
+                </div>
+                <div className="mt-1 text-[12px] leading-6 text-[#d7cfbb]">
+                  {EVALS_BETA_INTRO_HELP_2}
+                </div>
+              </div>
+
+              <div className="rounded-[8px] border border-[#4a3a1b] bg-[#1d1810] px-4 py-3">
+                <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#f3d38b]">
+                  How it works
+                </div>
+                <div className="mt-1 text-[12px] leading-6 text-[#d7cfbb]">
+                  {EVALS_BETA_INTRO_HELP_3}
+                </div>
+              </div>
+            </div>
+          </div>
+
 
         <PaperSnapshotReferenceSection
           paperSnapshotTab={paperSnapshotTab}

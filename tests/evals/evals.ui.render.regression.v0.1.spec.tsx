@@ -37,6 +37,17 @@ describe("Evals UI rendered mode regression v0.1", () => {
 
     expect(getModeSelect()).toHaveValue("run_bundle");
     expect(getTaskSelect()).toBeDisabled();
+      expect(
+        screen.getByText("Public beta — bring model outputs, not prompts")
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText(
+          "Use this page to score model-generated ladder or evalRun JSON against ZË-RO's deterministic eval instrument."
+        )
+      ).toBeInTheDocument();
+      expect(screen.getByText("What to paste")).toBeInTheDocument();
+      expect(screen.getByText("Privacy")).toBeInTheDocument();
+      expect(screen.getByText("How it works")).toBeInTheDocument();
 
     expect(
       screen.getByText(
