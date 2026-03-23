@@ -44,6 +44,8 @@ describe("Evals/Landing copy regression guard v0.1", () => {
       "No model calls happen inside /evals. You bring model outputs, ZË-RO scores them."
     );
     expect(landing).toContain("Open Evals Beta");
+      expect(landing).toContain("Report Feedback");
+      expect(landing).toContain("https://github.com/sokolgora-sketch/linguistic-decoder/issues/new");
     expect(landing).toContain("Open Instrument · Coming Soon");
     expect(landing).toContain("Voice Lab · Coming Soon");
     expect(landing).toContain(

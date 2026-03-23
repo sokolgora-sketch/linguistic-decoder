@@ -1574,6 +1574,12 @@ export function EvalsPageClientV0_1() {
     );
   };
 
+  const onCopyPageLink = async () => {
+    if (typeof window === "undefined") return;
+    const href = new URL("/evals", window.location.origin).toString();
+    await dfCopyText("Copied page link.", href);
+  };
+
   const onCopyCsvRow = async () => {
     if (!report) {
       setNotice("Copy CSV Row: score first.");
@@ -1684,6 +1690,25 @@ export function EvalsPageClientV0_1() {
             </div>
           </div>
 
+
+        <div className="mt-4 flex flex-wrap items-center gap-3">
+          <Link
+            href="https://github.com/sokolgora-sketch/linguistic-decoder/issues/new"
+            target="_blank"
+            rel="noreferrer"
+            className={`inline-flex items-center rounded-[6px] border border-[#6a5a2a] bg-[#242016] px-3 py-2 ${MT.actionSm} text-[#f3d38b] transition hover:border-[#8a7636] hover:bg-[#2a2418] hover:text-[#fff1c2]`}
+          >
+            Report feedback ↗
+          </Link>
+
+          <button
+            type="button"
+            className={`${MT.actionUtility} border-[#6a5a2a] bg-transparent text-[#f3d38b] transition hover:border-[#8a7636] hover:bg-[#1f1a12] hover:text-[#fff1c2]`}
+            onClick={() => void onCopyPageLink()}
+          >
+            Copy page link
+          </button>
+        </div>
 
         <PaperSnapshotReferenceSection
           paperSnapshotTab={paperSnapshotTab}

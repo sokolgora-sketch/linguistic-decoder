@@ -48,6 +48,12 @@ describe("Evals UI rendered mode regression v0.1", () => {
       expect(screen.getByText("What to paste")).toBeInTheDocument();
       expect(screen.getByText("Privacy")).toBeInTheDocument();
       expect(screen.getByText("How it works")).toBeInTheDocument();
+        expect(
+          screen.getByRole("link", { name: /Report feedback/i })
+        ).toBeInTheDocument();
+        expect(
+          screen.getByRole("button", { name: "Copy page link" })
+        ).toBeInTheDocument();
 
     expect(
       screen.getByText(

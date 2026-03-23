@@ -23,7 +23,11 @@ describe("Evals source-engine copy clarity guard v0.1", () => {
     expect(ui).toContain(
       "ZË-RO does not call models from this page. You generate outputs elsewhere, then score them here."
     );
-expect(ui).toContain("Run metadata");
+expect(ui).toContain("Report feedback ↗");
+    expect(ui).toContain("Copy page link");
+    expect(ui).toContain("Copied page link.");
+    expect(ui).toContain("https://github.com/sokolgora-sketch/linguistic-decoder/issues/new");
+    expect(ui).toContain("Run metadata");
     expect(ui).toContain("Optional report metadata for this scored run.");
 
     expect(ui).toContain("Upstream engine provenance");
