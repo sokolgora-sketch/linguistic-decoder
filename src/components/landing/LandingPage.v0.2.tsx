@@ -421,13 +421,13 @@ function LandingButton(props: {
       type="button"
       disabled
       className={cn(
-        "inline-flex w-full items-center justify-center gap-2 rounded-md border px-4 py-2 text-sm uppercase tracking-[0.12em] transition sm:w-auto",
+        "inline-flex w-full items-center justify-center gap-1.5 rounded-full border px-3.5 py-2 text-[11px] uppercase tracking-[0.14em] transition sm:w-auto sm:px-4",
         "font-mono",
-        "border-[#686868] bg-[#232323] text-neutral-300",
+        "border-[#555] bg-[#1b1b1b] text-[#a3a3a3]",
       )}
     >
       {props.label}
-      <Lock className="h-3.5 w-3.5" />
+      <Lock className="h-3 w-3" />
     </button>
   ) : props.external ? (
     <Link
@@ -435,27 +435,27 @@ function LandingButton(props: {
       target="_blank"
       rel="noreferrer"
       className={cn(
-        "inline-flex w-full items-center justify-center gap-2 rounded-md border px-4 py-2 text-sm uppercase tracking-[0.12em] transition sm:w-auto",
-        "font-mono border-[#686868] bg-[#232323] text-[#f5f5f5] hover:border-[#d93333]",
+        "inline-flex w-full items-center justify-center gap-1.5 rounded-full border px-3.5 py-2 text-[11px] uppercase tracking-[0.14em] transition sm:w-auto sm:px-4",
+        "font-mono border-[#5c5c5c] bg-transparent text-[#f5f5f5] hover:border-[#d93333] hover:bg-[#1d1d1d]",
       )}
     >
       {props.label}
-      <ExternalLink className="h-3.5 w-3.5" />
+      <ExternalLink className="h-3 w-3" />
     </Link>
   ) : (
     <Link
       href={props.href ?? "#"}
       className={cn(
-        "inline-flex w-full items-center justify-center gap-2 rounded-md border px-4 py-2 text-sm uppercase tracking-[0.12em] transition sm:w-auto",
+        "inline-flex w-full items-center justify-center gap-1.5 rounded-full border px-3.5 py-2 text-[11px] uppercase tracking-[0.14em] transition sm:w-auto sm:px-4",
         "font-mono",
         (props.label === "Try Evals" || props.label === "Open Evals Beta")
-          ? "border-[#d93333] bg-[#d93333] text-white hover:opacity-90"
+          ? "border-[#d93333] bg-[#d93333] text-white hover:border-[#ef4444] hover:bg-[#ef4444]"
           : "border-[#686868] bg-[#232323] text-[#f5f5f5] hover:border-[#d93333]",
       )}
     >
       {props.label}
       {(props.label === "Try Evals" || props.label === "Open Evals Beta") ? (
-        <ArrowRight className="h-3.5 w-3.5" />
+        <ArrowRight className="h-3 w-3" />
       ) : null}
     </Link>
   );
@@ -867,38 +867,45 @@ function HeroSection({ mounted }: { mounted: boolean }) {
         </div>
 
         <div className="max-w-xl rounded-md border border-[#686868] bg-[#232323] p-4 text-sm leading-6 text-neutral-300">
-          Use ZË-RO to test whether model outputs preserve a stable
-          vowel-aperture ↔ semantic ordering. Bring your own model output, score
-          it deterministically, and export the result.
+            Use ZË-RO to test whether model outputs preserve a stable
+            vowel-aperture ↔ semantic ordering. Bring your own model output, score
+            it deterministically, and export the result.
+          </div>
+
+          <div className="max-w-xl space-y-3">
+            <div className="text-[12px] leading-6 text-neutral-500 sm:text-[13px]">
+              {LANDING_COMING_SOON_NOTE}
+            </div>
+
+            <TooltipProvider delayDuration={80}>
+              <div className="flex flex-col items-start gap-2.5">
+                <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
+                  <LandingButton href="/evals" label="Open Evals Beta" />
+                  <LandingButton
+                    href="https://github.com/sokolgora-sketch/linguistic-decoder/issues/new"
+                    label="Report Feedback"
+                    external
+                  />
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
+                  <LandingButton
+                    label="Open Instrument · Coming Soon"
+                    disabled
+                    tooltip="Interactive vowel-aperture instrument. Input a word or sequence and explore its phonetic grounding across the 7-voice scale in real time. In development."
+                  />
+                  <LandingButton
+                    label="Voice Lab · Coming Soon"
+                    disabled
+                    tooltip="Record your voice and extract acoustic features such as F1, aperture, and duration against the ZË-RO baseline. Requires microphone access. In development."
+                  />
+                </div>
+              </div>
+            </TooltipProvider>
+          </div>
         </div>
-          </div>
 
-        <TooltipProvider delayDuration={80}>
-          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-            <LandingButton href="/evals" label="Open Evals Beta" />
-            <LandingButton
-              href="https://github.com/sokolgora-sketch/linguistic-decoder/issues/new"
-              label="Report Feedback"
-              external
-            />
-            <LandingButton
-              label="Open Instrument · Coming Soon"
-              disabled
-              tooltip="Interactive vowel-aperture instrument. Input a word or sequence and explore its phonetic grounding across the 7-voice scale in real time. In development."
-            />
-            <LandingButton
-              label="Voice Lab · Coming Soon"
-              disabled
-              tooltip="Record your voice and extract acoustic features such as F1, aperture, and duration against the ZË-RO baseline. Requires microphone access. In development."
-            />
-          </div>
-
-          <div className="max-w-[760px] text-[12px] leading-6 text-neutral-500 sm:text-[13px]">
-            {LANDING_COMING_SOON_NOTE}
-          </div>
-        </TooltipProvider>
-
-      <div className="grid gap-4">
+        <div className="grid gap-4">
         <HeroChart mounted={mounted} />
         <div className="grid gap-4 md:grid-cols-2">
           <HeroStatsCard />
