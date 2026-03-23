@@ -873,6 +873,11 @@ function HeroSection({ mounted }: { mounted: boolean }) {
           <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
             <LandingButton href="/evals" label="Open Evals Beta" />
             <LandingButton
+              href="https://github.com/sokolgora-sketch/linguistic-decoder/issues/new"
+              label="Report Feedback"
+              external
+            />
+            <LandingButton
               label="Open Instrument · Coming Soon"
               disabled
               tooltip="Interactive vowel-aperture instrument. Input a word or sequence and explore its phonetic grounding across the 7-voice scale in real time. In development."
