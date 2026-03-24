@@ -854,10 +854,23 @@ export function EvalsPageClientV0_1() {
     "paper1",
   );
   const [savedRuns, setSavedRuns] = useState<EvalsSavedRunRecordV0_1[]>([]);
+  const [selectedSavedRunId, setSelectedSavedRunId] = useState<string>("");
 
   useEffect(() => {
-    setSavedRuns(readSavedRuns());
+    const rows = readSavedRuns();
+    setSavedRuns(rows);
+    setSelectedSavedRunId(rows[0]?.id ?? "");
   }, []);
+
+  useEffect(() => {
+    if (!savedRuns.length) {
+      setSelectedSavedRunId("");
+      return;
+    }
+    setSelectedSavedRunId((prev) =>
+      prev && savedRuns.some((row) => row.id === prev) ? prev : savedRuns[0].id,
+    );
+  }, [savedRuns]);
 
   const bucketsOnlyTasks = useMemo(
     () => byoTasks.filter((t) => t.taskId === "T2_LADDER_V0_1"),
@@ -1209,6 +1222,15 @@ export function EvalsPageClientV0_1() {
     return nextRecord;
   }
 
+  function openSelectedSavedRun() {
+    const selected = savedRuns.find((row) => row.id === selectedSavedRunId);
+    if (!selected) {
+      setNotice("Open Saved Run: choose a saved run first.");
+      setTimeout(() => setNotice(null), 1800);
+      return;
+    }
+    restoreWorkbench(selected.workbench);
+  }
   function resetWorkbench() {
     setInputText("");
     setPickedFileName("");
@@ -2217,6 +2239,52 @@ export function EvalsPageClientV0_1() {
             </div>
           </div>
           <div className="space-y-3 pt-4">
+              <div className="rounded-[10px] border border-[#2f3b46] bg-[#12181d] px-5 py-4">
+                <div className="flex flex-col gap-3 xl:flex-row xl:items-end xl:justify-between">
+                  <div className="space-y-1">
+                    <div className={`${MT.sectionLabel} text-[#ededed]`}>
+                      Saved runs
+                    </div>
+                    <div className={`${MT.helper} text-[#a9a9a9]`}>
+                      Open a previously saved run checkpoint after reload or reset.
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+                    <div className="min-w-[280px]">
+                      <label className={`${MT.fieldLabel} text-[#ededed]`}>
+                        Open Saved Run
+                      </label>
+                      <select
+                        className={`mt-1 w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[11px] ${MT.fieldControl} text-[#e6e6e6] outline-none transition focus:border-[#666]`}
+                        value={selectedSavedRunId}
+                        onChange={(e) => setSelectedSavedRunId(e.target.value)}
+                        disabled={busy || savedRuns.length === 0}
+                      >
+                        {savedRuns.length === 0 ? (
+                          <option value="">No saved runs yet</option>
+                        ) : (
+                          savedRuns.map((row) => (
+                            <option key={row.id} value={row.id}>
+                              {row.title} · {row.id.slice(0, 8)}
+                            </option>
+                          ))
+                        )}
+                      </select>
+                    </div>
+
+                    <button
+                      type="button"
+                      className={`${MT.actionSecondary} border-[#555] bg-[#1a1a1a] text-[#e2e2e2] transition hover:border-[#777] hover:bg-[#202020] hover:text-white disabled:opacity-50`}
+                      onClick={openSelectedSavedRun}
+                      disabled={busy || !selectedSavedRunId}
+                    >
+                      Open Saved Run
+                    </button>
+                  </div>
+                </div>
+              </div>
+
             {mode === "run_bundle" && inputProbe.kind === "bucket_only" ? (
               <div className="rounded-[10px] border border-[#5b4a20] bg-[#1d1a12] px-5 py-4">
                 <div className="flex flex-wrap items-start gap-3">
