@@ -13,11 +13,17 @@ import type {
   EvalTaskReportV0_1,
 } from "@/shared/evals/report.v0.1";
 import {
+  applySeriesRunIdTemplate,
+  formatSeriesOrdinal,
+  makeDefaultRunSeries,
   makeSavedRunId,
+  readRunSeries,
   readSavedRuns,
+  writeRunSeries,
   writeSavedRuns,
 } from "@/ui/evals/evalsRunStore.v0.1";
 import type {
+  EvalsRunSeriesV0_1,
   EvalsSavedRunRecordV0_1,
   EvalsWorkbenchStateV0_1,
 } from "@/ui/evals/evalsRunStore.v0.1";
@@ -855,11 +861,19 @@ export function EvalsPageClientV0_1() {
   );
   const [savedRuns, setSavedRuns] = useState<EvalsSavedRunRecordV0_1[]>([]);
   const [selectedSavedRunId, setSelectedSavedRunId] = useState<string>("");
+  const [runSeries, setRunSeries] = useState<EvalsRunSeriesV0_1[]>([]);
+  const [selectedSeriesId, setSelectedSeriesId] = useState<string>("");
+  const [seriesLabelDraft, setSeriesLabelDraft] = useState<string>("fresh-chat");
+  const [seriesTargetCountDraft, setSeriesTargetCountDraft] = useState<string>("15");
 
   useEffect(() => {
     const rows = readSavedRuns();
     setSavedRuns(rows);
     setSelectedSavedRunId(rows[0]?.id ?? "");
+
+    const seriesRows = readRunSeries();
+    setRunSeries(seriesRows);
+    setSelectedSeriesId(seriesRows[0]?.id ?? "");
   }, []);
 
   useEffect(() => {
@@ -871,6 +885,16 @@ export function EvalsPageClientV0_1() {
       prev && savedRuns.some((row) => row.id === prev) ? prev : savedRuns[0].id,
     );
   }, [savedRuns]);
+
+  useEffect(() => {
+    if (!runSeries.length) {
+      setSelectedSeriesId("");
+      return;
+    }
+    setSelectedSeriesId((prev) =>
+      prev && runSeries.some((row) => row.id === prev) ? prev : runSeries[0].id,
+    );
+  }, [runSeries]);
 
   const bucketsOnlyTasks = useMemo(
     () => byoTasks.filter((t) => t.taskId === "T2_LADDER_V0_1"),
@@ -1195,18 +1219,80 @@ export function EvalsPageClientV0_1() {
     setTimeout(() => setNotice(null), 1800);
   }
 
-  function saveCurrentRun() {
+  function parseSeriesTargetCount(raw: string) {
+    const parsed = Number.parseInt(raw, 10);
+    return Number.isFinite(parsed) && parsed >= 1 ? parsed : 15;
+  }
+
+  function slugifySeriesPart(raw: string) {
+    const next = raw
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+    return next || "series";
+  }
+
+  function buildRunSeriesTemplate(labelValue: string) {
+    const providerPart = slugifySeriesPart(provider || "provider");
+    const modelPart = slugifySeriesPart(model || "model");
+    const labelPart = slugifySeriesPart(labelValue);
+    return `battery.v0.1.${providerPart}.${modelPart}.${labelPart}.{NN}`;
+  }
+
+  function makeSeriesLabel(labelValue: string, ordinal: number) {
+    return `${labelValue}.${formatSeriesOrdinal(ordinal).slice(1)}`;
+  }
+
+  function getSelectedRunSeries() {
+    return runSeries.find((row) => row.id === selectedSeriesId) ?? null;
+  }
+
+  function prefillNextSeriesRun(series: EvalsRunSeriesV0_1) {
+    setRunId(applySeriesRunIdTemplate(series.runIdTemplate, series.nextOrdinal));
+    setLabel(makeSeriesLabel(series.label, series.nextOrdinal));
+  }
+
+  function createRunSeries() {
+    const cleanedLabel = seriesLabelDraft.trim() || "fresh-chat";
+    const targetCount = parseSeriesTargetCount(seriesTargetCountDraft);
+    const nextSeries = makeDefaultRunSeries(
+      cleanedLabel,
+      buildRunSeriesTemplate(cleanedLabel),
+      targetCount,
+    );
+
+    setRunSeries((prev) => {
+      const nextRows = [nextSeries, ...prev];
+      writeRunSeries(nextRows);
+      return nextRows;
+    });
+
+    setSelectedSeriesId(nextSeries.id);
+    setSeriesLabelDraft(cleanedLabel);
+    setSeriesTargetCountDraft(String(targetCount));
+    prefillNextSeriesRun(nextSeries);
+    setNotice(`Created series: ${cleanedLabel}`);
+    setTimeout(() => setNotice(null), 1800);
+  }
+
+  function saveCurrentRun(seriesOverride?: EvalsRunSeriesV0_1 | null) {
     const snapshot = snapshotWorkbench();
     const now = Date.now();
-    const title = label.trim() || runId.trim() || "Saved run";
+    const series = seriesOverride ?? null;
+    const seriesOrdinal = series?.nextOrdinal ?? null;
+    const title =
+      label.trim() ||
+      runId.trim() ||
+      (series ? makeSeriesLabel(series.label, series.nextOrdinal) : "Saved run");
 
     const nextRecord: EvalsSavedRunRecordV0_1 = {
       id: makeSavedRunId(),
       title,
       createdAt: now,
       updatedAt: now,
-      seriesId: null,
-      ordinal: null,
+      seriesId: series?.id ?? null,
+      ordinal: seriesOrdinal,
       workbench: snapshot,
     };
 
@@ -1216,10 +1302,46 @@ export function EvalsPageClientV0_1() {
       return nextRows;
     });
 
-    setNotice(`Saved run: ${title}`);
-    setTimeout(() => setNotice(null), 1800);
+    if (!series) {
+      setNotice(`Saved run: ${title}`);
+      setTimeout(() => setNotice(null), 1800);
+    }
 
     return nextRecord;
+  }
+
+  function saveAndAdvanceSeries() {
+    const series = getSelectedRunSeries();
+    if (!series) {
+      setNotice("Save + Next Run: create or select a series first.");
+      setTimeout(() => setNotice(null), 1800);
+      return;
+    }
+
+    saveCurrentRun(series);
+
+    const nextSeries: EvalsRunSeriesV0_1 = {
+      ...series,
+      nextOrdinal: series.nextOrdinal + 1,
+      updatedAt: Date.now(),
+    };
+
+    setRunSeries((prev) => {
+      const nextRows = prev.map((row) => (row.id === series.id ? nextSeries : row));
+      writeRunSeries(nextRows);
+      return nextRows;
+    });
+
+    setInputText("");
+    setPickedFileName("");
+    setApiErr(null);
+    setReport(null);
+    setMd("");
+    prefillNextSeriesRun(nextSeries);
+    setNotice(
+      `Saved ${series.label} ${formatSeriesOrdinal(series.nextOrdinal)}. Ready for ${formatSeriesOrdinal(nextSeries.nextOrdinal)}.`,
+    );
+    setTimeout(() => setNotice(null), 2200);
   }
 
   function openSelectedSavedRun() {
@@ -1929,10 +2051,10 @@ export function EvalsPageClientV0_1() {
             </div>
 
             <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
-              <div>
+                <div className="md:col-span-2 xl:col-span-2">
                 <label className={`${MT.fieldLabel} text-[#ededed]`}>runId</label>
                 <input
-                  className={`w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[11px] ${MT.fieldControl} text-[#e6e6e6] outline-none transition focus:border-[#666]`}
+                    className={`w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[11px] font-mono text-[13px] ${MT.fieldControl} text-[#e6e6e6] outline-none transition focus:border-[#666]`}
                   value={runId}
                   onChange={(e) => setRunId(e.target.value)}
                 />
@@ -1970,6 +2092,7 @@ export function EvalsPageClientV0_1() {
                 />
               </div>
             </div>
+
 
             <details className="group mt-6 overflow-hidden rounded-[8px] border border-[#2f3b46] bg-[#12181d]">
               <summary className="flex cursor-pointer list-none items-start justify-between gap-3 px-4 py-4">
@@ -2058,6 +2181,140 @@ export function EvalsPageClientV0_1() {
                 </div>
               </div>
             </details>
+            <div className="space-y-3 pt-4">
+                <div className="rounded-[10px] border border-[#2d4a34] bg-[#101712] px-5 py-4">
+                  <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
+                    <div className="space-y-1">
+                      <div className={`${MT.sectionLabel} text-[#ededed]`}>
+                        Run series
+                      </div>
+                      <div className={`${MT.helper} text-[#a9a9a9]`}>
+                        Default target count is 15, but you can use any positive integer.
+                      </div>
+                    </div>
+
+                    <div className="grid gap-3 sm:grid-cols-[minmax(180px,1fr)_120px_minmax(220px,1fr)_auto] sm:items-end">
+                      <div>
+                        <label className={`${MT.fieldLabel} text-[#ededed]`}>
+                          Series label
+                        </label>
+                        <input
+                          className={`mt-1 w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[11px] ${MT.fieldControl} text-[#e6e6e6] outline-none transition focus:border-[#666]`}
+                          value={seriesLabelDraft}
+                          onChange={(e) => setSeriesLabelDraft(e.target.value)}
+                          placeholder="fresh-chat"
+                          disabled={busy}
+                        />
+                      </div>
+
+                      <div>
+                        <label className={`${MT.fieldLabel} text-[#ededed]`}>
+                          Target count
+                        </label>
+                        <input
+                          type="number"
+                          min="1"
+                          step="1"
+                          className={`mt-1 w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[11px] ${MT.fieldControl} text-[#e6e6e6] outline-none transition focus:border-[#666]`}
+                          value={seriesTargetCountDraft}
+                          onChange={(e) => setSeriesTargetCountDraft(e.target.value)}
+                          disabled={busy}
+                        />
+                      </div>
+
+                      <div>
+                        <label className={`${MT.fieldLabel} text-[#ededed]`}>
+                          Active series
+                        </label>
+                        <select
+                          className={`mt-1 w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[11px] ${MT.fieldControl} text-[#e6e6e6] outline-none transition focus:border-[#666]`}
+                          value={selectedSeriesId}
+                          onChange={(e) => setSelectedSeriesId(e.target.value)}
+                          disabled={busy || runSeries.length === 0}
+                        >
+                          {runSeries.length === 0 ? (
+                            <option value="">No series yet</option>
+                          ) : (
+                            runSeries.map((series) => (
+                              <option key={series.id} value={series.id}>
+                                {series.label} · next {series.nextOrdinal} / {series.targetCount}
+                              </option>
+                            ))
+                          )}
+                        </select>
+                      </div>
+
+                      <button
+                        type="button"
+                        className={`${MT.actionSecondary} border-[#2d4f8f] bg-[#15233d] text-[#c7d9ff] transition hover:border-[#4b73bd] hover:bg-[#1a2b48] hover:text-white disabled:opacity-50`}
+                        onClick={createRunSeries}
+                        disabled={busy}
+                      >
+                        Create Series
+                      </button>
+
+                      <button
+                        type="button"
+                        className={`${MT.actionSecondary} border-[#2d7f5a] bg-[#103224] text-[#c9f5df] transition hover:border-[#3ea776] hover:bg-[#17442f] hover:text-white disabled:opacity-50`}
+                        onClick={saveAndAdvanceSeries}
+                        disabled={busy || !selectedSeriesId || (!inputText.trim() && !report && !md)}
+                      >
+                        Save + Next Run
+                      </button>
+                    </div>
+
+                  </div>
+                </div>
+
+              <div className="rounded-[10px] border border-[#2f3b46] bg-[#12181d] px-5 py-4">
+                <div className="flex flex-col gap-3 xl:flex-row xl:items-end xl:justify-between">
+                  <div className="space-y-1">
+                    <div className={`${MT.sectionLabel} text-[#ededed]`}>
+                      Saved runs
+                    </div>
+                    <div className={`${MT.helper} text-[#a9a9a9]`}>
+                      Open a previously saved run checkpoint after reload or reset.
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+                    <div className="min-w-[280px]">
+                      <label className={`${MT.fieldLabel} text-[#ededed]`}>
+                        Open Saved Run
+                      </label>
+                      <select
+                        className={`mt-1 w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[11px] ${MT.fieldControl} text-[#e6e6e6] outline-none transition focus:border-[#666]`}
+                        value={selectedSavedRunId}
+                        onChange={(e) => setSelectedSavedRunId(e.target.value)}
+                        disabled={busy || savedRuns.length === 0}
+                      >
+                        {savedRuns.length === 0 ? (
+                          <option value="">No saved runs yet</option>
+                        ) : (
+                          savedRuns.map((row) => (
+                            <option key={row.id} value={row.id}>
+                              {row.title} · {row.id.slice(0, 8)}
+                            </option>
+                          ))
+                        )}
+                      </select>
+                    </div>
+
+                    <button
+                      type="button"
+                      className={`${MT.actionSecondary} border-[#555] bg-[#1a1a1a] text-[#e2e2e2] transition hover:border-[#777] hover:bg-[#202020] hover:text-white disabled:opacity-50`}
+                      onClick={openSelectedSavedRun}
+                      disabled={busy || !selectedSavedRunId}
+                    >
+                      Open Saved Run
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+
           <div className="space-y-2">
             <div className={`${MT.sectionLabel} text-[#ededed]`}>
               Input source
@@ -2173,7 +2430,7 @@ export function EvalsPageClientV0_1() {
               <button
                 type="button"
                 className={`${MT.actionSecondary} border-[#555] bg-[#1a1a1a] text-[#e2e2e2] transition hover:border-[#777] hover:bg-[#202020] hover:text-white disabled:opacity-50`}
-                onClick={resetWorkbench}
+                onClick={() => resetWorkbench()}
                 disabled={busy}
               >
                 Reset Workbench
@@ -2182,7 +2439,7 @@ export function EvalsPageClientV0_1() {
                 <button
                   type="button"
                   className={`${MT.actionSecondary} border-[#2d4f8f] bg-[#15233d] text-[#c7d9ff] transition hover:border-[#4b73bd] hover:bg-[#1a2b48] hover:text-white disabled:opacity-50`}
-                  onClick={saveCurrentRun}
+                  onClick={() => saveCurrentRun()}
                   disabled={busy || (!inputText.trim() && !report && !md)}
                 >
                   Save Run
@@ -2239,52 +2496,6 @@ export function EvalsPageClientV0_1() {
             </div>
           </div>
           <div className="space-y-3 pt-4">
-              <div className="rounded-[10px] border border-[#2f3b46] bg-[#12181d] px-5 py-4">
-                <div className="flex flex-col gap-3 xl:flex-row xl:items-end xl:justify-between">
-                  <div className="space-y-1">
-                    <div className={`${MT.sectionLabel} text-[#ededed]`}>
-                      Saved runs
-                    </div>
-                    <div className={`${MT.helper} text-[#a9a9a9]`}>
-                      Open a previously saved run checkpoint after reload or reset.
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
-                    <div className="min-w-[280px]">
-                      <label className={`${MT.fieldLabel} text-[#ededed]`}>
-                        Open Saved Run
-                      </label>
-                      <select
-                        className={`mt-1 w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[11px] ${MT.fieldControl} text-[#e6e6e6] outline-none transition focus:border-[#666]`}
-                        value={selectedSavedRunId}
-                        onChange={(e) => setSelectedSavedRunId(e.target.value)}
-                        disabled={busy || savedRuns.length === 0}
-                      >
-                        {savedRuns.length === 0 ? (
-                          <option value="">No saved runs yet</option>
-                        ) : (
-                          savedRuns.map((row) => (
-                            <option key={row.id} value={row.id}>
-                              {row.title} · {row.id.slice(0, 8)}
-                            </option>
-                          ))
-                        )}
-                      </select>
-                    </div>
-
-                    <button
-                      type="button"
-                      className={`${MT.actionSecondary} border-[#555] bg-[#1a1a1a] text-[#e2e2e2] transition hover:border-[#777] hover:bg-[#202020] hover:text-white disabled:opacity-50`}
-                      onClick={openSelectedSavedRun}
-                      disabled={busy || !selectedSavedRunId}
-                    >
-                      Open Saved Run
-                    </button>
-                  </div>
-                </div>
-              </div>
-
             {mode === "run_bundle" && inputProbe.kind === "bucket_only" ? (
               <div className="rounded-[10px] border border-[#5b4a20] bg-[#1d1a12] px-5 py-4">
                 <div className="flex flex-wrap items-start gap-3">

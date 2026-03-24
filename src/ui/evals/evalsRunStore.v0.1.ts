@@ -90,3 +90,29 @@ export function makeSeriesId() {
   }
   return `run-series-${Date.now()}`;
 }
+
+export function formatSeriesOrdinal(n: number) {
+  const safe = Number.isFinite(n) && n > 0 ? Math.floor(n) : 1;
+  return `r${String(safe).padStart(2, "0")}`;
+}
+
+export function applySeriesRunIdTemplate(template: string, ordinal: number) {
+  return template.replaceAll("{NN}", formatSeriesOrdinal(ordinal));
+}
+
+export function makeDefaultRunSeries(
+  label: string,
+  runIdTemplate: string,
+  targetCount = 15,
+): EvalsRunSeriesV0_1 {
+  const now = Date.now();
+  return {
+    id: makeSeriesId(),
+    label,
+    targetCount,
+    nextOrdinal: 1,
+    runIdTemplate,
+    createdAt: now,
+    updatedAt: now,
+  };
+}
