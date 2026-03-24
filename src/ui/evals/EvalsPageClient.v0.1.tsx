@@ -12,6 +12,15 @@ import type {
   EvalReportBundleV0_1,
   EvalTaskReportV0_1,
 } from "@/shared/evals/report.v0.1";
+import {
+  makeSavedRunId,
+  readSavedRuns,
+  writeSavedRuns,
+} from "@/ui/evals/evalsRunStore.v0.1";
+import type {
+  EvalsSavedRunRecordV0_1,
+  EvalsWorkbenchStateV0_1,
+} from "@/ui/evals/evalsRunStore.v0.1";
 
 type ApiOk = { ok: true; report: EvalReportBundleV0_1; md: string };
 type ApiErr = { ok: false; code: string; message: string };
@@ -844,6 +853,11 @@ export function EvalsPageClientV0_1() {
   const [paperSnapshotTab, setPaperSnapshotTab] = useState<"paper1" | "paper2">(
     "paper1",
   );
+  const [savedRuns, setSavedRuns] = useState<EvalsSavedRunRecordV0_1[]>([]);
+
+  useEffect(() => {
+    setSavedRuns(readSavedRuns());
+  }, []);
 
   const bucketsOnlyTasks = useMemo(
     () => byoTasks.filter((t) => t.taskId === "T2_LADDER_V0_1"),
@@ -1129,6 +1143,70 @@ export function EvalsPageClientV0_1() {
         },
       ],
     };
+  }
+
+  function snapshotWorkbench(): EvalsWorkbenchStateV0_1 {
+    return {
+      mode,
+      taskId,
+      runId,
+      provider,
+      model,
+      label,
+      sourceEngineId,
+      sourceEngineVersion,
+      sourceEngineBuild,
+      inputText,
+      pickedFileName,
+      report,
+      md,
+    };
+  }
+
+  function restoreWorkbench(snapshot: EvalsWorkbenchStateV0_1) {
+    setMode(snapshot.mode);
+    setTaskId(snapshot.taskId);
+    setRunId(snapshot.runId);
+    setProvider(snapshot.provider);
+    setModel(snapshot.model);
+    setLabel(snapshot.label);
+    setSourceEngineId(snapshot.sourceEngineId);
+    setSourceEngineVersion(snapshot.sourceEngineVersion);
+    setSourceEngineBuild(snapshot.sourceEngineBuild);
+    setInputText(snapshot.inputText);
+    setPickedFileName(snapshot.pickedFileName);
+    setReport(snapshot.report);
+    setMd(snapshot.md);
+    setApiErr(null);
+    setNotice("Saved run opened.");
+    setTimeout(() => setNotice(null), 1800);
+  }
+
+  function saveCurrentRun() {
+    const snapshot = snapshotWorkbench();
+    const now = Date.now();
+    const title = label.trim() || runId.trim() || "Saved run";
+
+    const nextRecord: EvalsSavedRunRecordV0_1 = {
+      id: makeSavedRunId(),
+      title,
+      createdAt: now,
+      updatedAt: now,
+      seriesId: null,
+      ordinal: null,
+      workbench: snapshot,
+    };
+
+    setSavedRuns((prev) => {
+      const nextRows = [nextRecord, ...prev];
+      writeSavedRuns(nextRows);
+      return nextRows;
+    });
+
+    setNotice(`Saved run: ${title}`);
+    setTimeout(() => setNotice(null), 1800);
+
+    return nextRecord;
   }
 
   function resetWorkbench() {
