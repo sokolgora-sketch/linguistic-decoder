@@ -2157,6 +2157,15 @@ export function EvalsPageClientV0_1() {
                 Reset Workbench
               </button>
 
+                <button
+                  type="button"
+                  className={`${MT.actionSecondary} border-[#2d4f8f] bg-[#15233d] text-[#c7d9ff] transition hover:border-[#4b73bd] hover:bg-[#1a2b48] hover:text-white disabled:opacity-50`}
+                  onClick={saveCurrentRun}
+                  disabled={busy || (!inputText.trim() && !report && !md)}
+                >
+                  Save Run
+                </button>
+
               <button
                 type="button"
                 className={`${MT.actionWarn} border-[#6b3737] bg-[#211717] text-[#e6a0a0] transition hover:border-[#cc0000] hover:bg-[#2a1616] hover:text-[#ffc1c1] disabled:opacity-50`}
