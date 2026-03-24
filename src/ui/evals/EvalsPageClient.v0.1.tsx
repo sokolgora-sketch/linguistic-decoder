@@ -1131,6 +1131,16 @@ export function EvalsPageClientV0_1() {
     };
   }
 
+  function resetWorkbench() {
+    setInputText("");
+    setPickedFileName("");
+    setApiErr(null);
+    setReport(null);
+    setMd("");
+    setNotice("Workbench reset.");
+    setTimeout(() => setNotice(null), 1800);
+  }
+
   async function onScore() {
     setApiErr(null);
     setNotice(null);
@@ -2063,16 +2073,10 @@ export function EvalsPageClientV0_1() {
               <button
                 type="button"
                 className={`${MT.actionSecondary} border-[#555] bg-[#1a1a1a] text-[#e2e2e2] transition hover:border-[#777] hover:bg-[#202020] hover:text-white disabled:opacity-50`}
-                onClick={() => {
-                  setInputText("");
-                  setApiErr(null);
-                  setReport(null);
-                  setMd("");
-                  setNotice(null);
-                }}
+                onClick={resetWorkbench}
                 disabled={busy}
               >
-                Clear / new run
+                Reset Workbench
               </button>
 
               <button
