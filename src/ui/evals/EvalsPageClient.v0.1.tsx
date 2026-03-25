@@ -835,9 +835,7 @@ export function EvalsPageClientV0_1() {
   );
 
   const [mode, setMode] = useState<"run_bundle" | "task_buckets">("run_bundle");
-  const [taskId, setTaskId] = useState<string>(
-    byoTasks[0]?.taskId ?? "T2_LADDER_V0_1",
-  );
+  const [taskId, setTaskId] = useState<string>("T2_LADDER_V0_1");
 
   const [runId, setRunId] = useState<string>("ui.run.v0.1");
   const [provider, setProvider] = useState<string>("");
@@ -928,20 +926,63 @@ export function EvalsPageClientV0_1() {
     : label;
 
   const bucketsOnlyTasks = useMemo(
-    () => byoTasks.filter((t) => t.taskId === "T2_LADDER_V0_1"),
+    () => byoTasks.filter((t) => t.inputShape === "bucketed_single_tokens"),
     [byoTasks],
+  );
+
+  const defaultBucketsTask = useMemo(
+    () =>
+      bucketsOnlyTasks.find((t) => t.taskId === "T2_LADDER_V0_1") ??
+      bucketsOnlyTasks[0] ??
+      null,
+    [bucketsOnlyTasks],
   );
 
   const selectedTask = useMemo(() => {
     const pool = mode === "task_buckets" ? bucketsOnlyTasks : byoTasks;
-    return pool.find((t) => t.taskId === taskId) ?? pool[0] ?? null;
-  }, [mode, taskId, byoTasks, bucketsOnlyTasks]);
+    return (
+      pool.find((t) => t.taskId === taskId) ??
+      (mode === "task_buckets" ? defaultBucketsTask : pool[0] ?? null)
+    );
+  }, [mode, taskId, byoTasks, bucketsOnlyTasks, defaultBucketsTask]);
 
   const inputProbe = useMemo(() => probeInput(inputText), [inputText]);
   const showAnalyzeV1Autofill = mode === "run_bundle";
   const hasSourceEngineMeta = Boolean(
     sourceEngineId.trim() || sourceEngineVersion.trim() || sourceEngineBuild.trim(),
   );
+
+  useEffect(() => {
+    if (!runSeries.length) {
+      setSelectedSeriesId("");
+      return;
+    }
+    setSelectedSeriesId((prev) =>
+      prev && runSeries.some((row) => row.id === prev) ? prev : runSeries[0].id,
+    );
+  }, [runSeries]);
+
+  useEffect(() => {
+    const shouldScroll =
+      Boolean(notice) ||
+      Boolean(apiErr) ||
+      inputProbe.kind === "corpus70_meta";
+
+    if (!shouldScroll) return;
+    if (typeof window === "undefined") return;
+
+    const timer = window.setTimeout(() => {
+      const node = feedbackRef.current;
+      if (node && typeof node.scrollIntoView === "function") {
+        node.scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+        });
+      }
+    }, 80);
+
+    return () => window.clearTimeout(timer);
+  }, [notice, apiErr, inputProbe.kind]);
 
   useEffect(() => {
     if (!runSeries.length) {
@@ -1148,7 +1189,8 @@ export function EvalsPageClientV0_1() {
       taskPool.find((t) => t.taskId === taskId) ?? taskPool[0] ?? null;
     // Auto-wrap only when the input is strictly buckets-only.
     if (effectiveMode === "run_bundle" && looksLikeBucketsOnly(parsed)) {
-      if (!taskForMode) throw new Error("No task selected");
+        const wrapTask = defaultBucketsTask ?? taskForMode;
+        if (!wrapTask) throw new Error("No task selected");
       return {
         evalRunVersion: "evalRun.v0.1",
         evalSpecVersion: "evalSpec.v0.1",
@@ -1170,7 +1212,7 @@ export function EvalsPageClientV0_1() {
         },
         tasks: [
           {
-            taskId: taskForMode.taskId,
+              taskId: wrapTask.taskId,
             inputShape: "bucketed_single_tokens",
             buckets: parsed,
           },
