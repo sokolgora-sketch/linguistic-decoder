@@ -963,10 +963,13 @@ export function EvalsPageClientV0_1() {
     if (typeof window === "undefined") return;
 
     const timer = window.setTimeout(() => {
-      feedbackRef.current?.scrollIntoView({
-        behavior: "smooth",
-        block: "center",
-      });
+      const node = feedbackRef.current;
+      if (node && typeof node.scrollIntoView === "function") {
+        node.scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+        });
+      }
     }, 80);
 
     return () => window.clearTimeout(timer);
@@ -1370,10 +1373,49 @@ export function EvalsPageClientV0_1() {
     return nextRecord;
   }
 
+  function findSeriesDuplicate(series: EvalsRunSeriesV0_1) {
+    const nextRunId =
+      runId.trim() ||
+      applySeriesRunIdTemplate(series.runIdTemplate, series.nextOrdinal);
+
+    const sameOrdinal = savedRuns.find(
+      (row) => row.seriesId === series.id && row.ordinal === series.nextOrdinal,
+    );
+    if (sameOrdinal) {
+      return { kind: "ordinal" as const, row: sameOrdinal, nextRunId };
+    }
+
+    const sameRunId = savedRuns.find(
+      (row) =>
+        row.seriesId === series.id &&
+        String(row.workbench.runId || "").trim() === nextRunId,
+    );
+    if (sameRunId) {
+      return { kind: "runId" as const, row: sameRunId, nextRunId };
+    }
+
+    return null;
+  }
+
   function saveAndAdvanceSeries() {
     const series = getSelectedRunSeries();
     if (!series) {
       showWarnNotice("Save + Next Run: create or select a series first.");
+      return;
+    }
+
+    const duplicate = findSeriesDuplicate(series);
+    if (duplicate?.kind === "ordinal") {
+      showWarnNotice(
+        `Duplicate guard: ${series.label} already has ${formatSeriesOrdinal(series.nextOrdinal)}.`,
+      );
+      return;
+    }
+
+    if (duplicate?.kind === "runId") {
+      showWarnNotice(
+        `Duplicate guard: active series already contains runId ${duplicate.nextRunId}.`,
+      );
       return;
     }
 
