@@ -1371,6 +1371,39 @@ export function EvalsPageClientV0_1() {
     setTimeout(() => setNotice(null), 2200);
   }
 
+  function deleteSelectedRunSeries() {
+    const series = getSelectedRunSeries();
+    if (!series) {
+      setNotice("Delete Active Series: choose an active series first.");
+      setTimeout(() => setNotice(null), 1800);
+      return;
+    }
+
+    const linkedRuns = savedRuns.filter((row) => row.seriesId === series.id);
+    if (linkedRuns.length > 0) {
+      setNotice(`Delete Active Series: ${series.label} has ${linkedRuns.length} saved runs. Delete saved runs first.`);
+      setTimeout(() => setNotice(null), 2400);
+      return;
+    }
+
+    const remaining = runSeries.filter((row) => row.id !== series.id);
+    writeRunSeries(remaining);
+    setRunSeries(remaining);
+    setSelectedSeriesId(remaining[0]?.id ?? "");
+    if (remaining[0]) {
+      setSeriesLabelDraft(remaining[0].label);
+      setSeriesTargetCountDraft(String(remaining[0].targetCount));
+      prefillNextSeriesRun(remaining[0]);
+    } else {
+      setSeriesLabelDraft("fresh-chat");
+      setSeriesTargetCountDraft("15");
+      setRunId("ui.run.v0.1");
+      setLabel("");
+    }
+    setNotice(`Deleted active series: ${series.label}`);
+    setTimeout(() => setNotice(null), 1800);
+  }
+
   function deleteSelectedSavedRun() {
     const selected = savedRuns.find((row) => row.id === selectedSavedRunId);
     if (!selected) {
@@ -2354,6 +2387,15 @@ export function EvalsPageClientV0_1() {
                         disabled={busy || !selectedSeriesId || (!inputText.trim() && !report && !md)}
                       >
                         Save + Next Run
+                      </button>
+
+                      <button
+                        type="button"
+                        className={`${MT.actionWarn} border-[#6b3737] bg-[#211717] text-[#e6a0a0] transition hover:border-[#cc0000] hover:bg-[#2a1616] hover:text-[#ffc1c1] disabled:opacity-50`}
+                        onClick={deleteSelectedRunSeries}
+                        disabled={busy || !selectedSeriesId}
+                      >
+                        Delete Active Series
                       </button>
                     </div>
 
