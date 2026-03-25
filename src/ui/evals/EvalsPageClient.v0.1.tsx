@@ -856,6 +856,19 @@ export function EvalsPageClientV0_1() {
   const [md, setMd] = useState<string>("");
 
   const [notice, setNotice] = useState<string | null>(null);
+  const feedbackRef = React.useRef<HTMLDivElement | null>(null);
+
+  const showWarnNotice = React.useCallback((message: string, timeoutMs = 7000) => {
+    setNotice(message);
+    window.setTimeout(() => setNotice(null), timeoutMs);
+  }, []);
+
+  const noticeIsWarn = useMemo(() => {
+    if (!notice) return false;
+    return /^(Save \+ Next Run:|Delete Active Series:|Delete Saved Run:|Open Saved Run:|Clipboard unavailable|Copy failed:|Copy Raw JSON:|Copy CSV Row:)/.test(
+      notice,
+    );
+  }, [notice]);
   const [paperSnapshotTab, setPaperSnapshotTab] = useState<"paper1" | "paper2">(
     "paper1",
   );
@@ -886,15 +899,6 @@ export function EvalsPageClientV0_1() {
     );
   }, [savedRuns]);
 
-  useEffect(() => {
-    if (!runSeries.length) {
-      setSelectedSeriesId("");
-      return;
-    }
-    setSelectedSeriesId((prev) =>
-      prev && runSeries.some((row) => row.id === prev) ? prev : runSeries[0].id,
-    );
-  }, [runSeries]);
 
   const activeRunSeries = useMemo(
     () => runSeries.find((row) => row.id === selectedSeriesId) ?? null,
@@ -938,6 +942,35 @@ export function EvalsPageClientV0_1() {
   const hasSourceEngineMeta = Boolean(
     sourceEngineId.trim() || sourceEngineVersion.trim() || sourceEngineBuild.trim(),
   );
+
+  useEffect(() => {
+    if (!runSeries.length) {
+      setSelectedSeriesId("");
+      return;
+    }
+    setSelectedSeriesId((prev) =>
+      prev && runSeries.some((row) => row.id === prev) ? prev : runSeries[0].id,
+    );
+  }, [runSeries]);
+
+  useEffect(() => {
+    const shouldScroll =
+      Boolean(notice) ||
+      Boolean(apiErr) ||
+      inputProbe.kind === "corpus70_meta";
+
+    if (!shouldScroll) return;
+    if (typeof window === "undefined") return;
+
+    const timer = window.setTimeout(() => {
+      feedbackRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+    }, 80);
+
+    return () => window.clearTimeout(timer);
+  }, [notice, apiErr, inputProbe.kind]);
 
   const readyToScore =
     Boolean(inputText.trim()) &&
@@ -1340,8 +1373,7 @@ export function EvalsPageClientV0_1() {
   function saveAndAdvanceSeries() {
     const series = getSelectedRunSeries();
     if (!series) {
-      setNotice("Save + Next Run: create or select a series first.");
-      setTimeout(() => setNotice(null), 1800);
+      showWarnNotice("Save + Next Run: create or select a series first.");
       return;
     }
 
@@ -1374,15 +1406,13 @@ export function EvalsPageClientV0_1() {
   function deleteSelectedRunSeries() {
     const series = getSelectedRunSeries();
     if (!series) {
-      setNotice("Delete Active Series: choose an active series first.");
-      setTimeout(() => setNotice(null), 1800);
+      showWarnNotice("Delete Active Series: choose an active series first.");
       return;
     }
 
     const linkedRuns = savedRuns.filter((row) => row.seriesId === series.id);
     if (linkedRuns.length > 0) {
-      setNotice(`Delete Active Series: ${series.label} has ${linkedRuns.length} saved runs. Delete saved runs first.`);
-      setTimeout(() => setNotice(null), 2400);
+      showWarnNotice(`Delete Active Series: ${series.label} has ${linkedRuns.length} saved runs. Delete saved runs first.`);
       return;
     }
 
@@ -1407,8 +1437,7 @@ export function EvalsPageClientV0_1() {
   function deleteSelectedSavedRun() {
     const selected = savedRuns.find((row) => row.id === selectedSavedRunId);
     if (!selected) {
-      setNotice("Delete Saved Run: choose a saved run first.");
-      setTimeout(() => setNotice(null), 1800);
+      showWarnNotice("Delete Saved Run: choose a saved run first.");
       return;
     }
 
@@ -1423,8 +1452,7 @@ export function EvalsPageClientV0_1() {
   function openSelectedSavedRun() {
     const selected = savedRuns.find((row) => row.id === selectedSavedRunId);
     if (!selected) {
-      setNotice("Open Saved Run: choose a saved run first.");
-      setTimeout(() => setNotice(null), 1800);
+      showWarnNotice("Open Saved Run: choose a saved run first.");
       return;
     }
     restoreWorkbench(selected.workbench);
@@ -1822,7 +1850,7 @@ export function EvalsPageClientV0_1() {
   const dfCopyText = async (labelMsg: string, text: string) => {
     try {
       if (!globalThis?.navigator?.clipboard?.writeText) {
-        setNotice("Clipboard unavailable in this browser.");
+        showWarnNotice("Clipboard unavailable in this browser.");
         return;
       }
       await navigator.clipboard.writeText(String(text ?? ""));
@@ -1830,7 +1858,7 @@ export function EvalsPageClientV0_1() {
       setTimeout(() => setNotice(null), 1800);
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e);
-      setNotice("Copy failed: " + msg);
+      showWarnNotice("Copy failed: " + msg);
     }
   };
 
@@ -1872,8 +1900,7 @@ export function EvalsPageClientV0_1() {
   const onCopyRawJson = async () => {
     const b = dfTryParseBucketsOnly(inputText);
     if (!b) {
-      setNotice("Copy Raw JSON: input is not buckets-only JSON (V1..V7).");
-      setTimeout(() => setNotice(null), 2200);
+      showWarnNotice("Copy Raw JSON: input is not buckets-only JSON (V1..V7).");
       return;
     }
     await dfCopyText(
@@ -1890,8 +1917,7 @@ export function EvalsPageClientV0_1() {
 
   const onCopyCsvRow = async () => {
     if (!report) {
-      setNotice("Copy CSV Row: score first.");
-      setTimeout(() => setNotice(null), 1800);
+      showWarnNotice("Copy CSV Row: score first.");
       return;
     }
     const task = dfGetPrimaryTask();
@@ -2674,7 +2700,10 @@ export function EvalsPageClientV0_1() {
             ) : null}
 
             {inputProbe.kind === "corpus70_meta" ? (
-              <div className="rounded-[10px] border border-[#5b3b3b] bg-[#1d1515] px-5 py-4">
+              <div
+                ref={feedbackRef}
+                className="rounded-[10px] border border-[#5b3b3b] bg-[#1d1515] px-5 py-4"
+              >
                 <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#f1b4b4]">
                   Unsupported input
                 </div>
@@ -2690,19 +2719,41 @@ export function EvalsPageClientV0_1() {
               </div>
             ) : null}
 
-            {notice ? (
-              <div className="rounded-[10px] border border-[#3e4a5b] bg-[#171b22] px-5 py-4">
-                <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#b8c7e8]">
-                  Note
+              {notice ? (
+                <div
+                  ref={feedbackRef}
+                  className={
+                    noticeIsWarn
+                      ? "rounded-[10px] border border-[#6a3d3d] bg-[#211717] px-5 py-4"
+                      : "rounded-[10px] border border-[#3e4a5b] bg-[#171b22] px-5 py-4"
+                  }
+                >
+                  <div
+                    className={
+                      noticeIsWarn
+                        ? "text-[11px] font-semibold uppercase tracking-[0.12em] text-[#f2b0b0]"
+                        : "text-[11px] font-semibold uppercase tracking-[0.12em] text-[#b8c7e8]"
+                    }
+                  >
+                    {noticeIsWarn ? "Warning" : "Note"}
+                  </div>
+                  <div
+                    className={
+                      noticeIsWarn
+                        ? "mt-1 text-[12px] leading-6 text-[#e0c7c7]"
+                        : "mt-1 text-[12px] leading-6 text-[#d2d9e6]"
+                    }
+                  >
+                    {notice}
+                  </div>
                 </div>
-                <div className="mt-1 text-[12px] leading-6 text-[#d2d9e6]">
-                  {notice}
-                </div>
-              </div>
-            ) : null}
+              ) : null}
 
             {apiErr ? (
-              <div className="rounded-[10px] border border-[#6a3d3d] bg-[#211717] px-5 py-4">
+              <div
+                ref={feedbackRef}
+                className="rounded-[10px] border border-[#6a3d3d] bg-[#211717] px-5 py-4"
+              >
                 <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#f2b0b0]">
                   Error{" "}
                   <span className="font-mono text-[#ffe4e4]">
