@@ -109,7 +109,7 @@ describe("Evals buckets-wrap integration v0.1", () => {
     jest.clearAllMocks();
   });
 
-  it("restricts buckets-only selector to T2 ladder", () => {
+  it("defaults buckets-only selector to T2 ladder while exposing all bucket tasks", () => {
     render(<EvalsPageClientV0_1 />);
 
     fireEvent.change(getModeSelect(), { target: { value: "task_buckets" } });
@@ -119,8 +119,16 @@ describe("Evals buckets-wrap integration v0.1", () => {
     expect(getTaskSelect()).toHaveValue("T2_LADDER_V0_1");
 
     const options = within(getTaskSelect()).getAllByRole("option");
-    expect(options).toHaveLength(1);
-    expect(options[0]).toHaveValue("T2_LADDER_V0_1");
+    expect(options).toHaveLength(4);
+    const optionValues = options.map(
+      (option) => (option as HTMLOptionElement).value,
+    );
+    expect(optionValues).toEqual([
+      "T1_BUCKET_V1_V0_1",
+      "T1_BUCKET_V4_V0_1",
+      "T1_BUCKET_V7_V0_1",
+      "T2_LADDER_V0_1",
+    ]);
   });
 
   it("auto-wraps exact V1..V7 buckets to T2 ladder from full-run mode", async () => {
