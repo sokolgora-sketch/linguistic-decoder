@@ -1371,6 +1371,22 @@ export function EvalsPageClientV0_1() {
     setTimeout(() => setNotice(null), 2200);
   }
 
+  function deleteSelectedSavedRun() {
+    const selected = savedRuns.find((row) => row.id === selectedSavedRunId);
+    if (!selected) {
+      setNotice("Delete Saved Run: choose a saved run first.");
+      setTimeout(() => setNotice(null), 1800);
+      return;
+    }
+
+    const remaining = savedRuns.filter((row) => row.id !== selected.id);
+    writeSavedRuns(remaining);
+    setSavedRuns(remaining);
+    setSelectedSavedRunId(remaining[0]?.id ?? "");
+    setNotice(`Deleted saved run: ${selected.title}`);
+    setTimeout(() => setNotice(null), 1800);
+  }
+
   function openSelectedSavedRun() {
     const selected = savedRuns.find((row) => row.id === selectedSavedRunId);
     if (!selected) {
@@ -2386,6 +2402,15 @@ export function EvalsPageClientV0_1() {
                     >
                       Open Saved Run
                     </button>
+
+                      <button
+                        type="button"
+                        className={`${MT.actionWarn} border-[#6b3737] bg-[#211717] text-[#e6a0a0] transition hover:border-[#cc0000] hover:bg-[#2a1616] hover:text-[#ffc1c1] disabled:opacity-50`}
+                        onClick={deleteSelectedSavedRun}
+                        disabled={busy || !selectedSavedRunId}
+                      >
+                        Delete Saved Run
+                      </button>
                   </div>
                 </div>
               </div>
