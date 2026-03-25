@@ -984,6 +984,38 @@ export function EvalsPageClientV0_1() {
     return () => window.clearTimeout(timer);
   }, [notice, apiErr, inputProbe.kind]);
 
+  useEffect(() => {
+    if (!runSeries.length) {
+      setSelectedSeriesId("");
+      return;
+    }
+    setSelectedSeriesId((prev) =>
+      prev && runSeries.some((row) => row.id === prev) ? prev : runSeries[0].id,
+    );
+  }, [runSeries]);
+
+  useEffect(() => {
+    const shouldScroll =
+      Boolean(notice) ||
+      Boolean(apiErr) ||
+      inputProbe.kind === "corpus70_meta";
+
+    if (!shouldScroll) return;
+    if (typeof window === "undefined") return;
+
+    const timer = window.setTimeout(() => {
+      const node = feedbackRef.current;
+      if (node && typeof node.scrollIntoView === "function") {
+        node.scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+        });
+      }
+    }, 80);
+
+    return () => window.clearTimeout(timer);
+  }, [notice, apiErr, inputProbe.kind]);
+
   const readyToScore =
     Boolean(inputText.trim()) &&
     inputProbe.kind !== "invalid_json" &&
