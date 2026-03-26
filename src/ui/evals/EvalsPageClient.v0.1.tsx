@@ -1327,13 +1327,13 @@ export function EvalsPageClientV0_1() {
     return {
       mode,
       taskId,
-      runId,
-      provider,
-      model,
-      label,
-      sourceEngineId,
-      sourceEngineVersion,
-      sourceEngineBuild,
+      runId: runId.trim(),
+      provider: provider.trim(),
+      model: model.trim(),
+      label: label.trim(),
+      sourceEngineId: sourceEngineId.trim(),
+      sourceEngineVersion: sourceEngineVersion.trim(),
+      sourceEngineBuild: sourceEngineBuild.trim(),
       inputText,
       pickedFileName,
       report,
@@ -2144,11 +2144,21 @@ export function EvalsPageClientV0_1() {
         scoredCount: rows.filter((row) => Boolean(row.workbench.report)).length,
         unscoredCount: rows.filter((row) => !row.workbench.report).length,
       },
-      savedRuns: rows.map((row) => ({
-        ...row,
-        createdAtIso: new Date(row.createdAt).toISOString(),
-        updatedAtIso: new Date(row.updatedAt).toISOString(),
-      })),
+        savedRuns: rows.map((row) => ({
+          ...row,
+          workbench: {
+            ...row.workbench,
+            runId: String(row.workbench.runId ?? "").trim(),
+            provider: String(row.workbench.provider ?? "").trim(),
+            model: String(row.workbench.model ?? "").trim(),
+            label: String(row.workbench.label ?? "").trim(),
+            sourceEngineId: String(row.workbench.sourceEngineId ?? "").trim(),
+            sourceEngineVersion: String(row.workbench.sourceEngineVersion ?? "").trim(),
+            sourceEngineBuild: String(row.workbench.sourceEngineBuild ?? "").trim(),
+          },
+          createdAtIso: new Date(row.createdAt).toISOString(),
+          updatedAtIso: new Date(row.updatedAt).toISOString(),
+        })),
     };
 
     const filename = `evals.${slugifySeriesPart(series.label)}.${rows.length}runs.json`;
