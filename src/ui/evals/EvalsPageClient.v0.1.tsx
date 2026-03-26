@@ -1946,6 +1946,129 @@ export function EvalsPageClientV0_1() {
     }
   };
 
+
+  const dfCsvCell = (value: unknown) => {
+    const text = String(value ?? "");
+    const escaped = text.replaceAll('"', '""');
+    return /[",\n\r]/.test(text) ? `"${escaped}"` : text;
+  };
+
+  const dfDownloadTextFile = (filename: string, text: string, mimeType: string) => {
+    if (typeof window === "undefined") return;
+    const blob = new Blob([text], { type: mimeType });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    window.URL.revokeObjectURL(url);
+  };
+
+  const buildSeriesCsvRow = (row: EvalsSavedRunRecordV0_1, seriesLabel: string) => {
+    const rep = row.workbench.report;
+    if (!rep) return null;
+
+    const ts = rep && rep.tasks ? rep.tasks : [];
+    const byo = Array.isArray(ts)
+      ? ts.find((x: any) => x?.kind === 'byo' || String(x?.taskId ?? '').includes('LADDER'))
+      : null;
+    const task = byo ?? (Array.isArray(ts) ? ts[0] : null);
+    const slope = dfGetSlopePresence(task);
+    const { validN, invalidN } = dfSumValidInvalid(task);
+
+    const pearson_r =
+      (slope as any)?.pearson_r ?? (slope as any)?.pearson?.r ?? '';
+    const spearman_rho =
+      (slope as any)?.spearman_rho ??
+      (slope as any)?.spearman?.rho ??
+      (slope as any)?.spearman?.r ??
+      '';
+    const p_perm =
+      (slope as any)?.p_spearman ?? (slope as any)?.p_perm_spearman ?? '';
+    const iters = (slope as any)?.iters ?? '';
+    const seed = (slope as any)?.seed ?? '';
+
+    const diag = (task as any)?.diagnostics ?? (task as any)?.diag ?? {};
+    const noVowelTokenCount =
+      diag?.noVowelTokenCount ?? diag?.no_vowel_token_count ?? '';
+
+    const reportMeta = rep.meta ?? {};
+    const csvRunId = String((rep as any)?.runId ?? row.workbench.runId ?? '').trim();
+    const csvProvider = String(reportMeta?.provider ?? row.workbench.provider ?? '').trim();
+    const csvModel = String(reportMeta?.model ?? row.workbench.model ?? '').trim();
+    const csvLabel = String(reportMeta?.label ?? row.workbench.label ?? '').trim();
+    const csvSourceEngineId = String(reportMeta?.sourceEngineId ?? row.workbench.sourceEngineId ?? '').trim();
+    const csvSourceEngineBuild = String(reportMeta?.sourceEngineBuild ?? row.workbench.sourceEngineBuild ?? '').trim();
+    const ordinal = row.ordinal != null ? formatSeriesOrdinal(row.ordinal) : '';
+
+    return [
+      new Date(row.updatedAt || row.createdAt).toISOString(),
+      seriesLabel,
+      ordinal,
+      csvRunId,
+      csvProvider,
+      csvModel,
+      csvLabel,
+      pearson_r,
+      spearman_rho,
+      p_perm,
+      validN,
+      invalidN,
+      noVowelTokenCount,
+      `iters=${iters}; seed=${seed}; p_perm_src=p_spearman; sourceEngineId=${csvSourceEngineId}; sourceEngineBuild=${csvSourceEngineBuild}`,
+    ].map(dfCsvCell).join(',');
+  };
+
+  function exportActiveSeriesCsv() {
+    const series = getSelectedRunSeries();
+    if (!series) {
+      showWarnNotice("Export Active Series CSV: choose an active series first.");
+      return;
+    }
+
+    const rows = savedRuns
+      .filter((row) => row.seriesId === series.id && row.workbench.report)
+      .sort((a, b) => {
+        const ao = a.ordinal ?? Number.MAX_SAFE_INTEGER;
+        const bo = b.ordinal ?? Number.MAX_SAFE_INTEGER;
+        if (ao !== bo) return ao - bo;
+        return a.createdAt - b.createdAt;
+      });
+
+    if (!rows.length) {
+      showWarnNotice(`Export Active Series CSV: ${series.label} has no scored saved runs yet.`);
+      return;
+    }
+
+    const header = [
+      'timestamp',
+      'seriesLabel',
+      'ordinal',
+      'runId',
+      'provider',
+      'model',
+      'label',
+      'pearson_r',
+      'spearman_rho',
+      'p_perm',
+      'validN',
+      'invalidN',
+      'noVowelTokenCount',
+      'notes',
+    ].join(',');
+
+    const body = rows
+      .map((row) => buildSeriesCsvRow(row, series.label))
+      .filter(Boolean)
+      .join('\n');
+
+    const filename = `evals.${slugifySeriesPart(series.label)}.${rows.length}runs.csv`;
+    dfDownloadTextFile(filename, [header, body].join('\n'), 'text/csv;charset=utf-8');
+    setNotice(`Exported active series CSV: ${series.label} (${rows.length} runs)`);
+    setTimeout(() => setNotice(null), 2200);
+  }
   const dfGetPrimaryTask = () => {
     const ts = report && report.tasks ? report.tasks : [];
     // Prefer a by-run task if present; else first task.
@@ -2506,6 +2629,15 @@ export function EvalsPageClientV0_1() {
                         disabled={busy || !selectedSeriesId}
                       >
                         Delete Active Series
+                      </button>
+
+                      <button
+                        type="button"
+                        className={`${MT.actionSecondary} border-[#3f5a2f] bg-[#172111] text-[#d7f0c8] transition hover:border-[#5b7f43] hover:bg-[#1d2a15] hover:text-white disabled:opacity-50`}
+                        onClick={exportActiveSeriesCsv}
+                        disabled={busy || !selectedSeriesId}
+                      >
+                        Export Active Series CSV
                       </button>
                     </div>
 
