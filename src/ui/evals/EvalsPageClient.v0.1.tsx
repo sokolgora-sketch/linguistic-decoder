@@ -991,6 +991,18 @@ export function EvalsPageClientV0_1() {
     activeSeriesUnscoredCount > 0 ||
     activeSeriesMissingOrdinals.length > 0;
 
+  const formatOrdinalList = (items: number[]) => {
+    if (!items.length) return "none";
+    const shown = items.slice(0, 8).map((n) => formatSeriesOrdinal(n));
+    return items.length > 8 ? `${shown.join(", ")} +${items.length - 8} more` : shown.join(", ");
+  };
+
+  const formatRunIdList = (items: string[]) => {
+    if (!items.length) return "none";
+    const shown = items.slice(0, 4);
+    return items.length > 4 ? `${shown.join(", ")} +${items.length - 4} more` : shown.join(", ");
+  };
+
   const activeSeriesHealthReasons = useMemo(() => {
     const reasons: string[] = [];
     if (activeSeriesDuplicateOrdinals.length > 0) {
@@ -1016,17 +1028,7 @@ export function EvalsPageClientV0_1() {
     activeSeriesScoredCount,
     activeSeriesUnscoredCount,
   ]);
-  const formatOrdinalList = (items: number[]) => {
-    if (!items.length) return "none";
-    const shown = items.slice(0, 8).map((n) => formatSeriesOrdinal(n));
-    return items.length > 8 ? `${shown.join(", ")} +${items.length - 8} more` : shown.join(", ");
-  };
 
-  const formatRunIdList = (items: string[]) => {
-    if (!items.length) return "none";
-    const shown = items.slice(0, 4);
-    return items.length > 4 ? `${shown.join(", ")} +${items.length - 4} more` : shown.join(", ");
-  };
 
   const bucketsOnlyTasks = useMemo(
     () => byoTasks.filter((t) => t.inputShape === "bucketed_single_tokens"),
