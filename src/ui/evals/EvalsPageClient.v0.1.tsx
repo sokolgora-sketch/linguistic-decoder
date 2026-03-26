@@ -2106,6 +2106,57 @@ export function EvalsPageClientV0_1() {
     setTimeout(() => setNotice(null), 2200);
   }
 
+  function exportAllSeriesCsv() {
+    const rows = savedRuns
+      .filter((row) => Boolean(row.workbench.report))
+      .map((row) => ({
+        row,
+        seriesLabel:
+          runSeries.find((series) => series.id === row.seriesId)?.label ??
+          (String(row.seriesId ?? '').trim() || 'unassigned'),
+      }))
+      .sort((a, b) => {
+        const labelCompare = a.seriesLabel.localeCompare(b.seriesLabel);
+        if (labelCompare !== 0) return labelCompare;
+        const ao = a.row.ordinal ?? Number.MAX_SAFE_INTEGER;
+        const bo = b.row.ordinal ?? Number.MAX_SAFE_INTEGER;
+        if (ao !== bo) return ao - bo;
+        return a.row.createdAt - b.row.createdAt;
+      });
+
+    if (!rows.length) {
+      showWarnNotice('Export All Series CSV: no scored saved runs yet.');
+      return;
+    }
+
+    const header = [
+      'timestamp',
+      'seriesLabel',
+      'ordinal',
+      'runId',
+      'provider',
+      'model',
+      'label',
+      'pearson_r',
+      'spearman_rho',
+      'p_perm',
+      'validN',
+      'invalidN',
+      'noVowelTokenCount',
+      'notes',
+    ].join(',');
+
+    const body = rows
+      .map(({ row, seriesLabel }) => buildSeriesCsvRow(row, seriesLabel))
+      .filter(Boolean)
+      .join('\n');
+
+    const filename = `evals.all-series.${rows.length}runs.csv`;
+    dfDownloadTextFile(filename, [header, body].join('\n'), 'text/csv;charset=utf-8');
+    setNotice(`Exported all series CSV (${rows.length} runs)`);
+    setTimeout(() => setNotice(null), 2200);
+  }
+
   function exportActiveSeriesJson() {
     const series = getSelectedRunSeries();
     if (!series) {
@@ -2144,21 +2195,21 @@ export function EvalsPageClientV0_1() {
         scoredCount: rows.filter((row) => Boolean(row.workbench.report)).length,
         unscoredCount: rows.filter((row) => !row.workbench.report).length,
       },
-        savedRuns: rows.map((row) => ({
-          ...row,
-          workbench: {
-            ...row.workbench,
-            runId: String(row.workbench.runId ?? "").trim(),
-            provider: String(row.workbench.provider ?? "").trim(),
-            model: String(row.workbench.model ?? "").trim(),
-            label: String(row.workbench.label ?? "").trim(),
-            sourceEngineId: String(row.workbench.sourceEngineId ?? "").trim(),
-            sourceEngineVersion: String(row.workbench.sourceEngineVersion ?? "").trim(),
-            sourceEngineBuild: String(row.workbench.sourceEngineBuild ?? "").trim(),
-          },
-          createdAtIso: new Date(row.createdAt).toISOString(),
-          updatedAtIso: new Date(row.updatedAt).toISOString(),
-        })),
+      savedRuns: rows.map((row) => ({
+        ...row,
+        workbench: {
+          ...row.workbench,
+          runId: String(row.workbench.runId ?? '').trim(),
+          provider: String(row.workbench.provider ?? '').trim(),
+          model: String(row.workbench.model ?? '').trim(),
+          label: String(row.workbench.label ?? '').trim(),
+          sourceEngineId: String(row.workbench.sourceEngineId ?? '').trim(),
+          sourceEngineVersion: String(row.workbench.sourceEngineVersion ?? '').trim(),
+          sourceEngineBuild: String(row.workbench.sourceEngineBuild ?? '').trim(),
+        },
+        createdAtIso: new Date(row.createdAt).toISOString(),
+        updatedAtIso: new Date(row.updatedAt).toISOString(),
+      })),
     };
 
     const filename = `evals.${slugifySeriesPart(series.label)}.${rows.length}runs.json`;
@@ -2818,6 +2869,15 @@ export function EvalsPageClientV0_1() {
                         disabled={busy || !selectedSeriesId}
                       >
                         Export Active Series JSON
+                      </button>
+
+                      <button
+                        type="button"
+                        className={`${MT.actionSecondary} border-[#5b4a2a] bg-[#1c150d] text-[#f3dfb7] transition hover:border-[#8a7345] hover:bg-[#261c11] hover:text-white disabled:opacity-50`}
+                        onClick={exportAllSeriesCsv}
+                        disabled={busy || savedRuns.length === 0}
+                      >
+                        Export All Series CSV
                       </button>
                     </div>
 
