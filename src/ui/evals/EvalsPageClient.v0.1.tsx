@@ -1029,6 +1029,65 @@ export function EvalsPageClientV0_1() {
     activeSeriesUnscoredCount,
   ]);
 
+  const activeSeriesDuplicateCleanupPlan = useMemo(() => {
+    if (!activeRunSeries) {
+      return { removeIds: [] as string[], removeCount: 0 };
+    }
+
+    const sorted = [...activeSeriesSavedRuns].sort((a, b) => {
+      if (a.createdAt !== b.createdAt) return a.createdAt - b.createdAt;
+      if (a.updatedAt !== b.updatedAt) return a.updatedAt - b.updatedAt;
+      return a.id.localeCompare(b.id);
+    });
+
+    const keepOrdinal = new Map<number, string>();
+    const keepRunId = new Map<string, string>();
+    const removeIds = new Set<string>();
+
+    for (const row of sorted) {
+      if (typeof row.ordinal === "number" && Number.isFinite(row.ordinal)) {
+        const keeper = keepOrdinal.get(row.ordinal);
+        if (!keeper) keepOrdinal.set(row.ordinal, row.id);
+        else if (keeper !== row.id) removeIds.add(row.id);
+      }
+
+      const rid = String(row.workbench.report?.runId ?? row.workbench.runId ?? "").trim();
+      if (rid) {
+        const keeper = keepRunId.get(rid);
+        if (!keeper) keepRunId.set(rid, row.id);
+        else if (keeper !== row.id) removeIds.add(row.id);
+      }
+    }
+
+    const ids = Array.from(removeIds);
+    return { removeIds: ids, removeCount: ids.length };
+  }, [activeRunSeries, activeSeriesSavedRuns]);
+
+  function cleanupActiveSeriesDuplicates() {
+    const series = getSelectedRunSeries();
+    if (!series) {
+      showWarnNotice("Duplicate cleanup: choose an active series first.");
+      return;
+    }
+
+    const removeIds = new Set(activeSeriesDuplicateCleanupPlan.removeIds);
+    if (!removeIds.size) {
+      showWarnNotice(`Duplicate cleanup: ${series.label} has no removable duplicates.`);
+      return;
+    }
+
+    const remaining = savedRuns.filter((row) => !removeIds.has(row.id));
+    writeSavedRuns(remaining);
+    setSavedRuns(remaining);
+    setSelectedSavedRunId((prev) =>
+      prev && remaining.some((row) => row.id === prev) ? prev : remaining[0]?.id ?? "",
+    );
+    setNotice(
+      `Duplicate cleanup: removed ${removeIds.size} later duplicate saved run${removeIds.size === 1 ? "" : "s"} from ${series.label}.`,
+    );
+    setTimeout(() => setNotice(null), 2400);
+  }
+
 
   const bucketsOnlyTasks = useMemo(
     () => byoTasks.filter((t) => t.inputShape === "bucketed_single_tokens"),
@@ -2914,6 +2973,19 @@ export function EvalsPageClientV0_1() {
                                 <li key={reason}>{reason}</li>
                               ))}
                             </ul>
+
+                            {activeSeriesHasHardWarnings ? (
+                              <div className="mt-3 flex flex-wrap gap-3">
+                                <button
+                                  type="button"
+                                  className={`${MT.actionWarn} border-[#8a4a4a] bg-[#2a1717] text-[#ffd1d1] transition hover:border-[#d85858] hover:bg-[#361818] hover:text-white disabled:opacity-50`}
+                                  onClick={cleanupActiveSeriesDuplicates}
+                                  disabled={busy || activeSeriesDuplicateCleanupPlan.removeCount === 0}
+                                >
+                                  Delete Later Duplicates ({activeSeriesDuplicateCleanupPlan.removeCount})
+                                </button>
+                              </div>
+                            ) : null}
                           </div>
                         ) : null}
                       </div>
