@@ -980,6 +980,42 @@ export function EvalsPageClientV0_1() {
     activeSeriesDuplicateOrdinals.length === 0 &&
     activeSeriesDuplicateRunIds.length === 0;
 
+
+  const activeSeriesHasHardWarnings =
+    activeSeriesDuplicateOrdinals.length > 0 ||
+    activeSeriesDuplicateRunIds.length > 0;
+
+  const activeSeriesNeedsAttention =
+    activeSeriesHasHardWarnings ||
+    activeSeriesScoredCount === 0 ||
+    activeSeriesUnscoredCount > 0 ||
+    activeSeriesMissingOrdinals.length > 0;
+
+  const activeSeriesHealthReasons = useMemo(() => {
+    const reasons: string[] = [];
+    if (activeSeriesDuplicateOrdinals.length > 0) {
+      reasons.push(`Duplicate ordinals: ${formatOrdinalList(activeSeriesDuplicateOrdinals)}`);
+    }
+    if (activeSeriesDuplicateRunIds.length > 0) {
+      reasons.push(`Duplicate runIds: ${formatRunIdList(activeSeriesDuplicateRunIds)}`);
+    }
+    if (activeSeriesMissingOrdinals.length > 0) {
+      reasons.push(`Missing ordinals: ${formatOrdinalList(activeSeriesMissingOrdinals)}`);
+    }
+    if (activeSeriesUnscoredCount > 0) {
+      reasons.push(`Unscored runs: ${activeSeriesUnscoredCount}`);
+    }
+    if (activeSeriesScoredCount === 0) {
+      reasons.push("No scored runs yet");
+    }
+    return reasons;
+  }, [
+    activeSeriesDuplicateOrdinals,
+    activeSeriesDuplicateRunIds,
+    activeSeriesMissingOrdinals,
+    activeSeriesScoredCount,
+    activeSeriesUnscoredCount,
+  ]);
   const formatOrdinalList = (items: number[]) => {
     if (!items.length) return "none";
     const shown = items.slice(0, 8).map((n) => formatSeriesOrdinal(n));
@@ -2695,14 +2731,40 @@ export function EvalsPageClientV0_1() {
                   </div>
                 </div>
 
-                <div className="rounded-[10px] border border-[#3b4f28] bg-[#11170e] px-5 py-4">
+                <div
+                  className={
+                    activeRunSeries
+                      ? activeSeriesHasHardWarnings
+                        ? "rounded-[10px] border border-[#6b3737] bg-[#211717] px-5 py-4"
+                        : activeSeriesNeedsAttention
+                          ? "rounded-[10px] border border-[#5e4b22] bg-[#1b160d] px-5 py-4"
+                          : "rounded-[10px] border border-[#2f5a3d] bg-[#101712] px-5 py-4"
+                      : "rounded-[10px] border border-[#3b4f28] bg-[#11170e] px-5 py-4"
+                  }
+                >
                   <div className="flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
                     <div className="space-y-1">
                       <div className={`${MT.sectionLabel} text-[#ededed]`}>
                         Series health
                       </div>
-                      <div className={`${MT.helper} text-[#a9b59a]`}>
-                        Read-only QA for the selected active series before export or battery completion.
+                      <div
+                        className={
+                          activeRunSeries
+                            ? activeSeriesHasHardWarnings
+                              ? `${MT.helper} text-[#e0b3b3}`
+                              : activeSeriesNeedsAttention
+                                ? `${MT.helper} text-[#d6c59b}`
+                                : `${MT.helper} text-[#b7d8c1}`
+                            : `${MT.helper} text-[#a9b59a}`
+                        }
+                      >
+                        {activeRunSeries
+                          ? activeSeriesHasHardWarnings
+                            ? "Hard warning: duplicates detected in the active series."
+                            : activeSeriesNeedsAttention
+                              ? "Attention needed before the series is fully clean."
+                              : "Series is clean and export-ready."
+                          : "Read-only QA for the selected active series before export or battery completion."}
                       </div>
                     </div>
 
@@ -2727,9 +2789,35 @@ export function EvalsPageClientV0_1() {
                               {activeSeriesUnscoredCount}
                             </div>
                           </div>
-                          <div className="rounded-[8px] border border-[#3c4a5e] bg-[#10151d] px-3 py-2">
-                            <div className={`${MT.fieldLabel} text-[#9fb1cb]`}>Export ready</div>
-                            <div className="mt-1 text-[13px] font-semibold text-[#eef4ff]">
+                          <div
+                            className={
+                              activeSeriesHasHardWarnings
+                                ? "rounded-[8px] border border-[#6b3737] bg-[#1e1414] px-3 py-2"
+                                : activeSeriesNeedsAttention
+                                  ? "rounded-[8px] border border-[#5e4b22] bg-[#19140d] px-3 py-2"
+                                  : "rounded-[8px] border border-[#2f5a3d] bg-[#0f1512] px-3 py-2"
+                            }
+                          >
+                            <div
+                              className={
+                                activeSeriesHasHardWarnings
+                                  ? `${MT.fieldLabel} text-[#e0b0b0}`
+                                  : activeSeriesNeedsAttention
+                                    ? `${MT.fieldLabel} text-[#d6c59b}`
+                                    : `${MT.fieldLabel} text-[#9fd0b0}`
+                              }
+                            >
+                              Export ready
+                            </div>
+                            <div
+                              className={
+                                activeSeriesHasHardWarnings
+                                  ? "mt-1 text-[13px] font-semibold text-[#ffd1d1]"
+                                  : activeSeriesNeedsAttention
+                                    ? "mt-1 text-[13px] font-semibold text-[#f0ddb0]"
+                                    : "mt-1 text-[13px] font-semibold text-[#def5e6]"
+                              }
+                            >
                               {activeSeriesExportReady ? "yes" : "no"}
                             </div>
                           </div>
@@ -2742,19 +2830,90 @@ export function EvalsPageClientV0_1() {
                               {formatOrdinalList(activeSeriesMissingOrdinals)}
                             </div>
                           </div>
-                          <div className="rounded-[8px] border border-[#303030] bg-[#101010] px-3 py-2">
-                            <div className={`${MT.fieldLabel} text-[#9f9f9f]`}>Duplicate ordinals</div>
-                            <div className="mt-1 text-[12px] leading-6 text-[#ededed]">
+                          <div
+                            className={
+                              activeSeriesDuplicateOrdinals.length > 0
+                                ? "rounded-[8px] border border-[#6b3737] bg-[#1e1414] px-3 py-2"
+                                : "rounded-[8px] border border-[#303030] bg-[#101010] px-3 py-2"
+                            }
+                          >
+                            <div
+                              className={
+                                activeSeriesDuplicateOrdinals.length > 0
+                                  ? `${MT.fieldLabel} text-[#e0b0b0}`
+                                  : `${MT.fieldLabel} text-[#9f9f9f}`
+                              }
+                            >
+                              Duplicate ordinals
+                            </div>
+                            <div
+                              className={
+                                activeSeriesDuplicateOrdinals.length > 0
+                                  ? "mt-1 text-[12px] leading-6 text-[#ffd1d1]"
+                                  : "mt-1 text-[12px] leading-6 text-[#ededed]"
+                              }
+                            >
                               {formatOrdinalList(activeSeriesDuplicateOrdinals)}
                             </div>
                           </div>
-                          <div className="rounded-[8px] border border-[#303030] bg-[#101010] px-3 py-2">
-                            <div className={`${MT.fieldLabel} text-[#9f9f9f]`}>Duplicate runIds</div>
-                            <div className="mt-1 overflow-x-auto text-[12px] leading-6 text-[#ededed]">
+                          <div
+                            className={
+                              activeSeriesDuplicateRunIds.length > 0
+                                ? "rounded-[8px] border border-[#6b3737] bg-[#1e1414] px-3 py-2"
+                                : "rounded-[8px] border border-[#303030] bg-[#101010] px-3 py-2"
+                            }
+                          >
+                            <div
+                              className={
+                                activeSeriesDuplicateRunIds.length > 0
+                                  ? `${MT.fieldLabel} text-[#e0b0b0}`
+                                  : `${MT.fieldLabel} text-[#9f9f9f}`
+                              }
+                            >
+                              Duplicate runIds
+                            </div>
+                            <div
+                              className={
+                                activeSeriesDuplicateRunIds.length > 0
+                                  ? "mt-1 overflow-x-auto text-[12px] leading-6 text-[#ffd1d1]"
+                                  : "mt-1 overflow-x-auto text-[12px] leading-6 text-[#ededed]"
+                              }
+                            >
                               {formatRunIdList(activeSeriesDuplicateRunIds)}
                             </div>
                           </div>
                         </div>
+
+                        {activeSeriesHealthReasons.length > 0 ? (
+                          <div
+                            className={
+                              activeSeriesHasHardWarnings
+                                ? "rounded-[8px] border border-[#6b3737] bg-[#1e1414] px-3 py-2"
+                                : "rounded-[8px] border border-[#5e4b22] bg-[#19140d] px-3 py-2"
+                            }
+                          >
+                            <div
+                              className={
+                                activeSeriesHasHardWarnings
+                                  ? `${MT.fieldLabel} text-[#e0b0b0}`
+                                  : `${MT.fieldLabel} text-[#d6c59b}`
+                              }
+                            >
+                              Why export is blocked / not clean
+                            </div>
+                            <ul
+                              className={
+                                activeSeriesHasHardWarnings
+                                  ? "mt-1 list-disc space-y-1 pl-5 text-[12px] leading-6 text-[#ffd1d1]"
+                                  : "mt-1 list-disc space-y-1 pl-5 text-[12px] leading-6 text-[#f0ddb0]"
+                              }
+                            >
+                              {activeSeriesHealthReasons.map((reason) => (
+                                <li key={reason}>{reason}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        ) : null}
                       </div>
                     ) : (
                       <div className={`${MT.helper} text-[#a9b59a]`}>
