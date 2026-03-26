@@ -2105,6 +2105,62 @@ export function EvalsPageClientV0_1() {
     setNotice(`Exported active series CSV: ${series.label} (${rows.length} runs)`);
     setTimeout(() => setNotice(null), 2200);
   }
+
+  function exportActiveSeriesJson() {
+    const series = getSelectedRunSeries();
+    if (!series) {
+      showWarnNotice("Export Active Series JSON: choose an active series first.");
+      return;
+    }
+
+    const rows = savedRuns
+      .filter((row) => row.seriesId === series.id)
+      .sort((a, b) => {
+        const ao = a.ordinal ?? Number.MAX_SAFE_INTEGER;
+        const bo = b.ordinal ?? Number.MAX_SAFE_INTEGER;
+        if (ao !== bo) return ao - bo;
+        return a.createdAt - b.createdAt;
+      });
+
+    if (!rows.length) {
+      showWarnNotice(`Export Active Series JSON: ${series.label} has no saved runs yet.`);
+      return;
+    }
+
+    const payload = {
+      exportVersion: "evals.activeSeriesExport.v0.1",
+      exportedAt: new Date().toISOString(),
+      series: {
+        id: series.id,
+        label: series.label,
+        targetCount: series.targetCount,
+        nextOrdinal: series.nextOrdinal,
+        runIdTemplate: series.runIdTemplate,
+        createdAt: new Date(series.createdAt).toISOString(),
+        updatedAt: new Date(series.updatedAt).toISOString(),
+      },
+      summary: {
+        savedCount: rows.length,
+        scoredCount: rows.filter((row) => Boolean(row.workbench.report)).length,
+        unscoredCount: rows.filter((row) => !row.workbench.report).length,
+      },
+      savedRuns: rows.map((row) => ({
+        ...row,
+        createdAtIso: new Date(row.createdAt).toISOString(),
+        updatedAtIso: new Date(row.updatedAt).toISOString(),
+      })),
+    };
+
+    const filename = `evals.${slugifySeriesPart(series.label)}.${rows.length}runs.json`;
+    dfDownloadTextFile(
+      filename,
+      JSON.stringify(payload, null, 2),
+      'application/json;charset=utf-8',
+    );
+    setNotice(`Exported active series JSON: ${series.label} (${rows.length} runs)`);
+    setTimeout(() => setNotice(null), 2200);
+  }
+
   const dfGetPrimaryTask = () => {
     const ts = report && report.tasks ? report.tasks : [];
     // Prefer a by-run task if present; else first task.
@@ -2743,6 +2799,15 @@ export function EvalsPageClientV0_1() {
                         disabled={busy || !selectedSeriesId}
                       >
                         Export Active Series CSV
+                      </button>
+
+                      <button
+                        type="button"
+                        className={`${MT.actionSecondary} border-[#30465d] bg-[#101b28] text-[#cfe6ff] transition hover:border-[#46698f] hover:bg-[#162434] hover:text-white disabled:opacity-50`}
+                        onClick={exportActiveSeriesJson}
+                        disabled={busy || !selectedSeriesId}
+                      >
+                        Export Active Series JSON
                       </button>
                     </div>
 
