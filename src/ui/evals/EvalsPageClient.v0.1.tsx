@@ -925,6 +925,73 @@ export function EvalsPageClientV0_1() {
     ? label || makeSeriesLabel(activeRunSeries.label, activeRunSeries.nextOrdinal)
     : label;
 
+  const activeSeriesScoredRuns = useMemo(
+    () => activeSeriesSavedRuns.filter((row) => Boolean(row.workbench.report)),
+    [activeSeriesSavedRuns],
+  );
+
+  const activeSeriesScoredCount = activeSeriesScoredRuns.length;
+  const activeSeriesUnscoredCount = Math.max(
+    activeSeriesSavedCount - activeSeriesScoredCount,
+    0,
+  );
+
+  const activeSeriesMissingOrdinals = useMemo(() => {
+    if (!activeRunSeries) return [];
+    const present = new Set(
+      activeSeriesSavedRuns
+        .map((row) => row.ordinal)
+        .filter((n): n is number => typeof n === "number" && Number.isFinite(n)),
+    );
+    return Array.from({ length: activeRunSeries.targetCount }, (_, i) => i + 1).filter(
+      (n) => !present.has(n),
+    );
+  }, [activeRunSeries, activeSeriesSavedRuns]);
+
+  const activeSeriesDuplicateOrdinals = useMemo(() => {
+    const counts = new Map<number, number>();
+    for (const row of activeSeriesSavedRuns) {
+      if (typeof row.ordinal !== "number" || !Number.isFinite(row.ordinal)) continue;
+      counts.set(row.ordinal, (counts.get(row.ordinal) ?? 0) + 1);
+    }
+    return Array.from(counts.entries())
+      .filter(([, count]) => count > 1)
+      .map(([ordinal]) => ordinal)
+      .sort((a, b) => a - b);
+  }, [activeSeriesSavedRuns]);
+
+  const activeSeriesDuplicateRunIds = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const row of activeSeriesSavedRuns) {
+      const rid = String(
+        row.workbench.report?.runId ?? row.workbench.runId ?? "",
+      ).trim();
+      if (!rid) continue;
+      counts.set(rid, (counts.get(rid) ?? 0) + 1);
+    }
+    return Array.from(counts.entries())
+      .filter(([, count]) => count > 1)
+      .map(([rid]) => rid)
+      .sort();
+  }, [activeSeriesSavedRuns]);
+
+  const activeSeriesExportReady =
+    activeSeriesScoredCount > 0 &&
+    activeSeriesDuplicateOrdinals.length === 0 &&
+    activeSeriesDuplicateRunIds.length === 0;
+
+  const formatOrdinalList = (items: number[]) => {
+    if (!items.length) return "none";
+    const shown = items.slice(0, 8).map((n) => formatSeriesOrdinal(n));
+    return items.length > 8 ? `${shown.join(", ")} +${items.length - 8} more` : shown.join(", ");
+  };
+
+  const formatRunIdList = (items: string[]) => {
+    if (!items.length) return "none";
+    const shown = items.slice(0, 4);
+    return items.length > 4 ? `${shown.join(", ")} +${items.length - 4} more` : shown.join(", ");
+  };
+
   const bucketsOnlyTasks = useMemo(
     () => byoTasks.filter((t) => t.inputShape === "bucketed_single_tokens"),
     [byoTasks],
@@ -984,37 +1051,6 @@ export function EvalsPageClientV0_1() {
     return () => window.clearTimeout(timer);
   }, [notice, apiErr, inputProbe.kind]);
 
-  useEffect(() => {
-    if (!runSeries.length) {
-      setSelectedSeriesId("");
-      return;
-    }
-    setSelectedSeriesId((prev) =>
-      prev && runSeries.some((row) => row.id === prev) ? prev : runSeries[0].id,
-    );
-  }, [runSeries]);
-
-  useEffect(() => {
-    const shouldScroll =
-      Boolean(notice) ||
-      Boolean(apiErr) ||
-      inputProbe.kind === "corpus70_meta";
-
-    if (!shouldScroll) return;
-    if (typeof window === "undefined") return;
-
-    const timer = window.setTimeout(() => {
-      const node = feedbackRef.current;
-      if (node && typeof node.scrollIntoView === "function") {
-        node.scrollIntoView({
-          behavior: "smooth",
-          block: "center",
-        });
-      }
-    }, 80);
-
-    return () => window.clearTimeout(timer);
-  }, [notice, apiErr, inputProbe.kind]);
 
   const readyToScore =
     Boolean(inputText.trim()) &&
@@ -2537,6 +2573,75 @@ export function EvalsPageClientV0_1() {
                     ) : (
                       <div className={`${MT.helper} text-[#b9af8a]`}>
                         No active series yet. Create or select a series to see live battery progress.
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="rounded-[10px] border border-[#3b4f28] bg-[#11170e] px-5 py-4">
+                  <div className="flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
+                    <div className="space-y-1">
+                      <div className={`${MT.sectionLabel} text-[#ededed]`}>
+                        Series health
+                      </div>
+                      <div className={`${MT.helper} text-[#a9b59a]`}>
+                        Read-only QA for the selected active series before export or battery completion.
+                      </div>
+                    </div>
+
+                    {activeRunSeries ? (
+                      <div className="min-w-0 flex-1 space-y-3">
+                        <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
+                          <div className="rounded-[8px] border border-[#35442a] bg-[#10140d] px-3 py-2">
+                            <div className={`${MT.fieldLabel} text-[#93a286]`}>Saved</div>
+                            <div className="mt-1 text-[13px] font-semibold text-[#f1f5ec]">
+                              {activeSeriesSavedCount} / {activeRunSeries.targetCount}
+                            </div>
+                          </div>
+                          <div className="rounded-[8px] border border-[#2e4a37] bg-[#0f1512] px-3 py-2">
+                            <div className={`${MT.fieldLabel} text-[#8fb79d]`}>Scored</div>
+                            <div className="mt-1 text-[13px] font-semibold text-[#def5e6]">
+                              {activeSeriesScoredCount}
+                            </div>
+                          </div>
+                          <div className="rounded-[8px] border border-[#4d4631] bg-[#15120d] px-3 py-2">
+                            <div className={`${MT.fieldLabel} text-[#c0b287]`}>Unscored</div>
+                            <div className="mt-1 text-[13px] font-semibold text-[#f2e5bb]">
+                              {activeSeriesUnscoredCount}
+                            </div>
+                          </div>
+                          <div className="rounded-[8px] border border-[#3c4a5e] bg-[#10151d] px-3 py-2">
+                            <div className={`${MT.fieldLabel} text-[#9fb1cb]`}>Export ready</div>
+                            <div className="mt-1 text-[13px] font-semibold text-[#eef4ff]">
+                              {activeSeriesExportReady ? "yes" : "no"}
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="grid gap-2 lg:grid-cols-3">
+                          <div className="rounded-[8px] border border-[#303030] bg-[#101010] px-3 py-2">
+                            <div className={`${MT.fieldLabel} text-[#9f9f9f]`}>Missing ordinals</div>
+                            <div className="mt-1 text-[12px] leading-6 text-[#ededed]">
+                              {formatOrdinalList(activeSeriesMissingOrdinals)}
+                            </div>
+                          </div>
+                          <div className="rounded-[8px] border border-[#303030] bg-[#101010] px-3 py-2">
+                            <div className={`${MT.fieldLabel} text-[#9f9f9f]`}>Duplicate ordinals</div>
+                            <div className="mt-1 text-[12px] leading-6 text-[#ededed]">
+                              {formatOrdinalList(activeSeriesDuplicateOrdinals)}
+                            </div>
+                          </div>
+                          <div className="rounded-[8px] border border-[#303030] bg-[#101010] px-3 py-2">
+                            <div className={`${MT.fieldLabel} text-[#9f9f9f]`}>Duplicate runIds</div>
+                            <div className="mt-1 overflow-x-auto text-[12px] leading-6 text-[#ededed]">
+                              {formatRunIdList(activeSeriesDuplicateRunIds)}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className={`${MT.helper} text-[#a9b59a]`}>
+                        No active series yet. Create or select a series to view QA health.
                       </div>
                     )}
                   </div>
