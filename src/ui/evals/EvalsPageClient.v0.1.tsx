@@ -1089,6 +1089,60 @@ export function EvalsPageClientV0_1() {
   }
 
 
+
+  const operatorSeriesRows = useMemo(() => {
+    return runSeries
+      .map((series) => {
+        const rows = savedRuns.filter((row) => row.seriesId === series.id);
+        const scoredCount = rows.filter((row) => Boolean(row.workbench.report)).length;
+        const unscoredCount = Math.max(rows.length - scoredCount, 0);
+
+        const ordinalCounts = new Map<number, number>();
+        const runIdCounts = new Map<string, number>();
+
+        for (const row of rows) {
+          if (typeof row.ordinal === "number" && Number.isFinite(row.ordinal)) {
+            ordinalCounts.set(row.ordinal, (ordinalCounts.get(row.ordinal) ?? 0) + 1);
+          }
+
+          const rid = String(row.workbench.report?.runId ?? row.workbench.runId ?? "").trim();
+          if (rid) {
+            runIdCounts.set(rid, (runIdCounts.get(rid) ?? 0) + 1);
+          }
+        }
+
+        const hasHardWarnings =
+          Array.from(ordinalCounts.values()).some((count) => count > 1) ||
+          Array.from(runIdCounts.values()).some((count) => count > 1);
+
+        const missingCount = Math.max(series.targetCount - rows.length, 0);
+        const exportReady = scoredCount > 0 && !hasHardWarnings;
+        const healthLabel = hasHardWarnings
+          ? "hard warning"
+          : missingCount > 0 || unscoredCount > 0 || scoredCount === 0
+            ? "attention"
+            : "clean";
+
+        const rowUpdatedAt = rows.length
+          ? Math.max(series.updatedAt, ...rows.map((row) => row.updatedAt))
+          : series.updatedAt;
+
+        return {
+          id: series.id,
+          label: series.label,
+          targetCount: series.targetCount,
+          savedCount: rows.length,
+          scoredCount,
+          nextOrdinal: formatSeriesOrdinal(series.nextOrdinal),
+          healthLabel,
+          exportReady,
+          updatedAt: rowUpdatedAt,
+          isActive: series.id === selectedSeriesId,
+        };
+      })
+      .sort((a, b) => b.updatedAt - a.updatedAt);
+  }, [runSeries, savedRuns, selectedSeriesId]);
+
   const bucketsOnlyTasks = useMemo(
     () => byoTasks.filter((t) => t.inputShape === "bucketed_single_tokens"),
     [byoTasks],
@@ -1109,6 +1163,66 @@ export function EvalsPageClientV0_1() {
       (mode === "task_buckets" ? defaultBucketsTask : pool[0] ?? null)
     );
   }, [mode, taskId, byoTasks, bucketsOnlyTasks, defaultBucketsTask]);
+
+  const operatorChecklistItems = useMemo(() => {
+    const providerValue = provider.trim();
+    const modelValue = model.trim();
+    const activeLabel = activeRunSeries?.label ?? "none";
+    const taskLabel = selectedTask?.taskId ?? "none";
+    const progressLabel = activeRunSeries
+      ? `${activeSeriesSavedCount}/${activeRunSeries.targetCount}`
+      : "0/0";
+
+    return [
+      {
+        key: "series",
+        label: "Active series selected",
+        tone: activeRunSeries ? "good" : "warn",
+        note: activeLabel,
+      },
+      {
+        key: "task",
+        label: "Task ready",
+        tone: selectedTask?.taskId ? "good" : "warn",
+        note: taskLabel,
+      },
+      {
+        key: "metadata",
+        label: "Provider + model set",
+        tone: providerValue && modelValue ? "good" : "warn",
+        note: `${providerValue || "provider?"} / ${modelValue || "model?"}`,
+      },
+      {
+        key: "progress",
+        label: "Runs captured",
+        tone: activeSeriesSavedCount > 0 ? "good" : "warn",
+        note: progressLabel,
+      },
+      {
+        key: "duplicates",
+        label: "Duplicates cleaned",
+        tone: activeSeriesHasHardWarnings ? "bad" : "good",
+        note: activeSeriesHasHardWarnings
+          ? `${activeSeriesDuplicateCleanupPlan.removeCount} removable`
+          : "clean",
+      },
+      {
+        key: "export",
+        label: "Export ready",
+        tone: activeSeriesExportReady ? "good" : activeSeriesHasHardWarnings ? "bad" : "warn",
+        note: activeSeriesExportReady ? "ready" : "blocked",
+      },
+    ];
+  }, [
+    activeRunSeries,
+    selectedTask,
+    provider,
+    model,
+    activeSeriesSavedCount,
+    activeSeriesHasHardWarnings,
+    activeSeriesExportReady,
+    activeSeriesDuplicateCleanupPlan.removeCount,
+  ]);
 
   const inputProbe = useMemo(() => probeInput(inputText), [inputText]);
   const showAnalyzeV1Autofill = mode === "run_bundle";
@@ -2741,6 +2855,133 @@ export function EvalsPageClientV0_1() {
               </div>
             </details>
             <div className="space-y-3 pt-4">
+                  <div className="grid gap-4 xl:grid-cols-[minmax(0,2fr)_minmax(300px,1fr)]">
+                    <div className="rounded-[10px] border border-[#33424a] bg-[#10151a] px-5 py-4">
+                      <div className="space-y-1">
+                        <div className={`${MT.sectionLabel} text-[#ededed]`}>
+                          Series dashboard
+                        </div>
+                        <div className={`${MT.helper} text-[#9fb1bf]`}>
+                          Compare all saved series before running, exporting, or cleaning up duplicates.
+                        </div>
+                      </div>
+
+                      {operatorSeriesRows.length > 0 ? (
+                        <div className="mt-4 overflow-x-auto">
+                          <table className="min-w-full border-separate border-spacing-0 text-left text-[12px]">
+                            <thead>
+                              <tr className="text-[#9fb1bf]">
+                                <th className="border-b border-[#26323a] px-3 py-2 font-medium">Series</th>
+                                <th className="border-b border-[#26323a] px-3 py-2 font-medium">Target</th>
+                                <th className="border-b border-[#26323a] px-3 py-2 font-medium">Saved</th>
+                                <th className="border-b border-[#26323a] px-3 py-2 font-medium">Scored</th>
+                                <th className="border-b border-[#26323a] px-3 py-2 font-medium">Next</th>
+                                <th className="border-b border-[#26323a] px-3 py-2 font-medium">Health</th>
+                                <th className="border-b border-[#26323a] px-3 py-2 font-medium">Export</th>
+                                <th className="border-b border-[#26323a] px-3 py-2 font-medium">Updated</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {operatorSeriesRows.map((row) => (
+                                <tr
+                                  key={row.id}
+                                  className={row.isActive ? "bg-[#131c23]" : ""}
+                                >
+                                  <td className="border-b border-[#1f2a31] px-3 py-2 align-top">
+                                    <div className="flex flex-wrap items-center gap-2">
+                                      <button
+                                        type="button"
+                                        className={`${MT.actionUtility} border-[#405766] bg-transparent text-[#cfe6ff] transition hover:border-[#5f8194] hover:bg-[#16202a] hover:text-white disabled:opacity-50`}
+                                        onClick={() => {
+                                          const next = runSeries.find((series) => series.id === row.id);
+                                          if (!next) return;
+                                          setSelectedSeriesId(next.id);
+                                          prefillNextSeriesRun(next);
+                                        }}
+                                        disabled={busy}
+                                      >
+                                        Use
+                                      </button>
+                                      <span className="font-semibold text-[#ededed]">{row.label}</span>
+                                      {row.isActive ? (
+                                        <span className="rounded-full border border-[#49667a] bg-[#16232d] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#cfe6ff]">
+                                          active
+                                        </span>
+                                      ) : null}
+                                    </div>
+                                  </td>
+                                  <td className="border-b border-[#1f2a31] px-3 py-2 text-[#ededed]">{row.targetCount}</td>
+                                  <td className="border-b border-[#1f2a31] px-3 py-2 text-[#ededed]">{row.savedCount}</td>
+                                  <td className="border-b border-[#1f2a31] px-3 py-2 text-[#ededed]">{row.scoredCount}</td>
+                                  <td className="border-b border-[#1f2a31] px-3 py-2 font-mono text-[#ededed]">{row.nextOrdinal}</td>
+                                  <td className="border-b border-[#1f2a31] px-3 py-2">
+                                    <span
+                                      className={
+                                        row.healthLabel === "hard warning"
+                                          ? "rounded-full border border-[#6b3737] bg-[#1e1414] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#ffd1d1]"
+                                          : row.healthLabel === "attention"
+                                            ? "rounded-full border border-[#5e4b22] bg-[#19140d] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#f0ddb0]"
+                                            : "rounded-full border border-[#2f5a3d] bg-[#0f1512] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#def5e6]"
+                                      }
+                                    >
+                                      {row.healthLabel}
+                                    </span>
+                                  </td>
+                                  <td className="border-b border-[#1f2a31] px-3 py-2 text-[#ededed]">
+                                    {row.exportReady ? "yes" : "no"}
+                                  </td>
+                                  <td className="border-b border-[#1f2a31] px-3 py-2 text-[#b8c7d9]">
+                                    {new Date(row.updatedAt).toLocaleString()}
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      ) : (
+                        <div className={`${MT.helper} mt-4 text-[#9fb1bf]`}>
+                          No series yet. Create one below to start the operator view.
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="rounded-[10px] border border-[#33424a] bg-[#10151a] px-5 py-4">
+                      <div className="space-y-1">
+                        <div className={`${MT.sectionLabel} text-[#ededed]`}>
+                          Operator checklist
+                        </div>
+                        <div className={`${MT.helper} text-[#9fb1bf]`}>
+                          Read top to bottom before starting or exporting a battery run.
+                        </div>
+                      </div>
+
+                      <div className="mt-4 space-y-2">
+                        {operatorChecklistItems.map((item) => (
+                          <div
+                            key={item.key}
+                            className="rounded-[8px] border border-[#26323a] bg-[#0d1216] px-3 py-2"
+                          >
+                            <div className="flex items-start gap-3">
+                              <span
+                                className={
+                                  item.tone === "good"
+                                    ? "mt-[5px] h-2.5 w-2.5 rounded-full bg-[#6fc18a]"
+                                    : item.tone === "bad"
+                                      ? "mt-[5px] h-2.5 w-2.5 rounded-full bg-[#d46a6a]"
+                                      : "mt-[5px] h-2.5 w-2.5 rounded-full bg-[#e6c16a]"
+                                }
+                              />
+                              <div className="min-w-0 flex-1">
+                                <div className="text-[12px] font-semibold text-[#ededed]">{item.label}</div>
+                                <div className="mt-1 break-words text-[12px] leading-6 text-[#b8c7d9]">{item.note}</div>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
                 <div className="rounded-[10px] border border-[#5a4c20] bg-[#18150d] px-5 py-4">
                   <div className="flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
                     <div className="space-y-1">
