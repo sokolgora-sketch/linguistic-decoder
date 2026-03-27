@@ -854,16 +854,15 @@ export function EvalsPageClientV0_1() {
   const [md, setMd] = useState<string>("");
 
   const [notice, setNotice] = useState<string | null>(null);
-  const feedbackRef = React.useRef<HTMLDivElement | null>(null);
+  const TOAST_TIMEOUT_MS = 7000;
 
-  const showWarnNotice = React.useCallback((message: string, timeoutMs = 7000) => {
+  const showWarnNotice = React.useCallback((message: string) => {
     setNotice(message);
-    window.setTimeout(() => setNotice(null), timeoutMs);
   }, []);
 
   const noticeIsWarn = useMemo(() => {
     if (!notice) return false;
-    return /^(Save \+ Next Run:|Delete Active Series:|Delete Saved Run:|Open Saved Run:|Clipboard unavailable|Copy failed:|Copy Raw JSON:|Copy CSV Row:)/.test(
+    return /^(Save \+ Next Run:|Delete Active Series:|Delete Saved Run:|Open Saved Run:|Duplicate cleanup:|Clipboard unavailable|Copy failed:|Copy Raw JSON:|Copy CSV Row:|Export Active Series CSV:|Export All Series CSV:|Export Active Series JSON:)/.test(
       notice,
     );
   }, [notice]);
@@ -1085,7 +1084,6 @@ export function EvalsPageClientV0_1() {
     setNotice(
       `Duplicate cleanup: removed ${removeIds.size} later duplicate saved run${removeIds.size === 1 ? "" : "s"} from ${series.label}.`,
     );
-    setTimeout(() => setNotice(null), 2400);
   }
 
 
@@ -1231,36 +1229,18 @@ export function EvalsPageClientV0_1() {
   );
 
   useEffect(() => {
-    if (!runSeries.length) {
-      setSelectedSeriesId("");
-      return;
-    }
-    setSelectedSeriesId((prev) =>
-      prev && runSeries.some((row) => row.id === prev) ? prev : runSeries[0].id,
-    );
-  }, [runSeries]);
+    if (!notice) return;
+    if (typeof window === "undefined") return;
+    const timer = window.setTimeout(() => setNotice(null), TOAST_TIMEOUT_MS);
+    return () => window.clearTimeout(timer);
+  }, [notice]);
 
   useEffect(() => {
-    const shouldScroll =
-      Boolean(notice) ||
-      Boolean(apiErr) ||
-      inputProbe.kind === "corpus70_meta";
-
-    if (!shouldScroll) return;
+    if (!apiErr) return;
     if (typeof window === "undefined") return;
-
-    const timer = window.setTimeout(() => {
-      const node = feedbackRef.current;
-      if (node && typeof node.scrollIntoView === "function") {
-        node.scrollIntoView({
-          behavior: "smooth",
-          block: "center",
-        });
-      }
-    }, 80);
-
+    const timer = window.setTimeout(() => setApiErr(null), TOAST_TIMEOUT_MS);
     return () => window.clearTimeout(timer);
-  }, [notice, apiErr, inputProbe.kind]);
+  }, [apiErr]);
 
 
   const readyToScore =
@@ -1568,7 +1548,6 @@ export function EvalsPageClientV0_1() {
     setMd(snapshot.md);
     setApiErr(null);
     setNotice("Saved run opened.");
-    setTimeout(() => setNotice(null), 1800);
   }
 
   function parseSeriesTargetCount(raw: string) {
@@ -1625,7 +1604,6 @@ export function EvalsPageClientV0_1() {
     setSeriesTargetCountDraft(String(targetCount));
     prefillNextSeriesRun(nextSeries);
     setNotice(`Created series: ${cleanedLabel}`);
-    setTimeout(() => setNotice(null), 1800);
   }
 
   function saveCurrentRun(seriesOverride?: EvalsRunSeriesV0_1 | null) {
@@ -1656,7 +1634,6 @@ export function EvalsPageClientV0_1() {
 
     if (!series) {
       setNotice(`Saved run: ${title}`);
-      setTimeout(() => setNotice(null), 1800);
     }
 
     return nextRecord;
@@ -1731,7 +1708,6 @@ export function EvalsPageClientV0_1() {
     setNotice(
       `Saved ${series.label} ${formatSeriesOrdinal(series.nextOrdinal)}. Ready for ${formatSeriesOrdinal(nextSeries.nextOrdinal)}.`,
     );
-    setTimeout(() => setNotice(null), 2200);
   }
 
   function deleteSelectedRunSeries() {
@@ -1762,7 +1738,6 @@ export function EvalsPageClientV0_1() {
       setLabel("");
     }
     setNotice(`Deleted active series: ${series.label}`);
-    setTimeout(() => setNotice(null), 1800);
   }
 
   function deleteSelectedSavedRun() {
@@ -1777,7 +1752,6 @@ export function EvalsPageClientV0_1() {
     setSavedRuns(remaining);
     setSelectedSavedRunId(remaining[0]?.id ?? "");
     setNotice(`Deleted saved run: ${selected.title}`);
-    setTimeout(() => setNotice(null), 1800);
   }
 
   function openSelectedSavedRun() {
@@ -1795,7 +1769,6 @@ export function EvalsPageClientV0_1() {
     setReport(null);
     setMd("");
     setNotice("Workbench reset.");
-    setTimeout(() => setNotice(null), 1800);
   }
 
   async function onScore() {
@@ -1903,7 +1876,6 @@ export function EvalsPageClientV0_1() {
           ? "Downloaded evalRun bundle. Raw V1..V7 input was auto-wrapped through T2_LADDER_V0_1."
           : "Downloaded evalRun bundle.",
       );
-      setTimeout(() => setNotice(null), 1800);
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
       setApiErr({ ok: false, code: "CLIENT_ERROR", message: msg });
@@ -2186,7 +2158,6 @@ export function EvalsPageClientV0_1() {
       }
       await navigator.clipboard.writeText(String(text ?? ""));
       setNotice(labelMsg);
-      setTimeout(() => setNotice(null), 1800);
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e);
       showWarnNotice("Copy failed: " + msg);
@@ -2314,7 +2285,6 @@ export function EvalsPageClientV0_1() {
     const filename = `evals.${slugifySeriesPart(series.label)}.${rows.length}runs.csv`;
     dfDownloadTextFile(filename, [header, body].join('\n'), 'text/csv;charset=utf-8');
     setNotice(`Exported active series CSV: ${series.label} (${rows.length} runs)`);
-    setTimeout(() => setNotice(null), 2200);
   }
 
   function exportAllSeriesCsv() {
@@ -2365,7 +2335,6 @@ export function EvalsPageClientV0_1() {
     const filename = `evals.all-series.${rows.length}runs.csv`;
     dfDownloadTextFile(filename, [header, body].join('\n'), 'text/csv;charset=utf-8');
     setNotice(`Exported all series CSV (${rows.length} runs)`);
-    setTimeout(() => setNotice(null), 2200);
   }
 
   function exportActiveSeriesJson() {
@@ -2430,7 +2399,6 @@ export function EvalsPageClientV0_1() {
       'application/json;charset=utf-8',
     );
     setNotice(`Exported active series JSON: ${series.label} (${rows.length} runs)`);
-    setTimeout(() => setNotice(null), 2200);
   }
 
   const dfGetPrimaryTask = () => {
@@ -3629,70 +3597,58 @@ export function EvalsPageClientV0_1() {
               </div>
             ) : null}
 
-            {inputProbe.kind === "corpus70_meta" ? (
-              <div
-                ref={feedbackRef}
-                className="rounded-[10px] border border-[#5b3b3b] bg-[#1d1515] px-5 py-4"
-              >
-                <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#f1b4b4]">
-                  Unsupported input
-                </div>
-                <div className="mt-1 text-[12px] leading-6 text-[#d8c0c0]">
-                  This looks like a Corpus70 meta-tags JSON. Evals expects
-                  either a full
-                  <span className="font-mono text-[#ffe0e0]">
-                    {" "}
-                    evalRun.v0.1{" "}
-                  </span>
-                  bundle or buckets keys V1..V7.
-                </div>
-              </div>
-            ) : null}
+            {(inputProbe.kind === "corpus70_meta" || notice || apiErr) ? (
+              <div className="pointer-events-none fixed bottom-4 right-4 z-[120] flex w-[min(420px,calc(100vw-2rem))] flex-col gap-3">
+                {inputProbe.kind === "corpus70_meta" ? (
+                  <div className="pointer-events-auto rounded-[10px] border border-[#5b3b3b] bg-[#1d1515] px-5 py-4 shadow-[0_10px_30px_rgba(0,0,0,0.35)]">
+                    <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#f1b4b4]">
+                      Unsupported input
+                    </div>
+                    <div className="mt-1 text-[12px] leading-6 text-[#d8c0c0]">
+                      This looks like a Corpus70 meta-tags JSON. Evals expects either a full
+                      <span className="font-mono text-[#ffe0e0]"> evalRun.v0.1 </span>
+                      bundle or buckets keys V1..V7.
+                    </div>
+                  </div>
+                ) : null}
 
-              {notice ? (
-                <div
-                  ref={feedbackRef}
-                  className={
-                    noticeIsWarn
-                      ? "rounded-[10px] border border-[#6a3d3d] bg-[#211717] px-5 py-4"
-                      : "rounded-[10px] border border-[#3e4a5b] bg-[#171b22] px-5 py-4"
-                  }
-                >
+                {apiErr ? (
+                  <div className="pointer-events-auto rounded-[10px] border border-[#6a3d3d] bg-[#211717] px-5 py-4 shadow-[0_10px_30px_rgba(0,0,0,0.35)]">
+                    <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#f2b0b0]">
+                      Error <span className="font-mono text-[#ffe4e4]">{apiErr.code}</span>
+                    </div>
+                    <div className="mt-1 text-[12px] leading-6 text-[#e0c7c7]">{apiErr.message}</div>
+                  </div>
+                ) : null}
+
+                {notice ? (
                   <div
                     className={
                       noticeIsWarn
-                        ? "text-[11px] font-semibold uppercase tracking-[0.12em] text-[#f2b0b0]"
-                        : "text-[11px] font-semibold uppercase tracking-[0.12em] text-[#b8c7e8]"
+                        ? "pointer-events-auto rounded-[10px] border border-[#6a3d3d] bg-[#211717] px-5 py-4 shadow-[0_10px_30px_rgba(0,0,0,0.35)]"
+                        : "pointer-events-auto rounded-[10px] border border-[#3e4a5b] bg-[#171b22] px-5 py-4 shadow-[0_10px_30px_rgba(0,0,0,0.35)]"
                     }
                   >
-                    {noticeIsWarn ? "Warning" : "Note"}
+                    <div
+                      className={
+                        noticeIsWarn
+                          ? "text-[11px] font-semibold uppercase tracking-[0.12em] text-[#f2b0b0]"
+                          : "text-[11px] font-semibold uppercase tracking-[0.12em] text-[#b8c7e8]"
+                      }
+                    >
+                      {noticeIsWarn ? "Warning" : "Note"}
+                    </div>
+                    <div
+                      className={
+                        noticeIsWarn
+                          ? "mt-1 text-[12px] leading-6 text-[#e0c7c7]"
+                          : "mt-1 text-[12px] leading-6 text-[#d2d9e6]"
+                      }
+                    >
+                      {notice}
+                    </div>
                   </div>
-                  <div
-                    className={
-                      noticeIsWarn
-                        ? "mt-1 text-[12px] leading-6 text-[#e0c7c7]"
-                        : "mt-1 text-[12px] leading-6 text-[#d2d9e6]"
-                    }
-                  >
-                    {notice}
-                  </div>
-                </div>
-              ) : null}
-
-            {apiErr ? (
-              <div
-                ref={feedbackRef}
-                className="rounded-[10px] border border-[#6a3d3d] bg-[#211717] px-5 py-4"
-              >
-                <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#f2b0b0]">
-                  Error{" "}
-                  <span className="font-mono text-[#ffe4e4]">
-                    {apiErr.code}
-                  </span>
-                </div>
-                <div className="mt-1 text-[12px] leading-6 text-[#e0c7c7]">
-                  {apiErr.message}
-                </div>
+                ) : null}
               </div>
             ) : null}
           </div>
