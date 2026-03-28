@@ -139,7 +139,7 @@
   "overrides": {
     "@tootallnate/once": "3.0.1",
     "handlebars": "4.7.9",
-    "picomatch": "2.3.2",
+    "picomatch": "4.0.4",
     "path-to-regexp": "0.1.13",
     "node-forge": "1.4.0"
   }
