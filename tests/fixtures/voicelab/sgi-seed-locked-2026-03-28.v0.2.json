@@ -1,0 +1,52 @@
+{
+  "seed_version": "sgi.seed.v0.2",
+  "source": "voicelab.baseline.v0.1",
+  "created_at": "2026-03-28T10:16:41.961Z",
+  "seed_id": "sgi_e0fa8e86-044d-46ff-b5da-242b659a8f6b_locked",
+  "seed_stage": "locked",
+  "seed_locked": true,
+  "recorded_vowels": ["A", "O", "E", "Ë", "U", "Y", "I"],
+  "missing_vowels": [],
+  "quality_gate": {
+    "passed": true,
+    "voicing_ratio": 0.799,
+    "vowels_recorded": 7,
+    "minimum_vowels_for_draft": 4,
+    "vowels_required_for_locked_seed": 7,
+    "anchor_locked": true
+  },
+  "acoustics": {
+    "f0_mean_hz": 244.7,
+    "f0_range_hz": 97.1,
+    "f1_mean_hz": 633.4,
+    "f1_std_hz": 58.4,
+    "f2_mean_hz": 1618.9,
+    "a_anchor_hz": 728,
+    "vtl_proxy": 1.149,
+    "aperture_dna": "A:1.00_O:0.88_E:0.70_Ë:0.92_U:0.68_Y:0.81_I:0.76",
+    "spectral_tilt": 0.391,
+    "stability_score": 0.799
+  },
+  "anchors": {
+    "age_band": null,
+    "presentation": null,
+    "skin_palette": null,
+    "eye_color": null,
+    "hair": null,
+    "style_target": null
+  },
+  "synthesis_params": {
+    "style": "photoreal",
+    "uncertainty_index": 0.201,
+    "seed_locked": true
+  },
+  "vowel_ladder": {
+    "A": { "f0_hz": 207.1, "f1_hz": 728, "f2_hz": 1413, "aperture": 1 },
+    "O": { "f0_hz": 217.7, "f1_hz": 667, "f2_hz": 1736, "aperture": 0.884 },
+    "E": { "f0_hz": 241.3, "f1_hz": 568, "f2_hz": 1792, "aperture": 0.697 },
+    "Ë": { "f0_hz": 208.7, "f1_hz": 684, "f2_hz": 1410, "aperture": 0.917 },
+    "U": { "f0_hz": 254.8, "f1_hz": 557, "f2_hz": 1056, "aperture": 0.676 },
+    "Y": { "f0_hz": 304.2, "f1_hz": 630, "f2_hz": 1945, "aperture": 0.814 },
+    "I": { "f0_hz": 279.4, "f1_hz": 600, "f2_hz": 1980, "aperture": 0.758 }
+  }
+}
