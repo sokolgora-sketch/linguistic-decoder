@@ -29,9 +29,10 @@ function buildEvidenceSummary(payload: Record<string, unknown>): ZeroVoiceLabBri
   return {
     vowelsRecorded: asNumber(payload.vowels_recorded),
     aAnchorHz: asNumber(payload.a_anchor_hz),
-    singerMode: singerMode?.mode === "standard" || singerMode?.mode === "singer"
-      ? singerMode.mode
-      : null,
+    singerMode:
+      singerMode?.mode === "standard" || singerMode?.mode === "singer"
+        ? singerMode.mode
+        : null,
     selectedVowel: asString(singerMode?.selected_vowel),
     targetPitchHz: asNumber(singerMode?.target_pitch_hz),
     seedStage: null,
@@ -41,7 +42,9 @@ function buildEvidenceSummary(payload: Record<string, unknown>): ZeroVoiceLabBri
 
 function buildSeedSummary(payload: Record<string, unknown>): ZeroVoiceLabBridgeSummaryV0_1 {
   return {
-    vowelsRecorded: asNumber(payload.vowels_recorded ?? asRecord(payload.quality_gate)?.vowels_recorded),
+    vowelsRecorded: asNumber(
+      payload.vowels_recorded ?? asRecord(payload.quality_gate)?.vowels_recorded
+    ),
     aAnchorHz: asNumber(asRecord(payload.acoustics)?.a_anchor_hz),
     singerMode: null,
     selectedVowel: null,

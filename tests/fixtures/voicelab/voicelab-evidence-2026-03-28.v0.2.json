@@ -1,0 +1,74 @@
+{
+  "schema": "VoiceLabEvidenceV0_2",
+  "version": "voicelab.evidence.v0.2",
+  "source": "voicelab",
+  "captured_at": "2026-03-28T10:16:34.531Z",
+  "a_anchor_hz": 728,
+  "vowels_recorded": 7,
+  "session_ref": "bfaf5e74-e15f-42d3-94fb-3146f2bbd103",
+  "project_ref": "3794de8e-2de5-4a98-a629-4130c74a6238",
+  "singer_mode": {
+    "mode": "singer",
+    "selected_vowel": "I",
+    "target_pitch_hz": 220,
+    "target_pitch_label": "A3",
+    "sustain_duration_ms": 2916,
+    "metrics": {
+      "capture_quality": 95.4,
+      "pitch_lock": 13.9,
+      "sustain_stability": 59.8,
+      "vowel_stability": 28.6,
+      "drift_severity": 100,
+      "warning_count": 4
+    },
+    "interpretation": {
+      "pitch_steadiness": {
+        "label": "Unsteady",
+        "color": "#fca5a5",
+        "detail": "σ 46.9 Hz · drift 66.2 Hz · 36 samples"
+      },
+      "vowel_shape": {
+        "label": "Unstable",
+        "color": "#fca5a5",
+        "detail": "F1 std 70.0 Hz"
+      }
+    },
+    "comparison": null,
+    "warnings": [
+      {
+        "key": "unstable_sustain",
+        "label": "Unstable sustain",
+        "message": "Sustain unstable. Try a steadier held tone.",
+        "severity": "critical"
+      },
+      {
+        "key": "pitch_drift",
+        "label": "Pitch drift",
+        "message": "Pitch drift detected. Try steadier pitch center.",
+        "severity": "critical"
+      },
+      {
+        "key": "pitch_target_mismatch",
+        "label": "Pitch target mismatch",
+        "message": "Target mismatch detected (414 cents off center).",
+        "severity": "warning"
+      },
+      {
+        "key": "inconsistent_vowel_shape",
+        "label": "Inconsistent vowel shape",
+        "message": "Vowel shape changed too much across the sustain.",
+        "severity": "critical"
+      }
+    ]
+  },
+  "vowels": {
+    "A": { "label": "A", "present": true, "f0_hz": 207.1, "f1_hz": 728, "f2_hz": 1413, "aperture": 1, "aperture_raw": 1, "aperture_state": "measured", "stability": null, "warnings": [] },
+    "O": { "label": "O", "present": true, "f0_hz": 217.7, "f1_hz": 667, "f2_hz": 1736, "aperture": 0.884, "aperture_raw": 0.884, "aperture_state": "measured", "stability": null, "warnings": [] },
+    "E": { "label": "E", "present": true, "f0_hz": 241.3, "f1_hz": 568, "f2_hz": 1792, "aperture": 0.697, "aperture_raw": 0.697, "aperture_state": "measured", "stability": null, "warnings": [] },
+    "Ë": { "label": "Ë", "present": true, "f0_hz": 208.7, "f1_hz": 684, "f2_hz": 1410, "aperture": 0.917, "aperture_raw": 0.917, "aperture_state": "measured", "stability": null, "warnings": [] },
+    "U": { "label": "U", "present": true, "f0_hz": 254.8, "f1_hz": 557, "f2_hz": 1056, "aperture": 0.676, "aperture_raw": 0.676, "aperture_state": "measured", "stability": null, "warnings": [] },
+    "Y": { "label": "Y", "present": true, "f0_hz": 304.2, "f1_hz": 630, "f2_hz": 1945, "aperture": 0.814, "aperture_raw": 0.814, "aperture_state": "measured", "stability": null, "warnings": [] },
+    "I": { "label": "I", "present": true, "f0_hz": 279.4, "f1_hz": 600, "f2_hz": 1980, "aperture": 0.758, "aperture_raw": 0.758, "aperture_state": "measured", "stability": null, "warnings": [] }
+  },
+  "notes": []
+}
