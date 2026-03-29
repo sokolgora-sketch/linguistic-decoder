@@ -2950,6 +2950,89 @@ export function EvalsPageClientV0_1() {
                     </div>
                   </div>
 
+                <div
+                  className={
+                    activeRunSeries
+                      ? activeSeriesHasHardWarnings
+                        ? "rounded-[10px] border border-[#6b3737] bg-[#211717] px-5 py-4"
+                        : activeSeriesNeedsAttention
+                          ? "rounded-[10px] border border-[#5e4b22] bg-[#1b160d] px-5 py-4"
+                          : "rounded-[10px] border border-[#2f5a3d] bg-[#101712] px-5 py-4"
+                      : "rounded-[10px] border border-[#3b4f28] bg-[#11170e] px-5 py-4"
+                  }
+                >
+                  <div className="flex flex-col gap-4">
+                    <div className="space-y-1">
+                      <div className={`${MT.sectionLabel} text-[#ededed]`}>
+                        Active series status
+                      </div>
+                      <div
+                        className={
+                          activeRunSeries
+                            ? activeSeriesHasHardWarnings
+                              ? `${MT.helper} text-[#e0b3b3]`
+                              : activeSeriesNeedsAttention
+                                ? `${MT.helper} text-[#d6c59b]`
+                                : `${MT.helper} text-[#b7d8c1]`
+                            : `${MT.helper} text-[#a9b59a]`
+                        }
+                      >
+                        {activeRunSeries
+                          ? activeSeriesHasHardWarnings
+                            ? "Duplicates or export blockers are present in the active series."
+                            : activeSeriesNeedsAttention
+                              ? "Series is in progress but still needs attention before export."
+                              : "Series is clean and ready for export."
+                          : "Create or select a series to surface live battery status here."}
+                      </div>
+                    </div>
+
+                    {activeRunSeries ? (
+                      <div className="flex flex-wrap gap-2">
+                        <span className="rounded-full border border-[#7b6b2b] bg-[#211b0d] px-3 py-1 text-[12px] font-semibold uppercase tracking-[0.08em] text-[#f5e7b0]">
+                          {activeRunSeries.label}
+                        </span>
+                        <span className="rounded-full border border-[#4a4a4a] bg-[#121212] px-3 py-1 text-[12px] font-semibold uppercase tracking-[0.08em] text-[#e6e6e6]">
+                          Next {activeSeriesNextOrdinal} / {activeRunSeries.targetCount}
+                        </span>
+                        <span className="rounded-full border border-[#2f5a3d] bg-[#102016] px-3 py-1 text-[12px] font-semibold uppercase tracking-[0.08em] text-[#bfe8cc]">
+                          Saved {activeSeriesSavedCount}
+                        </span>
+                        <span className="rounded-full border border-[#2e4a37] bg-[#0f1512] px-3 py-1 text-[12px] font-semibold uppercase tracking-[0.08em] text-[#def5e6]">
+                          Scored {activeSeriesScoredCount}
+                        </span>
+                        <span className="rounded-full border border-[#4d4631] bg-[#15120d] px-3 py-1 text-[12px] font-semibold uppercase tracking-[0.08em] text-[#f2e5bb]">
+                          Unscored {activeSeriesUnscoredCount}
+                        </span>
+                        <span className="rounded-full border border-[#5a3a2f] bg-[#1c120f] px-3 py-1 text-[12px] font-semibold uppercase tracking-[0.08em] text-[#f0c3b4]">
+                          Remaining {activeSeriesRemainingCount}
+                        </span>
+                        <span
+                          className={
+                            activeSeriesExportReady
+                              ? "rounded-full border border-[#2f5a3d] bg-[#0f1512] px-3 py-1 text-[12px] font-semibold uppercase tracking-[0.08em] text-[#def5e6]"
+                              : activeSeriesHasHardWarnings
+                                ? "rounded-full border border-[#6b3737] bg-[#1e1414] px-3 py-1 text-[12px] font-semibold uppercase tracking-[0.08em] text-[#ffd1d1]"
+                                : "rounded-full border border-[#5e4b22] bg-[#19140d] px-3 py-1 text-[12px] font-semibold uppercase tracking-[0.08em] text-[#f0ddb0]"
+                          }
+                        >
+                          Export {activeSeriesExportReady ? "ready" : "blocked"}
+                        </span>
+                        {activeSeriesDuplicateOrdinals.length > 0 || activeSeriesDuplicateRunIds.length > 0 ? (
+                          <span className="rounded-full border border-[#6b3737] bg-[#1e1414] px-3 py-1 text-[12px] font-semibold uppercase tracking-[0.08em] text-[#ffd1d1]">
+                            Duplicates
+                          </span>
+                        ) : null}
+                        {activeSeriesMissingOrdinals.length > 0 ? (
+                          <span className="rounded-full border border-[#5e4b22] bg-[#19140d] px-3 py-1 text-[12px] font-semibold uppercase tracking-[0.08em] text-[#f0ddb0]">
+                            Missing ordinals
+                          </span>
+                        ) : null}
+                      </div>
+                    ) : null}
+                  </div>
+                </div>
+
                 <div className="rounded-[10px] border border-[#5a4c20] bg-[#18150d] px-5 py-4">
                   <div className="flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
                     <div className="space-y-1">
