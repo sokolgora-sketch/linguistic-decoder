@@ -2258,166 +2258,217 @@ export function EvalsPageClientV0_1() {
   };
 
   function exportActiveSeriesCsv() {
-    const series = getSelectedRunSeries();
-    if (!series) {
-      showWarnNotice("Export Active Series CSV: choose an active series first.");
-      return;
-    }
-
-    const rows = savedRuns
-      .filter((row) => row.seriesId === series.id && row.workbench.report)
-      .sort((a, b) => {
-        const ao = a.ordinal ?? Number.MAX_SAFE_INTEGER;
-        const bo = b.ordinal ?? Number.MAX_SAFE_INTEGER;
-        if (ao !== bo) return ao - bo;
-        return a.createdAt - b.createdAt;
-      });
-
-    if (!rows.length) {
-      showWarnNotice(`Export Active Series CSV: ${series.label} has no scored saved runs yet.`);
-      return;
-    }
-
-    const header = [
-      'timestamp',
-      'seriesLabel',
-      'ordinal',
-      'runId',
-      'provider',
-      'model',
-      'label',
-      'pearson_r',
-      'spearman_rho',
-      'p_perm',
-      'validN',
-      'invalidN',
-      'noVowelTokenCount',
-      'notes',
-    ].join(',');
-
-    const body = rows
-      .map((row) => buildSeriesCsvRow(row, series.label))
-      .filter(Boolean)
-      .join('\n');
-
-    const filename = `evals.${slugifySeriesPart(series.label)}.${rows.length}runs.csv`;
-    dfDownloadTextFile(filename, [header, body].join('\n'), 'text/csv;charset=utf-8');
-    setNotice(`Exported active series CSV: ${series.label} (${rows.length} runs)`);
+  const series = getSelectedRunSeries();
+  if (!series) {
+    showWarnNotice("Export Active Series CSV: choose an active series first.");
+    return;
   }
+
+  const allRows = savedRuns
+    .filter((row) => row.seriesId === series.id)
+    .sort((a, b) => {
+      const ao = a.ordinal ?? Number.MAX_SAFE_INTEGER;
+      const bo = b.ordinal ?? Number.MAX_SAFE_INTEGER;
+      if (ao !== bo) return ao - bo;
+      return a.createdAt - b.createdAt;
+    });
+
+  const verdict = getSeriesExportVerdictV0_1(series, allRows);
+  const rows = allRows.filter((row) => Boolean(row.workbench.report));
+
+  if (!rows.length) {
+    showWarnNotice(`Export Active Series CSV: ${series.label} has no scored saved runs yet.`);
+    return;
+  }
+
+  if (verdict.hasHardWarnings) {
+    showWarnNotice(`Export Active Series CSV: ${series.label} blocked — ${verdict.reason}. Clean the active series first.`);
+    return;
+  }
+
+  const header = [
+    'timestamp',
+    'seriesLabel',
+    'ordinal',
+    'runId',
+    'provider',
+    'model',
+    'label',
+    'pearson_r',
+    'spearman_rho',
+    'p_perm',
+    'validN',
+    'invalidN',
+    'noVowelTokenCount',
+    'notes',
+  ].join(',');
+
+  const body = rows
+    .map((row) => buildSeriesCsvRow(row, series.label))
+    .filter(Boolean)
+    .join('\n');
+
+  const filename = `evals.${slugifySeriesPart(series.label)}.${rows.length}runs.csv`;
+  dfDownloadTextFile(filename, [header, body].join('\n'), 'text/csv;charset=utf-8');
+  setNotice(
+    verdict.exportMode === "ready"
+      ? `Exported active series CSV: ${series.label} (${rows.length} runs)`
+      : `Exported active series CSV with warning: ${series.label} (${rows.length} scored runs; ${verdict.reason}).`,
+  );
+}
 
   function exportAllSeriesCsv() {
-    const rows = savedRuns
-      .filter((row) => Boolean(row.workbench.report))
-      .map((row) => ({
-        row,
-        seriesLabel:
-          runSeries.find((series) => series.id === row.seriesId)?.label ??
-          (String(row.seriesId ?? '').trim() || 'unassigned'),
-      }))
-      .sort((a, b) => {
-        const labelCompare = a.seriesLabel.localeCompare(b.seriesLabel);
-        if (labelCompare !== 0) return labelCompare;
-        const ao = a.row.ordinal ?? Number.MAX_SAFE_INTEGER;
-        const bo = b.row.ordinal ?? Number.MAX_SAFE_INTEGER;
-        if (ao !== bo) return ao - bo;
-        return a.row.createdAt - b.row.createdAt;
-      });
+  const seriesVerdicts = runSeries
+    .map((series) => ({
+      series,
+      rows: savedRuns.filter((row) => row.seriesId === series.id),
+    }))
+    .filter(({ rows }) => rows.length > 0)
+    .map(({ series, rows }) => ({
+      series,
+      verdict: getSeriesExportVerdictV0_1(series, rows),
+    }));
 
-    if (!rows.length) {
-      showWarnNotice('Export All Series CSV: no scored saved runs yet.');
-      return;
-    }
-
-    const header = [
-      'timestamp',
-      'seriesLabel',
-      'ordinal',
-      'runId',
-      'provider',
-      'model',
-      'label',
-      'pearson_r',
-      'spearman_rho',
-      'p_perm',
-      'validN',
-      'invalidN',
-      'noVowelTokenCount',
-      'notes',
-    ].join(',');
-
-    const body = rows
-      .map(({ row, seriesLabel }) => buildSeriesCsvRow(row, seriesLabel))
-      .filter(Boolean)
-      .join('\n');
-
-    const filename = `evals.all-series.${rows.length}runs.csv`;
-    dfDownloadTextFile(filename, [header, body].join('\n'), 'text/csv;charset=utf-8');
-    setNotice(`Exported all series CSV (${rows.length} runs)`);
+  const blockedSeries = seriesVerdicts.filter(({ verdict }) => verdict.hasHardWarnings);
+  if (blockedSeries.length) {
+    showWarnNotice(
+      `Export All Series CSV: blocked — clean duplicates in ${blockedSeries
+        .map(({ series }) => series.label)
+        .join(", ")} first.`
+    );
+    return;
   }
+
+  const rows = savedRuns
+    .filter((row) => Boolean(row.workbench.report))
+    .map((row) => ({
+      row,
+      seriesLabel:
+        runSeries.find((series) => series.id === row.seriesId)?.label ??
+        (String(row.seriesId ?? '').trim() || 'unassigned'),
+    }))
+    .sort((a, b) => {
+      const labelCompare = a.seriesLabel.localeCompare(b.seriesLabel);
+      if (labelCompare !== 0) return labelCompare;
+      const ao = a.row.ordinal ?? Number.MAX_SAFE_INTEGER;
+      const bo = b.row.ordinal ?? Number.MAX_SAFE_INTEGER;
+      if (ao !== bo) return ao - bo;
+      return a.row.createdAt - b.row.createdAt;
+    });
+
+  if (!rows.length) {
+    showWarnNotice('Export All Series CSV: no scored saved runs yet.');
+    return;
+  }
+
+  const header = [
+    'timestamp',
+    'seriesLabel',
+    'ordinal',
+    'runId',
+    'provider',
+    'model',
+    'label',
+    'pearson_r',
+    'spearman_rho',
+    'p_perm',
+    'validN',
+    'invalidN',
+    'noVowelTokenCount',
+    'notes',
+  ].join(',');
+
+  const body = rows
+    .map(({ row, seriesLabel }) => buildSeriesCsvRow(row, seriesLabel))
+    .filter(Boolean)
+    .join('\n');
+
+  const filename = `evals.all-series.${rows.length}runs.csv`;
+  dfDownloadTextFile(filename, [header, body].join('\n'), 'text/csv;charset=utf-8');
+
+  const warnedSeriesCount = seriesVerdicts.filter(({ verdict }) => verdict.exportMode === "warn").length;
+  setNotice(
+    warnedSeriesCount > 0
+      ? `Exported all series CSV with warning: ${warnedSeriesCount} incomplete or partially scored series included.`
+      : `Exported all series CSV (${rows.length} runs)`
+  );
+}
 
   function exportActiveSeriesJson() {
-    const series = getSelectedRunSeries();
-    if (!series) {
-      showWarnNotice("Export Active Series JSON: choose an active series first.");
-      return;
-    }
-
-    const rows = savedRuns
-      .filter((row) => row.seriesId === series.id)
-      .sort((a, b) => {
-        const ao = a.ordinal ?? Number.MAX_SAFE_INTEGER;
-        const bo = b.ordinal ?? Number.MAX_SAFE_INTEGER;
-        if (ao !== bo) return ao - bo;
-        return a.createdAt - b.createdAt;
-      });
-
-    if (!rows.length) {
-      showWarnNotice(`Export Active Series JSON: ${series.label} has no saved runs yet.`);
-      return;
-    }
-
-    const payload = {
-      exportVersion: "evals.activeSeriesExport.v0.1",
-      exportedAt: new Date().toISOString(),
-      series: {
-        id: series.id,
-        label: series.label,
-        targetCount: series.targetCount,
-        nextOrdinal: series.nextOrdinal,
-        runIdTemplate: series.runIdTemplate,
-        createdAt: new Date(series.createdAt).toISOString(),
-        updatedAt: new Date(series.updatedAt).toISOString(),
-      },
-      summary: {
-        savedCount: rows.length,
-        scoredCount: rows.filter((row) => Boolean(row.workbench.report)).length,
-        unscoredCount: rows.filter((row) => !row.workbench.report).length,
-      },
-      savedRuns: rows.map((row) => ({
-        ...row,
-        workbench: {
-          ...row.workbench,
-          runId: String(row.workbench.runId ?? '').trim(),
-          provider: String(row.workbench.provider ?? '').trim(),
-          model: String(row.workbench.model ?? '').trim(),
-          label: String(row.workbench.label ?? '').trim(),
-          sourceEngineId: String(row.workbench.sourceEngineId ?? '').trim(),
-          sourceEngineVersion: String(row.workbench.sourceEngineVersion ?? '').trim(),
-          sourceEngineBuild: String(row.workbench.sourceEngineBuild ?? '').trim(),
-        },
-        createdAtIso: new Date(row.createdAt).toISOString(),
-        updatedAtIso: new Date(row.updatedAt).toISOString(),
-      })),
-    };
-
-    const filename = `evals.${slugifySeriesPart(series.label)}.${rows.length}runs.json`;
-    dfDownloadTextFile(
-      filename,
-      JSON.stringify(payload, null, 2),
-      'application/json;charset=utf-8',
-    );
-    setNotice(`Exported active series JSON: ${series.label} (${rows.length} runs)`);
+  const series = getSelectedRunSeries();
+  if (!series) {
+    showWarnNotice("Export Active Series JSON: choose an active series first.");
+    return;
   }
+
+  const rows = savedRuns
+    .filter((row) => row.seriesId === series.id)
+    .sort((a, b) => {
+      const ao = a.ordinal ?? Number.MAX_SAFE_INTEGER;
+      const bo = b.ordinal ?? Number.MAX_SAFE_INTEGER;
+      if (ao !== bo) return ao - bo;
+      return a.createdAt - b.createdAt;
+    });
+
+  if (!rows.length) {
+    showWarnNotice(`Export Active Series JSON: ${series.label} has no saved runs yet.`);
+    return;
+  }
+
+  const verdict = getSeriesExportVerdictV0_1(series, rows);
+  if (verdict.hasHardWarnings) {
+    showWarnNotice(`Export Active Series JSON: ${series.label} blocked — ${verdict.reason}. Clean the active series first.`);
+    return;
+  }
+
+  const payload = {
+    exportVersion: "evals.activeSeriesExport.v0.1",
+    exportedAt: new Date().toISOString(),
+    series: {
+      id: series.id,
+      label: series.label,
+      targetCount: series.targetCount,
+      nextOrdinal: series.nextOrdinal,
+      runIdTemplate: series.runIdTemplate,
+      createdAt: new Date(series.createdAt).toISOString(),
+      updatedAt: new Date(series.updatedAt).toISOString(),
+    },
+    summary: {
+      savedCount: verdict.savedCount,
+      scoredCount: verdict.scoredCount,
+      unscoredCount: verdict.unscoredCount,
+      exportMode: verdict.exportMode,
+      exportReason: verdict.reason,
+    },
+    savedRuns: rows.map((row) => ({
+      ...row,
+      workbench: {
+        ...row.workbench,
+        runId: String(row.workbench.runId ?? '').trim(),
+        provider: String(row.workbench.provider ?? '').trim(),
+        model: String(row.workbench.model ?? '').trim(),
+        label: String(row.workbench.label ?? '').trim(),
+        sourceEngineId: String(row.workbench.sourceEngineId ?? '').trim(),
+        sourceEngineVersion: String(row.workbench.sourceEngineVersion ?? '').trim(),
+        sourceEngineBuild: String(row.workbench.sourceEngineBuild ?? '').trim(),
+      },
+      createdAtIso: new Date(row.createdAt).toISOString(),
+      updatedAtIso: new Date(row.updatedAt).toISOString(),
+    })),
+  };
+
+  const filename = `evals.${slugifySeriesPart(series.label)}.${rows.length}runs.json`;
+  dfDownloadTextFile(
+    filename,
+    JSON.stringify(payload, null, 2),
+    'application/json;charset=utf-8',
+  );
+  setNotice(
+    verdict.exportMode === "ready"
+      ? `Exported active series JSON: ${series.label} (${rows.length} runs)`
+      : `Exported active series JSON with warning: ${series.label} (${verdict.reason}).`,
+  );
+}
 
   const dfGetPrimaryTask = () => {
     const ts = report && report.tasks ? report.tasks : [];
