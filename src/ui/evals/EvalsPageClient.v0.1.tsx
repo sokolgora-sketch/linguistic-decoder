@@ -27,6 +27,8 @@ import type {
   EvalsSavedRunRecordV0_1,
   EvalsWorkbenchStateV0_1,
 } from "@/ui/evals/evalsRunStore.v0.1";
+import { getSeriesExportVerdictV0_1 } from "@/ui/evals/evalsSeriesExportVerdict.v0.1";
+
 
 type ApiOk = { ok: true; report: EvalReportBundleV0_1; md: string };
 type ApiErr = { ok: false; code: string; message: string };
@@ -979,7 +981,6 @@ export function EvalsPageClientV0_1() {
     activeSeriesDuplicateOrdinals.length === 0 &&
     activeSeriesDuplicateRunIds.length === 0;
 
-
   const activeSeriesHasHardWarnings =
     activeSeriesDuplicateOrdinals.length > 0 ||
     activeSeriesDuplicateRunIds.length > 0;
@@ -989,6 +990,13 @@ export function EvalsPageClientV0_1() {
     activeSeriesScoredCount === 0 ||
     activeSeriesUnscoredCount > 0 ||
     activeSeriesMissingOrdinals.length > 0;
+
+  const activeSeriesExportMode =
+    activeSeriesExportReady
+      ? "ready"
+      : activeSeriesHasHardWarnings
+        ? "blocked"
+        : "warn";
 
   const formatOrdinalList = (items: number[]) => {
     if (!items.length) return "none";
@@ -1207,20 +1215,30 @@ export function EvalsPageClientV0_1() {
       {
         key: "export",
         label: "Export ready",
-        tone: activeSeriesExportReady ? "good" : activeSeriesHasHardWarnings ? "bad" : "warn",
-        note: activeSeriesExportReady ? "ready" : "blocked",
+        tone:
+          activeSeriesExportMode === "ready"
+            ? "good"
+            : activeSeriesExportMode === "blocked"
+              ? "bad"
+              : "warn",
+        note:
+          activeSeriesExportMode === "ready"
+            ? "ready"
+            : activeSeriesExportMode === "warn"
+              ? "warning"
+              : "blocked",
       },
     ];
-  }, [
-    activeRunSeries,
-    selectedTask,
-    provider,
-    model,
-    activeSeriesSavedCount,
-    activeSeriesHasHardWarnings,
-    activeSeriesExportReady,
-    activeSeriesDuplicateCleanupPlan.removeCount,
-  ]);
+    }, [
+      activeRunSeries,
+      selectedTask,
+      provider,
+      model,
+      activeSeriesSavedCount,
+      activeSeriesExportMode,
+      activeSeriesHasHardWarnings,
+      activeSeriesDuplicateCleanupPlan.removeCount,
+    ]);
 
   const inputProbe = useMemo(() => probeInput(inputText), [inputText]);
   const showAnalyzeV1Autofill = mode === "run_bundle";
