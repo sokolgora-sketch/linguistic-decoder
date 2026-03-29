@@ -3207,7 +3207,7 @@ export function EvalsPageClientV0_1() {
                 </div>
 
                 <div className="rounded-[10px] border border-[#2d4a34] bg-[#101712] px-5 py-4">
-                  <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
+                  <div className="flex flex-col gap-4">
                     <div className="space-y-1">
                       <div className={`${MT.sectionLabel} text-[#ededed]`}>
                         Run series
@@ -3217,110 +3217,127 @@ export function EvalsPageClientV0_1() {
                       </div>
                     </div>
 
-                    <div className="grid gap-3 sm:grid-cols-[minmax(180px,1fr)_120px_minmax(220px,1fr)_auto] sm:items-end">
-                      <div>
-                        <label className={`${MT.fieldLabel} text-[#ededed]`}>
-                          Series label
-                        </label>
-                        <input
-                          className={`mt-1 w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[11px] ${MT.fieldControl} text-[#e6e6e6] outline-none transition focus:border-[#666]`}
-                          value={seriesLabelDraft}
-                          onChange={(e) => setSeriesLabelDraft(e.target.value)}
-                          placeholder="fresh-chat"
-                          disabled={busy}
-                        />
-                      </div>
+                    <div className="mt-4 grid gap-4">
+                      <div className="grid gap-3 xl:grid-cols-[minmax(180px,1fr)_120px_minmax(220px,1fr)_auto] xl:items-end">
+                        <div>
+                          <label className={`${MT.fieldLabel} text-[#ededed]`}>
+                            Series label
+                          </label>
+                          <input
+                            className={`mt-1 w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[11px] ${MT.fieldControl} text-[#e6e6e6] outline-none transition focus:border-[#666]`}
+                            value={seriesLabelDraft}
+                            onChange={(e) => setSeriesLabelDraft(e.target.value)}
+                            placeholder="fresh-chat"
+                            disabled={busy}
+                          />
+                        </div>
 
-                      <div>
-                        <label className={`${MT.fieldLabel} text-[#ededed]`}>
-                          Target count
-                        </label>
-                        <input
-                          type="number"
-                          min="1"
-                          step="1"
-                          className={`mt-1 w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[11px] ${MT.fieldControl} text-[#e6e6e6] outline-none transition focus:border-[#666]`}
-                          value={seriesTargetCountDraft}
-                          onChange={(e) => setSeriesTargetCountDraft(e.target.value)}
-                          disabled={busy}
-                        />
-                      </div>
+                        <div>
+                          <label className={`${MT.fieldLabel} text-[#ededed]`}>
+                            Target count
+                          </label>
+                          <input
+                            type="number"
+                            min="1"
+                            step="1"
+                            className={`mt-1 w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[11px] ${MT.fieldControl} text-[#e6e6e6] outline-none transition focus:border-[#666]`}
+                            value={seriesTargetCountDraft}
+                            onChange={(e) => setSeriesTargetCountDraft(e.target.value)}
+                            disabled={busy}
+                          />
+                        </div>
 
-                      <div>
-                        <label className={`${MT.fieldLabel} text-[#ededed]`}>
-                          Active series
-                        </label>
-                        <select
-                          className={`mt-1 w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[11px] ${MT.fieldControl} text-[#e6e6e6] outline-none transition focus:border-[#666]`}
-                          value={selectedSeriesId}
-                          onChange={(e) => setSelectedSeriesId(e.target.value)}
-                          disabled={busy || runSeries.length === 0}
+                        <div>
+                          <label className={`${MT.fieldLabel} text-[#ededed]`}>
+                            Active series
+                          </label>
+                          <select
+                            className={`mt-1 w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[11px] ${MT.fieldControl} text-[#e6e6e6] outline-none transition focus:border-[#666]`}
+                            value={selectedSeriesId}
+                            onChange={(e) => setSelectedSeriesId(e.target.value)}
+                            disabled={busy || runSeries.length === 0}
+                          >
+                            {runSeries.length === 0 ? (
+                              <option value="">No series yet</option>
+                            ) : (
+                              runSeries.map((series) => (
+                                <option key={series.id} value={series.id}>
+                                  {series.label} · next {series.nextOrdinal} / {series.targetCount}
+                                </option>
+                              ))
+                            )}
+                          </select>
+                        </div>
+
+                        <button
+                          type="button"
+                          className={`${MT.actionSecondary} border-[#2d4f8f] bg-[#15233d] text-[#c7d9ff] transition hover:border-[#4b73bd] hover:bg-[#1a2b48] hover:text-white disabled:opacity-50`}
+                          onClick={createRunSeries}
+                          disabled={busy}
                         >
-                          {runSeries.length === 0 ? (
-                            <option value="">No series yet</option>
-                          ) : (
-                            runSeries.map((series) => (
-                              <option key={series.id} value={series.id}>
-                                {series.label} · next {series.nextOrdinal} / {series.targetCount}
-                              </option>
-                            ))
-                          )}
-                        </select>
+                          Create Series
+                        </button>
                       </div>
 
-                      <button
-                        type="button"
-                        className={`${MT.actionSecondary} border-[#2d4f8f] bg-[#15233d] text-[#c7d9ff] transition hover:border-[#4b73bd] hover:bg-[#1a2b48] hover:text-white disabled:opacity-50`}
-                        onClick={createRunSeries}
-                        disabled={busy}
-                      >
-                        Create Series
-                      </button>
+                      <div className="rounded-[8px] border border-[#2d4a34] bg-[#0f1512] px-4 py-4">
+                        <div className="space-y-1">
+                          <div className={`${MT.fieldLabel} text-[#ededed]`}>
+                            Series actions
+                          </div>
+                          <div className={`${MT.helperCompact} text-[#9fb3a4]`}>
+                            Save the next checkpoint, manage the active series, or export operator files.
+                          </div>
+                        </div>
 
-                      <button
-                        type="button"
-                        className={`${MT.actionSecondary} border-[#2d7f5a] bg-[#103224] text-[#c9f5df] transition hover:border-[#3ea776] hover:bg-[#17442f] hover:text-white disabled:opacity-50`}
-                        onClick={saveAndAdvanceSeries}
-                        disabled={busy || !selectedSeriesId || (!inputText.trim() && !report && !md)}
-                      >
-                        Save + Next Run
-                      </button>
+                        <div className="mt-4 flex flex-wrap gap-3">
+                          <button
+                            type="button"
+                            className={`${MT.actionSecondary} border-[#2d7f5a] bg-[#103224] text-[#c9f5df] transition hover:border-[#3ea776] hover:bg-[#17442f] hover:text-white disabled:opacity-50`}
+                            onClick={saveAndAdvanceSeries}
+                            disabled={busy || !selectedSeriesId || (!inputText.trim() && !report && !md)}
+                          >
+                            Save + Next Run
+                          </button>
 
-                      <button
-                        type="button"
-                        className={`${MT.actionWarn} border-[#6b3737] bg-[#211717] text-[#e6a0a0] transition hover:border-[#cc0000] hover:bg-[#2a1616] hover:text-[#ffc1c1] disabled:opacity-50`}
-                        onClick={deleteSelectedRunSeries}
-                        disabled={busy || !selectedSeriesId}
-                      >
-                        Delete Active Series
-                      </button>
+                          <button
+                            type="button"
+                            className={`${MT.actionWarn} border-[#6b3737] bg-[#211717] text-[#e6a0a0] transition hover:border-[#cc0000] hover:bg-[#2a1616] hover:text-[#ffc1c1] disabled:opacity-50`}
+                            onClick={deleteSelectedRunSeries}
+                            disabled={busy || !selectedSeriesId}
+                          >
+                            Delete Active Series
+                          </button>
+                        </div>
 
-                      <button
-                        type="button"
-                        className={`${MT.actionSecondary} border-[#3f5a2f] bg-[#172111] text-[#d7f0c8] transition hover:border-[#5b7f43] hover:bg-[#1d2a15] hover:text-white disabled:opacity-50`}
-                        onClick={exportActiveSeriesCsv}
-                        disabled={busy || !selectedSeriesId}
-                      >
-                        Export Active Series CSV
-                      </button>
+                        <div className="mt-3 flex flex-wrap gap-3">
+                          <button
+                            type="button"
+                            className={`${MT.actionSecondary} border-[#3f5a2f] bg-[#172111] text-[#d7f0c8] transition hover:border-[#5b7f43] hover:bg-[#1d2a15] hover:text-white disabled:opacity-50`}
+                            onClick={exportActiveSeriesCsv}
+                            disabled={busy || !selectedSeriesId}
+                          >
+                            Export Active Series CSV
+                          </button>
 
-                      <button
-                        type="button"
-                        className={`${MT.actionSecondary} border-[#30465d] bg-[#101b28] text-[#cfe6ff] transition hover:border-[#46698f] hover:bg-[#162434] hover:text-white disabled:opacity-50`}
-                        onClick={exportActiveSeriesJson}
-                        disabled={busy || !selectedSeriesId}
-                      >
-                        Export Active Series JSON
-                      </button>
+                          <button
+                            type="button"
+                            className={`${MT.actionSecondary} border-[#30465d] bg-[#101b28] text-[#cfe6ff] transition hover:border-[#46698f] hover:bg-[#162434] hover:text-white disabled:opacity-50`}
+                            onClick={exportActiveSeriesJson}
+                            disabled={busy || !selectedSeriesId}
+                          >
+                            Export Active Series JSON
+                          </button>
 
-                      <button
-                        type="button"
-                        className={`${MT.actionSecondary} border-[#5b4a2a] bg-[#1c150d] text-[#f3dfb7] transition hover:border-[#8a7345] hover:bg-[#261c11] hover:text-white disabled:opacity-50`}
-                        onClick={exportAllSeriesCsv}
-                        disabled={busy || savedRuns.length === 0}
-                      >
-                        Export All Series CSV
-                      </button>
+                          <button
+                            type="button"
+                            className={`${MT.actionSecondary} border-[#5b4a2a] bg-[#1c150d] text-[#f3dfb7] transition hover:border-[#8a7345] hover:bg-[#261c11] hover:text-white disabled:opacity-50`}
+                            onClick={exportAllSeriesCsv}
+                            disabled={busy || savedRuns.length === 0}
+                          >
+                            Export All Series CSV
+                          </button>
+                        </div>
+                      </div>
                     </div>
 
                   </div>
@@ -3337,8 +3354,8 @@ export function EvalsPageClientV0_1() {
                     </div>
                   </div>
 
-                  <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
-                    <div className="min-w-[280px]">
+                  <div className="mt-4 grid gap-4">
+                    <div className="space-y-1">
                       <label className={`${MT.fieldLabel} text-[#ededed]`}>
                         Open Saved Run
                       </label>
@@ -3358,16 +3375,20 @@ export function EvalsPageClientV0_1() {
                           ))
                         )}
                       </select>
+                      <div className={`${MT.helperCompact} text-[#9fb1bf]`}>
+                        Saved runs are frozen workbench checkpoints you can reopen after reset or reload.
+                      </div>
                     </div>
 
-                    <button
-                      type="button"
-                      className={`${MT.actionSecondary} border-[#555] bg-[#1a1a1a] text-[#e2e2e2] transition hover:border-[#777] hover:bg-[#202020] hover:text-white disabled:opacity-50`}
-                      onClick={openSelectedSavedRun}
-                      disabled={busy || !selectedSavedRunId}
-                    >
-                      Open Saved Run
-                    </button>
+                    <div className="flex flex-wrap gap-3">
+                      <button
+                        type="button"
+                        className={`${MT.actionSecondary} border-[#555] bg-[#1a1a1a] text-[#e2e2e2] transition hover:border-[#777] hover:bg-[#202020] hover:text-white disabled:opacity-50`}
+                        onClick={openSelectedSavedRun}
+                        disabled={busy || !selectedSavedRunId}
+                      >
+                        Open Saved Run
+                      </button>
 
                       <button
                         type="button"
@@ -3377,6 +3398,7 @@ export function EvalsPageClientV0_1() {
                       >
                         Delete Saved Run
                       </button>
+                    </div>
                   </div>
                 </div>
               </div>
