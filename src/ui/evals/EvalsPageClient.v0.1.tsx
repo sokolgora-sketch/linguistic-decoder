@@ -3040,36 +3040,21 @@ export function EvalsPageClientV0_1() {
                         Battery operator
                       </div>
                       <div className={`${MT.helper} text-[#b9af8a]`}>
-                        Track current series position before running the next save.
+                        Inspect the exact run payload that will be saved into the active series.
                       </div>
                     </div>
 
                     {activeRunSeries ? (
                       <div className="min-w-0 flex-1 space-y-3">
-                        <div className="flex flex-wrap gap-2">
-                          <span className="rounded-full border border-[#7b6b2b] bg-[#211b0d] px-3 py-1 text-[12px] font-semibold uppercase tracking-[0.08em] text-[#f5e7b0]">
-                            Series {activeRunSeries.label}
-                          </span>
-                          <span className="rounded-full border border-[#4a4a4a] bg-[#121212] px-3 py-1 text-[12px] font-semibold uppercase tracking-[0.08em] text-[#e6e6e6]">
-                            Next {activeSeriesNextOrdinal} / {activeRunSeries.targetCount}
-                          </span>
-                          <span className="rounded-full border border-[#2f5a3d] bg-[#102016] px-3 py-1 text-[12px] font-semibold uppercase tracking-[0.08em] text-[#bfe8cc]">
-                            Saved {activeSeriesSavedCount}
-                          </span>
-                          <span className="rounded-full border border-[#5a3a2f] bg-[#1c120f] px-3 py-1 text-[12px] font-semibold uppercase tracking-[0.08em] text-[#f0c3b4]">
-                            Remaining {activeSeriesRemainingCount}
-                          </span>
-                        </div>
-
                         <div className="grid gap-2 lg:grid-cols-2">
                           <div className="rounded-[8px] border border-[#303030] bg-[#101010] px-3 py-2">
-                            <div className={`${MT.fieldLabel} text-[#9f9f9f]`}>Current runId</div>
+                            <div className={`${MT.fieldLabel} text-[#9f9f9f]`}>RunId to save</div>
                             <div className="mt-1 overflow-x-auto font-mono text-[12px] text-[#ededed]">
                               {activeSeriesRunIdPreview || "—"}
                             </div>
                           </div>
                           <div className="rounded-[8px] border border-[#303030] bg-[#101010] px-3 py-2">
-                            <div className={`${MT.fieldLabel} text-[#9f9f9f]`}>Current label</div>
+                            <div className={`${MT.fieldLabel} text-[#9f9f9f]`}>Label to save</div>
                             <div className="mt-1 overflow-x-auto font-mono text-[12px] text-[#ededed]">
                               {activeSeriesLabelPreview || "—"}
                             </div>
