@@ -4072,92 +4072,104 @@ export function EvalsPageClientV0_1() {
                 </div>
               </div>
 
-              <div
-                className={`mt-5 flex flex-wrap items-center gap-x-6 gap-y-3 ${MT.markdownMeta} text-[#d8d8d8]`}
-              >
-                <span>
-                  specId:{" "}
-                  <span className="font-mono text-[#e5e5e5]">
-                    {report.specId}
-                  </span>
-                </span>
-                <span>
-                  evalSpecVersion:{" "}
-                  <span className="font-mono text-[#e5e5e5]">
-                    {report.evalSpecVersion}
-                  </span>
-                </span>
-                <span>
-                  runId:{" "}
-                  <span className="font-mono text-[#e5e5e5]">
-                    {report.runId}
-                  </span>
-                </span>
-              </div>
+              <div className="mt-5 rounded-[10px] border border-[#262626] bg-[#101010] px-5 py-4">
+                <div className="space-y-1">
+                  <div className={`${MT.sectionLabel} text-[#dfdfdf]`}>
+                    Run metadata snapshot
+                  </div>
+                  <div className={`${MT.helperCompact} text-[#9c9c9c]`}>
+                    High-level identifiers for the active report before the detailed device plate.
+                  </div>
+                </div>
 
-              <div
-                className={`mt-4 flex flex-wrap items-center gap-x-6 gap-y-3 ${MT.markdownMeta} text-[#d0d0d0]`}
-              >
-                <span>
-                  provider:{" "}
-                  <span
-                    className={`font-mono ${report.meta?.provider?.trim() ? "text-[#f2f2f2]" : "text-[#8f8f8f]"}`}
-                  >
-                    {report.meta?.provider?.trim()
-                      ? report.meta.provider
-                      : "not set"}
+                <div
+                  className={`mt-4 flex flex-wrap items-center gap-x-6 gap-y-3 ${MT.markdownMeta} text-[#d8d8d8]`}
+                >
+                  <span>
+                    specId:{" "}
+                    <span className="font-mono text-[#e5e5e5]">
+                      {report.specId}
+                    </span>
                   </span>
-                </span>
-                <span>
-                  model:{" "}
-                  <span
-                    className={`font-mono ${report.meta?.model?.trim() ? "text-[#f2f2f2]" : "text-[#8f8f8f]"}`}
-                  >
-                    {report.meta?.model?.trim() ? report.meta.model : "not set"}
+                  <span>
+                    evalSpecVersion:{" "}
+                    <span className="font-mono text-[#e5e5e5]">
+                      {report.evalSpecVersion}
+                    </span>
                   </span>
-                </span>
-                <span>
-                  label:{" "}
-                  <span
-                    className={`font-mono ${report.meta?.label?.trim() ? "text-[#f2f2f2]" : "text-[#8f8f8f]"}`}
-                  >
-                    {report.meta?.label?.trim() ? report.meta.label : "not set"}
+                  <span>
+                    runId:{" "}
+                    <span className="font-mono text-[#e5e5e5]">
+                      {report.runId}
+                    </span>
                   </span>
-                </span>
-              </div>
-              <div
-                className={`mt-2 flex flex-wrap items-center gap-x-6 gap-y-3 ${MT.markdownMeta} text-[#d0d0d0]`}
-              >
-                <span>
-                  sourceEngineId:{" "}
-                  <span
-                    className={`font-mono ${report.meta?.sourceEngineId?.trim() ? "text-[#f2f2f2]" : "text-[#8f8f8f]"}`}
-                  >
-                    {report.meta?.sourceEngineId?.trim()
-                      ? report.meta.sourceEngineId
-                      : "not set"}
+                </div>
+
+                <div
+                  className={`mt-3 flex flex-wrap items-center gap-x-6 gap-y-3 ${MT.markdownMeta} text-[#d0d0d0]`}
+                >
+                  <span>
+                    provider:{" "}
+                    <span
+                      className={`font-mono ${report.meta?.provider?.trim() ? "text-[#f2f2f2]" : "text-[#8f8f8f]"}`}
+                    >
+                      {report.meta?.provider?.trim()
+                        ? report.meta.provider
+                        : "not set"}
+                    </span>
                   </span>
-                </span>
-                <span>
-                  sourceEngineVersion:{" "}
-                  <span
-                    className={`font-mono ${report.meta?.sourceEngineVersion?.trim() ? "text-[#f2f2f2]" : "text-[#8f8f8f]"}`}
-                  >
-                    {report.meta?.sourceEngineVersion?.trim()
-                      ? report.meta.sourceEngineVersion
-                      : "not set"}
+                  <span>
+                    model:{" "}
+                    <span
+                      className={`font-mono ${report.meta?.model?.trim() ? "text-[#f2f2f2]" : "text-[#8f8f8f]"}`}
+                    >
+                      {report.meta?.model?.trim() ? report.meta.model : "not set"}
+                    </span>
                   </span>
-                </span>
-                <span>
-                  sourceEngineBuild:{" "}
-                  <span
-                    className={`font-mono ${report.meta?.sourceEngineBuild?.trim() ? "text-[#f2f2f2]" : "text-[#8f8f8f]"}`}
-                  >
-                    {report.meta?.sourceEngineBuild?.trim()
-                      ? report.meta.sourceEngineBuild
-                      : "not set"}
+                  <span>
+                    label:{" "}
+                    <span
+                      className={`font-mono ${report.meta?.label?.trim() ? "text-[#f2f2f2]" : "text-[#8f8f8f]"}`}
+                    >
+                      {report.meta?.label?.trim() ? report.meta.label : "not set"}
+                    </span>
                   </span>
-                </span>
+                </div>
+
+                <div
+                  className={`mt-2 flex flex-wrap items-center gap-x-6 gap-y-3 ${MT.markdownMeta} text-[#d0d0d0]`}
+                >
+                  <span>
+                    sourceEngineId:{" "}
+                    <span
+                      className={`font-mono ${report.meta?.sourceEngineId?.trim() ? "text-[#f2f2f2]" : "text-[#8f8f8f]"}`}
+                    >
+                      {report.meta?.sourceEngineId?.trim()
+                        ? report.meta.sourceEngineId
+                        : "not set"}
+                    </span>
+                  </span>
+                  <span>
+                    sourceEngineVersion:{" "}
+                    <span
+                      className={`font-mono ${report.meta?.sourceEngineVersion?.trim() ? "text-[#f2f2f2]" : "text-[#8f8f8f]"}`}
+                    >
+                      {report.meta?.sourceEngineVersion?.trim()
+                        ? report.meta.sourceEngineVersion
+                        : "not set"}
+                    </span>
+                  </span>
+                  <span>
+                    sourceEngineBuild:{" "}
+                    <span
+                      className={`font-mono ${report.meta?.sourceEngineBuild?.trim() ? "text-[#f2f2f2]" : "text-[#8f8f8f]"}`}
+                    >
+                      {report.meta?.sourceEngineBuild?.trim()
+                        ? report.meta.sourceEngineBuild
+                        : "not set"}
+                    </span>
+                  </span>
+                </div>
               </div>
 
               <div className="mt-5 rounded-[10px] border border-[#2f2f2f] bg-[#101010] px-5 py-5">
