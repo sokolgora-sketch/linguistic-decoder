@@ -28,6 +28,7 @@ import type {
   EvalsWorkbenchStateV0_1,
 } from "@/ui/evals/evalsRunStore.v0.1";
 import { getSeriesExportVerdictV0_1 } from "@/ui/evals/evalsSeriesExportVerdict.v0.1";
+import { summarizeEvalsBatterySeriesV0_1 } from "@/ui/evals/evalsBatterySummary.v0.1";
 
 
 type ApiOk = { ok: true; report: EvalReportBundleV0_1; md: string };
@@ -2904,6 +2905,93 @@ export function EvalsPageClientV0_1() {
                           Compare all saved series before running, exporting, or cleaning up duplicates.
                         </div>
                       </div>
+
+                        {(() => {
+                          const activeSeries = getSelectedRunSeries();
+                          if (!activeSeries) return null;
+
+                          const rows = savedRuns
+                            .filter((row) => row.seriesId === activeSeries.id)
+                            .sort((a, b) => {
+                              const ao = a.ordinal ?? Number.MAX_SAFE_INTEGER;
+                              const bo = b.ordinal ?? Number.MAX_SAFE_INTEGER;
+                              if (ao !== bo) return ao - bo;
+                              return a.createdAt - b.createdAt;
+                            });
+
+                          const summary = summarizeEvalsBatterySeriesV0_1(activeSeries, rows);
+                          if (!summary.scoredCount) return null;
+
+                          const fmt = (value: number | null) =>
+                            value == null ? "—" : value.toFixed(3);
+
+                          const controlTone =
+                            summary.controlFailCount > 0
+                              ? "border-[#7f1d1d] bg-[#2a1111] text-[#fca5a5]"
+                              : summary.controlWarnCount > 0
+                                ? "border-[#6a5a2a] bg-[#242016] text-[#f3d38b]"
+                                : "border-[#244234] bg-[#102017] text-[#9be3b1]";
+
+                          return (
+                            <div className="mt-4 rounded-[8px] border border-[#30414c] bg-[#0f151a] px-4 py-4">
+                              <div className="flex flex-wrap items-center justify-between gap-3">
+                                <div className="space-y-1">
+                                  <div className={`${MT.sectionLabel} text-[#ededed]`}>
+                                    Active battery summary
+                                  </div>
+                                  <div className={`${MT.helper} text-[#9fb1bf]`}>
+                                    {activeSeries.label} · {summary.scoredCount}/{summary.savedCount} scored · task {summary.mainTaskId ?? "—"}
+                                  </div>
+                                </div>
+                                <div className={`rounded-full border px-3 py-1 text-[11px] font-medium ${controlTone}`}>
+                                  controls clean {summary.controlCleanCount} · warn {summary.controlWarnCount} · fail {summary.controlFailCount}
+                                </div>
+                              </div>
+
+                              <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+                                <div className="rounded-[8px] border border-[#26323a] bg-[#12181d] px-3 py-3">
+                                  <div className={`${MT.helper} text-[#9fb1bf]`}>Spearman ρ</div>
+                                  <div className="mt-1 font-mono text-[13px] text-[#f2f2f2]">
+                                    mean {fmt(summary.meanSpearmanRho)} · median {fmt(summary.medianSpearmanRho)}
+                                  </div>
+                                  <div className="mt-1 font-mono text-[12px] text-[#a9b8c5]">
+                                    min {fmt(summary.minSpearmanRho)} · max {fmt(summary.maxSpearmanRho)}
+                                  </div>
+                                </div>
+
+                                <div className="rounded-[8px] border border-[#26323a] bg-[#12181d] px-3 py-3">
+                                  <div className={`${MT.helper} text-[#9fb1bf]`}>Pearson r</div>
+                                  <div className="mt-1 font-mono text-[13px] text-[#f2f2f2]">
+                                    mean {fmt(summary.meanPearsonR)} · median {fmt(summary.medianPearsonR)}
+                                  </div>
+                                  <div className="mt-1 font-mono text-[12px] text-[#a9b8c5]">
+                                    min {fmt(summary.minPearsonR)} · max {fmt(summary.maxPearsonR)}
+                                  </div>
+                                </div>
+
+                                <div className="rounded-[8px] border border-[#26323a] bg-[#12181d] px-3 py-3">
+                                  <div className={`${MT.helper} text-[#9fb1bf]`}>Permutation p</div>
+                                  <div className="mt-1 font-mono text-[13px] text-[#f2f2f2]">
+                                    min {fmt(summary.minPPerm)} · max {fmt(summary.maxPPerm)}
+                                  </div>
+                                  <div className="mt-1 text-[12px] text-[#a9b8c5]">
+                                    lower is stronger ladder signal
+                                  </div>
+                                </div>
+
+                                <div className="rounded-[8px] border border-[#26323a] bg-[#12181d] px-3 py-3">
+                                  <div className={`${MT.helper} text-[#9fb1bf]`}>Run spread</div>
+                                  <div className="mt-1 font-mono text-[13px] text-[#f2f2f2]">
+                                    strongest {summary.strongestRunId ?? "—"}
+                                  </div>
+                                  <div className="mt-1 font-mono text-[12px] text-[#a9b8c5]">
+                                    weakest {summary.weakestRunId ?? "—"}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })()}
 
                       {operatorSeriesRows.length > 0 ? (
                         <div className="mt-4 overflow-x-auto">
