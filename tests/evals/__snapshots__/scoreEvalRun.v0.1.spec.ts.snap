@@ -1,7 +1,30 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Evals scorer v0.1 — synthetic ladder + negative control gates scores T2 ladder and derived T3/T4 controls deterministically (no false positives) 1`] = `
+exports[`Evals scorer v0.1 — synthetic ladder + negative control gates scores T2 ladder and derives a clean T3/T4 control-health verdict deterministically 1`] = `
 {
+  "controlHealth": {
+    "failingCount": 0,
+    "missingCount": 0,
+    "reason": "T3/T4 controls clean",
+    "status": "controlClean",
+    "tasks": [
+      {
+        "p_pearson": 0.5879166666666666,
+        "p_spearman": 0.3491666666666667,
+        "status": "clean",
+        "taskId": "T3_NEGATIVE_CONTROL_SHUFFLE_V0_1",
+        "threshold": 0.1,
+      },
+      {
+        "p_pearson": 0.99375,
+        "p_spearman": 1,
+        "status": "clean",
+        "taskId": "T4_NEGATIVE_CONTROL_SHUFFLE_ALT_V0_1",
+        "threshold": 0.1,
+      },
+    ],
+    "threshold": 0.1,
+  },
   "evalReportVersion": "evalReport.v0.1",
   "evalSpecVersion": "evalSpec.v0.1",
   "meta": {

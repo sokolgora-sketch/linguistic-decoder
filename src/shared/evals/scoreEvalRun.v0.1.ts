@@ -108,6 +108,86 @@ function deriveShuffleBucketLabelsV0_1(params: {
   return out;
 }
 
+const CONTROL_HEALTH_THRESHOLD_P_V0_1 = 0.1;
+
+function buildControlHealthV0_1(reports: EvalTaskReportV0_1[]): EvalReportBundleV0_1["controlHealth"] {
+  const hasLadder = reports.some((t) => t.taskId === "T2_LADDER_V0_1");
+  if (!hasLadder) {
+    return {
+      status: "controlClean",
+      reason: "no ladder controls applicable",
+      threshold: CONTROL_HEALTH_THRESHOLD_P_V0_1,
+      failingCount: 0,
+      missingCount: 0,
+      tasks: [],
+    };
+  }
+
+  const tasks: EvalReportBundleV0_1["controlHealth"]["tasks"] = [
+    "T3_NEGATIVE_CONTROL_SHUFFLE_V0_1",
+    "T4_NEGATIVE_CONTROL_SHUFFLE_ALT_V0_1",
+  ].map((taskId) => {
+    const task = reports.find((t) => t.taskId === taskId);
+    const slope = task?.slope_aperturePresenceMean;
+    if (!slope) {
+      return {
+        taskId,
+        status: "missing",
+        p_spearman: null,
+        p_pearson: null,
+        threshold: CONTROL_HEALTH_THRESHOLD_P_V0_1,
+      };
+    }
+
+    const isClean =
+      slope.p_spearman >= CONTROL_HEALTH_THRESHOLD_P_V0_1 &&
+      slope.p_pearson >= CONTROL_HEALTH_THRESHOLD_P_V0_1;
+
+    return {
+      taskId,
+      status: isClean ? "clean" : "fail",
+      p_spearman: slope.p_spearman,
+      p_pearson: slope.p_pearson,
+      threshold: CONTROL_HEALTH_THRESHOLD_P_V0_1,
+    };
+  });
+
+  const failingCount = tasks.filter((t) => t.status === "fail").length;
+  const missingCount = tasks.filter((t) => t.status === "missing").length;
+
+  let status: EvalReportBundleV0_1["controlHealth"]["status"] = "controlClean";
+  let reason = "T3/T4 controls clean";
+
+  if (failingCount === 0 && missingCount === 0) {
+    status = "controlClean";
+    reason = "T3/T4 controls clean";
+  } else if (failingCount === 0 && missingCount > 0) {
+    status = "controlWarn";
+    reason = `${missingCount} control missing`; 
+  } else if (failingCount === 1 && missingCount === 0) {
+    status = "controlWarn";
+    reason = "1 control suspicious";
+  } else if (failingCount === 1 && missingCount === 1) {
+    status = "controlFail";
+    reason = "1 control suspicious and 1 missing";
+  } else if (failingCount >= 2) {
+    status = "controlFail";
+    reason = `${failingCount} controls suspicious`; 
+  } else {
+    status = "controlFail";
+    reason = "controls missing";
+  }
+
+  return {
+    status,
+    reason,
+    threshold: CONTROL_HEALTH_THRESHOLD_P_V0_1,
+    failingCount,
+    missingCount,
+    tasks,
+  };
+}
+
 export function scoreEvalRunBundleV0_1(params: { spec: EvalSpecV0_1; run: EvalRunBundleV0_1 }): EvalReportBundleV0_1 {
   const { spec, run } = params;
 
@@ -277,6 +357,8 @@ export function scoreEvalRunBundleV0_1(params: { spec: EvalSpecV0_1; run: EvalRu
     });
   }
 
+  const controlHealth = buildControlHealthV0_1(reports);
+
   return {
     evalReportVersion: "evalReport.v0.1",
     evalSpecVersion: "evalSpec.v0.1",
@@ -284,5 +366,6 @@ export function scoreEvalRunBundleV0_1(params: { spec: EvalSpecV0_1; run: EvalRu
     runId: run.runId,
     meta: run.meta,
     tasks: reports,
+    controlHealth,
   };
 }

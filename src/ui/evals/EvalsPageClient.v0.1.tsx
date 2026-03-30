@@ -2237,6 +2237,8 @@ export function EvalsPageClientV0_1() {
     const csvLabel = String(reportMeta?.label ?? row.workbench.label ?? '').trim();
     const csvSourceEngineId = String(reportMeta?.sourceEngineId ?? row.workbench.sourceEngineId ?? '').trim();
     const csvSourceEngineBuild = String(reportMeta?.sourceEngineBuild ?? row.workbench.sourceEngineBuild ?? '').trim();
+    const controlHealthStatus = String((rep as any)?.controlHealth?.status ?? "").trim();
+    const controlHealthReason = dfSplitCsvSafe((rep as any)?.controlHealth?.reason ?? "");
     const ordinal = row.ordinal != null ? formatSeriesOrdinal(row.ordinal) : '';
 
     return [
@@ -2253,7 +2255,7 @@ export function EvalsPageClientV0_1() {
       validN,
       invalidN,
       noVowelTokenCount,
-      `iters=${iters}; seed=${seed}; p_perm_src=p_spearman; sourceEngineId=${csvSourceEngineId}; sourceEngineBuild=${csvSourceEngineBuild}`,
+      `iters=${iters}; seed=${seed}; p_perm_src=p_spearman; sourceEngineId=${csvSourceEngineId}; sourceEngineBuild=${csvSourceEngineBuild}; controlHealth=${controlHealthStatus}; controlReason=${controlHealthReason}`,
     ].map(dfCsvCell).join(',');
   };
 

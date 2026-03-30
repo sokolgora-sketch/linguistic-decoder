@@ -555,5 +555,28 @@
         "notes": []
       }
     }
-  ]
+  ],
+  "controlHealth": {
+    "status": "controlClean",
+    "reason": "T3/T4 controls clean",
+    "threshold": 0.1,
+    "failingCount": 0,
+    "missingCount": 0,
+    "tasks": [
+      {
+        "taskId": "T3_NEGATIVE_CONTROL_SHUFFLE_V0_1",
+        "status": "clean",
+        "p_spearman": 0.3491666666666667,
+        "p_pearson": 0.5879166666666666,
+        "threshold": 0.1
+      },
+      {
+        "taskId": "T4_NEGATIVE_CONTROL_SHUFFLE_ALT_V0_1",
+        "status": "clean",
+        "p_spearman": 1,
+        "p_pearson": 0.99375,
+        "threshold": 0.1
+      }
+    ]
+  }
 }
