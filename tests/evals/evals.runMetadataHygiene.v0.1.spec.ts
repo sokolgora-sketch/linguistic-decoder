@@ -5,6 +5,10 @@ import {
   normalizeEvalsMetaTextV0_1,
   normalizeRunIdTemplateV0_1,
 } from "@/ui/evals/evalsRunMetadata.v0.1";
+import {
+  applySeriesRunIdTemplate,
+  makeDefaultRunSeries,
+} from "@/ui/evals/evalsRunStore.v0.1";
 
 describe("evals run metadata hygiene v0.1", () => {
   it("trims runId and meta fields during parse", () => {
@@ -50,5 +54,13 @@ describe("evals run metadata hygiene v0.1", () => {
     expect(normalizeRunIdTemplateV0_1("")).toBe("battery.{NN}");
     expect(normalizeRunIdTemplateV0_1("fresh-chat")).toBe("fresh-chat.{NN}");
     expect(normalizeRunIdTemplateV0_1("battery.{NN}")).toBe("battery.{NN}");
+  });
+
+  it("wires normalized runIdTemplate into series creation and preview", () => {
+    const series = makeDefaultRunSeries("fresh-chat", "fresh-chat", 3);
+
+    expect(series.runIdTemplate).toBe("fresh-chat.{NN}");
+    expect(applySeriesRunIdTemplate("fresh-chat", 1)).toBe("fresh-chat.r01");
+    expect(applySeriesRunIdTemplate(series.runIdTemplate, 12)).toBe("fresh-chat.r12");
   });
 });
