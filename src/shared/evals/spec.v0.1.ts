@@ -35,7 +35,7 @@ export type EvalTaskV0_1 = {
 
   // Derived-task wiring (v0.1 uses this for Negative Control)
   derivedFromTaskId?: string;         // e.g. "T2_LADDER_V0_1"
-  derivedOp?: "shuffle_bucket_labels"; // deterministic label shuffle (tokens fixed)
+  derivedOp?: "shuffle_bucket_labels" | "shuffle_bucket_labels_alt_seed"; // deterministic label shuffle variants (tokens fixed)
 };
 
 export type EvalSpecV0_1 = {
@@ -139,7 +139,11 @@ export function parseEvalSpecV0_1(input: unknown): EvalSpecV0_1 {
     const derivedOp = t.derivedOp === undefined ? undefined : asString(t.derivedOp, `spec.tasks[${idx}].derivedOp`);
     if (kind === "derived") {
       assert(typeof derivedFromTaskId === "string" && derivedFromTaskId.length > 0, `spec.tasks[${idx}]: derivedFromTaskId required`);
-      assert(derivedOp === "shuffle_bucket_labels", `spec.tasks[${idx}]: derivedOp must be 'shuffle_bucket_labels'`);
+        assert(
+          derivedOp === "shuffle_bucket_labels" ||
+            derivedOp === "shuffle_bucket_labels_alt_seed",
+          `spec.tasks[${idx}]: derivedOp must be 'shuffle_bucket_labels'|'shuffle_bucket_labels_alt_seed'`,
+        );
     }
 
     return {
@@ -283,6 +287,20 @@ export const EVAL_SPEC_V0_1: EvalSpecV0_1 = parseEvalSpecV0_1({
       prompt:
         "This task is derived automatically from T2 by deterministically shuffling bucket labels while keeping tokens fixed.\n" +
         "Expected behavior: slope collapses (false-positive detector).",
+    },
+    {
+      taskId: "T4_NEGATIVE_CONTROL_SHUFFLE_ALT_V0_1",
+      kind: "derived",
+      title: "Negative Control — Deterministic Label Shuffle (alt seed, tokens fixed)",
+      languageHint: "en",
+      inputShape: "bucketed_single_tokens",
+      targetBuckets: ["V1", "V2", "V3", "V4", "V5", "V6", "V7"],
+      nPerBucket: 10,
+      derivedFromTaskId: "T2_LADDER_V0_1",
+      derivedOp: "shuffle_bucket_labels_alt_seed",
+      prompt:
+        "This task is derived automatically from T2 by deterministically shuffling bucket labels with an alternate fixed seed while keeping tokens fixed.\n" +
+        "Expected behavior: slope collapses independently of T3 (second false-positive detector).",
     },
   ],
 });

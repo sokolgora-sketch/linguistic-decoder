@@ -9,12 +9,14 @@ function rep(base: string, n: number) {
   return out;
 }
 
-describe("Evals scorer v0.1 — synthetic ladder + negative control gate", () => {
-  it("scores T2 ladder and derived T3 control deterministically (no false positives)", () => {
+describe("Evals scorer v0.1 — synthetic ladder + negative control gates", () => {
+  it("scores T2 ladder and derived T3/T4 controls deterministically (no false positives)", () => {
     const t2 = EVAL_SPEC_V0_1.tasks.find((t) => t.taskId.startsWith("T2_") && t.kind === "byo");
-    const t3 = EVAL_SPEC_V0_1.tasks.find((t) => t.kind === "derived");
-    if (!t2) throw new Error("Missing T2 task in spec");
-    if (!t3) throw new Error("Missing derived task (T3) in spec");
+      const t3 = EVAL_SPEC_V0_1.tasks.find((t) => t.taskId === "T3_NEGATIVE_CONTROL_SHUFFLE_V0_1");
+      const t4 = EVAL_SPEC_V0_1.tasks.find((t) => t.taskId === "T4_NEGATIVE_CONTROL_SHUFFLE_ALT_V0_1");
+      if (!t2) throw new Error("Missing T2 task in spec");
+      if (!t3) throw new Error("Missing T3 derived task in spec");
+      if (!t4) throw new Error("Missing T4 derived task in spec");
 
     // Synthetic ladder: each bucket is dominated by one vowel carrier.
     // (We don't claim semantics — this is a calibration run for scorer wiring.)
@@ -49,14 +51,19 @@ describe("Evals scorer v0.1 — synthetic ladder + negative control gate", () =>
     expect(r2).toBeTruthy();
     expect(r2?.slope_aperturePresenceMean?.spearman_rho).toBe(-1);
 
-    const r3 = report.tasks.find((x) => x.taskId === t3.taskId);
-    expect(r3).toBeTruthy();
+      const r3 = report.tasks.find((x) => x.taskId === t3.taskId);
+      const r4 = report.tasks.find((x) => x.taskId === t4.taskId);
+      expect(r3).toBeTruthy();
+      expect(r4).toBeTruthy();
 
-    // M2.5 false-positive detector:
-    // derived control should NOT produce significant slope.
-    expect(r3?.slope_aperturePresenceMean?.p_spearman).toBeGreaterThanOrEqual(0.1);
-    expect(r3?.slope_aperturePresenceMean?.p_pearson).toBeGreaterThanOrEqual(0.1);
+      // M2.5 false-positive detector:
+      // existing derived shuffle control should NOT produce significant slope.
+      expect(r3?.slope_aperturePresenceMean?.p_spearman).toBeGreaterThanOrEqual(0.1);
+      expect(r3?.slope_aperturePresenceMean?.p_pearson).toBeGreaterThanOrEqual(0.1);
 
-    expect(report).toMatchSnapshot();
+      // T4 is the second deterministic null control; snapshot locks its exact behavior.
+      expect(r4?.taskId).toBe("T4_NEGATIVE_CONTROL_SHUFFLE_ALT_V0_1");
+
+      expect(report).toMatchSnapshot();
   });
 });

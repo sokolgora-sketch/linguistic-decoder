@@ -135,11 +135,16 @@ export function scoreEvalRunBundleV0_1(params: { spec: EvalSpecV0_1; run: EvalRu
       if (!baseId) continue;
       const basePayload = runByTaskId.get(baseId);
       if (!basePayload) continue;
-      payloadBuckets = deriveShuffleBucketLabelsV0_1({
-        baseBuckets: basePayload.buckets ?? {},
-        bucketOrder: BUCKETS_V0_1,
-        seed: (spec.scoring.permutation.seed ^ 0xC0FFEE) >>> 0,
-      });
+        const derivedSeed =
+          task.derivedOp === "shuffle_bucket_labels_alt_seed"
+            ? (spec.scoring.permutation.seed ^ 0x06B85E3) >>> 0
+            : (spec.scoring.permutation.seed ^ 0xC0FFEE) >>> 0;
+
+        payloadBuckets = deriveShuffleBucketLabelsV0_1({
+          baseBuckets: basePayload.buckets ?? {},
+          bucketOrder: BUCKETS_V0_1,
+          seed: derivedSeed,
+        });
       if (!payloadBuckets) {
         // can’t derive safely; emit a report with diagnostics anyway
         payloadBuckets = {};
