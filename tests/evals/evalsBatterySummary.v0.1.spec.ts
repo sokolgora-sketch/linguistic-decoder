@@ -1,6 +1,9 @@
 import { describe, expect, it } from "@jest/globals";
 
-import { summarizeEvalsBatterySeriesV0_1 } from "@/ui/evals/evalsBatterySummary.v0.1";
+import {
+  formatBatterySummaryRunIdV0_1,
+  summarizeEvalsBatterySeriesV0_1,
+} from "@/ui/evals/evalsBatterySummary.v0.1";
 import type {
   EvalsRunSeriesV0_1,
   EvalsSavedRunRecordV0_1,
@@ -149,5 +152,19 @@ describe("summarizeEvalsBatterySeriesV0_1", () => {
     expect(out.controlCleanCount).toBe(1);
     expect(out.controlWarnCount).toBe(1);
     expect(out.controlFailCount).toBe(1);
+  });
+});
+
+describe("formatBatterySummaryRunIdV0_1", () => {
+  it("formats canonical run ids for compact dashboard display", () => {
+    expect(
+      formatBatterySummaryRunIdV0_1(
+        "battery.v0.1.openai.chatgpt52thinking.fresh-chat.r01",
+      ),
+    ).toBe("fresh-chat.r01");
+
+    expect(formatBatterySummaryRunIdV0_1("battery.r01")).toBe("battery.r01");
+    expect(formatBatterySummaryRunIdV0_1("")).toBe("—");
+    expect(formatBatterySummaryRunIdV0_1(null)).toBe("—");
   });
 });
