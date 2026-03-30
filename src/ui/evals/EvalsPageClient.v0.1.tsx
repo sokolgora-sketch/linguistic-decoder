@@ -28,7 +28,10 @@ import type {
   EvalsWorkbenchStateV0_1,
 } from "@/ui/evals/evalsRunStore.v0.1";
 import { getSeriesExportVerdictV0_1 } from "@/ui/evals/evalsSeriesExportVerdict.v0.1";
-import { summarizeEvalsBatterySeriesV0_1 } from "@/ui/evals/evalsBatterySummary.v0.1";
+import {
+  formatBatterySummaryRunIdV0_1,
+  summarizeEvalsBatterySeriesV0_1,
+} from "@/ui/evals/evalsBatterySummary.v0.1";
 import { normalizeEvalsMetaTextV0_1 } from "@/ui/evals/evalsRunMetadata.v0.1";
 
 
@@ -2982,11 +2985,29 @@ export function EvalsPageClientV0_1() {
 
                                 <div className="rounded-[8px] border border-[#26323a] bg-[#12181d] px-3 py-3">
                                   <div className={`${MT.helper} text-[#9fb1bf]`}>Run spread</div>
-                                  <div className="mt-1 font-mono text-[13px] text-[#f2f2f2]">
-                                    strongest {summary.strongestRunId ?? "—"}
+
+                                  <div className="mt-2 min-w-0">
+                                    <div className="text-[11px] uppercase tracking-[0.08em] text-[#9fb1bf]">
+                                      strongest
+                                    </div>
+                                    <div
+                                      className="mt-1 min-w-0 break-words font-mono text-[13px] leading-5 text-[#f2f2f2]"
+                                      title={summary.strongestRunId ?? undefined}
+                                    >
+                                      {formatBatterySummaryRunIdV0_1(summary.strongestRunId)}
+                                    </div>
                                   </div>
-                                  <div className="mt-1 font-mono text-[12px] text-[#a9b8c5]">
-                                    weakest {summary.weakestRunId ?? "—"}
+
+                                  <div className="mt-3 min-w-0">
+                                    <div className="text-[11px] uppercase tracking-[0.08em] text-[#9fb1bf]">
+                                      weakest
+                                    </div>
+                                    <div
+                                      className="mt-1 min-w-0 break-words font-mono text-[12px] leading-5 text-[#a9b8c5]"
+                                      title={summary.weakestRunId ?? undefined}
+                                    >
+                                      {formatBatterySummaryRunIdV0_1(summary.weakestRunId)}
+                                    </div>
                                   </div>
                                 </div>
                               </div>

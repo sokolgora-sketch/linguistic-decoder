@@ -96,6 +96,24 @@ function extractMainTaskPoint(row: EvalsSavedRunRecordV0_1): BatteryPointV0_1 | 
   };
 }
 
+export function formatBatterySummaryRunIdV0_1(
+  value: string | null | undefined,
+): string {
+  if (!value) return "—";
+  const trimmed = value.trim();
+  if (!trimmed) return "—";
+
+  const parts = trimmed.split(".");
+  const last = parts[parts.length - 1] ?? "";
+  const prev = parts[parts.length - 2] ?? "";
+
+  if (/^r\d+$/i.test(last) && prev) {
+    return `${prev}.${last}`;
+  }
+
+  return trimmed;
+}
+
 export function summarizeEvalsBatterySeriesV0_1(
   series: EvalsRunSeriesV0_1,
   rows: EvalsSavedRunRecordV0_1[],
