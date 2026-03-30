@@ -1,3 +1,5 @@
+import { normalizeRunIdTemplateV0_1 } from "@/ui/evals/evalsRunMetadata.v0.1";
+
 import type { EvalReportBundleV0_1 } from "@/shared/evals/report.v0.1";
 
 export type EvalsWorkbenchStateV0_1 = {
@@ -97,7 +99,10 @@ export function formatSeriesOrdinal(n: number) {
 }
 
 export function applySeriesRunIdTemplate(template: string, ordinal: number) {
-  return template.replaceAll("{NN}", formatSeriesOrdinal(ordinal));
+  return normalizeRunIdTemplateV0_1(template).replaceAll(
+    "{NN}",
+    formatSeriesOrdinal(ordinal),
+  );
 }
 
 export function makeDefaultRunSeries(
@@ -111,7 +116,7 @@ export function makeDefaultRunSeries(
     label,
     targetCount,
     nextOrdinal: 1,
-    runIdTemplate,
+    runIdTemplate: normalizeRunIdTemplateV0_1(runIdTemplate),
     createdAt: now,
     updatedAt: now,
   };
