@@ -197,3 +197,44 @@ _not computed (needs >= 2 buckets)_
 - noVowelTokenCount: 0
 - totalInvalidTokenCount: 0
 - notes: (none)
+
+## T4_NEGATIVE_CONTROL_SHUFFLE_ALT_V0_1 — Negative Control — Deterministic Label Shuffle (alt seed, tokens fixed)
+
+- kind: derived
+- languageHint: en
+- targetBuckets: V1, V2, V3, V4, V5, V6, V7
+- nPerBucket: 10
+
+### Buckets
+
+| Bucket | expectedN | providedN | validN | invalidN | dupN | mean(primary) | mean(presenceMean) |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| V1 | 10 | 10 | 10 | 0 | 0 | 0.470 | 0.470 |
+| V2 | 10 | 10 | 10 | 0 | 0 | 0.490 | 0.490 |
+| V3 | 10 | 10 | 10 | 0 | 0 | 0.640 | 0.640 |
+| V4 | 10 | 10 | 10 | 0 | 0 | 0.540 | 0.540 |
+| V5 | 10 | 10 | 10 | 0 | 0 | 0.520 | 0.520 |
+| V6 | 10 | 10 | 10 | 0 | 0 | 0.610 | 0.610 |
+| V7 | 10 | 10 | 10 | 0 | 0 | 0.430 | 0.430 |
+
+### Slope — aperturePrimary
+
+- pearson r: 0.000 (parametric p=0.992)
+- spearman ρ: 0.000 (parametric p=1.000)
+- permutation test: iters=12000, seed=90273163
+
+### Slope — aperturePresenceMean
+
+- pearson r: 0.000 (parametric p=0.994)
+- spearman ρ: 0.000 (parametric p=1.000)
+- permutation test: iters=12000, seed=97631760
+
+### Diagnostics
+
+- missingBuckets: (none)
+- extraBuckets: (none)
+- emptyTokenCount: 0
+- whitespaceTokenCount: 0
+- noVowelTokenCount: 0
+- totalInvalidTokenCount: 0
+- notes: (none)

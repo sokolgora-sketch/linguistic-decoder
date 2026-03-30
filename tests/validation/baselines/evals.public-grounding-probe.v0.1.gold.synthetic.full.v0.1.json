@@ -405,6 +405,155 @@
         "totalInvalidTokenCount": 0,
         "notes": []
       }
+    },
+    {
+      "taskId": "T4_NEGATIVE_CONTROL_SHUFFLE_ALT_V0_1",
+      "kind": "derived",
+      "title": "Negative Control — Deterministic Label Shuffle (alt seed, tokens fixed)",
+      "languageHint": "en",
+      "targetBuckets": [
+        "V1",
+        "V2",
+        "V3",
+        "V4",
+        "V5",
+        "V6",
+        "V7"
+      ],
+      "nPerBucket": 10,
+      "buckets": [
+        {
+          "bucket": "V1",
+          "expectedN": 10,
+          "providedN": 10,
+          "validN": 10,
+          "invalidN": 0,
+          "duplicateN": 0,
+          "mean_aperturePrimary": 0.4699999999999999,
+          "mean_aperturePresenceMean": 0.4699999999999999
+        },
+        {
+          "bucket": "V2",
+          "expectedN": 10,
+          "providedN": 10,
+          "validN": 10,
+          "invalidN": 0,
+          "duplicateN": 0,
+          "mean_aperturePrimary": 0.48999999999999994,
+          "mean_aperturePresenceMean": 0.48999999999999994
+        },
+        {
+          "bucket": "V3",
+          "expectedN": 10,
+          "providedN": 10,
+          "validN": 10,
+          "invalidN": 0,
+          "duplicateN": 0,
+          "mean_aperturePrimary": 0.6399999999999999,
+          "mean_aperturePresenceMean": 0.6399999999999999
+        },
+        {
+          "bucket": "V4",
+          "expectedN": 10,
+          "providedN": 10,
+          "validN": 10,
+          "invalidN": 0,
+          "duplicateN": 0,
+          "mean_aperturePrimary": 0.5399999999999999,
+          "mean_aperturePresenceMean": 0.5399999999999999
+        },
+        {
+          "bucket": "V5",
+          "expectedN": 10,
+          "providedN": 10,
+          "validN": 10,
+          "invalidN": 0,
+          "duplicateN": 0,
+          "mean_aperturePrimary": 0.5199999999999999,
+          "mean_aperturePresenceMean": 0.5199999999999999
+        },
+        {
+          "bucket": "V6",
+          "expectedN": 10,
+          "providedN": 10,
+          "validN": 10,
+          "invalidN": 0,
+          "duplicateN": 0,
+          "mean_aperturePrimary": 0.6100000000000001,
+          "mean_aperturePresenceMean": 0.6100000000000001
+        },
+        {
+          "bucket": "V7",
+          "expectedN": 10,
+          "providedN": 10,
+          "validN": 10,
+          "invalidN": 0,
+          "duplicateN": 0,
+          "mean_aperturePrimary": 0.43,
+          "mean_aperturePresenceMean": 0.43
+        }
+      ],
+      "slope_aperturePrimary": {
+        "bucketOrder": [
+          "V1",
+          "V2",
+          "V3",
+          "V4",
+          "V5",
+          "V6",
+          "V7"
+        ],
+        "means": [
+          0.4699999999999999,
+          0.48999999999999994,
+          0.6399999999999999,
+          0.5399999999999999,
+          0.5199999999999999,
+          0.6100000000000001,
+          0.43
+        ],
+        "pearson_r": 5.698924404281975e-16,
+        "spearman_rho": 0,
+        "p_pearson": 0.9921666666666666,
+        "p_spearman": 1,
+        "iters": 12000,
+        "seed": 90273163
+      },
+      "slope_aperturePresenceMean": {
+        "bucketOrder": [
+          "V1",
+          "V2",
+          "V3",
+          "V4",
+          "V5",
+          "V6",
+          "V7"
+        ],
+        "means": [
+          0.4699999999999999,
+          0.48999999999999994,
+          0.6399999999999999,
+          0.5399999999999999,
+          0.5199999999999999,
+          0.6100000000000001,
+          0.43
+        ],
+        "pearson_r": 5.698924404281975e-16,
+        "spearman_rho": 0,
+        "p_pearson": 0.99375,
+        "p_spearman": 1,
+        "iters": 12000,
+        "seed": 97631760
+      },
+      "diagnostics": {
+        "missingBuckets": [],
+        "extraBuckets": [],
+        "emptyTokenCount": 0,
+        "whitespaceTokenCount": 0,
+        "noVowelTokenCount": 0,
+        "totalInvalidTokenCount": 0,
+        "notes": []
+      }
     }
   ]
 }
