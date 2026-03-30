@@ -40,6 +40,10 @@ function asString(x: unknown, path: string): string {
   return x;
 }
 
+function asTrimmedString(x: unknown, path: string): string {
+  return asString(x, path).trim();
+}
+
 function asStringArray(x: unknown, path: string): string[] {
   assert(Array.isArray(x), `${path}: expected array`);
   x.forEach((v, i) =>
@@ -81,8 +85,8 @@ export function parseEvalRunBundleV0_1(input: unknown): EvalRunBundleV0_1 {
     "run.specId: expected 'public-grounding-probe.v0.1'",
   );
 
-  const runId = asString(input.runId, "run.runId");
-  assert(runId.trim().length > 0, "run.runId: must be non-empty");
+  const runId = asTrimmedString(input.runId, "run.runId");
+  assert(runId.length > 0, "run.runId: must be non-empty");
 
   // meta (optional)
   let meta: EvalRunBundleV0_1["meta"] | undefined;
@@ -91,25 +95,25 @@ export function parseEvalRunBundleV0_1(input: unknown): EvalRunBundleV0_1 {
     const m = input.meta;
     meta = {
       provider:
-        m.provider === undefined
-          ? undefined
-          : asString(m.provider, "run.meta.provider"),
+          m.provider === undefined
+            ? undefined
+            : asTrimmedString(m.provider, "run.meta.provider"),
       model:
-        m.model === undefined ? undefined : asString(m.model, "run.meta.model"),
+          m.model === undefined ? undefined : asTrimmedString(m.model, "run.meta.model"),
       label:
-        m.label === undefined ? undefined : asString(m.label, "run.meta.label"),
+          m.label === undefined ? undefined : asTrimmedString(m.label, "run.meta.label"),
       sourceEngineId:
-        m.sourceEngineId === undefined
-          ? undefined
-          : asString(m.sourceEngineId, "run.meta.sourceEngineId"),
+          m.sourceEngineId === undefined
+            ? undefined
+            : asTrimmedString(m.sourceEngineId, "run.meta.sourceEngineId"),
       sourceEngineVersion:
-        m.sourceEngineVersion === undefined
-          ? undefined
-          : asString(m.sourceEngineVersion, "run.meta.sourceEngineVersion"),
+          m.sourceEngineVersion === undefined
+            ? undefined
+            : asTrimmedString(m.sourceEngineVersion, "run.meta.sourceEngineVersion"),
       sourceEngineBuild:
-        m.sourceEngineBuild === undefined
-          ? undefined
-          : asString(m.sourceEngineBuild, "run.meta.sourceEngineBuild"),
+          m.sourceEngineBuild === undefined
+            ? undefined
+            : asTrimmedString(m.sourceEngineBuild, "run.meta.sourceEngineBuild"),
     };
   }
 

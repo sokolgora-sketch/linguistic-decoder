@@ -29,6 +29,7 @@ import type {
 } from "@/ui/evals/evalsRunStore.v0.1";
 import { getSeriesExportVerdictV0_1 } from "@/ui/evals/evalsSeriesExportVerdict.v0.1";
 import { summarizeEvalsBatterySeriesV0_1 } from "@/ui/evals/evalsBatterySummary.v0.1";
+import { normalizeEvalsMetaTextV0_1 } from "@/ui/evals/evalsRunMetadata.v0.1";
 
 
 type ApiOk = { ok: true; report: EvalReportBundleV0_1; md: string };
@@ -2232,13 +2233,13 @@ export function EvalsPageClientV0_1() {
       diag?.noVowelTokenCount ?? diag?.no_vowel_token_count ?? '';
 
     const reportMeta = rep.meta ?? {};
-    const csvRunId = String((rep as any)?.runId ?? row.workbench.runId ?? '').trim();
-    const csvProvider = String(reportMeta?.provider ?? row.workbench.provider ?? '').trim();
-    const csvModel = String(reportMeta?.model ?? row.workbench.model ?? '').trim();
-    const csvLabel = String(reportMeta?.label ?? row.workbench.label ?? '').trim();
-    const csvSourceEngineId = String(reportMeta?.sourceEngineId ?? row.workbench.sourceEngineId ?? '').trim();
-    const csvSourceEngineBuild = String(reportMeta?.sourceEngineBuild ?? row.workbench.sourceEngineBuild ?? '').trim();
-    const controlHealthStatus = String((rep as any)?.controlHealth?.status ?? "").trim();
+    const csvRunId = normalizeEvalsMetaTextV0_1((rep as any)?.runId ?? row.workbench.runId ?? "");
+    const csvProvider = normalizeEvalsMetaTextV0_1(reportMeta?.provider ?? row.workbench.provider ?? "");
+    const csvModel = normalizeEvalsMetaTextV0_1(reportMeta?.model ?? row.workbench.model ?? "");
+    const csvLabel = normalizeEvalsMetaTextV0_1(reportMeta?.label ?? row.workbench.label ?? "");
+    const csvSourceEngineId = normalizeEvalsMetaTextV0_1(reportMeta?.sourceEngineId ?? row.workbench.sourceEngineId ?? "");
+    const csvSourceEngineBuild = normalizeEvalsMetaTextV0_1(reportMeta?.sourceEngineBuild ?? row.workbench.sourceEngineBuild ?? "");
+    const controlHealthStatus = normalizeEvalsMetaTextV0_1((rep as any)?.controlHealth?.status ?? "");
     const controlHealthReason = dfSplitCsvSafe((rep as any)?.controlHealth?.reason ?? "");
     const ordinal = row.ordinal != null ? formatSeriesOrdinal(row.ordinal) : '';
 
@@ -2256,7 +2257,7 @@ export function EvalsPageClientV0_1() {
       validN,
       invalidN,
       noVowelTokenCount,
-      `iters=${iters}; seed=${seed}; p_perm_src=p_spearman; sourceEngineId=${csvSourceEngineId}; sourceEngineBuild=${csvSourceEngineBuild}; controlHealth=${controlHealthStatus}; controlReason=${controlHealthReason}`,
+      `iters=${iters}; seed=${seed}; p_perm_src=p_spearman; sourceEngineId=${csvSourceEngineId || ""}; sourceEngineBuild=${csvSourceEngineBuild || ""}; controlHealth=${controlHealthStatus || ""}; controlReason=${controlHealthReason || ""}`,
     ].map(dfCsvCell).join(',');
   };
 
