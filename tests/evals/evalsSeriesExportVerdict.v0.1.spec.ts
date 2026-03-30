@@ -31,6 +31,7 @@ function makeRow(args: {
   ordinal: number | null;
   runId: string;
   scored: boolean;
+  controlStatus?: "controlClean" | "controlWarn" | "controlFail";
 }): EvalsSavedRunRecordV0_1 {
   const now = 1710000000000;
   return {
@@ -42,7 +43,13 @@ function makeRow(args: {
     ordinal: args.ordinal,
     workbench: makeWorkbench({
       runId: args.runId,
-      report: args.scored ? ({} as any) : null,
+      report: args.scored
+        ? ({
+            controlHealth: {
+              status: args.controlStatus ?? "controlClean",
+            },
+          } as any)
+        : null,
     }),
   };
 }
@@ -58,7 +65,7 @@ describe("getSeriesExportVerdictV0_1", () => {
     updatedAt: 1710000000000,
   };
 
-  it("returns ready for a complete, fully scored, duplicate-free series", () => {
+  it("returns ready for a complete, fully scored, duplicate-free, control-clean series", () => {
     const rows = [
       makeRow({ id: "r1", ordinal: 1, runId: "battery.r01", scored: true }),
       makeRow({ id: "r2", ordinal: 2, runId: "battery.r02", scored: true }),
@@ -77,6 +84,8 @@ describe("getSeriesExportVerdictV0_1", () => {
       hasHardWarnings: false,
       duplicateOrdinals: [],
       duplicateRunIds: [],
+      controlWarnCount: 0,
+      controlFailCount: 0,
       exportMode: "ready",
       reason: "clean",
     });
@@ -109,6 +118,22 @@ describe("getSeriesExportVerdictV0_1", () => {
     expect(out.reason).toBe("1 unscored saved run");
     expect(out.unscoredCount).toBe(1);
     expect(out.isComplete).toBe(true);
+  });
+
+  it("returns warn when a complete scored series has control-health fail", () => {
+    const rows = [
+      makeRow({ id: "r1", ordinal: 1, runId: "battery.r01", scored: true }),
+      makeRow({ id: "r2", ordinal: 2, runId: "battery.r02", scored: true, controlStatus: "controlFail" }),
+      makeRow({ id: "r3", ordinal: 3, runId: "battery.r03", scored: true }),
+    ];
+
+    const out = getSeriesExportVerdictV0_1(series, rows);
+
+    expect(out.exportMode).toBe("warn");
+    expect(out.reason).toBe("control health fail in 1 scored run");
+    expect(out.controlFailCount).toBe(1);
+    expect(out.controlWarnCount).toBe(0);
+    expect(out.hasHardWarnings).toBe(false);
   });
 
   it("returns blocked when there are duplicate ordinals", () => {

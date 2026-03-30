@@ -44,6 +44,28 @@ export type TaskDiagnosticsV0_1 = {
   notes: string[];
 };
 
+export type EvalControlTaskHealthV0_1 = {
+  taskId: string;
+  status: "clean" | "fail" | "missing";
+  p_spearman: number | null;
+  p_pearson: number | null;
+  threshold: number;
+};
+
+export type EvalControlHealthStatusV0_1 =
+  | "controlClean"
+  | "controlWarn"
+  | "controlFail";
+
+export type EvalControlHealthV0_1 = {
+  status: EvalControlHealthStatusV0_1;
+  reason: string;
+  threshold: number;
+  failingCount: number;
+  missingCount: number;
+  tasks: EvalControlTaskHealthV0_1[];
+};
+
 export type EvalTaskReportV0_1 = {
   taskId: string;
   kind: "byo" | "derived";
@@ -77,4 +99,5 @@ export type EvalReportBundleV0_1 = {
   };
 
   tasks: EvalTaskReportV0_1[];
+  controlHealth: EvalControlHealthV0_1;
 };

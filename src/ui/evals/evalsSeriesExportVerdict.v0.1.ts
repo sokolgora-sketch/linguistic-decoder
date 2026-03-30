@@ -15,6 +15,8 @@ export type EvalsSeriesExportVerdictV0_1 = {
   hasHardWarnings: boolean;
   duplicateOrdinals: number[];
   duplicateRunIds: string[];
+  controlWarnCount: number;
+  controlFailCount: number;
   exportMode: EvalsSeriesExportModeV0_1;
   reason: string;
 };
@@ -24,7 +26,8 @@ export function getSeriesExportVerdictV0_1(
   rows: EvalsSavedRunRecordV0_1[],
 ): EvalsSeriesExportVerdictV0_1 {
   const savedCount = rows.length;
-  const scoredCount = rows.filter((row) => Boolean(row.workbench.report)).length;
+  const scoredRows = rows.filter((row) => Boolean(row.workbench.report));
+  const scoredCount = scoredRows.length;
   const unscoredCount = Math.max(savedCount - scoredCount, 0);
   const missingCount = Math.max(series.targetCount - savedCount, 0);
   const isComplete = missingCount === 0 && savedCount >= series.targetCount;
@@ -54,13 +57,23 @@ export function getSeriesExportVerdictV0_1(
     .map(([runId]) => runId)
     .sort();
 
+  const controlWarnCount = scoredRows.filter(
+    (row) => row.workbench.report?.controlHealth?.status === "controlWarn",
+  ).length;
+
+  const controlFailCount = scoredRows.filter(
+    (row) => row.workbench.report?.controlHealth?.status === "controlFail",
+  ).length;
+
   const hasHardWarnings =
     duplicateOrdinals.length > 0 || duplicateRunIds.length > 0;
+
+  const hasControlIssues = controlWarnCount > 0 || controlFailCount > 0;
 
   const exportMode: EvalsSeriesExportModeV0_1 =
     hasHardWarnings || !hasScoredData
       ? "blocked"
-      : isComplete && unscoredCount === 0
+      : isComplete && unscoredCount === 0 && !hasControlIssues
         ? "ready"
         : "warn";
 
@@ -72,7 +85,11 @@ export function getSeriesExportVerdictV0_1(
         ? `series incomplete (${savedCount}/${series.targetCount})`
         : unscoredCount > 0
           ? `${unscoredCount} unscored saved run${unscoredCount === 1 ? "" : "s"}`
-          : "clean";
+          : controlFailCount > 0
+            ? `control health fail in ${controlFailCount} scored run${controlFailCount === 1 ? "" : "s"}`
+            : controlWarnCount > 0
+              ? `control health warn in ${controlWarnCount} scored run${controlWarnCount === 1 ? "" : "s"}`
+              : "clean";
 
   return {
     savedCount,
@@ -84,6 +101,8 @@ export function getSeriesExportVerdictV0_1(
     hasHardWarnings,
     duplicateOrdinals,
     duplicateRunIds,
+    controlWarnCount,
+    controlFailCount,
     exportMode,
     reason,
   };
