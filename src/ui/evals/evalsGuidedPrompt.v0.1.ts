@@ -125,8 +125,8 @@ function detectIssues(
     issues.push("V5 is too open relative to V4");
   }
 
-  if (m[5] > m[4] + ISSUE_EPSILON || m[5] > m[6] + ISSUE_EPSILON) {
-    issues.push("V6 is too open relative to V5 and V7 in presence-mean");
+  if (m[5] > m[4] + ISSUE_EPSILON) {
+    issues.push("V6 is too open relative to V5 in presence-mean");
   }
 
   if (p[6] >= p[5] || m[6] >= m[5]) {
@@ -144,49 +144,115 @@ function detectIssues(
   return issues;
 }
 
+function getShapeIssueCount(issues: string[]): number {
+  return issues.filter(
+    (issue) =>
+      !issue.startsWith("Null controls") &&
+      !issue.startsWith("Bucket means are incomplete"),
+  ).length;
+}
+
 function detectLevel(
   task: EvalTaskReportV0_1 | null,
   primaryMeans: number[],
   presenceMeans: number[],
   controlHealthStatus: string,
+  issues: string[],
 ): GuidedPromptLevelV0_1 {
   const slopePresence = task?.slope_aperturePresenceMean ?? null;
   const spearman =
     asFiniteNumber(slopePresence?.spearman_rho) ??
     asFiniteNumber(task?.slope_aperturePrimary?.spearman_rho);
 
-  if (controlHealthStatus === "controlFail") return "heavy";
-  if (controlHealthStatus === "controlWarn") return "light";
+  const shapeIssueCount = getShapeIssueCount(issues);
+  const tightEndpoint = isTightEndpoint(primaryMeans, presenceMeans);
 
-  if (spearman !== null && spearman <= -0.95 && isTightEndpoint(primaryMeans, presenceMeans)) {
+  if (controlHealthStatus === "controlFail") return "heavy";
+  if (controlHealthStatus === "controlWarn") {
+    return shapeIssueCount >= 2 ? "heavy" : "light";
+  }
+
+  if (spearman !== null && spearman <= -0.97 && tightEndpoint && shapeIssueCount === 0) {
     return "skip";
   }
 
-  if (spearman !== null && spearman <= -0.85) return "minimal";
-  if (spearman !== null && spearman <= -0.70) return "light";
+  if (spearman !== null && spearman <= -0.90 && tightEndpoint && shapeIssueCount <= 1) {
+    return "minimal";
+  }
+
+  if (spearman !== null && spearman <= -0.78 && shapeIssueCount <= 2) {
+    return "light";
+  }
+
   return "heavy";
 }
 
-function buildCorrectionRuleLine(level: GuidedPromptLevelV0_1): string[] {
+function buildCorrectionRuleLine(
+  level: GuidedPromptLevelV0_1,
+  shapeIssueCount: number,
+): string[] {
   switch (level) {
     case "heavy":
       return [
         "- improve monotonic descent from V1 toward V7",
-        "- make a stronger corrective revision while keeping the buckets semantically coherent",
+        "- revise aggressively where the readout flags shape problems; stable buckets may stay unchanged",
+        "- prioritize endpoint repair first, then middle-bucket cleanup",
       ];
     case "light":
       return [
         "- improve monotonic descent from V1 toward V7",
-        "- make a conservative corrective revision",
+        "- revise only the flagged buckets and preserve stable buckets where possible",
+        shapeIssueCount <= 2
+          ? "- make targeted edits rather than a full rewrite"
+          : "- keep the rewrite focused even if more than one bucket needs cleanup",
       ];
     case "minimal":
       return [
         "- improve monotonic descent from V1 toward V7",
-        "- revise only as much as needed",
+        "- revise only the minimum set of flagged buckets",
+        "- preserve already-stable buckets verbatim where possible",
       ];
     case "skip":
       return ["- this run is already converged; use the next fresh-chat baseline instead of revising"];
   }
+}
+
+function buildIssueDirectives(issues: string[]): string[] {
+  const directives: string[] = [];
+
+  if (issues.includes("V2 is too open relative to V1")) {
+    directives.push("- tighten V2 so it stays below V1 and remains heavier than V3");
+  }
+
+  if (issues.includes("V3 is too open relative to V2")) {
+    directives.push("- tighten V3 so it stays below V2 and above V4");
+  }
+
+  if (issues.includes("V4 is too open relative to V3 and V5")) {
+    directives.push("- tighten V4 toward the center; it should not open above V3 or V5");
+  }
+
+  if (issues.includes("V5 is too open relative to V4")) {
+    directives.push("- tighten V5 slightly so motion does not reopen the ladder after V4");
+  }
+
+  if (issues.includes("V6 is too open relative to V5 in presence-mean")) {
+    directives.push("- tighten V6 in presence-mean so the edge/tension region does not reopen after V5");
+  }
+
+  if (issues.includes("V7 should remain the tightest / least open endpoint")) {
+    directives.push("- tighten V7 first; it must be the least open endpoint and finish below V6 in both metrics");
+  }
+
+  if (issues.includes("Null controls are warning; keep the revision conservative")) {
+    directives.push("- keep lexical changes conservative so the null controls do not drift toward significance");
+  }
+
+  if (issues.includes("Null controls are failing; prioritize cleaning controls before pushing the ladder shape")) {
+    directives.push("- prioritize cleaning the null controls before any ambitious ladder rewrite");
+  }
+
+  return directives;
 }
 
 function renderMetricLine(label: string, values: number[]): string {
@@ -205,8 +271,10 @@ function buildCorrectionPrompt(params: {
 }): string | null {
   if (params.level === "skip") return null;
 
+  const shapeIssueCount = getShapeIssueCount(params.issues);
   const issueLines = params.issues.map((issue) => `- ${issue}`);
-  const ruleLines = buildCorrectionRuleLine(params.level);
+  const directiveLines = buildIssueDirectives(params.issues);
+  const ruleLines = buildCorrectionRuleLine(params.level, shapeIssueCount);
 
   return `Return STRICT JSON only. No prose.
 
@@ -238,9 +306,15 @@ ${renderMetricLine("aperturePresenceMean means", params.presenceMeans)}
 
 Revision rule:
 ${ruleLines.join("\n")}
-${issueLines.join("\n")}
+- preserve already-stable buckets unless the readout explicitly flags them
 - keep the null controls clean
 - avoid artificial or repetitive token choices
+
+Priority fixes:
+${directiveLines.length > 0 ? directiveLines.join("\n") : "- no additional bucket-specific directives"}
+
+Detected issues:
+${issueLines.join("\n")}
 
 Output shape:
 {
@@ -266,7 +340,7 @@ export function getGuidedPromptV0_1(
   const t3PSpearman = readTaskPSpearman(report, "T3_NEGATIVE_CONTROL_SHUFFLE_V0_1");
   const t4PSpearman = readTaskPSpearman(report, "T4_NEGATIVE_CONTROL_SHUFFLE_ALT_V0_1");
   const issues = detectIssues(primaryMeans, presenceMeans, controlHealthStatus);
-  const level = detectLevel(mainTask, primaryMeans, presenceMeans, controlHealthStatus);
+  const level = detectLevel(mainTask, primaryMeans, presenceMeans, controlHealthStatus, issues);
 
   return {
     level,

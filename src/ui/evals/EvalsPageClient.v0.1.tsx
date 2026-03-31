@@ -33,7 +33,10 @@ import {
   summarizeEvalsBatterySeriesV0_1,
 } from "@/ui/evals/evalsBatterySummary.v0.1";
 import { normalizeEvalsMetaTextV0_1 } from "@/ui/evals/evalsRunMetadata.v0.1";
-import { getGuidedPromptV0_1 } from "@/ui/evals/evalsGuidedPrompt.v0.1";
+import {
+  EVALS_GUIDED_BASELINE_PROMPT_V0_1,
+  getGuidedPromptV0_1,
+} from "@/ui/evals/evalsGuidedPrompt.v0.1";
 
 
 type ApiOk = { ok: true; report: EvalReportBundleV0_1; md: string };
@@ -2202,11 +2205,7 @@ export function EvalsPageClientV0_1() {
   };
 
   const onCopyGuidedBaselinePrompt = async () => {
-    if (!guidedPrompt?.baselinePrompt) {
-      showWarnNotice("Copy Baseline Prompt: prompt unavailable.");
-      return;
-    }
-    await dfCopyText("Copy Baseline Prompt: copied.", guidedPrompt.baselinePrompt);
+    await dfCopyText("Copy Baseline Prompt: copied.", EVALS_GUIDED_BASELINE_PROMPT_V0_1);
   };
 
   const onCopyGuidedCorrectionPrompt = async () => {
@@ -2694,34 +2693,6 @@ export function EvalsPageClientV0_1() {
             Copy page link
           </button>
 
-                <button
-                  type="button"
-                  className={`${MT.actionUtility} border-[#355a7a] bg-transparent text-[#9fd3ff] transition hover:border-[#4d7fa8] hover:bg-[#132031] hover:text-[#d7eeff] disabled:opacity-50`}
-                  onClick={() => void onCopyGuidedBaselinePrompt()}
-                  disabled={busy}
-                >
-                  Copy Baseline Prompt
-                </button>
-
-                <button
-                  type="button"
-                  className={`${MT.actionUtility} border-[#5a4b22] bg-transparent text-[#f1d48a] transition hover:border-[#8b7131] hover:bg-[#241d0f] hover:text-[#ffe6a8] disabled:opacity-50`}
-                  onClick={() => void onCopyGuidedCorrectionPrompt()}
-                  disabled={busy || !report || !guidedPrompt?.correctionPrompt}
-                >
-                  Copy Correction Prompt
-                </button>
-
-                <span
-                  className={`rounded-full border px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.12em] ${guidedPromptTone}`}
-                  title={
-                    guidedPrompt
-                      ? `guided prompt level: ${guidedPrompt.level}`
-                      : "guided prompt unavailable until a scored report exists"
-                  }
-                >
-                  guided {guidedPrompt?.level ?? "n/a"}
-                </span>
         </div>
 
         <PaperSnapshotReferenceSection
@@ -3650,6 +3621,35 @@ export function EvalsPageClientV0_1() {
                           >
                             Export All Series CSV
                           </button>
+
+                          <button
+                            type="button"
+                            className={`${MT.actionUtility} border-[#355a7a] bg-transparent text-[#9fd3ff] transition hover:border-[#4d7fa8] hover:bg-[#132031] hover:text-[#d7eeff] disabled:opacity-50`}
+                            onClick={() => void onCopyGuidedBaselinePrompt()}
+                            disabled={busy}
+                          >
+                            Copy Baseline Prompt
+                          </button>
+
+                          <button
+                            type="button"
+                            className={`${MT.actionUtility} border-[#5a4b22] bg-transparent text-[#f1d48a] transition hover:border-[#8b7131] hover:bg-[#241d0f] hover:text-[#ffe6a8] disabled:opacity-50`}
+                            onClick={() => void onCopyGuidedCorrectionPrompt()}
+                            disabled={busy || !report || !guidedPrompt?.correctionPrompt}
+                          >
+                            Copy Correction Prompt
+                          </button>
+
+                          <span
+                            className={`rounded-full border px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.12em] ${guidedPromptTone}`}
+                            title={
+                              guidedPrompt
+                                ? `guided prompt level: ${guidedPrompt.level}`
+                                : "guided prompt unavailable until a scored report exists"
+                            }
+                          >
+                            guided {guidedPrompt?.level ?? "n/a"}
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -3889,34 +3889,6 @@ export function EvalsPageClientV0_1() {
               </button>
 
 
-                <button
-                  type="button"
-                  className={`${MT.actionUtility} border-[#355a7a] bg-transparent text-[#9fd3ff] transition hover:border-[#4d7fa8] hover:bg-[#132031] hover:text-[#d7eeff] disabled:opacity-50`}
-                  onClick={() => void onCopyGuidedBaselinePrompt()}
-                  disabled={busy}
-                >
-                  Copy Baseline Prompt
-                </button>
-
-                <button
-                  type="button"
-                  className={`${MT.actionUtility} border-[#5a4b22] bg-transparent text-[#f1d48a] transition hover:border-[#8b7131] hover:bg-[#241d0f] hover:text-[#ffe6a8] disabled:opacity-50`}
-                  onClick={() => void onCopyGuidedCorrectionPrompt()}
-                  disabled={busy || !report || !guidedPrompt?.correctionPrompt}
-                >
-                  Copy Correction Prompt
-                </button>
-
-                <span
-                  className={`rounded-full border px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.12em] ${guidedPromptTone}`}
-                  title={
-                    guidedPrompt
-                      ? `guided prompt level: ${guidedPrompt.level}`
-                      : "guided prompt unavailable until a scored report exists"
-                  }
-                >
-                  guided {guidedPrompt?.level ?? "n/a"}
-                </span>
               <div className="min-w-0 flex-1" />
 
               <button

@@ -91,14 +91,24 @@ function makeReport(params: {
       tasks: [
         {
           taskId: "T3_NEGATIVE_CONTROL_SHUFFLE_V0_1",
-          status: controlHealthStatus === "controlFail" ? "fail" : controlHealthStatus === "controlWarn" ? "warn" : "clean",
+          status:
+            controlHealthStatus === "controlFail"
+              ? "fail"
+              : controlHealthStatus === "controlWarn"
+                ? "warn"
+                : "clean",
           p_spearman: t3PSpearman,
           p_pearson: 0.5,
           threshold: 0.1,
         },
         {
           taskId: "T4_NEGATIVE_CONTROL_SHUFFLE_ALT_V0_1",
-          status: controlHealthStatus === "controlFail" ? "fail" : controlHealthStatus === "controlWarn" ? "warn" : "clean",
+          status:
+            controlHealthStatus === "controlFail"
+              ? "fail"
+              : controlHealthStatus === "controlWarn"
+                ? "warn"
+                : "clean",
           p_spearman: t4PSpearman,
           p_pearson: 0.5,
           threshold: 0.1,
@@ -130,20 +140,47 @@ describe("evals guided prompt v0.1", () => {
     expect(out?.issues).toEqual(
       expect.arrayContaining([
         "V3 is too open relative to V2",
-        "V6 is too open relative to V5 and V7 in presence-mean",
+        "V6 is too open relative to V5 in presence-mean",
       ]),
     );
-    expect(out?.correctionPrompt).toContain("V3 is too open relative to V2");
+    expect(out?.correctionPrompt).toContain("prioritize endpoint repair first");
+    expect(out?.correctionPrompt).toContain("tighten V3 so it stays below V2 and above V4");
+    expect(out?.correctionPrompt).toContain("tighten V6 in presence-mean so the edge/tension region does not reopen after V5");
     expect(out?.correctionPrompt).toContain("T3 p_spearman: 0.656");
     expect(out?.correctionPrompt).toContain("T4 p_spearman: 0.597");
   });
 
+  it("builds a light correction prompt for a mid-strength run", () => {
+    const report = makeReport({
+      primaryMeans: [0.75, 0.71, 0.56, 0.58, 0.52, 0.42, 0.36],
+      presenceMeans: [0.695, 0.617, 0.602, 0.590, 0.515, 0.545, 0.360],
+      spearmanPrimary: -0.81,
+      spearmanPresence: -0.79,
+      controlHealthStatus: "controlClean",
+      t3PSpearman: 0.41,
+      t4PSpearman: 0.37,
+    });
+
+    const out = getGuidedPromptV0_1(report);
+    expect(out).toBeTruthy();
+    expect(out?.level).toBe("light");
+    expect(out?.issues).toEqual(
+      expect.arrayContaining([
+        "V4 is too open relative to V3 and V5",
+        "V6 is too open relative to V5 in presence-mean",
+      ]),
+    );
+    expect(out?.correctionPrompt).toContain("revise only the flagged buckets and preserve stable buckets where possible");
+    expect(out?.correctionPrompt).toContain("make targeted edits rather than a full rewrite");
+    expect(out?.correctionPrompt).toContain("tighten V4 toward the center; it should not open above V3 or V5");
+  });
+
   it("builds a minimal correction prompt for a near-converged run", () => {
     const report = makeReport({
-      primaryMeans: [0.75, 0.71, 0.54, 0.53, 0.62, 0.34, 0.36],
-      presenceMeans: [0.695, 0.617, 0.595, 0.542, 0.535, 0.487, 0.343],
-      spearmanPrimary: -0.857,
-      spearmanPresence: -1,
+      primaryMeans: [0.75, 0.71, 0.54, 0.53, 0.56, 0.34, 0.31],
+      presenceMeans: [0.695, 0.617, 0.595, 0.542, 0.535, 0.487, 0.320],
+      spearmanPrimary: -0.92,
+      spearmanPresence: -0.93,
       controlHealthStatus: "controlClean",
       t3PSpearman: 0.5560833333333334,
       t4PSpearman: 0.7095833333333333,
@@ -155,17 +192,17 @@ describe("evals guided prompt v0.1", () => {
     expect(out?.issues).toEqual(
       expect.arrayContaining([
         "V5 is too open relative to V4",
-        "V7 should remain the tightest / least open endpoint",
       ]),
     );
-    expect(out?.correctionPrompt).toContain("revise only as much as needed");
-    expect(out?.correctionPrompt).toContain("V5 is too open relative to V4");
+    expect(out?.correctionPrompt).toContain("revise only the minimum set of flagged buckets");
+    expect(out?.correctionPrompt).toContain("preserve already-stable buckets verbatim where possible");
+    expect(out?.correctionPrompt).toContain("tighten V5 slightly so motion does not reopen the ladder after V4");
   });
 
   it("skips correction for a converged clean run", () => {
     const report = makeReport({
       primaryMeans: [0.75, 0.71, 0.54, 0.53, 0.52, 0.34, 0.31],
-      presenceMeans: [0.695, 0.617, 0.595, 0.542, 0.515, 0.487, 0.32],
+      presenceMeans: [0.695, 0.617, 0.595, 0.542, 0.515, 0.487, 0.320],
       spearmanPrimary: -1,
       spearmanPresence: -1,
       controlHealthStatus: "controlClean",
