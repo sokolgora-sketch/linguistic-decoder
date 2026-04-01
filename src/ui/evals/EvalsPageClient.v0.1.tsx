@@ -2306,56 +2306,115 @@ export function EvalsPageClientV0_1() {
     <div className="min-h-screen bg-[#242424] text-white">
       <StickyNav />
 
-      <main className="mx-auto flex w-full max-w-[1200px] flex-col gap-8 px-10 pt-12 pb-24">
-        <header className="space-y-3">
-          <div className={`${MT.eyebrow} text-neutral-300`}>
-            instrument · evals
-          </div>
-          <h1 className={`${MT.heroTitle} text-[#f0f0f0]`}>ZË-RO Evals v0.1</h1>
-          <p className={`max-w-[680px] ${MT.heroBody} text-[#c2c2c2]`}>
-            Deterministic scorer. Bring model outputs; ZË-RO scores them. No
-            model calls.
-          </p>
-        </header>
-          <div className="rounded-[10px] border border-[#3b2f1a] bg-[#17130d] px-6 py-5">
-            <div className="space-y-2">
-              <div className={`${MT.sectionLabel} text-[#f3d38b]`}>
-                {EVALS_BETA_INTRO_TITLE}
+        <main className="mx-auto flex w-full max-w-[1680px] flex-col gap-8 px-6 pt-12 pb-24 xl:px-8">
+          <section className="rounded-[14px] border border-[#2f3742] bg-[#13171d] px-6 py-6 shadow-[0_16px_40px_rgba(0,0,0,0.24)]">
+            <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_360px] xl:items-start">
+              <div className="space-y-4">
+                <div className="space-y-3">
+                  <div className={`${MT.eyebrow} text-[#d7dde7]`}>
+                    instrument · evals
+                  </div>
+                  <h1 className={`${MT.heroTitle} text-[#f5f7fb]`}>
+                    ZË-RO Evals Workbench
+                  </h1>
+                  <p className={`max-w-[760px] ${MT.heroBody} text-[#bac3d2]`}>
+                    Deterministic scorer. Bring model outputs; ZË-RO scores them. No model calls. The workbench stays live-first, while reference and evidence stay nearby but out of the way.
+                  </p>
+                </div>
+
+                <div className="rounded-[12px] border border-[#4a3a1b] bg-[#17130d] px-4 py-4">
+                  <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#f3d38b]">
+                    {EVALS_BETA_INTRO_TITLE}
+                  </div>
+                  <div className="mt-1 text-[12px] leading-6 text-[#d7cfbb]">
+                    {EVALS_BETA_INTRO_BODY}
+                  </div>
+                </div>
+
+                <div className="grid gap-3 md:grid-cols-3">
+                  <div className="rounded-[12px] border border-[#303845] bg-[#171c23] px-4 py-4">
+                    <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#d7deea]">
+                      What to paste
+                    </div>
+                    <div className="mt-1 text-[12px] leading-6 text-[#aeb7c5]">
+                      {EVALS_BETA_INTRO_HELP_1}
+                    </div>
+                  </div>
+
+                  <div className="rounded-[12px] border border-[#303845] bg-[#171c23] px-4 py-4">
+                    <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#d7deea]">
+                      Privacy
+                    </div>
+                    <div className="mt-1 text-[12px] leading-6 text-[#aeb7c5]">
+                      {EVALS_BETA_INTRO_HELP_2}
+                    </div>
+                  </div>
+
+                  <div className="rounded-[12px] border border-[#303845] bg-[#171c23] px-4 py-4">
+                    <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#d7deea]">
+                      How it works
+                    </div>
+                    <div className="mt-1 text-[12px] leading-6 text-[#aeb7c5]">
+                      {EVALS_BETA_INTRO_HELP_3}
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div className={`${MT.helper} text-[#d7cfbb]`}>
-                {EVALS_BETA_INTRO_BODY}
-              </div>
+
+              <aside className="rounded-[12px] border border-[#2f3742] bg-[#10141a] px-5 py-5 shadow-[0_12px_30px_rgba(0,0,0,0.2)]">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div>
+                    <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#aeb7c5]">
+                      Live state
+                    </div>
+                    <div className="mt-1 text-[14px] font-semibold text-white">
+                      {stateLabel}
+                    </div>
+                  </div>
+                  <div className="inline-flex items-center gap-2 rounded-full border border-[#2e3a4a] bg-[#141b24] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#d9e6ff]">
+                    <span className={`h-2.5 w-2.5 rounded-full ${stateDotClass}`} />
+                    {busy ? "working" : report ? "scored" : readyToScore ? "ready" : "idle"}
+                  </div>
+                </div>
+
+                <div className="mt-4 grid grid-cols-2 gap-3">
+                  <div className="rounded-[12px] border border-[#2d3440] bg-[#171c23] px-4 py-4">
+                    <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#9fa9b8]">Pearson r</div>
+                    <div className="mt-2 font-mono text-[22px] text-[#dff7e9]">
+                      {typeof summaryPearson === "number" ? fmt(summaryPearson) : "—"}
+                    </div>
+                    <div className="mt-1 text-[11px] text-[#8893a3]">aperture primary</div>
+                  </div>
+
+                  <div className="rounded-[12px] border border-[#2d3440] bg-[#171c23] px-4 py-4">
+                    <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#9fa9b8]">Spearman ρ</div>
+                    <div className="mt-2 font-mono text-[22px] text-[#dff7e9]">
+                      {typeof summarySpearman === "number" ? fmt(summarySpearman) : "—"}
+                    </div>
+                    <div className="mt-1 text-[11px] text-[#8893a3]">aperture primary</div>
+                  </div>
+
+                  <div className="rounded-[12px] border border-[#2d3440] bg-[#171c23] px-4 py-4">
+                    <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#9fa9b8]">p_perm</div>
+                    <div className="mt-2 font-mono text-[22px] text-[#f4ddb0]">
+                      {typeof summaryPPerm === "number" ? fmtP(summaryPPerm) : "—"}
+                    </div>
+                    <div className="mt-1 text-[11px] text-[#8893a3]">permutation</div>
+                  </div>
+
+                  <div className="rounded-[12px] border border-[#2d3440] bg-[#171c23] px-4 py-4">
+                    <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#9fa9b8]">Compliance</div>
+                    <div className="mt-2 text-[22px] font-semibold text-[#d7e6ff]">
+                      {report ? complianceText : "—"}
+                    </div>
+                    <div className="mt-1 text-[11px] text-[#8893a3]">
+                      {report ? "ready to export" : "not scored"}
+                    </div>
+                  </div>
+                </div>
+              </aside>
             </div>
-
-            <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-3">
-              <div className="rounded-[8px] border border-[#4a3a1b] bg-[#1d1810] px-4 py-3">
-                <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#f3d38b]">
-                  What to paste
-                </div>
-                <div className="mt-1 text-[12px] leading-6 text-[#d7cfbb]">
-                  {EVALS_BETA_INTRO_HELP_1}
-                </div>
-              </div>
-
-              <div className="rounded-[8px] border border-[#4a3a1b] bg-[#1d1810] px-4 py-3">
-                <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#f3d38b]">
-                  Privacy
-                </div>
-                <div className="mt-1 text-[12px] leading-6 text-[#d7cfbb]">
-                  {EVALS_BETA_INTRO_HELP_2}
-                </div>
-              </div>
-
-              <div className="rounded-[8px] border border-[#4a3a1b] bg-[#1d1810] px-4 py-3">
-                <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#f3d38b]">
-                  How it works
-                </div>
-                <div className="mt-1 text-[12px] leading-6 text-[#d7cfbb]">
-                  {EVALS_BETA_INTRO_HELP_3}
-                </div>
-              </div>
-            </div>
-          </div>
+          </section>
 
 
         <div className="mt-4 flex flex-wrap items-center gap-3">
@@ -2378,27 +2437,12 @@ export function EvalsPageClientV0_1() {
 
         </div>
 
-          <section className="mt-8 rounded-[12px] border border-[#333] bg-[#141414] px-5 py-5">
-            <div className="flex flex-wrap items-start justify-between gap-4">
-              <div className="min-w-0 space-y-2">
-                <div className="text-[12px] font-semibold uppercase tracking-[0.12em] text-[#dcdcdc]">
-                  Paper snapshots
-                </div>
-                <div className="text-[16px] font-semibold text-white">
-                  Paper v0.1 snapshot · reference only
-                </div>
-                <div className="text-[12px] leading-6 text-[#9a9a9a]">
-                  Fresh-chat and same-thread battery results from LingBuzz/009799 and 009808 now live on a separate reference page so the main evals workbench stays focused on live scoring.
-                </div>
-                <div className="flex flex-wrap items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.1em] text-[#9a9a9a]">
-                  <span className="text-[#d6d6d6]">2 reference batteries</span>
-                  <span className="h-1 w-1 rounded-full bg-[#4a4a4a]" />
-                  <span>paper v0.1</span>
-                  <span className="h-1 w-1 rounded-full bg-[#4a4a4a]" />
-                  <span>not live data</span>
-                </div>
+          <section className="mt-6 rounded-[10px] border border-dashed border-[#3c4552] bg-[#12161c] px-5 py-4">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="min-w-0 text-[12px] leading-6 text-[#aeb7c5]">
+                Paper snapshots were moved off this page. Reference-only comparison now lives on{" "}
+                <span className="font-mono text-[#e5edf8]">/evals/reference</span>.
               </div>
-
               <Link
                 href="/evals/reference"
                 className="inline-flex shrink-0 items-center rounded-[10px] border border-[#5a2424] bg-[#1f1010] px-4 py-2 text-[12px] font-semibold uppercase tracking-[0.08em] text-[#fca5a5] transition hover:border-[#7a3434] hover:bg-[#281414] hover:text-[#ffd0d0]"
