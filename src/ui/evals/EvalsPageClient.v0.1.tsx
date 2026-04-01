@@ -37,6 +37,7 @@ import {
   EVALS_GUIDED_BASELINE_PROMPT_V0_1,
   getGuidedPromptV0_1,
 } from "@/ui/evals/evalsGuidedPrompt.v0.1";
+import { buildSavedRunSeriesGroupsV0_1 } from "@/ui/evals/evalsSavedRunGroups.v0.1";
 
 
 type ApiOk = { ok: true; report: EvalReportBundleV0_1; md: string };
@@ -882,6 +883,7 @@ export function EvalsPageClientV0_1() {
   );
   const [savedRuns, setSavedRuns] = useState<EvalsSavedRunRecordV0_1[]>([]);
   const [selectedSavedRunId, setSelectedSavedRunId] = useState<string>("");
+  const [openSavedRunGroupIds, setOpenSavedRunGroupIds] = useState<string[]>([]);
   const [runSeries, setRunSeries] = useState<EvalsRunSeriesV0_1[]>([]);
   const [selectedSeriesId, setSelectedSeriesId] = useState<string>("");
   const [seriesLabelDraft, setSeriesLabelDraft] = useState<string>("fresh-chat");
@@ -908,6 +910,32 @@ export function EvalsPageClientV0_1() {
     );
   }, [savedRuns]);
 
+
+  const savedRunSeriesGroups = useMemo(
+    () => buildSavedRunSeriesGroupsV0_1(savedRuns, runSeries),
+    [savedRuns, runSeries],
+  );
+
+  useEffect(() => {
+    if (!savedRunSeriesGroups.length) {
+      setOpenSavedRunGroupIds([]);
+      return;
+    }
+
+    const shouldOpen = new Set<string>();
+    shouldOpen.add(savedRunSeriesGroups[0].id);
+
+    const selectedGroup = savedRunSeriesGroups.find((group) =>
+      group.rows.some((row) => row.id === selectedSavedRunId),
+    );
+    if (selectedGroup) shouldOpen.add(selectedGroup.id);
+
+    setOpenSavedRunGroupIds((prev) => {
+      const next = new Set(prev.filter((id) => savedRunSeriesGroups.some((group) => group.id === id)));
+      for (const id of shouldOpen) next.add(id);
+      return Array.from(next);
+    });
+  }, [savedRunSeriesGroups, selectedSavedRunId]);
 
   const activeRunSeries = useMemo(
     () => runSeries.find((row) => row.id === selectedSeriesId) ?? null,
@@ -3685,28 +3713,92 @@ export function EvalsPageClientV0_1() {
                   </div>
 
                   <div className="mt-4 grid gap-4">
-                    <div className="space-y-1">
-                      <label className={`${MT.fieldLabel} text-[#ededed]`}>
-                        Open Saved Run
-                      </label>
-                      <select
-                        className={`mt-1 w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[11px] ${MT.fieldControl} text-[#e6e6e6] outline-none transition focus:border-[#666]`}
-                        value={selectedSavedRunId}
-                        onChange={(e) => setSelectedSavedRunId(e.target.value)}
-                        disabled={busy || savedRuns.length === 0}
-                      >
-                        {savedRuns.length === 0 ? (
-                          <option value="">No saved runs yet</option>
+                      <div className="space-y-2">
+                        <label className={`${MT.fieldLabel} text-[#ededed]`}>
+                          Open Saved Run
+                        </label>
+
+                        {savedRunSeriesGroups.length === 0 ? (
+                          <div className="rounded-[8px] border border-dashed border-[#3a3a3a] bg-[#151515] px-3 py-3 text-sm text-[#9fb1bf]">
+                            No saved runs yet
+                          </div>
                         ) : (
-                          savedRuns.map((row) => (
-                            <option key={row.id} value={row.id}>
-                              {row.title} · {row.id.slice(0, 8)}
-                            </option>
-                          ))
+                          <div className="space-y-3">
+                            {savedRunSeriesGroups.map((group) => (
+                              <details
+                                key={group.id}
+                                className="overflow-hidden rounded-[8px] border border-[#2f3b46] bg-[#151a1f]"
+                                open={openSavedRunGroupIds.includes(group.id)}
+                                onToggle={(e) => {
+                                  const isOpen = (e.currentTarget as HTMLDetailsElement).open;
+                                  setOpenSavedRunGroupIds((prev) => {
+                                    const next = new Set(prev);
+                                    if (isOpen) next.add(group.id);
+                                    else next.delete(group.id);
+                                    return Array.from(next);
+                                  });
+                                }}
+                              >
+                                <summary className="cursor-pointer list-none px-3 py-3 transition hover:bg-[#192028] [&::-webkit-details-marker]:hidden">
+                                  <div className="flex flex-wrap items-center justify-between gap-3">
+                                    <div className="min-w-0">
+                                      <div className="truncate text-sm font-semibold text-[#ededed]">
+                                        {group.label}
+                                      </div>
+                                      <div className="mt-1 text-xs text-[#9fb1bf]">
+                                        {group.runCount} run{group.runCount === 1 ? "" : "s"} · created{" "}
+                                        {new Date(group.createdAt).toLocaleString()} · updated{" "}
+                                        {new Date(group.updatedAt).toLocaleString()}
+                                      </div>
+                                    </div>
+                                    <div className="rounded-full border border-[#355a7a] bg-[#111a24] px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#9fd3ff]">
+                                      {group.seriesId ? "series" : "unassigned"}
+                                    </div>
+                                  </div>
+                                </summary>
+
+                                <div className="border-t border-[#26313a] px-3 py-3">
+                                  <div className="space-y-2">
+                                    {group.rows.map((row) => {
+                                      const selected = row.id === selectedSavedRunId;
+                                      return (
+                                        <button
+                                          key={row.id}
+                                          type="button"
+                                          onClick={() => setSelectedSavedRunId(row.id)}
+                                          className={`w-full rounded-[8px] border px-3 py-3 text-left transition ${
+                                            selected
+                                              ? "border-[#5c8db8] bg-[#132031] text-white"
+                                              : "border-[#313131] bg-[#171717] text-[#d6d6d6] hover:border-[#555] hover:bg-[#1d1d1d] hover:text-white"
+                                          }`}
+                                        >
+                                          <div className="flex flex-wrap items-center justify-between gap-3">
+                                            <div className="min-w-0">
+                                              <div className="truncate text-sm font-medium">
+                                                {row.title}
+                                              </div>
+                                              <div className="mt-1 text-xs text-[#9fb1bf]">
+                                                {typeof row.ordinal === "number" ? formatSeriesOrdinal(row.ordinal) : "no ordinal"} · {row.id.slice(0, 8)}
+                                              </div>
+                                            </div>
+                                            <div className="text-right text-xs text-[#9fb1bf]">
+                                              <div>saved {new Date(row.createdAt).toLocaleString()}</div>
+                                              <div>updated {new Date(row.updatedAt).toLocaleString()}</div>
+                                            </div>
+                                          </div>
+                                        </button>
+                                      );
+                                    })}
+                                  </div>
+                                </div>
+                              </details>
+                            ))}
+                          </div>
                         )}
-                      </select>
-                      <div className={`${MT.helperCompact} text-[#9fb1bf]`}>
-                        Saved runs are frozen workbench checkpoints you can reopen after reset or reload.
+
+                        <div className={`${MT.helperCompact} text-[#9fb1bf]`}>
+                          Saved runs are frozen workbench checkpoints grouped by series so you can reopen them after reset or reload.
+                        </div>
                       </div>
                     </div>
 
@@ -3733,7 +3825,6 @@ export function EvalsPageClientV0_1() {
                 </div>
               </div>
 
-            </div>
 
 
           <div className="space-y-2">
