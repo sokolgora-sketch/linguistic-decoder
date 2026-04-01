@@ -885,6 +885,7 @@ export function EvalsPageClientV0_1() {
   const [runSeries, setRunSeries] = useState<EvalsRunSeriesV0_1[]>([]);
   const [selectedSeriesId, setSelectedSeriesId] = useState<string>("");
   const [seriesLabelDraft, setSeriesLabelDraft] = useState<string>("fresh-chat");
+  const [saveNextGuidedReminderArmed, setSaveNextGuidedReminderArmed] = useState<boolean>(false);
   const [seriesTargetCountDraft, setSeriesTargetCountDraft] = useState<string>("15");
 
   useEffect(() => {
@@ -1311,6 +1312,11 @@ export function EvalsPageClientV0_1() {
           : null;
 
   const guidedPrompt = useMemo(() => getGuidedPromptV0_1(report ?? null), [report]);
+  const shouldRemindGuidedCorrection =
+    Boolean(report) &&
+    Boolean(guidedPrompt?.correctionPrompt) &&
+    guidedPrompt?.level !== "skip";
+
 
   const guidedPromptTone =
     guidedPrompt?.level === "skip"
@@ -1710,6 +1716,14 @@ export function EvalsPageClientV0_1() {
       return;
     }
 
+    if (shouldRemindGuidedCorrection && !saveNextGuidedReminderArmed) {
+      setSaveNextGuidedReminderArmed(true);
+      showWarnNotice(
+        "Save + Next Run: Copy Correction Prompt before advancing if you want to run the guided correction step. Click Save + Next Run again to continue anyway.",
+      );
+      return;
+    }
+
     const duplicate = findSeriesDuplicate(series);
     if (duplicate?.kind === "ordinal") {
       showWarnNotice(
@@ -1744,6 +1758,7 @@ export function EvalsPageClientV0_1() {
     setApiErr(null);
     setReport(null);
     setMd("");
+      setSaveNextGuidedReminderArmed(false);
     prefillNextSeriesRun(nextSeries);
     setNotice(
       `Saved ${series.label} ${formatSeriesOrdinal(series.nextOrdinal)}. Ready for ${formatSeriesOrdinal(nextSeries.nextOrdinal)}.`,
@@ -2221,6 +2236,7 @@ export function EvalsPageClientV0_1() {
       `Copy Correction Prompt: copied (${guidedPrompt.level}).`,
       guidedPrompt.correctionPrompt,
     );
+    setSaveNextGuidedReminderArmed(false);
   };
 
   const dfCsvCell = (value: unknown) => {
