@@ -917,25 +917,10 @@ export function EvalsPageClientV0_1() {
   );
 
   useEffect(() => {
-    if (!savedRunSeriesGroups.length) {
-      setOpenSavedRunGroupIds([]);
-      return;
-    }
-
-    const shouldOpen = new Set<string>();
-    shouldOpen.add(savedRunSeriesGroups[0].id);
-
-    const selectedGroup = savedRunSeriesGroups.find((group) =>
-      group.rows.some((row) => row.id === selectedSavedRunId),
+    setOpenSavedRunGroupIds((prev) =>
+      prev.filter((id) => savedRunSeriesGroups.some((group) => group.id === id)),
     );
-    if (selectedGroup) shouldOpen.add(selectedGroup.id);
-
-    setOpenSavedRunGroupIds((prev) => {
-      const next = new Set(prev.filter((id) => savedRunSeriesGroups.some((group) => group.id === id)));
-      for (const id of shouldOpen) next.add(id);
-      return Array.from(next);
-    });
-  }, [savedRunSeriesGroups, selectedSavedRunId]);
+  }, [savedRunSeriesGroups]);
 
   const activeRunSeries = useMemo(
     () => runSeries.find((row) => row.id === selectedSeriesId) ?? null,
