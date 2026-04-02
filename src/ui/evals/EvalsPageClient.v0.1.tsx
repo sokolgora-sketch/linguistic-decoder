@@ -2306,6 +2306,49 @@ export function EvalsPageClientV0_1() {
     <div className="min-h-screen bg-[#242424] text-white">
       <StickyNav />
 
+      <div className="sticky top-[48px] z-40 border-b border-[#1a1e28] bg-[#0d1017]">
+        <div className="mx-auto flex w-full max-w-[1680px] items-stretch divide-x divide-[#1a1e28] px-6 xl:px-8">
+          <div className="flex flex-1 items-baseline justify-between px-4 py-2.5">
+            <span className="text-[9px] font-semibold uppercase tracking-[0.15em] text-[#a4b0cc]">
+              Pearson r
+            </span>
+            <span className="font-mono text-[14px] text-[#44cf8b]">
+              {typeof summaryPearson === "number" ? fmt(summaryPearson) : "—"}
+            </span>
+          </div>
+          <div className="flex flex-1 items-baseline justify-between px-4 py-2.5">
+            <span className="text-[9px] font-semibold uppercase tracking-[0.15em] text-[#a4b0cc]">
+              Spearman ρ
+            </span>
+            <span className="font-mono text-[14px] text-[#44cf8b]">
+              {typeof summarySpearman === "number" ? fmt(summarySpearman) : "—"}
+            </span>
+          </div>
+          <div className="flex flex-1 items-baseline justify-between px-4 py-2.5">
+            <span className="text-[9px] font-semibold uppercase tracking-[0.15em] text-[#a4b0cc]">
+              P_perm
+            </span>
+            <span className="font-mono text-[14px] text-[#f4ddb0]">
+              {typeof summaryPPerm === "number" ? fmtP(summaryPPerm) : "—"}
+            </span>
+          </div>
+          <div className="flex flex-1 items-baseline justify-between px-4 py-2.5">
+            <span className="text-[9px] font-semibold uppercase tracking-[0.15em] text-[#a4b0cc]">
+              Compliance
+            </span>
+            <span className="font-mono text-[14px] text-[#d7e6ff]">
+              {report ? complianceText : "—"}
+            </span>
+          </div>
+          <div className="flex items-center gap-2 px-4 py-2.5">
+            <span className={`h-2 w-2 rounded-full ${stateDotClass}`} />
+            <span className="text-[9px] font-semibold uppercase tracking-[0.15em] text-[#bccdd8]">
+              {busy ? "working" : report ? "scored" : readyToScore ? "ready" : "idle"}
+            </span>
+          </div>
+        </div>
+      </div>
+
         <main className="mx-auto flex w-full max-w-[1680px] flex-col gap-8 px-6 pt-12 pb-24 xl:px-8">
           <section className="rounded-[14px] border border-[#2f3742] bg-[#13171d] px-6 py-6 shadow-[0_16px_40px_rgba(0,0,0,0.24)]">
             <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_360px] xl:items-start">
@@ -2691,6 +2734,375 @@ export function EvalsPageClientV0_1() {
               </aside>
 
               <div className="min-w-0 space-y-8">
+          <div className="space-y-2">
+            <div className={`${MT.sectionLabel} text-[#ededed]`}>
+              Input source
+            </div>
+            <div className={`${MT.helper} text-[#a9a9a9]`}>
+              Load a saved bundle or paste fresh JSON before scoring.
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 gap-5 xl:grid-cols-[420px_minmax(0,1fr)] xl:items-stretch">
+            <div className="rounded-[12px] border border-[#3a3a3a] bg-[#171717] px-6 py-6 h-full flex flex-col">
+              <div className="flex flex-wrap items-center gap-3">
+                <span className={`${MT.fieldLabelInline} text-[#ededed]`}>
+                  Upload JSON
+                </span>
+                <span className={`${MT.helper} text-[#a9a9a9]`}>
+                  Use a saved eval bundle or buckets-only JSON.
+                </span>
+              </div>
+
+              <div className="mt-5 flex flex-wrap items-center gap-4">
+                <label
+                  className={`inline-flex cursor-pointer items-center rounded-[6px] border border-[#3a3a3a] bg-[#1e1e1e] px-4 py-3 ${MT.actionMd} text-[#dfdfdf] transition hover:border-[#666] hover:bg-[#252525] hover:text-white`}
+                >
+                  <input
+                    type="file"
+                    accept=".json,application/json"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0] ?? null;
+                      setPickedFileName(file?.name ?? "");
+                      void onPickFile(file);
+                    }}
+                    className="sr-only"
+                  />
+                  Choose JSON file
+                </label>
+                <span
+                  className={`text-[12px] leading-6 ${pickedFileName ? "text-[#bdbdbd]" : "text-[#7d7d7d]"}`}
+                >
+                  {pickedFileName || "No JSON file selected"}
+                </span>
+              </div>
+
+              <div className={`${MT.helper} mt-auto pt-6 text-[#c8c8c8]`}>
+                Accepts full{" "}
+                <span className="font-mono text-[#f2f2f2]">evalRun.v0.1</span>{" "}
+                bundles or buckets-only JSON.
+              </div>
+            </div>
+            <div className="rounded-[12px] border border-[#3a3a3a] bg-[#131313] px-6 py-6 h-full">
+              <div className="space-y-1">
+                <label className="block text-[14px] font-semibold uppercase tracking-[0.12em] text-[#ededed]">
+                  Paste JSON
+                </label>
+                <div className={`${MT.helper} text-[#a9a9a9]`}>
+                  Paste a full{" "}
+                  <span className="font-mono text-[#d8d8d8]">evalRun.v0.1</span>{" "}
+                  bundle or buckets-only{" "}
+                  <span className="font-mono text-[#d8d8d8]">V1..V7</span> JSON.
+                </div>
+              </div>
+
+              <textarea
+                className="mt-3 min-h-[260px] w-full rounded-[8px] border border-[#3a3a3a] bg-[#101010] p-4 font-mono text-[15px] leading-[1.9] text-[#ededed] outline-none transition focus:border-[#555]"
+                style={{
+                  borderColor:
+                    inputText.trim().length === 0
+                      ? "#3a3a3a"
+                      : inputProbe.kind === "invalid_json"
+                        ? "#d93333"
+                        : inputProbe.kind
+                          ? "#16a34a"
+                          : "#3a3a3a",
+                  boxShadow:
+                    inputText.trim().length === 0
+                      ? "none"
+                      : inputProbe.kind === "invalid_json"
+                        ? "0 0 0 1px #d9333344"
+                        : inputProbe.kind
+                          ? "0 0 0 1px #16a34a44"
+                          : "none",
+                }}
+                value={inputText}
+                onChange={(e) => setInputText(e.target.value)}
+                placeholder={
+                  mode === "run_bundle"
+                    ? '{ "evalRunVersion": "evalRun.v0.1", ... }'
+                    : '{ "V1": ["token1", ...], "V2": [...], ... }'
+                }
+              />
+
+              {inputText.trim() && inputProbe.kind !== "invalid_json" ? (
+                <div
+                  className={`mt-3 inline-flex items-center gap-2 rounded-full border border-[#21452a] bg-[#112017] px-3 py-2 ${MT.chipText} text-[#4ade80]`}
+                >
+                  <span className="h-[6px] w-[6px] rounded-full bg-[#16a34a]" />
+                  JSON detected — ready to score
+                </div>
+              ) : null}
+            </div>
+          </div>
+          <div className="flex flex-col gap-3 pt-4">
+            <div className="flex flex-wrap items-center gap-3">
+              <button
+                type="button"
+                className={`${MT.actionPrimary} border-[#16a34a] bg-[#16a34a] text-white transition hover:border-[#15803d] hover:bg-[#15803d] hover:shadow-[0_0_0_1px_rgba(22,163,74,0.4),0_4px_16px_rgba(22,163,74,0.33)] disabled:cursor-not-allowed disabled:border-[#333] disabled:bg-[#111] disabled:text-[#333] disabled:shadow-none`}
+                onClick={() => void onScore()}
+                disabled={busy || !inputText.trim()}
+              >
+                {busy ? "Scoring…" : report ? "Scored ✓" : "Score run"}
+              </button>
+
+              <button
+                type="button"
+                className={`${MT.actionSecondary} border-[#555] bg-[#1a1a1a] text-[#e2e2e2] transition hover:border-[#777] hover:bg-[#202020] hover:text-white disabled:opacity-50`}
+                onClick={() => resetWorkbench()}
+                disabled={busy}
+              >
+                Reset Workbench
+              </button>
+
+                <button
+                  type="button"
+                  className={`${MT.actionSecondary} border-[#2d4f8f] bg-[#15233d] text-[#c7d9ff] transition hover:border-[#4b73bd] hover:bg-[#1a2b48] hover:text-white disabled:opacity-50`}
+                  onClick={() => saveCurrentRun()}
+                  disabled={busy || (!inputText.trim() && !report && !md)}
+                >
+                  Save Run
+                </button>
+
+              <button
+                type="button"
+                className={`${MT.actionWarn} border-[#6b3737] bg-[#211717] text-[#e6a0a0] transition hover:border-[#cc0000] hover:bg-[#2a1616] hover:text-[#ffc1c1] disabled:opacity-50`}
+                onClick={() => void onDownloadPdf()}
+                disabled={busy || !inputText.trim()}
+              >
+                Download PDF
+              </button>
+
+              <button
+                type="button"
+                className={`${MT.actionUtility} border-[#444] bg-transparent text-[#b8b8b8] transition hover:border-[#777] hover:bg-[#1f1f1f] hover:text-[#f2f2f2] disabled:opacity-50`}
+                onClick={() => void onDownloadBundle()}
+                disabled={busy || !inputText.trim()}
+              >
+                Download Bundle
+              </button>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-3">
+              <button
+                type="button"
+                className={`${MT.actionUtility} border-[#444] bg-transparent text-[#b8b8b8] transition hover:border-[#777] hover:bg-[#1f1f1f] hover:text-[#f2f2f2] disabled:opacity-50`}
+                onClick={() => void onCopyRawJson()}
+                disabled={busy || !inputText.trim()}
+              >
+                Copy Raw JSON
+              </button>
+
+              <button
+                type="button"
+                className={`${MT.actionUtility} border-[#444] bg-transparent text-[#b8b8b8] transition hover:border-[#777] hover:bg-[#1f1f1f] hover:text-[#f2f2f2] disabled:opacity-50`}
+                onClick={() => void onCopyCsvRow()}
+                disabled={busy || !report}
+              >
+                Copy CSV Row
+              </button>
+
+
+              <div className="min-w-0 flex-1" />
+
+              <button
+                type="button"
+                className={`${MT.actionUtility} border-dashed border-[#4a4a4a] bg-transparent text-[#c8c8c8] transition hover:border-[#777] hover:bg-[#1f1f1f] hover:text-white`}
+                onClick={loadExample}
+                disabled={busy}
+              >
+                Load example
+              </button>
+            </div>
+          </div>
+          <div className="space-y-3 pt-4">
+            {mode === "run_bundle" && inputProbe.kind === "bucket_only" ? (
+              <div className="rounded-[10px] border border-[#5b4a20] bg-[#1d1a12] px-5 py-4">
+                <div className="flex flex-wrap items-start gap-3">
+                  <div className="min-w-0 flex-1">
+                    <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#f3d38b]">
+                      Input mismatch
+                    </div>
+                    <div className="mt-1 text-[12px] leading-6 text-[#d7cfbb]">
+                      You are in{" "}
+                      <span className="font-mono text-[#fff1c2]">
+                        run_bundle
+                      </span>{" "}
+                      mode, but the input looks like bucketed tokens. Scoring
+                      and PDF export will auto-wrap into{" "}
+                      <span className="font-mono text-[#fff1c2]">
+                        evalRun.v0.1
+                      </span>
+                      .
+                    </div>
+                  </div>
+
+                  <button
+                    className="rounded-[6px] border border-[#6a5a2a] bg-[#242016] px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.06em] text-[#f3d38b] transition hover:border-[#8a7636] hover:bg-[#2a2418] hover:text-[#fff1c2]"
+                    type="button"
+                    onClick={() => setMode("task_buckets")}
+                  >
+                    Switch mode
+                  </button>
+                </div>
+              </div>
+            ) : null}
+
+            {(inputProbe.kind === "corpus70_meta" || notice || apiErr) ? (
+              <div className="pointer-events-none fixed bottom-4 right-4 z-[120] flex w-[min(420px,calc(100vw-2rem))] flex-col gap-3">
+                {inputProbe.kind === "corpus70_meta" ? (
+                  <div className="pointer-events-auto rounded-[10px] border border-[#5b3b3b] bg-[#1d1515] px-5 py-4 shadow-[0_10px_30px_rgba(0,0,0,0.35)]">
+                    <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#f1b4b4]">
+                      Unsupported input
+                    </div>
+                    <div className="mt-1 text-[12px] leading-6 text-[#d8c0c0]">
+                      This looks like a Corpus70 meta-tags JSON. Evals expects either a full
+                      <span className="font-mono text-[#ffe0e0]"> evalRun.v0.1 </span>
+                      bundle or buckets keys V1..V7.
+                    </div>
+                  </div>
+                ) : null}
+
+                {apiErr ? (
+                  <div className="pointer-events-auto rounded-[10px] border border-[#6a3d3d] bg-[#211717] px-5 py-4 shadow-[0_10px_30px_rgba(0,0,0,0.35)]">
+                    <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#f2b0b0]">
+                      Error <span className="font-mono text-[#ffe4e4]">{apiErr.code}</span>
+                    </div>
+                    <div className="mt-1 text-[12px] leading-6 text-[#e0c7c7]">{apiErr.message}</div>
+                  </div>
+                ) : null}
+
+                {notice ? (
+                  <div
+                    className={
+                      noticeIsWarn
+                        ? "pointer-events-auto rounded-[10px] border border-[#6a3d3d] bg-[#211717] px-5 py-4 shadow-[0_10px_30px_rgba(0,0,0,0.35)]"
+                        : "pointer-events-auto rounded-[10px] border border-[#3e4a5b] bg-[#171b22] px-5 py-4 shadow-[0_10px_30px_rgba(0,0,0,0.35)]"
+                    }
+                  >
+                    <div
+                      className={
+                        noticeIsWarn
+                          ? "text-[11px] font-semibold uppercase tracking-[0.12em] text-[#f2b0b0]"
+                          : "text-[11px] font-semibold uppercase tracking-[0.12em] text-[#b8c7e8]"
+                      }
+                    >
+                      {noticeIsWarn ? "Warning" : "Note"}
+                    </div>
+                    <div
+                      className={
+                        noticeIsWarn
+                          ? "mt-1 text-[12px] leading-6 text-[#e0c7c7]"
+                          : "mt-1 text-[12px] leading-6 text-[#d2d9e6]"
+                      }
+                    >
+                      {notice}
+                    </div>
+                  </div>
+                ) : null}
+              </div>
+            ) : null}
+          </div>
+              </div>
+            </div>
+        </section>
+        {busy || apiErr || report || readyToScore ? (
+          <section className="space-y-8">
+            <div
+              className={`rounded-[12px] border px-6 py-5 shadow-[0_10px_30px_rgba(0,0,0,0.18)] ${stateToneClass}`}
+            >
+              <div className="flex flex-wrap items-center gap-5">
+                <div
+                  className={`${MT.actionMd} inline-flex items-center gap-2 text-white`}
+                >
+                  <span
+                    className={`h-2.5 w-2.5 rounded-full ${stateDotClass}`}
+                  />
+                  {stateLabel}
+                </div>
+
+                {report ? (
+                  <>
+                    <div className="flex flex-wrap items-center gap-2 text-[12px]">
+                      <span className="rounded-full border border-[#4a4a4a] bg-[#0f0f0f] px-3 py-1.5 text-[#ededed]">
+                        provider{" "}
+                        <span
+                          className={`font-mono ${report.meta?.provider?.trim() ? "text-white" : "text-[#8f8f8f]"}`}
+                        >
+                          {report.meta?.provider?.trim()
+                            ? report.meta.provider
+                            : "not set"}
+                        </span>
+                      </span>
+                      <span className="rounded-full border border-[#4a4a4a] bg-[#0f0f0f] px-3 py-1.5 text-[#ededed]">
+                        model{" "}
+                        <span
+                          className={`font-mono ${report.meta?.model?.trim() ? "text-white" : "text-[#8f8f8f]"}`}
+                        >
+                          {report.meta?.model?.trim()
+                            ? report.meta.model
+                            : "not set"}
+                        </span>
+                      </span>
+                      <span className="rounded-full border border-[#4a4a4a] bg-[#0f0f0f] px-3 py-1.5 text-[#ededed]">
+                        label{" "}
+                        <span
+                          className={`font-mono ${report.meta?.label?.trim() ? "text-white" : "text-[#8f8f8f]"}`}
+                        >
+                          {report.meta?.label?.trim()
+                            ? report.meta.label
+                            : "not set"}
+                        </span>
+                      </span>
+                    </div>
+                    <div className="rounded-full border border-[#4a4a4a] bg-[#0f0f0f] px-3 py-2 font-mono text-[12px] text-[#f2f2f2]">
+                        runId <span className="text-white">{report.runId}</span>
+                      </div>
+                    </>
+                  ) : null}
+                </div>
+
+                {report ? (
+                  <div className="mt-3 flex flex-wrap items-center gap-2 text-[11px]">
+                    <span className="text-[11px] uppercase tracking-[0.12em] text-[#9f9f9f]">
+                      Run context
+                    </span>
+                    <span className="rounded-full border border-[#3f3f3f] bg-[#0f0f0f] px-3 py-1.5 text-[#d7d7d7]">
+                      upstreamEngine{" "}
+                        <span
+                          className={`font-mono ${report.meta?.sourceEngineVersion?.trim() ? "text-white" : "text-[#8f8f8f]"}`}
+                        >
+                          {report.meta?.sourceEngineVersion?.trim()
+                            ? report.meta.sourceEngineVersion
+                            : "not provided"}
+                        </span>
+                    </span>
+                    <span className="rounded-full border border-[#3f3f3f] bg-[#0f0f0f] px-3 py-1.5 text-[#d7d7d7]">
+                      taskId{" "}
+                      <span className="font-mono text-white">
+                        {devicePlateTaskId ?? "—"}
+                      </span>
+                    </span>
+                    <span className="rounded-full border border-[#3f3f3f] bg-[#0f0f0f] px-3 py-1.5 text-[#d7d7d7]">
+                      scorerBuild{" "}
+                      <span className="font-mono text-white">
+                        {devicePlateScorerBuild}
+                      </span>
+                    </span>
+                    <span className="rounded-full border border-[#3f3f3f] bg-[#0f0f0f] px-3 py-1.5 text-[#d7d7d7]">
+                      exportedAtUtc{" "}
+                      <span className="font-mono text-white">
+                        {devicePlateExportedAtUtc || "—"}
+                      </span>
+                    </span>
+                  </div>
+                ) : null}
+              </div>
+
+            <details className="rounded-[10px] border border-[#2a3540] bg-[#0e1318]">
+              <summary className="cursor-pointer px-5 py-4 text-[12px] font-semibold uppercase tracking-[0.12em] text-[#9fb1bf] transition hover:bg-[#111820] hover:text-[#d0dce8] [&::-webkit-details-marker]:hidden">
+                Series dashboard · run management
+              </summary>
             <div className="space-y-3 pt-4">
                   <div className="grid gap-4 xl:grid-cols-[minmax(0,2fr)_minmax(300px,1fr)]">
                     <div className="rounded-[10px] border border-[#33424a] bg-[#10151a] px-5 py-4">
@@ -3540,371 +3952,7 @@ export function EvalsPageClientV0_1() {
 
 
 
-          <div className="space-y-2">
-            <div className={`${MT.sectionLabel} text-[#ededed]`}>
-              Input source
-            </div>
-            <div className={`${MT.helper} text-[#a9a9a9]`}>
-              Load a saved bundle or paste fresh JSON before scoring.
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 gap-5 xl:grid-cols-[420px_minmax(0,1fr)] xl:items-stretch">
-            <div className="rounded-[12px] border border-[#3a3a3a] bg-[#171717] px-6 py-6 h-full flex flex-col">
-              <div className="flex flex-wrap items-center gap-3">
-                <span className={`${MT.fieldLabelInline} text-[#ededed]`}>
-                  Upload JSON
-                </span>
-                <span className={`${MT.helper} text-[#a9a9a9]`}>
-                  Use a saved eval bundle or buckets-only JSON.
-                </span>
-              </div>
-
-              <div className="mt-5 flex flex-wrap items-center gap-4">
-                <label
-                  className={`inline-flex cursor-pointer items-center rounded-[6px] border border-[#3a3a3a] bg-[#1e1e1e] px-4 py-3 ${MT.actionMd} text-[#dfdfdf] transition hover:border-[#666] hover:bg-[#252525] hover:text-white`}
-                >
-                  <input
-                    type="file"
-                    accept=".json,application/json"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0] ?? null;
-                      setPickedFileName(file?.name ?? "");
-                      void onPickFile(file);
-                    }}
-                    className="sr-only"
-                  />
-                  Choose JSON file
-                </label>
-                <span
-                  className={`text-[12px] leading-6 ${pickedFileName ? "text-[#bdbdbd]" : "text-[#7d7d7d]"}`}
-                >
-                  {pickedFileName || "No JSON file selected"}
-                </span>
-              </div>
-
-              <div className={`${MT.helper} mt-auto pt-6 text-[#c8c8c8]`}>
-                Accepts full{" "}
-                <span className="font-mono text-[#f2f2f2]">evalRun.v0.1</span>{" "}
-                bundles or buckets-only JSON.
-              </div>
-            </div>
-            <div className="rounded-[12px] border border-[#3a3a3a] bg-[#131313] px-6 py-6 h-full">
-              <div className="space-y-1">
-                <label className="block text-[14px] font-semibold uppercase tracking-[0.12em] text-[#ededed]">
-                  Paste JSON
-                </label>
-                <div className={`${MT.helper} text-[#a9a9a9]`}>
-                  Paste a full{" "}
-                  <span className="font-mono text-[#d8d8d8]">evalRun.v0.1</span>{" "}
-                  bundle or buckets-only{" "}
-                  <span className="font-mono text-[#d8d8d8]">V1..V7</span> JSON.
-                </div>
-              </div>
-
-              <textarea
-                className="mt-3 min-h-[260px] w-full rounded-[8px] border border-[#3a3a3a] bg-[#101010] p-4 font-mono text-[15px] leading-[1.9] text-[#ededed] outline-none transition focus:border-[#555]"
-                style={{
-                  borderColor:
-                    inputText.trim().length === 0
-                      ? "#3a3a3a"
-                      : inputProbe.kind === "invalid_json"
-                        ? "#d93333"
-                        : inputProbe.kind
-                          ? "#16a34a"
-                          : "#3a3a3a",
-                  boxShadow:
-                    inputText.trim().length === 0
-                      ? "none"
-                      : inputProbe.kind === "invalid_json"
-                        ? "0 0 0 1px #d9333344"
-                        : inputProbe.kind
-                          ? "0 0 0 1px #16a34a44"
-                          : "none",
-                }}
-                value={inputText}
-                onChange={(e) => setInputText(e.target.value)}
-                placeholder={
-                  mode === "run_bundle"
-                    ? '{ "evalRunVersion": "evalRun.v0.1", ... }'
-                    : '{ "V1": ["token1", ...], "V2": [...], ... }'
-                }
-              />
-
-              {inputText.trim() && inputProbe.kind !== "invalid_json" ? (
-                <div
-                  className={`mt-3 inline-flex items-center gap-2 rounded-full border border-[#21452a] bg-[#112017] px-3 py-2 ${MT.chipText} text-[#4ade80]`}
-                >
-                  <span className="h-[6px] w-[6px] rounded-full bg-[#16a34a]" />
-                  JSON detected — ready to score
-                </div>
-              ) : null}
-            </div>
-          </div>
-          <div className="flex flex-col gap-3 pt-4">
-            <div className="flex flex-wrap items-center gap-3">
-              <button
-                type="button"
-                className={`${MT.actionPrimary} border-[#16a34a] bg-[#16a34a] text-white transition hover:border-[#15803d] hover:bg-[#15803d] hover:shadow-[0_0_0_1px_rgba(22,163,74,0.4),0_4px_16px_rgba(22,163,74,0.33)] disabled:cursor-not-allowed disabled:border-[#333] disabled:bg-[#111] disabled:text-[#333] disabled:shadow-none`}
-                onClick={() => void onScore()}
-                disabled={busy || !inputText.trim()}
-              >
-                {busy ? "Scoring…" : report ? "Scored ✓" : "Score run"}
-              </button>
-
-              <button
-                type="button"
-                className={`${MT.actionSecondary} border-[#555] bg-[#1a1a1a] text-[#e2e2e2] transition hover:border-[#777] hover:bg-[#202020] hover:text-white disabled:opacity-50`}
-                onClick={() => resetWorkbench()}
-                disabled={busy}
-              >
-                Reset Workbench
-              </button>
-
-                <button
-                  type="button"
-                  className={`${MT.actionSecondary} border-[#2d4f8f] bg-[#15233d] text-[#c7d9ff] transition hover:border-[#4b73bd] hover:bg-[#1a2b48] hover:text-white disabled:opacity-50`}
-                  onClick={() => saveCurrentRun()}
-                  disabled={busy || (!inputText.trim() && !report && !md)}
-                >
-                  Save Run
-                </button>
-
-              <button
-                type="button"
-                className={`${MT.actionWarn} border-[#6b3737] bg-[#211717] text-[#e6a0a0] transition hover:border-[#cc0000] hover:bg-[#2a1616] hover:text-[#ffc1c1] disabled:opacity-50`}
-                onClick={() => void onDownloadPdf()}
-                disabled={busy || !inputText.trim()}
-              >
-                Download PDF
-              </button>
-
-              <button
-                type="button"
-                className={`${MT.actionUtility} border-[#444] bg-transparent text-[#b8b8b8] transition hover:border-[#777] hover:bg-[#1f1f1f] hover:text-[#f2f2f2] disabled:opacity-50`}
-                onClick={() => void onDownloadBundle()}
-                disabled={busy || !inputText.trim()}
-              >
-                Download Bundle
-              </button>
-            </div>
-
-            <div className="flex flex-wrap items-center gap-3">
-              <button
-                type="button"
-                className={`${MT.actionUtility} border-[#444] bg-transparent text-[#b8b8b8] transition hover:border-[#777] hover:bg-[#1f1f1f] hover:text-[#f2f2f2] disabled:opacity-50`}
-                onClick={() => void onCopyRawJson()}
-                disabled={busy || !inputText.trim()}
-              >
-                Copy Raw JSON
-              </button>
-
-              <button
-                type="button"
-                className={`${MT.actionUtility} border-[#444] bg-transparent text-[#b8b8b8] transition hover:border-[#777] hover:bg-[#1f1f1f] hover:text-[#f2f2f2] disabled:opacity-50`}
-                onClick={() => void onCopyCsvRow()}
-                disabled={busy || !report}
-              >
-                Copy CSV Row
-              </button>
-
-
-              <div className="min-w-0 flex-1" />
-
-              <button
-                type="button"
-                className={`${MT.actionUtility} border-dashed border-[#4a4a4a] bg-transparent text-[#c8c8c8] transition hover:border-[#777] hover:bg-[#1f1f1f] hover:text-white`}
-                onClick={loadExample}
-                disabled={busy}
-              >
-                Load example
-              </button>
-            </div>
-          </div>
-          <div className="space-y-3 pt-4">
-            {mode === "run_bundle" && inputProbe.kind === "bucket_only" ? (
-              <div className="rounded-[10px] border border-[#5b4a20] bg-[#1d1a12] px-5 py-4">
-                <div className="flex flex-wrap items-start gap-3">
-                  <div className="min-w-0 flex-1">
-                    <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#f3d38b]">
-                      Input mismatch
-                    </div>
-                    <div className="mt-1 text-[12px] leading-6 text-[#d7cfbb]">
-                      You are in{" "}
-                      <span className="font-mono text-[#fff1c2]">
-                        run_bundle
-                      </span>{" "}
-                      mode, but the input looks like bucketed tokens. Scoring
-                      and PDF export will auto-wrap into{" "}
-                      <span className="font-mono text-[#fff1c2]">
-                        evalRun.v0.1
-                      </span>
-                      .
-                    </div>
-                  </div>
-
-                  <button
-                    className="rounded-[6px] border border-[#6a5a2a] bg-[#242016] px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.06em] text-[#f3d38b] transition hover:border-[#8a7636] hover:bg-[#2a2418] hover:text-[#fff1c2]"
-                    type="button"
-                    onClick={() => setMode("task_buckets")}
-                  >
-                    Switch mode
-                  </button>
-                </div>
-              </div>
-            ) : null}
-
-            {(inputProbe.kind === "corpus70_meta" || notice || apiErr) ? (
-              <div className="pointer-events-none fixed bottom-4 right-4 z-[120] flex w-[min(420px,calc(100vw-2rem))] flex-col gap-3">
-                {inputProbe.kind === "corpus70_meta" ? (
-                  <div className="pointer-events-auto rounded-[10px] border border-[#5b3b3b] bg-[#1d1515] px-5 py-4 shadow-[0_10px_30px_rgba(0,0,0,0.35)]">
-                    <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#f1b4b4]">
-                      Unsupported input
-                    </div>
-                    <div className="mt-1 text-[12px] leading-6 text-[#d8c0c0]">
-                      This looks like a Corpus70 meta-tags JSON. Evals expects either a full
-                      <span className="font-mono text-[#ffe0e0]"> evalRun.v0.1 </span>
-                      bundle or buckets keys V1..V7.
-                    </div>
-                  </div>
-                ) : null}
-
-                {apiErr ? (
-                  <div className="pointer-events-auto rounded-[10px] border border-[#6a3d3d] bg-[#211717] px-5 py-4 shadow-[0_10px_30px_rgba(0,0,0,0.35)]">
-                    <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#f2b0b0]">
-                      Error <span className="font-mono text-[#ffe4e4]">{apiErr.code}</span>
-                    </div>
-                    <div className="mt-1 text-[12px] leading-6 text-[#e0c7c7]">{apiErr.message}</div>
-                  </div>
-                ) : null}
-
-                {notice ? (
-                  <div
-                    className={
-                      noticeIsWarn
-                        ? "pointer-events-auto rounded-[10px] border border-[#6a3d3d] bg-[#211717] px-5 py-4 shadow-[0_10px_30px_rgba(0,0,0,0.35)]"
-                        : "pointer-events-auto rounded-[10px] border border-[#3e4a5b] bg-[#171b22] px-5 py-4 shadow-[0_10px_30px_rgba(0,0,0,0.35)]"
-                    }
-                  >
-                    <div
-                      className={
-                        noticeIsWarn
-                          ? "text-[11px] font-semibold uppercase tracking-[0.12em] text-[#f2b0b0]"
-                          : "text-[11px] font-semibold uppercase tracking-[0.12em] text-[#b8c7e8]"
-                      }
-                    >
-                      {noticeIsWarn ? "Warning" : "Note"}
-                    </div>
-                    <div
-                      className={
-                        noticeIsWarn
-                          ? "mt-1 text-[12px] leading-6 text-[#e0c7c7]"
-                          : "mt-1 text-[12px] leading-6 text-[#d2d9e6]"
-                      }
-                    >
-                      {notice}
-                    </div>
-                  </div>
-                ) : null}
-              </div>
-            ) : null}
-          </div>
-              </div>
-            </div>
-        </section>
-        {busy || apiErr || report || readyToScore ? (
-          <section className="space-y-8">
-            <div
-              className={`rounded-[12px] border px-6 py-5 shadow-[0_10px_30px_rgba(0,0,0,0.18)] ${stateToneClass}`}
-            >
-              <div className="flex flex-wrap items-center gap-5">
-                <div
-                  className={`${MT.actionMd} inline-flex items-center gap-2 text-white`}
-                >
-                  <span
-                    className={`h-2.5 w-2.5 rounded-full ${stateDotClass}`}
-                  />
-                  {stateLabel}
-                </div>
-
-                {report ? (
-                  <>
-                    <div className="flex flex-wrap items-center gap-2 text-[12px]">
-                      <span className="rounded-full border border-[#4a4a4a] bg-[#0f0f0f] px-3 py-1.5 text-[#ededed]">
-                        provider{" "}
-                        <span
-                          className={`font-mono ${report.meta?.provider?.trim() ? "text-white" : "text-[#8f8f8f]"}`}
-                        >
-                          {report.meta?.provider?.trim()
-                            ? report.meta.provider
-                            : "not set"}
-                        </span>
-                      </span>
-                      <span className="rounded-full border border-[#4a4a4a] bg-[#0f0f0f] px-3 py-1.5 text-[#ededed]">
-                        model{" "}
-                        <span
-                          className={`font-mono ${report.meta?.model?.trim() ? "text-white" : "text-[#8f8f8f]"}`}
-                        >
-                          {report.meta?.model?.trim()
-                            ? report.meta.model
-                            : "not set"}
-                        </span>
-                      </span>
-                      <span className="rounded-full border border-[#4a4a4a] bg-[#0f0f0f] px-3 py-1.5 text-[#ededed]">
-                        label{" "}
-                        <span
-                          className={`font-mono ${report.meta?.label?.trim() ? "text-white" : "text-[#8f8f8f]"}`}
-                        >
-                          {report.meta?.label?.trim()
-                            ? report.meta.label
-                            : "not set"}
-                        </span>
-                      </span>
-                    </div>
-                    <div className="rounded-full border border-[#4a4a4a] bg-[#0f0f0f] px-3 py-2 font-mono text-[12px] text-[#f2f2f2]">
-                        runId <span className="text-white">{report.runId}</span>
-                      </div>
-                    </>
-                  ) : null}
-                </div>
-
-                {report ? (
-                  <div className="mt-3 flex flex-wrap items-center gap-2 text-[11px]">
-                    <span className="text-[11px] uppercase tracking-[0.12em] text-[#9f9f9f]">
-                      Run context
-                    </span>
-                    <span className="rounded-full border border-[#3f3f3f] bg-[#0f0f0f] px-3 py-1.5 text-[#d7d7d7]">
-                      upstreamEngine{" "}
-                        <span
-                          className={`font-mono ${report.meta?.sourceEngineVersion?.trim() ? "text-white" : "text-[#8f8f8f]"}`}
-                        >
-                          {report.meta?.sourceEngineVersion?.trim()
-                            ? report.meta.sourceEngineVersion
-                            : "not provided"}
-                        </span>
-                    </span>
-                    <span className="rounded-full border border-[#3f3f3f] bg-[#0f0f0f] px-3 py-1.5 text-[#d7d7d7]">
-                      taskId{" "}
-                      <span className="font-mono text-white">
-                        {devicePlateTaskId ?? "—"}
-                      </span>
-                    </span>
-                    <span className="rounded-full border border-[#3f3f3f] bg-[#0f0f0f] px-3 py-1.5 text-[#d7d7d7]">
-                      scorerBuild{" "}
-                      <span className="font-mono text-white">
-                        {devicePlateScorerBuild}
-                      </span>
-                    </span>
-                    <span className="rounded-full border border-[#3f3f3f] bg-[#0f0f0f] px-3 py-1.5 text-[#d7d7d7]">
-                      exportedAtUtc{" "}
-                      <span className="font-mono text-white">
-                        {devicePlateExportedAtUtc || "—"}
-                      </span>
-                    </span>
-                  </div>
-                ) : null}
-              </div>
-
+            </details>
             <div className="space-y-1">
               <div className={`${MT.sectionLabel} text-[#adadad]`}>
                 Scored summary
