@@ -2452,7 +2452,9 @@ export function EvalsPageClientV0_1() {
             </div>
           </section>
 
-        <section className="rounded-[10px] border border-[#333] bg-[#141414] px-8 py-8 space-y-8">
+          <section className="rounded-[10px] border border-[#333] bg-[#141414] px-8 py-8">
+            <div className="grid gap-8 xl:grid-cols-[320px_minmax(0,1fr)] xl:items-start">
+              <aside className="space-y-6 xl:sticky xl:top-6">
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
             <div>
               <label className={`${MT.fieldLabel} text-[#ededed]`}>
@@ -2555,8 +2557,8 @@ export function EvalsPageClientV0_1() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
-                <div className="md:col-span-2 xl:col-span-2">
+            <div className="grid grid-cols-1 gap-4">
+                <div>
                 <label className={`${MT.fieldLabel} text-[#ededed]`}>runId</label>
                 <input
                     className={`w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[11px] font-mono text-[13px] ${MT.fieldControl} text-[#e6e6e6] outline-none transition focus:border-[#666]`}
@@ -2686,6 +2688,9 @@ export function EvalsPageClientV0_1() {
                 </div>
               </div>
             </details>
+              </aside>
+
+              <div className="min-w-0 space-y-8">
             <div className="space-y-3 pt-4">
                   <div className="grid gap-4 xl:grid-cols-[minmax(0,2fr)_minmax(300px,1fr)]">
                     <div className="rounded-[10px] border border-[#33424a] bg-[#10151a] px-5 py-4">
@@ -3804,6 +3809,8 @@ export function EvalsPageClientV0_1() {
               </div>
             ) : null}
           </div>
+              </div>
+            </div>
         </section>
         {busy || apiErr || report || readyToScore ? (
           <section className="space-y-8">
