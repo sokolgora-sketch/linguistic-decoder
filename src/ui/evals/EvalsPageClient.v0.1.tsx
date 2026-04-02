@@ -3099,6 +3099,314 @@ export function EvalsPageClientV0_1() {
                 ) : null}
               </div>
 
+            <div className="space-y-1">
+              <div className={`${MT.sectionLabel} text-[#adadad]`}>
+                Scored summary
+              </div>
+              <div className={`${MT.helper} text-[#a9a9a9]`}>
+                Signal, compliance, and bucket trend for the active run.
+              </div>
+            </div>
+
+            {report && summaryTask ? (
+              <>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className={`${MT.sectionLabel} text-[#ededed]`}>
+                      Consistency (Spearman{" "}
+                      <span className="normal-case">ρ</span>)
+                    </div>
+                    <div className="font-mono text-[20px] text-white">
+                      {typeof summarySpearman === "number"
+                        ? fmt(summarySpearman)
+                        : "—"}
+                    </div>
+                  </div>
+                  <div className="h-[6px] overflow-hidden rounded-full bg-[#252525]">
+                    <div
+                      className={`h-full rounded-full ${consistencyBarClass}`}
+                      style={{ width: `${consistencyBarWidth}%` }}
+                    />
+                  </div>
+                </div>
+
+                <div className="inline-flex w-fit items-center gap-2 rounded-full border border-[#5a2424] bg-[#1b1111] px-4 py-2 text-[12px] uppercase tracking-[0.08em] text-[#f3b3b3]">
+                  <span className="h-[7px] w-[7px] rounded-full bg-[#d93333]" />
+                  <span>Expected direction</span>
+                  <span className="font-mono text-[#ffe1e1]">
+                    negative (V1→V7)
+                  </span>
+                </div>
+
+                <div className={`${MT.helper} text-[#a9a9a9]`}>
+                  Interpretation: more negative = stronger grounding · near 0 =
+                  flat · positive = inversion.
+                </div>
+
+                <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+                  {[
+                    {
+                      key: "Pearson r",
+                      value:
+                        typeof summaryPearson === "number"
+                          ? fmt(summaryPearson)
+                          : "—",
+                      note: "aperture primary",
+                      tone: "border-t-[#16a34a]",
+                    },
+                    {
+                      key: "Spearman ρ",
+                      value:
+                        typeof summarySpearman === "number"
+                          ? fmt(summarySpearman)
+                          : "—",
+                      note: "aperture primary",
+                      tone: "border-t-[#22c55e]",
+                    },
+                    {
+                      key: "p_perm",
+                      value:
+                        typeof summaryPPerm === "number"
+                          ? fmtP(summaryPPerm)
+                          : "—",
+                      note:
+                        summaryPermItersPresence || summaryPermSeedPresence
+                          ? `presenceMean · ${summaryPermItersPresence ?? "—"} iters · seed ${summaryPermSeedPresence ?? "—"}`
+                          : summaryPermItersPrimary || summaryPermSeedPrimary
+                            ? `primary · ${summaryPermItersPrimary ?? "—"} iters · seed ${summaryPermSeedPrimary ?? "—"}`
+                            : "permutation",
+                      tone: "border-t-[#f59e0b]",
+                    },
+                    {
+                      key: "Compliance",
+                      value: complianceText,
+                      note: `${summaryCounts.validN} valid · ${summaryCounts.invalidN} invalid`,
+                      tone: "border-t-[#3b82f6]",
+                    },
+                  ].map((card) => (
+                    <div
+                      key={card.key}
+                      className={`rounded-[12px] border border-[#3a3a3a] border-t-[3px] bg-[#161616] p-5 shadow-[0_8px_24px_rgba(0,0,0,0.14)] ${card.tone}`}
+                    >
+                      <div className={`${MT.statKey} text-[#e6e6e6]`}>
+                        {card.key === "Spearman ρ" ? (
+                          <>
+                            Spearman <span className="normal-case">ρ</span>
+                          </>
+                        ) : (
+                          card.key
+                        )}
+                      </div>
+                      <div className={`${MT.statValue} mt-3 text-white`}>
+                        {card.value}
+                      </div>
+                      <div className={`${MT.statNote} mt-2 text-[#d9d9d9]`}>
+                        {card.note}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {(() => {
+                  if (typeof summarySpearman !== "number") return null;
+
+                  const diagnosis = getSpearmanDiagnosisMeta(summarySpearman);
+                  if (!diagnosis) return null;
+
+                  return (
+                    <div
+                      className="mt-5 flex flex-wrap items-center gap-4 rounded-[12px] border border-[#3a3a3a] bg-[#161616] px-5 py-5 shadow-[0_8px_24px_rgba(0,0,0,0.14)]"
+                      title={diagnosis.hint}
+                    >
+                      <span
+                        className="inline-block h-[8px] w-[8px] rounded-full"
+                        style={{ backgroundColor: diagnosis.color }}
+                      />
+                      <span
+                        className={MT.statKey}
+                        style={{ color: diagnosis.color }}
+                      >
+                        {diagnosis.label}
+                      </span>
+                      <span className={`${MT.helper} text-[#ebebeb]`}>
+                        {diagnosis.hint}
+                      </span>
+                    </div>
+                  );
+                })()}
+
+                {summaryTask?.buckets?.length
+                  ? (() => {
+                      const buckets = summaryTask.buckets as Array<{
+                        bucket: string;
+                        mean_aperturePrimary?: number;
+                      }>;
+
+                      const pts = buckets.map((b, i) => {
+                        const mean =
+                          typeof b.mean_aperturePrimary === "number"
+                            ? b.mean_aperturePrimary
+                            : 0;
+
+                        return {
+                          label: b.bucket || `V${i + 1}`,
+                          x: 96 + i * 68,
+                          y: 170 - mean * 140,
+                          mean,
+                        };
+                      });
+
+                      const n = pts.length;
+                      const sumX = pts.reduce((a, p) => a + p.x, 0);
+                      const sumY = pts.reduce((a, p) => a + p.y, 0);
+                      const sumXY = pts.reduce((a, p) => a + p.x * p.y, 0);
+                      const sumXX = pts.reduce((a, p) => a + p.x * p.x, 0);
+                      const denom = n * sumXX - sumX * sumX;
+                      const m =
+                        denom !== 0 ? (n * sumXY - sumX * sumY) / denom : 0;
+                      const b0 = (sumY - m * sumX) / n;
+                      const x1 = 96;
+                      const x2 = pts[pts.length - 1]?.x ?? 96;
+                      const pathD = pts
+                        .map(
+                          (p, i) => (i === 0 ? "M " : "L ") + p.x + " " + p.y,
+                        )
+                        .join(" ");
+
+                      return (
+                        <div className="mt-7 rounded-[12px] border border-[#3a3a3a] bg-[#101010] px-6 py-6 shadow-[0_8px_24px_rgba(0,0,0,0.14)]">
+                          <div className="mb-1 text-[12px] font-semibold uppercase tracking-[0.14em] text-[#dddddd]">
+                            Aperture trend by bucket
+                          </div>
+                          <div className="mb-1 text-[12px] leading-6 text-[#a8a8a8]">
+                            Mean aperture score from V1 to V7.
+                          </div>
+                          <div className="mb-4 text-[11px] leading-6 text-[#8e8e8e]">
+                            Solid path = bucket means · dashed path = linear
+                            trend.
+                          </div>
+
+                          <svg viewBox="0 0 560 220" className="w-full">
+                            <line
+                              x1="58"
+                              y1="20"
+                              x2="58"
+                              y2="182"
+                              stroke="#333"
+                              strokeWidth="1"
+                            />
+                            <line
+                              x1="58"
+                              y1="182"
+                              x2="530"
+                              y2="182"
+                              stroke="#333"
+                              strokeWidth="1"
+                            />
+
+                            {[0, 0.5, 1.0].map((v) => (
+                              <g key={v}>
+                                <line
+                                  x1="58"
+                                  y1={170 - v * 140}
+                                  x2="530"
+                                  y2={170 - v * 140}
+                                  stroke="#1f1f1f"
+                                  strokeWidth="1"
+                                  strokeDasharray="3 4"
+                                />
+                                <text
+                                  x="50"
+                                  y={174 - v * 140}
+                                  textAnchor="end"
+                                  fill="#8a8a8a"
+                                  fontSize="10"
+                                  fontFamily="Inter, sans-serif"
+                                >
+                                  {v.toFixed(1)}
+                                </text>
+                              </g>
+                            ))}
+
+                            <path
+                              d={pathD}
+                              fill="none"
+                              stroke="#f59aa4"
+                              strokeWidth="1.75"
+                              strokeLinejoin="round"
+                              strokeLinecap="round"
+                              opacity="0.95"
+                            />
+
+                            <line
+                              x1={x1}
+                              y1={m * x1 + b0}
+                              x2={x2}
+                              y2={m * x2 + b0}
+                              stroke="#f87171"
+                              strokeWidth="1.5"
+                              strokeDasharray="5 4"
+                              opacity="0.8"
+                            />
+
+                            {pts.map((p, i) => {
+                              const bucketVoice =
+                                (["A", "O", "E", "Ë", "U", "Y", "I"] as const)[
+                                  i
+                                ] ?? "I";
+                              const dotColor =
+                                COLORS_HEX_BY_VOICE_V0_1[bucketVoice];
+
+                              return (
+                                <g key={p.label}>
+                                  <circle
+                                    cx={p.x}
+                                    cy={p.y}
+                                    r="6"
+                                    fill={dotColor}
+                                    opacity="0.95"
+                                  />
+                                  <text
+                                    x={p.x}
+                                    y={p.y - 11}
+                                    textAnchor="middle"
+                                    fill="#d0d0d0"
+                                    fontSize="10"
+                                    fontFamily="Inter, sans-serif"
+                                  >
+                                    {p.mean.toFixed(3)}
+                                  </text>
+                                  <text
+                                    x={p.x}
+                                    y="202"
+                                    textAnchor="middle"
+                                    fill="#8f8f8f"
+                                    fontSize="10"
+                                    fontFamily="Inter, sans-serif"
+                                  >
+                                    {p.label}
+                                  </text>
+                                </g>
+                              );
+                            })}
+
+                            <text
+                              x="294"
+                              y="216"
+                              textAnchor="middle"
+                              fill="#8f8f8f"
+                              fontSize="11"
+                              fontFamily="Inter, sans-serif"
+                            >
+                              Bucket rank
+                            </text>
+                          </svg>
+                        </div>
+                      );
+                    })()
+                  : null}
+              </>
+            ) : null}
             <details className="rounded-[10px] border border-[#2a3540] bg-[#0e1318]">
               <summary className="cursor-pointer px-5 py-4 text-[12px] font-semibold uppercase tracking-[0.12em] text-[#9fb1bf] transition hover:bg-[#111820] hover:text-[#d0dce8] [&::-webkit-details-marker]:hidden">
                 Series dashboard · run management
@@ -3953,314 +4261,6 @@ export function EvalsPageClientV0_1() {
 
 
             </details>
-            <div className="space-y-1">
-              <div className={`${MT.sectionLabel} text-[#adadad]`}>
-                Scored summary
-              </div>
-              <div className={`${MT.helper} text-[#a9a9a9]`}>
-                Signal, compliance, and bucket trend for the active run.
-              </div>
-            </div>
-
-            {report && summaryTask ? (
-              <>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div className={`${MT.sectionLabel} text-[#ededed]`}>
-                      Consistency (Spearman{" "}
-                      <span className="normal-case">ρ</span>)
-                    </div>
-                    <div className="font-mono text-[20px] text-white">
-                      {typeof summarySpearman === "number"
-                        ? fmt(summarySpearman)
-                        : "—"}
-                    </div>
-                  </div>
-                  <div className="h-[6px] overflow-hidden rounded-full bg-[#252525]">
-                    <div
-                      className={`h-full rounded-full ${consistencyBarClass}`}
-                      style={{ width: `${consistencyBarWidth}%` }}
-                    />
-                  </div>
-                </div>
-
-                <div className="inline-flex w-fit items-center gap-2 rounded-full border border-[#5a2424] bg-[#1b1111] px-4 py-2 text-[12px] uppercase tracking-[0.08em] text-[#f3b3b3]">
-                  <span className="h-[7px] w-[7px] rounded-full bg-[#d93333]" />
-                  <span>Expected direction</span>
-                  <span className="font-mono text-[#ffe1e1]">
-                    negative (V1→V7)
-                  </span>
-                </div>
-
-                <div className={`${MT.helper} text-[#a9a9a9]`}>
-                  Interpretation: more negative = stronger grounding · near 0 =
-                  flat · positive = inversion.
-                </div>
-
-                <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-                  {[
-                    {
-                      key: "Pearson r",
-                      value:
-                        typeof summaryPearson === "number"
-                          ? fmt(summaryPearson)
-                          : "—",
-                      note: "aperture primary",
-                      tone: "border-t-[#16a34a]",
-                    },
-                    {
-                      key: "Spearman ρ",
-                      value:
-                        typeof summarySpearman === "number"
-                          ? fmt(summarySpearman)
-                          : "—",
-                      note: "aperture primary",
-                      tone: "border-t-[#22c55e]",
-                    },
-                    {
-                      key: "p_perm",
-                      value:
-                        typeof summaryPPerm === "number"
-                          ? fmtP(summaryPPerm)
-                          : "—",
-                      note:
-                        summaryPermItersPresence || summaryPermSeedPresence
-                          ? `presenceMean · ${summaryPermItersPresence ?? "—"} iters · seed ${summaryPermSeedPresence ?? "—"}`
-                          : summaryPermItersPrimary || summaryPermSeedPrimary
-                            ? `primary · ${summaryPermItersPrimary ?? "—"} iters · seed ${summaryPermSeedPrimary ?? "—"}`
-                            : "permutation",
-                      tone: "border-t-[#f59e0b]",
-                    },
-                    {
-                      key: "Compliance",
-                      value: complianceText,
-                      note: `${summaryCounts.validN} valid · ${summaryCounts.invalidN} invalid`,
-                      tone: "border-t-[#3b82f6]",
-                    },
-                  ].map((card) => (
-                    <div
-                      key={card.key}
-                      className={`rounded-[12px] border border-[#3a3a3a] border-t-[3px] bg-[#161616] p-5 shadow-[0_8px_24px_rgba(0,0,0,0.14)] ${card.tone}`}
-                    >
-                      <div className={`${MT.statKey} text-[#e6e6e6]`}>
-                        {card.key === "Spearman ρ" ? (
-                          <>
-                            Spearman <span className="normal-case">ρ</span>
-                          </>
-                        ) : (
-                          card.key
-                        )}
-                      </div>
-                      <div className={`${MT.statValue} mt-3 text-white`}>
-                        {card.value}
-                      </div>
-                      <div className={`${MT.statNote} mt-2 text-[#d9d9d9]`}>
-                        {card.note}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                {(() => {
-                  if (typeof summarySpearman !== "number") return null;
-
-                  const diagnosis = getSpearmanDiagnosisMeta(summarySpearman);
-                  if (!diagnosis) return null;
-
-                  return (
-                    <div
-                      className="mt-5 flex flex-wrap items-center gap-4 rounded-[12px] border border-[#3a3a3a] bg-[#161616] px-5 py-5 shadow-[0_8px_24px_rgba(0,0,0,0.14)]"
-                      title={diagnosis.hint}
-                    >
-                      <span
-                        className="inline-block h-[8px] w-[8px] rounded-full"
-                        style={{ backgroundColor: diagnosis.color }}
-                      />
-                      <span
-                        className={MT.statKey}
-                        style={{ color: diagnosis.color }}
-                      >
-                        {diagnosis.label}
-                      </span>
-                      <span className={`${MT.helper} text-[#ebebeb]`}>
-                        {diagnosis.hint}
-                      </span>
-                    </div>
-                  );
-                })()}
-
-                {summaryTask?.buckets?.length
-                  ? (() => {
-                      const buckets = summaryTask.buckets as Array<{
-                        bucket: string;
-                        mean_aperturePrimary?: number;
-                      }>;
-
-                      const pts = buckets.map((b, i) => {
-                        const mean =
-                          typeof b.mean_aperturePrimary === "number"
-                            ? b.mean_aperturePrimary
-                            : 0;
-
-                        return {
-                          label: b.bucket || `V${i + 1}`,
-                          x: 96 + i * 68,
-                          y: 170 - mean * 140,
-                          mean,
-                        };
-                      });
-
-                      const n = pts.length;
-                      const sumX = pts.reduce((a, p) => a + p.x, 0);
-                      const sumY = pts.reduce((a, p) => a + p.y, 0);
-                      const sumXY = pts.reduce((a, p) => a + p.x * p.y, 0);
-                      const sumXX = pts.reduce((a, p) => a + p.x * p.x, 0);
-                      const denom = n * sumXX - sumX * sumX;
-                      const m =
-                        denom !== 0 ? (n * sumXY - sumX * sumY) / denom : 0;
-                      const b0 = (sumY - m * sumX) / n;
-                      const x1 = 96;
-                      const x2 = pts[pts.length - 1]?.x ?? 96;
-                      const pathD = pts
-                        .map(
-                          (p, i) => (i === 0 ? "M " : "L ") + p.x + " " + p.y,
-                        )
-                        .join(" ");
-
-                      return (
-                        <div className="mt-7 rounded-[12px] border border-[#3a3a3a] bg-[#101010] px-6 py-6 shadow-[0_8px_24px_rgba(0,0,0,0.14)]">
-                          <div className="mb-1 text-[12px] font-semibold uppercase tracking-[0.14em] text-[#dddddd]">
-                            Aperture trend by bucket
-                          </div>
-                          <div className="mb-1 text-[12px] leading-6 text-[#a8a8a8]">
-                            Mean aperture score from V1 to V7.
-                          </div>
-                          <div className="mb-4 text-[11px] leading-6 text-[#8e8e8e]">
-                            Solid path = bucket means · dashed path = linear
-                            trend.
-                          </div>
-
-                          <svg viewBox="0 0 560 220" className="w-full">
-                            <line
-                              x1="58"
-                              y1="20"
-                              x2="58"
-                              y2="182"
-                              stroke="#333"
-                              strokeWidth="1"
-                            />
-                            <line
-                              x1="58"
-                              y1="182"
-                              x2="530"
-                              y2="182"
-                              stroke="#333"
-                              strokeWidth="1"
-                            />
-
-                            {[0, 0.5, 1.0].map((v) => (
-                              <g key={v}>
-                                <line
-                                  x1="58"
-                                  y1={170 - v * 140}
-                                  x2="530"
-                                  y2={170 - v * 140}
-                                  stroke="#1f1f1f"
-                                  strokeWidth="1"
-                                  strokeDasharray="3 4"
-                                />
-                                <text
-                                  x="50"
-                                  y={174 - v * 140}
-                                  textAnchor="end"
-                                  fill="#8a8a8a"
-                                  fontSize="10"
-                                  fontFamily="Inter, sans-serif"
-                                >
-                                  {v.toFixed(1)}
-                                </text>
-                              </g>
-                            ))}
-
-                            <path
-                              d={pathD}
-                              fill="none"
-                              stroke="#f59aa4"
-                              strokeWidth="1.75"
-                              strokeLinejoin="round"
-                              strokeLinecap="round"
-                              opacity="0.95"
-                            />
-
-                            <line
-                              x1={x1}
-                              y1={m * x1 + b0}
-                              x2={x2}
-                              y2={m * x2 + b0}
-                              stroke="#f87171"
-                              strokeWidth="1.5"
-                              strokeDasharray="5 4"
-                              opacity="0.8"
-                            />
-
-                            {pts.map((p, i) => {
-                              const bucketVoice =
-                                (["A", "O", "E", "Ë", "U", "Y", "I"] as const)[
-                                  i
-                                ] ?? "I";
-                              const dotColor =
-                                COLORS_HEX_BY_VOICE_V0_1[bucketVoice];
-
-                              return (
-                                <g key={p.label}>
-                                  <circle
-                                    cx={p.x}
-                                    cy={p.y}
-                                    r="6"
-                                    fill={dotColor}
-                                    opacity="0.95"
-                                  />
-                                  <text
-                                    x={p.x}
-                                    y={p.y - 11}
-                                    textAnchor="middle"
-                                    fill="#d0d0d0"
-                                    fontSize="10"
-                                    fontFamily="Inter, sans-serif"
-                                  >
-                                    {p.mean.toFixed(3)}
-                                  </text>
-                                  <text
-                                    x={p.x}
-                                    y="202"
-                                    textAnchor="middle"
-                                    fill="#8f8f8f"
-                                    fontSize="10"
-                                    fontFamily="Inter, sans-serif"
-                                  >
-                                    {p.label}
-                                  </text>
-                                </g>
-                              );
-                            })}
-
-                            <text
-                              x="294"
-                              y="216"
-                              textAnchor="middle"
-                              fill="#8f8f8f"
-                              fontSize="11"
-                              fontFamily="Inter, sans-serif"
-                            >
-                              Bucket rank
-                            </text>
-                          </svg>
-                        </div>
-                      );
-                    })()
-                  : null}
-              </>
-            ) : null}
           </section>
         ) : null}
 
