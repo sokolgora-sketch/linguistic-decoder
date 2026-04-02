@@ -2365,14 +2365,14 @@ export function EvalsPageClientV0_1() {
                   </p>
                 </div>
 
-                <div className="rounded-[12px] border border-[#4a3a1b] bg-[#17130d] px-4 py-4">
-                  <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#f3d38b]">
+                <details className="rounded-[12px] border border-[#4a3a1b] bg-[#17130d]">
+                  <summary className="cursor-pointer px-4 py-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#f3d38b] transition hover:bg-[#1f1a10] [&::-webkit-details-marker]:hidden">
                     {EVALS_BETA_INTRO_TITLE}
-                  </div>
-                  <div className="mt-1 text-[12px] leading-6 text-[#d7cfbb]">
+                  </summary>
+                  <div className="px-4 pb-4 text-[12px] leading-6 text-[#d7cfbb]">
                     {EVALS_BETA_INTRO_BODY}
                   </div>
-                </div>
+                </details>
 
                 <div className="grid gap-3 md:grid-cols-3">
                   <div className="rounded-[12px] border border-[#303845] bg-[#171c23] px-4 py-4">
