@@ -4266,17 +4266,11 @@ export function EvalsPageClientV0_1() {
 
         {report ? (
           <section className="space-y-8 pt-6">
-            <div className="rounded-[12px] border border-[#2a2a2a] bg-[#151515] px-6 py-6">
-              <div className="flex flex-wrap items-start justify-between gap-3">
-                <div className="space-y-1">
-                  <div className={`${MT.sectionLabel} text-[#adadad]`}>
-                    Report
-                  </div>
-                  <div className={`${MT.helper} text-[#a9a9a9]`}>
-                    Bundle metadata, device plate, and markdown export.
-                  </div>
-                </div>
-              </div>
+            <details className="rounded-[12px] border border-[#2a2a2a] bg-[#151515]">
+              <summary className="cursor-pointer px-6 py-5 text-[12px] font-semibold uppercase tracking-[0.12em] text-[#adadad] transition hover:bg-[#1a1a1a] hover:text-[#d0d0d0] [&::-webkit-details-marker]:hidden">
+                Report · bundle metadata · markdown export
+              </summary>
+              <div className="px-6 pb-6">
 
               <div className="mt-5 rounded-[10px] border border-[#262626] bg-[#101010] px-5 py-4">
                 <div className="space-y-1">
@@ -4495,18 +4489,14 @@ export function EvalsPageClientV0_1() {
                   {md || "(empty)"}
                 </pre>
               </div>
-            </div>
-
-            <div className="space-y-1">
-              <div className={`${MT.sectionLabel} text-[#adadad]`}>
-                Task reports
               </div>
-              <div className={`${MT.helper} text-[#a9a9a9]`}>
-                Per-task breakdown for scored buckets and derived controls.
-              </div>
-            </div>
+            </details>
 
-            <div className="space-y-7">
+            <details className="rounded-[10px] border border-[#2a3540] bg-[#0e1318]">
+              <summary className="cursor-pointer px-5 py-4 text-[12px] font-semibold uppercase tracking-[0.12em] text-[#9fb1bf] transition hover:bg-[#111820] hover:text-[#d0dce8] [&::-webkit-details-marker]:hidden">
+                Task reports · per-task breakdown
+              </summary>
+              <div className="space-y-7 px-5 pb-5">
                 <section className="space-y-3">
                   <div className="space-y-1">
                     <div className={`${MT.sectionLabel} text-[#d6eadb]`}>
@@ -4543,7 +4533,8 @@ export function EvalsPageClientV0_1() {
                   </div>
                 </section>
               ) : null}
-            </div>
+              </div>
+            </details>
           </section>
         ) : null}
       </main>
