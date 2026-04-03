@@ -2496,7 +2496,7 @@ export function EvalsPageClientV0_1() {
           </section>
 
           <section className="rounded-[10px] border border-[#333] bg-[#141414] px-8 py-8">
-            <div className="grid gap-8 xl:grid-cols-[320px_minmax(0,1fr)] xl:items-start">
+            <div className="grid gap-8 xl:grid-cols-[320px_minmax(0,1fr)_280px] xl:items-start">
               <aside className="space-y-6 xl:sticky xl:top-6">
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
             <div>
@@ -3004,6 +3004,42 @@ export function EvalsPageClientV0_1() {
             ) : null}
           </div>
               </div>
+              <aside className="hidden xl:block xl:sticky xl:top-[96px] xl:self-start">
+                <div className="rounded-[10px] border border-[#33424a] bg-[#10151a] px-5 py-4">
+                  <div className="space-y-1">
+                    <div className={`${MT.sectionLabel} text-[#ededed]`}>
+                      Operator checklist
+                    </div>
+                    <div className={`${MT.helper} text-[#9fb1bf]`}>
+                      Read top to bottom before starting or exporting a battery run.
+                    </div>
+                  </div>
+                  <div className="mt-4 space-y-2">
+                    {operatorChecklistItems.map((item) => (
+                      <div
+                        key={item.key}
+                        className="rounded-[8px] border border-[#26323a] bg-[#0d1216] px-3 py-2"
+                      >
+                        <div className="flex items-start gap-3">
+                          <span
+                            className={
+                              item.tone === "good"
+                                ? "mt-[5px] h-2.5 w-2.5 rounded-full bg-[#6fc18a]"
+                                : item.tone === "bad"
+                                  ? "mt-[5px] h-2.5 w-2.5 rounded-full bg-[#d46a6a]"
+                                  : "mt-[5px] h-2.5 w-2.5 rounded-full bg-[#e6c16a]"
+                            }
+                          />
+                          <div className="min-w-0 flex-1">
+                            <div className="text-[12px] font-semibold text-[#ededed]">{item.label}</div>
+                            <div className="mt-1 break-words text-[12px] leading-6 text-[#b8c7d9]">{item.note}</div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </aside>
             </div>
         </section>
         {busy || apiErr || report || readyToScore ? (
@@ -3605,42 +3641,6 @@ export function EvalsPageClientV0_1() {
                           No series yet. Create one below to start the operator view.
                         </div>
                       )}
-                    </div>
-
-                    <div className="rounded-[10px] border border-[#33424a] bg-[#10151a] px-5 py-4">
-                      <div className="space-y-1">
-                        <div className={`${MT.sectionLabel} text-[#ededed]`}>
-                          Operator checklist
-                        </div>
-                        <div className={`${MT.helper} text-[#9fb1bf]`}>
-                          Read top to bottom before starting or exporting a battery run.
-                        </div>
-                      </div>
-
-                      <div className="mt-4 space-y-2">
-                        {operatorChecklistItems.map((item) => (
-                          <div
-                            key={item.key}
-                            className="rounded-[8px] border border-[#26323a] bg-[#0d1216] px-3 py-2"
-                          >
-                            <div className="flex items-start gap-3">
-                              <span
-                                className={
-                                  item.tone === "good"
-                                    ? "mt-[5px] h-2.5 w-2.5 rounded-full bg-[#6fc18a]"
-                                    : item.tone === "bad"
-                                      ? "mt-[5px] h-2.5 w-2.5 rounded-full bg-[#d46a6a]"
-                                      : "mt-[5px] h-2.5 w-2.5 rounded-full bg-[#e6c16a]"
-                                }
-                              />
-                              <div className="min-w-0 flex-1">
-                                <div className="text-[12px] font-semibold text-[#ededed]">{item.label}</div>
-                                <div className="mt-1 break-words text-[12px] leading-6 text-[#b8c7d9]">{item.note}</div>
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
                     </div>
                   </div>
 
