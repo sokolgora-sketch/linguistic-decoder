@@ -2355,14 +2355,14 @@ export function EvalsPageClientV0_1() {
       </div>
 
         <main className="mx-auto flex w-full max-w-[1680px] flex-col gap-8 px-6 pt-6 pb-16 xl:px-8">
-          <section className="rounded-[14px] border border-[#2f3742] bg-[#13171d] px-6 py-6 shadow-[0_16px_40px_rgba(0,0,0,0.24)]">
+          <section className="rounded-[14px] border border-[#2f3742] bg-[#13171d] px-6 py-4 shadow-[0_16px_40px_rgba(0,0,0,0.24)]">
             <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)] xl:items-start">
               <div className="space-y-4">
                 <div className="space-y-3">
                   <div className={`${MT.eyebrow} text-[#d7dde7]`}>
                     instrument · evals
                   </div>
-                  <h1 className={`${MT.heroTitle} text-[#f5f7fb]`}>
+                  <h1 className={`${MT.heroTitle} !text-[24px] text-[#f5f7fb]`}>
                     ZË-RO Evals Workbench
                   </h1>
                   <p className={`max-w-[760px] ${MT.heroBody} text-[#bac3d2]`}>
