@@ -4540,6 +4540,33 @@ export function EvalsPageClientV0_1() {
                     ))}
                   </div>
                 </div>
+                {activeRunSeries ? (
+                  <div className="mt-3 rounded-[10px] border border-[#2a3a2a] bg-[#0f1510] px-4 py-3">
+                    <div className="space-y-1">
+                      <div className={`${MT.sectionLabel} text-[#ededed]`}>Series health</div>
+                      <div className={`${MT.helper} text-[#9fb1bf]`}>{activeRunSeries.label}</div>
+                    </div>
+                    <div className="mt-3 flex flex-wrap gap-1.5">
+                      <span className="rounded-full border border-[#2f5a3d] bg-[#102016] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#bfe8cc]">
+                        Scored {activeSeriesScoredCount}
+                      </span>
+                      <span className="rounded-full border border-[#4a4a4a] bg-[#121212] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#e6e6e6]">
+                        {activeSeriesRemainingCount} left
+                      </span>
+                      <span
+                        className={
+                          activeSeriesExportReady
+                            ? "rounded-full border border-[#2f5a3d] bg-[#0f1512] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#def5e6]"
+                            : activeSeriesHasHardWarnings
+                              ? "rounded-full border border-[#6b3737] bg-[#1e1414] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#ffd1d1]"
+                              : "rounded-full border border-[#5e4b22] bg-[#19140d] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#f0ddb0]"
+                        }
+                      >
+                        Export {activeSeriesExportReady ? "ready" : "blocked"}
+                      </span>
+                    </div>
+                  </div>
+                ) : null}
               </aside>
             </div>
         </section>
