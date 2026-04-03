@@ -2868,6 +2868,33 @@ export function EvalsPageClientV0_1() {
               </button>
             </div>
           </div>
+          {activeRunSeries ? (
+            <div className="flex flex-wrap items-center gap-2 pt-3">
+              <span className="rounded-full border border-[#7b6b2b] bg-[#211b0d] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#f5e7b0]">
+                {activeRunSeries.label}
+              </span>
+              <span className="rounded-full border border-[#4a4a4a] bg-[#121212] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#e6e6e6]">
+                Next {activeSeriesNextOrdinal} / {activeRunSeries.targetCount}
+              </span>
+              <span className="rounded-full border border-[#2f5a3d] bg-[#102016] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#bfe8cc]">
+                Saved {activeSeriesSavedCount}
+              </span>
+              <span className="rounded-full border border-[#2e4a37] bg-[#0f1512] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#def5e6]">
+                Scored {activeSeriesScoredCount}
+              </span>
+              <span
+                className={
+                  activeSeriesExportReady
+                    ? "rounded-full border border-[#2f5a3d] bg-[#0f1512] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#def5e6]"
+                    : activeSeriesHasHardWarnings
+                      ? "rounded-full border border-[#6b3737] bg-[#1e1414] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#ffd1d1]"
+                      : "rounded-full border border-[#5e4b22] bg-[#19140d] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#f0ddb0]"
+                }
+              >
+                Export {activeSeriesExportReady ? "ready" : "blocked"}
+              </span>
+            </div>
+          ) : null}
           <div className="space-y-3 pt-4">
             {mode === "run_bundle" && inputProbe.kind === "bucket_only" ? (
               <div className="rounded-[10px] border border-[#5b4a20] bg-[#1d1a12] px-5 py-4">
