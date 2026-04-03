@@ -2351,7 +2351,7 @@ export function EvalsPageClientV0_1() {
 
         <main className="mx-auto flex w-full max-w-[1680px] flex-col gap-8 px-6 pt-12 pb-24 xl:px-8">
           <section className="rounded-[14px] border border-[#2f3742] bg-[#13171d] px-6 py-6 shadow-[0_16px_40px_rgba(0,0,0,0.24)]">
-            <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_360px] xl:items-start">
+            <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)] xl:items-start">
               <div className="space-y-4">
                 <div className="space-y-3">
                   <div className={`${MT.eyebrow} text-[#d7dde7]`}>
@@ -2404,58 +2404,6 @@ export function EvalsPageClientV0_1() {
                 </div>
               </div>
 
-              <aside className="rounded-[12px] border border-[#2f3742] bg-[#10141a] px-5 py-5 shadow-[0_12px_30px_rgba(0,0,0,0.2)]">
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                  <div>
-                    <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#aeb7c5]">
-                      Live state
-                    </div>
-                    <div className="mt-1 text-[14px] font-semibold text-white">
-                      {stateLabel}
-                    </div>
-                  </div>
-                  <div className="inline-flex items-center gap-2 rounded-full border border-[#2e3a4a] bg-[#141b24] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#d9e6ff]">
-                    <span className={`h-2.5 w-2.5 rounded-full ${stateDotClass}`} />
-                    {busy ? "working" : report ? "scored" : readyToScore ? "ready" : "idle"}
-                  </div>
-                </div>
-
-                <div className="mt-4 grid grid-cols-2 gap-3">
-                  <div className="rounded-[12px] border border-[#2d3440] bg-[#171c23] px-4 py-4">
-                    <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#9fa9b8]">Pearson r</div>
-                    <div className="mt-2 font-mono text-[22px] text-[#dff7e9]">
-                      {typeof summaryPearson === "number" ? fmt(summaryPearson) : "—"}
-                    </div>
-                    <div className="mt-1 text-[11px] text-[#8893a3]">aperture primary</div>
-                  </div>
-
-                  <div className="rounded-[12px] border border-[#2d3440] bg-[#171c23] px-4 py-4">
-                    <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#9fa9b8]">Spearman ρ</div>
-                    <div className="mt-2 font-mono text-[22px] text-[#dff7e9]">
-                      {typeof summarySpearman === "number" ? fmt(summarySpearman) : "—"}
-                    </div>
-                    <div className="mt-1 text-[11px] text-[#8893a3]">aperture primary</div>
-                  </div>
-
-                  <div className="rounded-[12px] border border-[#2d3440] bg-[#171c23] px-4 py-4">
-                    <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#9fa9b8]">p_perm</div>
-                    <div className="mt-2 font-mono text-[22px] text-[#f4ddb0]">
-                      {typeof summaryPPerm === "number" ? fmtP(summaryPPerm) : "—"}
-                    </div>
-                    <div className="mt-1 text-[11px] text-[#8893a3]">permutation</div>
-                  </div>
-
-                  <div className="rounded-[12px] border border-[#2d3440] bg-[#171c23] px-4 py-4">
-                    <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#9fa9b8]">Compliance</div>
-                    <div className="mt-2 text-[22px] font-semibold text-[#d7e6ff]">
-                      {report ? complianceText : "—"}
-                    </div>
-                    <div className="mt-1 text-[11px] text-[#8893a3]">
-                      {report ? "ready to export" : "not scored"}
-                    </div>
-                  </div>
-                </div>
-              </aside>
             </div>
           </section>
 
