@@ -2349,7 +2349,7 @@ export function EvalsPageClientV0_1() {
         </div>
       </div>
 
-        <main className="mx-auto flex w-full max-w-[1680px] flex-col gap-8 px-6 pt-12 pb-24 xl:px-8">
+        <main className="mx-auto flex w-full max-w-[1680px] flex-col gap-8 px-6 pt-6 pb-16 xl:px-8">
           <section className="rounded-[14px] border border-[#2f3742] bg-[#13171d] px-6 py-6 shadow-[0_16px_40px_rgba(0,0,0,0.24)]">
             <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)] xl:items-start">
               <div className="space-y-4">
@@ -2443,8 +2443,8 @@ export function EvalsPageClientV0_1() {
             </div>
           </section>
 
-          <section className="rounded-[10px] border border-[#333] bg-[#141414] px-8 py-8">
-            <div className="grid gap-8 xl:grid-cols-[320px_minmax(0,1fr)_280px] xl:items-start">
+          <section className="rounded-[10px] border border-[#333] bg-[#141414] px-6 py-6">
+            <div className="grid gap-6 xl:grid-cols-[320px_minmax(0,1fr)_280px] xl:items-start">
               <aside className="space-y-6 xl:sticky xl:top-6">
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
             <div>
