@@ -2340,11 +2340,16 @@ export function EvalsPageClientV0_1() {
               {report ? complianceText : "—"}
             </span>
           </div>
-          <div className="flex items-center gap-2 px-4 py-2.5">
-            <span className={`h-2 w-2 rounded-full ${stateDotClass}`} />
+          <div className="flex flex-col justify-center px-4 py-2.5 gap-0.5">
             <span className="text-[9px] font-semibold uppercase tracking-[0.15em] text-[#bccdd8]">
-              {busy ? "working" : report ? "scored" : readyToScore ? "ready" : "idle"}
+              {stateLabel}
             </span>
+            <div className="flex items-center gap-2">
+              <span className={`h-2 w-2 rounded-full ${stateDotClass}`} />
+              <span className="text-[9px] font-semibold uppercase tracking-[0.15em] text-[#6a7e90]">
+                {busy ? "working" : report ? "scored" : readyToScore ? "ready" : "idle"}
+              </span>
+            </div>
           </div>
         </div>
       </div>
