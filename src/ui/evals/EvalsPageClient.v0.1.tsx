@@ -2362,9 +2362,34 @@ export function EvalsPageClientV0_1() {
                   <div className={`${MT.eyebrow} text-[#d7dde7]`}>
                     instrument · evals
                   </div>
-                  <h1 className={`${MT.heroTitle} !text-[24px] text-[#f5f7fb]`}>
-                    ZË-RO Evals Workbench
-                  </h1>
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <h1 className={`${MT.heroTitle} !text-[24px] text-[#f5f7fb]`}>
+                      ZË-RO Evals Workbench
+                    </h1>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Link
+                        href="/evals/reference"
+                        className="inline-flex shrink-0 items-center rounded-[8px] border border-[#5a2424] bg-[#1f1010] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#fca5a5] transition hover:border-[#7a3434] hover:bg-[#281414] hover:text-[#ffd0d0]"
+                      >
+                        Reference page →
+                      </Link>
+                      <a
+                        href="https://github.com/sokolgora-sketch/linguistic-decoder/issues/new"
+                        target="_blank"
+                        rel="noreferrer"
+                        className={`inline-flex items-center rounded-[6px] border border-[#6a5a2a] bg-[#242016] px-3 py-1.5 ${MT.actionSm} text-[#f3d38b] transition hover:border-[#8a7636] hover:bg-[#2a2418] hover:text-[#fff1c2]`}
+                      >
+                        Report feedback ↗
+                      </a>
+                      <button
+                        type="button"
+                        className="inline-flex items-center rounded-[6px] border border-[#6a5a2a] bg-transparent px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#f3d38b] transition hover:border-[#8a7636] hover:bg-[#1f1a12] hover:text-[#fff1c2]"
+                        onClick={() => void onCopyPageLink()}
+                      >
+                        Copy page link
+                      </button>
+                    </div>
+                  </div>
                   <p className={`${MT.heroBody} text-[#bac3d2]`}>
                     Deterministic scorer. Bring model outputs; ZË-RO scores them. No model calls. The workbench stays live-first, while reference and evidence stay nearby but out of the way.
                   </p>
@@ -2414,37 +2439,6 @@ export function EvalsPageClientV0_1() {
 
 
 
-          <section className="mt-6 rounded-[10px] border border-dashed border-[#3c4552] bg-[#12161c] px-5 py-4">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <div className="min-w-0 text-[12px] leading-6 text-[#aeb7c5]">
-                Paper snapshots were moved off this page. Reference-only comparison now lives on{" "}
-                <span className="font-mono text-[#e5edf8]">/evals/reference</span>.
-              </div>
-              <Link
-                href="/evals/reference"
-                className="inline-flex shrink-0 items-center rounded-[10px] border border-[#5a2424] bg-[#1f1010] px-4 py-2 text-[12px] font-semibold uppercase tracking-[0.08em] text-[#fca5a5] transition hover:border-[#7a3434] hover:bg-[#281414] hover:text-[#ffd0d0]"
-              >
-                Open reference page →
-              </Link>
-              <div className="flex flex-wrap items-center gap-2">
-                <a
-                  href="https://github.com/sokolgora-sketch/linguistic-decoder/issues/new"
-                  target="_blank"
-                  rel="noreferrer"
-                  className={`inline-flex items-center rounded-[6px] border border-[#6a5a2a] bg-[#242016] px-3 py-2 ${MT.actionSm} text-[#f3d38b] transition hover:border-[#8a7636] hover:bg-[#2a2418] hover:text-[#fff1c2]`}
-                >
-                  Report feedback ↗
-                </a>
-                <button
-                  type="button"
-                  className={`${MT.actionUtility} border-[#6a5a2a] bg-transparent text-[#f3d38b] transition hover:border-[#8a7636] hover:bg-[#1f1a12] hover:text-[#fff1c2]`}
-                  onClick={() => void onCopyPageLink()}
-                >
-                  Copy page link
-                </button>
-              </div>
-            </div>
-          </section>
 
           <section className="rounded-[10px] border border-[#333] bg-[#141414] px-6 py-6">
             <div className="grid gap-6 xl:grid-cols-[320px_minmax(0,1fr)_280px] xl:items-start">
