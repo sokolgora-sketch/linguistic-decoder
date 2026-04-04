@@ -2688,7 +2688,7 @@ export function EvalsPageClientV0_1() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 gap-5 xl:grid-cols-[420px_minmax(0,1fr)] xl:items-stretch">
+          <div className="grid grid-cols-1 gap-5">
             <div className="rounded-[12px] border border-[#3a3a3a] bg-[#171717] px-6 py-6 h-full flex flex-col">
               <div className="flex flex-wrap items-center gap-3">
                 <span className={`${MT.fieldLabelInline} text-[#ededed]`}>
@@ -2742,7 +2742,7 @@ export function EvalsPageClientV0_1() {
               </div>
 
               <textarea
-                className="mt-3 min-h-[260px] w-full rounded-[8px] border border-[#3a3a3a] bg-[#101010] p-4 font-mono text-[15px] leading-[1.9] text-[#ededed] outline-none transition focus:border-[#555]"
+                className="mt-3 min-h-[312px] w-full rounded-[8px] border border-[#3a3a3a] bg-[#101010] p-4 font-mono text-[15px] leading-[1.9] text-[#ededed] outline-none transition focus:border-[#555]"
                 style={{
                   borderColor:
                     inputText.trim().length === 0
