@@ -2365,7 +2365,7 @@ export function EvalsPageClientV0_1() {
                   <h1 className={`${MT.heroTitle} !text-[24px] text-[#f5f7fb]`}>
                     ZË-RO Evals Workbench
                   </h1>
-                  <p className={`max-w-[760px] ${MT.heroBody} text-[#bac3d2]`}>
+                  <p className={`${MT.heroBody} text-[#bac3d2]`}>
                     Deterministic scorer. Bring model outputs; ZË-RO scores them. No model calls. The workbench stays live-first, while reference and evidence stay nearby but out of the way.
                   </p>
                 </div>
