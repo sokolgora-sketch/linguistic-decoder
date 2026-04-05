@@ -2727,8 +2727,7 @@ export function EvalsPageClientV0_1() {
                 <span className="font-mono text-[#f2f2f2]">evalRun.v0.1</span>{" "}
                 bundles or buckets-only JSON.
               </div>
-            </div>
-            <div className="rounded-[12px] border border-[#3a3a3a] bg-[#131313] px-6 py-6 h-full">
+              <div className="mt-5 pt-5 border-t border-[#2a2a2a]">
               <div className="space-y-1">
                 <label className="block text-[14px] font-semibold uppercase tracking-[0.12em] text-[#ededed]">
                   Paste JSON
@@ -2778,6 +2777,7 @@ export function EvalsPageClientV0_1() {
                   JSON detected — ready to score
                 </div>
               ) : null}
+              </div>
             </div>
             <div className="rounded-[12px] border border-[#2d4a34] bg-[#0d1410] px-6 py-6">
               <div className="space-y-1">
@@ -2955,34 +2955,6 @@ export function EvalsPageClientV0_1() {
               >
                 Export {activeSeriesExportReady ? "ready" : "blocked"}
               </span>
-            </div>
-          ) : null}
-          {activeRunSeries ? (
-            <div className="mt-3 rounded-[10px] border border-[#2a3a2a] bg-[#0f1510] px-4 py-3">
-              <div className="flex flex-wrap items-end justify-between gap-3">
-                <div className="grid gap-2 sm:grid-cols-2">
-                  <div className="rounded-[6px] border border-[#303030] bg-[#101010] px-3 py-2">
-                    <div className={`${MT.fieldLabel} text-[#9f9f9f]`}>RunId to save</div>
-                    <div className="mt-1 overflow-x-auto font-mono text-[12px] text-[#ededed]">
-                      {activeSeriesRunIdPreview || "—"}
-                    </div>
-                  </div>
-                  <div className="rounded-[6px] border border-[#303030] bg-[#101010] px-3 py-2">
-                    <div className={`${MT.fieldLabel} text-[#9f9f9f]`}>Label to save</div>
-                    <div className="mt-1 overflow-x-auto font-mono text-[12px] text-[#ededed]">
-                      {activeSeriesLabelPreview || "—"}
-                    </div>
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  className={`${MT.actionSecondary} border-[#2d7f5a] bg-[#103224] text-[#c9f5df] transition hover:border-[#3ea776] hover:bg-[#17442f] hover:text-white disabled:opacity-50`}
-                  onClick={saveAndAdvanceSeries}
-                  disabled={busy || !selectedSeriesId || (!inputText.trim() && !report && !md)}
-                >
-                  Save + Next Run
-                </button>
-              </div>
             </div>
           ) : null}
           <div className="space-y-3 pt-4">
