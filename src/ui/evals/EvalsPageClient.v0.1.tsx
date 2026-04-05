@@ -3124,6 +3124,12 @@ export function EvalsPageClientV0_1() {
                         {devicePlateScorerBuild}
                       </span>
                     </span>
+                    <span className="rounded-full border border-[#3f3f3f] bg-[#0f0f0f] px-3 py-1.5 text-[#d7d7d7]">
+                      exportedAtUtc{" "}
+                      <span className="font-mono text-white">
+                        {devicePlateExportedAtUtc || "—"}
+                      </span>
+                    </span>
                   </div>
                 ) : null}
               </div>
