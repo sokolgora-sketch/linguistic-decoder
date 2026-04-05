@@ -2929,10 +2929,10 @@ export function EvalsPageClientV0_1() {
           {false ? (
             <div>
               <span className="rounded-full border border-[#7b6b2b] bg-[#211b0d] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#f5e7b0]">
-                {activeRunSeries.label}
+                {activeRunSeries?.label}
               </span>
               <span className="rounded-full border border-[#4a4a4a] bg-[#121212] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#e6e6e6]">
-                Next {activeSeriesNextOrdinal} / {activeRunSeries.targetCount}
+                Next {activeSeriesNextOrdinal} / {activeRunSeries?.targetCount}
               </span>
               <span className="rounded-full border border-[#2f5a3d] bg-[#102016] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#bfe8cc]">
                 Saved {activeSeriesSavedCount}
