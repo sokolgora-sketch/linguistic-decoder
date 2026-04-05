@@ -2915,8 +2915,7 @@ export function EvalsPageClientV0_1() {
               >
                 Copy CSV Row
               </button>
-
-
+              {activeRunSeries ? (<><span className="rounded-full border border-[#7b6b2b] bg-[#211b0d] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#f5e7b0]">{activeRunSeries.label}</span><span className="rounded-full border border-[#4a4a4a] bg-[#121212] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#e6e6e6]">Next {activeSeriesNextOrdinal} / {activeRunSeries.targetCount}</span><span className="rounded-full border border-[#2f5a3d] bg-[#102016] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#bfe8cc]">Saved {activeSeriesSavedCount}</span><span className="rounded-full border border-[#2e4a37] bg-[#0f1512] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#def5e6]">Scored {activeSeriesScoredCount}</span><span className={activeSeriesExportReady ? "rounded-full border border-[#2f5a3d] bg-[#0f1512] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#def5e6]" : "rounded-full border border-[#5e4b22] bg-[#19140d] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#f0ddb0]"}>Export {activeSeriesExportReady ? "ready" : "blocked"}</span></>) : null}
               <div className="min-w-0 flex-1" />
 
               <button
@@ -2929,8 +2928,8 @@ export function EvalsPageClientV0_1() {
               </button>
             </div>
           </div>
-          {activeRunSeries ? (
-            <div className="flex flex-wrap items-center gap-2 pt-3">
+          {false ? (
+            <div>
               <span className="rounded-full border border-[#7b6b2b] bg-[#211b0d] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#f5e7b0]">
                 {activeRunSeries.label}
               </span>
@@ -3125,12 +3124,6 @@ export function EvalsPageClientV0_1() {
                       scorerBuild{" "}
                       <span className="font-mono text-white">
                         {devicePlateScorerBuild}
-                      </span>
-                    </span>
-                    <span className="rounded-full border border-[#3f3f3f] bg-[#0f0f0f] px-3 py-1.5 text-[#d7d7d7]">
-                      exportedAtUtc{" "}
-                      <span className="font-mono text-white">
-                        {devicePlateExportedAtUtc || "—"}
                       </span>
                     </span>
                   </div>
