@@ -2833,20 +2833,19 @@ export function EvalsPageClientV0_1() {
                   Create Series
                 </button>
               </div>
-            </div>
-            <div className="rounded-[12px] border border-[#1a2d1e] bg-[#0a100c] px-6 py-6">
-              <div className="space-y-1">
-                <div className={`${MT.sectionLabel} text-[#ededed]`}>Series actions</div>
-                <div className={`${MT.helperCompact} text-[#9fb3a4]`}>Save next, export, or delete the active series.</div>
-              </div>
-              <div className="mt-4 flex flex-wrap gap-2">
-                <button type="button" className={`${MT.actionSecondary} border-[#2d7f5a] bg-[#103224] text-[#c9f5df] transition hover:border-[#3ea776] hover:bg-[#17442f] hover:text-white disabled:opacity-50`} onClick={saveAndAdvanceSeries} disabled={busy || !selectedSeriesId || (!inputText.trim() && !report && !md)}>Save + Next Run</button>
-                <button type="button" className={`${MT.actionWarn} border-[#6b3737] bg-[#211717] text-[#e6a0a0] transition hover:border-[#cc0000] hover:bg-[#2a1616] hover:text-[#ffc1c1] disabled:opacity-50`} onClick={deleteSelectedRunSeries} disabled={busy || !selectedSeriesId}>Delete Active Series</button>
-                <button type="button" className={`${MT.actionSecondary} border-[#3f5a2f] bg-[#172111] text-[#d7f0c8] transition hover:border-[#5b7f43] hover:bg-[#1d2a15] hover:text-white disabled:opacity-50`} onClick={exportActiveSeriesCsv} disabled={busy || !selectedSeriesId}>Export JSON</button>
-                <div className="w-full"></div>
-                <button type="button" className={`${MT.actionSecondary} border-[#3f5a2f] bg-[#172111] text-[#d7f0c8] transition hover:border-[#5b7f43] hover:bg-[#1d2a15] hover:text-white disabled:opacity-50`} onClick={exportActiveSeriesCsv} disabled={busy || !selectedSeriesId}>Export CSV</button>
-                <button type="button" className={`${MT.actionUtility} border-[#355a7a] bg-transparent text-[#9fd3ff] transition hover:border-[#4d7fa8] hover:bg-[#132031] hover:text-[#d7eeff] disabled:opacity-50`} onClick={() => void onCopyGuidedBaselinePrompt()} disabled={busy}>Copy Baseline Prompt</button>
-                <button type="button" className={`${MT.actionUtility} border-[#5a4b22] bg-transparent text-[#f1d48a] transition hover:border-[#8b7131] hover:bg-[#241d0f] hover:text-[#ffe6a8] disabled:opacity-50`} onClick={() => void onCopyGuidedCorrectionPrompt()} disabled={busy || !report || !guidedPrompt?.correctionPrompt}>Copy Correction Prompt</button>
+              <div className="mt-4 border-t border-[#1a2d1e] pt-4">
+                <div className="space-y-1">
+                  <div className={`${MT.sectionLabel} text-[#ededed]`}>Series actions</div>
+                  <div className={`${MT.helperCompact} text-[#9fb3a4]`}>Save next, export, or delete the active series.</div>
+                </div>
+                <div className="mt-3 grid grid-cols-2 gap-2">
+                  <button type="button" className={`${MT.actionSecondary} border-[#2d7f5a] bg-[#103224] text-[#c9f5df] transition hover:border-[#3ea776] hover:bg-[#17442f] hover:text-white disabled:opacity-50`} onClick={saveAndAdvanceSeries} disabled={busy || !selectedSeriesId || (!inputText.trim() && !report && !md)}>Save + Next Run</button>
+                  <button type="button" className={`${MT.actionWarn} border-[#6b3737] bg-[#211717] text-[#e6a0a0] transition hover:border-[#cc0000] hover:bg-[#2a1616] hover:text-[#ffc1c1] disabled:opacity-50`} onClick={deleteSelectedRunSeries} disabled={busy || !selectedSeriesId}>Delete Active Series</button>
+                  <button type="button" className={`${MT.actionSecondary} border-[#30465d] bg-[#101b28] text-[#cfe6ff] transition hover:border-[#46698f] hover:bg-[#162434] hover:text-white disabled:opacity-50`} onClick={exportActiveSeriesJson} disabled={busy || !selectedSeriesId}>Export JSON</button>
+                  <button type="button" className={`${MT.actionSecondary} border-[#3f5a2f] bg-[#172111] text-[#d7f0c8] transition hover:border-[#5b7f43] hover:bg-[#1d2a15] hover:text-white disabled:opacity-50`} onClick={exportActiveSeriesCsv} disabled={busy || !selectedSeriesId}>Export CSV</button>
+                  <button type="button" className={`${MT.actionUtility} border-[#355a7a] bg-transparent text-[#9fd3ff] transition hover:border-[#4d7fa8] hover:bg-[#132031] hover:text-[#d7eeff] disabled:opacity-50`} onClick={() => void onCopyGuidedBaselinePrompt()} disabled={busy}>Copy Baseline Prompt</button>
+                  <button type="button" className={`${MT.actionUtility} border-[#5a4b22] bg-transparent text-[#f1d48a] transition hover:border-[#8b7131] hover:bg-[#241d0f] hover:text-[#ffe6a8] disabled:opacity-50`} onClick={() => void onCopyGuidedCorrectionPrompt()} disabled={busy || !report || !guidedPrompt?.correctionPrompt}>Copy Correction Prompt</button>
+                </div>
               </div>
             </div>
           </div>
