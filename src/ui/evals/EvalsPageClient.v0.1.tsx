@@ -2778,6 +2778,10 @@ export function EvalsPageClientV0_1() {
                 </div>
               ) : null}
               </div>
+              <div className="mt-5 flex flex-wrap gap-2 border-t border-[#2a2a2a] pt-4">
+                <button type="button" className={`${MT.actionPrimary} border-[#16a34a] bg-[#16a34a] text-white transition hover:border-[#15803d] hover:bg-[#15803d] hover:shadow-[0_0_0_1px_rgba(22,163,74,0.4),0_4px_16px_rgba(22,163,74,0.33)] disabled:cursor-not-allowed disabled:border-[#333] disabled:bg-[#111] disabled:text-[#333] disabled:shadow-none`} onClick={() => void onScore()} disabled={busy || !inputText.trim()}>{busy ? "Scoring…" : report ? "Scored ✓" : "Score run"}</button>
+                <button type="button" className={`${MT.actionSecondary} border-[#555] bg-[#1a1a1a] text-[#e2e2e2] transition hover:border-[#777] hover:bg-[#202020] hover:text-white disabled:opacity-50`} onClick={() => resetWorkbench()} disabled={busy}>Reset Workbench</button>
+              </div>
             </div>
             <div className="rounded-[12px] border border-[#2d4a34] bg-[#0d1410] px-6 py-6">
               <div className="space-y-1">
@@ -2851,24 +2855,6 @@ export function EvalsPageClientV0_1() {
           </div>
           <div className="flex flex-col gap-3 pt-4">
             <div className="flex flex-nowrap items-center gap-2 overflow-x-auto">
-              <button
-                type="button"
-                className={`${MT.actionPrimary} border-[#16a34a] bg-[#16a34a] text-white transition hover:border-[#15803d] hover:bg-[#15803d] hover:shadow-[0_0_0_1px_rgba(22,163,74,0.4),0_4px_16px_rgba(22,163,74,0.33)] disabled:cursor-not-allowed disabled:border-[#333] disabled:bg-[#111] disabled:text-[#333] disabled:shadow-none`}
-                onClick={() => void onScore()}
-                disabled={busy || !inputText.trim()}
-              >
-                {busy ? "Scoring…" : report ? "Scored ✓" : "Score run"}
-              </button>
-
-              <button
-                type="button"
-                className={`${MT.actionSecondary} border-[#555] bg-[#1a1a1a] text-[#e2e2e2] transition hover:border-[#777] hover:bg-[#202020] hover:text-white disabled:opacity-50`}
-                onClick={() => resetWorkbench()}
-                disabled={busy}
-              >
-                Reset Workbench
-              </button>
-
                 <button
                   type="button"
                   className={`${MT.actionSecondary} border-[#2d4f8f] bg-[#15233d] text-[#c7d9ff] transition hover:border-[#4b73bd] hover:bg-[#1a2b48] hover:text-white disabled:opacity-50`}
@@ -2897,24 +2883,12 @@ export function EvalsPageClientV0_1() {
               </button>
               <button
                 type="button"
-                className={`${MT.actionUtility} border-dashed border-[#4a4a4a] bg-transparent text-[#c8c8c8] transition hover:border-[#777] hover:bg-[#1f1f1f] hover:text-white`}
-                onClick={loadExample}
-                disabled={busy}
-              >
-                Load example
-              </button>
-            </div>
-
-            <div className="flex flex-wrap items-center gap-3">
-              <button
-                type="button"
                 className={`${MT.actionUtility} border-[#444] bg-transparent text-[#b8b8b8] transition hover:border-[#777] hover:bg-[#1f1f1f] hover:text-[#f2f2f2] disabled:opacity-50`}
                 onClick={() => void onCopyRawJson()}
                 disabled={busy || !inputText.trim()}
               >
                 Copy Raw JSON
               </button>
-
               <button
                 type="button"
                 className={`${MT.actionUtility} border-[#444] bg-transparent text-[#b8b8b8] transition hover:border-[#777] hover:bg-[#1f1f1f] hover:text-[#f2f2f2] disabled:opacity-50`}
@@ -2923,6 +2897,17 @@ export function EvalsPageClientV0_1() {
               >
                 Copy CSV Row
               </button>
+              <button
+                type="button"
+                className={`${MT.actionUtility} border-dashed border-[#4a4a4a] bg-transparent text-[#c8c8c8] transition hover:border-[#777] hover:bg-[#1f1f1f] hover:text-white`}
+                onClick={loadExample}
+                disabled={busy}
+              >
+                Load example
+              </button>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2">
               {activeRunSeries ? (<><span className="rounded-full border border-[#7b6b2b] bg-[#211b0d] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#f5e7b0]">{activeRunSeries.label}</span><span className="rounded-full border border-[#4a4a4a] bg-[#121212] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#e6e6e6]">Next {activeSeriesNextOrdinal} / {activeRunSeries.targetCount}</span><span className="rounded-full border border-[#2f5a3d] bg-[#102016] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#bfe8cc]">Saved {activeSeriesSavedCount}</span><span className="rounded-full border border-[#2e4a37] bg-[#0f1512] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#def5e6]">Scored {activeSeriesScoredCount}</span><span className={activeSeriesExportReady ? "rounded-full border border-[#2f5a3d] bg-[#0f1512] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#def5e6]" : "rounded-full border border-[#5e4b22] bg-[#19140d] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#f0ddb0]"}>Export {activeSeriesExportReady ? "ready" : "blocked"}</span></>) : null}
             </div>
           </div>
