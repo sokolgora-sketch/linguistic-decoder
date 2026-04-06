@@ -2954,7 +2954,7 @@ export function EvalsPageClientV0_1() {
               </span>
             </div>
           ) : null}
-          <div className="space-y-3 pt-1">
+          <div className="space-y-0 pt-0">
             {mode === "run_bundle" && inputProbe.kind === "bucket_only" ? (
               <div className="rounded-[10px] border border-[#5b4a20] bg-[#1d1a12] px-5 py-4">
                 <div className="flex flex-wrap items-start gap-3">
@@ -3043,7 +3043,7 @@ export function EvalsPageClientV0_1() {
             ) : null}
           </div>
         {busy || apiErr || report || readyToScore ? (
-          <section className="space-y-8">
+          <section className="space-y-1">
             <div
               className={`rounded-[12px] border px-6 py-5 shadow-[0_10px_30px_rgba(0,0,0,0.18)] ${stateToneClass}`}
             >
