@@ -2631,8 +2631,8 @@ export function EvalsPageClientV0_1() {
                   </div>
                 ) : null}
 
-                <div className="mt-4 grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
-                  <div className="md:col-span-2 xl:col-span-4 rounded-[8px] border border-[#2f3b46] bg-[#12181d] px-4 py-3">
+                <div className="mt-4 grid grid-cols-1 gap-3">
+                  <div className="rounded-[8px] border border-[#2f3b46] bg-[#12181d] px-4 py-3">
                     <div className={`${MT.helper} text-[#b8c7d9]`}>
                       Leave sourceEngine* blank for hand-pasted buckets, external model outputs, or synthetic examples. The scorer cannot infer upstream engine provenance by itself.
                     </div>
