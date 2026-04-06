@@ -49,6 +49,9 @@ describe("Evals UI rendered mode regression v0.1", () => {
       expect(screen.getByText("Privacy")).toBeInTheDocument();
       expect(screen.getByText("How it works")).toBeInTheDocument();
         expect(
+          screen.getByRole("link", { name: "Help" })
+        ).toBeInTheDocument();
+        expect(
           screen.getByRole("link", { name: /Report feedback/i })
         ).toBeInTheDocument();
         expect(
