@@ -4569,6 +4569,51 @@ export function EvalsPageClientV0_1() {
                     ))}
                   </div>
                 </div>
+                <div
+                  className={
+                    activeRunSeries
+                      ? activeSeriesHasHardWarnings
+                        ? "mt-3 rounded-[10px] border border-[#6b3737] bg-[#211717] px-4 py-3"
+                        : activeSeriesNeedsAttention
+                          ? "mt-3 rounded-[10px] border border-[#5e4b22] bg-[#1b160d] px-4 py-3"
+                          : "mt-3 rounded-[10px] border border-[#2f5a3d] bg-[#101712] px-4 py-3"
+                      : "mt-3 rounded-[10px] border border-[#3b4f28] bg-[#11170e] px-4 py-3"
+                  }
+                >
+                  <div className="space-y-1">
+                    <div className={`${MT.sectionLabel} text-[#ededed]`}>Series health</div>
+                    <div className={activeRunSeries ? activeSeriesHasHardWarnings ? `${MT.helper} text-[#e0b3b3]` : activeSeriesNeedsAttention ? `${MT.helper} text-[#d6c59b]` : `${MT.helper} text-[#b7d8c1]` : `${MT.helper} text-[#a9b59a]`}>
+                      {activeRunSeries ? activeSeriesHasHardWarnings ? "Hard warning: duplicates detected in the active series." : activeSeriesNeedsAttention ? "Attention needed before the series is fully clean." : "Series is clean and export-ready." : "Read-only QA for the selected active series."}
+                    </div>
+                  </div>
+                  {activeRunSeries ? (
+                    <>
+                    <div className="mt-3 grid grid-cols-2 gap-1.5">
+                      <div className="rounded-[6px] border border-[#35442a] bg-[#10140d] px-2 py-1.5"><div className={`${MT.fieldLabel} text-[#93a286]`}>Saved</div><div className="mt-0.5 text-[12px] font-semibold text-[#f1f5ec]">{activeSeriesSavedCount} / {activeRunSeries.targetCount}</div></div>
+                      <div className="rounded-[6px] border border-[#2e4a37] bg-[#0f1512] px-2 py-1.5"><div className={`${MT.fieldLabel} text-[#8fb79d]`}>Scored</div><div className="mt-0.5 text-[12px] font-semibold text-[#def5e6]">{activeSeriesScoredCount}</div></div>
+                      <div className="rounded-[6px] border border-[#4d4631] bg-[#15120d] px-2 py-1.5"><div className={`${MT.fieldLabel} text-[#c0b287]`}>Unscored</div><div className="mt-0.5 text-[12px] font-semibold text-[#f2e5bb]">{activeSeriesUnscoredCount}</div></div>
+                      <div className="rounded-[6px] border border-[#5a3a2f] bg-[#1c120f] px-2 py-1.5"><div className={`${MT.fieldLabel} text-[#f0c3b4]`}>Remaining</div><div className="mt-0.5 text-[12px] font-semibold text-[#f0c3b4]">{activeSeriesRemainingCount}</div></div>
+                      <div className={activeSeriesHasHardWarnings ? "rounded-[6px] border border-[#6b3737] bg-[#1e1414] px-2 py-1.5" : activeSeriesNeedsAttention ? "rounded-[6px] border border-[#5e4b22] bg-[#19140d] px-2 py-1.5" : "rounded-[6px] border border-[#2f5a3d] bg-[#0f1512] px-2 py-1.5"}><div className={activeSeriesHasHardWarnings ? `${MT.fieldLabel} text-[#e0b0b0]` : activeSeriesNeedsAttention ? `${MT.fieldLabel} text-[#d6c59b]` : `${MT.fieldLabel} text-[#9fd0b0]`}>Export ready</div><div className={activeSeriesHasHardWarnings ? "mt-0.5 text-[12px] font-semibold text-[#ffd1d1]" : activeSeriesNeedsAttention ? "mt-0.5 text-[12px] font-semibold text-[#f0ddb0]" : "mt-0.5 text-[12px] font-semibold text-[#def5e6]"}>{activeSeriesExportReady ? "yes" : "no"}</div></div>
+                      <div className="rounded-[6px] border border-[#303030] bg-[#101010] px-2 py-1.5 col-span-2"><div className={`${MT.fieldLabel} text-[#9f9f9f]`}>Missing ordinals</div><div className="mt-0.5 text-[11px] font-mono text-[#ededed]">{activeSeriesMissingOrdinals.length === 0 ? "none" : formatOrdinalList(activeSeriesMissingOrdinals)}</div></div>
+                      <div className={activeSeriesDuplicateOrdinals.length > 0 ? "rounded-[6px] border border-[#6b3737] bg-[#1e1414] px-2 py-1.5" : "rounded-[6px] border border-[#303030] bg-[#101010] px-2 py-1.5"}><div className={activeSeriesDuplicateOrdinals.length > 0 ? `${MT.fieldLabel} text-[#e0b0b0]` : `${MT.fieldLabel} text-[#9f9f9f]`}>Dup ordinals</div><div className="mt-0.5 text-[11px] font-mono text-[#ededed]">{activeSeriesDuplicateOrdinals.length === 0 ? "none" : formatOrdinalList(activeSeriesDuplicateOrdinals)}</div></div>
+                      <div className={activeSeriesDuplicateRunIds.length > 0 ? "rounded-[6px] border border-[#6b3737] bg-[#1e1414] px-2 py-1.5" : "rounded-[6px] border border-[#303030] bg-[#101010] px-2 py-1.5"}><div className={activeSeriesDuplicateRunIds.length > 0 ? `${MT.fieldLabel} text-[#e0b0b0]` : `${MT.fieldLabel} text-[#9f9f9f]`}>Dup runIds</div><div className="mt-0.5 text-[11px] font-mono text-[#ededed]">{activeSeriesDuplicateRunIds.length === 0 ? "none" : formatRunIdList(activeSeriesDuplicateRunIds)}</div></div>
+                    </div>
+                    {activeSeriesHealthReasons.length > 0 ? (
+                      <div className={activeSeriesHasHardWarnings ? "mt-2 rounded-[6px] border border-[#6b3737] bg-[#1e1414] px-3 py-2" : "mt-2 rounded-[6px] border border-[#5e4b22] bg-[#19140d] px-3 py-2"}>
+                        <div className={activeSeriesHasHardWarnings ? `${MT.fieldLabel} text-[#e0b0b0]` : `${MT.fieldLabel} text-[#d6c59b]`}>Why export is blocked / not clean</div>
+                        <ul className={activeSeriesHasHardWarnings ? "mt-1 list-disc space-y-0.5 pl-4 text-[11px] leading-5 text-[#ffd1d1]" : "mt-1 list-disc space-y-0.5 pl-4 text-[11px] leading-5 text-[#f0ddb0]"}>
+                          {activeSeriesHealthReasons.map((reason) => <li key={reason}>{reason}</li>)}
+                        </ul>
+                        {activeSeriesHasHardWarnings ? (
+                          <div className="mt-2">
+                            <button type="button" className={`${MT.actionWarn} border-[#8a4a4a] bg-[#2a1717] text-[#ffd1d1] transition hover:border-[#d85858] hover:bg-[#361818] hover:text-white disabled:opacity-50`} onClick={cleanupActiveSeriesDuplicates} disabled={busy || activeSeriesDuplicateCleanupPlan.removeCount === 0}>Delete Later Duplicates ({activeSeriesDuplicateCleanupPlan.removeCount})</button>
+                          </div>
+                        ) : null}
+                      </div>
+                    ) : null}
+                    </>
+                  ) : null}
+                </div>
               </aside>
             </div>
         </section>
