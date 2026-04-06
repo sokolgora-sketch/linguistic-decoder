@@ -2853,7 +2853,7 @@ export function EvalsPageClientV0_1() {
               </div>
             </div>
           </div>
-          <div className="flex flex-col gap-3 pt-4">
+          <div className="flex flex-col gap-2 pt-0">
             <div className="flex flex-nowrap items-center gap-2 overflow-x-auto">
                 <button
                   type="button"
@@ -2907,9 +2907,25 @@ export function EvalsPageClientV0_1() {
               </button>
             </div>
 
-            <div className="flex flex-wrap items-center gap-2">
-              {activeRunSeries ? (<><span className="rounded-full border border-[#7b6b2b] bg-[#211b0d] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#f5e7b0]">{activeRunSeries.label}</span><span className="rounded-full border border-[#4a4a4a] bg-[#121212] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#e6e6e6]">Next {activeSeriesNextOrdinal} / {activeRunSeries.targetCount}</span><span className="rounded-full border border-[#2f5a3d] bg-[#102016] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#bfe8cc]">Saved {activeSeriesSavedCount}</span><span className="rounded-full border border-[#2e4a37] bg-[#0f1512] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#def5e6]">Scored {activeSeriesScoredCount}</span><span className={activeSeriesExportReady ? "rounded-full border border-[#2f5a3d] bg-[#0f1512] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#def5e6]" : "rounded-full border border-[#5e4b22] bg-[#19140d] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#f0ddb0]"}>Export {activeSeriesExportReady ? "ready" : "blocked"}</span></>) : null}
+            {activeRunSeries ? (
+            <div className={activeSeriesHasHardWarnings ? "rounded-[10px] border border-[#6b3737] bg-[#211717] px-4 py-3" : activeSeriesNeedsAttention ? "rounded-[10px] border border-[#5e4b22] bg-[#1b160d] px-4 py-3" : "rounded-[10px] border border-[#2f5a3d] bg-[#101712] px-4 py-3"}>
+              <div className={`${MT.sectionLabel} mb-1 text-[#ededed]`}>Active series status</div>
+              <div className={activeSeriesHasHardWarnings ? `${MT.helperCompact} mb-2 text-[#e0b3b3]` : activeSeriesNeedsAttention ? `${MT.helperCompact} mb-2 text-[#d6c59b]` : `${MT.helperCompact} mb-2 text-[#b7d8c1]`}>
+                {activeSeriesHasHardWarnings ? "Duplicates or export blockers present." : activeSeriesNeedsAttention ? "Series needs attention before export." : "Series is clean and ready for export."}
+              </div>
+              <div className="flex flex-wrap gap-1 justify-between">
+                <span className="rounded-full border border-[#7b6b2b] bg-[#211b0d] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#f5e7b0]">{activeRunSeries.label}</span>
+                <span className="rounded-full border border-[#4a4a4a] bg-[#121212] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#e6e6e6]">Next {activeSeriesNextOrdinal} / {activeRunSeries.targetCount}</span>
+                <span className="rounded-full border border-[#2f5a3d] bg-[#102016] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#bfe8cc]">Saved {activeSeriesSavedCount}</span>
+                <span className="rounded-full border border-[#2e4a37] bg-[#0f1512] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#def5e6]">Scored {activeSeriesScoredCount}</span>
+                <span className="rounded-full border border-[#4d4631] bg-[#15120d] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#f2e5bb]">Unscored {activeSeriesUnscoredCount}</span>
+                <span className="rounded-full border border-[#5a3a2f] bg-[#1c120f] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#f0c3b4]">Remaining {activeSeriesRemainingCount}</span>
+                <span className={activeSeriesExportReady ? "rounded-full border border-[#2f5a3d] bg-[#0f1512] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#def5e6]" : activeSeriesHasHardWarnings ? "rounded-full border border-[#6b3737] bg-[#1e1414] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#ffd1d1]" : "rounded-full border border-[#5e4b22] bg-[#19140d] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#f0ddb0]"}>Export {activeSeriesExportReady ? "ready" : "blocked"}</span>
+                {activeSeriesMissingOrdinals.length > 0 ? <span className="rounded-full border border-[#5e4b22] bg-[#19140d] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#f0ddb0]">Missing ordinals</span> : null}
+                {activeSeriesDuplicateOrdinals.length > 0 || activeSeriesDuplicateRunIds.length > 0 ? <span className="rounded-full border border-[#6b3737] bg-[#1e1414] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#ffd1d1]">Duplicates</span> : null}
+              </div>
             </div>
+            ) : null}
           </div>
           {false ? (
             <div>
@@ -2938,7 +2954,7 @@ export function EvalsPageClientV0_1() {
               </span>
             </div>
           ) : null}
-          <div className="space-y-3 pt-4">
+          <div className="space-y-3 pt-1">
             {mode === "run_bundle" && inputProbe.kind === "bucket_only" ? (
               <div className="rounded-[10px] border border-[#5b4a20] bg-[#1d1a12] px-5 py-4">
                 <div className="flex flex-wrap items-start gap-3">
@@ -3083,7 +3099,7 @@ export function EvalsPageClientV0_1() {
                 </div>
 
                 {report ? (
-                  <div className="mt-3 flex flex-wrap items-center gap-2 text-[11px]">
+                  <div className="mt-3 flex flex-nowrap items-center gap-2 overflow-x-auto text-[11px]">
                     <span className="text-[11px] uppercase tracking-[0.12em] text-[#9f9f9f]">
                       Run context
                     </span>
