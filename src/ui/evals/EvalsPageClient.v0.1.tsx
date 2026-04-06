@@ -2443,7 +2443,7 @@ export function EvalsPageClientV0_1() {
           <section className="rounded-[10px] border border-[#333] bg-[#141414] px-6 py-6">
             <div className="grid gap-6 xl:grid-cols-[320px_minmax(0,1fr)_minmax(340px,420px)] xl:items-start">
               <aside className="space-y-6 xl:sticky xl:top-6">
-          <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+          <div className="grid grid-cols-1 gap-3">
             <div>
               <label className={`${MT.fieldLabel} text-[#ededed]`}>
                 Input mode
