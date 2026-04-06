@@ -3103,15 +3103,11 @@ export function EvalsPageClientV0_1() {
                     <span className="text-[11px] uppercase tracking-[0.12em] text-[#9f9f9f]">
                       Run context
                     </span>
-                    <span className="rounded-full border border-[#3f3f3f] bg-[#0f0f0f] px-3 py-1.5 text-[#d7d7d7]">
-                      upstreamEngine{" "}
-                        <span
-                          className={`font-mono ${report.meta?.sourceEngineVersion?.trim() ? "text-white" : "text-[#8f8f8f]"}`}
-                        >
-                          {report.meta?.sourceEngineVersion?.trim()
-                            ? report.meta.sourceEngineVersion
-                            : "not provided"}
-                        </span>
+                    <span className="inline-flex flex-col rounded-full border border-[#3f3f3f] bg-[#0f0f0f] px-3 py-1 text-[#d7d7d7] leading-tight">
+                      <span className="text-[10px] uppercase tracking-[0.08em]">upstreamEngine</span>
+                      <span className={`font-mono text-[11px] ${report.meta?.sourceEngineVersion?.trim() ? "text-white" : "text-[#8f8f8f]"}`}>
+                        {report.meta?.sourceEngineVersion?.trim() ? report.meta.sourceEngineVersion : "not provided"}
+                      </span>
                     </span>
                     <span className="rounded-full border border-[#3f3f3f] bg-[#0f0f0f] px-3 py-1.5 text-[#d7d7d7]">
                       taskId{" "}
