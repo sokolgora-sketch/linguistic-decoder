@@ -2926,6 +2926,43 @@ export function EvalsPageClientV0_1() {
               </div>
             </div>
             ) : null}
+            <div className="mt-2">
+              <div className="rounded-[10px] border border-[#5a4c20] bg-[#18150d] px-5 py-4">
+                                <div className="flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
+                                  <div className="space-y-1">
+                                    <div className={`${MT.sectionLabel} text-[#ededed]`}>
+                                      Battery operator
+                                    </div>
+                                    <div className={`${MT.helper} text-[#b9af8a]`}>
+                                      Inspect the exact run payload that will be saved into the active series.
+                                    </div>
+                                  </div>
+              
+                                  {activeRunSeries ? (
+                                    <div className="min-w-0 flex-1 space-y-3">
+                                      <div className="grid gap-2 lg:grid-cols-2">
+                                        <div className="rounded-[8px] border border-[#303030] bg-[#101010] px-3 py-2">
+                                          <div className={`${MT.fieldLabel} text-[#9f9f9f]`}>RunId to save</div>
+                                          <div className="mt-1 overflow-x-auto font-mono text-[12px] text-[#ededed]">
+                                            {activeSeriesRunIdPreview || "—"}
+                                          </div>
+                                        </div>
+                                        <div className="rounded-[8px] border border-[#303030] bg-[#101010] px-3 py-2">
+                                          <div className={`${MT.fieldLabel} text-[#9f9f9f]`}>Label to save</div>
+                                          <div className="mt-1 overflow-x-auto font-mono text-[12px] text-[#ededed]">
+                                            {activeSeriesLabelPreview || "—"}
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  ) : (
+                                    <div className={`${MT.helper} text-[#b9af8a]`}>
+                                      No active series yet. Create or select a series to see live battery progress.
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+            </div>
           </div>
           {false ? (
             <div>
@@ -3640,42 +3677,6 @@ export function EvalsPageClientV0_1() {
                     </div>
                   </div>
 
-
-                <div className="rounded-[10px] border border-[#5a4c20] bg-[#18150d] px-5 py-4">
-                  <div className="flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
-                    <div className="space-y-1">
-                      <div className={`${MT.sectionLabel} text-[#ededed]`}>
-                        Battery operator
-                      </div>
-                      <div className={`${MT.helper} text-[#b9af8a]`}>
-                        Inspect the exact run payload that will be saved into the active series.
-                      </div>
-                    </div>
-
-                    {activeRunSeries ? (
-                      <div className="min-w-0 flex-1 space-y-3">
-                        <div className="grid gap-2 lg:grid-cols-2">
-                          <div className="rounded-[8px] border border-[#303030] bg-[#101010] px-3 py-2">
-                            <div className={`${MT.fieldLabel} text-[#9f9f9f]`}>RunId to save</div>
-                            <div className="mt-1 overflow-x-auto font-mono text-[12px] text-[#ededed]">
-                              {activeSeriesRunIdPreview || "—"}
-                            </div>
-                          </div>
-                          <div className="rounded-[8px] border border-[#303030] bg-[#101010] px-3 py-2">
-                            <div className={`${MT.fieldLabel} text-[#9f9f9f]`}>Label to save</div>
-                            <div className="mt-1 overflow-x-auto font-mono text-[12px] text-[#ededed]">
-                              {activeSeriesLabelPreview || "—"}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    ) : (
-                      <div className={`${MT.helper} text-[#b9af8a]`}>
-                        No active series yet. Create or select a series to see live battery progress.
-                      </div>
-                    )}
-                  </div>
-                </div>
 
 
               <div className="rounded-[10px] border border-[#2f3b46] bg-[#12181d] px-5 py-4">
