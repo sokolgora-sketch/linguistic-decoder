@@ -137,7 +137,7 @@ function TaskCard({ t }: { t: EvalTaskReportV0_1 }) {
     : "Direct score report for the user-supplied task.";
 
   return (
-    <section className={`rounded-[12px] border px-6 py-6 space-y-6 ${cardToneClass}`}>
+    <section className={`rounded-[12px] border px-4 py-3 space-y-6 ${cardToneClass}`}>
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="space-y-2">
           <div className="text-[12px] font-semibold uppercase tracking-[0.12em] text-[#b8b8b8]">
@@ -293,7 +293,7 @@ function TaskCard({ t }: { t: EvalTaskReportV0_1 }) {
         </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
-        <div className="rounded-[10px] border border-[#303030] bg-[#101010] px-5 py-5">
+        <div className="rounded-[10px] border border-[#303030] bg-[#101010] px-4 py-3">
           <div className="text-[12px] font-semibold uppercase tracking-[0.12em] text-[#dcdcdc]">
             Slope — aperturePrimary
           </div>
@@ -333,7 +333,7 @@ function TaskCard({ t }: { t: EvalTaskReportV0_1 }) {
           )}
         </div>
 
-        <div className="rounded-[10px] border border-[#303030] bg-[#101010] px-5 py-5">
+        <div className="rounded-[10px] border border-[#303030] bg-[#101010] px-4 py-3">
           <div className="text-[12px] font-semibold uppercase tracking-[0.12em] text-[#dcdcdc]">
             Slope — aperturePresenceMean
           </div>
@@ -377,10 +377,10 @@ function TaskCard({ t }: { t: EvalTaskReportV0_1 }) {
       </div>
 
       <details className="overflow-hidden rounded-[10px] border border-[#2f2f2f] bg-[#101010]">
-        <summary className="cursor-pointer px-5 py-4 text-[12px] font-semibold uppercase tracking-[0.12em] text-[#dcdcdc]">
+        <summary className="cursor-pointer px-4 py-3 text-[12px] font-semibold uppercase tracking-[0.12em] text-[#dcdcdc]">
           Diagnostics
         </summary>
-        <div className="border-t border-[#262626] bg-[#0c0c0c] px-5 py-5">
+        <div className="border-t border-[#262626] bg-[#0c0c0c] px-4 py-3">
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             <div className="rounded-[8px] border border-[#242424] bg-[#111111] px-4 py-4">
               <div className={`${MT.sectionLabel} text-[#b3b3b3]`}>
@@ -2354,7 +2354,7 @@ export function EvalsPageClientV0_1() {
         </div>
       </div>
 
-        <main className="flex w-full flex-col gap-8 px-2 pt-6 pb-16 xl:px-4">
+        <main className="flex w-full flex-col gap-5 px-2 pt-6 pb-16 xl:px-4">
           <section className="rounded-[14px] border border-[#2f3742] bg-[#13171d] px-6 py-4 shadow-[0_16px_40px_rgba(0,0,0,0.24)]">
             <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)] xl:items-start">
               <div className="space-y-4">
@@ -2440,7 +2440,7 @@ export function EvalsPageClientV0_1() {
 
 
 
-          <section className="rounded-[10px] border border-[#333] bg-[#141414] px-6 py-6">
+          <section className="rounded-[10px] border border-[#333] bg-[#141414] px-4 py-3">
             <div className="grid gap-6 xl:grid-cols-[320px_minmax(0,1fr)_minmax(340px,420px)] xl:items-start">
               <aside className="space-y-6 xl:sticky xl:top-6">
           <div className="grid grid-cols-1 gap-3">
@@ -2510,7 +2510,7 @@ export function EvalsPageClientV0_1() {
                 ▼
               </span>
             </summary>
-            <div className="border-t border-[#6a5a2a] bg-[#1d1a12] px-5 py-5">
+            <div className="border-t border-[#6a5a2a] bg-[#1d1a12] px-4 py-3">
               <div className="mb-4 flex items-center justify-end">
                 <button
                   type="button"
@@ -2678,7 +2678,7 @@ export function EvalsPageClientV0_1() {
             </details>
               </aside>
 
-              <div className="min-w-0 space-y-8">
+              <div className="min-w-0 space-y-5">
           <div className="space-y-2">
             <div className={`${MT.sectionLabel} text-[#ededed]`}>
               Input source
@@ -2689,7 +2689,7 @@ export function EvalsPageClientV0_1() {
           </div>
 
           <div className="grid grid-cols-1 gap-5 xl:grid-cols-[1fr_380px] xl:items-stretch">
-            <div className="rounded-[12px] border border-[#3a3a3a] bg-[#171717] px-6 py-6 h-full flex flex-col">
+            <div className="rounded-[12px] border border-[#3a3a3a] bg-[#171717] px-4 py-3 h-full flex flex-col">
               <div className="flex flex-wrap items-center gap-3">
                 <span className={`${MT.fieldLabelInline} text-[#ededed]`}>
                   Upload JSON
@@ -2783,7 +2783,7 @@ export function EvalsPageClientV0_1() {
                 <button type="button" className={`${MT.actionSecondary} border-[#555] bg-[#1a1a1a] text-[#e2e2e2] transition hover:border-[#777] hover:bg-[#202020] hover:text-white disabled:opacity-50`} onClick={() => resetWorkbench()} disabled={busy}>Reset Workbench</button>
               </div>
             </div>
-            <div className="rounded-[12px] border border-[#2d4a34] bg-[#0d1410] px-6 py-6">
+            <div className="rounded-[12px] border border-[#2d4a34] bg-[#0d1410] px-4 py-3">
               <div className="space-y-1">
                 <div className={`${MT.sectionLabel} text-[#ededed]`}>Run series</div>
                 <div className={`${MT.helper} text-[#a9a9a9]`}>Create a new series or select an active one.</div>
@@ -2927,7 +2927,7 @@ export function EvalsPageClientV0_1() {
             </div>
             ) : null}
             <div className="mt-2">
-              <div className="rounded-[10px] border border-[#5a4c20] bg-[#18150d] px-5 py-4">
+              <div className="rounded-[10px] border border-[#5a4c20] bg-[#18150d] px-4 py-3">
                                 <div className="flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
                                   <div className="space-y-1">
                                     <div className={`${MT.sectionLabel} text-[#ededed]`}>
@@ -2993,7 +2993,7 @@ export function EvalsPageClientV0_1() {
           ) : null}
           <div className="space-y-0 pt-0">
             {mode === "run_bundle" && inputProbe.kind === "bucket_only" ? (
-              <div className="rounded-[10px] border border-[#5b4a20] bg-[#1d1a12] px-5 py-4">
+              <div className="rounded-[10px] border border-[#5b4a20] bg-[#1d1a12] px-4 py-3">
                 <div className="flex flex-wrap items-start gap-3">
                   <div className="min-w-0 flex-1">
                     <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#f3d38b]">
@@ -3027,7 +3027,7 @@ export function EvalsPageClientV0_1() {
             {(inputProbe.kind === "corpus70_meta" || notice || apiErr) ? (
               <div className="pointer-events-none fixed bottom-4 right-4 z-[120] flex w-[min(420px,calc(100vw-2rem))] flex-col gap-3">
                 {inputProbe.kind === "corpus70_meta" ? (
-                  <div className="pointer-events-auto rounded-[10px] border border-[#5b3b3b] bg-[#1d1515] px-5 py-4 shadow-[0_10px_30px_rgba(0,0,0,0.35)]">
+                  <div className="pointer-events-auto rounded-[10px] border border-[#5b3b3b] bg-[#1d1515] px-4 py-3 shadow-[0_10px_30px_rgba(0,0,0,0.35)]">
                     <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#f1b4b4]">
                       Unsupported input
                     </div>
@@ -3040,7 +3040,7 @@ export function EvalsPageClientV0_1() {
                 ) : null}
 
                 {apiErr ? (
-                  <div className="pointer-events-auto rounded-[10px] border border-[#6a3d3d] bg-[#211717] px-5 py-4 shadow-[0_10px_30px_rgba(0,0,0,0.35)]">
+                  <div className="pointer-events-auto rounded-[10px] border border-[#6a3d3d] bg-[#211717] px-4 py-3 shadow-[0_10px_30px_rgba(0,0,0,0.35)]">
                     <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#f2b0b0]">
                       Error <span className="font-mono text-[#ffe4e4]">{apiErr.code}</span>
                     </div>
@@ -3052,8 +3052,8 @@ export function EvalsPageClientV0_1() {
                   <div
                     className={
                       noticeIsWarn
-                        ? "pointer-events-auto rounded-[10px] border border-[#6a3d3d] bg-[#211717] px-5 py-4 shadow-[0_10px_30px_rgba(0,0,0,0.35)]"
-                        : "pointer-events-auto rounded-[10px] border border-[#3e4a5b] bg-[#171b22] px-5 py-4 shadow-[0_10px_30px_rgba(0,0,0,0.35)]"
+                        ? "pointer-events-auto rounded-[10px] border border-[#6a3d3d] bg-[#211717] px-4 py-3 shadow-[0_10px_30px_rgba(0,0,0,0.35)]"
+                        : "pointer-events-auto rounded-[10px] border border-[#3e4a5b] bg-[#171b22] px-4 py-3 shadow-[0_10px_30px_rgba(0,0,0,0.35)]"
                     }
                   >
                     <div
@@ -3284,7 +3284,7 @@ export function EvalsPageClientV0_1() {
 
                   return (
                     <div
-                      className="mt-5 flex flex-wrap items-center gap-4 rounded-[12px] border border-[#3a3a3a] bg-[#161616] px-5 py-5 shadow-[0_8px_24px_rgba(0,0,0,0.14)]"
+                      className="mt-5 flex flex-wrap items-center gap-4 rounded-[12px] border border-[#3a3a3a] bg-[#161616] px-4 py-3 shadow-[0_8px_24px_rgba(0,0,0,0.14)]"
                       title={diagnosis.hint}
                     >
                       <span
@@ -3343,7 +3343,7 @@ export function EvalsPageClientV0_1() {
                         .join(" ");
 
                       return (
-                        <div className="mt-7 rounded-[12px] border border-[#3a3a3a] bg-[#101010] px-6 py-6 shadow-[0_8px_24px_rgba(0,0,0,0.14)]">
+                        <div className="mt-7 rounded-[12px] border border-[#3a3a3a] bg-[#101010] px-4 py-3 shadow-[0_8px_24px_rgba(0,0,0,0.14)]">
                           <div className="mb-1 text-[12px] font-semibold uppercase tracking-[0.14em] text-[#dddddd]">
                             Aperture trend by bucket
                           </div>
@@ -3477,12 +3477,12 @@ export function EvalsPageClientV0_1() {
               </>
             ) : null}
             <details className="rounded-[10px] border border-[#2a3540] bg-[#0e1318]" open>
-              <summary className="cursor-pointer px-5 py-4 text-[12px] font-semibold uppercase tracking-[0.12em] text-[#9fb1bf] transition hover:bg-[#111820] hover:text-[#d0dce8] [&::-webkit-details-marker]:hidden">
+              <summary className="cursor-pointer px-4 py-3 text-[12px] font-semibold uppercase tracking-[0.12em] text-[#9fb1bf] transition hover:bg-[#111820] hover:text-[#d0dce8] [&::-webkit-details-marker]:hidden">
                 Series dashboard · run management
               </summary>
             <div className="space-y-3 pt-4">
                   <div className="grid gap-4">
-                    <div className="rounded-[10px] border border-[#33424a] bg-[#10151a] px-5 py-4">
+                    <div className="rounded-[10px] border border-[#33424a] bg-[#10151a] px-4 py-3">
                       <div className="space-y-1">
                         <div className={`${MT.sectionLabel} text-[#ededed]`}>
                           Series dashboard
@@ -3679,7 +3679,7 @@ export function EvalsPageClientV0_1() {
 
 
 
-              <div className="rounded-[10px] border border-[#2f3b46] bg-[#12181d] px-5 py-4">
+              <div className="rounded-[10px] border border-[#2f3b46] bg-[#12181d] px-4 py-3">
                 <div className="flex flex-col gap-3 xl:flex-row xl:items-end xl:justify-between">
                   <div className="space-y-1">
                     <div className={`${MT.sectionLabel} text-[#ededed]`}>
@@ -3810,14 +3810,14 @@ export function EvalsPageClientV0_1() {
         ) : null}
 
         {report ? (
-          <section className="space-y-8 pt-6">
+          <section className="space-y-5 pt-6">
             <details className="rounded-[12px] border border-[#2a2a2a] bg-[#151515]">
               <summary className="cursor-pointer px-6 py-5 text-[12px] font-semibold uppercase tracking-[0.12em] text-[#adadad] transition hover:bg-[#1a1a1a] hover:text-[#d0d0d0] [&::-webkit-details-marker]:hidden">
                 Report · bundle metadata · markdown export
               </summary>
               <div className="px-6 pb-6">
 
-              <div className="mt-5 rounded-[10px] border border-[#262626] bg-[#101010] px-5 py-4">
+              <div className="mt-5 rounded-[10px] border border-[#262626] bg-[#101010] px-4 py-3">
                 <div className="space-y-1">
                   <div className={`${MT.sectionLabel} text-[#dfdfdf]`}>
                     Run metadata snapshot
@@ -3917,7 +3917,7 @@ export function EvalsPageClientV0_1() {
                 </div>
               </div>
 
-              <div className="mt-5 rounded-[10px] border border-[#2f2f2f] bg-[#101010] px-5 py-5">
+              <div className="mt-5 rounded-[10px] border border-[#2f2f2f] bg-[#101010] px-4 py-3">
                 <div className={`${MT.sectionLabel} text-[#dfdfdf]`}>
                   Device plate
                 </div>
@@ -4008,7 +4008,7 @@ export function EvalsPageClientV0_1() {
               </div>
 
               <div className="mt-5 overflow-hidden rounded-[10px] border border-[#262626] bg-[#101010]">
-                <div className="flex items-center justify-between gap-4 border-b border-[#262626] px-5 py-4">
+                <div className="flex items-center justify-between gap-4 border-b border-[#262626] px-4 py-3">
                   <div className="space-y-1">
                     <div className={`${MT.sectionLabel} text-[#dfdfdf]`}>
                       Markdown export preview
@@ -4029,7 +4029,7 @@ export function EvalsPageClientV0_1() {
                   </button>
                 </div>
                 <pre
-                  className={`overflow-x-auto whitespace-pre-wrap bg-[#0c0c0c] px-5 py-5 ${MT.markdownBody} text-[#d7d7d7]`}
+                  className={`overflow-x-auto whitespace-pre-wrap bg-[#0c0c0c] px-4 py-3 ${MT.markdownBody} text-[#d7d7d7]`}
                 >
                   {md || "(empty)"}
                 </pre>
@@ -4038,7 +4038,7 @@ export function EvalsPageClientV0_1() {
             </details>
 
             <details className="rounded-[10px] border border-[#2a3540] bg-[#0e1318]">
-              <summary className="cursor-pointer px-5 py-4 text-[12px] font-semibold uppercase tracking-[0.12em] text-[#9fb1bf] transition hover:bg-[#111820] hover:text-[#d0dce8] [&::-webkit-details-marker]:hidden">
+              <summary className="cursor-pointer px-4 py-3 text-[12px] font-semibold uppercase tracking-[0.12em] text-[#9fb1bf] transition hover:bg-[#111820] hover:text-[#d0dce8] [&::-webkit-details-marker]:hidden">
                 Task reports · per-task breakdown
               </summary>
               <div className="space-y-7 px-5 pb-5">
@@ -4059,7 +4059,7 @@ export function EvalsPageClientV0_1() {
                 </section>
 
               {report.tasks.some((t) => t.kind !== "byo") ? (
-                <section className="mt-3 rounded-[12px] border border-[#303030] bg-[#171717] px-5 py-5 space-y-4">
+                <section className="mt-3 rounded-[12px] border border-[#303030] bg-[#171717] px-4 py-3 space-y-4">
                   <div className="space-y-1">
                     <div className={`${MT.sectionLabel} text-[#b3b3b3]`}>
                       Validation controls
@@ -4084,7 +4084,7 @@ export function EvalsPageClientV0_1() {
         ) : null}
               </div>
               <aside className="hidden xl:block xl:sticky xl:top-[96px] xl:self-start">
-                <div className="rounded-[10px] border border-[#33424a] bg-[#10151a] px-5 py-4">
+                <div className="rounded-[10px] border border-[#33424a] bg-[#10151a] px-4 py-3">
                   <div className="space-y-1">
                     <div className={`${MT.sectionLabel} text-[#ededed]`}>
                       Operator checklist
