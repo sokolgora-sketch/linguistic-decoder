@@ -137,7 +137,7 @@ function TaskCard({ t }: { t: EvalTaskReportV0_1 }) {
     : "Direct score report for the user-supplied task.";
 
   return (
-    <section className={`rounded-[12px] border px-4 py-3 space-y-6 ${cardToneClass}`}>
+    <section className={`rounded-[12px] border px-3 py-2 space-y-3 ${cardToneClass}`}>
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="space-y-2">
           <div className="text-[12px] font-semibold uppercase tracking-[0.12em] text-[#b8b8b8]">
@@ -186,28 +186,28 @@ function TaskCard({ t }: { t: EvalTaskReportV0_1 }) {
         <table className="w-full border-collapse text-[12px]">
           <thead>
             <tr className="border-b border-[#303030] bg-[#121212]">
-              <th className="px-3 py-3 text-left text-[11px] font-semibold uppercase tracking-[0.12em] text-[#b0b0b0]">
+              <th className="px-3 py-2 text-left text-[11px] font-semibold uppercase tracking-[0.12em] text-[#b0b0b0]">
                 Bucket
               </th>
-              <th className="px-3 py-3 text-right text-[11px] font-semibold uppercase tracking-[0.12em] text-[#b0b0b0]">
+              <th className="px-3 py-2 text-right text-[11px] font-semibold uppercase tracking-[0.12em] text-[#b0b0b0]">
                 Expected
               </th>
-              <th className="px-3 py-3 text-right text-[11px] font-semibold uppercase tracking-[0.12em] text-[#b0b0b0]">
+              <th className="px-3 py-2 text-right text-[11px] font-semibold uppercase tracking-[0.12em] text-[#b0b0b0]">
                 Provided
               </th>
-              <th className="px-3 py-3 text-right text-[11px] font-semibold uppercase tracking-[0.12em] text-[#b0b0b0]">
+              <th className="px-3 py-2 text-right text-[11px] font-semibold uppercase tracking-[0.12em] text-[#b0b0b0]">
                 Valid
               </th>
-              <th className="px-3 py-3 text-right text-[11px] font-semibold uppercase tracking-[0.12em] text-[#b0b0b0]">
+              <th className="px-3 py-2 text-right text-[11px] font-semibold uppercase tracking-[0.12em] text-[#b0b0b0]">
                 Invalid
               </th>
-              <th className="px-3 py-3 text-right text-[11px] font-semibold uppercase tracking-[0.12em] text-[#b0b0b0]">
+              <th className="px-3 py-2 text-right text-[11px] font-semibold uppercase tracking-[0.12em] text-[#b0b0b0]">
                 Dup
               </th>
-              <th className="px-3 py-3 text-right text-[11px] font-semibold uppercase tracking-[0.12em] text-[#b0b0b0]">
+              <th className="px-3 py-2 text-right text-[11px] font-semibold uppercase tracking-[0.12em] text-[#b0b0b0]">
                 Mean primary
               </th>
-              <th className="px-3 py-3 text-right text-[11px] font-semibold uppercase tracking-[0.12em] text-[#b0b0b0]">
+              <th className="px-3 py-2 text-right text-[11px] font-semibold uppercase tracking-[0.12em] text-[#b0b0b0]">
                 Mean presence
               </th>
             </tr>
@@ -293,12 +293,12 @@ function TaskCard({ t }: { t: EvalTaskReportV0_1 }) {
         </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
-        <div className="rounded-[10px] border border-[#303030] bg-[#101010] px-4 py-3">
+        <div className="rounded-[10px] border border-[#303030] bg-[#101010] px-3 py-2">
           <div className="text-[12px] font-semibold uppercase tracking-[0.12em] text-[#dcdcdc]">
             Slope — aperturePrimary
           </div>
           {t.slope_aperturePrimary ? (
-            <div className="mt-4 space-y-3 text-[12px] leading-7 text-[#cfcfcf]">
+            <div className="mt-2 space-y-3 text-[12px] leading-7 text-[#cfcfcf]">
               <div>
                 pearson r{" "}
                 <span className="font-mono text-white">
@@ -333,12 +333,12 @@ function TaskCard({ t }: { t: EvalTaskReportV0_1 }) {
           )}
         </div>
 
-        <div className="rounded-[10px] border border-[#303030] bg-[#101010] px-4 py-3">
+        <div className="rounded-[10px] border border-[#303030] bg-[#101010] px-3 py-2">
           <div className="text-[12px] font-semibold uppercase tracking-[0.12em] text-[#dcdcdc]">
             Slope — aperturePresenceMean
           </div>
           {t.slope_aperturePresenceMean ? (
-            <div className="mt-4 space-y-3 text-[12px] leading-7 text-[#cfcfcf]">
+            <div className="mt-2 space-y-3 text-[12px] leading-7 text-[#cfcfcf]">
               <div>
                 pearson r{" "}
                 <span className="font-mono text-white">
@@ -377,12 +377,12 @@ function TaskCard({ t }: { t: EvalTaskReportV0_1 }) {
       </div>
 
       <details className="overflow-hidden rounded-[10px] border border-[#2f2f2f] bg-[#101010]">
-        <summary className="cursor-pointer px-4 py-3 text-[12px] font-semibold uppercase tracking-[0.12em] text-[#dcdcdc]">
+        <summary className="cursor-pointer px-3 py-2 text-[12px] font-semibold uppercase tracking-[0.12em] text-[#dcdcdc]">
           Diagnostics
         </summary>
-        <div className="border-t border-[#262626] bg-[#0c0c0c] px-4 py-3">
+        <div className="border-t border-[#262626] bg-[#0c0c0c] px-3 py-2">
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-            <div className="rounded-[8px] border border-[#242424] bg-[#111111] px-4 py-4">
+            <div className="rounded-[8px] border border-[#242424] bg-[#111111] px-3 py-2">
               <div className={`${MT.sectionLabel} text-[#b3b3b3]`}>
                 Missing buckets
               </div>
@@ -390,7 +390,7 @@ function TaskCard({ t }: { t: EvalTaskReportV0_1 }) {
                 {joinList(t.diagnostics.missingBuckets)}
               </div>
             </div>
-            <div className="rounded-[8px] border border-[#242424] bg-[#111111] px-4 py-4">
+            <div className="rounded-[8px] border border-[#242424] bg-[#111111] px-3 py-2">
               <div className={`${MT.sectionLabel} text-[#b3b3b3]`}>
                 Extra buckets
               </div>
@@ -398,7 +398,7 @@ function TaskCard({ t }: { t: EvalTaskReportV0_1 }) {
                 {joinList(t.diagnostics.extraBuckets)}
               </div>
             </div>
-            <div className="rounded-[8px] border border-[#242424] bg-[#111111] px-4 py-4">
+            <div className="rounded-[8px] border border-[#242424] bg-[#111111] px-3 py-2">
               <div className={`${MT.sectionLabel} text-[#b3b3b3]`}>
                 Empty tokens
               </div>
@@ -406,7 +406,7 @@ function TaskCard({ t }: { t: EvalTaskReportV0_1 }) {
                 {t.diagnostics.emptyTokenCount}
               </div>
             </div>
-            <div className="rounded-[8px] border border-[#242424] bg-[#111111] px-4 py-4">
+            <div className="rounded-[8px] border border-[#242424] bg-[#111111] px-3 py-2">
               <div className={`${MT.sectionLabel} text-[#b3b3b3]`}>
                 Whitespace tokens
               </div>
@@ -414,7 +414,7 @@ function TaskCard({ t }: { t: EvalTaskReportV0_1 }) {
                 {t.diagnostics.whitespaceTokenCount}
               </div>
             </div>
-            <div className="rounded-[8px] border border-[#242424] bg-[#111111] px-4 py-4">
+            <div className="rounded-[8px] border border-[#242424] bg-[#111111] px-3 py-2">
               <div className={`${MT.sectionLabel} text-[#b3b3b3]`}>
                 No-vowel tokens
               </div>
@@ -422,7 +422,7 @@ function TaskCard({ t }: { t: EvalTaskReportV0_1 }) {
                 {t.diagnostics.noVowelTokenCount}
               </div>
             </div>
-            <div className="rounded-[8px] border border-[#242424] bg-[#111111] px-4 py-4">
+            <div className="rounded-[8px] border border-[#242424] bg-[#111111] px-3 py-2">
               <div className={`${MT.sectionLabel} text-[#b3b3b3]`}>
                 Total invalid
               </div>
@@ -432,7 +432,7 @@ function TaskCard({ t }: { t: EvalTaskReportV0_1 }) {
             </div>
           </div>
 
-          <div className="mt-4 rounded-[8px] border border-[#242424] bg-[#111111] px-4 py-4">
+          <div className="mt-2 rounded-[8px] border border-[#242424] bg-[#111111] px-3 py-2">
             <div className={`${MT.sectionLabel} text-[#b3b3b3]`}>Notes</div>
             <div className="mt-2 font-mono text-[14px] leading-7 text-[#f2f2f2]">
               {t.diagnostics.notes.length
@@ -2354,10 +2354,10 @@ export function EvalsPageClientV0_1() {
         </div>
       </div>
 
-        <main className="flex w-full flex-col gap-5 px-2 pt-6 pb-16 xl:px-4">
+        <main className="flex w-full flex-col gap-3 px-2 pt-6 pb-16 xl:px-4">
           <section className="rounded-[14px] border border-[#2f3742] bg-[#13171d] px-6 py-4 shadow-[0_16px_40px_rgba(0,0,0,0.24)]">
-            <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)] xl:items-start">
-              <div className="space-y-4">
+            <div className="grid gap-3 xl:grid-cols-[minmax(0,1fr)] xl:items-start">
+              <div className="space-y-2">
                 <div className="space-y-3">
                   <div className={`${MT.eyebrow} text-[#d7dde7]`}>
                     instrument · evals
@@ -2396,7 +2396,7 @@ export function EvalsPageClientV0_1() {
                 </div>
 
                 <details className="rounded-[12px] border border-[#4a3a1b] bg-[#17130d]">
-                  <summary className="cursor-pointer px-4 py-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#f3d38b] transition hover:bg-[#1f1a10] [&::-webkit-details-marker]:hidden">
+                  <summary className="cursor-pointer px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#f3d38b] transition hover:bg-[#1f1a10] [&::-webkit-details-marker]:hidden">
                     {EVALS_BETA_INTRO_TITLE}
                   </summary>
                   <div className="px-4 pb-4 text-[12px] leading-6 text-[#d7cfbb]">
@@ -2405,7 +2405,7 @@ export function EvalsPageClientV0_1() {
                 </details>
 
                 <div className="grid gap-3 md:grid-cols-3">
-                  <div className="rounded-[12px] border border-[#303845] bg-[#171c23] px-4 py-4">
+                  <div className="rounded-[12px] border border-[#303845] bg-[#171c23] px-3 py-2">
                     <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#d7deea]">
                       What to paste
                     </div>
@@ -2414,7 +2414,7 @@ export function EvalsPageClientV0_1() {
                     </div>
                   </div>
 
-                  <div className="rounded-[12px] border border-[#303845] bg-[#171c23] px-4 py-4">
+                  <div className="rounded-[12px] border border-[#303845] bg-[#171c23] px-3 py-2">
                     <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#d7deea]">
                       Privacy
                     </div>
@@ -2423,7 +2423,7 @@ export function EvalsPageClientV0_1() {
                     </div>
                   </div>
 
-                  <div className="rounded-[12px] border border-[#303845] bg-[#171c23] px-4 py-4">
+                  <div className="rounded-[12px] border border-[#303845] bg-[#171c23] px-3 py-2">
                     <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#d7deea]">
                       How it works
                     </div>
@@ -2440,16 +2440,16 @@ export function EvalsPageClientV0_1() {
 
 
 
-          <section className="rounded-[10px] border border-[#333] bg-[#141414] px-4 py-3">
-            <div className="grid gap-6 xl:grid-cols-[320px_minmax(0,1fr)_minmax(340px,420px)] xl:items-start">
-              <aside className="space-y-6 xl:sticky xl:top-6">
+          <section className="rounded-[10px] border border-[#333] bg-[#141414] px-3 py-2">
+            <div className="grid gap-3 xl:grid-cols-[320px_minmax(0,1fr)_minmax(340px,420px)] xl:items-start">
+              <aside className="space-y-3 xl:sticky xl:top-6">
           <div className="grid grid-cols-1 gap-3">
             <div>
               <label className={`${MT.fieldLabel} text-[#ededed]`}>
                 Input mode
               </label>
               <select
-                className={`w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[11px] ${MT.fieldControl} text-[#e6e6e6] outline-none transition focus:border-[#666]`}
+                className={`w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[7px] ${MT.fieldControl} text-[#e6e6e6] outline-none transition focus:border-[#666]`}
                 value={mode}
                 onChange={(e) => setMode(e.target.value as any)}
               >
@@ -2469,7 +2469,7 @@ export function EvalsPageClientV0_1() {
                   : "Task source"}
               </label>
               <select
-                className={`w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[11px] ${MT.fieldControl} text-[#e6e6e6] outline-none transition focus:border-[#666] disabled:opacity-35`}
+                className={`w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[7px] ${MT.fieldControl} text-[#e6e6e6] outline-none transition focus:border-[#666] disabled:opacity-35`}
                 value={
                   mode === "task_buckets"
                     ? (selectedTask?.taskId ?? "")
@@ -2510,7 +2510,7 @@ export function EvalsPageClientV0_1() {
                 ▼
               </span>
             </summary>
-            <div className="border-t border-[#6a5a2a] bg-[#1d1a12] px-4 py-3">
+            <div className="border-t border-[#6a5a2a] bg-[#1d1a12] px-3 py-2">
               <div className="mb-4 flex items-center justify-end">
                 <button
                   type="button"
@@ -2549,7 +2549,7 @@ export function EvalsPageClientV0_1() {
                 <div>
                 <label className={`${MT.fieldLabel} text-[#ededed]`}>runId</label>
                 <input
-                    className={`w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[11px] font-mono text-[13px] ${MT.fieldControl} text-[#e6e6e6] outline-none transition focus:border-[#666]`}
+                    className={`w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[7px] font-mono text-[13px] ${MT.fieldControl} text-[#e6e6e6] outline-none transition focus:border-[#666]`}
                   value={runId}
                   onChange={(e) => setRunId(e.target.value)}
                 />
@@ -2560,7 +2560,7 @@ export function EvalsPageClientV0_1() {
                   provider
                 </label>
                 <input
-                  className={`w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[11px] ${MT.fieldControl} text-[#e6e6e6] outline-none transition focus:border-[#666]`}
+                  className={`w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[7px] ${MT.fieldControl} text-[#e6e6e6] outline-none transition focus:border-[#666]`}
                   value={provider}
                   onChange={(e) => setProvider(e.target.value)}
                   placeholder="e.g. openai"
@@ -2570,7 +2570,7 @@ export function EvalsPageClientV0_1() {
               <div>
                 <label className={`${MT.fieldLabel} text-[#ededed]`}>model</label>
                 <input
-                  className={`w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[11px] ${MT.fieldControl} text-[#e6e6e6] outline-none transition focus:border-[#666]`}
+                  className={`w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[7px] ${MT.fieldControl} text-[#e6e6e6] outline-none transition focus:border-[#666]`}
                   value={model}
                   onChange={(e) => setModel(e.target.value)}
                   placeholder="e.g. gpt-4o"
@@ -2580,7 +2580,7 @@ export function EvalsPageClientV0_1() {
               <div>
                 <label className={`${MT.fieldLabel} text-[#ededed]`}>label</label>
                 <input
-                  className={`w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[11px] ${MT.fieldControl} text-[#e6e6e6] outline-none transition focus:border-[#666]`}
+                  className={`w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[7px] ${MT.fieldControl} text-[#e6e6e6] outline-none transition focus:border-[#666]`}
                   value={label}
                   onChange={(e) => setLabel(e.target.value)}
                   placeholder="e.g. fresh-chat"
@@ -2589,8 +2589,8 @@ export function EvalsPageClientV0_1() {
             </div>
 
 
-            <details className="group mt-6 overflow-hidden rounded-[8px] border border-[#2f3b46] bg-[#12181d]">
-              <summary className="flex cursor-pointer list-none items-start justify-between gap-3 px-4 py-4">
+            <details className="group mt-3 overflow-hidden rounded-[8px] border border-[#2f3b46] bg-[#12181d]">
+              <summary className="flex cursor-pointer list-none items-start justify-between gap-3 px-3 py-2">
                 <div className="space-y-2">
                   <div className={`${MT.sectionLabel} text-[#ededed]`}>
                     Upstream engine provenance
@@ -2604,7 +2604,7 @@ export function EvalsPageClientV0_1() {
                 </span>
               </summary>
 
-              <div className="border-t border-[#2f3b46] px-4 py-4">
+              <div className="border-t border-[#2f3b46] px-3 py-2">
                 {showAnalyzeV1Autofill ? (
                   <div className="flex flex-col items-start gap-2">
                     <div className="flex flex-wrap items-center gap-2">
@@ -2631,8 +2631,8 @@ export function EvalsPageClientV0_1() {
                   </div>
                 ) : null}
 
-                <div className="mt-4 grid grid-cols-1 gap-3">
-                  <div className="rounded-[8px] border border-[#2f3b46] bg-[#12181d] px-4 py-3">
+                <div className="mt-2 grid grid-cols-1 gap-3">
+                  <div className="rounded-[8px] border border-[#2f3b46] bg-[#12181d] px-3 py-2">
                     <div className={`${MT.helper} text-[#b8c7d9]`}>
                       Leave sourceEngine* blank for hand-pasted buckets, external model outputs, or synthetic examples. The scorer cannot infer upstream engine provenance by itself.
                     </div>
@@ -2643,7 +2643,7 @@ export function EvalsPageClientV0_1() {
                       sourceEngineId
                     </label>
                     <input
-                      className={`w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[11px] ${MT.fieldControl} text-[#e6e6e6] outline-none transition focus:border-[#666]`}
+                      className={`w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[7px] ${MT.fieldControl} text-[#e6e6e6] outline-none transition focus:border-[#666]`}
                       value={sourceEngineId}
                       onChange={(e) => setSourceEngineId(e.target.value)}
                       placeholder="e.g. zero-api"
@@ -2655,7 +2655,7 @@ export function EvalsPageClientV0_1() {
                       sourceEngineVersion
                     </label>
                     <input
-                      className={`w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[11px] ${MT.fieldControl} text-[#e6e6e6] outline-none transition focus:border-[#666]`}
+                      className={`w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[7px] ${MT.fieldControl} text-[#e6e6e6] outline-none transition focus:border-[#666]`}
                       value={sourceEngineVersion}
                       onChange={(e) => setSourceEngineVersion(e.target.value)}
                       placeholder="e.g. analyze-v1"
@@ -2667,7 +2667,7 @@ export function EvalsPageClientV0_1() {
                       sourceEngineBuild
                     </label>
                     <input
-                      className={`w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[11px] ${MT.fieldControl} text-[#e6e6e6] outline-none transition focus:border-[#666]`}
+                      className={`w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[7px] ${MT.fieldControl} text-[#e6e6e6] outline-none transition focus:border-[#666]`}
                       value={sourceEngineBuild}
                       onChange={(e) => setSourceEngineBuild(e.target.value)}
                       placeholder="e.g. 845bb5a"
@@ -2678,7 +2678,7 @@ export function EvalsPageClientV0_1() {
             </details>
               </aside>
 
-              <div className="min-w-0 space-y-5">
+              <div className="min-w-0 space-y-3">
           <div className="space-y-2">
             <div className={`${MT.sectionLabel} text-[#ededed]`}>
               Input source
@@ -2688,8 +2688,8 @@ export function EvalsPageClientV0_1() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 gap-5 xl:grid-cols-[1fr_380px] xl:items-stretch">
-            <div className="rounded-[12px] border border-[#3a3a3a] bg-[#171717] px-4 py-3 h-full flex flex-col">
+          <div className="grid grid-cols-1 gap-3 xl:grid-cols-[1fr_380px] xl:items-stretch">
+            <div className="rounded-[12px] border border-[#3a3a3a] bg-[#171717] px-3 py-2 h-full flex flex-col">
               <div className="flex flex-wrap items-center gap-3">
                 <span className={`${MT.fieldLabelInline} text-[#ededed]`}>
                   Upload JSON
@@ -2701,7 +2701,7 @@ export function EvalsPageClientV0_1() {
 
               <div className="mt-5 flex flex-wrap items-center gap-4">
                 <label
-                  className={`inline-flex cursor-pointer items-center rounded-[6px] border border-[#3a3a3a] bg-[#1e1e1e] px-4 py-3 ${MT.actionMd} text-[#dfdfdf] transition hover:border-[#666] hover:bg-[#252525] hover:text-white`}
+                  className={`inline-flex cursor-pointer items-center rounded-[6px] border border-[#3a3a3a] bg-[#1e1e1e] px-3 py-2 ${MT.actionMd} text-[#dfdfdf] transition hover:border-[#666] hover:bg-[#252525] hover:text-white`}
                 >
                   <input
                     type="file"
@@ -2783,16 +2783,16 @@ export function EvalsPageClientV0_1() {
                 <button type="button" className={`${MT.actionSecondary} border-[#555] bg-[#1a1a1a] text-[#e2e2e2] transition hover:border-[#777] hover:bg-[#202020] hover:text-white disabled:opacity-50`} onClick={() => resetWorkbench()} disabled={busy}>Reset Workbench</button>
               </div>
             </div>
-            <div className="rounded-[12px] border border-[#2d4a34] bg-[#0d1410] px-4 py-3">
+            <div className="rounded-[12px] border border-[#2d4a34] bg-[#0d1410] px-3 py-2">
               <div className="space-y-1">
                 <div className={`${MT.sectionLabel} text-[#ededed]`}>Run series</div>
                 <div className={`${MT.helper} text-[#a9a9a9]`}>Create a new series or select an active one.</div>
               </div>
-              <div className="mt-4 flex flex-col gap-3">
+              <div className="mt-2 flex flex-col gap-3">
                 <div>
                   <label className={`${MT.fieldLabel} text-[#ededed]`}>Series label</label>
                   <input
-                    className={`mt-1 w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[11px] ${MT.fieldControl} text-[#e6e6e6] outline-none transition focus:border-[#666]`}
+                    className={`mt-1 w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[7px] ${MT.fieldControl} text-[#e6e6e6] outline-none transition focus:border-[#666]`}
                     value={seriesLabelDraft}
                     onChange={(e) => setSeriesLabelDraft(e.target.value)}
                     placeholder="fresh-chat"
@@ -2803,7 +2803,7 @@ export function EvalsPageClientV0_1() {
                   <label className={`${MT.fieldLabel} text-[#ededed]`}>Target count</label>
                   <input
                     type="number" min="1" step="1"
-                    className={`mt-1 w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[11px] ${MT.fieldControl} text-[#e6e6e6] outline-none transition focus:border-[#666]`}
+                    className={`mt-1 w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[7px] ${MT.fieldControl} text-[#e6e6e6] outline-none transition focus:border-[#666]`}
                     value={seriesTargetCountDraft}
                     onChange={(e) => setSeriesTargetCountDraft(e.target.value)}
                     disabled={busy}
@@ -2812,7 +2812,7 @@ export function EvalsPageClientV0_1() {
                 <div>
                   <label className={`${MT.fieldLabel} text-[#ededed]`}>Active series</label>
                   <select
-                    className={`mt-1 w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[11px] ${MT.fieldControl} text-[#e6e6e6] outline-none transition focus:border-[#666]`}
+                    className={`mt-1 w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[7px] ${MT.fieldControl} text-[#e6e6e6] outline-none transition focus:border-[#666]`}
                     value={selectedSeriesId}
                     onChange={(e) => setSelectedSeriesId(e.target.value)}
                     disabled={busy || runSeries.length === 0}
@@ -2837,7 +2837,7 @@ export function EvalsPageClientV0_1() {
                   Create Series
                 </button>
               </div>
-              <div className="mt-4 border-t border-[#1a2d1e] pt-4">
+              <div className="mt-2 border-t border-[#1a2d1e] pt-4">
                 <div className="space-y-1">
                   <div className={`${MT.sectionLabel} text-[#ededed]`}>Series actions</div>
                   <div className={`${MT.helperCompact} text-[#9fb3a4]`}>Save next, export, or delete the active series.</div>
@@ -2908,7 +2908,7 @@ export function EvalsPageClientV0_1() {
             </div>
 
             {activeRunSeries ? (
-            <div className={activeSeriesHasHardWarnings ? "rounded-[10px] border border-[#6b3737] bg-[#211717] px-4 py-3" : activeSeriesNeedsAttention ? "rounded-[10px] border border-[#5e4b22] bg-[#1b160d] px-4 py-3" : "rounded-[10px] border border-[#2f5a3d] bg-[#101712] px-4 py-3"}>
+            <div className={activeSeriesHasHardWarnings ? "rounded-[10px] border border-[#6b3737] bg-[#211717] px-3 py-2" : activeSeriesNeedsAttention ? "rounded-[10px] border border-[#5e4b22] bg-[#1b160d] px-3 py-2" : "rounded-[10px] border border-[#2f5a3d] bg-[#101712] px-3 py-2"}>
               <div className={`${MT.sectionLabel} mb-1 text-[#ededed]`}>Active series status</div>
               <div className={activeSeriesHasHardWarnings ? `${MT.helperCompact} mb-2 text-[#e0b3b3]` : activeSeriesNeedsAttention ? `${MT.helperCompact} mb-2 text-[#d6c59b]` : `${MT.helperCompact} mb-2 text-[#b7d8c1]`}>
                 {activeSeriesHasHardWarnings ? "Duplicates or export blockers present." : activeSeriesNeedsAttention ? "Series needs attention before export." : "Series is clean and ready for export."}
@@ -2927,7 +2927,7 @@ export function EvalsPageClientV0_1() {
             </div>
             ) : null}
             <div className="mt-2">
-              <div className="rounded-[10px] border border-[#5a4c20] bg-[#18150d] px-4 py-3">
+              <div className="rounded-[10px] border border-[#5a4c20] bg-[#18150d] px-3 py-2">
                                 <div className="flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
                                   <div className="space-y-1">
                                     <div className={`${MT.sectionLabel} text-[#ededed]`}>
@@ -2993,7 +2993,7 @@ export function EvalsPageClientV0_1() {
           ) : null}
           <div className="space-y-0 pt-0">
             {mode === "run_bundle" && inputProbe.kind === "bucket_only" ? (
-              <div className="rounded-[10px] border border-[#5b4a20] bg-[#1d1a12] px-4 py-3">
+              <div className="rounded-[10px] border border-[#5b4a20] bg-[#1d1a12] px-3 py-2">
                 <div className="flex flex-wrap items-start gap-3">
                   <div className="min-w-0 flex-1">
                     <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#f3d38b]">
@@ -3027,7 +3027,7 @@ export function EvalsPageClientV0_1() {
             {(inputProbe.kind === "corpus70_meta" || notice || apiErr) ? (
               <div className="pointer-events-none fixed bottom-4 right-4 z-[120] flex w-[min(420px,calc(100vw-2rem))] flex-col gap-3">
                 {inputProbe.kind === "corpus70_meta" ? (
-                  <div className="pointer-events-auto rounded-[10px] border border-[#5b3b3b] bg-[#1d1515] px-4 py-3 shadow-[0_10px_30px_rgba(0,0,0,0.35)]">
+                  <div className="pointer-events-auto rounded-[10px] border border-[#5b3b3b] bg-[#1d1515] px-3 py-2 shadow-[0_10px_30px_rgba(0,0,0,0.35)]">
                     <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#f1b4b4]">
                       Unsupported input
                     </div>
@@ -3040,7 +3040,7 @@ export function EvalsPageClientV0_1() {
                 ) : null}
 
                 {apiErr ? (
-                  <div className="pointer-events-auto rounded-[10px] border border-[#6a3d3d] bg-[#211717] px-4 py-3 shadow-[0_10px_30px_rgba(0,0,0,0.35)]">
+                  <div className="pointer-events-auto rounded-[10px] border border-[#6a3d3d] bg-[#211717] px-3 py-2 shadow-[0_10px_30px_rgba(0,0,0,0.35)]">
                     <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#f2b0b0]">
                       Error <span className="font-mono text-[#ffe4e4]">{apiErr.code}</span>
                     </div>
@@ -3052,8 +3052,8 @@ export function EvalsPageClientV0_1() {
                   <div
                     className={
                       noticeIsWarn
-                        ? "pointer-events-auto rounded-[10px] border border-[#6a3d3d] bg-[#211717] px-4 py-3 shadow-[0_10px_30px_rgba(0,0,0,0.35)]"
-                        : "pointer-events-auto rounded-[10px] border border-[#3e4a5b] bg-[#171b22] px-4 py-3 shadow-[0_10px_30px_rgba(0,0,0,0.35)]"
+                        ? "pointer-events-auto rounded-[10px] border border-[#6a3d3d] bg-[#211717] px-3 py-2 shadow-[0_10px_30px_rgba(0,0,0,0.35)]"
+                        : "pointer-events-auto rounded-[10px] border border-[#3e4a5b] bg-[#171b22] px-3 py-2 shadow-[0_10px_30px_rgba(0,0,0,0.35)]"
                     }
                   >
                     <div
@@ -3084,7 +3084,7 @@ export function EvalsPageClientV0_1() {
             <div
               className={`rounded-[12px] border px-6 py-5 shadow-[0_10px_30px_rgba(0,0,0,0.18)] ${stateToneClass}`}
             >
-              <div className="flex flex-wrap items-center gap-5">
+              <div className="flex flex-wrap items-center gap-3">
                 <div
                   className={`${MT.actionMd} inline-flex items-center gap-2 text-white`}
                 >
@@ -3212,7 +3212,7 @@ export function EvalsPageClientV0_1() {
                   flat · positive = inversion.
                 </div>
 
-                <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+                <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
                   {[
                     {
                       key: "Pearson r",
@@ -3284,7 +3284,7 @@ export function EvalsPageClientV0_1() {
 
                   return (
                     <div
-                      className="mt-5 flex flex-wrap items-center gap-4 rounded-[12px] border border-[#3a3a3a] bg-[#161616] px-4 py-3 shadow-[0_8px_24px_rgba(0,0,0,0.14)]"
+                      className="mt-5 flex flex-wrap items-center gap-4 rounded-[12px] border border-[#3a3a3a] bg-[#161616] px-3 py-2 shadow-[0_8px_24px_rgba(0,0,0,0.14)]"
                       title={diagnosis.hint}
                     >
                       <span
@@ -3343,7 +3343,7 @@ export function EvalsPageClientV0_1() {
                         .join(" ");
 
                       return (
-                        <div className="mt-7 rounded-[12px] border border-[#3a3a3a] bg-[#101010] px-4 py-3 shadow-[0_8px_24px_rgba(0,0,0,0.14)]">
+                        <div className="mt-7 rounded-[12px] border border-[#3a3a3a] bg-[#101010] px-3 py-2 shadow-[0_8px_24px_rgba(0,0,0,0.14)]">
                           <div className="mb-1 text-[12px] font-semibold uppercase tracking-[0.14em] text-[#dddddd]">
                             Aperture trend by bucket
                           </div>
@@ -3477,12 +3477,12 @@ export function EvalsPageClientV0_1() {
               </>
             ) : null}
             <details className="rounded-[10px] border border-[#2a3540] bg-[#0e1318]" open>
-              <summary className="cursor-pointer px-4 py-3 text-[12px] font-semibold uppercase tracking-[0.12em] text-[#9fb1bf] transition hover:bg-[#111820] hover:text-[#d0dce8] [&::-webkit-details-marker]:hidden">
+              <summary className="cursor-pointer px-3 py-2 text-[12px] font-semibold uppercase tracking-[0.12em] text-[#9fb1bf] transition hover:bg-[#111820] hover:text-[#d0dce8] [&::-webkit-details-marker]:hidden">
                 Series dashboard · run management
               </summary>
             <div className="space-y-3 pt-4">
                   <div className="grid gap-4">
-                    <div className="rounded-[10px] border border-[#33424a] bg-[#10151a] px-4 py-3">
+                    <div className="rounded-[10px] border border-[#33424a] bg-[#10151a] px-3 py-2">
                       <div className="space-y-1">
                         <div className={`${MT.sectionLabel} text-[#ededed]`}>
                           Series dashboard
@@ -3519,7 +3519,7 @@ export function EvalsPageClientV0_1() {
                                 : "border-[#244234] bg-[#102017] text-[#9be3b1]";
 
                           return (
-                            <div className="mt-4 rounded-[8px] border border-[#30414c] bg-[#0f151a] px-4 py-4">
+                            <div className="mt-2 rounded-[8px] border border-[#30414c] bg-[#0f151a] px-3 py-2">
                               <div className="flex flex-wrap items-center justify-between gap-3">
                                 <div className="space-y-1">
                                   <div className={`${MT.sectionLabel} text-[#ededed]`}>
@@ -3534,8 +3534,8 @@ export function EvalsPageClientV0_1() {
                                 </div>
                               </div>
 
-                              <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-                                <div className="rounded-[8px] border border-[#26323a] bg-[#12181d] px-3 py-3">
+                              <div className="mt-2 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+                                <div className="rounded-[8px] border border-[#26323a] bg-[#12181d] px-3 py-2">
                                   <div className={`${MT.helper} text-[#9fb1bf]`}>Spearman ρ</div>
                                   <div className="mt-1 font-mono text-[13px] text-[#f2f2f2]">
                                     mean {fmt(summary.meanSpearmanRho)} · median {fmt(summary.medianSpearmanRho)}
@@ -3545,7 +3545,7 @@ export function EvalsPageClientV0_1() {
                                   </div>
                                 </div>
 
-                                <div className="rounded-[8px] border border-[#26323a] bg-[#12181d] px-3 py-3">
+                                <div className="rounded-[8px] border border-[#26323a] bg-[#12181d] px-3 py-2">
                                   <div className={`${MT.helper} text-[#9fb1bf]`}>Pearson r</div>
                                   <div className="mt-1 font-mono text-[13px] text-[#f2f2f2]">
                                     mean {fmt(summary.meanPearsonR)} · median {fmt(summary.medianPearsonR)}
@@ -3555,7 +3555,7 @@ export function EvalsPageClientV0_1() {
                                   </div>
                                 </div>
 
-                                <div className="rounded-[8px] border border-[#26323a] bg-[#12181d] px-3 py-3">
+                                <div className="rounded-[8px] border border-[#26323a] bg-[#12181d] px-3 py-2">
                                   <div className={`${MT.helper} text-[#9fb1bf]`}>Permutation p</div>
                                   <div className="mt-1 font-mono text-[13px] text-[#f2f2f2]">
                                     min {fmt(summary.minPPerm)} · max {fmt(summary.maxPPerm)}
@@ -3565,7 +3565,7 @@ export function EvalsPageClientV0_1() {
                                   </div>
                                 </div>
 
-                                <div className="rounded-[8px] border border-[#26323a] bg-[#12181d] px-3 py-3">
+                                <div className="rounded-[8px] border border-[#26323a] bg-[#12181d] px-3 py-2">
                                   <div className={`${MT.helper} text-[#9fb1bf]`}>Run spread</div>
 
                                   <div className="mt-2 min-w-0">
@@ -3598,7 +3598,7 @@ export function EvalsPageClientV0_1() {
                         })()}
 
                       {operatorSeriesRows.length > 0 ? (
-                        <div className="mt-4 overflow-x-auto">
+                        <div className="mt-2 overflow-x-auto">
                           <table className="min-w-full border-separate border-spacing-0 text-left text-[12px]">
                             <thead>
                               <tr className="text-[#9fb1bf]">
@@ -3670,7 +3670,7 @@ export function EvalsPageClientV0_1() {
                           </table>
                         </div>
                       ) : (
-                        <div className={`${MT.helper} mt-4 text-[#9fb1bf]`}>
+                        <div className={`${MT.helper} mt-2 text-[#9fb1bf]`}>
                           No series yet. Create one below to start the operator view.
                         </div>
                       )}
@@ -3679,7 +3679,7 @@ export function EvalsPageClientV0_1() {
 
 
 
-              <div className="rounded-[10px] border border-[#2f3b46] bg-[#12181d] px-4 py-3">
+              <div className="rounded-[10px] border border-[#2f3b46] bg-[#12181d] px-3 py-2">
                 <div className="flex flex-col gap-3 xl:flex-row xl:items-end xl:justify-between">
                   <div className="space-y-1">
                     <div className={`${MT.sectionLabel} text-[#ededed]`}>
@@ -3690,14 +3690,14 @@ export function EvalsPageClientV0_1() {
                     </div>
                   </div>
 
-                  <div className="mt-4 grid gap-4">
+                  <div className="mt-2 grid gap-4">
                       <div className="space-y-2">
                         <label className={`${MT.fieldLabel} text-[#ededed]`}>
                           Open Saved Run
                         </label>
 
                         {savedRunSeriesGroups.length === 0 ? (
-                          <div className="rounded-[8px] border border-dashed border-[#3a3a3a] bg-[#151515] px-3 py-3 text-sm text-[#9fb1bf]">
+                          <div className="rounded-[8px] border border-dashed border-[#3a3a3a] bg-[#151515] px-3 py-2 text-sm text-[#9fb1bf]">
                             No saved runs yet
                           </div>
                         ) : (
@@ -3717,7 +3717,7 @@ export function EvalsPageClientV0_1() {
                                   });
                                 }}
                               >
-                                <summary className="cursor-pointer list-none px-3 py-3 transition hover:bg-[#192028] [&::-webkit-details-marker]:hidden">
+                                <summary className="cursor-pointer list-none px-3 py-2 transition hover:bg-[#192028] [&::-webkit-details-marker]:hidden">
                                   <div className="flex flex-wrap items-center justify-between gap-3">
                                     <div className="min-w-0">
                                       <div className="truncate text-sm font-semibold text-[#ededed]">
@@ -3735,7 +3735,7 @@ export function EvalsPageClientV0_1() {
                                   </div>
                                 </summary>
 
-                                <div className="border-t border-[#26313a] px-3 py-3">
+                                <div className="border-t border-[#26313a] px-3 py-2">
                                   <div className="space-y-2">
                                     {group.rows.map((row) => {
                                       const selected = row.id === selectedSavedRunId;
@@ -3744,7 +3744,7 @@ export function EvalsPageClientV0_1() {
                                           key={row.id}
                                           type="button"
                                           onClick={() => setSelectedSavedRunId(row.id)}
-                                          className={`w-full rounded-[8px] border px-3 py-3 text-left transition ${
+                                          className={`w-full rounded-[8px] border px-3 py-2 text-left transition ${
                                             selected
                                               ? "border-[#5c8db8] bg-[#132031] text-white"
                                               : "border-[#313131] bg-[#171717] text-[#d6d6d6] hover:border-[#555] hover:bg-[#1d1d1d] hover:text-white"
@@ -3810,14 +3810,14 @@ export function EvalsPageClientV0_1() {
         ) : null}
 
         {report ? (
-          <section className="space-y-5 pt-6">
+          <section className="space-y-3 pt-6">
             <details className="rounded-[12px] border border-[#2a2a2a] bg-[#151515]">
               <summary className="cursor-pointer px-6 py-5 text-[12px] font-semibold uppercase tracking-[0.12em] text-[#adadad] transition hover:bg-[#1a1a1a] hover:text-[#d0d0d0] [&::-webkit-details-marker]:hidden">
                 Report · bundle metadata · markdown export
               </summary>
               <div className="px-6 pb-6">
 
-              <div className="mt-5 rounded-[10px] border border-[#262626] bg-[#101010] px-4 py-3">
+              <div className="mt-5 rounded-[10px] border border-[#262626] bg-[#101010] px-3 py-2">
                 <div className="space-y-1">
                   <div className={`${MT.sectionLabel} text-[#dfdfdf]`}>
                     Run metadata snapshot
@@ -3828,7 +3828,7 @@ export function EvalsPageClientV0_1() {
                 </div>
 
                 <div
-                  className={`mt-4 flex flex-wrap items-center gap-x-6 gap-y-3 ${MT.markdownMeta} text-[#d8d8d8]`}
+                  className={`mt-2 flex flex-wrap items-center gap-x-6 gap-y-3 ${MT.markdownMeta} text-[#d8d8d8]`}
                 >
                   <span>
                     specId:{" "}
@@ -3917,13 +3917,13 @@ export function EvalsPageClientV0_1() {
                 </div>
               </div>
 
-              <div className="mt-5 rounded-[10px] border border-[#2f2f2f] bg-[#101010] px-4 py-3">
+              <div className="mt-5 rounded-[10px] border border-[#2f2f2f] bg-[#101010] px-3 py-2">
                 <div className={`${MT.sectionLabel} text-[#dfdfdf]`}>
                   Device plate
                 </div>
 
                 <div
-                  className={`mt-4 flex flex-wrap items-center gap-x-6 gap-y-3 ${MT.markdownMeta} text-[#d8d8d8]`}
+                  className={`mt-2 flex flex-wrap items-center gap-x-6 gap-y-3 ${MT.markdownMeta} text-[#d8d8d8]`}
                 >
                   <span>
                     engineVersion:{" "}
@@ -4008,7 +4008,7 @@ export function EvalsPageClientV0_1() {
               </div>
 
               <div className="mt-5 overflow-hidden rounded-[10px] border border-[#262626] bg-[#101010]">
-                <div className="flex items-center justify-between gap-4 border-b border-[#262626] px-4 py-3">
+                <div className="flex items-center justify-between gap-4 border-b border-[#262626] px-3 py-2">
                   <div className="space-y-1">
                     <div className={`${MT.sectionLabel} text-[#dfdfdf]`}>
                       Markdown export preview
@@ -4029,7 +4029,7 @@ export function EvalsPageClientV0_1() {
                   </button>
                 </div>
                 <pre
-                  className={`overflow-x-auto whitespace-pre-wrap bg-[#0c0c0c] px-4 py-3 ${MT.markdownBody} text-[#d7d7d7]`}
+                  className={`overflow-x-auto whitespace-pre-wrap bg-[#0c0c0c] px-3 py-2 ${MT.markdownBody} text-[#d7d7d7]`}
                 >
                   {md || "(empty)"}
                 </pre>
@@ -4038,7 +4038,7 @@ export function EvalsPageClientV0_1() {
             </details>
 
             <details className="rounded-[10px] border border-[#2a3540] bg-[#0e1318]">
-              <summary className="cursor-pointer px-4 py-3 text-[12px] font-semibold uppercase tracking-[0.12em] text-[#9fb1bf] transition hover:bg-[#111820] hover:text-[#d0dce8] [&::-webkit-details-marker]:hidden">
+              <summary className="cursor-pointer px-3 py-2 text-[12px] font-semibold uppercase tracking-[0.12em] text-[#9fb1bf] transition hover:bg-[#111820] hover:text-[#d0dce8] [&::-webkit-details-marker]:hidden">
                 Task reports · per-task breakdown
               </summary>
               <div className="space-y-7 px-5 pb-5">
@@ -4059,7 +4059,7 @@ export function EvalsPageClientV0_1() {
                 </section>
 
               {report.tasks.some((t) => t.kind !== "byo") ? (
-                <section className="mt-3 rounded-[12px] border border-[#303030] bg-[#171717] px-4 py-3 space-y-4">
+                <section className="mt-3 rounded-[12px] border border-[#303030] bg-[#171717] px-3 py-2 space-y-2">
                   <div className="space-y-1">
                     <div className={`${MT.sectionLabel} text-[#b3b3b3]`}>
                       Validation controls
@@ -4084,7 +4084,7 @@ export function EvalsPageClientV0_1() {
         ) : null}
               </div>
               <aside className="hidden xl:block xl:sticky xl:top-[96px] xl:self-start">
-                <div className="rounded-[10px] border border-[#33424a] bg-[#10151a] px-4 py-3">
+                <div className="rounded-[10px] border border-[#33424a] bg-[#10151a] px-3 py-2">
                   <div className="space-y-1">
                     <div className={`${MT.sectionLabel} text-[#ededed]`}>
                       Operator checklist
@@ -4122,11 +4122,11 @@ export function EvalsPageClientV0_1() {
                   className={
                     activeRunSeries
                       ? activeSeriesHasHardWarnings
-                        ? "mt-3 rounded-[10px] border border-[#6b3737] bg-[#211717] px-4 py-3"
+                        ? "mt-3 rounded-[10px] border border-[#6b3737] bg-[#211717] px-3 py-2"
                         : activeSeriesNeedsAttention
-                          ? "mt-3 rounded-[10px] border border-[#5e4b22] bg-[#1b160d] px-4 py-3"
-                          : "mt-3 rounded-[10px] border border-[#2f5a3d] bg-[#101712] px-4 py-3"
-                      : "mt-3 rounded-[10px] border border-[#3b4f28] bg-[#11170e] px-4 py-3"
+                          ? "mt-3 rounded-[10px] border border-[#5e4b22] bg-[#1b160d] px-3 py-2"
+                          : "mt-3 rounded-[10px] border border-[#2f5a3d] bg-[#101712] px-3 py-2"
+                      : "mt-3 rounded-[10px] border border-[#3b4f28] bg-[#11170e] px-3 py-2"
                   }
                 >
                   <div className="space-y-1">
