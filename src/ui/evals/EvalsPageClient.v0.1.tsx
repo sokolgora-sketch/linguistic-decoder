@@ -2368,6 +2368,12 @@ export function EvalsPageClientV0_1() {
                     </h1>
                     <div className="flex flex-wrap items-center gap-2">
                       <Link
+                        href="/evals/help"
+                        className="inline-flex shrink-0 items-center rounded-[8px] border border-[#355a7a] bg-[#101a24] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#9fd3ff] transition hover:border-[#4d7fa8] hover:bg-[#132031] hover:text-[#d7eeff]"
+                      >
+                        Help
+                      </Link>
+                      <Link
                         href="/evals/reference"
                         className="inline-flex shrink-0 items-center rounded-[8px] border border-[#5a2424] bg-[#1f1010] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#fca5a5] transition hover:border-[#7a3434] hover:bg-[#281414] hover:text-[#ffd0d0]"
                       >
@@ -2769,14 +2775,27 @@ export function EvalsPageClientV0_1() {
                 }
               />
 
-              {inputText.trim() && inputProbe.kind !== "invalid_json" ? (
-                <div
-                  className={`mt-3 inline-flex items-center gap-2 rounded-full border border-[#21452a] bg-[#112017] px-3 py-2 ${MT.chipText} text-[#4ade80]`}
-                >
-                  <span className="h-[6px] w-[6px] rounded-full bg-[#16a34a]" />
-                  JSON detected — ready to score
-                </div>
-              ) : null}
+                              {inputText.trim() && inputProbe.kind === "invalid_json" ? (
+                  <div
+                    className={`mt-3 inline-flex items-center gap-2 rounded-full border border-[#6b3737] bg-[#211111] px-3 py-2 ${MT.chipText} text-[#fca5a5]`}
+                  >
+                    <span className="h-[6px] w-[6px] rounded-full bg-[#d93333]" />
+                    Invalid JSON — fix syntax before scoring
+                  </div>
+                ) : null}
+
+                {inputText.trim() && inputProbe.kind !== "invalid_json" ? (
+                  <div
+                    className={`mt-3 inline-flex items-center gap-2 rounded-full border border-[#21452a] bg-[#112017] px-3 py-2 ${MT.chipText} text-[#4ade80]`}
+                  >
+                    <span className="h-[6px] w-[6px] rounded-full bg-[#16a34a]" />
+                    {inputProbe.kind === "bucket_only"
+                      ? "Detected input · buckets-only V1..V7 JSON"
+                      : /["']evalRunVersion["']\s*:/.test(inputText)
+                        ? "Detected input · evalRun.v0.1 bundle"
+                        : "Detected input · structured JSON"}
+                  </div>
+                ) : null}
               </div>
               <div className="mt-5 flex flex-wrap gap-2 border-t border-[#2a2a2a] pt-4">
                 <button type="button" className={`${MT.actionPrimary} border-[#16a34a] bg-[#16a34a] text-white transition hover:border-[#15803d] hover:bg-[#15803d] hover:shadow-[0_0_0_1px_rgba(22,163,74,0.4),0_4px_16px_rgba(22,163,74,0.33)] disabled:cursor-not-allowed disabled:border-[#333] disabled:bg-[#111] disabled:text-[#333] disabled:shadow-none`} onClick={() => void onScore()} disabled={busy || !inputText.trim()}>{busy ? "Scoring…" : report ? "Scored ✓" : "Score run"}</button>
