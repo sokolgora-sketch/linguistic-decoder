@@ -1,35 +1,30 @@
 # Evals Help + Input Clarity v0.1 — Status
 
 ## Status
-Active
-In progress
+Done
+Merged
 
 ## Milestone summary
-This milestone makes the Evals workbench understandable to first-time users without private explanation.
+This milestone made the Evals workbench more understandable to first-time users without private explanation.
 
-## Current reason
-The layout shell is now substantially stronger after the recent PR series.
-The next release blocker is comprehension, not raw structure.
+## Shipped
+- added \`/evals/help\` page
+- added Help entry in the \`/evals\` hero action row
+- replaced the generic input-ready chip with explicit input detection
+- added focused tests for help page and input-chip clarity
 
-## In scope
-- `/evals/help`
-- help entry from `/evals`
-- plain-language metric glossary
-- clearer accepted-input guidance
-- examples and validation guidance
+## Acceptance criteria reached
+- first-time users can discover help directly from \`/evals\`
+- first-time users can distinguish help vs reference
+- the workbench now labels pasted JSON more explicitly before scoring
+- focused tests passed
+- gate passed
+- build passed
 
-## Out of scope
-- major layout rewrite
-- battery protocol lock
-- paper drafting
-- reference page redesign
-- broader ZË-RO public surfaces
+## PR
+- PR #846 — feat(evals): add help page and explicit input detection
 
-## Acceptance criteria
-- first-time users understand what Evals is
-- first-time users understand what to paste/upload
-- metric meanings are usable without reading the paper
-- `/evals/reference` is clearly understood as separate from live scoring
-- help is discoverable from `/evals`
-- gate and build pass
-
+## Next milestone
+- tighten remaining input helper copy around the upload/paste section
+- improve metric legibility on the live scored summary
+- continue toward public-beta release blockers: examples, validation clarity, shareability, screenshot polish
