@@ -843,9 +843,31 @@ export function EvalsPageClientV0_1() {
     const pool = mode === "task_buckets" ? bucketsOnlyTasks : byoTasks;
     return (
       pool.find((t) => t.taskId === taskId) ??
-      (mode === "task_buckets" ? defaultBucketsTask : pool[0] ?? null)
+      pool[0] ??
+      null
     );
-  }, [mode, taskId, byoTasks, bucketsOnlyTasks, defaultBucketsTask]);
+  }, [mode, taskId, byoTasks, bucketsOnlyTasks]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const params = new URLSearchParams(window.location.search);
+    const modeParam = params.get("mode");
+    const taskParam = (params.get("task") ?? "").trim();
+
+    if (modeParam !== "task_buckets") return;
+
+    setMode("task_buckets");
+
+    const nextTask =
+      bucketsOnlyTasks.find((t) => t.taskId === taskParam) ??
+      defaultBucketsTask ??
+      null;
+
+    if (nextTask?.taskId) {
+      setTaskId(nextTask.taskId);
+    }
+  }, [bucketsOnlyTasks, defaultBucketsTask]);
 
   const operatorChecklistItems = useMemo(() => {
     const providerValue = provider.trim();
@@ -2244,8 +2266,15 @@ export function EvalsPageClientV0_1() {
 
   const onCopyPageLink = async () => {
     if (typeof window === "undefined") return;
-    const href = new URL("/evals", window.location.origin).toString();
-    await dfCopyText("Copied page link.", href);
+
+    const href = new URL("/evals", window.location.origin);
+
+    if (mode === "task_buckets") {
+      href.searchParams.set("mode", "task_buckets");
+      href.searchParams.set("task", selectedTask?.taskId ?? taskId);
+    }
+
+    await dfCopyText("Copied page link.", href.toString());
   };
 
   const onCopyCsvRow = async () => {
