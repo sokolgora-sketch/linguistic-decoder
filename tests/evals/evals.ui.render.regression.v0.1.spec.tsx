@@ -45,9 +45,9 @@ describe("Evals UI rendered mode regression v0.1", () => {
           "Use this page to score model-generated ladder or evalRun JSON against ZË-RO's deterministic eval instrument."
         )
       ).toBeInTheDocument();
-      expect(screen.getByText("What to paste")).toBeInTheDocument();
+      expect(screen.getByText("Accepted input")).toBeInTheDocument();
       expect(screen.getByText("Privacy")).toBeInTheDocument();
-      expect(screen.getByText("How it works")).toBeInTheDocument();
+      expect(screen.getByText("Workflow")).toBeInTheDocument();
         expect(
           screen.getByRole("link", { name: "Help" })
         ).toBeInTheDocument();

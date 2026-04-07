@@ -2336,7 +2336,7 @@ export function EvalsPageClientV0_1() {
       <StickyNav />
 
       <div className="sticky top-[48px] z-40 border-b border-[#1a1e28] bg-[#0d1017]">
-        <div className="mx-auto flex w-full max-w-[1680px] items-stretch divide-x divide-[#1a1e28] px-6 xl:px-8">
+        <div className="flex w-full items-stretch divide-x divide-[#1a1e28] px-2 xl:px-4">
           <div className="flex flex-1 items-baseline justify-between px-4 py-2.5">
             <span className="text-[9px] font-semibold uppercase tracking-[0.15em] text-[#a4b0cc]">
               Pearson r
@@ -2355,7 +2355,7 @@ export function EvalsPageClientV0_1() {
           </div>
           <div className="flex flex-1 items-baseline justify-between px-4 py-2.5">
             <span className="text-[9px] font-semibold uppercase tracking-[0.15em] text-[#a4b0cc]">
-              P_perm
+              p_perm
             </span>
             <span className="font-mono text-[14px] text-[#f4ddb0]">
               {typeof summaryPPerm === "number" ? fmtP(summaryPPerm) : "—"}
@@ -2426,7 +2426,7 @@ export function EvalsPageClientV0_1() {
                     </div>
                   </div>
                   <p className={`${MT.heroBody} text-[#bac3d2]`}>
-                    Deterministic scorer. Bring model outputs; ZË-RO scores them. No model calls. The workbench stays live-first, while reference and evidence stay nearby but out of the way.
+                    Deterministic eval instrument. Bring model outputs; ZË-RO scores them. No model calls. Live scoring stays here; paper snapshots live on the reference page.
                   </p>
                 </div>
 
@@ -2440,16 +2440,16 @@ export function EvalsPageClientV0_1() {
                 </details>
 
                 <div className="grid gap-3 md:grid-cols-3">
-                  <div className="rounded-[12px] border border-[#303845] bg-[#171c23] px-3 py-2">
+                  <div className="rounded-[12px] border border-[#2c3540] bg-[#151a21] px-3 py-2">
                     <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#d7deea]">
-                      What to paste
+                      Accepted input
                     </div>
                     <div className="mt-1 text-[12px] leading-6 text-[#aeb7c5]">
                       {EVALS_BETA_INTRO_HELP_1}
                     </div>
                   </div>
 
-                  <div className="rounded-[12px] border border-[#303845] bg-[#171c23] px-3 py-2">
+                  <div className="rounded-[12px] border border-[#2c3540] bg-[#151a21] px-3 py-2">
                     <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#d7deea]">
                       Privacy
                     </div>
@@ -2458,9 +2458,9 @@ export function EvalsPageClientV0_1() {
                     </div>
                   </div>
 
-                  <div className="rounded-[12px] border border-[#303845] bg-[#171c23] px-3 py-2">
+                  <div className="rounded-[12px] border border-[#2c3540] bg-[#151a21] px-3 py-2">
                     <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#d7deea]">
-                      How it works
+                      Workflow
                     </div>
                     <div className="mt-1 text-[12px] leading-6 text-[#aeb7c5]">
                       {EVALS_BETA_INTRO_HELP_3}
@@ -2948,7 +2948,7 @@ export function EvalsPageClientV0_1() {
               </button>
               <button
                 type="button"
-                className={`${MT.actionUtility} border-dashed border-[#4a4a4a] bg-transparent text-[#c8c8c8] transition hover:border-[#777] hover:bg-[#1f1f1f] hover:text-white`}
+                className={` border-[#355a7a] bg-[#101a24] text-[#9fd3ff] transition hover:border-[#4d7fa8] hover:bg-[#132031] hover:text-[#d7eeff]`}
                 onClick={loadExample}
                 disabled={busy}
               >
