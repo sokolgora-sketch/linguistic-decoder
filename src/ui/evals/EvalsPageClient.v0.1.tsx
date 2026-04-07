@@ -3193,7 +3193,7 @@ export function EvalsPageClientV0_1() {
                 Scored summary
               </div>
               <div className={`${MT.helper} text-[#a9a9a9]`}>
-                Signal, compliance, and bucket trend for the active run.
+                Read signal strength, rank-order alignment, significance, and valid-token coverage for the active run.
               </div>
             </div>
 
@@ -3221,15 +3221,14 @@ export function EvalsPageClientV0_1() {
 
                 <div className="inline-flex w-fit items-center gap-2 rounded-full border border-[#5a2424] bg-[#1b1111] px-4 py-2 text-[12px] uppercase tracking-[0.08em] text-[#f3b3b3]">
                   <span className="h-[7px] w-[7px] rounded-full bg-[#d93333]" />
-                  <span>Expected direction</span>
+                  <span>Expected aperture slope</span>
                   <span className="font-mono text-[#ffe1e1]">
                     negative (V1→V7)
                   </span>
                 </div>
 
                 <div className={`${MT.helper} text-[#a9a9a9]`}>
-                  Interpretation: more negative = stronger grounding · near 0 =
-                  flat · positive = inversion.
+                  More negative = stronger expected slope · near 0 = weak or flat · positive = reversed order.
                 </div>
 
                 <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
@@ -3240,7 +3239,7 @@ export function EvalsPageClientV0_1() {
                         typeof summaryPearson === "number"
                           ? fmt(summaryPearson)
                           : "—",
-                      note: "aperture primary",
+                      note: "linear fit · aperture primary",
                       tone: "border-t-[#16a34a]",
                     },
                     {
@@ -3249,7 +3248,7 @@ export function EvalsPageClientV0_1() {
                         typeof summarySpearman === "number"
                           ? fmt(summarySpearman)
                           : "—",
-                      note: "aperture primary",
+                      note: "rank order · aperture primary",
                       tone: "border-t-[#22c55e]",
                     },
                     {
@@ -3260,16 +3259,16 @@ export function EvalsPageClientV0_1() {
                           : "—",
                       note:
                         summaryPermItersPresence || summaryPermSeedPresence
-                          ? `presenceMean · ${summaryPermItersPresence ?? "—"} iters · seed ${summaryPermSeedPresence ?? "—"}`
+                          ? `significance check · presenceMean · ${summaryPermItersPresence ?? "—"} iters · seed ${summaryPermSeedPresence ?? "—"}`
                           : summaryPermItersPrimary || summaryPermSeedPrimary
-                            ? `primary · ${summaryPermItersPrimary ?? "—"} iters · seed ${summaryPermSeedPrimary ?? "—"}`
-                            : "permutation",
+                            ? `significance check · primary · ${summaryPermItersPrimary ?? "—"} iters · seed ${summaryPermSeedPrimary ?? "—"}`
+                            : "significance check",
                       tone: "border-t-[#f59e0b]",
                     },
                     {
                       key: "Compliance",
                       value: complianceText,
-                      note: `${summaryCounts.validN} valid · ${summaryCounts.invalidN} invalid`,
+                      note: `${summaryCounts.validN} valid · ${summaryCounts.invalidN} invalid tokens`,
                       tone: "border-t-[#3b82f6]",
                     },
                   ].map((card) => (
