@@ -3049,10 +3049,10 @@ export function EvalsPageClientV0_1() {
                 {inputProbe.kind === "corpus70_meta" ? (
                   <div className="pointer-events-auto rounded-[10px] border border-[#5b3b3b] bg-[#1d1515] px-3 py-2 shadow-[0_10px_30px_rgba(0,0,0,0.35)]">
                     <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#f1b4b4]">
-                      Unsupported input
+                      Unsupported input · cannot score
                     </div>
                     <div className="mt-1 text-[12px] leading-6 text-[#d8c0c0]">
-                      This looks like a Corpus70 meta-tags JSON. Evals expects either a full
+                      This looks like a Corpus70 meta-tags JSON and cannot be scored here. Evals expects either a full
                       <span className="font-mono text-[#ffe0e0]"> evalRun.v0.1 </span>
                       bundle or buckets keys V1..V7.
                     </div>
@@ -3062,7 +3062,7 @@ export function EvalsPageClientV0_1() {
                 {apiErr ? (
                   <div className="pointer-events-auto rounded-[10px] border border-[#6a3d3d] bg-[#211717] px-3 py-2 shadow-[0_10px_30px_rgba(0,0,0,0.35)]">
                     <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#f2b0b0]">
-                      Error <span className="font-mono text-[#ffe4e4]">{apiErr.code}</span>
+                      Error · scoring/export failed <span className="font-mono text-[#ffe4e4]">{apiErr.code}</span>
                     </div>
                     <div className="mt-1 text-[12px] leading-6 text-[#e0c7c7]">{apiErr.message}</div>
                   </div>
@@ -3083,7 +3083,7 @@ export function EvalsPageClientV0_1() {
                           : "text-[11px] font-semibold uppercase tracking-[0.12em] text-[#b8c7e8]"
                       }
                     >
-                      {noticeIsWarn ? "Warning" : "Note"}
+                      {noticeIsWarn ? "Warning · review before continuing" : "Note · informational only"}
                     </div>
                     <div
                       className={
