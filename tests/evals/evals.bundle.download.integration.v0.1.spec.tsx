@@ -104,7 +104,7 @@ describe("Evals bundle download integration v0.1", () => {
     const harness = installDownloadHarness();
 
     try {
-      fireEvent.click(screen.getByRole("button", { name: "Load example" }));
+      fireEvent.click(screen.getByRole("button", { name: "Load synthetic example" }));
 
       fireEvent.change(getModeSelect(), {
         target: { value: "run_bundle" },
@@ -149,7 +149,7 @@ describe("Evals bundle download integration v0.1", () => {
     const harness = installDownloadHarness();
 
     try {
-      fireEvent.click(screen.getByRole("button", { name: "Load example" }));
+      fireEvent.click(screen.getByRole("button", { name: "Load synthetic example" }));
       expect(getModeSelect()).toHaveValue("task_buckets");
 
       fireEvent.click(screen.getByRole("button", { name: "Download Bundle" }));
@@ -181,7 +181,7 @@ describe("Evals bundle download integration v0.1", () => {
     const harness = installDownloadHarness();
 
     try {
-      fireEvent.click(screen.getByRole("button", { name: "Load example" }));
+      fireEvent.click(screen.getByRole("button", { name: "Load synthetic example" }));
       expect(getModeSelect()).toHaveValue("task_buckets");
 
       fireEvent.change(getSourceEngineIdInput(), {
