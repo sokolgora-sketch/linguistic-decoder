@@ -2690,7 +2690,7 @@ export function EvalsPageClientV0_1() {
               Input source
             </div>
             <div className={`${MT.helper} text-[#a9a9a9]`}>
-              Load a saved bundle or paste fresh JSON before scoring.
+              Bring either a saved evalRun.v0.1 bundle or raw V1..V7 buckets-only JSON. The input chip confirms what the workbench detected before scoring.
             </div>
           </div>
 
@@ -2701,7 +2701,7 @@ export function EvalsPageClientV0_1() {
                   Upload JSON
                 </span>
                 <span className={`${MT.helper} text-[#a9a9a9]`}>
-                  Use a saved eval bundle or buckets-only JSON.
+                  Upload a saved evalRun bundle or raw V1..V7 buckets-only JSON.
                 </span>
               </div>
 
@@ -2731,7 +2731,7 @@ export function EvalsPageClientV0_1() {
               <div className={`${MT.helper} mt-auto pt-6 text-[#c8c8c8]`}>
                 Accepts full{" "}
                 <span className="font-mono text-[#f2f2f2]">evalRun.v0.1</span>{" "}
-                bundles or buckets-only JSON.
+                bundles or raw V1..V7 buckets-only JSON.
               </div>
               <div className="mt-5 pt-5 border-t border-[#2a2a2a]">
               <div className="space-y-1">
@@ -2741,8 +2741,9 @@ export function EvalsPageClientV0_1() {
                 <div className={`${MT.helper} text-[#a9a9a9]`}>
                   Paste a full{" "}
                   <span className="font-mono text-[#d8d8d8]">evalRun.v0.1</span>{" "}
-                  bundle or buckets-only{" "}
-                  <span className="font-mono text-[#d8d8d8]">V1..V7</span> JSON.
+                  bundle or raw{" "}
+                    <span className="font-mono text-[#d8d8d8]">V1..V7</span>{" "}
+                    buckets-only JSON directly into the workbench.
                 </div>
               </div>
 
