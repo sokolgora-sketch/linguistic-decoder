@@ -446,10 +446,14 @@ function TaskCard({ t }: { t: EvalTaskReportV0_1 }) {
   );
 }
 
-function StickyNav() {
+function StickyNav({
+  onCopyPageLink,
+}: {
+  onCopyPageLink: () => void | Promise<void>;
+}) {
   return (
     <div className="sticky top-0 z-50 border-b border-[#333333] bg-[#1a1a1a]">
-      <div className="mx-auto flex h-12 w-full max-w-[1200px] items-center justify-between px-10">
+      <div className="flex w-full items-center justify-between gap-3 px-2 py-2 xl:px-4">
         <Link
           href="/"
           aria-label="ZË-RO home"
@@ -465,12 +469,41 @@ function StickyNav() {
           />
         </Link>
 
-        <Link
-          href="/"
-          className="text-[11px] uppercase tracking-[0.14em] text-neutral-300 transition hover:text-white"
-        >
-          ← home
-        </Link>
+        <div className="flex flex-wrap items-center justify-end gap-2">
+          <Link
+            href="/evals/help"
+            className="inline-flex shrink-0 items-center rounded-[8px] border border-[#355a7a] bg-[#101a24] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#9fd3ff] transition hover:border-[#4d7fa8] hover:bg-[#132031] hover:text-[#d7eeff]"
+          >
+            Help
+          </Link>
+          <Link
+            href="/evals/reference"
+            className="inline-flex shrink-0 items-center rounded-[8px] border border-[#5a2424] bg-[#1f1010] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#fca5a5] transition hover:border-[#7a3434] hover:bg-[#281414] hover:text-[#ffd0d0]"
+          >
+            Reference page →
+          </Link>
+          <a
+            href="https://github.com/sokolgora-sketch/linguistic-decoder/issues/new"
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center rounded-[6px] border border-[#6a5a2a] bg-[#242016] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#f3d38b] transition hover:border-[#8a7636] hover:bg-[#2a2418] hover:text-[#fff1c2]"
+          >
+            Report feedback ↗
+          </a>
+          <button
+            type="button"
+            className="inline-flex items-center rounded-[6px] border border-[#6a5a2a] bg-transparent px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#f3d38b] transition hover:border-[#8a7636] hover:bg-[#1f1a12] hover:text-[#fff1c2]"
+            onClick={() => void onCopyPageLink()}
+          >
+            Copy page link
+          </button>
+          <Link
+            href="/"
+            className="text-[11px] uppercase tracking-[0.14em] text-neutral-300 transition hover:text-white"
+          >
+            ← home
+          </Link>
+        </div>
       </div>
     </div>
   );
@@ -2333,7 +2366,7 @@ export function EvalsPageClientV0_1() {
 
   return (
     <div className="min-h-screen bg-[#242424] text-white">
-      <StickyNav />
+      <StickyNav onCopyPageLink={onCopyPageLink} />
 
       <div className="sticky top-[48px] z-40 border-b border-[#1a1e28] bg-[#0d1017]">
         <div className="flex w-full items-stretch divide-x divide-[#1a1e28] px-2 xl:px-4">
@@ -2391,40 +2424,9 @@ export function EvalsPageClientV0_1() {
                   <div className={`${MT.eyebrow} text-[#d7dde7]`}>
                     instrument · evals
                   </div>
-                  <div className="flex flex-wrap items-center justify-between gap-3">
-                    <h1 className={`${MT.heroTitle} !text-[24px] text-[#f5f7fb]`}>
+                  <h1 className={`${MT.heroTitle} !text-[24px] text-[#f5f7fb]`}>
                       ZË-RO Evals Workbench
                     </h1>
-                    <div className="flex flex-wrap items-center gap-2">
-                      <Link
-                        href="/evals/help"
-                        className="inline-flex shrink-0 items-center rounded-[8px] border border-[#355a7a] bg-[#101a24] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#9fd3ff] transition hover:border-[#4d7fa8] hover:bg-[#132031] hover:text-[#d7eeff]"
-                      >
-                        Help
-                      </Link>
-                      <Link
-                        href="/evals/reference"
-                        className="inline-flex shrink-0 items-center rounded-[8px] border border-[#5a2424] bg-[#1f1010] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#fca5a5] transition hover:border-[#7a3434] hover:bg-[#281414] hover:text-[#ffd0d0]"
-                      >
-                        Reference page →
-                      </Link>
-                      <a
-                        href="https://github.com/sokolgora-sketch/linguistic-decoder/issues/new"
-                        target="_blank"
-                        rel="noreferrer"
-                        className={`inline-flex items-center rounded-[6px] border border-[#6a5a2a] bg-[#242016] px-3 py-1.5 ${MT.actionSm} text-[#f3d38b] transition hover:border-[#8a7636] hover:bg-[#2a2418] hover:text-[#fff1c2]`}
-                      >
-                        Report feedback ↗
-                      </a>
-                      <button
-                        type="button"
-                        className="inline-flex items-center rounded-[6px] border border-[#6a5a2a] bg-transparent px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#f3d38b] transition hover:border-[#8a7636] hover:bg-[#1f1a12] hover:text-[#fff1c2]"
-                        onClick={() => void onCopyPageLink()}
-                      >
-                        Copy page link
-                      </button>
-                    </div>
-                  </div>
                   <p className={`${MT.heroBody} text-[#bac3d2]`}>
                     Deterministic eval instrument. Bring model outputs; ZË-RO scores them. No model calls. Live scoring stays here; paper snapshots live on the reference page.
                   </p>
