@@ -2922,7 +2922,7 @@ export function EvalsPageClientV0_1() {
                 onClick={loadExample}
                 disabled={busy}
               >
-                Load example
+                Load synthetic example
               </button>
             </div>
 
@@ -3016,7 +3016,7 @@ export function EvalsPageClientV0_1() {
                 <div className="flex flex-wrap items-start gap-3">
                   <div className="min-w-0 flex-1">
                     <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#f3d38b]">
-                      Input mismatch
+                      Buckets detected in bundle mode
                     </div>
                     <div className="mt-1 text-[12px] leading-6 text-[#d7cfbb]">
                       You are in{" "}
@@ -3037,7 +3037,7 @@ export function EvalsPageClientV0_1() {
                     type="button"
                     onClick={() => setMode("task_buckets")}
                   >
-                    Switch mode
+                    Switch to buckets-only mode
                   </button>
                 </div>
               </div>
