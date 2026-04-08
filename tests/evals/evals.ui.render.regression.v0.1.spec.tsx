@@ -42,15 +42,13 @@ describe("Evals UI rendered mode regression v0.1", () => {
       ).toBeInTheDocument();
       expect(
         screen.getByText(
-          "Use this page to score model-generated ladder or evalRun JSON against ZË-RO's deterministic eval instrument."
+          "Deterministic eval instrument. Bring model outputs; ZË-RO scores them. No model calls. Live scoring stays here; paper snapshots live on the reference page."
         )
       ).toBeInTheDocument();
-      expect(screen.getByText("Accepted input")).toBeInTheDocument();
-      expect(screen.getByText("Privacy")).toBeInTheDocument();
-      expect(screen.getByText("Workflow")).toBeInTheDocument();
-        expect(
-          screen.getByRole("link", { name: "Help" })
-        ).toBeInTheDocument();
+      expect(screen.getByText("Paste either a full evalRun.v0.1 bundle or raw V1..V7 bucket JSON. Run the model elsewhere, paste the result here, then score, inspect signal, save checkpoints, and export evidence.")).toBeInTheDocument();
+      expect(
+        screen.getByRole("link", { name: "Help" })
+      ).toBeInTheDocument();
         expect(
           screen.getByRole("link", { name: /Report feedback/i })
         ).toBeInTheDocument();

@@ -2433,62 +2433,109 @@ export function EvalsPageClientV0_1() {
       </div>
 
         <main className="flex w-full flex-col gap-3 px-2 pt-6 pb-16 xl:px-4">
-          <section className="rounded-[14px] border border-[#2f3742] bg-[#13171d] px-6 py-4 shadow-[0_16px_40px_rgba(0,0,0,0.24)]">
-            <div className="grid gap-3 xl:grid-cols-[minmax(0,1fr)] xl:items-start">
-              <div className="space-y-2">
-                <div className="space-y-3">
-                  <div className={`${MT.eyebrow} text-[#d7dde7]`}>
-                    instrument · evals
-                  </div>
-                  <h1 className={`${MT.heroTitle} !text-[24px] text-[#f5f7fb]`}>
+            <section className="rounded-[14px] border border-[#2f3742] bg-[#13171d] px-4 py-3 shadow-[0_16px_40px_rgba(0,0,0,0.24)]">
+              <div className="grid gap-3 xl:grid-cols-[minmax(0,1.42fr)_260px] xl:items-start">
+                <div className="min-w-0 space-y-2">
+                  <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                    <div className={`${MT.eyebrow} text-[#d7dde7]`}>
+                      instrument · evals
+                    </div>
+                    <h1 className={`${MT.heroTitle} !text-[18px] leading-none text-[#f5f7fb]`}>
                       ZË-RO Evals Workbench
                     </h1>
-                  <p className={`${MT.heroBody} text-[#bac3d2]`}>
+                  </div>
+                  <p className={`${MT.heroBody} text-[13px] leading-5 text-[#bac3d2]`}>
                     Deterministic eval instrument. Bring model outputs; ZË-RO scores them. No model calls. Live scoring stays here; paper snapshots live on the reference page.
                   </p>
+                  <div className="rounded-[10px] border border-[#233240] bg-[#111821] px-3 py-1.5">
+                    <p className="text-[12px] leading-5 text-[#c4d0de]">
+                      Paste either a full evalRun.v0.1 bundle or raw V1..V7 bucket JSON. Run the model elsewhere, paste the result here, then score, inspect signal, save checkpoints, and export evidence.
+                    </p>
+                  </div>
+                  <details className="rounded-[10px] border border-[#4a3a1b] bg-[#17130d]">
+                    <summary className="cursor-pointer px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-[#f3d38b] transition hover:bg-[#1f1a10] [&::-webkit-details-marker]:hidden">
+                      {EVALS_BETA_INTRO_TITLE}
+                    </summary>
+                    <div className="space-y-3 px-4 pb-3 text-[12px] leading-5 text-[#d7cfbb]">
+                      <p>
+                        Use this page to score model-generated ladder JSON or full <span className="font-mono text-[#fff1c2]">evalRun.v0.1</span> bundles against ZË-RO&apos;s deterministic eval instrument. This page does not generate outputs for you and it does not call a model on your behalf.
+                      </p>
+
+                      <div className="rounded-[8px] border border-[#5a4a20] bg-[#1c170f] px-3 py-2">
+                        <div className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#f3d38b]">
+                          What to paste
+                        </div>
+                        <div className="mt-1 text-[12px] leading-5 text-[#d7cfbb]">
+                          Paste either a full <span className="font-mono text-[#fff1c2]">evalRun.v0.1</span> bundle or raw <span className="font-mono text-[#fff1c2]">V1..V7</span> bucket JSON.
+                        </div>
+                      </div>
+
+                      <div className="rounded-[8px] border border-[#5a4a20] bg-[#1c170f] px-3 py-2">
+                        <div className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#f3d38b]">
+                          Where to paste it
+                        </div>
+                        <div className="mt-1 text-[12px] leading-5 text-[#d7cfbb]">
+                          Paste the JSON into the large input area in the workbench below, inside the main scoring panel. If you are pasting raw <span className="font-mono text-[#fff1c2]">V1..V7</span> bucket JSON, use the buckets-only flow. If you are pasting a full <span className="font-mono text-[#fff1c2]">evalRun.v0.1</span> bundle, use the full run bundle flow.
+                        </div>
+                      </div>
+
+                      <div className="rounded-[8px] border border-[#5a4a20] bg-[#1c170f] px-3 py-2">
+                        <div className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#f3d38b]">
+                          How the workflow works
+                        </div>
+                        <div className="mt-1 text-[12px] leading-5 text-[#d7cfbb]">
+                          First generate the output in your model of choice. Then copy that JSON result and paste it into the workbench below. After that, score the run, inspect the signal, controls, and provenance, save checkpoints you want to keep, and export evidence when you are ready to compare or report results.
+                        </div>
+                      </div>
+
+                      <div className="rounded-[8px] border border-[#5a4a20] bg-[#1c170f] px-3 py-2">
+                        <div className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#f3d38b]">
+                          What ZË-RO gives you
+                        </div>
+                        <div className="mt-1 text-[12px] leading-5 text-[#d7cfbb]">
+                          ZË-RO scores the structure you paste, shows the eval signal, lets you reopen saved checkpoints, and helps you export evidence in a consistent deterministic format.
+                        </div>
+                      </div>
+
+                      <p>
+                        Do not paste secrets, credentials, or sensitive material you would not want stored in local workbench state.
+                      </p>
+                    </div>
+                  </details>
                 </div>
 
-                <details className="rounded-[12px] border border-[#4a3a1b] bg-[#17130d]">
-                  <summary className="cursor-pointer px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#f3d38b] transition hover:bg-[#1f1a10] [&::-webkit-details-marker]:hidden">
-                    {EVALS_BETA_INTRO_TITLE}
-                  </summary>
-                  <div className="px-4 pb-4 text-[12px] leading-6 text-[#d7cfbb]">
-                    {EVALS_BETA_INTRO_BODY}
-                  </div>
-                </details>
-
-                <div className="grid gap-3 md:grid-cols-3">
-                  <div className="rounded-[12px] border border-[#2c3540] bg-[#151a21] px-3 py-2">
-                    <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#d7deea]">
-                      Accepted input
+                <div className="rounded-[12px] border border-[#2c3540] bg-[#10161e] px-2.5 py-1">
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="space-y-0.5">
+                      <div className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#d7deea]">
+                        Instrument preview
+                      </div>
+                      <div className="text-[11px] leading-4 text-[#aeb7c5]">
+                        Example ladder profile
+                      </div>
                     </div>
-                    <div className="mt-1 text-[12px] leading-6 text-[#aeb7c5]">
-                      {EVALS_BETA_INTRO_HELP_1}
+                    <div className="rounded-full border border-[#355a7a] bg-[#111a24] px-2 py-0.5 text-[9px] font-semibold uppercase tracking-[0.12em] text-[#9fd3ff]">
+                      V1–V7
                     </div>
                   </div>
-
-                  <div className="rounded-[12px] border border-[#2c3540] bg-[#151a21] px-3 py-2">
-                    <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#d7deea]">
-                      Privacy
-                    </div>
-                    <div className="mt-1 text-[12px] leading-6 text-[#aeb7c5]">
-                      {EVALS_BETA_INTRO_HELP_2}
-                    </div>
-                  </div>
-
-                  <div className="rounded-[12px] border border-[#2c3540] bg-[#151a21] px-3 py-2">
-                    <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#d7deea]">
-                      Workflow
-                    </div>
-                    <div className="mt-1 text-[12px] leading-6 text-[#aeb7c5]">
-                      {EVALS_BETA_INTRO_HELP_3}
-                    </div>
+                  <div className="mt-1 flex h-[42px] items-end gap-1">
+                    {[0.92, 0.8, 0.67, 0.58, 0.46, 0.34, 0.22].map((value, idx) => (
+                      <div key={`hero-v-${idx + 1}`} className="flex flex-1 flex-col items-center gap-0.5">
+                        <div className="flex h-[28px] w-full items-end">
+                          <div
+                            className="w-full rounded-[6px] border border-[#31404d] bg-[#172230]"
+                            style={{ height: `${Math.round(value * 100)}%` }}
+                          />
+                        </div>
+                        <div className="text-[8px] font-semibold uppercase tracking-[0.08em] text-[#8ea4ba]">
+                          V{idx + 1}
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>
-
-            </div>
-          </section>
+            </section>
 
 
 
@@ -3624,7 +3671,7 @@ export function EvalsPageClientV0_1() {
                                 <div className="rounded-[8px] border border-[#26323a] bg-[#12181d] px-3 py-2">
                                   <div className={`${MT.helper} text-[#9fb1bf]`}>Permutation p</div>
                                   <div className="mt-1 font-mono text-[13px] text-[#f2f2f2]">
-                                    min {fmt(summary.minPPerm)} · max {fmt(summary.maxPPerm)}
+                                    min {summary.minPPerm == null ? "—" : fmtP(summary.minPPerm)} · max {summary.maxPPerm == null ? "—" : fmtP(summary.maxPPerm)}
                                   </div>
                                   <div className="mt-1 text-[12px] text-[#a9b8c5]">
                                     lower is stronger ladder signal

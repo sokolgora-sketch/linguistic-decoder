@@ -15,8 +15,8 @@ describe("Evals screenshot-grade polish v0.1", () => {
     expect(src).toContain("p_perm");
     expect(src).toContain("Deterministic eval instrument.");
     expect(src).toContain("Live scoring stays here; paper snapshots live on the reference page.");
-    expect(src).toContain("Accepted input");
-    expect(src).toContain("Workflow");
+    expect(src).toContain("What to paste");
+    expect(src).toContain("How the workflow works");
     expect(src).toContain('border-[#355a7a] bg-[#101a24] text-[#9fd3ff]');
   });
 });
