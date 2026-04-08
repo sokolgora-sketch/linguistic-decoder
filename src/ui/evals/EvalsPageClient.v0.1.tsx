@@ -2542,7 +2542,7 @@ export function EvalsPageClientV0_1() {
 
           <section className="rounded-[10px] border border-[#333] bg-[#141414] px-3 py-2">
             <div className="grid gap-3 xl:grid-cols-[320px_minmax(0,1fr)_minmax(340px,420px)] xl:items-start">
-              <aside className="space-y-3 xl:sticky xl:top-6">
+              <aside className="space-y-3 xl:sticky xl:top-6 xl:max-h-[calc(100vh-96px)] xl:overflow-y-auto xl:pr-1">
           <div className="grid grid-cols-1 gap-3">
             <div>
               <label className={`${MT.fieldLabel} text-[#ededed]`}>
@@ -2778,7 +2778,7 @@ export function EvalsPageClientV0_1() {
             </details>
               </aside>
 
-              <div className="min-w-0 space-y-3">
+              <div className="min-w-0 space-y-3 xl:px-1">
           <div className="space-y-2">
             <div className={`${MT.sectionLabel} text-[#ededed]`}>
               Input source
@@ -4182,7 +4182,7 @@ export function EvalsPageClientV0_1() {
           </section>
         ) : null}
               </div>
-              <aside className="hidden xl:block xl:sticky xl:top-[96px] xl:self-start">
+              <aside className="hidden xl:block xl:sticky xl:top-[96px] xl:max-h-[calc(100vh-120px)] xl:self-start xl:overflow-y-auto xl:pl-1">
                 <div className="rounded-[10px] border border-[#33424a] bg-[#10151a] px-3 py-2">
                   <div className="space-y-1">
                     <div className={`${MT.sectionLabel} text-[#ededed]`}>
