@@ -476,6 +476,22 @@ function StickyNav({
           >
             Help
           </Link>
+            <button
+              type="button"
+              className="inline-flex shrink-0 items-center rounded-[8px] border border-[#355a7a] bg-[#0f151c] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#cfe6ff] transition hover:border-[#4d7fa8] hover:bg-[#132031] hover:text-white"
+              onClick={() => {
+                const savedRunsCard = document.getElementById("evals-saved-runs-card");
+                if (savedRunsCard instanceof HTMLDetailsElement) {
+                  savedRunsCard.open = true;
+                  savedRunsCard.scrollIntoView({
+                    behavior: "smooth",
+                    block: "start",
+                  });
+                }
+              }}
+            >
+              Open Saved Run
+            </button>
           <Link
             href="/evals/reference"
             className="inline-flex shrink-0 items-center rounded-[8px] border border-[#5a2424] bg-[#1f1010] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#fca5a5] transition hover:border-[#7a3434] hover:bg-[#281414] hover:text-[#ffd0d0]"
@@ -1517,19 +1533,19 @@ export function EvalsPageClientV0_1() {
     setNotice(`Deleted active series: ${series.label}`);
   }
 
-  function deleteSelectedSavedRun() {
-    const selected = savedRuns.find((row) => row.id === selectedSavedRunId);
-    if (!selected) {
-      showWarnNotice("Delete Saved Run: choose a saved run first.");
-      return;
-    }
+  function deleteSavedRunById(runId: string) {
+    const target = savedRuns.find((row) => row.id === runId);
+    if (!target) return;
 
-    const remaining = savedRuns.filter((row) => row.id !== selected.id);
+    const remaining = savedRuns.filter((row) => row.id !== runId);
     writeSavedRuns(remaining);
     setSavedRuns(remaining);
-    setSelectedSavedRunId(remaining[0]?.id ?? "");
-    setNotice(`Deleted saved run: ${selected.title}`);
+    setSelectedSavedRunId((prev) =>
+      prev === runId ? remaining[0]?.id ?? "" : prev
+    );
+    setNotice(`Deleted saved run: ${target.title}`);
   }
+
 
   function openSelectedSavedRun() {
     const selected = savedRuns.find((row) => row.id === selectedSavedRunId);
@@ -3729,136 +3745,122 @@ export function EvalsPageClientV0_1() {
 
 
 
-              <div className="rounded-[10px] border border-[#2f3b46] bg-[#12181d] px-3 py-2">
-                <div className="flex flex-col gap-3 xl:flex-row xl:items-end xl:justify-between">
-                  <div className="space-y-1">
-                    <div className={`${MT.sectionLabel} text-[#ededed]`}>
-                      Saved runs
-                    </div>
-                    <div className={`${MT.helper} text-[#a9a9a9]`}>
-                      Open a previously saved run checkpoint after reload or reset.
-                    </div>
-                  </div>
+              </div>
+              </details>
+            </section>
+          ) : null}
 
-                  <div className="mt-2 grid gap-4">
-                      <div className="space-y-2">
-                        <label className={`${MT.fieldLabel} text-[#ededed]`}>
-                          Open Saved Run
-                        </label>
-
-                        {savedRunSeriesGroups.length === 0 ? (
-                          <div className="rounded-[8px] border border-dashed border-[#3a3a3a] bg-[#151515] px-3 py-2 text-sm text-[#9fb1bf]">
-                            No saved runs yet
-                          </div>
-                        ) : (
-                          <div className="space-y-3">
-                            {savedRunSeriesGroups.map((group) => (
-                              <details
-                                key={group.id}
-                                className="overflow-hidden rounded-[8px] border border-[#2f3b46] bg-[#151a1f]"
-                                open={openSavedRunGroupIds.includes(group.id)}
-                                onToggle={(e) => {
-                                  const isOpen = (e.currentTarget as HTMLDetailsElement).open;
-                                  setOpenSavedRunGroupIds((prev) => {
-                                    const next = new Set(prev);
-                                    if (isOpen) next.add(group.id);
-                                    else next.delete(group.id);
-                                    return Array.from(next);
-                                  });
-                                }}
-                              >
-                                <summary className="cursor-pointer list-none px-3 py-2 transition hover:bg-[#192028] [&::-webkit-details-marker]:hidden">
-                                  <div className="flex flex-wrap items-center justify-between gap-3">
-                                    <div className="min-w-0">
-                                      <div className="truncate text-sm font-semibold text-[#ededed]">
-                                        {group.label}
-                                      </div>
-                                      <div className="mt-1 text-xs text-[#9fb1bf]">
-                                        {group.runCount} run{group.runCount === 1 ? "" : "s"} · created{" "}
-                                        {new Date(group.createdAt).toLocaleString()} · updated{" "}
-                                        {new Date(group.updatedAt).toLocaleString()}
-                                      </div>
-                                    </div>
-                                    <div className="rounded-full border border-[#355a7a] bg-[#111a24] px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#9fd3ff]">
-                                      {group.seriesId ? "series" : "unassigned"}
-                                    </div>
+                <details id="evals-saved-runs-card" className="rounded-[10px] border border-[#2f3b46] bg-[#12181d] px-3 py-2">
+                  <summary className="cursor-pointer list-none transition hover:text-white [&::-webkit-details-marker]:hidden">
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="space-y-1">
+                        <div className={`${MT.sectionLabel} text-[#ededed]`}>Saved runs</div>
+                        <div className={`${MT.helper} text-[#a9a9a9]`}>Open a previously saved run checkpoint after reload or reset.</div>
+                      </div>
+                      <div className="rounded-full border border-[#355a7a] bg-[#111a24] px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#cfe6ff]">expand</div>
+                    </div>
+                  </summary>
+                  <div className="mt-3 space-y-3">
+                    {savedRunSeriesGroups.length === 0 ? (
+                      <div className="rounded-[8px] border border-dashed border-[#3a3a3a] bg-[#151515] px-3 py-2 text-sm text-[#9fb1bf]">
+                        No saved runs yet
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        {savedRunSeriesGroups.map((group) => (
+                          <details
+                            key={group.id}
+                            className="overflow-hidden rounded-[8px] border border-[#2f3b46] bg-[#151a1f]"
+                            open={openSavedRunGroupIds.includes(group.id)}
+                            onToggle={(e) => {
+                              const isOpen = (e.currentTarget as HTMLDetailsElement).open;
+                              setOpenSavedRunGroupIds((prev) => {
+                                const next = new Set(prev);
+                                if (isOpen) next.add(group.id);
+                                else next.delete(group.id);
+                                return Array.from(next);
+                              });
+                            }}
+                          >
+                            <summary className="cursor-pointer list-none px-3 py-2 transition hover:bg-[#192028] [&::-webkit-details-marker]:hidden">
+                              <div className="flex flex-wrap items-center justify-between gap-3">
+                                <div className="min-w-0">
+                                  <div className="truncate text-sm font-semibold text-[#ededed]">
+                                    {group.label}
                                   </div>
-                                </summary>
-
-                                <div className="border-t border-[#26313a] px-3 py-2">
-                                  <div className="space-y-2">
-                                    {group.rows.map((row) => {
-                                      const selected = row.id === selectedSavedRunId;
-                                      return (
-                                        <button
-                                          key={row.id}
-                                          type="button"
-                                          onClick={() => setSelectedSavedRunId(row.id)}
-                                          className={`w-full rounded-[8px] border px-3 py-2 text-left transition ${
-                                            selected
-                                              ? "border-[#5c8db8] bg-[#132031] text-white"
-                                              : "border-[#313131] bg-[#171717] text-[#d6d6d6] hover:border-[#555] hover:bg-[#1d1d1d] hover:text-white"
-                                          }`}
-                                        >
-                                          <div className="flex flex-wrap items-center justify-between gap-3">
-                                            <div className="min-w-0">
-                                              <div className="truncate text-sm font-medium">
-                                                {row.title}
-                                              </div>
-                                              <div className="mt-1 text-xs text-[#9fb1bf]">
-                                                {typeof row.ordinal === "number" ? formatSeriesOrdinal(row.ordinal) : "no ordinal"} · {row.id.slice(0, 8)}
-                                              </div>
-                                            </div>
-                                            <div className="text-right text-xs text-[#9fb1bf]">
-                                              <div>saved {new Date(row.createdAt).toLocaleString()}</div>
-                                              <div>updated {new Date(row.updatedAt).toLocaleString()}</div>
-                                            </div>
-                                          </div>
-                                        </button>
-                                      );
-                                    })}
+                                  <div className="mt-1 text-xs text-[#9fb1bf]">
+                                    {group.runCount} run{group.runCount === 1 ? "" : "s"} · created{" "}
+                                    {new Date(group.createdAt).toLocaleString()} · updated{" "}
+                                    {new Date(group.updatedAt).toLocaleString()}
                                   </div>
                                 </div>
-                              </details>
-                            ))}
-                          </div>
-                        )}
+                                <div className="rounded-full border border-[#355a7a] bg-[#111a24] px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#9fd3ff]">
+                                  {group.seriesId ? "series" : "unassigned"}
+                                </div>
+                              </div>
+                            </summary>
 
-                        <div className={`${MT.helperCompact} text-[#9fb1bf]`}>
-                          Saved runs are frozen workbench checkpoints grouped by series so you can reopen them after reset or reload.
-                        </div>
+                            <div className="border-t border-[#26313a] px-3 py-2">
+                              <div className="space-y-2">
+                                {group.rows.map((row) => {
+                                  const selected = row.id === selectedSavedRunId;
+                                  return (
+                                    <div
+                                      key={row.id}
+                                      className={`flex flex-wrap items-start gap-3 rounded-[8px] border px-3 py-2 ${
+                                        selected
+                                          ? "border-[#5c8db8] bg-[#132031]"
+                                          : "border-[#313131] bg-[#171717]"
+                                      }`}
+                                    >
+                                      <button
+                                        type="button"
+                                        onClick={() => setSelectedSavedRunId(row.id)}
+                                        className={`min-w-0 flex-1 text-left transition ${
+                                          selected
+                                            ? "text-white"
+                                            : "text-[#d6d6d6] hover:text-white"
+                                        }`}
+                                      >
+                                        <div className="flex flex-wrap items-center justify-between gap-3">
+                                          <div className="min-w-0">
+                                            <div className="truncate text-sm font-medium">
+                                              {row.title}
+                                            </div>
+                                            <div className="mt-1 text-xs text-[#9fb1bf]">
+                                              {typeof row.ordinal === "number" ? formatSeriesOrdinal(row.ordinal) : "no ordinal"} · {row.id.slice(0, 8)}
+                                            </div>
+                                          </div>
+                                          <div className="text-right text-xs text-[#9fb1bf]">
+                                            <div>saved {new Date(row.createdAt).toLocaleString()}</div>
+                                            <div>updated {new Date(row.updatedAt).toLocaleString()}</div>
+                                          </div>
+                                        </div>
+                                      </button>
+
+                                      <button
+                                        type="button"
+                                        onClick={() => deleteSavedRunById(row.id)}
+                                        className="inline-flex shrink-0 items-center rounded-[8px] border border-[#6b3737] bg-[#211717] px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#ffc1c1] transition hover:border-[#cc0000] hover:bg-[#2a1616] hover:text-white disabled:opacity-50"
+                                        disabled={busy}
+                                      >
+                                        Delete
+                                      </button>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          </details>
+                        ))}
                       </div>
-                    </div>
+                    )}
 
-                    <div className="flex flex-wrap gap-3">
-                      <button
-                        type="button"
-                        className={`${MT.actionSecondary} border-[#555] bg-[#1a1a1a] text-[#e2e2e2] transition hover:border-[#777] hover:bg-[#202020] hover:text-white disabled:opacity-50`}
-                        onClick={openSelectedSavedRun}
-                        disabled={busy || !selectedSavedRunId}
-                      >
-                        Open Saved Run
-                      </button>
-
-                      <button
-                        type="button"
-                        className={`${MT.actionWarn} border-[#6b3737] bg-[#211717] text-[#e6a0a0] transition hover:border-[#cc0000] hover:bg-[#2a1616] hover:text-[#ffc1c1] disabled:opacity-50`}
-                        onClick={deleteSelectedSavedRun}
-                        disabled={busy || !selectedSavedRunId}
-                      >
-                        Delete Saved Run
-                      </button>
+                    <div className={`${MT.helperCompact} text-[#9fb1bf]`}>
+                      Saved runs are frozen workbench checkpoints grouped by series so you can reopen them after reset or reload.
                     </div>
                   </div>
-                </div>
-              </div>
-
-
-
-            </details>
-          </section>
-        ) : null}
-
+                </details>
         {report ? (
           <section className="space-y-3 pt-6">
             <details className="rounded-[12px] border border-[#2a2a2a] bg-[#151515]">
