@@ -2892,10 +2892,6 @@ export function EvalsPageClientV0_1() {
                   </div>
                 ) : null}
               </div>
-              <div className="mt-5 flex flex-wrap gap-2 border-t border-[#2a2a2a] pt-4">
-                <button type="button" className={`${MT.actionPrimary} border-[#16a34a] bg-[#16a34a] text-white transition hover:border-[#15803d] hover:bg-[#15803d] hover:shadow-[0_0_0_1px_rgba(22,163,74,0.4),0_4px_16px_rgba(22,163,74,0.33)] disabled:cursor-not-allowed disabled:border-[#333] disabled:bg-[#111] disabled:text-[#333] disabled:shadow-none`} onClick={() => void onScore()} disabled={busy || !inputText.trim()}>{busy ? "Scoring…" : report ? "Scored ✓" : "Score run"}</button>
-                <button type="button" className={`${MT.actionSecondary} border-[#555] bg-[#1a1a1a] text-[#e2e2e2] transition hover:border-[#777] hover:bg-[#202020] hover:text-white disabled:opacity-50`} onClick={() => resetWorkbench()} disabled={busy}>Reset Workbench</button>
-              </div>
             </div>
             <div className="rounded-[12px] border border-[#2d4a34] bg-[#0d1410] px-3 py-2">
               <div className="space-y-1">
@@ -2958,7 +2954,7 @@ export function EvalsPageClientV0_1() {
                 </div>
                 <div className="mt-3 grid grid-cols-2 gap-2">
                   <button type="button" className={`${MT.actionSecondary} border-[#2d7f5a] bg-[#103224] text-[#c9f5df] transition hover:border-[#3ea776] hover:bg-[#17442f] hover:text-white disabled:opacity-50`} onClick={saveAndAdvanceSeries} disabled={busy || !selectedSeriesId || (!inputText.trim() && !report && !md)}>Save + Next Run</button>
-                  <button type="button" className={`${MT.actionWarn} border-[#6b3737] bg-[#211717] text-[#e6a0a0] transition hover:border-[#cc0000] hover:bg-[#2a1616] hover:text-[#ffc1c1] disabled:opacity-50`} onClick={deleteSelectedRunSeries} disabled={busy || !selectedSeriesId}>Delete Active Series</button>
+                  <button type="button" className={`${MT.actionWarn} w-full min-h-[36px] px-2 py-1 text-[10px] leading-[1.1] border-[#6b3737] bg-[#211717] text-[#e6a0a0] transition hover:border-[#cc0000] hover:bg-[#2a1616] hover:text-[#ffc1c1] disabled:opacity-50`} onClick={deleteSelectedRunSeries} disabled={busy || !selectedSeriesId}>Delete Active Series</button>
                   <button type="button" className={`${MT.actionSecondary} border-[#30465d] bg-[#101b28] text-[#cfe6ff] transition hover:border-[#46698f] hover:bg-[#162434] hover:text-white disabled:opacity-50`} onClick={exportActiveSeriesJson} disabled={busy || !selectedSeriesId}>Export JSON</button>
                   <button type="button" className={`${MT.actionSecondary} border-[#3f5a2f] bg-[#172111] text-[#d7f0c8] transition hover:border-[#5b7f43] hover:bg-[#1d2a15] hover:text-white disabled:opacity-50`} onClick={exportActiveSeriesCsv} disabled={busy || !selectedSeriesId}>Export CSV</button>
                   <button type="button" className={`${MT.actionUtility} border-[#355a7a] bg-transparent text-[#9fd3ff] transition hover:border-[#4d7fa8] hover:bg-[#132031] hover:text-[#d7eeff] disabled:opacity-50`} onClick={() => void onCopyGuidedBaselinePrompt()} disabled={busy}>Copy Baseline Prompt</button>
@@ -2967,11 +2963,29 @@ export function EvalsPageClientV0_1() {
               </div>
             </div>
           </div>
-          <div className="flex flex-col gap-2 pt-0">
-            <div className="flex flex-nowrap items-center gap-2 overflow-x-auto">
+          <div className="space-y-1.5 pt-0">
+              <div className="grid grid-cols-2 gap-1.5 md:grid-cols-4">
                 <button
                   type="button"
-                  className={`${MT.actionSecondary} border-[#2d4f8f] bg-[#15233d] text-[#c7d9ff] transition hover:border-[#4b73bd] hover:bg-[#1a2b48] hover:text-white disabled:opacity-50`}
+                  className={`${MT.actionPrimary} w-full min-h-[32px] px-2 py-1 text-[9px] leading-[1] border-[#16a34a] bg-[#16a34a] text-white transition hover:border-[#15803d] hover:bg-[#15803d] hover:shadow-[0_0_0_1px_rgba(22,163,74,0.4),0_4px_16px_rgba(22,163,74,0.33)] disabled:cursor-not-allowed disabled:border-[#333] disabled:bg-[#111] disabled:text-[#333] disabled:shadow-none`}
+                  onClick={() => void onScore()}
+                  disabled={busy || !inputText.trim()}
+                >
+                  {busy ? "Scoring…" : report ? "Scored ✓" : "Score run"}
+                </button>
+
+                <button
+                  type="button"
+                  className={`${MT.actionSecondary} w-full min-h-[32px] px-2 py-1 text-[9px] leading-[1] border-[#555] bg-[#1a1a1a] text-[#e2e2e2] transition hover:border-[#777] hover:bg-[#202020] hover:text-white disabled:opacity-50`}
+                  onClick={() => resetWorkbench()}
+                  disabled={busy}
+                >
+                  Reset Workbench
+                </button>
+
+                <button
+                  type="button"
+                  className={`${MT.actionSecondary} w-full min-h-[32px] px-2 py-1 text-[9px] leading-[1] border-[#2d4f8f] bg-[#15233d] text-[#c7d9ff] transition hover:border-[#4b73bd] hover:bg-[#1a2b48] hover:text-white disabled:opacity-50`}
                   onClick={() => saveCurrentRun()}
                   disabled={busy || (!inputText.trim() && !report && !md)}
                 >
@@ -2980,7 +2994,7 @@ export function EvalsPageClientV0_1() {
 
               <button
                 type="button"
-                className={`${MT.actionWarn} border-[#6b3737] bg-[#211717] text-[#e6a0a0] transition hover:border-[#cc0000] hover:bg-[#2a1616] hover:text-[#ffc1c1] disabled:opacity-50`}
+                className={`${MT.actionWarn} w-full min-h-[32px] px-2 py-1 text-[9px] leading-[1] border-[#6b3737] bg-[#211717] text-[#e6a0a0] transition hover:border-[#cc0000] hover:bg-[#2a1616] hover:text-[#ffc1c1] disabled:opacity-50`}
                 onClick={() => void onDownloadPdf()}
                 disabled={busy || !inputText.trim()}
               >
@@ -2989,7 +3003,7 @@ export function EvalsPageClientV0_1() {
 
               <button
                 type="button"
-                className={`${MT.actionUtility} border-[#444] bg-transparent text-[#b8b8b8] transition hover:border-[#777] hover:bg-[#1f1f1f] hover:text-[#f2f2f2] disabled:opacity-50`}
+                className={`${MT.actionUtility} w-full min-h-[32px] px-2 py-1 text-[9px] leading-[1] border-[#444] bg-transparent text-[#b8b8b8] transition hover:border-[#777] hover:bg-[#1f1f1f] hover:text-[#f2f2f2] disabled:opacity-50`}
                 onClick={() => void onDownloadBundle()}
                 disabled={busy || !inputText.trim()}
               >
@@ -2997,7 +3011,7 @@ export function EvalsPageClientV0_1() {
               </button>
               <button
                 type="button"
-                className={`${MT.actionUtility} border-[#444] bg-transparent text-[#b8b8b8] transition hover:border-[#777] hover:bg-[#1f1f1f] hover:text-[#f2f2f2] disabled:opacity-50`}
+                className={`${MT.actionUtility} w-full min-h-[32px] px-2 py-1 text-[9px] leading-[1] border-[#444] bg-transparent text-[#b8b8b8] transition hover:border-[#777] hover:bg-[#1f1f1f] hover:text-[#f2f2f2] disabled:opacity-50`}
                 onClick={() => void onCopyRawJson()}
                 disabled={busy || !inputText.trim()}
               >
@@ -3005,7 +3019,7 @@ export function EvalsPageClientV0_1() {
               </button>
               <button
                 type="button"
-                className={`${MT.actionUtility} border-[#444] bg-transparent text-[#b8b8b8] transition hover:border-[#777] hover:bg-[#1f1f1f] hover:text-[#f2f2f2] disabled:opacity-50`}
+                className={`${MT.actionUtility} w-full min-h-[32px] px-2 py-1 text-[9px] leading-[1] border-[#444] bg-transparent text-[#b8b8b8] transition hover:border-[#777] hover:bg-[#1f1f1f] hover:text-[#f2f2f2] disabled:opacity-50`}
                 onClick={() => void onCopyCsvRow()}
                 disabled={busy || !report}
               >
@@ -3013,7 +3027,7 @@ export function EvalsPageClientV0_1() {
               </button>
               <button
                 type="button"
-                className={` border-[#355a7a] bg-[#101a24] text-[#9fd3ff] transition hover:border-[#4d7fa8] hover:bg-[#132031] hover:text-[#d7eeff]`}
+                className={`${MT.actionUtility} w-full min-h-[32px] px-2 py-1 text-[9px] leading-[1] border-[#355a7a] bg-[#101a24] text-[#9fd3ff] transition hover:border-[#4d7fa8] hover:bg-[#132031] hover:text-[#d7eeff] disabled:opacity-50`}
                 onClick={loadExample}
                 disabled={busy}
               >
