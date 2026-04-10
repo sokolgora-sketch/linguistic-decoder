@@ -2545,31 +2545,31 @@ export function EvalsPageClientV0_1() {
           stateToneClass={stateToneClass}
         />
 
-          <main className="flex w-full flex-col gap-3 px-2 pt-6 pb-16 xl:px-4">
+          <main className="flex w-full flex-col gap-3 px-2 pt-1 pb-16 xl:px-4">
             <section className="rounded-[14px] border border-[#2f3742] bg-[#13171d] px-4 py-3 shadow-[0_16px_40px_rgba(0,0,0,0.24)]">
-              <div className="grid gap-3 xl:grid-cols-[minmax(0,1.42fr)_260px] xl:items-start">
-                <div className="min-w-0 space-y-2">
-                  <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+              <div className="grid gap-1 xl:grid-cols-[minmax(0,1.78fr)_188px] xl:items-start">
+                <div className="min-w-0 space-y-0.5">
+                  <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 xl:flex-nowrap">
                     <div className={`${MT.eyebrow} text-[#d7dde7]`}>
                       instrument · evals
                     </div>
-                    <h1 className={`${MT.heroTitle} !text-[18px] leading-none text-[#f5f7fb]`}>
+                    <h1 className={`${MT.heroTitle} !text-[15px] leading-none text-[#f5f7fb] whitespace-nowrap`}>
                       ZË-RO Evals Workbench
                     </h1>
+                    <p className={`${MT.heroBody} text-[10px] leading-3 text-[#bac3d2] xl:min-w-0 xl:flex-1 xl:whitespace-nowrap`}>
+                      Deterministic eval instrument. Bring model outputs; ZË-RO scores them. No model calls. Live scoring stays here; paper snapshots live on the reference page.
+                    </p>
                   </div>
-                  <p className={`${MT.heroBody} text-[13px] leading-5 text-[#bac3d2]`}>
-                    Deterministic eval instrument. Bring model outputs; ZË-RO scores them. No model calls. Live scoring stays here; paper snapshots live on the reference page.
-                  </p>
-                  <div className="rounded-[10px] border border-[#233240] bg-[#111821] px-3 py-1.5">
-                    <p className="text-[12px] leading-5 text-[#c4d0de]">
+                  <div className="rounded-[10px] border border-[#233240] bg-[#111821] px-2.5 py-0.5">
+                    <p className="text-[10px] leading-3.5 text-[#c4d0de]">
                       Paste either a full evalRun.v0.1 bundle or raw V1..V7 bucket JSON. Run the model elsewhere, paste the result here, then score, inspect signal, save checkpoints, and export evidence.
                     </p>
                   </div>
                   <details className="rounded-[10px] border border-[#4a3a1b] bg-[#17130d]">
-                    <summary className="cursor-pointer px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-[#f3d38b] transition hover:bg-[#1f1a10] [&::-webkit-details-marker]:hidden">
+                    <summary className="cursor-pointer px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-[#f3d38b] transition hover:bg-[#1f1a10] [&::-webkit-details-marker]:hidden">
                       {EVALS_BETA_INTRO_TITLE}
                     </summary>
-                    <div className="space-y-3 px-4 pb-3 text-[12px] leading-5 text-[#d7cfbb]">
+                    <div className="space-y-2 px-3 pb-2 text-[12px] leading-5 text-[#d7cfbb]">
                       <p>
                         Use this page to score model-generated ladder JSON or full <span className="font-mono text-[#fff1c2]">evalRun.v0.1</span> bundles against ZË-RO&apos;s deterministic eval instrument. This page does not generate outputs for you and it does not call a model on your behalf.
                       </p>
@@ -2617,7 +2617,7 @@ export function EvalsPageClientV0_1() {
                   </details>
                 </div>
 
-                <div className="rounded-[12px] border border-[#2c3540] bg-[#10161e] px-2.5 py-1">
+                <div className="rounded-[12px] border border-[#2c3540] bg-[#10161e] px-1.5 py-0.5">
                   <div className="flex items-center justify-between gap-3">
                     <div className="space-y-0.5">
                       <div className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#d7deea]">
@@ -2631,10 +2631,10 @@ export function EvalsPageClientV0_1() {
                       V1–V7
                     </div>
                   </div>
-                  <div className="mt-1 flex h-[42px] items-end gap-1">
+                  <div className="mt-0.5 flex h-[24px] items-end gap-1">
                     {[0.92, 0.8, 0.67, 0.58, 0.46, 0.34, 0.22].map((value, idx) => (
                       <div key={`hero-v-${idx + 1}`} className="flex flex-1 flex-col items-center gap-0.5">
-                        <div className="flex h-[28px] w-full items-end">
+                        <div className="flex h-[14px] w-full items-end">
                           <div
                             className="w-full rounded-[6px] border border-[#31404d] bg-[#172230]"
                             style={{ height: `${Math.round(value * 100)}%` }}
@@ -4409,5 +4409,4 @@ export function EvalsPageClientV0_1() {
     </div>
   );
 }
-
 
