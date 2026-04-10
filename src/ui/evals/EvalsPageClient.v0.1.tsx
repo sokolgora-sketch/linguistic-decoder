@@ -59,6 +59,18 @@ type InputProbe =
   | { kind: "empty" }
   | { kind: "invalid_json"; error: string }
   | { kind: "bucket_only"; parsed: Record<string, string[]> }
+  | {
+      kind: "single_task_payload";
+      parsed: {
+        taskId: string;
+        inputShape: string;
+        buckets: Record<string, string[]>;
+        languageHint?: string;
+        vowelUnderTest?: string;
+        anchorLow?: string;
+        anchorHigh?: string;
+      };
+    }
   | { kind: "corpus70_meta"; parsed: any }
   | { kind: "other_json"; parsed: unknown };
 
@@ -66,19 +78,56 @@ function isPlainObject(x: unknown): x is Record<string, unknown> {
   return typeof x === "object" && x !== null && !Array.isArray(x);
 }
 
-function looksLikeBucketsOnly(x: unknown): x is Record<string, string[]> {
+function isStringArrayRecord(x: unknown): x is Record<string, string[]> {
   if (!isPlainObject(x)) return false;
-  const keys = Object.keys(x).sort();
-  const want = ["V1", "V2", "V3", "V4", "V5", "V6", "V7"];
-  if (keys.length !== want.length) return false;
-  for (let i = 0; i < want.length; i++) if (keys[i] !== want[i]) return false;
-
-  for (const k of want) {
-    const v = (x as any)[k];
+  const entries = Object.entries(x);
+  if (!entries.length) return false;
+  for (const [k, v] of entries) {
+    if (!k.trim()) return false;
     if (!Array.isArray(v)) return false;
     for (const it of v) if (typeof it !== "string") return false;
   }
   return true;
+}
+
+function hasExactStringArrayKeys(
+  x: unknown,
+  want: string[],
+): x is Record<string, string[]> {
+  if (!isStringArrayRecord(x)) return false;
+  const keys = Object.keys(x).sort();
+  const target = [...want].sort();
+  if (keys.length !== target.length) return false;
+  for (let i = 0; i < target.length; i++) if (keys[i] !== target[i]) return false;
+  return true;
+}
+
+function looksLikeBucketsOnly(x: unknown): x is Record<string, string[]> {
+  return hasExactStringArrayKeys(x, ["V1", "V2", "V3", "V4", "V5", "V6", "V7"]);
+}
+
+function looksLikeSingleTaskPayload(x: unknown): x is {
+  taskId: string;
+  inputShape: string;
+  buckets: Record<string, string[]>;
+  languageHint?: string;
+  vowelUnderTest?: string;
+  anchorLow?: string;
+  anchorHigh?: string;
+} {
+  if (!isPlainObject(x)) return false;
+  if (typeof (x as any).taskId !== "string") return false;
+  if (typeof (x as any).inputShape !== "string") return false;
+  if (!isPlainObject((x as any).buckets)) return false;
+  return isStringArrayRecord((x as any).buckets);
+}
+
+function taskAcceptsRawBucketObject(
+  task: (typeof EVAL_SPEC_V0_1.tasks)[number] | null,
+  x: unknown,
+): x is Record<string, string[]> {
+  if (!task) return false;
+  return hasExactStringArrayKeys(x, task.targetBuckets);
 }
 
 function looksLikeCorpus70Meta(x: unknown): boolean {
@@ -100,6 +149,9 @@ function probeInput(text: string): InputProbe {
       kind: "invalid_json",
       error: e instanceof Error ? e.message : String(e),
     };
+  }
+  if (looksLikeSingleTaskPayload(parsed)) {
+    return { kind: "single_task_payload", parsed };
   }
   if (looksLikeBucketsOnly(parsed)) return { kind: "bucket_only", parsed };
   if (looksLikeCorpus70Meta(parsed))
@@ -1041,13 +1093,12 @@ export function EvalsPageClientV0_1() {
   );
 
   const selectedTask = useMemo(() => {
-    const pool = mode === "task_buckets" ? bucketsOnlyTasks : byoTasks;
-    return (
-      pool.find((t) => t.taskId === taskId) ??
-      pool[0] ??
-      null
-    );
-  }, [mode, taskId, byoTasks, bucketsOnlyTasks]);
+    const fallback =
+      mode === "task_buckets"
+        ? defaultBucketsTask ?? byoTasks[0] ?? null
+        : byoTasks[0] ?? null;
+    return byoTasks.find((t) => t.taskId === taskId) ?? fallback;
+  }, [mode, taskId, byoTasks, defaultBucketsTask]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -1061,14 +1112,14 @@ export function EvalsPageClientV0_1() {
     setMode("task_buckets");
 
     const nextTask =
-      bucketsOnlyTasks.find((t) => t.taskId === taskParam) ??
+      byoTasks.find((t) => t.taskId === taskParam) ??
       defaultBucketsTask ??
       null;
 
     if (nextTask?.taskId) {
       setTaskId(nextTask.taskId);
     }
-  }, [bucketsOnlyTasks, defaultBucketsTask]);
+  }, [byoTasks, defaultBucketsTask]);
 
   const operatorChecklistItems = useMemo(() => {
     const providerValue = provider.trim();
@@ -1338,22 +1389,66 @@ export function EvalsPageClientV0_1() {
     if (prob.kind === "empty") throw new Error("Empty input");
     if (mode === "run_bundle" && prob.kind === "corpus70_meta") {
       throw new Error(
-        "This looks like a Corpus70 meta-tags JSON (version/allowedTags/tags). Evals expects evalRun.v0.1 or buckets V1..V7.",
+        "This looks like a Corpus70 meta-tags JSON (version/allowedTags/tags). Evals expects evalRun.v0.1 or raw task JSON.",
       );
     }
 
     const parsed = (prob as any).parsed as unknown;
     const effectiveMode = opts?.forceMode ?? mode;
-    const taskPool =
-      effectiveMode === "task_buckets" || looksLikeBucketsOnly(parsed)
-        ? bucketsOnlyTasks
-        : byoTasks;
+    const taskPool = byoTasks;
     const taskForMode =
-      taskPool.find((t) => t.taskId === taskId) ?? taskPool[0] ?? null;
-    // Auto-wrap only when the input is strictly buckets-only.
-    if (effectiveMode === "run_bundle" && looksLikeBucketsOnly(parsed)) {
-        const wrapTask = defaultBucketsTask ?? taskForMode;
-        if (!wrapTask) throw new Error("No task selected");
+      taskPool.find((t) => t.taskId === taskId) ??
+      (effectiveMode === "task_buckets"
+        ? defaultBucketsTask ?? taskPool[0] ?? null
+        : taskPool[0] ?? null);
+    const isRawLadder = looksLikeBucketsOnly(parsed);
+    const isRawTaskPayload = prob.kind === "single_task_payload";
+
+    const wrapTaskPayloadIntoRun = (rawTask: any) => ({
+      evalRunVersion: "evalRun.v0.1",
+      evalSpecVersion: "evalSpec.v0.1",
+      specId: "public-grounding-probe.v0.1",
+      runId: rid,
+      meta: {
+        ...(providerValue ? { provider: providerValue } : {}),
+        ...(modelValue ? { model: modelValue } : {}),
+        ...(labelValue ? { label: labelValue } : {}),
+        ...(sourceEngineIdValue ? { sourceEngineId: sourceEngineIdValue } : {}),
+        ...(sourceEngineVersionValue
+          ? { sourceEngineVersion: sourceEngineVersionValue }
+          : {}),
+        ...(sourceEngineBuildValue
+          ? { sourceEngineBuild: sourceEngineBuildValue }
+          : {}),
+      },
+      tasks: [
+        {
+          taskId: String(rawTask.taskId),
+          inputShape: String(rawTask.inputShape),
+          ...(typeof rawTask.languageHint === "string" && rawTask.languageHint.trim()
+            ? { languageHint: rawTask.languageHint.trim() }
+            : {}),
+          ...(typeof rawTask.vowelUnderTest === "string" && rawTask.vowelUnderTest.trim()
+            ? { vowelUnderTest: rawTask.vowelUnderTest.trim() }
+            : {}),
+          ...(typeof rawTask.anchorLow === "string" && rawTask.anchorLow.trim()
+            ? { anchorLow: rawTask.anchorLow.trim() }
+            : {}),
+          ...(typeof rawTask.anchorHigh === "string" && rawTask.anchorHigh.trim()
+            ? { anchorHigh: rawTask.anchorHigh.trim() }
+            : {}),
+          buckets: rawTask.buckets,
+        },
+      ],
+    });
+
+    if (effectiveMode === "run_bundle" && isRawTaskPayload) {
+      return wrapTaskPayloadIntoRun(parsed);
+    }
+
+    if (effectiveMode === "run_bundle" && isRawLadder) {
+      const wrapTask = defaultBucketsTask ?? taskForMode;
+      if (!wrapTask) throw new Error("No task selected");
       return {
         evalRunVersion: "evalRun.v0.1",
         evalSpecVersion: "evalSpec.v0.1",
@@ -1375,8 +1470,8 @@ export function EvalsPageClientV0_1() {
         },
         tasks: [
           {
-              taskId: wrapTask.taskId,
-            inputShape: "bucketed_single_tokens",
+            taskId: wrapTask.taskId,
+            inputShape: wrapTask.inputShape,
             buckets: parsed,
           },
         ],
@@ -1416,13 +1511,25 @@ export function EvalsPageClientV0_1() {
       return parsed;
     }
 
-    // effectiveMode === task_buckets (wrap raw buckets -> full run bundle)
-    if (!looksLikeBucketsOnly(parsed)) {
+    // effectiveMode === task_buckets (wrap raw task input -> full run bundle)
+    if (isRawTaskPayload) {
+      return wrapTaskPayloadIntoRun(parsed);
+    }
+
+    if (!taskForMode) throw new Error("No task selected");
+
+    if (taskForMode.inputShape !== "bucketed_single_tokens") {
       throw new Error(
-        "Buckets-only mode expects exactly keys V1..V7 with string arrays.",
+        `Raw task mode for ${taskForMode.taskId} expects a single-task JSON payload with taskId/inputShape/buckets.`,
       );
     }
-    if (!taskForMode) throw new Error("No task selected");
+
+    if (!taskAcceptsRawBucketObject(taskForMode, parsed)) {
+      throw new Error(
+        `Raw task mode for ${taskForMode.taskId} expects exactly keys ${taskForMode.targetBuckets.join(", ")} with string arrays.`,
+      );
+    }
+
     return {
       evalRunVersion: "evalRun.v0.1",
       evalSpecVersion: "evalSpec.v0.1",
@@ -1443,7 +1550,7 @@ export function EvalsPageClientV0_1() {
       tasks: [
         {
           taskId: taskForMode.taskId,
-          inputShape: "bucketed_single_tokens",
+          inputShape: taskForMode.inputShape,
           buckets: parsed,
         },
       ],
@@ -2670,7 +2777,7 @@ export function EvalsPageClientV0_1() {
                   Full run bundle (evalRun.v0.1)
                 </option>
                 <option value="task_buckets">
-                  Buckets only (wrap into a run)
+                  Raw task JSON (wrap into a run)
                 </option>
               </select>
             </div>
@@ -2678,7 +2785,7 @@ export function EvalsPageClientV0_1() {
             <div>
               <label className={`${MT.fieldLabel} text-[#ededed]`}>
                 {mode === "task_buckets"
-                  ? "Task (Buckets only mode)"
+                  ? "Task (Raw task mode)"
                   : "Task source"}
               </label>
               <select
@@ -2691,7 +2798,7 @@ export function EvalsPageClientV0_1() {
                 onChange={(e) => setTaskId(e.target.value)}
                 disabled={mode !== "task_buckets"}
               >
-                {(mode === "task_buckets" ? bucketsOnlyTasks : byoTasks).map(
+                {byoTasks.map(
                   (t) => (
                     <option key={t.taskId} value={t.taskId}>
                       {t.taskId} — {t.title}
@@ -2701,8 +2808,8 @@ export function EvalsPageClientV0_1() {
               </select>
               <div className={`${MT.helper} mt-2 text-[#a9a9a9]`}>
                 {mode === "task_buckets"
-                  ? "Select the task used to wrap V1..V7 bucket JSON into evalRun.v0.1."
-                  : "Task comes from bundle. This selector is only used when wrapping buckets-only JSON."}
+                  ? "Select the task used to wrap raw task JSON into evalRun.v0.1."
+                  : "Task comes from bundle. This selector is only used when wrapping raw task JSON."}
               </div>
             </div>
           </div>
@@ -2716,7 +2823,7 @@ export function EvalsPageClientV0_1() {
                 <span>
                   {mode === "task_buckets"
                     ? "TASK PROMPT — CLICK TO EXPAND & COPY TO MODEL"
-                    : "TASK PROMPT — USED ONLY FOR BUCKETS-ONLY MODE"}
+                    : "TASK PROMPT — USED ONLY FOR RAW TASK MODE"}
                 </span>
               </div>
               <span className="text-[12px] text-[#b8a97a] transition-transform duration-200 group-open:rotate-180">
@@ -2744,7 +2851,7 @@ export function EvalsPageClientV0_1() {
               >
                 {mode === "task_buckets"
                   ? (selectedTask?.prompt ?? "(no task selected)")
-                  : "Full run bundle mode expects task provenance to come from the uploaded evalRun.v0.1 bundle. Switch to Buckets only mode to copy a ZË-RO task prompt."}
+                  : "Full run bundle mode expects task provenance to come from the uploaded evalRun.v0.1 bundle. Switch to Raw task JSON mode to copy a ZË-RO task prompt."}
               </pre>
             </div>
           </details>

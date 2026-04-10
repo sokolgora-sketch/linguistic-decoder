@@ -119,7 +119,7 @@ describe("Evals buckets-wrap integration v0.1", () => {
     expect(getTaskSelect()).toHaveValue("T2_LADDER_V0_1");
 
     const options = within(getTaskSelect()).getAllByRole("option");
-    expect(options).toHaveLength(4);
+    expect(options).toHaveLength(5);
     const optionValues = options.map(
       (option) => (option as HTMLOptionElement).value,
     );
@@ -128,6 +128,7 @@ describe("Evals buckets-wrap integration v0.1", () => {
       "T1_BUCKET_V4_V0_1",
       "T1_BUCKET_V7_V0_1",
       "T2_LADDER_V0_1",
+      "T5_INTERMEDIATE_V0_1",
     ]);
   });
 

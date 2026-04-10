@@ -58,20 +58,20 @@ describe("Evals UI rendered mode regression v0.1", () => {
 
     expect(
       screen.getByText(
-        "Task comes from bundle. This selector is only used when wrapping buckets-only JSON."
+        "Task comes from bundle. This selector is only used when wrapping raw task JSON."
       )
     ).toBeInTheDocument();
 
     expect(
-      screen.getByText("TASK PROMPT — USED ONLY FOR BUCKETS-ONLY MODE")
+      screen.getByText("TASK PROMPT — USED ONLY FOR RAW TASK MODE")
     ).toBeInTheDocument();
 
-    forceOpenDetails("TASK PROMPT — USED ONLY FOR BUCKETS-ONLY MODE");
+    forceOpenDetails("TASK PROMPT — USED ONLY FOR RAW TASK MODE");
     expect(screen.getByRole("button", { name: "Copy" })).toBeDisabled();
 
     expect(
       screen.getByText(
-        "Full run bundle mode expects task provenance to come from the uploaded evalRun.v0.1 bundle. Switch to Buckets only mode to copy a ZË-RO task prompt."
+        "Full run bundle mode expects task provenance to come from the uploaded evalRun.v0.1 bundle. Switch to Raw task JSON mode to copy a ZË-RO task prompt."
       )
     ).toBeInTheDocument();
 
@@ -124,7 +124,7 @@ describe("Evals UI rendered mode regression v0.1", () => {
     expect(getTaskSelect()).toBeEnabled();
 
     expect(
-      screen.getByText("Select the task used to wrap V1..V7 bucket JSON into evalRun.v0.1.")
+      screen.getByText("Select the task used to wrap raw task JSON into evalRun.v0.1.")
     ).toBeInTheDocument();
 
     expect(

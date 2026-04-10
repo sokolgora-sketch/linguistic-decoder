@@ -119,7 +119,7 @@ describe("Evals/Landing copy regression guard v0.1", () => {
     const ui = readUtf8("src/ui/evals/EvalsPageClient.v0.1.tsx");
 
     expect(ui).toContain(
-      "Full run bundle mode expects task provenance to come from the uploaded evalRun.v0.1 bundle. Switch to Buckets only mode to copy a ZË-RO task prompt.",
+      "Full run bundle mode expects task provenance to come from the uploaded evalRun.v0.1 bundle. Switch to Raw task JSON mode to copy a ZË-RO task prompt.",
     );
     expect(ui).toContain('disabled={mode !== "task_buckets"}');
 
