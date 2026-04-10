@@ -1,14 +1,22 @@
 // EVALS-2 — Eval Run Contract v0.1
 // BYO outputs bundle. No model calls. Deterministic parse + validation only.
 
-import { BUCKETS_V0_1, type BucketId } from "./spec.v0.1";
-
-export type InputShapeV0_1 = "bucketed_single_tokens";
+import {
+  BUCKETS_V0_1,
+  INTERMEDIATE_BUCKETS_V0_1,
+  type BucketId,
+  type EvalBucketKeyV0_1,
+  type InputShapeV0_1,
+} from "./spec.v0.1";
 
 export type EvalRunTaskPayloadV0_1 = {
   taskId: string;
   inputShape: InputShapeV0_1;
-  buckets: Partial<Record<BucketId, string[]>>;
+  languageHint?: string;
+  vowelUnderTest?: string;
+  anchorLow?: BucketId;
+  anchorHigh?: BucketId;
+  buckets: Partial<Record<EvalBucketKeyV0_1, string[]>>;
 };
 
 export type EvalRunBundleV0_1 = {
@@ -61,6 +69,23 @@ function asBucketId(x: unknown, path: string): BucketId {
   return s as BucketId;
 }
 
+function asEvalBucketKeyForShape(
+  x: unknown,
+  inputShape: InputShapeV0_1,
+  path: string,
+): EvalBucketKeyV0_1 {
+  const s = asString(x, path);
+  const allowed =
+    inputShape === "intermediate_triple"
+      ? INTERMEDIATE_BUCKETS_V0_1
+      : BUCKETS_V0_1;
+  assert(
+    (allowed as string[]).includes(s),
+    `${path}: invalid bucket '${s}' for inputShape '${inputShape}'`,
+  );
+  return s as EvalBucketKeyV0_1;
+}
+
 export function parseEvalRunBundleV0_1(input: unknown): EvalRunBundleV0_1 {
   assert(isRecord(input), "run: expected object");
 
@@ -95,25 +120,29 @@ export function parseEvalRunBundleV0_1(input: unknown): EvalRunBundleV0_1 {
     const m = input.meta;
     meta = {
       provider:
-          m.provider === undefined
-            ? undefined
-            : asTrimmedString(m.provider, "run.meta.provider"),
+        m.provider === undefined
+          ? undefined
+          : asTrimmedString(m.provider, "run.meta.provider"),
       model:
-          m.model === undefined ? undefined : asTrimmedString(m.model, "run.meta.model"),
+        m.model === undefined
+          ? undefined
+          : asTrimmedString(m.model, "run.meta.model"),
       label:
-          m.label === undefined ? undefined : asTrimmedString(m.label, "run.meta.label"),
+        m.label === undefined
+          ? undefined
+          : asTrimmedString(m.label, "run.meta.label"),
       sourceEngineId:
-          m.sourceEngineId === undefined
-            ? undefined
-            : asTrimmedString(m.sourceEngineId, "run.meta.sourceEngineId"),
+        m.sourceEngineId === undefined
+          ? undefined
+          : asTrimmedString(m.sourceEngineId, "run.meta.sourceEngineId"),
       sourceEngineVersion:
-          m.sourceEngineVersion === undefined
-            ? undefined
-            : asTrimmedString(m.sourceEngineVersion, "run.meta.sourceEngineVersion"),
+        m.sourceEngineVersion === undefined
+          ? undefined
+          : asTrimmedString(m.sourceEngineVersion, "run.meta.sourceEngineVersion"),
       sourceEngineBuild:
-          m.sourceEngineBuild === undefined
-            ? undefined
-            : asTrimmedString(m.sourceEngineBuild, "run.meta.sourceEngineBuild"),
+        m.sourceEngineBuild === undefined
+          ? undefined
+          : asTrimmedString(m.sourceEngineBuild, "run.meta.sourceEngineBuild"),
     };
   }
 
@@ -123,20 +152,76 @@ export function parseEvalRunBundleV0_1(input: unknown): EvalRunBundleV0_1 {
     const taskId = asString(t.taskId, `run.tasks[${i}].taskId`);
     const inputShape = asString(t.inputShape, `run.tasks[${i}].inputShape`);
     assert(
-      inputShape === "bucketed_single_tokens",
-      `run.tasks[${i}].inputShape: expected 'bucketed_single_tokens'`,
+      inputShape === "bucketed_single_tokens" ||
+        inputShape === "intermediate_triple",
+      `run.tasks[${i}].inputShape: expected 'bucketed_single_tokens'|'intermediate_triple'`,
     );
+
+    const languageHint =
+      t.languageHint === undefined
+        ? undefined
+        : asTrimmedString(t.languageHint, `run.tasks[${i}].languageHint`);
+
+    const vowelUnderTest =
+      t.vowelUnderTest === undefined
+        ? undefined
+        : asTrimmedString(t.vowelUnderTest, `run.tasks[${i}].vowelUnderTest`);
+
+    const anchorLow =
+      t.anchorLow === undefined
+        ? undefined
+        : asBucketId(t.anchorLow, `run.tasks[${i}].anchorLow`);
+
+    const anchorHigh =
+      t.anchorHigh === undefined
+        ? undefined
+        : asBucketId(t.anchorHigh, `run.tasks[${i}].anchorHigh`);
+
+    if (inputShape === "intermediate_triple") {
+      assert(
+        typeof languageHint === "string" && languageHint.length > 0,
+        `run.tasks[${i}].languageHint: required for 'intermediate_triple'`,
+      );
+      assert(
+        typeof vowelUnderTest === "string" && vowelUnderTest.length > 0,
+        `run.tasks[${i}].vowelUnderTest: required for 'intermediate_triple'`,
+      );
+      assert(
+        typeof anchorLow === "string",
+        `run.tasks[${i}].anchorLow: required for 'intermediate_triple'`,
+      );
+      assert(
+        typeof anchorHigh === "string",
+        `run.tasks[${i}].anchorHigh: required for 'intermediate_triple'`,
+      );
+      assert(
+        anchorLow !== anchorHigh,
+        `run.tasks[${i}]: anchorLow and anchorHigh must differ`,
+      );
+    }
 
     assert(isRecord(t.buckets), `run.tasks[${i}].buckets: expected object`);
     const bucketsRaw = t.buckets;
 
-    const buckets: Partial<Record<BucketId, string[]>> = {};
+    const buckets: Partial<Record<EvalBucketKeyV0_1, string[]>> = {};
     for (const [k, v] of Object.entries(bucketsRaw)) {
-      const b = asBucketId(k, `run.tasks[${i}].buckets.key`);
+      const b = asEvalBucketKeyForShape(
+        k,
+        inputShape as InputShapeV0_1,
+        `run.tasks[${i}].buckets.key`,
+      );
       buckets[b] = asStringArray(v, `run.tasks[${i}].buckets['${b}']`);
     }
 
-    return { taskId, inputShape: "bucketed_single_tokens", buckets };
+    return {
+      taskId,
+      inputShape: inputShape as InputShapeV0_1,
+      languageHint,
+      vowelUnderTest,
+      anchorLow,
+      anchorHigh,
+      buckets,
+    };
   });
 
   return {

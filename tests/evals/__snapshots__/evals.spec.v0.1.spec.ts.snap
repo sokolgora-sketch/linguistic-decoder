@@ -116,6 +116,32 @@ Output shape:
       "title": "Full Ladder — V1..V7",
     },
     {
+      "derivedFromTaskId": undefined,
+      "derivedOp": undefined,
+      "inputShape": "intermediate_triple",
+      "kind": "byo",
+      "languageHint": "und",
+      "nPerBucket": 10,
+      "prompt": "Return STRICT JSON only. No prose.
+
+Goal: produce 10 SINGLE-TOKEN words for each bucket in an intermediate-vowel bracket test.
+Rules: each entry must be a single orthographic token (no spaces). Avoid punctuation.
+
+Output shape:
+{
+  "anchor_low": ["..."],
+  "x_vowel": ["..."],
+  "anchor_high": ["..."]
+}",
+      "targetBuckets": [
+        "anchor_low",
+        "x_vowel",
+        "anchor_high",
+      ],
+      "taskId": "T5_INTERMEDIATE_V0_1",
+      "title": "Intermediate Position Test",
+    },
+    {
       "derivedFromTaskId": "T2_LADDER_V0_1",
       "derivedOp": "shuffle_bucket_labels",
       "inputShape": "bucketed_single_tokens",

@@ -4,12 +4,21 @@
 export type BucketId = "V1" | "V2" | "V3" | "V4" | "V5" | "V6" | "V7";
 export const BUCKETS_V0_1: BucketId[] = ["V1", "V2", "V3", "V4", "V5", "V6", "V7"];
 
+export type IntermediateBucketId = "anchor_low" | "x_vowel" | "anchor_high";
+export const INTERMEDIATE_BUCKETS_V0_1: IntermediateBucketId[] = [
+  "anchor_low",
+  "x_vowel",
+  "anchor_high",
+];
+
+export type EvalBucketKeyV0_1 = BucketId | IntermediateBucketId;
+
 export type TaskKind = "byo" | "derived";
-export type InputShapeV0_1 = "bucketed_single_tokens";
+export type InputShapeV0_1 = "bucketed_single_tokens" | "intermediate_triple";
 
 export type PermutationSettingsV0_1 = {
   iters: number; // e.g. 12000
-  seed: number;  // deterministic base seed
+  seed: number; // deterministic base seed
 };
 
 export type ScoringV0_1 = {
@@ -26,15 +35,15 @@ export type EvalTaskV0_1 = {
   prompt: string;
 
   // Task intent
-  targetBuckets: BucketId[]; // subset (T1) or full ladder (T2/T3)
+  targetBuckets: EvalBucketKeyV0_1[]; // subset (T1/T5) or full ladder (T2/T3/T4)
   nPerBucket: number;
-  languageHint: string; // e.g. "en" (BCP47-ish, best-effort)
+  languageHint: string; // e.g. "en" / "und"
 
   // Output contract (BYO run must match this)
   inputShape: InputShapeV0_1;
 
   // Derived-task wiring (v0.1 uses this for Negative Control)
-  derivedFromTaskId?: string;         // e.g. "T2_LADDER_V0_1"
+  derivedFromTaskId?: string; // e.g. "T2_LADDER_V0_1"
   derivedOp?: "shuffle_bucket_labels" | "shuffle_bucket_labels_alt_seed"; // deterministic label shuffle variants (tokens fixed)
 };
 
@@ -60,6 +69,10 @@ function asString(x: unknown, path: string): string {
   return x;
 }
 
+function asTrimmedString(x: unknown, path: string): string {
+  return asString(x, path).trim();
+}
+
 function asNumber(x: unknown, path: string): number {
   assert(typeof x === "number" && Number.isFinite(x), `${path}: expected finite number`);
   return x;
@@ -69,6 +82,15 @@ function asBucketId(x: unknown, path: string): BucketId {
   const s = asString(x, path);
   assert((BUCKETS_V0_1 as string[]).includes(s), `${path}: invalid bucket '${s}'`);
   return s as BucketId;
+}
+
+function asEvalBucketKey(x: unknown, path: string): EvalBucketKeyV0_1 {
+  const s = asString(x, path);
+  assert(
+    ([...BUCKETS_V0_1, ...INTERMEDIATE_BUCKETS_V0_1] as string[]).includes(s),
+    `${path}: invalid bucket '${s}'`,
+  );
+  return s as EvalBucketKeyV0_1;
 }
 
 function asStringArray(x: unknown, path: string): string[] {
@@ -117,7 +139,7 @@ export function parseEvalSpecV0_1(input: unknown): EvalSpecV0_1 {
   const tasks: EvalTaskV0_1[] = input.tasks.map((t, idx) => {
     assert(isRecord(t), `spec.tasks[${idx}]: expected object`);
 
-    const taskId = asString(t.taskId, `spec.tasks[${idx}].taskId`);
+    const taskId = asTrimmedString(t.taskId, `spec.tasks[${idx}].taskId`);
     const kind = asString(t.kind, `spec.tasks[${idx}].kind`);
     assert(kind === "byo" || kind === "derived", `spec.tasks[${idx}].kind: expected 'byo'|'derived'`);
 
@@ -125,25 +147,53 @@ export function parseEvalSpecV0_1(input: unknown): EvalSpecV0_1 {
     const prompt = asString(t.prompt, `spec.tasks[${idx}].prompt`);
 
     assert(Array.isArray(t.targetBuckets), `spec.tasks[${idx}].targetBuckets: expected array`);
-    const targetBuckets = t.targetBuckets.map((b, j) => asBucketId(b, `spec.tasks[${idx}].targetBuckets[${j}]`));
+    const targetBuckets = t.targetBuckets.map((b, j) =>
+      asEvalBucketKey(b, `spec.tasks[${idx}].targetBuckets[${j}]`),
+    );
 
     const nPerBucket = asNumber(t.nPerBucket, `spec.tasks[${idx}].nPerBucket`);
     assert(Number.isInteger(nPerBucket) && nPerBucket > 0, `spec.tasks[${idx}].nPerBucket: must be int > 0`);
 
-    const languageHint = asString(t.languageHint, `spec.tasks[${idx}].languageHint`);
+    const languageHint = asTrimmedString(t.languageHint, `spec.tasks[${idx}].languageHint`);
+    assert(languageHint.length > 0, `spec.tasks[${idx}].languageHint: must be non-empty`);
 
     const inputShape = asString(t.inputShape, `spec.tasks[${idx}].inputShape`);
-    assert(inputShape === "bucketed_single_tokens", `spec.tasks[${idx}].inputShape: expected 'bucketed_single_tokens'`);
+    assert(
+      inputShape === "bucketed_single_tokens" || inputShape === "intermediate_triple",
+      `spec.tasks[${idx}].inputShape: expected 'bucketed_single_tokens'|'intermediate_triple'`,
+    );
 
-    const derivedFromTaskId = t.derivedFromTaskId === undefined ? undefined : asString(t.derivedFromTaskId, `spec.tasks[${idx}].derivedFromTaskId`);
-    const derivedOp = t.derivedOp === undefined ? undefined : asString(t.derivedOp, `spec.tasks[${idx}].derivedOp`);
+    const derivedFromTaskId =
+      t.derivedFromTaskId === undefined
+        ? undefined
+        : asString(t.derivedFromTaskId, `spec.tasks[${idx}].derivedFromTaskId`);
+    const derivedOp =
+      t.derivedOp === undefined
+        ? undefined
+        : asString(t.derivedOp, `spec.tasks[${idx}].derivedOp`);
+
+    if (inputShape === "intermediate_triple") {
+      assert(kind === "byo", `spec.tasks[${idx}]: 'intermediate_triple' tasks must be kind='byo'`);
+      assert(
+        targetBuckets.length === 3 &&
+          targetBuckets[0] === "anchor_low" &&
+          targetBuckets[1] === "x_vowel" &&
+          targetBuckets[2] === "anchor_high",
+        `spec.tasks[${idx}]: intermediate_triple targetBuckets must be anchor_low,x_vowel,anchor_high`,
+      );
+    }
+
     if (kind === "derived") {
+      assert(
+        inputShape === "bucketed_single_tokens",
+        `spec.tasks[${idx}]: derived tasks must use 'bucketed_single_tokens'`,
+      );
       assert(typeof derivedFromTaskId === "string" && derivedFromTaskId.length > 0, `spec.tasks[${idx}]: derivedFromTaskId required`);
-        assert(
-          derivedOp === "shuffle_bucket_labels" ||
-            derivedOp === "shuffle_bucket_labels_alt_seed",
-          `spec.tasks[${idx}]: derivedOp must be 'shuffle_bucket_labels'|'shuffle_bucket_labels_alt_seed'`,
-        );
+      assert(
+        derivedOp === "shuffle_bucket_labels" ||
+          derivedOp === "shuffle_bucket_labels_alt_seed",
+        `spec.tasks[${idx}]: derivedOp must be 'shuffle_bucket_labels'|'shuffle_bucket_labels_alt_seed'`,
+      );
     }
 
     return {
@@ -154,7 +204,7 @@ export function parseEvalSpecV0_1(input: unknown): EvalSpecV0_1 {
       targetBuckets,
       nPerBucket,
       languageHint,
-      inputShape: "bucketed_single_tokens",
+      inputShape: inputShape as InputShapeV0_1,
       derivedFromTaskId,
       derivedOp: derivedOp as EvalTaskV0_1["derivedOp"],
     };
@@ -171,7 +221,10 @@ export function parseEvalSpecV0_1(input: unknown): EvalSpecV0_1 {
   const idList = new Set(tasks.map((t) => t.taskId));
   for (const t of tasks) {
     if (t.kind === "derived") {
-      assert(t.derivedFromTaskId && idList.has(t.derivedFromTaskId), `task '${t.taskId}': derivedFromTaskId not found`);
+      assert(
+        t.derivedFromTaskId && idList.has(t.derivedFromTaskId),
+        `task '${t.taskId}': derivedFromTaskId not found`,
+      );
     }
   }
 
@@ -217,7 +270,7 @@ export const EVAL_SPEC_V0_1: EvalSpecV0_1 = parseEvalSpecV0_1({
         "Goal: produce 20 SINGLE-TOKEN words that best match semantic bucket V1 (Expansion/Space).\n" +
         "Rules: each entry must be a single orthographic token (no spaces). Avoid punctuation.\n\n" +
         "Output shape:\n" +
-        "{ \"V1\": [\"token1\", \"token2\", ... 20 total] }",
+        '{ "V1": ["token1", "token2", ... 20 total] }',
     },
     {
       taskId: "T1_BUCKET_V4_V0_1",
@@ -232,7 +285,7 @@ export const EVAL_SPEC_V0_1: EvalSpecV0_1 = parseEvalSpecV0_1({
         "Goal: produce 20 SINGLE-TOKEN words that best match semantic bucket V4 (Ground/Balance).\n" +
         "Rules: each entry must be a single orthographic token (no spaces). Avoid punctuation.\n\n" +
         "Output shape:\n" +
-        "{ \"V4\": [\"token1\", \"token2\", ... 20 total] }",
+        '{ "V4": ["token1", "token2", ... 20 total] }',
     },
     {
       taskId: "T1_BUCKET_V7_V0_1",
@@ -247,7 +300,7 @@ export const EVAL_SPEC_V0_1: EvalSpecV0_1 = parseEvalSpecV0_1({
         "Goal: produce 20 SINGLE-TOKEN words that best match semantic bucket V7 (Focus/Linearity).\n" +
         "Rules: each entry must be a single orthographic token (no spaces). Avoid punctuation.\n\n" +
         "Output shape:\n" +
-        "{ \"V7\": [\"token1\", \"token2\", ... 20 total] }",
+        '{ "V7": ["token1", "token2", ... 20 total] }',
     },
     {
       taskId: "T2_LADDER_V0_1",
@@ -265,13 +318,32 @@ export const EVAL_SPEC_V0_1: EvalSpecV0_1 = parseEvalSpecV0_1({
         "Before outputting the final JSON, perform a self-audit to ensure zero duplicates.\n\n" +
         "Output shape:\n" +
         "{\n" +
-        "  \"V1\": [\"...\"],\n" +
-        "  \"V2\": [\"...\"],\n" +
-        "  \"V3\": [\"...\"],\n" +
-        "  \"V4\": [\"...\"],\n" +
-        "  \"V5\": [\"...\"],\n" +
-        "  \"V6\": [\"...\"],\n" +
-        "  \"V7\": [\"...\"]\n" +
+        '  "V1": ["..."],\n' +
+        '  "V2": ["..."],\n' +
+        '  "V3": ["..."],\n' +
+        '  "V4": ["..."],\n' +
+        '  "V5": ["..."],\n' +
+        '  "V6": ["..."],\n' +
+        '  "V7": ["..."]\n' +
+        "}",
+    },
+    {
+      taskId: "T5_INTERMEDIATE_V0_1",
+      kind: "byo",
+      title: "Intermediate Position Test",
+      languageHint: "und",
+      inputShape: "intermediate_triple",
+      targetBuckets: ["anchor_low", "x_vowel", "anchor_high"],
+      nPerBucket: 10,
+      prompt:
+        "Return STRICT JSON only. No prose.\n\n" +
+        "Goal: produce 10 SINGLE-TOKEN words for each bucket in an intermediate-vowel bracket test.\n" +
+        "Rules: each entry must be a single orthographic token (no spaces). Avoid punctuation.\n\n" +
+        "Output shape:\n" +
+        "{\n" +
+        '  "anchor_low": ["..."],\n' +
+        '  "x_vowel": ["..."],\n' +
+        '  "anchor_high": ["..."]\n' +
         "}",
     },
     {
@@ -282,11 +354,11 @@ export const EVAL_SPEC_V0_1: EvalSpecV0_1 = parseEvalSpecV0_1({
       inputShape: "bucketed_single_tokens",
       targetBuckets: ["V1", "V2", "V3", "V4", "V5", "V6", "V7"],
       nPerBucket: 10,
-      derivedFromTaskId: "T2_LADDER_V0_1",
-      derivedOp: "shuffle_bucket_labels",
       prompt:
         "This task is derived automatically from T2 by deterministically shuffling bucket labels while keeping tokens fixed.\n" +
         "Expected behavior: slope collapses (false-positive detector).",
+      derivedFromTaskId: "T2_LADDER_V0_1",
+      derivedOp: "shuffle_bucket_labels",
     },
     {
       taskId: "T4_NEGATIVE_CONTROL_SHUFFLE_ALT_V0_1",
@@ -296,11 +368,11 @@ export const EVAL_SPEC_V0_1: EvalSpecV0_1 = parseEvalSpecV0_1({
       inputShape: "bucketed_single_tokens",
       targetBuckets: ["V1", "V2", "V3", "V4", "V5", "V6", "V7"],
       nPerBucket: 10,
-      derivedFromTaskId: "T2_LADDER_V0_1",
-      derivedOp: "shuffle_bucket_labels_alt_seed",
       prompt:
         "This task is derived automatically from T2 by deterministically shuffling bucket labels with an alternate fixed seed while keeping tokens fixed.\n" +
         "Expected behavior: slope collapses independently of T3 (second false-positive detector).",
+      derivedFromTaskId: "T2_LADDER_V0_1",
+      derivedOp: "shuffle_bucket_labels_alt_seed",
     },
   ],
 });

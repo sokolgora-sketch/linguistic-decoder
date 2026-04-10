@@ -3,10 +3,28 @@
 
 import { extractOrthographyVoicesFromWordV0_1 } from "@/shared/vowels/extractOrthographyVoicesFromWord.v0.1";
 
-import { slopePermutationV0_1, mean, mulberry32, shuffleInPlace } from "./stats.v0.1";
+import {
+  slopePermutationV0_1,
+  strictOrderPermutationV0_1,
+  mean,
+  mulberry32,
+  shuffleInPlace,
+} from "./stats.v0.1";
 import type { EvalRunBundleV0_1 } from "./run.v0.1";
-import { BUCKETS_V0_1, type BucketId, type EvalSpecV0_1 } from "./spec.v0.1";
-import type { EvalReportBundleV0_1, EvalTaskReportV0_1, BucketReportV0_1, SlopeReportV0_1 } from "./report.v0.1";
+import {
+  BUCKETS_V0_1,
+  INTERMEDIATE_BUCKETS_V0_1,
+  type BucketId,
+  type EvalBucketKeyV0_1,
+  type EvalSpecV0_1,
+} from "./spec.v0.1";
+import type {
+  EvalReportBundleV0_1,
+  EvalTaskReportV0_1,
+  BucketReportV0_1,
+  SlopeReportV0_1,
+  IntermediateTaskReportV0_1,
+} from "./report.v0.1";
 
 type Vowel = "A" | "E" | "I" | "O" | "U" | "Y" | "Ë";
 
@@ -29,11 +47,30 @@ function uniqInOrder(vs: Vowel[]): Vowel[] {
 
 function normVowel(v: unknown): Vowel | null {
   const s = String(v ?? "").trim().toUpperCase();
-  if (s === "A" || s === "E" || s === "I" || s === "O" || s === "U" || s === "Y" || s === "Ë") return s as Vowel;
+  if (
+    s === "A" ||
+    s === "E" ||
+    s === "I" ||
+    s === "O" ||
+    s === "U" ||
+    s === "Y" ||
+    s === "Ë"
+  )
+    return s as Vowel;
   return null;
 }
 
-function toSlopeReport(params: { bucketOrder: BucketId[]; scoreKey: "aperturePrimary" | "aperturePresenceMean"; iters: number; seed: number; items: Array<{ bucket: BucketId; score: number }> }): SlopeReportV0_1 {
+function isBucketId(x: string): x is BucketId {
+  return (BUCKETS_V0_1 as string[]).includes(x);
+}
+
+function toSlopeReport(params: {
+  bucketOrder: BucketId[];
+  scoreKey: "aperturePrimary" | "aperturePresenceMean";
+  iters: number;
+  seed: number;
+  items: Array<{ bucket: BucketId; score: number }>;
+}): SlopeReportV0_1 {
   const { bucketOrder, iters, seed, items } = params;
   const r = slopePermutationV0_1({
     bucketOrder,
@@ -52,15 +89,6 @@ function toSlopeReport(params: { bucketOrder: BucketId[]; scoreKey: "aperturePri
     iters,
     seed,
   };
-}
-
-function flattenRunBuckets(buckets: Partial<Record<BucketId, string[]>>, order: BucketId[]): Array<{ bucket: BucketId; token: string }> {
-  const out: Array<{ bucket: BucketId; token: string }> = [];
-  for (const b of order) {
-    const xs = buckets[b] ?? [];
-    for (const t of xs) out.push({ bucket: b, token: t });
-  }
-  return out;
 }
 
 // Deterministic negative control (no randomness):
@@ -108,9 +136,86 @@ function deriveShuffleBucketLabelsV0_1(params: {
   return out;
 }
 
+function buildIntermediateReportV0_1(params: {
+  perBucket: BucketReportV0_1[];
+  items: Array<{ bucket: EvalBucketKeyV0_1; score: number }>;
+  vowelUnderTest: string;
+  anchorLow: BucketId;
+  anchorHigh: BucketId;
+  iters: number;
+  seed: number;
+}): IntermediateTaskReportV0_1 | null {
+  const { perBucket, items, vowelUnderTest, anchorLow, anchorHigh, iters, seed } = params;
+
+  const bucketMap = new Map(
+    perBucket.map((b) => [b.bucket, b.mean_aperturePresenceMean] as const),
+  );
+
+  const mean_anchor_low = bucketMap.get("anchor_low");
+  const mean_x_vowel = bucketMap.get("x_vowel");
+  const mean_anchor_high = bucketMap.get("anchor_high");
+
+  if (
+    typeof mean_anchor_low !== "number" ||
+    typeof mean_x_vowel !== "number" ||
+    typeof mean_anchor_high !== "number" ||
+    !Number.isFinite(mean_anchor_low) ||
+    !Number.isFinite(mean_x_vowel) ||
+    !Number.isFinite(mean_anchor_high)
+  ) {
+    return null;
+  }
+
+  const gap_low = mean_anchor_low - mean_x_vowel;
+  const gap_high = mean_x_vowel - mean_anchor_high;
+  const denom = mean_anchor_low - mean_anchor_high;
+  const normalizedPosition =
+    Number.isFinite(denom) && denom !== 0 ? gap_low / denom : NaN;
+
+  let verdict: IntermediateTaskReportV0_1["verdict"];
+  if (mean_x_vowel > mean_anchor_low) {
+    verdict = "EXCEEDS_LOW";
+  } else if (mean_x_vowel >= mean_anchor_low) {
+    verdict = "COLLAPSED_LOW";
+  } else if (mean_x_vowel <= mean_anchor_high) {
+    verdict = "COLLAPSED_HIGH";
+  } else {
+    verdict = "INTERMEDIATE";
+  }
+
+  const ord = strictOrderPermutationV0_1({
+    bucketOrder: INTERMEDIATE_BUCKETS_V0_1,
+    items: items.map((x) => ({ bucket: x.bucket, score: x.score })),
+    iters,
+    seed,
+  });
+
+  return {
+    scoreKey: "aperturePresenceMean",
+    vowelUnderTest,
+    anchorLow,
+    anchorHigh,
+    mean_anchor_low,
+    mean_x_vowel,
+    mean_anchor_high,
+    gap_low,
+    gap_high,
+    normalizedPosition,
+    verdict,
+    ordinalPermutation: {
+      observed_order: ord.observed_order,
+      p_value: ord.p_order,
+      iters: ord.iters,
+      seed: ord.seed,
+    },
+  };
+}
+
 const CONTROL_HEALTH_THRESHOLD_P_V0_1 = 0.1;
 
-function buildControlHealthV0_1(reports: EvalTaskReportV0_1[]): EvalReportBundleV0_1["controlHealth"] {
+function buildControlHealthV0_1(
+  reports: EvalTaskReportV0_1[],
+): EvalReportBundleV0_1["controlHealth"] {
   const hasLadder = reports.some((t) => t.taskId === "T2_LADDER_V0_1");
   if (!hasLadder) {
     return {
@@ -163,7 +268,7 @@ function buildControlHealthV0_1(reports: EvalTaskReportV0_1[]): EvalReportBundle
     reason = "T3/T4 controls clean";
   } else if (failingCount === 0 && missingCount > 0) {
     status = "controlWarn";
-    reason = `${missingCount} control missing`; 
+    reason = `${missingCount} control missing`;
   } else if (failingCount === 1 && missingCount === 0) {
     status = "controlWarn";
     reason = "1 control suspicious";
@@ -172,7 +277,7 @@ function buildControlHealthV0_1(reports: EvalTaskReportV0_1[]): EvalReportBundle
     reason = "1 control suspicious and 1 missing";
   } else if (failingCount >= 2) {
     status = "controlFail";
-    reason = `${failingCount} controls suspicious`; 
+    reason = `${failingCount} controls suspicious`;
   } else {
     status = "controlFail";
     reason = "controls missing";
@@ -188,7 +293,10 @@ function buildControlHealthV0_1(reports: EvalTaskReportV0_1[]): EvalReportBundle
   };
 }
 
-export function scoreEvalRunBundleV0_1(params: { spec: EvalSpecV0_1; run: EvalRunBundleV0_1 }): EvalReportBundleV0_1 {
+export function scoreEvalRunBundleV0_1(params: {
+  spec: EvalSpecV0_1;
+  run: EvalRunBundleV0_1;
+}): EvalReportBundleV0_1 {
   const { spec, run } = params;
 
   const runByTaskId = new Map<string, EvalRunBundleV0_1["tasks"][number]>();
@@ -198,15 +306,21 @@ export function scoreEvalRunBundleV0_1(params: { spec: EvalSpecV0_1; run: EvalRu
 
   for (const task of spec.tasks) {
     const targetBuckets = task.targetBuckets;
-    const bucketOrder = targetBuckets.length === 7 ? BUCKETS_V0_1 : targetBuckets; // ladder uses canonical order
+    const bucketOrder: EvalBucketKeyV0_1[] =
+      task.inputShape === "bucketed_single_tokens" &&
+      targetBuckets.length === 7 &&
+      targetBuckets.every((b): b is BucketId => isBucketId(String(b)))
+        ? BUCKETS_V0_1
+        : targetBuckets;
 
-    const missingBuckets: BucketId[] = [];
-    const extraBuckets: BucketId[] = [];
+    const missingBuckets: EvalTaskReportV0_1["diagnostics"]["missingBuckets"] = [];
+    const extraBuckets: EvalTaskReportV0_1["diagnostics"]["extraBuckets"] = [];
+    const diagnosticNotes: string[] = [];
 
-    let payloadBuckets: Partial<Record<BucketId, string[]>> | null = null;
+    let payload = runByTaskId.get(task.taskId);
+    let payloadBuckets: Partial<Record<EvalBucketKeyV0_1, string[]>> | null = null;
 
     if (task.kind === "byo") {
-      const payload = runByTaskId.get(task.taskId);
       if (!payload) continue; // only score tasks present in run
       payloadBuckets = payload.buckets ?? {};
     } else {
@@ -215,26 +329,34 @@ export function scoreEvalRunBundleV0_1(params: { spec: EvalSpecV0_1; run: EvalRu
       if (!baseId) continue;
       const basePayload = runByTaskId.get(baseId);
       if (!basePayload) continue;
-        const derivedSeed =
-          task.derivedOp === "shuffle_bucket_labels_alt_seed"
-            ? (spec.scoring.permutation.seed ^ 0x06B85E3) >>> 0
-            : (spec.scoring.permutation.seed ^ 0xC0FFEE) >>> 0;
 
-        payloadBuckets = deriveShuffleBucketLabelsV0_1({
-          baseBuckets: basePayload.buckets ?? {},
-          bucketOrder: BUCKETS_V0_1,
-          seed: derivedSeed,
-        });
+      const derivedSeed =
+        task.derivedOp === "shuffle_bucket_labels_alt_seed"
+          ? (spec.scoring.permutation.seed ^ 0x06b85e3) >>> 0
+          : (spec.scoring.permutation.seed ^ 0x00c0ffee) >>> 0;
+
+      payloadBuckets = deriveShuffleBucketLabelsV0_1({
+        baseBuckets: (basePayload.buckets ?? {}) as Partial<Record<BucketId, string[]>>,
+        bucketOrder: BUCKETS_V0_1,
+        seed: derivedSeed,
+      });
       if (!payloadBuckets) {
         // can’t derive safely; emit a report with diagnostics anyway
         payloadBuckets = {};
       }
     }
 
+    const effectiveLanguageHint =
+      typeof payload?.languageHint === "string" && payload.languageHint.trim()
+        ? payload.languageHint.trim()
+        : task.languageHint;
+
     // detect missing/extra buckets
     const present = new Set(Object.keys(payloadBuckets ?? {}));
     for (const b of targetBuckets) if (!present.has(b)) missingBuckets.push(b);
-    for (const k of present) if (!(targetBuckets as string[]).includes(k)) extraBuckets.push(k as BucketId);
+    for (const k of present)
+      if (!(targetBuckets as string[]).includes(k))
+        extraBuckets.push(k as EvalBucketKeyV0_1);
 
     // token scoring
     let emptyTokenCount = 0;
@@ -242,8 +364,8 @@ export function scoreEvalRunBundleV0_1(params: { spec: EvalSpecV0_1; run: EvalRu
     let noVowelTokenCount = 0;
 
     const perBucket: BucketReportV0_1[] = [];
-    const slopeItemsPrimary: Array<{ bucket: BucketId; score: number }> = [];
-    const slopeItemsMean: Array<{ bucket: BucketId; score: number }> = [];
+    const slopeItemsPrimary: Array<{ bucket: EvalBucketKeyV0_1; score: number }> = [];
+    const slopeItemsMean: Array<{ bucket: EvalBucketKeyV0_1; score: number }> = [];
 
     for (const b of bucketOrder) {
       const raw = (payloadBuckets?.[b] ?? []).map((x) => String(x ?? ""));
@@ -258,8 +380,8 @@ export function scoreEvalRunBundleV0_1(params: { spec: EvalSpecV0_1; run: EvalRu
         else seen.add(t);
       }
 
-      let validP: number[] = [];
-      let validM: number[] = [];
+      const validP: number[] = [];
+      const validM: number[] = [];
       let invalidN = 0;
 
       for (const tok0 of trimmed) {
@@ -274,8 +396,13 @@ export function scoreEvalRunBundleV0_1(params: { spec: EvalSpecV0_1; run: EvalRu
           continue;
         }
 
-        const out = extractOrthographyVoicesFromWordV0_1({ word: tok0, langHint: task.languageHint }).voices;
-        const vs0 = (Array.isArray(out) ? out : []).map(normVowel).filter(Boolean) as Vowel[];
+        const out = extractOrthographyVoicesFromWordV0_1({
+          word: tok0,
+          langHint: effectiveLanguageHint,
+        }).voices;
+        const vs0 = (Array.isArray(out) ? out : [])
+          .map(normVowel)
+          .filter(Boolean) as Vowel[];
         const vs = uniqInOrder(vs0);
 
         if (!vs.length) {
@@ -310,15 +437,18 @@ export function scoreEvalRunBundleV0_1(params: { spec: EvalSpecV0_1; run: EvalRu
     const iters = spec.scoring.permutation.iters;
     const baseSeed = spec.scoring.permutation.seed;
 
-    const canSlope = bucketOrder.length >= 2;
+    const canSlope =
+      task.inputShape === "bucketed_single_tokens" &&
+      bucketOrder.length >= 2 &&
+      bucketOrder.every((b): b is BucketId => isBucketId(String(b)));
 
     const slopeP: SlopeReportV0_1 | null = canSlope
       ? toSlopeReport({
           bucketOrder,
           scoreKey: "aperturePrimary",
           iters,
-          seed: (baseSeed ^ 0xA11CE) >>> 0,
-          items: slopeItemsPrimary,
+          seed: (baseSeed ^ 0x0a11ce) >>> 0,
+          items: slopeItemsPrimary as Array<{ bucket: BucketId; score: number }>,
         })
       : null;
 
@@ -327,32 +457,75 @@ export function scoreEvalRunBundleV0_1(params: { spec: EvalSpecV0_1; run: EvalRu
           bucketOrder,
           scoreKey: "aperturePresenceMean",
           iters,
-          seed: (baseSeed ^ 0xBADA55) >>> 0,
-          items: slopeItemsMean,
+          seed: (baseSeed ^ 0x0bada55) >>> 0,
+          items: slopeItemsMean as Array<{ bucket: BucketId; score: number }>,
         })
       : null;
+
+    let intermediateReport: IntermediateTaskReportV0_1 | null = null;
+
+    if (task.inputShape === "intermediate_triple") {
+      const missingMeta: string[] = [];
+      if (!(typeof payload?.vowelUnderTest === "string" && payload.vowelUnderTest.trim())) {
+        missingMeta.push("vowelUnderTest");
+      }
+      if (!payload?.anchorLow) missingMeta.push("anchorLow");
+      if (!payload?.anchorHigh) missingMeta.push("anchorHigh");
+
+      if (missingMeta.length) {
+        diagnosticNotes.push(
+          `Intermediate report not computed (missing ${missingMeta.join(", ")}).`,
+        );
+      } else {
+        intermediateReport = buildIntermediateReportV0_1({
+          perBucket,
+          items: slopeItemsMean,
+          vowelUnderTest: String(payload?.vowelUnderTest ?? "").trim(),
+          anchorLow: payload!.anchorLow!,
+          anchorHigh: payload!.anchorHigh!,
+          iters,
+          seed: (baseSeed ^ 0x00715eed) >>> 0,
+        });
+
+        if (!intermediateReport) {
+          diagnosticNotes.push(
+            "Intermediate report not computed (requires finite mean_aperturePresenceMean for anchor_low, x_vowel, anchor_high).",
+          );
+        }
+      }
+    }
+
+    if (
+      task.kind === "derived" &&
+      Object.keys(payloadBuckets ?? {}).length === 0
+    ) {
+      diagnosticNotes.push(
+        "Derived control could not be computed (requires equal counts per bucket in base run).",
+      );
+    }
 
     reports.push({
       taskId: task.taskId,
       kind: task.kind,
       title: task.title,
-      languageHint: task.languageHint,
+      languageHint: effectiveLanguageHint,
       targetBuckets,
       nPerBucket: task.nPerBucket,
       buckets: perBucket,
       slope_aperturePrimary: slopeP,
       slope_aperturePresenceMean: slopeM,
+      ...(task.inputShape === "intermediate_triple"
+        ? { intermediate_aperturePresenceMean: intermediateReport }
+        : {}),
       diagnostics: {
         missingBuckets,
         extraBuckets,
         emptyTokenCount,
         whitespaceTokenCount,
         noVowelTokenCount,
-        totalInvalidTokenCount: emptyTokenCount + whitespaceTokenCount + noVowelTokenCount,
-        notes:
-          task.kind === "derived" && Object.keys(payloadBuckets ?? {}).length === 0
-            ? ["Derived control could not be computed (requires equal counts per bucket in base run)."]
-            : [],
+        totalInvalidTokenCount:
+          emptyTokenCount + whitespaceTokenCount + noVowelTokenCount,
+        notes: diagnosticNotes,
       },
     });
   }
