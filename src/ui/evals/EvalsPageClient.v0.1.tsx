@@ -450,12 +450,26 @@ function TaskCard({ t }: { t: EvalTaskReportV0_1 }) {
 
 function StickyNav({
   onCopyPageLink,
+  summaryPearsonText,
+  summarySpearmanText,
+  summaryPPermText,
+  complianceSummaryText,
+  stateDetailText,
+  stateDotClass,
+  stateToneClass,
 }: {
   onCopyPageLink: () => void | Promise<void>;
+  summaryPearsonText: string;
+  summarySpearmanText: string;
+  summaryPPermText: string;
+  complianceSummaryText: string;
+  stateDetailText: string;
+  stateDotClass: string;
+  stateToneClass: string;
 }) {
   return (
     <div className="sticky top-0 z-50 border-b border-[#333333] bg-[#1a1a1a]">
-      <div className="flex w-full items-center justify-between gap-3 px-2 py-2 xl:px-4">
+      <div className="flex w-full items-center gap-3 px-2 py-2 xl:px-4">
         <Link
           href="/"
           aria-label="ZË-RO home"
@@ -471,7 +485,30 @@ function StickyNav({
           />
         </Link>
 
-        <div className="flex flex-wrap items-center justify-end gap-2">
+        <div className="hidden min-w-0 flex-1 items-center justify-center gap-1 xl:flex">
+          <div title="Pearson r" className="inline-flex items-center gap-1 rounded-full border border-[#2f3a47] bg-[#10161e] px-2 py-1">
+            <span className="text-[9px] font-semibold uppercase tracking-[0.1em] text-[#8ea4ba]">r</span>
+            <span className="font-mono text-[11px] text-[#44cf8b]">{summaryPearsonText}</span>
+          </div>
+          <div title="Spearman ρ" className="inline-flex items-center gap-1 rounded-full border border-[#2f3a47] bg-[#10161e] px-2 py-1">
+            <span className="text-[9px] font-semibold uppercase tracking-[0.1em] text-[#8ea4ba]">ρ</span>
+            <span className="font-mono text-[11px] text-[#44cf8b]">{summarySpearmanText}</span>
+          </div>
+          <div title="p_perm" className="inline-flex items-center gap-1 rounded-full border border-[#4d4631] bg-[#15120d] px-2 py-1">
+            <span className="text-[9px] font-semibold uppercase tracking-[0.1em] text-[#c0b287]">p</span>
+            <span className="font-mono text-[11px] text-[#f4ddb0]">{summaryPPermText}</span>
+          </div>
+          <div title="Compliance" className="inline-flex items-center gap-1 rounded-full border border-[#30465d] bg-[#101b28] px-2 py-1">
+            <span className="text-[9px] font-semibold uppercase tracking-[0.1em] text-[#9fbdd9]">7/7</span>
+            <span className="font-mono text-[11px] text-[#d7e6ff]">{complianceSummaryText}</span>
+          </div>
+          <div className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 ${stateToneClass}`}>
+            <span className={`h-1.5 w-1.5 rounded-full ${stateDotClass}`} />
+            <span className="text-[9px] font-semibold uppercase tracking-[0.1em] text-[#d7dde7]">{stateDetailText}</span>
+          </div>
+        </div>
+
+        <div className="ml-auto flex shrink-0 flex-wrap items-center justify-end gap-2">
           <Link
             href="/evals/help"
             className="inline-flex shrink-0 items-center rounded-[8px] border border-[#355a7a] bg-[#101a24] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#9fd3ff] transition hover:border-[#4d7fa8] hover:bg-[#132031] hover:text-[#d7eeff]"
@@ -2496,58 +2533,19 @@ export function EvalsPageClientV0_1() {
   };
 
   return (
-    <div className="min-h-screen bg-[#242424] text-white">
-      <StickyNav onCopyPageLink={onCopyPageLink} />
+      <div className="min-h-screen bg-[#242424] text-white">
+        <StickyNav
+          onCopyPageLink={onCopyPageLink}
+          summaryPearsonText={typeof summaryPearson === "number" ? fmt(summaryPearson) : "—"}
+          summarySpearmanText={typeof summarySpearman === "number" ? fmt(summarySpearman) : "—"}
+          summaryPPermText={typeof summaryPPerm === "number" ? fmtP(summaryPPerm) : "—"}
+          complianceSummaryText={report ? complianceText : "—"}
+          stateDetailText={busy ? "working" : report ? "scored" : readyToScore ? "ready" : "idle"}
+          stateDotClass={stateDotClass}
+          stateToneClass={stateToneClass}
+        />
 
-      <div className="sticky top-[48px] z-40 border-b border-[#1a1e28] bg-[#0d1017]">
-        <div className="flex w-full items-stretch divide-x divide-[#1a1e28] px-2 xl:px-4">
-          <div className="flex flex-1 items-baseline justify-between px-4 py-2.5">
-            <span className="text-[9px] font-semibold uppercase tracking-[0.15em] text-[#a4b0cc]">
-              Pearson r
-            </span>
-            <span className="font-mono text-[14px] text-[#44cf8b]">
-              {typeof summaryPearson === "number" ? fmt(summaryPearson) : "—"}
-            </span>
-          </div>
-          <div className="flex flex-1 items-baseline justify-between px-4 py-2.5">
-            <span className="text-[9px] font-semibold uppercase tracking-[0.15em] text-[#a4b0cc]">
-              Spearman ρ
-            </span>
-            <span className="font-mono text-[14px] text-[#44cf8b]">
-              {typeof summarySpearman === "number" ? fmt(summarySpearman) : "—"}
-            </span>
-          </div>
-          <div className="flex flex-1 items-baseline justify-between px-4 py-2.5">
-            <span className="text-[9px] font-semibold uppercase tracking-[0.15em] text-[#a4b0cc]">
-              p_perm
-            </span>
-            <span className="font-mono text-[14px] text-[#f4ddb0]">
-              {typeof summaryPPerm === "number" ? fmtP(summaryPPerm) : "—"}
-            </span>
-          </div>
-          <div className="flex flex-1 items-baseline justify-between px-4 py-2.5">
-            <span className="text-[9px] font-semibold uppercase tracking-[0.15em] text-[#a4b0cc]">
-              Compliance
-            </span>
-            <span className="font-mono text-[14px] text-[#d7e6ff]">
-              {report ? complianceText : "—"}
-            </span>
-          </div>
-          <div className="flex flex-col justify-center px-4 py-2.5 gap-0.5">
-            <span className="text-[9px] font-semibold uppercase tracking-[0.15em] text-[#bccdd8]">
-              {stateLabel}
-            </span>
-            <div className="flex items-center gap-2">
-              <span className={`h-2 w-2 rounded-full ${stateDotClass}`} />
-              <span className="text-[9px] font-semibold uppercase tracking-[0.15em] text-[#6a7e90]">
-                {busy ? "working" : report ? "scored" : readyToScore ? "ready" : "idle"}
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-        <main className="flex w-full flex-col gap-3 px-2 pt-6 pb-16 xl:px-4">
+          <main className="flex w-full flex-col gap-3 px-2 pt-6 pb-16 xl:px-4">
             <section className="rounded-[14px] border border-[#2f3742] bg-[#13171d] px-4 py-3 shadow-[0_16px_40px_rgba(0,0,0,0.24)]">
               <div className="grid gap-3 xl:grid-cols-[minmax(0,1.42fr)_260px] xl:items-start">
                 <div className="min-w-0 space-y-2">
