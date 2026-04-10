@@ -832,6 +832,85 @@ export function EvalsPageClientV0_1() {
     return { removeIds: ids, removeCount: ids.length };
   }, [activeRunSeries, activeSeriesSavedRuns]);
 
+  const hasDraftToSave =
+    Boolean(inputText.trim()) || Boolean(report) || Boolean(md);
+
+  const activeSeriesDuplicateGuard = activeRunSeries
+    ? findSeriesDuplicate(activeRunSeries)
+    : null;
+
+  const activeSeriesInputStateLabel = !hasDraftToSave
+    ? "empty"
+    : report
+      ? "scored draft"
+      : "unscored draft";
+
+  const activeSeriesInputStateTone = !hasDraftToSave
+    ? "border-[#4a4a4a] bg-[#121212] text-[#c6c6c6]"
+    : report
+      ? "border-[#2f5a3d] bg-[#102016] text-[#bfe8cc]"
+      : "border-[#5e4b22] bg-[#19140d] text-[#f0ddb0]";
+
+  const activeSeriesDuplicateGuardLabel = !activeSeriesDuplicateGuard
+    ? "clear"
+    : activeSeriesDuplicateGuard.kind === "ordinal"
+      ? `ordinal collision (${formatSeriesOrdinal(activeRunSeries?.nextOrdinal ?? 1)})`
+      : `runId collision (${activeSeriesDuplicateGuard.nextRunId})`;
+
+  const activeSeriesDuplicateGuardTone = !activeSeriesDuplicateGuard
+    ? "border-[#2f5a3d] bg-[#102016] text-[#bfe8cc]"
+    : "border-[#6b3737] bg-[#1e1414] text-[#ffd1d1]";
+
+  const activeSeriesSaveNextStatusLabel = !activeRunSeries
+    ? "blocked · no active series"
+    : !hasDraftToSave
+      ? "blocked · nothing to save"
+      : activeSeriesDuplicateGuard?.kind === "ordinal"
+        ? "blocked · ordinal exists"
+        : activeSeriesDuplicateGuard?.kind === "runId"
+          ? "blocked · runId exists"
+          : "safe";
+
+  const activeSeriesSaveNextStatusTone =
+    activeSeriesSaveNextStatusLabel === "safe"
+      ? "border-[#2f5a3d] bg-[#102016] text-[#bfe8cc]"
+      : activeSeriesSaveNextStatusLabel.startsWith("warn")
+        ? "border-[#5e4b22] bg-[#19140d] text-[#f0ddb0]"
+        : "border-[#6b3737] bg-[#1e1414] text-[#ffd1d1]";
+
+  const activeSeriesExportSummary = activeSeriesExportReady
+    ? "Ready to export scored runs."
+    : activeSeriesHealthReasons[0] ?? "Series needs attention before export.";
+
+  const activeSeriesPayloadPreview = useMemo(() => {
+    if (!activeRunSeries) return "";
+    return JSON.stringify(
+      {
+        seriesLabel: activeRunSeries.label,
+        nextOrdinal: activeSeriesNextOrdinal,
+        runIdToSave: activeSeriesRunIdPreview || null,
+        labelToSave: activeSeriesLabelPreview || null,
+        inputState: activeSeriesInputStateLabel,
+        saveNextRun: activeSeriesSaveNextStatusLabel,
+        duplicateGuard: activeSeriesDuplicateGuardLabel,
+        exportMode: activeSeriesExportMode,
+        exportSummary: activeSeriesExportSummary,
+      },
+      null,
+      2,
+    );
+  }, [
+    activeRunSeries,
+    activeSeriesDuplicateGuardLabel,
+    activeSeriesExportMode,
+    activeSeriesExportSummary,
+    activeSeriesInputStateLabel,
+    activeSeriesLabelPreview,
+    activeSeriesNextOrdinal,
+    activeSeriesRunIdPreview,
+    activeSeriesSaveNextStatusLabel,
+  ]);
+
   function cleanupActiveSeriesDuplicates() {
     const series = getSelectedRunSeries();
     if (!series) {
@@ -3068,61 +3147,77 @@ export function EvalsPageClientV0_1() {
               </button>
             </div>
 
-            {activeRunSeries ? (
-            <div className={activeSeriesHasHardWarnings ? "rounded-[10px] border border-[#6b3737] bg-[#211717] px-3 py-2" : activeSeriesNeedsAttention ? "rounded-[10px] border border-[#5e4b22] bg-[#1b160d] px-3 py-2" : "rounded-[10px] border border-[#2f5a3d] bg-[#101712] px-3 py-2"}>
-              <div className={`${MT.sectionLabel} mb-1 text-[#ededed]`}>Active series status</div>
-              <div className={activeSeriesHasHardWarnings ? `${MT.helperCompact} mb-2 text-[#e0b3b3]` : activeSeriesNeedsAttention ? `${MT.helperCompact} mb-2 text-[#d6c59b]` : `${MT.helperCompact} mb-2 text-[#b7d8c1]`}>
-                {activeSeriesHasHardWarnings ? "Duplicates or export blockers present." : activeSeriesNeedsAttention ? "Series needs attention before export." : "Series is clean and ready for export."}
+            <div className={activeRunSeries ? activeSeriesHasHardWarnings ? "rounded-[10px] border border-[#6b3737] bg-[#211717] px-3 py-[6px]" : activeSeriesNeedsAttention ? "rounded-[10px] border border-[#5e4b22] bg-[#1b160d] px-3 py-[6px]" : "rounded-[10px] border border-[#2f5a3d] bg-[#101712] px-3 py-[6px]" : "rounded-[10px] border border-[#3a3a3a] bg-[#151515] px-3 py-[6px]"}>
+              <div className="mb-1 flex flex-wrap items-center justify-between gap-2">
+                <div className={`${MT.sectionLabel} text-[#ededed]`}>Active series operator</div>
+                <div className={activeRunSeries ? activeSeriesHasHardWarnings ? `${MT.helperCompact} rounded-full border border-[#6b3737] bg-[#1e1414] px-2 py-[2px] text-[#e0b3b3]` : activeSeriesNeedsAttention ? `${MT.helperCompact} rounded-full border border-[#5e4b22] bg-[#19140d] px-2 py-[2px] text-[#d6c59b]` : `${MT.helperCompact} rounded-full border border-[#2f5a3d] bg-[#0f1512] px-2 py-[2px] text-[#b7d8c1]` : `${MT.helperCompact} rounded-full border border-[#4a4a4a] bg-[#121212] px-2 py-[2px] text-[#c6c6c6]`}>
+                  {activeRunSeries
+                    ? activeSeriesHasHardWarnings
+                      ? "Duplicates or export blockers present."
+                      : activeSeriesNeedsAttention
+                        ? "Series needs attention before export."
+                        : "Ready to continue."
+                    : "No active series selected."}
+                </div>
               </div>
-              <div className="flex flex-wrap gap-1 justify-between">
-                <span className="rounded-full border border-[#7b6b2b] bg-[#211b0d] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#f5e7b0]">{activeRunSeries.label}</span>
-                <span className="rounded-full border border-[#4a4a4a] bg-[#121212] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#e6e6e6]">Next {activeSeriesNextOrdinal} / {activeRunSeries.targetCount}</span>
-                <span className="rounded-full border border-[#2f5a3d] bg-[#102016] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#bfe8cc]">Saved {activeSeriesSavedCount}</span>
-                <span className="rounded-full border border-[#2e4a37] bg-[#0f1512] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#def5e6]">Scored {activeSeriesScoredCount}</span>
-                <span className="rounded-full border border-[#4d4631] bg-[#15120d] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#f2e5bb]">Unscored {activeSeriesUnscoredCount}</span>
-                <span className="rounded-full border border-[#5a3a2f] bg-[#1c120f] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#f0c3b4]">Remaining {activeSeriesRemainingCount}</span>
-                <span className={activeSeriesExportReady ? "rounded-full border border-[#2f5a3d] bg-[#0f1512] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#def5e6]" : activeSeriesHasHardWarnings ? "rounded-full border border-[#6b3737] bg-[#1e1414] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#ffd1d1]" : "rounded-full border border-[#5e4b22] bg-[#19140d] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#f0ddb0]"}>Export {activeSeriesExportReady ? "ready" : "blocked"}</span>
-                {activeSeriesMissingOrdinals.length > 0 ? <span className="rounded-full border border-[#5e4b22] bg-[#19140d] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#f0ddb0]">Missing ordinals</span> : null}
-                {activeSeriesDuplicateOrdinals.length > 0 || activeSeriesDuplicateRunIds.length > 0 ? <span className="rounded-full border border-[#6b3737] bg-[#1e1414] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#ffd1d1]">Duplicates</span> : null}
-              </div>
-            </div>
-            ) : null}
-            <div className="mt-2">
-              <div className="rounded-[10px] border border-[#5a4c20] bg-[#18150d] px-3 py-2">
-                                <div className="flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
-                                  <div className="space-y-1">
-                                    <div className={`${MT.sectionLabel} text-[#ededed]`}>
-                                      Battery operator
-                                    </div>
-                                    <div className={`${MT.helper} text-[#b9af8a]`}>
-                                      Inspect the exact run payload that will be saved into the active series.
-                                    </div>
-                                  </div>
-              
-                                  {activeRunSeries ? (
-                                    <div className="min-w-0 flex-1 space-y-3">
-                                      <div className="grid gap-2 lg:grid-cols-2">
-                                        <div className="rounded-[8px] border border-[#303030] bg-[#101010] px-3 py-2">
-                                          <div className={`${MT.fieldLabel} text-[#9f9f9f]`}>RunId to save</div>
-                                          <div className="mt-1 overflow-x-auto font-mono text-[12px] text-[#ededed]">
-                                            {activeSeriesRunIdPreview || "—"}
-                                          </div>
-                                        </div>
-                                        <div className="rounded-[8px] border border-[#303030] bg-[#101010] px-3 py-2">
-                                          <div className={`${MT.fieldLabel} text-[#9f9f9f]`}>Label to save</div>
-                                          <div className="mt-1 overflow-x-auto font-mono text-[12px] text-[#ededed]">
-                                            {activeSeriesLabelPreview || "—"}
-                                          </div>
-                                        </div>
-                                      </div>
-                                    </div>
-                                  ) : (
-                                    <div className={`${MT.helper} text-[#b9af8a]`}>
-                                      No active series yet. Create or select a series to see live battery progress.
-                                    </div>
-                                  )}
-                                </div>
-                              </div>
+
+              {activeRunSeries ? (
+                <>
+                  <div className="flex flex-wrap items-center gap-1">
+                    <span className="rounded-full border border-[#7b6b2b] bg-[#211b0d] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#f5e7b0]">{activeRunSeries.label}</span>
+                    <span className="rounded-full border border-[#4a4a4a] bg-[#121212] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#e6e6e6]">Next {activeSeriesNextOrdinal} / {activeRunSeries.targetCount}</span>
+                    <span className="rounded-full border border-[#2f5a3d] bg-[#102016] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#bfe8cc]">Saved {activeSeriesSavedCount}</span>
+                    <span className="rounded-full border border-[#2e4a37] bg-[#0f1512] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#def5e6]">Scored {activeSeriesScoredCount}</span>
+                    <span className="rounded-full border border-[#4d4631] bg-[#15120d] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#f2e5bb]">Unscored {activeSeriesUnscoredCount}</span>
+                    <span className="rounded-full border border-[#5a3a2f] bg-[#1c120f] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#f0c3b4]">Remaining {activeSeriesRemainingCount}</span>
+                    <span className={activeSeriesExportReady ? "rounded-full border border-[#2f5a3d] bg-[#0f1512] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#def5e6]" : activeSeriesHasHardWarnings ? "rounded-full border border-[#6b3737] bg-[#1e1414] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#ffd1d1]" : "rounded-full border border-[#5e4b22] bg-[#19140d] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#f0ddb0]"}>Export {activeSeriesExportReady ? "ready" : "blocked"}</span>
+                    {activeSeriesMissingOrdinals.length > 0 ? <span className="rounded-full border border-[#5e4b22] bg-[#19140d] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#f0ddb0]">Missing ordinals</span> : null}
+                    {activeSeriesDuplicateOrdinals.length > 0 || activeSeriesDuplicateRunIds.length > 0 ? <span className="rounded-full border border-[#6b3737] bg-[#1e1414] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#ffd1d1]">Duplicates</span> : null}
+                  </div>
+
+                  <div className="mt-2 grid gap-2 lg:grid-cols-2 xl:grid-cols-4">
+                    <div className="rounded-[8px] border border-[#303030] bg-[#101010] px-3 py-2">
+                      <div className={`${MT.fieldLabel} text-[#9f9f9f]`}>Next ordinal</div>
+                      <div className="mt-1 font-mono text-[12px] text-[#ededed]">{activeSeriesNextOrdinal || "—"}</div>
+                    </div>
+                    <div className="rounded-[8px] border border-[#303030] bg-[#101010] px-3 py-2">
+                      <div className={`${MT.fieldLabel} text-[#9f9f9f]`}>RunId to save</div>
+                      <div className="mt-1 overflow-x-auto font-mono text-[12px] text-[#ededed]">{activeSeriesRunIdPreview || "—"}</div>
+                    </div>
+                    <div className="rounded-[8px] border border-[#303030] bg-[#101010] px-3 py-2">
+                      <div className={`${MT.fieldLabel} text-[#9f9f9f]`}>Label to save</div>
+                      <div className="mt-1 overflow-x-auto font-mono text-[12px] text-[#ededed]">{activeSeriesLabelPreview || "—"}</div>
+                    </div>
+                    <div className="rounded-[8px] border border-[#303030] bg-[#101010] px-3 py-2">
+                      <div className={`${MT.fieldLabel} text-[#9f9f9f]`}>Current input</div>
+                      <div className={`mt-1 inline-flex rounded-full border px-2 py-0.5 text-[11px] font-medium ${activeSeriesInputStateTone}`}>{activeSeriesInputStateLabel}</div>
+                    </div>
+                    <div className="rounded-[8px] border border-[#303030] bg-[#101010] px-3 py-2">
+                      <div className={`${MT.fieldLabel} text-[#9f9f9f]`}>Save + Next Run</div>
+                      <div className={`mt-1 inline-flex rounded-full border px-2 py-0.5 text-[11px] font-medium ${activeSeriesSaveNextStatusTone}`}>{activeSeriesSaveNextStatusLabel}</div>
+                    </div>
+                    <div className="rounded-[8px] border border-[#303030] bg-[#101010] px-3 py-2">
+                      <div className={`${MT.fieldLabel} text-[#9f9f9f]`}>Duplicate guard</div>
+                      <div className="mt-1 text-[12px] leading-5 text-[#d8d8d8]">{activeSeriesDuplicateGuardLabel}</div>
+                    </div>
+                    <div className="rounded-[8px] border border-[#303030] bg-[#101010] px-3 py-2 xl:col-span-2">
+                      <div className={`${MT.fieldLabel} text-[#9f9f9f]`}>Export summary</div>
+                      <div className="mt-1 text-[12px] leading-6 text-[#d8d8d8]"><span className="font-mono text-white">{activeSeriesExportMode}</span>{" · "}{activeSeriesExportSummary}</div>
+                    </div>
+                  </div>
+
+                  <details className="mt-2 rounded-[8px] border border-[#2f2f2f] bg-[#101010]">
+                    <summary className="cursor-pointer px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#b8b8b8] transition hover:bg-[#151515] hover:text-white [&::-webkit-details-marker]:hidden">
+                      Payload preview JSON
+                    </summary>
+                    <pre className="overflow-x-auto border-t border-[#242424] px-3 py-2 font-mono text-[11px] leading-6 text-[#dcdcdc]">{activeSeriesPayloadPreview}</pre>
+                  </details>
+                </>
+              ) : (
+                <div className={`${MT.helper} mt-2 text-[#a9a9a9]`}>
+                  Create or select a series to see next-ordinal, save-safety, duplicate guard, and export preflight details.
+                </div>
+              )}
             </div>
           </div>
           {false ? (
@@ -4316,3 +4411,5 @@ export function EvalsPageClientV0_1() {
     </div>
   );
 }
+
+
