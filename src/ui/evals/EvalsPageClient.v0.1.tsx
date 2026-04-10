@@ -15,10 +15,12 @@ import type {
 import {
   applySeriesRunIdTemplate,
   formatSeriesOrdinal,
+  loadPersistedEvalsRunStateV0_1,
   makeDefaultRunSeries,
   makeSavedRunId,
-  readRunSeries,
-  readSavedRuns,
+  readLocalPersistedEvalsRunStateV0_1,
+  savePersistedEvalsRunStateV0_1,
+  shouldUseRemotePersistedEvalsRunStateV0_1,
   writeRunSeries,
   writeSavedRuns,
 } from "@/ui/evals/evalsRunStore.v0.1";
@@ -592,16 +594,50 @@ export function EvalsPageClientV0_1() {
   const [seriesLabelDraft, setSeriesLabelDraft] = useState<string>("fresh-chat");
   const [saveNextGuidedReminderArmed, setSaveNextGuidedReminderArmed] = useState<boolean>(false);
   const [seriesTargetCountDraft, setSeriesTargetCountDraft] = useState<string>("15");
+  const [runStoreHydrated, setRunStoreHydrated] = useState<boolean>(false);
+  const skipFirstRunStorePersistRef = React.useRef(true);
 
   useEffect(() => {
-    const rows = readSavedRuns();
-    setSavedRuns(rows);
-    setSelectedSavedRunId(rows[0]?.id ?? "");
+    const localState = readLocalPersistedEvalsRunStateV0_1();
+    setSavedRuns(localState.savedRuns);
+    setSelectedSavedRunId(localState.savedRuns[0]?.id ?? "");
+    setRunSeries(localState.runSeries);
+    setSelectedSeriesId(localState.runSeries[0]?.id ?? "");
 
-    const seriesRows = readRunSeries();
-    setRunSeries(seriesRows);
-    setSelectedSeriesId(seriesRows[0]?.id ?? "");
+    if (!shouldUseRemotePersistedEvalsRunStateV0_1()) {
+      setRunStoreHydrated(true);
+      return;
+    }
+
+    let active = true;
+
+    void loadPersistedEvalsRunStateV0_1().then(
+      ({ savedRuns: rows, runSeries: seriesRows }) => {
+        if (!active) return;
+        setSavedRuns(rows);
+        setSelectedSavedRunId(rows[0]?.id ?? "");
+        setRunSeries(seriesRows);
+        setSelectedSeriesId(seriesRows[0]?.id ?? "");
+        setRunStoreHydrated(true);
+      },
+    );
+
+    return () => {
+      active = false;
+    };
   }, []);
+
+  useEffect(() => {
+    if (!runStoreHydrated) return;
+    if (skipFirstRunStorePersistRef.current) {
+      skipFirstRunStorePersistRef.current = false;
+      return;
+    }
+    void savePersistedEvalsRunStateV0_1({
+      savedRuns,
+      runSeries,
+    });
+  }, [runSeries, runStoreHydrated, savedRuns]);
 
   useEffect(() => {
     if (!savedRuns.length) {
