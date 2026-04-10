@@ -9,6 +9,7 @@ import type {
   EvalTaskReportV0_1,
   BucketReportV0_1,
   SlopeReportV0_1,
+  IntermediateTaskReportV0_1,
 } from "./report.v0.1";
 
 function fmt(x: number, d = 3): string {
@@ -49,6 +50,36 @@ function renderSlope(label: string, s: SlopeReportV0_1 | null): string[] {
   ];
 }
 
+function renderIntermediate(
+  s: IntermediateTaskReportV0_1 | null | undefined,
+): string[] {
+  if (!s)
+    return [
+      "### Intermediate Position — aperturePresenceMean",
+      "",
+      "_not computed_",
+      "",
+    ];
+
+  return [
+    "### Intermediate Position — aperturePresenceMean",
+    "",
+    `- vowelUnderTest: ${s.vowelUnderTest}`,
+    `- anchorLow: ${s.anchorLow}`,
+    `- anchorHigh: ${s.anchorHigh}`,
+    `- mean(anchor_low): ${fmt(s.mean_anchor_low)}`,
+    `- mean(x_vowel): ${fmt(s.mean_x_vowel)}`,
+    `- mean(anchor_high): ${fmt(s.mean_anchor_high)}`,
+    `- gap_low: ${fmt(s.gap_low)}`,
+    `- gap_high: ${fmt(s.gap_high)}`,
+    `- normalizedPosition: ${fmt(s.normalizedPosition)} (0=collapsed to low, 1=collapsed to high, 0.5=midpoint)`,
+    `- verdict: ${s.verdict}`,
+    `- permutation p: ${fmtP(s.ordinalPermutation.p_value)}`,
+    `- permutation test: iters=${s.ordinalPermutation.iters}, seed=${s.ordinalPermutation.seed}, observedOrder=${s.ordinalPermutation.observed_order}`,
+    "",
+  ];
+}
+
 function renderBuckets(buckets: BucketReportV0_1[]): string[] {
   const lines: string[] = [];
   lines.push(
@@ -78,10 +109,14 @@ function renderTask(t: EvalTaskReportV0_1): string[] {
   lines.push(...renderBuckets(t.buckets));
   lines.push("");
 
-  lines.push(...renderSlope("aperturePrimary", t.slope_aperturePrimary));
-  lines.push(
-    ...renderSlope("aperturePresenceMean", t.slope_aperturePresenceMean),
-  );
+  if (t.intermediate_aperturePresenceMean !== undefined) {
+    lines.push(...renderIntermediate(t.intermediate_aperturePresenceMean));
+  } else {
+    lines.push(...renderSlope("aperturePrimary", t.slope_aperturePrimary));
+    lines.push(
+      ...renderSlope("aperturePresenceMean", t.slope_aperturePresenceMean),
+    );
+  }
 
   lines.push("### Diagnostics");
   lines.push("");
@@ -177,34 +212,34 @@ export function renderEvalReportMdV0_1(
       : "—";
 
   function resolveScorerBuildV0_1() {
-  const short = (value: unknown) => {
-    const s = String(value ?? "").trim();
-    return s ? s.slice(0, 7) : "";
-  };
+    const short = (value: unknown) => {
+      const s = String(value ?? "").trim();
+      return s ? s.slice(0, 7) : "";
+    };
 
-  const isTest =
-    process.env.NODE_ENV === "test" || Boolean(process.env.JEST_WORKER_ID);
+    const isTest =
+      process.env.NODE_ENV === "test" || Boolean(process.env.JEST_WORKER_ID);
 
-  if (isTest) return "unknown";
+    if (isTest) return "unknown";
 
-  try {
+    try {
+      return (
+        short(
+          execSync("git rev-parse --short HEAD", {
+            stdio: ["ignore", "pipe", "ignore"],
+          }).toString("utf8"),
+        ) || "unknown"
+      );
+    } catch {}
+
     return (
-      short(
-        execSync("git rev-parse --short HEAD", {
-          stdio: ["ignore", "pipe", "ignore"],
-        }).toString("utf8")
-      ) || "unknown"
+      short(process.env.VERCEL_GIT_COMMIT_SHA) ||
+      short(process.env.GIT_SHA) ||
+      short(process.env.NEXT_PUBLIC_GIT_SHA) ||
+      short(process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA) ||
+      "unknown"
     );
-  } catch {}
-
-  return (
-    short(process.env.VERCEL_GIT_COMMIT_SHA) ||
-    short(process.env.GIT_SHA) ||
-    short(process.env.NEXT_PUBLIC_GIT_SHA) ||
-    short(process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA) ||
-    "unknown"
-  );
-}
+  }
 
   const scorerBuild = resolveScorerBuildV0_1();
 

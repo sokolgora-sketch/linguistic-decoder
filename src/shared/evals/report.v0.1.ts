@@ -1,12 +1,12 @@
 // EVALS-3 — Eval Report Contract v0.1
 // Deterministic scorer output. UI must render from this contract (not raw run).
 
-import type { BucketId } from "./spec.v0.1";
+import type { BucketId, EvalBucketKeyV0_1 } from "./spec.v0.1";
 
 export type ScoreKeyV0_1 = "aperturePrimary" | "aperturePresenceMean";
 
 export type BucketReportV0_1 = {
-  bucket: BucketId;
+  bucket: EvalBucketKeyV0_1;
   expectedN: number;
   providedN: number;
   validN: number;
@@ -31,9 +31,40 @@ export type SlopeReportV0_1 = {
   seed: number;
 };
 
+export type IntermediateVerdictV0_1 =
+  | "INTERMEDIATE"
+  | "COLLAPSED_LOW"
+  | "COLLAPSED_HIGH"
+  | "EXCEEDS_LOW";
+
+export type IntermediateOrdinalPermutationReportV0_1 = {
+  observed_order: boolean;
+  p_value: number;
+  iters: number;
+  seed: number;
+};
+
+export type IntermediateTaskReportV0_1 = {
+  scoreKey: "aperturePresenceMean";
+  vowelUnderTest: string;
+  anchorLow: BucketId;
+  anchorHigh: BucketId;
+
+  mean_anchor_low: number;
+  mean_x_vowel: number;
+  mean_anchor_high: number;
+
+  gap_low: number;
+  gap_high: number;
+  normalizedPosition: number;
+
+  verdict: IntermediateVerdictV0_1;
+  ordinalPermutation: IntermediateOrdinalPermutationReportV0_1;
+};
+
 export type TaskDiagnosticsV0_1 = {
-  missingBuckets: BucketId[];
-  extraBuckets: BucketId[];
+  missingBuckets: EvalBucketKeyV0_1[];
+  extraBuckets: EvalBucketKeyV0_1[];
 
   // token-level counts (best-effort; scorer may skip expensive lists in v0.1 UI)
   emptyTokenCount: number;
@@ -72,13 +103,15 @@ export type EvalTaskReportV0_1 = {
   title: string;
   languageHint: string;
 
-  targetBuckets: BucketId[];
+  targetBuckets: EvalBucketKeyV0_1[];
   nPerBucket: number;
 
   buckets: BucketReportV0_1[];
 
   slope_aperturePrimary: SlopeReportV0_1 | null;
   slope_aperturePresenceMean: SlopeReportV0_1 | null;
+
+  intermediate_aperturePresenceMean?: IntermediateTaskReportV0_1 | null;
 
   diagnostics: TaskDiagnosticsV0_1;
 };
