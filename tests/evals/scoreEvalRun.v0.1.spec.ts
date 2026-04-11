@@ -106,6 +106,7 @@ describe("Evals scorer v0.1 — synthetic ladder + negative control gates", () =
     expect(goodIntermediate?.verdict).toBe("INTERMEDIATE");
     expect(goodIntermediate?.ordinalPermutation.observed_order).toBe(true);
     expect(goodIntermediate?.ordinalPermutation.p_value).toBeCloseTo(0.12533333333333332, 12);
+    expect(goodIntermediate?.diagnosticFlags).toEqual([]);
     expect(goodTask?.slope_aperturePrimary).toBeNull();
     expect(goodTask?.slope_aperturePresenceMean).toBeNull();
 
@@ -140,6 +141,7 @@ describe("Evals scorer v0.1 — synthetic ladder + negative control gates", () =
     expect(wrongIntermediate?.mean_anchor_low).toBeCloseTo(0.8, 6);
     expect(wrongIntermediate?.mean_x_vowel).toBeCloseTo(0.8, 6);
     expect(wrongIntermediate?.mean_anchor_high).toBeCloseTo(0.6, 6);
+    expect(wrongIntermediate?.diagnosticFlags).toEqual([]);
     expect(wrongIntermediate?.verdict).toBe("COLLAPSED_LOW");
   });
 });
