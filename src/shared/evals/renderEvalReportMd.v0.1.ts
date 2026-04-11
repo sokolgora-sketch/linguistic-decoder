@@ -85,6 +85,7 @@ function renderIntermediate(
     `- bootstrap CI gap_high: ${s.bootstrap.ci95_gap_high ? `[${fmt(s.bootstrap.ci95_gap_high[0])}, ${fmt(s.bootstrap.ci95_gap_high[1])}]` : "—"}`,
     `- bootstrap CI normalizedPosition: ${s.bootstrap.ci95_normalizedPosition ? `[${fmt(s.bootstrap.ci95_normalizedPosition[0])}, ${fmt(s.bootstrap.ci95_normalizedPosition[1])}]` : "—"}`,
     `- bootstrap test: iters=${s.bootstrap.iters}, seed=${s.bootstrap.seed}`,
+    `- diagnostic flags: ${s.diagnosticFlags.length ? s.diagnosticFlags.join(", ") : "(none)"}`,
     "",
   ];
 }
