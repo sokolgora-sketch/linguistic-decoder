@@ -6,6 +6,9 @@ import { extractOrthographyVoicesFromWordV0_1 } from "@/shared/vowels/extractOrt
 import {
   slopePermutationV0_1,
   strictOrderPermutationV0_1,
+  marginPermutationMinGapV0_1,
+  hedgesGV0_1,
+  bootstrapIntermediateCIV0_1,
   mean,
   mulberry32,
   shuffleInPlace,
@@ -183,9 +186,35 @@ function buildIntermediateReportV0_1(params: {
     verdict = "INTERMEDIATE";
   }
 
+  const scoredItems = items.map((x) => ({ bucket: x.bucket, score: x.score }));
+
+  const lowScores = items
+    .filter((x) => x.bucket === "anchor_low")
+    .map((x) => x.score);
+  const xScores = items
+    .filter((x) => x.bucket === "x_vowel")
+    .map((x) => x.score);
+  const highScores = items
+    .filter((x) => x.bucket === "anchor_high")
+    .map((x) => x.score);
+
   const ord = strictOrderPermutationV0_1({
     bucketOrder: INTERMEDIATE_BUCKETS_V0_1,
-    items: items.map((x) => ({ bucket: x.bucket, score: x.score })),
+    items: scoredItems,
+    iters,
+    seed,
+  });
+
+  const margin = marginPermutationMinGapV0_1({
+    bucketOrder: INTERMEDIATE_BUCKETS_V0_1,
+    items: scoredItems,
+    iters,
+    seed,
+  });
+
+  const boot = bootstrapIntermediateCIV0_1({
+    bucketOrder: INTERMEDIATE_BUCKETS_V0_1,
+    items: scoredItems,
     iters,
     seed,
   });
@@ -207,6 +236,23 @@ function buildIntermediateReportV0_1(params: {
       p_value: ord.p_order,
       iters: ord.iters,
       seed: ord.seed,
+    },
+    marginPermutation: {
+      observed_min_gap: margin.observed_min_gap,
+      p_value: margin.p_margin,
+      iters: margin.iters,
+      seed: margin.seed,
+    },
+    effectSizes: {
+      hedges_g_low_x: hedgesGV0_1(lowScores, xScores),
+      hedges_g_x_high: hedgesGV0_1(xScores, highScores),
+    },
+    bootstrap: {
+      ci95_gap_low: boot.ci95_gap_low,
+      ci95_gap_high: boot.ci95_gap_high,
+      ci95_normalizedPosition: boot.ci95_normalizedPosition,
+      iters: boot.iters,
+      seed: boot.seed,
     },
   };
 }
