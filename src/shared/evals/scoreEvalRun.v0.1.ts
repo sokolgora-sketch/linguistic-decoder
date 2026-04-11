@@ -219,6 +219,14 @@ function buildIntermediateReportV0_1(params: {
     seed,
   });
 
+  const diagnosticFlags: string[] = [];
+  if (verdict === "INTERMEDIATE" && gap_low < 0.05) {
+    diagnosticFlags.push("NEAR_COLLAPSE_LOW");
+  }
+  if (verdict === "INTERMEDIATE" && gap_high < 0.05) {
+    diagnosticFlags.push("NEAR_COLLAPSE_HIGH");
+  }
+
   return {
     scoreKey: "aperturePresenceMean",
     vowelUnderTest,
@@ -254,6 +262,7 @@ function buildIntermediateReportV0_1(params: {
       iters: boot.iters,
       seed: boot.seed,
     },
+    diagnosticFlags,
   };
 }
 

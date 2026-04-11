@@ -83,6 +83,7 @@ export type IntermediateTaskReportV0_1 = {
   marginPermutation: IntermediateMarginPermutationReportV0_1;
   effectSizes: IntermediateEffectSizesReportV0_1;
   bootstrap: IntermediateBootstrapReportV0_1;
+  diagnosticFlags: string[];
 };
 
 export type TaskDiagnosticsV0_1 = {
