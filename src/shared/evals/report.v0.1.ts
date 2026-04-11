@@ -44,6 +44,26 @@ export type IntermediateOrdinalPermutationReportV0_1 = {
   seed: number;
 };
 
+export type IntermediateMarginPermutationReportV0_1 = {
+  observed_min_gap: number;
+  p_value: number;
+  iters: number;
+  seed: number;
+};
+
+export type IntermediateEffectSizesReportV0_1 = {
+  hedges_g_low_x: number | null;
+  hedges_g_x_high: number | null;
+};
+
+export type IntermediateBootstrapReportV0_1 = {
+  ci95_gap_low: [number, number] | null;
+  ci95_gap_high: [number, number] | null;
+  ci95_normalizedPosition: [number, number] | null;
+  iters: number;
+  seed: number;
+};
+
 export type IntermediateTaskReportV0_1 = {
   scoreKey: "aperturePresenceMean";
   vowelUnderTest: string;
@@ -60,6 +80,9 @@ export type IntermediateTaskReportV0_1 = {
 
   verdict: IntermediateVerdictV0_1;
   ordinalPermutation: IntermediateOrdinalPermutationReportV0_1;
+  marginPermutation: IntermediateMarginPermutationReportV0_1;
+  effectSizes: IntermediateEffectSizesReportV0_1;
+  bootstrap: IntermediateBootstrapReportV0_1;
 };
 
 export type TaskDiagnosticsV0_1 = {

@@ -200,3 +200,216 @@ export function strictOrderPermutationV0_1(params: {
     seed,
   };
 }
+
+function minAdjacentGapV0_1(means: number[]): number {
+  if (means.length < 2) return NaN;
+  let out = Number.POSITIVE_INFINITY;
+  for (let i = 0; i < means.length - 1; i++) {
+    const gap = means[i] - means[i + 1];
+    if (!Number.isFinite(gap)) return NaN;
+    if (gap < out) out = gap;
+  }
+  return out;
+}
+
+function sampleVarianceV0_1(xs: number[]): number {
+  if (xs.length < 2) return NaN;
+  const m = mean(xs);
+  if (!Number.isFinite(m)) return NaN;
+  let acc = 0;
+  for (const x of xs) {
+    const d = x - m;
+    acc += d * d;
+  }
+  return acc / (xs.length - 1);
+}
+
+function quantileSortedV0_1(xs: number[], q: number): number {
+  if (!xs.length) return NaN;
+  if (xs.length === 1) return xs[0];
+  const pos = (xs.length - 1) * q;
+  const lo = Math.floor(pos);
+  const hi = Math.ceil(pos);
+  if (lo === hi) return xs[lo];
+  const t = pos - lo;
+  return xs[lo] * (1 - t) + xs[hi] * t;
+}
+
+function ci95FromSamplesV0_1(xs: number[]): [number, number] | null {
+  const vals = xs.filter((x) => Number.isFinite(x)).sort((a, b) => a - b);
+  if (!vals.length) return null;
+  return [
+    quantileSortedV0_1(vals, 0.025),
+    quantileSortedV0_1(vals, 0.975),
+  ];
+}
+
+export function marginPermutationMinGapV0_1(params: {
+  bucketOrder: string[];
+  items: Array<{ bucket: string; score: number }>;
+  iters: number;
+  seed: number;
+}): {
+  bucketOrder: string[];
+  obsMeans: number[];
+  observed_min_gap: number;
+  p_margin: number;
+  iters: number;
+  seed: number;
+} {
+  const { bucketOrder, items, iters, seed } = params;
+
+  const obsMeans = bucketOrder.map((b) => {
+    const scores = items.filter((x) => x.bucket === b).map((x) => x.score);
+    return mean(scores);
+  });
+
+  const observed_min_gap = minAdjacentGapV0_1(obsMeans);
+  const labels = items.map((x) => x.bucket);
+  const rnd = mulberry32(seed);
+
+  if (
+    obsMeans.some((x) => !Number.isFinite(x)) ||
+    !Number.isFinite(observed_min_gap)
+  ) {
+    return {
+      bucketOrder,
+      obsMeans,
+      observed_min_gap: NaN,
+      p_margin: 1,
+      iters,
+      seed,
+    };
+  }
+
+  let successCount = 0;
+
+  for (let it = 0; it < iters; it++) {
+    const tmp = labels.slice();
+    shuffleInPlace(tmp, rnd);
+
+    const means = bucketOrder.map((b) => {
+      const scores: number[] = [];
+      for (let i = 0; i < items.length; i++) {
+        if (tmp[i] === b) scores.push(items[i].score);
+      }
+      return mean(scores);
+    });
+
+    const minGap = minAdjacentGapV0_1(means);
+    if (Number.isFinite(minGap) && minGap >= observed_min_gap) successCount++;
+  }
+
+  return {
+    bucketOrder,
+    obsMeans,
+    observed_min_gap,
+    p_margin: successCount / iters,
+    iters,
+    seed,
+  };
+}
+
+export function hedgesGV0_1(a: number[], b: number[]): number | null {
+  if (a.length < 2 || b.length < 2) return null;
+
+  const ma = mean(a);
+  const mb = mean(b);
+  if (!Number.isFinite(ma) || !Number.isFinite(mb)) return null;
+
+  const va = sampleVarianceV0_1(a);
+  const vb = sampleVarianceV0_1(b);
+  if (!Number.isFinite(va) || !Number.isFinite(vb)) return null;
+
+  const df = a.length + b.length - 2;
+  if (df <= 0) return null;
+
+  const pooled = ((a.length - 1) * va + (b.length - 1) * vb) / df;
+  if (pooled < 0) return null;
+  if (pooled === 0) return ma == mb ? 0 : null;
+
+  const d = (ma - mb) / Math.sqrt(pooled);
+  const correction = df > 1 ? 1 - 3 / (4 * df - 1) : 1;
+  return correction * d;
+}
+
+export function bootstrapIntermediateCIV0_1(params: {
+  bucketOrder: string[];
+  items: Array<{ bucket: string; score: number }>;
+  iters: number;
+  seed: number;
+}): {
+  ci95_gap_low: [number, number] | null;
+  ci95_gap_high: [number, number] | null;
+  ci95_normalizedPosition: [number, number] | null;
+  iters: number;
+  seed: number;
+} {
+  const { bucketOrder, items, iters, seed } = params;
+  if (bucketOrder.length !== 3) {
+    return {
+      ci95_gap_low: null,
+      ci95_gap_high: null,
+      ci95_normalizedPosition: null,
+      iters,
+      seed,
+    };
+  }
+
+  const grouped = new Map<string, number[]>();
+  for (const bucket of bucketOrder) grouped.set(bucket, []);
+  for (const item of items) {
+    const xs = grouped.get(item.bucket);
+    if (xs) xs.push(item.score);
+  }
+
+  const low = grouped.get(bucketOrder[0]) ?? [];
+  const mid = grouped.get(bucketOrder[1]) ?? [];
+  const high = grouped.get(bucketOrder[2]) ?? [];
+
+  if (!low.length || !mid.length || !high.length) {
+    return {
+      ci95_gap_low: null,
+      ci95_gap_high: null,
+      ci95_normalizedPosition: null,
+      iters,
+      seed,
+    };
+  }
+
+  const rnd = mulberry32(seed);
+  const gapLowSamples: number[] = [];
+  const gapHighSamples: number[] = [];
+  const posSamples: number[] = [];
+
+  function resampleMean(xs: number[]): number {
+    let acc = 0;
+    for (let i = 0; i < xs.length; i++) {
+      acc += xs[Math.floor(rnd() * xs.length)];
+    }
+    return acc / xs.length;
+  }
+
+  for (let it = 0; it < iters; it++) {
+    const meanLow = resampleMean(low);
+    const meanMid = resampleMean(mid);
+    const meanHigh = resampleMean(high);
+
+    const gapLow = meanLow - meanMid;
+    const gapHigh = meanMid - meanHigh;
+    const denom = meanLow - meanHigh;
+    const pos = Number.isFinite(denom) && denom !== 0 ? gapLow / denom : NaN;
+
+    if (Number.isFinite(gapLow)) gapLowSamples.push(gapLow);
+    if (Number.isFinite(gapHigh)) gapHighSamples.push(gapHigh);
+    if (Number.isFinite(pos)) posSamples.push(pos);
+  }
+
+  return {
+    ci95_gap_low: ci95FromSamplesV0_1(gapLowSamples),
+    ci95_gap_high: ci95FromSamplesV0_1(gapHighSamples),
+    ci95_normalizedPosition: ci95FromSamplesV0_1(posSamples),
+    iters,
+    seed,
+  };
+}
