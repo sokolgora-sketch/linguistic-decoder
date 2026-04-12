@@ -141,7 +141,88 @@ describe("Evals scorer v0.1 — synthetic ladder + negative control gates", () =
     expect(wrongIntermediate?.mean_anchor_low).toBeCloseTo(0.8, 6);
     expect(wrongIntermediate?.mean_x_vowel).toBeCloseTo(0.8, 6);
     expect(wrongIntermediate?.mean_anchor_high).toBeCloseTo(0.6, 6);
-    expect(wrongIntermediate?.diagnosticFlags).toEqual([]);
+    expect(wrongIntermediate?.diagnosticFlags).toContain("BOUNDARY_UNCERTAIN_LOW");
+    expect(wrongIntermediate?.diagnosticFlags).not.toContain("NEAR_COLLAPSE_LOW");
     expect(wrongIntermediate?.verdict).toBe("COLLAPSED_LOW");
+  });
+
+  test("flags low boundary uncertainty for near-collapse intermediates", () => {
+    const t5 = EVAL_SPEC_V0_1.tasks.find((x) => x.taskId === "T5_INTERMEDIATE_V0_1");
+    expect(t5).toBeTruthy();
+    if (!t5) return;
+
+    const nearBoundaryRun = {
+      evalRunVersion: "evalRun.v0.1",
+      evalSpecVersion: "evalSpec.v0.1",
+      specId: "public-grounding-probe.v0.1",
+      runId: "gold.synthetic.t5.boundary-low.v0.1",
+      meta: { provider: "synthetic", model: "none", label: "t5-boundary-low" },
+      tasks: [
+        {
+          taskId: t5.taskId,
+          inputShape: "intermediate_triple",
+          languageHint: "da",
+          vowelUnderTest: "ø",
+          anchorLow: "V2",
+          anchorHigh: "V5",
+          buckets: {
+            anchor_low: rep("o", t5.nPerBucket),
+            x_vowel: [...rep("o", 18), ...rep("oe", 12)],
+            anchor_high: rep("u", t5.nPerBucket),
+          },
+        },
+      ],
+    } as const;
+
+    const scored = scoreEvalRunBundleV0_1({ spec: EVAL_SPEC_V0_1, run: nearBoundaryRun });
+    const task = scored.tasks.find((x) => x.taskId === "T5_INTERMEDIATE_V0_1");
+    const inter = task?.intermediate_aperturePresenceMean;
+
+    expect(inter).toBeTruthy();
+    expect(inter?.verdict).toBe("INTERMEDIATE");
+    expect(inter?.gap_low).toBeGreaterThan(0);
+    expect(inter?.gap_low ?? 0).toBeLessThanOrEqual(0.041);
+    expect(inter?.diagnosticFlags).toContain("NEAR_COLLAPSE_LOW");
+    expect(inter?.diagnosticFlags).toContain("BOUNDARY_UNCERTAIN_LOW");
+  });
+
+  test("keeps low boundary uncertainty when verdict exceeds low", () => {
+    const t5 = EVAL_SPEC_V0_1.tasks.find((x) => x.taskId === "T5_INTERMEDIATE_V0_1");
+    expect(t5).toBeTruthy();
+    if (!t5) return;
+
+    const exceedsLowRun = {
+      evalRunVersion: "evalRun.v0.1",
+      evalSpecVersion: "evalSpec.v0.1",
+      specId: "public-grounding-probe.v0.1",
+      runId: "gold.synthetic.t5.boundary-cross-low.v0.1",
+      meta: { provider: "synthetic", model: "none", label: "t5-boundary-cross-low" },
+      tasks: [
+        {
+          taskId: t5.taskId,
+          inputShape: "intermediate_triple",
+          languageHint: "da",
+          vowelUnderTest: "ø",
+          anchorLow: "V2",
+          anchorHigh: "V5",
+          buckets: {
+            anchor_low: [...rep("o", 18), ...rep("oe", 12)],
+            x_vowel: rep("o", t5.nPerBucket),
+            anchor_high: rep("u", t5.nPerBucket),
+          },
+        },
+      ],
+    } as const;
+
+    const scored = scoreEvalRunBundleV0_1({ spec: EVAL_SPEC_V0_1, run: exceedsLowRun });
+    const task = scored.tasks.find((x) => x.taskId === "T5_INTERMEDIATE_V0_1");
+    const inter = task?.intermediate_aperturePresenceMean;
+
+    expect(inter).toBeTruthy();
+    expect(inter?.verdict).toBe("EXCEEDS_LOW");
+    expect(inter?.gap_low).toBeLessThanOrEqual(0);
+    expect(Math.abs(inter?.gap_low ?? 1)).toBeLessThanOrEqual(0.041);
+    expect(inter?.diagnosticFlags).toContain("BOUNDARY_UNCERTAIN_LOW");
+    expect(inter?.diagnosticFlags).not.toContain("NEAR_COLLAPSE_LOW");
   });
 });

@@ -219,12 +219,28 @@ function buildIntermediateReportV0_1(params: {
     seed,
   });
 
+  const ciGapLowSpansZero =
+    !!boot.ci95_gap_low &&
+    boot.ci95_gap_low[0] <= 0 &&
+    boot.ci95_gap_low[1] >= 0;
+  const ciGapHighSpansZero =
+    !!boot.ci95_gap_high &&
+    boot.ci95_gap_high[0] <= 0 &&
+    boot.ci95_gap_high[1] >= 0;
+  const boundaryGapThreshold = 0.041;
+
   const diagnosticFlags: string[] = [];
   if (verdict === "INTERMEDIATE" && gap_low < 0.05) {
     diagnosticFlags.push("NEAR_COLLAPSE_LOW");
   }
   if (verdict === "INTERMEDIATE" && gap_high < 0.05) {
     diagnosticFlags.push("NEAR_COLLAPSE_HIGH");
+  }
+  if (Math.abs(gap_low) <= boundaryGapThreshold || ciGapLowSpansZero) {
+    diagnosticFlags.push("BOUNDARY_UNCERTAIN_LOW");
+  }
+  if (Math.abs(gap_high) <= boundaryGapThreshold || ciGapHighSpansZero) {
+    diagnosticFlags.push("BOUNDARY_UNCERTAIN_HIGH");
   }
 
   return {
