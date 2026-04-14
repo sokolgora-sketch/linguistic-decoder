@@ -40,6 +40,7 @@ import {
   getGuidedPromptV0_1,
 } from "@/ui/evals/evalsGuidedPrompt.v0.1";
 import { buildSavedRunSeriesGroupsV0_1 } from "@/ui/evals/evalsSavedRunGroups.v0.1";
+import { buildEvalsWorkbookArrayBufferV0_1 } from "@/ui/evals/evalsWorkbookExport.v0.1";
 
 
 type ApiOk = { ok: true; report: EvalReportBundleV0_1; md: string };
@@ -1933,6 +1934,41 @@ export function EvalsPageClientV0_1() {
       setApiErr({ ok: false, code: "CLIENT_ERROR", message: msg });
     }
   }
+    async function onDownloadWorkbook() {
+      setApiErr(null);
+      setNotice(null);
+
+      try {
+        const workbookBytes = await buildEvalsWorkbookArrayBufferV0_1({
+          report,
+          md,
+          runId,
+        });
+
+        const rid = String(runId || "pilot-planner")
+          .replace(/[^a-zA-Z0-9._-]+/g, "_")
+          .slice(0, 120);
+
+        const blob = new Blob([workbookBytes], {
+          type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        });
+
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `evals.workbook.${rid}.v0.1.xlsx`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+
+        URL.revokeObjectURL(url);
+        setNotice("Downloaded Evals workbook.");
+      } catch (e) {
+        const msg = e instanceof Error ? e.message : String(e);
+        setApiErr({ ok: false, code: "CLIENT_ERROR", message: msg });
+      }
+    }
+
 
   async function onDownloadPdf() {
     setApiErr(null);
@@ -3181,7 +3217,7 @@ export function EvalsPageClientV0_1() {
             </div>
           </div>
           <div className="space-y-1.5 pt-0">
-              <div className="grid grid-cols-2 gap-1.5 md:grid-cols-4">
+              <div className="grid grid-cols-2 gap-1.5 md:grid-cols-5">
                 <button
                   type="button"
                   className={`${MT.actionPrimary} w-full min-h-[32px] px-2 py-1 text-[9px] leading-[1] border-[#16a34a] bg-[#16a34a] text-white transition hover:border-[#15803d] hover:bg-[#15803d] hover:shadow-[0_0_0_1px_rgba(22,163,74,0.4),0_4px_16px_rgba(22,163,74,0.33)] disabled:cursor-not-allowed disabled:border-[#333] disabled:bg-[#111] disabled:text-[#333] disabled:shadow-none`}
@@ -3226,6 +3262,14 @@ export function EvalsPageClientV0_1() {
               >
                 Download Bundle
               </button>
+                <button
+                  type="button"
+                  className={`${MT.actionUtility} w-full min-h-[32px] px-2 py-1 text-[9px] leading-[1] border-[#355a7a] bg-[#101a24] text-[#9fd3ff] transition hover:border-[#4d7fa8] hover:bg-[#132031] hover:text-[#d7eeff] disabled:opacity-50`}
+                  onClick={() => void onDownloadWorkbook()}
+                  disabled={busy}
+                >
+                  Download Workbook
+                </button>
               <button
                 type="button"
                 className={`${MT.actionUtility} w-full min-h-[32px] px-2 py-1 text-[9px] leading-[1] border-[#444] bg-transparent text-[#b8b8b8] transition hover:border-[#777] hover:bg-[#1f1f1f] hover:text-[#f2f2f2] disabled:opacity-50`}
