@@ -140,23 +140,41 @@ function addSheet(
   });
 
   ws.columns = widths.map((width) => ({ width }));
-
   rows.forEach((r) => ws.addRow(r));
 
-  const header = ws.getRow(1);
-  header.font = { bold: true };
-  header.fill = {
-    type: "pattern",
-    pattern: "solid",
-    fgColor: { argb: "FFD9EAF7" },
+  ws.autoFilter = {
+    from: { row: 1, column: 1 },
+    to: { row: 1, column: Math.max(1, widths.length) },
   };
-  header.alignment = { vertical: "top", wrapText: true };
 
-  ws.eachRow((row) => {
+  ws.eachRow((row, rowNumber) => {
     row.alignment = { vertical: "top", wrapText: false };
-  });
 
-  ws.getRow(1).alignment = { vertical: "top", wrapText: true };
+    row.eachCell((cell) => {
+      cell.border = {
+        top: { style: "thin", color: { argb: "FFE5E7EB" } },
+        left: { style: "thin", color: { argb: "FFE5E7EB" } },
+        bottom: { style: "thin", color: { argb: "FFE5E7EB" } },
+        right: { style: "thin", color: { argb: "FFE5E7EB" } },
+      };
+
+      if (typeof cell.value === "number") {
+        cell.numFmt = Number.isInteger(cell.value) ? "0" : "0.000";
+        cell.alignment = { vertical: "top", horizontal: "right", wrapText: false };
+      }
+    });
+
+    if (rowNumber === 1) {
+      row.height = 20;
+      row.font = { bold: true };
+      row.fill = {
+        type: "pattern",
+        pattern: "solid",
+        fgColor: { argb: "FFD9EAF7" },
+      };
+      row.alignment = { vertical: "middle", wrapText: true };
+    }
+  });
 }
 
 function runSummary(input: BuildEvalsWorkbookInputV0_1): Cell[][] {
