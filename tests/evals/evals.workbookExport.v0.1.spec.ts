@@ -95,6 +95,7 @@ describe("evals workbook export v0.1", () => {
     const wb = await readWorkbook(bytes);
     expect(wb.worksheets.map((ws) => ws.name)).toEqual([
       "Run Summary",
+      "T5 Summary",
       "Bucket Stats",
       "Pilot Planner",
       "Pilot Summary",
@@ -102,12 +103,17 @@ describe("evals workbook export v0.1", () => {
     ]);
 
     const runSummary = wb.getWorksheet("Run Summary");
+    const t5Summary = wb.getWorksheet("T5 Summary");
     const bucketStats = wb.getWorksheet("Bucket Stats");
     const planner = wb.getWorksheet("Pilot Planner");
     const summary = wb.getWorksheet("Pilot Summary");
 
     expect(runSummary?.getCell("C2").value).toBe(EVALS_WORKBOOK_EXPORT_VERSION_V0_1);
     expect(runSummary?.getCell("C11").value).toBe("T5_INTERMEDIATE_V0_1");
+    expect(t5Summary?.getCell("B2").value).toBe("T5_INTERMEDIATE_V0_1");
+    expect(t5Summary?.getCell("C2").value).toBe("fi");
+    expect(t5Summary?.getCell("D2").value).toBe("ä");
+    expect(t5Summary?.getCell("G2").value).toBe("INTERMEDIATE");
     expect(bucketStats?.getCell("A2").value).toBe("anchor_low");
     expect(planner?.getCell("H4").value).toBe("t5.fi.ae.v1-v3.pilot.main.r01");
     expect(summary?.getCell("B6").value).toBe("SOFT_COLLAPSE_HIGH_CONTROL");
@@ -127,6 +133,7 @@ describe("evals workbook export v0.1", () => {
 
     const wb = await readWorkbook(bytes);
     const runSummary = wb.getWorksheet("Run Summary");
+    const t5Summary = wb.getWorksheet("T5 Summary");
     const bucketStats = wb.getWorksheet("Bucket Stats");
 
     expect(runSummary?.getCell("C13").value).toBe("fi");
@@ -140,6 +147,20 @@ describe("evals workbook export v0.1", () => {
     expect(runSummary?.getCell("C21").value).toBe(0.99);
     expect(runSummary?.getCell("C22").value).toBe(0.735);
     expect(runSummary?.getCell("C23").value).toBe(0.441);
+
+    expect(t5Summary?.getCell("A2").value).toBe("workbook.smoke.t5.fi.ae.v1-v3.r01");
+    expect(t5Summary?.getCell("B2").value).toBe("T5_INTERMEDIATE_V0_1");
+    expect(t5Summary?.getCell("C2").value).toBe("fi");
+    expect(t5Summary?.getCell("D2").value).toBe("ä");
+    expect(t5Summary?.getCell("E2").value).toBe("V1");
+    expect(t5Summary?.getCell("F2").value).toBe("V3");
+    expect(t5Summary?.getCell("G2").value).toBe("INTERMEDIATE");
+    expect(t5Summary?.getCell("H2").value).toBe(0.464);
+    expect(t5Summary?.getCell("I2").value).toBe(0.255);
+    expect(t5Summary?.getCell("J2").value).toBe(0.294);
+    expect(t5Summary?.getCell("K2").value).toBe(0.99);
+    expect(t5Summary?.getCell("L2").value).toBe(0.735);
+    expect(t5Summary?.getCell("M2").value).toBe(0.441);
 
     expect(bucketStats?.getCell("A2").value).toBe("anchor_low");
     expect(bucketStats?.getCell("H2").value).toBe(0.99);
