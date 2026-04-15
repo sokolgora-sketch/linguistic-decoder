@@ -117,6 +117,11 @@ describe("evals workbook export v0.1", () => {
     expect(bucketStats?.getCell("A2").value).toBe("anchor_low");
     expect(planner?.getCell("H4").value).toBe("t5.fi.ae.v1-v3.pilot.main.r01");
     expect(summary?.getCell("B6").value).toBe("SOFT_COLLAPSE_HIGH_CONTROL");
+
+    expect(t5Summary?.views?.[0]).toMatchObject({ state: "frozen", ySplit: 1 });
+    expect(t5Summary?.autoFilter).toBe("A1:N1");
+    expect(t5Summary?.getRow(1).font?.bold).toBe(true);
+    expect(t5Summary?.getCell("H2").numFmt).toBe("0.000");
   });
 
   it("populates T5 summary and bucket stats from markdown fallback", async () => {
