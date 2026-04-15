@@ -201,6 +201,51 @@ function runSummary(input: BuildEvalsWorkbookInputV0_1): Cell[][] {
   ];
 }
 
+function t5Summary(input: BuildEvalsWorkbookInputV0_1): Cell[][] {
+  const report = input.report ?? null;
+  const task = primaryTask(report);
+  const inter = intermediate(task);
+  const md = input.md ?? "";
+
+  return [
+    [
+      "runId",
+      "taskId",
+      "language",
+      "vowel",
+      "anchorLow",
+      "anchorHigh",
+      "verdict",
+      "normalizedPosition",
+      "gap_low",
+      "gap_high",
+      "mean_anchor_low",
+      "mean_x_vowel",
+      "mean_anchor_high",
+      "diagnosticFlags",
+    ],
+    [
+      firstText((report as any)?.runId, input.runId, mdField(md, "runId")),
+      firstText(task?.taskId, mdField(md, "taskId")),
+      firstText(task?.languageHint, mdField(md, "languageHint")),
+      firstText(task?.vowelUnderTest, mdField(md, "vowelUnderTest")),
+      firstText(task?.anchorLow, mdField(md, "anchorLow")),
+      firstText(task?.anchorHigh, mdField(md, "anchorHigh")),
+      firstText(inter?.verdict, mdField(md, "verdict")),
+      firstNumber(inter?.normalizedPosition, mdNumber(md, "normalizedPosition")),
+      firstNumber(inter?.gap_low, mdNumber(md, "gap_low")),
+      firstNumber(inter?.gap_high, mdNumber(md, "gap_high")),
+      firstNumber(inter?.mean_anchor_low, mdNumber(md, "mean(anchor_low)")),
+      firstNumber(inter?.mean_x_vowel, mdNumber(md, "mean(x_vowel)")),
+      firstNumber(inter?.mean_anchor_high, mdNumber(md, "mean(anchor_high)")),
+      firstText(
+        Array.isArray(inter?.diagnosticFlags) ? inter.diagnosticFlags.join(", ") : "",
+        mdField(md, "diagnostic flags"),
+      ),
+    ],
+  ];
+}
+
 function bucketStats(task: Record<string, any> | null, md?: string | null): Cell[][] {
   const rows: Cell[][] = [
     [
@@ -278,6 +323,7 @@ export async function buildEvalsWorkbookArrayBufferV0_1(
   wb.created = new Date(input.exportedAtUtc ?? Date.now());
 
   addSheet(wb, "Run Summary", runSummary(input), [16, 24, 48]);
+  addSheet(wb, "T5 Summary", t5Summary(input), [34, 22, 12, 10, 12, 12, 18, 20, 12, 12, 18, 16, 18, 24]);
   addSheet(wb, "Bucket Stats", bucketStats(task, input.md), [18, 12, 12, 12, 12, 10, 16, 20]);
   addSheet(wb, "Pilot Planner", PILOT_PLANNER, [10, 8, 8, 16, 16, 12, 12, 34, 34, 34, 36, 34]);
   addSheet(wb, "Pilot Summary", PILOT_SUMMARY, [10, 28, 46, 28, 40]);

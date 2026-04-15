@@ -83,6 +83,7 @@ describe("Evals workbook download integration v0.1", () => {
 
       expect(wb.worksheets.map((ws) => ws.name)).toEqual([
         "Run Summary",
+        "T5 Summary",
         "Bucket Stats",
         "Pilot Planner",
         "Pilot Summary",
