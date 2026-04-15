@@ -21,6 +21,99 @@ function str(v: unknown): string {
   return String(v ?? "");
 }
 
+function cleanMdValue(v: string | undefined): string {
+  const value = String(v ?? "").trim();
+  return value === "(none)" || value === "—" ? "" : value;
+}
+
+function mdField(md: string | null | undefined, key: string): string {
+  const lines = String(md ?? "").split(/\r?\n/);
+  const needle = key.toLowerCase();
+
+  for (const line of lines) {
+    const match = line.match(/^\s*-\s*([^:]+):\s*(.*?)\s*$/);
+    if (!match) continue;
+
+    if (match[1].trim().toLowerCase() === needle) {
+      return cleanMdValue(match[2]);
+    }
+  }
+
+  return "";
+}
+
+function mdNumber(md: string | null | undefined, key: string): number | "" {
+  const value = mdField(md, key);
+  if (!value) return "";
+
+  const direct = Number(value);
+  if (Number.isFinite(direct)) return direct;
+
+  const match = value.match(/-?\d+(?:\.\d+)?/);
+  if (!match) return "";
+
+  const parsed = Number(match[0]);
+  return Number.isFinite(parsed) ? parsed : "";
+}
+
+function firstText(...values: unknown[]): string {
+  for (const value of values) {
+    const text = str(value).trim();
+    if (text) return text;
+  }
+  return "";
+}
+
+function firstNumber(...values: unknown[]): number | "" {
+  for (const value of values) {
+    const parsed = num(value);
+    if (parsed !== "") return parsed;
+  }
+  return "";
+}
+
+function parseMarkdownBucketStats(md: string | null | undefined): Cell[][] {
+  const rows: Cell[][] = [
+    [
+      "Bucket",
+      "expectedN",
+      "providedN",
+      "validN",
+      "invalidN",
+      "dupN",
+      "mean(primary)",
+      "mean(presenceMean)",
+    ],
+  ];
+
+  const lines = String(md ?? "").split(/\r?\n/);
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed.startsWith("|")) continue;
+    if (!/\|\s*(anchor_low|x_vowel|anchor_high)\s*\|/.test(trimmed)) continue;
+
+    const parts = trimmed
+      .split("|")
+      .map((part) => part.trim())
+      .filter(Boolean);
+
+    if (parts.length < 8) continue;
+
+    rows.push([
+      parts[0],
+      Number(parts[1]),
+      Number(parts[2]),
+      Number(parts[3]),
+      Number(parts[4]),
+      Number(parts[5]),
+      Number(parts[6]),
+      Number(parts[7]),
+    ]);
+  }
+
+  return rows.length > 1 ? rows : [];
+}
+
 function primaryTask(report: EvalReportBundleV0_1 | null | undefined): Record<string, any> | null {
   const tasks = Array.isArray((report as any)?.tasks) ? (report as any).tasks : [];
   return tasks.find((t: any) => t?.kind === "byo") ?? tasks[0] ?? null;
@@ -71,40 +164,44 @@ function runSummary(input: BuildEvalsWorkbookInputV0_1): Cell[][] {
   const task = primaryTask(report);
   const inter = intermediate(task);
   const meta = ((report as any)?.meta ?? {}) as Record<string, unknown>;
+  const md = input.md ?? "";
 
   return [
     ["Section", "Field", "Value"],
     ["workbook", "exportVersion", EVALS_WORKBOOK_EXPORT_VERSION_V0_1],
     ["workbook", "exportedAtUtc", input.exportedAtUtc ?? new Date().toISOString()],
-    ["run", "runId", str((report as any)?.runId || input.runId || "")],
-    ["run", "provider", str(meta.provider)],
-    ["run", "model", str(meta.model)],
-    ["run", "label", str(meta.label)],
-    ["run", "sourceEngineId", str(meta.sourceEngineId)],
-    ["run", "sourceEngineVersion", str(meta.sourceEngineVersion)],
-    ["run", "sourceEngineBuild", str(meta.sourceEngineBuild)],
-    ["task", "taskId", str(task?.taskId)],
-    ["task", "kind", str(task?.kind)],
-    ["task", "languageHint", str(task?.languageHint)],
-    ["task", "vowelUnderTest", str(task?.vowelUnderTest)],
-    ["task", "anchorLow", str(task?.anchorLow)],
-    ["task", "anchorHigh", str(task?.anchorHigh)],
-    ["intermediate", "verdict", str(inter?.verdict)],
-    ["intermediate", "normalizedPosition", num(inter?.normalizedPosition)],
-    ["intermediate", "gap_low", num(inter?.gap_low)],
-    ["intermediate", "gap_high", num(inter?.gap_high)],
-    ["intermediate", "mean_anchor_low", num(inter?.mean_anchor_low)],
-    ["intermediate", "mean_x_vowel", num(inter?.mean_x_vowel)],
-    ["intermediate", "mean_anchor_high", num(inter?.mean_anchor_high)],
+    ["run", "runId", firstText((report as any)?.runId, input.runId, mdField(md, "runId"))],
+    ["run", "provider", firstText(meta.provider, mdField(md, "provider"))],
+    ["run", "model", firstText(meta.model, mdField(md, "model"))],
+    ["run", "label", firstText(meta.label, mdField(md, "label"))],
+    ["run", "sourceEngineId", firstText(meta.sourceEngineId, mdField(md, "sourceEngineId"))],
+    ["run", "sourceEngineVersion", firstText(meta.sourceEngineVersion, mdField(md, "sourceEngineVersion"))],
+    ["run", "sourceEngineBuild", firstText(meta.sourceEngineBuild, mdField(md, "sourceEngineBuild"))],
+    ["task", "taskId", firstText(task?.taskId, mdField(md, "taskId"))],
+    ["task", "kind", firstText(task?.kind, mdField(md, "kind"))],
+    ["task", "languageHint", firstText(task?.languageHint, mdField(md, "languageHint"))],
+    ["task", "vowelUnderTest", firstText(task?.vowelUnderTest, mdField(md, "vowelUnderTest"))],
+    ["task", "anchorLow", firstText(task?.anchorLow, mdField(md, "anchorLow"))],
+    ["task", "anchorHigh", firstText(task?.anchorHigh, mdField(md, "anchorHigh"))],
+    ["intermediate", "verdict", firstText(inter?.verdict, mdField(md, "verdict"))],
+    ["intermediate", "normalizedPosition", firstNumber(inter?.normalizedPosition, mdNumber(md, "normalizedPosition"))],
+    ["intermediate", "gap_low", firstNumber(inter?.gap_low, mdNumber(md, "gap_low"))],
+    ["intermediate", "gap_high", firstNumber(inter?.gap_high, mdNumber(md, "gap_high"))],
+    ["intermediate", "mean_anchor_low", firstNumber(inter?.mean_anchor_low, mdNumber(md, "mean(anchor_low)"))],
+    ["intermediate", "mean_x_vowel", firstNumber(inter?.mean_x_vowel, mdNumber(md, "mean(x_vowel)"))],
+    ["intermediate", "mean_anchor_high", firstNumber(inter?.mean_anchor_high, mdNumber(md, "mean(anchor_high)"))],
     [
       "intermediate",
       "diagnosticFlags",
-      Array.isArray(inter?.diagnosticFlags) ? inter.diagnosticFlags.join(", ") : "",
+      firstText(
+        Array.isArray(inter?.diagnosticFlags) ? inter.diagnosticFlags.join(", ") : "",
+        mdField(md, "diagnostic flags"),
+      ),
     ],
   ];
 }
 
-function bucketStats(task: Record<string, any> | null): Cell[][] {
+function bucketStats(task: Record<string, any> | null, md?: string | null): Cell[][] {
   const rows: Cell[][] = [
     [
       "Bucket",
@@ -138,6 +235,9 @@ function bucketStats(task: Record<string, any> | null): Cell[][] {
   } else if (buckets && typeof buckets === "object") {
     Object.entries(buckets).forEach(([k, v]) => push(k, v));
   }
+
+  const markdownRows = parseMarkdownBucketStats(md);
+  if (markdownRows.length > 1) return markdownRows;
 
   return rows;
 }
@@ -178,7 +278,7 @@ export async function buildEvalsWorkbookArrayBufferV0_1(
   wb.created = new Date(input.exportedAtUtc ?? Date.now());
 
   addSheet(wb, "Run Summary", runSummary(input), [16, 24, 48]);
-  addSheet(wb, "Bucket Stats", bucketStats(task), [18, 12, 12, 12, 12, 10, 16, 20]);
+  addSheet(wb, "Bucket Stats", bucketStats(task, input.md), [18, 12, 12, 12, 12, 10, 16, 20]);
   addSheet(wb, "Pilot Planner", PILOT_PLANNER, [10, 8, 8, 16, 16, 12, 12, 34, 34, 34, 36, 34]);
   addSheet(wb, "Pilot Summary", PILOT_SUMMARY, [10, 28, 46, 28, 40]);
   addSheet(wb, "Raw Report", rawReport(input.md), [8, 120]);
