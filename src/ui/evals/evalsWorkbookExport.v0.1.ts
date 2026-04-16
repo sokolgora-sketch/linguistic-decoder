@@ -323,6 +323,38 @@ const PILOT_SUMMARY: Cell[][] = [
   ["pt-â", "SOFT_COLLAPSE_HIGH_CONTROL", "main/alt=INT | ctrl=COLLAPSED_HIGH | ctrl-alt=INT+HIGH_WARN", "mixed", "ctrl-alt does not fully collapse"],
 ];
 
+function csvCellV0_1(value: Cell): string {
+  const text = String(value ?? "");
+  return /[",\n\r]/.test(text) ? '"' + text.replaceAll('"', '""') + '"' : text;
+}
+
+function csvLineV0_1(row: Cell[]): string {
+  return row.map(csvCellV0_1).join(",");
+}
+
+export function buildEvalsSummaryCsvV0_1(input: BuildEvalsWorkbookInputV0_1): string {
+  const task = primaryTask(input.report ?? null);
+  const rows: Cell[][] = [
+    ["ZË-RO Evals Summary CSV"],
+    [],
+    ["Run Summary"],
+    ...runSummary(input),
+    [],
+    ["T5 Summary"],
+    ...t5Summary(input),
+    [],
+    ["Bucket Stats"],
+    ...bucketStats(task, input.md),
+  ];
+
+  return rows.map(csvLineV0_1).join("\n") + "\n";
+}
+
+/** Backwards-compatible alias for the first CSV PR draft. Prefer buildEvalsSummaryCsvV0_1. */
+export function buildEvalsT5CsvV0_1(input: BuildEvalsWorkbookInputV0_1): string {
+  return buildEvalsSummaryCsvV0_1(input);
+}
+
 function rawReport(md: string | null | undefined): Cell[][] {
   const lines = String(md ?? "").trim()
     ? String(md).split(/\r?\n/)

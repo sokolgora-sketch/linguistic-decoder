@@ -40,7 +40,7 @@ import {
   getGuidedPromptV0_1,
 } from "@/ui/evals/evalsGuidedPrompt.v0.1";
 import { buildSavedRunSeriesGroupsV0_1 } from "@/ui/evals/evalsSavedRunGroups.v0.1";
-import { buildEvalsWorkbookArrayBufferV0_1 } from "@/ui/evals/evalsWorkbookExport.v0.1";
+import { buildEvalsSummaryCsvV0_1, buildEvalsWorkbookArrayBufferV0_1 } from "@/ui/evals/evalsWorkbookExport.v0.1";
 
 
 type ApiOk = { ok: true; report: EvalReportBundleV0_1; md: string };
@@ -1934,6 +1934,70 @@ export function EvalsPageClientV0_1() {
       setApiErr({ ok: false, code: "CLIENT_ERROR", message: msg });
     }
   }
+    async function onDownloadSummaryCsv() {
+
+      setApiErr(null);
+
+      setNotice(null);
+
+
+      try {
+
+        const csv = buildEvalsSummaryCsvV0_1({
+
+          report,
+
+          md,
+
+          runId,
+
+        });
+
+
+        const rid = String(runId || "t5-summary")
+
+          .replace(/[^a-zA-Z0-9._-]+/g, "_")
+
+          .slice(0, 120);
+
+
+        const blob = new Blob([csv], {
+
+          type: "text/csv;charset=utf-8",
+
+        });
+
+
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement("a");
+
+        a.href = url;
+
+        a.download = `evals.summary.${rid}.v0.1.csv`;
+
+        document.body.appendChild(a);
+
+        a.click();
+
+        a.remove();
+
+
+        URL.revokeObjectURL(url);
+
+        setNotice("Downloaded Summary CSV.");
+
+      } catch (e) {
+
+        const msg = e instanceof Error ? e.message : String(e);
+
+        setApiErr({ ok: false, code: "CLIENT_ERROR", message: msg });
+
+      }
+
+    }
+
+
     async function onDownloadWorkbook() {
       setApiErr(null);
       setNotice(null);
@@ -3217,7 +3281,7 @@ export function EvalsPageClientV0_1() {
             </div>
           </div>
           <div className="space-y-1.5 pt-0">
-              <div className="grid grid-cols-2 gap-1.5 md:grid-cols-5">
+              <div className="grid grid-cols-2 gap-1.5 md:grid-cols-6">
                 <button
                   type="button"
                   className={`${MT.actionPrimary} w-full min-h-[32px] px-2 py-1 text-[9px] leading-[1] border-[#16a34a] bg-[#16a34a] text-white transition hover:border-[#15803d] hover:bg-[#15803d] hover:shadow-[0_0_0_1px_rgba(22,163,74,0.4),0_4px_16px_rgba(22,163,74,0.33)] disabled:cursor-not-allowed disabled:border-[#333] disabled:bg-[#111] disabled:text-[#333] disabled:shadow-none`}
@@ -3270,6 +3334,14 @@ export function EvalsPageClientV0_1() {
                 >
                   Download Workbook
                 </button>
+                  <button
+                    type="button"
+                    className={`${MT.actionUtility} w-full min-h-[32px] px-2 py-1 text-[9px] leading-[1] border-[#3f5a2f] bg-[#172111] text-[#d7f0c8] transition hover:border-[#5b7f43] hover:bg-[#1d2a15] hover:text-white disabled:opacity-50`}
+                    onClick={() => void onDownloadSummaryCsv()}
+                    disabled={busy}
+                  >
+                    Download Summary CSV
+                  </button>
               <button
                 type="button"
                 className={`${MT.actionUtility} w-full min-h-[32px] px-2 py-1 text-[9px] leading-[1] border-[#444] bg-transparent text-[#b8b8b8] transition hover:border-[#777] hover:bg-[#1f1f1f] hover:text-[#f2f2f2] disabled:opacity-50`}
