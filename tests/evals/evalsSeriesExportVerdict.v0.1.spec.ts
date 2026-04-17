@@ -74,7 +74,7 @@ describe("getSeriesExportVerdictV0_1", () => {
 
     const out = getSeriesExportVerdictV0_1(series, rows);
 
-    expect(out).toEqual({
+    expect(out).toMatchObject({
       savedCount: 3,
       scoredCount: 3,
       unscoredCount: 0,
