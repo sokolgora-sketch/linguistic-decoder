@@ -2285,8 +2285,10 @@ export function EvalsPageClientV0_1() {
         return;
       }
 
-      if (activeSeriesHasHardWarnings) {
-        showWarnNotice("Download Series Evidence Pack: clean duplicate ordinals/runIds first.");
+      if (!activeSeriesExportReady) {
+        showWarnNotice(
+          `Download Series Evidence Pack: complete and clean the active series first. ${activeSeriesExportSummary}`,
+        );
         return;
       }
 
@@ -3582,7 +3584,7 @@ export function EvalsPageClientV0_1() {
                       type="button"
                       className={`${MT.actionSecondary} w-full min-h-[32px] px-2 py-1 text-[9px] leading-[1] border-[#6a5a2a] bg-[#242016] text-[#f3d38b] transition hover:border-[#8a7636] hover:bg-[#2a2418] hover:text-[#fff1c2] disabled:opacity-50`}
                       onClick={() => void onDownloadSeriesEvidencePack()}
-                      disabled={busy || !selectedSeriesId || activeSeriesScoredCount === 0 || activeSeriesHasHardWarnings}
+                      disabled={busy || !selectedSeriesId || !activeSeriesExportReady}
                     >
                       Download Series Evidence Pack
                     </button>
