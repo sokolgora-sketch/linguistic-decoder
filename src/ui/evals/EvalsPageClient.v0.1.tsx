@@ -40,6 +40,7 @@ import {
   getGuidedPromptV0_1,
 } from "@/ui/evals/evalsGuidedPrompt.v0.1";
 import { buildSavedRunSeriesGroupsV0_1 } from "@/ui/evals/evalsSavedRunGroups.v0.1";
+import { buildEvalsEvidencePackZipArrayBufferV0_1 } from "@/ui/evals/evalsEvidencePackExport.v0.1";
 import { buildEvalsSummaryCsvV0_1, buildEvalsWorkbookArrayBufferV0_1 } from "@/ui/evals/evalsWorkbookExport.v0.1";
 
 
@@ -2091,6 +2092,98 @@ export function EvalsPageClientV0_1() {
     }
   }
 
+    async function onDownloadEvidencePack() {
+      setApiErr(null);
+      setNotice(null);
+      setBusy(true);
+
+      try {
+        if (!report || !md) {
+          setApiErr({
+            ok: false,
+            code: "EVIDENCE_PACK_REQUIRES_SCORE",
+            message: "Score the run before downloading an evidence pack.",
+          });
+          return;
+        }
+
+        const shouldAutoWrap =
+          mode === "run_bundle" && probeInput(inputText).kind === "bucket_only";
+
+        const runJson = buildRunJsonFromUi({
+          forceMode: shouldAutoWrap ? "task_buckets" : undefined,
+        });
+
+        const body = JSON.stringify(runJson);
+        const pdfRes = await fetch("/api/evals/pdf", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body,
+        });
+
+        if (!pdfRes.ok) {
+          const data = await pdfRes.json().catch(() => null);
+          setApiErr({
+            ok: false,
+            code: String(data?.code ?? "PDF_ERROR"),
+            message: String(data?.message ?? `HTTP ${pdfRes.status}`),
+          });
+          return;
+        }
+
+        const pdfBytes = await pdfRes.arrayBuffer();
+
+        const workbookBytes = await buildEvalsWorkbookArrayBufferV0_1({
+          report,
+          md,
+          runId,
+        });
+
+        const summaryCsv = buildEvalsSummaryCsvV0_1({
+          report,
+          md,
+          runId,
+        });
+
+        const exportedAtUtc = new Date().toISOString();
+        const zipBytes = await buildEvalsEvidencePackZipArrayBufferV0_1({
+          runId,
+          runJson,
+          report,
+          reportMd: md,
+          pdfBytes,
+          workbookBytes,
+          summaryCsv,
+          exportedAtUtc,
+        });
+
+        const rid = String(report?.runId || runId || "run")
+          .replace(/[^a-zA-Z0-9._-]+/g, "_")
+          .slice(0, 120);
+
+        const blob = new Blob([zipBytes], {
+          type: "application/zip",
+        });
+
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `evals.evidence-pack.${rid}.v0.1.zip`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+
+        URL.revokeObjectURL(url);
+        setNotice("Downloaded Evidence Pack.");
+      } catch (e) {
+        const msg = e instanceof Error ? e.message : String(e);
+        setApiErr({ ok: false, code: "CLIENT_ERROR", message: msg });
+      } finally {
+        setBusy(false);
+      }
+    }
+
+
   const devicePlateTaskId =
     report?.tasks?.find((t) => t.kind === "byo")?.taskId ??
     report?.tasks?.[0]?.taskId ??
@@ -3281,7 +3374,7 @@ export function EvalsPageClientV0_1() {
             </div>
           </div>
           <div className="space-y-1.5 pt-0">
-              <div className="grid grid-cols-2 gap-1.5 md:grid-cols-6">
+              <div className="grid grid-cols-2 gap-1.5 md:grid-cols-7">
                 <button
                   type="button"
                   className={`${MT.actionPrimary} w-full min-h-[32px] px-2 py-1 text-[9px] leading-[1] border-[#16a34a] bg-[#16a34a] text-white transition hover:border-[#15803d] hover:bg-[#15803d] hover:shadow-[0_0_0_1px_rgba(22,163,74,0.4),0_4px_16px_rgba(22,163,74,0.33)] disabled:cursor-not-allowed disabled:border-[#333] disabled:bg-[#111] disabled:text-[#333] disabled:shadow-none`}
@@ -3341,6 +3434,14 @@ export function EvalsPageClientV0_1() {
                     disabled={busy}
                   >
                     Download Summary CSV
+                  </button>
+                  <button
+                    type="button"
+                    className={`${MT.actionUtility} w-full min-h-[32px] px-2 py-1 text-[9px] leading-[1] border-[#6a5a2a] bg-[#242016] text-[#f3d38b] transition hover:border-[#8a7636] hover:bg-[#2a2418] hover:text-[#fff1c2] disabled:opacity-50`}
+                    onClick={() => void onDownloadEvidencePack()}
+                    disabled={busy || !report || !md}
+                  >
+                    Download Evidence Pack
                   </button>
               <button
                 type="button"
