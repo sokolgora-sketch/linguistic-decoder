@@ -247,3 +247,226 @@ export async function buildEvalsEvidencePackZipArrayBufferV0_1(
     compressionOptions: { level: 6 },
   });
 }
+
+
+type SeriesEvidencePackRunInputV0_1 = EvidencePackInputV0_1 & {
+  ordinal?: number | null;
+  title?: string | null;
+};
+
+type SeriesEvidencePackInputV0_1 = {
+  seriesId?: string | null;
+  seriesLabel: string;
+  targetCount?: number | null;
+  exportedAtUtc?: string;
+  runs: SeriesEvidencePackRunInputV0_1[];
+};
+
+function extractEvidenceMetaV0_1(input: EvidencePackInputV0_1): {
+  runId: string;
+  taskId: string;
+  language: string;
+  vowel: string;
+  anchorLow: string;
+  anchorHigh: string;
+  verdict: string;
+  normalizedPosition: string;
+  gapLow: string;
+  gapHigh: string;
+  meanLow: string;
+  meanX: string;
+  meanHigh: string;
+  flags: string;
+} {
+  const report = input.report ?? null;
+  const task = primaryTaskV0_1(report);
+  const inter = intermediateV0_1(task);
+
+  return {
+    runId: safePathPartV0_1((report as any)?.runId ?? input.runId, "run"),
+    taskId: textOrPendingV0_1(task?.taskId),
+    language: textOrPendingV0_1(task?.languageHint),
+    vowel: textOrPendingV0_1(inter?.vowelUnderTest ?? task?.vowelUnderTest),
+    anchorLow: textOrPendingV0_1(inter?.anchorLow ?? task?.anchorLow),
+    anchorHigh: textOrPendingV0_1(inter?.anchorHigh ?? task?.anchorHigh),
+    verdict: textOrPendingV0_1(inter?.verdict),
+    normalizedPosition: numberOrBlankV0_1(inter?.normalizedPosition),
+    gapLow: numberOrBlankV0_1(inter?.gap_low),
+    gapHigh: numberOrBlankV0_1(inter?.gap_high),
+    meanLow: numberOrBlankV0_1(inter?.mean_anchor_low),
+    meanX: numberOrBlankV0_1(inter?.mean_x_vowel),
+    meanHigh: numberOrBlankV0_1(inter?.mean_anchor_high),
+    flags: Array.isArray(inter?.diagnosticFlags) ? inter.diagnosticFlags.join(", ") : "",
+  };
+}
+
+function csvEscapeV0_1(value: unknown): string {
+  const text = String(value ?? "");
+  return /[",\n\r]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text;
+}
+
+function csvRowV0_1(values: unknown[]): string {
+  return values.map(csvEscapeV0_1).join(",");
+}
+
+function buildSeriesReadmeV0_1(params: {
+  seriesLabel: string;
+  seriesId: string;
+  targetCount: string;
+  exportedAtUtc: string;
+  runCount: number;
+}): string {
+  return `# ZË-RO Series Evidence Pack
+
+- evidencePackVersion: ${EVALS_EVIDENCE_PACK_VERSION_V0_1}
+- exportedAtUtc: ${params.exportedAtUtc}
+- seriesId: ${params.seriesId}
+- seriesLabel: ${params.seriesLabel}
+- targetCount: ${params.targetCount}
+- scoredRunCount: ${params.runCount}
+
+## Hypothesis under test
+
+There are only seven primal vowel positions. Written/phonetic vowels beyond seven are expected to behave as derived, intermediate, collapsed, or surface-variant positions inside the seven-primal field.
+
+## Evidence files
+
+- 01_RUN_INDEX.md
+- series-summary.csv
+- runs/<runId>/input.json
+- runs/<runId>/report.md
+- runs/<runId>/report.pdf
+- runs/<runId>/workbook.xlsx
+- runs/<runId>/summary.csv
+- runs/<runId>/notes.md
+
+## Reading order
+
+1. Open 01_RUN_INDEX.md for the whole battery.
+2. Open series-summary.csv for quick machine-readable values.
+3. Open each run notes.md for interpretation status.
+4. Open report.pdf for human-readable scored evidence.
+5. Open input.json to inspect exactly what was tested.
+`;
+}
+
+export async function buildEvalsSeriesEvidencePackZipArrayBufferV0_1(
+  input: SeriesEvidencePackInputV0_1,
+): Promise<ArrayBuffer> {
+  const exportedAtUtc = input.exportedAtUtc ?? new Date().toISOString();
+  const seriesLabel = input.seriesLabel.trim() || "series";
+  const seriesId = safePathPartV0_1(input.seriesId ?? seriesLabel, "series");
+  const targetCount = typeof input.targetCount === "number" && Number.isFinite(input.targetCount)
+    ? String(input.targetCount)
+    : "not set";
+
+  const zip = new JSZip();
+  const runs = [...input.runs].sort((a, b) => {
+    const ao = typeof a.ordinal === "number" ? a.ordinal : Number.MAX_SAFE_INTEGER;
+    const bo = typeof b.ordinal === "number" ? b.ordinal : Number.MAX_SAFE_INTEGER;
+    if (ao !== bo) return ao - bo;
+    return String(a.runId ?? "").localeCompare(String(b.runId ?? ""));
+  });
+
+  const metas = runs.map((run) => ({ run, meta: extractEvidenceMetaV0_1(run) }));
+
+  zip.file(
+    "00_README.md",
+    buildSeriesReadmeV0_1({
+      seriesLabel,
+      seriesId,
+      targetCount,
+      exportedAtUtc,
+      runCount: metas.length,
+    }),
+  );
+
+  const indexRows = [
+    "# Run Index",
+    "",
+    "| Ordinal | Run ID | Language | Vowel | Bracket | Verdict | normalizedPosition | gap_low | gap_high | Flags | Interpretation |",
+    "|---:|---|---|---:|---|---|---:|---:|---:|---|---|",
+    ...metas.map(({ run, meta }) => {
+      const ordinal =
+        typeof run.ordinal === "number" && Number.isFinite(run.ordinal)
+          ? String(run.ordinal)
+          : "";
+      return `| ${ordinal} | ${meta.runId} | ${meta.language} | ${meta.vowel} | ${meta.anchorLow}–${meta.anchorHigh} | ${meta.verdict} | ${meta.normalizedPosition} | ${meta.gapLow} | ${meta.gapHigh} | ${meta.flags || "none"} | Review notes.md |`;
+    }),
+    "",
+  ];
+  zip.file("01_RUN_INDEX.md", indexRows.join("\n"));
+
+  const csvRows = [
+    [
+      "ordinal",
+      "runId",
+      "taskId",
+      "language",
+      "vowel",
+      "anchorLow",
+      "anchorHigh",
+      "verdict",
+      "normalizedPosition",
+      "gap_low",
+      "gap_high",
+      "mean_anchor_low",
+      "mean_x_vowel",
+      "mean_anchor_high",
+      "diagnosticFlags",
+    ],
+    ...metas.map(({ run, meta }) => [
+      typeof run.ordinal === "number" ? run.ordinal : "",
+      meta.runId,
+      meta.taskId,
+      meta.language,
+      meta.vowel,
+      meta.anchorLow,
+      meta.anchorHigh,
+      meta.verdict,
+      meta.normalizedPosition,
+      meta.gapLow,
+      meta.gapHigh,
+      meta.meanLow,
+      meta.meanX,
+      meta.meanHigh,
+      meta.flags || "none",
+    ]),
+  ];
+  zip.file("series-summary.csv", csvRows.map(csvRowV0_1).join("\n") + "\n");
+
+  for (const { run, meta } of metas) {
+    const runDir = `runs/${meta.runId}`;
+    zip.file(`${runDir}/input.json`, `${JSON.stringify(run.runJson, null, 2)}\n`);
+    zip.file(`${runDir}/report.md`, run.reportMd || "No scored markdown report available.\n");
+    zip.file(`${runDir}/report.pdf`, run.pdfBytes);
+    zip.file(`${runDir}/workbook.xlsx`, run.workbookBytes);
+    zip.file(`${runDir}/summary.csv`, run.summaryCsv);
+    zip.file(
+      `${runDir}/notes.md`,
+      buildNotesV0_1({
+        exportedAtUtc,
+        runId: meta.runId,
+        taskId: meta.taskId,
+        language: meta.language,
+        vowel: meta.vowel,
+        anchorLow: meta.anchorLow,
+        anchorHigh: meta.anchorHigh,
+        verdict: meta.verdict,
+        normalizedPosition: meta.normalizedPosition,
+        gapLow: meta.gapLow,
+        gapHigh: meta.gapHigh,
+        meanLow: meta.meanLow,
+        meanX: meta.meanX,
+        meanHigh: meta.meanHigh,
+        flags: meta.flags,
+      }),
+    );
+  }
+
+  return await zip.generateAsync({
+    type: "arraybuffer",
+    compression: "DEFLATE",
+    compressionOptions: { level: 6 },
+  });
+}

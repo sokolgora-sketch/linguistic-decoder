@@ -40,7 +40,10 @@ import {
   getGuidedPromptV0_1,
 } from "@/ui/evals/evalsGuidedPrompt.v0.1";
 import { buildSavedRunSeriesGroupsV0_1 } from "@/ui/evals/evalsSavedRunGroups.v0.1";
-import { buildEvalsEvidencePackZipArrayBufferV0_1 } from "@/ui/evals/evalsEvidencePackExport.v0.1";
+import {
+  buildEvalsEvidencePackZipArrayBufferV0_1,
+  buildEvalsSeriesEvidencePackZipArrayBufferV0_1,
+} from "@/ui/evals/evalsEvidencePackExport.v0.1";
 import { buildEvalsSummaryCsvV0_1, buildEvalsWorkbookArrayBufferV0_1 } from "@/ui/evals/evalsWorkbookExport.v0.1";
 
 
@@ -1559,6 +1562,95 @@ export function EvalsPageClientV0_1() {
     };
   }
 
+  function buildRunJsonFromSnapshot(snapshot: EvalsWorkbenchStateV0_1): unknown {
+    const text = snapshot.inputText.trim();
+    if (!text) throw new Error("Saved run has no input JSON.");
+
+    const parsed = JSON.parse(text) as any;
+    const rid = snapshot.runId.trim() || parsed?.runId || "saved.run.v0.1";
+
+    const meta = {
+      ...(snapshot.provider.trim() ? { provider: snapshot.provider.trim() } : {}),
+      ...(snapshot.model.trim() ? { model: snapshot.model.trim() } : {}),
+      ...(snapshot.label.trim() ? { label: snapshot.label.trim() } : {}),
+      ...(snapshot.sourceEngineId.trim()
+        ? { sourceEngineId: snapshot.sourceEngineId.trim() }
+        : {}),
+      ...(snapshot.sourceEngineVersion.trim()
+        ? { sourceEngineVersion: snapshot.sourceEngineVersion.trim() }
+        : {}),
+      ...(snapshot.sourceEngineBuild.trim()
+        ? { sourceEngineBuild: snapshot.sourceEngineBuild.trim() }
+        : {}),
+    };
+
+    if (parsed && typeof parsed === "object" && parsed.evalRunVersion === "evalRun.v0.1") {
+      return {
+        ...parsed,
+        runId: parsed.runId || rid,
+        meta: {
+          ...(parsed.meta ?? {}),
+          ...meta,
+        },
+      };
+    }
+
+    if (
+      parsed &&
+      typeof parsed === "object" &&
+      typeof parsed.taskId === "string" &&
+      typeof parsed.inputShape === "string" &&
+      parsed.buckets &&
+      typeof parsed.buckets === "object"
+    ) {
+      return {
+        evalRunVersion: "evalRun.v0.1",
+        evalSpecVersion: "evalSpec.v0.1",
+        specId: "public-grounding-probe.v0.1",
+        runId: rid,
+        meta,
+        tasks: [
+          {
+            taskId: String(parsed.taskId),
+            inputShape: String(parsed.inputShape),
+            ...(typeof parsed.languageHint === "string" && parsed.languageHint.trim()
+              ? { languageHint: parsed.languageHint.trim() }
+              : {}),
+            ...(typeof parsed.vowelUnderTest === "string" && parsed.vowelUnderTest.trim()
+              ? { vowelUnderTest: parsed.vowelUnderTest.trim() }
+              : {}),
+            ...(typeof parsed.anchorLow === "string" && parsed.anchorLow.trim()
+              ? { anchorLow: parsed.anchorLow.trim() }
+              : {}),
+            ...(typeof parsed.anchorHigh === "string" && parsed.anchorHigh.trim()
+              ? { anchorHigh: parsed.anchorHigh.trim() }
+              : {}),
+            buckets: parsed.buckets,
+          },
+        ],
+      };
+    }
+
+    if (looksLikeBucketsOnly(parsed)) {
+      return {
+        evalRunVersion: "evalRun.v0.1",
+        evalSpecVersion: "evalSpec.v0.1",
+        specId: "public-grounding-probe.v0.1",
+        runId: rid,
+        meta,
+        tasks: [
+          {
+            taskId: snapshot.taskId,
+            inputShape: "bucketed_single_tokens",
+            buckets: parsed,
+          },
+        ],
+      };
+    }
+
+    throw new Error("Saved run input cannot be reconstructed as evalRun.v0.1.");
+  }
+
   function snapshotWorkbench(): EvalsWorkbenchStateV0_1 {
     return {
       mode,
@@ -2182,6 +2274,125 @@ export function EvalsPageClientV0_1() {
         setBusy(false);
       }
     }
+
+    async function onDownloadSeriesEvidencePack() {
+      setApiErr(null);
+      setNotice(null);
+
+      const series = getSelectedRunSeries();
+      if (!series) {
+        showWarnNotice("Download Series Evidence Pack: choose an active series first.");
+        return;
+      }
+
+      if (activeSeriesHasHardWarnings) {
+        showWarnNotice("Download Series Evidence Pack: clean duplicate ordinals/runIds first.");
+        return;
+      }
+
+      const scoredRows = activeSeriesSavedRuns
+        .filter((row) => Boolean(row.workbench.report) && Boolean(row.workbench.md))
+        .sort((a, b) => {
+          const ao = typeof a.ordinal === "number" ? a.ordinal : Number.MAX_SAFE_INTEGER;
+          const bo = typeof b.ordinal === "number" ? b.ordinal : Number.MAX_SAFE_INTEGER;
+          if (ao !== bo) return ao - bo;
+          return a.createdAt - b.createdAt;
+        });
+
+      if (scoredRows.length === 0) {
+        showWarnNotice("Download Series Evidence Pack: no scored saved runs in the active series.");
+        return;
+      }
+
+      setBusy(true);
+
+      try {
+        const exportedAtUtc = new Date().toISOString();
+
+        const runs = [];
+        for (const row of scoredRows) {
+          const snapshot = row.workbench;
+          if (!snapshot.report || !snapshot.md) continue;
+
+          const runJson = buildRunJsonFromSnapshot(snapshot);
+          const body = JSON.stringify(runJson);
+
+          const pdfRes = await fetch("/api/evals/pdf", {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body,
+          });
+
+          if (!pdfRes.ok) {
+            const data = await pdfRes.json().catch(() => null);
+            setApiErr({
+              ok: false,
+              code: String(data?.code ?? "PDF_ERROR"),
+              message: String(data?.message ?? `HTTP ${pdfRes.status}`),
+            });
+            return;
+          }
+
+          const pdfBytes = await pdfRes.arrayBuffer();
+          const workbookBytes = await buildEvalsWorkbookArrayBufferV0_1({
+            report: snapshot.report,
+            md: snapshot.md,
+            runId: snapshot.runId,
+          });
+          const summaryCsv = buildEvalsSummaryCsvV0_1({
+            report: snapshot.report,
+            md: snapshot.md,
+            runId: snapshot.runId,
+          });
+
+          runs.push({
+            ordinal: row.ordinal,
+            title: row.title,
+            runId: snapshot.report.runId ?? snapshot.runId,
+            runJson,
+            report: snapshot.report,
+            reportMd: snapshot.md,
+            pdfBytes,
+            workbookBytes,
+            summaryCsv,
+            exportedAtUtc,
+          });
+        }
+
+        const zipBytes = await buildEvalsSeriesEvidencePackZipArrayBufferV0_1({
+          seriesId: series.id,
+          seriesLabel: series.label,
+          targetCount: series.targetCount,
+          exportedAtUtc,
+          runs,
+        });
+
+        const sid = String(series.label || series.id || "series")
+          .replace(/[^a-zA-Z0-9._-]+/g, "_")
+          .slice(0, 120);
+
+        const blob = new Blob([zipBytes], {
+          type: "application/zip",
+        });
+
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `evals.series-evidence-pack.${sid}.v0.1.zip`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+
+        URL.revokeObjectURL(url);
+        setNotice("Downloaded Series Evidence Pack.");
+      } catch (e) {
+        const msg = e instanceof Error ? e.message : String(e);
+        setApiErr({ ok: false, code: "CLIENT_ERROR", message: msg });
+      } finally {
+        setBusy(false);
+      }
+    }
+
 
 
   const devicePlateTaskId =
@@ -3367,6 +3578,14 @@ export function EvalsPageClientV0_1() {
                   <button type="button" className={`${MT.actionWarn} w-full min-h-[32px] px-2 py-1 text-[9px] leading-[1] border-[#6b3737] bg-[#211717] text-[#e6a0a0] transition hover:border-[#cc0000] hover:bg-[#2a1616] hover:text-[#ffc1c1] disabled:opacity-50`} onClick={deleteSelectedRunSeries} disabled={busy || !selectedSeriesId}>Delete Active Series</button>
                   <button type="button" className={`${MT.actionSecondary} w-full min-h-[32px] px-2 py-1 text-[9px] leading-[1] border-[#30465d] bg-[#101b28] text-[#cfe6ff] transition hover:border-[#46698f] hover:bg-[#162434] hover:text-white disabled:opacity-50`} onClick={exportActiveSeriesJson} disabled={busy || !selectedSeriesId}>Export JSON</button>
                   <button type="button" className={`${MT.actionSecondary} w-full min-h-[32px] px-2 py-1 text-[9px] leading-[1] border-[#3f5a2f] bg-[#172111] text-[#d7f0c8] transition hover:border-[#5b7f43] hover:bg-[#1d2a15] hover:text-white disabled:opacity-50`} onClick={exportActiveSeriesCsv} disabled={busy || !selectedSeriesId}>Export CSV</button>
+                    <button
+                      type="button"
+                      className={`${MT.actionSecondary} w-full min-h-[32px] px-2 py-1 text-[9px] leading-[1] border-[#6a5a2a] bg-[#242016] text-[#f3d38b] transition hover:border-[#8a7636] hover:bg-[#2a2418] hover:text-[#fff1c2] disabled:opacity-50`}
+                      onClick={() => void onDownloadSeriesEvidencePack()}
+                      disabled={busy || !selectedSeriesId || activeSeriesScoredCount === 0 || activeSeriesHasHardWarnings}
+                    >
+                      Download Series Evidence Pack
+                    </button>
                   <button type="button" className={`${MT.actionUtility} w-full min-h-[32px] px-2 py-1 text-[9px] leading-[1] border-[#355a7a] bg-transparent text-[#9fd3ff] transition hover:border-[#4d7fa8] hover:bg-[#132031] hover:text-[#d7eeff] disabled:opacity-50`} onClick={() => void onCopyGuidedBaselinePrompt()} disabled={busy}>Copy Baseline Prompt</button>
                   <button type="button" className={`${MT.actionUtility} w-full min-h-[32px] px-2 py-1 text-[9px] leading-[1] border-[#5a4b22] bg-transparent text-[#f1d48a] transition hover:border-[#8b7131] hover:bg-[#241d0f] hover:text-[#ffe6a8] disabled:opacity-50`} onClick={() => void onCopyGuidedCorrectionPrompt()} disabled={busy || !report || !guidedPrompt?.correctionPrompt}>Copy Correction Prompt</button>
                 </div>
