@@ -101,8 +101,14 @@ describe("Evals evidence pack export v0.1", () => {
 
     expect(readme).toContain("ZË-RO Evidence Pack");
     expect(readme).toContain("There are only seven primal vowel positions");
+    expect(readme).toContain("vowelUnderTest: ä");
+    expect(readme).toContain("bracket: V1–V3");
+
     expect(index).toContain("t5.fi.ae.v1-v3.pilot.main.r03");
-    expect(index).toContain("INTERMEDIATE");
+    expect(index).toContain("fi | ä | V1–V3 | INTERMEDIATE");
+
+    expect(notes).toContain("vowelUnderTest: ä");
+    expect(notes).toContain("bracket: V1–V3");
     expect(notes).toContain("gap_low: 0.137");
     expect(notes).toContain("Supports / weakens / challenges: pending researcher review");
   });

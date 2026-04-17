@@ -178,9 +178,9 @@ export async function buildEvalsEvidencePackZipArrayBufferV0_1(
   const runId = safePathPartV0_1((report as any)?.runId ?? input.runId, "run");
   const taskId = textOrPendingV0_1(task?.taskId);
   const language = textOrPendingV0_1(task?.languageHint);
-  const vowel = textOrPendingV0_1(task?.vowelUnderTest);
-  const anchorLow = textOrPendingV0_1(task?.anchorLow);
-  const anchorHigh = textOrPendingV0_1(task?.anchorHigh);
+  const vowel = textOrPendingV0_1(inter?.vowelUnderTest ?? task?.vowelUnderTest);
+  const anchorLow = textOrPendingV0_1(inter?.anchorLow ?? task?.anchorLow);
+  const anchorHigh = textOrPendingV0_1(inter?.anchorHigh ?? task?.anchorHigh);
   const verdict = textOrPendingV0_1(inter?.verdict);
   const normalizedPosition = numberOrBlankV0_1(inter?.normalizedPosition);
   const gapLow = numberOrBlankV0_1(inter?.gap_low);
