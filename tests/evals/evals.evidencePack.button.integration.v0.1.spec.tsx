@@ -10,5 +10,9 @@ describe("Evals evidence pack button v0.1", () => {
     const button = screen.getByRole("button", { name: "Download Evidence Pack" });
     expect(button).toBeInTheDocument();
     expect(button).toBeDisabled();
+
+    const seriesButton = screen.getByRole("button", { name: "Download Series Evidence Pack" });
+    expect(seriesButton).toBeInTheDocument();
+    expect(seriesButton).toBeDisabled();
   });
 });
