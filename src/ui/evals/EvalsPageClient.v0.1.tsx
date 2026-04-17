@@ -805,6 +805,22 @@ export function EvalsPageClientV0_1() {
     );
   }, [activeRunSeries, activeSeriesSavedRuns]);
 
+  const activeSeriesOutOfRangeOrdinals = useMemo(() => {
+    if (!activeRunSeries) return [];
+    return Array.from(
+      new Set(
+        activeSeriesSavedRuns
+          .map((row) => row.ordinal)
+          .filter(
+            (n): n is number =>
+              typeof n === "number" &&
+              Number.isFinite(n) &&
+              (n < 1 || n > activeRunSeries.targetCount),
+          ),
+      ),
+    ).sort((a, b) => a - b);
+  }, [activeRunSeries, activeSeriesSavedRuns]);
+
   const activeSeriesDuplicateOrdinals = useMemo(() => {
     const counts = new Map<number, number>();
     for (const row of activeSeriesSavedRuns) {
@@ -832,20 +848,35 @@ export function EvalsPageClientV0_1() {
       .sort();
   }, [activeSeriesSavedRuns]);
 
+  const activeSeriesHasOrdinalRangeIssue =
+    activeSeriesOutOfRangeOrdinals.length > 0 ||
+    Boolean(
+      activeRunSeries &&
+        activeSeriesSavedCount >= activeRunSeries.targetCount &&
+        activeSeriesMissingOrdinals.length > 0,
+    );
+
   const activeSeriesExportReady =
-    activeSeriesScoredCount > 0 &&
+    Boolean(activeRunSeries) &&
+    activeSeriesSavedCount === activeRunSeries!.targetCount &&
+    activeSeriesScoredCount === activeRunSeries!.targetCount &&
+    activeSeriesUnscoredCount === 0 &&
+    activeSeriesMissingOrdinals.length === 0 &&
+    activeSeriesOutOfRangeOrdinals.length === 0 &&
     activeSeriesDuplicateOrdinals.length === 0 &&
     activeSeriesDuplicateRunIds.length === 0;
 
   const activeSeriesHasHardWarnings =
     activeSeriesDuplicateOrdinals.length > 0 ||
-    activeSeriesDuplicateRunIds.length > 0;
+    activeSeriesDuplicateRunIds.length > 0 ||
+    activeSeriesHasOrdinalRangeIssue;
 
   const activeSeriesNeedsAttention =
     activeSeriesHasHardWarnings ||
     activeSeriesScoredCount === 0 ||
     activeSeriesUnscoredCount > 0 ||
-    activeSeriesMissingOrdinals.length > 0;
+    activeSeriesMissingOrdinals.length > 0 ||
+    activeSeriesOutOfRangeOrdinals.length > 0;
 
   const activeSeriesExportMode =
     activeSeriesExportReady
@@ -877,6 +908,9 @@ export function EvalsPageClientV0_1() {
     if (activeSeriesMissingOrdinals.length > 0) {
       reasons.push(`Missing ordinals: ${formatOrdinalList(activeSeriesMissingOrdinals)}`);
     }
+    if (activeSeriesOutOfRangeOrdinals.length > 0) {
+      reasons.push(`Out-of-range ordinals: ${formatOrdinalList(activeSeriesOutOfRangeOrdinals)}`);
+    }
     if (activeSeriesUnscoredCount > 0) {
       reasons.push(`Unscored runs: ${activeSeriesUnscoredCount}`);
     }
@@ -888,6 +922,7 @@ export function EvalsPageClientV0_1() {
     activeSeriesDuplicateOrdinals,
     activeSeriesDuplicateRunIds,
     activeSeriesMissingOrdinals,
+    activeSeriesOutOfRangeOrdinals,
     activeSeriesScoredCount,
     activeSeriesUnscoredCount,
   ]);
@@ -1716,9 +1751,55 @@ export function EvalsPageClientV0_1() {
     return runSeries.find((row) => row.id === selectedSeriesId) ?? null;
   }
 
-  function prefillNextSeriesRun(series: EvalsRunSeriesV0_1) {
-    setRunId(applySeriesRunIdTemplate(series.runIdTemplate, series.nextOrdinal));
-    setLabel(makeSeriesLabel(series.label, series.nextOrdinal));
+  function findNextAvailableSeriesOrdinal(
+    series: EvalsRunSeriesV0_1,
+    rows: EvalsSavedRunRecordV0_1[] = savedRuns,
+  ) {
+    const present = new Set(
+      rows
+        .filter((row) => row.seriesId === series.id)
+        .map((row) => row.ordinal)
+        .filter((n): n is number => typeof n === "number" && Number.isFinite(n)),
+    );
+
+    for (let n = 1; n <= series.targetCount; n += 1) {
+      if (!present.has(n)) return n;
+    }
+
+    return series.targetCount + 1;
+  }
+
+  function isSeriesGeneratedRunId(series: EvalsRunSeriesV0_1, value: string) {
+    const clean = value.trim();
+    if (!clean) return true;
+
+    const maxOrdinal = Math.max(series.targetCount, series.nextOrdinal) + 10;
+    for (let n = 1; n <= maxOrdinal; n += 1) {
+      if (clean === applySeriesRunIdTemplate(series.runIdTemplate, n)) return true;
+    }
+
+    return false;
+  }
+
+  function isSeriesGeneratedLabel(series: EvalsRunSeriesV0_1, value: string) {
+    const clean = value.trim();
+    if (!clean) return true;
+
+    const maxOrdinal = Math.max(series.targetCount, series.nextOrdinal) + 10;
+    for (let n = 1; n <= maxOrdinal; n += 1) {
+      if (clean === makeSeriesLabel(series.label, n)) return true;
+    }
+
+    return false;
+  }
+
+  function prefillNextSeriesRun(
+    series: EvalsRunSeriesV0_1,
+    rows: EvalsSavedRunRecordV0_1[] = savedRuns,
+  ) {
+    const nextOrdinal = findNextAvailableSeriesOrdinal(series, rows);
+    setRunId(applySeriesRunIdTemplate(series.runIdTemplate, nextOrdinal));
+    setLabel(makeSeriesLabel(series.label, nextOrdinal));
   }
 
   function createRunSeries() {
@@ -1744,13 +1825,31 @@ export function EvalsPageClientV0_1() {
   }
 
   function saveCurrentRun(seriesOverride?: EvalsRunSeriesV0_1 | null) {
-    const snapshot = snapshotWorkbench();
+    const rawSnapshot = snapshotWorkbench();
     const now = Date.now();
     const series = seriesOverride ?? null;
     const seriesOrdinal = series?.nextOrdinal ?? null;
+    const generatedRunId =
+      series && seriesOrdinal
+        ? applySeriesRunIdTemplate(series.runIdTemplate, seriesOrdinal)
+        : "";
+    const generatedLabel =
+      series && seriesOrdinal ? makeSeriesLabel(series.label, seriesOrdinal) : "";
+    const snapshot: EvalsWorkbenchStateV0_1 =
+      series && seriesOrdinal
+        ? {
+            ...rawSnapshot,
+            runId: isSeriesGeneratedRunId(series, rawSnapshot.runId)
+              ? generatedRunId
+              : rawSnapshot.runId,
+            label: isSeriesGeneratedLabel(series, rawSnapshot.label)
+              ? generatedLabel
+              : rawSnapshot.label,
+          }
+        : rawSnapshot;
     const title =
-      label.trim() ||
-      runId.trim() ||
+      snapshot.label.trim() ||
+      snapshot.runId.trim() ||
       (series ? makeSeriesLabel(series.label, series.nextOrdinal) : "Saved run");
 
     const nextRecord: EvalsSavedRunRecordV0_1 = {
@@ -1815,10 +1914,24 @@ export function EvalsPageClientV0_1() {
       return;
     }
 
-    const duplicate = findSeriesDuplicate(series);
+    const saveOrdinal = findNextAvailableSeriesOrdinal(series);
+
+    if (saveOrdinal > series.targetCount) {
+      showWarnNotice(
+        `Save + Next Run: ${series.label} already has ${series.targetCount} saved run${series.targetCount === 1 ? "" : "s"}. Increase target count or delete a saved run first.`,
+      );
+      return;
+    }
+
+    const seriesForSave: EvalsRunSeriesV0_1 = {
+      ...series,
+      nextOrdinal: saveOrdinal,
+    };
+
+    const duplicate = findSeriesDuplicate(seriesForSave);
     if (duplicate?.kind === "ordinal") {
       showWarnNotice(
-        `Duplicate guard: ${series.label} already has ${formatSeriesOrdinal(series.nextOrdinal)}.`,
+        `Duplicate guard: ${series.label} already has ${formatSeriesOrdinal(saveOrdinal)}.`,
       );
       return;
     }
@@ -1830,11 +1943,13 @@ export function EvalsPageClientV0_1() {
       return;
     }
 
-    saveCurrentRun(series);
+    const savedRecord = saveCurrentRun(seriesForSave);
+    const rowsAfterSave = [savedRecord, ...savedRuns];
+    const nextOrdinal = findNextAvailableSeriesOrdinal(series, rowsAfterSave);
 
     const nextSeries: EvalsRunSeriesV0_1 = {
       ...series,
-      nextOrdinal: series.nextOrdinal + 1,
+      nextOrdinal,
       updatedAt: Date.now(),
     };
 
@@ -1849,10 +1964,10 @@ export function EvalsPageClientV0_1() {
     setApiErr(null);
     setReport(null);
     setMd("");
-      setSaveNextGuidedReminderArmed(false);
-    prefillNextSeriesRun(nextSeries);
+    setSaveNextGuidedReminderArmed(false);
+    prefillNextSeriesRun(nextSeries, rowsAfterSave);
     setNotice(
-      `Saved ${series.label} ${formatSeriesOrdinal(series.nextOrdinal)}. Ready for ${formatSeriesOrdinal(nextSeries.nextOrdinal)}.`,
+      `Saved ${series.label} ${formatSeriesOrdinal(saveOrdinal)}. Ready for ${formatSeriesOrdinal(nextOrdinal)}.`,
     );
   }
 
