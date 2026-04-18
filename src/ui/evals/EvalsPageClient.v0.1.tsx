@@ -772,15 +772,21 @@ export function EvalsPageClientV0_1() {
   const activeSeriesRemainingCount = activeRunSeries
     ? Math.max(activeRunSeries.targetCount - activeSeriesSavedCount, 0)
     : 0;
-  const activeSeriesNextOrdinal = activeRunSeries
-    ? formatSeriesOrdinal(activeRunSeries.nextOrdinal)
+  const activeSeriesNextOrdinalValue = activeRunSeries
+    ? findNextAvailableSeriesOrdinal(activeRunSeries, activeSeriesSavedRuns)
     : null;
-  const activeSeriesRunIdPreview = activeRunSeries
-    ? runId || applySeriesRunIdTemplate(activeRunSeries.runIdTemplate, activeRunSeries.nextOrdinal)
-    : runId;
-  const activeSeriesLabelPreview = activeRunSeries
-    ? label || makeSeriesLabel(activeRunSeries.label, activeRunSeries.nextOrdinal)
-    : label;
+  const activeSeriesNextOrdinal =
+    activeSeriesNextOrdinalValue != null
+      ? formatSeriesOrdinal(activeSeriesNextOrdinalValue)
+      : null;
+  const activeSeriesRunIdPreview =
+    activeRunSeries && activeSeriesNextOrdinalValue != null
+      ? runId || applySeriesRunIdTemplate(activeRunSeries.runIdTemplate, activeSeriesNextOrdinalValue)
+      : runId;
+  const activeSeriesLabelPreview =
+    activeRunSeries && activeSeriesNextOrdinalValue != null
+      ? label || makeSeriesLabel(activeRunSeries.label, activeSeriesNextOrdinalValue)
+      : label;
 
   const activeSeriesScoredRuns = useMemo(
     () => activeSeriesSavedRuns.filter((row) => Boolean(row.workbench.report)),
@@ -1109,7 +1115,12 @@ export function EvalsPageClientV0_1() {
           targetCount: series.targetCount,
           savedCount: rows.length,
           scoredCount,
-          nextOrdinal: formatSeriesOrdinal(series.nextOrdinal),
+          nextOrdinal: formatSeriesOrdinal(
+            findNextAvailableSeriesOrdinal(
+              series,
+              savedRuns.filter((row) => row.seriesId === series.id),
+            ),
+          ),
           healthLabel,
           exportReady,
           updatedAt: rowUpdatedAt,

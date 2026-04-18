@@ -14,5 +14,10 @@ describe("series ordinal reuse guard v0.1", () => {
     expect(src).toContain("activeSeriesMissingOrdinals.length === 0");
     expect(src).toContain("activeSeriesOutOfRangeOrdinals.length === 0");
     expect(src).toContain("activeSeriesHasOrdinalRangeIssue");
+    expect(src).toContain("const activeSeriesNextOrdinalValue = activeRunSeries");
+    expect(src).toContain("findNextAvailableSeriesOrdinal(activeRunSeries, activeSeriesSavedRuns)");
+    expect(src).toContain("applySeriesRunIdTemplate(activeRunSeries.runIdTemplate, activeSeriesNextOrdinalValue)");
+    expect(src).toContain("makeSeriesLabel(activeRunSeries.label, activeSeriesNextOrdinalValue)");
+    expect(src).toContain("savedRuns.filter((row) => row.seriesId === series.id)");
   });
 });
