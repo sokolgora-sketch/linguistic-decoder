@@ -4,7 +4,7 @@ describe("series ordinal reuse guard v0.1", () => {
   it("uses the lowest missing ordinal and requires exact target ordinals for export readiness", () => {
     const src = readFileSync("src/ui/evals/EvalsPageClient.v0.1.tsx", "utf8");
 
-    expect(src).toContain("function findNextAvailableSeriesOrdinal(");
+    expect(src).toContain("const findNextAvailableSeriesOrdinal = useCallback(");
     expect(src).toContain("for (let n = 1; n <= series.targetCount; n += 1)");
     expect(src).toContain("const saveOrdinal = findNextAvailableSeriesOrdinal(series)");
     expect(src).toContain("if (saveOrdinal > series.targetCount)");
