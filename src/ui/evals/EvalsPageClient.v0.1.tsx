@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { MT } from "@/ui/typography/marketingType.v0.1";
@@ -760,6 +760,25 @@ export function EvalsPageClientV0_1() {
     [runSeries, selectedSeriesId],
   );
 
+  const findNextAvailableSeriesOrdinal = useCallback((
+    series: EvalsRunSeriesV0_1,
+    rows?: EvalsSavedRunRecordV0_1[],
+  ) => {
+    const sourceRows = rows ?? savedRuns;
+    const present = new Set(
+      sourceRows
+        .filter((row) => row.seriesId === series.id)
+        .map((row) => row.ordinal)
+        .filter((n): n is number => typeof n === "number" && Number.isFinite(n)),
+    );
+
+    for (let n = 1; n <= series.targetCount; n += 1) {
+      if (!present.has(n)) return n;
+    }
+
+    return series.targetCount + 1;
+  }, [savedRuns]);
+
   const activeSeriesSavedRuns = useMemo(
     () =>
       activeRunSeries
@@ -1128,7 +1147,7 @@ export function EvalsPageClientV0_1() {
         };
       })
       .sort((a, b) => b.updatedAt - a.updatedAt);
-  }, [runSeries, savedRuns, selectedSeriesId]);
+  }, [runSeries, savedRuns, selectedSeriesId, findNextAvailableSeriesOrdinal]);
 
   const bucketsOnlyTasks = useMemo(
     () => byoTasks.filter((t) => t.inputShape === "bucketed_single_tokens"),
@@ -1762,23 +1781,7 @@ export function EvalsPageClientV0_1() {
     return runSeries.find((row) => row.id === selectedSeriesId) ?? null;
   }
 
-  function findNextAvailableSeriesOrdinal(
-    series: EvalsRunSeriesV0_1,
-    rows: EvalsSavedRunRecordV0_1[] = savedRuns,
-  ) {
-    const present = new Set(
-      rows
-        .filter((row) => row.seriesId === series.id)
-        .map((row) => row.ordinal)
-        .filter((n): n is number => typeof n === "number" && Number.isFinite(n)),
-    );
 
-    for (let n = 1; n <= series.targetCount; n += 1) {
-      if (!present.has(n)) return n;
-    }
-
-    return series.targetCount + 1;
-  }
 
   function isSeriesGeneratedRunId(series: EvalsRunSeriesV0_1, value: string) {
     const clean = value.trim();
