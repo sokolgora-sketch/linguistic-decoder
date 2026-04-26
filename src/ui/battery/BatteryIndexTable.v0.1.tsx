@@ -2,6 +2,7 @@ import {
   getAllBatteryCases,
   getBracket,
 } from "@/lib/battery/getBatteryCase.v0.1";
+import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 
 function statusBadgeClass(status: string): string {
@@ -63,7 +64,7 @@ export function BatteryIndexTableV0_1() {
                   className="border-b border-zinc-900 align-top text-zinc-200"
                 >
                   <td className="px-3 py-3">
-                    <div className="font-medium">{batteryCase.displayName}</div>
+                    <Link href={`/battery/${batteryCase.caseId}`} className="font-medium underline underline-offset-4 hover:text-white">{batteryCase.displayName}</Link>
                     <div className="mt-1 text-xs text-zinc-500">
                       {batteryCase.seriesLabel}
                     </div>
