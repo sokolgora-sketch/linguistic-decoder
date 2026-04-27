@@ -32,6 +32,8 @@ describe("Evals header actions layout v0.1", () => {
     expect(src).toContain('className="hidden min-w-0 flex-1 items-center justify-center gap-1 xl:flex"');
     expect(src).toContain('href="/evals/help"');
     expect(src).toContain('href="/evals/reference"');
+    expect(src).toContain('href="/battery"');
+    expect(src).toContain("Battery index");
     expect(src).toContain("Report feedback ↗");
     expect(src).toContain("Copy page link");
     expect(src).toContain("Open Saved Run");
