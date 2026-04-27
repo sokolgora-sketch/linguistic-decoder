@@ -47,12 +47,18 @@ export default async function BatteryCasePage({ params }: PageProps) {
   return (
     <main className="min-h-screen bg-black px-6 py-10 text-zinc-100">
       <div className="mx-auto max-w-4xl">
-        <div className="mb-6">
+        <div className="mb-6 flex flex-wrap gap-3">
           <Link
             href="/battery"
-            className="text-sm text-zinc-400 underline underline-offset-4"
+            className="text-sm text-zinc-400 underline underline-offset-4 hover:text-zinc-200"
           >
             ← Back to battery index
+          </Link>
+          <Link
+            href="/evals"
+            className="text-sm text-zinc-400 underline underline-offset-4 hover:text-zinc-200"
+          >
+            ← Back to Evals workbench
           </Link>
         </div>
 

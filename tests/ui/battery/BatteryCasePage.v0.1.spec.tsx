@@ -9,6 +9,16 @@ describe("BatteryCasePage.v0.1", () => {
 
     render(ui);
 
+    const batteryIndexLink = screen.getByRole("link", {
+      name: /back to battery index/i,
+    });
+    const evalsLink = screen.getByRole("link", {
+      name: /back to evals workbench/i,
+    });
+
+    expect(batteryIndexLink).toHaveAttribute("href", "/battery");
+    expect(evalsLink).toHaveAttribute("href", "/evals");
+
     expect(screen.getByText("French /ø~œ/")).toBeInTheDocument();
     expect(screen.getByText(/Strong high-boundary discrimination/i)).toBeInTheDocument();
     expect(screen.getByText("Optional stats")).toBeInTheDocument();
