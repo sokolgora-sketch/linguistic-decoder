@@ -41,9 +41,22 @@ describe("Evals evidence pack export v0.1", () => {
               gap_high: 0.603,
               normalizedPosition: 0.185,
               verdict: "INTERMEDIATE",
-              ordinalPermutation: { observed_order: true, p_value: 0.167, iters: 12000, seed: 85605032 },
-              marginPermutation: { observed_min_gap: 0.137, p_value: 0.001, iters: 12000, seed: 85605032 },
-              effectSizes: { hedges_g_low_x: 0.733, hedges_g_x_high: 3.263 },
+              ordinalPermutation: {
+                observed_order: true,
+                p_value: 0.167,
+                iters: 12000,
+                seed: 85605032,
+              },
+              marginPermutation: {
+                observed_min_gap: 0.137,
+                p_value: 0.001,
+                iters: 12000,
+                seed: 85605032,
+              },
+              effectSizes: {
+                hedges_g_low_x: 0.733,
+                hedges_g_x_high: 3.263,
+              },
               bootstrap: {
                 ci95_gap_low: [0.045, 0.227],
                 ci95_gap_high: [0.51, 0.693],
@@ -89,7 +102,7 @@ describe("Evals evidence pack export v0.1", () => {
       "runs/t5.fi.ae.v1-v3.pilot.main.r03/",
       "runs/t5.fi.ae.v1-v3.pilot.main.r03/input.json",
       "runs/t5.fi.ae.v1-v3.pilot.main.r03/notes.md",
-        "runs/t5.fi.ae.v1-v3.pilot.main.r03/report.json",
+      "runs/t5.fi.ae.v1-v3.pilot.main.r03/report.json",
       "runs/t5.fi.ae.v1-v3.pilot.main.r03/report.md",
       "runs/t5.fi.ae.v1-v3.pilot.main.r03/report.pdf",
       "runs/t5.fi.ae.v1-v3.pilot.main.r03/summary.csv",
@@ -99,11 +112,14 @@ describe("Evals evidence pack export v0.1", () => {
     const readme = await zip.file("00_README.md")?.async("string");
     const index = await zip.file("01_RUN_INDEX.md")?.async("string");
     const notes = await zip.file("runs/t5.fi.ae.v1-v3.pilot.main.r03/notes.md")?.async("string");
+    const reportJson = await zip.file("runs/t5.fi.ae.v1-v3.pilot.main.r03/report.json")?.async("string");
+    const parsedReport = JSON.parse(reportJson ?? "null");
 
     expect(readme).toContain("ZË-RO Evidence Pack");
     expect(readme).toContain("There are only seven primal vowel positions");
     expect(readme).toContain("vowelUnderTest: ä");
     expect(readme).toContain("bracket: V1–V3");
+    expect(readme).toContain("report.json");
 
     expect(index).toContain("t5.fi.ae.v1-v3.pilot.main.r03");
     expect(index).toContain("fi | ä | V1–V3 | INTERMEDIATE");
@@ -112,5 +128,9 @@ describe("Evals evidence pack export v0.1", () => {
     expect(notes).toContain("bracket: V1–V3");
     expect(notes).toContain("gap_low: 0.137");
     expect(notes).toContain("Supports / weakens / challenges: pending researcher review");
+
+    expect(parsedReport.runId).toBe("t5.fi.ae.v1-v3.pilot.main.r03");
+    expect(parsedReport.tasks[0].intermediate_aperturePresenceMean.marginPermutation.p_value).toBe(0.001);
+    expect(parsedReport.tasks[0].intermediate_aperturePresenceMean.bootstrap.ci95_normalizedPosition).toEqual([0.063, 0.296]);
   });
 });

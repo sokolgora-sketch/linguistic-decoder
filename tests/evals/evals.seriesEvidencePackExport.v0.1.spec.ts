@@ -94,16 +94,21 @@ describe("Evals series evidence pack export v0.1", () => {
     expect(zip.file("series-summary.csv")).toBeTruthy();
 
     expect(zip.file("runs/t5.fi.ae.v1-v3.pilot.main.r04/input.json")).toBeTruthy();
+    expect(zip.file("runs/t5.fi.ae.v1-v3.pilot.main.r04/report.json")).toBeTruthy();
     expect(zip.file("runs/t5.fi.ae.v1-v3.pilot.main.r04/report.pdf")).toBeTruthy();
     expect(zip.file("runs/t5.pt.aa.v1-v4.pilot.main.r01/input.json")).toBeTruthy();
+    expect(zip.file("runs/t5.pt.aa.v1-v4.pilot.main.r01/report.json")).toBeTruthy();
     expect(zip.file("runs/t5.pt.aa.v1-v4.pilot.main.r01/report.pdf")).toBeTruthy();
 
     const readme = await zip.file("00_README.md")?.async("string");
     const index = await zip.file("01_RUN_INDEX.md")?.async("string");
     const summary = await zip.file("series-summary.csv")?.async("string");
+    const firstReportJson = await zip.file("runs/t5.fi.ae.v1-v3.pilot.main.r04/report.json")?.async("string");
+    const firstReport = JSON.parse(firstReportJson ?? "null");
 
     expect(readme).toContain("ZË-RO Series Evidence Pack");
     expect(readme).toContain("scoredRunCount: 2");
+    expect(readme).toContain("report.json");
     expect(index).toContain("t5.fi.ae.v1-v3.pilot.main.r04");
     expect(index).toContain("ä | V1–V3 | INTERMEDIATE");
     expect(index).toContain("t5.pt.aa.v1-v4.pilot.main.r01");
@@ -111,5 +116,8 @@ describe("Evals series evidence pack export v0.1", () => {
     expect(summary).toContain("ordinal,runId,taskId,language,vowel,anchorLow,anchorHigh,verdict");
     expect(summary).toContain("1,t5.fi.ae.v1-v3.pilot.main.r04,T5_INTERMEDIATE_V0_1,fi,ä,V1,V3,INTERMEDIATE");
     expect(summary).toContain("2,t5.pt.aa.v1-v4.pilot.main.r01,T5_INTERMEDIATE_V0_1,pt,â,V1,V4,INTERMEDIATE");
+
+    expect(firstReport.runId).toBe("t5.fi.ae.v1-v3.pilot.main.r04");
+    expect(firstReport.tasks[0].intermediate_aperturePresenceMean.normalizedPosition).toBe(0.185);
   });
 });
