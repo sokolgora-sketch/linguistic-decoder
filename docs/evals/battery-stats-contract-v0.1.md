@@ -23,6 +23,7 @@ Expected source artifacts:
 
 - `evals.series-evidence-pack.<seriesLabel>.v0.1.zip`
 - `series-summary.csv`
+- per-run `report.json`
 - per-run `summary.csv`
 - per-run report markdown/PDF
 - run metadata
@@ -146,6 +147,7 @@ Do not render missing stats as zero.
 3. Locate or re-export the real evidence packs.
 4. Build a parser/helper that can read:
    - `series-summary.csv`
+   - per-run `report.json`
    - per-run `summary.csv`
    - per-run report markdown
 5. Add tests using a small fixture evidence-pack summary.

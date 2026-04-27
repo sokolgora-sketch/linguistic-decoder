@@ -71,6 +71,7 @@ There are only seven primal vowel positions. Written/phonetic vowels beyond seve
 ## Evidence files
 
 - runs/${params.runId}/input.json
+- runs/${params.runId}/report.json
 - runs/${params.runId}/report.md
 - runs/${params.runId}/report.pdf
 - runs/${params.runId}/workbook.xlsx
@@ -81,9 +82,10 @@ There are only seven primal vowel positions. Written/phonetic vowels beyond seve
 
 1. Open notes.md for the interpretation frame.
 2. Open report.pdf for the human-readable scored result.
-3. Open summary.csv for quick machine-readable values.
-4. Open workbook.xlsx for full structured evidence.
-5. Open input.json to inspect exactly what was tested.
+3. Open report.json for structured scorer output and statistical fields.
+4. Open summary.csv for quick machine-readable values.
+5. Open workbook.xlsx for full structured evidence.
+6. Open input.json to inspect exactly what was tested.
 `;
 }
 
@@ -160,6 +162,7 @@ function buildNotesV0_1(params: {
 ## Files
 
 - input.json
+- report.json
 - report.md
 - report.pdf
 - workbook.xlsx
@@ -216,6 +219,7 @@ export async function buildEvalsEvidencePackZipArrayBufferV0_1(
   );
 
   zip.file(`${runDir}/input.json`, `${JSON.stringify(input.runJson, null, 2)}\n`);
+  zip.file(`${runDir}/report.json`, `${JSON.stringify(report, null, 2)}\n`);
   zip.file(`${runDir}/report.md`, input.reportMd || "No scored markdown report available.\n");
   zip.file(`${runDir}/report.pdf`, input.pdfBytes);
   zip.file(`${runDir}/workbook.xlsx`, input.workbookBytes);
@@ -334,6 +338,7 @@ There are only seven primal vowel positions. Written/phonetic vowels beyond seve
 - 01_RUN_INDEX.md
 - series-summary.csv
 - runs/<runId>/input.json
+- runs/<runId>/report.json
 - runs/<runId>/report.md
 - runs/<runId>/report.pdf
 - runs/<runId>/workbook.xlsx
@@ -344,9 +349,10 @@ There are only seven primal vowel positions. Written/phonetic vowels beyond seve
 
 1. Open 01_RUN_INDEX.md for the whole battery.
 2. Open series-summary.csv for quick machine-readable values.
-3. Open each run notes.md for interpretation status.
-4. Open report.pdf for human-readable scored evidence.
-5. Open input.json to inspect exactly what was tested.
+3. Open each run report.json for structured scorer output and statistical fields.
+4. Open each run notes.md for interpretation status.
+5. Open report.pdf for human-readable scored evidence.
+6. Open input.json to inspect exactly what was tested.
 `;
 }
 
@@ -438,6 +444,7 @@ export async function buildEvalsSeriesEvidencePackZipArrayBufferV0_1(
   for (const { run, meta } of metas) {
     const runDir = `runs/${meta.runId}`;
     zip.file(`${runDir}/input.json`, `${JSON.stringify(run.runJson, null, 2)}\n`);
+    zip.file(`${runDir}/report.json`, `${JSON.stringify(run.report ?? null, null, 2)}\n`);
     zip.file(`${runDir}/report.md`, run.reportMd || "No scored markdown report available.\n");
     zip.file(`${runDir}/report.pdf`, run.pdfBytes);
     zip.file(`${runDir}/workbook.xlsx`, run.workbookBytes);

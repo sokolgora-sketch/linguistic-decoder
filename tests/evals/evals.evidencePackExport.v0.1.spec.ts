@@ -89,6 +89,7 @@ describe("Evals evidence pack export v0.1", () => {
       "runs/t5.fi.ae.v1-v3.pilot.main.r03/",
       "runs/t5.fi.ae.v1-v3.pilot.main.r03/input.json",
       "runs/t5.fi.ae.v1-v3.pilot.main.r03/notes.md",
+        "runs/t5.fi.ae.v1-v3.pilot.main.r03/report.json",
       "runs/t5.fi.ae.v1-v3.pilot.main.r03/report.md",
       "runs/t5.fi.ae.v1-v3.pilot.main.r03/report.pdf",
       "runs/t5.fi.ae.v1-v3.pilot.main.r03/summary.csv",
