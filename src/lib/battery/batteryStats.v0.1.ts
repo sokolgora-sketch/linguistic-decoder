@@ -1,4 +1,8 @@
-import type { IntermediateTaskReportV0_1 } from "@/shared/evals/report.v0.1";
+import type {
+  EvalReportBundleV0_1,
+  EvalTaskReportV0_1,
+  IntermediateTaskReportV0_1,
+} from "@/shared/evals/report.v0.1";
 
 export type BatteryBracketStatsSourceV0_1 = "evidence-pack";
 
@@ -34,6 +38,13 @@ export type BuildBatteryBracketStatsInputV0_1 = {
   seriesLabel: string;
   evidenceZipFilename: string;
   intermediate: IntermediateTaskReportV0_1 | null | undefined;
+  notes?: string;
+};
+
+export type BuildBatteryBracketStatsFromReportInputV0_1 = {
+  seriesLabel: string;
+  evidenceZipFilename: string;
+  report: EvalReportBundleV0_1 | null | undefined;
   notes?: string;
 };
 
@@ -97,4 +108,48 @@ export function hasImportedBatteryBracketStatsV0_1(
     stats.bootstrap.ci95GapHigh !== null ||
     stats.bootstrap.ci95NormalizedPosition !== null
   );
+}
+
+
+function hasIntermediateStatsV0_1(
+  task: EvalTaskReportV0_1 | null | undefined,
+): boolean {
+  return !!task?.intermediate_aperturePresenceMean;
+}
+
+export function getPrimaryIntermediateTaskReportV0_1(
+  report: EvalReportBundleV0_1 | null | undefined,
+): IntermediateTaskReportV0_1 | null {
+  const tasks = Array.isArray(report?.tasks) ? report.tasks : [];
+
+  const selected =
+    tasks.find(
+      (task) =>
+        task.taskId === "T5_INTERMEDIATE_V0_1" &&
+        task.kind === "byo" &&
+        hasIntermediateStatsV0_1(task),
+    ) ??
+    tasks.find(
+      (task) =>
+        task.taskId === "T5_INTERMEDIATE_V0_1" &&
+        hasIntermediateStatsV0_1(task),
+    ) ??
+    tasks.find(
+      (task) => task.kind === "byo" && hasIntermediateStatsV0_1(task),
+    ) ??
+    tasks.find((task) => hasIntermediateStatsV0_1(task)) ??
+    null;
+
+  return selected?.intermediate_aperturePresenceMean ?? null;
+}
+
+export function buildBatteryBracketStatsFromReportV0_1(
+  input: BuildBatteryBracketStatsFromReportInputV0_1,
+): BatteryBracketStatsV0_1 {
+  return buildBatteryBracketStatsFromIntermediateV0_1({
+    seriesLabel: input.seriesLabel,
+    evidenceZipFilename: input.evidenceZipFilename,
+    intermediate: getPrimaryIntermediateTaskReportV0_1(input.report),
+    notes: input.notes,
+  });
 }
