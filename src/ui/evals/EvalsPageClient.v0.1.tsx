@@ -589,6 +589,13 @@ function StickyNav({
               Open Saved Run
             </button>
           <Link
+            href="/battery"
+            className={`${MT.actionUtility} border-[#355a7a] bg-[#101a24] text-[#9fd3ff] transition hover:border-[#4d7fa8] hover:bg-[#132031] hover:text-[#d7eeff]`}
+          >
+            Battery index
+          </Link>
+
+          <Link
             href="/evals/reference"
             className="inline-flex shrink-0 items-center rounded-[8px] border border-[#5a2424] bg-[#1f1010] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#fca5a5] transition hover:border-[#7a3434] hover:bg-[#281414] hover:text-[#ffd0d0]"
           >
