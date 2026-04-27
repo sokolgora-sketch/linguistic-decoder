@@ -141,6 +141,37 @@ export default async function BatteryCasePage({ params }: PageProps) {
             </div>
           </div>
 
+
+          {batteryCase.mainPairStats || batteryCase.controlPairStats ? (
+            <div className="mt-4 rounded-xl border border-zinc-800 bg-zinc-900/40 p-4">
+              <div className="text-xs uppercase tracking-[0.18em] text-zinc-500">
+                Optional stats
+              </div>
+              <div className="mt-3 grid gap-4 md:grid-cols-2 text-sm">
+                <div>
+                  <div className="mb-2 text-zinc-400">main pair</div>
+                  <div className="space-y-1 text-zinc-300">
+                    <div><span className="text-zinc-500">positionMean:</span> {batteryCase.mainPairStats?.positionMean ?? "—"}</div>
+                    <div><span className="text-zinc-500">effectSize:</span> {batteryCase.mainPairStats?.effectSize ?? "—"}</div>
+                    <div><span className="text-zinc-500">ci95:</span> {batteryCase.mainPairStats?.ci95 ? batteryCase.mainPairStats.ci95.join(" to ") : "—"}</div>
+                    <div><span className="text-zinc-500">pValue:</span> {batteryCase.mainPairStats?.pValue ?? "—"}</div>
+                    <div><span className="text-zinc-500">notes:</span> {batteryCase.mainPairStats?.notes ?? "—"}</div>
+                  </div>
+                </div>
+                <div>
+                  <div className="mb-2 text-zinc-400">control pair</div>
+                  <div className="space-y-1 text-zinc-300">
+                    <div><span className="text-zinc-500">positionMean:</span> {batteryCase.controlPairStats?.positionMean ?? "—"}</div>
+                    <div><span className="text-zinc-500">effectSize:</span> {batteryCase.controlPairStats?.effectSize ?? "—"}</div>
+                    <div><span className="text-zinc-500">ci95:</span> {batteryCase.controlPairStats?.ci95 ? batteryCase.controlPairStats.ci95.join(" to ") : "—"}</div>
+                    <div><span className="text-zinc-500">pValue:</span> {batteryCase.controlPairStats?.pValue ?? "—"}</div>
+                    <div><span className="text-zinc-500">notes:</span> {batteryCase.controlPairStats?.notes ?? "—"}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : null}
+
           <div className="mt-4 rounded-xl border border-zinc-800 bg-zinc-900/40 p-4">
             <div className="text-xs uppercase tracking-[0.18em] text-zinc-500">
               Interpretation
