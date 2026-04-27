@@ -24,6 +24,14 @@ export type BatteryBracket = {
   note?: string;
 };
 
+export type BatteryCaseStats = {
+  positionMean?: number;
+  effectSize?: number;
+  ci95?: [number, number];
+  pValue?: number;
+  notes?: string;
+};
+
 export type BatteryCase = {
   caseId: string;
   displayName: string;
@@ -47,6 +55,9 @@ export type BatteryCase = {
 
   ordinalsConfirmed: [1, 2, 3, 4];
   shortInterpretation: string;
+
+  mainPairStats?: BatteryCaseStats;
+  controlPairStats?: BatteryCaseStats;
 };
 
 export const BRACKETS: Record<BracketId, BatteryBracket> = {
@@ -156,7 +167,13 @@ export const BATTERY_CASES: BatteryCase[] = [
     controlPairOutcome: "EXCEEDS_LOW / EXCEEDS_LOW",
     ordinalsConfirmed: [1, 2, 3, 4],
     shortInterpretation:
-      "Intended bracket stayed intermediate while controls exceeded low."
+      "Intended bracket stayed intermediate while controls exceeded low.",
+    mainPairStats: {
+      notes: "Journal-facing stats pending structured import from evidence pack."
+    },
+    controlPairStats: {
+      notes: "Journal-facing stats pending structured import from evidence pack."
+    }
   },
   {
     caseId: "pt-aa",
@@ -236,7 +253,13 @@ export const BATTERY_CASES: BatteryCase[] = [
     mainPairOutcome: "COLLAPSED_HIGH / COLLAPSED_HIGH",
     controlPairOutcome: "INTERMEDIATE / INTERMEDIATE",
     ordinalsConfirmed: [1, 2, 3, 4],
-    shortInterpretation: "Strong high-boundary discrimination."
+    shortInterpretation: "Strong high-boundary discrimination.",
+    mainPairStats: {
+      notes: "Journal-facing stats pending structured import from evidence pack."
+    },
+    controlPairStats: {
+      notes: "Journal-facing stats pending structured import from evidence pack."
+    }
   },
   {
     caseId: "tr-ii",
@@ -257,7 +280,13 @@ export const BATTERY_CASES: BatteryCase[] = [
     controlPairOutcome: "COLLAPSED_HIGH / COLLAPSED_HIGH",
     ordinalsConfirmed: [1, 2, 3, 4],
     shortInterpretation:
-      "Clearest pressure case; current V6-V7 placement challenged."
+      "Clearest pressure case; current V6-V7 placement challenged.",
+    mainPairStats: {
+      notes: "Journal-facing stats pending structured import from evidence pack."
+    },
+    controlPairStats: {
+      notes: "Journal-facing stats pending structured import from evidence pack."
+    }
   },
   {
     caseId: "et-ae",

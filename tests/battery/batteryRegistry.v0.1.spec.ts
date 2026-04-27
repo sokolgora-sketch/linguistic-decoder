@@ -58,6 +58,18 @@ describe("batteryRegistry.v0.1", () => {
     expect(bracket.high).toBe("V5");
   });
 
+  it("exposes optional stats fields without requiring them on every case", () => {
+    const french = getBatteryCaseById("fr-euoe");
+    const finnish = getBatteryCaseById("fi-ae");
+    const turkish = getBatteryCaseById("tr-ii");
+    const german = getBatteryCaseById("de-oe");
+
+    expect(french?.mainPairStats?.notes).toContain("Journal-facing stats pending");
+    expect(finnish?.controlPairStats?.notes).toContain("Journal-facing stats pending");
+    expect(turkish?.mainPairStats?.notes).toContain("Journal-facing stats pending");
+    expect(german?.mainPairStats).toBeUndefined();
+  });
+
   it("groups sections and statuses correctly", () => {
     expect(getBatteryCasesBySection("core")).toHaveLength(4);
     expect(getBatteryCasesBySection("expansion")).toHaveLength(4);
