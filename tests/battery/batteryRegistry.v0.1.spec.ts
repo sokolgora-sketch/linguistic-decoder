@@ -122,10 +122,80 @@ describe("batteryRegistry.v0.1", () => {
     expect(seriesStats.intended.main.notes).toBe("intended-main fixture");
     expect(seriesStats.control.alt.notes).toBe("control-alt fixture");
 
+    const finnish = getBatteryCaseById("fi-ae");
+    expect(finnish?.seriesStats).toBeUndefined();
+  });
+
+  it("imports Estonian four-run series stats from inspected manifest values", () => {
     const estonian = getBatteryCaseById("et-ae");
-    expect(estonian?.seriesStats).toBeUndefined();
-    expect(estonian?.mainPairStats).toBeUndefined();
-    expect(estonian?.controlPairStats).toBeUndefined();
+
+    expect(estonian?.seriesStats?.source).toBe("evidence-pack");
+    expect(estonian?.seriesStats?.seriesLabel).toBe("t5-et-ae-v1-v3-exp-v0.2");
+    expect(estonian?.seriesStats?.evidenceZipFilename).toBe(
+      "evals.series-evidence-pack.t5-et-ae-v1-v3-exp-v0.2.v0.1.zip",
+    );
+    expect(estonian?.seriesStats?.inspectedManifestPath).toBe(
+      "docs/evals/inspected-battery-packs-v0.1.md",
+    );
+
+    expect(estonian?.seriesStats?.intended.bracketId).toBe("V1-V3");
+    expect(estonian?.seriesStats?.control.bracketId).toBe("V2-V3");
+
+    expect(estonian?.seriesStats?.intended.main.marginPermutation.pValue).toBe(
+      0.0025833333333333333,
+    );
+    expect(estonian?.seriesStats?.intended.alt.marginPermutation.pValue).toBe(
+      0.05316666666666667,
+    );
+    expect(estonian?.seriesStats?.control.main.marginPermutation.pValue).toBe(
+      0.9974166666666666,
+    );
+    expect(estonian?.seriesStats?.control.alt.marginPermutation.pValue).toBe(
+      0.99975,
+    );
+
+    expect(estonian?.seriesStats?.intended.main.effectSizes.hedgesGLowX).toBe(
+      0.5545588905459405,
+    );
+    expect(estonian?.seriesStats?.intended.alt.effectSizes.hedgesGXHigh).toBe(
+      3.228770024675538,
+    );
+    expect(estonian?.seriesStats?.control.main.effectSizes.hedgesGLowX).toBe(
+      -1.2548084847778591,
+    );
+    expect(estonian?.seriesStats?.control.alt.effectSizes.hedgesGLowX).toBe(
+      -1.5256813128871087,
+    );
+
+    expect(
+      estonian?.seriesStats?.intended.main.bootstrap.ci95NormalizedPosition,
+    ).toEqual([0.01687618549916784, 0.25953006089362474]);
+    expect(
+      estonian?.seriesStats?.intended.alt.bootstrap.ci95NormalizedPosition,
+    ).toEqual([-0.10315486549358109, 0.1923810142806043]);
+    expect(
+      estonian?.seriesStats?.control.main.bootstrap.ci95NormalizedPosition,
+    ).toEqual([-0.9694656488549633, -0.3360955329356846]);
+    expect(
+      estonian?.seriesStats?.control.alt.bootstrap.ci95NormalizedPosition,
+    ).toEqual([-1.3543749569648162, -0.49355045311160994]);
+
+    expect(estonian?.seriesStats?.intended.main.notes).toContain(
+      "runs/t5.et.ae.v1-v3.exp.main.r01/report.json",
+    );
+    expect(estonian?.seriesStats?.intended.alt.notes).toContain(
+      "runs/t5.et.ae.v1-v3.exp.alt.r02/report.json",
+    );
+    expect(estonian?.seriesStats?.control.main.notes).toContain(
+      "runs/t5.et.ae.v2-v3.exp.ctrl.r03/report.json",
+    );
+    expect(estonian?.seriesStats?.control.alt.notes).toContain(
+      "runs/t5.et.ae.v2-v3.exp.ctrl-alt.r04/report.json",
+    );
+
+    expect(estonian?.seriesStats?.intended.main.marginPermutation.observedMinGap).toBeNull();
+    expect(estonian?.seriesStats?.intended.main.bootstrap.ci95GapLow).toBeNull();
+    expect(estonian?.seriesStats?.intended.main.bootstrap.ci95GapHigh).toBeNull();
   });
 
   it("groups sections and statuses correctly", () => {
