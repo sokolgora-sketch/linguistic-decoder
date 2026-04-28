@@ -5,6 +5,7 @@ import {
   getBracket,
 } from "@/lib/battery/getBatteryCase.v0.1";
 import { Badge } from "@/components/ui/badge";
+import type { BatteryBracketStatsV0_1 } from "@/lib/battery/batteryStats.v0.1";
 
 type PageProps = {
   params: Promise<{ caseId: string }>;
@@ -31,6 +32,51 @@ function strengthBadgeClass(strength: string): string {
     return "bg-red-900/30 text-red-200 border-red-900";
   }
   return "bg-zinc-800 text-zinc-200 border-zinc-700";
+}
+
+function formatStatNumber(value: number | null | undefined): string {
+  return typeof value === "number" && Number.isFinite(value) ? String(value) : "—";
+}
+
+function formatCi95(value: [number, number] | null | undefined): string {
+  return value ? `[${value[0]}, ${value[1]}]` : "—";
+}
+
+function SeriesStatsRunCard({
+  label,
+  stats,
+}: {
+  label: string;
+  stats: BatteryBracketStatsV0_1;
+}) {
+  return (
+    <div className="rounded-lg border border-zinc-800 bg-zinc-950/70 p-3">
+      <div className="mb-2 text-xs font-medium uppercase tracking-[0.16em] text-zinc-400">
+        {label}
+      </div>
+      <div className="space-y-1 text-xs text-zinc-300">
+        <div>
+          <span className="text-zinc-500">pValue:</span>{" "}
+          {formatStatNumber(stats.marginPermutation.pValue)}
+        </div>
+        <div>
+          <span className="text-zinc-500">g low/x:</span>{" "}
+          {formatStatNumber(stats.effectSizes.hedgesGLowX)}
+        </div>
+        <div>
+          <span className="text-zinc-500">g x/high:</span>{" "}
+          {formatStatNumber(stats.effectSizes.hedgesGXHigh)}
+        </div>
+        <div>
+          <span className="text-zinc-500">CI norm:</span>{" "}
+          {formatCi95(stats.bootstrap.ci95NormalizedPosition)}
+        </div>
+        <div className="break-all pt-1 text-zinc-500">
+          {stats.notes ?? "—"}
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export default async function BatteryCasePage({ params }: PageProps) {
@@ -147,13 +193,12 @@ export default async function BatteryCasePage({ params }: PageProps) {
             </div>
           </div>
 
-
           {batteryCase.mainPairStats || batteryCase.controlPairStats ? (
             <div className="mt-4 rounded-xl border border-zinc-800 bg-zinc-900/40 p-4">
               <div className="text-xs uppercase tracking-[0.18em] text-zinc-500">
                 Optional stats
               </div>
-              <div className="mt-3 grid gap-4 md:grid-cols-2 text-sm">
+              <div className="mt-3 grid gap-4 text-sm md:grid-cols-2">
                 <div>
                   <div className="mb-2 text-zinc-400">main pair</div>
                   <div className="space-y-1 text-zinc-300">
@@ -175,6 +220,63 @@ export default async function BatteryCasePage({ params }: PageProps) {
                   </div>
                 </div>
               </div>
+            </div>
+          ) : null}
+
+          {batteryCase.seriesStats ? (
+            <div className="mt-4 rounded-xl border border-zinc-800 bg-zinc-900/40 p-4">
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <div className="text-xs uppercase tracking-[0.18em] text-zinc-500">
+                    Evidence stats
+                  </div>
+                  <div className="mt-2 text-sm text-zinc-300">
+                    Four-run stats imported from inspected evidence-pack artifacts.
+                  </div>
+                </div>
+                <Badge
+                  variant="outline"
+                  className="border-zinc-700 bg-zinc-950 text-zinc-300"
+                >
+                  {batteryCase.seriesStats.source}
+                </Badge>
+              </div>
+
+              <div className="mt-4 grid gap-3 text-sm md:grid-cols-2">
+                <div><span className="text-zinc-500">series:</span> {batteryCase.seriesStats.seriesLabel}</div>
+                <div><span className="text-zinc-500">manifest:</span> {batteryCase.seriesStats.inspectedManifestPath ?? "—"}</div>
+                <div className="md:col-span-2">
+                  <span className="text-zinc-500">stats ZIP:</span>{" "}
+                  <code className="break-all text-xs text-zinc-300">
+                    {batteryCase.seriesStats.evidenceZipFilename}
+                  </code>
+                </div>
+              </div>
+
+              <div className="mt-4 grid gap-3 md:grid-cols-2">
+                <SeriesStatsRunCard
+                  label={`intended main · ${batteryCase.seriesStats.intended.bracketId}`}
+                  stats={batteryCase.seriesStats.intended.main}
+                />
+                <SeriesStatsRunCard
+                  label={`intended alt · ${batteryCase.seriesStats.intended.bracketId}`}
+                  stats={batteryCase.seriesStats.intended.alt}
+                />
+                <SeriesStatsRunCard
+                  label={`control main · ${batteryCase.seriesStats.control.bracketId}`}
+                  stats={batteryCase.seriesStats.control.main}
+                />
+                <SeriesStatsRunCard
+                  label={`control alt · ${batteryCase.seriesStats.control.bracketId}`}
+                  stats={batteryCase.seriesStats.control.alt}
+                />
+              </div>
+
+              {batteryCase.seriesStats.notes ? (
+                <p className="mt-4 text-xs leading-5 text-zinc-500">
+                  {batteryCase.seriesStats.notes}
+                </p>
+              ) : null}
             </div>
           ) : null}
 
