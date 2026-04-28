@@ -35,11 +35,20 @@ function strengthBadgeClass(strength: string): string {
 }
 
 function formatStatNumber(value: number | null | undefined): string {
-  return typeof value === "number" && Number.isFinite(value) ? String(value) : "—";
+  if (typeof value !== "number" || !Number.isFinite(value)) {
+    return "—";
+  }
+
+  return value.toLocaleString("en-US", {
+    maximumFractionDigits: 4,
+    useGrouping: false,
+  });
 }
 
 function formatCi95(value: [number, number] | null | undefined): string {
-  return value ? `[${value[0]}, ${value[1]}]` : "—";
+  return value
+    ? `[${formatStatNumber(value[0])}, ${formatStatNumber(value[1])}]`
+    : "—";
 }
 
 function SeriesStatsRunCard({
