@@ -1,6 +1,7 @@
 import {
   BATTERY_CASES,
   BRACKETS,
+  type BatteryFourRunSeriesStatsV0_1,
   type BracketId
 } from "@/lib/battery/batteryRegistry.v0.1";
 import {
