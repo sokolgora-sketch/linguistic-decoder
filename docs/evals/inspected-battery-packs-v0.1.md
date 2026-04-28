@@ -84,16 +84,16 @@ This supports the current battery interpretation:
 
 ### Import readiness
 
-Status: `ready-for-registry-import-planning`
+Status: `imported-into-registry`
 
-Not yet imported into registry.
+Imported by registry-import PR: `feat(battery): import Estonian series stats`.
 
-Required next PR:
+Registry representation:
 
-- decide exact registry representation for four-run series stats,
-- preserve main and control contrast separately,
-- avoid collapsing four runs into one vague p-value,
-- update tests before writing numeric registry values.
+- four-run `seriesStats`
+- intended/control preserved separately
+- main/alt preserved separately
+- source paths preserved through `runs/<runId>/report.json`
 
 
 ---
