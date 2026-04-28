@@ -19,4 +19,13 @@ describe("BatteryIndexTable.v0.1", () => {
     expect(screen.getAllByText("mixed").length).toBeGreaterThan(0);
     expect(screen.getAllByText("pressure").length).toBeGreaterThan(0);
   });
+
+  it("renders artifact-backed stats import status", () => {
+    render(<BatteryIndexTableV0_1 />);
+
+    expect(screen.getByRole("columnheader", { name: "Stats" })).toBeInTheDocument();
+
+    expect(screen.getAllByText("imported")).toHaveLength(2);
+    expect(screen.getAllByText("pending")).toHaveLength(7);
+  });
 });

@@ -28,6 +28,12 @@ function strengthBadgeClass(strength: string): string {
   return "bg-zinc-800 text-zinc-200 border-zinc-700";
 }
 
+function statsImportBadgeClass(hasSeriesStats: boolean): string {
+  return hasSeriesStats
+    ? "bg-sky-900/30 text-sky-200 border-sky-900"
+    : "bg-zinc-900 text-zinc-400 border-zinc-800";
+}
+
 export function BatteryIndexTableV0_1() {
   const cases = getAllBatteryCases();
 
@@ -36,7 +42,8 @@ export function BatteryIndexTableV0_1() {
       <div className="mb-4">
         <h2 className="text-lg font-semibold text-zinc-100">Battery index</h2>
         <p className="mt-1 text-sm text-zinc-400">
-          Canonical registry view for paper-aligned battery cases, brackets, and evidence labels.
+          Canonical registry view for paper-aligned battery cases, brackets,
+          and evidence labels.
         </p>
       </div>
 
@@ -50,6 +57,7 @@ export function BatteryIndexTableV0_1() {
               <th className="px-3 py-2 font-medium">Control</th>
               <th className="px-3 py-2 font-medium">Status</th>
               <th className="px-3 py-2 font-medium">Strength</th>
+              <th className="px-3 py-2 font-medium">Stats</th>
               <th className="px-3 py-2 font-medium">Interpretation</th>
             </tr>
           </thead>
@@ -57,6 +65,7 @@ export function BatteryIndexTableV0_1() {
             {cases.map((batteryCase) => {
               const intended = getBracket(batteryCase.intendedBracketId);
               const control = getBracket(batteryCase.controlBracketId);
+              const hasSeriesStats = Boolean(batteryCase.seriesStats);
 
               return (
                 <tr
@@ -64,12 +73,19 @@ export function BatteryIndexTableV0_1() {
                   className="border-b border-zinc-900 align-top text-zinc-200"
                 >
                   <td className="px-3 py-3">
-                    <Link href={`/battery/${batteryCase.caseId}`} className="font-medium underline underline-offset-4 hover:text-white">{batteryCase.displayName}</Link>
+                    <Link
+                      href={`/battery/${batteryCase.caseId}`}
+                      className="font-medium underline underline-offset-4 hover:text-white"
+                    >
+                      {batteryCase.displayName}
+                    </Link>
                     <div className="mt-1 text-xs text-zinc-500">
                       {batteryCase.seriesLabel}
                     </div>
                   </td>
-                  <td className="px-3 py-3 capitalize">{batteryCase.section}</td>
+                  <td className="px-3 py-3 capitalize">
+                    {batteryCase.section}
+                  </td>
                   <td className="px-3 py-3">
                     <div>{batteryCase.intendedBracketId}</div>
                     <div className="mt-1 text-xs text-zinc-500">
@@ -96,6 +112,14 @@ export function BatteryIndexTableV0_1() {
                       className={strengthBadgeClass(batteryCase.strength)}
                     >
                       {batteryCase.strength}
+                    </Badge>
+                  </td>
+                  <td className="px-3 py-3">
+                    <Badge
+                      variant="outline"
+                      className={statsImportBadgeClass(hasSeriesStats)}
+                    >
+                      {hasSeriesStats ? "imported" : "pending"}
                     </Badge>
                   </td>
                   <td className="px-3 py-3 text-zinc-300">
