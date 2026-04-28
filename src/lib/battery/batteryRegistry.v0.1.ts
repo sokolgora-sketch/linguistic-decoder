@@ -325,7 +325,122 @@ export const BATTERY_CASES: BatteryCase[] = [
     mainPairOutcome: "INTERMEDIATE / INTERMEDIATE",
     controlPairOutcome: "EXCEEDS_LOW / EXCEEDS_LOW",
     ordinalsConfirmed: [1, 2, 3, 4],
-    shortInterpretation: "Good partner case to Finnish ä."
+    shortInterpretation: "Good partner case to Finnish ä.",
+    seriesStats: {
+      source: "evidence-pack",
+      seriesLabel: "t5-et-ae-v1-v3-exp-v0.2",
+      evidenceZipFilename:
+        "evals.series-evidence-pack.t5-et-ae-v1-v3-exp-v0.2.v0.1.zip",
+      inspectedManifestPath: "docs/evals/inspected-battery-packs-v0.1.md",
+      intended: {
+        bracketId: "V1-V3",
+        main: {
+          source: "evidence-pack",
+          seriesLabel: "t5-et-ae-v1-v3-exp-v0.2",
+          evidenceZipFilename:
+            "evals.series-evidence-pack.t5-et-ae-v1-v3-exp-v0.2.v0.1.zip",
+          marginPermutation: {
+            observedMinGap: null,
+            pValue: 0.0025833333333333333,
+            iters: null,
+            seed: null
+          },
+          effectSizes: {
+            hedgesGLowX: 0.5545588905459405,
+            hedgesGXHigh: 3.3788729357208416
+          },
+          bootstrap: {
+            ci95GapLow: null,
+            ci95GapHigh: null,
+            ci95NormalizedPosition: [0.01687618549916784, 0.25953006089362474],
+            iters: null,
+            seed: null
+          },
+          notes:
+            "role:intended-main; source:runs/t5.et.ae.v1-v3.exp.main.r01/report.json"
+        },
+        alt: {
+          source: "evidence-pack",
+          seriesLabel: "t5-et-ae-v1-v3-exp-v0.2",
+          evidenceZipFilename:
+            "evals.series-evidence-pack.t5-et-ae-v1-v3-exp-v0.2.v0.1.zip",
+          marginPermutation: {
+            observedMinGap: null,
+            pValue: 0.05316666666666667,
+            iters: null,
+            seed: null
+          },
+          effectSizes: {
+            hedgesGLowX: 0.18585610045242854,
+            hedgesGXHigh: 3.228770024675538
+          },
+          bootstrap: {
+            ci95GapLow: null,
+            ci95GapHigh: null,
+            ci95NormalizedPosition: [-0.10315486549358109, 0.1923810142806043],
+            iters: null,
+            seed: null
+          },
+          notes:
+            "role:intended-alt; source:runs/t5.et.ae.v1-v3.exp.alt.r02/report.json"
+        }
+      },
+      control: {
+        bracketId: "V2-V3",
+        main: {
+          source: "evidence-pack",
+          seriesLabel: "t5-et-ae-v1-v3-exp-v0.2",
+          evidenceZipFilename:
+            "evals.series-evidence-pack.t5-et-ae-v1-v3-exp-v0.2.v0.1.zip",
+          marginPermutation: {
+            observedMinGap: null,
+            pValue: 0.9974166666666666,
+            iters: null,
+            seed: null
+          },
+          effectSizes: {
+            hedgesGLowX: -1.2548084847778591,
+            hedgesGXHigh: 3.3788729357208416
+          },
+          bootstrap: {
+            ci95GapLow: null,
+            ci95GapHigh: null,
+            ci95NormalizedPosition: [-0.9694656488549633, -0.3360955329356846],
+            iters: null,
+            seed: null
+          },
+          notes:
+            "role:control-main; source:runs/t5.et.ae.v2-v3.exp.ctrl.r03/report.json"
+        },
+        alt: {
+          source: "evidence-pack",
+          seriesLabel: "t5-et-ae-v1-v3-exp-v0.2",
+          evidenceZipFilename:
+            "evals.series-evidence-pack.t5-et-ae-v1-v3-exp-v0.2.v0.1.zip",
+          marginPermutation: {
+            observedMinGap: null,
+            pValue: 0.99975,
+            iters: null,
+            seed: null
+          },
+          effectSizes: {
+            hedgesGLowX: -1.5256813128871087,
+            hedgesGXHigh: 3.228770024675538
+          },
+          bootstrap: {
+            ci95GapLow: null,
+            ci95GapHigh: null,
+            ci95NormalizedPosition: [-1.3543749569648162, -0.49355045311160994],
+            iters: null,
+            seed: null
+          },
+          notes:
+            "role:control-alt; source:runs/t5.et.ae.v2-v3.exp.ctrl-alt.r04/report.json"
+        }
+      },
+      notes:
+        "Imported from inspected manifest. The inspected local ZIP had duplicate-export suffix '(1)', while registry keeps the canonical evidence filename."
+    }
   }
 ];
 
