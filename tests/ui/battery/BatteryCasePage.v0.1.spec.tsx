@@ -42,10 +42,14 @@ describe("BatteryCasePage.v0.1", () => {
     expect(screen.getByText(/control main · V2-V3/i)).toBeInTheDocument();
     expect(screen.getByText(/control alt · V2-V3/i)).toBeInTheDocument();
 
-    expect(screen.getByText(/0\.0025833333333333333/)).toBeInTheDocument();
-    expect(screen.getByText(/0\.05316666666666667/)).toBeInTheDocument();
-    expect(screen.getByText(/0\.9974166666666666/)).toBeInTheDocument();
-    expect(screen.getByText(/0\.99975/)).toBeInTheDocument();
+    expect(screen.getByText(/0\.0026/)).toBeInTheDocument();
+    expect(screen.getByText(/0\.0532/)).toBeInTheDocument();
+    expect(screen.getByText(/0\.9974/)).toBeInTheDocument();
+    expect(screen.getByText(/0\.9998/)).toBeInTheDocument();
+
+    expect(screen.getByText(/\[0\.0169, 0\.2595\]/)).toBeInTheDocument();
+    expect(screen.queryByText(/0\.0025833333333333333/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/0\.9974166666666666/)).not.toBeInTheDocument();
 
     expect(screen.getByText(/runs\/t5\.et\.ae\.v1-v3\.exp\.main\.r01\/report\.json/)).toBeInTheDocument();
     expect(screen.getByText(/runs\/t5\.et\.ae\.v1-v3\.exp\.alt\.r02\/report\.json/)).toBeInTheDocument();
