@@ -1,3 +1,5 @@
+import type { BatteryBracketStatsV0_1 } from "@/lib/battery/batteryStats.v0.1";
+
 export type BatterySection = "core" | "expansion" | "pressure";
 export type ScientificStatus = "support" | "mixed" | "pressure";
 export type Strength =
@@ -32,6 +34,22 @@ export type BatteryCaseStats = {
   notes?: string;
 };
 
+export type BatterySeriesRunPairStatsV0_1 = {
+  bracketId: BracketId;
+  main: BatteryBracketStatsV0_1;
+  alt: BatteryBracketStatsV0_1;
+};
+
+export type BatteryFourRunSeriesStatsV0_1 = {
+  source: "evidence-pack";
+  seriesLabel: string;
+  evidenceZipFilename: string;
+  inspectedManifestPath?: string;
+  intended: BatterySeriesRunPairStatsV0_1;
+  control: BatterySeriesRunPairStatsV0_1;
+  notes?: string;
+};
+
 export type BatteryCase = {
   caseId: string;
   displayName: string;
@@ -58,6 +76,7 @@ export type BatteryCase = {
 
   mainPairStats?: BatteryCaseStats;
   controlPairStats?: BatteryCaseStats;
+  seriesStats?: BatteryFourRunSeriesStatsV0_1;
 };
 
 export const BRACKETS: Record<BracketId, BatteryBracket> = {

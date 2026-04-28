@@ -153,20 +153,47 @@ Do not render missing stats as zero.
 5. Add tests using a small fixture evidence-pack summary.
 6. Only then replace placeholder notes with structured values.
 
-## Open question
+## Four-run series registry shape
 
-The current registry has one `mainPairStats` and one `controlPairStats` per case.
+The source evidence pack structure is now confirmed for four-run battery packs.
 
-A future version may need four-run series aggregation instead of single-run stats. If so, the normalized shape should add:
+A battery case may need to preserve four separate run-level stats:
 
-    seriesAggregate?: {
-      nRuns: number;
-      ordinals: [1, 2, 3, 4];
-      outcomeSummary: string;
-    };
+1. intended main
+2. intended alt
+3. control main
+4. control alt
 
-Do not add this until the source evidence pack structure is confirmed.
+Do not collapse those four rows into one p-value.
+
+The registry type may expose:
+
+```ts
+export type BatterySeriesRunPairStatsV0_1 = {
+  bracketId: BracketId;
+  main: BatteryBracketStatsV0_1;
+  alt: BatteryBracketStatsV0_1;
+};
+
+export type BatteryFourRunSeriesStatsV0_1 = {
+  source: "evidence-pack";
+  seriesLabel: string;
+  evidenceZipFilename: string;
+  inspectedManifestPath?: string;
+  intended: BatterySeriesRunPairStatsV0_1;
+  control: BatterySeriesRunPairStatsV0_1;
+  notes?: string;
+};
+```
+
+Then `BatteryCase` may expose:
+
+```ts
+seriesStats?: BatteryFourRunSeriesStatsV0_1;
+```
+
+The older `mainPairStats` and `controlPairStats` placeholders may remain for compatibility until the UI and registry migration are complete.
 
 ## Current conclusion
 
-The next implementation should not import real stats yet. The correct next step is to freeze the normalization contract, then import only from real evidence-pack artifacts once they are available.
+The next implementation should define the four-run series stats shape first. After that, import real values only from inspected evidence-pack artifacts, with tests proving source paths and run roles.
