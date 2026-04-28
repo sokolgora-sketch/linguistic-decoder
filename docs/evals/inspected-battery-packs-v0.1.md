@@ -94,3 +94,64 @@ Required next PR:
 - preserve main and control contrast separately,
 - avoid collapsing four runs into one vague p-value,
 - update tests before writing numeric registry values.
+
+
+---
+
+## 2026-04-28 — Finnish ä / V1-V3 core pack
+
+### Battery case
+
+- caseId: `fi-ae`
+- displayName: `Finnish ä`
+- seriesLabel: `t5-fi-ae-v1-v3-core-v0.2`
+- inspected evidenceZipFilename: `evals.series-evidence-pack.t5-fi-ae-v1-v3-core-v0.2.v0.1 (1).zip`
+- canonical registry filename currently recorded as: `evals.series-evidence-pack.t5-fi-ae-v1-v3-core-v0.2.v0.1.zip`
+- note: inspected file is a duplicate/export copy with `(1)` suffix; stats source paths are internal `report.json` artifacts.
+
+### Inspector command
+
+```bash
+ZIP="$HOME/Desktop/ZËRO /Dwnlosads /FINAL paper evidence /evals.series-evidence-pack.t5-fi-ae-v1-v3-core-v0.2.v0.1 (1).zip"
+
+npm run battery:inspect-pack -- --zip "$ZIP" --series-label "t5-fi-ae-v1-v3-core-v0.2"
+```
+
+### Inspector result
+
+```text
+# Battery Evidence Pack Stats
+seriesLabel: t5-fi-ae-v1-v3-core-v0.2
+evidenceZipFilename: evals.series-evidence-pack.t5-fi-ae-v1-v3-core-v0.2.v0.1 (1).zip
+runCount: 4
+
+runId   hasStats        pValue  hedgesGLowX     hedgesGXHigh    ci95NormalizedPosition  reportPath
+t5.fi.ae.v1-v3.core.alt.r02     true    0.02225 0.2358221892385302      2.452306194073692       [-0.11084128960841325, 0.2586216851158711]      runs/t5.fi.ae.v1-v3.core.alt.r02/report.json
+t5.fi.ae.v1-v3.core.main.r01    true    0.05383333333333333     0.15786370458162743     2.555873476619985       [-0.14128318043643415, 0.22555698479845424]   runs/t5.fi.ae.v1-v3.core.main.r01/report.json
+t5.fi.ae.v2-v3.core.ctrl-alt.r04        true    0.6138333333333333      -0.34312025976015914    2.4047766805732387      [-0.4226173776319394, 0.05906610605618381]    runs/t5.fi.ae.v2-v3.core.ctrl-alt.r04/report.json
+t5.fi.ae.v2-v3.core.ctrl.r03    true    0.9251666666666667      -0.7168234910674489     2.555873476619985       [-0.6582400418069919, -0.1005741189322699]    runs/t5.fi.ae.v2-v3.core.ctrl.r03/report.json
+```
+
+### Interpretation for registry-import planning
+
+Intended bracket: `V1-V3`
+
+- main run: `pValue = 0.05383333333333333`
+- alt run: `pValue = 0.02225`
+
+Control bracket: `V2-V3`
+
+- control run: `pValue = 0.9251666666666667`
+- control-alt run: `pValue = 0.6138333333333333`
+
+This supports the current battery interpretation:
+
+- intended bracket carries the signal,
+- wrong-bracket controls weaken/collapse relative to the intended pair,
+- all four runs are artifact-traceable through `report.json`.
+
+### Import readiness
+
+Status: `imported-into-registry`
+
+Imported by this registry-import PR: `feat(battery): import Finnish series stats`.

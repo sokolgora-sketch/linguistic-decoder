@@ -187,11 +187,120 @@ export const BATTERY_CASES: BatteryCase[] = [
     ordinalsConfirmed: [1, 2, 3, 4],
     shortInterpretation:
       "Intended bracket stayed intermediate while controls exceeded low.",
-    mainPairStats: {
-      notes: "Journal-facing stats pending structured import from evidence pack."
-    },
-    controlPairStats: {
-      notes: "Journal-facing stats pending structured import from evidence pack."
+    seriesStats: {
+      source: "evidence-pack",
+      seriesLabel: "t5-fi-ae-v1-v3-core-v0.2",
+      evidenceZipFilename:
+        "evals.series-evidence-pack.t5-fi-ae-v1-v3-core-v0.2.v0.1.zip",
+      inspectedManifestPath: "docs/evals/inspected-battery-packs-v0.1.md",
+      intended: {
+        bracketId: "V1-V3",
+        main: {
+          source: "evidence-pack",
+          seriesLabel: "t5-fi-ae-v1-v3-core-v0.2",
+          evidenceZipFilename:
+            "evals.series-evidence-pack.t5-fi-ae-v1-v3-core-v0.2.v0.1.zip",
+          marginPermutation: {
+            observedMinGap: 0.03222222222222204,
+            pValue: 0.05383333333333333,
+            iters: 12000,
+            seed: 85605032
+          },
+          effectSizes: {
+            hedgesGLowX: 0.15786370458162743,
+            hedgesGXHigh: 2.555873476619985
+          },
+          bootstrap: {
+            ci95GapLow: [-0.06999999999999995, 0.13111111111111096],
+            ci95GapHigh: [0.41500000000000037, 0.6122222222222224],
+            ci95NormalizedPosition: [-0.14128318043643415, 0.22555698479845424],
+            iters: 12000,
+            seed: 85605032
+          },
+          notes:
+            "role:intended-main; source:runs/t5.fi.ae.v1-v3.core.main.r01/report.json"
+        },
+        alt: {
+          source: "evidence-pack",
+          seriesLabel: "t5-fi-ae-v1-v3-core-v0.2",
+          evidenceZipFilename:
+            "evals.series-evidence-pack.t5-fi-ae-v1-v3-core-v0.2.v0.1.zip",
+          marginPermutation: {
+            observedMinGap: 0.044444444444444176,
+            pValue: 0.02225,
+            iters: 12000,
+            seed: 85605032
+          },
+          effectSizes: {
+            hedgesGLowX: 0.2358221892385302,
+            hedgesGXHigh: 2.452306194073692
+          },
+          bootstrap: {
+            ci95GapLow: [-0.04833333333333345, 0.1372222222222217],
+            ci95GapHigh: [0.3527638888888892, 0.531666666666667],
+            ci95NormalizedPosition: [-0.11084128960841325, 0.2586216851158711],
+            iters: 12000,
+            seed: 85605032
+          },
+          notes:
+            "role:intended-alt; source:runs/t5.fi.ae.v1-v3.core.alt.r02/report.json"
+        }
+      },
+      control: {
+        bracketId: "V2-V3",
+        main: {
+          source: "evidence-pack",
+          seriesLabel: "t5-fi-ae-v1-v3-core-v0.2",
+          evidenceZipFilename:
+            "evals.series-evidence-pack.t5-fi-ae-v1-v3-core-v0.2.v0.1.zip",
+          marginPermutation: {
+            observedMinGap: -0.13166666666666693,
+            pValue: 0.9251666666666667,
+            iters: 12000,
+            seed: 85605032
+          },
+          effectSizes: {
+            hedgesGLowX: -0.7168234910674489,
+            hedgesGXHigh: 2.555873476619985
+          },
+          bootstrap: {
+            ci95GapLow: [-0.22277777777777807, -0.04166666666666696],
+            ci95GapHigh: [0.41500000000000037, 0.6122222222222224],
+            ci95NormalizedPosition: [-0.6582400418069919, -0.1005741189322699],
+            iters: 12000,
+            seed: 85605032
+          },
+          notes:
+            "role:control-main; source:runs/t5.fi.ae.v2-v3.core.ctrl.r03/report.json"
+        },
+        alt: {
+          source: "evidence-pack",
+          seriesLabel: "t5-fi-ae-v1-v3-core-v0.2",
+          evidenceZipFilename:
+            "evals.series-evidence-pack.t5-fi-ae-v1-v3-core-v0.2.v0.1.zip",
+          marginPermutation: {
+            observedMinGap: -0.05777777777777826,
+            pValue: 0.6138333333333333,
+            iters: 12000,
+            seed: 85605032
+          },
+          effectSizes: {
+            hedgesGLowX: -0.34312025976015914,
+            hedgesGXHigh: 2.4047766805732387
+          },
+          bootstrap: {
+            ci95GapLow: [-0.14166666666666672, 0.024444444444444158],
+            ci95GapHigh: [0.3538888888888891, 0.532777777777778],
+            ci95NormalizedPosition: [-0.4226173776319394, 0.05906610605618381],
+            iters: 12000,
+            seed: 85605032
+          },
+          notes:
+            "role:control-alt; source:runs/t5.fi.ae.v2-v3.core.ctrl-alt.r04/report.json"
+        }
+      },
+      notes:
+        "Imported from inspected manifest. The inspected local ZIP had duplicate-export suffix '(1)', while registry keeps the canonical evidence filename."
     }
   },
   {

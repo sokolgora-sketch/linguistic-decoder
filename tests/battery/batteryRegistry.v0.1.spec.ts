@@ -67,9 +67,12 @@ describe("batteryRegistry.v0.1", () => {
     const german = getBatteryCaseById("de-oe");
 
     expect(french?.mainPairStats?.notes).toContain("Journal-facing stats pending");
-    expect(finnish?.controlPairStats?.notes).toContain("Journal-facing stats pending");
     expect(turkish?.mainPairStats?.notes).toContain("Journal-facing stats pending");
     expect(german?.mainPairStats).toBeUndefined();
+
+    expect(finnish?.mainPairStats).toBeUndefined();
+    expect(finnish?.controlPairStats).toBeUndefined();
+    expect(finnish?.seriesStats?.source).toBe("evidence-pack");
   });
 
   it("defines four-run series stats shape without importing registry numbers yet", () => {
@@ -122,8 +125,79 @@ describe("batteryRegistry.v0.1", () => {
     expect(seriesStats.intended.main.notes).toBe("intended-main fixture");
     expect(seriesStats.control.alt.notes).toBe("control-alt fixture");
 
+    const german = getBatteryCaseById("de-oe");
+    expect(german?.seriesStats).toBeUndefined();
+  });
+
+  it("imports Finnish four-run series stats from inspected manifest values", () => {
     const finnish = getBatteryCaseById("fi-ae");
-    expect(finnish?.seriesStats).toBeUndefined();
+
+    expect(finnish?.mainPairStats).toBeUndefined();
+    expect(finnish?.controlPairStats).toBeUndefined();
+
+    expect(finnish?.seriesStats?.source).toBe("evidence-pack");
+    expect(finnish?.seriesStats?.seriesLabel).toBe("t5-fi-ae-v1-v3-core-v0.2");
+    expect(finnish?.seriesStats?.evidenceZipFilename).toBe(
+      "evals.series-evidence-pack.t5-fi-ae-v1-v3-core-v0.2.v0.1.zip",
+    );
+    expect(finnish?.seriesStats?.inspectedManifestPath).toBe(
+      "docs/evals/inspected-battery-packs-v0.1.md",
+    );
+
+    expect(finnish?.seriesStats?.intended.bracketId).toBe("V1-V3");
+    expect(finnish?.seriesStats?.control.bracketId).toBe("V2-V3");
+
+    expect(finnish?.seriesStats?.intended.main.marginPermutation.pValue).toBe(
+      0.05383333333333333,
+    );
+    expect(finnish?.seriesStats?.intended.alt.marginPermutation.pValue).toBe(
+      0.02225,
+    );
+    expect(finnish?.seriesStats?.control.main.marginPermutation.pValue).toBe(
+      0.9251666666666667,
+    );
+    expect(finnish?.seriesStats?.control.alt.marginPermutation.pValue).toBe(
+      0.6138333333333333,
+    );
+
+    expect(finnish?.seriesStats?.intended.main.effectSizes.hedgesGLowX).toBe(
+      0.15786370458162743,
+    );
+    expect(finnish?.seriesStats?.intended.alt.effectSizes.hedgesGXHigh).toBe(
+      2.452306194073692,
+    );
+    expect(finnish?.seriesStats?.control.main.effectSizes.hedgesGLowX).toBe(
+      -0.7168234910674489,
+    );
+    expect(finnish?.seriesStats?.control.alt.effectSizes.hedgesGLowX).toBe(
+      -0.34312025976015914,
+    );
+
+    expect(
+      finnish?.seriesStats?.intended.main.bootstrap.ci95NormalizedPosition,
+    ).toEqual([-0.14128318043643415, 0.22555698479845424]);
+    expect(
+      finnish?.seriesStats?.intended.alt.bootstrap.ci95NormalizedPosition,
+    ).toEqual([-0.11084128960841325, 0.2586216851158711]);
+    expect(
+      finnish?.seriesStats?.control.main.bootstrap.ci95NormalizedPosition,
+    ).toEqual([-0.6582400418069919, -0.1005741189322699]);
+    expect(
+      finnish?.seriesStats?.control.alt.bootstrap.ci95NormalizedPosition,
+    ).toEqual([-0.4226173776319394, 0.05906610605618381]);
+
+    expect(finnish?.seriesStats?.intended.main.notes).toContain(
+      "runs/t5.fi.ae.v1-v3.core.main.r01/report.json",
+    );
+    expect(finnish?.seriesStats?.intended.alt.notes).toContain(
+      "runs/t5.fi.ae.v1-v3.core.alt.r02/report.json",
+    );
+    expect(finnish?.seriesStats?.control.main.notes).toContain(
+      "runs/t5.fi.ae.v2-v3.core.ctrl.r03/report.json",
+    );
+    expect(finnish?.seriesStats?.control.alt.notes).toContain(
+      "runs/t5.fi.ae.v2-v3.core.ctrl-alt.r04/report.json",
+    );
   });
 
   it("imports Estonian four-run series stats from inspected manifest values", () => {
