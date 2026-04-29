@@ -144,7 +144,122 @@ export const BATTERY_CASES: BatteryCase[] = [
     controlPairOutcome: "INTERMEDIATE / INTERMEDIATE",
     ordinalsConfirmed: [1, 2, 3, 4],
     shortInterpretation:
-      "Clean archive, but wrong-bracket controls stayed intermediate."
+      "Clean archive, but wrong-bracket controls stayed intermediate.",
+    seriesStats: {
+      source: "evidence-pack",
+      seriesLabel: "t5-de-oe-v2-v5-core-v0.2",
+      evidenceZipFilename:
+        "evals.series-evidence-pack.t5-de-oe-v2-v5-core-v0.2.v0.1.zip",
+      inspectedManifestPath: "docs/evals/inspected-battery-packs-v0.1.md",
+      intended: {
+        bracketId: "V2-V5",
+        main: {
+          source: "evidence-pack",
+          seriesLabel: "t5-de-oe-v2-v5-core-v0.2",
+          evidenceZipFilename:
+            "evals.series-evidence-pack.t5-de-oe-v2-v5-core-v0.2.v0.1.zip",
+          marginPermutation: {
+            observedMinGap: 0.13500000000000034,
+            pValue: 0,
+            iters: 12000,
+            seed: 85605032
+          },
+          effectSizes: {
+            hedgesGLowX: 1.2995551896449504,
+            hedgesGXHigh: 1.3790991837809656
+          },
+          bootstrap: {
+            ci95GapLow: [0.08333333333333359, 0.18666666666666687],
+            ci95GapHigh: [0.09833333333333305, 0.20999999999999952],
+            ci95NormalizedPosition: [0.29774946495452204, 0.6384180790960461],
+            iters: 12000,
+            seed: 85605032
+          },
+          notes:
+            "role:intended-main; source:runs/t5.de.oe.v2-v5.core.main.r01/report.json"
+        },
+        alt: {
+          source: "evidence-pack",
+          seriesLabel: "t5-de-oe-v2-v5-core-v0.2",
+          evidenceZipFilename:
+            "evals.series-evidence-pack.t5-de-oe-v2-v5-core-v0.2.v0.1.zip",
+          marginPermutation: {
+            observedMinGap: 0.09500000000000008,
+            pValue: 0,
+            iters: 12000,
+            seed: 85605032
+          },
+          effectSizes: {
+            hedgesGLowX: 1.4093058122409403,
+            hedgesGXHigh: 4.182285217921306
+          },
+          bootstrap: {
+            ci95GapLow: [0.06333333333333357, 0.12833333333333374],
+            ci95GapHigh: [0.19999999999999968, 0.25333333333333297],
+            ci95NormalizedPosition: [0.20689655172413862, 0.380000000000001],
+            iters: 12000,
+            seed: 85605032
+          },
+          notes:
+            "role:intended-alt; source:runs/t5.de.oe.v2-v5.core.alt.r02/report.json"
+        }
+      },
+      control: {
+        bracketId: "V1-V3",
+        main: {
+          source: "evidence-pack",
+          seriesLabel: "t5-de-oe-v2-v5-core-v0.2",
+          evidenceZipFilename:
+            "evals.series-evidence-pack.t5-de-oe-v2-v5-core-v0.2.v0.1.zip",
+          marginPermutation: {
+            observedMinGap: 0.2666666666666674,
+            pValue: 0,
+            iters: 12000,
+            seed: 85605032
+          },
+          effectSizes: {
+            hedgesGLowX: 2.357960820159967,
+            hedgesGXHigh: 3.0171932124650485
+          },
+          bootstrap: {
+            ci95GapLow: [0.21166666666666722, 0.3233333333333337],
+            ci95GapHigh: [0.3149999999999999, 0.4416666666666663],
+            ci95NormalizedPosition: [0.3350920029286223, 0.49580005555941425],
+            iters: 12000,
+            seed: 85605032
+          },
+          notes:
+            "role:control-main; source:runs/t5.de.oe.v1-v3.core.ctrl.r03/report.json"
+        },
+        alt: {
+          source: "evidence-pack",
+          seriesLabel: "t5-de-oe-v2-v5-core-v0.2",
+          evidenceZipFilename:
+            "evals.series-evidence-pack.t5-de-oe-v2-v5-core-v0.2.v0.1.zip",
+          marginPermutation: {
+            observedMinGap: 0.11277777777777853,
+            pValue: 0,
+            iters: 12000,
+            seed: 85605032
+          },
+          effectSizes: {
+            hedgesGLowX: 1.6303220871775905,
+            hedgesGXHigh: 4.349068466504851
+          },
+          bootstrap: {
+            ci95GapLow: [0.07833333333333381, 0.1466666666666674],
+            ci95GapHigh: [0.2794444444444444, 0.34999999999999976],
+            ci95NormalizedPosition: [0.19236073332608147, 0.3325242718446611],
+            iters: 12000,
+            seed: 85605032
+          },
+          notes:
+            "role:control-alt; source:runs/t5.de.oe.v1-v3.core.ctrl-alt.r04/report.json"
+        }
+      },
+      notes:
+        "Imported from inspected manifest. Fresh evidence confirms weak support: intended and control brackets both remained intermediate."
+    }
   },
   {
     caseId: "da-oe",
