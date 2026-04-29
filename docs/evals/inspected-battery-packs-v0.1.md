@@ -155,3 +155,46 @@ This supports the current battery interpretation:
 Status: `imported-into-registry`
 
 Imported by this registry-import PR: `feat(battery): import Finnish series stats`.
+
+
+---
+
+## 2026-04-29 — German ö / V2-V5 core pack
+
+### Battery case
+
+- caseId: `de-oe`
+- displayName: `German ö`
+- seriesLabel: `t5-de-oe-v2-v5-core-v0.2`
+- inspected evidenceZipFilename: `evals.series-evidence-pack.t5-de-oe-v2-v5-core-v0.2.v0.1 (1).zip`
+- canonical registry filename currently recorded as: `evals.series-evidence-pack.t5-de-oe-v2-v5-core-v0.2.v0.1.zip`
+- note: inspected file is a duplicate/export copy with `(1)` suffix; registry keeps canonical filename.
+
+### Inspector result
+
+```text
+# Battery Evidence Pack Stats
+seriesLabel: t5-de-oe-v2-v5-core-v0.2
+evidenceZipFilename: evals.series-evidence-pack.t5-de-oe-v2-v5-core-v0.2.v0.1 (1).zip
+runCount: 4
+
+t5.de.oe.v2-v5.core.main.r01    true    0    1.2995551896449504    1.3790991837809656    [0.29774946495452204, 0.6384180790960461]    runs/t5.de.oe.v2-v5.core.main.r01/report.json
+t5.de.oe.v2-v5.core.alt.r02     true    0    1.4093058122409403    4.182285217921306     [0.20689655172413862, 0.380000000000001]     runs/t5.de.oe.v2-v5.core.alt.r02/report.json
+t5.de.oe.v1-v3.core.ctrl.r03    true    0    2.357960820159967     3.0171932124650485    [0.3350920029286223, 0.49580005555941425]    runs/t5.de.oe.v1-v3.core.ctrl.r03/report.json
+t5.de.oe.v1-v3.core.ctrl-alt.r04 true   0    1.6303220871775905    4.349068466504851     [0.19236073332608147, 0.3325242718446611]    runs/t5.de.oe.v1-v3.core.ctrl-alt.r04/report.json
+```
+
+### Interpretation for registry-import planning
+
+Status remains `support / weak`.
+
+- intended V2-V5 runs are clean `INTERMEDIATE` with no diagnostic flags.
+- control V1-V3 runs are also `INTERMEDIATE` with no diagnostic flags.
+- this confirms weak support rather than strong discrimination.
+- the existing registry interpretation remains correct: wrong-bracket controls stayed intermediate.
+
+### Import readiness
+
+Status: `imported-into-registry`
+
+Imported by this registry-import PR: `feat(battery): import German series stats`.

@@ -25,7 +25,7 @@ describe("BatteryIndexTable.v0.1", () => {
 
     expect(screen.getByRole("columnheader", { name: "Stats" })).toBeInTheDocument();
 
-    expect(screen.getAllByText("imported")).toHaveLength(2);
-    expect(screen.getAllByText("pending")).toHaveLength(7);
+    expect(screen.getAllByText("imported")).toHaveLength(3);
+    expect(screen.getAllByText("pending")).toHaveLength(6);
   });
 });

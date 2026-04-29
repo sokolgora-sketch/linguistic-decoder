@@ -125,8 +125,48 @@ describe("batteryRegistry.v0.1", () => {
     expect(seriesStats.intended.main.notes).toBe("intended-main fixture");
     expect(seriesStats.control.alt.notes).toBe("control-alt fixture");
 
+    const danish = getBatteryCaseById("da-oe");
+    expect(danish?.seriesStats).toBeUndefined();
+  });
+
+  it("imports German four-run series stats from inspected manifest values", () => {
     const german = getBatteryCaseById("de-oe");
-    expect(german?.seriesStats).toBeUndefined();
+
+    expect(german?.strength).toBe("weak");
+    expect(german?.shortInterpretation).toContain("wrong-bracket controls");
+    expect(german?.seriesStats?.source).toBe("evidence-pack");
+    expect(german?.seriesStats?.seriesLabel).toBe("t5-de-oe-v2-v5-core-v0.2");
+    expect(german?.seriesStats?.intended.bracketId).toBe("V2-V5");
+    expect(german?.seriesStats?.control.bracketId).toBe("V1-V3");
+
+    expect(german?.seriesStats?.intended.main.marginPermutation.pValue).toBe(0);
+    expect(german?.seriesStats?.intended.alt.marginPermutation.pValue).toBe(0);
+    expect(german?.seriesStats?.control.main.marginPermutation.pValue).toBe(0);
+    expect(german?.seriesStats?.control.alt.marginPermutation.pValue).toBe(0);
+
+    expect(german?.seriesStats?.intended.main.bootstrap.ci95NormalizedPosition).toEqual([
+      0.29774946495452204,
+      0.6384180790960461,
+    ]);
+    expect(german?.seriesStats?.intended.alt.bootstrap.ci95NormalizedPosition).toEqual([
+      0.20689655172413862,
+      0.380000000000001,
+    ]);
+    expect(german?.seriesStats?.control.main.bootstrap.ci95NormalizedPosition).toEqual([
+      0.3350920029286223,
+      0.49580005555941425,
+    ]);
+    expect(german?.seriesStats?.control.alt.bootstrap.ci95NormalizedPosition).toEqual([
+      0.19236073332608147,
+      0.3325242718446611,
+    ]);
+
+    expect(german?.seriesStats?.intended.main.notes).toContain(
+      "runs/t5.de.oe.v2-v5.core.main.r01/report.json",
+    );
+    expect(german?.seriesStats?.control.alt.notes).toContain(
+      "runs/t5.de.oe.v1-v3.core.ctrl-alt.r04/report.json",
+    );
   });
 
   it("imports Finnish four-run series stats from inspected manifest values", () => {
