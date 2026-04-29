@@ -150,16 +150,16 @@ No PR without green gates.
 
 ## Current imported cases
 
-As of PR #925:
+As of PR #927:
 
 Imported:
 
+- de-oe — German ö
 - fi-ae — Finnish ä
 - et-ae — Estonian ä
 
 Pending:
 
-- de-oe — German ö
 - da-oe — Danish ø
 - pt-aa — Portuguese â
 - sv-oe — Swedish ö
