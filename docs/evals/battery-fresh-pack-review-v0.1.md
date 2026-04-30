@@ -128,3 +128,11 @@ Import only when:
 - the intended/control behavior matches the registry interpretation,
 - diagnostic flags are compatible with the claimed strength,
 - and the manifest/review note explains the decision.
+
+---
+
+## Follow-up refinement note
+
+Front-rounded follow-up refinements are summarized in `docs/evals/front-rounded-refinement-cluster-v0.1.md`.
+
+This follow-up note supersedes the older simple `V2–V5` reading for French, Norwegian, Danish, Swedish, and German in paper-writing contexts, but it does not change registry values.
