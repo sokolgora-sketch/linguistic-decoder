@@ -2036,13 +2036,33 @@ export function EvalsPageClientV0_1() {
   }
 
 
-  function openSelectedSavedRun() {
-    const selected = savedRuns.find((row) => row.id === selectedSavedRunId);
+  function openSavedRunById(savedRunId: string) {
+    const selected = savedRuns.find((row) => row.id === savedRunId);
     if (!selected) {
       showWarnNotice("Open Saved Run: choose a saved run first.");
       return;
     }
+
+    setSelectedSavedRunId(selected.id);
+
+    if (selected.seriesId) {
+      const series = runSeries.find((row) => row.id === selected.seriesId);
+      if (series) {
+        setSelectedSeriesId(series.id);
+        setSeriesLabelDraft(series.label);
+        setSeriesTargetCountDraft(String(series.targetCount));
+        setOpenSavedRunGroupIds((prev) =>
+          prev.includes(series.id) ? prev : [...prev, series.id],
+        );
+      }
+    }
+
     restoreWorkbench(selected.workbench);
+    setNotice(`Opened saved run: ${selected.title}`);
+  }
+
+  function openSelectedSavedRun() {
+    openSavedRunById(selectedSavedRunId);
   }
   function resetWorkbench() {
     setInputText("");
@@ -4623,7 +4643,7 @@ export function EvalsPageClientV0_1() {
                     <div className="flex items-center justify-between gap-3">
                       <div className="space-y-1">
                         <div className={`${MT.sectionLabel} text-[#ededed]`}>Saved runs</div>
-                        <div className={`${MT.helper} text-[#a9a9a9]`}>Open a previously saved run checkpoint after reload or reset.</div>
+                        <div className={`${MT.helper} text-[#a9a9a9]`}>Click a saved run or Load to restore its full checkpoint, including run metadata and provenance.</div>
                       </div>
                       <div className="rounded-full border border-[#355a7a] bg-[#111a24] px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#cfe6ff]">expand</div>
                     </div>
@@ -4683,7 +4703,7 @@ export function EvalsPageClientV0_1() {
                                     >
                                       <button
                                         type="button"
-                                        onClick={() => setSelectedSavedRunId(row.id)}
+                                        onClick={() => openSavedRunById(row.id)}
                                         className={`min-w-0 flex-1 text-left transition ${
                                           selected
                                             ? "text-white"
@@ -4704,6 +4724,15 @@ export function EvalsPageClientV0_1() {
                                             <div>updated {new Date(row.updatedAt).toLocaleString()}</div>
                                           </div>
                                         </div>
+                                      </button>
+
+                                      <button
+                                        type="button"
+                                        onClick={() => openSavedRunById(row.id)}
+                                        className="inline-flex shrink-0 items-center rounded-[8px] border border-[#355a7a] bg-[#111a24] px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#cfe6ff] transition hover:border-[#4d7fa8] hover:bg-[#132031] hover:text-white disabled:opacity-50"
+                                        disabled={busy}
+                                      >
+                                        Load
                                       </button>
 
                                       <button
