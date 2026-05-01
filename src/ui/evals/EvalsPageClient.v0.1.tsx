@@ -1759,6 +1759,96 @@ export function EvalsPageClientV0_1() {
     setNotice("Saved run opened.");
   }
 
+  const EVALS_MANAGED_PROVENANCE_KEYS_V0_1 = [
+    "provider",
+    "model",
+    "label",
+    "sourceEngineId",
+    "sourceEngineVersion",
+    "sourceEngineBuild",
+  ] as const;
+
+  type EvalsManagedProvenanceMetaV0_1 = Partial<
+    Record<(typeof EVALS_MANAGED_PROVENANCE_KEYS_V0_1)[number], string>
+  >;
+
+  function currentProvenanceMetaFromForm(): EvalsManagedProvenanceMetaV0_1 {
+    return {
+      ...(provider.trim() ? { provider: provider.trim() } : {}),
+      ...(model.trim() ? { model: model.trim() } : {}),
+      ...(label.trim() ? { label: label.trim() } : {}),
+      ...(sourceEngineId.trim() ? { sourceEngineId: sourceEngineId.trim() } : {}),
+      ...(sourceEngineVersion.trim()
+        ? { sourceEngineVersion: sourceEngineVersion.trim() }
+        : {}),
+      ...(sourceEngineBuild.trim() ? { sourceEngineBuild: sourceEngineBuild.trim() } : {}),
+    };
+  }
+
+  function applyManagedProvenanceMetaV0_1(
+    base: unknown,
+    patch: EvalsManagedProvenanceMetaV0_1,
+  ): Record<string, unknown> {
+    const next =
+      base && typeof base === "object" && !Array.isArray(base)
+        ? { ...(base as Record<string, unknown>) }
+        : {};
+
+    for (const key of EVALS_MANAGED_PROVENANCE_KEYS_V0_1) {
+      delete next[key];
+    }
+
+    for (const key of EVALS_MANAGED_PROVENANCE_KEYS_V0_1) {
+      const value = patch[key]?.trim();
+      if (value) next[key] = value;
+    }
+
+    return next;
+  }
+
+  function patchEvalRunInputTextMetaV0_1(
+    input: string,
+    patch: EvalsManagedProvenanceMetaV0_1,
+  ): string {
+    try {
+      const parsed = JSON.parse(input) as unknown;
+      if (
+        !parsed ||
+        typeof parsed !== "object" ||
+        Array.isArray(parsed) ||
+        (parsed as any).evalRunVersion !== "evalRun.v0.1"
+      ) {
+        return input;
+      }
+
+      const next = {
+        ...(parsed as Record<string, unknown>),
+        meta: applyManagedProvenanceMetaV0_1((parsed as any).meta, patch),
+      };
+
+      return JSON.stringify(next, null, 2);
+    } catch {
+      return input;
+    }
+  }
+
+  function patchReportMarkdownMetaV0_1(
+    reportMd: string,
+    patch: EvalsManagedProvenanceMetaV0_1,
+  ): string {
+    let next = reportMd;
+
+    for (const key of EVALS_MANAGED_PROVENANCE_KEYS_V0_1) {
+      const value = patch[key]?.trim() || "not set";
+      const pattern = new RegExp(`^- ${key}: .*`, "m");
+      if (pattern.test(next)) {
+        next = next.replace(pattern, `- ${key}: ${value}`);
+      }
+    }
+
+    return next;
+  }
+
   function parseSeriesTargetCount(raw: string) {
     const parsed = Number.parseInt(raw, 10);
     return Number.isFinite(parsed) && parsed >= 1 ? parsed : 15;
@@ -2020,6 +2110,58 @@ export function EvalsPageClientV0_1() {
       setLabel("");
     }
     setNotice(`Deleted active series: ${series.label}`);
+  }
+
+  function saveSelectedSavedRunProvenanceCorrection() {
+    const selected = savedRuns.find((row) => row.id === selectedSavedRunId);
+    if (!selected) {
+      showWarnNotice("Save provenance correction: load or select a saved run first.");
+      return;
+    }
+
+    const patch = currentProvenanceMetaFromForm();
+
+    const nextReport = selected.workbench.report
+      ? ({
+          ...selected.workbench.report,
+          meta: applyManagedProvenanceMetaV0_1(
+            selected.workbench.report.meta,
+            patch,
+          ) as typeof selected.workbench.report.meta,
+        } as typeof selected.workbench.report)
+      : selected.workbench.report;
+
+    const nextWorkbench = {
+      ...selected.workbench,
+      provider: patch.provider ?? "",
+      model: patch.model ?? "",
+      label: patch.label ?? "",
+      sourceEngineId: patch.sourceEngineId ?? "",
+      sourceEngineVersion: patch.sourceEngineVersion ?? "",
+      sourceEngineBuild: patch.sourceEngineBuild ?? "",
+      inputText: patchEvalRunInputTextMetaV0_1(selected.workbench.inputText, patch),
+      report: nextReport,
+      md: selected.workbench.md
+        ? patchReportMarkdownMetaV0_1(selected.workbench.md, patch)
+        : selected.workbench.md,
+    };
+
+    const now = Date.now();
+    const nextRows = savedRuns.map((row) =>
+      row.id === selected.id
+        ? {
+            ...row,
+            title: nextWorkbench.label || row.title,
+            updatedAt: now,
+            workbench: nextWorkbench,
+          }
+        : row,
+    );
+
+    writeSavedRuns(nextRows);
+    setSavedRuns(nextRows);
+    restoreWorkbench(nextWorkbench);
+    setNotice(`Saved provenance correction: ${nextWorkbench.label || selected.title}`);
   }
 
   function deleteSavedRunById(runId: string) {
@@ -4752,6 +4894,23 @@ export function EvalsPageClientV0_1() {
                         ))}
                       </div>
                     )}
+
+                    <div className="rounded-[8px] border border-[#3b4f28] bg-[#11170e] px-3 py-2">
+                      <div className={`${MT.sectionLabel} text-[#e7f5d9]`}>
+                        Provenance correction
+                      </div>
+                      <div className={`${MT.helperCompact} mt-1 text-[#a9b59a]`}>
+                        Load a saved run, edit provider/model/label/sourceEngine fields in Run metadata, then save correction. This does not edit runId, buckets, verdicts, or stats.
+                      </div>
+                      <button
+                        type="button"
+                        onClick={saveSelectedSavedRunProvenanceCorrection}
+                        disabled={busy || !selectedSavedRunId}
+                        className="mt-2 inline-flex rounded-[8px] border border-[#3b6b3f] bg-[#132016] px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#d9f7d9] transition hover:border-[#5aa75a] hover:bg-[#172a1a] hover:text-white disabled:opacity-50"
+                      >
+                        Save provenance correction
+                      </button>
+                    </div>
 
                     <div className={`${MT.helperCompact} text-[#9fb1bf]`}>
                       Saved runs are frozen workbench checkpoints grouped by series so you can reopen them after reset or reload.
