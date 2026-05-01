@@ -136,3 +136,11 @@ Import only when:
 Front-rounded follow-up refinements are summarized in `docs/evals/front-rounded-refinement-cluster-v0.1.md`.
 
 This follow-up note supersedes the older simple `V2–V5` reading for French, Norwegian, Danish, Swedish, and German in paper-writing contexts, but it does not change registry values.
+
+---
+
+## Portuguese and Turkish follow-up pressure review
+
+Portuguese `/â/` and Turkish `/ı/` follow-up review is summarized in `docs/evals/portuguese-turkish-pressure-review-v0.1.md`.
+
+This follow-up note supersedes the older simple `volatile` / `strong-pressure` wording for paper-writing contexts, but it does not change registry values.
