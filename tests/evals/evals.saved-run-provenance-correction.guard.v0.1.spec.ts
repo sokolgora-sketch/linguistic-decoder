@@ -5,8 +5,15 @@ const src = readFileSync("src/ui/evals/EvalsPageClient.v0.1.tsx", "utf8");
 describe("evals saved run provenance correction guard v0.1", () => {
   it("exposes a metadata-only correction action for saved runs", () => {
     expect(src).toContain("function saveSelectedSavedRunProvenanceCorrection()");
-    expect(src).toContain("Save provenance correction");
+    expect(src).toContain("Save provenance");
     expect(src).toContain("This does not edit runId, buckets, verdicts, or stats.");
+  });
+
+  it("places the provenance save action beside the selected saved run row", () => {
+    expect(src).toContain("{selected ? (");
+    expect(src).toContain("title=\"Save edited provider/model/label/sourceEngine metadata to this loaded saved run.\"");
+    expect(src).toContain("use Save provenance beside the selected saved run");
+    expect(src).not.toContain("Save provenance correction</button>");
   });
 
   it("updates managed provenance fields on workbench, run input meta, report meta, and report markdown", () => {
