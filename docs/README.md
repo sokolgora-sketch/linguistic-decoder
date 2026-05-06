@@ -107,6 +107,9 @@ Use this for:
 ### `docs/process/`
 Workflow, versioning, and operational-process docs for safe and repeatable repo work.
 
+Start here for workflow recovery:
+- `docs/process/workflows.md`
+
 Use this for:
 - dev workflow guidance
 - versioning and snapshot policy
@@ -149,9 +152,10 @@ At this stage, the repo should be read in this order:
 
 1. `README.md`
 2. `docs/README.md`
-3. `docs/constitution/README.md`
-4. core reference docs (`ROADMAP_V1_BOUNDARY.md`, `ENGINE_CONTRACT_FREEZE.md`, `ZERO_REALITY_GUIDE.md`, `RECOVERY.md`)
-5. lane indexes relevant to your question:
+3. `docs/process/workflows.md`
+4. `docs/constitution/README.md`
+5. core reference docs (`ROADMAP_V1_BOUNDARY.md`, `ENGINE_CONTRACT_FREEZE.md`, `ZERO_REALITY_GUIDE.md`, `RECOVERY.md`)
+6. lane indexes relevant to your question:
    - `docs/research/README.md`
    - `docs/ui/README.md`
    - `docs/validation/README.md`
@@ -159,6 +163,6 @@ At this stage, the repo should be read in this order:
    - `docs/contracts/README.md`
    - `docs/specs/README.md`
    - `docs/process/README.md`
-6. `docs/evals/`
-7. `docs/milestones/` as implementation history
-8. `docs/archive/` only when historical context is needed
+7. `docs/evals/`
+8. `docs/milestones/` as implementation history
+9. `docs/archive/` only when historical context is needed
