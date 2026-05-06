@@ -2,7 +2,9 @@
 
 **Author:** Sokol Gora / ZË-RO Research  
 **Draft:** v0.1  
-**Status:** Working paper draft
+**Status:** LingBuzz preprint  
+**LingBuzz reference:** lingbuzz/009966  
+**LingBuzz URL:** https://ling.auf.net/lingbuzz/009966
 
 ## Abstract
 
@@ -403,6 +405,8 @@ Cohort 01 provides evidence for bracket refinement in several vowel families, es
 ## Evidence availability
 
 The Cohort 01 evidence set contains ten languages and sixteen evidence packs. Each evidence pack contains the run index, series summary, input JSON, report JSON, markdown report, PDF report, workbook, per-run summary, and notes.
+
+LingBuzz preprint: https://ling.auf.net/lingbuzz/009966
 
 Evidence archive: https://doi.org/10.5281/zenodo.20047120
 
