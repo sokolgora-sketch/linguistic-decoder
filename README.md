@@ -19,6 +19,11 @@
 **Published:** LingBuzz, March 2026  
 **Reference:** `lingbuzz/009808`
 
+**Working paper:** [Seven-Primal-Vowel Bracket Testing: Cohort 01 Evidence Across Ten Languages](docs/papers/zero-cohort-01-vowel-bracket-battery-v0.1.md)  
+**Author:** Sokol Gora / ZË-RO Research  
+**Evidence archive:** [Zenodo DOI 10.5281/zenodo.20047120](https://doi.org/10.5281/zenodo.20047120)  
+**Reproduction:** [Cohort 01 reproduction runbook](docs/papers/zero-cohort-01-reproduction-runbook-v0.1.md)
+
 This repository contains the implementation, datasets, and reproducibility infrastructure described in those releases.
 
 ---
@@ -173,6 +178,9 @@ GNU Affero General Public License v3.0 (AGPL-3.0). See `LICENSE`.
 ## Publications / Preprints
 - LingBuzz 009799 — ZË-RO v0.1 baseline report (deterministic orthography aperture meter + baseline-lock drift workflow): https://ling.auf.net/lingbuzz/009799
 - LingBuzz 009808 — ZË-RO v0.2 Note: Morphological Masking & Recovery in Albanian200 (Controlled Ablation): https://ling.auf.net/lingbuzz/009808
+- Cohort 01 working paper — Seven-Primal-Vowel Bracket Testing: docs/papers/zero-cohort-01-vowel-bracket-battery-v0.1.md
+- Cohort 01 evidence archive — Zenodo DOI: https://doi.org/10.5281/zenodo.20047120
+- Cohort 01 reproduction runbook: docs/papers/zero-cohort-01-reproduction-runbook-v0.1.md
 
 ## Research Controls
 - Corpus70 tagger-sensitivity control (Gemini-blind vs Claude-blind):
