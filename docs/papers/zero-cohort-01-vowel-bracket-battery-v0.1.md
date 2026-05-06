@@ -404,7 +404,7 @@ Cohort 01 provides evidence for bracket refinement in several vowel families, es
 
 The Cohort 01 evidence set contains ten languages and sixteen evidence packs. Each evidence pack contains the run index, series summary, input JSON, report JSON, markdown report, PDF report, workbook, per-run summary, and notes.
 
-Evidence archive: DOI pending.
+Evidence archive: https://doi.org/10.5281/zenodo.20047120
 
 ---
 
