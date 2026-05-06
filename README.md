@@ -36,9 +36,10 @@ This repository contains the implementation, datasets, and reproducibility infra
 If you are new to the repo, read in this order:
 
 1. `docs/README.md`
-2. `docs/constitution/README.md`
-3. `docs/research/README.md`
-4. `docs/evals/`
+2. `docs/process/workflows.md`
+3. `docs/constitution/README.md`
+4. `docs/research/README.md`
+5. `docs/evals/`
 
 This is the shortest path to understanding:
 - what ZË-RO is
