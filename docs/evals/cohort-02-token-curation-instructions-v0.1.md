@@ -38,8 +38,8 @@ The first Cohort 02 subset is:
 
 | Case ID | Language | Vowel | Candidate bracket | Control bracket | Purpose |
 |---|---|---|---|---|---|
-| c02-no-oe-human | Norwegian | `/ø/` | V1-V3 | V2-V5 | low-edge front-rounded replication |
-| c02-da-oe-human | Danish | `/ø/` | V1-V3 | V2-V5 | low-edge front-rounded replication |
+| c02-no-oe-researcher | Norwegian | `/ø/` | V1-V3 | V2-V5 | low-edge front-rounded replication |
+| c02-da-oe-researcher | Danish | `/ø/` | V1-V3 | V2-V5 | low-edge front-rounded replication |
 | c02-tr-ii-redesign | Turkish | `/ı/` | V4-V7 | V5-V7 | high-region pressure redesign |
 | c02-ro-a-breve-redesign | Romanian | `/ă/` | V3-V4 | V2-V4 | central-vowel pressure redesign |
 
@@ -147,7 +147,7 @@ Important:
 
 Use:
 
-- Case ID: `c02-no-oe-human`
+- Case ID: `c02-no-oe-researcher`
 - Language: Norwegian
 - Vowel under test: `/ø/`
 - Role: candidate main
@@ -157,15 +157,15 @@ Run identity later:
 
 | Field | Value |
 |---|---|
-| runId | `t5.no.oe.v1-v3.human.main.r01` |
-| label | `no-oe-v1-v3-human-main-r01` |
-| series | `t5-no-oe-v1-v3-human-v0.1` |
+| runId | `t5.no.oe.v1-v3.researcher.main.r01` |
+| label | `no-oe-v1-v3-researcher-main-r01` |
+| series | `t5-no-oe-v1-v3-researcher-v0.1` |
 
 ### 6.2 Norwegian `/ø/` — candidate alt r02
 
 Use:
 
-- Case ID: `c02-no-oe-human`
+- Case ID: `c02-no-oe-researcher`
 - Language: Norwegian
 - Vowel under test: `/ø/`
 - Role: candidate alt
@@ -175,15 +175,15 @@ Run identity later:
 
 | Field | Value |
 |---|---|
-| runId | `t5.no.oe.v1-v3.human.alt.r02` |
-| label | `no-oe-v1-v3-human-alt-r02` |
-| series | `t5-no-oe-v1-v3-human-v0.1` |
+| runId | `t5.no.oe.v1-v3.researcher.alt.r02` |
+| label | `no-oe-v1-v3-researcher-alt-r02` |
+| series | `t5-no-oe-v1-v3-researcher-v0.1` |
 
 ### 6.3 Norwegian `/ø/` — control main r03
 
 Use:
 
-- Case ID: `c02-no-oe-human`
+- Case ID: `c02-no-oe-researcher`
 - Language: Norwegian
 - Vowel under test: `/ø/`
 - Role: control main
@@ -193,15 +193,15 @@ Run identity later:
 
 | Field | Value |
 |---|---|
-| runId | `t5.no.oe.v2-v5.human.ctrl.r03` |
-| label | `no-oe-v2-v5-human-ctrl-r03` |
-| series | `t5-no-oe-v1-v3-human-v0.1` |
+| runId | `t5.no.oe.v2-v5.researcher.ctrl.r03` |
+| label | `no-oe-v2-v5-researcher-ctrl-r03` |
+| series | `t5-no-oe-v1-v3-researcher-v0.1` |
 
 ### 6.4 Norwegian `/ø/` — control alt r04
 
 Use:
 
-- Case ID: `c02-no-oe-human`
+- Case ID: `c02-no-oe-researcher`
 - Language: Norwegian
 - Vowel under test: `/ø/`
 - Role: control alt
@@ -211,9 +211,9 @@ Run identity later:
 
 | Field | Value |
 |---|---|
-| runId | `t5.no.oe.v2-v5.human.ctrl-alt.r04` |
-| label | `no-oe-v2-v5-human-ctrl-alt-r04` |
-| series | `t5-no-oe-v1-v3-human-v0.1` |
+| runId | `t5.no.oe.v2-v5.researcher.ctrl-alt.r04` |
+| label | `no-oe-v2-v5-researcher-ctrl-alt-r04` |
+| series | `t5-no-oe-v1-v3-researcher-v0.1` |
 
 ---
 
@@ -221,7 +221,7 @@ Run identity later:
 
 Use:
 
-- Case ID: `c02-da-oe-human`
+- Case ID: `c02-da-oe-researcher`
 - Language: Danish
 - Vowel under test: `/ø/`
 - Role: candidate main
@@ -231,15 +231,15 @@ Run identity later:
 
 | Field | Value |
 |---|---|
-| runId | `t5.da.oe.v1-v3.human.main.r01` |
-| label | `da-oe-v1-v3-human-main-r01` |
-| series | `t5-da-oe-v1-v3-human-v0.1` |
+| runId | `t5.da.oe.v1-v3.researcher.main.r01` |
+| label | `da-oe-v1-v3-researcher-main-r01` |
+| series | `t5-da-oe-v1-v3-researcher-v0.1` |
 
 ### 6.6 Danish `/ø/` — candidate alt r02
 
 Use:
 
-- Case ID: `c02-da-oe-human`
+- Case ID: `c02-da-oe-researcher`
 - Language: Danish
 - Vowel under test: `/ø/`
 - Role: candidate alt
@@ -249,15 +249,15 @@ Run identity later:
 
 | Field | Value |
 |---|---|
-| runId | `t5.da.oe.v1-v3.human.alt.r02` |
-| label | `da-oe-v1-v3-human-alt-r02` |
-| series | `t5-da-oe-v1-v3-human-v0.1` |
+| runId | `t5.da.oe.v1-v3.researcher.alt.r02` |
+| label | `da-oe-v1-v3-researcher-alt-r02` |
+| series | `t5-da-oe-v1-v3-researcher-v0.1` |
 
 ### 6.7 Danish `/ø/` — control main r03
 
 Use:
 
-- Case ID: `c02-da-oe-human`
+- Case ID: `c02-da-oe-researcher`
 - Language: Danish
 - Vowel under test: `/ø/`
 - Role: control main
@@ -267,15 +267,15 @@ Run identity later:
 
 | Field | Value |
 |---|---|
-| runId | `t5.da.oe.v2-v5.human.ctrl.r03` |
-| label | `da-oe-v2-v5-human-ctrl-r03` |
-| series | `t5-da-oe-v1-v3-human-v0.1` |
+| runId | `t5.da.oe.v2-v5.researcher.ctrl.r03` |
+| label | `da-oe-v2-v5-researcher-ctrl-r03` |
+| series | `t5-da-oe-v1-v3-researcher-v0.1` |
 
 ### 6.8 Danish `/ø/` — control alt r04
 
 Use:
 
-- Case ID: `c02-da-oe-human`
+- Case ID: `c02-da-oe-researcher`
 - Language: Danish
 - Vowel under test: `/ø/`
 - Role: control alt
@@ -285,9 +285,9 @@ Run identity later:
 
 | Field | Value |
 |---|---|
-| runId | `t5.da.oe.v2-v5.human.ctrl-alt.r04` |
-| label | `da-oe-v2-v5-human-ctrl-alt-r04` |
-| series | `t5-da-oe-v1-v3-human-v0.1` |
+| runId | `t5.da.oe.v2-v5.researcher.ctrl-alt.r04` |
+| label | `da-oe-v2-v5-researcher-ctrl-alt-r04` |
+| series | `t5-da-oe-v1-v3-researcher-v0.1` |
 
 ---
 
@@ -305,9 +305,9 @@ Run identity later:
 
 | Field | Value |
 |---|---|
-| runId | `t5.tr.ii.v4-v7.redesign.main.r01` |
-| label | `tr-ii-v4-v7-redesign-main-r01` |
-| series | `t5-tr-ii-v4-v7-redesign-v0.1` |
+| runId | `t5.tr.ii.v4-v7.researcher.main.r01` |
+| label | `tr-ii-v4-v7-researcher-main-r01` |
+| series | `t5-tr-ii-v4-v7-researcher-v0.1` |
 
 ### 6.10 Turkish `/ı/` — candidate alt r02
 
@@ -323,9 +323,9 @@ Run identity later:
 
 | Field | Value |
 |---|---|
-| runId | `t5.tr.ii.v4-v7.redesign.alt.r02` |
-| label | `tr-ii-v4-v7-redesign-alt-r02` |
-| series | `t5-tr-ii-v4-v7-redesign-v0.1` |
+| runId | `t5.tr.ii.v4-v7.researcher.alt.r02` |
+| label | `tr-ii-v4-v7-researcher-alt-r02` |
+| series | `t5-tr-ii-v4-v7-researcher-v0.1` |
 
 ### 6.11 Turkish `/ı/` — control main r03
 
@@ -341,9 +341,9 @@ Run identity later:
 
 | Field | Value |
 |---|---|
-| runId | `t5.tr.ii.v5-v7.redesign.ctrl.r03` |
-| label | `tr-ii-v5-v7-redesign-ctrl-r03` |
-| series | `t5-tr-ii-v4-v7-redesign-v0.1` |
+| runId | `t5.tr.ii.v5-v7.researcher.ctrl.r03` |
+| label | `tr-ii-v5-v7-researcher-ctrl-r03` |
+| series | `t5-tr-ii-v4-v7-researcher-v0.1` |
 
 ### 6.12 Turkish `/ı/` — control alt r04
 
@@ -359,9 +359,9 @@ Run identity later:
 
 | Field | Value |
 |---|---|
-| runId | `t5.tr.ii.v5-v7.redesign.ctrl-alt.r04` |
-| label | `tr-ii-v5-v7-redesign-ctrl-alt-r04` |
-| series | `t5-tr-ii-v4-v7-redesign-v0.1` |
+| runId | `t5.tr.ii.v5-v7.researcher.ctrl-alt.r04` |
+| label | `tr-ii-v5-v7-researcher-ctrl-alt-r04` |
+| series | `t5-tr-ii-v4-v7-researcher-v0.1` |
 
 ---
 
@@ -379,9 +379,9 @@ Run identity later:
 
 | Field | Value |
 |---|---|
-| runId | `t5.ro.a-breve.v3-v4.redesign.main.r01` |
-| label | `ro-a-breve-v3-v4-redesign-main-r01` |
-| series | `t5-ro-a-breve-v3-v4-redesign-v0.1` |
+| runId | `t5.ro.a-breve.v3-v4.researcher.main.r01` |
+| label | `ro-a-breve-v3-v4-researcher-main-r01` |
+| series | `t5-ro-a-breve-v3-v4-researcher-v0.1` |
 
 ### 6.14 Romanian `/ă/` — candidate alt r02
 
@@ -397,9 +397,9 @@ Run identity later:
 
 | Field | Value |
 |---|---|
-| runId | `t5.ro.a-breve.v3-v4.redesign.alt.r02` |
-| label | `ro-a-breve-v3-v4-redesign-alt-r02` |
-| series | `t5-ro-a-breve-v3-v4-redesign-v0.1` |
+| runId | `t5.ro.a-breve.v3-v4.researcher.alt.r02` |
+| label | `ro-a-breve-v3-v4-researcher-alt-r02` |
+| series | `t5-ro-a-breve-v3-v4-researcher-v0.1` |
 
 ### 6.15 Romanian `/ă/` — control main r03
 
@@ -415,9 +415,9 @@ Run identity later:
 
 | Field | Value |
 |---|---|
-| runId | `t5.ro.a-breve.v2-v4.redesign.ctrl.r03` |
-| label | `ro-a-breve-v2-v4-redesign-ctrl-r03` |
-| series | `t5-ro-a-breve-v3-v4-redesign-v0.1` |
+| runId | `t5.ro.a-breve.v2-v4.researcher.ctrl.r03` |
+| label | `ro-a-breve-v2-v4-researcher-ctrl-r03` |
+| series | `t5-ro-a-breve-v3-v4-researcher-v0.1` |
 
 ### 6.16 Romanian `/ă/` — control alt r04
 
@@ -433,9 +433,9 @@ Run identity later:
 
 | Field | Value |
 |---|---|
-| runId | `t5.ro.a-breve.v2-v4.redesign.ctrl-alt.r04` |
-| label | `ro-a-breve-v2-v4-redesign-ctrl-alt-r04` |
-| series | `t5-ro-a-breve-v3-v4-redesign-v0.1` |
+| runId | `t5.ro.a-breve.v2-v4.researcher.ctrl-alt.r04` |
+| label | `ro-a-breve-v2-v4-researcher-ctrl-alt-r04` |
+| series | `t5-ro-a-breve-v3-v4-researcher-v0.1` |
 
 ---
 
@@ -560,17 +560,18 @@ For this first Cohort 02 token-curation subset, use:
 
 | Field | Value |
 |---|---|
-| provider | `manual` |
-| model | `hand-curated` |
-| sourceEngineId | `external-llm-curation` |
-| sourceEngineVersion | `t5-battery-2026-05-cohort-02-token-curation-v0.1` |
-| sourceEngineBuild | `<repo commit used when scoring/exporting>` |
+| provider | `openai` |
+| model | `chatgpt-assisted-researcher-reviewed` |
+| sourceEngineId | leave blank |
+| sourceEngineVersion | leave blank |
+| sourceEngineBuild | leave blank |
 
 Rules:
 
-- `sourceEngineBuild` is the repo commit used during scoring/exporting.
-- Do not rewrite `sourceEngineBuild` later to a publication commit.
+- Leave `sourceEngine*` blank for hand-pasted bucket fragments, external model outputs, or synthetic examples.
+- Only fill `sourceEngine*` when the scored JSON already came from an upstream ZË-RO engine/export.
 - Do not claim manual/external token curation came from `analyze-v1`.
+- Do not use `sourceEngineId` as a general note for assistant-assisted token curation.
 
 ---
 

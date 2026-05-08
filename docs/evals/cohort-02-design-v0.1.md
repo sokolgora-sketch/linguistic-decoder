@@ -85,13 +85,13 @@ Cohort 02 should use explicit curation lanes.
 
 | Lane | Name | Purpose | Token source |
 |---|---|---|---|
-| H | human-only | Control against external-assistant token bias | manually curated by operator |
+| C | researcher-reviewed | Control against unreviewed external-assistant token bias | assistant-proposed or manually curated, researcher reviewed |
 | X | cross-assistant | Compare token-set effects across assistants | same case, separately generated candidate buckets |
-| P | pressure redesign | Rebuild unresolved cases from scratch | human-first, external assistant only after design |
-| R | replication | Re-run selected strong / edge findings | human-only preferred |
+| P | pressure redesign | Rebuild unresolved cases from scratch | researcher-reviewed first, external assistant only after design |
+| R | replication | Re-run selected strong / edge findings | researcher-reviewed preferred |
 | A | acoustic bridge prep | Prepare later VoiceLab link | design notes only, no acoustic scoring in this cohort |
 
-Cohort 02 should start with lanes H, P, and R.
+Cohort 02 should start with lanes C, P, and R.
 
 Lane X is useful but should not be mixed into the first scoring pack unless the design explicitly calls it.
 
@@ -105,14 +105,14 @@ This table is a design plan, not evidence.
 
 | Case ID | Language | Vowel under test | Candidate bracket | Control bracket | Case kind | Curation lane | Hypothesis / purpose | Expected status category |
 |---|---|---|---|---|---|---|---|---|
-| c02-no-oe-human | Norwegian | `/ø/` | V1-V3 | V2-V5 | replication | H/R | Replicate low-edge front-rounded refinement with human-only tokens. | support if candidate remains cleaner than control |
-| c02-da-oe-human | Danish | `/ø/` | V1-V3 | V2-V5 | replication | H/R | Replicate Danish low-edge front-rounded pattern with human-only tokens. | support if candidate remains clean INTERMEDIATE and control pressures low |
-| c02-fr-euoe-human | French | `/ø~œ/` | V5-V7 | V2-V5 | high-edge audit | H/R | Re-test French as high-edge front-rounded case under stricter curation. | high-edge support or boundary uncertainty |
-| c02-pt-aa-human | Portuguese | `/â/` | V1-V4 | V2-V4 | edge-stress replication | H/R | Test whether Portuguese `/â/` keeps edge-stressed V1-V4 behavior with human-only tokens. | edge-stressed support or unstable |
+| c02-no-oe-researcher | Norwegian | `/ø/` | V1-V3 | V2-V5 | replication | C/R | Replicate low-edge front-rounded refinement with researcher-reviewed tokens. | support if candidate remains cleaner than control |
+| c02-da-oe-researcher | Danish | `/ø/` | V1-V3 | V2-V5 | replication | C/R | Replicate Danish low-edge front-rounded pattern with researcher-reviewed tokens. | support if candidate remains clean INTERMEDIATE and control pressures low |
+| c02-fr-euoe-researcher | French | `/ø~œ/` | V5-V7 | V2-V5 | high-edge audit | C/R | Re-test French as high-edge front-rounded case under stricter curation. | high-edge support or boundary uncertainty |
+| c02-pt-aa-researcher | Portuguese | `/â/` | V1-V4 | V2-V4 | edge-stress replication | C/R | Test whether Portuguese `/â/` keeps edge-stressed V1-V4 behavior with researcher-reviewed tokens. | edge-stressed support or unstable |
 | c02-tr-ii-redesign | Turkish | `/ı/` | V4-V7 | V5-V7 | pressure redesign | P | Rebuild Turkish `/ı/` as a high-region pressure audit, not bracket support. | unresolved / pressure unless candidate stabilizes clearly |
 | c02-ro-a-breve-redesign | Romanian | `/ă/` | V3-V4 | V2-V4 | pressure redesign | P | Rebuild Romanian `/ă/` around central vowel behavior before claiming bracket evidence. | unresolved / pressure unless candidate-control separation appears |
-| c02-de-oe-bridge | German | `/ö/` | V2-V4 | V1-V3 | bridge audit | H/R | Re-test German `/ö/` as a stable middle/bridging case, not headline support. | weak / bridging unless strong separation appears |
-| c02-sv-oe-bridge | Swedish | `/ö/` | V1-V3 | V2-V5 | bridge audit | H/R | Re-test Swedish `/ö/` as low-edge/bridging case and check whether V1-V3 stays cleaner. | weak / bridging or low-edge support |
+| c02-de-oe-bridge | German | `/ö/` | V2-V4 | V1-V3 | bridge audit | C/R | Re-test German `/ö/` as a stable middle/bridging case, not headline support. | weak / bridging unless strong separation appears |
+| c02-sv-oe-bridge | Swedish | `/ö/` | V1-V3 | V2-V5 | bridge audit | C/R | Re-test Swedish `/ö/` as low-edge/bridging case and check whether V1-V3 stays cleaner. | weak / bridging or low-edge support |
 
 ---
 
@@ -122,12 +122,12 @@ Series labels must be stable before scoring.
 
 | Case ID | Series label |
 |---|---|
-| c02-no-oe-human | `t5-no-oe-v1-v3-human-v0.1` |
-| c02-da-oe-human | `t5-da-oe-v1-v3-human-v0.1` |
-| c02-fr-euoe-human | `t5-fr-euoe-v5-v7-human-v0.1` |
-| c02-pt-aa-human | `t5-pt-aa-v1-v4-human-v0.1` |
-| c02-tr-ii-redesign | `t5-tr-ii-v4-v7-redesign-v0.1` |
-| c02-ro-a-breve-redesign | `t5-ro-a-breve-v3-v4-redesign-v0.1` |
+| c02-no-oe-researcher | `t5-no-oe-v1-v3-researcher-v0.1` |
+| c02-da-oe-researcher | `t5-da-oe-v1-v3-researcher-v0.1` |
+| c02-fr-euoe-researcher | `t5-fr-euoe-v5-v7-researcher-v0.1` |
+| c02-pt-aa-researcher | `t5-pt-aa-v1-v4-researcher-v0.1` |
+| c02-tr-ii-redesign | `t5-tr-ii-v4-v7-researcher-v0.1` |
+| c02-ro-a-breve-redesign | `t5-ro-a-breve-v3-v4-researcher-v0.1` |
 | c02-de-oe-bridge | `t5-de-oe-v2-v4-bridge-v0.1` |
 | c02-sv-oe-bridge | `t5-sv-oe-v1-v3-bridge-v0.1` |
 
@@ -141,59 +141,59 @@ Pattern:
 
 `t5.<language>.<vowel-code>.<bracket>.<case-kind>.<role>.rNN`
 
-### c02-no-oe-human
+### c02-no-oe-researcher
 
 | Ordinal | Role | Run ID | Label |
 |---:|---|---|---|
-| 1 | candidate main | `t5.no.oe.v1-v3.human.main.r01` | `no-oe-v1-v3-human-main-r01` |
-| 2 | candidate alt | `t5.no.oe.v1-v3.human.alt.r02` | `no-oe-v1-v3-human-alt-r02` |
-| 3 | control main | `t5.no.oe.v2-v5.human.ctrl.r03` | `no-oe-v2-v5-human-ctrl-r03` |
-| 4 | control alt | `t5.no.oe.v2-v5.human.ctrl-alt.r04` | `no-oe-v2-v5-human-ctrl-alt-r04` |
+| 1 | candidate main | `t5.no.oe.v1-v3.researcher.main.r01` | `no-oe-v1-v3-researcher-main-r01` |
+| 2 | candidate alt | `t5.no.oe.v1-v3.researcher.alt.r02` | `no-oe-v1-v3-researcher-alt-r02` |
+| 3 | control main | `t5.no.oe.v2-v5.researcher.ctrl.r03` | `no-oe-v2-v5-researcher-ctrl-r03` |
+| 4 | control alt | `t5.no.oe.v2-v5.researcher.ctrl-alt.r04` | `no-oe-v2-v5-researcher-ctrl-alt-r04` |
 
-### c02-da-oe-human
-
-| Ordinal | Role | Run ID | Label |
-|---:|---|---|---|
-| 1 | candidate main | `t5.da.oe.v1-v3.human.main.r01` | `da-oe-v1-v3-human-main-r01` |
-| 2 | candidate alt | `t5.da.oe.v1-v3.human.alt.r02` | `da-oe-v1-v3-human-alt-r02` |
-| 3 | control main | `t5.da.oe.v2-v5.human.ctrl.r03` | `da-oe-v2-v5-human-ctrl-r03` |
-| 4 | control alt | `t5.da.oe.v2-v5.human.ctrl-alt.r04` | `da-oe-v2-v5-human-ctrl-alt-r04` |
-
-### c02-fr-euoe-human
+### c02-da-oe-researcher
 
 | Ordinal | Role | Run ID | Label |
 |---:|---|---|---|
-| 1 | candidate main | `t5.fr.euoe.v5-v7.human.main.r01` | `fr-euoe-v5-v7-human-main-r01` |
-| 2 | candidate alt | `t5.fr.euoe.v5-v7.human.alt.r02` | `fr-euoe-v5-v7-human-alt-r02` |
-| 3 | control main | `t5.fr.euoe.v2-v5.human.ctrl.r03` | `fr-euoe-v2-v5-human-ctrl-r03` |
-| 4 | control alt | `t5.fr.euoe.v2-v5.human.ctrl-alt.r04` | `fr-euoe-v2-v5-human-ctrl-alt-r04` |
+| 1 | candidate main | `t5.da.oe.v1-v3.researcher.main.r01` | `da-oe-v1-v3-researcher-main-r01` |
+| 2 | candidate alt | `t5.da.oe.v1-v3.researcher.alt.r02` | `da-oe-v1-v3-researcher-alt-r02` |
+| 3 | control main | `t5.da.oe.v2-v5.researcher.ctrl.r03` | `da-oe-v2-v5-researcher-ctrl-r03` |
+| 4 | control alt | `t5.da.oe.v2-v5.researcher.ctrl-alt.r04` | `da-oe-v2-v5-researcher-ctrl-alt-r04` |
 
-### c02-pt-aa-human
+### c02-fr-euoe-researcher
 
 | Ordinal | Role | Run ID | Label |
 |---:|---|---|---|
-| 1 | candidate main | `t5.pt.aa.v1-v4.human.main.r01` | `pt-aa-v1-v4-human-main-r01` |
-| 2 | candidate alt | `t5.pt.aa.v1-v4.human.alt.r02` | `pt-aa-v1-v4-human-alt-r02` |
-| 3 | control main | `t5.pt.aa.v2-v4.human.ctrl.r03` | `pt-aa-v2-v4-human-ctrl-r03` |
-| 4 | control alt | `t5.pt.aa.v2-v4.human.ctrl-alt.r04` | `pt-aa-v2-v4-human-ctrl-alt-r04` |
+| 1 | candidate main | `t5.fr.euoe.v5-v7.researcher.main.r01` | `fr-euoe-v5-v7-researcher-main-r01` |
+| 2 | candidate alt | `t5.fr.euoe.v5-v7.researcher.alt.r02` | `fr-euoe-v5-v7-researcher-alt-r02` |
+| 3 | control main | `t5.fr.euoe.v2-v5.researcher.ctrl.r03` | `fr-euoe-v2-v5-researcher-ctrl-r03` |
+| 4 | control alt | `t5.fr.euoe.v2-v5.researcher.ctrl-alt.r04` | `fr-euoe-v2-v5-researcher-ctrl-alt-r04` |
+
+### c02-pt-aa-researcher
+
+| Ordinal | Role | Run ID | Label |
+|---:|---|---|---|
+| 1 | candidate main | `t5.pt.aa.v1-v4.researcher.main.r01` | `pt-aa-v1-v4-researcher-main-r01` |
+| 2 | candidate alt | `t5.pt.aa.v1-v4.researcher.alt.r02` | `pt-aa-v1-v4-researcher-alt-r02` |
+| 3 | control main | `t5.pt.aa.v2-v4.researcher.ctrl.r03` | `pt-aa-v2-v4-researcher-ctrl-r03` |
+| 4 | control alt | `t5.pt.aa.v2-v4.researcher.ctrl-alt.r04` | `pt-aa-v2-v4-researcher-ctrl-alt-r04` |
 
 ### c02-tr-ii-redesign
 
 | Ordinal | Role | Run ID | Label |
 |---:|---|---|---|
-| 1 | candidate main | `t5.tr.ii.v4-v7.redesign.main.r01` | `tr-ii-v4-v7-redesign-main-r01` |
-| 2 | candidate alt | `t5.tr.ii.v4-v7.redesign.alt.r02` | `tr-ii-v4-v7-redesign-alt-r02` |
-| 3 | control main | `t5.tr.ii.v5-v7.redesign.ctrl.r03` | `tr-ii-v5-v7-redesign-ctrl-r03` |
-| 4 | control alt | `t5.tr.ii.v5-v7.redesign.ctrl-alt.r04` | `tr-ii-v5-v7-redesign-ctrl-alt-r04` |
+| 1 | candidate main | `t5.tr.ii.v4-v7.researcher.main.r01` | `tr-ii-v4-v7-researcher-main-r01` |
+| 2 | candidate alt | `t5.tr.ii.v4-v7.researcher.alt.r02` | `tr-ii-v4-v7-researcher-alt-r02` |
+| 3 | control main | `t5.tr.ii.v5-v7.researcher.ctrl.r03` | `tr-ii-v5-v7-researcher-ctrl-r03` |
+| 4 | control alt | `t5.tr.ii.v5-v7.researcher.ctrl-alt.r04` | `tr-ii-v5-v7-researcher-ctrl-alt-r04` |
 
 ### c02-ro-a-breve-redesign
 
 | Ordinal | Role | Run ID | Label |
 |---:|---|---|---|
-| 1 | candidate main | `t5.ro.a-breve.v3-v4.redesign.main.r01` | `ro-a-breve-v3-v4-redesign-main-r01` |
-| 2 | candidate alt | `t5.ro.a-breve.v3-v4.redesign.alt.r02` | `ro-a-breve-v3-v4-redesign-alt-r02` |
-| 3 | control main | `t5.ro.a-breve.v2-v4.redesign.ctrl.r03` | `ro-a-breve-v2-v4-redesign-ctrl-r03` |
-| 4 | control alt | `t5.ro.a-breve.v2-v4.redesign.ctrl-alt.r04` | `ro-a-breve-v2-v4-redesign-ctrl-alt-r04` |
+| 1 | candidate main | `t5.ro.a-breve.v3-v4.researcher.main.r01` | `ro-a-breve-v3-v4-researcher-main-r01` |
+| 2 | candidate alt | `t5.ro.a-breve.v3-v4.researcher.alt.r02` | `ro-a-breve-v3-v4-researcher-alt-r02` |
+| 3 | control main | `t5.ro.a-breve.v2-v4.researcher.ctrl.r03` | `ro-a-breve-v2-v4-researcher-ctrl-r03` |
+| 4 | control alt | `t5.ro.a-breve.v2-v4.researcher.ctrl-alt.r04` | `ro-a-breve-v2-v4-researcher-ctrl-alt-r04` |
 
 ### c02-de-oe-bridge
 
@@ -217,21 +217,22 @@ Pattern:
 
 ## 8. Metadata convention
 
-For Cohort 02 manual or external curation:
+For Cohort 02 ChatGPT-assisted, researcher-reviewed curation:
 
 | Field | Value |
 |---|---|
-| provider | `manual` |
-| model | `hand-curated` |
-| sourceEngineId | `external-llm-curation` |
-| sourceEngineVersion | `t5-battery-2026-05-cohort-02-design-v0.1` |
-| sourceEngineBuild | `<repo commit used when scoring/exporting>` |
+| provider | `openai` |
+| model | `chatgpt-assisted-researcher-reviewed` |
+| sourceEngineId | leave blank |
+| sourceEngineVersion | leave blank |
+| sourceEngineBuild | leave blank |
 
 Important:
 
-- `sourceEngineBuild` must be the commit used during scoring/exporting.
-- Do not rewrite `sourceEngineBuild` later to a publication commit.
+- Leave `sourceEngine*` blank for hand-pasted bucket fragments, external model outputs, or synthetic examples.
+- Only fill `sourceEngine*` when the scored JSON already came from an upstream ZË-RO engine/export.
 - Do not claim external/manual curation came from `analyze-v1`.
+- Do not use `sourceEngineId` as a general note for assistant-assisted token curation.
 
 ---
 
@@ -283,8 +284,8 @@ After this design doc merges:
 
 Recommended first subset:
 
-- `c02-no-oe-human`
-- `c02-da-oe-human`
+- `c02-no-oe-researcher`
+- `c02-da-oe-researcher`
 - `c02-tr-ii-redesign`
 - `c02-ro-a-breve-redesign`
 
@@ -301,6 +302,6 @@ Before scoring begins, decide:
 
 1. Whether Cohort 02 starts with four cases or all eight planned cases.
 2. Whether cross-assistant curation is a separate sub-cohort.
-3. Whether human-only token sets should be archived before scoring.
+3. Whether researcher-reviewed token sets should be archived before scoring.
 4. Whether VoiceLab/acoustic bridge remains fully postponed until after Cohort 02 linguistic evidence.
 5. Whether Turkish `/ı/` needs a different candidate/control bracket before scoring.

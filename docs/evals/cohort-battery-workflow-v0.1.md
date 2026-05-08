@@ -164,30 +164,36 @@ Use:
 Fill:
 
     runId: <exact runId>
-    provider: manual
-    model: hand-curated
+    provider: <curation provider>
+    model: <curation model/convention>
     label: <exact label>
 
-For a public cohort using external/manual token curation, use the agreed curation provenance fields.
+For ChatGPT-assisted, researcher-reviewed token curation, use:
 
-Cohort 01 published provenance convention:
+    provider: openai
+    model: chatgpt-assisted-researcher-reviewed
 
-    sourceEngineId: external-llm-curation
-    sourceEngineVersion: t5-battery-2026-05-chatgpt-assisted-v0.1
-    sourceEngineBuild: 6ef31a5
+For fully manual, no-assistant curation, use a different explicit model value, for example:
 
-For future cohorts:
+    provider: manual
+    model: researcher-curated
 
-    sourceEngineId: external-llm-curation
-    sourceEngineVersion: t5-battery-YYYY-MM-<curation-method>-v0.1
-    sourceEngineBuild: <repo commit used when scoring/exporting>
+### Upstream engine provenance
 
-Important:
+Only fill `sourceEngine*` when the JSON being scored already came from an upstream ZË-RO engine/export.
 
-- sourceEngineBuild should be the repo commit used during scoring/exporting.
-- Do not rewrite sourceEngineBuild later to a publication commit.
-- If the run came from the live ZË-RO API, use the live API provenance instead.
-- Do not pretend external/manual curation came from analyze-v1.
+Leave `sourceEngine*` blank for:
+
+- hand-pasted bucket fragments;
+- external model outputs;
+- synthetic examples;
+- ChatGPT-assisted, researcher-reviewed token curation.
+
+Do not use `sourceEngineId` as a general note for external assistant curation.
+
+If the run came from a live ZË-RO API/export, use the live API/export provenance.
+
+Do not pretend external/manual curation came from `analyze-v1`.
 
 ---
 
