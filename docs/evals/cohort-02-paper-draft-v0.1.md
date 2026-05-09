@@ -1,11 +1,11 @@
 # Seven-Primal-Vowel Bracket Testing: Cohort 02 Support and Pressure Cases Across Six Languages
 
-Status: PAPER DRAFT ONLY  
-Version: v0.1  
-Created: 2026-05-09  
-Project: ZË-RO  
-Cohort: Cohort 02  
-Archive candidate: `zero-cohort-02-six-language-bracket-evidence-v0.1.zip`  
+Status: PAPER DRAFT ONLY
+Version: v0.1
+Created: 2026-05-09
+Project: ZË-RO
+Cohort: Cohort 02
+Archive candidate: `zero-cohort-02-six-language-bracket-evidence-v0.1.zip`
 Archive SHA256: `87973040984cbe50e09b86c75251fec066dba3672530873f1105c7cea2d90aaf`
 
 This is a repo-tracked paper draft.
