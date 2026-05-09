@@ -10,6 +10,8 @@ Archive SHA256: `87973040984cbe50e09b86c75251fec066dba3672530873f1105c7cea2d90aa
 
 This is a repo-tracked paper draft.
 
+Terminology note: `T5_INTERMEDIATE_V0_1` uses `T5` as an internal task label meaning Test 5. It does not refer to Google's T5 language model, and the scoring step does not use T5 logits or any external model call.
+
 This is not a Zenodo upload.
 
 This is not a LingBuzz submission.
