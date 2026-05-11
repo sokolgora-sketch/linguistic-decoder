@@ -9,23 +9,31 @@
 
 ## Published Research
 
-**Paper:** [ZË-RO v0.1: A Deterministic Orthography Aperture Meter with Baseline-Locked Drift Detection](https://ling.auf.net/lingbuzz/009799)  
-**Author:** Sokol Gora  
-**Published:** LingBuzz, February 2026  
-**Reference:** `lingbuzz/009799`
+- **Paper:** [ZË-RO v0.1: A Deterministic Orthography Aperture Meter with Baseline-Locked Drift Detection](https://ling.auf.net/lingbuzz/009799)
+  - **Author:** Sokol Gora
+  - **Published:** LingBuzz, February 2026
+  - **Reference:** `lingbuzz/009799`
 
-**Note:** [ZË-RO v0.2 Note: Morphological Masking & Recovery in Albanian200 (Controlled Ablation)](https://ling.auf.net/lingbuzz/009808)  
-**Author:** Sokol Gora  
-**Published:** LingBuzz, March 2026  
-**Reference:** `lingbuzz/009808`
+- **Note:** [ZË-RO v0.2 Note: Morphological Masking & Recovery in Albanian200 (Controlled Ablation)](https://ling.auf.net/lingbuzz/009808)
+  - **Author:** Sokol Gora
+  - **Published:** LingBuzz, March 2026
+  - **Reference:** `lingbuzz/009808`
 
-**Paper:** [Seven-Primal-Vowel Bracket Testing: Cohort 01 Evidence Across Ten Languages](https://ling.auf.net/lingbuzz/009966)  
-**Author:** Sokol Gora  
-**Published:** LingBuzz, May 2026  
-**Reference:** `lingbuzz/009966`  
-**Repository paper:** [Markdown](docs/papers/zero-cohort-01-vowel-bracket-battery-v0.1.md)  
-**Evidence archive:** [Zenodo DOI 10.5281/zenodo.20047120](https://doi.org/10.5281/zenodo.20047120)  
-**Reproduction:** [Cohort 01 reproduction runbook](docs/papers/zero-cohort-01-reproduction-runbook-v0.1.md)
+- **Paper:** [Seven-Primal-Vowel Bracket Testing: Cohort 01 Evidence Across Ten Languages](https://ling.auf.net/lingbuzz/009966)
+  - **Author:** Sokol Gora
+  - **Published:** LingBuzz, May 2026
+  - **Reference:** `lingbuzz/009966`
+  - **Repository paper:** [Markdown](docs/papers/zero-cohort-01-vowel-bracket-battery-v0.1.md)
+  - **Evidence archive:** [Zenodo DOI 10.5281/zenodo.20047120](https://doi.org/10.5281/zenodo.20047120)
+  - **Reproduction:** [Cohort 01 reproduction runbook](docs/papers/zero-cohort-01-reproduction-runbook-v0.1.md)
+
+- **Paper:** [Seven-Primal-Vowel Bracket Testing: Cohort 02 Support and Pressure Cases Across Six Languages](https://ling.auf.net/lingbuzz/009986)
+  - **Author:** Sokol Gora
+  - **Published:** LingBuzz, May 2026
+  - **Reference:** `lingbuzz/009986`
+  - **Repository paper:** [Markdown](docs/evals/cohort-02-paper-preprint-v0.6.md)
+  - **Evidence archive:** [Zenodo DOI 10.5281/zenodo.20116021](https://doi.org/10.5281/zenodo.20116021)
+  - **Publication record:** [Cohort 02 LingBuzz publication](docs/evals/cohort-02-lingbuzz-publication-v0.1.md)
 
 This repository contains the implementation, datasets, and reproducibility infrastructure described in those releases.
 
@@ -186,6 +194,12 @@ GNU Affero General Public License v3.0 (AGPL-3.0). See `LICENSE`.
 - Cohort 01 repository paper: docs/papers/zero-cohort-01-vowel-bracket-battery-v0.1.md
 - Cohort 01 evidence archive — Zenodo DOI: https://doi.org/10.5281/zenodo.20047120
 - Cohort 01 reproduction runbook: docs/papers/zero-cohort-01-reproduction-runbook-v0.1.md
+- LingBuzz 009986 — Seven-Primal-Vowel Bracket Testing: Cohort 02 Support and Pressure Cases Across Six Languages: https://ling.auf.net/lingbuzz/009986
+- Cohort 02 repository paper: docs/evals/cohort-02-paper-preprint-v0.6.md
+- Cohort 02 evidence archive — Zenodo DOI: https://doi.org/10.5281/zenodo.20116021
+- Cohort 02 all-versions archive DOI: https://doi.org/10.5281/zenodo.20116020
+- Cohort 02 LingBuzz publication record: docs/evals/cohort-02-lingbuzz-publication-v0.1.md
+- Cohort 02 Zenodo publication record: docs/evals/cohort-02-zenodo-publication-v0.1.md
 
 ## Research Controls
 - Corpus70 tagger-sensitivity control (Gemini-blind vs Claude-blind):
