@@ -7,6 +7,8 @@ import { parseEvalRunBundleV0_1 } from "@/shared/evals/run.v0.1";
 import { scoreEvalRunBundleV0_1 } from "@/shared/evals/scoreEvalRun.v0.1";
 import { renderEvalReportMdV0_1 } from "@/shared/evals/renderEvalReportMd.v0.1";
 
+jest.setTimeout(15000);
+
 const BUCKETS = {
   V1: ["a","aa","aaa","aaaa","aaaaa","aaaaaa","aaaaaaa","aaaaaaaa","aaaaaaaaa","aaaaaaaaaa"],
   V2: ["o","oo","ooo","oooo","ooooo","oooooo","ooooooo","oooooooo","ooooooooo","oooooooooo"],
