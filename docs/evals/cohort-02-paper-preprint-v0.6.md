@@ -81,10 +81,6 @@ Cohort 02 covers six language/vowel cases.
 
 Out of scope:
 
-- no new scoring in this paper draft;
-- no new token curation;
-- no registry migration;
-- no Cohort 01 rewrite;
 - no new scoring in this paper;
 - no new token curation;
 - no registry migration;
@@ -342,49 +338,72 @@ The case-level summary is written as short case notes rather than a wide table s
 - Control behavior: controls also failed or remained unstable.
 - Interpretation: unresolved central-vowel pressure; no tested bracket contains Romanian `/ă/` cleanly.
 
-### 5.2 Run-level numerical table
+### 5.2 Run-level numerical listing
 
-| Case | Run | Bracket | Verdict | normalizedPosition | gap_low | gap_high | Flags |
-|---|---|---|---|---:|---:|---:|---|
-| Norwegian `/ø/` | r01 | V1-V3 | INTERMEDIATE | 0.316312 | 0.247778 | 0.535556 | none |
-| Norwegian `/ø/` | r02 | V1-V3 | INTERMEDIATE | 0.357333 | 0.297778 | 0.535556 | none |
-| Norwegian `/ø/` | r03 | V2-V5 | INTERMEDIATE | 0.221289 | 0.087778 | 0.308889 | none |
-| Norwegian `/ø/` | r04 | V2-V5 | INTERMEDIATE | 0.294032 | 0.112222 | 0.269444 | none |
-| Danish `/ø/` | r01 | V1-V3 | INTERMEDIATE | 0.286334 | 0.220000 | 0.548333 | none |
-| Danish `/ø/` | r02 | V1-V3 | INTERMEDIATE | 0.325820 | 0.265000 | 0.548333 | none |
-| Danish `/ø/` | r03 | V2-V5 | INTERMEDIATE | 0.209402 | 0.081667 | 0.308333 | none |
-| Danish `/ø/` | r04 | V2-V5 | INTERMEDIATE | 0.270742 | 0.103333 | 0.278333 | none |
-| French `/ø~œ/` | r01 | V5-V7 | INTERMEDIATE | 0.315371 | 0.099167 | 0.215278 | none |
-| French `/ø~œ/` | r02 | V5-V7 | INTERMEDIATE | 0.238625 | 0.065556 | 0.209167 | none |
-| French `/ø~œ/` | r03 | V2-V5 | COLLAPSED_HIGH | 2.081818 | 0.190833 | -0.099167 | none |
-| French `/ø~œ/` | r04 | V2-V5 | COLLAPSED_HIGH | 1.621670 | 0.253611 | -0.097222 | none |
-| Portuguese `/â/` original | r01 | V1-V4 | COLLAPSED_HIGH | 1.265217 | 0.161667 | -0.033889 | BOUNDARY_UNCERTAIN_HIGH |
-| Portuguese `/â/` original | r02 | V1-V4 | COLLAPSED_HIGH | 1.097166 | 0.301111 | -0.026667 | BOUNDARY_UNCERTAIN_HIGH |
-| Portuguese `/â/` original | r03 | V2-V4 | EXCEEDS_LOW | 0.786340 | -0.124722 | -0.033889 | BOUNDARY_UNCERTAIN_HIGH |
-| Portuguese `/â/` original | r04 | V2-V4 | EXCEEDS_LOW | 0.014706 | -0.001667 | -0.111667 | BOUNDARY_UNCERTAIN_LOW |
-| Turkish `/ı/` | r01 | V4-V7 | INTERMEDIATE | 0.614663 | 0.400556 | 0.251111 | none |
-| Turkish `/ı/` | r02 | V4-V7 | INTERMEDIATE | 0.474286 | 0.276667 | 0.306667 | none |
-| Turkish `/ı/` | r03 | V5-V7 | INTERMEDIATE | 0.192982 | 0.055000 | 0.230000 | BOUNDARY_UNCERTAIN_LOW |
-| Turkish `/ı/` | r04 | V5-V7 | EXCEEDS_LOW | -0.063380 | -0.015000 | 0.251667 | BOUNDARY_UNCERTAIN_LOW |
-| Romanian `/ă/` v0.1 | r01 | V3-V4 | EXCEEDS_LOW | -4.256410 | -0.276667 | 0.341667 | none |
-| Romanian `/ă/` v0.1 | r02 | V3-V4 | EXCEEDS_LOW | 1.483283 | -0.271111 | 0.088333 | none |
-| Romanian `/ă/` v0.1 | r03 | V2-V4 | EXCEEDS_LOW | -2.382979 | -0.062222 | 0.088333 | BOUNDARY_UNCERTAIN_LOW |
-| Romanian `/ă/` v0.1 | r04 | V2-V4 | COLLAPSED_HIGH | 1.360577 | 0.078611 | -0.020833 | BOUNDARY_UNCERTAIN_LOW, BOUNDARY_UNCERTAIN_HIGH |
-| Romanian `/ă/` v0.2 | r01 | V2-V5 | EXCEEDS_LOW | -0.288566 | -0.088333 | 0.394444 | none |
-| Romanian `/ă/` v0.2 | r02 | V2-V5 | INTERMEDIATE | 0.107258 | 0.036944 | 0.307500 | NEAR_COLLAPSE_LOW, BOUNDARY_UNCERTAIN_LOW |
-| Romanian `/ă/` v0.2 | r03 | V3-V4 | EXCEEDS_LOW | 1.483283 | -0.271111 | 0.088333 | none |
-| Romanian `/ă/` v0.2 | r04 | V3-V4 | EXCEEDS_LOW | 0.960256 | -0.208056 | -0.008611 | BOUNDARY_UNCERTAIN_HIGH |
-| Portuguese `/â/` v0.2 | r01 | V1-V5 | INTERMEDIATE | 0.624464 | 0.161667 | 0.097222 | none |
-| Portuguese `/â/` v0.2 | r02 | V1-V5 | INTERMEDIATE | 0.856083 | 0.320556 | 0.053889 | none |
-| Portuguese `/â/` v0.2 | r03 | V1-V4 | COLLAPSED_HIGH | 1.265217 | 0.161667 | -0.033889 | BOUNDARY_UNCERTAIN_HIGH |
-| Portuguese `/â/` v0.2 | r04 | V1-V4 | COLLAPSED_HIGH | 1.576503 | 0.320556 | -0.117222 | none |
-| Portuguese `/â/` replication | r01 | V1-V5 | INTERMEDIATE | 0.753676 | 0.284722 | 0.093056 | none |
-| Portuguese `/â/` replication | r02 | V1-V5 | INTERMEDIATE | 0.875000 | 0.330556 | 0.047222 | NEAR_COLLAPSE_HIGH, BOUNDARY_UNCERTAIN_HIGH |
-| Portuguese `/â/` replication | r03 | V1-V4 | COLLAPSED_HIGH | 1.154279 | 0.284722 | -0.038056 | BOUNDARY_UNCERTAIN_HIGH |
-| Portuguese `/â/` replication | r04 | V1-V4 | COLLAPSED_HIGH | 1.599462 | 0.330556 | -0.123889 | none |
+The run-level evidence is listed as grouped notes instead of a wide table. This keeps the PDF readable and avoids column merging.
 
----
+**Norwegian /ø/**
 
+- r01, V1-V3, INTERMEDIATE: normalizedPosition 0.316312; gap_low 0.247778; gap_high 0.535556; flags none.
+- r02, V1-V3, INTERMEDIATE: normalizedPosition 0.357333; gap_low 0.297778; gap_high 0.535556; flags none.
+- r03, V2-V5, INTERMEDIATE: normalizedPosition 0.221289; gap_low 0.087778; gap_high 0.308889; flags none.
+- r04, V2-V5, INTERMEDIATE: normalizedPosition 0.294032; gap_low 0.112222; gap_high 0.269444; flags none.
+
+**Danish /ø/**
+
+- r01, V1-V3, INTERMEDIATE: normalizedPosition 0.286334; gap_low 0.220000; gap_high 0.548333; flags none.
+- r02, V1-V3, INTERMEDIATE: normalizedPosition 0.325820; gap_low 0.265000; gap_high 0.548333; flags none.
+- r03, V2-V5, INTERMEDIATE: normalizedPosition 0.209402; gap_low 0.081667; gap_high 0.308333; flags none.
+- r04, V2-V5, INTERMEDIATE: normalizedPosition 0.270742; gap_low 0.103333; gap_high 0.278333; flags none.
+
+**French /ø~œ/**
+
+- r01, V5-V7, INTERMEDIATE: normalizedPosition 0.315371; gap_low 0.099167; gap_high 0.215278; flags none.
+- r02, V5-V7, INTERMEDIATE: normalizedPosition 0.238625; gap_low 0.065556; gap_high 0.209167; flags none.
+- r03, V2-V5, COLLAPSED_HIGH: normalizedPosition 2.081818; gap_low 0.190833; gap_high -0.099167; flags none.
+- r04, V2-V5, COLLAPSED_HIGH: normalizedPosition 1.621670; gap_low 0.253611; gap_high -0.097222; flags none.
+
+**Portuguese /â/ original**
+
+- r01, V1-V4, COLLAPSED_HIGH: normalizedPosition 1.265217; gap_low 0.161667; gap_high -0.033889; flags BOUNDARY_UNCERTAIN_HIGH.
+- r02, V1-V4, COLLAPSED_HIGH: normalizedPosition 1.097166; gap_low 0.301111; gap_high -0.026667; flags BOUNDARY_UNCERTAIN_HIGH.
+- r03, V2-V4, EXCEEDS_LOW: normalizedPosition 0.786340; gap_low -0.124722; gap_high -0.033889; flags BOUNDARY_UNCERTAIN_HIGH.
+- r04, V2-V4, EXCEEDS_LOW: normalizedPosition 0.014706; gap_low -0.001667; gap_high -0.111667; flags BOUNDARY_UNCERTAIN_LOW.
+
+**Turkish /ı/**
+
+- r01, V4-V7, INTERMEDIATE: normalizedPosition 0.614663; gap_low 0.400556; gap_high 0.251111; flags none.
+- r02, V4-V7, INTERMEDIATE: normalizedPosition 0.474286; gap_low 0.276667; gap_high 0.306667; flags none.
+- r03, V5-V7, INTERMEDIATE: normalizedPosition 0.192982; gap_low 0.055000; gap_high 0.230000; flags BOUNDARY_UNCERTAIN_LOW.
+- r04, V5-V7, EXCEEDS_LOW: normalizedPosition -0.063380; gap_low -0.015000; gap_high 0.251667; flags BOUNDARY_UNCERTAIN_LOW.
+
+**Romanian /ă/ v0.1**
+
+- r01, V3-V4, EXCEEDS_LOW: normalizedPosition -4.256410; gap_low -0.276667; gap_high 0.341667; flags none.
+- r02, V3-V4, EXCEEDS_LOW: normalizedPosition 1.483283; gap_low -0.271111; gap_high 0.088333; flags none.
+- r03, V2-V4, EXCEEDS_LOW: normalizedPosition -2.382979; gap_low -0.062222; gap_high 0.088333; flags BOUNDARY_UNCERTAIN_LOW.
+- r04, V2-V4, COLLAPSED_HIGH: normalizedPosition 1.360577; gap_low 0.078611; gap_high -0.020833; flags BOUNDARY_UNCERTAIN_LOW and BOUNDARY_UNCERTAIN_HIGH.
+
+**Romanian /ă/ v0.2**
+
+- r01, V2-V5, EXCEEDS_LOW: normalizedPosition -0.288566; gap_low -0.088333; gap_high 0.394444; flags none.
+- r02, V2-V5, INTERMEDIATE: normalizedPosition 0.107258; gap_low 0.036944; gap_high 0.307500; flags NEAR_COLLAPSE_LOW and BOUNDARY_UNCERTAIN_LOW.
+- r03, V3-V4, EXCEEDS_LOW: normalizedPosition 1.483283; gap_low -0.271111; gap_high 0.088333; flags none.
+- r04, V3-V4, EXCEEDS_LOW: normalizedPosition 0.960256; gap_low -0.208056; gap_high -0.008611; flags BOUNDARY_UNCERTAIN_HIGH.
+
+**Portuguese /â/ v0.2**
+
+- r01, V1-V5, INTERMEDIATE: normalizedPosition 0.624464; gap_low 0.161667; gap_high 0.097222; flags none.
+- r02, V1-V5, INTERMEDIATE: normalizedPosition 0.856083; gap_low 0.320556; gap_high 0.053889; flags none.
+- r03, V1-V4, COLLAPSED_HIGH: normalizedPosition 1.265217; gap_low 0.161667; gap_high -0.033889; flags BOUNDARY_UNCERTAIN_HIGH.
+- r04, V1-V4, COLLAPSED_HIGH: normalizedPosition 1.576503; gap_low 0.320556; gap_high -0.117222; flags none.
+
+**Portuguese /â/ corrected replication**
+
+- r01, V1-V5, INTERMEDIATE: normalizedPosition 0.753676; gap_low 0.284722; gap_high 0.093056; flags none.
+- r02, V1-V5, INTERMEDIATE: normalizedPosition 0.875000; gap_low 0.330556; gap_high 0.047222; flags NEAR_COLLAPSE_HIGH and BOUNDARY_UNCERTAIN_HIGH.
+- r03, V1-V4, COLLAPSED_HIGH: normalizedPosition 1.154279; gap_low 0.284722; gap_high -0.038056; flags BOUNDARY_UNCERTAIN_HIGH.
+- r04, V1-V4, COLLAPSED_HIGH: normalizedPosition 1.599462; gap_low 0.330556; gap_high -0.123889; flags none.
 ## 6. Support cases
 
 ### 6.1 French `/ø~œ/`
