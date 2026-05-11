@@ -18,7 +18,11 @@ Cohort 02 therefore provides a disciplined classification layer: support, edge-s
 
 Keywords: ZË-RO; Seven-Primal-Vowel; vowel bracket testing; phonology; reproducibility; evaluation archive; Norwegian; Danish; French; Portuguese; Turkish; Romanian
 
-Publication status: not uploaded to Zenodo; not submitted to LingBuzz; no README public link; no registry migration.
+Publication status: Zenodo DOI reserved for the evidence archive; not submitted to LingBuzz; no README public link; no registry migration.
+
+Evidence archive DOI: https://doi.org/10.5281/zenodo.20116021
+
+All-versions DOI: https://doi.org/10.5281/zenodo.20116020
 
 ## 1. Introduction
 
@@ -602,9 +606,17 @@ Blocked public claims:
 
 ## 12. Reproducibility and archive
 
-A local archive candidate is built after final PDF generation:
+The Cohort 02 evidence archive is prepared for Zenodo publication as:
 
 `zero-cohort-02-six-language-bracket-evidence-v0.1.zip`
+
+Evidence archive DOI:
+
+`https://doi.org/10.5281/zenodo.20116021`
+
+All-versions DOI:
+
+`https://doi.org/10.5281/zenodo.20116020`
 
 The final top-level archive SHA256 is intentionally not embedded in this paper body because the archive contains the paper PDF. The final archive hash must be recorded after PDF generation in the archive metadata, Zenodo record, and repo-tracked archive-build result.
 
@@ -631,11 +643,13 @@ The archive also includes:
 - file-level checksums;
 - reproduction notes.
 
-The archive has not been uploaded to Zenodo.
+The Zenodo record DOI is `https://doi.org/10.5281/zenodo.20116021`.
+
+The Zenodo all-versions DOI is `https://doi.org/10.5281/zenodo.20116020`.
 
 The paper has not been submitted to LingBuzz.
 
-The project README has not been updated with a Cohort 02 public chain.
+The project README has not yet been updated with a Cohort 02 public chain.
 
 ---
 
@@ -691,7 +705,7 @@ Before any public release:
 2. generate the final PDF;
 3. rebuild the archive candidate including the PDF;
 4. decide whether the archive candidate should be uploaded to Zenodo;
-5. if uploaded, record DOI and update archive metadata;
+5. record DOI-linked archive build result in the repo after final archive rebuild;
 6. prepare LingBuzz submission text only after DOI exists;
 7. update README only after both archive and paper links exist;
 8. do not migrate registry labels from Cohort 02 alone.
