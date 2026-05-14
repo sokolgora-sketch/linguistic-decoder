@@ -5,6 +5,7 @@ export interface UICandidateRow {
   language: string;
   form: string;
   status?: string | null;
+  sourceKind?: string | null;
   vowelPath?: string | null;
   functionalStatement?: string | null;
   deepRootHeartGateStatus?: string | null;
@@ -54,6 +55,7 @@ export function buildCandidateRowsFromVM(vm: TelemetryViewModel): UICandidateRow
     language: pomStr(c.language) ?? "Unknown",
     form: pomStr(c.form) ?? "—",
     status: null, // do not invent; only show when engine emits later
+    sourceKind: c.sourceKind ? pomStr(c.sourceKind) : null, // v0.3: provenance surfaced; guard undefined for partial/mock VMs
     vowelPath: pomVowelPath(c.vowelPath),
     functionalStatement: pomStr(c.functionalStatement),
       deepRootHeartGateStatus: pomGateStatus((c as any).deepRootHeartGate),

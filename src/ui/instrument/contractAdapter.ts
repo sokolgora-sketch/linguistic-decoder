@@ -618,6 +618,12 @@ function buildSpectrumSection(m: PresentOrMissing<Vowel[]>): PresentOrMissing<Sp
       const form = asString(rec["form"]);
       const id = asString(rec["id"]) ?? stableCandidateId(i, lang, form);
 
+      // v0.3 honest-provenance: lift candidateRecord.source.kind into the VM.
+      // Adapter is the designated raw->VM boundary, so the lift happens here.
+      const candRecord = isRecord(rec["candidateRecord"]) ? rec["candidateRecord"] : null;
+      const candSource = candRecord && isRecord(candRecord["source"]) ? candRecord["source"] : null;
+      const candSourceKind = candSource ? asString(candSource["kind"]) : null;
+
 // EvidenceRefs should be stable and filesystem-safe (no ":" etc.)
 const evidenceId = String(id).toLowerCase().replace(/[^a-z0-9_]/g, "_");
 
@@ -647,6 +653,7 @@ const evidenceId = String(id).toLowerCase().replace(/[^a-z0-9_]/g, "_");
         id,
         language: lang ? present(lang) : missing("not_emitted"),
         form: form ? present(form) : missing("not_emitted"),
+        sourceKind: candSourceKind ? present(candSourceKind) : missing("not_emitted"),
         functionalStatement: functionalStatement ? present(functionalStatement) : missing("not_emitted"),
         vowelPath: candVowelPath ? present(candVowelPath) : missing("not_emitted"),
 

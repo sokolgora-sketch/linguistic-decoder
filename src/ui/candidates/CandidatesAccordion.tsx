@@ -47,6 +47,14 @@ export function CandidatesAccordion({ rows }: { rows: UICandidateRow[] }) {
                   <span className="rounded-md border px-2 py-0.5 text-xs">
                     {c.language}
                   </span>
+                  {c.sourceKind ? (
+                    <span
+                      className="rounded-md border px-2 py-0.5 text-xs font-mono opacity-70"
+                      title="Provenance: how this candidate entered the engine. SEED = entered by the researcher; not a discovered or proven result."
+                    >
+                      {c.sourceKind}
+                    </span>
+                  ) : null}
                   {c.status ? (
                     <span className="rounded-md border px-2 py-0.5 text-xs opacity-80">
                       {c.status}
