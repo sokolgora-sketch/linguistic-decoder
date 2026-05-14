@@ -11,7 +11,7 @@ Make RootMap visible in the Scientific Instrument UI as a VM-driven readout (no 
   - PRESENT when RootMap exists
   - NONE / not_emitted when RootMap is absent
   - MALFORMED when RootMap is present but invalid
-- Displays tokens, supported keys/explainers, composed meaning, and map/spans debug (when emitted).
+- Displays tokens, supported keys/explainers, constructed reading (hypothesis), and map/spans debug (when emitted).
 
 ### Telemetry VM
 - RootMap VM adapter v0.1 is defensive (never throws).

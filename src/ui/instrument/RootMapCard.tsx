@@ -218,7 +218,9 @@ export function RootMapCard(props: Props) {
         </div>
 
         <div>
-          <div className="text-[11px] uppercase tracking-wide text-neutral-400">Composed meaning</div>
+          <div className="text-[11px] uppercase tracking-wide text-neutral-400">
+            Constructed reading (hypothesis)
+          </div>
           <div className="mt-1 text-sm text-neutral-200">{safeText(v?.composedMeaning)}</div>
         </div>
 
