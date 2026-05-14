@@ -622,7 +622,7 @@ function buildSpectrumSection(m: PresentOrMissing<Vowel[]>): PresentOrMissing<Sp
       // Adapter is the designated raw->VM boundary, so the lift happens here.
       const candRecord = isRecord(rec["candidateRecord"]) ? rec["candidateRecord"] : null;
       const candSource = candRecord && isRecord(candRecord["source"]) ? candRecord["source"] : null;
-      const candSourceKind = candSource ? asString(candSource["kind"]) : null;
+      const candSourceKind = asString(rec["sourceKind"]) ?? (candSource ? asString(candSource["kind"]) : null);
 
 // EvidenceRefs should be stable and filesystem-safe (no ":" etc.)
 const evidenceId = String(id).toLowerCase().replace(/[^a-z0-9_]/g, "_");
@@ -880,4 +880,3 @@ function pomStringListFromEvidenceField(
 
   return present(mapped);
 }
-

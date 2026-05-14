@@ -68,6 +68,7 @@ export interface CandidateUI {
   status?: "pass" | "fail" | "unknown";
   confidenceTag?: string;
   fitTag?: string;
+  sourceKind?: string;
 }
 
 export interface AnalyzeWordResultUI {

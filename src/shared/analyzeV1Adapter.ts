@@ -46,6 +46,18 @@ function pickCandidateVowelPath(rawCandidate: Raw): string | undefined {
   return undefined;
 }
 
+function pickCandidateSourceKind(rawCandidate: Raw): string | undefined {
+  const direct = typeof rawCandidate?.sourceKind === "string" ? rawCandidate.sourceKind.trim() : "";
+  if (direct) return direct;
+
+  const nested =
+    typeof rawCandidate?.candidateRecord?.source?.kind === "string"
+      ? rawCandidate.candidateRecord.source.kind.trim()
+      : "";
+
+  return nested || undefined;
+}
+
 function pickPrimaryPath(raw: Raw, bestCandidate: Raw | null): PrimaryPathSummary | null {
   // Prefer best candidate path
   const bestPath = bestCandidate ? pickCandidateVowelPath(bestCandidate) : undefined;
@@ -94,6 +106,7 @@ function adaptCandidate(rawCandidate: Raw): CandidateUI {
 
   const confidenceTag = typeof rawCandidate?.confidenceTag === "string" ? rawCandidate.confidenceTag : undefined;
   const fitTag = typeof rawCandidate?.fitTag === "string" ? rawCandidate.fitTag : undefined;
+  const sourceKind = pickCandidateSourceKind(rawCandidate);
 
   return {
     id: String(rawCandidate?.id ?? `${language}-${form}`),
@@ -105,6 +118,7 @@ function adaptCandidate(rawCandidate: Raw): CandidateUI {
     status,
     confidenceTag,
     fitTag,
+    sourceKind,
   };
 }
 

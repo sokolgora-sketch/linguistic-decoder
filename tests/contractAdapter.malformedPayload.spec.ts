@@ -93,6 +93,19 @@ describe("contractAdapter: malformed payload never throws (v0.1.1)", () => {
     expect(vmOk.candidates[0].form.kind).toBe("present");
   });
 
+  test("candidate sourceKind direct field is lifted into VM", () => {
+    const vm = adaptAnalysisToTelemetryVM({
+      word: "study",
+      candidates: [{ language: "Latin", form: "studium", sourceKind: "SEED" }],
+    });
+
+    expect(vm.candidates).toHaveLength(1);
+    expect(vm.candidates[0].sourceKind.kind).toBe("present");
+    if (vm.candidates[0].sourceKind.kind === "present") {
+      expect(vm.candidates[0].sourceKind.value).toBe("SEED");
+    }
+  });
+
   test("ops/notes/signals counts: present when arrays emitted under evidence", () => {
     const vm = adaptAnalysisToTelemetryVM({
       word: "x",
