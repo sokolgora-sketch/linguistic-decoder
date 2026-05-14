@@ -146,6 +146,11 @@ export interface CandidateRowVM {
   language: PresentOrMissing<string>;
   form: PresentOrMissing<string>;
 
+  // v0.3 honest-provenance: SEED | LLM_PROPOSED | DATASET | USER_ADDED, etc.
+  // Surfaced from candidateRecord.source.kind. Blueprint section 0: "no single
+  // winner" — provenance must be visible, not implied.
+  sourceKind: PresentOrMissing<string>;
+
   functionalStatement: PresentOrMissing<string>;
   vowelPath: PresentOrMissing<Vowel[]>;
   deepRootHeartGate: PresentOrMissing<DeepRootHeartGateV01>;

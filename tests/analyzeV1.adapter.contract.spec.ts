@@ -59,4 +59,28 @@ describe("analyze-v1 adapter — UI contract invariants", () => {
     const ui = adaptAnalyzeV1ToUI(raw as any);
     expect(ui.candidates[0].vowelPath).toBe("U-I");
   });
+
+  it("preserves candidate source kind from candidateRecord", () => {
+    const raw = {
+      word: "study",
+      sanitized: "study",
+      engineVersion: "0.2.0-symbolic",
+      candidates: [
+        {
+          language: "Latin",
+          form: "studium",
+          candidateRecord: {
+            source: {
+              kind: "SEED",
+              ref: "canonCandidates.ts",
+              version: "canon.v0.1",
+            },
+          },
+        },
+      ],
+    };
+
+    const ui = adaptAnalyzeV1ToUI(raw as any);
+    expect(ui.candidates[0].sourceKind).toBe("SEED");
+  });
 });

@@ -46,6 +46,10 @@ exports[`ui telemetry vm contract v0.1.1 (candidates evidence lists) adapts cand
         "kind": "missing",
         "missing": "not_emitted",
       },
+      "sourceKind": {
+        "kind": "missing",
+        "missing": "not_emitted",
+      },
       "vowelPath": {
         "kind": "present",
         "value": [
@@ -94,6 +98,10 @@ exports[`ui telemetry vm contract v0.1.1 (candidates evidence lists) adapts cand
         "missing": "not_emitted",
       },
       "signals": {
+        "kind": "missing",
+        "missing": "not_emitted",
+      },
+      "sourceKind": {
         "kind": "missing",
         "missing": "not_emitted",
       },

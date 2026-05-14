@@ -11,6 +11,7 @@ describe("CandidatesAccordion: DeepRoot–Heart gate renders from VM (no raw inf
           id: "c1",
           language: { kind: "present", value: "en" },
           form: { kind: "present", value: "study" },
+          sourceKind: { kind: "present", value: "SEED" },
           functionalStatement: { kind: "present", value: "add + know" },
           vowelPath: { kind: "present", value: ["U", "I"] },
           deepRootHeartGate: { kind: "present", value: { status: "aligned", reasonCodes: [], evidenceRefs: [] } },
@@ -45,6 +46,7 @@ describe("CandidatesAccordion: DeepRoot–Heart gate renders from VM (no raw inf
     expect(screen.getAllByText(/Gate:/i).length).toBeGreaterThan(0);
     expect(screen.getByText(/Gate:\s*aligned/i)).toBeInTheDocument();
     expect(screen.getByText(/Gate:\s*misaligned/i)).toBeInTheDocument();
+    expect(screen.getByText("SEED")).toBeInTheDocument();
     expect(screen.getByText(/TERMINAL_VOWEL_CONFLICT/i)).toBeInTheDocument();
   });
 });
