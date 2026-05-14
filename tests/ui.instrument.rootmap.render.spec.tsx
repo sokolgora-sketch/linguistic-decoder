@@ -47,6 +47,9 @@ describe("RootMapCard: evidence/ops rendering (v0.1.4)", () => {
 
     render(<RootMapCard rootMap={rootMap} word="study" normalizedWord="study" />);
 
+    expect(screen.getByText("Constructed reading (hypothesis)")).toBeInTheDocument();
+    expect(screen.queryByText("Composed meaning")).toBeNull();
+
     // ops chip should render
     expect(screen.getByText("s_to_sh")).toBeInTheDocument();
 
