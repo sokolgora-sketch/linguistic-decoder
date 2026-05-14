@@ -33,6 +33,7 @@
   - **Reference:** `lingbuzz/009986`
   - **Repository paper:** [Markdown](docs/evals/cohort-02-paper-preprint-v0.6.md)
   - **Evidence archive:** [Zenodo DOI 10.5281/zenodo.20116021](https://doi.org/10.5281/zenodo.20116021)
+  - **Cross-model supplement:** [Zenodo DOI 10.5281/zenodo.20174451](https://doi.org/10.5281/zenodo.20174451)
   - **Publication record:** [Cohort 02 LingBuzz publication](docs/evals/cohort-02-lingbuzz-publication-v0.1.md)
 
 This repository contains the implementation, datasets, and reproducibility infrastructure described in those releases.
@@ -200,6 +201,9 @@ GNU Affero General Public License v3.0 (AGPL-3.0). See `LICENSE`.
 - Cohort 02 all-versions archive DOI: https://doi.org/10.5281/zenodo.20116020
 - Cohort 02 LingBuzz publication record: docs/evals/cohort-02-lingbuzz-publication-v0.1.md
 - Cohort 02 Zenodo publication record: docs/evals/cohort-02-zenodo-publication-v0.1.md
+- Cohort 02 cross-model supplement archive — Zenodo DOI: https://doi.org/10.5281/zenodo.20174451
+- Cohort 02 cross-model supplement all-versions DOI: https://doi.org/10.5281/zenodo.20174450
+- Cohort 02 cross-model supplement Zenodo publication record: docs/evals/cohort-02-cross-model-supplement-zenodo-publication-v0.1.md
 
 ## Research Controls
 - Corpus70 tagger-sensitivity control (Gemini-blind vs Claude-blind):
