@@ -13,7 +13,7 @@
  */
 
 import React from "react";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 
 /**
  * TODO(you): point this import at the telemetry UI component that renders
@@ -96,9 +96,17 @@ describe("ui guardrail: InstrumentPanel is a scientific instrument (v0.1)", () =
     expect(screen.getByText("What this tool does not do")).toBeInTheDocument();
     expect(screen.getByText("Shows deterministic engine output for one word.")).toBeInTheDocument();
     expect(screen.getByText("Prove a historical origin.")).toBeInTheDocument();
-    expect(screen.getByText("Evidence trace")).toBeInTheDocument();
-    expect(screen.getByText("candidate source kinds")).toBeInTheDocument();
-    expect(screen.getByText("RootMap hypothesis")).toBeInTheDocument();
+    expect(screen.getAllByText("Evidence trace").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("candidate source kinds").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("RootMap hypothesis").length).toBeGreaterThan(0);
+    expect(screen.getByTestId("open-instrument-shell")).toBeInTheDocument();
+    expect(screen.getByText("ZË-RO Open Instrument")).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "Overview" })).toHaveAttribute("aria-selected", "true");
+
+    const lightModeButton = screen.getByRole("button", { name: /light mode/i });
+    expect(lightModeButton).toHaveAttribute("aria-pressed", "true");
+    fireEvent.click(lightModeButton);
+    expect(screen.getByRole("button", { name: /dark mode/i })).toHaveAttribute("aria-pressed", "false");
 
     const evidenceTraceIndex = text.indexOf("evidence trace");
     const toolBoundariesIndex = text.indexOf("tool boundaries");
