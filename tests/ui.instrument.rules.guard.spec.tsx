@@ -90,5 +90,11 @@ describe("ui guardrail: InstrumentPanel is a scientific instrument (v0.1)", () =
     // A minimal positive assertion: panel exists and renders something.
     // Update the selector to something stable if you have a heading/testid.
     expect(document.body.textContent).toBeTruthy();
+
+    expect(screen.getByText("Tool boundaries")).toBeInTheDocument();
+    expect(screen.getByText("What this tool does")).toBeInTheDocument();
+    expect(screen.getByText("What this tool does not do")).toBeInTheDocument();
+    expect(screen.getByText("Shows deterministic engine output for one word.")).toBeInTheDocument();
+    expect(screen.getByText("Prove a historical origin.")).toBeInTheDocument();
   });
 });
