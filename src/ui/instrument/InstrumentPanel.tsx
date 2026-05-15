@@ -18,6 +18,7 @@ import { CountsRatiosCard } from './sections/CountsRatiosCard';
 import { RawJsonCard } from './sections/RawJsonCard';
 import { EvidencePackageCard } from './sections/EvidencePackageCard';
 import { OracleProposeWithEngineOracleCardV01 } from "./sections/OracleProposeWithEngineOracleCard.v0.1";
+import { EvidenceTraceCard } from "./sections/EvidenceTraceCard";
 import { ToolBoundaryCard } from "./sections/ToolBoundaryCard";
 import { WorldLanguageTreeCard } from './sections/WorldLanguageTreeCard';
 import { buildRootLightMapV01 } from '@/shared/rootLightMap.v0.1';
@@ -174,6 +175,12 @@ export function InstrumentPanel(props: Props) {
               onCopyFullJson={handleCopyFullJson}
             />
             <ToolBoundaryCard />
+            <EvidenceTraceCard
+              readout={vm.readout}
+              ledgerModel={ledgerModel}
+              candidateRows={candidateRows}
+              rootMap={vm.rootMap}
+            />
             <div className="mt-3">
               <MaskCarrierCard word={String(props.wordForMask ?? vm.readout?.word ?? "").trim()} ipa={props.carrierIpa} />
             </div>
