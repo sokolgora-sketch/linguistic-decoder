@@ -99,5 +99,15 @@ describe("ui guardrail: InstrumentPanel is a scientific instrument (v0.1)", () =
     expect(screen.getByText("Evidence trace")).toBeInTheDocument();
     expect(screen.getByText("candidate source kinds")).toBeInTheDocument();
     expect(screen.getByText("RootMap hypothesis")).toBeInTheDocument();
+
+    const evidenceTraceIndex = text.indexOf("evidence trace");
+    const toolBoundariesIndex = text.indexOf("tool boundaries");
+    const evidencePackageIndex = text.indexOf("evidence package");
+    const maskCarrierIndex = text.indexOf("mask vs carrier");
+
+    expect(evidenceTraceIndex).toBeGreaterThanOrEqual(0);
+    expect(toolBoundariesIndex).toBeGreaterThan(evidenceTraceIndex);
+    expect(evidencePackageIndex).toBeGreaterThan(toolBoundariesIndex);
+    expect(maskCarrierIndex).toBeGreaterThan(evidencePackageIndex);
   });
 });

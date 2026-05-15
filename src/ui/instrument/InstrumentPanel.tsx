@@ -174,16 +174,13 @@ export function InstrumentPanel(props: Props) {
               onCopySummary={() => void copyText("Summary copied.", summaryLines.join("\n"))}
               onCopyFullJson={handleCopyFullJson}
             />
-            <ToolBoundaryCard />
             <EvidenceTraceCard
               readout={vm.readout}
               ledgerModel={ledgerModel}
               candidateRows={candidateRows}
               rootMap={vm.rootMap}
             />
-            <div className="mt-3">
-              <MaskCarrierCard word={String(props.wordForMask ?? vm.readout?.word ?? "").trim()} ipa={props.carrierIpa} />
-            </div>
+            <ToolBoundaryCard />
               {/* Minimal controls (copy evidence package) */}
               <EvidencePackageCard
                 onCopyEvidencePackage={() => {
@@ -191,6 +188,10 @@ export function InstrumentPanel(props: Props) {
                   void copyText("Evidence package copied.", toPrettyJson(pkg));
                 }}
               />
+
+              <div className="mt-3">
+                <MaskCarrierCard word={String(props.wordForMask ?? vm.readout?.word ?? "").trim()} ipa={props.carrierIpa} />
+              </div>
 
               <OracleProposeWithEngineOracleCardV01
                 word={String((vm as any)?.readout?.word ?? "").trim()}
