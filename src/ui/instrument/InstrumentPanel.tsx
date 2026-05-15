@@ -1,6 +1,8 @@
 'use client';
 
 import React from "react";
+import Image from "next/image";
+import { Moon, Sun } from "lucide-react";
 import { ResonancePanelV01 } from "./ResonancePanel.v0.1";
 import { VowelPathTimeline } from "./VowelPathTimeline";
 import { SevenPrinciplesSpectrumCard } from "./sections/SevenPrinciplesSpectrumCard";
@@ -29,7 +31,9 @@ import { buildCandidateRowsFromVM } from '../candidates/candidateModel';
 import { CandidatesAccordion } from '../candidates/CandidatesAccordion';
 import { DeepRootHeartGateSummaryCard } from "./DeepRootHeartGateSummaryCard";
 import { OriginClaimCard } from '@/components/OriginClaimCard';
+import { cn } from "@/lib/utils";
 import { safeText } from "./safeText";
+import { MT } from "@/ui/typography/marketingType.v0.1";
 
 type Props =
   | {
@@ -55,8 +59,130 @@ function fmt<T>(x: { kind: 'present'; value: T } | { kind: 'missing'; missing: s
   return x.kind === 'present' ? String(x.value) : 'not_emitted';
 }
 
+type InstrumentSectionKey = "overview" | "evidence" | "candidates" | "roots" | "advanced";
+
+const INSTRUMENT_SECTIONS: Array<{ id: InstrumentSectionKey; label: string }> = [
+  { id: "overview", label: "Overview" },
+  { id: "evidence", label: "Evidence" },
+  { id: "candidates", label: "Candidates" },
+  { id: "roots", label: "Roots / Meaning" },
+  { id: "advanced", label: "Advanced" },
+];
+
+function pomValue(x: any, fallback = "not emitted"): string {
+  if (!x || typeof x !== "object") return fallback;
+  if (x.kind === "present") return String(x.value);
+  return fallback;
+}
+
+function voicePathValue(x: any): string {
+  if (x?.kind === "present" && Array.isArray(x.value) && x.value.length) {
+    return x.value.join("-");
+  }
+  return "not emitted";
+}
+
+function ShellBadge({
+  children,
+  tone = "neutral",
+}: {
+  children: React.ReactNode;
+  tone?: "neutral" | "green" | "blue" | "amber";
+}) {
+  return (
+    <span
+      className={cn(
+        "inline-flex min-h-7 items-center rounded-full border px-2.5 py-1 font-mono text-[11px]",
+        tone === "green" && "border-[#2f5a3d] bg-[#101712] text-[#b7d8c1] dark:border-[#2f5a3d] dark:bg-[#101712] dark:text-[#b7d8c1]",
+        tone === "blue" && "border-[#355a7a] bg-[#111a24] text-[#cfe6ff] dark:border-[#355a7a] dark:bg-[#111a24] dark:text-[#cfe6ff]",
+        tone === "amber" && "border-[#5e4b22] bg-[#19140d] text-[#f0ddb0] dark:border-[#5e4b22] dark:bg-[#19140d] dark:text-[#f0ddb0]",
+        tone === "neutral" && "border-[#303030] bg-[#101010] text-[#d7dde7] dark:border-[#303030] dark:bg-[#101010] dark:text-[#d7dde7]"
+      )}
+    >
+      {children}
+    </span>
+  );
+}
+
+function ShellMetric({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-[8px] border border-[#303030] bg-[#101010] p-3 dark:border-[#303030] dark:bg-[#101010]">
+      <div className={`${MT.fieldLabel} mb-1 text-[11px] text-[#8ea4ba] dark:text-[#8ea4ba]`}>{label}</div>
+      <div className="break-words font-mono text-[13px] text-[#f5f7fb] dark:text-[#f5f7fb]">{value}</div>
+    </div>
+  );
+}
+
+function ShellSection({
+  title,
+  children,
+  subtitle,
+}: {
+  title: string;
+  children: React.ReactNode;
+  subtitle?: string;
+}) {
+  return (
+    <section className="rounded-[12px] border border-[#303030] bg-[#151515] shadow-[0_16px_40px_rgba(0,0,0,0.18)] dark:border-[#303030] dark:bg-[#151515]">
+      <div className="border-b border-[#262626] px-4 py-3 dark:border-[#262626]">
+        <h2 className={`${MT.sectionLabel} text-[#f5f7fb] dark:text-[#f5f7fb]`}>{title}</h2>
+        {subtitle ? <div className="mt-1 text-[12px] leading-5 text-[#9fb1bf] dark:text-[#9fb1bf]">{subtitle}</div> : null}
+      </div>
+      <div className="p-4">{children}</div>
+    </section>
+  );
+}
+
+function SectionTabs({
+  active,
+  onChange,
+}: {
+  active: InstrumentSectionKey;
+  onChange: (next: InstrumentSectionKey) => void;
+}) {
+  return (
+    <div className="flex gap-2 overflow-x-auto pb-1" role="tablist" aria-label="Instrument sections">
+      {INSTRUMENT_SECTIONS.map((section) => (
+        <button
+          key={section.id}
+          type="button"
+          role="tab"
+          aria-selected={active === section.id}
+          className={cn(
+            `${MT.actionSm} min-h-9 shrink-0 rounded-[8px] border px-3 transition-colors`,
+            active === section.id
+              ? "border-[#355a7a] bg-[#111a24] text-[#cfe6ff] dark:border-[#355a7a] dark:bg-[#111a24] dark:text-[#cfe6ff]"
+              : "border-[#303030] bg-[#151515] text-[#aeb7c5] hover:border-[#4d4d4d] hover:text-white dark:border-[#303030] dark:bg-[#151515] dark:text-[#aeb7c5] dark:hover:border-[#4d4d4d] dark:hover:text-white"
+          )}
+          onClick={() => onChange(section.id)}
+        >
+          {section.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function TabPanel({
+  id,
+  active,
+  children,
+}: {
+  id: InstrumentSectionKey;
+  active: InstrumentSectionKey;
+  children: React.ReactNode;
+}) {
+  return (
+    <div role="tabpanel" hidden={active !== id}>
+      {children}
+    </div>
+  );
+}
+
 export function InstrumentPanel(props: Props) {
   const { toast } = useToast();
+  const [activeSection, setActiveSection] = React.useState<InstrumentSectionKey>("overview");
+  const [isDarkMode, setIsDarkMode] = React.useState(true);
 
   const inputVm = "vm" in props ? props.vm : undefined;
   const inputPayload = "payload" in props ? props.payload : undefined;
@@ -152,8 +278,22 @@ export function InstrumentPanel(props: Props) {
     );
   }
 
+  const statusText = String(vm.readout?.status ?? "detected");
+  const modeText = pomValue(vm.readout?.mode);
+  const pathText = voicePathValue(vm.readout?.voicePath);
+  const candidateCountText = String(vm.readout?.counts?.candidates ?? 0);
+  const normalizedText = normalizedWord || pomValue(vm.readout?.normalizedWord);
+
   return (
-      <div className="space-y-3">
+      <div
+        className={cn(
+          "space-y-3 rounded-[14px] border p-3 shadow-[0_16px_40px_rgba(0,0,0,0.24)] transition-colors",
+          isDarkMode
+            ? "dark border-[#2f3742] bg-[#13171d] text-[#f5f7fb]"
+            : "border-[#d5d5d5] bg-[#f5f5f5] text-[#111111]"
+        )}
+        data-testid="open-instrument-shell"
+      >
         {props.debug ? (
           <div className="mb-4 rounded border border-emerald-500 bg-black p-3 text-xs text-emerald-400">
             <div>InstrumentPanel ACTIVE</div>
@@ -165,52 +305,156 @@ export function InstrumentPanel(props: Props) {
           </div>
         ) : null}
 
-        <div className="grid gap-3 lg:grid-cols-12">
-          {/* LEFT: operator controls + core readout */}
-          <div className="space-y-3 lg:col-span-5">
-            {/* Readout (Telemetry Core) */}
-            <ReadoutCard
-              readout={vm.readout}
-              onCopySummary={() => void copyText("Summary copied.", summaryLines.join("\n"))}
-              onCopyFullJson={handleCopyFullJson}
-            />
-            <EvidenceTraceCard
-              readout={vm.readout}
-              ledgerModel={ledgerModel}
-              candidateRows={candidateRows}
-              rootMap={vm.rootMap}
-            />
-            <ToolBoundaryCard />
-              {/* Minimal controls (copy evidence package) */}
-              <EvidencePackageCard
-                onCopyEvidencePackage={() => {
-                  const pkg = buildEvidencePackageFromVM(vm as any, { ledgerModel });
-                  void copyText("Evidence package copied.", toPrettyJson(pkg));
-                }}
-              />
-
-              <div className="mt-3">
-                <MaskCarrierCard word={String(props.wordForMask ?? vm.readout?.word ?? "").trim()} ipa={props.carrierIpa} />
+        <div className="rounded-[12px] border border-[#2c3540] bg-[#10161e] p-3 dark:border-[#2c3540] dark:bg-[#10161e]">
+          <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-3">
+                <Image
+                  src="/zero_logo_hero_white.svg"
+                  alt="ZË-RO"
+                  width={140}
+                  height={35}
+                  className="h-8 w-auto"
+                  priority={false}
+                />
+                <div>
+                  <div className={`${MT.eyebrow} text-[10px] text-[#d7dde7] dark:text-[#d7dde7]`}>
+                    instrument · open
+                  </div>
+                  <h1 className={`${MT.heroTitle} !text-[17px] leading-none text-[#f5f7fb] dark:text-[#f5f7fb]`}>
+                    ZË-RO Open Instrument
+                  </h1>
+                  <div className="mt-1 text-[12px] leading-5 text-[#aeb7c5] dark:text-[#aeb7c5]">Deterministic readout for one word</div>
+                </div>
               </div>
 
-              <OracleProposeWithEngineOracleCardV01
-                word={String((vm as any)?.readout?.word ?? "").trim()}
-                mode={vm.readout.mode && vm.readout.mode.kind === "present" && vm.readout.mode.value === "open" ? "open" : "strict"}
-                onCopy={copyText}
-              />
-</div>
+              <div className="mt-4 grid gap-3 md:grid-cols-4">
+                <ShellMetric label="word" value={`word=${String(vm.readout.word ?? "not emitted")}`} />
+                <ShellMetric label="normalized" value={`norm=${normalizedText}`} />
+                <ShellMetric label="voice path" value={`path=${pathText}`} />
+                <ShellMetric label="candidates" value={`rows=${candidateCountText}`} />
+              </div>
+            </div>
 
-            {/* RIGHT: telemetry stream (contract order) */}
-            <div className="space-y-3 lg:col-span-7">
-              <CountsRatiosCard readout={vm.readout} engineVersion={engineVersion} />
+            <div className="flex shrink-0 flex-wrap items-center gap-2">
+              <ShellBadge tone="green">status={statusText}</ShellBadge>
+              <ShellBadge tone="blue">mode={modeText}</ShellBadge>
+              {engineVersion ? <ShellBadge tone="neutral">engine={engineVersion}</ShellBadge> : null}
+              <button
+                type="button"
+                aria-pressed={isDarkMode}
+                className={`${MT.actionSm} inline-flex min-h-9 items-center gap-2 rounded-[8px] border border-[#5e4b22] bg-[#19140d] px-3 text-[#f0ddb0] transition hover:border-[#8a6a2a] hover:text-white dark:border-[#5e4b22] dark:bg-[#19140d] dark:text-[#f0ddb0] dark:hover:border-[#8a6a2a] dark:hover:text-white`}
+                onClick={() => setIsDarkMode((next) => !next)}
+              >
+                {isDarkMode ? <Sun className="h-4 w-4" aria-hidden="true" /> : <Moon className="h-4 w-4" aria-hidden="true" />}
+                {isDarkMode ? "Light mode" : "Dark mode"}
+              </button>
+            </div>
+          </div>
+        </div>
 
-              {ledgerModel ? <EvidenceLedgerCard model={ledgerModel} engineVersion={engineVersion} /> : null}
+        <SectionTabs active={activeSection} onChange={setActiveSection} />
 
+        <div className="space-y-4">
+          <TabPanel id="overview" active={activeSection}>
+            <div className="grid gap-4 xl:grid-cols-12">
+              <div className="space-y-4 xl:col-span-7">
+                <ReadoutCard
+                  readout={vm.readout}
+                  onCopySummary={() => void copyText("Summary copied.", summaryLines.join("\n"))}
+                  onCopyFullJson={handleCopyFullJson}
+                />
+                <ShellSection title="Constructed reading (hypothesis)" subtitle="Inspection summary; not an origin claim.">
+                  <MeaningPanel vm={vm} />
+                </ShellSection>
+              </div>
+              <div className="space-y-4 xl:col-span-5">
+                <EvidenceTraceCard
+                  readout={vm.readout}
+                  ledgerModel={ledgerModel}
+                  candidateRows={candidateRows}
+                  rootMap={vm.rootMap}
+                />
+                <ToolBoundaryCard />
+              </div>
+            </div>
+          </TabPanel>
+
+          <TabPanel id="evidence" active={activeSection}>
+            <div className="grid gap-4 xl:grid-cols-12">
+              <div className="space-y-4 xl:col-span-5">
+                <EvidenceTraceCard
+                  readout={vm.readout}
+                  ledgerModel={ledgerModel}
+                  candidateRows={candidateRows}
+                  rootMap={vm.rootMap}
+                />
+                <EvidencePackageCard
+                  onCopyEvidencePackage={() => {
+                    const pkg = buildEvidencePackageFromVM(vm as any, { ledgerModel });
+                    void copyText("Evidence package copied.", toPrettyJson(pkg));
+                  }}
+                />
+              </div>
+              <div className="space-y-4 xl:col-span-7">
+                {ledgerModel ? <EvidenceLedgerCard model={ledgerModel} engineVersion={engineVersion} /> : null}
+                <CountsRatiosCard readout={vm.readout} engineVersion={engineVersion} />
+              </div>
+            </div>
+          </TabPanel>
+
+          <TabPanel id="candidates" active={activeSection}>
+            <div className="space-y-4">
               {candidateRows ? <DeepRootHeartGateSummaryCard rows={candidateRows as any} /> : null}
               {candidateRows ? <CandidatesAccordion rows={candidateRows} /> : null}
+            </div>
+          </TabPanel>
 
+          <TabPanel id="roots" active={activeSection}>
+            <div className="grid gap-4 xl:grid-cols-12">
+              <div className="space-y-4 xl:col-span-5">
+                <VowelPathTimeline
+                  detected={vm.readout.voicePath}
+                  surface={vm.readout.voicePathSurface}
+                  functional={vm.readout.voicePathFunctional}
+                  delta={vm.readout.voicePathDelta}
+                />
+                {(() => {
+                  const spectrum =
+                    (vm as any)?.sevenPrinciplesSpectrum ??
+                    (vm as any)?.readout?.sevenPrinciplesSpectrum ??
+                    null;
+                  return spectrum ? <SevenPrinciplesSpectrumCard spectrum={spectrum} /> : null;
+                })()}
+                <ResonancePanelV01 resonanceProfileV1={vm.resonanceProfileV1} />
+              </div>
+              <div className="space-y-4 xl:col-span-7">
+                <WorldLanguageTreeCard lightMap={lightMap} />
+                <SoundRootsCard
+                  soundRoots={vm.soundRoots ?? ({ kind: "missing", missing: "not_emitted", note: "soundRoots" } as any)}
+                  word={String((vm.readout as any)?.word ?? (vm.readout as any)?.inputWord ?? "")}
+                  normalizedWord={normalizedWord}
+                />
+                <RootMapCard
+                  rootMap={vm.rootMap ?? ({ kind: "missing", missing: "not_emitted", note: "rootMap" } as any)}
+                  word={String((vm.readout as any)?.word ?? (vm.readout as any)?.inputWord ?? "")}
+                  normalizedWord={normalizedWord}
+                />
+              </div>
+            </div>
+          </TabPanel>
 
-                {/* OriginClaim Gates (status / switch posture) */}
+          <TabPanel id="advanced" active={activeSection}>
+            <div className="grid gap-4 xl:grid-cols-12">
+              <div className="space-y-4 xl:col-span-5">
+                <MaskCarrierCard word={String(props.wordForMask ?? vm.readout?.word ?? "").trim()} ipa={props.carrierIpa} />
+                <OracleProposeWithEngineOracleCardV01
+                  word={String((vm as any)?.readout?.word ?? "").trim()}
+                  mode={vm.readout.mode && vm.readout.mode.kind === "present" && vm.readout.mode.value === "open" ? "open" : "strict"}
+                  onCopy={copyText}
+                />
+              </div>
+              <div className="space-y-4 xl:col-span-7">
                 {vm.originClaimGates ? (
                   <div className="rounded-xl border p-3">
                     <div className="text-sm font-semibold">OriginClaim Gates</div>
@@ -229,52 +473,17 @@ export function InstrumentPanel(props: Props) {
                     </pre>
                   </div>
                 ) : null}
-              {/* MATH / LENSES (optional telemetry) */}
-              {(() => {
-                const spectrum =
-                  (vm as any)?.sevenPrinciplesSpectrum ??
-                  (vm as any)?.readout?.sevenPrinciplesSpectrum ??
-                  null;
-                return spectrum ? <SevenPrinciplesSpectrumCard spectrum={spectrum} /> : null;
-              })()}
-
-                <VowelPathTimeline
-                detected={vm.readout.voicePath}
-                surface={vm.readout.voicePathSurface}
-                functional={vm.readout.voicePathFunctional}
-                delta={vm.readout.voicePathDelta}
-              />
-
-              <ResonancePanelV01 resonanceProfileV1={vm.resonanceProfileV1} />
-
-              
-                <WorldLanguageTreeCard lightMap={lightMap} />
-
-<SoundRootsCard
-                  soundRoots={vm.soundRoots ?? ({ kind: "missing", missing: "not_emitted", note: "soundRoots" } as any)}
-                  word={String((vm.readout as any)?.word ?? (vm.readout as any)?.inputWord ?? "")}
-                  normalizedWord={normalizedWord}
+                <OriginClaimCard
+                  originClaim={vm.originClaim?.kind === "present" ? (vm.originClaim as any).value : null}
                 />
-
-                <RootMapCard
-                rootMap={vm.rootMap ?? ({ kind: "missing", missing: "not_emitted", note: "rootMap" } as any)}
-                word={String((vm.readout as any)?.word ?? (vm.readout as any)?.inputWord ?? "")}
-                normalizedWord={normalizedWord}
-              />
-
-              <MeaningPanel vm={vm} />
-
-              {/* Origin Claim (computed, auditable) */}
-              <OriginClaimCard
-                originClaim={vm.originClaim?.kind === "present" ? (vm.originClaim as any).value : null}
-              />
-
-              <RawJsonCard
-                pretty={rawPretty}
-                onCopyFullJson={handleCopyFullJson}
-                engineVersion={engineVersion}
-              />
+                <RawJsonCard
+                  pretty={rawPretty}
+                  onCopyFullJson={handleCopyFullJson}
+                  engineVersion={engineVersion}
+                />
+              </div>
             </div>
+          </TabPanel>
         </div>
       </div>
     );
