@@ -96,5 +96,8 @@ describe("ui guardrail: InstrumentPanel is a scientific instrument (v0.1)", () =
     expect(screen.getByText("What this tool does not do")).toBeInTheDocument();
     expect(screen.getByText("Shows deterministic engine output for one word.")).toBeInTheDocument();
     expect(screen.getByText("Prove a historical origin.")).toBeInTheDocument();
+    expect(screen.getByText("Evidence trace")).toBeInTheDocument();
+    expect(screen.getByText("candidate source kinds")).toBeInTheDocument();
+    expect(screen.getByText("RootMap hypothesis")).toBeInTheDocument();
   });
 });
