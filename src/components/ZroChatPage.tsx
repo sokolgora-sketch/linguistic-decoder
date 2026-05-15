@@ -5,6 +5,7 @@ import ChatShell from '@/components/ChatShell';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { InstrumentPanel } from '@/ui/instrument/InstrumentPanel';
+import { MT } from '@/ui/typography/marketingType.v0.1';
 
 class UiErrorBoundary extends React.Component<
   { children: React.ReactNode; label?: string },
@@ -190,33 +191,53 @@ export default function ZroChatPage() {
     }
   }
 
+  const inputClassName =
+    "h-11 rounded-[8px] border-[#303030] bg-[#101010] font-mono text-[14px] text-[#f5f7fb] placeholder:text-[#777777] focus-visible:ring-[#355a7a] focus-visible:ring-offset-0 disabled:opacity-50";
+
   const composer = (
-  <div className="flex flex-col gap-2">
-    <div className="flex gap-2">
-      <Input
-        value={input}
-        onChange={e => setInput(e.target.value)}
-        onKeyDown={onKeyDown}
-        placeholder="gjuha"
-        aria-label="Word"
-        disabled={busy}
-      />
-      <Button type="button" onClick={onSubmit} disabled={busy} aria-busy={busy ? 'true' : 'false'}>
-        {busy ? 'Analyzing…' : 'Analyze'}
-      </Button>
+    <div className="rounded-[14px] border border-[#2f3742] bg-[#13171d] p-3 shadow-[0_16px_40px_rgba(0,0,0,0.24)]">
+      <div className="grid gap-3 xl:grid-cols-[minmax(0,1fr)_minmax(260px,0.42fr)_132px] xl:items-end">
+        <label className="block min-w-0">
+          <span className={`${MT.fieldLabel} mb-2 text-[11px] text-[#8ea4ba]`}>
+            Word
+          </span>
+          <Input
+            value={input}
+            onChange={e => setInput(e.target.value)}
+            onKeyDown={onKeyDown}
+            placeholder="gjuha"
+            aria-label="Word"
+            disabled={busy}
+            className={inputClassName}
+          />
+        </label>
+
+        <label className="block min-w-0">
+          <span className={`${MT.fieldLabel} mb-2 text-[11px] text-[#8ea4ba]`}>
+            IPA
+          </span>
+          <Input
+            value={ipa}
+            onChange={e => setIpa(e.target.value)}
+            onKeyDown={onKeyDown}
+            placeholder="optional e.g. /ˈfɑːðər/"
+            aria-label="IPA"
+            disabled={busy}
+            className={inputClassName}
+          />
+        </label>
+
+        <Button
+          type="button"
+          onClick={onSubmit}
+          disabled={busy}
+          aria-busy={busy ? 'true' : 'false'}
+          className={`${MT.actionSm} h-11 rounded-[8px] border border-[#355a7a] bg-[#111a24] px-4 text-[#cfe6ff] transition hover:border-[#4d7fa8] hover:bg-[#132031] hover:text-white disabled:opacity-50`}
+        >
+          {busy ? 'Analyzing…' : 'Analyze'}
+        </Button>
+      </div>
     </div>
-  
-    <div className="flex gap-2">
-  <Input
-    value={ipa}
-    onChange={e => setIpa(e.target.value)}
-    onKeyDown={onKeyDown}
-    placeholder="IPA (optional) e.g. /ˈfɑːðər/"
-    aria-label="IPA"
-    disabled={busy}
-  />
-</div>
-  </div>
   );
 
   const latestInstrumentPayload =
@@ -227,7 +248,7 @@ export default function ZroChatPage() {
       ?.instrumentPayload ?? null;
 
   return (
-    <ChatShell title="ZË-RO" subtitle="Seven-vowel word decoder." composer={composer} maxWidthClass="max-w-screen-2xl">
+    <ChatShell title="ZË-RO" subtitle="Deterministic word inspection" composer={composer} maxWidthClass="max-w-screen-2xl">
       <div className="space-y-4">
         {latestInstrumentPayload ? (
           <UiErrorBoundary label="InstrumentPanel">
