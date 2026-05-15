@@ -21,6 +21,17 @@ describe('Analyze keyboard interactions', () => {
     (global.fetch as jest.Mock).mockClear();
   });
 
+  it('renders the branded Open Instrument console frame', () => {
+    render(<ZroChatPage />);
+
+    expect(screen.getByAltText('ZË-RO')).toBeInTheDocument();
+    expect(screen.getByText('instrument · open')).toBeInTheDocument();
+    expect(screen.getByText('Deterministic word inspection')).toBeInTheDocument();
+    expect(screen.getByLabelText('Word')).toBeInTheDocument();
+    expect(screen.getByLabelText('IPA')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Analyze' })).toBeInTheDocument();
+  });
+
   it('triggers analysis with Enter key', async () => {
     render(<ZroChatPage />);
     const input = screen.getByLabelText('Word');
