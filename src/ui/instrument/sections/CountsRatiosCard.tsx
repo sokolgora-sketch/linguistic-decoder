@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 type KV = Record<string, unknown>;
 
@@ -73,15 +72,15 @@ function renderKV(obj: KV) {
   const entries = Object.entries(obj);
 
   if (!entries.length) {
-    return <div className="text-sm text-muted-foreground">Not available.</div>;
+    return <div className="text-sm text-slate-500">Not available.</div>;
   }
 
   return (
     <div className="grid gap-1">
       {entries.map(([k, v]) => (
         <div key={k} className="flex items-baseline justify-between gap-3">
-          <div className="text-sm text-muted-foreground">{k}</div>
-          <div className="text-sm font-mono">{renderValue(v)}</div>
+          <div className="text-sm text-slate-500">{k}</div>
+          <div className="text-sm font-mono text-slate-200">{renderValue(v)}</div>
         </div>
       ))}
     </div>
@@ -93,24 +92,24 @@ export function CountsRatiosCard(props: { readout: unknown; engineVersion?: stri
   const ratios = pickRatios(props.readout);
 
   return (
-    <Card>
-      <CardHeader className="py-3">
-        <CardTitle className="text-base">Counts / Ratios</CardTitle>
+    <section className="rounded-xl border border-slate-700/80 bg-[#10151c] p-4 shadow-[0_16px_48px_rgba(0,0,0,0.28)]">
+      <div>
+        <div className="text-sm font-semibold text-slate-100">Counts / Ratios</div>
         {props.engineVersion ? (
-          <div className="text-xs text-muted-foreground">engine: {props.engineVersion}</div>
+          <div className="mt-1 text-xs text-slate-500">engine: {props.engineVersion}</div>
         ) : null}
-      </CardHeader>
-      <CardContent className="grid gap-4">
+      </div>
+      <div className="mt-4 grid gap-4">
         <div>
-          <div className="mb-2 text-sm font-semibold">Counts</div>
-          {counts ? renderKV(counts) : <div className="text-sm text-muted-foreground">Not available.</div>}
+          <div className="mb-2 text-sm font-semibold text-slate-300">Counts</div>
+          {counts ? renderKV(counts) : <div className="text-sm text-slate-500">Not available.</div>}
         </div>
 
         <div>
-          <div className="mb-2 text-sm font-semibold">Ratios</div>
-          {ratios ? renderKV(ratios) : <div className="text-sm text-muted-foreground">Not available.</div>}
+          <div className="mb-2 text-sm font-semibold text-slate-300">Ratios</div>
+          {ratios ? renderKV(ratios) : <div className="text-sm text-slate-500">Not available.</div>}
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </section>
   );
 }

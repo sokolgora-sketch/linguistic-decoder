@@ -12,12 +12,12 @@ function renderPOM<T>(
   renderValue: (v: T) => React.ReactNode,
   fallbackLabel = "not_emitted"
 ) {
-  if (!pom) return <span className="text-muted-foreground">{fallbackLabel}</span>;
+  if (!pom) return <span className="text-slate-500">{fallbackLabel}</span>;
   if (pom.kind === "present") return renderValue(pom.value);
   return (
-    <span className="text-muted-foreground">
+    <span className="text-slate-500">
       {fallbackLabel}
-      {pom.note ? <span className="ml-2 opacity-70">({pom.note})</span> : null}
+      {pom.note ? <span className="ml-2 text-slate-600">({pom.note})</span> : null}
     </span>
   );
 }
@@ -28,7 +28,7 @@ function DeltaBadge({ label }: { label: "MATCH" | "DIVERGE" | "—" }) {
       ? "border-emerald-400/40 text-emerald-200"
       : label === "DIVERGE"
         ? "border-amber-400/40 text-amber-200"
-        : "border-muted-foreground/30 text-muted-foreground";
+        : "border-slate-700 text-slate-500";
 
   return (
     <span
@@ -54,7 +54,7 @@ export function VoicePathCompare({
       : "—";
 
   return (
-    <div className="mt-2 space-y-1 text-xs opacity-80">
+    <div className="mt-2 space-y-1 text-xs text-slate-400">
       <div>
         Voice path (surface):{" "}
         {renderPOM(surface, (arr) => <span className="font-mono">{fmt(arr)}</span>)}

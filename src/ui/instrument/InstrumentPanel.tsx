@@ -9,8 +9,6 @@ import { SevenPrinciplesSpectrumCard } from "./sections/SevenPrinciplesSpectrumC
 import { adaptAnalysisToTelemetryVM } from "@/ui/instrument/contractAdapter";
 import { RootMapCard } from "@/ui/instrument/RootMapCard";
 import { SoundRootsCard } from "@/ui/instrument/SoundRootsCard";
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { toPrettyJson } from "@/ui/instrument/prettyJson";
 import { buildEvidencePackageFromVM } from "@/ui/telemetry/buildEvidencePackageFromVM";
@@ -510,19 +508,19 @@ export function InstrumentPanel(props: Props) {
               </div>
               <div className="space-y-4 xl:col-span-7">
                 {vm.originClaimGates ? (
-                  <div className="rounded-xl border p-3">
-                    <div className="text-sm font-semibold">OriginClaim Gates</div>
-                    <div className="mt-1 text-sm">
+                  <div className="rounded-xl border border-slate-700/80 bg-[#10151c] p-4 shadow-[0_16px_48px_rgba(0,0,0,0.28)]">
+                    <div className="text-sm font-semibold text-slate-100">OriginClaim Gates</div>
+                    <div className="mt-1 text-sm text-slate-300">
                       Status:{" "}
                       <span className="font-mono">{vm.originClaimGates.active ? "ON" : "OFF"}</span>{" "}
-                      <span className="text-xs opacity-70">(dev flag: ?{vm.originClaimGates.flag}=1)</span>
+                      <span className="text-xs text-slate-500">(dev flag: ?{vm.originClaimGates.flag}=1)</span>
                     </div>
-                    <div className="mt-1 text-sm">
+                    <div className="mt-1 text-sm text-slate-300">
                       Candidates: <span className="font-mono">{vm.originClaimGates.candidateCount}</span>
                     </div>
 
-                    <div className="mt-2 text-xs opacity-70">Reason code counts</div>
-                    <pre className="mt-1 overflow-auto rounded-lg bg-black/5 p-2 text-xs">
+                    <div className="mt-2 text-xs text-slate-500">Reason code counts</div>
+                    <pre className="mt-1 overflow-auto rounded-lg border border-slate-800 bg-black/35 p-3 text-xs font-mono text-slate-200">
                       {JSON.stringify(vm.originClaimGates.reasonCounts, null, 2)}
                     </pre>
                   </div>
