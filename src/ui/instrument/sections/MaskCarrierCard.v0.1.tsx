@@ -32,12 +32,12 @@ export function MaskCarrierCard(props: { word: string; ipa?: string }) {
   const carrier = s.carrier?.voices?.length ? s.carrier.voices.join(" ") : "—";
 
   const status = !s.carrier
-    ? { text: "no IPA", cls: "text-neutral-500" }
+    ? { text: "no IPA", cls: "text-[#8ea4ba]" }
     : s.carrier.noCarrier
-      ? { text: "NO_CARRIER", cls: "text-neutral-600" }
+      ? { text: "NO_CARRIER", cls: "text-[#aeb7c5]" }
       : s.mismatch
-        ? { text: "MISMATCH", cls: "text-red-600" }
-        : { text: "MATCH", cls: "text-green-700" };
+        ? { text: "MISMATCH", cls: "text-[#ff9c9c]" }
+        : { text: "MATCH", cls: "text-[#b7d8c1]" };
 
   const flags = s.carrier ? joinFlags(s.carrier) : "";
   const trace = s.carrier ? traceString(s.carrier.traceTokens as any) : "";
@@ -45,47 +45,47 @@ export function MaskCarrierCard(props: { word: string; ipa?: string }) {
     !!s.carrier && !!trace && (!!s.mismatch || !!s.carrier.usedImplicit || !!s.carrier.usedSyllabic || !!s.carrier.noCarrier);
 
   return (
-    <div className="rounded-xl border p-3">
+    <div className="rounded-[12px] border border-[#2f3742] bg-[#10161e] p-4 text-[#f5f7fb]">
       <div className="flex items-center justify-between gap-3">
         <div className="font-semibold">Mask vs Carrier</div>
         <div className={`text-xs font-semibold ${status.cls}`}>{status.text}</div>
       </div>
 
       <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2">
-        <div className="rounded-lg bg-neutral-50 p-2">
-          <div className="text-xs text-neutral-600">Mask (orthography)</div>
-          <div className="mt-1 font-mono text-sm">{mask}</div>
-          <div className="mt-1 text-xs text-neutral-600">
+        <div className="rounded-[10px] border border-[#303a45] bg-[#0d1117] p-3">
+          <div className="text-xs text-[#8ea4ba]">Mask (orthography)</div>
+          <div className="mt-1 font-mono text-sm text-[#f5f7fb]">{mask}</div>
+          <div className="mt-1 text-xs text-[#aeb7c5]">
             mod7 total: <span className="font-mono">{s.mask.totalMod7}</span>
           </div>
           {s.mask.unmapped.length ? (
-            <div className="mt-1 text-xs text-neutral-600">
+            <div className="mt-1 text-xs text-[#aeb7c5]">
               unmapped: <span className="font-mono">{s.mask.unmapped.join(" ")}</span>
             </div>
           ) : null}
         </div>
 
-        <div className="rounded-lg bg-neutral-50 p-2">
-          <div className="text-xs text-neutral-600">Carrier (IPA)</div>
-          <div className="mt-1 font-mono text-sm">{carrier}</div>
-          <div className="mt-1 text-xs text-neutral-600">
+        <div className="rounded-[10px] border border-[#303a45] bg-[#0d1117] p-3">
+          <div className="text-xs text-[#8ea4ba]">Carrier (IPA)</div>
+          <div className="mt-1 font-mono text-sm text-[#f5f7fb]">{carrier}</div>
+          <div className="mt-1 text-xs text-[#aeb7c5]">
             mod7 total: <span className="font-mono">{s.carrier ? s.carrier.totalMod7 : "—"}</span>
           </div>
 
           {s.carrier && flags ? (
-            <div className="mt-1 text-xs text-neutral-600">
+            <div className="mt-1 text-xs text-[#aeb7c5]">
               flags: <span className="font-mono">{flags}</span>
             </div>
           ) : null}
 
           {s.carrier?.unmapped?.length ? (
-            <div className="mt-1 text-xs text-neutral-600">
+            <div className="mt-1 text-xs text-[#aeb7c5]">
               unmapped: <span className="font-mono">{s.carrier.unmapped.join(" ")}</span>
             </div>
           ) : null}
 
           {showTrace ? (
-            <div className="mt-1 text-xs text-neutral-600">
+            <div className="mt-1 text-xs text-[#aeb7c5]">
               trace: <span className="font-mono">{trace}</span>
             </div>
           ) : null}
@@ -93,7 +93,7 @@ export function MaskCarrierCard(props: { word: string; ipa?: string }) {
       </div>
 
       {s.carrier ? (
-        <div className="mt-2 text-xs text-neutral-600">
+        <div className="mt-2 text-xs text-[#aeb7c5]">
           distance: <span className="font-mono">{String(s.distance ?? 0)}</span>
         </div>
       ) : null}

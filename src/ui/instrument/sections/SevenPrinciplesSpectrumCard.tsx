@@ -59,7 +59,10 @@ function ChipRow(props: { label: string; values: string[]; fallback?: string }) 
   return (
     <div className="flex flex-wrap gap-2">
       {v.map((s, i) => (
-        <span key={i} className="inline-flex items-center rounded-md border bg-white/50 px-2 py-1 text-xs">
+        <span
+          key={i}
+          className="inline-flex items-center rounded-[8px] border border-[#303a45] bg-[#10161e] px-2 py-1 font-mono text-xs text-[#d7dde7]"
+        >
           {s}
         </span>
       ))}
@@ -88,14 +91,14 @@ function SectionCard(props: { label: string; data: unknown }) {
     vowels.length || colors.length || notes.length || roles.length || polarities.length || rings.length;
 
   return (
-    <div className="rounded-xl border bg-white/50 p-3">
+    <div className="rounded-[12px] border border-[#303a45] bg-[#0d1117] p-3 text-[#f5f7fb]">
       <div className="flex items-baseline justify-between gap-2">
-        <div className="text-sm font-semibold">{props.label}</div>
-        {state !== "present" ? <div className="text-xs opacity-70">{state}</div> : null}
+        <div className="text-sm font-semibold text-[#f5f7fb]">{props.label}</div>
+        {state !== "present" ? <div className="text-xs text-[#8ea4ba]">{state}</div> : null}
       </div>
 
       {!hasAny ? (
-        <div className="mt-2 text-xs opacity-70">—</div>
+        <div className="mt-2 text-xs text-[#8ea4ba]">—</div>
       ) : (
         <div className="mt-2 space-y-2">
           <ChipRow label="Vowels" values={vowels} />
@@ -108,17 +111,17 @@ function SectionCard(props: { label: string; data: unknown }) {
             {vowels.map((v, i) => (
               <span
                 key={i}
-                className="inline-flex items-center gap-2 rounded-md border bg-white/50 px-2 py-1 text-xs"
+                className="inline-flex items-center gap-2 rounded-[8px] border border-[#303a45] bg-[#10161e] px-2 py-1 text-xs text-[#d7dde7]"
               >
-                <span className="font-mono text-sm">{v}</span>
-                <span className="opacity-70">{colors[i] ?? "—"}</span>
-                <span className="opacity-70">{notes[i] ?? "—"}</span>
+                <span className="font-mono text-sm text-[#f5f7fb]">{v}</span>
+                <span className="text-[#8ea4ba]">{colors[i] ?? "—"}</span>
+                <span className="text-[#8ea4ba]">{notes[i] ?? "—"}</span>
               </span>
             ))}
           </div>
 
           {meta.length ? (
-            <div className="text-xs opacity-70">{meta.join(" · ")}</div>
+            <div className="text-xs text-[#8ea4ba]">{meta.join(" · ")}</div>
           ) : null}
         </div>
       )}
@@ -138,10 +141,10 @@ export function SevenPrinciplesSpectrumCard(props: { spectrum: unknown }) {
   const notEmitted = surfaceState !== "present" && functionalState !== "present";
 
   return (
-    <div className="rounded-2xl border bg-white/70 p-4">
+    <div className="rounded-[12px] border border-[#2f3742] bg-[#10161e] p-4 text-[#f5f7fb]">
       <div className="flex items-baseline justify-between gap-2">
-        <div className="text-base font-semibold">Seven Principles Spectrum</div>
-        {notEmitted ? <div className="text-xs opacity-70">not emitted</div> : null}
+        <div className="text-base font-semibold text-[#f5f7fb]">Seven Principles Spectrum</div>
+        {notEmitted ? <div className="text-xs text-[#8ea4ba]">not emitted</div> : null}
       </div>
 
       <div className="mt-3 space-y-2">
