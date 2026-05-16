@@ -27,9 +27,25 @@ describe('Analyze keyboard interactions', () => {
     expect(screen.getByAltText('ZË-RO')).toBeInTheDocument();
     expect(screen.getByText('instrument · open')).toBeInTheDocument();
     expect(screen.getByText('Deterministic word inspection')).toBeInTheDocument();
+    expect(screen.getByText('Open Instrument ready')).toBeInTheDocument();
+    expect(screen.getByText('No origin proof')).toBeInTheDocument();
     expect(screen.getByLabelText('Word')).toBeInTheDocument();
     expect(screen.getByLabelText('IPA')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Analyze' })).toBeInTheDocument();
+  });
+
+  it('replaces the empty state after a result payload arrives', async () => {
+    render(<ZroChatPage />);
+    expect(screen.getByText('Open Instrument ready')).toBeInTheDocument();
+
+    const input = screen.getByLabelText('Word');
+    fireEvent.change(input, { target: { value: 'test' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Analyze' }));
+
+    await waitFor(() => {
+      expect(screen.queryByText('Open Instrument ready')).not.toBeInTheDocument();
+    });
+    expect(global.fetch).toHaveBeenCalledTimes(1);
   });
 
   it('triggers analysis with Enter key', async () => {
