@@ -102,6 +102,14 @@ describe("ui guardrail: InstrumentPanel is a scientific instrument (v0.1)", () =
     expect(screen.getByTestId("open-instrument-shell")).toBeInTheDocument();
     expect(screen.getByText("ZË-RO Open Instrument")).toBeInTheDocument();
     expect(screen.getByRole("tab", { name: "Overview" })).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByText("active surface")).toBeInTheDocument();
+    expect(screen.getByText("Readout, evidence trace, and hypothesis summary in one inspection surface.")).toBeInTheDocument();
+    expect(screen.getByText("section=overview")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("tab", { name: "Candidates" }));
+    expect(screen.getByRole("tab", { name: "Candidates" })).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByText("Candidate rows remain inspection records, not a forced answer.")).toBeInTheDocument();
+    expect(screen.getByText("section=candidates")).toBeInTheDocument();
 
     const lightModeButton = screen.getByRole("button", { name: /light mode/i });
     expect(lightModeButton).toHaveAttribute("aria-pressed", "true");
