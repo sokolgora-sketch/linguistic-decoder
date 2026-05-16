@@ -61,12 +61,42 @@ function fmt<T>(x: { kind: 'present'; value: T } | { kind: 'missing'; missing: s
 
 type InstrumentSectionKey = "overview" | "evidence" | "candidates" | "roots" | "advanced";
 
-const INSTRUMENT_SECTIONS: Array<{ id: InstrumentSectionKey; label: string }> = [
-  { id: "overview", label: "Overview" },
-  { id: "evidence", label: "Evidence" },
-  { id: "candidates", label: "Candidates" },
-  { id: "roots", label: "Roots / Meaning" },
-  { id: "advanced", label: "Advanced" },
+const INSTRUMENT_SECTIONS: Array<{
+  id: InstrumentSectionKey;
+  label: string;
+  description: string;
+  accent: "blue" | "green" | "amber" | "neutral";
+}> = [
+  {
+    id: "overview",
+    label: "Overview",
+    description: "Readout, evidence trace, and hypothesis summary in one inspection surface.",
+    accent: "blue",
+  },
+  {
+    id: "evidence",
+    label: "Evidence",
+    description: "Source states, evidence ledger, and evidence package for the current run.",
+    accent: "green",
+  },
+  {
+    id: "candidates",
+    label: "Candidates",
+    description: "Candidate rows remain inspection records, not a forced answer.",
+    accent: "amber",
+  },
+  {
+    id: "roots",
+    label: "Roots / Meaning",
+    description: "Vowel path, principle, resonance, SoundRoots, and RootMap surfaces.",
+    accent: "neutral",
+  },
+  {
+    id: "advanced",
+    label: "Advanced",
+    description: "Mask, carrier, oracle, gate, and raw-payload diagnostics for the current run.",
+    accent: "neutral",
+  },
 ];
 
 function pomValue(x: any, fallback = "not emitted"): string {
@@ -106,7 +136,7 @@ function ShellBadge({
 
 function ShellMetric({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-[8px] border border-[#303030] bg-[#101010] p-3 dark:border-[#303030] dark:bg-[#101010]">
+    <div className="min-h-[78px] rounded-[8px] border border-[#303a45] bg-[#101010] p-3 dark:border-[#303a45] dark:bg-[#101010]">
       <div className={`${MT.fieldLabel} mb-1 text-[11px] text-[#8ea4ba] dark:text-[#8ea4ba]`}>{label}</div>
       <div className="break-words font-mono text-[13px] text-[#f5f7fb] dark:text-[#f5f7fb]">{value}</div>
     </div>
@@ -141,24 +171,45 @@ function SectionTabs({
   onChange: (next: InstrumentSectionKey) => void;
 }) {
   return (
-    <div className="flex gap-2 overflow-x-auto pb-1" role="tablist" aria-label="Instrument sections">
-      {INSTRUMENT_SECTIONS.map((section) => (
-        <button
-          key={section.id}
-          type="button"
-          role="tab"
-          aria-selected={active === section.id}
-          className={cn(
-            `${MT.actionSm} min-h-9 shrink-0 rounded-[8px] border px-3 transition-colors`,
-            active === section.id
-              ? "border-[#355a7a] bg-[#111a24] text-[#cfe6ff] dark:border-[#355a7a] dark:bg-[#111a24] dark:text-[#cfe6ff]"
-              : "border-[#303030] bg-[#151515] text-[#aeb7c5] hover:border-[#4d4d4d] hover:text-white dark:border-[#303030] dark:bg-[#151515] dark:text-[#aeb7c5] dark:hover:border-[#4d4d4d] dark:hover:text-white"
-          )}
-          onClick={() => onChange(section.id)}
-        >
-          {section.label}
-        </button>
-      ))}
+    <div className="rounded-[12px] border border-[#2f3742] bg-[#10161e] p-1.5 dark:border-[#2f3742] dark:bg-[#10161e]">
+      <div className="flex gap-1.5 overflow-x-auto" role="tablist" aria-label="Instrument sections">
+        {INSTRUMENT_SECTIONS.map((section) => (
+          <button
+            key={section.id}
+            type="button"
+            role="tab"
+            aria-selected={active === section.id}
+            className={cn(
+              `${MT.actionSm} min-h-10 shrink-0 rounded-[8px] border px-3 transition-colors`,
+              active === section.id
+                ? "border-[#355a7a] bg-[#111a24] text-[#cfe6ff] shadow-[inset_0_0_0_1px_rgba(142,164,186,0.16)] dark:border-[#355a7a] dark:bg-[#111a24] dark:text-[#cfe6ff]"
+                : "border-transparent bg-transparent text-[#aeb7c5] hover:border-[#303a45] hover:bg-[#151515] hover:text-white dark:text-[#aeb7c5] dark:hover:border-[#303a45] dark:hover:bg-[#151515] dark:hover:text-white"
+            )}
+            onClick={() => onChange(section.id)}
+          >
+            {section.label}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function SectionIntro({ section }: { section: (typeof INSTRUMENT_SECTIONS)[number] }) {
+  return (
+    <div className="rounded-[12px] border border-[#2f3742] bg-[#10161e] p-4 dark:border-[#2f3742] dark:bg-[#10161e]">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="min-w-0">
+          <div className={`${MT.microLabel} text-[#8ea4ba] dark:text-[#8ea4ba]`}>active surface</div>
+          <div className="mt-1 text-[18px] font-semibold leading-tight text-[#f5f7fb] dark:text-[#f5f7fb]">
+            {section.label}
+          </div>
+          <p className="mt-2 max-w-3xl text-[13px] leading-6 text-[#aeb7c5] dark:text-[#aeb7c5]">
+            {section.description}
+          </p>
+        </div>
+        <ShellBadge tone={section.accent}>section={section.id}</ShellBadge>
+      </div>
     </div>
   );
 }
@@ -283,11 +334,13 @@ export function InstrumentPanel(props: Props) {
   const pathText = voicePathValue(vm.readout?.voicePath);
   const candidateCountText = String(vm.readout?.counts?.candidates ?? 0);
   const normalizedText = normalizedWord || pomValue(vm.readout?.normalizedWord);
+  const activeSectionMeta =
+    INSTRUMENT_SECTIONS.find((section) => section.id === activeSection) ?? INSTRUMENT_SECTIONS[0];
 
   return (
       <div
         className={cn(
-          "space-y-3 rounded-[14px] border p-3 shadow-[0_16px_40px_rgba(0,0,0,0.24)] transition-colors",
+          "space-y-4 rounded-[14px] border p-4 shadow-[0_16px_40px_rgba(0,0,0,0.24)] transition-colors sm:p-5",
           isDarkMode
             ? "dark border-[#2f3742] bg-[#13171d] text-[#f5f7fb]"
             : "border-[#d5d5d5] bg-[#f5f5f5] text-[#111111]"
@@ -305,7 +358,7 @@ export function InstrumentPanel(props: Props) {
           </div>
         ) : null}
 
-        <div className="rounded-[12px] border border-[#2c3540] bg-[#10161e] p-3 dark:border-[#2c3540] dark:bg-[#10161e]">
+        <div className="rounded-[12px] border border-[#2c3540] bg-[#10161e] p-4 dark:border-[#2c3540] dark:bg-[#10161e] sm:p-5">
           <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-3">
@@ -328,7 +381,7 @@ export function InstrumentPanel(props: Props) {
                 </div>
               </div>
 
-              <div className="mt-4 grid gap-3 md:grid-cols-4">
+              <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
                 <ShellMetric label="word" value={`word=${String(vm.readout.word ?? "not emitted")}`} />
                 <ShellMetric label="normalized" value={`norm=${normalizedText}`} />
                 <ShellMetric label="voice path" value={`path=${pathText}`} />
@@ -354,6 +407,7 @@ export function InstrumentPanel(props: Props) {
         </div>
 
         <SectionTabs active={activeSection} onChange={setActiveSection} />
+        <SectionIntro section={activeSectionMeta} />
 
         <div className="space-y-4">
           <TabPanel id="overview" active={activeSection}>
