@@ -27,9 +27,9 @@ function BoundaryList({ items }: { items: string[] }) {
 
 export function ToolBoundaryCard() {
   return (
-    <section className="rounded-xl border p-4">
-      <div className="text-sm font-semibold">Tool boundaries</div>
-      <div className="mt-1 text-xs text-muted-foreground">
+    <section className="rounded-xl border border-slate-700/80 bg-[#10151c] p-4 shadow-[0_16px_48px_rgba(0,0,0,0.28)]">
+      <div className="text-sm font-semibold text-slate-100">Tool boundaries</div>
+      <div className="mt-1 text-xs text-slate-500">
         This panel keeps the Open Instrument readout conservative.
       </div>
 

@@ -24,7 +24,7 @@ type ResonanceProfileV1 = {
 
 function Chip({ label }: { label: string }) {
   return (
-    <span className="inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-mono">
+    <span className="inline-flex items-center rounded-md border border-blue-400/40 bg-blue-500/10 px-2 py-0.5 text-xs font-mono text-blue-100">
       {label}
     </span>
   );
@@ -33,8 +33,8 @@ function Chip({ label }: { label: string }) {
 function Row({ k, v }: { k: string; v: React.ReactNode }) {
   return (
     <div className="flex items-start justify-between gap-3">
-      <div className="text-xs text-neutral-500">{k}</div>
-      <div className="text-xs">{v}</div>
+      <div className="text-xs text-slate-500">{k}</div>
+      <div className="text-xs text-slate-300">{v}</div>
     </div>
   );
 }
@@ -46,9 +46,9 @@ export function ResonancePanelV01(props: { resonanceProfileV1: Maybe<ResonancePr
 
   if (m.kind !== "present") {
     return (
-      <div className="rounded-lg border p-3">
-        <div className="text-sm font-semibold">Resonance</div>
-        <div className="mt-2 text-xs text-neutral-500">
+      <div className="rounded-xl border border-slate-700/80 bg-[#10151c] p-4 shadow-[0_16px_48px_rgba(0,0,0,0.28)]">
+        <div className="text-sm font-semibold text-slate-100">Resonance</div>
+        <div className="mt-2 text-xs text-slate-500">
           Missing: {m.missing}{m.note ? ` — ${m.note}` : ""}
         </div>
       </div>
@@ -75,20 +75,20 @@ export function ResonancePanelV01(props: { resonanceProfileV1: Maybe<ResonancePr
   const normTrans: string[] = Array.isArray(normalized.transitions) ? normalized.transitions.map(String) : [];
 
   return (
-    <div className="rounded-lg border p-3">
+    <div className="rounded-xl border border-slate-700/80 bg-[#10151c] p-4 shadow-[0_16px_48px_rgba(0,0,0,0.28)]">
       <div className="flex items-baseline justify-between">
-        <div className="text-sm font-semibold">Resonance</div>
-        <div className="text-xs text-neutral-500 font-mono">v{String(rp.version ?? "0.1")}</div>
+        <div className="text-sm font-semibold text-slate-100">Resonance</div>
+        <div className="text-xs text-slate-500 font-mono">v{String(rp.version ?? "0.1")}</div>
       </div>
 
       <div className="mt-3 grid gap-3">
         <div className="grid gap-2">
-          <div className="text-xs font-semibold">Surface</div>
+          <div className="text-xs font-semibold text-slate-300">Surface</div>
           <Row
             k="Vowels"
             v={
               <div className="flex flex-wrap gap-1 justify-end">
-                {surfaceVowels.length ? surfaceVowels.map((v, i) => <Chip key={i} label={v} />) : <span className="text-neutral-500">—</span>}
+                {surfaceVowels.length ? surfaceVowels.map((v, i) => <Chip key={i} label={v} />) : <span className="text-slate-500">—</span>}
               </div>
             }
           />
@@ -112,13 +112,13 @@ export function ResonancePanelV01(props: { resonanceProfileV1: Maybe<ResonancePr
           />
         </div>
 
-        <div className="grid gap-2 border-t pt-3">
-          <div className="text-xs font-semibold">Normalized</div>
+        <div className="grid gap-2 border-t border-slate-800 pt-3">
+          <div className="text-xs font-semibold text-slate-300">Normalized</div>
           <Row
             k="Vowels"
             v={
               <div className="flex flex-wrap gap-1 justify-end">
-                {normVowels.length ? normVowels.map((v, i) => <Chip key={i} label={v} />) : <span className="text-neutral-500">—</span>}
+                {normVowels.length ? normVowels.map((v, i) => <Chip key={i} label={v} />) : <span className="text-slate-500">—</span>}
               </div>
             }
           />

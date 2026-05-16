@@ -1,8 +1,6 @@
 'use client';
 
 import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { safeText } from "../safeText";
 
 type Mode = "strict" | "open";
@@ -52,7 +50,7 @@ function buildVM(raw: unknown, fallbackWord: string, fallbackMode: Mode): VM {
 
   const oraclePrimaryPath = asStrArray(r?.oracle?.primaryVoicePath);
 
-  // verifier shape may evolve; best-effort boolean extraction only
+  // verifier shape may evolve; conservative boolean extraction only
   const cv = r?.claimVerification;
   const claimVerificationOk =
     typeof cv?.ok === "boolean"
@@ -135,48 +133,61 @@ export function OracleProposeWithEngineOracleCardV01(props: Props) {
   const canRun = !!word && status !== "loading";
 
   return (
-    <Card>
-      <CardHeader className="pb-2">
-        <CardTitle className="text-sm">Propose with Engine Oracle</CardTitle>
-        <div className="text-xs opacity-70">
+    <section className="rounded-xl border border-slate-700/80 bg-[#10151c] p-4 shadow-[0_16px_48px_rgba(0,0,0,0.28)]">
+      <div>
+        <div className="text-sm font-semibold text-slate-100">Propose with Engine Oracle</div>
+        <div className="mt-1 text-xs text-slate-500">
           Builds an oracle from engine v1 (surface vowels → strict terminal-Y hint), runs proposer once, then verifies the ClaimPacket.
         </div>
-      </CardHeader>
-      <CardContent className="space-y-3 min-w-0">
+      </div>
+      <div className="mt-4 space-y-3 min-w-0">
         <div className="grid gap-2">
-          <div className="text-xs opacity-70">Provider</div>
+          <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">Provider</div>
           <input
             value={provider}
             onChange={(e) => setProvider(e.target.value)}
             placeholder="mock | gemini | openai | ..."
-            className="w-full rounded-md border bg-transparent px-3 py-2 text-sm"
+            className="w-full rounded-md border border-slate-700 bg-black/30 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-600 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20"
           />
-          <div className="text-xs opacity-60">
+          <div className="text-xs text-slate-500">
             Default is <span className="font-mono">mock</span> (safe). Use a real provider only when you intend to spend tokens.
           </div>
         </div>
 
         <div className="flex flex-wrap gap-2">
-          <Button onClick={() => void run()} disabled={!canRun}>
+          <button
+            type="button"
+            className="rounded-md border border-blue-400/50 bg-blue-500/10 px-3 py-1.5 text-sm font-semibold text-blue-100 transition hover:border-blue-300 hover:bg-blue-500/20 disabled:cursor-not-allowed disabled:border-slate-700 disabled:bg-black/20 disabled:text-slate-600"
+            onClick={() => void run()}
+            disabled={!canRun}
+          >
             {status === "loading" ? "Running…" : "Run oracle proposal"}
-          </Button>
+          </button>
 
           {vm?.responsePretty && props.onCopy ? (
-            <Button variant="secondary" onClick={() => props.onCopy?.("Oracle response copied.", vm.responsePretty!)}>
+            <button
+              type="button"
+              className="rounded-md border border-slate-700 bg-slate-900/70 px-3 py-1.5 text-sm font-semibold text-slate-200 transition hover:border-slate-500 hover:bg-slate-800"
+              onClick={() => props.onCopy?.("Oracle response copied.", vm.responsePretty!)}
+            >
               Copy response
-            </Button>
+            </button>
           ) : null}
 
           {vm?.claimPacketPretty && props.onCopy ? (
-            <Button variant="secondary" onClick={() => props.onCopy?.("ClaimPacket copied.", vm.claimPacketPretty!)}>
+            <button
+              type="button"
+              className="rounded-md border border-slate-700 bg-slate-900/70 px-3 py-1.5 text-sm font-semibold text-slate-200 transition hover:border-slate-500 hover:bg-slate-800"
+              onClick={() => props.onCopy?.("ClaimPacket copied.", vm.claimPacketPretty!)}
+            >
               Copy ClaimPacket
-            </Button>
+            </button>
           ) : null}
         </div>
 
         {/* Summary */}
         {vm ? (
-          <div className="rounded-lg border p-3 text-sm">
+          <div className="rounded-lg border border-slate-800 bg-black/25 p-3 text-sm text-slate-200">
             <div className="flex items-center justify-between gap-2">
               <div className="font-semibold">
                 Status:{" "}
@@ -190,12 +201,12 @@ export function OracleProposeWithEngineOracleCardV01(props: Props) {
                   </>
                 ) : null}
               </div>
-              <div className="text-xs opacity-70">
+              <div className="text-xs text-slate-500">
                 provider=<span className="font-mono">{safeText(vm.provider)}</span>
               </div>
             </div>
 
-            <div className="mt-2 text-xs opacity-70">oracle.primaryVoicePath</div>
+            <div className="mt-2 text-xs text-slate-500">oracle.primaryVoicePath</div>
             <div className="mt-1 font-mono text-xs">
               {vm.oraclePrimaryPath.length ? vm.oraclePrimaryPath.join(" → ") : "not_emitted"}
             </div>
@@ -211,8 +222,8 @@ export function OracleProposeWithEngineOracleCardV01(props: Props) {
         {/* Proposer raw text (if available) */}
         {vm?.proposerRawText ? (
           <div>
-            <div className="text-xs opacity-70">proposerRawText</div>
-            <pre className="mt-1 max-h-48 max-w-full overflow-auto whitespace-pre-wrap break-words rounded-lg border bg-black/10 p-2 text-xs">
+            <div className="text-xs text-slate-500">proposerRawText</div>
+            <pre className="mt-1 max-h-48 max-w-full overflow-auto whitespace-pre-wrap break-words rounded-lg border border-slate-800 bg-black/35 p-3 text-xs text-slate-200">
 {vm.proposerRawText}
             </pre>
           </div>
@@ -221,13 +232,13 @@ export function OracleProposeWithEngineOracleCardV01(props: Props) {
         {/* Full response (text only) */}
         {vm?.responsePretty ? (
           <div>
-            <div className="text-xs opacity-70">response</div>
-            <pre className="mt-1 max-h-64 max-w-full overflow-auto whitespace-pre-wrap break-words rounded-lg border bg-black/10 p-2 text-xs">
+            <div className="text-xs text-slate-500">response</div>
+            <pre className="mt-1 max-h-64 max-w-full overflow-auto whitespace-pre-wrap break-words rounded-lg border border-slate-800 bg-black/35 p-3 text-xs text-slate-200">
 {vm.responsePretty}
             </pre>
           </div>
         ) : null}
-      </CardContent>
-    </Card>
+      </div>
+    </section>
   );
 }

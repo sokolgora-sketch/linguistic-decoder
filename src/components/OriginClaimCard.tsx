@@ -68,50 +68,50 @@ function safeSource(x: any): string {
 
 const brainCandidatesCount = brainCandidates.length;
 return (
-    <section>
-      <div className="text-sm font-semibold">Origin Claim</div>
+    <section className="rounded-xl border border-slate-700/80 bg-[#10151c] p-4 shadow-[0_16px_48px_rgba(0,0,0,0.28)]">
+      <div className="text-sm font-semibold text-slate-100">Origin Claim</div>
 
-      <div className="mt-2 text-xs leading-5 space-y-1">
+      <div className="mt-2 text-xs leading-5 space-y-1 text-slate-300">
         <div>
-          <span className="font-medium">Policy:</span>{" "}
+          <span className="font-medium text-slate-400">Policy:</span>{" "}
           <span>{policySummary(policy)}</span>
         </div>
 
         <div>
-          <span className="font-medium">Gates active:</span>{" "}
+          <span className="font-medium text-slate-400">Gates active:</span>{" "}
           <span>{toFlatText(gatesActive)}</span>
         </div>
 
           {seedFallbackOn ? (
             <div>
-              <span className="font-medium">Brain seed fallback:</span>{" "}
+              <span className="font-medium text-slate-400">Brain seed fallback:</span>{" "}
               {brainCandidatesCount > 0 ? (
                 <div className="mt-1 text-xs">
-                  <span className="font-medium">Brain candidates:</span>{" "}
+                  <span className="font-medium text-slate-400">Brain candidates:</span>{" "}
                   <span className="font-mono">{brainCandidatesCount}</span>
                   <details className="mt-1">
-                    <summary className="cursor-pointer opacity-80">show</summary>
+                    <summary className="cursor-pointer text-slate-300">show</summary>
                     <div className="mt-2 space-y-2">
                       {(brainCandidates || []).map((c: any, i: number) => (
-                        <div key={i} className="rounded border border-black/10 px-2 py-2">
+                        <div key={i} className="rounded border border-slate-800 bg-black/25 px-2 py-2">
                           <div className="text-xs">
                             <span className="font-mono">{safeText(c.languageName) || "Unknown"}</span>{" "}
-                            <span className="opacity-60">({safeText(c.languageId) || "wlt:unknown"})</span>
+                            <span className="text-slate-500">({safeText(c.languageId) || "wlt:unknown"})</span>
                           </div>
                           <div className="mt-1 text-xs">
-                            <span className="opacity-70">form:</span>{" "}
+                            <span className="text-slate-500">form:</span>{" "}
                             <span className="font-mono">{safeText(c.form) || "∅"}</span>
                           </div>
                           <div className="mt-1 text-xs">
-                            <span className="opacity-70">roots:</span>{" "}
+                            <span className="text-slate-500">roots:</span>{" "}
                             <span className="font-mono">{safeRoots(c.roots) || "∅"}</span>
                           </div>
                           <div className="mt-1 text-xs">
-                            <span className="opacity-70">opsUsed:</span>{" "}
+                            <span className="text-slate-500">opsUsed:</span>{" "}
                             <span className="font-mono">{safeOps(c.opsUsed) || "∅"}</span>
                           </div>
                           <div className="mt-1 text-xs">
-                            <span className="opacity-70">source:</span>{" "}
+                            <span className="text-slate-500">source:</span>{" "}
                             <span className="font-mono">{safeSource(c.source) || "∅"}</span>
                           </div>
                         </div>
@@ -121,9 +121,9 @@ return (
                 </div>
               ) : null}
 <span className="font-mono">ON</span>{" "}
-              <span className="opacity-70">·</span>{" "}
+              <span className="text-slate-500">·</span>{" "}
               <span className="font-mono">count={toFlatText(brainCandidatesCount)}</span>{" "}
-              <span className="opacity-70">records</span>
+              <span className="text-slate-500">records</span>
             </div>
           ) : null}
 

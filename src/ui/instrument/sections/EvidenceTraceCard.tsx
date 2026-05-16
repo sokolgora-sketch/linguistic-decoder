@@ -43,8 +43,8 @@ function rootMapStatus(rootMap: PresentOrMissing<RootMapVM> | undefined): string
 function TraceRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-baseline justify-between gap-3">
-      <div className="text-xs text-muted-foreground">{label}</div>
-      <div className="text-right text-xs font-mono">{value}</div>
+      <div className="text-xs text-slate-500">{label}</div>
+      <div className="text-right text-xs font-mono text-slate-200">{value}</div>
     </div>
   );
 }
@@ -65,9 +65,9 @@ export function EvidenceTraceCard({
   const ledgerSources = ledgerSections.map((section) => `${section.source ?? section.key}: ${section.state}`);
 
   return (
-    <section className="rounded-xl border p-4">
-      <div className="text-sm font-semibold">Evidence trace</div>
-      <div className="mt-1 text-xs text-muted-foreground">
+    <section className="rounded-xl border border-slate-700/80 bg-[#10151c] p-4 shadow-[0_16px_48px_rgba(0,0,0,0.28)]">
+      <div className="text-sm font-semibold text-slate-100">Evidence trace</div>
+      <div className="mt-1 text-xs text-slate-500">
         Compact map of emitted VM fields behind this readout.
       </div>
 
@@ -95,7 +95,7 @@ export function EvidenceTraceCard({
             ))}
           </ul>
         ) : (
-          <div className="mt-2 text-xs text-muted-foreground">not emitted</div>
+          <div className="mt-2 text-xs text-slate-500">not emitted</div>
         )}
       </div>
     </section>

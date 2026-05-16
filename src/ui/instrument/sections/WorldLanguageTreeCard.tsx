@@ -1,8 +1,6 @@
 'use client';
 
 import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { WORLD_LANGUAGE_TREE_V01 } from "@/shared/worldLanguageTree.v0.1";
 import type { RootLightMapV01, RootLight, RootLightReason } from "@/shared/rootLightMap.v0.1";
 
@@ -58,7 +56,7 @@ function reasonLabel(r: RootLightReason) {
 function ReasonChip(props: { reason: RootLightReason }) {
   const txt = reasonLabel(props.reason);
   return (
-    <span className="inline-flex items-center rounded border px-1.5 py-0.5 text-[11px] font-mono text-neutral-300">
+    <span className="inline-flex items-center rounded border border-slate-700 bg-black/25 px-1.5 py-0.5 text-[11px] font-mono text-slate-300">
       {txt}
     </span>
   );
@@ -114,10 +112,10 @@ function renderNode(params: {
   return (
     <div key={nodeId} style={{ paddingLeft: pad }} className="py-1">
       <div className="flex items-start gap-2">
-        <span className={lit ? "font-semibold" : ""}>
+        <span className={lit ? "font-semibold text-slate-100" : "text-slate-400"}>
           {lit ? "●" : "○"} {label}
         </span>
-        <span className="text-xs text-neutral-500">{nodeId}</span>
+        <span className="text-xs text-slate-600">{nodeId}</span>
 
         {lit ? (
           <span className="ml-2 flex flex-wrap gap-1">
@@ -129,10 +127,10 @@ function renderNode(params: {
       </div>
 
       {lit ? (
-        <div className="mt-1 space-y-0.5 text-xs text-neutral-500">
+        <div className="mt-1 space-y-0.5 text-xs text-slate-600">
           {hits.map((h, i) => (
             <div key={i} className="pl-4">
-              <span className="font-mono text-neutral-400">{h.source}</span>
+              <span className="font-mono text-slate-500">{h.source}</span>
             </div>
           ))}
         </div>
@@ -159,30 +157,29 @@ export function WorldLanguageTreeCard(props: Props) {
   }, [showAll, lights]);
 
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
+    <section className="rounded-xl border border-slate-700/80 bg-[#10151c] p-4 shadow-[0_16px_48px_rgba(0,0,0,0.28)]">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <CardTitle>World Language Tree</CardTitle>
-          <div className="mt-1 text-xs text-neutral-500">
+          <div className="text-sm font-semibold text-slate-100">World Language Tree</div>
+          <div className="mt-1 text-xs text-slate-500">
             Taxonomy scaffold — lit by evidence, not proof of origin.
           </div>
         </div>
 
-        <Button
-          variant="outline"
-          size="sm"
+        <button
+          type="button"
           onClick={() => setShowAll((v) => !v)}
-          className="font-mono"
+          className="rounded-md border border-blue-400/50 bg-blue-500/10 px-3 py-1.5 text-xs font-mono text-blue-100 transition hover:border-blue-300 hover:bg-blue-500/20"
         >
           {showAll ? "Focused view" : "Show full tree"}
-        </Button>
-      </CardHeader>
+        </button>
+      </div>
 
-      <CardContent>
-        <div className="mb-3 flex flex-wrap items-center gap-2 text-xs text-neutral-500">
+      <div className="mt-4">
+        <div className="mb-3 flex flex-wrap items-center gap-2 text-xs text-slate-500">
           <span className="font-mono">● lit</span>
           <span className="font-mono">○ unlit</span>
-          <span className="mx-1 opacity-50">|</span>
+          <span className="mx-1 text-slate-700">|</span>
           <span className="inline-flex items-center gap-1">
             <ReasonChip reason="origin_claim_candidate" /> from OriginClaim
           </span>
@@ -194,14 +191,14 @@ export function WorldLanguageTreeCard(props: Props) {
           </span>
         </div>
 
-        <div className="text-sm">
+        <div className="rounded-lg border border-slate-800 bg-black/20 p-3 text-sm">
           {renderNode({ nodeId: "world", depth: 0, lights, visibleSet })}
         </div>
 
         {!props.lightMap ? (
-          <div className="mt-2 text-xs text-neutral-500">No light map provided.</div>
+          <div className="mt-2 text-xs text-slate-500">No light map provided.</div>
         ) : null}
-      </CardContent>
-    </Card>
+      </div>
+    </section>
   );
 }

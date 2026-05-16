@@ -1,8 +1,6 @@
 'use client';
 
 import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 
 export function RawJsonCard(props: {
   pretty: string | null;
@@ -12,39 +10,44 @@ export function RawJsonCard(props: {
   const hasPretty = typeof props.pretty === "string" && props.pretty.length > 0;
 
   return (
-    <Card>
-      <CardHeader className="py-3">
-        <div className="flex items-center justify-between gap-3">
-          <CardTitle className="text-sm">Raw Engine JSON</CardTitle>
-          {props.onCopyFullJson ? (
-            <Button size="sm" variant="outline" onClick={props.onCopyFullJson}>
-              Copy Full JSON
-            </Button>
-          ) : null}
+    <section className="rounded-xl border border-slate-700/80 bg-[#10151c] p-4 shadow-[0_16px_48px_rgba(0,0,0,0.28)]">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <div className="text-sm font-semibold text-slate-100">Raw Engine JSON</div>
+          <div className="mt-1 text-xs text-slate-500">Collapsed inspection payload</div>
         </div>
-      </CardHeader>
+          {props.onCopyFullJson ? (
+            <button
+              type="button"
+              className="rounded-md border border-blue-400/50 bg-blue-500/10 px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-blue-100 transition hover:border-blue-300 hover:bg-blue-500/20"
+              onClick={props.onCopyFullJson}
+            >
+              Copy Full JSON
+            </button>
+          ) : null}
+      </div>
 
-      <CardContent className="py-3 text-sm">
+      <div className="mt-4 text-sm">
         <details>
-          <summary className="cursor-pointer select-none text-sm opacity-80">
+          <summary className="cursor-pointer select-none text-sm text-slate-300">
             Show / hide (collapsed by default)
           </summary>
 
-          <div className="mt-2 text-xs opacity-70">
+          <div className="mt-2 text-xs text-slate-500">
             engine: <span className="font-mono">{props.engineVersion ?? "not_emitted"}</span>
           </div>
 
           {hasPretty ? (
-            <pre className="mt-2 max-h-[420px] overflow-auto rounded-md border bg-muted/20 p-3 text-xs font-mono leading-relaxed">
+            <pre className="mt-2 max-h-[420px] overflow-auto rounded-md border border-slate-800 bg-black/35 p-3 text-xs font-mono leading-relaxed text-slate-200">
               {props.pretty}
             </pre>
           ) : (
-            <div className="mt-2 rounded-md border bg-muted/10 p-3 text-xs">
+            <div className="mt-2 rounded-md border border-slate-800 bg-black/25 p-3 text-xs text-slate-400">
               Not available in this render mode. (VM-only boundary or missing payload.)
             </div>
           )}
         </details>
-      </CardContent>
-    </Card>
+      </div>
+    </section>
   );
 }

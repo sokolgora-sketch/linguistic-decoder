@@ -25,16 +25,16 @@ function ringLabelFor(v: Vowel): "center" | "inner" | "middle" | "outer" | "unkn
 function VoiceChip({ v }: { v: Vowel }) {
   const ring = ringLabelFor(v);
   return (
-    <span className="inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-mono">
+    <span className="inline-flex items-center gap-1 rounded-full border border-blue-400/40 bg-blue-500/10 px-2 py-0.5 text-xs font-mono text-blue-100">
       <span>{v}</span>
-      <span className="text-muted-foreground">·{ring}</span>
+      <span className="text-blue-200/65">·{ring}</span>
     </span>
   );
 }
 
 function TokenChip({ t }: { t: string }) {
   return (
-    <span className="inline-flex items-center justify-center rounded-full border px-2 py-0.5 text-xs font-mono text-muted-foreground">
+    <span className="inline-flex items-center justify-center rounded-full border border-slate-700 bg-black/25 px-2 py-0.5 text-xs font-mono text-slate-400">
       {t}
     </span>
   );
@@ -44,8 +44,8 @@ export function PhoneticIpaPanelV0_1({ pom }: { pom: PresentOrMissing<PhoneticIp
   if (pom.kind === "missing") {
     return (
       <div className="text-sm font-mono">
-        <span className="text-muted-foreground">Not provided.</span>
-        <span className="ml-2 text-muted-foreground opacity-70">
+        <span className="text-slate-500">Not provided.</span>
+        <span className="ml-2 text-slate-600">
           [{pom.missing}
           {pom.note ? ` · ${pom.note}` : ""}]
         </span>
@@ -68,7 +68,7 @@ export function PhoneticIpaPanelV0_1({ pom }: { pom: PresentOrMissing<PhoneticIp
 
       {p.unmapped.length ? (
         <div className="mt-2 flex flex-wrap items-center gap-2">
-          <span className="text-muted-foreground">unmapped:</span>
+          <span className="text-slate-500">unmapped:</span>
           <span className="inline-flex flex-wrap gap-1">
             {p.unmapped.map((x, i) => (
               <TokenChip key={`${x}-${i}`} t={x} />

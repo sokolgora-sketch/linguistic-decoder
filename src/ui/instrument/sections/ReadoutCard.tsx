@@ -12,16 +12,16 @@ function renderPOM<T>(
 ) {
   if (pom.kind === "present") return renderValue(pom.value);
   return (
-    <span className="text-muted-foreground">
+    <span className="text-slate-500">
       {fallbackLabel}
-      {pom.note ? <span className="ml-2 opacity-70">({pom.note})</span> : null}
+      {pom.note ? <span className="ml-2 text-slate-600">({pom.note})</span> : null}
     </span>
   );
 }
 
 function VowelChip({ v }: { v: Vowel }) {
   return (
-    <span className="inline-flex items-center justify-center rounded-full border px-2 py-0.5 text-xs font-mono">
+    <span className="inline-flex items-center justify-center rounded-full border border-blue-400/40 bg-blue-500/10 px-2 py-0.5 text-xs font-mono text-blue-100">
       {v}
     </span>
   );
@@ -42,23 +42,31 @@ export function ReadoutCard({
   const phoneticIpaPOM = readout.phoneticIpaV0_1;
 
   return (
-    <div className="rounded-xl border p-4 shadow-sm">
-      <div className="flex items-start justify-between gap-4">
+    <div className="rounded-xl border border-slate-700/80 bg-[#10151c] p-4 shadow-[0_16px_48px_rgba(0,0,0,0.28)]">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div>
-          <div className="text-sm text-muted-foreground">Readout</div>
-          <div className="text-lg font-semibold">{readout.word}</div>
-          <div className="mt-1 text-sm font-mono">
+          <div className="text-sm text-slate-500">Readout</div>
+          <div className="text-lg font-semibold text-slate-100">{readout.word}</div>
+          <div className="mt-1 text-sm font-mono text-slate-300">
             normalized: {renderPOM(readout.normalizedWord, (v) => <span>{String(v)}</span>)}
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
-          <span className="rounded-full border px-2 py-1 text-xs">{statusBadge}</span>
-          <button className="rounded-md border px-3 py-1 text-sm" onClick={onCopySummary}>
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="rounded-full border border-green-400/40 bg-green-500/10 px-2 py-1 text-xs font-mono text-green-100">{statusBadge}</span>
+          <button
+            type="button"
+            className="rounded-md border border-blue-400/50 bg-blue-500/10 px-3 py-1 text-sm font-semibold text-blue-100 transition hover:border-blue-300 hover:bg-blue-500/20"
+            onClick={onCopySummary}
+          >
             Copy Summary
           </button>
           {onCopyFullJson ? (
-            <button className="rounded-md border px-3 py-1 text-sm" onClick={onCopyFullJson}>
+            <button
+              type="button"
+              className="rounded-md border border-slate-700 bg-slate-900/70 px-3 py-1 text-sm font-semibold text-slate-200 transition hover:border-slate-500 hover:bg-slate-800"
+              onClick={onCopyFullJson}
+            >
               Copy Full JSON
             </button>
           ) : null}
@@ -66,9 +74,9 @@ export function ReadoutCard({
       </div>
 
       <div className="mt-4 grid gap-3 md:grid-cols-2">
-        <div className="rounded-lg border p-3">
-          <div className="text-xs text-muted-foreground">Run context</div>
-          <div className="mt-2 space-y-1 text-sm font-mono">
+        <div className="rounded-lg border border-slate-800 bg-black/25 p-3">
+          <div className="text-xs text-slate-500">Run context</div>
+          <div className="mt-2 space-y-1 text-sm font-mono text-slate-300">
             <div>mode: {renderPOM(readout.mode, (v) => <span>{String(v)}</span>)}</div>
             <div>
               strictInput:{" "}
@@ -84,9 +92,9 @@ export function ReadoutCard({
           </div>
         </div>
 
-        <div className="rounded-lg border p-3">
-          <div className="text-xs text-muted-foreground">Detection</div>
-          <div className="mt-2 text-sm font-mono">
+        <div className="rounded-lg border border-slate-800 bg-black/25 p-3">
+          <div className="text-xs text-slate-500">Detection</div>
+          <div className="mt-2 text-sm font-mono text-slate-300">
             <div>
               voicePath:{" "}
               {renderPOM(
@@ -109,7 +117,7 @@ export function ReadoutCard({
             </div>
 
             <div className="mt-3">
-              <div className="text-xs text-muted-foreground">Phonetic IPA</div>
+              <div className="text-xs text-slate-500">Phonetic IPA</div>
               <div className="mt-2">
                 <PhoneticIpaPanelV0_1 pom={phoneticIpaPOM} />
               </div>
