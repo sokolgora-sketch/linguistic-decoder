@@ -346,14 +346,24 @@ export function InstrumentPanel(props: Props) {
         data-testid="open-instrument-shell"
       >
         {props.debug ? (
-          <div className="mb-4 rounded border border-emerald-500 bg-black p-3 text-xs text-emerald-400">
-            <div>InstrumentPanel ACTIVE</div>
-            <div>word: {safeText(vm.wordShown)}</div>
-            <div>engine: {safeText(vm.engineVersion)}</div>
-            <div>mode: {safeText(vm.mode)}</div>
-            <div>vowelPath: {safeText(vm.vowelPath?.join(" → "))}</div>
-            <div>signals: {vm.signals?.length ?? 0}</div>
-          </div>
+          <section
+            aria-label="InstrumentPanel debug"
+            className="mb-4 rounded-[10px] border border-emerald-400/40 bg-black/35 p-3 text-xs text-emerald-100 shadow-[0_10px_30px_rgba(0,0,0,0.22)]"
+          >
+            <div className="mb-2 flex flex-wrap items-center gap-2">
+              <span className="rounded-full border border-emerald-400/40 bg-emerald-500/10 px-2 py-0.5 font-mono text-[11px] uppercase tracking-wide">
+                InstrumentPanel ACTIVE
+              </span>
+              <span className="font-mono text-emerald-300/80">debug telemetry</span>
+            </div>
+            <div className="grid gap-1 font-mono text-emerald-200/90 sm:grid-cols-2 lg:grid-cols-3">
+              <div>word: {safeText(vm.readout?.word)}</div>
+              <div>engine: {safeText(engineVersion ?? "not_emitted")}</div>
+              <div>mode: {safeText(modeText)}</div>
+              <div>vowelPath: {safeText(pathText)}</div>
+              <div>signals: {fmt(vm.readout.counts.signals)}</div>
+            </div>
+          </section>
         ) : null}
 
         <div className="rounded-[12px] border border-[#2c3540] bg-[#10161e] p-4 dark:border-[#2c3540] dark:bg-[#10161e] sm:p-5">
