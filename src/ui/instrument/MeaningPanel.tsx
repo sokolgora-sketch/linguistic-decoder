@@ -130,16 +130,34 @@ export default function MeaningPanel({ vm }: Props) {
   ]);
 
   return (
-    <div className="rounded-lg border border-white/15 bg-black/20 p-4">
-      <div className="text-lg font-semibold">Meaning</div>
+    <div className="rounded-[12px] border border-[#303a45] bg-[#10151c] p-4 shadow-[0_16px_48px_rgba(0,0,0,0.22)]">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div className="min-w-0">
+          <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#8ea4ba]">reading surface</div>
+          <div className="mt-1 text-lg font-semibold text-[#f5f7fb]">Meaning</div>
+          <p className="mt-2 max-w-2xl text-[12px] leading-5 text-[#aeb7c5]">
+            Human-readable VM summary for the current word. It frames the readout as deterministic inspection, not origin proof.
+          </p>
+        </div>
+        <div className="shrink-0 rounded-full border border-[#303a45] bg-[#0d1117] px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.12em] text-[#cfe6ff]">
+          source=vm
+        </div>
+      </div>
 
-      <div className="mt-2 text-sm leading-6 opacity-90">{sentence}</div>
+      <div className="mt-4 rounded-[10px] border border-[#355a7a] bg-[#111a24] p-4">
+        <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#8ea4ba]">Summary</div>
+        <div className="mt-2 text-sm leading-6 text-[#f5f7fb]">{sentence}</div>
+        {sub ? <div className="mt-3 whitespace-pre-wrap font-mono text-xs leading-5 text-[#9fb1bf]">{sub}</div> : null}
+      </div>
 
-      {sub ? <div className="mt-2 whitespace-pre-wrap text-xs opacity-70">{sub}</div> : null}
+      <div className="mt-3 rounded-[10px] border border-[#27313d] bg-[#0d1117] p-4">
+        <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#8ea4ba]">Evidence posture</div>
+        <div className="mt-2 whitespace-pre-wrap text-xs leading-5 text-[#d7dde7]">{evidenceLines}</div>
+      </div>
 
-      <div className="mt-3 whitespace-pre-wrap text-xs opacity-70">{evidenceLines}</div>
-
-      <div className="mt-2 text-[11px] opacity-50">source: telemetry VM</div>
+      <div className="mt-3 text-[11px] leading-5 text-[#7d8ea3]">
+        Boundary: deterministic reading; no forced answer; not a historical-chain claim.
+      </div>
     </div>
   );
 }
