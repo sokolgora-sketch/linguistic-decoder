@@ -55,29 +55,29 @@ export function DeepRootHeartGateSummaryCard(props: { rows: readonly GateRowLike
   const s = buildSummary(rows);
 
   return (
-    <section className="rounded-xl border border-neutral-800 bg-neutral-950/40 p-4">
-      <header className="mb-3 flex items-baseline justify-between gap-3">
+    <section className="rounded-xl border border-slate-700/80 bg-[#10151c] p-4 shadow-[0_16px_48px_rgba(0,0,0,0.28)]">
+      <header className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h3 className="text-sm font-semibold tracking-wide text-neutral-100">Gate Summary</h3>
-          <div className="mt-1 font-mono text-xs text-neutral-400">DeepRoot–Heart Alignment (per candidate)</div>
+          <h3 className="text-sm font-semibold tracking-wide text-slate-100">Gate Summary</h3>
+          <div className="mt-1 font-mono text-xs text-slate-500">DeepRoot–Heart Alignment (per candidate)</div>
         </div>
-        <div className="text-xs text-neutral-400">
+        <div className="rounded-md border border-blue-400/40 bg-blue-500/10 px-2 py-1 font-mono text-xs text-blue-100">
           <span>{`Gate rows: ${s.total}`}</span>
         </div>
       </header>
 
       <div className="grid gap-3">
-        <div className="grid gap-1 text-sm text-neutral-200 font-mono">
-          <div>{`Aligned: ${s.aligned}`}</div>
-          <div>{`Misaligned: ${s.misaligned}`}</div>
-          <div>{`Insufficient: ${s.insufficient}`}</div>
-          <div>{`Missing: ${s.missing}`}</div>
+        <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="rounded-lg border border-green-400/30 bg-green-500/10 p-3 font-mono text-sm text-green-100">{`Aligned: ${s.aligned}`}</div>
+          <div className="rounded-lg border border-red-400/30 bg-red-500/10 p-3 font-mono text-sm text-red-100">{`Misaligned: ${s.misaligned}`}</div>
+          <div className="rounded-lg border border-amber-400/30 bg-amber-500/10 p-3 font-mono text-sm text-amber-100">{`Insufficient: ${s.insufficient}`}</div>
+          <div className="rounded-lg border border-slate-800 bg-black/25 p-3 font-mono text-sm text-slate-300">{`Missing: ${s.missing}`}</div>
         </div>
 
-        <div>
-          <div className="text-[11px] uppercase tracking-wide text-neutral-400">Top misalignment reasons</div>
+        <div className="rounded-lg border border-slate-800 bg-black/25 p-3">
+          <div className="text-[11px] uppercase tracking-wide text-slate-500">Top misalignment reasons</div>
           {s.topReasons.length ? (
-            <ul className="mt-2 space-y-1 text-xs text-neutral-300">
+            <ul className="mt-2 space-y-1 text-xs text-slate-300">
               {s.topReasons.map((x) => (
                 <li key={x.code} className="font-mono">
                   {x.code} — {x.count}
@@ -85,7 +85,7 @@ export function DeepRootHeartGateSummaryCard(props: { rows: readonly GateRowLike
               ))}
             </ul>
           ) : (
-            <div className="mt-2 text-xs text-neutral-400 font-mono">None</div>
+            <div className="mt-2 text-xs text-slate-500 font-mono">None</div>
           )}
         </div>
       </div>
