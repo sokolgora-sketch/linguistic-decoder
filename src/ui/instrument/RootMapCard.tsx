@@ -112,6 +112,17 @@ function renderInlineChips(items: string[]) {
   );
 }
 
+function metric(label: string, value: string) {
+  return (
+    <div className="min-w-0 rounded-[8px] border border-[#27313d] bg-[#0d1117] p-3">
+      <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#8ea4ba]">{label}</div>
+      <div className="mt-1 truncate font-mono text-[13px] text-[#f5f7fb]" title={value}>
+        {value}
+      </div>
+    </div>
+  );
+}
+
 export function RootMapCard(props: Props) {
   const { rootMap, word, normalizedWord } = props;
 
@@ -137,39 +148,56 @@ export function RootMapCard(props: Props) {
   const spansArr = Array.isArray(v?.spans) ? v!.spans! : [];
 
   const tokensLine = tokensArr.length ? tokensArr.map((t) => t.token).join(" | ") : "—";
+  const reading = safeText(v?.composedMeaning);
 
   return (
-    <section className="rounded-xl border border-neutral-800 bg-neutral-950/40 p-4">
-      <header className="mb-3 flex items-baseline justify-between gap-3">
-        <div>
-          <h3 className="text-sm font-semibold tracking-wide text-neutral-100">Root Map</h3>
-          <div className="mt-1 font-mono text-xs text-neutral-400">
+    <section className="rounded-[12px] border border-[#303a45] bg-[#10151c] p-4 shadow-[0_16px_48px_rgba(0,0,0,0.22)]">
+      <header className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div className="min-w-0">
+          <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#8ea4ba]">hypothesis surface</div>
+          <h3 className="mt-1 text-base font-semibold tracking-wide text-[#f5f7fb]">Root Map</h3>
+          <div className="mt-1 font-mono text-xs text-[#9fb1bf]">
             word={word}{"  "}norm={normalizedWord}
           </div>
+          <p className="mt-2 max-w-2xl text-[12px] leading-5 text-[#aeb7c5]">
+            Shows the constructed root reading and the VM evidence that supports it. This is an inspection surface, not origin proof.
+          </p>
         </div>
 
-        <div className="text-xs text-neutral-400">
+        <div className="shrink-0 rounded-full border border-[#303a45] bg-[#0d1117] px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.12em] text-[#cfe6ff]">
           <span>STATE: {state}</span>
           {rootMap.kind === "missing" ? <span className="ml-2">({rootMap.missing})</span> : null}
         </div>
       </header>
 
       {state !== "PRESENT" && stateDetail ? (
-        <div className="mb-3 rounded-lg border border-neutral-800 bg-neutral-950/30 p-2 text-xs text-neutral-300">
+        <div className="mb-4 rounded-[8px] border border-[#303a45] bg-[#0d1117] p-3 text-xs text-[#d7dde7]">
           {stateDetail}
         </div>
       ) : null}
 
-      <div className="grid gap-3">
-        <div>
-          <div className="text-[11px] uppercase tracking-wide text-neutral-400">Tokens</div>
-          <div className="mt-1 font-mono text-sm text-neutral-100">{tokensLine}</div>
+      <div className="mb-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+        {metric("tokens", tokensLine)}
+        {metric("supported keys", String(keysArr.length))}
+        {metric("carriers", String(carriersArr.length))}
+        {metric("spans", String(spansArr.length))}
+      </div>
+
+      <div className="grid gap-4">
+        <div className="rounded-[10px] border border-[#355a7a] bg-[#111a24] p-4">
+          <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#8ea4ba]">
+            Constructed reading (hypothesis)
+          </div>
+          <div className="mt-2 text-sm leading-6 text-[#f5f7fb]">{reading}</div>
+          <div className="mt-3 text-[11px] leading-5 text-[#9fb1bf]">
+            Boundary: deterministic root-map reading; no forced answer; not a historical-chain claim.
+          </div>
         </div>
 
         <div>
-          <div className="text-[11px] uppercase tracking-wide text-neutral-400">Supported Keys (explainers)</div>
+          <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#8ea4ba]">Supported keys</div>
           {keysArr.length === 0 ? (
-            <div className="mt-1 text-sm text-neutral-300">—</div>
+            <div className="mt-2 rounded-[8px] border border-[#27313d] bg-[#0d1117] p-3 text-sm text-[#d7dde7]">—</div>
           ) : (
             <ul className="mt-2 space-y-2">
               {keysArr.map((k, idx) => {
@@ -179,29 +207,31 @@ export function RootMapCard(props: Props) {
                 return (
                   <li
                     key={`${k.token}:${k.language ?? "?"}:${idx}`}
-                    className="rounded-lg border border-neutral-800 bg-neutral-950/30 p-2"
+                    className="rounded-[10px] border border-[#27313d] bg-[#0d1117] p-3"
                   >
                     <div className="flex flex-wrap items-baseline justify-between gap-2">
-                      <div className="text-sm text-neutral-100">
+                      <div className="text-sm text-[#f5f7fb]">
                         <span className="font-mono">{k.token}</span>
-                        {k.status ? <span className="ml-2 text-xs text-neutral-400">({k.status})</span> : null}
+                        {k.status ? <span className="ml-2 text-xs text-[#9fb1bf]">({k.status})</span> : null}
                       </div>
-                      <div className="text-xs text-neutral-400">{k.language ?? "unknown"}</div>
+                      <div className="rounded-full border border-[#303a45] bg-[#10151c] px-2 py-0.5 font-mono text-[11px] text-[#9fb1bf]">
+                        {k.language ?? "unknown"}
+                      </div>
                     </div>
 
-                    {k.gloss ? <div className="mt-1 text-sm text-neutral-200">{k.gloss}</div> : null}
+                    {k.gloss ? <div className="mt-2 text-sm leading-6 text-[#d7dde7]">{k.gloss}</div> : null}
 
                     {ops.length ? (
                       <div className="mt-2">
-                        <div className="text-[11px] uppercase tracking-wide text-neutral-500">ops</div>
+                        <div className="text-[11px] uppercase tracking-wide text-[#7d8ea3]">ops</div>
                         {renderInlineChips(ops)}
                       </div>
                     ) : null}
 
                     {evidence.length ? (
                       <div className="mt-2">
-                        <div className="text-[11px] uppercase tracking-wide text-neutral-500">evidence</div>
-                        <ul className="mt-1 space-y-0.5 text-xs text-neutral-300">
+                        <div className="text-[11px] uppercase tracking-wide text-[#7d8ea3]">evidence</div>
+                        <ul className="mt-1 space-y-0.5 text-xs text-[#d7dde7]">
                           {evidence.map((e, i) => (
                             <li key={`e:${k.token}:${i}`} className="font-mono">
                               {e}
@@ -217,30 +247,23 @@ export function RootMapCard(props: Props) {
           )}
         </div>
 
-        <div>
-          <div className="text-[11px] uppercase tracking-wide text-neutral-400">
-            Constructed reading (hypothesis)
-          </div>
-          <div className="mt-1 text-sm text-neutral-200">{safeText(v?.composedMeaning)}</div>
-        </div>
-
         {rootMap.kind === "present" && state === "PRESENT" ? (
           <div>
-            <div className="text-[11px] uppercase tracking-wide text-neutral-400">Normalized word map</div>
+            <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#8ea4ba]">Normalized word map</div>
             {renderHighlights(normalizedWord, spansArr)}
           </div>
         ) : null}
 
-        <details className="rounded-lg border border-neutral-800 bg-neutral-950/20 p-2">
-          <summary className="cursor-pointer text-xs text-neutral-400">Carriers + spans (debug)</summary>
+        <details className="rounded-[10px] border border-[#27313d] bg-[#0d1117] p-3">
+          <summary className="cursor-pointer text-xs text-[#9fb1bf]">Carriers + spans (debug)</summary>
 
           <div className="mt-2 grid gap-3">
             <div>
-              <div className="text-[11px] uppercase tracking-wide text-neutral-500">carriers</div>
+              <div className="text-[11px] uppercase tracking-wide text-[#7d8ea3]">carriers</div>
               {carriersArr.length === 0 ? (
-                <div className="mt-1 text-xs text-neutral-400">—</div>
+                <div className="mt-1 text-xs text-[#9fb1bf]">—</div>
               ) : (
-                <ul className="mt-1 space-y-1 text-xs text-neutral-300">
+                <ul className="mt-1 space-y-1 text-xs text-[#d7dde7]">
                   {carriersArr.map((c, i) => (
                     <li key={`c:${c.token}:${i}`} className="font-mono">
                       {c.token} — {c.language ?? "?"}: {c.carrierForm ?? "?"}
@@ -252,11 +275,11 @@ export function RootMapCard(props: Props) {
             </div>
 
             <div>
-              <div className="text-[11px] uppercase tracking-wide text-neutral-500">spans</div>
+              <div className="text-[11px] uppercase tracking-wide text-[#7d8ea3]">spans</div>
               {spansArr.length === 0 ? (
-                <div className="mt-1 text-xs text-neutral-400">—</div>
+                <div className="mt-1 text-xs text-[#9fb1bf]">—</div>
               ) : (
-                <ul className="mt-1 space-y-1 text-xs text-neutral-300">
+                <ul className="mt-1 space-y-1 text-xs text-[#d7dde7]">
                   {spansArr.map((s, i) => (
                     <li key={`s:${s.token}:${i}`} className="font-mono">
                       {s.token} [{String(s.start)},{String(s.end)}] {s.note ? `— ${s.note}` : ""}
