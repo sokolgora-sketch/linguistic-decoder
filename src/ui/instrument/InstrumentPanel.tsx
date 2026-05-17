@@ -12,6 +12,7 @@ import { SoundRootsCard } from "@/ui/instrument/SoundRootsCard";
 import { useToast } from '@/hooks/use-toast';
 import { toPrettyJson } from "@/ui/instrument/prettyJson";
 import { buildEvidencePackageFromVM } from "@/ui/telemetry/buildEvidencePackageFromVM";
+import { buildEvidenceSummaryTextFromVM } from "@/ui/telemetry/buildEvidenceSummaryTextFromVM";
 import { ReadoutCard } from './sections/ReadoutCard';
 import { MaskCarrierCard } from "@/ui/instrument/sections/MaskCarrierCard.v0.1";
 import { CountsRatiosCard } from './sections/CountsRatiosCard';
@@ -272,21 +273,10 @@ export function InstrumentPanel(props: Props) {
     }
   }
 
-  const summaryLines = React.useMemo(() => {
-    if (!isValidVm) return [];
-    return [
-      'ZË-RO Instrument Summary',
-      `word=${String(vm.readout.word)}`,
-      `mode=${fmt(vm.readout.mode)}`,
-      `strictInput=${fmt(vm.readout.strictInput)}`,
-      `engine=${fmt(vm.readout.engineVersion)}`,
-      `voicePath=${vm.readout.voicePath.kind === 'present' ? vm.readout.voicePath.value.join('-') : 'not_emitted'}`,
-      `candidates=${String(vm.readout.counts.candidates)}`,
-      `ops=${fmt(vm.readout.counts.ops)}`,
-      `notes=${fmt(vm.readout.counts.notes)}`,
-      `signals=${fmt(vm.readout.counts.signals)}`,
-    ];
-  }, [isValidVm, vm]);
+  const evidenceSummaryText = React.useMemo(() => {
+    if (!isValidVm) return "";
+    return buildEvidenceSummaryTextFromVM(vm, { ledgerModel, candidateRows });
+  }, [candidateRows, isValidVm, ledgerModel, vm]);
 
   const engineVersion = isValidVm && vm.readout.engineVersion.kind === 'present' ? vm.readout.engineVersion.value : null;
 
@@ -424,7 +414,7 @@ export function InstrumentPanel(props: Props) {
               <div className="space-y-4 xl:col-span-7">
                 <ReadoutCard
                   readout={vm.readout}
-                  onCopySummary={() => void copyText("Summary copied.", summaryLines.join("\n"))}
+                  onCopySummary={() => void copyText("Summary copied.", evidenceSummaryText)}
                   onCopyFullJson={handleCopyFullJson}
                 />
                 <ShellSection title="Constructed reading (hypothesis)" subtitle="Inspection summary; not an origin claim.">
@@ -453,6 +443,9 @@ export function InstrumentPanel(props: Props) {
                   rootMap={vm.rootMap}
                 />
                 <EvidencePackageCard
+                  onCopyEvidenceSummary={() => {
+                    void copyText("Evidence summary copied.", evidenceSummaryText);
+                  }}
                   onCopyEvidencePackage={() => {
                     const pkg = buildEvidencePackageFromVM(vm as any, { ledgerModel });
                     void copyText("Evidence package copied.", toPrettyJson(pkg));
