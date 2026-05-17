@@ -2,7 +2,9 @@ import fs from "node:fs";
 
 const DARK_SURFACE_FILES = [
   "src/components/OriginClaimCard.tsx",
+  "src/ui/candidates/CandidatesAccordion.tsx",
   "src/ui/instrument/InstrumentPanel.tsx",
+  "src/ui/instrument/DeepRootHeartGateSummaryCard.tsx",
   "src/ui/instrument/ResonancePanel.v0.1.tsx",
   "src/ui/instrument/VoicePathCompare.tsx",
   "src/ui/instrument/sections/CountsRatiosCard.tsx",
