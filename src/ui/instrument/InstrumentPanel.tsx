@@ -120,7 +120,7 @@ function ShellBadge({
   return (
     <span
       className={cn(
-        "inline-flex min-h-7 items-center rounded-full border px-2.5 py-1 font-mono text-[11px]",
+        "inline-flex min-h-7 max-w-full items-center rounded-full border px-2.5 py-1 text-left font-mono text-[11px] leading-5 break-all",
         tone === "green" && "border-[#2f5a3d] bg-[#101712] text-[#b7d8c1] dark:border-[#2f5a3d] dark:bg-[#101712] dark:text-[#b7d8c1]",
         tone === "blue" && "border-[#355a7a] bg-[#111a24] text-[#cfe6ff] dark:border-[#355a7a] dark:bg-[#111a24] dark:text-[#cfe6ff]",
         tone === "amber" && "border-[#5e4b22] bg-[#19140d] text-[#f0ddb0] dark:border-[#5e4b22] dark:bg-[#19140d] dark:text-[#f0ddb0]",
@@ -134,9 +134,9 @@ function ShellBadge({
 
 function ShellMetric({ label, value }: { label: string; value: string }) {
   return (
-    <div className="min-h-[78px] rounded-[8px] border border-[#303a45] bg-[#101010] p-3 dark:border-[#303a45] dark:bg-[#101010]">
+    <div className="min-h-[78px] min-w-0 overflow-hidden rounded-[8px] border border-[#303a45] bg-[#101010] p-3 dark:border-[#303a45] dark:bg-[#101010]">
       <div className={`${MT.fieldLabel} mb-1 text-[11px] text-[#8ea4ba] dark:text-[#8ea4ba]`}>{label}</div>
-      <div className="break-words font-mono text-[13px] text-[#f5f7fb] dark:text-[#f5f7fb]">{value}</div>
+      <div className="break-all font-mono text-[13px] text-[#f5f7fb] dark:text-[#f5f7fb]">{value}</div>
     </div>
   );
 }
@@ -169,8 +169,8 @@ function SectionTabs({
   onChange: (next: InstrumentSectionKey) => void;
 }) {
   return (
-    <div className="rounded-[12px] border border-[#2f3742] bg-[#10161e] p-1.5 dark:border-[#2f3742] dark:bg-[#10161e]">
-      <div className="flex gap-1.5 overflow-x-auto" role="tablist" aria-label="Instrument sections">
+    <div className="max-w-full overflow-hidden rounded-[12px] border border-[#2f3742] bg-[#10161e] p-1.5 dark:border-[#2f3742] dark:bg-[#10161e]">
+      <div className="flex max-w-full gap-1.5 overflow-x-auto overscroll-x-contain [-webkit-overflow-scrolling:touch]" role="tablist" aria-label="Instrument sections">
         {INSTRUMENT_SECTIONS.map((section) => (
           <button
             key={section.id}
@@ -178,7 +178,7 @@ function SectionTabs({
             role="tab"
             aria-selected={active === section.id}
             className={cn(
-              `${MT.actionSm} min-h-10 shrink-0 rounded-[8px] border px-3 transition-colors`,
+              `${MT.actionSm} min-h-10 shrink-0 whitespace-nowrap rounded-[8px] border px-3 transition-colors`,
               active === section.id
                 ? "border-[#355a7a] bg-[#111a24] text-[#cfe6ff] shadow-[inset_0_0_0_1px_rgba(142,164,186,0.16)] dark:border-[#355a7a] dark:bg-[#111a24] dark:text-[#cfe6ff]"
                 : "border-transparent bg-transparent text-[#aeb7c5] hover:border-[#303a45] hover:bg-[#151515] hover:text-white dark:text-[#aeb7c5] dark:hover:border-[#303a45] dark:hover:bg-[#151515] dark:hover:text-white"
@@ -339,6 +339,7 @@ export function InstrumentPanel(props: Props) {
       <div
         className={cn(
           "space-y-4 rounded-[14px] border p-4 shadow-[0_16px_40px_rgba(0,0,0,0.24)] transition-colors sm:p-5",
+          "max-w-full overflow-hidden",
           isDarkMode
             ? "dark border-[#2f3742] bg-[#13171d] text-[#f5f7fb]"
             : "border-[#d5d5d5] bg-[#f5f5f5] text-[#111111]"
@@ -356,7 +357,7 @@ export function InstrumentPanel(props: Props) {
               </span>
               <span className="font-mono text-emerald-300/80">debug telemetry</span>
             </div>
-            <div className="grid gap-1 font-mono text-emerald-200/90 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-1 break-all font-mono text-emerald-200/90 sm:grid-cols-2 lg:grid-cols-3">
               <div>word: {safeText(vm.readout?.word)}</div>
               <div>engine: {safeText(engineVersion ?? "not_emitted")}</div>
               <div>mode: {safeText(modeText)}</div>
@@ -368,17 +369,17 @@ export function InstrumentPanel(props: Props) {
 
         <div className="rounded-[12px] border border-[#2c3540] bg-[#10161e] p-4 dark:border-[#2c3540] dark:bg-[#10161e] sm:p-5">
           <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
-            <div className="min-w-0">
+            <div className="min-w-0 xl:max-w-[72%]">
               <div className="flex flex-wrap items-center gap-3">
                 <Image
                   src="/zero_logo_hero_white.svg"
                   alt="ZË-RO"
                   width={140}
                   height={35}
-                  className="h-8 w-auto"
+                  className="h-7 w-auto shrink-0 sm:h-8"
                   priority={false}
                 />
-                <div>
+                <div className="min-w-0">
                   <div className={`${MT.eyebrow} text-[10px] text-[#d7dde7] dark:text-[#d7dde7]`}>
                     instrument · open
                   </div>
@@ -397,14 +398,14 @@ export function InstrumentPanel(props: Props) {
               </div>
             </div>
 
-            <div className="flex shrink-0 flex-wrap items-center gap-2">
+            <div className="flex w-full min-w-0 flex-wrap items-center gap-2 xl:w-auto xl:shrink-0 xl:justify-end">
               <ShellBadge tone="green">status={statusText}</ShellBadge>
               <ShellBadge tone="blue">mode={modeText}</ShellBadge>
               {engineVersion ? <ShellBadge tone="neutral">engine={engineVersion}</ShellBadge> : null}
               <button
                 type="button"
                 aria-pressed={isDarkMode}
-                className={`${MT.actionSm} inline-flex min-h-9 items-center gap-2 rounded-[8px] border border-[#5e4b22] bg-[#19140d] px-3 text-[#f0ddb0] transition hover:border-[#8a6a2a] hover:text-white dark:border-[#5e4b22] dark:bg-[#19140d] dark:text-[#f0ddb0] dark:hover:border-[#8a6a2a] dark:hover:text-white`}
+                className={`${MT.actionSm} inline-flex min-h-9 max-w-full items-center gap-2 rounded-[8px] border border-[#5e4b22] bg-[#19140d] px-3 text-[#f0ddb0] transition hover:border-[#8a6a2a] hover:text-white dark:border-[#5e4b22] dark:bg-[#19140d] dark:text-[#f0ddb0] dark:hover:border-[#8a6a2a] dark:hover:text-white`}
                 onClick={() => setIsDarkMode((next) => !next)}
               >
                 {isDarkMode ? <Sun className="h-4 w-4" aria-hidden="true" /> : <Moon className="h-4 w-4" aria-hidden="true" />}
@@ -530,7 +531,7 @@ export function InstrumentPanel(props: Props) {
                     </div>
 
                     <div className="mt-2 text-xs text-slate-500">Reason code counts</div>
-                    <pre className="mt-1 overflow-auto rounded-lg border border-slate-800 bg-black/35 p-3 text-xs font-mono text-slate-200">
+                    <pre className="mt-1 max-w-full overflow-auto whitespace-pre-wrap break-words rounded-lg border border-slate-800 bg-black/35 p-3 text-xs font-mono text-slate-200">
                       {JSON.stringify(vm.originClaimGates.reasonCounts, null, 2)}
                     </pre>
                   </div>

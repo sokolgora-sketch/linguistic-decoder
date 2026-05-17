@@ -24,22 +24,22 @@ export default function ChatShell({
   composer,
   maxWidthClass = "max-w-7xl",
 }: ChatShellProps) {
-  const wrap = `mx-auto w-full ${maxWidthClass} px-4`;
+  const wrap = `mx-auto w-full ${maxWidthClass} px-3 sm:px-4`;
 
   return (
-    <div className="flex min-h-screen flex-col bg-[#111111] text-[#f5f7fb]">
+    <div className="flex min-h-screen min-w-0 flex-col bg-[#111111] text-[#f5f7fb]">
       <header className="sticky top-0 z-20 border-b border-[#333333] bg-[#1a1a1a]/95 backdrop-blur supports-[backdrop-filter]:bg-[#1a1a1a]/88">
-        <div className={`${wrap} flex items-center justify-between gap-3 py-2`}>
-          <div className="flex min-w-0 items-center gap-3">
+        <div className={`${wrap} flex min-w-0 flex-wrap items-center justify-between gap-2 py-2 sm:gap-3`}>
+          <div className="flex min-w-0 items-center gap-2 sm:gap-3">
             <Image
               src="/zero_logo_hero_white.svg"
               alt={title}
               width={140}
               height={35}
-              className="h-7 w-auto shrink-0"
+              className="h-6 w-auto shrink-0 sm:h-7"
               priority={false}
             />
-            <div className="min-w-0 border-l border-[#333333] pl-3">
+            <div className="min-w-0 border-l border-[#333333] pl-2 sm:pl-3">
               <div className={`${MT.eyebrow} text-[10px] text-[#d7dde7]`}>
                 instrument · open
               </div>
@@ -60,13 +60,13 @@ export default function ChatShell({
         </div>
       </header>
 
-      <main className="flex-1">
+      <main className={composer ? "flex-1 pb-[calc(16rem+env(safe-area-inset-bottom))] md:pb-[calc(9.5rem+env(safe-area-inset-bottom))] xl:pb-[calc(7.5rem+env(safe-area-inset-bottom))]" : "flex-1"}>
         <div className={`${wrap} py-4`}>{children}</div>
       </main>
 
       {composer ? (
         <footer className="sticky bottom-0 z-20 border-t border-[#333333] bg-[#111111]/95 backdrop-blur supports-[backdrop-filter]:bg-[#111111]/88">
-          <div className={`${wrap} py-4`}>{composer}</div>
+          <div className={`${wrap} pb-[calc(0.75rem+env(safe-area-inset-bottom))] pt-3 sm:py-4`}>{composer}</div>
         </footer>
       ) : null}
     </div>

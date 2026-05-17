@@ -247,11 +247,11 @@ export default function ZroChatPage() {
   }
 
   const inputClassName =
-    "h-11 rounded-[8px] border-[#303030] bg-[#101010] font-mono text-[14px] text-[#f5f7fb] placeholder:text-[#777777] focus-visible:ring-[#355a7a] focus-visible:ring-offset-0 disabled:opacity-50";
+    "h-11 w-full min-w-0 rounded-[8px] border-[#303030] bg-[#101010] font-mono text-[14px] text-[#f5f7fb] placeholder:text-[#777777] focus-visible:ring-[#355a7a] focus-visible:ring-offset-0 disabled:opacity-50";
 
   const composer = (
-    <div className="rounded-[14px] border border-[#2f3742] bg-[#13171d] p-3 shadow-[0_16px_40px_rgba(0,0,0,0.24)]">
-      <div className="grid gap-3 xl:grid-cols-[minmax(0,1fr)_minmax(260px,0.42fr)_132px] xl:items-end">
+    <div className="overflow-hidden rounded-[14px] border border-[#2f3742] bg-[#13171d] p-2.5 shadow-[0_16px_40px_rgba(0,0,0,0.24)] sm:p-3">
+      <div className="grid min-w-0 grid-cols-1 gap-3 md:grid-cols-[minmax(0,1fr)_minmax(220px,0.45fr)] xl:grid-cols-[minmax(0,1fr)_minmax(260px,0.42fr)_132px] xl:items-end">
         <label className="block min-w-0">
           <span className={`${MT.fieldLabel} mb-2 text-[11px] text-[#8ea4ba]`}>
             Word
@@ -287,7 +287,7 @@ export default function ZroChatPage() {
           onClick={onSubmit}
           disabled={busy}
           aria-busy={busy ? 'true' : 'false'}
-          className={`${MT.actionSm} h-11 rounded-[8px] border border-[#355a7a] bg-[#111a24] px-4 text-[#cfe6ff] transition hover:border-[#4d7fa8] hover:bg-[#132031] hover:text-white disabled:opacity-50`}
+          className={`${MT.actionSm} h-11 w-full rounded-[8px] border border-[#355a7a] bg-[#111a24] px-4 text-[#cfe6ff] transition hover:border-[#4d7fa8] hover:bg-[#132031] hover:text-white disabled:opacity-50 md:col-span-2 xl:col-span-1`}
         >
           {busy ? 'Analyzing…' : 'Analyze'}
         </Button>
