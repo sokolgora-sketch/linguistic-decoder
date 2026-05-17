@@ -38,7 +38,7 @@ export function RawJsonCard(props: {
           </div>
 
           {hasPretty ? (
-            <pre className="mt-2 max-h-[420px] overflow-auto rounded-md border border-slate-800 bg-black/35 p-3 text-xs font-mono leading-relaxed text-slate-200">
+            <pre className="mt-2 max-h-[420px] max-w-full overflow-auto whitespace-pre-wrap break-words rounded-md border border-slate-800 bg-black/35 p-3 text-xs font-mono leading-relaxed text-slate-200">
               {props.pretty}
             </pre>
           ) : (

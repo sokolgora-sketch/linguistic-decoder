@@ -5,7 +5,7 @@ import { toPrettyJson } from "@/ui/instrument/prettyJson";
 function CopyButton({ text, label }: { text: string; label: string }) {
   return (
     <button
-      className="rounded-md border border-blue-400/50 bg-blue-500/10 px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-blue-100 transition hover:border-blue-300 hover:bg-blue-500/20"
+      className="max-w-full rounded-md border border-blue-400/50 bg-blue-500/10 px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-blue-100 transition hover:border-blue-300 hover:bg-blue-500/20"
       onClick={() => navigator.clipboard.writeText(text)}
       type="button"
     >
@@ -36,7 +36,7 @@ function CandidateChip({
 
   return (
     <span
-      className={`inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-mono ${toneClass}`}
+      className={`inline-flex max-w-full items-center rounded-md border px-2 py-0.5 text-xs font-mono leading-5 break-all ${toneClass}`}
       title={title}
     >
       {children}
@@ -77,10 +77,10 @@ export function CandidatesAccordion({ rows }: { rows: UICandidateRow[] }) {
         {rows.map((c) => {
           const isOpen = openId === c.id;
           return (
-            <div key={c.id} className="overflow-hidden rounded-lg border border-slate-800 bg-black/25">
+            <div key={c.id} className="min-w-0 overflow-hidden rounded-lg border border-slate-800 bg-black/25">
               <button
                 type="button"
-                className="w-full px-3 py-3 text-left transition hover:bg-slate-900/50"
+                className="w-full min-w-0 px-3 py-3 text-left transition hover:bg-slate-900/50"
                 aria-expanded={isOpen}
                 onClick={() => setOpenId(isOpen ? null : c.id)}
               >
@@ -96,11 +96,11 @@ export function CandidatesAccordion({ rows }: { rows: UICandidateRow[] }) {
                         </CandidateChip>
                       ) : null}
                       {c.status ? <CandidateChip tone="amber">{c.status}</CandidateChip> : null}
-                      <span className="break-words font-mono text-sm text-slate-100">{c.form}</span>
+                      <span className="break-all font-mono text-sm text-slate-100">{c.form}</span>
                     </div>
 
                     {c.functionalStatement ? (
-                      <div className="text-sm text-slate-400">
+                      <div className="break-words text-sm text-slate-400">
                         {c.functionalStatement}
                       </div>
                     ) : null}
@@ -108,7 +108,7 @@ export function CandidatesAccordion({ rows }: { rows: UICandidateRow[] }) {
                     {c.deepRootHeartGateStatus === "misaligned" &&
                      Array.isArray(c.deepRootHeartGateReasons) &&
                      c.deepRootHeartGateReasons.length ? (
-                      <div className="font-mono text-xs text-slate-500">
+                      <div className="break-all font-mono text-xs text-slate-500">
                         {c.deepRootHeartGateReasons.join(", ")}
                       </div>
                     ) : null}
@@ -130,7 +130,7 @@ export function CandidatesAccordion({ rows }: { rows: UICandidateRow[] }) {
                 </div>
 
                 {Array.isArray(c.deepRootHeartGateEvidenceRefs) && c.deepRootHeartGateEvidenceRefs.length ? (
-                  <div className="mt-2 font-mono text-xs text-slate-500">
+                  <div className="mt-2 break-all font-mono text-xs text-slate-500">
                     Evidence: {c.deepRootHeartGateEvidenceRefs.join(", ")}
                   </div>
                 ) : null}
@@ -154,7 +154,7 @@ export function CandidatesAccordion({ rows }: { rows: UICandidateRow[] }) {
                           Gate: <span className="font-mono">misaligned</span>
                         </div>
                         {Array.isArray(c.deepRootHeartGateReasons) && c.deepRootHeartGateReasons.length ? (
-                          <div className="mt-1 font-mono">
+                            <div className="mt-1 break-all font-mono">
                             {c.deepRootHeartGateReasons.join(", ")}
                           </div>
                         ) : (
@@ -163,7 +163,7 @@ export function CandidatesAccordion({ rows }: { rows: UICandidateRow[] }) {
                       </div>
                     ) : null}
 
-                  <pre className="mt-3 max-h-80 overflow-auto rounded-md border border-slate-800 bg-black/35 p-3 text-xs text-slate-200">
+                  <pre className="mt-3 max-h-80 max-w-full overflow-auto whitespace-pre-wrap break-words rounded-md border border-slate-800 bg-black/35 p-3 text-xs text-slate-200">
 {toPrettyJson(c.raw)}
                   </pre>
                 </div>
