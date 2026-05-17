@@ -324,13 +324,27 @@ export default function ZroChatPage() {
           </div>
         )}
 
-          {debugEnabled ? (
-            <div className="mt-2 text-xs opacity-80 whitespace-pre-wrap">
-              debug: messages={messages.length} latestInstrumentPayload={latestInstrumentPayload ? "YES" : "NO"}
+        {debugEnabled ? (
+          <section
+            aria-label="Open Instrument debug telemetry"
+            className="rounded-[10px] border border-slate-700/80 bg-[#10151c] p-3 text-xs text-slate-300 shadow-[0_10px_30px_rgba(0,0,0,0.22)]"
+          >
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="rounded-full border border-blue-400/40 bg-blue-500/10 px-2 py-0.5 font-mono text-[11px] uppercase tracking-wide text-blue-100">
+                debug telemetry
+              </span>
+              <span className="font-mono text-slate-400">messages={messages.length}</span>
+              <span className="font-mono text-slate-400">
+                latestInstrumentPayload={latestInstrumentPayload ? "YES" : "NO"}
+              </span>
             </div>
-          ) : null}
-
-          {debugEnabled && debug ? <pre className="mt-2 text-xs opacity-80 whitespace-pre-wrap">{debug}</pre> : null}
+            {debug ? (
+              <pre className="mt-3 max-h-72 overflow-auto whitespace-pre-wrap rounded-md border border-slate-800 bg-black/35 p-3 font-mono text-xs text-slate-200">
+                {debug}
+              </pre>
+            ) : null}
+          </section>
+        ) : null}
         <div ref={bottomRef} />
       </div>
     </ChatShell>

@@ -34,6 +34,19 @@ describe('Analyze keyboard interactions', () => {
     expect(screen.getByRole('button', { name: 'Analyze' })).toBeInTheDocument();
   });
 
+  it('renders debug telemetry as a console surface when debug query is enabled', async () => {
+    window.history.pushState({}, '', '/chat?debug=1');
+
+    render(<ZroChatPage />);
+
+    expect(await screen.findByRole('region', { name: 'Open Instrument debug telemetry' })).toBeInTheDocument();
+    expect(screen.getByText('debug telemetry')).toBeInTheDocument();
+    expect(screen.getByText('messages=1')).toBeInTheDocument();
+    expect(screen.getByText('latestInstrumentPayload=NO')).toBeInTheDocument();
+
+    window.history.pushState({}, '', '/chat');
+  });
+
   it('replaces the empty state after a result payload arrives', async () => {
     render(<ZroChatPage />);
     expect(screen.getByText('Open Instrument ready')).toBeInTheDocument();
