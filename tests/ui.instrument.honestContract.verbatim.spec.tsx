@@ -33,11 +33,14 @@ function minimalPayload(): any {
 
 describe("Open Instrument honest contract", () => {
   it("renders the foundation contract verbatim", () => {
-    render(<HonestContractCard />);
+    const { container } = render(<HonestContractCard />);
 
     expect(screen.getByText("honest contract")).toBeInTheDocument();
     expect(screen.getByText("What Open Instrument is")).toBeInTheDocument();
     expect(screen.getByText(OPEN_INSTRUMENT_HONEST_CONTRACT)).toBeInTheDocument();
+    expect(screen.getByText("collapse")).toBeInTheDocument();
+    expect(screen.getByText("Visible by default. Collapse after reading; keep this boundary in mind before using candidates.")).toBeInTheDocument();
+    expect(container.querySelector("details")).toHaveAttribute("open");
   });
 
   it("keeps the contract visible in the post-analysis instrument shell", () => {
