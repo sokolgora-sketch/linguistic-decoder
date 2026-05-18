@@ -13,6 +13,7 @@ const DARK_SURFACE_FILES = [
   "src/ui/instrument/sections/CountsRatiosCard.tsx",
   "src/ui/instrument/sections/EvidencePackageCard.tsx",
   "src/ui/instrument/sections/EvidenceTraceCard.tsx",
+  "src/ui/instrument/sections/HonestContractCard.tsx",
   "src/ui/instrument/sections/MaskCarrierCard.v0.1.tsx",
   "src/ui/instrument/sections/MeaningCard.tsx",
   "src/ui/instrument/sections/OracleProposeWithEngineOracleCard.v0.1.tsx",
