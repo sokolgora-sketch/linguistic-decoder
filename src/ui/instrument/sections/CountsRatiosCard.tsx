@@ -72,15 +72,15 @@ function renderKV(obj: KV) {
   const entries = Object.entries(obj);
 
   if (!entries.length) {
-    return <div className="text-sm text-slate-500">Not available.</div>;
+    return <div className="text-sm text-[#7d8ea3]">Not available.</div>;
   }
 
   return (
-    <div className="grid gap-1">
+    <div className="grid gap-2">
       {entries.map(([k, v]) => (
-        <div key={k} className="flex items-baseline justify-between gap-3">
-          <div className="text-sm text-slate-500">{k}</div>
-          <div className="text-sm font-mono text-slate-200">{renderValue(v)}</div>
+        <div key={k} className="flex items-baseline justify-between gap-3 rounded-[8px] border border-[#27313d] bg-[#0d1117] px-3 py-2">
+          <div className="min-w-0 break-words text-sm text-[#8ea4ba]">{k}</div>
+          <div className="text-right text-sm font-mono text-[#f5f7fb]">{renderValue(v)}</div>
         </div>
       ))}
     </div>
@@ -92,23 +92,35 @@ export function CountsRatiosCard(props: { readout: unknown; engineVersion?: stri
   const ratios = pickRatios(props.readout);
 
   return (
-    <section className="rounded-xl border border-slate-700/80 bg-[#10151c] p-4 shadow-[0_16px_48px_rgba(0,0,0,0.28)]">
-      <div>
-        <div className="text-sm font-semibold text-slate-100">Counts / Ratios</div>
+    <section className="rounded-[12px] border border-[#303a45] bg-[#10151c] p-4 shadow-[0_16px_48px_rgba(0,0,0,0.22)]">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div className="min-w-0">
+          <div className="text-[10px] font-semibold uppercase text-[#8ea4ba]">overview totals</div>
+          <div className="mt-1 text-base font-semibold text-[#f5f7fb]">Counts / Ratios</div>
+          <div className="mt-2 max-w-2xl text-[12px] leading-5 text-[#aeb7c5]">
+            Humanized VM counts and ratios for this readout. Missing means the engine did not emit that field.
+          </div>
+        </div>
         {props.engineVersion ? (
-          <div className="mt-1 text-xs text-slate-500">engine: {props.engineVersion}</div>
+          <div className="shrink-0 rounded-full border border-[#303a45] bg-[#0d1117] px-3 py-1.5 font-mono text-[11px] uppercase text-[#cfe6ff]">
+            engine={props.engineVersion}
+          </div>
         ) : null}
       </div>
       <div className="mt-4 grid gap-4">
-        <div>
-          <div className="mb-2 text-sm font-semibold text-slate-300">Counts</div>
-          {counts ? renderKV(counts) : <div className="text-sm text-slate-500">Not available.</div>}
+        <div className="rounded-[10px] border border-[#27313d] bg-[#0d1117] p-3">
+          <div className="mb-3 text-xs font-semibold uppercase text-[#8ea4ba]">Counts</div>
+          {counts ? renderKV(counts) : <div className="text-sm text-[#7d8ea3]">Not available.</div>}
         </div>
 
-        <div>
-          <div className="mb-2 text-sm font-semibold text-slate-300">Ratios</div>
-          {ratios ? renderKV(ratios) : <div className="text-sm text-slate-500">Not available.</div>}
+        <div className="rounded-[10px] border border-[#27313d] bg-[#0d1117] p-3">
+          <div className="mb-3 text-xs font-semibold uppercase text-[#8ea4ba]">Ratios</div>
+          {ratios ? renderKV(ratios) : <div className="text-sm text-[#7d8ea3]">Not available.</div>}
         </div>
+      </div>
+
+      <div className="mt-4 rounded-[10px] border border-[#27313d] bg-[#0d1117] p-3 text-[11px] leading-5 text-[#7d8ea3]">
+        Boundary: overview metrics only; no score order; no forced answer.
       </div>
     </section>
   );

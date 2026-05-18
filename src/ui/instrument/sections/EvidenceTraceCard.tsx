@@ -42,9 +42,9 @@ function rootMapStatus(rootMap: PresentOrMissing<RootMapVM> | undefined): string
 
 function TraceRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex items-baseline justify-between gap-3">
-      <div className="text-xs text-slate-500">{label}</div>
-      <div className="text-right text-xs font-mono text-slate-200">{value}</div>
+    <div className="flex items-baseline justify-between gap-3 rounded-[8px] border border-[#27313d] bg-[#0d1117] px-3 py-2">
+      <div className="min-w-0 break-words text-xs text-[#8ea4ba]">{label}</div>
+      <div className="text-right text-xs font-mono text-[#f5f7fb]">{value}</div>
     </div>
   );
 }
@@ -65,13 +65,16 @@ export function EvidenceTraceCard({
   const ledgerSources = ledgerSections.map((section) => `${section.source ?? section.key}: ${section.state}`);
 
   return (
-    <section className="rounded-xl border border-slate-700/80 bg-[#10151c] p-4 shadow-[0_16px_48px_rgba(0,0,0,0.28)]">
-      <div className="text-sm font-semibold text-slate-100">Evidence trace</div>
-      <div className="mt-1 text-xs text-slate-500">
-        Compact map of emitted VM fields behind this readout.
+    <section className="rounded-[12px] border border-[#303a45] bg-[#10151c] p-4 shadow-[0_16px_48px_rgba(0,0,0,0.22)]">
+      <div className="min-w-0">
+        <div className="text-[10px] font-semibold uppercase text-[#8ea4ba]">overview field trace</div>
+        <div className="mt-1 text-base font-semibold text-[#f5f7fb]">Evidence trace</div>
+        <div className="mt-2 max-w-2xl text-[12px] leading-5 text-[#aeb7c5]">
+          Compact map of emitted VM fields behind this readout.
+        </div>
       </div>
 
-      <div className="mt-4 space-y-2">
+      <div className="mt-4 space-y-2 rounded-[10px] border border-[#27313d] bg-[#0d1117] p-3">
         <TraceRow label="input word" value={readout.word ? `word=${readout.word}` : "not emitted"} />
         <TraceRow label="normalized form" value={`norm=${pomText(readout.normalizedWord, String)}`} />
         <TraceRow label="voice path" value={`path=${vowelPathText(readout.voicePath)}`} />
@@ -84,10 +87,10 @@ export function EvidenceTraceCard({
         <TraceRow label="RootMap hypothesis" value={`rootMap=${rootMapStatus(rootMap)}`} />
       </div>
 
-      <div className="mt-4">
-        <div className="text-[11px] font-semibold uppercase tracking-wide text-neutral-400">Ledger sources</div>
+      <div className="mt-4 rounded-[10px] border border-[#27313d] bg-[#0d1117] p-3">
+        <div className="text-[11px] font-semibold uppercase text-[#8ea4ba]">Ledger sources</div>
         {ledgerSources.length ? (
-          <ul className="mt-2 space-y-1.5 text-xs text-neutral-300">
+          <ul className="mt-2 space-y-1.5 text-xs text-[#d7dde7]">
             {ledgerSources.map((source) => (
               <li key={source} className="font-mono">
                 {source}
@@ -95,8 +98,12 @@ export function EvidenceTraceCard({
             ))}
           </ul>
         ) : (
-          <div className="mt-2 text-xs text-slate-500">not emitted</div>
+          <div className="mt-2 text-xs text-[#7d8ea3]">not emitted</div>
         )}
+      </div>
+
+      <div className="mt-4 rounded-[10px] border border-[#27313d] bg-[#0d1117] p-3 text-[11px] leading-5 text-[#7d8ea3]">
+        Boundary: VM field trace only; not a proof chain; no forced answer.
       </div>
     </section>
   );

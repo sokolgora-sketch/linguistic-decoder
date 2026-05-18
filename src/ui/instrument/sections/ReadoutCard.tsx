@@ -27,6 +27,29 @@ function VowelChip({ v }: { v: Vowel }) {
   );
 }
 
+function pomSummary<T>(
+  pom: PresentOrMissing<T>,
+  renderValue: (v: T) => string = (v) => String(v),
+  fallbackLabel = "not emitted"
+) {
+  return pom.kind === "present" ? renderValue(pom.value) : fallbackLabel;
+}
+
+function StatusChip({ label, tone = "neutral" }: { label: string; tone?: "green" | "blue" | "neutral" }) {
+  const toneClass =
+    tone === "green"
+      ? "border-[#2f5a3d] bg-[#101712] text-[#b7d8c1]"
+      : tone === "blue"
+        ? "border-[#355a7a] bg-[#111a24] text-[#cfe6ff]"
+        : "border-[#303a45] bg-[#0d1117] text-[#d7dde7]";
+
+  return (
+    <span className={`rounded-full border px-3 py-1.5 font-mono text-[11px] uppercase ${toneClass}`}>
+      {label}
+    </span>
+  );
+}
+
 export function ReadoutCard({
   readout,
   onCopySummary,
@@ -42,21 +65,27 @@ export function ReadoutCard({
   const phoneticIpaPOM = readout.phoneticIpaV0_1;
 
   return (
-    <div className="rounded-xl border border-slate-700/80 bg-[#10151c] p-4 shadow-[0_16px_48px_rgba(0,0,0,0.28)]">
+    <div className="rounded-[12px] border border-[#303a45] bg-[#10151c] p-4 shadow-[0_16px_48px_rgba(0,0,0,0.22)]">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-        <div>
-          <div className="text-sm text-slate-500">Readout</div>
-          <div className="text-lg font-semibold text-slate-100">{readout.word}</div>
-          <div className="mt-1 text-sm font-mono text-slate-300">
+        <div className="min-w-0">
+          <div className="text-[10px] font-semibold uppercase text-[#8ea4ba]">overview readout</div>
+          <div className="mt-1 text-base font-semibold text-[#f5f7fb]">Readout</div>
+          <div className="mt-1 break-words text-lg font-semibold text-[#f5f7fb]">{readout.word}</div>
+          <div className="mt-1 text-sm font-mono text-[#d7dde7]">
             normalized: {renderPOM(readout.normalizedWord, (v) => <span>{String(v)}</span>)}
+          </div>
+          <div className="mt-2 max-w-2xl text-[12px] leading-5 text-[#aeb7c5]">
+            VM-backed readout for the current word. Use Evidence for handoff text and Advanced for raw audit payloads.
           </div>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          <span className="rounded-full border border-green-400/40 bg-green-500/10 px-2 py-1 text-xs font-mono text-green-100">{statusBadge}</span>
+          <StatusChip label={`status=${statusBadge.toLowerCase()}`} tone={readout.status === "detected" ? "green" : "neutral"} />
+          <StatusChip label={`mode=${pomSummary(readout.mode)}`} tone="blue" />
+          <StatusChip label={`engine=${pomSummary(readout.engineVersion)}`} />
           <button
             type="button"
-            className="rounded-md border border-blue-400/50 bg-blue-500/10 px-3 py-1 text-sm font-semibold text-blue-100 transition hover:border-blue-300 hover:bg-blue-500/20"
+            className="rounded-[8px] border border-blue-400/50 bg-blue-500/10 px-3 py-1.5 text-sm font-semibold text-blue-100 transition hover:border-blue-300 hover:bg-blue-500/20"
             onClick={onCopySummary}
           >
             Copy Summary
@@ -64,7 +93,7 @@ export function ReadoutCard({
           {onCopyFullJson ? (
             <button
               type="button"
-              className="rounded-md border border-slate-700 bg-slate-900/70 px-3 py-1 text-sm font-semibold text-slate-200 transition hover:border-slate-500 hover:bg-slate-800"
+              className="rounded-[8px] border border-[#303a45] bg-[#0d1117] px-3 py-1.5 text-sm font-semibold text-[#d7dde7] transition hover:border-[#4b5b6c] hover:bg-[#151b24]"
               onClick={onCopyFullJson}
             >
               Copy Full JSON
@@ -74,9 +103,9 @@ export function ReadoutCard({
       </div>
 
       <div className="mt-4 grid gap-3 md:grid-cols-2">
-        <div className="rounded-lg border border-slate-800 bg-black/25 p-3">
-          <div className="text-xs text-slate-500">Run context</div>
-          <div className="mt-2 space-y-1 text-sm font-mono text-slate-300">
+        <div className="rounded-[10px] border border-[#27313d] bg-[#0d1117] p-3">
+          <div className="text-xs font-semibold uppercase text-[#8ea4ba]">Run context</div>
+          <div className="mt-2 space-y-1 text-sm font-mono text-[#d7dde7]">
             <div>mode: {renderPOM(readout.mode, (v) => <span>{String(v)}</span>)}</div>
             <div>
               strictInput:{" "}
@@ -92,9 +121,9 @@ export function ReadoutCard({
           </div>
         </div>
 
-        <div className="rounded-lg border border-slate-800 bg-black/25 p-3">
-          <div className="text-xs text-slate-500">Detection</div>
-          <div className="mt-2 text-sm font-mono text-slate-300">
+        <div className="rounded-[10px] border border-[#27313d] bg-[#0d1117] p-3">
+          <div className="text-xs font-semibold uppercase text-[#8ea4ba]">Detection</div>
+          <div className="mt-2 text-sm font-mono text-[#d7dde7]">
             <div>
               voicePath:{" "}
               {renderPOM(
@@ -131,6 +160,10 @@ export function ReadoutCard({
             </div>
           </div>
         </div>
+      </div>
+
+      <div className="mt-4 rounded-[10px] border border-[#27313d] bg-[#0d1117] p-3 text-[11px] leading-5 text-[#7d8ea3]">
+        Boundary: deterministic readout only; no origin proof; no forced answer.
       </div>
     </div>
   );
