@@ -4,7 +4,7 @@ Status: FINNISH PHASE A EVIDENCE PACK RECORDED
 Project: ZË-RO
 Milestone: Cohort 03
 Phase: Finnish Phase A bridge
-Case: Finnish `/ö`
+Case: Finnish `/ö/`
 Date recorded: 2026-05-18
 
 This document records the Cohort 03 Finnish `/ö/` bridge evidence pack.
