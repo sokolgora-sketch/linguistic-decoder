@@ -5,6 +5,7 @@ import ChatShell from '@/components/ChatShell';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { InstrumentPanel } from '@/ui/instrument/InstrumentPanel';
+import { HonestContractCard } from '@/ui/instrument/sections/HonestContractCard';
 import { MT } from '@/ui/typography/marketingType.v0.1';
 
 class UiErrorBoundary extends React.Component<
@@ -75,47 +76,51 @@ const emptyStateSteps = [
 
 function OpenInstrumentEmptyState() {
   return (
-    <section
-      aria-label="Open Instrument status"
-      className="overflow-hidden rounded-[18px] border border-[#2f3742] bg-[#13171d] shadow-[0_18px_48px_rgba(0,0,0,0.24)]"
-    >
-      <div className="grid gap-0 lg:grid-cols-[minmax(0,1fr)_minmax(300px,0.72fr)]">
-        <div className="p-5 sm:p-6 lg:p-7">
-          <div className="mb-5 flex flex-wrap gap-2">
-            {readinessChips.map(chip => (
-              <span
-                key={chip}
-                className={`${MT.chipText} rounded-full border border-[#303a45] bg-[#10161e] px-3 py-1 font-mono text-[#b8c3cf]`}
-              >
-                {chip}
-              </span>
-            ))}
+    <div className="space-y-4">
+      <section
+        aria-label="Open Instrument status"
+        className="overflow-hidden rounded-[18px] border border-[#2f3742] bg-[#13171d] shadow-[0_18px_48px_rgba(0,0,0,0.24)]"
+      >
+        <div className="grid gap-0 lg:grid-cols-[minmax(0,1fr)_minmax(300px,0.72fr)]">
+          <div className="p-5 sm:p-6 lg:p-7">
+            <div className="mb-5 flex flex-wrap gap-2">
+              {readinessChips.map(chip => (
+                <span
+                  key={chip}
+                  className={`${MT.chipText} rounded-full border border-[#303a45] bg-[#10161e] px-3 py-1 font-mono text-[#b8c3cf]`}
+                >
+                  {chip}
+                </span>
+              ))}
+            </div>
+
+            <p className={`${MT.sectionLabel} text-[#8ea4ba]`}>instrument ready</p>
+            <h2 className="mt-3 text-[26px] font-semibold leading-tight text-[#f5f7fb]">
+              Open Instrument ready
+            </h2>
+            <p className="mt-4 max-w-2xl text-[14px] leading-7 text-[#b8c3cf]">
+              One word enters the deterministic readout. Evidence, candidates, roots, and advanced
+              diagnostics appear after analysis.
+            </p>
           </div>
 
-          <p className={`${MT.sectionLabel} text-[#8ea4ba]`}>instrument ready</p>
-          <h2 className="mt-3 text-[26px] font-semibold leading-tight text-[#f5f7fb]">
-            Open Instrument ready
-          </h2>
-          <p className="mt-4 max-w-2xl text-[14px] leading-7 text-[#b8c3cf]">
-            One word enters the deterministic readout. Evidence, candidates, roots, and advanced
-            diagnostics appear after analysis.
-          </p>
-        </div>
-
-        <div className="border-t border-[#2f3742] bg-[#10161e] p-4 sm:p-5 lg:border-l lg:border-t-0">
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
-            {emptyStateSteps.map(step => (
-              <div key={step.index} className="rounded-[10px] border border-[#29333f] bg-[#0d1117] p-4">
-                <div className={`${MT.microLabel} font-mono text-[#6f8294]`}>{step.index}</div>
-                <div className={`mt-3 font-mono text-[15px] font-semibold ${step.tone}`}>
-                  {step.label}
+          <div className="border-t border-[#2f3742] bg-[#10161e] p-4 sm:p-5 lg:border-l lg:border-t-0">
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
+              {emptyStateSteps.map(step => (
+                <div key={step.index} className="rounded-[10px] border border-[#29333f] bg-[#0d1117] p-4">
+                  <div className={`${MT.microLabel} font-mono text-[#6f8294]`}>{step.index}</div>
+                  <div className={`mt-3 font-mono text-[15px] font-semibold ${step.tone}`}>
+                    {step.label}
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
+
+      <HonestContractCard />
+    </div>
   );
 }
 

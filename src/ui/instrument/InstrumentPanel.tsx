@@ -18,6 +18,7 @@ import { MaskCarrierCard } from "@/ui/instrument/sections/MaskCarrierCard.v0.1";
 import { CountsRatiosCard } from './sections/CountsRatiosCard';
 import { RawJsonCard } from './sections/RawJsonCard';
 import { EvidencePackageCard } from './sections/EvidencePackageCard';
+import { HonestContractCard } from "./sections/HonestContractCard";
 import { OracleProposeWithEngineOracleCardV01 } from "./sections/OracleProposeWithEngineOracleCard.v0.1";
 import { EvidenceTraceCard } from "./sections/EvidenceTraceCard";
 import { ToolBoundaryCard } from "./sections/ToolBoundaryCard";
@@ -408,6 +409,7 @@ export function InstrumentPanel(props: Props) {
 
         <SectionTabs active={activeSection} onChange={setActiveSection} />
         <SectionIntro section={activeSectionMeta} />
+        <HonestContractCard />
 
         <div className="space-y-4">
           <TabPanel id="overview" active={activeSection}>
