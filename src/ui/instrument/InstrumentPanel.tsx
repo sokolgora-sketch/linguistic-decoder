@@ -22,6 +22,7 @@ import { OracleProposeWithEngineOracleCardV01 } from "./sections/OracleProposeWi
 import { EvidenceTraceCard } from "./sections/EvidenceTraceCard";
 import { ToolBoundaryCard } from "./sections/ToolBoundaryCard";
 import { WorldLanguageTreeCard } from './sections/WorldLanguageTreeCard';
+import { OriginClaimGatesCard } from "./sections/OriginClaimGatesCard";
 import { buildRootLightMapV01 } from '@/shared/rootLightMap.v0.1';
 import MeaningPanel from './MeaningPanel';
 import { buildEvidenceLedgerModelFromVM } from '../ledger/ledgerModel';
@@ -511,24 +512,7 @@ export function InstrumentPanel(props: Props) {
                 />
               </div>
               <div className="space-y-4 xl:col-span-7">
-                {vm.originClaimGates ? (
-                  <div className="rounded-xl border border-slate-700/80 bg-[#10151c] p-4 shadow-[0_16px_48px_rgba(0,0,0,0.28)]">
-                    <div className="text-sm font-semibold text-slate-100">OriginClaim Gates</div>
-                    <div className="mt-1 text-sm text-slate-300">
-                      Status:{" "}
-                      <span className="font-mono">{vm.originClaimGates.active ? "ON" : "OFF"}</span>{" "}
-                      <span className="text-xs text-slate-500">(dev flag: ?{vm.originClaimGates.flag}=1)</span>
-                    </div>
-                    <div className="mt-1 text-sm text-slate-300">
-                      Candidates: <span className="font-mono">{vm.originClaimGates.candidateCount}</span>
-                    </div>
-
-                    <div className="mt-2 text-xs text-slate-500">Reason code counts</div>
-                    <pre className="mt-1 max-w-full overflow-auto whitespace-pre-wrap break-words rounded-lg border border-slate-800 bg-black/35 p-3 text-xs font-mono text-slate-200">
-                      {JSON.stringify(vm.originClaimGates.reasonCounts, null, 2)}
-                    </pre>
-                  </div>
-                ) : null}
+                <OriginClaimGatesCard gates={vm.originClaimGates} />
                 <OriginClaimCard
                   originClaim={vm.originClaim?.kind === "present" ? (vm.originClaim as any).value : null}
                 />

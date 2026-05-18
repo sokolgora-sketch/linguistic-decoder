@@ -16,6 +16,7 @@ const DARK_SURFACE_FILES = [
   "src/ui/instrument/sections/MaskCarrierCard.v0.1.tsx",
   "src/ui/instrument/sections/MeaningCard.tsx",
   "src/ui/instrument/sections/OracleProposeWithEngineOracleCard.v0.1.tsx",
+  "src/ui/instrument/sections/OriginClaimGatesCard.tsx",
   "src/ui/instrument/sections/PhoneticIpaPanel.v0.1.tsx",
   "src/ui/instrument/sections/RawJsonCard.tsx",
   "src/ui/instrument/sections/ReadoutCard.tsx",
