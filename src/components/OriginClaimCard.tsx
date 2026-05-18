@@ -22,6 +22,10 @@ function toFlatText(v: unknown): string {
 }
 
 function policySummary(policy: any): string {
+  if (typeof policy === "string") {
+    if (policy === "no_single_winner") return "no forced answer";
+    return policy.replace(/_/g, " ");
+  }
   if (!policy || typeof policy !== "object") return toFlatText(policy);
   if ("gatesActive" in policy) return `gatesActive=${Boolean(policy.gatesActive)}`;
   return "object";

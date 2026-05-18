@@ -74,10 +74,11 @@ describe("ui: InstrumentPanel renders Origin Claim from VM", () => {
     const title = screen.getByText("Origin Claim");
     expect(title).toBeInTheDocument();
 
-    // Raw JSON card may also include the policy string; scope to the nearest ancestor that actually contains it.
-    const cardRoot = findNearestAncestorWithText(title as HTMLElement, /no_single_winner/i);
+    // Raw JSON may preserve the contract token; the visible Origin Claim card should use reader-facing copy.
+    const cardRoot = findNearestAncestorWithText(title as HTMLElement, /no forced answer/i);
     expect(cardRoot).toBeTruthy();
 
-    expect(within(cardRoot as HTMLElement).getByText(/no_single_winner/i)).toBeInTheDocument();
+    expect(within(cardRoot as HTMLElement).getByText(/no forced answer/i)).toBeInTheDocument();
+    expect((cardRoot as HTMLElement).textContent).not.toContain("no_single_winner");
   });
 });
