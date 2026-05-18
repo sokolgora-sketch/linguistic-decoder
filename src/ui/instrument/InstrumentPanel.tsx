@@ -444,6 +444,7 @@ export function InstrumentPanel(props: Props) {
                   rootMap={vm.rootMap}
                 />
                 <EvidencePackageCard
+                  engineVersion={engineVersion}
                   onCopyEvidenceSummary={() => {
                     void copyText("Evidence summary copied.", evidenceSummaryText);
                   }}
