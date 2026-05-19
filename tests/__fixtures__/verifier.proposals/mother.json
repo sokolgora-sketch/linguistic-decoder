@@ -7,7 +7,8 @@
       "language": "English",
       "opsUsed": [],
       "decomposition": {
-        "statement": "canon battery v0.1"
+        "statement": "canon battery v0.1",
+        "action": "mother"
       }
     }
   ]

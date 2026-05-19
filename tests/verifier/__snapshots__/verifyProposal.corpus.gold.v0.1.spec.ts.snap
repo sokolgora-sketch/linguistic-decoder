@@ -32,6 +32,11 @@ exports[`Verifier API: corpus gold (v0.1) fixture: damage.json 1`] = `
           "pass": true,
           "reason": "Decomposition/root material contains extracted vowel(s): A→E.",
         },
+        {
+          "id": "FUNCTION_FIT_NONEMPTY",
+          "pass": true,
+          "reason": "Structured function field(s) present: damage.",
+        },
       ],
       "extractedVowelPath": [
         "A",
@@ -111,6 +116,11 @@ exports[`Verifier API: corpus gold (v0.1) fixture: dem_albanian.json 1`] = `
           "pass": true,
           "reason": "Decomposition/root material contains extracted vowel(s): Ë.",
         },
+        {
+          "id": "FUNCTION_FIT_NONEMPTY",
+          "pass": true,
+          "reason": "Structured function field(s) present: dëm.",
+        },
       ],
       "extractedVowelPath": [
         "Ë",
@@ -178,6 +188,11 @@ exports[`Verifier API: corpus gold (v0.1) fixture: father.json 1`] = `
           "id": "ROOT_HAS_VOWEL",
           "pass": true,
           "reason": "Decomposition/root material contains extracted vowel(s): A→E.",
+        },
+        {
+          "id": "FUNCTION_FIT_NONEMPTY",
+          "pass": true,
+          "reason": "Structured function field(s) present: father.",
         },
       ],
       "extractedVowelPath": [
@@ -251,7 +266,12 @@ exports[`Verifier API: corpus gold (v0.1) fixture: language.json 1`] = `
         {
           "id": "ROOT_HAS_VOWEL",
           "pass": true,
-          "reason": "Decomposition/root material contains extracted vowel(s): A→E.",
+          "reason": "Decomposition/root material contains extracted vowel(s): A→U→E.",
+        },
+        {
+          "id": "FUNCTION_FIT_NONEMPTY",
+          "pass": true,
+          "reason": "Structured function field(s) present: language.",
         },
       ],
       "extractedVowelPath": [
@@ -339,6 +359,11 @@ exports[`Verifier API: corpus gold (v0.1) fixture: mother.json 1`] = `
           "pass": true,
           "reason": "Decomposition/root material contains extracted vowel(s): O→E.",
         },
+        {
+          "id": "FUNCTION_FIT_NONEMPTY",
+          "pass": true,
+          "reason": "Structured function field(s) present: mother.",
+        },
       ],
       "extractedVowelPath": [
         "O",
@@ -411,7 +436,12 @@ exports[`Verifier API: corpus gold (v0.1) fixture: study.json 1`] = `
         {
           "id": "ROOT_HAS_VOWEL",
           "pass": true,
-          "reason": "Decomposition/root material contains extracted vowel(s): U.",
+          "reason": "Decomposition/root material contains extracted vowel(s): U→I.",
+        },
+        {
+          "id": "FUNCTION_FIT_NONEMPTY",
+          "pass": true,
+          "reason": "Structured function field(s) present: study.",
         },
       ],
       "extractedVowelPath": [

@@ -21,6 +21,7 @@ exports[`proposeWithOracle.v0.1 (SSOT oracle) smoke: builds ClaimPacket + runs t
       "candidates": [
         {
           "decomposition": {
+            "action": "study",
             "statement": "mock proposer v0.2 study",
           },
           "form": "study",
@@ -62,6 +63,11 @@ exports[`proposeWithOracle.v0.1 (SSOT oracle) smoke: builds ClaimPacket + runs t
               "id": "ROOT_HAS_VOWEL",
               "pass": true,
               "reason": "Decomposition/root material contains extracted vowel(s): U→I.",
+            },
+            {
+              "id": "FUNCTION_FIT_NONEMPTY",
+              "pass": true,
+              "reason": "Structured function field(s) present: study.",
             },
           ],
           "extractedVowelPath": [
@@ -144,6 +150,7 @@ exports[`proposeWithOracle.v0.1 (SSOT oracle) smoke: builds ClaimPacket + runs t
     "candidates": [
       {
         "decomposition": {
+          "action": "study",
           "statement": "mock proposer v0.2 study",
         },
         "form": "study",
@@ -185,6 +192,11 @@ exports[`proposeWithOracle.v0.1 (SSOT oracle) smoke: builds ClaimPacket + runs t
             "id": "ROOT_HAS_VOWEL",
             "pass": true,
             "reason": "Decomposition/root material contains extracted vowel(s): U→I.",
+          },
+          {
+            "id": "FUNCTION_FIT_NONEMPTY",
+            "pass": true,
+            "reason": "Structured function field(s) present: study.",
           },
         ],
         "extractedVowelPath": [
@@ -237,6 +249,7 @@ exports[`proposeWithOracle.v0.1 (SSOT oracle) smoke: builds ClaimPacket + runs t
       "language": "English",
       "opsUsed": [],
       "decomposition": {
+        "action": "study",
         "statement": "mock proposer v0.2 study"
       }
     }
