@@ -26,7 +26,7 @@ function mkPassAttempt(word: string, mode: "strict" | "open", statement: string)
         form: word,
         language: canonFixtureLanguage(word),
         opsUsed: [],
-        decomposition: { statement },
+        decomposition: { action: word, statement },
       },
     ],
   });
@@ -41,7 +41,7 @@ function mkIllegalOpAttempt(word: string, mode: "strict" | "open") {
         form: word,
         language: canonFixtureLanguage(word),
         opsUsed: ["E_INSERT_NOT_ALLOWED"], // intentionally illegal
-        decomposition: { statement: "illegal op token should fail OPS_ALLOWED" },
+        decomposition: { action: word, statement: "illegal op token should fail OPS_ALLOWED" },
       },
     ],
   });

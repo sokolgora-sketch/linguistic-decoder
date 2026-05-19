@@ -42,7 +42,7 @@ exports[`proposeWithEngineOracle.v0.2 (engine v1 snapshot oracle) smoke: builds 
       "candidates": [
         {
           "decomposition": {
-            "statement": "mock proposer v0.2",
+            "statement": "mock proposer v0.2 study",
           },
           "form": "study",
           "language": "English",
@@ -78,6 +78,11 @@ exports[`proposeWithEngineOracle.v0.2 (engine v1 snapshot oracle) smoke: builds 
               "id": "LANG_KNOWN",
               "pass": true,
               "reason": "Language 'English' is in the v0.1 registry.",
+            },
+            {
+              "id": "ROOT_HAS_VOWEL",
+              "pass": true,
+              "reason": "Decomposition/root material contains extracted vowel(s): U→I.",
             },
           ],
           "extractedVowelPath": [
@@ -184,7 +189,7 @@ exports[`proposeWithEngineOracle.v0.2 (engine v1 snapshot oracle) smoke: builds 
     "candidates": [
       {
         "decomposition": {
-          "statement": "mock proposer v0.2",
+          "statement": "mock proposer v0.2 study",
         },
         "form": "study",
         "language": "English",
@@ -220,6 +225,11 @@ exports[`proposeWithEngineOracle.v0.2 (engine v1 snapshot oracle) smoke: builds 
             "id": "LANG_KNOWN",
             "pass": true,
             "reason": "Language 'English' is in the v0.1 registry.",
+          },
+          {
+            "id": "ROOT_HAS_VOWEL",
+            "pass": true,
+            "reason": "Decomposition/root material contains extracted vowel(s): U→I.",
           },
         ],
         "extractedVowelPath": [
@@ -272,7 +282,7 @@ exports[`proposeWithEngineOracle.v0.2 (engine v1 snapshot oracle) smoke: builds 
       "language": "English",
       "opsUsed": [],
       "decomposition": {
-        "statement": "mock proposer v0.2"
+        "statement": "mock proposer v0.2 study"
       }
     }
   ]

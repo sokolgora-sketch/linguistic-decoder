@@ -27,6 +27,11 @@ exports[`Verifier API: corpus gold (v0.1) fixture: damage.json 1`] = `
           "pass": true,
           "reason": "Language 'English' is in the v0.1 registry.",
         },
+        {
+          "id": "ROOT_HAS_VOWEL",
+          "pass": true,
+          "reason": "Decomposition/root material contains extracted vowel(s): A→E.",
+        },
       ],
       "extractedVowelPath": [
         "A",
@@ -101,6 +106,11 @@ exports[`Verifier API: corpus gold (v0.1) fixture: dem_albanian.json 1`] = `
           "pass": true,
           "reason": "Language 'Albanian' is in the v0.1 registry.",
         },
+        {
+          "id": "ROOT_HAS_VOWEL",
+          "pass": true,
+          "reason": "Decomposition/root material contains extracted vowel(s): Ë.",
+        },
       ],
       "extractedVowelPath": [
         "Ë",
@@ -163,6 +173,11 @@ exports[`Verifier API: corpus gold (v0.1) fixture: father.json 1`] = `
           "id": "LANG_KNOWN",
           "pass": true,
           "reason": "Language 'English' is in the v0.1 registry.",
+        },
+        {
+          "id": "ROOT_HAS_VOWEL",
+          "pass": true,
+          "reason": "Decomposition/root material contains extracted vowel(s): A→E.",
         },
       ],
       "extractedVowelPath": [
@@ -232,6 +247,11 @@ exports[`Verifier API: corpus gold (v0.1) fixture: language.json 1`] = `
           "id": "LANG_KNOWN",
           "pass": true,
           "reason": "Language 'English' is in the v0.1 registry.",
+        },
+        {
+          "id": "ROOT_HAS_VOWEL",
+          "pass": true,
+          "reason": "Decomposition/root material contains extracted vowel(s): A→E.",
         },
       ],
       "extractedVowelPath": [
@@ -314,6 +334,11 @@ exports[`Verifier API: corpus gold (v0.1) fixture: mother.json 1`] = `
           "pass": true,
           "reason": "Language 'English' is in the v0.1 registry.",
         },
+        {
+          "id": "ROOT_HAS_VOWEL",
+          "pass": true,
+          "reason": "Decomposition/root material contains extracted vowel(s): O→E.",
+        },
       ],
       "extractedVowelPath": [
         "O",
@@ -382,6 +407,11 @@ exports[`Verifier API: corpus gold (v0.1) fixture: study.json 1`] = `
           "id": "LANG_KNOWN",
           "pass": true,
           "reason": "Language 'English' is in the v0.1 registry.",
+        },
+        {
+          "id": "ROOT_HAS_VOWEL",
+          "pass": true,
+          "reason": "Decomposition/root material contains extracted vowel(s): U.",
         },
       ],
       "extractedVowelPath": [

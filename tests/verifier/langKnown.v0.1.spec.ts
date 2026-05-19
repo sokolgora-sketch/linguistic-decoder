@@ -105,13 +105,13 @@ describe("LANG_KNOWN rule — integration via runVerifierRulesV0_1", () => {
   const baseArgs = {
     mode: "strict" as const,
     opsUsedRaw: [],
-    extractedVowelPath: ["A"],
+    extractedVowelPath: ["E"],
   };
 
   it("passes when language is known (canonical name)", () => {
     const checks = runVerifierRulesV0_1({
       ...baseArgs,
-      candidate: { form: "test", language: "Albanian", decomposition: { statement: "x" } },
+      candidate: { form: "test", language: "Albanian", decomposition: { statement: "test" } },
     });
     const langCheck = checks.find((c) => c.id === "LANG_KNOWN");
     expect(langCheck?.pass).toBe(true);
@@ -120,7 +120,7 @@ describe("LANG_KNOWN rule — integration via runVerifierRulesV0_1", () => {
   it("passes when language is known (ISO 639-3 code)", () => {
     const checks = runVerifierRulesV0_1({
       ...baseArgs,
-      candidate: { form: "test", language: "sqi", decomposition: { statement: "x" } },
+      candidate: { form: "test", language: "sqi", decomposition: { statement: "test" } },
     });
     const langCheck = checks.find((c) => c.id === "LANG_KNOWN");
     expect(langCheck?.pass).toBe(true);
@@ -129,7 +129,7 @@ describe("LANG_KNOWN rule — integration via runVerifierRulesV0_1", () => {
   it("passes when language is known (ISO 639-1 alias)", () => {
     const checks = runVerifierRulesV0_1({
       ...baseArgs,
-      candidate: { form: "test", language: "sq", decomposition: { statement: "x" } },
+      candidate: { form: "test", language: "sq", decomposition: { statement: "test" } },
     });
     const langCheck = checks.find((c) => c.id === "LANG_KNOWN");
     expect(langCheck?.pass).toBe(true);
@@ -138,7 +138,7 @@ describe("LANG_KNOWN rule — integration via runVerifierRulesV0_1", () => {
   it("fails when language is missing", () => {
     const checks = runVerifierRulesV0_1({
       ...baseArgs,
-      candidate: { form: "test", decomposition: { statement: "x" } },
+      candidate: { form: "test", decomposition: { statement: "test" } },
     });
     const langCheck = checks.find((c) => c.id === "LANG_KNOWN");
     expect(langCheck?.pass).toBe(false);
@@ -148,7 +148,7 @@ describe("LANG_KNOWN rule — integration via runVerifierRulesV0_1", () => {
   it("fails when language is empty string", () => {
     const checks = runVerifierRulesV0_1({
       ...baseArgs,
-      candidate: { form: "test", language: "", decomposition: { statement: "x" } },
+      candidate: { form: "test", language: "", decomposition: { statement: "test" } },
     });
     const langCheck = checks.find((c) => c.id === "LANG_KNOWN");
     expect(langCheck?.pass).toBe(false);
@@ -157,21 +157,21 @@ describe("LANG_KNOWN rule — integration via runVerifierRulesV0_1", () => {
   it("fails when language is fictional (Klingon)", () => {
     const checks = runVerifierRulesV0_1({
       ...baseArgs,
-      candidate: { form: "test", language: "Klingon", decomposition: { statement: "x" } },
+      candidate: { form: "test", language: "Klingon", decomposition: { statement: "test" } },
     });
     const langCheck = checks.find((c) => c.id === "LANG_KNOWN");
     expect(langCheck?.pass).toBe(false);
     expect(langCheck?.reason).toMatch(/not a documented human language/i);
   });
 
-  it("returns 4 checks total (not 3)", () => {
+  it("returns 5 checks total (not 4)", () => {
     const checks = runVerifierRulesV0_1({
       ...baseArgs,
-      candidate: { form: "test", language: "Albanian", decomposition: { statement: "x" } },
+      candidate: { form: "test", language: "Albanian", decomposition: { statement: "test" } },
     });
-    expect(checks).toHaveLength(4);
+    expect(checks).toHaveLength(5);
     expect(checks.map((c) => c.id).sort()).toEqual(
-      ["DECOMP_PRESENT", "LANG_KNOWN", "OPS_ALLOWED", "PATH_MATCH"].sort()
+      ["DECOMP_PRESENT", "LANG_KNOWN", "OPS_ALLOWED", "PATH_MATCH", "ROOT_HAS_VOWEL"].sort()
     );
   });
 });
@@ -186,7 +186,7 @@ describe("LANG_KNOWN rule — hard-fail semantics via verifyProposalV0_1", () =>
           form: "test",
           language: "English",
           opsUsed: [],
-          decomposition: { statement: "ok" },
+          decomposition: { statement: "test" },
         },
       ],
     } as any);
@@ -202,7 +202,7 @@ describe("LANG_KNOWN rule — hard-fail semantics via verifyProposalV0_1", () =>
         {
           form: "test",
           opsUsed: [],
-          decomposition: { statement: "ok" },
+          decomposition: { statement: "test" },
         },
       ],
     } as any);
@@ -220,7 +220,7 @@ describe("LANG_KNOWN rule — hard-fail semantics via verifyProposalV0_1", () =>
           form: "test",
           language: "Klingon",
           opsUsed: [],
-          decomposition: { statement: "ok" },
+          decomposition: { statement: "test" },
         },
       ],
     } as any);
