@@ -3,6 +3,8 @@
 
 import type { AllowedOpId } from "@/shared/ops/allowedOps.v0.1";
 import { normalizeToAllowedOpId } from "@/shared/ops/allowedOps.v0.1";
+import { extractSevenVowelsFromString } from "@/shared/math7.core";
+import { applyStrictTerminalYHint } from "@/shared/math7.basis";
 import { isKnownLanguageV0_1 } from "./languageRegistry.v0.1";
 
 export type VerifierModeV0_1 = "strict" | "open";
@@ -22,7 +24,7 @@ export type ProposalCandidateV0_1 = {
 };
 
 export type VerifierCheckV0_1 = {
-  id: "OPS_ALLOWED" | "DECOMP_PRESENT" | "PATH_MATCH" | "LANG_KNOWN";
+  id: "OPS_ALLOWED" | "DECOMP_PRESENT" | "PATH_MATCH" | "LANG_KNOWN" | "ROOT_HAS_VOWEL";
   pass: boolean;
   reason: string;
 };
@@ -127,6 +129,33 @@ export function canonicalizeOpsUsedV0_1(tokens: string[]): {
   return { canonical, illegal };
 }
 
+function collectDecompositionMaterialV0_1(d: ProposalCandidateV0_1["decomposition"]): string[] {
+  if (!d || typeof d !== "object") return [];
+  return [d.action, d.instrument, d.unit, d.statement]
+    .map(asTrimmedString)
+    .filter((x): x is string => !!x);
+}
+
+function uniqueStableV0_1(xs: readonly string[]): string[] {
+  const out: string[] = [];
+  const seen = new Set<string>();
+  for (const x of xs) {
+    if (seen.has(x)) continue;
+    seen.add(x);
+    out.push(x);
+  }
+  return out;
+}
+
+function extractMaterialVowelsV0_1(parts: readonly string[], mode: VerifierModeV0_1): string[] {
+  return uniqueStableV0_1(
+    parts.flatMap((part) => {
+      const raw = extractSevenVowelsFromString(part);
+      return applyStrictTerminalYHint({ mode, word: part }, raw).map((v) => String(v));
+    })
+  );
+}
+
 export function runVerifierRulesV0_1(args: {
   mode: VerifierModeV0_1;
   candidate: ProposalCandidateV0_1;
@@ -192,5 +221,36 @@ export function runVerifierRulesV0_1(args: {
           reason: `Language '${langStr}' is not a documented human language in the v0.1 registry (constructed/fictional/unsupported).`,
         };
 
-  return [opsAllowed, decompPresent, pathMatch, langKnown];
+  // 5) ROOT_HAS_VOWEL (hard check; decomposition/root material must carry the extracted vowel path)
+    const decompMaterial = collectDecompositionMaterialV0_1(candidate.decomposition);
+    const materialVowels = extractMaterialVowelsV0_1(decompMaterial, args.mode);
+    const extractedSet = new Set(extractedVowelPath.map((v) => String(v)));
+    const overlap = uniqueStableV0_1(materialVowels.filter((v) => extractedSet.has(v)));
+
+    const rootHasVowel: VerifierCheckV0_1 =
+      extractedVowelPath.length === 0
+        ? {
+            id: "ROOT_HAS_VOWEL",
+            pass: false,
+            reason: "Candidate form has no extracted Seven-Voice vowels; root-vowel alignment cannot be verified.",
+          }
+        : decompMaterial.length === 0
+          ? {
+              id: "ROOT_HAS_VOWEL",
+              pass: false,
+              reason: "No decomposition/root material available for root-vowel check.",
+            }
+          : overlap.length > 0
+            ? {
+                id: "ROOT_HAS_VOWEL",
+                pass: true,
+                reason: `Decomposition/root material contains extracted vowel(s): ${overlap.join("→")}.`,
+              }
+            : {
+                id: "ROOT_HAS_VOWEL",
+                pass: false,
+                reason: `Decomposition/root material has no vowel from extracted path. extracted=${extractedVowelPath.join("→")} material=${materialVowels.length ? materialVowels.join("→") : "none"}.`,
+              };
+
+    return [opsAllowed, decompPresent, pathMatch, langKnown, rootHasVowel];
 }

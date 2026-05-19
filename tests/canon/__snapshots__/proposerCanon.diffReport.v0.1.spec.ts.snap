@@ -383,6 +383,11 @@ exports[`C2 canon diff report v0.1 (snapshot) train + holdout report 1`] = `
               "form": "mësim",
               "reason": "Missing decomposition (action/instrument/unit/statement).",
             },
+            {
+              "checkId": "ROOT_HAS_VOWEL",
+              "form": "mësim",
+              "reason": "No decomposition/root material available for root-vowel check.",
+            },
           ],
           "parseOk": true,
           "status": "FAIL",

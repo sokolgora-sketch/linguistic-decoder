@@ -27,6 +27,11 @@ exports[`Verifier API: verifyProposal v0.1 rejects illegal opsUsed deterministic
           "pass": true,
           "reason": "Language 'English' is in the v0.1 registry.",
         },
+        {
+          "id": "ROOT_HAS_VOWEL",
+          "pass": true,
+          "reason": "Decomposition/root material contains extracted vowel(s): E.",
+        },
       ],
       "extractedVowelPath": [
         "A",
@@ -58,6 +63,11 @@ exports[`Verifier API: verifyProposal v0.1 rejects illegal opsUsed deterministic
           "id": "LANG_KNOWN",
           "pass": true,
           "reason": "Language 'English' is in the v0.1 registry.",
+        },
+        {
+          "id": "ROOT_HAS_VOWEL",
+          "pass": true,
+          "reason": "Decomposition/root material contains extracted vowel(s): A→E.",
         },
       ],
       "extractedVowelPath": [

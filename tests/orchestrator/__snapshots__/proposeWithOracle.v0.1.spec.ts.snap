@@ -21,7 +21,7 @@ exports[`proposeWithOracle.v0.1 (SSOT oracle) smoke: builds ClaimPacket + runs t
       "candidates": [
         {
           "decomposition": {
-            "statement": "mock proposer v0.2",
+            "statement": "mock proposer v0.2 study",
           },
           "form": "study",
           "language": "English",
@@ -57,6 +57,11 @@ exports[`proposeWithOracle.v0.1 (SSOT oracle) smoke: builds ClaimPacket + runs t
               "id": "LANG_KNOWN",
               "pass": true,
               "reason": "Language 'English' is in the v0.1 registry.",
+            },
+            {
+              "id": "ROOT_HAS_VOWEL",
+              "pass": true,
+              "reason": "Decomposition/root material contains extracted vowel(s): U→I.",
             },
           ],
           "extractedVowelPath": [
@@ -139,7 +144,7 @@ exports[`proposeWithOracle.v0.1 (SSOT oracle) smoke: builds ClaimPacket + runs t
     "candidates": [
       {
         "decomposition": {
-          "statement": "mock proposer v0.2",
+          "statement": "mock proposer v0.2 study",
         },
         "form": "study",
         "language": "English",
@@ -175,6 +180,11 @@ exports[`proposeWithOracle.v0.1 (SSOT oracle) smoke: builds ClaimPacket + runs t
             "id": "LANG_KNOWN",
             "pass": true,
             "reason": "Language 'English' is in the v0.1 registry.",
+          },
+          {
+            "id": "ROOT_HAS_VOWEL",
+            "pass": true,
+            "reason": "Decomposition/root material contains extracted vowel(s): U→I.",
           },
         ],
         "extractedVowelPath": [
@@ -227,7 +237,7 @@ exports[`proposeWithOracle.v0.1 (SSOT oracle) smoke: builds ClaimPacket + runs t
       "language": "English",
       "opsUsed": [],
       "decomposition": {
-        "statement": "mock proposer v0.2"
+        "statement": "mock proposer v0.2 study"
       }
     }
   ]
