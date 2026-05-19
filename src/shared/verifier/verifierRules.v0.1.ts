@@ -24,7 +24,7 @@ export type ProposalCandidateV0_1 = {
 };
 
 export type VerifierCheckV0_1 = {
-  id: "OPS_ALLOWED" | "DECOMP_PRESENT" | "PATH_MATCH" | "LANG_KNOWN" | "ROOT_HAS_VOWEL";
+  id: "OPS_ALLOWED" | "DECOMP_PRESENT" | "PATH_MATCH" | "LANG_KNOWN" | "ROOT_HAS_VOWEL" | "FUNCTION_FIT_NONEMPTY";
   pass: boolean;
   reason: string;
 };
@@ -127,6 +127,13 @@ export function canonicalizeOpsUsedV0_1(tokens: string[]): {
   }
 
   return { canonical, illegal };
+}
+
+function collectFunctionFitFieldsV0_1(d: ProposalCandidateV0_1["decomposition"]): string[] {
+  if (!d || typeof d !== "object") return [];
+  return [d.action, d.instrument, d.unit]
+    .map(asTrimmedString)
+    .filter((x): x is string => !!x);
 }
 
 function collectDecompositionMaterialV0_1(d: ProposalCandidateV0_1["decomposition"]): string[] {
@@ -252,5 +259,21 @@ export function runVerifierRulesV0_1(args: {
                 reason: `Decomposition/root material has no vowel from extracted path. extracted=${extractedVowelPath.join("→")} material=${materialVowels.length ? materialVowels.join("→") : "none"}.`,
               };
 
-    return [opsAllowed, decompPresent, pathMatch, langKnown, rootHasVowel];
+    // 6) FUNCTION_FIT_NONEMPTY (hard check; statement alone is not enough)
+    const functionFitFields = collectFunctionFitFieldsV0_1(candidate.decomposition);
+    const functionFitNonempty: VerifierCheckV0_1 =
+      functionFitFields.length > 0
+        ? {
+            id: "FUNCTION_FIT_NONEMPTY",
+            pass: true,
+            reason: `Structured function field(s) present: ${functionFitFields.join(" | ")}.`,
+          }
+        : {
+            id: "FUNCTION_FIT_NONEMPTY",
+            pass: false,
+            reason:
+              "Missing structured function fit: provide non-empty action, instrument, or unit. statement alone is insufficient.",
+          };
+
+    return [opsAllowed, decompPresent, pathMatch, langKnown, rootHasVowel, functionFitNonempty];
 }

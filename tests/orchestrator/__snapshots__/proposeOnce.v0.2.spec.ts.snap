@@ -8,6 +8,7 @@ exports[`Proposer loop: proposeOnce v0.2 (mock) returns proposal + verification 
     "candidates": [
       {
         "decomposition": {
+          "action": "study",
           "statement": "mock proposer v0.2 study",
         },
         "form": "study",
@@ -28,6 +29,7 @@ exports[`Proposer loop: proposeOnce v0.2 (mock) returns proposal + verification 
       "language": "English",
       "opsUsed": [],
       "decomposition": {
+        "action": "study",
         "statement": "mock proposer v0.2 study"
       }
     }
@@ -64,6 +66,11 @@ exports[`Proposer loop: proposeOnce v0.2 (mock) returns proposal + verification 
             "id": "ROOT_HAS_VOWEL",
             "pass": true,
             "reason": "Decomposition/root material contains extracted vowel(s): U→I.",
+          },
+          {
+            "id": "FUNCTION_FIT_NONEMPTY",
+            "pass": true,
+            "reason": "Structured function field(s) present: study.",
           },
         ],
         "extractedVowelPath": [

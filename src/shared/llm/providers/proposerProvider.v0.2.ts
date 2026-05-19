@@ -28,7 +28,7 @@ async function proposeMock(req: ProposerRequestV0_2): Promise<ProposerResultV0_2
     word: req.word,
     mode: req.mode,
     candidates: [
-      { form: req.word, language: "English", opsUsed: [], decomposition: { statement: `mock proposer v0.2 ${req.word}` } },
+      { form: req.word, language: "English", opsUsed: [], decomposition: { action: req.word, statement: `mock proposer v0.2 ${req.word}` } },
     ],
   };
   return { provider: "mock", rawText: JSON.stringify(proposal, null, 2), meta: { model: "mock" } };

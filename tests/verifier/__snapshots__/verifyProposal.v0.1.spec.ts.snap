@@ -30,7 +30,12 @@ exports[`Verifier API: verifyProposal v0.1 rejects illegal opsUsed deterministic
         {
           "id": "ROOT_HAS_VOWEL",
           "pass": true,
-          "reason": "Decomposition/root material contains extracted vowel(s): E.",
+          "reason": "Decomposition/root material contains extracted vowel(s): A→E.",
+        },
+        {
+          "id": "FUNCTION_FIT_NONEMPTY",
+          "pass": true,
+          "reason": "Structured function field(s) present: damage.",
         },
       ],
       "extractedVowelPath": [
@@ -68,6 +73,11 @@ exports[`Verifier API: verifyProposal v0.1 rejects illegal opsUsed deterministic
           "id": "ROOT_HAS_VOWEL",
           "pass": true,
           "reason": "Decomposition/root material contains extracted vowel(s): A→E.",
+        },
+        {
+          "id": "FUNCTION_FIT_NONEMPTY",
+          "pass": true,
+          "reason": "Structured function field(s) present: dam | age.",
         },
       ],
       "extractedVowelPath": [

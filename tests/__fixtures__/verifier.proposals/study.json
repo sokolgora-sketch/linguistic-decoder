@@ -7,7 +7,8 @@
       "language": "English",
       "opsUsed": [],
       "decomposition": {
-        "statement": "study canon battery v0.1"
+        "statement": "study canon battery v0.1",
+        "action": "study"
       }
     }
   ]

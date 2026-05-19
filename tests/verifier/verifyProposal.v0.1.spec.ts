@@ -10,7 +10,7 @@ describe("Verifier API: verifyProposal v0.1", () => {
           form: "damage",
           language: "English",
           opsUsed: ["OP_NOT_REAL___ILLEGAL"],
-          decomposition: { statement: "test" },
+          decomposition: { action: "damage", statement: "test" },
           vowelPath: ["A", "A", "E"],
         },
         {
