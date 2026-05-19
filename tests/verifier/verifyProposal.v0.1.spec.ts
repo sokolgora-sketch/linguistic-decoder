@@ -8,12 +8,14 @@ describe("Verifier API: verifyProposal v0.1", () => {
       candidates: [
         {
           form: "damage",
+          language: "English",
           opsUsed: ["OP_NOT_REAL___ILLEGAL"],
           decomposition: { statement: "test" },
           vowelPath: ["A", "A", "E"],
         },
         {
           form: "damage",
+          language: "English",
           opsUsed: [],
           decomposition: { action: "dam", unit: "age" },
         },

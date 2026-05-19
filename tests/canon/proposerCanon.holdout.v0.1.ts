@@ -1,5 +1,10 @@
 import type { CanonCaseV0_1 } from "./proposerCanon.types.v0.1";
 
+function canonFixtureLanguage(word: string): "Albanian" | "English" {
+  const albanian = new Set(["bukuri", "matematikë", "sy"]);
+  return albanian.has(word) ? "Albanian" : "English";
+}
+
 function mkPassAttempt(word: string, mode: "strict" | "open", statement: string) {
   return JSON.stringify({
     word,
@@ -7,6 +12,7 @@ function mkPassAttempt(word: string, mode: "strict" | "open", statement: string)
     candidates: [
       {
         form: word,
+        language: canonFixtureLanguage(word),
         opsUsed: [],
         decomposition: { statement },
       },
@@ -38,7 +44,7 @@ export const proposerCanonHoldoutV0_1: readonly CanonCaseV0_1[] = [
         word: "bukuri",
         mode: "strict",
         candidates: [
-          { form: "bukuri", opsUsed: [], decomposition: { statement: "holdout pass: bukuri" } },
+          { form: "bukuri", language: "Albanian", opsUsed: [], decomposition: { statement: "holdout pass: bukuri" } },
         ],
       }),
     ],
@@ -54,7 +60,7 @@ export const proposerCanonHoldoutV0_1: readonly CanonCaseV0_1[] = [
         word: "matematik\u00eb",
         mode: "strict",
         candidates: [
-          { form: "matematik\u00eb", opsUsed: [], decomposition: { statement: "holdout pass: matematikë" } },
+          { form: "matematik\u00eb", language: "Albanian", opsUsed: [], decomposition: { statement: "holdout pass: matematikë" } },
         ],
       }),
     ],
@@ -70,7 +76,7 @@ export const proposerCanonHoldoutV0_1: readonly CanonCaseV0_1[] = [
         word: "sy",
         mode: "strict",
         candidates: [
-          { form: "sy", opsUsed: [], decomposition: { statement: "holdout pass: sy" } },
+          { form: "sy", language: "Albanian", opsUsed: [], decomposition: { statement: "holdout pass: sy" } },
         ],
       }),
     ],

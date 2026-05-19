@@ -22,6 +22,11 @@ exports[`Verifier API: verifyProposal v0.1 rejects illegal opsUsed deterministic
           "pass": true,
           "reason": "Provided vowelPath matches extracted path.",
         },
+        {
+          "id": "LANG_KNOWN",
+          "pass": true,
+          "reason": "Language 'English' is in the v0.1 registry.",
+        },
       ],
       "extractedVowelPath": [
         "A",
@@ -48,6 +53,11 @@ exports[`Verifier API: verifyProposal v0.1 rejects illegal opsUsed deterministic
           "id": "PATH_MATCH",
           "pass": true,
           "reason": "No vowelPath provided (not checked in v0.1).",
+        },
+        {
+          "id": "LANG_KNOWN",
+          "pass": true,
+          "reason": "Language 'English' is in the v0.1 registry.",
         },
       ],
       "extractedVowelPath": [

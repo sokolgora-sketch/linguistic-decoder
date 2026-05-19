@@ -44,6 +44,7 @@ exports[`/api/propose-with-engine-oracle (route) POST: ok=true for mock provider
             "statement": "mock proposer v0.2",
           },
           "form": "study",
+          "language": "English",
           "opsUsed": [],
         },
       ],
@@ -70,6 +71,11 @@ exports[`/api/propose-with-engine-oracle (route) POST: ok=true for mock provider
               "id": "PATH_MATCH",
               "pass": true,
               "reason": "No vowelPath provided (not checked in v0.1).",
+            },
+            {
+              "id": "LANG_KNOWN",
+              "pass": true,
+              "reason": "Language 'English' is in the v0.1 registry.",
             },
           ],
           "extractedVowelPath": [
@@ -178,6 +184,7 @@ exports[`/api/propose-with-engine-oracle (route) POST: ok=true for mock provider
           "statement": "mock proposer v0.2",
         },
         "form": "study",
+        "language": "English",
         "opsUsed": [],
       },
     ],
@@ -204,6 +211,11 @@ exports[`/api/propose-with-engine-oracle (route) POST: ok=true for mock provider
             "id": "PATH_MATCH",
             "pass": true,
             "reason": "No vowelPath provided (not checked in v0.1).",
+          },
+          {
+            "id": "LANG_KNOWN",
+            "pass": true,
+            "reason": "Language 'English' is in the v0.1 registry.",
           },
         ],
         "extractedVowelPath": [
@@ -253,6 +265,7 @@ exports[`/api/propose-with-engine-oracle (route) POST: ok=true for mock provider
   "candidates": [
     {
       "form": "study",
+      "language": "English",
       "opsUsed": [],
       "decomposition": {
         "statement": "mock proposer v0.2"

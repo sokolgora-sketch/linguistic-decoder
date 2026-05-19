@@ -24,6 +24,7 @@ exports[`proposeWithOracle.v0.1 (SSOT oracle) smoke: builds ClaimPacket + runs t
             "statement": "mock proposer v0.2",
           },
           "form": "study",
+          "language": "English",
           "opsUsed": [],
           "vowelPath": undefined,
         },
@@ -51,6 +52,11 @@ exports[`proposeWithOracle.v0.1 (SSOT oracle) smoke: builds ClaimPacket + runs t
               "id": "PATH_MATCH",
               "pass": true,
               "reason": "No vowelPath provided (not checked in v0.1).",
+            },
+            {
+              "id": "LANG_KNOWN",
+              "pass": true,
+              "reason": "Language 'English' is in the v0.1 registry.",
             },
           ],
           "extractedVowelPath": [
@@ -136,6 +142,7 @@ exports[`proposeWithOracle.v0.1 (SSOT oracle) smoke: builds ClaimPacket + runs t
           "statement": "mock proposer v0.2",
         },
         "form": "study",
+        "language": "English",
         "opsUsed": [],
         "vowelPath": undefined,
       },
@@ -163,6 +170,11 @@ exports[`proposeWithOracle.v0.1 (SSOT oracle) smoke: builds ClaimPacket + runs t
             "id": "PATH_MATCH",
             "pass": true,
             "reason": "No vowelPath provided (not checked in v0.1).",
+          },
+          {
+            "id": "LANG_KNOWN",
+            "pass": true,
+            "reason": "Language 'English' is in the v0.1 registry.",
           },
         ],
         "extractedVowelPath": [
@@ -212,6 +224,7 @@ exports[`proposeWithOracle.v0.1 (SSOT oracle) smoke: builds ClaimPacket + runs t
   "candidates": [
     {
       "form": "study",
+      "language": "English",
       "opsUsed": [],
       "decomposition": {
         "statement": "mock proposer v0.2"

@@ -1,5 +1,22 @@
 import type { CanonCaseV0_1 } from "./proposerCanon.types.v0.1";
 
+function canonFixtureLanguage(word: string): "Albanian" | "English" {
+  const albanian = new Set([
+    "bukuri",
+    "dritë",
+    "gjuhë",
+    "kuzhinë",
+    "matematikë",
+    "mësim",
+    "motër",
+    "natë",
+    "shtëpi",
+    "sy",
+    "zemër",
+  ]);
+  return albanian.has(word) ? "Albanian" : "English";
+}
+
 function mkPassAttempt(word: string, mode: "strict" | "open", statement: string) {
   return JSON.stringify({
     word,
@@ -7,6 +24,7 @@ function mkPassAttempt(word: string, mode: "strict" | "open", statement: string)
     candidates: [
       {
         form: word,
+        language: canonFixtureLanguage(word),
         opsUsed: [],
         decomposition: { statement },
       },
@@ -21,6 +39,7 @@ function mkIllegalOpAttempt(word: string, mode: "strict" | "open") {
     candidates: [
       {
         form: word,
+        language: canonFixtureLanguage(word),
         opsUsed: ["E_INSERT_NOT_ALLOWED"], // intentionally illegal
         decomposition: { statement: "illegal op token should fail OPS_ALLOWED" },
       },
@@ -79,7 +98,7 @@ export const proposerCanonTrainV0_1: readonly CanonCaseV0_1[] = [
         word: "drit\u00eb",
         mode: "strict",
         candidates: [
-          { form: "drit\u00eb", opsUsed: [], decomposition: { statement: "canon pass: dritë" } },
+          { form: "drit\u00eb", language: "Albanian", opsUsed: [], decomposition: { statement: "canon pass: dritë" } },
         ],
       }),
     ],
@@ -95,14 +114,14 @@ export const proposerCanonTrainV0_1: readonly CanonCaseV0_1[] = [
       JSON.stringify({
         word: "m\u00ebsim",
         mode: "strict",
-        candidates: [{ form: "m\u00ebsim", opsUsed: [] }],
+        candidates: [{ form: "m\u00ebsim", language: "Albanian", opsUsed: [] }],
       }),
       // PASS
       JSON.stringify({
         word: "m\u00ebsim",
         mode: "strict",
         candidates: [
-          { form: "m\u00ebsim", opsUsed: [], decomposition: { statement: "canon pass: mësim" } },
+          { form: "m\u00ebsim", language: "Albanian", opsUsed: [], decomposition: { statement: "canon pass: mësim" } },
         ],
       }),
     ],
@@ -119,7 +138,7 @@ export const proposerCanonTrainV0_1: readonly CanonCaseV0_1[] = [
         word: "damage",
         mode: "strict",
         candidates: [
-          { form: "damage", opsUsed: [], vowelPath: ["U"], decomposition: { statement: "bad vowelPath on purpose" } },
+          { form: "damage", language: "English", opsUsed: [], vowelPath: ["U"], decomposition: { statement: "bad vowelPath on purpose" } },
         ],
       }),
       // PASS: omit vowelPath entirely (v0.1 allows this)
@@ -127,7 +146,7 @@ export const proposerCanonTrainV0_1: readonly CanonCaseV0_1[] = [
         word: "damage",
         mode: "strict",
         candidates: [
-          { form: "damage", opsUsed: [], decomposition: { statement: "canon pass: damage" } },
+          { form: "damage", language: "English", opsUsed: [], decomposition: { statement: "canon pass: damage" } },
         ],
       }),
     ],
@@ -144,7 +163,7 @@ export const proposerCanonTrainV0_1: readonly CanonCaseV0_1[] = [
         word: "sterile",
         mode: "strict",
         candidates: [
-          { form: "sterile", opsUsed: ["E_INSERT_NOT_ALLOWED"], decomposition: { statement: "illegal op token" } },
+          { form: "sterile", language: "English", opsUsed: ["E_INSERT_NOT_ALLOWED"], decomposition: { statement: "illegal op token" } },
         ],
       }),
       // PASS
@@ -152,7 +171,7 @@ export const proposerCanonTrainV0_1: readonly CanonCaseV0_1[] = [
         word: "sterile",
         mode: "strict",
         candidates: [
-          { form: "sterile", opsUsed: [], decomposition: { statement: "canon pass: sterile" } },
+          { form: "sterile", language: "English", opsUsed: [], decomposition: { statement: "canon pass: sterile" } },
         ],
       }),
     ],

@@ -11,6 +11,7 @@ exports[`Proposer loop: proposeOnce v0.2 (mock) returns proposal + verification 
           "statement": "mock proposer v0.2",
         },
         "form": "study",
+        "language": "English",
         "opsUsed": [],
         "vowelPath": undefined,
       },
@@ -24,6 +25,7 @@ exports[`Proposer loop: proposeOnce v0.2 (mock) returns proposal + verification 
   "candidates": [
     {
       "form": "study",
+      "language": "English",
       "opsUsed": [],
       "decomposition": {
         "statement": "mock proposer v0.2"
@@ -52,6 +54,11 @@ exports[`Proposer loop: proposeOnce v0.2 (mock) returns proposal + verification 
             "id": "PATH_MATCH",
             "pass": true,
             "reason": "No vowelPath provided (not checked in v0.1).",
+          },
+          {
+            "id": "LANG_KNOWN",
+            "pass": true,
+            "reason": "Language 'English' is in the v0.1 registry.",
           },
         ],
         "extractedVowelPath": [
