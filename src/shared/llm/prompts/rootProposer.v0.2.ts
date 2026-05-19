@@ -17,6 +17,7 @@ Return ONLY a single JSON object that matches this shape:
   "candidates": [
     {
       "form": string,
+      "language": string,
       "opsUsed": string[],
       "decomposition": {
         "action"?: string,
@@ -34,8 +35,11 @@ Hard rules:
 - Always include at least 1 candidate.
 - Each candidate MUST include:
   - form (non-empty string)
+  - language (non-empty documented human language name/code; examples: English, Albanian, Latin, Ancient Greek, Sanskrit)
   - opsUsed (array; if unsure, use [])
-  - decomposition with at least ONE key present among: action/instrument/unit/statement
+  - decomposition with at least ONE non-empty structured function key among: action, instrument, unit
+- decomposition.statement is allowed as supporting explanation, but statement alone is insufficient.
+- decomposition action/instrument/unit should contain concise root/function material tied to the candidate form.
 - If you are not fully sure about vowelPath, OMIT it. (Verifier checks vowelPath only if provided.)
 - opsUsed must contain ONLY allowed operation IDs. If unsure, use [].
 
@@ -51,8 +55,11 @@ When repair is present:
 - Keep the same word + mode.
 - Only change what is required to fix the listed failReasons.
   - OPS_ALLOWED failed: remove/replace illegal opsUsed tokens (prefer removing).
-  - DECOMP_PRESENT failed: add a minimal decomposition.statement.
+  - DECOMP_PRESENT failed: add decomposition with at least action, instrument, unit, or statement.
   - PATH_MATCH failed: either fix vowelPath to match, OR omit vowelPath entirely.
+  - LANG_KNOWN failed: add/correct candidate.language using a documented human language.
+  - ROOT_HAS_VOWEL failed: revise decomposition action/instrument/unit/statement so root material contains at least one vowel from the candidate form's extracted vowel path.
+  - FUNCTION_FIT_NONEMPTY failed: add a non-empty decomposition.action, decomposition.instrument, or decomposition.unit; statement alone is not enough.
   - PARSE_ERROR: output valid JSON only, matching the required shape (word/mode/candidates...).
 - Do NOT add new unrelated candidates. Prefer editing the failing form.
 `.trim();
