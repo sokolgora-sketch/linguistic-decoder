@@ -22,6 +22,11 @@ exports[`Verifier API: corpus gold (v0.1) fixture: damage.json 1`] = `
           "pass": true,
           "reason": "No vowelPath provided (not checked in v0.1).",
         },
+        {
+          "id": "LANG_KNOWN",
+          "pass": true,
+          "reason": "Language 'English' is in the v0.1 registry.",
+        },
       ],
       "extractedVowelPath": [
         "A",
@@ -91,6 +96,11 @@ exports[`Verifier API: corpus gold (v0.1) fixture: dem_albanian.json 1`] = `
           "pass": true,
           "reason": "No vowelPath provided (not checked in v0.1).",
         },
+        {
+          "id": "LANG_KNOWN",
+          "pass": true,
+          "reason": "Language 'Albanian' is in the v0.1 registry.",
+        },
       ],
       "extractedVowelPath": [
         "Ë",
@@ -148,6 +158,11 @@ exports[`Verifier API: corpus gold (v0.1) fixture: father.json 1`] = `
           "id": "PATH_MATCH",
           "pass": true,
           "reason": "No vowelPath provided (not checked in v0.1).",
+        },
+        {
+          "id": "LANG_KNOWN",
+          "pass": true,
+          "reason": "Language 'English' is in the v0.1 registry.",
         },
       ],
       "extractedVowelPath": [
@@ -212,6 +227,11 @@ exports[`Verifier API: corpus gold (v0.1) fixture: language.json 1`] = `
           "id": "PATH_MATCH",
           "pass": true,
           "reason": "No vowelPath provided (not checked in v0.1).",
+        },
+        {
+          "id": "LANG_KNOWN",
+          "pass": true,
+          "reason": "Language 'English' is in the v0.1 registry.",
         },
       ],
       "extractedVowelPath": [
@@ -289,6 +309,11 @@ exports[`Verifier API: corpus gold (v0.1) fixture: mother.json 1`] = `
           "pass": true,
           "reason": "No vowelPath provided (not checked in v0.1).",
         },
+        {
+          "id": "LANG_KNOWN",
+          "pass": true,
+          "reason": "Language 'English' is in the v0.1 registry.",
+        },
       ],
       "extractedVowelPath": [
         "O",
@@ -352,6 +377,11 @@ exports[`Verifier API: corpus gold (v0.1) fixture: study.json 1`] = `
           "id": "PATH_MATCH",
           "pass": true,
           "reason": "No vowelPath provided (not checked in v0.1).",
+        },
+        {
+          "id": "LANG_KNOWN",
+          "pass": true,
+          "reason": "Language 'English' is in the v0.1 registry.",
         },
       ],
       "extractedVowelPath": [

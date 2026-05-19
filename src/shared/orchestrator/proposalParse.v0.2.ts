@@ -45,7 +45,8 @@ export function sanitizeProposalV0_2(
       const decomposition =
         (c as any).decomposition && typeof (c as any).decomposition === "object" ? (c as any).decomposition : {};
       const vowelPath = (c as any).vowelPath;
-      return { form: String((c as any).form), opsUsed, decomposition, vowelPath };
+      const language = (c as any).language;
+      return { form: String((c as any).form), language, opsUsed, decomposition, vowelPath };
     });
 
   return {

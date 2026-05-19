@@ -3,11 +3,13 @@
 
 import type { AllowedOpId } from "@/shared/ops/allowedOps.v0.1";
 import { normalizeToAllowedOpId } from "@/shared/ops/allowedOps.v0.1";
+import { isKnownLanguageV0_1 } from "./languageRegistry.v0.1";
 
 export type VerifierModeV0_1 = "strict" | "open";
 
 export type ProposalCandidateV0_1 = {
   form: string;
+  language?: unknown; // v0.1.2: required by LANG_KNOWN rule (hard check); missing/invalid -> reject
   opsUsed?: unknown;
   decomposition?: {
     action?: unknown;
@@ -20,7 +22,7 @@ export type ProposalCandidateV0_1 = {
 };
 
 export type VerifierCheckV0_1 = {
-  id: "OPS_ALLOWED" | "DECOMP_PRESENT" | "PATH_MATCH";
+  id: "OPS_ALLOWED" | "DECOMP_PRESENT" | "PATH_MATCH" | "LANG_KNOWN";
   pass: boolean;
   reason: string;
 };
@@ -172,5 +174,23 @@ export function runVerifierRulesV0_1(args: {
           reason: `vowelPath mismatch. provided=${provided.join("→")} extracted=${extractedVowelPath.join("→")}`,
         };
 
-  return [opsAllowed, decompPresent, pathMatch];
+  // 4) LANG_KNOWN (hard check; missing/empty/invalid language -> reject)
+  // v1.2a contract: candidates without a verifiable language cannot be evaluated.
+  const langRaw = candidate.language;
+  const langStr = typeof langRaw === "string" ? langRaw.trim() : "";
+  const langKnown: VerifierCheckV0_1 = !langStr
+    ? {
+        id: "LANG_KNOWN",
+        pass: false,
+        reason: "Language field empty or missing — candidate cannot be verified without a declared language.",
+      }
+    : isKnownLanguageV0_1(langStr)
+      ? { id: "LANG_KNOWN", pass: true, reason: `Language '${langStr}' is in the v0.1 registry.` }
+      : {
+          id: "LANG_KNOWN",
+          pass: false,
+          reason: `Language '${langStr}' is not a documented human language in the v0.1 registry (constructed/fictional/unsupported).`,
+        };
+
+  return [opsAllowed, decompPresent, pathMatch, langKnown];
 }

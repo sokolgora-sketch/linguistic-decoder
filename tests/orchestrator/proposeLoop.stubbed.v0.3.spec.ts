@@ -21,7 +21,7 @@ describe("Proposer loop: proposeLoop v0.3 (stubbed)", () => {
               word: "study",
               mode: "strict",
               candidates: [
-                { form: "study", opsUsed: ["OP_NOT_REAL___ILLEGAL"], decomposition: { statement: "x" } },
+                { form: "study", language: "English", opsUsed: ["OP_NOT_REAL___ILLEGAL"], decomposition: { statement: "x" } },
               ],
             },
             null,
@@ -38,7 +38,7 @@ describe("Proposer loop: proposeLoop v0.3 (stubbed)", () => {
           {
             word: "study",
             mode: "strict",
-            candidates: [{ form: "study", opsUsed: [], decomposition: { statement: "ok" } }],
+            candidates: [{ form: "study", language: "English", opsUsed: [], decomposition: { statement: "ok" } }],
           },
           null,
           2

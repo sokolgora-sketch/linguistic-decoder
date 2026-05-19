@@ -2,6 +2,13 @@
   "word": "dëm",
   "mode": "strict",
   "candidates": [
-    { "form": "dëm", "opsUsed": [], "decomposition": { "statement": "canon battery v0.1 (Ë extraction)" } }
+    {
+      "form": "dëm",
+      "language": "Albanian",
+      "opsUsed": [],
+      "decomposition": {
+        "statement": "canon battery v0.1 (Ë extraction)"
+      }
+    }
   ]
 }
