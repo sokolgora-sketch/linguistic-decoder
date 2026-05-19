@@ -301,42 +301,42 @@ Example:
     ]
   }
 }
+```
 
 This is only a proposed shape.
 
 No implementation is authorized by this document alone.
 
-7. Next audit implication
+## 7. Next audit implication
 
 Before changing scorer code, one follow-up design should be considered:
 
-high-anchor contamination-removal audit.
+- high-anchor contamination-removal audit.
 
 Purpose:
 
-compare high-anchor buckets with target-vowel-heavy tokens against high-anchor buckets cleaned of target-vowel-heavy tokens.
+- compare high-anchor buckets with target-vowel-heavy tokens against high-anchor buckets cleaned of target-vowel-heavy tokens.
 
 Possible future arms:
 
-Arm C: bracket geometry audit.
-Arm D: high-anchor contamination-removal audit.
+- Arm C: bracket geometry audit.
+- Arm D: high-anchor contamination-removal audit.
 
 No Arm C or Arm D should run without a separate design document.
 
-8. Claim boundaries
+## 8. Claim boundaries
 
 Allowed:
 
-A collapse diagnostics design now exists.
-The current COLLAPSED_HIGH verdict needs sub-diagnosis for high-region work.
-Proposed labels include HIGH_ANCHOR_SUCTION, HARD_HIGH_REGION_PRESSURE, BRACKET_GEOMETRY_SUSPECT, TARGET_FUNCTION_MISMATCH_UNLIKELY, HIGH_ANCHOR_CONTAMINATION_SUSPECT, and BOUNDARY_OVERPRESSURE.
+- A collapse diagnostics design now exists.
+- The current `COLLAPSED_HIGH` verdict needs sub-diagnosis for high-region work.
+- Proposed labels include `HIGH_ANCHOR_SUCTION`, `HARD_HIGH_REGION_PRESSURE`, `BRACKET_GEOMETRY_SUSPECT`, `TARGET_FUNCTION_MISMATCH_UNLIKELY`, `HIGH_ANCHOR_CONTAMINATION_SUSPECT`, and `BOUNDARY_OVERPRESSURE`.
 
 Blocked:
 
-Do not claim the high-region issue is solved.
-Do not claim Hindi /i supports any bracket.
-Do not claim V5-V7 supports high/front /i-type cases.
-Do not change scoring code from this design alone.
-Do not update README from this design alone.
-
-Do not publish this as final proof.
+- Do not claim this resolves the high-region issue.
+- Do not claim Hindi `/i` is support evidence for any bracket.
+- Do not claim `V5-V7` is supported for high/front `/i`-type cases.
+- Do not change scoring code from this design alone.
+- Do not update README from this design alone.
+- Do not publish this as final proof.
