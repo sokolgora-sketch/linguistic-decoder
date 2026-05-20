@@ -44,6 +44,7 @@ import {
   buildEvalsEvidencePackZipArrayBufferV0_1,
   buildEvalsSeriesEvidencePackZipArrayBufferV0_1,
 } from "@/ui/evals/evalsEvidencePackExport.v0.1";
+import { maybeBuildHighRegionSeriesDiagnosticsArtifactFromRowsV0_1 } from "@/ui/evals/evalsHighRegionSeriesDiagnosticsArtifactFromRows.v0.1";
 import { buildEvalsSummaryCsvV0_1, buildEvalsWorkbookArrayBufferV0_1 } from "@/ui/evals/evalsWorkbookExport.v0.1";
 
 
@@ -2659,11 +2660,26 @@ export function EvalsPageClientV0_1() {
           });
         }
 
+        const seriesDiagnosticsArtifact =
+          maybeBuildHighRegionSeriesDiagnosticsArtifactFromRowsV0_1({
+            seriesId: series.id,
+            seriesLabel: series.label,
+            rows: scoredRows
+              .filter((row) => Boolean(row.workbench.report))
+              .map((row) => ({
+                ordinal: row.ordinal,
+                title: row.title,
+                runId: row.workbench.report!.runId,
+                report: row.workbench.report!,
+              })),
+          });
+
         const zipBytes = await buildEvalsSeriesEvidencePackZipArrayBufferV0_1({
           seriesId: series.id,
           seriesLabel: series.label,
           targetCount: series.targetCount,
           exportedAtUtc,
+          seriesDiagnosticsArtifact,
           runs,
         });
 
