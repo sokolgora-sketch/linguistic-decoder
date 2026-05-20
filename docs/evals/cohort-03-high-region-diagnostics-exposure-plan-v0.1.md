@@ -11,8 +11,7 @@ It follows:
 
 - `docs/evals/cohort-03-high-region-collapse-diagnostics-design-v0.1.md`
 - `docs/evals/cohort-03-high-region-diagnostics-integration-plan-v0.1.md`
-- `src/shared/evals/highRegionCollapseDiagnostics.v0.1.ts-region-collapse-diagnostics-design-v0.1.md`
-- `docs/evals/cohort-03-high-region-diagnostics`
+- `src/shared/evals/highRegionCollapseDiagnostics.v0.1.ts`
 - `src/shared/evals/highRegionCollapseSeriesDiagnostics.v0.1.ts`
 
 It does not change code.
