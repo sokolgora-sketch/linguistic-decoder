@@ -1,5 +1,6 @@
 import { describe, expect, it } from "@jest/globals";
 import JSZip from "jszip";
+import { buildHighRegionSeriesDiagnosticsArtifactV0_1 } from "@/shared/evals/highRegionSeriesDiagnosticsArtifact.v0.1";
 
 import { buildEvalsSeriesEvidencePackZipArrayBufferV0_1 } from "@/ui/evals/evalsEvidencePackExport.v0.1";
 
@@ -63,6 +64,41 @@ describe("Evals series evidence pack export v0.1", () => {
       seriesLabel: "t5-falsification-2026-04",
       targetCount: 2,
       exportedAtUtc: "2026-04-17T00:00:00.000Z",
+      seriesDiagnosticsArtifact: buildHighRegionSeriesDiagnosticsArtifactV0_1({
+        series: {
+          seriesLabel: "test-series",
+          cohort: "cohort03",
+          phase: "high-region-audit",
+          languageHint: "hi",
+          vowelUnderTest: "i",
+          taskId: "T5_INTERMEDIATE_V0_1",
+          inputShape: "intermediate_triple",
+        },
+        sourceType: "manual_test_fixture",
+        runs: [
+          {
+            runId: "candidate-main",
+            role: "candidate",
+            bracket: "V5-V7",
+            verdict: "COLLAPSED_HIGH",
+            gap_low: 0.505,
+            gap_high: -0.31,
+            normalizedPosition: null,
+            diagnosticFlags: [],
+          },
+          {
+            runId: "control-main",
+            role: "control",
+            bracket: "V4-V7",
+            verdict: "COLLAPSED_HIGH",
+            gap_low: 0.47,
+            gap_high: -0.31,
+            normalizedPosition: null,
+            diagnosticFlags: [],
+          },
+        ],
+        functionMatchedArmCollapsedHigh: true,
+      }),
       runs: [
         {
           ordinal: 1,
@@ -92,6 +128,7 @@ describe("Evals series evidence pack export v0.1", () => {
     expect(zip.file("00_README.md")).toBeTruthy();
     expect(zip.file("01_RUN_INDEX.md")).toBeTruthy();
     expect(zip.file("series-summary.csv")).toBeTruthy();
+    expect(zip.file("series-diagnostics.json")).toBeTruthy();
 
     expect(zip.file("runs/t5.fi.ae.v1-v3.pilot.main.r04/input.json")).toBeTruthy();
     expect(zip.file("runs/t5.fi.ae.v1-v3.pilot.main.r04/report.json")).toBeTruthy();
@@ -103,6 +140,7 @@ describe("Evals series evidence pack export v0.1", () => {
     const readme = await zip.file("00_README.md")?.async("string");
     const index = await zip.file("01_RUN_INDEX.md")?.async("string");
     const summary = await zip.file("series-summary.csv")?.async("string");
+    const diagnostics = await zip.file("series-diagnostics.json")?.async("string");
     const firstReportJson = await zip.file("runs/t5.fi.ae.v1-v3.pilot.main.r04/report.json")?.async("string");
     const firstReport = JSON.parse(firstReportJson ?? "null");
 
@@ -114,6 +152,9 @@ describe("Evals series evidence pack export v0.1", () => {
     expect(index).toContain("t5.pt.aa.v1-v4.pilot.main.r01");
     expect(index).toContain("â | V1–V4 | INTERMEDIATE");
     expect(summary).toContain("ordinal,runId,taskId,language,vowel,anchorLow,anchorHigh,verdict");
+    expect(diagnostics).toContain("\"artifactVersion\": \"highRegionSeriesDiagnosticsArtifact.v0.1\"");
+    expect(diagnostics).toContain("\"collapseMode\": \"HIGH_ANCHOR_SUCTION\"");
+    expect(diagnostics).toContain("\"Does not change scorer output.\"");
     expect(summary).toContain("1,t5.fi.ae.v1-v3.pilot.main.r04,T5_INTERMEDIATE_V0_1,fi,ä,V1,V3,INTERMEDIATE");
     expect(summary).toContain("2,t5.pt.aa.v1-v4.pilot.main.r01,T5_INTERMEDIATE_V0_1,pt,â,V1,V4,INTERMEDIATE");
 
