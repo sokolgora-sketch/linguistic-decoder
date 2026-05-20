@@ -1,6 +1,7 @@
 import JSZip from "jszip";
 
 import type { EvalReportBundleV0_1 } from "@/shared/evals/report.v0.1";
+import type { HighRegionSeriesDiagnosticsArtifactV0_1 } from "@/shared/evals/highRegionSeriesDiagnosticsArtifact.v0.1";
 
 export const EVALS_EVIDENCE_PACK_VERSION_V0_1 = "evals.evidencePack.v0.1";
 
@@ -263,6 +264,7 @@ type SeriesEvidencePackInputV0_1 = {
   seriesLabel: string;
   targetCount?: number | null;
   exportedAtUtc?: string;
+  seriesDiagnosticsArtifact?: HighRegionSeriesDiagnosticsArtifactV0_1 | null;
   runs: SeriesEvidencePackRunInputV0_1[];
 };
 
@@ -337,6 +339,7 @@ There are only seven primal vowel positions. Written/phonetic vowels beyond seve
 
 - 01_RUN_INDEX.md
 - series-summary.csv
+- series-diagnostics.json (optional; present only when supplied)
 - runs/<runId>/input.json
 - runs/<runId>/report.json
 - runs/<runId>/report.md
@@ -349,10 +352,11 @@ There are only seven primal vowel positions. Written/phonetic vowels beyond seve
 
 1. Open 01_RUN_INDEX.md for the whole battery.
 2. Open series-summary.csv for quick machine-readable values.
-3. Open each run report.json for structured scorer output and statistical fields.
-4. Open each run notes.md for interpretation status.
-5. Open report.pdf for human-readable scored evidence.
-6. Open input.json to inspect exactly what was tested.
+3. If present, open series-diagnostics.json for series-level high-region diagnostics.
+4. Open each run report.json for structured scorer output and statistical fields.
+5. Open each run notes.md for interpretation status.
+6. Open report.pdf for human-readable scored evidence.
+7. Open input.json to inspect exactly what was tested.
 `;
 }
 
@@ -440,6 +444,13 @@ export async function buildEvalsSeriesEvidencePackZipArrayBufferV0_1(
     ]),
   ];
   zip.file("series-summary.csv", csvRows.map(csvRowV0_1).join("\n") + "\n");
+
+  if (input.seriesDiagnosticsArtifact) {
+    zip.file(
+      "series-diagnostics.json",
+      `${JSON.stringify(input.seriesDiagnosticsArtifact, null, 2)}\n`,
+    );
+  }
 
   for (const { run, meta } of metas) {
     const runDir = `runs/${meta.runId}`;
