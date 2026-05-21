@@ -89,7 +89,7 @@ This separates:
 
 Use this `anchor_low` bucket for all four runs:
 
-```json
+~~~json
 [
   "doodh",
   "phool",
@@ -102,10 +102,13 @@ Use this `anchor_low` bucket for all four runs:
   "chooha",
   "kooda"
 ]
-5.2 Main Hindi /i/ target bucket
+~~~
+
+### 5.2 Main Hindi `/i/` target bucket
 
 This is the previous target bucket from the high-front lane probe:
 
+~~~json
 [
   "din",
   "dil",
@@ -118,10 +121,13 @@ This is the previous target bucket from the high-front lane probe:
   "vidya",
   "mitti"
 ]
-5.3 Alternate Hindi /i/ target bucket
+~~~
 
-This alternate bucket keeps short-i transliteration pressure visible while avoiding direct reuse of the short-i high-anchor words:
+### 5.3 Alternate Hindi `/i/` target bucket
 
+This alternate bucket keeps short-`i` transliteration pressure visible while avoiding direct reuse of the short-`i` high-anchor words:
+
+~~~json
 [
   "chitra",
   "disha",
@@ -134,10 +140,13 @@ This alternate bucket keeps short-i transliteration pressure visible while avoid
   "sitar",
   "jigar"
 ]
-5.4 Long-ee high anchor
+~~~
 
-This is the previous Hindi V6-V7 high anchor:
+### 5.4 Long-`ee` high anchor
 
+This is the previous Hindi `V6-V7` high anchor:
+
+~~~json
 [
   "jeevan",
   "geet",
@@ -150,10 +159,13 @@ This is the previous Hindi V6-V7 high anchor:
   "deewar",
   "meetha"
 ]
-5.5 Short-i high anchor
+~~~
 
-This is the matched short-i high-anchor probe bucket:
+### 5.5 Short-`i` high anchor
 
+This is the matched short-`i` high-anchor probe bucket:
+
+~~~json
 [
   "imli",
   "mirch",
@@ -166,19 +178,23 @@ This is the matched short-i high-anchor probe bucket:
   "rishta",
   "bistar"
 ]
-6. Planned runs
-Run 1 — main target, long-ee high anchor control
+~~~
+
+## 6. Planned runs
+
+### Run 1 — main target, long-`ee` high anchor control
 
 Run ID:
 
-cohort03-hi-i-main-long-ee-high-anchor-control-r01
+- `cohort03-hi-i-main-long-ee-high-anchor-control-r01`
 
 Label:
 
-hi-i-main-long-ee-high-anchor-control-r01
+- `hi-i-main-long-ee-high-anchor-control-r01`
 
 JSON:
 
+~~~json
 {
   "taskId": "T5_INTERMEDIATE_V0_1",
   "inputShape": "intermediate_triple",
@@ -225,18 +241,21 @@ JSON:
     ]
   }
 }
-Run 2 — main target, short-i high anchor candidate
+~~~
+
+### Run 2 — main target, short-`i` high anchor candidate
 
 Run ID:
 
-cohort03-hi-i-main-short-i-high-anchor-candidate-r01
+- `cohort03-hi-i-main-short-i-high-anchor-candidate-r01`
 
 Label:
 
-hi-i-main-short-i-high-anchor-candidate-r01
+- `hi-i-main-short-i-high-anchor-candidate-r01`
 
 JSON:
 
+~~~json
 {
   "taskId": "T5_INTERMEDIATE_V0_1",
   "inputShape": "intermediate_triple",
@@ -283,18 +302,21 @@ JSON:
     ]
   }
 }
-Run 3 — alternate target, long-ee high anchor control
+~~~
+
+### Run 3 — alternate target, long-`ee` high anchor control
 
 Run ID:
 
-cohort03-hi-i-alt-long-ee-high-anchor-control-r01
+- `cohort03-hi-i-alt-long-ee-high-anchor-control-r01`
 
 Label:
 
-hi-i-alt-long-ee-high-anchor-control-r01
+- `hi-i-alt-long-ee-high-anchor-control-r01`
 
 JSON:
 
+~~~json
 {
   "taskId": "T5_INTERMEDIATE_V0_1",
   "inputShape": "intermediate_triple",
@@ -341,18 +363,21 @@ JSON:
     ]
   }
 }
-Run 4 — alternate target, short-i high anchor candidate
+~~~
+
+### Run 4 — alternate target, short-`i` high anchor candidate
 
 Run ID:
 
-cohort03-hi-i-alt-short-i-high-anchor-candidate-r01
+- `cohort03-hi-i-alt-short-i-high-anchor-candidate-r01`
 
 Label:
 
-hi-i-alt-short-i-high-anchor-candidate-r01
+- `hi-i-alt-short-i-high-anchor-candidate-r01`
 
 JSON:
 
+~~~json
 {
   "taskId": "T5_INTERMEDIATE_V0_1",
   "inputShape": "intermediate_triple",
@@ -399,81 +424,84 @@ JSON:
     ]
   }
 }
-7. Readout logic
-Outcome A — short-i high anchor stabilizes Hindi
+~~~
+
+## 7. Readout logic
+
+### Outcome A — short-`i` high anchor stabilizes Hindi
 
 Pattern:
 
-long-ee controls: COLLAPSED_HIGH
-short-i candidates: INTERMEDIATE
+- long-`ee` controls: `COLLAPSED_HIGH`
+- short-`i` candidates: `INTERMEDIATE`
 
 Interpretation:
 
-Hindi collapse is high-anchor-geometry sensitive. The long-ee high anchor is a likely confound.
+> Hindi collapse is high-anchor-geometry sensitive. The long-`ee` high anchor is a likely confound.
 
-Outcome B — Hindi remains collapsed under both high anchors
+### Outcome B — Hindi remains collapsed under both high anchors
 
 Pattern:
 
-long-ee controls: COLLAPSED_HIGH
-short-i candidates: COLLAPSED_HIGH
+- long-`ee` controls: `COLLAPSED_HIGH`
+- short-`i` candidates: `COLLAPSED_HIGH`
 
 Interpretation:
 
-Hindi /i/ pressure persists even when the high anchor is changed to short-i geometry. The issue is not explained by long-ee anchor shape alone.
+> Hindi `/i/` pressure persists even when the high anchor is changed to short-`i` geometry. The issue is not explained by long-`ee` anchor shape alone.
 
-Outcome C — both high-anchor types stabilize
+### Outcome C — both high-anchor types stabilize
 
 Pattern:
 
-long-ee controls: INTERMEDIATE
-short-i candidates: INTERMEDIATE
+- long-`ee` controls: `INTERMEDIATE`
+- short-`i` candidates: `INTERMEDIATE`
 
 Interpretation:
 
-The previous Hindi collapse may not be stable across reruns or target variants. Treat as replication pressure.
+> The previous Hindi collapse may not be stable across reruns or target variants. Treat as replication pressure.
 
-Outcome D — short-i anchor worsens or creates boundary artifacts
+### Outcome D — short-`i` anchor worsens or creates boundary artifacts
 
 Pattern:
 
-short-i candidates produce stronger collapse or new boundary flags.
+- short-`i` candidates produce stronger collapse or new boundary flags.
 
 Interpretation:
 
-The short-i high anchor may be too target-like or unsuitable as a boundary. Do not treat stabilization/failure as bracket support without further audit.
+> The short-`i` high anchor may be too target-like or unsuitable as a boundary. Do not treat stabilization/failure as bracket support without further audit.
 
-8. Export requirements
+## 8. Export requirements
 
 After running the four runs:
 
-save each run in /evals;
-export one series evidence pack;
-verify the ZIP includes series-diagnostics.json;
-inspect series-summary.csv;
-inspect all four report.json files;
-record SHA256;
-do not create a result PR until the whole series is inspected.
+- save each run in `/evals`;
+- export one series evidence pack;
+- verify the ZIP includes `series-diagnostics.json`;
+- inspect `series-summary.csv`;
+- inspect all four `report.json` files;
+- record SHA256;
+- do not create a result PR until the whole series is inspected.
 
 Expected exported series:
 
-evals.series-evidence-pack.cohort03-hi-i-short-i-vs-long-ee-high-anchor-v0.1.v0.1.zip
-9. Claim boundaries
+- `evals.series-evidence-pack.cohort03-hi-i-short-i-vs-long-ee-high-anchor-v0.1.v0.1.zip`
+
+## 9. Claim boundaries
 
 Allowed:
 
-This is a narrow confound test.
-The design tests whether Hindi /i/ collapse is sensitive to long-ee high-anchor geometry.
-Short-i stabilization would justify replication, not support.
-Continued collapse would show the issue is deeper than the long-ee anchor alone.
+- This is a narrow confound test.
+- The design tests whether Hindi `/i/` collapse is sensitive to long-`ee` high-anchor geometry.
+- Short-`i` stabilization would justify replication, not support.
+- Continued collapse would show the issue is deeper than the long-`ee` anchor alone.
 
 Blocked:
 
-Do not claim V6-V7 solves /i/.
-Do not claim Hindi /i/ supports or falsifies the model.
-Do not claim the long-ee confound is proven before runs.
-Do not update README from this probe.
-Do not change scorer math from this probe alone.
-Do not change anchor doctrine from this probe alone.
-
-Do not publish this as final evidence.
+- Do not claim `V6-V7` solves `/i/`.
+- Do not claim Hindi `/i/` supports or falsifies the model.
+- Do not claim the long-`ee` confound is proven before runs.
+- Do not update README from this probe.
+- Do not change scorer math from this probe alone.
+- Do not change anchor doctrine from this probe alone.
+- Do not publish this as final evidence.
