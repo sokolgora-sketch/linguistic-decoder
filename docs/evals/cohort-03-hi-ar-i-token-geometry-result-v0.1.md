@@ -214,9 +214,9 @@ This result supports:
 This result does not prove:
 
 - `V6-V7` solves `/i/`.
-- Arabic `/i/` supports `V6-V7`.
-- Hindi `/i/` falsifies the model.
-- The high-region model is solved.
+- Any support claim for Arabic `/i/` under `V6-V7`.
+- Any model-falsification claim from Hindi `/i/` alone.
+- Any solved-model claim.
 - The scorer should be changed.
 - Anchor doctrine should be changed.
 - Publication is justified.
