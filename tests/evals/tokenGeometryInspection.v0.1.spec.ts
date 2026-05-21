@@ -1,4 +1,7 @@
-import { compareTargetToHighAnchorTokenGeometryV0_1 } from "@/shared/evals/tokenGeometryInspection.v0.1";
+import {
+  compareTargetToHighAnchorTokenGeometryV0_1,
+  compareTokenGeometryBucketsV0_1,
+} from "@/shared/evals/tokenGeometryInspection.v0.1";
 
 const HINDI_TARGET = [
   "din",
@@ -24,6 +27,19 @@ const HINDI_V6_V7_HIGH_ANCHOR = [
   "keeda",
   "deewar",
   "meetha",
+] as const;
+
+const HINDI_ALT_TARGET = [
+  "chitra",
+  "disha",
+  "himmat",
+  "kiran",
+  "kismat",
+  "nishan",
+  "vikas",
+  "shikar",
+  "sitar",
+  "jigar",
 ] as const;
 
 const ARABIC_TARGET = [
@@ -103,5 +119,33 @@ describe("token geometry inspection v0.1", () => {
       "HIGH_ANCHOR_HAS_MORE_LONG_HIGH_FRONT_MARKERS_THAN_TARGET",
     );
     expect(arabic.flags).not.toContain("HIGH_ANCHOR_TOKENS_LONGER_THAN_TARGET");
+  });
+
+  it("compares Hindi main versus alternate target buckets without high-anchor assumptions", () => {
+    const split = compareTokenGeometryBucketsV0_1({
+      label: "hindi-i-main-vs-alt-target",
+      baseBucketId: "main-target",
+      baseTokens: HINDI_TARGET,
+      comparisonBucketId: "alternate-target",
+      comparisonTokens: HINDI_ALT_TARGET,
+    });
+
+    expect(split.label).toBe("hindi-i-main-vs-alt-target");
+    expect(split.base.bucketId).toBe("main-target");
+    expect(split.comparison.bucketId).toBe("alternate-target");
+
+    expect(split.base.meanTokenLength).toBe(4.4);
+    expect(split.comparison.meanTokenLength).toBe(5.5);
+
+    expect(split.deltas.comparisonMeanTokenLengthMinusBase).toBeCloseTo(1.1, 6);
+    expect(split.deltas.comparisonMinTokenLengthMinusBase).toBe(2);
+    expect(split.deltas.comparisonMaxTokenLengthMinusBase).toBe(-1);
+    expect(split.deltas.comparisonOpenFinalTokenCountMinusBase).toBe(-3);
+    expect(split.deltas.comparisonClosedFinalTokenCountMinusBase).toBe(3);
+    expect(split.deltas.comparisonMaxConsonantClusterMinusBase).toBe(-1);
+    expect(split.deltas.comparisonShortIMarkerCountMinusBase).toBe(-1);
+    expect(split.deltas.comparisonLongHighFrontMarkerCountMinusBase).toBe(0);
+    expect(split.deltas.markerCounts.i).toBe(-1);
+    expect(split.deltas.markerTokenCounts.i).toBe(0);
   });
 });
