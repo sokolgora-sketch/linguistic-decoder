@@ -36,6 +36,24 @@ export type TokenGeometryComparisonV0_1 = {
   readonly flags: readonly string[];
 };
 
+export type TokenGeometryBucketComparisonV0_1 = {
+  readonly label: string;
+  readonly base: TokenGeometryBucketSummaryV0_1;
+  readonly comparison: TokenGeometryBucketSummaryV0_1;
+  readonly deltas: {
+    readonly comparisonMeanTokenLengthMinusBase: number;
+    readonly comparisonMinTokenLengthMinusBase: number;
+    readonly comparisonMaxTokenLengthMinusBase: number;
+    readonly comparisonOpenFinalTokenCountMinusBase: number;
+    readonly comparisonClosedFinalTokenCountMinusBase: number;
+    readonly comparisonMaxConsonantClusterMinusBase: number;
+    readonly comparisonShortIMarkerCountMinusBase: number;
+    readonly comparisonLongHighFrontMarkerCountMinusBase: number;
+    readonly markerCounts: TokenGeometryMarkerCountsV0_1;
+    readonly markerTokenCounts: TokenGeometryMarkerCountsV0_1;
+  };
+};
+
 const VOWELS_V0_1 = new Set(["a", "e", "i", "o", "u", "y", "ë", "ı"]);
 
 export function summarizeTokenGeometryBucketV0_1(args: {
@@ -101,6 +119,51 @@ export function compareTargetToHighAnchorTokenGeometryV0_1(args: {
   };
 }
 
+export function compareTokenGeometryBucketsV0_1(args: {
+  readonly label: string;
+  readonly baseBucketId: string;
+  readonly baseTokens: readonly string[];
+  readonly comparisonBucketId: string;
+  readonly comparisonTokens: readonly string[];
+}): TokenGeometryBucketComparisonV0_1 {
+  const base = summarizeTokenGeometryBucketV0_1({
+    bucketId: args.baseBucketId,
+    tokens: args.baseTokens,
+  });
+  const comparison = summarizeTokenGeometryBucketV0_1({
+    bucketId: args.comparisonBucketId,
+    tokens: args.comparisonTokens,
+  });
+
+  return {
+    label: args.label,
+    base,
+    comparison,
+    deltas: {
+      comparisonMeanTokenLengthMinusBase: round6V0_1(
+        comparison.meanTokenLength - base.meanTokenLength,
+      ),
+      comparisonMinTokenLengthMinusBase: comparison.minTokenLength - base.minTokenLength,
+      comparisonMaxTokenLengthMinusBase: comparison.maxTokenLength - base.maxTokenLength,
+      comparisonOpenFinalTokenCountMinusBase:
+        comparison.openFinalTokenCount - base.openFinalTokenCount,
+      comparisonClosedFinalTokenCountMinusBase:
+        comparison.closedFinalTokenCount - base.closedFinalTokenCount,
+      comparisonMaxConsonantClusterMinusBase:
+        comparison.maxConsonantCluster - base.maxConsonantCluster,
+      comparisonShortIMarkerCountMinusBase:
+        comparison.shortIMarkerCount - base.shortIMarkerCount,
+      comparisonLongHighFrontMarkerCountMinusBase:
+        comparison.longHighFrontMarkerCount - base.longHighFrontMarkerCount,
+      markerCounts: subtractMarkerCountsV0_1(comparison.markerCounts, base.markerCounts),
+      markerTokenCounts: subtractMarkerCountsV0_1(
+        comparison.markerTokenCounts,
+        base.markerTokenCounts,
+      ),
+    },
+  };
+}
+
 function inferComparisonFlagsV0_1(args: {
   readonly target: TokenGeometryBucketSummaryV0_1;
   readonly highAnchor: TokenGeometryBucketSummaryV0_1;
@@ -129,6 +192,20 @@ function inferComparisonFlagsV0_1(args: {
   }
 
   return flags;
+}
+
+function subtractMarkerCountsV0_1(
+  comparison: TokenGeometryMarkerCountsV0_1,
+  base: TokenGeometryMarkerCountsV0_1,
+): TokenGeometryMarkerCountsV0_1 {
+  return {
+    i: comparison.i - base.i,
+    e: comparison.e - base.e,
+    ee: comparison.ee - base.ee,
+    ei: comparison.ei - base.ei,
+    ea: comparison.ea - base.ea,
+    ii: comparison.ii - base.ii,
+  };
 }
 
 function normalizeTokenV0_1(token: string): string {
