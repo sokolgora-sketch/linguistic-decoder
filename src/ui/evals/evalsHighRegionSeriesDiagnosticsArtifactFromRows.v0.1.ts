@@ -89,8 +89,8 @@ export function maybeBuildHighRegionSeriesDiagnosticsArtifactFromRowsV0_1(
   if (!completeRuns.some((run) => run.role === "control")) return null;
   if (!completeRuns.some((run) => run.bracket.endsWith("-V7"))) return null;
 
-  const languageHint = sameOrNullV0_1(completeRuns.map((run) => run.languageHint));
-  const vowelUnderTest = sameOrNullV0_1(completeRuns.map((run) => run.vowelUnderTest));
+  const languageHint = sameOrMixedV0_1(completeRuns.map((run) => run.languageHint));
+  const vowelUnderTest = sameOrMixedV0_1(completeRuns.map((run) => run.vowelUnderTest));
   const taskId = sameOrNullV0_1(completeRuns.map((run) => run.taskId));
 
   if (!languageHint || !vowelUnderTest || taskId !== "T5_INTERMEDIATE_V0_1") {
@@ -169,8 +169,20 @@ function numberOrNullV0_1(value: unknown): number | null {
 }
 
 function sameOrNullV0_1(values: readonly string[]): string | null {
-  const unique = [...new Set(values.map((value) => value.trim()).filter(Boolean))];
+  const unique = uniqueTextValuesV0_1(values);
   return unique.length === 1 ? unique[0] : null;
+}
+
+function sameOrMixedV0_1(values: readonly string[]): string | null {
+  const unique = uniqueTextValuesV0_1(values);
+  if (unique.length === 0) return null;
+  return unique.length === 1 ? unique[0] : "mixed";
+}
+
+function uniqueTextValuesV0_1(values: readonly string[]): string[] {
+  return [...new Set(values.map((value) => value.trim()).filter(Boolean))].sort((a, b) =>
+    a.localeCompare(b),
+  );
 }
 
 function inferCohortV0_1(seriesLabel: string): string {
