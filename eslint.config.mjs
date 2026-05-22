@@ -69,6 +69,18 @@ const eslintConfig = [
       },
     },
   },
+  {
+    name: "zero/react-hooks-compiler-compat",
+    rules: {
+      // React Compiler-style rules from eslint-plugin-react-hooks 7.1.x are not enabled
+      // for this app yet. Keep classic Hooks correctness checks, but do not require
+      // compiler-migration refactors inside a dev-dependency maintenance PR.
+      "react-hooks/set-state-in-effect": "off",
+      "react-hooks/static-components": "off",
+      "react-hooks/preserve-manual-memoization": "off"
+    }
+  },
+
 ];
 
 export default eslintConfig;
