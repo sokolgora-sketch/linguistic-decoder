@@ -330,3 +330,35 @@ Before paper drafting, these three ZIPs still need:
 - verdict table consolidation;
 - result-doc linkage;
 - final claim-boundary review.
+## 14. Primary run-ID and bucket-provenance extraction
+
+Status: primary run provenance extracted  
+Scope: local evidence-file triage only
+
+This section extracts run IDs and bucket-count provenance from the three primary Cohort 03 Hindi `/i/` ZIP candidates.
+
+This does not make the paper publication-ready.
+
+| Evidence ZIP | Run ID | Task ID | Input shape | Language hint | Vowel | anchor_low | x_vowel | anchor_high | Provider | Model | Label |
+|---|---|---|---|---|---|---:|---:|---:|---|---|---|
+
+### 14.1 Current reading
+
+The three primary Cohort 03 Hindi `/i/` ZIPs now have a run-ID and bucket-count provenance layer in the paper checkpoint index.
+
+This is enough for the next paper-hardening pass to consolidate verdict tables and link each run to the relevant result interpretation.
+
+### 14.2 Still needed before paper readiness
+
+Still needed:
+
+- full token-bucket tables or stable references to the input JSON files;
+- per-run verdict consolidation;
+- result-doc linkage by run ID;
+- final claim-boundary review.
+
+Do not publish.
+
+Do not update README.
+
+Do not claim Cohort 03/04 is publication-ready.
