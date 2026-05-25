@@ -138,3 +138,34 @@ Recommended next action:
 Do not run more evals yet.
 
 Do not draft the full paper yet.
+## 9. Located local ZIP candidates
+
+Recorded from local evidence folder:
+
+- `/Users/wei/Desktop/ZËRO /Dwnlosads /FINAL paper evidence /`
+
+This section records local ZIP candidates found for Cohort 03 Hindi `/i/` evidence hardening.
+
+| Evidence ZIP | SHA256 | Runs | Verdict summary | Status |
+|---|---|---:|---|---|
+| `evals.series-evidence-pack.cohort03-hi-i-length-matched-main-target-v0.1.v0.1.zip` | `4ef3e437635393643d61bf5c90dec87c3a5839bc1c4537fc9aec98f463fbcb27` | 3 | COLLAPSED_HIGH=1; INTERMEDIATE=2 | located locally |
+| `evals.series-evidence-pack.cohort03-hi-i-length-matched-main-target-replication-v0.1.v0.1.zip` | `8aae1cabd1170a21538c19b70c57f11e332ee9cbed5490989e87ce6145fc005e` | 3 | COLLAPSED_HIGH=1; INTERMEDIATE=2 | located locally |
+| `evals.series-evidence-pack.cohort03-hi-i-target-bucket-split-audit-v0.1.v0.1.zip` | `054c3b43138db13e33d5341ff9a8f61601ea7bc50b827cbc755f3e597a52503c` | 4 | COLLAPSED_HIGH=4 | located locally |
+| `evals.series-evidence-pack.cohort03-hi-i-short-i-vs-long-ee-high-anchor-v0.1.v0.1.zip` | `838fb7c5095094b3d01c82b8d34b322d38ce0623d619846e59f6c598532ee235` | 4 | COLLAPSED_HIGH=3; INTERMEDIATE=1 | located locally |
+| `evals.series-evidence-pack.cohort03-hi-i-anchor-sensitivity-matrix-v0.1.v0.1.zip` | `5dc1a4265575309d2227ec5b5f1321ada8633b58dcc60027a301c159d7a865fd` | 4 | COLLAPSED_HIGH=4 | located locally |
+| `evals.series-evidence-pack.cohort03-hi-i-highregion-audit-arm-a-current-lens-v0.1.v0.1.zip` | `4448d7f93726ebb559ea67d805894a9aaedd72c294688883f51e18dadb811f3d` | 4 | COLLAPSED_HIGH=4 | located locally |
+| `evals.series-evidence-pack.cohort03-hi-i-highregion-audit-arm-b-function-matched-v0.1.v0.1.zip` | `653d3e076aed9fe905d90cd046cde3bd721779caa4c851faf3d5e81907a92b10` | 4 | COLLAPSED_HIGH=4 | located locally |
+| `evals.series-evidence-pack.cohort03-hi-i-high-anchor-contamination-audit-arm-c-v0.1.v0.1.zip` | `dac888accddb9bf5ec76f576975563eaec77f195f362c73086397173f3da665c` | 4 | COLLAPSED_HIGH=4 | located locally |
+| `evals.series-evidence-pack.cohort03-hi-i-low-anchor-sensitivity-audit-v0.1.v0.1.zip` | `ced4e2f334192900fd3ef97ac65a496f3152cef5336af0a69953995835c075a9` | 4 | COLLAPSED_HIGH=4 | located locally |
+| `evals.series-evidence-pack.cohort03-hi-i-v5-v7-indo-iranian-v0.1.v0.1.zip` | `f890099992db2d1de9fafe8655212e3ff223791f284331082f4fbdfa4e54c8d9` | 4 | COLLAPSED_HIGH=4 | located locally |
+| `evals.series-evidence-pack.cohort03-hi-i-v5-v7-indo-iranian-v0.1.v0.1 (1).zip` | `3281b46e4036ae224429a35e3097630cad4d1c8a9df6f7adf53a5d7af2f79c2f` | 4 | COLLAPSED_HIGH=4 | located locally |
+
+## 10. Immediate next hardening step
+
+Next step after this ZIP index:
+
+> Inspect the located ZIPs and decide which ones are primary paper evidence versus supporting audit evidence.
+
+Do not treat every ZIP above as final paper evidence automatically.
+
+The duplicate Indo-Iranian ZIP copy must be checked before selecting a canonical file.
