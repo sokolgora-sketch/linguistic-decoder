@@ -237,3 +237,56 @@ Do not run new evals.
 Do not publish.
 
 Do not update README.
+
+## 12. Indo-Iranian duplicate ZIP canonical decision
+
+Status: duplicate comparison completed  
+Scope: local evidence-file classification only
+
+Two local Indo-Iranian ZIP files were compared:
+
+| File | SHA256 | Byte-identical? | Notes |
+|---|---|---:|---|
+| `evals.series-evidence-pack.cohort03-hi-i-v5-v7-indo-iranian-v0.1.v0.1.zip` | `f890099992db2d1de9fafe8655212e3ff223791f284331082f4fbdfa4e54c8d9` | no | older export; same run index and series summary; lacks `series-diagnostics.json` |
+| `evals.series-evidence-pack.cohort03-hi-i-v5-v7-indo-iranian-v0.1.v0.1 (1).zip` | `3281b46e4036ae224429a35e3097630cad4d1c8a9df6f7adf53a5d7af2f79c2f` | no | newer/richer export; same run index and series summary; includes `series-diagnostics.json` |
+
+### 12.1 Comparison result
+
+The files are not byte-identical.
+
+The scoring evidence is the same at the run-index and series-summary level:
+
+- same run IDs;
+- same brackets;
+- same verdicts;
+- same normalized positions;
+- same gaps;
+- same diagnostic flags.
+
+The newer `(1)` file includes one extra evidence file:
+
+- `series-diagnostics.json`
+
+### 12.2 Canonical decision
+
+Canonical local evidence file for this Indo-Iranian audit:
+
+> `evals.series-evidence-pack.cohort03-hi-i-v5-v7-indo-iranian-v0.1.v0.1 (1).zip`
+
+Reason:
+
+> It preserves the same scoring summary as the older export and includes the additional `series-diagnostics.json` evidence artifact.
+
+### 12.3 Duplicate handling
+
+The older non-`(1)` ZIP should be treated as a duplicate / superseded local export.
+
+Do not use the older non-`(1)` ZIP as canonical paper evidence unless the richer `(1)` copy becomes unavailable.
+
+### 12.4 Publication boundary
+
+This canonical decision does not make the Indo-Iranian audit primary paper evidence.
+
+It only resolves the duplicate-file ambiguity.
+
+The Indo-Iranian audit remains a supporting audit candidate unless later paper-scope review promotes it.
