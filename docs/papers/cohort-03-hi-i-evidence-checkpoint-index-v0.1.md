@@ -362,3 +362,52 @@ Do not publish.
 Do not update README.
 
 Do not claim Cohort 03/04 is publication-ready.
+## 15. Primary per-run verdict consolidation
+
+Status: primary per-run verdicts consolidated  
+Scope: local evidence-file triage only
+
+This section consolidates per-run verdict rows from `series-summary.csv` for the three primary Cohort 03 Hindi `/i/` ZIP candidates.
+
+This remains internal evidence hardening.
+
+It does not make the paper publication-ready.
+
+| Evidence ZIP | Run ID / label | Verdict | normalizedPosition | gap_low | gap_high | Diagnostic markers | Provisional role |
+|---|---|---|---:|---:|---:|---|---|
+`evals.series-evidence-pack.cohort03-hi-i-length-matched-main-target-v0.1.v0.1.zip` | `cohort03-hi-i-original-main-short-i-anchor-reference-r01` | COLLAPSED_HIGH | 1.018116 | 0.468333 | -0.008333 | BOUNDARY_UNCERTAIN_HIGH | primary: length-matched main target
+`evals.series-evidence-pack.cohort03-hi-i-length-matched-main-target-v0.1.v0.1.zip` | `cohort03-hi-i-length-matched-main-short-i-anchor-candidate-r01` | INTERMEDIATE | 0.706522 | 0.325 | 0.135 | BOUNDARY_UNCERTAIN_HIGH | primary: length-matched main target
+`evals.series-evidence-pack.cohort03-hi-i-length-matched-main-target-v0.1.v0.1.zip` | `cohort03-hi-i-alt-short-i-anchor-reference-r01` | INTERMEDIATE | 0.608696 | 0.28 | 0.18 | none | primary: length-matched main target
+`evals.series-evidence-pack.cohort03-hi-i-length-matched-main-target-replication-v0.1.v0.1.zip` | `cohort03-hi-i-repl-original-main-short-i-anchor-reference-r01` | COLLAPSED_HIGH | 1.018116 | 0.468333 | -0.008333 | BOUNDARY_UNCERTAIN_HIGH | primary: length-matched replication
+`evals.series-evidence-pack.cohort03-hi-i-length-matched-main-target-replication-v0.1.v0.1.zip` | `cohort03-hi-i-repl-length-matched-main-short-i-anchor-candidate-r01` | INTERMEDIATE | 0.938406 | 0.431667 | 0.028333 | NEAR_COLLAPSE_HIGH, BOUNDARY_UNCERTAIN_HIGH | primary: length-matched replication
+`evals.series-evidence-pack.cohort03-hi-i-length-matched-main-target-replication-v0.1.v0.1.zip` | `cohort03-hi-i-repl-alt-short-i-anchor-reference-r01` | INTERMEDIATE | 0.608696 | 0.28 | 0.18 | none | primary: length-matched replication
+`evals.series-evidence-pack.cohort03-hi-i-target-bucket-split-audit-v0.1.v0.1.zip` | `cohort03-hi-i-target-core-v5-v7-candidate-r01` | COLLAPSED_HIGH | 3.301587 | 0.693333 | -0.483333 | none | primary mechanism bridge: target-bucket split audit
+`evals.series-evidence-pack.cohort03-hi-i-target-bucket-split-audit-v0.1.v0.1.zip` | `cohort03-hi-i-target-mixed-v5-v7-candidate-r01` | COLLAPSED_HIGH | 1.373016 | 0.288333 | -0.078333 | none | primary mechanism bridge: target-bucket split audit
+`evals.series-evidence-pack.cohort03-hi-i-target-bucket-split-audit-v0.1.v0.1.zip` | `cohort03-hi-i-target-core-v4-v7-control-r01` | COLLAPSED_HIGH | 2.27193 | 0.863333 | -0.483333 | none | primary mechanism bridge: target-bucket split audit
+`evals.series-evidence-pack.cohort03-hi-i-target-bucket-split-audit-v0.1.v0.1.zip` | `cohort03-hi-i-target-mixed-v4-v7-control-r01` | COLLAPSED_HIGH | 1.20614 | 0.458333 | -0.078333 | none | primary mechanism bridge: target-bucket split audit
+
+### 15.1 Current reading
+
+The three primary Cohort 03 Hindi `/i/` evidence candidates now have:
+
+- ZIP identity;
+- SHA256;
+- run-count summary;
+- run-ID / label provenance;
+- bucket-count provenance;
+- per-run verdict consolidation.
+
+### 15.2 Still needed before paper readiness
+
+Still needed:
+
+- result-doc linkage by run ID;
+- stable token-bucket references;
+- final paper-table formatting;
+- final claim-boundary review.
+
+Do not publish.
+
+Do not update README.
+
+Do not claim Cohort 03/04 is publication-ready.
