@@ -290,3 +290,43 @@ This canonical decision does not make the Indo-Iranian audit primary paper evide
 It only resolves the duplicate-file ambiguity.
 
 The Indo-Iranian audit remains a supporting audit candidate unless later paper-scope review promotes it.
+## 13. Primary Cohort 03 Hindi `/i/` ZIP inspection
+
+Status: primary evidence inspection recorded  
+Scope: local evidence-file triage only
+
+This section inspects the three provisional primary Cohort 03 Hindi `/i/` evidence candidates.
+
+These are still internal evidence candidates.
+
+This does not make the paper publication-ready.
+
+| Evidence ZIP | SHA256 | Runs | Verdict summary | Diagnostic markers | Provisional role |
+|---|---|---:|---|---|---|
+| `evals.series-evidence-pack.cohort03-hi-i-length-matched-main-target-v0.1.v0.1.zip` | `4ef3e437635393643d61bf5c90dec87c3a5839bc1c4537fc9aec98f463fbcb27` | 3 | COLLAPSED_HIGH=1; INTERMEDIATE=2 | BOUNDARY_UNCERTAIN_HIGH | primary candidate: length-matched main pressure run |
+| `evals.series-evidence-pack.cohort03-hi-i-length-matched-main-target-replication-v0.1.v0.1.zip` | `8aae1cabd1170a21538c19b70c57f11e332ee9cbed5490989e87ce6145fc005e` | 3 | COLLAPSED_HIGH=1; INTERMEDIATE=2 | BOUNDARY_UNCERTAIN_HIGH;NEAR_COLLAPSE_HIGH | primary candidate: length-matched replication/check |
+| `evals.series-evidence-pack.cohort03-hi-i-target-bucket-split-audit-v0.1.v0.1.zip` | `054c3b43138db13e33d5341ff9a8f61601ea7bc50b827cbc755f3e597a52503c` | 4 | COLLAPSED_HIGH=4 | none found | primary mechanism-bridge candidate: target-bucket geometry audit |
+
+### 13.1 Current reading
+
+The three inspected ZIPs form the core Cohort 03 Hindi `/i/` primary-evidence lane:
+
+1. length-matched main target;
+2. length-matched main target replication;
+3. target-bucket split audit.
+
+They are primary candidates because they support the paper-outline chain:
+
+> Cohort 03 found Hindi `/i/` high-region pressure, while Cohort 04 later isolated final-shape token geometry as one pressure-reducing mechanism.
+
+### 13.2 Boundary
+
+Do not treat this inspection as public paper readiness.
+
+Before paper drafting, these three ZIPs still need:
+
+- exact run-ID extraction;
+- token-bucket provenance table;
+- verdict table consolidation;
+- result-doc linkage;
+- final claim-boundary review.
