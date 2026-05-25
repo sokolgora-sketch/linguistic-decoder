@@ -169,3 +169,71 @@ Next step after this ZIP index:
 Do not treat every ZIP above as final paper evidence automatically.
 
 The duplicate Indo-Iranian ZIP copy must be checked before selecting a canonical file.
+
+## 11. Provisional ZIP classification
+
+Status: provisional internal classification  
+Scope: evidence triage only
+
+This section classifies located local ZIP candidates by likely paper role.
+
+This classification does not make the paper publication-ready.
+
+It does not select final public evidence automatically.
+
+### 11.1 Primary paper-evidence candidates
+
+These ZIPs are the strongest candidates for the core Cohort 03 Hindi `/i/` pressure trajectory:
+
+| Evidence ZIP | Provisional role | Reason |
+|---|---|---|
+| `evals.series-evidence-pack.cohort03-hi-i-length-matched-main-target-v0.1.v0.1.zip` | primary candidate | central length-matched Hindi `/i/` pressure run |
+| `evals.series-evidence-pack.cohort03-hi-i-length-matched-main-target-replication-v0.1.v0.1.zip` | primary candidate | replication/check of the length-matched pressure result |
+| `evals.series-evidence-pack.cohort03-hi-i-target-bucket-split-audit-v0.1.v0.1.zip` | primary mechanism-bridge candidate | tests target-bucket geometry, linking Cohort 03 pressure to Cohort 04 final-shape mechanism |
+
+### 11.2 Supporting audit candidates
+
+These ZIPs should be treated as supporting audit evidence unless later inspection proves one belongs in the core paper table:
+
+| Evidence ZIP | Provisional role | Reason |
+|---|---|---|
+| `evals.series-evidence-pack.cohort03-hi-i-short-i-vs-long-ee-high-anchor-v0.1.v0.1.zip` | supporting audit | high-anchor / transliteration sensitivity check |
+| `evals.series-evidence-pack.cohort03-hi-i-anchor-sensitivity-matrix-v0.1.v0.1.zip` | supporting audit | broader anchor-sensitivity matrix |
+| `evals.series-evidence-pack.cohort03-hi-i-highregion-audit-arm-a-current-lens-v0.1.v0.1.zip` | supporting audit | high-region audit arm |
+| `evals.series-evidence-pack.cohort03-hi-i-highregion-audit-arm-b-function-matched-v0.1.v0.1.zip` | supporting audit | function-matched high-region audit arm |
+| `evals.series-evidence-pack.cohort03-hi-i-high-anchor-contamination-audit-arm-c-v0.1.v0.1.zip` | supporting audit | high-anchor contamination audit |
+| `evals.series-evidence-pack.cohort03-hi-i-low-anchor-sensitivity-audit-v0.1.v0.1.zip` | supporting audit | low-anchor sensitivity audit |
+
+### 11.3 Canonical-file decision needed
+
+The Indo-Iranian ZIP appears twice locally.
+
+| Evidence ZIP | Provisional role | Decision |
+|---|---|---|
+| `evals.series-evidence-pack.cohort03-hi-i-v5-v7-indo-iranian-v0.1.v0.1.zip` | canonical candidate pending hash/content comparison | compare against duplicate before use |
+| `evals.series-evidence-pack.cohort03-hi-i-v5-v7-indo-iranian-v0.1.v0.1 (1).zip` | duplicate candidate pending hash/content comparison | do not use until duplicate status is resolved |
+
+### 11.4 Exclusion rule
+
+Do not use any Cohort 03 Hindi `/i/` ZIP as final paper evidence until it has:
+
+- confirmed ZIP name;
+- SHA256;
+- run IDs;
+- verdict summary;
+- diagnostic flags;
+- token-bucket provenance;
+- result-doc linkage;
+- primary/supporting/duplicate classification.
+
+### 11.5 Next action
+
+Next action:
+
+> Compare the duplicate Indo-Iranian ZIPs and select the canonical file, then inspect the three primary candidates first.
+
+Do not run new evals.
+
+Do not publish.
+
+Do not update README.
