@@ -411,3 +411,49 @@ Do not publish.
 Do not update README.
 
 Do not claim Cohort 03/04 is publication-ready.
+## 16. Primary result-doc linkage by run ID
+
+Status: result-doc linkage recorded  
+Scope: internal evidence hardening only
+
+This section links the three primary Cohort 03 Hindi `/i/` ZIP candidate runs to the current interpretation source.
+
+Current interpretation source:
+
+- `docs/evals/cohort-03-hi-i-mechanism-synthesis-v0.1.md`
+
+This does not make the paper publication-ready.
+
+| Evidence ZIP | Run ID / label | Verdict | Diagnostic markers | Result interpretation source | Link status | Provisional role |
+|---|---|---|---|---|---|---|
+| `evals.series-evidence-pack.cohort03-hi-i-length-matched-main-target-v0.1.v0.1.zip` | `cohort03-hi-i-original-main-short-i-anchor-reference-r01` | COLLAPSED_HIGH | COLLAPSED_HIGH; BOUNDARY_UNCERTAIN_HIGH | `docs/evals/cohort-03-hi-i-mechanism-synthesis-v0.1.md` | linked to current synthesis | primary: length-matched main target |
+| `evals.series-evidence-pack.cohort03-hi-i-length-matched-main-target-v0.1.v0.1.zip` | `cohort03-hi-i-length-matched-main-short-i-anchor-candidate-r01` | INTERMEDIATE | BOUNDARY_UNCERTAIN_HIGH | `docs/evals/cohort-03-hi-i-mechanism-synthesis-v0.1.md` | linked to current synthesis | primary: length-matched main target |
+| `evals.series-evidence-pack.cohort03-hi-i-length-matched-main-target-v0.1.v0.1.zip` | `cohort03-hi-i-alt-short-i-anchor-reference-r01` | INTERMEDIATE | none | `docs/evals/cohort-03-hi-i-mechanism-synthesis-v0.1.md` | linked to current synthesis | primary: length-matched main target |
+| `evals.series-evidence-pack.cohort03-hi-i-length-matched-main-target-replication-v0.1.v0.1.zip` | `cohort03-hi-i-repl-original-main-short-i-anchor-reference-r01` | COLLAPSED_HIGH | COLLAPSED_HIGH; BOUNDARY_UNCERTAIN_HIGH | `docs/evals/cohort-03-hi-i-mechanism-synthesis-v0.1.md` | linked to current synthesis | primary: length-matched replication |
+| `evals.series-evidence-pack.cohort03-hi-i-length-matched-main-target-replication-v0.1.v0.1.zip` | `cohort03-hi-i-repl-length-matched-main-short-i-anchor-candidate-r01` | INTERMEDIATE | NEAR_COLLAPSE_HIGH; BOUNDARY_UNCERTAIN_HIGH | `docs/evals/cohort-03-hi-i-mechanism-synthesis-v0.1.md` | linked to current synthesis | primary: length-matched replication |
+| `evals.series-evidence-pack.cohort03-hi-i-length-matched-main-target-replication-v0.1.v0.1.zip` | `cohort03-hi-i-repl-alt-short-i-anchor-reference-r01` | INTERMEDIATE | none | `docs/evals/cohort-03-hi-i-mechanism-synthesis-v0.1.md` | linked to current synthesis | primary: length-matched replication |
+| `evals.series-evidence-pack.cohort03-hi-i-target-bucket-split-audit-v0.1.v0.1.zip` | `cohort03-hi-i-target-core-v5-v7-candidate-r01` | COLLAPSED_HIGH | COLLAPSED_HIGH | `docs/evals/cohort-03-hi-i-mechanism-synthesis-v0.1.md` | linked to current synthesis | primary mechanism bridge: target-bucket split audit |
+| `evals.series-evidence-pack.cohort03-hi-i-target-bucket-split-audit-v0.1.v0.1.zip` | `cohort03-hi-i-target-mixed-v5-v7-candidate-r01` | COLLAPSED_HIGH | COLLAPSED_HIGH | `docs/evals/cohort-03-hi-i-mechanism-synthesis-v0.1.md` | linked to current synthesis | primary mechanism bridge: target-bucket split audit |
+| `evals.series-evidence-pack.cohort03-hi-i-target-bucket-split-audit-v0.1.v0.1.zip` | `cohort03-hi-i-target-core-v4-v7-control-r01` | COLLAPSED_HIGH | COLLAPSED_HIGH | `docs/evals/cohort-03-hi-i-mechanism-synthesis-v0.1.md` | linked to current synthesis | primary mechanism bridge: target-bucket split audit |
+| `evals.series-evidence-pack.cohort03-hi-i-target-bucket-split-audit-v0.1.v0.1.zip` | `cohort03-hi-i-target-mixed-v4-v7-control-r01` | COLLAPSED_HIGH | COLLAPSED_HIGH | `docs/evals/cohort-03-hi-i-mechanism-synthesis-v0.1.md` | linked to current synthesis | primary mechanism bridge: target-bucket split audit |
+
+### 16.1 Current reading
+
+The three primary Cohort 03 Hindi `/i/` evidence candidates now have a result-doc linkage layer.
+
+The linkage is currently to the synthesis-level interpretation doc, not to separate per-run result docs.
+
+### 16.2 Still needed before paper readiness
+
+Still needed:
+
+- decide whether each primary run needs an individual result interpretation doc;
+- add stable token-bucket references;
+- consolidate final paper tables;
+- complete final claim-boundary review.
+
+Do not publish.
+
+Do not update README.
+
+Do not claim Cohort 03/04 is publication-ready.
