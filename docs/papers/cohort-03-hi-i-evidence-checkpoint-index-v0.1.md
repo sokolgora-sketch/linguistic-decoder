@@ -564,3 +564,103 @@ Do not publish.
 Do not update README.
 
 Do not claim Cohort 03/04 is publication-ready.
+
+## 19. Final claim-boundary review
+
+Status: internal claim-boundary review  
+Scope: Cohort 03 Hindi `/i/` primary evidence lane only
+
+This section defines what the current Cohort 03 Hindi `/i/` evidence checkpoint can and cannot support.
+
+This is not a publication claim.
+
+This does not make Cohort 03/04 publication-ready.
+
+### 19.1 Evidence chain now present
+
+The three primary Cohort 03 Hindi `/i/` evidence candidates now have:
+
+- ZIP identity;
+- SHA256;
+- provisional evidence classification;
+- duplicate/canonical-file handling for the Indo-Iranian audit;
+- primary ZIP inspection;
+- run-ID / label provenance;
+- bucket-count provenance;
+- per-run verdict consolidation;
+- result-doc linkage;
+- stable token-bucket references;
+- paper-table formatting draft.
+
+### 19.2 Claims this checkpoint can support internally
+
+This checkpoint can support the following internal statements:
+
+1. Cohort 03 Hindi `/i/` has a traceable primary evidence lane.
+2. The primary evidence lane has enough local provenance to be used in a future paper-table draft.
+3. The current interpretation source for the primary lane is:
+   - `docs/evals/cohort-03-hi-i-mechanism-synthesis-v0.1.md`
+4. Cohort 03 contributes the high-region pressure side of the wider Cohort 03/04 mechanism chain.
+5. The checkpoint is now evidence-organized enough for paper drafting work to begin, if the paper remains internally scoped.
+
+### 19.3 Claims this checkpoint does not support
+
+This checkpoint does not support these claims:
+
+- Cohort 03/04 is publication-ready.
+- Hindi `/i/` supports `V6-V7`.
+- Open-final distribution solves Hindi `/i/`.
+- Final-shape distribution is globally proven.
+- The mechanism generalizes beyond the tested Hindi `/i/` evidence.
+- The evidence is ready for README, Zenodo, LingBuzz, or public release.
+
+### 19.4 Required wording boundary
+
+Allowed wording:
+
+> Cohort 03 Hindi `/i/` is internally organized as a high-region pressure evidence lane with ZIP/hash/run/provenance/verdict/linkage/table-draft support.
+
+Allowed wording:
+
+> Cohort 04 later isolates final-shape token geometry as a pressure-reducing mechanism candidate.
+
+Blocked wording:
+
+> Hindi `/i/` is solved.
+
+Blocked wording:
+
+> Hindi `/i/` confirms `V6-V7`.
+
+Blocked wording:
+
+> Cohort 03/04 is publication-ready.
+
+Blocked wording:
+
+> Final shape is globally proven as the explanation for high-region pressure.
+
+### 19.5 Final status
+
+Current status:
+
+> Evidence-hardened internally, not publication-ready.
+
+Recommended next action:
+
+> Stop this evidence-hardening lane here unless creating separate per-run interpretation docs is explicitly required.
+
+### 19.6 Remaining optional work
+
+Optional future work:
+
+- create separate per-run interpretation docs;
+- prepare a private paper skeleton using the table draft;
+- run final paper-style copyedit;
+- decide whether Cohort 03/04 belongs in a public paper or stays internal until cross-language support is added.
+
+Do not publish.
+
+Do not update README.
+
+Do not claim Cohort 03/04 is publication-ready.
