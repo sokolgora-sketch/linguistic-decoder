@@ -457,3 +457,56 @@ Do not publish.
 Do not update README.
 
 Do not claim Cohort 03/04 is publication-ready.
+## 17. Stable token-bucket references
+
+Status: stable token-bucket references recorded  
+Scope: internal evidence hardening only
+
+This section records stable token-bucket references for the three primary Cohort 03 Hindi `/i/` ZIP candidates.
+
+The source of truth remains each ZIP's `runs/<run>/input.json` file.
+
+This section records exact ZIP-internal paths and JSON pointers instead of copying full token lists into the checkpoint document.
+
+This does not make the paper publication-ready.
+
+| Evidence ZIP | ZIP-internal input path | Run ID | anchor_low pointer | anchor_low count | x_vowel pointer | x_vowel count | anchor_high pointer | anchor_high count | Status |
+|---|---|---|---|---:|---|---:|---|---:|---|
+| `evals.series-evidence-pack.cohort03-hi-i-length-matched-main-target-v0.1.v0.1.zip` | `runs/cohort03-hi-i-alt-short-i-anchor-reference-r01/input.json` | `cohort03-hi-i-alt-short-i-anchor-reference-r01` | `/tasks/0/buckets/anchor_low` | 10 | `/tasks/0/buckets/x_vowel` | 10 | `/tasks/0/buckets/anchor_high` | 10 | stable ZIP input reference |
+| `evals.series-evidence-pack.cohort03-hi-i-length-matched-main-target-v0.1.v0.1.zip` | `runs/cohort03-hi-i-length-matched-main-short-i-anchor-candidate-r01/input.json` | `cohort03-hi-i-length-matched-main-short-i-anchor-candidate-r01` | `/tasks/0/buckets/anchor_low` | 10 | `/tasks/0/buckets/x_vowel` | 10 | `/tasks/0/buckets/anchor_high` | 10 | stable ZIP input reference |
+| `evals.series-evidence-pack.cohort03-hi-i-length-matched-main-target-v0.1.v0.1.zip` | `runs/cohort03-hi-i-original-main-short-i-anchor-reference-r01/input.json` | `cohort03-hi-i-original-main-short-i-anchor-reference-r01` | `/tasks/0/buckets/anchor_low` | 10 | `/tasks/0/buckets/x_vowel` | 10 | `/tasks/0/buckets/anchor_high` | 10 | stable ZIP input reference |
+| `evals.series-evidence-pack.cohort03-hi-i-length-matched-main-target-replication-v0.1.v0.1.zip` | `runs/cohort03-hi-i-repl-alt-short-i-anchor-reference-r01/input.json` | `cohort03-hi-i-repl-alt-short-i-anchor-reference-r01` | `/tasks/0/buckets/anchor_low` | 10 | `/tasks/0/buckets/x_vowel` | 10 | `/tasks/0/buckets/anchor_high` | 10 | stable ZIP input reference |
+| `evals.series-evidence-pack.cohort03-hi-i-length-matched-main-target-replication-v0.1.v0.1.zip` | `runs/cohort03-hi-i-repl-length-matched-main-short-i-anchor-candidate-r01/input.json` | `cohort03-hi-i-repl-length-matched-main-short-i-anchor-candidate-r01` | `/tasks/0/buckets/anchor_low` | 10 | `/tasks/0/buckets/x_vowel` | 10 | `/tasks/0/buckets/anchor_high` | 10 | stable ZIP input reference |
+| `evals.series-evidence-pack.cohort03-hi-i-length-matched-main-target-replication-v0.1.v0.1.zip` | `runs/cohort03-hi-i-repl-original-main-short-i-anchor-reference-r01/input.json` | `cohort03-hi-i-repl-original-main-short-i-anchor-reference-r01` | `/tasks/0/buckets/anchor_low` | 10 | `/tasks/0/buckets/x_vowel` | 10 | `/tasks/0/buckets/anchor_high` | 10 | stable ZIP input reference |
+| `evals.series-evidence-pack.cohort03-hi-i-target-bucket-split-audit-v0.1.v0.1.zip` | `runs/cohort03-hi-i-target-core-v4-v7-control-r01/input.json` | `cohort03-hi-i-target-core-v4-v7-control-r01` | `/tasks/0/buckets/anchor_low` | 10 | `/tasks/0/buckets/x_vowel` | 10 | `/tasks/0/buckets/anchor_high` | 10 | stable ZIP input reference |
+| `evals.series-evidence-pack.cohort03-hi-i-target-bucket-split-audit-v0.1.v0.1.zip` | `runs/cohort03-hi-i-target-core-v5-v7-candidate-r01/input.json` | `cohort03-hi-i-target-core-v5-v7-candidate-r01` | `/tasks/0/buckets/anchor_low` | 10 | `/tasks/0/buckets/x_vowel` | 10 | `/tasks/0/buckets/anchor_high` | 10 | stable ZIP input reference |
+| `evals.series-evidence-pack.cohort03-hi-i-target-bucket-split-audit-v0.1.v0.1.zip` | `runs/cohort03-hi-i-target-mixed-v4-v7-control-r01/input.json` | `cohort03-hi-i-target-mixed-v4-v7-control-r01` | `/tasks/0/buckets/anchor_low` | 10 | `/tasks/0/buckets/x_vowel` | 10 | `/tasks/0/buckets/anchor_high` | 10 | stable ZIP input reference |
+| `evals.series-evidence-pack.cohort03-hi-i-target-bucket-split-audit-v0.1.v0.1.zip` | `runs/cohort03-hi-i-target-mixed-v5-v7-candidate-r01/input.json` | `cohort03-hi-i-target-mixed-v5-v7-candidate-r01` | `/tasks/0/buckets/anchor_low` | 10 | `/tasks/0/buckets/x_vowel` | 10 | `/tasks/0/buckets/anchor_high` | 10 | stable ZIP input reference |
+
+### 17.1 Current reading
+
+The three primary Cohort 03 Hindi `/i/` evidence candidates now have stable token-bucket references.
+
+A future paper table can cite:
+
+- ZIP name;
+- SHA256;
+- run ID;
+- `runs/<run>/input.json`;
+- `/tasks/0/buckets/anchor_low`;
+- `/tasks/0/buckets/x_vowel`;
+- `/tasks/0/buckets/anchor_high`.
+
+### 17.2 Still needed before paper readiness
+
+Still needed:
+
+- final paper-table formatting;
+- final claim-boundary review;
+- decision on whether to create separate per-run interpretation docs.
+
+Do not publish.
+
+Do not update README.
+
+Do not claim Cohort 03/04 is publication-ready.
