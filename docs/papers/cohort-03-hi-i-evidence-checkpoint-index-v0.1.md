@@ -510,3 +510,57 @@ Do not publish.
 Do not update README.
 
 Do not claim Cohort 03/04 is publication-ready.
+## 18. Paper-table formatting draft
+
+Status: paper-table formatting draft  
+Scope: internal evidence hardening only
+
+This section formats the three primary Cohort 03 Hindi `/i/` evidence candidates into a compact table shape that can later be adapted for a paper draft.
+
+This is not a publication table yet.
+
+It does not make Cohort 03/04 publication-ready.
+
+| Evidence role | Evidence ZIP | SHA256 | Run ID / label | Verdict | normalizedPosition | Diagnostic markers | Token-bucket reference | Interpretation source | Paper-use status |
+|---|---|---|---|---|---:|---|---|---|---|
+| length-matched main target | `evals.series-evidence-pack.cohort03-hi-i-length-matched-main-target-v0.1.v0.1.zip` | `4ef3e437635393643d61bf5c90dec87c3a5839bc1c4537fc9aec98f463fbcb27` | `cohort03-hi-i-original-main-short-i-anchor-reference-r01` | COLLAPSED_HIGH | 1.018116 | COLLAPSED_HIGH; BOUNDARY_UNCERTAIN_HIGH | `runs/cohort03-hi-i-original-main-short-i-anchor-reference-r01/input.json; anchor_low=10; x_vowel=10; anchor_high=10` | `docs/evals/cohort-03-hi-i-mechanism-synthesis-v0.1.md` | internal paper-table candidate |
+| length-matched main target | `evals.series-evidence-pack.cohort03-hi-i-length-matched-main-target-v0.1.v0.1.zip` | `4ef3e437635393643d61bf5c90dec87c3a5839bc1c4537fc9aec98f463fbcb27` | `cohort03-hi-i-length-matched-main-short-i-anchor-candidate-r01` | INTERMEDIATE | 0.706522 | BOUNDARY_UNCERTAIN_HIGH | `runs/cohort03-hi-i-length-matched-main-short-i-anchor-candidate-r01/input.json; anchor_low=10; x_vowel=10; anchor_high=10` | `docs/evals/cohort-03-hi-i-mechanism-synthesis-v0.1.md` | internal paper-table candidate |
+| length-matched main target | `evals.series-evidence-pack.cohort03-hi-i-length-matched-main-target-v0.1.v0.1.zip` | `4ef3e437635393643d61bf5c90dec87c3a5839bc1c4537fc9aec98f463fbcb27` | `cohort03-hi-i-alt-short-i-anchor-reference-r01` | INTERMEDIATE | 0.608696 | none | `runs/cohort03-hi-i-alt-short-i-anchor-reference-r01/input.json; anchor_low=10; x_vowel=10; anchor_high=10` | `docs/evals/cohort-03-hi-i-mechanism-synthesis-v0.1.md` | internal paper-table candidate |
+| length-matched replication | `evals.series-evidence-pack.cohort03-hi-i-length-matched-main-target-replication-v0.1.v0.1.zip` | `8aae1cabd1170a21538c19b70c57f11e332ee9cbed5490989e87ce6145fc005e` | `cohort03-hi-i-repl-original-main-short-i-anchor-reference-r01` | COLLAPSED_HIGH | 1.018116 | COLLAPSED_HIGH; BOUNDARY_UNCERTAIN_HIGH | `runs/cohort03-hi-i-repl-original-main-short-i-anchor-reference-r01/input.json; anchor_low=10; x_vowel=10; anchor_high=10` | `docs/evals/cohort-03-hi-i-mechanism-synthesis-v0.1.md` | internal paper-table candidate |
+| length-matched replication | `evals.series-evidence-pack.cohort03-hi-i-length-matched-main-target-replication-v0.1.v0.1.zip` | `8aae1cabd1170a21538c19b70c57f11e332ee9cbed5490989e87ce6145fc005e` | `cohort03-hi-i-repl-length-matched-main-short-i-anchor-candidate-r01` | INTERMEDIATE | 0.938406 | NEAR_COLLAPSE_HIGH; BOUNDARY_UNCERTAIN_HIGH | `runs/cohort03-hi-i-repl-length-matched-main-short-i-anchor-candidate-r01/input.json; anchor_low=10; x_vowel=10; anchor_high=10` | `docs/evals/cohort-03-hi-i-mechanism-synthesis-v0.1.md` | internal paper-table candidate |
+| length-matched replication | `evals.series-evidence-pack.cohort03-hi-i-length-matched-main-target-replication-v0.1.v0.1.zip` | `8aae1cabd1170a21538c19b70c57f11e332ee9cbed5490989e87ce6145fc005e` | `cohort03-hi-i-repl-alt-short-i-anchor-reference-r01` | INTERMEDIATE | 0.608696 | none | `runs/cohort03-hi-i-repl-alt-short-i-anchor-reference-r01/input.json; anchor_low=10; x_vowel=10; anchor_high=10` | `docs/evals/cohort-03-hi-i-mechanism-synthesis-v0.1.md` | internal paper-table candidate |
+| target-bucket split audit / mechanism bridge | `evals.series-evidence-pack.cohort03-hi-i-target-bucket-split-audit-v0.1.v0.1.zip` | `054c3b43138db13e33d5341ff9a8f61601ea7bc50b827cbc755f3e597a52503c` | `cohort03-hi-i-target-core-v5-v7-candidate-r01` | COLLAPSED_HIGH | 3.301587 | COLLAPSED_HIGH | `runs/cohort03-hi-i-target-core-v5-v7-candidate-r01/input.json; anchor_low=10; x_vowel=10; anchor_high=10` | `docs/evals/cohort-03-hi-i-mechanism-synthesis-v0.1.md` | internal paper-table candidate |
+| target-bucket split audit / mechanism bridge | `evals.series-evidence-pack.cohort03-hi-i-target-bucket-split-audit-v0.1.v0.1.zip` | `054c3b43138db13e33d5341ff9a8f61601ea7bc50b827cbc755f3e597a52503c` | `cohort03-hi-i-target-mixed-v5-v7-candidate-r01` | COLLAPSED_HIGH | 1.373016 | COLLAPSED_HIGH | `runs/cohort03-hi-i-target-mixed-v5-v7-candidate-r01/input.json; anchor_low=10; x_vowel=10; anchor_high=10` | `docs/evals/cohort-03-hi-i-mechanism-synthesis-v0.1.md` | internal paper-table candidate |
+| target-bucket split audit / mechanism bridge | `evals.series-evidence-pack.cohort03-hi-i-target-bucket-split-audit-v0.1.v0.1.zip` | `054c3b43138db13e33d5341ff9a8f61601ea7bc50b827cbc755f3e597a52503c` | `cohort03-hi-i-target-core-v4-v7-control-r01` | COLLAPSED_HIGH | 2.27193 | COLLAPSED_HIGH | `runs/cohort03-hi-i-target-core-v4-v7-control-r01/input.json; anchor_low=10; x_vowel=10; anchor_high=10` | `docs/evals/cohort-03-hi-i-mechanism-synthesis-v0.1.md` | internal paper-table candidate |
+| target-bucket split audit / mechanism bridge | `evals.series-evidence-pack.cohort03-hi-i-target-bucket-split-audit-v0.1.v0.1.zip` | `054c3b43138db13e33d5341ff9a8f61601ea7bc50b827cbc755f3e597a52503c` | `cohort03-hi-i-target-mixed-v4-v7-control-r01` | COLLAPSED_HIGH | 1.20614 | COLLAPSED_HIGH | `runs/cohort03-hi-i-target-mixed-v4-v7-control-r01/input.json; anchor_low=10; x_vowel=10; anchor_high=10` | `docs/evals/cohort-03-hi-i-mechanism-synthesis-v0.1.md` | internal paper-table candidate |
+
+### 18.1 Current reading
+
+The primary Cohort 03 Hindi `/i/` evidence lane now has a paper-table draft format.
+
+The table links:
+
+- evidence role;
+- ZIP identity;
+- SHA256;
+- run ID / label;
+- verdict;
+- normalized position;
+- diagnostic markers;
+- token-bucket reference;
+- interpretation source.
+
+### 18.2 Remaining blockers before paper use
+
+Still needed:
+
+- final claim-boundary review;
+- decision on whether separate per-run interpretation docs are needed;
+- final table copyediting for paper style;
+- explicit statement of what the table supports and what it does not support.
+
+Do not publish.
+
+Do not update README.
+
+Do not claim Cohort 03/04 is publication-ready.
