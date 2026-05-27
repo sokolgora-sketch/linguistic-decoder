@@ -65,11 +65,17 @@ Cohort 04 does not support these claims:
 
 Before publication, Cohort 04 still needs:
 
-- per-run verdict consolidation;
 - result-doc linkage by run ID;
 - stable token-bucket references;
 - paper-table formatting draft;
 - final claim-boundary review.
+
+Completed evidence-hardening layers:
+
+- local ZIP inventory;
+- SHA256 hashes for located evidence ZIPs;
+- run-ID / bucket provenance extraction;
+- per-run verdict consolidation.
 
 Completed evidence-hardening layers:
 
@@ -269,6 +275,86 @@ The Cohort 04 Hindi `/i/` evidence lane now has:
 Cohort 04 still needs:
 
 - per-run verdict consolidation;
+- result-doc linkage by run ID;
+- stable token-bucket references;
+- paper-table formatting draft;
+- final claim-boundary review.
+
+Do not publish.
+
+Do not update README.
+
+Do not claim Cohort 04 is publication-ready.
+
+## 10. Primary per-run verdict consolidation
+
+Status: per-run verdict rows consolidated  
+Source: `series-summary.csv` from the two located Cohort 04 Hindi `/i/` ZIPs
+
+This section consolidates per-run verdict rows from the ZIP-level `series-summary.csv` files.
+
+### 10.1 First open-final / closed-final ZIP
+
+Evidence ZIP:
+
+`evals.series-evidence-pack.cohort04-hi-i-open-final-closed-final-v0.1.v0.1.zip`
+
+SHA256:
+
+`9e6904f18f65a25a505ce92bd8e55bb57dcb95520e0d4322ebf28ea572a287ef`
+
+| runId | taskId | languageHint | vowelUnderTest | anchors | verdict | flags |
+|---|---|---|---|---|---|---|
+| `cohort04-hi-i-baseline-reference-r01` | `T5_INTERMEDIATE_V0_1` | `hi` | `i` | `V6→V7` | `INTERMEDIATE` | `BOUNDARY_UNCERTAIN_HIGH` |
+| `cohort04-hi-i-open-final-target-r01` | `T5_INTERMEDIATE_V0_1` | `hi` | `i` | `V6→V7` | `INTERMEDIATE` | `none` |
+| `cohort04-hi-i-closed-final-target-r01` | `T5_INTERMEDIATE_V0_1` | `hi` | `i` | `V6→V7` | `INTERMEDIATE` | `BOUNDARY_UNCERTAIN_HIGH` |
+| `cohort04-hi-i-mixed-final-target-r01` | `T5_INTERMEDIATE_V0_1` | `hi` | `i` | `V6→V7` | `INTERMEDIATE` | `BOUNDARY_UNCERTAIN_HIGH` |
+
+### 10.2 Open-final replication ZIP
+
+Evidence ZIP:
+
+`evals.series-evidence-pack.cohort04-hi-i-open-final-replication-v0.1.v0.1.zip`
+
+SHA256:
+
+`9cd4a2934ca3a1fedd5e50115d4e930813f495775b7acb4ae91a40933bf2a82a`
+
+| runId | taskId | languageHint | vowelUnderTest | anchors | verdict | flags |
+|---|---|---|---|---|---|---|
+| `cohort04-hi-i-open-final-reference-r01` | `T5_INTERMEDIATE_V0_1` | `hi` | `i` | `V6→V7` | `INTERMEDIATE` | `none` |
+| `cohort04-hi-i-open-final-replication-a-r01` | `T5_INTERMEDIATE_V0_1` | `hi` | `i` | `V6→V7` | `INTERMEDIATE` | `none` |
+| `cohort04-hi-i-open-final-replication-b-r01` | `T5_INTERMEDIATE_V0_1` | `hi` | `i` | `V6→V7` | `INTERMEDIATE` | `none` |
+| `cohort04-hi-i-closed-final-reference-r01` | `T5_INTERMEDIATE_V0_1` | `hi` | `i` | `V6→V7` | `INTERMEDIATE` | `BOUNDARY_UNCERTAIN_HIGH` |
+
+### 10.3 Current verdict pattern
+
+The current Cohort 04 Hindi `/i/` verdict pattern is:
+
+- all eight runs remain `INTERMEDIATE`;
+- open-final target and replication runs carry no diagnostic flags;
+- closed-final/reference/baseline/mixed rows preserve or repeat `BOUNDARY_UNCERTAIN_HIGH`;
+- this supports the internal mechanism reading that final-shape distribution is an active token-geometry variable inside the tested packs.
+
+This is still an internal evidence statement only.
+
+### 10.4 Current evidence state
+
+The Cohort 04 Hindi `/i/` evidence lane now has:
+
+- repo-tracked design/result/synthesis documents;
+- local ZIP inventory;
+- SHA256 hashes for the two located evidence ZIPs;
+- ZIP-internal run folder inventory;
+- run-ID / provider / model / label provenance;
+- task metadata;
+- bucket-count provenance;
+- per-run verdict consolidation.
+
+### 10.5 Still needed before publication
+
+Cohort 04 still needs:
+
 - result-doc linkage by run ID;
 - stable token-bucket references;
 - paper-table formatting draft;
