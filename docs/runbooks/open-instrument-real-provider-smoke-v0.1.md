@@ -39,6 +39,7 @@ Verifier checks currently include:
 - Do not change the default provider from `mock`.
 - Do not run broad batteries with the real provider until a dedicated evidence workflow exists.
 - Do not use real-provider output as publication evidence without preserving raw request/response metadata.
+- Do not assume hosted-provider free tiers, model names, or rate limits are stable; check the provider dashboard/docs before each real smoke.
 
 ## Required local env vars
 
@@ -48,9 +49,40 @@ Set these only in your local terminal session:
     export OPENAI_API_KEY="..."
     export OPENAI_MODEL="..."
 
-Optional:
+## OpenAI-compatible endpoint presets
+
+The provider uses `OPENAI_BASE_URL` and calls:
+
+    ${OPENAI_BASE_URL}/chat/completions
+
+If `OPENAI_BASE_URL` is unset, the default is:
+
+    https://api.openai.com/v1
+
+### OpenAI official
+
+Use this for the official OpenAI API:
 
     export OPENAI_BASE_URL="https://api.openai.com/v1"
+    export OPENAI_MODEL="REPLACE_WITH_AVAILABLE_OPENAI_MODEL"
+
+### Groq OpenAI-compatible endpoint
+
+Use this only if your Groq account/API key is ready and the selected model is available in your account:
+
+    export OPENAI_BASE_URL="https://api.groq.com/openai/v1"
+    export OPENAI_API_KEY="REPLACE_WITH_GROQ_API_KEY"
+    export OPENAI_MODEL="REPLACE_WITH_AVAILABLE_GROQ_MODEL"
+
+### Ollama local OpenAI-compatible endpoint
+
+Use this only if Ollama is installed, running locally, and the selected model has been pulled:
+
+    export OPENAI_BASE_URL="http://localhost:11434/v1"
+    export OPENAI_API_KEY="ollama"
+    export OPENAI_MODEL="REPLACE_WITH_LOCAL_OLLAMA_MODEL"
+
+Example local model names are intentionally not locked here. Confirm installed models locally with your Ollama setup before running a smoke.
 
 ## Local dev server
 
@@ -60,7 +92,7 @@ Use the ZË-RO local port, usually `3001` when VoiceLab occupies `3000`.
 
 ## Mock baseline check
 
-Before testing the real provider, confirm mock still passes:
+Before testing any OpenAI-compatible provider, confirm mock still passes:
 
     curl -s http://localhost:3001/api/propose-loop \
       -H 'content-type: application/json' \
@@ -120,14 +152,17 @@ Common failure meanings:
 - `FUNCTION_FIT_NONEMPTY`: model gave statement-only decomposition
 - `OPS_ALLOWED`: model invented unsupported ops token
 - `PARSE_ERROR`: model failed JSON contract
+- provider HTTP error: endpoint/key/model/base URL is misconfigured or unavailable
 
 ## Completion definition
 
 This smoke is complete when:
 
 - mock baseline passes
-- one real-provider request returns either:
+- one OpenAI-compatible provider request returns either:
   - a clean `PASS`, or
   - a clean verifier-driven `FAIL` with readable fail reasons
+  - or a clean provider configuration error with no secrets printed
 - no secrets are committed
 - no default provider behavior changes
+- no real-provider output is treated as publication evidence
