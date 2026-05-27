@@ -65,7 +65,6 @@ Cohort 04 does not support these claims:
 
 Before publication, Cohort 04 still needs:
 
-- paper-table formatting draft;
 - final claim-boundary review.
 
 Completed evidence-hardening layers:
@@ -75,7 +74,8 @@ Completed evidence-hardening layers:
 - run-ID / bucket provenance extraction;
 - per-run verdict consolidation;
 - result-doc linkage by run ID;
-- stable token-bucket references.
+- stable token-bucket references;
+- paper-table formatting draft.
 
 ## 6. Recommended publication framing
 
@@ -533,6 +533,67 @@ The Cohort 04 Hindi `/i/` evidence lane now has:
 Cohort 04 still needs:
 
 - paper-table formatting draft;
+- final claim-boundary review.
+
+Do not publish.
+
+Do not update README.
+
+Do not claim Cohort 04 is publication-ready.
+
+## 13. Paper-table formatting draft
+
+Status: paper-table draft format recorded  
+Scope: two located Cohort 04 Hindi `/i/` evidence ZIPs
+
+This section formats the current Cohort 04 Hindi `/i/` evidence lane into compact paper-table shape.
+
+This is not a publication table yet.
+
+### 13.1 Compact evidence table draft
+
+| Evidence pack | ZIP | SHA256 | Runs | Task shape | Verdict pattern | Diagnostic pattern | Result linkage | Bucket refs | Paper role |
+|---|---|---|---:|---|---|---|---|---|---|
+| First open-final / closed-final pack | `evals.series-evidence-pack.cohort04-hi-i-open-final-closed-final-v0.1.v0.1.zip` | `9e6904f18f65a25a505ce92bd8e55bb57dcb95520e0d4322ebf28ea572a287ef` | 4 | `T5_INTERMEDIATE_V0_1 / intermediate_triple / hi / i / V6→V7` | all `INTERMEDIATE` | open-final target: no flags; baseline/closed-final/mixed: `BOUNDARY_UNCERTAIN_HIGH` | linked | referenced | primary mechanism evidence |
+| Open-final replication pack | `evals.series-evidence-pack.cohort04-hi-i-open-final-replication-v0.1.v0.1.zip` | `9cd4a2934ca3a1fedd5e50115d4e930813f495775b7acb4ae91a40933bf2a82a` | 4 | `T5_INTERMEDIATE_V0_1 / intermediate_triple / hi / i / V6→V7` | all `INTERMEDIATE` | open-final reference/replication A/replication B: no flags; closed-final reference: `BOUNDARY_UNCERTAIN_HIGH` | linked | referenced | replication / mechanism confirmation |
+
+### 13.2 Candidate paper wording draft
+
+The current internal table supports this cautious paper-draft wording:
+
+> Cohort 04 Hindi `/i/` produced stable `INTERMEDIATE` verdicts across two evidence packs and eight total runs under the `V6→V7` bracket. Open-final target and replication rows carried no diagnostic flags, while closed-final/reference/baseline/mixed rows preserved or repeated `BOUNDARY_UNCERTAIN_HIGH`. This pattern supports the internal mechanism reading that final-shape distribution is an active token-geometry variable in the tested packs.
+
+### 13.3 Do-not-use wording
+
+Do not use these stronger claims:
+
+- Cohort 04 proves the Hindi `/i/` bracket;
+- Cohort 04 independently validates the high-region model;
+- Cohort 04 is publication-ready;
+- Cohort 04 should be published alone;
+- Cohort 04 replaces Cohort 03;
+- Cohort 04 authorizes README, Zenodo, or LingBuzz updates.
+
+### 13.4 Current evidence state
+
+The Cohort 04 Hindi `/i/` evidence lane now has:
+
+- repo-tracked design/result/synthesis documents;
+- local ZIP inventory;
+- SHA256 hashes for the two located evidence ZIPs;
+- ZIP-internal run folder inventory;
+- run-ID / provider / model / label provenance;
+- task metadata;
+- bucket-count provenance;
+- per-run verdict consolidation;
+- result-doc linkage by run ID;
+- stable token-bucket references;
+- paper-table formatting draft.
+
+### 13.5 Still needed before publication
+
+Cohort 04 still needs:
+
 - final claim-boundary review.
 
 Do not publish.
