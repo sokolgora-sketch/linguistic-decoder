@@ -65,7 +65,6 @@ Cohort 04 does not support these claims:
 
 Before publication, Cohort 04 still needs:
 
-- stable token-bucket references;
 - paper-table formatting draft;
 - final claim-boundary review.
 
@@ -75,7 +74,8 @@ Completed evidence-hardening layers:
 - SHA256 hashes for located evidence ZIPs;
 - run-ID / bucket provenance extraction;
 - per-run verdict consolidation;
-- result-doc linkage by run ID.
+- result-doc linkage by run ID;
+- stable token-bucket references.
 
 ## 6. Recommended publication framing
 
@@ -441,6 +441,97 @@ The Cohort 04 Hindi `/i/` evidence lane now has:
 Cohort 04 still needs:
 
 - stable token-bucket references;
+- paper-table formatting draft;
+- final claim-boundary review.
+
+Do not publish.
+
+Do not update README.
+
+Do not claim Cohort 04 is publication-ready.
+
+## 12. Stable token-bucket references
+
+Status: stable token-bucket references recorded  
+Scope: two located Cohort 04 Hindi `/i/` evidence ZIPs
+
+This section records stable references to the source token buckets inside each ZIP run `input.json`.
+
+The inspected bucket path shape is:
+
+- `tasks[0].buckets.anchor_low`
+- `tasks[0].buckets.x_vowel`
+- `tasks[0].buckets.anchor_high`
+
+For all eight Cohort 04 runs, the bucket counts are:
+
+- `anchor_low: 10`
+- `x_vowel: 10`
+- `anchor_high: 10`
+
+### 12.1 First open-final / closed-final ZIP
+
+Evidence ZIP:
+
+`evals.series-evidence-pack.cohort04-hi-i-open-final-closed-final-v0.1.v0.1.zip`
+
+SHA256:
+
+`9e6904f18f65a25a505ce92bd8e55bb57dcb95520e0d4322ebf28ea572a287ef`
+
+| runId | ZIP-internal input path | anchor_low pointer | x_vowel pointer | anchor_high pointer | bucket counts | Status |
+|---|---|---|---|---|---|---|
+| `cohort04-hi-i-baseline-reference-r01` | `runs/cohort04-hi-i-baseline-reference-r01/input.json` | `/tasks/0/buckets/anchor_low` | `/tasks/0/buckets/x_vowel` | `/tasks/0/buckets/anchor_high` | `10/10/10` | referenced |
+| `cohort04-hi-i-open-final-target-r01` | `runs/cohort04-hi-i-open-final-target-r01/input.json` | `/tasks/0/buckets/anchor_low` | `/tasks/0/buckets/x_vowel` | `/tasks/0/buckets/anchor_high` | `10/10/10` | referenced |
+| `cohort04-hi-i-closed-final-target-r01` | `runs/cohort04-hi-i-closed-final-target-r01/input.json` | `/tasks/0/buckets/anchor_low` | `/tasks/0/buckets/x_vowel` | `/tasks/0/buckets/anchor_high` | `10/10/10` | referenced |
+| `cohort04-hi-i-mixed-final-target-r01` | `runs/cohort04-hi-i-mixed-final-target-r01/input.json` | `/tasks/0/buckets/anchor_low` | `/tasks/0/buckets/x_vowel` | `/tasks/0/buckets/anchor_high` | `10/10/10` | referenced |
+
+### 12.2 Open-final replication ZIP
+
+Evidence ZIP:
+
+`evals.series-evidence-pack.cohort04-hi-i-open-final-replication-v0.1.v0.1.zip`
+
+SHA256:
+
+`9cd4a2934ca3a1fedd5e50115d4e930813f495775b7acb4ae91a40933bf2a82a`
+
+| runId | ZIP-internal input path | anchor_low pointer | x_vowel pointer | anchor_high pointer | bucket counts | Status |
+|---|---|---|---|---|---|---|
+| `cohort04-hi-i-open-final-reference-r01` | `runs/cohort04-hi-i-open-final-reference-r01/input.json` | `/tasks/0/buckets/anchor_low` | `/tasks/0/buckets/x_vowel` | `/tasks/0/buckets/anchor_high` | `10/10/10` | referenced |
+| `cohort04-hi-i-open-final-replication-a-r01` | `runs/cohort04-hi-i-open-final-replication-a-r01/input.json` | `/tasks/0/buckets/anchor_low` | `/tasks/0/buckets/x_vowel` | `/tasks/0/buckets/anchor_high` | `10/10/10` | referenced |
+| `cohort04-hi-i-open-final-replication-b-r01` | `runs/cohort04-hi-i-open-final-replication-b-r01/input.json` | `/tasks/0/buckets/anchor_low` | `/tasks/0/buckets/x_vowel` | `/tasks/0/buckets/anchor_high` | `10/10/10` | referenced |
+| `cohort04-hi-i-closed-final-reference-r01` | `runs/cohort04-hi-i-closed-final-reference-r01/input.json` | `/tasks/0/buckets/anchor_low` | `/tasks/0/buckets/x_vowel` | `/tasks/0/buckets/anchor_high` | `10/10/10` | referenced |
+
+### 12.3 Reference boundary
+
+These references identify where the bucket tokens live inside the local evidence ZIPs.
+
+They do not quote the full token buckets.
+
+They do not create publication status.
+
+They do not authorize README, Zenodo, or LingBuzz updates.
+
+### 12.4 Current evidence state
+
+The Cohort 04 Hindi `/i/` evidence lane now has:
+
+- repo-tracked design/result/synthesis documents;
+- local ZIP inventory;
+- SHA256 hashes for the two located evidence ZIPs;
+- ZIP-internal run folder inventory;
+- run-ID / provider / model / label provenance;
+- task metadata;
+- bucket-count provenance;
+- per-run verdict consolidation;
+- result-doc linkage by run ID;
+- stable token-bucket references.
+
+### 12.5 Still needed before publication
+
+Cohort 04 still needs:
+
 - paper-table formatting draft;
 - final claim-boundary review.
 
