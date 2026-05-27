@@ -65,12 +65,17 @@ Cohort 04 does not support these claims:
 
 Before publication, Cohort 04 still needs:
 
-- run-ID / bucket provenance extraction;
 - per-run verdict consolidation;
 - result-doc linkage by run ID;
 - stable token-bucket references;
 - paper-table formatting draft;
 - final claim-boundary review.
+
+Completed evidence-hardening layers:
+
+- local ZIP inventory;
+- SHA256 hashes for located evidence ZIPs;
+- run-ID / bucket provenance extraction.
 
 Completed evidence-hardening layers:
 
@@ -167,6 +172,102 @@ The Cohort 04 Hindi `/i/` evidence lane now has:
 Cohort 04 still needs:
 
 - run-ID / bucket provenance extraction;
+- per-run verdict consolidation;
+- result-doc linkage by run ID;
+- stable token-bucket references;
+- paper-table formatting draft;
+- final claim-boundary review.
+
+Do not publish.
+
+Do not update README.
+
+Do not claim Cohort 04 is publication-ready.
+
+## 9. Run-ID and bucket-provenance extraction
+
+Status: run-ID and bucket provenance recorded  
+Scope: two located Cohort 04 Hindi `/i/` evidence ZIPs
+
+The ZIP `input.json` shape is:
+
+- top-level `runId`;
+- `meta.provider`;
+- `meta.model`;
+- `meta.label`;
+- `tasks[0].taskId`;
+- `tasks[0].inputShape`;
+- `tasks[0].languageHint`;
+- `tasks[0].vowelUnderTest`;
+- `tasks[0].anchorLow`;
+- `tasks[0].anchorHigh`;
+- `tasks[0].buckets.anchor_low`;
+- `tasks[0].buckets.x_vowel`;
+- `tasks[0].buckets.anchor_high`.
+
+Each inspected run uses:
+
+- `taskId: T5_INTERMEDIATE_V0_1`
+- `inputShape: intermediate_triple`
+- `languageHint: hi`
+- `vowelUnderTest: i`
+- `anchorLow: V6`
+- `anchorHigh: V7`
+- bucket counts:
+  - `anchor_low: 10`
+  - `x_vowel: 10`
+  - `anchor_high: 10`
+
+### 9.1 First open-final / closed-final ZIP
+
+Evidence ZIP:
+
+`evals.series-evidence-pack.cohort04-hi-i-open-final-closed-final-v0.1.v0.1.zip`
+
+SHA256:
+
+`9e6904f18f65a25a505ce92bd8e55bb57dcb95520e0d4322ebf28ea572a287ef`
+
+| Run folder | runId | provider | model | label | taskId | inputShape | languageHint | vowelUnderTest | anchors | bucket counts |
+|---|---|---|---|---|---|---|---|---|---|---|
+| `runs/cohort04-hi-i-baseline-reference-r01/` | `cohort04-hi-i-baseline-reference-r01` | `openai` | `chatgpt-assisted-researcher-reviewed` | `hi-i-baseline-reference-r01` | `T5_INTERMEDIATE_V0_1` | `intermediate_triple` | `hi` | `i` | `V6→V7` | `10/10/10` |
+| `runs/cohort04-hi-i-open-final-target-r01/` | `cohort04-hi-i-open-final-target-r01` | `openai` | `chatgpt-assisted-researcher-reviewed` | `hi-i-open-final-target-r01` | `T5_INTERMEDIATE_V0_1` | `intermediate_triple` | `hi` | `i` | `V6→V7` | `10/10/10` |
+| `runs/cohort04-hi-i-closed-final-target-r01/` | `cohort04-hi-i-closed-final-target-r01` | `openai` | `chatgpt-assisted-researcher-reviewed` | `hi-i-closed-final-target-r01` | `T5_INTERMEDIATE_V0_1` | `intermediate_triple` | `hi` | `i` | `V6→V7` | `10/10/10` |
+| `runs/cohort04-hi-i-mixed-final-target-r01/` | `cohort04-hi-i-mixed-final-target-r01` | `openai` | `chatgpt-assisted-researcher-reviewed` | `hi-i-mixed-final-target-r01` | `T5_INTERMEDIATE_V0_1` | `intermediate_triple` | `hi` | `i` | `V6→V7` | `10/10/10` |
+
+### 9.2 Open-final replication ZIP
+
+Evidence ZIP:
+
+`evals.series-evidence-pack.cohort04-hi-i-open-final-replication-v0.1.v0.1.zip`
+
+SHA256:
+
+`9cd4a2934ca3a1fedd5e50115d4e930813f495775b7acb4ae91a40933bf2a82a`
+
+| Run folder | runId | provider | model | label | taskId | inputShape | languageHint | vowelUnderTest | anchors | bucket counts |
+|---|---|---|---|---|---|---|---|---|---|---|
+| `runs/cohort04-hi-i-open-final-reference-r01/` | `cohort04-hi-i-open-final-reference-r01` | `openai` | `chatgpt-assisted-researcher-reviewed` | `hi-i-open-final-reference-r01` | `T5_INTERMEDIATE_V0_1` | `intermediate_triple` | `hi` | `i` | `V6→V7` | `10/10/10` |
+| `runs/cohort04-hi-i-open-final-replication-a-r01/` | `cohort04-hi-i-open-final-replication-a-r01` | `openai` | `chatgpt-assisted-researcher-reviewed` | `hi-i-open-final-replication-a-r01` | `T5_INTERMEDIATE_V0_1` | `intermediate_triple` | `hi` | `i` | `V6→V7` | `10/10/10` |
+| `runs/cohort04-hi-i-open-final-replication-b-r01/` | `cohort04-hi-i-open-final-replication-b-r01` | `openai` | `chatgpt-assisted-researcher-reviewed` | `hi-i-open-final-replication-b-r01` | `T5_INTERMEDIATE_V0_1` | `intermediate_triple` | `hi` | `i` | `V6→V7` | `10/10/10` |
+| `runs/cohort04-hi-i-closed-final-reference-r01/` | `cohort04-hi-i-closed-final-reference-r01` | `openai` | `chatgpt-assisted-researcher-reviewed` | `hi-i-closed-final-reference-r01` | `T5_INTERMEDIATE_V0_1` | `intermediate_triple` | `hi` | `i` | `V6→V7` | `10/10/10` |
+
+### 9.3 Current evidence state
+
+The Cohort 04 Hindi `/i/` evidence lane now has:
+
+- repo-tracked design/result/synthesis documents;
+- local ZIP inventory;
+- SHA256 hashes for the two located evidence ZIPs;
+- ZIP-internal run folder inventory;
+- run-ID / provider / model / label provenance;
+- task metadata;
+- bucket-count provenance.
+
+### 9.4 Still needed before publication
+
+Cohort 04 still needs:
+
 - per-run verdict consolidation;
 - result-doc linkage by run ID;
 - stable token-bucket references;
