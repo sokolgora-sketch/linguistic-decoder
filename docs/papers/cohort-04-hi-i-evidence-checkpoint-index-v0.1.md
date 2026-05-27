@@ -63,9 +63,7 @@ Cohort 04 does not support these claims:
 
 ## 5. Publication blockers
 
-Before publication, Cohort 04 still needs:
-
-- final claim-boundary review.
+No internal evidence-hardening blockers remain open in this checkpoint index.
 
 Completed evidence-hardening layers:
 
@@ -75,7 +73,12 @@ Completed evidence-hardening layers:
 - per-run verdict consolidation;
 - result-doc linkage by run ID;
 - stable token-bucket references;
-- paper-table formatting draft.
+- paper-table formatting draft;
+- final claim-boundary review.
+
+Publication actions still require a separate explicit release decision.
+
+Do not update README, Zenodo, LingBuzz, or public links from this checkpoint alone.
 
 ## 6. Recommended publication framing
 
@@ -601,3 +604,108 @@ Do not publish.
 Do not update README.
 
 Do not claim Cohort 04 is publication-ready.
+
+## 14. Final claim-boundary review
+
+Status: final internal claim-boundary review recorded  
+Scope: Cohort 04 Hindi `/i/` evidence checkpoint
+
+This section records what the current Cohort 04 Hindi `/i/` checkpoint can and cannot support.
+
+It closes the internal evidence-hardening checklist for this checkpoint index.
+
+It does not publish Cohort 04.
+
+### 14.1 Evidence-hardening completion status
+
+Completed layers:
+
+- repo-tracked design/result/synthesis documents;
+- local ZIP inventory;
+- SHA256 hashes for the two located evidence ZIPs;
+- ZIP-internal run folder inventory;
+- run-ID / provider / model / label provenance;
+- task metadata;
+- bucket-count provenance;
+- per-run verdict consolidation;
+- result-doc linkage by run ID;
+- stable token-bucket references;
+- paper-table formatting draft;
+- final claim-boundary review.
+
+### 14.2 Claims this checkpoint can support internally
+
+The current checkpoint can support these internal claims:
+
+- Cohort 04 Hindi `/i/` has a traceable evidence lane.
+- The lane contains two located local evidence ZIPs.
+- Both ZIPs have recorded SHA256 hashes.
+- All eight runs are linked to ZIP-internal `input.json` sources.
+- All eight runs use:
+  - `T5_INTERMEDIATE_V0_1`;
+  - `intermediate_triple`;
+  - `languageHint: hi`;
+  - `vowelUnderTest: i`;
+  - `V6→V7`;
+  - `10/10/10` bucket counts.
+- All eight runs returned `INTERMEDIATE`.
+- Open-final target/replication rows carry no diagnostic flags.
+- Closed-final/reference/baseline/mixed rows preserve or repeat `BOUNDARY_UNCERTAIN_HIGH`.
+- The current evidence supports the cautious internal mechanism reading that final-shape distribution is an active token-geometry variable inside the tested packs.
+- The checkpoint is ready to be used as a source for future paper-drafting work.
+
+### 14.3 Claims this checkpoint does not support
+
+The current checkpoint does not support these stronger claims:
+
+- Cohort 04 proves the Hindi `/i/` bracket.
+- Cohort 04 independently validates the high-region model.
+- Cohort 04 should be published alone.
+- Cohort 04 replaces Cohort 03.
+- Cohort 04 proves final-shape distribution as a general cross-linguistic rule.
+- Cohort 04 authorizes README updates.
+- Cohort 04 authorizes Zenodo upload.
+- Cohort 04 authorizes LingBuzz submission.
+- Cohort 04 is already public-publication complete.
+
+### 14.4 Required wording boundary
+
+Use this boundary wording:
+
+> Cohort 04 Hindi `/i/` is evidence-hardened internally and ready for future paper drafting, but it is not itself a public publication action.
+
+Use this shorter internal status when needed:
+
+> Evidence-hardened internally; publication action not started.
+
+Do not use:
+
+> Published.
+
+Do not use:
+
+> Publication-ready as a standalone result.
+
+### 14.5 Next publication path
+
+The next publication path, if chosen later, should be a separate release chain:
+
+1. draft paper section/table from this checkpoint;
+2. review Cohort 03 + Cohort 04 combined framing;
+3. decide whether this belongs in a high-region follow-up paper;
+4. create explicit publication PR(s);
+5. only then update README, Zenodo, LingBuzz, or public links.
+
+### 14.6 Final status
+
+Cohort 04 Hindi `/i/` checkpoint status:
+
+> Evidence-hardened internally; ready for future paper drafting; not published.
+
+Do not update README.
+
+Do not create Zenodo archive.
+
+Do not submit to LingBuzz.
+
+Do not claim Cohort 04 is publicly published.
