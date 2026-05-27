@@ -48,6 +48,20 @@ The relevant language/vowel target is:
 - `languageHint: hi`
 - `vowelUnderTest: i`
 
+The bucket geometry is balanced:
+
+- `10/10/10` means 10 low-anchor tokens, 10 target-vowel tokens, and 10 high-anchor tokens.
+
+Open-final and closed-final refer to token final-shape classes:
+
+- open-final: a token form ending in a vowel sound/letter in the working romanized token set;
+- closed-final: a token form ending in a consonant sound/letter in the working romanized token set.
+
+Diagnostic wording:
+
+- clean row: no diagnostic flags;
+- high-boundary pressure: `BOUNDARY_UNCERTAIN_HIGH`, meaning the scored target position sits near the high boundary of the tested bracket.
+
 The paper does not treat the output as broad statistical proof. It treats the outputs as traceable battery evidence under a fixed scoring framework.
 
 ## 4. Cohort 03 role
@@ -154,10 +168,144 @@ Do not submit to LingBuzz.
 
 Do not claim publication complete.
 
-## 13. Next step
 
-Next useful batch PR:
+## 13. Statistical falsification plan
 
-> Add formal references, evidence appendix details, and final paper-claim review together.
+The mechanism claim is not that Hindi `/i/` proves the high-region model.
 
-That future PR should still avoid public publication actions.
+The mechanism claim is narrower:
+
+> The diagnostic flag pattern is associated with final-shape distribution in the tested Cohort 04 packs.
+
+### 13.1 Null hypothesis
+
+Null hypothesis:
+
+> Diagnostic flag status is independent of final-shape label.
+
+In this null, `BOUNDARY_UNCERTAIN_HIGH` should not cluster systematically on closed-final/reference/baseline/mixed rows more than expected by chance.
+
+### 13.2 Observed pattern
+
+Observed Cohort 04 simplified pattern:
+
+| Final-shape class | Clean rows | Flagged rows |
+|---|---:|---:|
+| open-final-like | 4 | 0 |
+| non-open / closed-like | 0 | 4 |
+
+Observed test statistic:
+
+`T = flag_rate(non_open) - flag_rate(open)`
+
+Observed value:
+
+`T = 4/4 - 0/4 = 1.0`
+
+### 13.3 Exact permutation test
+
+Permutation unit:
+
+- run row.
+
+Fixed quantities:
+
+- 8 total rows;
+- 4 flagged rows;
+- 4 clean rows;
+- 4 open-final-like labels;
+- 4 non-open / closed-like labels.
+
+Permutation procedure:
+
+1. Hold the observed flag statuses fixed.
+2. Shuffle the final-shape labels across the 8 rows.
+3. Recompute `T = flag_rate(non_open) - flag_rate(open)`.
+4. Repeat over all exact assignments, or use at least 10,000 random permutations if implemented by simulation.
+
+Exact combinatoric count:
+
+`C(8,4) = 70`
+
+One-sided probability of all 4 flags landing in the 4 non-open rows by chance:
+
+`1 / 70 ≈ 0.0143`
+
+Two-sided extreme-separation probability:
+
+`2 / 70 ≈ 0.0286`
+
+### 13.4 Support condition
+
+The mechanism claim is supported only if:
+
+- the observed `T` remains at the extreme edge of the permutation distribution;
+- the one-sided permutation probability remains small;
+- row labels are not confounded by token length, morphology, source list, or loanword status.
+
+### 13.5 Kill condition
+
+The mechanism claim is killed or downgraded if:
+
+- random label permutation often produces equal or stronger separation;
+- bucket-level resampling loses the open-clean / closed-flagged split;
+- the open-final and closed-final token sets differ mainly by length, morphology, word source, or loan status;
+- an independent replication language with the same geometry fails to show any final-shape sensitivity.
+
+This test does not prove the high-region model. It only tests whether the final-shape diagnostic pattern is stronger than label-randomized chance.
+
+## 14. Replication target
+
+Recommended first replication language:
+
+> Georgian.
+
+Reason:
+
+- Georgian orthography is comparatively transparent;
+- the vowel inventory is simpler than Arabic’s written-vowel problem;
+- consonant clusters make open/closed final contrasts available;
+- it is independent enough from Hindi to test whether final-shape sensitivity is language-specific or mechanism-level.
+
+Arabic is not the first pick because short vowels are often not written, making final-shape classification unstable unless fully vocalized controlled data is used.
+
+Finnish is not the first pick because the orthography is clean but vowel harmony, suffix-heavy morphology, long vowels, and many open-final forms may create a separate morphology confound.
+
+### 14.1 Georgian replication requirements
+
+Use the same geometry:
+
+- `T5_INTERMEDIATE_V0_1`;
+- `intermediate_triple`;
+- `V6→V7`;
+- `10/10/10` buckets;
+- target vowel selected before curation;
+- open-final and closed-final labels fixed before scoring.
+
+### 14.2 Georgian disqualifying conditions
+
+Reject Georgian as the replication if:
+
+- clean `10/10/10` buckets cannot be built;
+- target tokens are dominated by one suffix or morphology class;
+- open-final and closed-final buckets are not length-balanced;
+- wordlist quality is dominated by names, loans, or transliteration artifacts;
+- transliteration loses final-vowel information;
+- closed-final rows and open-final rows come from different grammatical categories.
+
+## 15. Publication boundary
+
+This file remains an expanded draft paper.
+
+Do not update README.
+
+Do not create Zenodo archive.
+
+Do not submit to LingBuzz.
+
+Do not claim publication complete.
+
+The next useful work is not more wording polish. It is either:
+
+- implement the permutation falsification check; or
+- design the Georgian replication pack.
