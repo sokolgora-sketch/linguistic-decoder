@@ -6,7 +6,7 @@ Scope: Cohort 03 Hindi `/i/` + Cohort 04 Hindi `/i/`
 
 ## Abstract
 
-This follow-up paper examines Hindi `/i/` as a high-region pressure case in the ZË-RO vowel-bracket battery. Cohort 03 provides the primary traceable evidence lane. Cohort 04 refines the mechanism account by testing final-shape distribution under the same `V6→V7` bracket. Across Cohort 04, all eight runs remained `INTERMEDIATE`; open-final target and replication rows carried no diagnostic flags, while closed-final/reference/baseline/mixed rows preserved or repeated `BOUNDARY_UNCERTAIN_HIGH`. The combined evidence supports a cautious mechanism claim: Hindi `/i/` behavior in these packs is sensitive to token geometry, especially final-shape distribution. The evidence does not prove the full high-region model standalone.
+This draft examines Hindi `/i/` as a high-region pressure case in the ZË-RO vowel-bracket battery. Cohort 03 provides the primary traceable evidence lane. Cohort 04 tests a narrower mechanism: whether final-shape distribution changes the behavior of the same `V6→V7` bracket. Across Cohort 04, all eight runs remained `INTERMEDIATE`; open-final target and replication rows carried no diagnostic flags, while closed-final/reference/baseline/mixed rows preserved or repeated `BOUNDARY_UNCERTAIN_HIGH`. The combined evidence supports a cautious mechanism claim: Hindi `/i/` behavior in these packs is sensitive to token geometry, especially final-shape distribution. The evidence does not prove the full high-region model standalone.
 
 ## 1. Claim boundary
 
@@ -48,7 +48,7 @@ The relevant language/vowel target is:
 - `languageHint: hi`
 - `vowelUnderTest: i`
 
-The paper does not treat the output as a broad statistical proof. It treats the outputs as traceable battery evidence under a fixed scoring framework.
+The paper does not treat the output as broad statistical proof. It treats the outputs as traceable battery evidence under a fixed scoring framework.
 
 ## 4. Cohort 03 role
 
@@ -76,7 +76,7 @@ Use it for:
 
 Key pattern:
 
-- all 8 runs: `INTERMEDIATE`;
+- all 8 Cohort 04 runs: `INTERMEDIATE`;
 - open-final target/replication rows: no diagnostic flags;
 - closed-final/reference/baseline/mixed rows: `BOUNDARY_UNCERTAIN_HIGH`;
 - task shape: `T5_INTERMEDIATE_V0_1 / intermediate_triple / hi / i / V6→V7`;
@@ -124,9 +124,6 @@ Cohort 03 and Cohort 04 are internally traceable, but public publication still r
 Future reproduction material should point to:
 
 - Cohort 03 checkpoint index;
-- Coh should point to:
-
-- Cohort 03 checkpoint index;
 - Cohort 04 checkpoint index;
 - ZIP hashes recorded inside each checkpoint;
 - run IDs and bucket pointers recorded inside each checkpoint;
@@ -134,7 +131,18 @@ Future reproduction material should point to:
 
 No new reproduction archive is created by this draft.
 
-## 11. Publication boundary
+## 11. Evidence appendix draft
+
+Minimum future appendix entries:
+
+| Item | Required source |
+|---|---|
+| Cohort 03 checkpoint | `docs/papers/cohort-03-hi-i-evidence-checkpoint-index-v0.1.md` |
+| Cohort 04 checkpoint | `docs/papers/cohort-04-hi-i-evidence-checkpoint-index-v0.1.md` |
+| Shared mechanism overview | `docs/evals/cohort-03-04-high-region-mechanism-overview-v0.1.md` |
+| Draft section source | `docs/papers/cohort-03-04-high-region-follow-up-section-v0.1.md` |
+
+## 12. Publication boundary
 
 This file is an expanded draft paper.
 
@@ -146,10 +154,10 @@ Do not submit to LingBuzz.
 
 Do not claim publication complete.
 
-## 12. Next step
+## 13. Next step
 
-Next useful PR:
+Next useful batch PR:
 
-> Add a formal references/evidence appendix section for Cohort 03/04.
+> Add formal references, evidence appendix details, and final paper-claim review together.
 
 That future PR should still avoid public publication actions.
