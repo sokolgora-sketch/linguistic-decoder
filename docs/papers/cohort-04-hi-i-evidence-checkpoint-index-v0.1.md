@@ -77,24 +77,6 @@ Completed evidence-hardening layers:
 - per-run verdict consolidation;
 - result-doc linkage by run ID.
 
-Completed evidence-hardening layers:
-
-- local ZIP inventory;
-- SHA256 hashes for located evidence ZIPs;
-- run-ID / bucket provenance extraction;
-- per-run verdict consolidation.
-
-Completed evidence-hardening layers:
-
-- local ZIP inventory;
-- SHA256 hashes for located evidence ZIPs;
-- run-ID / bucket provenance extraction.
-
-Completed evidence-hardening layers:
-
-- local ZIP inventory;
-- SHA256 hashes for located evidence ZIPs.
-
 ## 6. Recommended publication framing
 
 Do not publish Cohort 04 alone yet.
