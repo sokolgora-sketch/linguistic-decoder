@@ -65,7 +65,6 @@ Cohort 04 does not support these claims:
 
 Before publication, Cohort 04 still needs:
 
-- result-doc linkage by run ID;
 - stable token-bucket references;
 - paper-table formatting draft;
 - final claim-boundary review.
@@ -75,18 +74,8 @@ Completed evidence-hardening layers:
 - local ZIP inventory;
 - SHA256 hashes for located evidence ZIPs;
 - run-ID / bucket provenance extraction;
-- per-run verdict consolidation.
-
-Completed evidence-hardening layers:
-
-- local ZIP inventory;
-- SHA256 hashes for located evidence ZIPs;
-- run-ID / bucket provenance extraction.
-
-Completed evidence-hardening layers:
-
-- local ZIP inventory;
-- SHA256 hashes for located evidence ZIPs.
+- per-run verdict consolidation;
+- result-doc linkage by run ID.
 
 ## 6. Recommended publication framing
 
@@ -356,6 +345,101 @@ The Cohort 04 Hindi `/i/` evidence lane now has:
 Cohort 04 still needs:
 
 - result-doc linkage by run ID;
+- stable token-bucket references;
+- paper-table formatting draft;
+- final claim-boundary review.
+
+Do not publish.
+
+Do not update README.
+
+Do not claim Cohort 04 is publication-ready.
+
+## 11. Result-doc linkage by run ID
+
+Status: result-doc linkage recorded  
+Scope: two located Cohort 04 Hindi `/i/` evidence ZIPs
+
+This section links each primary Cohort 04 run to the current repo-tracked result and synthesis documents.
+
+### 11.1 First open-final / closed-final ZIP
+
+Evidence ZIP:
+
+`evals.series-evidence-pack.cohort04-hi-i-open-final-closed-final-v0.1.v0.1.zip`
+
+Primary result document:
+
+`docs/evals/cohort-04-hi-i-open-final-closed-final-result-v0.1.md`
+
+Mechanism synthesis document:
+
+`docs/evals/cohort-04-hi-i-open-final-mechanism-synthesis-v0.1.md`
+
+Combined high-region mechanism overview:
+
+`docs/evals/cohort-03-04-high-region-mechanism-overview-v0.1.md`
+
+| runId | primary result doc | synthesis doc | mechanism overview | Link status |
+|---|---|---|---|---|
+| `cohort04-hi-i-baseline-reference-r01` | `docs/evals/cohort-04-hi-i-open-final-closed-final-result-v0.1.md` | `docs/evals/cohort-04-hi-i-open-final-mechanism-synthesis-v0.1.md` | `docs/evals/cohort-03-04-high-region-mechanism-overview-v0.1.md` | linked |
+| `cohort04-hi-i-open-final-target-r01` | `docs/evals/cohort-04-hi-i-open-final-closed-final-result-v0.1.md` | `docs/evals/cohort-04-hi-i-open-final-mechanism-synthesis-v0.1.md` | `docs/evals/cohort-03-04-high-region-mechanism-overview-v0.1.md` | linked |
+| `cohort04-hi-i-closed-final-target-r01` | `docs/evals/cohort-04-hi-i-open-final-closed-final-result-v0.1.md` | `docs/evals/cohort-04-hi-i-open-final-mechanism-synthesis-v0.1.md` | `docs/evals/cohort-03-04-high-region-mechanism-overview-v0.1.md` | linked |
+| `cohort04-hi-i-mixed-final-target-r01` | `docs/evals/cohort-04-hi-i-open-final-closed-final-result-v0.1.md` | `docs/evals/cohort-04-hi-i-open-final-mechanism-synthesis-v0.1.md` | `docs/evals/cohort-03-04-high-region-mechanism-overview-v0.1.md` | linked |
+
+### 11.2 Open-final replication ZIP
+
+Evidence ZIP:
+
+`evals.series-evidence-pack.cohort04-hi-i-open-final-replication-v0.1.v0.1.zip`
+
+Primary result document:
+
+`docs/evals/cohort-04-hi-i-open-final-replication-result-v0.1.md`
+
+Mechanism synthesis document:
+
+`docs/evals/cohort-04-hi-i-open-final-mechanism-synthesis-v0.1.md`
+
+Combined high-region mechanism overview:
+
+`docs/evals/cohort-03-04-high-region-mechanism-overview-v0.1.md`
+
+| runId | primary result doc | synthesis doc | mechanism overview | Link status |
+|---|---|---|---|---|
+| `cohort04-hi-i-open-final-reference-r01` | `docs/evals/cohort-04-hi-i-open-final-replication-result-v0.1.md` | `docs/evals/cohort-04-hi-i-open-final-mechanism-synthesis-v0.1.md` | `docs/evals/cohort-03-04-high-region-mechanism-overview-v0.1.md` | linked |
+| `cohort04-hi-i-open-final-replication-a-r01` | `docs/evals/cohort-04-hi-i-open-final-replication-result-v0.1.md` | `docs/evals/cohort-04-hi-i-open-final-mechanism-synthesis-v0.1.md` | `docs/evals/cohort-03-04-high-region-mechanism-overview-v0.1.md` | linked |
+| `cohort04-hi-i-open-final-replication-b-r01` | `docs/evals/cohort-04-hi-i-open-final-replication-result-v0.1.md` | `docs/evals/cohort-04-hi-i-open-final-mechanism-synthesis-v0.1.md` | `docs/evals/cohort-03-04-high-region-mechanism-overview-v0.1.md` | linked |
+| `cohort04-hi-i-closed-final-reference-r01` | `docs/evals/cohort-04-hi-i-open-final-replication-result-v0.1.md` | `docs/evals/cohort-04-hi-i-open-final-mechanism-synthesis-v0.1.md` | `docs/evals/cohort-03-04-high-region-mechanism-overview-v0.1.md` | linked |
+
+### 11.3 Linkage boundary
+
+This linkage is repo-internal.
+
+It does not create public publication status.
+
+It does not replace stable token-bucket references.
+
+It does not authorize README, Zenodo, or LingBuzz updates.
+
+### 11.4 Current evidence state
+
+The Cohort 04 Hindi `/i/` evidence lane now has:
+
+- repo-tracked design/result/synthesis documents;
+- local ZIP inventory;
+- SHA256 hashes for the two located evidence ZIPs;
+- ZIP-internal run folder inventory;
+- run-ID / provider / model / label provenance;
+- task metadata;
+- bucket-count provenance;
+- per-run verdict consolidation;
+- result-doc linkage by run ID.
+
+### 11.5 Still needed before publication
+
+Cohort 04 still needs:
+
 - stable token-bucket references;
 - paper-table formatting draft;
 - final claim-boundary review.
