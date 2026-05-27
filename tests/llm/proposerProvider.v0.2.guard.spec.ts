@@ -63,6 +63,62 @@ describe("proposerProvider v0.2 real-provider readiness guard", () => {
     ).rejects.toThrow(/openai_compat not configured/);
   });
 
+  it("honors OPENAI_BASE_URL for OpenAI-compatible endpoints", async () => {
+    process.env.OPENAI_API_KEY = "fake-key";
+    process.env.OPENAI_MODEL = "fake-model";
+    process.env.OPENAI_BASE_URL = "http://localhost:11434/v1";
+
+    const originalFetch = global.fetch;
+    const rawText = '{"word":"study","mode":"strict","candidates":[]}';
+
+    const fetchMock = jest.fn(async (input: unknown, init?: RequestInit) => {
+      expect(String(input)).toBe("http://localhost:11434/v1/chat/completions");
+      expect(init?.method).toBe("POST");
+
+      const headers = init?.headers as Record<string, string>;
+      expect(headers["content-type"]).toBe("application/json");
+      expect(headers.authorization).toBe("Bearer fake-key");
+
+      const body = JSON.parse(String(init?.body ?? "{}"));
+      expect(body.model).toBe("fake-model");
+      expect(body.temperature).toBe(0);
+      expect(body.messages).toEqual([
+        { role: "system", content: "Return JSON only." },
+        { role: "user", content: JSON.stringify({ word: "study", mode: "strict" }) },
+      ]);
+
+      return new Response(
+        JSON.stringify({
+          choices: [{ message: { content: rawText } }],
+        }),
+        { status: 200, headers: { "content-type": "application/json" } }
+      );
+    });
+
+    global.fetch = fetchMock as any;
+
+    try {
+      const out = await runProposerV0_2(
+        {
+          word: "study",
+          mode: "strict",
+          systemPrompt: "Return JSON only.",
+        },
+        "openai_compat"
+      );
+
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+      expect(out.provider).toBe("openai_compat");
+      expect(out.rawText).toBe(rawText);
+      expect(out.meta).toMatchObject({
+        model: "fake-model",
+        baseUrl: "http://localhost:11434/v1",
+      });
+    } finally {
+      global.fetch = originalFetch;
+    }
+  });
+
   it("keeps mock provider CI-safe and aligned with the Phase 2 verifier contract", async () => {
     const out = await runProposerV0_2(
       {
