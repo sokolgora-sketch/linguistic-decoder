@@ -254,6 +254,43 @@ The mechanism claim is killed or downgraded if:
 
 This test does not prove the high-region model. It only tests whether the final-shape diagnostic pattern is stronger than label-randomized chance.
 
+
+### 13.6 Exact permutation check result
+
+A local exact permutation check was run after the falsification plan was added.
+
+Observed simplified Cohort 04 pattern:
+
+| Final-shape class | Clean rows | Flagged rows |
+|---|---:|---:|
+| open-final-like | 4 | 0 |
+| non-open / closed-like | 0 | 4 |
+
+Result:
+
+| Quantity | Value |
+|---|---:|
+| Total rows | 8 |
+| Flagged rows | 4 |
+| Open-like labels | 4 |
+| Non-open / closed-like labels | 4 |
+| Exact assignments | 70 |
+| Observed `T` | 1.0 |
+| One-sided p-value | 0.014285714285714285 |
+| Two-sided p-value | 0.02857142857142857 |
+
+Interpretation:
+
+> The observed flag separation is unlikely under row-label permutation, supporting an association between final-shape label and diagnostic flag status in the tested Cohort 04 rows.
+
+Boundary:
+
+> This supports the final-shape association under row-label permutation. It does not prove independence from token-level confounds such as length, morphology, word-source, loanword status, or bucket construction artifacts.
+
+Next falsification step:
+
+> The claim still needs either bucket-level resampling or an independent same-geometry replication, with Georgian currently selected as the first replication target.
+
 ## 14. Replication target
 
 Recommended first replication language:
