@@ -58,7 +58,8 @@
     "research:taiwan:positionOrder:rootOnly:v0.9": "npm test -- tests/research/taiwan.positionOrder.rootOnly.v0.9.spec.ts",
     "research:taiwan:spectrum:rootOnly:v1.0": "npm test -- tests/research/taiwan.spectrum.rootOnly.v1.0.spec.ts",
     "battery:inspect-pack": "tsx scripts/inspect-battery-evidence-pack.v0.1.ts",
-    "battery:generate-series-stats": "tsx scripts/generate-battery-series-stats.v0.1.ts"
+    "battery:generate-series-stats": "tsx scripts/generate-battery-series-stats.v0.1.ts",
+    "evals:audit-buckets": "node scripts/evals/auditEvidenceBuckets.mjs"
   },
   "dependencies": {
     "@genkit-ai/google-genai": "^1.35.0",
