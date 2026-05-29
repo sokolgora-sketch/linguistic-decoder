@@ -137,6 +137,31 @@ Do not import stats from prose. Use evidence packs only.
 
 ---
 
+### 6. Evidence bucket audit workflow
+
+Path:
+
+    docs/evals/evidence-bucket-audit-workflow-v0.1.md
+
+Use this when:
+
+- inspecting Evals evidence ZIP bucket geometry;
+- deciding whether an intermediate-triple input should be reviewed before scoring;
+- using `npm run evals:audit-buckets`;
+- using CLI JSON audit output for durable evidence notes;
+- comparing CLI audit output against the `/evals` Bucket geometry check panel.
+
+This workflow preserves:
+
+- the human evidence bucket audit CLI path;
+- the machine-readable `--json` audit path;
+- the warning meanings for non-10 bucket counts, final target-vowel inflation, and high average target-vowel count;
+- the rule that these checks are warning-only and do not alter scorer math.
+
+Do not treat bucket audit output as publication authorization or scientific validation.
+
+---
+
 ## DF operating rule
 
 For future repo work:
@@ -158,6 +183,7 @@ For future repo work:
 - `docs/evals/quickstart.md`
 - `docs/runbooks/evals-battery-operator-runbook.v0.1.md`
 - `docs/evals/battery-stats-import-workflow-v0.1.md`
+- `docs/evals/evidence-bucket-audit-workflow-v0.1.md`
 
 ---
 
