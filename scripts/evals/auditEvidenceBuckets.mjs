@@ -7,7 +7,7 @@ import JSZip from "jszip";
 const BUCKET_IDS = ["anchor_low", "x_vowel", "anchor_high"];
 
 function usage() {
-  console.error("Usage: npm run evals:audit-buckets -- /path/to/evidence-pack.zip");
+  console.error("Usage: npm run evals:audit-buckets -- [--json] /path/to/evidence-pack.zip");
 }
 
 function isObject(value) {
@@ -194,8 +194,123 @@ function warningLines(bucketId, summary) {
   return warnings;
 }
 
+function parseArgs(argv) {
+  const json = argv.includes("--json");
+  const positional = argv.filter((arg) => arg !== "--json");
+
+  return {
+    json,
+    zipPath: positional[0],
+  };
+}
+
+function bucketSummaryForJson(bucketId, summary) {
+  return {
+    bucketId,
+    count: summary.count,
+    openFinal: summary.openFinal,
+    closedFinal: summary.closedFinal,
+    finalTarget: summary.finalTarget,
+    avgLength: Number(formatNumber(summary.avgLength)),
+    avgTargetCount: Number(formatNumber(summary.avgTargetCount)),
+    tokens: summary.stats.map((item) => ({
+      token: item.token,
+      finalShape: item.finalShape,
+      length: item.length,
+      targetCount: item.targetCount,
+      targetPositions: item.targetPositions,
+    })),
+  };
+}
+
+async function buildAuditReport(zipPath) {
+  const bytes = fs.readFileSync(zipPath);
+  const zip = await JSZip.loadAsync(bytes);
+  const inputPaths = Object.keys(zip.files)
+    .filter((name) => /(?:^|\/)runs\/[^/]+\/input\.json$/.test(name))
+    .sort();
+
+  const report = {
+    zipPath: path.resolve(zipPath),
+    inputJsonFiles: inputPaths.length,
+    runs: [],
+  };
+
+  for (const inputPath of inputPaths) {
+    const raw = await zip.file(inputPath).async("string");
+    const input = JSON.parse(raw);
+    const buckets = findBuckets(input);
+    const runId = runIdFromZipPath(inputPath);
+    const targetVowel = detectTargetVowel(input);
+    const run = {
+      runId,
+      targetVowel,
+      buckets: [],
+      warnings: [],
+    };
+
+    if (!buckets) {
+      run.warnings.push("ERROR: no anchor_low/x_vowel/anchor_high buckets found");
+      report.runs.push(run);
+      continue;
+    }
+
+    for (const bucketId of BUCKET_IDS) {
+      const tokens = asArray(buckets[bucketId]);
+      const summary = summarizeBucket(tokens, targetVowel);
+      run.buckets.push(bucketSummaryForJson(bucketId, summary));
+      run.warnings.push(...warningLines(bucketId, summary));
+    }
+
+    report.runs.push(run);
+  }
+
+  return report;
+}
+
+function printHumanReport(report) {
+  console.log(`Evidence ZIP: ${report.zipPath}`);
+  console.log(`Input JSON files: ${report.inputJsonFiles}`);
+
+  if (report.inputJsonFiles === 0) {
+    console.log("ERROR: no runs/*/input.json files found");
+    process.exitCode = 1;
+    return;
+  }
+
+  for (const run of report.runs) {
+    console.log("");
+    console.log(`RUN ${run.runId}`);
+    console.log(`targetVowel=${run.targetVowel}`);
+
+    if (run.buckets.length === 0) {
+      console.log("ERROR: no anchor_low/x_vowel/anchor_high buckets found");
+      continue;
+    }
+
+    for (const summary of run.buckets) {
+      console.log(
+        `${summary.bucketId}: count=${summary.count} open=${summary.openFinal} closed=${summary.closedFinal} finalTarget=${summary.finalTarget} avgLen=${formatNumber(summary.avgLength)} avgTargetCount=${formatNumber(summary.avgTargetCount)}`
+      );
+
+      for (const item of summary.tokens) {
+        console.log(
+          `  - ${item.token} | ${item.finalShape} | len=${item.length} | targetCount=${item.targetCount} | targetPos=${item.targetPositions}`
+        );
+      }
+    }
+
+    if (run.warnings.length) {
+      console.log("WARNINGS:");
+      for (const warning of run.warnings) console.log(`  - ${warning}`);
+    } else {
+      console.log("WARNINGS: none");
+    }
+  }
+}
+
 async function main() {
-  const zipPath = process.argv[2];
+  const { json, zipPath } = parseArgs(process.argv.slice(2));
 
   if (!zipPath) {
     usage();
@@ -209,62 +324,15 @@ async function main() {
     return;
   }
 
-  const bytes = fs.readFileSync(zipPath);
-  const zip = await JSZip.loadAsync(bytes);
-  const inputPaths = Object.keys(zip.files)
-    .filter((name) => /(?:^|\/)runs\/[^/]+\/input\.json$/.test(name))
-    .sort();
+  const report = await buildAuditReport(zipPath);
 
-  console.log(`Evidence ZIP: ${path.resolve(zipPath)}`);
-  console.log(`Input JSON files: ${inputPaths.length}`);
-
-  if (inputPaths.length === 0) {
-    console.log("ERROR: no runs/*/input.json files found");
-    process.exitCode = 1;
+  if (json) {
+    console.log(JSON.stringify(report, null, 2));
+    if (report.inputJsonFiles === 0) process.exitCode = 1;
     return;
   }
 
-  for (const inputPath of inputPaths) {
-    const raw = await zip.file(inputPath).async("string");
-    const input = JSON.parse(raw);
-    const buckets = findBuckets(input);
-    const runId = runIdFromZipPath(inputPath);
-    const targetVowel = detectTargetVowel(input);
-
-    console.log("");
-    console.log(`RUN ${runId}`);
-    console.log(`targetVowel=${targetVowel}`);
-
-    if (!buckets) {
-      console.log("ERROR: no anchor_low/x_vowel/anchor_high buckets found");
-      continue;
-    }
-
-    const allWarnings = [];
-
-    for (const bucketId of BUCKET_IDS) {
-      const tokens = asArray(buckets[bucketId]);
-      const summary = summarizeBucket(tokens, targetVowel);
-      allWarnings.push(...warningLines(bucketId, summary));
-
-      console.log(
-        `${bucketId}: count=${summary.count} open=${summary.openFinal} closed=${summary.closedFinal} finalTarget=${summary.finalTarget} avgLen=${formatNumber(summary.avgLength)} avgTargetCount=${formatNumber(summary.avgTargetCount)}`
-      );
-
-      for (const item of summary.stats) {
-        console.log(
-          `  - ${item.token} | ${item.finalShape} | len=${item.length} | targetCount=${item.targetCount} | targetPos=${item.targetPositions}`
-        );
-      }
-    }
-
-    if (allWarnings.length) {
-      console.log("WARNINGS:");
-      for (const warning of allWarnings) console.log(`  - ${warning}`);
-    } else {
-      console.log("WARNINGS: none");
-    }
-  }
+  printHumanReport(report);
 }
 
 main().catch((error) => {
