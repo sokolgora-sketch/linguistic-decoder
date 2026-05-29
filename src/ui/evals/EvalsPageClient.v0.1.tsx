@@ -46,6 +46,7 @@ import {
 } from "@/ui/evals/evalsEvidencePackExport.v0.1";
 import { maybeBuildHighRegionSeriesDiagnosticsArtifactFromRowsV0_1 } from "@/ui/evals/evalsHighRegionSeriesDiagnosticsArtifactFromRows.v0.1";
 import { buildEvalsSummaryCsvV0_1, buildEvalsWorkbookArrayBufferV0_1 } from "@/ui/evals/evalsWorkbookExport.v0.1";
+import { buildEvalsInputBucketWarningsV0_1 } from "@/ui/evals/evalsInputBucketWarnings.v0.1";
 
 
 type ApiOk = { ok: true; report: EvalReportBundleV0_1; md: string };
@@ -1294,6 +1295,11 @@ export function EvalsPageClientV0_1() {
     Boolean(inputText.trim()) &&
     inputProbe.kind !== "invalid_json" &&
     inputProbe.kind !== "corpus70_meta";
+
+  const inputBucketWarningPanel = useMemo(
+    () => buildEvalsInputBucketWarningsV0_1({ inputProbe }),
+    [inputProbe],
+  );
 
   const summaryTask: any =
     report?.tasks?.find(
@@ -3813,6 +3819,43 @@ export function EvalsPageClientV0_1() {
                   >
                     <span className="h-[6px] w-[6px] rounded-full bg-[#d93333]" />
                     Invalid JSON — fix syntax before scoring
+                  </div>
+                ) : null}
+
+                {inputBucketWarningPanel ? (
+                  <div className="rounded-[10px] border border-[#5a4a24] bg-[#1a1710] p-3 text-[12px] text-[#e8dcc0]">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <div className="font-semibold uppercase tracking-[0.1em] text-[#f3d38b]">
+                        Bucket geometry check
+                      </div>
+                      <div className="font-mono text-[11px] text-[#c7b98f]">
+                        {inputBucketWarningPanel.taskId} · target {inputBucketWarningPanel.targetVowel}
+                      </div>
+                    </div>
+                    <div className="mt-2 grid gap-2 md:grid-cols-3">
+                      {inputBucketWarningPanel.bucketSummaries.map((summary) => (
+                        <div key={summary.bucketId} className="rounded-[8px] border border-[#3f3420] bg-[#11100c] px-2 py-2">
+                          <div className="font-mono text-[11px] text-[#f7e4a6]">{summary.bucketId}</div>
+                          <div className="mt-1 text-[11px] text-[#cfc2a0]">
+                            n={summary.tokenCount} · open={summary.openFinalTokenCount} · closed={summary.closedFinalTokenCount}
+                          </div>
+                          <div className="mt-1 text-[11px] text-[#cfc2a0]">
+                            final-target={summary.finalTargetVowelTokenCount} · avg-target={summary.meanTargetVowelCount.toFixed(2)}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="mt-2 text-[11px] text-[#d6c9a7]">
+                      {inputBucketWarningPanel.warnings.length ? (
+                        <ul className="list-disc space-y-1 pl-4">
+                          {inputBucketWarningPanel.warnings.map((warning) => (
+                            <li key={warning}>{warning}</li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <span>No basic bucket-geometry warnings detected.</span>
+                      )}
+                    </div>
                   </div>
                 ) : null}
 
