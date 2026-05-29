@@ -1,151 +1,57 @@
 import {
   compareTargetToHighAnchorTokenGeometryV0_1,
   compareTokenGeometryBucketsV0_1,
+  summarizeTokenGeometryBucketV0_1,
 } from "@/shared/evals/tokenGeometryInspection.v0.1";
 
-const HINDI_TARGET = [
-  "din",
-  "dil",
-  "sir",
-  "kitab",
-  "shiksha",
-  "nadi",
-  "pita",
-  "kisan",
-  "vidya",
-  "mitti",
-] as const;
-
-const HINDI_V6_V7_HIGH_ANCHOR = [
-  "jeevan",
-  "geet",
-  "neend",
-  "cheez",
-  "teer",
-  "jeet",
-  "peepal",
-  "keeda",
-  "deewar",
-  "meetha",
-] as const;
-
-const HINDI_ALT_TARGET = [
-  "chitra",
-  "disha",
-  "himmat",
-  "kiran",
-  "kismat",
-  "nishan",
-  "vikas",
-  "shikar",
-  "sitar",
-  "jigar",
-] as const;
-
-const ARABIC_TARGET = [
-  "kitab",
-  "bint",
-  "sikkah",
-  "qalib",
-  "kabir",
-  "saghir",
-  "jadid",
-  "qadim",
-  "jism",
-  "ism",
-] as const;
-
-const ARABIC_V6_V7_HIGH_ANCHOR = [
-  "sifr",
-  "sirr",
-  "jild",
-  "tin",
-  "tibn",
-  "dibs",
-  "simt",
-  "rijl",
-  "hibr",
-  "liman",
-] as const;
-
-describe("token geometry inspection v0.1", () => {
-  it("captures the Hindi versus Arabic high-anchor spelling split without scoring new runs", () => {
-    const hindi = compareTargetToHighAnchorTokenGeometryV0_1({
-      label: "hindi-i-v6-v7",
-      targetTokens: HINDI_TARGET,
-      highAnchorTokens: HINDI_V6_V7_HIGH_ANCHOR,
+describe("tokenGeometryInspection v0.1", () => {
+  it("summarizes final-shape and target-vowel geometry", () => {
+    const summary = summarizeTokenGeometryBucketV0_1({
+      bucketId: "x_vowel",
+      targetVowel: "i",
+      tokens: ["nadi", "sabit", "khushi", "rekha"],
     });
 
-    const arabic = compareTargetToHighAnchorTokenGeometryV0_1({
-      label: "arabic-i-v6-v7",
-      targetTokens: ARABIC_TARGET,
-      highAnchorTokens: ARABIC_V6_V7_HIGH_ANCHOR,
-    });
-
-    expect(hindi.target.tokenCount).toBe(10);
-    expect(hindi.highAnchor.tokenCount).toBe(10);
-    expect(arabic.target.tokenCount).toBe(10);
-    expect(arabic.highAnchor.tokenCount).toBe(10);
-
-    expect(hindi.target.markerCounts.i).toBe(11);
-    expect(hindi.highAnchor.markerCounts.i).toBe(0);
-    expect(hindi.highAnchor.markerCounts.ee).toBe(10);
-    expect(hindi.highAnchor.markerTokenCounts.ee).toBe(10);
-
-    expect(arabic.target.markerCounts.i).toBe(10);
-    expect(arabic.highAnchor.markerCounts.i).toBe(10);
-    expect(arabic.highAnchor.markerCounts.ee).toBe(0);
-    expect(arabic.highAnchor.markerTokenCounts.i).toBe(10);
-
-    expect(hindi.deltas.highAnchorMeanTokenLengthMinusTarget).toBeCloseTo(0.7, 6);
-    expect(arabic.deltas.highAnchorMeanTokenLengthMinusTarget).toBeCloseTo(-0.8, 6);
-
-    expect(hindi.deltas.highAnchorLongHighFrontMarkersMinusTarget).toBe(10);
-    expect(arabic.deltas.highAnchorLongHighFrontMarkersMinusTarget).toBe(0);
-
-    expect(hindi.flags).toEqual(
-      expect.arrayContaining([
-        "HIGH_ANCHOR_HAS_MORE_LONG_HIGH_FRONT_MARKERS_THAN_TARGET",
-        "HIGH_ANCHOR_HAS_FEWER_SHORT_I_MARKERS_THAN_TARGET",
-        "HIGH_ANCHOR_TOKENS_LONGER_THAN_TARGET",
-        "HIGH_ANCHOR_DOMINATED_BY_EE_MARKER_TOKENS",
-      ]),
-    );
-
-    expect(arabic.flags).toEqual(
-      expect.arrayContaining(["HIGH_ANCHOR_ALL_TOKENS_HAVE_SHORT_I_MARKER"]),
-    );
-    expect(arabic.flags).not.toContain(
-      "HIGH_ANCHOR_HAS_MORE_LONG_HIGH_FRONT_MARKERS_THAN_TARGET",
-    );
-    expect(arabic.flags).not.toContain("HIGH_ANCHOR_TOKENS_LONGER_THAN_TARGET");
+    expect(summary.tokenCount).toBe(4);
+    expect(summary.openFinalTokenCount).toBe(3);
+    expect(summary.closedFinalTokenCount).toBe(1);
+    expect(summary.targetVowelCount).toBe(3);
+    expect(summary.targetVowelTokenCount).toBe(3);
+    expect(summary.finalTargetVowelTokenCount).toBe(2);
+    expect(summary.meanTargetVowelCount).toBe(0.75);
+    expect(summary.tokenSummaries.map((item) => item.targetVowelPositions)).toEqual([
+      [4],
+      [4],
+      [6],
+      [],
+    ]);
   });
 
-  it("compares Hindi main versus alternate target buckets without high-anchor assumptions", () => {
-    const split = compareTokenGeometryBucketsV0_1({
-      label: "hindi-i-main-vs-alt-target",
-      baseBucketId: "main-target",
-      baseTokens: HINDI_TARGET,
-      comparisonBucketId: "alternate-target",
-      comparisonTokens: HINDI_ALT_TARGET,
+  it("adds target-vowel deltas to bucket comparisons", () => {
+    const comparison = compareTokenGeometryBucketsV0_1({
+      label: "open-vs-closed",
+      baseBucketId: "open",
+      baseTokens: ["nadi", "rekha"],
+      comparisonBucketId: "closed",
+      comparisonTokens: ["sabit", "vidit"],
+      targetVowel: "i",
     });
 
-    expect(split.label).toBe("hindi-i-main-vs-alt-target");
-    expect(split.base.bucketId).toBe("main-target");
-    expect(split.comparison.bucketId).toBe("alternate-target");
+    expect(comparison.deltas.comparisonOpenFinalTokenCountMinusBase).toBe(-2);
+    expect(comparison.deltas.comparisonClosedFinalTokenCountMinusBase).toBe(2);
+    expect(comparison.deltas.comparisonTargetVowelCountMinusBase).toBe(2);
+    expect(comparison.deltas.comparisonFinalTargetVowelTokenCountMinusBase).toBe(-1);
+  });
 
-    expect(split.base.meanTokenLength).toBe(4.4);
-    expect(split.comparison.meanTokenLength).toBe(5.5);
+  it("flags target final-vowel inflation and high target-vowel count", () => {
+    const comparison = compareTargetToHighAnchorTokenGeometryV0_1({
+      label: "inflated",
+      targetVowel: "i",
+      targetTokens: ["bimari", "mini", "chini", "tithi"],
+      highAnchorTokens: ["rekha", "seema", "leela", "deva"],
+    });
 
-    expect(split.deltas.comparisonMeanTokenLengthMinusBase).toBeCloseTo(1.1, 6);
-    expect(split.deltas.comparisonMinTokenLengthMinusBase).toBe(2);
-    expect(split.deltas.comparisonMaxTokenLengthMinusBase).toBe(-1);
-    expect(split.deltas.comparisonOpenFinalTokenCountMinusBase).toBe(-3);
-    expect(split.deltas.comparisonClosedFinalTokenCountMinusBase).toBe(3);
-    expect(split.deltas.comparisonMaxConsonantClusterMinusBase).toBe(-1);
-    expect(split.deltas.comparisonShortIMarkerCountMinusBase).toBe(-1);
-    expect(split.deltas.comparisonLongHighFrontMarkerCountMinusBase).toBe(0);
-    expect(split.deltas.markerCounts.i).toBe(-1);
-    expect(split.deltas.markerTokenCounts.i).toBe(0);
+    expect(comparison.flags).toContain("TARGET_HAS_FINAL_TARGET_VOWEL_INFLATION");
+    expect(comparison.flags).toContain("TARGET_HAS_HIGH_AVERAGE_TARGET_VOWEL_COUNT");
   });
 });

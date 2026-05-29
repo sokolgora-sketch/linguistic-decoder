@@ -7,9 +7,21 @@ export type TokenGeometryMarkerCountsV0_1 = {
   readonly ii: number;
 };
 
+export type TokenGeometryTokenSummaryV0_1 = {
+  readonly token: string;
+  readonly length: number;
+  readonly finalChar: string;
+  readonly finalShape: "open_final" | "closed_final";
+  readonly targetVowelCount: number;
+  readonly finalIsTargetVowel: boolean;
+  readonly targetVowelPositions: readonly number[];
+};
+
 export type TokenGeometryBucketSummaryV0_1 = {
   readonly bucketId: string;
+  readonly targetVowel: string;
   readonly tokens: readonly string[];
+  readonly tokenSummaries: readonly TokenGeometryTokenSummaryV0_1[];
   readonly tokenCount: number;
   readonly uniqueTokenCount: number;
   readonly meanTokenLength: number;
@@ -22,6 +34,10 @@ export type TokenGeometryBucketSummaryV0_1 = {
   readonly markerTokenCounts: TokenGeometryMarkerCountsV0_1;
   readonly longHighFrontMarkerCount: number;
   readonly shortIMarkerCount: number;
+  readonly targetVowelCount: number;
+  readonly targetVowelTokenCount: number;
+  readonly finalTargetVowelTokenCount: number;
+  readonly meanTargetVowelCount: number;
 };
 
 export type TokenGeometryComparisonV0_1 = {
@@ -32,6 +48,8 @@ export type TokenGeometryComparisonV0_1 = {
     readonly highAnchorMeanTokenLengthMinusTarget: number;
     readonly highAnchorLongHighFrontMarkersMinusTarget: number;
     readonly highAnchorShortIMarkersMinusTarget: number;
+    readonly highAnchorTargetVowelCountMinusTarget: number;
+    readonly highAnchorFinalTargetVowelTokenCountMinusTarget: number;
   };
   readonly flags: readonly string[];
 };
@@ -49,6 +67,8 @@ export type TokenGeometryBucketComparisonV0_1 = {
     readonly comparisonMaxConsonantClusterMinusBase: number;
     readonly comparisonShortIMarkerCountMinusBase: number;
     readonly comparisonLongHighFrontMarkerCountMinusBase: number;
+    readonly comparisonTargetVowelCountMinusBase: number;
+    readonly comparisonFinalTargetVowelTokenCountMinusBase: number;
     readonly markerCounts: TokenGeometryMarkerCountsV0_1;
     readonly markerTokenCounts: TokenGeometryMarkerCountsV0_1;
   };
@@ -59,22 +79,35 @@ const VOWELS_V0_1 = new Set(["a", "e", "i", "o", "u", "y", "ë", "ı"]);
 export function summarizeTokenGeometryBucketV0_1(args: {
   readonly bucketId: string;
   readonly tokens: readonly string[];
+  readonly targetVowel?: string;
 }): TokenGeometryBucketSummaryV0_1 {
+  const targetVowel = normalizeTargetVowelV0_1(args.targetVowel ?? "i");
   const tokens = args.tokens.map(normalizeTokenV0_1).filter(Boolean);
   const lengths = tokens.map((token) => token.length);
   const markerCounts = countMarkersAcrossTokensV0_1(tokens);
   const markerTokenCounts = countMarkerTokensV0_1(tokens);
+  const tokenSummaries = tokens.map((token) => summarizeTokenGeometryV0_1(token, targetVowel));
+
+  const targetVowelCount = sumV0_1(
+    tokenSummaries.map((summary) => summary.targetVowelCount),
+  );
 
   return {
     bucketId: args.bucketId,
+    targetVowel,
     tokens,
+    tokenSummaries,
     tokenCount: tokens.length,
     uniqueTokenCount: new Set(tokens).size,
     meanTokenLength: round6V0_1(meanV0_1(lengths)),
     minTokenLength: lengths.length ? Math.min(...lengths) : 0,
     maxTokenLength: lengths.length ? Math.max(...lengths) : 0,
-    openFinalTokenCount: tokens.filter(endsWithVowelV0_1).length,
-    closedFinalTokenCount: tokens.filter((token) => !endsWithVowelV0_1(token)).length,
+    openFinalTokenCount: tokenSummaries.filter(
+      (summary) => summary.finalShape === "open_final",
+    ).length,
+    closedFinalTokenCount: tokenSummaries.filter(
+      (summary) => summary.finalShape === "closed_final",
+    ).length,
     maxConsonantCluster: tokens.reduce(
       (max, token) => Math.max(max, maxConsonantClusterV0_1(token)),
       0,
@@ -84,6 +117,16 @@ export function summarizeTokenGeometryBucketV0_1(args: {
     longHighFrontMarkerCount:
       markerCounts.ee + markerCounts.ei + markerCounts.ea + markerCounts.ii,
     shortIMarkerCount: markerCounts.i,
+    targetVowelCount,
+    targetVowelTokenCount: tokenSummaries.filter(
+      (summary) => summary.targetVowelCount > 0,
+    ).length,
+    finalTargetVowelTokenCount: tokenSummaries.filter(
+      (summary) => summary.finalIsTargetVowel,
+    ).length,
+    meanTargetVowelCount: round6V0_1(
+      tokens.length === 0 ? 0 : targetVowelCount / tokens.length,
+    ),
   };
 }
 
@@ -91,14 +134,18 @@ export function compareTargetToHighAnchorTokenGeometryV0_1(args: {
   readonly label: string;
   readonly targetTokens: readonly string[];
   readonly highAnchorTokens: readonly string[];
+  readonly targetVowel?: string;
 }): TokenGeometryComparisonV0_1 {
+  const targetVowel = args.targetVowel ?? "i";
   const target = summarizeTokenGeometryBucketV0_1({
     bucketId: `${args.label}:target`,
     tokens: args.targetTokens,
+    targetVowel,
   });
   const highAnchor = summarizeTokenGeometryBucketV0_1({
     bucketId: `${args.label}:highAnchor`,
     tokens: args.highAnchorTokens,
+    targetVowel,
   });
 
   const deltas = {
@@ -108,6 +155,10 @@ export function compareTargetToHighAnchorTokenGeometryV0_1(args: {
     highAnchorLongHighFrontMarkersMinusTarget:
       highAnchor.longHighFrontMarkerCount - target.longHighFrontMarkerCount,
     highAnchorShortIMarkersMinusTarget: highAnchor.shortIMarkerCount - target.shortIMarkerCount,
+    highAnchorTargetVowelCountMinusTarget:
+      highAnchor.targetVowelCount - target.targetVowelCount,
+    highAnchorFinalTargetVowelTokenCountMinusTarget:
+      highAnchor.finalTargetVowelTokenCount - target.finalTargetVowelTokenCount,
   };
 
   return {
@@ -125,14 +176,18 @@ export function compareTokenGeometryBucketsV0_1(args: {
   readonly baseTokens: readonly string[];
   readonly comparisonBucketId: string;
   readonly comparisonTokens: readonly string[];
+  readonly targetVowel?: string;
 }): TokenGeometryBucketComparisonV0_1 {
+  const targetVowel = args.targetVowel ?? "i";
   const base = summarizeTokenGeometryBucketV0_1({
     bucketId: args.baseBucketId,
     tokens: args.baseTokens,
+    targetVowel,
   });
   const comparison = summarizeTokenGeometryBucketV0_1({
     bucketId: args.comparisonBucketId,
     tokens: args.comparisonTokens,
+    targetVowel,
   });
 
   return {
@@ -155,6 +210,10 @@ export function compareTokenGeometryBucketsV0_1(args: {
         comparison.shortIMarkerCount - base.shortIMarkerCount,
       comparisonLongHighFrontMarkerCountMinusBase:
         comparison.longHighFrontMarkerCount - base.longHighFrontMarkerCount,
+      comparisonTargetVowelCountMinusBase:
+        comparison.targetVowelCount - base.targetVowelCount,
+      comparisonFinalTargetVowelTokenCountMinusBase:
+        comparison.finalTargetVowelTokenCount - base.finalTargetVowelTokenCount,
       markerCounts: subtractMarkerCountsV0_1(comparison.markerCounts, base.markerCounts),
       markerTokenCounts: subtractMarkerCountsV0_1(
         comparison.markerTokenCounts,
@@ -191,7 +250,40 @@ function inferComparisonFlagsV0_1(args: {
     flags.push("HIGH_ANCHOR_ALL_TOKENS_HAVE_SHORT_I_MARKER");
   }
 
+  if (args.target.finalTargetVowelTokenCount >= Math.ceil(args.target.tokenCount * 0.4)) {
+    flags.push("TARGET_HAS_FINAL_TARGET_VOWEL_INFLATION");
+  }
+
+  if (args.target.meanTargetVowelCount >= 1.5) {
+    flags.push("TARGET_HAS_HIGH_AVERAGE_TARGET_VOWEL_COUNT");
+  }
+
   return flags;
+}
+
+function summarizeTokenGeometryV0_1(
+  token: string,
+  targetVowel: string,
+): TokenGeometryTokenSummaryV0_1 {
+  const letters = tokenLettersV0_1(token);
+  const finalChar = letters.at(-1) ?? "";
+  const targetVowelPositions: number[] = [];
+
+  letters.forEach((letter, index) => {
+    if (letter === targetVowel) {
+      targetVowelPositions.push(index + 1);
+    }
+  });
+
+  return {
+    token,
+    length: letters.length,
+    finalChar,
+    finalShape: endsWithVowelV0_1(token) ? "open_final" : "closed_final",
+    targetVowelCount: targetVowelPositions.length,
+    finalIsTargetVowel: finalChar === targetVowel,
+    targetVowelPositions,
+  };
 }
 
 function subtractMarkerCountsV0_1(
@@ -208,8 +300,17 @@ function subtractMarkerCountsV0_1(
   };
 }
 
+function normalizeTargetVowelV0_1(targetVowel: string): string {
+  const normalized = normalizeTokenV0_1(targetVowel).replace(/[^a-zëı]/g, "");
+  return normalized.length === 1 ? normalized : "i";
+}
+
 function normalizeTokenV0_1(token: string): string {
-  return token.trim().toLowerCase();
+  return token.trim().toLowerCase().normalize("NFD").replace(/\p{M}/gu, "");
+}
+
+function tokenLettersV0_1(token: string): readonly string[] {
+  return [...token].filter((letter) => /[a-zëı]/i.test(letter));
 }
 
 function countMarkersAcrossTokensV0_1(tokens: readonly string[]): TokenGeometryMarkerCountsV0_1 {
@@ -235,41 +336,40 @@ function countMarkerTokensV0_1(tokens: readonly string[]): TokenGeometryMarkerCo
 }
 
 function countCharV0_1(token: string, char: string): number {
-  return [...token].filter((item) => item === char).length;
+  return [...token].filter((letter) => letter === char).length;
 }
 
-function countSubstringV0_1(token: string, marker: string): number {
-  return token.match(new RegExp(marker, "g"))?.length ?? 0;
+function countSubstringV0_1(token: string, substring: string): number {
+  return token.split(substring).length - 1;
 }
 
 function endsWithVowelV0_1(token: string): boolean {
-  const last = [...token].at(-1);
-  return Boolean(last && VOWELS_V0_1.has(last));
+  const finalChar = tokenLettersV0_1(token).at(-1) ?? "";
+  return VOWELS_V0_1.has(finalChar);
 }
 
 function maxConsonantClusterV0_1(token: string): number {
-  let current = 0;
   let max = 0;
+  let current = 0;
 
-  for (const char of token) {
-    if (VOWELS_V0_1.has(char)) {
+  for (const letter of tokenLettersV0_1(token)) {
+    if (VOWELS_V0_1.has(letter)) {
       current = 0;
-      continue;
+    } else {
+      current += 1;
+      max = Math.max(max, current);
     }
-
-    current += 1;
-    max = Math.max(max, current);
   }
 
   return max;
 }
 
-function meanV0_1(values: readonly number[]): number {
-  return values.length ? sumV0_1(values) / values.length : 0;
-}
-
 function sumV0_1(values: readonly number[]): number {
   return values.reduce((total, value) => total + value, 0);
+}
+
+function meanV0_1(values: readonly number[]): number {
+  return values.length === 0 ? 0 : sumV0_1(values) / values.length;
 }
 
 function round6V0_1(value: number): number {
