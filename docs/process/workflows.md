@@ -162,6 +162,31 @@ Do not treat bucket audit output as publication authorization or scientific vali
 
 ---
 
+### 7. Open Instrument local smoke-check workflow
+
+Path:
+
+    docs/open-instrument/local-smoke-check-workflow-v0.1.md
+
+Use this when:
+
+- opening the Open Instrument lane;
+- manually checking `/instrument-preview`;
+- manually checking `/chat?debug=1`;
+- confirming a minimal mock-safe `study` analysis still renders locally;
+- recording local smoke evidence before an Open Instrument PR.
+
+This workflow preserves:
+
+- the distinction between preview page and local interactive instrument;
+- the rule that local smoke is not a scientific eval or publication workflow;
+- the default mock-safe path with no live API key required;
+- clear stop conditions for provider/base URL confusion or missing credentials.
+
+Do not treat a local smoke pass as production readiness or publication evidence.
+
+---
+
 ## DF operating rule
 
 For future repo work:
@@ -184,6 +209,7 @@ For future repo work:
 - `docs/runbooks/evals-battery-operator-runbook.v0.1.md`
 - `docs/evals/battery-stats-import-workflow-v0.1.md`
 - `docs/evals/evidence-bucket-audit-workflow-v0.1.md`
+- `docs/open-instrument/local-smoke-check-workflow-v0.1.md`
 
 ---
 

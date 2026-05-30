@@ -1,0 +1,256 @@
+# Open Instrument Local Smoke-Check Workflow v0.1
+
+Purpose: define the manual local smoke workflow for checking that Open Instrument still loads and can run a minimal mock-safe readout before any future Open Instrument code work.
+
+This workflow is local/manual only. It is not a scientific eval, not a publication workflow, and not evidence that Open Instrument is production-ready.
+
+Use it when opening the Open Instrument lane, reviewing UI-only changes, or confirming that a branch did not break the local operator surface.
+
+---
+
+## 1. What This Workflow Checks
+
+This workflow checks that:
+
+- the public preview page loads at `/instrument-preview`;
+- the local interactive Open Instrument surface loads at `/chat?debug=1`;
+- a minimal word analysis can be exercised through the existing app without live credentials;
+- the debug readout exposes enough route and payload state to inspect failures;
+- provider/model/base URL behavior is visible or inspectable where the current app exposes it;
+- failures are captured without changing API behavior, scorer behavior, or model-provider behavior.
+
+This workflow does not require a live provider. The normal local path is mock-safe and deterministic.
+
+If a real provider smoke is explicitly needed later, use:
+
+```text
+docs/runbooks/open-instrument-real-provider-smoke-v0.1.md
+```
+
+Do not turn this local smoke workflow into a real-provider runbook.
+
+---
+
+## 2. Start From A Clean Branch
+
+Run from the repository root:
+
+```bash
+git status -sb
+git branch --show-current
+git log -8 --oneline --decorate
+```
+
+Expected:
+
+- working tree is clean before starting;
+- branch name matches the PR task;
+- recent commits match the expected mainline state.
+
+Stop if the working tree contains unrelated changes.
+
+---
+
+## 3. Start The Local App
+
+Use the normal Next.js dev server:
+
+```bash
+npm run dev
+```
+
+If another local app, such as VoiceLab, already uses port `3000`, use port `3001`:
+
+```bash
+npm run dev -- -p 3001
+```
+
+Record the port used in the smoke notes.
+
+---
+
+## 4. Preview Page Smoke
+
+Open the preview page:
+
+```text
+http://localhost:3001/instrument-preview
+```
+
+Use `http://localhost:3000/instrument-preview` if the dev server is running on port `3000`.
+
+Check:
+
+- the page loads without a browser error;
+- the page clearly states preview-only status;
+- the page does not imply that the public interactive instrument is live;
+- links back to the landing page and `/evals` are visible.
+
+This page is a public preview surface. It is not the interactive local instrument.
+
+---
+
+## 5. Interactive Local Instrument Smoke
+
+Open the local interactive surface with debug enabled:
+
+```text
+http://localhost:3001/chat?debug=1
+```
+
+Use `http://localhost:3000/chat?debug=1` if the dev server is running on port `3000`.
+
+Before running a word, check:
+
+- the ZË-RO console frame loads;
+- `Open Instrument ready` appears;
+- the honest contract panel is visible;
+- the bottom composer has `Word`, optional `IPA`, and `Analyze` controls.
+
+Run one minimal local check:
+
+```text
+word: study
+IPA: leave blank
+```
+
+Click `Analyze`.
+
+Expected after analysis:
+
+- the Open Instrument shell renders;
+- the readout shows `word=study`;
+- normalized form and voice path fields render;
+- section tabs are visible, including Overview, Evidence, Candidates, Roots / Meaning, and Advanced;
+- the debug telemetry panel is visible because `debug=1` is set;
+- no raw object is rendered directly into the UI;
+- no origin proof or single-winner claim is implied.
+
+---
+
+## 6. Mock-Safe API Probe
+
+Use this only as a local route check. It does not replace the browser smoke.
+
+```bash
+curl -s "http://localhost:3001/api/analyze-v1?word=study&mode=strict" | jq '{
+  word: .word,
+  engineVersion: .engineVersion,
+  heartPresent: (.heart != null),
+  candidates: ((.candidates // []) | length)
+}'
+```
+
+Use port `3000` if that is where the dev server is running.
+
+Expected:
+
+- the command returns JSON;
+- no live provider key is needed;
+- the response is enough to confirm the local analyze route is reachable.
+
+Do not treat this response as scientific evidence.
+
+---
+
+## 7. Provider / Model / Base URL Visibility
+
+Open Instrument has a separate optional proposer diagnostic in the Advanced section after a word has been analyzed.
+
+For this local smoke workflow:
+
+- leave the provider as `mock`;
+- confirm the Advanced proposer card shows provider state when visible;
+- do not enter a real provider unless the task explicitly scopes a real-provider smoke;
+- do not record API keys in notes, screenshots, console output, docs, or git history.
+
+Real-provider configuration uses:
+
+- `PROPOSER_PROVIDER`
+- `OPENAI_API_KEY`
+- `OPENAI_MODEL`
+- `OPENAI_BASE_URL`
+
+The default local smoke passes without these variables.
+
+---
+
+## 8. Do Not Proceed Conditions
+
+Stop before claiming a successful smoke if:
+
+- required local env vars are missing for a task that explicitly requires a real provider;
+- `/instrument-preview` fails to load;
+- `/chat?debug=1` fails to load;
+- the `Analyze` flow fails before rendering a structured Open Instrument readout;
+- provider/base URL behavior is unclear;
+- the smoke would require live credentials that are not available locally;
+- the browser shows a network, hydration, or raw-object rendering failure;
+- the route response prints secrets or unstable provider metadata.
+
+Record the failure message and stop. Do not patch around the failure unless a separate engineering task is selected.
+
+---
+
+## 9. Evidence To Record
+
+Record enough information for a future operator to understand the smoke result:
+
+- branch name;
+- HEAD commit;
+- local port used;
+- route checked:
+  - `/instrument-preview`
+  - `/chat?debug=1`
+  - optional `/api/analyze-v1?word=study&mode=strict`
+- command outputs for:
+  - `git status -sb`
+  - `npm run gate:quick`
+  - `npm run build`
+  - `npm audit --audit-level=moderate`
+- whether live credentials were used;
+- any observed browser or terminal failure message.
+
+If live credentials were used under a separate task, record only that live credentials were used. Do not record the key or any secret-bearing request details.
+
+---
+
+## 10. Required Gates Before PR
+
+Before opening an Open Instrument docs or code PR, run:
+
+```bash
+npm run gate:quick
+npm run build
+npm audit --audit-level=moderate
+```
+
+For docs-only changes, also verify the diff:
+
+```bash
+git diff --name-only origin/main...HEAD
+```
+
+Expected for this workflow PR:
+
+- this workflow doc;
+- optionally one workflow-index link.
+
+---
+
+## 11. Boundary
+
+This workflow does not authorize:
+
+- API changes;
+- model-provider changes;
+- scorer changes;
+- Evals-lane work;
+- VoiceLab work;
+- publication action;
+- token JSON changes;
+- evidence ZIP changes;
+- package changes;
+- test changes unless docs lint explicitly requires them.
+
+Keep this workflow as an operator smoke path. If a real-provider smoke is needed, use the existing real-provider smoke runbook and keep it under a separately selected task.
