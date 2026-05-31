@@ -90,6 +90,8 @@ describe("OracleProposeWithEngineOracleCard v0.1", () => {
     fireEvent.click(screen.getByRole("button", { name: /Run oracle proposal/i }));
 
     expect(await screen.findByText("Rejected proposals")).toBeInTheDocument();
+    expect(screen.getByText("proposal=fail")).toBeInTheDocument();
+    expect(screen.getByText("claim=fail")).toBeInTheDocument();
     expect(screen.getByText("rejected=1")).toBeInTheDocument();
     expect(screen.getByText("Atlantian")).toBeInTheDocument();
     expect(screen.getByText("xqz")).toBeInTheDocument();
@@ -183,6 +185,8 @@ describe("OracleProposeWithEngineOracleCard v0.1", () => {
     fireEvent.click(screen.getByRole("button", { name: /Run oracle proposal/i }));
 
     expect(await screen.findByText("Rejected proposals")).toBeInTheDocument();
+    expect(screen.getByText("proposal=pass")).toBeInTheDocument();
+    expect(screen.getByText("claim=pass")).toBeInTheDocument();
     expect(screen.getByText("rejected=0")).toBeInTheDocument();
     expect(screen.getByText("No rejected proposals emitted.")).toBeInTheDocument();
 
@@ -251,6 +255,8 @@ describe("OracleProposeWithEngineOracleCard v0.1", () => {
     fireEvent.click(screen.getByRole("button", { name: /Run oracle proposal/i }));
 
     expect(await screen.findByText("Rejected proposals")).toBeInTheDocument();
+    expect(screen.getByText("proposal=fail")).toBeInTheDocument();
+    expect(screen.getByText("claim=fail")).toBeInTheDocument();
     expect(screen.getByText("OPS_ALLOWED")).toBeInTheDocument();
     expect(screen.getByText(/remove illegal opsUsed entries/i)).toBeInTheDocument();
 
@@ -262,6 +268,65 @@ describe("OracleProposeWithEngineOracleCard v0.1", () => {
       reason: "Illegal opsUsed token(s): final y read as /i/",
       repairHint: "Repair: remove illegal opsUsed entries or replace them with allowed operation IDs. If unsure, use an empty opsUsed array.",
     });
+  });
+
+  test("separates proposal verifier status from claim verifier status", async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      json: async () => ({
+        ok: true,
+        word: "study",
+        mode: "strict",
+        provider: "mock_reject_ops",
+        oracle: { primaryVoicePath: ["U", "I"] },
+        proposal: {
+          candidates: [
+            {
+              language: "English",
+              form: "study",
+              opsUsed: ["E_INSERT_NOT_ALLOWED"],
+              decomposition: { action: "study" },
+            },
+          ],
+        },
+        proposalVerification: {
+          overallPass: false,
+          results: [
+            {
+              form: "study",
+              pass: false,
+              extractedVowelPath: ["U", "I"],
+              checks: [
+                {
+                  id: "OPS_ALLOWED",
+                  pass: false,
+                  reason: "Illegal opsUsed token(s): E_INSERT_NOT_ALLOWED",
+                },
+              ],
+            },
+          ],
+        },
+        claimVerification: { passed: true },
+      }),
+    } as unknown as typeof fetch);
+
+    render(
+      <OracleProposeWithEngineOracleCardV01
+        word="study"
+        mode="strict"
+        onCopy={() => void 0}
+      />
+    );
+
+    fireEvent.change(screen.getByPlaceholderText("mock | gemini | openai | ..."), {
+      target: { value: "mock_reject_ops" },
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: /Run oracle proposal/i }));
+
+    expect(await screen.findByText("Rejected proposals")).toBeInTheDocument();
+    expect(screen.getByText("proposal=fail")).toBeInTheDocument();
+    expect(screen.getByText("claim=pass")).toBeInTheDocument();
+    expect(screen.queryByText(/verifier=/i)).not.toBeInTheDocument();
   });
 
 });
