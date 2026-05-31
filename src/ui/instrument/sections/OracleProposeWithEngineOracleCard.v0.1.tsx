@@ -25,10 +25,23 @@ type VM = {
   proposerRawText?: string;
   responsePretty?: string;
   claimPacketPretty?: string;
+  rejectedProposals: RejectedProposalVM[];
+};
+
+type RejectedProposalVM = {
+  id: string;
+  form: string;
+  language: string;
+  extractedVowelPath: string[];
+  failedChecks: Array<{ id: string; reason: string }>;
 };
 
 function asStrArray(x: unknown): string[] {
   return Array.isArray(x) ? x.map((v) => String(v)).filter(Boolean) : [];
+}
+
+function asDisplayString(x: unknown, fallback: string): string {
+  return typeof x === "string" && x.trim() ? x.trim() : fallback;
 }
 
 function pretty(x: unknown): string {
@@ -37,6 +50,33 @@ function pretty(x: unknown): string {
   } catch {
     return String(x);
   }
+}
+
+function buildRejectedProposalsVM(raw: any): RejectedProposalVM[] {
+  const results = Array.isArray(raw?.proposalVerification?.results) ? raw.proposalVerification.results : [];
+  const candidates = Array.isArray(raw?.proposal?.candidates) ? raw.proposal.candidates : [];
+
+  return results
+    .map((result: any, index: number): RejectedProposalVM | null => {
+      if (!result || typeof result !== "object" || result.pass !== false) return null;
+
+      const checks = Array.isArray(result.checks) ? result.checks : [];
+      const failedChecks = checks
+        .filter((check: any) => check && typeof check === "object" && check.pass === false)
+        .map((check: any) => ({
+          id: asDisplayString(check.id, "UNKNOWN_CHECK"),
+          reason: asDisplayString(check.reason, "No reason emitted."),
+        }));
+
+      return {
+        id: `rejected-${index}`,
+        form: asDisplayString(result.form ?? candidates[index]?.form, "form not emitted"),
+        language: asDisplayString(candidates[index]?.language, "language not emitted"),
+        extractedVowelPath: asStrArray(result.extractedVowelPath),
+        failedChecks,
+      };
+    })
+    .filter((row: RejectedProposalVM | null): row is RejectedProposalVM => !!row);
 }
 
 function buildVM(raw: unknown, fallbackWord: string, fallbackMode: Mode): VM {
@@ -83,6 +123,7 @@ const claimPacketPretty = r?.claimPacket ? pretty(r.claimPacket) : "";
     proposerRawText,
     responsePretty,
     claimPacketPretty,
+    rejectedProposals: buildRejectedProposalsVM(r),
   };
 }
 
@@ -91,6 +132,66 @@ function Metric({ label, value }: { label: string; value: React.ReactNode }) {
     <div className="rounded-[8px] border border-[#27313d] bg-[#0d1117] p-3">
       <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#8ea4ba]">{label}</div>
       <div className="mt-1 min-w-0 break-words font-mono text-[13px] text-[#f5f7fb]">{value}</div>
+    </div>
+  );
+}
+
+function RejectedProposalsPanel({ rows }: { rows: RejectedProposalVM[] }) {
+  return (
+    <div className="rounded-[10px] border border-[#27313d] bg-[#0d1117] p-3">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <div className="text-sm font-semibold text-[#f5f7fb]">Rejected proposals</div>
+          <div className="mt-1 text-xs leading-5 text-[#7d8ea3]">
+            Verifier-rejected candidates from the proposer attempt. These are shown so the heart constraining the brain stays visible.
+          </div>
+        </div>
+        <span className="rounded-full border border-red-400/30 bg-red-500/10 px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.12em] text-red-100">
+          rejected={rows.length}
+        </span>
+      </div>
+
+      {rows.length ? (
+        <div className="mt-3 space-y-2">
+          {rows.map((row) => (
+            <div key={row.id} className="rounded-[8px] border border-red-400/25 bg-red-500/10 p-3">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="rounded-md border border-[#303a45] bg-black/20 px-2 py-0.5 font-mono text-xs text-[#d7dde7]">
+                      {safeText(row.language)}
+                    </span>
+                    <span className="break-all font-mono text-sm text-[#f5f7fb]">{safeText(row.form)}</span>
+                  </div>
+                  <div className="mt-2 text-xs text-[#7d8ea3]">
+                    extracted path:{" "}
+                    <span className="font-mono text-[#d7dde7]">
+                      {row.extractedVowelPath.length ? row.extractedVowelPath.join(" → ") : "not_emitted"}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {row.failedChecks.length ? (
+                <div className="mt-3 space-y-2">
+                  {row.failedChecks.map((check) => (
+                    <div key={`${row.id}-${check.id}`} className="rounded-[8px] border border-red-400/20 bg-black/20 p-2">
+                      <div className="font-mono text-xs text-red-100">{safeText(check.id)}</div>
+                      <div className="mt-1 break-words text-xs leading-5 text-red-100/80">{safeText(check.reason)}</div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="mt-3 text-xs text-red-100/70">No failed check reasons emitted.</div>
+              )}
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="mt-3 rounded-[8px] border border-[#27313d] bg-black/20 p-3 text-xs text-[#7d8ea3]">
+          No rejected proposals emitted.
+        </div>
+      )}
     </div>
   );
 }
@@ -133,6 +234,7 @@ export function OracleProposeWithEngineOracleCardV01(props: Props) {
         provider: String(provider ?? ""),
         oraclePrimaryPath: [],
         claimVerificationOk: null,
+        rejectedProposals: [],
         error: String(e?.message ?? e ?? "Request failed"),
       });
       setStatus("error");
@@ -252,6 +354,8 @@ export function OracleProposeWithEngineOracleCardV01(props: Props) {
             ) : null}
           </div>
         ) : null}
+
+        {vm ? <RejectedProposalsPanel rows={vm.rejectedProposals} /> : null}
 
         {/* Proposer raw text (if available) */}
         {vm?.proposerRawText ? (
