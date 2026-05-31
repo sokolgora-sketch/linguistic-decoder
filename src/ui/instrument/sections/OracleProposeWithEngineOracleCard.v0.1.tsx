@@ -34,7 +34,7 @@ type RejectedProposalVM = {
   form: string;
   language: string;
   extractedVowelPath: string[];
-  failedChecks: Array<{ id: string; reason: string }>;
+  failedChecks: Array<{ id: string; reason: string; repairHint: string }>;
 };
 
 function asStrArray(x: unknown): string[] {
@@ -53,6 +53,27 @@ function pretty(x: unknown): string {
   }
 }
 
+function repairHintForCheck(id: string): string {
+  switch (String(id || "").trim()) {
+    case "OPS_ALLOWED":
+      return "Repair: remove illegal opsUsed entries or replace them with allowed operation IDs. If unsure, use an empty opsUsed array.";
+    case "DECOMP_PRESENT":
+      return "Repair: add a decomposition object with at least one meaningful action, instrument, unit, or statement field.";
+    case "PATH_MATCH":
+      return "Repair: omit vowelPath unless it exactly matches the candidate form's extracted vowel path, or correct it to match.";
+    case "LANG_KNOWN":
+      return "Repair: use a documented human language name or code, such as English, Albanian, Latin, Ancient Greek, or Sanskrit.";
+    case "ROOT_HAS_VOWEL":
+      return "Repair: revise decomposition action, instrument, unit, or statement so the root/function material contains at least one extracted vowel from the candidate.";
+    case "FUNCTION_FIT_NONEMPTY":
+      return "Repair: add a non-empty decomposition.action, decomposition.instrument, or decomposition.unit. Statement alone is not enough.";
+    case "PARSE_ERROR":
+      return "Repair: return valid JSON only, with word, mode, and candidates matching the Proposal schema.";
+    default:
+      return "Repair: inspect the failed verifier reason, then edit only the minimum candidate field needed to satisfy the contract.";
+  }
+}
+
 function buildRejectedProposalsVM(raw: any): RejectedProposalVM[] {
   const results = Array.isArray(raw?.proposalVerification?.results) ? raw.proposalVerification.results : [];
   const candidates = Array.isArray(raw?.proposal?.candidates) ? raw.proposal.candidates : [];
@@ -64,10 +85,14 @@ function buildRejectedProposalsVM(raw: any): RejectedProposalVM[] {
       const checks = Array.isArray(result.checks) ? result.checks : [];
       const failedChecks = checks
         .filter((check: any) => check && typeof check === "object" && check.pass === false)
-        .map((check: any) => ({
-          id: asDisplayString(check.id, "UNKNOWN_CHECK"),
-          reason: asDisplayString(check.reason, "No reason emitted."),
-        }));
+        .map((check: any) => {
+          const id = asDisplayString(check.id, "UNKNOWN_CHECK");
+          return {
+            id,
+            reason: asDisplayString(check.reason, "No reason emitted."),
+            repairHint: repairHintForCheck(id),
+          };
+        });
 
       return {
         id: `rejected-${index}`,
@@ -96,6 +121,7 @@ function buildRejectedDiagnosticsPretty(raw: any, rows: RejectedProposalVM[], fa
       failedChecks: row.failedChecks.map((check) => ({
         id: check.id,
         reason: check.reason,
+        repairHint: check.repairHint,
       })),
     })),
   };
@@ -205,6 +231,10 @@ function RejectedProposalsPanel({ rows }: { rows: RejectedProposalVM[] }) {
                     <div key={`${row.id}-${check.id}`} className="rounded-[8px] border border-red-400/20 bg-black/20 p-2">
                       <div className="font-mono text-xs text-red-100">{safeText(check.id)}</div>
                       <div className="mt-1 break-words text-xs leading-5 text-red-100/80">{safeText(check.reason)}</div>
+                      <div className="mt-2 rounded-[6px] border border-red-400/15 bg-black/20 p-2 text-xs leading-5 text-red-50/80">
+                        <span className="font-semibold text-red-50">Repair hint: </span>
+                        {safeText(check.repairHint)}
+                      </div>
                     </div>
                   ))}
                 </div>
