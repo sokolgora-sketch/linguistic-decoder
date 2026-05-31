@@ -149,4 +149,34 @@ describe("proposerProvider v0.2 real-provider readiness guard", () => {
       ],
     });
   });
+  it("provides deterministic rejected mock output for local rejected-proposal smoke", async () => {
+    const out = await runProposerV0_2(
+      {
+        word: "study",
+        mode: "strict",
+        systemPrompt: "ignored in mock",
+      },
+      "mock_reject_ops"
+    );
+
+    expect(out.provider).toBe("mock_reject_ops");
+    expect(out.meta?.model).toBe("mock_reject_ops");
+
+    const parsed = JSON.parse(out.rawText);
+    expect(parsed).toMatchObject({
+      word: "study",
+      mode: "strict",
+      candidates: [
+        {
+          form: "study",
+          language: "English",
+          opsUsed: ["E_INSERT_NOT_ALLOWED"],
+          decomposition: {
+            action: "study",
+          },
+        },
+      ],
+    });
+  });
+
 });
