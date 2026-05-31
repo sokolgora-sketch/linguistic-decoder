@@ -17,6 +17,8 @@ This workflow checks that:
 - a minimal word analysis can be exercised through the existing app without live credentials;
 - the debug readout exposes enough route and payload state to inspect failures;
 - provider/model/base URL behavior is visible or inspectable where the current app exposes it;
+- the clean mock proposer path can be checked without live credentials;
+- the rejected mock proposer path can be checked without live credentials;
 - failures are captured without changing API behavior, scorer behavior, or model-provider behavior.
 
 This workflow does not require a live provider. The normal local path is mock-safe and deterministic.
@@ -159,10 +161,18 @@ Open Instrument has a separate optional proposer diagnostic in the Advanced sect
 
 For this local smoke workflow:
 
-- leave the provider as `mock`;
+- start with provider `mock`;
 - confirm the Advanced proposer card shows provider state when visible;
+- use `mock_reject_ops` only for the rejected-case smoke below;
 - do not enter a real provider unless the task explicitly scopes a real-provider smoke;
 - do not record API keys in notes, screenshots, console output, docs, or git history.
+
+The local mock providers are:
+
+| provider | purpose | network/secrets |
+|---|---|---|
+| `mock` | clean proposer path | none |
+| `mock_reject_ops` | rejected proposer path with deterministic `OPS_ALLOWED` failure | none |
 
 Real-provider configuration uses:
 
@@ -175,7 +185,118 @@ The default local smoke passes without these variables.
 
 ---
 
-## 8. Do Not Proceed Conditions
+## 8. Optional Mock Rejected-Proposal Smoke
+
+Use this after the clean `mock` path when the task touches rejected proposals, repair hints, proposer diagnostics, or oracle status labels.
+
+This smoke is still local and mock-safe. It does not use a live model, API key, Ollama, OpenAI, Groq, DeepSeek, or any external provider.
+
+Open:
+
+```text
+http://localhost:3001/chat?debug=1
+```
+
+Use port `3000` if that is where the dev server is running.
+
+Run:
+
+```text
+word: study
+IPA: leave blank
+```
+
+Click `Analyze`.
+
+Then open:
+
+```text
+Advanced → Propose with Engine Oracle
+```
+
+Change provider from:
+
+```text
+mock
+```
+
+to:
+
+```text
+mock_reject_ops
+```
+
+Click:
+
+```text
+Run oracle proposal
+```
+
+Expected UI result:
+
+- status shows `ok`;
+- status separates proposal and claim verification:
+  - `proposal=fail`;
+  - `claim=pass`;
+- provider shows `mock_reject_ops`;
+- `Rejected proposals` panel appears;
+- rejected count is `rejected=1`;
+- rejected candidate language is `English`;
+- rejected candidate form is `study`;
+- extracted path is `U → I`;
+- failed check is `OPS_ALLOWED`;
+- reason is `Illegal opsUsed token(s): E_INSERT_NOT_ALLOWED`;
+- repair hint appears:
+  - `Repair: remove illegal opsUsed entries or replace them with allowed operation IDs. If unsure, use an empty opsUsed array.`
+
+Expected copied rejected diagnostics:
+
+Click:
+
+```text
+Copy rejected diagnostics
+```
+
+The copied JSON should include:
+
+```json
+{
+  "diagnostic": "open-instrument.rejected-proposals.v0.1",
+  "word": "study",
+  "mode": "strict",
+  "provider": "mock_reject_ops",
+  "rejectedCount": 1,
+  "message": "Verifier-rejected proposals emitted.",
+  "rejectedProposals": [
+    {
+      "form": "study",
+      "language": "English",
+      "extractedVowelPath": ["U", "I"],
+      "failedChecks": [
+        {
+          "id": "OPS_ALLOWED",
+          "reason": "Illegal opsUsed token(s): E_INSERT_NOT_ALLOWED",
+          "repairHint": "Repair: remove illegal opsUsed entries or replace them with allowed operation IDs. If unsure, use an empty opsUsed array."
+        }
+      ]
+    }
+  ]
+}
+```
+
+Completion definition for this optional smoke:
+
+- clean `mock` path still passes;
+- `mock_reject_ops` path produces a deterministic proposal failure;
+- rejected proposal details are visible;
+- repair hint is visible;
+- proposal and claim statuses are not collapsed into one ambiguous verifier label;
+- no live credentials are used.
+
+
+---
+
+## 9. Do Not Proceed Conditions
 
 Stop before claiming a successful smoke if:
 
@@ -184,6 +305,7 @@ Stop before claiming a successful smoke if:
 - `/chat?debug=1` fails to load;
 - the `Analyze` flow fails before rendering a structured Open Instrument readout;
 - provider/base URL behavior is unclear;
+- `mock_reject_ops` does not produce `proposal=fail` and `claim=pass` when rejected-path smoke is required;
 - the smoke would require live credentials that are not available locally;
 - the browser shows a network, hydration, or raw-object rendering failure;
 - the route response prints secrets or unstable provider metadata.
@@ -192,7 +314,7 @@ Record the failure message and stop. Do not patch around the failure unless a se
 
 ---
 
-## 9. Evidence To Record
+## 10. Evidence To Record
 
 Record enough information for a future operator to understand the smoke result:
 
@@ -209,13 +331,15 @@ Record enough information for a future operator to understand the smoke result:
   - `npm run build`
   - `npm audit --audit-level=moderate`
 - whether live credentials were used;
+- whether the clean `mock` proposer path passed;
+- whether the optional `mock_reject_ops` rejected proposer path passed, if relevant;
 - any observed browser or terminal failure message.
 
 If live credentials were used under a separate task, record only that live credentials were used. Do not record the key or any secret-bearing request details.
 
 ---
 
-## 10. Required Gates Before PR
+## 11. Required Gates Before PR
 
 Before opening an Open Instrument docs or code PR, run:
 
@@ -238,12 +362,12 @@ Expected for this workflow PR:
 
 ---
 
-## 11. Boundary
+## 12. Boundary
 
 This workflow does not authorize:
 
 - API changes;
-- model-provider changes;
+- real model-provider changes;
 - scorer changes;
 - Evals-lane work;
 - VoiceLab work;
