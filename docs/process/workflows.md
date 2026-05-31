@@ -174,16 +174,24 @@ Use this when:
 - manually checking `/instrument-preview`;
 - manually checking `/chat?debug=1`;
 - confirming a minimal mock-safe `study` analysis still renders locally;
+- checking the clean proposer path with provider `mock`;
+- checking the rejected proposer path with provider `mock_reject_ops`;
 - recording local smoke evidence before an Open Instrument PR.
 
 This workflow preserves:
 
 - the distinction between preview page and local interactive instrument;
 - the rule that local smoke is not a scientific eval or publication workflow;
-- the default mock-safe path with no live API key required;
-- clear stop conditions for provider/base URL confusion or missing credentials.
+- the default clean mock path with no live API key required;
+- the rejected mock path with deterministic `OPS_ALLOWED` failure;
+- expected rejected-path labels:
+  - `proposal=fail`;
+  - `claim=pass`;
+- clear stop conditions for provider/base URL confusion, missing credentials, or rejected mock smoke mismatch.
 
 Do not treat a local smoke pass as production readiness or publication evidence.
+
+The rejected mock path is still local and no-cost. It must not be confused with a real-provider smoke.
 
 ---
 
