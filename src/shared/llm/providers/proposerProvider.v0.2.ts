@@ -1,4 +1,4 @@
-export type ProposerProviderIdV0_2 = "mock" | "openai_compat";
+export type ProposerProviderIdV0_2 = "mock" | "mock_reject_ops" | "openai_compat";
 
 export type ProposerRequestV0_2 = {
   word: string;
@@ -32,6 +32,27 @@ async function proposeMock(req: ProposerRequestV0_2): Promise<ProposerResultV0_2
     ],
   };
   return { provider: "mock", rawText: JSON.stringify(proposal, null, 2), meta: { model: "mock" } };
+}
+
+async function proposeMockRejectOps(req: ProposerRequestV0_2): Promise<ProposerResultV0_2> {
+  // Deterministic, CI-safe rejected proposal. No network, no secrets.
+  // Used only for local/operator smoke of rejected-proposal UI and repair guidance.
+  const proposal = {
+    word: req.word,
+    mode: req.mode,
+    candidates: [
+      {
+        form: req.word,
+        language: "English",
+        opsUsed: ["E_INSERT_NOT_ALLOWED"],
+        decomposition: {
+          action: req.word,
+          statement: `mock rejected proposer v0.2 ${req.word}`,
+        },
+      },
+    ],
+  };
+  return { provider: "mock_reject_ops", rawText: JSON.stringify(proposal, null, 2), meta: { model: "mock_reject_ops" } };
 }
 
 async function proposeOpenAICompat(req: ProposerRequestV0_2): Promise<ProposerResultV0_2> {
@@ -84,6 +105,7 @@ export async function runProposerV0_2(
   provider: ProposerProviderIdV0_2
 ): Promise<ProposerResultV0_2> {
   if (provider === "openai_compat") return proposeOpenAICompat(req);
+  if (provider === "mock_reject_ops") return proposeMockRejectOps(req);
   return proposeMock(req);
 }
 
