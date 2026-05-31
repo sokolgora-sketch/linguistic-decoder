@@ -25,6 +25,7 @@ type VM = {
   proposerRawText?: string;
   responsePretty?: string;
   claimPacketPretty?: string;
+  rejectedDiagnosticsPretty?: string;
   rejectedProposals: RejectedProposalVM[];
 };
 
@@ -79,6 +80,29 @@ function buildRejectedProposalsVM(raw: any): RejectedProposalVM[] {
     .filter((row: RejectedProposalVM | null): row is RejectedProposalVM => !!row);
 }
 
+
+function buildRejectedDiagnosticsPretty(raw: any, rows: RejectedProposalVM[], fallbackWord: string, fallbackMode: Mode): string {
+  const payload = {
+    diagnostic: "open-instrument.rejected-proposals.v0.1",
+    word: String(raw?.word ?? fallbackWord ?? ""),
+    mode: raw?.mode === "open" ? "open" : fallbackMode,
+    provider: String(raw?.provider ?? "not_emitted"),
+    rejectedCount: rows.length,
+    message: rows.length ? "Verifier-rejected proposals emitted." : "No rejected proposals emitted.",
+    rejectedProposals: rows.map((row) => ({
+      form: row.form,
+      language: row.language,
+      extractedVowelPath: row.extractedVowelPath,
+      failedChecks: row.failedChecks.map((check) => ({
+        id: check.id,
+        reason: check.reason,
+      })),
+    })),
+  };
+
+  return pretty(payload);
+}
+
 function buildVM(raw: unknown, fallbackWord: string, fallbackMode: Mode): VM {
   const r: any = raw ?? {};
   const ok = !!r && typeof r === "object" && r.ok === true;
@@ -111,6 +135,8 @@ function buildVM(raw: unknown, fallbackWord: string, fallbackMode: Mode): VM {
 const claimPacketPretty = r?.claimPacket ? pretty(r.claimPacket) : "";
 
   const error = typeof r?.error === "string" ? r.error : undefined;
+  const rejectedProposals = buildRejectedProposalsVM(r);
+  const rejectedDiagnosticsPretty = buildRejectedDiagnosticsPretty(r, rejectedProposals, word, mode);
 
   return {
     ok,
@@ -123,7 +149,8 @@ const claimPacketPretty = r?.claimPacket ? pretty(r.claimPacket) : "";
     proposerRawText,
     responsePretty,
     claimPacketPretty,
-    rejectedProposals: buildRejectedProposalsVM(r),
+    rejectedDiagnosticsPretty,
+    rejectedProposals,
   };
 }
 
@@ -234,6 +261,12 @@ export function OracleProposeWithEngineOracleCardV01(props: Props) {
         provider: String(provider ?? ""),
         oraclePrimaryPath: [],
         claimVerificationOk: null,
+        rejectedDiagnosticsPretty: buildRejectedDiagnosticsPretty(
+          { word, mode, provider: String(provider ?? ""), proposalVerification: { results: [] } },
+          [],
+          word,
+          mode
+        ),
         rejectedProposals: [],
         error: String(e?.message ?? e ?? "Request failed"),
       });
@@ -317,6 +350,16 @@ export function OracleProposeWithEngineOracleCardV01(props: Props) {
               onClick={() => props.onCopy?.("ClaimPacket copied.", vm.claimPacketPretty!)}
             >
               Copy ClaimPacket
+            </button>
+          ) : null}
+
+          {vm?.rejectedDiagnosticsPretty && props.onCopy ? (
+            <button
+              type="button"
+              className="rounded-[8px] border border-red-400/40 bg-red-500/10 px-3 py-1.5 text-sm font-semibold text-red-100 transition hover:border-red-300 hover:bg-red-500/20"
+              onClick={() => props.onCopy?.("Rejected diagnostics copied.", vm.rejectedDiagnosticsPretty!)}
+            >
+              Copy rejected diagnostics
             </button>
           ) : null}
         </div>

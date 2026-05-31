@@ -77,11 +77,13 @@ describe("OracleProposeWithEngineOracleCard v0.1", () => {
       }),
     } as unknown as typeof fetch);
 
+    const onCopy = jest.fn();
+
     render(
       <OracleProposeWithEngineOracleCardV01
         word="study"
         mode="strict"
-        onCopy={() => void 0}
+        onCopy={onCopy}
       />
     );
 
@@ -94,6 +96,38 @@ describe("OracleProposeWithEngineOracleCard v0.1", () => {
     expect(screen.getByText("LANG_KNOWN")).toBeInTheDocument();
     expect(screen.getByText("ROOT_HAS_VOWEL")).toBeInTheDocument();
     expect(screen.queryByText("studium")).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: /Copy rejected diagnostics/i }));
+
+    expect(onCopy).toHaveBeenCalledTimes(1);
+    expect(onCopy.mock.calls[0][0]).toBe("Rejected diagnostics copied.");
+
+    const copied = JSON.parse(String(onCopy.mock.calls[0][1]));
+    expect(copied).toMatchObject({
+      diagnostic: "open-instrument.rejected-proposals.v0.1",
+      word: "study",
+      mode: "strict",
+      provider: "mock",
+      rejectedCount: 1,
+      message: "Verifier-rejected proposals emitted.",
+      rejectedProposals: [
+        {
+          form: "xqz",
+          language: "Atlantian",
+          extractedVowelPath: [],
+          failedChecks: [
+            {
+              id: "LANG_KNOWN",
+              reason: "Language is not in the v0.1 registry.",
+            },
+            {
+              id: "ROOT_HAS_VOWEL",
+              reason: "Candidate form has no extracted Seven-Voice vowels.",
+            },
+          ],
+        },
+      ],
+    });
   });
 
   test("shows an empty rejected-proposals state after a clean proposer result", async () => {
@@ -132,11 +166,13 @@ describe("OracleProposeWithEngineOracleCard v0.1", () => {
       }),
     } as unknown as typeof fetch);
 
+    const onCopy = jest.fn();
+
     render(
       <OracleProposeWithEngineOracleCardV01
         word="study"
         mode="strict"
-        onCopy={() => void 0}
+        onCopy={onCopy}
       />
     );
 
@@ -145,5 +181,21 @@ describe("OracleProposeWithEngineOracleCard v0.1", () => {
     expect(await screen.findByText("Rejected proposals")).toBeInTheDocument();
     expect(screen.getByText("rejected=0")).toBeInTheDocument();
     expect(screen.getByText("No rejected proposals emitted.")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: /Copy rejected diagnostics/i }));
+
+    expect(onCopy).toHaveBeenCalledTimes(1);
+    expect(onCopy.mock.calls[0][0]).toBe("Rejected diagnostics copied.");
+
+    const copied = JSON.parse(String(onCopy.mock.calls[0][1]));
+    expect(copied).toMatchObject({
+      diagnostic: "open-instrument.rejected-proposals.v0.1",
+      word: "study",
+      mode: "strict",
+      provider: "mock",
+      rejectedCount: 0,
+      message: "No rejected proposals emitted.",
+      rejectedProposals: [],
+    });
   });
 });
