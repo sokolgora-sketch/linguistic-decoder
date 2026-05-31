@@ -18,6 +18,7 @@ type VM = {
   provider: string;
 
   oraclePrimaryPath: string[];
+  proposalVerificationOk: boolean | null;
   claimVerificationOk: boolean | null;
 
   error?: string;
@@ -140,7 +141,20 @@ function buildVM(raw: unknown, fallbackWord: string, fallbackMode: Mode): VM {
 
   const oraclePrimaryPath = asStrArray(r?.oracle?.primaryVoicePath);
 
-  // verifier shape may evolve; conservative boolean extraction only
+  const pv = r?.proposalVerification;
+  const pvResults = Array.isArray(pv?.results) ? pv.results : [];
+  const proposalVerificationOk =
+    typeof pv?.overallPass === "boolean"
+      ? pv.overallPass
+      : typeof pv?.passed === "boolean"
+        ? pv.passed
+        : typeof pv?.ok === "boolean"
+          ? pv.ok
+          : pvResults.length
+            ? pvResults.every((result: any) => result && typeof result === "object" && result.pass === true)
+            : null;
+
+  // claim verifier shape may evolve; conservative boolean extraction only
   const cv = r?.claimVerification;
   const claimVerificationOk =
     typeof cv?.ok === "boolean"
@@ -170,6 +184,7 @@ const claimPacketPretty = r?.claimPacket ? pretty(r.claimPacket) : "";
     mode,
     provider,
     oraclePrimaryPath,
+    proposalVerificationOk,
     claimVerificationOk,
     error,
     proposerRawText,
@@ -290,6 +305,7 @@ export function OracleProposeWithEngineOracleCardV01(props: Props) {
         mode,
         provider: String(provider ?? ""),
         oraclePrimaryPath: [],
+        proposalVerificationOk: null,
         claimVerificationOk: null,
         rejectedDiagnosticsPretty: buildRejectedDiagnosticsPretty(
           { word, mode, provider: String(provider ?? ""), proposalVerification: { results: [] } },
@@ -403,10 +419,16 @@ export function OracleProposeWithEngineOracleCardV01(props: Props) {
                 <span className="font-mono">
                   {vm.ok ? "ok" : "error"}
                 </span>
+                {vm.proposalVerificationOk !== null ? (
+                  <>
+                    {" · "}
+                    <span className="font-mono">proposal={vm.proposalVerificationOk ? "pass" : "fail"}</span>
+                  </>
+                ) : null}
                 {vm.claimVerificationOk !== null ? (
                   <>
-                    {" · verifier="}
-                    <span className="font-mono">{vm.claimVerificationOk ? "pass" : "fail"}</span>
+                    {" · "}
+                    <span className="font-mono">claim={vm.claimVerificationOk ? "pass" : "fail"}</span>
                   </>
                 ) : null}
               </div>
