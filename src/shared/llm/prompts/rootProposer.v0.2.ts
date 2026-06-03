@@ -1,3 +1,5 @@
+import type { PathMatchRepairScaffold } from "@/shared/llm/repair/pathMatchRepairScaffold.v0.1";
+
 /**
  * Root Proposer Prompt v0.2
  * - Strictly outputs ProposalV0_1 JSON only (no markdown, no commentary).
@@ -75,19 +77,23 @@ When repair is present:
 `.trim();
 
 export type RepairFailReasonV0_2 = { form: string; checkId: string; reason: string };
+export type RepairContextV0_2 = PathMatchRepairScaffold;
 
 export function buildRootProposerSystemPromptV0_2(args?: {
   failReasons?: RepairFailReasonV0_2[];
+  repairContexts?: RepairContextV0_2[];
 }): string {
   const base = ROOT_PROPOSER_SYSTEM_PROMPT_V0_2_BASE;
 
   const failReasons = args?.failReasons?.filter(Boolean) ?? [];
-  if (!failReasons.length) return base;
+  const repairContexts = args?.repairContexts?.filter(Boolean) ?? [];
+  if (!failReasons.length && !repairContexts.length) return base;
 
   // Deterministic append block (stable ordering is enforced by the orchestrator)
   const repairBlock = {
     repair: {
       failReasons,
+      repairContexts,
     },
   };
 
