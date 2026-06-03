@@ -58,20 +58,13 @@ When repair is present:
 - Only change what is required to fix the listed failReasons.
   - OPS_ALLOWED failed: remove/replace illegal opsUsed tokens (prefer removing).
   - DECOMP_PRESENT failed: add decomposition with at least action, instrument, unit, or statement.
-  - PATH_MATCH failed: repair truthfully by preserving the accepted form unless a justified variant/proto-form operation is explicitly allowed; recompute vowelPath from the candidate form and root/decomposition material; Do not change form only to satisfy PATH_MATCH; Do not change language only to satisfy PATH_MATCH; Do not invent vowels; Do not omit vowelPath to bypass stricter repair checking; if no truthful repair exists, fail honestly instead of inventing a path.
+  - PATH_MATCH failed: either fix vowelPath to match, OR omit vowelPath entirely.
   - VOWELPATH_REQUIRED failed: add a non-empty uppercase vowelPath array limited to A, E, I, O, U, Y, Ë.
   - LANG_KNOWN failed: add/correct candidate.language using a documented human language.
   - ROOT_HAS_VOWEL failed: revise decomposition action/instrument/unit/statement so root material contains at least one vowel from the candidate form's extracted vowel path.
   - FUNCTION_FIT_NONEMPTY failed: add a non-empty decomposition.action, decomposition.instrument, or decomposition.unit; statement alone is not enough.
   - PARSE_ERROR: output valid JSON only, matching the required shape (word/mode/candidates...).
 - Do NOT add new unrelated candidates. Prefer editing the failing form.
-- Repair must make the candidate true, not merely make the verifier pass.
-- For PATH_MATCH failures, keep the accepted form stable unless a justified variant/proto-form operation is explicitly allowed.
-- Recompute vowelPath from the candidate form and root/decomposition material.
-- Do not change form or language only to satisfy PATH_MATCH.
-- Do not invent vowels.
-- Do not omit vowelPath to bypass stricter repair checking.
-- If no truthful repair exists, fail honestly instead of inventing a path.
 `.trim();
 
 export type RepairFailReasonV0_2 = { form: string; checkId: string; reason: string };
