@@ -171,6 +171,37 @@ Blocked:
 
 ---
 
+## Artifact linkage
+
+Archived artifact:
+
+    docs/open-instrument/artifacts/local-provider-smoke/2026-06-03-open-instrument-local-smoke-ollama-llama3-1-8b-five-word-v0.1.json
+
+The artifact preserves exact local smoke request/response summaries for the five-word `llama3.1:8b` Open Instrument smoke.
+
+It records:
+
+- provider metadata;
+- model metadata;
+- word set;
+- per-run request summary;
+- per-run response summary;
+- raw proposer text;
+- verifier summary;
+- whether `vowelPath` was present or absent;
+- redaction status;
+- claim boundary.
+
+The artifact is development evidence only.
+
+It is not:
+
+- scientific evidence;
+- publication evidence;
+- eval evidence;
+- Cohort evidence;
+- a reason to change the default provider from `mock`.
+
 ## 9. Current decision
 
 Keep default provider as:
