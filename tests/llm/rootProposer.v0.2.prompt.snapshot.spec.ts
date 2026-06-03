@@ -10,8 +10,11 @@ describe("LLM prompt: rootProposer v0.2", () => {
     expect(ROOT_PROPOSER_SYSTEM_PROMPT_V0_2_BASE).toContain("language (non-empty documented human language");
     expect(ROOT_PROPOSER_SYSTEM_PROMPT_V0_2_BASE).toContain("action, instrument, unit");
     expect(ROOT_PROPOSER_SYSTEM_PROMPT_V0_2_BASE).toContain("statement alone is insufficient");
+    expect(ROOT_PROPOSER_SYSTEM_PROMPT_V0_2_BASE).toContain("Each candidate MUST include vowelPath");
+    expect(ROOT_PROPOSER_SYSTEM_PROMPT_V0_2_BASE).toContain("uppercase Seven-Voice symbols only");
     expect(ROOT_PROPOSER_SYSTEM_PROMPT_V0_2_BASE).toContain("LANG_KNOWN failed");
     expect(ROOT_PROPOSER_SYSTEM_PROMPT_V0_2_BASE).toContain("ROOT_HAS_VOWEL failed");
     expect(ROOT_PROPOSER_SYSTEM_PROMPT_V0_2_BASE).toContain("FUNCTION_FIT_NONEMPTY failed");
+    expect(ROOT_PROPOSER_SYSTEM_PROMPT_V0_2_BASE).toContain("VOWELPATH_REQUIRED failed");
   });
 });
