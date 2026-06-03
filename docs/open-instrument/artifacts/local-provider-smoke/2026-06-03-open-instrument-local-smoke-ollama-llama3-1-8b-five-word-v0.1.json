@@ -1,0 +1,1567 @@
+{
+  "archiveVersion": "v0.1",
+  "artifactType": "open-instrument-local-provider-smoke",
+  "createdAt": "2026-06-03T06:30:13.378Z",
+  "repo": {
+    "project": "ZË-RO",
+    "repository": "sokolgora-sketch/linguistic-decoder",
+    "commit": "db473bd38ed1f2aa97121ce861dcf303d1ef8875",
+    "branch": "docs/open-instrument-archive-llama-five-word-smoke-v0.1",
+    "workingTree": "clean"
+  },
+  "provider": {
+    "provider": "openai_compat",
+    "baseUrl": "http://localhost:11434/v1",
+    "apiKey": "ollama",
+    "model": "llama3.1:8b",
+    "runtime": "ollama"
+  },
+  "environment": {
+    "machine": "Apple M2",
+    "ramGb": 16,
+    "ollamaVersion": "ollama version is 0.24.0",
+    "ollamaList": "NAME           ID              SIZE      MODIFIED     \nllama3.1:8b    46e0c10c039e    4.9 GB    16 hours ago",
+    "notes": [
+      "Local Ollama smoke only.",
+      "No paid OpenAI API call used.",
+      "Dev server called through localhost."
+    ]
+  },
+  "wordSet": {
+    "slug": "five-word",
+    "words": [
+      "study",
+      "damage",
+      "language",
+      "philosophy",
+      "mathematics"
+    ]
+  },
+  "runs": [
+    {
+      "word": "study",
+      "request": {
+        "endpoint": "/api/propose-loop",
+        "mode": "strict",
+        "provider": "openai_compat",
+        "maxAttempts": 3
+      },
+      "responseSummary": {
+        "status": "PASS",
+        "attemptsUsed": 1,
+        "acceptedCandidateForms": [
+          "study"
+        ],
+        "provider": "openai_compat",
+        "model": "llama3.1:8b"
+      },
+      "candidateSummary": {
+        "form": "study",
+        "language": "English",
+        "opsUsed": [],
+        "decomposition": {
+          "action": "to study",
+          "instrument": "",
+          "unit": "",
+          "statement": ""
+        },
+        "vowelPath": {
+          "present": false,
+          "value": []
+        }
+      },
+      "verifierSummary": {
+        "checks": [
+          {
+            "id": "OPS_ALLOWED",
+            "pass": true,
+            "reason": "No opsUsed tokens provided."
+          },
+          {
+            "id": "DECOMP_PRESENT",
+            "pass": true,
+            "reason": "Decomposition present."
+          },
+          {
+            "id": "PATH_MATCH",
+            "pass": true,
+            "reason": "No vowelPath provided (not checked in v0.1)."
+          },
+          {
+            "id": "LANG_KNOWN",
+            "pass": true,
+            "reason": "Language 'English' is in the v0.1 registry."
+          },
+          {
+            "id": "ROOT_HAS_VOWEL",
+            "pass": true,
+            "reason": "Decomposition/root material contains extracted vowel(s): U→I."
+          },
+          {
+            "id": "FUNCTION_FIT_NONEMPTY",
+            "pass": true,
+            "reason": "Structured function field(s) present: to study."
+          }
+        ]
+      },
+      "failReasons": [
+        null
+      ],
+      "raw": {
+        "proposerRawText": "{\n  \"word\": \"study\",\n  \"mode\": \"strict\",\n  \"candidates\": [\n    {\n      \"form\": \"study\",\n      \"language\": \"English\",\n      \"opsUsed\": [],\n      \"decomposition\": {\n        \"action\": \"to study\",\n        \"instrument\": \"\",\n        \"unit\": \"\",\n        \"statement\": \"\"\n      }\n    }\n  ]\n}",
+        "fullApiResponse": {
+          "status": "PASS",
+          "word": "study",
+          "mode": "strict",
+          "meta": {
+            "provider": "openai_compat",
+            "model": "llama3.1:8b",
+            "promptVersion": "v0.2",
+            "verifierVersion": "v0.1",
+            "rulesVersion": "v0.1",
+            "cacheHit": true,
+            "maxAttempts": 3,
+            "attemptsUsed": 1
+          },
+          "final": {
+            "proposal": {
+              "word": "study",
+              "mode": "strict",
+              "candidates": [
+                {
+                  "form": "study",
+                  "language": "English",
+                  "opsUsed": [],
+                  "decomposition": {
+                    "action": "to study",
+                    "instrument": "",
+                    "unit": "",
+                    "statement": ""
+                  }
+                }
+              ]
+            },
+            "verification": {
+              "word": "study",
+              "mode": "strict",
+              "verifierVersion": "v0.1",
+              "rulesVersion": "v0.1",
+              "surface": {
+                "basis": "study",
+                "vowels": [
+                  "U",
+                  "I"
+                ],
+                "principlesPath": [
+                  "UNITY",
+                  "INSIGHT"
+                ],
+                "math7": {
+                  "values1to7": [
+                    5,
+                    3
+                  ],
+                  "rawSum": 8,
+                  "total1to7": 7,
+                  "wrapCount": 1,
+                  "jumps": [
+                    5
+                  ],
+                  "events": [
+                    "WRAP_GATE",
+                    "COMPLETION",
+                    "INFINITE_PEACE"
+                  ]
+                }
+              },
+              "results": [
+                {
+                  "form": "study",
+                  "pass": true,
+                  "normalizedOpsUsed": [],
+                  "extractedVowelPath": [
+                    "U",
+                    "I"
+                  ],
+                  "checks": [
+                    {
+                      "id": "OPS_ALLOWED",
+                      "pass": true,
+                      "reason": "No opsUsed tokens provided."
+                    },
+                    {
+                      "id": "DECOMP_PRESENT",
+                      "pass": true,
+                      "reason": "Decomposition present."
+                    },
+                    {
+                      "id": "PATH_MATCH",
+                      "pass": true,
+                      "reason": "No vowelPath provided (not checked in v0.1)."
+                    },
+                    {
+                      "id": "LANG_KNOWN",
+                      "pass": true,
+                      "reason": "Language 'English' is in the v0.1 registry."
+                    },
+                    {
+                      "id": "ROOT_HAS_VOWEL",
+                      "pass": true,
+                      "reason": "Decomposition/root material contains extracted vowel(s): U→I."
+                    },
+                    {
+                      "id": "FUNCTION_FIT_NONEMPTY",
+                      "pass": true,
+                      "reason": "Structured function field(s) present: to study."
+                    }
+                  ]
+                }
+              ],
+              "overallPass": true
+            },
+            "acceptedCandidateForms": [
+              "study"
+            ]
+          },
+          "trace": [
+            {
+              "attempt": 1,
+              "proposal": {
+                "word": "study",
+                "mode": "strict",
+                "candidates": [
+                  {
+                    "form": "study",
+                    "language": "English",
+                    "opsUsed": [],
+                    "decomposition": {
+                      "action": "to study",
+                      "instrument": "",
+                      "unit": "",
+                      "statement": ""
+                    }
+                  }
+                ]
+              },
+              "parseOk": true,
+              "verification": {
+                "word": "study",
+                "mode": "strict",
+                "verifierVersion": "v0.1",
+                "rulesVersion": "v0.1",
+                "surface": {
+                  "basis": "study",
+                  "vowels": [
+                    "U",
+                    "I"
+                  ],
+                  "principlesPath": [
+                    "UNITY",
+                    "INSIGHT"
+                  ],
+                  "math7": {
+                    "values1to7": [
+                      5,
+                      3
+                    ],
+                    "rawSum": 8,
+                    "total1to7": 7,
+                    "wrapCount": 1,
+                    "jumps": [
+                      5
+                    ],
+                    "events": [
+                      "WRAP_GATE",
+                      "COMPLETION",
+                      "INFINITE_PEACE"
+                    ]
+                  }
+                },
+                "results": [
+                  {
+                    "form": "study",
+                    "pass": true,
+                    "normalizedOpsUsed": [],
+                    "extractedVowelPath": [
+                      "U",
+                      "I"
+                    ],
+                    "checks": [
+                      {
+                        "id": "OPS_ALLOWED",
+                        "pass": true,
+                        "reason": "No opsUsed tokens provided."
+                      },
+                      {
+                        "id": "DECOMP_PRESENT",
+                        "pass": true,
+                        "reason": "Decomposition present."
+                      },
+                      {
+                        "id": "PATH_MATCH",
+                        "pass": true,
+                        "reason": "No vowelPath provided (not checked in v0.1)."
+                      },
+                      {
+                        "id": "LANG_KNOWN",
+                        "pass": true,
+                        "reason": "Language 'English' is in the v0.1 registry."
+                      },
+                      {
+                        "id": "ROOT_HAS_VOWEL",
+                        "pass": true,
+                        "reason": "Decomposition/root material contains extracted vowel(s): U→I."
+                      },
+                      {
+                        "id": "FUNCTION_FIT_NONEMPTY",
+                        "pass": true,
+                        "reason": "Structured function field(s) present: to study."
+                      }
+                    ]
+                  }
+                ],
+                "overallPass": true
+              },
+              "status": "PASS",
+              "proposerRawText": "{\n  \"word\": \"study\",\n  \"mode\": \"strict\",\n  \"candidates\": [\n    {\n      \"form\": \"study\",\n      \"language\": \"English\",\n      \"opsUsed\": [],\n      \"decomposition\": {\n        \"action\": \"to study\",\n        \"instrument\": \"\",\n        \"unit\": \"\",\n        \"statement\": \"\"\n      }\n    }\n  ]\n}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "word": "damage",
+      "request": {
+        "endpoint": "/api/propose-loop",
+        "mode": "strict",
+        "provider": "openai_compat",
+        "maxAttempts": 3
+      },
+      "responseSummary": {
+        "status": "PASS",
+        "attemptsUsed": 1,
+        "acceptedCandidateForms": [
+          "damage"
+        ],
+        "provider": "openai_compat",
+        "model": "llama3.1:8b"
+      },
+      "candidateSummary": {
+        "form": "damage",
+        "language": "English",
+        "opsUsed": [],
+        "decomposition": {
+          "action": "cause",
+          "instrument": "force",
+          "unit": "amount",
+          "statement": ""
+        },
+        "vowelPath": {
+          "present": false,
+          "value": []
+        }
+      },
+      "verifierSummary": {
+        "checks": [
+          {
+            "id": "OPS_ALLOWED",
+            "pass": true,
+            "reason": "No opsUsed tokens provided."
+          },
+          {
+            "id": "DECOMP_PRESENT",
+            "pass": true,
+            "reason": "Decomposition present."
+          },
+          {
+            "id": "PATH_MATCH",
+            "pass": true,
+            "reason": "No vowelPath provided (not checked in v0.1)."
+          },
+          {
+            "id": "LANG_KNOWN",
+            "pass": true,
+            "reason": "Language 'English' is in the v0.1 registry."
+          },
+          {
+            "id": "ROOT_HAS_VOWEL",
+            "pass": true,
+            "reason": "Decomposition/root material contains extracted vowel(s): A→E."
+          },
+          {
+            "id": "FUNCTION_FIT_NONEMPTY",
+            "pass": true,
+            "reason": "Structured function field(s) present: cause | force | amount."
+          }
+        ]
+      },
+      "failReasons": [
+        null
+      ],
+      "raw": {
+        "proposerRawText": "{\n  \"word\": \"damage\",\n  \"mode\": \"strict\",\n  \"candidates\": [\n    {\n      \"form\": \"damage\",\n      \"language\": \"English\",\n      \"opsUsed\": [],\n      \"decomposition\": {\n        \"action\": \"cause\",\n        \"instrument\": \"force\",\n        \"unit\": \"amount\"\n      }\n    }\n  ]\n}",
+        "fullApiResponse": {
+          "status": "PASS",
+          "word": "damage",
+          "mode": "strict",
+          "meta": {
+            "provider": "openai_compat",
+            "model": "llama3.1:8b",
+            "promptVersion": "v0.2",
+            "verifierVersion": "v0.1",
+            "rulesVersion": "v0.1",
+            "cacheHit": true,
+            "maxAttempts": 3,
+            "attemptsUsed": 1
+          },
+          "final": {
+            "proposal": {
+              "word": "damage",
+              "mode": "strict",
+              "candidates": [
+                {
+                  "form": "damage",
+                  "language": "English",
+                  "opsUsed": [],
+                  "decomposition": {
+                    "action": "cause",
+                    "instrument": "force",
+                    "unit": "amount"
+                  }
+                }
+              ]
+            },
+            "verification": {
+              "word": "damage",
+              "mode": "strict",
+              "verifierVersion": "v0.1",
+              "rulesVersion": "v0.1",
+              "surface": {
+                "basis": "damage",
+                "vowels": [
+                  "A",
+                  "A",
+                  "E"
+                ],
+                "principlesPath": [
+                  "TRUTH",
+                  "TRUTH",
+                  "EXPANSION"
+                ],
+                "math7": {
+                  "values1to7": [
+                    1,
+                    1,
+                    2
+                  ],
+                  "rawSum": 4,
+                  "total1to7": 2,
+                  "wrapCount": 0,
+                  "jumps": [
+                    0,
+                    1
+                  ],
+                  "events": [
+                    "COMPLETION"
+                  ]
+                }
+              },
+              "results": [
+                {
+                  "form": "damage",
+                  "pass": true,
+                  "normalizedOpsUsed": [],
+                  "extractedVowelPath": [
+                    "A",
+                    "A",
+                    "E"
+                  ],
+                  "checks": [
+                    {
+                      "id": "OPS_ALLOWED",
+                      "pass": true,
+                      "reason": "No opsUsed tokens provided."
+                    },
+                    {
+                      "id": "DECOMP_PRESENT",
+                      "pass": true,
+                      "reason": "Decomposition present."
+                    },
+                    {
+                      "id": "PATH_MATCH",
+                      "pass": true,
+                      "reason": "No vowelPath provided (not checked in v0.1)."
+                    },
+                    {
+                      "id": "LANG_KNOWN",
+                      "pass": true,
+                      "reason": "Language 'English' is in the v0.1 registry."
+                    },
+                    {
+                      "id": "ROOT_HAS_VOWEL",
+                      "pass": true,
+                      "reason": "Decomposition/root material contains extracted vowel(s): A→E."
+                    },
+                    {
+                      "id": "FUNCTION_FIT_NONEMPTY",
+                      "pass": true,
+                      "reason": "Structured function field(s) present: cause | force | amount."
+                    }
+                  ]
+                }
+              ],
+              "overallPass": true
+            },
+            "acceptedCandidateForms": [
+              "damage"
+            ]
+          },
+          "trace": [
+            {
+              "attempt": 1,
+              "proposal": {
+                "word": "damage",
+                "mode": "strict",
+                "candidates": [
+                  {
+                    "form": "damage",
+                    "language": "English",
+                    "opsUsed": [],
+                    "decomposition": {
+                      "action": "cause",
+                      "instrument": "force",
+                      "unit": "amount"
+                    }
+                  }
+                ]
+              },
+              "parseOk": true,
+              "verification": {
+                "word": "damage",
+                "mode": "strict",
+                "verifierVersion": "v0.1",
+                "rulesVersion": "v0.1",
+                "surface": {
+                  "basis": "damage",
+                  "vowels": [
+                    "A",
+                    "A",
+                    "E"
+                  ],
+                  "principlesPath": [
+                    "TRUTH",
+                    "TRUTH",
+                    "EXPANSION"
+                  ],
+                  "math7": {
+                    "values1to7": [
+                      1,
+                      1,
+                      2
+                    ],
+                    "rawSum": 4,
+                    "total1to7": 2,
+                    "wrapCount": 0,
+                    "jumps": [
+                      0,
+                      1
+                    ],
+                    "events": [
+                      "COMPLETION"
+                    ]
+                  }
+                },
+                "results": [
+                  {
+                    "form": "damage",
+                    "pass": true,
+                    "normalizedOpsUsed": [],
+                    "extractedVowelPath": [
+                      "A",
+                      "A",
+                      "E"
+                    ],
+                    "checks": [
+                      {
+                        "id": "OPS_ALLOWED",
+                        "pass": true,
+                        "reason": "No opsUsed tokens provided."
+                      },
+                      {
+                        "id": "DECOMP_PRESENT",
+                        "pass": true,
+                        "reason": "Decomposition present."
+                      },
+                      {
+                        "id": "PATH_MATCH",
+                        "pass": true,
+                        "reason": "No vowelPath provided (not checked in v0.1)."
+                      },
+                      {
+                        "id": "LANG_KNOWN",
+                        "pass": true,
+                        "reason": "Language 'English' is in the v0.1 registry."
+                      },
+                      {
+                        "id": "ROOT_HAS_VOWEL",
+                        "pass": true,
+                        "reason": "Decomposition/root material contains extracted vowel(s): A→E."
+                      },
+                      {
+                        "id": "FUNCTION_FIT_NONEMPTY",
+                        "pass": true,
+                        "reason": "Structured function field(s) present: cause | force | amount."
+                      }
+                    ]
+                  }
+                ],
+                "overallPass": true
+              },
+              "status": "PASS",
+              "proposerRawText": "{\n  \"word\": \"damage\",\n  \"mode\": \"strict\",\n  \"candidates\": [\n    {\n      \"form\": \"damage\",\n      \"language\": \"English\",\n      \"opsUsed\": [],\n      \"decomposition\": {\n        \"action\": \"cause\",\n        \"instrument\": \"force\",\n        \"unit\": \"amount\"\n      }\n    }\n  ]\n}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "word": "language",
+      "request": {
+        "endpoint": "/api/propose-loop",
+        "mode": "strict",
+        "provider": "openai_compat",
+        "maxAttempts": 3
+      },
+      "responseSummary": {
+        "status": "PASS",
+        "attemptsUsed": 1,
+        "acceptedCandidateForms": [
+          "language"
+        ],
+        "provider": "openai_compat",
+        "model": "llama3.1:8b"
+      },
+      "candidateSummary": {
+        "form": "language",
+        "language": "English",
+        "opsUsed": [],
+        "decomposition": {
+          "action": "express",
+          "instrument": "tongue",
+          "unit": "word",
+          "statement": ""
+        },
+        "vowelPath": {
+          "present": false,
+          "value": []
+        }
+      },
+      "verifierSummary": {
+        "checks": [
+          {
+            "id": "OPS_ALLOWED",
+            "pass": true,
+            "reason": "No opsUsed tokens provided."
+          },
+          {
+            "id": "DECOMP_PRESENT",
+            "pass": true,
+            "reason": "Decomposition present."
+          },
+          {
+            "id": "PATH_MATCH",
+            "pass": true,
+            "reason": "No vowelPath provided (not checked in v0.1)."
+          },
+          {
+            "id": "LANG_KNOWN",
+            "pass": true,
+            "reason": "Language 'English' is in the v0.1 registry."
+          },
+          {
+            "id": "ROOT_HAS_VOWEL",
+            "pass": true,
+            "reason": "Decomposition/root material contains extracted vowel(s): E→U."
+          },
+          {
+            "id": "FUNCTION_FIT_NONEMPTY",
+            "pass": true,
+            "reason": "Structured function field(s) present: express | tongue | word."
+          }
+        ]
+      },
+      "failReasons": [
+        null
+      ],
+      "raw": {
+        "proposerRawText": "{\n  \"word\": \"language\",\n  \"mode\": \"strict\",\n  \"candidates\": [\n    {\n      \"form\": \"language\",\n      \"language\": \"English\",\n      \"opsUsed\": [],\n      \"decomposition\": {\n        \"action\": \"express\",\n        \"instrument\": \"tongue\",\n        \"unit\": \"word\"\n      }\n    }\n  ]\n}",
+        "fullApiResponse": {
+          "status": "PASS",
+          "word": "language",
+          "mode": "strict",
+          "meta": {
+            "provider": "openai_compat",
+            "model": "llama3.1:8b",
+            "promptVersion": "v0.2",
+            "verifierVersion": "v0.1",
+            "rulesVersion": "v0.1",
+            "cacheHit": true,
+            "maxAttempts": 3,
+            "attemptsUsed": 1
+          },
+          "final": {
+            "proposal": {
+              "word": "language",
+              "mode": "strict",
+              "candidates": [
+                {
+                  "form": "language",
+                  "language": "English",
+                  "opsUsed": [],
+                  "decomposition": {
+                    "action": "express",
+                    "instrument": "tongue",
+                    "unit": "word"
+                  }
+                }
+              ]
+            },
+            "verification": {
+              "word": "language",
+              "mode": "strict",
+              "verifierVersion": "v0.1",
+              "rulesVersion": "v0.1",
+              "surface": {
+                "basis": "language",
+                "vowels": [
+                  "A",
+                  "U",
+                  "A",
+                  "E"
+                ],
+                "principlesPath": [
+                  "TRUTH",
+                  "UNITY",
+                  "TRUTH",
+                  "EXPANSION"
+                ],
+                "math7": {
+                  "values1to7": [
+                    1,
+                    5,
+                    1,
+                    2
+                  ],
+                  "rawSum": 9,
+                  "total1to7": 6,
+                  "wrapCount": 1,
+                  "jumps": [
+                    4,
+                    3,
+                    1
+                  ],
+                  "events": [
+                    "WRAP_GATE",
+                    "COMPLETION",
+                    "NEW_CYCLE"
+                  ]
+                }
+              },
+              "results": [
+                {
+                  "form": "language",
+                  "pass": true,
+                  "normalizedOpsUsed": [],
+                  "extractedVowelPath": [
+                    "A",
+                    "U",
+                    "A",
+                    "E"
+                  ],
+                  "checks": [
+                    {
+                      "id": "OPS_ALLOWED",
+                      "pass": true,
+                      "reason": "No opsUsed tokens provided."
+                    },
+                    {
+                      "id": "DECOMP_PRESENT",
+                      "pass": true,
+                      "reason": "Decomposition present."
+                    },
+                    {
+                      "id": "PATH_MATCH",
+                      "pass": true,
+                      "reason": "No vowelPath provided (not checked in v0.1)."
+                    },
+                    {
+                      "id": "LANG_KNOWN",
+                      "pass": true,
+                      "reason": "Language 'English' is in the v0.1 registry."
+                    },
+                    {
+                      "id": "ROOT_HAS_VOWEL",
+                      "pass": true,
+                      "reason": "Decomposition/root material contains extracted vowel(s): E→U."
+                    },
+                    {
+                      "id": "FUNCTION_FIT_NONEMPTY",
+                      "pass": true,
+                      "reason": "Structured function field(s) present: express | tongue | word."
+                    }
+                  ]
+                }
+              ],
+              "overallPass": true
+            },
+            "acceptedCandidateForms": [
+              "language"
+            ]
+          },
+          "trace": [
+            {
+              "attempt": 1,
+              "proposal": {
+                "word": "language",
+                "mode": "strict",
+                "candidates": [
+                  {
+                    "form": "language",
+                    "language": "English",
+                    "opsUsed": [],
+                    "decomposition": {
+                      "action": "express",
+                      "instrument": "tongue",
+                      "unit": "word"
+                    }
+                  }
+                ]
+              },
+              "parseOk": true,
+              "verification": {
+                "word": "language",
+                "mode": "strict",
+                "verifierVersion": "v0.1",
+                "rulesVersion": "v0.1",
+                "surface": {
+                  "basis": "language",
+                  "vowels": [
+                    "A",
+                    "U",
+                    "A",
+                    "E"
+                  ],
+                  "principlesPath": [
+                    "TRUTH",
+                    "UNITY",
+                    "TRUTH",
+                    "EXPANSION"
+                  ],
+                  "math7": {
+                    "values1to7": [
+                      1,
+                      5,
+                      1,
+                      2
+                    ],
+                    "rawSum": 9,
+                    "total1to7": 6,
+                    "wrapCount": 1,
+                    "jumps": [
+                      4,
+                      3,
+                      1
+                    ],
+                    "events": [
+                      "WRAP_GATE",
+                      "COMPLETION",
+                      "NEW_CYCLE"
+                    ]
+                  }
+                },
+                "results": [
+                  {
+                    "form": "language",
+                    "pass": true,
+                    "normalizedOpsUsed": [],
+                    "extractedVowelPath": [
+                      "A",
+                      "U",
+                      "A",
+                      "E"
+                    ],
+                    "checks": [
+                      {
+                        "id": "OPS_ALLOWED",
+                        "pass": true,
+                        "reason": "No opsUsed tokens provided."
+                      },
+                      {
+                        "id": "DECOMP_PRESENT",
+                        "pass": true,
+                        "reason": "Decomposition present."
+                      },
+                      {
+                        "id": "PATH_MATCH",
+                        "pass": true,
+                        "reason": "No vowelPath provided (not checked in v0.1)."
+                      },
+                      {
+                        "id": "LANG_KNOWN",
+                        "pass": true,
+                        "reason": "Language 'English' is in the v0.1 registry."
+                      },
+                      {
+                        "id": "ROOT_HAS_VOWEL",
+                        "pass": true,
+                        "reason": "Decomposition/root material contains extracted vowel(s): E→U."
+                      },
+                      {
+                        "id": "FUNCTION_FIT_NONEMPTY",
+                        "pass": true,
+                        "reason": "Structured function field(s) present: express | tongue | word."
+                      }
+                    ]
+                  }
+                ],
+                "overallPass": true
+              },
+              "status": "PASS",
+              "proposerRawText": "{\n  \"word\": \"language\",\n  \"mode\": \"strict\",\n  \"candidates\": [\n    {\n      \"form\": \"language\",\n      \"language\": \"English\",\n      \"opsUsed\": [],\n      \"decomposition\": {\n        \"action\": \"express\",\n        \"instrument\": \"tongue\",\n        \"unit\": \"word\"\n      }\n    }\n  ]\n}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "word": "philosophy",
+      "request": {
+        "endpoint": "/api/propose-loop",
+        "mode": "strict",
+        "provider": "openai_compat",
+        "maxAttempts": 3
+      },
+      "responseSummary": {
+        "status": "PASS",
+        "attemptsUsed": 1,
+        "acceptedCandidateForms": [
+          "philosophy"
+        ],
+        "provider": "openai_compat",
+        "model": "llama3.1:8b"
+      },
+      "candidateSummary": {
+        "form": "philosophy",
+        "language": "English",
+        "opsUsed": [],
+        "decomposition": {
+          "action": "contemplate",
+          "instrument": "mind",
+          "unit": "thought",
+          "statement": ""
+        },
+        "vowelPath": {
+          "present": false,
+          "value": []
+        }
+      },
+      "verifierSummary": {
+        "checks": [
+          {
+            "id": "OPS_ALLOWED",
+            "pass": true,
+            "reason": "No opsUsed tokens provided."
+          },
+          {
+            "id": "DECOMP_PRESENT",
+            "pass": true,
+            "reason": "Decomposition present."
+          },
+          {
+            "id": "PATH_MATCH",
+            "pass": true,
+            "reason": "No vowelPath provided (not checked in v0.1)."
+          },
+          {
+            "id": "LANG_KNOWN",
+            "pass": true,
+            "reason": "Language 'English' is in the v0.1 registry."
+          },
+          {
+            "id": "ROOT_HAS_VOWEL",
+            "pass": true,
+            "reason": "Decomposition/root material contains extracted vowel(s): O→I."
+          },
+          {
+            "id": "FUNCTION_FIT_NONEMPTY",
+            "pass": true,
+            "reason": "Structured function field(s) present: contemplate | mind | thought."
+          }
+        ]
+      },
+      "failReasons": [
+        null
+      ],
+      "raw": {
+        "proposerRawText": "{\n  \"word\": \"philosophy\",\n  \"mode\": \"strict\",\n  \"candidates\": [\n    {\n      \"form\": \"philosophy\",\n      \"language\": \"English\",\n      \"opsUsed\": [],\n      \"decomposition\": {\n        \"action\": \"contemplate\",\n        \"instrument\": \"mind\",\n        \"unit\": \"thought\"\n      }\n    }\n  ]\n}",
+        "fullApiResponse": {
+          "status": "PASS",
+          "word": "philosophy",
+          "mode": "strict",
+          "meta": {
+            "provider": "openai_compat",
+            "model": "llama3.1:8b",
+            "promptVersion": "v0.2",
+            "verifierVersion": "v0.1",
+            "rulesVersion": "v0.1",
+            "cacheHit": true,
+            "maxAttempts": 3,
+            "attemptsUsed": 1
+          },
+          "final": {
+            "proposal": {
+              "word": "philosophy",
+              "mode": "strict",
+              "candidates": [
+                {
+                  "form": "philosophy",
+                  "language": "English",
+                  "opsUsed": [],
+                  "decomposition": {
+                    "action": "contemplate",
+                    "instrument": "mind",
+                    "unit": "thought"
+                  }
+                }
+              ]
+            },
+            "verification": {
+              "word": "philosophy",
+              "mode": "strict",
+              "verifierVersion": "v0.1",
+              "rulesVersion": "v0.1",
+              "surface": {
+                "basis": "philosophy",
+                "vowels": [
+                  "I",
+                  "O",
+                  "O",
+                  "I"
+                ],
+                "principlesPath": [
+                  "INSIGHT",
+                  "BALANCE",
+                  "BALANCE",
+                  "INSIGHT"
+                ],
+                "math7": {
+                  "values1to7": [
+                    3,
+                    4,
+                    4,
+                    3
+                  ],
+                  "rawSum": 14,
+                  "total1to7": 4,
+                  "wrapCount": 1,
+                  "jumps": [
+                    1,
+                    0,
+                    6
+                  ],
+                  "events": [
+                    "WRAP_GATE",
+                    "COMPLETION"
+                  ]
+                }
+              },
+              "results": [
+                {
+                  "form": "philosophy",
+                  "pass": true,
+                  "normalizedOpsUsed": [],
+                  "extractedVowelPath": [
+                    "I",
+                    "O",
+                    "O",
+                    "I"
+                  ],
+                  "checks": [
+                    {
+                      "id": "OPS_ALLOWED",
+                      "pass": true,
+                      "reason": "No opsUsed tokens provided."
+                    },
+                    {
+                      "id": "DECOMP_PRESENT",
+                      "pass": true,
+                      "reason": "Decomposition present."
+                    },
+                    {
+                      "id": "PATH_MATCH",
+                      "pass": true,
+                      "reason": "No vowelPath provided (not checked in v0.1)."
+                    },
+                    {
+                      "id": "LANG_KNOWN",
+                      "pass": true,
+                      "reason": "Language 'English' is in the v0.1 registry."
+                    },
+                    {
+                      "id": "ROOT_HAS_VOWEL",
+                      "pass": true,
+                      "reason": "Decomposition/root material contains extracted vowel(s): O→I."
+                    },
+                    {
+                      "id": "FUNCTION_FIT_NONEMPTY",
+                      "pass": true,
+                      "reason": "Structured function field(s) present: contemplate | mind | thought."
+                    }
+                  ]
+                }
+              ],
+              "overallPass": true
+            },
+            "acceptedCandidateForms": [
+              "philosophy"
+            ]
+          },
+          "trace": [
+            {
+              "attempt": 1,
+              "proposal": {
+                "word": "philosophy",
+                "mode": "strict",
+                "candidates": [
+                  {
+                    "form": "philosophy",
+                    "language": "English",
+                    "opsUsed": [],
+                    "decomposition": {
+                      "action": "contemplate",
+                      "instrument": "mind",
+                      "unit": "thought"
+                    }
+                  }
+                ]
+              },
+              "parseOk": true,
+              "verification": {
+                "word": "philosophy",
+                "mode": "strict",
+                "verifierVersion": "v0.1",
+                "rulesVersion": "v0.1",
+                "surface": {
+                  "basis": "philosophy",
+                  "vowels": [
+                    "I",
+                    "O",
+                    "O",
+                    "I"
+                  ],
+                  "principlesPath": [
+                    "INSIGHT",
+                    "BALANCE",
+                    "BALANCE",
+                    "INSIGHT"
+                  ],
+                  "math7": {
+                    "values1to7": [
+                      3,
+                      4,
+                      4,
+                      3
+                    ],
+                    "rawSum": 14,
+                    "total1to7": 4,
+                    "wrapCount": 1,
+                    "jumps": [
+                      1,
+                      0,
+                      6
+                    ],
+                    "events": [
+                      "WRAP_GATE",
+                      "COMPLETION"
+                    ]
+                  }
+                },
+                "results": [
+                  {
+                    "form": "philosophy",
+                    "pass": true,
+                    "normalizedOpsUsed": [],
+                    "extractedVowelPath": [
+                      "I",
+                      "O",
+                      "O",
+                      "I"
+                    ],
+                    "checks": [
+                      {
+                        "id": "OPS_ALLOWED",
+                        "pass": true,
+                        "reason": "No opsUsed tokens provided."
+                      },
+                      {
+                        "id": "DECOMP_PRESENT",
+                        "pass": true,
+                        "reason": "Decomposition present."
+                      },
+                      {
+                        "id": "PATH_MATCH",
+                        "pass": true,
+                        "reason": "No vowelPath provided (not checked in v0.1)."
+                      },
+                      {
+                        "id": "LANG_KNOWN",
+                        "pass": true,
+                        "reason": "Language 'English' is in the v0.1 registry."
+                      },
+                      {
+                        "id": "ROOT_HAS_VOWEL",
+                        "pass": true,
+                        "reason": "Decomposition/root material contains extracted vowel(s): O→I."
+                      },
+                      {
+                        "id": "FUNCTION_FIT_NONEMPTY",
+                        "pass": true,
+                        "reason": "Structured function field(s) present: contemplate | mind | thought."
+                      }
+                    ]
+                  }
+                ],
+                "overallPass": true
+              },
+              "status": "PASS",
+              "proposerRawText": "{\n  \"word\": \"philosophy\",\n  \"mode\": \"strict\",\n  \"candidates\": [\n    {\n      \"form\": \"philosophy\",\n      \"language\": \"English\",\n      \"opsUsed\": [],\n      \"decomposition\": {\n        \"action\": \"contemplate\",\n        \"instrument\": \"mind\",\n        \"unit\": \"thought\"\n      }\n    }\n  ]\n}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "word": "mathematics",
+      "request": {
+        "endpoint": "/api/propose-loop",
+        "mode": "strict",
+        "provider": "openai_compat",
+        "maxAttempts": 3
+      },
+      "responseSummary": {
+        "status": "PASS",
+        "attemptsUsed": 1,
+        "acceptedCandidateForms": [
+          "mathematics"
+        ],
+        "provider": "openai_compat",
+        "model": "llama3.1:8b"
+      },
+      "candidateSummary": {
+        "form": "mathematics",
+        "language": "English",
+        "opsUsed": [],
+        "decomposition": {
+          "action": "calculate",
+          "instrument": "mind",
+          "unit": "concept",
+          "statement": ""
+        },
+        "vowelPath": {
+          "present": false,
+          "value": []
+        }
+      },
+      "verifierSummary": {
+        "checks": [
+          {
+            "id": "OPS_ALLOWED",
+            "pass": true,
+            "reason": "No opsUsed tokens provided."
+          },
+          {
+            "id": "DECOMP_PRESENT",
+            "pass": true,
+            "reason": "Decomposition present."
+          },
+          {
+            "id": "PATH_MATCH",
+            "pass": true,
+            "reason": "No vowelPath provided (not checked in v0.1)."
+          },
+          {
+            "id": "LANG_KNOWN",
+            "pass": true,
+            "reason": "Language 'English' is in the v0.1 registry."
+          },
+          {
+            "id": "ROOT_HAS_VOWEL",
+            "pass": true,
+            "reason": "Decomposition/root material contains extracted vowel(s): A→E→I."
+          },
+          {
+            "id": "FUNCTION_FIT_NONEMPTY",
+            "pass": true,
+            "reason": "Structured function field(s) present: calculate | mind | concept."
+          }
+        ]
+      },
+      "failReasons": [
+        null
+      ],
+      "raw": {
+        "proposerRawText": "{\n  \"word\": \"mathematics\",\n  \"mode\": \"strict\",\n  \"candidates\": [\n    {\n      \"form\": \"mathematics\",\n      \"language\": \"English\",\n      \"opsUsed\": [],\n      \"decomposition\": {\n        \"action\": \"calculate\",\n        \"instrument\": \"mind\",\n        \"unit\": \"concept\"\n      }\n    }\n  ]\n}",
+        "fullApiResponse": {
+          "status": "PASS",
+          "word": "mathematics",
+          "mode": "strict",
+          "meta": {
+            "provider": "openai_compat",
+            "model": "llama3.1:8b",
+            "promptVersion": "v0.2",
+            "verifierVersion": "v0.1",
+            "rulesVersion": "v0.1",
+            "cacheHit": true,
+            "maxAttempts": 3,
+            "attemptsUsed": 1
+          },
+          "final": {
+            "proposal": {
+              "word": "mathematics",
+              "mode": "strict",
+              "candidates": [
+                {
+                  "form": "mathematics",
+                  "language": "English",
+                  "opsUsed": [],
+                  "decomposition": {
+                    "action": "calculate",
+                    "instrument": "mind",
+                    "unit": "concept"
+                  }
+                }
+              ]
+            },
+            "verification": {
+              "word": "mathematics",
+              "mode": "strict",
+              "verifierVersion": "v0.1",
+              "rulesVersion": "v0.1",
+              "surface": {
+                "basis": "mathematics",
+                "vowels": [
+                  "A",
+                  "E",
+                  "A",
+                  "I"
+                ],
+                "principlesPath": [
+                  "TRUTH",
+                  "EXPANSION",
+                  "TRUTH",
+                  "INSIGHT"
+                ],
+                "math7": {
+                  "values1to7": [
+                    1,
+                    2,
+                    1,
+                    3
+                  ],
+                  "rawSum": 7,
+                  "total1to7": 4,
+                  "wrapCount": 0,
+                  "jumps": [
+                    1,
+                    6,
+                    2
+                  ],
+                  "events": [
+                    "COMPLETION"
+                  ]
+                }
+              },
+              "results": [
+                {
+                  "form": "mathematics",
+                  "pass": true,
+                  "normalizedOpsUsed": [],
+                  "extractedVowelPath": [
+                    "A",
+                    "E",
+                    "A",
+                    "I"
+                  ],
+                  "checks": [
+                    {
+                      "id": "OPS_ALLOWED",
+                      "pass": true,
+                      "reason": "No opsUsed tokens provided."
+                    },
+                    {
+                      "id": "DECOMP_PRESENT",
+                      "pass": true,
+                      "reason": "Decomposition present."
+                    },
+                    {
+                      "id": "PATH_MATCH",
+                      "pass": true,
+                      "reason": "No vowelPath provided (not checked in v0.1)."
+                    },
+                    {
+                      "id": "LANG_KNOWN",
+                      "pass": true,
+                      "reason": "Language 'English' is in the v0.1 registry."
+                    },
+                    {
+                      "id": "ROOT_HAS_VOWEL",
+                      "pass": true,
+                      "reason": "Decomposition/root material contains extracted vowel(s): A→E→I."
+                    },
+                    {
+                      "id": "FUNCTION_FIT_NONEMPTY",
+                      "pass": true,
+                      "reason": "Structured function field(s) present: calculate | mind | concept."
+                    }
+                  ]
+                }
+              ],
+              "overallPass": true
+            },
+            "acceptedCandidateForms": [
+              "mathematics"
+            ]
+          },
+          "trace": [
+            {
+              "attempt": 1,
+              "proposal": {
+                "word": "mathematics",
+                "mode": "strict",
+                "candidates": [
+                  {
+                    "form": "mathematics",
+                    "language": "English",
+                    "opsUsed": [],
+                    "decomposition": {
+                      "action": "calculate",
+                      "instrument": "mind",
+                      "unit": "concept"
+                    }
+                  }
+                ]
+              },
+              "parseOk": true,
+              "verification": {
+                "word": "mathematics",
+                "mode": "strict",
+                "verifierVersion": "v0.1",
+                "rulesVersion": "v0.1",
+                "surface": {
+                  "basis": "mathematics",
+                  "vowels": [
+                    "A",
+                    "E",
+                    "A",
+                    "I"
+                  ],
+                  "principlesPath": [
+                    "TRUTH",
+                    "EXPANSION",
+                    "TRUTH",
+                    "INSIGHT"
+                  ],
+                  "math7": {
+                    "values1to7": [
+                      1,
+                      2,
+                      1,
+                      3
+                    ],
+                    "rawSum": 7,
+                    "total1to7": 4,
+                    "wrapCount": 0,
+                    "jumps": [
+                      1,
+                      6,
+                      2
+                    ],
+                    "events": [
+                      "COMPLETION"
+                    ]
+                  }
+                },
+                "results": [
+                  {
+                    "form": "mathematics",
+                    "pass": true,
+                    "normalizedOpsUsed": [],
+                    "extractedVowelPath": [
+                      "A",
+                      "E",
+                      "A",
+                      "I"
+                    ],
+                    "checks": [
+                      {
+                        "id": "OPS_ALLOWED",
+                        "pass": true,
+                        "reason": "No opsUsed tokens provided."
+                      },
+                      {
+                        "id": "DECOMP_PRESENT",
+                        "pass": true,
+                        "reason": "Decomposition present."
+                      },
+                      {
+                        "id": "PATH_MATCH",
+                        "pass": true,
+                        "reason": "No vowelPath provided (not checked in v0.1)."
+                      },
+                      {
+                        "id": "LANG_KNOWN",
+                        "pass": true,
+                        "reason": "Language 'English' is in the v0.1 registry."
+                      },
+                      {
+                        "id": "ROOT_HAS_VOWEL",
+                        "pass": true,
+                        "reason": "Decomposition/root material contains extracted vowel(s): A→E→I."
+                      },
+                      {
+                        "id": "FUNCTION_FIT_NONEMPTY",
+                        "pass": true,
+                        "reason": "Structured function field(s) present: calculate | mind | concept."
+                      }
+                    ]
+                  }
+                ],
+                "overallPass": true
+              },
+              "status": "PASS",
+              "proposerRawText": "{\n  \"word\": \"mathematics\",\n  \"mode\": \"strict\",\n  \"candidates\": [\n    {\n      \"form\": \"mathematics\",\n      \"language\": \"English\",\n      \"opsUsed\": [],\n      \"decomposition\": {\n        \"action\": \"calculate\",\n        \"instrument\": \"mind\",\n        \"unit\": \"concept\"\n      }\n    }\n  ]\n}"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "redaction": {
+    "apiKeysStored": false,
+    "bearerTokensStored": false,
+    "fullEnvStored": false,
+    "notes": [
+      "OPENAI_API_KEY was local dummy value for Ollama.",
+      "No paid-provider API keys were stored.",
+      "No full environment dump was stored."
+    ]
+  },
+  "claimBoundary": {
+    "scientificEvidence": false,
+    "publicationEvidence": false,
+    "evalEvidence": false,
+    "cohortEvidence": false,
+    "defaultProviderChange": false,
+    "developmentEvidenceOnly": true
+  }
+}
