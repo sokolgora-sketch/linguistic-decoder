@@ -25,7 +25,7 @@ Return ONLY a single JSON object that matches this shape:
         "unit"?: string,
         "statement"?: string
       },
-      "vowelPath"?: string[]   // optional; omit unless confident it matches the form's extracted vowels
+      "vowelPath": string[]   // required; must be present, non-empty, uppercase-only, and limited to A/E/I/O/U/Y/Ë
     }
   ]
 }
@@ -40,7 +40,9 @@ Hard rules:
   - decomposition with at least ONE non-empty structured function key among: action, instrument, unit
 - decomposition.statement is allowed as supporting explanation, but statement alone is insufficient.
 - decomposition action/instrument/unit should contain concise root/function material tied to the candidate form.
-- If you are not fully sure about vowelPath, OMIT it. (Verifier checks vowelPath only if provided.)
+- Each candidate MUST include vowelPath.
+- vowelPath MUST be a non-empty array of uppercase Seven-Voice symbols only: A, E, I, O, U, Y, Ë.
+- If vowelPath is missing, empty, lowercase, or contains an out-of-set symbol, the candidate is incomplete for v0.2.
 - opsUsed must contain ONLY allowed operation IDs. If unsure, use [].
 
 Repair mode:
@@ -57,6 +59,7 @@ When repair is present:
   - OPS_ALLOWED failed: remove/replace illegal opsUsed tokens (prefer removing).
   - DECOMP_PRESENT failed: add decomposition with at least action, instrument, unit, or statement.
   - PATH_MATCH failed: either fix vowelPath to match, OR omit vowelPath entirely.
+  - VOWELPATH_REQUIRED failed: add a non-empty uppercase vowelPath array limited to A, E, I, O, U, Y, Ë.
   - LANG_KNOWN failed: add/correct candidate.language using a documented human language.
   - ROOT_HAS_VOWEL failed: revise decomposition action/instrument/unit/statement so root material contains at least one vowel from the candidate form's extracted vowel path.
   - FUNCTION_FIT_NONEMPTY failed: add a non-empty decomposition.action, decomposition.instrument, or decomposition.unit; statement alone is not enough.
