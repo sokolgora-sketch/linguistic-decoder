@@ -33,6 +33,10 @@ function isV02Artifact(filePath: string): boolean {
   return path.basename(filePath).endsWith("v0.2.json");
 }
 
+function isV03Artifact(filePath: string): boolean {
+  return path.basename(filePath).endsWith("v0.3.json");
+}
+
 function asObject(value: unknown, label = "value"): JsonObject {
   expect(value).toBeTruthy();
   expect(typeof value).toBe("object");
@@ -76,7 +80,7 @@ function assertCommonArtifactContract(
   expect(raw).not.toContain("OPENAI_API_KEY=");
   expect(raw).not.toContain("OPENAI_API_KEY:");
 
-  expect(isV02Artifact(filePath) || filePath.endsWith("v0.1.json")).toBe(true);
+  expect(isV02Artifact(filePath) || isV03Artifact(filePath) || filePath.endsWith("v0.1.json")).toBe(true);
 }
 
 function assertRunShape(runValue: unknown): JsonObject {
