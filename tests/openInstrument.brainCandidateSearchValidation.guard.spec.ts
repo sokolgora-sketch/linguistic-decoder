@@ -207,6 +207,29 @@ describe("Open Instrument Brain candidate search validation v0.1", () => {
     );
   });
 
+  it("fails enum fields returned as arrays", () => {
+    const output = validOutput() as BrainCandidateSearchOutput & {
+      chunkCandidates: Array<Record<string, unknown>>;
+    };
+    output.chunkCandidates[0].candidateType = ["strong_living_match"];
+    output.chunkCandidates[0].evidenceType = ["living_lexical"];
+    output.chunkCandidates[0].falseFriendRisk = ["medium"];
+
+    const result = validateBrainCandidateSearchOutput({
+      heartInput: studyInput(),
+      brainOutput: output,
+    });
+
+    expect(result.ok).toBe(false);
+    expect(result.issues).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ code: "INVALID_CANDIDATE_TYPE" }),
+        expect.objectContaining({ code: "INVALID_EVIDENCE_TYPE" }),
+        expect.objectContaining({ code: "INVALID_FALSE_FRIEND_RISK" }),
+      ]),
+    );
+  });
+
   it("fails invalid null candidate settings", () => {
     const input = studyInput();
     const output = validOutput(input);

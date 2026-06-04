@@ -126,6 +126,80 @@ describe("Open Instrument Brain candidate search prompt v0.1", () => {
     expect(prompt.userPrompt).toContain("ZE-RO doctrine");
   });
 
+  it("requires enum fields to be scalar strings and never arrays", () => {
+    expect(combined).toContain("Enum fields must be scalar strings, never arrays");
+    expect(combined).toContain("Never wrap enum values in arrays");
+    expect(combined).toContain(
+      "Arrays are invalid for candidateType, evidenceType, and falseFriendRisk",
+    );
+
+    expect(prompt.requiredOutputSchema).toMatchObject({
+      enumFieldsMustBeScalarStrings: true,
+      arraysAreInvalidForEnumFields: true,
+    });
+  });
+
+  it("forbids uppercase enum aliases from external terminology", () => {
+    for (const forbidden of [
+      "STRONG_LEXICAL",
+      "NULL_CANDIDATE",
+      "FALSE_FRIEND_RISK",
+    ]) {
+      expect(combined).toContain(forbidden);
+    }
+    expect(combined).toContain("Do not use uppercase enum aliases");
+  });
+
+  it("represents enum schema fields as scalar string descriptors, not direct arrays", () => {
+    const firstCandidate = (
+      prompt.requiredOutputSchema.chunkCandidates as Array<Record<string, unknown>>
+    )[0] as Record<string, unknown>;
+    const firstNullCandidate = (
+      prompt.requiredOutputSchema.nullCandidates as Array<Record<string, unknown>>
+    )[0] as Record<string, unknown>;
+
+    for (const field of ["candidateType", "evidenceType", "falseFriendRisk"]) {
+      expect(schemaJson).toContain(`"${field}"`);
+      expect(Array.isArray(firstCandidate[field])).toBe(false);
+      expect(Array.isArray(firstNullCandidate[field])).toBe(false);
+      expect(firstCandidate[field]).toMatchObject({
+        type: "string",
+        requiredScalar: true,
+        arraysAreInvalid: true,
+      });
+      expect(firstNullCandidate[field]).toMatchObject({
+        type: "string",
+        requiredScalar: true,
+        arraysAreInvalid: true,
+      });
+    }
+
+    expect(schemaJson).toContain('"allowedValues"');
+  });
+
+  it("requires exact segmentationId and exact Heart-approved chunk strings", () => {
+    expect(combined).toContain("copy the exact segmentationId");
+    expect(combined).toContain("use only exact chunk strings");
+    expect(combined).toContain("HEART_APPROVED_INPUT_JSON");
+  });
+
+  it("includes study segmentation 002 and its exact Heart chunks when built from that input", () => {
+    const studyStuDi = buildHeartChunkSegmentations("study").find(
+      (segmentation) => segmentation.segmentationId === "study.segmentation.002",
+    );
+    if (!studyStuDi) {
+      throw new Error("Expected study.segmentation.002 fixture.");
+    }
+
+    const segmentation002Prompt = buildBrainCandidateSearchPrompt(
+      brainInputFromHeartSegmentation(studyStuDi, targetLanguages),
+    );
+
+    expect(segmentation002Prompt.userPrompt).toContain("study.segmentation.002");
+    expect(segmentation002Prompt.userPrompt).toContain('"STU"');
+    expect(segmentation002Prompt.userPrompt).toContain('"DI"');
+  });
+
   it("sets claim boundary to no origin/scientific/publication claims", () => {
     expect(prompt.requiredOutputSchema.claimBoundary).toEqual({
       originClaim: false,
