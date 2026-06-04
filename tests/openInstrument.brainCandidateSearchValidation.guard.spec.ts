@@ -276,6 +276,110 @@ describe("Open Instrument Brain candidate search validation v0.1", () => {
     );
   });
 
+  it("fails null candidate missing segmentationId", () => {
+    const input = studyInput();
+    const output = validOutput(input);
+    output.nullCandidates = [
+      {
+        segmentationId: input.segmentationId,
+        chunk: "DI",
+        language: "Chinese",
+        candidateForm: "",
+        meaning: "",
+        functionFit: "",
+        sourceNote: "No credible candidate found.",
+        evidenceType: "none",
+        candidateType: "null_candidate",
+        falseFriendRisk: "none",
+        nullCandidate: true,
+        notes: "Absence recorded as evidence.",
+      } as BrainCandidateSearchOutput["nullCandidates"][number],
+    ];
+    delete (output.nullCandidates[0] as Record<string, unknown>).segmentationId;
+
+    const result = validateBrainCandidateSearchOutput({
+      heartInput: input,
+      brainOutput: output,
+    });
+
+    expect(result.ok).toBe(false);
+    expect(result.issues).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          code: "MISSING_FIELD",
+          path: "nullCandidates.0.segmentationId",
+        }),
+      ]),
+    );
+  });
+
+  it("fails null candidate wrong segmentationId", () => {
+    const input = studyInput();
+    const output = validOutput(input);
+    output.nullCandidates = [
+      {
+        segmentationId: "study.segmentation.WRONG",
+        chunk: "DI",
+        language: "Chinese",
+        candidateForm: "",
+        meaning: "",
+        functionFit: "",
+        sourceNote: "No credible candidate found.",
+        evidenceType: "none",
+        candidateType: "null_candidate",
+        falseFriendRisk: "none",
+        nullCandidate: true,
+        notes: "Absence recorded as evidence.",
+      } as BrainCandidateSearchOutput["nullCandidates"][number],
+    ];
+
+    const result = validateBrainCandidateSearchOutput({
+      heartInput: input,
+      brainOutput: output,
+    });
+
+    expect(result.ok).toBe(false);
+    expect(result.issues).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          code: "SEGMENTATION_ID_MISMATCH",
+          path: "nullCandidates.0.segmentationId",
+        }),
+      ]),
+    );
+  });
+
+  it("passes null candidate with exact segmentationId when all chunks are covered", () => {
+    const input = studyInput();
+    const output = validOutput(input);
+    output.nullCandidates = [
+      {
+        segmentationId: input.segmentationId,
+        chunk: "DI",
+        language: "Chinese",
+        candidateForm: "",
+        meaning: "",
+        functionFit: "",
+        sourceNote: "No credible candidate found.",
+        evidenceType: "none",
+        candidateType: "null_candidate",
+        falseFriendRisk: "none",
+        nullCandidate: true,
+        notes: "Absence recorded as evidence.",
+      } as BrainCandidateSearchOutput["nullCandidates"][number],
+    ];
+
+    const result = validateBrainCandidateSearchOutput({
+      heartInput: input,
+      brainOutput: output,
+    });
+
+    expect(result.ok).toBe(true);
+    expect(result.summary.checkedNullCandidates).toBe(1);
+    expect(result.summary.missingChunks).toEqual([]);
+    expect(result.summary.chunksCovered).toEqual(["SHTU", "DI"]);
+  });
+
   it("fails when a Heart chunk has no candidate or null candidate", () => {
     const output = validOutput();
     output.chunkCandidates = output.chunkCandidates.filter((candidate) => candidate.chunk !== "DI");
