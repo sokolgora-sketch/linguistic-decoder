@@ -103,6 +103,52 @@ describe("Open Instrument Brain candidate search prompt v0.1", () => {
     expect(schemaJson).toContain("null_candidate");
   });
 
+  it("requires null candidates to preserve exact traceability fields", () => {
+    expect(combined).toContain(
+      "nullCandidates follow the same traceability rules as chunkCandidates",
+    );
+    expect(combined).toContain("Every object in nullCandidates must include segmentationId");
+    expect(combined).toContain(
+      "Every nullCandidates[].segmentationId must exactly equal the Heart input segmentationId",
+    );
+    expect(combined).toContain("Never omit segmentationId from null candidates");
+    expect(combined).toContain("Never use a different segmentationId in null candidates");
+    expect(combined).toContain(
+      "Every null candidate must copy the exact Heart-approved chunk string",
+    );
+    expect(combined).toContain(
+      "Missing or mismatched segmentationId in any null candidate makes the entire Brain output invalid",
+    );
+    expect(combined).toContain(
+      "Null candidates are evidence of absence and must remain auditable",
+    );
+  });
+
+  it("keeps null candidate traceability reinforced for study.segmentation.004", () => {
+    const study004 = buildHeartChunkSegmentations("study").find(
+      (segmentation) => segmentation.segmentationId === "study.segmentation.004",
+    );
+    if (!study004) {
+      throw new Error("Expected study.segmentation.004 fixture.");
+    }
+
+    const prompt004 = buildBrainCandidateSearchPrompt(
+      brainInputFromHeartSegmentation(study004, targetLanguages),
+    );
+    const combined004 = `${prompt004.systemPrompt}\n${prompt004.userPrompt}`;
+
+    expect(combined004).toContain("study.segmentation.004");
+    expect(combined004).toContain('"S"');
+    expect(combined004).toContain('"TU"');
+    expect(combined004).toContain('"DI"');
+    expect(combined004).toContain(
+      "nullCandidates follow the same traceability rules as chunkCandidates",
+    );
+    expect(combined004).toContain(
+      "Every nullCandidates[].segmentationId must exactly equal the Heart input segmentationId",
+    );
+  });
+
   it("includes hard prohibitions", () => {
     for (const phrase of [
       "Do not create new segmentation",
