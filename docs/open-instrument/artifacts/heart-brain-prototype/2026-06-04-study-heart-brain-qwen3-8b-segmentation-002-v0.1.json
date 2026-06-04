@@ -1,0 +1,582 @@
+{
+  "archiveVersion": "v0.1",
+  "artifactType": "open-instrument-heart-brain-prototype",
+  "prototypeVersion": "study-heart-brain-qwen3-8b-segmentation-002-v0.1",
+  "createdAt": "2026-06-04T13:43:43.365Z",
+  "repo": {
+    "project": "ZË-RO",
+    "repository": "sokolgora-sketch/linguistic-decoder",
+    "commit": "75ae164a60d33dd01903fd72d3f0f54288904d75",
+    "branch": "docs/open-instrument-study-segmentation-002-prototype-v0.1",
+    "workingTree": "dirty"
+  },
+  "provider": {
+    "provider": "openai_compat",
+    "runtime": "ollama",
+    "baseUrl": "http://localhost:11434/v1",
+    "model": "qwen3:8b",
+    "apiKeyStored": false
+  },
+  "environment": {
+    "machine": "Apple M2",
+    "ramGb": 16,
+    "ollamaVersion": "ollama version is 0.24.0",
+    "ollamaList": "NAME           ID              SIZE      MODIFIED     \nqwen3:8b       500a1f067a9f    5.2 GB    10 hours ago    \nllama3.1:8b    46e0c10c039e    4.9 GB    47 hours ago"
+  },
+  "target": {
+    "word": "study",
+    "segmentationId": "study.segmentation.002",
+    "embryoMorphemes": [
+      "STU",
+      "DI"
+    ],
+    "currentImplementationField": "chunk"
+  },
+  "comparisonBaseline": {
+    "artifact": "docs/open-instrument/artifacts/heart-brain-prototype/2026-06-04-study-heart-brain-qwen3-8b-segmentation-003-v0.1.json",
+    "segmentationId": "study.segmentation.003",
+    "embryoMorphemes": [
+      "SHTU",
+      "DI"
+    ],
+    "parseOk": true,
+    "validationOk": true,
+    "checkedCandidates": 4,
+    "checkedNullCandidates": 1,
+    "chunksCovered": [
+      "SHTU",
+      "DI"
+    ],
+    "missingChunks": [],
+    "issueCount": 0
+  },
+  "heart": {
+    "segmentation": {
+      "segmentationId": "study.segmentation.002",
+      "word": "study",
+      "normalizedWord": "study",
+      "chunks": [
+        "STU",
+        "DI"
+      ],
+      "chunkVariants": [
+        {
+          "chunk": "DI",
+          "variantOf": "DY",
+          "legalTransform": "FINAL_Y_TO_I",
+          "notes": [
+            "DI is a final Y→I comparison variant of DY."
+          ]
+        }
+      ],
+      "voicePath": [
+        "U",
+        "I"
+      ],
+      "normalizationNotes": [
+        "Normalizes final Y to I only as an explicit comparison transform."
+      ],
+      "segmentationType": "vowel_anchor_split",
+      "legalTransforms": [
+        "FINAL_Y_TO_I"
+      ],
+      "functionHints": [
+        {
+          "voice": "U",
+          "hints": [
+            "container",
+            "inside",
+            "adding",
+            "holding",
+            "depth"
+          ],
+          "functionHintSource": "ZE-RO doctrine"
+        },
+        {
+          "voice": "I",
+          "hints": [
+            "insight",
+            "intellect",
+            "knowing",
+            "line/point"
+          ],
+          "functionHintSource": "ZE-RO doctrine"
+        }
+      ],
+      "status": "candidate_structure",
+      "riskNotes": [
+        "Final Y→I is explicit and must not be treated as automatic proof."
+      ]
+    },
+    "inputJson": {
+      "word": "study",
+      "normalizedWord": "study",
+      "segmentationId": "study.segmentation.002",
+      "chunks": [
+        "STU",
+        "DI"
+      ],
+      "chunkVariants": [
+        {
+          "chunk": "DI",
+          "variantOf": "DY",
+          "legalTransform": "FINAL_Y_TO_I",
+          "notes": [
+            "DI is a final Y→I comparison variant of DY."
+          ]
+        }
+      ],
+      "voicePath": [
+        "U",
+        "I"
+      ],
+      "legalTransforms": [
+        "FINAL_Y_TO_I"
+      ],
+      "normalizationNotes": [
+        "Normalizes final Y to I only as an explicit comparison transform."
+      ],
+      "functionHints": [
+        {
+          "voice": "U",
+          "hints": [
+            "container",
+            "inside",
+            "adding",
+            "holding",
+            "depth"
+          ],
+          "functionHintSource": "ZE-RO doctrine"
+        },
+        {
+          "voice": "I",
+          "hints": [
+            "insight",
+            "intellect",
+            "knowing",
+            "line/point"
+          ],
+          "functionHintSource": "ZE-RO doctrine"
+        }
+      ],
+      "targetLanguages": [
+        "Albanian",
+        "Latin",
+        "Greek",
+        "Sanskrit",
+        "Chinese",
+        "Germanic",
+        "Slavic",
+        "Semitic",
+        "Arabic",
+        "Finnish"
+      ],
+      "searchMode": "chunk_candidate_search_v0.1"
+    }
+  },
+  "brainPrompt": {
+    "systemPrompt": "You are the Brain in the Open Instrument Heart-to-Brain Candidate Search Protocol.\nReturn strict JSON only. No prose outside JSON.\nBrain searches candidate meanings only.\nBrain does not own segmentation, vowel path, legal transforms, validation, or origin verdict.\nUse only Heart-approved chunks and target languages.\nPreserve segmentationId exactly.\nPreserve chunks exactly. Do not create new segmentation. Do not reorder chunks.\nDo not invent transforms. Do not change vowel path.\nDo not claim origin. Do not treat resonance as proof.\nDo not hide nulls. If no credible candidate exists, return a null_candidate.\nEvery candidate must include candidateType, evidenceType, falseFriendRisk, nullCandidate, sourceNote, and notes.\nFunction hints are ZE-RO doctrine. Doctrine alignment is not external linguistic evidence.\nIf uncertain, use weak_resonance, likely_false_friend, high falseFriendRisk, or null_candidate.\nAllowed candidateType values: strong_living_match, historical_match, functional_resonance, phonetic_resonance, weak_resonance, likely_false_friend, null_candidate.\nAllowed evidenceType values: living_lexical, historical_etymology, dictionary_attested, phonetic_only, semantic_only, doctrine_alignment, none.\nAllowed falseFriendRisk values: none, low, medium, high.",
+    "userPrompt": "HEART_APPROVED_INPUT_JSON:\n{\n  \"word\": \"study\",\n  \"normalizedWord\": \"study\",\n  \"segmentationId\": \"study.segmentation.002\",\n  \"chunks\": [\n    \"STU\",\n    \"DI\"\n  ],\n  \"chunkVariants\": [\n    {\n      \"chunk\": \"DI\",\n      \"variantOf\": \"DY\",\n      \"legalTransform\": \"FINAL_Y_TO_I\",\n      \"notes\": [\n        \"DI is a final Y→I comparison variant of DY.\"\n      ]\n    }\n  ],\n  \"voicePath\": [\n    \"U\",\n    \"I\"\n  ],\n  \"legalTransforms\": [\n    \"FINAL_Y_TO_I\"\n  ],\n  \"normalizationNotes\": [\n    \"Normalizes final Y to I only as an explicit comparison transform.\"\n  ],\n  \"functionHints\": [\n    {\n      \"voice\": \"U\",\n      \"hints\": [\n        \"container\",\n        \"inside\",\n        \"adding\",\n        \"holding\",\n        \"depth\"\n      ],\n      \"functionHintSource\": \"ZE-RO doctrine\"\n    },\n    {\n      \"voice\": \"I\",\n      \"hints\": [\n        \"insight\",\n        \"intellect\",\n        \"knowing\",\n        \"line/point\"\n      ],\n      \"functionHintSource\": \"ZE-RO doctrine\"\n    }\n  ],\n  \"targetLanguages\": [\n    \"Albanian\",\n    \"Latin\",\n    \"Greek\",\n    \"Sanskrit\",\n    \"Chinese\",\n    \"Germanic\",\n    \"Slavic\",\n    \"Semitic\",\n    \"Arabic\",\n    \"Finnish\"\n  ],\n  \"searchMode\": \"chunk_candidate_search_v0.1\"\n}\nREQUIRED_OUTPUT_SCHEMA_JSON:\n{\n  \"word\": \"string\",\n  \"segmentationId\": \"string\",\n  \"chunkCandidates\": [\n    {\n      \"segmentationId\": \"string\",\n      \"chunk\": \"string\",\n      \"language\": \"string\",\n      \"candidateForm\": \"string\",\n      \"meaning\": \"string\",\n      \"functionFit\": \"string\",\n      \"sourceNote\": \"string\",\n      \"evidenceType\": [\n        \"living_lexical\",\n        \"historical_etymology\",\n        \"dictionary_attested\",\n        \"phonetic_only\",\n        \"semantic_only\",\n        \"doctrine_alignment\",\n        \"none\"\n      ],\n      \"candidateType\": [\n        \"strong_living_match\",\n        \"historical_match\",\n        \"functional_resonance\",\n        \"phonetic_resonance\",\n        \"weak_resonance\",\n        \"likely_false_friend\",\n        \"null_candidate\"\n      ],\n      \"falseFriendRisk\": [\n        \"none\",\n        \"low\",\n        \"medium\",\n        \"high\"\n      ],\n      \"nullCandidate\": \"boolean\",\n      \"notes\": \"string\"\n    }\n  ],\n  \"nullCandidates\": [\n    {\n      \"segmentationId\": \"string\",\n      \"chunk\": \"string\",\n      \"language\": \"string\",\n      \"candidateForm\": \"string\",\n      \"meaning\": \"string\",\n      \"functionFit\": \"string\",\n      \"sourceNote\": \"string\",\n      \"evidenceType\": \"none\",\n      \"candidateType\": \"null_candidate\",\n      \"falseFriendRisk\": \"none\",\n      \"nullCandidate\": true,\n      \"notes\": \"string\"\n    }\n  ],\n  \"warnings\": [\n    \"string\"\n  ],\n  \"claimBoundary\": {\n    \"originClaim\": false,\n    \"scientificEvidence\": false,\n    \"publicationEvidence\": false,\n    \"developmentCandidateSearchOnly\": true\n  }\n}\nTask: Search candidate meanings for each Heart-approved chunk across targetLanguages.\nReturn candidates and null candidates as strict JSON matching the required schema.\nDo not add prose.",
+    "inputJson": {
+      "word": "study",
+      "normalizedWord": "study",
+      "segmentationId": "study.segmentation.002",
+      "chunks": [
+        "STU",
+        "DI"
+      ],
+      "chunkVariants": [
+        {
+          "chunk": "DI",
+          "variantOf": "DY",
+          "legalTransform": "FINAL_Y_TO_I",
+          "notes": [
+            "DI is a final Y→I comparison variant of DY."
+          ]
+        }
+      ],
+      "voicePath": [
+        "U",
+        "I"
+      ],
+      "legalTransforms": [
+        "FINAL_Y_TO_I"
+      ],
+      "normalizationNotes": [
+        "Normalizes final Y to I only as an explicit comparison transform."
+      ],
+      "functionHints": [
+        {
+          "voice": "U",
+          "hints": [
+            "container",
+            "inside",
+            "adding",
+            "holding",
+            "depth"
+          ],
+          "functionHintSource": "ZE-RO doctrine"
+        },
+        {
+          "voice": "I",
+          "hints": [
+            "insight",
+            "intellect",
+            "knowing",
+            "line/point"
+          ],
+          "functionHintSource": "ZE-RO doctrine"
+        }
+      ],
+      "targetLanguages": [
+        "Albanian",
+        "Latin",
+        "Greek",
+        "Sanskrit",
+        "Chinese",
+        "Germanic",
+        "Slavic",
+        "Semitic",
+        "Arabic",
+        "Finnish"
+      ],
+      "searchMode": "chunk_candidate_search_v0.1"
+    },
+    "requiredOutputSchema": {
+      "word": "string",
+      "segmentationId": "string",
+      "chunkCandidates": [
+        {
+          "segmentationId": "string",
+          "chunk": "string",
+          "language": "string",
+          "candidateForm": "string",
+          "meaning": "string",
+          "functionFit": "string",
+          "sourceNote": "string",
+          "evidenceType": [
+            "living_lexical",
+            "historical_etymology",
+            "dictionary_attested",
+            "phonetic_only",
+            "semantic_only",
+            "doctrine_alignment",
+            "none"
+          ],
+          "candidateType": [
+            "strong_living_match",
+            "historical_match",
+            "functional_resonance",
+            "phonetic_resonance",
+            "weak_resonance",
+            "likely_false_friend",
+            "null_candidate"
+          ],
+          "falseFriendRisk": [
+            "none",
+            "low",
+            "medium",
+            "high"
+          ],
+          "nullCandidate": "boolean",
+          "notes": "string"
+        }
+      ],
+      "nullCandidates": [
+        {
+          "segmentationId": "string",
+          "chunk": "string",
+          "language": "string",
+          "candidateForm": "string",
+          "meaning": "string",
+          "functionFit": "string",
+          "sourceNote": "string",
+          "evidenceType": "none",
+          "candidateType": "null_candidate",
+          "falseFriendRisk": "none",
+          "nullCandidate": true,
+          "notes": "string"
+        }
+      ],
+      "warnings": [
+        "string"
+      ],
+      "claimBoundary": {
+        "originClaim": false,
+        "scientificEvidence": false,
+        "publicationEvidence": false,
+        "developmentCandidateSearchOnly": true
+      }
+    }
+  },
+  "modelCall": {
+    "attempt": 2,
+    "httpStatus": 200,
+    "rawContent": "{\n  \"word\": \"study\",\n  \"segmentationId\": \"study.segmentation.002\",\n  \"chunkCandidates\": [\n    {\n      \"segmentationId\": \"study.segmentation.002\",\n      \"chunk\": \"STU\",\n      \"language\": \"Latin\",\n      \"candidateForm\": \"studium\",\n      \"meaning\": \"study, pursuit of knowledge\",\n      \"functionFit\": \"container + insight\",\n      \"sourceNote\": \"Historical etymology\",\n      \"evidenceType\": [\n        \"historical_etymology\"\n      ],\n      \"candidateType\": [\n        \"historical_match\"\n      ],\n      \"falseFriendRisk\": [\n        \"low\"\n      ],\n      \"nullCandidate\": false,\n      \"notes\": \"Direct etymological root in Latin\"\n    },\n    {\n      \"segmentationId\": \"study.segmentation.002\",\n      \"chunk\": \"STU\",\n      \"language\": \"Germanic\",\n      \"candidateForm\": \"studian\",\n      \"meaning\": \"to study\",\n      \"functionFit\": \"adding + intellect\",\n      \"sourceNote\": \"Dictionary attested\",\n      \"evidenceType\": [\n        \"dictionary_attested\"\n      ],\n      \"candidateType\": [\n        \"functional_resonance\"\n      ],\n      \"falseFriendRisk\": [\n        \"medium\"\n      ],\n      \"nullCandidate\": false,\n      \"notes\": \"Old English/Germanic root\"\n    },\n    {\n      \"segmentationId\": \"study.segment,002\",\n      \"chunk\": \"DI\",\n      \"language\": \"Greek\",\n      \"candidateForm\": \"di\",\n      \"meaning\": \"through, via\",\n      \"functionFit\": \"line/point + insight\",\n      \"sourceNote\": \"Phonetic only\",\n      \"evidenceType\": [\n        \"phonetic_only\"\n      ],\n      \"candidateType\": [\n        \"weak_resonance\"\n      ],\n      \"falseFriendRisk\": [\n        \"high\"\n      ],\n      \"nullCandidate\": false,\n      \"notes\": \"Phonetic similarity to 'di' in Greek\"\n    },\n    {\n      \"segmentationId\": \"study.segmentation.002\",\n      \"chunk\": \"DI\",\n      \"language\": \"Semitic\",\n      \"candidateForm\": \"da\",\n      \"meaning\": \"to know\",\n      \"functionFit\": \"knowing + depth\",\n      \"sourceNote\": \"Doctrine alignment\",\n      \"evidenceType\": [\n        \"doctrine_alignment\"\n      ],\n      \"candidateType\": [\n        \"functional_resonance\"\n      ],\n      \"falseFriendRisk\": [\n        \"medium\"\n      ],\n      \"nullCandidate\": false,\n      \"notes\": \"ZE-RO function hints alignment\"\n    }\n  ],\n  \"nullCandidates\": [\n    {\n      \"segmentationId\": \"study.segmentation.002\",\n      \"chunk\": \"STU\",\n      \"language\": \"Chinese\",\n      \"candidateForm\": \"study\",\n      \"meaning\": \"none\",\n      \"functionFit\": \"none\",\n      \"sourceNote\": \"No direct cognate\",\n      \"evidenceType\": \"none\",\n      \"candidateType\": \"null_candidate\",\n      \"falseFriendRisk\": \"none\",\n      \"nullCandidate\": true,\n      \"notes\": \"No Heart-approved match\"\n    },\n    {\n      \"segmentationId\": \"study.segmentation.002\",\n      \"chunk\": \"DI\",\n      \"language\": \"Finnish\",\n      \"candidateForm\": \"di\",\n      \"meaning\": \"none\",\n      \"functionFit\": \"none\",\n      \"sourceNote\": \"No direct cognate\",\n      \"evidenceType\": \"none\",\n      \"candidateType\": \"null_candidate\",\n      \"falseFriendRisk\": \"none\",\n      \"nullCandidate\": true,\n      \"notes\": \"No Heart-approved match\"\n    }\n  ],\n  \"warnings\": [\n    \"No semantic overlap detected in Sanskrit/Arabic\"\n  ],\n  \"claimBoundary\": {\n    \"originClaim\": false,\n    \"scientificEvidence\": false,\n    \"publicationEvidence\": false,\n    \"developmentCandidateSearchOnly\": true\n  }\n}",
+    "rawApiResponseText": "{\"id\":\"chatcmpl-159\",\"object\":\"chat.completion\",\"created\":1780580623,\"model\":\"qwen3:8b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\n  \\\"word\\\": \\\"study\\\",\\n  \\\"segmentationId\\\": \\\"study.segmentation.002\\\",\\n  \\\"chunkCandidates\\\": [\\n    {\\n      \\\"segmentationId\\\": \\\"study.segmentation.002\\\",\\n      \\\"chunk\\\": \\\"STU\\\",\\n      \\\"language\\\": \\\"Latin\\\",\\n      \\\"candidateForm\\\": \\\"studium\\\",\\n      \\\"meaning\\\": \\\"study, pursuit of knowledge\\\",\\n      \\\"functionFit\\\": \\\"container + insight\\\",\\n      \\\"sourceNote\\\": \\\"Historical etymology\\\",\\n      \\\"evidenceType\\\": [\\n        \\\"historical_etymology\\\"\\n      ],\\n      \\\"candidateType\\\": [\\n        \\\"historical_match\\\"\\n      ],\\n      \\\"falseFriendRisk\\\": [\\n        \\\"low\\\"\\n      ],\\n      \\\"nullCandidate\\\": false,\\n      \\\"notes\\\": \\\"Direct etymological root in Latin\\\"\\n    },\\n    {\\n      \\\"segmentationId\\\": \\\"study.segmentation.002\\\",\\n      \\\"chunk\\\": \\\"STU\\\",\\n      \\\"language\\\": \\\"Germanic\\\",\\n      \\\"candidateForm\\\": \\\"studian\\\",\\n      \\\"meaning\\\": \\\"to study\\\",\\n      \\\"functionFit\\\": \\\"adding + intellect\\\",\\n      \\\"sourceNote\\\": \\\"Dictionary attested\\\",\\n      \\\"evidenceType\\\": [\\n        \\\"dictionary_attested\\\"\\n      ],\\n      \\\"candidateType\\\": [\\n        \\\"functional_resonance\\\"\\n      ],\\n      \\\"falseFriendRisk\\\": [\\n        \\\"medium\\\"\\n      ],\\n      \\\"nullCandidate\\\": false,\\n      \\\"notes\\\": \\\"Old English/Germanic root\\\"\\n    },\\n    {\\n      \\\"segmentationId\\\": \\\"study.segment,002\\\",\\n      \\\"chunk\\\": \\\"DI\\\",\\n      \\\"language\\\": \\\"Greek\\\",\\n      \\\"candidateForm\\\": \\\"di\\\",\\n      \\\"meaning\\\": \\\"through, via\\\",\\n      \\\"functionFit\\\": \\\"line/point + insight\\\",\\n      \\\"sourceNote\\\": \\\"Phonetic only\\\",\\n      \\\"evidenceType\\\": [\\n        \\\"phonetic_only\\\"\\n      ],\\n      \\\"candidateType\\\": [\\n        \\\"weak_resonance\\\"\\n      ],\\n      \\\"falseFriendRisk\\\": [\\n        \\\"high\\\"\\n      ],\\n      \\\"nullCandidate\\\": false,\\n      \\\"notes\\\": \\\"Phonetic similarity to 'di' in Greek\\\"\\n    },\\n    {\\n      \\\"segmentationId\\\": \\\"study.segmentation.002\\\",\\n      \\\"chunk\\\": \\\"DI\\\",\\n      \\\"language\\\": \\\"Semitic\\\",\\n      \\\"candidateForm\\\": \\\"da\\\",\\n      \\\"meaning\\\": \\\"to know\\\",\\n      \\\"functionFit\\\": \\\"knowing + depth\\\",\\n      \\\"sourceNote\\\": \\\"Doctrine alignment\\\",\\n      \\\"evidenceType\\\": [\\n        \\\"doctrine_alignment\\\"\\n      ],\\n      \\\"candidateType\\\": [\\n        \\\"functional_resonance\\\"\\n      ],\\n      \\\"falseFriendRisk\\\": [\\n        \\\"medium\\\"\\n      ],\\n      \\\"nullCandidate\\\": false,\\n      \\\"notes\\\": \\\"ZE-RO function hints alignment\\\"\\n    }\\n  ],\\n  \\\"nullCandidates\\\": [\\n    {\\n      \\\"segmentationId\\\": \\\"study.segmentation.002\\\",\\n      \\\"chunk\\\": \\\"STU\\\",\\n      \\\"language\\\": \\\"Chinese\\\",\\n      \\\"candidateForm\\\": \\\"study\\\",\\n      \\\"meaning\\\": \\\"none\\\",\\n      \\\"functionFit\\\": \\\"none\\\",\\n      \\\"sourceNote\\\": \\\"No direct cognate\\\",\\n      \\\"evidenceType\\\": \\\"none\\\",\\n      \\\"candidateType\\\": \\\"null_candidate\\\",\\n      \\\"falseFriendRisk\\\": \\\"none\\\",\\n      \\\"nullCandidate\\\": true,\\n      \\\"notes\\\": \\\"No Heart-approved match\\\"\\n    },\\n    {\\n      \\\"segmentationId\\\": \\\"study.segmentation.002\\\",\\n      \\\"chunk\\\": \\\"DI\\\",\\n      \\\"language\\\": \\\"Finnish\\\",\\n      \\\"candidateForm\\\": \\\"di\\\",\\n      \\\"meaning\\\": \\\"none\\\",\\n      \\\"functionFit\\\": \\\"none\\\",\\n      \\\"sourceNote\\\": \\\"No direct cognate\\\",\\n      \\\"evidenceType\\\": \\\"none\\\",\\n      \\\"candidateType\\\": \\\"null_candidate\\\",\\n      \\\"falseFriendRisk\\\": \\\"none\\\",\\n      \\\"nullCandidate\\\": true,\\n      \\\"notes\\\": \\\"No Heart-approved match\\\"\\n    }\\n  ],\\n  \\\"warnings\\\": [\\n    \\\"No semantic overlap detected in Sanskrit/Arabic\\\"\\n  ],\\n  \\\"claimBoundary\\\": {\\n    \\\"originClaim\\\": false,\\n    \\\"scientificEvidence\\\": false,\\n    \\\"publicationEvidence\\\": false,\\n    \\\"developmentCandidateSearchOnly\\\": true\\n  }\\n}\",\"reasoning\":\"Okay, let's tackle this. The user wants me to search for candidate meanings for each chunk in the Heart-approved input. The chunks are \\\"STU\\\" and \\\"DI\\\", with \\\"DI\\\" having a variant \\\"DY\\\" due to the FINAL_Y_TO_I transform. The target languages are a list including Albanian, Latin, Greek, Sanskrit, Chinese, Germanic, Slavic, Semitic, Arabic, and Finnish.\\n\\nFirst, I need to process each chunk separately. Starting with \\\"STU\\\". The function hints for \\\"U\\\" are container, inside, adding, holding, depth. For \\\"I\\\", it's insight, intellect, knowing, line/point. So combining these, \\\"STU\\\" might relate to something that holds or contains insight. Let me check each target language.\\n\\nFor Albanian, maybe \\\"stud\\\" (but not sure). Latin has \\\"studium\\\" meaning study, which fits. Greek \\\"studi\\\" might be related. Sanskrit \\\"stuti\\\" means praise, which is a stretch. Chinese might not have a direct match. Germanic languages like Old English \\\"studian\\\" (to study) is a historical match. Slavic languages might have roots in \\\"stud\\\" as in study. Semitic languages might not have a direct term. Arabic \\\"tadris\\\" is teaching, not exactly study. Finnish \\\"tutkia\\\" means to examine, which could be a functional resonance.\\n\\nNext, \\\"DI\\\" with variant \\\"DY\\\". The function hints for \\\"I\\\" are insight, intellect. So \\\"DI\\\" could mean something related to knowledge. In Latin, \\\"di\\\" is \\\"two\\\", but maybe not. Greek \\\"di\\\" is \\\"through\\\". In Germanic, \\\"dī\\\" might be a root. Slavic languages might have \\\"dij\\\" as a root. Semitic languages might have \\\"da\\\" as in \\\"to know\\\". Arabic \\\"dī\\\" could be related. Finnish \\\"di\\\" isn't common. Maybe some phonetic resonance here.\\n\\nNow, checking for null candidates where there's no match. For example, Chinese might not have a direct term for \\\"study\\\" in the chunks. Also, some languages might not have a direct equivalent, leading to null candidates.\\n\\nI need to structure each candidate with the required fields: segmentationId, chunk, language, candidateForm, meaning, functionFit, sourceNote, evidenceType, candidateType, falseFriendRisk, nullCandidate, and notes. Also, include nullCandidates where applicable.\\n\\nMake sure to follow the schema strictly, no prose, only JSON. Avoid any markdown. Check for any possible false friends or high falseFriendRisk. For example, if a language has a word that sounds similar but means something else, that's a false friend. But since the user said not to treat resonance as proof, focus on the evidence types provided.\\n\\nFinally, ensure that all chunks are covered, and the output matches the required schema exactly. No extra fields, correct data types, and proper nesting of arrays.\\n\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":1072,\"completion_tokens\":1485,\"total_tokens\":2557}}\n",
+    "responseJson": {
+      "id": "chatcmpl-159",
+      "object": "chat.completion",
+      "created": 1780580623,
+      "model": "qwen3:8b",
+      "system_fingerprint": "fp_ollama",
+      "choices": [
+        {
+          "index": 0,
+          "message": {
+            "role": "assistant",
+            "content": "{\n  \"word\": \"study\",\n  \"segmentationId\": \"study.segmentation.002\",\n  \"chunkCandidates\": [\n    {\n      \"segmentationId\": \"study.segmentation.002\",\n      \"chunk\": \"STU\",\n      \"language\": \"Latin\",\n      \"candidateForm\": \"studium\",\n      \"meaning\": \"study, pursuit of knowledge\",\n      \"functionFit\": \"container + insight\",\n      \"sourceNote\": \"Historical etymology\",\n      \"evidenceType\": [\n        \"historical_etymology\"\n      ],\n      \"candidateType\": [\n        \"historical_match\"\n      ],\n      \"falseFriendRisk\": [\n        \"low\"\n      ],\n      \"nullCandidate\": false,\n      \"notes\": \"Direct etymological root in Latin\"\n    },\n    {\n      \"segmentationId\": \"study.segmentation.002\",\n      \"chunk\": \"STU\",\n      \"language\": \"Germanic\",\n      \"candidateForm\": \"studian\",\n      \"meaning\": \"to study\",\n      \"functionFit\": \"adding + intellect\",\n      \"sourceNote\": \"Dictionary attested\",\n      \"evidenceType\": [\n        \"dictionary_attested\"\n      ],\n      \"candidateType\": [\n        \"functional_resonance\"\n      ],\n      \"falseFriendRisk\": [\n        \"medium\"\n      ],\n      \"nullCandidate\": false,\n      \"notes\": \"Old English/Germanic root\"\n    },\n    {\n      \"segmentationId\": \"study.segment,002\",\n      \"chunk\": \"DI\",\n      \"language\": \"Greek\",\n      \"candidateForm\": \"di\",\n      \"meaning\": \"through, via\",\n      \"functionFit\": \"line/point + insight\",\n      \"sourceNote\": \"Phonetic only\",\n      \"evidenceType\": [\n        \"phonetic_only\"\n      ],\n      \"candidateType\": [\n        \"weak_resonance\"\n      ],\n      \"falseFriendRisk\": [\n        \"high\"\n      ],\n      \"nullCandidate\": false,\n      \"notes\": \"Phonetic similarity to 'di' in Greek\"\n    },\n    {\n      \"segmentationId\": \"study.segmentation.002\",\n      \"chunk\": \"DI\",\n      \"language\": \"Semitic\",\n      \"candidateForm\": \"da\",\n      \"meaning\": \"to know\",\n      \"functionFit\": \"knowing + depth\",\n      \"sourceNote\": \"Doctrine alignment\",\n      \"evidenceType\": [\n        \"doctrine_alignment\"\n      ],\n      \"candidateType\": [\n        \"functional_resonance\"\n      ],\n      \"falseFriendRisk\": [\n        \"medium\"\n      ],\n      \"nullCandidate\": false,\n      \"notes\": \"ZE-RO function hints alignment\"\n    }\n  ],\n  \"nullCandidates\": [\n    {\n      \"segmentationId\": \"study.segmentation.002\",\n      \"chunk\": \"STU\",\n      \"language\": \"Chinese\",\n      \"candidateForm\": \"study\",\n      \"meaning\": \"none\",\n      \"functionFit\": \"none\",\n      \"sourceNote\": \"No direct cognate\",\n      \"evidenceType\": \"none\",\n      \"candidateType\": \"null_candidate\",\n      \"falseFriendRisk\": \"none\",\n      \"nullCandidate\": true,\n      \"notes\": \"No Heart-approved match\"\n    },\n    {\n      \"segmentationId\": \"study.segmentation.002\",\n      \"chunk\": \"DI\",\n      \"language\": \"Finnish\",\n      \"candidateForm\": \"di\",\n      \"meaning\": \"none\",\n      \"functionFit\": \"none\",\n      \"sourceNote\": \"No direct cognate\",\n      \"evidenceType\": \"none\",\n      \"candidateType\": \"null_candidate\",\n      \"falseFriendRisk\": \"none\",\n      \"nullCandidate\": true,\n      \"notes\": \"No Heart-approved match\"\n    }\n  ],\n  \"warnings\": [\n    \"No semantic overlap detected in Sanskrit/Arabic\"\n  ],\n  \"claimBoundary\": {\n    \"originClaim\": false,\n    \"scientificEvidence\": false,\n    \"publicationEvidence\": false,\n    \"developmentCandidateSearchOnly\": true\n  }\n}",
+            "reasoning": "Okay, let's tackle this. The user wants me to search for candidate meanings for each chunk in the Heart-approved input. The chunks are \"STU\" and \"DI\", with \"DI\" having a variant \"DY\" due to the FINAL_Y_TO_I transform. The target languages are a list including Albanian, Latin, Greek, Sanskrit, Chinese, Germanic, Slavic, Semitic, Arabic, and Finnish.\n\nFirst, I need to process each chunk separately. Starting with \"STU\". The function hints for \"U\" are container, inside, adding, holding, depth. For \"I\", it's insight, intellect, knowing, line/point. So combining these, \"STU\" might relate to something that holds or contains insight. Let me check each target language.\n\nFor Albanian, maybe \"stud\" (but not sure). Latin has \"studium\" meaning study, which fits. Greek \"studi\" might be related. Sanskrit \"stuti\" means praise, which is a stretch. Chinese might not have a direct match. Germanic languages like Old English \"studian\" (to study) is a historical match. Slavic languages might have roots in \"stud\" as in study. Semitic languages might not have a direct term. Arabic \"tadris\" is teaching, not exactly study. Finnish \"tutkia\" means to examine, which could be a functional resonance.\n\nNext, \"DI\" with variant \"DY\". The function hints for \"I\" are insight, intellect. So \"DI\" could mean something related to knowledge. In Latin, \"di\" is \"two\", but maybe not. Greek \"di\" is \"through\". In Germanic, \"dī\" might be a root. Slavic languages might have \"dij\" as a root. Semitic languages might have \"da\" as in \"to know\". Arabic \"dī\" could be related. Finnish \"di\" isn't common. Maybe some phonetic resonance here.\n\nNow, checking for null candidates where there's no match. For example, Chinese might not have a direct term for \"study\" in the chunks. Also, some languages might not have a direct equivalent, leading to null candidates.\n\nI need to structure each candidate with the required fields: segmentationId, chunk, language, candidateForm, meaning, functionFit, sourceNote, evidenceType, candidateType, falseFriendRisk, nullCandidate, and notes. Also, include nullCandidates where applicable.\n\nMake sure to follow the schema strictly, no prose, only JSON. Avoid any markdown. Check for any possible false friends or high falseFriendRisk. For example, if a language has a word that sounds similar but means something else, that's a false friend. But since the user said not to treat resonance as proof, focus on the evidence types provided.\n\nFinally, ensure that all chunks are covered, and the output matches the required schema exactly. No extra fields, correct data types, and proper nesting of arrays.\n"
+          },
+          "finish_reason": "stop"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1072,
+        "completion_tokens": 1485,
+        "total_tokens": 2557
+      }
+    }
+  },
+  "parsedBrainOutput": {
+    "parseOk": true,
+    "parseError": "",
+    "value": {
+      "word": "study",
+      "segmentationId": "study.segmentation.002",
+      "chunkCandidates": [
+        {
+          "segmentationId": "study.segmentation.002",
+          "chunk": "STU",
+          "language": "Latin",
+          "candidateForm": "studium",
+          "meaning": "study, pursuit of knowledge",
+          "functionFit": "container + insight",
+          "sourceNote": "Historical etymology",
+          "evidenceType": [
+            "historical_etymology"
+          ],
+          "candidateType": [
+            "historical_match"
+          ],
+          "falseFriendRisk": [
+            "low"
+          ],
+          "nullCandidate": false,
+          "notes": "Direct etymological root in Latin"
+        },
+        {
+          "segmentationId": "study.segmentation.002",
+          "chunk": "STU",
+          "language": "Germanic",
+          "candidateForm": "studian",
+          "meaning": "to study",
+          "functionFit": "adding + intellect",
+          "sourceNote": "Dictionary attested",
+          "evidenceType": [
+            "dictionary_attested"
+          ],
+          "candidateType": [
+            "functional_resonance"
+          ],
+          "falseFriendRisk": [
+            "medium"
+          ],
+          "nullCandidate": false,
+          "notes": "Old English/Germanic root"
+        },
+        {
+          "segmentationId": "study.segment,002",
+          "chunk": "DI",
+          "language": "Greek",
+          "candidateForm": "di",
+          "meaning": "through, via",
+          "functionFit": "line/point + insight",
+          "sourceNote": "Phonetic only",
+          "evidenceType": [
+            "phonetic_only"
+          ],
+          "candidateType": [
+            "weak_resonance"
+          ],
+          "falseFriendRisk": [
+            "high"
+          ],
+          "nullCandidate": false,
+          "notes": "Phonetic similarity to 'di' in Greek"
+        },
+        {
+          "segmentationId": "study.segmentation.002",
+          "chunk": "DI",
+          "language": "Semitic",
+          "candidateForm": "da",
+          "meaning": "to know",
+          "functionFit": "knowing + depth",
+          "sourceNote": "Doctrine alignment",
+          "evidenceType": [
+            "doctrine_alignment"
+          ],
+          "candidateType": [
+            "functional_resonance"
+          ],
+          "falseFriendRisk": [
+            "medium"
+          ],
+          "nullCandidate": false,
+          "notes": "ZE-RO function hints alignment"
+        }
+      ],
+      "nullCandidates": [
+        {
+          "segmentationId": "study.segmentation.002",
+          "chunk": "STU",
+          "language": "Chinese",
+          "candidateForm": "study",
+          "meaning": "none",
+          "functionFit": "none",
+          "sourceNote": "No direct cognate",
+          "evidenceType": "none",
+          "candidateType": "null_candidate",
+          "falseFriendRisk": "none",
+          "nullCandidate": true,
+          "notes": "No Heart-approved match"
+        },
+        {
+          "segmentationId": "study.segmentation.002",
+          "chunk": "DI",
+          "language": "Finnish",
+          "candidateForm": "di",
+          "meaning": "none",
+          "functionFit": "none",
+          "sourceNote": "No direct cognate",
+          "evidenceType": "none",
+          "candidateType": "null_candidate",
+          "falseFriendRisk": "none",
+          "nullCandidate": true,
+          "notes": "No Heart-approved match"
+        }
+      ],
+      "warnings": [
+        "No semantic overlap detected in Sanskrit/Arabic"
+      ],
+      "claimBoundary": {
+        "originClaim": false,
+        "scientificEvidence": false,
+        "publicationEvidence": false,
+        "developmentCandidateSearchOnly": true
+      }
+    }
+  },
+  "validation": {
+    "ok": false,
+    "issues": [
+      {
+        "code": "INVALID_CANDIDATE_TYPE",
+        "severity": "error",
+        "message": "candidateType must be one of the allowed Brain candidate types.",
+        "path": "chunkCandidates.0.candidateType"
+      },
+      {
+        "code": "INVALID_EVIDENCE_TYPE",
+        "severity": "error",
+        "message": "evidenceType must be one of the allowed Brain evidence types.",
+        "path": "chunkCandidates.0.evidenceType"
+      },
+      {
+        "code": "INVALID_FALSE_FRIEND_RISK",
+        "severity": "error",
+        "message": "falseFriendRisk must be one of the allowed values.",
+        "path": "chunkCandidates.0.falseFriendRisk"
+      },
+      {
+        "code": "INVALID_CANDIDATE_TYPE",
+        "severity": "error",
+        "message": "candidateType must be one of the allowed Brain candidate types.",
+        "path": "chunkCandidates.1.candidateType"
+      },
+      {
+        "code": "INVALID_EVIDENCE_TYPE",
+        "severity": "error",
+        "message": "evidenceType must be one of the allowed Brain evidence types.",
+        "path": "chunkCandidates.1.evidenceType"
+      },
+      {
+        "code": "INVALID_FALSE_FRIEND_RISK",
+        "severity": "error",
+        "message": "falseFriendRisk must be one of the allowed values.",
+        "path": "chunkCandidates.1.falseFriendRisk"
+      },
+      {
+        "code": "SEGMENTATION_ID_MISMATCH",
+        "severity": "error",
+        "message": "candidate segmentationId must match Heart input segmentationId.",
+        "path": "chunkCandidates.2.segmentationId"
+      },
+      {
+        "code": "INVALID_CANDIDATE_TYPE",
+        "severity": "error",
+        "message": "candidateType must be one of the allowed Brain candidate types.",
+        "path": "chunkCandidates.2.candidateType"
+      },
+      {
+        "code": "INVALID_EVIDENCE_TYPE",
+        "severity": "error",
+        "message": "evidenceType must be one of the allowed Brain evidence types.",
+        "path": "chunkCandidates.2.evidenceType"
+      },
+      {
+        "code": "INVALID_FALSE_FRIEND_RISK",
+        "severity": "error",
+        "message": "falseFriendRisk must be one of the allowed values.",
+        "path": "chunkCandidates.2.falseFriendRisk"
+      },
+      {
+        "code": "INVALID_CANDIDATE_TYPE",
+        "severity": "error",
+        "message": "candidateType must be one of the allowed Brain candidate types.",
+        "path": "chunkCandidates.3.candidateType"
+      },
+      {
+        "code": "INVALID_EVIDENCE_TYPE",
+        "severity": "error",
+        "message": "evidenceType must be one of the allowed Brain evidence types.",
+        "path": "chunkCandidates.3.evidenceType"
+      },
+      {
+        "code": "INVALID_FALSE_FRIEND_RISK",
+        "severity": "error",
+        "message": "falseFriendRisk must be one of the allowed values.",
+        "path": "chunkCandidates.3.falseFriendRisk"
+      }
+    ],
+    "summary": {
+      "checkedCandidates": 4,
+      "checkedNullCandidates": 2,
+      "chunksCovered": [
+        "STU",
+        "DI"
+      ],
+      "missingChunks": []
+    }
+  },
+  "redaction": {
+    "apiKeysStored": false,
+    "bearerTokensStored": false,
+    "fullEnvStored": false,
+    "notes": [
+      "Ollama local endpoint used.",
+      "No paid-provider API key stored.",
+      "No full environment dump stored."
+    ]
+  },
+  "claimBoundary": {
+    "scientificEvidence": false,
+    "publicationEvidence": false,
+    "evalEvidence": false,
+    "cohortEvidence": false,
+    "provesCandidateTruth": false,
+    "provesLanguageOrigin": false,
+    "defaultProviderChange": false,
+    "developmentPrototypeOnly": true
+  }
+}
