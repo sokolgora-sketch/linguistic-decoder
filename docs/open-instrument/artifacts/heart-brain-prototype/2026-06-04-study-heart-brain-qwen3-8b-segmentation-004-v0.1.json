@@ -1,0 +1,561 @@
+{
+  "archiveVersion": "v0.1",
+  "artifactType": "open-instrument-heart-brain-prototype",
+  "prototypeVersion": "study-heart-brain-qwen3-8b-segmentation-004-v0.1",
+  "createdAt": "2026-06-04T15:31:11.599Z",
+  "repo": {
+    "project": "ZË-RO",
+    "repository": "sokolgora-sketch/linguistic-decoder",
+    "commit": "c54c419d24d5f5f03010a0a6fe4670bda59bc4ef",
+    "branch": "docs/open-instrument-study-segmentation-004-prototype-v0.1",
+    "workingTree": "clean"
+  },
+  "provider": {
+    "provider": "openai_compat",
+    "runtime": "ollama",
+    "baseUrl": "http://localhost:11434/v1",
+    "model": "qwen3:8b",
+    "apiKeyStored": false
+  },
+  "environment": {
+    "machine": "Apple M2",
+    "ramGb": 16,
+    "ollamaVersion": "ollama version is 0.24.0",
+    "ollamaList": "NAME           ID              SIZE      MODIFIED     \nqwen3:8b       500a1f067a9f    5.2 GB    12 hours ago    \nllama3.1:8b    46e0c10c039e    4.9 GB    2 days ago"
+  },
+  "target": {
+    "word": "study",
+    "segmentationId": "study.segmentation.004",
+    "embryoMorphemes": [
+      "S",
+      "TU",
+      "DI"
+    ],
+    "currentImplementationField": "chunk"
+  },
+  "comparison": {
+    "baseline002": {
+      "artifact": "docs/open-instrument/artifacts/heart-brain-prototype/2026-06-04-study-heart-brain-qwen3-8b-segmentation-002-v0.2.json",
+      "segmentationId": "study.segmentation.002",
+      "embryoMorphemes": [
+        "STU",
+        "DI"
+      ],
+      "parseOk": true,
+      "validationOk": true,
+      "checkedCandidates": 2,
+      "checkedNullCandidates": 2,
+      "chunksCovered": [
+        "STU",
+        "DI"
+      ],
+      "missingChunks": [],
+      "issueCount": 0
+    },
+    "baseline003": {
+      "artifact": "docs/open-instrument/artifacts/heart-brain-prototype/2026-06-04-study-heart-brain-qwen3-8b-segmentation-003-v0.1.json",
+      "segmentationId": "study.segmentation.003",
+      "embryoMorphemes": [
+        "SHTU",
+        "DI"
+      ],
+      "parseOk": true,
+      "validationOk": true,
+      "checkedCandidates": 4,
+      "checkedNullCandidates": 1,
+      "chunksCovered": [
+        "SHTU",
+        "DI"
+      ],
+      "missingChunks": [],
+      "issueCount": 0
+    },
+    "review002": "docs/open-instrument/study-segmentation-002-v0.2-prototype-review-v0.1.md",
+    "approvedBy": {
+      "pr": 1175,
+      "target": "study.segmentation.004 / S + TU + DI"
+    }
+  },
+  "heart": {
+    "segmentation": {
+      "segmentationId": "study.segmentation.004",
+      "word": "study",
+      "normalizedWord": "study",
+      "chunks": [
+        "S",
+        "TU",
+        "DI"
+      ],
+      "chunkVariants": [
+        {
+          "chunk": "DI",
+          "variantOf": "DY",
+          "legalTransform": "FINAL_Y_TO_I",
+          "notes": [
+            "DI is a final Y→I comparison variant of DY."
+          ]
+        }
+      ],
+      "voicePath": [
+        "U",
+        "I"
+      ],
+      "normalizationNotes": [
+        "Splits consonant-only prefix material from vowel-bearing chunks."
+      ],
+      "segmentationType": "micro_chunk_split",
+      "legalTransforms": [
+        "FINAL_Y_TO_I"
+      ],
+      "functionHints": [
+        {
+          "voice": "U",
+          "hints": [
+            "container",
+            "inside",
+            "adding",
+            "holding",
+            "depth"
+          ],
+          "functionHintSource": "ZE-RO doctrine"
+        },
+        {
+          "voice": "I",
+          "hints": [
+            "insight",
+            "intellect",
+            "knowing",
+            "line/point"
+          ],
+          "functionHintSource": "ZE-RO doctrine"
+        }
+      ],
+      "status": "candidate_structure",
+      "riskNotes": [
+        "S is consonant-only prefix/material and short chunks increase false-positive risk."
+      ]
+    },
+    "inputJson": {
+      "word": "study",
+      "normalizedWord": "study",
+      "segmentationId": "study.segmentation.004",
+      "chunks": [
+        "S",
+        "TU",
+        "DI"
+      ],
+      "chunkVariants": [
+        {
+          "chunk": "DI",
+          "variantOf": "DY",
+          "legalTransform": "FINAL_Y_TO_I",
+          "notes": [
+            "DI is a final Y→I comparison variant of DY."
+          ]
+        }
+      ],
+      "voicePath": [
+        "U",
+        "I"
+      ],
+      "legalTransforms": [
+        "FINAL_Y_TO_I"
+      ],
+      "normalizationNotes": [
+        "Splits consonant-only prefix material from vowel-bearing chunks."
+      ],
+      "functionHints": [
+        {
+          "voice": "U",
+          "hints": [
+            "container",
+            "inside",
+            "adding",
+            "holding",
+            "depth"
+          ],
+          "functionHintSource": "ZE-RO doctrine"
+        },
+        {
+          "voice": "I",
+          "hints": [
+            "insight",
+            "intellect",
+            "knowing",
+            "line/point"
+          ],
+          "functionHintSource": "ZE-RO doctrine"
+        }
+      ],
+      "targetLanguages": [
+        "Albanian",
+        "Latin",
+        "Greek",
+        "Sanskrit",
+        "Chinese",
+        "Germanic",
+        "Slavic",
+        "Semitic",
+        "Arabic",
+        "Finnish"
+      ],
+      "searchMode": "chunk_candidate_search_v0.1"
+    }
+  },
+  "brainPrompt": {
+    "systemPrompt": "You are the Brain in the Open Instrument Heart-to-Brain Candidate Search Protocol.\nReturn strict JSON only. No prose outside JSON.\nBrain searches candidate meanings only.\nBrain does not own segmentation, vowel path, legal transforms, validation, or origin verdict.\nUse only Heart-approved chunks and target languages.\nPreserve segmentationId exactly.\nPreserve chunks exactly. Do not create new segmentation. Do not reorder chunks.\nDo not invent transforms. Do not change vowel path.\nDo not claim origin. Do not treat resonance as proof.\nDo not hide nulls. If no credible candidate exists, return a null_candidate.\nEvery candidate must include candidateType, evidenceType, falseFriendRisk, nullCandidate, sourceNote, and notes.\nEnum fields must be scalar strings, never arrays.\ncandidateType must be exactly one lowercase string copied from the allowed candidateType list.\nevidenceType must be exactly one lowercase string copied from the allowed evidenceType list.\nfalseFriendRisk must be exactly one lowercase string copied from the allowed falseFriendRisk list.\nNever wrap enum values in arrays. Arrays are invalid for candidateType, evidenceType, and falseFriendRisk.\nDo not use uppercase enum aliases such as STRONG_LEXICAL, NULL_CANDIDATE, or FALSE_FRIEND_RISK.\nDo not use prose labels or near-synonyms as enum values.\nEvery candidate and null candidate must copy the exact segmentationId from HEART_APPROVED_INPUT_JSON.\nEvery candidate and null candidate must use only exact chunk strings from HEART_APPROVED_INPUT_JSON.\nFor null candidates, use exactly: candidateType=\"null_candidate\", evidenceType=\"none\", falseFriendRisk=\"none\", nullCandidate=true.\nFunction hints are ZE-RO doctrine. Doctrine alignment is not external linguistic evidence.\nIf uncertain, use scalar strings: candidateType=\"weak_resonance\" or candidateType=\"null_candidate\"; evidenceType=\"none\" if null; falseFriendRisk=\"high\" if risky.\nAllowed candidateType values: strong_living_match, historical_match, functional_resonance, phonetic_resonance, weak_resonance, likely_false_friend, null_candidate.\nAllowed evidenceType values: living_lexical, historical_etymology, dictionary_attested, phonetic_only, semantic_only, doctrine_alignment, none.\nAllowed falseFriendRisk values: none, low, medium, high.",
+    "userPrompt": "HEART_APPROVED_INPUT_JSON:\n{\n  \"word\": \"study\",\n  \"normalizedWord\": \"study\",\n  \"segmentationId\": \"study.segmentation.004\",\n  \"chunks\": [\n    \"S\",\n    \"TU\",\n    \"DI\"\n  ],\n  \"chunkVariants\": [\n    {\n      \"chunk\": \"DI\",\n      \"variantOf\": \"DY\",\n      \"legalTransform\": \"FINAL_Y_TO_I\",\n      \"notes\": [\n        \"DI is a final Y→I comparison variant of DY.\"\n      ]\n    }\n  ],\n  \"voicePath\": [\n    \"U\",\n    \"I\"\n  ],\n  \"legalTransforms\": [\n    \"FINAL_Y_TO_I\"\n  ],\n  \"normalizationNotes\": [\n    \"Splits consonant-only prefix material from vowel-bearing chunks.\"\n  ],\n  \"functionHints\": [\n    {\n      \"voice\": \"U\",\n      \"hints\": [\n        \"container\",\n        \"inside\",\n        \"adding\",\n        \"holding\",\n        \"depth\"\n      ],\n      \"functionHintSource\": \"ZE-RO doctrine\"\n    },\n    {\n      \"voice\": \"I\",\n      \"hints\": [\n        \"insight\",\n        \"intellect\",\n        \"knowing\",\n        \"line/point\"\n      ],\n      \"functionHintSource\": \"ZE-RO doctrine\"\n    }\n  ],\n  \"targetLanguages\": [\n    \"Albanian\",\n    \"Latin\",\n    \"Greek\",\n    \"Sanskrit\",\n    \"Chinese\",\n    \"Germanic\",\n    \"Slavic\",\n    \"Semitic\",\n    \"Arabic\",\n    \"Finnish\"\n  ],\n  \"searchMode\": \"chunk_candidate_search_v0.1\"\n}\nREQUIRED_OUTPUT_SCHEMA_JSON:\n{\n  \"enumFieldsMustBeScalarStrings\": true,\n  \"arraysAreInvalidForEnumFields\": true,\n  \"word\": \"string\",\n  \"segmentationId\": \"string\",\n  \"chunkCandidates\": [\n    {\n      \"segmentationId\": \"string\",\n      \"chunk\": \"string\",\n      \"language\": \"string\",\n      \"candidateForm\": \"string\",\n      \"meaning\": \"string\",\n      \"functionFit\": \"string\",\n      \"sourceNote\": \"string\",\n      \"evidenceType\": {\n        \"type\": \"string\",\n        \"requiredScalar\": true,\n        \"arraysAreInvalid\": true,\n        \"allowedValues\": [\n          \"living_lexical\",\n          \"historical_etymology\",\n          \"dictionary_attested\",\n          \"phonetic_only\",\n          \"semantic_only\",\n          \"doctrine_alignment\",\n          \"none\"\n        ]\n      },\n      \"candidateType\": {\n        \"type\": \"string\",\n        \"requiredScalar\": true,\n        \"arraysAreInvalid\": true,\n        \"allowedValues\": [\n          \"strong_living_match\",\n          \"historical_match\",\n          \"functional_resonance\",\n          \"phonetic_resonance\",\n          \"weak_resonance\",\n          \"likely_false_friend\",\n          \"null_candidate\"\n        ]\n      },\n      \"falseFriendRisk\": {\n        \"type\": \"string\",\n        \"requiredScalar\": true,\n        \"arraysAreInvalid\": true,\n        \"allowedValues\": [\n          \"none\",\n          \"low\",\n          \"medium\",\n          \"high\"\n        ]\n      },\n      \"nullCandidate\": \"boolean\",\n      \"notes\": \"string\"\n    }\n  ],\n  \"nullCandidates\": [\n    {\n      \"segmentationId\": \"string\",\n      \"chunk\": \"string\",\n      \"language\": \"string\",\n      \"candidateForm\": \"string\",\n      \"meaning\": \"string\",\n      \"functionFit\": \"string\",\n      \"sourceNote\": \"string\",\n      \"evidenceType\": {\n        \"type\": \"string\",\n        \"requiredScalar\": true,\n        \"arraysAreInvalid\": true,\n        \"allowedValues\": [\n          \"none\"\n        ]\n      },\n      \"candidateType\": {\n        \"type\": \"string\",\n        \"requiredScalar\": true,\n        \"arraysAreInvalid\": true,\n        \"allowedValues\": [\n          \"null_candidate\"\n        ]\n      },\n      \"falseFriendRisk\": {\n        \"type\": \"string\",\n        \"requiredScalar\": true,\n        \"arraysAreInvalid\": true,\n        \"allowedValues\": [\n          \"none\"\n        ]\n      },\n      \"nullCandidate\": true,\n      \"notes\": \"string\"\n    }\n  ],\n  \"warnings\": [\n    \"string\"\n  ],\n  \"claimBoundary\": {\n    \"originClaim\": false,\n    \"scientificEvidence\": false,\n    \"publicationEvidence\": false,\n    \"developmentCandidateSearchOnly\": true\n  }\n}\nTask: Search candidate meanings for each Heart-approved chunk across targetLanguages.\nReturn candidates and null candidates as strict JSON matching the required schema.\nDo not add prose.",
+    "inputJson": {
+      "word": "study",
+      "normalizedWord": "study",
+      "segmentationId": "study.segmentation.004",
+      "chunks": [
+        "S",
+        "TU",
+        "DI"
+      ],
+      "chunkVariants": [
+        {
+          "chunk": "DI",
+          "variantOf": "DY",
+          "legalTransform": "FINAL_Y_TO_I",
+          "notes": [
+            "DI is a final Y→I comparison variant of DY."
+          ]
+        }
+      ],
+      "voicePath": [
+        "U",
+        "I"
+      ],
+      "legalTransforms": [
+        "FINAL_Y_TO_I"
+      ],
+      "normalizationNotes": [
+        "Splits consonant-only prefix material from vowel-bearing chunks."
+      ],
+      "functionHints": [
+        {
+          "voice": "U",
+          "hints": [
+            "container",
+            "inside",
+            "adding",
+            "holding",
+            "depth"
+          ],
+          "functionHintSource": "ZE-RO doctrine"
+        },
+        {
+          "voice": "I",
+          "hints": [
+            "insight",
+            "intellect",
+            "knowing",
+            "line/point"
+          ],
+          "functionHintSource": "ZE-RO doctrine"
+        }
+      ],
+      "targetLanguages": [
+        "Albanian",
+        "Latin",
+        "Greek",
+        "Sanskrit",
+        "Chinese",
+        "Germanic",
+        "Slavic",
+        "Semitic",
+        "Arabic",
+        "Finnish"
+      ],
+      "searchMode": "chunk_candidate_search_v0.1"
+    },
+    "requiredOutputSchema": {
+      "enumFieldsMustBeScalarStrings": true,
+      "arraysAreInvalidForEnumFields": true,
+      "word": "string",
+      "segmentationId": "string",
+      "chunkCandidates": [
+        {
+          "segmentationId": "string",
+          "chunk": "string",
+          "language": "string",
+          "candidateForm": "string",
+          "meaning": "string",
+          "functionFit": "string",
+          "sourceNote": "string",
+          "evidenceType": {
+            "type": "string",
+            "requiredScalar": true,
+            "arraysAreInvalid": true,
+            "allowedValues": [
+              "living_lexical",
+              "historical_etymology",
+              "dictionary_attested",
+              "phonetic_only",
+              "semantic_only",
+              "doctrine_alignment",
+              "none"
+            ]
+          },
+          "candidateType": {
+            "type": "string",
+            "requiredScalar": true,
+            "arraysAreInvalid": true,
+            "allowedValues": [
+              "strong_living_match",
+              "historical_match",
+              "functional_resonance",
+              "phonetic_resonance",
+              "weak_resonance",
+              "likely_false_friend",
+              "null_candidate"
+            ]
+          },
+          "falseFriendRisk": {
+            "type": "string",
+            "requiredScalar": true,
+            "arraysAreInvalid": true,
+            "allowedValues": [
+              "none",
+              "low",
+              "medium",
+              "high"
+            ]
+          },
+          "nullCandidate": "boolean",
+          "notes": "string"
+        }
+      ],
+      "nullCandidates": [
+        {
+          "segmentationId": "string",
+          "chunk": "string",
+          "language": "string",
+          "candidateForm": "string",
+          "meaning": "string",
+          "functionFit": "string",
+          "sourceNote": "string",
+          "evidenceType": {
+            "type": "string",
+            "requiredScalar": true,
+            "arraysAreInvalid": true,
+            "allowedValues": [
+              "none"
+            ]
+          },
+          "candidateType": {
+            "type": "string",
+            "requiredScalar": true,
+            "arraysAreInvalid": true,
+            "allowedValues": [
+              "null_candidate"
+            ]
+          },
+          "falseFriendRisk": {
+            "type": "string",
+            "requiredScalar": true,
+            "arraysAreInvalid": true,
+            "allowedValues": [
+              "none"
+            ]
+          },
+          "nullCandidate": true,
+          "notes": "string"
+        }
+      ],
+      "warnings": [
+        "string"
+      ],
+      "claimBoundary": {
+        "originClaim": false,
+        "scientificEvidence": false,
+        "publicationEvidence": false,
+        "developmentCandidateSearchOnly": true
+      }
+    }
+  },
+  "modelCall": {
+    "attempt": 1,
+    "httpStatus": 200,
+    "rawContent": "{\n  \"word\": \"study\",\n  \"segmentationId\": \"study.segmentation.004\",\n  \"chunkCandidates\": [\n    {\n      \"segmentationId\": \"study.segmentation.004\",\n      \"chunk\": \"S\",\n      \"language\": \"Germanic\",\n      \"candidateForm\": \"S\",\n      \"meaning\": \"container\",\n      \"functionFit\": \"ZE-RO doctrine container\",\n      \"sourceNote\": \"Function hint alignment\",\n      \"evidenceType\": \"doctrine_alignment\",\n      \"candidateType\": \"weak_resonance\",\n      \"falseFriendRisk\": \"medium\",\n      \"nullCandidate\": false,\n      \"notes\": \"Function hint resonance with ZE-RO doctrine\"\n    },\n    {\n      \"segmentationId\": \"study.segmentation.004\",\n      \"chunk\": \"TU\",\n      \"language\": \"Latin\",\n      \"candidateForm\": \"tu\",\n      \"meaning\": \"you\",\n      \"functionFit\": \"container\",\n      \"sourceNote\": \"Function hint alignment\",\n      \"evidenceType\": \"phonetic_only\",\n      \"candidateType\": \"weak_resonance\",\n      \"falseFriendRisk\": \"high\",\n      \"nullCandidate\": false,\n      \"notes\": \"Phonetic similarity to Latin 'tu'\"\n    },\n    {\n      \"segmentationId\": \"study.segmentation.004\",\n      \"chunk\": \"DI\",\n      \"language\": \"Greek\",\n      \"candidateForm\": \"di\",\n      \"meaning\": \"to give\",\n      \"functionFit\": \"insight\",\n      \"sourceNote\": \"Function hint alignment\",\n      \"evidenceType\": \"phonetic_only\",\n      \"candidateType\": \"weak_resonance\",\n      \"falseFriendRisk\": \"medium\",\n      \"nullCandidate\": false,\n      \"notes\": \"Phonetic similarity to Greek 'dō' (to give)\"\n    }\n  ],\n  \"nullCandidates\": [\n    {\n      \"segmentationId\": \"study.segmentation.004\",\n      \"chunk\": \"S\",\n      \"language\": \"Sanskrit\",\n      \"candidateForm\": \"S\",\n      \"meaning\": \"null\",\n      \"functionFit\": \"none\",\n      \"sourceNote\": \"No linguistic match\",\n      \"evidenceType\": \"none\",\n      \"candidateType\": \"null_candidate\",\n      \"falseFriendRisk\": \"none\",\n      \"nullCandidate\": true,\n      \"notes\": \"No credible candidate found\"\n    },\n    {\n      \"segmentationId\": \"study.segmentation.004\",\n      \"chunk\": \"TU\",\n      \"language\": \"Chinese\",\n      \"candidateForm\": \"TU\",\n      \"meaning\": \"null\",\n      \"functionFit\": \"none\",\n      \"sourceNote\": \"No linguistic match\",\n      \"evidenceType\": \"none\",\n      \"candidateType\": \"null_candidate\",\n      \"falseFriendRisk\": \"none\",\n      \"nullCandidate\": true,\n      \"notes\": \"No credible candidate found\"\n    },\n    {\n      \"segmentation,Id\": \"study.segmentation.004\",\n      \"chunk\": \"DI\",\n      \"language\": \"Arabic\",\n      \"candidateForm\": \"DI\",\n      \"meaning\": \"null\",\n      \"functionFit\": \"none\",\n      \"sourceNote\": \"No linguistic match\",\n      \"evidenceType\": \"none\",\n      \"candidateType\": \"null_candidate\",\n      \"falseFriendRisk\": \"none\",\n      \"nullCandidate\": true,\n      \"notes\": \"No credible candidate found\"\n    }\n  ],\n  \"warnings\": [\n    \"Function hints may not align with target language semantics\",\n    \"Phonetic resonances lack lexical attestation\"\n  ],\n  \"claimBoundary\": {\n    \"originClaim\": false,\n    \"scientificEvidence\": false,\n    \"publicationEvidence\": false,\n    \"developmentCandidateSearchOnly\": true\n  }\n}",
+    "rawApiResponseText": "{\"id\":\"chatcmpl-221\",\"object\":\"chat.completion\",\"created\":1780587071,\"model\":\"qwen3:8b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\n  \\\"word\\\": \\\"study\\\",\\n  \\\"segmentationId\\\": \\\"study.segmentation.004\\\",\\n  \\\"chunkCandidates\\\": [\\n    {\\n      \\\"segmentationId\\\": \\\"study.segmentation.004\\\",\\n      \\\"chunk\\\": \\\"S\\\",\\n      \\\"language\\\": \\\"Germanic\\\",\\n      \\\"candidateForm\\\": \\\"S\\\",\\n      \\\"meaning\\\": \\\"container\\\",\\n      \\\"functionFit\\\": \\\"ZE-RO doctrine container\\\",\\n      \\\"sourceNote\\\": \\\"Function hint alignment\\\",\\n      \\\"evidenceType\\\": \\\"doctrine_alignment\\\",\\n      \\\"candidateType\\\": \\\"weak_resonance\\\",\\n      \\\"falseFriendRisk\\\": \\\"medium\\\",\\n      \\\"nullCandidate\\\": false,\\n      \\\"notes\\\": \\\"Function hint resonance with ZE-RO doctrine\\\"\\n    },\\n    {\\n      \\\"segmentationId\\\": \\\"study.segmentation.004\\\",\\n      \\\"chunk\\\": \\\"TU\\\",\\n      \\\"language\\\": \\\"Latin\\\",\\n      \\\"candidateForm\\\": \\\"tu\\\",\\n      \\\"meaning\\\": \\\"you\\\",\\n      \\\"functionFit\\\": \\\"container\\\",\\n      \\\"sourceNote\\\": \\\"Function hint alignment\\\",\\n      \\\"evidenceType\\\": \\\"phonetic_only\\\",\\n      \\\"candidateType\\\": \\\"weak_resonance\\\",\\n      \\\"falseFriendRisk\\\": \\\"high\\\",\\n      \\\"nullCandidate\\\": false,\\n      \\\"notes\\\": \\\"Phonetic similarity to Latin 'tu'\\\"\\n    },\\n    {\\n      \\\"segmentationId\\\": \\\"study.segmentation.004\\\",\\n      \\\"chunk\\\": \\\"DI\\\",\\n      \\\"language\\\": \\\"Greek\\\",\\n      \\\"candidateForm\\\": \\\"di\\\",\\n      \\\"meaning\\\": \\\"to give\\\",\\n      \\\"functionFit\\\": \\\"insight\\\",\\n      \\\"sourceNote\\\": \\\"Function hint alignment\\\",\\n      \\\"evidenceType\\\": \\\"phonetic_only\\\",\\n      \\\"candidateType\\\": \\\"weak_resonance\\\",\\n      \\\"falseFriendRisk\\\": \\\"medium\\\",\\n      \\\"nullCandidate\\\": false,\\n      \\\"notes\\\": \\\"Phonetic similarity to Greek 'dō' (to give)\\\"\\n    }\\n  ],\\n  \\\"nullCandidates\\\": [\\n    {\\n      \\\"segmentationId\\\": \\\"study.segmentation.004\\\",\\n      \\\"chunk\\\": \\\"S\\\",\\n      \\\"language\\\": \\\"Sanskrit\\\",\\n      \\\"candidateForm\\\": \\\"S\\\",\\n      \\\"meaning\\\": \\\"null\\\",\\n      \\\"functionFit\\\": \\\"none\\\",\\n      \\\"sourceNote\\\": \\\"No linguistic match\\\",\\n      \\\"evidenceType\\\": \\\"none\\\",\\n      \\\"candidateType\\\": \\\"null_candidate\\\",\\n      \\\"falseFriendRisk\\\": \\\"none\\\",\\n      \\\"nullCandidate\\\": true,\\n      \\\"notes\\\": \\\"No credible candidate found\\\"\\n    },\\n    {\\n      \\\"segmentationId\\\": \\\"study.segmentation.004\\\",\\n      \\\"chunk\\\": \\\"TU\\\",\\n      \\\"language\\\": \\\"Chinese\\\",\\n      \\\"candidateForm\\\": \\\"TU\\\",\\n      \\\"meaning\\\": \\\"null\\\",\\n      \\\"functionFit\\\": \\\"none\\\",\\n      \\\"sourceNote\\\": \\\"No linguistic match\\\",\\n      \\\"evidenceType\\\": \\\"none\\\",\\n      \\\"candidateType\\\": \\\"null_candidate\\\",\\n      \\\"falseFriendRisk\\\": \\\"none\\\",\\n      \\\"nullCandidate\\\": true,\\n      \\\"notes\\\": \\\"No credible candidate found\\\"\\n    },\\n    {\\n      \\\"segmentation,Id\\\": \\\"study.segmentation.004\\\",\\n      \\\"chunk\\\": \\\"DI\\\",\\n      \\\"language\\\": \\\"Arabic\\\",\\n      \\\"candidateForm\\\": \\\"DI\\\",\\n      \\\"meaning\\\": \\\"null\\\",\\n      \\\"functionFit\\\": \\\"none\\\",\\n      \\\"sourceNote\\\": \\\"No linguistic match\\\",\\n      \\\"evidenceType\\\": \\\"none\\\",\\n      \\\"candidateType\\\": \\\"null_candidate\\\",\\n      \\\"falseFriendRisk\\\": \\\"none\\\",\\n      \\\"nullCandidate\\\": true,\\n      \\\"notes\\\": \\\"No credible candidate found\\\"\\n    }\\n  ],\\n  \\\"warnings\\\": [\\n    \\\"Function hints may not align with target language semantics\\\",\\n    \\\"Phonetic resonances lack lexical attestation\\\"\\n  ],\\n  \\\"claimBoundary\\\": {\\n    \\\"originClaim\\\": false,\\n    \\\"scientificEvidence\\\": false,\\n    \\\"publicationEvidence\\\": false,\\n    \\\"developmentCandidateSearchOnly\\\": true\\n  }\\n}\",\"reasoning\":\"Okay, let's tackle this query. The user wants me to act as the Brain in the Open Instrument Heart-to-Brain Candidate Search Protocol. My task is to search for candidate meanings for each chunk in the given word \\\"study\\\" across the target languages provided. The output needs to be strict JSON following the required schema.\\n\\nFirst, I need to understand the input data. The segmentationId is \\\"study.segmentation.004\\\" with chunks [\\\"S\\\", \\\"TU\\\", \\\"DI\\\"]. There's a chunk variant for \\\"DI\\\" as a final Y→I comparison of \\\"DY\\\". The voicePath has \\\"U\\\" and \\\"I\\\", with function hints from the ZE-RO doctrine. The target languages include Albanian, Latin, Greek, Sanskrit, Chinese, Germanic, Slavic, Semitic, Arabic, and Finnish.\\n\\nI need to check each chunk against these languages. Let's start with the first chunk \\\"S\\\". The function hints for \\\"U\\\" are container, inside, adding, holding, depth. For \\\"I\\\", it's insight, intellect, knowing, line/point. The legal transform is FINAL_Y_TO_I, so maybe \\\"DY\\\" is a variant for \\\"DI\\\".\\n\\nFor each chunk, I need to find possible meanings in the target languages. Let's consider \\\"S\\\" first. In Latin, \\\"S\\\" could be part of words like \\\"studium\\\" (study), but that's the whole word. Maybe \\\"S\\\" as a chunk might not have a direct meaning. In Germanic languages, \\\"S\\\" might relate to words like \\\"study\\\" in English, but that's a stretch. Maybe \\\"S\\\" as a chunk isn't directly mapped here.\\n\\nNext, \\\"TU\\\". In Latin, \\\"tu\\\" means \\\"you\\\", but that's a different word. In Greek, \\\"tu\\\" isn't a standard word. Maybe \\\"TU\\\" could be a phonetic element, but not sure. The function hint for \\\"U\\\" includes container, so maybe \\\"TU\\\" relates to that concept in some language.\\n\\nThen \\\"DI\\\". The variant is \\\"DY\\\" from FINAL_Y_TO_I. In Latin, \\\"di\\\" could be related to \\\"deus\\\" (god), but that's a stretch. In Sanskrit, \\\"di\\\" might not be a standard word. However, in some languages, \\\"DI\\\" could relate to \\\"to give\\\" or \\\"to do\\\", but I'm not certain. The function hint for \\\"I\\\" includes insight, so maybe \\\"DI\\\" relates to intellect in some language.\\n\\nLooking at the target languages, let's check each one. For example, in Albanian, \\\"studim\\\" means study, but that's the whole word. In Latin, \\\"studium\\\" is study. Greek has \\\"study\\\" as \\\"study\\\" (same as English). Sanskrit has \\\"stuti\\\" for praise, which is different. Chinese might have characters related to study, but the chunk \\\"S\\\" might not match. Germanic languages like German have \\\"studieren\\\" for study. Slavic languages might have similar roots. Semitic languages might not have direct matches. Arabic has \\\"tadris\\\" for teaching, which is related but not exact.\\n\\nConsidering the function hints, \\\"U\\\" as container and \\\"I\\\" as insight. Maybe \\\"DI\\\" in some language relates to intellect. For example, in Latin, \\\"di\\\" could be part of \\\"dies\\\" (days), but not directly. Alternatively, \\\"DI\\\" might be a phonetic element in a word meaning \\\"to know\\\" or \\\"insight\\\".\\n\\nSince the user requires strict JSON with specific fields, I need to structure each candidate with segmentationId, chunk, language, candidateForm, meaning, functionFit, sourceNote, evidenceType, candidateType, falseFriendRisk, nullCandidate, and notes. If no credible candidate exists, return a null_candidate.\\n\\nFor each chunk, I'll check possible matches. For \\\"S\\\", maybe no direct meaning. For \\\"TU\\\", perhaps in some language it's a term related to container. For \\\"DI\\\", maybe in Latin or Greek it's part of a word related to intellect. However, without specific knowledge of each language's words, I might have to mark some as null_candidate.\\n\\nAlso, the function hints from ZE-RO doctrine should be considered. For example, \\\"U\\\" as container might align with \\\"TU\\\" in a language where that concept is expressed. Similarly, \\\"I\\\" as insight could relate to \\\"DI\\\" in a language where that meaning exists.\\n\\nBut since I can't access external linguistic data, I have to rely on the given information. The chunk variants and legal transforms might help. For \\\"DI\\\" as a variant of \\\"DY\\\", maybe in a language where \\\"DY\\\" is a word, but without knowing that language, it's risky.\\n\\nTherefore, some candidates might be weak_resonance or null_candidate. For example, \\\"DI\\\" in Latin might have a weak resonance with \\\"dies\\\" (days), but that's a stretch. Alternatively, \\\"DI\\\" could be a phonetic element in a word meaning \\\"to know\\\" in some language, leading to a weak_resonance.\\n\\nIn the end, I'll structure the JSON with the required fields, ensuring that each candidate or null candidate follows the schema. If uncertain, use weak_resonance or null_candidate with appropriate notes.\\n\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":1471,\"completion_tokens\":1916,\"total_tokens\":3387}}\n",
+    "responseJson": {
+      "id": "chatcmpl-221",
+      "object": "chat.completion",
+      "created": 1780587071,
+      "model": "qwen3:8b",
+      "system_fingerprint": "fp_ollama",
+      "choices": [
+        {
+          "index": 0,
+          "message": {
+            "role": "assistant",
+            "content": "{\n  \"word\": \"study\",\n  \"segmentationId\": \"study.segmentation.004\",\n  \"chunkCandidates\": [\n    {\n      \"segmentationId\": \"study.segmentation.004\",\n      \"chunk\": \"S\",\n      \"language\": \"Germanic\",\n      \"candidateForm\": \"S\",\n      \"meaning\": \"container\",\n      \"functionFit\": \"ZE-RO doctrine container\",\n      \"sourceNote\": \"Function hint alignment\",\n      \"evidenceType\": \"doctrine_alignment\",\n      \"candidateType\": \"weak_resonance\",\n      \"falseFriendRisk\": \"medium\",\n      \"nullCandidate\": false,\n      \"notes\": \"Function hint resonance with ZE-RO doctrine\"\n    },\n    {\n      \"segmentationId\": \"study.segmentation.004\",\n      \"chunk\": \"TU\",\n      \"language\": \"Latin\",\n      \"candidateForm\": \"tu\",\n      \"meaning\": \"you\",\n      \"functionFit\": \"container\",\n      \"sourceNote\": \"Function hint alignment\",\n      \"evidenceType\": \"phonetic_only\",\n      \"candidateType\": \"weak_resonance\",\n      \"falseFriendRisk\": \"high\",\n      \"nullCandidate\": false,\n      \"notes\": \"Phonetic similarity to Latin 'tu'\"\n    },\n    {\n      \"segmentationId\": \"study.segmentation.004\",\n      \"chunk\": \"DI\",\n      \"language\": \"Greek\",\n      \"candidateForm\": \"di\",\n      \"meaning\": \"to give\",\n      \"functionFit\": \"insight\",\n      \"sourceNote\": \"Function hint alignment\",\n      \"evidenceType\": \"phonetic_only\",\n      \"candidateType\": \"weak_resonance\",\n      \"falseFriendRisk\": \"medium\",\n      \"nullCandidate\": false,\n      \"notes\": \"Phonetic similarity to Greek 'dō' (to give)\"\n    }\n  ],\n  \"nullCandidates\": [\n    {\n      \"segmentationId\": \"study.segmentation.004\",\n      \"chunk\": \"S\",\n      \"language\": \"Sanskrit\",\n      \"candidateForm\": \"S\",\n      \"meaning\": \"null\",\n      \"functionFit\": \"none\",\n      \"sourceNote\": \"No linguistic match\",\n      \"evidenceType\": \"none\",\n      \"candidateType\": \"null_candidate\",\n      \"falseFriendRisk\": \"none\",\n      \"nullCandidate\": true,\n      \"notes\": \"No credible candidate found\"\n    },\n    {\n      \"segmentationId\": \"study.segmentation.004\",\n      \"chunk\": \"TU\",\n      \"language\": \"Chinese\",\n      \"candidateForm\": \"TU\",\n      \"meaning\": \"null\",\n      \"functionFit\": \"none\",\n      \"sourceNote\": \"No linguistic match\",\n      \"evidenceType\": \"none\",\n      \"candidateType\": \"null_candidate\",\n      \"falseFriendRisk\": \"none\",\n      \"nullCandidate\": true,\n      \"notes\": \"No credible candidate found\"\n    },\n    {\n      \"segmentation,Id\": \"study.segmentation.004\",\n      \"chunk\": \"DI\",\n      \"language\": \"Arabic\",\n      \"candidateForm\": \"DI\",\n      \"meaning\": \"null\",\n      \"functionFit\": \"none\",\n      \"sourceNote\": \"No linguistic match\",\n      \"evidenceType\": \"none\",\n      \"candidateType\": \"null_candidate\",\n      \"falseFriendRisk\": \"none\",\n      \"nullCandidate\": true,\n      \"notes\": \"No credible candidate found\"\n    }\n  ],\n  \"warnings\": [\n    \"Function hints may not align with target language semantics\",\n    \"Phonetic resonances lack lexical attestation\"\n  ],\n  \"claimBoundary\": {\n    \"originClaim\": false,\n    \"scientificEvidence\": false,\n    \"publicationEvidence\": false,\n    \"developmentCandidateSearchOnly\": true\n  }\n}",
+            "reasoning": "Okay, let's tackle this query. The user wants me to act as the Brain in the Open Instrument Heart-to-Brain Candidate Search Protocol. My task is to search for candidate meanings for each chunk in the given word \"study\" across the target languages provided. The output needs to be strict JSON following the required schema.\n\nFirst, I need to understand the input data. The segmentationId is \"study.segmentation.004\" with chunks [\"S\", \"TU\", \"DI\"]. There's a chunk variant for \"DI\" as a final Y→I comparison of \"DY\". The voicePath has \"U\" and \"I\", with function hints from the ZE-RO doctrine. The target languages include Albanian, Latin, Greek, Sanskrit, Chinese, Germanic, Slavic, Semitic, Arabic, and Finnish.\n\nI need to check each chunk against these languages. Let's start with the first chunk \"S\". The function hints for \"U\" are container, inside, adding, holding, depth. For \"I\", it's insight, intellect, knowing, line/point. The legal transform is FINAL_Y_TO_I, so maybe \"DY\" is a variant for \"DI\".\n\nFor each chunk, I need to find possible meanings in the target languages. Let's consider \"S\" first. In Latin, \"S\" could be part of words like \"studium\" (study), but that's the whole word. Maybe \"S\" as a chunk might not have a direct meaning. In Germanic languages, \"S\" might relate to words like \"study\" in English, but that's a stretch. Maybe \"S\" as a chunk isn't directly mapped here.\n\nNext, \"TU\". In Latin, \"tu\" means \"you\", but that's a different word. In Greek, \"tu\" isn't a standard word. Maybe \"TU\" could be a phonetic element, but not sure. The function hint for \"U\" includes container, so maybe \"TU\" relates to that concept in some language.\n\nThen \"DI\". The variant is \"DY\" from FINAL_Y_TO_I. In Latin, \"di\" could be related to \"deus\" (god), but that's a stretch. In Sanskrit, \"di\" might not be a standard word. However, in some languages, \"DI\" could relate to \"to give\" or \"to do\", but I'm not certain. The function hint for \"I\" includes insight, so maybe \"DI\" relates to intellect in some language.\n\nLooking at the target languages, let's check each one. For example, in Albanian, \"studim\" means study, but that's the whole word. In Latin, \"studium\" is study. Greek has \"study\" as \"study\" (same as English). Sanskrit has \"stuti\" for praise, which is different. Chinese might have characters related to study, but the chunk \"S\" might not match. Germanic languages like German have \"studieren\" for study. Slavic languages might have similar roots. Semitic languages might not have direct matches. Arabic has \"tadris\" for teaching, which is related but not exact.\n\nConsidering the function hints, \"U\" as container and \"I\" as insight. Maybe \"DI\" in some language relates to intellect. For example, in Latin, \"di\" could be part of \"dies\" (days), but not directly. Alternatively, \"DI\" might be a phonetic element in a word meaning \"to know\" or \"insight\".\n\nSince the user requires strict JSON with specific fields, I need to structure each candidate with segmentationId, chunk, language, candidateForm, meaning, functionFit, sourceNote, evidenceType, candidateType, falseFriendRisk, nullCandidate, and notes. If no credible candidate exists, return a null_candidate.\n\nFor each chunk, I'll check possible matches. For \"S\", maybe no direct meaning. For \"TU\", perhaps in some language it's a term related to container. For \"DI\", maybe in Latin or Greek it's part of a word related to intellect. However, without specific knowledge of each language's words, I might have to mark some as null_candidate.\n\nAlso, the function hints from ZE-RO doctrine should be considered. For example, \"U\" as container might align with \"TU\" in a language where that concept is expressed. Similarly, \"I\" as insight could relate to \"DI\" in a language where that meaning exists.\n\nBut since I can't access external linguistic data, I have to rely on the given information. The chunk variants and legal transforms might help. For \"DI\" as a variant of \"DY\", maybe in a language where \"DY\" is a word, but without knowing that language, it's risky.\n\nTherefore, some candidates might be weak_resonance or null_candidate. For example, \"DI\" in Latin might have a weak resonance with \"dies\" (days), but that's a stretch. Alternatively, \"DI\" could be a phonetic element in a word meaning \"to know\" in some language, leading to a weak_resonance.\n\nIn the end, I'll structure the JSON with the required fields, ensuring that each candidate or null candidate follows the schema. If uncertain, use weak_resonance or null_candidate with appropriate notes.\n"
+          },
+          "finish_reason": "stop"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1471,
+        "completion_tokens": 1916,
+        "total_tokens": 3387
+      }
+    }
+  },
+  "parsedBrainOutput": {
+    "parseOk": true,
+    "parseError": "",
+    "value": {
+      "word": "study",
+      "segmentationId": "study.segmentation.004",
+      "chunkCandidates": [
+        {
+          "segmentationId": "study.segmentation.004",
+          "chunk": "S",
+          "language": "Germanic",
+          "candidateForm": "S",
+          "meaning": "container",
+          "functionFit": "ZE-RO doctrine container",
+          "sourceNote": "Function hint alignment",
+          "evidenceType": "doctrine_alignment",
+          "candidateType": "weak_resonance",
+          "falseFriendRisk": "medium",
+          "nullCandidate": false,
+          "notes": "Function hint resonance with ZE-RO doctrine"
+        },
+        {
+          "segmentationId": "study.segmentation.004",
+          "chunk": "TU",
+          "language": "Latin",
+          "candidateForm": "tu",
+          "meaning": "you",
+          "functionFit": "container",
+          "sourceNote": "Function hint alignment",
+          "evidenceType": "phonetic_only",
+          "candidateType": "weak_resonance",
+          "falseFriendRisk": "high",
+          "nullCandidate": false,
+          "notes": "Phonetic similarity to Latin 'tu'"
+        },
+        {
+          "segmentationId": "study.segmentation.004",
+          "chunk": "DI",
+          "language": "Greek",
+          "candidateForm": "di",
+          "meaning": "to give",
+          "functionFit": "insight",
+          "sourceNote": "Function hint alignment",
+          "evidenceType": "phonetic_only",
+          "candidateType": "weak_resonance",
+          "falseFriendRisk": "medium",
+          "nullCandidate": false,
+          "notes": "Phonetic similarity to Greek 'dō' (to give)"
+        }
+      ],
+      "nullCandidates": [
+        {
+          "segmentationId": "study.segmentation.004",
+          "chunk": "S",
+          "language": "Sanskrit",
+          "candidateForm": "S",
+          "meaning": "null",
+          "functionFit": "none",
+          "sourceNote": "No linguistic match",
+          "evidenceType": "none",
+          "candidateType": "null_candidate",
+          "falseFriendRisk": "none",
+          "nullCandidate": true,
+          "notes": "No credible candidate found"
+        },
+        {
+          "segmentationId": "study.segmentation.004",
+          "chunk": "TU",
+          "language": "Chinese",
+          "candidateForm": "TU",
+          "meaning": "null",
+          "functionFit": "none",
+          "sourceNote": "No linguistic match",
+          "evidenceType": "none",
+          "candidateType": "null_candidate",
+          "falseFriendRisk": "none",
+          "nullCandidate": true,
+          "notes": "No credible candidate found"
+        },
+        {
+          "segmentation,Id": "study.segmentation.004",
+          "chunk": "DI",
+          "language": "Arabic",
+          "candidateForm": "DI",
+          "meaning": "null",
+          "functionFit": "none",
+          "sourceNote": "No linguistic match",
+          "evidenceType": "none",
+          "candidateType": "null_candidate",
+          "falseFriendRisk": "none",
+          "nullCandidate": true,
+          "notes": "No credible candidate found"
+        }
+      ],
+      "warnings": [
+        "Function hints may not align with target language semantics",
+        "Phonetic resonances lack lexical attestation"
+      ],
+      "claimBoundary": {
+        "originClaim": false,
+        "scientificEvidence": false,
+        "publicationEvidence": false,
+        "developmentCandidateSearchOnly": true
+      }
+    }
+  },
+  "validation": {
+    "ok": false,
+    "issues": [
+      {
+        "code": "MISSING_FIELD",
+        "severity": "error",
+        "message": "candidate missing required field: segmentationId",
+        "path": "nullCandidates.2.segmentationId"
+      },
+      {
+        "code": "SEGMENTATION_ID_MISMATCH",
+        "severity": "error",
+        "message": "candidate segmentationId must match Heart input segmentationId.",
+        "path": "nullCandidates.2.segmentationId"
+      }
+    ],
+    "summary": {
+      "checkedCandidates": 3,
+      "checkedNullCandidates": 3,
+      "chunksCovered": [
+        "S",
+        "TU",
+        "DI"
+      ],
+      "missingChunks": []
+    }
+  },
+  "redaction": {
+    "apiKeysStored": false,
+    "bearerTokensStored": false,
+    "fullEnvStored": false,
+    "notes": [
+      "Ollama local endpoint used.",
+      "No paid-provider API key stored.",
+      "No full environment dump stored."
+    ]
+  },
+  "claimBoundary": {
+    "scientificEvidence": false,
+    "publicationEvidence": false,
+    "evalEvidence": false,
+    "cohortEvidence": false,
+    "provesCandidateTruth": false,
+    "provesLanguageOrigin": false,
+    "defaultProviderChange": false,
+    "developmentPrototypeOnly": true
+  }
+}
