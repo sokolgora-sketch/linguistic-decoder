@@ -77,8 +77,19 @@ export function brainInputFromHeartSegmentation(
   };
 }
 
+function enumScalarSchema(allowedValues: readonly string[]): Record<string, unknown> {
+  return {
+    type: "string",
+    requiredScalar: true,
+    arraysAreInvalid: true,
+    allowedValues: [...allowedValues],
+  };
+}
+
 function requiredOutputSchema(): Record<string, unknown> {
   return {
+    enumFieldsMustBeScalarStrings: true,
+    arraysAreInvalidForEnumFields: true,
     word: "string",
     segmentationId: "string",
     chunkCandidates: [
@@ -90,9 +101,9 @@ function requiredOutputSchema(): Record<string, unknown> {
         meaning: "string",
         functionFit: "string",
         sourceNote: "string",
-        evidenceType: [...BRAIN_EVIDENCE_TYPES],
-        candidateType: [...BRAIN_CANDIDATE_TYPES],
-        falseFriendRisk: [...BRAIN_FALSE_FRIEND_RISKS],
+        evidenceType: enumScalarSchema(BRAIN_EVIDENCE_TYPES),
+        candidateType: enumScalarSchema(BRAIN_CANDIDATE_TYPES),
+        falseFriendRisk: enumScalarSchema(BRAIN_FALSE_FRIEND_RISKS),
         nullCandidate: "boolean",
         notes: "string",
       },
@@ -106,9 +117,24 @@ function requiredOutputSchema(): Record<string, unknown> {
         meaning: "string",
         functionFit: "string",
         sourceNote: "string",
-        evidenceType: "none",
-        candidateType: "null_candidate",
-        falseFriendRisk: "none",
+        evidenceType: {
+          type: "string",
+          requiredScalar: true,
+          arraysAreInvalid: true,
+          allowedValues: ["none"],
+        },
+        candidateType: {
+          type: "string",
+          requiredScalar: true,
+          arraysAreInvalid: true,
+          allowedValues: ["null_candidate"],
+        },
+        falseFriendRisk: {
+          type: "string",
+          requiredScalar: true,
+          arraysAreInvalid: true,
+          allowedValues: ["none"],
+        },
         nullCandidate: true,
         notes: "string",
       },
@@ -140,8 +166,18 @@ export function buildBrainCandidateSearchPrompt(
     "Do not claim origin. Do not treat resonance as proof.",
     "Do not hide nulls. If no credible candidate exists, return a null_candidate.",
     "Every candidate must include candidateType, evidenceType, falseFriendRisk, nullCandidate, sourceNote, and notes.",
+    "Enum fields must be scalar strings, never arrays.",
+    "candidateType must be exactly one lowercase string copied from the allowed candidateType list.",
+    "evidenceType must be exactly one lowercase string copied from the allowed evidenceType list.",
+    "falseFriendRisk must be exactly one lowercase string copied from the allowed falseFriendRisk list.",
+    "Never wrap enum values in arrays. Arrays are invalid for candidateType, evidenceType, and falseFriendRisk.",
+    "Do not use uppercase enum aliases such as STRONG_LEXICAL, NULL_CANDIDATE, or FALSE_FRIEND_RISK.",
+    "Do not use prose labels or near-synonyms as enum values.",
+    "Every candidate and null candidate must copy the exact segmentationId from HEART_APPROVED_INPUT_JSON.",
+    "Every candidate and null candidate must use only exact chunk strings from HEART_APPROVED_INPUT_JSON.",
+    "For null candidates, use exactly: candidateType=\"null_candidate\", evidenceType=\"none\", falseFriendRisk=\"none\", nullCandidate=true.",
     "Function hints are ZE-RO doctrine. Doctrine alignment is not external linguistic evidence.",
-    "If uncertain, use weak_resonance, likely_false_friend, high falseFriendRisk, or null_candidate.",
+    "If uncertain, use scalar strings: candidateType=\"weak_resonance\" or candidateType=\"null_candidate\"; evidenceType=\"none\" if null; falseFriendRisk=\"high\" if risky.",
     `Allowed candidateType values: ${BRAIN_CANDIDATE_TYPES.join(", ")}.`,
     `Allowed evidenceType values: ${BRAIN_EVIDENCE_TYPES.join(", ")}.`,
     `Allowed falseFriendRisk values: ${BRAIN_FALSE_FRIEND_RISKS.join(", ")}.`,
