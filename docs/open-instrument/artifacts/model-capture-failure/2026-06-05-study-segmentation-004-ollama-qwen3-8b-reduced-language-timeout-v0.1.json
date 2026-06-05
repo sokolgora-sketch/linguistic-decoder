@@ -1,0 +1,147 @@
+{
+  "archiveVersion": "v0.1",
+  "artifactType": "open-instrument-model-capture-failure",
+  "createdAt": "2026-06-05T08:19:59.159Z",
+  "repo": {
+    "project": "ZË-RO",
+    "repository": "sokolgora-sketch/linguistic-decoder",
+    "commit": "3cc51b602bafc51215ea62ae803f86838c535d7d",
+    "branch": "docs/open-instrument-study-segmentation-004-reduced-language-v0.1",
+    "workingTree": "clean"
+  },
+  "target": {
+    "word": "study",
+    "segmentationId": "study.segmentation.004",
+    "embryoMorphemes": [
+      "S",
+      "TU",
+      "DI"
+    ],
+    "currentImplementationField": "chunk",
+    "reducedLanguage": true,
+    "targetLanguages": [
+      "Albanian",
+      "Latin",
+      "Chinese",
+      "Germanic"
+    ]
+  },
+  "provider": {
+    "provider": "openai_compat",
+    "runtime": "ollama",
+    "baseUrl": "http://localhost:11434/v1",
+    "model": "qwen3:8b",
+    "apiKeyStored": false
+  },
+  "modelCall": {
+    "requestBuilt": true,
+    "responseReceived": false,
+    "rawContentReceived": false
+  },
+  "failure": {
+    "kind": "timeout",
+    "message": "local reduced-language model call failed before usable Brain output",
+    "stage": "model_call",
+    "isOperationalFailure": true,
+    "isModelQualityFailure": false,
+    "isValidationFailure": false
+  },
+  "attempts": [
+    {
+      "attempt": 1,
+      "phase": "capture",
+      "timeoutMs": 180000,
+      "result": "timeout",
+      "errorMessage": "timeout",
+      "startedAt": "2026-06-05T08:11:59.071Z",
+      "endedAt": "2026-06-05T08:14:59.085Z",
+      "httpStatus": null
+    },
+    {
+      "attempt": 2,
+      "phase": "capture_retry",
+      "timeoutMs": 300000,
+      "result": "timeout",
+      "errorMessage": "timeout",
+      "startedAt": "2026-06-05T08:14:59.088Z",
+      "endedAt": "2026-06-05T08:19:59.150Z",
+      "httpStatus": null
+    }
+  ],
+  "timeoutPolicy": {
+    "preflightTimeoutMs": 30000,
+    "firstAttemptTimeoutMs": 180000,
+    "retryTimeoutMs": 300000,
+    "maxRetries": 1,
+    "policyDoc": "docs/open-instrument/local-model-timeout-budget-policy-v0.1.md"
+  },
+  "heartInputAvailable": true,
+  "brainPromptBuilt": true,
+  "rawResponseAvailable": false,
+  "parsedBrainOutputAvailable": false,
+  "validationAvailable": false,
+  "comparison": {
+    "previousSegmentation004Artifact": "docs/open-instrument/artifacts/heart-brain-prototype/2026-06-04-study-heart-brain-qwen3-8b-segmentation-004-v0.1.json",
+    "previousFullPromptTimeoutArtifact": "docs/open-instrument/artifacts/model-capture-failure/2026-06-04-study-segmentation-004-ollama-qwen3-8b-timeout-v0.1.json",
+    "timeoutReview": "docs/open-instrument/study-segmentation-004-capture-timeout-review-v0.1.md",
+    "timeoutPolicy": "docs/open-instrument/local-model-timeout-budget-policy-v0.1.md",
+    "traceabilityFixPr": 1178,
+    "timeoutDesignPr": 1180,
+    "timeoutArtifactPr": 1181,
+    "timeoutReviewPr": 1182,
+    "timeoutPolicyPr": 1183,
+    "baseline002": {
+      "artifact": "docs/open-instrument/artifacts/heart-brain-prototype/2026-06-04-study-heart-brain-qwen3-8b-segmentation-002-v0.2.json",
+      "segmentationId": "study.segmentation.002",
+      "embryoMorphemes": [
+        "STU",
+        "DI"
+      ],
+      "parseOk": true,
+      "validationOk": true,
+      "checkedCandidates": 2,
+      "checkedNullCandidates": 2,
+      "chunksCovered": [
+        "STU",
+        "DI"
+      ],
+      "missingChunks": [],
+      "issueCount": 0
+    },
+    "baseline003": {
+      "artifact": "docs/open-instrument/artifacts/heart-brain-prototype/2026-06-04-study-heart-brain-qwen3-8b-segmentation-003-v0.1.json",
+      "segmentationId": "study.segmentation.003",
+      "embryoMorphemes": [
+        "SHTU",
+        "DI"
+      ],
+      "parseOk": true,
+      "validationOk": true,
+      "checkedCandidates": 4,
+      "checkedNullCandidates": 1,
+      "chunksCovered": [
+        "SHTU",
+        "DI"
+      ],
+      "missingChunks": [],
+      "issueCount": 0
+    }
+  },
+  "claimBoundary": {
+    "scientificEvidence": false,
+    "publicationEvidence": false,
+    "evalEvidence": false,
+    "cohortEvidence": false,
+    "modelQualityEvidence": false,
+    "candidateTruthEvidence": false,
+    "languageOriginEvidence": false,
+    "validationFailure": false,
+    "defaultProviderChange": false,
+    "developmentOperationalRecordOnly": true
+  },
+  "redaction": {
+    "apiKeysStored": false,
+    "bearerTokensStored": false,
+    "fullEnvStored": false
+  }
+}
