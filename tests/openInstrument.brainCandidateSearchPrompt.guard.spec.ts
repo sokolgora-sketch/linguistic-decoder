@@ -85,6 +85,24 @@ describe("Open Instrument Brain candidate search prompt v0.1", () => {
     }
   });
 
+  it("requires non-null chunk candidates to include auditable sourceNote explanations", () => {
+    expect(combined).toContain("Every non-null chunkCandidates[] object must include sourceNote");
+    expect(combined).toContain("sourceNote must be a non-empty scalar string");
+    expect(combined).toContain("sourceNote must briefly explain why the candidate was returned");
+    expect(combined).toContain(
+      "sourceNote must state what evidence, lexical cue, uncertainty, or false-friend risk supports the candidate",
+    );
+    expect(combined).toContain("Do not omit sourceNote");
+    expect(combined).toContain("Do not use an empty string for sourceNote");
+    expect(combined).toContain(
+      "Do not put the explanation only in meaning, candidateType, evidenceType, or notes",
+    );
+    expect(combined).toContain(
+      "sourceNote is required even when the candidate is weak, uncertain, or false-friend-risk",
+    );
+    expect(combined).toContain("sourceNote makes each candidate auditable");
+  });
+
   it("includes every candidate type", () => {
     for (const candidateType of BRAIN_CANDIDATE_TYPES) {
       expect(combined).toContain(candidateType);
