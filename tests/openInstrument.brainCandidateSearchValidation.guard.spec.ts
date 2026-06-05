@@ -105,6 +105,46 @@ describe("Open Instrument Brain candidate search validation v0.1", () => {
     );
   });
 
+  it("fails when top-level claimBoundary is missing", () => {
+    const output = validOutput() as Partial<BrainCandidateSearchOutput>;
+    delete output.claimBoundary;
+
+    const result = validateBrainCandidateSearchOutput({
+      heartInput: studyInput(),
+      brainOutput: output,
+    });
+
+    expect(result.ok).toBe(false);
+    expect(result.issues).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          code: "MISSING_FIELD",
+          path: "claimBoundary",
+        }),
+      ]),
+    );
+  });
+
+  it("fails when top-level claimBoundary is null", () => {
+    const output = validOutput() as Partial<BrainCandidateSearchOutput>;
+    output.claimBoundary = null as unknown as BrainCandidateSearchOutput["claimBoundary"];
+
+    const result = validateBrainCandidateSearchOutput({
+      heartInput: studyInput(),
+      brainOutput: output,
+    });
+
+    expect(result.ok).toBe(false);
+    expect(result.issues).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          code: "INVALID_CLAIM_BOUNDARY",
+          path: "claimBoundary",
+        }),
+      ]),
+    );
+  });
+
   it("fails when top-level word is missing", () => {
     const output = validOutput() as Partial<BrainCandidateSearchOutput>;
     delete output.word;

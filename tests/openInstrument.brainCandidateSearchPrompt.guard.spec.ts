@@ -55,6 +55,31 @@ describe("Open Instrument Brain candidate search prompt v0.1", () => {
     }
   });
 
+  it("requires top-level warnings and claimBoundary metadata", () => {
+    expect(combined).toContain("Brain output must include top-level warnings");
+    expect(combined).toContain("warnings is required");
+    expect(combined).toContain("warnings must be an array");
+    expect(combined).toContain("warnings may be an empty array");
+    expect(combined).toContain("Use warnings: [] when there are no warnings");
+    expect(combined).toContain("Do not omit warnings");
+    expect(combined).toContain("Do not set warnings to null");
+    expect(combined).toContain("Do not set warnings to a string");
+    expect(combined).toContain("Do not put warnings only inside candidates");
+    expect(combined).toContain("Do not put warnings only in notes");
+
+    expect(combined).toContain("Brain output must include top-level claimBoundary");
+    expect(combined).toContain("claimBoundary is required");
+    expect(combined).toContain("claimBoundary must be a non-null object");
+    expect(combined).toContain("Do not omit claimBoundary");
+    expect(combined).toContain("Do not set claimBoundary to null");
+    expect(combined).toContain("Do not replace claimBoundary with a string");
+    expect(combined).toContain("Do not put claim-boundary text only in notes");
+    expect(combined).toContain("Do not put claim-boundary text only in warnings");
+    expect(combined).toContain(
+      "claimBoundary must explicitly mark development-only result, not origin proof, not candidate truth proof, not publication evidence, not eval evidence, not Cohort evidence, not model-quality evidence, and not a reason to change the default provider from mock",
+    );
+  });
+
   it("requires top-level identity fields to be exact Heart input values and not nested only inside candidates", () => {
     expect(combined).toContain("Brain output must include top-level word and top-level segmentationId");
     expect(combined).toContain("word must exactly equal Heart input word");
