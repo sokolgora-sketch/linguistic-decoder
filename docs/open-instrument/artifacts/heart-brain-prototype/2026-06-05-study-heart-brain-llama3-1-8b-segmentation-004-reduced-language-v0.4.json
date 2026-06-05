@@ -1,0 +1,741 @@
+{
+  "archiveVersion": 1,
+  "artifactType": "open-instrument-heart-brain-prototype",
+  "attempts": [
+    {
+      "attempt": 1,
+      "phase": "model_call",
+      "startedAt": "2026-06-05T15:29:23.354Z",
+      "endedAt": "2026-06-05T15:30:41.949Z",
+      "timeoutMs": 180000,
+      "httpStatus": 200,
+      "errorMessage": null,
+      "result": "completed"
+    }
+  ],
+  "brainPrompt": {
+    "inputJson": {
+      "word": "study",
+      "normalizedWord": "study",
+      "segmentationId": "study.segmentation.004",
+      "chunks": [
+        "S",
+        "TU",
+        "DI"
+      ],
+      "chunkVariants": [
+        {
+          "chunk": "DI",
+          "variantOf": "DY",
+          "legalTransform": "FINAL_Y_TO_I",
+          "notes": [
+            "DI is a final Y→I comparison variant of DY."
+          ]
+        }
+      ],
+      "voicePath": [
+        "U",
+        "I"
+      ],
+      "legalTransforms": [
+        "FINAL_Y_TO_I"
+      ],
+      "normalizationNotes": [
+        "Splits consonant-only prefix material from vowel-bearing chunks."
+      ],
+      "functionHints": [
+        {
+          "voice": "U",
+          "hints": [
+            "container",
+            "inside",
+            "adding",
+            "holding",
+            "depth"
+          ],
+          "functionHintSource": "ZE-RO doctrine"
+        },
+        {
+          "voice": "I",
+          "hints": [
+            "insight",
+            "intellect",
+            "knowing",
+            "line/point"
+          ],
+          "functionHintSource": "ZE-RO doctrine"
+        }
+      ],
+      "targetLanguages": [
+        "Albanian",
+        "Latin",
+        "Chinese",
+        "Germanic"
+      ],
+      "searchMode": "chunk_candidate_search_v0.1"
+    },
+    "requiredOutputSchema": {
+      "enumFieldsMustBeScalarStrings": true,
+      "arraysAreInvalidForEnumFields": true,
+      "word": "string",
+      "segmentationId": "string",
+      "chunkCandidates": [
+        {
+          "segmentationId": "string",
+          "chunk": "string",
+          "language": "string",
+          "candidateForm": "string",
+          "meaning": "string",
+          "functionFit": "string",
+          "sourceNote": "string",
+          "evidenceType": {
+            "type": "string",
+            "requiredScalar": true,
+            "arraysAreInvalid": true,
+            "allowedValues": [
+              "living_lexical",
+              "historical_etymology",
+              "dictionary_attested",
+              "phonetic_only",
+              "semantic_only",
+              "doctrine_alignment",
+              "none"
+            ]
+          },
+          "candidateType": {
+            "type": "string",
+            "requiredScalar": true,
+            "arraysAreInvalid": true,
+            "allowedValues": [
+              "strong_living_match",
+              "historical_match",
+              "functional_resonance",
+              "phonetic_resonance",
+              "weak_resonance",
+              "likely_false_friend",
+              "null_candidate"
+            ]
+          },
+          "falseFriendRisk": {
+            "type": "string",
+            "requiredScalar": true,
+            "arraysAreInvalid": true,
+            "allowedValues": [
+              "none",
+              "low",
+              "medium",
+              "high"
+            ]
+          },
+          "nullCandidate": "boolean",
+          "notes": "string"
+        }
+      ],
+      "nullCandidates": [
+        {
+          "segmentationId": "string",
+          "chunk": "string",
+          "language": "string",
+          "candidateForm": "string",
+          "meaning": "string",
+          "functionFit": "string",
+          "sourceNote": "string",
+          "evidenceType": {
+            "type": "string",
+            "requiredScalar": true,
+            "arraysAreInvalid": true,
+            "allowedValues": [
+              "none"
+            ]
+          },
+          "candidateType": {
+            "type": "string",
+            "requiredScalar": true,
+            "arraysAreInvalid": true,
+            "allowedValues": [
+              "null_candidate"
+            ]
+          },
+          "falseFriendRisk": {
+            "type": "string",
+            "requiredScalar": true,
+            "arraysAreInvalid": true,
+            "allowedValues": [
+              "none"
+            ]
+          },
+          "nullCandidate": true,
+          "notes": "string"
+        }
+      ],
+      "warnings": [
+        "string"
+      ],
+      "claimBoundary": {
+        "originClaim": false,
+        "scientificEvidence": false,
+        "publicationEvidence": false,
+        "developmentCandidateSearchOnly": true
+      }
+    },
+    "systemPrompt": "You are the Brain in the Open Instrument Heart-to-Brain Candidate Search Protocol.\nReturn strict JSON only. No prose outside JSON.\nBrain searches candidate meanings only.\nBrain does not own segmentation, vowel path, legal transforms, validation, or origin verdict.\nUse only Heart-approved chunks and target languages.\nBrain output must include top-level word and top-level segmentationId.\nword must exactly equal Heart input word.\nsegmentationId must exactly equal Heart input segmentationId.\nDo not omit word or segmentationId.\nDo not rename word or segmentationId.\nDo not place word or segmentationId only inside candidate objects.\nThese top-level identity fields are required even when all candidates are null.\nThese top-level identity fields are required even when the model is uncertain.\nPreserve segmentationId exactly.\nPreserve chunks exactly. Do not create new segmentation. Do not reorder chunks.\nDo not invent transforms. Do not change vowel path.\nDo not claim origin. Do not treat resonance as proof.\nDo not hide nulls. If no credible candidate exists, return a null_candidate.\nEvery candidate must include candidateType, evidenceType, falseFriendRisk, nullCandidate, sourceNote, and notes.\nBrain output must include top-level warnings.\nwarnings is required.\nwarnings must be an array.\nwarnings may be an empty array.\nUse warnings: [] when there are no warnings.\nDo not omit warnings.\nDo not set warnings to null.\nDo not set warnings to a string.\nDo not put warnings only inside candidates.\nDo not put warnings only in notes.\nBrain output must include top-level claimBoundary.\nclaimBoundary is required.\nclaimBoundary must be a non-null object.\nDo not omit claimBoundary.\nDo not set claimBoundary to null.\nDo not replace claimBoundary with a string.\nDo not put claim-boundary text only in notes.\nDo not put claim-boundary text only in warnings.\nclaimBoundary must explicitly mark development-only result, not origin proof, not candidate truth proof, not publication evidence, not eval evidence, not Cohort evidence, not model-quality evidence, and not a reason to change the default provider from mock.\nEnum fields must be scalar strings, never arrays.\ncandidateType must be exactly one lowercase string copied from the allowed candidateType list.\nevidenceType must be exactly one lowercase string copied from the allowed evidenceType list.\nfalseFriendRisk must be exactly one lowercase string copied from the allowed falseFriendRisk list.\nNever wrap enum values in arrays. Arrays are invalid for candidateType, evidenceType, and falseFriendRisk.\nDo not use uppercase enum aliases such as STRONG_LEXICAL, NULL_CANDIDATE, or FALSE_FRIEND_RISK.\nDo not use prose labels or near-synonyms as enum values.\nEvery non-null chunkCandidates[] object must include sourceNote.\nsourceNote must be a non-empty scalar string.\nsourceNote must briefly explain why the candidate was returned.\nsourceNote must state what evidence, lexical cue, uncertainty, or false-friend risk supports the candidate.\nDo not omit sourceNote.\nDo not use an empty string for sourceNote.\nDo not put the explanation only in meaning, candidateType, evidenceType, or notes.\nsourceNote is required even when the candidate is weak, uncertain, or false-friend-risk.\nsourceNote makes each candidate auditable.\nEvery candidate and null candidate must copy the exact segmentationId from HEART_APPROVED_INPUT_JSON.\nEvery candidate and null candidate must use only exact chunk strings from HEART_APPROVED_INPUT_JSON.\nFor null candidates, use exactly: candidateType=\"null_candidate\", evidenceType=\"none\", falseFriendRisk=\"none\", nullCandidate=true.\nnullCandidates follow the same traceability rules as chunkCandidates.\nEvery object in nullCandidates must include segmentationId.\nEvery nullCandidates[].segmentationId must exactly equal the Heart input segmentationId.\nNever omit segmentationId from null candidates.\nNever use a different segmentationId in null candidates.\nEvery null candidate must copy the exact Heart-approved chunk string.\nMissing or mismatched segmentationId in any null candidate makes the entire Brain output invalid.\nEvery null candidate must include a non-empty sourceNote explanation, or a non-empty notes explanation if that is the validator-required explanation field in the current contract.\nThe null-candidate explanation must explain why no credible candidate was returned for that chunk and language.\nNull candidates are evidence of absence and must remain auditable.\nNull candidates must never be silent placeholders.\nFor consonant-only or short chunks, use explicit null candidates when no credible candidate exists, but preserve exact traceability fields.\nFunction hints are ZE-RO doctrine. Doctrine alignment is not external linguistic evidence.\nIf uncertain, use scalar strings: candidateType=\"weak_resonance\" or candidateType=\"null_candidate\"; evidenceType=\"none\" if null; falseFriendRisk=\"high\" if risky.\nAllowed candidateType values: strong_living_match, historical_match, functional_resonance, phonetic_resonance, weak_resonance, likely_false_friend, null_candidate.\nAllowed evidenceType values: living_lexical, historical_etymology, dictionary_attested, phonetic_only, semantic_only, doctrine_alignment, none.\nAllowed falseFriendRisk values: none, low, medium, high.",
+    "userPrompt": "HEART_APPROVED_INPUT_JSON:\n{\n  \"word\": \"study\",\n  \"normalizedWord\": \"study\",\n  \"segmentationId\": \"study.segmentation.004\",\n  \"chunks\": [\n    \"S\",\n    \"TU\",\n    \"DI\"\n  ],\n  \"chunkVariants\": [\n    {\n      \"chunk\": \"DI\",\n      \"variantOf\": \"DY\",\n      \"legalTransform\": \"FINAL_Y_TO_I\",\n      \"notes\": [\n        \"DI is a final Y→I comparison variant of DY.\"\n      ]\n    }\n  ],\n  \"voicePath\": [\n    \"U\",\n    \"I\"\n  ],\n  \"legalTransforms\": [\n    \"FINAL_Y_TO_I\"\n  ],\n  \"normalizationNotes\": [\n    \"Splits consonant-only prefix material from vowel-bearing chunks.\"\n  ],\n  \"functionHints\": [\n    {\n      \"voice\": \"U\",\n      \"hints\": [\n        \"container\",\n        \"inside\",\n        \"adding\",\n        \"holding\",\n        \"depth\"\n      ],\n      \"functionHintSource\": \"ZE-RO doctrine\"\n    },\n    {\n      \"voice\": \"I\",\n      \"hints\": [\n        \"insight\",\n        \"intellect\",\n        \"knowing\",\n        \"line/point\"\n      ],\n      \"functionHintSource\": \"ZE-RO doctrine\"\n    }\n  ],\n  \"targetLanguages\": [\n    \"Albanian\",\n    \"Latin\",\n    \"Chinese\",\n    \"Germanic\"\n  ],\n  \"searchMode\": \"chunk_candidate_search_v0.1\"\n}\nREQUIRED_OUTPUT_SCHEMA_JSON:\n{\n  \"enumFieldsMustBeScalarStrings\": true,\n  \"arraysAreInvalidForEnumFields\": true,\n  \"word\": \"string\",\n  \"segmentationId\": \"string\",\n  \"chunkCandidates\": [\n    {\n      \"segmentationId\": \"string\",\n      \"chunk\": \"string\",\n      \"language\": \"string\",\n      \"candidateForm\": \"string\",\n      \"meaning\": \"string\",\n      \"functionFit\": \"string\",\n      \"sourceNote\": \"string\",\n      \"evidenceType\": {\n        \"type\": \"string\",\n        \"requiredScalar\": true,\n        \"arraysAreInvalid\": true,\n        \"allowedValues\": [\n          \"living_lexical\",\n          \"historical_etymology\",\n          \"dictionary_attested\",\n          \"phonetic_only\",\n          \"semantic_only\",\n          \"doctrine_alignment\",\n          \"none\"\n        ]\n      },\n      \"candidateType\": {\n        \"type\": \"string\",\n        \"requiredScalar\": true,\n        \"arraysAreInvalid\": true,\n        \"allowedValues\": [\n          \"strong_living_match\",\n          \"historical_match\",\n          \"functional_resonance\",\n          \"phonetic_resonance\",\n          \"weak_resonance\",\n          \"likely_false_friend\",\n          \"null_candidate\"\n        ]\n      },\n      \"falseFriendRisk\": {\n        \"type\": \"string\",\n        \"requiredScalar\": true,\n        \"arraysAreInvalid\": true,\n        \"allowedValues\": [\n          \"none\",\n          \"low\",\n          \"medium\",\n          \"high\"\n        ]\n      },\n      \"nullCandidate\": \"boolean\",\n      \"notes\": \"string\"\n    }\n  ],\n  \"nullCandidates\": [\n    {\n      \"segmentationId\": \"string\",\n      \"chunk\": \"string\",\n      \"language\": \"string\",\n      \"candidateForm\": \"string\",\n      \"meaning\": \"string\",\n      \"functionFit\": \"string\",\n      \"sourceNote\": \"string\",\n      \"evidenceType\": {\n        \"type\": \"string\",\n        \"requiredScalar\": true,\n        \"arraysAreInvalid\": true,\n        \"allowedValues\": [\n          \"none\"\n        ]\n      },\n      \"candidateType\": {\n        \"type\": \"string\",\n        \"requiredScalar\": true,\n        \"arraysAreInvalid\": true,\n        \"allowedValues\": [\n          \"null_candidate\"\n        ]\n      },\n      \"falseFriendRisk\": {\n        \"type\": \"string\",\n        \"requiredScalar\": true,\n        \"arraysAreInvalid\": true,\n        \"allowedValues\": [\n          \"none\"\n        ]\n      },\n      \"nullCandidate\": true,\n      \"notes\": \"string\"\n    }\n  ],\n  \"warnings\": [\n    \"string\"\n  ],\n  \"claimBoundary\": {\n    \"originClaim\": false,\n    \"scientificEvidence\": false,\n    \"publicationEvidence\": false,\n    \"developmentCandidateSearchOnly\": true\n  }\n}\nTask: Search candidate meanings for each Heart-approved chunk across targetLanguages.\nReturn candidates and null candidates as strict JSON matching the required schema.\nDo not add prose."
+  },
+  "claimBoundary": {
+    "originClaim": false,
+    "scientificEvidence": false,
+    "publicationEvidence": false,
+    "developmentCandidateSearchOnly": true
+  },
+  "comparison": {
+    "previousLlamaV01Artifact": "docs/open-instrument/artifacts/heart-brain-prototype/2026-06-05-study-heart-brain-llama3-1-8b-segmentation-004-reduced-language-v0.1.json",
+    "previousLlamaV01Review": "docs/open-instrument/study-segmentation-004-reduced-language-llama-result-review-v0.1.md",
+    "previousLlamaV02Artifact": "docs/open-instrument/artifacts/heart-brain-prototype/2026-06-05-study-heart-brain-llama3-1-8b-segmentation-004-reduced-language-v0.2.json",
+    "previousLlamaV02Review": "docs/open-instrument/study-segmentation-004-reduced-language-llama-v0.2-result-review-v0.1.md",
+    "previousLlamaV03Artifact": "docs/open-instrument/artifacts/heart-brain-prototype/2026-06-05-study-heart-brain-llama3-1-8b-segmentation-004-reduced-language-v0.3.json",
+    "previousLlamaV03Review": "docs/open-instrument/study-segmentation-004-reduced-language-llama-v0.3-result-review-v0.1.md",
+    "previousFullPromptTimeoutArtifact": "docs/open-instrument/artifacts/model-capture-failure/2026-06-04-study-segmentation-004-ollama-qwen3-8b-timeout-v0.1.json",
+    "previousFullPromptTimeoutReview": "docs/open-instrument/study-segmentation-004-capture-timeout-review-v0.1.md",
+    "previousReducedLanguageTimeoutArtifact": "docs/open-instrument/artifacts/model-capture-failure/2026-06-05-study-segmentation-004-ollama-qwen3-8b-reduced-language-timeout-v0.1.json",
+    "previousReducedLanguageTimeoutReview": "docs/open-instrument/study-segmentation-004-reduced-language-timeout-review-v0.1.md",
+    "identityContractReinforcementPr": 1192,
+    "sourceNoteContractReinforcementPr": 1198,
+    "metadataContractReinforcementPr": 1201,
+    "timeoutPolicy": "docs/open-instrument/local-model-timeout-budget-policy-v0.1.md",
+    "baseline002": {
+      "artifact": "docs/open-instrument/artifacts/heart-brain-prototype/2026-06-04-study-heart-brain-qwen3-8b-segmentation-002-v0.2.json",
+      "segmentationId": "study.segmentation.002",
+      "embryoMorphemes": [
+        "STU",
+        "DI"
+      ],
+      "parseOk": true,
+      "validationOk": true,
+      "checkedCandidates": 2,
+      "checkedNullCandidates": 2,
+      "chunksCovered": [
+        "STU",
+        "DI"
+      ],
+      "missingChunks": [],
+      "issueCount": 0,
+      "failureKind": null
+    },
+    "baseline003": {
+      "artifact": "docs/open-instrument/artifacts/heart-brain-prototype/2026-06-04-study-heart-brain-qwen3-8b-segmentation-003-v0.1.json",
+      "segmentationId": "study.segmentation.003",
+      "embryoMorphemes": [
+        "SHTU",
+        "DI"
+      ],
+      "parseOk": true,
+      "validationOk": true,
+      "checkedCandidates": 4,
+      "checkedNullCandidates": 1,
+      "chunksCovered": [
+        "SHTU",
+        "DI"
+      ],
+      "missingChunks": [],
+      "issueCount": 0,
+      "failureKind": null
+    }
+  },
+  "createdAt": "2026-06-05T15:30:41.954Z",
+  "environment": {
+    "machine": "Apple M2",
+    "ramGb": 16,
+    "ollamaVersion": "ollama version is 0.24.0",
+    "ollamaList": "NAME           ID              SIZE      MODIFIED     \nqwen3:8b       500a1f067a9f    5.2 GB    36 hours ago    \nllama3.1:8b    46e0c10c039e    4.9 GB    3 days ago"
+  },
+  "failureClassification": "validation_failure",
+  "heart": {
+    "segmentationId": "study.segmentation.004",
+    "word": "study",
+    "normalizedWord": "study",
+    "chunks": [
+      "S",
+      "TU",
+      "DI"
+    ],
+    "chunkVariants": [
+      {
+        "chunk": "DI",
+        "variantOf": "DY",
+        "legalTransform": "FINAL_Y_TO_I",
+        "notes": [
+          "DI is a final Y→I comparison variant of DY."
+        ]
+      }
+    ],
+    "voicePath": [
+      "U",
+      "I"
+    ],
+    "normalizationNotes": [
+      "Splits consonant-only prefix material from vowel-bearing chunks."
+    ],
+    "segmentationType": "micro_chunk_split",
+    "legalTransforms": [
+      "FINAL_Y_TO_I"
+    ],
+    "functionHints": [
+      {
+        "voice": "U",
+        "hints": [
+          "container",
+          "inside",
+          "adding",
+          "holding",
+          "depth"
+        ],
+        "functionHintSource": "ZE-RO doctrine"
+      },
+      {
+        "voice": "I",
+        "hints": [
+          "insight",
+          "intellect",
+          "knowing",
+          "line/point"
+        ],
+        "functionHintSource": "ZE-RO doctrine"
+      }
+    ],
+    "status": "candidate_structure",
+    "riskNotes": [
+      "S is consonant-only prefix/material and short chunks increase false-positive risk."
+    ]
+  },
+  "modelCall": {
+    "httpStatus": 200,
+    "rawApiResponseText": "{\"id\":\"chatcmpl-500\",\"object\":\"chat.completion\",\"created\":1780673441,\"model\":\"llama3.1:8b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\n  \\\"word\\\": \\\"study\\\",\\n  \\\"segmentationId\\\": \\\"study.segmentation.004\\\",\\n  \\\"chunkCandidates\\\": [\\n    {\\n      \\\"segmentationId\\\": \\\"study.segmentation.004\\\",\\n      \\\"chunk\\\": \\\"S\\\",\\n      \\\"language\\\": \\\"Albanian\\\",\\n      \\\"candidateForm\\\": \\\"S\\\",\\n      \\\"meaning\\\": \\\"\\\",\\n      \\\"functionFit\\\": \\\"\\\",\\n      \\\"sourceNote\\\": \\\"No credible candidate found for consonant-only chunk S in Albanian.\\\",\\n      \\\"evidenceType\\\": {\\n        \\\"type\\\": \\\"none\\\"\\n      },\\n      \\\"candidateType\\\": {\\n        \\\"type\\\": \\\"null_candidate\\\"\\n      },\\n      \\\"falseFriendRisk\\\": {\\n        \\\"type\\\": \\\"none\\\"\\n      },\\n      \\\"nullCandidate\\\": true,\\n      \\\"notes\\\": \\\"\\\"\\n    },\\n    {\\n      \\\"segmentationId\\\": \\\"study.segmentation.004\\\",\\n      \\\"chunk\\\": \\\"TU\\\",\\n      \\\"language\\\": \\\"Latin\\\",\\n      \\\"candidateForm\\\": \\\"TU\\\",\\n      \\\"meaning\\\": \\\"\\\",\\n      \\\"functionFit\\\": \\\"\\\",\\n      \\\"sourceNote\\\": \\\"No credible candidate found for chunk TU in Latin.\\\",\\n      \\\"evidenceType\\\": {\\n        \\\"type\\\": \\\"none\\\"\\n      },\\n      \\\"candidateType\\\": {\\n        \\\"type\\\": \\\"null_candidate\\\"\\n      },\\n      \\\"falseFriendRisk\\\": {\\n        \\\"type\\\": \\\"none\\\"\\n      },\\n      \\\"nullCandidate\\\": true,\\n      \\\"notes\\\": \\\"\\\"\\n    },\\n    {\\n      \\\"segmentationId\\\": \\\"study.segmentation.004\\\",\\n      \\\"chunk\\\": \\\"DI\\\",\\n      \\\"language\\\": \\\"Chinese\\\",\\n      \\\"candidateForm\\\": \\\"DI\\\",\\n      \\\"meaning\\\": \\\"\\\",\\n      \\\"functionFit\\\": \\\"\\\",\\n      \\\"sourceNote\\\": \\\"No credible candidate found for chunk DI in Chinese.\\\",\\n      \\\"evidenceType\\\": {\\n        \\\"type\\\": \\\"none\\\"\\n      },\\n      \\\"candidateType\\\": {\\n        \\\"type\\\": \\\"null_candidate\\\"\\n      },\\n      \\\"falseFriendRisk\\\": {\\n        \\\"type\\\": \\\"none\\\"\\n      },\\n      \\\"nullCandidate\\\": true,\\n      \\\"notes\\\": \\\"\\\"\\n    }\\n  ],\\n  \\\"nullCandidates\\\": [\\n    {\\n      \\\"segmentationId\\\": \\\"study.segmentation.004\\\",\\n      \\\"chunk\\\": \\\"S\\\",\\n      \\\"language\\\": \\\"Albanian\\\",\\n      \\\"candidateForm\\\": \\\"S\\\",\\n      \\\"meaning\\\": \\\"\\\",\\n      \\\"functionFit\\\": \\\"\\\",\\n      \\\"sourceNote\\\": \\\"No credible candidate found for consonant-only chunk S in Albanian.\\\",\\n      \\\"evidenceType\\\": {\\n        \\\"type\\\": \\\"none\\\"\\n      },\\n      \\\"candidateType\\\": {\\n        \\\"type\\\": \\\"null_candidate\\\"\\n      },\\n      \\\"falseFriendRisk\\\": {\\n        \\\"type\\\": \\\"none\\\"\\n      },\\n      \\\"nullCandidate\\\": true,\\n      \\\"notes\\\": \\\"\\\"\\n    },\\n    {\\n      \\\"segmentationId\\\": \\\"study.segmentation.004\\\",\\n      \\\"chunk\\\": \\\"TU\\\",\\n      \\\"language\\\": \\\"Latin\\\",\\n      \\\"candidateForm\\\": \\\"TU\\\",\\n      \\\"meaning\\\": \\\"\\\",\\n      \\\"functionFit\\\": \\\"\\\",\\n      \\\"sourceNote\\\": \\\"No credible candidate found for chunk TU in Latin.\\\",\\n      \\\"evidenceType\\\": {\\n        \\\"type\\\": \\\"none\\\"\\n      },\\n      \\\"candidateType\\\": {\\n        \\\"type\\\": \\\"null_candidate\\\"\\n      },\\n      \\\"falseFriendRisk\\\": {\\n        \\\"type\\\": \\\"none\\\"\\n      },\\n      \\\"nullCandidate\\\": true,\\n      \\\"notes\\\": \\\"\\\"\\n    },\\n    {\\n      \\\"segmentationId\\\": \\\"study.segmentation.004\\\",\\n      \\\"chunk\\\": \\\"DI\\\",\\n      \\\"language\\\": \\\"Chinese\\\",\\n      \\\"candidateForm\\\": \\\"DI\\\",\\n      \\\"meaning\\\": \\\"\\\",\\n      \\\"functionFit\\\": \\\"\\\",\\n      \\\"sourceNote\\\": \\\"No credible candidate found for chunk DI in Chinese.\\\",\\n      \\\"evidenceType\\\": {\\n        \\\"type\\\": \\\"none\\\"\\n      },\\n      \\\"candidateType\\\": {\\n        \\\"type\\\": \\\"null_candidate\\\"\\n      },\\n      \\\"falseFriendRisk\\\": {\\n        \\\"type\\\": \\\"none\\\"\\n      },\\n      \\\"nullCandidate\\\": true,\\n      \\\"notes\\\": \\\"\\\"\\n    }\\n  ],\\n  \\\"warnings\\\": [],\\n  \\\"claimBoundary\\\": {\\n    \\\"originClaim\\\": false,\\n    \\\"scientificEvidence\\\": false,\\n    \\\"publicationEvidence\\\": false,\\n    \\\"developmentCandidateSearchOnly\\\": true\\n  }\\n}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":2007,\"completion_tokens\":850,\"total_tokens\":2857}}\n"
+  },
+  "parsedBrainOutput": {
+    "word": "study",
+    "segmentationId": "study.segmentation.004",
+    "chunkCandidates": [
+      {
+        "segmentationId": "study.segmentation.004",
+        "chunk": "S",
+        "language": "Albanian",
+        "candidateForm": "S",
+        "meaning": "",
+        "functionFit": "",
+        "sourceNote": "No credible candidate found for consonant-only chunk S in Albanian.",
+        "evidenceType": {
+          "type": "none"
+        },
+        "candidateType": {
+          "type": "null_candidate"
+        },
+        "falseFriendRisk": {
+          "type": "none"
+        },
+        "nullCandidate": true,
+        "notes": ""
+      },
+      {
+        "segmentationId": "study.segmentation.004",
+        "chunk": "TU",
+        "language": "Latin",
+        "candidateForm": "TU",
+        "meaning": "",
+        "functionFit": "",
+        "sourceNote": "No credible candidate found for chunk TU in Latin.",
+        "evidenceType": {
+          "type": "none"
+        },
+        "candidateType": {
+          "type": "null_candidate"
+        },
+        "falseFriendRisk": {
+          "type": "none"
+        },
+        "nullCandidate": true,
+        "notes": ""
+      },
+      {
+        "segmentationId": "study.segmentation.004",
+        "chunk": "DI",
+        "language": "Chinese",
+        "candidateForm": "DI",
+        "meaning": "",
+        "functionFit": "",
+        "sourceNote": "No credible candidate found for chunk DI in Chinese.",
+        "evidenceType": {
+          "type": "none"
+        },
+        "candidateType": {
+          "type": "null_candidate"
+        },
+        "falseFriendRisk": {
+          "type": "none"
+        },
+        "nullCandidate": true,
+        "notes": ""
+      }
+    ],
+    "nullCandidates": [
+      {
+        "segmentationId": "study.segmentation.004",
+        "chunk": "S",
+        "language": "Albanian",
+        "candidateForm": "S",
+        "meaning": "",
+        "functionFit": "",
+        "sourceNote": "No credible candidate found for consonant-only chunk S in Albanian.",
+        "evidenceType": {
+          "type": "none"
+        },
+        "candidateType": {
+          "type": "null_candidate"
+        },
+        "falseFriendRisk": {
+          "type": "none"
+        },
+        "nullCandidate": true,
+        "notes": ""
+      },
+      {
+        "segmentationId": "study.segmentation.004",
+        "chunk": "TU",
+        "language": "Latin",
+        "candidateForm": "TU",
+        "meaning": "",
+        "functionFit": "",
+        "sourceNote": "No credible candidate found for chunk TU in Latin.",
+        "evidenceType": {
+          "type": "none"
+        },
+        "candidateType": {
+          "type": "null_candidate"
+        },
+        "falseFriendRisk": {
+          "type": "none"
+        },
+        "nullCandidate": true,
+        "notes": ""
+      },
+      {
+        "segmentationId": "study.segmentation.004",
+        "chunk": "DI",
+        "language": "Chinese",
+        "candidateForm": "DI",
+        "meaning": "",
+        "functionFit": "",
+        "sourceNote": "No credible candidate found for chunk DI in Chinese.",
+        "evidenceType": {
+          "type": "none"
+        },
+        "candidateType": {
+          "type": "null_candidate"
+        },
+        "falseFriendRisk": {
+          "type": "none"
+        },
+        "nullCandidate": true,
+        "notes": ""
+      }
+    ],
+    "warnings": [],
+    "claimBoundary": {
+      "originClaim": false,
+      "scientificEvidence": false,
+      "publicationEvidence": false,
+      "developmentCandidateSearchOnly": true
+    }
+  },
+  "preflight": {
+    "startedAt": "2026-06-05T15:29:23.322Z",
+    "endedAt": "2026-06-05T15:29:23.353Z",
+    "ok": true,
+    "timeout": false,
+    "httpStatus": 200,
+    "errorMessage": null
+  },
+  "prototypeVersion": "v0.4",
+  "provider": {
+    "provider": "openai_compat",
+    "runtime": "ollama",
+    "baseUrl": "http://localhost:11434/v1",
+    "model": "llama3.1:8b",
+    "apiKeyStored": false
+  },
+  "redaction": {
+    "apiKeysStored": false,
+    "bearerTokensStored": false,
+    "fullEnvStored": false,
+    "notes": [
+      "Uses local Ollama endpoint with OPENAI_API_KEY=ollama placeholder."
+    ]
+  },
+  "reducedLanguage": true,
+  "repo": {
+    "path": "/Users/wei/Desktop/ZËRO /Dwnlosads /zero-firebase-studio-export",
+    "branch": "docs/open-instrument-study-segmentation-004-reduced-language-llama-v0.4",
+    "head": "bb9252d"
+  },
+  "target": {
+    "word": "study",
+    "segmentationId": "study.segmentation.004",
+    "embryoMorphemes": [
+      "S",
+      "TU",
+      "DI"
+    ],
+    "currentImplementationField": "chunk",
+    "reducedLanguage": true,
+    "targetLanguages": [
+      "Albanian",
+      "Latin",
+      "Chinese",
+      "Germanic"
+    ]
+  },
+  "targetLanguages": [
+    "Albanian",
+    "Latin",
+    "Chinese",
+    "Germanic"
+  ],
+  "timeoutPolicy": {
+    "preflightTimeoutMs": 30000,
+    "firstAttemptTimeoutMs": 180000,
+    "retryTimeoutMs": 300000,
+    "maxRetries": 1,
+    "policyDoc": "docs/open-instrument/local-model-timeout-budget-policy-v0.1.md"
+  },
+  "validation": {
+    "ok": false,
+    "issues": [
+      {
+        "code": "INVALID_CANDIDATE_TYPE",
+        "severity": "error",
+        "message": "candidateType must be one of the allowed Brain candidate types.",
+        "path": "chunkCandidates.0.candidateType"
+      },
+      {
+        "code": "INVALID_EVIDENCE_TYPE",
+        "severity": "error",
+        "message": "evidenceType must be one of the allowed Brain evidence types.",
+        "path": "chunkCandidates.0.evidenceType"
+      },
+      {
+        "code": "INVALID_FALSE_FRIEND_RISK",
+        "severity": "error",
+        "message": "falseFriendRisk must be one of the allowed values.",
+        "path": "chunkCandidates.0.falseFriendRisk"
+      },
+      {
+        "code": "INVALID_NULL_CANDIDATE",
+        "severity": "error",
+        "message": "nullCandidate=true requires candidateType=null_candidate.",
+        "path": "chunkCandidates.0.candidateType"
+      },
+      {
+        "code": "INVALID_NULL_CANDIDATE",
+        "severity": "error",
+        "message": "nullCandidate=true requires evidenceType=none.",
+        "path": "chunkCandidates.0.evidenceType"
+      },
+      {
+        "code": "INVALID_NULL_CANDIDATE",
+        "severity": "error",
+        "message": "nullCandidate=true requires falseFriendRisk=none.",
+        "path": "chunkCandidates.0.falseFriendRisk"
+      },
+      {
+        "code": "INVALID_CANDIDATE_TYPE",
+        "severity": "error",
+        "message": "candidateType must be one of the allowed Brain candidate types.",
+        "path": "chunkCandidates.1.candidateType"
+      },
+      {
+        "code": "INVALID_EVIDENCE_TYPE",
+        "severity": "error",
+        "message": "evidenceType must be one of the allowed Brain evidence types.",
+        "path": "chunkCandidates.1.evidenceType"
+      },
+      {
+        "code": "INVALID_FALSE_FRIEND_RISK",
+        "severity": "error",
+        "message": "falseFriendRisk must be one of the allowed values.",
+        "path": "chunkCandidates.1.falseFriendRisk"
+      },
+      {
+        "code": "INVALID_NULL_CANDIDATE",
+        "severity": "error",
+        "message": "nullCandidate=true requires candidateType=null_candidate.",
+        "path": "chunkCandidates.1.candidateType"
+      },
+      {
+        "code": "INVALID_NULL_CANDIDATE",
+        "severity": "error",
+        "message": "nullCandidate=true requires evidenceType=none.",
+        "path": "chunkCandidates.1.evidenceType"
+      },
+      {
+        "code": "INVALID_NULL_CANDIDATE",
+        "severity": "error",
+        "message": "nullCandidate=true requires falseFriendRisk=none.",
+        "path": "chunkCandidates.1.falseFriendRisk"
+      },
+      {
+        "code": "INVALID_CANDIDATE_TYPE",
+        "severity": "error",
+        "message": "candidateType must be one of the allowed Brain candidate types.",
+        "path": "chunkCandidates.2.candidateType"
+      },
+      {
+        "code": "INVALID_EVIDENCE_TYPE",
+        "severity": "error",
+        "message": "evidenceType must be one of the allowed Brain evidence types.",
+        "path": "chunkCandidates.2.evidenceType"
+      },
+      {
+        "code": "INVALID_FALSE_FRIEND_RISK",
+        "severity": "error",
+        "message": "falseFriendRisk must be one of the allowed values.",
+        "path": "chunkCandidates.2.falseFriendRisk"
+      },
+      {
+        "code": "INVALID_NULL_CANDIDATE",
+        "severity": "error",
+        "message": "nullCandidate=true requires candidateType=null_candidate.",
+        "path": "chunkCandidates.2.candidateType"
+      },
+      {
+        "code": "INVALID_NULL_CANDIDATE",
+        "severity": "error",
+        "message": "nullCandidate=true requires evidenceType=none.",
+        "path": "chunkCandidates.2.evidenceType"
+      },
+      {
+        "code": "INVALID_NULL_CANDIDATE",
+        "severity": "error",
+        "message": "nullCandidate=true requires falseFriendRisk=none.",
+        "path": "chunkCandidates.2.falseFriendRisk"
+      },
+      {
+        "code": "INVALID_CANDIDATE_TYPE",
+        "severity": "error",
+        "message": "candidateType must be one of the allowed Brain candidate types.",
+        "path": "nullCandidates.0.candidateType"
+      },
+      {
+        "code": "INVALID_EVIDENCE_TYPE",
+        "severity": "error",
+        "message": "evidenceType must be one of the allowed Brain evidence types.",
+        "path": "nullCandidates.0.evidenceType"
+      },
+      {
+        "code": "INVALID_FALSE_FRIEND_RISK",
+        "severity": "error",
+        "message": "falseFriendRisk must be one of the allowed values.",
+        "path": "nullCandidates.0.falseFriendRisk"
+      },
+      {
+        "code": "INVALID_NULL_CANDIDATE",
+        "severity": "error",
+        "message": "nullCandidate=true requires candidateType=null_candidate.",
+        "path": "nullCandidates.0.candidateType"
+      },
+      {
+        "code": "INVALID_NULL_CANDIDATE",
+        "severity": "error",
+        "message": "nullCandidate=true requires evidenceType=none.",
+        "path": "nullCandidates.0.evidenceType"
+      },
+      {
+        "code": "INVALID_NULL_CANDIDATE",
+        "severity": "error",
+        "message": "nullCandidate=true requires falseFriendRisk=none.",
+        "path": "nullCandidates.0.falseFriendRisk"
+      },
+      {
+        "code": "INVALID_CANDIDATE_TYPE",
+        "severity": "error",
+        "message": "candidateType must be one of the allowed Brain candidate types.",
+        "path": "nullCandidates.1.candidateType"
+      },
+      {
+        "code": "INVALID_EVIDENCE_TYPE",
+        "severity": "error",
+        "message": "evidenceType must be one of the allowed Brain evidence types.",
+        "path": "nullCandidates.1.evidenceType"
+      },
+      {
+        "code": "INVALID_FALSE_FRIEND_RISK",
+        "severity": "error",
+        "message": "falseFriendRisk must be one of the allowed values.",
+        "path": "nullCandidates.1.falseFriendRisk"
+      },
+      {
+        "code": "INVALID_NULL_CANDIDATE",
+        "severity": "error",
+        "message": "nullCandidate=true requires candidateType=null_candidate.",
+        "path": "nullCandidates.1.candidateType"
+      },
+      {
+        "code": "INVALID_NULL_CANDIDATE",
+        "severity": "error",
+        "message": "nullCandidate=true requires evidenceType=none.",
+        "path": "nullCandidates.1.evidenceType"
+      },
+      {
+        "code": "INVALID_NULL_CANDIDATE",
+        "severity": "error",
+        "message": "nullCandidate=true requires falseFriendRisk=none.",
+        "path": "nullCandidates.1.falseFriendRisk"
+      },
+      {
+        "code": "INVALID_CANDIDATE_TYPE",
+        "severity": "error",
+        "message": "candidateType must be one of the allowed Brain candidate types.",
+        "path": "nullCandidates.2.candidateType"
+      },
+      {
+        "code": "INVALID_EVIDENCE_TYPE",
+        "severity": "error",
+        "message": "evidenceType must be one of the allowed Brain evidence types.",
+        "path": "nullCandidates.2.evidenceType"
+      },
+      {
+        "code": "INVALID_FALSE_FRIEND_RISK",
+        "severity": "error",
+        "message": "falseFriendRisk must be one of the allowed values.",
+        "path": "nullCandidates.2.falseFriendRisk"
+      },
+      {
+        "code": "INVALID_NULL_CANDIDATE",
+        "severity": "error",
+        "message": "nullCandidate=true requires candidateType=null_candidate.",
+        "path": "nullCandidates.2.candidateType"
+      },
+      {
+        "code": "INVALID_NULL_CANDIDATE",
+        "severity": "error",
+        "message": "nullCandidate=true requires evidenceType=none.",
+        "path": "nullCandidates.2.evidenceType"
+      },
+      {
+        "code": "INVALID_NULL_CANDIDATE",
+        "severity": "error",
+        "message": "nullCandidate=true requires falseFriendRisk=none.",
+        "path": "nullCandidates.2.falseFriendRisk"
+      }
+    ],
+    "summary": {
+      "checkedCandidates": 3,
+      "checkedNullCandidates": 3,
+      "chunksCovered": [
+        "S",
+        "TU",
+        "DI"
+      ],
+      "missingChunks": []
+    }
+  },
+  "warnings": []
+}
