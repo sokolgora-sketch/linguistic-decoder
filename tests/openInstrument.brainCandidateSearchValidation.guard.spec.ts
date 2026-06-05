@@ -105,6 +105,43 @@ describe("Open Instrument Brain candidate search validation v0.1", () => {
     );
   });
 
+  it("fails when top-level word is missing", () => {
+    const output = validOutput() as Partial<BrainCandidateSearchOutput>;
+    delete output.word;
+
+    const result = validateBrainCandidateSearchOutput({
+      heartInput: studyInput(),
+      brainOutput: output,
+    });
+
+    expect(result.ok).toBe(false);
+    expect(result.issues).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ code: "MISSING_FIELD", path: "word" }),
+      ]),
+    );
+  });
+
+  it("fails when top-level segmentationId is missing", () => {
+    const output = validOutput() as Partial<BrainCandidateSearchOutput>;
+    delete output.segmentationId;
+
+    const result = validateBrainCandidateSearchOutput({
+      heartInput: studyInput(),
+      brainOutput: output,
+    });
+
+    expect(result.ok).toBe(false);
+    expect(result.issues).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          code: "MISSING_FIELD",
+          path: "segmentationId",
+        }),
+      ]),
+    );
+  });
+
   it("fails wrong segmentationId", () => {
     const output = { ...validOutput(), segmentationId: "study.segmentation.999" };
 
@@ -273,6 +310,45 @@ describe("Open Instrument Brain candidate search validation v0.1", () => {
     expect(result.ok).toBe(false);
     expect(result.issues).toEqual(
       expect.arrayContaining([expect.objectContaining({ code: "INVALID_NULL_CANDIDATE" })]),
+    );
+  });
+
+  it("fails null candidate missing explanation field", () => {
+    const input = studyInput();
+    const output = validOutput(input);
+    output.chunkCandidates = [];
+    output.nullCandidates = [
+      {
+        segmentationId: input.segmentationId,
+        chunk: "DI",
+        language: "Chinese",
+        candidateForm: "",
+        meaning: "",
+        functionFit: "",
+        evidenceType: "none",
+        candidateType: "null_candidate",
+        falseFriendRisk: "none",
+        nullCandidate: true,
+      } as BrainCandidateSearchOutput["nullCandidates"][number],
+    ];
+
+    const result = validateBrainCandidateSearchOutput({
+      heartInput: input,
+      brainOutput: output,
+    });
+
+    expect(result.ok).toBe(false);
+    expect(result.issues).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          code: "MISSING_FIELD",
+          path: "nullCandidates.0.sourceNote",
+        }),
+        expect.objectContaining({
+          code: "INVALID_NULL_CANDIDATE",
+          path: "nullCandidates.0.sourceNote",
+        }),
+      ]),
     );
   });
 

@@ -55,6 +55,17 @@ describe("Open Instrument Brain candidate search prompt v0.1", () => {
     }
   });
 
+  it("requires top-level identity fields to be exact Heart input values and not nested only inside candidates", () => {
+    expect(combined).toContain("Brain output must include top-level word and top-level segmentationId");
+    expect(combined).toContain("word must exactly equal Heart input word");
+    expect(combined).toContain("segmentationId must exactly equal Heart input segmentationId");
+    expect(combined).toContain("Do not omit word or segmentationId");
+    expect(combined).toContain("Do not rename word or segmentationId");
+    expect(combined).toContain("Do not place word or segmentationId only inside candidate objects");
+    expect(combined).toContain("These top-level identity fields are required even when all candidates are null");
+    expect(combined).toContain("These top-level identity fields are required even when the model is uncertain");
+  });
+
   it("includes required chunk candidate fields", () => {
     for (const field of [
       "segmentationId",
@@ -120,8 +131,15 @@ describe("Open Instrument Brain candidate search prompt v0.1", () => {
       "Missing or mismatched segmentationId in any null candidate makes the entire Brain output invalid",
     );
     expect(combined).toContain(
+      "Every null candidate must include a non-empty sourceNote explanation, or a non-empty notes explanation if that is the validator-required explanation field in the current contract",
+    );
+    expect(combined).toContain(
+      "The null-candidate explanation must explain why no credible candidate was returned for that chunk and language",
+    );
+    expect(combined).toContain(
       "Null candidates are evidence of absence and must remain auditable",
     );
+    expect(combined).toContain("Null candidates must never be silent placeholders");
   });
 
   it("keeps null candidate traceability reinforced for study.segmentation.004", () => {
