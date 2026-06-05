@@ -1,0 +1,89 @@
+{
+  "archiveVersion": "v0.1",
+  "artifactType": "open-instrument-model-capture-failure",
+  "createdAt": "2026-06-05T05:18:54Z",
+  "repo": {
+    "project": "ZË-RO",
+    "repository": "sokolgora-sketch/linguistic-decoder",
+    "commit": "60c213f50f4bbeda429e0604e6e06e89924ac04d",
+    "branch": "docs/open-instrument-study-segmentation-004-v0.2-prototype",
+    "workingTree": "clean"
+  },
+  "target": {
+    "word": "study",
+    "segmentationId": "study.segmentation.004",
+    "embryoMorphemes": [
+      "S",
+      "TU",
+      "DI"
+    ],
+    "currentImplementationField": "chunk"
+  },
+  "provider": {
+    "provider": "openai_compat",
+    "runtime": "ollama",
+    "baseUrl": "http://localhost:11434/v1",
+    "model": "qwen3:8b",
+    "apiKeyStored": false
+  },
+  "modelCall": {
+    "requestBuilt": true,
+    "responseReceived": false,
+    "rawContentReceived": false
+  },
+  "failure": {
+    "kind": "timeout",
+    "message": "local model call timed out",
+    "stage": "model_call",
+    "isOperationalFailure": true,
+    "isModelQualityFailure": false,
+    "isValidationFailure": false
+  },
+  "attempts": [
+    {
+      "attempt": 1,
+      "timeoutMs": 120000,
+      "result": "timeout",
+      "errorMessage": "Error: timeout",
+      "startedAt": null,
+      "endedAt": null
+    },
+    {
+      "attempt": 2,
+      "timeoutMs": 600000,
+      "result": "timeout",
+      "errorMessage": "Error: timeout",
+      "startedAt": null,
+      "endedAt": null
+    }
+  ],
+  "heartInputAvailable": true,
+  "brainPromptBuilt": true,
+  "rawResponseAvailable": false,
+  "parsedBrainOutputAvailable": false,
+  "validationAvailable": false,
+  "comparison": {
+    "designDoc": "docs/open-instrument/model-capture-failure-artifact-design-v0.1.md",
+    "previousArtifact": "docs/open-instrument/artifacts/heart-brain-prototype/2026-06-04-study-heart-brain-qwen3-8b-segmentation-004-v0.1.json",
+    "previousReview": "docs/open-instrument/study-segmentation-004-prototype-failure-review-v0.1.md",
+    "traceabilityFixPr": 1178,
+    "designPr": 1180
+  },
+  "claimBoundary": {
+    "scientificEvidence": false,
+    "publicationEvidence": false,
+    "evalEvidence": false,
+    "cohortEvidence": false,
+    "modelQualityEvidence": false,
+    "candidateTruthEvidence": false,
+    "languageOriginEvidence": false,
+    "validationFailure": false,
+    "defaultProviderChange": false,
+    "developmentOperationalRecordOnly": true
+  },
+  "redaction": {
+    "apiKeysStored": false,
+    "bearerTokensStored": false,
+    "fullEnvStored": false
+  }
+}
