@@ -1,0 +1,677 @@
+{
+  "artifactType": "open_instrument_controlled_llama_retry_after_enum_repair",
+  "artifactVersion": "v0.1",
+  "createdAt": "2026-06-06",
+  "status": "archived",
+  "classification": "CLEAN_AFTER_NORMALIZATION",
+  "source": {
+    "word": "study",
+    "segmentationId": "study.segmentation.004",
+    "chunks": [
+      "S",
+      "TU",
+      "DI"
+    ],
+    "languages": [
+      "Albanian",
+      "Latin",
+      "Chinese",
+      "Germanic"
+    ],
+    "model": "llama3.1:8b",
+    "provider": "openai_compat",
+    "endpoint": "http://localhost:11434/v1/chat/completions",
+    "retryDesignDoc": "docs/open-instrument/study-segmentation-004-controlled-llama-retry-after-enum-repair-v0.1.md",
+    "runtimeBoundaryDoc": "docs/open-instrument/brain-normalization-runtime-boundary-v0.1.md"
+  },
+  "execution": {
+    "modelCallMade": true,
+    "normalizationApplied": true,
+    "normalizer": "normalizeBrainCandidateEnums",
+    "validator": "brainCandidateSearchValidation",
+    "providerDefaultChanged": false,
+    "promptChanged": false,
+    "validatorChanged": false,
+    "runtimeWiringChanged": false,
+    "sourceFilesChanged": false,
+    "attemptCount": 1
+  },
+  "summary": {
+    "parseOk": true,
+    "normalizationApplied": true,
+    "repairedCount": 18,
+    "unchangedCount": 0,
+    "unresolvedCount": 0,
+    "objectWrapperRepairCount": 18,
+    "objectWrapperUnresolvedCount": 0,
+    "validationOkAfterNormalization": true,
+    "validationIssueCountAfterNormalization": 0,
+    "validationIssueFamiliesAfterNormalization": {},
+    "classification": "CLEAN_AFTER_NORMALIZATION"
+  },
+  "heartInput": {
+    "word": "study",
+    "normalizedWord": "study",
+    "segmentationId": "study.segmentation.004",
+    "chunks": [
+      "S",
+      "TU",
+      "DI"
+    ],
+    "chunkVariants": [
+      {
+        "chunk": "DI",
+        "variantOf": "DY",
+        "legalTransform": "FINAL_Y_TO_I",
+        "notes": [
+          "DI is a final Y→I comparison variant of DY."
+        ]
+      }
+    ],
+    "voicePath": [
+      "U",
+      "I"
+    ],
+    "legalTransforms": [
+      "FINAL_Y_TO_I"
+    ],
+    "normalizationNotes": [
+      "Splits consonant-only prefix material from vowel-bearing chunks."
+    ],
+    "functionHints": [
+      {
+        "voice": "U",
+        "hints": [
+          "container",
+          "inside",
+          "adding",
+          "holding",
+          "depth"
+        ],
+        "functionHintSource": "ZE-RO doctrine"
+      },
+      {
+        "voice": "I",
+        "hints": [
+          "insight",
+          "intellect",
+          "knowing",
+          "line/point"
+        ],
+        "functionHintSource": "ZE-RO doctrine"
+      }
+    ],
+    "targetLanguages": [
+      "Albanian",
+      "Latin",
+      "Chinese",
+      "Germanic"
+    ],
+    "searchMode": "chunk_candidate_search_v0.1"
+  },
+  "rawProviderResponse": {
+    "httpStatus": 200,
+    "ok": true,
+    "headers": {
+      "content-type": "application/json",
+      "date": "Sat, 06 Jun 2026 13:38:51 GMT",
+      "transfer-encoding": "chunked"
+    },
+    "bodyText": "{\"id\":\"chatcmpl-457\",\"object\":\"chat.completion\",\"created\":1780753131,\"model\":\"llama3.1:8b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\n  \\\"word\\\": \\\"study\\\",\\n  \\\"segmentationId\\\": \\\"study.segmentation.004\\\",\\n  \\\"chunkCandidates\\\": [\\n    {\\n      \\\"segmentationId\\\": \\\"study.segmentation.004\\\",\\n      \\\"chunk\\\": \\\"S\\\",\\n      \\\"language\\\": \\\"Albanian\\\",\\n      \\\"candidateForm\\\": \\\"S\\\",\\n      \\\"meaning\\\": \\\"\\\",\\n      \\\"functionFit\\\": \\\"\\\",\\n      \\\"sourceNote\\\": \\\"No credible candidate found for consonant-only chunk S in Albanian.\\\",\\n      \\\"evidenceType\\\": {\\n        \\\"type\\\": \\\"none\\\"\\n      },\\n      \\\"candidateType\\\": {\\n        \\\"type\\\": \\\"null_candidate\\\"\\n      },\\n      \\\"falseFriendRisk\\\": {\\n        \\\"type\\\": \\\"none\\\"\\n      },\\n      \\\"nullCandidate\\\": true,\\n      \\\"notes\\\": \\\"\\\"\\n    },\\n    {\\n      \\\"segmentationId\\\": \\\"study.segmentation.004\\\",\\n      \\\"chunk\\\": \\\"TU\\\",\\n      \\\"language\\\": \\\"Latin\\\",\\n      \\\"candidateForm\\\": \\\"TU\\\",\\n      \\\"meaning\\\": \\\"\\\",\\n      \\\"functionFit\\\": \\\"\\\",\\n      \\\"sourceNote\\\": \\\"No credible candidate found for chunk TU in Latin.\\\",\\n      \\\"evidenceType\\\": {\\n        \\\"type\\\": \\\"none\\\"\\n      },\\n      \\\"candidateType\\\": {\\n        \\\"type\\\": \\\"null_candidate\\\"\\n      },\\n      \\\"falseFriendRisk\\\": {\\n        \\\"type\\\": \\\"none\\\"\\n      },\\n      \\\"nullCandidate\\\": true,\\n      \\\"notes\\\": \\\"\\\"\\n    },\\n    {\\n      \\\"segmentationId\\\": \\\"study.segmentation.004\\\",\\n      \\\"chunk\\\": \\\"DI\\\",\\n      \\\"language\\\": \\\"Chinese\\\",\\n      \\\"candidateForm\\\": \\\"DI\\\",\\n      \\\"meaning\\\": \\\"\\\",\\n      \\\"functionFit\\\": \\\"\\\",\\n      \\\"sourceNote\\\": \\\"No credible candidate found for chunk DI in Chinese.\\\",\\n      \\\"evidenceType\\\": {\\n        \\\"type\\\": \\\"none\\\"\\n      },\\n      \\\"candidateType\\\": {\\n        \\\"type\\\": \\\"null_candidate\\\"\\n      },\\n      \\\"falseFriendRisk\\\": {\\n        \\\"type\\\": \\\"none\\\"\\n      },\\n      \\\"nullCandidate\\\": true,\\n      \\\"notes\\\": \\\"\\\"\\n    }\\n  ],\\n  \\\"nullCandidates\\\": [\\n    {\\n      \\\"segmentationId\\\": \\\"study.segmentation.004\\\",\\n      \\\"chunk\\\": \\\"S\\\",\\n      \\\"language\\\": \\\"Albanian\\\",\\n      \\\"candidateForm\\\": \\\"S\\\",\\n      \\\"meaning\\\": \\\"\\\",\\n      \\\"functionFit\\\": \\\"\\\",\\n      \\\"sourceNote\\\": \\\"No credible candidate found for consonant-only chunk S in Albanian.\\\",\\n      \\\"evidenceType\\\": {\\n        \\\"type\\\": \\\"none\\\"\\n      },\\n      \\\"candidateType\\\": {\\n        \\\"type\\\": \\\"null_candidate\\\"\\n      },\\n      \\\"falseFriendRisk\\\": {\\n        \\\"type\\\": \\\"none\\\"\\n      },\\n      \\\"nullCandidate\\\": true,\\n      \\\"notes\\\": \\\"\\\"\\n    },\\n    {\\n      \\\"segmentationId\\\": \\\"study.segmentation.004\\\",\\n      \\\"chunk\\\": \\\"TU\\\",\\n      \\\"language\\\": \\\"Latin\\\",\\n      \\\"candidateForm\\\": \\\"TU\\\",\\n      \\\"meaning\\\": \\\"\\\",\\n      \\\"functionFit\\\": \\\"\\\",\\n      \\\"sourceNote\\\": \\\"No credible candidate found for chunk TU in Latin.\\\",\\n      \\\"evidenceType\\\": {\\n        \\\"type\\\": \\\"none\\\"\\n      },\\n      \\\"candidateType\\\": {\\n        \\\"type\\\": \\\"null_candidate\\\"\\n      },\\n      \\\"falseFriendRisk\\\": {\\n        \\\"type\\\": \\\"none\\\"\\n      },\\n      \\\"nullCandidate\\\": true,\\n      \\\"notes\\\": \\\"\\\"\\n    },\\n    {\\n      \\\"segmentationId\\\": \\\"study.segmentation.004\\\",\\n      \\\"chunk\\\": \\\"DI\\\",\\n      \\\"language\\\": \\\"Chinese\\\",\\n      \\\"candidateForm\\\": \\\"DI\\\",\\n      \\\"meaning\\\": \\\"\\\",\\n      \\\"functionFit\\\": \\\"\\\",\\n      \\\"sourceNote\\\": \\\"No credible candidate found for chunk DI in Chinese.\\\",\\n      \\\"evidenceType\\\": {\\n        \\\"type\\\": \\\"none\\\"\\n      },\\n      \\\"candidateType\\\": {\\n        \\\"type\\\": \\\"null_candidate\\\"\\n      },\\n      \\\"falseFriendRisk\\\": {\\n        \\\"type\\\": \\\"none\\\"\\n      },\\n      \\\"nullCandidate\\\": true,\\n      \\\"notes\\\": \\\"\\\"\\n    }\\n  ],\\n  \\\"warnings\\\": [],\\n  \\\"claimBoundary\\\": {\\n    \\\"originClaim\\\": false,\\n    \\\"scientificEvidence\\\": false,\\n    \\\"publicationEvidence\\\": false,\\n    \\\"developmentCandidateSearchOnly\\\": true\\n  }\\n}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":2055,\"completion_tokens\":850,\"total_tokens\":2905}}\n",
+    "bodyJson": {
+      "id": "chatcmpl-457",
+      "object": "chat.completion",
+      "created": 1780753131,
+      "model": "llama3.1:8b",
+      "system_fingerprint": "fp_ollama",
+      "choices": [
+        {
+          "index": 0,
+          "message": {
+            "role": "assistant",
+            "content": "{\n  \"word\": \"study\",\n  \"segmentationId\": \"study.segmentation.004\",\n  \"chunkCandidates\": [\n    {\n      \"segmentationId\": \"study.segmentation.004\",\n      \"chunk\": \"S\",\n      \"language\": \"Albanian\",\n      \"candidateForm\": \"S\",\n      \"meaning\": \"\",\n      \"functionFit\": \"\",\n      \"sourceNote\": \"No credible candidate found for consonant-only chunk S in Albanian.\",\n      \"evidenceType\": {\n        \"type\": \"none\"\n      },\n      \"candidateType\": {\n        \"type\": \"null_candidate\"\n      },\n      \"falseFriendRisk\": {\n        \"type\": \"none\"\n      },\n      \"nullCandidate\": true,\n      \"notes\": \"\"\n    },\n    {\n      \"segmentationId\": \"study.segmentation.004\",\n      \"chunk\": \"TU\",\n      \"language\": \"Latin\",\n      \"candidateForm\": \"TU\",\n      \"meaning\": \"\",\n      \"functionFit\": \"\",\n      \"sourceNote\": \"No credible candidate found for chunk TU in Latin.\",\n      \"evidenceType\": {\n        \"type\": \"none\"\n      },\n      \"candidateType\": {\n        \"type\": \"null_candidate\"\n      },\n      \"falseFriendRisk\": {\n        \"type\": \"none\"\n      },\n      \"nullCandidate\": true,\n      \"notes\": \"\"\n    },\n    {\n      \"segmentationId\": \"study.segmentation.004\",\n      \"chunk\": \"DI\",\n      \"language\": \"Chinese\",\n      \"candidateForm\": \"DI\",\n      \"meaning\": \"\",\n      \"functionFit\": \"\",\n      \"sourceNote\": \"No credible candidate found for chunk DI in Chinese.\",\n      \"evidenceType\": {\n        \"type\": \"none\"\n      },\n      \"candidateType\": {\n        \"type\": \"null_candidate\"\n      },\n      \"falseFriendRisk\": {\n        \"type\": \"none\"\n      },\n      \"nullCandidate\": true,\n      \"notes\": \"\"\n    }\n  ],\n  \"nullCandidates\": [\n    {\n      \"segmentationId\": \"study.segmentation.004\",\n      \"chunk\": \"S\",\n      \"language\": \"Albanian\",\n      \"candidateForm\": \"S\",\n      \"meaning\": \"\",\n      \"functionFit\": \"\",\n      \"sourceNote\": \"No credible candidate found for consonant-only chunk S in Albanian.\",\n      \"evidenceType\": {\n        \"type\": \"none\"\n      },\n      \"candidateType\": {\n        \"type\": \"null_candidate\"\n      },\n      \"falseFriendRisk\": {\n        \"type\": \"none\"\n      },\n      \"nullCandidate\": true,\n      \"notes\": \"\"\n    },\n    {\n      \"segmentationId\": \"study.segmentation.004\",\n      \"chunk\": \"TU\",\n      \"language\": \"Latin\",\n      \"candidateForm\": \"TU\",\n      \"meaning\": \"\",\n      \"functionFit\": \"\",\n      \"sourceNote\": \"No credible candidate found for chunk TU in Latin.\",\n      \"evidenceType\": {\n        \"type\": \"none\"\n      },\n      \"candidateType\": {\n        \"type\": \"null_candidate\"\n      },\n      \"falseFriendRisk\": {\n        \"type\": \"none\"\n      },\n      \"nullCandidate\": true,\n      \"notes\": \"\"\n    },\n    {\n      \"segmentationId\": \"study.segmentation.004\",\n      \"chunk\": \"DI\",\n      \"language\": \"Chinese\",\n      \"candidateForm\": \"DI\",\n      \"meaning\": \"\",\n      \"functionFit\": \"\",\n      \"sourceNote\": \"No credible candidate found for chunk DI in Chinese.\",\n      \"evidenceType\": {\n        \"type\": \"none\"\n      },\n      \"candidateType\": {\n        \"type\": \"null_candidate\"\n      },\n      \"falseFriendRisk\": {\n        \"type\": \"none\"\n      },\n      \"nullCandidate\": true,\n      \"notes\": \"\"\n    }\n  ],\n  \"warnings\": [],\n  \"claimBoundary\": {\n    \"originClaim\": false,\n    \"scientificEvidence\": false,\n    \"publicationEvidence\": false,\n    \"developmentCandidateSearchOnly\": true\n  }\n}"
+          },
+          "finish_reason": "stop"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 2055,
+        "completion_tokens": 850,
+        "total_tokens": 2905
+      }
+    },
+    "rawBrainOutputText": "{\n  \"word\": \"study\",\n  \"segmentationId\": \"study.segmentation.004\",\n  \"chunkCandidates\": [\n    {\n      \"segmentationId\": \"study.segmentation.004\",\n      \"chunk\": \"S\",\n      \"language\": \"Albanian\",\n      \"candidateForm\": \"S\",\n      \"meaning\": \"\",\n      \"functionFit\": \"\",\n      \"sourceNote\": \"No credible candidate found for consonant-only chunk S in Albanian.\",\n      \"evidenceType\": {\n        \"type\": \"none\"\n      },\n      \"candidateType\": {\n        \"type\": \"null_candidate\"\n      },\n      \"falseFriendRisk\": {\n        \"type\": \"none\"\n      },\n      \"nullCandidate\": true,\n      \"notes\": \"\"\n    },\n    {\n      \"segmentationId\": \"study.segmentation.004\",\n      \"chunk\": \"TU\",\n      \"language\": \"Latin\",\n      \"candidateForm\": \"TU\",\n      \"meaning\": \"\",\n      \"functionFit\": \"\",\n      \"sourceNote\": \"No credible candidate found for chunk TU in Latin.\",\n      \"evidenceType\": {\n        \"type\": \"none\"\n      },\n      \"candidateType\": {\n        \"type\": \"null_candidate\"\n      },\n      \"falseFriendRisk\": {\n        \"type\": \"none\"\n      },\n      \"nullCandidate\": true,\n      \"notes\": \"\"\n    },\n    {\n      \"segmentationId\": \"study.segmentation.004\",\n      \"chunk\": \"DI\",\n      \"language\": \"Chinese\",\n      \"candidateForm\": \"DI\",\n      \"meaning\": \"\",\n      \"functionFit\": \"\",\n      \"sourceNote\": \"No credible candidate found for chunk DI in Chinese.\",\n      \"evidenceType\": {\n        \"type\": \"none\"\n      },\n      \"candidateType\": {\n        \"type\": \"null_candidate\"\n      },\n      \"falseFriendRisk\": {\n        \"type\": \"none\"\n      },\n      \"nullCandidate\": true,\n      \"notes\": \"\"\n    }\n  ],\n  \"nullCandidates\": [\n    {\n      \"segmentationId\": \"study.segmentation.004\",\n      \"chunk\": \"S\",\n      \"language\": \"Albanian\",\n      \"candidateForm\": \"S\",\n      \"meaning\": \"\",\n      \"functionFit\": \"\",\n      \"sourceNote\": \"No credible candidate found for consonant-only chunk S in Albanian.\",\n      \"evidenceType\": {\n        \"type\": \"none\"\n      },\n      \"candidateType\": {\n        \"type\": \"null_candidate\"\n      },\n      \"falseFriendRisk\": {\n        \"type\": \"none\"\n      },\n      \"nullCandidate\": true,\n      \"notes\": \"\"\n    },\n    {\n      \"segmentationId\": \"study.segmentation.004\",\n      \"chunk\": \"TU\",\n      \"language\": \"Latin\",\n      \"candidateForm\": \"TU\",\n      \"meaning\": \"\",\n      \"functionFit\": \"\",\n      \"sourceNote\": \"No credible candidate found for chunk TU in Latin.\",\n      \"evidenceType\": {\n        \"type\": \"none\"\n      },\n      \"candidateType\": {\n        \"type\": \"null_candidate\"\n      },\n      \"falseFriendRisk\": {\n        \"type\": \"none\"\n      },\n      \"nullCandidate\": true,\n      \"notes\": \"\"\n    },\n    {\n      \"segmentationId\": \"study.segmentation.004\",\n      \"chunk\": \"DI\",\n      \"language\": \"Chinese\",\n      \"candidateForm\": \"DI\",\n      \"meaning\": \"\",\n      \"functionFit\": \"\",\n      \"sourceNote\": \"No credible candidate found for chunk DI in Chinese.\",\n      \"evidenceType\": {\n        \"type\": \"none\"\n      },\n      \"candidateType\": {\n        \"type\": \"null_candidate\"\n      },\n      \"falseFriendRisk\": {\n        \"type\": \"none\"\n      },\n      \"nullCandidate\": true,\n      \"notes\": \"\"\n    }\n  ],\n  \"warnings\": [],\n  \"claimBoundary\": {\n    \"originClaim\": false,\n    \"scientificEvidence\": false,\n    \"publicationEvidence\": false,\n    \"developmentCandidateSearchOnly\": true\n  }\n}"
+  },
+  "parsedRawBrainOutput": {
+    "word": "study",
+    "segmentationId": "study.segmentation.004",
+    "chunkCandidates": [
+      {
+        "segmentationId": "study.segmentation.004",
+        "chunk": "S",
+        "language": "Albanian",
+        "candidateForm": "S",
+        "meaning": "",
+        "functionFit": "",
+        "sourceNote": "No credible candidate found for consonant-only chunk S in Albanian.",
+        "evidenceType": {
+          "type": "none"
+        },
+        "candidateType": {
+          "type": "null_candidate"
+        },
+        "falseFriendRisk": {
+          "type": "none"
+        },
+        "nullCandidate": true,
+        "notes": ""
+      },
+      {
+        "segmentationId": "study.segmentation.004",
+        "chunk": "TU",
+        "language": "Latin",
+        "candidateForm": "TU",
+        "meaning": "",
+        "functionFit": "",
+        "sourceNote": "No credible candidate found for chunk TU in Latin.",
+        "evidenceType": {
+          "type": "none"
+        },
+        "candidateType": {
+          "type": "null_candidate"
+        },
+        "falseFriendRisk": {
+          "type": "none"
+        },
+        "nullCandidate": true,
+        "notes": ""
+      },
+      {
+        "segmentationId": "study.segmentation.004",
+        "chunk": "DI",
+        "language": "Chinese",
+        "candidateForm": "DI",
+        "meaning": "",
+        "functionFit": "",
+        "sourceNote": "No credible candidate found for chunk DI in Chinese.",
+        "evidenceType": {
+          "type": "none"
+        },
+        "candidateType": {
+          "type": "null_candidate"
+        },
+        "falseFriendRisk": {
+          "type": "none"
+        },
+        "nullCandidate": true,
+        "notes": ""
+      }
+    ],
+    "nullCandidates": [
+      {
+        "segmentationId": "study.segmentation.004",
+        "chunk": "S",
+        "language": "Albanian",
+        "candidateForm": "S",
+        "meaning": "",
+        "functionFit": "",
+        "sourceNote": "No credible candidate found for consonant-only chunk S in Albanian.",
+        "evidenceType": {
+          "type": "none"
+        },
+        "candidateType": {
+          "type": "null_candidate"
+        },
+        "falseFriendRisk": {
+          "type": "none"
+        },
+        "nullCandidate": true,
+        "notes": ""
+      },
+      {
+        "segmentationId": "study.segmentation.004",
+        "chunk": "TU",
+        "language": "Latin",
+        "candidateForm": "TU",
+        "meaning": "",
+        "functionFit": "",
+        "sourceNote": "No credible candidate found for chunk TU in Latin.",
+        "evidenceType": {
+          "type": "none"
+        },
+        "candidateType": {
+          "type": "null_candidate"
+        },
+        "falseFriendRisk": {
+          "type": "none"
+        },
+        "nullCandidate": true,
+        "notes": ""
+      },
+      {
+        "segmentationId": "study.segmentation.004",
+        "chunk": "DI",
+        "language": "Chinese",
+        "candidateForm": "DI",
+        "meaning": "",
+        "functionFit": "",
+        "sourceNote": "No credible candidate found for chunk DI in Chinese.",
+        "evidenceType": {
+          "type": "none"
+        },
+        "candidateType": {
+          "type": "null_candidate"
+        },
+        "falseFriendRisk": {
+          "type": "none"
+        },
+        "nullCandidate": true,
+        "notes": ""
+      }
+    ],
+    "warnings": [],
+    "claimBoundary": {
+      "originClaim": false,
+      "scientificEvidence": false,
+      "publicationEvidence": false,
+      "developmentCandidateSearchOnly": true
+    }
+  },
+  "normalization": {
+    "applied": true,
+    "normalizer": "normalizeBrainCandidateEnums",
+    "audit": [
+      {
+        "path": "chunkCandidates.0.candidateType",
+        "field": "candidateType",
+        "originalValue": {
+          "type": "null_candidate"
+        },
+        "normalizedValue": "null_candidate",
+        "extractedValue": "null_candidate",
+        "objectShape": "type",
+        "carrierKey": "type",
+        "mappingRuleId": "object_type_scalar_enum_wrapper",
+        "status": "repaired",
+        "reason": "Object wrapper extracted an already canonical scalar enum value."
+      },
+      {
+        "path": "chunkCandidates.0.evidenceType",
+        "field": "evidenceType",
+        "originalValue": {
+          "type": "none"
+        },
+        "normalizedValue": "none",
+        "extractedValue": "none",
+        "objectShape": "type",
+        "carrierKey": "type",
+        "mappingRuleId": "object_type_scalar_enum_wrapper",
+        "status": "repaired",
+        "reason": "Object wrapper extracted an already canonical scalar enum value."
+      },
+      {
+        "path": "chunkCandidates.0.falseFriendRisk",
+        "field": "falseFriendRisk",
+        "originalValue": {
+          "type": "none"
+        },
+        "normalizedValue": "none",
+        "extractedValue": "none",
+        "objectShape": "type",
+        "carrierKey": "type",
+        "mappingRuleId": "object_type_scalar_enum_wrapper",
+        "status": "repaired",
+        "reason": "Object wrapper extracted an already canonical scalar enum value."
+      },
+      {
+        "path": "chunkCandidates.1.candidateType",
+        "field": "candidateType",
+        "originalValue": {
+          "type": "null_candidate"
+        },
+        "normalizedValue": "null_candidate",
+        "extractedValue": "null_candidate",
+        "objectShape": "type",
+        "carrierKey": "type",
+        "mappingRuleId": "object_type_scalar_enum_wrapper",
+        "status": "repaired",
+        "reason": "Object wrapper extracted an already canonical scalar enum value."
+      },
+      {
+        "path": "chunkCandidates.1.evidenceType",
+        "field": "evidenceType",
+        "originalValue": {
+          "type": "none"
+        },
+        "normalizedValue": "none",
+        "extractedValue": "none",
+        "objectShape": "type",
+        "carrierKey": "type",
+        "mappingRuleId": "object_type_scalar_enum_wrapper",
+        "status": "repaired",
+        "reason": "Object wrapper extracted an already canonical scalar enum value."
+      },
+      {
+        "path": "chunkCandidates.1.falseFriendRisk",
+        "field": "falseFriendRisk",
+        "originalValue": {
+          "type": "none"
+        },
+        "normalizedValue": "none",
+        "extractedValue": "none",
+        "objectShape": "type",
+        "carrierKey": "type",
+        "mappingRuleId": "object_type_scalar_enum_wrapper",
+        "status": "repaired",
+        "reason": "Object wrapper extracted an already canonical scalar enum value."
+      },
+      {
+        "path": "chunkCandidates.2.candidateType",
+        "field": "candidateType",
+        "originalValue": {
+          "type": "null_candidate"
+        },
+        "normalizedValue": "null_candidate",
+        "extractedValue": "null_candidate",
+        "objectShape": "type",
+        "carrierKey": "type",
+        "mappingRuleId": "object_type_scalar_enum_wrapper",
+        "status": "repaired",
+        "reason": "Object wrapper extracted an already canonical scalar enum value."
+      },
+      {
+        "path": "chunkCandidates.2.evidenceType",
+        "field": "evidenceType",
+        "originalValue": {
+          "type": "none"
+        },
+        "normalizedValue": "none",
+        "extractedValue": "none",
+        "objectShape": "type",
+        "carrierKey": "type",
+        "mappingRuleId": "object_type_scalar_enum_wrapper",
+        "status": "repaired",
+        "reason": "Object wrapper extracted an already canonical scalar enum value."
+      },
+      {
+        "path": "chunkCandidates.2.falseFriendRisk",
+        "field": "falseFriendRisk",
+        "originalValue": {
+          "type": "none"
+        },
+        "normalizedValue": "none",
+        "extractedValue": "none",
+        "objectShape": "type",
+        "carrierKey": "type",
+        "mappingRuleId": "object_type_scalar_enum_wrapper",
+        "status": "repaired",
+        "reason": "Object wrapper extracted an already canonical scalar enum value."
+      },
+      {
+        "path": "nullCandidates.0.candidateType",
+        "field": "candidateType",
+        "originalValue": {
+          "type": "null_candidate"
+        },
+        "normalizedValue": "null_candidate",
+        "extractedValue": "null_candidate",
+        "objectShape": "type",
+        "carrierKey": "type",
+        "mappingRuleId": "object_type_scalar_enum_wrapper",
+        "status": "repaired",
+        "reason": "Object wrapper extracted an already canonical scalar enum value."
+      },
+      {
+        "path": "nullCandidates.0.evidenceType",
+        "field": "evidenceType",
+        "originalValue": {
+          "type": "none"
+        },
+        "normalizedValue": "none",
+        "extractedValue": "none",
+        "objectShape": "type",
+        "carrierKey": "type",
+        "mappingRuleId": "object_type_scalar_enum_wrapper",
+        "status": "repaired",
+        "reason": "Object wrapper extracted an already canonical scalar enum value."
+      },
+      {
+        "path": "nullCandidates.0.falseFriendRisk",
+        "field": "falseFriendRisk",
+        "originalValue": {
+          "type": "none"
+        },
+        "normalizedValue": "none",
+        "extractedValue": "none",
+        "objectShape": "type",
+        "carrierKey": "type",
+        "mappingRuleId": "object_type_scalar_enum_wrapper",
+        "status": "repaired",
+        "reason": "Object wrapper extracted an already canonical scalar enum value."
+      },
+      {
+        "path": "nullCandidates.1.candidateType",
+        "field": "candidateType",
+        "originalValue": {
+          "type": "null_candidate"
+        },
+        "normalizedValue": "null_candidate",
+        "extractedValue": "null_candidate",
+        "objectShape": "type",
+        "carrierKey": "type",
+        "mappingRuleId": "object_type_scalar_enum_wrapper",
+        "status": "repaired",
+        "reason": "Object wrapper extracted an already canonical scalar enum value."
+      },
+      {
+        "path": "nullCandidates.1.evidenceType",
+        "field": "evidenceType",
+        "originalValue": {
+          "type": "none"
+        },
+        "normalizedValue": "none",
+        "extractedValue": "none",
+        "objectShape": "type",
+        "carrierKey": "type",
+        "mappingRuleId": "object_type_scalar_enum_wrapper",
+        "status": "repaired",
+        "reason": "Object wrapper extracted an already canonical scalar enum value."
+      },
+      {
+        "path": "nullCandidates.1.falseFriendRisk",
+        "field": "falseFriendRisk",
+        "originalValue": {
+          "type": "none"
+        },
+        "normalizedValue": "none",
+        "extractedValue": "none",
+        "objectShape": "type",
+        "carrierKey": "type",
+        "mappingRuleId": "object_type_scalar_enum_wrapper",
+        "status": "repaired",
+        "reason": "Object wrapper extracted an already canonical scalar enum value."
+      },
+      {
+        "path": "nullCandidates.2.candidateType",
+        "field": "candidateType",
+        "originalValue": {
+          "type": "null_candidate"
+        },
+        "normalizedValue": "null_candidate",
+        "extractedValue": "null_candidate",
+        "objectShape": "type",
+        "carrierKey": "type",
+        "mappingRuleId": "object_type_scalar_enum_wrapper",
+        "status": "repaired",
+        "reason": "Object wrapper extracted an already canonical scalar enum value."
+      },
+      {
+        "path": "nullCandidates.2.evidenceType",
+        "field": "evidenceType",
+        "originalValue": {
+          "type": "none"
+        },
+        "normalizedValue": "none",
+        "extractedValue": "none",
+        "objectShape": "type",
+        "carrierKey": "type",
+        "mappingRuleId": "object_type_scalar_enum_wrapper",
+        "status": "repaired",
+        "reason": "Object wrapper extracted an already canonical scalar enum value."
+      },
+      {
+        "path": "nullCandidates.2.falseFriendRisk",
+        "field": "falseFriendRisk",
+        "originalValue": {
+          "type": "none"
+        },
+        "normalizedValue": "none",
+        "extractedValue": "none",
+        "objectShape": "type",
+        "carrierKey": "type",
+        "mappingRuleId": "object_type_scalar_enum_wrapper",
+        "status": "repaired",
+        "reason": "Object wrapper extracted an already canonical scalar enum value."
+      }
+    ],
+    "unresolved": [],
+    "repairedCount": 18,
+    "unchangedCount": 0,
+    "unresolvedCount": 0,
+    "objectWrapperRepairCount": 18,
+    "objectWrapperUnresolvedCount": 0
+  },
+  "normalizedBrainOutput": {
+    "word": "study",
+    "segmentationId": "study.segmentation.004",
+    "chunkCandidates": [
+      {
+        "segmentationId": "study.segmentation.004",
+        "chunk": "S",
+        "language": "Albanian",
+        "candidateForm": "S",
+        "meaning": "",
+        "functionFit": "",
+        "sourceNote": "No credible candidate found for consonant-only chunk S in Albanian.",
+        "evidenceType": "none",
+        "candidateType": "null_candidate",
+        "falseFriendRisk": "none",
+        "nullCandidate": true,
+        "notes": ""
+      },
+      {
+        "segmentationId": "study.segmentation.004",
+        "chunk": "TU",
+        "language": "Latin",
+        "candidateForm": "TU",
+        "meaning": "",
+        "functionFit": "",
+        "sourceNote": "No credible candidate found for chunk TU in Latin.",
+        "evidenceType": "none",
+        "candidateType": "null_candidate",
+        "falseFriendRisk": "none",
+        "nullCandidate": true,
+        "notes": ""
+      },
+      {
+        "segmentationId": "study.segmentation.004",
+        "chunk": "DI",
+        "language": "Chinese",
+        "candidateForm": "DI",
+        "meaning": "",
+        "functionFit": "",
+        "sourceNote": "No credible candidate found for chunk DI in Chinese.",
+        "evidenceType": "none",
+        "candidateType": "null_candidate",
+        "falseFriendRisk": "none",
+        "nullCandidate": true,
+        "notes": ""
+      }
+    ],
+    "nullCandidates": [
+      {
+        "segmentationId": "study.segmentation.004",
+        "chunk": "S",
+        "language": "Albanian",
+        "candidateForm": "S",
+        "meaning": "",
+        "functionFit": "",
+        "sourceNote": "No credible candidate found for consonant-only chunk S in Albanian.",
+        "evidenceType": "none",
+        "candidateType": "null_candidate",
+        "falseFriendRisk": "none",
+        "nullCandidate": true,
+        "notes": ""
+      },
+      {
+        "segmentationId": "study.segmentation.004",
+        "chunk": "TU",
+        "language": "Latin",
+        "candidateForm": "TU",
+        "meaning": "",
+        "functionFit": "",
+        "sourceNote": "No credible candidate found for chunk TU in Latin.",
+        "evidenceType": "none",
+        "candidateType": "null_candidate",
+        "falseFriendRisk": "none",
+        "nullCandidate": true,
+        "notes": ""
+      },
+      {
+        "segmentationId": "study.segmentation.004",
+        "chunk": "DI",
+        "language": "Chinese",
+        "candidateForm": "DI",
+        "meaning": "",
+        "functionFit": "",
+        "sourceNote": "No credible candidate found for chunk DI in Chinese.",
+        "evidenceType": "none",
+        "candidateType": "null_candidate",
+        "falseFriendRisk": "none",
+        "nullCandidate": true,
+        "notes": ""
+      }
+    ],
+    "warnings": [],
+    "claimBoundary": {
+      "originClaim": false,
+      "scientificEvidence": false,
+      "publicationEvidence": false,
+      "developmentCandidateSearchOnly": true
+    }
+  },
+  "validationAfterNormalization": {
+    "ok": true,
+    "issues": [],
+    "summary": {
+      "checkedCandidates": 3,
+      "checkedNullCandidates": 3,
+      "chunksCovered": [
+        "S",
+        "TU",
+        "DI"
+      ],
+      "missingChunks": []
+    }
+  },
+  "claimBoundary": {
+    "developmentOnly": true,
+    "controlledRetryOnly": true,
+    "originProof": false,
+    "candidateTruthProof": false,
+    "publicationEvidence": false,
+    "evalEvidence": false,
+    "cohortEvidence": false,
+    "modelQualityEvidence": false,
+    "providerDefaultChangeEvidence": false
+  },
+  "comparison": {
+    "previousObjectShapeReplayArtifact": "docs/open-instrument/artifacts/heart-brain-prototype/2026-06-06-study-heart-brain-llama3-1-8b-segmentation-004-reduced-language-v0.4-object-shape-enum-normalizer-replay-v0.1.json",
+    "previousObjectShapeReplayReview": "docs/open-instrument/study-segmentation-004-reduced-language-llama-v0.4-object-shape-enum-normalizer-replay-review-v0.1.md",
+    "previousRepairedCount": 18,
+    "previousUnresolvedCount": 0,
+    "previousValidationIssueCountAfterNormalization": 0,
+    "previousValidationOkAfterNormalization": true,
+    "comparisonMode": "structure_only"
+  }
+}
