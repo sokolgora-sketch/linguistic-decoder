@@ -1,0 +1,867 @@
+{
+  "archiveVersion": "v0.1",
+  "artifactType": "open-instrument-heart-brain-enum-normalizer-replay",
+  "replayVersion": "v0.1",
+  "replayMode": "offline_enum_normalization_only",
+  "createdAt": "2026-06-06T04:49:08.189Z",
+  "repo": {
+    "project": "ZË-RO",
+    "repository": "sokolgora-sketch/linguistic-decoder",
+    "commit": "b855c28444b46439ea2705dc10d611ade1e8d544",
+    "branch": "docs/open-instrument-llama-v0-4-enum-normalizer-replay",
+    "workingTree": "clean"
+  },
+  "source": {
+    "artifactPath": "/Users/wei/Desktop/ZËRO /Dwnlosads /zero-firebase-studio-export/docs/open-instrument/artifacts/heart-brain-prototype/2026-06-05-study-heart-brain-llama3-1-8b-segmentation-004-reduced-language-v0.4.json",
+    "reviewPath": "/Users/wei/Desktop/ZËRO /Dwnlosads /zero-firebase-studio-export/docs/open-instrument/study-segmentation-004-reduced-language-llama-v0.4-result-review-v0.1.md",
+    "policyPath": "/Users/wei/Desktop/ZËRO /Dwnlosads /zero-firebase-studio-export/docs/open-instrument/brain-candidate-enum-repair-policy-v0.1.md",
+    "helperPath": "/Users/wei/Desktop/ZËRO /Dwnlosads /zero-firebase-studio-export/src/shared/openInstrument/brainCandidateEnumRepair.v0.1.ts",
+    "validatorPath": "/Users/wei/Desktop/ZËRO /Dwnlosads /zero-firebase-studio-export/src/shared/openInstrument/brainCandidateSearchValidation.v0.1.ts"
+  },
+  "target": {
+    "word": "study",
+    "segmentationId": "study.segmentation.004",
+    "embryoMorphemes": [
+      "S",
+      "TU",
+      "DI"
+    ],
+    "reducedLanguage": true,
+    "targetLanguages": [
+      "Albanian",
+      "Latin",
+      "Chinese",
+      "Germanic"
+    ]
+  },
+  "comparison": {
+    "previousLlamaV04Artifact": "/Users/wei/Desktop/ZËRO /Dwnlosads /zero-firebase-studio-export/docs/open-instrument/artifacts/heart-brain-prototype/2026-06-05-study-heart-brain-llama3-1-8b-segmentation-004-reduced-language-v0.4.json",
+    "previousLlamaV04Review": "/Users/wei/Desktop/ZËRO /Dwnlosads /zero-firebase-studio-export/docs/open-instrument/study-segmentation-004-reduced-language-llama-v0.4-result-review-v0.1.md",
+    "helperPr": 1206,
+    "policyPr": 1205,
+    "metadataContractPr": 1201
+  },
+  "replay": {
+    "rawBrainOutput": {
+      "word": "study",
+      "segmentationId": "study.segmentation.004",
+      "chunkCandidates": [
+        {
+          "segmentationId": "study.segmentation.004",
+          "chunk": "S",
+          "language": "Albanian",
+          "candidateForm": "S",
+          "meaning": "",
+          "functionFit": "",
+          "sourceNote": "No credible candidate found for consonant-only chunk S in Albanian.",
+          "evidenceType": {
+            "type": "none"
+          },
+          "candidateType": {
+            "type": "null_candidate"
+          },
+          "falseFriendRisk": {
+            "type": "none"
+          },
+          "nullCandidate": true,
+          "notes": ""
+        },
+        {
+          "segmentationId": "study.segmentation.004",
+          "chunk": "TU",
+          "language": "Latin",
+          "candidateForm": "TU",
+          "meaning": "",
+          "functionFit": "",
+          "sourceNote": "No credible candidate found for chunk TU in Latin.",
+          "evidenceType": {
+            "type": "none"
+          },
+          "candidateType": {
+            "type": "null_candidate"
+          },
+          "falseFriendRisk": {
+            "type": "none"
+          },
+          "nullCandidate": true,
+          "notes": ""
+        },
+        {
+          "segmentationId": "study.segmentation.004",
+          "chunk": "DI",
+          "language": "Chinese",
+          "candidateForm": "DI",
+          "meaning": "",
+          "functionFit": "",
+          "sourceNote": "No credible candidate found for chunk DI in Chinese.",
+          "evidenceType": {
+            "type": "none"
+          },
+          "candidateType": {
+            "type": "null_candidate"
+          },
+          "falseFriendRisk": {
+            "type": "none"
+          },
+          "nullCandidate": true,
+          "notes": ""
+        }
+      ],
+      "nullCandidates": [
+        {
+          "segmentationId": "study.segmentation.004",
+          "chunk": "S",
+          "language": "Albanian",
+          "candidateForm": "S",
+          "meaning": "",
+          "functionFit": "",
+          "sourceNote": "No credible candidate found for consonant-only chunk S in Albanian.",
+          "evidenceType": {
+            "type": "none"
+          },
+          "candidateType": {
+            "type": "null_candidate"
+          },
+          "falseFriendRisk": {
+            "type": "none"
+          },
+          "nullCandidate": true,
+          "notes": ""
+        },
+        {
+          "segmentationId": "study.segmentation.004",
+          "chunk": "TU",
+          "language": "Latin",
+          "candidateForm": "TU",
+          "meaning": "",
+          "functionFit": "",
+          "sourceNote": "No credible candidate found for chunk TU in Latin.",
+          "evidenceType": {
+            "type": "none"
+          },
+          "candidateType": {
+            "type": "null_candidate"
+          },
+          "falseFriendRisk": {
+            "type": "none"
+          },
+          "nullCandidate": true,
+          "notes": ""
+        },
+        {
+          "segmentationId": "study.segmentation.004",
+          "chunk": "DI",
+          "language": "Chinese",
+          "candidateForm": "DI",
+          "meaning": "",
+          "functionFit": "",
+          "sourceNote": "No credible candidate found for chunk DI in Chinese.",
+          "evidenceType": {
+            "type": "none"
+          },
+          "candidateType": {
+            "type": "null_candidate"
+          },
+          "falseFriendRisk": {
+            "type": "none"
+          },
+          "nullCandidate": true,
+          "notes": ""
+        }
+      ],
+      "warnings": [],
+      "claimBoundary": {
+        "originClaim": false,
+        "scientificEvidence": false,
+        "publicationEvidence": false,
+        "developmentCandidateSearchOnly": true
+      }
+    },
+    "normalizedBrainOutput": {
+      "word": "study",
+      "segmentationId": "study.segmentation.004",
+      "chunkCandidates": [
+        {
+          "segmentationId": "study.segmentation.004",
+          "chunk": "S",
+          "language": "Albanian",
+          "candidateForm": "S",
+          "meaning": "",
+          "functionFit": "",
+          "sourceNote": "No credible candidate found for consonant-only chunk S in Albanian.",
+          "evidenceType": {
+            "type": "none"
+          },
+          "candidateType": {
+            "type": "null_candidate"
+          },
+          "falseFriendRisk": {
+            "type": "none"
+          },
+          "nullCandidate": true,
+          "notes": ""
+        },
+        {
+          "segmentationId": "study.segmentation.004",
+          "chunk": "TU",
+          "language": "Latin",
+          "candidateForm": "TU",
+          "meaning": "",
+          "functionFit": "",
+          "sourceNote": "No credible candidate found for chunk TU in Latin.",
+          "evidenceType": {
+            "type": "none"
+          },
+          "candidateType": {
+            "type": "null_candidate"
+          },
+          "falseFriendRisk": {
+            "type": "none"
+          },
+          "nullCandidate": true,
+          "notes": ""
+        },
+        {
+          "segmentationId": "study.segmentation.004",
+          "chunk": "DI",
+          "language": "Chinese",
+          "candidateForm": "DI",
+          "meaning": "",
+          "functionFit": "",
+          "sourceNote": "No credible candidate found for chunk DI in Chinese.",
+          "evidenceType": {
+            "type": "none"
+          },
+          "candidateType": {
+            "type": "null_candidate"
+          },
+          "falseFriendRisk": {
+            "type": "none"
+          },
+          "nullCandidate": true,
+          "notes": ""
+        }
+      ],
+      "nullCandidates": [
+        {
+          "segmentationId": "study.segmentation.004",
+          "chunk": "S",
+          "language": "Albanian",
+          "candidateForm": "S",
+          "meaning": "",
+          "functionFit": "",
+          "sourceNote": "No credible candidate found for consonant-only chunk S in Albanian.",
+          "evidenceType": {
+            "type": "none"
+          },
+          "candidateType": {
+            "type": "null_candidate"
+          },
+          "falseFriendRisk": {
+            "type": "none"
+          },
+          "nullCandidate": true,
+          "notes": ""
+        },
+        {
+          "segmentationId": "study.segmentation.004",
+          "chunk": "TU",
+          "language": "Latin",
+          "candidateForm": "TU",
+          "meaning": "",
+          "functionFit": "",
+          "sourceNote": "No credible candidate found for chunk TU in Latin.",
+          "evidenceType": {
+            "type": "none"
+          },
+          "candidateType": {
+            "type": "null_candidate"
+          },
+          "falseFriendRisk": {
+            "type": "none"
+          },
+          "nullCandidate": true,
+          "notes": ""
+        },
+        {
+          "segmentationId": "study.segmentation.004",
+          "chunk": "DI",
+          "language": "Chinese",
+          "candidateForm": "DI",
+          "meaning": "",
+          "functionFit": "",
+          "sourceNote": "No credible candidate found for chunk DI in Chinese.",
+          "evidenceType": {
+            "type": "none"
+          },
+          "candidateType": {
+            "type": "null_candidate"
+          },
+          "falseFriendRisk": {
+            "type": "none"
+          },
+          "nullCandidate": true,
+          "notes": ""
+        }
+      ],
+      "warnings": [],
+      "claimBoundary": {
+        "originClaim": false,
+        "scientificEvidence": false,
+        "publicationEvidence": false,
+        "developmentCandidateSearchOnly": true
+      }
+    },
+    "normalizationAuditCounts": {
+      "unresolved": 18
+    },
+    "unresolvedMappingRuleCounts": {
+      "non_scalar_value": 18
+    },
+    "audit": [
+      {
+        "path": "chunkCandidates.0.candidateType",
+        "field": "candidateType",
+        "originalValue": {
+          "type": "null_candidate"
+        },
+        "normalizedValue": {
+          "type": "null_candidate"
+        },
+        "mappingRuleId": "non_scalar_value",
+        "status": "unresolved",
+        "reason": "Enum field is non-scalar and cannot be coerced into a string."
+      },
+      {
+        "path": "chunkCandidates.0.evidenceType",
+        "field": "evidenceType",
+        "originalValue": {
+          "type": "none"
+        },
+        "normalizedValue": {
+          "type": "none"
+        },
+        "mappingRuleId": "non_scalar_value",
+        "status": "unresolved",
+        "reason": "Enum field is non-scalar and cannot be coerced into a string."
+      },
+      {
+        "path": "chunkCandidates.0.falseFriendRisk",
+        "field": "falseFriendRisk",
+        "originalValue": {
+          "type": "none"
+        },
+        "normalizedValue": {
+          "type": "none"
+        },
+        "mappingRuleId": "non_scalar_value",
+        "status": "unresolved",
+        "reason": "Enum field is non-scalar and cannot be coerced into a string."
+      },
+      {
+        "path": "chunkCandidates.1.candidateType",
+        "field": "candidateType",
+        "originalValue": {
+          "type": "null_candidate"
+        },
+        "normalizedValue": {
+          "type": "null_candidate"
+        },
+        "mappingRuleId": "non_scalar_value",
+        "status": "unresolved",
+        "reason": "Enum field is non-scalar and cannot be coerced into a string."
+      },
+      {
+        "path": "chunkCandidates.1.evidenceType",
+        "field": "evidenceType",
+        "originalValue": {
+          "type": "none"
+        },
+        "normalizedValue": {
+          "type": "none"
+        },
+        "mappingRuleId": "non_scalar_value",
+        "status": "unresolved",
+        "reason": "Enum field is non-scalar and cannot be coerced into a string."
+      },
+      {
+        "path": "chunkCandidates.1.falseFriendRisk",
+        "field": "falseFriendRisk",
+        "originalValue": {
+          "type": "none"
+        },
+        "normalizedValue": {
+          "type": "none"
+        },
+        "mappingRuleId": "non_scalar_value",
+        "status": "unresolved",
+        "reason": "Enum field is non-scalar and cannot be coerced into a string."
+      },
+      {
+        "path": "chunkCandidates.2.candidateType",
+        "field": "candidateType",
+        "originalValue": {
+          "type": "null_candidate"
+        },
+        "normalizedValue": {
+          "type": "null_candidate"
+        },
+        "mappingRuleId": "non_scalar_value",
+        "status": "unresolved",
+        "reason": "Enum field is non-scalar and cannot be coerced into a string."
+      },
+      {
+        "path": "chunkCandidates.2.evidenceType",
+        "field": "evidenceType",
+        "originalValue": {
+          "type": "none"
+        },
+        "normalizedValue": {
+          "type": "none"
+        },
+        "mappingRuleId": "non_scalar_value",
+        "status": "unresolved",
+        "reason": "Enum field is non-scalar and cannot be coerced into a string."
+      },
+      {
+        "path": "chunkCandidates.2.falseFriendRisk",
+        "field": "falseFriendRisk",
+        "originalValue": {
+          "type": "none"
+        },
+        "normalizedValue": {
+          "type": "none"
+        },
+        "mappingRuleId": "non_scalar_value",
+        "status": "unresolved",
+        "reason": "Enum field is non-scalar and cannot be coerced into a string."
+      },
+      {
+        "path": "nullCandidates.0.candidateType",
+        "field": "candidateType",
+        "originalValue": {
+          "type": "null_candidate"
+        },
+        "normalizedValue": {
+          "type": "null_candidate"
+        },
+        "mappingRuleId": "non_scalar_value",
+        "status": "unresolved",
+        "reason": "Enum field is non-scalar and cannot be coerced into a string."
+      },
+      {
+        "path": "nullCandidates.0.evidenceType",
+        "field": "evidenceType",
+        "originalValue": {
+          "type": "none"
+        },
+        "normalizedValue": {
+          "type": "none"
+        },
+        "mappingRuleId": "non_scalar_value",
+        "status": "unresolved",
+        "reason": "Enum field is non-scalar and cannot be coerced into a string."
+      },
+      {
+        "path": "nullCandidates.0.falseFriendRisk",
+        "field": "falseFriendRisk",
+        "originalValue": {
+          "type": "none"
+        },
+        "normalizedValue": {
+          "type": "none"
+        },
+        "mappingRuleId": "non_scalar_value",
+        "status": "unresolved",
+        "reason": "Enum field is non-scalar and cannot be coerced into a string."
+      },
+      {
+        "path": "nullCandidates.1.candidateType",
+        "field": "candidateType",
+        "originalValue": {
+          "type": "null_candidate"
+        },
+        "normalizedValue": {
+          "type": "null_candidate"
+        },
+        "mappingRuleId": "non_scalar_value",
+        "status": "unresolved",
+        "reason": "Enum field is non-scalar and cannot be coerced into a string."
+      },
+      {
+        "path": "nullCandidates.1.evidenceType",
+        "field": "evidenceType",
+        "originalValue": {
+          "type": "none"
+        },
+        "normalizedValue": {
+          "type": "none"
+        },
+        "mappingRuleId": "non_scalar_value",
+        "status": "unresolved",
+        "reason": "Enum field is non-scalar and cannot be coerced into a string."
+      },
+      {
+        "path": "nullCandidates.1.falseFriendRisk",
+        "field": "falseFriendRisk",
+        "originalValue": {
+          "type": "none"
+        },
+        "normalizedValue": {
+          "type": "none"
+        },
+        "mappingRuleId": "non_scalar_value",
+        "status": "unresolved",
+        "reason": "Enum field is non-scalar and cannot be coerced into a string."
+      },
+      {
+        "path": "nullCandidates.2.candidateType",
+        "field": "candidateType",
+        "originalValue": {
+          "type": "null_candidate"
+        },
+        "normalizedValue": {
+          "type": "null_candidate"
+        },
+        "mappingRuleId": "non_scalar_value",
+        "status": "unresolved",
+        "reason": "Enum field is non-scalar and cannot be coerced into a string."
+      },
+      {
+        "path": "nullCandidates.2.evidenceType",
+        "field": "evidenceType",
+        "originalValue": {
+          "type": "none"
+        },
+        "normalizedValue": {
+          "type": "none"
+        },
+        "mappingRuleId": "non_scalar_value",
+        "status": "unresolved",
+        "reason": "Enum field is non-scalar and cannot be coerced into a string."
+      },
+      {
+        "path": "nullCandidates.2.falseFriendRisk",
+        "field": "falseFriendRisk",
+        "originalValue": {
+          "type": "none"
+        },
+        "normalizedValue": {
+          "type": "none"
+        },
+        "mappingRuleId": "non_scalar_value",
+        "status": "unresolved",
+        "reason": "Enum field is non-scalar and cannot be coerced into a string."
+      }
+    ],
+    "unresolved": [
+      {
+        "path": "chunkCandidates.0.candidateType",
+        "field": "candidateType",
+        "originalValue": {
+          "type": "null_candidate"
+        },
+        "normalizedValue": {
+          "type": "null_candidate"
+        },
+        "mappingRuleId": "non_scalar_value",
+        "status": "unresolved",
+        "reason": "Enum field is non-scalar and cannot be coerced into a string."
+      },
+      {
+        "path": "chunkCandidates.0.evidenceType",
+        "field": "evidenceType",
+        "originalValue": {
+          "type": "none"
+        },
+        "normalizedValue": {
+          "type": "none"
+        },
+        "mappingRuleId": "non_scalar_value",
+        "status": "unresolved",
+        "reason": "Enum field is non-scalar and cannot be coerced into a string."
+      },
+      {
+        "path": "chunkCandidates.0.falseFriendRisk",
+        "field": "falseFriendRisk",
+        "originalValue": {
+          "type": "none"
+        },
+        "normalizedValue": {
+          "type": "none"
+        },
+        "mappingRuleId": "non_scalar_value",
+        "status": "unresolved",
+        "reason": "Enum field is non-scalar and cannot be coerced into a string."
+      },
+      {
+        "path": "chunkCandidates.1.candidateType",
+        "field": "candidateType",
+        "originalValue": {
+          "type": "null_candidate"
+        },
+        "normalizedValue": {
+          "type": "null_candidate"
+        },
+        "mappingRuleId": "non_scalar_value",
+        "status": "unresolved",
+        "reason": "Enum field is non-scalar and cannot be coerced into a string."
+      },
+      {
+        "path": "chunkCandidates.1.evidenceType",
+        "field": "evidenceType",
+        "originalValue": {
+          "type": "none"
+        },
+        "normalizedValue": {
+          "type": "none"
+        },
+        "mappingRuleId": "non_scalar_value",
+        "status": "unresolved",
+        "reason": "Enum field is non-scalar and cannot be coerced into a string."
+      },
+      {
+        "path": "chunkCandidates.1.falseFriendRisk",
+        "field": "falseFriendRisk",
+        "originalValue": {
+          "type": "none"
+        },
+        "normalizedValue": {
+          "type": "none"
+        },
+        "mappingRuleId": "non_scalar_value",
+        "status": "unresolved",
+        "reason": "Enum field is non-scalar and cannot be coerced into a string."
+      },
+      {
+        "path": "chunkCandidates.2.candidateType",
+        "field": "candidateType",
+        "originalValue": {
+          "type": "null_candidate"
+        },
+        "normalizedValue": {
+          "type": "null_candidate"
+        },
+        "mappingRuleId": "non_scalar_value",
+        "status": "unresolved",
+        "reason": "Enum field is non-scalar and cannot be coerced into a string."
+      },
+      {
+        "path": "chunkCandidates.2.evidenceType",
+        "field": "evidenceType",
+        "originalValue": {
+          "type": "none"
+        },
+        "normalizedValue": {
+          "type": "none"
+        },
+        "mappingRuleId": "non_scalar_value",
+        "status": "unresolved",
+        "reason": "Enum field is non-scalar and cannot be coerced into a string."
+      },
+      {
+        "path": "chunkCandidates.2.falseFriendRisk",
+        "field": "falseFriendRisk",
+        "originalValue": {
+          "type": "none"
+        },
+        "normalizedValue": {
+          "type": "none"
+        },
+        "mappingRuleId": "non_scalar_value",
+        "status": "unresolved",
+        "reason": "Enum field is non-scalar and cannot be coerced into a string."
+      },
+      {
+        "path": "nullCandidates.0.candidateType",
+        "field": "candidateType",
+        "originalValue": {
+          "type": "null_candidate"
+        },
+        "normalizedValue": {
+          "type": "null_candidate"
+        },
+        "mappingRuleId": "non_scalar_value",
+        "status": "unresolved",
+        "reason": "Enum field is non-scalar and cannot be coerced into a string."
+      },
+      {
+        "path": "nullCandidates.0.evidenceType",
+        "field": "evidenceType",
+        "originalValue": {
+          "type": "none"
+        },
+        "normalizedValue": {
+          "type": "none"
+        },
+        "mappingRuleId": "non_scalar_value",
+        "status": "unresolved",
+        "reason": "Enum field is non-scalar and cannot be coerced into a string."
+      },
+      {
+        "path": "nullCandidates.0.falseFriendRisk",
+        "field": "falseFriendRisk",
+        "originalValue": {
+          "type": "none"
+        },
+        "normalizedValue": {
+          "type": "none"
+        },
+        "mappingRuleId": "non_scalar_value",
+        "status": "unresolved",
+        "reason": "Enum field is non-scalar and cannot be coerced into a string."
+      },
+      {
+        "path": "nullCandidates.1.candidateType",
+        "field": "candidateType",
+        "originalValue": {
+          "type": "null_candidate"
+        },
+        "normalizedValue": {
+          "type": "null_candidate"
+        },
+        "mappingRuleId": "non_scalar_value",
+        "status": "unresolved",
+        "reason": "Enum field is non-scalar and cannot be coerced into a string."
+      },
+      {
+        "path": "nullCandidates.1.evidenceType",
+        "field": "evidenceType",
+        "originalValue": {
+          "type": "none"
+        },
+        "normalizedValue": {
+          "type": "none"
+        },
+        "mappingRuleId": "non_scalar_value",
+        "status": "unresolved",
+        "reason": "Enum field is non-scalar and cannot be coerced into a string."
+      },
+      {
+        "path": "nullCandidates.1.falseFriendRisk",
+        "field": "falseFriendRisk",
+        "originalValue": {
+          "type": "none"
+        },
+        "normalizedValue": {
+          "type": "none"
+        },
+        "mappingRuleId": "non_scalar_value",
+        "status": "unresolved",
+        "reason": "Enum field is non-scalar and cannot be coerced into a string."
+      },
+      {
+        "path": "nullCandidates.2.candidateType",
+        "field": "candidateType",
+        "originalValue": {
+          "type": "null_candidate"
+        },
+        "normalizedValue": {
+          "type": "null_candidate"
+        },
+        "mappingRuleId": "non_scalar_value",
+        "status": "unresolved",
+        "reason": "Enum field is non-scalar and cannot be coerced into a string."
+      },
+      {
+        "path": "nullCandidates.2.evidenceType",
+        "field": "evidenceType",
+        "originalValue": {
+          "type": "none"
+        },
+        "normalizedValue": {
+          "type": "none"
+        },
+        "mappingRuleId": "non_scalar_value",
+        "status": "unresolved",
+        "reason": "Enum field is non-scalar and cannot be coerced into a string."
+      },
+      {
+        "path": "nullCandidates.2.falseFriendRisk",
+        "field": "falseFriendRisk",
+        "originalValue": {
+          "type": "none"
+        },
+        "normalizedValue": {
+          "type": "none"
+        },
+        "mappingRuleId": "non_scalar_value",
+        "status": "unresolved",
+        "reason": "Enum field is non-scalar and cannot be coerced into a string."
+      }
+    ]
+  },
+  "validation": {
+    "raw": {
+      "ok": false,
+      "issueCount": 36,
+      "summary": {
+        "checkedCandidates": 3,
+        "checkedNullCandidates": 3,
+        "chunksCovered": [
+          "S",
+          "TU",
+          "DI"
+        ],
+        "missingChunks": []
+      }
+    },
+    "normalized": {
+      "ok": false,
+      "issueCount": 36,
+      "summary": {
+        "checkedCandidates": 3,
+        "checkedNullCandidates": 3,
+        "chunksCovered": [
+          "S",
+          "TU",
+          "DI"
+        ],
+        "missingChunks": []
+      },
+      "issueFamilies": {
+        "INVALID_CANDIDATE_TYPE": 6,
+        "INVALID_EVIDENCE_TYPE": 6,
+        "INVALID_FALSE_FRIEND_RISK": 6,
+        "INVALID_NULL_CANDIDATE": 18
+      },
+      "firstFourIssues": [
+        {
+          "code": "INVALID_CANDIDATE_TYPE",
+          "severity": "error",
+          "message": "candidateType must be one of the allowed Brain candidate types.",
+          "path": "chunkCandidates.0.candidateType"
+        },
+        {
+          "code": "INVALID_EVIDENCE_TYPE",
+          "severity": "error",
+          "message": "evidenceType must be one of the allowed Brain evidence types.",
+          "path": "chunkCandidates.0.evidenceType"
+        },
+        {
+          "code": "INVALID_FALSE_FRIEND_RISK",
+          "severity": "error",
+          "message": "falseFriendRisk must be one of the allowed values.",
+          "path": "chunkCandidates.0.falseFriendRisk"
+        },
+        {
+          "code": "INVALID_NULL_CANDIDATE",
+          "severity": "error",
+          "message": "nullCandidate=true requires candidateType=null_candidate.",
+          "path": "chunkCandidates.0.candidateType"
+        }
+      ]
+    }
+  },
+  "interpretation": {
+    "replayOutcome": "validation_failure",
+    "normalizationEffect": "no_enum_repairs_were_possible_because_the_payload_uses_non_scalar_enum_objects",
+    "note": "The offline normalizer preserved the raw Brain output, produced 18 unresolved enum audits, and did not change the validation outcome."
+  },
+  "claimBoundary": {
+    "originClaim": false,
+    "scientificEvidence": false,
+    "publicationEvidence": false,
+    "developmentCandidateSearchOnly": true
+  }
+}
