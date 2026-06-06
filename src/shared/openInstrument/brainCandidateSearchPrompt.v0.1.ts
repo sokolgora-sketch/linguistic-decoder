@@ -198,6 +198,8 @@ export function buildBrainCandidateSearchPrompt(
     "evidenceType must be exactly one lowercase string copied from the allowed evidenceType list.",
     "falseFriendRisk must be exactly one lowercase string copied from the allowed falseFriendRisk list.",
     "Never wrap enum values in arrays. Arrays are invalid for candidateType, evidenceType, and falseFriendRisk.",
+    "Never wrap enum values in objects. Objects are invalid for candidateType, evidenceType, and falseFriendRisk.",
+    "Do not return enum wrappers such as { \"type\": \"null_candidate\" } or { \"type\": \"none\" }.",
     "Do not use uppercase enum aliases such as STRONG_LEXICAL, NULL_CANDIDATE, or FALSE_FRIEND_RISK.",
     "Do not use prose labels or near-synonyms as enum values.",
     "Every non-null chunkCandidates[] object must include sourceNote.",
