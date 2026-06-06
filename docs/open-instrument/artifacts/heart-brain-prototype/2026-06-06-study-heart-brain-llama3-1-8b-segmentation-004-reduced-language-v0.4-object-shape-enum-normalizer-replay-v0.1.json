@@ -1,0 +1,585 @@
+{
+  "archiveVersion": "v0.1",
+  "artifactType": "open_instrument_offline_object_shape_enum_normalizer_replay",
+  "artifactVersion": "v0.1",
+  "createdAt": "2026-06-06",
+  "repo": {
+    "name": "sokolgora-sketch/linguistic-decoder",
+    "branch": "main",
+    "commit": "9266c5045277642cc8cac40bf650955582e6b8e7"
+  },
+  "source": {
+    "word": "study",
+    "segmentationId": "study.segmentation.004",
+    "chunks": [
+      "S",
+      "TU",
+      "DI"
+    ],
+    "model": "llama3.1:8b",
+    "provider": "openai_compat",
+    "languages": [
+      "Albanian",
+      "Latin",
+      "Chinese",
+      "Germanic"
+    ],
+    "originalV04ArtifactPath": "docs/open-instrument/artifacts/heart-brain-prototype/2026-06-05-study-heart-brain-llama3-1-8b-segmentation-004-reduced-language-v0.4.json",
+    "previousReplayArtifactPath": "docs/open-instrument/artifacts/heart-brain-prototype/2026-06-06-study-heart-brain-llama3-1-8b-segmentation-004-reduced-language-v0.4-enum-normalizer-replay-v0.1.json",
+    "previousReplayReviewPath": "docs/open-instrument/study-segmentation-004-reduced-language-llama-v0.4-enum-normalizer-replay-review-v0.1.md",
+    "rawSourceUsed": "previous_replay_rawBrainOutput"
+  },
+  "replay": {
+    "helper": "normalizeBrainCandidateEnums",
+    "helperFile": "src/shared/openInstrument/brainCandidateEnumRepair.v0.1.ts",
+    "validatorFile": "src/shared/openInstrument/brainCandidateSearchValidation.v0.1.ts",
+    "modelCallMade": false,
+    "runtimeWiringChanged": false,
+    "validatorChanged": false,
+    "promptChanged": false,
+    "providerDefaultChanged": false
+  },
+  "baseline": {
+    "previousRawValidationIssueCount": 36,
+    "previousNormalizedValidationIssueCount": 36,
+    "previousRepairedCount": 0,
+    "previousUnresolvedCount": 18,
+    "previousIssueFamilies": [
+      "INVALID_CANDIDATE_TYPE",
+      "INVALID_EVIDENCE_TYPE",
+      "INVALID_FALSE_FRIEND_RISK",
+      "INVALID_NULL_CANDIDATE"
+    ]
+  },
+  "summary": {
+    "auditTotal": 18,
+    "repairedCount": 18,
+    "unchangedCount": 0,
+    "unresolvedCount": 0,
+    "objectWrapperRepairCount": 18,
+    "objectWrapperUnresolvedCount": 0,
+    "validationOkAfterNormalization": true,
+    "validationIssueCountAfterNormalization": 0,
+    "validationIssueFamiliesAfterNormalization": [],
+    "deltaFromPreviousNormalizedIssueCount": -36,
+    "deltaFromPreviousUnresolvedCount": -18
+  },
+  "rawBrainOutput": {
+    "word": "study",
+    "segmentationId": "study.segmentation.004",
+    "chunkCandidates": [
+      {
+        "segmentationId": "study.segmentation.004",
+        "chunk": "S",
+        "language": "Albanian",
+        "candidateForm": "S",
+        "meaning": "",
+        "functionFit": "",
+        "sourceNote": "No credible candidate found for consonant-only chunk S in Albanian.",
+        "evidenceType": {
+          "type": "none"
+        },
+        "candidateType": {
+          "type": "null_candidate"
+        },
+        "falseFriendRisk": {
+          "type": "none"
+        },
+        "nullCandidate": true,
+        "notes": ""
+      },
+      {
+        "segmentationId": "study.segmentation.004",
+        "chunk": "TU",
+        "language": "Latin",
+        "candidateForm": "TU",
+        "meaning": "",
+        "functionFit": "",
+        "sourceNote": "No credible candidate found for chunk TU in Latin.",
+        "evidenceType": {
+          "type": "none"
+        },
+        "candidateType": {
+          "type": "null_candidate"
+        },
+        "falseFriendRisk": {
+          "type": "none"
+        },
+        "nullCandidate": true,
+        "notes": ""
+      },
+      {
+        "segmentationId": "study.segmentation.004",
+        "chunk": "DI",
+        "language": "Chinese",
+        "candidateForm": "DI",
+        "meaning": "",
+        "functionFit": "",
+        "sourceNote": "No credible candidate found for chunk DI in Chinese.",
+        "evidenceType": {
+          "type": "none"
+        },
+        "candidateType": {
+          "type": "null_candidate"
+        },
+        "falseFriendRisk": {
+          "type": "none"
+        },
+        "nullCandidate": true,
+        "notes": ""
+      }
+    ],
+    "nullCandidates": [
+      {
+        "segmentationId": "study.segmentation.004",
+        "chunk": "S",
+        "language": "Albanian",
+        "candidateForm": "S",
+        "meaning": "",
+        "functionFit": "",
+        "sourceNote": "No credible candidate found for consonant-only chunk S in Albanian.",
+        "evidenceType": {
+          "type": "none"
+        },
+        "candidateType": {
+          "type": "null_candidate"
+        },
+        "falseFriendRisk": {
+          "type": "none"
+        },
+        "nullCandidate": true,
+        "notes": ""
+      },
+      {
+        "segmentationId": "study.segmentation.004",
+        "chunk": "TU",
+        "language": "Latin",
+        "candidateForm": "TU",
+        "meaning": "",
+        "functionFit": "",
+        "sourceNote": "No credible candidate found for chunk TU in Latin.",
+        "evidenceType": {
+          "type": "none"
+        },
+        "candidateType": {
+          "type": "null_candidate"
+        },
+        "falseFriendRisk": {
+          "type": "none"
+        },
+        "nullCandidate": true,
+        "notes": ""
+      },
+      {
+        "segmentationId": "study.segmentation.004",
+        "chunk": "DI",
+        "language": "Chinese",
+        "candidateForm": "DI",
+        "meaning": "",
+        "functionFit": "",
+        "sourceNote": "No credible candidate found for chunk DI in Chinese.",
+        "evidenceType": {
+          "type": "none"
+        },
+        "candidateType": {
+          "type": "null_candidate"
+        },
+        "falseFriendRisk": {
+          "type": "none"
+        },
+        "nullCandidate": true,
+        "notes": ""
+      }
+    ],
+    "warnings": [],
+    "claimBoundary": {
+      "originClaim": false,
+      "scientificEvidence": false,
+      "publicationEvidence": false,
+      "developmentCandidateSearchOnly": true
+    }
+  },
+  "normalizedBrainOutput": {
+    "word": "study",
+    "segmentationId": "study.segmentation.004",
+    "chunkCandidates": [
+      {
+        "segmentationId": "study.segmentation.004",
+        "chunk": "S",
+        "language": "Albanian",
+        "candidateForm": "S",
+        "meaning": "",
+        "functionFit": "",
+        "sourceNote": "No credible candidate found for consonant-only chunk S in Albanian.",
+        "evidenceType": "none",
+        "candidateType": "null_candidate",
+        "falseFriendRisk": "none",
+        "nullCandidate": true,
+        "notes": ""
+      },
+      {
+        "segmentationId": "study.segmentation.004",
+        "chunk": "TU",
+        "language": "Latin",
+        "candidateForm": "TU",
+        "meaning": "",
+        "functionFit": "",
+        "sourceNote": "No credible candidate found for chunk TU in Latin.",
+        "evidenceType": "none",
+        "candidateType": "null_candidate",
+        "falseFriendRisk": "none",
+        "nullCandidate": true,
+        "notes": ""
+      },
+      {
+        "segmentationId": "study.segmentation.004",
+        "chunk": "DI",
+        "language": "Chinese",
+        "candidateForm": "DI",
+        "meaning": "",
+        "functionFit": "",
+        "sourceNote": "No credible candidate found for chunk DI in Chinese.",
+        "evidenceType": "none",
+        "candidateType": "null_candidate",
+        "falseFriendRisk": "none",
+        "nullCandidate": true,
+        "notes": ""
+      }
+    ],
+    "nullCandidates": [
+      {
+        "segmentationId": "study.segmentation.004",
+        "chunk": "S",
+        "language": "Albanian",
+        "candidateForm": "S",
+        "meaning": "",
+        "functionFit": "",
+        "sourceNote": "No credible candidate found for consonant-only chunk S in Albanian.",
+        "evidenceType": "none",
+        "candidateType": "null_candidate",
+        "falseFriendRisk": "none",
+        "nullCandidate": true,
+        "notes": ""
+      },
+      {
+        "segmentationId": "study.segmentation.004",
+        "chunk": "TU",
+        "language": "Latin",
+        "candidateForm": "TU",
+        "meaning": "",
+        "functionFit": "",
+        "sourceNote": "No credible candidate found for chunk TU in Latin.",
+        "evidenceType": "none",
+        "candidateType": "null_candidate",
+        "falseFriendRisk": "none",
+        "nullCandidate": true,
+        "notes": ""
+      },
+      {
+        "segmentationId": "study.segmentation.004",
+        "chunk": "DI",
+        "language": "Chinese",
+        "candidateForm": "DI",
+        "meaning": "",
+        "functionFit": "",
+        "sourceNote": "No credible candidate found for chunk DI in Chinese.",
+        "evidenceType": "none",
+        "candidateType": "null_candidate",
+        "falseFriendRisk": "none",
+        "nullCandidate": true,
+        "notes": ""
+      }
+    ],
+    "warnings": [],
+    "claimBoundary": {
+      "originClaim": false,
+      "scientificEvidence": false,
+      "publicationEvidence": false,
+      "developmentCandidateSearchOnly": true
+    }
+  },
+  "audit": [
+    {
+      "path": "chunkCandidates.0.candidateType",
+      "field": "candidateType",
+      "originalValue": {
+        "type": "null_candidate"
+      },
+      "normalizedValue": "null_candidate",
+      "extractedValue": "null_candidate",
+      "objectShape": "type",
+      "carrierKey": "type",
+      "mappingRuleId": "object_type_scalar_enum_wrapper",
+      "status": "repaired",
+      "reason": "Object wrapper extracted an already canonical scalar enum value."
+    },
+    {
+      "path": "chunkCandidates.0.evidenceType",
+      "field": "evidenceType",
+      "originalValue": {
+        "type": "none"
+      },
+      "normalizedValue": "none",
+      "extractedValue": "none",
+      "objectShape": "type",
+      "carrierKey": "type",
+      "mappingRuleId": "object_type_scalar_enum_wrapper",
+      "status": "repaired",
+      "reason": "Object wrapper extracted an already canonical scalar enum value."
+    },
+    {
+      "path": "chunkCandidates.0.falseFriendRisk",
+      "field": "falseFriendRisk",
+      "originalValue": {
+        "type": "none"
+      },
+      "normalizedValue": "none",
+      "extractedValue": "none",
+      "objectShape": "type",
+      "carrierKey": "type",
+      "mappingRuleId": "object_type_scalar_enum_wrapper",
+      "status": "repaired",
+      "reason": "Object wrapper extracted an already canonical scalar enum value."
+    },
+    {
+      "path": "chunkCandidates.1.candidateType",
+      "field": "candidateType",
+      "originalValue": {
+        "type": "null_candidate"
+      },
+      "normalizedValue": "null_candidate",
+      "extractedValue": "null_candidate",
+      "objectShape": "type",
+      "carrierKey": "type",
+      "mappingRuleId": "object_type_scalar_enum_wrapper",
+      "status": "repaired",
+      "reason": "Object wrapper extracted an already canonical scalar enum value."
+    },
+    {
+      "path": "chunkCandidates.1.evidenceType",
+      "field": "evidenceType",
+      "originalValue": {
+        "type": "none"
+      },
+      "normalizedValue": "none",
+      "extractedValue": "none",
+      "objectShape": "type",
+      "carrierKey": "type",
+      "mappingRuleId": "object_type_scalar_enum_wrapper",
+      "status": "repaired",
+      "reason": "Object wrapper extracted an already canonical scalar enum value."
+    },
+    {
+      "path": "chunkCandidates.1.falseFriendRisk",
+      "field": "falseFriendRisk",
+      "originalValue": {
+        "type": "none"
+      },
+      "normalizedValue": "none",
+      "extractedValue": "none",
+      "objectShape": "type",
+      "carrierKey": "type",
+      "mappingRuleId": "object_type_scalar_enum_wrapper",
+      "status": "repaired",
+      "reason": "Object wrapper extracted an already canonical scalar enum value."
+    },
+    {
+      "path": "chunkCandidates.2.candidateType",
+      "field": "candidateType",
+      "originalValue": {
+        "type": "null_candidate"
+      },
+      "normalizedValue": "null_candidate",
+      "extractedValue": "null_candidate",
+      "objectShape": "type",
+      "carrierKey": "type",
+      "mappingRuleId": "object_type_scalar_enum_wrapper",
+      "status": "repaired",
+      "reason": "Object wrapper extracted an already canonical scalar enum value."
+    },
+    {
+      "path": "chunkCandidates.2.evidenceType",
+      "field": "evidenceType",
+      "originalValue": {
+        "type": "none"
+      },
+      "normalizedValue": "none",
+      "extractedValue": "none",
+      "objectShape": "type",
+      "carrierKey": "type",
+      "mappingRuleId": "object_type_scalar_enum_wrapper",
+      "status": "repaired",
+      "reason": "Object wrapper extracted an already canonical scalar enum value."
+    },
+    {
+      "path": "chunkCandidates.2.falseFriendRisk",
+      "field": "falseFriendRisk",
+      "originalValue": {
+        "type": "none"
+      },
+      "normalizedValue": "none",
+      "extractedValue": "none",
+      "objectShape": "type",
+      "carrierKey": "type",
+      "mappingRuleId": "object_type_scalar_enum_wrapper",
+      "status": "repaired",
+      "reason": "Object wrapper extracted an already canonical scalar enum value."
+    },
+    {
+      "path": "nullCandidates.0.candidateType",
+      "field": "candidateType",
+      "originalValue": {
+        "type": "null_candidate"
+      },
+      "normalizedValue": "null_candidate",
+      "extractedValue": "null_candidate",
+      "objectShape": "type",
+      "carrierKey": "type",
+      "mappingRuleId": "object_type_scalar_enum_wrapper",
+      "status": "repaired",
+      "reason": "Object wrapper extracted an already canonical scalar enum value."
+    },
+    {
+      "path": "nullCandidates.0.evidenceType",
+      "field": "evidenceType",
+      "originalValue": {
+        "type": "none"
+      },
+      "normalizedValue": "none",
+      "extractedValue": "none",
+      "objectShape": "type",
+      "carrierKey": "type",
+      "mappingRuleId": "object_type_scalar_enum_wrapper",
+      "status": "repaired",
+      "reason": "Object wrapper extracted an already canonical scalar enum value."
+    },
+    {
+      "path": "nullCandidates.0.falseFriendRisk",
+      "field": "falseFriendRisk",
+      "originalValue": {
+        "type": "none"
+      },
+      "normalizedValue": "none",
+      "extractedValue": "none",
+      "objectShape": "type",
+      "carrierKey": "type",
+      "mappingRuleId": "object_type_scalar_enum_wrapper",
+      "status": "repaired",
+      "reason": "Object wrapper extracted an already canonical scalar enum value."
+    },
+    {
+      "path": "nullCandidates.1.candidateType",
+      "field": "candidateType",
+      "originalValue": {
+        "type": "null_candidate"
+      },
+      "normalizedValue": "null_candidate",
+      "extractedValue": "null_candidate",
+      "objectShape": "type",
+      "carrierKey": "type",
+      "mappingRuleId": "object_type_scalar_enum_wrapper",
+      "status": "repaired",
+      "reason": "Object wrapper extracted an already canonical scalar enum value."
+    },
+    {
+      "path": "nullCandidates.1.evidenceType",
+      "field": "evidenceType",
+      "originalValue": {
+        "type": "none"
+      },
+      "normalizedValue": "none",
+      "extractedValue": "none",
+      "objectShape": "type",
+      "carrierKey": "type",
+      "mappingRuleId": "object_type_scalar_enum_wrapper",
+      "status": "repaired",
+      "reason": "Object wrapper extracted an already canonical scalar enum value."
+    },
+    {
+      "path": "nullCandidates.1.falseFriendRisk",
+      "field": "falseFriendRisk",
+      "originalValue": {
+        "type": "none"
+      },
+      "normalizedValue": "none",
+      "extractedValue": "none",
+      "objectShape": "type",
+      "carrierKey": "type",
+      "mappingRuleId": "object_type_scalar_enum_wrapper",
+      "status": "repaired",
+      "reason": "Object wrapper extracted an already canonical scalar enum value."
+    },
+    {
+      "path": "nullCandidates.2.candidateType",
+      "field": "candidateType",
+      "originalValue": {
+        "type": "null_candidate"
+      },
+      "normalizedValue": "null_candidate",
+      "extractedValue": "null_candidate",
+      "objectShape": "type",
+      "carrierKey": "type",
+      "mappingRuleId": "object_type_scalar_enum_wrapper",
+      "status": "repaired",
+      "reason": "Object wrapper extracted an already canonical scalar enum value."
+    },
+    {
+      "path": "nullCandidates.2.evidenceType",
+      "field": "evidenceType",
+      "originalValue": {
+        "type": "none"
+      },
+      "normalizedValue": "none",
+      "extractedValue": "none",
+      "objectShape": "type",
+      "carrierKey": "type",
+      "mappingRuleId": "object_type_scalar_enum_wrapper",
+      "status": "repaired",
+      "reason": "Object wrapper extracted an already canonical scalar enum value."
+    },
+    {
+      "path": "nullCandidates.2.falseFriendRisk",
+      "field": "falseFriendRisk",
+      "originalValue": {
+        "type": "none"
+      },
+      "normalizedValue": "none",
+      "extractedValue": "none",
+      "objectShape": "type",
+      "carrierKey": "type",
+      "mappingRuleId": "object_type_scalar_enum_wrapper",
+      "status": "repaired",
+      "reason": "Object wrapper extracted an already canonical scalar enum value."
+    }
+  ],
+  "unresolved": [],
+  "validationAfterNormalization": {
+    "ok": true,
+    "issueCount": 0,
+    "summary": {
+      "checkedCandidates": 3,
+      "checkedNullCandidates": 3,
+      "chunksCovered": [
+        "S",
+        "TU",
+        "DI"
+      ],
+      "missingChunks": []
+    },
+    "issueFamilies": {},
+    "firstFourIssues": []
+  },
+  "claimBoundary": {
+    "developmentOnly": true,
+    "offlineReplayOnly": true,
+    "newModelResult": false,
+    "originProof": false,
+    "candidateTruthProof": false,
+    "publicationEvidence": false,
+    "evalEvidence": false,
+    "cohortEvidence": false,
+    "modelQualityEvidence": false,
+    "providerDefaultChangeEvidence": false
+  },
+  "interpretation": "Archived v0.4 object-shaped enum drift is structurally repairable under the approved wrapper policy, but this remains development-only replay evidence."
+}
