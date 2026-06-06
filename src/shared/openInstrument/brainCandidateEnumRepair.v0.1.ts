@@ -17,6 +17,9 @@ export type BrainCandidateEnumRepairAuditEntry = {
   mappingRuleId: string;
   status: BrainCandidateEnumRepairStatus;
   reason: string;
+  extractedValue?: unknown;
+  objectShape?: string;
+  carrierKey?: string;
 };
 
 export type BrainCandidateEnumRepairResult = {
@@ -35,6 +38,12 @@ type EnumRule = {
   field: BrainCandidateEnumField;
   allowedValues: readonly string[];
 };
+
+type BrainCandidateEnumObjectCarrierKey = "type";
+
+const APPROVED_OBJECT_CARRIER_KEYS: readonly BrainCandidateEnumObjectCarrierKey[] = [
+  "type",
+] as const;
 
 const ENUM_RULES: readonly EnumRule[] = [
   { field: "candidateType", allowedValues: BRAIN_CANDIDATE_TYPES },
@@ -78,7 +87,12 @@ function isCanonicalEnumValue(
   return rule ? rule.allowedValues.includes(value) : false;
 }
 
-function normalizeEnumValue(
+function describeObjectShape(value: Record<string, unknown>): string {
+  const keys = Object.keys(value).sort();
+  return keys.length > 0 ? keys.join("|") : "(empty object)";
+}
+
+function normalizeScalarEnumValue(
   field: BrainCandidateEnumField,
   originalValue: unknown,
   path: string,
@@ -175,6 +189,132 @@ function normalizeEnumValue(
       reason: "Enum value does not map to a known canonical value.",
     },
   };
+}
+
+function normalizeObjectWrappedEnumValue(
+  field: BrainCandidateEnumField,
+  originalValue: Record<string, unknown>,
+  path: string,
+): {
+  normalizedValue: unknown;
+  audit: BrainCandidateEnumRepairAuditEntry;
+} {
+  const objectShape = describeObjectShape(originalValue);
+  const carrierKey: BrainCandidateEnumObjectCarrierKey = "type";
+  const keys = Object.keys(originalValue);
+  const hasApprovedCarrier = Object.prototype.hasOwnProperty.call(
+    originalValue,
+    carrierKey,
+  );
+
+  if (!hasApprovedCarrier) {
+    return {
+      normalizedValue: originalValue,
+      audit: {
+        path,
+        field,
+        originalValue,
+        normalizedValue: originalValue,
+        objectShape,
+        mappingRuleId: "object_missing_carrier_key",
+        status: "unresolved",
+        reason:
+          "Object wrapper is missing the approved scalar carrier key and cannot be normalized.",
+      },
+    };
+  }
+
+  if (keys.length !== APPROVED_OBJECT_CARRIER_KEYS.length) {
+    return {
+      normalizedValue: originalValue,
+      audit: {
+        path,
+        field,
+        originalValue,
+        normalizedValue: originalValue,
+        objectShape,
+        carrierKey,
+        mappingRuleId: "object_multiple_carrier_keys",
+        status: "unresolved",
+        reason:
+          "Object wrapper must contain exactly one approved scalar carrier key.",
+      },
+    };
+  }
+
+  const extractedValue = originalValue[carrierKey];
+  if (typeof extractedValue !== "string") {
+    return {
+      normalizedValue: originalValue,
+      audit: {
+        path,
+        field,
+        originalValue,
+        normalizedValue: originalValue,
+        extractedValue,
+        objectShape,
+        carrierKey,
+        mappingRuleId: "object_non_scalar_carrier_value",
+        status: "unresolved",
+        reason:
+          "Object wrapper carrier value is not a scalar string and cannot be normalized.",
+      },
+    };
+  }
+
+  const scalarResult = normalizeScalarEnumValue(field, extractedValue, path);
+  if (scalarResult.audit.status === "unresolved") {
+    return {
+      normalizedValue: originalValue,
+      audit: {
+        path,
+        field,
+        originalValue,
+        normalizedValue: originalValue,
+        extractedValue,
+        objectShape,
+        carrierKey,
+        mappingRuleId: "object_unknown_enum_value",
+        status: "unresolved",
+        reason:
+          "Object wrapper carrier string does not map to a known canonical enum value.",
+      },
+    };
+  }
+
+  return {
+    normalizedValue: scalarResult.normalizedValue,
+    audit: {
+      path,
+      field,
+      originalValue,
+      normalizedValue: scalarResult.normalizedValue,
+      extractedValue,
+      objectShape,
+      carrierKey,
+      mappingRuleId: "object_type_scalar_enum_wrapper",
+      status: "repaired",
+      reason:
+        scalarResult.audit.status === "repaired"
+          ? "Object wrapper extracted a scalar string and normalized it to a canonical enum value."
+          : "Object wrapper extracted an already canonical scalar enum value.",
+    },
+  };
+}
+
+function normalizeEnumValue(
+  field: BrainCandidateEnumField,
+  originalValue: unknown,
+  path: string,
+): {
+  normalizedValue: unknown;
+  audit: BrainCandidateEnumRepairAuditEntry;
+} {
+  if (isRecord(originalValue)) {
+    return normalizeObjectWrappedEnumValue(field, originalValue, path);
+  }
+
+  return normalizeScalarEnumValue(field, originalValue, path);
 }
 
 function repairCandidateArray(

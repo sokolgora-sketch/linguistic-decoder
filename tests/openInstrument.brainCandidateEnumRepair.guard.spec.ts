@@ -255,6 +255,156 @@ describe("Brain candidate enum repair helper", () => {
     });
   });
 
+  it("repairs approved type-wrapper objects into canonical enum values", () => {
+    const input = buildBrainOutput({
+      chunkCandidates: [
+        {
+          segmentationId: "study.segmentation.004",
+          chunk: "DI",
+          language: "Latin",
+          candidateForm: "di",
+          meaning: "know",
+          functionFit: "knowledge function",
+          sourceNote: "attested lexical item",
+          evidenceType: { type: " living lexical " },
+          candidateType: { type: " weak resonance " },
+          falseFriendRisk: { type: " LOW " },
+          nullCandidate: false,
+          notes: "retained as a living lexical candidate",
+        },
+      ],
+      nullCandidates: [
+        {
+          segmentationId: "study.segmentation.004",
+          chunk: "S",
+          language: "Albanian",
+          candidateForm: "",
+          meaning: "",
+          functionFit: "",
+          sourceNote: "no credible candidate",
+          evidenceType: { type: " none " },
+          candidateType: { type: " null candidate " },
+          falseFriendRisk: { type: " NONE " },
+          nullCandidate: true,
+          notes: "absence explained",
+        },
+        {
+          segmentationId: "study.segmentation.004",
+          chunk: "TU",
+          language: "Latin",
+          candidateForm: "",
+          meaning: "",
+          functionFit: "",
+          sourceNote: "no credible candidate",
+          evidenceType: { type: " none " },
+          candidateType: { type: " null candidate " },
+          falseFriendRisk: { type: " NONE " },
+          nullCandidate: true,
+          notes: "absence explained",
+        },
+      ],
+    });
+
+    const result = normalizeBrainCandidateEnums(input);
+    const normalized = result.normalizedBrainOutput as Record<string, unknown>;
+    const chunkCandidate = (normalized.chunkCandidates as Record<string, unknown>[])[0];
+    const nullCandidates = normalized.nullCandidates as Record<string, unknown>[];
+    const nullCandidate = nullCandidates[0];
+    const tuNullCandidate = nullCandidates[1];
+
+    expect(input.chunkCandidates[0].candidateType).toEqual({ type: " weak resonance " });
+    expect(input.nullCandidates[0].candidateType).toEqual({ type: " null candidate " });
+    expect(normalized).toMatchObject({
+      chunkCandidates: [
+        {
+          candidateType: "weak_resonance",
+          evidenceType: "living_lexical",
+          falseFriendRisk: "low",
+        },
+      ],
+      nullCandidates: [
+        {
+          candidateType: "null_candidate",
+          evidenceType: "none",
+          falseFriendRisk: "none",
+        },
+        {
+          candidateType: "null_candidate",
+          evidenceType: "none",
+          falseFriendRisk: "none",
+        },
+      ],
+    });
+
+    expect(chunkCandidate.candidateType).toBe("weak_resonance");
+    expect(chunkCandidate.evidenceType).toBe("living_lexical");
+    expect(chunkCandidate.falseFriendRisk).toBe("low");
+    expect(nullCandidate.candidateType).toBe("null_candidate");
+    expect(nullCandidate.evidenceType).toBe("none");
+    expect(nullCandidate.falseFriendRisk).toBe("none");
+    expect(tuNullCandidate.candidateType).toBe("null_candidate");
+    expect(tuNullCandidate.evidenceType).toBe("none");
+    expect(tuNullCandidate.falseFriendRisk).toBe("none");
+
+    expect(auditByPath(result.audit, "chunkCandidates.0.candidateType")).toMatchObject({
+      status: "repaired",
+      mappingRuleId: "object_type_scalar_enum_wrapper",
+      originalValue: { type: " weak resonance " },
+      extractedValue: " weak resonance ",
+      normalizedValue: "weak_resonance",
+      objectShape: "type",
+      carrierKey: "type",
+    });
+
+    expect(auditByPath(result.audit, "chunkCandidates.0.evidenceType")).toMatchObject({
+      status: "repaired",
+      mappingRuleId: "object_type_scalar_enum_wrapper",
+      originalValue: { type: " living lexical " },
+      extractedValue: " living lexical ",
+      normalizedValue: "living_lexical",
+      objectShape: "type",
+      carrierKey: "type",
+    });
+
+    expect(auditByPath(result.audit, "chunkCandidates.0.falseFriendRisk")).toMatchObject({
+      status: "repaired",
+      mappingRuleId: "object_type_scalar_enum_wrapper",
+      originalValue: { type: " LOW " },
+      extractedValue: " LOW ",
+      normalizedValue: "low",
+      objectShape: "type",
+      carrierKey: "type",
+    });
+
+    expect(auditByPath(result.audit, "nullCandidates.0.candidateType")).toMatchObject({
+      status: "repaired",
+      mappingRuleId: "object_type_scalar_enum_wrapper",
+      originalValue: { type: " null candidate " },
+      extractedValue: " null candidate ",
+      normalizedValue: "null_candidate",
+      objectShape: "type",
+      carrierKey: "type",
+    });
+
+    expect(auditByPath(result.audit, "nullCandidates.1.evidenceType")).toMatchObject({
+      status: "repaired",
+      mappingRuleId: "object_type_scalar_enum_wrapper",
+      originalValue: { type: " none " },
+      extractedValue: " none ",
+      normalizedValue: "none",
+      objectShape: "type",
+      carrierKey: "type",
+    });
+
+    const validation = validateBrainCandidateSearchOutput({
+      heartInput: HEART_INPUT,
+      brainOutput: result.normalizedBrainOutput,
+    });
+
+    expect(validation.ok).toBe(true);
+    expect(validation.issues).toEqual([]);
+  });
+
   it("leaves unknown enum strings unresolved", () => {
     const result = normalizeBrainCandidateEnums(
       buildBrainOutput({
@@ -292,13 +442,27 @@ describe("Brain candidate enum repair helper", () => {
   });
 
   it.each([
-    { value: ["weak_resonance"], label: "one-item array" },
-    { value: ["weak_resonance", "strong_living_match"], label: "multi-item array" },
-    { value: { type: "weak_resonance" }, label: "object" },
-    { value: null, label: "null" },
-    { value: 42, label: "number" },
-    { value: true, label: "boolean" },
-  ])("marks non-scalar %s as unresolved", ({ value }) => {
+    {
+      label: "missing carrier key",
+      value: {},
+      mappingRuleId: "object_missing_carrier_key",
+    },
+    {
+      label: "multiple keys",
+      value: { type: "null_candidate", value: "extra" },
+      mappingRuleId: "object_multiple_carrier_keys",
+    },
+    {
+      label: "non-scalar carrier",
+      value: { type: ["null_candidate"] },
+      mappingRuleId: "object_non_scalar_carrier_value",
+    },
+    {
+      label: "unknown carrier string",
+      value: { type: "mystery_enum" },
+      mappingRuleId: "object_unknown_enum_value",
+    },
+  ])("leaves $label object wrappers unresolved", ({ value, mappingRuleId }) => {
     const result = normalizeBrainCandidateEnums(
       buildBrainOutput({
         chunkCandidates: [
@@ -325,7 +489,52 @@ describe("Brain candidate enum repair helper", () => {
         expect.objectContaining({
           path: "chunkCandidates.0.evidenceType",
           status: "unresolved",
-          mappingRuleId: "non_scalar_value",
+          mappingRuleId,
+        }),
+      ]),
+    );
+  });
+
+  it.each([
+    { value: ["weak_resonance"], label: "one-item array" },
+    { value: ["weak_resonance", "strong_living_match"], label: "multi-item array" },
+    { value: { type: ["weak_resonance"] }, label: "object" },
+    { value: null, label: "null" },
+    { value: 42, label: "number" },
+    { value: true, label: "boolean" },
+  ])("marks non-scalar %s as unresolved", ({ value }) => {
+    const expectedMappingRuleId =
+      typeof value === "object" && value !== null && !Array.isArray(value)
+        ? "object_non_scalar_carrier_value"
+        : "non_scalar_value";
+
+    const result = normalizeBrainCandidateEnums(
+      buildBrainOutput({
+        chunkCandidates: [
+          {
+            segmentationId: "study.segmentation.004",
+            chunk: "DI",
+            language: "Latin",
+            candidateForm: "di",
+            meaning: "know",
+            functionFit: "knowledge function",
+            sourceNote: "attested lexical item",
+            evidenceType: value,
+            candidateType: "strong_living_match",
+            falseFriendRisk: "low",
+            nullCandidate: false,
+            notes: "retained as a living lexical candidate",
+          },
+        ],
+      }),
+    );
+
+    expect(result.unresolved).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          path: "chunkCandidates.0.evidenceType",
+          status: "unresolved",
+          mappingRuleId: expectedMappingRuleId,
         }),
       ]),
     );
