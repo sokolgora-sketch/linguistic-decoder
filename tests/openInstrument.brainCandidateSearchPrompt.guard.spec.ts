@@ -246,6 +246,16 @@ describe("Open Instrument Brain candidate search prompt v0.1", () => {
     });
   });
 
+  it("forbids object wrappers for enum fields", () => {
+    expect(combined).toContain("Never wrap enum values in objects");
+    expect(combined).toContain(
+      "Objects are invalid for candidateType, evidenceType, and falseFriendRisk",
+    );
+    expect(combined).toContain(
+      'Do not return enum wrappers such as { "type": "null_candidate" } or { "type": "none" }',
+    );
+  });
+
   it("forbids uppercase enum aliases from external terminology", () => {
     for (const forbidden of [
       "STRONG_LEXICAL",
