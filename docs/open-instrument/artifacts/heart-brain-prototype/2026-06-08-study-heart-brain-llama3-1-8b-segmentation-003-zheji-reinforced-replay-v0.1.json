@@ -1,0 +1,221 @@
+{
+  "artifactVersion": "zheji-study003-reinforced-replay-artifact.v0.1",
+  "createdAt": "2026-06-08T08:00:34.059Z",
+  "classification": "CLEAN_ZHEJI_REINFORCED_REPLAY",
+  "status": "clean",
+  "fixedInput": {
+    "word": "study",
+    "segmentationId": "study.segmentation.003",
+    "chunks": [
+      "SHTU",
+      "DI"
+    ],
+    "voicePath": [
+      "U",
+      "I"
+    ]
+  },
+  "source": {
+    "provider": "openai_compat",
+    "model": "llama3.1:8b",
+    "endpoint": "http://localhost:11434/v1/chat/completions",
+    "providerDefault": "mock",
+    "openAiApiUsed": false
+  },
+  "execution": {
+    "modelCallMade": true,
+    "attemptCount": 1,
+    "providerHttpStatus": 200,
+    "providerDefaultChanged": false,
+    "runtimeWiringChanged": false,
+    "sourceFilesChanged": false,
+    "promptSourceChanged": false,
+    "validatorChanged": false,
+    "artifactWrittenByTempRunner": true,
+    "openAiApiUsed": false
+  },
+  "promptContract": {
+    "runnerVersion": "zheji-study003-replay-runner.v0.1",
+    "mode": "PLAN_ONLY_NO_MODEL_CALL",
+    "hasStructuralContract": true,
+    "hasLinguisticRules": true,
+    "hasOutputSkeleton": true,
+    "skeletonAtBottom": true,
+    "forbidsTopLevelCandidates": true,
+    "forcesChunkCandidates": true,
+    "forcesNullCandidates": true,
+    "forcesWarnings": true,
+    "forcesClaimBoundary": true
+  },
+  "request": {
+    "model": "llama3.1:8b",
+    "temperature": 0,
+    "top_p": 1,
+    "stream": false
+  },
+  "providerError": null,
+  "rawProviderResponse": {
+    "id": "chatcmpl-596",
+    "object": "chat.completion",
+    "created": 1780905634,
+    "model": "llama3.1:8b",
+    "system_fingerprint": "fp_ollama",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "{\n  \"word\": \"study\",\n  \"segmentationId\": \"study.segmentation.003\",\n  \"chunkCandidates\": [\n    {\n      \"chunk\": \"SHTU\",\n      \"segmentationId\": \"study.segmentation.003\",\n      \"language\": \"Albanian\",\n      \"candidateForm\": \"candidate form here\",\n      \"meaning\": \"short meaning here\",\n      \"functionFit\": \"direct\",\n      \"sourceNote\": \"short auditable evidence or limitation note\",\n      \"evidenceType\": \"living_lexical\",\n      \"candidateType\": \"weak_resonance\",\n      \"falseFriendRisk\": \"medium\",\n      \"nullCandidate\": false,\n      \"notes\": [\"short audit note\"],\n      \"analysisLayers\": {\n        \"formal\": { \"isPresent\": false, \"evidenceNote\": null },\n        \"symbolic\": { \"isPresent\": true, \"evidenceNote\": \"Insightful evidence supports candidate meaning.\" }\n      },\n      \"semanticTransparency\": {\n        \"level\": \"opaque\",\n        \"reason\": \"short auditable semantic/function motivation reason\",\n        \"decomposition\": []\n      }\n    },\n    {\n      \"chunk\": \"DI\",\n      \"segmentationId\": \"study.segmentation.003\",\n      \"language\": \"Latin\",\n      \"candidateForm\": \"candidate form here\",\n      \"meaning\": \"short meaning here\",\n      \"functionFit\": \"direct\",\n      \"sourceNote\": \"short auditable evidence or limitation note\",\n      \"evidenceType\": \"living_lexical\",\n      \"candidateType\": \"weak_resonance\",\n      \"falseFriendRisk\": \"medium\",\n      \"nullCandidate\": false,\n      \"notes\": [\"short audit note\"],\n      \"analysisLayers\": {\n        \"formal\": { \"isPresent\": true, \"evidenceNote\": \"Historical evidence supports candidate meaning.\" },\n        \"symbolic\": { \"isPresent\": false, \"evidenceNote\": null }\n      },\n      \"semanticTransparency\": {\n        \"level\": \"metaphorical\",\n        \"reason\": \"short auditable semantic/function motivation reason\",\n        \"decomposition\": [\"root1\", \"root2\"]\n      }\n    }\n  ],\n  \"nullCandidates\": [],\n  \"warnings\": [],\n  \"claimBoundary\": {\n    \"originClaim\": false,\n    \"winnerClaim\": false,\n    \"historicalProof\": false,\n    \"candidateTruthProof\": false,\n    \"modelQualityEvidence\": false,\n    \"providerDefaultChangeReason\": false\n  }\n}"
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 1563,
+      "completion_tokens": 525,
+      "total_tokens": 2088
+    }
+  },
+  "rawContent": "{\n  \"word\": \"study\",\n  \"segmentationId\": \"study.segmentation.003\",\n  \"chunkCandidates\": [\n    {\n      \"chunk\": \"SHTU\",\n      \"segmentationId\": \"study.segmentation.003\",\n      \"language\": \"Albanian\",\n      \"candidateForm\": \"candidate form here\",\n      \"meaning\": \"short meaning here\",\n      \"functionFit\": \"direct\",\n      \"sourceNote\": \"short auditable evidence or limitation note\",\n      \"evidenceType\": \"living_lexical\",\n      \"candidateType\": \"weak_resonance\",\n      \"falseFriendRisk\": \"medium\",\n      \"nullCandidate\": false,\n      \"notes\": [\"short audit note\"],\n      \"analysisLayers\": {\n        \"formal\": { \"isPresent\": false, \"evidenceNote\": null },\n        \"symbolic\": { \"isPresent\": true, \"evidenceNote\": \"Insightful evidence supports candidate meaning.\" }\n      },\n      \"semanticTransparency\": {\n        \"level\": \"opaque\",\n        \"reason\": \"short auditable semantic/function motivation reason\",\n        \"decomposition\": []\n      }\n    },\n    {\n      \"chunk\": \"DI\",\n      \"segmentationId\": \"study.segmentation.003\",\n      \"language\": \"Latin\",\n      \"candidateForm\": \"candidate form here\",\n      \"meaning\": \"short meaning here\",\n      \"functionFit\": \"direct\",\n      \"sourceNote\": \"short auditable evidence or limitation note\",\n      \"evidenceType\": \"living_lexical\",\n      \"candidateType\": \"weak_resonance\",\n      \"falseFriendRisk\": \"medium\",\n      \"nullCandidate\": false,\n      \"notes\": [\"short audit note\"],\n      \"analysisLayers\": {\n        \"formal\": { \"isPresent\": true, \"evidenceNote\": \"Historical evidence supports candidate meaning.\" },\n        \"symbolic\": { \"isPresent\": false, \"evidenceNote\": null }\n      },\n      \"semanticTransparency\": {\n        \"level\": \"metaphorical\",\n        \"reason\": \"short auditable semantic/function motivation reason\",\n        \"decomposition\": [\"root1\", \"root2\"]\n      }\n    }\n  ],\n  \"nullCandidates\": [],\n  \"warnings\": [],\n  \"claimBoundary\": {\n    \"originClaim\": false,\n    \"winnerClaim\": false,\n    \"historicalProof\": false,\n    \"candidateTruthProof\": false,\n    \"modelQualityEvidence\": false,\n    \"providerDefaultChangeReason\": false\n  }\n}",
+  "parsedRawBrainOutput": {
+    "word": "study",
+    "segmentationId": "study.segmentation.003",
+    "chunkCandidates": [
+      {
+        "chunk": "SHTU",
+        "segmentationId": "study.segmentation.003",
+        "language": "Albanian",
+        "candidateForm": "candidate form here",
+        "meaning": "short meaning here",
+        "functionFit": "direct",
+        "sourceNote": "short auditable evidence or limitation note",
+        "evidenceType": "living_lexical",
+        "candidateType": "weak_resonance",
+        "falseFriendRisk": "medium",
+        "nullCandidate": false,
+        "notes": [
+          "short audit note"
+        ],
+        "analysisLayers": {
+          "formal": {
+            "isPresent": false,
+            "evidenceNote": null
+          },
+          "symbolic": {
+            "isPresent": true,
+            "evidenceNote": "Insightful evidence supports candidate meaning."
+          }
+        },
+        "semanticTransparency": {
+          "level": "opaque",
+          "reason": "short auditable semantic/function motivation reason",
+          "decomposition": []
+        }
+      },
+      {
+        "chunk": "DI",
+        "segmentationId": "study.segmentation.003",
+        "language": "Latin",
+        "candidateForm": "candidate form here",
+        "meaning": "short meaning here",
+        "functionFit": "direct",
+        "sourceNote": "short auditable evidence or limitation note",
+        "evidenceType": "living_lexical",
+        "candidateType": "weak_resonance",
+        "falseFriendRisk": "medium",
+        "nullCandidate": false,
+        "notes": [
+          "short audit note"
+        ],
+        "analysisLayers": {
+          "formal": {
+            "isPresent": true,
+            "evidenceNote": "Historical evidence supports candidate meaning."
+          },
+          "symbolic": {
+            "isPresent": false,
+            "evidenceNote": null
+          }
+        },
+        "semanticTransparency": {
+          "level": "metaphorical",
+          "reason": "short auditable semantic/function motivation reason",
+          "decomposition": [
+            "root1",
+            "root2"
+          ]
+        }
+      }
+    ],
+    "nullCandidates": [],
+    "warnings": [],
+    "claimBoundary": {
+      "originClaim": false,
+      "winnerClaim": false,
+      "historicalProof": false,
+      "candidateTruthProof": false,
+      "modelQualityEvidence": false,
+      "providerDefaultChangeReason": false
+    }
+  },
+  "validation": {
+    "rawParseOk": true,
+    "parseExtraction": "direct_json",
+    "parseError": null,
+    "forbiddenRawFieldFound": false,
+    "forbiddenRawFields": [],
+    "structural": {
+      "ok": true,
+      "issueCount": 0,
+      "issues": []
+    },
+    "enrichment": {
+      "ok": true,
+      "warningCount": 0,
+      "warnings": [],
+      "validTransparencyCandidateCount": 2
+    },
+    "interpretation": "Reinforced replay tests whether the output skeleton prevents the previous top-level candidates collapse."
+  },
+  "zhejiDerivedOutput": {
+    "transparencyContrast": {
+      "hasContrast": true,
+      "matrix": {
+        "atomic": [],
+        "metaphorical": [
+          "Latin"
+        ],
+        "opaque": [
+          "Albanian"
+        ]
+      },
+      "partial": false,
+      "unavailableReason": null
+    }
+  },
+  "summary": {
+    "word": "study",
+    "segmentationId": "study.segmentation.003",
+    "chunks": [
+      "SHTU",
+      "DI"
+    ],
+    "voicePath": [
+      "U",
+      "I"
+    ],
+    "candidateCount": 2,
+    "nullCandidateCount": 0,
+    "semanticFunctionMotivationOnly": true
+  },
+  "claimBoundary": {
+    "developmentOnly": true,
+    "semanticFunctionMotivationOnly": true,
+    "originClaim": false,
+    "winnerClaim": false,
+    "historicalProof": false,
+    "candidateTruthProof": false,
+    "modelQualityEvidence": false,
+    "providerDefaultChangeReason": false
+  }
+}
