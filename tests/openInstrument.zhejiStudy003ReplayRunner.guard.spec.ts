@@ -83,4 +83,52 @@ describe("Zheji study003 replay runner scaffold v0.1", () => {
       providerDefaultChangeReason: false,
     });
   });
+  it("reinforces structural contract before Zheji enrichment", () => {
+    const plan = buildZhejiStudy003ReplayPlanV0_1({
+      date: "2026-06-08",
+    });
+
+    expect(plan.systemPrompt).toContain("<STRUCTURAL_CONTRACT>");
+    expect(plan.systemPrompt).toContain("The structural contract is non-negotiable.");
+    expect(plan.systemPrompt).toContain("Top-level keys must include word, segmentationId, chunkCandidates, nullCandidates, warnings, and claimBoundary.");
+    expect(plan.systemPrompt).toContain("Use top-level chunkCandidates. Do not use top-level candidates.");
+    expect(plan.systemPrompt).toContain("If structural fields are missing, the result is STRUCTURAL_FAILURE.");
+  });
+
+  it("isolates linguistic evaluation rules from the structural contract", () => {
+    const plan = buildZhejiStudy003ReplayPlanV0_1({
+      date: "2026-06-08",
+    });
+
+    expect(plan.systemPrompt).toContain("<LINGUISTIC_EVALUATION_RULES>");
+    expect(plan.systemPrompt).toContain("Zheji enrichment fields are additive only.");
+    expect(plan.systemPrompt).toContain("Missing or incomplete Zheji enrichment is ENRICHMENT_WARNING");
+    expect(plan.systemPrompt).toContain("If semanticTransparency.decomposition is uncertain, use an empty array []. Do not use null.");
+  });
+
+  it("puts an exact JSON output skeleton at the bottom of the user prompt", () => {
+    const plan = buildZhejiStudy003ReplayPlanV0_1({
+      date: "2026-06-08",
+    });
+
+    expect(plan.userPrompt).toContain("<OUTPUT_JSON_SKELETON>");
+    expect(plan.userPrompt).toContain('"chunkCandidates": [');
+    expect(plan.userPrompt).toContain('"nullCandidates": []');
+    expect(plan.userPrompt).toContain('"warnings": []');
+    expect(plan.userPrompt).toContain('"claimBoundary": {');
+    expect(plan.userPrompt).toContain('"analysisLayers": {');
+    expect(plan.userPrompt).toContain('"semanticTransparency": {');
+    expect(plan.userPrompt).toContain('"decomposition": []');
+    expect(plan.userPrompt.trim().endsWith("</OUTPUT_JSON_SKELETON>")).toBe(true);
+  });
+
+  it("forbids the failed top-level candidates replacement shape", () => {
+    const plan = buildZhejiStudy003ReplayPlanV0_1({
+      date: "2026-06-08",
+    });
+
+    expect(plan.userPrompt).toContain("Do not use top-level candidates.");
+    expect(plan.userPrompt).toContain("Use top-level chunkCandidates, nullCandidates, warnings, and claimBoundary.");
+    expect(plan.userPrompt).not.toContain('"candidates": [');
+  });
 });
