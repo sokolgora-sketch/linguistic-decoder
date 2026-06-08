@@ -1,0 +1,648 @@
+{
+  "artifactType": "open_instrument_zheji_study003_replay",
+  "artifactVersion": "v0.1",
+  "createdAt": "2026-06-08T06:29:07.459Z",
+  "status": "captured_with_issues",
+  "classification": "VALIDATION_FAILURE_AFTER_ZHEJI",
+  "source": {
+    "provider": "openai_compat",
+    "model": "llama3.1:8b",
+    "endpoint": "http://localhost:11434/v1/chat/completions",
+    "providerDefault": "mock",
+    "openAiApiUsed": false
+  },
+  "execution": {
+    "modelCallMade": true,
+    "attemptCount": 1,
+    "promptContractApplied": true,
+    "normalizationApplied": true,
+    "postProcessorApplied": true,
+    "validatorChanged": false,
+    "promptSourceChanged": false,
+    "sourceFilesChanged": false,
+    "providerDefaultChanged": false,
+    "openAiApiUsed": false,
+    "requestBody": {
+      "model": "llama3.1:8b",
+      "stream": false,
+      "temperature": 0,
+      "messages": [
+        {
+          "role": "system",
+          "content": "You are the Brain in the Open Instrument Heart-to-Brain Candidate Search Protocol.\nReturn strict JSON only. No prose outside JSON.\nBrain searches candidate meanings only.\nBrain does not own segmentation, vowel path, legal transforms, validation, derived contrast, or origin verdict.\nUse only Heart-approved chunks and target languages.\nBrain output must include top-level word and top-level segmentationId.\nDo not claim origin. Do not treat resonance as proof.\nDo not score, rank, choose a winner, claim history, or declare a true source.\nInspect semantic/function motivation only.\nEvery non-null chunk candidate must include analysisLayers and semanticTransparency.\nBrain must not return transparencyContrast.\nBrain must not return transparencyContrastNote.\ncandidateType must not be changed by Zheji fields."
+        },
+        {
+          "role": "user",
+          "content": "HEART_APPROVED_INPUT_JSON:\n{\n  \"word\": \"study\",\n  \"normalizedWord\": \"study\",\n  \"segmentationId\": \"study.segmentation.003\",\n  \"chunks\": [\n    \"SHTU\",\n    \"DI\"\n  ],\n  \"voicePath\": [\n    \"U\",\n    \"I\"\n  ],\n  \"legalTransforms\": [\n    \"S_TO_SH\",\n    \"FINAL_Y_TO_I\"\n  ],\n  \"chunkVariants\": [\n    {\n      \"chunk\": \"SHTU\",\n      \"variantOf\": \"STU\",\n      \"legalTransform\": \"S_TO_SH\",\n      \"note\": \"SHTU is an S_TO_SH soft comparison variant of STU.\"\n    },\n    {\n      \"chunk\": \"DI\",\n      \"variantOf\": \"DY\",\n      \"legalTransform\": \"FINAL_Y_TO_I\",\n      \"note\": \"DI is a final Y_TO_I comparison variant of DY.\"\n    }\n  ],\n  \"doctrineHints\": {\n    \"U\": \"container, inside, adding, holding, depth\",\n    \"I\": \"insight, intellect, knowing, line, point\"\n  },\n  \"targetLanguages\": [\n    \"Albanian\",\n    \"Latin\",\n    \"Chinese\",\n    \"Germanic\"\n  ],\n  \"searchMode\": \"zheji_study003_candidate_search_v0.1\"\n}\n\nZHEJI SEMANTIC TRANSPARENCY ADDITION\n\nWord: study\nSegmentation ID: study.segmentation.003\nHeart-approved chunks: SHTU + DI\nVoice path hint: U → I\n\nCompact Seven-Voice doctrine hints for this replay:\n- U: container, inside, adding, holding, depth\n- I: insight, intellect, knowing, line, point\n\nFor every non-null chunk candidate, include analysisLayers.\nanalysisLayers.formal.isPresent is true only when documented historical, lexical, dictionary, cognate, or established comparative evidence supports the candidate.\nanalysisLayers.formal.evidenceNote must be short, or null when formal evidence is not present.\nanalysisLayers.symbolic.isPresent is true only when candidate meaning aligns with the supplied doctrine hints for this embryo morpheme.\nanalysisLayers.symbolic.evidenceNote must be short, or null when symbolic evidence is not present.\nFor every non-null chunk candidate, include semanticTransparency.\nsemanticTransparency.level must be exactly one of: atomic, metaphorical, opaque.\nsemanticTransparency.reason must be short and auditable.\nsemanticTransparency.decomposition is optional. If uncertain, omit it.\nUse atomic only when candidate meaning is directly motivated as a literal, physical, or functional sum of smallest meaningful parts inside that language.\nUse metaphorical when roots or structure exist but the embryo meaning requires conceptual leap.\nUse opaque when no useful internal structural explanation exists for the embryo meaning.\nThis layer inspects semantic/function motivation. It does not declare winner, history, or origin.\nDo not return transparencyContrast.\nDo not return transparencyContrastNote.\nDo not score, rank, choose a winner, claim origin, or modify candidateType.\n\nTask:\nSearch candidate meanings for each Heart-approved chunk across targetLanguages.\nReturn candidates and null candidates as strict JSON matching the current Brain candidate schema plus the Zheji candidate-level fields.\nDo not add prose."
+        }
+      ],
+      "response_format": {
+        "type": "json_object"
+      }
+    }
+  },
+  "heartInput": {
+    "word": "study",
+    "normalizedWord": "study",
+    "segmentationId": "study.segmentation.003",
+    "chunks": [
+      "SHTU",
+      "DI"
+    ],
+    "voicePath": [
+      "U",
+      "I"
+    ],
+    "legalTransforms": [
+      "S_TO_SH",
+      "FINAL_Y_TO_I"
+    ],
+    "chunkVariants": [
+      {
+        "chunk": "SHTU",
+        "variantOf": "STU",
+        "legalTransform": "S_TO_SH",
+        "note": "SHTU is an S_TO_SH soft comparison variant of STU."
+      },
+      {
+        "chunk": "DI",
+        "variantOf": "DY",
+        "legalTransform": "FINAL_Y_TO_I",
+        "note": "DI is a final Y_TO_I comparison variant of DY."
+      }
+    ],
+    "doctrineHints": {
+      "U": "container, inside, adding, holding, depth",
+      "I": "insight, intellect, knowing, line, point"
+    },
+    "targetLanguages": [
+      "Albanian",
+      "Latin",
+      "Chinese",
+      "Germanic"
+    ],
+    "searchMode": "zheji_study003_candidate_search_v0.1"
+  },
+  "rawProviderResponse": {
+    "id": "chatcmpl-629",
+    "object": "chat.completion",
+    "created": 1780900147,
+    "model": "llama3.1:8b",
+    "system_fingerprint": "fp_ollama",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "{\n  \"word\": \"study\",\n  \"segmentationId\": \"study.segmentation.003\",\n  \"candidates\": [\n    {\n      \"chunk\": \"SHTU\",\n      \"analysisLayers\": {\n        \"formal\": {\n          \"isPresent\": true,\n          \"evidenceNote\": \"Historical evidence supports this candidate.\"\n        },\n        \"symbolic\": {\n          \"isPresent\": false\n        }\n      },\n      \"semanticTransparency\": {\n        \"level\": \"atomic\",\n        \"reason\": \"Directly motivated as a literal sum of smallest meaningful parts.\",\n        \"decomposition\": null\n      }\n    },\n    {\n      \"chunk\": \"DI\",\n      \"analysisLayers\": {\n        \"formal\": {\n          \"isPresent\": false\n        },\n        \"symbolic\": {\n          \"isPresent\": true,\n          \"evidenceNote\": \"Aligns with doctrine hints for this embryo morpheme.\"\n        }\n      },\n      \"semanticTransparency\": {\n        \"level\": \"metaphorical\",\n        \"reason\": \"Requires conceptual leap from roots or structure.\",\n        \"decomposition\": null\n      }\n    },\n    {\n      \"chunk\": \"SHTU\",\n      \"analysisLayers\": {\n        \"formal\": {\n          \"isPresent\": false\n        },\n        \"symbolic\": {\n          \"isPresent\": true,\n          \"evidenceNote\": \"Aligns with doctrine hints for this embryo morpheme.\"\n        }\n      },\n      \"semanticTransparency\": {\n        \"level\": \"opaque\",\n        \"reason\": \"No useful internal structural explanation exists.\",\n        \"decomposition\": null\n      }\n    },\n    {\n      \"chunk\": \"DI\",\n      \"analysisLayers\": {\n        \"formal\": {\n          \"isPresent\": true,\n          \"evidenceNote\": \"Lexical evidence supports this candidate.\"\n        },\n        \"symbolic\": {\n          \"isPresent\": false\n        }\n      },\n      \"semanticTransparency\": {\n        \"level\": \"atomic\",\n        \"reason\": \"Directly motivated as a literal sum of smallest meaningful parts.\",\n        \"decomposition\": null\n      }\n    }\n  ]\n}"
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 841,
+      "completion_tokens": 447,
+      "total_tokens": 1288
+    },
+    "http": {
+      "ok": true,
+      "status": 200,
+      "statusText": "OK"
+    }
+  },
+  "parsedRawBrainOutput": {
+    "word": "study",
+    "segmentationId": "study.segmentation.003",
+    "candidates": [
+      {
+        "chunk": "SHTU",
+        "analysisLayers": {
+          "formal": {
+            "isPresent": true,
+            "evidenceNote": "Historical evidence supports this candidate."
+          },
+          "symbolic": {
+            "isPresent": false
+          }
+        },
+        "semanticTransparency": {
+          "level": "atomic",
+          "reason": "Directly motivated as a literal sum of smallest meaningful parts.",
+          "decomposition": null
+        }
+      },
+      {
+        "chunk": "DI",
+        "analysisLayers": {
+          "formal": {
+            "isPresent": false
+          },
+          "symbolic": {
+            "isPresent": true,
+            "evidenceNote": "Aligns with doctrine hints for this embryo morpheme."
+          }
+        },
+        "semanticTransparency": {
+          "level": "metaphorical",
+          "reason": "Requires conceptual leap from roots or structure.",
+          "decomposition": null
+        }
+      },
+      {
+        "chunk": "SHTU",
+        "analysisLayers": {
+          "formal": {
+            "isPresent": false
+          },
+          "symbolic": {
+            "isPresent": true,
+            "evidenceNote": "Aligns with doctrine hints for this embryo morpheme."
+          }
+        },
+        "semanticTransparency": {
+          "level": "opaque",
+          "reason": "No useful internal structural explanation exists.",
+          "decomposition": null
+        }
+      },
+      {
+        "chunk": "DI",
+        "analysisLayers": {
+          "formal": {
+            "isPresent": true,
+            "evidenceNote": "Lexical evidence supports this candidate."
+          },
+          "symbolic": {
+            "isPresent": false
+          }
+        },
+        "semanticTransparency": {
+          "level": "atomic",
+          "reason": "Directly motivated as a literal sum of smallest meaningful parts.",
+          "decomposition": null
+        }
+      }
+    ]
+  },
+  "normalization": {
+    "rawBrainOutput": {
+      "word": "study",
+      "segmentationId": "study.segmentation.003",
+      "candidates": [
+        {
+          "chunk": "SHTU",
+          "analysisLayers": {
+            "formal": {
+              "isPresent": true,
+              "evidenceNote": "Historical evidence supports this candidate."
+            },
+            "symbolic": {
+              "isPresent": false
+            }
+          },
+          "semanticTransparency": {
+            "level": "atomic",
+            "reason": "Directly motivated as a literal sum of smallest meaningful parts.",
+            "decomposition": null
+          }
+        },
+        {
+          "chunk": "DI",
+          "analysisLayers": {
+            "formal": {
+              "isPresent": false
+            },
+            "symbolic": {
+              "isPresent": true,
+              "evidenceNote": "Aligns with doctrine hints for this embryo morpheme."
+            }
+          },
+          "semanticTransparency": {
+            "level": "metaphorical",
+            "reason": "Requires conceptual leap from roots or structure.",
+            "decomposition": null
+          }
+        },
+        {
+          "chunk": "SHTU",
+          "analysisLayers": {
+            "formal": {
+              "isPresent": false
+            },
+            "symbolic": {
+              "isPresent": true,
+              "evidenceNote": "Aligns with doctrine hints for this embryo morpheme."
+            }
+          },
+          "semanticTransparency": {
+            "level": "opaque",
+            "reason": "No useful internal structural explanation exists.",
+            "decomposition": null
+          }
+        },
+        {
+          "chunk": "DI",
+          "analysisLayers": {
+            "formal": {
+              "isPresent": true,
+              "evidenceNote": "Lexical evidence supports this candidate."
+            },
+            "symbolic": {
+              "isPresent": false
+            }
+          },
+          "semanticTransparency": {
+            "level": "atomic",
+            "reason": "Directly motivated as a literal sum of smallest meaningful parts.",
+            "decomposition": null
+          }
+        }
+      ]
+    },
+    "normalizedBrainOutput": {
+      "word": "study",
+      "segmentationId": "study.segmentation.003",
+      "candidates": [
+        {
+          "chunk": "SHTU",
+          "analysisLayers": {
+            "formal": {
+              "isPresent": true,
+              "evidenceNote": "Historical evidence supports this candidate."
+            },
+            "symbolic": {
+              "isPresent": false
+            }
+          },
+          "semanticTransparency": {
+            "level": "atomic",
+            "reason": "Directly motivated as a literal sum of smallest meaningful parts.",
+            "decomposition": null
+          }
+        },
+        {
+          "chunk": "DI",
+          "analysisLayers": {
+            "formal": {
+              "isPresent": false
+            },
+            "symbolic": {
+              "isPresent": true,
+              "evidenceNote": "Aligns with doctrine hints for this embryo morpheme."
+            }
+          },
+          "semanticTransparency": {
+            "level": "metaphorical",
+            "reason": "Requires conceptual leap from roots or structure.",
+            "decomposition": null
+          }
+        },
+        {
+          "chunk": "SHTU",
+          "analysisLayers": {
+            "formal": {
+              "isPresent": false
+            },
+            "symbolic": {
+              "isPresent": true,
+              "evidenceNote": "Aligns with doctrine hints for this embryo morpheme."
+            }
+          },
+          "semanticTransparency": {
+            "level": "opaque",
+            "reason": "No useful internal structural explanation exists.",
+            "decomposition": null
+          }
+        },
+        {
+          "chunk": "DI",
+          "analysisLayers": {
+            "formal": {
+              "isPresent": true,
+              "evidenceNote": "Lexical evidence supports this candidate."
+            },
+            "symbolic": {
+              "isPresent": false
+            }
+          },
+          "semanticTransparency": {
+            "level": "atomic",
+            "reason": "Directly motivated as a literal sum of smallest meaningful parts.",
+            "decomposition": null
+          }
+        }
+      ]
+    },
+    "audit": [],
+    "unresolved": []
+  },
+  "normalizedBrainOutput": {
+    "word": "study",
+    "segmentationId": "study.segmentation.003",
+    "candidates": [
+      {
+        "chunk": "SHTU",
+        "analysisLayers": {
+          "formal": {
+            "isPresent": true,
+            "evidenceNote": "Historical evidence supports this candidate."
+          },
+          "symbolic": {
+            "isPresent": false
+          }
+        },
+        "semanticTransparency": {
+          "level": "atomic",
+          "reason": "Directly motivated as a literal sum of smallest meaningful parts.",
+          "decomposition": null
+        }
+      },
+      {
+        "chunk": "DI",
+        "analysisLayers": {
+          "formal": {
+            "isPresent": false
+          },
+          "symbolic": {
+            "isPresent": true,
+            "evidenceNote": "Aligns with doctrine hints for this embryo morpheme."
+          }
+        },
+        "semanticTransparency": {
+          "level": "metaphorical",
+          "reason": "Requires conceptual leap from roots or structure.",
+          "decomposition": null
+        }
+      },
+      {
+        "chunk": "SHTU",
+        "analysisLayers": {
+          "formal": {
+            "isPresent": false
+          },
+          "symbolic": {
+            "isPresent": true,
+            "evidenceNote": "Aligns with doctrine hints for this embryo morpheme."
+          }
+        },
+        "semanticTransparency": {
+          "level": "opaque",
+          "reason": "No useful internal structural explanation exists.",
+          "decomposition": null
+        }
+      },
+      {
+        "chunk": "DI",
+        "analysisLayers": {
+          "formal": {
+            "isPresent": true,
+            "evidenceNote": "Lexical evidence supports this candidate."
+          },
+          "symbolic": {
+            "isPresent": false
+          }
+        },
+        "semanticTransparency": {
+          "level": "atomic",
+          "reason": "Directly motivated as a literal sum of smallest meaningful parts.",
+          "decomposition": null
+        }
+      }
+    ]
+  },
+  "zhejiPromptMetadata": {
+    "zhejiPromptContractApplied": true,
+    "sevenVoiceDoctrineReferenceIncluded": true,
+    "symbolicEvaluationAllowed": true,
+    "zhejiFieldsRequested": [
+      "analysisLayers",
+      "semanticTransparency"
+    ],
+    "transparencyContrastRequestedFromBrain": false
+  },
+  "zhejiDerivedOutput": {
+    "transparencyContrast": {
+      "hasContrast": true,
+      "matrix": {
+        "atomic": [
+          null
+        ],
+        "metaphorical": [
+          null
+        ],
+        "opaque": [
+          null
+        ]
+      }
+    }
+  },
+  "zhejiPostProcessor": {
+    "functionName": "detectTransparencyContrastV0_1",
+    "ok": true,
+    "note": "Computed from the model candidate array. Missing language fields produce null/empty language entries and are part of the validation failure evidence."
+  },
+  "validation": {
+    "rawParseOk": true,
+    "parseExtraction": "direct_json",
+    "parseError": null,
+    "brainValidation": {
+      "callOk": true,
+      "ok": false,
+      "issueCount": 10,
+      "result": {
+        "ok": false,
+        "issues": [
+          {
+            "code": "MISSING_FIELD",
+            "severity": "error",
+            "message": "Brain output missing required field: chunkCandidates",
+            "path": "chunkCandidates"
+          },
+          {
+            "code": "MISSING_FIELD",
+            "severity": "error",
+            "message": "Brain output missing required field: nullCandidates",
+            "path": "nullCandidates"
+          },
+          {
+            "code": "MISSING_FIELD",
+            "severity": "error",
+            "message": "Brain output missing required field: warnings",
+            "path": "warnings"
+          },
+          {
+            "code": "MISSING_FIELD",
+            "severity": "error",
+            "message": "Brain output missing required field: claimBoundary",
+            "path": "claimBoundary"
+          },
+          {
+            "code": "MISSING_FIELD",
+            "severity": "error",
+            "message": "chunkCandidates must be an array.",
+            "path": "chunkCandidates"
+          },
+          {
+            "code": "MISSING_FIELD",
+            "severity": "error",
+            "message": "nullCandidates must be an array.",
+            "path": "nullCandidates"
+          },
+          {
+            "code": "MISSING_FIELD",
+            "severity": "error",
+            "message": "warnings must be an array.",
+            "path": "warnings"
+          },
+          {
+            "code": "INVALID_CLAIM_BOUNDARY",
+            "severity": "error",
+            "message": "claimBoundary must be an object.",
+            "path": "claimBoundary"
+          },
+          {
+            "code": "MISSING_CHUNK_RESULT",
+            "severity": "error",
+            "message": "Every Heart-approved chunk must have at least one candidate or null candidate.",
+            "path": "chunks.SHTU"
+          },
+          {
+            "code": "MISSING_CHUNK_RESULT",
+            "severity": "error",
+            "message": "Every Heart-approved chunk must have at least one candidate or null candidate.",
+            "path": "chunks.DI"
+          }
+        ],
+        "summary": {
+          "checkedCandidates": 0,
+          "checkedNullCandidates": 0,
+          "chunksCovered": [],
+          "missingChunks": [
+            "SHTU",
+            "DI"
+          ]
+        }
+      },
+      "errors": []
+    },
+    "zhejiValidation": {
+      "callOk": true,
+      "ok": false,
+      "issueCount": 8,
+      "result": {
+        "ok": false,
+        "issues": [
+          {
+            "severity": "error",
+            "code": "INVALID_ZHEJI_ANALYSIS_LAYER",
+            "path": "chunkCandidates.0.analysisLayers.symbolic.evidenceNote",
+            "message": "evidenceNote must be string or null."
+          },
+          {
+            "severity": "error",
+            "code": "INVALID_ZHEJI_SEMANTIC_TRANSPARENCY",
+            "path": "chunkCandidates.0.semanticTransparency.decomposition",
+            "message": "semanticTransparency.decomposition must be an array of non-empty strings when present."
+          },
+          {
+            "severity": "error",
+            "code": "INVALID_ZHEJI_ANALYSIS_LAYER",
+            "path": "chunkCandidates.1.analysisLayers.formal.evidenceNote",
+            "message": "evidenceNote must be string or null."
+          },
+          {
+            "severity": "error",
+            "code": "INVALID_ZHEJI_SEMANTIC_TRANSPARENCY",
+            "path": "chunkCandidates.1.semanticTransparency.decomposition",
+            "message": "semanticTransparency.decomposition must be an array of non-empty strings when present."
+          },
+          {
+            "severity": "error",
+            "code": "INVALID_ZHEJI_ANALYSIS_LAYER",
+            "path": "chunkCandidates.2.analysisLayers.formal.evidenceNote",
+            "message": "evidenceNote must be string or null."
+          },
+          {
+            "severity": "error",
+            "code": "INVALID_ZHEJI_SEMANTIC_TRANSPARENCY",
+            "path": "chunkCandidates.2.semanticTransparency.decomposition",
+            "message": "semanticTransparency.decomposition must be an array of non-empty strings when present."
+          },
+          {
+            "severity": "error",
+            "code": "INVALID_ZHEJI_ANALYSIS_LAYER",
+            "path": "chunkCandidates.3.analysisLayers.symbolic.evidenceNote",
+            "message": "evidenceNote must be string or null."
+          },
+          {
+            "severity": "error",
+            "code": "INVALID_ZHEJI_SEMANTIC_TRANSPARENCY",
+            "path": "chunkCandidates.3.semanticTransparency.decomposition",
+            "message": "semanticTransparency.decomposition must be an array of non-empty strings when present."
+          }
+        ]
+      },
+      "errors": []
+    },
+    "forbiddenRawFieldFound": false,
+    "forbiddenRawFields": [],
+    "missingZhejiFields": false,
+    "missingZhejiReason": null,
+    "missingZhejiCount": 0,
+    "derivedContrastOk": true,
+    "rawBrainTopLevelKeys": [
+      "candidates",
+      "segmentationId",
+      "word"
+    ],
+    "normalizedBrainTopLevelKeys": [
+      "candidates",
+      "segmentationId",
+      "word"
+    ],
+    "candidateKeyShapes": [
+      [
+        "analysisLayers",
+        "chunk",
+        "semanticTransparency"
+      ],
+      [
+        "analysisLayers",
+        "chunk",
+        "semanticTransparency"
+      ],
+      [
+        "analysisLayers",
+        "chunk",
+        "semanticTransparency"
+      ],
+      [
+        "analysisLayers",
+        "chunk",
+        "semanticTransparency"
+      ]
+    ],
+    "interpretation": "The single local model call returned parseable JSON with candidate-level Zheji fields, but not the required Brain candidate search schema. Validation failure is retained as evidence."
+  },
+  "summary": {
+    "word": "study",
+    "segmentationId": "study.segmentation.003",
+    "chunks": [
+      "SHTU",
+      "DI"
+    ],
+    "candidateCount": 4,
+    "nullCandidateCount": 0,
+    "semanticFunctionMotivationOnly": true
+  },
+  "claimBoundary": {
+    "developmentOnly": true,
+    "semanticFunctionMotivationOnly": true,
+    "originClaim": false,
+    "winnerClaim": false,
+    "historicalProof": false,
+    "candidateTruthProof": false,
+    "modelQualityEvidence": false,
+    "providerDefaultChangeReason": false
+  }
+}
