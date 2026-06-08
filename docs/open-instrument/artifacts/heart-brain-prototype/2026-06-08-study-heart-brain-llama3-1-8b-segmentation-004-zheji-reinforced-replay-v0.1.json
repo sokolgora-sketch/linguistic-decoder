@@ -1,0 +1,314 @@
+{
+  "artifactVersion": "zheji-study004-reinforced-replay-artifact.v0.1",
+  "classification": "ZHEJI_STUDY004_REINFORCED_STRUCTURAL_FAILURE",
+  "status": "captured_with_issues",
+  "createdAt": "2026-06-08T11:53:56.084Z",
+  "source": {
+    "provider": "openai_compat",
+    "model": "llama3.1:8b",
+    "endpoint": "http://localhost:11434/v1/chat/completions",
+    "providerDefault": "mock",
+    "openAiApiUsed": false
+  },
+  "execution": {
+    "startedAt": "2026-06-08T11:53:00.926Z",
+    "completedAt": "2026-06-08T11:53:56.084Z",
+    "modelCallMade": true,
+    "attemptCount": 1,
+    "providerHttpStatus": 200,
+    "providerError": null,
+    "providerDefaultChanged": false,
+    "openAiApiUsed": false,
+    "runtimeWiringChanged": false,
+    "sourceFilesChanged": false,
+    "promptSourceChanged": false,
+    "validatorChanged": false
+  },
+  "fixedInput": {
+    "word": "study",
+    "segmentationId": "study.segmentation.004",
+    "chunks": [
+      "S",
+      "TU",
+      "DI"
+    ],
+    "voicePath": [
+      "U",
+      "I"
+    ]
+  },
+  "promptContract": {
+    "artifactRunner": "zheji-study004-reinforced-artifact-runner.v0.1",
+    "mode": "ONE_CALL_LOCAL_CAPTURE",
+    "hasStructuralContract": true,
+    "hasLinguisticRules": true,
+    "hasOutputSkeleton": true,
+    "skeletonAtBottom": true,
+    "forbidsTopLevelCandidates": true,
+    "forcesChunkCandidates": true,
+    "forcesNullCandidates": true,
+    "forcesWarnings": true,
+    "forcesClaimBoundary": true
+  },
+  "prompts": {
+    "systemPrompt": "Return strict JSON only. Do not wrap in markdown.\n\n<STRUCTURAL_CONTRACT>\nYou are filling a strict Open Instrument Brain candidate-search JSON object.\nThe structural contract is non-negotiable.\nTop-level keys must include word, segmentationId, chunkCandidates, nullCandidates, warnings, and claimBoundary.\nUse top-level chunkCandidates. Do not use top-level candidates.\nUse top-level nullCandidates, even when empty.\nUse top-level warnings, even when empty.\nUse top-level claimBoundary as a non-null object.\nEvery Heart-approved chunk must appear in either chunkCandidates or nullCandidates.\nEvery non-null chunkCandidates[] object must preserve all required Brain candidate fields.\nNull candidates must be placed only in nullCandidates and must preserve traceability.\nIf structural fields are missing, the result is STRUCTURAL_FAILURE.\n</STRUCTURAL_CONTRACT>\n\n<LINGUISTIC_EVALUATION_RULES>\nInspect semantic/function motivation only.\nTarget word: study.\nTarget segmentationId: study.segmentation.004.\nTarget chunks: S + TU + DI.\nExpected word-level voice path: U → I.\nDo not change S to SH.\nDo not change TU to STU.\nDo not change DI to D + I.\nDo not change .004 back to .003.\nZheji fields are additive only.\nAdd analysisLayers and semanticTransparency only after preserving the full Brain candidate schema.\nMissing or incomplete Zheji enrichment is ENRICHMENT_WARNING, not a reason to collapse the structural contract.\nanalysisLayers.formal.evidenceNote and analysisLayers.symbolic.evidenceNote must be string or null.\nWhen an analysis layer is not present, set evidenceNote to null.\nsemanticTransparency.decomposition must be an array. If uncertain, use an empty array []. Do not use null.\nBrain must not return transparencyContrast.\nBrain must not return transparencyContrastNote.\nBrain must not score candidates.\nBrain must not rank candidates.\nBrain must not choose a winner.\nBrain must not claim origin or historical truth.\ncandidateType must not be changed by Zheji fields.\n</LINGUISTIC_EVALUATION_RULES>",
+    "userPrompt": "Produce one strict JSON object for the fixed target.\n\nFixed input:\n- word: study\n- segmentationId: study.segmentation.004\n- chunks: S, TU, DI\n- voice path: U → I\n\nReturn exactly one represented result per chunk.\nFor each chunk, either provide one valid non-null candidate in chunkCandidates or one valid null candidate in nullCandidates.\nIf uncertain, use a null candidate instead of inventing.\n\nRequired non-null candidate fields:\n- chunk\n- segmentationId\n- language\n- candidateForm\n- meaning\n- functionFit\n- sourceNote\n- evidenceType\n- candidateType\n- falseFriendRisk\n- nullCandidate\n- notes\n- analysisLayers\n- semanticTransparency\n\nRequired null-candidate fields:\n- chunk\n- segmentationId\n- language\n- candidateForm\n- meaning\n- functionFit\n- sourceNote\n- evidenceType\n- candidateType\n- falseFriendRisk\n- nullCandidate\n- notes\n\nAllowed chunks only: S, TU, DI.\nDo not use top-level candidates.\nUse top-level chunkCandidates, nullCandidates, warnings, and claimBoundary.\nDo not return transparencyContrast.\nDo not return transparencyContrastNote.\n\n<OUTPUT_JSON_SKELETON>\n{\n  \"word\": \"study\",\n  \"segmentationId\": \"study.segmentation.004\",\n  \"chunkCandidates\": [\n    {\n      \"chunk\": \"S\",\n      \"segmentationId\": \"study.segmentation.004\",\n      \"language\": \"\",\n      \"candidateForm\": \"\",\n      \"meaning\": \"\",\n      \"functionFit\": \"\",\n      \"sourceNote\": \"\",\n      \"evidenceType\": \"\",\n      \"candidateType\": \"\",\n      \"falseFriendRisk\": \"\",\n      \"nullCandidate\": false,\n      \"notes\": \"\",\n      \"analysisLayers\": {\n        \"formal\": { \"isPresent\": false, \"evidenceNote\": null },\n        \"symbolic\": { \"isPresent\": false, \"evidenceNote\": null }\n      },\n      \"semanticTransparency\": {\n        \"level\": \"\",\n        \"rationale\": \"\",\n        \"decomposition\": []\n      }\n    }\n  ],\n  \"nullCandidates\": [],\n  \"warnings\": [],\n  \"claimBoundary\": {\n    \"originClaim\": false,\n    \"winnerClaim\": false,\n    \"historicalProof\": false,\n    \"candidateTruthProof\": false\n  }\n}\n</OUTPUT_JSON_SKELETON>"
+  },
+  "rawProviderResponse": {
+    "id": "chatcmpl-281",
+    "object": "chat.completion",
+    "created": 1780919636,
+    "model": "llama3.1:8b",
+    "system_fingerprint": "fp_ollama",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "{\n  \"word\": \"study\",\n  \"segmentationId\": \"study.segmentation.004\",\n  \"chunkCandidates\": [\n    {\n      \"chunk\": \"S\",\n      \"segmentationId\": \"study.segmentation.004\",\n      \"language\": \"\",\n      \"candidateForm\": \"\",\n      \"meaning\": \"\",\n      \"functionFit\": \"\",\n      \"sourceNote\": \"\",\n      \"evidenceType\": \"\",\n      \"candidateType\": \"\",\n      \"falseFriendRisk\": \"\",\n      \"nullCandidate\": false,\n      \"notes\": \"\",\n      \"analysisLayers\": {\n        \"formal\": { \"isPresent\": false, \"evidenceNote\": null },\n        \"symbolic\": { \"isPresent\": false, \"evidenceNote\": null }\n      },\n      \"semanticTransparency\": {\n        \"level\": \"\",\n        \"rationale\": \"\",\n        \"decomposition\": []\n      }\n    },\n    {\n      \"chunk\": \"TU\",\n      \"segmentationId\": \"study.segmentation.004\",\n      \"language\": \"\",\n      \"candidateForm\": \"\",\n      \"meaning\": \"\",\n      \"functionFit\": \"\",\n      \"sourceNote\": \"\",\n      \"evidenceType\": \"\",\n      \"candidateType\": \"\",\n      \"falseFriendRisk\": \"\",\n      \"nullCandidate\": false,\n      \"notes\": \"\",\n      \"analysisLayers\": {\n        \"formal\": { \"isPresent\": false, \"evidenceNote\": null },\n        \"symbolic\": { \"isPresent\": false, \"evidenceNote\": null }\n      },\n      \"semanticTransparency\": {\n        \"level\": \"\",\n        \"rationale\": \"\",\n        \"decomposition\": []\n      }\n    },\n    {\n      \"chunk\": \"DI\",\n      \"segmentationId\": \"study.segmentation.004\",\n      \"language\": \"\",\n      \"candidateForm\": \"\",\n      \"meaning\": \"\",\n      \"functionFit\": \"\",\n      \"sourceNote\": \"\",\n      \"evidenceType\": \"\",\n      \"candidateType\": \"\",\n      \"falseFriendRisk\": \"\",\n      \"nullCandidate\": false,\n      \"notes\": \"\",\n      \"analysisLayers\": {\n        \"formal\": { \"isPresent\": false, \"evidenceNote\": null },\n        \"symbolic\": { \"isPresent\": false, \"evidenceNote\": null }\n      },\n      \"semanticTransparency\": {\n        \"level\": \"\",\n        \"rationale\": \"\",\n        \"decomposition\": []\n      }\n    }\n  ],\n  \"nullCandidates\": [\n    {\n      \"chunk\": \"S\",\n      \"segmentationId\": \"study.segmentation.004\",\n      \"language\": \"\",\n      \"candidateForm\": \"\",\n      \"meaning\": \"\",\n      \"functionFit\": \"\",\n      \"sourceNote\": \"\",\n      \"evidenceType\": \"\",\n      \"candidateType\": \"\",\n      \"falseFriendRisk\": \"\",\n      \"nullCandidate\": true,\n      \"notes\": \"\"\n    },\n    {\n      \"chunk\": \"TU\",\n      \"segmentationId\": \"study.segmentation.004\",\n      \"language\": \"\",\n      \"candidateForm\": \"\",\n      \"meaning\": \"\",\n      \"functionFit\": \"\",\n      \"sourceNote\": \"\",\n      \"evidenceType\": \"\",\n      \"candidateType\": \"\",\n      \"falseFriendRisk\": \"\",\n      \"nullCandidate\": true,\n      \"notes\": \"\"\n    },\n    {\n      \"chunk\": \"DI\",\n      \"segmentationId\": \"study.segmentation.004\",\n      \"language\": \"\",\n      \"candidateForm\": \"\",\n      \"meaning\": \"\",\n      \"functionFit\": \"\",\n      \"sourceNote\": \"\",\n      \"evidenceType\": \"\",\n      \"candidateType\": \"\",\n      \"falseFriendRisk\": \"\",\n      \"nullCandidate\": true,\n      \"notes\": \"\"\n    }\n  ],\n  \"warnings\": [],\n  \"claimBoundary\": {\n    \"originClaim\": false,\n    \"winnerClaim\": false,\n    \"historicalProof\": false,\n    \"candidateTruthProof\": false\n  }\n}"
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 938,
+      "completion_tokens": 802,
+      "total_tokens": 1740
+    }
+  },
+  "rawText": "{\n  \"word\": \"study\",\n  \"segmentationId\": \"study.segmentation.004\",\n  \"chunkCandidates\": [\n    {\n      \"chunk\": \"S\",\n      \"segmentationId\": \"study.segmentation.004\",\n      \"language\": \"\",\n      \"candidateForm\": \"\",\n      \"meaning\": \"\",\n      \"functionFit\": \"\",\n      \"sourceNote\": \"\",\n      \"evidenceType\": \"\",\n      \"candidateType\": \"\",\n      \"falseFriendRisk\": \"\",\n      \"nullCandidate\": false,\n      \"notes\": \"\",\n      \"analysisLayers\": {\n        \"formal\": { \"isPresent\": false, \"evidenceNote\": null },\n        \"symbolic\": { \"isPresent\": false, \"evidenceNote\": null }\n      },\n      \"semanticTransparency\": {\n        \"level\": \"\",\n        \"rationale\": \"\",\n        \"decomposition\": []\n      }\n    },\n    {\n      \"chunk\": \"TU\",\n      \"segmentationId\": \"study.segmentation.004\",\n      \"language\": \"\",\n      \"candidateForm\": \"\",\n      \"meaning\": \"\",\n      \"functionFit\": \"\",\n      \"sourceNote\": \"\",\n      \"evidenceType\": \"\",\n      \"candidateType\": \"\",\n      \"falseFriendRisk\": \"\",\n      \"nullCandidate\": false,\n      \"notes\": \"\",\n      \"analysisLayers\": {\n        \"formal\": { \"isPresent\": false, \"evidenceNote\": null },\n        \"symbolic\": { \"isPresent\": false, \"evidenceNote\": null }\n      },\n      \"semanticTransparency\": {\n        \"level\": \"\",\n        \"rationale\": \"\",\n        \"decomposition\": []\n      }\n    },\n    {\n      \"chunk\": \"DI\",\n      \"segmentationId\": \"study.segmentation.004\",\n      \"language\": \"\",\n      \"candidateForm\": \"\",\n      \"meaning\": \"\",\n      \"functionFit\": \"\",\n      \"sourceNote\": \"\",\n      \"evidenceType\": \"\",\n      \"candidateType\": \"\",\n      \"falseFriendRisk\": \"\",\n      \"nullCandidate\": false,\n      \"notes\": \"\",\n      \"analysisLayers\": {\n        \"formal\": { \"isPresent\": false, \"evidenceNote\": null },\n        \"symbolic\": { \"isPresent\": false, \"evidenceNote\": null }\n      },\n      \"semanticTransparency\": {\n        \"level\": \"\",\n        \"rationale\": \"\",\n        \"decomposition\": []\n      }\n    }\n  ],\n  \"nullCandidates\": [\n    {\n      \"chunk\": \"S\",\n      \"segmentationId\": \"study.segmentation.004\",\n      \"language\": \"\",\n      \"candidateForm\": \"\",\n      \"meaning\": \"\",\n      \"functionFit\": \"\",\n      \"sourceNote\": \"\",\n      \"evidenceType\": \"\",\n      \"candidateType\": \"\",\n      \"falseFriendRisk\": \"\",\n      \"nullCandidate\": true,\n      \"notes\": \"\"\n    },\n    {\n      \"chunk\": \"TU\",\n      \"segmentationId\": \"study.segmentation.004\",\n      \"language\": \"\",\n      \"candidateForm\": \"\",\n      \"meaning\": \"\",\n      \"functionFit\": \"\",\n      \"sourceNote\": \"\",\n      \"evidenceType\": \"\",\n      \"candidateType\": \"\",\n      \"falseFriendRisk\": \"\",\n      \"nullCandidate\": true,\n      \"notes\": \"\"\n    },\n    {\n      \"chunk\": \"DI\",\n      \"segmentationId\": \"study.segmentation.004\",\n      \"language\": \"\",\n      \"candidateForm\": \"\",\n      \"meaning\": \"\",\n      \"functionFit\": \"\",\n      \"sourceNote\": \"\",\n      \"evidenceType\": \"\",\n      \"candidateType\": \"\",\n      \"falseFriendRisk\": \"\",\n      \"nullCandidate\": true,\n      \"notes\": \"\"\n    }\n  ],\n  \"warnings\": [],\n  \"claimBoundary\": {\n    \"originClaim\": false,\n    \"winnerClaim\": false,\n    \"historicalProof\": false,\n    \"candidateTruthProof\": false\n  }\n}",
+  "parsedRawBrainOutput": {
+    "word": "study",
+    "segmentationId": "study.segmentation.004",
+    "chunkCandidates": [
+      {
+        "chunk": "S",
+        "segmentationId": "study.segmentation.004",
+        "language": "",
+        "candidateForm": "",
+        "meaning": "",
+        "functionFit": "",
+        "sourceNote": "",
+        "evidenceType": "",
+        "candidateType": "",
+        "falseFriendRisk": "",
+        "nullCandidate": false,
+        "notes": "",
+        "analysisLayers": {
+          "formal": {
+            "isPresent": false,
+            "evidenceNote": null
+          },
+          "symbolic": {
+            "isPresent": false,
+            "evidenceNote": null
+          }
+        },
+        "semanticTransparency": {
+          "level": "",
+          "rationale": "",
+          "decomposition": []
+        }
+      },
+      {
+        "chunk": "TU",
+        "segmentationId": "study.segmentation.004",
+        "language": "",
+        "candidateForm": "",
+        "meaning": "",
+        "functionFit": "",
+        "sourceNote": "",
+        "evidenceType": "",
+        "candidateType": "",
+        "falseFriendRisk": "",
+        "nullCandidate": false,
+        "notes": "",
+        "analysisLayers": {
+          "formal": {
+            "isPresent": false,
+            "evidenceNote": null
+          },
+          "symbolic": {
+            "isPresent": false,
+            "evidenceNote": null
+          }
+        },
+        "semanticTransparency": {
+          "level": "",
+          "rationale": "",
+          "decomposition": []
+        }
+      },
+      {
+        "chunk": "DI",
+        "segmentationId": "study.segmentation.004",
+        "language": "",
+        "candidateForm": "",
+        "meaning": "",
+        "functionFit": "",
+        "sourceNote": "",
+        "evidenceType": "",
+        "candidateType": "",
+        "falseFriendRisk": "",
+        "nullCandidate": false,
+        "notes": "",
+        "analysisLayers": {
+          "formal": {
+            "isPresent": false,
+            "evidenceNote": null
+          },
+          "symbolic": {
+            "isPresent": false,
+            "evidenceNote": null
+          }
+        },
+        "semanticTransparency": {
+          "level": "",
+          "rationale": "",
+          "decomposition": []
+        }
+      }
+    ],
+    "nullCandidates": [
+      {
+        "chunk": "S",
+        "segmentationId": "study.segmentation.004",
+        "language": "",
+        "candidateForm": "",
+        "meaning": "",
+        "functionFit": "",
+        "sourceNote": "",
+        "evidenceType": "",
+        "candidateType": "",
+        "falseFriendRisk": "",
+        "nullCandidate": true,
+        "notes": ""
+      },
+      {
+        "chunk": "TU",
+        "segmentationId": "study.segmentation.004",
+        "language": "",
+        "candidateForm": "",
+        "meaning": "",
+        "functionFit": "",
+        "sourceNote": "",
+        "evidenceType": "",
+        "candidateType": "",
+        "falseFriendRisk": "",
+        "nullCandidate": true,
+        "notes": ""
+      },
+      {
+        "chunk": "DI",
+        "segmentationId": "study.segmentation.004",
+        "language": "",
+        "candidateForm": "",
+        "meaning": "",
+        "functionFit": "",
+        "sourceNote": "",
+        "evidenceType": "",
+        "candidateType": "",
+        "falseFriendRisk": "",
+        "nullCandidate": true,
+        "notes": ""
+      }
+    ],
+    "warnings": [],
+    "claimBoundary": {
+      "originClaim": false,
+      "winnerClaim": false,
+      "historicalProof": false,
+      "candidateTruthProof": false
+    }
+  },
+  "validation": {
+    "rawParseOk": true,
+    "parseExtraction": "direct_json",
+    "parseError": null,
+    "forbiddenRawFieldFound": false,
+    "forbiddenRawFields": [],
+    "structural": {
+      "ok": false,
+      "issueCount": 3,
+      "issues": [
+        {
+          "code": "INVALID_NULL_CANDIDATE_TYPE",
+          "path": "nullCandidates.0.candidateType",
+          "message": "Null candidate candidateType must equal null_candidate."
+        },
+        {
+          "code": "INVALID_NULL_CANDIDATE_TYPE",
+          "path": "nullCandidates.1.candidateType",
+          "message": "Null candidate candidateType must equal null_candidate."
+        },
+        {
+          "code": "INVALID_NULL_CANDIDATE_TYPE",
+          "path": "nullCandidates.2.candidateType",
+          "message": "Null candidate candidateType must equal null_candidate."
+        }
+      ]
+    },
+    "enrichment": {
+      "ok": false,
+      "warningCount": 3,
+      "warnings": [
+        {
+          "code": "INVALID_TRANSPARENCY_LEVEL",
+          "path": "chunkCandidates.0.semanticTransparency.level",
+          "message": "semanticTransparency.level should be a non-empty string."
+        },
+        {
+          "code": "INVALID_TRANSPARENCY_LEVEL",
+          "path": "chunkCandidates.1.semanticTransparency.level",
+          "message": "semanticTransparency.level should be a non-empty string."
+        },
+        {
+          "code": "INVALID_TRANSPARENCY_LEVEL",
+          "path": "chunkCandidates.2.semanticTransparency.level",
+          "message": "semanticTransparency.level should be a non-empty string."
+        }
+      ]
+    },
+    "validTransparencyCandidateCount": 0,
+    "missingTransparencyCount": 3
+  },
+  "zhejiDerivedOutput": {
+    "transparencyContrast": {
+      "hasContrast": false,
+      "partial": true,
+      "unavailableReason": "no_valid_semantic_transparency",
+      "matrix": {}
+    }
+  },
+  "zhejiPostProcessor": {
+    "functionName": "computeDerivedContrastLocalV0_1",
+    "ok": true,
+    "errors": []
+  },
+  "summary": {
+    "word": "study",
+    "segmentationId": "study.segmentation.004",
+    "chunks": [
+      "S",
+      "TU",
+      "DI"
+    ],
+    "voicePath": [
+      "U",
+      "I"
+    ],
+    "candidateCount": 3,
+    "nullCandidateCount": 3,
+    "semanticFunctionMotivationOnly": true
+  },
+  "claimBoundary": {
+    "developmentOnly": true,
+    "semanticFunctionMotivationOnly": true,
+    "originClaim": false,
+    "winnerClaim": false,
+    "historicalProof": false,
+    "candidateTruthProof": false,
+    "modelQualityEvidence": false,
+    "providerDefaultChangeReason": false
+  }
+}
