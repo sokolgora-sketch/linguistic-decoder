@@ -131,4 +131,26 @@ describe("Zheji study003 replay runner scaffold v0.1", () => {
     expect(plan.userPrompt).toContain("Use top-level chunkCandidates, nullCandidates, warnings, and claimBoundary.");
     expect(plan.userPrompt).not.toContain('"candidates": [');
   });
+
+  it("hardens null candidate enum and transparency level fallback language", () => {
+    const plan = buildZhejiStudy003ReplayPlanV0_1({});
+
+    expect(plan.systemPrompt).toContain("Every object in nullCandidates must use candidateType exactly null_candidate.");
+    expect(plan.systemPrompt).toContain("Do not use opaque, unknown, none, empty string, weak_resonance, or phonetic_only as nullCandidates[].candidateType.");
+    expect(plan.systemPrompt).toContain("null_candidate means no candidate was found for that chunk; opaque means a non-null candidate exists but cannot clearly motivate function.");
+    expect(plan.systemPrompt).toContain("semanticTransparency.level must be exactly one of atomic, metaphorical, opaque.");
+    expect(plan.systemPrompt).toContain("If semanticTransparency.level is uncertain for a non-null candidate, use opaque.");
+    expect(plan.systemPrompt).toContain("Do not leave semanticTransparency.level empty or null.");
+    expect(plan.systemPrompt).toContain("Open Instrument is not an etymology task. Do not find origin. Do not choose a winner.");
+    expect(plan.systemPrompt).toContain("functional identity card");
+    expect(plan.systemPrompt).toContain("free operators");
+    expect(plan.systemPrompt).toContain("Code F");
+    expect(plan.systemPrompt).toContain("Code E");
+
+    expect(plan.userPrompt).toContain("nullCandidates[].candidateType must be null_candidate, not opaque.");
+    expect(plan.userPrompt).toContain("For non-null candidates, semanticTransparency.level must be atomic, metaphorical, or opaque; if uncertain, use opaque.");
+    expect(plan.userPrompt).not.toContain("polarInversion");
+    expect(plan.userPrompt).not.toContain("vector-conservation");
+  });
+
 });
