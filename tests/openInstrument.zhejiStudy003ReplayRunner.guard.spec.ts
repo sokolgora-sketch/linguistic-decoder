@@ -153,4 +153,25 @@ describe("Zheji study003 replay runner scaffold v0.1", () => {
     expect(plan.userPrompt).not.toContain("vector-conservation");
   });
 
+
+  it("hardens candidate payload completion without invention", () => {
+    const plan = buildZhejiStudy003ReplayPlanV0_1({});
+
+    expect(plan.systemPrompt).toContain("For non-null chunkCandidates, language, candidateForm, meaning, and sourceNote must be non-empty.");
+    expect(plan.systemPrompt).toContain("If any required non-null candidate payload field cannot be filled honestly, use nullCandidates with candidateType null_candidate instead.");
+    expect(plan.systemPrompt).toContain("Do not emit blank non-null candidates.");
+    expect(plan.systemPrompt).toContain("Do not use placeholder payload values such as unknown, n/a, none, tbd, unavailable, not sure, or unspecified.");
+    expect(plan.systemPrompt).toContain("Do not invent a candidate only to satisfy required payload fields.");
+
+    expect(plan.userPrompt).toContain("Every non-null chunkCandidates[] object must include non-empty language, candidateForm, meaning, and sourceNote.");
+    expect(plan.userPrompt).toContain("If any required non-null candidate payload field cannot be filled honestly, use nullCandidates with candidateType null_candidate instead.");
+    expect(plan.userPrompt).toContain("Do not emit blank non-null candidates.");
+    expect(plan.userPrompt).toContain("Do not use placeholder payload values such as unknown, n/a, none, tbd, unavailable, not sure, or unspecified.");
+    expect(plan.userPrompt).toContain("Do not invent a candidate only to satisfy required payload fields.");
+
+    expect(plan.userPrompt).toContain("nullCandidates[].candidateType must be null_candidate, not opaque.");
+    expect(plan.userPrompt).toContain("Do not return transparencyContrast.");
+    expect(plan.userPrompt).toContain("Do not return transparencyContrastNote.");
+  });
+
 });
