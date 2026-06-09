@@ -1,0 +1,336 @@
+{
+  "artifactVersion": "zheji-study004-enum-hardened-rerun-artifact.v0.1",
+  "createdAt": "2026-06-09T04:41:38.431Z",
+  "classification": "ZHEJI_STUDY004_ENUM_HARDENED_STRUCTURAL_FAILURE",
+  "status": "captured_with_issues",
+  "fixedInput": {
+    "word": "study",
+    "segmentationId": "study.segmentation.004",
+    "chunks": [
+      "S",
+      "TU",
+      "DI"
+    ],
+    "voicePath": [
+      "U",
+      "I"
+    ]
+  },
+  "execution": {
+    "modelCallMade": true,
+    "attemptCount": 1,
+    "provider": "openai_compat",
+    "model": "llama3.1:8b",
+    "endpoint": "http://localhost:11434/v1/chat/completions",
+    "providerHttpStatus": 200,
+    "providerError": null,
+    "openAiApiUsed": false,
+    "providerDefaultChanged": false,
+    "runtimeWiringChanged": false,
+    "sourceFilesChanged": false,
+    "promptSourceChanged": false,
+    "validatorChanged": false
+  },
+  "promptContract": {
+    "artifactRunner": "zheji-study004-enum-hardened-capture-runner.v0.1",
+    "mode": "ONE_CALL_LOCAL_CAPTURE",
+    "hasStructuralContract": true,
+    "hasLinguisticRules": true,
+    "hasOutputSkeleton": true,
+    "skeletonAtBottom": true,
+    "forbidsTopLevelCandidates": true,
+    "forcesChunkCandidates": true,
+    "forcesNullCandidates": true,
+    "forcesWarnings": true,
+    "forcesClaimBoundary": true,
+    "blocksOpaqueAsNullCandidateType": true,
+    "usesOpaqueFallback": true,
+    "meaningMotivationFraming": true
+  },
+  "rawModelText": "{\n  \"word\": \"study\",\n  \"segmentationId\": \"study.segmentation.004\",\n  \"chunkCandidates\": [\n    {\n      \"chunk\": \"S\",\n      \"segmentationId\": \"study.segmentation.004\",\n      \"language\": \"\",\n      \"candidateForm\": \"\",\n      \"meaning\": \"\",\n      \"candidateType\": \"functional_candidate\",\n      \"evidenceType\": \"\",\n      \"functionFit\": \"\",\n      \"falseFriendRisk\": \"\",\n      \"nullCandidate\": false,\n      \"sourceNote\": \"\",\n      \"notes\": \"\",\n      \"analysisLayers\": {\n        \"formal\": {\n          \"isPresent\": true,\n          \"evidenceNote\": \"The word 'study' has a formal analysis layer.\"\n        },\n        \"symbolic\": {\n          \"isPresent\": true,\n          \"evidenceNote\": \"The word 'study' has a symbolic analysis layer.\"\n        }\n      },\n      \"semanticTransparency\": {\n        \"level\": \"atomic\",\n        \"reason\": \"\",\n        \"decomposition\": [\n          {\n            \"source\": \"container, inside, adding, holding, depth\",\n            \"target\": \"S\"\n          },\n          {\n            \"source\": \"insight, intellect, knowing, line, point\",\n            \"target\": \"I\"\n          }\n        ]\n      }\n    },\n    {\n      \"chunk\": \"TU\",\n      \"segmentationId\": \"study.segmentation.004\",\n      \"language\": \"\",\n      \"candidateForm\": \"\",\n      \"meaning\": \"\",\n      \"candidateType\": \"functional_candidate\",\n      \"evidenceType\": \"\",\n      \"functionFit\": \"\",\n      \"falseFriendRisk\": \"\",\n      \"nullCandidate\": false,\n      \"sourceNote\": \"\",\n      \"notes\": \"\",\n      \"analysisLayers\": {\n        \"formal\": {\n          \"isPresent\": true,\n          \"evidenceNote\": \"The word 'study' has a formal analysis layer.\"\n        },\n        \"symbolic\": {\n          \"isPresent\": true,\n          \"evidenceNote\": \"The word 'study' has a symbolic analysis layer.\"\n        }\n      },\n      \"semanticTransparency\": {\n        \"level\": \"atomic\",\n        \"reason\": \"\",\n        \"decomposition\": [\n          {\n            \"source\": \"container, inside, adding, holding, depth\",\n            \"target\": \"TU\"\n          },\n          {\n            \"source\": \"insight, intellect, knowing, line, point\",\n            \"target\": \"I\"\n          }\n        ]\n      }\n    },\n    {\n      \"chunk\": \"DI\",\n      \"segmentationId\": \"study.segmentation.004\",\n      \"language\": \"\",\n      \"candidateForm\": \"\",\n      \"meaning\": \"\",\n      \"candidateType\": \"functional_candidate\",\n      \"evidenceType\": \"\",\n      \"functionFit\": \"\",\n      \"falseFriendRisk\": \"\",\n      \"nullCandidate\": false,\n      \"sourceNote\": \"\",\n      \"notes\": \"\",\n      \"analysisLayers\": {\n        \"formal\": {\n          \"isPresent\": true,\n          \"evidenceNote\": \"The word 'study' has a formal analysis layer.\"\n        },\n        \"symbolic\": {\n          \"isPresent\": true,\n          \"evidenceNote\": \"The word 'study' has a symbolic analysis layer.\"\n        }\n      },\n      \"semanticTransparency\": {\n        \"level\": \"atomic\",\n        \"reason\": \"\",\n        \"decomposition\": [\n          {\n            \"source\": \"container, inside, adding, holding, depth\",\n            \"target\": \"DI\"\n          },\n          {\n            \"source\": \"insight, intellect, knowing, line, point\",\n            \"target\": \"I\"\n          }\n        ]\n      }\n    }\n  ],\n  \"nullCandidates\": [\n    {\n      \"candidateType\": \"null_candidate\",\n      \"chunk\": \"\",\n      \"segmentationId\": \"study.segmentation.004\",\n      \"language\": \"\",\n      \"candidateForm\": \"\",\n      \"meaning\": \"\",\n      \"evidenceType\": \"\",\n      \"functionFit\": \"\",\n      \"falseFriendRisk\": \"\",\n      \"nullCandidate\": true,\n      \"sourceNote\": \"\",\n      \"notes\": \"\"\n    }\n  ],\n  \"warnings\": [],\n  \"claimBoundary\": {\n    \"originClaim\": false,\n    \"winnerClaim\": false,\n    \"historicalProof\": false,\n    \"candidateTruthProof\": false,\n    \"semanticFunctionMotivationOnly\": true\n  }\n}",
+  "parsedRawBrainOutput": {
+    "word": "study",
+    "segmentationId": "study.segmentation.004",
+    "chunkCandidates": [
+      {
+        "chunk": "S",
+        "segmentationId": "study.segmentation.004",
+        "language": "",
+        "candidateForm": "",
+        "meaning": "",
+        "candidateType": "functional_candidate",
+        "evidenceType": "",
+        "functionFit": "",
+        "falseFriendRisk": "",
+        "nullCandidate": false,
+        "sourceNote": "",
+        "notes": "",
+        "analysisLayers": {
+          "formal": {
+            "isPresent": true,
+            "evidenceNote": "The word 'study' has a formal analysis layer."
+          },
+          "symbolic": {
+            "isPresent": true,
+            "evidenceNote": "The word 'study' has a symbolic analysis layer."
+          }
+        },
+        "semanticTransparency": {
+          "level": "atomic",
+          "reason": "",
+          "decomposition": [
+            {
+              "source": "container, inside, adding, holding, depth",
+              "target": "S"
+            },
+            {
+              "source": "insight, intellect, knowing, line, point",
+              "target": "I"
+            }
+          ]
+        }
+      },
+      {
+        "chunk": "TU",
+        "segmentationId": "study.segmentation.004",
+        "language": "",
+        "candidateForm": "",
+        "meaning": "",
+        "candidateType": "functional_candidate",
+        "evidenceType": "",
+        "functionFit": "",
+        "falseFriendRisk": "",
+        "nullCandidate": false,
+        "sourceNote": "",
+        "notes": "",
+        "analysisLayers": {
+          "formal": {
+            "isPresent": true,
+            "evidenceNote": "The word 'study' has a formal analysis layer."
+          },
+          "symbolic": {
+            "isPresent": true,
+            "evidenceNote": "The word 'study' has a symbolic analysis layer."
+          }
+        },
+        "semanticTransparency": {
+          "level": "atomic",
+          "reason": "",
+          "decomposition": [
+            {
+              "source": "container, inside, adding, holding, depth",
+              "target": "TU"
+            },
+            {
+              "source": "insight, intellect, knowing, line, point",
+              "target": "I"
+            }
+          ]
+        }
+      },
+      {
+        "chunk": "DI",
+        "segmentationId": "study.segmentation.004",
+        "language": "",
+        "candidateForm": "",
+        "meaning": "",
+        "candidateType": "functional_candidate",
+        "evidenceType": "",
+        "functionFit": "",
+        "falseFriendRisk": "",
+        "nullCandidate": false,
+        "sourceNote": "",
+        "notes": "",
+        "analysisLayers": {
+          "formal": {
+            "isPresent": true,
+            "evidenceNote": "The word 'study' has a formal analysis layer."
+          },
+          "symbolic": {
+            "isPresent": true,
+            "evidenceNote": "The word 'study' has a symbolic analysis layer."
+          }
+        },
+        "semanticTransparency": {
+          "level": "atomic",
+          "reason": "",
+          "decomposition": [
+            {
+              "source": "container, inside, adding, holding, depth",
+              "target": "DI"
+            },
+            {
+              "source": "insight, intellect, knowing, line, point",
+              "target": "I"
+            }
+          ]
+        }
+      }
+    ],
+    "nullCandidates": [
+      {
+        "candidateType": "null_candidate",
+        "chunk": "",
+        "segmentationId": "study.segmentation.004",
+        "language": "",
+        "candidateForm": "",
+        "meaning": "",
+        "evidenceType": "",
+        "functionFit": "",
+        "falseFriendRisk": "",
+        "nullCandidate": true,
+        "sourceNote": "",
+        "notes": ""
+      }
+    ],
+    "warnings": [],
+    "claimBoundary": {
+      "originClaim": false,
+      "winnerClaim": false,
+      "historicalProof": false,
+      "candidateTruthProof": false,
+      "semanticFunctionMotivationOnly": true
+    }
+  },
+  "validation": {
+    "rawParseOk": true,
+    "parseExtraction": "direct_json",
+    "forbiddenRawFieldFound": false,
+    "forbiddenRawFields": [],
+    "structural": {
+      "ok": false,
+      "issueCount": 14,
+      "issues": [
+        {
+          "code": "MISSING_LANGUAGE",
+          "path": "chunkCandidates.0.language",
+          "message": "language must be a non-empty string."
+        },
+        {
+          "code": "MISSING_CANDIDATE_FORM",
+          "path": "chunkCandidates.0.candidateForm",
+          "message": "candidateForm must be a non-empty string."
+        },
+        {
+          "code": "MISSING_MEANING",
+          "path": "chunkCandidates.0.meaning",
+          "message": "meaning must be a non-empty string."
+        },
+        {
+          "code": "MISSING_SOURCE_NOTE",
+          "path": "chunkCandidates.0.sourceNote",
+          "message": "sourceNote must be a non-empty string."
+        },
+        {
+          "code": "MISSING_LANGUAGE",
+          "path": "chunkCandidates.1.language",
+          "message": "language must be a non-empty string."
+        },
+        {
+          "code": "MISSING_CANDIDATE_FORM",
+          "path": "chunkCandidates.1.candidateForm",
+          "message": "candidateForm must be a non-empty string."
+        },
+        {
+          "code": "MISSING_MEANING",
+          "path": "chunkCandidates.1.meaning",
+          "message": "meaning must be a non-empty string."
+        },
+        {
+          "code": "MISSING_SOURCE_NOTE",
+          "path": "chunkCandidates.1.sourceNote",
+          "message": "sourceNote must be a non-empty string."
+        },
+        {
+          "code": "MISSING_LANGUAGE",
+          "path": "chunkCandidates.2.language",
+          "message": "language must be a non-empty string."
+        },
+        {
+          "code": "MISSING_CANDIDATE_FORM",
+          "path": "chunkCandidates.2.candidateForm",
+          "message": "candidateForm must be a non-empty string."
+        },
+        {
+          "code": "MISSING_MEANING",
+          "path": "chunkCandidates.2.meaning",
+          "message": "meaning must be a non-empty string."
+        },
+        {
+          "code": "MISSING_SOURCE_NOTE",
+          "path": "chunkCandidates.2.sourceNote",
+          "message": "sourceNote must be a non-empty string."
+        },
+        {
+          "code": "INVALID_NULL_CHUNK",
+          "path": "nullCandidates.0.chunk",
+          "message": "chunk must be one of S, TU, DI."
+        },
+        {
+          "code": "MISSING_NULL_SOURCE_NOTE",
+          "path": "nullCandidates.0.sourceNote",
+          "message": "null candidate sourceNote must explain why no credible candidate was found."
+        }
+      ]
+    },
+    "enrichment": {
+      "ok": true,
+      "warningCount": 0,
+      "warnings": []
+    },
+    "validTransparencyCandidateCount": 3,
+    "missingTransparencyCount": 0
+  },
+  "zhejiDerivedOutput": {
+    "transparencyContrast": {
+      "hasContrast": true,
+      "partial": false,
+      "unavailableReason": null,
+      "matrix": {
+        "atomic": [
+          {
+            "chunk": "S",
+            "language": "",
+            "candidateForm": ""
+          },
+          {
+            "chunk": "TU",
+            "language": "",
+            "candidateForm": ""
+          },
+          {
+            "chunk": "DI",
+            "language": "",
+            "candidateForm": ""
+          }
+        ]
+      }
+    }
+  },
+  "summary": {
+    "word": "study",
+    "segmentationId": "study.segmentation.004",
+    "chunks": [
+      "S",
+      "TU",
+      "DI"
+    ],
+    "voicePath": [
+      "U",
+      "I"
+    ],
+    "candidateCount": 3,
+    "nullCandidateCount": 1,
+    "semanticFunctionMotivationOnly": true
+  },
+  "claimBoundary": {
+    "developmentOnly": true,
+    "semanticFunctionMotivationOnly": true,
+    "originClaim": false,
+    "winnerClaim": false,
+    "historicalProof": false,
+    "candidateTruthProof": false,
+    "modelQualityEvidence": false,
+    "providerDefaultChangeReason": false
+  }
+}
