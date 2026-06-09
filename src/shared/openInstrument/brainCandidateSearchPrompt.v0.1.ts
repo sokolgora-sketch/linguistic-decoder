@@ -215,6 +215,8 @@ export function buildBrainCandidateSearchPrompt(
     "Every candidate and null candidate must use only exact chunk strings from HEART_APPROVED_INPUT_JSON.",
     "For null candidates, use exactly: candidateType=\"null_candidate\", evidenceType=\"none\", falseFriendRisk=\"none\", nullCandidate=true.",
     "nullCandidates follow the same traceability rules as chunkCandidates.",
+    "Every object in nullCandidates must include candidateType exactly null_candidate.",
+    "Do not use opaque as nullCandidates[].candidateType; opaque is only a semanticTransparency.level for non-null candidates.",
     "Every object in nullCandidates must include segmentationId.",
     "Every nullCandidates[].segmentationId must exactly equal the Heart input segmentationId.",
     "Never omit segmentationId from null candidates.",
