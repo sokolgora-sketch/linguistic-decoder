@@ -1,0 +1,300 @@
+{
+  "artifactVersion": "zheji-study004-segmentation-traceability-hardened-rerun.v0.1",
+  "classification": "CLEAN_ZHEJI_SEGMENTATION_TRACEABILITY_HARDENED_REPLAY",
+  "status": "clean",
+  "createdAt": "2026-06-09T09:31:29.192Z",
+  "fixedInput": {
+    "word": "study",
+    "normalizedWord": "study",
+    "segmentationId": "study.segmentation.004",
+    "chunks": [
+      "S",
+      "TU",
+      "DI"
+    ],
+    "voicePath": [
+      "U",
+      "I"
+    ],
+    "legalTransforms": [
+      "S_TO_SH",
+      "FINAL_Y_TO_I"
+    ],
+    "doctrineHints": {
+      "S": "boundary/pressure marker",
+      "TU": "toward/placement unit",
+      "DI": "knowing/insight unit",
+      "U": "container, inside, adding, holding, depth",
+      "I": "insight, intellect, knowing, line, point"
+    },
+    "targetLanguages": [
+      "Albanian",
+      "Latin",
+      "Chinese",
+      "Germanic"
+    ],
+    "searchMode": "zheji_study004_segmentation_traceability_hardened_rerun_v0.1"
+  },
+  "execution": {
+    "provider": "openai_compat",
+    "model": "llama3.1:8b",
+    "endpoint": "http://localhost:11434/v1/chat/completions",
+    "modelCallMade": true,
+    "attemptCount": 1,
+    "providerHttpStatus": 200,
+    "providerDefaultChanged": false,
+    "openAiApiUsed": false,
+    "startedAt": "2026-06-09T09:30:13.202Z",
+    "completedAt": "2026-06-09T09:31:29.192Z"
+  },
+  "promptContract": {
+    "semanticFunctionMotivationOnly": true,
+    "noOriginClaim": true,
+    "noWinnerClaim": true,
+    "noTopLevelCandidates": true,
+    "requiresChunkCandidates": true,
+    "requiresNullCandidates": true,
+    "requiresWarnings": true,
+    "requiresClaimBoundary": true,
+    "forbidsBrainTransparencyContrast": true,
+    "forbidsBrainTransparencyContrastNote": true,
+    "hardensCandidatePayload": true,
+    "hardensSegmentationTraceability": true
+  },
+  "request": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are the Brain in the Open Instrument Heart-to-Brain Candidate Search Protocol.\nReturn strict JSON only. Do not include markdown. Do not include prose outside JSON.\nOpen Instrument is not an etymology task. It finds meaning/function motivation, not origin.\nDo not find origin. Do not choose a winner. Do not claim history, ownership, superiority, or proof.\nSearch candidate meanings for each Heart-approved chunk across targetLanguages.\nUse top-level chunkCandidates, nullCandidates, warnings, and claimBoundary.\nDo not use top-level candidates.\nBrain must not return transparencyContrast.\nBrain must not return transparencyContrastNote.\nEvery object in chunkCandidates must include segmentationId.\nEvery chunkCandidates[].segmentationId must exactly equal the Heart input segmentationId.\nEvery object in nullCandidates must include segmentationId.\nEvery nullCandidates[].segmentationId must exactly equal the Heart input segmentationId.\nDo not leave candidate-level segmentationId empty.\nDo not infer, shorten, translate, normalize, or invent segmentationId.\nCopy segmentationId exactly from Heart-approved input into every candidate and null-candidate object.\nEvery non-null chunkCandidates[] object must include non-empty language, candidateForm, meaning, and sourceNote.\nIf any required non-null candidate payload field cannot be filled honestly, use nullCandidates with candidateType null_candidate instead.\nDo not emit blank non-null candidates.\nDo not use placeholder payload values such as unknown, n/a, none, tbd, unavailable, not sure, or unspecified.\nDo not invent a candidate only to satisfy required payload fields.\nsemanticTransparency.level must be exactly one of atomic, metaphorical, opaque.\nsemanticTransparency.level must not be empty or null. If uncertain for a non-null candidate, use opaque.\nopaque is for non-null candidates only; do not use opaque as nullCandidates[].candidateType.\nsemanticTransparency.reason must be short and auditable.\nsemanticTransparency.decomposition must be an array. If uncertain, use an empty array []. Do not use null.\nanalysisLayers.formal.isPresent is true only when documented historical, lexical, dictionary, cognate, or established comparative evidence supports the candidate.\nanalysisLayers.symbolic.isPresent is true only when candidate meaning aligns with the supplied doctrine hints for this embryo morpheme.\nUse Code F for formal support and Code E for symbolic support.\nUse nullCandidates only when no honest candidate can be emitted for a chunk/language pair.\nEvery nullCandidates[].candidateType must be exactly null_candidate.\nDo not use opaque, weak_resonance, phonetic_only, unknown, none, or empty string as nullCandidates[].candidateType."
+      },
+      {
+        "role": "user",
+        "content": "HEART_APPROVED_INPUT_JSON:\n{\n  \"word\": \"study\",\n  \"normalizedWord\": \"study\",\n  \"segmentationId\": \"study.segmentation.004\",\n  \"chunks\": [\n    \"S\",\n    \"TU\",\n    \"DI\"\n  ],\n  \"voicePath\": [\n    \"U\",\n    \"I\"\n  ],\n  \"legalTransforms\": [\n    \"S_TO_SH\",\n    \"FINAL_Y_TO_I\"\n  ],\n  \"doctrineHints\": {\n    \"S\": \"boundary/pressure marker\",\n    \"TU\": \"toward/placement unit\",\n    \"DI\": \"knowing/insight unit\",\n    \"U\": \"container, inside, adding, holding, depth\",\n    \"I\": \"insight, intellect, knowing, line, point\"\n  },\n  \"targetLanguages\": [\n    \"Albanian\",\n    \"Latin\",\n    \"Chinese\",\n    \"Germanic\"\n  ],\n  \"searchMode\": \"zheji_study004_segmentation_traceability_hardened_rerun_v0.1\"\n}\n\nTASK:\nReturn strict JSON for the Heart-approved segmentation.\n\nRequired top-level keys:\n- word\n- segmentationId\n- chunkCandidates\n- nullCandidates\n- warnings\n- claimBoundary\n\nRequired exact values:\n- word: study\n- segmentationId: study.segmentation.004\n- chunks are S, TU, DI\n- every candidate-level segmentationId must be study.segmentation.004\n\nFor each candidate:\n- preserve required Brain candidate fields first\n- then add analysisLayers\n- then add semanticTransparency\n\nReturn this JSON shape:\n\n{\n  \"word\": \"study\",\n  \"segmentationId\": \"study.segmentation.004\",\n  \"chunkCandidates\": [\n    {\n      \"chunk\": \"S\",\n      \"segmentationId\": \"study.segmentation.004\",\n      \"language\": \"Albanian\",\n      \"candidateForm\": \"candidate form here\",\n      \"meaning\": \"short meaning here\",\n      \"functionFit\": \"direct\",\n      \"sourceNote\": \"short auditable evidence or limitation note\",\n      \"evidenceType\": \"living_lexical\",\n      \"candidateType\": \"weak_resonance\",\n      \"falseFriendRisk\": \"medium\",\n      \"nullCandidate\": false,\n      \"notes\": [\"short audit note\"],\n      \"analysisLayers\": {\n        \"formal\": { \"isPresent\": false, \"evidenceNote\": null },\n        \"symbolic\": { \"isPresent\": false, \"evidenceNote\": null }\n      },\n      \"semanticTransparency\": {\n        \"level\": \"opaque\",\n        \"reason\": \"short auditable semantic/function motivation reason\",\n        \"decomposition\": []\n      }\n    }\n  ],\n  \"nullCandidates\": [\n    {\n      \"chunk\": \"S\",\n      \"segmentationId\": \"study.segmentation.004\",\n      \"language\": \"Albanian\",\n      \"candidateForm\": \"\",\n      \"meaning\": \"\",\n      \"functionFit\": \"none\",\n      \"sourceNote\": \"No honest candidate emitted for this chunk/language pair.\",\n      \"evidenceType\": \"none\",\n      \"candidateType\": \"null_candidate\",\n      \"falseFriendRisk\": \"none\",\n      \"nullCandidate\": true,\n      \"notes\": [\"short audit note\"]\n    }\n  ],\n  \"warnings\": [],\n  \"claimBoundary\": {\n    \"originClaim\": false,\n    \"winnerClaim\": false,\n    \"historicalProof\": false,\n    \"candidateTruthProof\": false,\n    \"modelQualityEvidence\": false,\n    \"providerDefaultChangeReason\": false\n  }\n}"
+      }
+    ],
+    "temperature": 0,
+    "top_p": 1,
+    "stream": false
+  },
+  "providerResponse": {
+    "id": "chatcmpl-154",
+    "object": "chat.completion",
+    "created": 1780997489,
+    "model": "llama3.1:8b",
+    "system_fingerprint": "fp_ollama",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "{\n  \"word\": \"study\",\n  \"segmentationId\": \"study.segmentation.004\",\n  \"chunkCandidates\": [\n    {\n      \"chunk\": \"S\",\n      \"segmentationId\": \"study.segmentation.004\",\n      \"language\": \"Albanian\",\n      \"candidateForm\": \"boundary/pressure marker\",\n      \"meaning\": \"boundary or pressure marker\",\n      \"functionFit\": \"direct\",\n      \"sourceNote\": \"doctrine hint for S\",\n      \"evidenceType\": \"doctrine_hint\",\n      \"candidateType\": \"weak_resonance\",\n      \"falseFriendRisk\": \"medium\",\n      \"nullCandidate\": false,\n      \"notes\": [\"boundary or pressure marker\"],\n      \"analysisLayers\": {\n        \"formal\": { \"isPresent\": false, \"evidenceNote\": null },\n        \"symbolic\": { \"isPresent\": true, \"evidenceNote\": \"Code E: doctrine hint for S\" }\n      },\n      \"semanticTransparency\": {\n        \"level\": \"atomic\",\n        \"reason\": \"direct mapping to doctrine hint\",\n        \"decomposition\": []\n      }\n    },\n    {\n      \"chunk\": \"TU\",\n      \"segmentationId\": \"study.segmentation.004\",\n      \"language\": \"Albanian\",\n      \"candidateForm\": \"toward/placement unit\",\n      \"meaning\": \"placement or movement toward something\",\n      \"functionFit\": \"direct\",\n      \"sourceNote\": \"doctrine hint for TU\",\n      \"evidenceType\": \"doctrine_hint\",\n      \"candidateType\": \"weak_resonance\",\n      \"falseFriendRisk\": \"medium\",\n      \"nullCandidate\": false,\n      \"notes\": [\"placement or movement toward something\"],\n      \"analysisLayers\": {\n        \"formal\": { \"isPresent\": false, \"evidenceNote\": null },\n        \"symbolic\": { \"isPresent\": true, \"evidenceNote\": \"Code E: doctrine hint for TU\" }\n      },\n      \"semanticTransparency\": {\n        \"level\": \"atomic\",\n        \"reason\": \"direct mapping to doctrine hint\",\n        \"decomposition\": []\n      }\n    },\n    {\n      \"chunk\": \"DI\",\n      \"segmentationId\": \"study.segmentation.004\",\n      \"language\": \"Albanian\",\n      \"candidateForm\": \"knowing/insight unit\",\n      \"meaning\": \"unit of knowing or insight\",\n      \"functionFit\": \"direct\",\n      \"sourceNote\": \"doctrine hint for DI\",\n      \"evidenceType\": \"doctrine_hint\",\n      \"candidateType\": \"weak_resonance\",\n      \"falseFriendRisk\": \"medium\",\n      \"nullCandidate\": false,\n      \"notes\": [\"unit of knowing or insight\"],\n      \"analysisLayers\": {\n        \"formal\": { \"isPresent\": false, \"evidenceNote\": null },\n        \"symbolic\": { \"isPresent\": true, \"evidenceNote\": \"Code E: doctrine hint for DI\" }\n      },\n      \"semanticTransparency\": {\n        \"level\": \"atomic\",\n        \"reason\": \"direct mapping to doctrine hint\",\n        \"decomposition\": []\n      }\n    }\n  ],\n  \"nullCandidates\": [\n    {\n      \"chunk\": \"S\",\n      \"segmentationId\": \"study.segmentation.004\",\n      \"language\": \"Albanian\",\n      \"candidateForm\": \"\",\n      \"meaning\": \"\",\n      \"functionFit\": \"none\",\n      \"sourceNote\": \"No honest candidate emitted for this chunk/language pair.\",\n      \"evidenceType\": \"none\",\n      \"candidateType\": \"null_candidate\",\n      \"falseFriendRisk\": \"none\",\n      \"nullCandidate\": true,\n      \"notes\": [\"short audit note\"]\n    },\n    {\n      \"chunk\": \"TU\",\n      \"segmentationId\": \"study.segmentation.004\",\n      \"language\": \"Albanian\",\n      \"candidateForm\": \"\",\n      \"meaning\": \"\",\n      \"functionFit\": \"none\",\n      \"sourceNote\": \"No honest candidate emitted for this chunk/language pair.\",\n      \"evidenceType\": \"none\",\n      \"candidateType\": \"null_candidate\",\n      \"falseFriendRisk\": \"none\",\n      \"nullCandidate\": true,\n      \"notes\": [\"short audit note\"]\n    },\n    {\n      \"chunk\": \"DI\",\n      \"segmentationId\": \"study.segmentation.004\",\n      \"language\": \"Albanian\",\n      \"candidateForm\": \"\",\n      \"meaning\": \"\",\n      \"functionFit\": \"none\",\n      \"sourceNote\": \"No honest candidate emitted for this chunk/language pair.\",\n      \"evidenceType\": \"none\",\n      \"candidateType\": \"null_candidate\",\n      \"falseFriendRisk\": \"none\",\n      \"nullCandidate\": true,\n      \"notes\": [\"short audit note\"]\n    }\n  ],\n  \"warnings\": [],\n  \"claimBoundary\": {\n    \"originClaim\": false,\n    \"winnerClaim\": false,\n    \"historicalProof\": false,\n    \"candidateTruthProof\": false,\n    \"modelQualityEvidence\": false,\n    \"providerDefaultChangeReason\": false\n  }\n}"
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 1275,
+      "completion_tokens": 1060,
+      "total_tokens": 2335
+    }
+  },
+  "rawBrainText": "{\n  \"word\": \"study\",\n  \"segmentationId\": \"study.segmentation.004\",\n  \"chunkCandidates\": [\n    {\n      \"chunk\": \"S\",\n      \"segmentationId\": \"study.segmentation.004\",\n      \"language\": \"Albanian\",\n      \"candidateForm\": \"boundary/pressure marker\",\n      \"meaning\": \"boundary or pressure marker\",\n      \"functionFit\": \"direct\",\n      \"sourceNote\": \"doctrine hint for S\",\n      \"evidenceType\": \"doctrine_hint\",\n      \"candidateType\": \"weak_resonance\",\n      \"falseFriendRisk\": \"medium\",\n      \"nullCandidate\": false,\n      \"notes\": [\"boundary or pressure marker\"],\n      \"analysisLayers\": {\n        \"formal\": { \"isPresent\": false, \"evidenceNote\": null },\n        \"symbolic\": { \"isPresent\": true, \"evidenceNote\": \"Code E: doctrine hint for S\" }\n      },\n      \"semanticTransparency\": {\n        \"level\": \"atomic\",\n        \"reason\": \"direct mapping to doctrine hint\",\n        \"decomposition\": []\n      }\n    },\n    {\n      \"chunk\": \"TU\",\n      \"segmentationId\": \"study.segmentation.004\",\n      \"language\": \"Albanian\",\n      \"candidateForm\": \"toward/placement unit\",\n      \"meaning\": \"placement or movement toward something\",\n      \"functionFit\": \"direct\",\n      \"sourceNote\": \"doctrine hint for TU\",\n      \"evidenceType\": \"doctrine_hint\",\n      \"candidateType\": \"weak_resonance\",\n      \"falseFriendRisk\": \"medium\",\n      \"nullCandidate\": false,\n      \"notes\": [\"placement or movement toward something\"],\n      \"analysisLayers\": {\n        \"formal\": { \"isPresent\": false, \"evidenceNote\": null },\n        \"symbolic\": { \"isPresent\": true, \"evidenceNote\": \"Code E: doctrine hint for TU\" }\n      },\n      \"semanticTransparency\": {\n        \"level\": \"atomic\",\n        \"reason\": \"direct mapping to doctrine hint\",\n        \"decomposition\": []\n      }\n    },\n    {\n      \"chunk\": \"DI\",\n      \"segmentationId\": \"study.segmentation.004\",\n      \"language\": \"Albanian\",\n      \"candidateForm\": \"knowing/insight unit\",\n      \"meaning\": \"unit of knowing or insight\",\n      \"functionFit\": \"direct\",\n      \"sourceNote\": \"doctrine hint for DI\",\n      \"evidenceType\": \"doctrine_hint\",\n      \"candidateType\": \"weak_resonance\",\n      \"falseFriendRisk\": \"medium\",\n      \"nullCandidate\": false,\n      \"notes\": [\"unit of knowing or insight\"],\n      \"analysisLayers\": {\n        \"formal\": { \"isPresent\": false, \"evidenceNote\": null },\n        \"symbolic\": { \"isPresent\": true, \"evidenceNote\": \"Code E: doctrine hint for DI\" }\n      },\n      \"semanticTransparency\": {\n        \"level\": \"atomic\",\n        \"reason\": \"direct mapping to doctrine hint\",\n        \"decomposition\": []\n      }\n    }\n  ],\n  \"nullCandidates\": [\n    {\n      \"chunk\": \"S\",\n      \"segmentationId\": \"study.segmentation.004\",\n      \"language\": \"Albanian\",\n      \"candidateForm\": \"\",\n      \"meaning\": \"\",\n      \"functionFit\": \"none\",\n      \"sourceNote\": \"No honest candidate emitted for this chunk/language pair.\",\n      \"evidenceType\": \"none\",\n      \"candidateType\": \"null_candidate\",\n      \"falseFriendRisk\": \"none\",\n      \"nullCandidate\": true,\n      \"notes\": [\"short audit note\"]\n    },\n    {\n      \"chunk\": \"TU\",\n      \"segmentationId\": \"study.segmentation.004\",\n      \"language\": \"Albanian\",\n      \"candidateForm\": \"\",\n      \"meaning\": \"\",\n      \"functionFit\": \"none\",\n      \"sourceNote\": \"No honest candidate emitted for this chunk/language pair.\",\n      \"evidenceType\": \"none\",\n      \"candidateType\": \"null_candidate\",\n      \"falseFriendRisk\": \"none\",\n      \"nullCandidate\": true,\n      \"notes\": [\"short audit note\"]\n    },\n    {\n      \"chunk\": \"DI\",\n      \"segmentationId\": \"study.segmentation.004\",\n      \"language\": \"Albanian\",\n      \"candidateForm\": \"\",\n      \"meaning\": \"\",\n      \"functionFit\": \"none\",\n      \"sourceNote\": \"No honest candidate emitted for this chunk/language pair.\",\n      \"evidenceType\": \"none\",\n      \"candidateType\": \"null_candidate\",\n      \"falseFriendRisk\": \"none\",\n      \"nullCandidate\": true,\n      \"notes\": [\"short audit note\"]\n    }\n  ],\n  \"warnings\": [],\n  \"claimBoundary\": {\n    \"originClaim\": false,\n    \"winnerClaim\": false,\n    \"historicalProof\": false,\n    \"candidateTruthProof\": false,\n    \"modelQualityEvidence\": false,\n    \"providerDefaultChangeReason\": false\n  }\n}",
+  "rawBrainOutput": {
+    "word": "study",
+    "segmentationId": "study.segmentation.004",
+    "chunkCandidates": [
+      {
+        "chunk": "S",
+        "segmentationId": "study.segmentation.004",
+        "language": "Albanian",
+        "candidateForm": "boundary/pressure marker",
+        "meaning": "boundary or pressure marker",
+        "functionFit": "direct",
+        "sourceNote": "doctrine hint for S",
+        "evidenceType": "doctrine_hint",
+        "candidateType": "weak_resonance",
+        "falseFriendRisk": "medium",
+        "nullCandidate": false,
+        "notes": [
+          "boundary or pressure marker"
+        ],
+        "analysisLayers": {
+          "formal": {
+            "isPresent": false,
+            "evidenceNote": null
+          },
+          "symbolic": {
+            "isPresent": true,
+            "evidenceNote": "Code E: doctrine hint for S"
+          }
+        },
+        "semanticTransparency": {
+          "level": "atomic",
+          "reason": "direct mapping to doctrine hint",
+          "decomposition": []
+        }
+      },
+      {
+        "chunk": "TU",
+        "segmentationId": "study.segmentation.004",
+        "language": "Albanian",
+        "candidateForm": "toward/placement unit",
+        "meaning": "placement or movement toward something",
+        "functionFit": "direct",
+        "sourceNote": "doctrine hint for TU",
+        "evidenceType": "doctrine_hint",
+        "candidateType": "weak_resonance",
+        "falseFriendRisk": "medium",
+        "nullCandidate": false,
+        "notes": [
+          "placement or movement toward something"
+        ],
+        "analysisLayers": {
+          "formal": {
+            "isPresent": false,
+            "evidenceNote": null
+          },
+          "symbolic": {
+            "isPresent": true,
+            "evidenceNote": "Code E: doctrine hint for TU"
+          }
+        },
+        "semanticTransparency": {
+          "level": "atomic",
+          "reason": "direct mapping to doctrine hint",
+          "decomposition": []
+        }
+      },
+      {
+        "chunk": "DI",
+        "segmentationId": "study.segmentation.004",
+        "language": "Albanian",
+        "candidateForm": "knowing/insight unit",
+        "meaning": "unit of knowing or insight",
+        "functionFit": "direct",
+        "sourceNote": "doctrine hint for DI",
+        "evidenceType": "doctrine_hint",
+        "candidateType": "weak_resonance",
+        "falseFriendRisk": "medium",
+        "nullCandidate": false,
+        "notes": [
+          "unit of knowing or insight"
+        ],
+        "analysisLayers": {
+          "formal": {
+            "isPresent": false,
+            "evidenceNote": null
+          },
+          "symbolic": {
+            "isPresent": true,
+            "evidenceNote": "Code E: doctrine hint for DI"
+          }
+        },
+        "semanticTransparency": {
+          "level": "atomic",
+          "reason": "direct mapping to doctrine hint",
+          "decomposition": []
+        }
+      }
+    ],
+    "nullCandidates": [
+      {
+        "chunk": "S",
+        "segmentationId": "study.segmentation.004",
+        "language": "Albanian",
+        "candidateForm": "",
+        "meaning": "",
+        "functionFit": "none",
+        "sourceNote": "No honest candidate emitted for this chunk/language pair.",
+        "evidenceType": "none",
+        "candidateType": "null_candidate",
+        "falseFriendRisk": "none",
+        "nullCandidate": true,
+        "notes": [
+          "short audit note"
+        ]
+      },
+      {
+        "chunk": "TU",
+        "segmentationId": "study.segmentation.004",
+        "language": "Albanian",
+        "candidateForm": "",
+        "meaning": "",
+        "functionFit": "none",
+        "sourceNote": "No honest candidate emitted for this chunk/language pair.",
+        "evidenceType": "none",
+        "candidateType": "null_candidate",
+        "falseFriendRisk": "none",
+        "nullCandidate": true,
+        "notes": [
+          "short audit note"
+        ]
+      },
+      {
+        "chunk": "DI",
+        "segmentationId": "study.segmentation.004",
+        "language": "Albanian",
+        "candidateForm": "",
+        "meaning": "",
+        "functionFit": "none",
+        "sourceNote": "No honest candidate emitted for this chunk/language pair.",
+        "evidenceType": "none",
+        "candidateType": "null_candidate",
+        "falseFriendRisk": "none",
+        "nullCandidate": true,
+        "notes": [
+          "short audit note"
+        ]
+      }
+    ],
+    "warnings": [],
+    "claimBoundary": {
+      "originClaim": false,
+      "winnerClaim": false,
+      "historicalProof": false,
+      "candidateTruthProof": false,
+      "modelQualityEvidence": false,
+      "providerDefaultChangeReason": false
+    }
+  },
+  "rawInspection": {
+    "hasTopLevelCandidates": false,
+    "hasChunkCandidates": true,
+    "hasNullCandidates": true,
+    "hasWarnings": true,
+    "hasClaimBoundary": true,
+    "hasTransparencyContrast": false,
+    "hasTransparencyContrastNote": false
+  },
+  "validation": {
+    "rawParseOk": true,
+    "parseExtraction": "direct_json",
+    "parseError": null,
+    "forbiddenRawFieldFound": false,
+    "forbiddenRawFields": [],
+    "structuralOk": true,
+    "structuralIssueCount": 0,
+    "structuralIssues": [],
+    "enrichmentOk": true,
+    "enrichmentWarningCount": 0,
+    "enrichmentWarnings": [],
+    "validTransparencyCandidateCount": 3,
+    "missingTransparencyCount": 0
+  },
+  "summary": {
+    "word": "study",
+    "segmentationId": "study.segmentation.004",
+    "chunks": [
+      "S",
+      "TU",
+      "DI"
+    ],
+    "voicePath": [
+      "U",
+      "I"
+    ],
+    "candidateCount": 3,
+    "nullCandidateCount": 3,
+    "semanticFunctionMotivationOnly": true
+  }
+}
