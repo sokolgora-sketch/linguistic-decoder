@@ -74,4 +74,28 @@ describe("Zheji transparency prompt contract v0.1", () => {
     expect(result.section).not.toContain("vector-conservation");
   });
 
+
+  it("requires non-empty candidate payloads without invented placeholders", () => {
+    const result = buildZhejiPromptContractSectionV0_1({
+      chunks: ["S", "TU", "DI"],
+      targetLanguages: ["Albanian", "Latin"],
+      voicePath: ["U", "I"],
+      doctrineHints: {
+        S: "boundary/pressure marker",
+        TU: "toward/placement unit",
+        DI: "knowing/insight unit",
+      },
+      transparencyContrastRequestedFromBrain: false,
+    });
+
+    expect(result.section).toContain("Every non-null chunkCandidates[] object must include non-empty language, candidateForm, meaning, and sourceNote.");
+    expect(result.section).toContain("If any required non-null candidate payload field cannot be filled honestly, use nullCandidates with candidateType null_candidate instead.");
+    expect(result.section).toContain("Do not emit blank non-null candidates.");
+    expect(result.section).toContain("Do not use placeholder payload values such as unknown, n/a, none, tbd, unavailable, not sure, or unspecified.");
+    expect(result.section).toContain("Do not invent a candidate only to satisfy required payload fields.");
+    expect(result.section).toContain("opaque is for non-null candidates only; do not use opaque as nullCandidates[].candidateType.");
+    expect(result.section).toContain("Do not return transparencyContrast.");
+    expect(result.section).toContain("Do not return transparencyContrastNote.");
+  });
+
 });
