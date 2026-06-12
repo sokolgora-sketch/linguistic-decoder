@@ -27,6 +27,9 @@ jobs:
       - name: Install
         run: npm ci
 
+      - name: Open Instrument run packet fixture validation
+        run: npm run open-instrument:validate-run-packet-fixture
+
       - name: Lint
         run: npm run lint
 

@@ -59,7 +59,8 @@
     "research:taiwan:spectrum:rootOnly:v1.0": "npm test -- tests/research/taiwan.spectrum.rootOnly.v1.0.spec.ts",
     "battery:inspect-pack": "tsx scripts/inspect-battery-evidence-pack.v0.1.ts",
     "battery:generate-series-stats": "tsx scripts/generate-battery-series-stats.v0.1.ts",
-    "evals:audit-buckets": "node scripts/evals/auditEvidenceBuckets.mjs"
+    "evals:audit-buckets": "node scripts/evals/auditEvidenceBuckets.mjs",
+    "open-instrument:validate-run-packet-fixture": "node scripts/openInstrumentRunPacketFixtureValidation.v0.1.mjs"
   },
   "dependencies": {
     "@genkit-ai/google-genai": "^1.36.0",

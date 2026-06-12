@@ -1,0 +1,138 @@
+{
+  "schemaVersion": "open-instrument.run-packet.v0.1",
+  "packetId": "fixture.open-instrument.run-packet.v0.1",
+  "runId": "fixture.open-instrument.run-packet.static.v0.1",
+  "createdAt": "2026-06-12T00:00:00.000Z",
+  "createdBy": "docs-only-fixture-design",
+  "status": "design_fixture",
+  "word": "study",
+  "normalizedWord": "study",
+  "targetObject": "word",
+  "segmentationId": "fixture.segmentation.study.demo",
+  "segmentationLabel": "STUDY_DEMO_SEGMENTATION",
+  "chunks": [
+    "STU",
+    "DY"
+  ],
+  "chunkVariants": [
+    {
+      "chunk": "DY",
+      "variantOf": "DI",
+      "legalTransform": "FINAL_Y_TO_I",
+      "notes": [
+        "Static fixture demo variant."
+      ]
+    }
+  ],
+  "voicePath": [
+    "U",
+    "Y"
+  ],
+  "legalTransforms": [
+    "FINAL_Y_TO_I"
+  ],
+  "functionHints": [
+    {
+      "voice": "U",
+      "hints": [
+        "container",
+        "inside",
+        "holding"
+      ],
+      "functionHintSource": "docs-only-fixture-design"
+    },
+    {
+      "voice": "Y",
+      "hints": [
+        "split",
+        "join",
+        "link"
+      ],
+      "functionHintSource": "docs-only-fixture-design"
+    }
+  ],
+  "targetLanguages": [
+    "Albanian",
+    "Latin",
+    "Chinese",
+    "Germanic"
+  ],
+  "searchMode": "static-fixture",
+  "provider": "fixture",
+  "model": "none",
+  "providerProfile": "static-fixture-no-provider",
+  "endpointType": "none",
+  "timeoutBudget": "not_applicable",
+  "promptContractPath": "docs/open-instrument/open-instrument-run-packet-contract-design-v0.1.md",
+  "expectedOutputSchema": "open-instrument.run-packet.v0.1",
+  "artifactPath": "docs/open-instrument/artifacts/run-packets/open-instrument-run-packet-fixture-v0.1.json",
+  "reportPath": "docs/open-instrument/open-instrument-run-packet-fixture-report-v0.1.md",
+  "reviewPath": "docs/open-instrument/open-instrument-run-packet-fixture-review-v0.1.md",
+  "sourceDesignPath": "docs/open-instrument/open-instrument-run-packet-fixture-design-v0.1.md",
+  "sourcePreflightPath": "not_applicable",
+  "claimBoundary": {
+    "originClaim": false,
+    "winnerClaim": false,
+    "candidateTruthClaim": false,
+    "languageSuperiorityClaim": false,
+    "modelQualityProof": false,
+    "publicationFraming": false
+  },
+  "publicationBoundary": {
+    "publicationReady": false,
+    "publicClaimAllowed": false,
+    "reason": "static fixture only, not run evidence"
+  },
+  "providerDefaultBoundary": {
+    "providerDefaultChanged": false,
+    "providerDefaultRequired": false,
+    "providerExecutionAllowed": false,
+    "openAiApiUseAllowed": false
+  },
+  "modelCallAuthorization": false,
+  "artifactCreationAuthorization": false,
+  "rerunAuthorization": false,
+  "openAiApiAuthorization": false,
+  "validatorExpectations": [
+    "required fields present",
+    "identity stable",
+    "segmentation explicit",
+    "boundaries explicit",
+    "false authorization preserved",
+    "non-runnable fixture only"
+  ],
+  "stopConditions": [
+    "implicit provider",
+    "implicit model",
+    "missing prompt contract",
+    "missing artifact path",
+    "missing report path",
+    "existing target artifact",
+    "existing target report",
+    "ambiguous OpenAI API use",
+    "ambiguous provider default behavior",
+    "absent claim boundary",
+    "absent publication boundary",
+    "missing validator expectations",
+    "segmentationId drift",
+    "chunk drift",
+    "enum array drift",
+    "forbidden claims",
+    "hidden null candidates",
+    "provider default claims"
+  ],
+  "evidenceClassIntent": "design-only",
+  "notes": [
+    "static fixture only",
+    "no model call",
+    "no rerun",
+    "no provider execution",
+    "no artifact creation",
+    "no OpenAI API use",
+    "not candidate-truth evidence",
+    "not origin evidence",
+    "future validation may prove schema/traceability alignment only",
+    "provider default remains unchanged",
+    "not publication framing"
+  ]
+}
