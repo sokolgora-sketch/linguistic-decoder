@@ -1,0 +1,630 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "open-instrument.provider-execution-preflight.static-fixture-schema.v0.1",
+  "title": "Open Instrument provider execution preflight static fixture schema v0.1",
+  "description": "Static schema for the non-executing provider execution preflight fixture only. This schema is not a provider request schema, not a model request schema, not runtime/API/UI wiring, and not publication evidence.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "fixtureIdentity",
+    "sourceDocs",
+    "repositoryState",
+    "runPacketStatus",
+    "staticValidationStatus",
+    "providerIdentity",
+    "modelIdentity",
+    "endpointIdentity",
+    "authorizationGates",
+    "defaultSnapshotStatus",
+    "promptSourceReviewStatus",
+    "capturePathStatus",
+    "failurePolicyStatus",
+    "runtimeApiUiExclusionStatus",
+    "artifactReportAuthorizationStatus",
+    "evidenceBoundaryStatus",
+    "finalDecision",
+    "stopConditions",
+    "unmappedFieldPolicy",
+    "nonExecutionDeclaration"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "open-instrument.provider-execution-preflight.static-fixture.v0.1"
+    },
+    "fixtureIdentity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "fixtureId",
+        "fixtureKind",
+        "fixtureMode",
+        "createdFor",
+        "authorizationSource"
+      ],
+      "properties": {
+        "fixtureId": {
+          "const": "open-instrument.provider-execution-preflight.static-fixture.v0.1"
+        },
+        "fixtureKind": {
+          "const": "provider_execution_preflight_static_fixture"
+        },
+        "fixtureMode": {
+          "const": "static_non_executing"
+        },
+        "createdFor": {
+          "type": "string",
+          "minLength": 1
+        },
+        "authorizationSource": {
+          "$ref": "#/$defs/sourceReference"
+        }
+      }
+    },
+    "sourceDocs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/sourceReference"
+      }
+    },
+    "repositoryState": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "expectedBaseBranch",
+        "expectedOpenNonDependencyPullRequests",
+        "expectedChangedFilesForFixtureCreation",
+        "runtimeApiUiChangesAuthorized",
+        "schemaChangesAuthorized",
+        "scriptChangesAuthorized",
+        "testChangesAuthorized",
+        "packageChangesAuthorized",
+        "ciWorkflowChangesAuthorized"
+      ],
+      "properties": {
+        "expectedBaseBranch": {
+          "const": "main"
+        },
+        "expectedOpenNonDependencyPullRequests": {
+          "const": 0
+        },
+        "expectedChangedFilesForFixtureCreation": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "runtimeApiUiChangesAuthorized": {
+          "const": false
+        },
+        "schemaChangesAuthorized": {
+          "const": false
+        },
+        "scriptChangesAuthorized": {
+          "const": false
+        },
+        "testChangesAuthorized": {
+          "const": false
+        },
+        "packageChangesAuthorized": {
+          "const": false
+        },
+        "ciWorkflowChangesAuthorized": {
+          "const": false
+        }
+      }
+    },
+    "runPacketStatus": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "runPacketFixtureValidationLaneStatus",
+        "liveRunPacketCreationAuthorized",
+        "providerRunPacketCreationAuthorized",
+        "modelRunPacketCreationAuthorized"
+      ],
+      "properties": {
+        "runPacketFixtureValidationLaneStatus": {
+          "type": "string",
+          "minLength": 1
+        },
+        "liveRunPacketCreationAuthorized": {
+          "const": false
+        },
+        "providerRunPacketCreationAuthorized": {
+          "const": false
+        },
+        "modelRunPacketCreationAuthorized": {
+          "const": false
+        }
+      }
+    },
+    "staticValidationStatus": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "checkedByExistingCommand",
+        "scope",
+        "newValidationCodeCreatedByThisFixture",
+        "schemaCreatedByThisFixture"
+      ],
+      "properties": {
+        "checkedByExistingCommand": {
+          "type": "string",
+          "minLength": 1
+        },
+        "scope": {
+          "type": "string",
+          "minLength": 1
+        },
+        "newValidationCodeCreatedByThisFixture": {
+          "const": false
+        },
+        "schemaCreatedByThisFixture": {
+          "const": false
+        }
+      }
+    },
+    "providerIdentity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "provider",
+        "providerKind",
+        "liveProviderNamePresent",
+        "providerExecutionAuthorized",
+        "providerDefaultChangeAuthorized"
+      ],
+      "properties": {
+        "provider": {
+          "const": "fixture"
+        },
+        "providerKind": {
+          "const": "placeholder_non_live"
+        },
+        "liveProviderNamePresent": {
+          "const": false
+        },
+        "providerExecutionAuthorized": {
+          "const": false
+        },
+        "providerDefaultChangeAuthorized": {
+          "const": false
+        }
+      }
+    },
+    "modelIdentity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "model",
+        "modelKind",
+        "liveModelNamePresent",
+        "modelCallAuthorized",
+        "modelDefaultChangeAuthorized"
+      ],
+      "properties": {
+        "model": {
+          "const": "none"
+        },
+        "modelKind": {
+          "const": "placeholder_non_live"
+        },
+        "liveModelNamePresent": {
+          "const": false
+        },
+        "modelCallAuthorized": {
+          "const": false
+        },
+        "modelDefaultChangeAuthorized": {
+          "const": false
+        }
+      }
+    },
+    "endpointIdentity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "endpointType",
+        "endpointUrl",
+        "liveEndpointUrlPresent",
+        "networkExecutionAuthorized",
+        "endpointDefaultChangeAuthorized"
+      ],
+      "properties": {
+        "endpointType": {
+          "const": "none"
+        },
+        "endpointUrl": {
+          "const": "none"
+        },
+        "liveEndpointUrlPresent": {
+          "const": false
+        },
+        "networkExecutionAuthorized": {
+          "const": false
+        },
+        "endpointDefaultChangeAuthorized": {
+          "const": false
+        }
+      }
+    },
+    "authorizationGates": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "providerExecutionAuthorized",
+        "modelCallAuthorized",
+        "openAiApiUseAuthorized",
+        "runtimeApiUiWiringAuthorized",
+        "artifactReportCreationAuthorized",
+        "publicationFramingAuthorized",
+        "fallbackProviderAuthorized",
+        "fallbackModelAuthorized",
+        "silentRerunAuthorized",
+        "hiddenExecutionPathAuthorized"
+      ],
+      "properties": {
+        "providerExecutionAuthorized": {
+          "const": false
+        },
+        "modelCallAuthorized": {
+          "const": false
+        },
+        "openAiApiUseAuthorized": {
+          "const": false
+        },
+        "runtimeApiUiWiringAuthorized": {
+          "const": false
+        },
+        "artifactReportCreationAuthorized": {
+          "const": false
+        },
+        "publicationFramingAuthorized": {
+          "const": false
+        },
+        "fallbackProviderAuthorized": {
+          "const": false
+        },
+        "fallbackModelAuthorized": {
+          "const": false
+        },
+        "silentRerunAuthorized": {
+          "const": false
+        },
+        "hiddenExecutionPathAuthorized": {
+          "const": false
+        }
+      }
+    },
+    "defaultSnapshotStatus": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "providerDefaultMutationAuthorized",
+        "modelDefaultMutationAuthorized",
+        "endpointDefaultMutationAuthorized",
+        "promptDefaultMutationAuthorized",
+        "capturePathDefaultMutationAuthorized"
+      ],
+      "properties": {
+        "providerDefaultMutationAuthorized": {
+          "const": false
+        },
+        "modelDefaultMutationAuthorized": {
+          "const": false
+        },
+        "endpointDefaultMutationAuthorized": {
+          "const": false
+        },
+        "promptDefaultMutationAuthorized": {
+          "const": false
+        },
+        "capturePathDefaultMutationAuthorized": {
+          "const": false
+        }
+      }
+    },
+    "promptSourceReviewStatus": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "promptPayloadForLiveExecutionPresent",
+        "promptMutationAuthorized",
+        "promptSourceStatus"
+      ],
+      "properties": {
+        "promptPayloadForLiveExecutionPresent": {
+          "const": false
+        },
+        "promptMutationAuthorized": {
+          "const": false
+        },
+        "promptSourceStatus": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "capturePathStatus": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "artifactPathPresent",
+        "reportPathPresent",
+        "evidencePackPathPresent",
+        "capturePathMutationAuthorized"
+      ],
+      "properties": {
+        "artifactPathPresent": {
+          "const": false
+        },
+        "reportPathPresent": {
+          "const": false
+        },
+        "evidencePackPathPresent": {
+          "const": false
+        },
+        "capturePathMutationAuthorized": {
+          "const": false
+        }
+      }
+    },
+    "failurePolicyStatus": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "defaultFailurePolicy",
+        "unknownFieldsPolicy",
+        "missingFieldsPolicy",
+        "ambiguousFieldsPolicy",
+        "executionImplyingFieldsPolicy"
+      ],
+      "properties": {
+        "defaultFailurePolicy": {
+          "const": "fail_closed"
+        },
+        "unknownFieldsPolicy": {
+          "const": "fail_closed"
+        },
+        "missingFieldsPolicy": {
+          "const": "fail_closed"
+        },
+        "ambiguousFieldsPolicy": {
+          "const": "fail_closed"
+        },
+        "executionImplyingFieldsPolicy": {
+          "const": "fail_closed"
+        }
+      }
+    },
+    "runtimeApiUiExclusionStatus": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "runtimeRouteReferencePresent",
+        "serverActionReferencePresent",
+        "uiControlReferencePresent",
+        "scheduledTaskReferencePresent",
+        "runtimeApiUiWiringAuthorized"
+      ],
+      "properties": {
+        "runtimeRouteReferencePresent": {
+          "const": false
+        },
+        "serverActionReferencePresent": {
+          "const": false
+        },
+        "uiControlReferencePresent": {
+          "const": false
+        },
+        "scheduledTaskReferencePresent": {
+          "const": false
+        },
+        "runtimeApiUiWiringAuthorized": {
+          "const": false
+        }
+      }
+    },
+    "artifactReportAuthorizationStatus": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "artifactCreationAuthorized",
+        "reportCreationAuthorized",
+        "evidencePackCreationAuthorized",
+        "publicationFramingAuthorized"
+      ],
+      "properties": {
+        "artifactCreationAuthorized": {
+          "const": false
+        },
+        "reportCreationAuthorized": {
+          "const": false
+        },
+        "evidencePackCreationAuthorized": {
+          "const": false
+        },
+        "publicationFramingAuthorized": {
+          "const": false
+        }
+      }
+    },
+    "evidenceBoundaryStatus": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "preflightControlFixtureEvidence",
+        "staticFixtureShapeEvidence",
+        "designTraceabilityEvidence",
+        "providerOutputEvidence",
+        "candidateTruthEvidence",
+        "originEvidence",
+        "modelQualityEvidence",
+        "publicationEvidence",
+        "executionSafetyEvidence"
+      ],
+      "properties": {
+        "preflightControlFixtureEvidence": {
+          "const": true
+        },
+        "staticFixtureShapeEvidence": {
+          "const": true
+        },
+        "designTraceabilityEvidence": {
+          "const": true
+        },
+        "providerOutputEvidence": {
+          "const": false
+        },
+        "candidateTruthEvidence": {
+          "const": false
+        },
+        "originEvidence": {
+          "const": false
+        },
+        "modelQualityEvidence": {
+          "const": false
+        },
+        "publicationEvidence": {
+          "const": false
+        },
+        "executionSafetyEvidence": {
+          "const": false
+        }
+      }
+    },
+    "finalDecision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "value",
+        "rationale"
+      ],
+      "properties": {
+        "value": {
+          "enum": [
+            "blocked_static_fixture_only",
+            "static_fixture_ready_for_schema_authorization_review"
+          ]
+        },
+        "rationale": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "stopConditions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "unmappedFieldPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "fixtureFieldWithoutAcceptedDesignMapping",
+        "acceptedDesignRequirementWithoutFixtureField",
+        "unknownFixtureField",
+        "executionImplyingFixtureField"
+      ],
+      "properties": {
+        "fixtureFieldWithoutAcceptedDesignMapping": {
+          "const": "fail_closed"
+        },
+        "acceptedDesignRequirementWithoutFixtureField": {
+          "const": "fail_closed"
+        },
+        "unknownFixtureField": {
+          "const": "fail_closed"
+        },
+        "executionImplyingFixtureField": {
+          "const": "fail_closed"
+        }
+      }
+    },
+    "nonExecutionDeclaration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "thisFixtureDoesNotExecute",
+        "thisFixtureIsNotRunnableInput",
+        "thisFixtureIsNotProviderRequest",
+        "thisFixtureIsNotModelRequest",
+        "thisFixtureIsNotOpenAiApiRequest",
+        "thisFixtureIsNotRuntimeApiUiWiring",
+        "thisFixtureIsNotArtifactReportOutput",
+        "thisFixtureIsNotPublicationEvidence"
+      ],
+      "properties": {
+        "thisFixtureDoesNotExecute": {
+          "const": true
+        },
+        "thisFixtureIsNotRunnableInput": {
+          "const": true
+        },
+        "thisFixtureIsNotProviderRequest": {
+          "const": true
+        },
+        "thisFixtureIsNotModelRequest": {
+          "const": true
+        },
+        "thisFixtureIsNotOpenAiApiRequest": {
+          "const": true
+        },
+        "thisFixtureIsNotRuntimeApiUiWiring": {
+          "const": true
+        },
+        "thisFixtureIsNotArtifactReportOutput": {
+          "const": true
+        },
+        "thisFixtureIsNotPublicationEvidence": {
+          "const": true
+        }
+      }
+    }
+  },
+  "$defs": {
+    "sourceReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "pr",
+        "title",
+        "mergeSha",
+        "shortSha"
+      ],
+      "properties": {
+        "pr": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "mergeSha": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "shortSha": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}$"
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reviewStatus": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}
