@@ -1,0 +1,319 @@
+{
+  "schemaVersion": "open-instrument.provider-execution-preflight.static-fixture.v0.1",
+  "fixtureIdentity": {
+    "fixtureId": "open-instrument.provider-execution-preflight.static-fixture.v0.1",
+    "fixtureKind": "provider_execution_preflight_static_fixture",
+    "fixtureMode": "static_non_executing",
+    "createdFor": "Open Instrument provider execution preflight control surface",
+    "authorizationSource": {
+      "pr": 1324,
+      "title": "docs(open-instrument): authorize static JSON fixture creation",
+      "mergeSha": "f163333f047ffb600310aaae40b6dedb741a77f3",
+      "shortSha": "f163333f",
+      "path": "docs/open-instrument/open-instrument-provider-execution-preflight-static-json-fixture-creation-authorization-v0.1.md"
+    }
+  },
+  "sourceDocs": [
+    {
+      "pr": 1305,
+      "title": "docs(open-instrument): close run packet fixture validation lane",
+      "mergeSha": "5c6e3ac55d0b539bc55132c69e0414863201fc13",
+      "shortSha": "5c6e3ac5",
+      "path": "docs/open-instrument/open-instrument-run-packet-fixture-validation-lane-closure-v0.1.md",
+      "reviewStatus": "closed"
+    },
+    {
+      "pr": 1307,
+      "title": "docs(open-instrument): design provider execution preflight boundary",
+      "mergeSha": "25313ed4cb839633c79e99d691ff7c479288d92f",
+      "shortSha": "25313ed4",
+      "path": "docs/open-instrument/open-instrument-provider-execution-preflight-boundary-design-v0.1.md",
+      "reviewStatus": "accepted_by_pr_1308"
+    },
+    {
+      "pr": 1308,
+      "title": "docs(open-instrument): review provider execution preflight boundary design",
+      "mergeSha": "a711c77d11ac9a4f0d9d8f7d2d47adc2dc5582e0",
+      "shortSha": "a711c77d",
+      "path": "docs/open-instrument/open-instrument-provider-execution-preflight-boundary-design-review-v0.1.md",
+      "reviewStatus": "accepted"
+    },
+    {
+      "pr": 1309,
+      "title": "docs(open-instrument): design provider execution preflight checklist",
+      "mergeSha": "d7c583a807cc10631857ef5657e6836c38344c0b",
+      "shortSha": "d7c583a8",
+      "path": "docs/open-instrument/open-instrument-provider-execution-preflight-checklist-design-v0.1.md",
+      "reviewStatus": "accepted_by_pr_1310"
+    },
+    {
+      "pr": 1310,
+      "title": "docs(open-instrument): review provider execution preflight checklist design",
+      "mergeSha": "d9844a6fd2e88e9988b2862d05aa242788378275",
+      "shortSha": "d9844a6f",
+      "path": "docs/open-instrument/open-instrument-provider-execution-preflight-checklist-design-review-v0.1.md",
+      "reviewStatus": "accepted"
+    },
+    {
+      "pr": 1311,
+      "title": "docs(open-instrument): design provider execution preflight checklist contract",
+      "mergeSha": "db21cc62c349a9d97569c2298b0f061b27abb4cc",
+      "shortSha": "db21cc62",
+      "path": "docs/open-instrument/open-instrument-provider-execution-preflight-checklist-contract-design-v0.1.md",
+      "reviewStatus": "accepted_by_pr_1312"
+    },
+    {
+      "pr": 1312,
+      "title": "docs(open-instrument): review provider execution preflight checklist contract design",
+      "mergeSha": "6755706741f1f67e015175937b0b432df250662b",
+      "shortSha": "67557067",
+      "path": "docs/open-instrument/open-instrument-provider-execution-preflight-checklist-contract-design-review-v0.1.md",
+      "reviewStatus": "accepted"
+    },
+    {
+      "pr": 1313,
+      "title": "docs(open-instrument): design provider execution preflight contract fixture",
+      "mergeSha": "db5b514deb21bb6c9125b440ff2a83c23dc1ceb1",
+      "shortSha": "db5b514d",
+      "path": "docs/open-instrument/open-instrument-provider-execution-preflight-contract-fixture-design-v0.1.md",
+      "reviewStatus": "accepted_by_pr_1314"
+    },
+    {
+      "pr": 1314,
+      "title": "docs(open-instrument): review provider execution preflight contract fixture design",
+      "mergeSha": "dde9ce7fff3182c693676864af08f6c75cab7f90",
+      "shortSha": "dde9ce7f",
+      "path": "docs/open-instrument/open-instrument-provider-execution-preflight-contract-fixture-design-review-v0.1.md",
+      "reviewStatus": "accepted"
+    },
+    {
+      "pr": 1315,
+      "title": "docs(open-instrument): design provider execution preflight fixture contract checklist mapping",
+      "mergeSha": "3b39e22e738d376d46642c960c8fe77ca6f329ee",
+      "shortSha": "3b39e22e",
+      "path": "docs/open-instrument/open-instrument-provider-execution-preflight-fixture-contract-checklist-mapping-design-v0.1.md",
+      "reviewStatus": "accepted_by_pr_1316"
+    },
+    {
+      "pr": 1316,
+      "title": "docs(open-instrument): review provider execution preflight fixture contract checklist mapping design",
+      "mergeSha": "7eb722e4e3143659fd82363623174f55ef737e0d",
+      "shortSha": "7eb722e4",
+      "path": "docs/open-instrument/open-instrument-provider-execution-preflight-fixture-contract-checklist-mapping-design-review-v0.1.md",
+      "reviewStatus": "accepted"
+    },
+    {
+      "pr": 1317,
+      "title": "docs(open-instrument): design provider execution preflight mapping coverage audit",
+      "mergeSha": "6855f5056e1ef27e68b473002bd249df987104f0",
+      "shortSha": "6855f505",
+      "path": "docs/open-instrument/open-instrument-provider-execution-preflight-mapping-coverage-audit-design-v0.1.md",
+      "reviewStatus": "accepted_by_pr_1318"
+    },
+    {
+      "pr": 1318,
+      "title": "docs(open-instrument): review provider execution preflight mapping coverage audit design",
+      "mergeSha": "f1a80d21c3223380bc51b48687508159bc210c4e",
+      "shortSha": "f1a80d21",
+      "path": "docs/open-instrument/open-instrument-provider-execution-preflight-mapping-coverage-audit-design-review-v0.1.md",
+      "reviewStatus": "accepted"
+    },
+    {
+      "pr": 1319,
+      "title": "docs(open-instrument): close provider execution preflight design lane",
+      "mergeSha": "4a692c654b22e5c304607caac3a5ac153bdf5227",
+      "shortSha": "4a692c65",
+      "path": "docs/open-instrument/open-instrument-provider-execution-preflight-design-lane-closure-v0.1.md",
+      "reviewStatus": "closed"
+    },
+    {
+      "pr": 1320,
+      "title": "docs(open-instrument): design provider execution preflight implementation authorization boundary",
+      "mergeSha": "8e480c662cd3ea9bb6f537536c541a1ee31f8e6d",
+      "shortSha": "8e480c66",
+      "path": "docs/open-instrument/open-instrument-provider-execution-preflight-implementation-authorization-boundary-design-v0.1.md",
+      "reviewStatus": "accepted_by_pr_1321"
+    },
+    {
+      "pr": 1321,
+      "title": "docs(open-instrument): review provider execution preflight implementation authorization boundary design",
+      "mergeSha": "5f5b33a7c10d5793031c0a7751d90256c06a4b0f",
+      "shortSha": "5f5b33a7",
+      "path": "docs/open-instrument/open-instrument-provider-execution-preflight-implementation-authorization-boundary-design-review-v0.1.md",
+      "reviewStatus": "accepted"
+    },
+    {
+      "pr": 1322,
+      "title": "docs(open-instrument): design static JSON fixture creation authorization boundary",
+      "mergeSha": "e2bce951332cac69446e56bf0ad6f379f7e2f594",
+      "shortSha": "e2bce951",
+      "path": "docs/open-instrument/open-instrument-provider-execution-preflight-static-json-fixture-creation-authorization-boundary-design-v0.1.md",
+      "reviewStatus": "accepted_by_pr_1323"
+    },
+    {
+      "pr": 1323,
+      "title": "docs(open-instrument): review static JSON fixture creation authorization boundary design",
+      "mergeSha": "ea44279058abdf855803446fc2775ec626fbaf24",
+      "shortSha": "ea442790",
+      "path": "docs/open-instrument/open-instrument-provider-execution-preflight-static-json-fixture-creation-authorization-boundary-design-review-v0.1.md",
+      "reviewStatus": "accepted"
+    },
+    {
+      "pr": 1324,
+      "title": "docs(open-instrument): authorize static JSON fixture creation",
+      "mergeSha": "f163333f047ffb600310aaae40b6dedb741a77f3",
+      "shortSha": "f163333f",
+      "path": "docs/open-instrument/open-instrument-provider-execution-preflight-static-json-fixture-creation-authorization-v0.1.md",
+      "reviewStatus": "authorization"
+    }
+  ],
+  "repositoryState": {
+    "expectedBaseBranch": "main",
+    "expectedOpenNonDependencyPullRequests": 0,
+    "expectedChangedFilesForFixtureCreation": [
+      "docs/open-instrument/fixtures/provider-execution-preflight/open-instrument-provider-execution-preflight-static-fixture-v0.1.json"
+    ],
+    "runtimeApiUiChangesAuthorized": false,
+    "schemaChangesAuthorized": false,
+    "scriptChangesAuthorized": false,
+    "testChangesAuthorized": false,
+    "packageChangesAuthorized": false,
+    "ciWorkflowChangesAuthorized": false
+  },
+  "runPacketStatus": {
+    "runPacketFixtureValidationLaneStatus": "closed_static_schema_traceability_only",
+    "liveRunPacketCreationAuthorized": false,
+    "providerRunPacketCreationAuthorized": false,
+    "modelRunPacketCreationAuthorized": false
+  },
+  "staticValidationStatus": {
+    "checkedByExistingCommand": "npm run open-instrument:validate-run-packet-fixture",
+    "scope": "existing static run packet fixture validation only",
+    "newValidationCodeCreatedByThisFixture": false,
+    "schemaCreatedByThisFixture": false
+  },
+  "providerIdentity": {
+    "provider": "fixture",
+    "providerKind": "placeholder_non_live",
+    "liveProviderNamePresent": false,
+    "providerExecutionAuthorized": false,
+    "providerDefaultChangeAuthorized": false
+  },
+  "modelIdentity": {
+    "model": "none",
+    "modelKind": "placeholder_non_live",
+    "liveModelNamePresent": false,
+    "modelCallAuthorized": false,
+    "modelDefaultChangeAuthorized": false
+  },
+  "endpointIdentity": {
+    "endpointType": "none",
+    "endpointUrl": "none",
+    "liveEndpointUrlPresent": false,
+    "networkExecutionAuthorized": false,
+    "endpointDefaultChangeAuthorized": false
+  },
+  "authorizationGates": {
+    "providerExecutionAuthorized": false,
+    "modelCallAuthorized": false,
+    "openAiApiUseAuthorized": false,
+    "runtimeApiUiWiringAuthorized": false,
+    "artifactReportCreationAuthorized": false,
+    "publicationFramingAuthorized": false,
+    "fallbackProviderAuthorized": false,
+    "fallbackModelAuthorized": false,
+    "silentRerunAuthorized": false,
+    "hiddenExecutionPathAuthorized": false
+  },
+  "defaultSnapshotStatus": {
+    "providerDefaultMutationAuthorized": false,
+    "modelDefaultMutationAuthorized": false,
+    "endpointDefaultMutationAuthorized": false,
+    "promptDefaultMutationAuthorized": false,
+    "capturePathDefaultMutationAuthorized": false
+  },
+  "promptSourceReviewStatus": {
+    "promptPayloadForLiveExecutionPresent": false,
+    "promptMutationAuthorized": false,
+    "promptSourceStatus": "not_applicable_static_fixture_only"
+  },
+  "capturePathStatus": {
+    "artifactPathPresent": false,
+    "reportPathPresent": false,
+    "evidencePackPathPresent": false,
+    "capturePathMutationAuthorized": false
+  },
+  "failurePolicyStatus": {
+    "defaultFailurePolicy": "fail_closed",
+    "unknownFieldsPolicy": "fail_closed",
+    "missingFieldsPolicy": "fail_closed",
+    "ambiguousFieldsPolicy": "fail_closed",
+    "executionImplyingFieldsPolicy": "fail_closed"
+  },
+  "runtimeApiUiExclusionStatus": {
+    "runtimeRouteReferencePresent": false,
+    "serverActionReferencePresent": false,
+    "uiControlReferencePresent": false,
+    "scheduledTaskReferencePresent": false,
+    "runtimeApiUiWiringAuthorized": false
+  },
+  "artifactReportAuthorizationStatus": {
+    "artifactCreationAuthorized": false,
+    "reportCreationAuthorized": false,
+    "evidencePackCreationAuthorized": false,
+    "publicationFramingAuthorized": false
+  },
+  "evidenceBoundaryStatus": {
+    "preflightControlFixtureEvidence": true,
+    "staticFixtureShapeEvidence": true,
+    "designTraceabilityEvidence": true,
+    "providerOutputEvidence": false,
+    "candidateTruthEvidence": false,
+    "originEvidence": false,
+    "modelQualityEvidence": false,
+    "publicationEvidence": false,
+    "executionSafetyEvidence": false
+  },
+  "finalDecision": {
+    "value": "blocked_static_fixture_only",
+    "rationale": "The static fixture records non-executing preflight-control shape only. Schema creation, validation implementation, runtime wiring, provider execution, model calls, and publication framing remain blocked."
+  },
+  "stopConditions": [
+    "changed files are not exactly the authorized fixture path",
+    "schema files change",
+    "TypeScript files change",
+    "scripts change",
+    "tests change",
+    "package files change",
+    "CI workflow files change",
+    "runtime/API/UI files change",
+    "provider execution appears",
+    "model call appears",
+    "OpenAI API use appears",
+    "hidden fallback appears",
+    "silent rerun appears",
+    "provider default changes",
+    "model default changes",
+    "endpoint default changes",
+    "artifact/report creation appears",
+    "publication framing appears",
+    "evidence boundary changes",
+    "required checks fail"
+  ],
+  "unmappedFieldPolicy": {
+    "fixtureFieldWithoutAcceptedDesignMapping": "fail_closed",
+    "acceptedDesignRequirementWithoutFixtureField": "fail_closed",
+    "unknownFixtureField": "fail_closed",
+    "executionImplyingFixtureField": "fail_closed"
+  },
+  "nonExecutionDeclaration": {
+    "thisFixtureDoesNotExecute": true,
+    "thisFixtureIsNotRunnableInput": true,
+    "thisFixtureIsNotProviderRequest": true,
+    "thisFixtureIsNotModelRequest": true,
+    "thisFixtureIsNotOpenAiApiRequest": true,
+    "thisFixtureIsNotRuntimeApiUiWiring": true,
+    "thisFixtureIsNotArtifactReportOutput": true,
+    "thisFixtureIsNotPublicationEvidence": true
+  }
+}
