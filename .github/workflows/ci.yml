@@ -30,6 +30,15 @@ jobs:
       - name: Open Instrument run packet fixture validation
         run: npm run open-instrument:validate-run-packet-fixture
 
+      - name: Validate Open Instrument provider execution preflight static fixture
+        run: npm run open-instrument:validate-provider-execution-preflight-static-fixture
+
+      - name: Test Open Instrument provider execution preflight static fixture validator
+        run: npx jest -c jest.config.mjs tests/openInstrument.providerExecutionPreflightStaticFixtureSchemaValidation.v0.1.spec.ts --runInBand
+
+      - name: Test Open Instrument provider execution preflight static fixture validator integration gate
+        run: npx jest -c jest.config.mjs tests/openInstrument.providerExecutionPreflightStaticFixtureSchemaValidationIntegrationGate.v0.1.spec.ts --runInBand
+
       - name: Lint
         run: npm run lint
 
