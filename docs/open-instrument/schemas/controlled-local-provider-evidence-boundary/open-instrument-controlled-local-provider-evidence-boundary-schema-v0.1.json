@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "open-instrument.controlled-local-provider.evidence-boundary.schema.v0.1",
+  "schemaId": "open-instrument.controlled-local-provider.evidence-boundary.schema.v0.1",
+  "kind": "manual-static-schema",
+  "boundarySchemaFor": "open-instrument.controlled-local-provider.evidence-boundary.v0.1",
+  "requiredTopLevelFields": [
+    "schemaVersion",
+    "fixtureId",
+    "boundaryVersion",
+    "sourceChain",
+    "providerIdentity",
+    "promptIdentity",
+    "responseIdentity",
+    "authorizationGates",
+    "evidenceBoundary",
+    "finalDecision",
+    "nonExecutionDeclaration"
+  ],
+  "allowedGrantedEvidenceClasses": [
+    "local_smoke_transcript",
+    "provider_output_observation",
+    "provider_output_reproducibility_observation",
+    "prompt_response_shape_observation",
+    "parser_compatibility_observation"
+  ],
+  "blockedEvidenceClasses": [
+    "candidate_truth_evidence",
+    "origin_evidence",
+    "model_quality_evidence",
+    "publication_evidence",
+    "execution_safety_evidence"
+  ],
+  "requiredFalseAuthorizationGates": [
+    "providerExecutionAuthorized",
+    "modelCallAuthorized",
+    "openAiApiUseAuthorized",
+    "remoteProviderEndpointAuthorized",
+    "secretsAuthorized",
+    "runtimeApiUiWiringAuthorized",
+    "artifactCreationAuthorized",
+    "evidencePackCreationAuthorized",
+    "parserPromotionAuthorized",
+    "candidateTruthEvidenceAuthorized",
+    "originEvidenceAuthorized",
+    "modelQualityEvidenceAuthorized",
+    "publicationEvidenceAuthorized",
+    "executionSafetyEvidenceAuthorized"
+  ],
+  "requiredTrueImplementationGates": [
+    "staticBoundaryRecordAuthorized",
+    "staticBoundarySchemaAuthorized",
+    "validationHelperAuthorized",
+    "validationTestsAuthorized"
+  ],
+  "requiredDenyReasons": [
+    "paid_openai_api_use_blocked",
+    "remote_provider_endpoint_blocked",
+    "hidden_rerun_blocked",
+    "runtime_api_ui_wiring_blocked",
+    "candidate_truth_claim_blocked",
+    "origin_claim_blocked",
+    "model_quality_claim_blocked",
+    "publication_claim_blocked",
+    "execution_safety_claim_blocked",
+    "secret_use_blocked",
+    "artifact_creation_blocked",
+    "evidence_pack_creation_blocked"
+  ],
+  "finalDecision": {
+    "allowedValues": [
+      "local_smoke_transcript_only",
+      "blocked_static_boundary_only"
+    ]
+  }
+}
