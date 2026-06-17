@@ -41,6 +41,20 @@ This lane does not create publication evidence.
 
 This lane does not create execution-safety evidence.
 
+This lane does not change source files.
+
+This lane does not change helper scripts.
+
+This lane does not change tests.
+
+This lane does not change fixtures.
+
+This lane does not change schemas.
+
+This lane does not change package metadata.
+
+This lane does not change CI.
+
 ## Source boundary
 
 This design follows the closed and assessed controlled local-provider evidence boundary lane.
@@ -247,6 +261,12 @@ This design does not implement a fixture.
 This design does not implement a helper.
 
 This design does not implement tests.
+
+This design does not change source files.
+
+This design does not change package metadata.
+
+This design does not change CI.
 
 This design does not run a provider.
 
