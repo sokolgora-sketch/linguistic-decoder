@@ -1,0 +1,212 @@
+{
+  "schemaVersion": "open-instrument.boundary-gated-local-provider.execution-capture.v0.1",
+  "executionCapturePacketId": "open-instrument.boundary-gated-local-provider.execution-capture.static-fixture.v0.1",
+  "sourceChain": {
+    "executionCaptureDesignPr": 1407,
+    "executionCaptureDesignMergeSha": "dce2d303830afa828598925c0cd7d33f9e880d1f",
+    "executionCaptureDesignDoc": "docs/open-instrument/open-instrument-boundary-gated-local-provider-execution-capture-lane-design-v0.1.md",
+    "executionCaptureDesignReviewPr": 1408,
+    "executionCaptureDesignReviewMergeSha": "2eeef7d120b737bfbfb444804514b3f3625e6de4",
+    "executionCaptureDesignReviewDoc": "docs/open-instrument/open-instrument-boundary-gated-local-provider-execution-capture-lane-design-review-v0.1.md",
+    "promptResponseCaptureClosureAssessmentPr": 1406,
+    "promptResponseCaptureClosureAssessmentMergeSha": "b2f91943d2e092d48e3ba3dda1a01ee25c9c3493",
+    "promptResponseCaptureClosureAssessmentDoc": "docs/open-instrument/open-instrument-boundary-gated-local-provider-prompt-response-capture-lane-closure-assessment-v0.1.md",
+    "promptResponseCaptureSchema": "docs/open-instrument/schemas/prompt-response-capture/open-instrument-boundary-gated-local-provider-prompt-response-capture-schema-v0.1.json",
+    "promptResponseCaptureFixture": "docs/open-instrument/fixtures/prompt-response-capture/open-instrument-boundary-gated-local-provider-prompt-response-capture-static-fixture-v0.1.json",
+    "priorControlledExecutionResponseSha256": "a049322ed9cd37d5aa3916423c2b6c62671a0131685dfd0945ef363ad43cb40f"
+  },
+  "executionAuthorization": {
+    "authorizationPr": 1409,
+    "authorizationMergeSha": "9d261b1a9623518281361f9876c6414f50739afc",
+    "authorizationDoc": "docs/open-instrument/open-instrument-boundary-gated-local-provider-execution-capture-implementation-authorization-v0.1.md",
+    "authorizedScope": "static_execution_capture_contract_machinery_only",
+    "actualProviderExecutionAuthorized": false
+  },
+  "executionOperator": {
+    "operatorDeclaration": "static_contract_fixture_no_operator_execution",
+    "operatorIdentityRequiredForFutureExecution": true,
+    "operatorIdentityPresent": false
+  },
+  "executionEnvironment": {
+    "environmentClass": "static_contract_fixture",
+    "futureExecutionEnvironmentRequired": "local_developer_machine_or_reviewed_local_ci_only",
+    "executionTimestampPolicy": "future_execution_timestamp_required_not_present_in_static_fixture"
+  },
+  "providerIdentity": {
+    "providerFamily": "local_provider_contract",
+    "providerName": "none_static_contract",
+    "modelName": "none_static_contract",
+    "providerIdentityExplicit": true,
+    "modelIdentityExplicit": true,
+    "liveProviderNamePresent": false,
+    "liveModelNamePresent": false
+  },
+  "endpointIdentity": {
+    "endpointType": "local_openai_compatible_future_required",
+    "endpointUrlClass": "local_loopback_required_for_future_execution",
+    "endpointClassExplicit": true,
+    "endpointClassLocalOnly": true,
+    "localEndpointProofRequired": true,
+    "localEndpointProofStatus": "required_for_future_execution_not_present_in_static_fixture",
+    "remoteProviderEndpointUsed": false,
+    "liveEndpointUrlPresent": false
+  },
+  "networkBoundary": {
+    "networkBoundaryDeclaration": "static_fixture_no_network_calls",
+    "paidOpenAiApiUsed": false,
+    "remoteProviderEndpointUsed": false,
+    "secretsUsed": false,
+    "networkCallOccurred": false
+  },
+  "promptIdentity": {
+    "promptSourcePath": "docs/open-instrument/open-instrument-boundary-gated-local-provider-execution-capture-lane-design-v0.1.md",
+    "promptSourceStatus": "static_contract_source_not_execution_prompt",
+    "promptCanonicalizationMethod": "utf8_lf_empty_non_execution_sentinel",
+    "promptSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "promptLength": 0,
+    "promptMutationPolicy": "no_prompt_mutation_static_contract"
+  },
+  "requestIdentity": {
+    "requestBodyCanonicalizationMethod": "json_stable_empty_non_execution_sentinel",
+    "requestBodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "requestBodyPreviewPolicy": "no_live_request_body_static_contract",
+    "requestBodyMutationPolicy": "no_request_body_mutation_static_contract"
+  },
+  "executionCommand": {
+    "executionCommandClass": "none_static_contract",
+    "executionCommandPresent": false,
+    "hiddenRerunDetected": false
+  },
+  "responseIdentity": {
+    "responseCaptureMethod": "static_empty_non_execution_sentinel",
+    "responseSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "responseRetentionPolicy": "no_live_response_captured_static_contract",
+    "responseMutationPolicy": "no_response_mutation_static_contract"
+  },
+  "rerunPolicy": {
+    "rerunAuthorized": false,
+    "hiddenRerunDetected": false,
+    "rerunPolicy": "not_authorized_in_static_contract"
+  },
+  "parserCompatibilityPolicy": {
+    "parserCompatibilityAuthorized": false,
+    "parserCompatibilityEvidenceCreated": false,
+    "parserCompatibilityPolicy": "not_authorized_in_static_contract"
+  },
+  "captureState": {
+    "defaultState": "execution_not_authorized",
+    "currentState": "execution_not_authorized",
+    "allowedStaticStates": [
+      "design_only",
+      "execution_contract_ready",
+      "execution_not_authorized",
+      "execution_captured_static_record_only",
+      "execution_capture_failed_closed",
+      "execution_capture_review_required"
+    ],
+    "inactiveDesignedStates": [
+      "execution_authorized_pending_capture"
+    ]
+  },
+  "authorizationGates": {
+    "actualProviderExecutionAuthorized": false,
+    "modelCallAuthorized": false,
+    "paidOpenAiApiUseAuthorized": false,
+    "remoteProviderEndpointAuthorized": false,
+    "secretsUseAuthorized": false,
+    "runtimeApiUiWiringAuthorized": false,
+    "artifactCreationAuthorized": false,
+    "evidencePackCreationAuthorized": false,
+    "publicationFramingAuthorized": false,
+    "providerOutputScoringAuthorized": false,
+    "candidateRankingAuthorized": false,
+    "providerOutputEvidenceAuthorized": false,
+    "parserCompatibilityEvidenceAuthorized": false,
+    "reproducibilityEvidenceAuthorized": false,
+    "candidateTruthEvidenceAuthorized": false,
+    "originEvidenceAuthorized": false,
+    "modelQualityEvidenceAuthorized": false,
+    "publicationEvidenceAuthorized": false,
+    "executionSafetyEvidenceAuthorized": false
+  },
+  "evidenceClassPolicy": {
+    "requested": [
+      "local_provider_execution_capture_contract_static"
+    ],
+    "granted": [
+      "local_provider_execution_capture_contract_static"
+    ],
+    "candidateOnly": [
+      "local_smoke_transcript",
+      "prompt_response_capture_record",
+      "local_provider_execution_capture_record",
+      "provider_output_observation_candidate",
+      "parser_compatibility_observation_candidate",
+      "reproducibility_observation_candidate"
+    ],
+    "denied": [
+      "provider_output_evidence",
+      "parser_compatibility_evidence",
+      "reproducibility_evidence",
+      "candidate_truth_evidence",
+      "origin_evidence",
+      "model_quality_evidence",
+      "publication_evidence",
+      "execution_safety_evidence"
+    ]
+  },
+  "denialReasons": {
+    "provider_output_evidence": "no_actual_provider_execution_and_no_live_response_capture",
+    "parser_compatibility_evidence": "parser_compatibility_not_authorized",
+    "reproducibility_evidence": "rerun_not_authorized",
+    "candidate_truth_evidence": "truth_promotion_not_authorized",
+    "origin_evidence": "origin_promotion_not_authorized",
+    "model_quality_evidence": "model_quality_promotion_not_authorized",
+    "publication_evidence": "publication_promotion_not_authorized",
+    "execution_safety_evidence": "execution_safety_promotion_not_authorized"
+  },
+  "finalExecutionCaptureDecision": {
+    "value": "execution_capture_contract_static_only",
+    "rationale": "static execution-capture contract machinery only; no provider run, model call, live response capture, or evidence promotion"
+  },
+  "nonPromotionDeclaration": {
+    "promptResponseCaptureContractNotProviderOutputEvidence": true,
+    "promptResponseCaptureContractNotParserCompatibilityEvidence": true,
+    "promptResponseCaptureContractNotReproducibilityEvidence": true,
+    "promptResponseCaptureContractNotCandidateTruthEvidence": true,
+    "promptResponseCaptureContractNotOriginEvidence": true,
+    "promptResponseCaptureContractNotModelQualityEvidence": true,
+    "promptResponseCaptureContractNotPublicationEvidence": true,
+    "promptResponseCaptureContractNotExecutionSafetyEvidence": true
+  },
+  "nonExecutionDeclaration": {
+    "providerRunOccurred": false,
+    "modelCallOccurred": false,
+    "paidOpenAiApiUsed": false,
+    "remoteProviderEndpointUsed": false,
+    "secretsUsed": false,
+    "runtimeApiUiWiringChanged": false,
+    "newProviderResponseCaptured": false,
+    "artifactCreated": false,
+    "evidencePackCreated": false,
+    "publicationFramingCreated": false,
+    "providerOutputScored": false,
+    "candidateRanked": false,
+    "providerOutputEvidenceCreated": false,
+    "parserCompatibilityEvidenceCreated": false,
+    "reproducibilityEvidenceCreated": false,
+    "candidateTruthEvidenceCreated": false,
+    "originEvidenceCreated": false,
+    "modelQualityEvidenceCreated": false,
+    "publicationEvidenceCreated": false,
+    "executionSafetyEvidenceCreated": false
+  },
+  "implementationGates": {
+    "schemaAdded": true,
+    "staticFixtureAdded": true,
+    "validationHelperAdded": true,
+    "focusedValidationTestsAdded": true,
+    "focusedIntegrationGateTestsAdded": true,
+    "implementationDocAdded": true
+  }
+}
