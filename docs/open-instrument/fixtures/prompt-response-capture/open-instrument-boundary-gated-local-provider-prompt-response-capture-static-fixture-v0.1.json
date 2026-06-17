@@ -1,0 +1,158 @@
+{
+  "schemaVersion": "open-instrument.boundary-gated-local-provider.prompt-response-capture.v0.1",
+  "capturePacketId": "open-instrument.boundary-gated-local-provider.prompt-response-capture.static-fixture.v0.1",
+  "sourceChain": {
+    "designPr": 1400,
+    "designMergeSha": "92def9c87a5ebe53417af4e8da5b83b40be00ac3",
+    "designDoc": "docs/open-instrument/open-instrument-boundary-gated-local-provider-prompt-response-capture-lane-design-v0.1.md",
+    "designReviewPr": 1401,
+    "designReviewMergeSha": "84e91cde438b5f0214bb10d1f2d3736ec72e5ada",
+    "designReviewDoc": "docs/open-instrument/open-instrument-boundary-gated-local-provider-prompt-response-capture-lane-design-review-v0.1.md",
+    "boundaryAssessmentPr": 1398,
+    "boundaryAssessmentMergeSha": "e574e916b97141c133c42ad79ee90a231429a343",
+    "boundaryAssessmentDoc": "docs/open-instrument/open-instrument-next-controlled-local-provider-evidence-boundary-lane-closure-assessment-v0.1.md",
+    "priorControlledExecutionResponseSha256": "a049322ed9cd37d5aa3916423c2b6c62671a0131685dfd0945ef363ad43cb40f"
+  },
+  "captureAuthorization": {
+    "authorizationPr": 1402,
+    "authorizationMergeSha": "782308f362fa1d468da0db2c77661e971c820055",
+    "authorizationDoc": "docs/open-instrument/open-instrument-boundary-gated-local-provider-prompt-response-capture-implementation-authorization-v0.1.md",
+    "authorizedScope": "static_prompt_response_capture_contract_machinery_only"
+  },
+  "providerIdentity": {
+    "providerFamily": "local_provider_contract",
+    "providerName": "none_static_contract",
+    "modelName": "none_static_contract",
+    "providerIdentityExplicit": true,
+    "modelIdentityExplicit": true,
+    "liveProviderNamePresent": false,
+    "liveModelNamePresent": false
+  },
+  "endpointIdentity": {
+    "endpointType": "local_openai_compatible_future_required",
+    "endpointUrlClass": "local_loopback_required_for_future_execution",
+    "localEndpointProofPolicy": "required_for_future_execution_not_present_in_static_fixture",
+    "endpointClassExplicit": true,
+    "endpointClassLocalOnly": true,
+    "remoteProviderEndpointUsed": false,
+    "liveEndpointUrlPresent": false
+  },
+  "promptIdentity": {
+    "promptSourcePath": "docs/open-instrument/open-instrument-boundary-gated-local-provider-prompt-response-capture-lane-design-v0.1.md",
+    "promptSourceStatus": "static_contract_source_not_execution_prompt",
+    "promptCanonicalizationMethod": "utf8_lf_empty_non_execution_sentinel",
+    "promptSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "promptLength": 0,
+    "promptMutationPolicy": "no_prompt_mutation_static_contract"
+  },
+  "requestIdentity": {
+    "requestBodyCanonicalizationMethod": "json_stable_empty_non_execution_sentinel",
+    "requestBodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "requestBodyMutationPolicy": "no_request_body_mutation_static_contract"
+  },
+  "responseIdentity": {
+    "responseCaptureMethod": "static_empty_non_execution_sentinel",
+    "responseSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "responseRetentionPolicy": "no_live_response_captured_static_contract",
+    "responseMutationPolicy": "no_response_mutation_static_contract"
+  },
+  "captureState": {
+    "defaultState": "execution_not_authorized",
+    "currentState": "execution_not_authorized",
+    "allowedStaticStates": [
+      "design_only",
+      "capture_contract_ready",
+      "execution_not_authorized",
+      "capture_recorded_static_only",
+      "capture_record_failed_closed",
+      "capture_record_review_required"
+    ],
+    "inactiveDesignedStates": [
+      "execution_authorized_pending_capture"
+    ]
+  },
+  "authorizationGates": {
+    "providerExecutionAuthorized": false,
+    "modelCallAuthorized": false,
+    "paidOpenAiApiUseAuthorized": false,
+    "remoteProviderEndpointAuthorized": false,
+    "secretsUseAuthorized": false,
+    "runtimeApiUiWiringAuthorized": false,
+    "artifactCreationAuthorized": false,
+    "evidencePackCreationAuthorized": false,
+    "publicationFramingAuthorized": false,
+    "providerOutputScoringAuthorized": false,
+    "candidateRankingAuthorized": false,
+    "candidateTruthEvidenceAuthorized": false,
+    "originEvidenceAuthorized": false,
+    "modelQualityEvidenceAuthorized": false,
+    "publicationEvidenceAuthorized": false,
+    "executionSafetyEvidenceAuthorized": false
+  },
+  "evidenceClassPolicy": {
+    "requested": [
+      "prompt_response_capture_contract_static"
+    ],
+    "granted": [
+      "prompt_response_capture_contract_static"
+    ],
+    "candidateOnly": [
+      "local_smoke_transcript",
+      "prompt_response_capture_record",
+      "provider_output_observation_candidate",
+      "parser_compatibility_observation_candidate",
+      "reproducibility_observation_candidate"
+    ],
+    "denied": [
+      "provider_output_evidence",
+      "parser_compatibility_evidence",
+      "reproducibility_evidence",
+      "candidate_truth_evidence",
+      "origin_evidence",
+      "model_quality_evidence",
+      "publication_evidence",
+      "execution_safety_evidence"
+    ]
+  },
+  "denialReasons": {
+    "provider_output_evidence": "no_provider_execution_and_no_live_response_capture",
+    "parser_compatibility_evidence": "parser_compatibility_not_authorized",
+    "reproducibility_evidence": "rerun_not_authorized",
+    "candidate_truth_evidence": "truth_promotion_not_authorized",
+    "origin_evidence": "origin_promotion_not_authorized",
+    "model_quality_evidence": "model_quality_promotion_not_authorized",
+    "publication_evidence": "publication_promotion_not_authorized",
+    "execution_safety_evidence": "execution_safety_promotion_not_authorized"
+  },
+  "finalCaptureDecision": {
+    "value": "capture_contract_static_only",
+    "rationale": "static contract machinery only; no provider run, model call, live response capture, or evidence promotion"
+  },
+  "nonExecutionDeclaration": {
+    "providerRunOccurred": false,
+    "modelCallOccurred": false,
+    "paidOpenAiApiUsed": false,
+    "remoteProviderEndpointUsed": false,
+    "secretsUsed": false,
+    "runtimeApiUiWiringChanged": false,
+    "newProviderResponseCaptured": false,
+    "artifactCreated": false,
+    "evidencePackCreated": false,
+    "publicationFramingCreated": false,
+    "providerOutputScored": false,
+    "candidateRanked": false,
+    "candidateTruthEvidenceCreated": false,
+    "originEvidenceCreated": false,
+    "modelQualityEvidenceCreated": false,
+    "publicationEvidenceCreated": false,
+    "executionSafetyEvidenceCreated": false
+  },
+  "implementationGates": {
+    "schemaAdded": true,
+    "staticFixtureAdded": true,
+    "validationHelperAdded": true,
+    "focusedValidationTestsAdded": true,
+    "focusedIntegrationGateTestsAdded": true,
+    "implementationDocAdded": true
+  }
+}

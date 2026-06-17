@@ -1,0 +1,91 @@
+{
+  "schemaVersion": "open-instrument.boundary-gated-local-provider.prompt-response-capture.schema.v0.1",
+  "schemaId": "open-instrument.boundary-gated-local-provider.prompt-response-capture.schema.v0.1",
+  "schemaStatus": "static_contract_validation_only",
+  "captureSchemaFor": "open-instrument.boundary-gated-local-provider.prompt-response-capture.v0.1",
+  "requiredTopLevelFields": [
+    "schemaVersion",
+    "capturePacketId",
+    "sourceChain",
+    "captureAuthorization",
+    "providerIdentity",
+    "endpointIdentity",
+    "promptIdentity",
+    "requestIdentity",
+    "responseIdentity",
+    "captureState",
+    "authorizationGates",
+    "evidenceClassPolicy",
+    "denialReasons",
+    "finalCaptureDecision",
+    "nonExecutionDeclaration",
+    "implementationGates"
+  ],
+  "requiredSha256Fields": [
+    "$.promptIdentity.promptSha256",
+    "$.requestIdentity.requestBodySha256",
+    "$.responseIdentity.responseSha256"
+  ],
+  "allowedGrantedClasses": [
+    "prompt_response_capture_contract_static"
+  ],
+  "candidateOnlyClasses": [
+    "local_smoke_transcript",
+    "prompt_response_capture_record",
+    "provider_output_observation_candidate",
+    "parser_compatibility_observation_candidate",
+    "reproducibility_observation_candidate"
+  ],
+  "blockedEvidenceClasses": [
+    "provider_output_evidence",
+    "parser_compatibility_evidence",
+    "reproducibility_evidence",
+    "candidate_truth_evidence",
+    "origin_evidence",
+    "model_quality_evidence",
+    "publication_evidence",
+    "execution_safety_evidence"
+  ],
+  "requiredFalseAuthorizationGates": [
+    "providerExecutionAuthorized",
+    "modelCallAuthorized",
+    "paidOpenAiApiUseAuthorized",
+    "remoteProviderEndpointAuthorized",
+    "secretsUseAuthorized",
+    "runtimeApiUiWiringAuthorized",
+    "artifactCreationAuthorized",
+    "evidencePackCreationAuthorized",
+    "publicationFramingAuthorized",
+    "providerOutputScoringAuthorized",
+    "candidateRankingAuthorized",
+    "candidateTruthEvidenceAuthorized",
+    "originEvidenceAuthorized",
+    "modelQualityEvidenceAuthorized",
+    "publicationEvidenceAuthorized",
+    "executionSafetyEvidenceAuthorized"
+  ],
+  "requiredFalseNonExecutionFlags": [
+    "providerRunOccurred",
+    "modelCallOccurred",
+    "paidOpenAiApiUsed",
+    "remoteProviderEndpointUsed",
+    "secretsUsed",
+    "runtimeApiUiWiringChanged",
+    "newProviderResponseCaptured",
+    "artifactCreated",
+    "evidencePackCreated",
+    "publicationFramingCreated",
+    "providerOutputScored",
+    "candidateRanked",
+    "candidateTruthEvidenceCreated",
+    "originEvidenceCreated",
+    "modelQualityEvidenceCreated",
+    "publicationEvidenceCreated",
+    "executionSafetyEvidenceCreated"
+  ],
+  "requiredDefaultState": "execution_not_authorized",
+  "forbiddenActiveStates": [
+    "execution_authorized_pending_capture"
+  ],
+  "requiredFinalDecision": "capture_contract_static_only"
+}
