@@ -1,0 +1,110 @@
+{
+  "schemaVersion": "open-instrument.controlled-local-provider.evidence-boundary.v0.1",
+  "fixtureId": "open-instrument.controlled-local-provider.evidence-boundary.static-fixture.v0.1",
+  "boundaryVersion": "v0.1",
+  "sourceChain": {
+    "designPr": 1392,
+    "designMergeSha": "611735fff5f2a452813621e8feb46e6529d21980",
+    "designDoc": "docs/open-instrument/open-instrument-next-controlled-local-provider-evidence-boundary-lane-design-v0.1.md",
+    "reviewPr": 1393,
+    "reviewMergeSha": "e95fd6389f828b206c5f4d44f0e2e45a0655e90d",
+    "reviewDoc": "docs/open-instrument/open-instrument-next-controlled-local-provider-evidence-boundary-lane-design-review-v0.1.md",
+    "authorizationPr": 1394,
+    "authorizationMergeSha": "339d8a855620e2f85746b6dbad57df31f3d5fa5d",
+    "authorizationDoc": "docs/open-instrument/open-instrument-next-controlled-local-provider-evidence-boundary-implementation-authorization-v0.1.md",
+    "priorControlledExecutionResponseSha256": "a049322ed9cd37d5aa3916423c2b6c62671a0131685dfd0945ef363ad43cb40f"
+  },
+  "providerIdentity": {
+    "providerFamily": "local",
+    "providerName": "ollama",
+    "modelName": "llama3.1:8b",
+    "endpointType": "local_openai_compatible",
+    "endpointUrlClass": "localhost",
+    "paidOpenAiApiUsed": false,
+    "remoteProviderEndpointUsed": false,
+    "secretsUsed": false
+  },
+  "promptIdentity": {
+    "promptId": "first-actual-controlled-local-provider-execution-lane-controlled-execution-v0.1",
+    "promptSha256": "unavailable_in_prior_lane",
+    "promptSha256Available": false,
+    "promptMutationTracked": false
+  },
+  "responseIdentity": {
+    "responseSha256": "a049322ed9cd37d5aa3916423c2b6c62671a0131685dfd0945ef363ad43cb40f",
+    "responseCaptureMethod": "controlled_local_smoke_transcript",
+    "responseRetentionPolicy": "hash_and_docs_reference_only",
+    "responseMutationTracked": false
+  },
+  "authorizationGates": {
+    "providerExecutionAuthorized": false,
+    "modelCallAuthorized": false,
+    "openAiApiUseAuthorized": false,
+    "remoteProviderEndpointAuthorized": false,
+    "secretsAuthorized": false,
+    "runtimeApiUiWiringAuthorized": false,
+    "artifactCreationAuthorized": false,
+    "evidencePackCreationAuthorized": false,
+    "parserPromotionAuthorized": false,
+    "candidateTruthEvidenceAuthorized": false,
+    "originEvidenceAuthorized": false,
+    "modelQualityEvidenceAuthorized": false,
+    "publicationEvidenceAuthorized": false,
+    "executionSafetyEvidenceAuthorized": false,
+    "staticBoundaryRecordAuthorized": true,
+    "staticBoundarySchemaAuthorized": true,
+    "validationHelperAuthorized": true,
+    "validationTestsAuthorized": true
+  },
+  "evidenceBoundary": {
+    "evidenceClassRequested": "local_smoke_transcript",
+    "evidenceClassesGranted": [
+      "local_smoke_transcript"
+    ],
+    "evidenceClassesDenied": [
+      "provider_output_observation",
+      "provider_output_reproducibility_observation",
+      "prompt_response_shape_observation",
+      "parser_compatibility_observation",
+      "candidate_truth_evidence",
+      "origin_evidence",
+      "model_quality_evidence",
+      "publication_evidence",
+      "execution_safety_evidence"
+    ],
+    "denialReasons": [
+      "paid_openai_api_use_blocked",
+      "remote_provider_endpoint_blocked",
+      "missing_prompt_hash_blocks_promotion",
+      "hidden_rerun_blocked",
+      "runtime_api_ui_wiring_blocked",
+      "candidate_truth_claim_blocked",
+      "origin_claim_blocked",
+      "model_quality_claim_blocked",
+      "publication_claim_blocked",
+      "execution_safety_claim_blocked",
+      "secret_use_blocked",
+      "artifact_creation_blocked",
+      "evidence_pack_creation_blocked"
+    ],
+    "promotionBlocked": true
+  },
+  "finalDecision": {
+    "value": "local_smoke_transcript_only",
+    "summary": "Prior local-provider response remains a local smoke transcript only. No provider execution, model call, runtime/API/UI wiring, or evidence promotion is authorized by this static boundary record."
+  },
+  "nonExecutionDeclaration": {
+    "providerRunOccurred": false,
+    "modelCallOccurred": false,
+    "paidOpenAiApiUsed": false,
+    "remoteProviderEndpointUsed": false,
+    "secretsUsed": false,
+    "runtimeApiUiWiringAdded": false,
+    "sourceFilesChangedForRuntime": false,
+    "candidateTruthEvidenceCreated": false,
+    "originEvidenceCreated": false,
+    "modelQualityEvidenceCreated": false,
+    "publicationEvidenceCreated": false,
+    "executionSafetyEvidenceCreated": false
+  }
+}
