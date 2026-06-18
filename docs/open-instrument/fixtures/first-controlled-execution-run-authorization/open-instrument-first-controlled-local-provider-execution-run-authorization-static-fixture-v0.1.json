@@ -1,0 +1,185 @@
+{
+  "schemaVersion": "open-instrument.first-controlled-local-provider-execution-run-authorization.v0.1",
+  "status": "static_contract_only",
+  "source": {
+    "runImplementationAuthorizationPr": 1433,
+    "runImplementationAuthorizationMergeSha": "4e40c983a130236f38ae4a3906db89d70b7b89e3",
+    "runImplementationAuthorizationDocument": "docs/open-instrument/open-instrument-first-controlled-local-provider-execution-run-authorization-implementation-authorization-v0.1.md",
+    "runDesignReviewPr": 1432,
+    "runDesignReviewMergeSha": "1be4b8263141986bed63770a0ac464c84e37d9be",
+    "runDesignReviewDocument": "docs/open-instrument/open-instrument-first-controlled-local-provider-execution-run-authorization-lane-design-review-v0.1.md",
+    "runDesignPr": 1431,
+    "runDesignMergeSha": "b96dafa21e0ed485ff97dade2f2512e96d5d5347",
+    "runDesignDocument": "docs/open-instrument/open-instrument-first-controlled-local-provider-execution-run-authorization-lane-design-v0.1.md",
+    "runReadinessPr": 1430,
+    "runReadinessMergeSha": "c36d9296e946c6727a99050b4d5123428be81f37",
+    "runReadinessDocument": "docs/open-instrument/open-instrument-first-controlled-local-provider-execution-run-readiness-assessment-v0.1.md",
+    "authorizationClosureAssessmentPr": 1429,
+    "authorizationClosureAssessmentMergeSha": "02c06d2df30ade9f356057c67c694f6883262afc",
+    "authorizationClosureAssessmentDocument": "docs/open-instrument/open-instrument-first-controlled-local-provider-execution-authorization-lane-closure-assessment-v0.1.md",
+    "sourceStaticAuthorizationFixture": "docs/open-instrument/fixtures/first-controlled-execution-authorization/open-instrument-first-controlled-local-provider-execution-authorization-static-fixture-v0.1.json",
+    "sourceStaticAuthorizationHelper": "scripts/openInstrumentFirstControlledLocalProviderExecutionAuthorizationValidation.v0.1.mjs",
+    "priorControlledExecutionResponseSha256": "a049322ed9cd37d5aa3916423c2b6c62671a0131685dfd0945ef363ad43cb40f"
+  },
+  "states": {
+    "allowed": [
+      "first_controlled_execution_run_authorization_design_only",
+      "first_controlled_execution_run_authorization_review_required",
+      "first_controlled_execution_run_authorization_not_granted",
+      "first_controlled_execution_run_authorization_candidate",
+      "first_controlled_execution_run_authorization_granted_one_shot_local_only",
+      "first_controlled_execution_run_authorization_failed_closed",
+      "first_controlled_execution_run_authorization_consumed",
+      "first_controlled_execution_run_authorization_expired"
+    ],
+    "default": "first_controlled_execution_run_authorization_not_granted",
+    "active": "first_controlled_execution_run_authorization_not_granted",
+    "oneShotRunGrantActive": false
+  },
+  "authorizationClasses": {
+    "granted": [
+      "first_controlled_local_provider_execution_run_authorization_contract_static"
+    ],
+    "denied": [
+      "actual_provider_execution",
+      "model_call",
+      "paid_openai_api_use",
+      "remote_provider_endpoint_use",
+      "localhost_provider_call",
+      "ollama_call",
+      "openai_compatible_endpoint_call",
+      "secrets_use",
+      "runtime_api_ui_wiring",
+      "artifact_creation",
+      "evidence_pack_creation",
+      "evidence_promotion"
+    ]
+  },
+  "identityRequirements": {
+    "providerFamilyRequired": true,
+    "providerNameRequired": true,
+    "providerVersionRequiredIfAvailable": true,
+    "modelFamilyRequired": true,
+    "modelNameRequired": true,
+    "modelVersionRequiredIfAvailable": true,
+    "endpointClassRequired": true,
+    "endpointUrlClassRequired": true,
+    "endpointIdentityRequired": true,
+    "localEndpointProofRequired": true,
+    "localhostOnlyDeclarationRequired": true
+  },
+  "endpointPolicy": {
+    "localOnlyEndpointClassRequired": true,
+    "remoteProviderEndpointUseAuthorized": false,
+    "localhostProviderCallAuthorized": false,
+    "ollamaCallAuthorized": false,
+    "openAiCompatibleEndpointCallAuthorized": false,
+    "providerFallbackAuthorized": false,
+    "modelFallbackAuthorized": false,
+    "endpointDiscoveryAuthorized": false,
+    "automaticProviderSelectionAuthorized": false,
+    "automaticModelSelectionAuthorized": false,
+    "hiddenRetryAuthorized": false,
+    "hiddenRerunAuthorized": false
+  },
+  "apiAndSecretPolicy": {
+    "actualProviderExecutionAuthorized": false,
+    "modelCallAuthorized": false,
+    "paidOpenAiApiUseAuthorized": false,
+    "secretsAuthorized": false,
+    "runtimeApiUiWiringAuthorized": false,
+    "artifactCreationAuthorized": false,
+    "evidencePackCreationAuthorized": false,
+    "publicationFramingAuthorized": false,
+    "providerOutputScoringAuthorized": false,
+    "candidateRankingAuthorized": false,
+    "evidencePromotionAuthorized": false
+  },
+  "environmentPolicy": {
+    "environmentVariableAllowlistRequired": true,
+    "environmentVariableDenylistRequired": true,
+    "undeclaredEnvironmentVariableReadAuthorized": false,
+    "credentialVariableReadAuthorized": false,
+    "endpointVariableReadWithoutDeclarationAuthorized": false
+  },
+  "promptRequestResponseRequirements": {
+    "promptSourcePathRequired": true,
+    "promptSourceReviewRequired": true,
+    "promptCanonicalizationMethodRequired": true,
+    "promptSha256Required": true,
+    "promptLengthRequired": true,
+    "promptMutationPolicyRequired": true,
+    "requestBodyCanonicalizationMethodRequired": true,
+    "requestBodySha256Required": true,
+    "requestBodyPreviewPolicyRequired": true,
+    "requestSecretsPolicyRequired": true,
+    "responseCaptureMethodRequired": true,
+    "responseSha256Required": true,
+    "responseRetentionPolicyRequired": true,
+    "responseMutationPolicyRequired": true,
+    "silentResponseOverwriteAuthorized": false
+  },
+  "limits": {
+    "maximumExecutionCount": 1,
+    "maximumRequestCount": 1,
+    "maximumResponseCount": 1,
+    "maximumRetryCount": 0,
+    "maximumRerunCount": 0
+  },
+  "lifecyclePolicy": {
+    "consumptionPolicyRequired": true,
+    "expirationPolicyRequired": true,
+    "reuseAuthorized": false,
+    "rerunWithoutNewAuthorizationAuthorized": false,
+    "consumeAfterOneShotRunRequired": true,
+    "failClosedIfConsumedRequired": true,
+    "failClosedIfExpiredRequired": true
+  },
+  "candidateOnlyClasses": [
+    "local_smoke_transcript",
+    "prompt_response_capture_record",
+    "local_provider_execution_capture_record",
+    "provider_output_observation_candidate",
+    "parser_compatibility_observation_candidate",
+    "reproducibility_observation_candidate"
+  ],
+  "blockedEvidenceClasses": [
+    "provider_output_evidence",
+    "parser_compatibility_evidence",
+    "reproducibility_evidence",
+    "candidate_truth_evidence",
+    "origin_evidence",
+    "model_quality_evidence",
+    "publication_evidence",
+    "execution_safety_evidence"
+  ],
+  "grantedEvidenceClasses": [],
+  "postRunReview": {
+    "requiredBeforeEvidenceClassChange": true,
+    "requiredBeforeParserCompatibilityEvidence": true,
+    "requiredBeforeReproducibilityEvidence": true,
+    "requiredBeforeCandidateTruthEvidence": true,
+    "requiredBeforeOriginEvidence": true,
+    "requiredBeforeModelQualityEvidence": true,
+    "requiredBeforePublicationEvidence": true,
+    "requiredBeforeExecutionSafetyEvidence": true
+  },
+  "nonExecutionDeclaration": {
+    "providerRunOccurred": false,
+    "modelCallOccurred": false,
+    "paidOpenAiApiUseOccurred": false,
+    "remoteEndpointUseOccurred": false,
+    "localhostProviderCallOccurred": false,
+    "ollamaCallOccurred": false,
+    "openAiCompatibleEndpointCallOccurred": false,
+    "secretsUseOccurred": false,
+    "runtimeApiUiWiringOccurred": false,
+    "artifactCreationOccurred": false,
+    "evidencePackCreationOccurred": false,
+    "publicationFramingOccurred": false,
+    "providerOutputScoringOccurred": false,
+    "candidateRankingOccurred": false,
+    "evidencePromotionOccurred": false
+  },
+  "finalDecision": "first_controlled_local_provider_execution_run_authorization_contract_static_only"
+}
