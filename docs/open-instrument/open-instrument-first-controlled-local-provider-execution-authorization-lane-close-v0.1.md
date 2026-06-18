@@ -1,344 +1,456 @@
 # Open Instrument first controlled local-provider execution authorization lane close v0.1
 
-## Status / scope
-
-- closure-only
-- docs-only
-- first controlled local-provider execution authorization lane v0.1 is closed
-- no provider execution
-- no model call
-- no OpenAI API use
-- no network access
-- no localhost access
-- no Ollama access
-- no OpenAI-compatible endpoint access
-- no secrets
-- no runtime/API/UI wiring
-- no provider default change
-- no model default change
-- no fixture mutation
-- no schema mutation
-- no package metadata changes
-- no CI changes
-- no helper script changes
-- no test changes
-- no artifacts
-- no reports
-- no evidence packs
-- no publication framing
+Status: closed
+Scope: first controlled local-provider execution authorization lane closure
 
 ## Closure decision
 
-The first controlled local-provider execution authorization lane v0.1 is closed.
+The first controlled local-provider execution authorization lane is closed.
 
-The closure is docs-only.
+Static first controlled local-provider execution authorization contract machinery is implemented.
 
-The closure is lane-closure only.
+The implementation was reviewed and accepted.
 
-The closed lane completed clarification, design, design review, implementation authorization, implementation, implementation review, and closure.
+This closure is docs-only.
 
-The closed lane produced an accepted docs-only implementation.
+This closure does not authorize actual provider execution.
 
-The closed lane produced no executable provider path.
+This closure does not authorize a model call.
 
-The closed lane produced no provider adapter.
+This closure does not authorize paid OpenAI API use.
 
-The closed lane produced no provider selector.
+This closure does not authorize remote provider endpoints.
 
-The closed lane produced no model selector.
+This closure does not authorize localhost provider calls.
 
-The closed lane produced no endpoint selector.
+This closure does not authorize Ollama calls.
 
-The closed lane produced no runtime/API/UI wiring.
+This closure does not authorize OpenAI-compatible endpoint calls.
 
-The closed lane changed no helper scripts.
+This closure does not authorize secrets.
 
-The closed lane changed no tests.
+This closure does not authorize runtime/API/UI wiring.
 
-The closed lane changed no fixtures.
+This closure does not authorize artifact creation.
 
-The closed lane changed no schemas.
+This closure does not authorize evidence-pack creation.
 
-The closed lane changed no package metadata.
+This closure does not authorize publication framing.
 
-The closed lane changed no CI.
+This closure does not authorize provider-output scoring.
 
-The closed lane did not execute a provider.
+This closure does not authorize candidate ranking.
 
-The closed lane did not call a model.
+This closure does not authorize evidence promotion.
 
-The closed lane did not use OpenAI API.
+## Closed chain
 
-The closed lane did not use network access.
+Implementation review:
 
-The closed lane did not use localhost.
+* PR #1427
+* merge SHA: `9ad91b77b7e5234f4320bb64b41163903c6aa6c2`
+* document: `docs/open-instrument/open-instrument-first-controlled-local-provider-execution-authorization-implementation-review-v0.1.md`
 
-The closed lane did not use Ollama.
+Implementation:
 
-The closed lane did not use OpenAI-compatible endpoint access.
+* PR #1426
+* merge SHA: `1ed5e5dd88377eafcf19ef84f6172b8eebb5dcf9`
+* document: `docs/open-instrument/open-instrument-first-controlled-local-provider-execution-authorization-implementation-v0.1.md`
 
-The closed lane did not use secrets.
+Implementation authorization:
 
-The closed lane did not create artifacts.
+* PR #1425
+* merge SHA: `0121b9d42f03e04ec13ae49d30155dd49be9c579`
+* document: `docs/open-instrument/open-instrument-first-controlled-local-provider-execution-authorization-implementation-authorization-v0.1.md`
 
-The closed lane did not create reports.
+Design review:
 
-The closed lane did not create evidence packs.
+* PR #1424
+* merge SHA: `b1c5d43651242879c23ed32e2b1b91b8880a7d3f`
+* document: `docs/open-instrument/open-instrument-first-controlled-local-provider-execution-authorization-lane-design-review-v0.1.md`
 
-The closed lane did not create publication framing.
+Design:
 
-The closed lane did not create provider-output evidence.
+* PR #1423
+* merge SHA: `f1c2600b6eace1a28482888760612ec1fffd3eb2`
+* document: `docs/open-instrument/open-instrument-first-controlled-local-provider-execution-authorization-lane-design-v0.1.md`
 
-The closed lane did not create candidate-truth evidence.
+Readiness assessment:
 
-The closed lane did not create origin evidence.
+* PR #1422
+* merge SHA: `b38acb3e1f94ade4aff1a91bc682191278a5b82a`
+* document: `docs/open-instrument/open-instrument-first-controlled-local-provider-execution-authorization-readiness-assessment-v0.1.md`
 
-The closed lane did not create model-quality evidence.
+Preceding closure assessment:
 
-The closed lane did not create publication evidence.
+* PR #1421
+* merge SHA: `7fa4ca1dc67b1ac524912460011f1b5963768487`
+* document: `docs/open-instrument/open-instrument-controlled-local-provider-execution-authorization-lane-closure-assessment-v0.1.md`
 
-The closed lane did not create execution-safety evidence.
+Prior controlled execution response SHA-256:
 
-Provider execution remains blocked.
+* `a049322ed9cd37d5aa3916423c2b6c62671a0131685dfd0945ef363ad43cb40f`
 
-## Closed lane sequence
+## Closed implementation artifacts
 
-1. PR #1375 — docs(open-instrument): clarify controlled local-provider post-assessment next step v0.1
-2. PR #1376 — docs(open-instrument): design first controlled local-provider execution authorization lane v0.1
-3. PR #1377 — docs(open-instrument): review first controlled local-provider execution authorization lane design v0.1
-4. PR #1378 — docs(open-instrument): authorize first controlled local-provider execution authorization lane implementation v0.1
-5. PR #1379 — docs(open-instrument): implement first controlled local-provider execution authorization lane v0.1
-6. PR #1380 — docs(open-instrument): review first controlled local-provider execution authorization lane implementation v0.1
-7. this closure PR
+Schema:
 
-## Source documents
+* `docs/open-instrument/schemas/first-controlled-execution-authorization/open-instrument-first-controlled-local-provider-execution-authorization-schema-v0.1.json`
 
-- `docs/open-instrument/open-instrument-controlled-local-provider-post-assessment-next-step-clarification-v0.1.md`
-- `docs/open-instrument/open-instrument-first-controlled-local-provider-execution-authorization-lane-design-v0.1.md`
-- `docs/open-instrument/open-instrument-first-controlled-local-provider-execution-authorization-lane-design-review-v0.1.md`
-- `docs/open-instrument/open-instrument-first-controlled-local-provider-execution-authorization-lane-implementation-authorization-v0.1.md`
-- `docs/open-instrument/open-instrument-first-controlled-local-provider-execution-authorization-lane-implementation-v0.1.md`
-- `docs/open-instrument/open-instrument-first-controlled-local-provider-execution-authorization-lane-implementation-review-v0.1.md`
+Static fixture:
 
-## Source merge commits
+* `docs/open-instrument/fixtures/first-controlled-execution-authorization/open-instrument-first-controlled-local-provider-execution-authorization-static-fixture-v0.1.json`
 
-- PR #1376 — `7630f9d4787a239846efcadfd037c1d124c1023e`
-- PR #1377 — `9fd8b680da8a24d7d9cefc1fcc8204dc673f6c48`
-- PR #1378 — `275cf2bf29fe05fdcced26291065dddf36965082`
-- PR #1379 — `f1f605398d5571a5ea2f252f29e408925a1be401`
-- PR #1380 — `0f1863ce61992044a828ce81bb95e3fd8bb495a4`
+Validation helper:
 
-## Accepted implementation summary
+* `scripts/openInstrumentFirstControlledLocalProviderExecutionAuthorizationValidation.v0.1.mjs`
 
-The accepted implementation was docs-only.
+Focused validation test:
 
-The accepted implementation created exactly one implementation document.
+* `tests/openInstrument.firstControlledLocalProviderExecutionAuthorizationValidation.v0.1.spec.ts`
 
-The accepted implementation was reviewed and accepted.
+Focused integration gate test:
 
-The implementation review created exactly one review document.
+* `tests/openInstrument.firstControlledLocalProviderExecutionAuthorizationIntegrationGate.v0.1.spec.ts`
 
-The implementation created no executable provider path.
+Implementation document:
 
-The implementation created no provider adapter.
+* `docs/open-instrument/open-instrument-first-controlled-local-provider-execution-authorization-implementation-v0.1.md`
 
-The implementation created no provider selector.
+Implementation review document:
 
-The implementation created no model selector.
+* `docs/open-instrument/open-instrument-first-controlled-local-provider-execution-authorization-implementation-review-v0.1.md`
 
-The implementation created no endpoint selector.
+## Closure findings
 
-The implementation created no runtime/API/UI wiring.
+Static first controlled local-provider execution authorization contract machinery exists.
 
-No source files changed.
+The implementation was reviewed and accepted.
 
-No tests changed.
+The fixture grants only `first_controlled_local_provider_execution_authorization_contract_static`.
 
-No package files changed.
+The default state is `first_controlled_execution_authorization_not_granted`.
 
-No CI files changed.
+The active state is `first_controlled_execution_authorization_not_granted`.
 
-No helper scripts changed.
+The future one-shot grant `first_controlled_execution_authorization_granted_one_shot_local_only` remains inactive.
 
-No fixtures changed.
+Actual provider execution remains unauthorized.
 
-No schemas changed.
+Model calls remain unauthorized.
 
-No runtime files changed.
+Paid OpenAI API use remains unauthorized.
 
-No API route files changed.
+Remote provider endpoints remain unauthorized.
 
-No UI component files changed.
+Localhost provider calls remain unauthorized.
 
-No artifacts were created.
+Ollama calls remain unauthorized.
 
-No reports were created.
+OpenAI-compatible endpoint calls remain unauthorized.
 
-No evidence packs were created.
+Secrets remain unauthorized.
 
-## Identity constraints confirmed
+Runtime/API/UI wiring remains unauthorized.
 
-- provider family: local_only_candidate
-- provider identity state: not_authorized
-- concrete provider name: none
-- live provider name present: false
-- model identity state: not_authorized
-- concrete model name: none
-- live model name present: false
-- endpoint type: none
-- endpoint identity state: not_authorized
-- endpoint URL: none
-- live endpoint URL present: false
-- provider execution authorized: false
-- model call authorized: false
-- OpenAI API use authorized: false
-- network access authorized: false
-- localhost access authorized: false
-- Ollama access authorized: false
-- OpenAI-compatible endpoint access authorized: false
-- runtime/API/UI wiring authorized: false
+Artifact creation remains unauthorized.
 
-## Environment, secrets, and network constraints confirmed
+Evidence-pack creation remains unauthorized.
 
-- required environment variables: none
-- optional environment variables: none
-- undeclared environment variables read: false
-- credential variables accepted: false
-- endpoint variables accepted: false
-- model variables accepted: false
-- secrets allowed: false
-- secrets read: false
-- network access allowed: false
-- network access attempted: false
-- localhost access allowed: false
-- localhost access attempted: false
-- Ollama access allowed: false
-- Ollama access attempted: false
-- OpenAI-compatible endpoint access allowed: false
-- OpenAI-compatible endpoint access attempted: false
+Publication framing remains unauthorized.
 
-## Claim boundary confirmed
+Provider-output scoring remains unauthorized.
 
-- provider-output evidence: false
-- candidate-truth evidence: false
-- origin evidence: false
-- model-quality evidence: false
-- publication evidence: false
-- execution-safety evidence: false
-- eval evidence: false
-- Cohort evidence: false
-- provider default change evidence: false
-- model default change evidence: false
+Candidate ranking remains unauthorized.
 
-## Interpretation
+Evidence promotion remains blocked.
 
-Closing this lane confirms the first controlled local-provider execution authorization lane is complete as documentation.
+The prior controlled execution response remains local smoke transcript only.
 
-Completion does not mean provider execution is ready.
+## State closure review
 
-Completion does not mean a live provider can be used.
+Closed states:
 
-Completion does not mean a model can be called.
+* `first_controlled_execution_authorization_design_only`
+* `first_controlled_execution_authorization_review_required`
+* `first_controlled_execution_authorization_not_granted`
+* `first_controlled_execution_authorization_candidate`
+* `first_controlled_execution_authorization_granted_one_shot_local_only`
+* `first_controlled_execution_authorization_failed_closed`
+* `first_controlled_execution_authorization_consumed`
+* `first_controlled_execution_authorization_expired`
 
-Completion does not authorize OpenAI API use.
+Default state remains:
 
-Completion does not authorize network access.
+* `first_controlled_execution_authorization_not_granted`
 
-Completion does not authorize localhost access.
+Active fixture state remains:
 
-Completion does not authorize Ollama access.
+* `first_controlled_execution_authorization_not_granted`
 
-Completion does not authorize OpenAI-compatible endpoint access.
+Inactive future grant state remains:
 
-Completion does not authorize secrets.
+* `first_controlled_execution_authorization_granted_one_shot_local_only`
 
-Completion does not authorize runtime/API/UI wiring.
+The one-shot grant remains inactive.
 
-Future live-provider work still requires a separate explicit authorization lane.
+## One-shot limit closure review
 
-## Stop conditions preserved
+The closed fixture keeps:
 
-Future work must still stop if it attempts to:
+* maximum execution count: `1`
+* maximum request count: `1`
+* maximum response count: `1`
+* maximum retry count: `0`
+* maximum rerun count: `0`
 
-- execute a provider without explicit authorization
-- call a model without explicit authorization
-- call OpenAI without explicit authorization
-- use network access without explicit authorization
-- use localhost without explicit authorization
-- use Ollama without explicit authorization
-- use an OpenAI-compatible endpoint without explicit authorization
-- use secrets without explicit authorization
-- use a live provider name without explicit authorization
-- use a live model name without explicit authorization
-- use a live endpoint URL without explicit authorization
-- mutate provider defaults without explicit authorization
-- mutate model defaults without explicit authorization
-- mutate fixtures without explicit authorization
-- mutate schemas without explicit authorization
-- change source files without explicit authorization
-- change tests without explicit authorization
-- change package metadata without explicit authorization
-- change CI without explicit authorization
-- change helper scripts without explicit authorization
-- add runtime/API/UI wiring without explicit authorization
-- create artifacts without explicit authorization
-- create reports without explicit authorization
-- create evidence packs without explicit authorization
-- claim provider-output evidence without explicit authorization
-- claim candidate-truth evidence without explicit authorization
-- claim origin evidence without explicit authorization
-- claim model-quality evidence without explicit authorization
-- claim publication evidence without explicit authorization
-- claim execution-safety evidence without explicit authorization
+Any widening still requires a separate reviewed authorization.
 
-## Non-authorization statement
+## Identity and local endpoint proof closure review
 
-This closure is not provider execution.
+The closed fixture requires:
 
-This closure is not model execution.
+* provider family
+* provider name
+* provider version if available
+* model family
+* model name
+* model version if available
+* endpoint class
+* endpoint URL class
+* endpoint identity
+* local endpoint proof
+* localhost-only declaration
 
-This closure is not OpenAI API use.
+Provider fallback remains forbidden.
 
-This closure is not network access.
+Model fallback remains forbidden.
 
-This closure is not localhost access.
+Endpoint discovery remains forbidden.
 
-This closure is not Ollama access.
+Automatic provider selection remains forbidden.
 
-This closure is not OpenAI-compatible endpoint access.
+Automatic model selection remains forbidden.
 
-This closure is not provider-execution readiness.
+Hidden retry remains forbidden.
 
-This closure is not model-quality evidence.
+Hidden rerun remains forbidden.
 
-This closure is not origin evidence.
+## Prompt, request, and response closure review
 
-This closure is not candidate-truth evidence.
+The closed fixture requires:
 
-This closure is not publication evidence.
+* prompt source path
+* prompt source review status
+* prompt canonicalization method
+* prompt SHA-256
+* prompt length
+* prompt mutation policy
+* request body canonicalization method
+* request body SHA-256
+* request body preview policy
+* request secrets policy
+* response capture method
+* response SHA-256 requirement
+* response retention policy
+* response mutation policy
 
-This closure is not execution-safety evidence.
+Prompt SHA-256 remains mandatory.
 
-This closure closes only the docs-only authorization lane.
+Request body SHA-256 remains mandatory.
+
+Response SHA-256 remains mandatory.
+
+## Candidate-only class closure review
+
+The following remain candidate-only:
+
+* `local_smoke_transcript`
+* `prompt_response_capture_record`
+* `local_provider_execution_capture_record`
+* `provider_output_observation_candidate`
+* `parser_compatibility_observation_candidate`
+* `reproducibility_observation_candidate`
+
+Candidate-only means not granted.
+
+Candidate-only does not mean evidence.
+
+Candidate-only does not mean truth.
+
+Candidate-only does not mean origin.
+
+Candidate-only does not mean model quality.
+
+Candidate-only does not mean publication.
+
+Candidate-only does not mean execution safety.
+
+## Blocked evidence class closure review
+
+The following remain blocked:
+
+* `provider_output_evidence`
+* `parser_compatibility_evidence`
+* `reproducibility_evidence`
+* `candidate_truth_evidence`
+* `origin_evidence`
+* `model_quality_evidence`
+* `publication_evidence`
+* `execution_safety_evidence`
+
+No evidence classes are granted.
+
+## Helper and gate closure review
+
+The helper validates the checked-in static fixture.
+
+The helper fails closed on provider execution authorization drift.
+
+The helper fails closed on model call authorization drift.
+
+The helper fails closed on paid OpenAI API authorization drift.
+
+The helper fails closed on remote endpoint authorization drift.
+
+The helper fails closed on localhost provider call authorization drift.
+
+The helper fails closed on Ollama authorization drift.
+
+The helper fails closed on OpenAI-compatible endpoint authorization drift.
+
+The helper fails closed on secrets authorization drift.
+
+The helper fails closed on missing provider identity requirement.
+
+The helper fails closed on missing model identity requirement.
+
+The helper fails closed on missing local endpoint proof requirement.
+
+The helper fails closed on missing prompt SHA-256 requirement.
+
+The helper fails closed on missing request body SHA-256 requirement.
+
+The helper fails closed on missing response SHA-256 requirement.
+
+The helper fails closed on maximum execution count drift.
+
+The helper fails closed on retry count drift.
+
+The helper fails closed on rerun count drift.
+
+The helper fails closed on active one-shot grant drift.
+
+The helper fails closed on evidence promotion drift.
+
+The integration gate confirms the helper remains static.
+
+The integration gate confirms the helper does not import runtime modules.
+
+The integration gate confirms the helper does not import provider clients.
+
+The integration gate confirms the helper does not import network modules.
+
+The integration gate confirms the helper does not import secrets code.
+
+The integration gate confirms the fixture remains non-executing.
+
+The integration gate confirms the one-shot grant remains inactive.
+
+The integration gate confirms evidence promotion remains blocked.
+
+## Non-execution closure review
+
+No provider run occurred.
+
+No model call occurred.
+
+No paid OpenAI API use occurred.
+
+No remote endpoint use occurred.
+
+No localhost provider call occurred.
+
+No Ollama call occurred.
+
+No OpenAI-compatible endpoint call occurred.
+
+No secrets use occurred.
+
+No runtime/API/UI wiring occurred.
+
+No artifact creation occurred.
+
+No evidence-pack creation occurred.
+
+No publication framing occurred.
+
+No provider-output scoring occurred.
+
+No candidate ranking occurred.
+
+No evidence promotion occurred.
+
+## What this closure means
+
+The first controlled local-provider execution authorization static lane is complete.
+
+The project now has a reviewed and closed static authorization packet contract.
+
+The project has not authorized actual execution.
+
+The future one-shot local-only grant remains inactive.
+
+Future actual provider execution still requires a separate reviewed execution authorization.
+
+The prior controlled execution response remains local smoke transcript only.
+
+## What this closure does not mean
+
+This does not mean provider execution is authorized.
+
+This does not mean a model call is authorized.
+
+This does not mean paid OpenAI API use is authorized.
+
+This does not mean remote provider endpoints are authorized.
+
+This does not mean localhost provider calls are authorized.
+
+This does not mean Ollama calls are authorized.
+
+This does not mean OpenAI-compatible endpoint calls are authorized.
+
+This does not mean secrets are authorized.
+
+This does not mean runtime/API/UI wiring is authorized.
+
+This does not mean artifacts or evidence packs are authorized.
+
+This does not mean candidate-truth evidence exists.
+
+This does not mean origin evidence exists.
+
+This does not mean model-quality evidence exists.
+
+This does not mean publication evidence exists.
+
+This does not mean execution-safety evidence exists.
+
+## Closure conclusion
+
+The first controlled local-provider execution authorization lane is closed.
+
+Static contract machinery exists and is reviewed.
+
+The future one-shot local-only grant remains inactive.
+
+Actual execution remains unauthorized.
+
+All evidence promotion remains blocked.
+
+The prior controlled execution response remains local smoke transcript only.
 
 ## Next accepted task
 
-`docs/open-instrument: design first actual controlled local-provider execution lane v0.1`
-
-That future design must remain docs-only.
-
-That future design must not execute providers or call models.
-
-That future design must not authorize OpenAI API use by itself.
-
-That future design must not authorize network access by itself.
-
-That future design must not authorize localhost access by itself.
-
-That future design must not authorize Ollama access by itself.
-
-That future design must not authorize OpenAI-compatible endpoint access by itself.
-
-That future design must not authorize secrets by itself.
-
-That future design must explicitly define stop conditions before any live execution can be separately authorized.
+`docs(open-instrument): assess first controlled local-provider execution authorization lane closure v0.1`
