@@ -1,0 +1,230 @@
+{
+  "schemaVersion": "open-instrument.controlled-local-provider.execution-authorization.v0.1",
+  "authorizationPacketId": "open-instrument.controlled-local-provider.execution-authorization.static-fixture.v0.1",
+  "sourceChain": {
+    "authorizationDesignPr": 1415,
+    "authorizationDesignMergeSha": "d3e5ef8ce4aef4deeab3d5e852dcd857758c447d",
+    "authorizationDesignDoc": "docs/open-instrument/open-instrument-controlled-local-provider-execution-authorization-lane-design-v0.1.md",
+    "authorizationDesignReviewPr": 1416,
+    "authorizationDesignReviewMergeSha": "1c7666ecb44687dfed9ce016dec19c437e8d0675",
+    "authorizationDesignReviewDoc": "docs/open-instrument/open-instrument-controlled-local-provider-execution-authorization-lane-design-review-v0.1.md",
+    "implementationAuthorizationPr": 1417,
+    "implementationAuthorizationMergeSha": "38b0a52b612720ecf60e84804834a67d8b456c86",
+    "implementationAuthorizationDoc": "docs/open-instrument/open-instrument-controlled-local-provider-execution-authorization-implementation-authorization-v0.1.md",
+    "readinessAssessmentPr": 1414,
+    "readinessAssessmentMergeSha": "d0e38f7a9af7254cf15236c838ed9d0193907ea7",
+    "readinessAssessmentDoc": "docs/open-instrument/open-instrument-controlled-local-provider-execution-readiness-assessment-v0.1.md",
+    "promptResponseCaptureClosureAssessmentPr": 1406,
+    "promptResponseCaptureClosureAssessmentMergeSha": "b2f91943d2e092d48e3ba3dda1a01ee25c9c3493",
+    "promptResponseCaptureClosureAssessmentDoc": "docs/open-instrument/open-instrument-boundary-gated-local-provider-prompt-response-capture-lane-closure-assessment-v0.1.md",
+    "executionCaptureClosureAssessmentPr": 1413,
+    "executionCaptureClosureAssessmentMergeSha": "d2efd37edc0e7c1da052c407a23c40a3b369f2e8",
+    "executionCaptureClosureAssessmentDoc": "docs/open-instrument/open-instrument-boundary-gated-local-provider-execution-capture-lane-closure-assessment-v0.1.md",
+    "promptResponseCaptureSchema": "docs/open-instrument/schemas/prompt-response-capture/open-instrument-boundary-gated-local-provider-prompt-response-capture-schema-v0.1.json",
+    "promptResponseCaptureFixture": "docs/open-instrument/fixtures/prompt-response-capture/open-instrument-boundary-gated-local-provider-prompt-response-capture-static-fixture-v0.1.json",
+    "executionCaptureSchema": "docs/open-instrument/schemas/execution-capture/open-instrument-boundary-gated-local-provider-execution-capture-schema-v0.1.json",
+    "executionCaptureFixture": "docs/open-instrument/fixtures/execution-capture/open-instrument-boundary-gated-local-provider-execution-capture-static-fixture-v0.1.json",
+    "priorControlledExecutionResponseSha256": "a049322ed9cd37d5aa3916423c2b6c62671a0131685dfd0945ef363ad43cb40f"
+  },
+  "providerIdentityRequirements": {
+    "providerFamilyRequired": true,
+    "providerNameRequired": true,
+    "modelNameRequired": true,
+    "providerVersionPolicyRequired": true,
+    "futureProviderFamily": "local_provider_required_for_future_authorization",
+    "futureProviderName": "explicit_local_provider_name_required",
+    "futureModelName": "explicit_local_model_name_required",
+    "hiddenProviderFallbackForbidden": true
+  },
+  "endpointRequirements": {
+    "endpointClassRequired": true,
+    "endpointUrlClassRequired": true,
+    "localOnlyEndpointRequired": true,
+    "localEndpointProofRequired": true,
+    "remoteEndpointForbidden": true,
+    "futureEndpointClass": "local_loopback_required_for_future_authorization",
+    "futureEndpointUrlClass": "local_only_no_remote_url_in_static_fixture"
+  },
+  "networkBoundaryRequirements": {
+    "localOnlyNetworkDeclarationRequired": true,
+    "paidOpenAiApiUseForbidden": true,
+    "remoteProviderEndpointUseForbidden": true,
+    "secretsUseForbidden": true,
+    "networkCallOccurred": false
+  },
+  "operatorRequirements": {
+    "operatorDeclarationRequired": true,
+    "operatorIdentityRequiredForFutureExecution": true,
+    "operatorIdentityPresent": false
+  },
+  "executionEnvironmentRequirements": {
+    "executionEnvironmentDeclarationRequired": true,
+    "futureExecutionEnvironment": "local_developer_machine_or_reviewed_local_ci_only",
+    "runtimeApiUiWiringForbidden": true
+  },
+  "promptRequirements": {
+    "promptSourcePathRequired": true,
+    "promptSourceReviewStatusRequired": true,
+    "promptCanonicalizationMethodRequired": true,
+    "promptSha256Required": true,
+    "untrackedPromptMutationForbidden": true
+  },
+  "requestRequirements": {
+    "requestBodyCanonicalizationMethodRequired": true,
+    "requestBodySha256Required": true,
+    "noSecretsRequestBodyPolicyRequired": true,
+    "requestPreviewPolicyRequired": true,
+    "untrackedRequestBodyMutationForbidden": true
+  },
+  "responseRequirements": {
+    "responseCaptureMethodRequired": true,
+    "responseSha256Required": true,
+    "responseRetentionPolicyRequired": true,
+    "responseMutationPolicyRequired": true,
+    "untrackedResponseMutationForbidden": true,
+    "silentResponseOverwriteForbidden": true
+  },
+  "executionCountLimits": {
+    "maximumExecutionCount": 1,
+    "maximumRequestCount": 1,
+    "maximumResponseCount": 1,
+    "higherCountRequiresExplicitReviewedAuthorization": true
+  },
+  "commandPolicy": {
+    "allowedCommandClassRequired": true,
+    "forbiddenCommandClassesRequired": true,
+    "hiddenRerunForbidden": true,
+    "automaticRetriesForbiddenUnlessExplicitlyAuthorized": true
+  },
+  "rerunPolicy": {
+    "rerunPolicyRequired": true,
+    "rerunAuthorized": false,
+    "hiddenRerunAllowed": false
+  },
+  "parserCompatibilityPolicy": {
+    "parserCompatibilityPolicyRequired": true,
+    "parserCompatibilityEvidenceAuthorized": false
+  },
+  "authorizationState": {
+    "defaultState": "execution_authorization_not_granted",
+    "currentState": "execution_authorization_not_granted",
+    "allowedStaticStates": [
+      "authorization_design_only",
+      "execution_authorization_not_granted",
+      "execution_authorization_review_required",
+      "controlled_local_execution_authorization_candidate",
+      "controlled_local_execution_authorization_failed_closed"
+    ],
+    "inactiveDesignedStates": [
+      "controlled_local_execution_authorization_granted_static_scope"
+    ]
+  },
+  "authorizationGates": {
+    "actualProviderExecutionAuthorized": false,
+    "modelCallAuthorized": false,
+    "paidOpenAiApiUseAuthorized": false,
+    "remoteProviderEndpointAuthorized": false,
+    "secretsUseAuthorized": false,
+    "runtimeApiUiWiringAuthorized": false,
+    "artifactCreationAuthorized": false,
+    "evidencePackCreationAuthorized": false,
+    "publicationFramingAuthorized": false,
+    "providerOutputScoringAuthorized": false,
+    "candidateRankingAuthorized": false,
+    "providerOutputEvidenceAuthorized": false,
+    "parserCompatibilityEvidenceAuthorized": false,
+    "reproducibilityEvidenceAuthorized": false,
+    "candidateTruthEvidenceAuthorized": false,
+    "originEvidenceAuthorized": false,
+    "modelQualityEvidenceAuthorized": false,
+    "publicationEvidenceAuthorized": false,
+    "executionSafetyEvidenceAuthorized": false
+  },
+  "evidenceClassPolicy": {
+    "requested": [
+      "controlled_local_provider_execution_authorization_contract_static"
+    ],
+    "granted": [
+      "controlled_local_provider_execution_authorization_contract_static"
+    ],
+    "candidateOnly": [
+      "local_smoke_transcript",
+      "prompt_response_capture_record",
+      "local_provider_execution_capture_record",
+      "provider_output_observation_candidate",
+      "parser_compatibility_observation_candidate",
+      "reproducibility_observation_candidate"
+    ],
+    "denied": [
+      "provider_output_evidence",
+      "parser_compatibility_evidence",
+      "reproducibility_evidence",
+      "candidate_truth_evidence",
+      "origin_evidence",
+      "model_quality_evidence",
+      "publication_evidence",
+      "execution_safety_evidence"
+    ]
+  },
+  "denialReasons": {
+    "provider_output_evidence": "actual_provider_execution_not_authorized",
+    "parser_compatibility_evidence": "parser_compatibility_evidence_not_authorized",
+    "reproducibility_evidence": "reproducibility_evidence_not_authorized",
+    "candidate_truth_evidence": "truth_promotion_not_authorized",
+    "origin_evidence": "origin_promotion_not_authorized",
+    "model_quality_evidence": "model_quality_promotion_not_authorized",
+    "publication_evidence": "publication_promotion_not_authorized",
+    "execution_safety_evidence": "execution_safety_promotion_not_authorized"
+  },
+  "finalAuthorizationDecision": {
+    "value": "execution_authorization_contract_static_only",
+    "rationale": "static authorization-envelope contract machinery only; no provider run, model call, live response capture, or evidence promotion"
+  },
+  "nonPromotionDeclaration": {
+    "providerOutputNotEvidence": true,
+    "parserCompatibilityNotEvidence": true,
+    "reproducibilityNotEvidence": true,
+    "candidateTruthNotEvidence": true,
+    "originNotEvidence": true,
+    "modelQualityNotEvidence": true,
+    "publicationNotEvidence": true,
+    "executionSafetyNotEvidence": true,
+    "priorControlledResponseRemainsLocalSmokeTranscriptOnly": true
+  },
+  "postExecutionReviewRequirement": {
+    "postExecutionReviewRequiredBeforeEvidenceClassChange": true,
+    "postExecutionReviewRequiredBeforeRuntimeApiUiWiring": true,
+    "postExecutionReviewRequiredBeforeArtifacts": true,
+    "postExecutionReviewRequiredBeforeEvidencePacks": true
+  },
+  "nonExecutionDeclaration": {
+    "providerRunOccurred": false,
+    "modelCallOccurred": false,
+    "paidOpenAiApiUsed": false,
+    "remoteProviderEndpointUsed": false,
+    "secretsUsed": false,
+    "runtimeApiUiWiringChanged": false,
+    "newProviderResponseCaptured": false,
+    "artifactCreated": false,
+    "evidencePackCreated": false,
+    "publicationFramingCreated": false,
+    "providerOutputScored": false,
+    "candidateRanked": false,
+    "providerOutputEvidenceCreated": false,
+    "parserCompatibilityEvidenceCreated": false,
+    "reproducibilityEvidenceCreated": false,
+    "candidateTruthEvidenceCreated": false,
+    "originEvidenceCreated": false,
+    "modelQualityEvidenceCreated": false,
+    "publicationEvidenceCreated": false,
+    "executionSafetyEvidenceCreated": false
+  },
+  "implementationGates": {
+    "schemaAdded": true,
+    "staticFixtureAdded": true,
+    "validationHelperAdded": true,
+    "focusedValidationTestsAdded": true,
+    "focusedIntegrationGateTestsAdded": true,
+    "implementationDocAdded": true
+  }
+}
