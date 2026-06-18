@@ -1,473 +1,498 @@
 # Open Instrument first controlled local-provider execution authorization lane design v0.1
 
 Status: design
-
-Scope: design only
-
-Lane: first controlled local-provider execution authorization
+Scope: first controlled local-provider execution authorization lane design
 
 ## Design decision
 
-This document designs a future first controlled local-provider execution authorization lane.
+The first controlled local-provider execution authorization lane is designed.
 
-This document is docs-only.
+This lane is design-only.
 
-This document does not authorize provider execution.
+This lane does not authorize actual provider execution.
 
-This document does not authorize model calls.
+This lane does not authorize a model call.
 
-This document does not authorize OpenAI API use.
+This lane does not authorize paid OpenAI API use.
 
-This document does not authorize network access.
+This lane does not authorize remote provider endpoints.
 
-This document does not authorize localhost access.
+This lane does not authorize localhost provider calls.
 
-This document does not authorize Ollama access.
+This lane does not authorize Ollama calls.
 
-This document does not authorize OpenAI-compatible endpoint access.
+This lane does not authorize OpenAI-compatible endpoint calls.
 
-This document does not authorize secrets.
+This lane does not authorize secrets.
 
-This document does not authorize runtime/API/UI wiring.
+This lane does not authorize runtime/API/UI wiring.
 
-This document does not authorize source changes.
+This lane does not authorize artifact creation.
 
-This document does not authorize tests.
+This lane does not authorize evidence-pack creation.
 
-This document does not authorize package metadata changes.
+This lane does not authorize publication framing.
 
-This document does not authorize CI changes.
+This lane does not authorize provider-output scoring.
 
-This document does not authorize helper script changes.
+This lane does not authorize candidate ranking.
 
-This document does not authorize fixture mutation.
+This lane does not authorize evidence promotion.
 
-This document does not authorize schema mutation.
+The purpose of this design is to define the exact future authorization shape for one tightly bounded local-only execution.
 
-This document does not authorize artifacts.
+The next lane must review this design before any implementation or execution authorization.
 
-This document does not authorize reports.
+## Source chain
 
-This document does not authorize evidence packs.
+First controlled local-provider execution authorization readiness assessment:
 
-This document does not authorize publication framing.
+* PR #1422
+* merge SHA: `b38acb3e1f94ade4aff1a91bc682191278a5b82a`
+* document: `docs/open-instrument/open-instrument-first-controlled-local-provider-execution-authorization-readiness-assessment-v0.1.md`
 
-Provider execution remains blocked.
+Controlled local-provider execution authorization lane closure assessment:
 
-## Source basis
+* PR #1421
+* merge SHA: `7fa4ca1dc67b1ac524912460011f1b5963768487`
+* document: `docs/open-instrument/open-instrument-controlled-local-provider-execution-authorization-lane-closure-assessment-v0.1.md`
 
-This design follows the post-assessment clarification that broke the self-reference loop after the controlled local-provider milestone closure assessment.
+Controlled local-provider execution authorization lane close:
 
-Source clarification:
+* PR #1420
+* merge SHA: `da94f1a5cbe3c0d1dcb08b77ca2053338e1fe391`
+* document: `docs/open-instrument/open-instrument-controlled-local-provider-execution-authorization-lane-close-v0.1.md`
 
-- docs/open-instrument/open-instrument-controlled-local-provider-post-assessment-next-step-clarification-v0.1.md
-- PR #1375
-- bc3536a712baac4d138c7b30f49bb7786c666eb0
+Controlled local-provider execution authorization implementation review:
 
-Source assessment:
+* PR #1419
+* merge SHA: `8faf710926b456038772631961376c62affc63fe`
+* document: `docs/open-instrument/open-instrument-controlled-local-provider-execution-authorization-implementation-review-v0.1.md`
 
-- docs/open-instrument/open-instrument-controlled-local-provider-milestone-closure-assessment-v0.1.md
-- PR #1374
-- 564c01e0564f5509912d0742f39f10ffb32fe2
+Controlled local-provider execution authorization implementation:
 
-Closed controlled local-provider implementation lane:
+* PR #1418
+* merge SHA: `c60e85aa649832c55aa2a27f098add61c27b3870`
+* document: `docs/open-instrument/open-instrument-controlled-local-provider-execution-authorization-implementation-v0.1.md`
 
-- docs/open-instrument/open-instrument-controlled-local-provider-implementation-lane-close-v0.1.md
-- PR #1373
-- bfc7225ecda3318a5b0bcba5aae1ff69549fc189
+Controlled local-provider execution authorization implementation authorization:
 
-Controlled local-provider source chain:
+* PR #1417
+* merge SHA: `38b0a52b612720ecf60e84804834a67d8b456c86`
+* document: `docs/open-instrument/open-instrument-controlled-local-provider-execution-authorization-implementation-authorization-v0.1.md`
 
-- PR #1368 — design controlled local-provider authorization lane
-- PR #1369 — review controlled local-provider authorization lane design
-- PR #1370 — authorize controlled local-provider implementation
-- PR #1371 — implement controlled local-provider
-- PR #1372 — review controlled local-provider implementation
-- PR #1373 — close controlled local-provider implementation lane
-- PR #1374 — assess controlled local-provider milestone closure
-- PR #1375 — clarify controlled local-provider post-assessment next step
+Controlled local-provider execution authorization lane design review:
 
-## Purpose
+* PR #1416
+* merge SHA: `1c7666ecb44687dfed9ce016dec19c437e8d0675`
+* document: `docs/open-instrument/open-instrument-controlled-local-provider-execution-authorization-lane-design-review-v0.1.md`
 
-The purpose of this design is to define what a future authorization lane must require before any first controlled local-provider execution can be considered.
+Controlled local-provider execution authorization lane design:
 
-The future authorization lane may only authorize a later implementation if it explicitly names every allowed execution boundary.
+* PR #1415
+* merge SHA: `d3e5ef8ce4aef4deeab3d5e852dcd857758c447d`
+* document: `docs/open-instrument/open-instrument-controlled-local-provider-execution-authorization-lane-design-v0.1.md`
 
-This design does not name a provider.
+Controlled local-provider execution readiness assessment:
 
-This design does not name a model.
+* PR #1414
+* merge SHA: `d0e38f7a9af7254cf15236c838ed9d0193907ea7`
+* document: `docs/open-instrument/open-instrument-controlled-local-provider-execution-readiness-assessment-v0.1.md`
 
-This design does not name an endpoint.
+Prior controlled execution response SHA-256:
 
-This design does not authorize a command.
+* `a049322ed9cd37d5aa3916423c2b6c62671a0131685dfd0945ef363ad43cb40f`
 
-This design does not authorize an environment variable.
+## Existing authorization artifacts
 
-This design does not authorize secrets.
+Schema:
 
-This design does not authorize network access.
+* `docs/open-instrument/schemas/execution-authorization/open-instrument-controlled-local-provider-execution-authorization-schema-v0.1.json`
 
-This design does not authorize localhost access.
+Static fixture:
 
-This design does not authorize Ollama access.
+* `docs/open-instrument/fixtures/execution-authorization/open-instrument-controlled-local-provider-execution-authorization-static-fixture-v0.1.json`
 
-This design does not authorize OpenAI-compatible endpoint access.
+Validation helper:
+
+* `scripts/openInstrumentControlledLocalProviderExecutionAuthorizationValidation.v0.1.mjs`
+
+Focused tests:
+
+* `tests/openInstrument.controlledLocalProviderExecutionAuthorizationValidation.v0.1.spec.ts`
+* `tests/openInstrument.controlledLocalProviderExecutionAuthorizationIntegrationGate.v0.1.spec.ts`
+
+## Problem being solved
+
+The project is ready to design the first controlled local-provider execution authorization lane.
+
+The project is not ready to execute.
+
+The closed authorization-envelope machinery proves that future execution authorization must be explicit, narrow, local-only, hash-complete, and non-promoting.
+
+The project needs a reviewed design before any later lane can authorize one local-only execution.
+
+This design defines the future one-shot local-only authorization constraints.
+
+This design prevents a drift from readiness into execution.
+
+## Intended achievement
+
+The intended achievement is not provider execution.
+
+The intended achievement is not a model call.
+
+The intended achievement is not provider-output evidence.
+
+The intended achievement is not candidate-truth evidence.
 
-## Future authorization lane shape
+The intended achievement is not origin evidence.
 
-A future first controlled local-provider execution authorization lane must be separate from this design.
+The intended achievement is not model-quality evidence.
 
-A future authorization lane must be docs-only until it is reviewed and accepted.
+The intended achievement is not publication evidence.
 
-A future authorization lane must explicitly decide whether any later implementation may:
+The intended achievement is not execution-safety evidence.
 
-- name a concrete local provider
-- name a concrete local model
-- name a concrete local endpoint
-- permit localhost access
-- permit Ollama access
-- permit OpenAI-compatible endpoint access
-- read environment variables
-- require or forbid secrets
-- execute one local-provider command
-- write any output files
-- classify any output as evidence
+The intended achievement is a future reviewed authorization packet that can authorize exactly one local-only execution under strict boundaries.
 
-If any item is omitted, the future lane must fail closed.
+## Designed future authorization packet
 
-## Provider identity requirements for future authorization
+A future first controlled local-provider execution authorization packet must include:
 
-A future authorization lane must explicitly define provider identity before any execution can be authorized.
+* schema version
+* authorization packet id
+* source readiness assessment PR
+* source readiness assessment merge SHA
+* source readiness assessment document path
+* source closure assessment PR
+* source closure assessment merge SHA
+* source closure assessment document path
+* execution authorization design PR
+* execution authorization design merge SHA
+* execution authorization review PR
+* execution authorization review merge SHA
+* execution authorization implementation PR if applicable
+* execution authorization implementation merge SHA if applicable
+* operator declaration
+* execution environment declaration
+* provider family
+* provider name
+* provider version if available
+* model family
+* model name
+* model version if available
+* endpoint class
+* endpoint URL class
+* endpoint identity
+* local endpoint proof
+* localhost-only declaration
+* paid OpenAI API use flag
+* remote provider endpoint use flag
+* Ollama use flag
+* OpenAI-compatible endpoint use flag
+* secrets use flag
+* environment variable allowlist
+* environment variable denylist
+* prompt source path
+* prompt source review status
+* prompt canonicalization method
+* prompt SHA-256
+* prompt length
+* prompt mutation policy
+* request body canonicalization method
+* request body SHA-256
+* request body preview policy
+* request secrets policy
+* response capture method
+* response SHA-256 requirement
+* response retention policy
+* response mutation policy
+* maximum execution count
+* maximum request count
+* maximum response count
+* retry policy
+* rerun authorization state
+* parser compatibility authorization state
+* allowed command class
+* forbidden command classes
+* evidence class requested
+* evidence class granted
+* evidence class denied
+* denial reasons
+* final authorization decision
+* non-promotion declaration
+* post-execution review requirement
 
-Required fields:
+## Designed future authorization states
 
-- provider family
-- concrete provider name
-- local provider name present
-- live provider name present
-- provider fallback policy
-- provider auto-selection policy
-- provider discovery policy
-- provider default mutation policy
-- provider identity failure policy
-
-Default state for this design:
-
-- provider family: local_only_candidate
-- provider identity state: not_authorized
-- concrete provider name: none
-- local provider name present: false
-- live provider name present: false
-- provider fallback authorized: false
-- provider auto-selection authorized: false
-- provider discovery authorized: false
-- provider default mutation authorized: false
+The future lane may define these states:
 
-This design does not authorize provider identity.
+* `first_controlled_execution_authorization_design_only`
+* `first_controlled_execution_authorization_review_required`
+* `first_controlled_execution_authorization_not_granted`
+* `first_controlled_execution_authorization_candidate`
+* `first_controlled_execution_authorization_granted_one_shot_local_only`
+* `first_controlled_execution_authorization_failed_closed`
+* `first_controlled_execution_authorization_consumed`
+* `first_controlled_execution_authorization_expired`
 
-## Model identity requirements for future authorization
+Default state must be:
 
-A future authorization lane must explicitly define model identity before any execution can be authorized.
+* `first_controlled_execution_authorization_not_granted`
 
-Required fields:
-
-- model family
-- concrete model name
-- local model name present
-- live model name present
-- model fallback policy
-- model auto-selection policy
-- model discovery policy
-- model default mutation policy
-- model identity failure policy
-
-Default state for this design:
-
-- model family: local_only_candidate
-- model identity state: not_authorized
-- concrete model name: none
-- local model name present: false
-- live model name present: false
-- model fallback authorized: false
-- model auto-selection authorized: false
-- model discovery authorized: false
-- model default mutation authorized: false
-
-This design does not authorize model identity.
-
-## Endpoint identity requirements for future authorization
-
-A future authorization lane must explicitly define endpoint identity before any execution can be authorized.
-
-Required fields:
-
-- endpoint type
-- endpoint identity state
-- endpoint URL
-- localhost access policy
-- Ollama access policy
-- OpenAI-compatible endpoint access policy
-- external endpoint access policy
-- OpenAI API access policy
-- endpoint fallback policy
-- endpoint discovery policy
-- endpoint failure policy
-
-Default state for this design:
-
-- endpoint type: none
-- endpoint identity state: not_authorized
-- endpoint URL: none
-- localhost access authorized: false
-- Ollama access authorized: false
-- OpenAI-compatible endpoint access authorized: false
-- external endpoint access authorized: false
-- OpenAI API access authorized: false
-- endpoint fallback authorized: false
-- endpoint discovery authorized: false
-
-This design does not authorize endpoint identity.
-
-## Command identity requirements for future authorization
-
-A future authorization lane must explicitly define command identity before any execution can be authorized.
-
-Required fields:
-
-- command name
-- command purpose
-- command input source
-- command output policy
-- command timeout policy
-- command retry policy
-- command failure policy
-- provider call count policy
-- model call count policy
-- network call count policy
-- artifact/report/evidence output policy
-
-Default state for this design:
-
-- command authorized: false
-- provider command authorized: false
-- model command authorized: false
-- network command authorized: false
-- artifact command authorized: false
-- report command authorized: false
-- evidence-pack command authorized: false
-
-This design does not authorize a command.
-
-## Environment, secrets, and network requirements for future authorization
-
-A future authorization lane must explicitly define all environment, secrets, and network rules before any execution can be authorized.
-
-Required fields:
-
-- required environment variables
-- optional environment variables
-- forbidden environment variables
-- credential variable policy
-- endpoint variable policy
-- model variable policy
-- OpenAI credential variable policy
-- provider credential variable policy
-- secrets policy
-- network access policy
-- localhost access policy
-- Ollama access policy
-- OpenAI-compatible endpoint access policy
-
-Default state for this design:
-
-- required environment variables: none
-- optional environment variables: none
-- undeclared environment variables read: false
-- credential variables accepted: false
-- endpoint variables accepted: false
-- model variables accepted: false
-- OpenAI credential variables accepted: false
-- provider credential variables accepted: false
-- secrets allowed: false
-- secrets read: false
-- network access allowed: false
-- network access attempted: false
-
-This design does not authorize environment variables, secrets, or network access.
-
-## Runtime/API/UI requirements for future authorization
-
-A future authorization lane must explicitly define whether runtime/API/UI wiring is allowed.
-
-Default state for this design:
-
-- runtime wiring authorized: false
-- API wiring authorized: false
-- UI wiring authorized: false
-- route wiring authorized: false
-- client wiring authorized: false
-- provider-selection UI authorized: false
-- production UI exposure authorized: false
-
-This design does not authorize runtime/API/UI wiring.
-
-## Artifact, report, and evidence requirements for future authorization
-
-A future authorization lane must explicitly define whether any output files are allowed.
-
-Default state for this design:
-
-- artifacts authorized: false
-- reports authorized: false
-- evidence packs authorized: false
-- publication framing authorized: false
-- provider-output evidence: false
-- candidate-truth evidence: false
-- origin evidence: false
-- model-quality evidence: false
-- publication evidence: false
-- execution-safety evidence: false
-
-This design does not authorize artifacts, reports, evidence packs, publication framing, or evidence claims.
-
-## File-scope requirements for future authorization
-
-A future authorization lane must list exact allowed changed files before any implementation can be authorized.
-
-Default state for this design:
-
-- allowed changed files: this design doc only
-- source changes authorized: false
-- test changes authorized: false
-- package metadata changes authorized: false
-- CI changes authorized: false
-- helper script changes authorized: false
-- fixture mutation authorized: false
-- schema mutation authorized: false
-- artifact creation authorized: false
-- report creation authorized: false
-- evidence-pack creation authorized: false
+In this design lane, the active state remains:
 
-This design does not authorize file changes outside this document.
+* `first_controlled_execution_authorization_design_only`
 
-## Required future validation gates
+This design lane does not activate:
 
-A future authorization lane must require these gates before any later implementation can be considered:
+* `first_controlled_execution_authorization_granted_one_shot_local_only`
 
-- node --check scripts/openInstrumentRunPacketFixtureValidation.v0.1.mjs
-- node --check scripts/openInstrumentProviderExecutionPreflightStaticFixtureSchemaValidation.v0.1.mjs
-- node --check scripts/openInstrumentProviderExecutionPreflightMappingCoverageAudit.v0.1.mjs
-- npm run open-instrument:validate-run-packet-fixture
-- npm run open-instrument:validate-provider-execution-preflight-static-fixture
-- npm run open-instrument:audit-provider-execution-preflight-mapping-coverage
-- npx jest -c jest.config.mjs tests/openInstrument.runPacketFixtureValidation.v0.1.spec.ts tests/openInstrument.runPacketFixtureValidationIntegrationGate.v0.1.spec.ts --runInBand
-- npx jest -c jest.config.mjs tests/openInstrument.providerExecutionPreflightStaticFixtureSchemaValidation.v0.1.spec.ts tests/openInstrument.providerExecutionPreflightStaticFixtureSchemaValidationIntegrationGate.v0.1.spec.ts --runInBand
-- npx jest -c jest.config.mjs tests/openInstrument.providerExecutionPreflightMappingCoverageAudit.v0.1.spec.ts --runInBand
-- npm run build
-- npm run gate:quick
-- git diff --check
+## Designed one-shot limits
 
-A future authorization lane must also require GitHub checks to pass before merge.
+The future authorization packet must default to:
 
-## Stop conditions
+* maximum execution count: `1`
+* maximum request count: `1`
+* maximum response count: `1`
+* maximum retry count: `0`
+* maximum rerun count: `0`
 
-Stop immediately if this design or any future lane attempts to:
+Any increase requires separate reviewed authorization.
 
-- execute a provider
-- call a model
-- call OpenAI
-- use network access
-- use localhost access
-- use Ollama
-- use an OpenAI-compatible endpoint
-- use secrets
-- use a concrete provider name without explicit authorization
-- use a concrete model name without explicit authorization
-- use an endpoint URL without explicit authorization
-- mutate provider defaults
-- mutate model defaults
-- mutate fixtures
-- mutate schemas
-- change source files without explicit authorization
-- change tests without explicit authorization
-- change package metadata without explicit authorization
-- change CI without explicit authorization
-- change helper scripts without explicit authorization
-- add runtime/API/UI wiring without explicit authorization
-- create artifacts without explicit authorization
-- create reports without explicit authorization
-- create evidence packs without explicit authorization
-- claim provider-output evidence without explicit authorization
-- claim candidate-truth evidence without explicit authorization
-- claim origin evidence without explicit authorization
-- claim model-quality evidence without explicit authorization
-- claim publication evidence without explicit authorization
-- claim execution-safety evidence without explicit authorization
+The future authorization must expire after use.
 
-## Non-authorization statement
+The future authorization must fail closed if reused.
 
-This design is not provider execution.
+The future authorization must fail closed if rerun without a new reviewed authorization.
 
-This design is not provider-execution readiness.
+## Required local-only boundary
 
-This design is not a model call.
+The future authorization must require a local-only endpoint class.
 
-This design is not OpenAI API use.
+The future authorization must require local endpoint proof.
 
-This design is not network access.
+The future authorization must forbid remote provider endpoints.
 
-This design is not localhost access.
+The future authorization must forbid paid OpenAI API use.
 
-This design is not Ollama access.
+The future authorization must forbid secrets.
 
-This design is not OpenAI-compatible endpoint access.
+The future authorization must forbid hidden fallback.
 
-This design is not secrets usage.
+The future authorization must forbid endpoint discovery.
 
-This design is not runtime/API/UI wiring.
+The future authorization must forbid automatic provider selection.
 
-This design is not provider-output evidence.
+The future authorization must forbid automatic model selection.
 
-This design is not candidate-truth evidence.
+The future authorization must forbid hidden retry.
 
-This design is not origin evidence.
+The future authorization must forbid hidden rerun.
 
-This design is not model-quality evidence.
+The future authorization must define whether Ollama is in scope.
 
-This design is not publication evidence.
+The future authorization must define whether an OpenAI-compatible local endpoint is in scope.
 
-This design is not execution-safety evidence.
+If Ollama is in scope, it must be explicitly local-only.
 
-This design only defines requirements for a future first controlled local-provider execution authorization lane.
+If an OpenAI-compatible endpoint is in scope, it must be explicitly local-only.
+
+No localhost provider call is authorized by this design.
+
+No Ollama call is authorized by this design.
+
+No OpenAI-compatible endpoint call is authorized by this design.
+
+## Required prompt and request boundary
+
+The future authorization must require a reviewed prompt source.
+
+The future authorization must require deterministic prompt canonicalization.
+
+The future authorization must require prompt SHA-256.
+
+The future authorization must require prompt mutation policy.
+
+The future authorization must require deterministic request body canonicalization.
+
+The future authorization must require request body SHA-256.
+
+The future authorization must require a no-secrets request policy.
+
+The future authorization must require request body preview policy.
+
+The future authorization must require that no untracked prompt mutation occurs.
+
+The future authorization must require that no untracked request body mutation occurs.
+
+## Required response boundary
+
+The future authorization must require deterministic response capture.
+
+The future authorization must require response SHA-256.
+
+The future authorization must require response retention policy.
+
+The future authorization must require response mutation policy.
+
+The future authorization must forbid silent response overwrite.
+
+The future authorization must require post-execution review before evidence-class changes.
+
+The future authorization must not treat the captured response as evidence by default.
+
+## Required fail-closed behavior
+
+The future authorization must fail closed if:
+
+* source readiness assessment is missing
+* closure assessment is missing
+* authorization design review is missing
+* provider family is missing
+* provider name is missing
+* model family is missing
+* model name is missing
+* endpoint class is missing
+* endpoint class is remote
+* local endpoint proof is missing
+* paid OpenAI API use is true
+* remote provider endpoint use is true
+* secrets use is true
+* undeclared environment variable is read
+* credential variable is read
+* endpoint variable is read without declaration
+* prompt source path is missing
+* prompt source is unreviewed
+* prompt SHA-256 is missing
+* request body SHA-256 is missing
+* response SHA-256 requirement is missing
+* maximum execution count is greater than one
+* maximum request count is greater than one
+* maximum response count is greater than one
+* retry count is greater than zero
+* rerun count is greater than zero
+* hidden provider fallback is allowed
+* hidden model fallback is allowed
+* endpoint discovery is allowed
+* hidden retry is allowed
+* hidden rerun is allowed
+* runtime/API/UI wiring appears
+* artifact creation appears
+* evidence-pack creation appears
+* provider-output evidence is granted
+* parser-compatibility evidence is granted
+* reproducibility evidence is granted
+* candidate-truth evidence is granted
+* origin evidence is granted
+* model-quality evidence is granted
+* publication evidence is granted
+* execution-safety evidence is granted
+
+## Evidence class policy
+
+The future authorization may allow these classes as candidate-only observations:
+
+* `local_smoke_transcript`
+* `prompt_response_capture_record`
+* `local_provider_execution_capture_record`
+* `provider_output_observation_candidate`
+* `parser_compatibility_observation_candidate`
+* `reproducibility_observation_candidate`
+
+Candidate-only means not granted.
+
+Candidate-only does not mean evidence.
+
+Candidate-only does not mean truth.
+
+Candidate-only does not mean origin.
+
+Candidate-only does not mean model quality.
+
+Candidate-only does not mean publication.
+
+Candidate-only does not mean execution safety.
+
+The following evidence classes remain blocked:
+
+* `provider_output_evidence`
+* `parser_compatibility_evidence`
+* `reproducibility_evidence`
+* `candidate_truth_evidence`
+* `origin_evidence`
+* `model_quality_evidence`
+* `publication_evidence`
+* `execution_safety_evidence`
+
+## Non-goals
+
+This design does not implement an authorization packet.
+
+This design does not implement a schema.
+
+This design does not implement a fixture.
+
+This design does not implement a helper.
+
+This design does not implement tests.
+
+This design does not run a provider.
+
+This design does not call a model.
+
+This design does not capture a new response.
+
+This design does not promote the prior response.
+
+This design does not create runtime/API/UI behavior.
+
+This design does not create artifacts.
+
+This design does not create evidence packs.
+
+## Review checklist for next lane
+
+The next review lane should verify:
+
+* this lane is design-only
+* no provider run occurred
+* no model call occurred
+* no paid OpenAI API use occurred
+* no remote endpoint use occurred
+* no localhost provider call occurred
+* no Ollama call occurred
+* no OpenAI-compatible endpoint call occurred
+* no secrets use occurred
+* no runtime/API/UI wiring occurred
+* local endpoint proof is mandatory in the future design
+* provider identity is mandatory in the future design
+* model identity is mandatory in the future design
+* prompt SHA-256 is mandatory in the future design
+* request body SHA-256 is mandatory in the future design
+* response SHA-256 is mandatory in the future design
+* maximum execution count remains one
+* maximum request count remains one
+* maximum response count remains one
+* retry count remains zero
+* rerun count remains zero
+* evidence promotion remains blocked
+* candidate-only observation classes remain candidates only
+* blocked evidence classes remain blocked
+
+## Achievement path
+
+We are now past static authorization-envelope closure.
+
+The next achievement is not execution.
+
+The next achievement is a reviewed design for the first tightly bounded local-only execution authorization.
+
+After this design is reviewed, a later lane may authorize static implementation of the first controlled execution authorization packet.
+
+Actual execution must still wait for a separate reviewed authorization and must remain one-shot, local-only, hash-complete, and non-promoting.
 
 ## Next accepted task
 
-The next accepted task after this design lands is:
-
-- docs(open-instrument): review first controlled local-provider execution authorization lane design v0.1
-
-That future review must remain docs-only.
-
-That future review must not execute providers.
-
-That future review must not call models.
-
-That future review must not call OpenAI.
-
-That future review must not use network access.
-
-That future review must not use localhost access.
-
-That future review must not use Ollama.
-
-That future review must not use OpenAI-compatible endpoint access.
-
-That future review must not use secrets.
-
-
-## Verification marker note
-
-This section records exact traceability markers for future review scripts.
-
-- A future authorization lane must be separate from this design.
-- docs/open-instrument: design first controlled local-provider execution authorization lane v0.1
+`docs(open-instrument): review first controlled local-provider execution authorization lane design v0.1`
