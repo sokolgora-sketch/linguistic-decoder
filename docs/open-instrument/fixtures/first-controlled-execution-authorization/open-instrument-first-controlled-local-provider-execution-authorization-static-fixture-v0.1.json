@@ -1,0 +1,171 @@
+{
+  "schemaVersion": "open-instrument.first-controlled-local-provider-execution-authorization.v0.1",
+  "status": "static_contract_only",
+  "source": {
+    "sourceReadinessAssessmentPr": 1422,
+    "sourceReadinessAssessmentMergeSha": "b38acb3e1f94ade4aff1a91bc682191278a5b82a",
+    "sourceReadinessAssessmentDocument": "docs/open-instrument/open-instrument-first-controlled-local-provider-execution-authorization-readiness-assessment-v0.1.md",
+    "sourceDesignPr": 1423,
+    "sourceDesignMergeSha": "f1c2600b6eace1a28482888760612ec1fffd3eb2",
+    "sourceDesignDocument": "docs/open-instrument/open-instrument-first-controlled-local-provider-execution-authorization-lane-design-v0.1.md",
+    "sourceDesignReviewPr": 1424,
+    "sourceDesignReviewMergeSha": "b1c5d43651242879c23ed32e2b1b91b8880a7d3f",
+    "sourceDesignReviewDocument": "docs/open-instrument/open-instrument-first-controlled-local-provider-execution-authorization-lane-design-review-v0.1.md",
+    "implementationAuthorizationPr": 1425,
+    "implementationAuthorizationMergeSha": "0121b9d42f03e04ec13ae49d30155dd49be9c579",
+    "implementationAuthorizationDocument": "docs/open-instrument/open-instrument-first-controlled-local-provider-execution-authorization-implementation-authorization-v0.1.md",
+    "priorControlledExecutionResponseSha256": "a049322ed9cd37d5aa3916423c2b6c62671a0131685dfd0945ef363ad43cb40f"
+  },
+  "states": {
+    "allowed": [
+      "first_controlled_execution_authorization_design_only",
+      "first_controlled_execution_authorization_review_required",
+      "first_controlled_execution_authorization_not_granted",
+      "first_controlled_execution_authorization_candidate",
+      "first_controlled_execution_authorization_granted_one_shot_local_only",
+      "first_controlled_execution_authorization_failed_closed",
+      "first_controlled_execution_authorization_consumed",
+      "first_controlled_execution_authorization_expired"
+    ],
+    "default": "first_controlled_execution_authorization_not_granted",
+    "active": "first_controlled_execution_authorization_not_granted",
+    "oneShotGrantActive": false
+  },
+  "authorizationClasses": {
+    "granted": [
+      "first_controlled_local_provider_execution_authorization_contract_static"
+    ],
+    "denied": [
+      "actual_provider_execution",
+      "model_call",
+      "paid_openai_api_use",
+      "remote_provider_endpoint_use",
+      "localhost_provider_call",
+      "ollama_call",
+      "openai_compatible_endpoint_call",
+      "secrets_use",
+      "runtime_api_ui_wiring",
+      "artifact_creation",
+      "evidence_pack_creation",
+      "evidence_promotion"
+    ]
+  },
+  "identityRequirements": {
+    "providerFamilyRequired": true,
+    "providerNameRequired": true,
+    "providerVersionRequiredIfAvailable": true,
+    "modelFamilyRequired": true,
+    "modelNameRequired": true,
+    "modelVersionRequiredIfAvailable": true,
+    "endpointClassRequired": true,
+    "endpointUrlClassRequired": true,
+    "endpointIdentityRequired": true,
+    "localEndpointProofRequired": true,
+    "localhostOnlyDeclarationRequired": true
+  },
+  "endpointPolicy": {
+    "localOnlyEndpointClassRequired": true,
+    "remoteProviderEndpointUseAuthorized": false,
+    "localhostProviderCallAuthorized": false,
+    "ollamaCallAuthorized": false,
+    "openAiCompatibleEndpointCallAuthorized": false,
+    "providerFallbackAuthorized": false,
+    "modelFallbackAuthorized": false,
+    "endpointDiscoveryAuthorized": false,
+    "automaticProviderSelectionAuthorized": false,
+    "automaticModelSelectionAuthorized": false,
+    "hiddenRetryAuthorized": false,
+    "hiddenRerunAuthorized": false
+  },
+  "apiAndSecretPolicy": {
+    "actualProviderExecutionAuthorized": false,
+    "modelCallAuthorized": false,
+    "paidOpenAiApiUseAuthorized": false,
+    "secretsAuthorized": false,
+    "runtimeApiUiWiringAuthorized": false,
+    "artifactCreationAuthorized": false,
+    "evidencePackCreationAuthorized": false,
+    "publicationFramingAuthorized": false,
+    "providerOutputScoringAuthorized": false,
+    "candidateRankingAuthorized": false,
+    "evidencePromotionAuthorized": false
+  },
+  "environmentPolicy": {
+    "environmentVariableAllowlistRequired": true,
+    "environmentVariableDenylistRequired": true,
+    "undeclaredEnvironmentVariableReadAuthorized": false,
+    "credentialVariableReadAuthorized": false,
+    "endpointVariableReadWithoutDeclarationAuthorized": false
+  },
+  "promptRequestResponseRequirements": {
+    "promptSourcePathRequired": true,
+    "promptSourceReviewRequired": true,
+    "promptCanonicalizationMethodRequired": true,
+    "promptSha256Required": true,
+    "promptLengthRequired": true,
+    "promptMutationPolicyRequired": true,
+    "requestBodyCanonicalizationMethodRequired": true,
+    "requestBodySha256Required": true,
+    "requestBodyPreviewPolicyRequired": true,
+    "requestSecretsPolicyRequired": true,
+    "responseCaptureMethodRequired": true,
+    "responseSha256Required": true,
+    "responseRetentionPolicyRequired": true,
+    "responseMutationPolicyRequired": true,
+    "silentResponseOverwriteAuthorized": false
+  },
+  "limits": {
+    "maximumExecutionCount": 1,
+    "maximumRequestCount": 1,
+    "maximumResponseCount": 1,
+    "maximumRetryCount": 0,
+    "maximumRerunCount": 0
+  },
+  "candidateOnlyClasses": [
+    "local_smoke_transcript",
+    "prompt_response_capture_record",
+    "local_provider_execution_capture_record",
+    "provider_output_observation_candidate",
+    "parser_compatibility_observation_candidate",
+    "reproducibility_observation_candidate"
+  ],
+  "blockedEvidenceClasses": [
+    "provider_output_evidence",
+    "parser_compatibility_evidence",
+    "reproducibility_evidence",
+    "candidate_truth_evidence",
+    "origin_evidence",
+    "model_quality_evidence",
+    "publication_evidence",
+    "execution_safety_evidence"
+  ],
+  "grantedEvidenceClasses": [],
+  "postExecutionReview": {
+    "requiredBeforeEvidenceClassChange": true,
+    "requiredBeforeParserCompatibilityEvidence": true,
+    "requiredBeforeReproducibilityEvidence": true,
+    "requiredBeforeCandidateTruthEvidence": true,
+    "requiredBeforeOriginEvidence": true,
+    "requiredBeforeModelQualityEvidence": true,
+    "requiredBeforePublicationEvidence": true,
+    "requiredBeforeExecutionSafetyEvidence": true
+  },
+  "nonExecutionDeclaration": {
+    "providerRunOccurred": false,
+    "modelCallOccurred": false,
+    "paidOpenAiApiUseOccurred": false,
+    "remoteEndpointUseOccurred": false,
+    "localhostProviderCallOccurred": false,
+    "ollamaCallOccurred": false,
+    "openAiCompatibleEndpointCallOccurred": false,
+    "secretsUseOccurred": false,
+    "runtimeApiUiWiringOccurred": false,
+    "artifactCreationOccurred": false,
+    "evidencePackCreationOccurred": false,
+    "publicationFramingOccurred": false,
+    "providerOutputScoringOccurred": false,
+    "candidateRankingOccurred": false,
+    "evidencePromotionOccurred": false
+  },
+  "finalDecision": "first_controlled_local_provider_execution_authorization_contract_static_only"
+}
