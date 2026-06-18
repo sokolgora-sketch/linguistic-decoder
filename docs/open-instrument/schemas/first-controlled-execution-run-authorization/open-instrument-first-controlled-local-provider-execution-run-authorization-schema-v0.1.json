@@ -1,0 +1,374 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "open-instrument-first-controlled-local-provider-execution-run-authorization-schema-v0.1",
+  "title": "Open Instrument first controlled local-provider execution run authorization schema v0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "status",
+    "source",
+    "states",
+    "authorizationClasses",
+    "identityRequirements",
+    "endpointPolicy",
+    "apiAndSecretPolicy",
+    "environmentPolicy",
+    "promptRequestResponseRequirements",
+    "limits",
+    "lifecyclePolicy",
+    "candidateOnlyClasses",
+    "blockedEvidenceClasses",
+    "grantedEvidenceClasses",
+    "postRunReview",
+    "nonExecutionDeclaration",
+    "finalDecision"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "open-instrument.first-controlled-local-provider-execution-run-authorization.v0.1"
+    },
+    "status": {
+      "const": "static_contract_only"
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "states": {
+      "type": "object",
+      "required": [
+        "allowed",
+        "default",
+        "active",
+        "oneShotRunGrantActive"
+      ],
+      "properties": {
+        "allowed": {
+          "type": "array",
+          "contains": {
+            "const": "first_controlled_execution_run_authorization_granted_one_shot_local_only"
+          }
+        },
+        "default": {
+          "const": "first_controlled_execution_run_authorization_not_granted"
+        },
+        "active": {
+          "const": "first_controlled_execution_run_authorization_not_granted"
+        },
+        "oneShotRunGrantActive": {
+          "const": false
+        }
+      },
+      "additionalProperties": true
+    },
+    "authorizationClasses": {
+      "type": "object",
+      "required": [
+        "granted",
+        "denied"
+      ],
+      "properties": {
+        "granted": {
+          "type": "array",
+          "contains": {
+            "const": "first_controlled_local_provider_execution_run_authorization_contract_static"
+          }
+        },
+        "denied": {
+          "type": "array"
+        }
+      },
+      "additionalProperties": true
+    },
+    "identityRequirements": {
+      "type": "object",
+      "required": [
+        "providerFamilyRequired",
+        "providerNameRequired",
+        "modelFamilyRequired",
+        "modelNameRequired",
+        "endpointClassRequired",
+        "endpointIdentityRequired",
+        "localEndpointProofRequired"
+      ],
+      "properties": {
+        "providerFamilyRequired": {
+          "const": true
+        },
+        "providerNameRequired": {
+          "const": true
+        },
+        "modelFamilyRequired": {
+          "const": true
+        },
+        "modelNameRequired": {
+          "const": true
+        },
+        "endpointClassRequired": {
+          "const": true
+        },
+        "endpointIdentityRequired": {
+          "const": true
+        },
+        "localEndpointProofRequired": {
+          "const": true
+        }
+      },
+      "additionalProperties": true
+    },
+    "endpointPolicy": {
+      "type": "object",
+      "required": [
+        "localOnlyEndpointClassRequired",
+        "remoteProviderEndpointUseAuthorized",
+        "localhostProviderCallAuthorized",
+        "ollamaCallAuthorized",
+        "openAiCompatibleEndpointCallAuthorized",
+        "providerFallbackAuthorized",
+        "modelFallbackAuthorized",
+        "endpointDiscoveryAuthorized",
+        "automaticProviderSelectionAuthorized",
+        "automaticModelSelectionAuthorized"
+      ],
+      "properties": {
+        "localOnlyEndpointClassRequired": {
+          "const": true
+        },
+        "remoteProviderEndpointUseAuthorized": {
+          "const": false
+        },
+        "localhostProviderCallAuthorized": {
+          "const": false
+        },
+        "ollamaCallAuthorized": {
+          "const": false
+        },
+        "openAiCompatibleEndpointCallAuthorized": {
+          "const": false
+        },
+        "providerFallbackAuthorized": {
+          "const": false
+        },
+        "modelFallbackAuthorized": {
+          "const": false
+        },
+        "endpointDiscoveryAuthorized": {
+          "const": false
+        },
+        "automaticProviderSelectionAuthorized": {
+          "const": false
+        },
+        "automaticModelSelectionAuthorized": {
+          "const": false
+        }
+      },
+      "additionalProperties": true
+    },
+    "apiAndSecretPolicy": {
+      "type": "object",
+      "required": [
+        "actualProviderExecutionAuthorized",
+        "modelCallAuthorized",
+        "paidOpenAiApiUseAuthorized",
+        "secretsAuthorized",
+        "runtimeApiUiWiringAuthorized",
+        "artifactCreationAuthorized",
+        "evidencePackCreationAuthorized",
+        "evidencePromotionAuthorized"
+      ],
+      "properties": {
+        "actualProviderExecutionAuthorized": {
+          "const": false
+        },
+        "modelCallAuthorized": {
+          "const": false
+        },
+        "paidOpenAiApiUseAuthorized": {
+          "const": false
+        },
+        "secretsAuthorized": {
+          "const": false
+        },
+        "runtimeApiUiWiringAuthorized": {
+          "const": false
+        },
+        "artifactCreationAuthorized": {
+          "const": false
+        },
+        "evidencePackCreationAuthorized": {
+          "const": false
+        },
+        "evidencePromotionAuthorized": {
+          "const": false
+        }
+      },
+      "additionalProperties": true
+    },
+    "environmentPolicy": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "promptRequestResponseRequirements": {
+      "type": "object",
+      "required": [
+        "promptSourcePathRequired",
+        "promptSourceReviewRequired",
+        "promptSha256Required",
+        "requestBodySha256Required",
+        "responseSha256Required"
+      ],
+      "properties": {
+        "promptSourcePathRequired": {
+          "const": true
+        },
+        "promptSourceReviewRequired": {
+          "const": true
+        },
+        "promptSha256Required": {
+          "const": true
+        },
+        "requestBodySha256Required": {
+          "const": true
+        },
+        "responseSha256Required": {
+          "const": true
+        }
+      },
+      "additionalProperties": true
+    },
+    "limits": {
+      "type": "object",
+      "required": [
+        "maximumExecutionCount",
+        "maximumRequestCount",
+        "maximumResponseCount",
+        "maximumRetryCount",
+        "maximumRerunCount"
+      ],
+      "properties": {
+        "maximumExecutionCount": {
+          "const": 1
+        },
+        "maximumRequestCount": {
+          "const": 1
+        },
+        "maximumResponseCount": {
+          "const": 1
+        },
+        "maximumRetryCount": {
+          "const": 0
+        },
+        "maximumRerunCount": {
+          "const": 0
+        }
+      },
+      "additionalProperties": true
+    },
+    "lifecyclePolicy": {
+      "type": "object",
+      "required": [
+        "consumptionPolicyRequired",
+        "expirationPolicyRequired",
+        "reuseAuthorized",
+        "rerunWithoutNewAuthorizationAuthorized"
+      ],
+      "properties": {
+        "consumptionPolicyRequired": {
+          "const": true
+        },
+        "expirationPolicyRequired": {
+          "const": true
+        },
+        "reuseAuthorized": {
+          "const": false
+        },
+        "rerunWithoutNewAuthorizationAuthorized": {
+          "const": false
+        }
+      },
+      "additionalProperties": true
+    },
+    "candidateOnlyClasses": {
+      "type": "array"
+    },
+    "blockedEvidenceClasses": {
+      "type": "array"
+    },
+    "grantedEvidenceClasses": {
+      "type": "array",
+      "maxItems": 0
+    },
+    "postRunReview": {
+      "type": "object",
+      "required": [
+        "requiredBeforeEvidenceClassChange"
+      ],
+      "properties": {
+        "requiredBeforeEvidenceClassChange": {
+          "const": true
+        }
+      },
+      "additionalProperties": true
+    },
+    "nonExecutionDeclaration": {
+      "type": "object",
+      "required": [
+        "providerRunOccurred",
+        "modelCallOccurred",
+        "paidOpenAiApiUseOccurred",
+        "remoteEndpointUseOccurred",
+        "localhostProviderCallOccurred",
+        "ollamaCallOccurred",
+        "openAiCompatibleEndpointCallOccurred",
+        "secretsUseOccurred",
+        "runtimeApiUiWiringOccurred",
+        "artifactCreationOccurred",
+        "evidencePackCreationOccurred",
+        "evidencePromotionOccurred"
+      ],
+      "properties": {
+        "providerRunOccurred": {
+          "const": false
+        },
+        "modelCallOccurred": {
+          "const": false
+        },
+        "paidOpenAiApiUseOccurred": {
+          "const": false
+        },
+        "remoteEndpointUseOccurred": {
+          "const": false
+        },
+        "localhostProviderCallOccurred": {
+          "const": false
+        },
+        "ollamaCallOccurred": {
+          "const": false
+        },
+        "openAiCompatibleEndpointCallOccurred": {
+          "const": false
+        },
+        "secretsUseOccurred": {
+          "const": false
+        },
+        "runtimeApiUiWiringOccurred": {
+          "const": false
+        },
+        "artifactCreationOccurred": {
+          "const": false
+        },
+        "evidencePackCreationOccurred": {
+          "const": false
+        },
+        "evidencePromotionOccurred": {
+          "const": false
+        }
+      },
+      "additionalProperties": true
+    },
+    "finalDecision": {
+      "const": "first_controlled_local_provider_execution_run_authorization_contract_static_only"
+    }
+  }
+}
