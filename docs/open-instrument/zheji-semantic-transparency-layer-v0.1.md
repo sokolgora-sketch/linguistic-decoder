@@ -1,319 +1,461 @@
-# Zheji Semantic Transparency Layer v0.1
+# Zheji Semantic Transparency Layer v0.1 — Design Contract
 
-## Status
-- design-only
-- not implemented
-- no schema change
-- no validator change
-- no prompt change
-- no runtime change
-- no model call
-- no artifact replay
-- no provider default change
-- no changes to existing Zheji UI/path summary code
-- Open Instrument development layer only
+Status: DESIGN.
 
-This is a design layer for embryo morpheme meaning analysis. It is not external origin/truth evidence.
+Project lane: Open Instrument / ZËRO.
+
+## Contract boundary
+
+This document defines a design contract only.
+
+It does not create a JSON schema file.
+It does not create a TypeScript schema.
+It does not create runtime code.
+It does not create provider execution.
+It does not create Zheji replay.
+It does not create UI wiring.
+It does not create evidence packs.
+It does not create publication framing.
 
 ## Purpose
-The purpose is to add a future semantic analysis layer inspired by Petro Zheji's internal semantic motivation method.
 
-The layer should help distinguish:
+The Zheji Semantic Transparency Layer lets ZËRO describe whether a candidate word analysis has visible meaning-motivation through small functional carriers.
 
-- formal/historical evidence;
-- symbolic/functional resonance;
-- semantic transparency inside a candidate language;
-- cross-language transparency contrast.
+The layer is designed to answer this kind of question:
 
-This should help ZË-RO inspect whether embryo morpheme candidates are internally explainable, not merely whether they match a historical dictionary chain.
+Can the analyzed word be explained as a transparent composition of smaller functional carriers, without claiming that those carriers prove historical origin?
 
-## Existing Zheji lens compatibility
-`src/engine/zhejiLens.ts` already contains earlier symbolic/Zheji-style helper logic.
-`src/lib/zhejiSummary.ts` is a UI structural overlay.
-`src/lib/zhejiSummary.ts` reads from `AnalyzeWordResultUI`.
-Existing Zheji summary logic computes vowel path, root polarity, tension path, subject/object/modifier roles, inversion helpers, and snippets.
-Existing tests cover UI-facing Zheji summaries and symbolic layer behavior.
+The layer must preserve ZËRO's core truth posture:
 
-Classify existing code as:
+* candidates are candidates
+* no single winner
+* null is allowed
+* evidence must be anchored
+* origin is not claimed
+* ownership is not claimed
+* provider output is not evidence unless separately authorized
 
-UI/path summary and symbolic overlay, not Open Instrument Brain-candidate semantic transparency.
+## Required user-facing posture
 
-Compatibility decision for v0.1:
+Allowed posture:
 
-- Do not modify existing Zheji code.
-- Do not wire Open Instrument to existing Zheji code yet.
-- Keep Open Instrument semantic transparency design separate for now.
-- Later, the Open Instrument layer may reuse Seven-Voice trait functions or doctrine references from the existing Zheji/trait code.
-- Any reuse must be designed explicitly before implementation.
+* semantic motivation
+* functional carrier
+* candidate transparency
+* meaning-motivation
+* witness strength
+* isolation audit
+* non-origin explanation
+* non-ownership explanation
 
-Why:
+Forbidden posture:
 
-- Existing Zheji summary operates on word-level/vowel-path UI result.
-- New Open Instrument layer operates on candidate-level and chunk-level Brain output.
-- These are different layers and should not be merged prematurely.
+* true origin
+* proven origin
+* final etymology
+* linguistic ownership
+* candidate truth
+* historical certainty
+* publication-grade proof
+* provider-confirmed truth
 
-## What to extract from Zheji
-Open Instrument should extract the method, not total claims.
+## Layer name
 
-Useful method:
+Canonical layer name:
 
-- internal semantic motivation;
-- smallest meaningful decomposition;
-- literal physical/functional explanation;
-- comparison between languages by semantic transparency;
-- asking whether one language explains a candidate more atomically than another.
+* `semanticTransparency`
 
-Do not import:
+Canonical contract version:
 
-- Albanian automatically wins;
-- Albanian is privileged by schema;
-- atomic decomposition equals true origin;
-- symbolic resonance equals historical proof;
-- universal prima-language claims;
-- automatic candidateType upgrades.
+* `zheji_semantic_transparency.v0.1`
 
-## Layer boundaries
+Canonical proof posture:
 
-### Structural layer
-Already handled by current Open Instrument:
+* `design_only_non_wiring`
 
-- Heart-owned segmentation;
-- Brain candidate output;
-- normalization;
-- strict validation.
+## Non-runnable field catalogue
 
-Question answered:
+This is a field catalogue, not a runnable schema.
 
-`Did the candidate object pass the instrument contract?`
+The future `semanticTransparency` object should contain these fields:
 
-### Functional transparency layer
-Future Zheji-inspired layer:
+* `schema_version`
+* `posture`
+* `target_word`
+* `normalized_word`
+* `surface_vowels`
+* `functional_vowel_path`
+* `transparency_status`
+* `claim_policy`
+* `free_operator_candidates`
+* `carrier_claims`
+* `code_f`
+* `code_e`
+* `isolation_audit`
+* `witnesses`
+* `blocked_claims`
+* `null_reason`
+* `source_note`
+* `diagnostic_notes`
 
-- formal vs symbolic evidence;
-- semantic transparency:
-  - atomic
-  - metaphorical
-  - opaque
-- deterministic cross-language contrast matrix.
+## transparency_status enum
 
-Question answered:
+Allowed statuses:
 
-`How directly does this candidate explain the embryo morpheme meaning inside its own language?`
+* `not_evaluated`
+* `null_no_transparency`
+* `insufficient_evidence`
+* `candidate_transparency`
+* `partial_transparency`
+* `strong_candidate_transparency`
+* `blocked_forbidden_claim`
 
-### Origin/truth layer
-Not handled by this layer.
+No status may mean proven origin.
 
-Question not answered:
+No status may mean candidate truth.
 
-`Is this the historical origin of the word?`
+No status may mean language ownership.
 
-This design does not cross into origin proof.
+## claim_policy
 
-## Proposed candidate-level field: `analysisLayers`
-Design this as a future field only. Do not implement now.
+The required policy is:
 
-Use a lightweight auditable shape:
+* `no_single_winner`
+* `non_origin_claim`
+* `non_ownership_claim`
+* `candidate_only`
+* `evidence_anchored`
+* `null_allowed`
 
-analysisLayers:
-- formal:
-  - isPresent: boolean
-  - evidenceNote: string | null
-- symbolic:
-  - isPresent: boolean
-  - evidenceNote: string | null
+If any future output lacks this policy, the transparency result must be treated as invalid.
 
-Definitions:
+## Free Operator eligibility
 
-- `formal.isPresent` means documented historical etymology, attested cognates, or established comparative evidence supports this candidate.
-- `formal.evidenceNote` gives a short source/reason note, or `null` when not present.
-- `symbolic.isPresent` means the candidate aligns with ZË-RO vowel-function doctrine or embryo-morpheme function.
-- `symbolic.evidenceNote` gives a short doctrine/function note, or `null` when not present.
-- Both formal and symbolic may be true.
-- Both may be false.
-- Neither automatically changes `candidateType`.
+A Free Operator candidate is a proposed small functional carrier.
 
-Important guardrail:
+A candidate may be treated as Free Operator eligible only if it is:
 
-If the 7-Voice doctrine matrix required for symbolic evaluation is unavailable or incomplete in the prompt contract, the model must default symbolic evaluation to false or not evaluated. Do not invite poetic symbolic hallucination.
+* standalone enough to be cited as a carrier
+* function-bearing
+* anchored to the candidate language or evidence set
+* not only a forced substring
+* not only a sound association
+* not only provider-suggested
+* not dependent on hidden historical ownership
+* not dependent on final-origin claims
 
-## Proposed candidate-level field: `semanticTransparency`
-Design this as a future field only. Do not implement now.
+A candidate must be rejected or downgraded if it requires:
 
-Use a lightweight object shape:
+* major semantic stretching
+* unanchored intuition
+* phonetic similarity without function
+* provider-only support
+* circular explanation
+* invented morphology
+* historical certainty not present in evidence
 
-semanticTransparency:
-- level: atomic | metaphorical | opaque
-- reason: string
-- decomposition?: string[]
+## Free Operator candidate fields
 
-Definitions:
+Each future free operator candidate should include:
 
-- `atomic`: candidate meaning is explained as a direct literal, physical, or functional sum of its smallest meaningful parts inside that language; minimal conceptual leap.
-- `metaphorical`: candidate has internal roots or structure, but reaching the embryo meaning requires abstraction or conceptual leap.
-- `opaque`: candidate exists as a lexical form but has no useful internal structural explanation for the embryo meaning.
+* `operator_id`
+* `surface_form`
+* `language`
+* `function_gloss`
+* `carrier_type`
+* `eligibility_status`
+* `eligibility_reasons`
+* `block_reasons`
+* `evidence_anchors`
+* `confidence_label`
 
-Important rule:
+Allowed `eligibility_status` values:
 
-Dictionary morphology alone is not enough for `atomic`. Judge the semantic path, not just whether a dictionary gives roots.
+* `eligible_candidate`
+* `partial_candidate`
+* `rejected_forced_substring`
+* `rejected_semantic_stretch`
+* `rejected_provider_only`
+* `rejected_unanchored`
+* `not_evaluated`
 
-Operational constraint:
+Allowed `carrier_type` values:
 
-Do not require long academic explanations. `reason` should be short and auditable. `decomposition` is optional because local models may not reliably identify discrete units for every candidate.
+* `standalone_word`
+* `bound_morpheme_candidate`
+* `function_root_candidate`
+* `semantic_echo`
+* `unknown`
 
-## Computed chunk-level field: `transparencyContrast`
-Do not let Brain write this field.
+`semantic_echo` is weak by default.
 
-Do not generate natural-language contrast prose in deterministic code.
+## carrier_claims
 
-Define future computed field at chunk/embryo level:
+Carrier claims must be separate from origin claims.
 
-transparencyContrast:
-- hasContrast: boolean
-- matrix:
-  - atomic: string[]
-  - metaphorical: string[]
-  - opaque: string[]
-
-Where each array contains the candidate languages that fall into that transparency level for the same embryo/chunk.
-
-Rules:
-
-- If candidates for the same embryo have different transparency levels, `hasContrast` is true.
-- If all non-null candidates share the same level, `hasContrast` is false.
-- The deterministic post-processor only groups candidates by level and language.
-- It does not write fluid prose.
-- It does not judge historical truth.
-- It does not choose a winner.
-- It does not modify `candidateType`.
-- It does not modify `analysisLayers`.
-- It does not modify `semanticTransparency`.
-
-Optional future UI behavior:
-
-The UI may render the matrix into readable text or visual flags for human review.
-
-## CandidateType boundary
-State clearly:
-
-- `candidateType` remains evidence/type classification.
-- `semanticTransparency.level = atomic` does not upgrade `candidateType`.
-- `symbolic.isPresent = true` does not upgrade `candidateType`.
-- Albanian atomic transparency does not upgrade `candidateType`.
-- Formal evidence may affect `candidateType` only under existing or separately designed rules.
-- Zheji transparency is a parallel analysis axis, not a replacement for `candidateType`.
-
-## Null candidate boundary
-Define:
+Allowed claim wording:
 
-- null candidates may receive `analysisLayers` as false/null only if later schema design chooses that.
-- null candidates should not receive `semanticTransparency`, because there is no candidate to evaluate.
-- null candidates should not be used in the transparency contrast matrix except as absence/null evidence.
+* "candidate carrier may motivate this function"
+* "candidate carrier has partial semantic transparency"
+* "candidate carrier is functionally aligned"
+* "candidate carrier is insufficiently anchored"
+* "no transparent carrier found"
 
-## Albanian boundary
-State:
+Forbidden claim wording:
 
-- Albanian is a high-value test language for semantic transparency.
-- Albanian must not be an automatic winner.
-- Albanian must follow the same `candidateType` rules as Latin, Greek, Sanskrit, Germanic, Chinese, and every other language.
-- Albanian atomic transparency is evidence to inspect, not proof.
-- Other languages may also produce atomic candidates.
-- If Albanian is atomic and another language is metaphorical, the system records structured contrast; it does not declare origin.
+* "this carrier proves origin"
+* "this carrier is the true root"
+* "this language owns the word"
+* "this candidate is historically proven"
+* "provider confirmed the answer"
 
-## Relationship to current study milestone
-Connect this design to the completed study lane:
+## Code F
 
-- `.004 / S + TU + DI` is the active hard-case structural path.
-- The Zheji layer should be tested first on a structurally stable path.
-- The completed `study` lane proves the pipeline can produce structurally clean development evidence.
-- The Zheji layer asks a different question: whether the validated candidates show meaningful transparency patterns.
-- A future replay may use `.003` as a clean baseline or `.004` as a hard-case transparency test.
+Code F means formal or functional visibility.
 
-## Implementation sequence, future only
-Recommend this future sequence, but do not implement now:
+It should answer:
 
-### PR A — design-review PR
-- review this design;
-- decide whether Open Instrument should stay separate from existing Zheji UI lens for v0.1;
-- decide whether later schema should reuse any Seven-Voice trait references.
+Can the candidate carrier be visibly separated and assigned a plausible function without forcing the word?
 
-### PR B — schema/types design or schema-only implementation
-- add additive fields only;
-- no prompt change;
-- no validator change;
-- no model run.
+Allowed `code_f.status` values:
 
-### PR C — validator checks
-- require new fields only after schema decision;
-- archived artifacts may fail expected new checks until replayed;
-- do not loosen existing checks.
+* `not_evaluated`
+* `visible`
+* `partial`
+* `blocked`
+* `absent`
 
-### PR D — Brain prompt contract append
-- add analysis layer instructions;
-- include an explicit 7-Voice doctrine reference for symbolic evaluation;
-- if doctrine reference is absent or incomplete, symbolic must default to false or not evaluated;
-- do not rewrite the whole prompt.
+Code F must not imply origin.
 
-### PR E — deterministic transparency contrast helper
-- implement matrix-based `detectTransparencyContrast`;
-- read-only over candidate list;
-- no prose generation;
-- never changes `candidateType`.
+Code F must not imply Code E.
 
-### PR F — controlled replay
-- replay one structurally clean segmentation;
-- archive raw + normalized + transparency fields;
-- review.
+## Code E
 
-This sequence may be adjusted after design review.
+Code E means experiential or symbolic visibility.
 
-## Non-goals
-- no schema implementation in this PR;
-- no prompt change in this PR;
-- no validator change in this PR;
-- no runtime change in this PR;
-- no model run in this PR;
-- no artifact replay in this PR;
-- no language expansion;
-- no automatic Albanian preference;
-- no origin proof;
-- no candidate truth proof;
-- no scoring system;
-- no changes to existing Zheji UI/path summary code.
+It should answer:
 
-## Enrichment, not scoring
-This layer is analysis enrichment, not automated grading.
+Does the candidate carrier carry a symbolic or experiential meaning relationship that can be described without claiming proof?
 
-It records:
+Allowed `code_e.status` values:
 
-- formal evidence;
-- symbolic resonance;
-- semantic transparency;
-- transparency contrast matrix.
+* `not_evaluated`
+* `visible`
+* `partial`
+* `blocked`
+* `absent`
 
-It does not decide:
+Code E must not imply origin.
 
-- which candidate is true;
-- which language wins;
-- whether a candidate is historical origin;
-- whether a word is proved.
+Code E must not imply Code F.
 
-Human review interprets the enriched artifact.
+## Code F / Code E independence
 
-## Recommended next step
-Recommend next PR after this design:
+Code F and Code E are independent.
 
-`docs/open-instrument: review zheji semantic transparency design`
+Allowed combinations:
 
-Reason:
+* F visible / E absent
+* F absent / E visible
+* F partial / E partial
+* F blocked / E visible
+* F visible / E blocked
 
-This layer affects schema, prompt, validator, artifacts, UI interpretation, existing Zheji lens compatibility, and human review. It should be reviewed before implementation.
+No combination proves origin.
 
-Do not recommend immediate schema implementation from this PR.
+No combination proves ownership.
 
-## Claim boundary
-- development design for embryo morpheme meaning analysis;
-- not external origin/truth evidence;
-- not candidate truth proof;
-- not historical origin proof;
-- not reason to change provider default from `mock`;
-- not reason to expand language/model scope without another controlled plan.
+## Isolation audit
+
+The isolation audit prevents forced interpretation.
+
+Required audit checks:
+
+* `standalone_check`
+* `function_check`
+* `substring_force_check`
+* `semantic_stretch_check`
+* `provider_only_check`
+* `origin_claim_check`
+* `ownership_claim_check`
+* `evidence_anchor_check`
+
+Allowed audit statuses:
+
+* `pass`
+* `warn`
+* `fail`
+* `not_evaluated`
+
+If `origin_claim_check` fails, transparency status must be `blocked_forbidden_claim`.
+
+If `ownership_claim_check` fails, transparency status must be `blocked_forbidden_claim`.
+
+If `provider_only_check` fails, the candidate must be rejected or downgraded.
+
+## Witness levels
+
+The layer should use witness levels, not winner labels.
+
+Allowed witness levels:
+
+* `fact`
+* `rule_inference`
+* `hypothesis`
+* `weak_echo`
+* `blocked`
+
+Minimum witness set for a candidate transparency claim:
+
+* input normalization witness
+* vowel path witness
+* carrier function witness
+* isolation audit witness
+
+If fewer than these witnesses exist, the status must be `insufficient_evidence` or `null_no_transparency`.
+
+## Null behavior
+
+Null is valid.
+
+Allowed null reasons:
+
+* `no_free_operator_candidate`
+* `no_functional_alignment`
+* `insufficient_evidence`
+* `forced_substring_only`
+* `provider_only_support`
+* `forbidden_origin_claim`
+* `forbidden_ownership_claim`
+* `not_evaluated`
+
+Null must not be treated as a failure.
+
+Null means the system preserved truth posture.
+
+## Source-note language
+
+Every future result must include a source note with this meaning:
+
+This artifact records candidate semantic transparency and meaning-motivation only. It does not claim origin, historical ownership, final etymology, or publication-grade proof.
+
+## Required blocked_claims list
+
+Every future result must explicitly block:
+
+* `proven_origin`
+* `true_origin`
+* `final_etymology`
+* `linguistic_ownership`
+* `candidate_truth`
+* `provider_as_evidence`
+* `publication_grade_proof`
+
+## Example: transparent candidate without origin claim
+
+Target:
+
+* `study`
+
+Possible candidate carriers:
+
+* `SHTU`
+* `DI`
+
+Allowed interpretation:
+
+* A candidate analysis may describe `SHTU + DI` as a functional decomposition if carrier evidence is anchored and the isolation audit passes.
+
+Forbidden interpretation:
+
+* The system must not claim that this proves the historical origin of `study`.
+
+## Example: null result
+
+Target:
+
+* any word with no anchored carrier set
+
+Allowed interpretation:
+
+* `transparency_status=null_no_transparency`
+* `null_reason=no_free_operator_candidate`
+
+Forbidden interpretation:
+
+* The system must not force a carrier because the vowel path looks interesting.
+
+## Example: blocked result
+
+A result must be blocked if it says:
+
+* "this language owns the word"
+* "this is the true origin"
+* "the provider verified the root"
+
+Required status:
+
+* `blocked_forbidden_claim`
+
+## Required future tests
+
+If this design is later implemented, tests must prove:
+
+* no origin claim is emitted
+* no ownership claim is emitted
+* null result is allowed
+* provider-only candidate is rejected or downgraded
+* Code F and Code E are independent
+* blocked forbidden claims force blocked status
+* the source note is present
+* the result remains candidate-only
+* no runtime/API/UI wiring occurs unless separately authorized
+
+## Implementation gates
+
+This design does not authorize implementation.
+
+A later implementation PR must explicitly state which of these is authorized:
+
+* passive schema only
+* fixture only
+* validation helper only
+* tests only
+* runtime integration
+* UI integration
+
+If runtime integration or UI integration is not explicitly authorized, it is forbidden.
+
+## Out of scope
+
+Out of scope for v0.1 design:
+
+* provider execution
+* local model execution
+* OpenAI API use
+* Zheji replay
+* consonant-frame extraction
+* engine scoring changes
+* candidate ranking changes
+* source-engine provenance changes
+* evidence-pack generation
+* public report generation
+* UI display changes
+* API response changes
+* VoiceLab work
+* Harmony work
+
+## Milestone completion path
+
+This design supports the existing milestone sequence:
+
+1. Milestone opened.
+2. Design contract created.
+3. Design contract reviewed.
+4. Passive schema or fixture may be considered only after review.
+5. Tests may be considered only after schema/fixture scope is accepted.
+6. Milestone closes only after final validation and DF_BRAIN closure update.
+
+## Current next task
+
+`docs(open-instrument): review zheji semantic transparency layer design v0.1`
