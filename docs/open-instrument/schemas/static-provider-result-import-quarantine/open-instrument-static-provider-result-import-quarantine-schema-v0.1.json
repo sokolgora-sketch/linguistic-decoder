@@ -1,0 +1,122 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "open-instrument-static-provider-result-import-quarantine-schema-v0.1",
+  "title": "Open Instrument static provider-result import quarantine schema v0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "recordKind",
+    "schemaVersion",
+    "sourceRecordRef",
+    "sourcePr",
+    "sourceMergeSha",
+    "providerName",
+    "modelName",
+    "endpointIdentity",
+    "localEndpointProofSha256",
+    "promptSha256",
+    "requestBodySha256",
+    "responseSha256",
+    "executionCount",
+    "requestCount",
+    "responseCaptureCount",
+    "retryCount",
+    "rerunCount",
+    "importStatus",
+    "quarantineStatus",
+    "candidateOnlyStatus",
+    "evidencePromotionStatus",
+    "publicationStatus",
+    "providerOutputScoringStatus",
+    "candidateRankingStatus",
+    "runtimeApiUiWiringStatus",
+    "secretStatus",
+    "blockedEvidenceClasses",
+    "nonExecutionStatement",
+    "notes"
+  ],
+  "properties": {
+    "recordKind": { "const": "open_instrument_static_provider_result_import_quarantine" },
+    "schemaVersion": { "const": "0.1" },
+    "sourceRecordRef": { "type": "string", "minLength": 1 },
+    "sourcePr": { "type": "integer", "const": 1442 },
+    "sourceMergeSha": { "type": "string", "pattern": "^[a-f0-9]{40}$" },
+    "providerName": { "const": "ollama" },
+    "modelName": { "const": "llama3.1:8b" },
+    "endpointIdentity": { "const": "http://127.0.0.1:11434/api/generate" },
+    "localEndpointProofSha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "promptSha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "requestBodySha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "responseSha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "executionCount": { "type": "integer", "const": 1 },
+    "requestCount": { "type": "integer", "const": 1 },
+    "responseCaptureCount": { "type": "integer", "const": 1 },
+    "retryCount": { "type": "integer", "const": 0 },
+    "rerunCount": { "type": "integer", "const": 0 },
+    "importStatus": {
+      "enum": ["static_import_defined", "static_import_validated", "static_import_rejected"]
+    },
+    "quarantineStatus": {
+      "enum": [
+        "quarantined_candidate_only",
+        "blocked_from_evidence",
+        "blocked_from_publication",
+        "blocked_from_scoring",
+        "blocked_from_ranking"
+      ]
+    },
+    "candidateOnlyStatus": { "const": "candidate_only_retained" },
+    "evidencePromotionStatus": { "const": "evidence_promotion_blocked" },
+    "publicationStatus": { "const": "publication_blocked" },
+    "providerOutputScoringStatus": { "const": "provider_output_scoring_blocked" },
+    "candidateRankingStatus": { "const": "candidate_ranking_blocked" },
+    "runtimeApiUiWiringStatus": { "const": "runtime_api_ui_wiring_blocked" },
+    "secretStatus": { "const": "secrets_absent" },
+    "blockedEvidenceClasses": {
+      "type": "array",
+      "minItems": 8,
+      "items": {
+        "enum": [
+          "provider_output_evidence",
+          "parser_compatibility_evidence",
+          "reproducibility_evidence",
+          "candidate_truth_evidence",
+          "origin_evidence",
+          "model_quality_evidence",
+          "publication_evidence",
+          "execution_safety_evidence"
+        ]
+      }
+    },
+    "nonExecutionStatement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "providerExecutionStatus",
+        "modelCallStatus",
+        "paidOpenAiApiStatus",
+        "remoteEndpointStatus",
+        "localhostCallStatus",
+        "ollamaCallStatus",
+        "openAiCompatibleEndpointStatus",
+        "retryStatus",
+        "rerunStatus"
+      ],
+      "properties": {
+        "providerExecutionStatus": { "const": "provider_execution_not_authorized" },
+        "modelCallStatus": { "const": "model_call_not_authorized" },
+        "paidOpenAiApiStatus": { "const": "paid_openai_api_not_authorized" },
+        "remoteEndpointStatus": { "const": "remote_endpoint_not_authorized" },
+        "localhostCallStatus": { "const": "localhost_call_not_authorized" },
+        "ollamaCallStatus": { "const": "ollama_call_not_authorized" },
+        "openAiCompatibleEndpointStatus": { "const": "openai_compatible_endpoint_not_authorized" },
+        "retryStatus": { "const": "retry_not_authorized" },
+        "rerunStatus": { "const": "rerun_not_authorized" }
+      }
+    },
+    "notes": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  }
+}
