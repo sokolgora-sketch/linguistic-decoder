@@ -1,0 +1,408 @@
+{
+  "fixture_version": "zheji_semantic_transparency_fixture.v0.1",
+  "posture": "passive_static_fixture_non_wiring",
+  "design_reference": "docs/open-instrument/zheji-semantic-transparency-layer-v0.1.md",
+  "scope_review_reference": "docs/open-instrument/reviews/zheji-semantic-transparency-passive-artifact-scope-review-v0.1.md",
+  "cases": [
+    {
+      "case_id": "candidate_transparency.study.shtu-di.v0.1",
+      "schema_version": "zheji_semantic_transparency.v0.1",
+      "posture": "design_only_non_wiring",
+      "target_word": "study",
+      "normalized_word": "study",
+      "surface_vowels": ["U", "Y"],
+      "functional_vowel_path": ["U", "I"],
+      "transparency_status": "candidate_transparency",
+      "claim_policy": {
+        "no_single_winner": true,
+        "non_origin_claim": true,
+        "non_ownership_claim": true,
+        "candidate_only": true,
+        "evidence_anchored": true,
+        "null_allowed": true
+      },
+      "free_operator_candidates": [
+        {
+          "operator_id": "sq.shtu.v0.1",
+          "surface_form": "shtu",
+          "language": "sq",
+          "function_gloss": "add / extend",
+          "carrier_type": "standalone_word",
+          "eligibility_status": "eligible_candidate",
+          "eligibility_reasons": [
+            "standalone enough for candidate carrier review",
+            "function-bearing",
+            "anchored to static fixture evidence"
+          ],
+          "block_reasons": [],
+          "evidence_anchors": [
+            "fixture.cases[0].free_operator_candidates[0]"
+          ],
+          "confidence_label": "hypothesis"
+        },
+        {
+          "operator_id": "sq.di.v0.1",
+          "surface_form": "di",
+          "language": "sq",
+          "function_gloss": "know",
+          "carrier_type": "standalone_word",
+          "eligibility_status": "eligible_candidate",
+          "eligibility_reasons": [
+            "standalone enough for candidate carrier review",
+            "function-bearing",
+            "anchored to static fixture evidence"
+          ],
+          "block_reasons": [],
+          "evidence_anchors": [
+            "fixture.cases[0].free_operator_candidates[1]"
+          ],
+          "confidence_label": "hypothesis"
+        }
+      ],
+      "carrier_claims": [
+        {
+          "claim_id": "claim.study.functional-carrier.v0.1",
+          "operator_id": "sq.shtu.v0.1+sq.di.v0.1",
+          "claim_text": "candidate carriers may motivate an add-plus-know functional reading",
+          "witness_level": "hypothesis",
+          "evidence_anchors": [
+            "fixture.cases[0].free_operator_candidates",
+            "fixture.cases[0].witnesses"
+          ]
+        }
+      ],
+      "code_f": {
+        "status": "partial",
+        "rationale": "candidate carrier segmentation is visible as a fixture-only analysis",
+        "evidence_anchors": [
+          "fixture.cases[0].carrier_claims[0]"
+        ]
+      },
+      "code_e": {
+        "status": "partial",
+        "rationale": "candidate experiential relation is described without origin or ownership claims",
+        "evidence_anchors": [
+          "fixture.cases[0].source_note"
+        ]
+      },
+      "isolation_audit": {
+        "standalone_check": {
+          "status": "pass",
+          "notes": ["candidate carriers are represented as standalone fixture candidates"]
+        },
+        "function_check": {
+          "status": "pass",
+          "notes": ["candidate carriers include function glosses"]
+        },
+        "substring_force_check": {
+          "status": "warn",
+          "notes": ["candidate decomposition remains hypothesis and does not force truth"]
+        },
+        "semantic_stretch_check": {
+          "status": "warn",
+          "notes": ["semantic relation remains candidate-only"]
+        },
+        "provider_only_check": {
+          "status": "pass",
+          "notes": ["fixture is static and not provider-generated"]
+        },
+        "origin_claim_check": {
+          "status": "pass",
+          "notes": ["no origin claim is made"]
+        },
+        "ownership_claim_check": {
+          "status": "pass",
+          "notes": ["no ownership claim is made"]
+        },
+        "evidence_anchor_check": {
+          "status": "pass",
+          "notes": ["fixture anchors are present"]
+        }
+      },
+      "witnesses": [
+        {
+          "witness_id": "witness.study.normalization",
+          "witness_type": "input_normalization",
+          "witness_level": "fact",
+          "anchor": "fixture.cases[0].normalized_word"
+        },
+        {
+          "witness_id": "witness.study.vowel-path",
+          "witness_type": "vowel_path",
+          "witness_level": "rule_inference",
+          "anchor": "fixture.cases[0].functional_vowel_path"
+        },
+        {
+          "witness_id": "witness.study.carrier-function",
+          "witness_type": "carrier_function",
+          "witness_level": "hypothesis",
+          "anchor": "fixture.cases[0].free_operator_candidates"
+        },
+        {
+          "witness_id": "witness.study.isolation-audit",
+          "witness_type": "isolation_audit",
+          "witness_level": "rule_inference",
+          "anchor": "fixture.cases[0].isolation_audit"
+        }
+      ],
+      "blocked_claims": [
+        "proven_origin",
+        "true_origin",
+        "final_etymology",
+        "linguistic_ownership",
+        "candidate_truth",
+        "provider_as_evidence",
+        "publication_grade_proof"
+      ],
+      "null_reason": null,
+      "source_note": "This passive fixture records candidate semantic transparency and meaning-motivation only. It does not claim origin, historical ownership, final etymology, or publication-grade proof.",
+      "diagnostic_notes": [
+        "static fixture only",
+        "not runtime wiring",
+        "not provider output",
+        "not evidence promotion"
+      ]
+    },
+    {
+      "case_id": "null.no-free-operator.v0.1",
+      "schema_version": "zheji_semantic_transparency.v0.1",
+      "posture": "design_only_non_wiring",
+      "target_word": "sample-null",
+      "normalized_word": "sample-null",
+      "surface_vowels": ["A", "U"],
+      "functional_vowel_path": ["A", "U"],
+      "transparency_status": "null_no_transparency",
+      "claim_policy": {
+        "no_single_winner": true,
+        "non_origin_claim": true,
+        "non_ownership_claim": true,
+        "candidate_only": true,
+        "evidence_anchored": true,
+        "null_allowed": true
+      },
+      "free_operator_candidates": [],
+      "carrier_claims": [],
+      "code_f": {
+        "status": "absent",
+        "rationale": "no free operator candidate is available",
+        "evidence_anchors": [
+          "fixture.cases[1].null_reason"
+        ]
+      },
+      "code_e": {
+        "status": "absent",
+        "rationale": "no semantic transparency is asserted",
+        "evidence_anchors": [
+          "fixture.cases[1].null_reason"
+        ]
+      },
+      "isolation_audit": {
+        "standalone_check": {
+          "status": "not_evaluated",
+          "notes": ["no candidate was available"]
+        },
+        "function_check": {
+          "status": "not_evaluated",
+          "notes": ["no candidate was available"]
+        },
+        "substring_force_check": {
+          "status": "pass",
+          "notes": ["null preserved; no substring forced"]
+        },
+        "semantic_stretch_check": {
+          "status": "pass",
+          "notes": ["null preserved; no semantic stretch"]
+        },
+        "provider_only_check": {
+          "status": "pass",
+          "notes": ["no provider support used"]
+        },
+        "origin_claim_check": {
+          "status": "pass",
+          "notes": ["no origin claim is made"]
+        },
+        "ownership_claim_check": {
+          "status": "pass",
+          "notes": ["no ownership claim is made"]
+        },
+        "evidence_anchor_check": {
+          "status": "warn",
+          "notes": ["null reason is the anchor"]
+        }
+      },
+      "witnesses": [
+        {
+          "witness_id": "witness.null.normalization",
+          "witness_type": "input_normalization",
+          "witness_level": "fact",
+          "anchor": "fixture.cases[1].normalized_word"
+        },
+        {
+          "witness_id": "witness.null.vowel-path",
+          "witness_type": "vowel_path",
+          "witness_level": "rule_inference",
+          "anchor": "fixture.cases[1].functional_vowel_path"
+        },
+        {
+          "witness_id": "witness.null.isolation-audit",
+          "witness_type": "isolation_audit",
+          "witness_level": "rule_inference",
+          "anchor": "fixture.cases[1].isolation_audit"
+        }
+      ],
+      "blocked_claims": [
+        "proven_origin",
+        "true_origin",
+        "final_etymology",
+        "linguistic_ownership",
+        "candidate_truth",
+        "provider_as_evidence",
+        "publication_grade_proof"
+      ],
+      "null_reason": "no_free_operator_candidate",
+      "source_note": "This passive fixture records candidate semantic transparency and meaning-motivation only. It does not claim origin, historical ownership, final etymology, or publication-grade proof.",
+      "diagnostic_notes": [
+        "null is valid",
+        "static fixture only",
+        "not runtime wiring"
+      ]
+    },
+    {
+      "case_id": "blocked.forbidden-origin-claim.v0.1",
+      "schema_version": "zheji_semantic_transparency.v0.1",
+      "posture": "design_only_non_wiring",
+      "target_word": "blocked-sample",
+      "normalized_word": "blocked-sample",
+      "surface_vowels": ["O", "E"],
+      "functional_vowel_path": ["O", "E"],
+      "transparency_status": "blocked_forbidden_claim",
+      "claim_policy": {
+        "no_single_winner": true,
+        "non_origin_claim": true,
+        "non_ownership_claim": true,
+        "candidate_only": true,
+        "evidence_anchored": true,
+        "null_allowed": true
+      },
+      "free_operator_candidates": [
+        {
+          "operator_id": "blocked.operator.v0.1",
+          "surface_form": "blocked",
+          "language": "fixture",
+          "function_gloss": "blocked because forbidden claim posture is detected",
+          "carrier_type": "unknown",
+          "eligibility_status": "rejected_unanchored",
+          "eligibility_reasons": [],
+          "block_reasons": [
+            "forbidden_origin_claim"
+          ],
+          "evidence_anchors": [
+            "fixture.cases[2].isolation_audit.origin_claim_check"
+          ],
+          "confidence_label": "blocked"
+        }
+      ],
+      "carrier_claims": [
+        {
+          "claim_id": "claim.blocked.forbidden-origin.v0.1",
+          "operator_id": "blocked.operator.v0.1",
+          "claim_text": "blocked because forbidden origin posture was detected",
+          "witness_level": "blocked",
+          "evidence_anchors": [
+            "fixture.cases[2].isolation_audit.origin_claim_check"
+          ]
+        }
+      ],
+      "code_f": {
+        "status": "blocked",
+        "rationale": "formal visibility is blocked by forbidden claim posture",
+        "evidence_anchors": [
+          "fixture.cases[2].isolation_audit.origin_claim_check"
+        ]
+      },
+      "code_e": {
+        "status": "blocked",
+        "rationale": "symbolic visibility is blocked by forbidden claim posture",
+        "evidence_anchors": [
+          "fixture.cases[2].isolation_audit.origin_claim_check"
+        ]
+      },
+      "isolation_audit": {
+        "standalone_check": {
+          "status": "fail",
+          "notes": ["candidate is not accepted"]
+        },
+        "function_check": {
+          "status": "fail",
+          "notes": ["candidate is blocked"]
+        },
+        "substring_force_check": {
+          "status": "fail",
+          "notes": ["blocked posture prevents acceptance"]
+        },
+        "semantic_stretch_check": {
+          "status": "fail",
+          "notes": ["blocked posture prevents acceptance"]
+        },
+        "provider_only_check": {
+          "status": "pass",
+          "notes": ["no provider output is accepted"]
+        },
+        "origin_claim_check": {
+          "status": "fail",
+          "notes": ["forbidden origin posture is represented only as a blocked audit condition"]
+        },
+        "ownership_claim_check": {
+          "status": "pass",
+          "notes": ["no ownership claim is accepted"]
+        },
+        "evidence_anchor_check": {
+          "status": "pass",
+          "notes": ["blocked audit anchor is present"]
+        }
+      },
+      "witnesses": [
+        {
+          "witness_id": "witness.blocked.normalization",
+          "witness_type": "input_normalization",
+          "witness_level": "fact",
+          "anchor": "fixture.cases[2].normalized_word"
+        },
+        {
+          "witness_id": "witness.blocked.vowel-path",
+          "witness_type": "vowel_path",
+          "witness_level": "rule_inference",
+          "anchor": "fixture.cases[2].functional_vowel_path"
+        },
+        {
+          "witness_id": "witness.blocked.claim",
+          "witness_type": "blocked_claim",
+          "witness_level": "blocked",
+          "anchor": "fixture.cases[2].isolation_audit.origin_claim_check"
+        },
+        {
+          "witness_id": "witness.blocked.isolation-audit",
+          "witness_type": "isolation_audit",
+          "witness_level": "blocked",
+          "anchor": "fixture.cases[2].isolation_audit"
+        }
+      ],
+      "blocked_claims": [
+        "proven_origin",
+        "true_origin",
+        "final_etymology",
+        "linguistic_ownership",
+        "candidate_truth",
+        "provider_as_evidence",
+        "publication_grade_proof"
+      ],
+      "null_reason": "forbidden_origin_claim",
+      "source_note": "This passive fixture records candidate semantic transparency and meaning-motivation only. It does not claim origin, historical ownership, final etymology, or publication-grade proof.",
+      "diagnostic_notes": [
+        "blocked case validates forbidden claim handling",
+        "static fixture only",
+        "not runtime wiring"
+      ]
+    }
+  ]
+}
