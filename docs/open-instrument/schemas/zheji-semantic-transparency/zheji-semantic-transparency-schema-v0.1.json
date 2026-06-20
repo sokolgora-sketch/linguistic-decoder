@@ -1,0 +1,293 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-instrument.local/schemas/zheji-semantic-transparency-schema-v0.1.json",
+  "title": "Zheji Semantic Transparency Layer v0.1 Passive Schema",
+  "description": "Passive schema for candidate semantic transparency artifacts. This schema is not runtime wiring and does not prove origin, ownership, final etymology, or publication-grade truth.",
+  "$comment": "Design: docs/open-instrument/zheji-semantic-transparency-layer-v0.1.md. Scope review: docs/open-instrument/reviews/zheji-semantic-transparency-passive-artifact-scope-review-v0.1.md.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "posture",
+    "target_word",
+    "normalized_word",
+    "surface_vowels",
+    "functional_vowel_path",
+    "transparency_status",
+    "claim_policy",
+    "free_operator_candidates",
+    "carrier_claims",
+    "code_f",
+    "code_e",
+    "isolation_audit",
+    "witnesses",
+    "blocked_claims",
+    "null_reason",
+    "source_note",
+    "diagnostic_notes"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "zheji_semantic_transparency.v0.1"
+    },
+    "posture": {
+      "const": "design_only_non_wiring"
+    },
+    "target_word": {
+      "type": "string",
+      "minLength": 1
+    },
+    "normalized_word": {
+      "type": "string",
+      "minLength": 1
+    },
+    "surface_vowels": {
+      "type": "array",
+      "items": {
+        "enum": ["A", "E", "I", "O", "U", "Y", "Ë"]
+      }
+    },
+    "functional_vowel_path": {
+      "type": "array",
+      "items": {
+        "enum": ["A", "E", "I", "O", "U", "Y", "Ë"]
+      }
+    },
+    "transparency_status": {
+      "enum": [
+        "not_evaluated",
+        "null_no_transparency",
+        "insufficient_evidence",
+        "candidate_transparency",
+        "partial_transparency",
+        "strong_candidate_transparency",
+        "blocked_forbidden_claim"
+      ]
+    },
+    "claim_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "no_single_winner",
+        "non_origin_claim",
+        "non_ownership_claim",
+        "candidate_only",
+        "evidence_anchored",
+        "null_allowed"
+      ],
+      "properties": {
+        "no_single_winner": { "const": true },
+        "non_origin_claim": { "const": true },
+        "non_ownership_claim": { "const": true },
+        "candidate_only": { "const": true },
+        "evidence_anchored": { "const": true },
+        "null_allowed": { "const": true }
+      }
+    },
+    "free_operator_candidates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "operator_id",
+          "surface_form",
+          "language",
+          "function_gloss",
+          "carrier_type",
+          "eligibility_status",
+          "eligibility_reasons",
+          "block_reasons",
+          "evidence_anchors",
+          "confidence_label"
+        ],
+        "properties": {
+          "operator_id": { "type": "string", "minLength": 1 },
+          "surface_form": { "type": "string", "minLength": 1 },
+          "language": { "type": "string", "minLength": 1 },
+          "function_gloss": { "type": "string", "minLength": 1 },
+          "carrier_type": {
+            "enum": [
+              "standalone_word",
+              "bound_morpheme_candidate",
+              "function_root_candidate",
+              "semantic_echo",
+              "unknown"
+            ]
+          },
+          "eligibility_status": {
+            "enum": [
+              "eligible_candidate",
+              "partial_candidate",
+              "rejected_forced_substring",
+              "rejected_semantic_stretch",
+              "rejected_provider_only",
+              "rejected_unanchored",
+              "not_evaluated"
+            ]
+          },
+          "eligibility_reasons": {
+            "type": "array",
+            "items": { "type": "string", "minLength": 1 }
+          },
+          "block_reasons": {
+            "type": "array",
+            "items": { "type": "string", "minLength": 1 }
+          },
+          "evidence_anchors": {
+            "type": "array",
+            "items": { "type": "string", "minLength": 1 }
+          },
+          "confidence_label": {
+            "enum": ["fact", "rule_inference", "hypothesis", "weak_echo", "blocked"]
+          }
+        }
+      }
+    },
+    "carrier_claims": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["claim_id", "operator_id", "claim_text", "witness_level", "evidence_anchors"],
+        "properties": {
+          "claim_id": { "type": "string", "minLength": 1 },
+          "operator_id": { "type": "string", "minLength": 1 },
+          "claim_text": { "type": "string", "minLength": 1 },
+          "witness_level": {
+            "enum": ["fact", "rule_inference", "hypothesis", "weak_echo", "blocked"]
+          },
+          "evidence_anchors": {
+            "type": "array",
+            "items": { "type": "string", "minLength": 1 }
+          }
+        }
+      }
+    },
+    "code_f": {
+      "$ref": "#/$defs/codeVisibility"
+    },
+    "code_e": {
+      "$ref": "#/$defs/codeVisibility"
+    },
+    "isolation_audit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "standalone_check",
+        "function_check",
+        "substring_force_check",
+        "semantic_stretch_check",
+        "provider_only_check",
+        "origin_claim_check",
+        "ownership_claim_check",
+        "evidence_anchor_check"
+      ],
+      "properties": {
+        "standalone_check": { "$ref": "#/$defs/auditCheck" },
+        "function_check": { "$ref": "#/$defs/auditCheck" },
+        "substring_force_check": { "$ref": "#/$defs/auditCheck" },
+        "semantic_stretch_check": { "$ref": "#/$defs/auditCheck" },
+        "provider_only_check": { "$ref": "#/$defs/auditCheck" },
+        "origin_claim_check": { "$ref": "#/$defs/auditCheck" },
+        "ownership_claim_check": { "$ref": "#/$defs/auditCheck" },
+        "evidence_anchor_check": { "$ref": "#/$defs/auditCheck" }
+      }
+    },
+    "witnesses": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["witness_id", "witness_type", "witness_level", "anchor"],
+        "properties": {
+          "witness_id": { "type": "string", "minLength": 1 },
+          "witness_type": {
+            "enum": [
+              "input_normalization",
+              "vowel_path",
+              "carrier_function",
+              "isolation_audit",
+              "source_note",
+              "blocked_claim"
+            ]
+          },
+          "witness_level": {
+            "enum": ["fact", "rule_inference", "hypothesis", "weak_echo", "blocked"]
+          },
+          "anchor": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "blocked_claims": {
+      "type": "array",
+      "contains": { "const": "proven_origin" },
+      "items": {
+        "enum": [
+          "proven_origin",
+          "true_origin",
+          "final_etymology",
+          "linguistic_ownership",
+          "candidate_truth",
+          "provider_as_evidence",
+          "publication_grade_proof"
+        ]
+      }
+    },
+    "null_reason": {
+      "enum": [
+        null,
+        "no_free_operator_candidate",
+        "no_functional_alignment",
+        "insufficient_evidence",
+        "forced_substring_only",
+        "provider_only_support",
+        "forbidden_origin_claim",
+        "forbidden_ownership_claim",
+        "not_evaluated"
+      ]
+    },
+    "source_note": {
+      "type": "string",
+      "minLength": 1
+    },
+    "diagnostic_notes": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    }
+  },
+  "$defs": {
+    "codeVisibility": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "rationale", "evidence_anchors"],
+      "properties": {
+        "status": {
+          "enum": ["not_evaluated", "visible", "partial", "blocked", "absent"]
+        },
+        "rationale": {
+          "type": "string",
+          "minLength": 1
+        },
+        "evidence_anchors": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "auditCheck": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "notes"],
+      "properties": {
+        "status": {
+          "enum": ["pass", "warn", "fail", "not_evaluated"]
+        },
+        "notes": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    }
+  }
+}
