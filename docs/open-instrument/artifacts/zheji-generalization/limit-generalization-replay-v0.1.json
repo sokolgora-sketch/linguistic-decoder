@@ -2,7 +2,7 @@
   "schemaVersion": "open-instrument.limit-generalization-replay.v0.1",
   "capturePacketId": "open-instrument.limit-generalization-replay.packet.v0.1",
   "source": {
-    "reviewedExecutionBaseSha": "f03ad84c799be1bbe08756ff9f7fadceb44bfe0e",
+    "reviewedExecutionBaseSha": "a663165e00b9f7f9754ff60c6e7e75f02bcf98a8",
     "promptSourcePath": "src/shared/openInstrument/brainCandidateSearchPrompt.v0.1.ts",
     "promptSourceContainsIsolationAudit": true,
     "promptGuardTestCommand": "npm test -- tests/openInstrument.brainCandidateSearchPrompt.isolationAudit.guard.v0.1.spec.ts --runInBand",
@@ -26,7 +26,7 @@
   "prechecks": {
     "workingTreeClean": true,
     "currentBranch": "main",
-    "currentHeadSha": "f03ad84c799be1bbe08756ff9f7fadceb44bfe0e",
+    "currentHeadSha": "a663165e00b9f7f9754ff60c6e7e75f02bcf98a8",
     "mainShaMatchesReviewedExecutionBase": true,
     "isolationAuditPresent": true,
     "promptGuardTestPassed": true,
@@ -69,9 +69,9 @@
   "responseIdentity": {
     "responseCaptureMethod": "chat_completions_message_content",
     "rawCaptureKind": "provider_response",
-    "rawProviderResponse": "{\"id\":\"chatcmpl-621\",\"object\":\"chat.completion\",\"created\":1782039442,\"model\":\"llama3.1:8b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\n  \\\"word\\\": \\\"limit\\\",\\n  \\\"stage\\\": \\\"MIXED_STAGE_ORTHOGRAPHIC_PRIMARY_WITH_PHONETIC_SANITY\\\",\\n  \\\"segmentation\\\": \\\"LI + MIT\\\",\\n  \\\"candidate\\\": null,\\n  \\\"nullAccepted\\\": true,\\n  \\\"claimBoundary\\\": {\\n    \\\"developmentOnly\\\": true,\\n    \\\"publicationEvidence\\\": false,\\n    \\\"originEvidence\\\": false,\\n    \\\"ownershipEvidence\\\": false,\\n    \\\"modelQualityEvidence\\\": false,\\n    \\\"providerOutputCorrectnessEvidence\\\": false,\\n    \\\"candidateTruthEvidence\\\": false,\\n    \\\"evidencePromotion\\\": false,\\n    \\\"winnerCrowned\\\": false\\n  }\\n}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":334,\"completion_tokens\":135,\"total_tokens\":469}}\n",
+    "rawProviderResponse": "{\"id\":\"chatcmpl-75\",\"object\":\"chat.completion\",\"created\":1782053622,\"model\":\"llama3.1:8b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\n  \\\"word\\\": \\\"limit\\\",\\n  \\\"stage\\\": \\\"MIXED_STAGE_ORTHOGRAPHIC_PRIMARY_WITH_PHONETIC_SANITY\\\",\\n  \\\"segmentation\\\": \\\"LI + MIT\\\",\\n  \\\"candidate\\\": null,\\n  \\\"nullAccepted\\\": true,\\n  \\\"claimBoundary\\\": {\\n    \\\"developmentOnly\\\": true,\\n    \\\"publicationEvidence\\\": false,\\n    \\\"originEvidence\\\": false,\\n    \\\"ownershipEvidence\\\": false,\\n    \\\"modelQualityEvidence\\\": false,\\n    \\\"providerOutputCorrectnessEvidence\\\": false,\\n    \\\"candidateTruthEvidence\\\": false,\\n    \\\"evidencePromotion\\\": false,\\n    \\\"winnerCrowned\\\": false\\n  }\\n}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":334,\"completion_tokens\":135,\"total_tokens\":469}}\n",
     "rawErrorText": null,
-    "responseSha256": "50eaa851024ecc19bb51f660cf9fe163db619d4a0acabc68ddc9d9969e191291",
+    "responseSha256": "2d1668adbd5e706425392fbe6239750a3e2e3a65c9722879a1c0538658e8b494",
     "responseRetentionPolicy": "artifact_only_development_only",
     "responseMutationPolicy": "response_text_immutable"
   },
@@ -93,6 +93,50 @@
     "claimBoundaryAccepted": false
   },
   "outcomeClassification": "REPLAY_INVALIDATED",
+  "invalidationCode": "VALIDATION_FAILED",
+  "invalidationStage": "validation",
+  "invalidationReason": "root.errors[0]: response.word must equal \"limit\"",
+  "failedCheck": "validation",
+  "expectedShape": "Provider output should be present, parseable, validation-diagnostic-bearing when invalidated, and claim-boundary safe.",
+  "receivedShapeSummary": {
+    "providerOutput": "string(length=834)",
+    "parsedOutput": "object(keys=normalizedCandidatePayload,outcomeClassification,validationOutcome)",
+    "validation": "object(keys=candidatePresent,claimBoundaryAccepted,errors,nullAccepted,status)",
+    "parseError": "null"
+  },
+  "parserStatus": "PARSED_OR_ATTACHED",
+  "validatorStatus": "FAILED",
+  "providerOutputPresent": true,
+  "providerOutputParseable": true,
+  "claimBoundaryStatus": "ATTACHED",
+  "invalidationDiagnostics": {
+    "invalidationCode": "VALIDATION_FAILED",
+    "invalidationStage": "validation",
+    "invalidationReason": "root.errors[0]: response.word must equal \"limit\"",
+    "failedCheck": "validation",
+    "expectedShape": "Provider output should be present, parseable, validation-diagnostic-bearing when invalidated, and claim-boundary safe.",
+    "receivedShapeSummary": {
+      "providerOutput": "string(length=834)",
+      "parsedOutput": "object(keys=normalizedCandidatePayload,outcomeClassification,validationOutcome)",
+      "validation": "object(keys=candidatePresent,claimBoundaryAccepted,errors,nullAccepted,status)",
+      "parseError": "null"
+    },
+    "parserStatus": "PARSED_OR_ATTACHED",
+    "validatorStatus": "FAILED",
+    "providerOutputPresent": true,
+    "providerOutputParseable": true,
+    "claimBoundaryStatus": "ATTACHED",
+    "diagnosticMessages": [
+      "root.errors[0]: response.word must equal \"limit\"",
+      "root.errors[1]: response.stage must equal \"MIXED_STAGE_ORTHOGRAPHIC_PRIMARY_WITH_PHONETIC_SANITY\"",
+      "root.errors[2]: response.segmentation must equal \"LI + MIT\"",
+      "root.errors[3]: response.candidate is required",
+      "root.errors[4]: response.nullAccepted is required",
+      "root.errors[5]: response.claimBoundary is required",
+      "root.errors[6]: nullAccepted must be true when no candidate is present",
+      "root.errors[7]: claimBoundary must preserve the reviewed non-evidence boundary"
+    ]
+  },
   "failureClassification": "REPLAY_INVALIDATED",
   "claimBoundary": {
     "developmentOnly": true,
