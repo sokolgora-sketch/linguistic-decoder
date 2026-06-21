@@ -59,6 +59,32 @@ describe("Open Instrument limit replay runner execution-base contract v0.1", () 
     expect(source).toContain('const EXPECTED_BASE_URL = "http://127.0.0.1:11434/v1";');
   });
 
+
+  it("emits invalidation diagnostics for invalidated replay artifacts", () => {
+    expect(source).toContain("function buildInvalidationDiagnostics(");
+    expect(source).toContain("invalidationCode");
+    expect(source).toContain("invalidationStage");
+    expect(source).toContain("invalidationReason");
+    expect(source).toContain("failedCheck");
+    expect(source).toContain("expectedShape");
+    expect(source).toContain("receivedShapeSummary");
+    expect(source).toContain("parserStatus");
+    expect(source).toContain("validatorStatus");
+    expect(source).toContain("providerOutputPresent");
+    expect(source).toContain("providerOutputParseable");
+    expect(source).toContain("claimBoundaryStatus");
+    expect(source).toContain("diagnosticMessages");
+
+    expect(source).toContain("PROVIDER_OUTPUT_MISSING");
+    expect(source).toContain("PROVIDER_OUTPUT_UNPARSEABLE");
+    expect(source).toContain("VALIDATION_FAILED");
+    expect(source).toContain("INVALIDATED_WITHOUT_ATTACHED_CAUSE");
+
+    expect(source).toContain("invalidationCode: invalidationDiagnostics.invalidationCode");
+    expect(source).toContain("invalidationReason: invalidationDiagnostics.invalidationReason");
+    expect(source).toContain("invalidationDiagnostics");
+  });
+
   it("preserves localhost-only and claim-boundary protections", () => {
     expect(source).toContain("OPENAI_BASE_URL must be localhost-only");
     expect(source).toContain("OPENAI_API_KEY must be the reviewed local dummy value");
