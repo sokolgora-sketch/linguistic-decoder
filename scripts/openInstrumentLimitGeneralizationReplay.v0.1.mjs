@@ -541,6 +541,169 @@ function analyzeResponse(rawResponseText, requestContext) {
   return analysis;
 }
 
+
+function summarizeShape(value) {
+  if (value === undefined) return "undefined";
+  if (value === null) return "null";
+  if (Array.isArray(value)) return `array(length=${value.length})`;
+  if (typeof value === "object") {
+    return `object(keys=${Object.keys(value).sort().join(",") || "none"})`;
+  }
+  if (typeof value === "string") return `string(length=${value.length})`;
+  return typeof value;
+}
+
+function collectDiagnosticStrings(value, path = "root", output = []) {
+  if (output.length >= 12) return output;
+
+  if (value === undefined || value === null) return output;
+
+  if (typeof value === "string") {
+    if (value.trim()) output.push(`${path}: ${value.trim().slice(0, 240)}`);
+    return output;
+  }
+
+  if (typeof value === "number" || typeof value === "boolean") {
+    output.push(`${path}: ${String(value)}`);
+    return output;
+  }
+
+  if (Array.isArray(value)) {
+    value.slice(0, 12).forEach((item, index) => {
+      collectDiagnosticStrings(item, `${path}[${index}]`, output);
+    });
+    return output;
+  }
+
+  if (typeof value === "object") {
+    for (const key of [
+      "error",
+      "errors",
+      "message",
+      "reason",
+      "failureReason",
+      "invalidationReason",
+      "errorCode",
+      "code",
+      "failedCheck",
+      "expected",
+      "received",
+      "issues",
+      "diagnostics",
+    ]) {
+      if (Object.prototype.hasOwnProperty.call(value, key)) {
+        collectDiagnosticStrings(value[key], `${path}.${key}`, output);
+      }
+      if (output.length >= 12) return output;
+    }
+  }
+
+  return output;
+}
+
+function buildInvalidationDiagnostics({
+  outcomeClassification,
+  providerOutput,
+  rawText,
+  responseText,
+  providerText,
+  parsedOutput,
+  parsedJson,
+  validation,
+  validationResult,
+  validationErrors,
+  parseError,
+  claimBoundary,
+}) {
+  const classification = outcomeClassification ?? "UNKNOWN";
+  const providerPayload = providerOutput ?? rawText ?? responseText ?? providerText;
+  const parsedPayload = parsedOutput ?? parsedJson;
+  const validationPayload = validation ?? validationResult ?? validationErrors;
+
+  const providerOutputPresent =
+    providerPayload !== undefined &&
+    providerPayload !== null &&
+    !(typeof providerPayload === "string" && providerPayload.trim() === "");
+
+  const providerOutputParseable = parsedPayload !== undefined && parsedPayload !== null;
+
+  const validationDiagnostics = collectDiagnosticStrings(validationPayload);
+  const parseDiagnostics = collectDiagnosticStrings(parseError);
+  const combinedDiagnostics = [...parseDiagnostics, ...validationDiagnostics].filter(Boolean);
+
+  const validationOk =
+    validationPayload &&
+    typeof validationPayload === "object" &&
+    "ok" in validationPayload
+      ? Boolean(validationPayload.ok)
+      : combinedDiagnostics.length === 0
+        ? "UNKNOWN"
+        : false;
+
+  let invalidationCode = "NOT_INVALIDATED";
+  let invalidationStage = "not_applicable";
+  let invalidationReason = "Replay was not classified as invalidated.";
+  let failedCheck = "none";
+
+  if (classification === "REPLAY_INVALIDATED") {
+    if (!providerOutputPresent) {
+      invalidationCode = "PROVIDER_OUTPUT_MISSING";
+      invalidationStage = "provider_capture";
+      invalidationReason = "Replay was invalidated because no provider output payload was available to artifact construction.";
+      failedCheck = "providerOutputPresent";
+    } else if (!providerOutputParseable) {
+      invalidationCode = "PROVIDER_OUTPUT_UNPARSEABLE";
+      invalidationStage = "parse";
+      invalidationReason = "Replay was invalidated because provider output was present but no parsed output was available to artifact construction.";
+      failedCheck = "providerOutputParseable";
+    } else if (validationOk === false) {
+      invalidationCode = "VALIDATION_FAILED";
+      invalidationStage = "validation";
+      invalidationReason =
+        combinedDiagnostics[0] ??
+        "Replay was invalidated because validation failed without a more specific diagnostic message.";
+      failedCheck = "validation";
+    } else {
+      invalidationCode = "INVALIDATED_WITHOUT_ATTACHED_CAUSE";
+      invalidationStage = "artifact_classification";
+      invalidationReason =
+        "Replay was classified as invalidated but the runner did not attach a concrete parser or validator failure source.";
+      failedCheck = "diagnostic_source";
+    }
+  }
+
+  return {
+    invalidationCode,
+    invalidationStage,
+    invalidationReason,
+    failedCheck,
+    expectedShape:
+      "Provider output should be present, parseable, validation-diagnostic-bearing when invalidated, and claim-boundary safe.",
+    receivedShapeSummary: {
+      providerOutput: summarizeShape(providerPayload),
+      parsedOutput: summarizeShape(parsedPayload),
+      validation: summarizeShape(validationPayload),
+      parseError: summarizeShape(parseError),
+    },
+    parserStatus: providerOutputPresent
+      ? providerOutputParseable
+        ? "PARSED_OR_ATTACHED"
+        : "UNPARSEABLE_OR_NOT_ATTACHED"
+      : "NO_PROVIDER_OUTPUT",
+    validatorStatus:
+      validationOk === true
+        ? "PASSED"
+        : validationOk === false
+          ? "FAILED"
+          : "UNKNOWN",
+    providerOutputPresent,
+    providerOutputParseable,
+    claimBoundaryStatus: claimBoundary ? "ATTACHED" : "NOT_EVALUATED_BY_DIAGNOSTICS",
+    diagnosticMessages: combinedDiagnostics,
+  };
+}
+
+
 function buildArtifact({
   currentHeadSha,
   args,
@@ -555,7 +718,23 @@ function buildArtifact({
   const capturedText = rawProviderResponse ?? rawErrorText ?? "";
   const responseSha256 = hasText(capturedText) ? sha256(capturedText) : null;
 
-  return {
+
+  const invalidationDiagnostics = buildInvalidationDiagnostics({
+    outcomeClassification: typeof outcomeClassification === "undefined" ? undefined : outcomeClassification,
+    providerOutput: typeof providerOutput === "undefined" ? undefined : providerOutput,
+    rawText: typeof rawText === "undefined" ? undefined : rawText,
+    responseText: typeof responseText === "undefined" ? undefined : responseText,
+    providerText: typeof providerText === "undefined" ? undefined : providerText,
+    parsedOutput: typeof parsedOutput === "undefined" ? undefined : parsedOutput,
+    parsedJson: typeof parsedJson === "undefined" ? undefined : parsedJson,
+    validation: typeof validation === "undefined" ? undefined : validation,
+    validationResult: typeof validationResult === "undefined" ? undefined : validationResult,
+    validationErrors: typeof validationErrors === "undefined" ? undefined : validationErrors,
+    parseError: typeof parseError === "undefined" ? undefined : parseError,
+    claimBoundary: typeof claimBoundary === "undefined" ? undefined : claimBoundary,
+  });
+
+return {
     schemaVersion: "open-instrument.limit-generalization-replay.v0.1",
     capturePacketId: "open-instrument.limit-generalization-replay.packet.v0.1",
     source: {
@@ -619,6 +798,19 @@ function buildArtifact({
     normalizedCandidatePayload: analysis.normalizedCandidatePayload,
     validationOutcome: analysis.validationOutcome,
     outcomeClassification: analysis.outcomeClassification,
+    invalidationCode: invalidationDiagnostics.invalidationCode,
+    invalidationStage: invalidationDiagnostics.invalidationStage,
+    invalidationReason: invalidationDiagnostics.invalidationReason,
+    failedCheck: invalidationDiagnostics.failedCheck,
+    expectedShape: invalidationDiagnostics.expectedShape,
+    receivedShapeSummary: invalidationDiagnostics.receivedShapeSummary,
+    parserStatus: invalidationDiagnostics.parserStatus,
+    validatorStatus: invalidationDiagnostics.validatorStatus,
+    providerOutputPresent: invalidationDiagnostics.providerOutputPresent,
+    providerOutputParseable: invalidationDiagnostics.providerOutputParseable,
+    claimBoundaryStatus: invalidationDiagnostics.claimBoundaryStatus,
+    invalidationDiagnostics,
+
     failureClassification:
       analysis.outcomeClassification === "GENERALIZATION_SIGNAL_PRESENT" ||
       analysis.outcomeClassification === "GENERALIZATION_NULL_ACCEPTED"
