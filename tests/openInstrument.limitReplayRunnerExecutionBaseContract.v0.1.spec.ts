@@ -86,6 +86,14 @@ describe("Open Instrument limit replay runner execution-base contract v0.1", () 
   });
 
 
+
+  it("extracts OpenAI-compatible chat completion message content before validation", () => {
+    expect(source).toContain("function extractOpenAiCompatibleMessageContentPayload(parsedPayload)");
+    expect(source).toContain("parsedPayload?.choices?.[0]?.message?.content");
+    expect(source).toContain("const rawParsedProviderResponse = JSON.parse(rawResponseText);");
+    expect(source).toContain("parsed = extractOpenAiCompatibleMessageContentPayload(rawParsedProviderResponse);");
+  });
+
   it("wires invalidation diagnostics to actual analysis and provider payload", () => {
     expect(source).toContain("outcomeClassification: analysis?.outcomeClassification");
     expect(source).toContain("providerOutput: rawProviderResponse ?? rawErrorText");

@@ -430,6 +430,20 @@ function classifyFailureFromRawText(rawText) {
   return "EXTRACTION_CONTRACT_FAILURE";
 }
 
+function extractOpenAiCompatibleMessageContentPayload(parsedPayload) {
+  const messageContent = parsedPayload?.choices?.[0]?.message?.content;
+
+  if (typeof messageContent !== "string" || messageContent.trim().length === 0) {
+    return parsedPayload;
+  }
+
+  try {
+    return JSON.parse(messageContent);
+  } catch {
+    return parsedPayload;
+  }
+}
+
 function analyzeResponse(rawResponseText, requestContext) {
   const analysis = {
     validationOutcome: {
@@ -445,7 +459,8 @@ function analyzeResponse(rawResponseText, requestContext) {
 
   let parsed;
   try {
-    parsed = JSON.parse(rawResponseText);
+    const rawParsedProviderResponse = JSON.parse(rawResponseText);
+    parsed = extractOpenAiCompatibleMessageContentPayload(rawParsedProviderResponse);
   } catch {
     analysis.outcomeClassification = classifyFailureFromRawText(rawResponseText);
     analysis.validationOutcome.errors.push("response is not valid JSON");
