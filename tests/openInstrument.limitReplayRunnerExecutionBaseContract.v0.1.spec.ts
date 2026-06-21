@@ -85,6 +85,23 @@ describe("Open Instrument limit replay runner execution-base contract v0.1", () 
     expect(source).toContain("invalidationDiagnostics");
   });
 
+
+  it("wires invalidation diagnostics to actual analysis and provider payload", () => {
+    expect(source).toContain("outcomeClassification: analysis?.outcomeClassification");
+    expect(source).toContain("providerOutput: rawProviderResponse ?? rawErrorText");
+    expect(source).toContain("rawText: capturedText");
+    expect(source).toContain("responseText: capturedText");
+    expect(source).toContain("parsedOutput: analysis");
+    expect(source).toContain("parsedJson: analysis?.normalizedCandidatePayload");
+    expect(source).toContain("validation: analysis?.validationOutcome");
+    expect(source).toContain("validationResult: analysis?.validationOutcome");
+    expect(source).toContain("validationErrors: analysis?.validationOutcome?.errors");
+    expect(source).toContain("parseError: analysis?.parseError ?? null");
+    expect(source).toContain("claimBoundary: analysis?.validationOutcome");
+
+    expect(source).not.toContain('outcomeClassification: typeof outcomeClassification === "undefined"');
+  });
+
   it("preserves localhost-only and claim-boundary protections", () => {
     expect(source).toContain("OPENAI_BASE_URL must be localhost-only");
     expect(source).toContain("OPENAI_API_KEY must be the reviewed local dummy value");

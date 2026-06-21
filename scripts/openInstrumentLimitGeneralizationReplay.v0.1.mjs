@@ -720,19 +720,19 @@ function buildArtifact({
 
 
   const invalidationDiagnostics = buildInvalidationDiagnostics({
-    outcomeClassification: typeof outcomeClassification === "undefined" ? undefined : outcomeClassification,
-    providerOutput: typeof providerOutput === "undefined" ? undefined : providerOutput,
-    rawText: typeof rawText === "undefined" ? undefined : rawText,
-    responseText: typeof responseText === "undefined" ? undefined : responseText,
-    providerText: typeof providerText === "undefined" ? undefined : providerText,
-    parsedOutput: typeof parsedOutput === "undefined" ? undefined : parsedOutput,
-    parsedJson: typeof parsedJson === "undefined" ? undefined : parsedJson,
-    validation: typeof validation === "undefined" ? undefined : validation,
-    validationResult: typeof validationResult === "undefined" ? undefined : validationResult,
-    validationErrors: typeof validationErrors === "undefined" ? undefined : validationErrors,
-    parseError: typeof parseError === "undefined" ? undefined : parseError,
-    claimBoundary: typeof claimBoundary === "undefined" ? undefined : claimBoundary,
+    outcomeClassification: analysis?.outcomeClassification,
+    providerOutput: rawProviderResponse ?? rawErrorText,
+    rawText: capturedText,
+    responseText: capturedText,
+    parsedOutput: analysis,
+    parsedJson: analysis?.normalizedCandidatePayload,
+    validation: analysis?.validationOutcome,
+    validationResult: analysis?.validationOutcome,
+    validationErrors: analysis?.validationOutcome?.errors,
+    parseError: analysis?.parseError ?? null,
+    claimBoundary: analysis?.validationOutcome,
   });
+
 
 return {
     schemaVersion: "open-instrument.limit-generalization-replay.v0.1",
