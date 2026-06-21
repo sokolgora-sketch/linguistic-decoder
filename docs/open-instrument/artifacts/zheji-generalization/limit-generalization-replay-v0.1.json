@@ -1,0 +1,108 @@
+{
+  "schemaVersion": "open-instrument.limit-generalization-replay.v0.1",
+  "capturePacketId": "open-instrument.limit-generalization-replay.packet.v0.1",
+  "source": {
+    "reviewedExecutionBaseSha": "f03ad84c799be1bbe08756ff9f7fadceb44bfe0e",
+    "promptSourcePath": "src/shared/openInstrument/brainCandidateSearchPrompt.v0.1.ts",
+    "promptSourceContainsIsolationAudit": true,
+    "promptGuardTestCommand": "npm test -- tests/openInstrument.brainCandidateSearchPrompt.isolationAudit.guard.v0.1.spec.ts --runInBand",
+    "passiveZhejiValidationCommand": "node scripts/openInstrumentZhejiSemanticTransparencyValidation.v0.1.mjs",
+    "passiveZhejiValidationTestCommand": "npm test -- tests/openInstrument.zhejiSemanticTransparencyValidation.v0.1.spec.ts --runInBand"
+  },
+  "executionRequest": {
+    "word": "limit",
+    "stage": "MIXED_STAGE_ORTHOGRAPHIC_PRIMARY_WITH_PHONETIC_SANITY",
+    "segmentation": "LI + MIT",
+    "providerFamily": "local_only_openai_compatible",
+    "providerName": "ollama_openai_compat",
+    "model": "llama3.1:8b",
+    "endpointClass": "localhost_only",
+    "outputPath": "docs/open-instrument/artifacts/zheji-generalization/limit-generalization-replay-v0.1.json",
+    "requestMethod": "POST",
+    "requestPath": "/chat/completions",
+    "temperature": 0,
+    "stream": false
+  },
+  "prechecks": {
+    "workingTreeClean": true,
+    "currentBranch": "main",
+    "currentHeadSha": "f03ad84c799be1bbe08756ff9f7fadceb44bfe0e",
+    "mainShaMatchesReviewedExecutionBase": true,
+    "isolationAuditPresent": true,
+    "promptGuardTestPassed": true,
+    "passiveZhejiValidationPassed": true,
+    "passiveZhejiValidationTestPassed": true
+  },
+  "providerIdentity": {
+    "providerFamily": "local_only_openai_compatible",
+    "providerName": "ollama_openai_compat",
+    "modelName": "llama3.1:8b",
+    "providerSelectionPolicy": "explicit_only_local_only",
+    "providerFallbackAllowed": false,
+    "automaticProviderSelectionAllowed": false,
+    "providerDefaultMutationAllowed": false
+  },
+  "endpointIdentity": {
+    "endpointClass": "localhost_only",
+    "baseUrl": "http://127.0.0.1:11434/v1",
+    "endpointPath": "/v1/chat/completions",
+    "localOnly": true,
+    "remoteProviderEndpointAllowed": false,
+    "openAiHostedEndpointAllowed": false,
+    "deepSeekEndpointAllowed": false
+  },
+  "promptIdentity": {
+    "promptSourcePath": "src/shared/openInstrument/brainCandidateSearchPrompt.v0.1.ts",
+    "promptSourceStatus": "reviewed_and_audited",
+    "promptCanonicalizationMethod": "json_stringify_system_prompt_and_user_prompt_v0.1",
+    "promptSha256": "13c4ede2692cc68f017f4f543baf34750a04e3658c542f5441bb2a6960bb54c4",
+    "promptLength": 1659,
+    "promptMutationPolicy": "prompt_source_locked_no_mutation",
+    "promptIncludesIsolationAudit": true
+  },
+  "requestIdentity": {
+    "requestBodyCanonicalizationMethod": "json_stringify_request_body_v0.1",
+    "requestBodySha256": "4e847fbfb84c7ec6d06f70d342e1b4346f9ea9207b80c89390857f84f8252607",
+    "requestBodyLength": 1814,
+    "requestBodyMutationPolicy": "request_body_locked_no_mutation"
+  },
+  "responseIdentity": {
+    "responseCaptureMethod": "chat_completions_message_content",
+    "rawCaptureKind": "provider_response",
+    "rawProviderResponse": "{\"id\":\"chatcmpl-621\",\"object\":\"chat.completion\",\"created\":1782039442,\"model\":\"llama3.1:8b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\n  \\\"word\\\": \\\"limit\\\",\\n  \\\"stage\\\": \\\"MIXED_STAGE_ORTHOGRAPHIC_PRIMARY_WITH_PHONETIC_SANITY\\\",\\n  \\\"segmentation\\\": \\\"LI + MIT\\\",\\n  \\\"candidate\\\": null,\\n  \\\"nullAccepted\\\": true,\\n  \\\"claimBoundary\\\": {\\n    \\\"developmentOnly\\\": true,\\n    \\\"publicationEvidence\\\": false,\\n    \\\"originEvidence\\\": false,\\n    \\\"ownershipEvidence\\\": false,\\n    \\\"modelQualityEvidence\\\": false,\\n    \\\"providerOutputCorrectnessEvidence\\\": false,\\n    \\\"candidateTruthEvidence\\\": false,\\n    \\\"evidencePromotion\\\": false,\\n    \\\"winnerCrowned\\\": false\\n  }\\n}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":334,\"completion_tokens\":135,\"total_tokens\":469}}\n",
+    "rawErrorText": null,
+    "responseSha256": "50eaa851024ecc19bb51f660cf9fe163db619d4a0acabc68ddc9d9969e191291",
+    "responseRetentionPolicy": "artifact_only_development_only",
+    "responseMutationPolicy": "response_text_immutable"
+  },
+  "normalizedCandidatePayload": null,
+  "validationOutcome": {
+    "status": "failed_closed",
+    "errors": [
+      "response.word must equal \"limit\"",
+      "response.stage must equal \"MIXED_STAGE_ORTHOGRAPHIC_PRIMARY_WITH_PHONETIC_SANITY\"",
+      "response.segmentation must equal \"LI + MIT\"",
+      "response.candidate is required",
+      "response.nullAccepted is required",
+      "response.claimBoundary is required",
+      "nullAccepted must be true when no candidate is present",
+      "claimBoundary must preserve the reviewed non-evidence boundary"
+    ],
+    "candidatePresent": false,
+    "nullAccepted": false,
+    "claimBoundaryAccepted": false
+  },
+  "outcomeClassification": "REPLAY_INVALIDATED",
+  "failureClassification": "REPLAY_INVALIDATED",
+  "claimBoundary": {
+    "developmentOnly": true,
+    "publicationEvidence": false,
+    "originEvidence": false,
+    "ownershipEvidence": false,
+    "modelQualityEvidence": false,
+    "providerOutputCorrectnessEvidence": false,
+    "candidateTruthEvidence": false,
+    "evidencePromotion": false,
+    "winnerCrowned": false
+  }
+}
