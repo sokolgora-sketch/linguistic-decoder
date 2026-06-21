@@ -10,7 +10,7 @@ const source = fs.readFileSync(runnerPath, "utf8");
 
 describe("Open Instrument limit replay runner execution-base contract v0.1", () => {
   it("does not hardcode the stale reviewed execution base SHA", () => {
-    expect(source).not.toContain(["const EXPECTED", "MAIN_SHA"].join("_"));
+    expect(source).not.toContain(["EXPECTED", "MAIN", "SHA"].join("_"));
     expect(source).not.toContain(["4a4b2dc411b929c486e91ff80923fc728", "c44bfc6"].join(""));
   });
 
@@ -30,6 +30,20 @@ describe("Open Instrument limit replay runner execution-base contract v0.1", () 
     expect(source).toContain("main SHA does not match the reviewed execution base");
     expect(source).toContain("expected: reviewedExecutionBase");
     expect(source).toContain("actual: headSha");
+  });
+
+
+  it("passes verified current main SHA into artifact construction", () => {
+    const buildArtifactSignature = source.match(/function buildArtifact\(\{[\s\S]*?\n\}\) \{/);
+    expect(buildArtifactSignature?.[0]).toContain("currentHeadSha");
+
+    const artifactCall = source.match(/const artifact = buildArtifact\(\{[\s\S]*?\n  \}\);/);
+    expect(artifactCall?.[0]).toContain("currentHeadSha");
+
+    expect(source).toContain("reviewedExecutionBaseSha: currentHeadSha");
+    expect(source).toContain("currentHeadSha,");
+    expect(source).not.toContain("currentHeadSha: EXPECTED_MAIN_SHA");
+    expect(source).not.toContain(["EXPECTED", "MAIN", "SHA"].join("_"));
   });
 
   it("preserves the reviewed exact limit replay scope", () => {

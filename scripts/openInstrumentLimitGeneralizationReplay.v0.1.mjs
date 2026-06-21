@@ -542,6 +542,7 @@ function analyzeResponse(rawResponseText, requestContext) {
 }
 
 function buildArtifact({
+  currentHeadSha,
   args,
   prechecks,
   request,
@@ -582,7 +583,7 @@ function buildArtifact({
     prechecks: {
       workingTreeClean: true,
       currentBranch: "main",
-      currentHeadSha: EXPECTED_MAIN_SHA,
+      currentHeadSha,
       mainShaMatchesReviewedExecutionBase: true,
       isolationAuditPresent: true,
       promptGuardTestPassed: true,
@@ -744,6 +745,7 @@ async function runLimitGeneralizationReplay(argv = process.argv) {
   }
 
   const artifact = buildArtifact({
+    currentHeadSha,
     args,
     prechecks,
     request: {
