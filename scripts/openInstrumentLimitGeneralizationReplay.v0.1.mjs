@@ -8,7 +8,7 @@ import { fileURLToPath } from "node:url";
 const SCRIPT_DIR = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(SCRIPT_DIR, "..");
 
-const EXPECTED_MAIN_SHA = "4a4b2dc411b929c486e91ff80923fc728c44bfc6";
+const FULL_GIT_SHA_PATTERN = /^[0-9a-f]{40}$/;
 const EXPECTED_WORD = "limit";
 const EXPECTED_STAGE = "MIXED_STAGE_ORTHOGRAPHIC_PRIMARY_WITH_PHONETIC_SANITY";
 const EXPECTED_SEGMENTATION = "LI + MIT";
@@ -31,6 +31,7 @@ const REQUIRED_ARGS = [
   "model",
   "endpoint-class",
   "output",
+  "reviewed-execution-base",
 ];
 
 const CLAIM_BOUNDARY_FALSE_FIELDS = [
@@ -143,6 +144,7 @@ function parseArgs(argv) {
     model: args.model,
     endpointClass: args["endpoint-class"],
     output: args.output,
+    reviewedExecutionBase: args["reviewed-execution-base"],
   };
 }
 
@@ -156,7 +158,13 @@ function ensureWorkingTreeClean() {
   }
 }
 
-function ensureOnReviewedMainBase() {
+function ensureOnReviewedMainBase(reviewedExecutionBase) {
+  if (!FULL_GIT_SHA_PATTERN.test(reviewedExecutionBase)) {
+    failClosed("reviewed-execution-base must be a full 40-character git SHA", {
+      received: reviewedExecutionBase,
+    });
+  }
+
   const branch = runCommand("git", ["branch", "--show-current"]);
   if (branch.status !== 0) {
     failClosed("git branch --show-current failed before execution", branch);
@@ -170,9 +178,9 @@ function ensureOnReviewedMainBase() {
     failClosed("git rev-parse HEAD failed before execution", head);
   }
   const headSha = head.stdout.trim();
-  if (headSha !== EXPECTED_MAIN_SHA) {
+  if (headSha !== reviewedExecutionBase) {
     failClosed("main SHA does not match the reviewed execution base", {
-      expected: EXPECTED_MAIN_SHA,
+      expected: reviewedExecutionBase,
       actual: headSha,
     });
   }
@@ -550,7 +558,7 @@ function buildArtifact({
     schemaVersion: "open-instrument.limit-generalization-replay.v0.1",
     capturePacketId: "open-instrument.limit-generalization-replay.packet.v0.1",
     source: {
-      reviewedExecutionBaseSha: EXPECTED_MAIN_SHA,
+      reviewedExecutionBaseSha: currentHeadSha,
       promptSourcePath: EXPECTED_PROMPT_SOURCE_PATH,
       promptSourceContainsIsolationAudit: true,
       promptGuardTestCommand: prechecks.promptGuard.command,
@@ -664,7 +672,7 @@ async function runLimitGeneralizationReplay(argv = process.argv) {
   validateRequestedArgs(args);
   validateEnv();
   ensureWorkingTreeClean();
-  const currentHeadSha = ensureOnReviewedMainBase();
+  const currentHeadSha = ensureOnReviewedMainBase(args.reviewedExecutionBase);
   const promptAudit = ensureIsolationAuditPromptMarker();
   const precheckTranscripts = runRequiredPrechecks();
 
