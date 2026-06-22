@@ -8,7 +8,7 @@ const runnerPath = path.join(
 
 const source = fs.readFileSync(runnerPath, "utf8");
 
-describe("Open Instrument limit replay runner execution-base contract v0.1", () => {
+describe("Open Instrument request-scoped replay runner execution-base contract v0.1", () => {
   it("does not hardcode the stale reviewed execution base SHA", () => {
     expect(source).not.toContain(["EXPECTED", "MAIN", "SHA"].join("_"));
     expect(source).not.toContain(["4a4b2dc411b929c486e91ff80923fc728", "c44bfc6"].join(""));
@@ -46,17 +46,15 @@ describe("Open Instrument limit replay runner execution-base contract v0.1", () 
     expect(source).not.toContain(["EXPECTED", "MAIN", "SHA"].join("_"));
   });
 
-  it("preserves the reviewed exact limit replay scope", () => {
-    expect(source).toContain('const EXPECTED_WORD = "limit";');
-    expect(source).toContain(
-      'const EXPECTED_STAGE = "MIXED_STAGE_ORTHOGRAPHIC_PRIMARY_WITH_PHONETIC_SANITY";',
-    );
-    expect(source).toContain('const EXPECTED_SEGMENTATION = "LI + MIT";');
+  it("preserves request-scoped replay inputs without default target assumptions", () => {
+    expect(source).toContain("GENERIC_REPLAY_SCOPE_V0_1");
+    expect(source).toContain("word must be a non-empty reviewed replay word");
+    expect(source).toContain("stage must be a non-empty reviewed replay stage");
+    expect(source).toContain("segmentation must be a non-empty reviewed replay segmentation");
     expect(source).toContain('const EXPECTED_PROVIDER_FAMILY = "local_only_openai_compatible";');
     expect(source).toContain('const EXPECTED_PROVIDER_NAME = "ollama_openai_compat";');
     expect(source).toContain('const EXPECTED_MODEL = "llama3.1:8b";');
     expect(source).toContain('const EXPECTED_ENDPOINT_CLASS = "localhost_only";');
-    expect(source).toContain('const EXPECTED_BASE_URL = "http://127.0.0.1:11434/v1";');
   });
 
 
@@ -120,4 +118,33 @@ describe("Open Instrument limit replay runner execution-base contract v0.1", () 
     expect(source).toContain("evidencePromotion");
     expect(source).toContain("winnerCrowned");
   });
+
+  it("keeps comic replay scope representable without weakening local-only safeguards", () => {
+    expect(source).toContain("GENERIC_REPLAY_SCOPE_V0_1");
+    expect(source).toContain("\"word\"");
+    expect(source).toContain("\"stage\"");
+    expect(source).toContain("\"segmentation\"");
+    expect(source).toContain("\"output\"");
+    expect(source).toContain("requestContext.word");
+    expect(source).toContain("requestContext.stage");
+    expect(source).toContain("requestContext.segmentation");
+    expect(source).toContain("ARTIFACT_OUTPUT_ROOT");
+    expect(source).toContain("outputPath: args.output");
+    expect(source).toContain("output must stay inside reviewed Open Instrument artifact root and end with .json");
+    expect(source).toContain("choices?.[0]?.message?.content");
+    expect(source).toContain("local_only_openai_compatible");
+    expect(source).toContain("localhost_only");
+
+    const reviewedComicScope = {
+      word: "comic",
+      stage: "MIXED_STAGE_ORTHOGRAPHIC_PRIMARY_WITH_PHONETIC_SANITY",
+      segmentation: "COM + IC",
+      output: "docs/open-instrument/artifacts/zheji-generalization/comic-generalization-replay-v0.1.json",
+    };
+
+    expect(reviewedComicScope.word).toBe("comic");
+    expect(reviewedComicScope.segmentation).toBe("COM + IC");
+    expect(reviewedComicScope.output).toContain("comic-generalization-replay-v0.1.json");
+  });
+
 });

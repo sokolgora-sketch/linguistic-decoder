@@ -9,17 +9,14 @@ const SCRIPT_DIR = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(SCRIPT_DIR, "..");
 
 const FULL_GIT_SHA_PATTERN = /^[0-9a-f]{40}$/;
-const EXPECTED_WORD = "limit";
-const EXPECTED_STAGE = "MIXED_STAGE_ORTHOGRAPHIC_PRIMARY_WITH_PHONETIC_SANITY";
-const EXPECTED_SEGMENTATION = "LI + MIT";
+// GENERIC_REPLAY_SCOPE_V0_1: word, stage, segmentation, and output path are required reviewed request inputs.
 const EXPECTED_PROVIDER_FAMILY = "local_only_openai_compatible";
 const EXPECTED_PROVIDER_NAME = "ollama_openai_compat";
 const EXPECTED_MODEL = "llama3.1:8b";
 const EXPECTED_ENDPOINT_CLASS = "localhost_only";
 const EXPECTED_BASE_URL = "http://127.0.0.1:11434/v1";
 const EXPECTED_API_KEY = "ollama";
-const EXPECTED_OUTPUT_RELATIVE_PATH =
-  "docs/open-instrument/artifacts/zheji-generalization/limit-generalization-replay-v0.1.json";
+const ARTIFACT_OUTPUT_ROOT = "docs/open-instrument/artifacts/zheji-generalization/";
 const EXPECTED_PROMPT_SOURCE_PATH =
   "src/shared/openInstrument/brainCandidateSearchPrompt.v0.1.ts";
 const REQUIRED_ARGS = [
@@ -244,14 +241,14 @@ function runRequiredPrechecks() {
 }
 
 function validateRequestedArgs(args) {
-  if (args.word !== EXPECTED_WORD) {
-    failClosed("word must be limit", { received: args.word });
+  if (typeof args.word !== "string" || args.word.trim().length === 0) {
+    failClosed("word must be a non-empty reviewed replay word", { received: args.word });
   }
-  if (args.stage !== EXPECTED_STAGE) {
-    failClosed("stage must match the reviewed exact limit replay stage", { received: args.stage });
+  if (typeof args.stage !== "string" || args.stage.trim().length === 0) {
+    failClosed("stage must be a non-empty reviewed replay stage", { received: args.stage });
   }
-  if (args.segmentation !== EXPECTED_SEGMENTATION) {
-    failClosed("segmentation must be LI + MIT", { received: args.segmentation });
+  if (typeof args.segmentation !== "string" || args.segmentation.trim().length === 0) {
+    failClosed("segmentation must be a non-empty reviewed replay segmentation", { received: args.segmentation });
   }
   if (args.providerFamily !== EXPECTED_PROVIDER_FAMILY) {
     failClosed("provider-family must be local_only_openai_compatible", { received: args.providerFamily });
@@ -265,8 +262,17 @@ function validateRequestedArgs(args) {
   if (args.endpointClass !== EXPECTED_ENDPOINT_CLASS) {
     failClosed("endpoint-class must be localhost_only", { received: args.endpointClass });
   }
-  if (args.output !== EXPECTED_OUTPUT_RELATIVE_PATH) {
-    failClosed("output must match the reviewed exact passive artifact path", { received: args.output });
+  if (typeof args.output !== "string" || args.output.trim().length === 0) {
+    failClosed("output must be a non-empty reviewed artifact path", { received: args.output });
+  }
+  if (path.isAbsolute(args.output) || args.output.includes("..") || args.output.includes("\\")) {
+    failClosed("output must be a safe relative reviewed artifact path", { received: args.output });
+  }
+  if (!args.output.startsWith(ARTIFACT_OUTPUT_ROOT) || !args.output.endsWith(".json")) {
+    failClosed("output must stay inside reviewed Open Instrument artifact root and end with .json", {
+      received: args.output,
+      artifactRoot: ARTIFACT_OUTPUT_ROOT,
+    });
   }
 }
 
@@ -315,7 +321,7 @@ function validateEnv() {
 
 function buildPrompts({ word, stage, segmentation }) {
   const systemPrompt = [
-    "You are the Open Instrument exact limit replay assistant.",
+    "You are the Open Instrument exact reviewed replay assistant.",
     "Return strict JSON only.",
     "No markdown, no prose, no code fences.",
     "The output is candidate-only and development-only.",
@@ -474,9 +480,9 @@ function analyzeResponse(rawResponseText, requestContext) {
   }
 
   const structuralChecks = [
-    ["word", EXPECTED_WORD],
-    ["stage", EXPECTED_STAGE],
-    ["segmentation", EXPECTED_SEGMENTATION],
+    ["word", requestContext.word],
+    ["stage", requestContext.stage],
+    ["segmentation", requestContext.segmentation],
   ];
 
   for (const [field, expected] of structuralChecks) {
@@ -750,8 +756,8 @@ function buildArtifact({
 
 
 return {
-    schemaVersion: "open-instrument.limit-generalization-replay.v0.1",
-    capturePacketId: "open-instrument.limit-generalization-replay.packet.v0.1",
+    schemaVersion: "open-instrument.reviewed-generalization-replay.v0.1",
+    capturePacketId: "open-instrument.reviewed-generalization-replay.packet.v0.1",
     source: {
       reviewedExecutionBaseSha: currentHeadSha,
       promptSourcePath: EXPECTED_PROMPT_SOURCE_PATH,
@@ -768,7 +774,7 @@ return {
       providerName: args.providerName,
       model: args.model,
       endpointClass: args.endpointClass,
-      outputPath: EXPECTED_OUTPUT_RELATIVE_PATH,
+      outputPath: args.output,
       requestMethod: "POST",
       requestPath: "/chat/completions",
       temperature: 0,
@@ -967,11 +973,11 @@ async function runLimitGeneralizationReplay(argv = process.argv) {
   });
 
   const outputPath = path.resolve(ROOT, args.output);
-  const expectedOutputPath = path.resolve(ROOT, EXPECTED_OUTPUT_RELATIVE_PATH);
-  if (outputPath !== expectedOutputPath) {
-    failClosed("output path resolution failed the exact-path check", {
+  const artifactRootPath = path.resolve(ROOT, ARTIFACT_OUTPUT_ROOT);
+  if (!outputPath.startsWith(`${artifactRootPath}${path.sep}`)) {
+    failClosed("output path resolution escaped the reviewed artifact root", {
       outputPath,
-      expectedOutputPath,
+      artifactRootPath,
     });
   }
 
