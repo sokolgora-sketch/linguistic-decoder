@@ -191,4 +191,20 @@ describe("Open Instrument request-scoped replay runner execution-base contract v
     expect(source).toContain("Return nullAccepted true with candidate null when no chunk-language candidate is found.");
   });
 
+
+  it("constrains candidate language to reviewed allowlist", () => {
+    expect(source).toContain("const CANDIDATE_LANGUAGE_ALLOWLIST = Object.freeze([");
+    expect(source).toContain('"Albanian"');
+    expect(source).toContain('"Latin"');
+    expect(source).toContain('"Greek"');
+    expect(source).toContain('"Sanskrit"');
+    expect(source).toContain("function candidateLanguageIsAllowed(language)");
+    expect(source).toContain("candidate.language must be one of the reviewed candidate languages");
+  });
+
+  it("prompts Brain to use only reviewed candidate languages", () => {
+    expect(source).toContain("candidate.language must be one of:");
+    expect(source).toContain("CANDIDATE_LANGUAGE_ALLOWLIST.join");
+  });
+
 });
