@@ -2,7 +2,7 @@
   "schemaVersion": "open-instrument.reviewed-generalization-replay.v0.1",
   "capturePacketId": "open-instrument.reviewed-generalization-replay.packet.v0.1",
   "source": {
-    "reviewedExecutionBaseSha": "ab943de17a450353787e2f6083b5e4df77e31d70",
+    "reviewedExecutionBaseSha": "5b4a6efcef2516c212ec77b0c0bd7c80a9d4686f",
     "promptSourcePath": "src/shared/openInstrument/brainCandidateSearchPrompt.v0.1.ts",
     "promptSourceContainsIsolationAudit": true,
     "promptGuardTestCommand": "npm test -- tests/openInstrument.brainCandidateSearchPrompt.isolationAudit.guard.v0.1.spec.ts --runInBand",
@@ -26,7 +26,7 @@
   "prechecks": {
     "workingTreeClean": true,
     "currentBranch": "main",
-    "currentHeadSha": "ab943de17a450353787e2f6083b5e4df77e31d70",
+    "currentHeadSha": "5b4a6efcef2516c212ec77b0c0bd7c80a9d4686f",
     "mainShaMatchesReviewedExecutionBase": true,
     "isolationAuditPresent": true,
     "promptGuardTestPassed": true,
@@ -69,65 +69,63 @@
   "responseIdentity": {
     "responseCaptureMethod": "chat_completions_message_content",
     "rawCaptureKind": "provider_response",
-    "rawProviderResponse": "{\"id\":\"chatcmpl-877\",\"object\":\"chat.completion\",\"created\":1782111630,\"model\":\"llama3.1:8b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\n  \\\"word\\\": \\\"comic\\\",\\n  \\\"stage\\\": \\\"MIXED_STAGE_ORTHOGRAPHIC_PRIMARY_WITH_PHONETIC_SANITY\\\",\\n  \\\"segmentation\\\": \\\"COM + IC\\\",\\n  \\\"candidate\\\": {\\n    \\\"isolatedStandaloneForm\\\": \\\"comic\\\",\\n    \\\"plainStandaloneDefinitionGloss\\\": \\\"relating to or characteristic of comedy\\\"\\n  },\\n  \\\"nullAccepted\\\": false,\\n  \\\"claimBoundary\\\": {\\n    \\\"developmentOnly\\\": true,\\n    \\\"publicationEvidence\\\": false,\\n    \\\"originEvidence\\\": false,\\n    \\\"ownershipEvidence\\\": false,\\n    \\\"modelQualityEvidence\\\": false,\\n    \\\"providerOutputCorrectnessEvidence\\\": false,\\n    \\\"candidateTruthEvidence\\\": false,\\n    \\\"evidencePromotion\\\": false,\\n    \\\"winnerCrowned\\\": false\\n  }\\n}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":334,\"completion_tokens\":165,\"total_tokens\":499}}\n",
+    "rawProviderResponse": "{\"id\":\"chatcmpl-579\",\"object\":\"chat.completion\",\"created\":1782115349,\"model\":\"llama3.1:8b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\n  \\\"word\\\": \\\"comic\\\",\\n  \\\"stage\\\": \\\"MIXED_STAGE_ORTHOGRAPHIC_PRIMARY_WITH_PHONETIC_SANITY\\\",\\n  \\\"segmentation\\\": \\\"COM + IC\\\",\\n  \\\"candidate\\\": {\\n    \\\"isolatedStandaloneForm\\\": \\\"comic\\\",\\n    \\\"plainStandaloneDefinitionGloss\\\": \\\"relating to or characteristic of comedy\\\"\\n  },\\n  \\\"nullAccepted\\\": false,\\n  \\\"claimBoundary\\\": {\\n    \\\"developmentOnly\\\": true,\\n    \\\"publicationEvidence\\\": false,\\n    \\\"originEvidence\\\": false,\\n    \\\"ownershipEvidence\\\": false,\\n    \\\"modelQualityEvidence\\\": false,\\n    \\\"providerOutputCorrectnessEvidence\\\": false,\\n    \\\"candidateTruthEvidence\\\": false,\\n    \\\"evidencePromotion\\\": false,\\n    \\\"winnerCrowned\\\": false\\n  }\\n}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":334,\"completion_tokens\":165,\"total_tokens\":499}}\n",
     "rawErrorText": null,
-    "responseSha256": "0aa531c1e007bd865f754e36ee7869c09f046283743878d204f3a816135617ae",
+    "responseSha256": "e7fb0e978434a385dd19ae4cf4357a1849b22c3f8f4d98eb2b21148589a5498a",
     "responseRetentionPolicy": "artifact_only_development_only",
     "responseMutationPolicy": "response_text_immutable"
   },
-  "normalizedCandidatePayload": null,
+  "normalizedCandidatePayload": {
+    "isolatedStandaloneForm": "comic",
+    "plainStandaloneDefinitionGloss": "relating to or characteristic of comedy",
+    "notes": []
+  },
   "validationOutcome": {
-    "status": "failed_closed",
-    "errors": [
-      "response.word must equal undefined",
-      "response.stage must equal undefined",
-      "response.segmentation must equal undefined"
-    ],
+    "status": "passed",
+    "errors": [],
     "candidatePresent": true,
     "nullAccepted": false,
-    "claimBoundaryAccepted": true
+    "claimBoundaryAccepted": true,
+    "requestPromptSha256": "5175766fd12b53b3ce44914b8931c2fcdc271d48a3c48a1a60a874e5c655a412",
+    "requestBodySha256": "1bd9f5c4f04c8936a3e7c9b397a0fbda9ddb5fa9b822fc7f5899d2a1f0ebe7e2"
   },
-  "outcomeClassification": "REPLAY_INVALIDATED",
-  "invalidationCode": "VALIDATION_FAILED",
-  "invalidationStage": "validation",
-  "invalidationReason": "root.errors[0]: response.word must equal undefined",
-  "failedCheck": "validation",
+  "outcomeClassification": "GENERALIZATION_SIGNAL_PRESENT",
+  "invalidationCode": "NOT_INVALIDATED",
+  "invalidationStage": "not_applicable",
+  "invalidationReason": "Replay was not classified as invalidated.",
+  "failedCheck": "none",
   "expectedShape": "Provider output should be present, parseable, validation-diagnostic-bearing when invalidated, and claim-boundary safe.",
   "receivedShapeSummary": {
     "providerOutput": "string(length=967)",
     "parsedOutput": "object(keys=normalizedCandidatePayload,outcomeClassification,validationOutcome)",
-    "validation": "object(keys=candidatePresent,claimBoundaryAccepted,errors,nullAccepted,status)",
+    "validation": "object(keys=candidatePresent,claimBoundaryAccepted,errors,nullAccepted,requestBodySha256,requestPromptSha256,status)",
     "parseError": "null"
   },
   "parserStatus": "PARSED_OR_ATTACHED",
-  "validatorStatus": "FAILED",
+  "validatorStatus": "UNKNOWN",
   "providerOutputPresent": true,
   "providerOutputParseable": true,
   "claimBoundaryStatus": "ATTACHED",
   "invalidationDiagnostics": {
-    "invalidationCode": "VALIDATION_FAILED",
-    "invalidationStage": "validation",
-    "invalidationReason": "root.errors[0]: response.word must equal undefined",
-    "failedCheck": "validation",
+    "invalidationCode": "NOT_INVALIDATED",
+    "invalidationStage": "not_applicable",
+    "invalidationReason": "Replay was not classified as invalidated.",
+    "failedCheck": "none",
     "expectedShape": "Provider output should be present, parseable, validation-diagnostic-bearing when invalidated, and claim-boundary safe.",
     "receivedShapeSummary": {
       "providerOutput": "string(length=967)",
       "parsedOutput": "object(keys=normalizedCandidatePayload,outcomeClassification,validationOutcome)",
-      "validation": "object(keys=candidatePresent,claimBoundaryAccepted,errors,nullAccepted,status)",
+      "validation": "object(keys=candidatePresent,claimBoundaryAccepted,errors,nullAccepted,requestBodySha256,requestPromptSha256,status)",
       "parseError": "null"
     },
     "parserStatus": "PARSED_OR_ATTACHED",
-    "validatorStatus": "FAILED",
+    "validatorStatus": "UNKNOWN",
     "providerOutputPresent": true,
     "providerOutputParseable": true,
     "claimBoundaryStatus": "ATTACHED",
-    "diagnosticMessages": [
-      "root.errors[0]: response.word must equal undefined",
-      "root.errors[1]: response.stage must equal undefined",
-      "root.errors[2]: response.segmentation must equal undefined"
-    ]
+    "diagnosticMessages": []
   },
-  "failureClassification": "REPLAY_INVALIDATED",
+  "failureClassification": null,
   "claimBoundary": {
     "developmentOnly": true,
     "publicationEvidence": false,
