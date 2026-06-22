@@ -936,6 +936,9 @@ async function runLimitGeneralizationReplay(argv = process.argv) {
     } else {
       rawProviderResponse = await response.text();
       analysis = analyzeResponse(rawProviderResponse, {
+        word: args.word,
+        stage: args.stage,
+        segmentation: args.segmentation,
         systemPrompt: request.systemPrompt,
         userPrompt: request.userPrompt,
         promptSha256: request.promptSha256,
