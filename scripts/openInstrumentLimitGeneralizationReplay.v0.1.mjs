@@ -319,6 +319,56 @@ function validateEnv() {
   }
 }
 
+function normalizeComparableText(value) {
+  return String(value ?? "")
+    .trim()
+    .toLocaleLowerCase("en-US");
+}
+
+function parseReviewedSegmentationChunks(segmentation) {
+  return String(segmentation ?? "")
+    .split("+")
+    .map((chunk) => chunk.trim().toLocaleUpperCase("en-US"))
+    .filter(Boolean);
+}
+
+function sourceLanguageForRequest(argsOrContext) {
+  const word = normalizeComparableText(argsOrContext?.word);
+  if (word === "comic") {
+    return "English";
+  }
+  return "English";
+}
+
+function equalsComparableText(left, right) {
+  return normalizeComparableText(left) === normalizeComparableText(right);
+}
+
+function glossMentionsWholeInputWord(gloss, word) {
+  const normalizedGloss = ` ${normalizeComparableText(gloss).replace(/[^a-z0-9ë]+/g, " ")} `;
+  const normalizedWord = normalizeComparableText(word).replace(/[^a-z0-9ë]+/g, "");
+  return Boolean(normalizedWord) && normalizedGloss.includes(` ${normalizedWord} `);
+}
+
+function buildChunkLanguageAntiTautologyPrompt({ word, segmentation }) {
+  const reviewedChunks = parseReviewedSegmentationChunks(segmentation);
+  const sourceLanguage = sourceLanguageForRequest({ word });
+  return [
+    "Chunk-language anti-tautology candidate contract:",
+    `- Source language: ${sourceLanguage}.`,
+    `- Reviewed chunks: ${reviewedChunks.join(", ")}.`,
+    "- Do not define the full input word.",
+    "- Do not return the full input word as candidate.isolatedStandaloneForm.",
+    "- Every non-null candidate must include candidate.chunk.",
+    "- Every non-null candidate must include candidate.language.",
+    "- candidate.chunk must be one of the reviewed chunks.",
+    "- candidate.language must not equal the source language.",
+    "- candidate.isolatedStandaloneForm must not equal the full input word.",
+    "- Return nullAccepted true with candidate null when no chunk-language candidate is found.",
+    "- Preserve claimBoundary developmentOnly true, evidencePromotion false, winnerCrowned false.",
+  ].join("\n");
+}
+
 function buildPrompts({ word, stage, segmentation }) {
   const systemPrompt = [
     "You are the Open Instrument exact reviewed replay assistant.",
@@ -330,7 +380,7 @@ function buildPrompts({ word, stage, segmentation }) {
     "Do not claim origin evidence, ownership evidence, publication evidence, model-quality evidence, provider-output correctness evidence, or candidate-truth evidence.",
   ].join("\n");
 
-  const userPrompt = [
+  const baseUserPrompt = [
     `word: ${word}`,
     `stage: ${stage}`,
     `segmentation: ${segmentation}`,
@@ -345,7 +395,7 @@ function buildPrompts({ word, stage, segmentation }) {
     "word, stage, segmentation, candidate, nullAccepted, claimBoundary.",
     "",
     "candidate must be either null or an object with:",
-    "isolatedStandaloneForm, plainStandaloneDefinitionGloss, notes.",
+    "chunk, language, isolatedStandaloneForm, plainStandaloneDefinitionGloss, notes.",
     "",
     "claimBoundary must be an object with these exact boolean fields:",
     "developmentOnly, publicationEvidence, originEvidence, ownershipEvidence, modelQualityEvidence, providerOutputCorrectnessEvidence, candidateTruthEvidence, evidencePromotion, winnerCrowned.",
@@ -357,6 +407,7 @@ function buildPrompts({ word, stage, segmentation }) {
     "If no candidate is present, nullAccepted must be true.",
   ].join("\n");
 
+  const userPrompt = `${baseUserPrompt}\n\n${buildChunkLanguageAntiTautologyPrompt({ word, segmentation })}`;
   const promptCanonicalText = JSON.stringify({ systemPrompt, userPrompt }, null, 2);
   const promptSha256 = sha256(promptCanonicalText);
 
@@ -397,11 +448,14 @@ function normalizeCandidate(candidate) {
     candidate.plainStandaloneDefinitionGloss ?? candidate.gloss ?? candidate.definition ?? null;
 
   return {
+    chunk: String(candidate.chunk ?? "").trim().toLocaleUpperCase("en-US"),
+    language: String(candidate.language ?? "").trim(),
     isolatedStandaloneForm,
     plainStandaloneDefinitionGloss,
     notes: Array.isArray(candidate.notes) ? candidate.notes : [],
   };
 }
+
 
 function claimBoundaryIsValid(boundary) {
   if (!isObject(boundary) || boundary.developmentOnly !== true) {
@@ -510,12 +564,36 @@ function analyzeResponse(rawResponseText, requestContext) {
   if (candidatePresent && candidate === null) {
     analysis.validationOutcome.errors.push("candidate must be an object when present");
   }
+
   if (candidatePresent && candidate) {
     if (!hasText(candidate.isolatedStandaloneForm)) {
       analysis.validationOutcome.errors.push("candidate.isolatedStandaloneForm must be a non-empty string");
     }
     if (!hasText(candidate.plainStandaloneDefinitionGloss)) {
       analysis.validationOutcome.errors.push("candidate.plainStandaloneDefinitionGloss must be a non-empty string");
+    }
+
+    const reviewedChunks = new Set(parseReviewedSegmentationChunks(requestContext.segmentation));
+    const sourceLanguage = String(requestContext.sourceLanguage ?? sourceLanguageForRequest(requestContext));
+
+    if (!hasText(candidate.chunk)) {
+      analysis.validationOutcome.errors.push("candidate.chunk must be a non-empty reviewed segmentation chunk");
+    } else if (!reviewedChunks.has(candidate.chunk)) {
+      analysis.validationOutcome.errors.push("candidate.chunk must be one of the reviewed segmentation chunks");
+    }
+
+    if (!hasText(candidate.language)) {
+      analysis.validationOutcome.errors.push("candidate.language must be a non-empty candidate language");
+    } else if (equalsComparableText(candidate.language, sourceLanguage)) {
+      analysis.validationOutcome.errors.push("candidate.language must not equal source language");
+    }
+
+    if (equalsComparableText(candidate.isolatedStandaloneForm, requestContext.word)) {
+      analysis.validationOutcome.errors.push("candidate.isolatedStandaloneForm must not equal input word");
+    }
+
+    if (glossMentionsWholeInputWord(candidate.plainStandaloneDefinitionGloss, requestContext.word)) {
+      analysis.validationOutcome.errors.push("candidate.plainStandaloneDefinitionGloss must not merely define the full input word");
     }
   }
 
@@ -537,6 +615,15 @@ function analyzeResponse(rawResponseText, requestContext) {
       analysis.validationOutcome.errors.some((error) => error.startsWith("response.word") || error.startsWith("response.stage") || error.startsWith("response.segmentation"))
     ) {
       analysis.outcomeClassification = "REPLAY_INVALIDATED";
+    } else if (
+      analysis.validationOutcome.errors.some((error) =>
+        error.startsWith("candidate.chunk") ||
+        error.startsWith("candidate.language") ||
+        error.startsWith("candidate.isolatedStandaloneForm") ||
+        error.startsWith("candidate.plainStandaloneDefinitionGloss")
+      )
+    ) {
+      analysis.outcomeClassification = "GENERALIZATION_SIGNAL_DEGENERATE_CIRCULAR_INPUT_WORD";
     } else if (
       analysis.validationOutcome.errors.some((error) => error.startsWith("candidate.") || error.startsWith("claimBoundary"))
     ) {
@@ -939,7 +1026,8 @@ async function runLimitGeneralizationReplay(argv = process.argv) {
         word: args.word,
         stage: args.stage,
         segmentation: args.segmentation,
-        systemPrompt: request.systemPrompt,
+        sourceLanguage: sourceLanguageForRequest(args),
+          systemPrompt: request.systemPrompt,
         userPrompt: request.userPrompt,
         promptSha256: request.promptSha256,
         requestBodyText,

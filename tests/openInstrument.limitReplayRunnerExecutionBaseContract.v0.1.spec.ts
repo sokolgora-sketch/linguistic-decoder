@@ -162,4 +162,33 @@ describe("Open Instrument request-scoped replay runner execution-base contract v
     expect(source).toContain('["segmentation", requestContext.segmentation]');
   });
 
+
+  it("requires chunk and language on non-null candidates", () => {
+    expect(source).toContain("chunk: String(candidate.chunk");
+    expect(source).toContain("language: String(candidate.language");
+    expect(source).toContain("candidate.chunk must be a non-empty reviewed segmentation chunk");
+    expect(source).toContain("candidate.language must be a non-empty candidate language");
+  });
+
+  it("rejects anti-tautology failures as degenerate signal instead of success", () => {
+    expect(source).toContain("candidate.isolatedStandaloneForm must not equal input word");
+    expect(source).toContain("candidate.plainStandaloneDefinitionGloss must not merely define the full input word");
+    expect(source).toContain("candidate.language must not equal source language");
+    expect(source).toContain("GENERALIZATION_SIGNAL_DEGENERATE_CIRCULAR_INPUT_WORD");
+  });
+
+  it("limits non-null candidates to reviewed segmentation chunks", () => {
+    expect(source).toContain("parseReviewedSegmentationChunks");
+    expect(source).toContain("candidate.chunk must be one of the reviewed segmentation chunks");
+    expect(source).toContain("sourceLanguage: sourceLanguageForRequest(args)");
+  });
+
+  it("prompts Brain away from whole-word dictionary definitions", () => {
+    expect(source).toContain("Do not define the full input word.");
+    expect(source).toContain("Do not return the full input word as candidate.isolatedStandaloneForm.");
+    expect(source).toContain("Every non-null candidate must include candidate.chunk.");
+    expect(source).toContain("Every non-null candidate must include candidate.language.");
+    expect(source).toContain("Return nullAccepted true with candidate null when no chunk-language candidate is found.");
+  });
+
 });
