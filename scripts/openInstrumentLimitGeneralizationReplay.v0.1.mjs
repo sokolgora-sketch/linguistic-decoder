@@ -319,6 +319,31 @@ function validateEnv() {
   }
 }
 
+const CANDIDATE_LANGUAGE_ALLOWLIST = Object.freeze([
+  "Albanian",
+  "Latin",
+  "Greek",
+  "Sanskrit",
+  "Hebrew",
+  "Arabic",
+  "Germanic",
+  "Gothic",
+  "Old English",
+  "English",
+  "French",
+  "Italian",
+  "Spanish",
+  "Romanian",
+  "Slavic",
+  "Old Church Slavonic",
+  "Mandarin",
+  "Chinese",
+]);
+
+const CANDIDATE_LANGUAGE_ALLOWLIST_NORMALIZED = new Set(
+  CANDIDATE_LANGUAGE_ALLOWLIST.map((language) => normalizeCandidateLanguage(language)),
+);
+
 function normalizeComparableText(value) {
   return String(value ?? "")
     .trim()
@@ -330,6 +355,14 @@ function parseReviewedSegmentationChunks(segmentation) {
     .split("+")
     .map((chunk) => chunk.trim().toLocaleUpperCase("en-US"))
     .filter(Boolean);
+}
+
+function normalizeCandidateLanguage(language) {
+  return normalizeComparableText(language).replace(/[^a-z0-9ë]+/g, " ");
+}
+
+function candidateLanguageIsAllowed(language) {
+  return CANDIDATE_LANGUAGE_ALLOWLIST_NORMALIZED.has(normalizeCandidateLanguage(language));
 }
 
 function sourceLanguageForRequest(argsOrContext) {
@@ -362,6 +395,7 @@ function buildChunkLanguageAntiTautologyPrompt({ word, segmentation }) {
     "- Every non-null candidate must include candidate.chunk.",
     "- Every non-null candidate must include candidate.language.",
     "- candidate.chunk must be one of the reviewed chunks.",
+    `- candidate.language must be one of: ${CANDIDATE_LANGUAGE_ALLOWLIST.join(", ")}.`,
     "- candidate.language must not equal the source language.",
     "- candidate.isolatedStandaloneForm must not equal the full input word.",
     "- Return nullAccepted true with candidate null when no chunk-language candidate is found.",
@@ -584,6 +618,8 @@ function analyzeResponse(rawResponseText, requestContext) {
 
     if (!hasText(candidate.language)) {
       analysis.validationOutcome.errors.push("candidate.language must be a non-empty candidate language");
+    } else if (!candidateLanguageIsAllowed(candidate.language)) {
+      analysis.validationOutcome.errors.push("candidate.language must be one of the reviewed candidate languages");
     } else if (equalsComparableText(candidate.language, sourceLanguage)) {
       analysis.validationOutcome.errors.push("candidate.language must not equal source language");
     }
