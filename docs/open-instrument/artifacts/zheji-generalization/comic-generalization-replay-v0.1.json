@@ -1,0 +1,142 @@
+{
+  "schemaVersion": "open-instrument.reviewed-generalization-replay.v0.1",
+  "capturePacketId": "open-instrument.reviewed-generalization-replay.packet.v0.1",
+  "source": {
+    "reviewedExecutionBaseSha": "ab943de17a450353787e2f6083b5e4df77e31d70",
+    "promptSourcePath": "src/shared/openInstrument/brainCandidateSearchPrompt.v0.1.ts",
+    "promptSourceContainsIsolationAudit": true,
+    "promptGuardTestCommand": "npm test -- tests/openInstrument.brainCandidateSearchPrompt.isolationAudit.guard.v0.1.spec.ts --runInBand",
+    "passiveZhejiValidationCommand": "node scripts/openInstrumentZhejiSemanticTransparencyValidation.v0.1.mjs",
+    "passiveZhejiValidationTestCommand": "npm test -- tests/openInstrument.zhejiSemanticTransparencyValidation.v0.1.spec.ts --runInBand"
+  },
+  "executionRequest": {
+    "word": "comic",
+    "stage": "MIXED_STAGE_ORTHOGRAPHIC_PRIMARY_WITH_PHONETIC_SANITY",
+    "segmentation": "COM + IC",
+    "providerFamily": "local_only_openai_compatible",
+    "providerName": "ollama_openai_compat",
+    "model": "llama3.1:8b",
+    "endpointClass": "localhost_only",
+    "outputPath": "docs/open-instrument/artifacts/zheji-generalization/comic-generalization-replay-v0.1.json",
+    "requestMethod": "POST",
+    "requestPath": "/chat/completions",
+    "temperature": 0,
+    "stream": false
+  },
+  "prechecks": {
+    "workingTreeClean": true,
+    "currentBranch": "main",
+    "currentHeadSha": "ab943de17a450353787e2f6083b5e4df77e31d70",
+    "mainShaMatchesReviewedExecutionBase": true,
+    "isolationAuditPresent": true,
+    "promptGuardTestPassed": true,
+    "passiveZhejiValidationPassed": true,
+    "passiveZhejiValidationTestPassed": true
+  },
+  "providerIdentity": {
+    "providerFamily": "local_only_openai_compatible",
+    "providerName": "ollama_openai_compat",
+    "modelName": "llama3.1:8b",
+    "providerSelectionPolicy": "explicit_only_local_only",
+    "providerFallbackAllowed": false,
+    "automaticProviderSelectionAllowed": false,
+    "providerDefaultMutationAllowed": false
+  },
+  "endpointIdentity": {
+    "endpointClass": "localhost_only",
+    "baseUrl": "http://127.0.0.1:11434/v1",
+    "endpointPath": "/v1/chat/completions",
+    "localOnly": true,
+    "remoteProviderEndpointAllowed": false,
+    "openAiHostedEndpointAllowed": false,
+    "deepSeekEndpointAllowed": false
+  },
+  "promptIdentity": {
+    "promptSourcePath": "src/shared/openInstrument/brainCandidateSearchPrompt.v0.1.ts",
+    "promptSourceStatus": "reviewed_and_audited",
+    "promptCanonicalizationMethod": "json_stringify_system_prompt_and_user_prompt_v0.1",
+    "promptSha256": "5175766fd12b53b3ce44914b8931c2fcdc271d48a3c48a1a60a874e5c655a412",
+    "promptLength": 1662,
+    "promptMutationPolicy": "prompt_source_locked_no_mutation",
+    "promptIncludesIsolationAudit": true
+  },
+  "requestIdentity": {
+    "requestBodyCanonicalizationMethod": "json_stringify_request_body_v0.1",
+    "requestBodySha256": "1bd9f5c4f04c8936a3e7c9b397a0fbda9ddb5fa9b822fc7f5899d2a1f0ebe7e2",
+    "requestBodyLength": 1817,
+    "requestBodyMutationPolicy": "request_body_locked_no_mutation"
+  },
+  "responseIdentity": {
+    "responseCaptureMethod": "chat_completions_message_content",
+    "rawCaptureKind": "provider_response",
+    "rawProviderResponse": "{\"id\":\"chatcmpl-877\",\"object\":\"chat.completion\",\"created\":1782111630,\"model\":\"llama3.1:8b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\n  \\\"word\\\": \\\"comic\\\",\\n  \\\"stage\\\": \\\"MIXED_STAGE_ORTHOGRAPHIC_PRIMARY_WITH_PHONETIC_SANITY\\\",\\n  \\\"segmentation\\\": \\\"COM + IC\\\",\\n  \\\"candidate\\\": {\\n    \\\"isolatedStandaloneForm\\\": \\\"comic\\\",\\n    \\\"plainStandaloneDefinitionGloss\\\": \\\"relating to or characteristic of comedy\\\"\\n  },\\n  \\\"nullAccepted\\\": false,\\n  \\\"claimBoundary\\\": {\\n    \\\"developmentOnly\\\": true,\\n    \\\"publicationEvidence\\\": false,\\n    \\\"originEvidence\\\": false,\\n    \\\"ownershipEvidence\\\": false,\\n    \\\"modelQualityEvidence\\\": false,\\n    \\\"providerOutputCorrectnessEvidence\\\": false,\\n    \\\"candidateTruthEvidence\\\": false,\\n    \\\"evidencePromotion\\\": false,\\n    \\\"winnerCrowned\\\": false\\n  }\\n}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":334,\"completion_tokens\":165,\"total_tokens\":499}}\n",
+    "rawErrorText": null,
+    "responseSha256": "0aa531c1e007bd865f754e36ee7869c09f046283743878d204f3a816135617ae",
+    "responseRetentionPolicy": "artifact_only_development_only",
+    "responseMutationPolicy": "response_text_immutable"
+  },
+  "normalizedCandidatePayload": null,
+  "validationOutcome": {
+    "status": "failed_closed",
+    "errors": [
+      "response.word must equal undefined",
+      "response.stage must equal undefined",
+      "response.segmentation must equal undefined"
+    ],
+    "candidatePresent": true,
+    "nullAccepted": false,
+    "claimBoundaryAccepted": true
+  },
+  "outcomeClassification": "REPLAY_INVALIDATED",
+  "invalidationCode": "VALIDATION_FAILED",
+  "invalidationStage": "validation",
+  "invalidationReason": "root.errors[0]: response.word must equal undefined",
+  "failedCheck": "validation",
+  "expectedShape": "Provider output should be present, parseable, validation-diagnostic-bearing when invalidated, and claim-boundary safe.",
+  "receivedShapeSummary": {
+    "providerOutput": "string(length=967)",
+    "parsedOutput": "object(keys=normalizedCandidatePayload,outcomeClassification,validationOutcome)",
+    "validation": "object(keys=candidatePresent,claimBoundaryAccepted,errors,nullAccepted,status)",
+    "parseError": "null"
+  },
+  "parserStatus": "PARSED_OR_ATTACHED",
+  "validatorStatus": "FAILED",
+  "providerOutputPresent": true,
+  "providerOutputParseable": true,
+  "claimBoundaryStatus": "ATTACHED",
+  "invalidationDiagnostics": {
+    "invalidationCode": "VALIDATION_FAILED",
+    "invalidationStage": "validation",
+    "invalidationReason": "root.errors[0]: response.word must equal undefined",
+    "failedCheck": "validation",
+    "expectedShape": "Provider output should be present, parseable, validation-diagnostic-bearing when invalidated, and claim-boundary safe.",
+    "receivedShapeSummary": {
+      "providerOutput": "string(length=967)",
+      "parsedOutput": "object(keys=normalizedCandidatePayload,outcomeClassification,validationOutcome)",
+      "validation": "object(keys=candidatePresent,claimBoundaryAccepted,errors,nullAccepted,status)",
+      "parseError": "null"
+    },
+    "parserStatus": "PARSED_OR_ATTACHED",
+    "validatorStatus": "FAILED",
+    "providerOutputPresent": true,
+    "providerOutputParseable": true,
+    "claimBoundaryStatus": "ATTACHED",
+    "diagnosticMessages": [
+      "root.errors[0]: response.word must equal undefined",
+      "root.errors[1]: response.stage must equal undefined",
+      "root.errors[2]: response.segmentation must equal undefined"
+    ]
+  },
+  "failureClassification": "REPLAY_INVALIDATED",
+  "claimBoundary": {
+    "developmentOnly": true,
+    "publicationEvidence": false,
+    "originEvidence": false,
+    "ownershipEvidence": false,
+    "modelQualityEvidence": false,
+    "providerOutputCorrectnessEvidence": false,
+    "candidateTruthEvidence": false,
+    "evidencePromotion": false,
+    "winnerCrowned": false
+  }
+}
