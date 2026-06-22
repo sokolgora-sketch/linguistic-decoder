@@ -2,7 +2,7 @@
   "schemaVersion": "open-instrument.reviewed-generalization-replay.v0.1",
   "capturePacketId": "open-instrument.reviewed-generalization-replay.packet.v0.1",
   "source": {
-    "reviewedExecutionBaseSha": "5b4a6efcef2516c212ec77b0c0bd7c80a9d4686f",
+    "reviewedExecutionBaseSha": "6803bcb1d78f4406cb9532a1fb5d8845a20227ce",
     "promptSourcePath": "src/shared/openInstrument/brainCandidateSearchPrompt.v0.1.ts",
     "promptSourceContainsIsolationAudit": true,
     "promptGuardTestCommand": "npm test -- tests/openInstrument.brainCandidateSearchPrompt.isolationAudit.guard.v0.1.spec.ts --runInBand",
@@ -26,7 +26,7 @@
   "prechecks": {
     "workingTreeClean": true,
     "currentBranch": "main",
-    "currentHeadSha": "5b4a6efcef2516c212ec77b0c0bd7c80a9d4686f",
+    "currentHeadSha": "6803bcb1d78f4406cb9532a1fb5d8845a20227ce",
     "mainShaMatchesReviewedExecutionBase": true,
     "isolationAuditPresent": true,
     "promptGuardTestPassed": true,
@@ -55,48 +55,44 @@
     "promptSourcePath": "src/shared/openInstrument/brainCandidateSearchPrompt.v0.1.ts",
     "promptSourceStatus": "reviewed_and_audited",
     "promptCanonicalizationMethod": "json_stringify_system_prompt_and_user_prompt_v0.1",
-    "promptSha256": "5175766fd12b53b3ce44914b8931c2fcdc271d48a3c48a1a60a874e5c655a412",
-    "promptLength": 1662,
+    "promptSha256": "ba3cdebf982784674fe4d44e14221a45702c117db0dc068bf48c1f9da467547b",
+    "promptLength": 2603,
     "promptMutationPolicy": "prompt_source_locked_no_mutation",
     "promptIncludesIsolationAudit": true
   },
   "requestIdentity": {
     "requestBodyCanonicalizationMethod": "json_stringify_request_body_v0.1",
-    "requestBodySha256": "1bd9f5c4f04c8936a3e7c9b397a0fbda9ddb5fa9b822fc7f5899d2a1f0ebe7e2",
-    "requestBodyLength": 1817,
+    "requestBodySha256": "58ed24030d2522b77799ff9797ed5993309be3402d7fd348f8b28607a9334934",
+    "requestBodyLength": 2758,
     "requestBodyMutationPolicy": "request_body_locked_no_mutation"
   },
   "responseIdentity": {
     "responseCaptureMethod": "chat_completions_message_content",
     "rawCaptureKind": "provider_response",
-    "rawProviderResponse": "{\"id\":\"chatcmpl-579\",\"object\":\"chat.completion\",\"created\":1782115349,\"model\":\"llama3.1:8b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\n  \\\"word\\\": \\\"comic\\\",\\n  \\\"stage\\\": \\\"MIXED_STAGE_ORTHOGRAPHIC_PRIMARY_WITH_PHONETIC_SANITY\\\",\\n  \\\"segmentation\\\": \\\"COM + IC\\\",\\n  \\\"candidate\\\": {\\n    \\\"isolatedStandaloneForm\\\": \\\"comic\\\",\\n    \\\"plainStandaloneDefinitionGloss\\\": \\\"relating to or characteristic of comedy\\\"\\n  },\\n  \\\"nullAccepted\\\": false,\\n  \\\"claimBoundary\\\": {\\n    \\\"developmentOnly\\\": true,\\n    \\\"publicationEvidence\\\": false,\\n    \\\"originEvidence\\\": false,\\n    \\\"ownershipEvidence\\\": false,\\n    \\\"modelQualityEvidence\\\": false,\\n    \\\"providerOutputCorrectnessEvidence\\\": false,\\n    \\\"candidateTruthEvidence\\\": false,\\n    \\\"evidencePromotion\\\": false,\\n    \\\"winnerCrowned\\\": false\\n  }\\n}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":334,\"completion_tokens\":165,\"total_tokens\":499}}\n",
+    "rawProviderResponse": "{\"id\":\"chatcmpl-966\",\"object\":\"chat.completion\",\"created\":1782140748,\"model\":\"llama3.1:8b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\n  \\\"word\\\": \\\"comic\\\",\\n  \\\"stage\\\": \\\"MIXED_STAGE_ORTHOGRAPHIC_PRIMARY_WITH_PHONETIC_SANITY\\\",\\n  \\\"segmentation\\\": \\\"COM + IC\\\",\\n  \\\"candidate\\\": null,\\n  \\\"nullAccepted\\\": true,\\n  \\\"claimBoundary\\\": {\\n    \\\"developmentOnly\\\": true,\\n    \\\"publicationEvidence\\\": false,\\n    \\\"originEvidence\\\": false,\\n    \\\"ownershipEvidence\\\": false,\\n    \\\"modelQualityEvidence\\\": false,\\n    \\\"providerOutputCorrectnessEvidence\\\": false,\\n    \\\"candidateTruthEvidence\\\": false,\\n    \\\"evidencePromotion\\\": false,\\n    \\\"winnerCrowned\\\": false\\n  }\\n}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":527,\"completion_tokens\":135,\"total_tokens\":662}}\n",
     "rawErrorText": null,
-    "responseSha256": "e7fb0e978434a385dd19ae4cf4357a1849b22c3f8f4d98eb2b21148589a5498a",
+    "responseSha256": "a13ee3b5375fb5ca0aadff472fd346d2e3b042c4d790a1a8dad318e74255903d",
     "responseRetentionPolicy": "artifact_only_development_only",
     "responseMutationPolicy": "response_text_immutable"
   },
-  "normalizedCandidatePayload": {
-    "isolatedStandaloneForm": "comic",
-    "plainStandaloneDefinitionGloss": "relating to or characteristic of comedy",
-    "notes": []
-  },
+  "normalizedCandidatePayload": null,
   "validationOutcome": {
     "status": "passed",
     "errors": [],
-    "candidatePresent": true,
-    "nullAccepted": false,
+    "candidatePresent": false,
+    "nullAccepted": true,
     "claimBoundaryAccepted": true,
-    "requestPromptSha256": "5175766fd12b53b3ce44914b8931c2fcdc271d48a3c48a1a60a874e5c655a412",
-    "requestBodySha256": "1bd9f5c4f04c8936a3e7c9b397a0fbda9ddb5fa9b822fc7f5899d2a1f0ebe7e2"
+    "requestPromptSha256": "ba3cdebf982784674fe4d44e14221a45702c117db0dc068bf48c1f9da467547b",
+    "requestBodySha256": "58ed24030d2522b77799ff9797ed5993309be3402d7fd348f8b28607a9334934"
   },
-  "outcomeClassification": "GENERALIZATION_SIGNAL_PRESENT",
+  "outcomeClassification": "GENERALIZATION_NULL_ACCEPTED",
   "invalidationCode": "NOT_INVALIDATED",
   "invalidationStage": "not_applicable",
   "invalidationReason": "Replay was not classified as invalidated.",
   "failedCheck": "none",
   "expectedShape": "Provider output should be present, parseable, validation-diagnostic-bearing when invalidated, and claim-boundary safe.",
   "receivedShapeSummary": {
-    "providerOutput": "string(length=967)",
+    "providerOutput": "string(length=835)",
     "parsedOutput": "object(keys=normalizedCandidatePayload,outcomeClassification,validationOutcome)",
     "validation": "object(keys=candidatePresent,claimBoundaryAccepted,errors,nullAccepted,requestBodySha256,requestPromptSha256,status)",
     "parseError": "null"
@@ -113,7 +109,7 @@
     "failedCheck": "none",
     "expectedShape": "Provider output should be present, parseable, validation-diagnostic-bearing when invalidated, and claim-boundary safe.",
     "receivedShapeSummary": {
-      "providerOutput": "string(length=967)",
+      "providerOutput": "string(length=835)",
       "parsedOutput": "object(keys=normalizedCandidatePayload,outcomeClassification,validationOutcome)",
       "validation": "object(keys=candidatePresent,claimBoundaryAccepted,errors,nullAccepted,requestBodySha256,requestPromptSha256,status)",
       "parseError": "null"
