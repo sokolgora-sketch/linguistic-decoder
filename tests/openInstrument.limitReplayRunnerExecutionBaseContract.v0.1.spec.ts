@@ -147,4 +147,19 @@ describe("Open Instrument request-scoped replay runner execution-base contract v
     expect(reviewedComicScope.output).toContain("comic-generalization-replay-v0.1.json");
   });
 
+
+  it("passes request-scoped word stage and segmentation into analyzeResponse on provider success", () => {
+    expect(source).toContain("analysis = analyzeResponse(rawProviderResponse, {");
+    expect(source).toContain("word: args.word");
+    expect(source).toContain("stage: args.stage");
+    expect(source).toContain("segmentation: args.segmentation");
+    expect(source).toContain("systemPrompt: request.systemPrompt");
+    expect(source).toContain("userPrompt: request.userPrompt");
+    expect(source).toContain("promptSha256: request.promptSha256");
+    expect(source).toContain("requestBodyText");
+    expect(source).toContain('["word", requestContext.word]');
+    expect(source).toContain('["stage", requestContext.stage]');
+    expect(source).toContain('["segmentation", requestContext.segmentation]');
+  });
+
 });
