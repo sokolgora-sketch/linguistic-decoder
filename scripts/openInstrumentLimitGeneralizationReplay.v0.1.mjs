@@ -344,6 +344,111 @@ const CANDIDATE_LANGUAGE_ALLOWLIST_NORMALIZED = new Set(
   CANDIDATE_LANGUAGE_ALLOWLIST.map((language) => normalizeCandidateLanguage(language)),
 );
 
+
+const FUNCTIONAL_EMBRYO_PROMPT_DELIVERY_LINES = Object.freeze([
+  "<ISOLATION_AUDIT>",
+  "Every non-null functional embryo candidate must provide an attested isolated standalone form in the carrier language.",
+  "candidate.attestationStatus is mandatory for every non-null candidate.",
+  "candidate.attestationStatus must equal attested_standalone_form.",
+  "reasonably_inferred is rejected.",
+  "constructed is rejected.",
+  "reconstructed_only is rejected.",
+  "gloss_only is rejected.",
+  "unattested is rejected.",
+  "unknown attestation is rejected.",
+  "candidate.attestationType is mandatory for every non-null candidate.",
+  "candidate.attestationType must describe a real standalone carrier such as lexical_item, particle, morpheme_with_independent_entry, or root_with_independent_entry.",
+  "candidate.standaloneForm is mandatory for every non-null candidate.",
+  "candidate.plainStandaloneDefinitionGloss is mandatory for every non-null candidate.",
+  "candidate.functionalEmbryoGloss is mandatory for every non-null candidate.",
+  "If an attested standalone form is unavailable, return nullAccepted true with candidate null.",
+  "Do not use reasonably inferred forms as a substitute for attested standalone forms.",
+  "Do not define the chunk using the full word meaning.",
+  "Do not use comic, comedy, funny, humorous, comedian, cartoon, strip, joke, laugh, or laughter as the embryo gloss for comic.",
+  "</ISOLATION_AUDIT>",
+  "<RESPONSE_ENVELOPE_REQUIRED>",
+  "Return one JSON object only.",
+  "Do not return markdown.",
+  "Do not return commentary outside JSON.",
+  "The JSON object must include word, stage, segmentation, chunk, candidateLanguage, nullAccepted, claimBoundary, candidate.",
+  "Echo word exactly from the target.",
+  "Echo stage exactly from the target.",
+  "Echo segmentation exactly from the target.",
+  "Echo chunk exactly from the target.",
+  "Echo candidateLanguage exactly from the target.",
+  "claimBoundary is mandatory.",
+  "nullAccepted is mandatory.",
+  "candidate must be an object or null.",
+  "</RESPONSE_ENVELOPE_REQUIRED>",
+  "<CLAIM_BOUNDARY_REQUIRED>",
+  "claimBoundary.developmentOnly must be true.",
+  "claimBoundary.publicationEvidence must be false.",
+  "claimBoundary.originEvidence must be false.",
+  "claimBoundary.ownershipEvidence must be false.",
+  "claimBoundary.modelQualityEvidence must be false.",
+  "claimBoundary.providerOutputCorrectnessEvidence must be false.",
+  "claimBoundary.candidateTruthEvidence must be false.",
+  "claimBoundary.evidencePromotion must be false.",
+  "claimBoundary.winnerCrowned must be false.",
+  "</CLAIM_BOUNDARY_REQUIRED>",
+]);
+
+function appendFunctionalEmbryoPromptDeliveryBlock(text) {
+  const block = FUNCTIONAL_EMBRYO_PROMPT_DELIVERY_LINES.join("\n");
+  const base = String(text ?? "");
+  if (
+    base.includes("<ISOLATION_AUDIT>") &&
+    base.includes("<RESPONSE_ENVELOPE_REQUIRED>") &&
+    base.includes("<CLAIM_BOUNDARY_REQUIRED>") &&
+    base.includes("attested_standalone_form")
+  ) {
+    return base;
+  }
+  return `${base}\n\n${block}`;
+}
+
+function getPromptPrintArgValue(argv, flag, fallback) {
+  const index = argv.indexOf(flag);
+  if (index >= 0 && index + 1 < argv.length) {
+    return argv[index + 1];
+  }
+  return fallback;
+}
+
+function normalizeAttestationStatus(value) {
+  return String(value ?? "").trim();
+}
+
+function computeComicCircularGlossOverlapRatio(...glosses) {
+  const blocked = new Set([
+    "comic",
+    "comedy",
+    "comedian",
+    "funny",
+    "humorous",
+    "humor",
+    "amusing",
+    "joke",
+    "cartoon",
+    "strip",
+    "laughter",
+    "laugh",
+  ]);
+  const tokens = String(glosses.filter(Boolean).join(" ") ?? "")
+    .toLocaleLowerCase("en-US")
+    .replace(/[^a-z0-9ë]+/g, " ")
+    .split(/\s+/)
+    .filter(Boolean);
+
+  if (tokens.length === 0) {
+    return 0;
+  }
+
+  const uniqueTokens = Array.from(new Set(tokens));
+  const overlapCount = uniqueTokens.filter((token) => blocked.has(token)).length;
+  return overlapCount / Math.max(1, uniqueTokens.length);
+}
+
 function normalizeComparableText(value) {
   return String(value ?? "")
     .trim()
@@ -400,6 +505,14 @@ function buildChunkLanguageAntiTautologyPrompt({ word, segmentation }) {
     "- candidate.isolatedStandaloneForm must not equal the full input word.",
     "- Return nullAccepted true with candidate null when no chunk-language candidate is found.",
     "- Preserve claimBoundary developmentOnly true, evidencePromotion false, winnerCrowned false.",
+    "- Every non-null candidate must include candidate.attestationStatus.",
+    "- candidate.attestationStatus must equal attested_standalone_form.",
+    "- reasonably_inferred is rejected.",
+    "- Every non-null candidate must include candidate.attestationType.",
+    "- Every non-null candidate must include candidate.standaloneForm.",
+    "- Every non-null candidate must include candidate.functionalEmbryoGloss.",
+    "- The embryo gloss must be smaller than the full-word meaning.",
+    "- Return one JSON object only; no markdown; no commentary outside JSON.",
   ].join("\n");
 }
 
@@ -441,7 +554,7 @@ function buildPrompts({ word, stage, segmentation }) {
     "If no candidate is present, nullAccepted must be true.",
   ].join("\n");
 
-  const userPrompt = `${baseUserPrompt}\n\n${buildChunkLanguageAntiTautologyPrompt({ word, segmentation })}`;
+  const userPrompt = appendFunctionalEmbryoPromptDeliveryBlock(`${baseUserPrompt}\n\n${buildChunkLanguageAntiTautologyPrompt({ word, segmentation })}`);
   const promptCanonicalText = JSON.stringify({ systemPrompt, userPrompt }, null, 2);
   const promptSha256 = sha256(promptCanonicalText);
 
@@ -486,6 +599,11 @@ function normalizeCandidate(candidate) {
     language: String(candidate.language ?? "").trim(),
     isolatedStandaloneForm,
     plainStandaloneDefinitionGloss,
+    functionalEmbryoGloss: String(candidate.functionalEmbryoGloss ?? candidate.embryoGloss ?? "").trim(),
+    attestationStatus: normalizeAttestationStatus(candidate.attestationStatus),
+    attestationType: String(candidate.attestationType ?? "").trim(),
+    standaloneForm: String(candidate.standaloneForm ?? candidate.isolatedStandaloneForm ?? "").trim(),
+    rejectionReasons: Array.isArray(candidate.rejectionReasons) ? candidate.rejectionReasons : [],
     notes: Array.isArray(candidate.notes) ? candidate.notes : [],
   };
 }
@@ -605,6 +723,28 @@ function analyzeResponse(rawResponseText, requestContext) {
     }
     if (!hasText(candidate.plainStandaloneDefinitionGloss)) {
       analysis.validationOutcome.errors.push("candidate.plainStandaloneDefinitionGloss must be a non-empty string");
+    }
+
+    if (!hasText(candidate.attestationStatus)) {
+      analysis.validationOutcome.errors.push("candidate.attestationStatus must be present for non-null candidates");
+    } else if (candidate.attestationStatus !== "attested_standalone_form") {
+      analysis.validationOutcome.errors.push("candidate.attestationStatus must equal attested_standalone_form");
+    }
+
+    if (!hasText(candidate.attestationType)) {
+      analysis.validationOutcome.errors.push("candidate.attestationType must be present for non-null candidates");
+    }
+
+    if (!hasText(candidate.standaloneForm)) {
+      analysis.validationOutcome.errors.push("candidate.standaloneForm must be present for non-null candidates");
+    }
+
+    if (!hasText(candidate.functionalEmbryoGloss)) {
+      analysis.validationOutcome.errors.push("candidate.functionalEmbryoGloss must be present for non-null candidates");
+    }
+
+    if (computeComicCircularGlossOverlapRatio(candidate.plainStandaloneDefinitionGloss, candidate.functionalEmbryoGloss) >= 0.5) {
+      analysis.validationOutcome.errors.push("candidate functional gloss must not circularly overlap the full-word definition tokens");
     }
 
     const reviewedChunks = new Set(parseReviewedSegmentationChunks(requestContext.segmentation));
@@ -1134,6 +1274,16 @@ function printArtifactSummary(artifact) {
 }
 
 async function main(argv = process.argv) {
+  // MAIN_PRINT_REVIEWED_REQUEST_EARLY_EXIT_V0_1
+  if (argv.includes("--print-reviewed-request")) {
+    const word = getPromptPrintArgValue(argv, "--word", "comic");
+    const stage = getPromptPrintArgValue(argv, "--stage", "MIXED_STAGE_ORTHOGRAPHIC_PRIMARY_WITH_PHONETIC_SANITY");
+    const segmentation = getPromptPrintArgValue(argv, "--segmentation", "COM + IC");
+    const request = buildPrompts({ word, stage, segmentation });
+    process.stdout.write(`${JSON.stringify(request, null, 2)}\n`);
+    return;
+  }
+
   try {
     const result = await runLimitGeneralizationReplay(argv);
     printArtifactSummary(result.artifact);
