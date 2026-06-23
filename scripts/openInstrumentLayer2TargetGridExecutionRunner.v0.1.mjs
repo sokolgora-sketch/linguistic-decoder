@@ -371,6 +371,58 @@ function buildExecutionArtifact({ reviewedExecutionBaseSha, providerIdentity, en
   };
 }
 
+
+const PROVIDER_MESSAGE_CONTENT_JSON_OBJECT_ERROR = "provider message content must be one JSON object";
+
+function isProviderMessageContentJsonObjectError(error) {
+  return String(error?.message ?? error).includes(PROVIDER_MESSAGE_CONTENT_JSON_OBJECT_ERROR);
+}
+
+function buildProviderNonJsonInvalidatedTargetResult({
+  target,
+  request,
+  messageContent,
+  rawText,
+  error,
+}) {
+  // NON_JSON_PROVIDER_RESPONSE_CAPTURE_REPAIR_V0_1
+  const responseText = String(messageContent ?? "");
+  const providerRawText = String(rawText ?? "");
+  const parserError = isProviderMessageContentJsonObjectError(error)
+    ? PROVIDER_MESSAGE_CONTENT_JSON_OBJECT_ERROR
+    : String(error?.message ?? error ?? PROVIDER_MESSAGE_CONTENT_JSON_OBJECT_ERROR);
+
+  const response = {
+    word: target.word,
+    stage: target.stage,
+    segmentation: target.segmentation,
+    chunk: target.chunk,
+    candidateLanguage: target.candidateLanguage,
+    candidate: null,
+    nullAccepted: false,
+    claimBoundary: safeClaimBoundary(),
+    providerMessageContentParseError: parserError,
+  };
+
+  const validation = validateTargetResponse(response, target);
+  const errors = Array.from(new Set([parserError, ...validation.errors]));
+
+  return {
+    targetId: target.targetId,
+    target,
+    outcomeClassification: "TARGET_INVALIDATED",
+    validation: {
+      status: "failed",
+      errors,
+    },
+    promptSha256: request.promptSha256,
+    requestBodySha256: request.requestBodySha256,
+    responseSha256: sha256Text(responseText),
+    providerRawPayloadSha256: providerRawText ? sha256Text(providerRawText) : null,
+    response,
+  };
+}
+
 async function callProviderForTarget({ target, providerIdentity }) {
   const request = buildRequestBody(target, providerIdentity);
   const endpoint = `${normalizeBaseUrl(providerIdentity.baseUrl)}${CHAT_COMPLETIONS_PATH}`;
@@ -391,16 +443,31 @@ async function callProviderForTarget({ target, providerIdentity }) {
 
   const rawPayload = JSON.parse(rawText);
   const messageContent = extractOpenAiCompatibleMessageContent(rawPayload);
-  const parsedResponse = parseJsonObjectFromText(messageContent);
 
-  return buildTargetResult({
-    target,
-    response: parsedResponse,
-    promptSha256: request.promptSha256,
-    requestBodySha256: request.requestBodySha256,
-    responseSha256: sha256Text(messageContent),
-    providerRawPayloadSha256: sha256Text(rawText),
-  });
+  try {
+    const parsedResponse = parseJsonObjectFromText(messageContent);
+
+    return buildTargetResult({
+      target,
+      response: parsedResponse,
+      promptSha256: request.promptSha256,
+      requestBodySha256: request.requestBodySha256,
+      responseSha256: sha256Text(messageContent),
+      providerRawPayloadSha256: sha256Text(rawText),
+    });
+  } catch (error) {
+    if (!isProviderMessageContentJsonObjectError(error)) {
+      throw error;
+    }
+
+    return buildProviderNonJsonInvalidatedTargetResult({
+      target,
+      request,
+      messageContent,
+      rawText,
+      error,
+    });
+  }
 }
 
 async function executeReviewedTargetGrid({ reviewedExecutionBaseSha, providerIdentity, outputPath }) {
@@ -565,6 +632,66 @@ function runSelfCheck() {
     errors.push("all-null artifact aggregate classification mismatch");
   }
 
+  const nonJsonTargetResult = buildProviderNonJsonInvalidatedTargetResult({
+    target: targetGrid[0],
+    request: {
+      promptSha256: reviewedRequests[0].promptSha256,
+      requestBodySha256: reviewedRequests[0].requestBodySha256,
+    },
+    messageContent: "This is not JSON.",
+    rawText: JSON.stringify({ choices: [{ message: { content: "This is not JSON." } }] }),
+    error: new Error(PROVIDER_MESSAGE_CONTENT_JSON_OBJECT_ERROR),
+  });
+
+  if (nonJsonTargetResult.outcomeClassification !== "TARGET_INVALIDATED") {
+    errors.push("non-json provider content must invalidate the target");
+  }
+
+  if (nonJsonTargetResult.validation.status !== "failed") {
+    errors.push("non-json provider content must fail validation");
+  }
+
+  if (!nonJsonTargetResult.validation.errors.includes(PROVIDER_MESSAGE_CONTENT_JSON_OBJECT_ERROR)) {
+    errors.push("non-json provider content must preserve parser error");
+  }
+
+  if (nonJsonTargetResult.response.candidate !== null) {
+    errors.push("non-json provider content must not become a candidate");
+  }
+
+  if (nonJsonTargetResult.response.nullAccepted !== false) {
+    errors.push("non-json provider content must not become null-accepted");
+  }
+
+  const allNonJsonInvalidatedArtifact = buildExecutionArtifact({
+    reviewedExecutionBaseSha: "f8ea719810489ade54cc63d37b3dc92dc04cfc5c",
+    providerIdentity: REVIEWED_PROVIDER_IDENTITY,
+    endpointIdentity: {
+      endpointClass: REVIEWED_PROVIDER_IDENTITY.endpointClass,
+      baseUrl: REVIEWED_PROVIDER_IDENTITY.baseUrl,
+      endpointPath: CHAT_COMPLETIONS_PATH,
+    },
+    targetGrid,
+    targetResults: targetGrid.map((target, index) => buildProviderNonJsonInvalidatedTargetResult({
+      target,
+      request: {
+        promptSha256: reviewedRequests[index].promptSha256,
+        requestBodySha256: reviewedRequests[index].requestBodySha256,
+      },
+      messageContent: `non-json:${target.targetId}`,
+      rawText: JSON.stringify({ choices: [{ message: { content: `non-json:${target.targetId}` } }] }),
+      error: new Error(PROVIDER_MESSAGE_CONTENT_JSON_OBJECT_ERROR),
+    })),
+  });
+
+  if (allNonJsonInvalidatedArtifact.targetResults.length !== 8) {
+    errors.push("non-json invalidated artifact must preserve all target results");
+  }
+
+  if (allNonJsonInvalidatedArtifact.aggregateClassification !== "TARGET_GRID_PARTIAL_INVALIDATED") {
+    errors.push("non-json invalidated artifact aggregate classification mismatch");
+  }
+
   try {
     validateProviderIdentityOrThrow({ ...REVIEWED_PROVIDER_IDENTITY, providerName: "other" });
     errors.push("provider identity mismatch should fail closed");
@@ -656,11 +783,13 @@ if (currentFilePath === invokedFilePath) {
 }
 
 export {
+  PROVIDER_MESSAGE_CONTENT_JSON_OBJECT_ERROR,
   REQUIRED_EXECUTION_FLAG,
   REVIEWED_OUTPUT_PATH,
   REVIEWED_PROVIDER_IDENTITY,
   RUNNER_SCHEMA_VERSION,
   buildExecutionArtifact,
+  buildProviderNonJsonInvalidatedTargetResult,
   buildRequestBody,
   buildReviewedRequests,
   buildTargetPrompt,
