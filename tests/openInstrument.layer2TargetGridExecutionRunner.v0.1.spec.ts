@@ -101,4 +101,64 @@ describe("Open Instrument Layer 2 target-grid execution runner v0.1", () => {
     expect(source).not.toContain("api.openai.com");
     expect(source).not.toContain("deepseek");
   });
+
+  it("captures provider non-JSON output as a deterministic invalidated target result", () => {
+    const script = `
+      import {
+        PROVIDER_MESSAGE_CONTENT_JSON_OBJECT_ERROR,
+        REVIEWED_PROVIDER_IDENTITY,
+        buildProviderNonJsonInvalidatedTargetResult,
+        buildRequestBody,
+      } from "./scripts/openInstrumentLayer2TargetGridExecutionRunner.v0.1.mjs";
+
+      const target = {
+        word: "comic",
+        stage: "MIXED_STAGE_ORTHOGRAPHIC_PRIMARY_WITH_PHONETIC_SANITY",
+        segmentation: "COM + IC",
+        chunk: "COM",
+        candidateLanguage: "Albanian",
+        sourceLanguage: "English",
+        targetId: "comic::COM::Albanian",
+        targetStatus: "pending",
+      };
+
+      const request = buildRequestBody(target, REVIEWED_PROVIDER_IDENTITY);
+      const result = buildProviderNonJsonInvalidatedTargetResult({
+        target,
+        request,
+        messageContent: "not json provider prose",
+        rawText: JSON.stringify({ choices: [{ message: { content: "not json provider prose" } }] }),
+        error: new Error(PROVIDER_MESSAGE_CONTENT_JSON_OBJECT_ERROR),
+      });
+
+      console.log(JSON.stringify(result));
+    `;
+
+    const output = execFileSync("node", ["--input-type=module", "-e", script], {
+      encoding: "utf8",
+    });
+
+    const result = JSON.parse(output);
+
+    expect(result.outcomeClassification).toBe("TARGET_INVALIDATED");
+    expect(result.validation.status).toBe("failed");
+    expect(result.validation.errors).toContain("provider message content must be one JSON object");
+    expect(result.response.candidate).toBeNull();
+    expect(result.response.nullAccepted).toBe(false);
+    expect(JSON.stringify(result.response)).not.toContain("not json provider prose");
+    expect(result.providerRawPayloadSha256).toMatch(/^[0-9a-f]{64}$/);
+    expect(result.responseSha256).toMatch(/^[0-9a-f]{64}$/);
+  });
+
+  it("keeps non-JSON capture non-retrying and artifact-safe by construction", () => {
+    const source = readFileSync(runnerPath, "utf8");
+
+    expect(source).toContain("NON_JSON_PROVIDER_RESPONSE_CAPTURE_REPAIR_V0_1");
+    expect(source).toContain("buildProviderNonJsonInvalidatedTargetResult");
+    expect(source).toContain("TARGET_INVALIDATED");
+    expect(source).toContain("provider message content must be one JSON object");
+    expect(source).toContain("allNonJsonInvalidatedArtifact");
+    expect(source).not.toMatch(/retryProvider|retry provider|setTimeout\(/i);
+  });
+
 });
