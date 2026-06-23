@@ -95,6 +95,9 @@ describe("Open Instrument Layer 2 target-grid execution runner v0.1", () => {
     expect(source).toContain("localhost_only");
     expect(source).toContain("http://127.0.0.1:11434/v1");
     expect(source).toContain("baseUrl must be reviewed localhost Ollama OpenAI-compatible endpoint");
+    expect(source).not.toContain("apiKey");
+    expect(source).not.toContain("authorization:");
+    expect(source).not.toContain("Bearer");
     expect(source).not.toContain("api.openai.com");
     expect(source).not.toContain("deepseek");
   });

@@ -29,7 +29,6 @@ const REVIEWED_PROVIDER_IDENTITY = Object.freeze({
   model: "llama3.1:8b",
   endpointClass: "localhost_only",
   baseUrl: "http://127.0.0.1:11434/v1",
-  apiKey: "ollama",
 });
 
 const REVIEWED_OUTPUT_PATH = "docs/open-instrument/artifacts/zheji-generalization/comic-layer2-target-grid-replay-v0.1.json";
@@ -46,7 +45,6 @@ const cliSchema = Object.freeze({
   model: "--model",
   endpointClass: "--endpoint-class",
   baseUrl: "--base-url",
-  apiKey: "--api-key",
   output: "--output",
 });
 
@@ -143,8 +141,6 @@ function validateProviderIdentityOrThrow(identity) {
   assertEqual(identity.model, REVIEWED_PROVIDER_IDENTITY.model, "model");
   assertEqual(identity.endpointClass, REVIEWED_PROVIDER_IDENTITY.endpointClass, "endpointClass");
   assertEqual(normalizeBaseUrl(identity.baseUrl), REVIEWED_PROVIDER_IDENTITY.baseUrl, "baseUrl");
-  assertEqual(identity.apiKey, REVIEWED_PROVIDER_IDENTITY.apiKey, "apiKey");
-
   if (!normalizeBaseUrl(identity.baseUrl).startsWith("http://127.0.0.1:11434/v1")) {
     throw new Error("baseUrl must be reviewed localhost Ollama OpenAI-compatible endpoint");
   }
@@ -310,7 +306,6 @@ async function callProviderForTarget({ target, providerIdentity }) {
     method: "POST",
     headers: {
       "content-type": "application/json",
-      authorization: `Bearer ${providerIdentity.apiKey}`,
     },
     body: JSON.stringify(request.requestBody),
   });
@@ -535,7 +530,6 @@ function providerIdentityFromArgs(values) {
     model: values[cliSchema.model],
     endpointClass: values[cliSchema.endpointClass],
     baseUrl: values[cliSchema.baseUrl],
-    apiKey: values[cliSchema.apiKey],
   };
 }
 
