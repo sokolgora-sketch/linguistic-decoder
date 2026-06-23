@@ -1,5 +1,8 @@
 #!/usr/bin/env node
 
+import { resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+
 const TARGET_GRID_SCHEMA_VERSION = "open-instrument.layer2-chunk-language-target-grid.scaffold.v0.1";
 
 const REVIEWED_WORD = "comic";
@@ -402,13 +405,18 @@ function runSelfCheck() {
   };
 }
 
-if (process.argv.includes("--print-grid")) {
-  console.log(JSON.stringify(buildTargetGrid(), null, 2));
-} else if (process.argv.includes("--self-check")) {
-  const result = runSelfCheck();
-  console.log(JSON.stringify(result, null, 2));
-  if (!result.ok) {
-    process.exitCode = 1;
+const currentFilePath = resolve(fileURLToPath(import.meta.url));
+const invokedFilePath = process.argv[1] ? resolve(process.argv[1]) : "";
+
+if (currentFilePath === invokedFilePath) {
+  if (process.argv.includes("--print-grid")) {
+    console.log(JSON.stringify(buildTargetGrid(), null, 2));
+  } else if (process.argv.includes("--self-check")) {
+    const result = runSelfCheck();
+    console.log(JSON.stringify(result, null, 2));
+    if (!result.ok) {
+      process.exitCode = 1;
+    }
   }
 }
 
