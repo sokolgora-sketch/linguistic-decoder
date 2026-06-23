@@ -143,6 +143,36 @@ function validateClaimBoundary(claimBoundary) {
   };
 }
 
+function functionalEmbryoGlossOverlapRatio(...glosses) {
+  const blocked = new Set([
+    "comic",
+    "comedy",
+    "comedian",
+    "funny",
+    "humorous",
+    "humor",
+    "amusing",
+    "joke",
+    "cartoon",
+    "strip",
+    "laughter",
+    "laugh",
+  ]);
+  const tokens = String(glosses.filter(Boolean).join(" ") ?? "")
+    .toLocaleLowerCase("en-US")
+    .replace(/[^a-z0-9ë]+/g, " ")
+    .split(/\s+/)
+    .filter(Boolean);
+
+  if (tokens.length === 0) {
+    return 0;
+  }
+
+  const uniqueTokens = Array.from(new Set(tokens));
+  const overlapCount = uniqueTokens.filter((token) => blocked.has(token)).length;
+  return overlapCount / Math.max(1, uniqueTokens.length);
+}
+
 function validateTargetResponse(response, target) {
   const errors = [];
 
@@ -192,7 +222,7 @@ function validateTargetResponse(response, target) {
     if (candidate === undefined || typeof candidate !== "object") {
       errors.push("response.candidate must be object or null");
     } else {
-      for (const key of ["chunk", "language", "isolatedStandaloneForm", "plainStandaloneDefinitionGloss", "notes"]) {
+      for (const key of ["chunk", "language", "isolatedStandaloneForm", "plainStandaloneDefinitionGloss", "attestationStatus", "attestationType", "standaloneForm", "functionalEmbryoGloss", "notes"]) {
         if (candidate?.[key] === undefined) {
           errors.push(`candidate.${key} must be present`);
         }
@@ -220,6 +250,28 @@ function validateTargetResponse(response, target) {
 
       if (glossMentionsWholeInputWord(candidate?.plainStandaloneDefinitionGloss, target?.word)) {
         errors.push("candidate.plainStandaloneDefinitionGloss must not merely define the full input word");
+      }
+
+      if (!hasText(candidate?.attestationStatus)) {
+        errors.push("candidate.attestationStatus must be present for non-null candidates");
+      } else if (candidate.attestationStatus !== "attested_standalone_form") {
+        errors.push("candidate.attestationStatus must equal attested_standalone_form");
+      }
+
+      if (!hasText(candidate?.attestationType)) {
+        errors.push("candidate.attestationType must be present for non-null candidates");
+      }
+
+      if (!hasText(candidate?.standaloneForm ?? candidate?.isolatedStandaloneForm)) {
+        errors.push("candidate.standaloneForm must be present for non-null candidates");
+      }
+
+      if (!hasText(candidate?.functionalEmbryoGloss)) {
+        errors.push("candidate.functionalEmbryoGloss must be present for non-null candidates");
+      }
+
+      if (functionalEmbryoGlossOverlapRatio(candidate?.plainStandaloneDefinitionGloss, candidate?.functionalEmbryoGloss) >= 0.5) {
+        errors.push("candidate functional gloss must not circularly overlap the full-word definition tokens");
       }
 
       if (!Array.isArray(candidate?.notes)) {
@@ -356,6 +408,10 @@ function runSelfCheck() {
       language: targetGrid[0].candidateLanguage,
       isolatedStandaloneForm: "kom",
       plainStandaloneDefinitionGloss: "standalone test gloss",
+      functionalEmbryoGloss: "standalone carrier gloss",
+      attestationStatus: "attested_standalone_form",
+      attestationType: "lexical_item",
+      standaloneForm: "kom",
       notes: [],
     },
     nullAccepted: false,

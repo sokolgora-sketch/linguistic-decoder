@@ -48,6 +48,69 @@ const cliSchema = Object.freeze({
   output: "--output",
 });
 
+
+const FUNCTIONAL_EMBRYO_PROMPT_DELIVERY_LINES = Object.freeze([
+  "<ISOLATION_AUDIT>",
+  "Every non-null functional embryo candidate must provide an attested isolated standalone form in the carrier language.",
+  "candidate.attestationStatus is mandatory for every non-null candidate.",
+  "candidate.attestationStatus must equal attested_standalone_form.",
+  "reasonably_inferred is rejected.",
+  "constructed is rejected.",
+  "reconstructed_only is rejected.",
+  "gloss_only is rejected.",
+  "unattested is rejected.",
+  "unknown attestation is rejected.",
+  "candidate.attestationType is mandatory for every non-null candidate.",
+  "candidate.attestationType must describe a real standalone carrier such as lexical_item, particle, morpheme_with_independent_entry, or root_with_independent_entry.",
+  "candidate.standaloneForm is mandatory for every non-null candidate.",
+  "candidate.plainStandaloneDefinitionGloss is mandatory for every non-null candidate.",
+  "candidate.functionalEmbryoGloss is mandatory for every non-null candidate.",
+  "If an attested standalone form is unavailable, return nullAccepted true with candidate null.",
+  "Do not use reasonably inferred forms as a substitute for attested standalone forms.",
+  "Do not define the chunk using the full word meaning.",
+  "Do not use comic, comedy, funny, humorous, comedian, cartoon, strip, joke, laugh, or laughter as the embryo gloss for comic.",
+  "</ISOLATION_AUDIT>",
+  "<RESPONSE_ENVELOPE_REQUIRED>",
+  "Return one JSON object only.",
+  "Do not return markdown.",
+  "Do not return commentary outside JSON.",
+  "The JSON object must include word, stage, segmentation, chunk, candidateLanguage, nullAccepted, claimBoundary, candidate.",
+  "Echo word exactly from the target.",
+  "Echo stage exactly from the target.",
+  "Echo segmentation exactly from the target.",
+  "Echo chunk exactly from the target.",
+  "Echo candidateLanguage exactly from the target.",
+  "claimBoundary is mandatory.",
+  "nullAccepted is mandatory.",
+  "candidate must be an object or null.",
+  "</RESPONSE_ENVELOPE_REQUIRED>",
+  "<CLAIM_BOUNDARY_REQUIRED>",
+  "claimBoundary.developmentOnly must be true.",
+  "claimBoundary.publicationEvidence must be false.",
+  "claimBoundary.originEvidence must be false.",
+  "claimBoundary.ownershipEvidence must be false.",
+  "claimBoundary.modelQualityEvidence must be false.",
+  "claimBoundary.providerOutputCorrectnessEvidence must be false.",
+  "claimBoundary.candidateTruthEvidence must be false.",
+  "claimBoundary.evidencePromotion must be false.",
+  "claimBoundary.winnerCrowned must be false.",
+  "</CLAIM_BOUNDARY_REQUIRED>",
+]);
+
+function appendFunctionalEmbryoPromptDeliveryBlock(text) {
+  const block = FUNCTIONAL_EMBRYO_PROMPT_DELIVERY_LINES.join("\n");
+  const base = String(text ?? "");
+  if (
+    base.includes("<ISOLATION_AUDIT>") &&
+    base.includes("<RESPONSE_ENVELOPE_REQUIRED>") &&
+    base.includes("<CLAIM_BOUNDARY_REQUIRED>") &&
+    base.includes("attested_standalone_form")
+  ) {
+    return base;
+  }
+  return `${base}\n\n${block}`;
+}
+
 function sha256Text(text) {
   return createHash("sha256").update(text, "utf8").digest("hex");
 }
@@ -187,7 +250,17 @@ function buildTargetPrompt(target) {
 }
 
 function buildRequestBody(target, providerIdentity) {
-  const prompt = buildTargetPrompt(target);
+  const basePrompt = buildTargetPrompt(target);
+  const prompt = appendFunctionalEmbryoPromptDeliveryBlock([
+    basePrompt,
+    JSON.stringify({
+      word: target.word,
+      stage: target.stage,
+      segmentation: target.segmentation,
+      chunk: target.chunk,
+      candidateLanguage: target.candidateLanguage,
+    }, null, 2),
+  ].join("\n\n"));
 
   const body = {
     model: providerIdentity.model,
@@ -437,6 +510,11 @@ function runSelfCheck() {
       language: targetGrid[0].candidateLanguage,
       isolatedStandaloneForm: "kom",
       plainStandaloneDefinitionGloss: "standalone development-only test gloss",
+      plainStandaloneGloss: "standalone development-only test gloss",
+      functionalEmbryoGloss: "standalone development-only carrier gloss",
+      attestationStatus: "attested_standalone_form",
+      attestationType: "lexical_item",
+      standaloneForm: "kom",
       notes: [],
     },
     nullAccepted: false,
