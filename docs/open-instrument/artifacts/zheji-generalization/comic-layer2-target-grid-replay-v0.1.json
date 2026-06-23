@@ -1,0 +1,677 @@
+{
+  "schemaVersion": "open-instrument.layer2-target-grid-execution-runner.v0.1",
+  "scaffoldSchemaVersion": "open-instrument.layer2-chunk-language-target-grid.scaffold.v0.1",
+  "word": "comic",
+  "stage": "MIXED_STAGE_ORTHOGRAPHIC_PRIMARY_WITH_PHONETIC_SANITY",
+  "segmentation": "COM + IC",
+  "reviewedExecutionBaseSha": "e7ce1062f6d0f430ee37f293bfbf350d18b9ee84",
+  "providerIdentity": {
+    "providerFamily": "local_only_openai_compatible",
+    "providerName": "ollama_openai_compat",
+    "model": "llama3.1:8b"
+  },
+  "endpointIdentity": {
+    "endpointClass": "localhost_only",
+    "baseUrl": "http://127.0.0.1:11434/v1",
+    "chatCompletionsPath": "/chat/completions"
+  },
+  "targetGrid": [
+    {
+      "word": "comic",
+      "stage": "MIXED_STAGE_ORTHOGRAPHIC_PRIMARY_WITH_PHONETIC_SANITY",
+      "segmentation": "COM + IC",
+      "chunk": "COM",
+      "candidateLanguage": "Albanian",
+      "sourceLanguage": "English",
+      "targetId": "comic::COM::Albanian",
+      "targetStatus": "pending"
+    },
+    {
+      "word": "comic",
+      "stage": "MIXED_STAGE_ORTHOGRAPHIC_PRIMARY_WITH_PHONETIC_SANITY",
+      "segmentation": "COM + IC",
+      "chunk": "COM",
+      "candidateLanguage": "Latin",
+      "sourceLanguage": "English",
+      "targetId": "comic::COM::Latin",
+      "targetStatus": "pending"
+    },
+    {
+      "word": "comic",
+      "stage": "MIXED_STAGE_ORTHOGRAPHIC_PRIMARY_WITH_PHONETIC_SANITY",
+      "segmentation": "COM + IC",
+      "chunk": "COM",
+      "candidateLanguage": "Greek",
+      "sourceLanguage": "English",
+      "targetId": "comic::COM::Greek",
+      "targetStatus": "pending"
+    },
+    {
+      "word": "comic",
+      "stage": "MIXED_STAGE_ORTHOGRAPHIC_PRIMARY_WITH_PHONETIC_SANITY",
+      "segmentation": "COM + IC",
+      "chunk": "COM",
+      "candidateLanguage": "Sanskrit",
+      "sourceLanguage": "English",
+      "targetId": "comic::COM::Sanskrit",
+      "targetStatus": "pending"
+    },
+    {
+      "word": "comic",
+      "stage": "MIXED_STAGE_ORTHOGRAPHIC_PRIMARY_WITH_PHONETIC_SANITY",
+      "segmentation": "COM + IC",
+      "chunk": "IC",
+      "candidateLanguage": "Albanian",
+      "sourceLanguage": "English",
+      "targetId": "comic::IC::Albanian",
+      "targetStatus": "pending"
+    },
+    {
+      "word": "comic",
+      "stage": "MIXED_STAGE_ORTHOGRAPHIC_PRIMARY_WITH_PHONETIC_SANITY",
+      "segmentation": "COM + IC",
+      "chunk": "IC",
+      "candidateLanguage": "Latin",
+      "sourceLanguage": "English",
+      "targetId": "comic::IC::Latin",
+      "targetStatus": "pending"
+    },
+    {
+      "word": "comic",
+      "stage": "MIXED_STAGE_ORTHOGRAPHIC_PRIMARY_WITH_PHONETIC_SANITY",
+      "segmentation": "COM + IC",
+      "chunk": "IC",
+      "candidateLanguage": "Greek",
+      "sourceLanguage": "English",
+      "targetId": "comic::IC::Greek",
+      "targetStatus": "pending"
+    },
+    {
+      "word": "comic",
+      "stage": "MIXED_STAGE_ORTHOGRAPHIC_PRIMARY_WITH_PHONETIC_SANITY",
+      "segmentation": "COM + IC",
+      "chunk": "IC",
+      "candidateLanguage": "Sanskrit",
+      "sourceLanguage": "English",
+      "targetId": "comic::IC::Sanskrit",
+      "targetStatus": "pending"
+    }
+  ],
+  "targetResults": [
+    {
+      "targetId": "comic::COM::Albanian",
+      "target": {
+        "word": "comic",
+        "stage": "MIXED_STAGE_ORTHOGRAPHIC_PRIMARY_WITH_PHONETIC_SANITY",
+        "segmentation": "COM + IC",
+        "chunk": "COM",
+        "candidateLanguage": "Albanian",
+        "sourceLanguage": "English",
+        "targetId": "comic::COM::Albanian",
+        "targetStatus": "pending"
+      },
+      "outcomeClassification": "TARGET_INVALIDATED",
+      "validation": {
+        "status": "failed",
+        "errors": [
+          "response.word must be present",
+          "response.stage must be present",
+          "response.segmentation must be present",
+          "response.chunk must be present",
+          "response.candidateLanguage must be present",
+          "response.nullAccepted must be present",
+          "response.claimBoundary must be present",
+          "response.word must equal target.word",
+          "response.stage must equal target.stage",
+          "response.segmentation must equal target.segmentation",
+          "response.chunk must equal target.chunk",
+          "response.candidateLanguage must equal target.candidateLanguage",
+          "claimBoundary.developmentOnly must be true",
+          "claimBoundary.publicationEvidence must be false",
+          "claimBoundary.originEvidence must be false",
+          "claimBoundary.ownershipEvidence must be false",
+          "claimBoundary.modelQualityEvidence must be false",
+          "claimBoundary.providerOutputCorrectnessEvidence must be false",
+          "claimBoundary.candidateTruthEvidence must be false",
+          "claimBoundary.evidencePromotion must be false",
+          "claimBoundary.winnerCrowned must be false",
+          "response.candidate must be object or null"
+        ]
+      },
+      "promptSha256": "bc446fb89fa8ff26aeb6d4d436beb32fe039291c7f65a9a0d663434d7d1b2679",
+      "requestBodySha256": "f488d031777533bf35bcb745a11d9f0e21f28c5f33ce37122bc12f63721ea891",
+      "responseSha256": "07ee6c8eb8bff73f6dc314af458c22cd3237c3eea41e205b5b36008f482fa3d5",
+      "providerRawPayloadSha256": "b15366c8115f4c01a8b9554429b115d90919a8bdc3ebfed1f62e296e581e54cc",
+      "response": {
+        "error": "JSON object is not valid",
+        "message": "The JSON object contains prose outside of the JSON structure. The instruction 'Return exactly one JSON object' was not followed."
+      }
+    },
+    {
+      "targetId": "comic::COM::Latin",
+      "target": {
+        "word": "comic",
+        "stage": "MIXED_STAGE_ORTHOGRAPHIC_PRIMARY_WITH_PHONETIC_SANITY",
+        "segmentation": "COM + IC",
+        "chunk": "COM",
+        "candidateLanguage": "Latin",
+        "sourceLanguage": "English",
+        "targetId": "comic::COM::Latin",
+        "targetStatus": "pending"
+      },
+      "outcomeClassification": "TARGET_INVALIDATED",
+      "validation": {
+        "status": "failed",
+        "errors": [
+          "response.nullAccepted must be present",
+          "response.claimBoundary must be present",
+          "claimBoundary.developmentOnly must be true",
+          "claimBoundary.publicationEvidence must be false",
+          "claimBoundary.originEvidence must be false",
+          "claimBoundary.ownershipEvidence must be false",
+          "claimBoundary.modelQualityEvidence must be false",
+          "claimBoundary.providerOutputCorrectnessEvidence must be false",
+          "claimBoundary.candidateTruthEvidence must be false",
+          "claimBoundary.evidencePromotion must be false",
+          "claimBoundary.winnerCrowned must be false",
+          "response.candidate must be object or null"
+        ]
+      },
+      "promptSha256": "623073fcc265dc43679c85ec27ed637f8d935ea62154719337ff141e66050358",
+      "requestBodySha256": "631bfb102c495b9bf54c2a71b547e974d4db1a5be10148c2f133f4af8f489970",
+      "responseSha256": "623073fcc265dc43679c85ec27ed637f8d935ea62154719337ff141e66050358",
+      "providerRawPayloadSha256": "28bc2de9f725912c1c7c9b81d3b6fe4c4586881047ea835a31ae34e97d0710f7",
+      "response": {
+        "task": "Open Instrument Layer 2 target-grid candidate check",
+        "instruction": "Return exactly one JSON object. Do not use markdown. Do not add prose outside JSON.",
+        "word": "comic",
+        "stage": "MIXED_STAGE_ORTHOGRAPHIC_PRIMARY_WITH_PHONETIC_SANITY",
+        "segmentation": "COM + IC",
+        "chunk": "COM",
+        "candidateLanguage": "Latin",
+        "sourceLanguage": "English",
+        "requirements": {
+          "candidateMustBeStandaloneInCandidateLanguage": true,
+          "candidateChunkMustEqualTargetChunk": true,
+          "candidateLanguageMustEqualTargetCandidateLanguage": true,
+          "candidateMustNotBeFullInputWord": true,
+          "glossMustNotMerelyDefineFullInputWord": true,
+          "nullIsValidWhenNoCandidateFound": true,
+          "evidencePromotionAllowed": false,
+          "publicationFramingAllowed": false,
+          "winnerCrowningAllowed": false
+        },
+        "responseShape": {
+          "word": "comic",
+          "stage": "MIXED_STAGE_ORTHOGRAPHIC_PRIMARY_WITH_PHONETIC_SANITY",
+          "segmentation": "COM + IC",
+          "chunk": "COM",
+          "candidateLanguage": "Latin",
+          "candidate": null,
+          "nullAccepted": true,
+          "claimBoundary": {
+            "developmentOnly": true,
+            "publicationEvidence": false,
+            "originEvidence": false,
+            "ownershipEvidence": false,
+            "modelQualityEvidence": false,
+            "providerOutputCorrectnessEvidence": false,
+            "candidateTruthEvidence": false,
+            "evidencePromotion": false,
+            "winnerCrowned": false
+          }
+        }
+      }
+    },
+    {
+      "targetId": "comic::COM::Greek",
+      "target": {
+        "word": "comic",
+        "stage": "MIXED_STAGE_ORTHOGRAPHIC_PRIMARY_WITH_PHONETIC_SANITY",
+        "segmentation": "COM + IC",
+        "chunk": "COM",
+        "candidateLanguage": "Greek",
+        "sourceLanguage": "English",
+        "targetId": "comic::COM::Greek",
+        "targetStatus": "pending"
+      },
+      "outcomeClassification": "TARGET_INVALIDATED",
+      "validation": {
+        "status": "failed",
+        "errors": [
+          "response.nullAccepted must be present",
+          "response.claimBoundary must be present",
+          "claimBoundary.developmentOnly must be true",
+          "claimBoundary.publicationEvidence must be false",
+          "claimBoundary.originEvidence must be false",
+          "claimBoundary.ownershipEvidence must be false",
+          "claimBoundary.modelQualityEvidence must be false",
+          "claimBoundary.providerOutputCorrectnessEvidence must be false",
+          "claimBoundary.candidateTruthEvidence must be false",
+          "claimBoundary.evidencePromotion must be false",
+          "claimBoundary.winnerCrowned must be false",
+          "response.candidate must be object or null"
+        ]
+      },
+      "promptSha256": "14a9cebb4d9fc27455ac98762d30d229dcc032bbf9d226dfed0c72c759888833",
+      "requestBodySha256": "57f8398f95de9a2398b908ddc00ce6a21620a4f925e0e787ae2c08da3194754b",
+      "responseSha256": "a6171ce7b3b399f4a9290f5e9ca86e9a9f79e5bab039b368f080e433cf41f48d",
+      "providerRawPayloadSha256": "5a4d39c83d98580fbe62b295f28ccc0b707a29a47fe2b6a848c5532096defbf9",
+      "response": {
+        "task": "Open Instrument Layer 2 target-grid candidate check",
+        "instruction": "Return exactly one JSON object. Do not use markdown. Do not add prose outside JSON.",
+        "word": "comic",
+        "stage": "MIXED_STAGE_ORTHOGRAPHIC_PRIMARY_WITH_PHONETIC_SANITY",
+        "segmentation": "COM + IC",
+        "chunk": "COM",
+        "candidateLanguage": "Greek",
+        "sourceLanguage": "English",
+        "requirements": {
+          "candidateMustBeStandaloneInCandidateLanguage": true,
+          "candidateChunkMustEqualTargetChunk": true,
+          "candidateLanguageMustEqualTargetCandidateLanguage": true,
+          "candidateMustNotBeFullInputWord": true,
+          "glossMustNotMerelyDefineFullInputWord": true,
+          "nullIsValidWhenNoCandidateFound": true,
+          "evidencePromotionAllowed": false,
+          "publicationFramingAllowed": false,
+          "winnerCrowningAllowed": false
+        },
+        "responseShape": {
+          "word": "comic",
+          "stage": "MIXED_STAGE_ORTHOGRAPHIC_PRIMARY_WITH_PHONETIC_SANITY",
+          "segmentation": "COM + IC",
+          "chunk": "COM",
+          "candidateLanguage": "Greek",
+          "candidate": null,
+          "nullAccepted": true,
+          "claimBoundary": {
+            "developmentOnly": true,
+            "publicationEvidence": false,
+            "originEvidence": false,
+            "ownershipEvidence": false,
+            "modelQualityEvidence": false,
+            "providerOutputCorrectnessEvidence": false,
+            "candidateTruthEvidence": false,
+            "evidencePromotion": false,
+            "winnerCrowned": false
+          }
+        },
+        "result": {
+          "pass": true,
+          "message": ""
+        }
+      }
+    },
+    {
+      "targetId": "comic::COM::Sanskrit",
+      "target": {
+        "word": "comic",
+        "stage": "MIXED_STAGE_ORTHOGRAPHIC_PRIMARY_WITH_PHONETIC_SANITY",
+        "segmentation": "COM + IC",
+        "chunk": "COM",
+        "candidateLanguage": "Sanskrit",
+        "sourceLanguage": "English",
+        "targetId": "comic::COM::Sanskrit",
+        "targetStatus": "pending"
+      },
+      "outcomeClassification": "TARGET_INVALIDATED",
+      "validation": {
+        "status": "failed",
+        "errors": [
+          "response.word must be present",
+          "response.stage must be present",
+          "response.segmentation must be present",
+          "response.chunk must be present",
+          "response.candidateLanguage must be present",
+          "response.nullAccepted must be present",
+          "response.claimBoundary must be present",
+          "response.word must equal target.word",
+          "response.stage must equal target.stage",
+          "response.segmentation must equal target.segmentation",
+          "response.chunk must equal target.chunk",
+          "response.candidateLanguage must equal target.candidateLanguage",
+          "claimBoundary.developmentOnly must be true",
+          "claimBoundary.publicationEvidence must be false",
+          "claimBoundary.originEvidence must be false",
+          "claimBoundary.ownershipEvidence must be false",
+          "claimBoundary.modelQualityEvidence must be false",
+          "claimBoundary.providerOutputCorrectnessEvidence must be false",
+          "claimBoundary.candidateTruthEvidence must be false",
+          "claimBoundary.evidencePromotion must be false",
+          "claimBoundary.winnerCrowned must be false",
+          "response.candidate must be object or null"
+        ]
+      },
+      "promptSha256": "2d11a16cbc54f8670886219b69dbef51131bb2ea6f42381da50addf4da4b73ab",
+      "requestBodySha256": "447c61fa42c8cbd15f8faa17b9eee234deec35152c795cdbecfbfc4a658a4105",
+      "responseSha256": "07ee6c8eb8bff73f6dc314af458c22cd3237c3eea41e205b5b36008f482fa3d5",
+      "providerRawPayloadSha256": "95ae68513c6a3bcfdd9a01061b7d0fb887baee5f5584b4193bdfa83c1c3bf553",
+      "response": {
+        "error": "JSON object is not valid",
+        "message": "The JSON object contains prose outside of the JSON structure. The instruction 'Return exactly one JSON object' was not followed."
+      }
+    },
+    {
+      "targetId": "comic::IC::Albanian",
+      "target": {
+        "word": "comic",
+        "stage": "MIXED_STAGE_ORTHOGRAPHIC_PRIMARY_WITH_PHONETIC_SANITY",
+        "segmentation": "COM + IC",
+        "chunk": "IC",
+        "candidateLanguage": "Albanian",
+        "sourceLanguage": "English",
+        "targetId": "comic::IC::Albanian",
+        "targetStatus": "pending"
+      },
+      "outcomeClassification": "TARGET_INVALIDATED",
+      "validation": {
+        "status": "failed",
+        "errors": [
+          "response.nullAccepted must be present",
+          "response.claimBoundary must be present",
+          "claimBoundary.developmentOnly must be true",
+          "claimBoundary.publicationEvidence must be false",
+          "claimBoundary.originEvidence must be false",
+          "claimBoundary.ownershipEvidence must be false",
+          "claimBoundary.modelQualityEvidence must be false",
+          "claimBoundary.providerOutputCorrectnessEvidence must be false",
+          "claimBoundary.candidateTruthEvidence must be false",
+          "claimBoundary.evidencePromotion must be false",
+          "claimBoundary.winnerCrowned must be false",
+          "response.candidate must be object or null"
+        ]
+      },
+      "promptSha256": "7570e247fe9a7f3ecff588e2fbcc3966fbfecc6e35b0e6ba114a4ddd101191a9",
+      "requestBodySha256": "9ab2ee9ab9fc6e2400422f69f9a1a3f840d3a34d92196db602b8df6b039b202f",
+      "responseSha256": "7570e247fe9a7f3ecff588e2fbcc3966fbfecc6e35b0e6ba114a4ddd101191a9",
+      "providerRawPayloadSha256": "65ffb6187b19ae4c6c428c24b1a0143af4583cb7e63e9e7a5061d35d2e28b182",
+      "response": {
+        "task": "Open Instrument Layer 2 target-grid candidate check",
+        "instruction": "Return exactly one JSON object. Do not use markdown. Do not add prose outside JSON.",
+        "word": "comic",
+        "stage": "MIXED_STAGE_ORTHOGRAPHIC_PRIMARY_WITH_PHONETIC_SANITY",
+        "segmentation": "COM + IC",
+        "chunk": "IC",
+        "candidateLanguage": "Albanian",
+        "sourceLanguage": "English",
+        "requirements": {
+          "candidateMustBeStandaloneInCandidateLanguage": true,
+          "candidateChunkMustEqualTargetChunk": true,
+          "candidateLanguageMustEqualTargetCandidateLanguage": true,
+          "candidateMustNotBeFullInputWord": true,
+          "glossMustNotMerelyDefineFullInputWord": true,
+          "nullIsValidWhenNoCandidateFound": true,
+          "evidencePromotionAllowed": false,
+          "publicationFramingAllowed": false,
+          "winnerCrowningAllowed": false
+        },
+        "responseShape": {
+          "word": "comic",
+          "stage": "MIXED_STAGE_ORTHOGRAPHIC_PRIMARY_WITH_PHONETIC_SANITY",
+          "segmentation": "COM + IC",
+          "chunk": "IC",
+          "candidateLanguage": "Albanian",
+          "candidate": null,
+          "nullAccepted": true,
+          "claimBoundary": {
+            "developmentOnly": true,
+            "publicationEvidence": false,
+            "originEvidence": false,
+            "ownershipEvidence": false,
+            "modelQualityEvidence": false,
+            "providerOutputCorrectnessEvidence": false,
+            "candidateTruthEvidence": false,
+            "evidencePromotion": false,
+            "winnerCrowned": false
+          }
+        }
+      }
+    },
+    {
+      "targetId": "comic::IC::Latin",
+      "target": {
+        "word": "comic",
+        "stage": "MIXED_STAGE_ORTHOGRAPHIC_PRIMARY_WITH_PHONETIC_SANITY",
+        "segmentation": "COM + IC",
+        "chunk": "IC",
+        "candidateLanguage": "Latin",
+        "sourceLanguage": "English",
+        "targetId": "comic::IC::Latin",
+        "targetStatus": "pending"
+      },
+      "outcomeClassification": "TARGET_INVALIDATED",
+      "validation": {
+        "status": "failed",
+        "errors": [
+          "response.nullAccepted must be present",
+          "response.claimBoundary must be present",
+          "claimBoundary.developmentOnly must be true",
+          "claimBoundary.publicationEvidence must be false",
+          "claimBoundary.originEvidence must be false",
+          "claimBoundary.ownershipEvidence must be false",
+          "claimBoundary.modelQualityEvidence must be false",
+          "claimBoundary.providerOutputCorrectnessEvidence must be false",
+          "claimBoundary.candidateTruthEvidence must be false",
+          "claimBoundary.evidencePromotion must be false",
+          "claimBoundary.winnerCrowned must be false",
+          "response.candidate must be object or null"
+        ]
+      },
+      "promptSha256": "1b3c8874f2f6ba39b6193544f4ae8dbe7056a99f045889f3d22116710fb649f0",
+      "requestBodySha256": "5ba9ac11ed2b152a93bf10cb028ee462c67d5ec3e8e7309b4e87e726ff4c1470",
+      "responseSha256": "1b3c8874f2f6ba39b6193544f4ae8dbe7056a99f045889f3d22116710fb649f0",
+      "providerRawPayloadSha256": "029ae359405b8e604e8060eedf2d099551156ac667b9fd15987ae5a82e90c18c",
+      "response": {
+        "task": "Open Instrument Layer 2 target-grid candidate check",
+        "instruction": "Return exactly one JSON object. Do not use markdown. Do not add prose outside JSON.",
+        "word": "comic",
+        "stage": "MIXED_STAGE_ORTHOGRAPHIC_PRIMARY_WITH_PHONETIC_SANITY",
+        "segmentation": "COM + IC",
+        "chunk": "IC",
+        "candidateLanguage": "Latin",
+        "sourceLanguage": "English",
+        "requirements": {
+          "candidateMustBeStandaloneInCandidateLanguage": true,
+          "candidateChunkMustEqualTargetChunk": true,
+          "candidateLanguageMustEqualTargetCandidateLanguage": true,
+          "candidateMustNotBeFullInputWord": true,
+          "glossMustNotMerelyDefineFullInputWord": true,
+          "nullIsValidWhenNoCandidateFound": true,
+          "evidencePromotionAllowed": false,
+          "publicationFramingAllowed": false,
+          "winnerCrowningAllowed": false
+        },
+        "responseShape": {
+          "word": "comic",
+          "stage": "MIXED_STAGE_ORTHOGRAPHIC_PRIMARY_WITH_PHONETIC_SANITY",
+          "segmentation": "COM + IC",
+          "chunk": "IC",
+          "candidateLanguage": "Latin",
+          "candidate": null,
+          "nullAccepted": true,
+          "claimBoundary": {
+            "developmentOnly": true,
+            "publicationEvidence": false,
+            "originEvidence": false,
+            "ownershipEvidence": false,
+            "modelQualityEvidence": false,
+            "providerOutputCorrectnessEvidence": false,
+            "candidateTruthEvidence": false,
+            "evidencePromotion": false,
+            "winnerCrowned": false
+          }
+        }
+      }
+    },
+    {
+      "targetId": "comic::IC::Greek",
+      "target": {
+        "word": "comic",
+        "stage": "MIXED_STAGE_ORTHOGRAPHIC_PRIMARY_WITH_PHONETIC_SANITY",
+        "segmentation": "COM + IC",
+        "chunk": "IC",
+        "candidateLanguage": "Greek",
+        "sourceLanguage": "English",
+        "targetId": "comic::IC::Greek",
+        "targetStatus": "pending"
+      },
+      "outcomeClassification": "TARGET_INVALIDATED",
+      "validation": {
+        "status": "failed",
+        "errors": [
+          "response.nullAccepted must be present",
+          "response.claimBoundary must be present",
+          "claimBoundary.developmentOnly must be true",
+          "claimBoundary.publicationEvidence must be false",
+          "claimBoundary.originEvidence must be false",
+          "claimBoundary.ownershipEvidence must be false",
+          "claimBoundary.modelQualityEvidence must be false",
+          "claimBoundary.providerOutputCorrectnessEvidence must be false",
+          "claimBoundary.candidateTruthEvidence must be false",
+          "claimBoundary.evidencePromotion must be false",
+          "claimBoundary.winnerCrowned must be false",
+          "response.candidate must be object or null"
+        ]
+      },
+      "promptSha256": "8cd1c362260f6c2583b11094bf7cd1512747d0015fab6997183cb4ee739c8fee",
+      "requestBodySha256": "9f837378f24ec460dfca63b70b804d06ba60115c359acf07049e79be28d03610",
+      "responseSha256": "5b068cc4b4d5fb4103f61cd416633989e95cadf702112c81e7ada0642046a0c6",
+      "providerRawPayloadSha256": "0d3ba9257ed373962848920f26e86c81f58f207eba4015c52c162646f5d0a85b",
+      "response": {
+        "task": "Open Instrument Layer 2 target-grid candidate check",
+        "instruction": "Return exactly one JSON object. Do not use markdown. Do not add prose outside JSON.",
+        "word": "comic",
+        "stage": "MIXED_STAGE_ORTHOGRAPHIC_PRIMARY_WITH_PHONETIC_SANITY",
+        "segmentation": "COM + IC",
+        "chunk": "IC",
+        "candidateLanguage": "Greek",
+        "sourceLanguage": "English",
+        "requirements": {
+          "candidateMustBeStandaloneInCandidateLanguage": true,
+          "candidateChunkMustEqualTargetChunk": true,
+          "candidateLanguageMustEqualTargetCandidateLanguage": true,
+          "candidateMustNotBeFullInputWord": true,
+          "glossMustNotMerelyDefineFullInputWord": true,
+          "nullIsValidWhenNoCandidateFound": true,
+          "evidencePromotionAllowed": false,
+          "publicationFramingAllowed": false,
+          "winnerCrowningAllowed": false
+        },
+        "responseShape": {
+          "word": "comic",
+          "stage": "MIXED_STAGE_ORTHOGRAPHIC_PRIMARY_WITH_PHONETIC_SANITY",
+          "segmentation": "COM + IC",
+          "chunk": "IC",
+          "candidateLanguage": "Greek",
+          "candidate": null,
+          "nullAccepted": true,
+          "claimBoundary": {
+            "developmentOnly": true,
+            "publicationEvidence": false,
+            "originEvidence": false,
+            "ownershipEvidence": false,
+            "modelQualityEvidence": false,
+            "providerOutputCorrectnessEvidence": false,
+            "candidateTruthEvidence": false,
+            "evidencePromotion": false,
+            "winnerCrowned": false
+          }
+        },
+        "result": {
+          "pass": true,
+          "message": ""
+        }
+      }
+    },
+    {
+      "targetId": "comic::IC::Sanskrit",
+      "target": {
+        "word": "comic",
+        "stage": "MIXED_STAGE_ORTHOGRAPHIC_PRIMARY_WITH_PHONETIC_SANITY",
+        "segmentation": "COM + IC",
+        "chunk": "IC",
+        "candidateLanguage": "Sanskrit",
+        "sourceLanguage": "English",
+        "targetId": "comic::IC::Sanskrit",
+        "targetStatus": "pending"
+      },
+      "outcomeClassification": "TARGET_INVALIDATED",
+      "validation": {
+        "status": "failed",
+        "errors": [
+          "response.nullAccepted must be present",
+          "response.claimBoundary must be present",
+          "claimBoundary.developmentOnly must be true",
+          "claimBoundary.publicationEvidence must be false",
+          "claimBoundary.originEvidence must be false",
+          "claimBoundary.ownershipEvidence must be false",
+          "claimBoundary.modelQualityEvidence must be false",
+          "claimBoundary.providerOutputCorrectnessEvidence must be false",
+          "claimBoundary.candidateTruthEvidence must be false",
+          "claimBoundary.evidencePromotion must be false",
+          "claimBoundary.winnerCrowned must be false",
+          "response.candidate must be object or null"
+        ]
+      },
+      "promptSha256": "6c770e0f93c555ef7461a276b65286376e6286934c7429d7716f045c69e003f9",
+      "requestBodySha256": "d9afca3a85d652257c64079b93053c8c25a4d0f83cc3f72539d16bfd3e34778f",
+      "responseSha256": "6c770e0f93c555ef7461a276b65286376e6286934c7429d7716f045c69e003f9",
+      "providerRawPayloadSha256": "89fd2dd34dff33ed3c9d4f74b37a8c95456cc083fa2b996bee3804123e74cbbf",
+      "response": {
+        "task": "Open Instrument Layer 2 target-grid candidate check",
+        "instruction": "Return exactly one JSON object. Do not use markdown. Do not add prose outside JSON.",
+        "word": "comic",
+        "stage": "MIXED_STAGE_ORTHOGRAPHIC_PRIMARY_WITH_PHONETIC_SANITY",
+        "segmentation": "COM + IC",
+        "chunk": "IC",
+        "candidateLanguage": "Sanskrit",
+        "sourceLanguage": "English",
+        "requirements": {
+          "candidateMustBeStandaloneInCandidateLanguage": true,
+          "candidateChunkMustEqualTargetChunk": true,
+          "candidateLanguageMustEqualTargetCandidateLanguage": true,
+          "candidateMustNotBeFullInputWord": true,
+          "glossMustNotMerelyDefineFullInputWord": true,
+          "nullIsValidWhenNoCandidateFound": true,
+          "evidencePromotionAllowed": false,
+          "publicationFramingAllowed": false,
+          "winnerCrowningAllowed": false
+        },
+        "responseShape": {
+          "word": "comic",
+          "stage": "MIXED_STAGE_ORTHOGRAPHIC_PRIMARY_WITH_PHONETIC_SANITY",
+          "segmentation": "COM + IC",
+          "chunk": "IC",
+          "candidateLanguage": "Sanskrit",
+          "candidate": null,
+          "nullAccepted": true,
+          "claimBoundary": {
+            "developmentOnly": true,
+            "publicationEvidence": false,
+            "originEvidence": false,
+            "ownershipEvidence": false,
+            "modelQualityEvidence": false,
+            "providerOutputCorrectnessEvidence": false,
+            "candidateTruthEvidence": false,
+            "evidencePromotion": false,
+            "winnerCrowned": false
+          }
+        }
+      }
+    }
+  ],
+  "aggregateClassification": "TARGET_GRID_PARTIAL_INVALIDATED",
+  "scaffoldAggregateClassification": "TARGET_GRID_PARTIAL_INVALIDATED",
+  "claimBoundary": {
+    "developmentOnly": true,
+    "publicationEvidence": false,
+    "originEvidence": false,
+    "ownershipEvidence": false,
+    "modelQualityEvidence": false,
+    "providerOutputCorrectnessEvidence": false,
+    "candidateTruthEvidence": false,
+    "evidencePromotion": false,
+    "winnerCrowned": false
+  }
+}
