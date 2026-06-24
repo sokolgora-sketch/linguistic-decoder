@@ -265,6 +265,10 @@ function buildRequestBody(target, providerIdentity) {
   const body = {
     model: providerIdentity.model,
     temperature: 0,
+    // PROVIDER_JSON_RESPONSE_CONTRACT_HARDENING_V0_1
+    response_format: {
+      type: "json_object",
+    },
     messages: [
       {
         role: "system",
@@ -537,6 +541,10 @@ function runSelfCheck() {
 
   if (!reviewedRequests.every((request) => /^[0-9a-f]{64}$/.test(request.requestBodySha256))) {
     errors.push("every request must expose a request body sha256");
+  }
+
+  if (!reviewedRequests.every((request) => request.requestBody?.response_format?.type === "json_object")) {
+    errors.push("every request must require provider JSON object response format");
   }
 
   for (const target of targetGrid) {

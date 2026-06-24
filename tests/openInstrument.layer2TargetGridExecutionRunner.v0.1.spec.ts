@@ -45,6 +45,9 @@ describe("Open Instrument Layer 2 target-grid execution runner v0.1", () => {
       requestBody: {
         model: string;
         temperature: number;
+        response_format?: {
+          type: string;
+        };
       };
     }>;
 
@@ -63,6 +66,7 @@ describe("Open Instrument Layer 2 target-grid execution runner v0.1", () => {
     expect(requests.every((request) => /^[0-9a-f]{64}$/.test(request.requestBodySha256))).toBe(true);
     expect(requests.every((request) => request.requestBody.model === "llama3.1:8b")).toBe(true);
     expect(requests.every((request) => request.requestBody.temperature === 0)).toBe(true);
+    expect(requests.every((request) => request.requestBody.response_format?.type === "json_object")).toBe(true);
   });
 
   it("refuses execution without explicit reviewed execution flag", () => {
@@ -76,6 +80,8 @@ describe("Open Instrument Layer 2 target-grid execution runner v0.1", () => {
     expect(source).toContain('const REQUIRED_EXECUTION_FLAG = "--execute-reviewed-layer2-target-grid"');
     expect(source).toContain("function buildTargetPrompt");
     expect(source).toContain("function buildRequestBody");
+    expect(source).toContain("PROVIDER_JSON_RESPONSE_CONTRACT_HARDENING_V0_1");
+    expect(source).toContain('type: "json_object"');
     expect(source).toContain("function validateReviewedExecutionBaseOrThrow");
     expect(source).toContain("function validateProviderIdentityOrThrow");
     expect(source).toContain("function validateOutputPathOrThrow");
@@ -158,6 +164,7 @@ describe("Open Instrument Layer 2 target-grid execution runner v0.1", () => {
     expect(source).toContain("TARGET_INVALIDATED");
     expect(source).toContain("provider message content must be one JSON object");
     expect(source).toContain("allNonJsonInvalidatedArtifact");
+    expect(source).toContain("every request must require provider JSON object response format");
     expect(source).not.toMatch(/retryProvider|retry provider|setTimeout\(/i);
   });
 
