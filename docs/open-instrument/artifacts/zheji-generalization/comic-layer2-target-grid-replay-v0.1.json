@@ -4,7 +4,7 @@
   "word": "comic",
   "stage": "MIXED_STAGE_ORTHOGRAPHIC_PRIMARY_WITH_PHONETIC_SANITY",
   "segmentation": "COM + IC",
-  "reviewedExecutionBaseSha": "e7ce1062f6d0f430ee37f293bfbf350d18b9ee84",
+  "reviewedExecutionBaseSha": "6f52bb6b1a506ec82d40ce7cfe22c6a15e2286d3",
   "providerIdentity": {
     "providerFamily": "local_only_openai_compatible",
     "providerName": "ollama_openai_compat",
@@ -114,37 +114,34 @@
       "validation": {
         "status": "failed",
         "errors": [
-          "response.word must be present",
-          "response.stage must be present",
-          "response.segmentation must be present",
-          "response.chunk must be present",
-          "response.candidateLanguage must be present",
-          "response.nullAccepted must be present",
-          "response.claimBoundary must be present",
-          "response.word must equal target.word",
-          "response.stage must equal target.stage",
-          "response.segmentation must equal target.segmentation",
-          "response.chunk must equal target.chunk",
-          "response.candidateLanguage must equal target.candidateLanguage",
-          "claimBoundary.developmentOnly must be true",
-          "claimBoundary.publicationEvidence must be false",
-          "claimBoundary.originEvidence must be false",
-          "claimBoundary.ownershipEvidence must be false",
-          "claimBoundary.modelQualityEvidence must be false",
-          "claimBoundary.providerOutputCorrectnessEvidence must be false",
-          "claimBoundary.candidateTruthEvidence must be false",
-          "claimBoundary.evidencePromotion must be false",
-          "claimBoundary.winnerCrowned must be false",
-          "response.candidate must be object or null"
+          "provider message content must be one JSON object",
+          "null target response must set nullAccepted true"
         ]
       },
-      "promptSha256": "bc446fb89fa8ff26aeb6d4d436beb32fe039291c7f65a9a0d663434d7d1b2679",
-      "requestBodySha256": "f488d031777533bf35bcb745a11d9f0e21f28c5f33ce37122bc12f63721ea891",
-      "responseSha256": "07ee6c8eb8bff73f6dc314af458c22cd3237c3eea41e205b5b36008f482fa3d5",
-      "providerRawPayloadSha256": "b15366c8115f4c01a8b9554429b115d90919a8bdc3ebfed1f62e296e581e54cc",
+      "promptSha256": "4004282f79ece93ddcad1f645e02a98c25f290c6d41b8376255bffdc822553b0",
+      "requestBodySha256": "6b76ad4d4c555e81cc8243fdf004fd15869b7e2a4107960cf8fb2a5a94275894",
+      "responseSha256": "0ad736b46ae48b36fbe952bdc2ea7af6d9532ab22bceea298a5978727e8c0ff8",
+      "providerRawPayloadSha256": "cfe71602a6215d87818b066ff16a8853570820dfb7e61426c7b88f1f4d75d05e",
       "response": {
-        "error": "JSON object is not valid",
-        "message": "The JSON object contains prose outside of the JSON structure. The instruction 'Return exactly one JSON object' was not followed."
+        "word": "comic",
+        "stage": "MIXED_STAGE_ORTHOGRAPHIC_PRIMARY_WITH_PHONETIC_SANITY",
+        "segmentation": "COM + IC",
+        "chunk": "COM",
+        "candidateLanguage": "Albanian",
+        "candidate": null,
+        "nullAccepted": false,
+        "claimBoundary": {
+          "developmentOnly": true,
+          "publicationEvidence": false,
+          "originEvidence": false,
+          "ownershipEvidence": false,
+          "modelQualityEvidence": false,
+          "providerOutputCorrectnessEvidence": false,
+          "candidateTruthEvidence": false,
+          "evidencePromotion": false,
+          "winnerCrowned": false
+        },
+        "providerMessageContentParseError": "provider message content must be one JSON object"
       }
     },
     {
@@ -163,64 +160,34 @@
       "validation": {
         "status": "failed",
         "errors": [
-          "response.nullAccepted must be present",
-          "response.claimBoundary must be present",
-          "claimBoundary.developmentOnly must be true",
-          "claimBoundary.publicationEvidence must be false",
-          "claimBoundary.originEvidence must be false",
-          "claimBoundary.ownershipEvidence must be false",
-          "claimBoundary.modelQualityEvidence must be false",
-          "claimBoundary.providerOutputCorrectnessEvidence must be false",
-          "claimBoundary.candidateTruthEvidence must be false",
-          "claimBoundary.evidencePromotion must be false",
-          "claimBoundary.winnerCrowned must be false",
-          "response.candidate must be object or null"
+          "provider message content must be one JSON object",
+          "null target response must set nullAccepted true"
         ]
       },
-      "promptSha256": "623073fcc265dc43679c85ec27ed637f8d935ea62154719337ff141e66050358",
-      "requestBodySha256": "631bfb102c495b9bf54c2a71b547e974d4db1a5be10148c2f133f4af8f489970",
-      "responseSha256": "623073fcc265dc43679c85ec27ed637f8d935ea62154719337ff141e66050358",
-      "providerRawPayloadSha256": "28bc2de9f725912c1c7c9b81d3b6fe4c4586881047ea835a31ae34e97d0710f7",
+      "promptSha256": "532c57fb37d718fe0a0bfba653d99df06036a899c0ebdbb1b7834c2c32a3a8ca",
+      "requestBodySha256": "6d19c50ec26f53cf41bb156b27bfe9e7f8ab9eb9632db84fa2c2c6d8f2530a14",
+      "responseSha256": "2d1070268702cab88cd2e9e64ccb986943b362cd7937bb243725ef6f63a4e1f8",
+      "providerRawPayloadSha256": "8840c50e45379f6605e8a5a5645ea7729e169a04cb6e24b5192191613c56b3d3",
       "response": {
-        "task": "Open Instrument Layer 2 target-grid candidate check",
-        "instruction": "Return exactly one JSON object. Do not use markdown. Do not add prose outside JSON.",
         "word": "comic",
         "stage": "MIXED_STAGE_ORTHOGRAPHIC_PRIMARY_WITH_PHONETIC_SANITY",
         "segmentation": "COM + IC",
         "chunk": "COM",
         "candidateLanguage": "Latin",
-        "sourceLanguage": "English",
-        "requirements": {
-          "candidateMustBeStandaloneInCandidateLanguage": true,
-          "candidateChunkMustEqualTargetChunk": true,
-          "candidateLanguageMustEqualTargetCandidateLanguage": true,
-          "candidateMustNotBeFullInputWord": true,
-          "glossMustNotMerelyDefineFullInputWord": true,
-          "nullIsValidWhenNoCandidateFound": true,
-          "evidencePromotionAllowed": false,
-          "publicationFramingAllowed": false,
-          "winnerCrowningAllowed": false
+        "candidate": null,
+        "nullAccepted": false,
+        "claimBoundary": {
+          "developmentOnly": true,
+          "publicationEvidence": false,
+          "originEvidence": false,
+          "ownershipEvidence": false,
+          "modelQualityEvidence": false,
+          "providerOutputCorrectnessEvidence": false,
+          "candidateTruthEvidence": false,
+          "evidencePromotion": false,
+          "winnerCrowned": false
         },
-        "responseShape": {
-          "word": "comic",
-          "stage": "MIXED_STAGE_ORTHOGRAPHIC_PRIMARY_WITH_PHONETIC_SANITY",
-          "segmentation": "COM + IC",
-          "chunk": "COM",
-          "candidateLanguage": "Latin",
-          "candidate": null,
-          "nullAccepted": true,
-          "claimBoundary": {
-            "developmentOnly": true,
-            "publicationEvidence": false,
-            "originEvidence": false,
-            "ownershipEvidence": false,
-            "modelQualityEvidence": false,
-            "providerOutputCorrectnessEvidence": false,
-            "candidateTruthEvidence": false,
-            "evidencePromotion": false,
-            "winnerCrowned": false
-          }
-        }
+        "providerMessageContentParseError": "provider message content must be one JSON object"
       }
     },
     {
@@ -239,68 +206,34 @@
       "validation": {
         "status": "failed",
         "errors": [
-          "response.nullAccepted must be present",
-          "response.claimBoundary must be present",
-          "claimBoundary.developmentOnly must be true",
-          "claimBoundary.publicationEvidence must be false",
-          "claimBoundary.originEvidence must be false",
-          "claimBoundary.ownershipEvidence must be false",
-          "claimBoundary.modelQualityEvidence must be false",
-          "claimBoundary.providerOutputCorrectnessEvidence must be false",
-          "claimBoundary.candidateTruthEvidence must be false",
-          "claimBoundary.evidencePromotion must be false",
-          "claimBoundary.winnerCrowned must be false",
-          "response.candidate must be object or null"
+          "provider message content must be one JSON object",
+          "null target response must set nullAccepted true"
         ]
       },
-      "promptSha256": "14a9cebb4d9fc27455ac98762d30d229dcc032bbf9d226dfed0c72c759888833",
-      "requestBodySha256": "57f8398f95de9a2398b908ddc00ce6a21620a4f925e0e787ae2c08da3194754b",
-      "responseSha256": "a6171ce7b3b399f4a9290f5e9ca86e9a9f79e5bab039b368f080e433cf41f48d",
-      "providerRawPayloadSha256": "5a4d39c83d98580fbe62b295f28ccc0b707a29a47fe2b6a848c5532096defbf9",
+      "promptSha256": "cc8a963616aaf56f52b04ea0f80870342727d8f171a68b557c953038523f9871",
+      "requestBodySha256": "41dfcd3e78b0446fdbbace6cca5f77ddbfb37589a19ea3596df8dda3033a302b",
+      "responseSha256": "2d1070268702cab88cd2e9e64ccb986943b362cd7937bb243725ef6f63a4e1f8",
+      "providerRawPayloadSha256": "d975dd305dc41222ffb0cf46a9f03b16ea7a9879e20469a8dc20967d1cc23a1b",
       "response": {
-        "task": "Open Instrument Layer 2 target-grid candidate check",
-        "instruction": "Return exactly one JSON object. Do not use markdown. Do not add prose outside JSON.",
         "word": "comic",
         "stage": "MIXED_STAGE_ORTHOGRAPHIC_PRIMARY_WITH_PHONETIC_SANITY",
         "segmentation": "COM + IC",
         "chunk": "COM",
         "candidateLanguage": "Greek",
-        "sourceLanguage": "English",
-        "requirements": {
-          "candidateMustBeStandaloneInCandidateLanguage": true,
-          "candidateChunkMustEqualTargetChunk": true,
-          "candidateLanguageMustEqualTargetCandidateLanguage": true,
-          "candidateMustNotBeFullInputWord": true,
-          "glossMustNotMerelyDefineFullInputWord": true,
-          "nullIsValidWhenNoCandidateFound": true,
-          "evidencePromotionAllowed": false,
-          "publicationFramingAllowed": false,
-          "winnerCrowningAllowed": false
+        "candidate": null,
+        "nullAccepted": false,
+        "claimBoundary": {
+          "developmentOnly": true,
+          "publicationEvidence": false,
+          "originEvidence": false,
+          "ownershipEvidence": false,
+          "modelQualityEvidence": false,
+          "providerOutputCorrectnessEvidence": false,
+          "candidateTruthEvidence": false,
+          "evidencePromotion": false,
+          "winnerCrowned": false
         },
-        "responseShape": {
-          "word": "comic",
-          "stage": "MIXED_STAGE_ORTHOGRAPHIC_PRIMARY_WITH_PHONETIC_SANITY",
-          "segmentation": "COM + IC",
-          "chunk": "COM",
-          "candidateLanguage": "Greek",
-          "candidate": null,
-          "nullAccepted": true,
-          "claimBoundary": {
-            "developmentOnly": true,
-            "publicationEvidence": false,
-            "originEvidence": false,
-            "ownershipEvidence": false,
-            "modelQualityEvidence": false,
-            "providerOutputCorrectnessEvidence": false,
-            "candidateTruthEvidence": false,
-            "evidencePromotion": false,
-            "winnerCrowned": false
-          }
-        },
-        "result": {
-          "pass": true,
-          "message": ""
-        }
+        "providerMessageContentParseError": "provider message content must be one JSON object"
       }
     },
     {
@@ -319,37 +252,34 @@
       "validation": {
         "status": "failed",
         "errors": [
-          "response.word must be present",
-          "response.stage must be present",
-          "response.segmentation must be present",
-          "response.chunk must be present",
-          "response.candidateLanguage must be present",
-          "response.nullAccepted must be present",
-          "response.claimBoundary must be present",
-          "response.word must equal target.word",
-          "response.stage must equal target.stage",
-          "response.segmentation must equal target.segmentation",
-          "response.chunk must equal target.chunk",
-          "response.candidateLanguage must equal target.candidateLanguage",
-          "claimBoundary.developmentOnly must be true",
-          "claimBoundary.publicationEvidence must be false",
-          "claimBoundary.originEvidence must be false",
-          "claimBoundary.ownershipEvidence must be false",
-          "claimBoundary.modelQualityEvidence must be false",
-          "claimBoundary.providerOutputCorrectnessEvidence must be false",
-          "claimBoundary.candidateTruthEvidence must be false",
-          "claimBoundary.evidencePromotion must be false",
-          "claimBoundary.winnerCrowned must be false",
-          "response.candidate must be object or null"
+          "provider message content must be one JSON object",
+          "null target response must set nullAccepted true"
         ]
       },
-      "promptSha256": "2d11a16cbc54f8670886219b69dbef51131bb2ea6f42381da50addf4da4b73ab",
-      "requestBodySha256": "447c61fa42c8cbd15f8faa17b9eee234deec35152c795cdbecfbfc4a658a4105",
-      "responseSha256": "07ee6c8eb8bff73f6dc314af458c22cd3237c3eea41e205b5b36008f482fa3d5",
-      "providerRawPayloadSha256": "95ae68513c6a3bcfdd9a01061b7d0fb887baee5f5584b4193bdfa83c1c3bf553",
+      "promptSha256": "f40d480050f12a4e831971cfc98844ffd0ed1c98e8125ec22b2dd449c67a24a4",
+      "requestBodySha256": "f6bf1102bcc20b4d59f1189db4d71d9ee855d9b45be03d3a6bb913758392f5fd",
+      "responseSha256": "10042926e1b46e91c7f9f29a20abc8dc47717b419f7bd0a030c9cd83d029b997",
+      "providerRawPayloadSha256": "a90a3c8cfb142ee91ba7e1e0cb9a400b3c3184f91c08ed9be1acf51bc55ad7c2",
       "response": {
-        "error": "JSON object is not valid",
-        "message": "The JSON object contains prose outside of the JSON structure. The instruction 'Return exactly one JSON object' was not followed."
+        "word": "comic",
+        "stage": "MIXED_STAGE_ORTHOGRAPHIC_PRIMARY_WITH_PHONETIC_SANITY",
+        "segmentation": "COM + IC",
+        "chunk": "COM",
+        "candidateLanguage": "Sanskrit",
+        "candidate": null,
+        "nullAccepted": false,
+        "claimBoundary": {
+          "developmentOnly": true,
+          "publicationEvidence": false,
+          "originEvidence": false,
+          "ownershipEvidence": false,
+          "modelQualityEvidence": false,
+          "providerOutputCorrectnessEvidence": false,
+          "candidateTruthEvidence": false,
+          "evidencePromotion": false,
+          "winnerCrowned": false
+        },
+        "providerMessageContentParseError": "provider message content must be one JSON object"
       }
     },
     {
@@ -368,64 +298,34 @@
       "validation": {
         "status": "failed",
         "errors": [
-          "response.nullAccepted must be present",
-          "response.claimBoundary must be present",
-          "claimBoundary.developmentOnly must be true",
-          "claimBoundary.publicationEvidence must be false",
-          "claimBoundary.originEvidence must be false",
-          "claimBoundary.ownershipEvidence must be false",
-          "claimBoundary.modelQualityEvidence must be false",
-          "claimBoundary.providerOutputCorrectnessEvidence must be false",
-          "claimBoundary.candidateTruthEvidence must be false",
-          "claimBoundary.evidencePromotion must be false",
-          "claimBoundary.winnerCrowned must be false",
-          "response.candidate must be object or null"
+          "provider message content must be one JSON object",
+          "null target response must set nullAccepted true"
         ]
       },
-      "promptSha256": "7570e247fe9a7f3ecff588e2fbcc3966fbfecc6e35b0e6ba114a4ddd101191a9",
-      "requestBodySha256": "9ab2ee9ab9fc6e2400422f69f9a1a3f840d3a34d92196db602b8df6b039b202f",
-      "responseSha256": "7570e247fe9a7f3ecff588e2fbcc3966fbfecc6e35b0e6ba114a4ddd101191a9",
-      "providerRawPayloadSha256": "65ffb6187b19ae4c6c428c24b1a0143af4583cb7e63e9e7a5061d35d2e28b182",
+      "promptSha256": "ed7545a31b93a0eca4051775611412fbd5e9c5dd1aa3e42390243e68cbecdfea",
+      "requestBodySha256": "300f18fddad386eb218e955365ff3663969ff24d7ec32a0b8943320c2548771f",
+      "responseSha256": "23cce1e18abf8003a709e1396ac212696e6b3981601c347d097c30446f1ac9d3",
+      "providerRawPayloadSha256": "3808132bbb21f8c52950df75a3079dcdb2a86de1cdb4a36da254a08a4ed31bff",
       "response": {
-        "task": "Open Instrument Layer 2 target-grid candidate check",
-        "instruction": "Return exactly one JSON object. Do not use markdown. Do not add prose outside JSON.",
         "word": "comic",
         "stage": "MIXED_STAGE_ORTHOGRAPHIC_PRIMARY_WITH_PHONETIC_SANITY",
         "segmentation": "COM + IC",
         "chunk": "IC",
         "candidateLanguage": "Albanian",
-        "sourceLanguage": "English",
-        "requirements": {
-          "candidateMustBeStandaloneInCandidateLanguage": true,
-          "candidateChunkMustEqualTargetChunk": true,
-          "candidateLanguageMustEqualTargetCandidateLanguage": true,
-          "candidateMustNotBeFullInputWord": true,
-          "glossMustNotMerelyDefineFullInputWord": true,
-          "nullIsValidWhenNoCandidateFound": true,
-          "evidencePromotionAllowed": false,
-          "publicationFramingAllowed": false,
-          "winnerCrowningAllowed": false
+        "candidate": null,
+        "nullAccepted": false,
+        "claimBoundary": {
+          "developmentOnly": true,
+          "publicationEvidence": false,
+          "originEvidence": false,
+          "ownershipEvidence": false,
+          "modelQualityEvidence": false,
+          "providerOutputCorrectnessEvidence": false,
+          "candidateTruthEvidence": false,
+          "evidencePromotion": false,
+          "winnerCrowned": false
         },
-        "responseShape": {
-          "word": "comic",
-          "stage": "MIXED_STAGE_ORTHOGRAPHIC_PRIMARY_WITH_PHONETIC_SANITY",
-          "segmentation": "COM + IC",
-          "chunk": "IC",
-          "candidateLanguage": "Albanian",
-          "candidate": null,
-          "nullAccepted": true,
-          "claimBoundary": {
-            "developmentOnly": true,
-            "publicationEvidence": false,
-            "originEvidence": false,
-            "ownershipEvidence": false,
-            "modelQualityEvidence": false,
-            "providerOutputCorrectnessEvidence": false,
-            "candidateTruthEvidence": false,
-            "evidencePromotion": false,
-            "winnerCrowned": false
-          }
-        }
+        "providerMessageContentParseError": "provider message content must be one JSON object"
       }
     },
     {
@@ -444,64 +344,34 @@
       "validation": {
         "status": "failed",
         "errors": [
-          "response.nullAccepted must be present",
-          "response.claimBoundary must be present",
-          "claimBoundary.developmentOnly must be true",
-          "claimBoundary.publicationEvidence must be false",
-          "claimBoundary.originEvidence must be false",
-          "claimBoundary.ownershipEvidence must be false",
-          "claimBoundary.modelQualityEvidence must be false",
-          "claimBoundary.providerOutputCorrectnessEvidence must be false",
-          "claimBoundary.candidateTruthEvidence must be false",
-          "claimBoundary.evidencePromotion must be false",
-          "claimBoundary.winnerCrowned must be false",
-          "response.candidate must be object or null"
+          "provider message content must be one JSON object",
+          "null target response must set nullAccepted true"
         ]
       },
-      "promptSha256": "1b3c8874f2f6ba39b6193544f4ae8dbe7056a99f045889f3d22116710fb649f0",
-      "requestBodySha256": "5ba9ac11ed2b152a93bf10cb028ee462c67d5ec3e8e7309b4e87e726ff4c1470",
-      "responseSha256": "1b3c8874f2f6ba39b6193544f4ae8dbe7056a99f045889f3d22116710fb649f0",
-      "providerRawPayloadSha256": "029ae359405b8e604e8060eedf2d099551156ac667b9fd15987ae5a82e90c18c",
+      "promptSha256": "44c88b53f0c0b36eb95d0d1de3d0170780448cb473c168d3f17c8af2b0bc97a6",
+      "requestBodySha256": "dc5a13c8c2361471f3b7cac1b0324c2b60fbe9f57844dedb25738e55ad41af21",
+      "responseSha256": "c38c156344e8b9b639ee159d06b785425c8018d04ce2edd68b0d6e3eb35b6cc6",
+      "providerRawPayloadSha256": "b1a10b8a930f1fd94f4c2bcbfd6d0ca289ddc9fc239a2ebff73e62de8778af65",
       "response": {
-        "task": "Open Instrument Layer 2 target-grid candidate check",
-        "instruction": "Return exactly one JSON object. Do not use markdown. Do not add prose outside JSON.",
         "word": "comic",
         "stage": "MIXED_STAGE_ORTHOGRAPHIC_PRIMARY_WITH_PHONETIC_SANITY",
         "segmentation": "COM + IC",
         "chunk": "IC",
         "candidateLanguage": "Latin",
-        "sourceLanguage": "English",
-        "requirements": {
-          "candidateMustBeStandaloneInCandidateLanguage": true,
-          "candidateChunkMustEqualTargetChunk": true,
-          "candidateLanguageMustEqualTargetCandidateLanguage": true,
-          "candidateMustNotBeFullInputWord": true,
-          "glossMustNotMerelyDefineFullInputWord": true,
-          "nullIsValidWhenNoCandidateFound": true,
-          "evidencePromotionAllowed": false,
-          "publicationFramingAllowed": false,
-          "winnerCrowningAllowed": false
+        "candidate": null,
+        "nullAccepted": false,
+        "claimBoundary": {
+          "developmentOnly": true,
+          "publicationEvidence": false,
+          "originEvidence": false,
+          "ownershipEvidence": false,
+          "modelQualityEvidence": false,
+          "providerOutputCorrectnessEvidence": false,
+          "candidateTruthEvidence": false,
+          "evidencePromotion": false,
+          "winnerCrowned": false
         },
-        "responseShape": {
-          "word": "comic",
-          "stage": "MIXED_STAGE_ORTHOGRAPHIC_PRIMARY_WITH_PHONETIC_SANITY",
-          "segmentation": "COM + IC",
-          "chunk": "IC",
-          "candidateLanguage": "Latin",
-          "candidate": null,
-          "nullAccepted": true,
-          "claimBoundary": {
-            "developmentOnly": true,
-            "publicationEvidence": false,
-            "originEvidence": false,
-            "ownershipEvidence": false,
-            "modelQualityEvidence": false,
-            "providerOutputCorrectnessEvidence": false,
-            "candidateTruthEvidence": false,
-            "evidencePromotion": false,
-            "winnerCrowned": false
-          }
-        }
+        "providerMessageContentParseError": "provider message content must be one JSON object"
       }
     },
     {
@@ -520,68 +390,34 @@
       "validation": {
         "status": "failed",
         "errors": [
-          "response.nullAccepted must be present",
-          "response.claimBoundary must be present",
-          "claimBoundary.developmentOnly must be true",
-          "claimBoundary.publicationEvidence must be false",
-          "claimBoundary.originEvidence must be false",
-          "claimBoundary.ownershipEvidence must be false",
-          "claimBoundary.modelQualityEvidence must be false",
-          "claimBoundary.providerOutputCorrectnessEvidence must be false",
-          "claimBoundary.candidateTruthEvidence must be false",
-          "claimBoundary.evidencePromotion must be false",
-          "claimBoundary.winnerCrowned must be false",
-          "response.candidate must be object or null"
+          "provider message content must be one JSON object",
+          "null target response must set nullAccepted true"
         ]
       },
-      "promptSha256": "8cd1c362260f6c2583b11094bf7cd1512747d0015fab6997183cb4ee739c8fee",
-      "requestBodySha256": "9f837378f24ec460dfca63b70b804d06ba60115c359acf07049e79be28d03610",
-      "responseSha256": "5b068cc4b4d5fb4103f61cd416633989e95cadf702112c81e7ada0642046a0c6",
-      "providerRawPayloadSha256": "0d3ba9257ed373962848920f26e86c81f58f207eba4015c52c162646f5d0a85b",
+      "promptSha256": "16ee5061440065f9bda941e864c4ba74f8badcbd917985b77e8bcb648f7c9f98",
+      "requestBodySha256": "b1d790afa8a301732a94c4e16005dffe36ebd9c884936a34188376667ee8eff4",
+      "responseSha256": "8823f39ab99061cf85e1999eb108dc38c6d60fe785574c27d443750e1e19438e",
+      "providerRawPayloadSha256": "c66fe0f633e7d8db01f9d9d332e8958754f73b22c4f120689d9f34151919953f",
       "response": {
-        "task": "Open Instrument Layer 2 target-grid candidate check",
-        "instruction": "Return exactly one JSON object. Do not use markdown. Do not add prose outside JSON.",
         "word": "comic",
         "stage": "MIXED_STAGE_ORTHOGRAPHIC_PRIMARY_WITH_PHONETIC_SANITY",
         "segmentation": "COM + IC",
         "chunk": "IC",
         "candidateLanguage": "Greek",
-        "sourceLanguage": "English",
-        "requirements": {
-          "candidateMustBeStandaloneInCandidateLanguage": true,
-          "candidateChunkMustEqualTargetChunk": true,
-          "candidateLanguageMustEqualTargetCandidateLanguage": true,
-          "candidateMustNotBeFullInputWord": true,
-          "glossMustNotMerelyDefineFullInputWord": true,
-          "nullIsValidWhenNoCandidateFound": true,
-          "evidencePromotionAllowed": false,
-          "publicationFramingAllowed": false,
-          "winnerCrowningAllowed": false
+        "candidate": null,
+        "nullAccepted": false,
+        "claimBoundary": {
+          "developmentOnly": true,
+          "publicationEvidence": false,
+          "originEvidence": false,
+          "ownershipEvidence": false,
+          "modelQualityEvidence": false,
+          "providerOutputCorrectnessEvidence": false,
+          "candidateTruthEvidence": false,
+          "evidencePromotion": false,
+          "winnerCrowned": false
         },
-        "responseShape": {
-          "word": "comic",
-          "stage": "MIXED_STAGE_ORTHOGRAPHIC_PRIMARY_WITH_PHONETIC_SANITY",
-          "segmentation": "COM + IC",
-          "chunk": "IC",
-          "candidateLanguage": "Greek",
-          "candidate": null,
-          "nullAccepted": true,
-          "claimBoundary": {
-            "developmentOnly": true,
-            "publicationEvidence": false,
-            "originEvidence": false,
-            "ownershipEvidence": false,
-            "modelQualityEvidence": false,
-            "providerOutputCorrectnessEvidence": false,
-            "candidateTruthEvidence": false,
-            "evidencePromotion": false,
-            "winnerCrowned": false
-          }
-        },
-        "result": {
-          "pass": true,
-          "message": ""
-        }
+        "providerMessageContentParseError": "provider message content must be one JSON object"
       }
     },
     {
@@ -600,64 +436,34 @@
       "validation": {
         "status": "failed",
         "errors": [
-          "response.nullAccepted must be present",
-          "response.claimBoundary must be present",
-          "claimBoundary.developmentOnly must be true",
-          "claimBoundary.publicationEvidence must be false",
-          "claimBoundary.originEvidence must be false",
-          "claimBoundary.ownershipEvidence must be false",
-          "claimBoundary.modelQualityEvidence must be false",
-          "claimBoundary.providerOutputCorrectnessEvidence must be false",
-          "claimBoundary.candidateTruthEvidence must be false",
-          "claimBoundary.evidencePromotion must be false",
-          "claimBoundary.winnerCrowned must be false",
-          "response.candidate must be object or null"
+          "provider message content must be one JSON object",
+          "null target response must set nullAccepted true"
         ]
       },
-      "promptSha256": "6c770e0f93c555ef7461a276b65286376e6286934c7429d7716f045c69e003f9",
-      "requestBodySha256": "d9afca3a85d652257c64079b93053c8c25a4d0f83cc3f72539d16bfd3e34778f",
-      "responseSha256": "6c770e0f93c555ef7461a276b65286376e6286934c7429d7716f045c69e003f9",
-      "providerRawPayloadSha256": "89fd2dd34dff33ed3c9d4f74b37a8c95456cc083fa2b996bee3804123e74cbbf",
+      "promptSha256": "73bf3e8e5f611e6b64742c8272d462175a68943fec8401a96357121d7945aee9",
+      "requestBodySha256": "caf8027c776aaefc1ac8c1c6e6cdbc3c8a195c04cee17defdd0f9954c86151d2",
+      "responseSha256": "55809db6627d5005f1f3894c6903b0138f539513ad5c24157da5a65cd0da5349",
+      "providerRawPayloadSha256": "93e64a1d6a09bf86ca71e36de97c7d529dedcd7c6af283640bb45e0f807ef61d",
       "response": {
-        "task": "Open Instrument Layer 2 target-grid candidate check",
-        "instruction": "Return exactly one JSON object. Do not use markdown. Do not add prose outside JSON.",
         "word": "comic",
         "stage": "MIXED_STAGE_ORTHOGRAPHIC_PRIMARY_WITH_PHONETIC_SANITY",
         "segmentation": "COM + IC",
         "chunk": "IC",
         "candidateLanguage": "Sanskrit",
-        "sourceLanguage": "English",
-        "requirements": {
-          "candidateMustBeStandaloneInCandidateLanguage": true,
-          "candidateChunkMustEqualTargetChunk": true,
-          "candidateLanguageMustEqualTargetCandidateLanguage": true,
-          "candidateMustNotBeFullInputWord": true,
-          "glossMustNotMerelyDefineFullInputWord": true,
-          "nullIsValidWhenNoCandidateFound": true,
-          "evidencePromotionAllowed": false,
-          "publicationFramingAllowed": false,
-          "winnerCrowningAllowed": false
+        "candidate": null,
+        "nullAccepted": false,
+        "claimBoundary": {
+          "developmentOnly": true,
+          "publicationEvidence": false,
+          "originEvidence": false,
+          "ownershipEvidence": false,
+          "modelQualityEvidence": false,
+          "providerOutputCorrectnessEvidence": false,
+          "candidateTruthEvidence": false,
+          "evidencePromotion": false,
+          "winnerCrowned": false
         },
-        "responseShape": {
-          "word": "comic",
-          "stage": "MIXED_STAGE_ORTHOGRAPHIC_PRIMARY_WITH_PHONETIC_SANITY",
-          "segmentation": "COM + IC",
-          "chunk": "IC",
-          "candidateLanguage": "Sanskrit",
-          "candidate": null,
-          "nullAccepted": true,
-          "claimBoundary": {
-            "developmentOnly": true,
-            "publicationEvidence": false,
-            "originEvidence": false,
-            "ownershipEvidence": false,
-            "modelQualityEvidence": false,
-            "providerOutputCorrectnessEvidence": false,
-            "candidateTruthEvidence": false,
-            "evidencePromotion": false,
-            "winnerCrowned": false
-          }
-        }
+        "providerMessageContentParseError": "provider message content must be one JSON object"
       }
     }
   ],
