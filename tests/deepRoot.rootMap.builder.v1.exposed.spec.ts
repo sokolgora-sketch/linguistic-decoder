@@ -1,3 +1,4 @@
+import { buildRootMapV1 } from "@/shared/deepRoot.rootMap.builder.v1";
 
 it("buildRootMapV1 prefers Heart-aligned terminal vowel (study: DI not DA)", () => {
   const H_DI = {
