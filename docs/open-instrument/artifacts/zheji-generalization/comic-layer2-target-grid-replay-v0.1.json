@@ -4,7 +4,7 @@
   "word": "comic",
   "stage": "MIXED_STAGE_ORTHOGRAPHIC_PRIMARY_WITH_PHONETIC_SANITY",
   "segmentation": "COM + IC",
-  "reviewedExecutionBaseSha": "6f52bb6b1a506ec82d40ce7cfe22c6a15e2286d3",
+  "reviewedExecutionBaseSha": "eb945b03d02eb93946dd3bd559325fd7536a5d82",
   "providerIdentity": {
     "providerFamily": "local_only_openai_compatible",
     "providerName": "ollama_openai_compat",
@@ -110,26 +110,22 @@
         "targetId": "comic::COM::Albanian",
         "targetStatus": "pending"
       },
-      "outcomeClassification": "TARGET_INVALIDATED",
+      "outcomeClassification": "TARGET_NULL_ACCEPTED",
       "validation": {
-        "status": "failed",
-        "errors": [
-          "provider message content must be one JSON object",
-          "null target response must set nullAccepted true"
-        ]
+        "status": "passed",
+        "errors": []
       },
       "promptSha256": "4004282f79ece93ddcad1f645e02a98c25f290c6d41b8376255bffdc822553b0",
-      "requestBodySha256": "6b76ad4d4c555e81cc8243fdf004fd15869b7e2a4107960cf8fb2a5a94275894",
-      "responseSha256": "0ad736b46ae48b36fbe952bdc2ea7af6d9532ab22bceea298a5978727e8c0ff8",
-      "providerRawPayloadSha256": "cfe71602a6215d87818b066ff16a8853570820dfb7e61426c7b88f1f4d75d05e",
+      "requestBodySha256": "6b8a7761c339bc826cb4749e506f6b541cc7ec4065b1e704dda01027fc4e7ab1",
+      "responseSha256": "879921682c44c46f6200f837905a65b56392e24c5c1862da58486592b6854477",
+      "providerRawPayloadSha256": "e9a8e6e60ca9df91ffe4e06ed52d51e65ca2cf58141495637e7e0e9187cce1c6",
       "response": {
         "word": "comic",
         "stage": "MIXED_STAGE_ORTHOGRAPHIC_PRIMARY_WITH_PHONETIC_SANITY",
         "segmentation": "COM + IC",
         "chunk": "COM",
         "candidateLanguage": "Albanian",
-        "candidate": null,
-        "nullAccepted": false,
+        "nullAccepted": true,
         "claimBoundary": {
           "developmentOnly": true,
           "publicationEvidence": false,
@@ -141,7 +137,7 @@
           "evidencePromotion": false,
           "winnerCrowned": false
         },
-        "providerMessageContentParseError": "provider message content must be one JSON object"
+        "candidate": null
       }
     },
     {
@@ -156,26 +152,22 @@
         "targetId": "comic::COM::Latin",
         "targetStatus": "pending"
       },
-      "outcomeClassification": "TARGET_INVALIDATED",
+      "outcomeClassification": "TARGET_NULL_ACCEPTED",
       "validation": {
-        "status": "failed",
-        "errors": [
-          "provider message content must be one JSON object",
-          "null target response must set nullAccepted true"
-        ]
+        "status": "passed",
+        "errors": []
       },
       "promptSha256": "532c57fb37d718fe0a0bfba653d99df06036a899c0ebdbb1b7834c2c32a3a8ca",
-      "requestBodySha256": "6d19c50ec26f53cf41bb156b27bfe9e7f8ab9eb9632db84fa2c2c6d8f2530a14",
-      "responseSha256": "2d1070268702cab88cd2e9e64ccb986943b362cd7937bb243725ef6f63a4e1f8",
-      "providerRawPayloadSha256": "8840c50e45379f6605e8a5a5645ea7729e169a04cb6e24b5192191613c56b3d3",
+      "requestBodySha256": "926ad08f5e24a52d98237d50fabad925e9d9c6d3a7a7e32729e8f2e214ac1d15",
+      "responseSha256": "7d7c47fbadbee232797e53e52a0e89066fe847f7588d45d499cd2b58039403fe",
+      "providerRawPayloadSha256": "7ed5323da090bac6ccbffaea143fcf5d211294079b1c246bf691b416fc305c9c",
       "response": {
         "word": "comic",
         "stage": "MIXED_STAGE_ORTHOGRAPHIC_PRIMARY_WITH_PHONETIC_SANITY",
         "segmentation": "COM + IC",
         "chunk": "COM",
         "candidateLanguage": "Latin",
-        "candidate": null,
-        "nullAccepted": false,
+        "nullAccepted": true,
         "claimBoundary": {
           "developmentOnly": true,
           "publicationEvidence": false,
@@ -187,7 +179,7 @@
           "evidencePromotion": false,
           "winnerCrowned": false
         },
-        "providerMessageContentParseError": "provider message content must be one JSON object"
+        "candidate": null
       }
     },
     {
@@ -202,26 +194,22 @@
         "targetId": "comic::COM::Greek",
         "targetStatus": "pending"
       },
-      "outcomeClassification": "TARGET_INVALIDATED",
+      "outcomeClassification": "TARGET_NULL_ACCEPTED",
       "validation": {
-        "status": "failed",
-        "errors": [
-          "provider message content must be one JSON object",
-          "null target response must set nullAccepted true"
-        ]
+        "status": "passed",
+        "errors": []
       },
       "promptSha256": "cc8a963616aaf56f52b04ea0f80870342727d8f171a68b557c953038523f9871",
-      "requestBodySha256": "41dfcd3e78b0446fdbbace6cca5f77ddbfb37589a19ea3596df8dda3033a302b",
-      "responseSha256": "2d1070268702cab88cd2e9e64ccb986943b362cd7937bb243725ef6f63a4e1f8",
-      "providerRawPayloadSha256": "d975dd305dc41222ffb0cf46a9f03b16ea7a9879e20469a8dc20967d1cc23a1b",
+      "requestBodySha256": "41abdbcf9c76eee6251e0296a61c77b8790f9e2340a51b7afdc5b3098399918e",
+      "responseSha256": "8b3d16ee8f730555475083828a25b782401916437f9d9063762c4beb3ce8f75f",
+      "providerRawPayloadSha256": "c0e1c0dc41723272b73b2ecc182627dc92f5cf35badbfffd9cc533bf54f425d9",
       "response": {
         "word": "comic",
         "stage": "MIXED_STAGE_ORTHOGRAPHIC_PRIMARY_WITH_PHONETIC_SANITY",
         "segmentation": "COM + IC",
         "chunk": "COM",
         "candidateLanguage": "Greek",
-        "candidate": null,
-        "nullAccepted": false,
+        "nullAccepted": true,
         "claimBoundary": {
           "developmentOnly": true,
           "publicationEvidence": false,
@@ -233,7 +221,7 @@
           "evidencePromotion": false,
           "winnerCrowned": false
         },
-        "providerMessageContentParseError": "provider message content must be one JSON object"
+        "candidate": null
       }
     },
     {
@@ -248,26 +236,22 @@
         "targetId": "comic::COM::Sanskrit",
         "targetStatus": "pending"
       },
-      "outcomeClassification": "TARGET_INVALIDATED",
+      "outcomeClassification": "TARGET_NULL_ACCEPTED",
       "validation": {
-        "status": "failed",
-        "errors": [
-          "provider message content must be one JSON object",
-          "null target response must set nullAccepted true"
-        ]
+        "status": "passed",
+        "errors": []
       },
       "promptSha256": "f40d480050f12a4e831971cfc98844ffd0ed1c98e8125ec22b2dd449c67a24a4",
-      "requestBodySha256": "f6bf1102bcc20b4d59f1189db4d71d9ee855d9b45be03d3a6bb913758392f5fd",
-      "responseSha256": "10042926e1b46e91c7f9f29a20abc8dc47717b419f7bd0a030c9cd83d029b997",
-      "providerRawPayloadSha256": "a90a3c8cfb142ee91ba7e1e0cb9a400b3c3184f91c08ed9be1acf51bc55ad7c2",
+      "requestBodySha256": "d6b6687e6f27afa6e8a55d7ec36b2e5ec05d2f13342c0071348427af4b2d00c5",
+      "responseSha256": "a7f38747c67d8d959b7b355c4bde6bf2de305fe4062360f8027015959d41d672",
+      "providerRawPayloadSha256": "d8cbb00feed14bed334200d190c6e0fa07471c03ae8d4f5bfff82428239be823",
       "response": {
         "word": "comic",
         "stage": "MIXED_STAGE_ORTHOGRAPHIC_PRIMARY_WITH_PHONETIC_SANITY",
         "segmentation": "COM + IC",
         "chunk": "COM",
         "candidateLanguage": "Sanskrit",
-        "candidate": null,
-        "nullAccepted": false,
+        "nullAccepted": true,
         "claimBoundary": {
           "developmentOnly": true,
           "publicationEvidence": false,
@@ -279,7 +263,7 @@
           "evidencePromotion": false,
           "winnerCrowned": false
         },
-        "providerMessageContentParseError": "provider message content must be one JSON object"
+        "candidate": null
       }
     },
     {
@@ -294,26 +278,22 @@
         "targetId": "comic::IC::Albanian",
         "targetStatus": "pending"
       },
-      "outcomeClassification": "TARGET_INVALIDATED",
+      "outcomeClassification": "TARGET_NULL_ACCEPTED",
       "validation": {
-        "status": "failed",
-        "errors": [
-          "provider message content must be one JSON object",
-          "null target response must set nullAccepted true"
-        ]
+        "status": "passed",
+        "errors": []
       },
       "promptSha256": "ed7545a31b93a0eca4051775611412fbd5e9c5dd1aa3e42390243e68cbecdfea",
-      "requestBodySha256": "300f18fddad386eb218e955365ff3663969ff24d7ec32a0b8943320c2548771f",
-      "responseSha256": "23cce1e18abf8003a709e1396ac212696e6b3981601c347d097c30446f1ac9d3",
-      "providerRawPayloadSha256": "3808132bbb21f8c52950df75a3079dcdb2a86de1cdb4a36da254a08a4ed31bff",
+      "requestBodySha256": "361070db6dd3e3e3c7849561d0c3d1299c4fe710c62789d6ae9934323cd3994b",
+      "responseSha256": "8b5593d55138a1a9cd44abe4ef85a03eebb2d576ef17820bca58c5529fff731a",
+      "providerRawPayloadSha256": "1695d3cb335aa99f5977d48d4d62788cbec4eae1f5bbd63e3da1cd5e05ecbafe",
       "response": {
         "word": "comic",
         "stage": "MIXED_STAGE_ORTHOGRAPHIC_PRIMARY_WITH_PHONETIC_SANITY",
         "segmentation": "COM + IC",
         "chunk": "IC",
         "candidateLanguage": "Albanian",
-        "candidate": null,
-        "nullAccepted": false,
+        "nullAccepted": true,
         "claimBoundary": {
           "developmentOnly": true,
           "publicationEvidence": false,
@@ -325,7 +305,7 @@
           "evidencePromotion": false,
           "winnerCrowned": false
         },
-        "providerMessageContentParseError": "provider message content must be one JSON object"
+        "candidate": null
       }
     },
     {
@@ -340,26 +320,22 @@
         "targetId": "comic::IC::Latin",
         "targetStatus": "pending"
       },
-      "outcomeClassification": "TARGET_INVALIDATED",
+      "outcomeClassification": "TARGET_NULL_ACCEPTED",
       "validation": {
-        "status": "failed",
-        "errors": [
-          "provider message content must be one JSON object",
-          "null target response must set nullAccepted true"
-        ]
+        "status": "passed",
+        "errors": []
       },
       "promptSha256": "44c88b53f0c0b36eb95d0d1de3d0170780448cb473c168d3f17c8af2b0bc97a6",
-      "requestBodySha256": "dc5a13c8c2361471f3b7cac1b0324c2b60fbe9f57844dedb25738e55ad41af21",
-      "responseSha256": "c38c156344e8b9b639ee159d06b785425c8018d04ce2edd68b0d6e3eb35b6cc6",
-      "providerRawPayloadSha256": "b1a10b8a930f1fd94f4c2bcbfd6d0ca289ddc9fc239a2ebff73e62de8778af65",
+      "requestBodySha256": "525ca97b6bfb04e6530227076554abdfb8b079f9b393fe9b6dd66030aee212a6",
+      "responseSha256": "6b5802cd210732a93c1f0f82e616aa03a49bb5bdd348a34fa393b2b2ac875ada",
+      "providerRawPayloadSha256": "ee1ddb57a4735a226329e8aac5077cbb0f96b0bc2cdb752743ba7b60449ccf76",
       "response": {
         "word": "comic",
         "stage": "MIXED_STAGE_ORTHOGRAPHIC_PRIMARY_WITH_PHONETIC_SANITY",
         "segmentation": "COM + IC",
         "chunk": "IC",
         "candidateLanguage": "Latin",
-        "candidate": null,
-        "nullAccepted": false,
+        "nullAccepted": true,
         "claimBoundary": {
           "developmentOnly": true,
           "publicationEvidence": false,
@@ -371,7 +347,7 @@
           "evidencePromotion": false,
           "winnerCrowned": false
         },
-        "providerMessageContentParseError": "provider message content must be one JSON object"
+        "candidate": null
       }
     },
     {
@@ -386,26 +362,22 @@
         "targetId": "comic::IC::Greek",
         "targetStatus": "pending"
       },
-      "outcomeClassification": "TARGET_INVALIDATED",
+      "outcomeClassification": "TARGET_NULL_ACCEPTED",
       "validation": {
-        "status": "failed",
-        "errors": [
-          "provider message content must be one JSON object",
-          "null target response must set nullAccepted true"
-        ]
+        "status": "passed",
+        "errors": []
       },
       "promptSha256": "16ee5061440065f9bda941e864c4ba74f8badcbd917985b77e8bcb648f7c9f98",
-      "requestBodySha256": "b1d790afa8a301732a94c4e16005dffe36ebd9c884936a34188376667ee8eff4",
-      "responseSha256": "8823f39ab99061cf85e1999eb108dc38c6d60fe785574c27d443750e1e19438e",
-      "providerRawPayloadSha256": "c66fe0f633e7d8db01f9d9d332e8958754f73b22c4f120689d9f34151919953f",
+      "requestBodySha256": "ffd96c8f962cf51591f49ce66492439cafd9b0ec987b2bb9cb2901c965cee3b5",
+      "responseSha256": "3a7b8d50789b2aba105b4d3860f51b97ba20a6bd2ec3fc5c4194e032c471bcc0",
+      "providerRawPayloadSha256": "7ce6b592bc851187494b71a100dc6813405e5d109bd399ec5aedaa96d89e8913",
       "response": {
         "word": "comic",
         "stage": "MIXED_STAGE_ORTHOGRAPHIC_PRIMARY_WITH_PHONETIC_SANITY",
         "segmentation": "COM + IC",
         "chunk": "IC",
         "candidateLanguage": "Greek",
-        "candidate": null,
-        "nullAccepted": false,
+        "nullAccepted": true,
         "claimBoundary": {
           "developmentOnly": true,
           "publicationEvidence": false,
@@ -417,7 +389,7 @@
           "evidencePromotion": false,
           "winnerCrowned": false
         },
-        "providerMessageContentParseError": "provider message content must be one JSON object"
+        "candidate": null
       }
     },
     {
@@ -432,26 +404,22 @@
         "targetId": "comic::IC::Sanskrit",
         "targetStatus": "pending"
       },
-      "outcomeClassification": "TARGET_INVALIDATED",
+      "outcomeClassification": "TARGET_NULL_ACCEPTED",
       "validation": {
-        "status": "failed",
-        "errors": [
-          "provider message content must be one JSON object",
-          "null target response must set nullAccepted true"
-        ]
+        "status": "passed",
+        "errors": []
       },
       "promptSha256": "73bf3e8e5f611e6b64742c8272d462175a68943fec8401a96357121d7945aee9",
-      "requestBodySha256": "caf8027c776aaefc1ac8c1c6e6cdbc3c8a195c04cee17defdd0f9954c86151d2",
-      "responseSha256": "55809db6627d5005f1f3894c6903b0138f539513ad5c24157da5a65cd0da5349",
-      "providerRawPayloadSha256": "93e64a1d6a09bf86ca71e36de97c7d529dedcd7c6af283640bb45e0f807ef61d",
+      "requestBodySha256": "a7c474a5ba556988d7c6e69a0d239b6845c0bf01bfff65993771366797f00ebc",
+      "responseSha256": "6d0b546fb8b5ae62a2dd3f70c8ca1a7b2f39e72e336eb52a9bfb17131e6d880c",
+      "providerRawPayloadSha256": "6c0aa8b37280b621bd38a47e7b3c450c5b0f989a133f291b009415814f147da8",
       "response": {
         "word": "comic",
         "stage": "MIXED_STAGE_ORTHOGRAPHIC_PRIMARY_WITH_PHONETIC_SANITY",
         "segmentation": "COM + IC",
         "chunk": "IC",
         "candidateLanguage": "Sanskrit",
-        "candidate": null,
-        "nullAccepted": false,
+        "nullAccepted": true,
         "claimBoundary": {
           "developmentOnly": true,
           "publicationEvidence": false,
@@ -463,12 +431,12 @@
           "evidencePromotion": false,
           "winnerCrowned": false
         },
-        "providerMessageContentParseError": "provider message content must be one JSON object"
+        "candidate": null
       }
     }
   ],
-  "aggregateClassification": "TARGET_GRID_PARTIAL_INVALIDATED",
-  "scaffoldAggregateClassification": "TARGET_GRID_PARTIAL_INVALIDATED",
+  "aggregateClassification": "TARGET_GRID_ALL_NULL_ACCEPTED",
+  "scaffoldAggregateClassification": "TARGET_GRID_ALL_NULL_ACCEPTED",
   "claimBoundary": {
     "developmentOnly": true,
     "publicationEvidence": false,
