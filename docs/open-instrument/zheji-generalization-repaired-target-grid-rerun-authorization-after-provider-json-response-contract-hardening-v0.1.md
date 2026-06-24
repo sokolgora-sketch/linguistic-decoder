@@ -43,6 +43,34 @@ Execution remains blocked until this authorization definition is reviewed and ac
 
 Exactly one future controlled local-only execution PR may be authorized after that review.
 
+## Critical audit caveats before execution
+
+The reviewed rerun authorization remains scoped to the exact English target `comic`.
+
+The current single-call replay helper `sourceLanguageForRequest` is not accepted as a general source-language resolver.
+
+That helper currently resolves the reviewed `comic` path to English, which is mechanically safe for this exact rerun.
+
+A clean `comic` rerun must not be cited as proof that source-language anti-tautology generalizes to non-English source targets.
+
+Before any non-English source target, broad replay generalization, or source-language anti-tautology generalization claim, a separate reviewed PR must do one of the following:
+
+* collapse the relevant replay lane to explicit English-only scope, with dead conditional logic removed or documented
+* implement real reviewed source-language resolution for non-English source targets
+
+The current normal Jest gate also has a known discovery caveat: files ending in `.test.ts` are not guaranteed by the existing `tests/**/*.spec.ts(x)` convention.
+
+Before broader milestone closure or RootMap/selection-logic trust claims, a separate reviewed PR must either:
+
+* rename the undiscovered `.test.ts` files to `.spec.ts`
+* or explicitly document intentional exclusion if any such files are not meant to run in gate
+
+These audit caveats do not authorize code changes in this PR.
+
+These audit caveats do not authorize provider/model execution in this PR.
+
+These audit caveats do not block the exact future one-shot `comic` rerun after separate authorization review, because the target word is English by reviewed scope.
+
 ## Authorized execution base
 
 A future execution PR must use this exact reviewed implementation base:
