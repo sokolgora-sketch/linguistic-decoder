@@ -470,13 +470,76 @@ function candidateLanguageIsAllowed(language) {
   return CANDIDATE_LANGUAGE_ALLOWLIST_NORMALIZED.has(normalizeCandidateLanguage(language));
 }
 
-function sourceLanguageForRequest(argsOrContext) {
-  const word = normalizeComparableText(argsOrContext?.word);
-  if (word === "comic") {
+
+export const GENERALIZATION_REPLAY_SOURCE_LANGUAGE_SCOPE_POLICY_V0_1 = Object.freeze({
+  schemaVersion: "open-instrument.generalization-replay-source-language-scope-policy.v0.1",
+  sourceScope: "english_source_only",
+  supportedSourceLanguages: Object.freeze(["English"]),
+  unsupportedStatus: "UNSUPPORTED_SOURCE_LANGUAGE_FOR_CURRENT_GENERALIZATION_REPLAY",
+  failClosed: true,
+});
+
+function sourceLanguageFieldFromRequest(argsOrContext = {}) {
+  if (typeof argsOrContext === "string") {
+    return argsOrContext;
+  }
+
+  if (!argsOrContext || typeof argsOrContext !== "object") {
+    return undefined;
+  }
+
+  return (
+    argsOrContext.sourceLanguage ??
+    argsOrContext.source_language ??
+    argsOrContext.sourceLang ??
+    argsOrContext.wordSourceLanguage ??
+    argsOrContext.inputSourceLanguage ??
+    argsOrContext.request?.sourceLanguage ??
+    argsOrContext.request?.source_language ??
+    argsOrContext.metadata?.sourceLanguage ??
+    argsOrContext.metadata?.source_language
+  );
+}
+
+export function normalizeSourceLanguageForRequest(argsOrContext = {}) {
+  const rawSourceLanguage = sourceLanguageFieldFromRequest(argsOrContext);
+
+  if (rawSourceLanguage === undefined || rawSourceLanguage === null || String(rawSourceLanguage).trim() === "") {
     return "English";
   }
-  return "English";
+
+  return String(rawSourceLanguage).trim();
 }
+
+export function assertSupportedSourceLanguageForRequest(argsOrContext = {}) {
+  const sourceLanguage = normalizeSourceLanguageForRequest(argsOrContext);
+  const supportedSourceLanguages = GENERALIZATION_REPLAY_SOURCE_LANGUAGE_SCOPE_POLICY_V0_1.supportedSourceLanguages;
+
+  if (!supportedSourceLanguages.includes(sourceLanguage)) {
+    const error = new Error(
+      `Unsupported source language for current generalization replay: ${sourceLanguage}. ` +
+        `This replay path is English-source-only until a reviewed resolver replaces the scope guard.`
+    );
+
+    error.name = "UnsupportedSourceLanguageForGeneralizationReplayError";
+    error.code = GENERALIZATION_REPLAY_SOURCE_LANGUAGE_SCOPE_POLICY_V0_1.unsupportedStatus;
+    error.status = GENERALIZATION_REPLAY_SOURCE_LANGUAGE_SCOPE_POLICY_V0_1.unsupportedStatus;
+    error.sourceLanguage = sourceLanguage;
+    error.supportedSourceLanguages = [...supportedSourceLanguages];
+
+    throw error;
+  }
+
+  return {
+    sourceLanguage,
+    policy: GENERALIZATION_REPLAY_SOURCE_LANGUAGE_SCOPE_POLICY_V0_1,
+  };
+}
+
+export function sourceLanguageForRequest(argsOrContext = {}) {
+  return assertSupportedSourceLanguageForRequest(argsOrContext).sourceLanguage;
+}
+
 
 function equalsComparableText(left, right) {
   return normalizeComparableText(left) === normalizeComparableText(right);
