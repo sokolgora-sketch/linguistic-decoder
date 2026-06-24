@@ -5,6 +5,70 @@ import path from "node:path";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
+export const GENERALIZATION_REPLAY_CANDIDATE_LANGUAGE_POLICY_V0_1 = Object.freeze({
+  schemaVersion: "open-instrument.generalization-replay-candidate-language-policy.v0.1",
+  scope: "target_grid_candidate_languages",
+  supportedCandidateLanguages: Object.freeze([
+    Object.freeze({ id: "albanian", label: "Albanian" }),
+    Object.freeze({ id: "latin", label: "Latin" }),
+    Object.freeze({ id: "greek", label: "Greek" }),
+    Object.freeze({ id: "sanskrit", label: "Sanskrit" }),
+  ]),
+  activeTargetGridCandidateLanguageIds: Object.freeze(["albanian", "latin", "greek", "sanskrit"]),
+  unsupportedStatus: "UNSUPPORTED_CANDIDATE_LANGUAGE_FOR_CURRENT_GENERALIZATION_REPLAY",
+  failClosed: true,
+});
+
+export function supportedCandidateLanguagesForReplay() {
+  return GENERALIZATION_REPLAY_CANDIDATE_LANGUAGE_POLICY_V0_1.supportedCandidateLanguages.map((language) => ({
+    id: language.id,
+    label: language.label,
+  }));
+}
+
+export function assertSupportedCandidateLanguageForReplay(candidateLanguage) {
+  const rawCandidateLanguage = candidateLanguage && typeof candidateLanguage === "object"
+    ? candidateLanguage.id ?? candidateLanguage.label ?? candidateLanguage.candidateLanguage ?? candidateLanguage.targetLanguage
+    : candidateLanguage;
+
+  const normalizedCandidateLanguage = String(rawCandidateLanguage ?? "").trim().toLowerCase();
+
+  const matchedLanguage = GENERALIZATION_REPLAY_CANDIDATE_LANGUAGE_POLICY_V0_1.supportedCandidateLanguages.find(
+    (language) =>
+      language.id === normalizedCandidateLanguage ||
+      language.label.toLowerCase() === normalizedCandidateLanguage
+  );
+
+  if (!matchedLanguage) {
+    const error = new Error(
+      `Unsupported candidate language for current generalization replay: ${String(rawCandidateLanguage ?? "")}. ` +
+        `Use the candidate-language SSOT before extending the target grid.`
+    );
+
+    error.name = "UnsupportedCandidateLanguageForGeneralizationReplayError";
+    error.code = GENERALIZATION_REPLAY_CANDIDATE_LANGUAGE_POLICY_V0_1.unsupportedStatus;
+    error.status = GENERALIZATION_REPLAY_CANDIDATE_LANGUAGE_POLICY_V0_1.unsupportedStatus;
+    error.candidateLanguage = rawCandidateLanguage;
+    error.supportedCandidateLanguages = supportedCandidateLanguagesForReplay();
+
+    throw error;
+  }
+
+  return {
+    id: matchedLanguage.id,
+    label: matchedLanguage.label,
+  };
+}
+
+export function activeTargetGridCandidateLanguagesForReplay() {
+  return GENERALIZATION_REPLAY_CANDIDATE_LANGUAGE_POLICY_V0_1.activeTargetGridCandidateLanguageIds.map((languageId) =>
+    assertSupportedCandidateLanguageForReplay(languageId)
+  );
+}
+
+export function activeTargetGridCandidateLanguageLabelsForReplay() {
+  return activeTargetGridCandidateLanguagesForReplay().map((language) => language.label);
+}
 const SCRIPT_DIR = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(SCRIPT_DIR, "..");
 
