@@ -1,8 +1,9 @@
 import type { VowelVoice } from "../vowels/vowelVoices.v0.1";
+import { symbolicMathOrder, type SevenVoiceKey } from "../sevenVoiceOrderedViews.v0.1";
 
 // Canon symbolic ladder (UI + book + meaning doctrine)
-export const VOICES_V0_1 = ["A", "E", "I", "O", "U", "Y", "Ë"] as const;
-export type VoiceV0_1 = (typeof VOICES_V0_1)[number];
+export const VOICES_V0_1 = symbolicMathOrder;
+export type VoiceV0_1 = SevenVoiceKey;
 
 // Alias to make intent explicit
 export const SYMBOLIC_ORDER_V0_1 = VOICES_V0_1;

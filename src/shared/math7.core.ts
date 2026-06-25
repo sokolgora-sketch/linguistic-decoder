@@ -14,8 +14,9 @@
  */
 
 import { extractOrthographyVoicesFromWordV0_1 } from "./vowels/extractOrthographyVoicesFromWord.v0.1";
-export const SEVEN_VOWELS = ["A", "E", "I", "O", "U", "Y", "Ë"] as const;
-export type SevenVowel = (typeof SEVEN_VOWELS)[number];
+import { symbolicMathOrder, type SevenVoiceKey } from "./sevenVoiceOrderedViews.v0.1";
+export const SEVEN_VOWELS = symbolicMathOrder;
+export type SevenVowel = SevenVoiceKey;
 
 // 0-based indexing (matches existing behavior where "study" => totalMod7 = 2)
 export const VOWEL_INDEX: Record<SevenVowel, number> = {
