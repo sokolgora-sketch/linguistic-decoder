@@ -7,6 +7,7 @@ import { MT } from "@/ui/typography/marketingType.v0.1";
 
 import { EVAL_SPEC_V0_1 } from "@/shared/evals/spec.v0.1";
 import { COLORS_HEX_BY_VOICE_V0_1 } from "@/shared/doctrine/voiceDoctrine.v0.1";
+import { acousticVoiceLabOrder } from "@/shared/sevenVoiceOrderedViews.v0.1";
 import { getSpearmanDiagnosisMeta } from "@/shared/evals/getSpearmanDiagnosis.v0.1";
 import type {
   EvalReportBundleV0_1,
@@ -4575,7 +4576,7 @@ export function EvalsPageClientV0_1() {
 
                             {pts.map((p, i) => {
                               const bucketVoice =
-                                (["A", "O", "E", "Ë", "U", "Y", "I"] as const)[
+                                acousticVoiceLabOrder[
                                   i
                                 ] ?? "I";
                               const dotColor =

@@ -1,3 +1,4 @@
+import { acousticVoiceLabOrder } from "../../src/shared/sevenVoiceOrderedViews.v0.1";
 import fs from "fs";
 import path from "path";
 
@@ -16,7 +17,8 @@ describe("Evals chart canonical dot colors guard v0.1", () => {
     );
 
     expect(ui).toContain("const bucketVoice =");
-    expect(ui).toContain('["A", "O", "E", "Ë", "U", "Y", "I"] as const');
+    expect(acousticVoiceLabOrder).toEqual(["A", "O", "E", "Ë", "U", "Y", "I"]);
+    expect(ui).toContain('acousticVoiceLabOrder');
     expect(ui).toContain('] ?? "I";');
 
     expect(ui).toContain("const dotColor =");

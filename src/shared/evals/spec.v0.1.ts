@@ -1,8 +1,9 @@
+import { evalBucketOrder } from "../sevenVoiceOrderedViews.v0.1";
 // EVALS-0 — Eval Spec Contract v0.1
 // Versioned tasks for BYO outputs scoring. No model calls. Deterministic only.
 
 export type BucketId = "V1" | "V2" | "V3" | "V4" | "V5" | "V6" | "V7";
-export const BUCKETS_V0_1: BucketId[] = ["V1", "V2", "V3", "V4", "V5", "V6", "V7"];
+export const BUCKETS_V0_1: BucketId[] = [...evalBucketOrder];
 
 export type IntermediateBucketId = "anchor_low" | "x_vowel" | "anchor_high";
 export const INTERMEDIATE_BUCKETS_V0_1: IntermediateBucketId[] = [

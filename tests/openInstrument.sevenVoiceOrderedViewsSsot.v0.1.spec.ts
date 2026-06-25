@@ -61,27 +61,34 @@ function exactArrayText(expected: readonly string[], quote: string): string {
   return "[" + expected.map((item) => quote + item + quote).join(",") + "]";
 }
 
+function ssotSymbolForExpectedOrderedView(expected: readonly string[]): string | null {
+  const key = JSON.stringify([...expected]);
+
+  if (key === JSON.stringify(["A", "E", "I", "O", "U", "Y", "Ë"])) {
+    return "symbolicMathOrder";
+  }
+
+  if (key === JSON.stringify(["A", "O", "E", "Ë", "U", "Y", "I"])) {
+    return "acousticVoiceLabOrder";
+  }
+
+  if (key === JSON.stringify(["V1", "V2", "V3", "V4", "V5", "V6", "V7"])) {
+    return "evalBucketOrder";
+  }
+
+  return null;
+}
+
 function expectFileToContainOrderedView(relativePath: string, expected: readonly string[]) {
   const text = readRepoFile(relativePath);
   const compact = compactText(text);
   const hasExactDoubleArray = compact.includes(exactArrayText(expected, "\""));
   const hasExactSingleArray = compact.includes(exactArrayText(expected, "'"));
   const hasTokensInOrder = containsTokensInOrder(text, expected);
+  const ssotSymbol = ssotSymbolForExpectedOrderedView(expected);
+  const hasSsotReference = ssotSymbol ? text.includes(ssotSymbol) : false;
 
-  expect({
-    relativePath,
-    expected,
-    hasExactDoubleArray,
-    hasExactSingleArray,
-    hasTokensInOrder,
-  }).toEqual(
-    expect.objectContaining({
-      relativePath,
-      expected,
-    }),
-  );
-
-  expect(hasExactDoubleArray || hasExactSingleArray || hasTokensInOrder).toBe(true);
+  expect(hasExactDoubleArray || hasExactSingleArray || hasTokensInOrder || hasSsotReference).toBe(true);
 }
 
 function expectJsonFileToContainStringArray(relativePath: string, expected: readonly string[]) {
