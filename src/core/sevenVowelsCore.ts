@@ -1,8 +1,10 @@
 // src/core/sevenVowelsCore.ts
 // Base-7 vowel math: symbols, indexes, rings, and simple helpers.
 
-export const VOWELS = ["A", "E", "I", "O", "U", "Y", "Ë"] as const;
-export type Vowel = (typeof VOWELS)[number];
+import { symbolicMathOrder, type SevenVoiceKey } from "../shared/sevenVoiceOrderedViews.v0.1";
+
+export const VOWELS = symbolicMathOrder;
+export type Vowel = SevenVoiceKey;
 
 // 0–6 index in the fixed A,E,I,O,U,Y,Ë order
 export type VowelIndex = 0 | 1 | 2 | 3 | 4 | 5 | 6;
