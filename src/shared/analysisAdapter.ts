@@ -226,7 +226,331 @@ function buildHeartSummary(payload: any, math7: any) {
   };
 }
 
-function buildMindCandidates(payload: EnginePayload): Candidate[] {
+
+const EMBRYO_FIRST_CLAIM_TYPES = [
+  "functionalMotivation",
+  "historicalTransmission",
+  "surfaceResonance",
+  "seedPairing",
+  "unresolved",
+  "notEvaluated",
+] as const;
+
+const EMBRYO_FIRST_ORIGIN_CLAIMS = [
+  "not_claimed",
+  "context_only",
+  "explicitly_supported",
+  "rejected_for_this_output",
+] as const;
+
+const EMBRYO_FIRST_HISTORICAL_RELATIONS = [
+  "not_evaluated",
+  "context_only",
+  "possible_loan_relation",
+  "attested_loan_relation",
+  "possible_cognate_relation",
+  "unknown",
+  "not_applicable",
+] as const;
+
+const EMBRYO_FIRST_VALIDATION_OUTCOMES = [
+  "validated",
+  "partial",
+  "failed",
+  "not_evaluated",
+  "blocked",
+] as const;
+
+const EMBRYO_FIRST_RANK_GROUPS = [
+  "validatedFunctionalMotivation",
+  "partialFunctionalMotivation",
+  "surfaceOrSeedOnly",
+  "historicalContextOnly",
+  "unresolved",
+] as const;
+
+const EMBRYO_FIRST_USER_DECISION_POSTURES = ["user_decides"] as const;
+
+function embryoFirstRecord(value: unknown): Record<string, unknown> {
+  if (value && typeof value === "object" && !Array.isArray(value)) {
+    return value as Record<string, unknown>;
+  }
+
+  return {};
+}
+
+function embryoFirstText(value: unknown): string | null {
+  if (typeof value !== "string") {
+    return null;
+  }
+
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed : null;
+}
+
+function embryoFirstNumber(value: unknown): number | null {
+  return typeof value === "number" && Number.isFinite(value) ? value : null;
+}
+
+function embryoFirstFirstText(...values: unknown[]): string | null {
+  for (const value of values) {
+    const text = embryoFirstText(value);
+    if (text) {
+      return text;
+    }
+  }
+
+  return null;
+}
+
+function embryoFirstAllowed<const T extends readonly string[]>(
+  value: unknown,
+  allowed: T,
+): T[number] | null {
+  const text = embryoFirstText(value);
+  if (!text) {
+    return null;
+  }
+
+  return allowed.includes(text) ? text : null;
+}
+
+function embryoFirstStringList(value: unknown): string[] | null {
+  if (!Array.isArray(value)) {
+    return null;
+  }
+
+  const items = value
+    .map((item) => embryoFirstText(item))
+    .filter((item): item is string => Boolean(item));
+
+  return items.length > 0 ? items : null;
+}
+
+function embryoFirstEmbryoSize(embryo: string | null): number | null {
+  if (!embryo) {
+    return null;
+  }
+
+  const compact = embryo.replace(/\s+/g, "");
+  return compact.length > 0 ? Array.from(compact).length : null;
+}
+
+function embryoFirstValidationReasons(
+  existing: unknown,
+  checks: {
+    isSeed: boolean;
+    isolatedStandaloneForm: string | null;
+    plainStandaloneGloss: string | null;
+    sourceNote: string | null;
+    semanticBridge: string | null;
+  },
+): string[] {
+  const reasons = embryoFirstStringList(existing) ?? [];
+
+  const add = (reason: string) => {
+    if (!reasons.includes(reason)) {
+      reasons.push(reason);
+    }
+  };
+
+  if (checks.isSeed) {
+    add("sourceKind_seed_not_validation");
+  }
+
+  if (!checks.isolatedStandaloneForm) {
+    add("missing_isolatedStandaloneForm");
+  }
+
+  if (!checks.plainStandaloneGloss) {
+    add("missing_plainStandaloneGloss");
+  }
+
+  if (!checks.sourceNote) {
+    add("missing_sourceNote");
+  }
+
+  if (!checks.semanticBridge) {
+    add("missing_semanticBridge");
+  }
+
+  if (
+    !checks.isolatedStandaloneForm ||
+    !checks.plainStandaloneGloss ||
+    !checks.sourceNote ||
+    !checks.semanticBridge
+  ) {
+    add("embryo_first_full_functional_validation_not_claimed");
+  }
+
+  return reasons;
+}
+
+export function projectEmbryoFirstCandidateForAnalyzeV1<T>(
+  candidate: T,
+  payload: unknown,
+  index = 0,
+): T & Record<string, unknown> {
+  const candidateRecord = embryoFirstRecord(candidate);
+  const nestedCandidateRecord = embryoFirstRecord(candidateRecord.candidateRecord);
+  const payloadRecord = embryoFirstRecord(payload);
+
+  const word = embryoFirstFirstText(payloadRecord.word) ?? "unknown";
+  const candidateId =
+    embryoFirstFirstText(candidateRecord.candidateId, candidateRecord.id) ??
+    `${word}:candidate:${index + 1}`;
+  const displayForm =
+    embryoFirstFirstText(candidateRecord.displayForm, candidateRecord.form) ?? word;
+  const candidateLanguage =
+    embryoFirstFirstText(candidateRecord.candidateLanguage, candidateRecord.language) ??
+    "unknown";
+
+  const sourceKind = embryoFirstFirstText(
+    candidateRecord.sourceKind,
+    nestedCandidateRecord.sourceKind,
+  );
+  const isSeed = sourceKind?.toUpperCase() === "SEED";
+
+  const isolatedStandaloneForm = embryoFirstFirstText(
+    candidateRecord.isolatedStandaloneForm,
+  );
+  const plainStandaloneGloss = embryoFirstFirstText(candidateRecord.plainStandaloneGloss);
+  const sourceNote = embryoFirstFirstText(candidateRecord.sourceNote);
+  const semanticBridge = embryoFirstFirstText(candidateRecord.semanticBridge);
+  const embryo = embryoFirstFirstText(candidateRecord.embryo, isolatedStandaloneForm);
+  const embryoLanguage = embryoFirstFirstText(
+    candidateRecord.embryoLanguage,
+    embryo ? candidateLanguage : null,
+  );
+
+  const hasIsolationProof = Boolean(
+    isolatedStandaloneForm && plainStandaloneGloss && sourceNote,
+  );
+  const hasFunctionalBridge = Boolean(hasIsolationProof && semanticBridge);
+
+  let claimType =
+    embryoFirstAllowed(candidateRecord.claimType, EMBRYO_FIRST_CLAIM_TYPES) ??
+    (hasFunctionalBridge
+      ? "functionalMotivation"
+      : isSeed
+        ? "seedPairing"
+        : "surfaceResonance");
+
+  let validationOutcome =
+    embryoFirstAllowed(
+      candidateRecord.validationOutcome,
+      EMBRYO_FIRST_VALIDATION_OUTCOMES,
+    ) ?? (hasFunctionalBridge ? "partial" : "not_evaluated");
+
+  if (claimType === "functionalMotivation" && !hasIsolationProof) {
+    claimType = isSeed ? "seedPairing" : "surfaceResonance";
+    validationOutcome = "blocked";
+  }
+
+  if (validationOutcome === "validated" && !hasIsolationProof) {
+    validationOutcome = "blocked";
+  }
+
+  const rankGroup =
+    embryoFirstAllowed(candidateRecord.rankGroup, EMBRYO_FIRST_RANK_GROUPS) ??
+    (validationOutcome === "validated" && claimType === "functionalMotivation"
+      ? "validatedFunctionalMotivation"
+      : hasIsolationProof
+        ? "partialFunctionalMotivation"
+        : isSeed
+          ? "surfaceOrSeedOnly"
+          : "surfaceOrSeedOnly");
+
+  const rankScore =
+    embryoFirstNumber(candidateRecord.rankScore) ??
+    (rankGroup === "validatedFunctionalMotivation"
+      ? 100
+      : rankGroup === "partialFunctionalMotivation"
+        ? 60
+        : isSeed
+          ? 30
+          : 25);
+
+  const validationReasons = embryoFirstValidationReasons(
+    candidateRecord.validationReasons,
+    {
+      isSeed,
+      isolatedStandaloneForm,
+      plainStandaloneGloss,
+      sourceNote,
+      semanticBridge,
+    },
+  );
+
+  const segmentation =
+    candidateRecord.segmentation ??
+    candidateRecord.decomposition ??
+    candidateRecord.morphology ??
+    null;
+  const expansionChain =
+    embryoFirstStringList(candidateRecord.expansionChain) ??
+    (embryo ? [embryo, displayForm] : [displayForm]);
+
+  const rankReason =
+    embryoFirstFirstText(candidateRecord.rankReason) ??
+    (hasIsolationProof
+      ? "partial embryo-first functional motivation evidence is present"
+      : isSeed
+        ? "seed pairing only; sourceKind SEED is not validation"
+        : "surface candidate only; embryo-first isolation proof is not supplied");
+
+  const claimBoundary =
+    embryoFirstFirstText(candidateRecord.claimBoundary) ??
+    (hasIsolationProof
+      ? "functional motivation evidence only; not historical origin"
+      : "not historical origin or validated functional motivation");
+
+  return {
+    ...candidateRecord,
+    candidateId,
+    displayForm,
+    candidateLanguage,
+    claimType,
+    originClaim:
+      embryoFirstAllowed(candidateRecord.originClaim, EMBRYO_FIRST_ORIGIN_CLAIMS) ??
+      "not_claimed",
+    historicalRelation:
+      embryoFirstAllowed(
+        candidateRecord.historicalRelation,
+        EMBRYO_FIRST_HISTORICAL_RELATIONS,
+      ) ?? "not_evaluated",
+    embryo,
+    embryoSize:
+      embryoFirstNumber(candidateRecord.embryoSize) ?? embryoFirstEmbryoSize(embryo),
+    embryoLanguage,
+    isolatedStandaloneForm,
+    plainStandaloneGloss,
+    sourceNote,
+    segmentation,
+    semanticBridge,
+    expansionChain,
+    validationOutcome,
+    validationReasons,
+    rankGroup,
+    rankScore,
+    rankReason,
+    claimBoundary,
+    userDecisionPosture:
+      embryoFirstAllowed(
+        candidateRecord.userDecisionPosture,
+        EMBRYO_FIRST_USER_DECISION_POSTURES,
+      ) ?? "user_decides",
+  } as unknown as T & Record<string, unknown>;
+}
+
+
+function buildMindCandidates(payload: EnginePayload): Candidate[]  {
+  return buildMindCandidatesBase(payload).map((candidate, index) =>
+    projectEmbryoFirstCandidateForAnalyzeV1(candidate, payload, index),
+  );
+}
+
+function buildMindCandidatesBase(payload: EnginePayload): Candidate[]  {
   if (CANON_CANDIDATES[payload.word]) {
     return CANON_CANDIDATES[payload.word] as unknown as Candidate[];
   }
