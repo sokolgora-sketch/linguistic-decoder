@@ -1,0 +1,792 @@
+{
+  "alphabet": "auto",
+  "candidates": [],
+  "consonants": {
+    "field": {
+      "slots": [
+        {
+          "ch": "m",
+          "kind": "smooth"
+        },
+        {
+          "ch": "s",
+          "kind": "spiky"
+        },
+        {
+          "ch": "t",
+          "kind": "spiky"
+        },
+        {
+          "ch": "r",
+          "kind": "smooth"
+        }
+      ],
+      "smoothHits": 2,
+      "spikyHits": 2
+    },
+    "summary": {
+      "dominantArchetypes": [
+        "smooth"
+      ],
+      "notes": [],
+      "smoothRatio": 0.5
+    }
+  },
+  "deepRoot": {
+    "basis": "mystery",
+    "candidates": [],
+    "hypotheses": [],
+    "protoRoots": [],
+    "soundRoots": {
+      "claimedDomains": [],
+      "domains": [],
+      "matches": [],
+      "missingDomains": [],
+      "version": "soundRoots-v0.2",
+      "warnings": []
+    },
+    "version": "deeproot-output-v1"
+  },
+  "engineMeta": {
+    "alphabet": "auto",
+    "engineVersion": "0.2.0-symbolic",
+    "heartInstrumentV1": null,
+    "mode": "strict"
+  },
+  "engineVersion": "0.2.0-symbolic",
+  "evidence": {
+    "basis": "mystery",
+    "cacheHit": false,
+    "levelPath": [
+      -1,
+      1,
+      1
+    ],
+    "math7": {
+      "primary": {
+        "basis": "YEI",
+        "cycleState": "open",
+        "indices": [
+          5,
+          1,
+          2
+        ],
+        "indices0to6": [
+          5,
+          1,
+          2
+        ],
+        "principlesPath": [
+          "REFLECTION",
+          "EXPANSION",
+          "INSIGHT"
+        ],
+        "rawSum1to7": 11,
+        "sum": 8,
+        "sum0to6": 8,
+        "total1to7": 2,
+        "totalMod7": 1,
+        "values1to7": [
+          6,
+          2,
+          3
+        ],
+        "vowels": [
+          "Y",
+          "E",
+          "I"
+        ]
+      }
+    },
+    "normalizationSteps": [
+      {
+        "from": "YEY",
+        "op": "vowel_normalize",
+        "reason": "functional_equivalence",
+        "to": "YEI"
+      }
+    ],
+    "notes": [],
+    "ops": [],
+    "recomputed": true,
+    "ringPath": [
+      2,
+      2,
+      1
+    ],
+    "signals": [
+      "base_raw=YEY",
+      "base_norm=YEI",
+      "cons_windows=SibilantFricative",
+      "prefix 'm' → Nasal",
+      "alphabet=latin",
+      "EVIDENCE_V1",
+      "EVIDENCE_MATH7_BACKFILL"
+    ],
+    "solveMs": null,
+    "surfaceVowels": [
+      "Y",
+      "E",
+      "I"
+    ],
+    "surfaceVowelsRaw": [
+      "Y",
+      "E",
+      "Y"
+    ],
+    "vowelPath": [
+      "Y",
+      "E",
+      "I"
+    ]
+  },
+  "evidencePackage": {
+    "counts": {
+      "signals": {
+        "kind": "present",
+        "value": 7
+      }
+    },
+    "engineVersion": "0.2.0-symbolic",
+    "mode": "strict",
+    "normalizedWord": "mystery",
+    "notes": [],
+    "sevenPrinciplesSpectrum": {
+      "delta": {
+        "functionalIndices1": [
+          6,
+          2,
+          3
+        ],
+        "functionalRings": [
+          2,
+          2,
+          1
+        ],
+        "surfaceIndices1": [
+          6,
+          2,
+          6
+        ],
+        "surfaceRings": [
+          2,
+          2,
+          2
+        ]
+      },
+      "functional": {
+        "crossesCenter": false,
+        "drift": "mixed",
+        "endsOnE": false,
+        "endsOnË": false,
+        "indices1": [
+          6,
+          2,
+          3
+        ],
+        "ringIndex": [
+          2,
+          2,
+          1
+        ]
+      },
+      "surface": {
+        "crossesCenter": false,
+        "drift": "mixed",
+        "endsOnE": false,
+        "endsOnË": false,
+        "indices1": [
+          6,
+          2,
+          6
+        ],
+        "ringIndex": [
+          2,
+          2,
+          2
+        ]
+      }
+    },
+    "summary": {
+      "signalsCount": 7,
+      "voicePath": "Y → E → I",
+      "voicePathDelta": "YEY vs YEI",
+      "voicePathFunctional": "Y → E → I",
+      "voicePathSurface": "Y → E → Y"
+    },
+    "version": "evidence_package.v0.1",
+    "word": "mystery"
+  },
+  "frontier": [],
+  "heart": {
+    "alphabet": "auto",
+    "engineVersion": "0.2.0-symbolic",
+    "math7": {
+      "primary": {
+        "basis": "YEI",
+        "cycleState": "open",
+        "indices": [
+          5,
+          1,
+          2
+        ],
+        "indices0to6": [
+          5,
+          1,
+          2
+        ],
+        "principlesPath": [
+          "REFLECTION",
+          "EXPANSION",
+          "INSIGHT"
+        ],
+        "rawSum1to7": 11,
+        "sum": 8,
+        "sum0to6": 8,
+        "total1to7": 2,
+        "totalMod7": 1,
+        "values1to7": [
+          6,
+          2,
+          3
+        ],
+        "vowels": [
+          "Y",
+          "E",
+          "I"
+        ]
+      }
+    },
+    "mode": "strict",
+    "narrative": "Word mystery follows stable balance.",
+    "principlePath": [
+      "REFLECTION",
+      "EXPANSION",
+      "INSIGHT"
+    ],
+    "word": "mystery"
+  },
+  "heartInstrumentV1": {
+    "basisNfc": "mystery",
+    "math7": {
+      "events": [
+        "WRAP_GATE",
+        "COMPLETION"
+      ],
+      "jumps": [
+        3,
+        4
+      ],
+      "rawSum": 14,
+      "total1to7": 5,
+      "totalMod7": 4,
+      "values1to7": [
+        6,
+        2,
+        6
+      ],
+      "wrapCount": 1
+    },
+    "principlesPath": [
+      "REFLECTION",
+      "EXPANSION",
+      "REFLECTION"
+    ],
+    "surfaceMath7": {
+      "events": [
+        "WRAP_GATE",
+        "COMPLETION"
+      ],
+      "jumps": [
+        3,
+        4
+      ],
+      "rawSum": 14,
+      "total1to7": 5,
+      "totalMod7": 4,
+      "values1to7": [
+        6,
+        2,
+        6
+      ],
+      "wrapCount": 1
+    },
+    "surfaceTotal1to7": 5,
+    "surfaceTotalMod7": 4,
+    "surfaceVowels": [
+      "Y",
+      "E",
+      "Y"
+    ],
+    "values1to7": [
+      6,
+      2,
+      6
+    ]
+  },
+  "history": [],
+  "languageFamilies": [],
+  "meta": {
+    "created": "2026-06-25T14:29:20.699Z",
+    "inputs": {
+      "alphabet": "auto",
+      "brainCandidatesSeedFallback": false,
+      "mode": "strict",
+      "word": "mystery"
+    },
+    "version": "0.2.0-symbolic"
+  },
+  "mind": {
+    "dominantPrinciple": "Expansion",
+    "dominantPrincipleId": "EXPANSION",
+    "dominantPrincipleLabel": "Expansion",
+    "logicStatement": "The word reflects Expansion principle with balanced flow.",
+    "patternName": "EXPANSION-balanced",
+    "polarity": "balanced"
+  },
+  "mode": "strict",
+  "originClaim": {
+    "candidates": [],
+    "meta": {
+      "engineVersion": "0.2.0-symbolic",
+      "generatedAt": "2026-06-25T14:29:20.699Z",
+      "inputs": {
+        "alphabet": "auto",
+        "mode": "strict",
+        "word": "mystery"
+      }
+    },
+    "policy": "no_single_winner",
+    "summary": {
+      "confidence": "insufficient_evidence",
+      "note": "No passing candidates with sufficient computed support in the current result layers."
+    },
+    "support": {
+      "claimId": "oc:mystery",
+      "refs": [
+        "ref:heart.math7.primary"
+      ]
+    },
+    "version": "v1"
+  },
+  "originClaimGates": {
+    "active": null,
+    "flag": "ocg"
+  },
+  "primaryPath": null,
+  "raw": {
+    "alphabet": "auto",
+    "candidates": [],
+    "consonants": {
+      "field": {
+        "slots": [
+          {
+            "ch": "m",
+            "kind": "smooth"
+          },
+          {
+            "ch": "s",
+            "kind": "spiky"
+          },
+          {
+            "ch": "t",
+            "kind": "spiky"
+          },
+          {
+            "ch": "r",
+            "kind": "smooth"
+          }
+        ],
+        "smoothHits": 2,
+        "spikyHits": 2
+      },
+      "summary": {
+        "dominantArchetypes": [
+          "smooth"
+        ],
+        "notes": [],
+        "smoothRatio": 0.5
+      }
+    },
+    "deepRoot": {
+      "basis": "mystery",
+      "candidates": [],
+      "hypotheses": [],
+      "protoRoots": [],
+      "soundRoots": {
+        "claimedDomains": [],
+        "domains": [],
+        "matches": [],
+        "missingDomains": [],
+        "version": "soundRoots-v0.2",
+        "warnings": []
+      },
+      "version": "deeproot-output-v1"
+    },
+    "engineVersion": "0.2.0-symbolic",
+    "evidence": {
+      "basis": "mystery",
+      "cacheHit": false,
+      "levelPath": [
+        -1,
+        1,
+        1
+      ],
+      "math7": {
+        "primary": {
+          "basis": "YEI",
+          "cycleState": "open",
+          "indices": [
+            5,
+            1,
+            2
+          ],
+          "indices0to6": [
+            5,
+            1,
+            2
+          ],
+          "principlesPath": [
+            "REFLECTION",
+            "EXPANSION",
+            "INSIGHT"
+          ],
+          "rawSum1to7": 11,
+          "sum": 8,
+          "sum0to6": 8,
+          "total1to7": 2,
+          "totalMod7": 1,
+          "values1to7": [
+            6,
+            2,
+            3
+          ],
+          "vowels": [
+            "Y",
+            "E",
+            "I"
+          ]
+        }
+      },
+      "normalizationSteps": [
+        {
+          "from": "YEY",
+          "op": "vowel_normalize",
+          "reason": "functional_equivalence",
+          "to": "YEI"
+        }
+      ],
+      "notes": [],
+      "ops": [],
+      "recomputed": true,
+      "ringPath": [
+        2,
+        2,
+        1
+      ],
+      "signals": [
+        "base_raw=YEY",
+        "base_norm=YEI",
+        "cons_windows=SibilantFricative",
+        "prefix 'm' → Nasal",
+        "alphabet=latin",
+        "EVIDENCE_V1",
+        "EVIDENCE_MATH7_BACKFILL"
+      ],
+      "solveMs": null,
+      "surfaceVowels": [
+        "Y",
+        "E",
+        "I"
+      ],
+      "surfaceVowelsRaw": [
+        "Y",
+        "E",
+        "Y"
+      ],
+      "vowelPath": [
+        "Y",
+        "E",
+        "I"
+      ]
+    },
+    "heart": {
+      "alphabet": "auto",
+      "engineVersion": "0.2.0-symbolic",
+      "math7": {
+        "primary": {
+          "basis": "YEI",
+          "cycleState": "open",
+          "indices": [
+            5,
+            1,
+            2
+          ],
+          "indices0to6": [
+            5,
+            1,
+            2
+          ],
+          "principlesPath": [
+            "REFLECTION",
+            "EXPANSION",
+            "INSIGHT"
+          ],
+          "rawSum1to7": 11,
+          "sum": 8,
+          "sum0to6": 8,
+          "total1to7": 2,
+          "totalMod7": 1,
+          "values1to7": [
+            6,
+            2,
+            3
+          ],
+          "vowels": [
+            "Y",
+            "E",
+            "I"
+          ]
+        }
+      },
+      "mode": "strict",
+      "narrative": "Word mystery follows stable balance.",
+      "principlePath": [
+        "REFLECTION",
+        "EXPANSION",
+        "INSIGHT"
+      ],
+      "word": "mystery"
+    },
+    "heartPrimaryPath": [
+      "Y",
+      "E",
+      "I"
+    ],
+    "meta": {
+      "created": "2026-06-25T14:29:20.699Z",
+      "inputs": {
+        "alphabet": "auto",
+        "brainCandidatesSeedFallback": false,
+        "mode": "strict",
+        "word": "mystery"
+      },
+      "version": "0.2.0-symbolic"
+    },
+    "mind": {
+      "dominantPrinciple": "Expansion",
+      "dominantPrincipleId": "EXPANSION",
+      "dominantPrincipleLabel": "Expansion",
+      "logicStatement": "The word reflects Expansion principle with balanced flow.",
+      "patternName": "EXPANSION-balanced",
+      "polarity": "balanced"
+    },
+    "mode": "strict",
+    "originClaim": {
+      "candidates": [],
+      "meta": {
+        "engineVersion": "0.2.0-symbolic",
+        "generatedAt": "2026-06-25T14:29:20.699Z",
+        "inputs": {
+          "alphabet": "auto",
+          "mode": "strict",
+          "word": "mystery"
+        }
+      },
+      "policy": "no_single_winner",
+      "summary": {
+        "confidence": "insufficient_evidence",
+        "note": "No passing candidates with sufficient computed support in the current result layers."
+      },
+      "support": {
+        "claimId": "oc:mystery",
+        "refs": [
+          "ref:heart.math7.primary"
+        ]
+      },
+      "version": "v1"
+    },
+    "resonanceProfileV1": {
+      "normalized": {
+        "bucketCounts": {
+          "boundary": 0,
+          "manifest": 2,
+          "source": 1
+        },
+        "colorBand": [
+          "indigo",
+          "orange",
+          "yellow"
+        ],
+        "dominantBucket": "mixed",
+        "dominantColor": "mixed",
+        "notes": [
+          "mixed buckets: source+manifest"
+        ],
+        "polaritySymbol": "◐",
+        "signature": "MIXED_SOURCE_MANIFEST",
+        "transitions": [
+          "source→manifest"
+        ],
+        "vowels": [
+          "Y",
+          "E",
+          "I"
+        ]
+      },
+      "surface": {
+        "bucketCounts": {
+          "boundary": 0,
+          "manifest": 1,
+          "source": 2
+        },
+        "colorBand": [
+          "indigo",
+          "orange",
+          "indigo"
+        ],
+        "dominantBucket": "mixed",
+        "dominantColor": "mixed",
+        "notes": [
+          "mixed buckets: source+manifest"
+        ],
+        "polaritySymbol": "◐",
+        "signature": "MIXED_SOURCE_MANIFEST",
+        "transitions": [
+          "source→manifest",
+          "manifest→source"
+        ],
+        "vowels": [
+          "Y",
+          "E",
+          "Y"
+        ]
+      },
+      "version": "resonance-profile-v1"
+    },
+    "rootMap": {
+      "composedMeaning": "",
+      "keys": [],
+      "notes": [
+        "No minRoots hypotheses available; RootMap not emitted."
+      ],
+      "tokens": []
+    },
+    "sanitized": "mystery",
+    "symbolicCore": {
+      "notes": [
+        "Placeholder note"
+      ]
+    },
+    "word": "mystery",
+    "wordMatrix": {
+      "canon": [],
+      "deepRoot": {
+        "form": "",
+        "label": "Proto-root",
+        "language": "",
+        "layer": "deeproot",
+        "notes": "",
+        "voicePath": ""
+      },
+      "primary": {
+        "label": "Primary path",
+        "layer": "heart",
+        "notes": "Placeholder note",
+        "voicePath": "REFLECTION → EXPANSION → INSIGHT"
+      },
+      "word": "mystery"
+    }
+  },
+  "resonanceProfileV1": {
+    "normalized": {
+      "bucketCounts": {
+        "boundary": 0,
+        "manifest": 2,
+        "source": 1
+      },
+      "colorBand": [
+        "indigo",
+        "orange",
+        "yellow"
+      ],
+      "dominantBucket": "mixed",
+      "dominantColor": "mixed",
+      "notes": [
+        "mixed buckets: source+manifest"
+      ],
+      "polaritySymbol": "◐",
+      "signature": "MIXED_SOURCE_MANIFEST",
+      "transitions": [
+        "source→manifest"
+      ],
+      "vowels": [
+        "Y",
+        "E",
+        "I"
+      ]
+    },
+    "surface": {
+      "bucketCounts": {
+        "boundary": 0,
+        "manifest": 1,
+        "source": 2
+      },
+      "colorBand": [
+        "indigo",
+        "orange",
+        "indigo"
+      ],
+      "dominantBucket": "mixed",
+      "dominantColor": "mixed",
+      "notes": [
+        "mixed buckets: source+manifest"
+      ],
+      "polaritySymbol": "◐",
+      "signature": "MIXED_SOURCE_MANIFEST",
+      "transitions": [
+        "source→manifest",
+        "manifest→source"
+      ],
+      "vowels": [
+        "Y",
+        "E",
+        "Y"
+      ]
+    },
+    "version": "resonance-profile-v1"
+  },
+  "rootMap": {
+    "composedMeaning": "",
+    "keys": [],
+    "notes": [
+      "No minRoots hypotheses available; RootMap not emitted."
+    ],
+    "tokens": []
+  },
+  "sanitized": "mystery",
+  "symbolicCore": {
+    "notes": [
+      "Placeholder note"
+    ]
+  },
+  "word": "mystery",
+  "wordMatrix": {
+    "canon": [],
+    "deepRoot": {
+      "form": "",
+      "label": "Proto-root",
+      "language": "",
+      "layer": "deeproot",
+      "notes": "",
+      "voicePath": ""
+    },
+    "primary": {
+      "label": "Primary path",
+      "layer": "heart",
+      "notes": "Placeholder note",
+      "voicePath": "REFLECTION → EXPANSION → INSIGHT"
+    },
+    "word": "mystery"
+  }
+}

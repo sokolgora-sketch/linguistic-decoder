@@ -1,0 +1,1700 @@
+{
+  "alphabet": "auto",
+  "candidates": [
+    {
+      "confidenceTag": "strong",
+      "fitTag": "strong",
+      "form": "studium",
+      "functionalStatement": "Deliberate effort of knowing that leads to a formed inner state.",
+      "gloss": "study, zeal, pursuit",
+      "id": "latin-studium",
+      "language": "Latin",
+      "sourceKind": "SEED",
+      "status": "pass",
+      "vowelPath": "U-I"
+    },
+    {
+      "confidenceTag": "strong",
+      "fitTag": "strong",
+      "form": "studim",
+      "id": "albanian-studim",
+      "language": "Albanian",
+      "sourceKind": "SEED",
+      "status": "pass",
+      "vowelPath": "U-I"
+    }
+  ],
+  "consonants": {
+    "field": {
+      "slots": [
+        {
+          "ch": "s",
+          "kind": "spiky"
+        },
+        {
+          "ch": "t",
+          "kind": "spiky"
+        },
+        {
+          "ch": "d",
+          "kind": "spiky"
+        }
+      ],
+      "smoothHits": 0,
+      "spikyHits": 3
+    },
+    "summary": {
+      "dominantArchetypes": [
+        "spiky"
+      ],
+      "notes": [],
+      "smoothRatio": 0
+    }
+  },
+  "deepRoot": {
+    "basis": "study",
+    "candidates": [
+      {
+        "basis": "study",
+        "carriers": [
+          {
+            "carrierForm": "shtu",
+            "lang": "sq",
+            "ops": [
+              "s_to_sh"
+            ],
+            "protoRootId": "SHTU",
+            "segment": "stu"
+          },
+          {
+            "carrierForm": "da",
+            "lang": "sq",
+            "ops": [
+              "vowel_swap"
+            ],
+            "protoRootId": "DA",
+            "segment": "dy"
+          }
+        ],
+        "checks": {
+          "opsWithinLimits": true,
+          "skeletonExplained": true
+        },
+        "decomposition": {
+          "action": "SHTU"
+        },
+        "id": "study:SHTU+DA:0",
+        "opsCount": 2,
+        "protoRoots": [
+          "SHTU",
+          "DA"
+        ],
+        "segments": [
+          "stu",
+          "dy"
+        ]
+      },
+      {
+        "basis": "study",
+        "carriers": [
+          {
+            "carrierForm": "shtu",
+            "lang": "sq",
+            "ops": [
+              "s_to_sh"
+            ],
+            "protoRootId": "SHTU",
+            "segment": "stu"
+          },
+          {
+            "carrierForm": "di",
+            "lang": "sq",
+            "ops": [
+              "y_to_i"
+            ],
+            "protoRootId": "DI",
+            "segment": "dy"
+          }
+        ],
+        "checks": {
+          "opsWithinLimits": true,
+          "skeletonExplained": true
+        },
+        "decomposition": {
+          "action": "SHTU",
+          "function": "DI"
+        },
+        "id": "study:SHTU+DI:1",
+        "opsCount": 2,
+        "protoRoots": [
+          "SHTU",
+          "DI"
+        ],
+        "segments": [
+          "stu",
+          "dy"
+        ]
+      }
+    ],
+    "functionalRoots": [
+      {
+        "gloss": "Functional reading: shtu (not yours / added-on) + di (know) → making knowledge yours through learning.",
+        "id": "sq.shtu+di.v1",
+        "language": "sq",
+        "notes": [
+          "english carrier → sq functional reading",
+          "note: studim treated as nominal closure of the same carrier family",
+          "Deterministic pilot hypothesis (v1).",
+          "No historical-chain claim; functional decomposition only."
+        ],
+        "opsUsed": [
+          "s_to_sh",
+          "y_to_i"
+        ],
+        "roots": [
+          "shtu",
+          "di"
+        ],
+        "surfaceForms": [
+          "study",
+          "studim"
+        ],
+        "vowelPath": "U→I"
+      }
+    ],
+    "hypotheses": [
+      {
+        "basis": "study",
+        "carriers": [
+          {
+            "carrierForm": "shtu",
+            "lang": "sq",
+            "ops": [
+              "s_to_sh"
+            ],
+            "protoRootId": "SHTU",
+            "segment": "stu"
+          },
+          {
+            "carrierForm": "da",
+            "lang": "sq",
+            "ops": [
+              "vowel_swap"
+            ],
+            "protoRootId": "DA",
+            "segment": "dy"
+          }
+        ],
+        "checks": {
+          "opsWithinLimits": true,
+          "skeletonExplained": true
+        },
+        "decomposition": {
+          "action": "SHTU"
+        },
+        "id": "study:SHTU+DA:0",
+        "opsCount": 2,
+        "protoRoots": [
+          "SHTU",
+          "DA"
+        ],
+        "segments": [
+          "stu",
+          "dy"
+        ]
+      },
+      {
+        "basis": "study",
+        "carriers": [
+          {
+            "carrierForm": "shtu",
+            "lang": "sq",
+            "ops": [
+              "s_to_sh"
+            ],
+            "protoRootId": "SHTU",
+            "segment": "stu"
+          },
+          {
+            "carrierForm": "di",
+            "lang": "sq",
+            "ops": [
+              "y_to_i"
+            ],
+            "protoRootId": "DI",
+            "segment": "dy"
+          }
+        ],
+        "checks": {
+          "opsWithinLimits": true,
+          "skeletonExplained": true
+        },
+        "decomposition": {
+          "action": "SHTU",
+          "function": "DI"
+        },
+        "id": "study:SHTU+DI:1",
+        "opsCount": 2,
+        "protoRoots": [
+          "SHTU",
+          "DI"
+        ],
+        "segments": [
+          "stu",
+          "dy"
+        ]
+      }
+    ],
+    "protoRoots": [
+      "SHTU",
+      "DA",
+      "DI"
+    ],
+    "rootFamilies": [
+      {
+        "carriers": [],
+        "id": "family_shtu_da_v1_1",
+        "label": "SHTU + DA",
+        "protoRoots": [
+          {
+            "root": "SHTU"
+          },
+          {
+            "root": "DA"
+          }
+        ]
+      },
+      {
+        "carriers": [],
+        "id": "family_shtu_di_v1_2",
+        "label": "SHTU + DI",
+        "protoRoots": [
+          {
+            "root": "SHTU"
+          },
+          {
+            "root": "DI"
+          }
+        ]
+      }
+    ],
+    "soundRoots": {
+      "claimedDomains": [],
+      "domains": [],
+      "matches": [],
+      "missingDomains": [],
+      "version": "soundRoots-v0.2",
+      "warnings": []
+    },
+    "version": "deeproot-output-v1"
+  },
+  "engineMeta": {
+    "alphabet": "auto",
+    "engineVersion": "0.2.0-symbolic",
+    "heartInstrumentV1": null,
+    "mode": "strict"
+  },
+  "engineVersion": "0.2.0-symbolic",
+  "evidence": {
+    "basis": "study",
+    "cacheHit": false,
+    "levelPath": [
+      -1,
+      1
+    ],
+    "math7": {
+      "primary": {
+        "basis": "UI",
+        "cycleState": "open",
+        "indices": [
+          4,
+          2
+        ],
+        "indices0to6": [
+          4,
+          2
+        ],
+        "principlesPath": [
+          "UNITY",
+          "INSIGHT"
+        ],
+        "rawSum1to7": 8,
+        "sum": 6,
+        "sum0to6": 6,
+        "total1to7": 7,
+        "totalMod7": 6,
+        "values1to7": [
+          5,
+          3
+        ],
+        "vowels": [
+          "U",
+          "I"
+        ]
+      }
+    },
+    "normalizationSteps": [
+      {
+        "from": "UY",
+        "op": "vowel_normalize",
+        "reason": "functional_equivalence",
+        "to": "UI"
+      }
+    ],
+    "notes": [],
+    "ops": [],
+    "recomputed": true,
+    "ringPath": [
+      1,
+      1
+    ],
+    "signals": [
+      "base_raw=UY",
+      "base_norm=UI",
+      "cons_windows=-",
+      "prefix 'st' → Plosive",
+      "alphabet=latin",
+      "EVIDENCE_V1",
+      "EVIDENCE_MATH7_BACKFILL"
+    ],
+    "solveMs": null,
+    "surfaceVowels": [
+      "U",
+      "I"
+    ],
+    "surfaceVowelsRaw": [
+      "U",
+      "Y"
+    ],
+    "vowelPath": [
+      "U",
+      "I"
+    ]
+  },
+  "evidencePackage": {
+    "counts": {
+      "signals": {
+        "kind": "present",
+        "value": 7
+      }
+    },
+    "engineVersion": "0.2.0-symbolic",
+    "mode": "strict",
+    "normalizedWord": "study",
+    "notes": [],
+    "sevenPrinciplesSpectrum": {
+      "delta": {
+        "functionalIndices1": [
+          5,
+          3
+        ],
+        "functionalRings": [
+          1,
+          1
+        ],
+        "surfaceIndices1": [
+          5,
+          6
+        ],
+        "surfaceRings": [
+          1,
+          2
+        ]
+      },
+      "functional": {
+        "crossesCenter": false,
+        "drift": "mostly_decreasing",
+        "endsOnE": false,
+        "endsOnË": false,
+        "indices1": [
+          5,
+          3
+        ],
+        "ringIndex": [
+          1,
+          1
+        ]
+      },
+      "surface": {
+        "crossesCenter": false,
+        "drift": "mostly_increasing",
+        "endsOnE": false,
+        "endsOnË": false,
+        "indices1": [
+          5,
+          6
+        ],
+        "ringIndex": [
+          1,
+          2
+        ]
+      }
+    },
+    "summary": {
+      "signalsCount": 7,
+      "voicePath": "U → I",
+      "voicePathDelta": "UY vs UI",
+      "voicePathFunctional": "U → I",
+      "voicePathSurface": "U → Y"
+    },
+    "version": "evidence_package.v0.1",
+    "word": "study"
+  },
+  "frontier": [],
+  "heart": {
+    "alphabet": "auto",
+    "engineVersion": "0.2.0-symbolic",
+    "math7": {
+      "primary": {
+        "basis": "UI",
+        "cycleState": "open",
+        "indices": [
+          4,
+          2
+        ],
+        "indices0to6": [
+          4,
+          2
+        ],
+        "principlesPath": [
+          "UNITY",
+          "INSIGHT"
+        ],
+        "rawSum1to7": 8,
+        "sum": 6,
+        "sum0to6": 6,
+        "total1to7": 7,
+        "totalMod7": 6,
+        "values1to7": [
+          5,
+          3
+        ],
+        "vowels": [
+          "U",
+          "I"
+        ]
+      }
+    },
+    "mode": "strict",
+    "narrative": "Word study follows stable balance.",
+    "principlePath": [
+      "UNITY",
+      "INSIGHT"
+    ],
+    "word": "study"
+  },
+  "heartInstrumentV1": {
+    "basisNfc": "study",
+    "math7": {
+      "events": [
+        "WRAP_GATE",
+        "COMPLETION"
+      ],
+      "jumps": [
+        1
+      ],
+      "rawSum": 11,
+      "total1to7": 3,
+      "totalMod7": 2,
+      "values1to7": [
+        5,
+        6
+      ],
+      "wrapCount": 1
+    },
+    "principlesPath": [
+      "UNITY",
+      "REFLECTION"
+    ],
+    "surfaceMath7": {
+      "events": [
+        "WRAP_GATE",
+        "COMPLETION"
+      ],
+      "jumps": [
+        1
+      ],
+      "rawSum": 11,
+      "total1to7": 3,
+      "totalMod7": 2,
+      "values1to7": [
+        5,
+        6
+      ],
+      "wrapCount": 1
+    },
+    "surfaceTotal1to7": 3,
+    "surfaceTotalMod7": 2,
+    "surfaceVowels": [
+      "U",
+      "Y"
+    ],
+    "values1to7": [
+      5,
+      6
+    ]
+  },
+  "history": [],
+  "languageFamilies": [],
+  "meta": {
+    "created": "2026-06-25T14:29:20.347Z",
+    "inputs": {
+      "alphabet": "auto",
+      "brainCandidatesSeedFallback": false,
+      "mode": "strict",
+      "word": "study"
+    },
+    "version": "0.2.0-symbolic"
+  },
+  "mind": {
+    "dominantPrinciple": "Evolution",
+    "dominantPrincipleId": "EVOLUTION",
+    "dominantPrincipleLabel": "Evolution",
+    "logicStatement": "The word reflects Evolution principle with balanced flow.",
+    "patternName": "EVOLUTION-balanced",
+    "polarity": "balanced"
+  },
+  "mode": "strict",
+  "originClaim": {
+    "candidates": [
+      {
+        "confidence": "strong",
+        "evidenceRefs": [
+          "primaryPath.voicePath",
+          "heart.math7.primary",
+          "candidates[albanian-studim]",
+          "candidates[albanian-studim].vowelPath"
+        ],
+        "form": "studim",
+        "id": "oc:albanian-studim",
+        "language": "Albanian",
+        "reasons": [
+          "Candidate marked pass by engine candidate layer.",
+          "DeepRoot–Heart gate aligned (terminal vowel agreement).",
+          "Candidate voice path aligns with primary voice path.",
+          "Candidate shows non-empty morphological structure (prefix/root/suffix parts)."
+        ],
+        "status": "pass"
+      },
+      {
+        "confidence": "strong",
+        "evidenceRefs": [
+          "primaryPath.voicePath",
+          "heart.math7.primary",
+          "candidates[latin-studium]",
+          "candidates[latin-studium].vowelPath"
+        ],
+        "form": "studium",
+        "id": "oc:latin-studium",
+        "language": "Latin",
+        "reasons": [
+          "Candidate marked pass by engine candidate layer.",
+          "DeepRoot–Heart gate aligned (terminal vowel agreement).",
+          "Candidate voice path aligns with primary voice path.",
+          "Candidate shows non-empty morphological structure (prefix/root/suffix parts)."
+        ],
+        "status": "pass"
+      }
+    ],
+    "meta": {
+      "engineVersion": "0.2.0-symbolic",
+      "generatedAt": "2026-06-25T14:29:20.348Z",
+      "inputs": {
+        "alphabet": "auto",
+        "brainCandidates": [
+          {
+            "form": "studium",
+            "functionTag": "UNKNOWN",
+            "gloss": "study, zeal, pursuit",
+            "languageId": "wlt:canon.latin",
+            "languageName": "Latin",
+            "opsUsed": [],
+            "roots": [
+              "STUD-"
+            ],
+            "source": {
+              "kind": "SEED",
+              "ref": "canonCandidates.ts",
+              "version": "canon.v0.1"
+            },
+            "v": "brain.candidateRecord.v0.1"
+          },
+          {
+            "form": "studim",
+            "functionTag": "UNKNOWN",
+            "gloss": "studim",
+            "languageId": "wlt:canon.albanian",
+            "languageName": "Albanian",
+            "opsUsed": [],
+            "roots": [
+              "STUD-"
+            ],
+            "source": {
+              "kind": "SEED",
+              "ref": "canonCandidates.ts",
+              "version": "canon.v0.1"
+            },
+            "v": "brain.candidateRecord.v0.1"
+          }
+        ],
+        "mode": "strict",
+        "word": "study"
+      }
+    },
+    "policy": "no_single_winner",
+    "summary": {
+      "confidence": "strong",
+      "note": "Computed from candidate/deepRoot/voice-path/morphology signals. Passing: 2; strong: 2; medium: 0."
+    },
+    "support": {
+      "claimId": "oc:study",
+      "refs": [
+        "ref:candidates[albanian-studim]",
+        "ref:candidates[latin-studium]",
+        "ref:heart.math7.primary"
+      ]
+    },
+    "version": "v1"
+  },
+  "originClaimGates": {
+    "active": null,
+    "flag": "ocg"
+  },
+  "primaryPath": {
+    "levelPath": "",
+    "ringPath": [
+      1,
+      1
+    ],
+    "voicePath": [
+      "U",
+      "I"
+    ]
+  },
+  "raw": {
+    "alphabet": "auto",
+    "candidates": [
+      {
+        "axes": {
+          "consonants": "pass",
+          "morphology": "pass",
+          "principles": "pass"
+        },
+        "candidateRecord": {
+          "explains": [],
+          "form": "studium",
+          "functionTag": "UNKNOWN",
+          "gloss": "study, zeal, pursuit",
+          "languageId": "wlt:canon.latin",
+          "languageName": "Latin",
+          "opsUsed": [],
+          "roots": [
+            "STUD-"
+          ],
+          "source": {
+            "kind": "SEED",
+            "ref": "canonCandidates.ts",
+            "version": "canon.v0.1"
+          },
+          "v": "brain.candidateRecord.v0.1"
+        },
+        "confidenceTag": "strong",
+        "consonantProfile": "build",
+        "consonantProfileOk": true,
+        "consonantSignals": [
+          "sibilant-fricative",
+          "plosive"
+        ],
+        "fitTag": "strong",
+        "form": "studium",
+        "function": "Deliberate effort of knowing that leads to a formed inner state.",
+        "gloss": "study, zeal, pursuit",
+        "id": "latin-studium",
+        "language": "Latin",
+        "morphology": {
+          "root": "stud-",
+          "suffixes": [
+            "-ium"
+          ]
+        },
+        "morphologyMatrix": {
+          "pivot": "stud"
+        },
+        "note": "Base concept influencing English 'study'.",
+        "status": "pass",
+        "symbolic": [
+          {
+            "axis": "energy",
+            "note": "Represents a conscious application of will.",
+            "tag": "effort"
+          }
+        ],
+        "voices": {
+          "ringPath": [
+            1,
+            1
+          ],
+          "voiceSequence": [
+            "U",
+            "I"
+          ]
+        }
+      },
+      {
+        "axes": {
+          "consonants": "pass",
+          "morphology": "pass",
+          "principles": "pass"
+        },
+        "candidateRecord": {
+          "explains": [],
+          "form": "studim",
+          "functionTag": "UNKNOWN",
+          "gloss": "studim",
+          "languageId": "wlt:canon.albanian",
+          "languageName": "Albanian",
+          "opsUsed": [],
+          "roots": [
+            "STUD-"
+          ],
+          "source": {
+            "kind": "SEED",
+            "ref": "canonCandidates.ts",
+            "version": "canon.v0.1"
+          },
+          "v": "brain.candidateRecord.v0.1"
+        },
+        "confidenceTag": "strong",
+        "consonantProfile": "build",
+        "consonantProfileOk": true,
+        "consonantSignals": [
+          "sibilant-fricative",
+          "plosive"
+        ],
+        "fitTag": "strong",
+        "form": "studim",
+        "id": "albanian-studim",
+        "language": "Albanian",
+        "morphology": {
+          "root": "stud-",
+          "suffixes": [
+            "-im"
+          ]
+        },
+        "morphologyMatrix": {
+          "pivot": "s'tu"
+        },
+        "status": "pass",
+        "voices": {
+          "ringPath": [
+            1,
+            1
+          ],
+          "voiceSequence": [
+            "U",
+            "I"
+          ]
+        }
+      }
+    ],
+    "consonants": {
+      "field": {
+        "slots": [
+          {
+            "ch": "s",
+            "kind": "spiky"
+          },
+          {
+            "ch": "t",
+            "kind": "spiky"
+          },
+          {
+            "ch": "d",
+            "kind": "spiky"
+          }
+        ],
+        "smoothHits": 0,
+        "spikyHits": 3
+      },
+      "summary": {
+        "dominantArchetypes": [
+          "spiky"
+        ],
+        "notes": [],
+        "smoothRatio": 0
+      }
+    },
+    "deepRoot": {
+      "basis": "study",
+      "candidates": [
+        {
+          "basis": "study",
+          "carriers": [
+            {
+              "carrierForm": "shtu",
+              "lang": "sq",
+              "ops": [
+                "s_to_sh"
+              ],
+              "protoRootId": "SHTU",
+              "segment": "stu"
+            },
+            {
+              "carrierForm": "da",
+              "lang": "sq",
+              "ops": [
+                "vowel_swap"
+              ],
+              "protoRootId": "DA",
+              "segment": "dy"
+            }
+          ],
+          "checks": {
+            "opsWithinLimits": true,
+            "skeletonExplained": true
+          },
+          "decomposition": {
+            "action": "SHTU"
+          },
+          "id": "study:SHTU+DA:0",
+          "opsCount": 2,
+          "protoRoots": [
+            "SHTU",
+            "DA"
+          ],
+          "segments": [
+            "stu",
+            "dy"
+          ]
+        },
+        {
+          "basis": "study",
+          "carriers": [
+            {
+              "carrierForm": "shtu",
+              "lang": "sq",
+              "ops": [
+                "s_to_sh"
+              ],
+              "protoRootId": "SHTU",
+              "segment": "stu"
+            },
+            {
+              "carrierForm": "di",
+              "lang": "sq",
+              "ops": [
+                "y_to_i"
+              ],
+              "protoRootId": "DI",
+              "segment": "dy"
+            }
+          ],
+          "checks": {
+            "opsWithinLimits": true,
+            "skeletonExplained": true
+          },
+          "decomposition": {
+            "action": "SHTU",
+            "function": "DI"
+          },
+          "id": "study:SHTU+DI:1",
+          "opsCount": 2,
+          "protoRoots": [
+            "SHTU",
+            "DI"
+          ],
+          "segments": [
+            "stu",
+            "dy"
+          ]
+        }
+      ],
+      "functionalRoots": [
+        {
+          "gloss": "Functional reading: shtu (not yours / added-on) + di (know) → making knowledge yours through learning.",
+          "id": "sq.shtu+di.v1",
+          "language": "sq",
+          "notes": [
+            "english carrier → sq functional reading",
+            "note: studim treated as nominal closure of the same carrier family",
+            "Deterministic pilot hypothesis (v1).",
+            "No historical-chain claim; functional decomposition only."
+          ],
+          "opsUsed": [
+            "s_to_sh",
+            "y_to_i"
+          ],
+          "roots": [
+            "shtu",
+            "di"
+          ],
+          "surfaceForms": [
+            "study",
+            "studim"
+          ],
+          "vowelPath": "U→I"
+        }
+      ],
+      "hypotheses": [
+        {
+          "basis": "study",
+          "carriers": [
+            {
+              "carrierForm": "shtu",
+              "lang": "sq",
+              "ops": [
+                "s_to_sh"
+              ],
+              "protoRootId": "SHTU",
+              "segment": "stu"
+            },
+            {
+              "carrierForm": "da",
+              "lang": "sq",
+              "ops": [
+                "vowel_swap"
+              ],
+              "protoRootId": "DA",
+              "segment": "dy"
+            }
+          ],
+          "checks": {
+            "opsWithinLimits": true,
+            "skeletonExplained": true
+          },
+          "decomposition": {
+            "action": "SHTU"
+          },
+          "id": "study:SHTU+DA:0",
+          "opsCount": 2,
+          "protoRoots": [
+            "SHTU",
+            "DA"
+          ],
+          "segments": [
+            "stu",
+            "dy"
+          ]
+        },
+        {
+          "basis": "study",
+          "carriers": [
+            {
+              "carrierForm": "shtu",
+              "lang": "sq",
+              "ops": [
+                "s_to_sh"
+              ],
+              "protoRootId": "SHTU",
+              "segment": "stu"
+            },
+            {
+              "carrierForm": "di",
+              "lang": "sq",
+              "ops": [
+                "y_to_i"
+              ],
+              "protoRootId": "DI",
+              "segment": "dy"
+            }
+          ],
+          "checks": {
+            "opsWithinLimits": true,
+            "skeletonExplained": true
+          },
+          "decomposition": {
+            "action": "SHTU",
+            "function": "DI"
+          },
+          "id": "study:SHTU+DI:1",
+          "opsCount": 2,
+          "protoRoots": [
+            "SHTU",
+            "DI"
+          ],
+          "segments": [
+            "stu",
+            "dy"
+          ]
+        }
+      ],
+      "protoRoots": [
+        "SHTU",
+        "DA",
+        "DI"
+      ],
+      "rootFamilies": [
+        {
+          "carriers": [],
+          "id": "family_shtu_da_v1_1",
+          "label": "SHTU + DA",
+          "protoRoots": [
+            {
+              "root": "SHTU"
+            },
+            {
+              "root": "DA"
+            }
+          ]
+        },
+        {
+          "carriers": [],
+          "id": "family_shtu_di_v1_2",
+          "label": "SHTU + DI",
+          "protoRoots": [
+            {
+              "root": "SHTU"
+            },
+            {
+              "root": "DI"
+            }
+          ]
+        }
+      ],
+      "soundRoots": {
+        "claimedDomains": [],
+        "domains": [],
+        "matches": [],
+        "missingDomains": [],
+        "version": "soundRoots-v0.2",
+        "warnings": []
+      },
+      "version": "deeproot-output-v1"
+    },
+    "engineVersion": "0.2.0-symbolic",
+    "evidence": {
+      "basis": "study",
+      "cacheHit": false,
+      "levelPath": [
+        -1,
+        1
+      ],
+      "math7": {
+        "primary": {
+          "basis": "UI",
+          "cycleState": "open",
+          "indices": [
+            4,
+            2
+          ],
+          "indices0to6": [
+            4,
+            2
+          ],
+          "principlesPath": [
+            "UNITY",
+            "INSIGHT"
+          ],
+          "rawSum1to7": 8,
+          "sum": 6,
+          "sum0to6": 6,
+          "total1to7": 7,
+          "totalMod7": 6,
+          "values1to7": [
+            5,
+            3
+          ],
+          "vowels": [
+            "U",
+            "I"
+          ]
+        }
+      },
+      "normalizationSteps": [
+        {
+          "from": "UY",
+          "op": "vowel_normalize",
+          "reason": "functional_equivalence",
+          "to": "UI"
+        }
+      ],
+      "notes": [],
+      "ops": [],
+      "recomputed": true,
+      "ringPath": [
+        1,
+        1
+      ],
+      "signals": [
+        "base_raw=UY",
+        "base_norm=UI",
+        "cons_windows=-",
+        "prefix 'st' → Plosive",
+        "alphabet=latin",
+        "EVIDENCE_V1",
+        "EVIDENCE_MATH7_BACKFILL"
+      ],
+      "solveMs": null,
+      "surfaceVowels": [
+        "U",
+        "I"
+      ],
+      "surfaceVowelsRaw": [
+        "U",
+        "Y"
+      ],
+      "vowelPath": [
+        "U",
+        "I"
+      ]
+    },
+    "heart": {
+      "alphabet": "auto",
+      "engineVersion": "0.2.0-symbolic",
+      "math7": {
+        "primary": {
+          "basis": "UI",
+          "cycleState": "open",
+          "indices": [
+            4,
+            2
+          ],
+          "indices0to6": [
+            4,
+            2
+          ],
+          "principlesPath": [
+            "UNITY",
+            "INSIGHT"
+          ],
+          "rawSum1to7": 8,
+          "sum": 6,
+          "sum0to6": 6,
+          "total1to7": 7,
+          "totalMod7": 6,
+          "values1to7": [
+            5,
+            3
+          ],
+          "vowels": [
+            "U",
+            "I"
+          ]
+        }
+      },
+      "mode": "strict",
+      "narrative": "Word study follows stable balance.",
+      "principlePath": [
+        "UNITY",
+        "INSIGHT"
+      ],
+      "word": "study"
+    },
+    "heartPrimaryPath": [
+      "U",
+      "I"
+    ],
+    "meta": {
+      "created": "2026-06-25T14:29:20.347Z",
+      "inputs": {
+        "alphabet": "auto",
+        "brainCandidatesSeedFallback": false,
+        "mode": "strict",
+        "word": "study"
+      },
+      "version": "0.2.0-symbolic"
+    },
+    "mind": {
+      "dominantPrinciple": "Evolution",
+      "dominantPrincipleId": "EVOLUTION",
+      "dominantPrincipleLabel": "Evolution",
+      "logicStatement": "The word reflects Evolution principle with balanced flow.",
+      "patternName": "EVOLUTION-balanced",
+      "polarity": "balanced"
+    },
+    "mode": "strict",
+    "originClaim": {
+      "candidates": [
+        {
+          "confidence": "strong",
+          "evidenceRefs": [
+            "primaryPath.voicePath",
+            "heart.math7.primary",
+            "candidates[albanian-studim]",
+            "candidates[albanian-studim].vowelPath"
+          ],
+          "form": "studim",
+          "id": "oc:albanian-studim",
+          "language": "Albanian",
+          "reasons": [
+            "Candidate marked pass by engine candidate layer.",
+            "DeepRoot–Heart gate aligned (terminal vowel agreement).",
+            "Candidate voice path aligns with primary voice path.",
+            "Candidate shows non-empty morphological structure (prefix/root/suffix parts)."
+          ],
+          "status": "pass"
+        },
+        {
+          "confidence": "strong",
+          "evidenceRefs": [
+            "primaryPath.voicePath",
+            "heart.math7.primary",
+            "candidates[latin-studium]",
+            "candidates[latin-studium].vowelPath"
+          ],
+          "form": "studium",
+          "id": "oc:latin-studium",
+          "language": "Latin",
+          "reasons": [
+            "Candidate marked pass by engine candidate layer.",
+            "DeepRoot–Heart gate aligned (terminal vowel agreement).",
+            "Candidate voice path aligns with primary voice path.",
+            "Candidate shows non-empty morphological structure (prefix/root/suffix parts)."
+          ],
+          "status": "pass"
+        }
+      ],
+      "meta": {
+        "engineVersion": "0.2.0-symbolic",
+        "generatedAt": "2026-06-25T14:29:20.348Z",
+        "inputs": {
+          "alphabet": "auto",
+          "brainCandidates": [
+            {
+              "form": "studium",
+              "functionTag": "UNKNOWN",
+              "gloss": "study, zeal, pursuit",
+              "languageId": "wlt:canon.latin",
+              "languageName": "Latin",
+              "opsUsed": [],
+              "roots": [
+                "STUD-"
+              ],
+              "source": {
+                "kind": "SEED",
+                "ref": "canonCandidates.ts",
+                "version": "canon.v0.1"
+              },
+              "v": "brain.candidateRecord.v0.1"
+            },
+            {
+              "form": "studim",
+              "functionTag": "UNKNOWN",
+              "gloss": "studim",
+              "languageId": "wlt:canon.albanian",
+              "languageName": "Albanian",
+              "opsUsed": [],
+              "roots": [
+                "STUD-"
+              ],
+              "source": {
+                "kind": "SEED",
+                "ref": "canonCandidates.ts",
+                "version": "canon.v0.1"
+              },
+              "v": "brain.candidateRecord.v0.1"
+            }
+          ],
+          "mode": "strict",
+          "word": "study"
+        }
+      },
+      "policy": "no_single_winner",
+      "summary": {
+        "confidence": "strong",
+        "note": "Computed from candidate/deepRoot/voice-path/morphology signals. Passing: 2; strong: 2; medium: 0."
+      },
+      "support": {
+        "claimId": "oc:study",
+        "refs": [
+          "ref:candidates[albanian-studim]",
+          "ref:candidates[latin-studium]",
+          "ref:heart.math7.primary"
+        ]
+      },
+      "version": "v1"
+    },
+    "resonanceProfileV1": {
+      "normalized": {
+        "bucketCounts": {
+          "boundary": 0,
+          "manifest": 1,
+          "source": 1
+        },
+        "colorBand": [
+          "blue",
+          "yellow"
+        ],
+        "dominantBucket": "mixed",
+        "dominantColor": "mixed",
+        "notes": [
+          "mixed buckets: source+manifest"
+        ],
+        "polaritySymbol": "◐",
+        "signature": "MIXED_SOURCE_MANIFEST",
+        "transitions": [
+          "source→manifest"
+        ],
+        "vowels": [
+          "U",
+          "I"
+        ]
+      },
+      "surface": {
+        "bucketCounts": {
+          "boundary": 0,
+          "manifest": 0,
+          "source": 2
+        },
+        "colorBand": [
+          "blue",
+          "indigo"
+        ],
+        "dominantBucket": "source",
+        "dominantColor": "mixed",
+        "notes": [
+          "pure bucket: source"
+        ],
+        "polaritySymbol": "♀",
+        "signature": "PURE_SOURCE",
+        "transitions": [],
+        "vowels": [
+          "U",
+          "Y"
+        ]
+      },
+      "version": "resonance-profile-v1"
+    },
+    "rootMap": {
+      "carriers": [
+        {
+          "carrierForm": "shtoj",
+          "language": "sq",
+          "note": "gloss: to add",
+          "token": "SHTU"
+        },
+        {
+          "carrierForm": "shtim",
+          "language": "sq",
+          "note": "gloss: addition / increase",
+          "token": "SHTU"
+        },
+        {
+          "carrierForm": "shtue",
+          "language": "sq",
+          "note": "gloss: added (participle)",
+          "token": "SHTU"
+        },
+        {
+          "carrierForm": "stu",
+          "language": "en",
+          "note": "gloss: surface segment carrier (study)",
+          "token": "SHTU"
+        },
+        {
+          "carrierForm": "dij",
+          "language": "sq",
+          "note": "gloss: I know",
+          "token": "DI"
+        },
+        {
+          "carrierForm": "dije",
+          "language": "sq",
+          "note": "gloss: knowledge",
+          "token": "DI"
+        },
+        {
+          "carrierForm": "dit",
+          "language": "sq",
+          "note": "gloss: day (carrier; semantic drift possible)",
+          "token": "DI"
+        }
+      ],
+      "composedMeaning": "add / increase / put-on + know / knowledge",
+      "keys": [
+        {
+          "evidence": [
+            "sq: shtu",
+            "ops: s_to_sh",
+            "gloss: add / increased"
+          ],
+          "gloss": "add / increase / put-on",
+          "language": "sq",
+          "ops": [
+            "s_to_sh"
+          ],
+          "status": "supported",
+          "token": "SHTU"
+        },
+        {
+          "evidence": [
+            "sq: di",
+            "ops: y_to_i",
+            "gloss: I know"
+          ],
+          "gloss": "know / knowledge",
+          "language": "sq",
+          "ops": [
+            "y_to_i"
+          ],
+          "status": "supported",
+          "token": "DI"
+        }
+      ],
+      "spans": [
+        {
+          "end": 3,
+          "note": "segment=stu",
+          "source": "surface",
+          "start": 0,
+          "token": "SHTU"
+        },
+        {
+          "end": 5,
+          "note": "segment=dy",
+          "source": "surface",
+          "start": 3,
+          "token": "DI"
+        }
+      ],
+      "tokens": [
+        {
+          "role": "action",
+          "token": "SHTU",
+          "vowel_path": "U"
+        },
+        {
+          "role": "instrument",
+          "token": "DI",
+          "vowel_path": "I"
+        }
+      ]
+    },
+    "sanitized": "study",
+    "symbolicCore": {
+      "notes": [
+        "Placeholder note"
+      ]
+    },
+    "word": "study",
+    "wordMatrix": {
+      "canon": [
+        {
+          "form": "studium",
+          "label": "Latin",
+          "language": "Latin",
+          "layer": "canon",
+          "voicePath": "U → I"
+        },
+        {
+          "form": "studim",
+          "label": "Albanian",
+          "language": "Albanian",
+          "layer": "canon",
+          "voicePath": "U → I"
+        }
+      ],
+      "deepRoot": {
+        "form": "",
+        "label": "Proto-root",
+        "language": "",
+        "layer": "deeproot",
+        "notes": "",
+        "voicePath": ""
+      },
+      "primary": {
+        "label": "Primary path",
+        "layer": "heart",
+        "notes": "Placeholder note",
+        "voicePath": "UNITY → INSIGHT"
+      },
+      "word": "study"
+    }
+  },
+  "resonanceProfileV1": {
+    "normalized": {
+      "bucketCounts": {
+        "boundary": 0,
+        "manifest": 1,
+        "source": 1
+      },
+      "colorBand": [
+        "blue",
+        "yellow"
+      ],
+      "dominantBucket": "mixed",
+      "dominantColor": "mixed",
+      "notes": [
+        "mixed buckets: source+manifest"
+      ],
+      "polaritySymbol": "◐",
+      "signature": "MIXED_SOURCE_MANIFEST",
+      "transitions": [
+        "source→manifest"
+      ],
+      "vowels": [
+        "U",
+        "I"
+      ]
+    },
+    "surface": {
+      "bucketCounts": {
+        "boundary": 0,
+        "manifest": 0,
+        "source": 2
+      },
+      "colorBand": [
+        "blue",
+        "indigo"
+      ],
+      "dominantBucket": "source",
+      "dominantColor": "mixed",
+      "notes": [
+        "pure bucket: source"
+      ],
+      "polaritySymbol": "♀",
+      "signature": "PURE_SOURCE",
+      "transitions": [],
+      "vowels": [
+        "U",
+        "Y"
+      ]
+    },
+    "version": "resonance-profile-v1"
+  },
+  "rootMap": {
+    "carriers": [
+      {
+        "carrierForm": "shtoj",
+        "language": "sq",
+        "note": "gloss: to add",
+        "token": "SHTU"
+      },
+      {
+        "carrierForm": "shtim",
+        "language": "sq",
+        "note": "gloss: addition / increase",
+        "token": "SHTU"
+      },
+      {
+        "carrierForm": "shtue",
+        "language": "sq",
+        "note": "gloss: added (participle)",
+        "token": "SHTU"
+      },
+      {
+        "carrierForm": "stu",
+        "language": "en",
+        "note": "gloss: surface segment carrier (study)",
+        "token": "SHTU"
+      },
+      {
+        "carrierForm": "dij",
+        "language": "sq",
+        "note": "gloss: I know",
+        "token": "DI"
+      },
+      {
+        "carrierForm": "dije",
+        "language": "sq",
+        "note": "gloss: knowledge",
+        "token": "DI"
+      },
+      {
+        "carrierForm": "dit",
+        "language": "sq",
+        "note": "gloss: day (carrier; semantic drift possible)",
+        "token": "DI"
+      }
+    ],
+    "composedMeaning": "add / increase / put-on + know / knowledge",
+    "keys": [
+      {
+        "evidence": [
+          "sq: shtu",
+          "ops: s_to_sh",
+          "gloss: add / increased"
+        ],
+        "gloss": "add / increase / put-on",
+        "language": "sq",
+        "ops": [
+          "s_to_sh"
+        ],
+        "status": "supported",
+        "token": "SHTU"
+      },
+      {
+        "evidence": [
+          "sq: di",
+          "ops: y_to_i",
+          "gloss: I know"
+        ],
+        "gloss": "know / knowledge",
+        "language": "sq",
+        "ops": [
+          "y_to_i"
+        ],
+        "status": "supported",
+        "token": "DI"
+      }
+    ],
+    "spans": [
+      {
+        "end": 3,
+        "note": "segment=stu",
+        "source": "surface",
+        "start": 0,
+        "token": "SHTU"
+      },
+      {
+        "end": 5,
+        "note": "segment=dy",
+        "source": "surface",
+        "start": 3,
+        "token": "DI"
+      }
+    ],
+    "tokens": [
+      {
+        "role": "action",
+        "token": "SHTU",
+        "vowel_path": "U"
+      },
+      {
+        "role": "instrument",
+        "token": "DI",
+        "vowel_path": "I"
+      }
+    ]
+  },
+  "sanitized": "study",
+  "symbolicCore": {
+    "notes": [
+      "Placeholder note"
+    ]
+  },
+  "word": "study",
+  "wordMatrix": {
+    "canon": [
+      {
+        "form": "studium",
+        "label": "Latin",
+        "language": "Latin",
+        "layer": "canon",
+        "voicePath": "U → I"
+      },
+      {
+        "form": "studim",
+        "label": "Albanian",
+        "language": "Albanian",
+        "layer": "canon",
+        "voicePath": "U → I"
+      }
+    ],
+    "deepRoot": {
+      "form": "",
+      "label": "Proto-root",
+      "language": "",
+      "layer": "deeproot",
+      "notes": "",
+      "voicePath": ""
+    },
+    "primary": {
+      "label": "Primary path",
+      "layer": "heart",
+      "notes": "Placeholder note",
+      "voicePath": "UNITY → INSIGHT"
+    },
+    "word": "study"
+  }
+}
