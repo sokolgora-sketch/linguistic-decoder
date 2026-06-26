@@ -1,0 +1,704 @@
+{
+  "alphabet": "auto",
+  "candidates": [],
+  "consonants": {
+    "field": {
+      "slots": [
+        {
+          "ch": "w",
+          "kind": "smooth"
+        },
+        {
+          "ch": "t",
+          "kind": "spiky"
+        },
+        {
+          "ch": "r",
+          "kind": "smooth"
+        }
+      ],
+      "smoothHits": 2,
+      "spikyHits": 1
+    },
+    "summary": {
+      "dominantArchetypes": [
+        "smooth"
+      ],
+      "notes": [],
+      "smoothRatio": 0.6666666666666666
+    }
+  },
+  "deepRoot": {
+    "basis": "water",
+    "candidates": [],
+    "hypotheses": [],
+    "protoRoots": [],
+    "soundRoots": {
+      "claimedDomains": [],
+      "domains": [],
+      "matches": [],
+      "missingDomains": [],
+      "version": "soundRoots-v0.2",
+      "warnings": []
+    },
+    "version": "deeproot-output-v1"
+  },
+  "engineMeta": {
+    "alphabet": "auto",
+    "engineVersion": "0.2.0-symbolic",
+    "heartInstrumentV1": null,
+    "mode": "strict"
+  },
+  "engineVersion": "0.2.0-symbolic",
+  "evidence": {
+    "basis": "water",
+    "cacheHit": false,
+    "levelPath": [
+      1,
+      1
+    ],
+    "math7": {
+      "primary": {
+        "basis": "AE",
+        "cycleState": "open",
+        "indices": [
+          0,
+          1
+        ],
+        "indices0to6": [
+          0,
+          1
+        ],
+        "principlesPath": [
+          "TRUTH",
+          "EXPANSION"
+        ],
+        "rawSum1to7": 3,
+        "sum": 1,
+        "sum0to6": 1,
+        "total1to7": 2,
+        "totalMod7": 1,
+        "values1to7": [
+          1,
+          2
+        ],
+        "vowels": [
+          "A",
+          "E"
+        ]
+      }
+    },
+    "normalizationSteps": [],
+    "notes": [],
+    "ops": [],
+    "recomputed": true,
+    "ringPath": [
+      3,
+      2
+    ],
+    "signals": [
+      "base_raw=AE",
+      "base_norm=AE",
+      "cons_windows=Plosive",
+      "prefix 'w' → Glide",
+      "suffix 'r' → Liquid",
+      "alphabet=latin",
+      "EVIDENCE_V1",
+      "EVIDENCE_MATH7_BACKFILL"
+    ],
+    "solveMs": null,
+    "surfaceVowels": [
+      "A",
+      "E"
+    ],
+    "surfaceVowelsRaw": [
+      "A",
+      "E"
+    ],
+    "vowelPath": [
+      "A",
+      "E"
+    ]
+  },
+  "evidencePackage": {
+    "counts": {
+      "signals": {
+        "kind": "present",
+        "value": 8
+      }
+    },
+    "engineVersion": "0.2.0-symbolic",
+    "mode": "strict",
+    "normalizedWord": "water",
+    "notes": [],
+    "sevenPrinciplesSpectrum": {
+      "delta": {
+        "functionalIndices1": [
+          1,
+          2
+        ],
+        "functionalRings": [
+          3,
+          2
+        ],
+        "surfaceIndices1": [
+          1,
+          2
+        ],
+        "surfaceRings": [
+          3,
+          2
+        ]
+      },
+      "functional": {
+        "crossesCenter": false,
+        "drift": "mostly_increasing",
+        "endsOnE": true,
+        "endsOnË": false,
+        "indices1": [
+          1,
+          2
+        ],
+        "ringIndex": [
+          3,
+          2
+        ]
+      },
+      "surface": {
+        "crossesCenter": false,
+        "drift": "mostly_increasing",
+        "endsOnE": true,
+        "endsOnË": false,
+        "indices1": [
+          1,
+          2
+        ],
+        "ringIndex": [
+          3,
+          2
+        ]
+      }
+    },
+    "summary": {
+      "signalsCount": 8,
+      "voicePath": "A → E",
+      "voicePathDelta": "AE vs AE",
+      "voicePathFunctional": "A → E",
+      "voicePathSurface": "A → E"
+    },
+    "version": "evidence_package.v0.1",
+    "word": "water"
+  },
+  "frontier": [],
+  "heart": {
+    "alphabet": "auto",
+    "engineVersion": "0.2.0-symbolic",
+    "math7": {
+      "primary": {
+        "basis": "AE",
+        "cycleState": "open",
+        "indices": [
+          0,
+          1
+        ],
+        "indices0to6": [
+          0,
+          1
+        ],
+        "principlesPath": [
+          "TRUTH",
+          "EXPANSION"
+        ],
+        "rawSum1to7": 3,
+        "sum": 1,
+        "sum0to6": 1,
+        "total1to7": 2,
+        "totalMod7": 1,
+        "values1to7": [
+          1,
+          2
+        ],
+        "vowels": [
+          "A",
+          "E"
+        ]
+      }
+    },
+    "mode": "strict",
+    "narrative": "Word water follows stable balance.",
+    "principlePath": [
+      "TRUTH",
+      "EXPANSION"
+    ],
+    "word": "water"
+  },
+  "heartInstrumentV1": {
+    "basisNfc": "water",
+    "math7": {
+      "events": [
+        "COMPLETION"
+      ],
+      "jumps": [
+        1
+      ],
+      "rawSum": 3,
+      "total1to7": 2,
+      "totalMod7": 1,
+      "values1to7": [
+        1,
+        2
+      ],
+      "wrapCount": 0
+    },
+    "principlesPath": [
+      "TRUTH",
+      "EXPANSION"
+    ],
+    "surfaceMath7": {
+      "events": [
+        "COMPLETION"
+      ],
+      "jumps": [
+        1
+      ],
+      "rawSum": 3,
+      "total1to7": 2,
+      "totalMod7": 1,
+      "values1to7": [
+        1,
+        2
+      ],
+      "wrapCount": 0
+    },
+    "surfaceTotal1to7": 2,
+    "surfaceTotalMod7": 1,
+    "surfaceVowels": [
+      "A",
+      "E"
+    ],
+    "values1to7": [
+      1,
+      2
+    ]
+  },
+  "history": [],
+  "languageFamilies": [],
+  "meta": {
+    "created": "2026-06-25T14:29:20.865Z",
+    "inputs": {
+      "alphabet": "auto",
+      "brainCandidatesSeedFallback": false,
+      "mode": "strict",
+      "word": "water"
+    },
+    "version": "0.2.0-symbolic"
+  },
+  "mind": {
+    "dominantPrinciple": "Expansion",
+    "dominantPrincipleId": "EXPANSION",
+    "dominantPrincipleLabel": "Expansion",
+    "logicStatement": "The word reflects Expansion principle with balanced flow.",
+    "patternName": "EXPANSION-balanced",
+    "polarity": "balanced"
+  },
+  "mode": "strict",
+  "originClaim": {
+    "candidates": [],
+    "meta": {
+      "engineVersion": "0.2.0-symbolic",
+      "generatedAt": "2026-06-25T14:29:20.865Z",
+      "inputs": {
+        "alphabet": "auto",
+        "mode": "strict",
+        "word": "water"
+      }
+    },
+    "policy": "no_single_winner",
+    "summary": {
+      "confidence": "insufficient_evidence",
+      "note": "No passing candidates with sufficient computed support in the current result layers."
+    },
+    "support": {
+      "claimId": "oc:water",
+      "refs": [
+        "ref:heart.math7.primary"
+      ]
+    },
+    "version": "v1"
+  },
+  "originClaimGates": {
+    "active": null,
+    "flag": "ocg"
+  },
+  "primaryPath": null,
+  "raw": {
+    "alphabet": "auto",
+    "candidates": [],
+    "consonants": {
+      "field": {
+        "slots": [
+          {
+            "ch": "w",
+            "kind": "smooth"
+          },
+          {
+            "ch": "t",
+            "kind": "spiky"
+          },
+          {
+            "ch": "r",
+            "kind": "smooth"
+          }
+        ],
+        "smoothHits": 2,
+        "spikyHits": 1
+      },
+      "summary": {
+        "dominantArchetypes": [
+          "smooth"
+        ],
+        "notes": [],
+        "smoothRatio": 0.6666666666666666
+      }
+    },
+    "deepRoot": {
+      "basis": "water",
+      "candidates": [],
+      "hypotheses": [],
+      "protoRoots": [],
+      "soundRoots": {
+        "claimedDomains": [],
+        "domains": [],
+        "matches": [],
+        "missingDomains": [],
+        "version": "soundRoots-v0.2",
+        "warnings": []
+      },
+      "version": "deeproot-output-v1"
+    },
+    "engineVersion": "0.2.0-symbolic",
+    "evidence": {
+      "basis": "water",
+      "cacheHit": false,
+      "levelPath": [
+        1,
+        1
+      ],
+      "math7": {
+        "primary": {
+          "basis": "AE",
+          "cycleState": "open",
+          "indices": [
+            0,
+            1
+          ],
+          "indices0to6": [
+            0,
+            1
+          ],
+          "principlesPath": [
+            "TRUTH",
+            "EXPANSION"
+          ],
+          "rawSum1to7": 3,
+          "sum": 1,
+          "sum0to6": 1,
+          "total1to7": 2,
+          "totalMod7": 1,
+          "values1to7": [
+            1,
+            2
+          ],
+          "vowels": [
+            "A",
+            "E"
+          ]
+        }
+      },
+      "normalizationSteps": [],
+      "notes": [],
+      "ops": [],
+      "recomputed": true,
+      "ringPath": [
+        3,
+        2
+      ],
+      "signals": [
+        "base_raw=AE",
+        "base_norm=AE",
+        "cons_windows=Plosive",
+        "prefix 'w' → Glide",
+        "suffix 'r' → Liquid",
+        "alphabet=latin",
+        "EVIDENCE_V1",
+        "EVIDENCE_MATH7_BACKFILL"
+      ],
+      "solveMs": null,
+      "surfaceVowels": [
+        "A",
+        "E"
+      ],
+      "surfaceVowelsRaw": [
+        "A",
+        "E"
+      ],
+      "vowelPath": [
+        "A",
+        "E"
+      ]
+    },
+    "heart": {
+      "alphabet": "auto",
+      "engineVersion": "0.2.0-symbolic",
+      "math7": {
+        "primary": {
+          "basis": "AE",
+          "cycleState": "open",
+          "indices": [
+            0,
+            1
+          ],
+          "indices0to6": [
+            0,
+            1
+          ],
+          "principlesPath": [
+            "TRUTH",
+            "EXPANSION"
+          ],
+          "rawSum1to7": 3,
+          "sum": 1,
+          "sum0to6": 1,
+          "total1to7": 2,
+          "totalMod7": 1,
+          "values1to7": [
+            1,
+            2
+          ],
+          "vowels": [
+            "A",
+            "E"
+          ]
+        }
+      },
+      "mode": "strict",
+      "narrative": "Word water follows stable balance.",
+      "principlePath": [
+        "TRUTH",
+        "EXPANSION"
+      ],
+      "word": "water"
+    },
+    "heartPrimaryPath": [
+      "A",
+      "E"
+    ],
+    "meta": {
+      "created": "2026-06-25T14:29:20.865Z",
+      "inputs": {
+        "alphabet": "auto",
+        "brainCandidatesSeedFallback": false,
+        "mode": "strict",
+        "word": "water"
+      },
+      "version": "0.2.0-symbolic"
+    },
+    "mind": {
+      "dominantPrinciple": "Expansion",
+      "dominantPrincipleId": "EXPANSION",
+      "dominantPrincipleLabel": "Expansion",
+      "logicStatement": "The word reflects Expansion principle with balanced flow.",
+      "patternName": "EXPANSION-balanced",
+      "polarity": "balanced"
+    },
+    "mode": "strict",
+    "originClaim": {
+      "candidates": [],
+      "meta": {
+        "engineVersion": "0.2.0-symbolic",
+        "generatedAt": "2026-06-25T14:29:20.865Z",
+        "inputs": {
+          "alphabet": "auto",
+          "mode": "strict",
+          "word": "water"
+        }
+      },
+      "policy": "no_single_winner",
+      "summary": {
+        "confidence": "insufficient_evidence",
+        "note": "No passing candidates with sufficient computed support in the current result layers."
+      },
+      "support": {
+        "claimId": "oc:water",
+        "refs": [
+          "ref:heart.math7.primary"
+        ]
+      },
+      "version": "v1"
+    },
+    "resonanceProfileV1": {
+      "normalized": {
+        "bucketCounts": {
+          "boundary": 0,
+          "manifest": 2,
+          "source": 0
+        },
+        "colorBand": [
+          "red",
+          "orange"
+        ],
+        "dominantBucket": "manifest",
+        "dominantColor": "mixed",
+        "notes": [
+          "pure bucket: manifest"
+        ],
+        "polaritySymbol": "♂",
+        "signature": "PURE_MANIFEST",
+        "transitions": [],
+        "vowels": [
+          "A",
+          "E"
+        ]
+      },
+      "surface": {
+        "bucketCounts": {
+          "boundary": 0,
+          "manifest": 2,
+          "source": 0
+        },
+        "colorBand": [
+          "red",
+          "orange"
+        ],
+        "dominantBucket": "manifest",
+        "dominantColor": "mixed",
+        "notes": [
+          "pure bucket: manifest"
+        ],
+        "polaritySymbol": "♂",
+        "signature": "PURE_MANIFEST",
+        "transitions": [],
+        "vowels": [
+          "A",
+          "E"
+        ]
+      },
+      "version": "resonance-profile-v1"
+    },
+    "rootMap": {
+      "composedMeaning": "",
+      "keys": [],
+      "notes": [
+        "No minRoots hypotheses available; RootMap not emitted."
+      ],
+      "tokens": []
+    },
+    "sanitized": "water",
+    "symbolicCore": {
+      "notes": [
+        "Placeholder note"
+      ]
+    },
+    "word": "water",
+    "wordMatrix": {
+      "canon": [],
+      "deepRoot": {
+        "form": "",
+        "label": "Proto-root",
+        "language": "",
+        "layer": "deeproot",
+        "notes": "",
+        "voicePath": ""
+      },
+      "primary": {
+        "label": "Primary path",
+        "layer": "heart",
+        "notes": "Placeholder note",
+        "voicePath": "TRUTH → EXPANSION"
+      },
+      "word": "water"
+    }
+  },
+  "resonanceProfileV1": {
+    "normalized": {
+      "bucketCounts": {
+        "boundary": 0,
+        "manifest": 2,
+        "source": 0
+      },
+      "colorBand": [
+        "red",
+        "orange"
+      ],
+      "dominantBucket": "manifest",
+      "dominantColor": "mixed",
+      "notes": [
+        "pure bucket: manifest"
+      ],
+      "polaritySymbol": "♂",
+      "signature": "PURE_MANIFEST",
+      "transitions": [],
+      "vowels": [
+        "A",
+        "E"
+      ]
+    },
+    "surface": {
+      "bucketCounts": {
+        "boundary": 0,
+        "manifest": 2,
+        "source": 0
+      },
+      "colorBand": [
+        "red",
+        "orange"
+      ],
+      "dominantBucket": "manifest",
+      "dominantColor": "mixed",
+      "notes": [
+        "pure bucket: manifest"
+      ],
+      "polaritySymbol": "♂",
+      "signature": "PURE_MANIFEST",
+      "transitions": [],
+      "vowels": [
+        "A",
+        "E"
+      ]
+    },
+    "version": "resonance-profile-v1"
+  },
+  "rootMap": {
+    "composedMeaning": "",
+    "keys": [],
+    "notes": [
+      "No minRoots hypotheses available; RootMap not emitted."
+    ],
+    "tokens": []
+  },
+  "sanitized": "water",
+  "symbolicCore": {
+    "notes": [
+      "Placeholder note"
+    ]
+  },
+  "word": "water",
+  "wordMatrix": {
+    "canon": [],
+    "deepRoot": {
+      "form": "",
+      "label": "Proto-root",
+      "language": "",
+      "layer": "deeproot",
+      "notes": "",
+      "voicePath": ""
+    },
+    "primary": {
+      "label": "Primary path",
+      "layer": "heart",
+      "notes": "Placeholder note",
+      "voicePath": "TRUTH → EXPANSION"
+    },
+    "word": "water"
+  }
+}
