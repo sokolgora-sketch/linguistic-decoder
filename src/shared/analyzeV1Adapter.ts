@@ -107,8 +107,33 @@ function adaptCandidate(rawCandidate: Raw): CandidateUI {
   const confidenceTag = typeof rawCandidate?.confidenceTag === "string" ? rawCandidate.confidenceTag : undefined;
   const fitTag = typeof rawCandidate?.fitTag === "string" ? rawCandidate.fitTag : undefined;
   const sourceKind = pickCandidateSourceKind(rawCandidate);
+  const embryoFirstCandidateFields = {
+    candidateId: rawCandidate?.candidateId,
+    displayForm: rawCandidate?.displayForm,
+    candidateLanguage: rawCandidate?.candidateLanguage,
+    claimType: rawCandidate?.claimType,
+    originClaim: rawCandidate?.originClaim,
+    historicalRelation: rawCandidate?.historicalRelation,
+    embryo: rawCandidate?.embryo,
+    embryoSize: rawCandidate?.embryoSize,
+    embryoLanguage: rawCandidate?.embryoLanguage,
+    isolatedStandaloneForm: rawCandidate?.isolatedStandaloneForm,
+    plainStandaloneGloss: rawCandidate?.plainStandaloneGloss,
+    sourceNote: rawCandidate?.sourceNote,
+    segmentation: rawCandidate?.segmentation,
+    semanticBridge: rawCandidate?.semanticBridge,
+    expansionChain: rawCandidate?.expansionChain,
+    validationOutcome: rawCandidate?.validationOutcome,
+    validationReasons: rawCandidate?.validationReasons,
+    rankGroup: rawCandidate?.rankGroup,
+    rankScore: rawCandidate?.rankScore,
+    rankReason: rawCandidate?.rankReason,
+    claimBoundary: rawCandidate?.claimBoundary,
+    userDecisionPosture: rawCandidate?.userDecisionPosture,
+  };
 
   return {
+    ...embryoFirstCandidateFields,
     id: String(rawCandidate?.id ?? `${language}-${form}`),
     language,
     form,
@@ -119,7 +144,7 @@ function adaptCandidate(rawCandidate: Raw): CandidateUI {
     confidenceTag,
     fitTag,
     sourceKind,
-  };
+  } as unknown as CandidateUI;
 }
 
 export function adaptAnalyzeV1ToUI(raw: Raw): AnalyzeWordResultUI {
