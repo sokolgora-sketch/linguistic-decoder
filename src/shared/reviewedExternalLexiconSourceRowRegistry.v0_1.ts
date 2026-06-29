@@ -1,0 +1,70 @@
+import type { ReviewedExternalLexiconCandidateSourceRowV0_1 } from "./reviewedExternalLexiconEvidenceGate.validator.v0_1";
+
+export type ReviewedExternalLexiconSourceRowRegistryBoundaryV0_1 = {
+  registryId: "reviewed-external-lexicon-source-row-registry.v0_1";
+  productionRows: readonly ReviewedExternalLexiconCandidateSourceRowV0_1[];
+  liveRowCount: number;
+  hasLiveRows: boolean;
+  syntheticFixtureRowsAllowed: false;
+  liveCitationRequirement: "reviewed_external_metadata_required";
+};
+
+const PRODUCTION_SOURCE_ROWS_V0_1 =
+  [] as const satisfies readonly ReviewedExternalLexiconCandidateSourceRowV0_1[];
+
+function asRecord(value: unknown): Record<string, unknown> | null {
+  return value && typeof value === "object" ? (value as Record<string, unknown>) : null;
+}
+
+function flattenStrings(value: unknown): string[] {
+  if (typeof value === "string") return [value];
+  if (Array.isArray(value)) return value.flatMap(flattenStrings);
+  if (value && typeof value === "object") return Object.values(value).flatMap(flattenStrings);
+  return [];
+}
+
+function stringField(row: unknown, key: string): string {
+  const record = asRecord(row);
+  const value = record?.[key];
+  return typeof value === "string" ? value : "";
+}
+
+function externalCitations(row: unknown): unknown[] {
+  const record = asRecord(row);
+  const citations = record?.externalCitations;
+  return Array.isArray(citations) ? citations : [];
+}
+
+export function getReviewedExternalLexiconProductionSourceRowsV0_1(): readonly ReviewedExternalLexiconCandidateSourceRowV0_1[] {
+  return PRODUCTION_SOURCE_ROWS_V0_1;
+}
+
+export function getReviewedExternalLexiconSourceRowRegistryBoundaryV0_1(): ReviewedExternalLexiconSourceRowRegistryBoundaryV0_1 {
+  const productionRows = getReviewedExternalLexiconProductionSourceRowsV0_1();
+
+  return {
+    registryId: "reviewed-external-lexicon-source-row-registry.v0_1",
+    productionRows,
+    liveRowCount: productionRows.length,
+    hasLiveRows: productionRows.length > 0,
+    syntheticFixtureRowsAllowed: false,
+    liveCitationRequirement: "reviewed_external_metadata_required",
+  };
+}
+
+export function isReviewedExternalLexiconRegistryRowProductionSafeV0_1(row: unknown): boolean {
+  const sourceId = stringField(row, "sourceId");
+  const sourceUrlRefs = externalCitations(row).map((citation) =>
+    stringField(citation, "sourceUrlOrArchiveRef"),
+  );
+  const citationIds = externalCitations(row).map((citation) =>
+    stringField(citation, "citationId"),
+  );
+
+  if (sourceId.startsWith("fixture.") || sourceId.includes(".synthetic.")) return false;
+  if (citationIds.some((citationId) => citationId.startsWith("fixture."))) return false;
+  if (sourceUrlRefs.some((ref) => ref.startsWith("fixture://"))) return false;
+  if (flattenStrings(row).some((text) => text.includes("CONTRACT TEST ONLY"))) return false;
+
+  return true;
+}
