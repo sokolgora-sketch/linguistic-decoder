@@ -45,8 +45,9 @@ describe('Canonical Candidate Adapter', () => {
     expect(result.consonants!.field.smoothHits + result.consonants!.field.spikyHits).toBeGreaterThanOrEqual(1);
 
     for (const c of result.candidates) {
-      expect(c.status).toBe('pass');
-      expect(c.fitTag).toBe('strong');
+      expect(c.status).toBe('experimental');
+      expect(c.confidenceTag).toBe('speculative');
+      expect(c.fitTag).toBe('weak');
       expect(c.morphology).toBeDefined();
       expect(c.id).toContain('stud');
       // consonant checks
@@ -98,8 +99,9 @@ describe('Canonical Candidate Adapter', () => {
     expect(result.consonants!.field.smoothHits + result.consonants!.field.spikyHits).toBeGreaterThanOrEqual(1);
 
     for (const c of result.candidates) {
-      expect(c.status).toBe('pass');
-      expect(c.fitTag).toBe('strong');
+      expect(c.status).toBe('experimental');
+      expect(c.confidenceTag).toBe('speculative');
+      expect(c.fitTag).toBe('weak');
       expect(c.morphology).toBeDefined();
       expect(c.id).toMatch(/dam|dëm/);
       // consonant checks

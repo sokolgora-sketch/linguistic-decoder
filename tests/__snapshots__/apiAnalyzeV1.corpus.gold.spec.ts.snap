@@ -1991,7 +1991,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         "candidateLanguage": "Latin",
         "claimBoundary": "not historical origin or validated functional motivation",
         "claimType": "surfaceResonance",
-        "confidenceTag": "strong",
+        "confidenceTag": "speculative",
         "displayForm": "damnum",
         "embryo": null,
         "embryoLanguage": null,
@@ -1999,7 +1999,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         "expansionChain": [
           "damnum",
         ],
-        "fitTag": "strong",
+        "fitTag": "weak",
         "form": "damnum",
         "historicalRelation": "not_evaluated",
         "id": "latin-damnum",
@@ -2019,7 +2019,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         "semanticBridge": null,
         "sourceKind": "SEED",
         "sourceNote": null,
-        "status": "pass",
+        "status": "unknown",
         "userDecisionPosture": "user_decides",
         "validationOutcome": "not_evaluated",
         "validationReasons": [
@@ -2035,7 +2035,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         "candidateLanguage": "Albanian",
         "claimBoundary": "not historical origin or validated functional motivation",
         "claimType": "surfaceResonance",
-        "confidenceTag": "strong",
+        "confidenceTag": "speculative",
         "displayForm": "dëm",
         "embryo": null,
         "embryoLanguage": null,
@@ -2043,7 +2043,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         "expansionChain": [
           "dëm",
         ],
-        "fitTag": "strong",
+        "fitTag": "weak",
         "form": "dëm",
         "historicalRelation": "not_evaluated",
         "id": "albanian-dëm",
@@ -2061,7 +2061,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         "semanticBridge": null,
         "sourceKind": "SEED",
         "sourceNote": null,
-        "status": "pass",
+        "status": "unknown",
         "userDecisionPosture": "user_decides",
         "validationOutcome": "not_evaluated",
         "validationReasons": [
@@ -2337,7 +2337,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
     "originClaim": {
       "candidates": [
         {
-          "confidence": "medium",
+          "confidence": "insufficient_evidence",
           "evidenceRefs": [
             "primaryPath.voicePath",
             "heart.math7.primary",
@@ -2347,15 +2347,15 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
           "id": "oc:albanian-dëm",
           "language": "Albanian",
           "reasons": [
-            "Candidate marked pass by engine candidate layer.",
+            "Candidate status unknown (no explicit pass/fail).",
             "DeepRoot–Heart gate insufficient data (missing heart or candidate path).",
             "Voice path alignment cannot be determined from available fields.",
             "Candidate shows non-empty morphological structure (prefix/root/suffix parts).",
           ],
-          "status": "pass",
+          "status": "unknown",
         },
         {
-          "confidence": "medium",
+          "confidence": "insufficient_evidence",
           "evidenceRefs": [
             "primaryPath.voicePath",
             "heart.math7.primary",
@@ -2365,12 +2365,12 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
           "id": "oc:latin-damnum",
           "language": "Latin",
           "reasons": [
-            "Candidate marked pass by engine candidate layer.",
+            "Candidate status unknown (no explicit pass/fail).",
             "DeepRoot–Heart gate insufficient data (missing heart or candidate path).",
             "Voice path alignment cannot be determined from available fields.",
             "Candidate shows non-empty morphological structure (prefix/root/suffix parts).",
           ],
-          "status": "pass",
+          "status": "unknown",
         },
       ],
       "meta": {
@@ -2419,8 +2419,8 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
       },
       "policy": "no_single_winner",
       "summary": {
-        "confidence": "medium",
-        "note": "Computed from candidate/deepRoot/voice-path/morphology signals. Passing: 2; strong: 0; medium: 2.",
+        "confidence": "insufficient_evidence",
+        "note": "No passing candidates with sufficient computed support in the current result layers.",
       },
       "support": {
         "claimId": "oc:damage",
@@ -2467,7 +2467,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
           },
           "claimBoundary": "not historical origin or validated functional motivation",
           "claimType": "surfaceResonance",
-          "confidenceTag": "strong",
+          "confidenceTag": "speculative",
           "consonantProfile": "cut",
           "consonantProfileOk": true,
           "consonantSignals": [
@@ -2481,7 +2481,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
           "expansionChain": [
             "damnum",
           ],
-          "fitTag": "strong",
+          "fitTag": "weak",
           "form": "damnum",
           "historicalRelation": "not_evaluated",
           "id": "latin-damnum",
@@ -2509,7 +2509,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
           },
           "semanticBridge": null,
           "sourceNote": null,
-          "status": "pass",
+          "status": "experimental",
           "symbolic": [
             {
               "axis": "substance",
@@ -2555,7 +2555,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
           },
           "claimBoundary": "not historical origin or validated functional motivation",
           "claimType": "surfaceResonance",
-          "confidenceTag": "strong",
+          "confidenceTag": "speculative",
           "consonantProfile": "cut",
           "consonantProfileOk": true,
           "consonantSignals": [
@@ -2568,7 +2568,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
           "expansionChain": [
             "dëm",
           ],
-          "fitTag": "strong",
+          "fitTag": "weak",
           "form": "dëm",
           "historicalRelation": "not_evaluated",
           "id": "albanian-dëm",
@@ -2592,7 +2592,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
           },
           "semanticBridge": null,
           "sourceNote": null,
-          "status": "pass",
+          "status": "experimental",
           "userDecisionPosture": "user_decides",
           "validationOutcome": "not_evaluated",
           "validationReasons": [
@@ -2813,7 +2813,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
       "originClaim": {
         "candidates": [
           {
-            "confidence": "medium",
+            "confidence": "insufficient_evidence",
             "evidenceRefs": [
               "primaryPath.voicePath",
               "heart.math7.primary",
@@ -2823,15 +2823,15 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
             "id": "oc:albanian-dëm",
             "language": "Albanian",
             "reasons": [
-              "Candidate marked pass by engine candidate layer.",
+              "Candidate status unknown (no explicit pass/fail).",
               "DeepRoot–Heart gate insufficient data (missing heart or candidate path).",
               "Voice path alignment cannot be determined from available fields.",
               "Candidate shows non-empty morphological structure (prefix/root/suffix parts).",
             ],
-            "status": "pass",
+            "status": "unknown",
           },
           {
-            "confidence": "medium",
+            "confidence": "insufficient_evidence",
             "evidenceRefs": [
               "primaryPath.voicePath",
               "heart.math7.primary",
@@ -2841,12 +2841,12 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
             "id": "oc:latin-damnum",
             "language": "Latin",
             "reasons": [
-              "Candidate marked pass by engine candidate layer.",
+              "Candidate status unknown (no explicit pass/fail).",
               "DeepRoot–Heart gate insufficient data (missing heart or candidate path).",
               "Voice path alignment cannot be determined from available fields.",
               "Candidate shows non-empty morphological structure (prefix/root/suffix parts).",
             ],
-            "status": "pass",
+            "status": "unknown",
           },
         ],
         "meta": {
@@ -2895,8 +2895,8 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         },
         "policy": "no_single_winner",
         "summary": {
-          "confidence": "medium",
-          "note": "Computed from candidate/deepRoot/voice-path/morphology signals. Passing: 2; strong: 0; medium: 2.",
+          "confidence": "insufficient_evidence",
+          "note": "No passing candidates with sufficient computed support in the current result layers.",
         },
         "support": {
           "claimId": "oc:damage",
@@ -11306,7 +11306,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         "candidateLanguage": "Latin",
         "claimBoundary": "not historical origin or validated functional motivation",
         "claimType": "surfaceResonance",
-        "confidenceTag": "strong",
+        "confidenceTag": "speculative",
         "displayForm": "studium",
         "embryo": null,
         "embryoLanguage": null,
@@ -11314,7 +11314,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         "expansionChain": [
           "studium",
         ],
-        "fitTag": "strong",
+        "fitTag": "weak",
         "form": "studium",
         "functionalStatement": "Deliberate effort of knowing that leads to a formed inner state.",
         "gloss": "study, zeal, pursuit",
@@ -11336,7 +11336,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         "semanticBridge": null,
         "sourceKind": "SEED",
         "sourceNote": null,
-        "status": "pass",
+        "status": "unknown",
         "userDecisionPosture": "user_decides",
         "validationOutcome": "not_evaluated",
         "validationReasons": [
@@ -11353,7 +11353,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         "candidateLanguage": "Albanian",
         "claimBoundary": "not historical origin or validated functional motivation",
         "claimType": "surfaceResonance",
-        "confidenceTag": "strong",
+        "confidenceTag": "speculative",
         "displayForm": "studim",
         "embryo": null,
         "embryoLanguage": null,
@@ -11361,7 +11361,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         "expansionChain": [
           "studim",
         ],
-        "fitTag": "strong",
+        "fitTag": "weak",
         "form": "studim",
         "historicalRelation": "not_evaluated",
         "id": "albanian-studim",
@@ -11381,7 +11381,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         "semanticBridge": null,
         "sourceKind": "SEED",
         "sourceNote": null,
-        "status": "pass",
+        "status": "unknown",
         "userDecisionPosture": "user_decides",
         "validationOutcome": "not_evaluated",
         "validationReasons": [
@@ -11852,7 +11852,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
     "originClaim": {
       "candidates": [
         {
-          "confidence": "strong",
+          "confidence": "insufficient_evidence",
           "evidenceRefs": [
             "primaryPath.voicePath",
             "heart.math7.primary",
@@ -11863,15 +11863,15 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
           "id": "oc:albanian-studim",
           "language": "Albanian",
           "reasons": [
-            "Candidate marked pass by engine candidate layer.",
+            "Candidate status unknown (no explicit pass/fail).",
             "DeepRoot–Heart gate aligned (terminal vowel agreement).",
             "Candidate voice path aligns with primary voice path.",
             "Candidate shows non-empty morphological structure (prefix/root/suffix parts).",
           ],
-          "status": "pass",
+          "status": "unknown",
         },
         {
-          "confidence": "strong",
+          "confidence": "insufficient_evidence",
           "evidenceRefs": [
             "primaryPath.voicePath",
             "heart.math7.primary",
@@ -11882,12 +11882,12 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
           "id": "oc:latin-studium",
           "language": "Latin",
           "reasons": [
-            "Candidate marked pass by engine candidate layer.",
+            "Candidate status unknown (no explicit pass/fail).",
             "DeepRoot–Heart gate aligned (terminal vowel agreement).",
             "Candidate voice path aligns with primary voice path.",
             "Candidate shows non-empty morphological structure (prefix/root/suffix parts).",
           ],
-          "status": "pass",
+          "status": "unknown",
         },
       ],
       "meta": {
@@ -11936,8 +11936,8 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
       },
       "policy": "no_single_winner",
       "summary": {
-        "confidence": "strong",
-        "note": "Computed from candidate/deepRoot/voice-path/morphology signals. Passing: 2; strong: 2; medium: 0.",
+        "confidence": "insufficient_evidence",
+        "note": "No passing candidates with sufficient computed support in the current result layers.",
       },
       "support": {
         "claimId": "oc:study",
@@ -11984,7 +11984,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
           },
           "claimBoundary": "not historical origin or validated functional motivation",
           "claimType": "surfaceResonance",
-          "confidenceTag": "strong",
+          "confidenceTag": "speculative",
           "consonantProfile": "build",
           "consonantProfileOk": true,
           "consonantSignals": [
@@ -11998,7 +11998,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
           "expansionChain": [
             "studium",
           ],
-          "fitTag": "strong",
+          "fitTag": "weak",
           "form": "studium",
           "function": "Deliberate effort of knowing that leads to a formed inner state.",
           "gloss": "study, zeal, pursuit",
@@ -12029,7 +12029,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
           },
           "semanticBridge": null,
           "sourceNote": null,
-          "status": "pass",
+          "status": "experimental",
           "symbolic": [
             {
               "axis": "energy",
@@ -12085,7 +12085,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
           },
           "claimBoundary": "not historical origin or validated functional motivation",
           "claimType": "surfaceResonance",
-          "confidenceTag": "strong",
+          "confidenceTag": "speculative",
           "consonantProfile": "build",
           "consonantProfileOk": true,
           "consonantSignals": [
@@ -12099,7 +12099,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
           "expansionChain": [
             "studim",
           ],
-          "fitTag": "strong",
+          "fitTag": "weak",
           "form": "studim",
           "historicalRelation": "not_evaluated",
           "id": "albanian-studim",
@@ -12127,7 +12127,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
           },
           "semanticBridge": null,
           "sourceNote": null,
-          "status": "pass",
+          "status": "experimental",
           "userDecisionPosture": "user_decides",
           "validationOutcome": "not_evaluated",
           "validationReasons": [
@@ -12557,7 +12557,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
       "originClaim": {
         "candidates": [
           {
-            "confidence": "strong",
+            "confidence": "insufficient_evidence",
             "evidenceRefs": [
               "primaryPath.voicePath",
               "heart.math7.primary",
@@ -12568,15 +12568,15 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
             "id": "oc:albanian-studim",
             "language": "Albanian",
             "reasons": [
-              "Candidate marked pass by engine candidate layer.",
+              "Candidate status unknown (no explicit pass/fail).",
               "DeepRoot–Heart gate aligned (terminal vowel agreement).",
               "Candidate voice path aligns with primary voice path.",
               "Candidate shows non-empty morphological structure (prefix/root/suffix parts).",
             ],
-            "status": "pass",
+            "status": "unknown",
           },
           {
-            "confidence": "strong",
+            "confidence": "insufficient_evidence",
             "evidenceRefs": [
               "primaryPath.voicePath",
               "heart.math7.primary",
@@ -12587,12 +12587,12 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
             "id": "oc:latin-studium",
             "language": "Latin",
             "reasons": [
-              "Candidate marked pass by engine candidate layer.",
+              "Candidate status unknown (no explicit pass/fail).",
               "DeepRoot–Heart gate aligned (terminal vowel agreement).",
               "Candidate voice path aligns with primary voice path.",
               "Candidate shows non-empty morphological structure (prefix/root/suffix parts).",
             ],
-            "status": "pass",
+            "status": "unknown",
           },
         ],
         "meta": {
@@ -12641,8 +12641,8 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         },
         "policy": "no_single_winner",
         "summary": {
-          "confidence": "strong",
-          "note": "Computed from candidate/deepRoot/voice-path/morphology signals. Passing: 2; strong: 2; medium: 0.",
+          "confidence": "insufficient_evidence",
+          "note": "No passing candidates with sufficient computed support in the current result layers.",
         },
         "support": {
           "claimId": "oc:study",

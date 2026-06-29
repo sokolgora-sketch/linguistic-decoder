@@ -4,7 +4,7 @@ exports[`originClaim v1 — gold snapshots (originClaim block only) gold:damage 
 {
   "candidates": [
     {
-      "confidence": "medium",
+      "confidence": "insufficient_evidence",
       "evidenceRefs": [
         "primaryPath.voicePath",
         "heart.math7.primary",
@@ -14,15 +14,15 @@ exports[`originClaim v1 — gold snapshots (originClaim block only) gold:damage 
       "id": "oc:albanian-dëm",
       "language": "Albanian",
       "reasons": [
-        "Candidate marked pass by engine candidate layer.",
+        "Candidate status unknown (no explicit pass/fail).",
         "DeepRoot–Heart gate insufficient data (missing heart or candidate path).",
         "Voice path alignment cannot be determined from available fields.",
         "Candidate shows non-empty morphological structure (prefix/root/suffix parts).",
       ],
-      "status": "pass",
+      "status": "unknown",
     },
     {
-      "confidence": "medium",
+      "confidence": "insufficient_evidence",
       "evidenceRefs": [
         "primaryPath.voicePath",
         "heart.math7.primary",
@@ -32,12 +32,12 @@ exports[`originClaim v1 — gold snapshots (originClaim block only) gold:damage 
       "id": "oc:latin-damnum",
       "language": "Latin",
       "reasons": [
-        "Candidate marked pass by engine candidate layer.",
+        "Candidate status unknown (no explicit pass/fail).",
         "DeepRoot–Heart gate insufficient data (missing heart or candidate path).",
         "Voice path alignment cannot be determined from available fields.",
         "Candidate shows non-empty morphological structure (prefix/root/suffix parts).",
       ],
-      "status": "pass",
+      "status": "unknown",
     },
   ],
   "meta": {
@@ -87,8 +87,8 @@ exports[`originClaim v1 — gold snapshots (originClaim block only) gold:damage 
   },
   "policy": "no_single_winner",
   "summary": {
-    "confidence": "medium",
-    "note": "Computed from candidate/deepRoot/voice-path/morphology signals. Passing: 2; strong: 0; medium: 2.",
+    "confidence": "insufficient_evidence",
+    "note": "No passing candidates with sufficient computed support in the current result layers.",
   },
   "support": {
     "claimId": "oc:damage",
@@ -337,7 +337,7 @@ exports[`originClaim v1 — gold snapshots (originClaim block only) gold:study 1
 {
   "candidates": [
     {
-      "confidence": "strong",
+      "confidence": "insufficient_evidence",
       "evidenceRefs": [
         "primaryPath.voicePath",
         "heart.math7.primary",
@@ -348,15 +348,15 @@ exports[`originClaim v1 — gold snapshots (originClaim block only) gold:study 1
       "id": "oc:albanian-studim",
       "language": "Albanian",
       "reasons": [
-        "Candidate marked pass by engine candidate layer.",
+        "Candidate status unknown (no explicit pass/fail).",
         "DeepRoot–Heart gate aligned (terminal vowel agreement).",
         "Candidate voice path aligns with primary voice path.",
         "Candidate shows non-empty morphological structure (prefix/root/suffix parts).",
       ],
-      "status": "pass",
+      "status": "unknown",
     },
     {
-      "confidence": "strong",
+      "confidence": "insufficient_evidence",
       "evidenceRefs": [
         "primaryPath.voicePath",
         "heart.math7.primary",
@@ -367,12 +367,12 @@ exports[`originClaim v1 — gold snapshots (originClaim block only) gold:study 1
       "id": "oc:latin-studium",
       "language": "Latin",
       "reasons": [
-        "Candidate marked pass by engine candidate layer.",
+        "Candidate status unknown (no explicit pass/fail).",
         "DeepRoot–Heart gate aligned (terminal vowel agreement).",
         "Candidate voice path aligns with primary voice path.",
         "Candidate shows non-empty morphological structure (prefix/root/suffix parts).",
       ],
-      "status": "pass",
+      "status": "unknown",
     },
   ],
   "meta": {
@@ -422,8 +422,8 @@ exports[`originClaim v1 — gold snapshots (originClaim block only) gold:study 1
   },
   "policy": "no_single_winner",
   "summary": {
-    "confidence": "strong",
-    "note": "Computed from candidate/deepRoot/voice-path/morphology signals. Passing: 2; strong: 2; medium: 0.",
+    "confidence": "insufficient_evidence",
+    "note": "No passing candidates with sufficient computed support in the current result layers.",
   },
   "support": {
     "claimId": "oc:study",
