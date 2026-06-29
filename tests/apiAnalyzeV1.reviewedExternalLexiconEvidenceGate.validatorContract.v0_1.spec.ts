@@ -208,6 +208,61 @@ describe("reviewed external lexicon evidence gate validator contract v0.1", () =
     );
   });
 
+
+  it("allows reviewed Gheg da as split/divide free-operator evidence", () => {
+    const projected = evaluateReviewedExternalLexiconEvidenceGateV0_1(
+      baseRow({
+        candidateId: "albanian-da-dam-damage-functional",
+        displayForm: "DA → DAM → DAMAGE",
+        embryo: "DA",
+        isolatedStandaloneForm: "da",
+        plainStandaloneGloss: "split / divide",
+        semanticBridge: "what is split or broken becomes harmed or damaged",
+        externalCitations: [
+          reviewedCitation({
+            citationId: "contract-fixture-gheg-da-split-v0",
+            attestedForm: "da",
+            attestedGloss: "split / divide",
+            attestedGrammarNote:
+              "Gheg Albanian free operator, as in E kom da bukën për gjysë.",
+            entryLocator: "entry:gheg-da-split",
+          }),
+        ],
+      }),
+    );
+
+    expect(projected.validationOutcome).toBe("source_validation_eligible");
+    expect(projected.eligible).toBe(true);
+    expect(projected.validationReasons).toEqual([]);
+  });
+
+  it("allows reviewed Tosk daj as split/divide free-operator cognate evidence", () => {
+    const projected = evaluateReviewedExternalLexiconEvidenceGateV0_1(
+      baseRow({
+        candidateId: "albanian-da-dam-damage-functional",
+        displayForm: "DA → DAM → DAMAGE",
+        embryo: "DA",
+        isolatedStandaloneForm: "da",
+        plainStandaloneGloss: "split / divide",
+        semanticBridge: "what is split or broken becomes harmed or damaged",
+        externalCitations: [
+          reviewedCitation({
+            citationId: "contract-fixture-tosk-daj-split-v0",
+            attestedForm: "daj",
+            attestedGloss: "split / divide",
+            attestedGrammarNote:
+              "Tosk Albanian standalone cognate/free-operator form for split/divide.",
+            entryLocator: "entry:tosk-daj-split",
+          }),
+        ],
+      }),
+    );
+
+    expect(projected.validationOutcome).toBe("source_validation_eligible");
+    expect(projected.eligible).toBe(true);
+    expect(projected.validationReasons).toEqual([]);
+  });
+
   it("does not allow ndaj or ndarë derivative evidence to prove isolated two-letter da", () => {
     const projected = evaluateReviewedExternalLexiconEvidenceGateV0_1(
       baseRow({
