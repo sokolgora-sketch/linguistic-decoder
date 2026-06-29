@@ -10,4 +10,17 @@ describe("analyze-v1 emits rootMap (v0.1)", () => {
     expect(out.rootMap.tokens).toBeDefined();
     expect(out.rootMap.keys).toBeDefined();
   });
+  it("emits mode DA as Gheg dialect-attested pending review, not gave-supported", async () => {
+    const payload = await analyzeWordV1("mode", { mode: "strict" } as any);
+    const out = enginePayloadToAnalysisResult(payload as any) as any;
+
+    const da = out.rootMap?.keys?.find((key: any) => key?.token === "DA");
+    const evidence = Array.isArray(da?.evidence) ? da.evidence.join("\n") : "";
+
+    expect(da?.status).toBe("dialect_attested_pending_review");
+    expect(evidence).toContain("Gheg dialect");
+    expect(evidence).toContain("E kom da bukën për gjysë");
+    expect(evidence).not.toContain("gave (aorist/part)");
+  });
+
 });

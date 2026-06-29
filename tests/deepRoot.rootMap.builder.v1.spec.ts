@@ -37,4 +37,30 @@ describe("buildRootMapV1 (RootMap selection)", () => {
 
     expect(rm?.tokens.map((t) => t.token)).toEqual(["SHTU", "DI"]);
   });
+  it("marks Gheg DA split as dialect-attested pending review instead of gave-supported", () => {
+    const rm = buildRootMapV1({
+      basis: "da",
+      minRoots: [
+        {
+          protoRoots: ["DA"],
+          carriers: [
+            { protoRootId: "DA", segment: "da", carrierForm: "da", lang: "sq", ops: [] },
+          ],
+          decomposition: { action: "DA" },
+          checks: { opsWithinLimits: true, skeletonExplained: true },
+          opsCount: 0,
+        } as any,
+      ],
+      heartPrimaryPath: ["A"],
+    });
+
+    const da = rm?.keys.find((key) => key.token === "DA");
+    const evidence = da?.evidence.join("\n") ?? "";
+
+    expect(da?.status).toBe("dialect_attested_pending_review");
+    expect(evidence).toContain("Gheg dialect");
+    expect(evidence).toContain("E kom da bukën për gjysë");
+    expect(evidence).not.toContain("gave (aorist/part)");
+  });
+
 });

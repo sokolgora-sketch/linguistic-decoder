@@ -60,7 +60,13 @@ export const PROTO_ROOTS_V1: readonly ProtoRoot[] = Object.freeze([
     gloss: "divide / cut / separate",
     roleHint: "Action",
     carriers: [
-      { lang: "sq", form: "da", gloss: "gave (aorist/part)", notes: "carrier; semantics can branch; keep cautious" },
+      {
+        lang: "sq",
+        form: "da",
+        gloss: "split / divide (Gheg dialect)",
+        notes:
+          "Dialect attestation pending reviewed external citation: E kom da bukën për gjysë = I have split the bread in half; do not use da=gave homophone as split proof",
+      },
       { lang: "sq", form: "ndaj", gloss: "divide / share" },
       { lang: "sq", form: "ndarë", gloss: "divided" },
     ],

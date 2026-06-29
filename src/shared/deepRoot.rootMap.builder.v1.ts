@@ -73,11 +73,23 @@ function extractVowelPath(s: string): string | undefined {
   return m.join("-");
 }
 
-function keyStatusForCarrier(carrier: { lang?: string; ops?: string[] } | null): RootKeyStatusV1 {
-  // v0.1 policy:
-  // - supported: a concrete carrier match exists (any lang) AND ops are within limits (already checked upstream)
-  // - speculative: missing carrier
+function keyStatusForCarrier(
+  carrier: { lang?: string; ops?: string[] } | null,
+  carrierGloss?: string,
+  carrierNotes?: string,
+): RootKeyStatusV1 {
   if (!carrier) return "speculative";
+
+  const text = `${carrierGloss ?? ""} ${carrierNotes ?? ""}`.toLocaleLowerCase("en-US");
+
+  if (text.includes("gheg") || text.includes("dialect attestation")) {
+    return "dialect_attested_pending_review";
+  }
+
+  if (text.includes("weak")) {
+    return "carrier_only";
+  }
+
   return "supported";
 }
 
@@ -236,13 +248,22 @@ const tokens: RootTokenV1[] = [];
     if (carrierForm) evidence.push(`${language}: ${carrierForm}`);
     if (ops.length > 0) evidence.push(`ops: ${ops.join(", ")}`);
 
-    // If we can find the specific carrier gloss in protoRoots, add 1 line (optional).
-    if (proto?.carriers && carrierForm) {
-      const hit = proto.carriers.find((c) => c.lang === chosenCarrier?.lang && c.form === carrierForm);
-      if (hit?.gloss) evidence.push(`gloss: ${hit.gloss}`);
-    }
+    const protoCarrierHit =
+      proto?.carriers && carrierForm
+        ? proto.carriers.find((c) => c.lang === chosenCarrier?.lang && c.form === carrierForm)
+        : undefined;
 
-    const status: RootKeyStatusV1 = keyStatusForCarrier(chosenCarrier ?? null);
+    if (protoCarrierHit?.gloss) evidence.push(`gloss: ${protoCarrierHit.gloss}`);
+    const shouldExposeCarrierNote =
+      protoCarrierHit?.notes &&
+      /dialect attestation|gheg|weak|homophone|do not use/i.test(protoCarrierHit.notes);
+    if (shouldExposeCarrierNote) evidence.push(`note: ${protoCarrierHit.notes}`);
+
+    const status: RootKeyStatusV1 = keyStatusForCarrier(
+      chosenCarrier ?? null,
+      protoCarrierHit?.gloss,
+      protoCarrierHit?.notes,
+    );
 
     keys.push({
       token: protoRootId,
