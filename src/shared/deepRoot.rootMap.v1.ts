@@ -16,7 +16,11 @@ export type RootTokenV1 = {
   vowel_path?: string; // optional (if token contains vowels)
 };
 
-export type RootKeyStatusV1 = "supported" | "speculative";
+export type RootKeyStatusV1 =
+  | "supported"
+  | "speculative"
+  | "dialect_attested_pending_review"
+  | "carrier_only";
 
 export type RootKeyV1 = {
   token: string; // must match a token in tokens[]

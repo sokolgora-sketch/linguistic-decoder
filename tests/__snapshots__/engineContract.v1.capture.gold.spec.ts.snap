@@ -1171,14 +1171,15 @@ exports[`Engine Contract v1 — capture engine output (goldens) study (strict, a
         "evidence": [
           "sq: da",
           "ops: vowel_swap",
-          "gloss: gave (aorist/part)"
+          "gloss: split / divide (Gheg dialect)",
+          "note: Dialect attestation pending reviewed external citation: E kom da bukën për gjysë = I have split the bread in half; do not use da=gave homophone as split proof"
         ],
         "gloss": "divide / cut / separate",
         "language": "sq",
         "ops": [
           "vowel_swap"
         ],
-        "status": "supported",
+        "status": "dialect_attested_pending_review",
         "token": "DA"
       }
     ],
