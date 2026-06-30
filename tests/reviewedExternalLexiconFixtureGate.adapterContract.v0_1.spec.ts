@@ -25,6 +25,8 @@ describe("reviewed external lexicon fixture gate adapter contract v0.1", () => {
           accepted: expect.any(Boolean),
           blocked: expect.any(Boolean),
           reasons: expect.any(Array),
+          evidenceCategories: expect.any(Array),
+          freeOperatorDiagnostic: expect.anything(),
           resultText: expect.any(String),
         }),
       );
@@ -62,7 +64,23 @@ describe("reviewed external lexicon fixture gate adapter contract v0.1", () => {
       "fixture.synthetic.reviewed-gheg-da-source-row.v0_1",
     );
     expect(projection.reasons).toEqual([]);
+    expect(projection.evidenceCategories).toEqual(
+      expect.arrayContaining([
+        "free_operator_attested",
+        "functional_motivation_supported",
+        "historical_origin_not_claimed",
+        "user_decides",
+      ]),
+    );
+    expect(projection.freeOperatorDiagnostic).toMatchObject({
+      operator: "da",
+      attestedForms: ["da"],
+      historicalOriginClaim: "not_claimed",
+      userDecisionPosture: "user_decides",
+    });
     expect(projection.resultText).toContain("source_validation_eligible");
+    expect(projection.resultText).toContain("free_operator_attested");
+    expect(projection.resultText).toContain("functional_motivation_supported");
     expect(projection.resultText).toContain("user_decides");
   });
 
@@ -97,6 +115,13 @@ describe("reviewed external lexicon fixture gate adapter contract v0.1", () => {
     expect(projection.reasons).toContain(
       "da_quarantine_missing_reviewed_exact_external_citation",
     );
+    expect(projection.evidenceCategories).toContain("derivative_family_support");
+    expect(projection.freeOperatorDiagnostic).toMatchObject({
+      operator: "da",
+      attestedForms: ["ndare"],
+      historicalOriginClaim: "not_claimed",
+      userDecisionPosture: "user_decides",
+    });
   });
 
   it("adapts DA homophone trap as blocked by DA quarantine reason", () => {
@@ -109,5 +134,12 @@ describe("reviewed external lexicon fixture gate adapter contract v0.1", () => {
     expect(projection.reasons).toContain(
       "da_quarantine_missing_reviewed_exact_external_citation",
     );
+    expect(projection.evidenceCategories).toContain("homophone_collision");
+    expect(projection.freeOperatorDiagnostic).toMatchObject({
+      operator: "da",
+      attestedForms: ["da"],
+      historicalOriginClaim: "not_claimed",
+      userDecisionPosture: "user_decides",
+    });
   });
 });
