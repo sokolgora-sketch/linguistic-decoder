@@ -95,6 +95,19 @@ else
   echo "OK: no obvious historical-origin/winner/superiority drift in runtime src"
 fi
 
+
+echo
+echo "=== check validator exposes canonical diagnostics ==="
+VALIDATOR="src/shared/reviewedExternalLexiconEvidenceGate.validator.v0_1.ts"
+for needle in "evidenceCategories" "freeOperatorDiagnostic" "classifyFreeOperatorEvidenceV0_1"; do
+  if ! rg -n -F -- "$needle" "$VALIDATOR" >/dev/null; then
+    echo "DRIFT: validator missing canonical diagnostic hook: $needle"
+    ERROR=1
+  else
+    echo "OK: validator exposes $needle"
+  fi
+done
+
 echo
 echo "=== focused model test ==="
 npm test -- tests/freeOperatorEvidence.v0_1.spec.ts --runInBand
