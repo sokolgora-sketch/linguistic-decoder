@@ -123,6 +123,29 @@ function hasGiveGlossV0_1(value: string | null | undefined): boolean {
   return /\b(give|gave|given)\b/.test(text);
 }
 
+const ALBANIAN_DA_DIALECT_FREE_OPERATOR_FORMS_V0_1: ReadonlySet<string> = new Set([
+  "da",
+  "daj",
+]);
+
+const ALBANIAN_DA_DERIVATIVE_FAMILY_FORMS_V0_1: ReadonlySet<string> = new Set([
+  "ndaj",
+  "ndarë",
+  "ndare",
+]);
+
+function isAlbanianDaDialectFreeOperatorSplitCitationV0_1(
+  citation: ReviewedExternalLexiconCitationV0_1,
+): boolean {
+  const form = normalizeReviewedExternalLexiconTextV0_1(citation.attestedForm);
+
+  return (
+    ALBANIAN_DA_DIALECT_FREE_OPERATOR_FORMS_V0_1.has(form) &&
+    hasSplitDivideGlossV0_1(citation.attestedGloss) &&
+    !hasGiveGlossV0_1(citation.attestedGloss)
+  );
+}
+
 export function evaluateReviewedExternalLexiconEvidenceGateV0_1(
   row: ReviewedExternalLexiconCandidateSourceRowV0_1,
 ): ReviewedExternalLexiconEvidenceGateEvaluationV0_1 {
@@ -181,13 +204,13 @@ export function evaluateReviewedExternalLexiconEvidenceGateV0_1(
 
   if (row.candidateId === "albanian-da-dam-damage-functional") {
     const exactDaSplit = reviewedExternalCitations.some(
-      (citation) =>
-        normalizeReviewedExternalLexiconTextV0_1(citation.attestedForm) === "da" &&
-        hasSplitDivideGlossV0_1(citation.attestedGloss),
+      isAlbanianDaDialectFreeOperatorSplitCitationV0_1,
     );
 
     const derivativeInsteadOfEmbryo = reviewedExternalCitations.some((citation) =>
-      ["ndaj", "ndarë", "ndare"].includes(normalizeReviewedExternalLexiconTextV0_1(citation.attestedForm)),
+      ALBANIAN_DA_DERIVATIVE_FAMILY_FORMS_V0_1.has(
+        normalizeReviewedExternalLexiconTextV0_1(citation.attestedForm),
+      ),
     );
 
     const gaveCollision = reviewedExternalCitations.some(
