@@ -76,7 +76,7 @@ describe("reviewed external lexicon source row fixture gate v0.1", () => {
     expect(text).toMatch(/pass|valid|accepted|eligible/i);
     expect(text).not.toContain("da_quarantine_missing_reviewed_exact_external_citation");
     expect(text).not.toContain("externalCitation_homophone_collision");
-    expect(text).not.toContain("externalCitation_derivative_not_embryo");
+    expect(text).not.toContain("externalCitation_derivative_family_support_not_exact_embryo");
 
     expect(syntheticReviewedGhegDaSourceRowFixtureV0_1.sourceNote).toContain(
       "CONTRACT TEST ONLY",
@@ -119,6 +119,7 @@ describe("reviewed external lexicon source row fixture gate v0.1", () => {
     const text = resultText(result);
 
     expect(text).toContain("da_quarantine_missing_reviewed_exact_external_citation");
+    expect(text).toContain("da_family_supported_by_derivative_form");
     expect(text).toMatch(/block|fail|reject|quarantine|missing/i);
   });
 
