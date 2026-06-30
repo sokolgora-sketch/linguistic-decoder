@@ -1,3 +1,49 @@
+export const syntheticReviewedGhegDaSourceRowFixtureV0_1 = {
+  sourceId: "fixture.synthetic.reviewed-gheg-da-source-row.v0_1",
+  sourceKind: "reviewed_dictionary_source",
+  sourceStatus: "reviewed_accepted",
+  candidateId: "albanian-da-dam-damage-functional",
+  displayForm: "Gheg DA split fixture",
+  candidateLanguage: "sq",
+  embryo: "DA",
+  isolatedStandaloneForm: "da",
+  plainStandaloneGloss: "split / divide",
+  sourceNote:
+    "CONTRACT TEST ONLY reviewed Gheg DA fixture. Gheg da is treated as a living split/divide free-operator attestation pending live reviewed citation metadata.",
+  semanticBridge:
+    "CONTRACT TEST ONLY bridge. What is split or divided can motivate harmed/damaged as functional semantics, without making historical-origin or winner claims.",
+  originClaim: false,
+  historicalTransmissionClaim: false,
+  winnerClaim: false,
+  languageSuperiorityClaim: false,
+  candidateTruthClaim: false,
+  publicationEvidenceClaim: false,
+  scientificEvidenceClaim: false,
+  userDecisionPosture: "user_decides",
+  externalCitations: [
+    {
+      citationId: "fixture.synthetic.reviewed-gheg-da-citation.v0_1",
+      citationStatus: "reviewed_accepted",
+      citationType: "dictionary_entry",
+      sourceTitle: "CONTRACT TEST ONLY Synthetic Reviewed Gheg Lexicon",
+      sourceAuthorOrEditor: "Open Instrument contract test",
+      sourcePublisherOrHost: "Open Instrument tests",
+      sourceDateOrVersion: "v0.1",
+      sourceUrlOrArchiveRef: "fixture://reviewed-external-lexicon/gheg-da-split",
+      entryLocator: "fixture-entry:gheg-da-split",
+      attestedForm: "da",
+      attestedGloss: "split / divide",
+      attestedGrammarNote:
+        "CONTRACT TEST ONLY Gheg Albanian free-operator example: E kom da bukën për gjysë.",
+      reviewedBy: "open-instrument-contract-test",
+      reviewedAt: "2026-06-30",
+      reviewNote:
+        "CONTRACT TEST ONLY reviewed Gheg DA citation fixture. Not live evidence.",
+      sourceHashOrArchiveHash: "fixture-hash-gheg-da-split-v0-1",
+    },
+  ],
+} as const;
+
 export const syntheticReviewedDiSourceRowFixtureV0_1 = {
   sourceId: "fixture.synthetic.reviewed-di.v0_1",
   sourceKind: "reviewed_dictionary_source",
@@ -179,6 +225,7 @@ export const syntheticDaHomophoneTrapSourceRowFixtureV0_1 = {
 
 export const reviewedExternalLexiconSourceRowFixtureContractRowsV0_1 = [
   syntheticReviewedDiSourceRowFixtureV0_1,
+  syntheticReviewedGhegDaSourceRowFixtureV0_1,
   syntheticSeedSourceRowFixtureV0_1,
   syntheticDaDerivativeTrapSourceRowFixtureV0_1,
   syntheticDaHomophoneTrapSourceRowFixtureV0_1,

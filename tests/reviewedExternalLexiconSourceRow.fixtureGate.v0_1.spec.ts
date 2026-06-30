@@ -4,6 +4,7 @@ import {
   syntheticDaDerivativeTrapSourceRowFixtureV0_1,
   syntheticDaHomophoneTrapSourceRowFixtureV0_1,
   syntheticReviewedDiSourceRowFixtureV0_1,
+  syntheticReviewedGhegDaSourceRowFixtureV0_1,
   syntheticSeedSourceRowFixtureV0_1,
 } from "./fixtures/openInstrument/reviewedExternalLexiconSourceRows.fixture.v0_1";
 
@@ -37,7 +38,7 @@ describe("reviewed external lexicon source row fixture gate v0.1", () => {
       evaluateFixture(row),
     );
 
-    expect(results).toHaveLength(4);
+    expect(results).toHaveLength(5);
 
     for (const result of results) {
       expect(result).toBeTruthy();
@@ -63,6 +64,33 @@ describe("reviewed external lexicon source row fixture gate v0.1", () => {
     expect(syntheticReviewedDiSourceRowFixtureV0_1.originClaim).toBe(false);
     expect(syntheticReviewedDiSourceRowFixtureV0_1.winnerClaim).toBe(false);
     expect(syntheticReviewedDiSourceRowFixtureV0_1.userDecisionPosture).toBe(
+      "user_decides",
+    );
+  });
+
+
+  it("allows the synthetic reviewed Gheg DA row through the positive validator path without making it live evidence", () => {
+    const result = evaluateFixture(syntheticReviewedGhegDaSourceRowFixtureV0_1);
+    const text = resultText(result);
+
+    expect(text).toMatch(/pass|valid|accepted|eligible/i);
+    expect(text).not.toContain("da_quarantine_missing_reviewed_exact_external_citation");
+    expect(text).not.toContain("externalCitation_homophone_collision");
+    expect(text).not.toContain("externalCitation_derivative_not_embryo");
+
+    expect(syntheticReviewedGhegDaSourceRowFixtureV0_1.sourceNote).toContain(
+      "CONTRACT TEST ONLY",
+    );
+    expect(syntheticReviewedGhegDaSourceRowFixtureV0_1.externalCitations[0].attestedForm).toBe("da");
+    expect(syntheticReviewedGhegDaSourceRowFixtureV0_1.externalCitations[0].attestedGloss).toBe(
+      "split / divide",
+    );
+    expect(syntheticReviewedGhegDaSourceRowFixtureV0_1.externalCitations[0].attestedGrammarNote).toContain(
+      "E kom da bukën për gjysë",
+    );
+    expect(syntheticReviewedGhegDaSourceRowFixtureV0_1.originClaim).toBe(false);
+    expect(syntheticReviewedGhegDaSourceRowFixtureV0_1.winnerClaim).toBe(false);
+    expect(syntheticReviewedGhegDaSourceRowFixtureV0_1.userDecisionPosture).toBe(
       "user_decides",
     );
   });
