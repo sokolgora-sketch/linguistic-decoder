@@ -3,6 +3,7 @@ import {
   syntheticDaDerivativeTrapSourceRowFixtureV0_1,
   syntheticDaHomophoneTrapSourceRowFixtureV0_1,
   syntheticReviewedDiSourceRowFixtureV0_1,
+  syntheticReviewedGhegDaSourceRowFixtureV0_1,
   syntheticSeedSourceRowFixtureV0_1,
 } from "./fixtures/openInstrument/reviewedExternalLexiconSourceRows.fixture.v0_1";
 
@@ -50,7 +51,7 @@ const REQUIRED_CITATION_KEYS = [
 
 describe("reviewed external lexicon source row fixture contract v0.1", () => {
   it("keeps every fixture row on the reviewed source-row contract shape", () => {
-    expect(reviewedExternalLexiconSourceRowFixtureContractRowsV0_1).toHaveLength(4);
+    expect(reviewedExternalLexiconSourceRowFixtureContractRowsV0_1).toHaveLength(5);
 
     for (const row of reviewedExternalLexiconSourceRowFixtureContractRowsV0_1) {
       expect(Object.keys(row).sort()).toEqual(REQUIRED_SOURCE_ROW_KEYS);
@@ -109,6 +110,39 @@ describe("reviewed external lexicon source row fixture contract v0.1", () => {
       attestedForm: "di",
       attestedGloss: "know",
     });
+  });
+
+
+  it("provides one synthetic reviewed Gheg DA row while preserving dialect and non-live posture", () => {
+    expect(syntheticReviewedGhegDaSourceRowFixtureV0_1.candidateId).toBe(
+      "albanian-da-dam-damage-functional",
+    );
+    expect(syntheticReviewedGhegDaSourceRowFixtureV0_1.embryo).toBe("DA");
+    expect(syntheticReviewedGhegDaSourceRowFixtureV0_1.isolatedStandaloneForm).toBe(
+      "da",
+    );
+    expect(syntheticReviewedGhegDaSourceRowFixtureV0_1.plainStandaloneGloss).toBe(
+      "split / divide",
+    );
+    expect(syntheticReviewedGhegDaSourceRowFixtureV0_1.sourceNote).toContain(
+      "Gheg DA",
+    );
+    expect(syntheticReviewedGhegDaSourceRowFixtureV0_1.sourceNote).toContain(
+      "CONTRACT TEST ONLY",
+    );
+    expect(syntheticReviewedGhegDaSourceRowFixtureV0_1.externalCitations[0].attestedForm).toBe(
+      "da",
+    );
+    expect(syntheticReviewedGhegDaSourceRowFixtureV0_1.externalCitations[0].attestedGloss).toBe(
+      "split / divide",
+    );
+    expect(syntheticReviewedGhegDaSourceRowFixtureV0_1.externalCitations[0].attestedGrammarNote).toContain(
+      "E kom da bukën për gjysë",
+    );
+    expect(syntheticReviewedGhegDaSourceRowFixtureV0_1.originClaim).toBe(false);
+    expect(syntheticReviewedGhegDaSourceRowFixtureV0_1.userDecisionPosture).toBe(
+      "user_decides",
+    );
   });
 
   it("keeps seed rows non-validating by source kind and citation type", () => {

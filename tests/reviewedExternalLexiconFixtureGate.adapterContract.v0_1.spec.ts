@@ -4,6 +4,7 @@ import {
   syntheticDaDerivativeTrapSourceRowFixtureV0_1,
   syntheticDaHomophoneTrapSourceRowFixtureV0_1,
   syntheticReviewedDiSourceRowFixtureV0_1,
+  syntheticReviewedGhegDaSourceRowFixtureV0_1,
   syntheticSeedSourceRowFixtureV0_1,
 } from "./fixtures/openInstrument/reviewedExternalLexiconSourceRows.fixture.v0_1";
 
@@ -13,7 +14,7 @@ describe("reviewed external lexicon fixture gate adapter contract v0.1", () => {
       evaluateReviewedExternalLexiconFixtureGateRowV0_1(row),
     );
 
-    expect(projections).toHaveLength(4);
+    expect(projections).toHaveLength(5);
 
     for (const projection of projections) {
       expect(projection).toEqual(
@@ -45,6 +46,24 @@ describe("reviewed external lexicon fixture gate adapter contract v0.1", () => {
     expect(projection.reasons).not.toContain(
       "da_quarantine_missing_reviewed_exact_external_citation",
     );
+  });
+
+
+  it("adapts synthetic reviewed Gheg DA as accepted while preserving fixture-only posture", () => {
+    const projection = evaluateReviewedExternalLexiconFixtureGateRowV0_1(
+      syntheticReviewedGhegDaSourceRowFixtureV0_1,
+    );
+
+    expect(projection.fixtureOnly).toBe(true);
+    expect(projection.accepted).toBe(true);
+    expect(projection.blocked).toBe(false);
+    expect(projection.candidateId).toBe("albanian-da-dam-damage-functional");
+    expect(projection.sourceId).toBe(
+      "fixture.synthetic.reviewed-gheg-da-source-row.v0_1",
+    );
+    expect(projection.reasons).toEqual([]);
+    expect(projection.resultText).toContain("source_validation_eligible");
+    expect(projection.resultText).toContain("user_decides");
   });
 
   it("adapts SEED as blocked by source kind reason", () => {
