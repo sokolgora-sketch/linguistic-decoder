@@ -13,6 +13,8 @@ export type ReviewedExternalLexiconFixtureGateAdapterProjectionV0_1 = {
   accepted: boolean;
   blocked: boolean;
   reasons: string[];
+  evidenceCategories: string[];
+  freeOperatorDiagnostic: unknown;
   resultText: string;
   rawResult: unknown;
 };
@@ -41,6 +43,10 @@ export function evaluateReviewedExternalLexiconFixtureGateRowV0_1(
     reasons.length > 0 || /block|fail|reject|missing|quarantine|not_validation/i.test(resultText);
 
   const accepted = !blocked && /pass|valid|accepted/i.test(resultText);
+  const evidenceCategories = Array.isArray(rawResult.evidenceCategories)
+    ? rawResult.evidenceCategories.map(String)
+    : [];
+  const freeOperatorDiagnostic = rawResult.freeOperatorDiagnostic ?? null;
 
   return {
     sourceId: rowStringField(row, "sourceId"),
@@ -49,6 +55,8 @@ export function evaluateReviewedExternalLexiconFixtureGateRowV0_1(
     accepted,
     blocked,
     reasons: [...reasons],
+    evidenceCategories,
+    freeOperatorDiagnostic,
     resultText,
     rawResult,
   };
