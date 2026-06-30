@@ -292,7 +292,8 @@ describe("reviewed external lexicon evidence gate validator contract v0.1", () =
     expect(projected.validationOutcome).toBe("blocked");
     expect(projected.validationReasons).toEqual(
       expect.arrayContaining([
-        "externalCitation_derivative_not_embryo",
+        "da_family_supported_by_derivative_form",
+        "externalCitation_derivative_family_support_not_exact_embryo",
         "da_quarantine_missing_reviewed_exact_external_citation",
       ]),
     );

@@ -219,7 +219,10 @@ export function evaluateReviewedExternalLexiconEvidenceGateV0_1(
         hasGiveGlossV0_1(citation.attestedGloss),
     );
 
-    if (derivativeInsteadOfEmbryo) reasons.add("externalCitation_derivative_not_embryo");
+    if (derivativeInsteadOfEmbryo) {
+      reasons.add("da_family_supported_by_derivative_form");
+      reasons.add("externalCitation_derivative_family_support_not_exact_embryo");
+    }
     if (gaveCollision) reasons.add("externalCitation_homophone_collision");
     if (gaveCollision) reasons.add("externalCitation_gloss_mismatch");
 
