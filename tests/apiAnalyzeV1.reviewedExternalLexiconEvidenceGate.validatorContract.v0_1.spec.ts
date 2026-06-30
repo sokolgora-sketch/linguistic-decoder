@@ -329,6 +329,130 @@ describe("reviewed external lexicon evidence gate validator contract v0.1", () =
     );
   });
 
+
+  it("surfaces canonical free-operator diagnostics for reviewed Gheg DA evidence", () => {
+    const projected = evaluateReviewedExternalLexiconEvidenceGateV0_1(
+      baseRow({
+        candidateId: "albanian-da-dam-damage-functional",
+        displayForm: "DA → DAM → DAMAGE",
+        embryo: "DA",
+        isolatedStandaloneForm: "da",
+        plainStandaloneGloss: "split / divide",
+        semanticBridge: "what is split or broken becomes harmed or damaged",
+        externalCitations: [
+          reviewedCitation({
+            citationId: "contract-fixture-gheg-da-diagnostics-v0",
+            attestedForm: "da",
+            attestedGloss: "split / divide",
+            attestedGrammarNote:
+              "Gheg Albanian free operator, as in E kom da bukën për gjysë.",
+            entryLocator: "entry:gheg-da-diagnostics",
+          }),
+        ],
+      }),
+    );
+
+    expect(projected.validationOutcome).toBe("source_validation_eligible");
+    expect(projected.evidenceCategories).toEqual(
+      expect.arrayContaining([
+        "free_operator_attested",
+        "functional_motivation_supported",
+        "historical_origin_not_claimed",
+        "user_decides",
+      ]),
+    );
+    expect(projected.evidenceCategories).not.toContain("homophone_collision");
+    expect(projected.freeOperatorDiagnostic).toMatchObject({
+      operator: "da",
+      attestedForms: ["da"],
+      functionalBridge: "what is split or broken becomes harmed or damaged",
+      historicalOriginClaim: "not_claimed",
+      userDecisionPosture: "user_decides",
+    });
+  });
+
+  it("surfaces DA-family support diagnostics for derivative forms without pretending exact free-operator proof", () => {
+    const projected = evaluateReviewedExternalLexiconEvidenceGateV0_1(
+      baseRow({
+        candidateId: "albanian-da-dam-damage-functional",
+        displayForm: "DA → DAM → DAMAGE",
+        embryo: "DA",
+        isolatedStandaloneForm: "da",
+        plainStandaloneGloss: "split / divide",
+        semanticBridge: "what is split or broken becomes harmed or damaged",
+        externalCitations: [
+          reviewedCitation({
+            citationId: "contract-fixture-ndaj-diagnostics-v0",
+            attestedForm: "ndaj",
+            attestedGloss: "divide / share",
+            entryLocator: "entry:ndaj-diagnostics",
+          }),
+        ],
+      }),
+    );
+
+    expect(projected.validationOutcome).toBe("blocked");
+    expect(projected.validationReasons).toEqual(
+      expect.arrayContaining([
+        "da_family_supported_by_derivative_form",
+        "externalCitation_derivative_family_support_not_exact_embryo",
+        "da_quarantine_missing_reviewed_exact_external_citation",
+      ]),
+    );
+    expect(projected.evidenceCategories).toEqual(
+      expect.arrayContaining([
+        "derivative_family_support",
+        "historical_origin_not_claimed",
+        "user_decides",
+      ]),
+    );
+    expect(projected.evidenceCategories).not.toContain("free_operator_attested");
+    expect(projected.freeOperatorDiagnostic).toMatchObject({
+      operator: "da",
+      attestedForms: ["ndaj"],
+      historicalOriginClaim: "not_claimed",
+      userDecisionPosture: "user_decides",
+    });
+  });
+
+  it("surfaces homophone diagnostics for DA equals gave without creating free-operator support", () => {
+    const projected = evaluateReviewedExternalLexiconEvidenceGateV0_1(
+      baseRow({
+        candidateId: "albanian-da-dam-damage-functional",
+        displayForm: "DA → DAM → DAMAGE",
+        embryo: "DA",
+        isolatedStandaloneForm: "da",
+        plainStandaloneGloss: "split / divide",
+        semanticBridge: "what is split or broken becomes harmed or damaged",
+        externalCitations: [
+          reviewedCitation({
+            citationId: "contract-fixture-da-gave-diagnostics-v0",
+            attestedForm: "da",
+            attestedGloss: "gave",
+            entryLocator: "entry:da-gave-diagnostics",
+          }),
+        ],
+      }),
+    );
+
+    expect(projected.validationOutcome).toBe("blocked");
+    expect(projected.evidenceCategories).toEqual(
+      expect.arrayContaining([
+        "homophone_collision",
+        "historical_origin_not_claimed",
+        "user_decides",
+      ]),
+    );
+    expect(projected.evidenceCategories).not.toContain("free_operator_attested");
+    expect(projected.evidenceCategories).not.toContain("functional_motivation_supported");
+    expect(projected.freeOperatorDiagnostic).toMatchObject({
+      operator: "da",
+      attestedForms: ["da"],
+      historicalOriginClaim: "not_claimed",
+      userDecisionPosture: "user_decides",
+    });
+  });
+
   it("allows DI to become source-validation eligible only with reviewed external citation and semantic bridge", () => {
     const projected = evaluateReviewedExternalLexiconEvidenceGateV0_1(baseRow());
 

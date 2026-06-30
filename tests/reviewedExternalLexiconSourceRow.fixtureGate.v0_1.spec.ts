@@ -74,6 +74,8 @@ describe("reviewed external lexicon source row fixture gate v0.1", () => {
     const text = resultText(result);
 
     expect(text).toMatch(/pass|valid|accepted|eligible/i);
+    expect(text).toContain("free_operator_attested");
+    expect(text).toContain("functional_motivation_supported");
     expect(text).not.toContain("da_quarantine_missing_reviewed_exact_external_citation");
     expect(text).not.toContain("externalCitation_homophone_collision");
     expect(text).not.toContain("externalCitation_derivative_family_support_not_exact_embryo");

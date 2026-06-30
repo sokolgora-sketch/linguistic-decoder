@@ -1,3 +1,8 @@
+import {
+  classifyFreeOperatorEvidenceV0_1,
+  type FreeOperatorEvidenceCategoryV0_1,
+} from "./freeOperatorEvidence.v0_1";
+
 export type ReviewedExternalLexiconCitationStatusV0_1 =
   | "missing"
   | "present_unreviewed"
@@ -81,10 +86,21 @@ export type ReviewedExternalLexiconCandidateSourceRowV0_1 = {
   externalCitations: ReviewedExternalLexiconCitationV0_1[];
 };
 
+export type ReviewedExternalLexiconEvidenceGateDiagnosticV0_1 = {
+  operator: string;
+  evidenceCategories: FreeOperatorEvidenceCategoryV0_1[];
+  attestedForms: string[];
+  functionalBridge: string | null;
+  historicalOriginClaim: "not_claimed";
+  userDecisionPosture: "user_decides" | null;
+};
+
 export type ReviewedExternalLexiconEvidenceGateEvaluationV0_1 = {
   eligible: boolean;
   validationOutcome: "source_validation_eligible" | "blocked";
   validationReasons: string[];
+  evidenceCategories: FreeOperatorEvidenceCategoryV0_1[];
+  freeOperatorDiagnostic: ReviewedExternalLexiconEvidenceGateDiagnosticV0_1 | null;
   originClaim: "not_claimed";
   userDecisionPosture: "user_decides" | null;
 };
@@ -247,6 +263,29 @@ export function evaluateReviewedExternalLexiconEvidenceGateV0_1(
     }
   }
 
+  const freeOperatorCategorySet = new Set<FreeOperatorEvidenceCategoryV0_1>([
+    "historical_origin_not_claimed",
+    "user_decides",
+  ]);
+
+  const attestedForms: string[] = [];
+
+  for (const citation of reviewedExternalCitations) {
+    if (citation.attestedForm) attestedForms.push(citation.attestedForm);
+
+    const classification = classifyFreeOperatorEvidenceV0_1({
+      operator: row.embryo,
+      attestedForm: citation.attestedForm ?? "",
+      attestedGloss: citation.attestedGloss ?? "",
+      functionalBridge: row.semanticBridge,
+    });
+
+    for (const category of classification.categories) {
+      freeOperatorCategorySet.add(category);
+    }
+  }
+
+  const evidenceCategories = [...freeOperatorCategorySet].sort();
   const validationReasons = [...reasons].sort();
   const eligible = validationReasons.length === 0;
 
@@ -254,6 +293,17 @@ export function evaluateReviewedExternalLexiconEvidenceGateV0_1(
     eligible,
     validationOutcome: eligible ? "source_validation_eligible" : "blocked",
     validationReasons,
+    evidenceCategories,
+    freeOperatorDiagnostic: row.embryo
+      ? {
+          operator: normalizeReviewedExternalLexiconTextV0_1(row.embryo),
+          evidenceCategories,
+          attestedForms: [...new Set(attestedForms)].sort(),
+          functionalBridge: row.semanticBridge,
+          historicalOriginClaim: "not_claimed",
+          userDecisionPosture: row.userDecisionPosture,
+        }
+      : null,
     originClaim: "not_claimed",
     userDecisionPosture: row.userDecisionPosture,
   };
