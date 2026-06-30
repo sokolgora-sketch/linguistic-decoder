@@ -130,6 +130,8 @@ function adaptCandidate(rawCandidate: Raw): CandidateUI {
     rankReason: rawCandidate?.rankReason,
     claimBoundary: rawCandidate?.claimBoundary,
     userDecisionPosture: rawCandidate?.userDecisionPosture,
+    evidenceCategories: rawCandidate?.evidenceCategories,
+    freeOperatorDiagnostic: rawCandidate?.freeOperatorDiagnostic,
   };
 
   return {
