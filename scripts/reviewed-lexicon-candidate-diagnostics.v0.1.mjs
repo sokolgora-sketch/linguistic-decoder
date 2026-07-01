@@ -27,7 +27,7 @@ describe("temporary reviewed lexicon candidate diagnostics audit", () => {
         sourceId: row.sourceId,
         candidateId: row.candidateId,
         productionSafe,
-        liveStatus: productionSafe ? "production_candidate" : "non_live_candidate",
+        liveStatus: productionSafe ? "promotion_ready_candidate" : "non_live_candidate",
         validationOutcome: gate.validationOutcome,
         validationReasons: gate.validationReasons,
         evidenceCategories: gate.evidenceCategories,

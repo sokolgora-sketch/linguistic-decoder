@@ -2,7 +2,7 @@ import { reviewedExternalLexiconSourceRowCandidateRegistryV0_1 } from "../src/sh
 import { buildReviewedExternalLexiconPromotionChecklistV0_1 } from "../src/shared/reviewedExternalLexiconSourceRowPromotionChecklist.v0_1";
 
 describe("reviewed external lexicon source row promotion checklist Gheg DA v0.1", () => {
-  it("keeps the current Gheg DA candidate not promotion-ready until pending metadata is finalized", () => {
+  it("marks the current Gheg DA candidate promotion-ready after reviewed citation metadata intake", () => {
     const row = reviewedExternalLexiconSourceRowCandidateRegistryV0_1[0];
     const checklist = buildReviewedExternalLexiconPromotionChecklistV0_1(row);
 
@@ -10,44 +10,35 @@ describe("reviewed external lexicon source row promotion checklist Gheg DA v0.1"
       checklistVersion: "reviewed-external-lexicon-promotion-checklist.v0_1",
       sourceId: "reviewed.external.gheg-da.damage.candidate.v0_1",
       candidateId: "albanian-da-dam-damage-functional",
-      promotionReady: false,
+      promotionReady: true,
     });
 
-    expect(checklist.items).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          id: "source_url_or_archive_ref_finalized",
-          passed: false,
-        }),
-        expect.objectContaining({
-          id: "entry_locator_finalized",
-          passed: false,
-        }),
-        expect.objectContaining({
-          id: "source_note_live_marker_removed",
-          passed: false,
-        }),
-      ]),
-    );
+    expect(checklist.items.every((item) => item.passed)).toBe(true);
   });
 
-  it("passes only when pending markers are replaced and the non-live source note is removed", () => {
+  it("fails if pending markers or the non-live source note return", () => {
     const row = {
       ...reviewedExternalLexiconSourceRowCandidateRegistryV0_1[0],
       sourceNote:
-        "Reviewed Gheg da as a free operator meaning split/divide can functionally motivate damage/harm through split/divided state.",
+        "NON-LIVE CANDIDATE: Reviewed Gheg da as a free operator meaning split/divide can functionally motivate damage/harm.",
       externalCitations: [
         {
           ...reviewedExternalLexiconSourceRowCandidateRegistryV0_1[0].externalCitations[0],
-          sourceUrlOrArchiveRef: "archive://reviewed-external-lexicon/gheg-da-split-divide",
-          entryLocator: "entry:gheg-da-split-divide",
+          sourceUrlOrArchiveRef: "pending-reviewed-external-citation:gheg-da-split-divide",
+          entryLocator: "pending:gheg-da",
         },
       ],
     };
 
     const checklist = buildReviewedExternalLexiconPromotionChecklistV0_1(row);
 
-    expect(checklist.promotionReady).toBe(true);
-    expect(checklist.items.every((item) => item.passed)).toBe(true);
+    expect(checklist.promotionReady).toBe(false);
+    expect(checklist.items).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: "source_url_or_archive_ref_finalized", passed: false }),
+        expect.objectContaining({ id: "entry_locator_finalized", passed: false }),
+        expect.objectContaining({ id: "source_note_live_marker_removed", passed: false }),
+      ]),
+    );
   });
 });
