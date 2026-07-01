@@ -108,6 +108,24 @@ for needle in "evidenceCategories" "freeOperatorDiagnostic" "classifyFreeOperato
   fi
 done
 
+
+echo
+echo "=== check free-operator profile contract ==="
+PROFILE="src/shared/freeOperatorProfile.v0_1.ts"
+if [ ! -f "$PROFILE" ]; then
+  echo "DRIFT: $PROFILE is missing"
+  ERROR=1
+else
+  for token in "DA_FREE_OPERATOR_PROFILE_V0_1" "directFreeOperator" "derivativeFamilySupport" "homophoneCollisions"; do
+    if rg -n -F -- "$token" "$PROFILE" >/dev/null; then
+      echo "OK: profile exposes $token"
+    else
+      echo "DRIFT: profile missing $token"
+      ERROR=1
+    fi
+  done
+fi
+
 echo
 echo "=== focused model test ==="
 npm test -- tests/freeOperatorEvidence.v0_1.spec.ts --runInBand
