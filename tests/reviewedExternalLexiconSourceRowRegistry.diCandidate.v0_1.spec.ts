@@ -10,7 +10,7 @@ describe("reviewed external lexicon source row candidate registry DI v0.1", () =
     (candidate) => candidate.sourceId === "reviewed.external.di.knowledge.candidate.v0_1",
   );
 
-  it("exposes DI as a non-live reviewed source-row candidate", () => {
+  it("exposes DI as a reviewed source-row candidate with claim boundaries locked off", () => {
     expect(row).toMatchObject({
       sourceId: "reviewed.external.di.knowledge.candidate.v0_1",
       candidateId: "albanian-di-know-functional",
@@ -28,7 +28,8 @@ describe("reviewed external lexicon source row candidate registry DI v0.1", () =
       userDecisionPosture: "user_decides",
     });
 
-    expect(row?.sourceNote).toContain("NON-LIVE CANDIDATE");
+    expect(row?.sourceNote).not.toContain("NON-LIVE CANDIDATE");
+    expect(row?.sourceNote).toContain("Reviewed citation candidate");
     expect(row?.externalCitations[0]).toMatchObject({
       citationStatus: "reviewed_accepted",
       citationType: "dictionary_entry",
@@ -37,13 +38,18 @@ describe("reviewed external lexicon source row candidate registry DI v0.1", () =
     });
   });
 
-  it("is not production-safe until pending citation metadata is replaced", () => {
+  it("is promotion-safe after reviewed citation metadata intake while remaining outside production rows", () => {
     expect(row).toBeDefined();
-    expect(isReviewedExternalLexiconRegistryRowProductionSafeV0_1(row)).toBe(false);
-    expect(row?.externalCitations[0].sourceUrlOrArchiveRef).toContain(
-      "pending-reviewed-external-citation",
-    );
-    expect(row?.externalCitations[0].entryLocator).toContain("pending:");
+    expect(isReviewedExternalLexiconRegistryRowProductionSafeV0_1(row)).toBe(true);
+    expect(row?.externalCitations[0]).toMatchObject({
+      sourceTitle: "di",
+      sourcePublisherOrHost: "Wiktionary / DPEWA reference listing",
+      sourceUrlOrArchiveRef: "https://en.wiktionary.org/wiki/di#Albanian",
+      entryLocator: "Albanian > Etymology 1 > Verb > di: to know",
+      sourceHashOrArchiveHash: "url:https://en.wiktionary.org/wiki/di#Albanian",
+    });
+    expect(row?.externalCitations[0].sourceUrlOrArchiveRef).not.toContain("pending");
+    expect(row?.externalCitations[0].entryLocator).not.toContain("pending:");
   });
 
   it("is source-validation eligible for diagnostics while remaining non-live", () => {
@@ -66,26 +72,11 @@ describe("reviewed external lexicon source row candidate registry DI v0.1", () =
     });
   });
 
-  it("keeps the promotion checklist blocked by pending metadata", () => {
+  it("marks the promotion checklist ready after reviewed citation metadata intake", () => {
     expect(row).toBeDefined();
     const checklist = buildReviewedExternalLexiconPromotionChecklistV0_1(row);
 
-    expect(checklist.promotionReady).toBe(false);
-    expect(checklist.items).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          id: "source_url_or_archive_ref_finalized",
-          passed: false,
-        }),
-        expect.objectContaining({
-          id: "entry_locator_finalized",
-          passed: false,
-        }),
-        expect.objectContaining({
-          id: "source_note_live_marker_removed",
-          passed: false,
-        }),
-      ]),
-    );
+    expect(checklist.promotionReady).toBe(true);
+    expect(checklist.items.every((item) => item.passed)).toBe(true);
   });
 });
