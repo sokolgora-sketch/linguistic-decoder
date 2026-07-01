@@ -48,6 +48,9 @@ describe("reviewed external lexicon source row candidate registry DI v0.1", () =
       entryLocator: "Albanian > Etymology 1 > Verb > di: to know",
       sourceHashOrArchiveHash: "url:https://en.wiktionary.org/wiki/di#Albanian",
     });
+    expect(row?.externalCitations[0].reviewNote).toContain(
+      "Direct DPEWA/FGJSH locator",
+    );
     expect(row?.externalCitations[0].sourceUrlOrArchiveRef).not.toContain("pending");
     expect(row?.externalCitations[0].entryLocator).not.toContain("pending:");
   });

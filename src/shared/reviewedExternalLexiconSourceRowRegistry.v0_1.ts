@@ -55,7 +55,7 @@ export const reviewedExternalLexiconSourceRowCandidateRegistryV0_1 = [
         reviewedAt: "2026-07-01",
         sourceHashOrArchiveHash: "url:https://en.wiktionary.org/wiki/di#Albanian",
         reviewNote:
-          "Reviewed citation metadata intake for Albanian di as know/knowledge. Candidate registry row only; production registry promotion remains separately gated.",
+          "Reviewed citation metadata intake for Albanian di as know/knowledge via stable Wiktionary entry with DPEWA/FGJSH reference trail. Direct DPEWA/FGJSH locator or archived authoritative dictionary snapshot is still required before production-live promotion.",
       },
     ],
   },
