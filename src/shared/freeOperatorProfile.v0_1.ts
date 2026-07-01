@@ -50,8 +50,29 @@ export const DA_FREE_OPERATOR_PROFILE_V0_1: FreeOperatorProfileV0_1 = {
   userDecisionPosture: "user_decides",
 };
 
+export const DI_FREE_OPERATOR_PROFILE_V0_1: FreeOperatorProfileV0_1 = {
+  profileVersion: "free-operator-profile.v0_1",
+  operator: "di",
+  languageScope: ["Albanian", "Gheg Albanian", "Tosk Albanian"],
+  directFreeOperator: {
+    forms: ["di"],
+    glossTerms: ["know", "knowledge", "understand", "insight", "learning", "study"],
+    categories: ["free_operator_attested"],
+  },
+  derivativeFamilySupport: {
+    forms: [],
+    glossTerms: [],
+    categories: [],
+  },
+  homophoneCollisions: [],
+  requiresFunctionalBridgeFor: "functional_motivation_supported",
+  historicalOriginClaim: "not_claimed",
+  userDecisionPosture: "user_decides",
+};
+
 export const FREE_OPERATOR_PROFILES_V0_1 = [
   DA_FREE_OPERATOR_PROFILE_V0_1,
+  DI_FREE_OPERATOR_PROFILE_V0_1,
 ] as const satisfies readonly FreeOperatorProfileV0_1[];
 
 export function normalizeFreeOperatorProfileTextV0_1(value: string): string {
