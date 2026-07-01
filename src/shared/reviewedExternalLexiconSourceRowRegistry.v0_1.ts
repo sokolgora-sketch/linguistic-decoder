@@ -12,6 +12,54 @@ export type ReviewedExternalLexiconSourceRowRegistryBoundaryV0_1 = {
 const PRODUCTION_SOURCE_ROWS_V0_1 =
   [] as const satisfies readonly ReviewedExternalLexiconCandidateSourceRowV0_1[];
 
+export const reviewedExternalLexiconSourceRowCandidateRegistryV0_1 = [
+  {
+    sourceId: "reviewed.external.gheg-da.damage.candidate.v0_1",
+    candidateId: "albanian-da-dam-damage-functional",
+    displayForm: "Gheg DA split damage candidate",
+    candidateLanguage: "sq",
+    sourceKind: "reviewed_dictionary_source",
+    sourceStatus: "reviewed_accepted",
+    embryo: "DA",
+    isolatedStandaloneForm: "da",
+    plainStandaloneGloss: "split / divide",
+    sourceNote:
+      "NON-LIVE CANDIDATE: Gheg da as a free operator meaning split/divide can functionally motivate damage/harm through split/divided state. Pending reviewed external citation metadata before production promotion.",
+    semanticBridge:
+      "what is split or divided can motivate damage/harm without making a historical-origin claim",
+    originClaim: false,
+    historicalTransmissionClaim: false,
+    winnerClaim: false,
+    languageSuperiorityClaim: false,
+    candidateTruthClaim: false,
+    publicationEvidenceClaim: false,
+    scientificEvidenceClaim: false,
+    userDecisionPosture: "user_decides",
+    externalCitations: [
+      {
+        citationId: "reviewed.external.gheg-da.damage.candidate.citation.v0_1",
+        citationStatus: "reviewed_accepted",
+        citationType: "dictionary_entry",
+        sourceTitle: "Pending Reviewed Gheg DA Split Citation",
+        sourceAuthorOrEditor: "pending reviewed external lexicon editor",
+        sourcePublisherOrHost: "pending reviewed external lexicon source",
+        sourceDateOrVersion: "pending",
+        sourceUrlOrArchiveRef: "pending-reviewed-external-citation:gheg-da-split-divide",
+        attestedForm: "da",
+        attestedGloss: "split / divide",
+        attestedGrammarNote:
+          "Gheg Albanian standalone verb/free operator; pending reviewed external citation metadata",
+        entryLocator: "pending:gheg-da",
+        reviewedBy: "open-instrument-candidate-registry",
+        reviewedAt: "2026-06-30",
+        reviewNote:
+          "Candidate row only. Do not promote until citation source, locator, and review metadata are finalized.",
+        sourceHashOrArchiveHash: "pending-reviewed-external-citation-hash-gheg-da-split-v0-1",
+      },
+    ],
+  },
+] as const satisfies readonly ReviewedExternalLexiconCandidateSourceRowV0_1[];
+
 function asRecord(value: unknown): Record<string, unknown> | null {
   return value && typeof value === "object" ? (value as Record<string, unknown>) : null;
 }
@@ -64,7 +112,9 @@ export function isReviewedExternalLexiconRegistryRowProductionSafeV0_1(row: unkn
   if (sourceId.startsWith("fixture.") || sourceId.includes(".synthetic.")) return false;
   if (citationIds.some((citationId) => citationId.startsWith("fixture."))) return false;
   if (sourceUrlRefs.some((ref) => ref.startsWith("fixture://"))) return false;
+  if (sourceUrlRefs.some((ref) => ref.startsWith("pending-reviewed-external-citation:"))) return false;
   if (flattenStrings(row).some((text) => text.includes("CONTRACT TEST ONLY"))) return false;
+  if (flattenStrings(row).some((text) => text.includes("NON-LIVE CANDIDATE"))) return false;
 
   return true;
 }
