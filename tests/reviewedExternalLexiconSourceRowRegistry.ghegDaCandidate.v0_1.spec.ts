@@ -11,7 +11,7 @@ describe("reviewed external lexicon source row candidate registry Gheg DA v0.1",
     expect(reviewedExternalLexiconSourceRowCandidateRegistryV0_1).toHaveLength(1);
   });
 
-  it("contains a non-live reviewed Gheg DA damage candidate with claim boundaries locked off", () => {
+  it("contains a reviewed Gheg DA damage candidate with claim boundaries locked off", () => {
     const row = reviewedExternalLexiconSourceRowCandidateRegistryV0_1[0];
 
     expect(row).toMatchObject({
@@ -34,28 +34,26 @@ describe("reviewed external lexicon source row candidate registry Gheg DA v0.1",
       userDecisionPosture: "user_decides",
     });
 
-    expect(row.sourceNote).toContain("NON-LIVE CANDIDATE");
-    expect(row.sourceNote).toContain("Pending reviewed external citation metadata");
+    expect(row.sourceNote).not.toContain("NON-LIVE CANDIDATE");
+    expect(row.sourceNote).toContain("Reviewed citation candidate");
     expect(row.semanticBridge).toContain("without making a historical-origin claim");
   });
 
-  it("is deliberately not production-safe until pending citation metadata is replaced", () => {
+  it("is promotion-safe after reviewed citation metadata intake while remaining outside production rows", () => {
     const row = reviewedExternalLexiconSourceRowCandidateRegistryV0_1[0];
 
-    expect(isReviewedExternalLexiconRegistryRowProductionSafeV0_1(row)).toBe(false);
+    expect(isReviewedExternalLexiconRegistryRowProductionSafeV0_1(row)).toBe(true);
     expect(row.externalCitations[0].citationStatus).toBe("reviewed_accepted");
     expect(row.externalCitations[0].citationType).toBe("dictionary_entry");
-    expect(row.externalCitations[0].sourceTitle).toBe("Pending Reviewed Gheg DA Split Citation");
-    expect(row.externalCitations[0].sourceAuthorOrEditor).toBe("pending reviewed external lexicon editor");
-    expect(row.externalCitations[0].sourcePublisherOrHost).toBe("pending reviewed external lexicon source");
-    expect(row.externalCitations[0].sourceDateOrVersion).toBe("pending");
+    expect(row.externalCitations[0].sourceTitle).toBe("Linguistic variation within the Northwestern Gheg Albanian dialect");
+    expect(row.externalCitations[0].sourceAuthorOrEditor).toBe("Lindon Dedvukaj & Rexhina Ndoci");
+    expect(row.externalCitations[0].sourcePublisherOrHost).toBe("Proceedings of the Linguistic Society of America");
+    expect(row.externalCitations[0].sourceDateOrVersion).toBe("2023; volume 8, issue 1; article 5501");
     expect(row.externalCitations[0].reviewedBy).toBe("open-instrument-candidate-registry");
     expect(row.externalCitations[0].reviewedAt).toBe("2026-06-30");
-    expect(row.externalCitations[0].sourceHashOrArchiveHash).toBe(
-      "pending-reviewed-external-citation-hash-gheg-da-split-v0-1",
-    );
-    expect(row.externalCitations[0].sourceUrlOrArchiveRef).toContain(
-      "pending-reviewed-external-citation",
+    expect(row.externalCitations[0].sourceHashOrArchiveHash).toBe("doi:10.3765/plsa.v8i1.5501");
+    expect(row.externalCitations[0].sourceUrlOrArchiveRef).toBe(
+      "https://doi.org/10.3765/plsa.v8i1.5501",
     );
   });
 
