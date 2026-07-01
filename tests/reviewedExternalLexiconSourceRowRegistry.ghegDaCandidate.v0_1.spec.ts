@@ -18,8 +18,13 @@ function getGhegDaCandidateRowV0_1() {
 }
 
 describe("reviewed external lexicon source row candidate registry Gheg DA v0.1", () => {
-  it("keeps production rows empty while exposing a non-live candidate registry", () => {
-    expect(getReviewedExternalLexiconProductionSourceRowsV0_1()).toEqual([]);
+  it("keeps the reviewed Gheg DA row available in both candidate and production registries", () => {
+    expect(getReviewedExternalLexiconProductionSourceRowsV0_1()).toEqual([
+      expect.objectContaining({
+        sourceId: GHEG_DA_SOURCE_ID_V0_1,
+        candidateId: "albanian-da-dam-damage-functional",
+      }),
+    ]);
     expect(reviewedExternalLexiconSourceRowCandidateRegistryV0_1).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
@@ -53,7 +58,8 @@ describe("reviewed external lexicon source row candidate registry Gheg DA v0.1",
     });
 
     expect(row.sourceNote).not.toContain("NON-LIVE CANDIDATE");
-    expect(row.sourceNote).toContain("Reviewed citation candidate");
+    expect(row.sourceNote).toContain("Reviewed source row");
+    expect(row.sourceNote).toContain("Production registry promotion accepted");
     expect(row.semanticBridge).toContain("without making a historical-origin claim");
   });
 
