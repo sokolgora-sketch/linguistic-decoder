@@ -55,8 +55,8 @@ describe("reviewed lexicon candidate diagnostics audit v0.1", () => {
     expect(diRow).toMatchObject({
       sourceId: "reviewed.external.di.knowledge.candidate.v0_1",
       candidateId: "albanian-di-know-functional",
-      productionSafe: false,
-      liveStatus: "non_live_candidate",
+      productionSafe: true,
+      liveStatus: "promotion_ready_candidate",
       validationOutcome: "source_validation_eligible",
       evidenceCategories: [
         "free_operator_attested",
@@ -72,17 +72,11 @@ describe("reviewed lexicon candidate diagnostics audit v0.1", () => {
       historicalOriginClaim: "not_claimed",
       userDecisionPosture: "user_decides",
     });
-    expect(diRow.nonLiveReason).toContain("NON-LIVE CANDIDATE");
+    expect(diRow.nonLiveReason).toBeNull();
     expect(diRow.promotionChecklist).toMatchObject({
       checklistVersion: "reviewed-external-lexicon-promotion-checklist.v0_1",
-      promotionReady: false,
+      promotionReady: true,
     });
-    expect(diRow.promotionChecklistFailedItems).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ id: "source_url_or_archive_ref_finalized" }),
-        expect.objectContaining({ id: "entry_locator_finalized" }),
-        expect.objectContaining({ id: "source_note_live_marker_removed" }),
-      ]),
-    );
+    expect(diRow.promotionChecklistFailedItems).toEqual([]);
   });
 });
