@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { classifyFreeOperatorEvidenceV0_1 } from "../src/shared/freeOperatorEvidence.v0_1";
 
 describe("free operator evidence model v0.1", () => {
@@ -99,4 +100,19 @@ describe("free operator evidence model v0.1", () => {
     expect(result.categories).toContain("historical_origin_not_claimed");
     expect(result.categories).toContain("user_decides");
   });
+  it("uses free-operator profiles instead of DA-specific classifier branches", () => {
+    const classifierSource = readFileSync(
+      "src/shared/freeOperatorEvidence.v0_1.ts",
+      "utf8",
+    );
+
+    expect(classifierSource).toContain("FREE_OPERATOR_PROFILES_V0_1");
+    expect(classifierSource).toContain("profile.directFreeOperator");
+    expect(classifierSource).toContain("profile.derivativeFamilySupport");
+    expect(classifierSource).toContain("profile.homophoneCollisions");
+    expect(classifierSource).not.toContain('operator === "da"');
+    expect(classifierSource).not.toContain('form === "ndaj"');
+    expect(classifierSource).not.toContain("hasGiveGlossV0_1");
+  });
+
 });

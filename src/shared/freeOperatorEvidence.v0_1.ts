@@ -1,3 +1,10 @@
+import {
+  FREE_OPERATOR_PROFILES_V0_1,
+  freeOperatorProfileFormMatchesV0_1,
+  freeOperatorProfileGlossMatchesV0_1,
+  normalizeFreeOperatorProfileTextV0_1,
+} from "./freeOperatorProfile.v0_1";
+
 export type FreeOperatorEvidenceCategoryV0_1 =
   | "free_operator_attested"
   | "functional_motivation_supported"
@@ -22,47 +29,66 @@ export type FreeOperatorEvidenceClassificationV0_1 = {
   userDecisionPosture: "user_decides";
 };
 
-function normalizeFreeOperatorTextV0_1(value: string): string {
-  return value.trim().toLocaleLowerCase("en-US");
+function hasFunctionalBridgeV0_1(value: string | null | undefined): boolean {
+  return Boolean(value && value.trim());
 }
 
-function hasSplitDivideGlossV0_1(value: string): boolean {
-  return /\b(split|divide|separate|separation|cut|share|divided)\b/.test(
-    normalizeFreeOperatorTextV0_1(value),
+function findFreeOperatorProfileV0_1(operator: string) {
+  const normalizedOperator = normalizeFreeOperatorProfileTextV0_1(operator);
+
+  return FREE_OPERATOR_PROFILES_V0_1.find(
+    (profile) => normalizeFreeOperatorProfileTextV0_1(profile.operator) === normalizedOperator,
   );
 }
 
-function hasGiveGlossV0_1(value: string): boolean {
-  return /\b(give|gave|given)\b/.test(normalizeFreeOperatorTextV0_1(value));
-}
-
-function hasFunctionalBridgeV0_1(value: string | null | undefined): boolean {
-  return Boolean(value && value.trim());
+function addMatchingTermSetCategoriesV0_1(
+  categories: Set<FreeOperatorEvidenceCategoryV0_1>,
+  termSet: {
+    forms: readonly string[];
+    glossTerms: readonly string[];
+    categories: readonly FreeOperatorEvidenceCategoryV0_1[];
+  },
+  form: string,
+  gloss: string,
+): void {
+  if (
+    freeOperatorProfileFormMatchesV0_1(termSet.forms, form) &&
+    freeOperatorProfileGlossMatchesV0_1(termSet.glossTerms, gloss)
+  ) {
+    for (const category of termSet.categories) categories.add(category);
+  }
 }
 
 export function classifyFreeOperatorEvidenceV0_1(
   input: FreeOperatorEvidenceInputV0_1,
 ): FreeOperatorEvidenceClassificationV0_1 {
-  const operator = normalizeFreeOperatorTextV0_1(input.operator);
-  const form = normalizeFreeOperatorTextV0_1(input.attestedForm);
-  const gloss = normalizeFreeOperatorTextV0_1(input.attestedGloss);
+  const operator = normalizeFreeOperatorProfileTextV0_1(input.operator);
+  const form = normalizeFreeOperatorProfileTextV0_1(input.attestedForm);
+  const gloss = normalizeFreeOperatorProfileTextV0_1(input.attestedGloss);
 
   const categories = new Set<FreeOperatorEvidenceCategoryV0_1>();
 
   categories.add("historical_origin_not_claimed");
   categories.add("user_decides");
 
-  if (operator === "da") {
-    if ((form === "da" || form === "daj") && hasSplitDivideGlossV0_1(gloss)) {
-      categories.add("free_operator_attested");
-    }
+  const profile = findFreeOperatorProfileV0_1(operator);
 
-    if ((form === "ndaj" || form === "ndarë" || form === "ndare") && hasSplitDivideGlossV0_1(gloss)) {
-      categories.add("derivative_family_support");
-    }
+  if (profile) {
+    addMatchingTermSetCategoriesV0_1(
+      categories,
+      profile.directFreeOperator,
+      form,
+      gloss,
+    );
+    addMatchingTermSetCategoriesV0_1(
+      categories,
+      profile.derivativeFamilySupport,
+      form,
+      gloss,
+    );
 
-    if (form === "da" && hasGiveGlossV0_1(gloss)) {
-      categories.add("homophone_collision");
+    for (const collision of profile.homophoneCollisions) {
+      addMatchingTermSetCategoriesV0_1(categories, collision, form, gloss);
     }
   }
 

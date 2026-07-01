@@ -126,6 +126,24 @@ else
   done
 fi
 
+
+echo
+echo "=== check classifier is profile-driven ==="
+CLASSIFIER="src/shared/freeOperatorEvidence.v0_1.ts"
+if rg -n -F -- "FREE_OPERATOR_PROFILES_V0_1" "$CLASSIFIER" >/dev/null; then
+  echo "OK: classifier reads free-operator profiles"
+else
+  echo "DRIFT: classifier does not read FREE_OPERATOR_PROFILES_V0_1"
+  ERROR=1
+fi
+
+if rg -n -F -- 'operator === "da"' "$CLASSIFIER" >/dev/null; then
+  echo "DRIFT: classifier still has DA-specific operator branch"
+  ERROR=1
+else
+  echo "OK: classifier has no DA-specific operator branch"
+fi
+
 echo
 echo "=== focused model test ==="
 npm test -- tests/freeOperatorEvidence.v0_1.spec.ts --runInBand
