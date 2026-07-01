@@ -5,14 +5,32 @@ import {
 } from "../src/shared/reviewedExternalLexiconSourceRowRegistry.v0_1";
 import { evaluateReviewedExternalLexiconEvidenceGateV0_1 } from "../src/shared/reviewedExternalLexiconEvidenceGate.validator.v0_1";
 
+const GHEG_DA_SOURCE_ID_V0_1 = "reviewed.external.gheg-da.damage.candidate.v0_1";
+
+function getGhegDaCandidateRowV0_1() {
+  const row = reviewedExternalLexiconSourceRowCandidateRegistryV0_1.find(
+    (candidate) => candidate.sourceId === GHEG_DA_SOURCE_ID_V0_1,
+  );
+
+  if (!row) throw new Error("Gheg DA candidate row not found.");
+
+  return row;
+}
+
 describe("reviewed external lexicon source row candidate registry Gheg DA v0.1", () => {
   it("keeps production rows empty while exposing a non-live candidate registry", () => {
     expect(getReviewedExternalLexiconProductionSourceRowsV0_1()).toEqual([]);
-    expect(reviewedExternalLexiconSourceRowCandidateRegistryV0_1).toHaveLength(1);
+    expect(reviewedExternalLexiconSourceRowCandidateRegistryV0_1).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          sourceId: GHEG_DA_SOURCE_ID_V0_1,
+        }),
+      ]),
+    );
   });
 
   it("contains a reviewed Gheg DA damage candidate with claim boundaries locked off", () => {
-    const row = reviewedExternalLexiconSourceRowCandidateRegistryV0_1[0];
+    const row = getGhegDaCandidateRowV0_1();
 
     expect(row).toMatchObject({
       sourceId: "reviewed.external.gheg-da.damage.candidate.v0_1",
@@ -40,7 +58,7 @@ describe("reviewed external lexicon source row candidate registry Gheg DA v0.1",
   });
 
   it("is promotion-safe after reviewed citation metadata intake while remaining outside production rows", () => {
-    const row = reviewedExternalLexiconSourceRowCandidateRegistryV0_1[0];
+    const row = getGhegDaCandidateRowV0_1();
 
     expect(isReviewedExternalLexiconRegistryRowProductionSafeV0_1(row)).toBe(true);
     expect(row.externalCitations[0].citationStatus).toBe("reviewed_accepted");
@@ -59,7 +77,7 @@ describe("reviewed external lexicon source row candidate registry Gheg DA v0.1",
 
   it("still exercises the positive free-operator gate path for diagnostics", () => {
     const result = evaluateReviewedExternalLexiconEvidenceGateV0_1(
-      reviewedExternalLexiconSourceRowCandidateRegistryV0_1[0],
+      getGhegDaCandidateRowV0_1(),
     );
 
     expect(result.validationOutcome).toBe("source_validation_eligible");
