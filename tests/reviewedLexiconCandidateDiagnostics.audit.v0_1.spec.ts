@@ -34,5 +34,16 @@ describe("reviewed lexicon candidate diagnostics audit v0.1", () => {
       userDecisionPosture: "user_decides",
     });
     expect(report.rows[0].nonLiveReason).toContain("NON-LIVE CANDIDATE");
+    expect(report.rows[0].promotionChecklist).toMatchObject({
+      checklistVersion: "reviewed-external-lexicon-promotion-checklist.v0_1",
+      promotionReady: false,
+    });
+    expect(report.rows[0].promotionChecklistFailedItems).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: "source_url_or_archive_ref_finalized" }),
+        expect.objectContaining({ id: "entry_locator_finalized" }),
+        expect.objectContaining({ id: "source_note_live_marker_removed" }),
+      ]),
+    );
   });
 });
