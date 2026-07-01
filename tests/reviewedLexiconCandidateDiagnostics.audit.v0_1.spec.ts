@@ -10,9 +10,21 @@ describe("reviewed lexicon candidate diagnostics audit v0.1", () => {
 
     const report = JSON.parse(raw);
     expect(report.reportVersion).toBe("reviewed-lexicon-candidate-diagnostics.v0.1");
-    expect(report.rows).toHaveLength(1);
+    expect(report.rows).toHaveLength(2);
 
-    expect(report.rows[0]).toMatchObject({
+    const daRow = report.rows.find(
+      (row: { sourceId?: string }) =>
+        row.sourceId === "reviewed.external.gheg-da.damage.candidate.v0_1",
+    );
+    const diRow = report.rows.find(
+      (row: { sourceId?: string }) =>
+        row.sourceId === "reviewed.external.di.knowledge.candidate.v0_1",
+    );
+
+    expect(daRow).toBeDefined();
+    expect(diRow).toBeDefined();
+
+    expect(daRow).toMatchObject({
       sourceId: "reviewed.external.gheg-da.damage.candidate.v0_1",
       candidateId: "albanian-da-dam-damage-functional",
       productionSafe: true,
@@ -27,17 +39,50 @@ describe("reviewed lexicon candidate diagnostics audit v0.1", () => {
       userDecisionPosture: "user_decides",
     });
 
-    expect(report.rows[0].freeOperatorDiagnostic).toMatchObject({
+    expect(daRow.freeOperatorDiagnostic).toMatchObject({
       operator: "da",
       attestedForms: ["da"],
       historicalOriginClaim: "not_claimed",
       userDecisionPosture: "user_decides",
     });
-    expect(report.rows[0].nonLiveReason).toBeNull();
-    expect(report.rows[0].promotionChecklist).toMatchObject({
+    expect(daRow.nonLiveReason).toBeNull();
+    expect(daRow.promotionChecklist).toMatchObject({
       checklistVersion: "reviewed-external-lexicon-promotion-checklist.v0_1",
       promotionReady: true,
     });
-    expect(report.rows[0].promotionChecklistFailedItems).toEqual([]);
+    expect(daRow.promotionChecklistFailedItems).toEqual([]);
+
+    expect(diRow).toMatchObject({
+      sourceId: "reviewed.external.di.knowledge.candidate.v0_1",
+      candidateId: "albanian-di-know-functional",
+      productionSafe: false,
+      liveStatus: "non_live_candidate",
+      validationOutcome: "source_validation_eligible",
+      evidenceCategories: [
+        "free_operator_attested",
+        "functional_motivation_supported",
+        "historical_origin_not_claimed",
+        "user_decides",
+      ],
+      userDecisionPosture: "user_decides",
+    });
+    expect(diRow.freeOperatorDiagnostic).toMatchObject({
+      operator: "di",
+      attestedForms: ["di"],
+      historicalOriginClaim: "not_claimed",
+      userDecisionPosture: "user_decides",
+    });
+    expect(diRow.nonLiveReason).toContain("NON-LIVE CANDIDATE");
+    expect(diRow.promotionChecklist).toMatchObject({
+      checklistVersion: "reviewed-external-lexicon-promotion-checklist.v0_1",
+      promotionReady: false,
+    });
+    expect(diRow.promotionChecklistFailedItems).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: "source_url_or_archive_ref_finalized" }),
+        expect.objectContaining({ id: "entry_locator_finalized" }),
+        expect.objectContaining({ id: "source_note_live_marker_removed" }),
+      ]),
+    );
   });
 });

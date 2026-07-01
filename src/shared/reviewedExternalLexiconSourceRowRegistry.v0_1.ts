@@ -14,6 +14,52 @@ const PRODUCTION_SOURCE_ROWS_V0_1 =
 
 export const reviewedExternalLexiconSourceRowCandidateRegistryV0_1 = [
   {
+    sourceId: "reviewed.external.di.knowledge.candidate.v0_1",
+    candidateId: "albanian-di-know-functional",
+    candidateLanguage: "sq",
+    displayForm: "DI know knowledge candidate",
+    sourceKind: "reviewed_dictionary_source",
+    sourceStatus: "reviewed_accepted",
+    embryo: "DI",
+    isolatedStandaloneForm: "di",
+    plainStandaloneGloss: "know / knowledge",
+    sourceNote:
+      "NON-LIVE CANDIDATE: Albanian di as a free operator meaning know/knowledge can functionally motivate study/learning. Pending reviewed external citation metadata before production promotion.",
+    semanticBridge:
+      "knowledge can motivate study and learning functionally without making a historical-origin claim",
+    originClaim: false,
+    historicalTransmissionClaim: false,
+    winnerClaim: false,
+    languageSuperiorityClaim: false,
+    candidateTruthClaim: false,
+    publicationEvidenceClaim: false,
+    scientificEvidenceClaim: false,
+    userDecisionPosture: "user_decides",
+    externalCitations: [
+      {
+        citationId: "reviewed.external.di.knowledge.candidate.citation.v0_1",
+        citationStatus: "reviewed_accepted",
+        citationType: "dictionary_entry",
+        sourceTitle: "Pending reviewed Albanian DI citation",
+        sourceAuthorOrEditor: "Pending reviewer",
+        sourcePublisherOrHost: "Pending reviewed external source",
+        sourceDateOrVersion: "pending",
+        sourceUrlOrArchiveRef: "pending-reviewed-external-citation:albanian-di-know-knowledge",
+        entryLocator: "pending:albanian-di",
+        attestedForm: "di",
+        attestedGloss: "know / knowledge",
+        attestedGrammarNote:
+          "Albanian standalone verb/free operator candidate; pending reviewed external citation metadata",
+        reviewedBy: "DF",
+        reviewedAt: "2026-07-01",
+        sourceHashOrArchiveHash: "pending-reviewed-external-citation:albanian-di-know-knowledge",
+        reviewNote:
+          "Candidate row only. Do not promote until citation source, locator, and review metadata are finalized.",
+      },
+    ],
+  },
+
+  {
     sourceId: "reviewed.external.gheg-da.damage.candidate.v0_1",
     candidateId: "albanian-da-dam-damage-functional",
     displayForm: "Gheg DA split damage candidate",

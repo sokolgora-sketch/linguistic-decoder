@@ -1,9 +1,21 @@
 import { reviewedExternalLexiconSourceRowCandidateRegistryV0_1 } from "../src/shared/reviewedExternalLexiconSourceRowRegistry.v0_1";
 import { buildReviewedExternalLexiconPromotionChecklistV0_1 } from "../src/shared/reviewedExternalLexiconSourceRowPromotionChecklist.v0_1";
 
+const GHEG_DA_SOURCE_ID_V0_1 = "reviewed.external.gheg-da.damage.candidate.v0_1";
+
+function getGhegDaCandidateRowV0_1() {
+  const row = reviewedExternalLexiconSourceRowCandidateRegistryV0_1.find(
+    (candidate) => candidate.sourceId === GHEG_DA_SOURCE_ID_V0_1,
+  );
+
+  if (!row) throw new Error("Gheg DA candidate row not found.");
+
+  return row;
+}
+
 describe("reviewed external lexicon source row promotion checklist Gheg DA v0.1", () => {
   it("marks the current Gheg DA candidate promotion-ready after reviewed citation metadata intake", () => {
-    const row = reviewedExternalLexiconSourceRowCandidateRegistryV0_1[0];
+    const row = getGhegDaCandidateRowV0_1();
     const checklist = buildReviewedExternalLexiconPromotionChecklistV0_1(row);
 
     expect(checklist).toMatchObject({
@@ -18,12 +30,12 @@ describe("reviewed external lexicon source row promotion checklist Gheg DA v0.1"
 
   it("fails if pending markers or the non-live source note return", () => {
     const row = {
-      ...reviewedExternalLexiconSourceRowCandidateRegistryV0_1[0],
+      ...getGhegDaCandidateRowV0_1(),
       sourceNote:
         "NON-LIVE CANDIDATE: Reviewed Gheg da as a free operator meaning split/divide can functionally motivate damage/harm.",
       externalCitations: [
         {
-          ...reviewedExternalLexiconSourceRowCandidateRegistryV0_1[0].externalCitations[0],
+          ...getGhegDaCandidateRowV0_1().externalCitations[0],
           sourceUrlOrArchiveRef: "pending-reviewed-external-citation:gheg-da-split-divide",
           entryLocator: "pending:gheg-da",
         },
