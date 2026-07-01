@@ -115,4 +115,26 @@ describe("free operator evidence model v0.1", () => {
     expect(classifierSource).not.toContain("hasGiveGlossV0_1");
   });
 
+  it("classifies DI through the free-operator profile registry", () => {
+    const result = classifyFreeOperatorEvidenceV0_1({
+      operator: "DI",
+      attestedForm: "di",
+      attestedGloss: "know / knowledge",
+      functionalBridge: "knowledge can motivate study and learning functionally",
+    });
+
+    expect(result).toEqual({
+      operator: "di",
+      attestedForm: "di",
+      categories: [
+        "free_operator_attested",
+        "functional_motivation_supported",
+        "historical_origin_not_claimed",
+        "user_decides",
+      ],
+      historicalOriginClaim: "not_claimed",
+      userDecisionPosture: "user_decides",
+    });
+  });
+
 });

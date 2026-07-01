@@ -1,5 +1,6 @@
 import {
   DA_FREE_OPERATOR_PROFILE_V0_1,
+  DI_FREE_OPERATOR_PROFILE_V0_1,
   FREE_OPERATOR_PROFILES_V0_1,
   freeOperatorProfileFormMatchesV0_1,
   freeOperatorProfileGlossMatchesV0_1,
@@ -65,4 +66,33 @@ describe("free operator profile contract v0.1", () => {
     expect(freeOperatorProfileFormMatchesV0_1(collision.forms, "da")).toBe(true);
     expect(freeOperatorProfileGlossMatchesV0_1(collision.glossTerms, "gave")).toBe(true);
   });
+  it("models DI as a direct know/knowledge free operator", () => {
+    expect(FREE_OPERATOR_PROFILES_V0_1).toContain(DI_FREE_OPERATOR_PROFILE_V0_1);
+    expect(DI_FREE_OPERATOR_PROFILE_V0_1).toMatchObject({
+      profileVersion: "free-operator-profile.v0_1",
+      operator: "di",
+      directFreeOperator: {
+        forms: ["di"],
+        categories: ["free_operator_attested"],
+      },
+      derivativeFamilySupport: {
+        forms: [],
+        glossTerms: [],
+        categories: [],
+      },
+      homophoneCollisions: [],
+      historicalOriginClaim: "not_claimed",
+      userDecisionPosture: "user_decides",
+    });
+
+    expect(freeOperatorProfileFormMatchesV0_1(
+      DI_FREE_OPERATOR_PROFILE_V0_1.directFreeOperator.forms,
+      "DI",
+    )).toBe(true);
+    expect(freeOperatorProfileGlossMatchesV0_1(
+      DI_FREE_OPERATOR_PROFILE_V0_1.directFreeOperator.glossTerms,
+      "know / knowledge",
+    )).toBe(true);
+  });
+
 });

@@ -116,7 +116,7 @@ if [ ! -f "$PROFILE" ]; then
   echo "DRIFT: $PROFILE is missing"
   ERROR=1
 else
-  for token in "DA_FREE_OPERATOR_PROFILE_V0_1" "directFreeOperator" "derivativeFamilySupport" "homophoneCollisions"; do
+  for token in "DA_FREE_OPERATOR_PROFILE_V0_1" "DI_FREE_OPERATOR_PROFILE_V0_1" "directFreeOperator" "derivativeFamilySupport" "homophoneCollisions"; do
     if rg -n -F -- "$token" "$PROFILE" >/dev/null; then
       echo "OK: profile exposes $token"
     else
