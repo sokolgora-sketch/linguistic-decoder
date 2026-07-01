@@ -14,12 +14,14 @@ import {
   reviewedExternalLexiconSourceRowCandidateRegistryV0_1,
 } from "../src/shared/reviewedExternalLexiconSourceRowRegistry.v0_1";
 import { evaluateReviewedExternalLexiconEvidenceGateV0_1 } from "../src/shared/reviewedExternalLexiconEvidenceGate.validator.v0_1";
+import { buildReviewedExternalLexiconPromotionChecklistV0_1 } from "../src/shared/reviewedExternalLexiconSourceRowPromotionChecklist.v0_1";
 
 describe("temporary reviewed lexicon candidate diagnostics audit", () => {
   it("writes the candidate diagnostics report", () => {
     const rows = reviewedExternalLexiconSourceRowCandidateRegistryV0_1.map((row) => {
       const gate = evaluateReviewedExternalLexiconEvidenceGateV0_1(row);
       const productionSafe = isReviewedExternalLexiconRegistryRowProductionSafeV0_1(row);
+      const promotionChecklist = buildReviewedExternalLexiconPromotionChecklistV0_1(row);
 
       return {
         sourceId: row.sourceId,
@@ -33,6 +35,8 @@ describe("temporary reviewed lexicon candidate diagnostics audit", () => {
         nonLiveReason: productionSafe
           ? null
           : "Candidate registry row is blocked from production by pending citation metadata and NON-LIVE CANDIDATE boundary.",
+        promotionChecklist,
+        promotionChecklistFailedItems: promotionChecklist.items.filter((item) => !item.passed),
         userDecisionPosture: gate.userDecisionPosture,
       };
     });
