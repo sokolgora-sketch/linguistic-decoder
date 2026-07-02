@@ -1178,7 +1178,8 @@ exports[`Engine Contract v1 — capture engine output (goldens) study (strict, a
           "sq: da",
           "ops: vowel_swap",
           "gloss: split / divide / cut",
-          "note: direct reviewed Gheg free-operator evidence; Dedvukaj & Ndoci 2023 PLSA example (4), DOI 10.3765/plsa.v8i1.5501"
+          "note: direct reviewed Gheg free-operator evidence; Dedvukaj & Ndoci 2023 PLSA example (4), DOI 10.3765/plsa.v8i1.5501",
+          "reviewed functional free-operator evidence: Dedvukaj & Ndoci 2023 PLSA, Example (4), page 3; footnote 1: da = to split, cut, divide. https://doi.org/10.3765/plsa.v8i1.5501; historicalOriginClaim=not_claimed; winnerClaim=not_claimed; languageSuperiorityClaim=not_claimed; userDecisionPosture=user_decides"
         ],
         "gloss": "split / divide / cut / separate",
         "language": "sq",
