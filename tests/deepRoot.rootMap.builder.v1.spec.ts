@@ -37,7 +37,7 @@ describe("buildRootMapV1 (RootMap selection)", () => {
 
     expect(rm?.tokens.map((t) => t.token)).toEqual(["SHTU", "DI"]);
   });
-  it("marks Gheg DA split as dialect-attested pending review instead of gave-supported", () => {
+  it("marks Gheg DA split as reviewed dialect evidence instead of gave-supported", () => {
     const rm = buildRootMapV1({
       basis: "da",
       minRoots: [
@@ -58,8 +58,9 @@ describe("buildRootMapV1 (RootMap selection)", () => {
     const evidence = da?.evidence.join("\n") ?? "";
 
     expect(da?.status).toBe("dialect_attested_pending_review");
-    expect(evidence).toContain("Gheg dialect");
-    expect(evidence).toContain("E kom da bukën për gjysë");
+    expect(evidence).toContain("reviewed Gheg free-operator evidence");
+    expect(evidence).toContain("Dedvukaj & Ndoci 2023 PLSA");
+    expect(evidence).toContain("10.3765/plsa.v8i1.5501");
     expect(evidence).not.toContain("gave (aorist/part)");
   });
 

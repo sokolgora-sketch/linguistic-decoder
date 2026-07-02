@@ -10,7 +10,7 @@ describe("analyze-v1 emits rootMap (v0.1)", () => {
     expect(out.rootMap.tokens).toBeDefined();
     expect(out.rootMap.keys).toBeDefined();
   });
-  it("emits mode DA as Gheg dialect-attested pending review, not gave-supported", async () => {
+  it("emits mode DA as reviewed Gheg dialect evidence, not gave-supported", async () => {
     const payload = await analyzeWordV1("mode", { mode: "strict" } as any);
     const out = enginePayloadToAnalysisResult(payload as any) as any;
 
@@ -18,8 +18,9 @@ describe("analyze-v1 emits rootMap (v0.1)", () => {
     const evidence = Array.isArray(da?.evidence) ? da.evidence.join("\n") : "";
 
     expect(da?.status).toBe("dialect_attested_pending_review");
-    expect(evidence).toContain("Gheg dialect");
-    expect(evidence).toContain("E kom da bukën për gjysë");
+    expect(evidence).toContain("reviewed Gheg free-operator evidence");
+    expect(evidence).toContain("Dedvukaj & Ndoci 2023 PLSA");
+    expect(evidence).toContain("10.3765/plsa.v8i1.5501");
     expect(evidence).not.toContain("gave (aorist/part)");
   });
 
