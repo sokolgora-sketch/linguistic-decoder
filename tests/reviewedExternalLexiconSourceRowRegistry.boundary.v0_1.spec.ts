@@ -9,16 +9,25 @@ import {
 } from "./fixtures/openInstrument/reviewedExternalLexiconSourceRows.fixture.v0_1";
 
 describe("reviewed external lexicon source row registry boundary v0.1", () => {
-  it("starts with an empty production registry", () => {
+  it("exposes the reviewed Gheg DA row in the production registry", () => {
     const rows = getReviewedExternalLexiconProductionSourceRowsV0_1();
     const boundary = getReviewedExternalLexiconSourceRowRegistryBoundaryV0_1();
 
-    expect(rows).toEqual([]);
+    expect(rows).toHaveLength(1);
+    expect(rows[0]).toMatchObject({
+      sourceId: "reviewed.external.gheg-da.damage.candidate.v0_1",
+      candidateId: "albanian-da-dam-damage-functional",
+      sourceKind: "reviewed_dictionary_source",
+      sourceStatus: "reviewed_accepted",
+      embryo: "DA",
+      isolatedStandaloneForm: "da",
+      userDecisionPosture: "user_decides",
+    });
     expect(boundary).toEqual({
       registryId: "reviewed-external-lexicon-source-row-registry.v0_1",
-      productionRows: [],
-      liveRowCount: 0,
-      hasLiveRows: false,
+      productionRows: rows,
+      liveRowCount: 1,
+      hasLiveRows: true,
       syntheticFixtureRowsAllowed: false,
       liveCitationRequirement: "reviewed_external_metadata_required",
     });

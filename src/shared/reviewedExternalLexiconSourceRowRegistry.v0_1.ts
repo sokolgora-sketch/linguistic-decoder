@@ -9,8 +9,9 @@ export type ReviewedExternalLexiconSourceRowRegistryBoundaryV0_1 = {
   liveCitationRequirement: "reviewed_external_metadata_required";
 };
 
-const PRODUCTION_SOURCE_ROWS_V0_1 =
-  [] as const satisfies readonly ReviewedExternalLexiconCandidateSourceRowV0_1[];
+const PRODUCTION_SOURCE_ROW_IDS_V0_1 = new Set<string>([
+  "reviewed.external.gheg-da.damage.candidate.v0_1",
+]);
 
 export const reviewedExternalLexiconSourceRowCandidateRegistryV0_1 = [
   {
@@ -71,7 +72,7 @@ export const reviewedExternalLexiconSourceRowCandidateRegistryV0_1 = [
     isolatedStandaloneForm: "da",
     plainStandaloneGloss: "split / divide",
     sourceNote:
-      "Reviewed citation candidate: Gheg da as a free operator meaning split/divide can functionally motivate damage/harm through split/divided state. Candidate registry row only; production registry remains separately gated.",
+      "Reviewed source row: Gheg da as a free operator meaning split/divide can functionally motivate damage/harm through split/divided state. Production registry promotion accepted v0.1; output remains user-decidable.",
     semanticBridge:
       "what is split or divided can motivate damage/harm without making a historical-origin claim",
     originClaim: false,
@@ -100,7 +101,7 @@ export const reviewedExternalLexiconSourceRowCandidateRegistryV0_1 = [
         reviewedBy: "open-instrument-candidate-registry",
         reviewedAt: "2026-06-30",
         reviewNote:
-          "Reviewed citation metadata intake for Gheg da as split/cut/divide. Candidate registry row only; production registry promotion remains separately gated.",
+          "Reviewed citation metadata intake for Gheg da as split/cut/divide. Production source row promotion accepted v0.1; no historical-origin or winner claim.",
         sourceHashOrArchiveHash: "doi:10.3765/plsa.v8i1.5501",
       },
     ],
@@ -131,7 +132,9 @@ function externalCitations(row: unknown): unknown[] {
 }
 
 export function getReviewedExternalLexiconProductionSourceRowsV0_1(): readonly ReviewedExternalLexiconCandidateSourceRowV0_1[] {
-  return PRODUCTION_SOURCE_ROWS_V0_1;
+  return reviewedExternalLexiconSourceRowCandidateRegistryV0_1.filter((row) =>
+    PRODUCTION_SOURCE_ROW_IDS_V0_1.has(row.sourceId),
+  );
 }
 
 export function getReviewedExternalLexiconSourceRowRegistryBoundaryV0_1(): ReviewedExternalLexiconSourceRowRegistryBoundaryV0_1 {
