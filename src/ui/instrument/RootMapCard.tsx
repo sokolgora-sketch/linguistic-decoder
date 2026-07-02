@@ -11,7 +11,7 @@ type Maybe<T> = Present<T> | Missing;
 
 type RootMapSpanVM = { token: string; start?: number; end?: number; note?: string };
 type RootMapTokenVM = { token: string; role?: string; vowel_path?: string };
-type RootMapKeyVM = { token: string; language?: string; gloss?: string; status?: string; ops?: unknown; evidence?: unknown };
+type RootMapKeyVM = { token: string; language?: string; gloss?: string; status?: string; ops?: string[]; evidence?: string[] };
 type RootMapCarrierVM = { token: string; language?: string; carrierForm?: string; note?: string };
 
 type RootMapVM = {
