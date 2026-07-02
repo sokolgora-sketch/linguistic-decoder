@@ -38,7 +38,7 @@ describe("reviewed external lexicon source row candidate registry DI v0.1", () =
     });
   });
 
-  it("is promotion-safe after reviewed citation metadata intake while remaining outside production rows", () => {
+  it("is production-safe as metadata but remains blocked from production-live promotion pending direct authoritative locator", () => {
     expect(row).toBeDefined();
     expect(isReviewedExternalLexiconRegistryRowProductionSafeV0_1(row)).toBe(true);
     expect(row?.externalCitations[0]).toMatchObject({
@@ -51,6 +51,10 @@ describe("reviewed external lexicon source row candidate registry DI v0.1", () =
     expect(row?.externalCitations[0].reviewNote).toContain(
       "Direct DPEWA/FGJSH locator",
     );
+    expect(row?.externalCitations[0].reviewNote).toContain(
+      "still required before production-live promotion",
+    );
+    expect(row?.sourceNote).toContain("production registry remains separately gated");
     expect(row?.externalCitations[0].sourceUrlOrArchiveRef).not.toContain("pending");
     expect(row?.externalCitations[0].entryLocator).not.toContain("pending:");
   });
@@ -75,11 +79,18 @@ describe("reviewed external lexicon source row candidate registry DI v0.1", () =
     });
   });
 
-  it("marks the promotion checklist ready after reviewed citation metadata intake", () => {
+  it("keeps the checklist blocked for production-live promotion until direct authoritative locator exists", () => {
     expect(row).toBeDefined();
     const checklist = buildReviewedExternalLexiconPromotionChecklistV0_1(row);
 
-    expect(checklist.promotionReady).toBe(true);
-    expect(checklist.items.every((item) => item.passed)).toBe(true);
+    expect(checklist.promotionReady).toBe(false);
+    expect(checklist.items).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: "direct_authoritative_locator_or_archive",
+          passed: false,
+        }),
+      ]),
+    );
   });
 });

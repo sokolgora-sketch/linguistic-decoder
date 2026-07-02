@@ -26,12 +26,30 @@ function firstCitation(row: ReviewedExternalLexiconCandidateSourceRowV0_1) {
   return row.externalCitations[0];
 }
 
+function hasDirectAuthoritativeLocatorOrArchiveV0_1(
+  row: ReviewedExternalLexiconCandidateSourceRowV0_1,
+): boolean {
+  const citation = firstCitation(row);
+  const reviewNote = citation?.reviewNote ?? "";
+  const sourceNote = row.sourceNote ?? "";
+
+  if (reviewNote.includes("still required before production-live promotion")) return false;
+  if (sourceNote.includes("production registry remains separately gated")) return false;
+
+  return true;
+}
+
 export function buildReviewedExternalLexiconPromotionChecklistV0_1(
   row: ReviewedExternalLexiconCandidateSourceRowV0_1,
 ): ReviewedExternalLexiconPromotionChecklistV0_1 {
   const citation = firstCitation(row);
 
   const items: ReviewedExternalLexiconPromotionChecklistItemV0_1[] = [
+    {
+      id: "direct_authoritative_locator_or_archive",
+      label: "Direct authoritative locator or archived authoritative dictionary evidence is present.",
+      passed: hasDirectAuthoritativeLocatorOrArchiveV0_1(row),
+    },
     {
       id: "source_status_reviewed_accepted",
       label: "Row has reviewed accepted source status.",
