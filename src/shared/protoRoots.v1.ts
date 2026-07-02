@@ -57,20 +57,41 @@ export const PROTO_ROOTS_V1: readonly ProtoRoot[] = Object.freeze([
   },
   {
     id: "DA",
-    gloss: "divide / cut / separate",
+    gloss: "split / divide / cut / separate",
     roleHint: "Action",
     carriers: [
       {
         lang: "sq",
+        dialect: "Gheg",
         form: "da",
-        gloss: "split / divide (Gheg dialect)",
+        gloss: "split / divide / cut",
         notes:
-          "Dialect attestation pending reviewed external citation: E kom da bukën për gjysë = I have split the bread in half; do not use da=gave homophone as split proof",
+          "direct reviewed Gheg free-operator evidence; Dedvukaj & Ndoci 2023 PLSA example (4), DOI 10.3765/plsa.v8i1.5501",
       },
-      { lang: "sq", form: "ndaj", gloss: "divide / share" },
-      { lang: "sq", form: "ndarë", gloss: "divided" },
+      {
+        lang: "sq",
+        dialect: "Tosk",
+        form: "daj",
+        gloss: "split / divide",
+        notes: "Tosk cognate path for DA free-operator support",
+      },
+      {
+        lang: "sq",
+        dialect: "Tosk",
+        form: "ndaj",
+        gloss: "divide / share",
+        notes: "DA-family derivative support; not exact isolated free-operator proof",
+      },
+      {
+        lang: "sq",
+        dialect: "Tosk",
+        form: "ndarë",
+        gloss: "divided",
+        notes: "DA-family derivative support; not exact isolated free-operator proof",
+      },
     ],
-    notes: "Proto-root used as example for minimal functional decomposition patterns.",
+    notes:
+      "Proto-root aligned with reviewed Gheg DA split/divide evidence. Homophone collision lane: da = gave (aorist/part) remains separate and is not a runtime carrier for split/divide evidence.",
   },
   {
     id: "AT",

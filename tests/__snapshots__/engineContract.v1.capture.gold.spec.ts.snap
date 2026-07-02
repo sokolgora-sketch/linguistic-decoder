@@ -1139,6 +1139,12 @@ exports[`Engine Contract v1 — capture engine output (goldens) study (strict, a
         "token": "SHTU"
       },
       {
+        "carrierForm": "daj",
+        "language": "sq",
+        "note": "gloss: split / divide",
+        "token": "DA"
+      },
+      {
         "carrierForm": "ndaj",
         "language": "sq",
         "note": "gloss: divide / share",
@@ -1151,7 +1157,7 @@ exports[`Engine Contract v1 — capture engine output (goldens) study (strict, a
         "token": "DA"
       }
     ],
-    "composedMeaning": "add / increase / put-on + divide / cut / separate",
+    "composedMeaning": "add / increase / put-on + split / divide / cut / separate",
     "keys": [
       {
         "evidence": [
@@ -1171,10 +1177,10 @@ exports[`Engine Contract v1 — capture engine output (goldens) study (strict, a
         "evidence": [
           "sq: da",
           "ops: vowel_swap",
-          "gloss: split / divide (Gheg dialect)",
-          "note: Dialect attestation pending reviewed external citation: E kom da bukën për gjysë = I have split the bread in half; do not use da=gave homophone as split proof"
+          "gloss: split / divide / cut",
+          "note: direct reviewed Gheg free-operator evidence; Dedvukaj & Ndoci 2023 PLSA example (4), DOI 10.3765/plsa.v8i1.5501"
         ],
-        "gloss": "divide / cut / separate",
+        "gloss": "split / divide / cut / separate",
         "language": "sq",
         "ops": [
           "vowel_swap"
