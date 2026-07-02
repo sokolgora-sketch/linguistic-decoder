@@ -56,19 +56,21 @@ describe("reviewed external lexicon runtime projection contract v0.1", () => {
     );
   });
 
-  it("does not wire production source rows into analyze-v1 yet", () => {
+  it("keeps projection logic mediated through the RootMap builder, not route or UI adapters", () => {
     const fs = require("node:fs");
     const path = require("node:path");
     const read = (file: string) => fs.readFileSync(path.join(process.cwd(), file), "utf8");
 
-    const runtimeSources = [
+    const routeAndAdapterSources = [
       "app/api/analyze-v1/route.ts",
       "src/engine/analyzeWordV1.ts",
       "src/shared/analysisAdapter.ts",
       "src/shared/analyzeV1Adapter.ts",
     ].map(read).join("\n");
+    const rootMapBuilderSource = read("src/shared/deepRoot.rootMap.builder.v1.ts");
 
-    expect(runtimeSources).not.toContain("projectReviewedExternalLexiconProductionRowForRuntimeV0_1");
-    expect(runtimeSources).not.toContain("reviewed-external-lexicon-runtime-projection.v0_1");
+    expect(routeAndAdapterSources).not.toContain("getReviewedExternalLexiconProductionSourceRowsV0_1");
+    expect(routeAndAdapterSources).not.toContain("projectReviewedExternalLexiconProductionRowForRuntimeV0_1");
+    expect(rootMapBuilderSource).toContain("projectReviewedExternalLexiconProductionRowForRuntimeV0_1");
   });
 });

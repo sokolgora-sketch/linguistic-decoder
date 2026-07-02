@@ -31,7 +31,7 @@ describe("reviewed external lexicon production source row runtime boundary v0.1"
     );
   });
 
-  it("locks production source rows out of analyze-v1 runtime wiring until a reviewed wiring PR", () => {
+  it("keeps production source rows out of direct route and UI adapter wiring", () => {
     const runtimeSources = [
       "app/api/analyze-v1/route.ts",
       "src/engine/analyzeWordV1.ts",
@@ -42,6 +42,9 @@ describe("reviewed external lexicon production source row runtime boundary v0.1"
     expect(runtimeSources).not.toContain("getReviewedExternalLexiconProductionSourceRowsV0_1");
     expect(runtimeSources).not.toContain("reviewed.external.gheg-da.damage.candidate.v0_1");
     expect(runtimeSources).not.toContain("reviewed.external.di.knowledge.candidate.v0_1");
+
+    const rootMapBuilderSource = read("src/shared/deepRoot.rootMap.builder.v1.ts");
+    expect(rootMapBuilderSource).toContain("projectReviewedExternalLexiconProductionRowForRuntimeV0_1");
   });
 
   it("documents the safe next step before runtime projection", () => {
@@ -52,7 +55,7 @@ describe("reviewed external lexicon production source row runtime boundary v0.1"
     expect(registrySource).toContain("reviewed.external.di.knowledge.candidate.v0_1");
 
     // Boundary: source rows are reviewed evidence objects first.
-    // Runtime candidate projection must be a separate reviewed PR with snapshots.
+    // Runtime projection is mediated through the reviewed projection adapter and RootMap builder.
     expect(registrySource).toContain("Production source row promotion accepted v0.1");
     expect(registrySource).toContain("still required before production-live promotion");
   });

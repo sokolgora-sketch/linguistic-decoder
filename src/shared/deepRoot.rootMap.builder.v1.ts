@@ -22,6 +22,8 @@ import type {
 } from "./deepRoot.rootMap.v1";
 import { getProtoRootV1 } from "./protoRoots.v1";
 import { extractSevenVowelsFromString } from "@/shared/math7.core";
+import { getReviewedExternalLexiconProductionSourceRowsV0_1 } from "./reviewedExternalLexiconSourceRowRegistry.v0_1";
+import { projectReviewedExternalLexiconProductionRowForRuntimeV0_1 } from "./reviewedExternalLexiconRuntimeProjection.v0_1";
 
 function roleHintToTokenRole(roleHint?: string): RootTokenRoleV1 {
   switch (roleHint) {
@@ -171,11 +173,25 @@ function buildSpansOrNull(params: {
   return spans.length > 0 ? spans : null;
 }
 
+
+function buildReviewedFunctionalRuntimeEvidenceByEmbryoV0_1(): ReadonlyMap<string, string> {
+  const entries = getReviewedExternalLexiconProductionSourceRowsV0_1()
+    .map(projectReviewedExternalLexiconProductionRowForRuntimeV0_1)
+    .filter((projection): projection is NonNullable<typeof projection> => projection != null)
+    .map((projection) => [
+      projection.embryo,
+      `reviewed functional free-operator evidence: ${projection.evidenceText}; historicalOriginClaim=${projection.claimBoundary.historicalOriginClaim}; winnerClaim=${projection.claimBoundary.winnerClaim}; languageSuperiorityClaim=${projection.claimBoundary.languageSuperiorityClaim}; userDecisionPosture=${projection.claimBoundary.userDecisionPosture}`,
+    ] as const);
+
+  return new Map(entries);
+}
+
 export function buildRootMapV1(params: {
 basis: string;
   minRoots: MinRootHypothesis[] | null | undefined;
   heartPrimaryPath?: unknown; // optional: prefer Heart-aligned hypothesis
 }): RootMapV1 | null {
+  const reviewedEvidenceByEmbryo = buildReviewedFunctionalRuntimeEvidenceByEmbryoV0_1();
   const basis = String(params.basis ?? "").trim();
   const minRoots = Array.isArray(params.minRoots) ? params.minRoots : [];
 
@@ -258,6 +274,11 @@ const tokens: RootTokenV1[] = [];
       protoCarrierHit?.notes &&
       /dialect attestation|gheg|weak|homophone|do not use/i.test(protoCarrierHit.notes);
     if (shouldExposeCarrierNote) evidence.push(`note: ${protoCarrierHit.notes}`);
+
+    const reviewedFunctionalEvidence = reviewedEvidenceByEmbryo.get(protoRootId);
+    if (reviewedFunctionalEvidence && !evidence.includes(reviewedFunctionalEvidence)) {
+      evidence.push(reviewedFunctionalEvidence);
+    }
 
     const status: RootKeyStatusV1 = keyStatusForCarrier(
       chosenCarrier ?? null,
