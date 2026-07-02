@@ -56,7 +56,6 @@ describe("reviewed lexicon candidate diagnostics audit v0.1", () => {
       sourceId: "reviewed.external.di.knowledge.candidate.v0_1",
       candidateId: "albanian-di-know-functional",
       productionSafe: true,
-      liveStatus: "promotion_ready_candidate",
       validationOutcome: "source_validation_eligible",
       evidenceCategories: [
         "free_operator_attested",
@@ -66,6 +65,7 @@ describe("reviewed lexicon candidate diagnostics audit v0.1", () => {
       ],
       userDecisionPosture: "user_decides",
     });
+    expect(diRow.liveStatus).not.toBe("production_live");
     expect(diRow.freeOperatorDiagnostic).toMatchObject({
       operator: "di",
       attestedForms: ["di"],
@@ -75,8 +75,13 @@ describe("reviewed lexicon candidate diagnostics audit v0.1", () => {
     expect(diRow.nonLiveReason).toBeNull();
     expect(diRow.promotionChecklist).toMatchObject({
       checklistVersion: "reviewed-external-lexicon-promotion-checklist.v0_1",
-      promotionReady: true,
+      promotionReady: false,
     });
-    expect(diRow.promotionChecklistFailedItems).toEqual([]);
+    expect(diRow.promotionChecklistFailedItems).toEqual([
+      expect.objectContaining({
+        id: "direct_authoritative_locator_or_archive",
+        passed: false,
+      }),
+    ]);
   });
 });
