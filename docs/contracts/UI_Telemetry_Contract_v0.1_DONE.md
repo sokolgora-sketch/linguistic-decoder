@@ -1,5 +1,22 @@
 # UI Telemetry Contract v0.1 — DONE
 
+
+## Current Live Surface Status (2026-07)
+
+This document remains a historical DONE record for UI Telemetry Contract v0.1. It is not the complete current live-surface contract.
+
+Current Open Instrument truth:
+
+- The live user surface is `/chat`.
+- `/chat` renders `ZroChatPage`, which calls `/api/analyze-v1`.
+- The instrument surface is VM-driven through `src/ui/instrument/contractAdapter.ts`.
+- `InstrumentPanel` is tabbed; the old fixed left/right column wording below is historical milestone language.
+- Raw JSON is debug/collapsed-oriented and must not be treated as the primary user surface.
+- `RootMapCard` renders VM RootMap keys/evidence defensively.
+- Reviewed DA functional operator evidence is now visible through `rootMap.keys[].evidence` and EvidencePackage rootMap export.
+- DI is semantically supported but remains non-live until direct authoritative locator/archive packaging is explicitly closed.
+- Runtime evidence remains functional/operator evidence, not historical-origin, winner, or language-superiority evidence.
+
 This document records the **definition of done that was achieved** for UI Telemetry Contract v0.1.
 It is not a task list.
 
