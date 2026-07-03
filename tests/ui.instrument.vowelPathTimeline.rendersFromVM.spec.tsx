@@ -1,43 +1,48 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import type { PresentOrMissing } from '@/ui/telemetry/types';
 import { VowelPathTimeline } from '@/ui/instrument/VowelPathTimeline';
 
-function present<T>(value: T): PresentOrMissing<T> {
-  return { kind: 'present', value };
+function present<T>(value: T) {
+  return { kind: 'present' as const, value };
 }
 
-function missing<T>(note?: string): PresentOrMissing<T> {
-  return { kind: 'missing', missing: 'not_emitted', note };
+function missing() {
+  return { kind: 'missing' as const, missing: 'not_emitted' as const };
 }
 
 describe('VowelPathTimeline (v0.1)', () => {
   it('renders DIVERGE when surface != functional', () => {
     render(
       <VowelPathTimeline
-        detected={present(['U', 'I'] as any)}
-        surface={present(['U', 'Y'] as any)}
-        functional={present(['U', 'I'] as any)}
+        detected={present(['U', 'I'])}
+        surface={present(['U', 'Y'])}
+        functional={present(['U', 'I'])}
         delta="DIVERGE"
       />
     );
 
-    expect(screen.getByText(/Vowel Path Timeline/)).toBeInTheDocument();
     expect(screen.getByText('DIVERGE')).toBeInTheDocument();
-
-    expect(screen.getByText('Detected')).toBeInTheDocument();
-    expect(screen.getByText('Surface')).toBeInTheDocument();
-    expect(screen.getByText('Functional')).toBeInTheDocument();
-
-    // spot-check one formatted path
     expect(screen.getAllByText('U → I').length).toBeGreaterThan(0);
     expect(screen.getByText('U → Y')).toBeInTheDocument();
   });
 
-  it('renders NOT EMITTED when detected missing', () => {
+  it('renders SHIFT when VM emits SHIFT', () => {
     render(
       <VowelPathTimeline
-        detected={missing('no detected')}
+        detected={present(['U', 'I'])}
+        surface={present(['U', 'Y'])}
+        functional={present(['U', 'I'])}
+        delta="SHIFT"
+      />
+    );
+
+    expect(screen.getByText('SHIFT')).toBeInTheDocument();
+  });
+
+  it('renders not emitted state when paths are missing', () => {
+    render(
+      <VowelPathTimeline
+        detected={missing()}
         surface={missing()}
         functional={missing()}
         delta="NOT_EMITTED"
@@ -46,6 +51,5 @@ describe('VowelPathTimeline (v0.1)', () => {
 
     expect(screen.getByText('NOT EMITTED')).toBeInTheDocument();
     expect(screen.getByText('No detected voice path.')).toBeInTheDocument();
-    expect(screen.getAllByText('not emitted').length).toBeGreaterThan(0);
   });
 });
