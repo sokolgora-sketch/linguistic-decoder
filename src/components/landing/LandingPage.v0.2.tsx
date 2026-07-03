@@ -210,7 +210,7 @@ const LANDING_ZERO_MEANING_TITLE = "What ZË-RO means";
 const LANDING_ZERO_MEANING_BODY =
   "ZË-RO draws from Albanian: ZË means voice, and RO points to living continuity. The name reflects the project's aim: to return attention to voice, follow it toward deeper structural patterns, and examine those patterns through a clear, repeatable, evidence-based instrument.";
 const LANDING_COMING_SOON_NOTE =
-  "Open Instrument and Voice Lab are planned next. They stay closed during the Evals beta so the live surface remains stable and testable.";
+  "Open Instrument is live at /chat. Voice Lab remains a separate preview surface while Evals stays the deterministic scoring entry point.";
 
 const LLM_PAPERS: LlmPaper[] = [
   {

@@ -55,7 +55,7 @@ describe("Evals/Landing copy regression guard v0.1", () => {
     expect(landing).toContain("Instrument Preview");
     expect(landing).toContain("Voice Lab Preview");
     expect(landing).toContain(
-      "Open Instrument and Voice Lab are planned next. They stay closed during the Evals beta so the live surface remains stable and testable."
+      "Open Instrument is live at /chat. Voice Lab remains a separate preview surface while Evals stays the deterministic scoring entry point."
     );
 
     expect(landing).toContain("Research snapshots and live evals");
