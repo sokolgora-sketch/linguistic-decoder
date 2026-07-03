@@ -494,9 +494,21 @@ function buildSpectrumSection(m: PresentOrMissing<Vowel[]>): PresentOrMissing<Sp
           drift,
         });
       }
+        // Preserve original missing reason if present
+        if (m.kind === "missing") {
+          const missingStateValue = m.missing;
+          const missingState =
+            missingStateValue === "none" ||
+            missingStateValue === "not_emitted" ||
+            missingStateValue === "malformed" ||
+            missingStateValue === "unknown"
+              ? missingStateValue
+              : "unknown";
+          const note = typeof m.note === "string" ? m.note : undefined;
+          return missing(missingState, note);
+        }
 
-      // Preserve original missing reason if present
-      return missing((m as any)?.missing ?? "unknown", (m as any)?.note);
+        return missing("unknown");
     }
 
   const sevenPrinciplesSpectrum = (() => {
