@@ -248,28 +248,64 @@ function normalizeVowelPathString(v: unknown): Vowel[] | null {
 
 // ----------------------- voice path selection -----------------------
 
-function pickVoicePaths(payload: any): { detected: string | null; surface: string | null; functional: string | null } {
+function getField(obj: unknown, key: string): unknown {
+  return isRecord(obj) ? obj[key] : undefined;
+}
+
+function pickVoicePaths(payload: unknown): { detected: string | null; surface: string | null; functional: string | null } {
   // detected (primary)
-  const primaryPath = isRecord(payload?.primaryPath) ? payload.primaryPath : null;
+  const primaryPath = isRecord(getField(payload, "primaryPath"))
+    ? (getField(payload, "primaryPath") as Record<string, unknown>)
+    : null;
   const detectedArr = primaryPath ? normalizeVowelPathArray(primaryPath["voicePath"]) : null;
 
   // surface/functional (optional)
   const detected = detectedArr ? detectedArr.join("-") : null;
 
+  const evidence = isRecord(getField(payload, "evidence"))
+    ? (getField(payload, "evidence") as Record<string, unknown>)
+    : null;
+
+  const deepRoot = isRecord(getField(payload, "deepRoot"))
+    ? (getField(payload, "deepRoot") as Record<string, unknown>)
+    : null;
+
+  const functionalRoots = Array.isArray(deepRoot?.["functionalRoots"])
+    ? (deepRoot?.["functionalRoots"] as unknown[])
+    : null;
+
+  const functionalRoot0 = functionalRoots && functionalRoots.length > 0 && isRecord(functionalRoots[0])
+    ? (functionalRoots[0] as Record<string, unknown>)
+    : null;
+
+  const candidates = Array.isArray(getField(payload, "candidates"))
+    ? (getField(payload, "candidates") as unknown[])
+    : null;
+
+  const candidate0 = candidates && candidates.length > 0 && isRecord(candidates[0])
+    ? (candidates[0] as Record<string, unknown>)
+    : null;
+
   const surface =
-    (normalizeVowelPathString(payload?.evidence?.surfaceVowels?.join?.("-"))?.join("-") ?? null) ??
-    (normalizeVowelPathArray(payload?.evidence?.surfaceVowels)?.join("-") ?? null);
+    (() => {
+      const sv = evidence?.["surfaceVowels"];
+      if (Array.isArray(sv)) {
+        const joined = normalizeVowelPathString(sv.map((x) => String(x)).join("-"))?.join("-");
+        return joined ?? normalizeVowelPathArray(sv)?.join("-") ?? null;
+      }
+      return null;
+    })();
 
   const functional =
-  (normalizeVowelPathString(payload?.deepRoot?.functionalRoots?.[0]?.vowelPath)?.join("-") ?? null) ??
-  (normalizeVowelPathArray(payload?.deepRoot?.functionalRoots?.[0]?.vowelPath)?.join("-") ?? null) ??
-  (normalizeVowelPathString(payload?.deepRoot?.functionalRoots?.[0]?.vowel_path)?.join("-") ?? null) ??
-  (normalizeVowelPathArray(payload?.deepRoot?.functionalRoots?.[0]?.vowel_path)?.join("-") ?? null) ??
-  (normalizeVowelPathString(payload?.candidates?.[0]?.vowelPath)?.join("-") ?? null) ??
-  (normalizeVowelPathArray(payload?.candidates?.[0]?.vowelPath)?.join("-") ?? null) ??
-  (normalizeVowelPathString(payload?.candidates?.[0]?.vowel_path)?.join("-") ?? null) ??
-  (normalizeVowelPathArray(payload?.candidates?.[0]?.vowel_path)?.join("-") ?? null) ??
-  null;
+    (normalizeVowelPathString(functionalRoot0?.["vowelPath"])?.join("-") ?? null) ??
+    (normalizeVowelPathArray(functionalRoot0?.["vowelPath"])?.join("-") ?? null) ??
+    (normalizeVowelPathString(functionalRoot0?.["vowel_path"])?.join("-") ?? null) ??
+    (normalizeVowelPathArray(functionalRoot0?.["vowel_path"])?.join("-") ?? null) ??
+    (normalizeVowelPathString(candidate0?.["vowelPath"])?.join("-") ?? null) ??
+    (normalizeVowelPathArray(candidate0?.["vowelPath"])?.join("-") ?? null) ??
+    (normalizeVowelPathString(candidate0?.["vowel_path"])?.join("-") ?? null) ??
+    (normalizeVowelPathArray(candidate0?.["vowel_path"])?.join("-") ?? null) ??
+    null;
 
   return { detected, surface, functional };
 }
@@ -281,7 +317,7 @@ function stableCandidateId(index: number, lang: string | null, form: string | nu
 // ----------------------- adapter -----------------------
 
 export function adaptAnalysisToTelemetryVM(raw: unknown): TelemetryViewModel {
-  const payload = arguments[0] as any;
+  const payload = raw;
 
   const vp = pickVoicePaths(payload);
 
@@ -290,9 +326,10 @@ export function adaptAnalysisToTelemetryVM(raw: unknown): TelemetryViewModel {
   // Accept both string and array-ish shapes; normalize to dash-delimited.
   const heartPrimaryPathForGate: string | null =
     (() => {
+      const heartPrimaryPath = getField(payload, "heartPrimaryPath");
       const s =
-        normalizeVowelPathString((payload as any)?.heartPrimaryPath)?.join("-") ??
-        normalizeVowelPathArray((payload as any)?.heartPrimaryPath)?.join("-") ??
+        normalizeVowelPathString(heartPrimaryPath)?.join("-") ??
+        normalizeVowelPathArray(heartPrimaryPath)?.join("-") ??
         null;
 
       const cleaned = typeof s === "string" && s.trim() ? s.trim() : null;
@@ -342,19 +379,20 @@ export function adaptAnalysisToTelemetryVM(raw: unknown): TelemetryViewModel {
 // - Surface path uses evidence.surfaceVowelsRaw (fallback: heartInstrumentV1.surfaceVowels, then vp.surface)
 // - Functional path uses evidence.surfaceVowels (fallback: evidence.vowelPath, then vp.functional)
 
-const hiRoot =
-  isRecord(payload) && isRecord((payload as any)["heartInstrumentV1"])
-    ? ((payload as any)["heartInstrumentV1"] as any)
-    : null;
+const hiRoot = isRecord(getField(payload, "heartInstrumentV1"))
+  ? (getField(payload, "heartInstrumentV1") as Record<string, unknown>)
+  : null;
 const hiSurfaceArr = hiRoot ? asStringArray(hiRoot["surfaceVowels"]) : null;
 
 // Evidence may exist at root or mirrored in raw.evidence (adapter must not touch later bindings).
-const evRootEvidence =
-  isRecord(payload) && isRecord((payload as any)["evidence"]) ? ((payload as any)["evidence"] as any) : null;
+const evRootEvidence = isRecord(getField(payload, "evidence"))
+  ? (getField(payload, "evidence") as Record<string, unknown>)
+  : null;
 
+const rawPayload = getField(payload, "raw");
 const evRawEvidence =
-  isRecord(payload) && isRecord((payload as any)["raw"]) && isRecord(((payload as any)["raw"] as any)["evidence"])
-    ? (((payload as any)["raw"] as any)["evidence"] as any)
+  isRecord(rawPayload) && isRecord(rawPayload["evidence"])
+    ? (rawPayload["evidence"] as Record<string, unknown>)
     : null;
 
 const evPick = evRootEvidence ?? evRawEvidence ?? null;
