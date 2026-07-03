@@ -8,6 +8,50 @@ Use it when opening the Open Instrument lane, reviewing UI-only changes, or conf
 
 ---
 
+## Current Repo-Native Live Smoke (2026-07)
+
+After a PR cluster or meaningful Open Instrument lane close, run the repo-native live smoke in addition to `npm run gate:quick`:
+
+```bash
+npm run open-instrument:live-smoke
+```
+
+This command is the durable version of the manual DF live-smoke rule. It checks:
+
+- production build;
+- `next start` on a local smoke port;
+- live `/chat`;
+- live `/`;
+- real `/api/analyze-v1` calls with lane-correct proof words;
+- focused regression proof for the Open Instrument evidence lane.
+
+Current proof words:
+
+| word | expected proof |
+|---|---|
+| `da` | reviewed DA functional evidence appears because DA is a live RootMap key |
+| `dam` | reviewed DA functional evidence appears because DA is a live RootMap key |
+| `study` | DI appears as ordinary carrier evidence while reviewed DI runtime projection remains blocked |
+| `damage` | reviewed DA evidence does not appear by broad English semantic expansion |
+| `xyz` | calm empty/null behavior without reviewed DA or DI projection |
+
+Boundary:
+
+- This smoke does not call an external model provider.
+- This smoke does not promote DI.
+- This smoke does not add a broad English semantic expansion layer.
+- This smoke does not make historical-origin, winner, or language-superiority claims.
+- Do not treat `damage` not showing reviewed DA evidence as a bug unless a future semantic expansion or segmentation lane explicitly changes that contract.
+
+For branch-level debugging, the script supports:
+
+```bash
+npm run open-instrument:live-smoke -- --skip-focused-tests
+OPEN_INSTRUMENT_LIVE_SMOKE_PORT=3112 npm run open-instrument:live-smoke
+```
+
+---
+
 ## 1. What This Workflow Checks
 
 This workflow checks that:

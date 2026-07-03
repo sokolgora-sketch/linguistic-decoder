@@ -62,7 +62,8 @@
     "evals:audit-buckets": "node scripts/evals/auditEvidenceBuckets.mjs",
     "open-instrument:validate-run-packet-fixture": "node scripts/openInstrumentRunPacketFixtureValidation.v0.1.mjs",
     "open-instrument:validate-provider-execution-preflight-static-fixture": "node scripts/openInstrumentProviderExecutionPreflightStaticFixtureSchemaValidation.v0.1.mjs",
-    "open-instrument:audit-provider-execution-preflight-mapping-coverage": "node scripts/openInstrumentProviderExecutionPreflightMappingCoverageAudit.v0.1.mjs"
+    "open-instrument:audit-provider-execution-preflight-mapping-coverage": "node scripts/openInstrumentProviderExecutionPreflightMappingCoverageAudit.v0.1.mjs",
+    "open-instrument:live-smoke": "node scripts/open-instrument/live-smoke.v0.1.mjs"
   },
   "dependencies": {
     "@genkit-ai/google-genai": "^1.37.0",

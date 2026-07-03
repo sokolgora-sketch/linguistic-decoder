@@ -176,12 +176,14 @@ Use this when:
 - confirming a minimal mock-safe `study` analysis still renders locally;
 - checking the clean proposer path with provider `mock`;
 - checking the rejected proposer path with provider `mock_reject_ops`;
-- recording local smoke evidence before an Open Instrument PR.
+- recording local smoke evidence before an Open Instrument PR;
+- running the repo-native `npm run open-instrument:live-smoke` command after a PR cluster or meaningful lane close.
 
 This workflow preserves:
 
 - the distinction between preview page and local interactive instrument;
 - the rule that local smoke is not a scientific eval or publication workflow;
+- the lane-correct proof words `da`, `dam`, `study`, `damage`, and `xyz`;
 - the default clean mock path with no live API key required;
 - the rejected mock path with deterministic `OPS_ALLOWED` failure;
 - expected rejected-path labels:
