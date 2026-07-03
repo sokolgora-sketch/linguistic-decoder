@@ -5,7 +5,7 @@ type Props = {
   detected: PresentOrMissing<Vowel[]>;
   surface: PresentOrMissing<Vowel[]>;
   functional: PresentOrMissing<Vowel[]>;
-  delta: 'MATCH' | 'DIVERGE' | 'NOT_EMITTED';
+  delta: 'MATCH' | 'SHIFT' | 'DIVERGE' | 'NOT_EMITTED';
 };
 
 function isPresent<T>(
@@ -39,7 +39,14 @@ function PathRow({ label, maybe }: { label: string; maybe: PresentOrMissing<Vowe
 }
 
 function DeltaBadge({ delta }: { delta: Props['delta'] }) {
-  const text = delta === 'MATCH' ? 'MATCH' : delta === 'DIVERGE' ? 'DIVERGE' : 'NOT EMITTED';
+  const text =
+    delta === 'MATCH'
+      ? 'MATCH'
+      : delta === 'SHIFT'
+        ? 'SHIFT'
+        : delta === 'DIVERGE'
+          ? 'DIVERGE'
+          : 'NOT EMITTED';
 
   return (
     <span className="inline-flex items-center rounded-full border border-neutral-600 px-2 py-0.5 text-xs text-neutral-200">
@@ -54,21 +61,12 @@ export function VowelPathTimeline(props: Props) {
   const functional = props.functional;
 
   const detectedPresent = isPresent(detected) && !!detected.value?.length;
-  const surfacePresent = isPresent(surface) && !!surface.value?.length;
-  const functionalPresent = isPresent(functional) && !!functional.value?.length;
-
-  const deltaComputed: Props['delta'] =
-    !detectedPresent || !surfacePresent || !functionalPresent
-      ? 'NOT_EMITTED'
-      : formatPath(surface.value) === formatPath(functional.value)
-        ? 'MATCH'
-        : 'DIVERGE';
 
   return (
     <div className="rounded-xl border border-neutral-700 bg-neutral-900/40 p-4">
       <div className="mb-3 flex items-center justify-between">
         <div className="text-sm font-semibold text-neutral-100">Vowel Path Timeline (Detected vs Interpreted)</div>
-        <DeltaBadge delta={deltaComputed} />
+        <DeltaBadge delta={props.delta} />
       </div>
 
       {!detectedPresent ? (

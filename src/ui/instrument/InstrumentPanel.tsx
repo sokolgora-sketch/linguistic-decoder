@@ -13,6 +13,7 @@ import { useToast } from '@/hooks/use-toast';
 import { toPrettyJson } from "@/ui/instrument/prettyJson";
 import { buildEvidencePackageFromVM } from "@/ui/telemetry/buildEvidencePackageFromVM";
 import { buildEvidenceSummaryTextFromVM } from "@/ui/telemetry/buildEvidenceSummaryTextFromVM";
+import type { MissingState, PresentOrMissing, ResonanceProfileV1VM, RootMapVM, SoundRootsVM, TelemetryViewModel, Vowel } from "@/ui/telemetry/types";
 import { ReadoutCard } from './sections/ReadoutCard';
 import { MaskCarrierCard } from "@/ui/instrument/sections/MaskCarrierCard.v0.1";
 import { CountsRatiosCard } from './sections/CountsRatiosCard';
@@ -48,7 +49,7 @@ type Props =
     }
   | {
       /** Telemetry VM (already adapted). VM-only boundary for callers like ZroChatPage. */
-      vm: any;
+      vm: TelemetryViewModel;
       payload?: never;
         wordForMask?: string;
         carrierIpa?: string;
@@ -231,6 +232,72 @@ function TabPanel({
   );
 }
 
+function isTelemetryVm(vm: unknown): vm is TelemetryViewModel {
+  return !!vm && typeof vm === "object" && "readout" in vm && !!(vm as { readout?: unknown }).readout;
+}
+
+function missingRootMap(): PresentOrMissing<RootMapVM> {
+  return { kind: "missing", missing: "not_emitted", note: "rootMap" };
+}
+
+function missingSoundRoots(): PresentOrMissing<SoundRootsVM> {
+  return { kind: "missing", missing: "not_emitted", note: "soundRoots" };
+}
+
+function normalizePanelMissingState(
+  missing: MissingState
+): "not_emitted" | "malformed" | "unknown" {
+  return missing === "none" ? "not_emitted" : missing;
+}
+
+function resonancePanelProfile(
+  value: PresentOrMissing<ResonanceProfileV1VM> | undefined
+):
+  | { kind: "present"; value: ResonanceProfileV1VM }
+  | { kind: "missing"; missing: "not_emitted" | "malformed" | "unknown"; note?: string } {
+  if (!value) {
+    return { kind: "missing", missing: "not_emitted", note: "resonanceProfileV1" };
+  }
+  if (value.kind === "present") return value;
+  return {
+    kind: "missing",
+    missing: normalizePanelMissingState(value.missing),
+    note: value.note,
+  };
+}
+
+function soundRootsPanelValue(
+  value: PresentOrMissing<SoundRootsVM> | undefined
+):
+  | { kind: "present"; value: SoundRootsVM }
+  | { kind: "missing"; missing: "not_emitted" | "malformed" | "unknown"; note?: string } {
+  if (!value) {
+    return { kind: "missing", missing: "not_emitted", note: "soundRoots" };
+  }
+  if (value.kind === "present") return value;
+  return {
+    kind: "missing",
+    missing: normalizePanelMissingState(value.missing),
+    note: value.note,
+  };
+}
+
+function rootMapPanelValue(
+  value: PresentOrMissing<RootMapVM> | undefined
+):
+  | { kind: "present"; value: RootMapVM }
+  | { kind: "missing"; missing: "not_emitted" | "malformed" | "unknown"; note?: string } {
+  if (!value) {
+    return { kind: "missing", missing: "not_emitted", note: "rootMap" };
+  }
+  if (value.kind === "present") return value;
+  return {
+    kind: "missing",
+    missing: normalizePanelMissingState(value.missing),
+    note: value.note,
+  };
+}
+
 export function InstrumentPanel(props: Props) {
   const { toast } = useToast();
   const [activeSection, setActiveSection] = React.useState<InstrumentSectionKey>("overview");
@@ -244,8 +311,7 @@ export function InstrumentPanel(props: Props) {
     return adaptAnalysisToTelemetryVM(inputPayload);
   }, [inputVm, inputPayload]);
 
-  const isValidVm =
-    !!vm && typeof vm === "object" && (vm as any).readout && typeof (vm as any).readout === "object";
+  const isValidVm = isTelemetryVm(vm);
 
   const lightMap = React.useMemo(() => {
     try {
@@ -280,7 +346,25 @@ export function InstrumentPanel(props: Props) {
     return buildEvidenceSummaryTextFromVM(vm, { ledgerModel, candidateRows });
   }, [candidateRows, isValidVm, ledgerModel, vm]);
 
-  const engineVersion = isValidVm && vm.readout.engineVersion.kind === 'present' ? vm.readout.engineVersion.value : null;
+  const resonanceProfileForPanel = React.useMemo(
+    () => resonancePanelProfile(isValidVm ? vm.resonanceProfileV1 : undefined),
+    [isValidVm, vm]
+  );
+
+  const soundRootsForPanel = React.useMemo(
+    () => soundRootsPanelValue(isValidVm ? vm.soundRoots : undefined),
+    [isValidVm, vm]
+  );
+
+  const rootMapForPanel = React.useMemo(
+    () => rootMapPanelValue(isValidVm ? vm.rootMap : undefined),
+    [isValidVm, vm]
+  );
+
+  const engineVersion =
+    isValidVm && vm.readout.engineVersion.kind === "present"
+      ? vm.readout.engineVersion.value
+      : undefined;
 
     const normalizedWord =
   isValidVm && vm.readout.normalizedWord && vm.readout.normalizedWord.kind === "present"
@@ -321,9 +405,14 @@ export function InstrumentPanel(props: Props) {
 
   const statusText = String(vm.readout?.status ?? "detected");
   const modeText = pomValue(vm.readout?.mode);
-  const pathText = voicePathValue(vm.readout?.voicePath);
-  const candidateCountText = String(vm.readout?.counts?.candidates ?? 0);
-  const normalizedText = normalizedWord || pomValue(vm.readout?.normalizedWord);
+  const readout = isValidVm ? vm.readout : null;
+  const pathText = voicePathValue(readout?.voicePath);
+  const candidateCountText = String(readout?.counts?.candidates ?? 0);
+  const normalizedText = normalizedWord || pomValue(readout?.normalizedWord);
+  const surfaceVoicePath: PresentOrMissing<Vowel[]> =
+    readout?.voicePathSurface ?? { kind: "missing", missing: "not_emitted", note: "voicePathSurface" };
+  const functionalVoicePath: PresentOrMissing<Vowel[]> =
+    readout?.voicePathFunctional ?? { kind: "missing", missing: "not_emitted", note: "voicePathFunctional" };
   const activeSectionMeta =
     INSTRUMENT_SECTIONS.find((section) => section.id === activeSection) ?? INSTRUMENT_SECTIONS[0];
 
@@ -446,12 +535,12 @@ export function InstrumentPanel(props: Props) {
                   rootMap={vm.rootMap}
                 />
                 <EvidencePackageCard
-                  engineVersion={engineVersion}
+                  engineVersion={engineVersion ?? null}
                   onCopyEvidenceSummary={() => {
                     void copyText("Evidence summary copied.", evidenceSummaryText);
                   }}
                   onCopyEvidencePackage={() => {
-                    const pkg = buildEvidencePackageFromVM(vm as any, { ledgerModel });
+                    const pkg = buildEvidencePackageFromVM(vm, { ledgerModel });
                     void copyText("Evidence package copied.", toPrettyJson(pkg));
                   }}
                 />
@@ -475,8 +564,8 @@ export function InstrumentPanel(props: Props) {
               <div className="space-y-4 xl:col-span-5">
                 <VowelPathTimeline
                   detected={vm.readout.voicePath}
-                  surface={vm.readout.voicePathSurface}
-                  functional={vm.readout.voicePathFunctional}
+                  surface={surfaceVoicePath}
+                  functional={functionalVoicePath}
                   delta={vm.readout.voicePathDelta}
                 />
                 {(() => {
@@ -486,18 +575,18 @@ export function InstrumentPanel(props: Props) {
                     null;
                   return spectrum ? <SevenPrinciplesSpectrumCard spectrum={spectrum} /> : null;
                 })()}
-                <ResonancePanelV01 resonanceProfileV1={vm.resonanceProfileV1} />
+                <ResonancePanelV01 resonanceProfileV1={resonanceProfileForPanel} />
               </div>
               <div className="space-y-4 xl:col-span-7">
                 <WorldLanguageTreeCard lightMap={lightMap} />
                 <SoundRootsCard
-                  soundRoots={vm.soundRoots ?? ({ kind: "missing", missing: "not_emitted", note: "soundRoots" } as any)}
-                  word={String((vm.readout as any)?.word ?? (vm.readout as any)?.inputWord ?? "")}
+                  soundRoots={soundRootsForPanel}
+                  word={String(vm.readout.word ?? "")}
                   normalizedWord={normalizedWord}
                 />
                 <RootMapCard
-                  rootMap={vm.rootMap ?? ({ kind: "missing", missing: "not_emitted", note: "rootMap" } as any)}
-                  word={String((vm.readout as any)?.word ?? (vm.readout as any)?.inputWord ?? "")}
+                  rootMap={rootMapForPanel}
+                  word={String(vm.readout.word ?? "")}
                   normalizedWord={normalizedWord}
                 />
               </div>
@@ -509,7 +598,7 @@ export function InstrumentPanel(props: Props) {
               <div className="space-y-4 xl:col-span-5">
                 <MaskCarrierCard word={String(props.wordForMask ?? vm.readout?.word ?? "").trim()} ipa={props.carrierIpa} />
                 <OracleProposeWithEngineOracleCardV01
-                  word={String((vm as any)?.readout?.word ?? "").trim()}
+                  word={String(vm.readout.word ?? "").trim()}
                   mode={vm.readout.mode && vm.readout.mode.kind === "present" && vm.readout.mode.value === "open" ? "open" : "strict"}
                   onCopy={copyText}
                 />
@@ -517,12 +606,12 @@ export function InstrumentPanel(props: Props) {
               <div className="space-y-4 xl:col-span-7">
                 <OriginClaimGatesCard gates={vm.originClaimGates} />
                 <OriginClaimCard
-                  originClaim={vm.originClaim?.kind === "present" ? (vm.originClaim as any).value : null}
+                  originClaim={vm.originClaim?.kind === "present" ? vm.originClaim.value : null}
                 />
                 <RawJsonCard
                   pretty={rawPretty}
                   onCopyFullJson={handleCopyFullJson}
-                  engineVersion={engineVersion}
+                  engineVersion={engineVersion ?? null}
                 />
               </div>
             </div>
