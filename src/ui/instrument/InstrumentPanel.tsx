@@ -569,10 +569,7 @@ export function InstrumentPanel(props: Props) {
                   delta={vm.readout.voicePathDelta}
                 />
                 {(() => {
-                  const spectrum =
-                    (vm as any)?.sevenPrinciplesSpectrum ??
-                    (vm as any)?.readout?.sevenPrinciplesSpectrum ??
-                    null;
+                  const spectrum = vm.readout.sevenPrinciplesSpectrum ?? null;
                   return spectrum ? <SevenPrinciplesSpectrumCard spectrum={spectrum} /> : null;
                 })()}
                 <ResonancePanelV01 resonanceProfileV1={resonanceProfileForPanel} />
