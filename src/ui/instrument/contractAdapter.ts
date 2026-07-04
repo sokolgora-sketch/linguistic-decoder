@@ -274,37 +274,36 @@ function getField(obj: unknown, key: string): unknown {
 
 function pickVoicePaths(payload: unknown): { detected: string | null; surface: string | null; functional: string | null } {
   // detected (primary)
-  const primaryPath = isRecord(getField(payload, "primaryPath"))
-    ? (getField(payload, "primaryPath") as Record<string, unknown>)
-    : null;
+  const primaryPathValue = getField(payload, "primaryPath");
+  const primaryPath = isRecord(primaryPathValue) ? primaryPathValue : null;
   const detectedArr = primaryPath ? normalizeVowelPathArray(primaryPath["voicePath"]) : null;
 
   // surface/functional (optional)
   const detected = detectedArr ? detectedArr.join("-") : null;
 
-  const evidence = isRecord(getField(payload, "evidence"))
-    ? (getField(payload, "evidence") as Record<string, unknown>)
-    : null;
+  const evidenceValue = getField(payload, "evidence");
+  const evidence = isRecord(evidenceValue) ? evidenceValue : null;
 
-  const deepRoot = isRecord(getField(payload, "deepRoot"))
-    ? (getField(payload, "deepRoot") as Record<string, unknown>)
-    : null;
+  const deepRootValue = getField(payload, "deepRoot");
+  const deepRoot = isRecord(deepRootValue) ? deepRootValue : null;
 
-  const functionalRoots = Array.isArray(deepRoot?.["functionalRoots"])
-    ? (deepRoot?.["functionalRoots"] as unknown[])
-    : null;
+  const functionalRoots =
+    deepRoot && Array.isArray(deepRoot["functionalRoots"])
+      ? deepRoot["functionalRoots"]
+      : null;
 
-  const functionalRoot0 = functionalRoots && functionalRoots.length > 0 && isRecord(functionalRoots[0])
-    ? (functionalRoots[0] as Record<string, unknown>)
-    : null;
+  const functionalRoot0 =
+    functionalRoots && functionalRoots.length > 0 && isRecord(functionalRoots[0])
+      ? functionalRoots[0]
+      : null;
 
-  const candidates = Array.isArray(getField(payload, "candidates"))
-    ? (getField(payload, "candidates") as unknown[])
-    : null;
+  const candidatesValue = getField(payload, "candidates");
+  const candidates = Array.isArray(candidatesValue) ? candidatesValue : null;
 
-  const candidate0 = candidates && candidates.length > 0 && isRecord(candidates[0])
-    ? (candidates[0] as Record<string, unknown>)
-    : null;
+  const candidate0 =
+    candidates && candidates.length > 0 && isRecord(candidates[0])
+      ? candidates[0]
+      : null;
 
   const surface =
     (() => {
