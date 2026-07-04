@@ -133,14 +133,15 @@ function pickFromRootMetaContract(root: Record<string, unknown> | null, key: str
   );
 }
 
-function pickMetaCreated(root: any): string | null {
-  const meta = root && typeof root === "object" ? (root as any).meta : null;
-  const contract = root && typeof root === "object" ? (root as any).contract : null;
+function pickMetaCreated(root: Record<string, unknown> | null): string | null {
+  const meta = root && isRecord(root["meta"]) ? root["meta"] : null;
+  const contract = root && isRecord(root["contract"]) ? root["contract"] : null;
+  const contractMeta = contract && isRecord(contract["meta"]) ? contract["meta"] : null;
   return (
-    asString(contract?.meta?.created) ??
-    asString(contract?.meta?.createdAt) ??
-    asString(meta?.created) ??
-    asString(meta?.createdAt) ??
+    asString(contractMeta ? contractMeta["created"] : null) ??
+    asString(contractMeta ? contractMeta["createdAt"] : null) ??
+    asString(meta ? meta["created"] : null) ??
+    asString(meta ? meta["createdAt"] : null) ??
     null
   );
 }
