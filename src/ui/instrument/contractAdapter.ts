@@ -795,16 +795,18 @@ const evidenceId = String(id).toLowerCase().replace(/[^a-z0-9_]/g, "_");
     })();
 
   const reasonCounts: Record<string, number> = {};
-  if (oc && Array.isArray(oc.candidates)) {
-    for (const c of (oc.candidates as any[])) {
-        if (isRecord(c) && Array.isArray(c.reasonCodes)) {
-            for (const code of (c.reasonCodes as any[])) {
-                const codeStr = String(code);
-                reasonCounts[codeStr] = (reasonCounts[codeStr] ?? 0) + 1;
-            }
+    const ocCandidates = oc && Array.isArray(oc["candidates"]) ? oc["candidates"] : null;
+    if (ocCandidates) {
+      for (const c of ocCandidates) {
+        if (!isRecord(c)) continue;
+        const reasonCodes = c["reasonCodes"];
+        if (!Array.isArray(reasonCodes)) continue;
+        for (const code of reasonCodes) {
+          const codeStr = String(code);
+          reasonCounts[codeStr] = (reasonCounts[codeStr] ?? 0) + 1;
         }
+      }
     }
-  }
 
   const gatesActive = (oc && isRecord(oc.policy) && oc.policy.gatesActive === true) || (oc && oc.policy === "gates-v1.1");
 
