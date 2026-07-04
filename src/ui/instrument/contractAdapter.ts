@@ -825,9 +825,95 @@ const evidenceId = String(id).toLowerCase().replace(/[^a-z0-9_]/g, "_");
     if (!("surface" in v)) return missing("malformed", "resonanceProfileV1.surface missing");
     if (!("normalized" in v)) return missing("malformed", "resonanceProfileV1.normalized missing");
 
-    return present(v as ResonanceProfileV1VM);
-  })();
+    const parseResonanceReadout = (
+      input: unknown,
+      label: "surface" | "normalized"
+    ):
+      | { ok: true; value: ResonanceProfileV1VM["surface"] }
+      | { ok: false; reason: string } => {
+      if (!isRecord(input)) return { ok: false, reason: `resonanceProfileV1.${label} expected object` };
 
+      const vowels = asStringArray(input["vowels"]);
+      if (!vowels) return { ok: false, reason: `resonanceProfileV1.${label}.vowels expected string[]` };
+
+      const bucketCountsValue = input["bucketCounts"];
+      if (!isRecord(bucketCountsValue)) {
+        return { ok: false, reason: `resonanceProfileV1.${label}.bucketCounts expected object` };
+      }
+
+      const source = typeof bucketCountsValue["source"] === "number" ? bucketCountsValue["source"] : null;
+      const boundary = typeof bucketCountsValue["boundary"] === "number" ? bucketCountsValue["boundary"] : null;
+      const manifest = typeof bucketCountsValue["manifest"] === "number" ? bucketCountsValue["manifest"] : null;
+      if (source == null || boundary == null || manifest == null) {
+        return {
+          ok: false,
+          reason: `resonanceProfileV1.${label}.bucketCounts expected numeric source/boundary/manifest`,
+        };
+      }
+
+      const dominantBucket = asString(input["dominantBucket"]);
+      if (
+        dominantBucket !== "source" &&
+        dominantBucket !== "boundary" &&
+        dominantBucket !== "manifest" &&
+        dominantBucket !== "mixed" &&
+        dominantBucket !== "none"
+      ) {
+        return { ok: false, reason: `resonanceProfileV1.${label}.dominantBucket expected ResonanceBucket` };
+      }
+
+      const signature = asString(input["signature"]);
+      if (!signature) return { ok: false, reason: `resonanceProfileV1.${label}.signature expected string` };
+
+      const polaritySymbol = asString(input["polaritySymbol"]);
+      if (!polaritySymbol) {
+        return { ok: false, reason: `resonanceProfileV1.${label}.polaritySymbol expected string` };
+      }
+
+      const colorBand = asStringArray(input["colorBand"]);
+      if (!colorBand) return { ok: false, reason: `resonanceProfileV1.${label}.colorBand expected string[]` };
+
+      const dominantColor = asString(input["dominantColor"]);
+      if (!dominantColor) {
+        return { ok: false, reason: `resonanceProfileV1.${label}.dominantColor expected string` };
+      }
+
+      const transitions = asStringArray(input["transitions"]);
+      if (!transitions) {
+        return { ok: false, reason: `resonanceProfileV1.${label}.transitions expected string[]` };
+      }
+
+      const notes = asStringArray(input["notes"]);
+      if (!notes) return { ok: false, reason: `resonanceProfileV1.${label}.notes expected string[]` };
+
+      return {
+        ok: true,
+        value: {
+          vowels,
+          bucketCounts: { source, boundary, manifest },
+          dominantBucket,
+          signature,
+          polaritySymbol,
+          colorBand,
+          dominantColor,
+          transitions,
+          notes,
+        },
+      };
+    };
+
+    const surfaceParsed = parseResonanceReadout(v["surface"], "surface");
+    if (!surfaceParsed.ok) return missing("malformed", surfaceParsed.reason);
+
+    const normalizedParsed = parseResonanceReadout(v["normalized"], "normalized");
+    if (!normalizedParsed.ok) return missing("malformed", normalizedParsed.reason);
+
+    return present({
+      version,
+      surface: surfaceParsed.value,
+      normalized: normalizedParsed.value,
+    });
+  })();
 
   // ----------------------- phonetic IPA v0.1 -----------------------
     const phoneticIpaV0_1: PresentOrMissing<PhoneticIpaV0_1VM> = (() => {
