@@ -834,14 +834,15 @@ const evidenceId = String(id).toLowerCase().replace(/[^a-z0-9_]/g, "_");
     if (!isRecord(payload)) return missing("not_emitted", "phoneticIpaV0_1");
     if (!("phoneticIpaV0_1" in payload)) return missing("not_emitted", "phoneticIpaV0_1");
 
-    const v = (payload as any).phoneticIpaV0_1;
+    const v = payload["phoneticIpaV0_1"];
     if (v == null) return missing("not_emitted", "phoneticIpaV0_1");
     if (!isRecord(v)) return missing("malformed", "phoneticIpaV0_1 expected object");
 
-    const ipa = asString((v as any).ipa);
-    const voices = asVowelArray2((v as any).voices);
-    const unmappedRaw = (v as any)?.diagnostics?.unmapped;
-    const unmapped = Array.isArray(unmappedRaw) ? unmappedRaw.map((x: any) => String(x)) : [];
+    const ipa = asString(v["ipa"]);
+    const voices = asVowelArray2(v["voices"]);
+    const diagnostics = isRecord(v["diagnostics"]) ? v["diagnostics"] : null;
+    const unmappedRaw = diagnostics ? diagnostics["unmapped"] : null;
+    const unmapped = Array.isArray(unmappedRaw) ? unmappedRaw.map((x) => String(x)) : [];
 
     if (!ipa) return missing("malformed", "phoneticIpaV0_1.ipa expected string");
     if (!voices) return missing("malformed", "phoneticIpaV0_1.voices expected Vowel[]");
