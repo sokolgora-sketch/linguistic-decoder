@@ -617,21 +617,16 @@ function buildSpectrumSection(m: PresentOrMissing<Vowel[]>): PresentOrMissing<Sp
           : missing("not_emitted", "Expected strictInput; derive requires mode");
 
 // Evidence ledger sources (root -> raw.evidence -> heart.evidence)
-  const rootEvidence = isRecord(root["evidence"]) ? (root["evidence"] as Record<string, unknown>) : null;
+    const rootEvidence = isRecord(root["evidence"]) ? root["evidence"] : null;
 
-  const rawEvidence =
-    isRecord((root as any)["raw"]) && isRecord(((root as any)["raw"] as any)["evidence"])
-      ? ((((root as any)["raw"] as any)["evidence"] as any) as Record<string, unknown>)
-      : null;
+    const rawRecord = isRecord(root["raw"]) ? root["raw"] : null;
+    const rawEvidence = rawRecord && isRecord(rawRecord["evidence"]) ? rawRecord["evidence"] : null;
 
-  const heartEvidence =
-    heart && isRecord((heart as any)["evidence"])
-      ? (((heart as any)["evidence"] as any) as Record<string, unknown>)
-      : null;
+    const heartEvidence = heart && isRecord(heart["evidence"]) ? heart["evidence"] : null;
 
-  const evidence = rootEvidence ?? rawEvidence ?? heartEvidence ?? null;
+    const evidence = rootEvidence ?? rawEvidence ?? heartEvidence ?? null;
 
-  const normalizationSteps =
+const normalizationSteps =
     asArray(evidence?.["normalizationSteps"]) ??
     asArray(heartEvidence?.["normalizationSteps"]) ??
     null;
