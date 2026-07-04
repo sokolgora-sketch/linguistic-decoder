@@ -167,10 +167,10 @@ function formatNormalizationStep(x: unknown): string {
   if (typeof x === "string") return x;
   if (!x || typeof x !== "object") return String(x);
 
-  const o = x as any;
-  const from = typeof o.from === "string" ? o.from : "";
-  const to = typeof o.to === "string" ? o.to : "";
-  const reason = typeof o.reason === "string" ? o.reason : "";
+  const o = x as Record<string, unknown>;
+  const from = typeof o["from"] === "string" ? o["from"] : "";
+  const to = typeof o["to"] === "string" ? o["to"] : "";
+  const reason = typeof o["reason"] === "string" ? o["reason"] : "";
 
   // { from:"UY", to:"UI", reason:"functional_equivalence" }
   // -> "UY → UI (functional_equivalence)"
