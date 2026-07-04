@@ -656,17 +656,19 @@ const normalizationSteps =
     // Prefer this for DeepRoot–Heart gate comparisons; fall back per-candidate otherwise.
     const deepRootFunctionalPathStr: string | null =
   (() => {
-    const fr0 = (payload as any)?.deepRoot?.functionalRoots?.[0] ?? null;
+    const deepRoot = isRecord(root["deepRoot"]) ? root["deepRoot"] : null;
+    const functionalRoots = deepRoot && Array.isArray(deepRoot["functionalRoots"]) ? deepRoot["functionalRoots"] : null;
+    const fr0 = functionalRoots && functionalRoots.length > 0 && isRecord(functionalRoots[0]) ? functionalRoots[0] : null;
 
     const arr =
-      normalizeVowelPathArray(fr0?.vowelPath) ??
-      normalizeVowelPathString(fr0?.vowelPath) ??
-      normalizeVowelPathArray(fr0?.vowel_path) ??
-      normalizeVowelPathString(fr0?.vowel_path) ??
-      normalizeVowelPathArray(fr0?.voicePath) ??
-      normalizeVowelPathString(fr0?.voicePath) ??
-      normalizeVowelPathArray(fr0?.voice_path) ??
-      normalizeVowelPathString(fr0?.voice_path) ??
+      normalizeVowelPathArray(fr0 ? fr0["vowelPath"] : null) ??
+      normalizeVowelPathString(fr0 ? fr0["vowelPath"] : null) ??
+      normalizeVowelPathArray(fr0 ? fr0["vowel_path"] : null) ??
+      normalizeVowelPathString(fr0 ? fr0["vowel_path"] : null) ??
+      normalizeVowelPathArray(fr0 ? fr0["voicePath"] : null) ??
+      normalizeVowelPathString(fr0 ? fr0["voicePath"] : null) ??
+      normalizeVowelPathArray(fr0 ? fr0["voice_path"] : null) ??
+      normalizeVowelPathString(fr0 ? fr0["voice_path"] : null) ??
       null;
 
     const s = arr ? arr.join("-") : null;
