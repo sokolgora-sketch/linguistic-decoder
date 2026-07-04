@@ -567,13 +567,13 @@ function buildSpectrumSection(m: PresentOrMissing<Vowel[]>): PresentOrMissing<Sp
 
   const word = asString(root["word"]) ?? "(missing word)";
   const sanitized = asString(root["sanitized"]);
-  const engineVersion = pickFromRootMetaContract(root as any, "engineVersion");
+  const engineVersion = pickFromRootMetaContract(root, "engineVersion");
   const mode =
-      normalizeMode(pickFromRootMetaContract(root as any, "mode") ?? root["mode"]) ??
+      normalizeMode(pickFromRootMetaContract(root, "mode") ?? root["mode"]) ??
       (heart ? normalizeMode(heart["mode"]) : null);
   const alphabet =
-    pickFromRootMetaContract(root as any, "alphabet") ??
-    (heart ? asString((heart as any)["alphabet"]) : null);
+    pickFromRootMetaContract(root, "alphabet") ??
+    (heart ? asString(heart["alphabet"]) : null);
 
   const meta = isRecord(root["meta"]) ? root["meta"] : null;
   const createdAt = meta ? asString(meta["created"]) : null;
