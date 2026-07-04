@@ -631,21 +631,24 @@ const normalizationSteps =
     asArray(heartEvidence?.["normalizationSteps"]) ??
     null;
 
+  const rootOps = asArray(root["ops"]);
   const ops =
     asArray(evidence?.["ops"]) ??
-    asArray((root as any)["ops"]) ??
+    rootOps ??
     asArray(heartEvidence?.["ops"]) ??
     null;
 
+  const rootNotes = asArray(root["notes"]);
   const notes =
     asArray(evidence?.["notes"]) ??
-    asArray((root as any)["notes"]) ??
+    rootNotes ??
     asArray(heartEvidence?.["notes"]) ??
     null;
 
+  const rootSignals = asArray(root["signals"]);
   const signals =
     asArray(evidence?.["signals"]) ??
-    asArray((root as any)["signals"]) ??
+    rootSignals ??
     asArray(heartEvidence?.["signals"]) ??
     null;
 
