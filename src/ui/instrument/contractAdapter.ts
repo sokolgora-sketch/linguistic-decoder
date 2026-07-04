@@ -580,10 +580,8 @@ function buildSpectrumSection(m: PresentOrMissing<Vowel[]>): PresentOrMissing<Sp
 
   const heartPrinciplePath = heart ? (asStringArray(heart["principlePath"]) ?? null) : null;
 
-  const heartMath7Primary =
-    heart && isRecord((heart as any)["math7"]) && isRecord(((heart as any)["math7"] as any)["primary"])
-      ? (((heart as any)["math7"] as any)["primary"] as Record<string, unknown>)
-      : null;
+  const heartMath7 = heart && isRecord(heart["math7"]) ? heart["math7"] : null;
+  const heartMath7Primary = heartMath7 && isRecord(heartMath7["primary"]) ? heartMath7["primary"] : null;
 
   const math7PrinciplesPath = heartMath7Primary ? asStringArray(heartMath7Primary["principlesPath"]) : null;
   const principlesPathRaw = heartPrinciplePath ?? math7PrinciplesPath;
