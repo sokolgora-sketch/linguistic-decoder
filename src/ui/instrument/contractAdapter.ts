@@ -122,13 +122,13 @@ function asString(v: unknown): string | null {
 }
 
 // Pick helpers (Instrument contract adapter)
-function pickFromRootMetaContract(root: any, key: string): string | null {
-  const meta = root && typeof root === "object" ? (root as any).meta : null;
-  const contract = root && typeof root === "object" ? (root as any).contract : null;
+function pickFromRootMetaContract(root: Record<string, unknown> | null, key: string): string | null {
+  const meta = root && isRecord(root["meta"]) ? root["meta"] : null;
+  const contract = root && isRecord(root["contract"]) ? root["contract"] : null;
   return (
-    asString(root?.[key]) ??
-    asString(contract?.[key]) ??
-    asString(meta?.[key]) ??
+    asString(root ? root[key] : null) ??
+    asString(contract ? contract[key] : null) ??
+    asString(meta ? meta[key] : null) ??
     null
   );
 }
