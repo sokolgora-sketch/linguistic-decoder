@@ -593,9 +593,9 @@ function buildSpectrumSection(m: PresentOrMissing<Vowel[]>): PresentOrMissing<Sp
     (heartMath7Primary ? normalizeVowelPathArray(heartMath7Primary["vowels"]) : null);
 
   const strictInputEmittedRaw =
-      (heart ? (heart as any)["strictInput"] : null) ??
-      (root as any)["strictInput"] ??
-      pickFromRootMetaContract(root as any, "strictInput") ??
+      (heart ? heart["strictInput"] : null) ??
+      root["strictInput"] ??
+      pickFromRootMetaContract(root, "strictInput") ??
       null;
 
     const strictInputEmittedBool: boolean | null =
