@@ -939,7 +939,7 @@ function pomStringListFromEvidenceField(
   if (!parent) return missing("not_emitted", `evidence.${field}`);
   if (!(field in parent)) return missing("not_emitted", `evidence.${field}`);
 
-  const v = (parent as any)[field];
+  const v = parent[field];
   if (v == null) return missing("not_emitted", `evidence.${field}`);
   if (!Array.isArray(v)) return missing("malformed", `evidence.${field} expected array`);
 
