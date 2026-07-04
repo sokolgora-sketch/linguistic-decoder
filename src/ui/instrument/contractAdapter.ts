@@ -852,10 +852,13 @@ const evidenceId = String(id).toLowerCase().replace(/[^a-z0-9_]/g, "_");
 
     return present({ ipa, voices, unmapped });
   })();
+const originClaimGatesActiveRecord =
+    isRecord(raw) && isRecord(raw["originClaimGates"]) ? raw["originClaimGates"] : null;
+
 const originClaimGates: OriginClaimGatesVM = {
     active: (() => {
       // VM-only: NEVER override with dev flags / URL params.
-      const a = (raw as any)?.originClaimGates?.active;
+      const a = originClaimGatesActiveRecord ? originClaimGatesActiveRecord["active"] : null;
       if (typeof a === "boolean") return a;
 
       // Fallback: derive from OriginClaim policy gates indicator.
