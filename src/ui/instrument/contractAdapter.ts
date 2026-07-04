@@ -814,12 +814,12 @@ const evidenceId = String(id).toLowerCase().replace(/[^a-z0-9_]/g, "_");
     if (!isRecord(payload)) return missing("not_emitted", "resonanceProfileV1");
     if (!("resonanceProfileV1" in payload)) return missing("not_emitted", "resonanceProfileV1");
 
-    const v = (payload as any).resonanceProfileV1;
+    const v = payload["resonanceProfileV1"];
     if (v == null) return missing("not_emitted", "resonanceProfileV1");
 
     if (!isRecord(v)) return missing("malformed", "resonanceProfileV1 expected object");
 
-    const version = asString((v as any).version);
+    const version = asString(v["version"]);
     if (!version) return missing("malformed", "resonanceProfileV1.version expected string");
 
     if (!("surface" in v)) return missing("malformed", "resonanceProfileV1.surface missing");
