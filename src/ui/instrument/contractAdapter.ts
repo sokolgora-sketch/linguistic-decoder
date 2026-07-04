@@ -34,9 +34,9 @@ type ParseRootMapResult = { ok: true; value: RootMapV1 } | { ok: false; reason: 
 function parseRootMapV1(v: unknown): ParseRootMapResult {
   if (!isRecord(v)) return { ok: false, reason: "rootMap expected object" };
 
-  const tokens = (v as any).tokens;
-  const keys = (v as any).keys;
-  const composedMeaning = (v as any).composedMeaning;
+  const tokens = v["tokens"];
+  const keys = v["keys"];
+  const composedMeaning = v["composedMeaning"];
 
   if (!Array.isArray(tokens)) return { ok: false, reason: "rootMap.tokens expected array" };
   if (!Array.isArray(keys)) return { ok: false, reason: "rootMap.keys expected array" };
@@ -45,47 +45,66 @@ function parseRootMapV1(v: unknown): ParseRootMapResult {
   // tokens: [{ token: string, role?: string, vowel_path?: string }]
   for (const t of tokens) {
     if (!isRecord(t)) return { ok: false, reason: "rootMap.tokens item expected object" };
-    if (typeof (t as any).token !== "string") return { ok: false, reason: "rootMap.tokens[].token expected string" };
-    if ("role" in t && (t as any).role != null && typeof (t as any).role !== "string")
+
+    const token = t["token"];
+    const role = t["role"];
+    const vowelPath = t["vowel_path"];
+
+    if (typeof token !== "string") return { ok: false, reason: "rootMap.tokens[].token expected string" };
+    if (role != null && typeof role !== "string")
       return { ok: false, reason: "rootMap.tokens[].role expected string" };
-    if ("vowel_path" in t && (t as any).vowel_path != null && typeof (t as any).vowel_path !== "string")
+    if (vowelPath != null && typeof vowelPath !== "string")
       return { ok: false, reason: "rootMap.tokens[].vowel_path expected string" };
   }
 
   // keys: [{ token, language, gloss, evidence[], status, ops?[] }]
   for (const k of keys) {
     if (!isRecord(k)) return { ok: false, reason: "rootMap.keys item expected object" };
-    if (typeof (k as any).token !== "string") return { ok: false, reason: "rootMap.keys[].token expected string" };
-    if (typeof (k as any).language !== "string") return { ok: false, reason: "rootMap.keys[].language expected string" };
-    if (typeof (k as any).gloss !== "string") return { ok: false, reason: "rootMap.keys[].gloss expected string" };
-    if (!Array.isArray((k as any).evidence) || !(k as any).evidence.every((x: any) => typeof x === "string"))
+
+    const token = k["token"];
+    const language = k["language"];
+    const gloss = k["gloss"];
+    const evidence = k["evidence"];
+    const status = k["status"];
+    const ops = k["ops"];
+
+    if (typeof token !== "string") return { ok: false, reason: "rootMap.keys[].token expected string" };
+    if (typeof language !== "string") return { ok: false, reason: "rootMap.keys[].language expected string" };
+    if (typeof gloss !== "string") return { ok: false, reason: "rootMap.keys[].gloss expected string" };
+    if (!Array.isArray(evidence) || !evidence.every((x) => typeof x === "string"))
       return { ok: false, reason: "rootMap.keys[].evidence expected string[]" };
-    if (typeof (k as any).status !== "string") return { ok: false, reason: "rootMap.keys[].status expected string" };
-    if ("ops" in k && (k as any).ops != null) {
-      if (!Array.isArray((k as any).ops) || !(k as any).ops.every((x: any) => typeof x === "string"))
+    if (typeof status !== "string") return { ok: false, reason: "rootMap.keys[].status expected string" };
+    if (ops != null) {
+      if (!Array.isArray(ops) || !ops.every((x) => typeof x === "string"))
         return { ok: false, reason: "rootMap.keys[].ops expected string[]" };
     }
   }
 
   // carriers?: [{ token, language, carrierForm, note? }]
-  const carriers = (v as any).carriers;
+  const carriers = v["carriers"];
   if (carriers != null) {
     if (!Array.isArray(carriers)) return { ok: false, reason: "rootMap.carriers expected array" };
     for (const c of carriers) {
       if (!isRecord(c)) return { ok: false, reason: "rootMap.carriers item expected object" };
-      if (typeof (c as any).token !== "string") return { ok: false, reason: "rootMap.carriers[].token expected string" };
-      if (typeof (c as any).language !== "string") return { ok: false, reason: "rootMap.carriers[].language expected string" };
-      if (typeof (c as any).carrierForm !== "string")
+
+      const token = c["token"];
+      const language = c["language"];
+      const carrierForm = c["carrierForm"];
+      const note = c["note"];
+
+      if (typeof token !== "string") return { ok: false, reason: "rootMap.carriers[].token expected string" };
+      if (typeof language !== "string") return { ok: false, reason: "rootMap.carriers[].language expected string" };
+      if (typeof carrierForm !== "string")
         return { ok: false, reason: "rootMap.carriers[].carrierForm expected string" };
-      if ("note" in c && (c as any).note != null && typeof (c as any).note !== "string")
+      if (note != null && typeof note !== "string")
         return { ok: false, reason: "rootMap.carriers[].note expected string" };
     }
   }
 
   // notes?: string[]
-  const notes = (v as any).notes;
+  const notes = v["notes"];
   if (notes != null) {
-    if (!Array.isArray(notes) || !notes.every((x: any) => typeof x === "string"))
+    if (!Array.isArray(notes) || !notes.every((x) => typeof x === "string"))
       return { ok: false, reason: "rootMap.notes expected string[]" };
   }
 
@@ -765,13 +784,13 @@ const evidenceId = String(id).toLowerCase().replace(/[^a-z0-9_]/g, "_");
       if (!isRecord(payload)) return missing("not_emitted", "rootMap");
       if (!("rootMap" in payload)) return missing("not_emitted", "rootMap");
 
-      const v = (payload as any).rootMap;
+      const v = payload["rootMap"];
       if (v == null) return missing("not_emitted", "rootMap");
 
       const parsed = parseRootMapV1(v);
       if (!parsed.ok) return missing("malformed", parsed.reason);
 
-      return present(parsed.value as any);
+      return present(parsed.value);
     })();
 
   const reasonCounts: Record<string, number> = {};
