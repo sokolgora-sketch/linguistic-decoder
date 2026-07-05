@@ -82,7 +82,7 @@ export function EvidenceTraceCard({
         <TraceRow label="functional path" value={`functional=${vowelPathText(readout.voicePathFunctional)}`} />
         <TraceRow label="path delta" value={`delta=${readout.voicePathDelta}`} />
         <TraceRow label="candidate rows" value={`rows=${rows.length}`} />
-        <TraceRow label="candidate source kinds" value={`sources=${sourceKindSummary(rows)}`} />
+        <TraceRow label="candidate provenance kinds" value={`provenance=${sourceKindSummary(rows)}`} />
         <TraceRow label="candidate paths emitted" value={`paths=${rows.length ? emittedCandidatePathSummary(rows) : "not emitted"}`} />
         <TraceRow label="RootMap hypothesis" value={`rootMap=${rootMapStatus(rootMap)}`} />
       </div>

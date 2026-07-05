@@ -97,7 +97,7 @@ describe("ui guardrail: InstrumentPanel is a scientific instrument (v0.1)", () =
     expect(screen.getByText("Shows deterministic engine output for one word.")).toBeInTheDocument();
     expect(screen.getByText("Prove a historical origin.")).toBeInTheDocument();
     expect(screen.getAllByText("Evidence trace").length).toBeGreaterThan(0);
-    expect(screen.getAllByText("candidate source kinds").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("candidate provenance kinds").length).toBeGreaterThan(0);
     expect(screen.getAllByText("RootMap hypothesis").length).toBeGreaterThan(0);
     expect(screen.getByTestId("open-instrument-shell")).toBeInTheDocument();
     expect(screen.getByText("ZË-RO Open Instrument")).toBeInTheDocument();
