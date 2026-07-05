@@ -941,7 +941,7 @@ const evidenceId = String(id).toLowerCase().replace(/[^a-z0-9_]/g, "_");
           })
         ),
 // leave decomposition for later (shape varies too much right now)
-        decomposition: missing("not_emitted") as PresentOrMissing<DecompositionItemVM[]>,
+        decomposition: missing<DecompositionItemVM[]>("not_emitted"),
 
         ops: candOps ? presentStringArray(candOps) : missing("not_emitted"),
         notes: candNotes ? presentStringArray(candNotes) : missing("not_emitted"),
