@@ -70,7 +70,7 @@ export function EvidenceTraceCard({
         <div className="text-[10px] font-semibold uppercase text-[#8ea4ba]">overview field trace</div>
         <div className="mt-1 text-base font-semibold text-[#f5f7fb]">Evidence trace</div>
         <div className="mt-2 max-w-2xl text-[12px] leading-5 text-[#aeb7c5]">
-          Compact map of emitted VM fields behind this readout.
+          Compact inspection map of emitted VM fields behind this readout.
         </div>
       </div>
 
@@ -81,9 +81,9 @@ export function EvidenceTraceCard({
         <TraceRow label="surface path" value={`surface=${vowelPathText(readout.voicePathSurface)}`} />
         <TraceRow label="functional path" value={`functional=${vowelPathText(readout.voicePathFunctional)}`} />
         <TraceRow label="path delta" value={`delta=${readout.voicePathDelta}`} />
-        <TraceRow label="candidate rows" value={`rows=${rows.length}`} />
+        <TraceRow label="candidate rows emitted" value={`rows=${rows.length}`} />
         <TraceRow label="candidate provenance kinds" value={`provenance=${sourceKindSummary(rows)}`} />
-        <TraceRow label="candidate paths emitted" value={`paths=${rows.length ? emittedCandidatePathSummary(rows) : "not emitted"}`} />
+        <TraceRow label="candidate vowel paths emitted" value={`paths=${rows.length ? emittedCandidatePathSummary(rows) : "not emitted"}`} />
         <TraceRow label="RootMap hypothesis" value={`rootMap=${rootMapStatus(rootMap)}`} />
       </div>
 
