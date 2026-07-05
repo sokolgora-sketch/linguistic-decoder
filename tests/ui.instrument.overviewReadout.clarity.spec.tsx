@@ -81,7 +81,7 @@ describe("Open Instrument Overview readout clarity", () => {
 
     expect(screen.getByText(/overview field trace/i)).toBeInTheDocument();
     expect(screen.getByText("Evidence trace")).toBeInTheDocument();
-    expect(screen.getByText(/Compact map of emitted VM fields/i)).toBeInTheDocument();
+    expect(screen.getByText(/Compact inspection map of emitted VM fields/i)).toBeInTheDocument();
     expect(screen.getByText("Ledger sources")).toBeInTheDocument();
     expect(screen.getByText("vm.readout: present")).toBeInTheDocument();
     expect(screen.getByText(/Boundary: VM field trace only/i)).toBeInTheDocument();
