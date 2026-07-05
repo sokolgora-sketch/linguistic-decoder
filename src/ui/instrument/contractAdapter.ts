@@ -614,21 +614,17 @@ export function adaptAnalysisToTelemetryVM(raw: unknown): TelemetryViewModel {
 // - Surface path uses evidence.surfaceVowelsRaw (fallback: heartInstrumentV1.surfaceVowels, then vp.surface)
 // - Functional path uses evidence.surfaceVowels (fallback: evidence.vowelPath, then vp.functional)
 
-const hiRoot = isRecord(getField(payload, "heartInstrumentV1"))
-  ? (getField(payload, "heartInstrumentV1") as Record<string, unknown>)
-  : null;
+const hiRootValue = getField(payload, "heartInstrumentV1");
+const hiRoot = isRecord(hiRootValue) ? hiRootValue : null;
 const hiSurfaceArr = hiRoot ? asStringArray(hiRoot["surfaceVowels"]) : null;
 
 // Evidence may exist at root or mirrored in raw.evidence (adapter must not touch later bindings).
-const evRootEvidence = isRecord(getField(payload, "evidence"))
-  ? (getField(payload, "evidence") as Record<string, unknown>)
-  : null;
+const evRootEvidenceValue = getField(payload, "evidence");
+const evRootEvidence = isRecord(evRootEvidenceValue) ? evRootEvidenceValue : null;
 
 const rawPayload = getField(payload, "raw");
-const evRawEvidence =
-  isRecord(rawPayload) && isRecord(rawPayload["evidence"])
-    ? (rawPayload["evidence"] as Record<string, unknown>)
-    : null;
+const rawEvidenceValue = isRecord(rawPayload) ? rawPayload["evidence"] : null;
+const evRawEvidence = isRecord(rawEvidenceValue) ? rawEvidenceValue : null;
 
 const evPick = evRootEvidence ?? evRawEvidence ?? null;
 
