@@ -42,6 +42,52 @@ function parseRootMapV1(v: unknown): ParseRootMapResult {
   if (!Array.isArray(keys)) return { ok: false, reason: "rootMap.keys expected array" };
   if (typeof composedMeaning !== "string") return { ok: false, reason: "rootMap.composedMeaning expected string" };
 
+  type RootMapTokenRole = Exclude<NonNullable<RootMapV1["tokens"]>[number]["role"], undefined>;
+  type RootMapKeyStatus = NonNullable<RootMapV1["keys"]>[number]["status"];
+  type RootMapSpanSource = NonNullable<RootMapV1["spans"]>[number]["source"];
+
+  const normalizeRootTokenRole = (value: unknown): RootMapTokenRole | null => {
+    switch (String(value ?? "")) {
+      case "action":
+      case "Action":
+        return "action";
+      case "instrument":
+      case "Instrument":
+      case "Function":
+        return "instrument";
+      default:
+        return null;
+    }
+  };
+
+  const normalizeRootKeyStatus = (value: unknown): RootMapKeyStatus | null => {
+    if (typeof value !== "string") return null;
+
+    switch (value) {
+      case "supported":
+        return "supported";
+      case "dialect_attested_pending_review":
+        return "dialect_attested_pending_review";
+      case "carrier_only":
+        return "carrier_only";
+      default:
+        return null;
+    }
+  };
+
+  const normalizeRootSpanSource = (value: unknown): RootMapSpanSource | null => {
+    if (typeof value !== "string") return null;
+
+    switch (value) {
+      case "surface":
+        return "surface";
+      case "normalized":
+        return "normalized";
+      default:
+        return null;
+    }
+  };
+
   // tokens: [{ token: string, role?: string, vowel_path?: string }]
   for (const t of tokens) {
     if (!isRecord(t)) return { ok: false, reason: "rootMap.tokens item expected object" };
@@ -50,9 +96,11 @@ function parseRootMapV1(v: unknown): ParseRootMapResult {
     const role = t["role"];
     const vowelPath = t["vowel_path"];
 
+    const normalizedRole = role == null ? null : normalizeRootTokenRole(role);
+
     if (typeof token !== "string") return { ok: false, reason: "rootMap.tokens[].token expected string" };
-    if (role != null && typeof role !== "string")
-      return { ok: false, reason: "rootMap.tokens[].role expected string" };
+    if (role != null && normalizedRole == null)
+      return { ok: false, reason: "rootMap.tokens[].role expected RootTokenRoleV1" };
     if (vowelPath != null && typeof vowelPath !== "string")
       return { ok: false, reason: "rootMap.tokens[].vowel_path expected string" };
   }
@@ -67,13 +115,15 @@ function parseRootMapV1(v: unknown): ParseRootMapResult {
     const evidence = k["evidence"];
     const status = k["status"];
     const ops = k["ops"];
+    const normalizedStatus = normalizeRootKeyStatus(status);
 
     if (typeof token !== "string") return { ok: false, reason: "rootMap.keys[].token expected string" };
     if (typeof language !== "string") return { ok: false, reason: "rootMap.keys[].language expected string" };
     if (typeof gloss !== "string") return { ok: false, reason: "rootMap.keys[].gloss expected string" };
     if (!Array.isArray(evidence) || !evidence.every((x) => typeof x === "string"))
       return { ok: false, reason: "rootMap.keys[].evidence expected string[]" };
-    if (typeof status !== "string") return { ok: false, reason: "rootMap.keys[].status expected string" };
+    if (normalizedStatus == null)
+      return { ok: false, reason: "rootMap.keys[].status expected RootKeyStatusV1" };
     if (ops != null) {
       if (!Array.isArray(ops) || !ops.every((x) => typeof x === "string"))
         return { ok: false, reason: "rootMap.keys[].ops expected string[]" };
@@ -101,6 +151,32 @@ function parseRootMapV1(v: unknown): ParseRootMapResult {
     }
   }
 
+  // spans?: [{ token, start, end, source, note? }]
+  const spans = v["spans"];
+  if (spans != null) {
+    if (!Array.isArray(spans)) return { ok: false, reason: "rootMap.spans expected array" };
+    for (const s of spans) {
+      if (!isRecord(s)) return { ok: false, reason: "rootMap.spans item expected object" };
+
+      const token = s["token"];
+      const start = s["start"];
+      const end = s["end"];
+      const source = s["source"];
+      const note = s["note"];
+      const normalizedSource = normalizeRootSpanSource(source);
+
+      if (typeof token !== "string") return { ok: false, reason: "rootMap.spans[].token expected string" };
+      if (typeof start !== "number")
+        return { ok: false, reason: "rootMap.spans[].start expected number" };
+      if (typeof end !== "number")
+        return { ok: false, reason: "rootMap.spans[].end expected number" };
+      if (normalizedSource == null)
+        return { ok: false, reason: "rootMap.spans[].source expected RootSpanSourceV1" };
+      if (note != null && typeof note !== "string")
+        return { ok: false, reason: "rootMap.spans[].note expected string" };
+    }
+  }
+
   // notes?: string[]
   const notes = v["notes"];
   if (notes != null) {
@@ -108,7 +184,130 @@ function parseRootMapV1(v: unknown): ParseRootMapResult {
       return { ok: false, reason: "rootMap.notes expected string[]" };
   }
 
-  return { ok: true, value: v as RootMapV1 };
+  type RootMapToken = NonNullable<RootMapV1["tokens"]>[number];
+  type RootMapKey = NonNullable<RootMapV1["keys"]>[number];
+  type RootMapCarrier = NonNullable<RootMapV1["carriers"]>[number];
+  type RootMapSpan = NonNullable<RootMapV1["spans"]>[number];
+
+  const typedTokens: RootMapToken[] = tokens.map((t): RootMapToken => {
+    if (!isRecord(t)) throw new Error("rootMap.tokens item expected object");
+
+    const token = t["token"];
+    const role = t["role"];
+    const vowelPath = t["vowel_path"];
+    const normalizedRole = role == null ? null : normalizeRootTokenRole(role);
+
+    if (typeof token !== "string") throw new Error("rootMap.tokens[].token expected string");
+    if (role != null && normalizedRole == null) throw new Error("rootMap.tokens[].role expected RootTokenRoleV1");
+    if (vowelPath != null && typeof vowelPath !== "string") throw new Error("rootMap.tokens[].vowel_path expected string");
+
+    return {
+      token,
+      ...(normalizedRole != null ? { role: normalizedRole } : {}),
+      ...(vowelPath != null ? { vowel_path: vowelPath } : {}),
+    };
+  });
+
+  const typedKeys: RootMapKey[] = keys.map((k): RootMapKey => {
+    if (!isRecord(k)) throw new Error("rootMap.keys item expected object");
+
+    const token = k["token"];
+    const language = k["language"];
+    const gloss = k["gloss"];
+    const evidence = k["evidence"];
+    const status = k["status"];
+    const ops = k["ops"];
+    const normalizedStatus = normalizeRootKeyStatus(status);
+
+    if (typeof token !== "string") throw new Error("rootMap.keys[].token expected string");
+    if (typeof language !== "string") throw new Error("rootMap.keys[].language expected string");
+    if (typeof gloss !== "string") throw new Error("rootMap.keys[].gloss expected string");
+    if (!Array.isArray(evidence) || !evidence.every((x) => typeof x === "string"))
+      throw new Error("rootMap.keys[].evidence expected string[]");
+    if (normalizedStatus == null) throw new Error("rootMap.keys[].status expected RootKeyStatusV1");
+    if (ops != null && (!Array.isArray(ops) || !ops.every((x) => typeof x === "string")))
+      throw new Error("rootMap.keys[].ops expected string[]");
+
+    return {
+      token,
+      language,
+      gloss,
+      evidence,
+      status: normalizedStatus,
+      ...(ops != null ? { ops } : {}),
+    };
+  });
+
+  const typedCarriers: RootMapV1["carriers"] =
+    carriers == null
+      ? undefined
+      : carriers.map((c): RootMapCarrier => {
+          if (!isRecord(c)) throw new Error("rootMap.carriers item expected object");
+
+          const token = c["token"];
+          const language = c["language"];
+          const carrierForm = c["carrierForm"];
+          const note = c["note"];
+
+          if (typeof token !== "string") throw new Error("rootMap.carriers[].token expected string");
+          if (typeof language !== "string") throw new Error("rootMap.carriers[].language expected string");
+          if (typeof carrierForm !== "string") throw new Error("rootMap.carriers[].carrierForm expected string");
+          if (note != null && typeof note !== "string") throw new Error("rootMap.carriers[].note expected string");
+
+          return {
+            token,
+            language,
+            carrierForm,
+            ...(note != null ? { note } : {}),
+          };
+        });
+
+  const typedSpans: RootMapV1["spans"] =
+    spans == null
+      ? undefined
+      : spans.map((s): RootMapSpan => {
+          if (!isRecord(s)) throw new Error("rootMap.spans item expected object");
+
+          const token = s["token"];
+          const start = s["start"];
+          const end = s["end"];
+          const source = s["source"];
+          const note = s["note"];
+          const normalizedSource = normalizeRootSpanSource(source);
+
+          if (typeof token !== "string") throw new Error("rootMap.spans[].token expected string");
+          if (typeof start !== "number")
+            throw new Error("rootMap.spans[].start expected number");
+          if (typeof end !== "number")
+            throw new Error("rootMap.spans[].end expected number");
+          if (normalizedSource == null)
+            throw new Error("rootMap.spans[].source expected RootSpanSourceV1");
+          if (note != null && typeof note !== "string")
+            throw new Error("rootMap.spans[].note expected string");
+
+          return {
+            token,
+            start,
+            end,
+            source: normalizedSource,
+            ...(note != null ? { note } : {}),
+          };
+        });
+
+  const typedNotes: RootMapV1["notes"] =
+    notes == null ? undefined : notes.map((x) => String(x));
+
+  return {
+    ok: true,
+    value: {
+      tokens: typedTokens,
+      keys: typedKeys,
+      composedMeaning,
+      ...(typedCarriers ? { carriers: typedCarriers } : {}),
+      ...(typedSpans ? { spans: typedSpans } : {}),
+      ...(typedNotes ? { notes: typedNotes } : {}),
+    },
+  };
 }
 
 // ----------------------- small helpers -----------------------
