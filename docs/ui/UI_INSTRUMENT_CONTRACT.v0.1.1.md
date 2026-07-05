@@ -1,6 +1,18 @@
 # UI Telemetry Contract v0.1.1
 ## Adapter Lock + Missing-State Discipline
 
+## Current Live Surface Status (2026-07)
+
+This document is a historical milestone record.
+It is not the complete current live-surface contract.
+
+Current Open Instrument truth:
+
+- The live user surface is `/chat`.
+- `InstrumentPanel` is tabbed with top-level sections: `Overview`, `Evidence`, `Candidates`, `Roots / Meaning`, and `Advanced`.
+- Raw JSON is audit/debug detail in `Advanced`, not the primary user surface.
+- Any legacy left/right column wording below is historical milestone language.
+
 This milestone does NOT add new features.
 It hardens correctness of the existing UI Telemetry Instrument.
 
@@ -103,7 +115,7 @@ Rules:
 - Shows only emitted telemetry
 - Never computed client-side
 
-### RAW JSON
+### RAW JSON (historical slot)
 - Inspection only
 - Never required for understanding
 

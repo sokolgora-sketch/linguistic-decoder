@@ -1,5 +1,19 @@
 # UI Telemetry Contract v0.1 — DONE Criteria (Final)
 
+## Current Live Surface Status (2026-07)
+
+This document remains a historical DONE record for UI Telemetry Contract v0.1.
+It is not the complete current live-surface contract.
+
+Current Open Instrument truth:
+
+- The live user surface is `/chat`.
+- `/chat` renders `ZroChatPage`, which calls `/api/analyze-v1`.
+- The instrument surface is VM-driven through `src/ui/instrument/contractAdapter.ts`.
+- `InstrumentPanel` is tabbed with top-level sections: `Overview`, `Evidence`, `Candidates`, `Roots / Meaning`, and `Advanced`.
+- Raw JSON is audit/debug detail inside the `Advanced` section and must not be treated as the primary user surface.
+- Any fixed left/right column wording below is historical milestone language.
+
 ## Purpose
 The UI Telemetry Contract v0.1 defines the **scientific-instrument boundary** between engine output and UI rendering.  
 When this milestone is marked DONE, the UI is guaranteed to be:
@@ -13,6 +27,9 @@ This document defines the **non-negotiable conditions** under which v0.1 is cons
 ---
 
 ## DONE Criteria
+
+The criteria below record the milestone boundary that was completed.
+They should not be misread as the full current top-level navigation model of the live tabbed surface.
 
 ### 1) VM-Only Rendering (Hard Invariant)
 **Condition**
@@ -106,6 +123,9 @@ These tests fail immediately if raw payload access is detected.
 ---
 
 ## Milestone Status
+
+This milestone remains complete.
+The live-surface notes above reconcile the historical DONE record with the current tabbed instrument shell.
 ✅ **UI Telemetry Contract v0.1 is COMPLETE**
 
 All scientific-instrument invariants are enforced by tests.  
