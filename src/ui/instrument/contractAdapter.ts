@@ -433,8 +433,25 @@ function normalizeMode(v: unknown): "strict" | "open" | null {
 
 function normalizeVowelChar(s: string): Vowel | null {
   const t = s.trim().toUpperCase();
-  if (t === "A" || t === "E" || t === "I" || t === "O" || t === "U" || t === "Y" || t === "Ë") return t as Vowel;
-  return null;
+
+  switch (t) {
+    case "A":
+      return "A";
+    case "E":
+      return "E";
+    case "I":
+      return "I";
+    case "O":
+      return "O";
+    case "U":
+      return "U";
+    case "Y":
+      return "Y";
+    case "Ë":
+      return "Ë";
+    default:
+      return null;
+  }
 }
 
 function normalizeVowelPathArray(v: unknown): Vowel[] | null {
