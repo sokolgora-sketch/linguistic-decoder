@@ -41,7 +41,7 @@ describe("Evals/Landing copy regression guard v0.1", () => {
 
     expect(landing).toContain("ZË-RO Public Beta");
     expect(landing).toContain(
-      "Deterministic evals now live. Open Instrument and Voice Lab are intentionally closed for now."
+      "Deterministic evals now live. Open Instrument is live at /chat. Voice Lab remains preview-only while Evals stays the deterministic scoring entry point."
     );
     expect(landing).toContain(
       "ZË-RO is a deterministic eval instrument for testing whether model outputs preserve a seven-voice vowel-aperture ladder."
@@ -55,7 +55,7 @@ describe("Evals/Landing copy regression guard v0.1", () => {
     expect(landing).toContain("Instrument Preview");
     expect(landing).toContain("Voice Lab Preview");
     expect(landing).toContain(
-      "Open Instrument is live at /chat. Voice Lab remains a separate preview surface while Evals stays the deterministic scoring entry point."
+      "Open Instrument is live at /chat. Instrument Preview is static, Voice Lab remains preview-only, and Evals stays the deterministic scoring entry point."
     );
 
     expect(landing).toContain("Research snapshots and live evals");

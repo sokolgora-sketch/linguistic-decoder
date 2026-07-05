@@ -201,7 +201,7 @@ const SHOW_LLM_RESULTS_ON_LANDING = false;
 
 const LANDING_BETA_STRIP_TITLE = "ZË-RO Public Beta";
 const LANDING_BETA_STRIP_BODY =
-  "Deterministic evals now live. Open Instrument and Voice Lab are intentionally closed for now.";
+  "Deterministic evals now live. Open Instrument is live at /chat. Voice Lab remains preview-only while Evals stays the deterministic scoring entry point.";
 const LANDING_HERO_SENTENCE =
   "ZË-RO is a deterministic eval instrument for testing whether model outputs preserve a seven-voice vowel-aperture ladder.";
 const LANDING_HERO_SUPPORT =
@@ -210,7 +210,7 @@ const LANDING_ZERO_MEANING_TITLE = "What ZË-RO means";
 const LANDING_ZERO_MEANING_BODY =
   "ZË-RO draws from Albanian: ZË means voice, and RO points to living continuity. The name reflects the project's aim: to return attention to voice, follow it toward deeper structural patterns, and examine those patterns through a clear, repeatable, evidence-based instrument.";
 const LANDING_COMING_SOON_NOTE =
-  "Open Instrument is live at /chat. Voice Lab remains a separate preview surface while Evals stays the deterministic scoring entry point.";
+  "Open Instrument is live at /chat. Instrument Preview is static, Voice Lab remains preview-only, and Evals stays the deterministic scoring entry point.";
 
 const LLM_PAPERS: LlmPaper[] = [
   {
@@ -881,6 +881,7 @@ function HeroSection({ mounted }: { mounted: boolean }) {
               <div className="flex flex-col items-start gap-2.5">
                 <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
                   <LandingButton href="/evals" label="Open Evals Beta" />
+                  <LandingButton href="/chat" label="Open Instrument Live" />
                   <LandingButton
                     href="https://github.com/sokolgora-sketch/linguistic-decoder/issues/new"
                     label="Report Feedback"
@@ -891,7 +892,7 @@ function HeroSection({ mounted }: { mounted: boolean }) {
                 <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
                   <LandingButton
                     href="/instrument-preview"
-                    label="Instrument Preview"
+                    label="Instrument Preview (static)"
                   />
                   <LandingButton
                     href="/voice-lab-preview"
