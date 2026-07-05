@@ -366,11 +366,17 @@ function formatNormalizationStep(x: unknown): string {
   // Contract: never throw; always return a string.
   if (typeof x === "string") return x;
   if (!x || typeof x !== "object") return String(x);
+  if (!isRecord(x)) {
+    try {
+      return JSON.stringify(x);
+    } catch {
+      return String(x);
+    }
+  }
 
-  const o = x as Record<string, unknown>;
-  const from = typeof o["from"] === "string" ? o["from"] : "";
-  const to = typeof o["to"] === "string" ? o["to"] : "";
-  const reason = typeof o["reason"] === "string" ? o["reason"] : "";
+  const from = typeof x["from"] === "string" ? x["from"] : "";
+  const to = typeof x["to"] === "string" ? x["to"] : "";
+  const reason = typeof x["reason"] === "string" ? x["reason"] : "";
 
   // { from:"UY", to:"UI", reason:"functional_equivalence" }
   // -> "UY → UI (functional_equivalence)"
@@ -380,9 +386,9 @@ function formatNormalizationStep(x: unknown): string {
   }
 
   try {
-    return JSON.stringify(o);
+    return JSON.stringify(x);
   } catch {
-    return String(o);
+    return String(x);
   }
 }
 
@@ -987,7 +993,7 @@ const evidenceId = String(id).toLowerCase().replace(/[^a-z0-9_]/g, "_");
 
   const p = isRecord(payload) ? payload : null;
   const oc = p && isRecord(p.originClaim) ? p.originClaim : null;
-    const originClaim: PresentOrMissing<unknown> = oc ? present(oc as unknown) : missing('not_emitted', 'originClaim');
+    const originClaim: PresentOrMissing<unknown> = oc ? present<unknown>(oc) : missing<unknown>("not_emitted", "originClaim");
 
     // ----------------------- rootMap v0.1 -----------------------
     const rootMap: PresentOrMissing<RootMapVM> = (() => {
