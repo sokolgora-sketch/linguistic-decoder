@@ -68,7 +68,7 @@ export function CandidatesAccordion({ rows }: { rows: UICandidateRow[] }) {
       <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h2 className="text-base font-semibold text-slate-100">Candidates</h2>
-          <div className="mt-1 text-xs text-slate-500">VM candidate rows for inspection.</div>
+          <div className="mt-1 text-xs text-slate-500">Inspection rows only. Provenance shows how a row entered the engine; alignment shows DeepRoot–Heart status.</div>
         </div>
         <CandidateChip tone="blue">{rows.length} emitted</CandidateChip>
       </div>
@@ -92,7 +92,7 @@ export function CandidatesAccordion({ rows }: { rows: UICandidateRow[] }) {
                         <CandidateChip
                           title="Provenance: how this candidate entered the engine. SEED = entered by the researcher; not a discovered or proven result."
                         >
-                          {c.sourceKind}
+                          {`Provenance: ${c.sourceKind}`}
                         </CandidateChip>
                       ) : null}
                       {c.status ? <CandidateChip tone="amber">{c.status}</CandidateChip> : null}
@@ -122,8 +122,11 @@ export function CandidatesAccordion({ rows }: { rows: UICandidateRow[] }) {
                     )}
 
                     {c.deepRootHeartGateStatus ? (
-                      <CandidateChip tone={gateTone(c.deepRootHeartGateStatus)}>
-                        {`Gate: ${c.deepRootHeartGateStatus}`}
+                      <CandidateChip
+                        tone={gateTone(c.deepRootHeartGateStatus)}
+                        title="DeepRoot–Heart alignment status for this candidate row."
+                      >
+                        {`Alignment: ${c.deepRootHeartGateStatus}`}
                       </CandidateChip>
                     ) : null}
                   </div>
@@ -131,7 +134,7 @@ export function CandidatesAccordion({ rows }: { rows: UICandidateRow[] }) {
 
                 {Array.isArray(c.deepRootHeartGateEvidenceRefs) && c.deepRootHeartGateEvidenceRefs.length ? (
                   <div className="mt-2 break-all font-mono text-xs text-slate-500">
-                    Evidence: {c.deepRootHeartGateEvidenceRefs.join(", ")}
+                    Gate evidence: {c.deepRootHeartGateEvidenceRefs.join(", ")}
                   </div>
                 ) : null}
               </button>
@@ -151,7 +154,7 @@ export function CandidatesAccordion({ rows }: { rows: UICandidateRow[] }) {
                     {c.deepRootHeartGateStatus === "misaligned" ? (
                       <div className="mt-3 rounded-md border border-red-400/30 bg-red-500/10 p-3 text-xs text-red-100">
                         <div>
-                          Gate: <span className="font-mono">misaligned</span>
+                          Alignment: <span className="font-mono">misaligned</span>
                         </div>
                         {Array.isArray(c.deepRootHeartGateReasons) && c.deepRootHeartGateReasons.length ? (
                             <div className="mt-1 break-all font-mono">

@@ -43,10 +43,10 @@ describe("CandidatesAccordion: DeepRoot–Heart gate renders from VM (no raw inf
     const rows = buildCandidateRowsFromVM(vm);
     render(<CandidatesAccordion rows={rows} />);
 
-    expect(screen.getAllByText(/Gate:/i).length).toBeGreaterThan(0);
-    expect(screen.getByText(/Gate:\s*aligned/i)).toBeInTheDocument();
-    expect(screen.getByText(/Gate:\s*misaligned/i)).toBeInTheDocument();
-    expect(screen.getByText("SEED")).toBeInTheDocument();
+    expect(screen.getAllByText(/Alignment:/i).length).toBeGreaterThan(0);
+    expect(screen.getByText(/Alignment:\s*aligned/i)).toBeInTheDocument();
+    expect(screen.getByText(/Alignment:\s*misaligned/i)).toBeInTheDocument();
+    expect(screen.getByText("Provenance: SEED")).toBeInTheDocument();
     expect(screen.getByText(/TERMINAL_VOWEL_CONFLICT/i)).toBeInTheDocument();
   });
 });
