@@ -74,15 +74,18 @@ const brainCandidatesCount = brainCandidates.length;
 return (
     <section className="rounded-xl border border-slate-700/80 bg-[#10151c] p-4 shadow-[0_16px_48px_rgba(0,0,0,0.28)]">
       <div className="text-sm font-semibold text-slate-100">Origin Claim</div>
+      <div className="mt-2 text-xs leading-5 text-slate-400">
+        Observational claim summary for inspection only. No historical proof, no forced answer, and the final decision stays with the user.
+      </div>
 
-      <div className="mt-2 text-xs leading-5 space-y-1 text-slate-300">
+      <div className="mt-3 text-xs leading-5 space-y-1 text-slate-300">
         <div>
-          <span className="font-medium text-slate-400">Policy:</span>{" "}
+          <span className="font-medium text-slate-400">Decision posture:</span>{" "}
           <span>{policySummary(policy)}</span>
         </div>
 
         <div>
-          <span className="font-medium text-slate-400">Gates active:</span>{" "}
+          <span className="font-medium text-slate-400">Gate diagnostics active:</span>{" "}
           <span>{toFlatText(gatesActive)}</span>
         </div>
 
@@ -131,6 +134,10 @@ return (
             </div>
           ) : null}
 
+      </div>
+
+      <div className="mt-3 text-[11px] leading-5 text-[#7d8ea3]">
+        Boundary: observational summary only; no historical proof; no forced answer; user decides.
       </div>
     </section>
   );
