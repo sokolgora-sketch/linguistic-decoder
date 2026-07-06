@@ -41,7 +41,7 @@ Boundary:
 - This smoke does not promote DI.
 - This smoke does not add a broad English semantic expansion layer.
 - This smoke does not make historical-origin, winner, or language-superiority claims.
-- Do not treat `damage` not showing reviewed DA evidence as a bug unless a future semantic expansion or segmentation lane explicitly changes that contract.
+- Treat `damage` showing reviewed DA evidence as the current expected contract after bounded DA minRoots emission.
 
 For branch-level debugging, the script supports:
 

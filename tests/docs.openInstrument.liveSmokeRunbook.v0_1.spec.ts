@@ -17,7 +17,7 @@ describe("Open Instrument live smoke runbook v0.1", () => {
     expect(script).toContain('"study"');
     expect(script).toContain('"damage"');
     expect(script).toContain('"xyz"');
-    expect(script).toContain("Expected damage to avoid broad English semantic DA evidence.");
+    expect(script).toContain("Expected damage to expose reviewed DA evidence after bounded DA minRoots emission.");
     expect(script).toContain("Expected study to keep reviewed DI runtime projection absent.");
   });
 
@@ -35,7 +35,7 @@ describe("Open Instrument live smoke runbook v0.1", () => {
     expect(workflow).toContain("`study`");
     expect(workflow).toContain("`damage`");
     expect(workflow).toContain("`xyz`");
-    expect(workflow).toContain("Do not treat `damage` not showing reviewed DA evidence as a bug");
+    expect(workflow).toContain("Treat `damage` showing reviewed DA evidence as the current expected contract after bounded DA minRoots emission.");
 
     expect(index).toContain("running the repo-native `npm run open-instrument:live-smoke` command");
     expect(index).toContain("the lane-correct proof words `da`, `dam`, `study`, `damage`, and `xyz`");
