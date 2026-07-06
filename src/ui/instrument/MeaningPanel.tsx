@@ -136,7 +136,7 @@ export default function MeaningPanel({ vm }: Props) {
           <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#8ea4ba]">reading surface</div>
           <div className="mt-1 text-lg font-semibold text-[#f5f7fb]">Meaning</div>
           <p className="mt-2 max-w-2xl text-[12px] leading-5 text-[#aeb7c5]">
-            Human-readable VM summary for the current word. It frames the readout as deterministic inspection, not origin proof.
+            Human-readable deterministic reading for the current word. It frames the readout as inspection output, not origin proof.
           </p>
         </div>
         <div className="shrink-0 rounded-full border border-[#303a45] bg-[#0d1117] px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.12em] text-[#cfe6ff]">
@@ -145,13 +145,13 @@ export default function MeaningPanel({ vm }: Props) {
       </div>
 
       <div className="mt-4 rounded-[10px] border border-[#355a7a] bg-[#111a24] p-4">
-        <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#8ea4ba]">Summary</div>
+        <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#8ea4ba]">Deterministic reading</div>
         <div className="mt-2 text-sm leading-6 text-[#f5f7fb]">{sentence}</div>
         {sub ? <div className="mt-3 whitespace-pre-wrap font-mono text-xs leading-5 text-[#9fb1bf]">{sub}</div> : null}
       </div>
 
       <div className="mt-3 rounded-[10px] border border-[#27313d] bg-[#0d1117] p-4">
-        <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#8ea4ba]">Evidence posture</div>
+        <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#8ea4ba]">Inspection evidence posture</div>
         <div className="mt-2 whitespace-pre-wrap text-xs leading-5 text-[#d7dde7]">{evidenceLines}</div>
       </div>
 

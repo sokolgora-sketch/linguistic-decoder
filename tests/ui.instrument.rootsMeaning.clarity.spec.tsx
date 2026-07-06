@@ -26,7 +26,9 @@ describe("Open Instrument roots/meaning clarity", () => {
     );
 
     expect(screen.getByText("Meaning")).toBeInTheDocument();
-    expect(screen.getByText(/Human-readable VM summary/i)).toBeInTheDocument();
+    expect(screen.getByText(/Human-readable deterministic reading/i)).toBeInTheDocument();
+    expect(screen.getByText("Deterministic reading")).toBeInTheDocument();
+    expect(screen.getByText("Inspection evidence posture")).toBeInTheDocument();
     expect(screen.getByText(/Boundary: deterministic reading/i)).toBeInTheDocument();
     expect(screen.getByText(/not a historical-chain claim/i)).toBeInTheDocument();
   });
