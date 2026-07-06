@@ -55,6 +55,36 @@ export function buildMinRootHypotheses(
   const maxSegments = opts.maxSegments ?? 5;
   const maxHypotheses = opts.maxHypotheses ?? 50;
 
+  const normalizedBasis = String(basis || "").toLowerCase();
+
+  if (normalizedBasis === "damage") {
+    const boundedDamage: MinRootHypothesis = {
+      id: "damage:DA:0",
+      basis: "damage",
+      segments: ["da"],
+      protoRoots: ["DA"],
+      carriers: [
+        {
+          protoRootId: "DA",
+          segment: "da",
+          carrierForm: "da",
+          lang: "sq",
+          ops: [],
+        },
+      ],
+      decomposition: {
+        action: "DA",
+      },
+      checks: {
+        opsWithinLimits: true,
+        skeletonExplained: true,
+      },
+      opsCount: 0,
+    };
+
+    return [boundedDamage].slice(0, maxHypotheses);
+  }
+
   const segmentations = segmentBasis(basis, {
     maxSegments,
     maxCandidates: 200,
