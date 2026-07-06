@@ -78,7 +78,8 @@ describe("ui: InstrumentPanel renders Origin Claim from VM", () => {
     const cardRoot = findNearestAncestorWithText(title as HTMLElement, /no forced answer/i);
     expect(cardRoot).toBeTruthy();
 
-    expect(within(cardRoot as HTMLElement).getByText(/no forced answer/i)).toBeInTheDocument();
+    const postureLabel = within(cardRoot as HTMLElement).getByText("Decision posture:");
+    expect(postureLabel.parentElement?.textContent ?? "").toMatch(/no forced answer/i);
     expect((cardRoot as HTMLElement).textContent).not.toContain("no_single_winner");
   });
 });
