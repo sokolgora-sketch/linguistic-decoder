@@ -87,7 +87,35 @@ exports[`Engine Contract v1 — capture engine output (goldens) damage (strict, 
   ],
   "deepRoot": {
     "basis": "damage",
-    "candidates": [],
+    "candidates": [
+      {
+        "basis": "damage",
+        "carriers": [
+          {
+            "carrierForm": "da",
+            "lang": "sq",
+            "ops": [],
+            "protoRootId": "DA",
+            "segment": "da"
+          }
+        ],
+        "checks": {
+          "opsWithinLimits": true,
+          "skeletonExplained": true
+        },
+        "decomposition": {
+          "action": "DA"
+        },
+        "id": "damage:DA:0",
+        "opsCount": 0,
+        "protoRoots": [
+          "DA"
+        ],
+        "segments": [
+          "da"
+        ]
+      }
+    ],
     "functionalRoots": [
       {
         "gloss": "Functional reading: dëm (harm / loss / injury) as a minimal carrier for the damage concept.",
@@ -110,8 +138,50 @@ exports[`Engine Contract v1 — capture engine output (goldens) damage (strict, 
         "vowelPath": "A→Ë"
       }
     ],
-    "hypotheses": [],
-    "protoRoots": [],
+    "hypotheses": [
+      {
+        "basis": "damage",
+        "carriers": [
+          {
+            "carrierForm": "da",
+            "lang": "sq",
+            "ops": [],
+            "protoRootId": "DA",
+            "segment": "da"
+          }
+        ],
+        "checks": {
+          "opsWithinLimits": true,
+          "skeletonExplained": true
+        },
+        "decomposition": {
+          "action": "DA"
+        },
+        "id": "damage:DA:0",
+        "opsCount": 0,
+        "protoRoots": [
+          "DA"
+        ],
+        "segments": [
+          "da"
+        ]
+      }
+    ],
+    "protoRoots": [
+      "DA"
+    ],
+    "rootFamilies": [
+      {
+        "carriers": [],
+        "id": "family_da_v1_1",
+        "label": "DA",
+        "protoRoots": [
+          {
+            "root": "DA"
+          }
+        ]
+      }
+    ],
     "version": "deeproot-output-v1"
   },
   "engineVersion": "v1.0.0",
@@ -152,12 +222,59 @@ exports[`Engine Contract v1 — capture engine output (goldens) damage (strict, 
   },
   "normalizedWord": "damage",
   "rootMap": {
-    "composedMeaning": "",
-    "keys": [],
-    "notes": [
-      "No minRoots hypotheses available; RootMap not emitted."
+    "carriers": [
+      {
+        "carrierForm": "daj",
+        "language": "sq",
+        "note": "gloss: split / divide",
+        "token": "DA"
+      },
+      {
+        "carrierForm": "ndaj",
+        "language": "sq",
+        "note": "gloss: divide / share",
+        "token": "DA"
+      },
+      {
+        "carrierForm": "ndarë",
+        "language": "sq",
+        "note": "gloss: divided",
+        "token": "DA"
+      }
     ],
-    "tokens": []
+    "composedMeaning": "split / divide / cut / separate",
+    "keys": [
+      {
+        "evidence": [
+          "sq: da",
+          "gloss: split / divide / cut",
+          "note: direct reviewed Gheg free-operator evidence; Dedvukaj & Ndoci 2023 PLSA example (4), DOI 10.3765/plsa.v8i1.5501",
+          "reviewed functional free-operator evidence: Dedvukaj & Ndoci 2023 PLSA, Example (4), page 3; footnote 1: da = to split, cut, divide. https://doi.org/10.3765/plsa.v8i1.5501; historicalOriginClaim=not_claimed; winnerClaim=not_claimed; languageSuperiorityClaim=not_claimed; userDecisionPosture=user_decides"
+        ],
+        "gloss": "split / divide / cut / separate",
+        "language": "sq",
+        "ops": null,
+        "status": "dialect_attested_pending_review",
+        "token": "DA"
+      }
+    ],
+    "notes": null,
+    "spans": [
+      {
+        "end": 2,
+        "note": "segment=da",
+        "source": "surface",
+        "start": 0,
+        "token": "DA"
+      }
+    ],
+    "tokens": [
+      {
+        "role": "action",
+        "token": "DA",
+        "vowel_path": "A"
+      }
+    ]
   },
   "warnings": null,
   "word": "damage"

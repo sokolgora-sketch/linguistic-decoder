@@ -49,3 +49,29 @@ describe("DR3 DeepRoot minimal roots engine v1", () => {
     }
   });
 });
+
+describe("damage bounded minRoots emission v0.1", () => {
+  it("emits one bounded DA hypothesis for damage", () => {
+    const out = buildMinRootHypotheses("damage");
+
+    expect(out).toHaveLength(1);
+    expect(out[0]).toEqual({
+      id: "damage:DA:0",
+      basis: "damage",
+      segments: ["da"],
+      protoRoots: ["DA"],
+      carriers: [
+        {
+          protoRootId: "DA",
+          segment: "da",
+          carrierForm: "da",
+          lang: "sq",
+          ops: [],
+        },
+      ],
+      decomposition: { action: "DA" },
+      checks: { opsWithinLimits: true, skeletonExplained: true },
+      opsCount: 0,
+    });
+  });
+});

@@ -29,12 +29,20 @@ describe("analyze-v1 reviewed DA runtime projection live words v0.1", () => {
     expect(evidence).toContain("userDecisionPosture=user_decides");
   });
 
-  it("keeps reviewed DA evidence attached to RootMap operator keys, not broad English semantic guesses", async () => {
+  it("surfaces reviewed DA functional evidence for damage once bounded DA minRoots is emitted", async () => {
     const out = await analyze("damage");
-    const evidence = rootMapEvidenceText(out);
+    const da = out.rootMap?.keys?.find((key: any) => key?.token === "DA");
 
-    expect(evidence).not.toContain("reviewed functional free-operator evidence");
-    expect(evidence).not.toContain("Dedvukaj & Ndoci 2023 PLSA");
+    expect(da).toBeTruthy();
+
+    const evidence = Array.isArray(da?.evidence) ? da.evidence.join("\n") : "";
+
+    expect(evidence).toContain("reviewed functional free-operator evidence");
+    expect(evidence).toContain("Dedvukaj & Ndoci 2023 PLSA");
+    expect(evidence).toContain("historicalOriginClaim=not_claimed");
+    expect(evidence).toContain("winnerClaim=not_claimed");
+    expect(evidence).toContain("languageSuperiorityClaim=not_claimed");
+    expect(evidence).toContain("userDecisionPosture=user_decides");
   });
 
   it("keeps DI reviewed locator-packaging lane absent even when DI is a live RootMap key", async () => {

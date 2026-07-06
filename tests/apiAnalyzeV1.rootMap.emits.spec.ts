@@ -24,4 +24,21 @@ describe("analyze-v1 emits rootMap (v0.1)", () => {
     expect(evidence).not.toContain("gave (aorist/part)");
   });
 
+
+
+
+  it("emits damage RootMap with bounded DA key", async () => {
+    const payload = await analyzeWordV1("damage", { mode: "strict" } as any);
+    const out = enginePayloadToAnalysisResult(payload as any) as any;
+
+    const da = out.rootMap?.keys?.find((key: any) => key?.token === "DA");
+    const evidence = Array.isArray(da?.evidence) ? da.evidence.join("\n") : "";
+
+    expect(da).toBeTruthy();
+    expect(da?.status).toBe("dialect_attested_pending_review");
+    expect(evidence).toContain("reviewed Gheg free-operator evidence");
+    expect(evidence).toContain("Dedvukaj & Ndoci 2023 PLSA");
+    expect(evidence).not.toContain("gave (aorist/part)");
+  });
+
 });
