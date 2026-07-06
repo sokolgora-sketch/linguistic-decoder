@@ -214,7 +214,7 @@ async function main() {
     assert(hasKey(results.study, "DI"), "Expected study to expose DI as ordinary RootMap carrier evidence.");
     assert(!hasReviewedDiProjection(results.study), "Expected study to keep reviewed DI runtime projection absent.");
 
-    assert(!hasReviewedDaEvidence(results.damage), "Expected damage to avoid broad English semantic DA evidence.");
+    assert(hasReviewedDaEvidence(results.damage), "Expected damage to expose reviewed DA evidence after bounded DA minRoots emission.");
     assert(!hasReviewedDaEvidence(results.xyz), "Expected xyz to avoid reviewed DA evidence.");
     assert(!hasReviewedDiProjection(results.xyz), "Expected xyz to avoid reviewed DI runtime projection.");
 
