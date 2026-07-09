@@ -1,7 +1,7 @@
 # Open Instrument Milestone — DA Canon Template Lock v0.1
 
 ## Status
-Proposed
+In progress — Phase 1 complete
 
 ## Purpose
 
@@ -245,6 +245,40 @@ Inspect/docs only
 
 ---
 
+
+## Milestone execution status
+
+| Area | Status | Notes |
+|---|---|---|
+| Phase 1 — DA end-to-end audit | COMPLETE | Audit report landed and runtime posture locked |
+| Phase 2 — DA reusable template doc | COMPLETE | Template reference doc landed |
+| Phase 3 — DA→DI gap matrix | PENDING IN THIS CLOSEOUT LANE | Needed to make scaling posture explicit |
+| Phase 4 — milestone closeout | PENDING IN THIS CLOSEOUT LANE | Needs acceptance matrix + closeout status |
+
+## Acceptance matrix
+
+| Requirement | Status | Notes |
+|---|---|---|
+| DA source row mapped | PASS | Documented in Phase 1 audit |
+| DA promotion checklist mapped | PASS | Documented in Phase 1 audit |
+| DA validator path mapped | PASS | Documented in Phase 1 audit |
+| DA runtime projection mapped | PASS | Documented in Phase 1 audit |
+| DA RootMap/runtime proof mapped | PASS | Documented in Phase 1 audit |
+| DA live smoke obligations mapped | PASS | Documented in Phase 1 audit + runbook |
+| Reusable operator template exists | PASS | `operator-template-DA-reference-v0.1.md` landed |
+| DA→DI scaling gap matrix exists | PENDING | Add in this closeout lane |
+| Milestone closeout wording updated | PENDING | Add in this closeout lane |
+
+## Closeout checklist
+
+- [x] DA source-row / checklist / validator / runtime path mapped exactly
+- [x] DA reusable operator template doc exists
+- [x] DA runtime truth captured in audit form
+- [ ] DA→DI gap matrix completed against the DA template
+- [ ] Milestone status advanced from baseline proposal to closeout-ready execution state
+- [ ] Next scaling lane named explicitly from the gap matrix
+
+
 ## Phase 2 — Lock the reusable DA template
 
 ### Goal
@@ -395,6 +429,16 @@ That first report should answer:
 - The value is “future operators now have a professional template.”
 
 ---
+
+
+## Next lane after milestone closeout
+
+After this closeout lands, the next lane should be:
+
+**DI authoritative locator/archive closure inspection-to-promotion plan**
+
+That lane remains separate from this docs-only closeout because DI still lacks production-live reviewed runtime closure.
+
 
 ## Definition of done
 

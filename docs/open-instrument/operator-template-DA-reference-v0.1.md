@@ -253,6 +253,36 @@ This is useful because it shows that:
 
 ---
 
+
+## 11A. Operator acceptance checklist
+
+A future operator should not be treated as template-complete until all of these are explicit:
+
+- reviewed source row exists
+- promotion checklist status is explicit
+- validator outcome is explicit
+- runtime projection posture is explicit
+- RootMap/runtime proof words exist
+- live-smoke expectation is explicit
+- blocker wording is explicit if the operator is intentionally non-live
+- docs/runbook obligations are updated when runtime expectations change
+
+## 11B. Copy-this-file-set baseline
+
+Every future operator lane should inspect or touch this file set deliberately:
+
+- `src/shared/reviewedExternalLexiconSourceRowRegistry.v0_1.ts`
+- `src/shared/reviewedExternalLexiconSourceRowPromotionChecklist.v0_1.ts`
+- `src/shared/reviewedExternalLexiconEvidenceGate.validator.v0_1.ts`
+- `src/shared/reviewedExternalLexiconRuntimeProjection.v0_1.ts`
+- `src/shared/deepRoot.rootMap.builder.v1.ts`
+- `src/shared/freeOperatorProfile.v0_1.ts`
+- `src/shared/freeOperatorEvidence.v0_1.ts`
+- focused operator tests
+- `scripts/open-instrument/live-smoke.v0.1.mjs`
+- affected docs/runbooks
+
+
 ## 12. Definition of done for a future operator
 
 A future operator can be treated as DA-template compliant only when all are true:
