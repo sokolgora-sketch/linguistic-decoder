@@ -14,7 +14,7 @@ Current Open Instrument truth:
 - Raw JSON is debug/collapsed-oriented and must not be treated as the primary user surface.
 - `RootMapCard` renders VM RootMap keys/evidence defensively.
 - Reviewed DA functional operator evidence is now visible through `rootMap.keys[].evidence` and EvidencePackage rootMap export.
-- DI is semantically supported but remains non-live until direct authoritative locator/archive packaging is explicitly closed.
+- DI is production-live for bounded functional lexical projection; direct DPEWA/FGJSH authority remains unresolved only for stronger historical-authority or stronger-source claims.
 - Runtime evidence remains functional/operator evidence, not historical-origin, winner, or language-superiority evidence.
 
 This document records the **definition of done that was achieved** for UI Telemetry Contract v0.1.

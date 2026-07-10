@@ -31,8 +31,8 @@ Current proof words:
 |---|---|
 | `da` | reviewed DA functional evidence appears because DA is a live RootMap key |
 | `dam` | reviewed DA functional evidence appears because DA is a live RootMap key |
-| `study` | DI appears as ordinary carrier evidence while reviewed DI runtime projection remains blocked |
-| `damage` | reviewed DA evidence does not appear by broad English semantic expansion |
+| `study` | bounded reviewed DI functional evidence appears for the live DI RootMap key |
+| `damage` | reviewed DA functional evidence appears for the bounded DA RootMap emission |
 | `xyz` | calm empty/null behavior without reviewed DA or DI projection |
 
 Boundary:
