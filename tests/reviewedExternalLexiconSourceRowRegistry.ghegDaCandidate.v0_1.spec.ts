@@ -19,12 +19,17 @@ function getGhegDaCandidateRowV0_1() {
 
 describe("reviewed external lexicon source row candidate registry Gheg DA v0.1", () => {
   it("keeps the reviewed Gheg DA row available in both candidate and production registries", () => {
-    expect(getReviewedExternalLexiconProductionSourceRowsV0_1()).toEqual([
-      expect.objectContaining({
-        sourceId: GHEG_DA_SOURCE_ID_V0_1,
-        candidateId: "albanian-da-dam-damage-functional",
-      }),
-    ]);
+    expect(
+      getReviewedExternalLexiconProductionSourceRowsV0_1(),
+    ).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          sourceId: GHEG_DA_SOURCE_ID_V0_1,
+          candidateId:
+            "albanian-da-dam-damage-functional",
+        }),
+      ]),
+    );
     expect(reviewedExternalLexiconSourceRowCandidateRegistryV0_1).toEqual(
       expect.arrayContaining([
         expect.objectContaining({

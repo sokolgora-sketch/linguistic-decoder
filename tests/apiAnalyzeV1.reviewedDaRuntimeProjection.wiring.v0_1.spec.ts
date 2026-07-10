@@ -21,13 +21,42 @@ describe("analyze-v1 reviewed DA runtime projection wiring v0.1", () => {
     expect(evidence).toContain("userDecisionPosture=user_decides");
   });
 
-  it("keeps reviewed DI locator-packaging lane absent from runtime reviewed projection evidence", async () => {
-    const payload = await analyzeWordV1("study", { mode: "strict" } as any);
-    const out = enginePayloadToAnalysisResult(payload as any) as any;
-    const evidence = JSON.stringify(out.rootMap ?? {});
+  it("surfaces bounded reviewed DI evidence through the existing RootMap projection path", async () => {
+    const payload = await analyzeWordV1(
+      "study",
+      { mode: "strict" } as any,
+    );
 
-    expect(evidence).not.toContain("reviewed.external.di.knowledge.candidate.v0_1");
-    expect(evidence).not.toContain("reviewed functional free-operator evidence: di");
-    expect(evidence).not.toContain("Direct DPEWA/FGJSH locator");
+    const out =
+      enginePayloadToAnalysisResult(payload as any) as any;
+
+    const di = out.rootMap?.keys?.find(
+      (key: any) => key?.token === "DI",
+    );
+
+    const evidence = Array.isArray(di?.evidence)
+      ? di.evidence.join("\n")
+      : "";
+
+    expect(di).toBeTruthy();
+    expect(evidence).toContain(
+      "reviewed functional free-operator evidence",
+    );
+    expect(evidence).toContain(
+      "https://en.wiktionary.org/wiki/di#Albanian",
+    );
+    expect(evidence).toContain(
+      "historicalOriginClaim=not_claimed",
+    );
+    expect(evidence).toContain(
+      "userDecisionPosture=user_decides",
+    );
+
+    expect(evidence).not.toContain(
+      "10.3765/plsa.v8i1.5501",
+    );
+    expect(evidence).not.toContain(
+      "Direct DPEWA/FGJSH locator",
+    );
   });
 });

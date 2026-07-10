@@ -1,37 +1,37 @@
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
+import fs from "node:fs";
+import path from "node:path";
 import {
   getReviewedExternalLexiconProductionSourceRowsV0_1,
 } from "../src/shared/reviewedExternalLexiconSourceRowRegistry.v0_1";
 
-function read(path: string): string {
-  return readFileSync(join(process.cwd(), path), "utf8");
-}
+const read = (file: string): string =>
+  fs.readFileSync(path.join(process.cwd(), file), "utf8");
 
-describe("reviewed external lexicon production source row runtime boundary v0.1", () => {
-  it("has reviewed DA production rows while DI remains blocked from production rows", () => {
-    const rows = getReviewedExternalLexiconProductionSourceRowsV0_1();
+describe("reviewed external lexicon source-row runtime boundary v0.1", () => {
+  it("exposes DA and DI only through authorization-enforced production enumeration", () => {
+    const rows =
+      getReviewedExternalLexiconProductionSourceRowsV0_1();
 
-    expect(rows).toEqual([
-      expect.objectContaining({
-        sourceId: "reviewed.external.gheg-da.damage.candidate.v0_1",
-        candidateId: "albanian-da-dam-damage-functional",
-        embryo: "DA",
-        isolatedStandaloneForm: "da",
-        userDecisionPosture: "user_decides",
-      }),
-    ]);
-
-    expect(rows).not.toEqual(
+    expect(rows).toHaveLength(2);
+    expect(rows).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          sourceId: "reviewed.external.di.knowledge.candidate.v0_1",
+          sourceId:
+            "reviewed.external.gheg-da.damage.candidate.v0_1",
+          embryo: "DA",
+          userDecisionPosture: "user_decides",
+        }),
+        expect.objectContaining({
+          sourceId:
+            "reviewed.external.di.knowledge.candidate.v0_1",
+          embryo: "DI",
+          userDecisionPosture: "user_decides",
         }),
       ]),
     );
   });
 
-  it("keeps production source rows out of direct route and UI adapter wiring", () => {
+  it("keeps production rows out of direct route and UI adapter wiring", () => {
     const runtimeSources = [
       "app/api/analyze-v1/route.ts",
       "src/engine/analyzeWordV1.ts",
@@ -39,24 +39,47 @@ describe("reviewed external lexicon production source row runtime boundary v0.1"
       "src/shared/analyzeV1Adapter.ts",
     ].map(read).join("\n");
 
-    expect(runtimeSources).not.toContain("getReviewedExternalLexiconProductionSourceRowsV0_1");
-    expect(runtimeSources).not.toContain("reviewed.external.gheg-da.damage.candidate.v0_1");
-    expect(runtimeSources).not.toContain("reviewed.external.di.knowledge.candidate.v0_1");
+    expect(runtimeSources).not.toContain(
+      "getReviewedExternalLexiconProductionSourceRowsV0_1",
+    );
+    expect(runtimeSources).not.toContain(
+      "reviewed.external.gheg-da.damage.candidate.v0_1",
+    );
+    expect(runtimeSources).not.toContain(
+      "reviewed.external.di.knowledge.candidate.v0_1",
+    );
 
-    const rootMapBuilderSource = read("src/shared/deepRoot.rootMap.builder.v1.ts");
-    expect(rootMapBuilderSource).toContain("projectReviewedExternalLexiconProductionRowForRuntimeV0_1");
+    const rootMapBuilderSource = read(
+      "src/shared/deepRoot.rootMap.builder.v1.ts",
+    );
+
+    expect(rootMapBuilderSource).toContain(
+      "projectReviewedExternalLexiconProductionRowForRuntimeV0_1",
+    );
   });
 
-  it("documents the safe next step before runtime projection", () => {
-    const registrySource = read("src/shared/reviewedExternalLexiconSourceRowRegistry.v0_1.ts");
+  it("documents bounded DI production separately from unresolved historical authority", () => {
+    const registrySource = read(
+      "src/shared/reviewedExternalLexiconSourceRowRegistry.v0_1.ts",
+    );
 
-    expect(registrySource).toContain("PRODUCTION_SOURCE_ROW_IDS_V0_1");
-    expect(registrySource).toContain("reviewed.external.gheg-da.damage.candidate.v0_1");
-    expect(registrySource).toContain("reviewed.external.di.knowledge.candidate.v0_1");
-
-    // Boundary: source rows are reviewed evidence objects first.
-    // Runtime projection is mediated through the reviewed projection adapter and RootMap builder.
-    expect(registrySource).toContain("Production source row promotion accepted v0.1");
-    expect(registrySource).toContain("still required before production-live promotion");
+    expect(registrySource).toContain(
+      "PRODUCTION_SOURCE_ROW_IDS_V0_1",
+    );
+    expect(registrySource).toContain(
+      "reviewed.external.gheg-da.damage.candidate.v0_1",
+    );
+    expect(registrySource).toContain(
+      "reviewed.external.di.knowledge.candidate.v0_1",
+    );
+    expect(registrySource).toContain(
+      "bounded functional lexical projection",
+    );
+    expect(registrySource).toContain(
+      "remains unresolved for historical-authority or stronger-source claims",
+    );
+    expect(registrySource).toContain(
+      "is not required for this bounded lexical projection",
+    );
   });
 });

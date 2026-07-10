@@ -15,7 +15,6 @@ describe(
   () => {
     const daSourceId =
       "reviewed.external.gheg-da.damage.candidate.v0_1";
-
     const diSourceId =
       "reviewed.external.di.knowledge.candidate.v0_1";
 
@@ -23,7 +22,6 @@ describe(
       reviewedExternalLexiconSourceRowCandidateRegistryV0_1.find(
         (row) => row.sourceId === daSourceId,
       );
-
     const diRow =
       reviewedExternalLexiconSourceRowCandidateRegistryV0_1.find(
         (row) => row.sourceId === diSourceId,
@@ -35,7 +33,6 @@ describe(
           daSourceId,
         ),
       ).toBe(true);
-
       expect(
         isReviewedExternalLexiconSourceIdFunctionallyRuntimeAuthorizedV0_1(
           diSourceId,
@@ -43,18 +40,53 @@ describe(
       ).toBe(true);
     });
 
-    it("keeps existing DA production membership because DA passes machine authorization", () => {
+    it("returns both bounded production rows only after machine authorization passes", () => {
       expect(daRow).toBeDefined();
+      expect(diRow).toBeDefined();
 
-      const authorization =
+      expect(
         evaluateReviewedExternalLexiconFunctionalRuntimeAuthorizationV0_1(
           daRow!,
+        ).authorized,
+      ).toBe(true);
+      expect(
+        evaluateReviewedExternalLexiconFunctionalRuntimeAuthorizationV0_1(
+          diRow!,
+        ).authorized,
+      ).toBe(true);
+
+      expect(
+        getReviewedExternalLexiconProductionSourceRowsV0_1(),
+      ).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            sourceId: daSourceId,
+            candidateId: "albanian-da-dam-damage-functional",
+            embryo: "DA",
+          }),
+          expect.objectContaining({
+            sourceId: diSourceId,
+            candidateId: "albanian-di-know-functional",
+            embryo: "DI",
+          }),
+        ]),
+      );
+
+      expect(
+        getReviewedExternalLexiconProductionSourceRowsV0_1(),
+      ).toHaveLength(2);
+    });
+
+    it("keeps DI bounded by functional authorization and user decision", () => {
+      const authorization =
+        evaluateReviewedExternalLexiconFunctionalRuntimeAuthorizationV0_1(
+          diRow!,
         );
 
       expect(authorization).toEqual(
         expect.objectContaining({
-          sourceId: daSourceId,
-          candidateId: "albanian-da-dam-damage-functional",
+          sourceId: diSourceId,
+          candidateId: "albanian-di-know-functional",
           authorized: true,
           authorizationScope:
             "bounded_functional_lexical_projection",
@@ -63,44 +95,12 @@ describe(
           reasons: [],
         }),
       );
-
       expect(authorization.readiness.functionalReady).toBe(true);
-
-      expect(
-        getReviewedExternalLexiconProductionSourceRowsV0_1(),
-      ).toEqual([
-        expect.objectContaining({
-          sourceId: daSourceId,
-          candidateId: "albanian-da-dam-damage-functional",
-          embryo: "DA",
-        }),
-      ]);
     });
 
-    it("keeps DI outside production membership despite DI passing authorization", () => {
-      expect(diRow).toBeDefined();
-
-      const authorization =
-        evaluateReviewedExternalLexiconFunctionalRuntimeAuthorizationV0_1(
-          diRow!,
-        );
-
-      expect(authorization.authorized).toBe(true);
-      expect(authorization.readiness.functionalReady).toBe(true);
-
-      const productionIds =
-        getReviewedExternalLexiconProductionSourceRowsV0_1().map(
-          (row) => row.sourceId,
-        );
-
-      expect(productionIds).not.toContain(diSourceId);
-    });
-
-    it("rejects a production candidate when machine authorization fails", () => {
-      expect(daRow).toBeDefined();
-
+    it("rejects a production candidate when candidate truth is introduced", () => {
       const malformed = {
-        ...daRow!,
+        ...diRow!,
         candidateTruthClaim: true,
       } as unknown as ReviewedExternalLexiconCandidateSourceRowV0_1;
 
@@ -116,12 +116,10 @@ describe(
     });
 
     it("rejects a production candidate when lexical readiness fails", () => {
-      expect(daRow).toBeDefined();
-
       const malformed:
         ReviewedExternalLexiconCandidateSourceRowV0_1 = {
-          ...daRow!,
-          externalCitations: daRow!.externalCitations.map(
+          ...diRow!,
+          externalCitations: diRow!.externalCitations.map(
             (citation, index) =>
               index === 0
                 ? {

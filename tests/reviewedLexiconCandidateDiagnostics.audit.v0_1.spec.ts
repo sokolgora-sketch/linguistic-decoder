@@ -75,13 +75,8 @@ describe("reviewed lexicon candidate diagnostics audit v0.1", () => {
     expect(diRow.nonLiveReason).toBeNull();
     expect(diRow.promotionChecklist).toMatchObject({
       checklistVersion: "reviewed-external-lexicon-promotion-checklist.v0_1",
-      promotionReady: false,
+      promotionReady: true,
     });
-    expect(diRow.promotionChecklistFailedItems).toEqual([
-      expect.objectContaining({
-        id: "direct_authoritative_locator_or_archive",
-        passed: false,
-      }),
-    ]);
+    expect(diRow.promotionChecklistFailedItems).toEqual([]);
   });
 });
