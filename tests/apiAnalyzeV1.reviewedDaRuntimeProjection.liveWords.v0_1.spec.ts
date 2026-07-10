@@ -45,17 +45,47 @@ describe("analyze-v1 reviewed DA runtime projection live words v0.1", () => {
     expect(evidence).toContain("userDecisionPosture=user_decides");
   });
 
-  it("keeps DI reviewed locator-packaging lane absent even when DI is a live RootMap key", async () => {
+  it("surfaces bounded reviewed DI evidence only when DI is a live RootMap key", async () => {
     const out = await analyze("study");
-    const di = out.rootMap?.keys?.find((key: any) => key?.token === "DI");
-    const evidence = rootMapEvidenceText(out);
+
+    const di = out.rootMap?.keys?.find(
+      (key: any) => key?.token === "DI",
+    );
+
+    const evidence = Array.isArray(di?.evidence)
+      ? di.evidence.join("\n")
+      : "";
 
     expect(di).toBeTruthy();
     expect(evidence).toContain("sq: di");
     expect(evidence).toContain("gloss: I know");
+    expect(evidence).toContain(
+      "reviewed functional free-operator evidence",
+    );
+    expect(evidence).toContain(
+      "Albanian > Etymology 1 > Verb > di: to know",
+    );
+    expect(evidence).toContain(
+      "https://en.wiktionary.org/wiki/di#Albanian",
+    );
+    expect(evidence).toContain(
+      "historicalOriginClaim=not_claimed",
+    );
+    expect(evidence).toContain(
+      "winnerClaim=not_claimed",
+    );
+    expect(evidence).toContain(
+      "languageSuperiorityClaim=not_claimed",
+    );
+    expect(evidence).toContain(
+      "userDecisionPosture=user_decides",
+    );
 
-    expect(evidence).not.toContain("reviewed.external.di.knowledge.candidate.v0_1");
-    expect(evidence).not.toContain("reviewed functional free-operator evidence: di");
-    expect(evidence).not.toContain("Direct DPEWA/FGJSH locator");
+    expect(evidence).not.toContain(
+      "10.3765/plsa.v8i1.5501",
+    );
+    expect(evidence).not.toContain(
+      "Direct DPEWA/FGJSH locator",
+    );
   });
 });

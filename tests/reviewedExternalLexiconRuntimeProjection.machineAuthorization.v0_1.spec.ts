@@ -29,19 +29,19 @@ describe(
         (row) => row.sourceId === diSourceId,
       );
 
-    it("keeps DA in explicit production membership and DI outside it", () => {
-      expect(
-        isReviewedExternalLexiconSourceIdInProductionMembershipV0_1(
-          daSourceId,
-        ),
-      ).toBe(true);
+      it("keeps DA and DI in explicit bounded production membership", () => {
+        expect(
+          isReviewedExternalLexiconSourceIdInProductionMembershipV0_1(
+            daSourceId,
+          ),
+        ).toBe(true);
 
-      expect(
-        isReviewedExternalLexiconSourceIdInProductionMembershipV0_1(
-          diSourceId,
-        ),
-      ).toBe(false);
-    });
+        expect(
+          isReviewedExternalLexiconSourceIdInProductionMembershipV0_1(
+            diSourceId,
+          ),
+        ).toBe(true);
+      });
 
     it("preserves the exact DA runtime projection contract", () => {
       expect(daRow).toBeDefined();
@@ -114,22 +114,53 @@ describe(
       );
     });
 
-    it("keeps DI non-projectable because DI is not a production member", () => {
-      expect(diRow).toBeDefined();
+      it("projects DI only after explicit membership and machine authorization pass", () => {
+        expect(diRow).toBeDefined();
 
-      expect(
-        projectReviewedExternalLexiconProductionRowForRuntimeV0_1(
-          diRow!,
-        ),
-      ).toBeNull();
+        const projection =
+          projectReviewedExternalLexiconProductionRowForRuntimeV0_1(
+            diRow!,
+          );
 
-      const productionIds =
-        getReviewedExternalLexiconProductionSourceRowsV0_1().map(
-          (row) => row.sourceId,
+        expect(projection).toEqual(
+          expect.objectContaining({
+            sourceId: diSourceId,
+            candidateId: "albanian-di-know-functional",
+            embryo: "DI",
+            isolatedStandaloneForm: "di",
+            claimBoundary: {
+              historicalOriginClaim: "not_claimed",
+              winnerClaim: "not_claimed",
+              languageSuperiorityClaim: "not_claimed",
+              userDecisionPosture: "user_decides",
+            },
+          }),
         );
 
-      expect(productionIds).not.toContain(diSourceId);
-    });
+        expect(projection?.evidenceText).toContain(
+          "Albanian > Etymology 1 > Verb > di: to know",
+        );
+        expect(projection?.evidenceText).toContain(
+          "di = know / knowledge",
+        );
+        expect(projection?.evidenceText).toContain(
+          "https://en.wiktionary.org/wiki/di#Albanian",
+        );
+
+        expect(projection?.evidenceText).not.toContain(
+          "10.3765/plsa.v8i1.5501",
+        );
+        expect(projection?.evidenceText).not.toContain(
+          "Direct DPEWA/FGJSH locator",
+        );
+
+        const productionIds =
+          getReviewedExternalLexiconProductionSourceRowsV0_1().map(
+            (row) => row.sourceId,
+          );
+
+        expect(productionIds).toContain(diSourceId);
+      });
 
     it("fails closed when an authorized production row gains a candidate-truth claim", () => {
       expect(daRow).toBeDefined();

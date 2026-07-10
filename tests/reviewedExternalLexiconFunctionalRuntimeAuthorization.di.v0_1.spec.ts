@@ -92,7 +92,7 @@ describe(
           (productionRow) => productionRow.sourceId,
         );
 
-      expect(productionIds).not.toContain(sourceId);
+      expect(productionIds).toContain(sourceId);
     });
 
     it("rejects an unauthorized source ID", () => {

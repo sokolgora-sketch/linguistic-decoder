@@ -75,9 +75,16 @@ function hasReviewedDaEvidence(data) {
 function hasReviewedDiProjection(data) {
   const text = evidenceText(data);
   return (
-    hasText(text, "reviewed.external.di.knowledge.candidate.v0_1") ||
-    hasText(text, "reviewed functional free-operator evidence: di") ||
-    hasText(text, "Direct DPEWA/FGJSH locator")
+    hasText(text, "reviewed functional free-operator evidence") &&
+    hasText(text, "Albanian > Etymology 1 > Verb > di: to know") &&
+    hasText(text, "di = know / knowledge") &&
+    hasText(text, "https://en.wiktionary.org/wiki/di#Albanian") &&
+    hasText(text, "historicalOriginClaim=not_claimed") &&
+    hasText(text, "winnerClaim=not_claimed") &&
+    hasText(text, "languageSuperiorityClaim=not_claimed") &&
+    hasText(text, "userDecisionPosture=user_decides") &&
+    !hasText(text, "10.3765/plsa.v8i1.5501") &&
+    !hasText(text, "Direct DPEWA/FGJSH locator")
   );
 }
 
@@ -211,12 +218,16 @@ async function main() {
     assert(hasKey(results.dam, "DA"), "Expected dam to expose DA as a RootMap key.");
     assert(hasReviewedDaEvidence(results.dam), "Expected dam to expose reviewed DA functional evidence.");
 
-    assert(hasKey(results.study, "DI"), "Expected study to expose DI as ordinary RootMap carrier evidence.");
-    assert(!hasReviewedDiProjection(results.study), "Expected study to keep reviewed DI runtime projection absent.");
+    assert(hasKey(results.study, "DI"), "Expected study to expose DI as a RootMap key.");
+    assert(hasReviewedDiProjection(results.study), "Expected study to expose bounded reviewed DI functional evidence.");
 
     assert(hasReviewedDaEvidence(results.damage), "Expected damage to expose reviewed DA evidence after bounded DA minRoots emission.");
     assert(!hasReviewedDaEvidence(results.xyz), "Expected xyz to avoid reviewed DA evidence.");
     assert(!hasReviewedDiProjection(results.xyz), "Expected xyz to avoid reviewed DI runtime projection.");
+
+    assert(!hasReviewedDiProjection(results.da), "Expected da to avoid reviewed DI evidence.");
+    assert(!hasReviewedDiProjection(results.dam), "Expected dam to avoid reviewed DI evidence.");
+    assert(!hasReviewedDiProjection(results.damage), "Expected damage to avoid reviewed DI evidence.");
 
     if (!skipFocusedTests) {
       console.log("\n=== focused regression proof ===");

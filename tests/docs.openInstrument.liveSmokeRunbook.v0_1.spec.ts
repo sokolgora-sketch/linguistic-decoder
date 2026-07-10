@@ -18,7 +18,9 @@ describe("Open Instrument live smoke runbook v0.1", () => {
     expect(script).toContain('"damage"');
     expect(script).toContain('"xyz"');
     expect(script).toContain("Expected damage to expose reviewed DA evidence after bounded DA minRoots emission.");
-    expect(script).toContain("Expected study to keep reviewed DI runtime projection absent.");
+    expect(script).toContain(
+      "Expected study to expose bounded reviewed DI functional evidence.",
+    );
   });
 
   it("documents the live smoke rule in the Open Instrument workflow docs", () => {

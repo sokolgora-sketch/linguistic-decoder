@@ -11,6 +11,7 @@ export type ReviewedExternalLexiconSourceRowRegistryBoundaryV0_1 = {
 };
 
 const PRODUCTION_SOURCE_ROW_IDS_V0_1 = new Set<string>([
+  "reviewed.external.di.knowledge.candidate.v0_1",
   "reviewed.external.gheg-da.damage.candidate.v0_1",
 ]);
 
@@ -26,7 +27,7 @@ export const reviewedExternalLexiconSourceRowCandidateRegistryV0_1 = [
     isolatedStandaloneForm: "di",
     plainStandaloneGloss: "know / knowledge",
     sourceNote:
-      "Reviewed citation candidate: Albanian di as a free operator meaning know/knowledge can functionally motivate study/learning. Candidate registry row only; production registry remains separately gated.",
+      "Reviewed production row for bounded functional lexical projection: Albanian di as a free operator meaning know/knowledge can functionally motivate study/learning. Historical origin, transmission, winner, language-superiority, publication-evidence, scientific-evidence and candidate-truth claims remain disabled; the user decides.",
     semanticBridge:
       "knowledge can motivate study and learning functionally without making a historical-origin claim",
     originClaim: false,
@@ -57,7 +58,7 @@ export const reviewedExternalLexiconSourceRowCandidateRegistryV0_1 = [
         reviewedAt: "2026-07-01",
         sourceHashOrArchiveHash: "url:https://en.wiktionary.org/wiki/di#Albanian",
         reviewNote:
-          "Reviewed citation metadata intake for Albanian di as know/knowledge via stable Wiktionary entry with DPEWA/FGJSH reference trail. Direct DPEWA/FGJSH locator or archived authoritative dictionary snapshot is still required before production-live promotion.",
+          "Reviewed citation metadata for bounded functional lexical projection of Albanian di as know/knowledge via the stable Wiktionary entry and its DPEWA/FGJSH reference trail. A direct DPEWA/FGJSH locator or archived authoritative dictionary snapshot remains unresolved for historical-authority or stronger-source claims and is not required for this bounded lexical projection.",
       },
     ],
   },
