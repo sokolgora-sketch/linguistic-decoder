@@ -1,4 +1,6 @@
 import type { ReviewedExternalLexiconCandidateSourceRowV0_1 } from "./reviewedExternalLexiconEvidenceGate.validator.v0_1";
+import { evaluateReviewedExternalLexiconFunctionalRuntimeAuthorizationV0_1 } from "./reviewedExternalLexiconFunctionalRuntimeAuthorization.v0_1";
+import { isReviewedExternalLexiconSourceIdInProductionMembershipV0_1 } from "./reviewedExternalLexiconSourceRowRegistry.v0_1";
 
 export type ReviewedExternalLexiconRuntimeProjectionV0_1 = {
   projectionVersion: "reviewed-external-lexicon-runtime-projection.v0_1";
@@ -23,14 +25,6 @@ function firstCitation(row: ReviewedExternalLexiconCandidateSourceRowV0_1) {
   return row.externalCitations[0];
 }
 
-function hasAcceptedProductionPromotionMarker(row: ReviewedExternalLexiconCandidateSourceRowV0_1): boolean {
-  const citation = firstCitation(row);
-  return (
-    text(row.sourceNote).includes("Production registry promotion accepted v0.1") &&
-    text(citation?.reviewNote).includes("Production source row promotion accepted v0.1")
-  );
-}
-
 function sourceLabel(citation: ReturnType<typeof firstCitation>): string {
   const title = text(citation?.sourceTitle);
   const author = text(citation?.sourceAuthorOrEditor);
@@ -52,7 +46,18 @@ function sourceLabel(citation: ReturnType<typeof firstCitation>): string {
 export function projectReviewedExternalLexiconProductionRowForRuntimeV0_1(
   row: ReviewedExternalLexiconCandidateSourceRowV0_1,
 ): ReviewedExternalLexiconRuntimeProjectionV0_1 | null {
-  if (!hasAcceptedProductionPromotionMarker(row)) return null;
+  if (
+    !isReviewedExternalLexiconSourceIdInProductionMembershipV0_1(
+      row.sourceId,
+    )
+  ) {
+    return null;
+  }
+
+  const authorization =
+    evaluateReviewedExternalLexiconFunctionalRuntimeAuthorizationV0_1(row);
+
+  if (!authorization.authorized) return null;
   if (row.sourceStatus !== "reviewed_accepted") return null;
   if (row.userDecisionPosture !== "user_decides") return null;
   if (row.originClaim !== false) return null;
