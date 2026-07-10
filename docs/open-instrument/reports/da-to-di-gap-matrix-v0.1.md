@@ -1,5 +1,29 @@
 # Open Instrument — DA to DI Gap Matrix v0.1
 
+## Supersession notice — 2026-07-10
+
+This document is preserved as a historical record of the DI posture at the time
+it was written.
+
+Its blocked-production conclusions were superseded by PR #1724,
+`feat(open-instrument): enable bounded DI production membership`.
+
+Current posture:
+
+- DI is production-live for bounded functional lexical projection;
+- reviewed DI evidence appears for `study`;
+- machine-readable authorization and explicit production membership are both
+  required;
+- direct DPEWA/FGJSH authority remains unresolved only for stronger
+  historical-authority or stronger-source claims;
+- historical origin, transmission, winner, superiority, and candidate truth
+  remain unclaimed;
+- the user decides.
+
+The historical analysis below is not rewritten.
+
+---
+
 ## Status
 Drafted for DA canon closeout.
 

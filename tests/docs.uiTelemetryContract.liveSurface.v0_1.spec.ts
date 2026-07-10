@@ -22,7 +22,7 @@ describe("UI telemetry DONE doc live-surface reconciliation v0.1", () => {
     expect(doc).toContain("`InstrumentPanel` is tabbed");
     expect(doc).toContain("Raw JSON is debug/collapsed-oriented");
     expect(doc).toContain("Reviewed DA functional operator evidence");
-    expect(doc).toContain("DI is semantically supported but remains non-live");
+    expect(doc).toContain("DI is production-live for bounded functional lexical projection");
     expect(doc).toContain("not historical-origin, winner, or language-superiority evidence");
   });
 });

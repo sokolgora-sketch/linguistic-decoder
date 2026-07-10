@@ -101,7 +101,7 @@ Purpose:
 
 DA reference:
 - DA promotion path is closed enough for runtime reviewed evidence
-- DI currently demonstrates what a blocked operator looks like by contrast
+- DI now demonstrates a second production-live operator using the same bounded functional admission path
 
 ---
 
@@ -202,7 +202,7 @@ Every canon operator should eventually define:
 
 DA reference:
 - DA reviewed evidence must be visible for DA proof words
-- DI reviewed runtime projection must remain absent while blocked
+- DI reviewed runtime projection must be visible for its bounded positive proof words and absent for unrelated negative controls
 
 ---
 
@@ -240,16 +240,24 @@ Required copy-pattern:
 
 ## 11. DI comparison rule
 
-DI currently proves the opposite case:
+DI now proves the second production-live bounded functional path:
 
-- reviewed candidate exists
-- live DI carrier evidence can appear
-- reviewed DI runtime projection stays blocked
+- reviewed source row exists;
+- functional lexical readiness passes;
+- machine-readable runtime authorization passes;
+- explicit production membership exists;
+- reviewed DI evidence appears for `study`;
+- reviewed DI evidence remains absent for unrelated inputs;
+- historical-origin and candidate-truth claims remain disabled;
+- the user decides.
 
 This is useful because it shows that:
-- reviewed candidate presence is not enough
-- live carrier presence is not enough
-- production-live reviewed evidence requires closure, not guesswork
+
+- DA is not a one-off implementation;
+- production membership still requires machine authorization;
+- bounded functional projection can scale across operators;
+- direct historical authority is separate from bounded lexical-function evidence;
+- future operators should copy the process rather than DA or DI content.
 
 ---
 
