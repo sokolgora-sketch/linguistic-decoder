@@ -1,4 +1,5 @@
 import type { ReviewedExternalLexiconCandidateSourceRowV0_1 } from "./reviewedExternalLexiconEvidenceGate.validator.v0_1";
+import { evaluateReviewedExternalLexiconFunctionalRuntimeAuthorizationV0_1 } from "./reviewedExternalLexiconFunctionalRuntimeAuthorization.v0_1";
 
 export type ReviewedExternalLexiconSourceRowRegistryBoundaryV0_1 = {
   registryId: "reviewed-external-lexicon-source-row-registry.v0_1";
@@ -132,8 +133,11 @@ function externalCitations(row: unknown): unknown[] {
 }
 
 export function getReviewedExternalLexiconProductionSourceRowsV0_1(): readonly ReviewedExternalLexiconCandidateSourceRowV0_1[] {
-  return reviewedExternalLexiconSourceRowCandidateRegistryV0_1.filter((row) =>
-    PRODUCTION_SOURCE_ROW_IDS_V0_1.has(row.sourceId),
+  return reviewedExternalLexiconSourceRowCandidateRegistryV0_1.filter(
+    (row) =>
+      PRODUCTION_SOURCE_ROW_IDS_V0_1.has(row.sourceId) &&
+      evaluateReviewedExternalLexiconFunctionalRuntimeAuthorizationV0_1(row)
+        .authorized,
   );
 }
 
