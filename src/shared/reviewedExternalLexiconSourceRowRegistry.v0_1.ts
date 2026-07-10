@@ -132,10 +132,18 @@ function externalCitations(row: unknown): unknown[] {
   return Array.isArray(citations) ? citations : [];
 }
 
+export function isReviewedExternalLexiconSourceIdInProductionMembershipV0_1(
+  sourceId: string,
+): boolean {
+  return PRODUCTION_SOURCE_ROW_IDS_V0_1.has(sourceId);
+}
+
 export function getReviewedExternalLexiconProductionSourceRowsV0_1(): readonly ReviewedExternalLexiconCandidateSourceRowV0_1[] {
   return reviewedExternalLexiconSourceRowCandidateRegistryV0_1.filter(
     (row) =>
-      PRODUCTION_SOURCE_ROW_IDS_V0_1.has(row.sourceId) &&
+      isReviewedExternalLexiconSourceIdInProductionMembershipV0_1(
+        row.sourceId,
+      ) &&
       evaluateReviewedExternalLexiconFunctionalRuntimeAuthorizationV0_1(row)
         .authorized,
   );
