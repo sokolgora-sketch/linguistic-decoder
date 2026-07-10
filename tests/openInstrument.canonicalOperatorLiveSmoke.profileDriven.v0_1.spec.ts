@@ -1,0 +1,108 @@
+import fs from "node:fs";
+
+import {
+  canonicalOperatorProfilesV0_1,
+} from "@/shared/canonicalOperatorProfile.v0_1";
+
+import {
+  buildCanonicalOperatorLiveSmokeCasesV0_1,
+  getCanonicalOperatorLiveSmokeWordsV0_1,
+} from "../scripts/open-instrument/canonical-operator-live-smoke-cases.v0.1";
+
+describe("Open Instrument canonical operator live smoke profile contract v0.1", () => {
+  it("derives all positive and negative cases from canonical profiles", () => {
+    const cases = buildCanonicalOperatorLiveSmokeCasesV0_1();
+
+    const expectedCount = canonicalOperatorProfilesV0_1.reduce(
+      (total, profile) =>
+        total +
+        profile.positiveProofWords.length +
+        profile.negativeControlWords.length,
+      0,
+    );
+
+    expect(cases).toHaveLength(expectedCount);
+
+    for (const profile of canonicalOperatorProfilesV0_1) {
+      const operatorCases = cases.filter(
+        (smokeCase) =>
+          smokeCase.operatorId === profile.operatorId,
+      );
+
+      expect(
+        operatorCases
+          .filter(
+            (smokeCase) =>
+              smokeCase.expectation === "evidence_present",
+          )
+          .map((smokeCase) => smokeCase.word),
+      ).toEqual(profile.positiveProofWords);
+
+      expect(
+        operatorCases
+          .filter(
+            (smokeCase) =>
+              smokeCase.expectation === "evidence_absent",
+          )
+          .map((smokeCase) => smokeCase.word),
+      ).toEqual(profile.negativeControlWords);
+
+      for (const smokeCase of operatorCases) {
+        expect(smokeCase.embryo).toBe(profile.embryo);
+        expect(smokeCase.sourceId).toBe(profile.sourceId);
+        expect(smokeCase.evidenceText.length).toBeGreaterThan(0);
+      }
+    }
+  });
+
+  it("deduplicates fetched words while preserving profile order", () => {
+    expect(getCanonicalOperatorLiveSmokeWordsV0_1()).toEqual([
+      "da",
+      "dam",
+      "damage",
+      "study",
+      "xyz",
+      "mode",
+    ]);
+  });
+
+  it("keeps DA and DI runtime_verified and outside canon_locked", () => {
+    for (const profile of canonicalOperatorProfilesV0_1) {
+      expect(profile.canonLifecycleStatus).toBe("runtime_verified");
+      expect(profile.canonLifecycleStatus).not.toBe("canon_locked");
+    }
+  });
+
+  it("makes the runner consume the profile-backed case owner", () => {
+    const runner = fs.readFileSync(
+      "scripts/open-instrument/live-smoke.v0.1.ts",
+      "utf8",
+    );
+
+    expect(runner).toContain(
+      'from "./canonical-operator-live-smoke-cases.v0.1"',
+    );
+    expect(runner).toContain(
+      "buildCanonicalOperatorLiveSmokeCasesV0_1",
+    );
+    expect(runner).toContain(
+      "getCanonicalOperatorLiveSmokeWordsV0_1",
+    );
+
+    expect(runner).not.toContain(
+      'const words = ["da", "dam", "study", "damage", "xyz"]',
+    );
+    expect(runner).not.toContain("hasReviewedDaEvidence");
+    expect(runner).not.toContain("hasReviewedDiProjection");
+  });
+
+  it("uses the repository-established tsx runtime", () => {
+    const pkg = JSON.parse(
+      fs.readFileSync("package.json", "utf8"),
+    );
+
+    expect(pkg.scripts["open-instrument:live-smoke"]).toBe(
+      "tsx scripts/open-instrument/live-smoke.v0.1.ts",
+    );
+  });
+});

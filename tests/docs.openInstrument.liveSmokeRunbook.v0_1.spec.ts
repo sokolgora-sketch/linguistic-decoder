@@ -3,24 +3,56 @@ import { existsSync, readFileSync } from "node:fs";
 describe("Open Instrument live smoke runbook v0.1", () => {
   it("exposes a repo-native live smoke command with lane-correct proof words", () => {
     const pkg = JSON.parse(readFileSync("package.json", "utf8"));
-    const scriptPath = "scripts/open-instrument/live-smoke.v0.1.mjs";
+    const scriptPath = "scripts/open-instrument/live-smoke.v0.1.ts";
 
-    expect(pkg.scripts["open-instrument:live-smoke"]).toBe(`node ${scriptPath}`);
+    expect(pkg.scripts["open-instrument:live-smoke"]).toBe(`tsx ${scriptPath}`);
     expect(existsSync(scriptPath)).toBe(true);
 
     const script = readFileSync(scriptPath, "utf8");
+    const caseOwner = readFileSync(
+      "scripts/open-instrument/canonical-operator-live-smoke-cases.v0.1.ts",
+      "utf8",
+    );
+    const profileOwner = readFileSync(
+      "src/shared/canonicalOperatorProfile.v0_1.ts",
+      "utf8",
+    );
 
     expect(script).toContain("production build");
     expect(script).toContain("/api/analyze-v1");
-    expect(script).toContain('"da"');
-    expect(script).toContain('"dam"');
-    expect(script).toContain('"study"');
-    expect(script).toContain('"damage"');
-    expect(script).toContain('"xyz"');
-    expect(script).toContain("Expected damage to expose reviewed DA evidence after bounded DA minRoots emission.");
     expect(script).toContain(
-      "Expected study to expose bounded reviewed DI functional evidence.",
+      "buildCanonicalOperatorLiveSmokeCasesV0_1",
     );
+    expect(script).toContain(
+      "getCanonicalOperatorLiveSmokeWordsV0_1",
+    );
+    expect(script).toContain("assertSmokeCase");
+
+    expect(caseOwner).toContain(
+      "getResolvedCanonicalOperatorProfilesV0_1",
+    );
+    expect(caseOwner).toContain("positiveProofWords");
+    expect(caseOwner).toContain("negativeControlWords");
+    expect(caseOwner).toContain("runtimeProjection.evidenceText");
+
+    expect(profileOwner).toContain(
+      'positiveProofWords: ["da", "dam", "damage"]',
+    );
+    expect(profileOwner).toContain(
+      'negativeControlWords: ["study", "xyz"]',
+    );
+    expect(profileOwner).toContain(
+      'positiveProofWords: ["study"]',
+    );
+    expect(profileOwner).toContain(
+      'negativeControlWords: ["da", "dam", "damage", "mode", "xyz"]',
+    );
+
+    expect(script).not.toContain(
+      'const words = ["da", "dam", "study", "damage", "xyz"]',
+    );
+    expect(script).not.toContain("hasReviewedDaEvidence");
+    expect(script).not.toContain("hasReviewedDiProjection");
   });
 
   it("documents the live smoke rule in the Open Instrument workflow docs", () => {
