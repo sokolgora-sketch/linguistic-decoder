@@ -92,7 +92,9 @@ The resolver fails closed when the configured source ID does not exist.
 - operator ID: `DA`;
 - source ID:
   `reviewed.external.gheg-da.damage.candidate.v0_1`;
-- lifecycle: `runtime_verified`;
+- lifecycle: `canon_locked`;
+- admitted scope:
+  `bounded_functional_lexical_projection`;
 - positive proof words:
   - `da`;
   - `dam`;
@@ -116,7 +118,10 @@ The resolver fails closed when the configured source ID does not exist.
   - `mode`;
   - `xyz`.
 
-Neither DA nor DI is `canon_locked` in this PR.
+DA is `canon_locked` under the separately reviewed bounded functional
+scope.
+
+DI remains `runtime_verified`.
 
 ## Claim boundary
 
@@ -196,6 +201,6 @@ The contract is accepted when:
 - runtime projection is derived from the existing projection function;
 - unknown source IDs fail closed;
 - profiles contain no duplicated citation or runtime evidence fields;
-- both profiles remain `runtime_verified`;
-- neither profile is declared `canon_locked`;
+- DA is `canon_locked` under bounded functional lexical projection;
+- DI remains `runtime_verified`;
 - the full repository gate passes.

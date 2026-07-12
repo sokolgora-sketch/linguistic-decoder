@@ -43,8 +43,10 @@ Every canonical operator profile must:
 7. emit a non-null runtime projection;
 8. preserve source ID, candidate ID, embryo, and isolated form identity;
 9. preserve bounded claim boundaries;
-10. remain `runtime_verified`;
-11. remain outside `canon_locked` until the later review lane;
+10. hold a runtime-mature lifecycle status:
+    - `runtime_verified`; or
+    - `canon_locked`;
+11. satisfy the separate admission contract before entering `canon_locked`;
 12. define non-empty positive proof words;
 13. define non-empty negative control words;
 14. avoid overlap between its positive and negative proof lists;
@@ -146,16 +148,15 @@ It does not modify:
 
 ## Canon lifecycle boundary
 
-DA and DI remain:
+DA is:
+
+- `canon_locked` under bounded functional lexical projection.
+
+DI remains:
 
 - `runtime_verified`.
 
-They are not promoted to:
-
-- `canon_locked`.
-
-The later data-driven smoke and canon-review lanes must close before that
-promotion can be considered.
+Shared runtime guarantees continue to apply to both lifecycle states.
 
 ## Acceptance criteria
 

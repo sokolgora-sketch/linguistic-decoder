@@ -29,10 +29,10 @@ The first reference operators are:
 
 Current governance posture:
 
-- DA is `runtime_verified`;
+- DA is `canon_locked` for bounded functional lexical projection;
 - DI is `runtime_verified` for bounded functional lexical projection;
-- neither operator is `canon_locked` until the reusable operator framework,
-  shared tests, data-driven live smoke, and canon review are complete.
+- DA's canon lock is operational governance only and preserves all not-claimed
+  boundaries.
 
 Canonical status in this contract means operational reference status inside
 Open Instrument.
@@ -264,7 +264,11 @@ The second fact must not silently rewrite the first.
 
 Current lifecycle status:
 
-- `runtime_verified`.
+- `canon_locked`.
+
+Admitted scope:
+
+- `bounded_functional_lexical_projection`.
 
 ## DI status interpretation
 
@@ -309,8 +313,8 @@ After this contract is reviewed:
 1. add a canonical operator profile contract referencing existing source rows;
 2. add shared canonical operator assertions;
 3. make live smoke data-driven;
-4. review and lock DA and DI as `canon_locked`;
-5. add a third operator as the scalability proof.
+4. lock DA as `canon_locked` while preserving DI as `runtime_verified`;
+5. review DI separately and add a third operator as the scalability proof.
 
 ## Scope boundary
 
@@ -338,7 +342,8 @@ This contract is complete when:
 - each dimension has a defined owner and meaning;
 - RootMap token status remains distinct from production governance;
 - reviewed evidence placement is explicitly deferred to a reviewed future lane;
-- DA and DI are recorded as `runtime_verified`;
-- neither is prematurely declared `canon_locked`;
+- DA is recorded as `canon_locked` under bounded functional lexical
+  projection;
+- DI remains `runtime_verified`;
 - current-state docs match PR #1724;
 - historical reports carry supersession notices rather than rewritten history.

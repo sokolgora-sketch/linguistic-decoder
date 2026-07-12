@@ -124,18 +124,31 @@ describe("canonical operator shared contract v0.1", () => {
   );
 
   it.each(resolvedProfiles)(
-    "$profile.operatorId remains runtime_verified and not canon_locked",
+    "$profile.operatorId holds a runtime-mature lifecycle status",
     ({ profile }) => {
       expect(profile.reviewedEvidenceStatus).toBe(
         "reviewed_functional",
       );
-      expect(profile.canonLifecycleStatus).toBe("runtime_verified");
-      expect(profile.canonLifecycleStatus).not.toBe("canon_locked");
+      expect(["runtime_verified", "canon_locked"]).toContain(
+        profile.canonLifecycleStatus,
+      );
       expect(profile.authorizationScope).toBe(
         "bounded_functional_lexical_projection",
       );
     },
   );
+
+  it("locks DA as canon_locked while DI remains runtime_verified", () => {
+    const da = canonicalOperatorProfilesV0_1.find(
+      (profile) => profile.operatorId === "DA",
+    );
+    const di = canonicalOperatorProfilesV0_1.find(
+      (profile) => profile.operatorId === "DI",
+    );
+
+    expect(da?.canonLifecycleStatus).toBe("canon_locked");
+    expect(di?.canonLifecycleStatus).toBe("runtime_verified");
+  });
 
   it.each(resolvedProfiles)(
     "$profile.operatorId keeps explicit positive and negative proof cases",
