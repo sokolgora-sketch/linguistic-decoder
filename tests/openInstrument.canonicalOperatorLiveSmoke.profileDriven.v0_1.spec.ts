@@ -66,10 +66,21 @@ describe("Open Instrument canonical operator live smoke profile contract v0.1", 
     ]);
   });
 
-  it("keeps DA and DI runtime_verified and outside canon_locked", () => {
+  it("accepts DA canon_locked while preserving DI runtime_verified", () => {
+    const da = canonicalOperatorProfilesV0_1.find(
+      (profile) => profile.operatorId === "DA",
+    );
+    const di = canonicalOperatorProfilesV0_1.find(
+      (profile) => profile.operatorId === "DI",
+    );
+
+    expect(da?.canonLifecycleStatus).toBe("canon_locked");
+    expect(di?.canonLifecycleStatus).toBe("runtime_verified");
+
     for (const profile of canonicalOperatorProfilesV0_1) {
-      expect(profile.canonLifecycleStatus).toBe("runtime_verified");
-      expect(profile.canonLifecycleStatus).not.toBe("canon_locked");
+      expect(["runtime_verified", "canon_locked"]).toContain(
+        profile.canonLifecycleStatus,
+      );
     }
   });
 

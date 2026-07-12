@@ -50,8 +50,9 @@ Before live API execution, every canonical profile must:
 - expose a non-null runtime projection;
 - preserve source ID and embryo identity;
 - expose non-empty runtime evidence text;
-- remain `runtime_verified`;
-- remain outside `canon_locked`.
+- hold a runtime-mature lifecycle status:
+  - `runtime_verified`; or
+  - `canon_locked`.
 
 If any requirement fails, the smoke exits with failure.
 
@@ -127,12 +128,13 @@ It is not:
 
 ## Lifecycle boundary
 
-DA and DI remain:
+DA is:
+
+- `canon_locked` under bounded functional lexical projection.
+
+DI remains:
 
 - `runtime_verified`.
 
-They are not promoted to:
-
-- `canon_locked`.
-
-A separate reviewed canon-lock lane is required.
+The smoke accepts both runtime-mature states while rejecting earlier lifecycle
+states and `deprecated`.

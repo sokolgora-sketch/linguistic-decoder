@@ -64,7 +64,7 @@ export const canonicalOperatorProfilesV0_1 = [
     sourceId: "reviewed.external.gheg-da.damage.candidate.v0_1",
     boundedLexicalFunction: "split / divide functional motivation",
     reviewedEvidenceStatus: "reviewed_functional",
-    canonLifecycleStatus: "runtime_verified",
+    canonLifecycleStatus: "canon_locked",
     authorizationScope: "bounded_functional_lexical_projection",
     positiveProofWords: ["da", "dam", "damage"],
     negativeControlWords: ["study", "xyz"],

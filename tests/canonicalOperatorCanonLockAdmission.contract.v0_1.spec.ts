@@ -131,7 +131,7 @@ describe("canonical operator canon-lock admission contract v0.1", () => {
     expect(review).toContain("- `runtime_verified`.");
   });
 
-  it("does not mutate current DA or DI lifecycle values", () => {
+  it("records the reviewed DA-only lifecycle transition", () => {
     expect(profileSource).toContain(
       'operatorId: "DA"',
     );
@@ -144,11 +144,13 @@ describe("canonical operator canon-lock admission contract v0.1", () => {
         /canonLifecycleStatus: "runtime_verified"/g,
       ) ?? [];
 
-    expect(runtimeVerifiedMatches).toHaveLength(2);
+    const canonLockedMatches =
+      profileSource.match(
+        /canonLifecycleStatus: "canon_locked"/g,
+      ) ?? [];
 
-    expect(profileSource).not.toContain(
-      'canonLifecycleStatus: "canon_locked"',
-    );
+    expect(runtimeVerifiedMatches).toHaveLength(1);
+    expect(canonLockedMatches).toHaveLength(1);
   });
 
   it("keeps the lane docs-and-contract only", () => {

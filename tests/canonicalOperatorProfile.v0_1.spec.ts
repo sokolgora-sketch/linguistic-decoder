@@ -25,18 +25,25 @@ const expectedProfileKeys = [
 ].sort();
 
 describe("canonical operator profile v0.1", () => {
-  it("registers DA and DI as runtime-verified reference profiles", () => {
+  it("registers DA as canon_locked and preserves DI as runtime_verified", () => {
     expect(canonicalOperatorProfilesV0_1).toHaveLength(2);
     expect(canonicalOperatorProfilesV0_1.map((profile) => profile.operatorId)).toEqual([
       "DA",
       "DI",
     ]);
 
+    const da = getCanonicalOperatorProfileV0_1("DA");
+    const di = getCanonicalOperatorProfileV0_1("DI");
+
+    expect(da?.canonLifecycleStatus).toBe("canon_locked");
+    expect(di?.canonLifecycleStatus).toBe("runtime_verified");
+
     for (const profile of canonicalOperatorProfilesV0_1) {
       expect(profile.profileVersion).toBe("canonical-operator-profile.v0_1");
       expect(profile.reviewedEvidenceStatus).toBe("reviewed_functional");
-      expect(profile.canonLifecycleStatus).toBe("runtime_verified");
-      expect(profile.canonLifecycleStatus).not.toBe("canon_locked");
+      expect(["runtime_verified", "canon_locked"]).toContain(
+        profile.canonLifecycleStatus,
+      );
       expect(profile.authorizationScope).toBe(
         "bounded_functional_lexical_projection",
       );

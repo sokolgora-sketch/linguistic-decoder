@@ -21,12 +21,15 @@ function fail(message: string): never {
   throw new Error(`Canonical operator live-smoke configuration error: ${message}`);
 }
 
-function assertRuntimeVerifiedProfile(
+function assertRuntimeMatureProfile(
   profile: CanonicalOperatorProfileV0_1,
 ): void {
-  if (profile.canonLifecycleStatus !== "runtime_verified") {
+  if (
+    profile.canonLifecycleStatus !== "runtime_verified" &&
+    profile.canonLifecycleStatus !== "canon_locked"
+  ) {
     fail(
-      `${profile.operatorId} must be runtime_verified, received ${profile.canonLifecycleStatus}`,
+      `${profile.operatorId} must hold a runtime-mature lifecycle status, received ${profile.canonLifecycleStatus}`,
     );
   }
 
@@ -69,7 +72,7 @@ export function buildCanonicalOperatorLiveSmokeCasesV0_1(): readonly CanonicalOp
       productionMember,
       runtimeProjection,
     }) => {
-      assertRuntimeVerifiedProfile(profile);
+      assertRuntimeMatureProfile(profile);
 
       if (!readiness.functionalReady) {
         fail(`${profile.operatorId} is not functionally ready`);
