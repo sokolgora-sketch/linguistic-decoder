@@ -33,7 +33,7 @@ export type CanonicalOperatorCanonLockAdmissionV0_1 = {
 };
 
 const CANON_LOCK_ADMITTED_OPERATOR_IDS_V0_1 =
-  new Set<string>(["DA"]);
+  new Set<string>(["DA", "DI"]);
 
 const RUNTIME_MATURE_LIFECYCLE_STATUSES_V0_1 =
   new Set<string>(["runtime_verified", "canon_locked"]);

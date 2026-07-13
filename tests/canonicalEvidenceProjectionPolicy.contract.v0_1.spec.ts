@@ -138,7 +138,7 @@ describe("canonical evidence projection policy contract v0.1", () => {
     }
   });
 
-  it("preserves DA and DI lifecycle values", () => {
+  it("preserves the current DA and DI canon-locked lifecycle values", () => {
     const canonLockedMatches =
       profileSource.match(
         /canonLifecycleStatus: "canon_locked"/g,
@@ -149,15 +149,15 @@ describe("canonical evidence projection policy contract v0.1", () => {
         /canonLifecycleStatus: "runtime_verified"/g,
       ) ?? [];
 
-    expect(canonLockedMatches).toHaveLength(1);
-    expect(runtimeVerifiedMatches).toHaveLength(1);
+    expect(canonLockedMatches).toHaveLength(2);
+    expect(runtimeVerifiedMatches).toHaveLength(0);
 
     expect(profileSource).toMatch(
       /operatorId: "DA"[\s\S]*?canonLifecycleStatus: "canon_locked"/,
     );
 
     expect(profileSource).toMatch(
-      /operatorId: "DI"[\s\S]*?canonLifecycleStatus: "runtime_verified"/,
+      /operatorId: "DI"[\s\S]*?canonLifecycleStatus: "canon_locked"/,
     );
   });
 });

@@ -25,7 +25,7 @@ const expectedProfileKeys = [
 ].sort();
 
 describe("canonical operator profile v0.1", () => {
-  it("registers DA as canon_locked and preserves DI as runtime_verified", () => {
+  it("registers DA and DI as canon_locked", () => {
     expect(canonicalOperatorProfilesV0_1).toHaveLength(2);
     expect(canonicalOperatorProfilesV0_1.map((profile) => profile.operatorId)).toEqual([
       "DA",
@@ -36,7 +36,7 @@ describe("canonical operator profile v0.1", () => {
     const di = getCanonicalOperatorProfileV0_1("DI");
 
     expect(da?.canonLifecycleStatus).toBe("canon_locked");
-    expect(di?.canonLifecycleStatus).toBe("runtime_verified");
+    expect(di?.canonLifecycleStatus).toBe("canon_locked");
 
     for (const profile of canonicalOperatorProfilesV0_1) {
       expect(profile.profileVersion).toBe("canonical-operator-profile.v0_1");
