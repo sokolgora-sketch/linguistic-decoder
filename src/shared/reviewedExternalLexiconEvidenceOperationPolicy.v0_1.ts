@@ -8,7 +8,9 @@ export type ReviewedExternalLexiconEvidenceOperationPolicyReasonV0_1 =
   | "policy_embryo_mismatch"
   | "operation_missing"
   | "operation_unsupported"
-  | "operation_not_allowed";
+  | "operation_not_allowed"
+  | "carrier_form_missing"
+  | "carrier_form_not_allowed";
 
 export type ReviewedExternalLexiconEvidenceOperationPolicyV0_1 = {
   policyVersion:
@@ -16,6 +18,7 @@ export type ReviewedExternalLexiconEvidenceOperationPolicyV0_1 = {
   sourceId: string;
   embryo: string;
   allowedEvidenceOps: readonly AllowedOpId[];
+  allowedEvidenceCarrierForms: readonly string[];
 };
 
 export type ReviewedExternalLexiconEvidenceOperationEvaluationV0_1 = {
@@ -25,6 +28,7 @@ export type ReviewedExternalLexiconEvidenceOperationEvaluationV0_1 = {
   embryo: string;
   allowed: boolean;
   effectiveOps: readonly AllowedOpId[];
+  effectiveCarrierForm: string | null;
   reasons:
     readonly ReviewedExternalLexiconEvidenceOperationPolicyReasonV0_1[];
 };
@@ -36,6 +40,7 @@ export const reviewedExternalLexiconEvidenceOperationPoliciesV0_1 = [
     sourceId: "reviewed.external.di.knowledge.candidate.v0_1",
     embryo: "DI",
     allowedEvidenceOps: ["exact", "y_to_i"],
+    allowedEvidenceCarrierForms: ["di"],
   },
   {
     policyVersion:
@@ -43,6 +48,7 @@ export const reviewedExternalLexiconEvidenceOperationPoliciesV0_1 = [
     sourceId: "reviewed.external.gheg-da.damage.candidate.v0_1",
     embryo: "DA",
     allowedEvidenceOps: ["exact"],
+    allowedEvidenceCarrierForms: ["da"],
   },
 ] as const satisfies readonly ReviewedExternalLexiconEvidenceOperationPolicyV0_1[];
 
@@ -80,6 +86,12 @@ export function evaluateReviewedExternalLexiconEvidenceOperationPolicyV0_1(
       params.sourceId,
     );
 
+  const policyIdentityMatches =
+    Boolean(
+      policy &&
+        policy.embryo === params.embryo,
+    );
+
   if (!policy) {
     reasons.add("policy_missing");
   } else if (policy.embryo !== params.embryo) {
@@ -89,12 +101,12 @@ export function evaluateReviewedExternalLexiconEvidenceOperationPolicyV0_1(
   const rawOps = Array.isArray(params.ops) ? params.ops : [];
   const effectiveOps: AllowedOpId[] = [];
 
-  if (rawOps.length === 0) {
-    const segment = normalizeCarrierTextV0_1(params.segment);
-    const carrierForm = normalizeCarrierTextV0_1(
-      params.carrierForm,
-    );
+  const segment = normalizeCarrierTextV0_1(params.segment);
+  const carrierForm = normalizeCarrierTextV0_1(
+    params.carrierForm,
+  );
 
+  if (rawOps.length === 0) {
     if (
       segment.length > 0 &&
       carrierForm.length > 0 &&
@@ -120,6 +132,7 @@ export function evaluateReviewedExternalLexiconEvidenceOperationPolicyV0_1(
   }
 
   if (
+    policyIdentityMatches &&
     policy &&
     effectiveOps.some(
       (operation) =>
@@ -127,6 +140,24 @@ export function evaluateReviewedExternalLexiconEvidenceOperationPolicyV0_1(
     )
   ) {
     reasons.add("operation_not_allowed");
+  }
+
+  if (
+    policyIdentityMatches &&
+    policy
+  ) {
+    if (!carrierForm) {
+      reasons.add("carrier_form_missing");
+    } else {
+      const allowedCarrierForms =
+        policy.allowedEvidenceCarrierForms.map(
+          normalizeCarrierTextV0_1,
+        );
+
+      if (!allowedCarrierForms.includes(carrierForm)) {
+        reasons.add("carrier_form_not_allowed");
+      }
+    }
   }
 
   const sortedReasons = [...reasons].sort();
@@ -138,6 +169,8 @@ export function evaluateReviewedExternalLexiconEvidenceOperationPolicyV0_1(
     embryo: params.embryo,
     allowed: sortedReasons.length === 0,
     effectiveOps,
+    effectiveCarrierForm:
+      carrierForm || null,
     reasons: sortedReasons,
   };
 }

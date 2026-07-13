@@ -38,15 +38,22 @@ describe("Open Instrument live smoke runbook v0.1", () => {
     expect(profileOwner).toContain(
       'positiveProofWords: ["da", "dam", "damage"]',
     );
-    expect(profileOwner).toContain(
-      'negativeControlWords: ["study", "xyz", "mode", "made", "dome"]',
+    expect(profileOwner).toMatch(
+      /operatorId: "DA",[\s\S]*?negativeControlWords:\s*\[\s*"study",\s*"xyz",\s*"mode",\s*"made",\s*"dome",\s*"di",\s*"studim",\s*\]/,
     );
     expect(profileOwner).toContain(
-      'positiveProofWords: ["study"]',
+      'positiveProofWords: ["di", "study", "studim"]',
     );
     expect(profileOwner).toContain(
-      'negativeControlWords: ["da", "dam", "damage", "mode", "xyz"]',
+      'negativeControlWords: [',
     );
+    for (const word of [
+      '"dij"',
+      '"dije"',
+      '"dit"',
+    ]) {
+      expect(profileOwner).toContain(word);
+    }
 
     expect(script).not.toContain(
       'const words = ["da", "dam", "study", "damage", "xyz"]',

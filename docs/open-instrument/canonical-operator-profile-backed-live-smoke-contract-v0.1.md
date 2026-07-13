@@ -141,3 +141,31 @@ DI remains:
 
 The smoke accepts both runtime-mature states while rejecting earlier lifecycle
 states and `deprecated`.
+
+## Carrier-scope extension — 2026-07
+
+The profile-backed smoke also verifies reviewed carrier scope.
+
+Current DI evidence-positive words are:
+
+- `di`;
+- `study`;
+- `studim`.
+
+Each must resolve through selected reviewed carrier:
+
+- `di`.
+
+Current DI evidence-absence carrier controls are:
+
+- `dij`;
+- `dije`;
+- `dit`.
+
+These controls may retain a DI token and carrier diagnostics while the exact
+reviewed DI projection and citation-bearing metadata remain absent.
+
+`dit` also retains its non-citation weak-carrier warning.
+
+This extension does not change DI from `runtime_verified` and does not alter
+DA `canon_locked` status.
