@@ -31,10 +31,13 @@ describe("reviewed external lexicon evidence operation policy v0.1", () => {
 
       expect(matches).toHaveLength(1);
       expect(matches[0].embryo).toBe(row.embryo);
+      expect(
+        matches[0].allowedEvidenceCarrierForms,
+      ).toContain(row.isolatedStandaloneForm);
     }
   });
 
-  it("allows exact DA evidence only", () => {
+  it("allows exact DA evidence only through carrier da", () => {
     expect(
       getReviewedExternalLexiconEvidenceOperationPolicyV0_1(
         DA_SOURCE,
@@ -43,6 +46,7 @@ describe("reviewed external lexicon evidence operation policy v0.1", () => {
       sourceId: DA_SOURCE,
       embryo: "DA",
       allowedEvidenceOps: ["exact"],
+      allowedEvidenceCarrierForms: ["da"],
     });
 
     expect(
@@ -58,7 +62,25 @@ describe("reviewed external lexicon evidence operation policy v0.1", () => {
     ).toMatchObject({
       allowed: true,
       effectiveOps: ["exact"],
+      effectiveCarrierForm: "da",
       reasons: [],
+    });
+
+    expect(
+      evaluateReviewedExternalLexiconEvidenceOperationPolicyV0_1(
+        {
+          sourceId: DA_SOURCE,
+          embryo: "DA",
+          ops: ["exact"],
+          segment: "daj",
+          carrierForm: "daj",
+        },
+      ),
+    ).toMatchObject({
+      allowed: false,
+      effectiveOps: ["exact"],
+      effectiveCarrierForm: "daj",
+      reasons: ["carrier_form_not_allowed"],
     });
 
     for (const operation of [
@@ -96,6 +118,7 @@ describe("reviewed external lexicon evidence operation policy v0.1", () => {
     ).toMatchObject({
       allowed: true,
       effectiveOps: ["exact"],
+      effectiveCarrierForm: "da",
       reasons: [],
     });
 
@@ -112,27 +135,93 @@ describe("reviewed external lexicon evidence operation policy v0.1", () => {
     ).toMatchObject({
       allowed: false,
       effectiveOps: [],
+      effectiveCarrierForm: "da",
       reasons: ["operation_missing"],
     });
   });
 
-  it("allows DI y_to_i while remaining fail closed", () => {
+  it("allows DI exact and y_to_i only through reviewed carrier di", () => {
+    expect(
+      getReviewedExternalLexiconEvidenceOperationPolicyV0_1(
+        DI_SOURCE,
+      ),
+    ).toMatchObject({
+      sourceId: DI_SOURCE,
+      embryo: "DI",
+      allowedEvidenceOps: ["exact", "y_to_i"],
+      allowedEvidenceCarrierForms: ["di"],
+    });
+
+    for (const params of [
+      {
+        ops: ["exact"],
+        segment: "di",
+        carrierForm: "di",
+      },
+      {
+        ops: ["y_to_i"],
+        segment: "dy",
+        carrierForm: "di",
+      },
+    ]) {
+      expect(
+        evaluateReviewedExternalLexiconEvidenceOperationPolicyV0_1(
+          {
+            sourceId: DI_SOURCE,
+            embryo: "DI",
+            ...params,
+          },
+        ),
+      ).toMatchObject({
+        allowed: true,
+        effectiveCarrierForm: "di",
+        reasons: [],
+      });
+    }
+  });
+
+  it.each(["dij", "dije", "dit"])(
+    "withholds reviewed DI evidence from unreviewed carrier %s",
+    (carrierForm) => {
+      expect(
+        evaluateReviewedExternalLexiconEvidenceOperationPolicyV0_1(
+          {
+            sourceId: DI_SOURCE,
+            embryo: "DI",
+            ops: ["exact"],
+            segment: carrierForm,
+            carrierForm,
+          },
+        ),
+      ).toMatchObject({
+        allowed: false,
+        effectiveOps: ["exact"],
+        effectiveCarrierForm: carrierForm,
+        reasons: ["carrier_form_not_allowed"],
+      });
+    },
+  );
+
+  it("fails closed for missing carrier identity", () => {
     expect(
       evaluateReviewedExternalLexiconEvidenceOperationPolicyV0_1(
         {
           sourceId: DI_SOURCE,
           embryo: "DI",
-          ops: ["y_to_i"],
-          segment: "dy",
-          carrierForm: "di",
+          ops: ["exact"],
+          segment: "di",
+          carrierForm: "",
         },
       ),
     ).toMatchObject({
-      allowed: true,
-      effectiveOps: ["y_to_i"],
-      reasons: [],
+      allowed: false,
+      effectiveOps: ["exact"],
+      effectiveCarrierForm: null,
+      reasons: ["carrier_form_missing"],
     });
+  });
 
+  it("remains fail closed for missing policy, embryo mismatch and unsupported operations", () => {
     expect(
       evaluateReviewedExternalLexiconEvidenceOperationPolicyV0_1(
         {

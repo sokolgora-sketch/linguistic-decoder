@@ -80,6 +80,8 @@ describe("DA canonical operator canon-lock transition v0.1", () => {
           "mode",
           "made",
           "dome",
+          "di",
+          "studim",
         ],
       }),
     );

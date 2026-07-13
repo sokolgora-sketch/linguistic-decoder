@@ -168,15 +168,24 @@ describe("canonical operator profile v0.1", () => {
       "mode",
       "made",
       "dome",
+      "di",
+      "studim",
     ]);
 
-    expect(di?.positiveProofWords).toEqual(["study"]);
+    expect(di?.positiveProofWords).toEqual([
+      "di",
+      "study",
+      "studim",
+    ]);
     expect(di?.negativeControlWords).toEqual([
       "da",
       "dam",
       "damage",
       "mode",
       "xyz",
+      "dij",
+      "dije",
+      "dit",
     ]);
   });
 });

@@ -112,14 +112,19 @@ The resolver fails closed when the configured source ID does not exist.
 - source ID:
   `reviewed.external.di.knowledge.candidate.v0_1`;
 - lifecycle: `runtime_verified`;
-- positive proof word:
+- positive proof words:
+  - `di`;
   - `study`;
+  - `studim`;
 - negative controls:
   - `da`;
   - `dam`;
   - `damage`;
   - `mode`;
-  - `xyz`.
+  - `xyz`;
+  - `dij`;
+  - `dije`;
+  - `dit`.
 
 DA is `canon_locked` under the separately reviewed bounded functional
 scope.

@@ -65,6 +65,11 @@ describe("Open Instrument canonical operator live smoke profile contract v0.1", 
       "mode",
       "made",
       "dome",
+      "di",
+      "studim",
+      "dij",
+      "dije",
+      "dit",
     ]);
   });
 

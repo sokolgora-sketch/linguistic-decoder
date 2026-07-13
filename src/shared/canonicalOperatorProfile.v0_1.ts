@@ -67,7 +67,15 @@ export const canonicalOperatorProfilesV0_1 = [
     canonLifecycleStatus: "canon_locked",
     authorizationScope: "bounded_functional_lexical_projection",
     positiveProofWords: ["da", "dam", "damage"],
-    negativeControlWords: ["study", "xyz", "mode", "made", "dome"],
+    negativeControlWords: [
+      "study",
+      "xyz",
+      "mode",
+      "made",
+      "dome",
+      "di",
+      "studim",
+    ],
   },
   {
     profileVersion: "canonical-operator-profile.v0_1",
@@ -79,8 +87,17 @@ export const canonicalOperatorProfilesV0_1 = [
     reviewedEvidenceStatus: "reviewed_functional",
     canonLifecycleStatus: "runtime_verified",
     authorizationScope: "bounded_functional_lexical_projection",
-    positiveProofWords: ["study"],
-    negativeControlWords: ["da", "dam", "damage", "mode", "xyz"],
+    positiveProofWords: ["di", "study", "studim"],
+    negativeControlWords: [
+      "da",
+      "dam",
+      "damage",
+      "mode",
+      "xyz",
+      "dij",
+      "dije",
+      "dit",
+    ],
   },
 ] as const satisfies readonly CanonicalOperatorProfileV0_1[];
 
