@@ -162,7 +162,13 @@ describe("canonical operator profile v0.1", () => {
     const di = getCanonicalOperatorProfileV0_1("DI");
 
     expect(da?.positiveProofWords).toEqual(["da", "dam", "damage"]);
-    expect(da?.negativeControlWords).toContain("study");
+    expect(da?.negativeControlWords).toEqual([
+      "study",
+      "xyz",
+      "mode",
+      "made",
+      "dome",
+    ]);
 
     expect(di?.positiveProofWords).toEqual(["study"]);
     expect(di?.negativeControlWords).toEqual([

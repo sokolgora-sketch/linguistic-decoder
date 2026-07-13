@@ -74,7 +74,13 @@ describe("DA canonical operator canon-lock transition v0.1", () => {
         authorizationScope:
           "bounded_functional_lexical_projection",
         positiveProofWords: ["da", "dam", "damage"],
-        negativeControlWords: ["study", "xyz"],
+        negativeControlWords: [
+          "study",
+          "xyz",
+          "mode",
+          "made",
+          "dome",
+        ],
       }),
     );
   });

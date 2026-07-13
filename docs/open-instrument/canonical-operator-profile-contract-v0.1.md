@@ -101,7 +101,10 @@ The resolver fails closed when the configured source ID does not exist.
   - `damage`;
 - negative controls:
   - `study`;
-  - `xyz`.
+  - `xyz`;
+  - `mode`;
+  - `made`;
+  - `dome`.
 
 ### DI
 

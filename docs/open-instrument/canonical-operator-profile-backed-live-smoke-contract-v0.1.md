@@ -74,10 +74,13 @@ route.
 For every negative control, the smoke requires:
 
 - the exact profile-specific reviewed runtime-projection evidence text to be
-  absent.
+  absent from the operator's RootMap key;
+- citation-bearing reviewed metadata to be absent from that same key,
+  including reviewed-source wording, citation wording, DOI markers, and URLs.
 
-This permits a word to contain another operator while preventing evidence
-leakage from the operator currently under test.
+This permits a word to retain an operator-shaped token while preventing both
+complete and partial reviewed-evidence leakage from the operator currently
+under test.
 
 ## Preserved behavior
 

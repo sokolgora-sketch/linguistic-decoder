@@ -24,6 +24,7 @@ import { getProtoRootV1 } from "./protoRoots.v1";
 import { extractSevenVowelsFromString } from "@/shared/math7.core";
 import { getReviewedExternalLexiconProductionSourceRowsV0_1 } from "./reviewedExternalLexiconSourceRowRegistry.v0_1";
 import { projectReviewedExternalLexiconProductionRowForRuntimeV0_1 } from "./reviewedExternalLexiconRuntimeProjection.v0_1";
+import { evaluateReviewedExternalLexiconEvidenceOperationPolicyV0_1 } from "./reviewedExternalLexiconEvidenceOperationPolicy.v0_1";
 
 function roleHintToTokenRole(roleHint?: string): RootTokenRoleV1 {
   switch (roleHint) {
@@ -174,14 +175,41 @@ function buildSpansOrNull(params: {
 }
 
 
-function buildReviewedFunctionalRuntimeEvidenceByEmbryoV0_1(): ReadonlyMap<string, string> {
-  const entries = getReviewedExternalLexiconProductionSourceRowsV0_1()
-    .map(projectReviewedExternalLexiconProductionRowForRuntimeV0_1)
-    .filter((projection): projection is NonNullable<typeof projection> => projection != null)
-    .map((projection) => [
+type ReviewedFunctionalRuntimeEvidenceV0_1 = {
+  sourceId: string;
+  embryo: string;
+  evidenceText: string;
+};
+
+function buildReviewedFunctionalRuntimeEvidenceByEmbryoV0_1(): ReadonlyMap<
+  string,
+  ReviewedFunctionalRuntimeEvidenceV0_1
+> {
+  const entries: Array<
+    readonly [string, ReviewedFunctionalRuntimeEvidenceV0_1]
+  > = [];
+
+  for (
+    const row of
+    getReviewedExternalLexiconProductionSourceRowsV0_1()
+  ) {
+    const projection =
+      projectReviewedExternalLexiconProductionRowForRuntimeV0_1(
+        row,
+      );
+
+    if (!projection) continue;
+
+    entries.push([
       projection.embryo,
-      `reviewed functional free-operator evidence: ${projection.evidenceText}; historicalOriginClaim=${projection.claimBoundary.historicalOriginClaim}; winnerClaim=${projection.claimBoundary.winnerClaim}; languageSuperiorityClaim=${projection.claimBoundary.languageSuperiorityClaim}; userDecisionPosture=${projection.claimBoundary.userDecisionPosture}`,
-    ] as const);
+      {
+        sourceId: projection.sourceId,
+        embryo: projection.embryo,
+        evidenceText:
+          `reviewed functional free-operator evidence: ${projection.evidenceText}; historicalOriginClaim=${projection.claimBoundary.historicalOriginClaim}; winnerClaim=${projection.claimBoundary.winnerClaim}; languageSuperiorityClaim=${projection.claimBoundary.languageSuperiorityClaim}; userDecisionPosture=${projection.claimBoundary.userDecisionPosture}`,
+      },
+    ]);
+  }
 
   return new Map(entries);
 }
@@ -269,15 +297,62 @@ const tokens: RootTokenV1[] = [];
         ? proto.carriers.find((c) => c.lang === chosenCarrier?.lang && c.form === carrierForm)
         : undefined;
 
-    if (protoCarrierHit?.gloss) evidence.push(`gloss: ${protoCarrierHit.gloss}`);
-    const shouldExposeCarrierNote =
-      protoCarrierHit?.notes &&
-      /dialect attestation|gheg|weak|homophone|do not use/i.test(protoCarrierHit.notes);
-    if (shouldExposeCarrierNote) evidence.push(`note: ${protoCarrierHit.notes}`);
+    if (protoCarrierHit?.gloss) {
+      evidence.push(`gloss: ${protoCarrierHit.gloss}`);
+    }
 
-    const reviewedFunctionalEvidence = reviewedEvidenceByEmbryo.get(protoRootId);
-    if (reviewedFunctionalEvidence && !evidence.includes(reviewedFunctionalEvidence)) {
-      evidence.push(reviewedFunctionalEvidence);
+    const reviewedFunctionalEvidence =
+      reviewedEvidenceByEmbryo.get(protoRootId);
+
+    const evidenceOperationEvaluation =
+      reviewedFunctionalEvidence
+        ? evaluateReviewedExternalLexiconEvidenceOperationPolicyV0_1(
+            {
+              sourceId: reviewedFunctionalEvidence.sourceId,
+              embryo: reviewedFunctionalEvidence.embryo,
+              ops,
+              segment: chosenCarrier?.segment,
+              carrierForm,
+            },
+          )
+        : null;
+
+    const carrierNoteContainsReviewedCitationMetadata =
+      Boolean(
+        protoCarrierHit?.notes &&
+          /\breviewed\b|\bcitation\b|\bdoi\b|https?:\/\//i.test(
+            protoCarrierHit.notes,
+          ),
+      );
+
+    const shouldExposeCarrierNote =
+      Boolean(
+        protoCarrierHit?.notes &&
+          /dialect attestation|gheg|weak|homophone|do not use/i.test(
+            protoCarrierHit.notes,
+          ),
+      );
+
+    const carrierNoteOperationAllowed =
+      !carrierNoteContainsReviewedCitationMetadata ||
+      evidenceOperationEvaluation?.allowed === true;
+
+    if (
+      shouldExposeCarrierNote &&
+      carrierNoteOperationAllowed &&
+      protoCarrierHit?.notes
+    ) {
+      evidence.push(`note: ${protoCarrierHit.notes}`);
+    }
+
+    if (
+      reviewedFunctionalEvidence &&
+      evidenceOperationEvaluation?.allowed &&
+      !evidence.includes(
+        reviewedFunctionalEvidence.evidenceText,
+      )
+    ) {
+      evidence.push(reviewedFunctionalEvidence.evidenceText);
     }
 
     const status: RootKeyStatusV1 = keyStatusForCarrier(
