@@ -138,7 +138,7 @@ describe("canonical operator shared contract v0.1", () => {
     },
   );
 
-  it("locks DA as canon_locked while DI remains runtime_verified", () => {
+  it("locks DA and DI as canon_locked", () => {
     const da = canonicalOperatorProfilesV0_1.find(
       (profile) => profile.operatorId === "DA",
     );
@@ -147,7 +147,7 @@ describe("canonical operator shared contract v0.1", () => {
     );
 
     expect(da?.canonLifecycleStatus).toBe("canon_locked");
-    expect(di?.canonLifecycleStatus).toBe("runtime_verified");
+    expect(di?.canonLifecycleStatus).toBe("canon_locked");
   });
 
   it.each(resolvedProfiles)(

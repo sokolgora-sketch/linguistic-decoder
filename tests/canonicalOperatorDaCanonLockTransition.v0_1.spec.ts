@@ -42,20 +42,27 @@ describe("DA canonical operator canon-lock transition v0.1", () => {
     );
   });
 
-  it("keeps DI outside canon lock", () => {
+  it("preserves DI as an independently admitted canon-locked operator", () => {
     expect(di).toBeDefined();
 
     const admission =
       evaluateCanonicalOperatorCanonLockAdmissionV0_1(di!);
 
-    expect(admission.admitted).toBe(false);
-    expect(admission.admittedScope).toBeNull();
-    expect(admission.reasons).toContain(
-      "operator_not_explicitly_admitted",
-    );
+    expect(admission).toEqual({
+      admissionVersion:
+        "canonical-operator-canon-lock-admission.v0_1",
+      operatorId: "DI",
+      sourceId:
+        "reviewed.external.di.knowledge.candidate.v0_1",
+      admitted: true,
+      admittedScope:
+        "bounded_functional_lexical_projection",
+      rollbackLifecycleStatus: "runtime_verified",
+      reasons: [],
+    });
 
     expect(di?.profile.canonLifecycleStatus).toBe(
-      "runtime_verified",
+      "canon_locked",
     );
   });
 
@@ -101,7 +108,7 @@ describe("DA canonical operator canon-lock transition v0.1", () => {
     });
   });
 
-  it("keeps exactly one canon_locked and one runtime_verified profile", () => {
+  it("preserves DA while both reviewed operators are canon_locked", () => {
     expect(
       canonicalOperatorProfilesV0_1
         .filter(
@@ -109,7 +116,7 @@ describe("DA canonical operator canon-lock transition v0.1", () => {
             profile.canonLifecycleStatus === "canon_locked",
         )
         .map((profile) => profile.operatorId),
-    ).toEqual(["DA"]);
+    ).toEqual(["DA", "DI"]);
 
     expect(
       canonicalOperatorProfilesV0_1
@@ -119,6 +126,6 @@ describe("DA canonical operator canon-lock transition v0.1", () => {
             "runtime_verified",
         )
         .map((profile) => profile.operatorId),
-    ).toEqual(["DI"]);
+    ).toEqual([]);
   });
 });

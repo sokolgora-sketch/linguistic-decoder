@@ -85,7 +85,7 @@ export const canonicalOperatorProfilesV0_1 = [
     sourceId: "reviewed.external.di.knowledge.candidate.v0_1",
     boundedLexicalFunction: "know / knowledge functional motivation",
     reviewedEvidenceStatus: "reviewed_functional",
-    canonLifecycleStatus: "runtime_verified",
+    canonLifecycleStatus: "canon_locked",
     authorizationScope: "bounded_functional_lexical_projection",
     positiveProofWords: ["di", "study", "studim"],
     negativeControlWords: [

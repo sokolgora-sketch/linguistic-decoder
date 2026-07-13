@@ -131,13 +131,9 @@ It is not:
 
 ## Lifecycle boundary
 
-DA is:
+DA and DI are:
 
 - `canon_locked` under bounded functional lexical projection.
-
-DI remains:
-
-- `runtime_verified`.
 
 The smoke accepts both runtime-mature states while rejecting earlier lifecycle
 states and `deprecated`.
@@ -167,5 +163,5 @@ reviewed DI projection and citation-bearing metadata remain absent.
 
 `dit` also retains its non-citation weak-carrier warning.
 
-This extension does not change DI from `runtime_verified` and does not alter
-DA `canon_locked` status.
+The carrier-scope extension remains unchanged by DI canon lock. DA and DI
+both retain `canon_locked` status under bounded functional lexical projection.

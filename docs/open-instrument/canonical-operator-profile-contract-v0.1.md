@@ -111,7 +111,9 @@ The resolver fails closed when the configured source ID does not exist.
 - operator ID: `DI`;
 - source ID:
   `reviewed.external.di.knowledge.candidate.v0_1`;
-- lifecycle: `runtime_verified`;
+- lifecycle: `canon_locked`;
+- admitted scope:
+  `bounded_functional_lexical_projection`;
 - positive proof words:
   - `di`;
   - `study`;
@@ -126,10 +128,8 @@ The resolver fails closed when the configured source ID does not exist.
   - `dije`;
   - `dit`.
 
-DA is `canon_locked` under the separately reviewed bounded functional
-scope.
-
-DI remains `runtime_verified`.
+DA and DI are `canon_locked` under separately reviewed transitions limited
+to bounded functional lexical projection.
 
 ## Claim boundary
 
@@ -210,5 +210,5 @@ The contract is accepted when:
 - unknown source IDs fail closed;
 - profiles contain no duplicated citation or runtime evidence fields;
 - DA is `canon_locked` under bounded functional lexical projection;
-- DI remains `runtime_verified`;
+- DI is `canon_locked` under bounded functional lexical projection;
 - the full repository gate passes.

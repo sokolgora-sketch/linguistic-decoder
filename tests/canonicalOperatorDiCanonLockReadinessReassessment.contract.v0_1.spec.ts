@@ -14,6 +14,11 @@ describe("DI canon-lock readiness reassessment v0.1", () => {
     "utf8",
   );
 
+  const transition = readFileSync(
+    "docs/open-instrument/di-canon-lock-lifecycle-transition-v0.1.md",
+    "utf8",
+  );
+
   const resolvedDi =
     getResolvedCanonicalOperatorProfilesV0_1().find(
       (resolved) => resolved.profile.operatorId === "DI",
@@ -33,12 +38,22 @@ describe("DI canon-lock readiness reassessment v0.1", () => {
     );
   });
 
-  it("keeps DI runtime_verified and outside explicit admission", () => {
+  it("preserves the historical pre-transition record after admission", () => {
+    expect(report).toContain(
+      "The current admission result remains fail closed with:",
+    );
+    expect(report).toContain(
+      "- `operator_not_explicitly_admitted`.",
+    );
+    expect(transition).toContain(
+      "The readiness reassessment remains a historical pre-transition record.",
+    );
+
     expect(resolvedDi).toBeDefined();
 
     expect(
       resolvedDi?.profile.canonLifecycleStatus,
-    ).toBe("runtime_verified");
+    ).toBe("canon_locked");
 
     const admission =
       evaluateCanonicalOperatorCanonLockAdmissionV0_1(
@@ -46,10 +61,11 @@ describe("DI canon-lock readiness reassessment v0.1", () => {
       );
 
     expect(admission).toMatchObject({
-      admitted: false,
-      admittedScope: null,
+      admitted: true,
+      admittedScope:
+        "bounded_functional_lexical_projection",
       rollbackLifecycleStatus: "runtime_verified",
-      reasons: ["operator_not_explicitly_admitted"],
+      reasons: [],
     });
   });
 
