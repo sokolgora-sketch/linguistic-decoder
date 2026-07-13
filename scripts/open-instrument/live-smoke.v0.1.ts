@@ -70,19 +70,52 @@ function rootMapKeys(data: any): readonly any[] {
     : [];
 }
 
-function rootMapEvidenceText(data: any): string {
-  return JSON.stringify(data?.rootMap ?? {});
+function rootMapKey(
+  data: any,
+  token: string,
+): any | null {
+  return (
+    rootMapKeys(data).find(
+      (key) => key?.token === token,
+    ) ?? null
+  );
+}
+
+function rootMapKeyEvidenceText(
+  data: any,
+  token: string,
+): string {
+  const key = rootMapKey(data, token);
+
+  return Array.isArray(key?.evidence)
+    ? key.evidence.join("\n")
+    : "";
 }
 
 function hasKey(data: any, token: string): boolean {
-  return rootMapKeys(data).some((key) => key?.token === token);
+  return rootMapKey(data, token) != null;
 }
 
 function hasExactReviewedProjection(
   data: any,
+  token: string,
   evidenceText: string,
 ): boolean {
-  return rootMapEvidenceText(data).includes(evidenceText);
+  return rootMapKeyEvidenceText(
+    data,
+    token,
+  ).includes(evidenceText);
+}
+
+function hasCitationBearingReviewedEvidence(
+  data: any,
+  token: string,
+): boolean {
+  const evidence = rootMapKeyEvidenceText(data, token);
+
+  return /\breviewed\b|\bcitation\b|\bdoi\b|https?:\/\//i.test(
+    evidence,
+  );
 }
 
 async function isPortAvailable(port: number): Promise<boolean> {
@@ -195,8 +228,14 @@ function summarizeWord(
       expectation: smokeCase.expectation,
       evidenceVisible: hasExactReviewedProjection(
         data,
+        smokeCase.embryo,
         smokeCase.evidenceText,
       ),
+      citationBearingEvidenceVisible:
+        hasCitationBearingReviewedEvidence(
+          data,
+          smokeCase.embryo,
+        ),
     })),
   };
 }
@@ -207,8 +246,15 @@ function assertSmokeCase(
 ): void {
   const evidenceVisible = hasExactReviewedProjection(
     data,
+    smokeCase.embryo,
     smokeCase.evidenceText,
   );
+
+  const citationBearingEvidenceVisible =
+    hasCitationBearingReviewedEvidence(
+      data,
+      smokeCase.embryo,
+    );
 
   if (smokeCase.expectation === "evidence_present") {
     assert(
@@ -227,6 +273,11 @@ function assertSmokeCase(
   assert(
     !evidenceVisible,
     `Expected ${smokeCase.word} to avoid reviewed ${smokeCase.operatorId} evidence from ${smokeCase.sourceId}.`,
+  );
+
+  assert(
+    !citationBearingEvidenceVisible,
+    `Expected ${smokeCase.word} to avoid citation-bearing reviewed ${smokeCase.operatorId} metadata on the ${smokeCase.embryo} RootMap key.`,
   );
 }
 

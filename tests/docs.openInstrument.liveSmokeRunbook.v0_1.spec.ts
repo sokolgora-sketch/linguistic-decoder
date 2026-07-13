@@ -39,7 +39,7 @@ describe("Open Instrument live smoke runbook v0.1", () => {
       'positiveProofWords: ["da", "dam", "damage"]',
     );
     expect(profileOwner).toContain(
-      'negativeControlWords: ["study", "xyz"]',
+      'negativeControlWords: ["study", "xyz", "mode", "made", "dome"]',
     );
     expect(profileOwner).toContain(
       'positiveProofWords: ["study"]',

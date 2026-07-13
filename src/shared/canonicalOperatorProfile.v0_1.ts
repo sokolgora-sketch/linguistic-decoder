@@ -67,7 +67,7 @@ export const canonicalOperatorProfilesV0_1 = [
     canonLifecycleStatus: "canon_locked",
     authorizationScope: "bounded_functional_lexical_projection",
     positiveProofWords: ["da", "dam", "damage"],
-    negativeControlWords: ["study", "xyz"],
+    negativeControlWords: ["study", "xyz", "mode", "made", "dome"],
   },
   {
     profileVersion: "canonical-operator-profile.v0_1",

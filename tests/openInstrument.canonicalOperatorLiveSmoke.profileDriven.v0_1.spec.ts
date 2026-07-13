@@ -63,6 +63,8 @@ describe("Open Instrument canonical operator live smoke profile contract v0.1", 
       "study",
       "xyz",
       "mode",
+      "made",
+      "dome",
     ]);
   });
 
@@ -103,6 +105,16 @@ describe("Open Instrument canonical operator live smoke profile contract v0.1", 
     expect(runner).not.toContain(
       'const words = ["da", "dam", "study", "damage", "xyz"]',
     );
+    expect(runner).toContain(
+      "hasCitationBearingReviewedEvidence",
+    );
+    expect(runner).toContain(
+      "rootMapKeyEvidenceText",
+    );
+    expect(runner).toContain(
+      "citationBearingEvidenceVisible",
+    );
+
     expect(runner).not.toContain("hasReviewedDaEvidence");
     expect(runner).not.toContain("hasReviewedDiProjection");
   });
