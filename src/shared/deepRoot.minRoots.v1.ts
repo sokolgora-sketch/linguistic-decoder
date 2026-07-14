@@ -11,6 +11,7 @@
 
 import { segmentBasis } from "./segmenter.v1";
 import { matchSegmentToProtoRoots } from "./carrierMatcher.v1";
+import { discoverCanonicalOperatorCandidatesV0_1 } from "./canonicalOperatorDiscovery.v0_1";
 
 export type MinRootHypothesis = {
   id: string;
@@ -55,35 +56,9 @@ export function buildMinRootHypotheses(
   const maxSegments = opts.maxSegments ?? 5;
   const maxHypotheses = opts.maxHypotheses ?? 50;
 
-  const normalizedBasis = String(basis || "").toLowerCase();
-
-  if (normalizedBasis === "damage") {
-    const boundedDamage: MinRootHypothesis = {
-      id: "damage:DA:0",
-      basis: "damage",
-      segments: ["da"],
-      protoRoots: ["DA"],
-      carriers: [
-        {
-          protoRootId: "DA",
-          segment: "da",
-          carrierForm: "da",
-          lang: "sq",
-          ops: [],
-        },
-      ],
-      decomposition: {
-        action: "DA",
-      },
-      checks: {
-        opsWithinLimits: true,
-        skeletonExplained: true,
-      },
-      opsCount: 0,
-    };
-
-    return [boundedDamage].slice(0, maxHypotheses);
-  }
+  const normalizedBasis = String(basis || "")
+    .trim()
+    .toLowerCase();
 
   const segmentations = segmentBasis(basis, {
     maxSegments,
@@ -165,7 +140,83 @@ export function buildMinRootHypotheses(
     }
   }
 
-  return out.slice(0, maxHypotheses);
+  const canonicalDiscoveries =
+    discoverCanonicalOperatorCandidatesV0_1(
+      normalizedBasis,
+    ).filter(
+      (candidate) =>
+        candidate.reviewedEvidenceEligible,
+    );
+
+  const existingCanonicalMatches = new Set(
+    out.flatMap((hypothesis) =>
+      hypothesis.carriers.map((carrier) =>
+        [
+          carrier.protoRootId,
+          carrier.segment,
+          carrier.carrierForm,
+          [...carrier.ops].sort().join(","),
+        ].join("\u0000"),
+      ),
+    ),
+  );
+
+  const canonicalFallbacks: MinRootHypothesis[] = [];
+
+  for (const discovery of canonicalDiscoveries) {
+    const discoveryKey = [
+      discovery.operatorId,
+      discovery.segment,
+      discovery.carrierForm,
+      [...discovery.operations].sort().join(","),
+    ].join("\u0000");
+
+    if (existingCanonicalMatches.has(discoveryKey)) {
+      continue;
+    }
+
+    const protoRoot =
+      discovery.operatorId;
+
+    const emittedOps =
+      discovery.operations.length === 1 &&
+      discovery.operations[0] === "exact"
+        ? []
+        : [...discovery.operations];
+
+    canonicalFallbacks.push({
+      id:
+        `${normalizedBasis}:${protoRoot}:` +
+        `${canonicalFallbacks.length}`,
+      basis: normalizedBasis,
+      segments: [discovery.segment],
+      protoRoots: [protoRoot],
+      carriers: [
+        {
+          protoRootId: protoRoot,
+          segment: discovery.segment,
+          carrierForm: discovery.carrierForm,
+          lang: discovery.language,
+          ops: emittedOps,
+        },
+      ],
+      decomposition:
+        protoRoot === "DA"
+          ? { action: protoRoot }
+          : { function: protoRoot },
+      checks: {
+        opsWithinLimits:
+          emittedOps.length <= 5,
+        skeletonExplained: true,
+      },
+      opsCount: emittedOps.length,
+    });
+  }
+
+  return [
+    ...canonicalFallbacks,
+    ...out,
+  ].slice(0, maxHypotheses);
 }
 
 function deriveDecomposition(carriers: any[]) {
