@@ -1,90 +1,39 @@
-import type { AllowedOpId } from "./ops/allowedOps.v0.1";
+import {
+  resolveLegacyFunctionalRootCompatibilityV0_1,
+  type FunctionalRootHypothesisV1,
+} from "./legacyFunctionalRootCompatibilityRegistry.v0_1";
+
+export type {
+  FunctionalRootHypothesisV1,
+} from "./legacyFunctionalRootCompatibilityRegistry.v0_1";
+
 /**
  * DeepRoot Functional Roots v1
- * Deterministic, conservative micro-root hypotheses.
  *
- * Rules:
- * - Only emit for explicitly supported words (whitelist).
- * - No winners, no scores.
- * - JSON-safe output only.
- * - Keep text stable (tests + snapshots depend on it).
+ * Compatibility boundary:
+ * - Existing v1 study, damage, and father outputs remain stable.
+ * - Whole-word records are owned by an explicit compatibility registry.
+ * - This resolver does not authorize new words or reviewed evidence.
+ * - No winner or historical-origin claim is created here.
  */
-
-export type FunctionalRootHypothesisV1 = {
-  id: string;
-  language: string; // e.g. "sq"
-  surfaceForms: string[]; // which surface words this applies to
-  roots: string[]; // functional micro-roots (lowercase)
-  gloss: string; // short functional reading
-  opsUsed: AllowedOpId[]; // explanation of mapping/allowed transforms
-  vowelPath?: string; // optional, UI hint (stable string)
-  notes?: string[]; // optional
-};
-
 export function extractFunctionalRootsV1(params: {
-  basis: { word: string; normalizedWord: string };
+  basis: {
+    word: string;
+    normalizedWord: string;
+  };
 }): FunctionalRootHypothesisV1[] {
-  const w = (params.basis.normalizedWord || "").toLowerCase();
-  const out: FunctionalRootHypothesisV1[] = [];
+  const normalizedWord = String(
+    params.basis.normalizedWord ?? "",
+  )
+    .trim()
+    .toLocaleLowerCase("en-US");
 
-  // v1 whitelist (deterministic)
-  if (w === "study") {
-    out.push({
-      id: "sq.shtu+di.v1",
-      language: "sq",
-      surfaceForms: ["study", "studim"],
-      roots: ["shtu", "di"],
-      gloss:
-        "Functional reading: shtu (not yours / added-on) + di (know) → making knowledge yours through learning.",
-      opsUsed: ["s_to_sh", "y_to_i"],
-      vowelPath: "U→I",
-      notes: [
-        "english carrier → sq functional reading",
-        "note: studim treated as nominal closure of the same carrier family",
-        "Deterministic pilot hypothesis (v1).",
-        "No historical-chain claim; functional decomposition only.",
-      ],
-    });
-  }
+  const compatibilityOutput =
+    resolveLegacyFunctionalRootCompatibilityV0_1(
+      normalizedWord,
+    );
 
-  if (w === "damage") {
-    out.push({
-      id: "sq.dem.v1",
-      language: "sq",
-      surfaceForms: ["damage", "dëm"],
-      roots: ["dëm"],
-      gloss:
-        "Functional reading: dëm (harm / loss / injury) as a minimal carrier for the damage concept.",
-      opsUsed: [],
-      vowelPath: "A→Ë",
-      notes: [
-        "english surface → sq carrier (short form)",
-        "note: this is a minimal-root hypothesis, not a historical-chain claim",
-        "Deterministic pilot hypothesis (v1.1).",
-        "No winner; functional carrier only.",
-      ],
-    });
-  }
-
-  // v1.2: father (AT/PAT family)
-  if (w === "father") {
-    out.push({
-      id: "proto.at.pat.v1",
-      language: "proto",
-      surfaceForms: ["father", "pater", "atë"],
-      roots: ["AT", "PAT"],
-      gloss:
-        "Functional root AT / PAT: origin, projection, source of lineage and authority.",
-      opsUsed: [],
-      vowelPath: "A→Ë",
-      notes: [
-        "surface → proto carrier",
-        "no winner; family-level functional root",
-        "Proto functional family (non-historical claim).",
-        "Carrier across IE and Albanian.",
-      ],
-    });
-  }
-
-  return out;
+  return compatibilityOutput
+    ? [compatibilityOutput]
+    : [];
 }
