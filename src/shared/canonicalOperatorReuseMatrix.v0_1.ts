@@ -3,6 +3,10 @@ import {
   type CanonicalOperatorDiscoveryCandidateV0_1,
 } from "./canonicalOperatorDiscovery.v0_1";
 
+import {
+  buildCanonicalOperatorProfileDrivenReuseCasesV0_1,
+} from "./canonicalOperatorProfileDrivenReuseCorpus.v0_1";
+
 export const CANONICAL_OPERATOR_REUSE_MATRIX_VERSION_V0_1 =
   "canonical-operator-reuse-matrix.v0_1" as const;
 
@@ -96,98 +100,161 @@ export type CanonicalOperatorReuseMetricsV0_1 = {
     readonly CanonicalOperatorReuseObservationV0_1[];
 };
 
+type ProfileDrivenReuseCaseAugmentationV0_1 = {
+  caseId?: string;
+  categories?:
+    readonly CanonicalOperatorReuseCategoryV0_1[];
+  expectedCandidateOnlyOperators?:
+    readonly CanonicalOperatorIdV0_1[];
+  expectedNoCandidates?: boolean;
+  notes?: readonly string[];
+};
+
+const PROFILE_DRIVEN_REUSE_CASE_AUGMENTATIONS_V0_1:
+Readonly<
+  Record<
+    string,
+    ProfileDrivenReuseCaseAugmentationV0_1
+  >
+> = {
+  dij: {
+    caseId: "di-unreviewed-dij",
+    categories: [
+      "di_unreviewed_structural",
+      "embedded_substring_collision",
+    ],
+    expectedCandidateOnlyOperators: ["DI"],
+    notes: [
+      "Structural DI pattern is observable.",
+      "Reviewed evidence remains unauthorized.",
+    ],
+  },
+  dije: {
+    caseId: "di-unreviewed-dije",
+    categories: [
+      "di_unreviewed_structural",
+      "embedded_substring_collision",
+    ],
+    expectedCandidateOnlyOperators: ["DI"],
+    notes: [
+      "Structural DI pattern is observable.",
+      "Reviewed evidence remains unauthorized.",
+    ],
+  },
+  dit: {
+    caseId: "di-unreviewed-dit",
+    categories: [
+      "di_unreviewed_structural",
+      "embedded_substring_collision",
+    ],
+    expectedCandidateOnlyOperators: ["DI"],
+    notes: [
+      "Structural DI pattern is observable.",
+      "Semantic drift does not authorize reviewed evidence.",
+    ],
+  },
+  mode: {
+    caseId: "operation-collision-mode",
+    categories: ["operation_collision"],
+    expectedCandidateOnlyOperators: [],
+    expectedNoCandidates: true,
+    notes: [
+      "Unsupported operation paths must not create canonical candidates.",
+    ],
+  },
+  made: {
+    caseId: "operation-collision-made",
+    categories: ["operation_collision"],
+    expectedCandidateOnlyOperators: [],
+    expectedNoCandidates: true,
+    notes: [
+      "Unsupported operation paths must not create canonical candidates.",
+    ],
+  },
+  dome: {
+    caseId: "operation-collision-dome",
+    categories: ["operation_collision"],
+    expectedCandidateOnlyOperators: [],
+    expectedNoCandidates: true,
+    notes: [
+      "Unsupported operation paths must not create canonical candidates.",
+    ],
+  },
+  xyz: {
+    caseId: "unsupported-null-xyz",
+    categories: ["unsupported_null"],
+    expectedCandidateOnlyOperators: [],
+    expectedNoCandidates: true,
+    notes: [
+      "Null is valid when no canonical candidate is supported.",
+    ],
+  },
+};
+
+function uniqueCategoriesInOrderV0_1(
+  categories:
+    readonly CanonicalOperatorReuseCategoryV0_1[],
+): CanonicalOperatorReuseCategoryV0_1[] {
+  return Array.from(new Set(categories));
+}
+
+function buildProfileDrivenReuseMatrixCasesV0_1():
+CanonicalOperatorReuseMatrixCaseV0_1[] {
+  return buildCanonicalOperatorProfileDrivenReuseCasesV0_1().map(
+    (profileCase) => {
+      const augmentation =
+        PROFILE_DRIVEN_REUSE_CASE_AUGMENTATIONS_V0_1[
+          profileCase.input
+        ] ?? {};
+
+      const reviewedCategories =
+        profileCase.expectedReviewedOperators.map(
+          (operatorId):
+          CanonicalOperatorReuseCategoryV0_1 =>
+            operatorId === "DA"
+              ? "da_reviewed_positive"
+              : "di_reviewed_positive",
+        );
+
+      const crossOperatorCategories:
+      CanonicalOperatorReuseCategoryV0_1[] =
+        profileCase.negativeControlOperators.length > 0
+          ? ["cross_operator_negative"]
+          : [];
+
+      return {
+        caseId:
+          augmentation.caseId ??
+          profileCase.caseId,
+        input: profileCase.input,
+        categories:
+          uniqueCategoriesInOrderV0_1([
+            ...reviewedCategories,
+            ...crossOperatorCategories,
+            ...(augmentation.categories ?? []),
+            "repeated_run_determinism",
+          ]),
+        expectedReviewedOperators:
+          profileCase.expectedReviewedOperators,
+        expectedCandidateOnlyOperators:
+          augmentation
+            .expectedCandidateOnlyOperators ??
+          [],
+        expectedNoCandidates:
+          augmentation.expectedNoCandidates,
+        notes: [
+          "Base expectation generated from canonical operator profile proof and control words.",
+          `Profile source ids: ${profileCase.sourceProfileIds.join(", ")}.`,
+          ...(augmentation.notes ?? []),
+        ],
+      };
+    },
+  );
+}
+
 export const canonicalOperatorReuseMatrixV0_1:
 readonly CanonicalOperatorReuseMatrixCaseV0_1[] = [
-  {
-    caseId: "da-reviewed-exact",
-    input: "da",
-    categories: [
-      "da_reviewed_positive",
-      "cross_operator_negative",
-      "repeated_run_determinism",
-    ],
-    expectedReviewedOperators: ["DA"],
-    expectedCandidateOnlyOperators: [],
-    notes: [
-      "Canon-locked DA exact positive.",
-      "DI reviewed evidence must remain absent.",
-    ],
-  },
-  {
-    caseId: "da-reviewed-dam",
-    input: "dam",
-    categories: [
-      "da_reviewed_positive",
-      "cross_operator_negative",
-      "repeated_run_determinism",
-    ],
-    expectedReviewedOperators: ["DA"],
-    expectedCandidateOnlyOperators: [],
-    notes: [
-      "Reviewed DA bridge word.",
-      "No reviewed DI projection is expected.",
-    ],
-  },
-  {
-    caseId: "da-reviewed-damage",
-    input: "damage",
-    categories: [
-      "da_reviewed_positive",
-      "cross_operator_negative",
-      "repeated_run_determinism",
-    ],
-    expectedReviewedOperators: ["DA"],
-    expectedCandidateOnlyOperators: [],
-    notes: [
-      "Reviewed DA bridge word.",
-      "Legacy dëm compatibility output is outside this discovery metric.",
-    ],
-  },
-  {
-    caseId: "di-reviewed-exact",
-    input: "di",
-    categories: [
-      "di_reviewed_positive",
-      "cross_operator_negative",
-      "repeated_run_determinism",
-    ],
-    expectedReviewedOperators: ["DI"],
-    expectedCandidateOnlyOperators: [],
-    notes: [
-      "Canon-locked DI exact positive.",
-      "DA reviewed evidence must remain absent.",
-    ],
-  },
-  {
-    caseId: "di-reviewed-study",
-    input: "study",
-    categories: [
-      "di_reviewed_positive",
-      "cross_operator_negative",
-      "repeated_run_determinism",
-    ],
-    expectedReviewedOperators: ["DI"],
-    expectedCandidateOnlyOperators: [],
-    notes: [
-      "Reviewed DI bridge through y_to_i.",
-      "SHTU compatibility material does not grant canonical authorization.",
-    ],
-  },
-  {
-    caseId: "di-reviewed-studim",
-    input: "studim",
-    categories: [
-      "di_reviewed_positive",
-      "cross_operator_negative",
-      "repeated_run_determinism",
-    ],
-    expectedReviewedOperators: ["DI"],
-    expectedCandidateOnlyOperators: [],
-    notes: [
-      "Reviewed DI bridge word.",
-      "DA reviewed evidence must remain absent.",
-    ],
-  },
+  ...buildProfileDrivenReuseMatrixCasesV0_1(),
   {
     caseId: "da-unreviewed-data",
     input: "data",
@@ -201,111 +268,12 @@ readonly CanonicalOperatorReuseMatrixCaseV0_1[] = [
     notes: [
       "Structural DA pattern is observable.",
       "Reviewed evidence remains unauthorized.",
+      "This case is not a canonical profile proof or control word.",
     ],
   },
   {
-    caseId: "di-unreviewed-dij",
-    input: "dij",
-    categories: [
-      "di_unreviewed_structural",
-      "embedded_substring_collision",
-      "repeated_run_determinism",
-    ],
-    expectedReviewedOperators: [],
-    expectedCandidateOnlyOperators: ["DI"],
-    notes: [
-      "Structural DI pattern is observable.",
-      "Reviewed evidence remains unauthorized.",
-    ],
-  },
-  {
-    caseId: "di-unreviewed-dije",
-    input: "dije",
-    categories: [
-      "di_unreviewed_structural",
-      "embedded_substring_collision",
-      "repeated_run_determinism",
-    ],
-    expectedReviewedOperators: [],
-    expectedCandidateOnlyOperators: ["DI"],
-    notes: [
-      "Structural DI pattern is observable.",
-      "Reviewed evidence remains unauthorized.",
-    ],
-  },
-  {
-    caseId: "di-unreviewed-dit",
-    input: "dit",
-    categories: [
-      "di_unreviewed_structural",
-      "embedded_substring_collision",
-      "repeated_run_determinism",
-    ],
-    expectedReviewedOperators: [],
-    expectedCandidateOnlyOperators: ["DI"],
-    notes: [
-      "Structural DI pattern is observable.",
-      "Semantic drift does not authorize reviewed evidence.",
-    ],
-  },
-  {
-    caseId: "operation-collision-mode",
-    input: "mode",
-    categories: [
-      "operation_collision",
-      "repeated_run_determinism",
-    ],
-    expectedReviewedOperators: [],
-    expectedCandidateOnlyOperators: [],
-    expectedNoCandidates: true,
-    notes: [
-      "Unsupported operation path must not create a canonical candidate.",
-    ],
-  },
-  {
-    caseId: "operation-collision-made",
-    input: "made",
-    categories: [
-      "operation_collision",
-      "repeated_run_determinism",
-    ],
-    expectedReviewedOperators: [],
-    expectedCandidateOnlyOperators: [],
-    expectedNoCandidates: true,
-    notes: [
-      "Unsupported operation path must not create a canonical candidate.",
-    ],
-  },
-  {
-    caseId: "operation-collision-dome",
-    input: "dome",
-    categories: [
-      "operation_collision",
-      "repeated_run_determinism",
-    ],
-    expectedReviewedOperators: [],
-    expectedCandidateOnlyOperators: [],
-    expectedNoCandidates: true,
-    notes: [
-      "Unsupported operation path must not create a canonical candidate.",
-    ],
-  },
-  {
-    caseId: "unsupported-null-xyz",
-    input: "xyz",
-    categories: [
-      "unsupported_null",
-      "repeated_run_determinism",
-    ],
-    expectedReviewedOperators: [],
-    expectedCandidateOnlyOperators: [],
-    expectedNoCandidates: true,
-    notes: [
-      "Null is valid when no canonical candidate is supported.",
-    ],
-  },
-  {
-    caseId: "normalization-damage-case-whitespace",
+    caseId:
+      "normalization-damage-case-whitespace",
     input: "  DAMAGE  ",
     categories: [
       "case_and_whitespace_normalization",
@@ -314,9 +282,9 @@ readonly CanonicalOperatorReuseMatrixCaseV0_1[] = [
     expectedReviewedOperators: ["DA"],
     expectedCandidateOnlyOperators: [],
     normalizationEquivalentToCaseId:
-      "da-reviewed-damage",
+      "profile-da-damage",
     notes: [
-      "ASCII case and surrounding whitespace normalize to damage.",
+      "ASCII case and surrounding whitespace normalize to the profile-generated damage case.",
     ],
   },
   {
@@ -329,13 +297,14 @@ readonly CanonicalOperatorReuseMatrixCaseV0_1[] = [
     expectedReviewedOperators: ["DI"],
     expectedCandidateOnlyOperators: [],
     normalizationEquivalentToCaseId:
-      "di-reviewed-exact",
+      "profile-di-di",
     notes: [
-      "ASCII uppercase normalizes to di.",
+      "ASCII uppercase normalizes to the profile-generated di case.",
     ],
   },
   {
-    caseId: "normalization-study-unicode-space",
+    caseId:
+      "normalization-study-unicode-space",
     input: "\u00a0STUDY\u00a0",
     categories: [
       "unicode_normalization",
@@ -345,7 +314,7 @@ readonly CanonicalOperatorReuseMatrixCaseV0_1[] = [
     expectedReviewedOperators: ["DI"],
     expectedCandidateOnlyOperators: [],
     normalizationEquivalentToCaseId:
-      "di-reviewed-study",
+      "profile-di-study",
     notes: [
       "Unicode non-breaking spaces are trimmed.",
       "No Unicode lexical equivalence beyond current normalization is claimed.",
