@@ -6,6 +6,10 @@ import {
 } from "@/shared/canonicalOperatorProfile.v0_1";
 
 import {
+  buildCanonicalOperatorProfileDrivenReuseCasesV0_1,
+} from "@/shared/canonicalOperatorProfileDrivenReuseCorpus.v0_1";
+
+import {
   CANONICAL_OPERATOR_REUSE_MATRIX_VERSION_V0_1,
   REQUIRED_CANONICAL_OPERATOR_REUSE_CATEGORIES_V0_1,
   canonicalOperatorReuseMatrixV0_1,
@@ -24,6 +28,110 @@ function readRepoFile(
 describe(
   "DA/DI canonical-operator reuse matrix and metrics v0.1",
   () => {
+    it("derives base proof and control expectations from canonical profiles", () => {
+      const generated =
+        buildCanonicalOperatorProfileDrivenReuseCasesV0_1();
+
+      const generatedByInput =
+        new Map(
+          generated.map((generatedCase) => [
+            generatedCase.input,
+            generatedCase,
+          ]),
+        );
+
+      expect(generated.length).toBeGreaterThan(0);
+
+      expect(
+        new Set(
+          generated.map(
+            (generatedCase) =>
+              generatedCase.caseId,
+          ),
+        ).size,
+      ).toBe(generated.length);
+
+      for (
+        const profile
+        of canonicalOperatorProfilesV0_1
+      ) {
+        if (
+          profile.operatorId !== "DA" &&
+          profile.operatorId !== "DI"
+        ) {
+          continue;
+        }
+
+        for (
+          const positiveWord
+          of profile.positiveProofWords
+        ) {
+          const generatedCase =
+            generatedByInput.get(positiveWord);
+
+          expect(generatedCase).toBeDefined();
+
+          expect(
+            generatedCase
+              ?.expectedReviewedOperators,
+          ).toContain(profile.operatorId);
+        }
+
+        for (
+          const negativeWord
+          of profile.negativeControlWords
+        ) {
+          const generatedCase =
+            generatedByInput.get(negativeWord);
+
+          expect(generatedCase).toBeDefined();
+
+          expect(
+            generatedCase
+              ?.negativeControlOperators,
+          ).toContain(profile.operatorId);
+        }
+      }
+    });
+
+    it("removes manually owned DA and DI base-case truth from the matrix owner", () => {
+      const matrixSource = readRepoFile(
+        "src/shared/canonicalOperatorReuseMatrix.v0_1.ts",
+      );
+
+      const generatorSource = readRepoFile(
+        "src/shared/canonicalOperatorProfileDrivenReuseCorpus.v0_1.ts",
+      );
+
+      expect(matrixSource).toContain(
+        "buildCanonicalOperatorProfileDrivenReuseCasesV0_1",
+      );
+
+      expect(generatorSource).toContain(
+        "profile.positiveProofWords",
+      );
+
+      expect(generatorSource).toContain(
+        "profile.negativeControlWords",
+      );
+
+      expect(matrixSource).not.toContain(
+        'caseId: "da-reviewed-exact"',
+      );
+
+      expect(matrixSource).not.toContain(
+        'caseId: "di-reviewed-exact"',
+      );
+
+      expect(matrixSource).not.toContain(
+        'caseId: "di-reviewed-study"',
+      );
+
+      expect(matrixSource).not.toContain(
+        'caseId: "di-reviewed-studim"',
+      );
+    });
+
     it("owns a unique data-driven matrix", () => {
       const caseIds =
         canonicalOperatorReuseMatrixV0_1.map(
