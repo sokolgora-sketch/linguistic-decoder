@@ -454,6 +454,7 @@ const checked = AnalyzeWordResultV1ContractSchema.safeParse(out);
     let final: any = {
       ...ensured,
       rootMap: (out as any).rootMap,
+      analysisStatusV0_1: (out as any).analysisStatusV0_1,
       originClaim: (out as any).originClaim,
       originClaimGates: { flag: "ocg", active: gatesOn },
       evidence: finalEvidence,
@@ -664,6 +665,7 @@ const checked = AnalyzeWordResultV1ContractSchema.safeParse(out);
     let final: any = {
       ...ensured,
       rootMap: (out as any).rootMap,
+      analysisStatusV0_1: (out as any).analysisStatusV0_1,
       originClaim: (out as any).originClaim,
       originClaimGates: { flag: "ocg", active: gatesOn },
       evidence: finalEvidence,

@@ -15,6 +15,7 @@ import { buildEvidencePackageFromVM } from "@/ui/telemetry/buildEvidencePackageF
 import { buildEvidenceSummaryTextFromVM } from "@/ui/telemetry/buildEvidenceSummaryTextFromVM";
 import type { MissingState, PresentOrMissing, ResonanceProfileV1VM, RootMapVM, SoundRootsVM, TelemetryViewModel, Vowel } from "@/ui/telemetry/types";
 import { ReadoutCard } from './sections/ReadoutCard';
+import { AnalysisStatusCardV0_1 } from "./sections/AnalysisStatusCard.v0.1";
 import { MaskCarrierCard } from "@/ui/instrument/sections/MaskCarrierCard.v0.1";
 import { CountsRatiosCard } from './sections/CountsRatiosCard';
 import { RawJsonCard } from './sections/RawJsonCard';
@@ -504,6 +505,15 @@ export function InstrumentPanel(props: Props) {
           <TabPanel id="overview" active={activeSection}>
             <div className="grid gap-4 xl:grid-cols-12">
               <div className="space-y-4 xl:col-span-7">
+                <AnalysisStatusCardV0_1
+                  status={
+                    vm.analysisStatusV0_1 ?? {
+                      kind: "missing",
+                      missing: "not_emitted",
+                      note: "analysisStatusV0_1",
+                    }
+                  }
+                />
                 <ReadoutCard
                   readout={vm.readout}
                   onCopySummary={() => void copyText("Summary copied.", evidenceSummaryText)}

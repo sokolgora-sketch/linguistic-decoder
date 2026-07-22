@@ -35,6 +35,7 @@ function pickHeartPrimaryPath(payload: any): unknown {
 import { buildMinRootHypotheses } from "./deepRoot.minRoots.v1";
 import { buildOriginClaimV1 } from "./originClaim.builder.v1";
 import { attachSoundRootsV0_2 } from "./soundRoots/soundRoots.attach.v0.2";
+import { buildAnalysisStatusV0_1 } from "./analysisStatus.v0_1";
 
 function sameStringArray(a: any, b: any): boolean {
   if (!Array.isArray(a) || !Array.isArray(b)) return false;
@@ -206,7 +207,10 @@ export function enginePayloadToAnalysisResult(payload: EnginePayload): AnalyzeWo
 
   (result as any).rootMap = rootMap;
 
-  return result;
+    (result as any).analysisStatusV0_1 =
+    buildAnalysisStatusV0_1(result);
+
+return result;
 }
 
 // --- helpers (minimal stubs; replace later if needed) ---

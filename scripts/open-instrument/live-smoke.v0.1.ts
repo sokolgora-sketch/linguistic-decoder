@@ -202,11 +202,84 @@ async function waitForServer(baseUrl: string): Promise<void> {
   throw new Error(`Server did not become ready: ${message}`);
 }
 
+const EXPECTED_ANALYSIS_STATUS_BY_WORD_V0_1: Readonly<Record<string, string>> = {
+  da: "reviewed_functional_evidence",
+  dam: "reviewed_functional_evidence",
+  damage: "reviewed_functional_evidence",
+  di: "reviewed_functional_evidence",
+  study: "reviewed_functional_evidence",
+  studim: "reviewed_functional_evidence",
+  data: "candidate_only",
+  dij: "candidate_only",
+  dije: "candidate_only",
+  dit: "candidate_only",
+  mode: "structural_unreviewed",
+  made: "structural_unreviewed",
+  dome: "structural_unreviewed",
+  xyz: "null_no_supported_candidate",
+};
+
+const ALLOWED_ANALYSIS_STATUSES_V0_1 = new Set([
+  "reviewed_functional_evidence",
+  "candidate_only",
+  "structural_unreviewed",
+  "null_no_supported_candidate",
+]);
+
+function assertAnalysisStatusV0_1(
+  word: string,
+  data: any,
+): void {
+  const analysisStatus = data?.analysisStatusV0_1;
+
+  assert(
+    analysisStatus != null && typeof analysisStatus === "object",
+    `Expected ${word} to expose analysisStatusV0_1.`,
+  );
+
+  assert(
+    analysisStatus.schemaVersion === "open-instrument.analysis-status.v0_1",
+    `Expected ${word} to expose the analysis status v0.1 schema.`,
+  );
+
+  assert(
+    ALLOWED_ANALYSIS_STATUSES_V0_1.has(analysisStatus.status),
+    `Expected ${word} to expose an allowed analysis status.`,
+  );
+
+  const expectedStatus =
+    EXPECTED_ANALYSIS_STATUS_BY_WORD_V0_1[word];
+
+  if (expectedStatus) {
+    assert(
+      analysisStatus.status === expectedStatus,
+      `Expected ${word} analysis status ${expectedStatus}; received ${String(analysisStatus.status)}.`,
+    );
+  }
+
+  assert(
+    analysisStatus.userDecisionPosture === "user_decides",
+    `Expected ${word} to preserve user_decides.`,
+  );
+
+  assert(
+    analysisStatus.claimBoundary?.historicalOriginClaim === "not_claimed" &&
+      analysisStatus.claimBoundary?.historicalTransmissionClaim === "not_claimed" &&
+      analysisStatus.claimBoundary?.winnerClaim === "not_claimed" &&
+      analysisStatus.claimBoundary?.languageSuperiorityClaim === "not_claimed" &&
+      analysisStatus.claimBoundary?.linguisticOwnershipClaim === "not_claimed" &&
+      analysisStatus.claimBoundary?.candidateTruthClaim === "not_claimed" &&
+      analysisStatus.claimBoundary?.structuralOutputIsCandidateTruth === false &&
+      analysisStatus.claimBoundary?.nullIsValid === true,
+    `Expected ${word} to preserve all analysis-status claim boundaries.`,
+  );
+}
 function summarizeWord(
   word: string,
   data: any,
   cases: readonly CanonicalOperatorLiveSmokeCaseV0_1[],
 ): Record<string, unknown> {
+  assertAnalysisStatusV0_1(word, data);
   return {
     word,
     rootMapPresent: data?.rootMap != null,
