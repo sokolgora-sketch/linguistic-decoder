@@ -28,6 +28,7 @@ import type {
 import type { RootMapV1 } from "@/shared/deepRoot.rootMap.v1";
 import { computeDeepRootHeartGateV01 } from "@/shared/deepRootHeartGate.v0.1.compute";
 import { SEVEN_PRINCIPLES, vowelToIndex1, vowelToRingIndex, vowelToColor, vowelToNote } from "@/shared/sevenPrinciples.v1";
+import type { AnalysisStatusV0_1VM } from "../telemetry/types";
 
 type ParseRootMapResult = { ok: true; value: RootMapV1 } | { ok: false; reason: string };
 
@@ -555,6 +556,89 @@ function stableCandidateId(index: number, lang: string | null, form: string | nu
   return `cand_${index}_${(lang ?? "xx").toLowerCase()}_${(form ?? "form").toLowerCase()}`.replace(/[^a-z0-9_]/g, "_");
 }
 
+function parseAnalysisStatusV0_1(
+  payload: unknown,
+): PresentOrMissing<AnalysisStatusV0_1VM> {
+  if (!isRecord(payload)) {
+    return missing("malformed", "analysisStatusV0_1 payload");
+  }
+
+  const value = payload["analysisStatusV0_1"];
+
+  if (value == null) {
+    return missing("not_emitted", "analysisStatusV0_1");
+  }
+
+  if (!isRecord(value)) {
+    return missing("malformed", "analysisStatusV0_1 expected object");
+  }
+
+  const schemaVersion = value["schemaVersion"];
+  const statusValue = value["status"];
+  const summary = value["summary"];
+  const reviewedOperators = value["reviewedOperators"];
+  const candidateOnlyOperators = value["candidateOnlyOperators"];
+  const structuralTokens = value["structuralTokens"];
+  const claimBoundary = value["claimBoundary"];
+  const userDecisionPosture = value["userDecisionPosture"];
+
+  const allowedStatuses = new Set<AnalysisStatusV0_1VM["status"]>([
+    "reviewed_functional_evidence",
+    "candidate_only",
+    "structural_unreviewed",
+    "null_no_supported_candidate",
+  ]);
+
+  if (
+    schemaVersion !== "open-instrument.analysis-status.v0_1" ||
+    typeof statusValue !== "string" ||
+    !allowedStatuses.has(statusValue as AnalysisStatusV0_1VM["status"]) ||
+    typeof summary !== "string" ||
+    !Array.isArray(reviewedOperators) ||
+    !reviewedOperators.every((item) => typeof item === "string") ||
+    !Array.isArray(candidateOnlyOperators) ||
+    !candidateOnlyOperators.every((item) => typeof item === "string") ||
+    !Array.isArray(structuralTokens) ||
+    !structuralTokens.every((item) => typeof item === "string") ||
+    !isRecord(claimBoundary) ||
+    userDecisionPosture !== "user_decides"
+  ) {
+    return missing("malformed", "analysisStatusV0_1 contract");
+  }
+
+  if (
+    claimBoundary["historicalOriginClaim"] !== "not_claimed" ||
+    claimBoundary["historicalTransmissionClaim"] !== "not_claimed" ||
+    claimBoundary["winnerClaim"] !== "not_claimed" ||
+    claimBoundary["languageSuperiorityClaim"] !== "not_claimed" ||
+    claimBoundary["linguisticOwnershipClaim"] !== "not_claimed" ||
+    claimBoundary["candidateTruthClaim"] !== "not_claimed" ||
+    claimBoundary["structuralOutputIsCandidateTruth"] !== false ||
+    claimBoundary["nullIsValid"] !== true
+  ) {
+    return missing("malformed", "analysisStatusV0_1 claimBoundary");
+  }
+
+  return present({
+    schemaVersion: "open-instrument.analysis-status.v0_1",
+    status: statusValue as AnalysisStatusV0_1VM["status"],
+    summary,
+    reviewedOperators: reviewedOperators.map((item) => String(item)),
+    candidateOnlyOperators: candidateOnlyOperators.map((item) => String(item)),
+    structuralTokens: structuralTokens.map((item) => String(item)),
+    claimBoundary: {
+      historicalOriginClaim: "not_claimed",
+      historicalTransmissionClaim: "not_claimed",
+      winnerClaim: "not_claimed",
+      languageSuperiorityClaim: "not_claimed",
+      linguisticOwnershipClaim: "not_claimed",
+      candidateTruthClaim: "not_claimed",
+      structuralOutputIsCandidateTruth: false,
+      nullIsValid: true,
+    },
+    userDecisionPosture: "user_decides",
+  });
+}
 // ----------------------- adapter -----------------------
 
 export function adaptAnalysisToTelemetryVM(raw: unknown): TelemetryViewModel {
@@ -1215,6 +1299,7 @@ const originClaimGates: OriginClaimGatesVM = {
       soundRoots: adaptSoundRootsToVM(payload),
 
       resonanceProfileV1,
+    analysisStatusV0_1: parseAnalysisStatusV0_1(payload),
     raw,
   };
 }

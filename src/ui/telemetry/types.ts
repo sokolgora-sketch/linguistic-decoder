@@ -195,6 +195,33 @@ export interface OriginClaimGatesVM {
   reasonCounts: Record<string, number>;
 }
 
+export type AnalysisStatusCodeV0_1 =
+  | "reviewed_functional_evidence"
+  | "candidate_only"
+  | "structural_unreviewed"
+  | "null_no_supported_candidate";
+
+export type AnalysisStatusClaimBoundaryV0_1VM = {
+  historicalOriginClaim: "not_claimed";
+  historicalTransmissionClaim: "not_claimed";
+  winnerClaim: "not_claimed";
+  languageSuperiorityClaim: "not_claimed";
+  linguisticOwnershipClaim: "not_claimed";
+  candidateTruthClaim: "not_claimed";
+  structuralOutputIsCandidateTruth: false;
+  nullIsValid: true;
+};
+
+export type AnalysisStatusV0_1VM = {
+  schemaVersion: "open-instrument.analysis-status.v0_1";
+  status: AnalysisStatusCodeV0_1;
+  summary: string;
+  reviewedOperators: string[];
+  candidateOnlyOperators: string[];
+  structuralTokens: string[];
+  claimBoundary: AnalysisStatusClaimBoundaryV0_1VM;
+  userDecisionPosture: "user_decides";
+};
 export interface TelemetryViewModel {
   readout: TelemetryReadout;
   evidence: EvidenceLedger;
@@ -207,4 +234,6 @@ export interface TelemetryViewModel {
   soundRoots: PresentOrMissing<SoundRootsVM>;
   resonanceProfileV1: PresentOrMissing<ResonanceProfileV1VM>;
   raw: unknown;
+
+  analysisStatusV0_1?: PresentOrMissing<AnalysisStatusV0_1VM>;
 }

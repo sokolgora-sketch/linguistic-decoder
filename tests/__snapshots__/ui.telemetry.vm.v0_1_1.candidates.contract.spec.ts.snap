@@ -2,6 +2,11 @@
 
 exports[`ui telemetry vm contract v0.1.1 (candidates evidence lists) adapts candidate ops/notes/signals when present (study strict fixture) 1`] = `
 {
+  "analysisStatusV0_1": {
+    "kind": "missing",
+    "missing": "not_emitted",
+    "note": "analysisStatusV0_1",
+  },
   "candidates": [
     {
       "decomposition": {

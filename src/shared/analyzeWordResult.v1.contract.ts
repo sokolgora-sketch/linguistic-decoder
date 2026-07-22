@@ -8,6 +8,36 @@ import { z } from "zod";
  * If you want to allow a new top-level key, add it here AND update tests.
  */
 
+export const AnalysisStatusClaimBoundaryV0_1ContractSchema = z
+  .object({
+    historicalOriginClaim: z.literal("not_claimed"),
+    historicalTransmissionClaim: z.literal("not_claimed"),
+    winnerClaim: z.literal("not_claimed"),
+    languageSuperiorityClaim: z.literal("not_claimed"),
+    linguisticOwnershipClaim: z.literal("not_claimed"),
+    candidateTruthClaim: z.literal("not_claimed"),
+    structuralOutputIsCandidateTruth: z.literal(false),
+    nullIsValid: z.literal(true),
+  })
+  .strict();
+
+export const AnalysisStatusV0_1ContractSchema = z
+  .object({
+    schemaVersion: z.literal("open-instrument.analysis-status.v0_1"),
+    status: z.enum([
+      "reviewed_functional_evidence",
+      "candidate_only",
+      "structural_unreviewed",
+      "null_no_supported_candidate",
+    ]),
+    summary: z.string().min(1),
+    reviewedOperators: z.array(z.string()),
+    candidateOnlyOperators: z.array(z.string()),
+    structuralTokens: z.array(z.string()),
+    claimBoundary: AnalysisStatusClaimBoundaryV0_1ContractSchema,
+    userDecisionPosture: z.literal("user_decides"),
+  })
+  .strict();
 export const AnalyzeWordResultV1ContractSchema = z
   .object({
     word: z.string().min(1),
@@ -26,6 +56,7 @@ export const AnalyzeWordResultV1ContractSchema = z
     candidates: z.array(z.unknown()).optional(),
     deepRoot: z.unknown().optional(),
     rootMap: z.unknown().optional(),
+    analysisStatusV0_1: AnalysisStatusV0_1ContractSchema.optional(),
       heartPrimaryPath: z.unknown().optional(),
       resonanceProfileV1: z.unknown().optional(),
     // Origin Claim Protocol (V1) — keep loose until protocol stabilizes
@@ -71,6 +102,7 @@ export function toAnalyzeWordResultV1Contract(input: unknown): AnalyzeWordResult
     candidates: o.candidates,
     deepRoot: o.deepRoot,
     rootMap: o.rootMap,
+    analysisStatusV0_1: o.analysisStatusV0_1,
       heartPrimaryPath: o.heartPrimaryPath,
       resonanceProfileV1: o.resonanceProfileV1,
     wordMatrix: o.wordMatrix,

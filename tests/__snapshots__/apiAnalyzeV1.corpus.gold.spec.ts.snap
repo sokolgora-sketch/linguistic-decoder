@@ -4,6 +4,25 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
 {
   "123": {
     "alphabet": "auto",
+    "analysisStatusV0_1": {
+      "candidateOnlyOperators": [],
+      "claimBoundary": {
+        "candidateTruthClaim": "not_claimed",
+        "historicalOriginClaim": "not_claimed",
+        "historicalTransmissionClaim": "not_claimed",
+        "languageSuperiorityClaim": "not_claimed",
+        "linguisticOwnershipClaim": "not_claimed",
+        "nullIsValid": true,
+        "structuralOutputIsCandidateTruth": false,
+        "winnerClaim": "not_claimed",
+      },
+      "reviewedOperators": [],
+      "schemaVersion": "open-instrument.analysis-status.v0_1",
+      "status": "null_no_supported_candidate",
+      "structuralTokens": [],
+      "summary": "No supported canonical candidate or reviewed functional evidence is available. Null is a valid result.",
+      "userDecisionPosture": "user_decides",
+    },
     "candidates": [],
     "consonants": {
       "field": {
@@ -212,6 +231,25 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
     },
     "raw": {
       "alphabet": "auto",
+      "analysisStatusV0_1": {
+        "candidateOnlyOperators": [],
+        "claimBoundary": {
+          "candidateTruthClaim": "not_claimed",
+          "historicalOriginClaim": "not_claimed",
+          "historicalTransmissionClaim": "not_claimed",
+          "languageSuperiorityClaim": "not_claimed",
+          "linguisticOwnershipClaim": "not_claimed",
+          "nullIsValid": true,
+          "structuralOutputIsCandidateTruth": false,
+          "winnerClaim": "not_claimed",
+        },
+        "reviewedOperators": [],
+        "schemaVersion": "open-instrument.analysis-status.v0_1",
+        "status": "null_no_supported_candidate",
+        "structuralTokens": [],
+        "summary": "No supported canonical candidate or reviewed functional evidence is available. Null is a valid result.",
+        "userDecisionPosture": "user_decides",
+      },
       "candidates": [],
       "consonants": {
         "field": {
@@ -540,6 +578,25 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
   },
   "O'Neill": {
     "alphabet": "auto",
+    "analysisStatusV0_1": {
+      "candidateOnlyOperators": [],
+      "claimBoundary": {
+        "candidateTruthClaim": "not_claimed",
+        "historicalOriginClaim": "not_claimed",
+        "historicalTransmissionClaim": "not_claimed",
+        "languageSuperiorityClaim": "not_claimed",
+        "linguisticOwnershipClaim": "not_claimed",
+        "nullIsValid": true,
+        "structuralOutputIsCandidateTruth": false,
+        "winnerClaim": "not_claimed",
+      },
+      "reviewedOperators": [],
+      "schemaVersion": "open-instrument.analysis-status.v0_1",
+      "status": "null_no_supported_candidate",
+      "structuralTokens": [],
+      "summary": "No supported canonical candidate or reviewed functional evidence is available. Null is a valid result.",
+      "userDecisionPosture": "user_decides",
+    },
     "candidates": [],
     "consonants": {
       "field": {
@@ -821,6 +878,25 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
     },
     "raw": {
       "alphabet": "auto",
+      "analysisStatusV0_1": {
+        "candidateOnlyOperators": [],
+        "claimBoundary": {
+          "candidateTruthClaim": "not_claimed",
+          "historicalOriginClaim": "not_claimed",
+          "historicalTransmissionClaim": "not_claimed",
+          "languageSuperiorityClaim": "not_claimed",
+          "linguisticOwnershipClaim": "not_claimed",
+          "nullIsValid": true,
+          "structuralOutputIsCandidateTruth": false,
+          "winnerClaim": "not_claimed",
+        },
+        "reviewedOperators": [],
+        "schemaVersion": "open-instrument.analysis-status.v0_1",
+        "status": "null_no_supported_candidate",
+        "structuralTokens": [],
+        "summary": "No supported canonical candidate or reviewed functional evidence is available. Null is a valid result.",
+        "userDecisionPosture": "user_decides",
+      },
       "candidates": [],
       "consonants": {
         "field": {
@@ -1222,6 +1298,25 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
   },
   "co-operate": {
     "alphabet": "auto",
+    "analysisStatusV0_1": {
+      "candidateOnlyOperators": [],
+      "claimBoundary": {
+        "candidateTruthClaim": "not_claimed",
+        "historicalOriginClaim": "not_claimed",
+        "historicalTransmissionClaim": "not_claimed",
+        "languageSuperiorityClaim": "not_claimed",
+        "linguisticOwnershipClaim": "not_claimed",
+        "nullIsValid": true,
+        "structuralOutputIsCandidateTruth": false,
+        "winnerClaim": "not_claimed",
+      },
+      "reviewedOperators": [],
+      "schemaVersion": "open-instrument.analysis-status.v0_1",
+      "status": "null_no_supported_candidate",
+      "structuralTokens": [],
+      "summary": "No supported canonical candidate or reviewed functional evidence is available. Null is a valid result.",
+      "userDecisionPosture": "user_decides",
+    },
     "candidates": [],
     "consonants": {
       "field": {
@@ -1543,6 +1638,25 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
     },
     "raw": {
       "alphabet": "auto",
+      "analysisStatusV0_1": {
+        "candidateOnlyOperators": [],
+        "claimBoundary": {
+          "candidateTruthClaim": "not_claimed",
+          "historicalOriginClaim": "not_claimed",
+          "historicalTransmissionClaim": "not_claimed",
+          "languageSuperiorityClaim": "not_claimed",
+          "linguisticOwnershipClaim": "not_claimed",
+          "nullIsValid": true,
+          "structuralOutputIsCandidateTruth": false,
+          "winnerClaim": "not_claimed",
+        },
+        "reviewedOperators": [],
+        "schemaVersion": "open-instrument.analysis-status.v0_1",
+        "status": "null_no_supported_candidate",
+        "structuralTokens": [],
+        "summary": "No supported canonical candidate or reviewed functional evidence is available. Null is a valid result.",
+        "userDecisionPosture": "user_decides",
+      },
       "candidates": [],
       "consonants": {
         "field": {
@@ -1985,6 +2099,29 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
   },
   "damage": {
     "alphabet": "auto",
+    "analysisStatusV0_1": {
+      "candidateOnlyOperators": [],
+      "claimBoundary": {
+        "candidateTruthClaim": "not_claimed",
+        "historicalOriginClaim": "not_claimed",
+        "historicalTransmissionClaim": "not_claimed",
+        "languageSuperiorityClaim": "not_claimed",
+        "linguisticOwnershipClaim": "not_claimed",
+        "nullIsValid": true,
+        "structuralOutputIsCandidateTruth": false,
+        "winnerClaim": "not_claimed",
+      },
+      "reviewedOperators": [
+        "DA",
+      ],
+      "schemaVersion": "open-instrument.analysis-status.v0_1",
+      "status": "reviewed_functional_evidence",
+      "structuralTokens": [
+        "DA",
+      ],
+      "summary": "Bounded reviewed functional evidence is available for DA. This is functional evidence, not a historical-origin or winner claim.",
+      "userDecisionPosture": "user_decides",
+    },
     "candidates": [
       {
         "candidateId": "latin-damnum",
@@ -2508,6 +2645,29 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
     },
     "raw": {
       "alphabet": "auto",
+      "analysisStatusV0_1": {
+        "candidateOnlyOperators": [],
+        "claimBoundary": {
+          "candidateTruthClaim": "not_claimed",
+          "historicalOriginClaim": "not_claimed",
+          "historicalTransmissionClaim": "not_claimed",
+          "languageSuperiorityClaim": "not_claimed",
+          "linguisticOwnershipClaim": "not_claimed",
+          "nullIsValid": true,
+          "structuralOutputIsCandidateTruth": false,
+          "winnerClaim": "not_claimed",
+        },
+        "reviewedOperators": [
+          "DA",
+        ],
+        "schemaVersion": "open-instrument.analysis-status.v0_1",
+        "status": "reviewed_functional_evidence",
+        "structuralTokens": [
+          "DA",
+        ],
+        "summary": "Bounded reviewed functional evidence is available for DA. This is functional evidence, not a historical-origin or winner claim.",
+        "userDecisionPosture": "user_decides",
+      },
       "candidates": [
         {
           "axes": {
@@ -3340,6 +3500,27 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
   },
   "diet": {
     "alphabet": "auto",
+    "analysisStatusV0_1": {
+      "candidateOnlyOperators": [
+        "DI",
+      ],
+      "claimBoundary": {
+        "candidateTruthClaim": "not_claimed",
+        "historicalOriginClaim": "not_claimed",
+        "historicalTransmissionClaim": "not_claimed",
+        "languageSuperiorityClaim": "not_claimed",
+        "linguisticOwnershipClaim": "not_claimed",
+        "nullIsValid": true,
+        "structuralOutputIsCandidateTruth": false,
+        "winnerClaim": "not_claimed",
+      },
+      "reviewedOperators": [],
+      "schemaVersion": "open-instrument.analysis-status.v0_1",
+      "status": "candidate_only",
+      "structuralTokens": [],
+      "summary": "Structural canonical candidates were detected for DI, but reviewed functional evidence is not authorized.",
+      "userDecisionPosture": "user_decides",
+    },
     "candidates": [],
     "consonants": {
       "field": {
@@ -3583,6 +3764,27 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
     },
     "raw": {
       "alphabet": "auto",
+      "analysisStatusV0_1": {
+        "candidateOnlyOperators": [
+          "DI",
+        ],
+        "claimBoundary": {
+          "candidateTruthClaim": "not_claimed",
+          "historicalOriginClaim": "not_claimed",
+          "historicalTransmissionClaim": "not_claimed",
+          "languageSuperiorityClaim": "not_claimed",
+          "linguisticOwnershipClaim": "not_claimed",
+          "nullIsValid": true,
+          "structuralOutputIsCandidateTruth": false,
+          "winnerClaim": "not_claimed",
+        },
+        "reviewedOperators": [],
+        "schemaVersion": "open-instrument.analysis-status.v0_1",
+        "status": "candidate_only",
+        "structuralTokens": [],
+        "summary": "Structural canonical candidates were detected for DI, but reviewed functional evidence is not authorized.",
+        "userDecisionPosture": "user_decides",
+      },
       "candidates": [],
       "consonants": {
         "field": {
@@ -3935,6 +4137,25 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
   },
   "father": {
     "alphabet": "auto",
+    "analysisStatusV0_1": {
+      "candidateOnlyOperators": [],
+      "claimBoundary": {
+        "candidateTruthClaim": "not_claimed",
+        "historicalOriginClaim": "not_claimed",
+        "historicalTransmissionClaim": "not_claimed",
+        "languageSuperiorityClaim": "not_claimed",
+        "linguisticOwnershipClaim": "not_claimed",
+        "nullIsValid": true,
+        "structuralOutputIsCandidateTruth": false,
+        "winnerClaim": "not_claimed",
+      },
+      "reviewedOperators": [],
+      "schemaVersion": "open-instrument.analysis-status.v0_1",
+      "status": "null_no_supported_candidate",
+      "structuralTokens": [],
+      "summary": "No supported canonical candidate or reviewed functional evidence is available. Null is a valid result.",
+      "userDecisionPosture": "user_decides",
+    },
     "candidates": [
       {
         "candidateId": "latin-pater",
@@ -4380,6 +4601,25 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
     },
     "raw": {
       "alphabet": "auto",
+      "analysisStatusV0_1": {
+        "candidateOnlyOperators": [],
+        "claimBoundary": {
+          "candidateTruthClaim": "not_claimed",
+          "historicalOriginClaim": "not_claimed",
+          "historicalTransmissionClaim": "not_claimed",
+          "languageSuperiorityClaim": "not_claimed",
+          "linguisticOwnershipClaim": "not_claimed",
+          "nullIsValid": true,
+          "structuralOutputIsCandidateTruth": false,
+          "winnerClaim": "not_claimed",
+        },
+        "reviewedOperators": [],
+        "schemaVersion": "open-instrument.analysis-status.v0_1",
+        "status": "null_no_supported_candidate",
+        "structuralTokens": [],
+        "summary": "No supported canonical candidate or reviewed functional evidence is available. Null is a valid result.",
+        "userDecisionPosture": "user_decides",
+      },
       "candidates": [
         {
           "axes": {
@@ -5046,6 +5286,25 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
   },
   "gjak": {
     "alphabet": "auto",
+    "analysisStatusV0_1": {
+      "candidateOnlyOperators": [],
+      "claimBoundary": {
+        "candidateTruthClaim": "not_claimed",
+        "historicalOriginClaim": "not_claimed",
+        "historicalTransmissionClaim": "not_claimed",
+        "languageSuperiorityClaim": "not_claimed",
+        "linguisticOwnershipClaim": "not_claimed",
+        "nullIsValid": true,
+        "structuralOutputIsCandidateTruth": false,
+        "winnerClaim": "not_claimed",
+      },
+      "reviewedOperators": [],
+      "schemaVersion": "open-instrument.analysis-status.v0_1",
+      "status": "null_no_supported_candidate",
+      "structuralTokens": [],
+      "summary": "No supported canonical candidate or reviewed functional evidence is available. Null is a valid result.",
+      "userDecisionPosture": "user_decides",
+    },
     "candidates": [],
     "consonants": {
       "field": {
@@ -5276,6 +5535,25 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
     },
     "raw": {
       "alphabet": "auto",
+      "analysisStatusV0_1": {
+        "candidateOnlyOperators": [],
+        "claimBoundary": {
+          "candidateTruthClaim": "not_claimed",
+          "historicalOriginClaim": "not_claimed",
+          "historicalTransmissionClaim": "not_claimed",
+          "languageSuperiorityClaim": "not_claimed",
+          "linguisticOwnershipClaim": "not_claimed",
+          "nullIsValid": true,
+          "structuralOutputIsCandidateTruth": false,
+          "winnerClaim": "not_claimed",
+        },
+        "reviewedOperators": [],
+        "schemaVersion": "open-instrument.analysis-status.v0_1",
+        "status": "null_no_supported_candidate",
+        "structuralTokens": [],
+        "summary": "No supported canonical candidate or reviewed functional evidence is available. Null is a valid result.",
+        "userDecisionPosture": "user_decides",
+      },
       "candidates": [],
       "consonants": {
         "field": {
@@ -5620,6 +5898,25 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
   },
   "internet": {
     "alphabet": "auto",
+    "analysisStatusV0_1": {
+      "candidateOnlyOperators": [],
+      "claimBoundary": {
+        "candidateTruthClaim": "not_claimed",
+        "historicalOriginClaim": "not_claimed",
+        "historicalTransmissionClaim": "not_claimed",
+        "languageSuperiorityClaim": "not_claimed",
+        "linguisticOwnershipClaim": "not_claimed",
+        "nullIsValid": true,
+        "structuralOutputIsCandidateTruth": false,
+        "winnerClaim": "not_claimed",
+      },
+      "reviewedOperators": [],
+      "schemaVersion": "open-instrument.analysis-status.v0_1",
+      "status": "null_no_supported_candidate",
+      "structuralTokens": [],
+      "summary": "No supported canonical candidate or reviewed functional evidence is available. Null is a valid result.",
+      "userDecisionPosture": "user_decides",
+    },
     "candidates": [],
     "consonants": {
       "field": {
@@ -5897,6 +6194,25 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
     },
     "raw": {
       "alphabet": "auto",
+      "analysisStatusV0_1": {
+        "candidateOnlyOperators": [],
+        "claimBoundary": {
+          "candidateTruthClaim": "not_claimed",
+          "historicalOriginClaim": "not_claimed",
+          "historicalTransmissionClaim": "not_claimed",
+          "languageSuperiorityClaim": "not_claimed",
+          "linguisticOwnershipClaim": "not_claimed",
+          "nullIsValid": true,
+          "structuralOutputIsCandidateTruth": false,
+          "winnerClaim": "not_claimed",
+        },
+        "reviewedOperators": [],
+        "schemaVersion": "open-instrument.analysis-status.v0_1",
+        "status": "null_no_supported_candidate",
+        "structuralTokens": [],
+        "summary": "No supported canonical candidate or reviewed functional evidence is available. Null is a valid result.",
+        "userDecisionPosture": "user_decides",
+      },
       "candidates": [],
       "consonants": {
         "field": {
@@ -6285,6 +6601,25 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
   },
   "language": {
     "alphabet": "auto",
+    "analysisStatusV0_1": {
+      "candidateOnlyOperators": [],
+      "claimBoundary": {
+        "candidateTruthClaim": "not_claimed",
+        "historicalOriginClaim": "not_claimed",
+        "historicalTransmissionClaim": "not_claimed",
+        "languageSuperiorityClaim": "not_claimed",
+        "linguisticOwnershipClaim": "not_claimed",
+        "nullIsValid": true,
+        "structuralOutputIsCandidateTruth": false,
+        "winnerClaim": "not_claimed",
+      },
+      "reviewedOperators": [],
+      "schemaVersion": "open-instrument.analysis-status.v0_1",
+      "status": "null_no_supported_candidate",
+      "structuralTokens": [],
+      "summary": "No supported canonical candidate or reviewed functional evidence is available. Null is a valid result.",
+      "userDecisionPosture": "user_decides",
+    },
     "candidates": [],
     "consonants": {
       "field": {
@@ -6593,6 +6928,25 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
     },
     "raw": {
       "alphabet": "auto",
+      "analysisStatusV0_1": {
+        "candidateOnlyOperators": [],
+        "claimBoundary": {
+          "candidateTruthClaim": "not_claimed",
+          "historicalOriginClaim": "not_claimed",
+          "historicalTransmissionClaim": "not_claimed",
+          "languageSuperiorityClaim": "not_claimed",
+          "linguisticOwnershipClaim": "not_claimed",
+          "nullIsValid": true,
+          "structuralOutputIsCandidateTruth": false,
+          "winnerClaim": "not_claimed",
+        },
+        "reviewedOperators": [],
+        "schemaVersion": "open-instrument.analysis-status.v0_1",
+        "status": "null_no_supported_candidate",
+        "structuralTokens": [],
+        "summary": "No supported canonical candidate or reviewed functional evidence is available. Null is a valid result.",
+        "userDecisionPosture": "user_decides",
+      },
       "candidates": [],
       "consonants": {
         "field": {
@@ -7027,6 +7381,25 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
   },
   "love": {
     "alphabet": "auto",
+    "analysisStatusV0_1": {
+      "candidateOnlyOperators": [],
+      "claimBoundary": {
+        "candidateTruthClaim": "not_claimed",
+        "historicalOriginClaim": "not_claimed",
+        "historicalTransmissionClaim": "not_claimed",
+        "languageSuperiorityClaim": "not_claimed",
+        "linguisticOwnershipClaim": "not_claimed",
+        "nullIsValid": true,
+        "structuralOutputIsCandidateTruth": false,
+        "winnerClaim": "not_claimed",
+      },
+      "reviewedOperators": [],
+      "schemaVersion": "open-instrument.analysis-status.v0_1",
+      "status": "null_no_supported_candidate",
+      "structuralTokens": [],
+      "summary": "No supported canonical candidate or reviewed functional evidence is available. Null is a valid result.",
+      "userDecisionPosture": "user_decides",
+    },
     "candidates": [
       {
         "candidateId": "latin-amor",
@@ -7441,6 +7814,25 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
     },
     "raw": {
       "alphabet": "auto",
+      "analysisStatusV0_1": {
+        "candidateOnlyOperators": [],
+        "claimBoundary": {
+          "candidateTruthClaim": "not_claimed",
+          "historicalOriginClaim": "not_claimed",
+          "historicalTransmissionClaim": "not_claimed",
+          "languageSuperiorityClaim": "not_claimed",
+          "linguisticOwnershipClaim": "not_claimed",
+          "nullIsValid": true,
+          "structuralOutputIsCandidateTruth": false,
+          "winnerClaim": "not_claimed",
+        },
+        "reviewedOperators": [],
+        "schemaVersion": "open-instrument.analysis-status.v0_1",
+        "status": "null_no_supported_candidate",
+        "structuralTokens": [],
+        "summary": "No supported canonical candidate or reviewed functional evidence is available. Null is a valid result.",
+        "userDecisionPosture": "user_decides",
+      },
       "candidates": [
         {
           "axes": {
@@ -8098,6 +8490,25 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
   },
   "mathematics": {
     "alphabet": "auto",
+    "analysisStatusV0_1": {
+      "candidateOnlyOperators": [],
+      "claimBoundary": {
+        "candidateTruthClaim": "not_claimed",
+        "historicalOriginClaim": "not_claimed",
+        "historicalTransmissionClaim": "not_claimed",
+        "languageSuperiorityClaim": "not_claimed",
+        "linguisticOwnershipClaim": "not_claimed",
+        "nullIsValid": true,
+        "structuralOutputIsCandidateTruth": false,
+        "winnerClaim": "not_claimed",
+      },
+      "reviewedOperators": [],
+      "schemaVersion": "open-instrument.analysis-status.v0_1",
+      "status": "null_no_supported_candidate",
+      "structuralTokens": [],
+      "summary": "No supported canonical candidate or reviewed functional evidence is available. Null is a valid result.",
+      "userDecisionPosture": "user_decides",
+    },
     "candidates": [],
     "consonants": {
       "field": {
@@ -8415,6 +8826,25 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
     },
     "raw": {
       "alphabet": "auto",
+      "analysisStatusV0_1": {
+        "candidateOnlyOperators": [],
+        "claimBoundary": {
+          "candidateTruthClaim": "not_claimed",
+          "historicalOriginClaim": "not_claimed",
+          "historicalTransmissionClaim": "not_claimed",
+          "languageSuperiorityClaim": "not_claimed",
+          "linguisticOwnershipClaim": "not_claimed",
+          "nullIsValid": true,
+          "structuralOutputIsCandidateTruth": false,
+          "winnerClaim": "not_claimed",
+        },
+        "reviewedOperators": [],
+        "schemaVersion": "open-instrument.analysis-status.v0_1",
+        "status": "null_no_supported_candidate",
+        "structuralTokens": [],
+        "summary": "No supported canonical candidate or reviewed functional evidence is available. Null is a valid result.",
+        "userDecisionPosture": "user_decides",
+      },
       "candidates": [],
       "consonants": {
         "field": {
@@ -8850,6 +9280,25 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
   },
   "naïve": {
     "alphabet": "auto",
+    "analysisStatusV0_1": {
+      "candidateOnlyOperators": [],
+      "claimBoundary": {
+        "candidateTruthClaim": "not_claimed",
+        "historicalOriginClaim": "not_claimed",
+        "historicalTransmissionClaim": "not_claimed",
+        "languageSuperiorityClaim": "not_claimed",
+        "linguisticOwnershipClaim": "not_claimed",
+        "nullIsValid": true,
+        "structuralOutputIsCandidateTruth": false,
+        "winnerClaim": "not_claimed",
+      },
+      "reviewedOperators": [],
+      "schemaVersion": "open-instrument.analysis-status.v0_1",
+      "status": "null_no_supported_candidate",
+      "structuralTokens": [],
+      "summary": "No supported canonical candidate or reviewed functional evidence is available. Null is a valid result.",
+      "userDecisionPosture": "user_decides",
+    },
     "candidates": [],
     "consonants": {
       "field": {
@@ -9115,6 +9564,25 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
     },
     "raw": {
       "alphabet": "auto",
+      "analysisStatusV0_1": {
+        "candidateOnlyOperators": [],
+        "claimBoundary": {
+          "candidateTruthClaim": "not_claimed",
+          "historicalOriginClaim": "not_claimed",
+          "historicalTransmissionClaim": "not_claimed",
+          "languageSuperiorityClaim": "not_claimed",
+          "linguisticOwnershipClaim": "not_claimed",
+          "nullIsValid": true,
+          "structuralOutputIsCandidateTruth": false,
+          "winnerClaim": "not_claimed",
+        },
+        "reviewedOperators": [],
+        "schemaVersion": "open-instrument.analysis-status.v0_1",
+        "status": "null_no_supported_candidate",
+        "structuralTokens": [],
+        "summary": "No supported canonical candidate or reviewed functional evidence is available. Null is a valid result.",
+        "userDecisionPosture": "user_decides",
+      },
       "candidates": [],
       "consonants": {
         "field": {
@@ -9491,6 +9959,25 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
   },
   "philosophy": {
     "alphabet": "auto",
+    "analysisStatusV0_1": {
+      "candidateOnlyOperators": [],
+      "claimBoundary": {
+        "candidateTruthClaim": "not_claimed",
+        "historicalOriginClaim": "not_claimed",
+        "historicalTransmissionClaim": "not_claimed",
+        "languageSuperiorityClaim": "not_claimed",
+        "linguisticOwnershipClaim": "not_claimed",
+        "nullIsValid": true,
+        "structuralOutputIsCandidateTruth": false,
+        "winnerClaim": "not_claimed",
+      },
+      "reviewedOperators": [],
+      "schemaVersion": "open-instrument.analysis-status.v0_1",
+      "status": "null_no_supported_candidate",
+      "structuralTokens": [],
+      "summary": "No supported canonical candidate or reviewed functional evidence is available. Null is a valid result.",
+      "userDecisionPosture": "user_decides",
+    },
     "candidates": [],
     "consonants": {
       "field": {
@@ -9797,6 +10284,25 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
     },
     "raw": {
       "alphabet": "auto",
+      "analysisStatusV0_1": {
+        "candidateOnlyOperators": [],
+        "claimBoundary": {
+          "candidateTruthClaim": "not_claimed",
+          "historicalOriginClaim": "not_claimed",
+          "historicalTransmissionClaim": "not_claimed",
+          "languageSuperiorityClaim": "not_claimed",
+          "linguisticOwnershipClaim": "not_claimed",
+          "nullIsValid": true,
+          "structuralOutputIsCandidateTruth": false,
+          "winnerClaim": "not_claimed",
+        },
+        "reviewedOperators": [],
+        "schemaVersion": "open-instrument.analysis-status.v0_1",
+        "status": "null_no_supported_candidate",
+        "structuralTokens": [],
+        "summary": "No supported canonical candidate or reviewed functional evidence is available. Null is a valid result.",
+        "userDecisionPosture": "user_decides",
+      },
       "candidates": [],
       "consonants": {
         "field": {
@@ -10226,6 +10732,25 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
   },
   "résumé": {
     "alphabet": "auto",
+    "analysisStatusV0_1": {
+      "candidateOnlyOperators": [],
+      "claimBoundary": {
+        "candidateTruthClaim": "not_claimed",
+        "historicalOriginClaim": "not_claimed",
+        "historicalTransmissionClaim": "not_claimed",
+        "languageSuperiorityClaim": "not_claimed",
+        "linguisticOwnershipClaim": "not_claimed",
+        "nullIsValid": true,
+        "structuralOutputIsCandidateTruth": false,
+        "winnerClaim": "not_claimed",
+      },
+      "reviewedOperators": [],
+      "schemaVersion": "open-instrument.analysis-status.v0_1",
+      "status": "null_no_supported_candidate",
+      "structuralTokens": [],
+      "summary": "No supported canonical candidate or reviewed functional evidence is available. Null is a valid result.",
+      "userDecisionPosture": "user_decides",
+    },
     "candidates": [],
     "consonants": {
       "field": {
@@ -10485,6 +11010,25 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
     },
     "raw": {
       "alphabet": "auto",
+      "analysisStatusV0_1": {
+        "candidateOnlyOperators": [],
+        "claimBoundary": {
+          "candidateTruthClaim": "not_claimed",
+          "historicalOriginClaim": "not_claimed",
+          "historicalTransmissionClaim": "not_claimed",
+          "languageSuperiorityClaim": "not_claimed",
+          "linguisticOwnershipClaim": "not_claimed",
+          "nullIsValid": true,
+          "structuralOutputIsCandidateTruth": false,
+          "winnerClaim": "not_claimed",
+        },
+        "reviewedOperators": [],
+        "schemaVersion": "open-instrument.analysis-status.v0_1",
+        "status": "null_no_supported_candidate",
+        "structuralTokens": [],
+        "summary": "No supported canonical candidate or reviewed functional evidence is available. Null is a valid result.",
+        "userDecisionPosture": "user_decides",
+      },
       "candidates": [],
       "consonants": {
         "field": {
@@ -10852,6 +11396,25 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
   },
   "sterile": {
     "alphabet": "auto",
+    "analysisStatusV0_1": {
+      "candidateOnlyOperators": [],
+      "claimBoundary": {
+        "candidateTruthClaim": "not_claimed",
+        "historicalOriginClaim": "not_claimed",
+        "historicalTransmissionClaim": "not_claimed",
+        "languageSuperiorityClaim": "not_claimed",
+        "linguisticOwnershipClaim": "not_claimed",
+        "nullIsValid": true,
+        "structuralOutputIsCandidateTruth": false,
+        "winnerClaim": "not_claimed",
+      },
+      "reviewedOperators": [],
+      "schemaVersion": "open-instrument.analysis-status.v0_1",
+      "status": "null_no_supported_candidate",
+      "structuralTokens": [],
+      "summary": "No supported canonical candidate or reviewed functional evidence is available. Null is a valid result.",
+      "userDecisionPosture": "user_decides",
+    },
     "candidates": [],
     "consonants": {
       "field": {
@@ -11133,6 +11696,25 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
     },
     "raw": {
       "alphabet": "auto",
+      "analysisStatusV0_1": {
+        "candidateOnlyOperators": [],
+        "claimBoundary": {
+          "candidateTruthClaim": "not_claimed",
+          "historicalOriginClaim": "not_claimed",
+          "historicalTransmissionClaim": "not_claimed",
+          "languageSuperiorityClaim": "not_claimed",
+          "linguisticOwnershipClaim": "not_claimed",
+          "nullIsValid": true,
+          "structuralOutputIsCandidateTruth": false,
+          "winnerClaim": "not_claimed",
+        },
+        "reviewedOperators": [],
+        "schemaVersion": "open-instrument.analysis-status.v0_1",
+        "status": "null_no_supported_candidate",
+        "structuralTokens": [],
+        "summary": "No supported canonical candidate or reviewed functional evidence is available. Null is a valid result.",
+        "userDecisionPosture": "user_decides",
+      },
       "candidates": [],
       "consonants": {
         "field": {
@@ -11530,6 +12112,30 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
   },
   "study": {
     "alphabet": "auto",
+    "analysisStatusV0_1": {
+      "candidateOnlyOperators": [],
+      "claimBoundary": {
+        "candidateTruthClaim": "not_claimed",
+        "historicalOriginClaim": "not_claimed",
+        "historicalTransmissionClaim": "not_claimed",
+        "languageSuperiorityClaim": "not_claimed",
+        "linguisticOwnershipClaim": "not_claimed",
+        "nullIsValid": true,
+        "structuralOutputIsCandidateTruth": false,
+        "winnerClaim": "not_claimed",
+      },
+      "reviewedOperators": [
+        "DI",
+      ],
+      "schemaVersion": "open-instrument.analysis-status.v0_1",
+      "status": "reviewed_functional_evidence",
+      "structuralTokens": [
+        "SHTU",
+        "DI",
+      ],
+      "summary": "Bounded reviewed functional evidence is available for DI. This is functional evidence, not a historical-origin or winner claim.",
+      "userDecisionPosture": "user_decides",
+    },
     "candidates": [
       {
         "candidateId": "latin-studium",
@@ -12185,6 +12791,30 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
     },
     "raw": {
       "alphabet": "auto",
+      "analysisStatusV0_1": {
+        "candidateOnlyOperators": [],
+        "claimBoundary": {
+          "candidateTruthClaim": "not_claimed",
+          "historicalOriginClaim": "not_claimed",
+          "historicalTransmissionClaim": "not_claimed",
+          "languageSuperiorityClaim": "not_claimed",
+          "linguisticOwnershipClaim": "not_claimed",
+          "nullIsValid": true,
+          "structuralOutputIsCandidateTruth": false,
+          "winnerClaim": "not_claimed",
+        },
+        "reviewedOperators": [
+          "DI",
+        ],
+        "schemaVersion": "open-instrument.analysis-status.v0_1",
+        "status": "reviewed_functional_evidence",
+        "structuralTokens": [
+          "SHTU",
+          "DI",
+        ],
+        "summary": "Bounded reviewed functional evidence is available for DI. This is functional evidence, not a historical-origin or winner claim.",
+        "userDecisionPosture": "user_decides",
+      },
       "candidates": [
         {
           "axes": {
@@ -13282,6 +13912,25 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
   },
   "y": {
     "alphabet": "auto",
+    "analysisStatusV0_1": {
+      "candidateOnlyOperators": [],
+      "claimBoundary": {
+        "candidateTruthClaim": "not_claimed",
+        "historicalOriginClaim": "not_claimed",
+        "historicalTransmissionClaim": "not_claimed",
+        "languageSuperiorityClaim": "not_claimed",
+        "linguisticOwnershipClaim": "not_claimed",
+        "nullIsValid": true,
+        "structuralOutputIsCandidateTruth": false,
+        "winnerClaim": "not_claimed",
+      },
+      "reviewedOperators": [],
+      "schemaVersion": "open-instrument.analysis-status.v0_1",
+      "status": "null_no_supported_candidate",
+      "structuralTokens": [],
+      "summary": "No supported canonical candidate or reviewed functional evidence is available. Null is a valid result.",
+      "userDecisionPosture": "user_decides",
+    },
     "candidates": [],
     "consonants": {
       "field": {
@@ -13504,6 +14153,25 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
     },
     "raw": {
       "alphabet": "auto",
+      "analysisStatusV0_1": {
+        "candidateOnlyOperators": [],
+        "claimBoundary": {
+          "candidateTruthClaim": "not_claimed",
+          "historicalOriginClaim": "not_claimed",
+          "historicalTransmissionClaim": "not_claimed",
+          "languageSuperiorityClaim": "not_claimed",
+          "linguisticOwnershipClaim": "not_claimed",
+          "nullIsValid": true,
+          "structuralOutputIsCandidateTruth": false,
+          "winnerClaim": "not_claimed",
+        },
+        "reviewedOperators": [],
+        "schemaVersion": "open-instrument.analysis-status.v0_1",
+        "status": "null_no_supported_candidate",
+        "structuralTokens": [],
+        "summary": "No supported canonical candidate or reviewed functional evidence is available. Null is a valid result.",
+        "userDecisionPosture": "user_decides",
+      },
       "candidates": [],
       "consonants": {
         "field": {
@@ -13840,6 +14508,25 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
   },
   "ë": {
     "alphabet": "auto",
+    "analysisStatusV0_1": {
+      "candidateOnlyOperators": [],
+      "claimBoundary": {
+        "candidateTruthClaim": "not_claimed",
+        "historicalOriginClaim": "not_claimed",
+        "historicalTransmissionClaim": "not_claimed",
+        "languageSuperiorityClaim": "not_claimed",
+        "linguisticOwnershipClaim": "not_claimed",
+        "nullIsValid": true,
+        "structuralOutputIsCandidateTruth": false,
+        "winnerClaim": "not_claimed",
+      },
+      "reviewedOperators": [],
+      "schemaVersion": "open-instrument.analysis-status.v0_1",
+      "status": "null_no_supported_candidate",
+      "structuralTokens": [],
+      "summary": "No supported canonical candidate or reviewed functional evidence is available. Null is a valid result.",
+      "userDecisionPosture": "user_decides",
+    },
     "candidates": [],
     "consonants": {
       "field": {
@@ -14055,6 +14742,25 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
     },
     "raw": {
       "alphabet": "auto",
+      "analysisStatusV0_1": {
+        "candidateOnlyOperators": [],
+        "claimBoundary": {
+          "candidateTruthClaim": "not_claimed",
+          "historicalOriginClaim": "not_claimed",
+          "historicalTransmissionClaim": "not_claimed",
+          "languageSuperiorityClaim": "not_claimed",
+          "linguisticOwnershipClaim": "not_claimed",
+          "nullIsValid": true,
+          "structuralOutputIsCandidateTruth": false,
+          "winnerClaim": "not_claimed",
+        },
+        "reviewedOperators": [],
+        "schemaVersion": "open-instrument.analysis-status.v0_1",
+        "status": "null_no_supported_candidate",
+        "structuralTokens": [],
+        "summary": "No supported canonical candidate or reviewed functional evidence is available. Null is a valid result.",
+        "userDecisionPosture": "user_decides",
+      },
       "candidates": [],
       "consonants": {
         "field": {

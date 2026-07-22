@@ -13,6 +13,7 @@ import type {
   EngineMetaSummary,
 } from "./resultShape.v1";
 import type { OriginClaimV1 as OriginClaimProtocolV1 } from "./originClaim.v1";
+import type { AnalysisStatusV0_1 } from "./analysisStatus.v0_1";
 
 // -------------------- Canonical V1 enums --------------------
 
@@ -93,4 +94,6 @@ export type AnalyzeWordResultV1 = {
 
   // Allow forward-compatible extra fields without forcing refactors
   [k: string]: unknown;
+
+  analysisStatusV0_1?: AnalysisStatusV0_1;
 };
