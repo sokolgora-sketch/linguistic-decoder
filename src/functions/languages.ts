@@ -25,7 +25,7 @@ export function classRange(cls: CClass): [number, number] {
 
 export const Albanian: LangProfile = {
   id: "albanian",
-  detect: (w) => /[ëç]|xh|zh|sh|dh|th|nj|gj|ll|rr|q/i.test(w),
+  detect: (w) => /ë|xh|zh|dh|nj|gj|ll|rr/i.test(w),
   DIGRAPH: {
     "ll": "Liquid", "rr": "Liquid",
     "nj": "Nasal",
@@ -68,7 +68,7 @@ export const Latin: LangProfile = {
 
 export const Turkish: LangProfile = {
   id: "turkish",
-  detect: (w) => /[çğşıöü]|ç|ş|c(?!h)|j/i.test(w),
+  detect: (w) => /[ğışöü]/i.test(w),
   DIGRAPH: {
     "ch": "Affricate",
     "sch": "SibilantFricative", "tsch": "Affricate",

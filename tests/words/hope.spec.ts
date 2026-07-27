@@ -28,6 +28,6 @@ describe("word: hope", () => {
     expect(classes.join(" ")).toMatch(/Plosive/);
 
     // Debug signal should include alphabet id
-    expect(signals.join(" ")).toMatch(/alphabet=/);
+    expect(signals.join(" ")).toMatch(/consonant_profile=/);
   });
 });

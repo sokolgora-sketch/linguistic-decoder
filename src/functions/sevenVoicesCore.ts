@@ -230,7 +230,7 @@ export function solveWord(word, opts: any = {}, alphabet) {
         `base_norm=${base.join("") || "-"}`,
         `cons_windows=${consClasses.join(",") || "-"}`,
         ...edgeWindows,
-        `alphabet=${profile.id}`
+        `consonant_profile=${profile.id}`
     ];
 
     return {
