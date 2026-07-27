@@ -229,6 +229,15 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
       "active": null,
       "flag": "ocg",
     },
+    "primaryPath": {
+      "levelPath": "0",
+      "ringPath": [
+        0,
+      ],
+      "voicePath": [
+        "O",
+      ],
+    },
     "raw": {
       "alphabet": "auto",
       "analysisStatusV0_1": {
@@ -425,6 +434,11 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
           ],
         },
         "version": "v1",
+      },
+      "primaryPath": {
+        "levelPath": "0",
+        "ringPath": "0",
+        "voicePath": "O",
       },
       "resonanceProfileV1": {
         "normalized": {
@@ -876,6 +890,19 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
       "active": null,
       "flag": "ocg",
     },
+    "primaryPath": {
+      "levelPath": "0-1-1",
+      "ringPath": [
+        0,
+        2,
+        1,
+      ],
+      "voicePath": [
+        "O",
+        "E",
+        "I",
+      ],
+    },
     "raw": {
       "alphabet": "auto",
       "analysisStatusV0_1": {
@@ -1113,6 +1140,11 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
           ],
         },
         "version": "v1",
+      },
+      "primaryPath": {
+        "levelPath": "0-1-1",
+        "ringPath": "0-2-1",
+        "voicePath": "O-E-I",
       },
       "resonanceProfileV1": {
         "normalized": {
@@ -1636,6 +1668,21 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
       "active": null,
       "flag": "ocg",
     },
+    "primaryPath": {
+      "levelPath": "0-1-1-1",
+      "ringPath": [
+        0,
+        2,
+        3,
+        2,
+      ],
+      "voicePath": [
+        "O",
+        "E",
+        "A",
+        "E",
+      ],
+    },
     "raw": {
       "alphabet": "auto",
       "analysisStatusV0_1": {
@@ -1902,6 +1949,11 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
           ],
         },
         "version": "v1",
+      },
+      "primaryPath": {
+        "levelPath": "0-1-1-1",
+        "ringPath": "0-2-3-2",
+        "voicePath": "O-E-A-E",
       },
       "resonanceProfileV1": {
         "normalized": {
@@ -2643,6 +2695,17 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
       "active": null,
       "flag": "ocg",
     },
+    "primaryPath": {
+      "levelPath": "1-1",
+      "ringPath": [
+        3,
+        2,
+      ],
+      "voicePath": [
+        "A",
+        "E",
+      ],
+    },
     "raw": {
       "alphabet": "auto",
       "analysisStatusV0_1": {
@@ -3208,6 +3271,11 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         },
         "version": "v1",
       },
+      "primaryPath": {
+        "levelPath": "1-1",
+        "ringPath": "3-2",
+        "voicePath": "A-E",
+      },
       "resonanceProfileV1": {
         "normalized": {
           "bucketCounts": {
@@ -3762,6 +3830,15 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
       "active": null,
       "flag": "ocg",
     },
+    "primaryPath": {
+      "levelPath": "1",
+      "ringPath": [
+        1,
+      ],
+      "voicePath": [
+        "I",
+      ],
+    },
     "raw": {
       "alphabet": "auto",
       "analysisStatusV0_1": {
@@ -3972,6 +4049,11 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
           ],
         },
         "version": "v1",
+      },
+      "primaryPath": {
+        "levelPath": "1",
+        "ringPath": "1",
+        "voicePath": "I",
       },
       "resonanceProfileV1": {
         "normalized": {
@@ -4599,6 +4681,17 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
       "active": null,
       "flag": "ocg",
     },
+    "primaryPath": {
+      "levelPath": "1-1",
+      "ringPath": [
+        3,
+        2,
+      ],
+      "voicePath": [
+        "A",
+        "E",
+      ],
+    },
     "raw": {
       "alphabet": "auto",
       "analysisStatusV0_1": {
@@ -5088,6 +5181,11 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         },
         "version": "v1",
       },
+      "primaryPath": {
+        "levelPath": "1-1",
+        "ringPath": "3-2",
+        "voicePath": "A-E",
+      },
       "resonanceProfileV1": {
         "normalized": {
           "bucketCounts": {
@@ -5533,6 +5631,15 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
       "active": null,
       "flag": "ocg",
     },
+    "primaryPath": {
+      "levelPath": "1",
+      "ringPath": [
+        3,
+      ],
+      "voicePath": [
+        "A",
+      ],
+    },
     "raw": {
       "alphabet": "auto",
       "analysisStatusV0_1": {
@@ -5737,6 +5844,11 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
           ],
         },
         "version": "v1",
+      },
+      "primaryPath": {
+        "levelPath": "1",
+        "ringPath": "3",
+        "voicePath": "A",
       },
       "resonanceProfileV1": {
         "normalized": {
@@ -6192,6 +6304,17 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
       "active": null,
       "flag": "ocg",
     },
+    "primaryPath": {
+      "levelPath": "1-1",
+      "ringPath": [
+        1,
+        2,
+      ],
+      "voicePath": [
+        "I",
+        "E",
+      ],
+    },
     "raw": {
       "alphabet": "auto",
       "analysisStatusV0_1": {
@@ -6428,6 +6551,11 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
           ],
         },
         "version": "v1",
+      },
+      "primaryPath": {
+        "levelPath": "1-1",
+        "ringPath": "1-2",
+        "voicePath": "I-E",
       },
       "resonanceProfileV1": {
         "normalized": {
@@ -6926,6 +7054,21 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
       "active": null,
       "flag": "ocg",
     },
+    "primaryPath": {
+      "levelPath": "1--1-1-1",
+      "ringPath": [
+        3,
+        1,
+        3,
+        2,
+      ],
+      "voicePath": [
+        "A",
+        "U",
+        "A",
+        "E",
+      ],
+    },
     "raw": {
       "alphabet": "auto",
       "analysisStatusV0_1": {
@@ -7184,6 +7327,11 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
           ],
         },
         "version": "v1",
+      },
+      "primaryPath": {
+        "levelPath": "1--1-1-1",
+        "ringPath": "3-1-3-2",
+        "voicePath": "A-U-A-E",
       },
       "resonanceProfileV1": {
         "normalized": {
@@ -7812,6 +7960,17 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
       "active": null,
       "flag": "ocg",
     },
+    "primaryPath": {
+      "levelPath": "0-1",
+      "ringPath": [
+        0,
+        2,
+      ],
+      "voicePath": [
+        "O",
+        "E",
+      ],
+    },
     "raw": {
       "alphabet": "auto",
       "analysisStatusV0_1": {
@@ -8283,6 +8442,11 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
           ],
         },
         "version": "v1",
+      },
+      "primaryPath": {
+        "levelPath": "0-1",
+        "ringPath": "0-2",
+        "voicePath": "O-E",
       },
       "resonanceProfileV1": {
         "normalized": {
@@ -8824,6 +8988,21 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
       "active": null,
       "flag": "ocg",
     },
+    "primaryPath": {
+      "levelPath": "1-1-1-1",
+      "ringPath": [
+        3,
+        2,
+        3,
+        1,
+      ],
+      "voicePath": [
+        "A",
+        "E",
+        "A",
+        "I",
+      ],
+    },
     "raw": {
       "alphabet": "auto",
       "analysisStatusV0_1": {
@@ -9095,6 +9274,11 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
           ],
         },
         "version": "v1",
+      },
+      "primaryPath": {
+        "levelPath": "1-1-1-1",
+        "ringPath": "3-2-3-1",
+        "voicePath": "A-E-A-I",
       },
       "resonanceProfileV1": {
         "normalized": {
@@ -9562,6 +9746,17 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
       "active": null,
       "flag": "ocg",
     },
+    "primaryPath": {
+      "levelPath": "1-1",
+      "ringPath": [
+        3,
+        2,
+      ],
+      "voicePath": [
+        "A",
+        "E",
+      ],
+    },
     "raw": {
       "alphabet": "auto",
       "analysisStatusV0_1": {
@@ -9786,6 +9981,11 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
           ],
         },
         "version": "v1",
+      },
+      "primaryPath": {
+        "levelPath": "1-1",
+        "ringPath": "3-2",
+        "voicePath": "A-E",
       },
       "resonanceProfileV1": {
         "normalized": {
@@ -10282,6 +10482,19 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
       "active": null,
       "flag": "ocg",
     },
+    "primaryPath": {
+      "levelPath": "1-0-1",
+      "ringPath": [
+        1,
+        0,
+        1,
+      ],
+      "voicePath": [
+        "I",
+        "O",
+        "I",
+      ],
+    },
     "raw": {
       "alphabet": "auto",
       "analysisStatusV0_1": {
@@ -10539,6 +10752,11 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
           ],
         },
         "version": "v1",
+      },
+      "primaryPath": {
+        "levelPath": "1-0-1",
+        "ringPath": "1-0-1",
+        "voicePath": "I-O-I",
       },
       "resonanceProfileV1": {
         "normalized": {
@@ -11008,6 +11226,15 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
       "active": null,
       "flag": "ocg",
     },
+    "primaryPath": {
+      "levelPath": "-1",
+      "ringPath": [
+        1,
+      ],
+      "voicePath": [
+        "U",
+      ],
+    },
     "raw": {
       "alphabet": "auto",
       "analysisStatusV0_1": {
@@ -11221,6 +11448,11 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
           ],
         },
         "version": "v1",
+      },
+      "primaryPath": {
+        "levelPath": "-1",
+        "ringPath": "1",
+        "voicePath": "U",
       },
       "resonanceProfileV1": {
         "normalized": {
@@ -11694,6 +11926,19 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
       "active": null,
       "flag": "ocg",
     },
+    "primaryPath": {
+      "levelPath": "1-1-1",
+      "ringPath": [
+        2,
+        1,
+        2,
+      ],
+      "voicePath": [
+        "E",
+        "I",
+        "E",
+      ],
+    },
     "raw": {
       "alphabet": "auto",
       "analysisStatusV0_1": {
@@ -11935,6 +12180,11 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
           ],
         },
         "version": "v1",
+      },
+      "primaryPath": {
+        "levelPath": "1-1-1",
+        "ringPath": "2-1-2",
+        "voicePath": "E-I-E",
       },
       "resonanceProfileV1": {
         "normalized": {
@@ -12789,6 +13039,17 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
       "active": null,
       "flag": "ocg",
     },
+    "primaryPath": {
+      "levelPath": "-1-1",
+      "ringPath": [
+        1,
+        1,
+      ],
+      "voicePath": [
+        "U",
+        "I",
+      ],
+    },
     "raw": {
       "alphabet": "auto",
       "analysisStatusV0_1": {
@@ -13514,6 +13775,11 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         },
         "version": "v1",
       },
+      "primaryPath": {
+        "levelPath": "-1-1",
+        "ringPath": "1-1",
+        "voicePath": "U-I",
+      },
       "resonanceProfileV1": {
         "normalized": {
           "bucketCounts": {
@@ -14151,6 +14417,15 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
       "active": null,
       "flag": "ocg",
     },
+    "primaryPath": {
+      "levelPath": "1",
+      "ringPath": [
+        1,
+      ],
+      "voicePath": [
+        "I",
+      ],
+    },
     "raw": {
       "alphabet": "auto",
       "analysisStatusV0_1": {
@@ -14347,6 +14622,11 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
           ],
         },
         "version": "v1",
+      },
+      "primaryPath": {
+        "levelPath": "1",
+        "ringPath": "1",
+        "voicePath": "I",
       },
       "resonanceProfileV1": {
         "normalized": {
@@ -14740,6 +15020,15 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
       "active": null,
       "flag": "ocg",
     },
+    "primaryPath": {
+      "levelPath": "-1",
+      "ringPath": [
+        3,
+      ],
+      "voicePath": [
+        "Ë",
+      ],
+    },
     "raw": {
       "alphabet": "auto",
       "analysisStatusV0_1": {
@@ -14929,6 +15218,11 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
           ],
         },
         "version": "v1",
+      },
+      "primaryPath": {
+        "levelPath": "-1",
+        "ringPath": "3",
+        "voicePath": "Ë",
       },
       "resonanceProfileV1": {
         "normalized": {

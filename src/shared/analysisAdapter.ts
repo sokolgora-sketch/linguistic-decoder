@@ -44,6 +44,30 @@ function sameStringArray(a: any, b: any): boolean {
   return true;
 }
 
+function pathPartsToDashString(value: unknown): string {
+  if (!Array.isArray(value)) return "";
+
+  return value
+    .map((item) => String(item ?? "").trim())
+    .filter(Boolean)
+    .join("-");
+}
+
+function projectAuthoritativePrimaryPath(
+  payload: EnginePayload,
+): AnalyzeWordResultV1["primaryPath"] | undefined {
+  const primaryPath = (payload as any)?.primaryPath;
+  const voicePath = pathPartsToDashString(primaryPath?.voicePath);
+
+  if (!voicePath) return undefined;
+
+  return {
+    voicePath,
+    levelPath: pathPartsToDashString(primaryPath?.levelPath),
+    ringPath: pathPartsToDashString(primaryPath?.ringPath),
+  };
+}
+
 function pickSurfaceVowels(payload: any, math7: any): string[] | null {
     return (
       // Contract surface (preferred): evidence.surfaceVowels
@@ -84,6 +108,8 @@ export function enginePayloadToAnalysisResult(payload: EnginePayload): AnalyzeWo
 
   const candidates = buildMindCandidates(payload);
   const deepRoot = buildDeepRoot(payload);
+  const authoritativePrimaryPath =
+    projectAuthoritativePrimaryPath(payload);
 
   const result: AnalyzeWordResultV1 = {
     word: payload.word,
@@ -91,6 +117,9 @@ export function enginePayloadToAnalysisResult(payload: EnginePayload): AnalyzeWo
     engineVersion: payload.engineVersion,
     mode: payload.mode as Mode,
     alphabet: payload.alphabet as Alphabet,
+    ...(authoritativePrimaryPath
+      ? { primaryPath: authoritativePrimaryPath }
+      : {}),
     heart,
     mind,
     consonants,

@@ -1,13 +1,13 @@
 import type { AnalyzeWordResultUI } from "@/shared/resultsUI";
 
 /**
- * Normalize "voice path" between:
- * - primaryPath.voicePath: string[]
- * - candidates[0].vowelPath: string (joined)
+ * Normalize the authoritative word-level voice path.
  *
- * Rule:
- * - If either exists, derive the other.
- * - Never invent a path if neither exists.
+ * Rules:
+ * - Preserve primaryPath when the engine emitted it.
+ * - A legacy candidate path may backfill a missing primaryPath.
+ * - Never copy the word-level primary path into a candidate row.
+ * - Never invent a path when neither source exists.
  */
 function splitPath(s?: string | null): string[] {
   if (!s) return [];
@@ -15,13 +15,6 @@ function splitPath(s?: string | null): string[] {
     .split(/[-–—\s]+/g)
     .map((x) => x.trim())
     .filter(Boolean);
-}
-
-function joinPath(path?: string[] | null): string | undefined {
-  if (!Array.isArray(path) || path.length === 0) return undefined;
-  const cleaned = path.map((x) => String(x).trim()).filter(Boolean);
-  if (cleaned.length === 0) return undefined;
-  return cleaned.join("-");
 }
 
 export function ensurePrimaryAndCandidatePaths(
@@ -52,12 +45,6 @@ export function ensurePrimaryAndCandidatePaths(
     };
   } else if (!Array.isArray(result.primaryPath.voicePath) || result.primaryPath.voicePath.length === 0) {
     result.primaryPath.voicePath = chosenArr;
-  }
-
-  // Ensure candidates[0].vowelPath exists
-  const joined = joinPath(chosenArr);
-  if (best && joined && !best.vowelPath) {
-    best.vowelPath = joined;
   }
 
   return result;
