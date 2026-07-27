@@ -58,27 +58,105 @@ function pickCandidateSourceKind(rawCandidate: Raw): string | undefined {
   return nested || undefined;
 }
 
-function pickPrimaryPath(raw: Raw, bestCandidate: Raw | null): PrimaryPathSummary | null {
-  // Prefer best candidate path
-  const bestPath = bestCandidate ? pickCandidateVowelPath(bestCandidate) : undefined;
+function normalizePrimaryVoicePath(value: unknown): string[] {
+  if (Array.isArray(value)) {
+    return value
+      .map((item) => String(item ?? "").trim().toUpperCase())
+      .filter((item) => /^[AEIOUYË]$/.test(item));
+  }
 
-  // Secondary: deepRoot top candidate vowelPath if it exists
-  const deep0 = raw?.deepRoot?.candidates?.[0]?.vowelPath;
-  const deepPath = typeof deep0 === "string" ? normalizeArrowPath(deep0) : undefined;
+  if (typeof value === "string") {
+    return extractSevenVowelsFromString(value);
+  }
+
+  return [];
+}
+
+function normalizePrimaryRingPath(value: unknown): number[] {
+  if (Array.isArray(value)) {
+    return value
+      .map((item) => Number(item))
+      .filter((item) => Number.isFinite(item));
+  }
+
+  if (typeof value === "string") {
+    return value
+      .split(/[-–—\s]+/g)
+      .map((item) => Number(item))
+      .filter((item) => Number.isFinite(item));
+  }
+
+  return [];
+}
+
+function normalizePrimaryLevelPath(value: unknown): string {
+  if (Array.isArray(value)) {
+    return value
+      .map((item) => String(item ?? "").trim())
+      .filter(Boolean)
+      .join("-");
+  }
+
+  return typeof value === "string"
+    ? value.trim()
+    : "";
+}
+
+function pickPrimaryPath(raw: Raw, bestCandidate: Raw | null): PrimaryPathSummary | null {
+  const directPrimaryPath =
+    raw?.primaryPath && typeof raw.primaryPath === "object"
+      ? raw.primaryPath
+      : null;
+
+  const directVoicePath =
+    normalizePrimaryVoicePath(
+      directPrimaryPath?.voicePath,
+    );
+
+  if (directVoicePath.length > 0) {
+    return {
+      voicePath: directVoicePath,
+      levelPath:
+        normalizePrimaryLevelPath(
+          directPrimaryPath?.levelPath,
+        ),
+      ringPath:
+        normalizePrimaryRingPath(
+          directPrimaryPath?.ringPath,
+        ),
+    };
+  }
+
+  // Legacy compatibility only: candidate or DeepRoot paths may backfill a
+  // missing primary path, but they never override an emitted engine path.
+  const bestPath =
+    bestCandidate
+      ? pickCandidateVowelPath(bestCandidate)
+      : undefined;
+
+  const deep0 =
+    raw?.deepRoot?.candidates?.[0]?.vowelPath;
+
+  const deepPath =
+    typeof deep0 === "string"
+      ? normalizeArrowPath(deep0)
+      : undefined;
 
   const pathStr = bestPath ?? deepPath;
   const voicePath = splitVoicePath(pathStr);
 
   if (!voicePath.length) return null;
 
-  // ringPath: prefer numeric ringPath from bestCandidate.voices.ringPath
-  const ringPath = Array.isArray(bestCandidate?.voices?.ringPath)
-    ? bestCandidate.voices.ringPath.filter((n: any) => Number.isFinite(n))
-    : [];
+  const ringPath =
+    Array.isArray(bestCandidate?.voices?.ringPath)
+      ? bestCandidate.voices.ringPath.filter(
+          (n: any) => Number.isFinite(n),
+        )
+      : [];
 
   return {
     voicePath,
-    levelPath: "", // keep stable; formalize later if/when you introduce levels
+    levelPath: "",
     ringPath,
   };
 }

@@ -38,6 +38,20 @@ export const AnalysisStatusV0_1ContractSchema = z
     userDecisionPosture: z.literal("user_decides"),
   })
   .strict();
+export const AnalyzeWordPrimaryPathV1ContractSchema = z
+  .object({
+    voicePath: z.union([
+      z.string().min(1),
+      z.array(z.string().min(1)).min(1),
+    ]),
+    levelPath: z.string(),
+    ringPath: z.union([
+      z.string(),
+      z.array(z.number()),
+    ]),
+  })
+  .strict();
+
 export const AnalyzeWordResultV1ContractSchema = z
   .object({
     word: z.string().min(1),
@@ -47,6 +61,9 @@ export const AnalyzeWordResultV1ContractSchema = z
     engineVersion: z.string().min(1),
     mode: z.string().min(1),
     alphabet: z.string().min(1),
+    primaryPath:
+      AnalyzeWordPrimaryPathV1ContractSchema
+        .optional(),
 
     // Optional analysis blocks (kept loose for now; contract is about shape/stability)
     heart: z.unknown().optional(),
@@ -94,6 +111,7 @@ export function toAnalyzeWordResultV1Contract(input: unknown): AnalyzeWordResult
     engineVersion: o.engineVersion,
     mode: o.mode,
     alphabet: o.alphabet,
+    primaryPath: o.primaryPath,
 
     heart: o.heart,
     mind: o.mind,
