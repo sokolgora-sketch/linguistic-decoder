@@ -18,9 +18,9 @@ test("damage → A→E", () => {
   expect(primaryPath.voicePath.join("→")).toBe("A→E");
 });
 
-test("study (strict) → U→I", () => {
+test("study (strict) → U→Y", () => {
   const { primaryPath } = runAnalysis("study", opts, "auto");
-  expect(primaryPath.voicePath.join("→")).toBe("U→I");
+  expect(primaryPath.voicePath.join("→")).toBe("U→Y");
 });
 
 test("life (strict) stable path exists", () => {

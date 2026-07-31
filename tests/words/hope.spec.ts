@@ -1,7 +1,7 @@
 
 import { runAnalysis } from "@/lib/runAnalysis";
 import { chooseProfile } from "@/functions/languages";
-import { readWindowsDebug, extractBase, normalizeTerminalY } from "@/functions/sevenVoicesC";
+import { readWindowsDebug, extractBase } from "@/functions/sevenVoicesC";
 import { Vowel } from "@/functions/sevenVoicesCore";
 import type { Alphabet } from "@/lib/runAnalysis";
 import type { SolveOptions } from "@/functions/sevenVoicesCore";
@@ -22,12 +22,12 @@ describe("word: hope", () => {
     // checksum V may vary if primes ever change; assert the product as a sanity check
     expect(primary.checksums?.V).toBe(21);
 
-    const base = normalizeTerminalY(extractBase("hope"), "hope");
+    const base = extractBase("hope");
     const prof = chooseProfile("hope", undefined);
     const { classes } = readWindowsDebug("hope", base, prof);
     expect(classes.join(" ")).toMatch(/Plosive/);
 
-    // Debug signal should include alphabet id
+    // Debug signal should identify the selected consonant profile
     expect(signals.join(" ")).toMatch(/consonant_profile=/);
   });
 });

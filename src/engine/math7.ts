@@ -1,6 +1,5 @@
 import { totalMod7FromVowels, isSevenVowel, type SevenVowel, VOWEL_INDEX, totalMod7FromSum0to6 } from "@/shared/math7.core";
 import { extractMath7BasisFromPayload } from "@/shared/math7.basis";
-import { applyStrictTerminalYHint } from "@/shared/math7.basis";
 
 /**
  * Public: principle names emitted by Math7.
@@ -121,11 +120,16 @@ export function math7PrimaryFromVowels(
  * Public API expected by analysisAdapter and routes.
  * It consumes the engine payload and derives Math7 summary.
  *
- * IMPORTANT: we intentionally use the payload's vowelPath (if present),
- * because that is the analysis pipeline's basis.
+ * IMPORTANT: use the extracted authoritative vowel path unchanged.
+ * Canonical Y remains Y; candidate/oracle transformations are separate.
  */
 export function computeMath7ForResult(payload: any): Math7Summary {
-  const { basis, vowels } = extractMath7BasisFromPayload(payload);
-  const hinted = applyStrictTerminalYHint(payload, vowels);
-  return { primary: math7PrimaryFromVowels(hinted, { basis: hinted.join("") || basis }) };
+  const { basis, vowels } =
+    extractMath7BasisFromPayload(payload);
+
+  return {
+    primary: math7PrimaryFromVowels(vowels, {
+      basis: vowels.join("") || basis,
+    }),
+  };
 }

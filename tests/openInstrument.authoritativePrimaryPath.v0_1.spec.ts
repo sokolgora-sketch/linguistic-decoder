@@ -8,7 +8,7 @@ import {
 import { ensurePrimaryAndCandidatePaths } from "@/shared/ensurePaths";
 
 const PRIMARY_PATH_CASES = [
-  { word: "study", expected: ["U", "I"] },
+  { word: "study", expected: ["U", "Y"] },
   { word: "damage", expected: ["A", "E"] },
   { word: "data", expected: ["A"] },
   { word: "dij", expected: ["I"] },

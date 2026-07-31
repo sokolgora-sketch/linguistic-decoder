@@ -13,8 +13,8 @@ describe("Seven-Voices heart core — study", () => {
 
     // Compare only the heart piece so we can evolve other parts later
     expect(heart).toBeDefined();
-    expect(heart.voicePath).toEqual("U → I");
-    expect(heart.ringPath).toEqual("1 → 1");
-    expect(heart.levelPath).toEqual("low → high");
+    expect(heart.voicePath).toEqual("U → Y");
+    expect(heart.ringPath).toEqual("1 → 2");
+    expect(heart.levelPath).toEqual("low → low");
   });
 });

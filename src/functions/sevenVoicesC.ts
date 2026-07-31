@@ -37,20 +37,6 @@ export function extractBase(word: string): Vowel[] {
   return out;
 }
 
-export function normalizeTerminalY(seq: Vowel[], rawWord: string): Vowel[] {
-  if (
-    seq.length &&
-    seq[seq.length - 1] === "Y" &&
-    rawWord.toLowerCase().endsWith("y")
-  ) {
-    const out = seq.slice();
-    out[out.length - 1] = "I";
-    return out;
-  }
-  return seq;
-}
-
-
 export function computeC(voicePath: Vowel[], consClasses: CClass[], RING: Record<Vowel, number>): number {
   let c = 0;
   const hops = Math.max(0, voicePath.length - 1);

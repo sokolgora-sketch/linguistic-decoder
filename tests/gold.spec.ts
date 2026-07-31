@@ -20,9 +20,9 @@ test("damage (strict) → A→E", () => {
   expect(vp(r)).toBe("A→E");
 });
 
-test("study (strict) → U→I", () => {
+test("study (strict) → U→Y", () => {
   const r = runAnalysis("study", base, "auto");
-  expect(vp(r)).toBe("U→I");
+  expect(vp(r)).toBe("U→Y");
 });
 
 test("hope (strict) → O→E", () => {
