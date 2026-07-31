@@ -30,8 +30,8 @@ function expectPrimary(word: string, expectedPath: string, expectedRings: number
 }
 
 describe('Seven-Voices core — smoke', () => {
-  test('study → U→I (rings 1→1)', () => {
-    expectPrimary('study', 'U→I', [1,1]);
+  test('study → U→Y (rings 1→2)', () => {
+    expectPrimary('study', 'U→Y', [1,2]);
   });
 
   test('damage → A→E (rings 3→2)', () => {

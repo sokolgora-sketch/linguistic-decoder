@@ -349,8 +349,8 @@ exports[`originClaim v1 — gold snapshots (originClaim block only) gold:study 1
       "language": "Albanian",
       "reasons": [
         "Candidate status unknown (no explicit pass/fail).",
-        "DeepRoot–Heart gate aligned (terminal vowel agreement).",
-        "Candidate voice path aligns with primary voice path.",
+        "DeepRoot–Heart gate misaligned (terminal vowel conflict).",
+        "Voice path alignment cannot be determined from available fields.",
         "Candidate shows non-empty morphological structure (prefix/root/suffix parts).",
       ],
       "status": "unknown",
@@ -368,8 +368,8 @@ exports[`originClaim v1 — gold snapshots (originClaim block only) gold:study 1
       "language": "Latin",
       "reasons": [
         "Candidate status unknown (no explicit pass/fail).",
-        "DeepRoot–Heart gate aligned (terminal vowel agreement).",
-        "Candidate voice path aligns with primary voice path.",
+        "DeepRoot–Heart gate misaligned (terminal vowel conflict).",
+        "Voice path alignment cannot be determined from available fields.",
         "Candidate shows non-empty morphological structure (prefix/root/suffix parts).",
       ],
       "status": "unknown",

@@ -37,6 +37,92 @@ describe("buildRootMapV1 (RootMap selection)", () => {
 
     expect(rm?.tokens.map((t) => t.token)).toEqual(["SHTU", "DI"]);
   });
+
+  it("uses reviewed terminal-operation admission when canonical Heart Y has no exact hypothesis", () => {
+    const H_DI = {
+      protoRoots: ["SHTU", "DI"],
+      carriers: [
+        {
+          protoRootId: "SHTU",
+          segment: "stu",
+          carrierForm: "shtu",
+          lang: "sq",
+          ops: ["s_to_sh"],
+        },
+        {
+          protoRootId: "DI",
+          segment: "dy",
+          carrierForm: "di",
+          lang: "sq",
+          ops: ["y_to_i"],
+        },
+      ],
+      decomposition: {
+        action: "SHTU",
+        function: "DI",
+      },
+      checks: {
+        opsWithinLimits: true,
+        skeletonExplained: true,
+      },
+      opsCount: 2,
+    };
+
+    const H_DA = {
+      protoRoots: ["SHTU", "DA"],
+      carriers: [
+        {
+          protoRootId: "SHTU",
+          segment: "stu",
+          carrierForm: "shtu",
+          lang: "sq",
+          ops: ["s_to_sh"],
+        },
+        {
+          protoRootId: "DA",
+          segment: "dy",
+          carrierForm: "da",
+          lang: "sq",
+          ops: ["vowel_swap"],
+        },
+      ],
+      decomposition: {
+        action: "SHTU",
+      },
+      checks: {
+        opsWithinLimits: true,
+        skeletonExplained: true,
+      },
+      opsCount: 2,
+    };
+
+    const rm = buildRootMapV1({
+      basis: "study",
+      minRoots: [H_DA as any, H_DI as any],
+      heartPrimaryPath: ["U", "Y"],
+    });
+
+    expect(
+      rm?.tokens.map((token) => token.token),
+    ).toEqual(["SHTU", "DI"]);
+
+    expect(
+      rm?.keys.find((key) => key.token === "DI")?.ops,
+    ).toEqual(["y_to_i"]);
+
+    expect(
+      rm?.keys
+        .find((key) => key.token === "DI")
+        ?.evidence.join("\n"),
+    ).toContain(
+      "reviewed functional free-operator evidence",
+    );
+
+    expect(
+      rm?.tokens.map((token) => token.token),
+    ).not.toContain("DA");
+  });
+
   it("marks Gheg DA split as reviewed dialect evidence instead of gave-supported", () => {
     const rm = buildRootMapV1({
       basis: "da",

@@ -15,7 +15,7 @@
 // @ts-nocheck
 
 import { getManifest, EngineManifest } from "../engine/manifest";
-import { computeC, extractBase, normalizeTerminalY, readWindowsDebug, edgeBiasPenalty, type EdgeInfo } from "./sevenVoicesC";
+import { computeC, extractBase, readWindowsDebug, edgeBiasPenalty, type EdgeInfo } from "./sevenVoicesC";
 import { chooseProfile, CClass } from "./languages";
 
 export const VOWELS = ["A", "E", "I", "O", "U", "Y", "Ë"] as const;
@@ -164,7 +164,7 @@ export function solveWord(word, opts: any = {}, alphabet) {
     const opCost = opts.opCost ?? manifest.opCost;
 
     const rawBase = extractBase(word);
-    const base = normalizeTerminalY(rawBase, word);
+    const base = rawBase;
     const baseSeq = base.length ? base : (["O"] as Vowel[]);
 
     const profile = chooseProfile(word, alphabet === "auto" ? undefined : alphabet);

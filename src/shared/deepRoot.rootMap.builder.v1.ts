@@ -1,14 +1,14 @@
 // src/shared/deepRoot.rootMap.builder.v1.ts
 //
 // DeepRoot RootMap v0.1 — Functional Key Decoder
-// Deterministic builder: chooses the first min-root hypothesis (stable order).
+// Deterministic builder: prefers Heart alignment, then reviewed operation admission, then stable order.
 //
 // Inputs are *already* curated by:
 // - segmenter.v1
 // - carrierMatcher.v1
 // - protoRoots.v1 (curated truth table)
 //
-// No scoring. No ranking language wars. Just: tokens + keys + composed meaning.
+// No language-origin scoring and no winner claim. Selection remains deterministic and evidence-bounded.
 
 import type { MinRootHypothesis } from "./deepRoot.minRoots.v1";
 import type {
@@ -214,6 +214,53 @@ function buildReviewedFunctionalRuntimeEvidenceByEmbryoV0_1(): ReadonlyMap<
   return new Map(entries);
 }
 
+
+function hypothesisHasAllowedReviewedTerminalEvidenceV0_1(
+  hypothesis: MinRootHypothesis,
+  reviewedEvidenceByEmbryo: ReadonlyMap<
+    string,
+    ReviewedFunctionalRuntimeEvidenceV0_1
+  >,
+): boolean {
+  const protoRoots = Array.isArray(
+    (hypothesis as any)?.protoRoots,
+  )
+    ? (hypothesis as any).protoRoots
+    : [];
+
+  const terminalProtoRoot = String(
+    protoRoots[protoRoots.length - 1] ?? "",
+  ).trim();
+
+  if (!terminalProtoRoot) return false;
+
+  const reviewedFunctionalEvidence =
+    reviewedEvidenceByEmbryo.get(terminalProtoRoot);
+
+  if (!reviewedFunctionalEvidence) return false;
+
+  const carriers = Array.isArray(
+    (hypothesis as any)?.carriers,
+  )
+    ? (hypothesis as any).carriers
+    : [];
+
+  const terminalCarrier = carriers.find(
+    (carrier: any) =>
+      String(carrier?.protoRootId ?? "") === terminalProtoRoot,
+  );
+
+  if (!terminalCarrier) return false;
+
+  return evaluateReviewedExternalLexiconEvidenceOperationPolicyV0_1({
+    sourceId: reviewedFunctionalEvidence.sourceId,
+    embryo: reviewedFunctionalEvidence.embryo,
+    ops: terminalCarrier?.ops,
+    segment: terminalCarrier?.segment,
+    carrierForm: terminalCarrier?.carrierForm,
+  }).allowed;
+}
+
 export function buildRootMapV1(params: {
 basis: string;
   minRoots: MinRootHypothesis[] | null | undefined;
@@ -234,30 +281,45 @@ basis: string;
   }
 
 
-  // Deterministic choice (v0.1.1):
+  // Deterministic selection:
+  //
+  // 1. Preserve exact Heart-terminal alignment when available.
+  // 2. If the canonical Heart terminal has no exact hypothesis, prefer the
+  //    first hypothesis whose terminal carrier operation is admitted by the
+  //    reviewed evidence policy.
+  // 3. Otherwise retain stable source order.
+  //
+  // This does not promote candidate evidence into the authoritative Heart
+  // path. It only prevents an unsupported generic transformation from winning
+  // merely because it appears first.
 
+  const heartTerm = lastVowelFromAnyPath(
+    params.heartPrimaryPath,
+  );
 
-  // Prefer the first hypothesis whose terminal vowel matches Heart primary terminal vowel.
+  const heartAlignedHypothesis = heartTerm
+    ? minRoots.find(
+        (hypothesis) =>
+          hypothesisTerminalVowel(hypothesis) === heartTerm,
+      )
+    : undefined;
 
-
-  // Fallback: first hypothesis (stable order).
-
-
-  const heartTerm = lastVowelFromAnyPath(params.heartPrimaryPath);
-
+  const reviewedOperationAdmittedHypothesis =
+    heartTerm && !heartAlignedHypothesis
+      ? minRoots.find((hypothesis) =>
+          hypothesisHasAllowedReviewedTerminalEvidenceV0_1(
+            hypothesis,
+            reviewedEvidenceByEmbryo,
+          ),
+        )
+      : undefined;
 
   const h =
+    heartAlignedHypothesis ??
+    reviewedOperationAdmittedHypothesis ??
+    minRoots[0];
 
-
-    (heartTerm
-
-
-      ? (minRoots.find((hh) => hypothesisTerminalVowel(hh) === heartTerm) ?? minRoots[0])
-
-
-      : minRoots[0]);
-
-const tokens: RootTokenV1[] = [];
+  const tokens: RootTokenV1[] = [];
   const keys: RootKeyV1[] = [];
   const carriersOut: RootCarrierV1[] = [];
 
