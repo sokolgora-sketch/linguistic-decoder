@@ -80,17 +80,31 @@ function keyStatusForCarrier(
   carrier: { lang?: string; ops?: string[] } | null,
   carrierGloss?: string,
   carrierNotes?: string,
+  reviewedEvidenceAvailable = false,
+  reviewedEvidenceAuthorized = false,
 ): RootKeyStatusV1 {
   if (!carrier) return "speculative";
 
-  const text = `${carrierGloss ?? ""} ${carrierNotes ?? ""}`.toLocaleLowerCase("en-US");
+  const text =
+    `${carrierGloss ?? ""} ${carrierNotes ?? ""}`
+      .toLocaleLowerCase("en-US");
 
-  if (text.includes("gheg") || text.includes("dialect attestation")) {
+  if (
+    text.includes("gheg") ||
+    text.includes("dialect attestation")
+  ) {
     return "dialect_attested_pending_review";
   }
 
   if (text.includes("weak")) {
     return "carrier_only";
+  }
+
+  if (
+    reviewedEvidenceAvailable &&
+    !reviewedEvidenceAuthorized
+  ) {
+    return "candidate_only";
   }
 
   return "supported";
@@ -421,6 +435,8 @@ basis: string;
       chosenCarrier ?? null,
       protoCarrierHit?.gloss,
       protoCarrierHit?.notes,
+      Boolean(reviewedFunctionalEvidence),
+      evidenceOperationEvaluation?.allowed === true,
     );
 
     keys.push({

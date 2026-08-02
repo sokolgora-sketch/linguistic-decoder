@@ -20,7 +20,8 @@ export type RootKeyStatusV1 =
   | "supported"
   | "speculative"
   | "dialect_attested_pending_review"
-  | "carrier_only";
+  | "carrier_only"
+  | "candidate_only";
 
 export type RootKeyV1 = {
   token: string; // must match a token in tokens[]

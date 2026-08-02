@@ -71,6 +71,8 @@ function parseRootMapV1(v: unknown): ParseRootMapResult {
         return "dialect_attested_pending_review";
       case "carrier_only":
         return "carrier_only";
+      case "candidate_only":
+        return "candidate_only";
       default:
         return null;
     }

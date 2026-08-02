@@ -19,7 +19,7 @@ export const RootTokenV1Schema = z.object({
   vowel_path: z.string().optional(),
 });
 
-export const RootKeyStatusV1Schema = z.enum(["supported", "speculative", "dialect_attested_pending_review", "carrier_only"]);
+export const RootKeyStatusV1Schema = z.enum(["supported", "speculative", "dialect_attested_pending_review", "carrier_only", "candidate_only"]);
 
 export const RootKeyV1Schema = z.object({
   token: z.string(),
