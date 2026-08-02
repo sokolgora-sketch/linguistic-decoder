@@ -50,8 +50,8 @@ describe("analyze-v1 reviewed DI evidence carrier boundary v0.1", () => {
   );
 
   it.each([
-    ["dij", "supported"],
-    ["dije", "supported"],
+    ["dij", "candidate_only"],
+    ["dije", "candidate_only"],
     ["dit", "carrier_only"],
   ])(
     "%s retains its DI token but withholds reviewed DI evidence",
