@@ -1,10 +1,99 @@
 import { buildRootMapV1 } from "@/shared/deepRoot.rootMap.builder.v1";
+import type { MinRootHypothesis } from "@/shared/deepRoot.minRoots.v1";
 
 // Minimal proto roots used by builder are read via getProtoRootV1.
 // These tests focus on hypothesis selection behavior, not protoRoots content.
 // If a protoRootId is unknown, tokens still emit, but gloss may be "unknown".
 
 describe("buildRootMapV1 (RootMap selection)", () => {
+
+  it("returns null when the RootMap basis is empty", () => {
+    expect(
+      buildRootMapV1({
+        basis: "",
+        minRoots: [],
+      }),
+    ).toBeNull();
+  });
+
+  it("returns an empty RootMap note when minRoots are unavailable", () => {
+    expect(
+      buildRootMapV1({
+        basis: "test",
+        minRoots: [],
+      }),
+    ).toEqual({
+      tokens: [],
+      keys: [],
+      composedMeaning: "",
+      notes: [
+        "No minRoots hypotheses available; RootMap not emitted.",
+      ],
+    });
+  });
+
+  it("emits deterministic study tokens and carrier fields from one hypothesis", () => {
+    const hypothesis: MinRootHypothesis = {
+      id: "study:stub:0",
+      basis: "study",
+      segments: ["stu", "di"],
+      protoRoots: ["SHTU", "DI"],
+      carriers: [
+        {
+          protoRootId: "SHTU",
+          segment: "stu",
+          carrierForm: "stu",
+          lang: "en",
+          ops: ["s↔sh"],
+        },
+        {
+          protoRootId: "DI",
+          segment: "di",
+          carrierForm: "di",
+          lang: "sq",
+          ops: [],
+        },
+      ],
+      decomposition: {
+        action: "SHTU",
+        function: "DI",
+      },
+      checks: {
+        opsWithinLimits: true,
+        skeletonExplained: true,
+      },
+      opsCount: 1,
+    };
+
+    const rootMap = buildRootMapV1({
+      basis: "study",
+      minRoots: [hypothesis],
+    });
+
+    expect(
+      rootMap?.tokens.map((token) => token.token),
+    ).toEqual(["SHTU", "DI"]);
+
+    expect(rootMap?.keys).toHaveLength(2);
+
+    expect(rootMap?.keys[0]).toMatchObject({
+      token: "SHTU",
+      language: "en",
+      ops: ["s↔sh"],
+    });
+
+    expect(
+      rootMap?.keys[0].evidence,
+    ).toContain("ops: s↔sh");
+
+    expect(rootMap?.keys[1]).toMatchObject({
+      token: "DI",
+      language: "sq",
+    });
+
+    expect(rootMap?.keys[1].ops).toBeUndefined();
+  });
+
   it("prefers Heart-aligned terminal vowel (study: DI not DA)", () => {
     const H_DI = {
       protoRoots: ["SHTU", "DI"],
