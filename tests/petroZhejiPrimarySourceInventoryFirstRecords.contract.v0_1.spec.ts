@@ -260,7 +260,26 @@ describe(
       }
     });
 
-    it("keeps all first records metadata-only instead of promoting them to primary text", () => {
+    it("keeps source classification metadata-only while recording verified physical-access requirements", () => {
+      const expectedAccessStatusBySourceId = new Map([
+        [
+          "pz-meta-shqipja-sanskritishtja-1996-v0.1",
+          "METADATA_ONLY",
+        ],
+        [
+          "pz-meta-shqipja-sanskritishtja-2005-revised-family-v0.1",
+          "PHYSICAL_COPY_REQUIRED",
+        ],
+        [
+          "pz-meta-shqipja-sanskritishtja-volume2-conflict-v0.1",
+          "PHYSICAL_COPY_REQUIRED",
+        ],
+        [
+          "pz-meta-roli-mesianik-2015-pagination-conflict-v0.1",
+          "PHYSICAL_COPY_REQUIRED",
+        ],
+      ]);
+
       for (const record of inventory.records) {
         expect(
           record.sourceClass,
@@ -271,13 +290,21 @@ describe(
         expect(
           record.sourceAccessStatus,
         ).toBe(
-          "METADATA_ONLY",
+          expectedAccessStatusBySourceId.get(
+            record.sourceId,
+          ),
         );
 
         expect(
           record.sourceClass,
         ).not.toBe(
           "PETRO_ZHEJI_PRIMARY_PUBLISHED_WORK",
+        );
+
+        expect(
+          record.sourceAccessStatus,
+        ).not.toBe(
+          "VERIFIED_ACCESSIBLE",
         );
       }
 
@@ -438,6 +465,275 @@ describe(
       );
     });
 
+    it("records concrete SEEU physical holdings without claiming source inspection", () => {
+      const recordById = new Map(
+        inventory.records.map(
+          (record: { sourceId: string }) => [
+            record.sourceId,
+            record,
+          ],
+        ),
+      );
+
+      const physicalSourceIds = [
+        "pz-meta-shqipja-sanskritishtja-2005-revised-family-v0.1",
+        "pz-meta-shqipja-sanskritishtja-volume2-conflict-v0.1",
+        "pz-meta-roli-mesianik-2015-pagination-conflict-v0.1",
+      ];
+
+      for (const sourceId of physicalSourceIds) {
+        const record = recordById.get(
+          sourceId,
+        );
+
+        expect(record).toBeDefined();
+
+        expect(
+          record.sourceAccessStatus,
+        ).toBe(
+          "PHYSICAL_COPY_REQUIRED",
+        );
+
+        expect(
+          record.physicalCopyStatus,
+        ).toContain(
+          "Available",
+        );
+
+        expect(
+          record.sourceAccessOwner,
+        ).toContain(
+          "South East European University",
+        );
+
+        expect(
+          record.editionIdentityStatus,
+        ).not.toBe(
+          "EXACT_EDITION_VERIFIED",
+        );
+
+        expect(
+          record.citationStability,
+        ).not.toBe(
+          "PAGE_STABLE",
+        );
+      }
+
+      const original1996 = recordById.get(
+        "pz-meta-shqipja-sanskritishtja-1996-v0.1",
+      );
+
+      expect(
+        original1996.sourceAccessStatus,
+      ).toBe(
+        "METADATA_ONLY",
+      );
+
+      expect(
+        original1996.physicalCopyStatus,
+      ).toBeNull();
+
+      expect(
+        original1996.sourceAccessOwner,
+      ).toBeNull();
+
+      const roli = recordById.get(
+        "pz-meta-roli-mesianik-2015-pagination-conflict-v0.1",
+      );
+
+      expect(
+        roli.contentRelevance,
+      ).toContain(
+        "Një parashtrim i shkurtër i algoritmit simbolik",
+      );
+
+      const evidenceIds = inventory.provenanceEvidence.map(
+        (item: { evidenceId: string }) => item.evidenceId,
+      );
+
+      expect(
+        evidenceIds,
+      ).toContain(
+        "pz-evidence-seeu-live-holdings-shqipja-2026-08-07",
+      );
+
+      expect(
+        evidenceIds,
+      ).toContain(
+        "pz-evidence-seeu-live-holdings-roli-2026-08-07",
+      );
+    });
+
+    it("binds SEEU physical-access evidence to exact public-catalogue holding identifiers", () => {
+      const recordById = new Map(
+        inventory.records.map(
+          (record: { sourceId: string }) => [
+            record.sourceId,
+            record,
+          ],
+        ),
+      );
+
+      const family = recordById.get(
+        "pz-meta-shqipja-sanskritishtja-2005-revised-family-v0.1",
+      );
+
+      expect(family).toBeDefined();
+
+      expect(
+        family.physicalCopyStatus,
+      ).toContain(
+        "catalogue status Available",
+      );
+
+      expect(
+        family.physicalCopyStatus,
+      ).toContain(
+        "2702-000386",
+      );
+
+      expect(
+        family.physicalCopyStatus,
+      ).toContain(
+        "491.2 Zhe-Shq 2005",
+      );
+
+      expect(
+        family.physicalCopyStatus,
+      ).toContain(
+        "2702-000387",
+      );
+
+      expect(
+        family.physicalCopyStatus,
+      ).toContain(
+        "491.2 Zhe-Shq 2006",
+      );
+
+      const volume2 = recordById.get(
+        "pz-meta-shqipja-sanskritishtja-volume2-conflict-v0.1",
+      );
+
+      expect(volume2).toBeDefined();
+
+      expect(
+        volume2.physicalCopyStatus,
+      ).toContain(
+        "catalogue status Available",
+      );
+
+      expect(
+        volume2.physicalCopyStatus,
+      ).toContain(
+        "2702-000387",
+      );
+
+      expect(
+        volume2.physicalCopyStatus,
+      ).toContain(
+        "491.2 Zhe-Shq 2006",
+      );
+
+      const roli = recordById.get(
+        "pz-meta-roli-mesianik-2015-pagination-conflict-v0.1",
+      );
+
+      expect(roli).toBeDefined();
+
+      expect(
+        roli.physicalCopyStatus,
+      ).toContain(
+        "catalogue status Available",
+      );
+
+      expect(
+        roli.physicalCopyStatus,
+      ).toContain(
+        "2702-006109",
+      );
+
+      expect(
+        roli.physicalCopyStatus,
+      ).toContain(
+        "2702-005746",
+      );
+
+      expect(
+        roli.physicalCopyStatus,
+      ).toContain(
+        "491.2 Zhe-Rol 2015",
+      );
+
+      const evidenceById = new Map(
+        inventory.provenanceEvidence.map(
+          (item: { evidenceId: string }) => [
+            item.evidenceId,
+            item,
+          ],
+        ),
+      );
+
+      const shqipjaEvidence = evidenceById.get(
+        "pz-evidence-seeu-live-holdings-shqipja-2026-08-07",
+      );
+
+      expect(shqipjaEvidence).toBeDefined();
+
+      expect(
+        JSON.stringify(
+          shqipjaEvidence.observedFacts,
+        ),
+      ).toContain(
+        "2702-000386",
+      );
+
+      expect(
+        JSON.stringify(
+          shqipjaEvidence.observedFacts,
+        ),
+      ).toContain(
+        "2702-000387",
+      );
+
+      expect(
+        JSON.stringify(
+          shqipjaEvidence.observedFacts,
+        ),
+      ).toContain(
+        "status Available",
+      );
+
+      const roliEvidence = evidenceById.get(
+        "pz-evidence-seeu-live-holdings-roli-2026-08-07",
+      );
+
+      expect(roliEvidence).toBeDefined();
+
+      expect(
+        JSON.stringify(
+          roliEvidence.observedFacts,
+        ),
+      ).toContain(
+        "2702-006109",
+      );
+
+      expect(
+        JSON.stringify(
+          roliEvidence.observedFacts,
+        ),
+      ).toContain(
+        "2702-005746",
+      );
+
+      expect(
+        JSON.stringify(
+          roliEvidence.observedFacts,
+        ),
+      ).toContain(
+        "Një parashtrim i shkurtër i algoritmit simbolik",
+      );
+    });
+
     it("does not manufacture exact-edition or stable-page evidence", () => {
       for (const record of inventory.records) {
         expect(
@@ -472,7 +768,7 @@ describe(
       expect(
         inventory.provenanceEvidence,
       ).toHaveLength(
-        11,
+        13,
       );
 
       const evidenceIds = inventory.provenanceEvidence.map(

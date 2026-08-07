@@ -84,18 +84,19 @@
       "printedPageSystem": null,
       "digitalPageSystem": null,
       "language": "Albanian",
-      "physicalCopyStatus": null,
+      "physicalCopyStatus": "SEEU live catalogue identifies two relevant physical holdings with catalogue status Available: volume 1 barcode 2702-000386, call number 491.2 Zhe-Shq 2005; volume 2 barcode 2702-000387, call number 491.2 Zhe-Shq 2006.",
       "scanStatus": null,
-      "sourceAccessStatus": "METADATA_ONLY",
-      "sourceAccessOwner": null,
+      "sourceAccessStatus": "PHYSICAL_COPY_REQUIRED",
+      "sourceAccessOwner": "Library \"Max van der Stoel\", South East European University (SEEU)",
       "sourceLocationClass": "PUBLIC_LIBRARY_OR_ARCHIVE",
       "provenanceNotes": [
         "pz-evidence-openlibrary-shqipja-2005-revised",
-        "pz-evidence-seeu-shqipja-volumes"
+        "pz-evidence-seeu-shqipja-volumes",
+        "pz-evidence-seeu-live-holdings-shqipja-2026-08-07"
       ],
       "citationStability": "UNKNOWN",
       "quotationAvailability": null,
-      "legalUseNotes": "Public catalogue metadata only. No copyrighted book or scan is stored in this inventory.",
+      "legalUseNotes": "A lawful public-library physical access path is identified at SEEU. Open Instrument has not inspected, borrowed, scanned, photographed, quoted, or stored either physical volume. Physical inspection or a lawful library-mediated limited reproduction is still required.",
       "knownEditionDifferences": [
         "Open Library records a 2005 revised two-volume Tertiumdatur edition family.",
         "SEEU catalogue metadata reports volume 1 as 2005 / 228 pages and volume 2 as 2006 / 559 pages."
@@ -113,7 +114,7 @@
         "Volume 2 is represented as 2005 in Google Books but 2006 in WorldCat and SEEU catalogue metadata.",
         "Exact volume-level printing and page-system identity have not been verified against an inspected copy."
       ],
-      "contentRelevance": "Revised family of a first-title milestone target; primary content has not been inspected.",
+      "contentRelevance": "Revised family of a first-title milestone target. SEEU currently catalogues available physical copies of both revised volumes, but Open Instrument has not inspected their primary text.",
       "verificationStatus": "BLOCKED",
       "reviewer": "Open Instrument source-inventory construction v0.1",
       "reviewedAt": "2026-08-07",
@@ -144,19 +145,20 @@
       "printedPageSystem": null,
       "digitalPageSystem": null,
       "language": "Albanian",
-      "physicalCopyStatus": null,
+      "physicalCopyStatus": "SEEU live catalogue identifies a physical copy with catalogue status Available: barcode 2702-000387, call number 491.2 Zhe-Shq 2006.",
       "scanStatus": null,
-      "sourceAccessStatus": "METADATA_ONLY",
-      "sourceAccessOwner": null,
+      "sourceAccessStatus": "PHYSICAL_COPY_REQUIRED",
+      "sourceAccessOwner": "Library \"Max van der Stoel\", South East European University (SEEU)",
       "sourceLocationClass": "PUBLIC_LIBRARY_OR_ARCHIVE",
       "provenanceNotes": [
         "pz-evidence-googlebooks-shqipja-volume2-2005",
         "pz-evidence-worldcat-shqipja-volume2-2006",
-        "pz-evidence-seeu-shqipja-volumes"
+        "pz-evidence-seeu-shqipja-volumes",
+        "pz-evidence-seeu-live-holdings-shqipja-2026-08-07"
       ],
       "citationStability": "UNKNOWN",
       "quotationAvailability": null,
-      "legalUseNotes": "Public catalogue metadata only; no primary copy has been inspected or stored.",
+      "legalUseNotes": "A lawful public-library physical access path is identified at SEEU. The copy has not been inspected by Open Instrument. No scan, photograph, quotation, or copyrighted primary text is stored.",
       "knownEditionDifferences": [
         "Google Books reports Tertiumdatur volume 2 as 2005 with ISBN 9994380516 / 9789994380510.",
         "WorldCat reports volume 2 as 2006 and 'Bot. i 1'.",
@@ -176,7 +178,7 @@
         "Edition statement conflict/unresolved identity: WorldCat reports 'Bot. i 1' while other records do not establish the same exact printing.",
         "The observed 559-page count is not yet tied to a project-inspected exact edition."
       ],
-      "contentRelevance": "Specific volume surface of a first-title milestone target; primary content has not been inspected.",
+      "contentRelevance": "Specific volume surface of a first-title milestone target. SEEU catalogues an available physical 2006 / 559-page copy, but this does not resolve the conflicting Google Books 2005 metadata or establish exact edition identity for page-cited work.",
       "verificationStatus": "BLOCKED",
       "reviewer": "Open Instrument source-inventory construction v0.1",
       "reviewedAt": "2026-08-07",
@@ -207,20 +209,21 @@
       "printedPageSystem": null,
       "digitalPageSystem": null,
       "language": "Albanian",
-      "physicalCopyStatus": null,
+      "physicalCopyStatus": "SEEU live catalogue identifies two physical copies with catalogue status Available: barcode 2702-006109, call number 491.2 Zhe-Rol 2015; barcode 2702-005746, call number 491.2 Zhe-Rol 2015.",
       "scanStatus": null,
-      "sourceAccessStatus": "METADATA_ONLY",
-      "sourceAccessOwner": null,
+      "sourceAccessStatus": "PHYSICAL_COPY_REQUIRED",
+      "sourceAccessOwner": "Library \"Max van der Stoel\", South East European University (SEEU)",
       "sourceLocationClass": "PUBLIC_LIBRARY_OR_ARCHIVE",
       "provenanceNotes": [
         "pz-evidence-openlibrary-roli-2015",
         "pz-evidence-googlebooks-roli-2015",
         "pz-evidence-worldcat-roli-2015",
-        "pz-evidence-seeu-roli-2015"
+        "pz-evidence-seeu-roli-2015",
+        "pz-evidence-seeu-live-holdings-roli-2026-08-07"
       ],
       "citationStability": "UNKNOWN",
       "quotationAvailability": null,
-      "legalUseNotes": "Public catalogue metadata only. No primary text or scan has been acquired, reproduced, or committed.",
+      "legalUseNotes": "A lawful public-library physical access path is identified at SEEU. Open Instrument has not inspected, borrowed, scanned, photographed, quoted, or stored the book.",
       "knownEditionDifferences": [
         "Open Library and Google Books report 859 pages for ISBN 9789928190246.",
         "SEEU reports [928] pages for the same ISBN, including an index at pages [915]-[928]."
@@ -238,7 +241,7 @@
         "Pagination conflict: 859 pages versus [928] pages.",
         "Exact copy/printing identity connecting the conflicting pagination records is not yet established."
       ],
-      "contentRelevance": "First-title target of the Petro Zheji fidelity milestone; primary content has not been inspected.",
+      "contentRelevance": "First-title target of the Petro Zheji fidelity milestone. SEEU's public catalogue contents note explicitly identifies 'Një parashtrim i shkurtër i algoritmit simbolik'. This is a content-location lead only; no exact page location or primary-text passage has been verified.",
       "verificationStatus": "BLOCKED",
       "reviewer": "Open Instrument source-inventory construction v0.1",
       "reviewedAt": "2026-08-07",
@@ -486,6 +489,32 @@
         "[928] pages",
         "ISBN13 9789928190246",
         "index at pages [915]-[928]"
+      ]
+    },
+    {
+      "evidenceId": "pz-evidence-seeu-live-holdings-shqipja-2026-08-07",
+      "sourceName": "SEEU Library \"Max van der Stoel\" live public catalogue",
+      "catalogueRecordId": "SEEU notice 399 / notice 400",
+      "observedFacts": [
+        "Volume 1: Shqipja dhe Sanskritishtja: pjesa e parë; Tertiumdatur; 2005; 2nd edition; 228 pages; ISBN13 9789994380503.",
+        "Volume 1 physical holding: barcode 2702-000386; call number 491.2 Zhe-Shq 2005; status Available.",
+        "Volume 2: Shqipja dhe Sanskritishtja: pjesa e dytë; Tertiumdatur; 2006; 559 pages; ISBN13 9789994380510.",
+        "Volume 2 physical holding: barcode 2702-000387; call number 491.2 Zhe-Shq 2006; status Available.",
+        "Volume 2 catalogue note identifies index pages [541]-556 and bibliographical references pages [557]-559.",
+        "The physical holdings have not been inspected by Open Instrument."
+      ]
+    },
+    {
+      "evidenceId": "pz-evidence-seeu-live-holdings-roli-2026-08-07",
+      "sourceName": "SEEU Library \"Max van der Stoel\" live public catalogue",
+      "catalogueRecordId": "SEEU notice 17222",
+      "observedFacts": [
+        "Roli mesianik i shqipes: shembja e kullës së Babelit; Petro Zheji; UET Press; 2015; ISBN13 9789928190246; [928] pages.",
+        "Physical holding: barcode 2702-006109; call number 491.2 Zhe-Rol 2015; status Available.",
+        "Physical holding: barcode 2702-005746; call number 491.2 Zhe-Rol 2015; status Available.",
+        "Catalogue contents note includes 'Një parashtrim i shkurtër i algoritmit simbolik'.",
+        "Catalogue note identifies index pages [915]-[928].",
+        "The physical holdings have not been inspected by Open Instrument."
       ]
     }
   ]
