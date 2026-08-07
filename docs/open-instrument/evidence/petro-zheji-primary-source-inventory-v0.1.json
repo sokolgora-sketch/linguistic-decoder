@@ -1,0 +1,492 @@
+{
+  "inventoryId": "PETRO_ZHEJI_PRIMARY_SOURCE_INVENTORY_V0_1",
+  "status": "ACTIVE_PARTIAL_METADATA_ONLY",
+  "lane": "CONSTRUCT_PETRO_ZHEJI_PRIMARY_SOURCE_INVENTORY_V0_1",
+  "constructedAt": "2026-08-07",
+  "governingProductMain": "c3c1dcd428833d99233801304eaff2b6cc9dcd4a",
+  "claimBoundary": "These are source-inventory metadata records, not verified primary-text records and not Symbolic Algorithm evidence.",
+  "records": [
+    {
+      "sourceId": "pz-meta-shqipja-sanskritishtja-1996-v0.1",
+      "workId": "pz-work-shqipja-dhe-sanskritishtja",
+      "canonicalTitle": "Shqipja dhe Sanskritishtja",
+      "originalLanguageTitle": "Shqipja dhe sanskritishtja: studim",
+      "author": "Petro Zheji",
+      "workType": "BOOK",
+      "sourceClass": "EDITION_OR_LIBRARY_METADATA",
+      "publisher": "Shtëpia Botuese Rrënjët",
+      "publicationYear": 1996,
+      "editionStatement": null,
+      "editionNumber": null,
+      "editionIdentityStatus": "EDITION_FAMILY_VERIFIED",
+      "volume": "1",
+      "isbnOrCatalogueId": "LCCN 97143211; Open Library OL749353M; WorldCat OCLC 38897681 / 633666124; Google Books MjwEuAAACAAJ",
+      "totalPages": 198,
+      "printedPageSystem": null,
+      "digitalPageSystem": null,
+      "language": "Albanian",
+      "physicalCopyStatus": null,
+      "scanStatus": null,
+      "sourceAccessStatus": "METADATA_ONLY",
+      "sourceAccessOwner": null,
+      "sourceLocationClass": "PUBLIC_LIBRARY_OR_ARCHIVE",
+      "provenanceNotes": [
+        "pz-evidence-openlibrary-shqipja-1996",
+        "pz-evidence-googlebooks-shqipja-1996",
+        "pz-evidence-worldcat-shqipja-1996"
+      ],
+      "citationStability": "UNKNOWN",
+      "quotationAvailability": null,
+      "legalUseNotes": "Public catalogue metadata only. No primary text was acquired, downloaded, scanned, quoted, or committed.",
+      "knownEditionDifferences": [
+        "This 1996 Rrënjët catalogue surface is distinct from the later Tertiumdatur revised two-volume family.",
+        "The observed 198-page value is catalogue metadata and has not been verified against an inspected exact copy."
+      ],
+      "editionSelectionRole": "UNDECIDED",
+      "editionSelectionRoles": [
+        "UNDECIDED"
+      ],
+      "editionSelectionReason": "Metadata reviewed only; no fidelity-baseline edition selected.",
+      "existingOpenInstrumentCitationRefs": [
+        "docs/open-instrument/reports/petro-zheji-primary-source-and-symbolic-algorithm-fidelity-baseline-v0.1.md",
+        "docs/open-instrument/reports/petro-zheji-primary-source-inventory-and-edition-policy-design-v0.2.md"
+      ],
+      "unresolvedEditionConflicts": [
+        "Exact printing and copy identity are not verified; printed page stability is not established."
+      ],
+      "contentRelevance": "First-title target of the Petro Zheji fidelity milestone; primary content has not been inspected.",
+      "verificationStatus": "METADATA_REVIEWED",
+      "reviewer": "Open Instrument source-inventory construction v0.1",
+      "reviewedAt": "2026-08-07",
+      "blockers": [
+        "PRIMARY_TEXT_NOT_AVAILABLE",
+        "EXACT_EDITION_NOT_VERIFIED",
+        "PAGINATION_NOT_VERIFIED",
+        "PASSAGE_NOT_LOCATED"
+      ]
+    },
+    {
+      "sourceId": "pz-meta-shqipja-sanskritishtja-2005-revised-family-v0.1",
+      "workId": "pz-work-shqipja-dhe-sanskritishtja",
+      "canonicalTitle": "Shqipja dhe Sanskritishtja",
+      "originalLanguageTitle": "Shqipja dhe Sanskritishtja",
+      "author": "Petro Zheji",
+      "workType": "BOOK",
+      "sourceClass": "EDITION_OR_LIBRARY_METADATA",
+      "publisher": "Tertiumdatur",
+      "publicationYear": 2005,
+      "editionStatement": "Botimi i 2. i përmirësuar.",
+      "editionNumber": 2,
+      "editionIdentityStatus": "EDITION_FAMILY_VERIFIED",
+      "volume": "2-volume family",
+      "isbnOrCatalogueId": "ISBN10 9994380508 / 9994380516; ISBN13 9789994380503 / 9789994380510; LCCN 2007372096; Open Library OL31772646M",
+      "totalPages": null,
+      "printedPageSystem": null,
+      "digitalPageSystem": null,
+      "language": "Albanian",
+      "physicalCopyStatus": null,
+      "scanStatus": null,
+      "sourceAccessStatus": "METADATA_ONLY",
+      "sourceAccessOwner": null,
+      "sourceLocationClass": "PUBLIC_LIBRARY_OR_ARCHIVE",
+      "provenanceNotes": [
+        "pz-evidence-openlibrary-shqipja-2005-revised",
+        "pz-evidence-seeu-shqipja-volumes"
+      ],
+      "citationStability": "UNKNOWN",
+      "quotationAvailability": null,
+      "legalUseNotes": "Public catalogue metadata only. No copyrighted book or scan is stored in this inventory.",
+      "knownEditionDifferences": [
+        "Open Library records a 2005 revised two-volume Tertiumdatur edition family.",
+        "SEEU catalogue metadata reports volume 1 as 2005 / 228 pages and volume 2 as 2006 / 559 pages."
+      ],
+      "editionSelectionRole": "UNDECIDED",
+      "editionSelectionRoles": [
+        "UNDECIDED"
+      ],
+      "editionSelectionReason": "Family identity is known, but exact per-volume printing and pagination remain unresolved.",
+      "existingOpenInstrumentCitationRefs": [
+        "docs/open-instrument/reports/petro-zheji-primary-source-and-symbolic-algorithm-fidelity-baseline-v0.1.md",
+        "docs/open-instrument/reports/petro-zheji-primary-source-inventory-and-edition-policy-design-v0.2.md"
+      ],
+      "unresolvedEditionConflicts": [
+        "Volume 2 is represented as 2005 in Google Books but 2006 in WorldCat and SEEU catalogue metadata.",
+        "Exact volume-level printing and page-system identity have not been verified against an inspected copy."
+      ],
+      "contentRelevance": "Revised family of a first-title milestone target; primary content has not been inspected.",
+      "verificationStatus": "BLOCKED",
+      "reviewer": "Open Instrument source-inventory construction v0.1",
+      "reviewedAt": "2026-08-07",
+      "blockers": [
+        "PRIMARY_TEXT_NOT_AVAILABLE",
+        "EXACT_EDITION_NOT_VERIFIED",
+        "PAGINATION_NOT_VERIFIED",
+        "CONFLICTING_PUBLICATION_METADATA",
+        "PASSAGE_NOT_LOCATED"
+      ]
+    },
+    {
+      "sourceId": "pz-meta-shqipja-sanskritishtja-volume2-conflict-v0.1",
+      "workId": "pz-work-shqipja-dhe-sanskritishtja",
+      "canonicalTitle": "Shqipja dhe Sanskritishtja",
+      "originalLanguageTitle": "Shqipja dhe Sanskritishtja: pjesa e dytë",
+      "author": "Petro Zheji",
+      "workType": "BOOK",
+      "sourceClass": "EDITION_OR_LIBRARY_METADATA",
+      "publisher": "Tertiumdatur",
+      "publicationYear": null,
+      "editionStatement": null,
+      "editionNumber": null,
+      "editionIdentityStatus": "CONFLICTING_METADATA",
+      "volume": "2",
+      "isbnOrCatalogueId": "ISBN10 9994380516; ISBN13 9789994380510; WorldCat OCLC 891510645; SEEU catalogue record 399; Google Books TfunpwAACAAJ",
+      "totalPages": 559,
+      "printedPageSystem": null,
+      "digitalPageSystem": null,
+      "language": "Albanian",
+      "physicalCopyStatus": null,
+      "scanStatus": null,
+      "sourceAccessStatus": "METADATA_ONLY",
+      "sourceAccessOwner": null,
+      "sourceLocationClass": "PUBLIC_LIBRARY_OR_ARCHIVE",
+      "provenanceNotes": [
+        "pz-evidence-googlebooks-shqipja-volume2-2005",
+        "pz-evidence-worldcat-shqipja-volume2-2006",
+        "pz-evidence-seeu-shqipja-volumes"
+      ],
+      "citationStability": "UNKNOWN",
+      "quotationAvailability": null,
+      "legalUseNotes": "Public catalogue metadata only; no primary copy has been inspected or stored.",
+      "knownEditionDifferences": [
+        "Google Books reports Tertiumdatur volume 2 as 2005 with ISBN 9994380516 / 9789994380510.",
+        "WorldCat reports volume 2 as 2006 and 'Bot. i 1'.",
+        "SEEU reports volume 2 as 2006, 559 pages, with ISBN 9789994380510."
+      ],
+      "editionSelectionRole": "UNDECIDED",
+      "editionSelectionRoles": [
+        "UNDECIDED"
+      ],
+      "editionSelectionReason": "Conflicting publication-year and edition metadata prevent baseline selection.",
+      "existingOpenInstrumentCitationRefs": [
+        "docs/open-instrument/reports/petro-zheji-primary-source-and-symbolic-algorithm-fidelity-baseline-v0.1.md",
+        "docs/open-instrument/reports/petro-zheji-primary-source-inventory-and-edition-policy-design-v0.2.md"
+      ],
+      "unresolvedEditionConflicts": [
+        "Publication year conflict: 2005 versus 2006.",
+        "Edition statement conflict/unresolved identity: WorldCat reports 'Bot. i 1' while other records do not establish the same exact printing.",
+        "The observed 559-page count is not yet tied to a project-inspected exact edition."
+      ],
+      "contentRelevance": "Specific volume surface of a first-title milestone target; primary content has not been inspected.",
+      "verificationStatus": "BLOCKED",
+      "reviewer": "Open Instrument source-inventory construction v0.1",
+      "reviewedAt": "2026-08-07",
+      "blockers": [
+        "PRIMARY_TEXT_NOT_AVAILABLE",
+        "EXACT_EDITION_NOT_VERIFIED",
+        "PAGINATION_NOT_VERIFIED",
+        "CONFLICTING_PUBLICATION_METADATA",
+        "PASSAGE_NOT_LOCATED"
+      ]
+    },
+    {
+      "sourceId": "pz-meta-roli-mesianik-2015-pagination-conflict-v0.1",
+      "workId": "pz-work-roli-mesianik-i-shqipes",
+      "canonicalTitle": "Roli Mesianik i Shqipes",
+      "originalLanguageTitle": "Roli Mesianik i Shqipes: shembja e Kullës së Babelit",
+      "author": "Petro Zheji",
+      "workType": "BOOK",
+      "sourceClass": "EDITION_OR_LIBRARY_METADATA",
+      "publisher": "UET Press",
+      "publicationYear": 2015,
+      "editionStatement": "bot. i 1 (WorldCat catalogue metadata)",
+      "editionNumber": 1,
+      "editionIdentityStatus": "CONFLICTING_METADATA",
+      "volume": null,
+      "isbnOrCatalogueId": "ISBN10 9928190240; ISBN13 9789928190246; LCCN 2015485180; Open Library OL30864006M; WorldCat OCLC 927141774 / 964670778",
+      "totalPages": null,
+      "printedPageSystem": null,
+      "digitalPageSystem": null,
+      "language": "Albanian",
+      "physicalCopyStatus": null,
+      "scanStatus": null,
+      "sourceAccessStatus": "METADATA_ONLY",
+      "sourceAccessOwner": null,
+      "sourceLocationClass": "PUBLIC_LIBRARY_OR_ARCHIVE",
+      "provenanceNotes": [
+        "pz-evidence-openlibrary-roli-2015",
+        "pz-evidence-googlebooks-roli-2015",
+        "pz-evidence-worldcat-roli-2015",
+        "pz-evidence-seeu-roli-2015"
+      ],
+      "citationStability": "UNKNOWN",
+      "quotationAvailability": null,
+      "legalUseNotes": "Public catalogue metadata only. No primary text or scan has been acquired, reproduced, or committed.",
+      "knownEditionDifferences": [
+        "Open Library and Google Books report 859 pages for ISBN 9789928190246.",
+        "SEEU reports [928] pages for the same ISBN, including an index at pages [915]-[928]."
+      ],
+      "editionSelectionRole": "UNDECIDED",
+      "editionSelectionRoles": [
+        "UNDECIDED"
+      ],
+      "editionSelectionReason": "Same-ISBN pagination conflict prevents exact-edition and baseline selection.",
+      "existingOpenInstrumentCitationRefs": [
+        "docs/open-instrument/reports/petro-zheji-primary-source-and-symbolic-algorithm-fidelity-baseline-v0.1.md",
+        "docs/open-instrument/reports/petro-zheji-primary-source-inventory-and-edition-policy-design-v0.2.md"
+      ],
+      "unresolvedEditionConflicts": [
+        "Pagination conflict: 859 pages versus [928] pages.",
+        "Exact copy/printing identity connecting the conflicting pagination records is not yet established."
+      ],
+      "contentRelevance": "First-title target of the Petro Zheji fidelity milestone; primary content has not been inspected.",
+      "verificationStatus": "BLOCKED",
+      "reviewer": "Open Instrument source-inventory construction v0.1",
+      "reviewedAt": "2026-08-07",
+      "blockers": [
+        "PRIMARY_TEXT_NOT_AVAILABLE",
+        "EXACT_EDITION_NOT_VERIFIED",
+        "PAGINATION_NOT_VERIFIED",
+        "CONFLICTING_PUBLICATION_METADATA",
+        "PASSAGE_NOT_LOCATED"
+      ]
+    }
+  ],
+  "perWorkEditionSelectionDecisions": [
+    {
+      "workId": "pz-work-shqipja-dhe-sanskritishtja",
+      "candidateSourceIds": [
+        "pz-meta-shqipja-sanskritishtja-1996-v0.1",
+        "pz-meta-shqipja-sanskritishtja-2005-revised-family-v0.1",
+        "pz-meta-shqipja-sanskritishtja-volume2-conflict-v0.1"
+      ],
+      "candidateSourceRoleAssignments": [
+        {
+          "sourceId": "pz-meta-shqipja-sanskritishtja-1996-v0.1",
+          "editionSelectionRole": "UNDECIDED",
+          "editionSelectionRoles": [
+            "UNDECIDED"
+          ]
+        },
+        {
+          "sourceId": "pz-meta-shqipja-sanskritishtja-2005-revised-family-v0.1",
+          "editionSelectionRole": "UNDECIDED",
+          "editionSelectionRoles": [
+            "UNDECIDED"
+          ]
+        },
+        {
+          "sourceId": "pz-meta-shqipja-sanskritishtja-volume2-conflict-v0.1",
+          "editionSelectionRole": "UNDECIDED",
+          "editionSelectionRoles": [
+            "UNDECIDED"
+          ]
+        }
+      ],
+      "selectedSourceId": null,
+      "selectionDecisionStatus": "DECISION_BLOCKED",
+      "selectionReason": "Exact edition, volume, and pagination identity remain unresolved; no fidelity-baseline edition may be selected.",
+      "existingOpenInstrumentCitationRefs": [
+        "docs/open-instrument/reports/petro-zheji-primary-source-and-symbolic-algorithm-fidelity-baseline-v0.1.md",
+        "docs/open-instrument/reports/petro-zheji-primary-source-inventory-and-edition-policy-design-v0.2.md"
+      ],
+      "knownEditionDifferences": [
+        "1996 Rrënjët catalogue surface",
+        "2005 Tertiumdatur revised two-volume family",
+        "volume-2 publication-year conflict: 2005 versus 2006"
+      ],
+      "unresolvedEditionConflicts": [
+        "Volume 2 publication year: 2005 versus 2006",
+        "Exact printing/copy identity not verified",
+        "Stable printed pagination not verified"
+      ],
+      "reviewer": "Open Instrument source-inventory construction v0.1",
+      "reviewedAt": "2026-08-07",
+      "blockers": [
+        "PRIMARY_TEXT_NOT_AVAILABLE",
+        "EXACT_EDITION_NOT_VERIFIED",
+        "PAGINATION_NOT_VERIFIED",
+        "CONFLICTING_PUBLICATION_METADATA"
+      ]
+    },
+    {
+      "workId": "pz-work-roli-mesianik-i-shqipes",
+      "candidateSourceIds": [
+        "pz-meta-roli-mesianik-2015-pagination-conflict-v0.1"
+      ],
+      "candidateSourceRoleAssignments": [
+        {
+          "sourceId": "pz-meta-roli-mesianik-2015-pagination-conflict-v0.1",
+          "editionSelectionRole": "UNDECIDED",
+          "editionSelectionRoles": [
+            "UNDECIDED"
+          ]
+        }
+      ],
+      "selectedSourceId": null,
+      "selectionDecisionStatus": "DECISION_BLOCKED",
+      "selectionReason": "Same-ISBN pagination conflict prevents exact-edition verification and fidelity-baseline selection.",
+      "existingOpenInstrumentCitationRefs": [
+        "docs/open-instrument/reports/petro-zheji-primary-source-and-symbolic-algorithm-fidelity-baseline-v0.1.md",
+        "docs/open-instrument/reports/petro-zheji-primary-source-inventory-and-edition-policy-design-v0.2.md"
+      ],
+      "knownEditionDifferences": [
+        "859-page catalogue representation",
+        "[928]-page catalogue representation"
+      ],
+      "unresolvedEditionConflicts": [
+        "Pagination: 859 versus [928] pages",
+        "Exact copy/printing identity not verified"
+      ],
+      "reviewer": "Open Instrument source-inventory construction v0.1",
+      "reviewedAt": "2026-08-07",
+      "blockers": [
+        "PRIMARY_TEXT_NOT_AVAILABLE",
+        "EXACT_EDITION_NOT_VERIFIED",
+        "PAGINATION_NOT_VERIFIED",
+        "CONFLICTING_PUBLICATION_METADATA"
+      ]
+    }
+  ],
+  "provenanceEvidence": [
+    {
+      "evidenceId": "pz-evidence-openlibrary-shqipja-1996",
+      "sourceName": "Open Library",
+      "catalogueRecordId": "OL749353M",
+      "observedFacts": [
+        "Petro Zheji",
+        "Shqipja dhe Sanskritishtja",
+        "Shtëpia Botuese Rrënjët",
+        "1996",
+        "LCCN 97143211",
+        "pagination recorded as v. <1 >"
+      ]
+    },
+    {
+      "evidenceId": "pz-evidence-googlebooks-shqipja-1996",
+      "sourceName": "Google Books",
+      "catalogueRecordId": "MjwEuAAACAAJ",
+      "observedFacts": [
+        "Petro Zheji",
+        "Shqipja dhe sanskritishtja: studim",
+        "Shtëpia Botuese Rrënjët",
+        "1996",
+        "198 pages"
+      ]
+    },
+    {
+      "evidenceId": "pz-evidence-worldcat-shqipja-1996",
+      "sourceName": "WorldCat",
+      "catalogueRecordId": "OCLC 38897681 / 633666124",
+      "observedFacts": [
+        "Petro Zheji",
+        "Shqipja dhe Sanskritishtja: studim",
+        "Shtëpia Botuese Rrënjët",
+        "1996 / 1996-",
+        "Albanian print book"
+      ]
+    },
+    {
+      "evidenceId": "pz-evidence-openlibrary-shqipja-2005-revised",
+      "sourceName": "Open Library",
+      "catalogueRecordId": "OL31772646M",
+      "observedFacts": [
+        "Petro Zheji",
+        "Shqipja dhe Sanskritishtja",
+        "Botimi i 2. i përmirësuar.",
+        "Tertiumdatur",
+        "2005",
+        "2 volumes",
+        "ISBN10 9994380508 / 9994380516",
+        "LCCN 2007372096"
+      ]
+    },
+    {
+      "evidenceId": "pz-evidence-googlebooks-shqipja-volume2-2005",
+      "sourceName": "Google Books",
+      "catalogueRecordId": "TfunpwAACAAJ",
+      "observedFacts": [
+        "Shqipja dhe Sanskritishtja, Volume 2",
+        "Petro Zheji",
+        "Tertiumdatur",
+        "2005",
+        "ISBN10 9994380516",
+        "ISBN13 9789994380510"
+      ]
+    },
+    {
+      "evidenceId": "pz-evidence-worldcat-shqipja-volume2-2006",
+      "sourceName": "WorldCat",
+      "catalogueRecordId": "OCLC 891510645",
+      "observedFacts": [
+        "Shqipja dhe sanskritishtja. 2",
+        "Petro Zheji",
+        "Tertiumdatur",
+        "2006",
+        "Bot. i 1"
+      ]
+    },
+    {
+      "evidenceId": "pz-evidence-seeu-shqipja-volumes",
+      "sourceName": "SEEU Library Max van der Stoel",
+      "catalogueRecordId": "volume-2 record 399 / catalogue listing",
+      "observedFacts": [
+        "Volume 1: Tertiumdatur, 2005, 228 pages, ISBN13 9789994380503",
+        "Volume 2: Tertiumdatur, 2006, 559 pages, ISBN13 9789994380510"
+      ]
+    },
+    {
+      "evidenceId": "pz-evidence-openlibrary-roli-2015",
+      "sourceName": "Open Library",
+      "catalogueRecordId": "OL30864006M",
+      "observedFacts": [
+        "Petro Zheji",
+        "Roli Mesianik i Shqipes",
+        "UET Press",
+        "2015",
+        "859 pages",
+        "ISBN13 9789928190246",
+        "LCCN 2015485180",
+        "OCLC 927141774"
+      ]
+    },
+    {
+      "evidenceId": "pz-evidence-googlebooks-roli-2015",
+      "sourceName": "Google Books",
+      "catalogueRecordId": "rO38jgEACAAJ",
+      "observedFacts": [
+        "Petro Zheji",
+        "Roli Mesianik i Shqipes: shembja e Kullës së Babelit",
+        "UET-Press",
+        "2015",
+        "859 pages",
+        "ISBN13 9789928190246"
+      ]
+    },
+    {
+      "evidenceId": "pz-evidence-worldcat-roli-2015",
+      "sourceName": "WorldCat",
+      "catalogueRecordId": "OCLC 927141774 / 964670778",
+      "observedFacts": [
+        "Petro Zheji",
+        "Roli mesianik i Shqipes",
+        "UET-Press",
+        "2015",
+        "bot. i 1"
+      ]
+    },
+    {
+      "evidenceId": "pz-evidence-seeu-roli-2015",
+      "sourceName": "SEEU Library Max van der Stoel",
+      "catalogueRecordId": "catalogue listing",
+      "observedFacts": [
+        "Petro Zheji",
+        "Roli mesianik i shqipes",
+        "UET Press",
+        "2015",
+        "[928] pages",
+        "ISBN13 9789928190246",
+        "index at pages [915]-[928]"
+      ]
+    }
+  ]
+}
