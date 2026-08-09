@@ -6,7 +6,10 @@ import { analyzeMind, analyzeConsonants, analyzeSymbolic } from "@/engine/mindAn
 import { CANON_CANDIDATES } from "./canonCandidates";
 import { buildWordMatrix } from "./wordMatrix.v1";
 import { buildDeepRootOutputV1 } from "./deepRoot.output.v1";
-import { buildRootMapV1 } from "./deepRoot.rootMap.builder.v1";
+import {
+  buildRootMapV1,
+  buildReviewedFunctionalCandidateProjectionsFromRootMapV0_1,
+} from "./deepRoot.rootMap.builder.v1";
 import { pickHeartPrimaryPathForRootMap } from "./heartPrimaryPathForRootMap.v0.1.2";
 import { buildResonanceProfileV1 } from "@/shared/resonanceProfile.v1";
 
@@ -251,6 +254,42 @@ export function enginePayloadToAnalysisResult(payload: EnginePayload): AnalyzeWo
 
     (result as any).analysisStatusV0_1 =
     buildAnalysisStatusV0_1(result);
+
+  // Reviewed embryo-first visibility overlay.
+  //
+  // Important boundary:
+  // - RootMap remains the reviewed-evidence authority.
+  // - OriginClaim and analysisStatus are already computed before this overlay.
+  // - This layer exposes already-authorized functional evidence; it does not
+  //   create evidence, rewrite RootMap, or feed origin/winner computation.
+  const reviewedVisibleCandidates =
+    buildReviewedFunctionalCandidateProjectionsFromRootMapV0_1({
+      rootMap,
+      targetWord: String(payload.word ?? ""),
+    });
+
+  if (reviewedVisibleCandidates.length > 0) {
+    const existingCandidates = Array.isArray(
+      (result as any).candidates,
+    )
+      ? (result as any).candidates
+      : [];
+
+    const projectedReviewedCandidates =
+      reviewedVisibleCandidates.map((candidate, index) =>
+        projectEmbryoFirstCandidateForAnalyzeV1(
+          candidate,
+          payload,
+          index,
+        ),
+      );
+
+    (result as any).candidates =
+      orderEmbryoFirstCandidatesForAnalyzeV1([
+        ...projectedReviewedCandidates,
+        ...existingCandidates,
+      ]);
+  }
 
 return result;
 }

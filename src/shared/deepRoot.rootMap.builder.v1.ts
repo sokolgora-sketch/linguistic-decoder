@@ -275,6 +275,138 @@ function hypothesisHasAllowedReviewedTerminalEvidenceV0_1(
   }).allowed;
 }
 
+export type ReviewedFunctionalCandidateProjectionV0_1 =
+  Record<string, unknown>;
+
+export function buildReviewedFunctionalCandidateProjectionsFromRootMapV0_1(
+  params: {
+    rootMap: RootMapV1 | null | undefined;
+    targetWord: string;
+  },
+): ReviewedFunctionalCandidateProjectionV0_1[] {
+  const targetWord = String(params.targetWord ?? "").trim();
+
+  if (!targetWord) {
+    return [];
+  }
+
+  const keys = Array.isArray(params.rootMap?.keys)
+    ? params.rootMap.keys
+    : [];
+
+  const reviewedEmbryos = new Set(
+    keys
+      .filter((key) => {
+        const evidence = Array.isArray(key?.evidence)
+          ? key.evidence
+          : [];
+
+        return evidence.some((entry) =>
+          String(entry).includes(
+            "reviewed functional free-operator evidence",
+          ),
+        );
+      })
+      .map((key) => String(key?.token ?? "").trim())
+      .filter(Boolean),
+  );
+
+  if (reviewedEmbryos.size === 0) {
+    return [];
+  }
+
+  return getReviewedExternalLexiconProductionSourceRowsV0_1()
+    .filter((row) => reviewedEmbryos.has(row.embryo))
+    .map((row) => ({
+      id: row.candidateId,
+      language: row.candidateLanguage,
+      family: "reviewed-external-lexicon",
+      form: row.isolatedStandaloneForm,
+
+      decomposition: {
+        parts: [],
+        functionalStatement: row.semanticBridge,
+      },
+
+      voices: {
+        voiceSequence: [],
+        ringPath: [],
+        dominantVoices: {},
+      },
+
+      ruleChecks: {
+        soundPathOk: false,
+        functionalDecompOk: true,
+        sevenVoicesAlignmentOk: false,
+        consonantMeaningOk: false,
+        harmonyOk: false,
+      },
+
+      principleSignals: {
+        truthOk: false,
+        expansionOk: false,
+        insightOk: false,
+        balanceOk: false,
+        unityOk: false,
+        networkIntegrityOk: false,
+        evolutionOk: false,
+      },
+
+      status: "experimental",
+      confidenceTag: "speculative",
+
+      sourceId: row.sourceId,
+      sourceKind: row.sourceKind,
+      sourceStatus: row.sourceStatus,
+
+      candidateId: row.candidateId,
+      displayForm: row.displayForm,
+      candidateLanguage: row.candidateLanguage,
+      functionalStatement: row.semanticBridge,
+      gloss: row.plainStandaloneGloss,
+
+      claimType: "functionalMotivation",
+      originClaim: "not_claimed",
+      historicalRelation: "not_evaluated",
+
+      embryo: row.embryo,
+      embryoLanguage: row.candidateLanguage,
+      isolatedStandaloneForm:
+        row.isolatedStandaloneForm,
+      plainStandaloneGloss:
+        row.plainStandaloneGloss,
+      sourceNote: row.sourceNote,
+
+      segmentation: {
+        embryo: row.embryo,
+        targetWord,
+      },
+
+      semanticBridge: row.semanticBridge,
+      expansionChain: [
+        row.embryo,
+        targetWord.toUpperCase(),
+      ],
+
+      validationOutcome: "validated",
+      validationReasons: [
+        "reviewed_production_source_row",
+        "live_rootmap_reviewed_functional_evidence",
+      ],
+
+      rankGroup: "validatedFunctionalMotivation",
+      rankScore: 100,
+      rankReason:
+        "reviewed production source row matches live RootMap reviewed functional evidence",
+
+      claimBoundary:
+        "functional motivation evidence only; not historical origin",
+
+      userDecisionPosture: "user_decides",
+    }));
+}
+
+
 export function buildRootMapV1(params: {
 basis: string;
   minRoots: MinRootHypothesis[] | null | undefined;
