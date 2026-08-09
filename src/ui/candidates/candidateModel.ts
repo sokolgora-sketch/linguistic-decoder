@@ -6,6 +6,15 @@ export interface UICandidateRow {
   form: string;
   status?: string | null;
   sourceKind?: string | null;
+
+  embryo?: string | null;
+  plainStandaloneGloss?: string | null;
+  claimType?: string | null;
+  validationOutcome?: string | null;
+  rankGroup?: string | null;
+  claimBoundary?: string | null;
+  userDecisionPosture?: string | null;
+
   vowelPath?: string | null;
   functionalStatement?: string | null;
   deepRootHeartGateStatus?: string | null;
@@ -56,6 +65,42 @@ export function buildCandidateRowsFromVM(vm: TelemetryViewModel): UICandidateRow
     form: pomStr(c.form) ?? "—",
     status: null, // do not invent; only show when engine emits later
     sourceKind: c.sourceKind ? pomStr(c.sourceKind) : null, // v0.3: provenance surfaced; guard undefined for partial/mock VMs
+
+    embryo:
+      c.embryo
+        ? pomStr(c.embryo)
+        : null,
+
+    plainStandaloneGloss:
+      c.plainStandaloneGloss
+        ? pomStr(c.plainStandaloneGloss)
+        : null,
+
+    claimType:
+      c.claimType
+        ? pomStr(c.claimType)
+        : null,
+
+    validationOutcome:
+      c.validationOutcome
+        ? pomStr(c.validationOutcome)
+        : null,
+
+    rankGroup:
+      c.rankGroup
+        ? pomStr(c.rankGroup)
+        : null,
+
+    claimBoundary:
+      c.claimBoundary
+        ? pomStr(c.claimBoundary)
+        : null,
+
+    userDecisionPosture:
+      c.userDecisionPosture
+        ? pomStr(c.userDecisionPosture)
+        : null,
+
     vowelPath: pomVowelPath(c.vowelPath),
     functionalStatement: pomStr(c.functionalStatement),
       deepRootHeartGateStatus: pomGateStatus((c as any).deepRootHeartGate),

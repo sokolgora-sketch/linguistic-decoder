@@ -995,6 +995,18 @@ const normalizationSteps =
       const candSource = candRecord && isRecord(candRecord["source"]) ? candRecord["source"] : null;
       const candSourceKind = asString(rec["sourceKind"]) ?? (candSource ? asString(candSource["kind"]) : null);
 
+      const embryo = asString(rec["embryo"]);
+      const plainStandaloneGloss =
+        asString(rec["plainStandaloneGloss"]);
+      const claimType = asString(rec["claimType"]);
+      const validationOutcome =
+        asString(rec["validationOutcome"]);
+      const rankGroup = asString(rec["rankGroup"]);
+      const claimBoundary =
+        asString(rec["claimBoundary"]);
+      const userDecisionPosture =
+        asString(rec["userDecisionPosture"]);
+
 // EvidenceRefs should be stable and filesystem-safe (no ":" etc.)
 const evidenceId = String(id).toLowerCase().replace(/[^a-z0-9_]/g, "_");
 
@@ -1025,6 +1037,47 @@ const evidenceId = String(id).toLowerCase().replace(/[^a-z0-9_]/g, "_");
         language: lang ? present(lang) : missing("not_emitted"),
         form: form ? present(form) : missing("not_emitted"),
         sourceKind: candSourceKind ? present(candSourceKind) : missing("not_emitted"),
+
+        ...(embryo
+          ? { embryo: present(embryo) }
+          : {}),
+
+        ...(plainStandaloneGloss
+          ? {
+              plainStandaloneGloss:
+                present(plainStandaloneGloss),
+            }
+          : {}),
+
+        ...(claimType
+          ? { claimType: present(claimType) }
+          : {}),
+
+        ...(validationOutcome
+          ? {
+              validationOutcome:
+                present(validationOutcome),
+            }
+          : {}),
+
+        ...(rankGroup
+          ? { rankGroup: present(rankGroup) }
+          : {}),
+
+        ...(claimBoundary
+          ? {
+              claimBoundary:
+                present(claimBoundary),
+            }
+          : {}),
+
+        ...(userDecisionPosture
+          ? {
+              userDecisionPosture:
+                present(userDecisionPosture),
+            }
+          : {}),
+
         functionalStatement: functionalStatement ? present(functionalStatement) : missing("not_emitted"),
         vowelPath: candVowelPath ? present(candVowelPath) : missing("not_emitted"),
 

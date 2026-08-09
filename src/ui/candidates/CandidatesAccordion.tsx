@@ -76,6 +76,13 @@ export function CandidatesAccordion({ rows }: { rows: UICandidateRow[] }) {
       <div className="space-y-2">
         {rows.map((c) => {
           const isOpen = openId === c.id;
+
+          const hasEmbryoFirstReadout =
+            Boolean(
+              c.embryo ||
+              c.claimType === "functionalMotivation",
+            );
+
           return (
             <div key={c.id} className="min-w-0 overflow-hidden rounded-lg border border-slate-800 bg-black/25">
               <button
@@ -102,6 +109,70 @@ export function CandidatesAccordion({ rows }: { rows: UICandidateRow[] }) {
                     {c.functionalStatement ? (
                       <div className="break-words text-sm text-slate-400">
                         {c.functionalStatement}
+                      </div>
+                    ) : null}
+
+                    {hasEmbryoFirstReadout ? (
+                      <div className="space-y-2 rounded-md border border-slate-700/80 bg-slate-950/35 p-2.5">
+                        <div className="flex flex-wrap items-center gap-2">
+                          {c.embryo ? (
+                            <CandidateChip tone="blue">
+                              {`Embryo: ${c.embryo}`}
+                            </CandidateChip>
+                          ) : null}
+
+                          {c.validationOutcome ? (
+                            <CandidateChip
+                              tone={
+                                c.validationOutcome === "validated"
+                                  ? "green"
+                                  : c.validationOutcome === "partial"
+                                    ? "amber"
+                                    : "neutral"
+                              }
+                            >
+                              {
+                                c.claimType === "functionalMotivation"
+                                  ? `Functional evidence: ${c.validationOutcome}`
+                                  : c.claimType === "historicalTransmission"
+                                    ? `Historical context: ${c.validationOutcome}`
+                                    : `Validation: ${c.validationOutcome}`
+                              }
+                            </CandidateChip>
+                          ) : null}
+
+                          {c.claimType === "functionalMotivation" ? (
+                            <CandidateChip tone="green">
+                              Functional motivation
+                            </CandidateChip>
+                          ) : null}
+
+                          {c.rankGroup ? (
+                            <CandidateChip
+                              title="Deterministic embryo-first ordering group."
+                            >
+                              {`Rank group: ${c.rankGroup}`}
+                            </CandidateChip>
+                          ) : null}
+                        </div>
+
+                        {c.plainStandaloneGloss ? (
+                          <div className="break-words text-xs text-slate-300">
+                            {`Embryo gloss: ${c.plainStandaloneGloss}`}
+                          </div>
+                        ) : null}
+
+                        {c.claimBoundary ? (
+                          <div className="break-words text-xs text-slate-400">
+                            {`Boundary: ${c.claimBoundary}`}
+                          </div>
+                        ) : null}
+
+                        {c.userDecisionPosture === "user_decides" ? (
+                          <div className="text-xs font-medium text-slate-300">
+                            Decision: user decides
+                          </div>
+                        ) : null}
                       </div>
                     ) : null}
 
