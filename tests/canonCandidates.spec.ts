@@ -40,11 +40,27 @@ describe('Canonical Candidate Adapter', () => {
 
     const result = enginePayloadToAnalysisResult(payload);
 
-    expect(result.candidates).toHaveLength(2);
+    expect(result.candidates).toHaveLength(3);
     expect(result.consonants).toBeDefined();
     expect(result.consonants!.field.smoothHits + result.consonants!.field.spikyHits).toBeGreaterThanOrEqual(1);
 
-    for (const c of result.candidates) {
+    const reviewed = result.candidates[0] as any;
+    expect(reviewed.candidateId).toBe("albanian-di-know-functional");
+    expect(reviewed.embryo).toBe("DI");
+    expect(reviewed.validationOutcome).toBe("validated");
+    expect(reviewed.rankGroup).toBe("validatedFunctionalMotivation");
+    expect(reviewed.originClaim).toBe("not_claimed");
+    expect(reviewed.userDecisionPosture).toBe("user_decides");
+
+    const canonCandidates = result.candidates.filter(
+      (candidate) =>
+        candidate.id === "latin-studium" ||
+        candidate.id === "albanian-studim",
+    );
+
+    expect(canonCandidates).toHaveLength(2);
+
+    for (const c of canonCandidates) {
       expect(c.status).toBe('experimental');
       expect(c.confidenceTag).toBe('speculative');
       expect(c.fitTag).toBe('weak');
@@ -94,11 +110,29 @@ describe('Canonical Candidate Adapter', () => {
 
     const result = enginePayloadToAnalysisResult(payload);
 
-    expect(result.candidates).toHaveLength(2);
+    expect(result.candidates).toHaveLength(3);
     expect(result.consonants).toBeDefined();
     expect(result.consonants!.field.smoothHits + result.consonants!.field.spikyHits).toBeGreaterThanOrEqual(1);
 
-    for (const c of result.candidates) {
+    const reviewed = result.candidates[0] as any;
+    expect(reviewed.candidateId).toBe(
+      "albanian-da-dam-damage-functional",
+    );
+    expect(reviewed.embryo).toBe("DA");
+    expect(reviewed.validationOutcome).toBe("validated");
+    expect(reviewed.rankGroup).toBe("validatedFunctionalMotivation");
+    expect(reviewed.originClaim).toBe("not_claimed");
+    expect(reviewed.userDecisionPosture).toBe("user_decides");
+
+    const canonCandidates = result.candidates.filter(
+      (candidate) =>
+        candidate.id === "latin-damnum" ||
+        candidate.id === "albanian-dëm",
+    );
+
+    expect(canonCandidates).toHaveLength(2);
+
+    for (const c of canonCandidates) {
       expect(c.status).toBe('experimental');
       expect(c.confidenceTag).toBe('speculative');
       expect(c.fitTag).toBe('weak');
