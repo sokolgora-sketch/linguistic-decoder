@@ -590,10 +590,88 @@ export function projectEmbryoFirstCandidateForAnalyzeV1<T>(
 }
 
 
+export function orderEmbryoFirstCandidatesForAnalyzeV1<
+  T extends Record<string, unknown>,
+>(candidates: readonly T[]): T[] {
+  return candidates
+    .map((candidate, index) => ({ candidate, index }))
+    .sort((left, right) => {
+      const candidateTier = (
+        candidate: Record<string, unknown>,
+      ): number => {
+        const rankGroup = embryoFirstAllowed(
+          candidate.rankGroup,
+          EMBRYO_FIRST_RANK_GROUPS,
+        );
+        const validationOutcome = embryoFirstAllowed(
+          candidate.validationOutcome,
+          EMBRYO_FIRST_VALIDATION_OUTCOMES,
+        );
+
+        switch (rankGroup) {
+          case "validatedFunctionalMotivation":
+            return validationOutcome === "validated" ? 0 : 5;
+
+          case "partialFunctionalMotivation":
+            return validationOutcome === "validated" ||
+              validationOutcome === "partial"
+              ? 1
+              : 5;
+
+          case "surfaceOrSeedOnly":
+            return 2;
+
+          case "historicalContextOnly":
+            return 3;
+
+          case "unresolved":
+            return 4;
+
+          default:
+            return 5;
+        }
+      };
+
+      const leftTier = candidateTier(left.candidate);
+      const rightTier = candidateTier(right.candidate);
+
+      if (leftTier !== rightTier) {
+        return leftTier - rightTier;
+      }
+
+      // Embryo-size ranking belongs only inside the two functional groups.
+      // Surface/seed, historical context, unresolved, and unknown candidates
+      // preserve their existing deterministic order within their group.
+      if (leftTier > 1) {
+        return left.index - right.index;
+      }
+
+      const leftSize = embryoFirstNumber(left.candidate.embryoSize);
+      const rightSize = embryoFirstNumber(right.candidate.embryoSize);
+
+      if (leftSize != null && rightSize != null && leftSize !== rightSize) {
+        return leftSize - rightSize;
+      }
+
+      if (leftSize != null && rightSize == null) {
+        return -1;
+      }
+
+      if (leftSize == null && rightSize != null) {
+        return 1;
+      }
+
+      return left.index - right.index;
+    })
+    .map(({ candidate }) => candidate);
+}
+
 function buildMindCandidates(payload: EnginePayload): Candidate[]  {
-  return buildMindCandidatesBase(payload).map((candidate, index) =>
+  const projected = buildMindCandidatesBase(payload).map((candidate, index) =>
     projectEmbryoFirstCandidateForAnalyzeV1(candidate, payload, index),
   );
+
+  return orderEmbryoFirstCandidatesForAnalyzeV1(projected) as Candidate[];
 }
 
 function buildMindCandidatesBase(payload: EnginePayload): Candidate[]  {
