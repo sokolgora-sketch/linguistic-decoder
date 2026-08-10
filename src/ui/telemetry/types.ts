@@ -151,6 +151,16 @@ export interface CandidateRowVM {
   // winner" — provenance must be visible, not implied.
   sourceKind: PresentOrMissing<string>;
 
+  // Embryo-first fields are optional because legacy payloads may not emit them.
+  // When present, only contractAdapter may lift them from raw analysis data.
+  embryo?: PresentOrMissing<string>;
+  plainStandaloneGloss?: PresentOrMissing<string>;
+  claimType?: PresentOrMissing<string>;
+  validationOutcome?: PresentOrMissing<string>;
+  rankGroup?: PresentOrMissing<string>;
+  claimBoundary?: PresentOrMissing<string>;
+  userDecisionPosture?: PresentOrMissing<string>;
+
   functionalStatement: PresentOrMissing<string>;
   vowelPath: PresentOrMissing<Vowel[]>;
   deepRootHeartGate: PresentOrMissing<DeepRootHeartGateV01>;
