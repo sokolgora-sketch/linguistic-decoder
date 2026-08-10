@@ -32,7 +32,10 @@ function buildSummary(rows: readonly GateRowLike[]) {
 
     if (status === "aligned") aligned++;
     else if (status === "misaligned") misaligned++;
-    else if (status === "insufficient") insufficient++;
+    else if (
+      status === "insufficient_data" ||
+      status === "insufficient"
+    ) insufficient++;
     else missing++;
 
     if (status === "misaligned") {

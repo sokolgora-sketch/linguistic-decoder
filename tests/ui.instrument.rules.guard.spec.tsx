@@ -103,12 +103,20 @@ describe("ui guardrail: InstrumentPanel is a scientific instrument (v0.1)", () =
     expect(screen.getByText("ZË-RO Open Instrument")).toBeInTheDocument();
     expect(screen.getByRole("tab", { name: "Overview" })).toHaveAttribute("aria-selected", "true");
     expect(screen.getByText("active surface")).toBeInTheDocument();
-    expect(screen.getByText("Readout, evidence trace, and hypothesis summary in one inspection surface.")).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "Functional motivation first, with the deterministic readout underneath.",
+      ),
+    ).toBeInTheDocument();
     expect(screen.getByText("section=overview")).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("tab", { name: "Candidates" }));
     expect(screen.getByRole("tab", { name: "Candidates" })).toHaveAttribute("aria-selected", "true");
-    expect(screen.getByText("Candidate rows remain inspection records, not a forced answer.")).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "Functional candidate first; secondary engine records stay collapsed.",
+      ),
+    ).toBeInTheDocument();
     expect(screen.getByText("section=candidates")).toBeInTheDocument();
 
     const lightModeButton = screen.getByRole("button", { name: /light mode/i });
@@ -121,9 +129,26 @@ describe("ui guardrail: InstrumentPanel is a scientific instrument (v0.1)", () =
     const evidencePackageIndex = text.indexOf("evidence package");
     const maskCarrierIndex = text.indexOf("mask vs carrier");
 
-    expect(evidenceTraceIndex).toBeGreaterThanOrEqual(0);
-    expect(toolBoundariesIndex).toBeGreaterThan(evidenceTraceIndex);
-    expect(evidencePackageIndex).toBeGreaterThan(toolBoundariesIndex);
-    expect(maskCarrierIndex).toBeGreaterThan(evidencePackageIndex);
+    expect(
+      evidenceTraceIndex,
+    ).toBeGreaterThanOrEqual(0);
+
+    expect(
+      evidencePackageIndex,
+    ).toBeGreaterThan(
+      evidenceTraceIndex,
+    );
+
+    expect(
+      maskCarrierIndex,
+    ).toBeGreaterThan(
+      evidencePackageIndex,
+    );
+
+    expect(
+      toolBoundariesIndex,
+    ).toBeGreaterThan(
+      maskCarrierIndex,
+    );
   });
 });

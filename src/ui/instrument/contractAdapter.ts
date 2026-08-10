@@ -697,14 +697,15 @@ export function adaptAnalysisToTelemetryVM(raw: unknown): TelemetryViewModel {
 
   const detectedParts = toVoiceParts(vp.detected);
 
-// v0.1.x semantics (Milestone B):
-// - evidence.surfaceVowels       = authoritative functional/detected path (instrument truth)
-// - evidence.surfaceVowelsRaw    = true raw surface path
-// - evidence.vowelPath           = legacy duplicate of functional path
+// Embryo-first path semantics:
+// - detected path = primary/Heart surface detection.
+// - surface path = evidence.surfaceVowelsRaw when emitted.
+// - functional path = DeepRoot functionalRoots vowelPath when emitted.
+// - evidence.surfaceVowels/evidence.vowelPath are run-level fallbacks.
+// - candidate vowelPath is a final compatibility fallback only.
 //
-// Adapter rules:
-// - Surface path uses evidence.surfaceVowelsRaw (fallback: heartInstrumentV1.surfaceVowels, then vp.surface)
-// - Functional path uses evidence.surfaceVowels (fallback: evidence.vowelPath, then vp.functional)
+// This prevents a surface U-Y reading from masking a DeepRoot functional U-I
+// reading and falsely reporting MATCH.
 
 const hiRootValue = getField(payload, "heartInstrumentV1");
 const hiRoot = isRecord(hiRootValue) ? hiRootValue : null;
@@ -732,12 +733,53 @@ const surfaceForParts =
       ? hiSurfaceArr.join("-")
       : vp.surface;
 
+const deepRootForReadoutValue =
+  getField(payload, "deepRoot");
+
+const deepRootForReadout =
+  isRecord(deepRootForReadoutValue)
+    ? deepRootForReadoutValue
+    : null;
+
+const deepRootFunctionalRootsForReadout =
+  deepRootForReadout &&
+  Array.isArray(
+    deepRootForReadout["functionalRoots"],
+  )
+    ? deepRootForReadout["functionalRoots"]
+    : null;
+
+const deepRootFunctionalRoot0ForReadout =
+  deepRootFunctionalRootsForReadout &&
+  deepRootFunctionalRootsForReadout.length > 0 &&
+  isRecord(
+    deepRootFunctionalRootsForReadout[0],
+  )
+    ? deepRootFunctionalRootsForReadout[0]
+    : null;
+
+const deepRootFunctionalForParts =
+  (normalizeVowelPathString(
+    deepRootFunctionalRoot0ForReadout?.["vowelPath"],
+  )?.join("-") ?? null) ??
+  (normalizeVowelPathArray(
+    deepRootFunctionalRoot0ForReadout?.["vowelPath"],
+  )?.join("-") ?? null) ??
+  (normalizeVowelPathString(
+    deepRootFunctionalRoot0ForReadout?.["vowel_path"],
+  )?.join("-") ?? null) ??
+  (normalizeVowelPathArray(
+    deepRootFunctionalRoot0ForReadout?.["vowel_path"],
+  )?.join("-") ?? null) ??
+  null;
+
 const functionalForParts =
-  evFunctionalArr
+  deepRootFunctionalForParts ??
+  (evFunctionalArr
     ? evFunctionalArr.join("-")
     : evVowelPathArr
       ? evVowelPathArr.join("-")
-      : vp.functional;
+      : vp.functional);
 
 const surfaceParts = toVoiceParts(surfaceForParts);
 const functionalParts = toVoiceParts(functionalForParts);
@@ -752,7 +794,8 @@ const voicePathDetectedMaybe: PresentOrMissing<Vowel[]> =
     functionalParts ? present(functionalParts) : missing<Vowel[]>("not_emitted");
   // Delta must be computed from the SAME sources the UI renders:
 // - surfaceParts uses evidence.surfaceVowelsRaw (fallback: heartInstrumentV1.surfaceVowels, then vp.surface)
-// - functionalParts uses evidence.surfaceVowels (fallback: evidence.vowelPath, then vp.functional)
+// - functionalParts uses DeepRoot functional path first,
+//   then emitted evidence, then candidate compatibility fallback.
   const surfaceNorm = surfaceParts ? surfaceParts.join("-") : null;
   const functionalNorm = functionalParts ? functionalParts.join("-") : null;
 
@@ -1085,16 +1128,20 @@ const evidenceId = String(id).toLowerCase().replace(/[^a-z0-9_]/g, "_");
           computeDeepRootHeartGateV01({
             heartPrimaryPath: heartPrimaryPathForGate,
             deepRootFunctionalPath:
-              (candVowelPath && candVowelPath.length ? candVowelPath.join("-") : null) ??
-              deepRootFunctionalPathStr,
+              (candVowelPath && candVowelPath.length
+                ? candVowelPath.join("-")
+                : claimType !== "functionalMotivation"
+                  ? deepRootFunctionalPathStr
+                  : null),
             evidenceRefs: [
               "heartPrimaryPath",
               "primaryPath.voicePath",
               ...(candVowelPath && candVowelPath.length
                 ? ["candidates[" + evidenceId + "].vowelPath"]
-                : deepRootFunctionalPathStr
-                ? ["deepRoot.functionalRoots[0].vowelPath"]
-                : []),
+                : claimType !== "functionalMotivation" &&
+                    deepRootFunctionalPathStr
+                  ? ["deepRoot.functionalRoots[0].vowelPath"]
+                  : []),
             ],
           })
         ),

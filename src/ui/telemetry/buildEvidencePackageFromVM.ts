@@ -15,6 +15,7 @@ export type EvidencePackageV01 = {
     voicePathFunctional?: string;
     voicePathCarrier?: string;
     voicePathDelta?: string;
+    voicePathCarrierDelta?: string;
     signalsCount?: number;
   };
 
@@ -74,6 +75,50 @@ function deriveCarrierVoicePath(readout: any): string | undefined {
   const r = readout ?? {};
   const phon = unwrapPOM(r?.phoneticIpaV0_1);
   return joinVoicesArrow(phon?.voices);
+}
+
+function normalizeVoicePathForComparison(
+  path: string | undefined,
+): string | undefined {
+  if (!path) return undefined;
+
+  const compact =
+    path
+      .trim()
+      .toUpperCase()
+      .replace(/[→–—]/g, "-")
+      .replace(/\s+/g, "");
+
+  if (!compact) return undefined;
+
+  const parts =
+    compact.includes("-")
+      ? compact
+          .split("-")
+          .filter(Boolean)
+      : Array.from(compact);
+
+  const allowed =
+    new Set([
+      "A",
+      "E",
+      "I",
+      "O",
+      "U",
+      "Y",
+      "Ë",
+    ]);
+
+  if (
+    parts.length === 0 ||
+    !parts.every((part) =>
+      allowed.has(part),
+    )
+  ) {
+    return undefined;
+  }
+
+  return parts.join("-");
 }
 
 function pickSignalsCountFromVM(vm: any): number | undefined {
@@ -180,13 +225,42 @@ export function buildEvidencePackageFromVM(vm: any, opts?: { ledgerModel?: any }
     notes: [],
   };
 
-  // If IPA carrier voices exist, compute mask vs carrier delta for the export bundle.
+  // If IPA carrier voices exist, preserve the surface/functional delta
+  // and expose the independent surface/carrier comparison separately.
   const maskPath = deriveMaskVoicePath(r);
   const carrierPath = deriveCarrierVoicePath(r);
   if (pkg.summary && carrierPath) {
-    (pkg.summary as any).voicePathCarrier = carrierPath;
-    if (!pkg.summary.voicePathSurface && maskPath) pkg.summary.voicePathSurface = maskPath;
-    if (maskPath) pkg.summary.voicePathDelta = maskPath === carrierPath ? "MATCH" : "DIVERGE";
+    pkg.summary.voicePathCarrier =
+      carrierPath;
+
+    if (
+      !pkg.summary.voicePathSurface &&
+      maskPath
+    ) {
+      pkg.summary.voicePathSurface =
+        maskPath;
+    }
+
+    const normalizedMaskPath =
+      normalizeVoicePathForComparison(
+        maskPath,
+      );
+
+    const normalizedCarrierPath =
+      normalizeVoicePathForComparison(
+        carrierPath,
+      );
+
+    if (
+      normalizedMaskPath &&
+      normalizedCarrierPath
+    ) {
+      pkg.summary.voicePathCarrierDelta =
+        normalizedMaskPath ===
+        normalizedCarrierPath
+          ? "MATCH"
+          : "DIVERGE";
+    }
   }
 
   // Light cleanup: remove empty summary keys
