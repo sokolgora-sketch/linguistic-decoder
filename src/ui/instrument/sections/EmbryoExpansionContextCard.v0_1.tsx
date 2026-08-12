@@ -130,6 +130,55 @@ function usefulFunctionalCandidate(
   );
 }
 
+function usefulFunctionalCompositionCandidate(
+  rows: CandidateRowVM[],
+  rootTokens: string[],
+): CandidateRowVM | null {
+  if (rootTokens.length < 2) {
+    return null;
+  }
+
+  const expectedExpression =
+    rootTokens
+      .join(" + ")
+      .trim()
+      .toUpperCase();
+
+  return (
+    rows.find((row) => {
+      const claimType =
+        presentString(
+          row.claimType,
+        );
+
+      const validation =
+        presentString(
+          row.validationOutcome,
+        );
+
+      const form =
+        presentString(
+          row.form,
+        );
+
+      return (
+        claimType ===
+          "functionalMotivation" &&
+        (
+          validation ===
+            "validated" ||
+          validation ===
+            "partial"
+        ) &&
+        form
+          ?.trim()
+          .toUpperCase() ===
+          expectedExpression
+      );
+    }) ?? null
+  );
+}
+
 function evidenceStateFromCandidate(
   row: CandidateRowVM,
 ): "Reviewed" | "Partial" | "Proposed" {
@@ -229,6 +278,7 @@ export function EmbryoExpansionContextCardV0_1({
     "Proposed";
 
   let composedMeaning = "";
+  let candidateExpression = "";
 
   const componentRows: Array<{
     token: string;
@@ -243,6 +293,22 @@ export function EmbryoExpansionContextCardV0_1({
   if (rootTokens.length > 0) {
     tokens =
       rootTokens;
+
+    const composedCandidate =
+      usefulFunctionalCompositionCandidate(
+        Array.isArray(
+          vm.candidates,
+        )
+          ? vm.candidates
+          : [],
+        rootTokens,
+      );
+
+    candidateExpression =
+      presentString(
+        composedCandidate?.form,
+      ) ??
+      rootTokens.join(" + ");
 
     const keys =
       Array.isArray(
@@ -279,10 +345,21 @@ export function EmbryoExpansionContextCardV0_1({
       ).length;
 
     evidenceStatus =
-      reviewedCount ===
-      tokens.length
-        ? "Reviewed"
-        : "Partial";
+      composedCandidate
+        ? evidenceStateFromCandidate(
+            composedCandidate,
+          )
+        : reviewedCount ===
+            tokens.length
+          ? "Reviewed"
+          : "Partial";
+
+    const candidateLanguage =
+      humanLanguage(
+        presentString(
+          composedCandidate?.language,
+        ),
+      );
 
     const languages =
       Array.from(
@@ -303,12 +380,19 @@ export function EmbryoExpansionContextCardV0_1({
         ),
       );
 
-    if (languages.length > 0) {
+    if (candidateLanguage) {
+      language =
+        candidateLanguage;
+    } else if (languages.length > 0) {
       language =
         languages.join(" + ");
     }
 
     composedMeaning =
+      presentString(
+        composedCandidate
+          ?.functionalStatement,
+      ) ??
       String(
         rootMap?.composedMeaning ??
           "",
@@ -371,6 +455,9 @@ export function EmbryoExpansionContextCardV0_1({
         .toUpperCase(),
     ];
 
+    candidateExpression =
+      tokens[0];
+
     language =
       humanLanguage(
         presentString(
@@ -409,6 +496,7 @@ export function EmbryoExpansionContextCardV0_1({
   }
 
   const candidate =
+    candidateExpression ||
     tokens.join(" + ");
 
   return (

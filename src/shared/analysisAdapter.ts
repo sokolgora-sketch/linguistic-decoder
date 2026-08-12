@@ -9,6 +9,7 @@ import { buildDeepRootOutputV1 } from "./deepRoot.output.v1";
 import {
   buildRootMapV1,
   buildReviewedFunctionalCandidateProjectionsFromRootMapV0_1,
+  buildFunctionalCandidateCompositionsFromRootMapV0_1,
 } from "./deepRoot.rootMap.builder.v1";
 import { pickHeartPrimaryPathForRootMap } from "./heartPrimaryPathForRootMap.v0.1.2";
 import { buildResonanceProfileV1 } from "@/shared/resonanceProfile.v1";
@@ -116,6 +117,16 @@ export function enginePayloadToAnalysisResult(payload: EnginePayload): AnalyzeWo
       .trim()
       .toLowerCase();
 
+  // One authoritative DeepRoot/RootMap basis for this analysis.
+  // Public/raw word fields remain unchanged.
+  const deepRootBasis =
+    normalizeAnalysisWordForDeepRootV0_1(
+      (payload as any).sanitized ??
+        (payload as any).sanitizedWord ??
+        (payload as any).normalizedWord ??
+        payload.word,
+    );
+
   const math7 = computeMath7ForResult(payload);
   const heart = buildHeartSummary(payload, math7);
   const mind = analyzeMind(math7, payload);
@@ -123,7 +134,11 @@ export function enginePayloadToAnalysisResult(payload: EnginePayload): AnalyzeWo
   const symbolic = analyzeSymbolic(payload);
 
   const candidates = buildMindCandidates(payload);
-  const deepRoot = buildDeepRoot(payload);
+  const deepRoot =
+    buildDeepRoot(
+      payload,
+      deepRootBasis,
+    );
   const authoritativePrimaryPath =
     projectAuthoritativePrimaryPath(payload);
 
@@ -234,9 +249,14 @@ export function enginePayloadToAnalysisResult(payload: EnginePayload): AnalyzeWo
     }
 
 
+  // Do not rediscover basis authority from public/result fields.
+  // This is the exact normalized basis used to construct DeepRoot hypotheses.
+  const rootMapBasis =
+    deepRootBasis;
+
   const rootMap =
     buildRootMapV1({
-      basis: String((result as any)?.deepRoot?.basis ?? (result as any)?.sanitized ?? (result as any)?.word ?? "").trim(),
+      basis: rootMapBasis,
       minRoots:
         (result as any)?.deepRoot?.hypotheses ??
         (result as any)?.deepRoot?.candidates ??
@@ -252,8 +272,14 @@ export function enginePayloadToAnalysisResult(payload: EnginePayload): AnalyzeWo
 
   (result as any).rootMap = rootMap;
 
-    (result as any).analysisStatusV0_1 =
-    buildAnalysisStatusV0_1(result);
+  // Analysis status must evaluate the same normalized target
+  // that authorized this RootMap. Keep the public/raw result
+  // word unchanged; provide only the authoritative status view.
+  (result as any).analysisStatusV0_1 =
+    buildAnalysisStatusV0_1({
+      word: rootMapBasis,
+      rootMap,
+    });
 
   // Reviewed embryo-first visibility overlay.
   //
@@ -265,28 +291,57 @@ export function enginePayloadToAnalysisResult(payload: EnginePayload): AnalyzeWo
   const reviewedVisibleCandidates =
     buildReviewedFunctionalCandidateProjectionsFromRootMapV0_1({
       rootMap,
-      targetWord: String(payload.word ?? ""),
+      targetWord: rootMapBasis,
     });
 
-  if (reviewedVisibleCandidates.length > 0) {
+  const composedVisibleCandidates =
+    buildFunctionalCandidateCompositionsFromRootMapV0_1({
+      rootMap,
+      targetWord: rootMapBasis,
+    });
+
+  const visibleFunctionalCandidates = [
+    ...reviewedVisibleCandidates,
+    ...composedVisibleCandidates,
+  ];
+
+  // Composition provenance is authenticated only at this
+  // RootMap-owned overlay seam. The exported generic projector
+  // must not trust caller-supplied segmentation evidence labels.
+  const authenticatedFunctionalCompositionCandidateIds =
+    new Set(
+      composedVisibleCandidates
+        .map((candidate) =>
+          String(
+            candidate.candidateId ??
+              candidate.id ??
+              "",
+          ).trim(),
+        )
+        .filter(Boolean),
+    );
+
+  if (visibleFunctionalCandidates.length > 0) {
     const existingCandidates = Array.isArray(
       (result as any).candidates,
     )
       ? (result as any).candidates
       : [];
 
-    const projectedReviewedCandidates =
-      reviewedVisibleCandidates.map((candidate, index) =>
-        projectEmbryoFirstCandidateForAnalyzeV1(
-          candidate,
-          payload,
-          index,
-        ),
+    const projectedFunctionalCandidates =
+      visibleFunctionalCandidates.map(
+        (candidate, index) =>
+          projectEmbryoFirstCandidateForAnalyzeV1Internal(
+            candidate,
+            payload,
+            index,
+            authenticatedFunctionalCompositionCandidateIds,
+          ),
       );
 
     (result as any).candidates =
       orderEmbryoFirstCandidatesForAnalyzeV1([
-        ...projectedReviewedCandidates,
+        ...projectedFunctionalCandidates,
         ...existingCandidates,
       ]);
   }
@@ -425,6 +480,7 @@ function embryoFirstValidationReasons(
   existing: unknown,
   checks: {
     isSeed: boolean;
+    isFunctionalComposition: boolean;
     isolatedStandaloneForm: string | null;
     plainStandaloneGloss: string | null;
     sourceNote: string | null;
@@ -443,16 +499,18 @@ function embryoFirstValidationReasons(
     add("sourceKind_seed_not_validation");
   }
 
-  if (!checks.isolatedStandaloneForm) {
-    add("missing_isolatedStandaloneForm");
-  }
+  if (!checks.isFunctionalComposition) {
+    if (!checks.isolatedStandaloneForm) {
+      add("missing_isolatedStandaloneForm");
+    }
 
-  if (!checks.plainStandaloneGloss) {
-    add("missing_plainStandaloneGloss");
-  }
+    if (!checks.plainStandaloneGloss) {
+      add("missing_plainStandaloneGloss");
+    }
 
-  if (!checks.sourceNote) {
-    add("missing_sourceNote");
+    if (!checks.sourceNote) {
+      add("missing_sourceNote");
+    }
   }
 
   if (!checks.semanticBridge) {
@@ -460,21 +518,44 @@ function embryoFirstValidationReasons(
   }
 
   if (
-    !checks.isolatedStandaloneForm ||
-    !checks.plainStandaloneGloss ||
-    !checks.sourceNote ||
-    !checks.semanticBridge
+    !checks.isFunctionalComposition &&
+    (
+      !checks.isolatedStandaloneForm ||
+      !checks.plainStandaloneGloss ||
+      !checks.sourceNote ||
+      !checks.semanticBridge
+    )
   ) {
-    add("embryo_first_full_functional_validation_not_claimed");
+    add(
+      "embryo_first_full_functional_validation_not_claimed",
+    );
   }
 
   return reasons;
 }
 
+const EMPTY_AUTHENTICATED_FUNCTIONAL_COMPOSITION_IDS =
+  new Set<string>();
+
 export function projectEmbryoFirstCandidateForAnalyzeV1<T>(
   candidate: T,
   payload: unknown,
   index = 0,
+): T & Record<string, unknown> {
+  return projectEmbryoFirstCandidateForAnalyzeV1Internal(
+    candidate,
+    payload,
+    index,
+    EMPTY_AUTHENTICATED_FUNCTIONAL_COMPOSITION_IDS,
+  );
+}
+
+function projectEmbryoFirstCandidateForAnalyzeV1Internal<T>(
+  candidate: T,
+  payload: unknown,
+  index: number,
+  authenticatedFunctionalCompositionCandidateIds:
+    ReadonlySet<string>,
 ): T & Record<string, unknown> {
   const candidateRecord = embryoFirstRecord(candidate);
   const nestedCandidateRecord = embryoFirstRecord(candidateRecord.candidateRecord);
@@ -501,15 +582,103 @@ export function projectEmbryoFirstCandidateForAnalyzeV1<T>(
   );
   const plainStandaloneGloss = embryoFirstFirstText(candidateRecord.plainStandaloneGloss);
   const sourceNote = embryoFirstFirstText(candidateRecord.sourceNote);
-  const semanticBridge = embryoFirstFirstText(candidateRecord.semanticBridge);
+  const semanticBridge =
+    embryoFirstFirstText(
+      candidateRecord.semanticBridge,
+    );
+
+  const segmentationRecord =
+    embryoFirstRecord(
+      candidateRecord.segmentation,
+    );
+
+  const rawCompositionComponents =
+    Array.isArray(
+      segmentationRecord.components,
+    )
+      ? segmentationRecord.components
+      : [];
+
+  const compositionComponents =
+    rawCompositionComponents
+      .map((component) =>
+        embryoFirstRecord(component),
+      )
+      .filter((component) => {
+        const evidenceState =
+          embryoFirstText(
+            component.evidenceState,
+          );
+
+        return Boolean(
+          embryoFirstText(
+            component.embryo,
+          ) &&
+            embryoFirstText(
+              component.language,
+            ) &&
+            embryoFirstText(
+              component.plainMeaning,
+            ) &&
+            (
+              evidenceState ===
+                "reviewed" ||
+              evidenceState ===
+                "structural"
+            ),
+        );
+      });
+
+  const declaresFunctionalComposition =
+    embryoFirstText(
+      segmentationRecord.kind,
+    ) === "functionalComposition";
+
+  const isFunctionalComposition =
+    declaresFunctionalComposition &&
+    rawCompositionComponents.length >= 2 &&
+    compositionComponents.length ===
+      rawCompositionComponents.length;
+
+  const reviewedCompositionCount =
+    compositionComponents.filter(
+      (component) =>
+        embryoFirstText(
+          component.evidenceState,
+        ) === "reviewed",
+    ).length;
+
+  const hasAuthenticatedFunctionalCompositionProvenance =
+    Boolean(
+      isFunctionalComposition &&
+        sourceKind ===
+          "rootmap_functional_composition" &&
+        authenticatedFunctionalCompositionCandidateIds.has(
+          candidateId,
+        ),
+    );
+
+  const hasFunctionalCompositionEvidence =
+    Boolean(
+      hasAuthenticatedFunctionalCompositionProvenance &&
+        semanticBridge &&
+        reviewedCompositionCount > 0,
+    );
+
   const embryo = embryoFirstFirstText(candidateRecord.embryo, isolatedStandaloneForm);
   const embryoLanguage = embryoFirstFirstText(
     candidateRecord.embryoLanguage,
     embryo ? candidateLanguage : null,
   );
 
+  // Standalone lexical isolation can authorize a single-embryo
+  // candidate, but it can never authenticate a multi-embryo
+  // functional composition.
   const hasIsolationProof = Boolean(
-    isolatedStandaloneForm && plainStandaloneGloss && sourceNote,
+    !declaresFunctionalComposition &&
+      isolatedStandaloneForm &&
+      plainStandaloneGloss &&
+      sourceNote,
   );
   const hasFunctionalBridge = Boolean(hasIsolationProof && semanticBridge);
 
@@ -527,45 +696,139 @@ export function projectEmbryoFirstCandidateForAnalyzeV1<T>(
       EMBRYO_FIRST_VALIDATION_OUTCOMES,
     ) ?? (hasFunctionalBridge ? "partial" : "not_evaluated");
 
-  if (claimType === "functionalMotivation" && !hasIsolationProof) {
-    claimType = isSeed ? "seedPairing" : "surfaceResonance";
-    validationOutcome = "blocked";
+  if (
+    declaresFunctionalComposition &&
+    !hasFunctionalCompositionEvidence
+  ) {
+    // Composition truth fails closed unless provenance came from
+    // the authenticated RootMap-owned overlay. Caller-supplied
+    // component labels, isolation fields, semantic bridges, and
+    // validation labels do not create composition authority.
+    claimType =
+      isSeed
+        ? "seedPairing"
+        : "surfaceResonance";
+
+    validationOutcome =
+      "blocked";
+  } else if (
+    claimType ===
+      "functionalMotivation" &&
+    !hasIsolationProof &&
+    !hasFunctionalCompositionEvidence
+  ) {
+    claimType =
+      isSeed
+        ? "seedPairing"
+        : "surfaceResonance";
+
+    validationOutcome =
+      "blocked";
   }
 
-  if (validationOutcome === "validated" && !hasIsolationProof) {
-    validationOutcome = "blocked";
+  if (
+    validationOutcome ===
+      "validated" &&
+    (
+      declaresFunctionalComposition ||
+      !hasIsolationProof
+    )
+  ) {
+    // Multi-embryo component evidence does not authorize a
+    // Reviewed composition-level semantic bridge. Authenticated
+    // RootMap compositions remain Partial; unauthenticated
+    // caller-supplied compositions remain blocked.
+    validationOutcome =
+      hasFunctionalCompositionEvidence
+        ? "partial"
+        : "blocked";
   }
 
-  const rankGroup =
-    embryoFirstAllowed(candidateRecord.rankGroup, EMBRYO_FIRST_RANK_GROUPS) ??
-    (validationOutcome === "validated" && claimType === "functionalMotivation"
+  let rankGroup =
+    embryoFirstAllowed(
+      candidateRecord.rankGroup,
+      EMBRYO_FIRST_RANK_GROUPS,
+    ) ??
+    (validationOutcome === "validated" &&
+    claimType === "functionalMotivation"
       ? "validatedFunctionalMotivation"
-      : hasIsolationProof
+      : hasFunctionalCompositionEvidence
         ? "partialFunctionalMotivation"
-        : isSeed
-          ? "surfaceOrSeedOnly"
+        : hasIsolationProof
+          ? "partialFunctionalMotivation"
           : "surfaceOrSeedOnly");
 
+  if (declaresFunctionalComposition) {
+    if (hasFunctionalCompositionEvidence) {
+      rankGroup =
+        "partialFunctionalMotivation";
+    } else if (
+      rankGroup ===
+        "validatedFunctionalMotivation" ||
+      rankGroup ===
+        "partialFunctionalMotivation"
+    ) {
+      rankGroup =
+        "surfaceOrSeedOnly";
+    }
+  }
+
   const rankScore =
-    embryoFirstNumber(candidateRecord.rankScore) ??
-    (rankGroup === "validatedFunctionalMotivation"
-      ? 100
-      : rankGroup === "partialFunctionalMotivation"
-        ? 60
-        : isSeed
-          ? 30
-          : 25);
+    declaresFunctionalComposition &&
+    !hasFunctionalCompositionEvidence
+      ? 25
+      : embryoFirstNumber(
+          candidateRecord.rankScore,
+        ) ??
+        (rankGroup ===
+        "validatedFunctionalMotivation"
+          ? 100
+          : rankGroup ===
+            "partialFunctionalMotivation"
+            ? 60
+            : isSeed
+              ? 30
+              : 25);
 
   const validationReasons = embryoFirstValidationReasons(
-    candidateRecord.validationReasons,
+    declaresFunctionalComposition &&
+    !hasAuthenticatedFunctionalCompositionProvenance
+      ? []
+      : candidateRecord.validationReasons,
     {
       isSeed,
+      isFunctionalComposition:
+        declaresFunctionalComposition,
       isolatedStandaloneForm,
       plainStandaloneGloss,
       sourceNote,
       semanticBridge,
     },
   );
+
+  if (
+    declaresFunctionalComposition &&
+    !isFunctionalComposition &&
+    !validationReasons.includes(
+      "malformed_functional_composition",
+    )
+  ) {
+    validationReasons.push(
+      "malformed_functional_composition",
+    );
+  }
+
+  if (
+    declaresFunctionalComposition &&
+    !hasAuthenticatedFunctionalCompositionProvenance &&
+    !validationReasons.includes(
+      "functional_composition_provenance_not_authenticated",
+    )
+  ) {
+    validationReasons.push(
+      "functional_composition_provenance_not_authenticated",
+    );
+  }
 
   const segmentation =
     candidateRecord.segmentation ??
@@ -577,18 +840,32 @@ export function projectEmbryoFirstCandidateForAnalyzeV1<T>(
     (embryo ? [embryo, displayForm] : [displayForm]);
 
   const rankReason =
-    embryoFirstFirstText(candidateRecord.rankReason) ??
-    (hasIsolationProof
-      ? "partial embryo-first functional motivation evidence is present"
-      : isSeed
-        ? "seed pairing only; sourceKind SEED is not validation"
-        : "surface candidate only; embryo-first isolation proof is not supplied");
+    declaresFunctionalComposition &&
+    !hasFunctionalCompositionEvidence
+      ? "functional composition evidence provenance is not authenticated"
+      : embryoFirstFirstText(
+          candidateRecord.rankReason,
+        ) ??
+        (hasFunctionalCompositionEvidence
+          ? "partial authenticated multi-embryo functional composition evidence is present"
+          : hasIsolationProof
+            ? "partial embryo-first functional motivation evidence is present"
+            : isSeed
+              ? "seed pairing only; sourceKind SEED is not validation"
+              : "surface candidate only; embryo-first isolation proof is not supplied");
 
   const claimBoundary =
-    embryoFirstFirstText(candidateRecord.claimBoundary) ??
-    (hasIsolationProof
-      ? "functional motivation evidence only; not historical origin"
-      : "not historical origin or validated functional motivation");
+    declaresFunctionalComposition &&
+    !hasFunctionalCompositionEvidence
+      ? "unauthenticated composition evidence is not functional candidate truth"
+      : embryoFirstFirstText(
+          candidateRecord.claimBoundary,
+        ) ??
+        (hasFunctionalCompositionEvidence
+          ? "partial functional composition only; composition-level reviewed semantic bridge is not authorized"
+          : hasIsolationProof
+            ? "functional motivation evidence only; not historical origin"
+            : "not historical origin or validated functional motivation");
 
   return {
     ...candidateRecord,
@@ -750,16 +1027,38 @@ function buildMindCandidatesBase(payload: EnginePayload): Candidate[]  {
   return [];
 }
 
-function buildDeepRoot(payload: any) {
-  const normalizedWord =
-    (payload as any).sanitized ??
-    (payload as any).sanitizedWord ??
-    (payload as any).normalizedWord ??
-    String(payload.word ?? "").trim().toLowerCase();
+function normalizeAnalysisWordForDeepRootV0_1(
+  value: unknown,
+): string {
+  const raw =
+    String(value ?? "")
+      .normalize("NFC")
+      .trim()
+      .toLowerCase();
+
+  const canonical =
+    raw.replace(/[^a-zë]/g, "");
+
+  // Preserve prior behavior for inputs outside the current
+  // Latin+Ë normalization lane while still stripping punctuation
+  // for supported forms such as "study!".
+  return canonical || raw;
+}
+
+function buildDeepRoot(
+  payload: any,
+  normalizedWord: string,
+) {
+  // normalizedWord is computed once by enginePayloadToAnalysisResult
+  // and is the authority for DeepRoot hypotheses + RootMap.
+  const authoritativeBasis =
+    normalizeAnalysisWordForDeepRootV0_1(
+      normalizedWord,
+    );
 
   // DR3 min-roots
   // (Adjust opts to your current policy)
-  const minRoots = buildMinRootHypotheses(normalizedWord, {
+  const minRoots = buildMinRootHypotheses(authoritativeBasis, {
     allowSSh: true,
     langAllowList: ["sq"],
     maxHypotheses: 25,
@@ -768,7 +1067,17 @@ function buildDeepRoot(payload: any) {
 
   // DR4/DR5 output (hypotheses + optional rootFamilies; plus legacy alias candidates)
   return buildDeepRootOutputV1({
-    basis: { word: String(payload.word ?? normalizedWord), normalizedWord },
+    basis: {
+      // Preserve the existing public/reporting DeepRoot basis contract.
+      // Internal RootMap authorization uses authoritativeBasis directly
+      // and does not rediscover trust from this public field.
+      word: String(
+        payload.word ??
+          authoritativeBasis,
+      ),
+      normalizedWord:
+        authoritativeBasis,
+    },
     minRoots,
   }) ?? undefined;
 }

@@ -97,6 +97,48 @@ function record(value: unknown): Record<string, unknown> {
   return value as Record<string, unknown>;
 }
 
+function functionalCompositionComponents(
+  candidate: Record<string, unknown>,
+): Record<string, unknown>[] | null {
+  const segmentation =
+    candidate.segmentation;
+
+  if (
+    !segmentation ||
+    typeof segmentation !== "object" ||
+    Array.isArray(segmentation)
+  ) {
+    return null;
+  }
+
+  const record =
+    segmentation as Record<
+      string,
+      unknown
+    >;
+
+  if (
+    record.kind !==
+    "functionalComposition"
+  ) {
+    return null;
+  }
+
+  if (
+    !Array.isArray(
+      record.components,
+    ) ||
+    record.components.length < 2
+  ) {
+    return null;
+  }
+
+  return record.components as Record<
+    string,
+    unknown
+  >[];
+}
+
 function candidatesFrom(payload: unknown): Record<string, unknown>[] {
   const body = record(payload);
   const candidates =
@@ -142,9 +184,68 @@ describe("analyze-v1 embryo-first candidate contract v0.1", () => {
           candidate.claimType === "functionalMotivation" ||
           candidate.rankGroup === "validatedFunctionalMotivation"
         ) {
-          expect(candidate.isolatedStandaloneForm).toBeTruthy();
-          expect(candidate.plainStandaloneGloss).toBeTruthy();
-          expect(candidate.sourceNote).toBeTruthy();
+          const compositionComponents =
+            functionalCompositionComponents(
+              candidate,
+            );
+
+          if (compositionComponents) {
+            expect(
+              candidate.claimType,
+            ).toBe(
+              "functionalMotivation",
+            );
+
+            expect([
+              "validated",
+              "partial",
+            ]).toContain(
+              candidate.validationOutcome,
+            );
+
+            expect([
+              "validatedFunctionalMotivation",
+              "partialFunctionalMotivation",
+            ]).toContain(
+              candidate.rankGroup,
+            );
+
+            for (
+              const component of
+              compositionComponents
+            ) {
+              expect(
+                typeof component.embryo,
+              ).toBe("string");
+
+              expect(
+                typeof component.language,
+              ).toBe("string");
+
+              expect(
+                typeof component.plainMeaning,
+              ).toBe("string");
+
+              expect([
+                "reviewed",
+                "structural",
+              ]).toContain(
+                component.evidenceState,
+              );
+            }
+          } else {
+            expect(
+              candidate.isolatedStandaloneForm,
+            ).toBeTruthy();
+
+            expect(
+              candidate.plainStandaloneGloss,
+            ).toBeTruthy();
+
+            expect(
+              candidate.sourceNote,
+            ).toBeTruthy();
+          }
         }
       }
     },

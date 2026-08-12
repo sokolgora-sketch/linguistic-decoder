@@ -254,7 +254,7 @@ exports[`Engine Contract v1 — capture engine output (goldens) damage (strict, 
         "gloss": "split / divide / cut / separate",
         "language": "sq",
         "ops": null,
-        "status": "dialect_attested_pending_review",
+        "status": "supported",
         "token": "DA"
       }
     ],

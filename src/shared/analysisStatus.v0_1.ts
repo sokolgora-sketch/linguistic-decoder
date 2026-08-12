@@ -56,6 +56,37 @@ function operatorSummary(operators: readonly string[]): string {
   return operators.length > 0 ? operators.join(", ") : "none";
 }
 
+export function isReviewedFunctionalEvidenceLineV0_1(
+  value: unknown,
+): boolean {
+  if (typeof value !== "string") {
+    return false;
+  }
+
+  const normalized =
+    value
+      .trim()
+      .toLocaleLowerCase("en-US");
+
+  return (
+    normalized.startsWith(
+      "reviewed functional free-operator evidence:",
+    ) &&
+    normalized.includes(
+      "historicaloriginclaim=not_claimed",
+    ) &&
+    normalized.includes(
+      "winnerclaim=not_claimed",
+    ) &&
+    normalized.includes(
+      "languagesuperiorityclaim=not_claimed",
+    ) &&
+    normalized.includes(
+      "userdecisionposture=user_decides",
+    )
+  );
+}
+
 export function buildAnalysisStatusV0_1(resultValue: unknown): AnalysisStatusV0_1 {
   type UnknownRecord =
     Record<string, unknown>;
@@ -135,37 +166,6 @@ export function buildAnalysisStatusV0_1(resultValue: unknown): AnalysisStatusV0_
         : [],
     );
 
-  const isReviewedEvidenceLine = (
-    value: unknown,
-  ): boolean => {
-    if (typeof value !== "string") {
-      return false;
-    }
-
-    const normalized =
-      value
-        .trim()
-        .toLocaleLowerCase("en-US");
-
-    return (
-      normalized.startsWith(
-        "reviewed functional free-operator evidence:",
-      ) &&
-      normalized.includes(
-        "historicaloriginclaim=not_claimed",
-      ) &&
-      normalized.includes(
-        "winnerclaim=not_claimed",
-      ) &&
-      normalized.includes(
-        "languagesuperiorityclaim=not_claimed",
-      ) &&
-      normalized.includes(
-        "userdecisionposture=user_decides",
-      )
-    );
-  };
-
   const hasMatchingEmittedReviewedEvidence = (
     operatorId: string,
   ): boolean =>
@@ -187,7 +187,7 @@ export function buildAnalysisStatusV0_1(resultValue: unknown): AnalysisStatusV0_
       return (
         Array.isArray(evidence) &&
         evidence.some(
-          isReviewedEvidenceLine,
+          isReviewedFunctionalEvidenceLineV0_1,
         )
       );
     });

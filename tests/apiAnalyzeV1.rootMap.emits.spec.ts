@@ -43,7 +43,7 @@ describe("analyze-v1 emits rootMap (v0.1)", () => {
     const evidence = Array.isArray(da?.evidence) ? da.evidence.join("\n") : "";
 
     expect(da).toBeTruthy();
-    expect(da?.status).toBe("dialect_attested_pending_review");
+    expect(da?.status).toBe("supported");
     expect(evidence).toContain("reviewed Gheg free-operator evidence");
     expect(evidence).toContain("Dedvukaj & Ndoci 2023 PLSA");
     expect(evidence).not.toContain("gave (aorist/part)");

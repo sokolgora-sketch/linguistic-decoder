@@ -25,6 +25,7 @@ import { extractSevenVowelsFromString } from "@/shared/math7.core";
 import { getReviewedExternalLexiconProductionSourceRowsV0_1 } from "./reviewedExternalLexiconSourceRowRegistry.v0_1";
 import { projectReviewedExternalLexiconProductionRowForRuntimeV0_1 } from "./reviewedExternalLexiconRuntimeProjection.v0_1";
 import { evaluateReviewedExternalLexiconEvidenceOperationPolicyV0_1 } from "./reviewedExternalLexiconEvidenceOperationPolicy.v0_1";
+import { discoverCanonicalOperatorCandidatesV0_1 } from "./canonicalOperatorDiscovery.v0_1";
 
 function roleHintToTokenRole(roleHint?: string): RootTokenRoleV1 {
   switch (roleHint) {
@@ -84,6 +85,16 @@ function keyStatusForCarrier(
   reviewedEvidenceAuthorized = false,
 ): RootKeyStatusV1 {
   if (!carrier) return "speculative";
+
+  // A reviewed production row whose carrier/operation policy is
+  // explicitly authorized is runtime-supported evidence.
+  //
+  // This check must precede generic dialect-note classification:
+  // exact reviewed Gheg DA is authorized, while transformed DA
+  // remains unauthorized because its operation policy fails.
+  if (reviewedEvidenceAuthorized) {
+    return "supported";
+  }
 
   const text =
     `${carrierGloss ?? ""} ${carrierNotes ?? ""}`
@@ -192,8 +203,154 @@ function buildSpansOrNull(params: {
 type ReviewedFunctionalRuntimeEvidenceV0_1 = {
   sourceId: string;
   embryo: string;
+  language: string;
   evidenceText: string;
 };
+
+type ReviewedRootMapKeyProvenanceV0_1 = {
+  sourceId: string;
+  embryo: string;
+  language: string;
+  evidenceText: string;
+  carrierForm: string;
+  segment: string;
+  ops: string[];
+};
+
+const reviewedRootMapKeyProvenanceV0_1 =
+  new WeakMap<
+    RootKeyV1,
+    ReviewedRootMapKeyProvenanceV0_1
+  >();
+
+type TrustedRootMapProvenanceV0_1 = {
+  basis: string;
+  normalizedBasis: string;
+};
+
+const trustedRootMapProvenanceV0_1 =
+  new WeakMap<
+    RootMapV1,
+    TrustedRootMapProvenanceV0_1
+  >();
+
+function normalizeTrustedRootMapBasisV0_1(
+  value: unknown,
+): string {
+  return String(value ?? "")
+    .normalize("NFC")
+    .trim()
+    .toLocaleLowerCase("en-US");
+}
+
+function deepFreezeRootMapValueV0_1<T>(
+  value: T,
+): T {
+  if (
+    value === null ||
+    typeof value !== "object" ||
+    Object.isFrozen(value)
+  ) {
+    return value;
+  }
+
+  const record =
+    value as Record<
+      string,
+      unknown
+    >;
+
+  for (
+    const nestedValue of
+    Object.values(record)
+  ) {
+    deepFreezeRootMapValueV0_1(
+      nestedValue,
+    );
+  }
+
+  Object.freeze(value);
+
+  return value;
+}
+
+function registerTrustedRootMapV0_1(
+  rootMap: RootMapV1,
+  basis: string,
+): RootMapV1 {
+  const canonicalBasis =
+    String(basis ?? "")
+      .normalize("NFC")
+      .trim();
+
+  const normalizedBasis =
+    normalizeTrustedRootMapBasisV0_1(
+      canonicalBasis,
+    );
+
+  if (!normalizedBasis) {
+    return deepFreezeRootMapValueV0_1(
+      rootMap,
+    );
+  }
+
+  deepFreezeRootMapValueV0_1(
+    rootMap,
+  );
+
+  trustedRootMapProvenanceV0_1.set(
+    rootMap,
+    {
+      basis: canonicalBasis,
+      normalizedBasis,
+    },
+  );
+
+  return rootMap;
+}
+
+function resolveTrustedRootMapBasisV0_1(
+  rootMap:
+    | RootMapV1
+    | null
+    | undefined,
+  targetWord: unknown,
+): string | null {
+  if (
+    !rootMap ||
+    typeof rootMap !== "object"
+  ) {
+    return null;
+  }
+
+  const provenance =
+    trustedRootMapProvenanceV0_1.get(
+      rootMap,
+    );
+
+  if (!provenance) {
+    return null;
+  }
+
+  const requestedTarget =
+    normalizeTrustedRootMapBasisV0_1(
+      targetWord,
+    );
+
+  if (
+    !requestedTarget ||
+    requestedTarget !==
+      provenance.normalizedBasis
+  ) {
+    return null;
+  }
+
+  if (!Object.isFrozen(rootMap)) {
+    return null;
+  }
+
+  return provenance.basis;
+}
 
 function buildReviewedFunctionalRuntimeEvidenceByEmbryoV0_1(): ReadonlyMap<
   string,
@@ -219,6 +376,7 @@ function buildReviewedFunctionalRuntimeEvidenceByEmbryoV0_1(): ReadonlyMap<
       {
         sourceId: projection.sourceId,
         embryo: projection.embryo,
+        language: row.candidateLanguage,
         evidenceText:
           `reviewed functional free-operator evidence: ${projection.evidenceText}; historicalOriginClaim=${projection.claimBoundary.historicalOriginClaim}; winnerClaim=${projection.claimBoundary.winnerClaim}; languageSuperiorityClaim=${projection.claimBoundary.languageSuperiorityClaim}; userDecisionPosture=${projection.claimBoundary.userDecisionPosture}`,
       },
@@ -226,6 +384,43 @@ function buildReviewedFunctionalRuntimeEvidenceByEmbryoV0_1(): ReadonlyMap<
   }
 
   return new Map(entries);
+}
+
+function buildTargetAuthorizedReviewedFunctionalRuntimeEvidenceByEmbryoV0_1(
+  targetWord: string,
+): ReadonlyMap<
+  string,
+  ReviewedFunctionalRuntimeEvidenceV0_1
+> {
+  const eligibleOperators =
+    new Set(
+      discoverCanonicalOperatorCandidatesV0_1(
+        targetWord,
+      )
+        .filter(
+          (candidate) =>
+            candidate.reviewedEvidenceEligible ===
+            true,
+        )
+        .map(
+          (candidate) =>
+            candidate.operatorId
+              .trim()
+              .toUpperCase(),
+        ),
+    );
+
+  const trustedEvidence =
+    buildReviewedFunctionalRuntimeEvidenceByEmbryoV0_1();
+
+  return new Map(
+    [...trustedEvidence.entries()].filter(
+      ([embryo]) =>
+        eligibleOperators.has(
+          embryo.trim().toUpperCase(),
+        ),
+    ),
+  );
 }
 
 
@@ -266,6 +461,30 @@ function hypothesisHasAllowedReviewedTerminalEvidenceV0_1(
 
   if (!terminalCarrier) return false;
 
+  const terminalCarrierLanguage =
+    String(
+      terminalCarrier?.lang ?? "",
+    )
+      .trim()
+      .toLocaleLowerCase("en-US");
+
+  const reviewedEvidenceLanguage =
+    String(
+      reviewedFunctionalEvidence.language ??
+        "",
+    )
+      .trim()
+      .toLocaleLowerCase("en-US");
+
+  if (
+    !terminalCarrierLanguage ||
+    !reviewedEvidenceLanguage ||
+    terminalCarrierLanguage !==
+      reviewedEvidenceLanguage
+  ) {
+    return false;
+  }
+
   return evaluateReviewedExternalLexiconEvidenceOperationPolicyV0_1({
     sourceId: reviewedFunctionalEvidence.sourceId,
     embryo: reviewedFunctionalEvidence.embryo,
@@ -274,6 +493,140 @@ function hypothesisHasAllowedReviewedTerminalEvidenceV0_1(
     carrierForm: terminalCarrier?.carrierForm,
   }).allowed;
 }
+
+function rootMapKeyHasReviewedFunctionalEvidenceV0_1(
+  key: RootKeyV1,
+  authorizedEvidenceByEmbryo: ReadonlyMap<
+    string,
+    ReviewedFunctionalRuntimeEvidenceV0_1
+  >,
+): boolean {
+  if (key.status !== "supported") {
+    return false;
+  }
+
+  const provenance =
+    reviewedRootMapKeyProvenanceV0_1.get(
+      key,
+    );
+
+  if (!provenance) {
+    return false;
+  }
+
+  const token =
+    String(key.token ?? "")
+      .trim()
+      .toUpperCase();
+
+  if (
+    !token ||
+    token !==
+      provenance.embryo
+        .trim()
+        .toUpperCase()
+  ) {
+    return false;
+  }
+
+  const trusted =
+    authorizedEvidenceByEmbryo.get(
+      token,
+    );
+
+  if (!trusted) {
+    return false;
+  }
+
+  if (
+    trusted.sourceId !==
+      provenance.sourceId ||
+    trusted.embryo !==
+      provenance.embryo ||
+    trusted.evidenceText !==
+      provenance.evidenceText
+  ) {
+    return false;
+  }
+
+  const keyLanguage =
+    String(key.language ?? "")
+      .trim()
+      .toLowerCase();
+
+  const trustedLanguage =
+    String(trusted.language ?? "")
+      .trim()
+      .toLowerCase();
+
+  const provenanceLanguage =
+    String(provenance.language ?? "")
+      .trim()
+      .toLowerCase();
+
+  if (
+    !keyLanguage ||
+    !trustedLanguage ||
+    !provenanceLanguage ||
+    keyLanguage !== trustedLanguage ||
+    keyLanguage !== provenanceLanguage
+  ) {
+    return false;
+  }
+
+  const currentOps =
+    Array.isArray(key.ops)
+      ? key.ops.map((op) =>
+          String(op),
+        )
+      : [];
+
+  if (
+    currentOps.length !==
+      provenance.ops.length ||
+    currentOps.some(
+      (op, index) =>
+        op !== provenance.ops[index],
+    )
+  ) {
+    return false;
+  }
+
+  const policy =
+    evaluateReviewedExternalLexiconEvidenceOperationPolicyV0_1(
+      {
+        sourceId:
+          provenance.sourceId,
+        embryo:
+          provenance.embryo,
+        ops:
+          provenance.ops,
+        segment:
+          provenance.segment,
+        carrierForm:
+          provenance.carrierForm,
+      },
+    );
+
+  if (!policy.allowed) {
+    return false;
+  }
+
+  const evidence =
+    Array.isArray(key.evidence)
+      ? key.evidence
+      : [];
+
+  return evidence.some(
+    (line) =>
+      typeof line === "string" &&
+      line.trim() ===
+        provenance.evidenceText &&
+      line.trim() ===
+        trusted.evidenceText,
+  );
+}
+
 
 export type ReviewedFunctionalCandidateProjectionV0_1 =
   Record<string, unknown>;
@@ -284,7 +637,20 @@ export function buildReviewedFunctionalCandidateProjectionsFromRootMapV0_1(
     targetWord: string;
   },
 ): ReviewedFunctionalCandidateProjectionV0_1[] {
-  const targetWord = String(params.targetWord ?? "").trim();
+  const requestedTargetWord =
+    String(
+      params.targetWord ?? "",
+    ).trim();
+
+  if (!requestedTargetWord) {
+    return [];
+  }
+
+  const targetWord =
+    resolveTrustedRootMapBasisV0_1(
+      params.rootMap,
+      requestedTargetWord,
+    );
 
   if (!targetWord) {
     return [];
@@ -294,19 +660,19 @@ export function buildReviewedFunctionalCandidateProjectionsFromRootMapV0_1(
     ? params.rootMap.keys
     : [];
 
+  const authorizedEvidenceByEmbryo =
+    buildTargetAuthorizedReviewedFunctionalRuntimeEvidenceByEmbryoV0_1(
+      targetWord,
+    );
+
   const reviewedEmbryos = new Set(
     keys
-      .filter((key) => {
-        const evidence = Array.isArray(key?.evidence)
-          ? key.evidence
-          : [];
-
-        return evidence.some((entry) =>
-          String(entry).includes(
-            "reviewed functional free-operator evidence",
-          ),
-        );
-      })
+      .filter((key) =>
+        rootMapKeyHasReviewedFunctionalEvidenceV0_1(
+          key,
+          authorizedEvidenceByEmbryo,
+        ),
+      )
       .map((key) => String(key?.token ?? "").trim())
       .filter(Boolean),
   );
@@ -406,6 +772,279 @@ export function buildReviewedFunctionalCandidateProjectionsFromRootMapV0_1(
     }));
 }
 
+export function buildFunctionalCandidateCompositionsFromRootMapV0_1(
+  params: {
+    rootMap: RootMapV1 | null | undefined;
+    targetWord: string;
+  },
+): ReviewedFunctionalCandidateProjectionV0_1[] {
+  const requestedTargetWord =
+    String(
+      params.targetWord ?? "",
+    ).trim();
+
+  if (!requestedTargetWord) {
+    return [];
+  }
+
+  const targetWord =
+    resolveTrustedRootMapBasisV0_1(
+      params.rootMap,
+      requestedTargetWord,
+    );
+
+  if (!targetWord) {
+    return [];
+  }
+
+  const tokens = Array.isArray(
+    params.rootMap?.tokens,
+  )
+    ? params.rootMap.tokens
+        .map((item) =>
+          String(item?.token ?? "")
+            .trim()
+            .toUpperCase(),
+        )
+        .filter(Boolean)
+    : [];
+
+  if (tokens.length < 2) {
+    return [];
+  }
+
+  const keys = Array.isArray(
+    params.rootMap?.keys,
+  )
+    ? params.rootMap.keys
+    : [];
+
+  const authorizedEvidenceByEmbryo =
+    buildTargetAuthorizedReviewedFunctionalRuntimeEvidenceByEmbryoV0_1(
+      targetWord,
+    );
+
+  const keyByToken = new Map(
+    keys.map((key) => [
+      String(key?.token ?? "")
+        .trim()
+        .toUpperCase(),
+      key,
+    ]),
+  );
+
+  const components = tokens.map(
+    (token) => {
+      const key = keyByToken.get(token);
+
+      if (!key) {
+        return null;
+      }
+
+      // First-class functional composition requires each
+      // participating RootMap key to be fully eligible.
+      //
+      // Non-supported statuses remain diagnostic/context-only
+      // material and must not be relabeled as structural evidence
+      // merely because another component has reviewed evidence.
+      if (key.status !== "supported") {
+        return null;
+      }
+
+      const language =
+        String(key.language ?? "").trim();
+
+      const plainMeaning =
+        String(key.gloss ?? "").trim();
+
+      if (!language || !plainMeaning) {
+        return null;
+      }
+
+      return {
+        embryo: token,
+        language,
+        plainMeaning,
+        evidenceState:
+          rootMapKeyHasReviewedFunctionalEvidenceV0_1(
+            key,
+            authorizedEvidenceByEmbryo,
+          )
+            ? "reviewed"
+            : "structural",
+      };
+    },
+  );
+
+  if (
+    components.some(
+      (component) => component == null,
+    )
+  ) {
+    return [];
+  }
+
+  const concreteComponents =
+    components.filter(
+      (
+        component,
+      ): component is NonNullable<
+        (typeof components)[number]
+      > => component != null,
+    );
+
+  const languages = Array.from(
+    new Set(
+      concreteComponents.map(
+        (component) =>
+          component.language
+            .trim()
+            .toLowerCase(),
+      ),
+    ),
+  );
+
+  if (languages.length !== 1) {
+    return [];
+  }
+
+  const reviewedCount =
+    concreteComponents.filter(
+      (component) =>
+        component.evidenceState ===
+        "reviewed",
+    ).length;
+
+  // Structural RootMap material alone is not enough to
+  // promote a functional candidate.
+  if (reviewedCount === 0) {
+    return [];
+  }
+
+  const allReviewed =
+    reviewedCount ===
+    concreteComponents.length;
+
+  const language =
+    concreteComponents[0].language;
+
+  const expression =
+    tokens.join(" + ");
+
+  const composedMeaning =
+    String(
+      params.rootMap?.composedMeaning ??
+        "",
+    ).trim();
+
+  if (!composedMeaning) {
+    return [];
+  }
+
+  const candidateId =
+    `rootmap-composition:${language.toLowerCase()}:${tokens
+      .map((token) =>
+        token.toLowerCase(),
+      )
+      .join("+")}`;
+
+  return [
+    {
+      id: candidateId,
+      language,
+      family:
+        "rootmap-functional-composition",
+      form: expression,
+
+      decomposition: {
+        parts: [...tokens],
+        functionalStatement:
+          composedMeaning,
+      },
+
+      status: "experimental",
+      confidenceTag: "speculative",
+      sourceKind:
+        "rootmap_functional_composition",
+
+      candidateId,
+      displayForm: expression,
+      candidateLanguage: language,
+      functionalStatement:
+        composedMeaning,
+      gloss: composedMeaning,
+
+      claimType:
+        "functionalMotivation",
+      originClaim: "not_claimed",
+      historicalRelation:
+        "not_evaluated",
+
+      // A multi-embryo expression is not itself
+      // represented as one isolated standalone embryo.
+      embryo: null,
+      embryoLanguage: null,
+      isolatedStandaloneForm: null,
+      plainStandaloneGloss: null,
+
+      sourceNote:
+        "Composition projected from live RootMap component evidence. Component review states remain separate; this is functional motivation, not historical-origin or winner evidence.",
+
+      segmentation: {
+        kind: "functionalComposition",
+        components:
+          concreteComponents,
+      },
+
+      semanticBridge:
+        composedMeaning,
+
+      expansionChain: [
+        ...tokens,
+        targetWord.toUpperCase(),
+      ],
+
+      // Component-level lexical review does not validate the
+      // composition-level semantic bridge. Until a separately
+      // reviewed composition bridge exists, the composed candidate
+      // remains Partial even when every component is reviewed.
+      validationOutcome:
+        "partial",
+
+      validationReasons:
+        allReviewed
+          ? [
+              "rootmap_multi_embryo_composition",
+              "all_components_reviewed_functional_evidence",
+              "composition_semantic_bridge_not_reviewed",
+            ]
+          : [
+              "rootmap_multi_embryo_composition",
+              "mixed_component_evidence",
+              "at_least_one_reviewed_functional_component",
+              "composition_semantic_bridge_not_reviewed",
+            ],
+
+      rankGroup:
+        "partialFunctionalMotivation",
+
+      rankScore:
+        70,
+
+      rankReason:
+        allReviewed
+          ? "all component lexical evidence is reviewed, but the composition-level semantic bridge remains unreviewed"
+          : "multi-embryo functional composition has mixed reviewed and structural component evidence; the composition-level semantic bridge remains unreviewed",
+
+      claimBoundary:
+        "partial functional composition only; component evidence does not authorize the composition-level semantic bridge; not historical origin or fully reviewed candidate truth",
+
+      userDecisionPosture:
+        "user_decides",
+    },
+  ];
+}
+
 
 export function buildRootMapV1(params: {
 basis: string;
@@ -414,17 +1053,93 @@ basis: string;
 }): RootMapV1 | null {
   const reviewedEvidenceByEmbryo = buildReviewedFunctionalRuntimeEvidenceByEmbryoV0_1();
   const basis = String(params.basis ?? "").trim();
-  const minRoots = Array.isArray(params.minRoots) ? params.minRoots : [];
+  const providedMinRoots =
+    Array.isArray(params.minRoots)
+      ? params.minRoots
+      : [];
 
   if (!basis) return null;
-  if (minRoots.length === 0) {
-    return {
-      tokens: [],
-      keys: [],
-      composedMeaning: "",
-      notes: ["No minRoots hypotheses available; RootMap not emitted."],
-    };
+
+  if (providedMinRoots.length === 0) {
+    return registerTrustedRootMapV0_1(
+      {
+        tokens: [],
+        keys: [],
+        composedMeaning: "",
+        notes: [
+          "No minRoots hypotheses available; RootMap not emitted.",
+        ],
+      },
+      basis,
+    );
   }
+
+  const normalizedBasis =
+    normalizeTrustedRootMapBasisV0_1(
+      basis,
+    );
+
+  const basisMatchedMinRoots =
+    providedMinRoots.filter(
+      (hypothesis) =>
+        normalizeTrustedRootMapBasisV0_1(
+          hypothesis?.basis,
+        ) === normalizedBasis,
+    );
+
+  // Legacy structural fixtures may predate the required hypothesis.basis
+  // field. They may still produce bounded structural RootMap output, but
+  // they can never authorize reviewed evidence or trusted projections.
+  const legacyUnscopedMinRoots =
+    providedMinRoots.filter(
+      (hypothesis) =>
+        normalizeTrustedRootMapBasisV0_1(
+          hypothesis?.basis,
+        ) === "",
+    );
+
+  const minRoots =
+    basisMatchedMinRoots.length > 0
+      ? basisMatchedMinRoots
+      : legacyUnscopedMinRoots;
+
+  const selectedHypothesisBasisTrusted =
+    basisMatchedMinRoots.length > 0;
+
+  // Explicitly mismatched hypotheses are rejected rather than
+  // attributed to the caller-provided RootMap basis.
+  if (minRoots.length === 0) {
+    return registerTrustedRootMapV0_1(
+      {
+        tokens: [],
+        keys: [],
+        composedMeaning: "",
+        notes: [
+          "No minRoots hypotheses matched the RootMap basis; RootMap not emitted.",
+        ],
+      },
+      basis,
+    );
+  }
+
+  // Target-word reviewed evidence authorization is owned by
+  // canonical operator discovery. A matching reviewed carrier and
+  // allowed operation are necessary but not sufficient by themselves.
+  const reviewedEvidenceEligibleOperators =
+    new Set(
+      discoverCanonicalOperatorCandidatesV0_1(
+        basis,
+      )
+        .filter(
+          (candidate) =>
+            candidate.reviewedEvidenceEligible ===
+            true,
+        )
+        .map(
+          (candidate) =>
+            candidate.operatorId,
+        ),
+    );
 
 
   // Deterministic selection:
@@ -525,6 +1240,33 @@ basis: string;
           )
         : null;
 
+    const reviewedEvidenceTargetAuthorized =
+      reviewedEvidenceEligibleOperators.has(
+        protoRootId,
+      );
+
+    const reviewedEvidenceLanguageAuthorized =
+      Boolean(
+        reviewedFunctionalEvidence,
+      ) &&
+      language
+        .trim()
+        .toLocaleLowerCase("en-US") ===
+        String(
+          reviewedFunctionalEvidence?.language ??
+            "",
+        )
+          .trim()
+          .toLocaleLowerCase("en-US");
+
+    const reviewedEvidenceAuthorized =
+      selectedHypothesisBasisTrusted &&
+      Boolean(reviewedFunctionalEvidence) &&
+      evidenceOperationEvaluation?.allowed ===
+        true &&
+      reviewedEvidenceTargetAuthorized &&
+      reviewedEvidenceLanguageAuthorized;
+
     const carrierNoteContainsReviewedCitationMetadata =
       Boolean(
         protoCarrierHit?.notes &&
@@ -543,7 +1285,7 @@ basis: string;
 
     const carrierNoteOperationAllowed =
       !carrierNoteContainsReviewedCitationMetadata ||
-      evidenceOperationEvaluation?.allowed === true;
+      reviewedEvidenceAuthorized;
 
     if (
       shouldExposeCarrierNote &&
@@ -555,7 +1297,7 @@ basis: string;
 
     if (
       reviewedFunctionalEvidence &&
-      evidenceOperationEvaluation?.allowed &&
+      reviewedEvidenceAuthorized &&
       !evidence.includes(
         reviewedFunctionalEvidence.evidenceText,
       )
@@ -568,17 +1310,53 @@ basis: string;
       protoCarrierHit?.gloss,
       protoCarrierHit?.notes,
       Boolean(reviewedFunctionalEvidence),
-      evidenceOperationEvaluation?.allowed === true,
+      reviewedEvidenceAuthorized,
     );
 
-    keys.push({
+    const key: RootKeyV1 = {
       token: protoRootId,
       language,
       gloss,
-      evidence: evidence.length > 0 ? evidence : ["No carrier evidence (speculative)."],
+      evidence:
+        evidence.length > 0
+          ? evidence
+          : [
+              "No carrier evidence (speculative).",
+            ],
       status,
-      ops: ops.length > 0 ? ops : undefined,
-    });
+      ops:
+        ops.length > 0
+          ? [...ops]
+          : undefined,
+    };
+
+    keys.push(key);
+
+    if (
+      reviewedEvidenceAuthorized &&
+      reviewedFunctionalEvidence &&
+      evidenceOperationEvaluation?.allowed ===
+        true
+    ) {
+      reviewedRootMapKeyProvenanceV0_1.set(
+        key,
+        {
+          sourceId:
+            reviewedFunctionalEvidence.sourceId,
+          embryo:
+            reviewedFunctionalEvidence.embryo,
+          language,
+          evidenceText:
+            reviewedFunctionalEvidence.evidenceText,
+          carrierForm,
+          segment:
+            String(
+              chosenCarrier?.segment ?? "",
+            ),
+          ops: [...ops],
+        },
+      );
+    }
 
     // Optional carriers list (secondary “carriers”, not keys)
     if (proto?.carriers) {
@@ -614,12 +1392,32 @@ basis: string;
     carriers: Array.isArray(h.carriers) ? (h.carriers as any[]) : [],
   });
 
-  return {
+  const rootMap: RootMapV1 = {
     tokens,
     keys,
-    carriers: carriersOut.length > 0 ? carriersOut : undefined,
-    spans: spans ?? undefined,
+    carriers:
+      carriersOut.length > 0
+        ? carriersOut
+        : undefined,
+    spans:
+      spans ?? undefined,
     composedMeaning,
-    notes: notes.length > 0 ? notes : undefined,
+    notes:
+      notes.length > 0
+        ? notes
+        : undefined,
   };
+
+  if (!selectedHypothesisBasisTrusted) {
+    // Structural-only legacy RootMaps are immutable but deliberately
+    // absent from private trusted RootMap provenance.
+    return deepFreezeRootMapValueV0_1(
+      rootMap,
+    );
+  }
+
+  return registerTrustedRootMapV0_1(
+    rootMap,
+    basis,
+  );
 }
