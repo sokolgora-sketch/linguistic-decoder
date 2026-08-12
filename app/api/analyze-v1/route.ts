@@ -9,6 +9,9 @@ import { backfillEvidencePackageSignalsCountV01 } from "./evidencePackage.signal
 import { toAnalyzeWordResultV1Contract } from "@/shared/analyzeWordResult.v1.contract";
 import { ensurePrimaryAndCandidatePaths } from "@/shared/ensurePaths";
 import { extractCarrierVoicesFromIpaV0_1 } from "@/shared/vowels/extractCarrierVoicesFromIpa.v0.1";
+import {
+  selectEvidencePackageFunctionalPathV0_1,
+} from "@/shared/evidencePackageFunctionalPath.v0_1";
 // ✅ Contract guard
 import { AnalyzeWordResultV1ContractSchema } from "@/shared/analyzeWordResult.v1.contract";
 
@@ -42,9 +45,6 @@ function applyDevOriginClaimGates(reqUrl?: string): boolean | null {
 }
 
  // --- EvidencePackage helpers (server-safe) ---
-type Vowel = "A"|"E"|"I"|"O"|"U"|"Y"|"Ë";
-
-
   type BuildTelemetryVmForEvidencePackageParams = {
     word: string;
     mode: unknown;
@@ -129,14 +129,61 @@ function buildTelemetryVmForEvidencePackage(params: BuildTelemetryVmForEvidenceP
   const outAny: any = out as any;
   const heartAny: any = heartInstrumentV1 as any;
   const surfaceVowels =
-      Array.isArray(heartAny?.surfaceVowels) ? heartAny.surfaceVowels : null;
+    Array.isArray(
+      heartAny?.surfaceVowels,
+    )
+      ? heartAny.surfaceVowels
+      : null;
+
+  const detectedVowels =
+    Array.isArray(
+      outAny?.primaryPath?.voicePath,
+    )
+      ? outAny.primaryPath.voicePath
+      : Array.isArray(
+            outAny?.heart?.math7
+              ?.primary?.vowels,
+          )
+        ? outAny.heart.math7
+            .primary.vowels
+        : null;
+
+  const functionalRoot0 =
+    Array.isArray(
+      outAny?.deepRoot
+        ?.functionalRoots,
+    ) &&
+    outAny.deepRoot
+      .functionalRoots.length > 0
+      ? outAny.deepRoot
+          .functionalRoots[0]
+      : null;
+
+  const emittedFunctionalPath =
+    Array.isArray(
+      outAny?.heart?.math7
+        ?.primary?.vowels,
+    )
+      ? outAny.heart.math7
+          .primary.vowels
+      : outAny?.primaryPath
+          ?.voicePath;
 
   const functionalVowels =
-      Array.isArray(outAny?.heart?.math7?.primary?.vowels)
-        ? outAny.heart.math7.primary.vowels
-        : (Array.isArray(outAny?.primaryPath?.voicePath) ? outAny.primaryPath.voicePath : null);
+    selectEvidencePackageFunctionalPathV0_1({
+      deepRootPath:
+        functionalRoot0?.vowelPath ??
+        functionalRoot0?.vowel_path,
+      emittedFunctionalPath,
+      detectedPath:
+        detectedVowels,
+    });
 
-  const spectrum = buildSpectrumVM(surfaceVowels, functionalVowels);
+  const spectrum =
+    buildSpectrumVM(
+      surfaceVowels,
+      functionalVowels,
+    );
 
   return {
     wordShown: String(word ?? ""),
@@ -146,12 +193,25 @@ function buildTelemetryVmForEvidencePackage(params: BuildTelemetryVmForEvidenceP
     readout: {
       word: String(word ?? ""),
       normalizedWord: String(outAny?.sanitized ?? word ?? ""),
-      voicePath: Array.isArray(functionalVowels) ? functionalVowels : [],
-      voicePathSurface: Array.isArray(surfaceVowels) ? surfaceVowels : [],
-      voicePathFunctional: Array.isArray(functionalVowels) ? functionalVowels : [],
+      voicePath:
+        Array.isArray(detectedVowels)
+          ? detectedVowels
+          : [],
+      voicePathSurface:
+        Array.isArray(surfaceVowels)
+          ? surfaceVowels
+          : [],
+      voicePathFunctional:
+        Array.isArray(functionalVowels)
+          ? functionalVowels
+          : [],
       voicePathDelta:
-        Array.isArray(surfaceVowels) && Array.isArray(functionalVowels)
-          ? (surfaceVowels.join("") + " vs " + functionalVowels.join(""))
+        Array.isArray(surfaceVowels) &&
+        Array.isArray(functionalVowels)
+          ? surfaceVowels.join("") ===
+            functionalVowels.join("")
+            ? "MATCH"
+            : "DIVERGE"
           : "",
       // IMPORTANT: instrument currently renders spectrum from readout
       sevenPrinciplesSpectrum: spectrum,

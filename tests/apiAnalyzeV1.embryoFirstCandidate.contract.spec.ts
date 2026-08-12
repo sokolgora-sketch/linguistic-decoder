@@ -1,5 +1,8 @@
 import { GET } from "../app/api/analyze-v1/route";
 import { projectEmbryoFirstCandidateForAnalyzeV1 } from "../src/shared/analysisAdapter";
+import {
+  selectEvidencePackageFunctionalPathV0_1,
+} from "../src/shared/evidencePackageFunctionalPath.v0_1";
 
 const REQUIRED_FIELDS = [
   "candidateId",
@@ -61,9 +64,26 @@ const RANK_GROUPS = [
   "unresolved",
 ];
 
-async function analyzeV1(word: string): Promise<unknown> {
+async function analyzeV1(
+  word: string,
+  ipa?: string,
+): Promise<unknown> {
+  const params =
+    new URLSearchParams({
+      word,
+    });
+
+  if (ipa) {
+    params.set(
+      "ipa",
+      ipa,
+    );
+  }
+
   const response = await GET(
-    new Request(`http://localhost/api/analyze-v1?word=${encodeURIComponent(word)}`),
+    new Request(
+      `http://localhost/api/analyze-v1?${params.toString()}`,
+    ),
   );
 
   expect(response.status).toBe(200);
@@ -129,6 +149,194 @@ describe("analyze-v1 embryo-first candidate contract v0.1", () => {
       }
     },
   );
+
+  it("keeps emitted functional evidence ahead of detected fallback when DeepRoot is absent", () => {
+    expect(
+      selectEvidencePackageFunctionalPathV0_1({
+        deepRootPath: null,
+        emittedFunctionalPath: [
+          "U",
+          "I",
+        ],
+        detectedPath: [
+          "U",
+          "Y",
+        ],
+      }),
+    ).toEqual([
+      "U",
+      "I",
+    ]);
+  });
+
+  it("keeps DeepRoot functional path ahead of emitted functional evidence", () => {
+    expect(
+      selectEvidencePackageFunctionalPathV0_1({
+        deepRootPath: "U→I",
+        emittedFunctionalPath: [
+          "U",
+          "Y",
+        ],
+        detectedPath: [
+          "U",
+          "Y",
+        ],
+      }),
+    ).toEqual([
+      "U",
+      "I",
+    ]);
+  });
+
+  it("keeps the study evidence package aligned with DeepRoot functional truth", async () => {
+    const payload = record(
+      await analyzeV1("study"),
+    );
+
+    const deepRoot = record(
+      payload.deepRoot,
+    );
+
+    const functionalRoots =
+      deepRoot.functionalRoots;
+
+    expect(
+      Array.isArray(functionalRoots),
+    ).toBe(true);
+
+    const functionalRoot =
+      record(
+        (
+          functionalRoots as unknown[]
+        )[0],
+      );
+
+    expect(
+      functionalRoot.vowelPath,
+    ).toBe("U→I");
+
+    const evidencePackage =
+      record(
+        payload.evidencePackage,
+      );
+
+    const summary =
+      record(
+        evidencePackage.summary,
+      );
+
+    expect(
+      summary.voicePath,
+    ).toBe("U → Y");
+
+    expect(
+      summary.voicePathSurface,
+    ).toBe("U → Y");
+
+    expect(
+      summary.voicePathFunctional,
+    ).toBe("U → I");
+
+    expect(
+      summary.voicePathDelta,
+    ).toBe("DIVERGE");
+
+    const spectrum =
+      record(
+        evidencePackage
+          .sevenPrinciplesSpectrum,
+      );
+
+    const surface =
+      record(
+        spectrum.surface,
+      );
+
+    const functional =
+      record(
+        spectrum.functional,
+      );
+
+    const delta =
+      record(
+        spectrum.delta,
+      );
+
+    expect(
+      surface.indices1,
+    ).toEqual([5, 6]);
+
+    expect(
+      functional.indices1,
+    ).toEqual([5, 3]);
+
+    expect(
+      delta.surfaceIndices1,
+    ).toEqual([5, 6]);
+
+    expect(
+      delta.functionalIndices1,
+    ).toEqual([5, 3]);
+  });
+
+  it("keeps functional delta and IPA carrier delta separate for study", async () => {
+    const payload =
+      record(
+        await analyzeV1(
+          "study",
+          "/ʊʏ/",
+        ),
+      );
+
+    const evidencePackage =
+      record(
+        payload.evidencePackage,
+      );
+
+    const summary =
+      record(
+        evidencePackage.summary,
+      );
+
+    expect(
+      summary.voicePath,
+    ).toBe("U → Y");
+
+    expect(
+      summary.voicePathSurface,
+    ).toBe("U → Y");
+
+    expect(
+      summary.voicePathFunctional,
+    ).toBe("U → I");
+
+    expect(
+      summary.voicePathDelta,
+    ).toBe("DIVERGE");
+
+    expect(
+      summary.voicePathCarrier,
+    ).toBe("U → Y");
+
+    expect(
+      summary.voicePathCarrierDelta,
+    ).toBe("MATCH");
+
+    const spectrum =
+      record(
+        evidencePackage
+          .sevenPrinciplesSpectrum,
+      );
+
+    const functional =
+      record(
+        spectrum.functional,
+      );
+
+    expect(
+      functional.indices1,
+    ).toEqual([5, 3]);
+  });
 
   it("does not let sourceKind SEED imply validation", () => {
     const candidate = projectEmbryoFirstCandidateForAnalyzeV1(

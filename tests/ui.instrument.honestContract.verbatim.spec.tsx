@@ -32,15 +32,38 @@ function minimalPayload(): any {
 }
 
 describe("Open Instrument honest contract", () => {
-  it("renders the foundation contract verbatim", () => {
+  it("keeps the full foundation contract available without putting it before the useful result", () => {
     const { container } = render(<HonestContractCard />);
 
-    expect(screen.getByText("honest contract")).toBeInTheDocument();
-    expect(screen.getByText("What Open Instrument is")).toBeInTheDocument();
-    expect(screen.getByText(OPEN_INSTRUMENT_HONEST_CONTRACT)).toBeInTheDocument();
-    expect(screen.getByText("collapse")).toBeInTheDocument();
-    expect(screen.getByText("Visible by default. Collapse after reading; keep this boundary in mind before using candidates.")).toBeInTheDocument();
-    expect(container.querySelector("details")).toHaveAttribute("open");
+    expect(
+      screen.getByText("boundary"),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByText(
+        "Functional motivation, not historical etymology",
+      ),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByText(
+        OPEN_INSTRUMENT_HONEST_CONTRACT,
+      ),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByText("expand"),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByText(
+        "Optional context. The primary result stays focused on functional motivation.",
+      ),
+    ).toBeInTheDocument();
+
+    expect(
+      container.querySelector("details"),
+    ).not.toHaveAttribute("open");
   });
 
   it("keeps the contract visible in the post-analysis instrument shell", () => {

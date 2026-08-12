@@ -151,7 +151,7 @@ describe("/api/analyze-v1 evidence smoke (curl)", () => {
 
 
   test(
-    "GET carrier lane: EvidencePackage summary includes voicePathCarrier + DIVERGE when ipa is provided",
+    "GET carrier lane: EvidencePackage keeps functional delta separate from carrier delta when ipa is provided",
     async () => {
       const ipa = encodeURIComponent("/ˈrɪð(ə)m/");
       const { status, json, raw } = await getJson(
@@ -163,9 +163,11 @@ describe("/api/analyze-v1 evidence smoke (curl)", () => {
       const sum: any = json?.evidencePackage?.summary;
       expect(sum).toBeTruthy();
 
-      // Lock: carrier must be emitted and delta must be MATCH|DIVERGE (rhythm should DIVERGE: Y vs I→Ë)
+      // Functional delta and IPA carrier delta are independent truth layers.
+      // rhythm: surface Y == functional Y, while carrier I→Ë differs.
+      expect(sum.voicePathDelta).toBe("MATCH");
       expect(sum.voicePathCarrier).toBe("I → Ë");
-      expect(sum.voicePathDelta).toBe("DIVERGE");
+      expect(sum.voicePathCarrierDelta).toBe("DIVERGE");
 
       // sanity: response wasn't HTML
       expect(raw.trim().startsWith("{")).toBe(true);
@@ -174,7 +176,7 @@ describe("/api/analyze-v1 evidence smoke (curl)", () => {
   );
 
   test(
-    "POST carrier lane: EvidencePackage summary includes voicePathCarrier + DIVERGE when ipa is provided",
+    "POST carrier lane: EvidencePackage keeps functional delta separate from carrier delta when ipa is provided",
     async () => {
       const { status, json, raw } = await postJson(`${BASE}/api/analyze-v1`, {
         word: "rhythm",
@@ -187,8 +189,9 @@ describe("/api/analyze-v1 evidence smoke (curl)", () => {
       const sum: any = json?.evidencePackage?.summary;
       expect(sum).toBeTruthy();
 
+      expect(sum.voicePathDelta).toBe("MATCH");
       expect(sum.voicePathCarrier).toBe("I → Ë");
-      expect(sum.voicePathDelta).toBe("DIVERGE");
+      expect(sum.voicePathCarrierDelta).toBe("DIVERGE");
 
       // sanity: response wasn't HTML
       expect(raw.trim().startsWith("{")).toBe(true);

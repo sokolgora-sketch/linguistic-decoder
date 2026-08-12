@@ -33,6 +33,7 @@ import { EvidenceLedgerCard } from '../ledger/EvidenceLedgerCard';
 import { buildCandidateRowsFromVM } from '../candidates/candidateModel';
 import { CandidatesAccordion } from '../candidates/CandidatesAccordion';
 import { DeepRootHeartGateSummaryCard } from "./DeepRootHeartGateSummaryCard";
+import { EmbryoExpansionContextCardV0_1 } from "./sections/EmbryoExpansionContextCard.v0_1";
 import { OriginClaimCard } from '@/components/OriginClaimCard';
 import { cn } from "@/lib/utils";
 import { safeText } from "./safeText";
@@ -73,7 +74,7 @@ const INSTRUMENT_SECTIONS: Array<{
   {
     id: "overview",
     label: "Overview",
-    description: "Readout, evidence trace, and hypothesis summary in one inspection surface.",
+    description: "Functional motivation first, with the deterministic readout underneath.",
     accent: "blue",
   },
   {
@@ -85,7 +86,7 @@ const INSTRUMENT_SECTIONS: Array<{
   {
     id: "candidates",
     label: "Candidates",
-    description: "Candidate rows remain inspection records, not a forced answer.",
+    description: "Functional candidate first; secondary engine records stay collapsed.",
     accent: "amber",
   },
   {
@@ -97,7 +98,7 @@ const INSTRUMENT_SECTIONS: Array<{
   {
     id: "advanced",
     label: "Advanced",
-    description: "Mask, carrier, oracle, gate, and raw-payload diagnostics for the current run.",
+    description: "Technical diagnostics, gates, claim boundaries, oracle, and raw payload.",
     accent: "neutral",
   },
 ];
@@ -503,35 +504,30 @@ export function InstrumentPanel(props: Props) {
 
         <div className="space-y-4">
           <TabPanel id="overview" active={activeSection}>
-            <div className="grid gap-4 xl:grid-cols-12">
-              <div className="space-y-4 xl:col-span-7">
-                <AnalysisStatusCardV0_1
-                  status={
-                    vm.analysisStatusV0_1 ?? {
-                      kind: "missing",
-                      missing: "not_emitted",
-                      note: "analysisStatusV0_1",
-                    }
-                  }
-                />
-                <ReadoutCard
-                  readout={vm.readout}
-                  onCopySummary={() => void copyText("Summary copied.", evidenceSummaryText)}
-                  onCopyFullJson={handleCopyFullJson}
-                />
-                <ShellSection title="Constructed reading (hypothesis)" subtitle="Inspection summary; not an origin claim.">
-                  <MeaningPanel vm={vm} />
-                </ShellSection>
-              </div>
-              <div className="space-y-4 xl:col-span-5">
-                <EvidenceTraceCard
-                  readout={vm.readout}
-                  ledgerModel={ledgerModel}
-                  candidateRows={candidateRows}
-                  rootMap={vm.rootMap}
-                />
-                <ToolBoundaryCard />
-              </div>
+            <div className="space-y-4">
+              <EmbryoExpansionContextCardV0_1
+                vm={vm}
+              />
+
+              <ReadoutCard
+                readout={vm.readout}
+                onCopySummary={() =>
+                  void copyText(
+                    "Summary copied.",
+                    evidenceSummaryText,
+                  )
+                }
+                onCopyFullJson={
+                  handleCopyFullJson
+                }
+              />
+
+              <ShellSection
+                title="Constructed reading"
+                subtitle="Plain deterministic interpretation for the current word."
+              >
+                <MeaningPanel vm={vm} />
+              </ShellSection>
             </div>
           </TabPanel>
 
@@ -564,8 +560,23 @@ export function InstrumentPanel(props: Props) {
 
           <TabPanel id="candidates" active={activeSection}>
             <div className="space-y-4">
-              {candidateRows ? <DeepRootHeartGateSummaryCard rows={candidateRows as any} /> : null}
-              {candidateRows ? <CandidatesAccordion rows={candidateRows} /> : null}
+              <EmbryoExpansionContextCardV0_1
+                vm={vm}
+              />
+
+              {candidateRows ? (
+                <details className="rounded-xl border border-[#303a45] bg-[#10151c]">
+                  <summary className="cursor-pointer list-none px-4 py-3 text-sm font-semibold text-[#c6d0dc] [&::-webkit-details-marker]:hidden">
+                    Other candidate records
+                  </summary>
+
+                  <div className="border-t border-[#303a45] p-4">
+                    <CandidatesAccordion
+                      rows={candidateRows}
+                    />
+                  </div>
+                </details>
+              ) : null}
             </div>
           </TabPanel>
 
@@ -603,22 +614,72 @@ export function InstrumentPanel(props: Props) {
           <TabPanel id="advanced" active={activeSection}>
             <div className="grid gap-4 xl:grid-cols-12">
               <div className="space-y-4 xl:col-span-5">
-                <MaskCarrierCard word={String(props.wordForMask ?? vm.readout?.word ?? "").trim()} ipa={props.carrierIpa} />
+                <AnalysisStatusCardV0_1
+                  status={
+                    vm.analysisStatusV0_1 ?? {
+                      kind: "missing",
+                      missing: "not_emitted",
+                      note: "analysisStatusV0_1",
+                    }
+                  }
+                />
+
+                <MaskCarrierCard
+                  word={String(
+                    props.wordForMask ??
+                      vm.readout?.word ??
+                      "",
+                  ).trim()}
+                  ipa={props.carrierIpa}
+                />
+
                 <OracleProposeWithEngineOracleCardV01
-                  word={String(vm.readout.word ?? "").trim()}
-                  mode={vm.readout.mode && vm.readout.mode.kind === "present" && vm.readout.mode.value === "open" ? "open" : "strict"}
+                  word={String(
+                    vm.readout.word ?? "",
+                  ).trim()}
+                  mode={
+                    vm.readout.mode &&
+                    vm.readout.mode.kind ===
+                      "present" &&
+                    vm.readout.mode.value ===
+                      "open"
+                      ? "open"
+                      : "strict"
+                  }
                   onCopy={copyText}
                 />
+
+                <ToolBoundaryCard />
               </div>
+
               <div className="space-y-4 xl:col-span-7">
-                <OriginClaimGatesCard gates={vm.originClaimGates} />
-                <OriginClaimCard
-                  originClaim={vm.originClaim?.kind === "present" ? vm.originClaim.value : null}
+                {candidateRows ? (
+                  <DeepRootHeartGateSummaryCard
+                    rows={candidateRows as any}
+                  />
+                ) : null}
+
+                <OriginClaimGatesCard
+                  gates={vm.originClaimGates}
                 />
+
+                <OriginClaimCard
+                  originClaim={
+                    vm.originClaim?.kind ===
+                    "present"
+                      ? vm.originClaim.value
+                      : null
+                  }
+                />
+
                 <RawJsonCard
                   pretty={rawPretty}
-                  onCopyFullJson={handleCopyFullJson}
-                  engineVersion={engineVersion ?? null}
+                  onCopyFullJson={
+                    handleCopyFullJson
+                  }
+                  engineVersion={
+                    engineVersion ?? null
+                  }
                 />
               </div>
             </div>
