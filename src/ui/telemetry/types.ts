@@ -139,6 +139,13 @@ export interface DecompositionItemVM {
   notes: PresentOrMissing<string>;
 }
 
+export interface FunctionalCandidateComponentVM {
+  embryo: string;
+  language: PresentOrMissing<string>;
+  plainMeaning: PresentOrMissing<string>;
+  evidenceState: PresentOrMissing<string>;
+}
+
 export interface CandidateRowVM {
   index: number;
   id: string;
@@ -160,6 +167,11 @@ export interface CandidateRowVM {
   rankGroup?: PresentOrMissing<string>;
   claimBoundary?: PresentOrMissing<string>;
   userDecisionPosture?: PresentOrMissing<string>;
+
+  // Structured multi-embryo presentation data.
+  // Lifted only by contractAdapter from emitted candidate segmentation.
+  functionalComponents?:
+    PresentOrMissing<FunctionalCandidateComponentVM[]>;
 
   functionalStatement: PresentOrMissing<string>;
   vowelPath: PresentOrMissing<Vowel[]>;
