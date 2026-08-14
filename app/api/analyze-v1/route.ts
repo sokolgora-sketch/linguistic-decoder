@@ -6,6 +6,7 @@ import { enginePayloadToAnalysisResult } from "@/shared/analysisAdapter";
 import { adaptAnalyzeV1ToUI } from "@/shared/analyzeV1Adapter";
 import { buildEvidencePackageFromVM } from "@/ui/telemetry/buildEvidencePackageFromVM";
 import { backfillEvidencePackageSignalsCountV01 } from "./evidencePackage.signalsCount.backfill.v0.1";
+import { runAutomaticFunctionalCandidateProposalV0_1 } from "@/shared/orchestrator/automaticFunctionalCandidateProposal.v0.1";
 import { toAnalyzeWordResultV1Contract } from "@/shared/analyzeWordResult.v1.contract";
 import { ensurePrimaryAndCandidatePaths } from "@/shared/ensurePaths";
 import { extractCarrierVoicesFromIpaV0_1 } from "@/shared/vowels/extractCarrierVoicesFromIpa.v0.1";
@@ -554,6 +555,30 @@ const checked = AnalyzeWordResultV1ContractSchema.safeParse(out);
       });
     }
     if (final && typeof final === "object") (final as any).evidencePackage = evidencePackage;
+
+    const automaticFunctionalProposalV0_1 =
+      await runAutomaticFunctionalCandidateProposalV0_1({
+        word,
+        mode:
+          modeParsed === "open"
+            ? "open"
+            : "strict",
+        analysis: final,
+      });
+
+    if (
+      final &&
+      typeof final === "object" &&
+      (
+        automaticFunctionalProposalV0_1.attempted ||
+        automaticFunctionalProposalV0_1.status ===
+          "skipped_real_provider_not_ready"
+      )
+    ) {
+      (final as any).automaticFunctionalProposalV0_1 =
+        automaticFunctionalProposalV0_1;
+    }
+
     return NextResponse.json(final);
   } catch (err: any) {
     return NextResponse.json(
@@ -766,6 +791,30 @@ const checked = AnalyzeWordResultV1ContractSchema.safeParse(out);
       });
     }
     if (final && typeof final === "object") (final as any).evidencePackage = evidencePackage;
+
+    const automaticFunctionalProposalV0_1 =
+      await runAutomaticFunctionalCandidateProposalV0_1({
+        word,
+        mode:
+          modeParsed === "open"
+            ? "open"
+            : "strict",
+        analysis: final,
+      });
+
+    if (
+      final &&
+      typeof final === "object" &&
+      (
+        automaticFunctionalProposalV0_1.attempted ||
+        automaticFunctionalProposalV0_1.status ===
+          "skipped_real_provider_not_ready"
+      )
+    ) {
+      (final as any).automaticFunctionalProposalV0_1 =
+        automaticFunctionalProposalV0_1;
+    }
+
     return NextResponse.json(final);
   } catch (err: any) {
     return NextResponse.json(
