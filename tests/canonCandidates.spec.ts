@@ -40,7 +40,32 @@ describe('Canonical Candidate Adapter', () => {
 
     const result = enginePayloadToAnalysisResult(payload);
 
-    expect(result.candidates).toHaveLength(3);
+    expect(result.candidates).toHaveLength(4);
+
+    const composedCandidate =
+      result.candidates.find(
+        (candidate: any) =>
+          candidate?.candidateId ===
+          "rootmap-composition:sq:shtu+di",
+      );
+
+    expect(composedCandidate).toBeTruthy();
+    expect(
+      (composedCandidate as any)
+        ?.displayForm,
+    ).toBe("SHTU + DI");
+
+    expect(
+      (composedCandidate as any)
+        ?.validationOutcome,
+    ).toBe("partial");
+
+    expect(
+      (composedCandidate as any)
+        ?.rankGroup,
+    ).toBe(
+      "partialFunctionalMotivation",
+    );
     expect(result.consonants).toBeDefined();
     expect(result.consonants!.field.smoothHits + result.consonants!.field.spikyHits).toBeGreaterThanOrEqual(1);
 
