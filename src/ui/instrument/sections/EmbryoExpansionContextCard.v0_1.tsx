@@ -2,6 +2,7 @@ import React from "react";
 
 import type {
   CandidateRowVM,
+  FunctionalCandidateComponentVM,
   PresentOrMissing,
   TelemetryViewModel,
   Vowel,
@@ -73,109 +74,167 @@ function humanLanguage(
   );
 }
 
+function presentFunctionalComponents(
+  row: CandidateRowVM,
+): FunctionalCandidateComponentVM[] {
+  if (
+    row.functionalComponents?.kind !==
+      "present" ||
+    !Array.isArray(
+      row.functionalComponents.value,
+    )
+  ) {
+    return [];
+  }
+
+  return row.functionalComponents.value;
+}
+
+function candidateTokens(
+  row: CandidateRowVM,
+): string[] {
+  const components =
+    presentFunctionalComponents(row);
+
+  if (components.length > 0) {
+    return components
+      .map((component) =>
+        String(
+          component.embryo ?? "",
+        )
+          .trim()
+          .toUpperCase(),
+      )
+      .filter(Boolean);
+  }
+
+  const embryo =
+    presentString(row.embryo);
+
+  if (embryo) {
+    return [
+      embryo
+        .trim()
+        .toUpperCase(),
+    ];
+  }
+
+  const form =
+    presentString(row.form);
+
+  if (!form) {
+    return [];
+  }
+
+  const parts =
+    form
+      .split(/\s*\+\s*/u)
+      .map((part) =>
+        part.trim().toUpperCase(),
+      )
+      .filter(Boolean);
+
+  return parts.length > 0
+    ? parts
+    : [];
+}
+
+function isFunctionalCandidate(
+  row: CandidateRowVM,
+): boolean {
+  const claimType =
+    presentString(
+      row.claimType,
+    );
+
+  const embryo =
+    presentString(
+      row.embryo,
+    );
+
+  return (
+    claimType ===
+      "functionalMotivation" ||
+    (
+      claimType === null &&
+      Boolean(embryo)
+    )
+  );
+}
+
+function isCompositionCandidate(
+  row: CandidateRowVM,
+): boolean {
+  const sourceKind =
+    presentString(
+      row.sourceKind,
+    );
+
+  if (
+    sourceKind ===
+      "rootmap_functional_composition"
+  ) {
+    return true;
+  }
+
+  return (
+    candidateTokens(row).length > 1
+  );
+}
+
+function validationScore(
+  row: CandidateRowVM,
+): number {
+  const validation =
+    presentString(
+      row.validationOutcome,
+    );
+
+  if (validation === "validated") {
+    return 3;
+  }
+
+  if (validation === "partial") {
+    return 2;
+  }
+
+  return 1;
+}
+
 function usefulFunctionalCandidate(
   rows: CandidateRowVM[],
 ): CandidateRowVM | null {
   const functional =
-    rows.filter((row) => {
-      const claimType =
-        presentString(
-          row.claimType,
-        );
-
-      const embryo =
-        presentString(
-          row.embryo,
-        );
-
-      return (
-        claimType ===
-          "functionalMotivation" ||
-        (
-          claimType === null &&
-          Boolean(embryo)
-        )
-      );
-    });
+    rows.filter(
+      isFunctionalCandidate,
+    );
 
   if (functional.length === 0) {
     return null;
   }
 
-  const score = (
-    row: CandidateRowVM,
-  ): number => {
-    const validation =
-      presentString(
-        row.validationOutcome,
-      );
-
-    if (validation === "validated") {
-      return 3;
-    }
-
-    if (validation === "partial") {
-      return 2;
-    }
-
-    return 1;
-  };
-
   return (
     [...functional].sort(
-      (a, b) =>
-        score(b) - score(a) ||
-        a.index - b.index,
+      (a, b) => {
+        const compositionDelta =
+          Number(
+            isCompositionCandidate(b),
+          ) -
+          Number(
+            isCompositionCandidate(a),
+          );
+
+        if (compositionDelta !== 0) {
+          return compositionDelta;
+        }
+
+        return (
+          validationScore(b) -
+            validationScore(a) ||
+          a.index - b.index
+        );
+      },
     )[0] ?? null
-  );
-}
-
-function usefulFunctionalCompositionCandidate(
-  rows: CandidateRowVM[],
-  rootTokens: string[],
-): CandidateRowVM | null {
-  if (rootTokens.length < 2) {
-    return null;
-  }
-
-  const expectedExpression =
-    rootTokens
-      .join(" + ")
-      .trim()
-      .toUpperCase();
-
-  return (
-    rows.find((row) => {
-      const claimType =
-        presentString(
-          row.claimType,
-        );
-
-      const validation =
-        presentString(
-          row.validationOutcome,
-        );
-
-      const form =
-        presentString(
-          row.form,
-        );
-
-      return (
-        claimType ===
-          "functionalMotivation" &&
-        (
-          validation ===
-            "validated" ||
-          validation ===
-            "partial"
-        ) &&
-        form
-          ?.trim()
-          .toUpperCase() ===
-          expectedExpression
-      );
-    }) ?? null
   );
 }
 
@@ -250,22 +309,103 @@ export function EmbryoExpansionContextCardV0_1({
       vm.readout.word ?? "",
     ).trim();
 
+  const rows =
+    Array.isArray(
+      vm.candidates,
+    )
+      ? vm.candidates
+      : [];
+
+  const primaryCandidate =
+    usefulFunctionalCandidate(
+      rows,
+    );
+
+  if (!primaryCandidate) {
+    return (
+      <NoSupportedFunctionalCandidate
+        word={word}
+      />
+    );
+  }
+
   const rootTokens =
     Array.isArray(
       rootMap?.tokens,
     )
       ? rootMap.tokens
           .map((item) =>
-            String(item.token ?? "")
+            String(
+              item.token ?? "",
+            )
               .trim()
               .toUpperCase(),
           )
           .filter(Boolean)
       : [];
 
+  const keys =
+    Array.isArray(
+      rootMap?.keys,
+    )
+      ? rootMap.keys
+      : [];
+
+  const keyByToken =
+    new Map(
+      keys.map((key) => [
+        String(
+          key.token ?? "",
+        )
+          .trim()
+          .toUpperCase(),
+        key,
+      ]),
+    );
+
+  const reviewed =
+    new Set(
+      (
+        status?.reviewedOperators ??
+        []
+      ).map((token) =>
+        String(token)
+          .trim()
+          .toUpperCase(),
+      ),
+    );
+
   const functionalPath =
     renderedPath(
-      vm.readout.voicePathFunctional,
+      vm.readout
+        .voicePathFunctional,
+    );
+
+  const primaryValidation =
+    presentString(
+      primaryCandidate
+        .validationOutcome,
+    );
+
+  const useLegacyRootMapComposition =
+    !isCompositionCandidate(
+      primaryCandidate,
+    ) &&
+    primaryValidation ===
+      "validated" &&
+    !presentString(
+      primaryCandidate
+        .functionalStatement,
+    ) &&
+    rootTokens.length > 1 &&
+    rootTokens.some((token) =>
+      reviewed.has(token),
+    ) &&
+    Boolean(
+      String(
+        rootMap?.composedMeaning ??
+          "",
+      ).trim(),
     );
 
   let tokens: string[] = [];
@@ -290,54 +430,13 @@ export function EmbryoExpansionContextCardV0_1({
       | "proposed";
   }> = [];
 
-  if (rootTokens.length > 0) {
-    tokens =
-      rootTokens;
-
-    const composedCandidate =
-      usefulFunctionalCompositionCandidate(
-        Array.isArray(
-          vm.candidates,
-        )
-          ? vm.candidates
-          : [],
-        rootTokens,
-      );
+  if (
+    useLegacyRootMapComposition
+  ) {
+    tokens = rootTokens;
 
     candidateExpression =
-      presentString(
-        composedCandidate?.form,
-      ) ??
       rootTokens.join(" + ");
-
-    const keys =
-      Array.isArray(
-        rootMap?.keys,
-      )
-        ? rootMap.keys
-        : [];
-
-    const keyByToken =
-      new Map(
-        keys.map((key) => [
-          String(key.token ?? "")
-            .trim()
-            .toUpperCase(),
-          key,
-        ]),
-      );
-
-    const reviewed =
-      new Set(
-        (
-          status?.reviewedOperators ??
-          []
-        ).map((token) =>
-          String(token)
-            .trim()
-            .toUpperCase(),
-        ),
-      );
 
     const reviewedCount =
       tokens.filter((token) =>
@@ -345,21 +444,10 @@ export function EmbryoExpansionContextCardV0_1({
       ).length;
 
     evidenceStatus =
-      composedCandidate
-        ? evidenceStateFromCandidate(
-            composedCandidate,
-          )
-        : reviewedCount ===
-            tokens.length
-          ? "Reviewed"
-          : "Partial";
-
-    const candidateLanguage =
-      humanLanguage(
-        presentString(
-          composedCandidate?.language,
-        ),
-      );
+      reviewedCount ===
+      tokens.length
+        ? "Reviewed"
+        : "Partial";
 
     const languages =
       Array.from(
@@ -367,8 +455,9 @@ export function EmbryoExpansionContextCardV0_1({
           tokens
             .map((token) =>
               humanLanguage(
-                keyByToken.get(token)
-                  ?.language,
+                keyByToken.get(
+                  token,
+                )?.language,
               ),
             )
             .filter(
@@ -380,21 +469,17 @@ export function EmbryoExpansionContextCardV0_1({
         ),
       );
 
-    if (candidateLanguage) {
-      language =
-        candidateLanguage;
-    } else if (languages.length > 0) {
+    if (
+      languages.length > 0
+    ) {
       language =
         languages.join(" + ");
     }
 
     composedMeaning =
-      presentString(
-        composedCandidate
-          ?.functionalStatement,
-      ) ??
       String(
-        rootMap?.composedMeaning ??
+        rootMap
+          ?.composedMeaning ??
           "",
       ).trim();
 
@@ -416,16 +501,12 @@ export function EmbryoExpansionContextCardV0_1({
       });
     }
   } else {
-    const candidate =
-      usefulFunctionalCandidate(
-        Array.isArray(
-          vm.candidates,
-        )
-          ? vm.candidates
-          : [],
+    tokens =
+      candidateTokens(
+        primaryCandidate,
       );
 
-    if (!candidate) {
+    if (tokens.length === 0) {
       return (
         <NoSupportedFunctionalCandidate
           word={word}
@@ -433,66 +514,205 @@ export function EmbryoExpansionContextCardV0_1({
       );
     }
 
-    const embryo =
+    const emittedEmbryo =
       presentString(
-        candidate.embryo,
-      ) ??
-      presentString(
-        candidate.form,
+        primaryCandidate.embryo,
       );
 
-    if (!embryo) {
-      return (
-        <NoSupportedFunctionalCandidate
-          word={word}
-        />
-      );
-    }
-
-    tokens = [
-      embryo
-        .trim()
-        .toUpperCase(),
-    ];
-
+    // Preserve the embryo-first display contract for one-embryo
+    // candidates: DI / DA / AT should lead rather than a carrier
+    // or lexical form such as lowercase "di".
     candidateExpression =
-      tokens[0];
-
-    language =
-      humanLanguage(
-        presentString(
-          candidate.language,
-        ),
-      ) ??
-      "Language not emitted";
+      tokens.length === 1 &&
+      emittedEmbryo
+        ? tokens[0]
+        : presentString(
+            primaryCandidate.form,
+          ) ??
+          tokens.join(" + ");
 
     evidenceStatus =
       evidenceStateFromCandidate(
-        candidate,
+        primaryCandidate,
       );
 
-    const gloss =
+    const components =
+      presentFunctionalComponents(
+        primaryCandidate,
+      );
+
+    const componentByToken =
+      new Map(
+        components.map(
+          (component) => [
+            String(
+              component.embryo ??
+                "",
+            )
+              .trim()
+              .toUpperCase(),
+            component,
+          ],
+        ),
+      );
+
+    const candidateLanguage =
+      humanLanguage(
+        presentString(
+          primaryCandidate.language,
+        ),
+      );
+
+    const componentLanguages =
+      Array.from(
+        new Set(
+          tokens
+            .map((token) => {
+              const component =
+                componentByToken.get(
+                  token,
+                );
+
+              return humanLanguage(
+                presentString(
+                  component?.language,
+                ),
+              );
+            })
+            .filter(
+              (
+                value,
+              ): value is string =>
+                Boolean(value),
+            ),
+        ),
+      );
+
+    const rootLanguages =
+      Array.from(
+        new Set(
+          tokens
+            .map((token) =>
+              humanLanguage(
+                keyByToken.get(
+                  token,
+                )?.language,
+              ),
+            )
+            .filter(
+              (
+                value,
+              ): value is string =>
+                Boolean(value),
+            ),
+        ),
+      );
+
+    if (candidateLanguage) {
+      language =
+        candidateLanguage;
+    } else if (
+      componentLanguages.length > 0
+    ) {
+      language =
+        componentLanguages.join(
+          " + ",
+        );
+    } else if (
+      rootLanguages.length > 0
+    ) {
+      language =
+        rootLanguages.join(" + ");
+    }
+
+    const standaloneGloss =
       presentString(
-        candidate.plainStandaloneGloss,
-      ) ??
-      "meaning not emitted";
+        primaryCandidate
+          .plainStandaloneGloss,
+      );
 
     composedMeaning =
       presentString(
-        candidate.functionalStatement,
+        primaryCandidate
+          .functionalStatement,
       ) ??
-      gloss;
+      (
+        tokens.length === 1
+          ? standaloneGloss
+          : null
+      ) ??
+      "";
 
-    componentRows.push({
-      token: tokens[0],
-      gloss,
-      state:
-        evidenceStatus === "Reviewed"
-          ? "reviewed"
-          : evidenceStatus === "Partial"
-            ? "partial"
-            : "proposed",
-    });
+    const fallbackState:
+      | "reviewed"
+      | "partial"
+      | "proposed" =
+      evidenceStatus ===
+        "Reviewed"
+        ? "reviewed"
+        : evidenceStatus ===
+            "Partial"
+          ? "partial"
+          : "proposed";
+
+    for (const token of tokens) {
+      const component =
+        componentByToken.get(
+          token,
+        );
+
+      const key =
+        keyByToken.get(token);
+
+      const emittedState =
+        presentString(
+          component
+            ?.evidenceState,
+        )?.toLowerCase();
+
+      const state:
+        | "reviewed"
+        | "structural"
+        | "partial"
+        | "proposed" =
+        emittedState ===
+          "reviewed" ||
+        emittedState ===
+          "structural" ||
+        emittedState ===
+          "partial" ||
+        emittedState ===
+          "proposed"
+          ? emittedState
+          : key
+              ? reviewed.has(
+                  token,
+                )
+                ? "reviewed"
+                : "structural"
+              : fallbackState;
+
+      componentRows.push({
+        token,
+        gloss:
+          presentString(
+            component
+              ?.plainMeaning,
+          ) ??
+          (
+            String(
+              key?.gloss ?? "",
+            ).trim() ||
+            (
+              tokens.length === 1
+                ? standaloneGloss
+                : null
+            ) ||
+            "meaning not emitted"
+          ),
+        state,
+      });
+    }
   }
 
   const candidate =

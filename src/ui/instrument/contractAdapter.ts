@@ -1050,6 +1050,99 @@ const normalizationSteps =
       const userDecisionPosture =
         asString(rec["userDecisionPosture"]);
 
+      const segmentation =
+        isRecord(rec["segmentation"])
+          ? rec["segmentation"]
+          : null;
+
+      const rawFunctionalComponents =
+        segmentation &&
+        asString(segmentation["kind"]) ===
+          "functionalComposition"
+          ? asArray(
+              segmentation["components"],
+            )
+          : null;
+
+      const functionalComponents =
+        (
+          rawFunctionalComponents ?? []
+        ).flatMap((item) => {
+          if (!isRecord(item)) {
+            return [];
+          }
+
+          const embryo =
+            asString(item["embryo"]);
+
+          if (!embryo) {
+            return [];
+          }
+
+          const componentLanguageRaw =
+            item["language"];
+
+          const plainMeaningRaw =
+            item["plainMeaning"];
+
+          const evidenceStateRaw =
+            item["evidenceState"];
+
+          const componentLanguage:
+            string | null =
+            typeof componentLanguageRaw ===
+              "string"
+              ? componentLanguageRaw.trim() ||
+                null
+              : null;
+
+          const plainMeaning:
+            string | null =
+            typeof plainMeaningRaw ===
+              "string"
+              ? plainMeaningRaw.trim() ||
+                null
+              : null;
+
+          const evidenceState:
+            string | null =
+            typeof evidenceStateRaw ===
+              "string"
+              ? evidenceStateRaw.trim() ||
+                null
+              : null;
+
+          return [
+            {
+              embryo,
+              language:
+                componentLanguage
+                  ? present<string>(
+                      componentLanguage,
+                    )
+                  : missing<string>(
+                      "not_emitted",
+                    ),
+              plainMeaning:
+                plainMeaning
+                  ? present<string>(
+                      plainMeaning,
+                    )
+                  : missing<string>(
+                      "not_emitted",
+                    ),
+              evidenceState:
+                evidenceState
+                  ? present<string>(
+                      evidenceState,
+                    )
+                  : missing<string>(
+                      "not_emitted",
+                    ),
+            },
+          ];
+        });
+
 // EvidenceRefs should be stable and filesystem-safe (no ":" etc.)
 const evidenceId = String(id).toLowerCase().replace(/[^a-z0-9_]/g, "_");
 
@@ -1118,6 +1211,15 @@ const evidenceId = String(id).toLowerCase().replace(/[^a-z0-9_]/g, "_");
           ? {
               userDecisionPosture:
                 present(userDecisionPosture),
+            }
+          : {}),
+
+        ...(functionalComponents.length > 0
+          ? {
+              functionalComponents:
+                present(
+                  functionalComponents,
+                ),
             }
           : {}),
 
