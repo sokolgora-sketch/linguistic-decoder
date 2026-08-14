@@ -405,8 +405,12 @@ async function main(): Promise<void> {
       "/chat missing Open Instrument text",
     );
     assert(
-      chatHtml.includes("Evidence"),
-      "/chat missing Evidence text",
+      chatHtml.includes("Analyze one word"),
+      "/chat missing Analyze one word text",
+    );
+    assert(
+      chatHtml.includes("Functional motivation"),
+      "/chat missing Functional motivation text",
     );
     assert(rootHtml.includes("ZË-RO"), "/ missing ZË-RO text");
     assert(

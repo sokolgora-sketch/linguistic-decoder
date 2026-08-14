@@ -100,24 +100,52 @@ describe("ui guardrail: InstrumentPanel is a scientific instrument (v0.1)", () =
     expect(screen.getAllByText("candidate provenance kinds").length).toBeGreaterThan(0);
     expect(screen.getAllByText("RootMap hypothesis").length).toBeGreaterThan(0);
     expect(screen.getByTestId("open-instrument-shell")).toBeInTheDocument();
-    expect(screen.getByText("ZË-RO Open Instrument")).toBeInTheDocument();
-    expect(screen.getByRole("tab", { name: "Overview" })).toHaveAttribute("aria-selected", "true");
-    expect(screen.getByText("active surface")).toBeInTheDocument();
+
     expect(
-      screen.getByText(
+      screen.getByTestId("instrument-word"),
+    ).toHaveTextContent("test");
+
+    expect(
+      screen.getByRole("tab", { name: "Overview" }),
+    ).toHaveAttribute("aria-selected", "true");
+
+    // Slice F deliberately removes engineering-console chrome from
+    // the normal result while preserving the scientific safeguards.
+    expect(
+      screen.queryByText("ZË-RO Open Instrument"),
+    ).not.toBeInTheDocument();
+
+    expect(
+      screen.queryByText("active surface"),
+    ).not.toBeInTheDocument();
+
+    expect(
+      screen.queryByText(
         "Functional motivation first, with the deterministic readout underneath.",
       ),
-    ).toBeInTheDocument();
-    expect(screen.getByText("section=overview")).toBeInTheDocument();
+    ).not.toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole("tab", { name: "Candidates" }));
-    expect(screen.getByRole("tab", { name: "Candidates" })).toHaveAttribute("aria-selected", "true");
     expect(
-      screen.getByText(
+      screen.queryByText("section=overview"),
+    ).not.toBeInTheDocument();
+
+    fireEvent.click(
+      screen.getByRole("tab", { name: "Candidates" }),
+    );
+
+    expect(
+      screen.getByRole("tab", { name: "Candidates" }),
+    ).toHaveAttribute("aria-selected", "true");
+
+    expect(
+      screen.queryByText(
         "Functional candidate first; secondary engine records stay collapsed.",
       ),
-    ).toBeInTheDocument();
-    expect(screen.getByText("section=candidates")).toBeInTheDocument();
+    ).not.toBeInTheDocument();
+
+    expect(
+      screen.queryByText("section=candidates"),
+    ).not.toBeInTheDocument();
 
     const lightModeButton = screen.getByRole("button", { name: /light mode/i });
     expect(lightModeButton).toHaveAttribute("aria-pressed", "true");

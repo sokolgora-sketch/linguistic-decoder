@@ -1,7 +1,6 @@
 'use client';
 
 import React from "react";
-import Image from "next/image";
 import { Moon, Sun } from "lucide-react";
 import { ResonancePanelV01 } from "./ResonancePanel.v0.1";
 import { VowelPathTimeline } from "./VowelPathTimeline";
@@ -68,39 +67,12 @@ type InstrumentSectionKey = "overview" | "evidence" | "candidates" | "roots" | "
 const INSTRUMENT_SECTIONS: Array<{
   id: InstrumentSectionKey;
   label: string;
-  description: string;
-  accent: "blue" | "green" | "amber" | "neutral";
 }> = [
-  {
-    id: "overview",
-    label: "Overview",
-    description: "Functional motivation first, with the deterministic readout underneath.",
-    accent: "blue",
-  },
-  {
-    id: "evidence",
-    label: "Evidence",
-    description: "Source states, evidence ledger, and evidence package for the current run.",
-    accent: "green",
-  },
-  {
-    id: "candidates",
-    label: "Candidates",
-    description: "Functional candidate first; secondary engine records stay collapsed.",
-    accent: "amber",
-  },
-  {
-    id: "roots",
-    label: "Roots / Meaning",
-    description: "Vowel path, principle, resonance, SoundRoots, and RootMap surfaces.",
-    accent: "neutral",
-  },
-  {
-    id: "advanced",
-    label: "Advanced",
-    description: "Technical diagnostics, gates, claim boundaries, oracle, and raw payload.",
-    accent: "neutral",
-  },
+  { id: "overview", label: "Overview" },
+  { id: "evidence", label: "Evidence" },
+  { id: "candidates", label: "Candidates" },
+  { id: "roots", label: "Roots / Meaning" },
+  { id: "advanced", label: "Advanced" },
 ];
 
 function pomValue(x: any, fallback = "not emitted"): string {
@@ -114,37 +86,6 @@ function voicePathValue(x: any): string {
     return x.value.join("-");
   }
   return "not emitted";
-}
-
-function ShellBadge({
-  children,
-  tone = "neutral",
-}: {
-  children: React.ReactNode;
-  tone?: "neutral" | "green" | "blue" | "amber";
-}) {
-  return (
-    <span
-      className={cn(
-        "inline-flex min-h-7 max-w-full items-center rounded-full border px-2.5 py-1 text-left font-mono text-[11px] leading-5 break-all",
-        tone === "green" && "border-[#2f5a3d] bg-[#101712] text-[#b7d8c1] dark:border-[#2f5a3d] dark:bg-[#101712] dark:text-[#b7d8c1]",
-        tone === "blue" && "border-[#355a7a] bg-[#111a24] text-[#cfe6ff] dark:border-[#355a7a] dark:bg-[#111a24] dark:text-[#cfe6ff]",
-        tone === "amber" && "border-[#5e4b22] bg-[#19140d] text-[#f0ddb0] dark:border-[#5e4b22] dark:bg-[#19140d] dark:text-[#f0ddb0]",
-        tone === "neutral" && "border-[#303030] bg-[#101010] text-[#d7dde7] dark:border-[#303030] dark:bg-[#101010] dark:text-[#d7dde7]"
-      )}
-    >
-      {children}
-    </span>
-  );
-}
-
-function ShellMetric({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="min-h-[78px] min-w-0 overflow-hidden rounded-[8px] border border-[#303a45] bg-[#101010] p-3 dark:border-[#303a45] dark:bg-[#101010]">
-      <div className={`${MT.fieldLabel} mb-1 text-[11px] text-[#8ea4ba] dark:text-[#8ea4ba]`}>{label}</div>
-      <div className="break-all font-mono text-[13px] text-[#f5f7fb] dark:text-[#f5f7fb]">{value}</div>
-    </div>
-  );
 }
 
 function ShellSection({
@@ -194,25 +135,6 @@ function SectionTabs({
             {section.label}
           </button>
         ))}
-      </div>
-    </div>
-  );
-}
-
-function SectionIntro({ section }: { section: (typeof INSTRUMENT_SECTIONS)[number] }) {
-  return (
-    <div className="rounded-[12px] border border-[#2f3742] bg-[#10161e] p-4 dark:border-[#2f3742] dark:bg-[#10161e]">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="min-w-0">
-          <div className={`${MT.microLabel} text-[#8ea4ba] dark:text-[#8ea4ba]`}>active surface</div>
-          <div className="mt-1 text-[18px] font-semibold leading-tight text-[#f5f7fb] dark:text-[#f5f7fb]">
-            {section.label}
-          </div>
-          <p className="mt-2 max-w-3xl text-[13px] leading-6 text-[#aeb7c5] dark:text-[#aeb7c5]">
-            {section.description}
-          </p>
-        </div>
-        <ShellBadge tone={section.accent}>section={section.id}</ShellBadge>
       </div>
     </div>
   );
@@ -405,18 +327,13 @@ export function InstrumentPanel(props: Props) {
     );
   }
 
-  const statusText = String(vm.readout?.status ?? "detected");
   const modeText = pomValue(vm.readout?.mode);
   const readout = isValidVm ? vm.readout : null;
   const pathText = voicePathValue(readout?.voicePath);
-  const candidateCountText = String(readout?.counts?.candidates ?? 0);
-  const normalizedText = normalizedWord || pomValue(readout?.normalizedWord);
   const surfaceVoicePath: PresentOrMissing<Vowel[]> =
     readout?.voicePathSurface ?? { kind: "missing", missing: "not_emitted", note: "voicePathSurface" };
   const functionalVoicePath: PresentOrMissing<Vowel[]> =
     readout?.voicePathFunctional ?? { kind: "missing", missing: "not_emitted", note: "voicePathFunctional" };
-  const activeSectionMeta =
-    INSTRUMENT_SECTIONS.find((section) => section.id === activeSection) ?? INSTRUMENT_SECTIONS[0];
 
   return (
       <div
@@ -451,56 +368,50 @@ export function InstrumentPanel(props: Props) {
         ) : null}
 
         <div className="rounded-[12px] border border-[#2c3540] bg-[#10161e] p-4 dark:border-[#2c3540] dark:bg-[#10161e] sm:p-5">
-          <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
-            <div className="min-w-0 xl:max-w-[72%]">
-              <div className="flex flex-wrap items-center gap-3">
-                <Image
-                  src="/zero_logo_hero_white.svg"
-                  alt="ZË-RO"
-                  width={140}
-                  height={35}
-                  className="h-7 w-auto shrink-0 sm:h-8"
-                  priority={false}
-                />
-                <div className="min-w-0">
-                  <div className={`${MT.eyebrow} text-[10px] text-[#d7dde7] dark:text-[#d7dde7]`}>
-                    instrument · open
-                  </div>
-                  <h1 className={`${MT.heroTitle} !text-[17px] leading-none text-[#f5f7fb] dark:text-[#f5f7fb]`}>
-                    ZË-RO Open Instrument
-                  </h1>
-                  <div className="mt-1 text-[12px] leading-5 text-[#aeb7c5] dark:text-[#aeb7c5]">Deterministic readout for one word</div>
-                </div>
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+            <div className="min-w-0">
+              <div className={`${MT.fieldLabel} text-[11px] text-[#8ea4ba]`}>
+                Word
               </div>
 
-              <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-                <ShellMetric label="word" value={`word=${String(vm.readout.word ?? "not emitted")}`} />
-                <ShellMetric label="normalized" value={`norm=${normalizedText}`} />
-                <ShellMetric label="voice path" value={`path=${pathText}`} />
-                <ShellMetric label="candidates" value={`rows=${candidateCountText}`} />
-              </div>
-            </div>
-
-            <div className="flex w-full min-w-0 flex-wrap items-center gap-2 xl:w-auto xl:shrink-0 xl:justify-end">
-              <ShellBadge tone="green">status={statusText}</ShellBadge>
-              <ShellBadge tone="blue">mode={modeText}</ShellBadge>
-              {engineVersion ? <ShellBadge tone="neutral">engine={engineVersion}</ShellBadge> : null}
-              <button
-                type="button"
-                aria-pressed={isDarkMode}
-                className={`${MT.actionSm} inline-flex min-h-9 max-w-full items-center gap-2 rounded-[8px] border border-[#5e4b22] bg-[#19140d] px-3 text-[#f0ddb0] transition hover:border-[#8a6a2a] hover:text-white dark:border-[#5e4b22] dark:bg-[#19140d] dark:text-[#f0ddb0] dark:hover:border-[#8a6a2a] dark:hover:text-white`}
-                onClick={() => setIsDarkMode((next) => !next)}
+              <div
+                data-testid="instrument-word"
+                className="mt-2 break-words text-[30px] font-semibold leading-tight text-[#f5f7fb] sm:text-[36px]"
               >
-                {isDarkMode ? <Sun className="h-4 w-4" aria-hidden="true" /> : <Moon className="h-4 w-4" aria-hidden="true" />}
-                {isDarkMode ? "Light mode" : "Dark mode"}
-              </button>
+                {String(vm.readout.word ?? "not emitted")}
+              </div>
+
+              {normalizedWord &&
+              normalizedWord !==
+                String(vm.readout.word ?? "")
+                  .trim()
+                  .toLowerCase() ? (
+                <div className="mt-2 font-mono text-[12px] text-[#8ea4ba]">
+                  {`normalized: ${normalizedWord}`}
+                </div>
+              ) : null}
             </div>
+
+            <button
+              type="button"
+              aria-pressed={isDarkMode}
+              className={`${MT.actionSm} inline-flex min-h-9 shrink-0 items-center gap-2 rounded-[8px] border border-[#303a45] bg-[#151515] px-3 text-[#c6d0dc] transition hover:border-[#4d5f72] hover:text-white`}
+              onClick={() => setIsDarkMode((next) => !next)}
+            >
+              {isDarkMode ? (
+                <Sun className="h-4 w-4" aria-hidden="true" />
+              ) : (
+                <Moon className="h-4 w-4" aria-hidden="true" />
+              )}
+              {isDarkMode ? "Light mode" : "Dark mode"}
+            </button>
           </div>
         </div>
 
-        <SectionTabs active={activeSection} onChange={setActiveSection} />
-        <SectionIntro section={activeSectionMeta} />
-        <HonestContractCard />
+        <SectionTabs
+          active={activeSection}
+          onChange={setActiveSection}
+        />
 
         <div className="space-y-4">
           <TabPanel id="overview" active={activeSection}>
@@ -509,25 +420,29 @@ export function InstrumentPanel(props: Props) {
                 vm={vm}
               />
 
-              <ReadoutCard
-                readout={vm.readout}
-                onCopySummary={() =>
-                  void copyText(
-                    "Summary copied.",
-                    evidenceSummaryText,
-                  )
-                }
-                onCopyFullJson={
-                  handleCopyFullJson
-                }
-              />
-
-              <ShellSection
-                title="Constructed reading"
-                subtitle="Plain deterministic interpretation for the current word."
+              <details
+                data-testid="deterministic-details"
+                className="rounded-xl border border-[#303a45] bg-[#10151c]"
               >
-                <MeaningPanel vm={vm} />
-              </ShellSection>
+                <summary className="cursor-pointer list-none px-4 py-3 text-sm font-semibold text-[#c6d0dc] [&::-webkit-details-marker]:hidden">
+                  Deterministic details
+                </summary>
+
+                <div className="border-t border-[#303a45] p-4">
+                  <ReadoutCard
+                    readout={vm.readout}
+                    onCopySummary={() =>
+                      void copyText(
+                        "Summary copied.",
+                        evidenceSummaryText,
+                      )
+                    }
+                    onCopyFullJson={
+                      handleCopyFullJson
+                    }
+                  />
+                </div>
+              </details>
             </div>
           </TabPanel>
 
@@ -596,6 +511,15 @@ export function InstrumentPanel(props: Props) {
                 <ResonancePanelV01 resonanceProfileV1={resonanceProfileForPanel} />
               </div>
               <div className="space-y-4 xl:col-span-7">
+                <div data-testid="roots-meaning-reading">
+                  <ShellSection
+                    title="Meaning"
+                    subtitle="Plain deterministic interpretation for the current word."
+                  >
+                    <MeaningPanel vm={vm} />
+                  </ShellSection>
+                </div>
+
                 <WorldLanguageTreeCard lightMap={lightMap} />
                 <SoundRootsCard
                   soundRoots={soundRootsForPanel}
@@ -614,6 +538,10 @@ export function InstrumentPanel(props: Props) {
           <TabPanel id="advanced" active={activeSection}>
             <div className="grid gap-4 xl:grid-cols-12">
               <div className="space-y-4 xl:col-span-5">
+                <div data-testid="advanced-boundary">
+                  <HonestContractCard />
+                </div>
+
                 <AnalysisStatusCardV0_1
                   status={
                     vm.analysisStatusV0_1 ?? {
