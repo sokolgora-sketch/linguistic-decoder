@@ -7,6 +7,7 @@ import { adaptAnalyzeV1ToUI } from "@/shared/analyzeV1Adapter";
 import { buildEvidencePackageFromVM } from "@/ui/telemetry/buildEvidencePackageFromVM";
 import { backfillEvidencePackageSignalsCountV01 } from "./evidencePackage.signalsCount.backfill.v0.1";
 import { runAutomaticFunctionalCandidateProposalV0_1 } from "@/shared/orchestrator/automaticFunctionalCandidateProposal.v0.1";
+import { verifyAutomaticFunctionalProposalV0_1 } from "@/shared/verifier/verifyAutomaticFunctionalProposal.v0.1";
 import { toAnalyzeWordResultV1Contract } from "@/shared/analyzeWordResult.v1.contract";
 import { ensurePrimaryAndCandidatePaths } from "@/shared/ensurePaths";
 import { extractCarrierVoicesFromIpaV0_1 } from "@/shared/vowels/extractCarrierVoicesFromIpa.v0.1";
@@ -566,6 +567,49 @@ const checked = AnalyzeWordResultV1ContractSchema.safeParse(out);
         analysis: final,
       });
 
+    const automaticFunctionalProposalVerificationV0_1 =
+      verifyAutomaticFunctionalProposalV0_1({
+        analysis: final,
+        automaticProposal:
+          automaticFunctionalProposalV0_1,
+      });
+
+    if (
+      final &&
+      typeof final === "object" &&
+      automaticFunctionalProposalVerificationV0_1
+        .promotedCandidates.length > 0
+    ) {
+      const deterministicCandidates =
+        Array.isArray(
+          (final as any).candidates,
+        )
+          ? (final as any).candidates
+          : [];
+
+      (final as any).candidates = [
+        ...deterministicCandidates,
+        ...automaticFunctionalProposalVerificationV0_1
+          .promotedCandidates,
+      ];
+
+      try {
+        toAnalyzeWordResultV1Contract(
+          final,
+        );
+      } catch (e: any) {
+        return contractFailResponse({
+          message:
+            "Slice E candidate promotion failed V1 contract projection",
+          issues:
+            e?.issues ??
+            e?.message ??
+            String(e),
+          out: final,
+        });
+      }
+    }
+
     if (
       final &&
       typeof final === "object" &&
@@ -577,6 +621,19 @@ const checked = AnalyzeWordResultV1ContractSchema.safeParse(out);
     ) {
       (final as any).automaticFunctionalProposalV0_1 =
         automaticFunctionalProposalV0_1;
+    }
+
+    if (
+      final &&
+      typeof final === "object" &&
+      automaticFunctionalProposalV0_1
+        .realProvider === true &&
+      automaticFunctionalProposalV0_1
+        .attempted === true
+    ) {
+      (final as any)
+        .automaticFunctionalProposalVerificationV0_1 =
+        automaticFunctionalProposalVerificationV0_1;
     }
 
     return NextResponse.json(final);
@@ -802,6 +859,49 @@ const checked = AnalyzeWordResultV1ContractSchema.safeParse(out);
         analysis: final,
       });
 
+    const automaticFunctionalProposalVerificationV0_1 =
+      verifyAutomaticFunctionalProposalV0_1({
+        analysis: final,
+        automaticProposal:
+          automaticFunctionalProposalV0_1,
+      });
+
+    if (
+      final &&
+      typeof final === "object" &&
+      automaticFunctionalProposalVerificationV0_1
+        .promotedCandidates.length > 0
+    ) {
+      const deterministicCandidates =
+        Array.isArray(
+          (final as any).candidates,
+        )
+          ? (final as any).candidates
+          : [];
+
+      (final as any).candidates = [
+        ...deterministicCandidates,
+        ...automaticFunctionalProposalVerificationV0_1
+          .promotedCandidates,
+      ];
+
+      try {
+        toAnalyzeWordResultV1Contract(
+          final,
+        );
+      } catch (e: any) {
+        return contractFailResponse({
+          message:
+            "Slice E candidate promotion failed V1 contract projection",
+          issues:
+            e?.issues ??
+            e?.message ??
+            String(e),
+          out: final,
+        });
+      }
+    }
+
     if (
       final &&
       typeof final === "object" &&
@@ -813,6 +913,19 @@ const checked = AnalyzeWordResultV1ContractSchema.safeParse(out);
     ) {
       (final as any).automaticFunctionalProposalV0_1 =
         automaticFunctionalProposalV0_1;
+    }
+
+    if (
+      final &&
+      typeof final === "object" &&
+      automaticFunctionalProposalV0_1
+        .realProvider === true &&
+      automaticFunctionalProposalV0_1
+        .attempted === true
+    ) {
+      (final as any)
+        .automaticFunctionalProposalVerificationV0_1 =
+        automaticFunctionalProposalVerificationV0_1;
     }
 
     return NextResponse.json(final);

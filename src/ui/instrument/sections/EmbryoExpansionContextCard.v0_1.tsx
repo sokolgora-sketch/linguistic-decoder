@@ -213,25 +213,85 @@ function usefulFunctionalCandidate(
     return null;
   }
 
+  const supported =
+    functional.filter(
+      (row) => {
+        const validation =
+          presentString(
+            row.validationOutcome,
+          );
+
+        return (
+          validation ===
+            "validated" ||
+          validation ===
+            "partial"
+        );
+      },
+    );
+
+  if (supported.length > 0) {
+    return (
+      [...supported].sort(
+        (a, b) => {
+          const compositionDelta =
+            Number(
+              isCompositionCandidate(b),
+            ) -
+            Number(
+              isCompositionCandidate(a),
+            );
+
+          if (
+            compositionDelta !== 0
+          ) {
+            return compositionDelta;
+          }
+
+          return (
+            validationScore(b) -
+              validationScore(a) ||
+            a.index - b.index
+          );
+        },
+      )[0] ?? null
+    );
+  }
+
+  // Slice E:
+  // Proposed candidates are used only when no Reviewed/Partial
+  // functional result exists. The verifier already orders them
+  // from the smallest accepted embryo set to larger expansions,
+  // so preserve that order instead of composition-first ranking.
   return (
     [...functional].sort(
       (a, b) => {
-        const compositionDelta =
-          Number(
-            isCompositionCandidate(b),
-          ) -
-          Number(
-            isCompositionCandidate(a),
-          );
+        const aTokens =
+          candidateTokens(a);
 
-        if (compositionDelta !== 0) {
-          return compositionDelta;
+        const bTokens =
+          candidateTokens(b);
+
+        const tokenDelta =
+          aTokens.length -
+          bTokens.length;
+
+        if (tokenDelta !== 0) {
+          return tokenDelta;
         }
 
+        const sizeDelta =
+          aTokens
+            .join("")
+            .length -
+          bTokens
+            .join("")
+            .length;
+
         return (
-          validationScore(b) -
-            validationScore(a) ||
-          a.index - b.index
+          sizeDelta ||
+          a.index -
+            b.index
         );
       },
     )[0] ?? null
