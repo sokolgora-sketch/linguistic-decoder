@@ -5,7 +5,6 @@ import ChatShell from '@/components/ChatShell';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { InstrumentPanel } from '@/ui/instrument/InstrumentPanel';
-import { HonestContractCard } from '@/ui/instrument/sections/HonestContractCard';
 import { MT } from '@/ui/typography/marketingType.v0.1';
 
 class UiErrorBoundary extends React.Component<
@@ -65,62 +64,26 @@ function safeString(e: unknown): string {
   }
 }
 
-const readinessChips = ['VM-backed readout', 'Evidence-first', 'No origin proof'] as const;
-
-const emptyStateSteps = [
-  { index: '01', label: 'Word', tone: 'text-[#cfe6ff]' },
-  { index: '02', label: 'Evidence', tone: 'text-[#b7d8c1]' },
-  { index: '03', label: 'Candidates', tone: 'text-[#f0ddb0]' },
-  { index: '04', label: 'Roots', tone: 'text-[#d7dce3]' },
-] as const;
-
 function OpenInstrumentEmptyState() {
   return (
-    <div className="space-y-4">
-      <section
-        aria-label="Open Instrument status"
-        className="overflow-hidden rounded-[18px] border border-[#2f3742] bg-[#13171d] shadow-[0_18px_48px_rgba(0,0,0,0.24)]"
-      >
-        <div className="grid gap-0 lg:grid-cols-[minmax(0,1fr)_minmax(300px,0.72fr)]">
-          <div className="p-5 sm:p-6 lg:p-7">
-            <div className="mb-5 flex flex-wrap gap-2">
-              {readinessChips.map(chip => (
-                <span
-                  key={chip}
-                  className={`${MT.chipText} rounded-full border border-[#303a45] bg-[#10161e] px-3 py-1 font-mono text-[#b8c3cf]`}
-                >
-                  {chip}
-                </span>
-              ))}
-            </div>
+    <section
+      aria-label="Open Instrument ready"
+      className="rounded-[18px] border border-[#2f3742] bg-[#13171d] p-6 shadow-[0_18px_48px_rgba(0,0,0,0.24)] sm:p-8"
+    >
+      <p className={`${MT.sectionLabel} text-[#8ea4ba]`}>
+        Functional motivation
+      </p>
 
-            <p className={`${MT.sectionLabel} text-[#8ea4ba]`}>instrument ready</p>
-            <h2 className="mt-3 text-[26px] font-semibold leading-tight text-[#f5f7fb]">
-              Open Instrument ready
-            </h2>
-            <p className="mt-4 max-w-2xl text-[14px] leading-7 text-[#b8c3cf]">
-              One word enters the deterministic readout. Evidence, candidates, roots, and advanced
-              diagnostics appear after analysis.
-            </p>
-          </div>
+      <h2 className="mt-3 text-[26px] font-semibold leading-tight text-[#f5f7fb]">
+        Analyze one word
+      </h2>
 
-          <div className="border-t border-[#2f3742] bg-[#10161e] p-4 sm:p-5 lg:border-l lg:border-t-0">
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
-              {emptyStateSteps.map(step => (
-                <div key={step.index} className="rounded-[10px] border border-[#29333f] bg-[#0d1117] p-4">
-                  <div className={`${MT.microLabel} font-mono text-[#6f8294]`}>{step.index}</div>
-                  <div className={`mt-3 font-mono text-[15px] font-semibold ${step.tone}`}>
-                    {step.label}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <HonestContractCard />
-    </div>
+      <p className="mt-3 max-w-2xl text-[14px] leading-7 text-[#b8c3cf]">
+        Type a word below to see the strongest supported functional candidate,
+        its smallest meaningful embryos, their plain meanings, and the current
+        evidence state.
+      </p>
+    </section>
   );
 }
 
@@ -308,7 +271,12 @@ export default function ZroChatPage() {
       ?.instrumentPayload ?? null;
 
   return (
-    <ChatShell title="ZË-RO" subtitle="Deterministic word inspection" composer={composer} maxWidthClass="max-w-screen-2xl">
+    <ChatShell
+      title="ZË-RO"
+      subtitle="Functional motivation for one word"
+      composer={composer}
+      maxWidthClass="max-w-screen-2xl"
+    >
       <div className="space-y-4">
         {latestInstrumentPayload ? (
           <UiErrorBoundary label="InstrumentPanel">

@@ -101,7 +101,12 @@ describe("ui guardrail: InstrumentPanel candidates are VM-only (v0.1.1)", () => 
     render(<InstrumentPanel payload={poisonedPayload} />);
 
     // Candidate content proves VM-driven path is used.
-    expect(screen.getByText("study")).toBeInTheDocument();
-    expect(screen.getByText(/test functional statement/i)).toBeInTheDocument();
+    expect(
+      screen.getByTestId("instrument-word"),
+    ).toHaveTextContent("study");
+
+    expect(
+      screen.getByText(/test functional statement/i),
+    ).toBeInTheDocument();
   });
 });

@@ -32,7 +32,7 @@ describe("/chat submit empty-state transition contract", () => {
 
     render(<ZroChatPage />);
 
-    expect(screen.getByText("Open Instrument ready")).toBeInTheDocument();
+    expect(screen.getByText("Analyze one word")).toBeInTheDocument();
     expect(screen.queryByTestId("open-instrument-shell")).not.toBeInTheDocument();
 
     fireEvent.change(screen.getByLabelText("Word"), { target: { value: "study" } });
@@ -44,7 +44,7 @@ describe("/chat submit empty-state transition contract", () => {
 
     await screen.findByTestId("open-instrument-shell");
 
-    expect(screen.queryByText("Open Instrument ready")).not.toBeInTheDocument();
+    expect(screen.queryByText("Analyze one word")).not.toBeInTheDocument();
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();
     expect(global.fetch).toHaveBeenCalledTimes(1);
   });
@@ -54,7 +54,7 @@ describe("/chat submit empty-state transition contract", () => {
 
     render(<ZroChatPage />);
 
-    expect(screen.getByText("Open Instrument ready")).toBeInTheDocument();
+    expect(screen.getByText("Analyze one word")).toBeInTheDocument();
     expect(screen.queryByTestId("open-instrument-shell")).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("button", { name: "Analyze" }));
@@ -62,7 +62,7 @@ describe("/chat submit empty-state transition contract", () => {
     await screen.findByRole("alert");
     expect(screen.getByText("Type a word before analyzing.")).toBeInTheDocument();
 
-    expect(screen.getByText("Open Instrument ready")).toBeInTheDocument();
+    expect(screen.getByText("Analyze one word")).toBeInTheDocument();
     expect(screen.queryByTestId("open-instrument-shell")).not.toBeInTheDocument();
     expect(global.fetch).not.toHaveBeenCalled();
   });

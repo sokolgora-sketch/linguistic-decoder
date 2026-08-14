@@ -21,14 +21,14 @@ describe('Analyze keyboard interactions', () => {
     (global.fetch as jest.Mock).mockClear();
   });
 
-  it('renders the branded Open Instrument console frame', () => {
+  it('renders the branded Open Instrument result-first frame', () => {
     render(<ZroChatPage />);
 
     expect(screen.getByAltText('ZË-RO')).toBeInTheDocument();
     expect(screen.getByText('instrument · open')).toBeInTheDocument();
-    expect(screen.getByText('Deterministic word inspection')).toBeInTheDocument();
-    expect(screen.getByText('Open Instrument ready')).toBeInTheDocument();
-    expect(screen.getByText('No origin proof')).toBeInTheDocument();
+    expect(screen.getByText('Functional motivation for one word')).toBeInTheDocument();
+    expect(screen.getByText('Analyze one word')).toBeInTheDocument();
+    expect(screen.queryByText('No origin proof')).not.toBeInTheDocument();
     expect(screen.getByLabelText('Word')).toBeInTheDocument();
     expect(screen.getByLabelText('IPA')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Analyze' })).toBeInTheDocument();
@@ -49,14 +49,14 @@ describe('Analyze keyboard interactions', () => {
 
   it('replaces the empty state after a result payload arrives', async () => {
     render(<ZroChatPage />);
-    expect(screen.getByText('Open Instrument ready')).toBeInTheDocument();
+    expect(screen.getByText('Analyze one word')).toBeInTheDocument();
 
     const input = screen.getByLabelText('Word');
     fireEvent.change(input, { target: { value: 'test' } });
     fireEvent.click(screen.getByRole('button', { name: 'Analyze' }));
 
     await waitFor(() => {
-      expect(screen.queryByText('Open Instrument ready')).not.toBeInTheDocument();
+      expect(screen.queryByText('Analyze one word')).not.toBeInTheDocument();
     });
     expect(global.fetch).toHaveBeenCalledTimes(1);
   });
