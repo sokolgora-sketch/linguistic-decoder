@@ -474,9 +474,12 @@ function resolveProviderV0_1(
         "OPEN_INSTRUMENT_AUTO_PROPOSER_TEST_PROVIDER",
       );
 
-    if (testProvider === "mock") {
+    if (
+      testProvider === "mock" ||
+      testProvider === "openai_compat"
+    ) {
       return {
-        provider: "mock",
+        provider: testProvider,
         skipped: null,
       };
     }

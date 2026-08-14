@@ -1055,10 +1055,21 @@ const normalizationSteps =
           ? rec["segmentation"]
           : null;
 
+      const segmentationKind =
+        segmentation
+          ? asString(
+              segmentation["kind"],
+            )
+          : null;
+
       const rawFunctionalComponents =
         segmentation &&
-        asString(segmentation["kind"]) ===
-          "functionalComposition"
+        (
+          segmentationKind ===
+            "functionalComposition" ||
+          segmentationKind ===
+            "functionalProposal"
+        )
           ? asArray(
               segmentation["components"],
             )
