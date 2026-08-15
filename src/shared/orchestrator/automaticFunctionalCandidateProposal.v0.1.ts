@@ -40,6 +40,7 @@ export type FunctionalProposalEnvelopeV0_1 = {
 export type AutomaticFunctionalProposalStatusV0_1 =
   | "skipped_disabled"
   | "skipped_real_provider_not_ready"
+  | "skipped_functional_path_unavailable"
   | "mock_exercised_test_only"
   | "proposed_unverified"
   | "malformed_output"
@@ -63,6 +64,7 @@ export type AutomaticFunctionalProposalContextV0_1 = {
   surfaceVowelPath: string[];
   functionalVowelPath: string[];
   explicitFunctionalNormalization: boolean;
+  modernFunctionalAuthorityPresent: boolean;
   rootMapTokens: string[];
   reviewedOperators: string[];
   structuralTokens: string[];
@@ -141,7 +143,18 @@ export function buildAutomaticFunctionalProposalContextV0_1(
       ? root[
           "functionalVoiceNormalizationV0_1"
         ]
-      : {};
+      : null;
+
+  const automaticCarrierPronunciation =
+    isRecord(
+      root[
+        "automaticCarrierPronunciationV0_1"
+      ],
+    )
+      ? root[
+          "automaticCarrierPronunciationV0_1"
+        ]
+      : null;
 
   const rootMap =
     isRecord(root["rootMap"])
@@ -159,21 +172,39 @@ export function buildAutomaticFunctionalProposalContextV0_1(
       : stringArray(evidence["surfaceVowels"]);
 
   const normalizedFunctionalVowelPath =
-    stringArray(
-      functionalNormalization[
-        "functionalPath"
-      ],
-    );
+    functionalNormalization
+      ? stringArray(
+          functionalNormalization[
+            "functionalPath"
+          ],
+        )
+      : [];
 
   const explicitFunctionalNormalization =
     normalizedFunctionalVowelPath.length > 0;
 
+  const modernFunctionalAuthorityPresent =
+    functionalNormalization !== null ||
+    (
+      automaticCarrierPronunciation !== null &&
+      (
+        automaticCarrierPronunciation[
+          "attempted"
+        ] === true ||
+        automaticCarrierPronunciation[
+          "status"
+        ] === "manual_ipa"
+      )
+    );
+
   const functionalVowelPath =
     explicitFunctionalNormalization
       ? normalizedFunctionalVowelPath
-      : stringArray(evidence["vowelPath"]).length > 0
-        ? stringArray(evidence["vowelPath"])
-        : stringArray(evidence["surfaceVowels"]);
+      : modernFunctionalAuthorityPresent
+        ? []
+        : stringArray(evidence["vowelPath"]).length > 0
+          ? stringArray(evidence["vowelPath"])
+          : stringArray(evidence["surfaceVowels"]);
 
   const rootMapTokens = Array.isArray(rootMap["tokens"])
     ? rootMap["tokens"]
@@ -254,6 +285,7 @@ export function buildAutomaticFunctionalProposalContextV0_1(
     surfaceVowelPath,
     functionalVowelPath,
     explicitFunctionalNormalization,
+    modernFunctionalAuthorityPresent,
     rootMapTokens: unique(rootMapTokens),
     reviewedOperators: unique(reviewedOperators),
     structuralTokens: unique(structuralTokens),
@@ -742,6 +774,33 @@ export async function runAutomaticFunctionalCandidateProposalV0_1(
       buildAutomaticFunctionalProposalContextV0_1(
         req.analysis,
       );
+
+    if (
+      deterministicContext
+        .modernFunctionalAuthorityPresent &&
+      deterministicContext
+        .functionalVowelPath
+        .length === 0
+    ) {
+      return {
+        schemaVersion:
+          AUTOMATIC_FUNCTIONAL_PROPOSAL_SCHEMA_V0_1,
+        attempted: false,
+        status:
+          "skipped_functional_path_unavailable",
+        provider,
+        realProvider:
+          isRealProvider,
+        mockProvider:
+          isMockProvider,
+        userFacingEligible: false,
+        verificationState:
+          "not_started",
+        candidateCount: 0,
+        proposal: null,
+        error: null,
+      };
+    }
 
     const proposer =
       await withTimeout(

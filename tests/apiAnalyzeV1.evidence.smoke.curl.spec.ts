@@ -155,7 +155,7 @@ describe("/api/analyze-v1 evidence smoke (curl)", () => {
     async () => {
       const ipa = encodeURIComponent("/ˈrɪð(ə)m/");
       const { status, json, raw } = await getJson(
-        `${BASE}/api/analyze-v1?word=rhythm&mode=strict&ipa=${ipa}`
+        `${BASE}/api/analyze-v1?word=rhythm&mode=strict&ipa=${ipa}&language=English`
       );
 
       expect(status).toBe(200);
@@ -186,6 +186,7 @@ describe("/api/analyze-v1 evidence smoke (curl)", () => {
         word: "rhythm",
         mode: "strict",
         ipa: "/ˈrɪð(ə)m/",
+        language: "English",
       });
 
       expect(status).toBe(200);

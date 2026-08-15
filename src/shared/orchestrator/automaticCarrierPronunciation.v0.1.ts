@@ -175,9 +175,15 @@ function timeoutMs(): number {
 }
 
 async function withTimeout<T>(
-  promise: Promise<T>,
+  run:
+    (
+      signal: AbortSignal,
+    ) => Promise<T>,
   ms: number,
 ): Promise<T> {
+  const controller =
+    new AbortController();
+
   let timer:
     | ReturnType<
         typeof setTimeout
@@ -189,12 +195,15 @@ async function withTimeout<T>(
       (_resolve, reject) => {
         timer =
           setTimeout(
-            () =>
+            () => {
               reject(
                 new Error(
                   "automatic_carrier_timeout",
                 ),
-              ),
+              );
+
+              controller.abort();
+            },
             ms,
           );
       },
@@ -202,7 +211,9 @@ async function withTimeout<T>(
 
   try {
     return await Promise.race([
-      promise,
+      run(
+        controller.signal,
+      ),
       timeout,
     ]);
   } finally {
@@ -279,8 +290,7 @@ export async function runAutomaticCarrierPronunciationV0_1(
       language:
         text(
           input.manualLanguageHint,
-        ) ??
-        "English",
+        ),
       ipa:
         manualIpa,
       error: null,
@@ -356,18 +366,9 @@ export async function runAutomaticCarrierPronunciationV0_1(
   try {
     const response =
       await withTimeout(
-        runProposerV0_2(
-          {
-            word:
-              String(
-                input.word ??
-                  "",
-              ).trim(),
-            mode:
-              input.mode,
-            systemPrompt:
-              SYSTEM_PROMPT,
-            userPayload: {
+        (signal) =>
+          runProposerV0_2(
+            {
               word:
                 String(
                   input.word ??
@@ -375,10 +376,21 @@ export async function runAutomaticCarrierPronunciationV0_1(
                 ).trim(),
               mode:
                 input.mode,
+              systemPrompt:
+                SYSTEM_PROMPT,
+              userPayload: {
+                word:
+                  String(
+                    input.word ??
+                      "",
+                  ).trim(),
+                mode:
+                  input.mode,
+              },
+              signal,
             },
-          },
-          "openai_compat",
-        ),
+            "openai_compat",
+          ),
         timeoutMs(),
       );
 

@@ -33,6 +33,7 @@ const BodySchema = z
     mode: z.enum(["strict", "open"]).optional(),
     alphabet: z.string().optional(),
       ipa: z.string().optional(),
+      language: z.string().optional(),
   })
   .passthrough();
 
@@ -579,6 +580,8 @@ async function applyAutomaticFunctionalVoiceNormalizationV0_1(
       | "open";
     ipa:
       string;
+    manualLanguageHint:
+      string;
   },
 ): Promise<void> {
   const {
@@ -586,6 +589,7 @@ async function applyAutomaticFunctionalVoiceNormalizationV0_1(
     word,
     mode,
     ipa,
+    manualLanguageHint,
   } = args;
 
   if (
@@ -613,9 +617,8 @@ async function applyAutomaticFunctionalVoiceNormalizationV0_1(
       manualIpa:
         ipa || null,
       manualLanguageHint:
-        ipa
-          ? "English"
-          : null,
+        manualLanguageHint ||
+        null,
     });
 
   // Always expose the bounded pronunciation stage result.
@@ -682,9 +685,23 @@ export async function POST(req: Request) {
     );
   }
 
-  const { word, mode, alphabet, ipa: ipaRaw } = parsed.data;
+  const {
+    word,
+    mode,
+    alphabet,
+    ipa: ipaRaw,
+    language: languageRaw,
+  } = parsed.data;
 
-  const ipa = typeof ipaRaw === "string" ? ipaRaw.trim() : "";
+  const ipa =
+    typeof ipaRaw === "string"
+      ? ipaRaw.trim()
+      : "";
+
+  const language =
+    typeof languageRaw === "string"
+      ? languageRaw.trim()
+      : "";
 
 const modeParsed =
     mode === "strict" || mode === "open" ? (mode as "strict" | "open") : undefined;
@@ -722,6 +739,8 @@ try {
         word,
         mode: modeParsed ?? mode ?? "strict",
         alphabet: alphabet ?? "auto",
+        language:
+          language || undefined,
         brainCandidatesSeedFallback: seedFallbackEnabled,
       };
 
@@ -886,6 +905,8 @@ const checked = AnalyzeWordResultV1ContractSchema.safeParse(out);
           ? "open"
           : "strict",
       ipa,
+      manualLanguageHint:
+        language,
     });
 
     refreshEvidencePackageAfterFunctionalNormalizationV0_1({
@@ -957,7 +978,9 @@ const checked = AnalyzeWordResultV1ContractSchema.safeParse(out);
       (
         automaticFunctionalProposalV0_1.attempted ||
         automaticFunctionalProposalV0_1.status ===
-          "skipped_real_provider_not_ready"
+          "skipped_real_provider_not_ready" ||
+        automaticFunctionalProposalV0_1.status ===
+          "skipped_functional_path_unavailable"
       )
     ) {
       (final as any).automaticFunctionalProposalV0_1 =
@@ -997,6 +1020,8 @@ export async function GET(req: Request) {
   
 
     const ipa = (url.searchParams.get("ipa") ?? "").trim();
+    const language =
+      (url.searchParams.get("language") ?? "").trim();
 // Seed fallback flag (BRAIN-0.2)
     const seedFallbackEnabled =
       url.searchParams.get("seed") === "1" ||
@@ -1025,6 +1050,8 @@ if (!word) {
         mode: modeParsed ?? (mode as any) ?? "strict",
         alphabet: alphabet || "auto",
         ipa: ipa || undefined,
+        language:
+          language || undefined,
           brainCandidatesSeedFallback: seedFallbackEnabled,
       };
 
@@ -1198,6 +1225,8 @@ const checked = AnalyzeWordResultV1ContractSchema.safeParse(out);
           ? "open"
           : "strict",
       ipa,
+      manualLanguageHint:
+        language,
     });
 
     refreshEvidencePackageAfterFunctionalNormalizationV0_1({
@@ -1269,7 +1298,9 @@ const checked = AnalyzeWordResultV1ContractSchema.safeParse(out);
       (
         automaticFunctionalProposalV0_1.attempted ||
         automaticFunctionalProposalV0_1.status ===
-          "skipped_real_provider_not_ready"
+          "skipped_real_provider_not_ready" ||
+        automaticFunctionalProposalV0_1.status ===
+          "skipped_functional_path_unavailable"
       )
     ) {
       (final as any).automaticFunctionalProposalV0_1 =

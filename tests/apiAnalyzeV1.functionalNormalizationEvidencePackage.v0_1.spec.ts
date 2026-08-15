@@ -5,6 +5,7 @@ import {
 function requestFor(
   word: string,
   ipa?: string,
+  language?: string,
 ): Request {
   const url =
     new URL(
@@ -28,6 +29,13 @@ function requestFor(
     );
   }
 
+  if (language) {
+    url.searchParams.set(
+      "language",
+      language,
+    );
+  }
+
   return new Request(
     url.toString(),
   );
@@ -44,6 +52,7 @@ describe(
             requestFor(
               "memory",
               "/ˈmɛməri/",
+              "English",
             ),
           );
 
@@ -150,6 +159,7 @@ describe(
             requestFor(
               "riverglass",
               "/ˈrɪvərɡlæs/",
+              "English",
             ),
           );
 
@@ -192,6 +202,66 @@ describe(
             .voicePathDelta ??
             "",
         ).toBe("");
+      },
+    );
+
+    test(
+      "manual IPA without a language hint does not activate English-only functional normalization",
+      async () => {
+        const response =
+          await GET(
+            requestFor(
+              "muy",
+              "/mui/",
+            ),
+          );
+
+        expect(
+          response.status,
+        ).toBe(200);
+
+        const body =
+          await response.json();
+
+        expect(
+          body
+            .automaticCarrierPronunciationV0_1
+            .status,
+        ).toBe(
+          "manual_ipa",
+        );
+
+        expect(
+          body
+            .automaticCarrierPronunciationV0_1
+            .language,
+        ).toBeNull();
+
+        expect(
+          body
+            .functionalVoiceNormalizationV0_1,
+        ).toBeUndefined();
+
+        expect(
+          body.evidence.vowelPath,
+        ).toEqual([
+          "U",
+          "Y",
+        ]);
+
+        const automaticCandidates =
+          (
+            body.candidates ??
+            []
+          ).filter(
+            (row: any) =>
+              row?.sourceKind ===
+              "automatic_llm_functional_proposal",
+          );
+
+        expect(
+          automaticCandidates,
+        ).toHaveLength(0);
       },
     );
   },

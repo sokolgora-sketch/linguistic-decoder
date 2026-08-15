@@ -5,6 +5,7 @@ import {
 import {
   buildAutomaticFunctionalProposalContextV0_1,
   reconcileSliceGRequiredTransformsV0_1,
+  runAutomaticFunctionalCandidateProposalV0_1,
   sanitizeAutomaticFunctionalRequiredTransformsV0_1,
 } from "@/shared/orchestrator/automaticFunctionalCandidateProposal.v0.1";
 
@@ -350,6 +351,185 @@ describe(
                       "SHTU",
                     gloss:
                       "measure",
+                  },
+                ],
+              }),
+          });
+
+        expect(
+          result.status,
+        ).toBe(
+          "rejected_all",
+        );
+
+        expect(
+          result.results[0]
+            ?.checks.find(
+              (check) =>
+                check.id ===
+                "FUNCTIONAL_PATH_MATCH",
+            )?.pass,
+        ).toBe(false);
+      },
+    );
+
+    test(
+      "failed modern normalization does not fall back to canonical evidence",
+      () => {
+        const context =
+          buildAutomaticFunctionalProposalContextV0_1({
+            evidence: {
+              surfaceVowels: [
+                "I",
+                "E",
+                "A",
+              ],
+              vowelPath: [
+                "I",
+                "E",
+                "A",
+              ],
+            },
+            automaticCarrierPronunciationV0_1: {
+              attempted: true,
+              status:
+                "proposed",
+            },
+            functionalVoiceNormalizationV0_1: {
+              status:
+                "unsupported_difference",
+              functionalPath:
+                null,
+            },
+            candidates: [],
+          });
+
+        expect(
+          context
+            .modernFunctionalAuthorityPresent,
+        ).toBe(true);
+
+        expect(
+          context
+            .explicitFunctionalNormalization,
+        ).toBe(false);
+
+        expect(
+          context
+            .functionalVowelPath,
+        ).toEqual([]);
+      },
+    );
+
+    test(
+      "automatic proposer skips a modern run that has no usable functional path",
+      async () => {
+        const result =
+          await runAutomaticFunctionalCandidateProposalV0_1(
+            {
+              word:
+                "riverglass",
+              mode:
+                "strict",
+              analysis: {
+                evidence: {
+                  surfaceVowels: [
+                    "I",
+                    "E",
+                    "A",
+                  ],
+                  vowelPath: [
+                    "I",
+                    "E",
+                    "A",
+                  ],
+                },
+                automaticCarrierPronunciationV0_1: {
+                  attempted: true,
+                  status:
+                    "proposed",
+                },
+                functionalVoiceNormalizationV0_1: {
+                  status:
+                    "unsupported_difference",
+                  functionalPath:
+                    null,
+                },
+                candidates: [],
+              },
+            },
+            {
+              providerOverrideForTests:
+                "mock",
+            },
+          );
+
+        expect(
+          result.status,
+        ).toBe(
+          "skipped_functional_path_unavailable",
+        );
+
+        expect(
+          result.attempted,
+        ).toBe(false);
+
+        expect(
+          result.proposal,
+        ).toBeNull();
+      },
+    );
+
+    test(
+      "verifier rejects a proposal when modern normalization exists without a usable functional path",
+      () => {
+        const result =
+          verifyAutomaticFunctionalProposalV0_1({
+            analysis: {
+              word:
+                "riverglass",
+              evidence: {
+                surfaceVowelsRaw: [
+                  "I",
+                  "E",
+                  "A",
+                ],
+                surfaceVowels: [
+                  "I",
+                  "E",
+                  "A",
+                ],
+                vowelPath: [
+                  "I",
+                  "E",
+                  "A",
+                ],
+              },
+              automaticCarrierPronunciationV0_1: {
+                attempted: true,
+                status:
+                  "proposed",
+              },
+              functionalVoiceNormalizationV0_1: {
+                status:
+                  "unsupported_difference",
+                functionalPath:
+                  null,
+              },
+              candidates: [],
+            },
+            automaticProposal:
+              automaticProposal({
+                word:
+                  "riverglass",
+                expression:
+                  "DI",
+                embryos: [
+                  {
+                    form:
+                      "DI",
+                    gloss:
+                      "fixture",
                   },
                 ],
               }),
