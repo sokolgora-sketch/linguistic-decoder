@@ -8,6 +8,12 @@ import { buildEvidencePackageFromVM } from "@/ui/telemetry/buildEvidencePackageF
 import { backfillEvidencePackageSignalsCountV01 } from "./evidencePackage.signalsCount.backfill.v0.1";
 import { runAutomaticFunctionalCandidateProposalV0_1 } from "@/shared/orchestrator/automaticFunctionalCandidateProposal.v0.1";
 import { verifyAutomaticFunctionalProposalV0_1 } from "@/shared/verifier/verifyAutomaticFunctionalProposal.v0.1";
+import {
+  runAutomaticCarrierPronunciationV0_1,
+} from "@/shared/orchestrator/automaticCarrierPronunciation.v0.1";
+import {
+  buildFunctionalVoiceNormalizationV0_1,
+} from "@/shared/openInstrument/functionalVoiceNormalization.v0.1";
 import { toAnalyzeWordResultV1Contract } from "@/shared/analyzeWordResult.v1.contract";
 import { ensurePrimaryAndCandidatePaths } from "@/shared/ensurePaths";
 import { extractCarrierVoicesFromIpaV0_1 } from "@/shared/vowels/extractCarrierVoicesFromIpa.v0.1";
@@ -337,6 +343,151 @@ function contractFailResponse(params: { message: string; issues?: unknown; out?:
   );
 }
 
+
+function hasDeepRootFunctionalPathV0_1(
+  final: any,
+): boolean {
+  if (
+    !final ||
+    typeof final !== "object"
+  ) {
+    return false;
+  }
+
+  const deepRoot =
+    final.deepRoot &&
+    typeof final.deepRoot === "object"
+      ? final.deepRoot
+      : null;
+
+  const roots =
+    deepRoot &&
+    Array.isArray(
+      deepRoot.functionalRoots,
+    )
+      ? deepRoot.functionalRoots
+      : [];
+
+  return roots.some(
+    (row: unknown) => {
+      if (
+        !row ||
+        typeof row !== "object" ||
+        Array.isArray(row)
+      ) {
+        return false;
+      }
+
+      const record =
+        row as
+          Record<string, unknown>;
+
+      const value =
+        record["vowelPath"] ??
+        record["vowel_path"];
+
+      if (
+        Array.isArray(value)
+      ) {
+        return value.length > 0;
+      }
+
+      return (
+        typeof value === "string" &&
+        value.trim().length > 0
+      );
+    },
+  );
+}
+
+async function applyAutomaticFunctionalVoiceNormalizationV0_1(
+  args: {
+    final: any;
+    word: string;
+    mode:
+      | "strict"
+      | "open";
+    ipa:
+      string;
+  },
+): Promise<void> {
+  const {
+    final,
+    word,
+    mode,
+    ipa,
+  } = args;
+
+  if (
+    !final ||
+    typeof final !== "object"
+  ) {
+    return;
+  }
+
+  // Existing deterministic DeepRoot functional truth remains
+  // the higher functional authority. Crucially, we do NOT
+  // rewrite Heart/evidence to it.
+  if (
+    hasDeepRootFunctionalPathV0_1(
+      final,
+    )
+  ) {
+    return;
+  }
+
+  const pronunciation =
+    await runAutomaticCarrierPronunciationV0_1({
+      word,
+      mode,
+      manualIpa:
+        ipa || null,
+      manualLanguageHint:
+        ipa
+          ? "English"
+          : null,
+    });
+
+  // Always expose the bounded pronunciation stage result.
+  //
+  // Skipped states are diagnostics, not pronunciation truth.
+  // Keeping them visible prevents configuration/provider
+  // failures from silently looking like "the stage did not run".
+  final
+    .automaticCarrierPronunciationV0_1 =
+    pronunciation;
+
+  if (
+    !pronunciation.ipa ||
+    !pronunciation.language
+  ) {
+    return;
+  }
+
+  const normalization =
+    buildFunctionalVoiceNormalizationV0_1({
+      word,
+      language:
+        pronunciation.language,
+      ipa:
+        pronunciation.ipa,
+    });
+
+  // Separate truth channel.
+  //
+  // DO NOT mutate:
+  // - primaryPath
+  // - heart.math7.primary
+  // - heartInstrumentV1
+  // - evidence.surfaceVowels
+  // - evidence.surfaceVowelsRaw
+  // - evidence.vowelPath
+  // - evidence.normalizationSteps
+  final
+    .functionalVoiceNormalizationV0_1 =
+    normalization;
+}
+
 export async function POST(req: Request) {
   const gatesOn = applyDevOriginClaimGates(req.url);
 
@@ -556,6 +707,16 @@ const checked = AnalyzeWordResultV1ContractSchema.safeParse(out);
       });
     }
     if (final && typeof final === "object") (final as any).evidencePackage = evidencePackage;
+
+    await applyAutomaticFunctionalVoiceNormalizationV0_1({
+      final,
+      word,
+      mode:
+        modeParsed === "open"
+          ? "open"
+          : "strict",
+      ipa,
+    });
 
     const automaticFunctionalProposalV0_1 =
       await runAutomaticFunctionalCandidateProposalV0_1({
@@ -848,6 +1009,16 @@ const checked = AnalyzeWordResultV1ContractSchema.safeParse(out);
       });
     }
     if (final && typeof final === "object") (final as any).evidencePackage = evidencePackage;
+
+    await applyAutomaticFunctionalVoiceNormalizationV0_1({
+      final,
+      word,
+      mode:
+        modeParsed === "open"
+          ? "open"
+          : "strict",
+      ipa,
+    });
 
     const automaticFunctionalProposalV0_1 =
       await runAutomaticFunctionalCandidateProposalV0_1({

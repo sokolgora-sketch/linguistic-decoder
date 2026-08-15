@@ -852,6 +852,74 @@ export function verifyAutomaticFunctionalProposalV0_1(
         ),
       );
 
+      const sliceGNormalization =
+        isRecord(
+          root[
+            "functionalVoiceNormalizationV0_1"
+          ],
+        )
+          ? root[
+              "functionalVoiceNormalizationV0_1"
+            ]
+          : null;
+
+      const explicitSliceGFunctionalPath =
+        sliceGNormalization &&
+        Array.isArray(
+          sliceGNormalization[
+            "functionalPath"
+          ],
+        )
+          ? sliceGNormalization[
+              "functionalPath"
+            ]
+              .map(
+                (voice: unknown) =>
+                  normalizedToken(
+                    voice,
+                  ),
+              )
+              .filter(Boolean)
+          : [];
+
+      const functionalPathMatchRequired =
+        explicitSliceGFunctionalPath.length > 0;
+
+      const functionalPathMatches =
+        !functionalPathMatchRequired
+          ? true
+          : (
+              candidateVowelPath.length ===
+                explicitSliceGFunctionalPath.length &&
+              candidateVowelPath.every(
+                (voice, index) =>
+                  normalizedToken(
+                    voice,
+                  ) ===
+                  explicitSliceGFunctionalPath[
+                    index
+                  ],
+              )
+            );
+
+      checks.push(
+        makeCheck(
+          "FUNCTIONAL_PATH_MATCH",
+          functionalPathMatches,
+          !functionalPathMatchRequired
+            ? "no explicit Slice G functional-normalization path is present; legacy Slice E behavior is preserved"
+            : functionalPathMatches
+              ? `candidate vowel path matches explicit Slice G functional path ${explicitSliceGFunctionalPath.join(
+                  "→",
+                )}`
+              : `candidate vowel path ${candidateVowelPath.join(
+                  "→",
+                )} differs from explicit Slice G functional path ${explicitSliceGFunctionalPath.join(
+                  "→",
+                )}`,
+        ),
+      );
+
       let reviewedEvidenceOk =
         true;
 
