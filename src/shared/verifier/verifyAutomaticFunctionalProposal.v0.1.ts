@@ -852,6 +852,107 @@ export function verifyAutomaticFunctionalProposalV0_1(
         ),
       );
 
+      const sliceGNormalization =
+        isRecord(
+          root[
+            "functionalVoiceNormalizationV0_1"
+          ],
+        )
+          ? root[
+              "functionalVoiceNormalizationV0_1"
+            ]
+          : null;
+
+      const automaticCarrierPronunciation =
+        isRecord(
+          root[
+            "automaticCarrierPronunciationV0_1"
+          ],
+        )
+          ? root[
+              "automaticCarrierPronunciationV0_1"
+            ]
+          : null;
+
+      const modernFunctionalAuthorityPresent =
+        sliceGNormalization !== null ||
+        (
+          automaticCarrierPronunciation !==
+            null &&
+          (
+            automaticCarrierPronunciation[
+              "attempted"
+            ] === true ||
+            automaticCarrierPronunciation[
+              "status"
+            ] === "manual_ipa"
+          )
+        );
+
+      const explicitSliceGFunctionalPath =
+        sliceGNormalization &&
+        Array.isArray(
+          sliceGNormalization[
+            "functionalPath"
+          ],
+        )
+          ? sliceGNormalization[
+              "functionalPath"
+            ]
+              .map(
+                (voice: unknown) =>
+                  normalizedToken(
+                    voice,
+                  ),
+              )
+              .filter(Boolean)
+          : [];
+
+      const functionalPathMatchRequired =
+        modernFunctionalAuthorityPresent;
+
+      const functionalPathMatches =
+        !functionalPathMatchRequired
+          ? true
+          : explicitSliceGFunctionalPath
+                .length === 0
+            ? false
+            : (
+                candidateVowelPath.length ===
+                  explicitSliceGFunctionalPath
+                    .length &&
+                candidateVowelPath.every(
+                  (voice, index) =>
+                    normalizedToken(
+                      voice,
+                    ) ===
+                    explicitSliceGFunctionalPath[
+                      index
+                    ],
+                )
+              );
+
+      checks.push(
+        makeCheck(
+          "FUNCTIONAL_PATH_MATCH",
+          functionalPathMatches,
+          !functionalPathMatchRequired
+            ? "no modern Slice G pronunciation/normalization authority is present; legacy Slice E behavior is preserved"
+            : explicitSliceGFunctionalPath
+                  .length === 0
+              ? "modern Slice G pronunciation/normalization authority is present but no usable functional path was emitted; proposal cannot be promoted"
+              : functionalPathMatches
+                ? `candidate vowel path matches explicit Slice G functional path ${explicitSliceGFunctionalPath.join(
+                    "→",
+                  )}`
+                : `candidate vowel path ${candidateVowelPath.join(
+                    "→",
+                  )} differs from explicit Slice G functional path ${explicitSliceGFunctionalPath.join(
+                    "→",
+                  )}`,
+        ),
+      );
+
       let reviewedEvidenceOk =
         true;
 

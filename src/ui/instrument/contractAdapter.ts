@@ -773,13 +773,86 @@ const deepRootFunctionalForParts =
   )?.join("-") ?? null) ??
   null;
 
-const functionalForParts =
-  deepRootFunctionalForParts ??
-  (evFunctionalArr
+const functionalNormalizationValue =
+  getField(
+    payload,
+    "functionalVoiceNormalizationV0_1",
+  );
+
+const functionalNormalization =
+  isRecord(
+    functionalNormalizationValue,
+  )
+    ? functionalNormalizationValue
+    : null;
+
+const automaticCarrierPronunciationValue =
+  getField(
+    payload,
+    "automaticCarrierPronunciationV0_1",
+  );
+
+const automaticCarrierPronunciation =
+  isRecord(
+    automaticCarrierPronunciationValue,
+  )
+    ? automaticCarrierPronunciationValue
+    : null;
+
+const normalizedFunctionalForParts =
+  functionalNormalization
+    ? (
+        normalizeVowelPathArray(
+          functionalNormalization[
+            "functionalPath"
+          ],
+        )?.join("-") ??
+        normalizeVowelPathString(
+          functionalNormalization[
+            "functionalPath"
+          ],
+        )?.join("-") ??
+        null
+      )
+    : null;
+
+// Legacy payload compatibility:
+// evidence.surfaceVowels/evidence.vowelPath remain valid
+// run-level functional fallbacks when no Slice G
+// normalization attempt exists.
+//
+// A modern attempted pronunciation with no usable
+// normalization MUST NOT silently fall back to surface
+// and call it functional.
+const modernFunctionalAuthorityPresent =
+  functionalNormalization !== null ||
+  (
+    automaticCarrierPronunciation !== null &&
+    (
+      automaticCarrierPronunciation[
+        "attempted"
+      ] === true ||
+      automaticCarrierPronunciation[
+        "status"
+      ] === "manual_ipa"
+    )
+  );
+
+const legacyFunctionalForParts =
+  evFunctionalArr
     ? evFunctionalArr.join("-")
     : evVowelPathArr
       ? evVowelPathArr.join("-")
-      : vp.functional);
+      : vp.functional;
+
+const functionalForParts =
+  deepRootFunctionalForParts ??
+  normalizedFunctionalForParts ??
+  (
+    modernFunctionalAuthorityPresent
+      ? null
+      : legacyFunctionalForParts
+  );
 
 const surfaceParts = toVoiceParts(surfaceForParts);
 const functionalParts = toVoiceParts(functionalForParts);

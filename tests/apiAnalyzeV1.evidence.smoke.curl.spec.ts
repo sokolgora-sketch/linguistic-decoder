@@ -155,7 +155,7 @@ describe("/api/analyze-v1 evidence smoke (curl)", () => {
     async () => {
       const ipa = encodeURIComponent("/ˈrɪð(ə)m/");
       const { status, json, raw } = await getJson(
-        `${BASE}/api/analyze-v1?word=rhythm&mode=strict&ipa=${ipa}`
+        `${BASE}/api/analyze-v1?word=rhythm&mode=strict&ipa=${ipa}&language=English`
       );
 
       expect(status).toBe(200);
@@ -163,9 +163,13 @@ describe("/api/analyze-v1 evidence smoke (curl)", () => {
       const sum: any = json?.evidencePackage?.summary;
       expect(sum).toBeTruthy();
 
-      // Functional delta and IPA carrier delta are independent truth layers.
-      // rhythm: surface Y == functional Y, while carrier I→Ë differs.
-      expect(sum.voicePathDelta).toBe("MATCH");
+      // Functional and IPA carrier remain independent truth layers.
+      // Slice G rhythm normalization:
+      // surface Y -> functional I→Ë;
+      // IPA carrier also emits I→Ë.
+      expect(sum.voicePathSurface).toBe("Y");
+      expect(sum.voicePathFunctional).toBe("I → Ë");
+      expect(sum.voicePathDelta).toBe("DIVERGE");
       expect(sum.voicePathCarrier).toBe("I → Ë");
       expect(sum.voicePathCarrierDelta).toBe("DIVERGE");
 
@@ -182,6 +186,7 @@ describe("/api/analyze-v1 evidence smoke (curl)", () => {
         word: "rhythm",
         mode: "strict",
         ipa: "/ˈrɪð(ə)m/",
+        language: "English",
       });
 
       expect(status).toBe(200);
@@ -189,7 +194,9 @@ describe("/api/analyze-v1 evidence smoke (curl)", () => {
       const sum: any = json?.evidencePackage?.summary;
       expect(sum).toBeTruthy();
 
-      expect(sum.voicePathDelta).toBe("MATCH");
+      expect(sum.voicePathSurface).toBe("Y");
+      expect(sum.voicePathFunctional).toBe("I → Ë");
+      expect(sum.voicePathDelta).toBe("DIVERGE");
       expect(sum.voicePathCarrier).toBe("I → Ë");
       expect(sum.voicePathCarrierDelta).toBe("DIVERGE");
 

@@ -8,6 +8,12 @@ import {
 import {
   tryParseJsonV0_2,
 } from "@/shared/orchestrator/proposalParse.v0.2";
+import {
+  extractSevenVowelsFromString,
+} from "@/shared/math7.core";
+import {
+  normalizeToAllowedOpId,
+} from "@/shared/ops/allowedOps.v0.1";
 
 export const AUTOMATIC_FUNCTIONAL_PROPOSAL_SCHEMA_V0_1 =
   "open-instrument.automatic-functional-proposal.v0_1" as const;
@@ -34,6 +40,7 @@ export type FunctionalProposalEnvelopeV0_1 = {
 export type AutomaticFunctionalProposalStatusV0_1 =
   | "skipped_disabled"
   | "skipped_real_provider_not_ready"
+  | "skipped_functional_path_unavailable"
   | "mock_exercised_test_only"
   | "proposed_unverified"
   | "malformed_output"
@@ -56,6 +63,8 @@ export type AutomaticFunctionalProposalResultV0_1 = {
 export type AutomaticFunctionalProposalContextV0_1 = {
   surfaceVowelPath: string[];
   functionalVowelPath: string[];
+  explicitFunctionalNormalization: boolean;
+  modernFunctionalAuthorityPresent: boolean;
   rootMapTokens: string[];
   reviewedOperators: string[];
   structuralTokens: string[];
@@ -125,6 +134,28 @@ export function buildAutomaticFunctionalProposalContextV0_1(
       ? root["evidence"]
       : {};
 
+  const functionalNormalization =
+    isRecord(
+      root[
+        "functionalVoiceNormalizationV0_1"
+      ],
+    )
+      ? root[
+          "functionalVoiceNormalizationV0_1"
+        ]
+      : null;
+
+  const automaticCarrierPronunciation =
+    isRecord(
+      root[
+        "automaticCarrierPronunciationV0_1"
+      ],
+    )
+      ? root[
+          "automaticCarrierPronunciationV0_1"
+        ]
+      : null;
+
   const rootMap =
     isRecord(root["rootMap"])
       ? root["rootMap"]
@@ -140,10 +171,40 @@ export function buildAutomaticFunctionalProposalContextV0_1(
       ? stringArray(evidence["surfaceVowelsRaw"])
       : stringArray(evidence["surfaceVowels"]);
 
+  const normalizedFunctionalVowelPath =
+    functionalNormalization
+      ? stringArray(
+          functionalNormalization[
+            "functionalPath"
+          ],
+        )
+      : [];
+
+  const explicitFunctionalNormalization =
+    normalizedFunctionalVowelPath.length > 0;
+
+  const modernFunctionalAuthorityPresent =
+    functionalNormalization !== null ||
+    (
+      automaticCarrierPronunciation !== null &&
+      (
+        automaticCarrierPronunciation[
+          "attempted"
+        ] === true ||
+        automaticCarrierPronunciation[
+          "status"
+        ] === "manual_ipa"
+      )
+    );
+
   const functionalVowelPath =
-    stringArray(evidence["vowelPath"]).length > 0
-      ? stringArray(evidence["vowelPath"])
-      : stringArray(evidence["surfaceVowels"]);
+    explicitFunctionalNormalization
+      ? normalizedFunctionalVowelPath
+      : modernFunctionalAuthorityPresent
+        ? []
+        : stringArray(evidence["vowelPath"]).length > 0
+          ? stringArray(evidence["vowelPath"])
+          : stringArray(evidence["surfaceVowels"]);
 
   const rootMapTokens = Array.isArray(rootMap["tokens"])
     ? rootMap["tokens"]
@@ -223,6 +284,8 @@ export function buildAutomaticFunctionalProposalContextV0_1(
   return {
     surfaceVowelPath,
     functionalVowelPath,
+    explicitFunctionalNormalization,
+    modernFunctionalAuthorityPresent,
     rootMapTokens: unique(rootMapTokens),
     reviewedOperators: unique(reviewedOperators),
     structuralTokens: unique(structuralTokens),
@@ -230,6 +293,47 @@ export function buildAutomaticFunctionalProposalContextV0_1(
     reviewedLexicalEvidence,
     existingCandidates,
   };
+}
+
+export function sanitizeAutomaticFunctionalRequiredTransformsV0_1(
+  value: unknown,
+): string[] {
+  const raw =
+    stringArray(value);
+
+  const out: string[] = [];
+
+  for (const item of raw) {
+    const canonical =
+      normalizeToAllowedOpId(
+        item,
+      );
+
+    // Canonical engine operations are normalized.
+    // Unknown transform requests MUST remain visible
+    // so the deterministic verifier can reject them.
+    const retained =
+      canonical ??
+      item
+        .normalize("NFKC")
+        .trim();
+
+    if (!retained) {
+      continue;
+    }
+
+    if (
+      !out.includes(
+        retained,
+      )
+    ) {
+      out.push(
+        retained,
+      );
+    }
+  }
+
+  return out;
 }
 
 function sanitizeFunctionalProposalV0_1(
@@ -295,7 +399,7 @@ function sanitizeFunctionalProposalV0_1(
       });
 
     const requiredTransforms =
-      stringArray(
+      sanitizeAutomaticFunctionalRequiredTransformsV0_1(
         rawCandidate[
           "requiredTransforms"
         ],
@@ -328,6 +432,102 @@ function sanitizeFunctionalProposalV0_1(
   return {
     word,
     candidates,
+  };
+}
+
+export function reconcileSliceGRequiredTransformsV0_1(
+  proposal:
+    FunctionalProposalEnvelopeV0_1,
+  context:
+    AutomaticFunctionalProposalContextV0_1,
+): FunctionalProposalEnvelopeV0_1 {
+  if (
+    !context
+      .explicitFunctionalNormalization ||
+    context
+      .functionalVowelPath
+      .length === 0
+  ) {
+    return proposal;
+  }
+
+  const targetPath =
+    context
+      .functionalVowelPath
+      .map(
+        (voice) =>
+          String(voice)
+            .normalize("NFKC")
+            .trim()
+            .toUpperCase(),
+      );
+
+  return {
+    ...proposal,
+    candidates:
+      proposal.candidates.map(
+        (candidate) => {
+          const candidatePath =
+            extractSevenVowelsFromString(
+              candidate
+                .candidateExpression,
+            )
+              .map(
+                (voice) =>
+                  String(voice)
+                    .normalize("NFKC")
+                    .trim()
+                    .toUpperCase(),
+              );
+
+          const exactPathMatch =
+            candidatePath.length ===
+              targetPath.length &&
+            candidatePath.every(
+              (voice, index) =>
+                voice ===
+                targetPath[index],
+            );
+
+          if (!exactPathMatch) {
+            // A mismatching proposal gets no repair.
+            // Unknown transforms remain present and
+            // deterministic verification can reject them.
+            return candidate;
+          }
+
+          const canonicalOnly =
+            candidate
+              .requiredTransforms
+              .flatMap(
+                (transform) => {
+                  const canonical =
+                    normalizeToAllowedOpId(
+                      transform,
+                    );
+
+                  return canonical
+                    ? [canonical]
+                    : [];
+                },
+              );
+
+          return {
+            ...candidate,
+            // The expression already emits the exact
+            // deterministic Slice G functional path.
+            //
+            // Therefore free-form model transform prose
+            // cannot be required for vowel-path alignment.
+            // Recognized engine operations remain visible
+            // and still face TRANSFORMS_PERMITTED.
+            requiredTransforms:
+              unique(
+                canonicalOnly,
+              ),
+          };
+        },
+      ),
   };
 }
 
@@ -575,6 +775,33 @@ export async function runAutomaticFunctionalCandidateProposalV0_1(
         req.analysis,
       );
 
+    if (
+      deterministicContext
+        .modernFunctionalAuthorityPresent &&
+      deterministicContext
+        .functionalVowelPath
+        .length === 0
+    ) {
+      return {
+        schemaVersion:
+          AUTOMATIC_FUNCTIONAL_PROPOSAL_SCHEMA_V0_1,
+        attempted: false,
+        status:
+          "skipped_functional_path_unavailable",
+        provider,
+        realProvider:
+          isRealProvider,
+        mockProvider:
+          isMockProvider,
+        userFacingEligible: false,
+        verificationState:
+          "not_started",
+        candidateCount: 0,
+        proposal: null,
+        error: null,
+      };
+    }
+
     const proposer =
       await withTimeout(
         runProposerV0_2(
@@ -646,6 +873,12 @@ export async function runAutomaticFunctionalCandidateProposalV0_1(
       };
     }
 
+    const reconciledProposal =
+      reconcileSliceGRequiredTransformsV0_1(
+        proposal,
+        deterministicContext,
+      );
+
     return {
       schemaVersion:
         AUTOMATIC_FUNCTIONAL_PROPOSAL_SCHEMA_V0_1,
@@ -659,8 +892,10 @@ export async function runAutomaticFunctionalCandidateProposalV0_1(
       verificationState:
         "pending_slice_e",
       candidateCount:
-        proposal.candidates.length,
-      proposal,
+        reconciledProposal
+          .candidates.length,
+      proposal:
+        reconciledProposal,
       error: null,
     };
   } catch (error: unknown) {

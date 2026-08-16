@@ -9,6 +9,7 @@ export type ProposerRequestV0_2 = {
    * Used by v0.3 loop to send repair failReasons deterministically.
    */
   userPayload?: unknown;
+  signal?: AbortSignal;
 };
 
 export type ProposerResultV0_2 = {
@@ -88,6 +89,7 @@ async function proposeOpenAICompat(req: ProposerRequestV0_2): Promise<ProposerRe
       authorization: `Bearer ${key}`,
     },
     body: JSON.stringify(body),
+    signal: req.signal,
   });
 
   if (!r.ok) {

@@ -39,6 +39,11 @@ Rules:
 - semanticBridge must explain the functional connection between the embryos and the input word.
 - functionalExplanation must be short, plain language suitable for a normal user.
 - requiredTransforms must contain only transforms actually required by the proposal; use [] when none are required.
+- If deterministicContext.permittedTransforms is empty, requiredTransforms MUST be [].
+- Pronunciation/carrier normalization is handled separately and must not be invented as a candidate requiredTransform.
+- When deterministicContext.functionalVowelPath is non-empty, candidateExpression must emit exactly that Seven-Voice vowel path.
+- Do not use requiredTransforms to compensate for a candidateExpression whose Seven-Voice path differs from deterministicContext.functionalVowelPath.
+- When no deterministic functional candidate exists, still propose a bounded living-language functional hypothesis when a plausible smallest embryo can be stated.
 - Treat deterministicContext as bounded evidence/hints, not permission to invent facts.
 - Prefer reviewed lexical material from deterministicContext when it genuinely supports the proposal.
 - Structural tokens may be used as structural hints but must not be called reviewed.
