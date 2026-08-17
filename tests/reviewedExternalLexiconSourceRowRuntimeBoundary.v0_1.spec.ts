@@ -8,11 +8,11 @@ const read = (file: string): string =>
   fs.readFileSync(path.join(process.cwd(), file), "utf8");
 
 describe("reviewed external lexicon source-row runtime boundary v0.1", () => {
-  it("exposes DA and DI only through authorization-enforced production enumeration", () => {
+  it("exposes DA, DI, and runtime-verified AT only through authorization-enforced production enumeration", () => {
     const rows =
       getReviewedExternalLexiconProductionSourceRowsV0_1();
 
-    expect(rows).toHaveLength(2);
+    expect(rows).toHaveLength(3);
     expect(rows).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
@@ -25,6 +25,12 @@ describe("reviewed external lexicon source-row runtime boundary v0.1", () => {
           sourceId:
             "reviewed.external.di.knowledge.candidate.v0_1",
           embryo: "DI",
+          userDecisionPosture: "user_decides",
+        }),
+        expect.objectContaining({
+          sourceId:
+            "reviewed.external.albanian-at.father.candidate.v0_1",
+          embryo: "AT",
           userDecisionPosture: "user_decides",
         }),
       ]),
@@ -47,6 +53,9 @@ describe("reviewed external lexicon source-row runtime boundary v0.1", () => {
     );
     expect(runtimeSources).not.toContain(
       "reviewed.external.di.knowledge.candidate.v0_1",
+    );
+    expect(runtimeSources).not.toContain(
+      "reviewed.external.albanian-at.father.candidate.v0_1",
     );
 
     const rootMapBuilderSource = read(

@@ -1,7 +1,7 @@
 import { execFileSync } from "node:child_process";
 
 describe("reviewed lexicon candidate diagnostics audit v0.1", () => {
-  it("prints non-live Gheg DA candidate diagnostics without production promotion", () => {
+  it("prints reviewed production candidate diagnostics with bounded promotion posture", () => {
     const raw = execFileSync(
       "node",
       ["scripts/reviewed-lexicon-candidate-diagnostics.v0.1.mjs"],
@@ -10,7 +10,7 @@ describe("reviewed lexicon candidate diagnostics audit v0.1", () => {
 
     const report = JSON.parse(raw);
     expect(report.reportVersion).toBe("reviewed-lexicon-candidate-diagnostics.v0.1");
-    expect(report.rows).toHaveLength(2);
+    expect(report.rows).toHaveLength(3);
 
     const daRow = report.rows.find(
       (row: { sourceId?: string }) =>

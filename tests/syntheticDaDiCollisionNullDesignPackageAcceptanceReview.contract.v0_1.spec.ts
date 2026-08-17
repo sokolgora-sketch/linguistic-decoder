@@ -387,20 +387,33 @@ describe(
       }
     });
 
-    it("preserves the immutable DA/DI machine baseline", () => {
+    it("preserves the immutable DA/DI machine baseline while allowing later operators", () => {
+      const daDiProfiles =
+        canonicalOperatorProfilesV0_1.filter(
+          (profile) =>
+            profile.operatorId === "DA" ||
+            profile.operatorId === "DI",
+        );
+
       expect(
-        canonicalOperatorProfilesV0_1.map(
+        daDiProfiles.map(
           (profile) => profile.operatorId,
         ),
       ).toEqual(["DA", "DI"]);
 
       expect(
-        canonicalOperatorProfilesV0_1.every(
+        daDiProfiles.every(
           (profile) =>
             profile.canonLifecycleStatus ===
             "canon_locked",
         ),
       ).toBe(true);
+
+      expect(
+        canonicalOperatorProfilesV0_1.map(
+          (profile) => profile.operatorId,
+        ),
+      ).toContain("AT");
 
       expect(
         canonicalOperatorReuseMatrixV0_1,

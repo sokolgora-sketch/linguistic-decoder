@@ -441,7 +441,7 @@ describe(
       }
     });
 
-    it("preserves the immutable DA/DI baseline", () => {
+    it("preserves the immutable DA/DI baseline while allowing later operators", () => {
       expect(
         canonicalOperatorReuseMatrixV0_1,
       ).toHaveLength(19);
@@ -450,19 +450,32 @@ describe(
         REQUIRED_CANONICAL_OPERATOR_REUSE_CATEGORIES_V0_1,
       ).toHaveLength(12);
 
+      const daDiProfiles =
+        canonicalOperatorProfilesV0_1.filter(
+          (profile) =>
+            profile.operatorId === "DA" ||
+            profile.operatorId === "DI",
+        );
+
       expect(
-        canonicalOperatorProfilesV0_1.map(
+        daDiProfiles.map(
           (profile) => profile.operatorId,
         ),
       ).toEqual(["DA", "DI"]);
 
       expect(
-        canonicalOperatorProfilesV0_1.every(
+        daDiProfiles.every(
           (profile) =>
             profile.canonLifecycleStatus ===
             "canon_locked",
         ),
       ).toBe(true);
+
+      expect(
+        canonicalOperatorProfilesV0_1.map(
+          (profile) => profile.operatorId,
+        ),
+      ).toContain("AT");
     });
 
     it("introduces no runtime, profile, discovery, API, or UI implementation", () => {

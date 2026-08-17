@@ -4341,14 +4341,59 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         "structuralOutputIsCandidateTruth": false,
         "winnerClaim": "not_claimed",
       },
-      "reviewedOperators": [],
+      "reviewedOperators": [
+        "AT",
+      ],
       "schemaVersion": "open-instrument.analysis-status.v0_1",
-      "status": "null_no_supported_candidate",
-      "structuralTokens": [],
-      "summary": "No supported canonical candidate or reviewed functional evidence is available. Null is a valid result.",
+      "status": "reviewed_functional_evidence",
+      "structuralTokens": [
+        "AT",
+      ],
+      "summary": "Bounded reviewed functional evidence is available for AT. This is functional evidence, not a historical-origin or winner claim.",
       "userDecisionPosture": "user_decides",
     },
     "candidates": [
+      {
+        "candidateId": "albanian-at-father-functional",
+        "candidateLanguage": "sq",
+        "claimBoundary": "functional motivation evidence only; not historical origin",
+        "claimType": "functionalMotivation",
+        "confidenceTag": "speculative",
+        "displayForm": "AT",
+        "embryo": "AT",
+        "embryoLanguage": "sq",
+        "embryoSize": 2,
+        "expansionChain": [
+          "AT",
+          "FATHER",
+        ],
+        "form": "at",
+        "functionalStatement": "Albanian at meaning father directly motivates the father function without making a historical-origin claim",
+        "gloss": "father",
+        "historicalRelation": "not_evaluated",
+        "id": "albanian-at-father-functional",
+        "isolatedStandaloneForm": "at",
+        "language": "sq",
+        "originClaim": "not_claimed",
+        "plainStandaloneGloss": "father",
+        "rankGroup": "validatedFunctionalMotivation",
+        "rankReason": "reviewed production source row matches live RootMap reviewed functional evidence",
+        "rankScore": 100,
+        "segmentation": {
+          "embryo": "AT",
+          "targetWord": "father",
+        },
+        "semanticBridge": "Albanian at meaning father directly motivates the father function without making a historical-origin claim",
+        "sourceKind": "reviewed_lexical_source",
+        "sourceNote": "Reviewed bounded Albanian lexical row: at is attested as father in the Albanian inherited lexicon. This row supports AT as a functional father embryo only on explicitly authorized proof targets. It does not claim historical origin, transmission, winner, ownership, language superiority, publication evidence, scientific evidence, or unrestricted interpretation of the homographic modern at 'horse'.",
+        "status": "unknown",
+        "userDecisionPosture": "user_decides",
+        "validationOutcome": "validated",
+        "validationReasons": [
+          "reviewed_production_source_row",
+          "live_rootmap_reviewed_functional_evidence",
+        ],
+      },
       {
         "candidateId": "latin-pater",
         "candidateLanguage": "Latin",
@@ -4470,7 +4515,35 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
     "debug": undefined,
     "deepRoot": {
       "basis": "father",
-      "candidates": [],
+      "candidates": [
+        {
+          "basis": "father",
+          "carriers": [
+            {
+              "carrierForm": "at",
+              "lang": "sq",
+              "ops": [],
+              "protoRootId": "AT",
+              "segment": "at",
+            },
+          ],
+          "checks": {
+            "opsWithinLimits": true,
+            "skeletonExplained": true,
+          },
+          "decomposition": {
+            "unit": "AT",
+          },
+          "id": "father:AT:0",
+          "opsCount": 0,
+          "protoRoots": [
+            "AT",
+          ],
+          "segments": [
+            "at",
+          ],
+        },
+      ],
       "functionalRoots": [
         {
           "gloss": "Functional root AT / PAT: origin, projection, source of lineage and authority.",
@@ -4495,8 +4568,50 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
           "vowelPath": "A→Ë",
         },
       ],
-      "hypotheses": [],
-      "protoRoots": [],
+      "hypotheses": [
+        {
+          "basis": "father",
+          "carriers": [
+            {
+              "carrierForm": "at",
+              "lang": "sq",
+              "ops": [],
+              "protoRootId": "AT",
+              "segment": "at",
+            },
+          ],
+          "checks": {
+            "opsWithinLimits": true,
+            "skeletonExplained": true,
+          },
+          "decomposition": {
+            "unit": "AT",
+          },
+          "id": "father:AT:0",
+          "opsCount": 0,
+          "protoRoots": [
+            "AT",
+          ],
+          "segments": [
+            "at",
+          ],
+        },
+      ],
+      "protoRoots": [
+        "AT",
+      ],
+      "rootFamilies": [
+        {
+          "carriers": [],
+          "id": "family_at_v1_1",
+          "label": "AT",
+          "protoRoots": [
+            {
+              "root": "AT",
+            },
+          ],
+        },
+      ],
       "soundRoots": {
         "claimedDomains": [],
         "domains": [],
@@ -4816,14 +4931,87 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
           "structuralOutputIsCandidateTruth": false,
           "winnerClaim": "not_claimed",
         },
-        "reviewedOperators": [],
+        "reviewedOperators": [
+          "AT",
+        ],
         "schemaVersion": "open-instrument.analysis-status.v0_1",
-        "status": "null_no_supported_candidate",
-        "structuralTokens": [],
-        "summary": "No supported canonical candidate or reviewed functional evidence is available. Null is a valid result.",
+        "status": "reviewed_functional_evidence",
+        "structuralTokens": [
+          "AT",
+        ],
+        "summary": "Bounded reviewed functional evidence is available for AT. This is functional evidence, not a historical-origin or winner claim.",
         "userDecisionPosture": "user_decides",
       },
       "candidates": [
+        {
+          "candidateId": "albanian-at-father-functional",
+          "candidateLanguage": "sq",
+          "claimBoundary": "functional motivation evidence only; not historical origin",
+          "claimType": "functionalMotivation",
+          "confidenceTag": "speculative",
+          "decomposition": {
+            "functionalStatement": "Albanian at meaning father directly motivates the father function without making a historical-origin claim",
+            "parts": [],
+          },
+          "displayForm": "AT",
+          "embryo": "AT",
+          "embryoLanguage": "sq",
+          "embryoSize": 2,
+          "expansionChain": [
+            "AT",
+            "FATHER",
+          ],
+          "family": "reviewed-external-lexicon",
+          "form": "at",
+          "functionalStatement": "Albanian at meaning father directly motivates the father function without making a historical-origin claim",
+          "gloss": "father",
+          "historicalRelation": "not_evaluated",
+          "id": "albanian-at-father-functional",
+          "isolatedStandaloneForm": "at",
+          "language": "sq",
+          "originClaim": "not_claimed",
+          "plainStandaloneGloss": "father",
+          "principleSignals": {
+            "balanceOk": false,
+            "evolutionOk": false,
+            "expansionOk": false,
+            "insightOk": false,
+            "networkIntegrityOk": false,
+            "truthOk": false,
+            "unityOk": false,
+          },
+          "rankGroup": "validatedFunctionalMotivation",
+          "rankReason": "reviewed production source row matches live RootMap reviewed functional evidence",
+          "rankScore": 100,
+          "ruleChecks": {
+            "consonantMeaningOk": false,
+            "functionalDecompOk": true,
+            "harmonyOk": false,
+            "sevenVoicesAlignmentOk": false,
+            "soundPathOk": false,
+          },
+          "segmentation": {
+            "embryo": "AT",
+            "targetWord": "father",
+          },
+          "semanticBridge": "Albanian at meaning father directly motivates the father function without making a historical-origin claim",
+          "sourceId": "reviewed.external.albanian-at.father.candidate.v0_1",
+          "sourceKind": "reviewed_lexical_source",
+          "sourceNote": "Reviewed bounded Albanian lexical row: at is attested as father in the Albanian inherited lexicon. This row supports AT as a functional father embryo only on explicitly authorized proof targets. It does not claim historical origin, transmission, winner, ownership, language superiority, publication evidence, scientific evidence, or unrestricted interpretation of the homographic modern at 'horse'.",
+          "sourceStatus": "reviewed_accepted",
+          "status": "experimental",
+          "userDecisionPosture": "user_decides",
+          "validationOutcome": "validated",
+          "validationReasons": [
+            "reviewed_production_source_row",
+            "live_rootmap_reviewed_functional_evidence",
+          ],
+          "voices": {
+            "dominantVoices": {},
+            "ringPath": [],
+            "voiceSequence": [],
+          },
+        },
         {
           "axes": {
             "consonants": "pass",
@@ -5021,7 +5209,35 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
       },
       "deepRoot": {
         "basis": "father",
-        "candidates": [],
+        "candidates": [
+          {
+            "basis": "father",
+            "carriers": [
+              {
+                "carrierForm": "at",
+                "lang": "sq",
+                "ops": [],
+                "protoRootId": "AT",
+                "segment": "at",
+              },
+            ],
+            "checks": {
+              "opsWithinLimits": true,
+              "skeletonExplained": true,
+            },
+            "decomposition": {
+              "unit": "AT",
+            },
+            "id": "father:AT:0",
+            "opsCount": 0,
+            "protoRoots": [
+              "AT",
+            ],
+            "segments": [
+              "at",
+            ],
+          },
+        ],
         "functionalRoots": [
           {
             "gloss": "Functional root AT / PAT: origin, projection, source of lineage and authority.",
@@ -5046,8 +5262,50 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
             "vowelPath": "A→Ë",
           },
         ],
-        "hypotheses": [],
-        "protoRoots": [],
+        "hypotheses": [
+          {
+            "basis": "father",
+            "carriers": [
+              {
+                "carrierForm": "at",
+                "lang": "sq",
+                "ops": [],
+                "protoRootId": "AT",
+                "segment": "at",
+              },
+            ],
+            "checks": {
+              "opsWithinLimits": true,
+              "skeletonExplained": true,
+            },
+            "decomposition": {
+              "unit": "AT",
+            },
+            "id": "father:AT:0",
+            "opsCount": 0,
+            "protoRoots": [
+              "AT",
+            ],
+            "segments": [
+              "at",
+            ],
+          },
+        ],
+        "protoRoots": [
+          "AT",
+        ],
+        "rootFamilies": [
+          {
+            "carriers": [],
+            "id": "family_at_v1_1",
+            "label": "AT",
+            "protoRoots": [
+              {
+                "root": "AT",
+              },
+            ],
+          },
+        ],
         "soundRoots": {
           "claimedDomains": [],
           "domains": [],
@@ -5346,12 +5604,56 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         "version": "resonance-profile-v1",
       },
       "rootMap": {
-        "composedMeaning": "",
-        "keys": [],
-        "notes": [
-          "No minRoots hypotheses available; RootMap not emitted.",
+        "carriers": [
+          {
+            "carrierForm": "atë",
+            "language": "sq",
+            "note": "gloss: father",
+            "token": "AT",
+          },
+          {
+            "carrierForm": "ati",
+            "language": "sq",
+            "note": "gloss: the father (def/older form)",
+            "token": "AT",
+          },
+          {
+            "carrierForm": "pater",
+            "language": "la",
+            "note": "gloss: father (non-minimal carrier; reference only)",
+            "token": "AT",
+          },
         ],
-        "tokens": [],
+        "composedMeaning": "father / progenitor marker",
+        "keys": [
+          {
+            "evidence": [
+              "sq: at",
+              "gloss: father",
+              "reviewed functional free-operator evidence: Bardhyl Demiraj; database revised by Alexander Lubotsky and Michiel de Vaan, Demiraj 1997; database compiled 1998-1999; accessed 2026-08-16, The Albanian inherited lexicon, at [m] (tg) {2} 'father'; Alb. atë [m] (tg) 'father' (AE 83): at = father. https://ieed.ullet.net/alb.html; historicalOriginClaim=not_claimed; winnerClaim=not_claimed; languageSuperiorityClaim=not_claimed; userDecisionPosture=user_decides",
+            ],
+            "gloss": "father / progenitor marker",
+            "language": "sq",
+            "status": "supported",
+            "token": "AT",
+          },
+        ],
+        "spans": [
+          {
+            "end": 3,
+            "note": "segment=at",
+            "source": "surface",
+            "start": 1,
+            "token": "AT",
+          },
+        ],
+        "tokens": [
+          {
+            "role": "unit",
+            "token": "AT",
+            "vowel_path": "A",
+          },
+        ],
       },
       "sanitized": "father",
       "symbolicCore": {
@@ -5444,12 +5746,56 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
       "version": "resonance-profile-v1",
     },
     "rootMap": {
-      "composedMeaning": "",
-      "keys": [],
-      "notes": [
-        "No minRoots hypotheses available; RootMap not emitted.",
+      "carriers": [
+        {
+          "carrierForm": "atë",
+          "language": "sq",
+          "note": "gloss: father",
+          "token": "AT",
+        },
+        {
+          "carrierForm": "ati",
+          "language": "sq",
+          "note": "gloss: the father (def/older form)",
+          "token": "AT",
+        },
+        {
+          "carrierForm": "pater",
+          "language": "la",
+          "note": "gloss: father (non-minimal carrier; reference only)",
+          "token": "AT",
+        },
       ],
-      "tokens": [],
+      "composedMeaning": "father / progenitor marker",
+      "keys": [
+        {
+          "evidence": [
+            "sq: at",
+            "gloss: father",
+            "reviewed functional free-operator evidence: Bardhyl Demiraj; database revised by Alexander Lubotsky and Michiel de Vaan, Demiraj 1997; database compiled 1998-1999; accessed 2026-08-16, The Albanian inherited lexicon, at [m] (tg) {2} 'father'; Alb. atë [m] (tg) 'father' (AE 83): at = father. https://ieed.ullet.net/alb.html; historicalOriginClaim=not_claimed; winnerClaim=not_claimed; languageSuperiorityClaim=not_claimed; userDecisionPosture=user_decides",
+          ],
+          "gloss": "father / progenitor marker",
+          "language": "sq",
+          "status": "supported",
+          "token": "AT",
+        },
+      ],
+      "spans": [
+        {
+          "end": 3,
+          "note": "segment=at",
+          "source": "surface",
+          "start": 1,
+          "token": "AT",
+        },
+      ],
+      "tokens": [
+        {
+          "role": "unit",
+          "token": "AT",
+          "vowel_path": "A",
+        },
+      ],
     },
     "sanitized": "father",
     "symbolicCore": {

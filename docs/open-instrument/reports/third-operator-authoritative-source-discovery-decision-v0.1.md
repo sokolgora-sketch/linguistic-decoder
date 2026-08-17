@@ -2,6 +2,12 @@
 
 Status: DECISION_ONLY.
 
+> Historical status note — 2026-08-16:
+> this null decision records the repository state before authoritative AT
+> lexical evidence was admitted. It is superseded for current runtime state by
+> `third-operator-at-authoritative-source-admission-v0.1.md`.
+> The original null result remains preserved as historical decision evidence.
+
 Project lane:
 
 - Open Instrument / ZË-RO.

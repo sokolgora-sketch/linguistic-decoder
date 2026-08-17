@@ -4,14 +4,14 @@ import {
 } from "../src/shared/reviewedExternalLexiconSourceRowRegistry.v0_1";
 
 describe("reviewed external lexicon source row registry boundary v0.1", () => {
-  it("exposes reviewed DA and DI rows through the production registry", () => {
+  it("exposes reviewed DA, DI, and AT rows through the production registry", () => {
     const rows =
       getReviewedExternalLexiconProductionSourceRowsV0_1();
 
     const boundary =
       getReviewedExternalLexiconSourceRowRegistryBoundaryV0_1();
 
-    expect(rows).toHaveLength(2);
+    expect(rows).toHaveLength(3);
 
     expect(rows).toEqual(
       expect.arrayContaining([
@@ -32,19 +32,30 @@ describe("reviewed external lexicon source row registry boundary v0.1", () => {
           sourceStatus: "reviewed_accepted",
           embryo: "DI",
         }),
+        expect.objectContaining({
+          sourceId:
+            "reviewed.external.albanian-at.father.candidate.v0_1",
+          candidateId:
+            "albanian-at-father-functional",
+          sourceKind:
+            "reviewed_lexical_source",
+          sourceStatus:
+            "reviewed_accepted",
+          embryo: "AT",
+        }),
       ]),
     );
 
     expect(boundary).toMatchObject({
       registryId:
         "reviewed-external-lexicon-source-row-registry.v0_1",
-      liveRowCount: 2,
+      liveRowCount: 3,
       hasLiveRows: true,
       syntheticFixtureRowsAllowed: false,
       liveCitationRequirement:
         "reviewed_external_metadata_required",
     });
 
-    expect(boundary.productionRows).toHaveLength(2);
+    expect(boundary.productionRows).toHaveLength(3);
   });
 });

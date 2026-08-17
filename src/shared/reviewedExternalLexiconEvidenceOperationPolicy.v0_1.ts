@@ -45,6 +45,14 @@ export const reviewedExternalLexiconEvidenceOperationPoliciesV0_1 = [
   {
     policyVersion:
       "reviewed-external-lexicon-evidence-operation-policy.v0_1",
+    sourceId: "reviewed.external.albanian-at.father.candidate.v0_1",
+    embryo: "AT",
+    allowedEvidenceOps: ["exact"],
+    allowedEvidenceCarrierForms: ["at"],
+  },
+  {
+    policyVersion:
+      "reviewed-external-lexicon-evidence-operation-policy.v0_1",
     sourceId: "reviewed.external.gheg-da.damage.candidate.v0_1",
     embryo: "DA",
     allowedEvidenceOps: ["exact"],

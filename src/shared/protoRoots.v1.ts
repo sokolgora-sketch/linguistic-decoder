@@ -98,6 +98,14 @@ export const PROTO_ROOTS_V1: readonly ProtoRoot[] = Object.freeze([
     gloss: "father / progenitor marker",
     roleHint: "Unit",
     carriers: [
+      {
+        lang: "sq",
+        dialect: "Tosk/Gheg",
+        form: "at",
+        gloss: "father",
+        notes:
+          "Reviewed Albanian inherited-lexicon carrier: at [m] (tg) = father; Demiraj 1997 / IEED. Homograph-sensitive: reviewed functional projection is target-authorized by the AT canonical profile and must not treat every bare at as father.",
+      },
       { lang: "sq", form: "atë", gloss: "father" },
       { lang: "sq", form: "ati", gloss: "the father (def/older form)" },
       { lang: "la", form: "pater", gloss: "father (non-minimal carrier; reference only)", notes: "not minimal; included for cross-language carrier awareness" },

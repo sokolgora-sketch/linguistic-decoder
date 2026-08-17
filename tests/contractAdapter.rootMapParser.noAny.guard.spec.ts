@@ -25,6 +25,12 @@ describe("contractAdapter rootMap parser boundary", () => {
     expect(block).toContain('type RootMapKeyStatus =');
     expect(block).toContain('type RootMapSpanSource =');
     expect(block).toContain('const normalizeRootTokenRole = (value: unknown): RootMapTokenRole | null => {');
+    expect(block).toContain('case "unit":');
+    expect(block).toContain('return "unit";');
+    expect(block).toContain('case "modifier":');
+    expect(block).toContain('return "modifier";');
+    expect(block).toContain('case "unknown":');
+    expect(block).toContain('return "unknown";');
     expect(block).toContain('const normalizeRootKeyStatus = (value: unknown): RootMapKeyStatus | null => {');
     expect(block).toContain('const normalizeRootSpanSource = (value: unknown): RootMapSpanSource | null => {');
 

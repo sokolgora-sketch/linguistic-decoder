@@ -47,7 +47,7 @@ export function buildReviewedExternalLexiconPromotionChecklistV0_1(
   const items: ReviewedExternalLexiconPromotionChecklistItemV0_1[] = [
     {
       id: "direct_authoritative_locator_or_archive",
-      label: "Direct authoritative locator or archived authoritative dictionary evidence is present.",
+      label: "Direct authoritative locator or archived authoritative lexical evidence is present.",
       passed: hasDirectAuthoritativeLocatorOrArchiveV0_1(row),
     },
     {
@@ -61,9 +61,11 @@ export function buildReviewedExternalLexiconPromotionChecklistV0_1(
       passed: citation?.citationStatus === "reviewed_accepted",
     },
     {
-      id: "citation_type_dictionary_entry",
-      label: "Citation is a dictionary entry.",
-      passed: citation?.citationType === "dictionary_entry",
+      id: "citation_type_supported_lexical_source",
+      label: "Citation type is supported for bounded lexical promotion.",
+      passed:
+        citation?.citationType === "dictionary_entry" ||
+        citation?.citationType === "academic_lexical_reference",
     },
     {
       id: "source_title_present",

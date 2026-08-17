@@ -165,38 +165,93 @@ describe(
       );
     });
 
-    it("keeps father as a Null control when no reviewed functional RootMap evidence is live", async () => {
+    it("surfaces reviewed AT functional evidence for father without making an origin claim", async () => {
       const body = await analyzeV1("father");
 
-      expect(
-        validatedFunctionalCandidates(body),
-      ).toEqual([]);
+      const validated =
+        validatedFunctionalCandidates(
+          body,
+        );
 
-      for (const candidate of candidatesFrom(body)) {
-        expect(candidate.originClaim).toBe("not_claimed");
-        expect(candidate.validationOutcome).not.toBe(
+      const at =
+        validated.find(
+          (candidate: any) =>
+            candidate
+              ?.candidateId ===
+            "albanian-at-father-functional",
+        );
+
+      expect(at).toMatchObject({
+        candidateId:
+          "albanian-at-father-functional",
+        candidateLanguage: "sq",
+        displayForm: "AT",
+        embryo: "AT",
+        isolatedStandaloneForm:
+          "at",
+        plainStandaloneGloss:
+          "father",
+        claimType:
+          "functionalMotivation",
+        validationOutcome:
           "validated",
-        );
-        expect(candidate.rankGroup).not.toBe(
+        rankGroup:
           "validatedFunctionalMotivation",
+        originClaim:
+          "not_claimed",
+        historicalRelation:
+          "not_evaluated",
+        userDecisionPosture:
+          "user_decides",
+      });
+
+      const atKey =
+        rootMapKey(
+          body,
+          "AT",
         );
-      }
 
-      const keys = Array.isArray(body?.rootMap?.keys)
-        ? body.rootMap.keys
-        : [];
+      expect(atKey).toBeTruthy();
 
-      const reviewedEvidence = keys.flatMap((key: any) =>
-        Array.isArray(key?.evidence)
-          ? key.evidence.filter((entry: unknown) =>
-              String(entry).includes(
-                "reviewed functional free-operator evidence",
-              ),
-            )
-          : [],
+      expect(
+        reviewedFunctionalEvidenceText(
+          atKey,
+        ),
+      ).toContain(
+        "reviewed functional free-operator evidence",
       );
 
-      expect(reviewedEvidence).toEqual([]);
+      expect(
+        reviewedFunctionalEvidenceText(
+          atKey,
+        ),
+      ).toContain(
+        "The Albanian inherited lexicon",
+      );
+
+      expect(
+        reviewedFunctionalEvidenceText(
+          atKey,
+        ),
+      ).toContain(
+        "historicalOriginClaim=not_claimed",
+      );
+
+      expect(
+        body
+          ?.analysisStatusV0_1
+          ?.reviewedOperators,
+      ).toContain(
+        "AT",
+      );
+
+      expect(
+        body
+          ?.analysisStatusV0_1
+          ?.status,
+      ).toBe(
+        "reviewed_functional_evidence",
+      );
     });
   },
 );

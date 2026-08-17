@@ -87,7 +87,7 @@ describe(
 
         expect(
           body.candidates,
-        ).toHaveLength(2);
+        ).toHaveLength(3);
 
         expect(
           body.candidates.every(
@@ -144,7 +144,7 @@ describe(
 
         expect(
           body.candidates,
-        ).toHaveLength(2);
+        ).toHaveLength(3);
 
         expect(
           body.candidates.some(

@@ -262,19 +262,20 @@ describe(
       ).toBeNull();
     });
 
-    it("preserves DA and DI as the only production rows", () => {
+    it("keeps JO outside production while preserving admitted production rows", () => {
       expect(
         getReviewedExternalLexiconProductionSourceRowsV0_1().map(
           (row) => row.sourceId,
         ),
       ).toEqual([
         "reviewed.external.di.knowledge.candidate.v0_1",
+        "reviewed.external.albanian-at.father.candidate.v0_1",
         "reviewed.external.gheg-da.damage.candidate.v0_1",
       ]);
 
       expect(
         getReviewedExternalLexiconProductionSourceRowsV0_1(),
-      ).toHaveLength(2);
+      ).toHaveLength(3);
     });
 
     it("does not insert JO into the candidate registry or authorization owner", () => {

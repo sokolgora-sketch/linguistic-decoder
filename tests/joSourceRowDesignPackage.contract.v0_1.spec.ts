@@ -282,7 +282,7 @@ describe(
 
       expect(
         getReviewedExternalLexiconProductionSourceRowsV0_1(),
-      ).toHaveLength(2);
+      ).toHaveLength(3);
 
       expect(
         getReviewedExternalLexiconProductionSourceRowsV0_1().map(
@@ -290,6 +290,7 @@ describe(
         ),
       ).toEqual([
         "reviewed.external.di.knowledge.candidate.v0_1",
+        "reviewed.external.albanian-at.father.candidate.v0_1",
         "reviewed.external.gheg-da.damage.candidate.v0_1",
       ]);
     });

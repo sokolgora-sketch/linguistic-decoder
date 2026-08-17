@@ -17,6 +17,8 @@ describe(
       "reviewed.external.gheg-da.damage.candidate.v0_1";
     const diSourceId =
       "reviewed.external.di.knowledge.candidate.v0_1";
+    const atSourceId =
+      "reviewed.external.albanian-at.father.candidate.v0_1";
 
     const daRow =
       reviewedExternalLexiconSourceRowCandidateRegistryV0_1.find(
@@ -26,8 +28,12 @@ describe(
       reviewedExternalLexiconSourceRowCandidateRegistryV0_1.find(
         (row) => row.sourceId === diSourceId,
       );
+    const atRow =
+      reviewedExternalLexiconSourceRowCandidateRegistryV0_1.find(
+        (row) => row.sourceId === atSourceId,
+      );
 
-    it("machine-authorizes both reviewed DA and reviewed DI source IDs", () => {
+    it("machine-authorizes reviewed DA, DI, and AT source IDs", () => {
       expect(
         isReviewedExternalLexiconSourceIdFunctionallyRuntimeAuthorizedV0_1(
           daSourceId,
@@ -38,11 +44,17 @@ describe(
           diSourceId,
         ),
       ).toBe(true);
+      expect(
+        isReviewedExternalLexiconSourceIdFunctionallyRuntimeAuthorizedV0_1(
+          atSourceId,
+        ),
+      ).toBe(true);
     });
 
     it("returns both bounded production rows only after machine authorization passes", () => {
       expect(daRow).toBeDefined();
       expect(diRow).toBeDefined();
+      expect(atRow).toBeDefined();
 
       expect(
         evaluateReviewedExternalLexiconFunctionalRuntimeAuthorizationV0_1(
@@ -52,6 +64,11 @@ describe(
       expect(
         evaluateReviewedExternalLexiconFunctionalRuntimeAuthorizationV0_1(
           diRow!,
+        ).authorized,
+      ).toBe(true);
+      expect(
+        evaluateReviewedExternalLexiconFunctionalRuntimeAuthorizationV0_1(
+          atRow!,
         ).authorized,
       ).toBe(true);
 
@@ -69,12 +86,18 @@ describe(
             candidateId: "albanian-di-know-functional",
             embryo: "DI",
           }),
+          expect.objectContaining({
+            sourceId: atSourceId,
+            candidateId:
+              "albanian-at-father-functional",
+            embryo: "AT",
+          }),
         ]),
       );
 
       expect(
         getReviewedExternalLexiconProductionSourceRowsV0_1(),
-      ).toHaveLength(2);
+      ).toHaveLength(3);
     });
 
     it("keeps DI bounded by functional authorization and user decision", () => {
@@ -141,5 +164,37 @@ describe(
         "functional_readiness_failed",
       );
     });
+
+    it("keeps AT bounded by reviewed lexical readiness and user decision", () => {
+      expect(atRow).toBeDefined();
+
+      const authorization =
+        evaluateReviewedExternalLexiconFunctionalRuntimeAuthorizationV0_1(
+          atRow!,
+        );
+
+      expect(authorization).toEqual(
+        expect.objectContaining({
+          sourceId: atSourceId,
+          candidateId:
+            "albanian-at-father-functional",
+          authorized: true,
+          authorizationScope:
+            "bounded_functional_lexical_projection",
+          historicalOriginClaim:
+            "not_claimed",
+          userDecisionPosture:
+            "user_decides",
+          reasons: [],
+        }),
+      );
+
+      expect(
+        authorization
+          .readiness
+          .functionalReady,
+      ).toBe(true);
+    });
+
   },
 );
