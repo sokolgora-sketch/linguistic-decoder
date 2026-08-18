@@ -120,15 +120,21 @@ describe(
       ]);
 
       expect(
-        String(composition.functionalStatement),
-      ).toContain(
-        "add / increase / put-on",
+        composition.functionalStatement,
+      ).toBe(
+        "Adding or increasing knowledge; making knowledge yours through learning.",
       );
 
       expect(
-        String(composition.functionalStatement),
-      ).toContain(
-        "know / knowledge",
+        composition.semanticBridge,
+      ).toBe(
+        "Adding or increasing knowledge; making knowledge yours through learning.",
+      );
+
+      expect(
+        composition.gloss,
+      ).toBe(
+        "add / increase / put-on + know / knowledge",
       );
 
       const reviewedDiIndex =

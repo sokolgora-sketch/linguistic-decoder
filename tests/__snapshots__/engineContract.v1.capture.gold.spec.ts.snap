@@ -1101,6 +1101,7 @@ exports[`Engine Contract v1 — capture engine output (goldens) study (strict, a
           "s_to_sh",
           "y_to_i"
         ],
+        "plainFunctionalExplanation": "Adding or increasing knowledge; making knowledge yours through learning.",
         "roots": [
           "shtu",
           "di"

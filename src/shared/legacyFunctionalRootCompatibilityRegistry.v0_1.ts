@@ -9,6 +9,7 @@ export type FunctionalRootHypothesisV1 = {
   surfaceForms: string[];
   roots: string[];
   gloss: string;
+  plainFunctionalExplanation?: string;
   opsUsed: AllowedOpId[];
   vowelPath?: string;
   notes?: string[];
@@ -60,6 +61,8 @@ export const legacyFunctionalRootCompatibilityRegistryV0_1: readonly LegacyFunct
         roots: ["shtu", "di"],
         gloss:
           "Functional reading: shtu (not yours / added-on) + di (know) → making knowledge yours through learning.",
+        plainFunctionalExplanation:
+          "Adding or increasing knowledge; making knowledge yours through learning.",
         opsUsed: ["s_to_sh", "y_to_i"],
         vowelPath: "U→I",
         notes: [

@@ -8,6 +8,15 @@ import type {
   Vowel,
 } from "@/ui/telemetry/types";
 
+import {
+  SEVEN_PRINCIPLES,
+  VOWELS_7,
+} from "@/shared/sevenPrinciples.v1";
+
+import {
+  PRINCIPLES_V0_1,
+} from "@/v1/principles.vocab.v0.1";
+
 function renderedPath(
   value:
     | {
@@ -30,6 +39,121 @@ function renderedPath(
   }
 
   return value.value.join(" → ");
+}
+
+type SevenVoiceDisplayItemV0_1 = {
+  vowel: Vowel;
+  index1: number;
+  principle: string;
+  color: string;
+  note: string;
+};
+
+function titleCaseCanonValueV0_1(
+  value: unknown,
+): string {
+  const text =
+    String(value ?? "")
+      .trim()
+      .toLocaleLowerCase("en-US");
+
+  if (!text) return "";
+
+  return (
+    text.charAt(0).toUpperCase() +
+    text.slice(1)
+  );
+}
+
+function buildSevenVoiceDisplayItemV0_1(
+  vowel: Vowel,
+): SevenVoiceDisplayItemV0_1 | null {
+  const traits =
+    SEVEN_PRINCIPLES[
+      vowel as keyof typeof SEVEN_PRINCIPLES
+    ];
+
+  const vocabulary =
+    PRINCIPLES_V0_1.find(
+      (entry) =>
+        entry.vowel === vowel,
+    );
+
+  if (
+    !traits ||
+    !vocabulary
+  ) {
+    return null;
+  }
+
+  return {
+    vowel,
+    index1: traits.index1,
+    principle: vocabulary.label,
+    color:
+      titleCaseCanonValueV0_1(
+        traits.color,
+      ),
+    note: traits.note,
+  };
+}
+
+function functionalSevenVoiceItemsV0_1(
+  value:
+    | {
+        kind: "present";
+        value: Vowel[];
+      }
+    | {
+        kind: "missing";
+        missing: string;
+        note?: string;
+      }
+    | undefined,
+): SevenVoiceDisplayItemV0_1[] {
+  if (
+    value?.kind !== "present" ||
+    !Array.isArray(value.value) ||
+    value.value.length === 0
+  ) {
+    return [];
+  }
+
+  const items =
+    value.value.map(
+      (vowel) =>
+        buildSevenVoiceDisplayItemV0_1(
+          vowel,
+        ),
+    );
+
+  if (
+    items.some(
+      (item) => item === null,
+    )
+  ) {
+    return [];
+  }
+
+  return items as
+    SevenVoiceDisplayItemV0_1[];
+}
+
+function fullSevenVoiceKeyV0_1():
+  SevenVoiceDisplayItemV0_1[] {
+  return VOWELS_7
+    .map(
+      (vowel) =>
+        buildSevenVoiceDisplayItemV0_1(
+          vowel as Vowel,
+        ),
+    )
+    .filter(
+      (
+        item,
+      ): item is SevenVoiceDisplayItemV0_1 =>
+        item !== null,
+    );
 }
 
 function presentString(
@@ -440,6 +564,37 @@ export function EmbryoExpansionContextCardV0_1({
       vm.readout
         .voicePathFunctional,
     );
+
+  const functionalSevenVoices =
+    functionalSevenVoiceItemsV0_1(
+      vm.readout
+        .voicePathFunctional,
+    );
+
+  const functionalPrinciplePath =
+    functionalSevenVoices
+      .map(
+        (item) =>
+          `${item.vowel} (${item.index1}) — ${item.principle}`,
+      )
+      .join(" → ");
+
+  const functionalColorPath =
+    functionalSevenVoices
+      .map(
+        (item) => item.color,
+      )
+      .join(" → ");
+
+  const functionalNotePath =
+    functionalSevenVoices
+      .map(
+        (item) => item.note,
+      )
+      .join(" → ");
+
+  const sevenVoiceKey =
+    fullSevenVoiceKeyV0_1();
 
   const primaryValidation =
     presentString(
@@ -863,6 +1018,123 @@ export function EmbryoExpansionContextCardV0_1({
       {functionalPath ? (
         <div className="mt-4 font-mono text-sm text-slate-700 dark:text-slate-300">
           {`Functional path: ${functionalPath}`}
+        </div>
+      ) : null}
+
+      {functionalSevenVoices.length > 0 ? (
+        <div
+          data-testid="functional-seven-voice-alignment"
+          className="mt-3 rounded-lg border border-violet-300 bg-violet-50 p-4 dark:border-violet-400/25 dark:bg-violet-500/5"
+        >
+          <div className="text-xs font-semibold uppercase tracking-[0.14em] text-violet-700 dark:text-violet-200">
+            ZË-RO Seven-Voice alignment
+          </div>
+
+          <div
+            data-testid="functional-principle-path"
+            className="mt-2 text-sm font-medium text-slate-900 dark:text-slate-100"
+          >
+            {`Principles: ${functionalPrinciplePath}`}
+          </div>
+
+          <div
+            data-testid="functional-color-path"
+            className="mt-1 text-sm text-slate-800 dark:text-slate-200"
+          >
+            {`Colors: ${functionalColorPath}`}
+          </div>
+
+          <div
+            data-testid="functional-note-path"
+            className="mt-1 text-sm text-slate-800 dark:text-slate-200"
+          >
+            {`Musical notes: ${functionalNotePath}`}
+          </div>
+
+          <div className="mt-3 flex flex-wrap gap-2">
+            {functionalSevenVoices.map(
+              (item) => (
+                <div
+                  key={`active-${item.vowel}`}
+                  className="flex items-center gap-2 rounded-md border border-slate-300 bg-white/80 px-2.5 py-1.5 text-xs text-slate-800 dark:border-slate-700 dark:bg-black/20 dark:text-slate-200"
+                >
+                  <span
+                    aria-hidden="true"
+                    className="h-3 w-3 rounded-full border border-black/15"
+                    style={{
+                      backgroundColor:
+                        item.color.toLowerCase(),
+                    }}
+                  />
+
+                  <span className="font-mono font-semibold">
+                    {`${item.vowel} (${item.index1})`}
+                  </span>
+
+                  <span>
+                    {item.principle}
+                  </span>
+
+                  <span>
+                    {item.color}
+                  </span>
+
+                  <span>
+                    {`Note ${item.note}`}
+                  </span>
+                </div>
+              ),
+            )}
+          </div>
+
+          <div className="mt-4 text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-600 dark:text-slate-400">
+            Full seven-key
+          </div>
+
+          <div
+            data-testid="seven-voice-key"
+            className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-7"
+          >
+            {sevenVoiceKey.map(
+              (item) => (
+                <div
+                  key={`key-${item.vowel}`}
+                  className="rounded-md border border-slate-300 bg-white/80 p-2 text-xs text-slate-800 dark:border-slate-700 dark:bg-black/20 dark:text-slate-200"
+                >
+                  <div className="flex items-center gap-1.5">
+                    <span
+                      aria-hidden="true"
+                      className="h-3 w-3 rounded-full border border-black/15"
+                      style={{
+                        backgroundColor:
+                          item.color.toLowerCase(),
+                      }}
+                    />
+
+                    <span className="font-mono font-semibold">
+                      {`${item.vowel} (${item.index1})`}
+                    </span>
+                  </div>
+
+                  <div className="mt-1 font-medium">
+                    {item.principle}
+                  </div>
+
+                  <div className="mt-0.5">
+                    {item.color}
+                  </div>
+
+                  <div className="mt-0.5">
+                    {`Note ${item.note}`}
+                  </div>
+                </div>
+              ),
+            )}
+          </div>
+
+          <div className="mt-3 text-[11px] leading-5 text-slate-500 dark:text-slate-400">
+            Canonical ZË-RO model mapping. These principle, color, and musical-note correspondences are functional model metadata, not a historical-origin or external scientific-proof claim.
+          </div>
         </div>
       ) : null}
 

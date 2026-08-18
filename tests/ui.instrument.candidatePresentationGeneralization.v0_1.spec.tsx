@@ -84,6 +84,12 @@ describe(
           "DI · reviewed",
         ),
       ).toBeInTheDocument();
+
+      expect(
+        screen.getByText(
+          "Adding or increasing knowledge; making knowledge yours through learning.",
+        ),
+      ).toBeInTheDocument();
     });
 
     it("shows a one-embryo functional candidate even when RootMap also exists", async () => {

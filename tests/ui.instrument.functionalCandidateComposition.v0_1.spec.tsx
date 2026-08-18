@@ -2,6 +2,7 @@ import React from "react";
 import {
   render,
   screen,
+  within,
 } from "@testing-library/react";
 
 import { GET } from "../app/api/analyze-v1/route";
@@ -42,8 +43,11 @@ describe(
 
       expect(composition).toBeTruthy();
 
-      composition.functionalStatement =
-        "candidate-level composition explanation";
+      expect(
+        composition.functionalStatement,
+      ).toBe(
+        "Adding or increasing knowledge; making knowledge yours through learning.",
+      );
 
       body.rootMap.composedMeaning =
         "ROOTMAP FALLBACK SHOULD NOT LEAD";
@@ -81,9 +85,82 @@ describe(
 
       expect(
         screen.getByText(
-          "candidate-level composition explanation",
+          "Adding or increasing knowledge; making knowledge yours through learning.",
         ),
       ).toBeInTheDocument();
+
+      const sevenVoiceAlignment =
+        screen.getByTestId(
+          "functional-seven-voice-alignment",
+        );
+
+      expect(
+        within(
+          sevenVoiceAlignment,
+        ).getByText(
+          "Principles: U (5) — Unity → I (3) — Insight",
+        ),
+      ).toBeInTheDocument();
+
+      expect(
+        within(
+          sevenVoiceAlignment,
+        ).getByText(
+          "Colors: Blue → Yellow",
+        ),
+      ).toBeInTheDocument();
+
+      expect(
+        within(
+          sevenVoiceAlignment,
+        ).getByText(
+          "Musical notes: G → E",
+        ),
+      ).toBeInTheDocument();
+
+      const sevenVoiceKey =
+        screen.getByTestId(
+          "seven-voice-key",
+        );
+
+      for (
+        const expected of [
+          "A (1)",
+          "Truth",
+          "Red",
+          "Note C",
+          "E (2)",
+          "Expansion",
+          "Orange",
+          "Note D",
+          "I (3)",
+          "Insight",
+          "Yellow",
+          "Note E",
+          "O (4)",
+          "Balance",
+          "Green",
+          "Note F",
+          "U (5)",
+          "Unity",
+          "Blue",
+          "Note G",
+          "Y (6)",
+          "Reflection",
+          "Indigo",
+          "Note A",
+          "Ë (7)",
+          "Evolution",
+          "Violet",
+          "Note B",
+        ]
+      ) {
+        expect(
+          sevenVoiceKey,
+        ).toHaveTextContent(
+          expected,
+        );
+      }
 
       expect(
         screen.queryByText(

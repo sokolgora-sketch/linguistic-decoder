@@ -26,6 +26,9 @@ import { getReviewedExternalLexiconProductionSourceRowsV0_1 } from "./reviewedEx
 import { projectReviewedExternalLexiconProductionRowForRuntimeV0_1 } from "./reviewedExternalLexiconRuntimeProjection.v0_1";
 import { evaluateReviewedExternalLexiconEvidenceOperationPolicyV0_1 } from "./reviewedExternalLexiconEvidenceOperationPolicy.v0_1";
 import { discoverCanonicalOperatorCandidatesV0_1 } from "./canonicalOperatorDiscovery.v0_1";
+import type {
+  FunctionalRootHypothesisV1,
+} from "./legacyFunctionalRootCompatibilityRegistry.v0_1";
 
 function roleHintToTokenRole(roleHint?: string): RootTokenRoleV1 {
   switch (roleHint) {
@@ -772,10 +775,124 @@ export function buildReviewedFunctionalCandidateProjectionsFromRootMapV0_1(
     }));
 }
 
+function normalizeFunctionalCompositionTextV0_1(
+  value: unknown,
+): string {
+  return String(value ?? "")
+    .normalize("NFC")
+    .trim()
+    .toLocaleLowerCase("en-US");
+}
+
+function normalizeFunctionalCompositionRootV0_1(
+  value: unknown,
+): string {
+  return String(value ?? "")
+    .normalize("NFC")
+    .trim()
+    .toUpperCase();
+}
+
+function resolvePlainFunctionalCompositionExplanationV0_1(
+  params: {
+    functionalRoots:
+      | readonly FunctionalRootHypothesisV1[]
+      | null
+      | undefined;
+    targetWord: string;
+    language: string;
+    tokens: readonly string[];
+  },
+): string | null {
+  const targetWord =
+    normalizeFunctionalCompositionTextV0_1(
+      params.targetWord,
+    );
+
+  const language =
+    normalizeFunctionalCompositionTextV0_1(
+      params.language,
+    );
+
+  const tokens =
+    params.tokens.map(
+      normalizeFunctionalCompositionRootV0_1,
+    );
+
+  if (
+    !targetWord ||
+    !language ||
+    tokens.length === 0
+  ) {
+    return null;
+  }
+
+  const functionalRoots =
+    Array.isArray(params.functionalRoots)
+      ? params.functionalRoots
+      : [];
+
+  for (const root of functionalRoots) {
+    const rootLanguage =
+      normalizeFunctionalCompositionTextV0_1(
+        root?.language,
+      );
+
+    if (rootLanguage !== language) {
+      continue;
+    }
+
+    const surfaceForms =
+      Array.isArray(root?.surfaceForms)
+        ? root.surfaceForms.map(
+            normalizeFunctionalCompositionTextV0_1,
+          )
+        : [];
+
+    if (!surfaceForms.includes(targetWord)) {
+      continue;
+    }
+
+    const roots: string[] =
+      Array.isArray(root?.roots)
+        ? root.roots.map(
+            normalizeFunctionalCompositionRootV0_1,
+          )
+        : [];
+
+    const exactRootSequence =
+      roots.length === tokens.length &&
+      roots.every(
+        (rootToken, index) =>
+          rootToken === tokens[index],
+      );
+
+    if (!exactRootSequence) {
+      continue;
+    }
+
+    const explanation =
+      String(
+        root?.plainFunctionalExplanation ??
+          "",
+      ).trim();
+
+    if (explanation) {
+      return explanation;
+    }
+  }
+
+  return null;
+}
+
+
 export function buildFunctionalCandidateCompositionsFromRootMapV0_1(
   params: {
     rootMap: RootMapV1 | null | undefined;
     targetWord: string;
+    functionalRoots?:
+      | readonly FunctionalRootHypothesisV1[]
+      | null;
   },
 ): ReviewedFunctionalCandidateProjectionV0_1[] {
   const requestedTargetWord =
@@ -941,6 +1058,16 @@ export function buildFunctionalCandidateCompositionsFromRootMapV0_1(
     return [];
   }
 
+  const plainFunctionalExplanation =
+    resolvePlainFunctionalCompositionExplanationV0_1({
+      functionalRoots:
+        params.functionalRoots,
+      targetWord,
+      language,
+      tokens,
+    }) ??
+    composedMeaning;
+
   const candidateId =
     `rootmap-composition:${language.toLowerCase()}:${tokens
       .map((token) =>
@@ -959,7 +1086,7 @@ export function buildFunctionalCandidateCompositionsFromRootMapV0_1(
       decomposition: {
         parts: [...tokens],
         functionalStatement:
-          composedMeaning,
+          plainFunctionalExplanation,
       },
 
       status: "experimental",
@@ -971,7 +1098,7 @@ export function buildFunctionalCandidateCompositionsFromRootMapV0_1(
       displayForm: expression,
       candidateLanguage: language,
       functionalStatement:
-        composedMeaning,
+        plainFunctionalExplanation,
       gloss: composedMeaning,
 
       claimType:
@@ -997,7 +1124,7 @@ export function buildFunctionalCandidateCompositionsFromRootMapV0_1(
       },
 
       semanticBridge:
-        composedMeaning,
+        plainFunctionalExplanation,
 
       expansionChain: [
         ...tokens,
