@@ -56,6 +56,15 @@ function parseRootMapV1(v: unknown): ParseRootMapResult {
       case "Instrument":
       case "Function":
         return "instrument";
+      case "unit":
+      case "Unit":
+        return "unit";
+      case "modifier":
+      case "Modifier":
+        return "modifier";
+      case "unknown":
+      case "Unknown":
+        return "unknown";
       default:
         return null;
     }

@@ -2,6 +2,8 @@ import {
   canonicalOperatorProfilesV0_1,
   getCanonicalOperatorProfileV0_1,
   getResolvedCanonicalOperatorProfilesV0_1,
+  isCanonicalOperatorProfileDiscoveryTargetV0_1,
+  isCanonicalOperatorProfileStructuralCarrierAllowedV0_1,
   resolveCanonicalOperatorProfileV0_1,
   type CanonicalOperatorProfileV0_1,
 } from "@/shared/canonicalOperatorProfile.v0_1";
@@ -25,18 +27,21 @@ const expectedProfileKeys = [
 ].sort();
 
 describe("canonical operator profile v0.1", () => {
-  it("registers DA and DI as canon_locked", () => {
-    expect(canonicalOperatorProfilesV0_1).toHaveLength(2);
+  it("registers DA and DI as canon_locked and AT as runtime_verified", () => {
+    expect(canonicalOperatorProfilesV0_1).toHaveLength(3);
     expect(canonicalOperatorProfilesV0_1.map((profile) => profile.operatorId)).toEqual([
       "DA",
       "DI",
+      "AT",
     ]);
 
     const da = getCanonicalOperatorProfileV0_1("DA");
     const di = getCanonicalOperatorProfileV0_1("DI");
+    const at = getCanonicalOperatorProfileV0_1("AT");
 
     expect(da?.canonLifecycleStatus).toBe("canon_locked");
     expect(di?.canonLifecycleStatus).toBe("canon_locked");
+    expect(at?.canonLifecycleStatus).toBe("runtime_verified");
 
     for (const profile of canonicalOperatorProfilesV0_1) {
       expect(profile.profileVersion).toBe("canonical-operator-profile.v0_1");
@@ -86,7 +91,7 @@ describe("canonical operator profile v0.1", () => {
   it("derives readiness, authorization, membership and projection from existing owners", () => {
     const resolvedProfiles = getResolvedCanonicalOperatorProfilesV0_1();
 
-    expect(resolvedProfiles).toHaveLength(2);
+    expect(resolvedProfiles).toHaveLength(3);
 
     for (const resolved of resolvedProfiles) {
       expect(resolved.sourceRow.sourceId).toBe(resolved.profile.sourceId);
@@ -133,9 +138,10 @@ describe("canonical operator profile v0.1", () => {
     }
   });
 
-  it("resolves DA and DI by normalized operator ID", () => {
+  it("resolves DA, DI, and AT by normalized operator ID", () => {
     expect(getCanonicalOperatorProfileV0_1("da")?.operatorId).toBe("DA");
     expect(getCanonicalOperatorProfileV0_1(" DI ")?.operatorId).toBe("DI");
+    expect(getCanonicalOperatorProfileV0_1(" at ")?.operatorId).toBe("AT");
     expect(getCanonicalOperatorProfileV0_1("TER")).toBeNull();
   });
 
@@ -188,4 +194,142 @@ describe("canonical operator profile v0.1", () => {
       "dit",
     ]);
   });
+
+  it("keeps AT target-bounded and treats bare at as a negative homograph control", () => {
+    const at =
+      getCanonicalOperatorProfileV0_1(
+        "AT",
+      );
+
+    expect(at).toBeDefined();
+
+    expect(
+      at?.positiveProofWords,
+    ).toEqual([
+      "father",
+    ]);
+
+    expect(
+      at?.negativeControlWords,
+    ).toEqual([
+      "at",
+      "damage",
+      "study",
+      "mode",
+      "xyz",
+      "da",
+      "di",
+      "studim",
+    ]);
+
+    expect(
+      at?.negativeControlWords,
+    ).toContain("at");
+  });
+
+  it("bounds only the reviewed isolated runtime_verified carrier while preserving legacy structural carriers", () => {
+    const at =
+      getCanonicalOperatorProfileV0_1(
+        "AT",
+      );
+
+    expect(at).toBeDefined();
+
+    expect(
+      isCanonicalOperatorProfileStructuralCarrierAllowedV0_1(
+        at!,
+        "father",
+        "at",
+      ),
+    ).toBe(true);
+
+    expect(
+      isCanonicalOperatorProfileStructuralCarrierAllowedV0_1(
+        at!,
+        "at",
+        "at",
+      ),
+    ).toBe(true);
+
+    expect(
+      isCanonicalOperatorProfileStructuralCarrierAllowedV0_1(
+        at!,
+        "diet",
+        "at",
+      ),
+    ).toBe(false);
+
+    expect(
+      isCanonicalOperatorProfileStructuralCarrierAllowedV0_1(
+        at!,
+        "data",
+        "at",
+      ),
+    ).toBe(false);
+
+    for (const legacyCarrier of [
+      "atë",
+      "ati",
+      "pater",
+    ]) {
+      expect(
+        isCanonicalOperatorProfileStructuralCarrierAllowedV0_1(
+          at!,
+          legacyCarrier,
+          legacyCarrier,
+        ),
+      ).toBe(true);
+    }
+  });
+
+  it("keeps runtime_verified discovery target-bounded while canon_locked operators retain broad structural discovery", () => {
+    const da =
+      getCanonicalOperatorProfileV0_1(
+        "DA",
+      );
+
+    const at =
+      getCanonicalOperatorProfileV0_1(
+        "AT",
+      );
+
+    expect(da).toBeDefined();
+    expect(at).toBeDefined();
+
+    expect(
+      isCanonicalOperatorProfileDiscoveryTargetV0_1(
+        da!,
+        "data",
+      ),
+    ).toBe(true);
+
+    expect(
+      isCanonicalOperatorProfileDiscoveryTargetV0_1(
+        at!,
+        "father",
+      ),
+    ).toBe(true);
+
+    expect(
+      isCanonicalOperatorProfileDiscoveryTargetV0_1(
+        at!,
+        "at",
+      ),
+    ).toBe(true);
+
+    expect(
+      isCanonicalOperatorProfileDiscoveryTargetV0_1(
+        at!,
+        "diet",
+      ),
+    ).toBe(false);
+
+    expect(
+      isCanonicalOperatorProfileDiscoveryTargetV0_1(
+        at!,
+        "data",
+      ),
+    ).toBe(false);
+  });
+
 });

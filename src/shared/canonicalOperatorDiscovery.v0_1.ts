@@ -1,5 +1,6 @@
 import {
   canonicalOperatorProfilesV0_1,
+  isCanonicalOperatorProfileDiscoveryTargetV0_1,
   resolveCanonicalOperatorProfileV0_1,
 } from "./canonicalOperatorProfile.v0_1";
 import { matchSegmentToProtoRoots } from "./carrierMatcher.v1";
@@ -58,7 +59,11 @@ export function discoverCanonicalOperatorCandidatesV0_1(
         !resolved.readiness.functionalReady ||
         !resolved.authorization.authorized ||
         !resolved.productionMember ||
-        !resolved.runtimeProjection
+        !resolved.runtimeProjection ||
+        !isCanonicalOperatorProfileDiscoveryTargetV0_1(
+          profile,
+          normalizedBasis,
+        )
       ) {
         return [];
       }

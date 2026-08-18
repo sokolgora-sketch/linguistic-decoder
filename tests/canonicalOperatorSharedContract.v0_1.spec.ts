@@ -37,6 +37,19 @@ const operatorSpecificEvidenceMarkers = {
       "Dedvukaj & Ndoci 2023 PLSA",
     ],
   },
+  AT: {
+    required: [
+      "The Albanian inherited lexicon",
+      "at [m] (tg) {2} 'father'",
+      "https://ieed.ullet.net/alb.html",
+      "at = father",
+    ],
+    forbidden: [
+      "10.3765/plsa.v8i1.5501",
+      "Dedvukaj & Ndoci 2023 PLSA",
+      "https://en.wiktionary.org/wiki/di#Albanian",
+    ],
+  },
 } as const;
 
 describe("canonical operator shared contract v0.1", () => {

@@ -56,6 +56,7 @@ describe(
       ["di", "DI", "di", ["exact"]],
       ["study", "DI", "dy", ["y_to_i"]],
       ["studim", "DI", "di", ["exact"]],
+      ["father", "AT", "at", ["exact"]],
     ])(
       "%s resolves a reviewed canonical %s bridge",
       (
@@ -236,5 +237,78 @@ describe(
         ),
       ).toBe(false);
     });
+
+    it("keeps bare at outside reviewed father-function authorization", () => {
+      const candidates =
+        candidatesFor(
+          "at",
+          "AT",
+        );
+
+      expect(candidates).toContainEqual(
+        expect.objectContaining({
+          basis: "at",
+          operatorId: "AT",
+          embryo: "AT",
+          segment: "at",
+          carrierForm: "at",
+          operations: ["exact"],
+          functionalBridgeStatus:
+            "unreviewed",
+          reviewedEvidenceEligible:
+            false,
+        }),
+      );
+    });
+
+    it("emits father AT as a Unit canonical fallback without a father-specific runtime branch", () => {
+      const fallback =
+        buildMinRootHypotheses(
+          "father",
+        ).find(
+          (hypothesis) =>
+            hypothesis.id ===
+            "father:AT:0",
+        );
+
+      expect(fallback).toEqual({
+        id: "father:AT:0",
+        basis: "father",
+        segments: ["at"],
+        protoRoots: ["AT"],
+        carriers: [
+          {
+            protoRootId: "AT",
+            segment: "at",
+            carrierForm: "at",
+            lang: "sq",
+            ops: [],
+          },
+        ],
+        decomposition: {
+          unit: "AT",
+        },
+        checks: {
+          opsWithinLimits: true,
+          skeletonExplained: true,
+        },
+        opsCount: 0,
+      });
+
+      const source =
+        fs.readFileSync(
+          "src/shared/deepRoot.minRoots.v1.ts",
+          "utf8",
+        );
+
+      expect(source).not.toContain(
+        'normalizedBasis === "father"',
+      );
+
+      expect(source).not.toContain(
+        'basis === "father"',
+      );
+    });
+
   },
 );

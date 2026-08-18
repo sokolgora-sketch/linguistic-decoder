@@ -760,14 +760,14 @@ export function EmbryoExpansionContextCardV0_1({
               ?.plainMeaning,
           ) ??
           (
+            tokens.length === 1
+              ? standaloneGloss
+              : null
+          ) ??
+          (
             String(
               key?.gloss ?? "",
             ).trim() ||
-            (
-              tokens.length === 1
-                ? standaloneGloss
-                : null
-            ) ||
             "meaning not emitted"
           ),
         state,

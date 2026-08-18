@@ -13,6 +13,7 @@ export type ReviewedExternalLexiconSourceRowRegistryBoundaryV0_1 = {
 const PRODUCTION_SOURCE_ROW_IDS_V0_1 = new Set<string>([
   "reviewed.external.di.knowledge.candidate.v0_1",
   "reviewed.external.gheg-da.damage.candidate.v0_1",
+  "reviewed.external.albanian-at.father.candidate.v0_1",
 ]);
 
 export const reviewedExternalLexiconSourceRowCandidateRegistryV0_1 = [
@@ -59,6 +60,58 @@ export const reviewedExternalLexiconSourceRowCandidateRegistryV0_1 = [
         sourceHashOrArchiveHash: "url:https://en.wiktionary.org/wiki/di#Albanian",
         reviewNote:
           "Reviewed citation metadata for bounded functional lexical projection of Albanian di as know/knowledge via the stable Wiktionary entry and its DPEWA/FGJSH reference trail. A direct DPEWA/FGJSH locator or archived authoritative dictionary snapshot remains unresolved for historical-authority or stronger-source claims and is not required for this bounded lexical projection.",
+      },
+    ],
+  },
+
+  {
+    sourceId: "reviewed.external.albanian-at.father.candidate.v0_1",
+    candidateId: "albanian-at-father-functional",
+    candidateLanguage: "sq",
+    displayForm: "AT",
+    sourceKind: "reviewed_lexical_source",
+    sourceStatus: "reviewed_accepted",
+    embryo: "AT",
+    isolatedStandaloneForm: "at",
+    plainStandaloneGloss: "father",
+    sourceNote:
+      "Reviewed bounded Albanian lexical row: at is attested as father in the Albanian inherited lexicon. This row supports AT as a functional father embryo only on explicitly authorized proof targets. It does not claim historical origin, transmission, winner, ownership, language superiority, publication evidence, scientific evidence, or unrestricted interpretation of the homographic modern at 'horse'.",
+    semanticBridge:
+      "Albanian at meaning father directly motivates the father function without making a historical-origin claim",
+    originClaim: false,
+    historicalTransmissionClaim: false,
+    winnerClaim: false,
+    languageSuperiorityClaim: false,
+    candidateTruthClaim: false,
+    publicationEvidenceClaim: false,
+    scientificEvidenceClaim: false,
+    userDecisionPosture: "user_decides",
+    externalCitations: [
+      {
+        citationId:
+          "reviewed.external.albanian-at.father.citation.v0_1",
+        citationStatus: "reviewed_accepted",
+        citationType: "academic_lexical_reference",
+        sourceTitle: "The Albanian inherited lexicon",
+        sourceAuthorOrEditor:
+          "Bardhyl Demiraj; database revised by Alexander Lubotsky and Michiel de Vaan",
+        sourcePublisherOrHost: "IEED / ieed.ullet.net",
+        sourceDateOrVersion:
+          "Demiraj 1997; database compiled 1998-1999; accessed 2026-08-16",
+        sourceUrlOrArchiveRef:
+          "https://ieed.ullet.net/alb.html",
+        entryLocator:
+          "at [m] (tg) {2} 'father'; Alb. atë [m] (tg) 'father' (AE 83)",
+        attestedForm: "at",
+        attestedGloss: "father",
+        attestedGrammarNote:
+          "(tg) marks the form as both Tosk and Gheg; the entry also records Albanian atë as father.",
+        reviewedBy: "open-instrument-candidate-registry",
+        reviewedAt: "2026-08-16",
+        reviewNote:
+          "Accepted as bounded lexical evidence for AT/father functional motivation. The source is not used to assert historical origin, borrowing direction, linguistic ownership, or unrestricted homograph resolution.",
+        sourceHashOrArchiveHash:
+          "url:https://ieed.ullet.net/alb.html",
       },
     ],
   },

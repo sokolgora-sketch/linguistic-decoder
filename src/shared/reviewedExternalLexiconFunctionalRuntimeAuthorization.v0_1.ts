@@ -36,6 +36,7 @@ const FUNCTIONAL_RUNTIME_AUTHORIZED_SOURCE_IDS_V0_1 =
   new Set<string>([
     "reviewed.external.di.knowledge.candidate.v0_1",
     "reviewed.external.gheg-da.damage.candidate.v0_1",
+    "reviewed.external.albanian-at.father.candidate.v0_1",
   ]);
 
 export function isReviewedExternalLexiconSourceIdFunctionallyRuntimeAuthorizedV0_1(

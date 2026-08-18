@@ -12,6 +12,11 @@
 import { segmentBasis } from "./segmenter.v1";
 import { matchSegmentToProtoRoots } from "./carrierMatcher.v1";
 import { discoverCanonicalOperatorCandidatesV0_1 } from "./canonicalOperatorDiscovery.v0_1";
+import { getProtoRootV1 } from "./protoRoots.v1";
+import {
+  canonicalOperatorProfilesV0_1,
+  isCanonicalOperatorProfileStructuralCarrierAllowedV0_1,
+} from "./canonicalOperatorProfile.v0_1";
 
 export type MinRootHypothesis = {
   id: string;
@@ -60,6 +65,19 @@ export function buildMinRootHypotheses(
     .trim()
     .toLowerCase();
 
+  const canonicalProfileByOperator =
+    new Map<
+      string,
+      (typeof canonicalOperatorProfilesV0_1)[number]
+    >(
+      canonicalOperatorProfilesV0_1.map(
+        (profile) => [
+          profile.operatorId,
+          profile,
+        ] as const,
+      ),
+    );
+
   const segmentations = segmentBasis(basis, {
     maxSegments,
     maxCandidates: 200,
@@ -70,12 +88,31 @@ export function buildMinRootHypotheses(
   for (const seg of segmentations) {
     if (out.length >= maxHypotheses) break;
 
-    const matchesPerSegment = seg.segments.map((s) =>
-      matchSegmentToProtoRoots(s, {
-        allowSSh: opts.allowSSh,
-        langAllowList: opts.langAllowList,
-      })
-    );
+    const matchesPerSegment =
+      seg.segments.map((s) =>
+        matchSegmentToProtoRoots(s, {
+          allowSSh: opts.allowSSh,
+          langAllowList:
+            opts.langAllowList,
+        }).filter((match) => {
+          const profile =
+            canonicalProfileByOperator.get(
+              match.protoRootId,
+            );
+
+          if (!profile) {
+            return true;
+          }
+
+          return (
+            isCanonicalOperatorProfileStructuralCarrierAllowedV0_1(
+              profile,
+              normalizedBasis,
+              match.carrier?.form,
+            )
+          );
+        }),
+      );
 
     if (matchesPerSegment.some((m) => m.length === 0)) continue;
 
@@ -201,9 +238,14 @@ export function buildMinRootHypotheses(
         },
       ],
       decomposition:
-        protoRoot === "DA"
-          ? { action: protoRoot }
-          : { function: protoRoot },
+        deriveDecomposition([
+          {
+            protoRootId: protoRoot,
+            roleHint:
+              getProtoRootV1(protoRoot)
+                ?.roleHint,
+          },
+        ]),
       checks: {
         opsWithinLimits:
           emittedOps.length <= 5,

@@ -7,7 +7,7 @@ import {
 } from "../src/shared/reviewedExternalLexiconRuntimeProjection.v0_1";
 
 describe("reviewed external lexicon runtime projection contract v0.1", () => {
-  it("projects both bounded production rows into boundary-safe runtime evidence", () => {
+  it("projects all bounded production rows into boundary-safe runtime evidence", () => {
     const projections =
       getReviewedExternalLexiconProductionSourceRowsV0_1()
         .map(
@@ -20,7 +20,7 @@ describe("reviewed external lexicon runtime projection contract v0.1", () => {
             projection != null,
         );
 
-    expect(projections).toHaveLength(2);
+    expect(projections).toHaveLength(3);
 
     expect(projections).toEqual(
       expect.arrayContaining([

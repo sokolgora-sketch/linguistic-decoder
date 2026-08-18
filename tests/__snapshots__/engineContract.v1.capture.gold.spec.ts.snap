@@ -297,7 +297,35 @@ exports[`Engine Contract v1 — capture engine output (goldens) father (strict, 
   ],
   "deepRoot": {
     "basis": "father",
-    "candidates": [],
+    "candidates": [
+      {
+        "basis": "father",
+        "carriers": [
+          {
+            "carrierForm": "at",
+            "lang": "sq",
+            "ops": [],
+            "protoRootId": "AT",
+            "segment": "at"
+          }
+        ],
+        "checks": {
+          "opsWithinLimits": true,
+          "skeletonExplained": true
+        },
+        "decomposition": {
+          "unit": "AT"
+        },
+        "id": "father:AT:0",
+        "opsCount": 0,
+        "protoRoots": [
+          "AT"
+        ],
+        "segments": [
+          "at"
+        ]
+      }
+    ],
     "functionalRoots": [
       {
         "gloss": "Functional root AT / PAT: origin, projection, source of lineage and authority.",
@@ -322,8 +350,50 @@ exports[`Engine Contract v1 — capture engine output (goldens) father (strict, 
         "vowelPath": "A→Ë"
       }
     ],
-    "hypotheses": [],
-    "protoRoots": [],
+    "hypotheses": [
+      {
+        "basis": "father",
+        "carriers": [
+          {
+            "carrierForm": "at",
+            "lang": "sq",
+            "ops": [],
+            "protoRootId": "AT",
+            "segment": "at"
+          }
+        ],
+        "checks": {
+          "opsWithinLimits": true,
+          "skeletonExplained": true
+        },
+        "decomposition": {
+          "unit": "AT"
+        },
+        "id": "father:AT:0",
+        "opsCount": 0,
+        "protoRoots": [
+          "AT"
+        ],
+        "segments": [
+          "at"
+        ]
+      }
+    ],
+    "protoRoots": [
+      "AT"
+    ],
+    "rootFamilies": [
+      {
+        "carriers": [],
+        "id": "family_at_v1_1",
+        "label": "AT",
+        "protoRoots": [
+          {
+            "root": "AT"
+          }
+        ]
+      }
+    ],
     "version": "deeproot-output-v1"
   },
   "engineVersion": "v1.0.0",
@@ -361,12 +431,58 @@ exports[`Engine Contract v1 — capture engine output (goldens) father (strict, 
   },
   "normalizedWord": "father",
   "rootMap": {
-    "composedMeaning": "",
-    "keys": [],
-    "notes": [
-      "No minRoots hypotheses available; RootMap not emitted."
+    "carriers": [
+      {
+        "carrierForm": "atë",
+        "language": "sq",
+        "note": "gloss: father",
+        "token": "AT"
+      },
+      {
+        "carrierForm": "ati",
+        "language": "sq",
+        "note": "gloss: the father (def/older form)",
+        "token": "AT"
+      },
+      {
+        "carrierForm": "pater",
+        "language": "la",
+        "note": "gloss: father (non-minimal carrier; reference only)",
+        "token": "AT"
+      }
     ],
-    "tokens": []
+    "composedMeaning": "father / progenitor marker",
+    "keys": [
+      {
+        "evidence": [
+          "sq: at",
+          "gloss: father",
+          "reviewed functional free-operator evidence: Bardhyl Demiraj; database revised by Alexander Lubotsky and Michiel de Vaan, Demiraj 1997; database compiled 1998-1999; accessed 2026-08-16, The Albanian inherited lexicon, at [m] (tg) {2} 'father'; Alb. atë [m] (tg) 'father' (AE 83): at = father. https://ieed.ullet.net/alb.html; historicalOriginClaim=not_claimed; winnerClaim=not_claimed; languageSuperiorityClaim=not_claimed; userDecisionPosture=user_decides"
+        ],
+        "gloss": "father / progenitor marker",
+        "language": "sq",
+        "ops": null,
+        "status": "supported",
+        "token": "AT"
+      }
+    ],
+    "notes": null,
+    "spans": [
+      {
+        "end": 3,
+        "note": "segment=at",
+        "source": "surface",
+        "start": 1,
+        "token": "AT"
+      }
+    ],
+    "tokens": [
+      {
+        "role": "unit",
+        "token": "AT",
+        "vowel_path": "A"
+      }
+    ]
   },
   "warnings": null,
   "word": "father"

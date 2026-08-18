@@ -1,6 +1,7 @@
 import {
   DA_FREE_OPERATOR_PROFILE_V0_1,
   DI_FREE_OPERATOR_PROFILE_V0_1,
+  AT_FREE_OPERATOR_PROFILE_V0_1,
   FREE_OPERATOR_PROFILES_V0_1,
   freeOperatorProfileFormMatchesV0_1,
   freeOperatorProfileGlossMatchesV0_1,
@@ -93,6 +94,63 @@ describe("free operator profile contract v0.1", () => {
       DI_FREE_OPERATOR_PROFILE_V0_1.directFreeOperator.glossTerms,
       "know / knowledge",
     )).toBe(true);
+  });
+
+  it("models AT father evidence with an explicit horse homograph collision", () => {
+    expect(
+      FREE_OPERATOR_PROFILES_V0_1,
+    ).toContain(
+      AT_FREE_OPERATOR_PROFILE_V0_1,
+    );
+
+    expect(
+      AT_FREE_OPERATOR_PROFILE_V0_1,
+    ).toMatchObject({
+      profileVersion:
+        "free-operator-profile.v0_1",
+      operator: "at",
+      directFreeOperator: {
+        forms: ["at", "atë"],
+        categories: [
+          "free_operator_attested",
+        ],
+      },
+      derivativeFamilySupport: {
+        forms: ["ati"],
+      },
+      historicalOriginClaim:
+        "not_claimed",
+      userDecisionPosture:
+        "user_decides",
+    });
+
+    expect(
+      freeOperatorProfileGlossMatchesV0_1(
+        AT_FREE_OPERATOR_PROFILE_V0_1
+          .directFreeOperator
+          .glossTerms,
+        "father",
+      ),
+    ).toBe(true);
+
+    expect(
+      AT_FREE_OPERATOR_PROFILE_V0_1
+        .homophoneCollisions[0],
+    ).toMatchObject({
+      forms: ["at"],
+      categories: [
+        "homophone_collision",
+      ],
+    });
+
+    expect(
+      freeOperatorProfileGlossMatchesV0_1(
+        AT_FREE_OPERATOR_PROFILE_V0_1
+          .homophoneCollisions[0]
+          .glossTerms,
+        "saddle horse",
+      ),
+    ).toBe(true);
   });
 
 });

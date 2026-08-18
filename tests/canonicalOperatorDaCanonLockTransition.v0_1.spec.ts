@@ -108,7 +108,7 @@ describe("DA canonical operator canon-lock transition v0.1", () => {
     });
   });
 
-  it("preserves DA while both reviewed operators are canon_locked", () => {
+  it("preserves DA and DI canon locks while AT remains runtime_verified", () => {
     expect(
       canonicalOperatorProfilesV0_1
         .filter(
@@ -126,6 +126,6 @@ describe("DA canonical operator canon-lock transition v0.1", () => {
             "runtime_verified",
         )
         .map((profile) => profile.operatorId),
-    ).toEqual([]);
+    ).toEqual(["AT"]);
   });
 });

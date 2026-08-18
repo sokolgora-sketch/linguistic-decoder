@@ -99,7 +99,145 @@ export const canonicalOperatorProfilesV0_1 = [
       "dit",
     ],
   },
+  {
+    profileVersion: "canonical-operator-profile.v0_1",
+    operatorId: "AT",
+    embryo: "AT",
+    language: "sq",
+    sourceId: "reviewed.external.albanian-at.father.candidate.v0_1",
+    boundedLexicalFunction: "father functional motivation",
+    reviewedEvidenceStatus: "reviewed_functional",
+    canonLifecycleStatus: "runtime_verified",
+    authorizationScope: "bounded_functional_lexical_projection",
+    positiveProofWords: ["father"],
+    negativeControlWords: [
+      "at",
+      "damage",
+      "study",
+      "mode",
+      "xyz",
+      "da",
+      "di",
+      "studim",
+    ],
+  },
 ] as const satisfies readonly CanonicalOperatorProfileV0_1[];
+
+function normalizeCanonicalOperatorDiscoveryWordV0_1(
+  value: unknown,
+): string {
+  return String(value ?? "")
+    .trim()
+    .toLocaleLowerCase("en-US");
+}
+
+export function isCanonicalOperatorProfileDiscoveryTargetV0_1(
+  profile: CanonicalOperatorProfileV0_1,
+  basis: unknown,
+): boolean {
+  const normalizedBasis =
+    normalizeCanonicalOperatorDiscoveryWordV0_1(
+      basis,
+    );
+
+  if (!normalizedBasis) {
+    return false;
+  }
+
+  if (
+    profile.canonLifecycleStatus ===
+    "canon_locked"
+  ) {
+    return true;
+  }
+
+  if (
+    profile.canonLifecycleStatus !==
+    "runtime_verified"
+  ) {
+    return false;
+  }
+
+  const boundedTargets =
+    new Set(
+      [
+        ...profile.positiveProofWords,
+        ...profile.negativeControlWords,
+      ].map(
+        normalizeCanonicalOperatorDiscoveryWordV0_1,
+      ),
+    );
+
+  return boundedTargets.has(
+    normalizedBasis,
+  );
+}
+
+/**
+ * Structural DeepRoot discovery is broader than reviewed canonical evidence.
+ *
+ * For canon-locked profiles, existing broad structural discovery remains
+ * unchanged.
+ *
+ * For runtime-verified profiles, only the newly reviewed isolated carrier is
+ * target-bounded. Pre-existing carriers remain available to generic structural
+ * DeepRoot discovery, but they do not gain reviewed functional evidence unless
+ * canonical discovery separately authorizes the whole-word target.
+ */
+export function isCanonicalOperatorProfileStructuralCarrierAllowedV0_1(
+  profile: CanonicalOperatorProfileV0_1,
+  basis: unknown,
+  carrierForm: unknown,
+): boolean {
+  if (
+    isCanonicalOperatorProfileDiscoveryTargetV0_1(
+      profile,
+      basis,
+    )
+  ) {
+    return true;
+  }
+
+  if (
+    profile.canonLifecycleStatus !==
+    "runtime_verified"
+  ) {
+    return false;
+  }
+
+  const resolved =
+    resolveCanonicalOperatorProfileV0_1(
+      profile,
+    );
+
+  if (!resolved) {
+    return false;
+  }
+
+  const reviewedIsolatedCarrier =
+    normalizeCanonicalOperatorDiscoveryWordV0_1(
+      resolved
+        .sourceRow
+        .isolatedStandaloneForm,
+    );
+
+  const normalizedCarrier =
+    normalizeCanonicalOperatorDiscoveryWordV0_1(
+      carrierForm,
+    );
+
+  if (
+    !reviewedIsolatedCarrier ||
+    !normalizedCarrier
+  ) {
+    return false;
+  }
+
+  return (
+    normalizedCarrier !==
+    reviewedIsolatedCarrier
+  );
+}
 
 export function getCanonicalOperatorProfileV0_1(
   operatorId: string,

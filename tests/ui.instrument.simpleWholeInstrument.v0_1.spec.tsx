@@ -171,11 +171,34 @@ describe(
             "tabpanel",
           );
 
-        expect(
+        const functionalCard =
           within(
             overviewPanel,
+          ).getByTestId(
+            "functional-motivation-card",
+          );
+
+        expect(
+          within(
+            functionalCard,
           ).getByText(
-            "No supported functional candidate yet.",
+            "Evidence: Reviewed",
+          ),
+        ).toBeVisible();
+
+        expect(
+          within(
+            functionalCard,
+          ).getByText(
+            "AT · reviewed",
+          ),
+        ).toBeVisible();
+
+        expect(
+          within(
+            functionalCard,
+          ).getByText(
+            "father",
           ),
         ).toBeVisible();
 
@@ -210,6 +233,40 @@ describe(
         expect(
           meaning,
         ).toBeVisible();
+
+        const rootMapHeading =
+          screen.getByRole(
+            "heading",
+            {
+              name:
+                "Root Map",
+            },
+          );
+
+        const rootMapSection =
+          rootMapHeading.closest(
+            "section",
+          );
+
+        expect(
+          rootMapSection,
+        ).not.toBeNull();
+
+        expect(
+          within(
+            rootMapSection!,
+          ).getByText(
+            "STATE: PRESENT",
+          ),
+        ).toBeVisible();
+
+        expect(
+          within(
+            rootMapSection!,
+          ).queryByText(
+            "rootMap.tokens[].role expected RootTokenRoleV1",
+          ),
+        ).not.toBeInTheDocument();
 
         fireEvent.click(
           screen.getByRole(
