@@ -187,6 +187,32 @@ The primary functional-motivation result must expose:
 
 Adding or increasing knowledge; making knowledge yours through learning.
 
+**Seven-Voice alignment:**
+
+- Functional vowel path: `U → I`
+- Seven Principles: `U (5) — Unity → I (3) — Insight`
+- Colors: `Blue → Yellow`
+- Musical notes: `G → E`
+
+The primary result must make the active vowel-to-principle,
+vowel-to-color, and vowel-to-note mappings visible without requiring
+the user to open lower diagnostic surfaces.
+
+It must also expose the compact canonical seven-key:
+
+- `A (1) — Truth — Red — C`
+- `E (2) — Expansion — Orange — D`
+- `I (3) — Insight — Yellow — E`
+- `O (4) — Balance — Green — F`
+- `U (5) — Unity — Blue — G`
+- `Y (6) — Reflection — Indigo — A`
+- `Ë (7) — Evolution — Violet — B`
+
+These are canonical ZË-RO model mappings. Their display does not
+create a historical-origin, language-superiority, or external
+scientific-proof claim.
+
+
 **Evidence status:** Partial
 
 The existing surface/functional truth remains:
@@ -605,6 +631,10 @@ Study
  SHTU = add / increase / put-on.
  DI = know / knowledge.
  Functional explanation is clear.
+Functional Seven-Principles alignment is immediately visible and derived from canonical SSOT.
+Functional color alignment is immediately visible and derived from canonical SSOT.
+Functional musical-note alignment is immediately visible and derived from canonical SSOT.
+The compact seven-vowel principle/color/note key is visible in the primary result.
  Candidate status = Partial until SHTU reaches full review.
  DI remains reviewed.
  SHTU remains honestly pending/structural.

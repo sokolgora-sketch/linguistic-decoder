@@ -12900,7 +12900,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
           "STUDY",
         ],
         "form": "SHTU + DI",
-        "functionalStatement": "add / increase / put-on + know / knowledge",
+        "functionalStatement": "Adding or increasing knowledge; making knowledge yours through learning.",
         "gloss": "add / increase / put-on + know / knowledge",
         "historicalRelation": "not_evaluated",
         "id": "rootmap-composition:sq:shtu+di",
@@ -12928,7 +12928,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
           ],
           "kind": "functionalComposition",
         },
-        "semanticBridge": "add / increase / put-on + know / knowledge",
+        "semanticBridge": "Adding or increasing knowledge; making knowledge yours through learning.",
         "sourceKind": "rootmap_functional_composition",
         "sourceNote": "Composition projected from live RootMap component evidence. Component review states remain separate; this is functional motivation, not historical-origin or winner evidence.",
         "status": "unknown",
@@ -12940,6 +12940,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
           "at_least_one_reviewed_functional_component",
           "composition_semantic_bridge_not_reviewed",
         ],
+        "vowelPath": "U-I",
       },
       {
         "candidateId": "latin-studium",
@@ -13162,6 +13163,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
             "s_to_sh",
             "y_to_i",
           ],
+          "plainFunctionalExplanation": "Adding or increasing knowledge; making knowledge yours through learning.",
           "roots": [
             "shtu",
             "di",
@@ -13700,7 +13702,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
           "claimType": "functionalMotivation",
           "confidenceTag": "speculative",
           "decomposition": {
-            "functionalStatement": "add / increase / put-on + know / knowledge",
+            "functionalStatement": "Adding or increasing knowledge; making knowledge yours through learning.",
             "parts": [
               "SHTU",
               "DI",
@@ -13717,7 +13719,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
           ],
           "family": "rootmap-functional-composition",
           "form": "SHTU + DI",
-          "functionalStatement": "add / increase / put-on + know / knowledge",
+          "functionalStatement": "Adding or increasing knowledge; making knowledge yours through learning.",
           "gloss": "add / increase / put-on + know / knowledge",
           "historicalRelation": "not_evaluated",
           "id": "rootmap-composition:sq:shtu+di",
@@ -13745,7 +13747,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
             ],
             "kind": "functionalComposition",
           },
-          "semanticBridge": "add / increase / put-on + know / knowledge",
+          "semanticBridge": "Adding or increasing knowledge; making knowledge yours through learning.",
           "sourceKind": "rootmap_functional_composition",
           "sourceNote": "Composition projected from live RootMap component evidence. Component review states remain separate; this is functional motivation, not historical-origin or winner evidence.",
           "status": "experimental",
@@ -13757,6 +13759,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
             "at_least_one_reviewed_functional_component",
             "composition_semantic_bridge_not_reviewed",
           ],
+          "vowelPath": "U→I",
         },
         {
           "axes": {
@@ -14078,6 +14081,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
               "s_to_sh",
               "y_to_i",
             ],
+            "plainFunctionalExplanation": "Adding or increasing knowledge; making knowledge yours through learning.",
             "roots": [
               "shtu",
               "di",

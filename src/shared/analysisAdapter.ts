@@ -298,6 +298,16 @@ export function enginePayloadToAnalysisResult(payload: EnginePayload): AnalyzeWo
     buildFunctionalCandidateCompositionsFromRootMapV0_1({
       rootMap,
       targetWord: rootMapBasis,
+      functionalRoots:
+        Array.isArray(
+          (result as any)
+            ?.deepRoot
+            ?.functionalRoots,
+        )
+          ? (result as any)
+              .deepRoot
+              .functionalRoots
+          : [],
     });
 
   const visibleFunctionalCandidates = [
