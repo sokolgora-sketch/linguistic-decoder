@@ -12940,6 +12940,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
           "at_least_one_reviewed_functional_component",
           "composition_semantic_bridge_not_reviewed",
         ],
+        "vowelPath": "U-I",
       },
       {
         "candidateId": "latin-studium",
@@ -13758,6 +13759,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
             "at_least_one_reviewed_functional_component",
             "composition_semantic_bridge_not_reviewed",
           ],
+          "vowelPath": "U→I",
         },
         {
           "axes": {

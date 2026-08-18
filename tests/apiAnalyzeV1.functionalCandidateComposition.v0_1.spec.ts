@@ -137,6 +137,12 @@ describe(
         "add / increase / put-on + know / knowledge",
       );
 
+      expect(
+        composition.vowelPath,
+      ).toBe(
+        "U-I",
+      );
+
       const reviewedDiIndex =
         body.candidates.findIndex(
           (candidate: any) =>

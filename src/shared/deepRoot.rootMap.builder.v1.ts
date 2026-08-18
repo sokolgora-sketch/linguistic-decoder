@@ -793,7 +793,12 @@ function normalizeFunctionalCompositionRootV0_1(
     .toUpperCase();
 }
 
-function resolvePlainFunctionalCompositionExplanationV0_1(
+type FunctionalCompositionMetadataV0_1 = {
+  plainFunctionalExplanation: string | null;
+  vowelPath: string | null;
+};
+
+function resolveFunctionalCompositionMetadataV0_1(
   params: {
     functionalRoots:
       | readonly FunctionalRootHypothesisV1[]
@@ -803,7 +808,7 @@ function resolvePlainFunctionalCompositionExplanationV0_1(
     language: string;
     tokens: readonly string[];
   },
-): string | null {
+): FunctionalCompositionMetadataV0_1 | null {
   const targetWord =
     normalizeFunctionalCompositionTextV0_1(
       params.targetWord,
@@ -877,9 +882,18 @@ function resolvePlainFunctionalCompositionExplanationV0_1(
           "",
       ).trim();
 
-    if (explanation) {
-      return explanation;
-    }
+    const vowelPath =
+      String(
+        root?.vowelPath ??
+          "",
+      ).trim();
+
+    return {
+      plainFunctionalExplanation:
+        explanation || null,
+      vowelPath:
+        vowelPath || null,
+    };
   }
 
   return null;
@@ -1058,15 +1072,24 @@ export function buildFunctionalCandidateCompositionsFromRootMapV0_1(
     return [];
   }
 
-  const plainFunctionalExplanation =
-    resolvePlainFunctionalCompositionExplanationV0_1({
+  const functionalCompositionMetadata =
+    resolveFunctionalCompositionMetadataV0_1({
       functionalRoots:
         params.functionalRoots,
       targetWord,
       language,
       tokens,
-    }) ??
+    });
+
+  const plainFunctionalExplanation =
+    functionalCompositionMetadata
+      ?.plainFunctionalExplanation ??
     composedMeaning;
+
+  const candidateVowelPath =
+    functionalCompositionMetadata
+      ?.vowelPath ??
+    null;
 
   const candidateId =
     `rootmap-composition:${language.toLowerCase()}:${tokens
@@ -1100,6 +1123,12 @@ export function buildFunctionalCandidateCompositionsFromRootMapV0_1(
       functionalStatement:
         plainFunctionalExplanation,
       gloss: composedMeaning,
+      ...(candidateVowelPath
+        ? {
+            vowelPath:
+              candidateVowelPath,
+          }
+        : {}),
 
       claimType:
         "functionalMotivation",

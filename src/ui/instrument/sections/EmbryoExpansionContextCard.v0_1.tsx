@@ -559,43 +559,6 @@ export function EmbryoExpansionContextCardV0_1({
       ),
     );
 
-  const functionalPath =
-    renderedPath(
-      vm.readout
-        .voicePathFunctional,
-    );
-
-  const functionalSevenVoices =
-    functionalSevenVoiceItemsV0_1(
-      vm.readout
-        .voicePathFunctional,
-    );
-
-  const functionalPrinciplePath =
-    functionalSevenVoices
-      .map(
-        (item) =>
-          `${item.vowel} (${item.index1}) — ${item.principle}`,
-      )
-      .join(" → ");
-
-  const functionalColorPath =
-    functionalSevenVoices
-      .map(
-        (item) => item.color,
-      )
-      .join(" → ");
-
-  const functionalNotePath =
-    functionalSevenVoices
-      .map(
-        (item) => item.note,
-      )
-      .join(" → ");
-
-  const sevenVoiceKey =
-    fullSevenVoiceKeyV0_1();
-
   const primaryValidation =
     presentString(
       primaryCandidate
@@ -622,6 +585,126 @@ export function EmbryoExpansionContextCardV0_1({
           "",
       ).trim(),
     );
+
+
+  const legacyCompositionVowelPath:
+    PresentOrMissing<Vowel[]> | undefined =
+    useLegacyRootMapComposition
+      ? (() => {
+          if (
+            !Array.isArray(
+              rootMap?.tokens,
+            ) ||
+            rootMap.tokens.length === 0
+          ) {
+            return undefined;
+          }
+
+          const voices: Vowel[] = [];
+
+          for (
+            const token of
+              rootMap.tokens
+          ) {
+            const rawPath =
+              String(
+                token?.vowel_path ??
+                  "",
+              )
+                .normalize("NFC")
+                .trim()
+                .toUpperCase();
+
+            if (!rawPath) {
+              return undefined;
+            }
+
+            const parts =
+              rawPath.includes("→")
+                ? rawPath.split("→")
+                : rawPath.includes("-")
+                  ? rawPath.split("-")
+                  : rawPath.split("");
+
+            for (
+              const rawPart of parts
+            ) {
+              const part =
+                rawPart.trim();
+
+              if (
+                !part ||
+                !(
+                  VOWELS_7 as
+                    readonly string[]
+                ).includes(part)
+              ) {
+                return undefined;
+              }
+
+              voices.push(
+                part as Vowel,
+              );
+            }
+          }
+
+          return voices.length > 0
+            ? {
+                kind: "present",
+                value: voices,
+              }
+            : undefined;
+        })()
+      : undefined;
+
+  // The active alignment is owned by the candidate actually
+  // displayed in this card:
+  //
+  // - first-class candidate: its own candidate vowelPath
+  // - legacy RootMap composition: its own token vowel_path sequence
+  //
+  // Never borrow vm.readout.voicePathFunctional merely because the
+  // wider run has a functional path.
+  const displayedCandidateVowelPath =
+    useLegacyRootMapComposition
+      ? legacyCompositionVowelPath
+      : primaryCandidate
+          .vowelPath;
+
+  const functionalPath =
+    renderedPath(
+      displayedCandidateVowelPath,
+    );
+
+  const functionalSevenVoices =
+    functionalSevenVoiceItemsV0_1(
+      displayedCandidateVowelPath,
+    );
+
+  const functionalPrinciplePath =
+    functionalSevenVoices
+      .map(
+        (item) =>
+          `${item.vowel} (${item.index1}) — ${item.principle}`,
+      )
+      .join(" → ");
+
+  const functionalColorPath =
+    functionalSevenVoices
+      .map(
+        (item) => item.color,
+      )
+      .join(" → ");
+
+  const functionalNotePath =
+    functionalSevenVoices
+      .map(
+        (item) => item.note,
+      )
+      .join(" → ");
+
+  const sevenVoiceKey =
+    fullSevenVoiceKeyV0_1();
 
   let tokens: string[] = [];
   let language =
@@ -1021,14 +1104,23 @@ export function EmbryoExpansionContextCardV0_1({
         </div>
       ) : null}
 
-      {functionalSevenVoices.length > 0 ? (
+      {sevenVoiceKey.length > 0 ? (
         <div
-          data-testid="functional-seven-voice-alignment"
+          data-testid="functional-seven-voice-model"
           className="mt-3 rounded-lg border border-violet-300 bg-violet-50 p-4 dark:border-violet-400/25 dark:bg-violet-500/5"
         >
           <div className="text-xs font-semibold uppercase tracking-[0.14em] text-violet-700 dark:text-violet-200">
-            ZË-RO Seven-Voice alignment
+            ZË-RO Seven-Voice model
           </div>
+
+          {functionalSevenVoices.length > 0 ? (
+            <div
+              data-testid="functional-seven-voice-alignment"
+              className="mt-3"
+            >
+              <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-600 dark:text-slate-400">
+                Active candidate alignment
+              </div>
 
           <div
             data-testid="functional-principle-path"
@@ -1086,6 +1178,9 @@ export function EmbryoExpansionContextCardV0_1({
               ),
             )}
           </div>
+
+            </div>
+          ) : null}
 
           <div className="mt-4 text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-600 dark:text-slate-400">
             Full seven-key

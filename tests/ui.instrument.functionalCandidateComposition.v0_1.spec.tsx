@@ -168,5 +168,67 @@ describe(
         ),
       ).not.toBeInTheDocument();
     });
+
+    it("does not borrow the run-level U-I alignment when the displayed DI fallback has no candidate vowel path", async () => {
+      const body =
+        await analyzeV1("study");
+
+      const reviewedDi =
+        body.candidates.find(
+          (candidate: any) =>
+            candidate?.embryo === "DI" &&
+            candidate?.validationOutcome ===
+              "validated",
+        );
+
+      expect(reviewedDi).toBeTruthy();
+      expect(
+        reviewedDi.vowelPath,
+      ).toBeUndefined();
+
+      body.candidates = [
+        reviewedDi,
+      ];
+
+      const vm =
+        adaptAnalysisToTelemetryVM(body);
+
+      expect(
+        vm.readout
+          .voicePathFunctional,
+      ).toEqual({
+        kind: "present",
+        value: ["U", "I"],
+      });
+
+      expect(
+        vm.candidates[0]
+          .vowelPath.kind,
+      ).toBe("missing");
+
+      render(
+        <EmbryoExpansionContextCardV0_1
+          vm={vm}
+        />,
+      );
+
+      expect(
+        screen.queryByTestId(
+          "functional-seven-voice-alignment",
+        ),
+      ).not.toBeInTheDocument();
+
+      expect(
+        screen.queryByText(
+          "Functional path: U → I",
+        ),
+      ).not.toBeInTheDocument();
+
+      expect(
+        screen.getByTestId(
+          "seven-voice-key",
+        ),
+      ).toBeInTheDocument();
+    });
   },
 );
