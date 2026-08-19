@@ -2,7 +2,7 @@
 
 **Milestone ID:** `OPEN_INSTRUMENT_SIMPLE_FUNCTIONAL_MOTIVATION_V1`
 
-**Status:** `ACTIVE`
+**Status:** `DONE`
 
 **Opened:** 2026-08-12
 
@@ -693,3 +693,167 @@ DF_BRAIN closure commit.
 Do not create a separate milestone-closure design document.
 
 The finished product itself is the closure evidence.
+## 21. Final closure evidence — 2026-08-18
+
+<!-- OPEN_INSTRUMENT_SIMPLE_FUNCTIONAL_MOTIVATION_V1_CLOSED_2026_08_18 -->
+
+`OPEN_INSTRUMENT_SIMPLE_FUNCTIONAL_MOTIVATION_V1` satisfied all governing exit criteria before this status change.
+
+### Final implementation PRs
+
+- PR #1789 → `73d85c33890e1b314fd2c45c9ffd414f1a7eb5f6`
+- PR #1790 → `aad2e6f55e236c2efc153fe0fb5ac974691bc9ed`
+- PR #1791 → `0de7a3cf0a6f85f68d888e92f0ad53bb4f516453`
+- PR #1792 → `49a9d21cadc19c67c48f69f86d315679a7864b20`
+- PR #1793 → `a6848ac49d3eea8b6fe610ac8b768dab452de669`
+- PR #1794 → `62f8d747be53a0b532f068040fc04596a4f653d2`
+- PR #1795 → `d77fdd49a92bfaed418baa5375740fcd9d7f3d96`
+- PR #1796 → `a83298434065ee3b33987d52b26bd94247c5c101`
+- PR #1797 → `d6a792a728ea4621d1c5d01605f4ca1e57aab9cd`
+
+Final implementation main before the closure-only documentation update:
+
+`d6a792a728ea4621d1c5d01605f4ca1e57aab9cd`
+
+### Final Study product proof
+
+Normal `/chat` browser acceptance showed:
+
+- language: Albanian;
+- evidence: Partial;
+- candidate: `SHTU + DI`;
+- SHTU: structural — `add / increase / put-on`;
+- DI: reviewed — `know / knowledge`;
+- exact plain functional explanation:
+  `Adding or increasing knowledge; making knowledge yours through learning.`;
+- candidate-owned functional path: `U → I`;
+- canonical principle alignment: `U (5) — Unity → I (3) — Insight`;
+- canonical colors: `Blue → Yellow`;
+- canonical musical notes: `G → E`;
+- full seven-vowel principle/color/note key visible;
+- surface path: `U → Y`;
+- delta: `DIVERGE`.
+
+The principle/color/note display is explicitly bounded as canonical ZË-RO model metadata, not historical-origin or external scientific proof.
+
+### Final Damage control
+
+Normal `/chat` browser acceptance showed:
+
+- language: Albanian;
+- evidence: Reviewed;
+- candidate: `DA`;
+- meaning: `split / divide`;
+- bounded functional motivation remained useful and truthful;
+- RootMap remained PRESENT with reviewed DA evidence;
+- reviewed DA emitted no candidate-specific `A → Ë` path;
+- candidate-level active Seven-Voice alignment was therefore correctly suppressed;
+- run-level deterministic functional path `A → Ë` remained visible separately;
+- no historical-origin, winner, superiority, ownership, or candidate-truth promotion occurred.
+
+### Final Father control
+
+Normal `/chat` browser acceptance showed:
+
+- language: Albanian;
+- evidence: Reviewed;
+- candidate: `AT`;
+- meaning: `father`;
+- RootMap remained PRESENT;
+- AT RootMap role: `unit`;
+- reviewed AT emitted no candidate-specific `A → Ë` path;
+- candidate-level active Seven-Voice alignment was therefore correctly suppressed;
+- run-level deterministic functional path `A → Ë` remained visible separately;
+- reviewed AT evidence stayed target-bounded and did not create an unrestricted bare-`at` father rule;
+- no historical-origin or winner claim occurred.
+
+### Candidate-bound Seven-Voice truth
+
+The final valid Codex P2 finding was resolved before merge.
+
+Active Seven-Voice alignment now belongs to the result actually displayed:
+
+- first-class candidates/compositions use their own candidate vowel path;
+- legacy displayed RootMap compositions derive alignment from their own RootMap token vowel paths;
+- reviewed single-embryo candidates without their own vowel path do not borrow a broader run-level functional path;
+- the full canonical seven-key can remain visible independently as model reference metadata.
+
+### Actual LLM provider proof
+
+Slice G completed real non-mock normal-Analyze candidate discovery using:
+
+- local provider: Ollama;
+- model: `llama3.1:8b`;
+- loopback-only OpenAI-compatible endpoint;
+- no paid OpenAI API;
+- no remote provider.
+
+At least one arbitrary/non-hardcoded live discovery was deterministically verified while preserving Proposed-only status.
+
+Additional browser/control coverage during Slice G included:
+
+- `memory`: surface `E-O-Y` → functional `E-O-I`, Proposed;
+- `rhythm`: canonical surface `Y` → functional `I-Ë`, Proposed;
+- `garden`: valid no-supported-candidate / Null outcome;
+- `silver`: provider timeout failed safely without false promotion;
+- `window`: unavailable carrier alignment failed closed, functional path remained unavailable, and no candidate was promoted.
+
+Mock-provider output remained excluded from real user truth.
+
+### Final engineering proof
+
+Final PR #1797 reviewed source:
+
+`f2ddf99859a28d3b86b4e3296626ce927f42edcc`
+
+Proof completed before merge:
+
+- focused tests: PASS;
+- `npm run typecheck:contracts`: PASS;
+- `npm run gate:quick`: PASS;
+- exact-source GitHub CI: PASS;
+- contracts-typecheck: PASS;
+- CodeQL: PASS;
+- no unresolved actionable Codex finding;
+- mandatory actual-browser pre-merge smoke: PASS;
+- explicit user approval of final visible behavior: PASS.
+
+PR #1797 then merged to:
+
+`d6a792a728ea4621d1c5d01605f4ca1e57aab9cd`
+
+Merged-main production proof:
+
+- `/chat`: PASS;
+- `/`: PASS;
+- profile-driven DA / DI / AT positive and negative runtime assertions: PASS;
+- smoke-focused regression suites: PASS;
+- `npm run open-instrument:live-smoke`: PASS when executed with the external automatic proposer disabled, matching the live-smoke runner's no-external-provider contract;
+- merged main remained clean.
+
+The initial merged-main smoke attempt built successfully and began passing route/API assertions, but inherited a locally enabled real proposer and hit the smoke runner's 10-second HTTP abort. The canonical no-external-provider rerun completed successfully without source changes.
+
+### DF_BRAIN closure evidence
+
+Both required DF_BRAIN records were synchronized before closure:
+
+- `log/2026-08.md`;
+- `projects/zero/zero.md`.
+
+DF_BRAIN synchronization commit:
+
+`b5ea5183d885cb79657542d2b6e6ee5453f35650`
+
+That commit records PR #1796, PR #1797, final browser evidence, candidate-bound Seven-Voice behavior, merged-main live-smoke proof, and the preserved Slice G real-provider proof.
+
+### Closure decision
+
+Every governing exit criterion in section 19 is satisfied.
+
+No additional implementation slice is required for this milestone.
+
+The milestone is therefore:
+
+`DONE`
+
+Future Open Instrument work must be selected from fresh product/repository inspection rather than extending this completed milestone by assumption.
