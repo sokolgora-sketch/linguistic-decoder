@@ -16,6 +16,7 @@ const expectedProfileKeys = [
   "authorizationScope",
   "boundedLexicalFunction",
   "canonLifecycleStatus",
+  "discoveryScope",
   "embryo",
   "language",
   "negativeControlWords",
@@ -42,6 +43,10 @@ describe("canonical operator profile v0.1", () => {
     expect(da?.canonLifecycleStatus).toBe("canon_locked");
     expect(di?.canonLifecycleStatus).toBe("canon_locked");
     expect(at?.canonLifecycleStatus).toBe("runtime_verified");
+
+    expect(da?.discoveryScope).toBe("broad_structural");
+    expect(di?.discoveryScope).toBe("broad_structural");
+    expect(at?.discoveryScope).toBe("bounded_targets");
 
     for (const profile of canonicalOperatorProfilesV0_1) {
       expect(profile.profileVersion).toBe("canonical-operator-profile.v0_1");
@@ -156,6 +161,7 @@ describe("canonical operator profile v0.1", () => {
       reviewedEvidenceStatus: "none",
       canonLifecycleStatus: "candidate",
       authorizationScope: "bounded_functional_lexical_projection",
+      discoveryScope: "bounded_targets",
       positiveProofWords: ["unknown"],
       negativeControlWords: ["xyz"],
     };
@@ -282,7 +288,7 @@ describe("canonical operator profile v0.1", () => {
     }
   });
 
-  it("keeps runtime_verified discovery target-bounded while canon_locked operators retain broad structural discovery", () => {
+  it("uses explicit discovery scope instead of lifecycle to control discovery breadth", () => {
     const da =
       getCanonicalOperatorProfileV0_1(
         "DA",
