@@ -32,6 +32,10 @@ export type CanonicalOperatorLifecycleStatusV0_1 =
 export type CanonicalOperatorAuthorizationScopeV0_1 =
   "bounded_functional_lexical_projection";
 
+export type CanonicalOperatorDiscoveryScopeV0_1 =
+  | "broad_structural"
+  | "bounded_targets";
+
 export type CanonicalOperatorProfileV0_1 = {
   profileVersion: "canonical-operator-profile.v0_1";
   operatorId: string;
@@ -42,6 +46,7 @@ export type CanonicalOperatorProfileV0_1 = {
   reviewedEvidenceStatus: CanonicalOperatorReviewedEvidenceStatusV0_1;
   canonLifecycleStatus: CanonicalOperatorLifecycleStatusV0_1;
   authorizationScope: CanonicalOperatorAuthorizationScopeV0_1;
+  discoveryScope: CanonicalOperatorDiscoveryScopeV0_1;
   positiveProofWords: readonly string[];
   negativeControlWords: readonly string[];
 };
@@ -66,6 +71,7 @@ export const canonicalOperatorProfilesV0_1 = [
     reviewedEvidenceStatus: "reviewed_functional",
     canonLifecycleStatus: "canon_locked",
     authorizationScope: "bounded_functional_lexical_projection",
+    discoveryScope: "broad_structural",
     positiveProofWords: ["da", "dam", "damage"],
     negativeControlWords: [
       "study",
@@ -87,6 +93,7 @@ export const canonicalOperatorProfilesV0_1 = [
     reviewedEvidenceStatus: "reviewed_functional",
     canonLifecycleStatus: "canon_locked",
     authorizationScope: "bounded_functional_lexical_projection",
+    discoveryScope: "broad_structural",
     positiveProofWords: ["di", "study", "studim"],
     negativeControlWords: [
       "da",
@@ -109,6 +116,7 @@ export const canonicalOperatorProfilesV0_1 = [
     reviewedEvidenceStatus: "reviewed_functional",
     canonLifecycleStatus: "runtime_verified",
     authorizationScope: "bounded_functional_lexical_projection",
+    discoveryScope: "bounded_targets",
     positiveProofWords: ["father"],
     negativeControlWords: [
       "at",
@@ -145,17 +153,14 @@ export function isCanonicalOperatorProfileDiscoveryTargetV0_1(
   }
 
   if (
-    profile.canonLifecycleStatus ===
-    "canon_locked"
-  ) {
-    return true;
-  }
-
-  if (
-    profile.canonLifecycleStatus !==
-    "runtime_verified"
+    profile.canonLifecycleStatus !== "runtime_verified" &&
+    profile.canonLifecycleStatus !== "canon_locked"
   ) {
     return false;
+  }
+
+  if (profile.discoveryScope === "broad_structural") {
+    return true;
   }
 
   const boundedTargets =
@@ -176,13 +181,15 @@ export function isCanonicalOperatorProfileDiscoveryTargetV0_1(
 /**
  * Structural DeepRoot discovery is broader than reviewed canonical evidence.
  *
- * For canon-locked profiles, existing broad structural discovery remains
- * unchanged.
+ * Discovery breadth is profile metadata, not a canon-lifecycle side effect.
  *
- * For runtime-verified profiles, only the newly reviewed isolated carrier is
- * target-bounded. Pre-existing carriers remain available to generic structural
- * DeepRoot discovery, but they do not gain reviewed functional evidence unless
- * canonical discovery separately authorizes the whole-word target.
+ * Broad-structural profiles retain generic structural discovery.
+ *
+ * Bounded-target profiles keep the reviewed isolated carrier target-bounded
+ * across runtime-mature lifecycle states. Pre-existing carriers remain
+ * available to generic structural DeepRoot discovery, but they do not gain
+ * reviewed functional evidence unless canonical discovery separately
+ * authorizes the whole-word target.
  */
 export function isCanonicalOperatorProfileStructuralCarrierAllowedV0_1(
   profile: CanonicalOperatorProfileV0_1,
@@ -199,8 +206,11 @@ export function isCanonicalOperatorProfileStructuralCarrierAllowedV0_1(
   }
 
   if (
-    profile.canonLifecycleStatus !==
-    "runtime_verified"
+    profile.discoveryScope !== "bounded_targets" ||
+    (
+      profile.canonLifecycleStatus !== "runtime_verified" &&
+      profile.canonLifecycleStatus !== "canon_locked"
+    )
   ) {
     return false;
   }

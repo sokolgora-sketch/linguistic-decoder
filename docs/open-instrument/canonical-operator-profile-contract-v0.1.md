@@ -29,6 +29,7 @@ The canonical profile stores only stable operator coordination metadata:
 - reviewed-evidence expectation;
 - canon lifecycle status;
 - expected authorization scope;
+- discovery scope;
 - positive proof words;
 - negative control words.
 
@@ -95,6 +96,8 @@ The resolver fails closed when the configured source ID does not exist.
 - lifecycle: `canon_locked`;
 - admitted scope:
   `bounded_functional_lexical_projection`;
+- discovery scope:
+  `broad_structural`;
 - positive proof words:
   - `da`;
   - `dam`;
@@ -114,6 +117,8 @@ The resolver fails closed when the configured source ID does not exist.
 - lifecycle: `canon_locked`;
 - admitted scope:
   `bounded_functional_lexical_projection`;
+- discovery scope:
+  `broad_structural`;
 - positive proof words:
   - `di`;
   - `study`;
@@ -130,6 +135,34 @@ The resolver fails closed when the configured source ID does not exist.
 
 DA and DI are `canon_locked` under separately reviewed transitions limited
 to bounded functional lexical projection.
+
+## Discovery-scope boundary
+
+Canon lifecycle and discovery breadth are separate profile concerns.
+
+Supported discovery scopes are:
+
+- `broad_structural`;
+- `bounded_targets`.
+
+`broad_structural` allows a runtime-mature profile to participate in generic
+canonical operator discovery across arbitrary input bases.
+
+`bounded_targets` limits the reviewed isolated carrier to the profile positive
+proof words and negative control words, while preserving pre-existing legacy
+structural carriers through generic DeepRoot discovery.
+
+Current profile policy is:
+
+- DA: `broad_structural`;
+- DI: `broad_structural`;
+- AT: `bounded_targets`.
+
+A lifecycle transition to `canon_locked` must not silently widen a profile from
+`bounded_targets` to `broad_structural`.
+
+Discovery-scope changes require an explicit reviewed change and must preserve
+known homograph, carrier-isolation, false-positive, and claim boundaries.
 
 ## Claim boundary
 
@@ -211,4 +244,6 @@ The contract is accepted when:
 - profiles contain no duplicated citation or runtime evidence fields;
 - DA is `canon_locked` under bounded functional lexical projection;
 - DI is `canon_locked` under bounded functional lexical projection;
+- discovery breadth is explicit profile metadata rather than a lifecycle side effect;
+- AT can remain `bounded_targets` across a later lifecycle transition;
 - the full repository gate passes.
