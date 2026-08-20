@@ -138,7 +138,7 @@ describe("canonical evidence projection policy contract v0.1", () => {
     }
   });
 
-  it("preserves DA and DI canon locks while later AT remains separately runtime_verified", () => {
+  it("preserves DA, DI, and AT canon locks after the dedicated AT transition", () => {
     const canonLockedMatches =
       profileSource.match(
         /canonLifecycleStatus: "canon_locked"/g,
@@ -149,8 +149,8 @@ describe("canonical evidence projection policy contract v0.1", () => {
         /canonLifecycleStatus: "runtime_verified"/g,
       ) ?? [];
 
-    expect(canonLockedMatches).toHaveLength(2);
-    expect(runtimeVerifiedMatches).toHaveLength(1);
+    expect(canonLockedMatches).toHaveLength(3);
+    expect(runtimeVerifiedMatches).toHaveLength(0);
 
     expect(profileSource).toMatch(
       /operatorId: "DA"[\s\S]*?canonLifecycleStatus: "canon_locked"/,
@@ -161,7 +161,7 @@ describe("canonical evidence projection policy contract v0.1", () => {
     );
 
     expect(profileSource).toMatch(
-      /operatorId: "AT"[\s\S]*?canonLifecycleStatus: "runtime_verified"/,
+      /operatorId: "AT"[\s\S]*?canonLifecycleStatus: "canon_locked"/,
     );
   });
 });

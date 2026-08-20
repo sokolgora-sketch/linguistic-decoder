@@ -151,16 +151,21 @@ describe("canonical operator shared contract v0.1", () => {
     },
   );
 
-  it("locks DA and DI as canon_locked", () => {
+  it("locks DA, DI, and AT while preserving explicit discovery scope", () => {
     const da = canonicalOperatorProfilesV0_1.find(
       (profile) => profile.operatorId === "DA",
     );
     const di = canonicalOperatorProfilesV0_1.find(
       (profile) => profile.operatorId === "DI",
     );
+    const at = canonicalOperatorProfilesV0_1.find(
+      (profile) => profile.operatorId === "AT",
+    );
 
     expect(da?.canonLifecycleStatus).toBe("canon_locked");
     expect(di?.canonLifecycleStatus).toBe("canon_locked");
+    expect(at?.canonLifecycleStatus).toBe("canon_locked");
+    expect(at?.discoveryScope).toBe("bounded_targets");
   });
 
   it.each(resolvedProfiles)(

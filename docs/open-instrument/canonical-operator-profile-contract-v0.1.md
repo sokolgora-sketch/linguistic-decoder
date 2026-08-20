@@ -133,8 +133,33 @@ The resolver fails closed when the configured source ID does not exist.
   - `dije`;
   - `dit`.
 
-DA and DI are `canon_locked` under separately reviewed transitions limited
+### AT
+
+- operator ID: `AT`;
+- source ID:
+  `reviewed.external.albanian-at.father.candidate.v0_1`;
+- lifecycle: `canon_locked`;
+- admitted scope:
+  `bounded_functional_lexical_projection`;
+- discovery scope:
+  `bounded_targets`;
+- positive proof words:
+  - `father`;
+- negative controls:
+  - `at`;
+  - `damage`;
+  - `study`;
+  - `mode`;
+  - `xyz`;
+  - `da`;
+  - `di`;
+  - `studim`.
+
+DA, DI, and AT are `canon_locked` under separately reviewed transitions limited
 to bounded functional lexical projection.
+
+AT remains `bounded_targets`; canon lock does not widen AT into generic broad
+structural discovery.
 
 ## Discovery-scope boundary
 
@@ -245,5 +270,5 @@ The contract is accepted when:
 - DA is `canon_locked` under bounded functional lexical projection;
 - DI is `canon_locked` under bounded functional lexical projection;
 - discovery breadth is explicit profile metadata rather than a lifecycle side effect;
-- AT can remain `bounded_targets` across a later lifecycle transition;
+- AT is `canon_locked` while remaining `bounded_targets`;
 - the full repository gate passes.

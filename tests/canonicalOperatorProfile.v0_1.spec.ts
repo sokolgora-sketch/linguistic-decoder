@@ -28,7 +28,7 @@ const expectedProfileKeys = [
 ].sort();
 
 describe("canonical operator profile v0.1", () => {
-  it("registers DA and DI as canon_locked and AT as runtime_verified", () => {
+  it("registers DA, DI, and AT as canon_locked with explicit discovery scopes", () => {
     expect(canonicalOperatorProfilesV0_1).toHaveLength(3);
     expect(canonicalOperatorProfilesV0_1.map((profile) => profile.operatorId)).toEqual([
       "DA",
@@ -42,7 +42,7 @@ describe("canonical operator profile v0.1", () => {
 
     expect(da?.canonLifecycleStatus).toBe("canon_locked");
     expect(di?.canonLifecycleStatus).toBe("canon_locked");
-    expect(at?.canonLifecycleStatus).toBe("runtime_verified");
+    expect(at?.canonLifecycleStatus).toBe("canon_locked");
 
     expect(da?.discoveryScope).toBe("broad_structural");
     expect(di?.discoveryScope).toBe("broad_structural");
@@ -233,7 +233,7 @@ describe("canonical operator profile v0.1", () => {
     ).toContain("at");
   });
 
-  it("bounds only the reviewed isolated runtime_verified carrier while preserving legacy structural carriers", () => {
+  it("bounds the reviewed isolated AT carrier while preserving legacy structural carriers", () => {
     const at =
       getCanonicalOperatorProfileV0_1(
         "AT",

@@ -178,7 +178,7 @@ describe("DI canonical operator canon-lock transition v0.1", () => {
     );
   });
 
-  it("keeps DA and DI canon_locked while AT remains runtime_verified", () => {
+  it("keeps the historical DI transition valid while current AT is also canon_locked", () => {
     expect(
       canonicalOperatorProfilesV0_1.map(
         (profile) => [
@@ -189,7 +189,7 @@ describe("DI canonical operator canon-lock transition v0.1", () => {
     ).toEqual([
       ["DA", "canon_locked"],
       ["DI", "canon_locked"],
-      ["AT", "runtime_verified"],
+      ["AT", "canon_locked"],
     ]);
   });
 

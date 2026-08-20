@@ -114,7 +114,7 @@ export const canonicalOperatorProfilesV0_1 = [
     sourceId: "reviewed.external.albanian-at.father.candidate.v0_1",
     boundedLexicalFunction: "father functional motivation",
     reviewedEvidenceStatus: "reviewed_functional",
-    canonLifecycleStatus: "runtime_verified",
+    canonLifecycleStatus: "canon_locked",
     authorizationScope: "bounded_functional_lexical_projection",
     discoveryScope: "bounded_targets",
     positiveProofWords: ["father"],
