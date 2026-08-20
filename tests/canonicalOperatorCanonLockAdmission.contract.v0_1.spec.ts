@@ -131,7 +131,7 @@ describe("canonical operator canon-lock admission contract v0.1", () => {
     expect(review).toContain("- `runtime_verified`.");
   });
 
-  it("records DA and DI canon locks while AT remains outside canon-lock admission", () => {
+  it("records DA, DI, and AT canon locks while historical readiness records remain historical", () => {
     expect(profileSource).toContain(
       'operatorId: "DA"',
     );
@@ -149,11 +149,11 @@ describe("canonical operator canon-lock admission contract v0.1", () => {
         /canonLifecycleStatus: "canon_locked"/g,
       ) ?? [];
 
-    expect(runtimeVerifiedMatches).toHaveLength(1);
-    expect(canonLockedMatches).toHaveLength(2);
+    expect(runtimeVerifiedMatches).toHaveLength(0);
+    expect(canonLockedMatches).toHaveLength(3);
 
     expect(profileSource).toMatch(
-      /operatorId: "AT"[\s\S]*?canonLifecycleStatus: "runtime_verified"/,
+      /operatorId: "AT"[\s\S]*?canonLifecycleStatus: "canon_locked"/,
     );
   });
 

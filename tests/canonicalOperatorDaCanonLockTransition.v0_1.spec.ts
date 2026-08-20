@@ -108,24 +108,18 @@ describe("DA canonical operator canon-lock transition v0.1", () => {
     });
   });
 
-  it("preserves DA and DI canon locks while AT remains runtime_verified", () => {
+  it("preserves the historical DA transition while all current operators are canon_locked", () => {
     expect(
-      canonicalOperatorProfilesV0_1
-        .filter(
-          (profile) =>
-            profile.canonLifecycleStatus === "canon_locked",
-        )
-        .map((profile) => profile.operatorId),
-    ).toEqual(["DA", "DI"]);
-
-    expect(
-      canonicalOperatorProfilesV0_1
-        .filter(
-          (profile) =>
-            profile.canonLifecycleStatus ===
-            "runtime_verified",
-        )
-        .map((profile) => profile.operatorId),
-    ).toEqual(["AT"]);
+      canonicalOperatorProfilesV0_1.map(
+        (profile) => [
+          profile.operatorId,
+          profile.canonLifecycleStatus,
+        ],
+      ),
+    ).toEqual([
+      ["DA", "canon_locked"],
+      ["DI", "canon_locked"],
+      ["AT", "canon_locked"],
+    ]);
   });
 });

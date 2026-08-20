@@ -253,7 +253,7 @@ describe(
       );
     });
 
-    it("registers AT as runtime_verified but not canon_locked", () => {
+    it("preserves AT source admission identity after the dedicated canon-lock transition", () => {
       const profile =
         getCanonicalOperatorProfileV0_1(
           "AT",
@@ -269,9 +269,11 @@ describe(
         reviewedEvidenceStatus:
           "reviewed_functional",
         canonLifecycleStatus:
-          "runtime_verified",
+          "canon_locked",
         authorizationScope:
           "bounded_functional_lexical_projection",
+        discoveryScope:
+          "bounded_targets",
         positiveProofWords: [
           "father",
         ],
@@ -307,21 +309,15 @@ describe(
           resolved!,
         );
 
-      expect(admission.admitted).toBe(
-        false,
-      );
-
-      expect(
-        admission.reasons,
-      ).toContain(
-        "operator_not_explicitly_admitted",
-      );
-
-      expect(
-        admission.rollbackLifecycleStatus,
-      ).toBe(
-        "runtime_verified",
-      );
+      expect(admission).toMatchObject({
+        operatorId: "AT",
+        admitted: true,
+        admittedScope:
+          "bounded_functional_lexical_projection",
+        rollbackLifecycleStatus:
+          "runtime_verified",
+        reasons: [],
+      });
     });
 
     it("authorizes father but not bare at as reviewed functional target", () => {
@@ -403,7 +399,7 @@ describe(
       }
     });
 
-    it("prevents runtime_verified AT from leaking into unrelated generic discovery", () => {
+    it("prevents bounded-target AT from leaking into unrelated generic discovery after canon lock", () => {
       for (const word of [
         "diet",
         "data",
