@@ -217,8 +217,12 @@ describe("JO candidate registry transition review v0.1", () => {
       "reviewed.external.jo.refusal.candidate.v0_1",
     );
 
+    expect(policySource).not.toContain(
+      "sourceId: \"reviewed.external.jo.refusal.candidate.v0_1\"",
+    );
+
     expect(policySource).not.toMatch(
-      /operatorId:\s*"JO"/,
+      /embryo:\s*"JO"/,
     );
   });
 
