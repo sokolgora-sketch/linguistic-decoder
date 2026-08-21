@@ -3,6 +3,9 @@ import {
   isCanonicalOperatorProfileDiscoveryTargetV0_1,
   resolveCanonicalOperatorProfileV0_1,
 } from "./canonicalOperatorProfile.v0_1";
+import {
+  resolveCanonicalOperatorReviewedTargetFamilyV0_1,
+} from "./canonicalOperatorReviewedTargetFamily.v0_1";
 import { matchSegmentToProtoRoots } from "./carrierMatcher.v1";
 import {
   evaluateReviewedExternalLexiconEvidenceOperationPolicyV0_1,
@@ -54,34 +57,67 @@ export function discoverCanonicalOperatorCandidatesV0_1(
       const resolved =
         resolveCanonicalOperatorProfileV0_1(profile);
 
+      const reviewedTargetFamily =
+        resolveCanonicalOperatorReviewedTargetFamilyV0_1(
+          profile,
+          normalizedBasis,
+        );
+
+      const discoveryTargetAllowed =
+        isCanonicalOperatorProfileDiscoveryTargetV0_1(
+          profile,
+          normalizedBasis,
+        );
+
       if (
         !resolved ||
         !resolved.readiness.functionalReady ||
         !resolved.authorization.authorized ||
         !resolved.productionMember ||
         !resolved.runtimeProjection ||
-        !isCanonicalOperatorProfileDiscoveryTargetV0_1(
-          profile,
-          normalizedBasis,
+        (
+          !discoveryTargetAllowed &&
+          !reviewedTargetFamily
         )
       ) {
         return [];
       }
 
-      return [{ profile, resolved }];
+      return [
+        {
+          profile,
+          resolved,
+          reviewedTargetFamily,
+        },
+      ];
     });
 
   if (resolvedProfiles.length === 0) return [];
 
   const canonicalProfileByOperator = new Map<
     string,
-    (typeof canonicalOperatorProfilesV0_1)[number]
+    {
+      profile:
+        (typeof canonicalOperatorProfilesV0_1)[number];
+      reviewedTargetFamily:
+        ReturnType<
+          typeof resolveCanonicalOperatorReviewedTargetFamilyV0_1
+        >;
+    }
   >();
 
-  for (const { profile } of resolvedProfiles) {
+  for (
+    const {
+      profile,
+      reviewedTargetFamily,
+    } of resolvedProfiles
+  ) {
     canonicalProfileByOperator.set(
       profile.operatorId,
-      profile,
+      {
+        profile,
+        reviewedTargetFamily,
+      },
     );
   }
 
@@ -111,12 +147,17 @@ export function discoverCanonicalOperatorCandidatesV0_1(
       });
 
       for (const match of matches) {
-        const profile =
+        const canonicalProfile =
           canonicalProfileByOperator.get(
             match.protoRootId,
           );
 
-        if (!profile) continue;
+        if (!canonicalProfile) continue;
+
+        const {
+          profile,
+          reviewedTargetFamily,
+        } = canonicalProfile;
 
         const carrierForm =
           normalizeTextV0_1(match.carrier?.form);
@@ -148,15 +189,9 @@ export function discoverCanonicalOperatorCandidatesV0_1(
 
         if (segmentStart < 0) continue;
 
-        const reviewedBridgeWords =
-          profile.positiveProofWords.map(
-            normalizeTextV0_1,
-          );
-
         const reviewedEvidenceEligible =
-          reviewedBridgeWords.includes(
-            normalizedBasis,
-          );
+          reviewedTargetFamily
+            ?.reviewedFamilyEligible === true;
 
         const key = [
           profile.operatorId,

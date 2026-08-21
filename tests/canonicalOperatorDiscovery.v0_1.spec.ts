@@ -25,18 +25,26 @@ function candidatesFor(
 describe(
   "generic canonical-operator discovery v0.1",
   () => {
-    it("uses existing positive proof words as the reviewed bridge allowlist", () => {
+    it("delegates reviewed whole-word and target-family authorization to the shared deterministic resolver", () => {
       const source = fs.readFileSync(
         "src/shared/canonicalOperatorDiscovery.v0_1.ts",
         "utf8",
       );
 
       expect(source).toContain(
-        "profile.positiveProofWords.map",
+        "resolveCanonicalOperatorReviewedTargetFamilyV0_1",
+      );
+
+      expect(source).toContain(
+        "reviewedTargetFamily",
       );
 
       expect(source).not.toContain(
-        "approvedFunctionalBridgeWords",
+        "const reviewedBridgeWords",
+      );
+
+      expect(source).not.toContain(
+        "reviewedBridgeWords.includes",
       );
 
       for (
