@@ -2,7 +2,6 @@ import React from "react";
 import {
   render,
   screen,
-  within,
 } from "@testing-library/react";
 
 import { GET } from "../app/api/analyze-v1/route";
@@ -31,7 +30,7 @@ async function analyzeV1(
 describe(
   "Open Instrument functional candidate composition UI v0.1",
   () => {
-    it("drives the primary SHTU + DI result from the first-class composed candidate while RootMap remains component evidence", async () => {
+    it("keeps the first-class SHTU + DI composition as evidence while reviewed DI leads the embryo-first primary card", async () => {
       const body = await analyzeV1("study");
 
       const composition =
@@ -62,18 +61,14 @@ describe(
       );
 
       expect(
-        screen.getByText("SHTU + DI"),
-      ).toBeInTheDocument();
+        screen.getAllByText(
+          "DI",
+        ).length,
+      ).toBeGreaterThanOrEqual(1);
 
       expect(
         screen.getByText(
-          "Evidence: Partial",
-        ),
-      ).toBeInTheDocument();
-
-      expect(
-        screen.getByText(
-          "SHTU · structural",
+          "Evidence: Reviewed",
         ),
       ).toBeInTheDocument();
 
@@ -84,39 +79,22 @@ describe(
       ).toBeInTheDocument();
 
       expect(
-        screen.getByText(
-          "Adding or increasing knowledge; making knowledge yours through learning.",
+        screen.queryByText(
+          "SHTU + DI",
         ),
-      ).toBeInTheDocument();
+      ).not.toBeInTheDocument();
 
-      const sevenVoiceAlignment =
-        screen.getByTestId(
+      expect(
+        screen.queryByText(
+          "Evidence: Partial",
+        ),
+      ).not.toBeInTheDocument();
+
+      expect(
+        screen.queryByTestId(
           "functional-seven-voice-alignment",
-        );
-
-      expect(
-        within(
-          sevenVoiceAlignment,
-        ).getByText(
-          "Principles: U (5) — Unity → I (3) — Insight",
         ),
-      ).toBeInTheDocument();
-
-      expect(
-        within(
-          sevenVoiceAlignment,
-        ).getByText(
-          "Colors: Blue → Yellow",
-        ),
-      ).toBeInTheDocument();
-
-      expect(
-        within(
-          sevenVoiceAlignment,
-        ).getByText(
-          "Musical notes: G → E",
-        ),
-      ).toBeInTheDocument();
+      ).not.toBeInTheDocument();
 
       const sevenVoiceKey =
         screen.getByTestId(

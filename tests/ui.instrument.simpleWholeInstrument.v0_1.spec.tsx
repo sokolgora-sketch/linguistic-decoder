@@ -61,18 +61,26 @@ describe(
         expect(
           within(
             overviewPanel,
+          ).getAllByText(
+            "DI",
+          ).length,
+        ).toBeGreaterThanOrEqual(1);
+
+        expect(
+          within(
+            overviewPanel,
           ).getByText(
-            "SHTU + DI",
+            "Evidence: Reviewed",
           ),
         ).toBeVisible();
 
         expect(
           within(
             overviewPanel,
-          ).getByText(
-            "Evidence: Partial",
+          ).queryByText(
+            "SHTU + DI",
           ),
-        ).toBeVisible();
+        ).not.toBeInTheDocument();
 
         expect(
           screen.queryByText(

@@ -195,6 +195,24 @@ describe(
           rejectedCount: 0,
         });
 
+        expect(
+          body.analysisStatusV0_1,
+        ).toMatchObject({
+          status:
+            "candidate_only",
+          reviewedOperators: [],
+          candidateOnlyOperators: [],
+          structuralTokens: [],
+        });
+
+        expect(
+          body
+            .analysisStatusV0_1
+            .summary,
+        ).toBe(
+          "Deterministically verified Proposed functional candidate available: MI. It remains an unreviewed functional hypothesis, not candidate truth or historical-origin evidence. User decides.",
+        );
+
         const promoted =
           body.candidates.find(
             (candidate: any) =>
@@ -251,6 +269,212 @@ describe(
                   .candidateId,
             ),
         ).toBe(false);
+      },
+    );
+
+    it(
+      "deduplicates a real-provider DA proposal against the existing reviewed functional embryo",
+      async () => {
+        configureFakeRealProvider({
+          word:
+            "damage",
+          candidates: [
+            {
+              language:
+                "Albanian",
+              candidateExpression:
+                "DA",
+              embryos: [
+                {
+                  form:
+                    "DA",
+                  gloss:
+                    "split / divide",
+                },
+              ],
+              semanticBridge:
+                "A bounded split/divide function can motivate the reviewed damage candidate.",
+              requiredTransforms:
+                [],
+              functionalExplanation:
+                "Fixture functional explanation.",
+            },
+          ],
+        });
+
+        const response =
+          await GET(
+            new Request(
+              "http://localhost/api/analyze-v1?word=damage&mode=strict",
+            ),
+          );
+
+        expect(
+          response.status,
+        ).toBe(200);
+
+        const body =
+          await response.json();
+
+        expect(
+          body.analysisStatusV0_1,
+        ).toMatchObject({
+          status:
+            "reviewed_functional_evidence",
+          reviewedOperators: [
+            "DA",
+          ],
+        });
+
+        expect(
+          body
+            .automaticFunctionalProposalVerificationV0_1,
+        ).toMatchObject({
+          status:
+            "deduplicated_only",
+          acceptedCount: 0,
+          rejectedCount: 0,
+          deduplicatedCount: 1,
+        });
+
+        const reviewedDa =
+          body.candidates.filter(
+            (candidate: any) =>
+              candidate
+                ?.claimType ===
+                "functionalMotivation" &&
+              candidate
+                ?.validationOutcome ===
+                "validated" &&
+              String(
+                candidate?.embryo ??
+                  candidate?.form ??
+                  "",
+              )
+                .trim()
+                .toUpperCase() ===
+                "DA",
+          );
+
+        expect(
+          reviewedDa.length,
+        ).toBeGreaterThanOrEqual(
+          1,
+        );
+
+        const automaticDa =
+          body.candidates.filter(
+            (candidate: any) =>
+              candidate
+                ?.sourceKind ===
+                "automatic_llm_functional_proposal" &&
+              String(
+                candidate?.embryo ??
+                  candidate?.form ??
+                  "",
+              )
+                .trim()
+                .toUpperCase() ===
+                "DA",
+          );
+
+        expect(
+          automaticDa,
+        ).toEqual([]);
+      },
+    );
+
+    it(
+      "rejects a memory-style circular embryo gloss before user-facing promotion",
+      async () => {
+        configureFakeRealProvider({
+          word:
+            "memory",
+          candidates: [
+            {
+              language:
+                "English",
+              candidateExpression:
+                "MEM + OI",
+              embryos: [
+                {
+                  form:
+                    "MEM",
+                  gloss:
+                    "retain in memory",
+                },
+                {
+                  form:
+                    "OI",
+                  gloss:
+                    "perceive or know",
+                },
+              ],
+              semanticBridge:
+                "Retaining information and perceiving it can motivate the target concept.",
+              requiredTransforms:
+                [],
+              functionalExplanation:
+                "A bounded functional hypothesis.",
+            },
+          ],
+        });
+
+        const response =
+          await GET(
+            new Request(
+              "http://localhost/api/analyze-v1?word=memory&mode=strict",
+            ),
+          );
+
+        expect(
+          response.status,
+        ).toBe(200);
+
+        const body =
+          await response.json();
+
+        expect(
+          body
+            .automaticFunctionalProposalVerificationV0_1,
+        ).toMatchObject({
+          status:
+            "rejected_all",
+          acceptedCount: 0,
+          rejectedCount: 1,
+          deduplicatedCount: 0,
+        });
+
+        const result =
+          body
+            .automaticFunctionalProposalVerificationV0_1
+            .results[0];
+
+        expect(
+          result.checks.find(
+            (check: any) =>
+              check.id ===
+              "PROPOSED_EMBRYO_GLOSS_NON_CIRCULAR",
+          ),
+        ).toMatchObject({
+          pass: false,
+        });
+
+        expect(
+          body.candidates.some(
+            (candidate: any) =>
+              candidate
+                ?.sourceKind ===
+              "automatic_llm_functional_proposal",
+          ),
+        ).toBe(false);
+
+        expect(
+          body.analysisStatusV0_1
+            .status,
+        ).toBe(
+          "null_no_supported_candidate",
+        );
       },
     );
 

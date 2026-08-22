@@ -174,6 +174,43 @@ const POSITIVE_CASES = [
     ],
   },
   {
+    word: "novalume",
+    input: {
+      word: "novalume",
+      rootMap: {
+        tokens: [],
+        keys: [],
+      },
+      candidates: [
+        {
+          candidateId:
+            "automatic-functional-proposal:novalume:1",
+          displayForm: "MI",
+          form: "MI",
+          claimType:
+            "functionalMotivation",
+          sourceKind:
+            "automatic_llm_functional_proposal",
+          sourceStatus:
+            "deterministically_verified_proposed",
+          validationOutcome:
+            "not_evaluated",
+          userDecisionPosture:
+            "user_decides",
+          proposalVerificationV0_1: {
+            classification:
+              "Proposed",
+          },
+        },
+      ],
+    },
+    status:
+      "candidate_only",
+    reviewedOperators: [],
+    candidateOnlyOperators: [],
+    structuralTokens: [],
+  },
+  {
     word: "xyz",
     input: {
       word: "xyz",

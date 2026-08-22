@@ -56,6 +56,62 @@ function operatorSummary(operators: readonly string[]): string {
   return operators.length > 0 ? operators.join(", ") : "none";
 }
 
+function readVerifiedProposedFunctionalCandidatesV0_1(
+  result: UnknownRecord,
+): string[] {
+  const rows =
+    Array.isArray(result.candidates)
+      ? result.candidates
+      : [];
+
+  return uniqueStrings(
+    rows.flatMap((candidate) => {
+      if (!isRecord(candidate)) {
+        return [];
+      }
+
+      const verification =
+        isRecord(
+          candidate.proposalVerificationV0_1,
+        )
+          ? candidate
+              .proposalVerificationV0_1
+          : null;
+
+      const isVerifiedProposed =
+        candidate.claimType ===
+          "functionalMotivation" &&
+        candidate.sourceKind ===
+          "automatic_llm_functional_proposal" &&
+        candidate.sourceStatus ===
+          "deterministically_verified_proposed" &&
+        candidate.validationOutcome ===
+          "not_evaluated" &&
+        candidate.userDecisionPosture ===
+          "user_decides" &&
+        verification?.classification ===
+          "Proposed";
+
+      if (!isVerifiedProposed) {
+        return [];
+      }
+
+      const label =
+        typeof candidate.displayForm ===
+          "string"
+          ? candidate.displayForm.trim()
+          : typeof candidate.form ===
+              "string"
+            ? candidate.form.trim()
+            : "";
+
+      return label
+        ? [label]
+        : [];
+    }),
+  );
+}
+
 export function isReviewedFunctionalEvidenceLineV0_1(
   value: unknown,
 ): boolean {
@@ -238,6 +294,13 @@ export function buildAnalysisStatusV0_1(resultValue: unknown): AnalysisStatusV0_
         ),
     );
 
+  const proposedFunctionalCandidates =
+    resultRecord
+      ? readVerifiedProposedFunctionalCandidatesV0_1(
+          resultRecord,
+        )
+      : [];
+
   let status:
     AnalysisStatusCodeV0_1;
 
@@ -251,6 +314,16 @@ export function buildAnalysisStatusV0_1(resultValue: unknown): AnalysisStatusV0_
       `Bounded reviewed functional evidence is available for ${reviewedOperators.join(
         ", ",
       )}. This is functional evidence, not a historical-origin or winner claim.`;
+  } else if (
+    proposedFunctionalCandidates.length > 0
+  ) {
+    status =
+      "candidate_only";
+
+    summary =
+      `Deterministically verified Proposed functional candidate${proposedFunctionalCandidates.length === 1 ? "" : "s"} available: ${proposedFunctionalCandidates.join(
+        ", ",
+      )}. ${proposedFunctionalCandidates.length === 1 ? "It remains an unreviewed functional hypothesis" : "They remain unreviewed functional hypotheses"}, not candidate truth or historical-origin evidence. User decides.`;
   } else if (
     candidateOnlyOperators.length > 0
   ) {
