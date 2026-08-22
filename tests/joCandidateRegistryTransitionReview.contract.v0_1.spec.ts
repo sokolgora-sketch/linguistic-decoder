@@ -145,7 +145,7 @@ describe("JO candidate registry transition review v0.1", () => {
     });
   });
 
-  it("records the current main baseline as DA DI AT while JO remains absent", () => {
+  it("records Stage 1 current state with JO candidate-registered while production remains DA DI AT", () => {
     expect(
       reviewedExternalLexiconSourceRowCandidateRegistryV0_1.map(
         (row) => row.sourceId,
@@ -154,6 +154,7 @@ describe("JO candidate registry transition review v0.1", () => {
       "reviewed.external.di.knowledge.candidate.v0_1",
       "reviewed.external.albanian-at.father.candidate.v0_1",
       "reviewed.external.gheg-da.damage.candidate.v0_1",
+      "reviewed.external.jo.refusal.candidate.v0_1",
     ]);
 
     expect(
@@ -166,7 +167,7 @@ describe("JO candidate registry transition review v0.1", () => {
       "reviewed.external.gheg-da.damage.candidate.v0_1",
     ]);
 
-    expect(registrySource).not.toContain(
+    expect(registrySource).toContain(
       "reviewed.external.jo.refusal.candidate.v0_1",
     );
 
@@ -226,9 +227,13 @@ describe("JO candidate registry transition review v0.1", () => {
     );
   });
 
-  it("keeps JO out of production membership during the review lane", () => {
-    expect(registrySource).not.toMatch(
-      /PRODUCTION_SOURCE_ROW_IDS_V0_1[\s\S]*reviewed\.external\.jo\.refusal\.candidate\.v0_1/,
+  it("keeps JO out of production membership during Stage 1", () => {
+    expect(
+      getReviewedExternalLexiconProductionSourceRowsV0_1().map(
+        (row) => row.sourceId,
+      ),
+    ).not.toContain(
+      "reviewed.external.jo.refusal.candidate.v0_1",
     );
 
     expect(review).toContain(

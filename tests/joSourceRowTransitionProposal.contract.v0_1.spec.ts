@@ -403,9 +403,12 @@ describe(
       }
     });
 
-    it("leaves JO absent from every current production owner", () => {
-      const currentOwners = [
-        registrySource,
+    it("keeps JO candidate-only and absent from later production and runtime owners", () => {
+      expect(registrySource).toContain(
+        JO_SOURCE_ROW_DESIGN_SOURCE_ID_V0_1,
+      );
+
+      const laterOwners = [
         authorizationSource,
         projectionSource,
         operationPolicySource,
@@ -414,7 +417,7 @@ describe(
         rootMapSource,
       ];
 
-      for (const source of currentOwners) {
+      for (const source of laterOwners) {
         expect(source).not.toContain(
           JO_SOURCE_ROW_DESIGN_SOURCE_ID_V0_1,
         );

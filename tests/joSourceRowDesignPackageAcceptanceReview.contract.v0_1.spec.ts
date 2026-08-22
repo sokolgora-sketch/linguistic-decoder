@@ -278,16 +278,16 @@ describe(
       ).toHaveLength(3);
     });
 
-    it("does not insert JO into the candidate registry or authorization owner", () => {
+    it("keeps JO candidate-registered but absent from authorization owner", () => {
       expect(
         reviewedExternalLexiconSourceRowCandidateRegistryV0_1.map(
           (row) => row.sourceId,
         ),
-      ).not.toContain(
+      ).toContain(
         JO_SOURCE_ROW_DESIGN_SOURCE_ID_V0_1,
       );
 
-      expect(registrySource).not.toContain(
+      expect(registrySource).toContain(
         JO_SOURCE_ROW_DESIGN_SOURCE_ID_V0_1,
       );
 

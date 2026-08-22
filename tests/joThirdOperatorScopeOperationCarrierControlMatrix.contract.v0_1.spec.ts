@@ -251,9 +251,18 @@ describe(
       expect(admission).not.toContain('"JO"');
     });
 
-    it("does not create a JO reviewed source row", () => {
-      expect(sourceRegistry).not.toMatch(
-        /reviewed\.external\.[^"\n]*jo[^"\n]*candidate/i,
+    it("keeps JO candidate-registered but outside production membership", () => {
+      expect(sourceRegistry).toContain(
+        "reviewed.external.jo.refusal.candidate.v0_1",
+      );
+
+      const productionMembership =
+        sourceRegistry.match(
+          /const PRODUCTION_SOURCE_ROW_IDS_V0_1 = new Set<string>\(\[([\s\S]*?)\]\);/,
+        )?.[1] ?? "";
+
+      expect(productionMembership).not.toContain(
+        "reviewed.external.jo.refusal.candidate.v0_1",
       );
     });
 

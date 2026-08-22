@@ -170,15 +170,24 @@ describe("JO third-operator source-readiness decision v0.1", () => {
     expect(admissionSource).not.toContain('"JO"');
   });
 
-  it("does not add a reviewed JO production source row", () => {
+  it("keeps JO candidate-registered but outside production membership", () => {
     expect(sourceRegistry).toContain(
       "reviewed.external.gheg-da.damage.candidate.v0_1",
     );
     expect(sourceRegistry).toContain(
       "reviewed.external.di.knowledge.candidate.v0_1",
     );
-    expect(sourceRegistry).not.toMatch(
-      /reviewed\.external\.[^"\n]*jo[^"\n]*candidate/i,
+    expect(sourceRegistry).toContain(
+      "reviewed.external.jo.refusal.candidate.v0_1",
+    );
+
+    const productionMembership =
+      sourceRegistry.match(
+        /const PRODUCTION_SOURCE_ROW_IDS_V0_1 = new Set<string>\(\[([\s\S]*?)\]\);/,
+      )?.[1] ?? "";
+
+    expect(productionMembership).not.toContain(
+      "reviewed.external.jo.refusal.candidate.v0_1",
     );
   });
 
