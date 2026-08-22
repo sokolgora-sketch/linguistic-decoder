@@ -161,6 +161,61 @@ export const reviewedExternalLexiconSourceRowCandidateRegistryV0_1 = [
       },
     ],
   },
+  {
+    sourceId: "reviewed.external.jo.refusal.candidate.v0_1",
+    candidateId: "albanian-jo-standalone-refusal-functional",
+    candidateLanguage: "sq",
+    displayForm: "JO standalone refusal candidate",
+    sourceKind: "reviewed_dictionary_source",
+    sourceStatus: "reviewed_accepted",
+    embryo: "JO",
+    isolatedStandaloneForm: "jo",
+    plainStandaloneGloss: "standalone refusal / explicit rejection",
+    sourceNote:
+      "Reviewed JO candidate-registry row for the bounded standalone-refusal or explicit-rejection function. Candidate registration is not production admission or runtime authorization. Historical origin, transmission, winner, language-superiority, publication-evidence, scientific-evidence, candidate-truth and general-negation ownership claims remain disabled; the user decides.",
+    semanticBridge:
+      "standalone refusal or explicit rejection can functionally motivate a direct negative response without claiming historical origin, unrestricted negative polarity or ownership of general grammatical negation",
+    originClaim: false,
+    historicalTransmissionClaim: false,
+    winnerClaim: false,
+    languageSuperiorityClaim: false,
+    candidateTruthClaim: false,
+    publicationEvidenceClaim: false,
+    scientificEvidenceClaim: false,
+    userDecisionPosture: "user_decides",
+    externalCitations: [
+      {
+        citationId:
+          "reviewed.external.jo.refusal.candidate.citation.v0_1",
+        citationStatus: "reviewed_accepted",
+        citationType: "dictionary_entry",
+        sourceTitle: "JO part.",
+        sourceAuthorOrEditor:
+          "Bardhyl Demiraj; Olav Hackstein",
+        sourcePublisherOrHost:
+          "Digitales Philologisch-Etymologisches Wörterbuch des Altalbanischen / Ludwig-Maximilians-Universität München",
+        sourceDateOrVersion:
+          "first publication 2024; source snapshot reviewed 2026-07-14",
+        sourceUrlOrArchiveRef:
+          "https://www.dpwa.gwi.uni-muenchen.de/dictionary/?lemmaid=25210",
+        entryLocator:
+          "DPEWA post ID 25210; exact article head JO part.; dictionary lemmaid=25210",
+        attestedForm: "jo",
+        attestedGloss:
+          "no / not; bounded here to standalone refusal or explicit rejection",
+        attestedGrammarNote:
+          "Exact attested Albanian particle article JO part.; classification Simplex. The article includes broader grammatical-negation uses, but the v0.1 functional scope excludes general sentence-level negation, prefix behavior, suffix behavior, substring projection and transformed carriers.",
+        reviewedBy:
+          "open-instrument-source-row-design-review",
+        reviewedAt: "2026-07-14",
+        sourceHashOrArchiveHash:
+          "f482a54f8f5648803b1eb7c91bed1b2013becf894e4d32f80e06f8f134a66a9e",
+        reviewNote:
+          "Candidate-specific DPEWA evidence reviewed for JO candidate-registry placement. Exact article identity, post ID, stable locator, authors, publication year, modern dictionary reference FGJSSH 745f. and source snapshot hash are preserved. Historical attestations remain contextual only. Candidate registration is not production membership or runtime authorization.",
+      },
+    ],
+  },
+
 ] as const satisfies readonly ReviewedExternalLexiconCandidateSourceRowV0_1[];
 
 function asRecord(value: unknown): Record<string, unknown> | null {

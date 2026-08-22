@@ -295,16 +295,16 @@ describe(
       ]);
     });
 
-    it("is not inserted into the reviewed candidate registry", () => {
+    it("is candidate-registered while remaining absent from authorization", () => {
       expect(
         reviewedExternalLexiconSourceRowCandidateRegistryV0_1.map(
           (row) => row.sourceId,
         ),
-      ).not.toContain(
+      ).toContain(
         JO_SOURCE_ROW_DESIGN_SOURCE_ID_V0_1,
       );
 
-      expect(registrySource).not.toContain(
+      expect(registrySource).toContain(
         JO_SOURCE_ROW_DESIGN_SOURCE_ID_V0_1,
       );
 

@@ -1,7 +1,7 @@
 import { execFileSync } from "node:child_process";
 
 describe("reviewed lexicon candidate diagnostics audit v0.1", () => {
-  it("prints reviewed production candidate diagnostics with bounded promotion posture", () => {
+  it("prints reviewed candidate diagnostics with bounded promotion posture", () => {
     const raw = execFileSync(
       "node",
       ["scripts/reviewed-lexicon-candidate-diagnostics.v0.1.mjs"],
@@ -10,7 +10,7 @@ describe("reviewed lexicon candidate diagnostics audit v0.1", () => {
 
     const report = JSON.parse(raw);
     expect(report.reportVersion).toBe("reviewed-lexicon-candidate-diagnostics.v0.1");
-    expect(report.rows).toHaveLength(3);
+    expect(report.rows).toHaveLength(4);
 
     const daRow = report.rows.find(
       (row: { sourceId?: string }) =>
@@ -20,9 +20,14 @@ describe("reviewed lexicon candidate diagnostics audit v0.1", () => {
       (row: { sourceId?: string }) =>
         row.sourceId === "reviewed.external.di.knowledge.candidate.v0_1",
     );
+    const joRow = report.rows.find(
+      (row: { sourceId?: string }) =>
+        row.sourceId === "reviewed.external.jo.refusal.candidate.v0_1",
+    );
 
     expect(daRow).toBeDefined();
     expect(diRow).toBeDefined();
+    expect(joRow).toBeDefined();
 
     expect(daRow).toMatchObject({
       sourceId: "reviewed.external.gheg-da.damage.candidate.v0_1",
@@ -78,5 +83,48 @@ describe("reviewed lexicon candidate diagnostics audit v0.1", () => {
       promotionReady: true,
     });
     expect(diRow.promotionChecklistFailedItems).toEqual([]);
+
+    expect(joRow).toMatchObject({
+      sourceId:
+        "reviewed.external.jo.refusal.candidate.v0_1",
+      candidateId:
+        "albanian-jo-standalone-refusal-functional",
+      productionSafe: true,
+      liveStatus:
+        "promotion_ready_candidate",
+      validationOutcome:
+        "source_validation_eligible",
+      evidenceCategories: [
+        "historical_origin_not_claimed",
+        "user_decides",
+      ],
+      userDecisionPosture:
+        "user_decides",
+    });
+
+    expect(joRow.liveStatus).not.toBe(
+      "production_live",
+    );
+
+    expect(joRow.freeOperatorDiagnostic).toMatchObject({
+      operator: "jo",
+      attestedForms: ["jo"],
+      historicalOriginClaim:
+        "not_claimed",
+      userDecisionPosture:
+        "user_decides",
+    });
+
+    expect(joRow.nonLiveReason).toBeNull();
+
+    expect(joRow.promotionChecklist).toMatchObject({
+      checklistVersion:
+        "reviewed-external-lexicon-promotion-checklist.v0_1",
+      promotionReady: true,
+    });
+
+    expect(
+      joRow.promotionChecklistFailedItems,
+    ).toEqual([]);
   });
 });
