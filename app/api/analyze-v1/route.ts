@@ -15,6 +15,7 @@ import {
   buildFunctionalVoiceNormalizationV0_1,
 } from "@/shared/openInstrument/functionalVoiceNormalization.v0.1";
 import { toAnalyzeWordResultV1Contract } from "@/shared/analyzeWordResult.v1.contract";
+import { buildAnalysisStatusV0_1 } from "@/shared/analysisStatus.v0_1";
 import { ensurePrimaryAndCandidatePaths } from "@/shared/ensurePaths";
 import { extractCarrierVoicesFromIpaV0_1 } from "@/shared/vowels/extractCarrierVoicesFromIpa.v0.1";
 import {
@@ -955,6 +956,17 @@ const checked = AnalyzeWordResultV1ContractSchema.safeParse(out);
           .promotedCandidates,
       ];
 
+      // Proposal promotion happens after the deterministic analysis
+      // adapter has already emitted analysisStatusV0_1.
+      // Reconcile the status from the final candidate set so a
+      // verified Proposed result cannot coexist with a stale Null
+      // status. Reviewed evidence still wins inside the shared
+      // status builder.
+      (final as any).analysisStatusV0_1 =
+        buildAnalysisStatusV0_1(
+          final,
+        );
+
       try {
         toAnalyzeWordResultV1Contract(
           final,
@@ -1274,6 +1286,17 @@ const checked = AnalyzeWordResultV1ContractSchema.safeParse(out);
         ...automaticFunctionalProposalVerificationV0_1
           .promotedCandidates,
       ];
+
+      // Proposal promotion happens after the deterministic analysis
+      // adapter has already emitted analysisStatusV0_1.
+      // Reconcile the status from the final candidate set so a
+      // verified Proposed result cannot coexist with a stale Null
+      // status. Reviewed evidence still wins inside the shared
+      // status builder.
+      (final as any).analysisStatusV0_1 =
+        buildAnalysisStatusV0_1(
+          final,
+        );
 
       try {
         toAnalyzeWordResultV1Contract(

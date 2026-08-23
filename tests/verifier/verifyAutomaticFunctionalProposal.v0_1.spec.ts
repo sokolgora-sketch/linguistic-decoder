@@ -404,6 +404,217 @@ describe(
     );
 
     it(
+      "deduplicates a proposal against the canonical embryo when the reviewed display form is descriptive",
+      () => {
+        const analysis =
+          emptyAnalysis(
+            "fixture-word",
+          );
+
+        analysis.candidates = [
+          {
+            candidateLanguage:
+              "sq",
+            displayForm:
+              "Gheg DA split damage candidate",
+            form:
+              "da",
+            embryo:
+              "DA",
+            claimType:
+              "functionalMotivation",
+            validationOutcome:
+              "validated",
+            sourceKind:
+              "reviewed_dictionary_source",
+          },
+        ];
+
+        const out =
+          verifyAutomaticFunctionalProposalV0_1({
+            analysis,
+            automaticProposal:
+              realProposal({
+                word:
+                  "fixture-word",
+                candidates: [
+                  {
+                    language:
+                      "Albanian",
+                    candidateExpression:
+                      "DA",
+                    embryos: [
+                      {
+                        form:
+                          "DA",
+                        gloss:
+                          "split / divide",
+                      },
+                    ],
+                    semanticBridge:
+                      "fixture bridge",
+                    requiredTransforms:
+                      [],
+                    functionalExplanation:
+                      "fixture explanation",
+                  },
+                ],
+              }),
+          });
+
+        expect(out).toMatchObject({
+          status:
+            "deduplicated_only",
+          acceptedCount: 0,
+          rejectedCount: 0,
+          deduplicatedCount: 1,
+        });
+
+        expect(
+          out.results[0]
+            .checks.find(
+              (check) =>
+                check.id ===
+                "NOT_DUPLICATE",
+            ),
+        ).toMatchObject({
+          pass: false,
+        });
+
+        expect(
+          out.promotedCandidates,
+        ).toEqual([]);
+      },
+    );
+
+    it(
+      "rejects an unreviewed embryo gloss that repeats the complete target word",
+      () => {
+        const out =
+          verifyAutomaticFunctionalProposalV0_1({
+            analysis:
+              emptyAnalysis(
+                "memory",
+              ),
+            automaticProposal:
+              realProposal({
+                word:
+                  "memory",
+                candidates: [
+                  {
+                    language:
+                      "English",
+                    candidateExpression:
+                      "MEM + OI",
+                    embryos: [
+                      {
+                        form:
+                          "MEM",
+                        gloss:
+                          "retain in memory",
+                      },
+                      {
+                        form:
+                          "OI",
+                        gloss:
+                          "perceive or know",
+                      },
+                    ],
+                    semanticBridge:
+                      "Retaining information and perceiving it can motivate the target concept.",
+                    requiredTransforms:
+                      [],
+                    functionalExplanation:
+                      "A bounded functional hypothesis.",
+                  },
+                ],
+              }),
+          });
+
+        expect(out).toMatchObject({
+          status:
+            "rejected_all",
+          acceptedCount: 0,
+          rejectedCount: 1,
+          deduplicatedCount: 0,
+        });
+
+        expect(
+          out.results[0]
+            .checks.find(
+              (check) =>
+                check.id ===
+                "PROPOSED_EMBRYO_GLOSS_NON_CIRCULAR",
+            ),
+        ).toMatchObject({
+          pass: false,
+        });
+
+        expect(
+          out.promotedCandidates,
+        ).toEqual([]);
+      },
+    );
+
+    it(
+      "allows an independently stated unreviewed embryo gloss through the non-circularity check",
+      () => {
+        const out =
+          verifyAutomaticFunctionalProposalV0_1({
+            analysis:
+              emptyAnalysis(
+                "memory",
+              ),
+            automaticProposal:
+              realProposal({
+                word:
+                  "memory",
+                candidates: [
+                  {
+                    language:
+                      "English",
+                    candidateExpression:
+                      "MEM + OI",
+                    embryos: [
+                      {
+                        form:
+                          "MEM",
+                        gloss:
+                          "retain information",
+                      },
+                      {
+                        form:
+                          "OI",
+                        gloss:
+                          "perceive or know",
+                      },
+                    ],
+                    semanticBridge:
+                      "Retaining information and perceiving it can motivate the target concept.",
+                    requiredTransforms:
+                      [],
+                    functionalExplanation:
+                      "A bounded functional hypothesis.",
+                  },
+                ],
+              }),
+          });
+
+        const check =
+          out.results[0]
+            .checks.find(
+              (item) =>
+                item.id ===
+                "PROPOSED_EMBRYO_GLOSS_NON_CIRCULAR",
+            );
+
+        expect(check).toMatchObject({
+          pass: true,
+        });
+      },
+    );
+
+    it(
       "orders accepted Proposed candidates smallest-first",
       () => {
         const out =

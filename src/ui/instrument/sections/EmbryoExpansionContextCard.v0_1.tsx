@@ -358,23 +358,52 @@ function usefulFunctionalCandidate(
     return (
       [...supported].sort(
         (a, b) => {
-          const compositionDelta =
-            Number(
-              isCompositionCandidate(b),
-            ) -
-            Number(
-              isCompositionCandidate(a),
-            );
+          // Embryo-first canonical rule:
+          //
+          // 1. stronger evidence first;
+          // 2. then the smallest functional embryo/component set;
+          // 3. then the smallest textual embryo;
+          // 4. preserve emitted order as the final tie-breaker.
+          //
+          // A larger partial composition must never displace a
+          // smaller validated functional embryo merely because it
+          // contains multiple components.
+          const validationDelta =
+            validationScore(b) -
+            validationScore(a);
 
           if (
-            compositionDelta !== 0
+            validationDelta !== 0
           ) {
-            return compositionDelta;
+            return validationDelta;
           }
 
+          const aTokens =
+            candidateTokens(a);
+
+          const bTokens =
+            candidateTokens(b);
+
+          const tokenDelta =
+            aTokens.length -
+            bTokens.length;
+
+          if (
+            tokenDelta !== 0
+          ) {
+            return tokenDelta;
+          }
+
+          const sizeDelta =
+            aTokens
+              .join("")
+              .length -
+            bTokens
+              .join("")
+              .length;
+
           return (
-            validationScore(b) -
-              validationScore(a) ||
+            sizeDelta ||
             a.index - b.index
           );
         },

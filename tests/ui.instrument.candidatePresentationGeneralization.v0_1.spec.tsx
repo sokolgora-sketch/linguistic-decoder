@@ -53,7 +53,7 @@ function renderPayload(
 describe(
   "Open Instrument candidate presentation generalization v0.1",
   () => {
-    it("uses the first-class multi-embryo candidate for study without word-specific UI logic", async () => {
+    it("selects the smallest validated functional embryo for study before a larger partial composition", async () => {
       const body =
         await analyzeV1(
           "study",
@@ -63,21 +63,15 @@ describe(
 
       expect(
         screen.getByText(
-          "SHTU + DI",
+          "Evidence: Reviewed",
         ),
       ).toBeInTheDocument();
 
       expect(
-        screen.getByText(
-          "Evidence: Partial",
-        ),
-      ).toBeInTheDocument();
-
-      expect(
-        screen.getByText(
-          "SHTU · structural",
-        ),
-      ).toBeInTheDocument();
+        screen.getAllByText(
+          "DI",
+        ).length,
+      ).toBeGreaterThanOrEqual(1);
 
       expect(
         screen.getByText(
@@ -87,7 +81,73 @@ describe(
 
       expect(
         screen.getByText(
-          "Adding or increasing knowledge; making knowledge yours through learning.",
+          "knowledge can motivate study and learning functionally without making a historical-origin claim",
+        ),
+      ).toBeInTheDocument();
+
+      expect(
+        screen.queryByText(
+          "SHTU + DI",
+        ),
+      ).not.toBeInTheDocument();
+
+      expect(
+        screen.queryByText(
+          "Evidence: Partial",
+        ),
+      ).not.toBeInTheDocument();
+    });
+
+    it("keeps damage on the shared reviewed DA embryo-first path", async () => {
+      const body =
+        await analyzeV1(
+          "damage",
+        );
+
+      renderPayload(body);
+
+      expect(
+        screen.getByText(
+          "Evidence: Reviewed",
+        ),
+      ).toBeInTheDocument();
+
+      expect(
+        screen.getAllByText(
+          "DA",
+        ).length,
+      ).toBeGreaterThanOrEqual(1);
+
+      expect(
+        screen.getByText(
+          "DA · reviewed",
+        ),
+      ).toBeInTheDocument();
+    });
+
+    it("keeps father on the shared reviewed AT embryo-first path", async () => {
+      const body =
+        await analyzeV1(
+          "father",
+        );
+
+      renderPayload(body);
+
+      expect(
+        screen.getByText(
+          "Evidence: Reviewed",
+        ),
+      ).toBeInTheDocument();
+
+      expect(
+        screen.getAllByText(
+          "AT",
+        ).length,
+      ).toBeGreaterThanOrEqual(1);
+
+      expect(
+        screen.getByText(
+          "AT · reviewed",
         ),
       ).toBeInTheDocument();
     });

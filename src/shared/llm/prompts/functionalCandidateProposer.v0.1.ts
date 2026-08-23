@@ -36,6 +36,8 @@ Rules:
 - A candidate may contain one embryo or multiple embryos.
 - candidateExpression must name the proposed embryo sequence, for example "DI" or "SHTU + DI".
 - Every embryo requires a concise plain functional gloss.
+- An embryo gloss must explain that embryo independently; it must not use the complete input word as the definition of an unreviewed embryo.
+- If an unreviewed embryo cannot be explained without repeating the complete input word, omit that candidate rather than returning a tautological gloss.
 - semanticBridge must explain the functional connection between the embryos and the input word.
 - functionalExplanation must be short, plain language suitable for a normal user.
 - requiredTransforms must contain only transforms actually required by the proposal; use [] when none are required.

@@ -229,6 +229,40 @@ function glossesOverlap(
   return false;
 }
 
+function glossMentionsWholeInputWordV0_1(
+  gloss: unknown,
+  word: unknown,
+): boolean {
+  const normalizedWordToken =
+    normalizedWord(word)
+      .replace(
+        /[^\p{L}\p{N}]+/gu,
+        "",
+      );
+
+  if (!normalizedWordToken) {
+    return false;
+  }
+
+  const glossTokens =
+    String(gloss ?? "")
+      .normalize("NFKC")
+      .toLowerCase()
+      .replace(
+        /[^\p{L}\p{N}]+/gu,
+        " ",
+      )
+      .split(/\s+/u)
+      .map((item) =>
+        item.trim(),
+      )
+      .filter(Boolean);
+
+  return glossTokens.includes(
+    normalizedWordToken,
+  );
+}
+
 function normalizeTransform(
   value: unknown,
 ): string {
@@ -297,10 +331,37 @@ function existingCandidateKeys(
       ) ??
       text(row["language"]);
 
+    // Functional candidates may carry a descriptive displayForm that is
+    // intentionally richer than their canonical embryo identity.
+    //
+    // Deduplication must therefore prefer an explicitly emitted embryo for
+    // functional-motivation rows. Otherwise a reviewed candidate such as a
+    // descriptive DA record can fail to deduplicate an equivalent Proposed
+    // "DA" candidate merely because its user-facing label is longer.
+    //
+    // Non-functional rows preserve the existing display/form/embryo
+    // precedence.
+    const functionalEmbryoIdentity =
+      row["claimType"] ===
+        "functionalMotivation"
+        ? text(row["embryo"])
+        : null;
+
     const expression =
-      text(row["displayForm"]) ??
-      text(row["form"]) ??
-      text(row["embryo"]);
+      functionalEmbryoIdentity ??
+      (
+        row["claimType"] ===
+          "functionalMotivation"
+          ? (
+              text(row["form"]) ??
+              text(row["displayForm"])
+            )
+          : (
+              text(row["displayForm"]) ??
+              text(row["form"]) ??
+              text(row["embryo"])
+            )
+      );
 
     if (
       !language ||
@@ -809,6 +870,47 @@ export function verifyAutomaticFunctionalProposalV0_1(
           explanationPresent
             ? "plain functional explanation is present"
             : "plain functional explanation is missing",
+        ),
+      );
+
+      const circularUnreviewedEmbryos =
+        candidate.embryos
+          .filter(
+            (embryo) => {
+              const reviewedEmbryo =
+                reviewedEvidence.has(
+                  normalizedToken(
+                    embryo.form,
+                  ),
+                );
+
+              return (
+                !reviewedEmbryo &&
+                glossMentionsWholeInputWordV0_1(
+                  embryo.gloss,
+                  analysisWord,
+                )
+              );
+            },
+          )
+          .map(
+            (embryo) =>
+              embryo.form,
+          );
+
+      const proposedEmbryoGlossesNonCircular =
+        circularUnreviewedEmbryos.length ===
+        0;
+
+      checks.push(
+        makeCheck(
+          "PROPOSED_EMBRYO_GLOSS_NON_CIRCULAR",
+          proposedEmbryoGlossesNonCircular,
+          proposedEmbryoGlossesNonCircular
+            ? "unreviewed Proposed embryo glosses do not repeat the complete input word"
+            : `unreviewed Proposed embryo gloss repeats the complete input word for: ${circularUnreviewedEmbryos.join(
+                ", ",
+              )}`,
         ),
       );
 
