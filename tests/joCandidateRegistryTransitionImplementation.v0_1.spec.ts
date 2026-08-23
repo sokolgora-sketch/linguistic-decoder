@@ -215,7 +215,7 @@ describe(
       ]);
     });
 
-    it("keeps every later JO runtime and governance owner unwired", () => {
+    it("keeps later JO runtime and governance owners unwired while allowing only the separately reviewed Stage-2 operation policy", () => {
       const registrySource =
         readFileSync(
           "src/shared/reviewedExternalLexiconSourceRowRegistry.v0_1.ts",
@@ -276,16 +276,20 @@ describe(
         JO_SOURCE_ROW_DESIGN_SOURCE_ID_V0_1,
       );
 
-      expect(operationSource).not.toContain(
+      expect(operationSource).toContain(
         JO_SOURCE_ROW_DESIGN_SOURCE_ID_V0_1,
       );
 
-      expect(operationSource).not.toMatch(
-        /operatorId:\s*"JO"/,
+      expect(operationSource).toMatch(
+        /embryo:\s*"JO"/,
       );
 
-      expect(operationSource).not.toMatch(
-        /embryo:\s*"JO"/,
+      expect(operationSource).toContain(
+        'allowedEvidenceOps: ["exact"]',
+      );
+
+      expect(operationSource).toContain(
+        'allowedEvidenceCarrierForms: ["jo"]',
       );
 
       expect(projectionSource).not.toContain(

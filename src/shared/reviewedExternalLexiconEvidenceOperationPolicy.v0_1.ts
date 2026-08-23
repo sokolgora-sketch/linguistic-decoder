@@ -58,6 +58,14 @@ export const reviewedExternalLexiconEvidenceOperationPoliciesV0_1 = [
     allowedEvidenceOps: ["exact"],
     allowedEvidenceCarrierForms: ["da"],
   },
+  {
+    policyVersion:
+      "reviewed-external-lexicon-evidence-operation-policy.v0_1",
+    sourceId: "reviewed.external.jo.refusal.candidate.v0_1",
+    embryo: "JO",
+    allowedEvidenceOps: ["exact"],
+    allowedEvidenceCarrierForms: ["jo"],
+  },
 ] as const satisfies readonly ReviewedExternalLexiconEvidenceOperationPolicyV0_1[];
 
 export function getReviewedExternalLexiconEvidenceOperationPolicyV0_1(

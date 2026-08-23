@@ -119,7 +119,7 @@ describe("JO Stage 2 operation/carrier policy registration review v0.1", () => {
     }
   });
 
-  it("records the current Stage-1 machine state without implementing Stage 2 in the review PR", () => {
+  it("preserves the reviewed Stage-1 record while current machine state contains only the accepted Stage-2 policy transition", () => {
     expect(registrySource).toContain(JO_SOURCE);
 
     const productionSet =
@@ -129,7 +129,19 @@ describe("JO Stage 2 operation/carrier policy registration review v0.1", () => {
 
     expect(productionSet).not.toContain(JO_SOURCE);
 
-    expect(policySource).not.toContain(JO_SOURCE);
+    expect(policySource).toContain(
+      `sourceId: "${JO_SOURCE}"`,
+    );
+    expect(policySource).toMatch(
+      /embryo:\s*"JO"/,
+    );
+    expect(policySource).toContain(
+      'allowedEvidenceOps: ["exact"]',
+    );
+    expect(policySource).toContain(
+      'allowedEvidenceCarrierForms: ["jo"]',
+    );
+
     expect(authorizationSource).not.toContain(JO_SOURCE);
     expect(profileSource).not.toMatch(
       /operatorId:\s*"JO"/,
@@ -151,10 +163,16 @@ describe("JO Stage 2 operation/carrier policy registration review v0.1", () => {
     }
   });
 
-  it("explicitly reviews the production-row count coupling before implementation", () => {
-    expect(policyTestSource).toContain(
+  it("preserves the reviewed count-coupling correction and verifies its Stage-2 test implementation", () => {
+    expect(policyTestSource).not.toContain(
       "toHaveLength(productionRows.length)",
     );
+
+    expect(policyTestSource).toContain(
+      "covers every production source row exactly once while allowing only the reviewed JO Stage-2 pre-production policy",
+    );
+
+    expect(policyTestSource).toContain(JO_SOURCE);
 
     for (const marker of [
       "Shared policy registry contract correction",

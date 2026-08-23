@@ -403,28 +403,39 @@ describe(
       }
     });
 
-    it("keeps JO candidate-only and absent from later production and runtime owners", () => {
+    it("keeps JO outside production and runtime owners while allowing only the later reviewed Stage-2 operation policy", () => {
       expect(registrySource).toContain(
         JO_SOURCE_ROW_DESIGN_SOURCE_ID_V0_1,
       );
 
-      const laterOwners = [
+      const laterRuntimeOrProductionOwners = [
         authorizationSource,
         projectionSource,
-        operationPolicySource,
         profileSource,
         admissionSource,
         rootMapSource,
       ];
 
-      for (const source of laterOwners) {
+      for (const source of laterRuntimeOrProductionOwners) {
         expect(source).not.toContain(
           JO_SOURCE_ROW_DESIGN_SOURCE_ID_V0_1,
         );
       }
 
-      expect(operationPolicySource).not.toMatch(
-        /operatorId:\s*"JO"/,
+      expect(operationPolicySource).toContain(
+        JO_SOURCE_ROW_DESIGN_SOURCE_ID_V0_1,
+      );
+
+      expect(operationPolicySource).toMatch(
+        /embryo:\s*"JO"/,
+      );
+
+      expect(operationPolicySource).toContain(
+        'allowedEvidenceOps: ["exact"]',
+      );
+
+      expect(operationPolicySource).toContain(
+        'allowedEvidenceCarrierForms: ["jo"]',
       );
 
       expect(profileSource).not.toMatch(

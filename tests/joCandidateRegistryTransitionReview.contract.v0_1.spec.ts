@@ -203,7 +203,7 @@ describe("JO candidate registry transition review v0.1", () => {
     );
   });
 
-  it("keeps production runtime policy profile and canon stages unauthorized", () => {
+  it("keeps production runtime profile and canon stages unauthorized while current policy owner reflects the separately reviewed Stage-2 transition", () => {
     for (const marker of [
       "`JO_OPERATION_OR_CARRIER_POLICY_IMPLEMENTATION`",
       "`JO_CANONICAL_PROFILE_IMPLEMENTATION`",
@@ -218,12 +218,20 @@ describe("JO candidate registry transition review v0.1", () => {
       "reviewed.external.jo.refusal.candidate.v0_1",
     );
 
-    expect(policySource).not.toContain(
+    expect(policySource).toContain(
       "sourceId: \"reviewed.external.jo.refusal.candidate.v0_1\"",
     );
 
-    expect(policySource).not.toMatch(
+    expect(policySource).toMatch(
       /embryo:\s*"JO"/,
+    );
+
+    expect(policySource).toContain(
+      'allowedEvidenceOps: ["exact"]',
+    );
+
+    expect(policySource).toContain(
+      'allowedEvidenceCarrierForms: ["jo"]',
     );
   });
 
