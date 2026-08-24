@@ -355,13 +355,21 @@ describe(
       );
     });
 
-    it("does not register JO in operation, profile or admission owners", () => {
-      expect(operationSource).not.toMatch(
-        /operatorId:\s*"JO"/,
+    it("allows only the later reviewed Stage-2 operation policy while profile and admission owners remain absent", () => {
+      expect(operationSource).toContain(
+        'sourceId: "reviewed.external.jo.refusal.candidate.v0_1"',
       );
 
-      expect(operationSource).not.toMatch(
+      expect(operationSource).toMatch(
         /embryo:\s*"JO"/,
+      );
+
+      expect(operationSource).toContain(
+        'allowedEvidenceOps: ["exact"]',
+      );
+
+      expect(operationSource).toContain(
+        'allowedEvidenceCarrierForms: ["jo"]',
       );
 
       expect(profileSource).not.toMatch(

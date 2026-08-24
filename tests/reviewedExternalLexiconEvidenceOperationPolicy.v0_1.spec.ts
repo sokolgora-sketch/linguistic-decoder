@@ -14,14 +14,13 @@ const DA_SOURCE =
 const DI_SOURCE =
   "reviewed.external.di.knowledge.candidate.v0_1";
 
+const JO_SOURCE =
+  "reviewed.external.jo.refusal.candidate.v0_1";
+
 describe("reviewed external lexicon evidence operation policy v0.1", () => {
-  it("covers every production source row exactly once", () => {
+  it("covers every production source row exactly once while allowing only the reviewed JO Stage-2 pre-production policy", () => {
     const productionRows =
       getReviewedExternalLexiconProductionSourceRowsV0_1();
-
-    expect(
-      reviewedExternalLexiconEvidenceOperationPoliciesV0_1,
-    ).toHaveLength(productionRows.length);
 
     for (const row of productionRows) {
       const matches =
@@ -35,6 +34,162 @@ describe("reviewed external lexicon evidence operation policy v0.1", () => {
         matches[0].allowedEvidenceCarrierForms,
       ).toContain(row.isolatedStandaloneForm);
     }
+
+    expect(
+      productionRows.map((row) => row.sourceId),
+    ).not.toContain(JO_SOURCE);
+
+    const joPolicies =
+      reviewedExternalLexiconEvidenceOperationPoliciesV0_1.filter(
+        (policy) => policy.sourceId === JO_SOURCE,
+      );
+
+    expect(joPolicies).toHaveLength(1);
+    expect(joPolicies[0]).toMatchObject({
+      sourceId: JO_SOURCE,
+      embryo: "JO",
+      allowedEvidenceOps: ["exact"],
+      allowedEvidenceCarrierForms: ["jo"],
+    });
+
+    const expectedPolicySourceIds = [
+      ...productionRows.map((row) => row.sourceId),
+      JO_SOURCE,
+    ].sort();
+
+    const actualPolicySourceIds =
+      reviewedExternalLexiconEvidenceOperationPoliciesV0_1
+        .map((policy) => policy.sourceId)
+        .slice()
+        .sort();
+
+    expect(actualPolicySourceIds).toEqual(
+      expectedPolicySourceIds,
+    );
+  });
+
+  it("registers JO exact-only operation and jo-only carrier policy", () => {
+    expect(
+      getReviewedExternalLexiconEvidenceOperationPolicyV0_1(
+        JO_SOURCE,
+      ),
+    ).toMatchObject({
+      sourceId: JO_SOURCE,
+      embryo: "JO",
+      allowedEvidenceOps: ["exact"],
+      allowedEvidenceCarrierForms: ["jo"],
+    });
+
+    expect(
+      evaluateReviewedExternalLexiconEvidenceOperationPolicyV0_1(
+        {
+          sourceId: JO_SOURCE,
+          embryo: "JO",
+          ops: ["exact"],
+          segment: "jo",
+          carrierForm: "jo",
+        },
+      ),
+    ).toMatchObject({
+      allowed: true,
+      effectiveOps: ["exact"],
+      effectiveCarrierForm: "jo",
+      reasons: [],
+    });
+
+    for (const carrierForm of [
+      "po",
+      "da",
+      "di",
+      "major",
+      "enjoy",
+      "joke",
+      "joint",
+      "banjo",
+      "judo",
+      "*jo",
+    ]) {
+      expect(
+        evaluateReviewedExternalLexiconEvidenceOperationPolicyV0_1(
+          {
+            sourceId: JO_SOURCE,
+            embryo: "JO",
+            ops: ["exact"],
+            segment: carrierForm,
+            carrierForm,
+          },
+        ),
+      ).toMatchObject({
+        allowed: false,
+        effectiveOps: ["exact"],
+        effectiveCarrierForm: carrierForm,
+        reasons: ["carrier_form_not_allowed"],
+      });
+    }
+
+    expect(
+      evaluateReviewedExternalLexiconEvidenceOperationPolicyV0_1(
+        {
+          sourceId: JO_SOURCE,
+          embryo: "JO",
+          ops: ["vowel_swap"],
+          segment: "jo",
+          carrierForm: "jo",
+        },
+      ),
+    ).toMatchObject({
+      allowed: false,
+      reasons: ["operation_not_allowed"],
+    });
+
+    expect(
+      evaluateReviewedExternalLexiconEvidenceOperationPolicyV0_1(
+        {
+          sourceId: JO_SOURCE,
+          embryo: "JO",
+          ops: [],
+          segment: "j",
+          carrierForm: "jo",
+        },
+      ),
+    ).toMatchObject({
+      allowed: false,
+      effectiveOps: [],
+      effectiveCarrierForm: "jo",
+      reasons: ["operation_missing"],
+    });
+
+    expect(
+      evaluateReviewedExternalLexiconEvidenceOperationPolicyV0_1(
+        {
+          sourceId: JO_SOURCE,
+          embryo: "JO",
+          ops: ["exact"],
+          segment: "jo",
+          carrierForm: "",
+        },
+      ),
+    ).toMatchObject({
+      allowed: false,
+      effectiveOps: ["exact"],
+      effectiveCarrierForm: null,
+      reasons: ["carrier_form_missing"],
+    });
+
+    expect(
+      evaluateReviewedExternalLexiconEvidenceOperationPolicyV0_1(
+        {
+          sourceId: JO_SOURCE,
+          embryo: "DA",
+          ops: ["exact"],
+          segment: "jo",
+          carrierForm: "jo",
+        },
+      ),
+    ).toMatchObject({
+      allowed: false,
+      reasons: ["policy_embryo_mismatch"],
+    });
   });
 
   it("allows exact DA evidence only through carrier da", () => {

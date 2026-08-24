@@ -275,12 +275,18 @@ describe(
       );
     });
 
-    it("does not register a JO evidence-operation policy", () => {
-      expect(operationPolicy).not.toMatch(
-        /operatorId:\s*"JO"/,
+    it("reflects the later reviewed Stage-2 JO exact-only operation and carrier policy", () => {
+      expect(operationPolicy).toContain(
+        'sourceId: "reviewed.external.jo.refusal.candidate.v0_1"',
       );
-      expect(operationPolicy).not.toMatch(
+      expect(operationPolicy).toMatch(
         /embryo:\s*"JO"/,
+      );
+      expect(operationPolicy).toContain(
+        'allowedEvidenceOps: ["exact"]',
+      );
+      expect(operationPolicy).toContain(
+        'allowedEvidenceCarrierForms: ["jo"]',
       );
     });
 

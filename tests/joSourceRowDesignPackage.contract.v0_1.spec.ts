@@ -557,13 +557,21 @@ describe(
       );
     });
 
-    it("does not register JO in operation, profile or canon-lock owners", () => {
-      expect(operationPolicySource).not.toMatch(
-        /operatorId:\s*"JO"/,
+    it("allows only the later reviewed Stage-2 operation policy while profile and canon-lock owners remain absent", () => {
+      expect(operationPolicySource).toContain(
+        'sourceId: "reviewed.external.jo.refusal.candidate.v0_1"',
       );
 
-      expect(operationPolicySource).not.toMatch(
+      expect(operationPolicySource).toMatch(
         /embryo:\s*"JO"/,
+      );
+
+      expect(operationPolicySource).toContain(
+        'allowedEvidenceOps: ["exact"]',
+      );
+
+      expect(operationPolicySource).toContain(
+        'allowedEvidenceCarrierForms: ["jo"]',
       );
 
       expect(profileSource).not.toMatch(
