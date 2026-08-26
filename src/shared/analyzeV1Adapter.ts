@@ -201,6 +201,30 @@ function adaptCandidate(rawCandidate: Raw): CandidateUI {
     segmentation: rawCandidate?.segmentation,
     semanticBridge: rawCandidate?.semanticBridge,
     expansionChain: rawCandidate?.expansionChain,
+
+    // Logic-first structural-hypothesis metadata.
+    // These fields are additive pass-through only. The UI adapter
+    // does not create, validate, promote, or reinterpret them.
+    hypothesisVersion: rawCandidate?.hypothesisVersion,
+    discoveryStatus: rawCandidate?.discoveryStatus,
+    independentStandaloneMeaning:
+      rawCandidate?.independentStandaloneMeaning,
+    lexicalAttestation: rawCandidate?.lexicalAttestation,
+    functionalSupportStatus:
+      rawCandidate?.functionalSupportStatus,
+    evidenceRefs: rawCandidate?.evidenceRefs,
+    reductionSteps: rawCandidate?.reductionSteps,
+    reasonCodes: rawCandidate?.reasonCodes,
+    historicalOriginClaim:
+      rawCandidate?.historicalOriginClaim,
+    historicalTransmissionClaim:
+      rawCandidate?.historicalTransmissionClaim,
+    winnerClaim: rawCandidate?.winnerClaim,
+    languageSuperiorityClaim:
+      rawCandidate?.languageSuperiorityClaim,
+    candidateTruthClaim:
+      rawCandidate?.candidateTruthClaim,
+
     validationOutcome: rawCandidate?.validationOutcome,
     validationReasons: rawCandidate?.validationReasons,
     rankGroup: rawCandidate?.rankGroup,

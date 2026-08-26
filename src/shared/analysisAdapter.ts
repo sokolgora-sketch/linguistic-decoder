@@ -40,6 +40,7 @@ import { buildMinRootHypotheses } from "./deepRoot.minRoots.v1";
 import { buildOriginClaimV1 } from "./originClaim.builder.v1";
 import { attachSoundRootsV0_2 } from "./soundRoots/soundRoots.attach.v0.2";
 import { buildAnalysisStatusV0_1 } from "./analysisStatus.v0_1";
+import { discoverStructuralHypothesesV0_1 } from "./structuralHypothesisDiscovery.v0_1";
 
 function sameStringArray(a: any, b: any): boolean {
   if (!Array.isArray(a) || !Array.isArray(b)) return false;
@@ -272,14 +273,198 @@ export function enginePayloadToAnalysisResult(payload: EnginePayload): AnalyzeWo
 
   (result as any).rootMap = rootMap;
 
-  // Analysis status must evaluate the same normalized target
-  // that authorized this RootMap. Keep the public/raw result
-  // word unchanged; provide only the authoritative status view.
-  (result as any).analysisStatusV0_1 =
+  // Logic-first structural discovery v0.1.
+  //
+  // Boundary:
+  // - deterministic structural discovery is evidence-independent
+  // - structural hypotheses are not reviewed lexical evidence
+  // - OriginClaim was already computed above and is intentionally
+  //   not recomputed from these hypotheses
+  // - analysisStatus must see these candidates so a defensible
+  //   structural hypothesis cannot coexist with stale Null
+  const structuralHypothesesV0_1 =
+    discoverStructuralHypothesesV0_1(
+      rootMapBasis,
+    );
+
+  // Public structural projection is gap-filling only.
+  //
+  // Compute the deterministic baseline before adding logic-derived
+  // structural hypotheses. Reviewed functional evidence, canonical
+  // candidate ownership, and existing RootMap structure all outrank
+  // this discovery layer.
+  const baselineAnalysisStatusV0_1 =
     buildAnalysisStatusV0_1({
       word: rootMapBasis,
       rootMap,
+      candidates:
+        (result as any)
+          .candidates,
     });
+
+  const shouldProjectStructuralHypothesesV0_1 =
+    baselineAnalysisStatusV0_1
+      .status ===
+        "null_no_supported_candidate" &&
+    structuralHypothesesV0_1.length >
+      0;
+
+  if (
+    shouldProjectStructuralHypothesesV0_1
+  ) {
+    const existingCandidates =
+      Array.isArray(
+        (result as any)
+          .candidates,
+      )
+        ? (result as any)
+            .candidates
+        : [];
+
+    const projectedStructuralCandidates =
+      structuralHypothesesV0_1.map(
+        (
+          hypothesis,
+          index,
+        ) =>
+          projectEmbryoFirstCandidateForAnalyzeV1(
+            {
+              id:
+                hypothesis
+                  .hypothesisId,
+              candidateId:
+                hypothesis
+                  .hypothesisId,
+              form:
+                hypothesis
+                  .embryo,
+              displayForm:
+                hypothesis
+                  .embryo,
+              candidateLanguage:
+                "unknown",
+              sourceKind:
+                "logic_derived_structural_hypothesis",
+              claimType:
+                "structuralHypothesis",
+              originClaim:
+                "not_claimed",
+              historicalRelation:
+                "not_evaluated",
+              embryo:
+                hypothesis
+                  .embryo,
+              embryoSize:
+                hypothesis
+                  .embryoSize,
+              embryoLanguage:
+                null,
+              isolatedStandaloneForm:
+                null,
+              plainStandaloneGloss:
+                null,
+              sourceNote:
+                null,
+              segmentation:
+                null,
+              semanticBridge:
+                null,
+              expansionChain:
+                hypothesis
+                  .expansionChain,
+              reductionSteps:
+                hypothesis
+                  .reductionSteps,
+              hypothesisVersion:
+                hypothesis
+                  .hypothesisVersion,
+              discoveryStatus:
+                hypothesis
+                  .discoveryStatus,
+              independentStandaloneMeaning:
+                hypothesis
+                  .independentStandaloneMeaning,
+              lexicalAttestation:
+                hypothesis
+                  .lexicalAttestation,
+              functionalSupportStatus:
+                hypothesis
+                  .functionalSupportStatus,
+              evidenceRefs:
+                hypothesis
+                  .evidenceRefs,
+              reasonCodes:
+                hypothesis
+                  .reasonCodes,
+              validationOutcome:
+                "not_evaluated",
+              validationReasons:
+                hypothesis
+                  .reasonCodes,
+              rankGroup:
+                "structuralHypothesis",
+              rankScore:
+                hypothesis
+                  .reasonCodes
+                  .includes(
+                    "minimum_defensible_embryo_reached",
+                  )
+                  ? 50
+                  : 40,
+              rankReason:
+                hypothesis
+                  .reasonCodes
+                  .includes(
+                    "minimum_defensible_embryo_reached",
+                  )
+                  ? "minimum deterministic structural hypothesis; independent meaning remains unknown"
+                  : "deterministic structural hypothesis; larger competing embryo; independent meaning remains unknown",
+              claimBoundary:
+                "logic-derived structural hypothesis only; independent meaning unknown; not reviewed evidence, candidate truth, or historical origin",
+              historicalOriginClaim:
+                hypothesis
+                  .historicalOriginClaim,
+              historicalTransmissionClaim:
+                hypothesis
+                  .historicalTransmissionClaim,
+              winnerClaim:
+                hypothesis
+                  .winnerClaim,
+              languageSuperiorityClaim:
+                hypothesis
+                  .languageSuperiorityClaim,
+              candidateTruthClaim:
+                hypothesis
+                  .candidateTruthClaim,
+              userDecisionPosture:
+                hypothesis
+                  .userDecisionPosture,
+            },
+            payload,
+            index,
+          ),
+      );
+
+    (result as any).candidates =
+      orderEmbryoFirstCandidatesForAnalyzeV1([
+        ...existingCandidates,
+        ...projectedStructuralCandidates,
+      ]);
+  }
+
+  // Reuse the untouched baseline when structural discovery was
+  // lower-precedence. Recompute only when structural candidates
+  // actually filled a valid Null gap.
+  (result as any).analysisStatusV0_1 =
+    shouldProjectStructuralHypothesesV0_1
+      ? buildAnalysisStatusV0_1({
+          word: rootMapBasis,
+          rootMap,
+          candidates:
+            (result as any)
+              .candidates,
+        })
+      : baselineAnalysisStatusV0_1;
 
   // Reviewed embryo-first visibility overlay.
   //
@@ -379,6 +564,7 @@ function buildHeartSummary(payload: any, math7: any) {
 
 const EMBRYO_FIRST_CLAIM_TYPES = [
   "functionalMotivation",
+  "structuralHypothesis",
   "historicalTransmission",
   "surfaceResonance",
   "seedPairing",
@@ -414,6 +600,7 @@ const EMBRYO_FIRST_VALIDATION_OUTCOMES = [
 const EMBRYO_FIRST_RANK_GROUPS = [
   "validatedFunctionalMotivation",
   "partialFunctionalMotivation",
+  "structuralHypothesis",
   "surfaceOrSeedOnly",
   "historicalContextOnly",
   "unresolved",
@@ -491,6 +678,7 @@ function embryoFirstValidationReasons(
   checks: {
     isSeed: boolean;
     isFunctionalComposition: boolean;
+    isStructuralHypothesis: boolean;
     isolatedStandaloneForm: string | null;
     plainStandaloneGloss: string | null;
     sourceNote: string | null;
@@ -509,7 +697,10 @@ function embryoFirstValidationReasons(
     add("sourceKind_seed_not_validation");
   }
 
-  if (!checks.isFunctionalComposition) {
+  if (
+    !checks.isFunctionalComposition &&
+    !checks.isStructuralHypothesis
+  ) {
     if (!checks.isolatedStandaloneForm) {
       add("missing_isolatedStandaloneForm");
     }
@@ -523,12 +714,16 @@ function embryoFirstValidationReasons(
     }
   }
 
-  if (!checks.semanticBridge) {
+  if (
+    !checks.isStructuralHypothesis &&
+    !checks.semanticBridge
+  ) {
     add("missing_semanticBridge");
   }
 
   if (
     !checks.isFunctionalComposition &&
+    !checks.isStructuralHypothesis &&
     (
       !checks.isolatedStandaloneForm ||
       !checks.plainStandaloneGloss ||
@@ -586,6 +781,18 @@ function projectEmbryoFirstCandidateForAnalyzeV1Internal<T>(
     nestedCandidateRecord.sourceKind,
   );
   const isSeed = sourceKind?.toUpperCase() === "SEED";
+
+  const requestedClaimType =
+    embryoFirstAllowed(
+      candidateRecord.claimType,
+      EMBRYO_FIRST_CLAIM_TYPES,
+    );
+
+  const isStructuralHypothesis =
+    requestedClaimType ===
+      "structuralHypothesis" &&
+    sourceKind ===
+      "logic_derived_structural_hypothesis";
 
   const isolatedStandaloneForm = embryoFirstFirstText(
     candidateRecord.isolatedStandaloneForm,
@@ -675,11 +882,22 @@ function projectEmbryoFirstCandidateForAnalyzeV1Internal<T>(
         reviewedCompositionCount > 0,
     );
 
-  const embryo = embryoFirstFirstText(candidateRecord.embryo, isolatedStandaloneForm);
-  const embryoLanguage = embryoFirstFirstText(
-    candidateRecord.embryoLanguage,
-    embryo ? candidateLanguage : null,
+  const embryo = embryoFirstFirstText(
+    candidateRecord.embryo,
+    isolatedStandaloneForm,
   );
+
+  const embryoLanguage =
+    isStructuralHypothesis
+      ? embryoFirstText(
+          candidateRecord.embryoLanguage,
+        )
+      : embryoFirstFirstText(
+          candidateRecord.embryoLanguage,
+          embryo
+            ? candidateLanguage
+            : null,
+        );
 
   // Standalone lexical isolation can authorize a single-embryo
   // candidate, but it can never authenticate a multi-embryo
@@ -693,7 +911,7 @@ function projectEmbryoFirstCandidateForAnalyzeV1Internal<T>(
   const hasFunctionalBridge = Boolean(hasIsolationProof && semanticBridge);
 
   let claimType =
-    embryoFirstAllowed(candidateRecord.claimType, EMBRYO_FIRST_CLAIM_TYPES) ??
+    requestedClaimType ??
     (hasFunctionalBridge
       ? "functionalMotivation"
       : isSeed
@@ -766,7 +984,9 @@ function projectEmbryoFirstCandidateForAnalyzeV1Internal<T>(
         ? "partialFunctionalMotivation"
         : hasIsolationProof
           ? "partialFunctionalMotivation"
-          : "surfaceOrSeedOnly");
+          : isStructuralHypothesis
+            ? "structuralHypothesis"
+            : "surfaceOrSeedOnly");
 
   if (declaresFunctionalComposition) {
     if (hasFunctionalCompositionEvidence) {
@@ -809,6 +1029,7 @@ function projectEmbryoFirstCandidateForAnalyzeV1Internal<T>(
       isSeed,
       isFunctionalComposition:
         declaresFunctionalComposition,
+      isStructuralHypothesis,
       isolatedStandaloneForm,
       plainStandaloneGloss,
       sourceNote,
@@ -944,17 +1165,20 @@ export function orderEmbryoFirstCandidatesForAnalyzeV1<
               ? 1
               : 5;
 
-          case "surfaceOrSeedOnly":
+          case "structuralHypothesis":
             return 2;
 
-          case "historicalContextOnly":
+          case "surfaceOrSeedOnly":
             return 3;
 
-          case "unresolved":
+          case "historicalContextOnly":
             return 4;
 
-          default:
+          case "unresolved":
             return 5;
+
+          default:
+            return 6;
         }
       };
 
@@ -965,10 +1189,11 @@ export function orderEmbryoFirstCandidatesForAnalyzeV1<
         return leftTier - rightTier;
       }
 
-      // Embryo-size ranking belongs only inside the two functional groups.
-      // Surface/seed, historical context, unresolved, and unknown candidates
-      // preserve their existing deterministic order within their group.
-      if (leftTier > 1) {
+      // Embryo-size ranking belongs inside functional groups and the
+      // deterministic structural-hypothesis group. Surface/seed,
+      // historical context, unresolved, and unknown candidates preserve
+      // their existing deterministic order within their group.
+      if (leftTier > 2) {
         return left.index - right.index;
       }
 
@@ -985,6 +1210,34 @@ export function orderEmbryoFirstCandidatesForAnalyzeV1<
 
       if (leftSize == null && rightSize != null) {
         return 1;
+      }
+
+      if (leftTier === 2) {
+        const leftOperationCount =
+          Array.isArray(
+            left.candidate.reductionSteps,
+          )
+            ? left.candidate
+                .reductionSteps.length
+            : Number.POSITIVE_INFINITY;
+
+        const rightOperationCount =
+          Array.isArray(
+            right.candidate.reductionSteps,
+          )
+            ? right.candidate
+                .reductionSteps.length
+            : Number.POSITIVE_INFINITY;
+
+        if (
+          leftOperationCount !==
+          rightOperationCount
+        ) {
+          return (
+            leftOperationCount -
+            rightOperationCount
+          );
+        }
       }
 
       return left.index - right.index;
@@ -1046,12 +1299,37 @@ function normalizeAnalysisWordForDeepRootV0_1(
       .trim()
       .toLowerCase();
 
+  // Current DeepRoot lexical normalization authority is bounded to
+  // ASCII Latin letters plus canonical Ë.
+  //
+  // An unsupported Unicode letter/mark must not be deleted while
+  // neighboring supported letters survive. That would silently
+  // change lexical identity, e.g. résumé -> rsum.
+  //
+  // Inputs outside this lane therefore preserve the existing raw
+  // fallback. Transliteration requires a separate reviewed contract.
+  const hasUnsupportedUnicodeLetter =
+    Array.from(raw).some(
+      (symbol) =>
+        /[\p{L}\p{M}]/u.test(
+          symbol,
+        ) &&
+        !/[a-zë]/u.test(
+          symbol,
+        ),
+    );
+
+  if (
+    hasUnsupportedUnicodeLetter
+  ) {
+    return raw;
+  }
+
   const canonical =
     raw.replace(/[^a-zë]/g, "");
 
-  // Preserve prior behavior for inputs outside the current
-  // Latin+Ë normalization lane while still stripping punctuation
-  // for supported forms such as "study!".
+  // Preserve prior behavior for non-lexical punctuation/spacing
+  // around currently supported Latin+Ë forms such as "study!".
   return canonical || raw;
 }
 

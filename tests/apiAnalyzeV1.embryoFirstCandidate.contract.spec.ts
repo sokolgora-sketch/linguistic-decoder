@@ -31,6 +31,7 @@ const REQUIRED_FIELDS = [
 
 const CLAIM_TYPES = [
   "functionalMotivation",
+  "structuralHypothesis",
   "historicalTransmission",
   "surfaceResonance",
   "seedPairing",
@@ -59,6 +60,7 @@ const VALIDATION_OUTCOMES = [
 const RANK_GROUPS = [
   "validatedFunctionalMotivation",
   "partialFunctionalMotivation",
+  "structuralHypothesis",
   "surfaceOrSeedOnly",
   "historicalContextOnly",
   "unresolved",
