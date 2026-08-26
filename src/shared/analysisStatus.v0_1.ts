@@ -56,6 +56,49 @@ function operatorSummary(operators: readonly string[]): string {
   return operators.length > 0 ? operators.join(", ") : "none";
 }
 
+function readStructuralHypothesisCandidatesV0_1(
+  result: UnknownRecord,
+): string[] {
+  const rows =
+    Array.isArray(result.candidates)
+      ? result.candidates
+      : [];
+
+  return uniqueStrings(
+    rows.flatMap((candidate) => {
+      if (!isRecord(candidate)) {
+        return [];
+      }
+
+      const isStructuralHypothesis =
+        candidate.claimType ===
+          "structuralHypothesis" &&
+        candidate.sourceKind ===
+          "logic_derived_structural_hypothesis" &&
+        candidate.rankGroup ===
+          "structuralHypothesis" &&
+        candidate.validationOutcome ===
+          "not_evaluated" &&
+        candidate.userDecisionPosture ===
+          "user_decides";
+
+      if (!isStructuralHypothesis) {
+        return [];
+      }
+
+      const embryo =
+        typeof candidate.embryo ===
+          "string"
+          ? candidate.embryo.trim()
+          : "";
+
+      return embryo
+        ? [embryo]
+        : [];
+    }),
+  );
+}
+
 function readVerifiedProposedFunctionalCandidatesV0_1(
   result: UnknownRecord,
 ): string[] {
@@ -301,6 +344,29 @@ export function buildAnalysisStatusV0_1(resultValue: unknown): AnalysisStatusV0_
         )
       : [];
 
+  const structuralHypothesisCandidates =
+    resultRecord
+      ? readStructuralHypothesisCandidatesV0_1(
+          resultRecord,
+        )
+      : [];
+
+  // Logic-derived structural hypotheses are a lower-precedence
+  // status-driving layer. They become aggregate structuralTokens
+  // only when no reviewed, proposed, canonical-candidate, or
+  // existing RootMap structural layer already owns the status.
+  const structuralHypothesesDriveStatus =
+    reviewedOperators.length === 0 &&
+    proposedFunctionalCandidates.length === 0 &&
+    candidateOnlyOperators.length === 0 &&
+    structuralTokens.length === 0 &&
+    structuralHypothesisCandidates.length > 0;
+
+  const statusStructuralTokens =
+    structuralHypothesesDriveStatus
+      ? structuralHypothesisCandidates
+      : structuralTokens;
+
   let status:
     AnalysisStatusCodeV0_1;
 
@@ -344,6 +410,16 @@ export function buildAnalysisStatusV0_1(resultValue: unknown): AnalysisStatusV0_
       `Structural RootMap output was emitted for ${structuralTokens.join(
         ", ",
       )}, but no reviewed canonical operator evidence applies.`;
+  } else if (
+    structuralHypothesisCandidates.length > 0
+  ) {
+    status =
+      "structural_unreviewed";
+
+    summary =
+      `Deterministic structural hypothes${structuralHypothesisCandidates.length === 1 ? "is" : "es"} available for ${structuralHypothesisCandidates.join(
+        ", ",
+      )}. Independent functional meaning and reviewed evidence remain unclaimed.`;
   } else {
     status =
       "null_no_supported_candidate";
@@ -359,7 +435,8 @@ export function buildAnalysisStatusV0_1(resultValue: unknown): AnalysisStatusV0_
     summary,
     reviewedOperators,
     candidateOnlyOperators,
-    structuralTokens,
+    structuralTokens:
+      statusStructuralTokens,
     claimBoundary: {
       historicalOriginClaim:
         "not_claimed",

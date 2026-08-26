@@ -469,12 +469,52 @@ describe(
           ),
         ).toBe(false);
 
+        // The rejected automatic functional proposal must not erase
+        // an independently derived deterministic structural hypothesis.
+        // MEMORY already yields MEMORY -> MEM -> EM with the automatic
+        // proposer disabled; EM remains meaning-unknown and unreviewed.
         expect(
-          body.analysisStatusV0_1
-            .status,
-        ).toBe(
-          "null_no_supported_candidate",
-        );
+          body.analysisStatusV0_1,
+        ).toMatchObject({
+          status:
+            "structural_unreviewed",
+          reviewedOperators: [],
+          candidateOnlyOperators: [],
+          structuralTokens: [
+            "EM",
+          ],
+        });
+
+        const structuralEm =
+          body.candidates.filter(
+            (candidate: any) =>
+              candidate
+                ?.sourceKind ===
+                "logic_derived_structural_hypothesis" &&
+              candidate
+                ?.embryo ===
+                "EM",
+          );
+
+        expect(
+          structuralEm,
+        ).toHaveLength(1);
+
+        expect(
+          structuralEm[0],
+        ).toMatchObject({
+          claimType:
+            "structuralHypothesis",
+          embryo:
+            "EM",
+          embryoSize: 2,
+          independentStandaloneMeaning:
+            null,
+          candidateTruthClaim:
+            "not_claimed",
+          historicalOriginClaim:
+            "not_claimed",
+        });
       },
     );
 
