@@ -1132,6 +1132,34 @@ const normalizationSteps =
       const userDecisionPosture =
         asString(rec["userDecisionPosture"]);
 
+      const discoveryStatus =
+        asString(rec["discoveryStatus"]);
+
+      const independentStandaloneMeaningWasEmitted =
+        Object.prototype.hasOwnProperty.call(
+          rec,
+          "independentStandaloneMeaning",
+        );
+
+      const independentStandaloneMeaningValue =
+        rec["independentStandaloneMeaning"];
+
+      const independentStandaloneMeaningIsValid =
+        independentStandaloneMeaningWasEmitted &&
+        (
+          independentStandaloneMeaningValue === null ||
+          typeof independentStandaloneMeaningValue === "string"
+        );
+
+      const functionalSupportStatus =
+        asString(rec["functionalSupportStatus"]);
+
+      const historicalOriginClaim =
+        asString(rec["historicalOriginClaim"]);
+
+      const candidateTruthClaim =
+        asString(rec["candidateTruthClaim"]);
+
       const segmentation =
         isRecord(rec["segmentation"])
           ? rec["segmentation"]
@@ -1304,6 +1332,44 @@ const evidenceId = String(id).toLowerCase().replace(/[^a-z0-9_]/g, "_");
           ? {
               userDecisionPosture:
                 present(userDecisionPosture),
+            }
+          : {}),
+
+        ...(discoveryStatus
+          ? {
+              discoveryStatus:
+                present(discoveryStatus),
+            }
+          : {}),
+
+        ...(independentStandaloneMeaningIsValid
+          ? {
+              independentStandaloneMeaning:
+                present(
+                  independentStandaloneMeaningValue as
+                    string | null,
+                ),
+            }
+          : {}),
+
+        ...(functionalSupportStatus
+          ? {
+              functionalSupportStatus:
+                present(functionalSupportStatus),
+            }
+          : {}),
+
+        ...(historicalOriginClaim
+          ? {
+              historicalOriginClaim:
+                present(historicalOriginClaim),
+            }
+          : {}),
+
+        ...(candidateTruthClaim
+          ? {
+              candidateTruthClaim:
+                present(candidateTruthClaim),
             }
           : {}),
 
