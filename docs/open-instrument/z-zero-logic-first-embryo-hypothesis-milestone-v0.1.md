@@ -2,7 +2,7 @@
 
 Date: 2026-08-25
 
-Status: Z_ZERO_LOGIC_FIRST_EMBRYO_HYPOTHESIS_RUNTIME_VERIFIED_PENDING_UI_TRUTH_DISPLAY.
+Status: Z_ZERO_LOGIC_FIRST_EMBRYO_HYPOTHESIS_MILESTONE_CLOSED.
 
 ## Purpose
 
@@ -435,13 +435,38 @@ Verified implementation state:
 - `npm run gate:quick` has passed on the implementation worktree
 - Open Instrument production live smoke has passed with the automatic proposer disabled
 
-The milestone is **not closed**.
+The milestone is **closed**.
 
-Step 8 — UI truth display — remains open. No UI or TSX files are modified in this implementation lane.
+Step 8 — UI truth display — is implemented and merged.
 
-The current API/adapter contract distinguishes structural hypotheses correctly, but a dedicated user-facing presentation that clearly separates Hypothesis / Unknown / reviewed evidence has not yet been implemented or UI-smoke verified.
+PR #1809 added the bounded user-facing truth display required by this milestone:
 
-Therefore milestone closure must wait for the bounded UI truth-display lane and its required validation.
+- `Structural hypothesis`
+- `Independent meaning: Unknown`
+- `Functional support: Unknown`
+- `Historical origin: not claimed`
+- `Candidate truth: not claimed`
+- `Hypothesis — structural, unreviewed`
+
+The UI presentation preserves the existing truth separation:
+
+- structural hypotheses are not reviewed functional evidence;
+- structural hypotheses are not candidate truth;
+- structural hypotheses do not create historical-origin claims;
+- the Functional Motivation evidence card remains separately governed;
+- reviewed evidence and production promotion remain separate.
+
+Step 9 — regression and gate — is satisfied.
+
+The Step-8 implementation passed:
+
+- the dedicated structural-hypothesis UI truth-display contract;
+- the existing UI regression pack;
+- repo-native Open Instrument local production smoke;
+- `npm run gate:quick`;
+- GitHub required checks.
+
+Step 10 — milestone closure — is therefore eligible and recorded below.
 
 ## Milestone plan
 
@@ -491,4 +516,149 @@ Run focused tests, `npm run gate:quick`, live smoke, and UI smoke where applicab
 
 ### Step 10 — milestone closure
 
-Close only after live output proves logic-first discovery without weakening evidence promotion.
+Status:
+
+`Z_ZERO_LOGIC_FIRST_EMBRYO_HYPOTHESIS_MILESTONE_CLOSED`
+
+Closed.
+
+<!-- Z_ZERO_LOGIC_FIRST_EMBRYO_HYPOTHESIS_MILESTONE_CLOSED_2026_08_26 -->
+
+## Final closure evidence — 2026-08-26
+
+### Closure decision
+
+The ZË-RO Logic-First Embryo Hypothesis milestone v0.1 is closed.
+
+The milestone has completed its required architecture:
+
+~~~text
+deterministic structural discovery
+→ structural hypothesis
+→ functional support
+→ reviewed evidence
+→ production promotion
+→ runtime verification
+→ optional canon lock
+~~~
+
+Logic-derived structural discovery now exists as a distinct truth tier without weakening later evidence or promotion gates.
+
+### Core implementation
+
+PR #1808 implemented the bounded logic-first structural-hypothesis core.
+
+Source commit:
+
+`f238f5194de1399de84ad8a05007048238012fdc`
+
+Merged main after PR #1808:
+
+`8883060f75fc84d1bf308bea3e378f6ce4deea3e`
+
+Core behavior includes:
+
+- deterministic structural-hypothesis discovery;
+- explicit reduction operations and reason codes;
+- structural defensibility gates;
+- size-2 minimum-anchor family gating;
+- Null-only public structural projection;
+- fail-closed unsupported-Unicode handling;
+- deterministic `STERILE → STER → TER → ER`;
+- structural sibling `ERILE`;
+- generic `GJAK → JAK → AK`;
+- generic `MEMORY → MEM → EM`.
+
+These remain structural hypotheses only.
+
+No independent lexical meaning is manufactured.
+
+Historical origin remains unclaimed.
+
+Candidate truth remains unclaimed.
+
+Production promotion remains separate.
+
+### UI truth display
+
+PR #1809 implemented Step 8 and was squash merged.
+
+Source commit:
+
+`59a5f8aafe2394adea8abfa5a60f8649fa8711a0`
+
+Squash merge:
+
+`a3238874989f45f624cf99ccd6d5d5f07f796f63`
+
+User-facing structural hypotheses now visibly distinguish:
+
+- Hypothesis;
+- Unknown independent meaning;
+- Unknown functional support;
+- historical origin not claimed;
+- candidate truth not claimed;
+- reviewed functional evidence as a separate state.
+
+The structural analysis state is presented as:
+
+`Hypothesis — structural, unreviewed`
+
+The presentation follows the existing adapter boundary:
+
+~~~text
+analyze-v1
+→ contractAdapter
+→ CandidateRowVM
+→ candidate presentation
+~~~
+
+Presentation components do not bypass the VM to reinterpret raw structural truth.
+
+### Validation evidence
+
+The final Step-8 implementation validation established:
+
+- focused structural-hypothesis UI contract: PASS;
+- UI regression pack: PASS;
+- repo-native Open Instrument local production smoke: PASS;
+- `npm run gate:quick`: PASS;
+- unit suites: 580 passed, 3 skipped;
+- unit tests: 2458 passed, 4 skipped;
+- snapshots: 149 passed;
+- integration suites: 2 passed;
+- integration tests: 5 passed;
+- Next.js 16.2.12 production build: PASS;
+- GitHub required checks for PR #1809: 5/5 successful.
+
+### Closure boundaries
+
+This milestone closure does not claim:
+
+- that `ER` has an independently established lexical meaning;
+- that `ER`, `TER`, `SHTER`, `AK`, or `EM` are historical origins;
+- that any structural hypothesis is reviewed evidence;
+- that any structural hypothesis is production truth;
+- that any candidate is a historical winner;
+- that one language owns or originates the target word;
+- that candidate evidence may bypass review or promotion gates.
+
+`Unknown` remains valid inside a non-Null hypothesis.
+
+`Null` remains valid when deterministic ZË-RO logic cannot produce a defensible structural hypothesis.
+
+The governing posture remains:
+
+**Logic discovers. Evidence validates or contextualizes. Promotion remains strict.**
+
+**Discovery may outrun evidence. Meaning may not outrun logic.**
+
+### Final state
+
+All ten milestone steps are complete.
+
+No additional implementation slice is required for ZË-RO Logic-First Embryo Hypothesis v0.1.
+
+The milestone is:
+
+`Z_ZERO_LOGIC_FIRST_EMBRYO_HYPOTHESIS_MILESTONE_CLOSED`
