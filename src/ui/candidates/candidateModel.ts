@@ -15,6 +15,12 @@ export interface UICandidateRow {
   claimBoundary?: string | null;
   userDecisionPosture?: string | null;
 
+  discoveryStatus?: string | null;
+  independentStandaloneMeaning?: string | null;
+  functionalSupportStatus?: string | null;
+  historicalOriginClaim?: string | null;
+  candidateTruthClaim?: string | null;
+
   vowelPath?: string | null;
   functionalStatement?: string | null;
   deepRootHeartGateStatus?: string | null;
@@ -100,6 +106,31 @@ export function buildCandidateRowsFromVM(vm: TelemetryViewModel): UICandidateRow
       c.userDecisionPosture
         ? pomStr(c.userDecisionPosture)
         : null,
+
+    discoveryStatus:
+      c.discoveryStatus
+        ? pomStr(c.discoveryStatus)
+        : undefined,
+
+    independentStandaloneMeaning:
+      c.independentStandaloneMeaning?.kind === "present"
+        ? c.independentStandaloneMeaning.value
+        : undefined,
+
+    functionalSupportStatus:
+      c.functionalSupportStatus
+        ? pomStr(c.functionalSupportStatus)
+        : undefined,
+
+    historicalOriginClaim:
+      c.historicalOriginClaim
+        ? pomStr(c.historicalOriginClaim)
+        : undefined,
+
+    candidateTruthClaim:
+      c.candidateTruthClaim
+        ? pomStr(c.candidateTruthClaim)
+        : undefined,
 
     vowelPath: pomVowelPath(c.vowelPath),
     functionalStatement: pomStr(c.functionalStatement),

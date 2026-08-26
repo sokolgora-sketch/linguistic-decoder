@@ -9,7 +9,7 @@ import type {
 const STATUS_LABELS: Record<AnalysisStatusCodeV0_1, string> = {
   reviewed_functional_evidence: "Reviewed functional evidence",
   candidate_only: "Candidate only",
-  structural_unreviewed: "Structural — unreviewed",
+  structural_unreviewed: "Hypothesis — structural, unreviewed",
   null_no_supported_candidate: "Null — no supported candidate",
 };
 

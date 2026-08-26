@@ -168,6 +168,15 @@ export interface CandidateRowVM {
   claimBoundary?: PresentOrMissing<string>;
   userDecisionPosture?: PresentOrMissing<string>;
 
+  // Logic-first structural-hypothesis truth fields.
+  // These remain candidate presentation metadata only; they do not
+  // promote structural output into reviewed or production truth.
+  discoveryStatus?: PresentOrMissing<string>;
+  independentStandaloneMeaning?: PresentOrMissing<string | null>;
+  functionalSupportStatus?: PresentOrMissing<string>;
+  historicalOriginClaim?: PresentOrMissing<string>;
+  candidateTruthClaim?: PresentOrMissing<string>;
+
   // Structured multi-embryo presentation data.
   // Lifted only by contractAdapter from emitted candidate segmentation.
   functionalComponents?:

@@ -77,6 +77,10 @@ export function CandidatesAccordion({ rows }: { rows: UICandidateRow[] }) {
         {rows.map((c) => {
           const isOpen = openId === c.id;
 
+          const isStructuralHypothesis =
+            c.claimType === "structuralHypothesis" &&
+            c.discoveryStatus === "structural_hypothesis";
+
           const hasEmbryoFirstReadout =
             Boolean(
               c.embryo ||
@@ -121,7 +125,7 @@ export function CandidatesAccordion({ rows }: { rows: UICandidateRow[] }) {
                             </CandidateChip>
                           ) : null}
 
-                          {c.validationOutcome ? (
+                          {c.validationOutcome && !isStructuralHypothesis ? (
                             <CandidateChip
                               tone={
                                 c.validationOutcome === "validated"
@@ -147,6 +151,12 @@ export function CandidatesAccordion({ rows }: { rows: UICandidateRow[] }) {
                             </CandidateChip>
                           ) : null}
 
+                          {isStructuralHypothesis ? (
+                            <CandidateChip tone="amber">
+                              Structural hypothesis
+                            </CandidateChip>
+                          ) : null}
+
                           {c.rankGroup ? (
                             <CandidateChip
                               title="Deterministic embryo-first ordering group."
@@ -159,6 +169,34 @@ export function CandidatesAccordion({ rows }: { rows: UICandidateRow[] }) {
                         {c.plainStandaloneGloss ? (
                           <div className="break-words text-xs text-slate-300">
                             {`Embryo gloss: ${c.plainStandaloneGloss}`}
+                          </div>
+                        ) : null}
+
+                        {isStructuralHypothesis &&
+                        c.independentStandaloneMeaning === null ? (
+                          <div className="break-words text-xs font-medium text-amber-100">
+                            Independent meaning: Unknown
+                          </div>
+                        ) : null}
+
+                        {isStructuralHypothesis &&
+                        c.functionalSupportStatus === "unknown" ? (
+                          <div className="break-words text-xs text-slate-300">
+                            Functional support: Unknown
+                          </div>
+                        ) : null}
+
+                        {isStructuralHypothesis &&
+                        c.historicalOriginClaim === "not_claimed" ? (
+                          <div className="break-words text-xs text-slate-300">
+                            Historical origin: not claimed
+                          </div>
+                        ) : null}
+
+                        {isStructuralHypothesis &&
+                        c.candidateTruthClaim === "not_claimed" ? (
+                          <div className="break-words text-xs text-slate-300">
+                            Candidate truth: not claimed
                           </div>
                         ) : null}
 
