@@ -189,7 +189,7 @@ describe(
     );
 
     it(
-      "uses logic-derived structural tokens when they are the layer preventing Null",
+      "keeps STERILE structural hypotheses while higher-precedence bounded research owns aggregate status",
       async () => {
         const body =
           await live(
@@ -200,16 +200,20 @@ describe(
           body.analysisStatusV0_1
             .status,
         ).toBe(
-          "structural_unreviewed",
+          "research_functional_hypothesis",
         );
 
         expect(
           body.analysisStatusV0_1
-            .structuralTokens,
+            .researchHypothesisEmbryos,
         ).toEqual([
           "ER",
-          "ERILE",
         ]);
+
+        expect(
+          body.analysisStatusV0_1
+            .structuralTokens,
+        ).toEqual([]);
 
         expect(
           body.analysisStatusV0_1
@@ -220,6 +224,29 @@ describe(
           body.analysisStatusV0_1
             .candidateOnlyOperators,
         ).toEqual([]);
+
+        const structuralEmbryos =
+          Array.isArray(
+            body.candidates,
+          )
+            ? body.candidates
+                .filter(
+                  (candidate: any) =>
+                    candidate?.sourceKind ===
+                    "logic_derived_structural_hypothesis",
+                )
+                .map(
+                  (candidate: any) =>
+                    candidate.embryo,
+                )
+            : [];
+
+        expect(
+          structuralEmbryos,
+        ).toEqual([
+          "ER",
+          "ERILE",
+        ]);
       },
     );
   },

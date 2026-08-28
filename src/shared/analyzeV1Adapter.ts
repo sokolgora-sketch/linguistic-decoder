@@ -189,6 +189,20 @@ function adaptCandidate(rawCandidate: Raw): CandidateUI {
     candidateId: rawCandidate?.candidateId,
     displayForm: rawCandidate?.displayForm,
     candidateLanguage: rawCandidate?.candidateLanguage,
+
+    // Multi-source functional research provenance.
+    //
+    // Additive pass-through only:
+    // this adapter does not validate, promote, reinterpret, or
+    // manufacture research evidence.
+    targetWord: rawCandidate?.targetWord,
+    sourceId: rawCandidate?.sourceId,
+    sourceStatus: rawCandidate?.sourceStatus,
+    embryoRelation: rawCandidate?.embryoRelation,
+    relationOperationIds: rawCandidate?.relationOperationIds,
+    attestationTruth: rawCandidate?.attestationTruth,
+    functionalBridgeTruth: rawCandidate?.functionalBridgeTruth,
+
     claimType: rawCandidate?.claimType,
     originClaim: rawCandidate?.originClaim,
     historicalRelation: rawCandidate?.historicalRelation,

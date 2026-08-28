@@ -6,6 +6,13 @@ export interface UICandidateRow {
   form: string;
   status?: string | null;
   sourceKind?: string | null;
+  targetWord?: string | null;
+  sourceId?: string | null;
+  sourceStatus?: string | null;
+  semanticBridge?: string | null;
+  evidenceRefs?: string[] | null;
+  attestationTruth?: string | null;
+  functionalBridgeTruth?: string | null;
 
   embryo?: string | null;
   plainStandaloneGloss?: string | null;
@@ -35,6 +42,28 @@ function pomStr(
   x: { kind: "present"; value: string } | { kind: "missing"; missing: string; note?: string }
 ): string | null {
   return x.kind === "present" ? x.value : null;
+}
+
+function pomStringArray(
+  x: any,
+): string[] | null {
+  if (
+    x?.kind !== "present" ||
+    !Array.isArray(x.value)
+  ) {
+    return null;
+  }
+
+  const values =
+    x.value
+      .map((item: any) =>
+        String(item).trim(),
+      )
+      .filter(Boolean);
+
+  return values.length
+    ? values
+    : null;
 }
 
 function pomVowelPath(x: any): string | null {
@@ -71,6 +100,47 @@ export function buildCandidateRowsFromVM(vm: TelemetryViewModel): UICandidateRow
     form: pomStr(c.form) ?? "—",
     status: null, // do not invent; only show when engine emits later
     sourceKind: c.sourceKind ? pomStr(c.sourceKind) : null, // v0.3: provenance surfaced; guard undefined for partial/mock VMs
+
+    targetWord:
+      c.targetWord
+        ? pomStr(c.targetWord)
+        : null,
+
+    sourceId:
+      c.sourceId
+        ? pomStr(c.sourceId)
+        : null,
+
+    sourceStatus:
+      c.sourceStatus
+        ? pomStr(c.sourceStatus)
+        : null,
+
+    semanticBridge:
+      c.semanticBridge
+        ? pomStr(c.semanticBridge)
+        : null,
+
+    evidenceRefs:
+      c.evidenceRefs
+        ? pomStringArray(
+            c.evidenceRefs,
+          )
+        : null,
+
+    attestationTruth:
+      c.attestationTruth
+        ? pomStr(
+            c.attestationTruth,
+          )
+        : null,
+
+    functionalBridgeTruth:
+      c.functionalBridgeTruth
+        ? pomStr(
+            c.functionalBridgeTruth,
+          )
+        : null,
 
     embryo:
       c.embryo

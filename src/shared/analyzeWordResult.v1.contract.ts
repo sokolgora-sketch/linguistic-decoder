@@ -26,6 +26,7 @@ export const AnalysisStatusV0_1ContractSchema = z
     schemaVersion: z.literal("open-instrument.analysis-status.v0_1"),
     status: z.enum([
       "reviewed_functional_evidence",
+      "research_functional_hypothesis",
       "candidate_only",
       "structural_unreviewed",
       "null_no_supported_candidate",
@@ -33,6 +34,7 @@ export const AnalysisStatusV0_1ContractSchema = z
     summary: z.string().min(1),
     reviewedOperators: z.array(z.string()),
     candidateOnlyOperators: z.array(z.string()),
+    researchHypothesisEmbryos: z.array(z.string()),
     structuralTokens: z.array(z.string()),
     claimBoundary: AnalysisStatusClaimBoundaryV0_1ContractSchema,
     userDecisionPosture: z.literal("user_decides"),

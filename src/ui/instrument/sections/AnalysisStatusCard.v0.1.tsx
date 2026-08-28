@@ -8,6 +8,7 @@ import type {
 
 const STATUS_LABELS: Record<AnalysisStatusCodeV0_1, string> = {
   reviewed_functional_evidence: "Reviewed functional evidence",
+  research_functional_hypothesis: "Research functional hypothesis",
   candidate_only: "Candidate only",
   structural_unreviewed: "Hypothesis — structural, unreviewed",
   null_no_supported_candidate: "Null — no supported candidate",
@@ -78,6 +79,20 @@ export function AnalysisStatusCardV0_1({
             {joinOrNone(value.candidateOnlyOperators)}
           </dd>
         </div>
+
+        {value.status ===
+        "research_functional_hypothesis" ? (
+          <div className="rounded-[8px] border border-[#4b3f2c] bg-[#18140e] p-3">
+            <dt className="text-xs text-[#c8ae79]">
+              Research embryos
+            </dt>
+            <dd className="mt-1 font-mono text-[#f0ddb0]">
+              {joinOrNone(
+                value.researchHypothesisEmbryos,
+              )}
+            </dd>
+          </div>
+        ) : null}
 
         <div className="rounded-[8px] border border-[#303843] bg-[#11161c] p-3">
           <dt className="text-xs text-[#8f9aa7]">Structural tokens</dt>

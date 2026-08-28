@@ -589,12 +589,15 @@ function parseAnalysisStatusV0_1(
   const summary = value["summary"];
   const reviewedOperators = value["reviewedOperators"];
   const candidateOnlyOperators = value["candidateOnlyOperators"];
+  const researchHypothesisEmbryos =
+    value["researchHypothesisEmbryos"];
   const structuralTokens = value["structuralTokens"];
   const claimBoundary = value["claimBoundary"];
   const userDecisionPosture = value["userDecisionPosture"];
 
   const allowedStatuses = new Set<AnalysisStatusV0_1VM["status"]>([
     "reviewed_functional_evidence",
+    "research_functional_hypothesis",
     "candidate_only",
     "structural_unreviewed",
     "null_no_supported_candidate",
@@ -609,6 +612,22 @@ function parseAnalysisStatusV0_1(
     !reviewedOperators.every((item) => typeof item === "string") ||
     !Array.isArray(candidateOnlyOperators) ||
     !candidateOnlyOperators.every((item) => typeof item === "string") ||
+    !(
+      (
+        Array.isArray(
+          researchHypothesisEmbryos,
+        ) &&
+        researchHypothesisEmbryos.every(
+          (item) =>
+            typeof item === "string",
+        )
+      ) ||
+      (
+        researchHypothesisEmbryos == null &&
+        statusValue !==
+          "research_functional_hypothesis"
+      )
+    ) ||
     !Array.isArray(structuralTokens) ||
     !structuralTokens.every((item) => typeof item === "string") ||
     !isRecord(claimBoundary) ||
@@ -636,6 +655,14 @@ function parseAnalysisStatusV0_1(
     summary,
     reviewedOperators: reviewedOperators.map((item) => String(item)),
     candidateOnlyOperators: candidateOnlyOperators.map((item) => String(item)),
+    researchHypothesisEmbryos:
+      Array.isArray(
+        researchHypothesisEmbryos,
+      )
+        ? researchHypothesisEmbryos.map(
+            (item) => String(item),
+          )
+        : [],
     structuralTokens: structuralTokens.map((item) => String(item)),
     claimBoundary: {
       historicalOriginClaim: "not_claimed",
@@ -1120,6 +1147,25 @@ const normalizationSteps =
       const candSource = candRecord && isRecord(candRecord["source"]) ? candRecord["source"] : null;
       const candSourceKind = asString(rec["sourceKind"]) ?? (candSource ? asString(candSource["kind"]) : null);
 
+      const targetWord =
+        asString(rec["targetWord"]);
+      const sourceId =
+        asString(rec["sourceId"]);
+      const sourceStatus =
+        asString(rec["sourceStatus"]);
+      const semanticBridge =
+        asString(rec["semanticBridge"]);
+      const evidenceRefs =
+        asStringArray(
+          rec["evidenceRefs"],
+        );
+      const attestationTruth =
+        asString(rec["attestationTruth"]);
+      const functionalBridgeTruth =
+        asString(
+          rec["functionalBridgeTruth"],
+        );
+
       const embryo = asString(rec["embryo"]);
       const plainStandaloneGloss =
         asString(rec["plainStandaloneGloss"]);
@@ -1294,6 +1340,58 @@ const evidenceId = String(id).toLowerCase().replace(/[^a-z0-9_]/g, "_");
         language: lang ? present(lang) : missing("not_emitted"),
         form: form ? present(form) : missing("not_emitted"),
         sourceKind: candSourceKind ? present(candSourceKind) : missing("not_emitted"),
+
+        ...(targetWord
+          ? {
+              targetWord:
+                present(targetWord),
+            }
+          : {}),
+
+        ...(sourceId
+          ? {
+              sourceId:
+                present(sourceId),
+            }
+          : {}),
+
+        ...(sourceStatus
+          ? {
+              sourceStatus:
+                present(sourceStatus),
+            }
+          : {}),
+
+        ...(semanticBridge
+          ? {
+              semanticBridge:
+                present(semanticBridge),
+            }
+          : {}),
+
+        ...(evidenceRefs &&
+        evidenceRefs.length > 0
+          ? {
+              evidenceRefs:
+                present(evidenceRefs),
+            }
+          : {}),
+
+        ...(attestationTruth
+          ? {
+              attestationTruth:
+                present(attestationTruth),
+            }
+          : {}),
+
+        ...(functionalBridgeTruth
+          ? {
+              functionalBridgeTruth:
+                present(
+                  functionalBridgeTruth,
+                ),
+            }
+          : {}),
 
         ...(embryo
           ? { embryo: present(embryo) }

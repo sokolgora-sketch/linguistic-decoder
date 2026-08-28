@@ -41,6 +41,10 @@ import { buildOriginClaimV1 } from "./originClaim.builder.v1";
 import { attachSoundRootsV0_2 } from "./soundRoots/soundRoots.attach.v0.2";
 import { buildAnalysisStatusV0_1 } from "./analysisStatus.v0_1";
 import { discoverStructuralHypothesesV0_1 } from "./structuralHypothesisDiscovery.v0_1";
+import { discoverMultiSourceFunctionalWitnessesV0_1 } from "./multiSourceFunctionalDiscovery.v0_1";
+import { buildMultiSourceFunctionalResearchInputsV0_1 } from "./multiSourceFunctionalResearchEvidenceRegistry.v0_1";
+import { multiSourceFunctionalResearchEvidenceRowsErV0_1 } from "./multiSourceFunctionalResearchEvidenceRows.er.v0_1";
+import { projectMultiSourceFunctionalResearchWitnessesV0_1 } from "./multiSourceFunctionalResearchProjection.v0_1";
 
 function sameStringArray(a: any, b: any): boolean {
   if (!Array.isArray(a) || !Array.isArray(b)) return false;
@@ -452,9 +456,119 @@ export function enginePayloadToAnalysisResult(payload: EnginePayload): AnalyzeWo
       ]);
   }
 
+  // Multi-source functional research v0.1.
+  //
+  // Boundary:
+  // - research discovery is layered only after a deterministic
+  //   structural hypothesis has validly filled the Null gap;
+  // - the runtime code is target/embryo generic: source rows own
+  //   their target-specific functional hypotheses;
+  // - no reviewed evidence, OriginClaim, winner truth, or provider
+  //   execution is created here;
+  // - structural candidates remain present alongside research
+  //   witnesses.
+  const projectedResearchCandidatesV0_1 =
+    shouldProjectStructuralHypothesesV0_1
+      ? structuralHypothesesV0_1.flatMap(
+          (hypothesis) => {
+            const researchInputs =
+              buildMultiSourceFunctionalResearchInputsV0_1({
+                targetWord:
+                  rootMapBasis,
+
+                embryo:
+                  hypothesis.embryo,
+
+                rows:
+                  multiSourceFunctionalResearchEvidenceRowsErV0_1,
+              });
+
+            if (
+              researchInputs.length ===
+              0
+            ) {
+              return [];
+            }
+
+            const researchWitnesses =
+              discoverMultiSourceFunctionalWitnessesV0_1({
+                targetWord:
+                  rootMapBasis,
+
+                embryo:
+                  hypothesis.embryo,
+
+                structuralExpansionChain:
+                  hypothesis
+                    .expansionChain,
+
+                sources:
+                  researchInputs,
+              });
+
+            return projectMultiSourceFunctionalResearchWitnessesV0_1(
+              researchWitnesses,
+            );
+          },
+        )
+      : [];
+
+  if (
+    projectedResearchCandidatesV0_1
+      .length > 0
+  ) {
+    const existingCandidates =
+      Array.isArray(
+        (result as any)
+          .candidates,
+      )
+        ? (result as any)
+            .candidates
+        : [];
+
+    const researchCandidateById =
+      new Map<
+        string,
+        Record<string, unknown>
+      >();
+
+    for (
+      const candidate
+      of projectedResearchCandidatesV0_1
+    ) {
+      const candidateId =
+        String(
+          candidate
+            .candidateId ??
+            "",
+        ).trim();
+
+      if (
+        candidateId &&
+        !researchCandidateById
+          .has(candidateId)
+      ) {
+        researchCandidateById.set(
+          candidateId,
+          candidate as unknown as Record<
+            string,
+            unknown
+          >,
+        );
+      }
+    }
+
+    (result as any).candidates =
+      orderEmbryoFirstCandidatesForAnalyzeV1([
+        ...existingCandidates,
+        ...researchCandidateById.values(),
+      ]);
+  }
+
   // Reuse the untouched baseline when structural discovery was
-  // lower-precedence. Recompute only when structural candidates
-  // actually filled a valid Null gap.
+  // lower-precedence. When structural discovery filled a valid
+  // Null gap, recompute only after any bounded research witnesses
+  // have been layered so aggregate status sees both seams.
   (result as any).analysisStatusV0_1 =
     shouldProjectStructuralHypothesesV0_1
       ? buildAnalysisStatusV0_1({
