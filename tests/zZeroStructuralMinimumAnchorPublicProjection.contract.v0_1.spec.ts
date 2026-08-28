@@ -226,7 +226,7 @@ describe(
     );
 
     it(
-      "projects STERILE because structural discovery fills a genuine Null gap",
+      "keeps STERILE minimum-anchor structural projection while bounded research owns aggregate status",
       async () => {
         const body =
           await analyze(
@@ -238,8 +238,22 @@ describe(
             .analysisStatusV0_1
             .status,
         ).toBe(
-          "structural_unreviewed",
+          "research_functional_hypothesis",
         );
+
+        expect(
+          body
+            .analysisStatusV0_1
+            .researchHypothesisEmbryos,
+        ).toEqual([
+          "ER",
+        ]);
+
+        expect(
+          body
+            .analysisStatusV0_1
+            .structuralTokens,
+        ).toEqual([]);
 
         expect(
           liveStructuralCandidates(

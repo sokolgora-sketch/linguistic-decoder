@@ -127,6 +127,10 @@ describe("Open Instrument canonical operator live smoke profile contract v0.1", 
       "citationBearingEvidenceVisible",
     );
 
+    expect(runner).toContain(
+      '"research_functional_hypothesis"',
+    );
+
     expect(runner).not.toContain("hasReviewedDaEvidence");
     expect(runner).not.toContain("hasReviewedDiProjection");
   });

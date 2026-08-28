@@ -28,7 +28,7 @@ function presentValue(value: any): any {
 }
 
 describe(
-  "Open Instrument structural hypothesis UI truth display v0.1",
+  "Open Instrument structural and research hypothesis UI truth display v0.1",
   () => {
     it(
       "lifts explicit structural truth through the VM boundary",
@@ -160,25 +160,179 @@ describe(
     );
 
     it(
-      "labels structural_unreviewed as Hypothesis rather than evidence",
+      "lifts bounded research provenance and truth levels through the VM and candidate presentation seam",
+      async () => {
+        const body =
+          await analyze(
+            "sterile",
+          );
+
+        body.candidates =
+          body.candidates.filter(
+            (candidate: any) =>
+              candidate?.sourceKind ===
+                "multi_source_research_witness" &&
+              candidate?.sourceId ===
+                "research.external.greek-eremos-empty-devoid.v0_1",
+          );
+
+        const vm =
+          adaptAnalysisToTelemetryVM(
+            body,
+          );
+
+        const research =
+          vm.candidates.find(
+            (candidate: any) =>
+              presentValue(
+                candidate.sourceKind,
+              ) ===
+              "multi_source_research_witness",
+          ) as any;
+
+        expect(
+          research,
+        ).toBeTruthy();
+
+        expect(
+          presentValue(
+            research?.sourceId,
+          ),
+        ).toBe(
+          "research.external.greek-eremos-empty-devoid.v0_1",
+        );
+
+        expect(
+          presentValue(
+            research?.sourceStatus,
+          ),
+        ).toBe(
+          "research_candidate",
+        );
+
+        expect(
+          presentValue(
+            research?.attestationTruth,
+          ),
+        ).toBe(
+          "fact",
+        );
+
+        expect(
+          presentValue(
+            research?.functionalBridgeTruth,
+          ),
+        ).toBe(
+          "hypothesis",
+        );
+
+        expect(
+          presentValue(
+            research?.targetWord,
+          ),
+        ).toBe(
+          "sterile",
+        );
+
+        expect(
+          presentValue(
+            research?.evidenceRefs,
+          ),
+        ).toEqual([
+          "research.external.logeion-eremos.citation.v0_1",
+          "research.external.pokorny-er5-greek-reflex.citation.v0_1",
+        ]);
+
+        render(
+          <CandidatesAccordion
+            rows={
+              buildCandidateRowsFromVM(
+                vm,
+              )
+            }
+          />,
+        );
+
+        expect(
+          screen.getByText(
+            "Research functional hypothesis",
+          ),
+        ).toBeInTheDocument();
+
+        expect(
+          screen.getByText(
+            "Attestation: Fact",
+          ),
+        ).toBeInTheDocument();
+
+        expect(
+          screen.getByText(
+            "Functional bridge: Hypothesis",
+          ),
+        ).toBeInTheDocument();
+
+        expect(
+          screen.getByText(
+            "Historical origin: not claimed",
+          ),
+        ).toBeInTheDocument();
+
+        expect(
+          screen.getByText(
+            "Candidate truth: not claimed",
+          ),
+        ).toBeInTheDocument();
+
+        expect(
+          screen.getByText(
+            /empty, deserted/i,
+          ),
+        ).toBeInTheDocument();
+      },
+    );
+
+    it(
+      "labels source-backed STERILE research as Research functional hypothesis rather than reviewed evidence",
       async () => {
         const vm =
           adaptAnalysisToTelemetryVM(
-            await analyze("sterile"),
+            await analyze(
+              "sterile",
+            ),
           );
 
         expect(
-          vm.analysisStatusV0_1?.kind,
-        ).toBe("present");
+          vm.analysisStatusV0_1
+            ?.kind,
+        ).toBe(
+          "present",
+        );
 
         if (
           vm.analysisStatusV0_1
-            ?.kind !== "present"
+            ?.kind !==
+          "present"
         ) {
           throw new Error(
             "analysisStatusV0_1 missing",
           );
         }
+
+        expect(
+          vm.analysisStatusV0_1
+            .value
+            .status,
+        ).toBe(
+          "research_functional_hypothesis",
+        );
+
+        expect(
+          vm.analysisStatusV0_1
+            .value
+            .researchHypothesisEmbryos,
+        ).toEqual([
+          "ER",
+        ]);
 
         render(
           <AnalysisStatusCardV0_1
@@ -193,8 +347,14 @@ describe(
             "heading",
             {
               name:
-                "Hypothesis — structural, unreviewed",
+                "Research functional hypothesis",
             },
+          ),
+        ).toBeInTheDocument();
+
+        expect(
+          screen.getByText(
+            "Research embryos",
           ),
         ).toBeInTheDocument();
 
@@ -207,15 +367,27 @@ describe(
             },
           ),
         ).not.toBeInTheDocument();
+
+        expect(
+          screen.queryByRole(
+            "heading",
+            {
+              name:
+                "Hypothesis — structural, unreviewed",
+            },
+          ),
+        ).not.toBeInTheDocument();
       },
     );
 
     it(
-      "does not promote structural hypotheses into Functional motivation",
+      "surfaces bounded research in Functional motivation without promoting it to reviewed evidence",
       async () => {
         const vm =
           adaptAnalysisToTelemetryVM(
-            await analyze("sterile"),
+            await analyze(
+              "sterile",
+            ),
           );
 
         render(
@@ -225,10 +397,24 @@ describe(
         );
 
         expect(
-          screen.getByText(
+          screen.queryByText(
             "No supported functional candidate yet.",
           ),
+        ).not.toBeInTheDocument();
+
+        expect(
+          screen.getByText(
+            "Research hypothesis",
+          ),
         ).toBeInTheDocument();
+
+        expect(
+          screen.getAllByText(
+            /productive.*capacity/i,
+          ).length,
+        ).toBeGreaterThan(
+          0,
+        );
 
         expect(
           screen.queryByText(

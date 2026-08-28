@@ -5,6 +5,7 @@ export const ANALYSIS_STATUS_SCHEMA_VERSION_V0_1 =
 
 export type AnalysisStatusCodeV0_1 =
   | "reviewed_functional_evidence"
+  | "research_functional_hypothesis"
   | "candidate_only"
   | "structural_unreviewed"
   | "null_no_supported_candidate";
@@ -26,6 +27,7 @@ export type AnalysisStatusV0_1 = {
   summary: string;
   reviewedOperators: string[];
   candidateOnlyOperators: string[];
+  researchHypothesisEmbryos: string[];
   structuralTokens: string[];
   claimBoundary: AnalysisStatusClaimBoundaryV0_1;
   userDecisionPosture: "user_decides";
@@ -150,6 +152,122 @@ function readVerifiedProposedFunctionalCandidatesV0_1(
 
       return label
         ? [label]
+        : [];
+    }),
+  );
+}
+
+function readResearchFunctionalHypothesisCandidatesV0_1(
+  result: UnknownRecord,
+  analyzedWord: string,
+): string[] {
+  const rows =
+    Array.isArray(result.candidates)
+      ? result.candidates
+      : [];
+
+  const normalizedAnalyzedWord =
+    analyzedWord
+      .trim()
+      .toLocaleLowerCase("en-US");
+
+  if (!normalizedAnalyzedWord) {
+    return [];
+  }
+
+  return uniqueStrings(
+    rows.flatMap((candidate) => {
+      if (!isRecord(candidate)) {
+        return [];
+      }
+
+      const candidateTargetWord =
+        typeof candidate.targetWord ===
+          "string"
+          ? candidate.targetWord
+              .trim()
+              .toLocaleLowerCase("en-US")
+          : "";
+
+      const embryo =
+        typeof candidate.embryo ===
+          "string"
+          ? candidate.embryo.trim()
+          : "";
+
+      const semanticBridge =
+        typeof candidate.semanticBridge ===
+          "string"
+          ? candidate.semanticBridge.trim()
+          : "";
+
+      const evidenceRefs =
+        Array.isArray(candidate.evidenceRefs)
+          ? candidate.evidenceRefs
+              .filter(
+                (value): value is string =>
+                  typeof value === "string",
+              )
+              .map((value) => value.trim())
+              .filter(Boolean)
+          : [];
+
+      const sourceStatusIsResearch =
+        candidate.sourceStatus ===
+          "research_candidate" ||
+        candidate.sourceStatus ===
+          "reviewed_candidate";
+
+      const attestationTruthIsUsable =
+        candidate.attestationTruth ===
+          "fact" ||
+        candidate.attestationTruth ===
+          "inference" ||
+        candidate.attestationTruth ===
+          "hypothesis";
+
+      const functionalBridgeTruthIsUsable =
+        candidate.functionalBridgeTruth ===
+          "fact" ||
+        candidate.functionalBridgeTruth ===
+          "inference" ||
+        candidate.functionalBridgeTruth ===
+          "hypothesis";
+
+      const isBoundedResearchFunctionalHypothesis =
+        candidateTargetWord ===
+          normalizedAnalyzedWord &&
+        embryo.length > 0 &&
+        candidate.sourceKind ===
+          "multi_source_research_witness" &&
+        sourceStatusIsResearch &&
+        candidate.claimType ===
+          "functionalMotivation" &&
+        candidate.validationOutcome ===
+          "not_evaluated" &&
+        candidate.rankGroup ===
+          "unresolved" &&
+        semanticBridge.length > 0 &&
+        evidenceRefs.length > 0 &&
+        attestationTruthIsUsable &&
+        functionalBridgeTruthIsUsable &&
+        candidate.claimBoundary ===
+          "research_functional_hypothesis_only" &&
+        candidate.historicalOriginClaim ===
+          "not_claimed" &&
+        candidate.historicalTransmissionClaim ===
+          "not_claimed" &&
+        candidate.winnerClaim ===
+          "not_claimed" &&
+        candidate.languageSuperiorityClaim ===
+          "not_claimed" &&
+        candidate.candidateTruthClaim ===
+          "not_claimed" &&
+        candidate.userDecisionPosture ===
+          "user_decides";
+
+      return isBoundedResearchFunctionalHypothesis
+        ? [embryo]
         : [];
     }),
   );
@@ -351,12 +469,21 @@ export function buildAnalysisStatusV0_1(resultValue: unknown): AnalysisStatusV0_
         )
       : [];
 
+  const researchHypothesisEmbryos =
+    resultRecord
+      ? readResearchFunctionalHypothesisCandidatesV0_1(
+          resultRecord,
+          basis,
+        )
+      : [];
+
   // Logic-derived structural hypotheses are a lower-precedence
   // status-driving layer. They become aggregate structuralTokens
-  // only when no reviewed, proposed, canonical-candidate, or
-  // existing RootMap structural layer already owns the status.
+  // only when no reviewed, research, proposed, canonical-candidate,
+  // or existing RootMap structural layer already owns the status.
   const structuralHypothesesDriveStatus =
     reviewedOperators.length === 0 &&
+    researchHypothesisEmbryos.length === 0 &&
     proposedFunctionalCandidates.length === 0 &&
     candidateOnlyOperators.length === 0 &&
     structuralTokens.length === 0 &&
@@ -380,6 +507,16 @@ export function buildAnalysisStatusV0_1(resultValue: unknown): AnalysisStatusV0_
       `Bounded reviewed functional evidence is available for ${reviewedOperators.join(
         ", ",
       )}. This is functional evidence, not a historical-origin or winner claim.`;
+  } else if (
+    researchHypothesisEmbryos.length > 0
+  ) {
+    status =
+      "research_functional_hypothesis";
+
+    summary =
+      `Source-backed functional research hypothes${researchHypothesisEmbryos.length === 1 ? "is" : "es"} available for ${researchHypothesisEmbryos.join(
+        ", ",
+      )}. ${researchHypothesisEmbryos.length === 1 ? "It is" : "They are"} not reviewed functional evidence, candidate truth, or historical-origin evidence. User decides.`;
   } else if (
     proposedFunctionalCandidates.length > 0
   ) {
@@ -435,6 +572,7 @@ export function buildAnalysisStatusV0_1(resultValue: unknown): AnalysisStatusV0_
     summary,
     reviewedOperators,
     candidateOnlyOperators,
+    researchHypothesisEmbryos,
     structuralTokens:
       statusStructuralTokens,
     claimBoundary: {

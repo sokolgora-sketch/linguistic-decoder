@@ -51,6 +51,17 @@ function gateTone(status: string | null | undefined): "neutral" | "green" | "amb
   return "neutral";
 }
 
+function truthLabel(
+  value: string | null | undefined,
+): string | null {
+  if (!value) return null;
+
+  return (
+    value.charAt(0).toUpperCase() +
+    value.slice(1)
+  );
+}
+
 export function CandidatesAccordion({ rows }: { rows: UICandidateRow[] }) {
   const [openId, setOpenId] = useState<string | null>(null);
 
@@ -80,6 +91,14 @@ export function CandidatesAccordion({ rows }: { rows: UICandidateRow[] }) {
           const isStructuralHypothesis =
             c.claimType === "structuralHypothesis" &&
             c.discoveryStatus === "structural_hypothesis";
+
+          const isResearchFunctionalHypothesis =
+            c.sourceKind ===
+              "multi_source_research_witness" &&
+            c.claimType ===
+              "functionalMotivation" &&
+            c.claimBoundary ===
+              "research_functional_hypothesis_only";
 
           const hasEmbryoFirstReadout =
             Boolean(
@@ -125,7 +144,9 @@ export function CandidatesAccordion({ rows }: { rows: UICandidateRow[] }) {
                             </CandidateChip>
                           ) : null}
 
-                          {c.validationOutcome && !isStructuralHypothesis ? (
+                          {c.validationOutcome &&
+                          !isStructuralHypothesis &&
+                          !isResearchFunctionalHypothesis ? (
                             <CandidateChip
                               tone={
                                 c.validationOutcome === "validated"
@@ -148,6 +169,12 @@ export function CandidatesAccordion({ rows }: { rows: UICandidateRow[] }) {
                           {c.claimType === "functionalMotivation" ? (
                             <CandidateChip tone="green">
                               Functional motivation
+                            </CandidateChip>
+                          ) : null}
+
+                          {isResearchFunctionalHypothesis ? (
+                            <CandidateChip tone="amber">
+                              Research functional hypothesis
                             </CandidateChip>
                           ) : null}
 
@@ -186,14 +213,45 @@ export function CandidatesAccordion({ rows }: { rows: UICandidateRow[] }) {
                           </div>
                         ) : null}
 
-                        {isStructuralHypothesis &&
+                        {isResearchFunctionalHypothesis &&
+                        c.attestationTruth ? (
+                          <div className="break-words text-xs text-slate-300">
+                            {`Attestation: ${truthLabel(c.attestationTruth)}`}
+                          </div>
+                        ) : null}
+
+                        {isResearchFunctionalHypothesis &&
+                        c.functionalBridgeTruth ? (
+                          <div className="break-words text-xs font-medium text-amber-100">
+                            {`Functional bridge: ${truthLabel(c.functionalBridgeTruth)}`}
+                          </div>
+                        ) : null}
+
+                        {isResearchFunctionalHypothesis &&
+                        c.sourceId ? (
+                          <div className="break-all font-mono text-xs text-slate-400">
+                            {`Source: ${c.sourceId}`}
+                          </div>
+                        ) : null}
+
+                        {isResearchFunctionalHypothesis &&
+                        Array.isArray(c.evidenceRefs) &&
+                        c.evidenceRefs.length > 0 ? (
+                          <div className="break-all font-mono text-xs text-slate-400">
+                            {`Evidence refs: ${c.evidenceRefs.join(", ")}`}
+                          </div>
+                        ) : null}
+
+                        {(isStructuralHypothesis ||
+                          isResearchFunctionalHypothesis) &&
                         c.historicalOriginClaim === "not_claimed" ? (
                           <div className="break-words text-xs text-slate-300">
                             Historical origin: not claimed
                           </div>
                         ) : null}
 
-                        {isStructuralHypothesis &&
+                        {(isStructuralHypothesis ||
+                          isResearchFunctionalHypothesis) &&
                         c.candidateTruthClaim === "not_claimed" ? (
                           <div className="break-words text-xs text-slate-300">
                             Candidate truth: not claimed

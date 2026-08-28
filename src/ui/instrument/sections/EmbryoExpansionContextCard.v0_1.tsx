@@ -594,6 +594,23 @@ export function EmbryoExpansionContextCardV0_1({
         .validationOutcome,
     );
 
+  const isResearchFunctionalCandidate =
+    presentString(
+      primaryCandidate
+        .sourceKind,
+    ) ===
+      "multi_source_research_witness" &&
+    presentString(
+      primaryCandidate
+        .claimType,
+    ) ===
+      "functionalMotivation" &&
+    presentString(
+      primaryCandidate
+        .claimBoundary,
+    ) ===
+      "research_functional_hypothesis_only";
+
   const useLegacyRootMapComposition =
     !isCompositionCandidate(
       primaryCandidate,
@@ -754,6 +771,7 @@ export function EmbryoExpansionContextCardV0_1({
       | "reviewed"
       | "structural"
       | "partial"
+      | "research"
       | "proposed";
   }> = [];
 
@@ -959,6 +977,14 @@ export function EmbryoExpansionContextCardV0_1({
       );
 
     composedMeaning =
+      (
+        isResearchFunctionalCandidate
+          ? presentString(
+              primaryCandidate
+                .semanticBridge,
+            )
+          : null
+      ) ??
       presentString(
         primaryCandidate
           .functionalStatement,
@@ -973,14 +999,17 @@ export function EmbryoExpansionContextCardV0_1({
     const fallbackState:
       | "reviewed"
       | "partial"
+      | "research"
       | "proposed" =
-      evidenceStatus ===
-        "Reviewed"
-        ? "reviewed"
+      isResearchFunctionalCandidate
+        ? "research"
         : evidenceStatus ===
-            "Partial"
-          ? "partial"
-          : "proposed";
+            "Reviewed"
+          ? "reviewed"
+          : evidenceStatus ===
+              "Partial"
+            ? "partial"
+            : "proposed";
 
     for (const token of tokens) {
       const component =
@@ -1001,6 +1030,7 @@ export function EmbryoExpansionContextCardV0_1({
         | "reviewed"
         | "structural"
         | "partial"
+        | "research"
         | "proposed" =
         emittedState ===
           "reviewed" ||
@@ -1008,6 +1038,8 @@ export function EmbryoExpansionContextCardV0_1({
           "structural" ||
         emittedState ===
           "partial" ||
+        emittedState ===
+          "research" ||
         emittedState ===
           "proposed"
           ? emittedState
@@ -1067,7 +1099,9 @@ export function EmbryoExpansionContextCardV0_1({
         </div>
 
         <div className="shrink-0 rounded-full border border-amber-400/50 bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-900 dark:bg-amber-500/10 dark:text-amber-100">
-          {`Evidence: ${evidenceStatus}`}
+          {isResearchFunctionalCandidate
+            ? "Research hypothesis"
+            : `Evidence: ${evidenceStatus}`}
         </div>
       </div>
 

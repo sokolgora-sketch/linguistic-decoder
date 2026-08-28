@@ -158,6 +158,17 @@ export interface CandidateRowVM {
   // winner" — provenance must be visible, not implied.
   sourceKind: PresentOrMissing<string>;
 
+  // Multi-source functional-research provenance.
+  // These fields remain presentation metadata only and do not imply
+  // review, production promotion, historical origin, or candidate truth.
+  targetWord?: PresentOrMissing<string>;
+  sourceId?: PresentOrMissing<string>;
+  sourceStatus?: PresentOrMissing<string>;
+  semanticBridge?: PresentOrMissing<string>;
+  evidenceRefs?: PresentOrMissing<string[]>;
+  attestationTruth?: PresentOrMissing<string>;
+  functionalBridgeTruth?: PresentOrMissing<string>;
+
   // Embryo-first fields are optional because legacy payloads may not emit them.
   // When present, only contractAdapter may lift them from raw analysis data.
   embryo?: PresentOrMissing<string>;
@@ -228,6 +239,7 @@ export interface OriginClaimGatesVM {
 
 export type AnalysisStatusCodeV0_1 =
   | "reviewed_functional_evidence"
+  | "research_functional_hypothesis"
   | "candidate_only"
   | "structural_unreviewed"
   | "null_no_supported_candidate";
@@ -249,6 +261,7 @@ export type AnalysisStatusV0_1VM = {
   summary: string;
   reviewedOperators: string[];
   candidateOnlyOperators: string[];
+  researchHypothesisEmbryos: string[];
   structuralTokens: string[];
   claimBoundary: AnalysisStatusClaimBoundaryV0_1VM;
   userDecisionPosture: "user_decides";

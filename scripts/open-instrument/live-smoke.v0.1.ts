@@ -221,6 +221,7 @@ const EXPECTED_ANALYSIS_STATUS_BY_WORD_V0_1: Readonly<Record<string, string>> = 
 
 const ALLOWED_ANALYSIS_STATUSES_V0_1 = new Set([
   "reviewed_functional_evidence",
+  "research_functional_hypothesis",
   "candidate_only",
   "structural_unreviewed",
   "null_no_supported_candidate",

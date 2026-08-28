@@ -248,7 +248,7 @@ describe(
     );
 
     it(
-      "reconciles STERILE aggregate status from Null to structural_unreviewed",
+      "reconciles STERILE aggregate status to research_functional_hypothesis while preserving structural context",
       async () => {
         const body =
           await analyze(
@@ -259,7 +259,7 @@ describe(
           body.analysisStatusV0_1
             .status,
         ).toBe(
-          "structural_unreviewed",
+          "research_functional_hypothesis",
         );
 
         expect(
@@ -274,11 +274,15 @@ describe(
 
         expect(
           body.analysisStatusV0_1
-            .structuralTokens,
+            .researchHypothesisEmbryos,
         ).toEqual([
           "ER",
-          "ERILE",
         ]);
+
+        expect(
+          body.analysisStatusV0_1
+            .structuralTokens,
+        ).toEqual([]);
 
         expect(
           body.analysisStatusV0_1

@@ -23,6 +23,10 @@ describe(
         "reviewed_functional_evidence",
       ],
       [
+        "sterile",
+        "research_functional_hypothesis",
+      ],
+      [
         "data",
         "candidate_only",
       ],
@@ -87,6 +91,33 @@ describe(
             value.claimBoundary
               .nullIsValid,
           ).toBe(true);
+
+          if (
+            word ===
+            "sterile"
+          ) {
+            expect(
+              value
+                .researchHypothesisEmbryos,
+            ).toEqual([
+              "ER",
+            ]);
+
+            expect(
+              value
+                .reviewedOperators,
+            ).toEqual([]);
+
+            expect(
+              value
+                .candidateOnlyOperators,
+            ).toEqual([]);
+
+            expect(
+              value
+                .structuralTokens,
+            ).toEqual([]);
+          }
         }
       },
     );
