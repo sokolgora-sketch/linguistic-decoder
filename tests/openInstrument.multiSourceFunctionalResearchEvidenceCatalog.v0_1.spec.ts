@@ -136,10 +136,17 @@ describe(
             ? raw.rows as Array<Record<string, unknown>>
             : [];
 
-        expect(rows).toHaveLength(5);
+        const erRows =
+          rows.filter(
+            (row) =>
+              row.embryo ===
+              "ER",
+          );
+
+        expect(erRows).toHaveLength(5);
 
         expect(
-          rows.map(
+          erRows.map(
             (row) =>
               row.researchEvidenceId,
           ),
@@ -152,7 +159,7 @@ describe(
         ]);
 
         const albanian =
-          rows.filter(
+          erRows.filter(
             (row) =>
               row.language ===
               "Albanian",
@@ -172,7 +179,7 @@ describe(
         ]);
 
         expect(
-          rows.map(
+          erRows.map(
             (row) =>
               row.sourceStatus,
           ),
@@ -293,8 +300,6 @@ describe(
               >
           )();
 
-        expect(loaded).toHaveLength(5);
-
         const raw =
           readJson(
             catalogPath,
@@ -307,6 +312,12 @@ describe(
               >
             >;
           };
+
+        expect(
+          loaded,
+        ).toHaveLength(
+          raw.rows.length,
+        );
 
         const unsafeStatus =
           JSON.parse(

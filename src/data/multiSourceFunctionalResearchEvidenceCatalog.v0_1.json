@@ -217,6 +217,47 @@
       "languageSuperiorityClaim": "not_claimed",
       "candidateTruthClaim": "not_claimed",
       "userDecisionPosture": "user_decides"
+    },
+    {
+      "registryVersion": "open-instrument.multi-source-functional-research-evidence-registry.v0_1",
+      "researchEvidenceId": "research.external.karoly-ak-flow.gjak.v0_1",
+      "embryo": "AK",
+      "evidenceFamily": "dialect_lexicon",
+      "language": "Turkic comparative evidence (Tatar and Yakut)",
+      "form": "ak-",
+      "gloss": "to flow",
+      "embryoRelation": "exact_form",
+      "relationOperationIds": [],
+      "attestationTruth": "fact",
+      "sourceStatus": "research_candidate",
+      "citations": [
+        {
+          "citationId": "research.external.karoly-ak-flow.gjak.citation.v0_1",
+          "sourceTitle": "Yakut derivational morphology — An historical approach — Deverbal nominals",
+          "sourceAuthorOrEditor": "László Károly",
+          "sourcePublisherOrHost": "University of Szeged, Department of Altaic Studies",
+          "sourceDateOrVersion": "2007",
+          "sourceUrlOrArchiveRef": "https://doktori.bibl.u-szeged.hu/id/eprint/817/5/2007_laszlo_karoly.pdf",
+          "entryLocator": "printed page 29: Tatar agim 'current' < ak- 'to flow'; Yakut akin 'flow, current; torrent' < ak- 'to flow'",
+          "sourceHashOrArchiveHash": null,
+          "attestedForm": "ak-",
+          "attestedGloss": "to flow"
+        }
+      ],
+      "functionalHypotheses": [
+        {
+          "targetWord": "gjak",
+          "semanticBridge": "an attested 'to flow' function can be tested as functional motivation for blood as a flowing or circulating bodily substance; this is a functional hypothesis only and does not assert historical origin or transmission",
+          "functionalBridgeTruth": "hypothesis",
+          "claimBoundary": "functional_hypothesis_only"
+        }
+      ],
+      "historicalOriginClaim": "not_claimed",
+      "historicalTransmissionClaim": "not_claimed",
+      "winnerClaim": "not_claimed",
+      "languageSuperiorityClaim": "not_claimed",
+      "candidateTruthClaim": "not_claimed",
+      "userDecisionPosture": "user_decides"
     }
   ]
 }
