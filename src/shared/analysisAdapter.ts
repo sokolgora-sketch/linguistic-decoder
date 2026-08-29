@@ -43,8 +43,11 @@ import { buildAnalysisStatusV0_1 } from "./analysisStatus.v0_1";
 import { discoverStructuralHypothesesV0_1 } from "./structuralHypothesisDiscovery.v0_1";
 import { discoverMultiSourceFunctionalWitnessesV0_1 } from "./multiSourceFunctionalDiscovery.v0_1";
 import { buildMultiSourceFunctionalResearchInputsV0_1 } from "./multiSourceFunctionalResearchEvidenceRegistry.v0_1";
-import { multiSourceFunctionalResearchEvidenceRowsErV0_1 } from "./multiSourceFunctionalResearchEvidenceRows.er.v0_1";
+import { loadMultiSourceFunctionalResearchEvidenceCatalogV0_1 } from "./multiSourceFunctionalResearchEvidenceCatalog.v0_1";
 import { projectMultiSourceFunctionalResearchWitnessesV0_1 } from "./multiSourceFunctionalResearchProjection.v0_1";
+
+const multiSourceFunctionalResearchEvidenceCatalogV0_1 =
+  loadMultiSourceFunctionalResearchEvidenceCatalogV0_1();
 
 function sameStringArray(a: any, b: any): boolean {
   if (!Array.isArray(a) || !Array.isArray(b)) return false;
@@ -480,7 +483,7 @@ export function enginePayloadToAnalysisResult(payload: EnginePayload): AnalyzeWo
                   hypothesis.embryo,
 
                 rows:
-                  multiSourceFunctionalResearchEvidenceRowsErV0_1,
+                  multiSourceFunctionalResearchEvidenceCatalogV0_1,
               });
 
             if (
