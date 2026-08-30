@@ -17,6 +17,12 @@ const SUCCESS_PAYLOAD = {
   },
 };
 
+function countAnalyzeV1Fetches(): number {
+  return (global.fetch as jest.Mock).mock.calls.filter(
+    ([input]) => String(input).includes("/api/analyze-v1?")
+  ).length;
+}
+
 describe("/chat retry-after-error contract", () => {
   afterEach(() => {
     jest.restoreAllMocks();
@@ -56,7 +62,7 @@ describe("/chat retry-after-error contract", () => {
     expect(screen.queryByText("Engine error.")).not.toBeInTheDocument();
     expect(screen.queryByText("Open Instrument ready")).not.toBeInTheDocument();
 
-    expect(global.fetch).toHaveBeenCalledTimes(2);
+    expect(countAnalyzeV1Fetches()).toBe(2);
   });
 
   it("clears the visible error banner and renders result state when a retry succeeds after a thrown network failure", async () => {
@@ -88,6 +94,6 @@ describe("/chat retry-after-error contract", () => {
     expect(screen.queryByText("Network error.")).not.toBeInTheDocument();
     expect(screen.queryByText("Open Instrument ready")).not.toBeInTheDocument();
 
-    expect(global.fetch).toHaveBeenCalledTimes(2);
+    expect(countAnalyzeV1Fetches()).toBe(2);
   });
 });

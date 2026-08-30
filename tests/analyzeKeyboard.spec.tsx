@@ -9,6 +9,12 @@ global.fetch = jest.fn(() =>
   } as Response)
 );
 
+function countAnalyzeV1Fetches(): number {
+  return (global.fetch as jest.Mock).mock.calls.filter(
+    ([input]) => String(input).includes('/api/analyze-v1?')
+  ).length;
+}
+
 describe('Analyze keyboard interactions', () => {
   beforeEach(() => {
     const mockIntersectionObserver = jest.fn();
@@ -58,7 +64,7 @@ describe('Analyze keyboard interactions', () => {
     await waitFor(() => {
       expect(screen.queryByText('Analyze one word')).not.toBeInTheDocument();
     });
-    expect(global.fetch).toHaveBeenCalledTimes(1);
+    expect(countAnalyzeV1Fetches()).toBe(1);
   });
 
   it('triggers analysis with Enter key', async () => {
@@ -68,7 +74,7 @@ describe('Analyze keyboard interactions', () => {
     fireEvent.keyDown(input, { key: 'Enter', code: 'Enter' });
 
     await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledTimes(1);
+      expect(countAnalyzeV1Fetches()).toBe(1);
     });
   });
 
@@ -101,7 +107,7 @@ describe('Analyze keyboard interactions', () => {
     fireEvent.keyDown(input, { key: 'Enter', code: 'Enter' });
 
     await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledTimes(1);
+      expect(countAnalyzeV1Fetches()).toBe(1);
     });
 
     // After loading, the button should be re-enabled

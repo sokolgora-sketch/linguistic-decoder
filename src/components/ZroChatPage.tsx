@@ -5,6 +5,8 @@ import ChatShell from '@/components/ChatShell';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { InstrumentPanel } from '@/ui/instrument/InstrumentPanel';
+import { CrossLanguageRecurrenceCardV0_1 } from '@/ui/instrument/sections/CrossLanguageRecurrenceCard.v0.1';
+import type { SevenVoiceFunctionalRecurrenceResearchAvailableV0_1 } from '@/shared/openInstrument/sevenVoiceFunctionalRecurrenceResearchCatalog.v0_1';
 import { MT } from '@/ui/typography/marketingType.v0.1';
 
 class UiErrorBoundary extends React.Component<
@@ -95,6 +97,8 @@ export default function ZroChatPage() {
   const [validation, setValidation] = React.useState<string | null>(null);
   const [statusBanner, setStatusBanner] = React.useState<string | null>(null);
   const [debug, setDebug] = React.useState<string | null>(null);
+  const [recurrenceResearch, setRecurrenceResearch] =
+    React.useState<SevenVoiceFunctionalRecurrenceResearchAvailableV0_1 | null>(null);
   const [messages, setMessages] = React.useState<Msg[]>([
       { id: 'init', role: 'assistant', text: 'Type a word and press Enter.' },
     ]);
@@ -128,6 +132,7 @@ export default function ZroChatPage() {
     setValidation(null);
     setStatusBanner(null);
     setDebug(null);
+    setRecurrenceResearch(null);
 
     const userMsg: Msg = { id: uid(), role: 'user', text: w };
     const assistantMsg: Msg = { id: uid(), role: 'assistant', text: 'Analyzing…' };
@@ -186,6 +191,31 @@ export default function ZroChatPage() {
             : x
         )
       );
+
+      try {
+        const recurrenceRes = await fetch(
+          `/api/research/fvr?concept=${encodeURIComponent(w)}`,
+          { method: 'GET' }
+        );
+
+        if (recurrenceRes.ok) {
+          const recurrenceJson = await recurrenceRes.json();
+
+          if (recurrenceJson?.status === 'available') {
+            setRecurrenceResearch(
+              recurrenceJson as SevenVoiceFunctionalRecurrenceResearchAvailableV0_1
+            );
+          } else {
+            setRecurrenceResearch(null);
+          }
+        } else {
+          setRecurrenceResearch(null);
+        }
+      } catch {
+        // Research recurrence is an optional secondary surface.
+        // It must never make the primary word analysis fail.
+        setRecurrenceResearch(null);
+      }
     } catch (err) {
       setMessages(prev =>
         prev.map(x =>
@@ -290,6 +320,14 @@ export default function ZroChatPage() {
         ) : (
           <OpenInstrumentEmptyState />
         )}
+
+        {recurrenceResearch ? (
+          <UiErrorBoundary label="CrossLanguageRecurrenceCard">
+            <CrossLanguageRecurrenceCardV0_1
+              result={recurrenceResearch}
+            />
+          </UiErrorBoundary>
+        ) : null}
 
         {(validation || statusBanner) && (
           <div role="alert" className="text-sm text-red-400">
