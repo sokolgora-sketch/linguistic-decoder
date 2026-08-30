@@ -44,6 +44,9 @@ const focusedTests = [
   "tests/apiAnalyzeV1.reviewedDaRuntimeProjection.wiring.v0_1.spec.ts",
   "tests/apiAnalyzeV1.reviewedDiRuntimeBlocker.contract.v0_1.spec.ts",
   "tests/docs.uiTelemetryContract.liveSurface.v0_1.spec.ts",
+  "tests/openInstrument.sevenVoiceFunctionalRecurrenceResearchCatalog.water.v0_1.spec.ts",
+  "tests/apiResearchFvr.water.v0_1.spec.ts",
+  "tests/openInstrument.crossLanguageRecurrenceCard.v0_1.spec.tsx",
 ];
 
 function run(command: string, commandArgs: readonly string[]): void {
@@ -429,6 +432,90 @@ async function main(): Promise<void> {
           root: {
             ok: true,
             bytes: rootHtml.length,
+          },
+        },
+        null,
+        2,
+      ),
+    );
+
+    console.log("\n=== cross-language recurrence research surface smoke ===");
+
+    const waterRecurrence =
+      await fetchJson(
+        `${baseUrl}/api/research/fvr?concept=water`,
+      );
+
+    assert(
+      waterRecurrence?.status === "available",
+      "Expected WATER FVR research surface to be available.",
+    );
+
+    assert(
+      Array.isArray(
+        waterRecurrence?.sharedFunctionalNucleus,
+      ) &&
+        waterRecurrence.sharedFunctionalNucleus.length === 1 &&
+        waterRecurrence.sharedFunctionalNucleus[0] === "U",
+      "Expected WATER FVR shared functional nucleus U.",
+    );
+
+    assert(
+      waterRecurrence?.truth?.recurrenceObservationTruth ===
+        "fact_within_declared_comparison_forms",
+      "Expected deterministic recurrence truth boundary.",
+    );
+
+    assert(
+      waterRecurrence?.truth?.functionalVoiceMeaningTruth ===
+        "research_hypothesis",
+      "Expected functional meaning to remain research_hypothesis.",
+    );
+
+    assert(
+      Array.isArray(
+        waterRecurrence?.observations,
+      ) &&
+        waterRecurrence.observations
+          .map((row: any) => row?.comparisonForm)
+          .join("|") ===
+        "UOTER|UJË|UJ|SHUI",
+      "Expected exact admitted WATER comparison cohort.",
+    );
+
+    const unknownRecurrenceResponse =
+      await fetch(
+        `${baseUrl}/api/research/fvr?concept=xyz`,
+      );
+
+    assert(
+      unknownRecurrenceResponse.status === 404,
+      "Expected unknown FVR concept to return 404 not_available.",
+    );
+
+    console.log(
+      JSON.stringify(
+        {
+          water: {
+            status:
+              waterRecurrence.status,
+            conceptId:
+              waterRecurrence.conceptId,
+            sharedFunctionalNucleus:
+              waterRecurrence.sharedFunctionalNucleus,
+            comparisonForms:
+              waterRecurrence.observations.map(
+                (row: any) =>
+                  row?.comparisonForm,
+              ),
+            functionalVoiceMeaningTruth:
+              waterRecurrence
+                ?.truth
+                ?.functionalVoiceMeaningTruth,
+          },
+          unknownConcept: {
+            status:
+              unknownRecurrenceResponse.status,
           },
         },
         null,

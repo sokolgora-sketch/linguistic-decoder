@@ -17,6 +17,12 @@ const SUCCESS_PAYLOAD = {
   },
 };
 
+function countAnalyzeV1Fetches(): number {
+  return (global.fetch as jest.Mock).mock.calls.filter(
+    ([input]) => String(input).includes("/api/analyze-v1?")
+  ).length;
+}
+
 describe("/chat submit empty-state transition contract", () => {
   afterEach(() => {
     jest.restoreAllMocks();
@@ -46,7 +52,7 @@ describe("/chat submit empty-state transition contract", () => {
 
     expect(screen.queryByText("Analyze one word")).not.toBeInTheDocument();
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();
-    expect(global.fetch).toHaveBeenCalledTimes(1);
+    expect(countAnalyzeV1Fetches()).toBe(1);
   });
 
   it("keeps the empty state visible when submit is attempted with blank input and does not call fetch", async () => {
