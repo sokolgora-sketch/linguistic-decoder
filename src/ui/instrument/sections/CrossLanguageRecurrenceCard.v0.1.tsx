@@ -13,6 +13,15 @@ CrossLanguageRecurrenceCardV0_1(
       SevenVoiceFunctionalRecurrenceResearchAvailableV0_1;
   },
 ) {
+  const functionalNormalizationComparisons =
+    result.observations.filter(
+      (
+        observation,
+      ) =>
+        observation.comparisonMode ===
+        "z_zero_functional_normalization",
+    );
+
   return (
     <section
       aria-label="Cross-Language Recurrence research"
@@ -52,10 +61,32 @@ CrossLanguageRecurrenceCardV0_1(
             className="mt-3 rounded-[8px] border border-[#303a45] bg-black/20 p-2 text-xs leading-5 text-[#aeb7c5]"
             data-testid="fvr-mode-separation"
           >
-            This FVR comparison path is separate from the single-word
-            functional normalization shown elsewhere. WATER → UOTER is an
-            explicit ZË-RO project-doctrine comparison form for this research
-            cohort; it does not replace the Analyze V1 functional path.
+            {functionalNormalizationComparisons.length > 0 ? (
+              <>
+                This FVR comparison path is separate from the single-word
+                functional normalization shown elsewhere.{" "}
+                {functionalNormalizationComparisons
+                  .map(
+                    (
+                      observation,
+                    ) =>
+                      `${observation.surfaceForm} → ${observation.comparisonForm}`,
+                  )
+                  .join(
+                    ", ",
+                  )}{" "}
+                uses explicitly declared ZË-RO functional-normalization
+                comparison data for this research cohort; it does not replace
+                the Analyze V1 functional path.
+              </>
+            ) : (
+              <>
+                These FVR comparison forms use their declared research
+                comparison modes and remain separate from the single-word
+                Analyze V1 result; they do not replace the Analyze V1
+                functional path.
+              </>
+            )}
           </div>
         </div>
 

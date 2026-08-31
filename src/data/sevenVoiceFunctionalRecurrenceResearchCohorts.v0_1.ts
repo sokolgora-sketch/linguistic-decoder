@@ -396,5 +396,189 @@ sevenVoiceFunctionalRecurrenceResearchCohortCatalogV0_1 =
         ],
       },
     },
+
+    {
+      conceptId:
+        "EYE",
+
+      aliases: [
+        "eye",
+      ],
+
+      cohort: {
+        schemaVersion:
+          SEVEN_VOICE_FUNCTIONAL_RECURRENCE_COHORT_EVIDENCE_SCHEMA_V0_1,
+
+        cohortId:
+          "research.recurrence.eye.v0_1",
+
+        conceptId:
+          "EYE",
+
+        observations: [
+          {
+            recurrenceEvidenceId:
+              "research.eye.english-eye.v0_1",
+
+            evidenceRole:
+              "cohort_member",
+
+            languageId:
+              "English",
+
+            languageVariety:
+              null,
+
+            surfaceForm:
+              "EYE",
+
+            comparisonForm:
+              "EYE",
+
+            comparisonMode:
+              "orthography",
+
+            comparisonAuthority:
+              "source_orthography",
+
+            comparisonProvenance: {
+              provenanceId:
+                "research.eye.english-eye.orthography.v0_1",
+
+              authority:
+                "source_orthography",
+
+              ruleId:
+                null,
+
+              evidenceRefs: [],
+            },
+
+            attestationTruth:
+              "fact",
+
+            sourceStatus:
+              "research_candidate",
+
+            citations: [
+              {
+                citationId:
+                  "research.eye.english.oxford-eye.v0_1",
+
+                sourceTitle:
+                  "Oxford Advanced Learner's Dictionary — eye noun",
+
+                sourceAuthorOrEditor:
+                  null,
+
+                sourcePublisherOrHost:
+                  "Oxford University Press",
+
+                sourceDateOrVersion:
+                  "accessed 2026-08-30",
+
+                sourceUrlOrArchiveRef:
+                  "https://www.oxfordlearnersdictionaries.com/us/definition/english/eye_1",
+
+                entryLocator:
+                  "eye noun; part of body; sense 1",
+
+                sourceHashOrArchiveHash:
+                  null,
+
+                attestedForm:
+                  "EYE",
+
+                attestedGloss:
+                  "eye",
+              },
+            ],
+
+            claimBoundary,
+          },
+
+          {
+            recurrenceEvidenceId:
+              "research.eye.albanian-standard-sy.v0_1",
+
+            evidenceRole:
+              "cohort_member",
+
+            languageId:
+              "Albanian",
+
+            languageVariety:
+              "Standard",
+
+            surfaceForm:
+              "SY",
+
+            comparisonForm:
+              "SY",
+
+            comparisonMode:
+              "orthography",
+
+            comparisonAuthority:
+              "source_orthography",
+
+            comparisonProvenance: {
+              provenanceId:
+                "research.eye.albanian-standard-sy.orthography.v0_1",
+
+              authority:
+                "source_orthography",
+
+              ruleId:
+                null,
+
+              evidenceRefs: [],
+            },
+
+            attestationTruth:
+              "fact",
+
+            sourceStatus:
+              "research_candidate",
+
+            citations: [
+              {
+                citationId:
+                  "research.eye.albanian-standard.iecor-211.v0_1",
+
+                sourceTitle:
+                  "IE-CoR Cognate Set 211 — eye",
+
+                sourceAuthorOrEditor:
+                  "Matthew Scarborough et al.",
+
+                sourcePublisherOrHost:
+                  "IE-CoR",
+
+                sourceDateOrVersion:
+                  "accessed 2026-08-30",
+
+                sourceUrlOrArchiveRef:
+                  "https://iecor.clld.org/cognatesets/211",
+
+                entryLocator:
+                  "Albanian: Standard; lexeme sy; meaning eye",
+
+                sourceHashOrArchiveHash:
+                  null,
+
+                attestedForm:
+                  "SY",
+
+                attestedGloss:
+                  "eye",
+              },
+            ],
+
+            claimBoundary,
+          },
+        ],
+      },
+    },
   ] as const satisfies
     readonly SevenVoiceFunctionalRecurrenceResearchCohortCatalogEntryV0_1[];

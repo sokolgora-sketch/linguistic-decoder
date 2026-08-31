@@ -92,6 +92,16 @@ describe(
         );
 
         expect(
+          screen
+            .getByTestId(
+              "fvr-mode-separation",
+            )
+            .textContent,
+        ).toMatch(
+          /WATER → UOTER/,
+        );
+
+        expect(
           screen.getAllByText(
             "UJ",
           ),
@@ -137,6 +147,106 @@ describe(
             {
               name:
                 /Revised Mandarin Chinese Dictionary/i,
+            },
+          ),
+        ).toBeTruthy();
+      },
+    );
+
+    it(
+      "shows the EYE Y recurrence without WATER-specific normalization copy",
+      () => {
+        const result =
+          buildSevenVoiceFunctionalRecurrenceResearchSurfaceV0_1(
+            "eye",
+          );
+
+        if (
+          !result ||
+          result.status !==
+            "available"
+        ) {
+          throw new Error(
+            "expected available EYE research result",
+          );
+        }
+
+        render(
+          <CrossLanguageRecurrenceCardV0_1
+            result={
+              result
+            }
+          />,
+        );
+
+        expect(
+          screen
+            .getByTestId(
+              "fvr-shared-nucleus",
+            )
+            .textContent,
+        ).toBe(
+          "Y",
+        );
+
+        expect(
+          screen.getAllByText(
+            "EYE",
+          ),
+        ).toHaveLength(
+          2,
+        );
+
+        expect(
+          screen.getAllByText(
+            "SY",
+          ),
+        ).toHaveLength(
+          2,
+        );
+
+        const modeSeparation =
+          screen
+            .getByTestId(
+              "fvr-mode-separation",
+            )
+            .textContent ??
+          "";
+
+        expect(
+          modeSeparation,
+        ).toMatch(
+          /declared research comparison modes/i,
+        );
+
+        expect(
+          modeSeparation,
+        ).toMatch(
+          /do not replace the Analyze V1 functional path/i,
+        );
+
+        expect(
+          modeSeparation,
+        ).not.toMatch(
+          /WATER|UOTER/i,
+        );
+
+        expect(
+          screen.getByRole(
+            "link",
+            {
+              name:
+                /Oxford Advanced Learner's Dictionary/i,
+            },
+          ),
+        ).toBeTruthy();
+
+        expect(
+          screen.getByRole(
+            "link",
+            {
+              name:
+                /IE-CoR Cognate Set 211/i,
             },
           ),
         ).toBeTruthy();
