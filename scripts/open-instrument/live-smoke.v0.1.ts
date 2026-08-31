@@ -45,7 +45,9 @@ const focusedTests = [
   "tests/apiAnalyzeV1.reviewedDiRuntimeBlocker.contract.v0_1.spec.ts",
   "tests/docs.uiTelemetryContract.liveSurface.v0_1.spec.ts",
   "tests/openInstrument.sevenVoiceFunctionalRecurrenceResearchCatalog.water.v0_1.spec.ts",
+  "tests/openInstrument.sevenVoiceFunctionalRecurrenceResearchCatalog.eye.v0_1.spec.ts",
   "tests/apiResearchFvr.water.v0_1.spec.ts",
+  "tests/apiResearchFvr.eye.v0_1.spec.ts",
   "tests/openInstrument.crossLanguageRecurrenceCard.v0_1.spec.tsx",
 ];
 
@@ -483,6 +485,48 @@ async function main(): Promise<void> {
       "Expected exact admitted WATER comparison cohort.",
     );
 
+    const eyeRecurrence =
+      await fetchJson(
+        `${baseUrl}/api/research/fvr?concept=eye`,
+      );
+
+    assert(
+      eyeRecurrence?.status === "available",
+      "Expected EYE FVR research surface to be available.",
+    );
+
+    assert(
+      Array.isArray(
+        eyeRecurrence?.sharedFunctionalNucleus,
+      ) &&
+        eyeRecurrence.sharedFunctionalNucleus.length === 1 &&
+        eyeRecurrence.sharedFunctionalNucleus[0] === "Y",
+      "Expected EYE FVR shared functional nucleus Y.",
+    );
+
+    assert(
+      eyeRecurrence?.truth?.recurrenceObservationTruth ===
+        "fact_within_declared_comparison_forms",
+      "Expected EYE deterministic recurrence truth boundary.",
+    );
+
+    assert(
+      eyeRecurrence?.truth?.functionalVoiceMeaningTruth ===
+        "research_hypothesis",
+      "Expected EYE functional meaning to remain research_hypothesis.",
+    );
+
+    assert(
+      Array.isArray(
+        eyeRecurrence?.observations,
+      ) &&
+        eyeRecurrence.observations
+          .map((row: any) => row?.comparisonForm)
+          .join("|") ===
+        "EYE|SY",
+      "Expected exact admitted EYE comparison cohort.",
+    );
+
     const unknownRecurrenceResponse =
       await fetch(
         `${baseUrl}/api/research/fvr?concept=xyz`,
@@ -510,6 +554,23 @@ async function main(): Promise<void> {
               ),
             functionalVoiceMeaningTruth:
               waterRecurrence
+                ?.truth
+                ?.functionalVoiceMeaningTruth,
+          },
+          eye: {
+            status:
+              eyeRecurrence.status,
+            conceptId:
+              eyeRecurrence.conceptId,
+            sharedFunctionalNucleus:
+              eyeRecurrence.sharedFunctionalNucleus,
+            comparisonForms:
+              eyeRecurrence.observations.map(
+                (row: any) =>
+                  row?.comparisonForm,
+              ),
+            functionalVoiceMeaningTruth:
+              eyeRecurrence
                 ?.truth
                 ?.functionalVoiceMeaningTruth,
           },
