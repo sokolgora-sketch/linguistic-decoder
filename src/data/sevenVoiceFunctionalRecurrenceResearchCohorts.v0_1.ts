@@ -580,5 +580,190 @@ sevenVoiceFunctionalRecurrenceResearchCohortCatalogV0_1 =
         ],
       },
     },
+      {
+        conceptId:
+          "FATHER",
+
+        aliases: [
+          "father",
+        ],
+
+        cohort: {
+          schemaVersion:
+            SEVEN_VOICE_FUNCTIONAL_RECURRENCE_COHORT_EVIDENCE_SCHEMA_V0_1,
+
+          cohortId:
+            "research.recurrence.father.v0_1",
+
+          conceptId:
+            "FATHER",
+
+          observations: [
+            {
+              recurrenceEvidenceId:
+                "research.father.english-father.v0_1",
+
+              evidenceRole:
+                "cohort_member",
+
+              languageId:
+                "English",
+
+              languageVariety:
+                null,
+
+              surfaceForm:
+                "FATHER",
+
+              comparisonForm:
+                "FATHER",
+
+              comparisonMode:
+                "orthography",
+
+              comparisonAuthority:
+                "source_orthography",
+
+              comparisonProvenance: {
+                provenanceId:
+                  "research.father.english-father.orthography.v0_1",
+
+                authority:
+                  "source_orthography",
+
+                ruleId:
+                  null,
+
+                evidenceRefs: [],
+              },
+
+              attestationTruth:
+                "fact",
+
+              sourceStatus:
+                "research_candidate",
+
+              citations: [
+                {
+                  citationId:
+                    "research.father.english.oxford-father.v0_1",
+
+                  sourceTitle:
+                    "Oxford Advanced Learner's Dictionary — father noun",
+
+                  sourceAuthorOrEditor:
+                    null,
+
+                  sourcePublisherOrHost:
+                    "Oxford University Press",
+
+                  sourceDateOrVersion:
+                    "accessed 2026-08-31",
+
+                  sourceUrlOrArchiveRef:
+                    "https://www.oxfordlearnersdictionaries.com/us/definition/english/father_1",
+
+                  entryLocator:
+                    "father noun; sense 1; male parent",
+
+                  sourceHashOrArchiveHash:
+                    null,
+
+                  attestedForm:
+                    "FATHER",
+
+                  attestedGloss:
+                    "father",
+                },
+              ],
+
+              claimBoundary,
+            },
+
+            {
+              recurrenceEvidenceId:
+                "research.father.albanian-at.v0_1",
+
+              evidenceRole:
+                "cohort_member",
+
+              languageId:
+                "Albanian",
+
+              languageVariety:
+                null,
+
+              surfaceForm:
+                "AT",
+
+              comparisonForm:
+                "AT",
+
+              comparisonMode:
+                "orthography",
+
+              comparisonAuthority:
+                "source_orthography",
+
+              comparisonProvenance: {
+                provenanceId:
+                  "research.father.albanian-at.orthography.v0_1",
+
+                authority:
+                  "source_orthography",
+
+                ruleId:
+                  null,
+
+                evidenceRefs: [
+                  "reviewed.external.albanian-at.father.citation.v0_1",
+                ],
+              },
+
+              attestationTruth:
+                "fact",
+
+              sourceStatus:
+                "research_candidate",
+
+              citations: [
+                {
+                  citationId:
+                    "research.father.albanian.at-ieed.v0_1",
+
+                  sourceTitle:
+                    "The Albanian inherited lexicon",
+
+                  sourceAuthorOrEditor:
+                    "Bardhyl Demiraj; database revised by Alexander Lubotsky and Michiel de Vaan",
+
+                  sourcePublisherOrHost:
+                    "IEED / ieed.ullet.net",
+
+                  sourceDateOrVersion:
+                    "Demiraj 1997; database compiled 1998-1999; accessed 2026-08-16",
+
+                  sourceUrlOrArchiveRef:
+                    "https://ieed.ullet.net/alb.html",
+
+                  entryLocator:
+                    "at [m] (tg) {2} 'father'; Alb. atë [m] (tg) 'father' (AE 83)",
+
+                  sourceHashOrArchiveHash:
+                    null,
+
+                  attestedForm:
+                    "at",
+
+                  attestedGloss:
+                    "father",
+                },
+              ],
+
+              claimBoundary,
+            },
+          ],
+        },
+      },
   ] as const satisfies
     readonly SevenVoiceFunctionalRecurrenceResearchCohortCatalogEntryV0_1[];

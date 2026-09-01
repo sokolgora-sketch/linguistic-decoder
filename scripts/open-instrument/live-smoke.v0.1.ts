@@ -527,6 +527,48 @@ async function main(): Promise<void> {
       "Expected exact admitted EYE comparison cohort.",
     );
 
+    const fatherRecurrence =
+      await fetchJson(
+        `${baseUrl}/api/research/fvr?concept=father`,
+      );
+
+    assert(
+      fatherRecurrence?.status === "available",
+      "Expected FATHER FVR research surface to be available.",
+    );
+
+    assert(
+      Array.isArray(
+        fatherRecurrence?.sharedFunctionalNucleus,
+      ) &&
+        fatherRecurrence.sharedFunctionalNucleus.length === 1 &&
+        fatherRecurrence.sharedFunctionalNucleus[0] === "A",
+      "Expected FATHER FVR shared functional nucleus A.",
+    );
+
+    assert(
+      fatherRecurrence?.truth?.recurrenceObservationTruth ===
+        "fact_within_declared_comparison_forms",
+      "Expected FATHER deterministic recurrence truth boundary.",
+    );
+
+    assert(
+      fatherRecurrence?.truth?.functionalVoiceMeaningTruth ===
+        "research_hypothesis",
+      "Expected FATHER functional meaning to remain research_hypothesis.",
+    );
+
+    assert(
+      Array.isArray(
+        fatherRecurrence?.observations,
+      ) &&
+        fatherRecurrence.observations
+          .map((row: any) => row?.comparisonForm)
+          .join("|") ===
+        "FATHER|AT",
+      "Expected exact admitted FATHER comparison cohort.",
+    );
+
     const unknownRecurrenceResponse =
       await fetch(
         `${baseUrl}/api/research/fvr?concept=xyz`,
@@ -571,6 +613,23 @@ async function main(): Promise<void> {
               ),
             functionalVoiceMeaningTruth:
               eyeRecurrence
+                ?.truth
+                ?.functionalVoiceMeaningTruth,
+          },
+          father: {
+            status:
+              fatherRecurrence.status,
+            conceptId:
+              fatherRecurrence.conceptId,
+            sharedFunctionalNucleus:
+              fatherRecurrence.sharedFunctionalNucleus,
+            comparisonForms:
+              fatherRecurrence.observations.map(
+                (row: any) =>
+                  row?.comparisonForm,
+              ),
+            functionalVoiceMeaningTruth:
+              fatherRecurrence
                 ?.truth
                 ?.functionalVoiceMeaningTruth,
           },
