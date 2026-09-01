@@ -1,0 +1,206 @@
+import fs from "node:fs";
+
+const DOC =
+  "docs/open-instrument/z-zero-seven-voice-functional-recurrence-statistics-research-design-v0.1.md";
+
+function read(
+  path: string,
+): string {
+  return fs.readFileSync(
+    path,
+    "utf8",
+  );
+}
+
+describe(
+  "ZË-RO Seven-Voice Functional Recurrence Statistics Research Design v0.1",
+  () => {
+    it(
+      "locks the milestone as design-only and explicitly non-implementing",
+      () => {
+        const doc =
+          read(DOC);
+
+        expect(doc).toContain(
+          "SEVEN_VOICE_FUNCTIONAL_RECURRENCE_STATISTICS_RESEARCH_DESIGN_V0_1",
+        );
+
+        expect(doc).toContain(
+          "open-instrument.seven-voice-functional-recurrence-statistics-research-design.v0_1",
+        );
+
+        expect(doc).toContain(
+          "Status: DESIGN_ONLY.",
+        );
+
+        expect(doc).toContain(
+          "It does not calculate statistics.",
+        );
+
+        expect(doc).toContain(
+          "It does not authorize statistics implementation.",
+        );
+
+        expect(doc).toContain(
+          "**Evidence admission precedes recurrence statistics.**",
+        );
+      },
+    );
+
+    it(
+      "locks current evidence to WATER EYE and FATHER without inventing a numeric threshold",
+      () => {
+        const doc =
+          read(DOC);
+
+        for (
+          const required
+          of [
+            "WATER → shared `U`",
+            "EYE → shared `Y`",
+            "FATHER → shared `A`",
+            "This design does not choose a numeric minimum cohort count.",
+            "The number three is not itself treated as a statistical threshold.",
+            "The current three live cohorts do not, by themselves, authorize inferential statistics.",
+            "`insufficient_data`",
+          ]
+        ) {
+          expect(doc).toContain(
+            required,
+          );
+        }
+      },
+    );
+
+    it(
+      "requires an explicit corpus cohort-selection controls dependence baseline and null model",
+      () => {
+        const doc =
+          read(DOC);
+
+        for (
+          const required
+          of [
+            "## Corpus definition",
+            "## Cohort-selection rules",
+            "## Positive controls, negative controls, and counterexamples",
+            "## Independence and dependence",
+            "## Comparison-mode separation",
+            "## Canonical-voice baseline frequencies",
+            "## Null model",
+            "## Minimum evidence and insufficiency posture",
+          ]
+        ) {
+          expect(doc).toContain(
+            required,
+          );
+        }
+
+        expect(doc).toContain(
+          "Outcome-driven cohort selection is prohibited.",
+        );
+
+        expect(doc).toContain(
+          "No assumption of equal `1/7` baseline probability is authorized by this milestone.",
+        );
+
+        expect(doc).toContain(
+          "This milestone does not select a permutation test, parametric model, Bayesian model, bootstrap, or other statistical method.",
+        );
+      },
+    );
+
+    it(
+      "preserves explicit comparison modes and forbids silent pooling",
+      () => {
+        const doc =
+          read(DOC);
+
+        for (
+          const required
+          of [
+            "`orthography`",
+            "`transliteration`",
+            "`z_zero_functional_normalization`",
+            "A future statistics design must not pool these modes silently.",
+            "`WATER -> UOTER` remains explicit ZË-RO functional-normalization doctrine",
+          ]
+        ) {
+          expect(doc).toContain(
+            required,
+          );
+        }
+      },
+    );
+
+    it(
+      "locks Null insufficiency truth hierarchy and non-promotion boundaries",
+      () => {
+        const doc =
+          read(DOC);
+
+        for (
+          const required
+          of [
+            "Fact",
+            "Inference",
+            "Hypothesis",
+            "Unknown / Null",
+            "Null and insufficiency are valid scientific outcomes.",
+            "`candidateTruthClaim = not_claimed`",
+            "`universalityClaim = not_claimed`",
+            "`userDecisionPosture = user_decides`",
+            "`no_single_winner`",
+            "## Promotion prohibition",
+          ]
+        ) {
+          expect(doc).toContain(
+            required,
+          );
+        }
+      },
+    );
+
+    it(
+      "locks statistics implementation API UI engine catalog provider and JO work as unauthorized",
+      () => {
+        const doc =
+          read(DOC);
+
+        expect(doc).toContain(
+          "## No implementation authorization",
+        );
+
+        for (
+          const required
+          of [
+            "recurrence statistics runtime code",
+            "statistics helpers",
+            "statistical libraries",
+            "API routes",
+            "UI surfaces",
+            "recurrence engine logic",
+            "evidence-admission logic",
+            "research catalog data",
+            "new source-backed cohorts",
+            "provider execution",
+            "evidence promotion",
+            "JO runtime work",
+          ]
+        ) {
+          expect(doc).toContain(
+            required,
+          );
+        }
+
+        expect(doc).toContain(
+          "`blocked_methodology_incomplete`",
+        );
+
+        expect(doc).toContain(
+          "`not_authorized`",
+        );
+      },
+    );
+  },
+);
