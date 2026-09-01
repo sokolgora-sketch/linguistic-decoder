@@ -46,8 +46,10 @@ const focusedTests = [
   "tests/docs.uiTelemetryContract.liveSurface.v0_1.spec.ts",
   "tests/openInstrument.sevenVoiceFunctionalRecurrenceResearchCatalog.water.v0_1.spec.ts",
   "tests/openInstrument.sevenVoiceFunctionalRecurrenceResearchCatalog.eye.v0_1.spec.ts",
+  "tests/openInstrument.sevenVoiceFunctionalRecurrenceResearchCatalog.father.v0_1.spec.ts",
   "tests/apiResearchFvr.water.v0_1.spec.ts",
   "tests/apiResearchFvr.eye.v0_1.spec.ts",
+  "tests/apiResearchFvr.father.v0_1.spec.ts",
   "tests/openInstrument.crossLanguageRecurrenceCard.v0_1.spec.tsx",
 ];
 
