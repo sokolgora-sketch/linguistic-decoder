@@ -134,6 +134,36 @@ describe(
     );
 
     it(
+      "locks adaptive stopping discovery-confirmatory separation and multiplicity handling",
+      () => {
+        const doc =
+          read(DOC);
+
+        for (
+          const required
+          of [
+            "preregister a stopping rule",
+            "sequential-inference method",
+            "Repeatedly checking a conventional significance result and stopping when a preferred threshold appears is prohibited.",
+            "### Discovery versus confirmatory evidence",
+            "remain exploratory evidence",
+            "independent preregistered holdout",
+            "Reusing discovery cohorts as though they were an independent holdout is prohibited.",
+            "## Multiplicity and confirmatory endpoints",
+            "define the hypothesis family before confirmatory testing begins",
+            "preregister one primary endpoint or primary hypothesis",
+            "multiplicity-correction procedure",
+            "those results must remain explicitly exploratory",
+          ]
+        ) {
+          expect(doc).toContain(
+            required,
+          );
+        }
+      },
+    );
+
+    it(
       "locks Null insufficiency truth hierarchy and non-promotion boundaries",
       () => {
         const doc =

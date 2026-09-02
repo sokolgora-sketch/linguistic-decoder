@@ -85,6 +85,17 @@ It must state:
 - whether the corpus is fixed before analysis or expanded adaptively
 - how duplicate lexical or source evidence is prevented from inflating counts
 
+If corpus expansion is adaptive, merely declaring that posture is not sufficient for confirmatory inference.
+
+Before confirmatory analysis begins, the methodology must either:
+
+- preregister a stopping rule that determines when corpus expansion ends
+- or use a reviewed sequential-inference method whose uncertainty calculation explicitly accounts for adaptive sampling
+
+Repeatedly checking a conventional significance result and stopping when a preferred threshold appears is prohibited.
+
+If no valid stopping rule or sequential-inference treatment exists, results from adaptive expansion remain exploratory.
+
 A convenience sample must not be presented as a representative linguistic population.
 
 ## Cohort-selection rules
@@ -106,6 +117,24 @@ Selection rules must address:
 Cohorts must not be selected because they produce a desired shared voice.
 
 Outcome-driven cohort selection is prohibited.
+
+### Discovery versus confirmatory evidence
+
+A cohort used to discover or motivate a recurrence hypothesis must not also be treated as independent confirmatory evidence for that same hypothesis.
+
+The current live cohorts:
+
+- WATER → shared `U`
+- EYE → shared `Y`
+- FATHER → shared `A`
+
+remain exploratory evidence for any U, Y, or A functional-recurrence hypothesis that was discovered, selected, or refined using those cohorts.
+
+Confirmatory inference for such a hypothesis requires an independent preregistered holdout or other independently collected confirmatory evidence that was not used to discover, select, tune, or refine the tested hypothesis.
+
+The confirmatory target, cohort-selection rule, comparison mode, stopping rule, and primary analysis must be declared before the holdout evidence is examined.
+
+Reusing discovery cohorts as though they were an independent holdout is prohibited.
 
 ## Inclusion and exclusion
 
@@ -220,6 +249,30 @@ It must specify:
 This milestone does not select a permutation test, parametric model, Bayesian model, bootstrap, or other statistical method.
 
 Method selection remains a future reviewed decision.
+
+## Multiplicity and confirmatory endpoints
+
+A future methodology must define the hypothesis family before confirmatory testing begins.
+
+The hypothesis family must state which combination of these dimensions is being tested:
+
+- canonical voices
+- lexical concepts
+- comparison modes
+- recurrence outcomes
+- test statistics
+- subgroup or language-family analyses
+
+Testing multiple voices, concepts, modes, statistics, or subgroups and reporting only favorable results is prohibited.
+
+For confirmatory inference, the future methodology must do at least one of the following as appropriate to the declared research question:
+
+- preregister one primary endpoint or primary hypothesis before confirmatory evidence is examined
+- define an explicit multiplicity-correction procedure for the declared hypothesis family
+
+If multiple uncorrected tests are explored without a preregistered primary endpoint or reviewed multiplicity handling, those results must remain explicitly exploratory and must not be presented as confirmatory statistical evidence.
+
+The future methodology must preserve the distinction between exploratory hypothesis generation and confirmatory inference.
 
 ## Minimum evidence and insufficiency posture
 
