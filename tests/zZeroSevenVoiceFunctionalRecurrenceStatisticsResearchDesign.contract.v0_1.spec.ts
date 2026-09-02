@@ -151,9 +151,15 @@ describe(
             "Reusing discovery cohorts as though they were an independent holdout is prohibited.",
             "## Multiplicity and confirmatory endpoints",
             "define the hypothesis family before confirmatory testing begins",
-            "preregister one primary endpoint or primary hypothesis",
+            "preregister one sole primary endpoint or primary hypothesis",
             "multiplicity-correction procedure",
-            "those results must remain explicitly exploratory",
+            "- or remain explicitly exploratory and must not be presented as confirmatory statistical evidence",
+            "Every confirmatory endpoint outside the sole preregistered primary endpoint",
+            "Secondary voices, concepts, modes, subgroup analyses, alternative statistics, and other non-primary tests do not become confirmatory merely because one primary endpoint was preregistered.",
+            "comparison authority and deterministic transformation procedure must also be frozen before holdout evidence is examined",
+            "the applicable non-empty rule id",
+            "The exact comparison form for a holdout must therefore be derived under the frozen authority and rule rather than selected after inspecting the holdout result.",
+            "Post-hoc alternative transliterations, normalizations, authorities, rule ids, or comparison forms must remain explicitly exploratory",
           ]
         ) {
           expect(doc).toContain(

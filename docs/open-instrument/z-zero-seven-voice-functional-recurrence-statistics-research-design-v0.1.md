@@ -134,6 +134,19 @@ Confirmatory inference for such a hypothesis requires an independent preregister
 
 The confirmatory target, cohort-selection rule, comparison mode, stopping rule, and primary analysis must be declared before the holdout evidence is examined.
 
+For any confirmatory use of `transliteration` or `z_zero_functional_normalization`, the comparison authority and deterministic transformation procedure must also be frozen before holdout evidence is examined.
+
+That preregistered transformation specification must identify:
+
+- the comparison authority or transliteration scheme
+- the deterministic transliteration or normalization procedure
+- the applicable non-empty rule id
+- the comparison provenance required by the existing evidence-admission contract
+
+The exact comparison form for a holdout must therefore be derived under the frozen authority and rule rather than selected after inspecting the holdout result.
+
+Post-hoc alternative transliterations, normalizations, authorities, rule ids, or comparison forms must remain explicitly exploratory and must not be used as confirmatory evidence for the preregistered hypothesis.
+
 Reusing discovery cohorts as though they were an independent holdout is prohibited.
 
 ## Inclusion and exclusion
@@ -265,12 +278,18 @@ The hypothesis family must state which combination of these dimensions is being 
 
 Testing multiple voices, concepts, modes, statistics, or subgroups and reporting only favorable results is prohibited.
 
-For confirmatory inference, the future methodology must do at least one of the following as appropriate to the declared research question:
+For confirmatory inference, a methodology may preregister one sole primary endpoint or primary hypothesis before confirmatory evidence is examined.
 
-- preregister one primary endpoint or primary hypothesis before confirmatory evidence is examined
-- define an explicit multiplicity-correction procedure for the declared hypothesis family
+That sole preregistered primary endpoint may be evaluated under the reviewed primary analysis without an additional multiplicity correction solely because it is the single primary endpoint.
 
-If multiple uncorrected tests are explored without a preregistered primary endpoint or reviewed multiplicity handling, those results must remain explicitly exploratory and must not be presented as confirmatory statistical evidence.
+Every confirmatory endpoint outside the sole preregistered primary endpoint must either:
+
+- be covered by an explicit reviewed multiplicity-correction procedure for the declared hypothesis family
+- or remain explicitly exploratory and must not be presented as confirmatory statistical evidence
+
+Secondary voices, concepts, modes, subgroup analyses, alternative statistics, and other non-primary tests do not become confirmatory merely because one primary endpoint was preregistered.
+
+If there is more than one confirmatory endpoint, the methodology must define multiplicity handling for every confirmatory test outside the sole primary endpoint.
 
 The future methodology must preserve the distinction between exploratory hypothesis generation and confirmatory inference.
 
