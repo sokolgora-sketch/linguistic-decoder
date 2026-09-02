@@ -107,6 +107,28 @@ describe(
         expect(doc).toContain(
           "This milestone does not select a permutation test, parametric model, Bayesian model, bootstrap, or other statistical method.",
         );
+
+        for (
+          const required
+          of [
+            "preregister at least one positive-control cohort or positive-control class before confirmatory evidence is examined",
+            "Failure of a required positive control must block or invalidate confirmatory inference",
+            "the analysis must return `insufficient_data` or another explicitly reviewed blocked-control state",
+            "This milestone does not invent or designate a concrete new positive-control cohort.",
+            "the empirical baseline specification must be frozen before holdout evidence is examined",
+            "the null-model specification must also be frozen before holdout evidence is examined",
+            "Post-hoc alternative baselines, null models, randomization or modeling rules, or preserved-structure choices must remain explicitly exploratory",
+            "must prospectively justify the planned sample size or evidence volume",
+            "a power analysis tied to the preregistered effect-size assumptions",
+            "a precision / uncertainty-width target tied to the preregistered inferential question",
+            "If the preregistered adequacy criterion is not met, confirmatory inference must remain blocked and the result must be `insufficient_data`.",
+            "This requirement does not authorize this milestone to invent a numeric minimum cohort count, sample size, power threshold, or uncertainty-width threshold.",
+          ]
+        ) {
+          expect(doc).toContain(
+            required,
+          );
+        }
       },
     );
 

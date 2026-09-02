@@ -172,6 +172,21 @@ Missing evidence must not be converted into a positive or negative recurrence ob
 
 A valid statistics design requires controlled evidence.
 
+For confirmatory inference, the future methodology must preregister at least one positive-control cohort or positive-control class before confirmatory evidence is examined.
+
+For every required positive control, the preregistration must define:
+
+- the positive-control cohort or control class
+- the expected control behavior or result
+- the comparison mode and deterministic comparison procedure used for that control
+- the decision rule applied if the positive control fails
+
+Failure of a required positive control must block or invalidate confirmatory inference rather than being ignored after results are known.
+
+If a required positive-control criterion is not met, the analysis must return `insufficient_data` or another explicitly reviewed blocked-control state instead of a confirmatory statistical claim.
+
+This milestone does not invent or designate a concrete new positive-control cohort.
+
 Negative controls and counterexamples must remain visible even when they weaken a proposed functional pattern.
 
 The design must preserve cohorts that:
@@ -244,6 +259,8 @@ No assumption of equal `1/7` baseline probability is authorized by this mileston
 
 A uniform baseline may only be used if a future reviewed methodology justifies it for the exact unit of analysis.
 
+For confirmatory inference, the empirical baseline specification must be frozen before holdout evidence is examined.
+
 ## Null model
 
 A future statistics lane must define an explicit null model before computing significance.
@@ -258,6 +275,12 @@ It must specify:
 - what comparison modes are preserved
 - what constitutes a test statistic
 - what constitutes a Null result
+
+For confirmatory inference, the null-model specification must also be frozen before holdout evidence is examined.
+
+The frozen baseline and null-model specification must include the randomization or modeling rule, the structure preserved, the dependencies held fixed, the comparison modes preserved, the test statistic, and the rule defining a Null result.
+
+Post-hoc alternative baselines, null models, randomization or modeling rules, or preserved-structure choices must remain explicitly exploratory and must not be used as confirmatory evidence for the preregistered hypothesis.
 
 This milestone does not select a permutation test, parametric model, Bayesian model, bootstrap, or other statistical method.
 
@@ -305,6 +328,19 @@ A future methodology may define a minimum only when justified by:
 - dependence assumptions
 - selected null model
 - selected statistical method
+
+Before confirmatory evidence is examined, the future methodology must prospectively justify the planned sample size or evidence volume.
+
+That prospective justification must use at least one reviewed adequacy criterion appropriate to the selected statistical method:
+
+- a power analysis tied to the preregistered effect-size assumptions
+- or a precision / uncertainty-width target tied to the preregistered inferential question
+
+The adequacy criterion must be declared before confirmatory evidence is examined.
+
+If the preregistered adequacy criterion is not met, confirmatory inference must remain blocked and the result must be `insufficient_data`.
+
+This requirement does not authorize this milestone to invent a numeric minimum cohort count, sample size, power threshold, or uncertainty-width threshold.
 
 Until then:
 
