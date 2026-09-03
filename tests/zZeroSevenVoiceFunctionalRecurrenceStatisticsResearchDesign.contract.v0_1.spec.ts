@@ -132,6 +132,12 @@ describe(
             "Failure of a required positive control must block or invalidate confirmatory inference",
             "the analysis must return `insufficient_data` or another explicitly reviewed blocked-control state",
             "This milestone does not invent or designate a concrete new positive-control cohort.",
+            "preregister at least one appropriate negative-control cohort or negative-control class before confirmatory evidence is examined",
+            "the expected negative-control behavior or result",
+            "the prespecified criterion that determines whether the negative control has failed",
+            "Failure of a required negative control must block unqualified confirmatory inference",
+            "If a required negative-control criterion is not met, the analysis must return `insufficient_data` or another explicitly reviewed blocked-control state instead of an unqualified confirmatory statistical claim.",
+            "This milestone does not invent or designate a concrete new negative-control cohort, numeric negative-control threshold, or acceptance tolerance.",
             "the empirical baseline specification must be frozen before any evidence from the applicable confirmatory dataset is examined",
             "the null-model specification must also be frozen before any evidence from the applicable confirmatory dataset is examined",
             "the complete inferential decision rule must also be preregistered and frozen before any evidence from the applicable confirmatory dataset is examined",
@@ -211,8 +217,13 @@ describe(
             "Secondary voices, concepts, modes, subgroup analyses, alternative statistics, and other non-primary tests do not become confirmatory merely because one primary endpoint was preregistered.",
             "comparison authority and deterministic transformation procedure must also be frozen before any evidence from the applicable confirmatory dataset is examined",
             "the applicable non-empty rule id",
-            "The exact comparison form used for any confirmatory dataset must therefore be derived under the frozen authority and rule rather than selected after inspecting that dataset's result.",
-            "Post-hoc alternative transliterations, normalizations, authorities, rule ids, or comparison forms must remain explicitly exploratory",
+            "the methodology must also preregister and freeze a deterministic orthographic surface and comparison-form selection rule before any evidence from the applicable confirmatory dataset is examined",
+            "how multiple source-attested spellings, scripts, lexical variants, or equivalent candidate surfaces are handled",
+            "the deterministic rule or tie-breaking procedure that selects the confirmatory orthographic surface and comparison form",
+            "The exact orthographic comparison form must be derived under that frozen selection rule rather than chosen after inspecting which variant produces a preferred recurrence outcome.",
+            "The exact comparison form used for any confirmatory dataset must therefore be derived under the applicable frozen authority, transformation rule, or orthographic selection rule rather than selected after inspecting that dataset's result.",
+            "Post-hoc alternative transliterations, normalizations, orthographic variants, authorities, rule ids, selection rules, or comparison forms must remain explicitly exploratory",
+            "This milestone does not choose a preferred orthographic variant, invent a new orthographic normalization, or modify the existing FVR evidence-admission contract.",
           ]
         ) {
           expect(doc).toContain(

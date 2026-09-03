@@ -161,9 +161,22 @@ That preregistered transformation specification must identify:
 - the applicable non-empty rule id
 - the comparison provenance required by the existing evidence-admission contract
 
-The exact comparison form used for any confirmatory dataset must therefore be derived under the frozen authority and rule rather than selected after inspecting that dataset's result.
+For any confirmatory use of `orthography`, the methodology must also preregister and freeze a deterministic orthographic surface and comparison-form selection rule before any evidence from the applicable confirmatory dataset is examined.
 
-Post-hoc alternative transliterations, normalizations, authorities, rule ids, or comparison forms must remain explicitly exploratory and must not be used as confirmatory evidence for the preregistered hypothesis.
+That frozen orthographic selection specification must define:
+
+- the source or lexical-entry authority from which an orthographic form may be selected
+- how multiple source-attested spellings, scripts, lexical variants, or equivalent candidate surfaces are handled
+- the deterministic rule or tie-breaking procedure that selects the confirmatory orthographic surface and comparison form
+- how missing, ambiguous, or unresolved orthographic alternatives are classified
+
+The exact orthographic comparison form must be derived under that frozen selection rule rather than chosen after inspecting which variant produces a preferred recurrence outcome.
+
+The exact comparison form used for any confirmatory dataset must therefore be derived under the applicable frozen authority, transformation rule, or orthographic selection rule rather than selected after inspecting that dataset's result.
+
+Post-hoc alternative transliterations, normalizations, orthographic variants, authorities, rule ids, selection rules, or comparison forms must remain explicitly exploratory and must not be used as confirmatory evidence for the preregistered hypothesis.
+
+This milestone does not choose a preferred orthographic variant, invent a new orthographic normalization, or modify the existing FVR evidence-admission contract.
 
 Reusing discovery cohorts as though they were an independent holdout is prohibited.
 
@@ -204,6 +217,22 @@ Failure of a required positive control must block or invalidate confirmatory inf
 If a required positive-control criterion is not met, the analysis must return `insufficient_data` or another explicitly reviewed blocked-control state instead of a confirmatory statistical claim.
 
 This milestone does not invent or designate a concrete new positive-control cohort.
+
+For confirmatory inference, the future methodology must also preregister at least one appropriate negative-control cohort or negative-control class before confirmatory evidence is examined.
+
+For every required negative control, the preregistration must define:
+
+- the negative-control cohort or control class
+- the expected negative-control behavior or result
+- the comparison mode and deterministic comparison procedure used for that control
+- the prespecified criterion that determines whether the negative control has failed
+- the decision rule applied if the negative control fails
+
+Failure of a required negative control must block unqualified confirmatory inference rather than being ignored after results are known.
+
+If a required negative-control criterion is not met, the analysis must return `insufficient_data` or another explicitly reviewed blocked-control state instead of an unqualified confirmatory statistical claim.
+
+This milestone does not invent or designate a concrete new negative-control cohort, numeric negative-control threshold, or acceptance tolerance.
 
 Negative controls and counterexamples must remain visible even when they weaken a proposed functional pattern.
 
