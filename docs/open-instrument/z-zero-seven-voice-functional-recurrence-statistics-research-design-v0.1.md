@@ -71,6 +71,20 @@ A future design must distinguish at minimum:
 
 No implementation may silently count one unit while presenting conclusions about another.
 
+For confirmatory inference, the exact unit of analysis and its aggregation or counting rule must be preregistered and frozen before any evidence from the applicable confirmatory dataset is examined.
+
+That frozen unit-of-analysis specification must define:
+
+- the primary counting unit used for the confirmatory result
+- how multiple concepts, lexical forms, language varieties, or other repeated observations associated with one language or source are aggregated, retained separately, or otherwise mapped to that unit
+- the weighting or contribution rule applied to each declared analysis unit
+- the denominator or deterministic rule that maps admitted observations into the reported analysis units
+- how repeated or nested observations are prevented from silently changing the effective sample represented by that unit
+
+Post-hoc changes to the counting unit, aggregation rule, weighting rule, denominator, or observation-to-unit mapping after any evidence from the applicable confirmatory dataset has been examined must remain explicitly exploratory and must not support confirmatory inference.
+
+This milestone does not choose a concrete unit of analysis, aggregation method, weighting scheme, denominator, or effective-sample rule.
+
 ## Corpus definition
 
 Before statistical analysis, a reviewed future authorization must define the corpus or sampling frame.
