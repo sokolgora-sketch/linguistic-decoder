@@ -85,7 +85,7 @@ It must state:
 - whether the corpus is fixed before analysis or expanded adaptively
 - how duplicate lexical or source evidence is prevented from inflating counts
 
-For confirmatory inference, the complete corpus or sampling-frame definition must be preregistered and frozen before holdout evidence is examined.
+For confirmatory inference, the complete corpus or sampling-frame definition must be preregistered and frozen before any evidence from the applicable confirmatory dataset is examined.
 
 That frozen definition includes:
 
@@ -97,7 +97,7 @@ That frozen definition includes:
 - the fixed-versus-adaptive corpus posture
 - the duplicate lexical or source evidence control rule
 
-Any post-hoc change to those sampling-frame decisions after holdout evidence has been examined must remain explicitly exploratory and must not support confirmatory inference.
+Any post-hoc change to those sampling-frame decisions after any evidence from the applicable confirmatory dataset has been examined must remain explicitly exploratory and must not support confirmatory inference.
 
 If corpus expansion is adaptive, merely declaring that posture is not sufficient for confirmatory inference.
 
@@ -144,11 +144,15 @@ The current live cohorts:
 
 remain exploratory evidence for any U, Y, or A functional-recurrence hypothesis that was discovered, selected, or refined using those cohorts.
 
-Confirmatory inference for such a hypothesis requires an independent preregistered holdout or other independently collected confirmatory evidence that was not used to discover, select, tune, or refine the tested hypothesis.
+Confirmatory inference for such a hypothesis requires an independent preregistered holdout or other independently collected confirmatory dataset that was not used to discover, select, tune, or refine the tested hypothesis.
 
-The confirmatory target, cohort-selection rule, comparison mode, stopping rule, and primary analysis must be declared before the holdout evidence is examined.
+Every dataset intended to support confirmatory inference must be prospectively designated as confirmatory before any of its evidence is examined.
 
-For any confirmatory use of `transliteration` or `z_zero_functional_normalization`, the comparison authority and deterministic transformation procedure must also be frozen before holdout evidence is examined.
+The same preregistration and freeze requirements apply whether that dataset is an independent holdout or another independently collected confirmatory dataset.
+
+The confirmatory target, cohort-selection rule, comparison mode, stopping rule, and primary analysis must be declared before any evidence from the applicable confirmatory dataset is examined.
+
+For any confirmatory use of `transliteration` or `z_zero_functional_normalization`, the comparison authority and deterministic transformation procedure must also be frozen before any evidence from the applicable confirmatory dataset is examined.
 
 That preregistered transformation specification must identify:
 
@@ -157,7 +161,7 @@ That preregistered transformation specification must identify:
 - the applicable non-empty rule id
 - the comparison provenance required by the existing evidence-admission contract
 
-The exact comparison form for a holdout must therefore be derived under the frozen authority and rule rather than selected after inspecting the holdout result.
+The exact comparison form used for any confirmatory dataset must therefore be derived under the frozen authority and rule rather than selected after inspecting that dataset's result.
 
 Post-hoc alternative transliterations, normalizations, authorities, rule ids, or comparison forms must remain explicitly exploratory and must not be used as confirmatory evidence for the preregistered hypothesis.
 
@@ -287,7 +291,7 @@ No assumption of equal `1/7` baseline probability is authorized by this mileston
 
 A uniform baseline may only be used if a future reviewed methodology justifies it for the exact unit of analysis.
 
-For confirmatory inference, the empirical baseline specification must be frozen before holdout evidence is examined.
+For confirmatory inference, the empirical baseline specification must be frozen before any evidence from the applicable confirmatory dataset is examined.
 
 ## Null model
 
@@ -304,11 +308,11 @@ It must specify:
 - what constitutes a test statistic
 - what constitutes a Null result
 
-For confirmatory inference, the null-model specification must also be frozen before holdout evidence is examined.
+For confirmatory inference, the null-model specification must also be frozen before any evidence from the applicable confirmatory dataset is examined.
 
 The frozen baseline and null-model specification must include the randomization or modeling rule, the structure preserved, the dependencies held fixed, the comparison modes preserved, the test statistic, and the rule defining a Null result.
 
-For confirmatory inference, the complete inferential decision rule must also be preregistered and frozen before holdout evidence is examined.
+For confirmatory inference, the complete inferential decision rule must also be preregistered and frozen before any evidence from the applicable confirmatory dataset is examined.
 
 If significance testing is used, that frozen decision rule must specify:
 
@@ -316,7 +320,7 @@ If significance testing is used, that frozen decision rule must specify:
 - the test sidedness where applicable
 - the exact rejection or confirmatory decision criterion
 
-If a Bayesian or other inferential framework is used instead, the analogous reviewed decision threshold or decision rule must be preregistered and frozen before holdout evidence is examined.
+If a Bayesian or other inferential framework is used instead, the analogous reviewed decision threshold or decision rule must be preregistered and frozen before any evidence from the applicable confirmatory dataset is examined.
 
 Post-hoc changes to the significance level, test sidedness, rejection criterion, Bayesian threshold, or analogous inferential decision rule after confirmatory evidence has been examined must remain explicitly exploratory and must not support confirmatory statistical claims.
 
