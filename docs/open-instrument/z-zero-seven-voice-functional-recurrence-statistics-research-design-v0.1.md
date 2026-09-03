@@ -232,6 +232,20 @@ This design does not choose a specific correction method.
 
 It requires the dependence problem to be explicitly modeled or bounded before inferential statistics are authorized.
 
+For confirmatory inference, the dependence treatment must be preregistered and frozen before confirmatory evidence is examined.
+
+That frozen dependence specification must state:
+
+- which genealogical dependencies are grouped or otherwise treated as dependent
+- which areal dependencies are grouped or otherwise treated as dependent
+- which lexical dependencies are grouped or otherwise treated as dependent
+- which source dependencies are grouped or otherwise treated as dependent
+- how each declared dependence class is modeled, clustered, bounded, or otherwise incorporated into the reviewed analysis
+
+Post-hoc alternative dependence groupings, cluster definitions, models, bounding rules, or correlation treatments introduced after confirmatory evidence has been examined must remain explicitly exploratory and must not support confirmatory statistical claims.
+
+This milestone does not choose a concrete dependence model, invent dependence clusters, invent correlation coefficients, or compute a dependence adjustment.
+
 ## Comparison-mode separation
 
 The established FVR comparison modes remain distinct:
