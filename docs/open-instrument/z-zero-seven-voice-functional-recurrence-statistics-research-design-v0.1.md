@@ -308,6 +308,20 @@ For confirmatory inference, the null-model specification must also be frozen bef
 
 The frozen baseline and null-model specification must include the randomization or modeling rule, the structure preserved, the dependencies held fixed, the comparison modes preserved, the test statistic, and the rule defining a Null result.
 
+For confirmatory inference, the complete inferential decision rule must also be preregistered and frozen before holdout evidence is examined.
+
+If significance testing is used, that frozen decision rule must specify:
+
+- the significance level or alpha
+- the test sidedness where applicable
+- the exact rejection or confirmatory decision criterion
+
+If a Bayesian or other inferential framework is used instead, the analogous reviewed decision threshold or decision rule must be preregistered and frozen before holdout evidence is examined.
+
+Post-hoc changes to the significance level, test sidedness, rejection criterion, Bayesian threshold, or analogous inferential decision rule after confirmatory evidence has been examined must remain explicitly exploratory and must not support confirmatory statistical claims.
+
+This milestone does not choose a numeric alpha, choose test sidedness, choose a Bayesian threshold, invent a rejection rule, compute a p-value, or compute a posterior probability.
+
 Post-hoc alternative baselines, null models, randomization or modeling rules, or preserved-structure choices must remain explicitly exploratory and must not be used as confirmatory evidence for the preregistered hypothesis.
 
 This milestone does not select a permutation test, parametric model, Bayesian model, bootstrap, or other statistical method.
