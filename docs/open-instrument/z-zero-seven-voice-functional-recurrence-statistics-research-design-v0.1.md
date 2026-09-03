@@ -85,6 +85,20 @@ It must state:
 - whether the corpus is fixed before analysis or expanded adaptively
 - how duplicate lexical or source evidence is prevented from inflating counts
 
+For confirmatory inference, the complete corpus or sampling-frame definition must be preregistered and frozen before holdout evidence is examined.
+
+That frozen definition includes:
+
+- the represented population
+- eligible languages or varieties
+- eligible lexical concepts
+- source-accessibility treatment
+- missing or inaccessible evidence treatment
+- the fixed-versus-adaptive corpus posture
+- the duplicate lexical or source evidence control rule
+
+Any post-hoc change to those sampling-frame decisions after holdout evidence has been examined must remain explicitly exploratory and must not support confirmatory inference.
+
 If corpus expansion is adaptive, merely declaring that posture is not sufficient for confirmatory inference.
 
 Before confirmatory analysis begins, the methodology must either:
@@ -288,7 +302,15 @@ Method selection remains a future reviewed decision.
 
 ## Multiplicity and confirmatory endpoints
 
-A future methodology must define the hypothesis family before confirmatory testing begins.
+For confirmatory inference, the complete hypothesis family must be preregistered and frozen before confirmatory evidence is examined.
+
+The preregistered confirmatory specification must also freeze:
+
+- the sole primary endpoint or primary hypothesis, if one exists
+- every secondary endpoint intended to remain confirmatory
+- the multiplicity-correction procedure covering every non-primary confirmatory test that requires correction
+
+Post-hoc narrowing of the hypothesis family, post-hoc endpoint selection, or post-hoc changes to the multiplicity-correction procedure after confirmatory evidence has been examined must remain explicitly exploratory and must not support confirmatory statistical claims.
 
 The hypothesis family must state which combination of these dimensions is being tested:
 
