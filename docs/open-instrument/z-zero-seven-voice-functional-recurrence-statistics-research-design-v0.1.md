@@ -387,6 +387,16 @@ Possible descriptive outputs include:
 
 Inferential outputs remain unauthorized until a reviewed null model and statistical method exist.
 
+Every future confirmatory inferential result must report an effect size or effect magnitude on the declared unit of analysis together with an uncertainty interval.
+
+Before confirmatory evidence is examined, the methodology must preregister the confidence or credible level used for that interval, or another explicitly reviewed uncertainty level and procedure appropriate to the selected statistical method.
+
+A statistical-significance result or p-value alone must not be presented as evidence of practical importance, effect magnitude, or precision.
+
+Post-hoc changes to the uncertainty level, interval procedure, or effect-size definition after confirmatory evidence has been examined must remain explicitly exploratory and must not support confirmatory statistical claims.
+
+This milestone does not choose an effect-size statistic, invent a numeric effect-size threshold, invent a confidence or credible level, compute an effect size, or compute an uncertainty interval.
+
 No future numeric result may automatically become:
 
 - candidate truth
