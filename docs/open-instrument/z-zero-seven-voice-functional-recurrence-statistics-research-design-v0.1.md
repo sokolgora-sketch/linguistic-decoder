@@ -198,6 +198,16 @@ Reusing discovery cohorts as though they were an independent holdout is prohibit
 
 Every future statistical dataset must make inclusion and exclusion machine-auditable.
 
+For every confirmatory dataset, the exact inclusion and exclusion eligibility criteria and the deterministic rules that map observations into inclusion, exclusion, unavailable, blocked, or other exceptional states must be preregistered and frozen before any evidence from the applicable confirmatory dataset is examined.
+
+That frozen specification must define, as applicable:
+
+- source-quality and source-availability eligibility criteria
+- treatment of ambiguous, unresolved, missing, or inaccessible observations
+- duplicate-observation and duplicate-source handling
+- the conditions producing `excluded_with_reason`, `insufficient_source`, `invalid_comparison`, `blocked`, or `unknown`
+- any deterministic tie-breaking or exceptional-state mapping needed to prevent outcome-driven inclusion or exclusion
+
 Each observation must have an explicit state such as:
 
 - included
@@ -208,6 +218,10 @@ Each observation must have an explicit state such as:
 - invalid_comparison
 - blocked
 - unknown
+
+Post-hoc changes to inclusion criteria, exclusion criteria, source-quality rules, exceptional-state mappings, or eligibility decisions after confirmatory evidence has been examined must remain explicitly exploratory and must not support confirmatory inference.
+
+This milestone does not choose concrete source-quality thresholds, exclusion thresholds, or dataset-specific eligibility outcomes.
 
 Null and Unknown remain valid outcomes.
 
