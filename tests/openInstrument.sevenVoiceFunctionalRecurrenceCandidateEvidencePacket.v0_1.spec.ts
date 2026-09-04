@@ -1,0 +1,588 @@
+import {
+  SEVEN_VOICE_FUNCTIONAL_RECURRENCE_CANDIDATE_EVIDENCE_PACKET_SCHEMA_V0_1,
+  validateSevenVoiceFunctionalRecurrenceCandidateEvidencePacketV0_1,
+  type SevenVoiceFunctionalRecurrenceCandidateEvidencePacketV0_1,
+} from "@/shared/openInstrument/sevenVoiceFunctionalRecurrenceCandidateEvidencePacket.v0_1";
+
+const claimBoundary = {
+  historicalOriginClaim:
+    "not_claimed",
+  historicalTransmissionClaim:
+    "not_claimed",
+  cognacyClaim:
+    "not_claimed",
+  borrowingClaim:
+    "not_claimed",
+  winnerClaim:
+    "not_claimed",
+  languageSuperiorityClaim:
+    "not_claimed",
+  candidateTruthClaim:
+    "not_claimed",
+  universalityClaim:
+    "not_claimed",
+  userDecisionPosture:
+    "user_decides",
+} as const;
+
+function packet():
+  SevenVoiceFunctionalRecurrenceCandidateEvidencePacketV0_1 {
+  return {
+    schemaVersion:
+      SEVEN_VOICE_FUNCTIONAL_RECURRENCE_CANDIDATE_EVIDENCE_PACKET_SCHEMA_V0_1,
+
+    packetId:
+      "research.fvr.candidate.example.v0_1",
+
+    conceptId:
+      "EXAMPLE",
+
+    researchOnly:
+      true,
+
+    admittedCohortId:
+      null,
+
+    candidates: [
+      {
+        candidateObservationId:
+          "candidate.example.language-a.v0_1",
+
+        languageId:
+          "Language A",
+
+        languageVariety:
+          null,
+
+        intendedEvidenceRole:
+          "cohort_member",
+
+        surfaceForm:
+          null,
+
+        attestedGloss:
+          null,
+
+        sourceStatus:
+          null,
+
+        citations: [],
+
+        proposedComparisonForm:
+          null,
+
+        proposedComparisonMode:
+          null,
+
+        proposedComparisonAuthority:
+          null,
+
+        proposedComparisonProvenance:
+          null,
+
+        reviewStatus:
+          "needs_source",
+
+        reviewNotes: [],
+
+        claimBoundary,
+      },
+    ],
+  };
+}
+
+describe(
+  "Open Instrument FVR candidate evidence packet v0.1",
+  () => {
+    it(
+      "permits incomplete needs_source research without pretending it is admission-ready",
+      () => {
+        const result =
+          validateSevenVoiceFunctionalRecurrenceCandidateEvidencePacketV0_1(
+            packet(),
+          );
+
+        expect(
+          result.valid,
+        ).toBe(true);
+
+        expect(
+          result.reasonCodes,
+        ).toEqual([]);
+
+        expect(
+          result.needsSourceCandidateIds,
+        ).toEqual([
+          "candidate.example.language-a.v0_1",
+        ]);
+
+        expect(
+          result.readyForAdmissionReviewCandidateIds,
+        ).toEqual([]);
+      },
+    );
+
+    it(
+      "fails closed when a candidate is labeled ready without source and comparison evidence",
+      () => {
+        const input =
+          JSON.parse(
+            JSON.stringify(
+              packet(),
+            ),
+          ) as any;
+
+        input.candidates[0].reviewStatus =
+          "ready_for_admission_review";
+
+        const result =
+          validateSevenVoiceFunctionalRecurrenceCandidateEvidencePacketV0_1(
+            input,
+          );
+
+        expect(
+          result.valid,
+        ).toBe(false);
+
+        expect(
+          result.reasonCodes,
+        ).toEqual(
+          expect.arrayContaining([
+            "ready_surface_form_missing",
+            "ready_attested_gloss_missing",
+            "ready_source_status_missing",
+            "ready_citation_missing",
+            "ready_comparison_form_missing",
+            "ready_comparison_mode_missing",
+            "ready_comparison_authority_missing",
+            "ready_comparison_provenance_missing",
+          ]),
+        );
+      },
+    );
+
+    it(
+      "accepts a source-traceable orthographic candidate as ready for admission review without admitting it",
+      () => {
+        const input =
+          JSON.parse(
+            JSON.stringify(
+              packet(),
+            ),
+          ) as any;
+
+        input.candidates[0] = {
+          ...input.candidates[0],
+
+          surfaceForm:
+            "FORM",
+
+          attestedGloss:
+            "example gloss",
+
+          sourceStatus:
+            "research_candidate",
+
+          citations: [
+            {
+              citationId:
+                "candidate.example.citation.v0_1",
+
+              sourceTitle:
+                "Example lexical source",
+
+              sourceAuthorOrEditor:
+                null,
+
+              sourcePublisherOrHost:
+                "Example Publisher",
+
+              sourceDateOrVersion:
+                "v1",
+
+              sourceUrlOrArchiveRef:
+                "https://example.invalid/source",
+
+              entryLocator:
+                "entry FORM",
+
+              sourceHashOrArchiveHash:
+                null,
+
+              attestedForm:
+                "FORM",
+
+              attestedGloss:
+                "example gloss",
+            },
+          ],
+
+          proposedComparisonForm:
+            "FORM",
+
+          proposedComparisonMode:
+            "orthography",
+
+          proposedComparisonAuthority:
+            "source_orthography",
+
+          proposedComparisonProvenance: {
+            provenanceId:
+              "candidate.example.orthography.v0_1",
+
+            authority:
+              "source_orthography",
+
+            ruleId:
+              null,
+
+            evidenceRefs: [],
+          },
+
+          reviewStatus:
+            "ready_for_admission_review",
+        };
+
+        const result =
+          validateSevenVoiceFunctionalRecurrenceCandidateEvidencePacketV0_1(
+            input,
+          );
+
+        expect(
+          result.valid,
+        ).toBe(true);
+
+        expect(
+          result.readyForAdmissionReviewCandidateIds,
+        ).toEqual([
+          "candidate.example.language-a.v0_1",
+        ]);
+
+        expect(
+          input.researchOnly,
+        ).toBe(true);
+
+        expect(
+          input.admittedCohortId,
+        ).toBeNull();
+      },
+    );
+
+    it(
+      "requires a named rule for transliteration or functional normalization",
+      () => {
+        const input =
+          JSON.parse(
+            JSON.stringify(
+              packet(),
+            ),
+          ) as any;
+
+        input.candidates[0] = {
+          ...input.candidates[0],
+
+          surfaceForm:
+            "surface",
+
+          attestedGloss:
+            "example",
+
+          sourceStatus:
+            "research_candidate",
+
+          citations: [
+            {
+              citationId:
+                "candidate.example.transliteration-citation.v0_1",
+
+              sourceTitle:
+                "Example source",
+
+              sourceAuthorOrEditor:
+                null,
+
+              sourcePublisherOrHost:
+                "Example Publisher",
+
+              sourceDateOrVersion:
+                "v1",
+
+              sourceUrlOrArchiveRef:
+                "https://example.invalid/source",
+
+              entryLocator:
+                "entry surface",
+
+              sourceHashOrArchiveHash:
+                null,
+
+              attestedForm:
+                "surface",
+
+              attestedGloss:
+                "example",
+            },
+          ],
+
+          proposedComparisonForm:
+            "SURFACE",
+
+          proposedComparisonMode:
+            "transliteration",
+
+          proposedComparisonAuthority:
+            "example_scheme",
+
+          proposedComparisonProvenance: {
+            provenanceId:
+              "candidate.example.transliteration.v0_1",
+
+            authority:
+              "example_scheme",
+
+            ruleId:
+              null,
+
+            evidenceRefs: [],
+          },
+
+          reviewStatus:
+            "ready_for_admission_review",
+        };
+
+        const result =
+          validateSevenVoiceFunctionalRecurrenceCandidateEvidencePacketV0_1(
+            input,
+          );
+
+        expect(
+          result.valid,
+        ).toBe(false);
+
+        expect(
+          result.reasonCodes,
+        ).toContain(
+          "ready_comparison_rule_id_missing",
+        );
+      },
+    );
+
+    it(
+      "normalizes candidate ids before duplicate detection",
+      () => {
+        const input =
+          JSON.parse(
+            JSON.stringify(
+              packet(),
+            ),
+          ) as any;
+
+        input.candidates.push({
+          ...input.candidates[0],
+
+          candidateObservationId:
+            " candidate.example.language-a.v0_1 ",
+        });
+
+        const result =
+          validateSevenVoiceFunctionalRecurrenceCandidateEvidencePacketV0_1(
+            input,
+          );
+
+        expect(
+          result.valid,
+        ).toBe(false);
+
+        expect(
+          result.reasonCodes,
+        ).toContain(
+          "duplicate_candidate_id",
+        );
+      },
+    );
+
+    it(
+      "rejects runtime attempts to escape the research-only staging boundary",
+      () => {
+        const input =
+          JSON.parse(
+            JSON.stringify(
+              packet(),
+            ),
+          ) as any;
+
+        input.researchOnly =
+          false;
+
+        input.admittedCohortId =
+          "research.recurrence.illegal.v0_1";
+
+        const result =
+          validateSevenVoiceFunctionalRecurrenceCandidateEvidencePacketV0_1(
+            input,
+          );
+
+        expect(
+          result.valid,
+        ).toBe(false);
+
+        expect(
+          result.reasonCodes,
+        ).toEqual(
+          expect.arrayContaining([
+            "research_only_boundary_invalid",
+            "admitted_cohort_boundary_invalid",
+          ]),
+        );
+      },
+    );
+
+    it(
+      "requires a ready citation to attest the declared lexical surface",
+      () => {
+        const input =
+          JSON.parse(
+            JSON.stringify(
+              packet(),
+            ),
+          ) as any;
+
+        input.candidates[0] = {
+          ...input.candidates[0],
+
+          surfaceForm:
+            "FORM",
+
+          attestedGloss:
+            "example gloss",
+
+          sourceStatus:
+            "research_candidate",
+
+          citations: [
+            {
+              citationId:
+                "candidate.example.wrong-surface.v0_1",
+
+              sourceTitle:
+                "Example lexical source",
+
+              sourceAuthorOrEditor:
+                null,
+
+              sourcePublisherOrHost:
+                "Example Publisher",
+
+              sourceDateOrVersion:
+                "v1",
+
+              sourceUrlOrArchiveRef:
+                "https://example.invalid/source",
+
+              entryLocator:
+                "entry OTHER",
+
+              sourceHashOrArchiveHash:
+                null,
+
+              attestedForm:
+                "OTHER",
+
+              attestedGloss:
+                "example gloss",
+            },
+          ],
+
+          proposedComparisonForm:
+            "FORM",
+
+          proposedComparisonMode:
+            "orthography",
+
+          proposedComparisonAuthority:
+            "source_orthography",
+
+          proposedComparisonProvenance: {
+            provenanceId:
+              "candidate.example.orthography.v0_1",
+
+            authority:
+              "source_orthography",
+
+            ruleId:
+              null,
+
+            evidenceRefs: [],
+          },
+
+          reviewStatus:
+            "ready_for_admission_review",
+        };
+
+        const result =
+          validateSevenVoiceFunctionalRecurrenceCandidateEvidencePacketV0_1(
+            input,
+          );
+
+        expect(
+          result.valid,
+        ).toBe(false);
+
+        expect(
+          result.reasonCodes,
+        ).toContain(
+          "ready_surface_attestation_missing",
+        );
+      },
+    );
+
+    it(
+      "preserves rejected research candidates and requires an explicit reason",
+      () => {
+        const input =
+          JSON.parse(
+            JSON.stringify(
+              packet(),
+            ),
+          ) as any;
+
+        input.candidates[0].reviewStatus =
+          "reject";
+
+        let result =
+          validateSevenVoiceFunctionalRecurrenceCandidateEvidencePacketV0_1(
+            input,
+          );
+
+        expect(
+          result.valid,
+        ).toBe(false);
+
+        expect(
+          result.reasonCodes,
+        ).toContain(
+          "rejected_candidate_missing_reason",
+        );
+
+        input.candidates[0].reviewNotes = [
+          "source does not attest the required lexical meaning",
+        ];
+
+        result =
+          validateSevenVoiceFunctionalRecurrenceCandidateEvidencePacketV0_1(
+            input,
+          );
+
+        expect(
+          result.valid,
+        ).toBe(true);
+
+        expect(
+          result.rejectedCandidateIds,
+        ).toEqual([
+          "candidate.example.language-a.v0_1",
+        ]);
+      },
+    );
+  },
+);
