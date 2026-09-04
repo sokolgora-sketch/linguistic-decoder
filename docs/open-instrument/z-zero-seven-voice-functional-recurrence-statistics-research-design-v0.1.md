@@ -179,6 +179,25 @@ Every dataset intended to support confirmatory inference must be prospectively d
 
 The same preregistration and freeze requirements apply whether that dataset is an independent holdout or another independently collected confirmatory dataset.
 
+For any hypothesis or confirmatory claim that may be evaluated across more than one confirmatory dataset, every confirmatory attempt must remain registered and auditable, including unsuccessful, inconclusive, blocked, and completed attempts.
+
+Before evidence from the first applicable confirmatory dataset is examined, the methodology must preregister and freeze the rule governing confirmatory interpretation across repeated datasets.
+
+That across-dataset rule must use an explicitly reviewed approach such as:
+
+- a sequential or alpha-spending procedure
+- an across-dataset multiplicity procedure
+- a preregistered synthesis or meta-analytic rule
+- or another reviewed method that preserves the intended confirmatory error or decision properties across repeated attempts
+
+A newly collected confirmatory dataset must not silently reset the confirmatory error budget or permit repeated independent attempts until a preferred result appears.
+
+Selective continuation, stopping, omission, or reporting of confirmatory datasets based on observed results is prohibited.
+
+If repeated confirmatory datasets exist without a preregistered applicable across-dataset rule, the additional attempts must remain exploratory and must not independently create a confirmatory claim.
+
+This milestone does not choose a sequential procedure, alpha-spending rule, across-dataset multiplicity correction, synthesis method, or meta-analytic model.
+
 The confirmatory target, cohort-selection rule, comparison mode, stopping rule, and primary analysis must be declared before any evidence from the applicable confirmatory dataset is examined.
 
 For any confirmatory use of `transliteration` or `z_zero_functional_normalization`, the comparison authority and deterministic transformation procedure must also be frozen before any evidence from the applicable confirmatory dataset is examined.
@@ -419,7 +438,18 @@ That frozen statistical-method specification must define, as applicable:
 - the variance, uncertainty, exact, asymptotic, permutation, resampling, or posterior-computation procedure used by that method
 - deterministic analysis parameters that can change the reported estimate, uncertainty, test result, or confirmatory classification
 - any required resampling count, randomization rule, convergence criterion, approximation rule, or equivalent method-specific setting
+- whether stochastic computation is used or the calculation is exhaustive
+- the prospectively fixed random seed or deterministic random-stream derivation used for stochastic confirmatory computation
+- the prespecified treatment of Monte Carlo or simulation error near an inferential decision boundary
 - how ties, missing analytic inputs, failed convergence, or other method-specific exceptional states are classified when applicable
+
+When permutation, bootstrap, Monte Carlo, posterior sampling, or another stochastic procedure is used for confirmatory inference, the methodology must preregister and freeze either a reproducible random seed, a deterministic random-stream derivation, or an exhaustive computation rule before any evidence from the applicable confirmatory dataset is examined.
+
+Repeatedly rerunning a stochastic confirmatory analysis with new random streams until a preferred p-value, interval, posterior result, or classification appears is prohibited.
+
+The methodology must also preregister how Monte Carlo or simulation error near the confirmatory decision boundary is handled, including any deterministic rule for increasing computation or returning an indeterminate, blocked, or `insufficient_data` result.
+
+This milestone does not choose a random seed, random-number generator, deterministic stream derivation, Monte Carlo tolerance, simulation count, or boundary-handling threshold.
 
 A statistical method, estimator, variance procedure, resampling configuration, or other analysis parameter must not be selected after examining which available option produces a preferred magnitude, uncertainty interval, significance result, posterior result, or confirmatory conclusion.
 
@@ -505,7 +535,15 @@ If the precision / uncertainty-width branch is used, the exact precision or unce
 
 The selected adequacy criterion and its applicable target or assumptions must be declared and frozen before confirmatory evidence is examined.
 
-Post-hoc weakening or replacement of the target power, effect-size assumption, precision target, uncertainty-width target, or other adequacy criterion after confirmatory evidence has been examined must remain explicitly exploratory and must not unblock confirmatory inference.
+Every endpoint intended to remain confirmatory must satisfy an applicable prospectively justified adequacy criterion for that endpoint.
+
+A study-level adequacy result for one primary endpoint must not automatically authorize confirmatory inference for rarer secondary voices, subgroups, concepts, comparison modes, or other endpoints with materially different information, prevalence, variance, dependence, or effective sample size.
+
+A shared adequacy calculation may cover more than one confirmatory endpoint only when the preregistered methodology explicitly demonstrates that the frozen criterion is applicable to each covered endpoint.
+
+Any confirmatory endpoint that does not meet its applicable prospective power, precision, uncertainty-width, or other reviewed adequacy target must be classified as `insufficient_data` or explicitly exploratory rather than emitted as a confirmatory positive or Null result.
+
+Post-hoc weakening or replacement of the target power, effect-size assumption, precision target, uncertainty-width target, endpoint-specific adequacy requirement, or other adequacy criterion after confirmatory evidence has been examined must remain explicitly exploratory and must not unblock confirmatory inference.
 
 If the preregistered adequacy criterion is not met, confirmatory inference must remain blocked and the result must be `insufficient_data`.
 
