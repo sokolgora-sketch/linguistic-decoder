@@ -510,6 +510,7 @@ Future statistical outputs must preserve:
 - Inference
 - Hypothesis
 - Unknown / `insufficient_data`
+- `empty_recurrence`
 - Null
 
 Observed dataset counts may be factual within a declared dataset.
@@ -520,11 +521,17 @@ Functional interpretation remains hypothesis unless separately supported.
 
 Insufficient evidence remains Unknown / `insufficient_data` and must not be represented as Null.
 
+At the admitted cohort-observation layer, `sharedFunctionalNucleus = []` must be represented for statistical purposes as `empty_recurrence`.
+
+`empty_recurrence` is a descriptive observation that the admitted comparison forms for that cohort yielded no shared canonical voice. It does not by itself imply adequate evidence, statistical power, successful controls, a tested null model, or an inferential Null conclusion.
+
+The existing cohort-evidence phrase `Null / empty recurrence is a valid result` remains valid descriptive evidence-contract terminology. Within statistical output, its observation-level meaning must be mapped to `empty_recurrence` and must not be conflated with the inferential Null classification defined here.
+
 A Null classification may be emitted only when the preregistered adequacy, control, evidence, and methodology requirements for the applicable confirmatory analysis are satisfied and the reviewed decision rule yields its prespecified Null classification.
 
-Unknown / `insufficient_data` means that the available evidence or methodology does not support a confirmatory conclusion. Null is a distinct inferential classification from an adequately specified completed analysis under its reviewed decision rule.
+Unknown / `insufficient_data` means that the available evidence or methodology does not support a confirmatory conclusion. `empty_recurrence` means that an admitted cohort yielded no shared recurrence at the observation layer. Null is a distinct inferential classification from an adequately specified completed analysis under its reviewed decision rule.
 
-Neither Null nor `insufficient_data` is permission to claim historical origin, candidate truth, universality, or proof of absence beyond the reviewed statistical interpretation.
+Neither Null, `empty_recurrence`, nor `insufficient_data` is permission to claim historical origin, candidate truth, universality, or proof of absence beyond its reviewed evidentiary or statistical interpretation.
 
 These categories must not be collapsed.
 
