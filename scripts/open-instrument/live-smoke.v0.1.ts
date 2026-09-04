@@ -25,6 +25,14 @@ import {
   type CanonicalOperatorLiveSmokeCaseV0_1,
 } from "./canonical-operator-live-smoke-cases.v0.1";
 
+import {
+  sevenVoiceFunctionalRecurrenceResearchCohortCatalogV0_1,
+} from "../../src/data/sevenVoiceFunctionalRecurrenceResearchCohorts.v0_1";
+
+import {
+  buildSevenVoiceFunctionalRecurrenceResearchSurfaceV0_1,
+} from "../../src/shared/openInstrument/sevenVoiceFunctionalRecurrenceResearchCatalog.v0_1";
+
 const args = new Set(process.argv.slice(2));
 const skipBuild = args.has("--skip-build");
 const skipFocusedTests = args.has("--skip-focused-tests");
@@ -44,12 +52,7 @@ const focusedTests = [
   "tests/apiAnalyzeV1.reviewedDaRuntimeProjection.wiring.v0_1.spec.ts",
   "tests/apiAnalyzeV1.reviewedDiRuntimeBlocker.contract.v0_1.spec.ts",
   "tests/docs.uiTelemetryContract.liveSurface.v0_1.spec.ts",
-  "tests/openInstrument.sevenVoiceFunctionalRecurrenceResearchCatalog.water.v0_1.spec.ts",
-  "tests/openInstrument.sevenVoiceFunctionalRecurrenceResearchCatalog.eye.v0_1.spec.ts",
-  "tests/openInstrument.sevenVoiceFunctionalRecurrenceResearchCatalog.father.v0_1.spec.ts",
-  "tests/apiResearchFvr.water.v0_1.spec.ts",
-  "tests/apiResearchFvr.eye.v0_1.spec.ts",
-  "tests/apiResearchFvr.father.v0_1.spec.ts",
+  "tests/openInstrument.sevenVoiceFunctionalRecurrenceResearchCatalog.catalogWide.v0_1.spec.ts",
   "tests/openInstrument.crossLanguageRecurrenceCard.v0_1.spec.tsx",
 ];
 
@@ -445,199 +448,162 @@ async function main(): Promise<void> {
 
     console.log("\n=== cross-language recurrence research surface smoke ===");
 
-    const waterRecurrence =
-      await fetchJson(
-        `${baseUrl}/api/research/fvr?concept=water`,
+    assert(
+      sevenVoiceFunctionalRecurrenceResearchCohortCatalogV0_1.length > 0,
+      "Expected at least one FVR research cohort in the catalog.",
+    );
+
+    const recurrenceSummaries:
+      Record<string, unknown> =
+      {};
+
+    for (
+      const entry
+      of sevenVoiceFunctionalRecurrenceResearchCohortCatalogV0_1
+    ) {
+      const queryConcept =
+        entry.aliases[0] ??
+        entry.conceptId;
+
+      const expected =
+        buildSevenVoiceFunctionalRecurrenceResearchSurfaceV0_1(
+          entry.conceptId,
+        );
+
+      assert(
+        expected?.status ===
+          "available",
+        `Expected admitted local FVR surface for ${entry.conceptId}.`,
       );
 
-    assert(
-      waterRecurrence?.status === "available",
-      "Expected WATER FVR research surface to be available.",
-    );
+      const live =
+        await fetchJson(
+          `${baseUrl}/api/research/fvr?concept=${encodeURIComponent(
+            queryConcept,
+          )}`,
+        );
 
-    assert(
-      Array.isArray(
-        waterRecurrence?.sharedFunctionalNucleus,
-      ) &&
-        waterRecurrence.sharedFunctionalNucleus.length === 1 &&
-        waterRecurrence.sharedFunctionalNucleus[0] === "U",
-      "Expected WATER FVR shared functional nucleus U.",
-    );
-
-    assert(
-      waterRecurrence?.truth?.recurrenceObservationTruth ===
-        "fact_within_declared_comparison_forms",
-      "Expected deterministic recurrence truth boundary.",
-    );
-
-    assert(
-      waterRecurrence?.truth?.functionalVoiceMeaningTruth ===
-        "research_hypothesis",
-      "Expected functional meaning to remain research_hypothesis.",
-    );
-
-    assert(
-      Array.isArray(
-        waterRecurrence?.observations,
-      ) &&
-        waterRecurrence.observations
-          .map((row: any) => row?.comparisonForm)
-          .join("|") ===
-        "UOTER|UJË|UJ|SHUI",
-      "Expected exact admitted WATER comparison cohort.",
-    );
-
-    const eyeRecurrence =
-      await fetchJson(
-        `${baseUrl}/api/research/fvr?concept=eye`,
+      assert(
+        live?.status ===
+          "available",
+        `Expected live FVR surface for ${entry.conceptId}.`,
       );
 
-    assert(
-      eyeRecurrence?.status === "available",
-      "Expected EYE FVR research surface to be available.",
-    );
-
-    assert(
-      Array.isArray(
-        eyeRecurrence?.sharedFunctionalNucleus,
-      ) &&
-        eyeRecurrence.sharedFunctionalNucleus.length === 1 &&
-        eyeRecurrence.sharedFunctionalNucleus[0] === "Y",
-      "Expected EYE FVR shared functional nucleus Y.",
-    );
-
-    assert(
-      eyeRecurrence?.truth?.recurrenceObservationTruth ===
-        "fact_within_declared_comparison_forms",
-      "Expected EYE deterministic recurrence truth boundary.",
-    );
-
-    assert(
-      eyeRecurrence?.truth?.functionalVoiceMeaningTruth ===
-        "research_hypothesis",
-      "Expected EYE functional meaning to remain research_hypothesis.",
-    );
-
-    assert(
-      Array.isArray(
-        eyeRecurrence?.observations,
-      ) &&
-        eyeRecurrence.observations
-          .map((row: any) => row?.comparisonForm)
-          .join("|") ===
-        "EYE|SY",
-      "Expected exact admitted EYE comparison cohort.",
-    );
-
-    const fatherRecurrence =
-      await fetchJson(
-        `${baseUrl}/api/research/fvr?concept=father`,
+      assert(
+        live?.conceptId ===
+          expected.conceptId,
+        `Expected live FVR concept id ${entry.conceptId}.`,
       );
 
-    assert(
-      fatherRecurrence?.status === "available",
-      "Expected FATHER FVR research surface to be available.",
-    );
+      assert(
+        live?.cohortId ===
+          expected.cohortId,
+        `Expected live FVR cohort id for ${entry.conceptId}.`,
+      );
 
-    assert(
-      Array.isArray(
-        fatherRecurrence?.sharedFunctionalNucleus,
-      ) &&
-        fatherRecurrence.sharedFunctionalNucleus.length === 1 &&
-        fatherRecurrence.sharedFunctionalNucleus[0] === "A",
-      "Expected FATHER FVR shared functional nucleus A.",
-    );
+      assert(
+        JSON.stringify(
+          live
+            ?.sharedCanonicalVoices,
+        ) ===
+          JSON.stringify(
+            expected
+              .sharedCanonicalVoices,
+          ),
+        `Expected live canonical recurrence for ${entry.conceptId}.`,
+      );
 
-    assert(
-      fatherRecurrence?.truth?.recurrenceObservationTruth ===
-        "fact_within_declared_comparison_forms",
-      "Expected FATHER deterministic recurrence truth boundary.",
-    );
+      assert(
+        JSON.stringify(
+          live
+            ?.sharedFunctionalNucleus,
+        ) ===
+          JSON.stringify(
+            expected
+              .sharedFunctionalNucleus,
+          ),
+        `Expected live functional nucleus for ${entry.conceptId}.`,
+      );
 
-    assert(
-      fatherRecurrence?.truth?.functionalVoiceMeaningTruth ===
-        "research_hypothesis",
-      "Expected FATHER functional meaning to remain research_hypothesis.",
-    );
+      assert(
+        JSON.stringify(
+          live?.observations,
+        ) ===
+          JSON.stringify(
+            expected.observations,
+          ),
+        `Expected live admitted observations for ${entry.conceptId}.`,
+      );
 
-    assert(
-      Array.isArray(
-        fatherRecurrence?.observations,
-      ) &&
-        fatherRecurrence.observations
-          .map((row: any) => row?.comparisonForm)
-          .join("|") ===
-        "FATHER|AT",
-      "Expected exact admitted FATHER comparison cohort.",
-    );
+      assert(
+        JSON.stringify(
+          live?.truth,
+        ) ===
+          JSON.stringify(
+            expected.truth,
+          ),
+        `Expected live FVR truth boundary for ${entry.conceptId}.`,
+      );
+
+      assert(
+        JSON.stringify(
+          live?.claimBoundary,
+        ) ===
+          JSON.stringify(
+            expected.claimBoundary,
+          ),
+        `Expected live FVR claim boundary for ${entry.conceptId}.`,
+      );
+
+      recurrenceSummaries[
+        entry.conceptId
+          .toLocaleLowerCase(
+            "en-US",
+          )
+      ] = {
+        status:
+          live.status,
+        conceptId:
+          live.conceptId,
+        sharedFunctionalNucleus:
+          live
+            .sharedFunctionalNucleus,
+        comparisonForms:
+          live
+            .observations
+            .map(
+              (row: any) =>
+                row
+                  ?.comparisonForm,
+            ),
+        functionalVoiceMeaningTruth:
+          live
+            ?.truth
+            ?.functionalVoiceMeaningTruth,
+      };
+    }
 
     const unknownRecurrenceResponse =
       await fetch(
-        `${baseUrl}/api/research/fvr?concept=xyz`,
+        `${baseUrl}/api/research/fvr?concept=${encodeURIComponent(
+          "__unknown_fvr_catalog_smoke__",
+        )}`,
       );
 
     assert(
-      unknownRecurrenceResponse.status === 404,
-      "Expected unknown FVR concept to return 404 not_available.",
+      unknownRecurrenceResponse.status ===
+        404,
+      "Expected unknown FVR concept to remain fail-closed with 404.",
     );
 
     console.log(
       JSON.stringify(
         {
-          water: {
-            status:
-              waterRecurrence.status,
-            conceptId:
-              waterRecurrence.conceptId,
-            sharedFunctionalNucleus:
-              waterRecurrence.sharedFunctionalNucleus,
-            comparisonForms:
-              waterRecurrence.observations.map(
-                (row: any) =>
-                  row?.comparisonForm,
-              ),
-            functionalVoiceMeaningTruth:
-              waterRecurrence
-                ?.truth
-                ?.functionalVoiceMeaningTruth,
-          },
-          eye: {
-            status:
-              eyeRecurrence.status,
-            conceptId:
-              eyeRecurrence.conceptId,
-            sharedFunctionalNucleus:
-              eyeRecurrence.sharedFunctionalNucleus,
-            comparisonForms:
-              eyeRecurrence.observations.map(
-                (row: any) =>
-                  row?.comparisonForm,
-              ),
-            functionalVoiceMeaningTruth:
-              eyeRecurrence
-                ?.truth
-                ?.functionalVoiceMeaningTruth,
-          },
-          father: {
-            status:
-              fatherRecurrence.status,
-            conceptId:
-              fatherRecurrence.conceptId,
-            sharedFunctionalNucleus:
-              fatherRecurrence.sharedFunctionalNucleus,
-            comparisonForms:
-              fatherRecurrence.observations.map(
-                (row: any) =>
-                  row?.comparisonForm,
-              ),
-            functionalVoiceMeaningTruth:
-              fatherRecurrence
-                ?.truth
-                ?.functionalVoiceMeaningTruth,
-          },
+          ...recurrenceSummaries,
           unknownConcept: {
             status:
-              unknownRecurrenceResponse.status,
+              unknownRecurrenceResponse
+                .status,
           },
         },
         null,
