@@ -48,6 +48,49 @@ const EXPECTED_RECURRENCE_CLAIM_BOUNDARY_V0_1 = {
     "user_decides",
 } as const;
 
+const EXPECTED_COHORT_OUTPUTS_V0_1 = {
+  WATER: {
+    sharedCanonicalVoices: [
+      "U",
+    ],
+    sharedFunctionalNucleus: [
+      "U",
+    ],
+    comparisonForms: [
+      "UOTER",
+      "UJË",
+      "UJ",
+      "SHUI",
+    ],
+  },
+
+  EYE: {
+    sharedCanonicalVoices: [
+      "Y",
+    ],
+    sharedFunctionalNucleus: [
+      "Y",
+    ],
+    comparisonForms: [
+      "EYE",
+      "SY",
+    ],
+  },
+
+  FATHER: {
+    sharedCanonicalVoices: [
+      "A",
+    ],
+    sharedFunctionalNucleus: [
+      "A",
+    ],
+    comparisonForms: [
+      "FATHER",
+      "AT",
+    ],
+  },
+} as const;
+
 function normalizeIdentityV0_1(
   value: string,
 ): string {
@@ -55,6 +98,14 @@ function normalizeIdentityV0_1(
     .normalize("NFC")
     .trim()
     .toLocaleLowerCase("en-US");
+}
+
+function normalizeAuditIdV0_1(
+  value: string,
+): string {
+  return value
+    .normalize("NFC")
+    .trim();
 }
 
 describe(
@@ -90,14 +141,23 @@ describe(
             entry.conceptId.trim(),
           ).not.toBe("");
 
+          const normalizedCohortId =
+            normalizeAuditIdV0_1(
+              entry.cohort.cohortId,
+            );
+
+          expect(
+            normalizedCohortId,
+          ).not.toBe("");
+
           expect(
             cohortIds.has(
-              entry.cohort.cohortId,
+              normalizedCohortId,
             ),
           ).toBe(false);
 
           cohortIds.add(
-            entry.cohort.cohortId,
+            normalizedCohortId,
           );
 
           for (
@@ -148,14 +208,23 @@ describe(
             const row
             of entry.cohort.observations
           ) {
+            const normalizedRecurrenceEvidenceId =
+              normalizeAuditIdV0_1(
+                row.recurrenceEvidenceId,
+              );
+
+            expect(
+              normalizedRecurrenceEvidenceId,
+            ).not.toBe("");
+
             expect(
               recurrenceEvidenceIds.has(
-                row.recurrenceEvidenceId,
+                normalizedRecurrenceEvidenceId,
               ),
             ).toBe(false);
 
             recurrenceEvidenceIds.add(
-              row.recurrenceEvidenceId,
+              normalizedRecurrenceEvidenceId,
             );
 
             const observationKey =
@@ -284,10 +353,33 @@ describe(
     it(
       "admits and deterministically projects every catalog cohort without concept-specific test wiring",
       () => {
+        expect(
+          Object.keys(
+            EXPECTED_COHORT_OUTPUTS_V0_1,
+          ).sort(),
+        ).toEqual(
+          sevenVoiceFunctionalRecurrenceResearchCohortCatalogV0_1
+            .map(
+              (entry) =>
+                entry.conceptId,
+            )
+            .sort(),
+        );
+
         for (
           const entry
           of sevenVoiceFunctionalRecurrenceResearchCohortCatalogV0_1
         ) {
+          const expected =
+            EXPECTED_COHORT_OUTPUTS_V0_1[
+              entry.conceptId as keyof typeof EXPECTED_COHORT_OUTPUTS_V0_1
+            ];
+
+          if (!expected) {
+            throw new Error(
+              `missing independent golden output for ${entry.conceptId}`,
+            );
+          }
           const analysis =
             analyzeSevenVoiceFunctionalRecurrenceFromCohortEvidenceV0_1(
               entry.cohort,
@@ -371,9 +463,24 @@ describe(
           );
 
           expect(
+            first.sharedCanonicalVoices,
+          ).toEqual(
+            expected.sharedCanonicalVoices,
+          );
+
+          expect(
             first.sharedFunctionalNucleus,
           ).toEqual(
-            first.sharedCanonicalVoices,
+            expected.sharedFunctionalNucleus,
+          );
+
+          expect(
+            first.observations.map(
+              (row) =>
+                row.comparisonForm,
+            ),
+          ).toEqual(
+            expected.comparisonForms,
           );
 
           expect(
