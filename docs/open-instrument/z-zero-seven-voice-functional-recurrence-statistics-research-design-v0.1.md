@@ -464,6 +464,12 @@ Inferential outputs remain unauthorized until a reviewed null model and statisti
 
 Every future confirmatory inferential result must report an effect size or effect magnitude on the declared unit of analysis together with an uncertainty interval.
 
+Before any evidence from the applicable confirmatory dataset is examined, the methodology must preregister and freeze the exact effect-size statistic or effect measure and the estimand it represents.
+
+That frozen effect specification must state the quantity being estimated, the declared analysis unit to which it applies, the comparison or reference encoded by the estimand when applicable, and the deterministic rule that maps admitted observations to that reported effect.
+
+The effect measure or estimand must not be selected after examining which available definition produces a preferred magnitude, direction, uncertainty interval, or confirmatory conclusion.
+
 Before confirmatory evidence is examined, the methodology must preregister the confidence or credible level used for that interval, or another explicitly reviewed uncertainty level and procedure appropriate to the selected statistical method.
 
 A statistical-significance result or p-value alone must not be presented as evidence of practical importance, effect magnitude, or precision.
@@ -488,7 +494,8 @@ Future statistical outputs must preserve:
 - Fact
 - Inference
 - Hypothesis
-- Unknown / Null
+- Unknown / `insufficient_data`
+- Null
 
 Observed dataset counts may be factual within a declared dataset.
 
@@ -496,7 +503,13 @@ Model-based estimates may be inference.
 
 Functional interpretation remains hypothesis unless separately supported.
 
-Insufficient evidence remains Unknown / Null.
+Insufficient evidence remains Unknown / `insufficient_data` and must not be represented as Null.
+
+A Null classification may be emitted only when the preregistered adequacy, control, evidence, and methodology requirements for the applicable confirmatory analysis are satisfied and the reviewed decision rule yields its prespecified Null classification.
+
+Unknown / `insufficient_data` means that the available evidence or methodology does not support a confirmatory conclusion. Null is a distinct inferential classification from an adequately specified completed analysis under its reviewed decision rule.
+
+Neither Null nor `insufficient_data` is permission to claim historical origin, candidate truth, universality, or proof of absence beyond the reviewed statistical interpretation.
 
 These categories must not be collapsed.
 
@@ -609,7 +622,7 @@ Current evidence sufficiency for inferential recurrence statistics:
 
 This is not a failure.
 
-Null and insufficiency are valid scientific outcomes.
+Null and insufficiency are both valid scientific outcomes, but they are distinct classifications and must not be conflated.
 
 The governing doctrine remains:
 
