@@ -537,6 +537,346 @@ describe(
     );
 
     it(
+      "rejects unknown review statuses instead of treating them as ready",
+      () => {
+        const input =
+          JSON.parse(
+            JSON.stringify(
+              packet(),
+            ),
+          ) as any;
+
+        input.candidates[0].reviewStatus =
+          "approved";
+
+        const result =
+          validateSevenVoiceFunctionalRecurrenceCandidateEvidencePacketV0_1(
+            input,
+          );
+
+        expect(
+          result.valid,
+        ).toBe(false);
+
+        expect(
+          result.reasonCodes,
+        ).toContain(
+          "review_status_invalid",
+        );
+
+        expect(
+          result.readyForAdmissionReviewCandidateIds,
+        ).toEqual([]);
+      },
+    );
+
+    it(
+      "reports malformed citation data instead of throwing during normalization",
+      () => {
+        const input =
+          JSON.parse(
+            JSON.stringify(
+              packet(),
+            ),
+          ) as any;
+
+        input.candidates[0] = {
+          ...input.candidates[0],
+
+          surfaceForm:
+            "FORM",
+
+          attestedGloss:
+            "example gloss",
+
+          sourceStatus:
+            "research_candidate",
+
+          citations: [
+            {
+              citationId:
+                "candidate.example.malformed.v0_1",
+
+              sourceTitle:
+                "Example source",
+
+              sourceAuthorOrEditor:
+                null,
+
+              sourcePublisherOrHost:
+                "Example Publisher",
+
+              sourceDateOrVersion:
+                "v1",
+
+              sourceUrlOrArchiveRef:
+                "https://example.invalid/source",
+
+              entryLocator:
+                "entry FORM",
+
+              sourceHashOrArchiveHash:
+                null,
+
+              attestedForm:
+                undefined,
+
+              attestedGloss:
+                "example gloss",
+            },
+          ],
+
+          proposedComparisonForm:
+            "FORM",
+
+          proposedComparisonMode:
+            "orthography",
+
+          proposedComparisonAuthority:
+            "source_orthography",
+
+          proposedComparisonProvenance: {
+            provenanceId:
+              "candidate.example.orthography.v0_1",
+
+            authority:
+              "source_orthography",
+
+            ruleId:
+              null,
+
+            evidenceRefs: [],
+          },
+
+          reviewStatus:
+            "ready_for_admission_review",
+        };
+
+        expect(
+          () =>
+            validateSevenVoiceFunctionalRecurrenceCandidateEvidencePacketV0_1(
+              input,
+            ),
+        ).not.toThrow();
+
+        const result =
+          validateSevenVoiceFunctionalRecurrenceCandidateEvidencePacketV0_1(
+            input,
+          );
+
+        expect(
+          result.valid,
+        ).toBe(false);
+
+        expect(
+          result.reasonCodes,
+        ).toContain(
+          "ready_citation_incomplete",
+        );
+      },
+    );
+
+    it(
+      "requires a citation to attest the declared surface and gloss together",
+      () => {
+        const input =
+          JSON.parse(
+            JSON.stringify(
+              packet(),
+            ),
+          ) as any;
+
+        input.candidates[0] = {
+          ...input.candidates[0],
+
+          surfaceForm:
+            "FORM",
+
+          attestedGloss:
+            "fire",
+
+          sourceStatus:
+            "research_candidate",
+
+          citations: [
+            {
+              citationId:
+                "candidate.example.gloss-mismatch.v0_1",
+
+              sourceTitle:
+                "Example source",
+
+              sourceAuthorOrEditor:
+                null,
+
+              sourcePublisherOrHost:
+                "Example Publisher",
+
+              sourceDateOrVersion:
+                "v1",
+
+              sourceUrlOrArchiveRef:
+                "https://example.invalid/source",
+
+              entryLocator:
+                "entry FORM",
+
+              sourceHashOrArchiveHash:
+                null,
+
+              attestedForm:
+                "FORM",
+
+              attestedGloss:
+                "water",
+            },
+          ],
+
+          proposedComparisonForm:
+            "FORM",
+
+          proposedComparisonMode:
+            "orthography",
+
+          proposedComparisonAuthority:
+            "source_orthography",
+
+          proposedComparisonProvenance: {
+            provenanceId:
+              "candidate.example.orthography.v0_1",
+
+            authority:
+              "source_orthography",
+
+            ruleId:
+              null,
+
+            evidenceRefs: [],
+          },
+
+          reviewStatus:
+            "ready_for_admission_review",
+        };
+
+        const result =
+          validateSevenVoiceFunctionalRecurrenceCandidateEvidencePacketV0_1(
+            input,
+          );
+
+        expect(
+          result.valid,
+        ).toBe(false);
+
+        expect(
+          result.reasonCodes,
+        ).toContain(
+          "ready_surface_gloss_attestation_missing",
+        );
+      },
+    );
+
+    it(
+      "rejects incomplete comparison provenance before admission review",
+      () => {
+        const input =
+          JSON.parse(
+            JSON.stringify(
+              packet(),
+            ),
+          ) as any;
+
+        input.candidates[0] = {
+          ...input.candidates[0],
+
+          surfaceForm:
+            "FORM",
+
+          attestedGloss:
+            "example gloss",
+
+          sourceStatus:
+            "research_candidate",
+
+          citations: [
+            {
+              citationId:
+                "candidate.example.provenance.v0_1",
+
+              sourceTitle:
+                "Example source",
+
+              sourceAuthorOrEditor:
+                null,
+
+              sourcePublisherOrHost:
+                "Example Publisher",
+
+              sourceDateOrVersion:
+                "v1",
+
+              sourceUrlOrArchiveRef:
+                "https://example.invalid/source",
+
+              entryLocator:
+                "entry FORM",
+
+              sourceHashOrArchiveHash:
+                null,
+
+              attestedForm:
+                "FORM",
+
+              attestedGloss:
+                "example gloss",
+            },
+          ],
+
+          proposedComparisonForm:
+            "FORM",
+
+          proposedComparisonMode:
+            "orthography",
+
+          proposedComparisonAuthority:
+            "source_orthography",
+
+          proposedComparisonProvenance: {
+            provenanceId:
+              "",
+
+            authority:
+              "source_orthography",
+
+            ruleId:
+              null,
+
+            evidenceRefs: [
+              123,
+            ],
+          },
+
+          reviewStatus:
+            "ready_for_admission_review",
+        };
+
+        const result =
+          validateSevenVoiceFunctionalRecurrenceCandidateEvidencePacketV0_1(
+            input,
+          );
+
+        expect(
+          result.valid,
+        ).toBe(false);
+
+        expect(
+          result.reasonCodes,
+        ).toContain(
+          "ready_comparison_provenance_invalid",
+        );
+      },
+    );
+
+    it(
       "preserves rejected research candidates and requires an explicit reason",
       () => {
         const input =

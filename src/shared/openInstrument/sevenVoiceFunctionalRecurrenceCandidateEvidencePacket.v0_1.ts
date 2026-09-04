@@ -128,6 +128,7 @@ export type SevenVoiceFunctionalRecurrenceCandidatePacketReasonCodeV0_1 =
   | "duplicate_candidate_id"
   | "language_id_missing"
   | "claim_boundary_invalid"
+  | "review_status_invalid"
   | "rejected_candidate_missing_reason"
   | "ready_surface_form_missing"
   | "ready_attested_gloss_missing"
@@ -135,10 +136,12 @@ export type SevenVoiceFunctionalRecurrenceCandidatePacketReasonCodeV0_1 =
   | "ready_citation_missing"
   | "ready_citation_incomplete"
   | "ready_surface_attestation_missing"
+  | "ready_surface_gloss_attestation_missing"
   | "ready_comparison_form_missing"
   | "ready_comparison_mode_missing"
   | "ready_comparison_authority_missing"
   | "ready_comparison_provenance_missing"
+  | "ready_comparison_provenance_invalid"
   | "ready_comparison_authority_mismatch"
   | "ready_comparison_rule_id_missing";
 
@@ -160,15 +163,22 @@ export type SevenVoiceFunctionalRecurrenceCandidatePacketValidationV0_1 =
   }>;
 
 function normalizedId(
-  value: string,
+  value: unknown,
 ): string {
+  if (
+    typeof value !==
+      "string"
+  ) {
+    return "";
+  }
+
   return value
     .normalize("NFC")
     .trim();
 }
 
 function hasText(
-  value: string | null | undefined,
+  value: unknown,
 ): value is string {
   return (
     typeof value === "string" &&
@@ -234,15 +244,20 @@ function citationIsComplete(
   );
 }
 
-function citationsAttestSurface(
+function citationsAttestSurfaceAndGloss(
   citations:
     readonly MultiSourceFunctionalResearchCitationV0_1[],
   surfaceForm:
+    string | null,
+  attestedGloss:
     string | null,
 ): boolean {
   if (
     !hasText(
       surfaceForm,
+    ) ||
+    !hasText(
+      attestedGloss,
     )
   ) {
     return false;
@@ -253,12 +268,24 @@ function citationsAttestSurface(
       surfaceForm,
     );
 
+  const normalizedGloss =
+    normalizedId(
+      attestedGloss,
+    );
+
   return citations.some(
     (citation) =>
+      citationIsComplete(
+        citation,
+      ) &&
       normalizedId(
         citation.attestedForm,
       ) ===
-      normalizedSurface,
+        normalizedSurface &&
+      normalizedId(
+        citation.attestedGloss,
+      ) ===
+        normalizedGloss,
   );
 }
 
@@ -392,6 +419,21 @@ validateSevenVoiceFunctionalRecurrenceCandidateEvidencePacketV0_1(
     }
 
     if (
+      candidate.reviewStatus !==
+        "needs_source" &&
+      candidate.reviewStatus !==
+        "ready_for_admission_review" &&
+      candidate.reviewStatus !==
+        "reject"
+    ) {
+      reasonCodes.add(
+        "review_status_invalid",
+      );
+
+      continue;
+    }
+
+    if (
       candidate.reviewStatus ===
       "needs_source"
     ) {
@@ -477,14 +519,37 @@ validateSevenVoiceFunctionalRecurrenceCandidateEvidencePacketV0_1(
         );
       }
 
+      const hasSurfaceAttestation =
+        candidate.citations.some(
+          (citation) =>
+            citationIsComplete(
+              citation,
+            ) &&
+            normalizedId(
+              citation.attestedForm,
+            ) ===
+              normalizedId(
+                candidate.surfaceForm,
+              ),
+        );
+
       if (
-        !citationsAttestSurface(
-          candidate.citations,
-          candidate.surfaceForm,
-        )
+        !hasSurfaceAttestation
       ) {
         reasonCodes.add(
           "ready_surface_attestation_missing",
+        );
+      }
+
+      if (
+        !citationsAttestSurfaceAndGloss(
+          candidate.citations,
+          candidate.surfaceForm,
+          candidate.attestedGloss,
+        )
+      ) {
+        reasonCodes.add(
+          "ready_surface_gloss_attestation_missing",
         );
       }
     }
@@ -530,6 +595,38 @@ validateSevenVoiceFunctionalRecurrenceCandidateEvidencePacketV0_1(
       );
 
       continue;
+    }
+
+    const provenanceIsValid =
+      hasText(
+        provenance.provenanceId,
+      ) &&
+      hasText(
+        provenance.authority,
+      ) &&
+      (
+        provenance.ruleId ===
+          null ||
+        hasText(
+          provenance.ruleId,
+        )
+      ) &&
+      Array.isArray(
+        provenance.evidenceRefs,
+      ) &&
+      provenance.evidenceRefs.every(
+        (ref) =>
+          hasText(
+            ref,
+          ),
+      );
+
+    if (
+      !provenanceIsValid
+    ) {
+      reasonCodes.add(
+        "ready_comparison_provenance_invalid",
+      );
     }
 
     if (
