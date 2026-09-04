@@ -111,6 +111,21 @@ That frozen definition includes:
 - the fixed-versus-adaptive corpus posture
 - the duplicate lexical or source evidence control rule
 
+When the represented population is larger than the collected confirmatory corpus, the future methodology must also preregister and freeze the sampling or selection mechanism before any evidence from the applicable confirmatory dataset is examined.
+
+That frozen sampling specification must state, as applicable:
+
+- whether the design is a census, probability sample, or another explicitly justified selection mechanism
+- how eligible languages, varieties, concepts, or other analysis units are selected, recruited, sampled, or ordered for collection
+- the inclusion probabilities, sampling weights, or equivalent design information required by the selected inferential method when applicable
+- the population to which inference is permitted under that sampling mechanism
+
+If a convenience, purposive, availability-based, or other non-probability sample is used without an explicitly reviewed basis for wider population inference, inferential claims must be restricted to the observed corpus rather than presented as representative of the broader linguistic population.
+
+Post-hoc changes to the sampling mechanism, recruitment rule, selection order, inclusion probabilities, sampling weights, or permitted inference population after confirmatory evidence has been examined must remain explicitly exploratory and must not support confirmatory inference.
+
+This milestone does not choose a concrete sampling design, census rule, inclusion probability, sampling weight, or population-generalization rule.
+
 Any post-hoc change to those sampling-frame decisions after any evidence from the applicable confirmatory dataset has been examined must remain explicitly exploratory and must not support confirmatory inference.
 
 If corpus expansion is adaptive, merely declaring that posture is not sufficient for confirmatory inference.
@@ -350,6 +365,16 @@ A uniform baseline may only be used if a future reviewed methodology justifies i
 
 For confirmatory inference, the empirical baseline specification must be frozen before any evidence from the applicable confirmatory dataset is examined.
 
+If an empirical baseline frequency is estimated from a finite reference corpus or other sampled evidence rather than validly treated as fixed, the baseline data source and estimation procedure must also be preregistered and frozen before any evidence from the applicable confirmatory dataset is examined.
+
+The frozen baseline specification must state whether the baseline is treated as fixed or estimated and, when estimated, how baseline-estimation uncertainty is propagated through the confirmatory inferential procedure.
+
+A plug-in empirical baseline estimate must not be treated as known without uncertainty unless the reviewed methodology provides a valid justification for treating that baseline as fixed.
+
+Post-hoc changes to the baseline data source, estimator, fixed-versus-estimated treatment, or uncertainty-propagation procedure after confirmatory evidence has been examined must remain explicitly exploratory and must not support confirmatory inference.
+
+This milestone does not choose a baseline estimator, reference corpus, fixed baseline, variance estimate, or uncertainty-propagation method.
+
 ## Null model
 
 A future statistics lane must define an explicit null model before computing significance.
@@ -439,6 +464,16 @@ Every confirmatory endpoint outside the sole preregistered primary endpoint must
 Secondary voices, concepts, modes, subgroup analyses, alternative statistics, and other non-primary tests do not become confirmatory merely because one primary endpoint was preregistered.
 
 If there is more than one confirmatory endpoint, the methodology must define multiplicity handling for every confirmatory test outside the sole primary endpoint.
+
+For a frequentist confirmatory family with multiple endpoints, uncertainty intervals used to support familywise confirmatory claims must use a simultaneous or multiplicity-adjusted interval procedure consistent with the reviewed multiplicity design.
+
+Ordinary marginal intervals may still be reported only when they are clearly labeled as marginal and are not used to make familywise confirmatory claims or to imply rejection where the corresponding multiplicity-adjusted confirmatory test does not reject.
+
+The interval treatment for the confirmatory family must be preregistered and frozen before any evidence from the applicable confirmatory dataset is examined.
+
+Post-hoc switching between marginal, simultaneous, or multiplicity-adjusted interval procedures after confirmatory evidence has been examined must remain explicitly exploratory and must not support confirmatory statistical claims.
+
+This milestone does not choose a simultaneous-confidence procedure, multiplicity-adjusted interval method, familywise coverage level, or numeric correction threshold.
 
 The future methodology must preserve the distinction between exploratory hypothesis generation and confirmatory inference.
 
