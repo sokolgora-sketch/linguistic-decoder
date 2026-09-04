@@ -371,9 +371,24 @@ This milestone does not choose a numeric alpha, choose test sidedness, choose a 
 
 Post-hoc alternative baselines, null models, randomization or modeling rules, or preserved-structure choices must remain explicitly exploratory and must not be used as confirmatory evidence for the preregistered hypothesis.
 
-This milestone does not select a permutation test, parametric model, Bayesian model, bootstrap, or other statistical method.
+For confirmatory inference, the exact statistical method and its analysis parameters must be preregistered and frozen before any evidence from the applicable confirmatory dataset is examined.
 
-Method selection remains a future reviewed decision.
+That frozen statistical-method specification must define, as applicable:
+
+- the inferential procedure or model family used for the confirmatory analysis
+- the estimator or test procedure used to produce the declared result
+- the variance, uncertainty, exact, asymptotic, permutation, resampling, or posterior-computation procedure used by that method
+- deterministic analysis parameters that can change the reported estimate, uncertainty, test result, or confirmatory classification
+- any required resampling count, randomization rule, convergence criterion, approximation rule, or equivalent method-specific setting
+- how ties, missing analytic inputs, failed convergence, or other method-specific exceptional states are classified when applicable
+
+A statistical method, estimator, variance procedure, resampling configuration, or other analysis parameter must not be selected after examining which available option produces a preferred magnitude, uncertainty interval, significance result, posterior result, or confirmatory conclusion.
+
+Post-hoc alternative methods or analysis-parameter choices introduced after confirmatory evidence has been examined must remain explicitly exploratory and must not support confirmatory statistical claims.
+
+This milestone does not select a permutation test, parametric model, Bayesian model, bootstrap, variance estimator, resampling configuration, or other statistical method or analysis parameter.
+
+Method selection remains a future reviewed decision, but any method used for confirmatory inference must be selected and frozen prospectively under the requirements above.
 
 ## Multiplicity and confirmatory endpoints
 

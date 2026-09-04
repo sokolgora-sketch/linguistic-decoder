@@ -131,7 +131,7 @@ describe(
         );
 
         expect(doc).toContain(
-          "This milestone does not select a permutation test, parametric model, Bayesian model, bootstrap, or other statistical method.",
+          "This milestone does not select a permutation test, parametric model, Bayesian model, bootstrap, variance estimator, resampling configuration, or other statistical method or analysis parameter.",
         );
 
         for (
@@ -157,6 +157,14 @@ describe(
             "Post-hoc changes to the significance level, test sidedness, rejection criterion, Bayesian threshold, or analogous inferential decision rule after confirmatory evidence has been examined must remain explicitly exploratory",
             "This milestone does not choose a numeric alpha, choose test sidedness, choose a Bayesian threshold, invent a rejection rule, compute a p-value, or compute a posterior probability.",
             "Post-hoc alternative baselines, null models, randomization or modeling rules, or preserved-structure choices must remain explicitly exploratory",
+            "the exact statistical method and its analysis parameters must be preregistered and frozen before any evidence from the applicable confirmatory dataset is examined",
+            "the inferential procedure or model family used for the confirmatory analysis",
+            "the estimator or test procedure used to produce the declared result",
+            "the variance, uncertainty, exact, asymptotic, permutation, resampling, or posterior-computation procedure used by that method",
+            "deterministic analysis parameters that can change the reported estimate, uncertainty, test result, or confirmatory classification",
+            "A statistical method, estimator, variance procedure, resampling configuration, or other analysis parameter must not be selected after examining which available option produces a preferred magnitude, uncertainty interval, significance result, posterior result, or confirmatory conclusion.",
+            "Post-hoc alternative methods or analysis-parameter choices introduced after confirmatory evidence has been examined must remain explicitly exploratory",
+            "Method selection remains a future reviewed decision, but any method used for confirmatory inference must be selected and frozen prospectively under the requirements above.",
             "must prospectively justify the planned sample size or evidence volume",
             "a power analysis tied to the preregistered effect-size assumptions",
             "a precision / uncertainty-width target tied to the preregistered inferential question",
