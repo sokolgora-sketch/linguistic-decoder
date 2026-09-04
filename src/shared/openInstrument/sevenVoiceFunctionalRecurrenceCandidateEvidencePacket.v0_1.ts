@@ -123,22 +123,31 @@ export type SevenVoiceFunctionalRecurrenceCandidatePacketReasonCodeV0_1 =
   | "concept_id_missing"
   | "research_only_boundary_invalid"
   | "admitted_cohort_boundary_invalid"
+  | "invalid_packet_shape"
+  | "invalid_candidate_set"
   | "empty_candidate_set"
+  | "invalid_candidate_shape"
   | "candidate_id_missing"
   | "duplicate_candidate_id"
   | "language_id_missing"
+  | "language_variety_invalid"
+  | "intended_evidence_role_invalid"
   | "claim_boundary_invalid"
   | "review_status_invalid"
+  | "review_notes_invalid"
+  | "citations_invalid"
   | "rejected_candidate_missing_reason"
   | "ready_surface_form_missing"
   | "ready_attested_gloss_missing"
   | "ready_source_status_missing"
+  | "ready_source_status_invalid"
   | "ready_citation_missing"
   | "ready_citation_incomplete"
   | "ready_surface_attestation_missing"
   | "ready_surface_gloss_attestation_missing"
   | "ready_comparison_form_missing"
   | "ready_comparison_mode_missing"
+  | "ready_comparison_mode_invalid"
   | "ready_comparison_authority_missing"
   | "ready_comparison_provenance_missing"
   | "ready_comparison_provenance_invalid"
@@ -161,6 +170,57 @@ export type SevenVoiceFunctionalRecurrenceCandidatePacketValidationV0_1 =
     rejectedCandidateIds:
       readonly string[];
   }>;
+
+type UnknownRecord = {
+  [key: string]: unknown;
+};
+
+function isRecord(
+  value: unknown,
+): value is UnknownRecord {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    !Array.isArray(
+      value,
+    )
+  );
+}
+
+function evidenceRoleIsValid(
+  value: unknown,
+): boolean {
+  return (
+    value ===
+      "cohort_member" ||
+    value ===
+      "negative_control"
+  );
+}
+
+function sourceStatusIsValid(
+  value: unknown,
+): boolean {
+  return (
+    value ===
+      "research_candidate" ||
+    value ===
+      "reviewed_candidate"
+  );
+}
+
+function comparisonModeIsValid(
+  value: unknown,
+): boolean {
+  return (
+    value ===
+      "orthography" ||
+    value ===
+      "transliteration" ||
+    value ===
+      "z_zero_functional_normalization"
+  );
+}
 
 function normalizedId(
   value: unknown,
@@ -187,9 +247,16 @@ function hasText(
 }
 
 function claimBoundaryIsResearchOnly(
-  value:
-    SevenVoiceFunctionalRecurrenceCohortEvidenceClaimBoundaryV0_1,
+  value: unknown,
 ): boolean {
+  if (
+    !isRecord(
+      value,
+    )
+  ) {
+    return false;
+  }
+
   return (
     value.historicalOriginClaim ===
       "not_claimed" &&
@@ -213,9 +280,16 @@ function claimBoundaryIsResearchOnly(
 }
 
 function citationIsComplete(
-  citation:
-    MultiSourceFunctionalResearchCitationV0_1,
-): boolean {
+  citation: unknown,
+): citation is MultiSourceFunctionalResearchCitationV0_1 {
+  if (
+    !isRecord(
+      citation,
+    )
+  ) {
+    return false;
+  }
+
   return (
     hasText(
       citation.citationId,
@@ -246,11 +320,9 @@ function citationIsComplete(
 
 function citationsAttestSurfaceAndGloss(
   citations:
-    readonly MultiSourceFunctionalResearchCitationV0_1[],
-  surfaceForm:
-    string | null,
-  attestedGloss:
-    string | null,
+    readonly unknown[],
+  surfaceForm: unknown,
+  attestedGloss: unknown,
 ): boolean {
   if (
     !hasText(
@@ -291,8 +363,7 @@ function citationsAttestSurfaceAndGloss(
 
 export function
 validateSevenVoiceFunctionalRecurrenceCandidateEvidencePacketV0_1(
-  packet:
-    SevenVoiceFunctionalRecurrenceCandidateEvidencePacketV0_1,
+  packet: unknown,
 ):
   SevenVoiceFunctionalRecurrenceCandidatePacketValidationV0_1 {
   const reasonCodes =
@@ -308,6 +379,30 @@ validateSevenVoiceFunctionalRecurrenceCandidateEvidencePacketV0_1(
 
   const rejectedCandidateIds:
     string[] = [];
+
+  if (
+    !isRecord(
+      packet,
+    )
+  ) {
+    reasonCodes.add(
+      "invalid_packet_shape",
+    );
+
+    return {
+      valid:
+        false,
+
+      reasonCodes:
+        [...reasonCodes],
+
+      readyForAdmissionReviewCandidateIds,
+
+      needsSourceCandidateIds,
+
+      rejectedCandidateIds,
+    };
+  }
 
   if (
     packet.schemaVersion !==
@@ -357,6 +452,30 @@ validateSevenVoiceFunctionalRecurrenceCandidateEvidencePacketV0_1(
   }
 
   if (
+    !Array.isArray(
+      packet.candidates,
+    )
+  ) {
+    reasonCodes.add(
+      "invalid_candidate_set",
+    );
+
+    return {
+      valid:
+        false,
+
+      reasonCodes:
+        [...reasonCodes],
+
+      readyForAdmissionReviewCandidateIds,
+
+      needsSourceCandidateIds,
+
+      rejectedCandidateIds,
+    };
+  }
+
+  if (
     packet.candidates.length ===
     0
   ) {
@@ -372,6 +491,17 @@ validateSevenVoiceFunctionalRecurrenceCandidateEvidencePacketV0_1(
     const candidate
     of packet.candidates
   ) {
+    if (
+      !isRecord(
+        candidate,
+      )
+    ) {
+      reasonCodes.add(
+        "invalid_candidate_shape",
+      );
+
+      continue;
+    }
     const candidateId =
       normalizedId(
         candidate.candidateObservationId,
@@ -409,12 +539,58 @@ validateSevenVoiceFunctionalRecurrenceCandidateEvidencePacketV0_1(
     }
 
     if (
+      candidate.languageVariety !==
+        null &&
+      typeof candidate.languageVariety !==
+        "string"
+    ) {
+      reasonCodes.add(
+        "language_variety_invalid",
+      );
+    }
+
+    if (
+      !evidenceRoleIsValid(
+        candidate.intendedEvidenceRole,
+      )
+    ) {
+      reasonCodes.add(
+        "intended_evidence_role_invalid",
+      );
+    }
+
+    if (
       !claimBoundaryIsResearchOnly(
         candidate.claimBoundary,
       )
     ) {
       reasonCodes.add(
         "claim_boundary_invalid",
+      );
+    }
+
+    if (
+      !Array.isArray(
+        candidate.reviewNotes,
+      ) ||
+      !candidate.reviewNotes.every(
+        (note) =>
+          typeof note ===
+            "string",
+      )
+    ) {
+      reasonCodes.add(
+        "review_notes_invalid",
+      );
+    }
+
+    if (
+      !Array.isArray(
+        candidate.citations,
+      )
+    ) {
+      reasonCodes.add(
+        "citations_invalid",
       );
     }
 
@@ -437,9 +613,14 @@ validateSevenVoiceFunctionalRecurrenceCandidateEvidencePacketV0_1(
       candidate.reviewStatus ===
       "needs_source"
     ) {
-      needsSourceCandidateIds.push(
-        candidate.candidateObservationId,
-      );
+      if (
+        candidateId.length >
+        0
+      ) {
+        needsSourceCandidateIds.push(
+          candidateId,
+        );
+      }
 
       continue;
     }
@@ -448,11 +629,19 @@ validateSevenVoiceFunctionalRecurrenceCandidateEvidencePacketV0_1(
       candidate.reviewStatus ===
       "reject"
     ) {
-      rejectedCandidateIds.push(
-        candidate.candidateObservationId,
-      );
+      if (
+        candidateId.length >
+        0
+      ) {
+        rejectedCandidateIds.push(
+          candidateId,
+        );
+      }
 
       if (
+        !Array.isArray(
+          candidate.reviewNotes,
+        ) ||
         !candidate.reviewNotes.some(
           (note) =>
             hasText(
@@ -468,9 +657,14 @@ validateSevenVoiceFunctionalRecurrenceCandidateEvidencePacketV0_1(
       continue;
     }
 
-    readyForAdmissionReviewCandidateIds.push(
-      candidate.candidateObservationId,
-    );
+    if (
+      candidateId.length >
+      0
+    ) {
+      readyForAdmissionReviewCandidateIds.push(
+        candidateId,
+      );
+    }
 
     if (
       !hasText(
@@ -499,9 +693,25 @@ validateSevenVoiceFunctionalRecurrenceCandidateEvidencePacketV0_1(
       reasonCodes.add(
         "ready_source_status_missing",
       );
+    } else if (
+      !sourceStatusIsValid(
+        candidate.sourceStatus,
+      )
+    ) {
+      reasonCodes.add(
+        "ready_source_status_invalid",
+      );
     }
 
     if (
+      !Array.isArray(
+        candidate.citations,
+      )
+    ) {
+      reasonCodes.add(
+        "citations_invalid",
+      );
+    } else if (
       candidate.citations.length ===
       0
     ) {
@@ -571,6 +781,14 @@ validateSevenVoiceFunctionalRecurrenceCandidateEvidencePacketV0_1(
       reasonCodes.add(
         "ready_comparison_mode_missing",
       );
+    } else if (
+      !comparisonModeIsValid(
+        candidate.proposedComparisonMode,
+      )
+    ) {
+      reasonCodes.add(
+        "ready_comparison_mode_invalid",
+      );
     }
 
     if (
@@ -592,6 +810,18 @@ validateSevenVoiceFunctionalRecurrenceCandidateEvidencePacketV0_1(
     ) {
       reasonCodes.add(
         "ready_comparison_provenance_missing",
+      );
+
+      continue;
+    }
+
+    if (
+      !isRecord(
+        provenance,
+      )
+    ) {
+      reasonCodes.add(
+        "ready_comparison_provenance_invalid",
       );
 
       continue;

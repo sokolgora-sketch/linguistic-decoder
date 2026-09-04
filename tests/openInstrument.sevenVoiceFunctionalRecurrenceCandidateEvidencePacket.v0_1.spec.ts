@@ -877,6 +877,262 @@ describe(
     );
 
     it(
+      "fails closed for malformed packet and candidate containers instead of throwing",
+      () => {
+        const malformedPackets: any[] = [
+          null,
+          {
+            ...packet(),
+            candidates:
+              null,
+          },
+          {
+            ...packet(),
+            candidates: [
+              null,
+            ],
+          },
+          {
+            ...packet(),
+            candidates: [
+              {
+                ...packet().candidates[0],
+                claimBoundary:
+                  null,
+              },
+            ],
+          },
+          {
+            ...packet(),
+            candidates: [
+              {
+                ...packet().candidates[0],
+                reviewStatus:
+                  "reject",
+                reviewNotes:
+                  null,
+              },
+            ],
+          },
+          {
+            ...packet(),
+            candidates: [
+              {
+                ...packet().candidates[0],
+                reviewStatus:
+                  "ready_for_admission_review",
+                citations:
+                  null,
+              },
+            ],
+          },
+        ];
+
+        for (
+          const input
+          of malformedPackets
+        ) {
+          expect(
+            () =>
+              validateSevenVoiceFunctionalRecurrenceCandidateEvidencePacketV0_1(
+                input,
+              ),
+          ).not.toThrow();
+
+          expect(
+            validateSevenVoiceFunctionalRecurrenceCandidateEvidencePacketV0_1(
+              input,
+            ).valid,
+          ).toBe(false);
+        }
+      },
+    );
+
+    it(
+      "rejects runtime discriminator values that downstream cohort admission does not accept",
+      () => {
+        const makeReady =
+          () => {
+            const input =
+              JSON.parse(
+                JSON.stringify(
+                  packet(),
+                ),
+              ) as any;
+
+            input.candidates[0] = {
+              ...input.candidates[0],
+
+              surfaceForm:
+                "FORM",
+
+              attestedGloss:
+                "example gloss",
+
+              sourceStatus:
+                "research_candidate",
+
+              citations: [
+                {
+                  citationId:
+                    "candidate.example.runtime-enums.v0_1",
+
+                  sourceTitle:
+                    "Example source",
+
+                  sourceAuthorOrEditor:
+                    null,
+
+                  sourcePublisherOrHost:
+                    "Example Publisher",
+
+                  sourceDateOrVersion:
+                    "v1",
+
+                  sourceUrlOrArchiveRef:
+                    "https://example.invalid/source",
+
+                  entryLocator:
+                    "entry FORM",
+
+                  sourceHashOrArchiveHash:
+                    null,
+
+                  attestedForm:
+                    "FORM",
+
+                  attestedGloss:
+                    "example gloss",
+                },
+              ],
+
+              proposedComparisonForm:
+                "FORM",
+
+              proposedComparisonMode:
+                "orthography",
+
+              proposedComparisonAuthority:
+                "source_orthography",
+
+              proposedComparisonProvenance: {
+                provenanceId:
+                  "candidate.example.runtime-enums.provenance.v0_1",
+
+                authority:
+                  "source_orthography",
+
+                ruleId:
+                  null,
+
+                evidenceRefs: [],
+              },
+
+              reviewStatus:
+                "ready_for_admission_review",
+            };
+
+            return input;
+          };
+
+        {
+          const input =
+            makeReady();
+
+          input.candidates[0].intendedEvidenceRole =
+            "positive_control";
+
+          const result =
+            validateSevenVoiceFunctionalRecurrenceCandidateEvidencePacketV0_1(
+              input,
+            );
+
+          expect(
+            result.valid,
+          ).toBe(false);
+
+          expect(
+            result.reasonCodes,
+          ).toContain(
+            "intended_evidence_role_invalid",
+          );
+        }
+
+        {
+          const input =
+            makeReady();
+
+          input.candidates[0].languageVariety =
+            123;
+
+          const result =
+            validateSevenVoiceFunctionalRecurrenceCandidateEvidencePacketV0_1(
+              input,
+            );
+
+          expect(
+            result.valid,
+          ).toBe(false);
+
+          expect(
+            result.reasonCodes,
+          ).toContain(
+            "language_variety_invalid",
+          );
+        }
+
+        {
+          const input =
+            makeReady();
+
+          input.candidates[0].sourceStatus =
+            "approved";
+
+          const result =
+            validateSevenVoiceFunctionalRecurrenceCandidateEvidencePacketV0_1(
+              input,
+            );
+
+          expect(
+            result.valid,
+          ).toBe(false);
+
+          expect(
+            result.reasonCodes,
+          ).toContain(
+            "ready_source_status_invalid",
+          );
+        }
+
+        {
+          const input =
+            makeReady();
+
+          input.candidates[0].proposedComparisonMode =
+            "phonetic";
+
+          input.candidates[0].proposedComparisonProvenance.ruleId =
+            "some.rule";
+
+          const result =
+            validateSevenVoiceFunctionalRecurrenceCandidateEvidencePacketV0_1(
+              input,
+            );
+
+          expect(
+            result.valid,
+          ).toBe(false);
+
+          expect(
+            result.reasonCodes,
+          ).toContain(
+            "ready_comparison_mode_invalid",
+          );
+        }
+      },
+    );
+
+    it(
       "preserves rejected research candidates and requires an explicit reason",
       () => {
         const input =
