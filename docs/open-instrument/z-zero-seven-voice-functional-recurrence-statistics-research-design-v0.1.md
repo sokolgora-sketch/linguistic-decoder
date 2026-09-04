@@ -445,14 +445,22 @@ Before confirmatory evidence is examined, the future methodology must prospectiv
 
 That prospective justification must use at least one reviewed adequacy criterion appropriate to the selected statistical method:
 
-- a power analysis tied to the preregistered effect-size assumptions
+- a power analysis tied to prospectively justified and preregistered effect-size assumptions
 - or a precision / uncertainty-width target tied to the preregistered inferential question
 
-The adequacy criterion must be declared before confirmatory evidence is examined.
+If the power-analysis branch is used, the target power and the effect-size assumption or assumptions supporting the planned sample size must be prospectively justified, preregistered, and frozen before any evidence from the applicable confirmatory dataset is examined.
+
+The target power must be explicit rather than left implicit in the fact that a power calculation was performed.
+
+If the precision / uncertainty-width branch is used, the exact precision or uncertainty-width target used to justify the planned sample size or evidence volume must likewise be prospectively justified, preregistered, and frozen before any evidence from the applicable confirmatory dataset is examined.
+
+The selected adequacy criterion and its applicable target or assumptions must be declared and frozen before confirmatory evidence is examined.
+
+Post-hoc weakening or replacement of the target power, effect-size assumption, precision target, uncertainty-width target, or other adequacy criterion after confirmatory evidence has been examined must remain explicitly exploratory and must not unblock confirmatory inference.
 
 If the preregistered adequacy criterion is not met, confirmatory inference must remain blocked and the result must be `insufficient_data`.
 
-This requirement does not authorize this milestone to invent a numeric minimum cohort count, sample size, power threshold, or uncertainty-width threshold.
+This requirement does not authorize this milestone to invent a numeric minimum cohort count, sample size, target power, effect-size assumption, precision target, or uncertainty-width threshold.
 
 Until then:
 
