@@ -471,7 +471,7 @@ Possible descriptive outputs include:
 - cohort counts
 - observation counts
 - mode-stratified counts
-- Null recurrence counts
+- `empty_recurrence` counts
 - shared-voice frequencies
 - counterexample frequencies
 

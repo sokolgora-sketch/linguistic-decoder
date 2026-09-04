@@ -264,6 +264,7 @@ describe(
             "Hypothesis",
             "Unknown / `insufficient_data`",
             "`empty_recurrence`",
+            "`empty_recurrence` counts",
             "Null",
             "Null and insufficiency are both valid scientific outcomes, but they are distinct classifications and must not be conflated.",
             "Insufficient evidence remains Unknown / `insufficient_data` and must not be represented as Null.",
