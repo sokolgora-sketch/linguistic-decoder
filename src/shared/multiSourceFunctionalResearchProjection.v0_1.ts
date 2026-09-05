@@ -38,6 +38,9 @@ export type MultiSourceFunctionalResearchProjectionV0_1 = {
 
   embryo: string;
 
+  embryoAuthority:
+    MultiSourceFunctionalWitnessV0_1["embryoAuthority"];
+
   sourceKind:
     "multi_source_research_witness";
 
@@ -237,6 +240,9 @@ export function projectMultiSourceFunctionalResearchWitnessesV0_1(
       language,
 
       embryo,
+
+      embryoAuthority:
+        witness.embryoAuthority,
 
       sourceKind:
         "multi_source_research_witness",

@@ -41,8 +41,14 @@ import { buildOriginClaimV1 } from "./originClaim.builder.v1";
 import { attachSoundRootsV0_2 } from "./soundRoots/soundRoots.attach.v0.2";
 import { buildAnalysisStatusV0_1 } from "./analysisStatus.v0_1";
 import { discoverStructuralHypothesesV0_1 } from "./structuralHypothesisDiscovery.v0_1";
-import { discoverMultiSourceFunctionalWitnessesV0_1 } from "./multiSourceFunctionalDiscovery.v0_1";
-import { buildMultiSourceFunctionalResearchInputsV0_1 } from "./multiSourceFunctionalResearchEvidenceRegistry.v0_1";
+import {
+  discoverMultiSourceFunctionalWitnessesV0_1,
+  discoverSourceAttestedFunctionalWitnessesV0_1,
+} from "./multiSourceFunctionalDiscovery.v0_1";
+import {
+  buildMultiSourceFunctionalResearchInputsV0_1,
+  buildSourceAttestedFunctionalResearchInputGroupsV0_1,
+} from "./multiSourceFunctionalResearchEvidenceRegistry.v0_1";
 import { loadMultiSourceFunctionalResearchEvidenceCatalogV0_1 } from "./multiSourceFunctionalResearchEvidenceCatalog.v0_1";
 import { projectMultiSourceFunctionalResearchWitnessesV0_1 } from "./multiSourceFunctionalResearchProjection.v0_1";
 
@@ -462,15 +468,16 @@ export function enginePayloadToAnalysisResult(payload: EnginePayload): AnalyzeWo
   // Multi-source functional research v0.1.
   //
   // Boundary:
-  // - research discovery is layered only after a deterministic
-  //   structural hypothesis has validly filled the Null gap;
-  // - the runtime code is target/embryo generic: source rows own
+  // - structurally keyed research remains layered only after a
+  //   deterministic structural hypothesis validly fills a Null gap;
+  // - a separate source-attested exact-form fallback may fill a true
+  //   Null only when structural discovery emits no defensible embryo;
+  // - both paths remain target/embryo generic and source rows own
   //   their target-specific functional hypotheses;
   // - no reviewed evidence, OriginClaim, winner truth, or provider
   //   execution is created here;
-  // - structural candidates remain present alongside research
-  //   witnesses.
-  const projectedResearchCandidatesV0_1 =
+  // - structural candidates remain present only on the structural path.
+  const projectedStructuralResearchCandidatesV0_1 =
     shouldProjectStructuralHypothesesV0_1
       ? structuralHypothesesV0_1.flatMap(
           (hypothesis) => {
@@ -515,6 +522,49 @@ export function enginePayloadToAnalysisResult(payload: EnginePayload): AnalyzeWo
           },
         )
       : [];
+
+  // Evidence-first research fallback v0.1.
+  //
+  // This seam activates only when deterministic analysis is genuinely
+  // Null and structural discovery produced no defensible embryo.
+  // Source rows must directly attest their declared embryo as an exact
+  // form. No structural chain is fabricated and no reviewed/origin/
+  // winner/candidate truth is created here.
+  const shouldProjectSourceAttestedResearchV0_1 =
+    baselineAnalysisStatusV0_1
+      .status ===
+        "null_no_supported_candidate" &&
+    structuralHypothesesV0_1.length ===
+      0;
+
+  const projectedSourceAttestedResearchCandidatesV0_1 =
+    shouldProjectSourceAttestedResearchV0_1
+      ? buildSourceAttestedFunctionalResearchInputGroupsV0_1({
+          targetWord:
+            rootMapBasis,
+
+          rows:
+            multiSourceFunctionalResearchEvidenceCatalogV0_1,
+        }).flatMap((group) =>
+          projectMultiSourceFunctionalResearchWitnessesV0_1(
+            discoverSourceAttestedFunctionalWitnessesV0_1({
+              targetWord:
+                rootMapBasis,
+
+              embryo:
+                group.embryo,
+
+              sources:
+                group.sources,
+            }),
+          ),
+        )
+      : [];
+
+  const projectedResearchCandidatesV0_1 = [
+    ...projectedStructuralResearchCandidatesV0_1,
+    ...projectedSourceAttestedResearchCandidatesV0_1,
+  ];
 
   if (
     projectedResearchCandidatesV0_1
@@ -568,12 +618,15 @@ export function enginePayloadToAnalysisResult(payload: EnginePayload): AnalyzeWo
       ]);
   }
 
-  // Reuse the untouched baseline when structural discovery was
-  // lower-precedence. When structural discovery filled a valid
-  // Null gap, recompute only after any bounded research witnesses
-  // have been layered so aggregate status sees both seams.
+  // Reuse the untouched baseline unless a bounded gap-filling
+  // research/structural seam actually changed the candidate surface.
+  const shouldRecomputeGapFilledStatusV0_1 =
+    shouldProjectStructuralHypothesesV0_1 ||
+    projectedSourceAttestedResearchCandidatesV0_1
+      .length > 0;
+
   (result as any).analysisStatusV0_1 =
-    shouldProjectStructuralHypothesesV0_1
+    shouldRecomputeGapFilledStatusV0_1
       ? buildAnalysisStatusV0_1({
           word: rootMapBasis,
           rootMap,

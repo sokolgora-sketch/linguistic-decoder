@@ -5,7 +5,7 @@ import { normalizeToAllowedOpId } from "./ops/allowedOps.v0.1";
  *
  * Governing posture:
  *
- * structural discovery
+ * structural discovery OR bounded source-attested exact-form fallback
  *   -> multi-source functional witness discovery
  *   -> functional evaluation / semantic bridge
  *   -> embryo-first candidate projection
@@ -19,7 +19,7 @@ import { normalizeToAllowedOpId } from "./ops/allowedOps.v0.1";
  *   into one confidence value;
  * - stop after the first source hit.
  *
- * A structurally discovered embryo is a research key.
+ * A research embryo enters through explicit structural or source-attested authority.
  * A source hit is evidence about a form/meaning relation.
  * A functional bridge from that evidence to the target word is
  * a separate claim and must carry its own truth status.
@@ -61,7 +61,7 @@ export type MultiSourceFunctionalEvidenceRecordV0_1 = {
   citationRefs: readonly string[];
 
   /**
-   * Relationship between the structurally discovered embryo and
+   * Relationship between the requested research embryo and
    * the externally observed form.
    *
    * No relation may be inferred merely because two strings look similar.
@@ -127,11 +127,29 @@ export type MultiSourceFunctionalDiscoveryInputV0_1 = {
   sources: readonly MultiSourceFunctionalEvidenceRecordV0_1[];
 };
 
+export type SourceAttestedFunctionalDiscoveryInputV0_1 = {
+  targetWord: string;
+  embryo: string;
+
+  /**
+   * Evidence-first authority does not claim a structural expansion chain.
+   * The source form itself must exactly attest the requested embryo.
+   */
+  sources: readonly MultiSourceFunctionalEvidenceRecordV0_1[];
+};
+
+export type FunctionalEmbryoAuthorityV0_1 =
+  | "structural_discovery"
+  | "source_attested_exact_form";
+
 export type MultiSourceFunctionalWitnessV0_1 = {
   witnessId: string;
 
   targetWord: string;
   embryo: string;
+
+  embryoAuthority:
+    FunctionalEmbryoAuthorityV0_1;
 
   sourceId: string;
   evidenceFamily: MultiSourceEvidenceFamilyV0_1;
@@ -314,6 +332,140 @@ function isAdmissibleEvidenceRecordV0_1(
  * - this function does not review, authorize, rank, or promote
  *   witnesses into production evidence.
  */
+function buildFunctionalWitnessesV0_1(
+  input: {
+    targetWord: string;
+    embryo: string;
+
+    embryoAuthority:
+      FunctionalEmbryoAuthorityV0_1;
+
+    sources:
+      readonly MultiSourceFunctionalEvidenceRecordV0_1[];
+  },
+): MultiSourceFunctionalWitnessV0_1[] {
+  const witnesses:
+    MultiSourceFunctionalWitnessV0_1[] =
+    [];
+
+  const seenSourceIds =
+    new Set<string>();
+
+  for (const source of input.sources) {
+    if (
+      !isAdmissibleEvidenceRecordV0_1(
+        source,
+      )
+    ) {
+      continue;
+    }
+
+    const sourceId =
+      normalizeDiscoveryTextV0_1(
+        source.sourceId,
+      );
+
+    if (
+      seenSourceIds.has(
+        sourceId,
+      )
+    ) {
+      continue;
+    }
+
+    seenSourceIds.add(
+      sourceId,
+    );
+
+    const semanticBridge =
+      source.semanticBridge == null
+        ? null
+        : normalizeDiscoveryTextV0_1(
+            source.semanticBridge,
+          ) || null;
+
+    witnesses.push({
+      witnessId:
+        `multi-source-functional:${input.targetWord}:${input.embryo}:${sourceId}`,
+
+      targetWord:
+        input.targetWord,
+
+      embryo:
+        input.embryo,
+
+      embryoAuthority:
+        input.embryoAuthority,
+
+      sourceId,
+
+      evidenceFamily:
+        source.evidenceFamily,
+
+      sourceStatus:
+        source.sourceStatus,
+
+      language:
+        normalizeDiscoveryTextV0_1(
+          source.language,
+        ),
+
+      sourceForm:
+        normalizeDiscoveryTextV0_1(
+          source.form,
+        ),
+
+      gloss:
+        normalizeDiscoveryTextV0_1(
+          source.gloss,
+        ),
+
+      citationRefs:
+        normalizeCitationRefsV0_1(
+          source.citationRefs,
+        ),
+
+      embryoRelation:
+        source.embryoRelation,
+
+      relationOperationIds:
+        normalizeOperationIdsV0_1(
+          source.relationOperationIds,
+        ),
+
+      attestationTruth:
+        source.attestationTruth,
+
+      semanticBridge,
+
+      functionalBridgeTruth:
+        semanticBridge == null
+          ? "unknown"
+          : source.functionalBridgeTruth,
+
+      historicalOriginClaim:
+        "not_claimed",
+
+      historicalTransmissionClaim:
+        "not_claimed",
+
+      winnerClaim:
+        "not_claimed",
+
+      languageSuperiorityClaim:
+        "not_claimed",
+
+      candidateTruthClaim:
+        "not_claimed",
+
+      userDecisionPosture:
+        "user_decides",
+    });
+  }
+
+  return witnesses;
+}
+
 export function discoverMultiSourceFunctionalWitnessesV0_1(
   input: MultiSourceFunctionalDiscoveryInputV0_1,
 ): MultiSourceFunctionalWitnessV0_1[] {
@@ -347,100 +499,66 @@ export function discoverMultiSourceFunctionalWitnessesV0_1(
     return [];
   }
 
-  const witnesses:
-    MultiSourceFunctionalWitnessV0_1[] =
-    [];
+  return buildFunctionalWitnessesV0_1({
+    targetWord,
+    embryo,
 
-  const seenSourceIds = new Set<string>();
+    embryoAuthority:
+      "structural_discovery",
 
-  for (const source of input.sources) {
-    if (
-      !isAdmissibleEvidenceRecordV0_1(
-        source,
-      )
-    ) {
-      continue;
-    }
+    sources:
+      input.sources,
+  });
+}
 
-    const sourceId =
-      normalizeDiscoveryTextV0_1(
-        source.sourceId,
-      );
+/**
+ * Evidence-first research fallback.
+ *
+ * This does not infer an embryo from spelling and does not fabricate
+ * a structural expansion chain. The requested embryo must be directly
+ * attested by an admissible exact-form source record.
+ */
+export function discoverSourceAttestedFunctionalWitnessesV0_1(
+  input:
+    SourceAttestedFunctionalDiscoveryInputV0_1,
+): MultiSourceFunctionalWitnessV0_1[] {
+  const targetWord =
+    normalizeDiscoveryTextV0_1(
+      input.targetWord,
+    );
 
-    if (seenSourceIds.has(sourceId)) {
-      continue;
-    }
+  const embryo =
+    normalizeDiscoveryTextV0_1(
+      input.embryo,
+    );
 
-    seenSourceIds.add(sourceId);
-
-    const semanticBridge =
-      source.semanticBridge == null
-        ? null
-        : normalizeDiscoveryTextV0_1(
-            source.semanticBridge,
-          ) || null;
-
-    witnesses.push({
-      witnessId:
-        `multi-source-functional:${targetWord}:${embryo}:${sourceId}`,
-
-      targetWord,
-      embryo,
-
-      sourceId,
-      evidenceFamily:
-        source.evidenceFamily,
-      sourceStatus:
-        source.sourceStatus,
-
-      language:
-        normalizeDiscoveryTextV0_1(
-          source.language,
-        ),
-      sourceForm:
-        normalizeDiscoveryTextV0_1(
-          source.form,
-        ),
-      gloss:
-        normalizeDiscoveryTextV0_1(
-          source.gloss,
-        ),
-      citationRefs:
-        normalizeCitationRefsV0_1(
-          source.citationRefs,
-        ),
-
-      embryoRelation:
-        source.embryoRelation,
-      relationOperationIds:
-        normalizeOperationIdsV0_1(
-          source.relationOperationIds,
-        ),
-
-      attestationTruth:
-        source.attestationTruth,
-
-      semanticBridge,
-      functionalBridgeTruth:
-        semanticBridge == null
-          ? "unknown"
-          : source.functionalBridgeTruth,
-
-      historicalOriginClaim:
-        "not_claimed",
-      historicalTransmissionClaim:
-        "not_claimed",
-      winnerClaim:
-        "not_claimed",
-      languageSuperiorityClaim:
-        "not_claimed",
-      candidateTruthClaim:
-        "not_claimed",
-
-      userDecisionPosture:
-        "user_decides",
-    });
+  if (!targetWord || !embryo) {
+    return [];
   }
 
-  return witnesses;
+  const exactSources =
+    input.sources.filter(
+      (source) =>
+        source.embryoRelation ===
+          "exact_form" &&
+        normalizeDiscoveryTextV0_1(
+          source.form,
+        ).toLocaleUpperCase(
+          "en-US",
+        ) ===
+          embryo.toLocaleUpperCase(
+            "en-US",
+          ),
+    );
+
+  return buildFunctionalWitnessesV0_1({
+    targetWord,
+    embryo,
+
+    embryoAuthority:
+      "source_attested_exact_form",
+
+    sources:
+      exactSources,
+  });
 }

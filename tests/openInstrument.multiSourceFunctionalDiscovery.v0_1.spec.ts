@@ -1,5 +1,6 @@
 import {
   discoverMultiSourceFunctionalWitnessesV0_1,
+  discoverSourceAttestedFunctionalWitnessesV0_1,
   type MultiSourceFunctionalEvidenceRecordV0_1,
 } from "@/shared/multiSourceFunctionalDiscovery.v0_1";
 
@@ -383,7 +384,81 @@ describe(
         expect(result[0]).toMatchObject({
           targetWord: "gjak",
           embryo: "AK",
+          embryoAuthority:
+            "structural_discovery",
           sourceId: "fixture.generic.ak.v0_1",
+        });
+      },
+    );
+    it(
+      "marks exact-form fallback witnesses with source-attested authority and rejects non-exact relations",
+      () => {
+        const exactSource:
+          MultiSourceFunctionalEvidenceRecordV0_1 = {
+            sourceId:
+              "fixture.source-attested.dua.v0_1",
+            evidenceFamily:
+              "lexical_dictionary",
+            language:
+              "Fixture Albanian",
+            form:
+              "dua",
+            gloss:
+              "to love",
+            citationRefs: [
+              "fixture:citation:dua",
+            ],
+            embryoRelation:
+              "exact_form",
+            relationOperationIds: [],
+            attestationTruth:
+              "fact",
+            semanticBridge:
+              "fixture LOVE bridge",
+            functionalBridgeTruth:
+              "hypothesis",
+            sourceStatus:
+              "research_candidate",
+          };
+
+        const nonExactSource:
+          MultiSourceFunctionalEvidenceRecordV0_1 = {
+            ...exactSource,
+            sourceId:
+              "fixture.source-attested.non-exact.v0_1",
+            embryoRelation:
+              "semantic_resemblance",
+          };
+
+        const result =
+          discoverSourceAttestedFunctionalWitnessesV0_1({
+            targetWord:
+              "love",
+            embryo:
+              "DUA",
+            sources: [
+              exactSource,
+              nonExactSource,
+            ],
+          });
+
+        expect(result).toHaveLength(1);
+
+        expect(result[0]).toMatchObject({
+          targetWord:
+            "love",
+          embryo:
+            "DUA",
+          embryoAuthority:
+            "source_attested_exact_form",
+          sourceId:
+            "fixture.source-attested.dua.v0_1",
+          embryoRelation:
+            "exact_form",
+          historicalOriginClaim:
+            "not_claimed",
+          candidateTruthClaim:
+            "not_claimed",
         });
       },
     );

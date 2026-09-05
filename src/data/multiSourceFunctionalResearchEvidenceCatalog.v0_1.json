@@ -258,6 +258,88 @@
       "languageSuperiorityClaim": "not_claimed",
       "candidateTruthClaim": "not_claimed",
       "userDecisionPosture": "user_decides"
+    },
+    {
+      "registryVersion": "open-instrument.multi-source-functional-research-evidence-registry.v0_1",
+      "researchEvidenceId": "research.external.albanian-dua-love.v0_1",
+      "embryo": "DUA",
+      "evidenceFamily": "lexical_dictionary",
+      "language": "Albanian",
+      "form": "dua",
+      "gloss": "to love; to want",
+      "embryoRelation": "exact_form",
+      "relationOperationIds": [],
+      "attestationTruth": "fact",
+      "sourceStatus": "research_candidate",
+      "citations": [
+        {
+          "citationId": "research.external.fjale-dua-love.citation.v0_1",
+          "sourceTitle": "FJALË — Dua",
+          "sourceAuthorOrEditor": null,
+          "sourcePublisherOrHost": "FJALË — Fjalor Shqip",
+          "sourceDateOrVersion": "accessed 2026-09-05",
+          "sourceUrlOrArchiveRef": "https://fjale.al/dua",
+          "entryLocator": "DUA kal., senses 1-2",
+          "sourceHashOrArchiveHash": null,
+          "attestedForm": "dua",
+          "attestedGloss": "to love; to have a feeling of love for someone or something"
+        }
+      ],
+      "functionalHypotheses": [
+        {
+          "targetWord": "love",
+          "semanticBridge": "the independently attested Albanian verb dua meaning 'to love' can be tested as a direct functional expression of the LOVE concept; this is cross-language functional research only and does not assert historical origin or transmission",
+          "functionalBridgeTruth": "hypothesis",
+          "claimBoundary": "functional_hypothesis_only"
+        }
+      ],
+      "historicalOriginClaim": "not_claimed",
+      "historicalTransmissionClaim": "not_claimed",
+      "winnerClaim": "not_claimed",
+      "languageSuperiorityClaim": "not_claimed",
+      "candidateTruthClaim": "not_claimed",
+      "userDecisionPosture": "user_decides"
+    },
+    {
+      "registryVersion": "open-instrument.multi-source-functional-research-evidence-registry.v0_1",
+      "researchEvidenceId": "research.external.latin-amo-love.v0_1",
+      "embryo": "AMO",
+      "evidenceFamily": "historical_dictionary",
+      "language": "Latin",
+      "form": "amo",
+      "gloss": "to like; to love",
+      "embryoRelation": "exact_form",
+      "relationOperationIds": [],
+      "attestationTruth": "fact",
+      "sourceStatus": "research_candidate",
+      "citations": [
+        {
+          "citationId": "research.external.lewis-short-amo-love.citation.v0_1",
+          "sourceTitle": "Lewis and Short Latin Dictionary — amo",
+          "sourceAuthorOrEditor": "Charlton T. Lewis and Charles Short",
+          "sourcePublisherOrHost": "Scaife ATLAS / Perseus Digital Library",
+          "sourceDateOrVersion": "accessed 2026-09-05",
+          "sourceUrlOrArchiveRef": "https://atlas.perseus.tufts.edu/dictionaries/entry/urn%3Acite2%3Ascaife-viewer%3Adictionary-entries.atlas_v1%3Alat.ls.perseus-eng2-n2280/",
+          "entryLocator": "amo, first general definition",
+          "sourceHashOrArchiveHash": null,
+          "attestedForm": "amo",
+          "attestedGloss": "to like, to love"
+        }
+      ],
+      "functionalHypotheses": [
+        {
+          "targetWord": "love",
+          "semanticBridge": "the independently attested Latin verb amo meaning 'to love' can be tested as a direct functional expression of the LOVE concept; this is cross-language functional research only and does not assert historical origin or transmission",
+          "functionalBridgeTruth": "hypothesis",
+          "claimBoundary": "functional_hypothesis_only"
+        }
+      ],
+      "historicalOriginClaim": "not_claimed",
+      "historicalTransmissionClaim": "not_claimed",
+      "winnerClaim": "not_claimed",
+      "languageSuperiorityClaim": "not_claimed",
+      "candidateTruthClaim": "not_claimed",
+      "userDecisionPosture": "user_decides"
     }
   ]
 }

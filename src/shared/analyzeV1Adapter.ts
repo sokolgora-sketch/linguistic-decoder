@@ -207,6 +207,7 @@ function adaptCandidate(rawCandidate: Raw): CandidateUI {
     originClaim: rawCandidate?.originClaim,
     historicalRelation: rawCandidate?.historicalRelation,
     embryo: rawCandidate?.embryo,
+    embryoAuthority: rawCandidate?.embryoAuthority,
     embryoSize: rawCandidate?.embryoSize,
     embryoLanguage: rawCandidate?.embryoLanguage,
     isolatedStandaloneForm: rawCandidate?.isolatedStandaloneForm,
