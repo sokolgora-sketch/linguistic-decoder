@@ -138,4 +138,33 @@ describe("live candidate envelope contract", () => {
 
     expect(() => toAnalyzeWordResultV1Contract(malformed)).toThrow();
   });
+
+  it("rejects a non-empty candidate array when a live candidate lacks candidateId", () => {
+    const { candidateId: _candidateId, ...candidateWithoutId } =
+      base.candidates[0];
+
+    expect(() =>
+      toAnalyzeWordResultV1Contract({
+        ...base,
+        candidates: [candidateWithoutId],
+      }),
+    ).toThrow();
+  });
+
+  it("rejects an all-malformed candidate array instead of bypassing validation", () => {
+    const { candidateId: _firstCandidateId, ...firstCandidateWithoutId } =
+      base.candidates[0];
+    const { candidateId: _secondCandidateId, ...secondCandidateWithoutId } =
+      base.candidates[0];
+
+    expect(() =>
+      toAnalyzeWordResultV1Contract({
+        ...base,
+        candidates: [
+          firstCandidateWithoutId,
+          { ...secondCandidateWithoutId, sourceNote: null },
+        ],
+      }),
+    ).toThrow();
+  });
 });
