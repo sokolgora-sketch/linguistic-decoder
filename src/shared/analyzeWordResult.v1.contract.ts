@@ -54,6 +54,125 @@ export const AnalyzeWordPrimaryPathV1ContractSchema = z
   })
   .strict();
 
+const EMBRYO_FIRST_CLAIM_TYPES = [
+  "functionalMotivation",
+  "structuralHypothesis",
+  "historicalTransmission",
+  "surfaceResonance",
+  "seedPairing",
+  "unresolved",
+  "notEvaluated",
+] as const;
+
+const EMBRYO_FIRST_ORIGIN_CLAIMS = [
+  "not_claimed",
+  "context_only",
+  "explicitly_supported",
+  "rejected_for_this_output",
+] as const;
+
+const EMBRYO_FIRST_HISTORICAL_RELATIONS = [
+  "not_evaluated",
+  "context_only",
+  "possible_loan_relation",
+  "attested_loan_relation",
+  "possible_cognate_relation",
+  "unknown",
+  "not_applicable",
+] as const;
+
+const EMBRYO_FIRST_VALIDATION_OUTCOMES = [
+  "validated",
+  "partial",
+  "failed",
+  "not_evaluated",
+  "blocked",
+] as const;
+
+const EMBRYO_FIRST_RANK_GROUPS = [
+  "validatedFunctionalMotivation",
+  "partialFunctionalMotivation",
+  "structuralHypothesis",
+  "surfaceOrSeedOnly",
+  "historicalContextOnly",
+  "unresolved",
+] as const;
+
+/**
+ * Normalized live candidate envelope. Legacy candidate fields remain allowed
+ * through passthrough; this schema only hardens the additive embryo-first
+ * projection and does not assert linguistic truth or source validity.
+ */
+export const AnalyzeV1CandidateEnvelopeSchema = z
+  .object({
+    candidateId: z.string().min(1),
+    displayForm: z.string().min(1),
+    candidateLanguage: z.string().min(1),
+    claimType: z.enum(EMBRYO_FIRST_CLAIM_TYPES),
+    originClaim: z.enum(EMBRYO_FIRST_ORIGIN_CLAIMS),
+    historicalRelation: z.enum(EMBRYO_FIRST_HISTORICAL_RELATIONS),
+    embryo: z.string().nullable(),
+    embryoSize: z.number().finite().nullable(),
+    embryoLanguage: z.string().nullable(),
+    isolatedStandaloneForm: z.string().nullable(),
+    plainStandaloneGloss: z.string().nullable(),
+    sourceNote: z.string().nullable(),
+    segmentation: z.unknown().nullable(),
+    semanticBridge: z.string().nullable(),
+    expansionChain: z.array(z.string()),
+    validationOutcome: z.enum(EMBRYO_FIRST_VALIDATION_OUTCOMES),
+    validationReasons: z.array(z.string()),
+    rankGroup: z.enum(EMBRYO_FIRST_RANK_GROUPS),
+    rankScore: z.number().finite(),
+    rankReason: z.string().min(1),
+    claimBoundary: z.string().min(1),
+    userDecisionPosture: z.literal("user_decides"),
+  })
+  .passthrough();
+
+const AnalyzeV1ResearchCandidateEnvelopeSchema = z
+  .object({
+    candidateId: z.string().min(1),
+    displayForm: z.string().min(1),
+    candidateLanguage: z.string().min(1),
+    claimType: z.literal("functionalMotivation"),
+    embryo: z.string().min(1),
+    plainStandaloneGloss: z.string().min(1),
+    semanticBridge: z.string().nullable(),
+    validationOutcome: z.literal("not_evaluated"),
+    rankGroup: z.literal("unresolved"),
+    claimBoundary: z.literal("research_functional_hypothesis_only"),
+    userDecisionPosture: z.literal("user_decides"),
+  })
+  .passthrough();
+
+export type AnalyzeV1CandidateEnvelope = z.infer<
+  typeof AnalyzeV1CandidateEnvelopeSchema
+>;
+
+function validateLiveCandidateEnvelopeArray(value: unknown): void {
+  if (!Array.isArray(value)) return;
+
+  const containsLiveCandidate = value.some(
+    (candidate) =>
+      candidate &&
+      typeof candidate === "object" &&
+      !Array.isArray(candidate) &&
+      "candidateId" in candidate,
+  );
+
+  if (containsLiveCandidate) {
+    z
+      .array(
+        z.union([
+          AnalyzeV1CandidateEnvelopeSchema,
+          AnalyzeV1ResearchCandidateEnvelopeSchema,
+        ]),
+      )
+      .parse(value);
+  }
+}
+
 export const AnalyzeWordResultV1ContractSchema = z
   .object({
     word: z.string().min(1),
@@ -105,6 +224,8 @@ export function toAnalyzeWordResultV1Contract(input: unknown): AnalyzeWordResult
   // Zod will strip unknown keys BEFORE strict check? No—strict rejects unknown keys.
   // So we validate against a pre-picked object to guarantee stability.
   const o = (input ?? {}) as any;
+
+  validateLiveCandidateEnvelopeArray(o.candidates);
 
   const picked = {
     word: o.word,
