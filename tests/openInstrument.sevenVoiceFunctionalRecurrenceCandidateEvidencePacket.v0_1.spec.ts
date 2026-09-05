@@ -158,6 +158,10 @@ describe(
             "ready_comparison_provenance_missing",
           ]),
         );
+        expect(
+          result.readyForAdmissionReviewCandidateIds,
+        ).toEqual([]);
+
       },
     );
 
@@ -1056,6 +1060,10 @@ describe(
           ).toContain(
             "intended_evidence_role_invalid",
           );
+
+          expect(
+            result.readyForAdmissionReviewCandidateIds,
+          ).toEqual([]);
         }
 
         {

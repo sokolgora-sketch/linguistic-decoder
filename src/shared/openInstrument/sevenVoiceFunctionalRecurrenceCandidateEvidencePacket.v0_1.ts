@@ -656,12 +656,30 @@ validateSevenVoiceFunctionalRecurrenceCandidateEvidencePacketV0_1(
     const candidate
     of packet.candidates
   ) {
+    const candidateReasonCodes =
+      new Set<
+        SevenVoiceFunctionalRecurrenceCandidatePacketReasonCodeV0_1
+      >();
+
+    const addCandidateReason = (
+      reason:
+        SevenVoiceFunctionalRecurrenceCandidatePacketReasonCodeV0_1,
+    ) => {
+      candidateReasonCodes.add(
+        reason,
+      );
+
+      reasonCodes.add(
+        reason,
+      );
+    };
+
     if (
       !isRecord(
         candidate,
       )
     ) {
-      reasonCodes.add(
+      addCandidateReason(
         "invalid_candidate_shape",
       );
 
@@ -676,7 +694,7 @@ validateSevenVoiceFunctionalRecurrenceCandidateEvidencePacketV0_1(
       candidateId.length ===
       0
     ) {
-      reasonCodes.add(
+      addCandidateReason(
         "candidate_id_missing",
       );
     } else if (
@@ -684,7 +702,7 @@ validateSevenVoiceFunctionalRecurrenceCandidateEvidencePacketV0_1(
         candidateId,
       )
     ) {
-      reasonCodes.add(
+      addCandidateReason(
         "duplicate_candidate_id",
       );
     } else {
@@ -698,7 +716,7 @@ validateSevenVoiceFunctionalRecurrenceCandidateEvidencePacketV0_1(
         candidate.languageId,
       )
     ) {
-      reasonCodes.add(
+      addCandidateReason(
         "language_id_missing",
       );
     }
@@ -709,7 +727,7 @@ validateSevenVoiceFunctionalRecurrenceCandidateEvidencePacketV0_1(
       typeof candidate.languageVariety !==
         "string"
     ) {
-      reasonCodes.add(
+      addCandidateReason(
         "language_variety_invalid",
       );
     }
@@ -719,7 +737,7 @@ validateSevenVoiceFunctionalRecurrenceCandidateEvidencePacketV0_1(
         candidate.intendedEvidenceRole,
       )
     ) {
-      reasonCodes.add(
+      addCandidateReason(
         "intended_evidence_role_invalid",
       );
     }
@@ -729,7 +747,7 @@ validateSevenVoiceFunctionalRecurrenceCandidateEvidencePacketV0_1(
         candidate.claimBoundary,
       )
     ) {
-      reasonCodes.add(
+      addCandidateReason(
         "claim_boundary_invalid",
       );
     }
@@ -744,7 +762,7 @@ validateSevenVoiceFunctionalRecurrenceCandidateEvidencePacketV0_1(
             "string",
       )
     ) {
-      reasonCodes.add(
+      addCandidateReason(
         "review_notes_invalid",
       );
     }
@@ -754,7 +772,7 @@ validateSevenVoiceFunctionalRecurrenceCandidateEvidencePacketV0_1(
         candidate.citations,
       )
     ) {
-      reasonCodes.add(
+      addCandidateReason(
         "citations_invalid",
       );
     }
@@ -767,7 +785,7 @@ validateSevenVoiceFunctionalRecurrenceCandidateEvidencePacketV0_1(
     if (
       !presentEvidenceIsValid
     ) {
-      reasonCodes.add(
+      addCandidateReason(
         "candidate_present_evidence_invalid",
       );
     }
@@ -780,7 +798,7 @@ validateSevenVoiceFunctionalRecurrenceCandidateEvidencePacketV0_1(
       candidate.reviewStatus !==
         "reject"
     ) {
-      reasonCodes.add(
+      addCandidateReason(
         "review_status_invalid",
       );
 
@@ -828,7 +846,7 @@ validateSevenVoiceFunctionalRecurrenceCandidateEvidencePacketV0_1(
             ),
         )
       ) {
-        reasonCodes.add(
+        addCandidateReason(
           "rejected_candidate_missing_reason",
         );
       }
@@ -837,20 +855,11 @@ validateSevenVoiceFunctionalRecurrenceCandidateEvidencePacketV0_1(
     }
 
     if (
-      candidateId.length >
-      0
-    ) {
-      readyForAdmissionReviewCandidateIds.push(
-        candidateId,
-      );
-    }
-
-    if (
       !hasText(
         candidate.surfaceForm,
       )
     ) {
-      reasonCodes.add(
+      addCandidateReason(
         "ready_surface_form_missing",
       );
     }
@@ -860,7 +869,7 @@ validateSevenVoiceFunctionalRecurrenceCandidateEvidencePacketV0_1(
         candidate.attestedGloss,
       )
     ) {
-      reasonCodes.add(
+      addCandidateReason(
         "ready_attested_gloss_missing",
       );
     }
@@ -869,7 +878,7 @@ validateSevenVoiceFunctionalRecurrenceCandidateEvidencePacketV0_1(
       candidate.sourceStatus ==
       null
     ) {
-      reasonCodes.add(
+      addCandidateReason(
         "ready_source_status_missing",
       );
     } else if (
@@ -877,7 +886,7 @@ validateSevenVoiceFunctionalRecurrenceCandidateEvidencePacketV0_1(
         candidate.sourceStatus,
       )
     ) {
-      reasonCodes.add(
+      addCandidateReason(
         "ready_source_status_invalid",
       );
     }
@@ -887,14 +896,14 @@ validateSevenVoiceFunctionalRecurrenceCandidateEvidencePacketV0_1(
         candidate.citations,
       )
     ) {
-      reasonCodes.add(
+      addCandidateReason(
         "citations_invalid",
       );
     } else if (
       candidate.citations.length ===
       0
     ) {
-      reasonCodes.add(
+      addCandidateReason(
         "ready_citation_missing",
       );
     } else {
@@ -903,7 +912,7 @@ validateSevenVoiceFunctionalRecurrenceCandidateEvidencePacketV0_1(
           citationIsComplete,
         )
       ) {
-        reasonCodes.add(
+        addCandidateReason(
           "ready_citation_incomplete",
         );
       }
@@ -925,7 +934,7 @@ validateSevenVoiceFunctionalRecurrenceCandidateEvidencePacketV0_1(
       if (
         !hasSurfaceAttestation
       ) {
-        reasonCodes.add(
+        addCandidateReason(
           "ready_surface_attestation_missing",
         );
       }
@@ -937,7 +946,7 @@ validateSevenVoiceFunctionalRecurrenceCandidateEvidencePacketV0_1(
           candidate.attestedGloss,
         )
       ) {
-        reasonCodes.add(
+        addCandidateReason(
           "ready_surface_gloss_attestation_missing",
         );
       }
@@ -948,7 +957,7 @@ validateSevenVoiceFunctionalRecurrenceCandidateEvidencePacketV0_1(
         candidate.proposedComparisonForm,
       )
     ) {
-      reasonCodes.add(
+      addCandidateReason(
         "ready_comparison_form_missing",
       );
     }
@@ -957,7 +966,7 @@ validateSevenVoiceFunctionalRecurrenceCandidateEvidencePacketV0_1(
       candidate.proposedComparisonMode ==
       null
     ) {
-      reasonCodes.add(
+      addCandidateReason(
         "ready_comparison_mode_missing",
       );
     } else if (
@@ -965,7 +974,7 @@ validateSevenVoiceFunctionalRecurrenceCandidateEvidencePacketV0_1(
         candidate.proposedComparisonMode,
       )
     ) {
-      reasonCodes.add(
+      addCandidateReason(
         "ready_comparison_mode_invalid",
       );
     }
@@ -975,7 +984,7 @@ validateSevenVoiceFunctionalRecurrenceCandidateEvidencePacketV0_1(
         candidate.proposedComparisonAuthority,
       )
     ) {
-      reasonCodes.add(
+      addCandidateReason(
         "ready_comparison_authority_missing",
       );
     }
@@ -987,7 +996,7 @@ validateSevenVoiceFunctionalRecurrenceCandidateEvidencePacketV0_1(
       provenance ==
       null
     ) {
-      reasonCodes.add(
+      addCandidateReason(
         "ready_comparison_provenance_missing",
       );
 
@@ -999,7 +1008,7 @@ validateSevenVoiceFunctionalRecurrenceCandidateEvidencePacketV0_1(
         provenance,
       )
     ) {
-      reasonCodes.add(
+      addCandidateReason(
         "ready_comparison_provenance_invalid",
       );
 
@@ -1033,7 +1042,7 @@ validateSevenVoiceFunctionalRecurrenceCandidateEvidencePacketV0_1(
     if (
       !provenanceIsValid
     ) {
-      reasonCodes.add(
+      addCandidateReason(
         "ready_comparison_provenance_invalid",
       );
     }
@@ -1045,7 +1054,7 @@ validateSevenVoiceFunctionalRecurrenceCandidateEvidencePacketV0_1(
       provenance.authority !==
         candidate.proposedComparisonAuthority
     ) {
-      reasonCodes.add(
+      addCandidateReason(
         "ready_comparison_authority_mismatch",
       );
     }
@@ -1059,8 +1068,19 @@ validateSevenVoiceFunctionalRecurrenceCandidateEvidencePacketV0_1(
         provenance.ruleId,
       )
     ) {
-      reasonCodes.add(
+      addCandidateReason(
         "ready_comparison_rule_id_missing",
+      );
+    }
+
+    if (
+      candidateId.length >
+        0 &&
+      candidateReasonCodes.size ===
+        0
+    ) {
+      readyForAdmissionReviewCandidateIds.push(
+        candidateId,
       );
     }
   }
