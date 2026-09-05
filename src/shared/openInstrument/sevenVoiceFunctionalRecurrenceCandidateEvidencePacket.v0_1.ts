@@ -649,6 +649,10 @@ validateSevenVoiceFunctionalRecurrenceCandidateEvidencePacketV0_1(
     );
   }
 
+  const packetEnvelopeIsValid =
+    reasonCodes.size ===
+    0;
+
   const candidateIdCounts =
     new Map<
       string,
@@ -856,8 +860,9 @@ validateSevenVoiceFunctionalRecurrenceCandidateEvidencePacketV0_1(
       if (
         candidateId.length >
           0 &&
-        !isDuplicateCandidateId &&
-        presentEvidenceIsValid
+        packetEnvelopeIsValid &&
+        candidateReasonCodes.size ===
+          0
       ) {
         needsSourceCandidateIds.push(
           candidateId,
@@ -872,16 +877,6 @@ validateSevenVoiceFunctionalRecurrenceCandidateEvidencePacketV0_1(
       "reject"
     ) {
       if (
-        candidateId.length >
-          0 &&
-        !isDuplicateCandidateId
-      ) {
-        rejectedCandidateIds.push(
-          candidateId,
-        );
-      }
-
-      if (
         !Array.isArray(
           candidate.reviewNotes,
         ) ||
@@ -894,6 +889,18 @@ validateSevenVoiceFunctionalRecurrenceCandidateEvidencePacketV0_1(
       ) {
         addCandidateReason(
           "rejected_candidate_missing_reason",
+        );
+      }
+
+      if (
+        candidateId.length >
+          0 &&
+        packetEnvelopeIsValid &&
+        candidateReasonCodes.size ===
+          0
+      ) {
+        rejectedCandidateIds.push(
+          candidateId,
         );
       }
 
@@ -1122,6 +1129,7 @@ validateSevenVoiceFunctionalRecurrenceCandidateEvidencePacketV0_1(
     if (
       candidateId.length >
         0 &&
+      packetEnvelopeIsValid &&
       candidateReasonCodes.size ===
         0
     ) {

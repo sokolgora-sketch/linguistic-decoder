@@ -166,6 +166,183 @@ describe(
     );
 
     it(
+      "does not expose a ready candidate when the packet envelope is invalid",
+      () => {
+        const input =
+          JSON.parse(
+            JSON.stringify(
+              packet(),
+            ),
+          ) as any;
+
+        input.candidates[0] = {
+          ...input.candidates[0],
+
+          surfaceForm:
+            "FORM",
+
+          attestedGloss:
+            "example gloss",
+
+          sourceStatus:
+            "research_candidate",
+
+          citations: [
+            {
+              citationId:
+                "candidate.example.invalid-envelope.v0_1",
+
+              sourceTitle:
+                "Example lexical source",
+
+              sourceAuthorOrEditor:
+                null,
+
+              sourcePublisherOrHost:
+                "Example Publisher",
+
+              sourceDateOrVersion:
+                "v1",
+
+              sourceUrlOrArchiveRef:
+                "https://example.invalid/source",
+
+              entryLocator:
+                "entry FORM",
+
+              sourceHashOrArchiveHash:
+                null,
+
+              attestedForm:
+                "FORM",
+
+              attestedGloss:
+                "example gloss",
+            },
+          ],
+
+          proposedComparisonForm:
+            "FORM",
+
+          proposedComparisonMode:
+            "orthography",
+
+          proposedComparisonAuthority:
+            "source_orthography",
+
+          proposedComparisonProvenance: {
+            provenanceId:
+              "candidate.example.invalid-envelope.provenance.v0_1",
+
+            authority:
+              "source_orthography",
+
+            ruleId:
+              null,
+
+            evidenceRefs: [],
+          },
+
+          reviewStatus:
+            "ready_for_admission_review",
+        };
+
+        input.researchOnly =
+          false;
+
+        const result =
+          validateSevenVoiceFunctionalRecurrenceCandidateEvidencePacketV0_1(
+            input,
+          );
+
+        expect(
+          result.valid,
+        ).toBe(false);
+
+        expect(
+          result.reasonCodes,
+        ).toContain(
+          "research_only_boundary_invalid",
+        );
+
+        expect(
+          result.readyForAdmissionReviewCandidateIds,
+        ).toEqual([]);
+      },
+    );
+
+    it(
+      "does not expose needs_source ids when common candidate validation fails",
+      () => {
+        const input =
+          JSON.parse(
+            JSON.stringify(
+              packet(),
+            ),
+          ) as any;
+
+        input.candidates[0].languageId =
+          "";
+
+        const result =
+          validateSevenVoiceFunctionalRecurrenceCandidateEvidencePacketV0_1(
+            input,
+          );
+
+        expect(
+          result.valid,
+        ).toBe(false);
+
+        expect(
+          result.reasonCodes,
+        ).toContain(
+          "language_id_missing",
+        );
+
+        expect(
+          result.needsSourceCandidateIds,
+        ).toEqual([]);
+      },
+    );
+
+    it(
+      "does not expose rejected ids before the rejection itself validates",
+      () => {
+        const input =
+          JSON.parse(
+            JSON.stringify(
+              packet(),
+            ),
+          ) as any;
+
+        input.candidates[0].reviewStatus =
+          "reject";
+
+        input.candidates[0].reviewNotes =
+          [];
+
+        const result =
+          validateSevenVoiceFunctionalRecurrenceCandidateEvidencePacketV0_1(
+            input,
+          );
+
+        expect(
+          result.valid,
+        ).toBe(false);
+
+        expect(
+          result.reasonCodes,
+        ).toContain(
+          "rejected_candidate_missing_reason",
+        );
+
+        expect(
+          result.rejectedCandidateIds,
+        ).toEqual([]);
+      },
+    );
+
+    it(
       "accepts a source-traceable orthographic candidate as ready for admission review without admitting it",
       () => {
         const input =
