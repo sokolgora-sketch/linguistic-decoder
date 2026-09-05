@@ -34,6 +34,11 @@ describe("RootMapCard evidence type boundary v0.1", () => {
 
     expect(screen.getByText("sq: da")).toBeTruthy();
     expect(screen.getByText(/Dedvukaj & Ndoci 2023 PLSA/i)).toBeTruthy();
+    expect(screen.getByText("Keys")).toBeTruthy();
+    expect(screen.queryByText("Supported keys")).toBeNull();
+    expect(screen.getAllByText("DA")[1]?.closest("li")).toHaveTextContent(
+      "dialect_attested_pending_review",
+    );
     expect(screen.getByText("vowel_swap")).toBeTruthy();
     expect(screen.queryByText(/\[object Object\]/)).toBeNull();
     expect(screen.queryByText(/malformed/)).toBeNull();
