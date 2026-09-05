@@ -71,3 +71,71 @@ describe("analysisStatusV0_1 strict contract projection", () => {
     ).toBe(false);
   });
 });
+
+describe("live candidate envelope contract", () => {
+  const base = {
+    word: "study",
+    sanitized: "study",
+    engineVersion: "test",
+    mode: "strict",
+    alphabet: "auto",
+    candidates: [
+      {
+        id: "legacy-seed",
+        language: "Latin",
+        form: "studium",
+        status: "experimental",
+        confidenceTag: "solid",
+        fitTag: "strong",
+        candidateId: "latin-studium-seed-context",
+        displayForm: "Latin studium seed context",
+        candidateLanguage: "Latin",
+        claimType: "seedPairing",
+        originClaim: "not_claimed",
+        historicalRelation: "context_only",
+        embryo: "studium",
+        embryoSize: 7,
+        embryoLanguage: "Latin",
+        isolatedStandaloneForm: null,
+        plainStandaloneGloss: null,
+        sourceNote: null,
+        segmentation: null,
+        semanticBridge: null,
+        expansionChain: ["studium", "study"],
+        validationOutcome: "not_evaluated",
+        validationReasons: ["sourceKind_seed_not_validation"],
+        rankGroup: "surfaceOrSeedOnly",
+        rankScore: 30,
+        rankReason: "seed pairing only; sourceKind SEED is not validation",
+        claimBoundary: "not historical origin or validated functional motivation",
+        userDecisionPosture: "user_decides",
+      },
+    ],
+  };
+
+  it("validates the additive envelope while preserving legacy fields", () => {
+    const projected = toAnalyzeWordResultV1Contract(base);
+
+    expect(projected.candidates?.[0]).toMatchObject({
+      status: "experimental",
+      confidenceTag: "solid",
+      fitTag: "strong",
+      validationOutcome: "not_evaluated",
+      rankGroup: "surfaceOrSeedOnly",
+    });
+  });
+
+  it("rejects a live candidate missing an embryo-first field", () => {
+    const malformed = {
+      ...base,
+      candidates: [
+        {
+          ...(base.candidates[0] as Record<string, unknown>),
+          sourceNote: undefined,
+        },
+      ],
+    };
+
+    expect(() => toAnalyzeWordResultV1Contract(malformed)).toThrow();
+  });
+});
