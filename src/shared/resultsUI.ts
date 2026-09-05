@@ -61,6 +61,9 @@ export interface CandidateUI {
   id: string;
   language: string;
   form: string;
+  candidateId?: string;
+  displayForm?: string;
+  candidateLanguage?: string;
   functionalStatement?: string;
   vowelPath?: string;
   decomposition?: string[];
@@ -69,6 +72,26 @@ export interface CandidateUI {
   confidenceTag?: string;
   fitTag?: string;
   sourceKind?: string;
+  claimType?: string;
+  originClaim?: string;
+  historicalRelation?: string;
+  embryo?: string | null;
+  embryoAuthority?: string;
+  embryoSize?: number | null;
+  embryoLanguage?: string | null;
+  isolatedStandaloneForm?: string | null;
+  plainStandaloneGloss?: string | null;
+  sourceNote?: string | null;
+  segmentation?: unknown;
+  semanticBridge?: string | null;
+  expansionChain?: string[];
+  validationOutcome?: string;
+  validationReasons?: string[];
+  rankGroup?: string;
+  rankScore?: number;
+  rankReason?: string;
+  claimBoundary?: string;
+  userDecisionPosture?: string;
 }
 
 export interface AnalyzeWordResultUI {

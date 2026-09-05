@@ -83,4 +83,51 @@ describe("analyze-v1 adapter — UI contract invariants", () => {
     const ui = adaptAnalyzeV1ToUI(raw as any);
     expect(ui.candidates[0].sourceKind).toBe("SEED");
   });
+
+  it("preserves the typed embryo-first candidate fields", () => {
+    const raw = {
+      word: "study",
+      sanitized: "study",
+      engineVersion: "0.2.0-symbolic",
+      candidates: [
+        {
+          id: "albanian-study",
+          language: "Albanian",
+          form: "shtu + di",
+          candidateId: "albanian-shtu-di-study-functional",
+          displayForm: "Albanian shtu + di study",
+          candidateLanguage: "Albanian",
+          claimType: "functionalMotivation",
+          originClaim: "not_claimed",
+          historicalRelation: "not_evaluated",
+          embryo: "di",
+          embryoAuthority: "source_attested_exact_form",
+          embryoSize: 2,
+          embryoLanguage: "Albanian",
+          isolatedStandaloneForm: "di",
+          plainStandaloneGloss: "to know",
+          sourceNote: "independent source note",
+          segmentation: null,
+          semanticBridge: "study as know",
+          expansionChain: ["di", "study"],
+          validationOutcome: "partial",
+          validationReasons: [],
+          rankGroup: "partialFunctionalMotivation",
+          rankScore: 60,
+          rankReason: "partial evidence",
+          claimBoundary: "not historical origin",
+          userDecisionPosture: "user_decides",
+        },
+      ],
+    };
+
+    expect(adaptAnalyzeV1ToUI(raw).candidates[0]).toMatchObject({
+      candidateId: "albanian-shtu-di-study-functional",
+      claimType: "functionalMotivation",
+      embryo: "di",
+      validationOutcome: "partial",
+      rankGroup: "partialFunctionalMotivation",
+      userDecisionPosture: "user_decides",
+    });
+  });
 });
