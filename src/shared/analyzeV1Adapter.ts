@@ -263,7 +263,7 @@ function adaptCandidate(rawCandidate: Raw): CandidateUI {
     confidenceTag,
     fitTag,
     sourceKind,
-  } as unknown as CandidateUI;
+  };
 }
 
 export function adaptAnalyzeV1ToUI(raw: Raw): AnalyzeWordResultUI {
