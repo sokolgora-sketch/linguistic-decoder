@@ -372,7 +372,7 @@ describe(
     );
 
     it(
-      "normalizes candidate ids before duplicate detection",
+      "normalizes duplicate candidate ids before classification regardless of order",
       () => {
         const input =
           JSON.parse(
@@ -381,8 +381,84 @@ describe(
             ),
           ) as any;
 
-        input.candidates.push({
+        input.candidates[0] = {
           ...input.candidates[0],
+
+          surfaceForm:
+            "FORM",
+
+          attestedGloss:
+            "example gloss",
+
+          sourceStatus:
+            "research_candidate",
+
+          citations: [
+            {
+              citationId:
+                "candidate.example.duplicate-ready.v0_1",
+
+              sourceTitle:
+                "Example lexical source",
+
+              sourceAuthorOrEditor:
+                null,
+
+              sourcePublisherOrHost:
+                "Example Publisher",
+
+              sourceDateOrVersion:
+                "v1",
+
+              sourceUrlOrArchiveRef:
+                "https://example.invalid/source",
+
+              entryLocator:
+                "entry FORM",
+
+              sourceHashOrArchiveHash:
+                null,
+
+              attestedForm:
+                "FORM",
+
+              attestedGloss:
+                "example gloss",
+            },
+          ],
+
+          proposedComparisonForm:
+            "FORM",
+
+          proposedComparisonMode:
+            "orthography",
+
+          proposedComparisonAuthority:
+            "source_orthography",
+
+          proposedComparisonProvenance: {
+            provenanceId:
+              "candidate.example.duplicate-ready.provenance.v0_1",
+
+            authority:
+              "source_orthography",
+
+            ruleId:
+              null,
+
+            evidenceRefs: [],
+          },
+
+          reviewStatus:
+            "ready_for_admission_review",
+        };
+
+        input.candidates.push({
+          ...JSON.parse(
+            JSON.stringify(
+              input.candidates[0],
+            ),
+          ),
 
           candidateObservationId:
             " candidate.example.language-a.v0_1 ",
@@ -402,6 +478,38 @@ describe(
         ).toContain(
           "duplicate_candidate_id",
         );
+
+        expect(
+          result.readyForAdmissionReviewCandidateIds,
+        ).toEqual([]);
+
+        const reversedInput =
+          JSON.parse(
+            JSON.stringify(
+              input,
+            ),
+          ) as any;
+
+        reversedInput.candidates.reverse();
+
+        const reversedResult =
+          validateSevenVoiceFunctionalRecurrenceCandidateEvidencePacketV0_1(
+            reversedInput,
+          );
+
+        expect(
+          reversedResult.valid,
+        ).toBe(false);
+
+        expect(
+          reversedResult.reasonCodes,
+        ).toContain(
+          "duplicate_candidate_id",
+        );
+
+        expect(
+          reversedResult.readyForAdmissionReviewCandidateIds,
+        ).toEqual([]);
       },
     );
 

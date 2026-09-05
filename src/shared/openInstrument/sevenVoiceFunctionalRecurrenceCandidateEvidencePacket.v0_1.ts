@@ -649,8 +649,47 @@ validateSevenVoiceFunctionalRecurrenceCandidateEvidencePacketV0_1(
     );
   }
 
-  const candidateIds =
-    new Set<string>();
+  const candidateIdCounts =
+    new Map<
+      string,
+      number
+    >();
+
+  for (
+    const candidate
+    of packet.candidates
+  ) {
+    if (
+      !isRecord(
+        candidate,
+      )
+    ) {
+      continue;
+    }
+
+    const candidateId =
+      normalizedId(
+        candidate.candidateObservationId,
+      );
+
+    if (
+      candidateId.length ===
+      0
+    ) {
+      continue;
+    }
+
+    candidateIdCounts.set(
+      candidateId,
+      (
+        candidateIdCounts.get(
+          candidateId,
+        ) ??
+        0
+      ) +
+        1,
+    );
+  }
 
   for (
     const candidate
@@ -690,6 +729,17 @@ validateSevenVoiceFunctionalRecurrenceCandidateEvidencePacketV0_1(
         candidate.candidateObservationId,
       );
 
+    const isDuplicateCandidateId =
+      candidateId.length >
+        0 &&
+      (
+        candidateIdCounts.get(
+          candidateId,
+        ) ??
+        0
+      ) >
+        1;
+
     if (
       candidateId.length ===
       0
@@ -698,16 +748,10 @@ validateSevenVoiceFunctionalRecurrenceCandidateEvidencePacketV0_1(
         "candidate_id_missing",
       );
     } else if (
-      candidateIds.has(
-        candidateId,
-      )
+      isDuplicateCandidateId
     ) {
       addCandidateReason(
         "duplicate_candidate_id",
-      );
-    } else {
-      candidateIds.add(
-        candidateId,
       );
     }
 
@@ -812,6 +856,7 @@ validateSevenVoiceFunctionalRecurrenceCandidateEvidencePacketV0_1(
       if (
         candidateId.length >
           0 &&
+        !isDuplicateCandidateId &&
         presentEvidenceIsValid
       ) {
         needsSourceCandidateIds.push(
@@ -828,7 +873,8 @@ validateSevenVoiceFunctionalRecurrenceCandidateEvidencePacketV0_1(
     ) {
       if (
         candidateId.length >
-        0
+          0 &&
+        !isDuplicateCandidateId
       ) {
         rejectedCandidateIds.push(
           candidateId,
