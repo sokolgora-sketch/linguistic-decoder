@@ -463,40 +463,62 @@ export function buildSourceAttestedFunctionalResearchInputGroupsV0_1(
     return [];
   }
 
+  const eligibleRows =
+    options.rows.filter(
+      (row) => {
+        if (
+          !researchBoundaryIsPreservedV0_1(
+            row,
+          ) ||
+          row.embryoRelation !==
+            "exact_form" ||
+          !sameResearchKeyV0_1(
+            row.embryo,
+            row.form,
+          )
+        ) {
+          return false;
+        }
+
+        const hasMatchingUsableCitation =
+          row.citations.some(
+            (citation) =>
+              citationIdIfUsableV0_1(
+                citation,
+              ) !== null &&
+              sameResearchKeyV0_1(
+                citation.attestedForm,
+                row.form,
+              ) &&
+              sameResearchKeyV0_1(
+                citation.attestedForm,
+                row.embryo,
+              ),
+          );
+
+        if (
+          !hasMatchingUsableCitation
+        ) {
+          return false;
+        }
+
+        return row.functionalHypotheses.some(
+          (candidate) =>
+            candidate.claimBoundary ===
+              "functional_hypothesis_only" &&
+            sameResearchKeyV0_1(
+              candidate.targetWord,
+              targetWord,
+            ),
+        );
+      },
+    );
+
   const embryos: string[] = [];
   const seenEmbryos =
     new Set<string>();
 
-  for (const row of options.rows) {
-    if (
-      !researchBoundaryIsPreservedV0_1(
-        row,
-      ) ||
-      row.embryoRelation !==
-        "exact_form" ||
-      !sameResearchKeyV0_1(
-        row.embryo,
-        row.form,
-      )
-    ) {
-      continue;
-    }
-
-    const hasTargetHypothesis =
-      row.functionalHypotheses.some(
-        (candidate) =>
-          candidate.claimBoundary ===
-            "functional_hypothesis_only" &&
-          sameResearchKeyV0_1(
-            candidate.targetWord,
-            targetWord,
-          ),
-      );
-
-    if (!hasTargetHypothesis) {
-      continue;
-    }
-
+  for (const row of eligibleRows) {
     const embryo =
       normalizeResearchTextV0_1(
         row.embryo,
@@ -527,7 +549,7 @@ export function buildSourceAttestedFunctionalResearchInputGroupsV0_1(
           targetWord,
           embryo,
           rows:
-            options.rows,
+            eligibleRows,
         }).filter(
           (source) =>
             source.embryoRelation ===
