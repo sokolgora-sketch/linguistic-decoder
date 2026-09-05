@@ -1133,6 +1133,199 @@ describe(
     );
 
     it(
+      "validates malformed present evidence even while status remains needs_source",
+      () => {
+        const mutations = [
+          (input: any) => {
+            input.candidates[0].surfaceForm =
+              123;
+          },
+
+          (input: any) => {
+            input.candidates[0].sourceStatus =
+              "approved";
+          },
+
+          (input: any) => {
+            input.candidates[0].citations = [
+              null,
+            ];
+          },
+
+          (input: any) => {
+            input.candidates[0].proposedComparisonMode =
+              "phonetic";
+          },
+
+          (input: any) => {
+            input.candidates[0].proposedComparisonProvenance = {
+              provenanceId:
+                "",
+
+              authority:
+                "source_orthography",
+
+              ruleId:
+                null,
+
+              evidenceRefs: [],
+            };
+          },
+        ];
+
+        for (
+          const mutate
+          of mutations
+        ) {
+          const input =
+            JSON.parse(
+              JSON.stringify(
+                packet(),
+              ),
+            ) as any;
+
+          mutate(
+            input,
+          );
+
+          const result =
+            validateSevenVoiceFunctionalRecurrenceCandidateEvidencePacketV0_1(
+              input,
+            );
+
+          expect(
+            result.valid,
+          ).toBe(false);
+
+          expect(
+            result.reasonCodes,
+          ).toContain(
+            "candidate_present_evidence_invalid",
+          );
+
+          expect(
+            result.needsSourceCandidateIds,
+          ).toEqual([]);
+        }
+      },
+    );
+
+    it(
+      "rejects non-string nullable citation metadata",
+      () => {
+        for (
+          const field
+          of [
+            "sourceAuthorOrEditor",
+            "sourceHashOrArchiveHash",
+          ] as const
+        ) {
+          const input =
+            JSON.parse(
+              JSON.stringify(
+                packet(),
+              ),
+            ) as any;
+
+          input.candidates[0] = {
+            ...input.candidates[0],
+
+            surfaceForm:
+              "FORM",
+
+            attestedGloss:
+              "example gloss",
+
+            sourceStatus:
+              "research_candidate",
+
+            citations: [
+              {
+                citationId:
+                  "candidate.example.bad-citation-metadata.v0_1",
+
+                sourceTitle:
+                  "Example lexical source",
+
+                sourceAuthorOrEditor:
+                  null,
+
+                sourcePublisherOrHost:
+                  "Example Publisher",
+
+                sourceDateOrVersion:
+                  "v1",
+
+                sourceUrlOrArchiveRef:
+                  "https://example.invalid/source",
+
+                entryLocator:
+                  "entry FORM",
+
+                sourceHashOrArchiveHash:
+                  null,
+
+                attestedForm:
+                  "FORM",
+
+                attestedGloss:
+                  "example gloss",
+              },
+            ],
+
+            proposedComparisonForm:
+              "FORM",
+
+            proposedComparisonMode:
+              "orthography",
+
+            proposedComparisonAuthority:
+              "source_orthography",
+
+            proposedComparisonProvenance: {
+              provenanceId:
+                "candidate.example.bad-citation-metadata.provenance.v0_1",
+
+              authority:
+                "source_orthography",
+
+              ruleId:
+                null,
+
+              evidenceRefs: [],
+            },
+
+            reviewStatus:
+              "ready_for_admission_review",
+          };
+
+          input.candidates[0].citations[0][field] = {
+            invalid:
+              true,
+          };
+
+          const result =
+            validateSevenVoiceFunctionalRecurrenceCandidateEvidencePacketV0_1(
+              input,
+            );
+
+          expect(
+            result.valid,
+          ).toBe(false);
+
+          expect(
+            result.reasonCodes,
+          ).toEqual(
+            expect.arrayContaining([
+              "candidate_present_evidence_invalid",
+              "ready_citation_incomplete",
+            ]),
+          );
+        }
+      },
+    );
+
+    it(
       "preserves rejected research candidates and requires an explicit reason",
       () => {
         const input =

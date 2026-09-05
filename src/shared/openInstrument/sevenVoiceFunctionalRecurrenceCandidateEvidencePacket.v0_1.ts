@@ -136,6 +136,7 @@ export type SevenVoiceFunctionalRecurrenceCandidatePacketReasonCodeV0_1 =
   | "review_status_invalid"
   | "review_notes_invalid"
   | "citations_invalid"
+  | "candidate_present_evidence_invalid"
   | "rejected_candidate_missing_reason"
   | "ready_surface_form_missing"
   | "ready_attested_gloss_missing"
@@ -309,6 +310,18 @@ function citationIsComplete(
     hasText(
       citation.entryLocator,
     ) &&
+    (
+      citation.sourceAuthorOrEditor ===
+        null ||
+      typeof citation.sourceAuthorOrEditor ===
+        "string"
+    ) &&
+    (
+      citation.sourceHashOrArchiveHash ===
+        null ||
+      typeof citation.sourceHashOrArchiveHash ===
+        "string"
+    ) &&
     hasText(
       citation.attestedForm,
     ) &&
@@ -359,6 +372,158 @@ function citationsAttestSurfaceAndGloss(
       ) ===
         normalizedGloss,
   );
+}
+
+function comparisonProvenanceIsStructurallyValid(
+  value: unknown,
+): value is UnknownRecord {
+  return (
+    isRecord(
+      value,
+    ) &&
+    hasText(
+      value.provenanceId,
+    ) &&
+    hasText(
+      value.authority,
+    ) &&
+    (
+      value.ruleId ===
+        null ||
+      hasText(
+        value.ruleId,
+      )
+    ) &&
+    Array.isArray(
+      value.evidenceRefs,
+    ) &&
+    value.evidenceRefs.every(
+      (ref) =>
+        hasText(
+          ref,
+        ),
+    )
+  );
+}
+
+function candidatePresentEvidenceIsValid(
+  candidate: UnknownRecord,
+): boolean {
+  if (
+    candidate.surfaceForm !==
+      null &&
+    !hasText(
+      candidate.surfaceForm,
+    )
+  ) {
+    return false;
+  }
+
+  if (
+    candidate.attestedGloss !==
+      null &&
+    !hasText(
+      candidate.attestedGloss,
+    )
+  ) {
+    return false;
+  }
+
+  if (
+    candidate.sourceStatus !==
+      null &&
+    !sourceStatusIsValid(
+      candidate.sourceStatus,
+    )
+  ) {
+    return false;
+  }
+
+  if (
+    !Array.isArray(
+      candidate.citations,
+    ) ||
+    !candidate.citations.every(
+      citationIsComplete,
+    )
+  ) {
+    return false;
+  }
+
+  if (
+    candidate.proposedComparisonForm !==
+      null &&
+    !hasText(
+      candidate.proposedComparisonForm,
+    )
+  ) {
+    return false;
+  }
+
+  if (
+    candidate.proposedComparisonMode !==
+      null &&
+    !comparisonModeIsValid(
+      candidate.proposedComparisonMode,
+    )
+  ) {
+    return false;
+  }
+
+  if (
+    candidate.proposedComparisonAuthority !==
+      null &&
+    !hasText(
+      candidate.proposedComparisonAuthority,
+    )
+  ) {
+    return false;
+  }
+
+  const provenance =
+    candidate.proposedComparisonProvenance;
+
+  if (
+    provenance !==
+      null
+  ) {
+    if (
+      !comparisonProvenanceIsStructurallyValid(
+        provenance,
+      )
+    ) {
+      return false;
+    }
+
+    if (
+      candidate.proposedComparisonAuthority !==
+        null &&
+      hasText(
+        candidate.proposedComparisonAuthority,
+      ) &&
+      provenance.authority !==
+        candidate.proposedComparisonAuthority
+    ) {
+      return false;
+    }
+
+    if (
+      candidate.proposedComparisonMode !==
+        null &&
+      comparisonModeIsValid(
+        candidate.proposedComparisonMode,
+      ) &&
+      candidate.proposedComparisonMode !==
+        "orthography" &&
+      !hasText(
+        provenance.ruleId,
+      )
+    ) {
+      return false;
+    }
+  }
+
+  return true;
 }
 
 export function
@@ -594,6 +759,19 @@ validateSevenVoiceFunctionalRecurrenceCandidateEvidencePacketV0_1(
       );
     }
 
+    const presentEvidenceIsValid =
+      candidatePresentEvidenceIsValid(
+        candidate,
+      );
+
+    if (
+      !presentEvidenceIsValid
+    ) {
+      reasonCodes.add(
+        "candidate_present_evidence_invalid",
+      );
+    }
+
     if (
       candidate.reviewStatus !==
         "needs_source" &&
@@ -615,7 +793,8 @@ validateSevenVoiceFunctionalRecurrenceCandidateEvidencePacketV0_1(
     ) {
       if (
         candidateId.length >
-        0
+          0 &&
+        presentEvidenceIsValid
       ) {
         needsSourceCandidateIds.push(
           candidateId,
