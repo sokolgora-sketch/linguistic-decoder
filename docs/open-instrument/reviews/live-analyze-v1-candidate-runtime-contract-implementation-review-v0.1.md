@@ -62,8 +62,10 @@ GitHub checks passed:
 
 Post-merge provider-disabled Open Instrument live smoke passed.
 
-Local `gate:quick` completed the unit and build phases but did not exit in the
-integration phase and was stopped. It is not treated as a local gate pass.
+Local `gate:quick` completed its lint and unit phases but did not exit during
+the integration phase and was stopped. Because `--quick` skips the production
+build, the production build was executed separately and passed. It is not
+treated as a local gate pass.
 
 ## Scope confirmation
 

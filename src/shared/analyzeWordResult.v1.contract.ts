@@ -153,15 +153,7 @@ export type AnalyzeV1CandidateEnvelope = z.infer<
 function validateLiveCandidateEnvelopeArray(value: unknown): void {
   if (!Array.isArray(value)) return;
 
-  const containsLiveCandidate = value.some(
-    (candidate) =>
-      candidate &&
-      typeof candidate === "object" &&
-      !Array.isArray(candidate) &&
-      "candidateId" in candidate,
-  );
-
-  if (containsLiveCandidate) {
+  if (value.length > 0) {
     z
       .array(
         z.union([
