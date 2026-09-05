@@ -124,6 +124,20 @@ export type BuildMultiSourceFunctionalResearchInputsOptionsV0_1 = {
     readonly MultiSourceFunctionalResearchEvidenceRowV0_1[];
 };
 
+export type BuildSourceAttestedFunctionalResearchInputGroupsOptionsV0_1 = {
+  targetWord: string;
+
+  rows:
+    readonly MultiSourceFunctionalResearchEvidenceRowV0_1[];
+};
+
+export type SourceAttestedFunctionalResearchInputGroupV0_1 = {
+  embryo: string;
+
+  sources:
+    readonly MultiSourceFunctionalEvidenceRecordV0_1[];
+};
+
 function normalizeResearchTextV0_1(
   value: string,
 ): string {
@@ -238,7 +252,7 @@ function researchBoundaryIsPreservedV0_1(
  *
  * Responsibilities of this adapter:
  *
- * - match the requested structural embryo;
+ * - match the requested research embryo;
  * - preserve every distinct source row rather than stopping at one;
  * - require structured citation provenance;
  * - select only the hypothesis scoped to the requested target word;
@@ -421,4 +435,133 @@ export function buildMultiSourceFunctionalResearchInputsV0_1(
   }
 
   return out;
+}
+
+/**
+ * Build evidence-first research groups only from target-bound rows whose
+ * declared embryo is directly attested by the source form itself.
+ *
+ * This seam is deliberately narrower than structural research:
+ *
+ * - it runs on passive registry evidence only;
+ * - exact-form source attestation is required;
+ * - no structural expansion chain is manufactured;
+ * - target-word hypothesis binding remains mandatory;
+ * - ordinary multi-source citation and research-boundary validation is reused;
+ * - this function does not authorize runtime projection by itself.
+ */
+export function buildSourceAttestedFunctionalResearchInputGroupsV0_1(
+  options:
+    BuildSourceAttestedFunctionalResearchInputGroupsOptionsV0_1,
+): SourceAttestedFunctionalResearchInputGroupV0_1[] {
+  const targetWord =
+    normalizeResearchTextV0_1(
+      options.targetWord,
+    );
+
+  if (!targetWord) {
+    return [];
+  }
+
+  const eligibleRows =
+    options.rows.filter(
+      (row) => {
+        if (
+          !researchBoundaryIsPreservedV0_1(
+            row,
+          ) ||
+          row.embryoRelation !==
+            "exact_form" ||
+          !sameResearchKeyV0_1(
+            row.embryo,
+            row.form,
+          )
+        ) {
+          return false;
+        }
+
+        const hasMatchingUsableCitation =
+          row.citations.some(
+            (citation) =>
+              citationIdIfUsableV0_1(
+                citation,
+              ) !== null &&
+              sameResearchKeyV0_1(
+                citation.attestedForm,
+                row.form,
+              ) &&
+              sameResearchKeyV0_1(
+                citation.attestedForm,
+                row.embryo,
+              ),
+          );
+
+        if (
+          !hasMatchingUsableCitation
+        ) {
+          return false;
+        }
+
+        return row.functionalHypotheses.some(
+          (candidate) =>
+            candidate.claimBoundary ===
+              "functional_hypothesis_only" &&
+            sameResearchKeyV0_1(
+              candidate.targetWord,
+              targetWord,
+            ),
+        );
+      },
+    );
+
+  const embryos: string[] = [];
+  const seenEmbryos =
+    new Set<string>();
+
+  for (const row of eligibleRows) {
+    const embryo =
+      normalizeResearchTextV0_1(
+        row.embryo,
+      );
+
+    const key =
+      embryo.toLocaleUpperCase(
+        "en-US",
+      );
+
+    if (
+      !embryo ||
+      seenEmbryos.has(key)
+    ) {
+      continue;
+    }
+
+    seenEmbryos.add(key);
+    embryos.push(embryo);
+  }
+
+  return embryos
+    .map((embryo) => ({
+      embryo,
+
+      sources:
+        buildMultiSourceFunctionalResearchInputsV0_1({
+          targetWord,
+          embryo,
+          rows:
+            eligibleRows,
+        }).filter(
+          (source) =>
+            source.embryoRelation ===
+              "exact_form" &&
+            sameResearchKeyV0_1(
+              source.form,
+              embryo,
+            ),
+        ),
+    }))
+    .filter(
+      (group) =>
+        group.sources.length > 0,
+    );
 }

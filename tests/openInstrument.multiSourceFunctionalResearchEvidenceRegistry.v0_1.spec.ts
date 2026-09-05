@@ -1,5 +1,6 @@
 import {
   buildMultiSourceFunctionalResearchInputsV0_1,
+  buildSourceAttestedFunctionalResearchInputGroupsV0_1,
   MULTI_SOURCE_FUNCTIONAL_RESEARCH_EVIDENCE_REGISTRY_VERSION_V0_1,
   type MultiSourceFunctionalResearchEvidenceRowV0_1,
 } from "@/shared/multiSourceFunctionalResearchEvidenceRegistry.v0_1";
@@ -425,6 +426,83 @@ describe(
           gloss:
             "fixture gloss",
         });
+      },
+    );
+
+    it(
+      "requires a matching usable citation for source-attested exact-form authority and blocks same-embryo piggybacking",
+      () => {
+        const matchingRow =
+          rows.find(
+            (row) =>
+              row.researchEvidenceId ===
+              "fixture.research.other.ak.v0_1",
+          );
+
+        expect(
+          matchingRow,
+        ).toBeDefined();
+
+        if (!matchingRow) {
+          throw new Error(
+            "fixture AK row missing",
+          );
+        }
+
+        const mismatchedCitationRow:
+          MultiSourceFunctionalResearchEvidenceRowV0_1 = {
+          ...matchingRow,
+
+          researchEvidenceId:
+            "fixture.research.other.ak.mismatched-citation.v0_1",
+
+          citations: [
+            {
+              ...matchingRow.citations[0],
+
+              citationId:
+                "fixture.citation.ak.mismatched-form.v0_1",
+
+              attestedForm:
+                "not-ak",
+            },
+          ],
+        };
+
+        expect(
+          buildSourceAttestedFunctionalResearchInputGroupsV0_1({
+            targetWord: "gjak",
+            rows: [
+              mismatchedCitationRow,
+            ],
+          }),
+        ).toEqual([]);
+
+        const mixed =
+          buildSourceAttestedFunctionalResearchInputGroupsV0_1({
+            targetWord: "gjak",
+            rows: [
+              matchingRow,
+              mismatchedCitationRow,
+            ],
+          });
+
+        expect(
+          mixed,
+        ).toHaveLength(1);
+
+        expect(
+          mixed[0]?.embryo,
+        ).toBe("AK");
+
+        expect(
+          mixed[0]?.sources.map(
+            (source) =>
+              source.sourceId,
+          ),
+        ).toEqual([
+          "fixture.research.other.ak.v0_1",
+        ]);
       },
     );
 

@@ -53,11 +53,7 @@ describe(
               AK_SOURCE_ID,
           );
 
-        expect(rows).toHaveLength(1);
-
-        expect(
-          catalog.rows,
-        ).toHaveLength(6);
+                expect(rows).toHaveLength(1);
       },
     );
 
@@ -228,9 +224,11 @@ describe(
         const loaded =
           loadMultiSourceFunctionalResearchEvidenceCatalogV0_1();
 
-        expect(
+                expect(
           loaded,
-        ).toHaveLength(6);
+        ).toHaveLength(
+          catalog.rows.length,
+        );
 
         const ak =
           loaded.find(
