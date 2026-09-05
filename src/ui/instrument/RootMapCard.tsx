@@ -178,7 +178,7 @@ export function RootMapCard(props: Props) {
 
       <div className="mb-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
         {metric("tokens", tokensLine)}
-        {metric("supported keys", String(keysArr.length))}
+        {metric("keys", String(keysArr.length))}
         {metric("carriers", String(carriersArr.length))}
         {metric("spans", String(spansArr.length))}
       </div>
@@ -195,7 +195,7 @@ export function RootMapCard(props: Props) {
         </div>
 
         <div>
-          <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#8ea4ba]">Supported keys</div>
+          <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#8ea4ba]">Keys</div>
           {keysArr.length === 0 ? (
             <div className="mt-2 rounded-[8px] border border-[#27313d] bg-[#0d1117] p-3 text-sm text-[#d7dde7]">—</div>
           ) : (

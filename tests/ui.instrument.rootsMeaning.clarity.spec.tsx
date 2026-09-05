@@ -64,7 +64,7 @@ describe("Open Instrument roots/meaning clarity", () => {
     expect(screen.getByText("Constructed reading (hypothesis)")).toBeInTheDocument();
     expect(screen.getByText(/not origin proof/i)).toBeInTheDocument();
     expect(screen.getByText(/no forced answer/i)).toBeInTheDocument();
-    expect(screen.getByText("Supported keys")).toBeInTheDocument();
+    expect(screen.getByText("Keys")).toBeInTheDocument();
   });
 
   it("separates matched, claimed, missing, and warning SoundRoots signals", () => {
