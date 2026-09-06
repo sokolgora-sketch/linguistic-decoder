@@ -3,33 +3,51 @@
 import React from 'react';
 
 type Props = {
-  vm: any; // caller guarantees "telemetry VM" shape (or a minimal test stub)
+  vm: MeaningVM;
 };
 
 type Present<T> = { kind: 'present'; value: T };
-type Missing = { kind: 'missing'; missing?: string; note?: string };
+type Missing = { kind: 'missing'; missing?: unknown; note?: unknown };
+type MeaningVM = {
+  readout?: {
+    principlesPath?: unknown;
+    counts?: { candidates?: unknown };
+    voicePathDelta?: unknown;
+    voicePath?: unknown;
+    voicePathSurface?: unknown;
+    voicePathFunctional?: unknown;
+  };
+  detection?: Record<string, unknown>;
+  evidence?: {
+    normalizationSteps?: unknown;
+    ops?: unknown;
+    signals?: unknown;
+    notes?: unknown;
+  };
+  counts?: { candidates?: unknown };
+};
 
-function isPresent<T>(m: any): m is Present<T> {
-  return m?.kind === 'present';
+function isPresent<T>(m: unknown): m is Present<T> {
+  return typeof m === 'object' && m !== null && 'kind' in m && m.kind === 'present';
 }
 
-function isMissing(m: any): m is Missing {
-  return m?.kind === 'missing';
+function isMissing(m: unknown): m is Missing {
+  return typeof m === 'object' && m !== null && 'kind' in m && m.kind === 'missing';
 }
 
 function joinParts(parts: Array<string | null | undefined>): string {
   return parts.filter(Boolean).join(' ');
 }
 
-function formatArrowPath(parts: any[]): string {
+function formatArrowPath(parts: unknown[]): string {
   return (parts ?? []).map(String).join(' → ');
 }
 
-function asText(x: any): string | null {
+function asText(x: unknown): string | null {
   return typeof x === 'string' && x.trim() ? x.trim() : null;
 }
 
-function renderMaybeList(label: string, m: any): string {
+function renderMaybeList(label: string, m: unknown): string {
   // m is expected to be PresentOrMissing<string[]>
   if (isPresent<string[]>(m)) {
     const v = Array.isArray(m.value) ? m.value : [];
@@ -85,21 +103,21 @@ export default function MeaningPanel({ vm }: Props) {
   const functional = readout.voicePathFunctional;
 
   const functionalLine =
-    isPresent<any[]>(functional) && Array.isArray(functional.value) && functional.value.length
+    isPresent<unknown[]>(functional) && Array.isArray(functional.value) && functional.value.length
       ? `Functional path: ${formatArrowPath(functional.value)}.`
       : asText(detection.voicePathFunctional)
         ? `Functional path: ${asText(detection.voicePathFunctional)}.`
         : null;
 
   const surfaceLine =
-    isPresent<any[]>(surface) && Array.isArray(surface.value) && surface.value.length
+    isPresent<unknown[]>(surface) && Array.isArray(surface.value) && surface.value.length
       ? `Surface path: ${formatArrowPath(surface.value)}.`
       : asText(detection.voicePathSurface)
         ? `Surface path: ${asText(detection.voicePathSurface)}.`
         : null;
 
   const detectedLine =
-    isPresent<any[]>(detected) && Array.isArray(detected.value) && detected.value.length
+    isPresent<unknown[]>(detected) && Array.isArray(detected.value) && detected.value.length
       ? `Voice path: ${formatArrowPath(detected.value)}.`
       : asText(detection.voicePath)
         ? `Voice path: ${asText(detection.voicePath)}.`
