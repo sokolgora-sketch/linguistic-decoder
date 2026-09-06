@@ -6,7 +6,7 @@ import { sevenVoiceRegistry, symbolicMathOrder } from "@/shared/sevenVoiceOrdere
 import { SEVEN_PRINCIPLES } from "@/shared/sevenPrinciples.v1";
 import { mirrorIndex, ringOfIndex, type Index1 } from "@/shared/sevenPrinciples.math.v1";
 import { VOWEL_VOICES_V0_1, isVowelVoice } from "@/shared/vowels/vowelVoices.v0.1";
-import { mapVowelsV0_2 } from "@/shared/vowels/mapVowels.v0.2";
+import { extractOrthographyVoicesFromWordV0_1 } from "@/shared/vowels/extractOrthographyVoicesFromWord.v0.1";
 import { analyzeWordV1 } from "@/v1/analyzeWordV1";
 import { SEVEN_VOWELS as V1_VOWELS, value1to7 } from "@/v1/math7.core.v1";
 
@@ -53,8 +53,8 @@ it("projects unchanged canonical numbers into the active v1 evidence contract", 
 });
 
 it("keeps explicit Turkish consonantal y scoped to that request", () => {
-  expect(mapVowelsV0_2({ word: "yol" }).voices).toEqual(["Y", "O"]);
-  expect(mapVowelsV0_2({ word: "yol", langHint: "tr" }).voices).toEqual(["O"]);
-  expect(mapVowelsV0_2({ word: "yol" }).voices).toEqual(["Y", "O"]);
+  expect(extractOrthographyVoicesFromWordV0_1({ word: "yol" }).voices).toEqual(["Y", "O"]);
+  expect(extractOrthographyVoicesFromWordV0_1({ word: "yol", langHint: "tr" }).voices).toEqual(["O"]);
+  expect(extractOrthographyVoicesFromWordV0_1({ word: "yol" }).voices).toEqual(["Y", "O"]);
   expect(isVowelVoice("Y")).toBe(true);
 });
