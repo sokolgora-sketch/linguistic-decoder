@@ -1,4 +1,5 @@
-import type { TelemetryViewModel, CandidateRowVM } from "../telemetry/types";
+import type { DeepRootHeartGateV01 } from "@/shared/deepRootHeartGate.v0.1";
+import type { CandidateRowVM, PresentOrMissing, TelemetryViewModel } from "../telemetry/types";
 
 export interface UICandidateRow {
   id: string;
@@ -33,7 +34,7 @@ export interface UICandidateRow {
   deepRootHeartGateStatus?: string | null;
   deepRootHeartGateReasons?: string[] | null;
   deepRootHeartGateEvidenceRefs?: string[] | null;
-  raw: any; // for Copy Candidate JSON
+  raw: unknown; // for Copy Candidate JSON
 }
 
 // --- v0.1.1+: VM-first adapter lock ---
@@ -45,7 +46,7 @@ function pomStr(
 }
 
 function pomStringArray(
-  x: any,
+  x: PresentOrMissing<unknown> | undefined,
 ): string[] | null {
   if (
     x?.kind !== "present" ||
@@ -56,7 +57,7 @@ function pomStringArray(
 
   const values =
     x.value
-      .map((item: any) =>
+      .map((item) =>
         String(item).trim(),
       )
       .filter(Boolean);
@@ -66,25 +67,31 @@ function pomStringArray(
     : null;
 }
 
-function pomVowelPath(x: any): string | null {
+function pomVowelPath(x: PresentOrMissing<unknown> | undefined): string | null {
   return x?.kind === "present" && Array.isArray(x.value) ? x.value.join("-") : null;
 }
 
-function pomGateStatus(x: any): string | null {
+function pomGateStatus(
+  x: PresentOrMissing<DeepRootHeartGateV01> | undefined,
+): string | null {
   // x is PresentOrMissing<DeepRootHeartGateV01>
   if (x?.kind !== "present") return null;
   const s = x?.value?.status;
   return typeof s === "string" ? s : null;
 }
 
-function pomGateReasons(x: any): string[] | null {
+function pomGateReasons(
+  x: PresentOrMissing<DeepRootHeartGateV01> | undefined,
+): string[] | null {
   if (x?.kind !== "present") return null;
   const r = x?.value?.reasonCodes;
   if (!Array.isArray(r)) return null;
-  return r.map((v: any) => String(v));
+  return r.map((v: unknown) => String(v));
 }
 
-function pomGateEvidenceRefs(g: any): string[] | null {
+function pomGateEvidenceRefs(
+  g: PresentOrMissing<DeepRootHeartGateV01> | undefined,
+): string[] | null {
   // VM shape: PresentOrMissing<DeepRootHeartGateV01>
   // We only accept a string[]; otherwise null.
   const refs = g?.kind === "present" ? g?.value?.evidenceRefs : null;
@@ -204,9 +211,9 @@ export function buildCandidateRowsFromVM(vm: TelemetryViewModel): UICandidateRow
 
     vowelPath: pomVowelPath(c.vowelPath),
     functionalStatement: pomStr(c.functionalStatement),
-      deepRootHeartGateStatus: pomGateStatus((c as any).deepRootHeartGate),
-      deepRootHeartGateReasons: pomGateReasons((c as any).deepRootHeartGate),
-      deepRootHeartGateEvidenceRefs: pomGateEvidenceRefs((c as any).deepRootHeartGate),
+      deepRootHeartGateStatus: pomGateStatus(c.deepRootHeartGate),
+      deepRootHeartGateReasons: pomGateReasons(c.deepRootHeartGate),
+      deepRootHeartGateEvidenceRefs: pomGateEvidenceRefs(c.deepRootHeartGate),
     raw: c.raw,
   }));
 }
