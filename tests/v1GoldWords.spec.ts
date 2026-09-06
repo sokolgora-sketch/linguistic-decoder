@@ -1,4 +1,5 @@
-import { analyzeWordV1, extractVowelPathV1, normalizeWordV1, ENGINE_VERSION_V1 } from "./analyzeWordV1";
+import { analyzeWordV1, normalizeWordV1 } from "@/v1/analyzeWordV1";
+import { ENGINE_VERSION_V1 } from "@/v1/versions.v1";
 
 describe("ZË-RO v1 gold words (minimal contract baseline)", () => {
   const cases: Array<{ word: string; normalized: string; vowelPath: string }> = [
@@ -18,11 +19,11 @@ describe("ZË-RO v1 gold words (minimal contract baseline)", () => {
     expect(b.normalizedWord).toBe("study");
   });
 
-  it("extractVowelPathV1 extracts Seven-vowel vowels only", () => {
-    expect(extractVowelPathV1("study")).toBe("U-Y");
-    expect(extractVowelPathV1("zë")).toBe("Ë");
-    expect(extractVowelPathV1("rhythm")).toBe("Y");
-    expect(extractVowelPathV1("bcdfg")).toBe("");
+  it("evidence surface path extracts Seven-vowel vowels only", () => {
+    expect(analyzeWordV1("study").evidence.surfacePath).toBe("U-Y");
+    expect(analyzeWordV1("zë").evidence.surfacePath).toBe("Ë");
+    expect(analyzeWordV1("rhythm").evidence.surfacePath).toBe("Y");
+    expect(analyzeWordV1("bcdfg").evidence.surfacePath).toBe("");
   });
 
   it("analyzeWordV1 returns the v1 contract shape for gold words", () => {
