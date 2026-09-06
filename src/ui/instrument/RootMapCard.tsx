@@ -2,28 +2,19 @@
 
 import React from "react";
 import { safeText } from "./safeText";
-
-
-type MissingReason = "not_emitted" | "malformed" | "unknown";
-type Present<T> = { kind: "present"; value: T };
-type Missing = { kind: "missing"; missing: MissingReason; note?: string };
-type Maybe<T> = Present<T> | Missing;
-
-type RootMapSpanVM = { token: string; start?: number; end?: number; note?: string };
-type RootMapTokenVM = { token: string; role?: string; vowel_path?: string };
-type RootMapKeyVM = { token: string; language?: string; gloss?: string; status?: string; ops?: string[]; evidence?: string[] };
-type RootMapCarrierVM = { token: string; language?: string; carrierForm?: string; note?: string };
-
-type RootMapVM = {
-  tokens?: RootMapTokenVM[];
-  keys?: RootMapKeyVM[];
-  carriers?: RootMapCarrierVM[];
-  spans?: RootMapSpanVM[];
-  composedMeaning?: string;
-};
+import type {
+  PresentOrMissing,
+  RootMapVM,
+} from "@/ui/telemetry/types";
+import type {
+  RootCarrierV1 as RootMapCarrierVM,
+  RootKeyV1 as RootMapKeyVM,
+  RootSpanV1 as RootMapSpanVM,
+  RootTokenV1 as RootMapTokenVM,
+} from "@/shared/deepRoot.rootMap.v1";
 
 type Props = {
-  rootMap: Maybe<RootMapVM>;
+  rootMap: PresentOrMissing<RootMapVM>;
   word: string;
   normalizedWord: string;
 };
