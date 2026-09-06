@@ -140,22 +140,15 @@ export default function ZroChatPage() {
     setMessages(prev => [...prev, userMsg, assistantMsg]);
     setBusy(true);
 
-    let res: any = null;
-    let json: any = null;
-
     try {
       const url = `/api/analyze-v1?word=${encodeURIComponent(w)}&mode=strict${ipaTrim ? `&ipa=${encodeURIComponent(ipaTrim)}` : ""}`;
-      res = await fetch(url, { method: 'GET' });
+      const res = await fetch(url, { method: 'GET' });
+      const json: unknown =
+        typeof res.json === 'function' ? await res.json() : null;
 
-      if (res && typeof res.json === 'function') {
-        json = await res.json();
-      } else {
-        json = null;
-      }
-
-      if (!res?.ok) {
-        const status = typeof res?.status === 'number' ? res.status : 0;
-        const statusText = typeof res?.statusText === 'string' ? res.statusText : '';
+      if (!res.ok) {
+        const status = res.status;
+        const statusText = res.statusText;
     setLastRun(runMeta);
 
 
@@ -297,7 +290,10 @@ export default function ZroChatPage() {
     messages
       .slice()
       .reverse()
-      .find((m): m is Msg & { instrumentPayload: unknown } => (m as any)?.instrumentPayload != null)
+      .find(
+        (m): m is Extract<Msg, { role: 'assistant' }> & { instrumentPayload: unknown } =>
+          'instrumentPayload' in m && m.instrumentPayload != null,
+      )
       ?.instrumentPayload ?? null;
 
   return (
