@@ -91,8 +91,13 @@ export function ownProcess(proc: ChildProcess) {
 export async function startNextServer(mode: "dev" | "start") {
   const port = await availablePort();
   const base = `http://127.0.0.1:${port}`;
+  const providerDisabledEnv = {
+    OPEN_INSTRUMENT_AUTO_PROPOSER: "0",
+    OPEN_INSTRUMENT_AUTO_CARRIER: "0",
+    PROPOSER_PROVIDER: "mock",
+  };
   const proc = spawn(process.execPath, [require.resolve("next/dist/bin/next"), mode, "-p", String(port), "-H", "127.0.0.1"], {
-    env: { ...process.env, PORT: String(port), NEXT_TELEMETRY_DISABLED: "1", ...(mode === "start" ? { NODE_ENV: "production" } : {}) },
+    env: { ...process.env, ...providerDisabledEnv, PORT: String(port), NEXT_TELEMETRY_DISABLED: "1", ...(mode === "start" ? { NODE_ENV: "production" } : {}) },
     detached: process.platform !== "win32",
     stdio: ["ignore", "pipe", "pipe"],
   });

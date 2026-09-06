@@ -7,6 +7,13 @@ import type { AddressInfo } from "node:net";
 import { ownProcess, requestJson } from "./helpers/ownedNextServer";
 
 describe("integration server ownership", () => {
+  test("forces provider-disabled execution for owned integration servers", () => {
+    const helper = readFileSync("tests/helpers/ownedNextServer.ts", "utf8");
+    expect(helper).toContain('OPEN_INSTRUMENT_AUTO_PROPOSER: "0"');
+    expect(helper).toContain('OPEN_INSTRUMENT_AUTO_CARRIER: "0"');
+    expect(helper).toContain('PROPOSER_PROVIDER: "mock"');
+  });
+
   test("destroys a request when a connected server never sends headers", async () => {
     const server = http.createServer(() => {});
     server.listen(0, "127.0.0.1");
