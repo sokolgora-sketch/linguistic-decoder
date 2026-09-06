@@ -35,14 +35,20 @@ describe("integration server ownership", () => {
     const script = `
       const { spawn } = require('node:child_process');
       const child = spawn(process.execPath, ['-e', "process.on('SIGTERM', () => {}); process.send('ready'); setInterval(() => {}, 1000)"], { stdio: ['ignore', '${stdio}', '${stdio}', 'ipc'] });
-      child.on('message', () => console.log(child.pid));
+      child.on('message', () => process.stdout.write(String(child.pid) + '\\n'));
       process.on('SIGTERM', () => process.exit(0));
     `;
-    const child = spawn(process.execPath, ["-e", script], { detached: true, stdio: ["ignore", "pipe", "pipe"] });
+    const child = spawn(process.execPath, ["-e", script], {
+      detached: true,
+      stdio: ["ignore", "pipe", "pipe"],
+      env: { ...process.env, FORCE_COLOR: "1" },
+    });
     const owned = ownProcess(child);
     try {
       const [output] = await once(child.stdout!, "data");
       const descendantPid = Number(String(output).trim());
+      expect(Number.isInteger(descendantPid)).toBe(true);
+      expect(descendantPid).toBeGreaterThan(0);
       await owned.stop();
       expect(child.exitCode).toBe(0);
       // Linux PID 1 may retain a dead orphan as a zombie; that is not a live leak.
