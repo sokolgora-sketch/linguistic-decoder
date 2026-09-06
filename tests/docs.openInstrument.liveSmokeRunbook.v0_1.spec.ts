@@ -27,6 +27,9 @@ describe("Open Instrument live smoke runbook v0.1", () => {
       "getCanonicalOperatorLiveSmokeWordsV0_1",
     );
     expect(script).toContain("assertSmokeCase");
+    expect(script).toContain('OPEN_INSTRUMENT_AUTO_PROPOSER: "0"');
+    expect(script).toContain('OPEN_INSTRUMENT_AUTO_CARRIER: "0"');
+    expect(script).toContain('PROPOSER_PROVIDER: "mock"');
 
     expect(caseOwner).toContain(
       "getResolvedCanonicalOperatorProfilesV0_1",

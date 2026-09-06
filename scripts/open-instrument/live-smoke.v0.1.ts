@@ -389,6 +389,12 @@ async function main(): Promise<void> {
     "npm",
     ["run", "start", "--", "-p", String(port), "-H", host],
     {
+      env: {
+        ...process.env,
+        OPEN_INSTRUMENT_AUTO_PROPOSER: "0",
+        OPEN_INSTRUMENT_AUTO_CARRIER: "0",
+        PROPOSER_PROVIDER: "mock",
+      },
       stdio: ["ignore", "pipe", "pipe"],
       shell: false,
     },
