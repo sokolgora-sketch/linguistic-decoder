@@ -43,10 +43,8 @@ export function requestJson(url: string, method = "GET", body: unknown = null, t
 export function ownProcess(proc: ChildProcess) {
   let closed = false;
   let failure: Error | undefined;
-  const completion = new Promise<void>((resolve) => {
-    proc.once("error", (error) => { failure = error; });
-    proc.once("close", () => { closed = true; resolve(); });
-  });
+  proc.once("error", (error) => { failure = error; });
+  proc.once("close", () => { closed = true; });
   let stopPromise: Promise<void> | undefined;
   function signal(value: NodeJS.Signals) {
     try {
@@ -56,6 +54,14 @@ export function ownProcess(proc: ChildProcess) {
       if ((error as NodeJS.ErrnoException).code !== "ESRCH") throw error;
     }
   }
+  function groupAlive() {
+    if (process.platform === "win32" || !proc.pid) return !closed;
+    try { process.kill(-proc.pid, 0); return true; }
+    catch (error) {
+      if ((error as NodeJS.ErrnoException).code === "ESRCH") return false;
+      throw error;
+    }
+  }
   return {
     assertRunning() {
       if (failure) throw failure;
@@ -63,18 +69,17 @@ export function ownProcess(proc: ChildProcess) {
     },
     stop() {
       stopPromise ??= (async () => {
-        if (closed) return;
+        if (closed && !groupAlive()) return;
         signal("SIGTERM");
-        let fallback: ReturnType<typeof setTimeout> | undefined;
-        let deadline: ReturnType<typeof setTimeout> | undefined;
-        const bounded = new Promise<never>((_, reject) => {
-          fallback = setTimeout(() => {
-            try { signal("SIGKILL"); } catch (error) { reject(error); }
-          }, 5_000);
-          deadline = setTimeout(() => reject(new Error("Owned process did not close after termination")), 10_000);
-        });
-        try { await Promise.race([completion, bounded]); }
-        finally { clearTimeout(fallback); clearTimeout(deadline); }
+        const started = Date.now();
+        let forced = false;
+        // Leader closure does not prove that descendants with separate stdio exited.
+        while (!closed || groupAlive()) {
+          const elapsed = Date.now() - started;
+          if (!forced && elapsed >= 5_000) { signal("SIGKILL"); forced = true; }
+          if (elapsed >= 10_000) throw new Error("Owned process group did not close after termination");
+          await new Promise((resolve) => setTimeout(resolve, 25));
+        }
       })();
       return stopPromise;
     },

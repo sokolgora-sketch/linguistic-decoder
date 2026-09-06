@@ -30,10 +30,11 @@ describe("integration server ownership", () => {
     expect(child.exitCode !== null || child.signalCode !== null).toBe(true);
   });
 
-  (process.platform === "win32" ? test.skip : test)("cleans a descendant even after its wrapper exits", async () => {
+  (process.platform === "win32" ? test.skip : test).each(["inherit", "ignore"] as const)("cleans a descendant with %s stdio after its wrapper exits", async (stdio) => {
     const script = `
       const { spawn } = require('node:child_process');
-      const child = spawn(process.execPath, ['-e', "process.on('SIGTERM', () => {}); console.log('ready'); setInterval(() => {}, 1000)"], { stdio: ['ignore', 'inherit', 'inherit'] });
+      const child = spawn(process.execPath, ['-e', "process.on('SIGTERM', () => {}); process.send('ready'); setInterval(() => {}, 1000)"], { stdio: ['ignore', '${stdio}', '${stdio}', 'ipc'] });
+      child.on('message', () => console.log('ready'));
       process.on('SIGTERM', () => process.exit(0));
     `;
     const child = spawn(process.execPath, ["-e", script], { detached: true, stdio: ["ignore", "pipe", "pipe"] });
