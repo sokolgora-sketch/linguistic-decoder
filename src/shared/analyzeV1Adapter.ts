@@ -1,4 +1,9 @@
-import type { AnalyzeWordResultUI, CandidateUI, PrimaryPathSummary } from "@/shared/resultsUI";
+import type {
+  AnalyzeWordResultUI,
+  CandidateUI,
+  EngineMetaRaw,
+  PrimaryPathSummary,
+} from "@/shared/resultsUI";
 import { extractSevenVowelsFromString } from "@/shared/math7.core";
 
 /**
@@ -10,11 +15,61 @@ import { extractSevenVowelsFromString } from "@/shared/math7.core";
  * - Populate primaryPath.voicePath[] when possible.
  *
  * Design:
- * - Treat raw as `unknown` / `any` and adapt defensively.
+ * - Treat raw payload fields as `unknown` and adapt defensively.
  * - Prefer canonical vowelPath format: "U-I" (machine-friendly).
  */
 
-type Raw = any;
+type RawRecord = Record<string, unknown>;
+
+type RawCandidate = RawRecord & {
+  voices?: RawRecord & {
+    voiceSequence?: unknown;
+    ringPath?: unknown;
+  };
+  candidateRecord?: RawRecord & {
+    source?: RawRecord;
+  };
+};
+
+type RawAnalyzeV1 = RawRecord & {
+  candidates?: unknown;
+  primaryPath?: RawRecord;
+  deepRoot?: RawRecord & {
+    candidates?: unknown;
+  };
+  engineMeta?: EngineMetaRaw;
+  meta?: AnalyzeWordResultUI["meta"];
+};
+
+function asRawRecord(value: unknown): RawRecord {
+  return value !== null && typeof value === "object"
+    ? (value as RawRecord)
+    : {};
+}
+
+function optionalString(value: unknown): string | undefined {
+  return typeof value === "string" ? value : undefined;
+}
+
+function optionalStringOrNull(value: unknown): string | null | undefined {
+  return value === null || typeof value === "string" ? value : undefined;
+}
+
+function optionalNumberOrNull(value: unknown): number | null | undefined {
+  return value === null || (typeof value === "number" && Number.isFinite(value))
+    ? value
+    : undefined;
+}
+
+function optionalFiniteNumber(value: unknown): number | undefined {
+  return typeof value === "number" && Number.isFinite(value) ? value : undefined;
+}
+
+function optionalStringArray(value: unknown): string[] | undefined {
+  return Array.isArray(value)
+    ? value.filter((item): item is string => typeof item === "string")
+    : undefined;
+}
 
 function joinVoicePath(seq: unknown): string | undefined {
   if (!Array.isArray(seq)) return undefined;
@@ -34,7 +89,7 @@ function normalizeArrowPath(s: string): string {
   return hits.join("-");
 }
 
-function pickCandidateVowelPath(rawCandidate: Raw): string | undefined {
+function pickCandidateVowelPath(rawCandidate: RawCandidate): string | undefined {
   // Canonical: candidate.voices.voiceSequence => "U-I"
   const fromVoices = joinVoicePath(rawCandidate?.voices?.voiceSequence);
   if (fromVoices) return fromVoices;
@@ -46,7 +101,7 @@ function pickCandidateVowelPath(rawCandidate: Raw): string | undefined {
   return undefined;
 }
 
-function pickCandidateSourceKind(rawCandidate: Raw): string | undefined {
+function pickCandidateSourceKind(rawCandidate: RawCandidate): string | undefined {
   const direct = typeof rawCandidate?.sourceKind === "string" ? rawCandidate.sourceKind.trim() : "";
   if (direct) return direct;
 
@@ -102,7 +157,10 @@ function normalizePrimaryLevelPath(value: unknown): string {
     : "";
 }
 
-function pickPrimaryPath(raw: Raw, bestCandidate: Raw | null): PrimaryPathSummary | null {
+function pickPrimaryPath(
+  raw: RawAnalyzeV1,
+  bestCandidate: RawCandidate | null,
+): PrimaryPathSummary | null {
   const directPrimaryPath =
     raw?.primaryPath && typeof raw.primaryPath === "object"
       ? raw.primaryPath
@@ -134,8 +192,10 @@ function pickPrimaryPath(raw: Raw, bestCandidate: Raw | null): PrimaryPathSummar
       ? pickCandidateVowelPath(bestCandidate)
       : undefined;
 
-  const deep0 =
-    raw?.deepRoot?.candidates?.[0]?.vowelPath;
+  const deepRootCandidates = Array.isArray(raw?.deepRoot?.candidates)
+    ? raw.deepRoot.candidates.map(asRawRecord)
+    : [];
+  const deep0 = deepRootCandidates[0]?.vowelPath;
 
   const deepPath =
     typeof deep0 === "string"
@@ -150,7 +210,7 @@ function pickPrimaryPath(raw: Raw, bestCandidate: Raw | null): PrimaryPathSummar
   const ringPath =
     Array.isArray(bestCandidate?.voices?.ringPath)
       ? bestCandidate.voices.ringPath.filter(
-          (n: any) => Number.isFinite(n),
+          (n) => Number.isFinite(Number(n)),
         )
       : [];
 
@@ -161,7 +221,7 @@ function pickPrimaryPath(raw: Raw, bestCandidate: Raw | null): PrimaryPathSummar
   };
 }
 
-function adaptCandidate(rawCandidate: Raw): CandidateUI {
+function adaptCandidate(rawCandidate: RawCandidate): CandidateUI {
   const language = String(rawCandidate?.language ?? rawCandidate?.lang ?? "unknown");
   const form = String(rawCandidate?.form ?? "");
 
@@ -186,68 +246,63 @@ function adaptCandidate(rawCandidate: Raw): CandidateUI {
   const fitTag = typeof rawCandidate?.fitTag === "string" ? rawCandidate.fitTag : undefined;
   const sourceKind = pickCandidateSourceKind(rawCandidate);
   const embryoFirstCandidateFields = {
-    candidateId: rawCandidate?.candidateId,
-    displayForm: rawCandidate?.displayForm,
-    candidateLanguage: rawCandidate?.candidateLanguage,
+    candidateId: optionalString(rawCandidate?.candidateId),
+    displayForm: optionalString(rawCandidate?.displayForm),
+    candidateLanguage: optionalString(rawCandidate?.candidateLanguage),
 
     // Multi-source functional research provenance.
     //
     // Additive pass-through only:
     // this adapter does not validate, promote, reinterpret, or
     // manufacture research evidence.
-    targetWord: rawCandidate?.targetWord,
-    sourceId: rawCandidate?.sourceId,
-    sourceStatus: rawCandidate?.sourceStatus,
-    embryoRelation: rawCandidate?.embryoRelation,
-    relationOperationIds: rawCandidate?.relationOperationIds,
-    attestationTruth: rawCandidate?.attestationTruth,
-    functionalBridgeTruth: rawCandidate?.functionalBridgeTruth,
+    targetWord: optionalString(rawCandidate?.targetWord),
+    sourceId: optionalString(rawCandidate?.sourceId),
+    sourceStatus: optionalString(rawCandidate?.sourceStatus),
+    embryoRelation: optionalString(rawCandidate?.embryoRelation),
+    relationOperationIds: optionalStringArray(rawCandidate?.relationOperationIds),
+    attestationTruth: optionalString(rawCandidate?.attestationTruth),
+    functionalBridgeTruth: optionalString(rawCandidate?.functionalBridgeTruth),
 
-    claimType: rawCandidate?.claimType,
-    originClaim: rawCandidate?.originClaim,
-    historicalRelation: rawCandidate?.historicalRelation,
-    embryo: rawCandidate?.embryo,
-    embryoAuthority: rawCandidate?.embryoAuthority,
-    embryoSize: rawCandidate?.embryoSize,
-    embryoLanguage: rawCandidate?.embryoLanguage,
-    isolatedStandaloneForm: rawCandidate?.isolatedStandaloneForm,
-    plainStandaloneGloss: rawCandidate?.plainStandaloneGloss,
-    sourceNote: rawCandidate?.sourceNote,
+    claimType: optionalString(rawCandidate?.claimType),
+    originClaim: optionalString(rawCandidate?.originClaim),
+    historicalRelation: optionalString(rawCandidate?.historicalRelation),
+    embryo: optionalStringOrNull(rawCandidate?.embryo),
+    embryoAuthority: optionalString(rawCandidate?.embryoAuthority),
+    embryoSize: optionalNumberOrNull(rawCandidate?.embryoSize),
+    embryoLanguage: optionalStringOrNull(rawCandidate?.embryoLanguage),
+    isolatedStandaloneForm: optionalStringOrNull(rawCandidate?.isolatedStandaloneForm),
+    plainStandaloneGloss: optionalStringOrNull(rawCandidate?.plainStandaloneGloss),
+    sourceNote: optionalStringOrNull(rawCandidate?.sourceNote),
     segmentation: rawCandidate?.segmentation,
-    semanticBridge: rawCandidate?.semanticBridge,
-    expansionChain: rawCandidate?.expansionChain,
+    semanticBridge: optionalStringOrNull(rawCandidate?.semanticBridge),
+    expansionChain: optionalStringArray(rawCandidate?.expansionChain),
 
     // Logic-first structural-hypothesis metadata.
     // These fields are additive pass-through only. The UI adapter
     // does not create, validate, promote, or reinterpret them.
-    hypothesisVersion: rawCandidate?.hypothesisVersion,
-    discoveryStatus: rawCandidate?.discoveryStatus,
+    hypothesisVersion: optionalString(rawCandidate?.hypothesisVersion),
+    discoveryStatus: optionalString(rawCandidate?.discoveryStatus),
     independentStandaloneMeaning:
       rawCandidate?.independentStandaloneMeaning,
-    lexicalAttestation: rawCandidate?.lexicalAttestation,
-    functionalSupportStatus:
-      rawCandidate?.functionalSupportStatus,
+    lexicalAttestation: optionalString(rawCandidate?.lexicalAttestation),
+    functionalSupportStatus: optionalString(rawCandidate?.functionalSupportStatus),
     evidenceRefs: rawCandidate?.evidenceRefs,
     reductionSteps: rawCandidate?.reductionSteps,
     reasonCodes: rawCandidate?.reasonCodes,
-    historicalOriginClaim:
-      rawCandidate?.historicalOriginClaim,
-    historicalTransmissionClaim:
-      rawCandidate?.historicalTransmissionClaim,
-    winnerClaim: rawCandidate?.winnerClaim,
-    languageSuperiorityClaim:
-      rawCandidate?.languageSuperiorityClaim,
-    candidateTruthClaim:
-      rawCandidate?.candidateTruthClaim,
+    historicalOriginClaim: optionalString(rawCandidate?.historicalOriginClaim),
+    historicalTransmissionClaim: optionalString(rawCandidate?.historicalTransmissionClaim),
+    winnerClaim: optionalString(rawCandidate?.winnerClaim),
+    languageSuperiorityClaim: optionalString(rawCandidate?.languageSuperiorityClaim),
+    candidateTruthClaim: optionalString(rawCandidate?.candidateTruthClaim),
 
-    validationOutcome: rawCandidate?.validationOutcome,
-    validationReasons: rawCandidate?.validationReasons,
-    rankGroup: rawCandidate?.rankGroup,
-    rankScore: rawCandidate?.rankScore,
-    rankReason: rawCandidate?.rankReason,
-    claimBoundary: rawCandidate?.claimBoundary,
-    userDecisionPosture: rawCandidate?.userDecisionPosture,
-    evidenceCategories: rawCandidate?.evidenceCategories,
+    validationOutcome: optionalString(rawCandidate?.validationOutcome),
+    validationReasons: optionalStringArray(rawCandidate?.validationReasons),
+    rankGroup: optionalString(rawCandidate?.rankGroup),
+    rankScore: optionalFiniteNumber(rawCandidate?.rankScore),
+    rankReason: optionalString(rawCandidate?.rankReason),
+    claimBoundary: optionalString(rawCandidate?.claimBoundary),
+    userDecisionPosture: optionalString(rawCandidate?.userDecisionPosture),
+    evidenceCategories: optionalStringArray(rawCandidate?.evidenceCategories),
     freeOperatorDiagnostic: rawCandidate?.freeOperatorDiagnostic,
   };
 
@@ -266,12 +321,15 @@ function adaptCandidate(rawCandidate: Raw): CandidateUI {
   };
 }
 
-export function adaptAnalyzeV1ToUI(raw: Raw): AnalyzeWordResultUI {
+export function adaptAnalyzeV1ToUI(rawInput: unknown): AnalyzeWordResultUI {
+  const raw = asRawRecord(rawInput) as RawAnalyzeV1;
   const word = String(raw?.word ?? "");
   const sanitized = String(raw?.sanitized ?? word);
   const engineVersion = String(raw?.engineVersion ?? "unknown");
 
-  const rawCandidates: Raw[] = Array.isArray(raw?.candidates) ? raw.candidates : [];
+  const rawCandidates: RawCandidate[] = Array.isArray(raw?.candidates)
+    ? raw.candidates.map((candidate) => asRawRecord(candidate) as RawCandidate)
+    : [];
   const candidates: CandidateUI[] = rawCandidates.map(adaptCandidate);
 
   const bestRaw = rawCandidates[0] ?? null;
@@ -283,14 +341,13 @@ export function adaptAnalyzeV1ToUI(raw: Raw): AnalyzeWordResultUI {
   const languageFamilies = Array.isArray(raw?.languageFamilies) ? raw.languageFamilies : [];
   const history = Array.isArray(raw?.history) ? raw.history : [];
 
-  const engineMeta =
+  const engineMeta: EngineMetaRaw =
     raw?.engineMeta ??
     ({
       engineVersion,
-    heartInstrumentV1: null,
-      mode: raw?.mode ?? undefined,
-      alphabet: raw?.alphabet ?? undefined,
-    } as any);
+      mode: typeof raw?.mode === "string" ? raw.mode : undefined,
+      alphabet: typeof raw?.alphabet === "string" ? raw.alphabet : undefined,
+    });
 
   return {
     word,
@@ -309,8 +366,8 @@ export function adaptAnalyzeV1ToUI(raw: Raw): AnalyzeWordResultUI {
     languageFamilies,
     history,
     engineMeta,
-    mode: raw?.mode,
-    alphabet: raw?.alphabet,
+    mode: typeof raw?.mode === "string" ? raw.mode : undefined,
+    alphabet: typeof raw?.alphabet === "string" ? raw.alphabet : undefined,
     wordMatrix: raw?.wordMatrix,
     symbolic: raw?.symbolic,
     meta: raw?.meta,
