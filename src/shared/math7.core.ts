@@ -15,19 +15,12 @@
 
 import { extractOrthographyVoicesFromWordV0_1 } from "./vowels/extractOrthographyVoicesFromWord.v0.1";
 import { symbolicMathOrder, type SevenVoiceKey } from "./sevenVoiceOrderedViews.v0.1";
+import { VOWEL_INDEX as CORE_VOWEL_INDEX } from "../core/sevenVowelsCore";
 export const SEVEN_VOWELS = symbolicMathOrder;
 export type SevenVowel = SevenVoiceKey;
 
 // 0-based indexing (matches existing behavior where "study" => totalMod7 = 2)
-export const VOWEL_INDEX: Record<SevenVowel, number> = {
-  A: 0,
-  E: 1,
-  I: 2,
-  O: 3,
-  U: 4,
-  Y: 5,
-  "Ë": 6,
-};
+export const VOWEL_INDEX: Record<SevenVowel, number> = { ...CORE_VOWEL_INDEX };
 
 export function isSevenVowel(x: string): x is SevenVowel {
   return (SEVEN_VOWELS as readonly string[]).includes(x);

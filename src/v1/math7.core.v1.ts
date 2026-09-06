@@ -1,23 +1,17 @@
-import { extractSevenVowelsFromString } from "@/shared/math7.core";
+import { extractSevenVowelsFromString, SEVEN_VOWELS as CANONICAL_SEVEN_VOWELS, type SevenVowel as CanonicalSevenVowel } from "@/shared/math7.core";
 
-export type SevenVowel = "A" | "E" | "I" | "O" | "U" | "Y" | "Ë";
+import { sevenVoiceRegistry } from "@/shared/sevenVoiceOrderedViews.v0.1";
 
-export const SEVEN_VOWELS: ReadonlyArray<SevenVowel> = ["A", "E", "I", "O", "U", "Y", "Ë"];
+export type SevenVowel = CanonicalSevenVowel;
+
+export const SEVEN_VOWELS: ReadonlyArray<SevenVowel> = CANONICAL_SEVEN_VOWELS;
 
 /**
  * Public 1..7 mapping (clock ring).
  * A=1, E=2, I=3, O=4, U=5, Y=6, Ë=7
  */
 export function value1to7(v: SevenVowel): number {
-  switch (v) {
-    case "A": return 1;
-    case "E": return 2;
-    case "I": return 3;
-    case "O": return 4;
-    case "U": return 5;
-    case "Y": return 6;
-    case "Ë": return 7;
-  }
+  return sevenVoiceRegistry[v]?.math7Value;
 }
 
 function mod(n: number, m: number) {
