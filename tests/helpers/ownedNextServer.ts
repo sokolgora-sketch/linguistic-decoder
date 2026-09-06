@@ -74,7 +74,9 @@ export function ownProcess(proc: ChildProcess) {
         const started = Date.now();
         let forced = false;
         // Leader closure does not prove that descendants with separate stdio exited.
-        while (!closed || groupAlive()) {
+        // After SIGKILL, an unreaped zombie may keep kill(group, 0) successful.
+        // Await the owned child's close, but do not wait for PID 1 to reap orphans.
+        while (!closed || (!forced && groupAlive())) {
           const elapsed = Date.now() - started;
           if (!forced && elapsed >= 5_000) { signal("SIGKILL"); forced = true; }
           if (elapsed >= 10_000) throw new Error("Owned process group did not close after termination");

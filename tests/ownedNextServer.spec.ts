@@ -1,6 +1,7 @@
 /** @jest-environment node */
-import { spawn } from "node:child_process";
+import { ChildProcess, spawn } from "node:child_process";
 import { once } from "node:events";
+import { readFileSync } from "node:fs";
 import http from "node:http";
 import type { AddressInfo } from "node:net";
 import { ownProcess, requestJson } from "./helpers/ownedNextServer";
@@ -34,18 +35,48 @@ describe("integration server ownership", () => {
     const script = `
       const { spawn } = require('node:child_process');
       const child = spawn(process.execPath, ['-e', "process.on('SIGTERM', () => {}); process.send('ready'); setInterval(() => {}, 1000)"], { stdio: ['ignore', '${stdio}', '${stdio}', 'ipc'] });
-      child.on('message', () => console.log('ready'));
+      child.on('message', () => console.log(child.pid));
       process.on('SIGTERM', () => process.exit(0));
     `;
     const child = spawn(process.execPath, ["-e", script], { detached: true, stdio: ["ignore", "pipe", "pipe"] });
     const owned = ownProcess(child);
     try {
-      await once(child.stdout!, "data");
+      const [output] = await once(child.stdout!, "data");
+      const descendantPid = Number(String(output).trim());
       await owned.stop();
       expect(child.exitCode).toBe(0);
-      expect(() => process.kill(-child.pid!, 0)).toThrow();
+      // Linux PID 1 may retain a dead orphan as a zombie; that is not a live leak.
+      try {
+        process.kill(descendantPid, 0);
+        expect(process.platform).toBe("linux");
+        const stat = readFileSync(`/proc/${descendantPid}/stat`, "utf8");
+        expect(stat.slice(stat.lastIndexOf(")") + 2).split(" ")[0]).toBe("Z");
+      } catch (error) {
+        if (!["ESRCH", "ENOENT"].includes((error as NodeJS.ErrnoException).code ?? "")) throw error;
+      }
     } finally {
       await owned.stop();
     }
   }, 15_000);
+
+  test("does not wait for a zombie-only group to disappear after SIGKILL", async () => {
+    if (process.platform === "win32") return;
+    jest.useFakeTimers();
+    const child = new ChildProcess();
+    Object.defineProperty(child, "pid", { value: 123456 });
+    const kill = jest.spyOn(process, "kill").mockImplementation((_pid, signal) => {
+      if (signal === "SIGTERM") child.emit("close", 0, null);
+      return true; // group lookup remains successful, as with unreaped zombies
+    });
+    try {
+      const stopping = ownProcess(child).stop();
+      await jest.advanceTimersByTimeAsync(5_100);
+      await stopping;
+      expect(kill).toHaveBeenCalledWith(-123456, "SIGKILL");
+      expect(jest.getTimerCount()).toBe(0);
+    } finally {
+      kill.mockRestore();
+      jest.useRealTimers();
+    }
+  });
 });
