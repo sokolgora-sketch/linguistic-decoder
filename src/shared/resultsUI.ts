@@ -121,7 +121,7 @@ export interface AnalyzeWordResultUI {
   // Top-level mode / alphabet (for the Engine meta card + debug)
   mode?: string;
   alphabet?: string;
-  wordMatrix?: any;
+  wordMatrix?: unknown;
   symbolic?: {
     label?: string;
     notes?: (string | null)[];
@@ -129,7 +129,7 @@ export interface AnalyzeWordResultUI {
   };
   /** DeepRoot (public, JSON-safe). hypotheses-first. */
   resonanceProfileV1?: unknown;
-  deepRoot?: any;
+  deepRoot?: unknown;
 
 }
 
