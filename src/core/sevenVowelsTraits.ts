@@ -1,3 +1,4 @@
+import { sevenVoiceRegistry } from "../shared/sevenVoiceOrderedViews.v0.1";
 // src/core/sevenVowelsTraits.ts
 // Symbolic traits for each of the Seven-vowel + Zheji structural lens.
 
@@ -35,7 +36,7 @@ const TRAITS: Record<Vowel, VowelTrait> = {
   A: {
     symbol: "A",
     ring: ringOf("A"),
-    color: "red",
+    color: sevenVoiceRegistry["A"].symbolicColor,
     role: "Father / Source",
     force: "Action / Fire / Truth",
     lightDarkPolarity: "light",
@@ -45,7 +46,7 @@ const TRAITS: Record<Vowel, VowelTrait> = {
   E: {
     symbol: "E",
     ring: ringOf("E"),
-    color: "orange",
+    color: sevenVoiceRegistry["E"].symbolicColor,
     role: "Expansion",
     force: "Flow / Bridge / Exchange",
     lightDarkPolarity: "light",
@@ -55,7 +56,7 @@ const TRAITS: Record<Vowel, VowelTrait> = {
   I: {
     symbol: "I",
     ring: ringOf("I"),
-    color: "yellow",
+    color: sevenVoiceRegistry["I"].symbolicColor,
     role: "Insight",
     force: "Pattern / Focus / Line",
     lightDarkPolarity: "light",
@@ -65,7 +66,7 @@ const TRAITS: Record<Vowel, VowelTrait> = {
   O: {
     symbol: "O",
     ring: ringOf("O"),
-    color: "green",
+    color: sevenVoiceRegistry["O"].symbolicColor,
     role: "Mediator / Heart / Balance",
     force: "Center / Orbit / Hold",
     lightDarkPolarity: "balanced",
@@ -75,7 +76,7 @@ const TRAITS: Record<Vowel, VowelTrait> = {
   U: {
     symbol: "U",
     ring: ringOf("U"),
-    color: "blue",
+    color: sevenVoiceRegistry["U"].symbolicColor,
     role: "Unity / Field",
     force: "Space / Support / Carry",
     lightDarkPolarity: "light",
@@ -85,7 +86,7 @@ const TRAITS: Record<Vowel, VowelTrait> = {
   Y: {
     symbol: "Y",
     ring: ringOf("Y"),
-    color: "indigo",
+    color: sevenVoiceRegistry["Y"].symbolicColor,
     role: "Network / Edge",
     force: "Signal / Link / Checksum",
     lightDarkPolarity: "dark",
@@ -95,7 +96,7 @@ const TRAITS: Record<Vowel, VowelTrait> = {
   "Ë": {
     symbol: "Ë",
     ring: ringOf("Ë"),
-    color: "violet",
+    color: sevenVoiceRegistry["Ë"].symbolicColor,
     role: "Mother / Evolution",
     force: "Closure / Birth / Formed Unit",
     lightDarkPolarity: "dark",

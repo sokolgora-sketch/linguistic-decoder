@@ -3,21 +3,17 @@
 
 import { symbolicMathOrder, type SevenVoiceKey } from "../shared/sevenVoiceOrderedViews.v0.1";
 
+import { sevenVoiceRegistry } from "../shared/sevenVoiceOrderedViews.v0.1";
+
 export const VOWELS = symbolicMathOrder;
 export type Vowel = SevenVoiceKey;
 
 // 0–6 index in the fixed A,E,I,O,U,Y,Ë order
 export type VowelIndex = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
-export const VOWEL_INDEX: Record<Vowel, VowelIndex> = {
-  A: 0,
-  E: 1,
-  I: 2,
-  O: 3,
-  U: 4,
-  Y: 5,
-  "Ë": 6,
-};
+export const VOWEL_INDEX: Record<Vowel, VowelIndex> = Object.fromEntries(
+  VOWELS.map((voice) => [voice, sevenVoiceRegistry[voice].symbolicMathIndex - 1]),
+) as Record<Vowel, VowelIndex>;
 
 // Ring model (Heart): 
 // 0 = O (mediator / heart)
@@ -27,13 +23,13 @@ export const VOWEL_INDEX: Record<Vowel, VowelIndex> = {
 export type RingIndex = 0 | 1 | 2 | 3;
 
 export const VOWEL_RING: Record<Vowel, RingIndex> = {
-  O: 0,
-  I: 1,
-  U: 1,
-  E: 2,
-  Y: 2,
-  A: 3,
-  "Ë": 3,
+  O: sevenVoiceRegistry["O"].symbolicRing,
+  I: sevenVoiceRegistry["I"].symbolicRing,
+  U: sevenVoiceRegistry["U"].symbolicRing,
+  E: sevenVoiceRegistry["E"].symbolicRing,
+  Y: sevenVoiceRegistry["Y"].symbolicRing,
+  A: sevenVoiceRegistry["A"].symbolicRing,
+  "Ë": sevenVoiceRegistry["Ë"].symbolicRing,
 };
 
 export function indexOf(v: Vowel): VowelIndex {

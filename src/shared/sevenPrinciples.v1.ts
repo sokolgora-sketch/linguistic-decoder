@@ -1,3 +1,4 @@
+import { sevenVoiceRegistry } from "./sevenVoiceOrderedViews.v0.1";
 export type Note = "C" | "D" | "E" | "F" | "G" | "A" | "B";
 
 export const VOWEL_TO_NOTE_V0_1: Record<Vowel, Note> =
@@ -91,7 +92,7 @@ export const SEVEN_PRINCIPLES: Record<Vowel, SevenPrinciple> = {
     ring: ringLabelFromRingIndex(VOWEL_RING.A),
     role: "Initiation/Source",
     polarity: "masculine",
-    color: "red",
+    color: sevenVoiceRegistry["A"].symbolicColor,
     note: "C",
   },
   E: {
@@ -102,7 +103,7 @@ export const SEVEN_PRINCIPLES: Record<Vowel, SevenPrinciple> = {
     ring: ringLabelFromRingIndex(VOWEL_RING.E),
     role: "Expansion/Bridge",
     polarity: "feminine-leaning",
-    color: "orange",
+    color: sevenVoiceRegistry["E"].symbolicColor,
     note: "D",
   },
   I: {
@@ -113,7 +114,7 @@ export const SEVEN_PRINCIPLES: Record<Vowel, SevenPrinciple> = {
     ring: ringLabelFromRingIndex(VOWEL_RING.I),
     role: "Direction/Focus",
     polarity: "masculine-leaning",
-    color: "yellow",
+    color: sevenVoiceRegistry["I"].symbolicColor,
     note: "E",
   },
   O: {
@@ -124,7 +125,7 @@ export const SEVEN_PRINCIPLES: Record<Vowel, SevenPrinciple> = {
     ring: ringLabelFromRingIndex(VOWEL_RING.O),
     role: "Mediation/Balance",
     polarity: "neutral",
-    color: "green",
+    color: sevenVoiceRegistry["O"].symbolicColor,
     note: "F",
   },
   U: {
@@ -135,7 +136,7 @@ export const SEVEN_PRINCIPLES: Record<Vowel, SevenPrinciple> = {
     ring: ringLabelFromRingIndex(VOWEL_RING.U),
     role: "Containment/Depth",
     polarity: "feminine",
-    color: "blue",
+    color: sevenVoiceRegistry["U"].symbolicColor,
     note: "G",
   },
   Y: {
@@ -146,7 +147,7 @@ export const SEVEN_PRINCIPLES: Record<Vowel, SevenPrinciple> = {
     ring: ringLabelFromRingIndex(VOWEL_RING.Y),
     role: "Reflection/Mirror",
     polarity: "feminine-leaning",
-    color: "indigo",
+    color: sevenVoiceRegistry["Y"].symbolicColor,
     note: "A",
   },
   "Ë": {
@@ -157,7 +158,7 @@ export const SEVEN_PRINCIPLES: Record<Vowel, SevenPrinciple> = {
     ring: ringLabelFromRingIndex(VOWEL_RING["Ë"]),
     role: "Completion/Unit",
     polarity: "feminine",
-    color: "violet",
+    color: sevenVoiceRegistry["Ë"].symbolicColor,
     note: "B",
   },
 };

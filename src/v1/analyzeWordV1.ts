@@ -9,16 +9,8 @@ import {
   RULESET_VERSION_V1,
 } from "./versions.v1";
 import { totalMod7FromSum0to6 } from "./math7.core.v1";
-import { extractSevenVowelsFromString } from "@/shared/math7.core";
-const VOWEL_INDEX: Record<SevenVowel, number> = {
-  A: 0,
-  E: 1,
-  I: 2,
-  O: 3,
-  U: 4,
-  Y: 5,
-  Ë: 6,
-};
+import { extractSevenVowelsFromString, VOWEL_INDEX } from "@/shared/math7.core";
+
 
 function extractSevenVowelsV1(normalizedWord: string): SevenVowel[] {
   // Orthography SSOT: shared extractor (Universal Vowel Mapper v0.1).
