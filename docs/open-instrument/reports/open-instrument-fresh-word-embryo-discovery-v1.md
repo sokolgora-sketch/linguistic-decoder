@@ -55,8 +55,8 @@ The existing `sterile` control remains a positive structural family with `ER` as
 
 | Lane | State |
 | --- | --- |
-| 1. Baseline failure taxonomy | NEXT |
-| 2. Generic structural grammar expansion | NOT_STARTED |
+| 1. Baseline failure taxonomy | DONE |
+| 2. Generic structural grammar expansion | NEXT |
 | 3. Structural defensibility v0.2 / additive verification | NOT_STARTED |
 | 4. Explicit target-sense product path | NOT_STARTED |
 | 5. End-to-end functional discovery | NOT_STARTED |
@@ -83,13 +83,32 @@ The milestone may become `DONE` only after:
 
 Every continuation must verify repository identity, branch/main state, divergence, worktree, remote, and protected stash before editing. Read this document and the closed predecessor in full. Continue only the first incomplete lane. Inspect current implementation, callers, and tests before patching. Never weaken existing gates to improve coverage, and never add word-specific branches, catalog rows, lexical meanings, or evidence claims.
 
-## 7. Initial next task
+## 7. Lane 1 closeout: baseline failure taxonomy
 
-**Lane 1 — Baseline failure taxonomy.**
+The current v0.1 grammar was inspected and probed without production changes. Its authorized operations are `peel_right_vowel_led_expansion` and `peel_left_consonant_frame`; the existing defensibility gates require at least two authorized operations and a minimum emitted anchor size of two.
 
-Classify normalized basis, voice path, candidate reductions, rejected reductions, exact rejection rules, reachable form, authorized operation count, and the reason no structural hypothesis survives for each opening word. No production implementation change is allowed during this classification pass.
+| Word | Voice path | Mechanically reachable terminal(s) | Rejection |
+| --- | --- | --- | --- |
+| `candle` | `A,E` | `ANDLE` after one left-frame peel | one operation; terminal remains above size 2 |
+| `staircase` | `A,I,A,E` | `AIRC` after `ASE` peel plus two left-frame peels; `AIRCASE` via two left-frame peels | smallest defensible terminal is size 4 |
+| `orchard` | `O,A` | `ORCH` after `ARD` right vowel-led peel | one operation; terminal remains above size 2 |
+| `tunnel` | `U,E` | `UNN` after `EL` right vowel-led peel plus one left-frame peel | smallest defensible terminal is size 3 |
+| `ribbon` | `I,O` | `IBB` after `ON` right vowel-led peel plus one left-frame peel | smallest defensible terminal is size 3 |
+| `helmet` | `E,E` | `ELM` after `ET` right vowel-led peel plus one left-frame peel | smallest defensible terminal is size 3 |
+| `pocket` | `O,E` | `OCK` after `ET` right vowel-led peel plus one left-frame peel | smallest defensible terminal is size 3 |
+| `chimney` | `I,E` | `IMNEY` after two left-frame peels | smallest defensible terminal is size 5 |
 
-## 8. Opening proof
+The dominant gap is not target sense, evidence, or doctrine. It is a missing generic right-edge consonant-led expansion/frame grammar. Several words contain a bounded terminal consonant frame followed by a canonical voice, but v0.1 only recognizes the reverse vowel-led orientation. Existing operation-count and minimum-anchor gates remain justified and unchanged.
+
+The `sterile` positive control remains `ER` with the existing three-step chain. The `xyz`, `data`, `dij`, and `mode` negative controls remain Null under the current grammar.
+
+## 8. Initial next task
+
+**Lane 2 — Generic structural grammar expansion.**
+
+Add one bounded, generic structural operation only if its invariant is defensible from the existing vowel-path and consonant-frame model. Do not change operation-count or minimum-anchor gates.
+
+## 9. Opening proof
 
 - repository: `sokolgora-sketch/linguistic-decoder`;
 - path: `/Users/wei/Desktop/ZËRO /Dwnlosads /zero-firebase-studio-export`;
