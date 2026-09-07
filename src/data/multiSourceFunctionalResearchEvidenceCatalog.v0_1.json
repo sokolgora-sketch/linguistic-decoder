@@ -1365,6 +1365,211 @@
       "languageSuperiorityClaim": "not_claimed",
       "candidateTruthClaim": "not_claimed",
       "userDecisionPosture": "user_decides"
+    },
+    {
+      "registryVersion": "open-instrument.multi-source-functional-research-evidence-registry.v0_1",
+      "researchEvidenceId": "research.external.albanian-vesh-ear.scale50.v0_1",
+      "embryo": "VESH",
+      "evidenceFamily": "lexical_dictionary",
+      "language": "Albanian",
+      "form": "vesh",
+      "gloss": "ear; organ of hearing",
+      "embryoRelation": "exact_form",
+      "relationOperationIds": [],
+      "attestationTruth": "fact",
+      "sourceStatus": "research_candidate",
+      "citations": [
+        {
+          "citationId": "research.external.fjale-vesh-ear.scale50.citation.v0_1",
+          "sourceTitle": "FJALË — Vesh",
+          "sourceAuthorOrEditor": null,
+          "sourcePublisherOrHost": "FJALË — Fjalor Shqip",
+          "sourceDateOrVersion": "accessed 2026-09-07",
+          "sourceUrlOrArchiveRef": "https://fjale.al/vesh",
+          "entryLocator": "VESH m., senses 1-2",
+          "sourceHashOrArchiveHash": null,
+          "attestedForm": "vesh",
+          "attestedGloss": "each of the two hearing organs; also the capacity for hearing"
+        }
+      ],
+      "functionalHypotheses": [
+        {
+          "targetWord": "ear",
+          "semanticBridge": "the independently attested Albanian noun vesh denotes the ear and can be tested as a direct cross-language functional witness for the EAR concept; this remains research-only and does not assert historical origin, transmission, winner status, or candidate truth",
+          "functionalBridgeTruth": "hypothesis",
+          "claimBoundary": "functional_hypothesis_only"
+        }
+      ],
+      "historicalOriginClaim": "not_claimed",
+      "historicalTransmissionClaim": "not_claimed",
+      "winnerClaim": "not_claimed",
+      "languageSuperiorityClaim": "not_claimed",
+      "candidateTruthClaim": "not_claimed",
+      "userDecisionPosture": "user_decides"
+    },
+    {
+      "registryVersion": "open-instrument.multi-source-functional-research-evidence-registry.v0_1",
+      "researchEvidenceId": "research.external.albanian-hunde-nose.scale50.v0_1",
+      "embryo": "HUNDË",
+      "evidenceFamily": "lexical_dictionary",
+      "language": "Albanian",
+      "form": "hundë",
+      "gloss": "nose; organ of smell and breathing",
+      "embryoRelation": "exact_form",
+      "relationOperationIds": [],
+      "attestationTruth": "fact",
+      "sourceStatus": "research_candidate",
+      "citations": [
+        {
+          "citationId": "research.external.fjale-hunde-nose.scale50.citation.v0_1",
+          "sourceTitle": "FJALË — Hundë",
+          "sourceAuthorOrEditor": null,
+          "sourcePublisherOrHost": "FJALË — Fjalor Shqip",
+          "sourceDateOrVersion": "accessed 2026-09-07",
+          "sourceUrlOrArchiveRef": "https://fjale.al/hund%C3%AB",
+          "entryLocator": "HUNDË f., sense 1",
+          "sourceHashOrArchiveHash": null,
+          "attestedForm": "hundë",
+          "attestedGloss": "organ of smell; projecting part of the face through which air passes"
+        }
+      ],
+      "functionalHypotheses": [
+        {
+          "targetWord": "nose",
+          "semanticBridge": "the independently attested Albanian noun hundë denotes the nose and can be tested as a direct cross-language functional witness for the NOSE concept; this remains research-only and does not assert historical origin, transmission, winner status, or candidate truth",
+          "functionalBridgeTruth": "hypothesis",
+          "claimBoundary": "functional_hypothesis_only"
+        }
+      ],
+      "historicalOriginClaim": "not_claimed",
+      "historicalTransmissionClaim": "not_claimed",
+      "winnerClaim": "not_claimed",
+      "languageSuperiorityClaim": "not_claimed",
+      "candidateTruthClaim": "not_claimed",
+      "userDecisionPosture": "user_decides"
+    },
+    {
+      "registryVersion": "open-instrument.multi-source-functional-research-evidence-registry.v0_1",
+      "researchEvidenceId": "research.external.albanian-kembe-foot.scale50.v0_1",
+      "embryo": "KËMBË",
+      "evidenceFamily": "lexical_dictionary",
+      "language": "Albanian",
+      "form": "këmbë",
+      "gloss": "foot / lower limb; terminal part used for standing and walking",
+      "embryoRelation": "exact_form",
+      "relationOperationIds": [],
+      "attestationTruth": "fact",
+      "sourceStatus": "research_candidate",
+      "citations": [
+        {
+          "citationId": "research.external.fjale-kembe-foot.scale50.citation.v0_1",
+          "sourceTitle": "FJALË — Këmbë",
+          "sourceAuthorOrEditor": null,
+          "sourcePublisherOrHost": "FJALË — Fjalor Shqip",
+          "sourceDateOrVersion": "accessed 2026-09-07",
+          "sourceUrlOrArchiveRef": "https://fjale.al/k%C3%ABmb%C3%AB",
+          "entryLocator": "KËMBË f., senses 1-2",
+          "sourceHashOrArchiveHash": null,
+          "attestedForm": "këmbë",
+          "attestedGloss": "lower limb and its terminal part; foot used for standing, walking, or movement"
+        }
+      ],
+      "functionalHypotheses": [
+        {
+          "targetWord": "foot",
+          "semanticBridge": "the independently attested Albanian noun këmbë includes the foot and lower limb and can be tested as a direct cross-language functional witness for the FOOT concept; this remains research-only and does not assert historical origin, transmission, winner status, or candidate truth",
+          "functionalBridgeTruth": "hypothesis",
+          "claimBoundary": "functional_hypothesis_only"
+        }
+      ],
+      "historicalOriginClaim": "not_claimed",
+      "historicalTransmissionClaim": "not_claimed",
+      "winnerClaim": "not_claimed",
+      "languageSuperiorityClaim": "not_claimed",
+      "candidateTruthClaim": "not_claimed",
+      "userDecisionPosture": "user_decides"
+    },
+    {
+      "registryVersion": "open-instrument.multi-source-functional-research-evidence-registry.v0_1",
+      "researchEvidenceId": "research.external.albanian-paqe-peace.scale50.v0_1",
+      "embryo": "PAQE",
+      "evidenceFamily": "lexical_dictionary",
+      "language": "Albanian",
+      "form": "paqe",
+      "gloss": "peace; state without conflict or war",
+      "embryoRelation": "exact_form",
+      "relationOperationIds": [],
+      "attestationTruth": "fact",
+      "sourceStatus": "research_candidate",
+      "citations": [
+        {
+          "citationId": "research.external.fjale-paqe-peace.scale50.citation.v0_1",
+          "sourceTitle": "FJALË — Paqe",
+          "sourceAuthorOrEditor": null,
+          "sourcePublisherOrHost": "FJALË — Fjalor Shqip",
+          "sourceDateOrVersion": "accessed 2026-09-07",
+          "sourceUrlOrArchiveRef": "https://fjale.al/paqe",
+          "entryLocator": "PAQE f., senses 1-3",
+          "sourceHashOrArchiveHash": null,
+          "attestedForm": "paqe",
+          "attestedGloss": "peace; calm relations and a state without war or conflict"
+        }
+      ],
+      "functionalHypotheses": [
+        {
+          "targetWord": "peace",
+          "semanticBridge": "the independently attested Albanian noun paqe denotes peace and can be tested as a direct cross-language functional witness for the PEACE concept; this remains research-only and does not assert historical origin, transmission, winner status, or candidate truth",
+          "functionalBridgeTruth": "hypothesis",
+          "claimBoundary": "functional_hypothesis_only"
+        }
+      ],
+      "historicalOriginClaim": "not_claimed",
+      "historicalTransmissionClaim": "not_claimed",
+      "winnerClaim": "not_claimed",
+      "languageSuperiorityClaim": "not_claimed",
+      "candidateTruthClaim": "not_claimed",
+      "userDecisionPosture": "user_decides"
+    },
+    {
+      "registryVersion": "open-instrument.multi-source-functional-research-evidence-registry.v0_1",
+      "researchEvidenceId": "research.external.albanian-mbret-king.scale50.v0_1",
+      "embryo": "MBRET",
+      "evidenceFamily": "lexical_dictionary",
+      "language": "Albanian",
+      "form": "mbret",
+      "gloss": "king; monarch holding a royal title",
+      "embryoRelation": "exact_form",
+      "relationOperationIds": [],
+      "attestationTruth": "fact",
+      "sourceStatus": "research_candidate",
+      "citations": [
+        {
+          "citationId": "research.external.fjale-mbret-king.scale50.citation.v0_1",
+          "sourceTitle": "FJALË — Mbret",
+          "sourceAuthorOrEditor": null,
+          "sourcePublisherOrHost": "FJALË — Fjalor Shqip",
+          "sourceDateOrVersion": "accessed 2026-09-07",
+          "sourceUrlOrArchiveRef": "https://fjale.al/mbret",
+          "entryLocator": "MBRET m., sense 1",
+          "sourceHashOrArchiveHash": null,
+          "attestedForm": "mbret",
+          "attestedGloss": "king; monarch who holds the hereditary royal title"
+        }
+      ],
+      "functionalHypotheses": [
+        {
+          "targetWord": "king",
+          "semanticBridge": "the independently attested Albanian noun mbret denotes a king and can be tested as a direct cross-language functional witness for the KING concept; this remains research-only and does not assert historical origin, transmission, winner status, or candidate truth",
+          "functionalBridgeTruth": "hypothesis",
+          "claimBoundary": "functional_hypothesis_only"
+        }
+      ],
+      "historicalOriginClaim": "not_claimed",
+      "historicalTransmissionClaim": "not_claimed",
+      "winnerClaim": "not_claimed",
+      "languageSuperiorityClaim": "not_claimed",
+      "candidateTruthClaim": "not_claimed",
+      "userDecisionPosture": "user_decides"
     }
   ]
 }
