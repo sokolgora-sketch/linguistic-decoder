@@ -167,7 +167,7 @@ describe("Open Instrument live source intake WATER pilot v0.1", () => {
     expect(MANUALLY_ENTERED_CAPTURE_FIELDS_V0_1).toBe(13);
     expect(AUTO_FILLED_TRADITION_FIELDS_V0_1).toBe(10);
     expect(HUMAN_SEMANTIC_JUDGMENT_FIELDS_V0_1).toBe(10);
-    expect(catalog.rows).toHaveLength(52);
+    expect(catalog.rows).toHaveLength(62);
     expect(catalog.rows.filter((row) => row.functionalHypotheses.some((hypothesis) => hypothesis.targetWord === "water"))).toHaveLength(2);
   });
 

@@ -1,0 +1,55 @@
+{
+  "packetVersion": "open-instrument.research-evidence-packet.v0_1",
+  "packetId": "tree.physical-plant.v0_1",
+  "targetWord": "tree",
+  "targetSenseId": "physical_tree_plant",
+  "semanticBridge": "The Albanian and Latin entries independently attest lexical forms for a physical tree; treating them as a shared functional referent remains a research hypothesis only.",
+  "sources": [
+    {
+      "sourceKey": "verified-source:capture.fjale-fjalor-shqip-v0-1.pem-f-sense-2.pem.v0_1",
+      "embryo": "pemë",
+      "evidenceFamily": "lexical_dictionary",
+      "language": "Albanian",
+      "form": "pemë",
+      "gloss": "Dru me trung dhe me shumë degë të cilat formojnë një si kurorë; fryti i këtij druri.",
+      "embryoRelation": "exact_form",
+      "relationOperationIds": [],
+      "citation": {
+        "citationId": "open-instrument.source-record.capture.fjale-fjalor-shqip-v0-1.pem-f-sense-2.pem.v0_1.citation.v0_1",
+        "sourceTitle": "FJALË — Fjalor Shqip",
+        "sourceAuthorOrEditor": null,
+        "sourcePublisherOrHost": "FJALË — Fjalor Shqip",
+        "sourceDateOrVersion": "accessed 2026-09-07",
+        "sourceUrlOrArchiveRef": "https://fjale.al/pem%C3%AB",
+        "entryLocator": "PEMË f.; sense 2",
+        "sourceHashOrArchiveHash": null,
+        "attestedForm": "pemë",
+        "attestedGloss": "Dru me trung dhe me shumë degë të cilat formojnë një si kurorë; fryti i këtij druri.",
+        "provenanceGroupId": "fjale.fjalor-shqip.v0_1"
+      }
+    },
+    {
+      "sourceKey": "verified-source:capture.scaife-lewis-short-v0-1.headword-arbor-general-tree-sense-entry-text-beginning-a-tree.arbor.v0_1",
+      "embryo": "arbor",
+      "evidenceFamily": "historical_dictionary",
+      "language": "Latin",
+      "form": "arbor",
+      "gloss": "a tree; in general, a tree",
+      "embryoRelation": "exact_form",
+      "relationOperationIds": [],
+      "citation": {
+        "citationId": "open-instrument.source-record.capture.scaife-lewis-short-v0-1.headword-arbor-general-tree-sense-entry-text-beginning-a-tree.arbor.v0_1.citation.v0_1",
+        "sourceTitle": "Lewis & Short Latin Dictionary",
+        "sourceAuthorOrEditor": "Charlton T. Lewis and Charles Short",
+        "sourcePublisherOrHost": "Scaife ATLAS / Perseus Digital Library",
+        "sourceDateOrVersion": "Lewis & Short; accessed 2026-09-07",
+        "sourceUrlOrArchiveRef": "https://atlas.perseus.tufts.edu/dictionaries/entry/urn%3Acite2%3Ascaife-viewer%3Adictionary-entries.atlas_v1%3Alat.ls.perseus-eng2-n3372/",
+        "entryLocator": "headword arbor; general tree sense; entry text beginning A tree.",
+        "sourceHashOrArchiveHash": null,
+        "attestedForm": "arbor",
+        "attestedGloss": "a tree; in general, a tree",
+        "provenanceGroupId": "scaife.lewis-short.v0_1"
+      }
+    }
+  ]
+}

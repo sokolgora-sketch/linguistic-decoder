@@ -2172,6 +2172,436 @@
       "languageSuperiorityClaim": "not_claimed",
       "candidateTruthClaim": "not_claimed",
       "userDecisionPosture": "user_decides"
+    },
+    {
+      "registryVersion": "open-instrument.multi-source-functional-research-evidence-registry.v0_1",
+      "researchEvidenceId": "research.external.open-instrument-research-evidence-packet-v0-1.tree-physical-plant-v0-1.verified-source-capture-fjale-fjalor-shqip-v0-1-pem-f-sense-2-pem-v0-1",
+      "embryo": "pemë",
+      "evidenceFamily": "lexical_dictionary",
+      "language": "Albanian",
+      "form": "pemë",
+      "gloss": "Dru me trung dhe me shumë degë të cilat formojnë një si kurorë; fryti i këtij druri.",
+      "embryoRelation": "exact_form",
+      "relationOperationIds": [],
+      "attestationTruth": "fact",
+      "sourceStatus": "research_candidate",
+      "citations": [
+        {
+          "citationId": "open-instrument.source-record.capture.fjale-fjalor-shqip-v0-1.pem-f-sense-2.pem.v0_1.citation.v0_1",
+          "sourceTitle": "FJALË — Fjalor Shqip",
+          "sourceAuthorOrEditor": null,
+          "sourcePublisherOrHost": "FJALË — Fjalor Shqip",
+          "sourceDateOrVersion": "accessed 2026-09-07",
+          "sourceUrlOrArchiveRef": "https://fjale.al/pem%C3%AB",
+          "entryLocator": "PEMË f.; sense 2",
+          "sourceHashOrArchiveHash": null,
+          "attestedForm": "pemë",
+          "attestedGloss": "Dru me trung dhe me shumë degë të cilat formojnë një si kurorë; fryti i këtij druri.",
+          "provenanceGroupId": "fjale.fjalor-shqip.v0_1"
+        }
+      ],
+      "functionalHypotheses": [
+        {
+          "targetWord": "tree",
+          "targetSenseId": "physical_tree_plant",
+          "semanticBridge": "The Albanian and Latin entries independently attest lexical forms for a physical tree; treating them as a shared functional referent remains a research hypothesis only.",
+          "functionalBridgeTruth": "hypothesis",
+          "claimBoundary": "functional_hypothesis_only"
+        }
+      ],
+      "historicalOriginClaim": "not_claimed",
+      "historicalTransmissionClaim": "not_claimed",
+      "winnerClaim": "not_claimed",
+      "languageSuperiorityClaim": "not_claimed",
+      "candidateTruthClaim": "not_claimed",
+      "userDecisionPosture": "user_decides"
+    },
+    {
+      "registryVersion": "open-instrument.multi-source-functional-research-evidence-registry.v0_1",
+      "researchEvidenceId": "research.external.open-instrument-research-evidence-packet-v0-1.tree-physical-plant-v0-1.verified-source-capture-scaife-lewis-short-v0-1-headword-arbor-general-tree-sense-entry-text-beginning-a-tree-arbor-v0-1",
+      "embryo": "arbor",
+      "evidenceFamily": "historical_dictionary",
+      "language": "Latin",
+      "form": "arbor",
+      "gloss": "a tree; in general, a tree",
+      "embryoRelation": "exact_form",
+      "relationOperationIds": [],
+      "attestationTruth": "fact",
+      "sourceStatus": "research_candidate",
+      "citations": [
+        {
+          "citationId": "open-instrument.source-record.capture.scaife-lewis-short-v0-1.headword-arbor-general-tree-sense-entry-text-beginning-a-tree.arbor.v0_1.citation.v0_1",
+          "sourceTitle": "Lewis & Short Latin Dictionary",
+          "sourceAuthorOrEditor": "Charlton T. Lewis and Charles Short",
+          "sourcePublisherOrHost": "Scaife ATLAS / Perseus Digital Library",
+          "sourceDateOrVersion": "Lewis & Short; accessed 2026-09-07",
+          "sourceUrlOrArchiveRef": "https://atlas.perseus.tufts.edu/dictionaries/entry/urn%3Acite2%3Ascaife-viewer%3Adictionary-entries.atlas_v1%3Alat.ls.perseus-eng2-n3372/",
+          "entryLocator": "headword arbor; general tree sense; entry text beginning A tree.",
+          "sourceHashOrArchiveHash": null,
+          "attestedForm": "arbor",
+          "attestedGloss": "a tree; in general, a tree",
+          "provenanceGroupId": "scaife.lewis-short.v0_1"
+        }
+      ],
+      "functionalHypotheses": [
+        {
+          "targetWord": "tree",
+          "targetSenseId": "physical_tree_plant",
+          "semanticBridge": "The Albanian and Latin entries independently attest lexical forms for a physical tree; treating them as a shared functional referent remains a research hypothesis only.",
+          "functionalBridgeTruth": "hypothesis",
+          "claimBoundary": "functional_hypothesis_only"
+        }
+      ],
+      "historicalOriginClaim": "not_claimed",
+      "historicalTransmissionClaim": "not_claimed",
+      "winnerClaim": "not_claimed",
+      "languageSuperiorityClaim": "not_claimed",
+      "candidateTruthClaim": "not_claimed",
+      "userDecisionPosture": "user_decides"
+    },
+    {
+      "registryVersion": "open-instrument.multi-source-functional-research-evidence-registry.v0_1",
+      "researchEvidenceId": "research.external.open-instrument-research-evidence-packet-v0-1.snow-physical-precipitation-v0-1.verified-source-capture-fjale-fjalor-shqip-v0-1-bor-f-kryes-nj-sh-sense-1-bor-v0-1",
+      "embryo": "borë",
+      "evidenceFamily": "lexical_dictionary",
+      "language": "Albanian",
+      "form": "borë",
+      "gloss": "Reshje atmosferike, që bie nga retë flokë-flokë në trajtë kristalesh të bardha; shtresa e bardhë e këtyre flokëve, që mbulojnë vendin aty ku bien; dëborë.",
+      "embryoRelation": "exact_form",
+      "relationOperationIds": [],
+      "attestationTruth": "fact",
+      "sourceStatus": "research_candidate",
+      "citations": [
+        {
+          "citationId": "open-instrument.source-record.capture.fjale-fjalor-shqip-v0-1.bor-f-kryes-nj-sh-sense-1.bor.v0_1.citation.v0_1",
+          "sourceTitle": "FJALË — Fjalor Shqip",
+          "sourceAuthorOrEditor": null,
+          "sourcePublisherOrHost": "FJALË — Fjalor Shqip",
+          "sourceDateOrVersion": "accessed 2026-09-07",
+          "sourceUrlOrArchiveRef": "https://fjale.al/bor%C3%AB",
+          "entryLocator": "borë f.kryes.nj.sh.; sense 1",
+          "sourceHashOrArchiveHash": null,
+          "attestedForm": "borë",
+          "attestedGloss": "Reshje atmosferike, që bie nga retë flokë-flokë në trajtë kristalesh të bardha; shtresa e bardhë e këtyre flokëve, që mbulojnë vendin aty ku bien; dëborë.",
+          "provenanceGroupId": "fjale.fjalor-shqip.v0_1"
+        }
+      ],
+      "functionalHypotheses": [
+        {
+          "targetWord": "snow",
+          "targetSenseId": "physical_snow_precipitation",
+          "semanticBridge": "The Albanian and Latin entries independently attest lexical forms for physical snow precipitation; treating them as a shared functional referent remains a research hypothesis only.",
+          "functionalBridgeTruth": "hypothesis",
+          "claimBoundary": "functional_hypothesis_only"
+        }
+      ],
+      "historicalOriginClaim": "not_claimed",
+      "historicalTransmissionClaim": "not_claimed",
+      "winnerClaim": "not_claimed",
+      "languageSuperiorityClaim": "not_claimed",
+      "candidateTruthClaim": "not_claimed",
+      "userDecisionPosture": "user_decides"
+    },
+    {
+      "registryVersion": "open-instrument.multi-source-functional-research-evidence-registry.v0_1",
+      "researchEvidenceId": "research.external.open-instrument-research-evidence-packet-v0-1.snow-physical-precipitation-v0-1.verified-source-capture-scaife-lewis-short-v0-1-headword-nix-snow-sense-entry-text-beginning-snow-nix-v0-1",
+      "embryo": "nix",
+      "evidenceFamily": "historical_dictionary",
+      "language": "Latin",
+      "form": "nix",
+      "gloss": "snow",
+      "embryoRelation": "exact_form",
+      "relationOperationIds": [],
+      "attestationTruth": "fact",
+      "sourceStatus": "research_candidate",
+      "citations": [
+        {
+          "citationId": "open-instrument.source-record.capture.scaife-lewis-short-v0-1.headword-nix-snow-sense-entry-text-beginning-snow.nix.v0_1.citation.v0_1",
+          "sourceTitle": "Lewis & Short Latin Dictionary",
+          "sourceAuthorOrEditor": "Charlton T. Lewis and Charles Short",
+          "sourcePublisherOrHost": "Scaife ATLAS / Perseus Digital Library",
+          "sourceDateOrVersion": "Lewis & Short; accessed 2026-09-07",
+          "sourceUrlOrArchiveRef": "https://atlas.perseus.tufts.edu/dictionaries/entry/urn%3Acite2%3Ascaife-viewer%3Adictionary-entries.atlas_v1%3Alat.ls.perseus-eng2-n31054/",
+          "entryLocator": "headword nix; snow sense; entry text beginning snow.",
+          "sourceHashOrArchiveHash": null,
+          "attestedForm": "nix",
+          "attestedGloss": "snow",
+          "provenanceGroupId": "scaife.lewis-short.v0_1"
+        }
+      ],
+      "functionalHypotheses": [
+        {
+          "targetWord": "snow",
+          "targetSenseId": "physical_snow_precipitation",
+          "semanticBridge": "The Albanian and Latin entries independently attest lexical forms for physical snow precipitation; treating them as a shared functional referent remains a research hypothesis only.",
+          "functionalBridgeTruth": "hypothesis",
+          "claimBoundary": "functional_hypothesis_only"
+        }
+      ],
+      "historicalOriginClaim": "not_claimed",
+      "historicalTransmissionClaim": "not_claimed",
+      "winnerClaim": "not_claimed",
+      "languageSuperiorityClaim": "not_claimed",
+      "candidateTruthClaim": "not_claimed",
+      "userDecisionPosture": "user_decides"
+    },
+    {
+      "registryVersion": "open-instrument.multi-source-functional-research-evidence-registry.v0_1",
+      "researchEvidenceId": "research.external.open-instrument-research-evidence-packet-v0-1.cloud-physical-atmospheric-v0-1.verified-source-capture-fjale-fjalor-shqip-v0-1-re-i-f-sense-1-re-v0-1",
+      "embryo": "re",
+      "evidenceFamily": "lexical_dictionary",
+      "language": "Albanian",
+      "form": "re",
+      "gloss": "Grumbull avujsh uji, që rrinë pezull lart në qiell.",
+      "embryoRelation": "exact_form",
+      "relationOperationIds": [],
+      "attestationTruth": "fact",
+      "sourceStatus": "research_candidate",
+      "citations": [
+        {
+          "citationId": "open-instrument.source-record.capture.fjale-fjalor-shqip-v0-1.re-i-f-sense-1.re.v0_1.citation.v0_1",
+          "sourceTitle": "FJALË — Fjalor Shqip",
+          "sourceAuthorOrEditor": null,
+          "sourcePublisherOrHost": "FJALË — Fjalor Shqip",
+          "sourceDateOrVersion": "accessed 2026-09-07",
+          "sourceUrlOrArchiveRef": "https://fjale.al/re",
+          "entryLocator": "RE I f.; sense 1",
+          "sourceHashOrArchiveHash": null,
+          "attestedForm": "re",
+          "attestedGloss": "Grumbull avujsh uji, që rrinë pezull lart në qiell.",
+          "provenanceGroupId": "fjale.fjalor-shqip.v0_1"
+        }
+      ],
+      "functionalHypotheses": [
+        {
+          "targetWord": "cloud",
+          "targetSenseId": "physical_cloud_atmospheric",
+          "semanticBridge": "The Albanian and Latin entries independently attest lexical forms for an atmospheric cloud; treating them as a shared functional referent remains a research hypothesis only.",
+          "functionalBridgeTruth": "hypothesis",
+          "claimBoundary": "functional_hypothesis_only"
+        }
+      ],
+      "historicalOriginClaim": "not_claimed",
+      "historicalTransmissionClaim": "not_claimed",
+      "winnerClaim": "not_claimed",
+      "languageSuperiorityClaim": "not_claimed",
+      "candidateTruthClaim": "not_claimed",
+      "userDecisionPosture": "user_decides"
+    },
+    {
+      "registryVersion": "open-instrument.multi-source-functional-research-evidence-registry.v0_1",
+      "researchEvidenceId": "research.external.open-instrument-research-evidence-packet-v0-1.cloud-physical-atmospheric-v0-1.verified-source-capture-scaife-lewis-short-v0-1-headword-nimbus-cloud-in-general-entry-text-beginning-a-cloud-in-general-nimbus-v0-1",
+      "embryo": "nimbus",
+      "evidenceFamily": "historical_dictionary",
+      "language": "Latin",
+      "form": "nimbus",
+      "gloss": "a cloud in general; a black rain-cloud or thunder-cloud",
+      "embryoRelation": "exact_form",
+      "relationOperationIds": [],
+      "attestationTruth": "fact",
+      "sourceStatus": "research_candidate",
+      "citations": [
+        {
+          "citationId": "open-instrument.source-record.capture.scaife-lewis-short-v0-1.headword-nimbus-cloud-in-general-entry-text-beginning-a-cloud-in-general.nimbus.v0_1.citation.v0_1",
+          "sourceTitle": "Lewis & Short Latin Dictionary",
+          "sourceAuthorOrEditor": "Charlton T. Lewis and Charles Short",
+          "sourcePublisherOrHost": "Scaife ATLAS / Perseus Digital Library",
+          "sourceDateOrVersion": "Lewis & Short; accessed 2026-09-07",
+          "sourceUrlOrArchiveRef": "https://atlas.perseus.tufts.edu/dictionaries/entry/urn%3Acite2%3Ascaife-viewer%3Adictionary-entries.atlas_v1%3Alat.ls.perseus-eng2-n30975/",
+          "entryLocator": "headword nimbus; cloud in general; entry text beginning A cloud in general.",
+          "sourceHashOrArchiveHash": null,
+          "attestedForm": "nimbus",
+          "attestedGloss": "a cloud in general; a black rain-cloud or thunder-cloud",
+          "provenanceGroupId": "scaife.lewis-short.v0_1"
+        }
+      ],
+      "functionalHypotheses": [
+        {
+          "targetWord": "cloud",
+          "targetSenseId": "physical_cloud_atmospheric",
+          "semanticBridge": "The Albanian and Latin entries independently attest lexical forms for an atmospheric cloud; treating them as a shared functional referent remains a research hypothesis only.",
+          "functionalBridgeTruth": "hypothesis",
+          "claimBoundary": "functional_hypothesis_only"
+        }
+      ],
+      "historicalOriginClaim": "not_claimed",
+      "historicalTransmissionClaim": "not_claimed",
+      "winnerClaim": "not_claimed",
+      "languageSuperiorityClaim": "not_claimed",
+      "candidateTruthClaim": "not_claimed",
+      "userDecisionPosture": "user_decides"
+    },
+    {
+      "registryVersion": "open-instrument.multi-source-functional-research-evidence-registry.v0_1",
+      "researchEvidenceId": "research.external.open-instrument-research-evidence-packet-v0-1.skin-physical-body-covering-v0-1.verified-source-capture-fjale-fjalor-shqip-v0-1-l-kur-f-sense-1-l-kur-v0-1",
+      "embryo": "lëkurë",
+      "evidenceFamily": "lexical_dictionary",
+      "language": "Albanian",
+      "form": "lëkurë",
+      "gloss": "Shtresë e hollë, që mbështjell trupin e njeriut ose të kafshëve; kjo shtresë që u rripet kafshëve dhe përpunohet për qëllime të ndryshme; lëkurçe.",
+      "embryoRelation": "exact_form",
+      "relationOperationIds": [],
+      "attestationTruth": "fact",
+      "sourceStatus": "research_candidate",
+      "citations": [
+        {
+          "citationId": "open-instrument.source-record.capture.fjale-fjalor-shqip-v0-1.l-kur-f-sense-1.l-kur.v0_1.citation.v0_1",
+          "sourceTitle": "FJALË — Fjalor Shqip",
+          "sourceAuthorOrEditor": null,
+          "sourcePublisherOrHost": "FJALË — Fjalor Shqip",
+          "sourceDateOrVersion": "accessed 2026-09-07",
+          "sourceUrlOrArchiveRef": "https://fjale.al/l%C3%ABkur%C3%AB",
+          "entryLocator": "LËKURË f.; sense 1",
+          "sourceHashOrArchiveHash": null,
+          "attestedForm": "lëkurë",
+          "attestedGloss": "Shtresë e hollë, që mbështjell trupin e njeriut ose të kafshëve; kjo shtresë që u rripet kafshëve dhe përpunohet për qëllime të ndryshme; lëkurçe.",
+          "provenanceGroupId": "fjale.fjalor-shqip.v0_1"
+        }
+      ],
+      "functionalHypotheses": [
+        {
+          "targetWord": "skin",
+          "targetSenseId": "physical_human_animal_skin",
+          "semanticBridge": "The Albanian and Latin entries independently attest lexical forms for physical human or animal skin; treating them as a shared functional referent remains a research hypothesis only.",
+          "functionalBridgeTruth": "hypothesis",
+          "claimBoundary": "functional_hypothesis_only"
+        }
+      ],
+      "historicalOriginClaim": "not_claimed",
+      "historicalTransmissionClaim": "not_claimed",
+      "winnerClaim": "not_claimed",
+      "languageSuperiorityClaim": "not_claimed",
+      "candidateTruthClaim": "not_claimed",
+      "userDecisionPosture": "user_decides"
+    },
+    {
+      "registryVersion": "open-instrument.multi-source-functional-research-evidence-registry.v0_1",
+      "researchEvidenceId": "research.external.open-instrument-research-evidence-packet-v0-1.skin-physical-body-covering-v0-1.verified-source-capture-scaife-lewis-short-v0-1-headword-pellis-skin-hide-sense-entry-text-beginning-skin-hide-pellis-v0-1",
+      "embryo": "pellis",
+      "evidenceFamily": "historical_dictionary",
+      "language": "Latin",
+      "form": "pellis",
+      "gloss": "skin, hide, pelt; a skin or hide of an animal",
+      "embryoRelation": "exact_form",
+      "relationOperationIds": [],
+      "attestationTruth": "fact",
+      "sourceStatus": "research_candidate",
+      "citations": [
+        {
+          "citationId": "open-instrument.source-record.capture.scaife-lewis-short-v0-1.headword-pellis-skin-hide-sense-entry-text-beginning-skin-hide.pellis.v0_1.citation.v0_1",
+          "sourceTitle": "Lewis & Short Latin Dictionary",
+          "sourceAuthorOrEditor": "Charlton T. Lewis and Charles Short",
+          "sourcePublisherOrHost": "Scaife ATLAS / Perseus Digital Library",
+          "sourceDateOrVersion": "Lewis & Short; accessed 2026-09-07",
+          "sourceUrlOrArchiveRef": "https://atlas.perseus.tufts.edu/dictionaries/entry/urn%3Acite2%3Ascaife-viewer%3Adictionary-entries.atlas_v1%3Alat.ls.perseus-eng2-n34447/",
+          "entryLocator": "headword pellis; skin/hide sense; entry text beginning skin, hide.",
+          "sourceHashOrArchiveHash": null,
+          "attestedForm": "pellis",
+          "attestedGloss": "skin, hide, pelt; a skin or hide of an animal",
+          "provenanceGroupId": "scaife.lewis-short.v0_1"
+        }
+      ],
+      "functionalHypotheses": [
+        {
+          "targetWord": "skin",
+          "targetSenseId": "physical_human_animal_skin",
+          "semanticBridge": "The Albanian and Latin entries independently attest lexical forms for physical human or animal skin; treating them as a shared functional referent remains a research hypothesis only.",
+          "functionalBridgeTruth": "hypothesis",
+          "claimBoundary": "functional_hypothesis_only"
+        }
+      ],
+      "historicalOriginClaim": "not_claimed",
+      "historicalTransmissionClaim": "not_claimed",
+      "winnerClaim": "not_claimed",
+      "languageSuperiorityClaim": "not_claimed",
+      "candidateTruthClaim": "not_claimed",
+      "userDecisionPosture": "user_decides"
+    },
+    {
+      "registryVersion": "open-instrument.multi-source-functional-research-evidence-registry.v0_1",
+      "researchEvidenceId": "research.external.open-instrument-research-evidence-packet-v0-1.friend-close-person-v0-1.verified-source-capture-fjale-fjalor-shqip-v0-1-mik-m-sense-1-mik-v0-1",
+      "embryo": "mik",
+      "evidenceFamily": "lexical_dictionary",
+      "language": "Albanian",
+      "form": "mik",
+      "gloss": "Ai me të cilin kemi miqësi; ai që na do të mirën, na ndihmon me gjithë zemër e na gjendet në çdo nevojë; një i njohur, me të cilin kemi lidhje të ngushta, njeri i afërt.",
+      "embryoRelation": "exact_form",
+      "relationOperationIds": [],
+      "attestationTruth": "fact",
+      "sourceStatus": "research_candidate",
+      "citations": [
+        {
+          "citationId": "open-instrument.source-record.capture.fjale-fjalor-shqip-v0-1.mik-m-sense-1.mik.v0_1.citation.v0_1",
+          "sourceTitle": "FJALË — Fjalor Shqip",
+          "sourceAuthorOrEditor": null,
+          "sourcePublisherOrHost": "FJALË — Fjalor Shqip",
+          "sourceDateOrVersion": "accessed 2026-09-07",
+          "sourceUrlOrArchiveRef": "https://fjale.al/mik",
+          "entryLocator": "MIK m.; sense 1",
+          "sourceHashOrArchiveHash": null,
+          "attestedForm": "mik",
+          "attestedGloss": "Ai me të cilin kemi miqësi; ai që na do të mirën, na ndihmon me gjithë zemër e na gjendet në çdo nevojë; një i njohur, me të cilin kemi lidhje të ngushta, njeri i afërt.",
+          "provenanceGroupId": "fjale.fjalor-shqip.v0_1"
+        }
+      ],
+      "functionalHypotheses": [
+        {
+          "targetWord": "friend",
+          "targetSenseId": "close_friend_person",
+          "semanticBridge": "The Albanian and Latin entries independently attest lexical forms for a close friend or familiar person; treating them as a shared functional referent remains a research hypothesis only.",
+          "functionalBridgeTruth": "hypothesis",
+          "claimBoundary": "functional_hypothesis_only"
+        }
+      ],
+      "historicalOriginClaim": "not_claimed",
+      "historicalTransmissionClaim": "not_claimed",
+      "winnerClaim": "not_claimed",
+      "languageSuperiorityClaim": "not_claimed",
+      "candidateTruthClaim": "not_claimed",
+      "userDecisionPosture": "user_decides"
+    },
+    {
+      "registryVersion": "open-instrument.multi-source-functional-research-evidence-registry.v0_1",
+      "researchEvidenceId": "research.external.open-instrument-research-evidence-packet-v0-1.friend-close-person-v0-1.verified-source-capture-scaife-lewis-short-v0-1-headword-familiaris-friendly-friend-sense-entry-text-beginning-familiar-intimate-friendly-familiaris-v0-1",
+      "embryo": "familiaris",
+      "evidenceFamily": "historical_dictionary",
+      "language": "Latin",
+      "form": "familiaris",
+      "gloss": "familiar, intimate, friendly; a familiar acquaintance, friend",
+      "embryoRelation": "exact_form",
+      "relationOperationIds": [],
+      "attestationTruth": "fact",
+      "sourceStatus": "research_candidate",
+      "citations": [
+        {
+          "citationId": "open-instrument.source-record.capture.scaife-lewis-short-v0-1.headword-familiaris-friendly-friend-sense-entry-text-beginning-familiar-intimate-friendly.familiaris.v0_1.citation.v0_1",
+          "sourceTitle": "Lewis & Short Latin Dictionary",
+          "sourceAuthorOrEditor": "Charlton T. Lewis and Charles Short",
+          "sourcePublisherOrHost": "Scaife ATLAS / Perseus Digital Library",
+          "sourceDateOrVersion": "Lewis & Short; accessed 2026-09-07",
+          "sourceUrlOrArchiveRef": "https://atlas.perseus.tufts.edu/dictionaries/entry/urn%3Acite2%3Ascaife-viewer%3Adictionary-entries.atlas_v1%3Alat.ls.perseus-eng2-n17655/",
+          "entryLocator": "headword familiaris; friendly/friend sense; entry text beginning Familiar, intimate, friendly.",
+          "sourceHashOrArchiveHash": null,
+          "attestedForm": "familiaris",
+          "attestedGloss": "familiar, intimate, friendly; a familiar acquaintance, friend",
+          "provenanceGroupId": "scaife.lewis-short.v0_1"
+        }
+      ],
+      "functionalHypotheses": [
+        {
+          "targetWord": "friend",
+          "targetSenseId": "close_friend_person",
+          "semanticBridge": "The Albanian and Latin entries independently attest lexical forms for a close friend or familiar person; treating them as a shared functional referent remains a research hypothesis only.",
+          "functionalBridgeTruth": "hypothesis",
+          "claimBoundary": "functional_hypothesis_only"
+        }
+      ],
+      "historicalOriginClaim": "not_claimed",
+      "historicalTransmissionClaim": "not_claimed",
+      "winnerClaim": "not_claimed",
+      "languageSuperiorityClaim": "not_claimed",
+      "candidateTruthClaim": "not_claimed",
+      "userDecisionPosture": "user_decides"
     }
   ]
 }

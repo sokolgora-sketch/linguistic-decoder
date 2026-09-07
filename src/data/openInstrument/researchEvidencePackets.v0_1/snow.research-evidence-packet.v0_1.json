@@ -1,0 +1,55 @@
+{
+  "packetVersion": "open-instrument.research-evidence-packet.v0_1",
+  "packetId": "snow.physical-precipitation.v0_1",
+  "targetWord": "snow",
+  "targetSenseId": "physical_snow_precipitation",
+  "semanticBridge": "The Albanian and Latin entries independently attest lexical forms for physical snow precipitation; treating them as a shared functional referent remains a research hypothesis only.",
+  "sources": [
+    {
+      "sourceKey": "verified-source:capture.fjale-fjalor-shqip-v0-1.bor-f-kryes-nj-sh-sense-1.bor.v0_1",
+      "embryo": "borë",
+      "evidenceFamily": "lexical_dictionary",
+      "language": "Albanian",
+      "form": "borë",
+      "gloss": "Reshje atmosferike, që bie nga retë flokë-flokë në trajtë kristalesh të bardha; shtresa e bardhë e këtyre flokëve, që mbulojnë vendin aty ku bien; dëborë.",
+      "embryoRelation": "exact_form",
+      "relationOperationIds": [],
+      "citation": {
+        "citationId": "open-instrument.source-record.capture.fjale-fjalor-shqip-v0-1.bor-f-kryes-nj-sh-sense-1.bor.v0_1.citation.v0_1",
+        "sourceTitle": "FJALË — Fjalor Shqip",
+        "sourceAuthorOrEditor": null,
+        "sourcePublisherOrHost": "FJALË — Fjalor Shqip",
+        "sourceDateOrVersion": "accessed 2026-09-07",
+        "sourceUrlOrArchiveRef": "https://fjale.al/bor%C3%AB",
+        "entryLocator": "borë f.kryes.nj.sh.; sense 1",
+        "sourceHashOrArchiveHash": null,
+        "attestedForm": "borë",
+        "attestedGloss": "Reshje atmosferike, që bie nga retë flokë-flokë në trajtë kristalesh të bardha; shtresa e bardhë e këtyre flokëve, që mbulojnë vendin aty ku bien; dëborë.",
+        "provenanceGroupId": "fjale.fjalor-shqip.v0_1"
+      }
+    },
+    {
+      "sourceKey": "verified-source:capture.scaife-lewis-short-v0-1.headword-nix-snow-sense-entry-text-beginning-snow.nix.v0_1",
+      "embryo": "nix",
+      "evidenceFamily": "historical_dictionary",
+      "language": "Latin",
+      "form": "nix",
+      "gloss": "snow",
+      "embryoRelation": "exact_form",
+      "relationOperationIds": [],
+      "citation": {
+        "citationId": "open-instrument.source-record.capture.scaife-lewis-short-v0-1.headword-nix-snow-sense-entry-text-beginning-snow.nix.v0_1.citation.v0_1",
+        "sourceTitle": "Lewis & Short Latin Dictionary",
+        "sourceAuthorOrEditor": "Charlton T. Lewis and Charles Short",
+        "sourcePublisherOrHost": "Scaife ATLAS / Perseus Digital Library",
+        "sourceDateOrVersion": "Lewis & Short; accessed 2026-09-07",
+        "sourceUrlOrArchiveRef": "https://atlas.perseus.tufts.edu/dictionaries/entry/urn%3Acite2%3Ascaife-viewer%3Adictionary-entries.atlas_v1%3Alat.ls.perseus-eng2-n31054/",
+        "entryLocator": "headword nix; snow sense; entry text beginning snow.",
+        "sourceHashOrArchiveHash": null,
+        "attestedForm": "nix",
+        "attestedGloss": "snow",
+        "provenanceGroupId": "scaife.lewis-short.v0_1"
+      }
+    }
+  ]
+}

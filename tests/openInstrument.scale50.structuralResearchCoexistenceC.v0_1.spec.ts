@@ -242,12 +242,7 @@ describe(
       },
     );
 
-    it.each([
-      "tree",
-      "skin",
-      "sleep",
-      "friend",
-    ])(
+    it.each(["sleep"])(
       "%s remains structural-only without target-bound source evidence",
       async (word) => {
         const body =
