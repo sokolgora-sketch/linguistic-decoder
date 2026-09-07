@@ -8,11 +8,13 @@ export const STRUCTURAL_HYPOTHESIS_VERSION_V0_1 =
 
 export type StructuralReductionOperationIdV0_1 =
   | "peel_right_vowel_led_expansion"
+  | "peel_right_consonant_led_expansion"
   | "peel_left_consonant_frame";
 
 export type StructuralReductionReasonCodeV0_1 =
   | "structural_reduction_applied"
   | "right_edge_vowel_led_expansion"
+  | "right_edge_consonant_led_expansion"
   | "left_consonant_frame_preserved"
   | "structural_containment_preserved"
   | "deterministic_operation_authorized"
@@ -325,6 +327,94 @@ function applyRightEdgePeelV0_1(
   return out;
 }
 
+function buildRightConsonantLedPeelStepV0_1(
+  form: string,
+  suffixLength: 3,
+): StructuralReductionStepV0_1 | null {
+  const chars = symbolsV0_1(form);
+
+  if (chars.length < suffixLength + 3) {
+    return null;
+  }
+
+  const start = chars.length - suffixLength;
+  const suffixChars = chars.slice(start);
+  const suffix = suffixChars.join("");
+  const firstSuffixSymbol = suffixChars[0] ?? "";
+  const secondSuffixSymbol = suffixChars[1] ?? "";
+  const lastSuffixSymbol = suffixChars[suffixChars.length - 1] ?? "";
+
+  if (
+    isCanonicalVoiceSymbolV0_1(firstSuffixSymbol) ||
+    isCanonicalVoiceSymbolV0_1(secondSuffixSymbol) ||
+    !isCanonicalVoiceSymbolV0_1(lastSuffixSymbol) ||
+    voicePathV0_1(suffix).length !== 1
+  ) {
+    return null;
+  }
+
+  const suffixHasConsonantalFrame = suffixChars.some(
+    (symbol) => !isCanonicalVoiceSymbolV0_1(symbol),
+  );
+
+  if (!suffixHasConsonantalFrame) {
+    return null;
+  }
+
+  const next = chars.slice(0, start).join("");
+
+  if (
+    symbolsV0_1(next).length < 3 ||
+    !containsCanonicalVoiceV0_1(next)
+  ) {
+    return null;
+  }
+
+  return {
+    from: displayFormV0_1(form),
+    to: displayFormV0_1(next),
+    operationId: "peel_right_consonant_led_expansion",
+    reasonCodes: [
+      "structural_reduction_applied",
+      "right_edge_consonant_led_expansion",
+      "structural_containment_preserved",
+      "deterministic_operation_authorized",
+      "voice_path_recorded",
+    ],
+    fromSpan: {
+      start,
+      end: chars.length,
+    },
+    removedOrChanged: displayFormV0_1(suffix),
+    voicePathBefore: voicePathV0_1(form),
+    voicePathAfter: voicePathV0_1(next),
+  };
+}
+
+function applyRightConsonantLedPeelV0_1(
+  form: string,
+): ReductionBranchV0_1[] {
+  const out: ReductionBranchV0_1[] = [];
+
+  for (const suffixLength of [3] as const) {
+    const step = buildRightConsonantLedPeelStepV0_1(
+      form,
+      suffixLength,
+    );
+
+    if (!step) {
+      continue;
+    }
+
+    out.push({
+      form: step.to.toLocaleLowerCase("en-US"),
+      reductionSteps: [step],
+    });
+  }
+
+  return out;
+}
+
 function buildLeftFramePeelStepV0_1(
   form: string,
 ): StructuralReductionStepV0_1 | null {
@@ -590,6 +680,9 @@ export function discoverStructuralHypothesesV0_1(
         reductionSteps: [],
       },
       ...applyRightEdgePeelV0_1(
+        basis,
+      ),
+      ...applyRightConsonantLedPeelV0_1(
         basis,
       ),
     ];

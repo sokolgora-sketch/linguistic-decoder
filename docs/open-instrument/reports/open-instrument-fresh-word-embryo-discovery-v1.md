@@ -56,8 +56,8 @@ The existing `sterile` control remains a positive structural family with `ER` as
 | Lane | State |
 | --- | --- |
 | 1. Baseline failure taxonomy | DONE |
-| 2. Generic structural grammar expansion | NEXT |
-| 3. Structural defensibility v0.2 / additive verification | NOT_STARTED |
+| 2. Generic structural grammar expansion | DONE |
+| 3. Structural defensibility v0.2 / additive verification | NEXT |
 | 4. Explicit target-sense product path | NOT_STARTED |
 | 5. End-to-end functional discovery | NOT_STARTED |
 | 6. Generalization / anti-hardcode proof | NOT_STARTED |
@@ -98,17 +98,42 @@ The current v0.1 grammar was inspected and probed without production changes. It
 | `pocket` | `O,E` | `OCK` after `ET` right vowel-led peel plus one left-frame peel | smallest defensible terminal is size 3 |
 | `chimney` | `I,E` | `IMNEY` after two left-frame peels | smallest defensible terminal is size 5 |
 
-The dominant gap is not target sense, evidence, or doctrine. It is a missing generic right-edge consonant-led expansion/frame grammar. Several words contain a bounded terminal consonant frame followed by a canonical voice, but v0.1 only recognizes the reverse vowel-led orientation. Existing operation-count and minimum-anchor gates remain justified and unchanged.
+The dominant gap is not target sense, evidence, or doctrine. It is a missing generic right-edge consonant-led expansion/frame grammar. Some words contain a bounded three-symbol terminal CCV frame with exactly one canonical voice, but v0.1 only recognizes the reverse vowel-led orientation. Existing operation-count and minimum-anchor gates remain justified and unchanged.
 
 The `sterile` positive control remains `ER` with the existing three-step chain. The `xyz`, `data`, `dij`, and `mode` negative controls remain Null under the current grammar.
 
-## 8. Initial next task
+## 8. Lane 2 closeout: generic structural grammar expansion
 
-**Lane 2 — Generic structural grammar expansion.**
+The structural grammar was extended additively in `src/shared/structuralHypothesisDiscovery.v0_1.ts` with `peel_right_consonant_led_expansion`.
 
-Add one bounded, generic structural operation only if its invariant is defensible from the existing vowel-path and consonant-frame model. Do not change operation-count or minimum-anchor gates.
+The operation is authorized only when:
 
-## 9. Opening proof
+- the removed segment is exactly three normalized symbols;
+- its first two symbols are consonant frame symbols;
+- its final symbol is a canonical Seven-Voice symbol;
+- the segment contains exactly one canonical voice;
+- the retained base is at least three symbols and contains a canonical voice.
+
+The operation emits a complete transformation trace and reason code. Existing `operationCount >= 2` and minimum anchor size `2` gates were not changed. No target word, target sense, lexical lookup, evidence row, or catalog data is consulted.
+
+Focused validation:
+
+- 6 suites passed;
+- 75 tests passed;
+- opening `candle` now yields `AN <- CAN <- CANDLE`;
+- `staircase`, `orchard`, `tunnel`, `ribbon`, `helmet`, `pocket`, and `chimney` remain Null;
+- `sterile` remains exactly `ER`, `ERILE`;
+- `xyz`, `data`, `dij`, `mode`, `terror`, and `sister` remain empty.
+
+This is a bounded structural family, not a lexical claim. `AN` has no independent standalone meaning or attestation in this lane.
+
+## 9. Initial next task
+
+**Lane 3 — Structural defensibility v0.2 / additive verification.**
+
+Extend focused verification for the new operation, malformed traces, duplicate paths, depth limits, unsupported input, and no-single-winner behavior. Preserve the existing negative controls.
+
+## 10. Opening proof
 
 - repository: `sokolgora-sketch/linguistic-decoder`;
 - path: `/Users/wei/Desktop/ZËRO /Dwnlosads /zero-firebase-studio-export`;
