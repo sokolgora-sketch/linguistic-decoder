@@ -528,14 +528,14 @@ describe(
         }
 
         const loaded = (load as () => Array<Record<string, unknown>>)();
-        expect(loaded).toHaveLength(38);
-        expect(loaded[0]?.functionalHypotheses[0]).not.toHaveProperty("targetSenseId");
-        expect(loaded[0]?.citations[0]).not.toHaveProperty("provenanceGroupId");
-
         const raw = readJson(catalogPath) as {
           catalogVersion: string;
           rows: Array<Record<string, unknown>>;
         };
+        expect(loaded).toHaveLength(raw.rows.length);
+        expect(loaded[0]?.functionalHypotheses[0]).not.toHaveProperty("targetSenseId");
+        expect(loaded[0]?.citations[0]).not.toHaveProperty("provenanceGroupId");
+
         const enriched = JSON.parse(JSON.stringify(raw)) as typeof raw;
         const row = enriched.rows[0];
         const citation = (row.citations as Array<Record<string, unknown>>)[0];
@@ -545,7 +545,7 @@ describe(
         hypothesis.targetSenseId = "target-sense-a";
 
         const parsed = (parse as (value: unknown) => Array<Record<string, unknown>>)(enriched);
-        expect(parsed).toHaveLength(38);
+        expect(parsed).toHaveLength(raw.rows.length);
         expect(parsed[0]?.citations[0]).toMatchObject({
           provenanceGroupId: "source-family-a",
         });

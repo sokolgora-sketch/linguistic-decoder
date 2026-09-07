@@ -109,6 +109,9 @@ describe("Open Instrument Cohort-G evidence packet validator v0.1", () => {
     ["attestation is not fact", (rows: MultiSourceFunctionalResearchEvidenceRowV0_1[]) => {
       rows[0].attestationTruth = "inference";
     }, "attestation_not_fact"],
+    ["source status is not research candidate", (rows: MultiSourceFunctionalResearchEvidenceRowV0_1[]) => {
+      rows[0].sourceStatus = "reviewed_candidate";
+    }, "source_status_not_research_candidate"],
     ["functional bridge is not hypothesis", (rows: MultiSourceFunctionalResearchEvidenceRowV0_1[]) => {
       rows[0].functionalHypotheses[0].functionalBridgeTruth = "inference";
     }, "functional_bridge_not_hypothesis"],

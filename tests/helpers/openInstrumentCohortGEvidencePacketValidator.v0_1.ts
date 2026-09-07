@@ -15,6 +15,7 @@ export type CohortGEvidencePacketReasonCodeV0_1 =
   | "target_hypothesis_missing"
   | "target_sense_missing"
   | "target_sense_mismatch"
+  | "source_status_not_research_candidate"
   | "attestation_not_fact"
   | "functional_bridge_missing"
   | "functional_bridge_not_hypothesis"
@@ -134,6 +135,11 @@ export function validateCohortGEvidencePacketV0_1(
 
     if (row.attestationTruth !== "fact") {
       reasonCodes.add("attestation_not_fact");
+      continue;
+    }
+
+    if (row.sourceStatus !== "research_candidate") {
+      reasonCodes.add("source_status_not_research_candidate");
       continue;
     }
 

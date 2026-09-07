@@ -1570,6 +1570,350 @@
       "languageSuperiorityClaim": "not_claimed",
       "candidateTruthClaim": "not_claimed",
       "userDecisionPosture": "user_decides"
+    },
+    {
+      "registryVersion": "open-instrument.multi-source-functional-research-evidence-registry.v0_1",
+      "researchEvidenceId": "research.external.albanian-ndertoj-build.scale50.cohortG.v0_1",
+      "embryo": "NDËRTOJ",
+      "evidenceFamily": "lexical_dictionary",
+      "language": "Albanian",
+      "form": "ndërtoj",
+      "gloss": "to build, construct, or assemble physically",
+      "embryoRelation": "exact_form",
+      "relationOperationIds": [],
+      "attestationTruth": "fact",
+      "sourceStatus": "research_candidate",
+      "citations": [
+        {
+          "citationId": "research.external.fjale-ndertoj-build.scale50.cohortG.citation.v0_1",
+          "sourceTitle": "FJALË — Ndërtoj",
+          "sourceAuthorOrEditor": null,
+          "sourcePublisherOrHost": "FJALË — Fjalor Shqip",
+          "sourceDateOrVersion": "accessed 2026-09-07",
+          "sourceUrlOrArchiveRef": "https://fjale.al/nd%C3%ABrtoj",
+          "entryLocator": "NDËRTOJ kal., sense 1",
+          "sourceHashOrArchiveHash": null,
+          "attestedForm": "ndërtoj",
+          "attestedGloss": "raise or make a building, bridge, or other physical object from materials; prepare a machine or device from parts",
+          "provenanceGroupId": "fjale.fjalor-shqip.v0_1"
+        }
+      ],
+      "functionalHypotheses": [
+        {
+          "targetWord": "build",
+          "targetSenseId": "physical_construction",
+          "semanticBridge": "the independently attested Albanian verb ndërtoj directly denotes physical construction or assembly and can be tested as a bounded functional witness for the BUILD concept; this remains research-only and makes no historical-origin, winner, or candidate-truth claim",
+          "functionalBridgeTruth": "hypothesis",
+          "claimBoundary": "functional_hypothesis_only"
+        }
+      ],
+      "historicalOriginClaim": "not_claimed",
+      "historicalTransmissionClaim": "not_claimed",
+      "winnerClaim": "not_claimed",
+      "languageSuperiorityClaim": "not_claimed",
+      "candidateTruthClaim": "not_claimed",
+      "userDecisionPosture": "user_decides"
+    },
+    {
+      "registryVersion": "open-instrument.multi-source-functional-research-evidence-registry.v0_1",
+      "researchEvidenceId": "research.external.greek-oikodomeo-build.scale50.cohortG.v0_1",
+      "embryo": "οἰκοδομέω",
+      "evidenceFamily": "lexical_dictionary",
+      "language": "Ancient Greek",
+      "form": "οἰκοδομέω",
+      "gloss": "to build a house; construct",
+      "embryoRelation": "exact_form",
+      "relationOperationIds": [],
+      "attestationTruth": "fact",
+      "sourceStatus": "research_candidate",
+      "citations": [
+        {
+          "citationId": "research.external.logeion-oikodomeo-build.scale50.cohortG.citation.v0_1",
+          "sourceTitle": "Logeion — οἰκοδομέω",
+          "sourceAuthorOrEditor": "LSJ material presented by Logeion",
+          "sourcePublisherOrHost": "University of Chicago Logeion",
+          "sourceDateOrVersion": "accessed 2026-09-07",
+          "sourceUrlOrArchiveRef": "https://logeion.uchicago.edu/%CE%BF%E1%BC%B0%CE%BA%CE%BF%CE%B4%CE%BF%CE%BC%CE%AD%CF%89",
+          "entryLocator": "οἰκοδομέω, Short Definition; LSJ sense 1",
+          "sourceHashOrArchiveHash": null,
+          "attestedForm": "οἰκοδομέω",
+          "attestedGloss": "to build a house; generally build",
+          "provenanceGroupId": "logeion.lsj.v0_1"
+        }
+      ],
+      "functionalHypotheses": [
+        {
+          "targetWord": "build",
+          "targetSenseId": "physical_construction",
+          "semanticBridge": "the independently attested Ancient Greek verb οἰκοδομέω denotes building or constructing a house and can be tested as a bounded functional witness for physical BUILD; this remains research-only and makes no historical-origin, winner, or candidate-truth claim",
+          "functionalBridgeTruth": "hypothesis",
+          "claimBoundary": "functional_hypothesis_only"
+        }
+      ],
+      "historicalOriginClaim": "not_claimed",
+      "historicalTransmissionClaim": "not_claimed",
+      "winnerClaim": "not_claimed",
+      "languageSuperiorityClaim": "not_claimed",
+      "candidateTruthClaim": "not_claimed",
+      "userDecisionPosture": "user_decides"
+    },
+    {
+      "registryVersion": "open-instrument.multi-source-functional-research-evidence-registry.v0_1",
+      "researchEvidenceId": "research.external.albanian-mbaj-carry.scale50.cohortG.v0_1",
+      "embryo": "MBAJ",
+      "evidenceFamily": "lexical_dictionary",
+      "language": "Albanian",
+      "form": "mbaj",
+      "gloss": "to hold, bear, carry, or transport physically",
+      "embryoRelation": "exact_form",
+      "relationOperationIds": [],
+      "attestationTruth": "fact",
+      "sourceStatus": "research_candidate",
+      "citations": [
+        {
+          "citationId": "research.external.fjale-mbaj-carry.scale50.cohortG.citation.v0_1",
+          "sourceTitle": "FJALË — Mbaj",
+          "sourceAuthorOrEditor": null,
+          "sourcePublisherOrHost": "FJALË — Fjalor Shqip",
+          "sourceDateOrVersion": "accessed 2026-09-07",
+          "sourceUrlOrArchiveRef": "https://fjale.al/mbaj",
+          "entryLocator": "MBAJ kal., senses 1-2",
+          "sourceHashOrArchiveHash": null,
+          "attestedForm": "mbaj",
+          "attestedGloss": "hold something so it does not fall or move; carry or transport it on the back, neck, arm, or by a vehicle",
+          "provenanceGroupId": "fjale.fjalor-shqip.v0_1"
+        }
+      ],
+      "functionalHypotheses": [
+        {
+          "targetWord": "carry",
+          "targetSenseId": "physical_bearing_transport",
+          "semanticBridge": "the independently attested Albanian verb mbaj directly covers physically holding, bearing, and transporting an object and can be tested as a bounded functional witness for CARRY; this remains research-only and makes no historical-origin, winner, or candidate-truth claim",
+          "functionalBridgeTruth": "hypothesis",
+          "claimBoundary": "functional_hypothesis_only"
+        }
+      ],
+      "historicalOriginClaim": "not_claimed",
+      "historicalTransmissionClaim": "not_claimed",
+      "winnerClaim": "not_claimed",
+      "languageSuperiorityClaim": "not_claimed",
+      "candidateTruthClaim": "not_claimed",
+      "userDecisionPosture": "user_decides"
+    },
+    {
+      "registryVersion": "open-instrument.multi-source-functional-research-evidence-registry.v0_1",
+      "researchEvidenceId": "research.external.greek-phero-carry.scale50.cohortG.v0_1",
+      "embryo": "φέρω",
+      "evidenceFamily": "lexical_dictionary",
+      "language": "Ancient Greek",
+      "form": "φέρω",
+      "gloss": "to bear or carry a load; bring or carry along",
+      "embryoRelation": "exact_form",
+      "relationOperationIds": [],
+      "attestationTruth": "fact",
+      "sourceStatus": "research_candidate",
+      "citations": [
+        {
+          "citationId": "research.external.scaife-middle-liddell-phero-carry.scale50.cohortG.citation.v0_1",
+          "sourceTitle": "Middle Liddell — φέρω",
+          "sourceAuthorOrEditor": "Henry George Liddell and Robert Scott",
+          "sourcePublisherOrHost": "Scaife ATLAS / Perseus Digital Library",
+          "sourceDateOrVersion": "Middle Liddell; accessed 2026-09-07",
+          "sourceUrlOrArchiveRef": "https://atlas.perseus.tufts.edu/dictionaries/entry/urn%3Acite2%3Ascaife-viewer%3Adictionary-entries.atlas_v1%3Amiddle-liddell.perseus-eng2-n34639/",
+          "entryLocator": "URN urn:cite2:scaife-viewer:dictionary-entries.atlas_v1:middle-liddell.perseus-eng2-n34639; headword φέρω; senses to bear or carry a load and to bring/carry",
+          "sourceHashOrArchiveHash": null,
+          "attestedForm": "φέρω",
+          "attestedGloss": "to bear or carry a load; to bear along implying motion; to bring or fetch",
+          "provenanceGroupId": "scaife.middle-liddell.v0_1"
+        }
+      ],
+      "functionalHypotheses": [
+        {
+          "targetWord": "carry",
+          "targetSenseId": "physical_bearing_transport",
+          "semanticBridge": "the independently attested Ancient Greek verb φέρω denotes bearing or carrying a load and can be tested as a bounded functional witness for physical CARRY; this remains research-only and makes no historical-origin, winner, or candidate-truth claim",
+          "functionalBridgeTruth": "hypothesis",
+          "claimBoundary": "functional_hypothesis_only"
+        }
+      ],
+      "historicalOriginClaim": "not_claimed",
+      "historicalTransmissionClaim": "not_claimed",
+      "winnerClaim": "not_claimed",
+      "languageSuperiorityClaim": "not_claimed",
+      "candidateTruthClaim": "not_claimed",
+      "userDecisionPosture": "user_decides"
+    },
+    {
+      "registryVersion": "open-instrument.multi-source-functional-research-evidence-registry.v0_1",
+      "researchEvidenceId": "research.external.albanian-burre-man.scale50.cohortG.v0_1",
+      "embryo": "BURRË",
+      "evidenceFamily": "lexical_dictionary",
+      "language": "Albanian",
+      "form": "burrë",
+      "gloss": "adult male human; man",
+      "embryoRelation": "exact_form",
+      "relationOperationIds": [],
+      "attestationTruth": "fact",
+      "sourceStatus": "research_candidate",
+      "citations": [
+        {
+          "citationId": "research.external.fjale-burre-man.scale50.cohortG.citation.v0_1",
+          "sourceTitle": "FJALË — Burrë",
+          "sourceAuthorOrEditor": null,
+          "sourcePublisherOrHost": "FJALË — Fjalor Shqip",
+          "sourceDateOrVersion": "accessed 2026-09-07",
+          "sourceUrlOrArchiveRef": "https://fjale.al/burr%C3%AB",
+          "entryLocator": "BURRË m., sense 1",
+          "sourceHashOrArchiveHash": null,
+          "attestedForm": "burrë",
+          "attestedGloss": "a person of the male sex; a mature or adult male person",
+          "provenanceGroupId": "fjale.fjalor-shqip.v0_1"
+        }
+      ],
+      "functionalHypotheses": [
+        {
+          "targetWord": "man",
+          "targetSenseId": "adult_male_human",
+          "semanticBridge": "the independently attested Albanian noun burrë denotes an adult male human and can be tested as a bounded functional witness for the adult-male MAN sense; this does not claim mankind, humanity, personhood, or historical origin",
+          "functionalBridgeTruth": "hypothesis",
+          "claimBoundary": "functional_hypothesis_only"
+        }
+      ],
+      "historicalOriginClaim": "not_claimed",
+      "historicalTransmissionClaim": "not_claimed",
+      "winnerClaim": "not_claimed",
+      "languageSuperiorityClaim": "not_claimed",
+      "candidateTruthClaim": "not_claimed",
+      "userDecisionPosture": "user_decides"
+    },
+    {
+      "registryVersion": "open-instrument.multi-source-functional-research-evidence-registry.v0_1",
+      "researchEvidenceId": "research.external.latin-vir-man.scale50.cohortG.v0_1",
+      "embryo": "VĬR",
+      "evidenceFamily": "historical_dictionary",
+      "language": "Latin",
+      "form": "vĭr",
+      "gloss": "male person; adult male; man",
+      "embryoRelation": "exact_form",
+      "relationOperationIds": [],
+      "attestationTruth": "fact",
+      "sourceStatus": "research_candidate",
+      "citations": [
+        {
+          "citationId": "research.external.scaife-lewis-short-vir-man.scale50.cohortG.citation.v0_1",
+          "sourceTitle": "Lewis & Short Latin Dictionary — vĭr",
+          "sourceAuthorOrEditor": "Charlton T. Lewis and Charles Short",
+          "sourcePublisherOrHost": "Scaife ATLAS / Perseus Digital Library",
+          "sourceDateOrVersion": "Lewis & Short; accessed 2026-09-07",
+          "sourceUrlOrArchiveRef": "https://atlas.perseus.tufts.edu/dictionaries/entry/urn%3Acite2%3Ascaife-viewer%3Adictionary-entries.atlas_v1%3Alat.ls.perseus-eng2-n51034/",
+          "entryLocator": "URN urn:cite2:scaife-viewer:dictionary-entries.atlas_v1:lat.ls.perseus-eng2-n51034; headword vĭr; primary sense a male person, a man",
+          "sourceHashOrArchiveHash": null,
+          "attestedForm": "vĭr",
+          "attestedGloss": "a male person, adult male, man",
+          "provenanceGroupId": "scaife.lewis-short.v0_1"
+        }
+      ],
+      "functionalHypotheses": [
+        {
+          "targetWord": "man",
+          "targetSenseId": "adult_male_human",
+          "semanticBridge": "the independently attested Latin noun vĭr denotes a male person or adult male and can be tested as a bounded functional witness for the adult-male MAN sense; this does not claim mankind, humanity, personhood, or historical origin",
+          "functionalBridgeTruth": "hypothesis",
+          "claimBoundary": "functional_hypothesis_only"
+        }
+      ],
+      "historicalOriginClaim": "not_claimed",
+      "historicalTransmissionClaim": "not_claimed",
+      "winnerClaim": "not_claimed",
+      "languageSuperiorityClaim": "not_claimed",
+      "candidateTruthClaim": "not_claimed",
+      "userDecisionPosture": "user_decides"
+    },
+    {
+      "registryVersion": "open-instrument.multi-source-functional-research-evidence-registry.v0_1",
+      "researchEvidenceId": "research.external.albanian-liri-freedom.scale50.cohortG.v0_1",
+      "embryo": "LIRI",
+      "evidenceFamily": "lexical_dictionary",
+      "language": "Albanian",
+      "form": "liri",
+      "gloss": "liberty; freedom from oppression, dependence, or restraint",
+      "embryoRelation": "exact_form",
+      "relationOperationIds": [],
+      "attestationTruth": "fact",
+      "sourceStatus": "research_candidate",
+      "citations": [
+        {
+          "citationId": "research.external.fjale-liri-freedom.scale50.cohortG.citation.v0_1",
+          "sourceTitle": "FJALË — Liri",
+          "sourceAuthorOrEditor": null,
+          "sourcePublisherOrHost": "FJALË — Fjalor Shqip",
+          "sourceDateOrVersion": "accessed 2026-09-07",
+          "sourceUrlOrArchiveRef": "https://fjale.al/liri",
+          "entryLocator": "LIRI I f., senses 1-2",
+          "sourceHashOrArchiveHash": null,
+          "attestedForm": "liri",
+          "attestedGloss": "being free; absence of oppression, dependence, or restrictions; being not imprisoned and enjoying civil rights",
+          "provenanceGroupId": "fjale.fjalor-shqip.v0_1"
+        }
+      ],
+      "functionalHypotheses": [
+        {
+          "targetWord": "freedom",
+          "targetSenseId": "liberty_absence_of_restraint",
+          "semanticBridge": "the independently attested Albanian noun liri denotes liberty and freedom from oppression or restraint and can be tested as a bounded functional witness for FREEDOM; this remains research-only and makes no historical-origin, winner, or candidate-truth claim",
+          "functionalBridgeTruth": "hypothesis",
+          "claimBoundary": "functional_hypothesis_only"
+        }
+      ],
+      "historicalOriginClaim": "not_claimed",
+      "historicalTransmissionClaim": "not_claimed",
+      "winnerClaim": "not_claimed",
+      "languageSuperiorityClaim": "not_claimed",
+      "candidateTruthClaim": "not_claimed",
+      "userDecisionPosture": "user_decides"
+    },
+    {
+      "registryVersion": "open-instrument.multi-source-functional-research-evidence-registry.v0_1",
+      "researchEvidenceId": "research.external.latin-libertas-freedom.scale50.cohortG.v0_1",
+      "embryo": "LĪBERTAS",
+      "evidenceFamily": "historical_dictionary",
+      "language": "Latin",
+      "form": "lībertas",
+      "gloss": "freedom; liberty; freedom from restraint or obligation",
+      "embryoRelation": "exact_form",
+      "relationOperationIds": [],
+      "attestationTruth": "fact",
+      "sourceStatus": "research_candidate",
+      "citations": [
+        {
+          "citationId": "research.external.scaife-lewis-short-libertas-freedom.scale50.cohortG.citation.v0_1",
+          "sourceTitle": "Lewis & Short Latin Dictionary — lībertas",
+          "sourceAuthorOrEditor": "Charlton T. Lewis and Charles Short",
+          "sourcePublisherOrHost": "Scaife ATLAS / Perseus Digital Library",
+          "sourceDateOrVersion": "Lewis & Short; accessed 2026-09-07",
+          "sourceUrlOrArchiveRef": "https://atlas.perseus.tufts.edu/dictionaries/entry/urn%3Acite2%3Ascaife-viewer%3Adictionary-entries.atlas_v1%3Alat.ls.perseus-eng2-n26481/",
+          "entryLocator": "URN urn:cite2:scaife-viewer:dictionary-entries.atlas_v1:lat.ls.perseus-eng2-n26481; headword lībertas; sense 1",
+          "sourceHashOrArchiveHash": null,
+          "attestedForm": "lībertas",
+          "attestedGloss": "the state or condition of a freeman; freedom, liberty, freedom from restraint or obligation",
+          "provenanceGroupId": "scaife.lewis-short.v0_1"
+        }
+      ],
+      "functionalHypotheses": [
+        {
+          "targetWord": "freedom",
+          "targetSenseId": "liberty_absence_of_restraint",
+          "semanticBridge": "the independently attested Latin noun lībertas denotes freedom or liberty, including freedom from restraint or obligation, and can be tested as a bounded functional witness for FREEDOM; this remains research-only and makes no historical-origin, winner, or candidate-truth claim",
+          "functionalBridgeTruth": "hypothesis",
+          "claimBoundary": "functional_hypothesis_only"
+        }
+      ],
+      "historicalOriginClaim": "not_claimed",
+      "historicalTransmissionClaim": "not_claimed",
+      "winnerClaim": "not_claimed",
+      "languageSuperiorityClaim": "not_claimed",
+      "candidateTruthClaim": "not_claimed",
+      "userDecisionPosture": "user_decides"
     }
   ]
 }
