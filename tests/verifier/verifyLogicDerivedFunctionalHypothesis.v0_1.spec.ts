@@ -7,6 +7,9 @@ import {
 import type {
   StructuralHypothesisV0_1,
 } from "../../src/shared/structuralHypothesisDiscovery.v0_1";
+import {
+  discoverStructuralHypothesesV0_1,
+} from "../../src/shared/structuralHypothesisDiscovery.v0_1";
 
 function structuralFixture(): StructuralHypothesisV0_1 {
   return {
@@ -94,6 +97,34 @@ describe("logic-derived functional hypothesis verifier v0.1", () => {
       reasonCodes: [],
     });
     expect(result.checks.every((check) => check.pass)).toBe(true);
+  });
+
+  test("accepts the actual bounded CANDLE consonant-led structural path", () => {
+    const structuralHypothesis = discoverStructuralHypothesesV0_1("candle").find(
+      (hypothesis) => hypothesis.embryo === "AN",
+    );
+
+    expect(structuralHypothesis).toBeDefined();
+
+    const result = buildLogicDerivedFunctionalHypothesisV0_1({
+      targetWord: "candle",
+      targetSense: {
+        id: "wax_light_source",
+        label: "a wax light source",
+      },
+      structuralHypothesis: structuralHypothesis!,
+    });
+
+    expect(result.ok).toBe(true);
+    expect(
+      verifyLogicDerivedFunctionalHypothesisV0_1(
+        result.ok ? result.hypothesis : null,
+        { targetWord: "candle" },
+      ),
+    ).toMatchObject({
+      status: "verified",
+      accepted: true,
+    });
   });
 
   test.each([

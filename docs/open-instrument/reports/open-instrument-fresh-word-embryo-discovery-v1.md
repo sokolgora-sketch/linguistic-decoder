@@ -57,8 +57,8 @@ The existing `sterile` control remains a positive structural family with `ER` as
 | --- | --- |
 | 1. Baseline failure taxonomy | DONE |
 | 2. Generic structural grammar expansion | DONE |
-| 3. Structural defensibility v0.2 / additive verification | NEXT |
-| 4. Explicit target-sense product path | NOT_STARTED |
+| 3. Structural defensibility v0.2 / additive verification | DONE |
+| 4. Explicit target-sense product path | NEXT |
 | 5. End-to-end functional discovery | NOT_STARTED |
 | 6. Generalization / anti-hardcode proof | NOT_STARTED |
 | 7. Negative / adversarial controls | NOT_STARTED |
@@ -127,13 +127,26 @@ Focused validation:
 
 This is a bounded structural family, not a lexical claim. `AN` has no independent standalone meaning or attestation in this lane.
 
-## 9. Initial next task
+## 9. Lane 3 closeout: additive verification for the new structural operation
 
-**Lane 3 — Structural defensibility v0.2 / additive verification.**
+The verifier allowlist now authorizes `peel_right_consonant_led_expansion` without changing the truth hierarchy or weakening any existing acceptance rule. The verifier test exercises the actual discovered `candle -> AN` path and confirms that a user-bound logic hypothesis is accepted only as a hypothesis with the existing claim-boundary protections.
 
-Extend focused verification for the new operation, malformed traces, duplicate paths, depth limits, unsupported input, and no-single-winner behavior. Preserve the existing negative controls.
+Focused validation:
 
-## 10. Opening proof
+- 7 suites passed;
+- 73 tests passed;
+- structural, verifier, API, UI, projection, defensibility, and normalization coverage remained green;
+- no-single-winner, historical-origin, historical-transmission, winner, language-superiority, candidate-truth, and user-decision protections remain unchanged.
+
+This closes verification for the additive operation. It does not claim that `AN` is a lexical meaning or reviewed evidence.
+
+## 10. Initial next task
+
+**Lane 4 — Explicit target-sense product path.**
+
+Carry an explicit user-provided target-sense label through the normal product request path without requiring the user to know an internal ID. Derive only a deterministic opaque request identifier at the API boundary, preserve blank-sense backward compatibility, and bind the label to the existing logic-derived hypothesis without promoting it to lexical truth.
+
+## 11. Opening proof
 
 - repository: `sokolgora-sketch/linguistic-decoder`;
 - path: `/Users/wei/Desktop/ZËRO /Dwnlosads /zero-firebase-studio-export`;
