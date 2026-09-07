@@ -15,7 +15,8 @@
  * It does not make origin, winner, or superiority claims.
  */
 
-import { spawn, spawnSync } from "node:child_process";
+import { spawn, spawnSync, type ChildProcess } from "node:child_process";
+import { once } from "node:events";
 import net from "node:net";
 import { setTimeout as delay } from "node:timers/promises";
 
@@ -65,6 +66,48 @@ function run(command: string, commandArgs: readonly string[]): void {
   if (result.status !== 0) {
     process.exit(result.status ?? 1);
   }
+}
+
+async function stopOwnedServer(proc: ChildProcess): Promise<void> {
+  const signal = (value: NodeJS.Signals) => {
+    try {
+      if (process.platform !== "win32" && proc.pid) process.kill(-proc.pid, value);
+      else proc.kill(value);
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code !== "ESRCH") throw error;
+    }
+  };
+
+  const groupAlive = () => {
+    if (process.platform === "win32" || !proc.pid) return proc.exitCode === null;
+    try {
+      process.kill(-proc.pid, 0);
+      return true;
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code === "ESRCH") return false;
+      throw error;
+    }
+  };
+
+  if (proc.exitCode !== null && !groupAlive()) return;
+  signal("SIGTERM");
+  const close = once(proc, "close");
+  const started = Date.now();
+  let forced = false;
+
+  while (proc.exitCode === null || (!forced && groupAlive())) {
+    const elapsed = Date.now() - started;
+    if (!forced && elapsed >= 5_000) {
+      signal("SIGKILL");
+      forced = true;
+    }
+    if (elapsed >= 10_000) {
+      throw new Error("Live-smoke server process group did not close after termination");
+    }
+    await delay(25);
+  }
+
+  await close;
 }
 
 function assert(
@@ -397,6 +440,7 @@ async function main(): Promise<void> {
       },
       stdio: ["ignore", "pipe", "pipe"],
       shell: false,
+      detached: process.platform !== "win32",
     },
   );
 
@@ -679,8 +723,7 @@ async function main(): Promise<void> {
 
     console.log("\n✅ open-instrument live smoke passed\n");
   } finally {
-    server.kill("SIGTERM");
-    await delay(500);
+    await stopOwnedServer(server);
   }
 }
 
