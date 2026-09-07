@@ -5,8 +5,11 @@ import orderPacket from "../src/data/openInstrument/researchEvidencePackets.v0_1
 import catalog from "../src/data/multiSourceFunctionalResearchEvidenceCatalog.v0_1.json";
 import {
   adaptVerifiedSourceRecordV0_1,
-  OPEN_INSTRUMENT_VERIFIED_SOURCE_RECORD_VERSION_V0_1,
 } from "@/shared/openInstrumentSourceAdapter.v0_1";
+import {
+  captureReviewedSourceV0_1,
+  OPEN_INSTRUMENT_SOURCE_CAPTURE_VERSION_V0_1,
+} from "@/shared/openInstrumentSourceCapture.v0_1";
 import {
   compileOpenInstrumentResearchEvidencePacketInputV0_1,
   parseOpenInstrumentResearchEvidencePacketV0_1,
@@ -29,21 +32,16 @@ function readCommittedOrderPacketV0_1(): unknown {
   ) as unknown;
 }
 
-function verifiedSourceRecordFromPacketSourceV0_1(
+function reviewedSourceCaptureFromPacketSourceV0_1(
   source: (typeof orderPacket.sources)[number],
 ) {
   return {
-    sourceRecordVersion: OPEN_INSTRUMENT_VERIFIED_SOURCE_RECORD_VERSION_V0_1,
-    sourceRecordId: `verified.${source.sourceKey}.v0_1`,
+    captureVersion: OPEN_INSTRUMENT_SOURCE_CAPTURE_VERSION_V0_1,
     sourceTraditionId: source.citation.provenanceGroupId,
-    language: source.language,
     sourceTitle: source.citation.sourceTitle,
-    sourceAuthorOrEditor: source.citation.sourceAuthorOrEditor,
-    sourcePublisherOrHost: source.citation.sourcePublisherOrHost,
     sourceDateOrVersion: source.citation.sourceDateOrVersion,
     sourceUrlOrArchiveRef: source.citation.sourceUrlOrArchiveRef,
     entryLocator: source.citation.entryLocator,
-    sourceHashOrArchiveHash: source.citation.sourceHashOrArchiveHash,
     attestedForm: source.citation.attestedForm,
     attestedGloss: source.citation.attestedGloss,
   };
@@ -81,10 +79,29 @@ describe("Open Instrument source adapter ORDER end-to-end dogfood v0.1", () => {
     expect(parsedCommittedPacket.ok).toBe(true);
     if (!parsedCommittedPacket.ok) throw new Error(parsedCommittedPacket.errors.join("; "));
 
-    const adapterResults = orderPacket.sources.map((source) =>
-      adaptVerifiedSourceRecordV0_1(
-        verifiedSourceRecordFromPacketSourceV0_1(source),
-      ),
+    const captureResults = orderPacket.sources.map((source) =>
+      captureReviewedSourceV0_1(reviewedSourceCaptureFromPacketSourceV0_1(source)),
+    );
+    expect(captureResults.every((result) => result.ok)).toBe(true);
+    if (captureResults.some((result) => !result.ok)) {
+      throw new Error("ORDER source capture did not produce two source records");
+    }
+
+    const sourceRecords = captureResults.map((result) => {
+      if (!result.ok) throw new Error("expected source capture success");
+      return result.sourceRecord;
+    });
+    expect(sourceRecords.map((record) => record.language)).toEqual([
+      "Albanian",
+      "Latin",
+    ]);
+    expect(sourceRecords.map((record) => record.sourcePublisherOrHost)).toEqual([
+      "FJALË — Fjalor Shqip",
+      "Scaife ATLAS / Perseus Digital Library",
+    ]);
+
+    const adapterResults = sourceRecords.map((sourceRecord) =>
+      adaptVerifiedSourceRecordV0_1(sourceRecord),
     );
 
     expect(adapterResults).toHaveLength(2);
@@ -103,8 +120,8 @@ describe("Open Instrument source adapter ORDER end-to-end dogfood v0.1", () => {
     });
 
     expect(candidates.map((candidate) => candidate.sourceKey)).toEqual([
-      "verified-source:verified.fjale-rend.v0_1",
-      "verified-source:verified.lewis-short-ordo.v0_1",
+      "verified-source:capture.fjale-fjalor-shqip-v0-1.rend-i-m-senses-1-3.rend.v0_1",
+      "verified-source:capture.scaife-lewis-short-v0-1.urn-urn-cite2-scaife-viewer-dictionary-entries-atlas-v1-lat-ls-perseus-eng2-n32947-headword-ordo-primary-arrangement-sense.ordo.v0_1",
     ]);
     expect(candidates.map((candidate) => candidate.evidenceFamily)).toEqual([
       "lexical_dictionary",
@@ -124,8 +141,8 @@ describe("Open Instrument source adapter ORDER end-to-end dogfood v0.1", () => {
       "scaife.lewis-short.v0_1",
     ]);
     expect(candidates.map((candidate) => candidate.citation?.citationId)).toEqual([
-      "open-instrument.source-record.verified.fjale-rend.v0_1.citation.v0_1",
-      "open-instrument.source-record.verified.lewis-short-ordo.v0_1.citation.v0_1",
+      "open-instrument.source-record.capture.fjale-fjalor-shqip-v0-1.rend-i-m-senses-1-3.rend.v0_1.citation.v0_1",
+      "open-instrument.source-record.capture.scaife-lewis-short-v0-1.urn-urn-cite2-scaife-viewer-dictionary-entries-atlas-v1-lat-ls-perseus-eng2-n32947-headword-ordo-primary-arrangement-sense.ordo.v0_1.citation.v0_1",
     ]);
     expect(candidates.every((candidate) => candidate.classifications.evidenceFamily === "DETERMINISTIC_DERIVATION")).toBe(true);
     expect(candidates.every((candidate) => candidate.classifications.provenance === "DETERMINISTIC_DERIVATION")).toBe(true);
@@ -193,8 +210,10 @@ describe("Open Instrument source adapter ORDER end-to-end dogfood v0.1", () => {
   });
 
   it("records the exact source-metadata reduction without hiding review work", () => {
-    const packetSourceMetadataFieldsPerSource = 16;
-    const packetSourceMetadataFields = packetSourceMetadataFieldsPerSource * 2;
+    const reviewedCaptureFieldsPerSource = 7;
+    const reviewedCaptureFields = reviewedCaptureFieldsPerSource * 2;
+    const autoFilledTraditionFieldsPerSource = 5;
+    const autoFilledTraditionFields = autoFilledTraditionFieldsPerSource * 2;
     const reviewerJudgmentFields = [
       "targetWord",
       "targetSenseId",
@@ -208,8 +227,9 @@ describe("Open Instrument source adapter ORDER end-to-end dogfood v0.1", () => {
       "source-independence approval",
     ];
 
-    expect(packetSourceMetadataFields).toBe(32);
-    expect(packetSourceMetadataFields - packetSourceMetadataFields).toBe(0);
+    expect(reviewedCaptureFields).toBe(14);
+    expect(autoFilledTraditionFields).toBe(10);
+    expect(reviewedCaptureFields - reviewedCaptureFields).toBe(0);
     expect(reviewerJudgmentFields).toHaveLength(10);
   });
 });

@@ -76,6 +76,11 @@ export type OpenInstrumentSourceAdapterResultV0_1 =
 type SourceTraditionMappingV0_1 = {
   evidenceFamily: MultiSourceEvidenceFamilyV0_1;
   provenanceGroupId: string;
+  language: string;
+  sourceTitle: string;
+  sourceAuthorOrEditor: string | null;
+  sourcePublisherOrHost: string;
+  sourceDateOrVersion: string | null;
 };
 
 /** These IDs are copied from existing catalog provenance, not generated here. */
@@ -85,14 +90,29 @@ export const OPEN_INSTRUMENT_SOURCE_TRADITION_MAPPINGS_V0_1: Readonly<
   "fjale.fjalor-shqip.v0_1": {
     evidenceFamily: "lexical_dictionary",
     provenanceGroupId: "fjale.fjalor-shqip.v0_1",
+    language: "Albanian",
+    sourceTitle: "FJALË — Fjalor Shqip",
+    sourceAuthorOrEditor: null,
+    sourcePublisherOrHost: "FJALË — Fjalor Shqip",
+    sourceDateOrVersion: null,
   },
   "scaife.lewis-short.v0_1": {
     evidenceFamily: "historical_dictionary",
     provenanceGroupId: "scaife.lewis-short.v0_1",
+    language: "Latin",
+    sourceTitle: "Lewis & Short Latin Dictionary",
+    sourceAuthorOrEditor: "Charlton T. Lewis and Charles Short",
+    sourcePublisherOrHost: "Scaife ATLAS / Perseus Digital Library",
+    sourceDateOrVersion: null,
   },
   "scaife.middle-liddell.v0_1": {
     evidenceFamily: "historical_dictionary",
     provenanceGroupId: "scaife.middle-liddell.v0_1",
+    language: "Ancient Greek",
+    sourceTitle: "Middle Liddell",
+    sourceAuthorOrEditor: "Henry George Liddell and Robert Scott",
+    sourcePublisherOrHost: "Scaife ATLAS / Perseus Digital Library",
+    sourceDateOrVersion: null,
   },
 };
 
