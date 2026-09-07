@@ -1,0 +1,55 @@
+{
+  "packetVersion": "open-instrument.research-evidence-packet.v0_1",
+  "packetId": "sea.physical-saltwater-body.v0_1",
+  "targetWord": "sea",
+  "targetSenseId": "physical_sea_saltwater_body",
+  "semanticBridge": "The source entries attest lexical forms for a bounded sea or saltwater-body sense; treating that shared physical referent as a ZË-RO functional bridge remains a research hypothesis only.",
+  "sources": [
+    {
+      "sourceKey": "verified-source:capture.fjale-fjalor-shqip-v0-1.det-m-sense-1.det.v0_1",
+      "embryo": "det",
+      "evidenceFamily": "lexical_dictionary",
+      "language": "Albanian",
+      "form": "det",
+      "gloss": "Hapësirë shumë e madhe me ujë të kripur, që zakonisht është e rrethuar me tokë jo nga të gjitha anët dhe që qëndron disi e veçuar; pjesa më e madhe e rruzullit tokësor, e mbuluar me ujë të kripur.",
+      "embryoRelation": "exact_form",
+      "relationOperationIds": [],
+      "citation": {
+        "citationId": "open-instrument.source-record.capture.fjale-fjalor-shqip-v0-1.det-m-sense-1.det.v0_1.citation.v0_1",
+        "sourceTitle": "FJALË — Fjalor Shqip",
+        "sourceAuthorOrEditor": null,
+        "sourcePublisherOrHost": "FJALË — Fjalor Shqip",
+        "sourceDateOrVersion": "accessed 2026-09-07",
+        "sourceUrlOrArchiveRef": "https://fjale.al/det",
+        "entryLocator": "det m.; sense 1",
+        "sourceHashOrArchiveHash": null,
+        "attestedForm": "det",
+        "attestedGloss": "Hapësirë shumë e madhe me ujë të kripur, që zakonisht është e rrethuar me tokë jo nga të gjitha anët dhe që qëndron disi e veçuar; pjesa më e madhe e rruzullit tokësor, e mbuluar me ujë të kripur.",
+        "provenanceGroupId": "fjale.fjalor-shqip.v0_1"
+      }
+    },
+    {
+      "sourceKey": "verified-source:capture.scaife-lewis-short-v0-1.headword-mare-sea-sense-entry-text-beginning-sea.mare.v0_1",
+      "embryo": "mare",
+      "evidenceFamily": "historical_dictionary",
+      "language": "Latin",
+      "form": "mare",
+      "gloss": "sea, the sea",
+      "embryoRelation": "exact_form",
+      "relationOperationIds": [],
+      "citation": {
+        "citationId": "open-instrument.source-record.capture.scaife-lewis-short-v0-1.headword-mare-sea-sense-entry-text-beginning-sea.mare.v0_1.citation.v0_1",
+        "sourceTitle": "Lewis & Short Latin Dictionary",
+        "sourceAuthorOrEditor": "Charlton T. Lewis and Charles Short",
+        "sourcePublisherOrHost": "Scaife ATLAS / Perseus Digital Library",
+        "sourceDateOrVersion": "Lewis & Short; accessed 2026-09-07",
+        "sourceUrlOrArchiveRef": "https://atlas.perseus.tufts.edu/dictionaries/entry/urn%3Acite2%3Ascaife-viewer%3Adictionary-entries.atlas_v1%3Alat.ls.perseus-eng2-n28019/",
+        "entryLocator": "headword mare; sea sense; entry text beginning sea.",
+        "sourceHashOrArchiveHash": null,
+        "attestedForm": "mare",
+        "attestedGloss": "sea, the sea",
+        "provenanceGroupId": "scaife.lewis-short.v0_1"
+      }
+    }
+  ]
+}

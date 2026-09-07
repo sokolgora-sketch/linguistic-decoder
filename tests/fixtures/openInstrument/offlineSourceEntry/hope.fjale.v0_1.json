@@ -1,0 +1,18 @@
+{
+  "snapshotVersion": "open-instrument.offline-source-entry-snapshot.v0_1",
+  "sourceTraditionId": "fjale.fjalor-shqip.v0_1",
+  "sourceSnapshotId": "fjale-shprese-reviewed-2026-09-07",
+  "sourceDateOrVersion": "accessed 2026-09-07",
+  "sourceUrlOrArchiveRef": "https://fjale.al/shpres%C3%AB",
+  "entry": {
+    "headword": "shpresë",
+    "locator": "shpresë f.; sense 1",
+    "attestedForms": ["shpresë"],
+    "senses": [
+      {
+        "label": "sense 1",
+        "text": "Besimi që kemi se do të na plotësohet një dëshirë, një qëllim a një synim; qëndrimi në pritje me një besim të tillë; ndjenja që kemi kur e shohim si të mundshme përmbushjen e një dëshire a arritjen e një qëllimi."
+      }
+    ]
+  }
+}

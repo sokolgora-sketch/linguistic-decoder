@@ -8,6 +8,7 @@ export type OpenInstrumentOfflineSourceEntrySnapshotV0_1 = {
   snapshotVersion: typeof OPEN_INSTRUMENT_OFFLINE_SOURCE_ENTRY_SNAPSHOT_VERSION_V0_1;
   sourceTraditionId: string;
   sourceSnapshotId: string;
+  sourceDateOrVersion?: string | null;
   sourceUrlOrArchiveRef?: string | null;
   entry: {
     headword: string;
@@ -37,6 +38,7 @@ export type OpenInstrumentExtractedSourceFactsV0_1 = {
   extractorVersion: typeof OPEN_INSTRUMENT_SOURCE_FACT_CANDIDATE_VERSION_V0_1;
   sourceTraditionId: string;
   sourceSnapshotId: string;
+  sourceDateOrVersion: string | null;
   sourceUrlOrArchiveRef: string | null;
   headwordCandidates: readonly string[];
   entryLocatorCandidates: readonly string[];
@@ -105,6 +107,10 @@ function extractSnapshotEntryV0_1(
 ): OpenInstrumentSourceFactExtractionResultV0_1 {
   const sourceTraditionId = normalizeTextV0_1(value.sourceTraditionId);
   const sourceSnapshotId = normalizeTextV0_1(value.sourceSnapshotId);
+  const sourceDateOrVersion =
+    value.sourceDateOrVersion === undefined || value.sourceDateOrVersion === null
+      ? null
+      : normalizeTextV0_1(value.sourceDateOrVersion);
   const sourceUrlOrArchiveRef =
     value.sourceUrlOrArchiveRef === undefined || value.sourceUrlOrArchiveRef === null
       ? null
@@ -164,6 +170,7 @@ function extractSnapshotEntryV0_1(
       extractorVersion: OPEN_INSTRUMENT_SOURCE_FACT_CANDIDATE_VERSION_V0_1,
       sourceTraditionId,
       sourceSnapshotId,
+      sourceDateOrVersion,
       sourceUrlOrArchiveRef,
       headwordCandidates: [headword as string],
       entryLocatorCandidates: [locator as string],

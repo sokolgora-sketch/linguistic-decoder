@@ -242,7 +242,7 @@ describe(
       },
     );
 
-    it.each(["sleep"])(
+    it.each(["break"])(
       "%s remains structural-only without target-bound source evidence",
       async (word) => {
         const body =
