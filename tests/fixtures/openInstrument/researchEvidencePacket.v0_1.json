@@ -1,0 +1,55 @@
+{
+  "packetVersion": "open-instrument.research-evidence-packet.v0_1",
+  "packetId": "fixture.packet.compiler.v0_1",
+  "targetWord": "compiler-fixture",
+  "targetSenseId": "fixture_exact_form",
+  "semanticBridge": "CONTRACT TEST ONLY: this packet validates deterministic compilation without asserting external evidence.",
+  "sources": [
+    {
+      "sourceKey": "source-b",
+      "embryo": "BETA",
+      "evidenceFamily": "lexical_dictionary",
+      "language": "fixture-language-b",
+      "form": "beta",
+      "gloss": "CONTRACT TEST ONLY fixture gloss B",
+      "embryoRelation": "exact_form",
+      "relationOperationIds": [],
+      "citation": {
+        "citationId": "fixture.citation.b.v0_1",
+        "sourceTitle": "CONTRACT TEST ONLY Packet Compiler Source B",
+        "sourceAuthorOrEditor": null,
+        "sourcePublisherOrHost": "Open Instrument tests",
+        "sourceDateOrVersion": "v0.1",
+        "sourceUrlOrArchiveRef": "fixture://research-evidence-packet/source-b",
+        "entryLocator": "fixture-entry:source-b",
+        "sourceHashOrArchiveHash": null,
+        "attestedForm": "beta",
+        "attestedGloss": "CONTRACT TEST ONLY fixture gloss B",
+        "provenanceGroupId": "fixture-provenance-b"
+      }
+    },
+    {
+      "sourceKey": "source-a",
+      "embryo": "ALPHA",
+      "evidenceFamily": "lexical_dictionary",
+      "language": "fixture-language-a",
+      "form": "alpha",
+      "gloss": "CONTRACT TEST ONLY fixture gloss A",
+      "embryoRelation": "exact_form",
+      "relationOperationIds": [],
+      "citation": {
+        "citationId": "fixture.citation.a.v0_1",
+        "sourceTitle": "CONTRACT TEST ONLY Packet Compiler Source A",
+        "sourceAuthorOrEditor": null,
+        "sourcePublisherOrHost": "Open Instrument tests",
+        "sourceDateOrVersion": "v0.1",
+        "sourceUrlOrArchiveRef": "fixture://research-evidence-packet/source-a",
+        "entryLocator": "fixture-entry:source-a",
+        "sourceHashOrArchiveHash": null,
+        "attestedForm": "alpha",
+        "attestedGloss": "CONTRACT TEST ONLY fixture gloss A",
+        "provenanceGroupId": "fixture-provenance-a"
+      }
+    }
+  ]
+}
