@@ -955,6 +955,211 @@
       "languageSuperiorityClaim": "not_claimed",
       "candidateTruthClaim": "not_claimed",
       "userDecisionPosture": "user_decides"
+    },
+    {
+      "registryVersion": "open-instrument.multi-source-functional-research-evidence-registry.v0_1",
+      "researchEvidenceId": "research.external.albanian-qiell-sky.scale50.v0_1",
+      "embryo": "QIELL",
+      "evidenceFamily": "lexical_dictionary",
+      "language": "Albanian",
+      "form": "qiell",
+      "gloss": "sky; the air-filled space surrounding Earth and appearing above us",
+      "embryoRelation": "exact_form",
+      "relationOperationIds": [],
+      "attestationTruth": "fact",
+      "sourceStatus": "research_candidate",
+      "citations": [
+        {
+          "citationId": "research.external.fjale-qiell-sky.scale50.citation.v0_1",
+          "sourceTitle": "FJALË — Qiell",
+          "sourceAuthorOrEditor": null,
+          "sourcePublisherOrHost": "FJALË — Fjalor Shqip",
+          "sourceDateOrVersion": "accessed 2026-09-07",
+          "sourceUrlOrArchiveRef": "https://fjale.al/qiell",
+          "entryLocator": "QIELL m., senses 1-2",
+          "sourceHashOrArchiveHash": null,
+          "attestedForm": "qiell",
+          "attestedGloss": "sky; the space surrounding Earth and the visible expanse above"
+        }
+      ],
+      "functionalHypotheses": [
+        {
+          "targetWord": "sky",
+          "semanticBridge": "the independently attested Albanian noun qiell denotes the sky and can be tested as a direct cross-language functional witness for the SKY concept; this is research-only and does not assert historical origin, transmission, winner status, or candidate truth",
+          "functionalBridgeTruth": "hypothesis",
+          "claimBoundary": "functional_hypothesis_only"
+        }
+      ],
+      "historicalOriginClaim": "not_claimed",
+      "historicalTransmissionClaim": "not_claimed",
+      "winnerClaim": "not_claimed",
+      "languageSuperiorityClaim": "not_claimed",
+      "candidateTruthClaim": "not_claimed",
+      "userDecisionPosture": "user_decides"
+    },
+    {
+      "registryVersion": "open-instrument.multi-source-functional-research-evidence-registry.v0_1",
+      "researchEvidenceId": "research.external.albanian-zemer-heart.scale50.v0_1",
+      "embryo": "ZEMËR",
+      "evidenceFamily": "lexical_dictionary",
+      "language": "Albanian",
+      "form": "zemër",
+      "gloss": "heart; central organ of the circulatory system",
+      "embryoRelation": "exact_form",
+      "relationOperationIds": [],
+      "attestationTruth": "fact",
+      "sourceStatus": "research_candidate",
+      "citations": [
+        {
+          "citationId": "research.external.fjale-zemer-heart.scale50.citation.v0_1",
+          "sourceTitle": "FJALË — Zemër",
+          "sourceAuthorOrEditor": null,
+          "sourcePublisherOrHost": "FJALË — Fjalor Shqip",
+          "sourceDateOrVersion": "accessed 2026-09-07",
+          "sourceUrlOrArchiveRef": "https://fjale.al/zem%C3%ABr",
+          "entryLocator": "ZEMËR f., sense 1",
+          "sourceHashOrArchiveHash": null,
+          "attestedForm": "zemër",
+          "attestedGloss": "heart; central organ of the circulatory system in humans and animals"
+        }
+      ],
+      "functionalHypotheses": [
+        {
+          "targetWord": "heart",
+          "semanticBridge": "the independently attested Albanian noun zemër denotes the heart and can be tested as a direct cross-language functional witness for the HEART concept; this is research-only and does not assert historical origin, transmission, winner status, or candidate truth",
+          "functionalBridgeTruth": "hypothesis",
+          "claimBoundary": "functional_hypothesis_only"
+        }
+      ],
+      "historicalOriginClaim": "not_claimed",
+      "historicalTransmissionClaim": "not_claimed",
+      "winnerClaim": "not_claimed",
+      "languageSuperiorityClaim": "not_claimed",
+      "candidateTruthClaim": "not_claimed",
+      "userDecisionPosture": "user_decides"
+    },
+    {
+      "registryVersion": "open-instrument.multi-source-functional-research-evidence-registry.v0_1",
+      "researchEvidenceId": "research.external.albanian-ha-eat.scale50.v0_1",
+      "embryo": "HA",
+      "evidenceFamily": "lexical_dictionary",
+      "language": "Albanian",
+      "form": "ha",
+      "gloss": "to eat; chew and swallow food",
+      "embryoRelation": "exact_form",
+      "relationOperationIds": [],
+      "attestationTruth": "fact",
+      "sourceStatus": "research_candidate",
+      "citations": [
+        {
+          "citationId": "research.external.fjale-ha-eat.scale50.citation.v0_1",
+          "sourceTitle": "FJALË — Ha",
+          "sourceAuthorOrEditor": null,
+          "sourcePublisherOrHost": "FJALË — Fjalor Shqip",
+          "sourceDateOrVersion": "accessed 2026-09-07",
+          "sourceUrlOrArchiveRef": "https://fjale.al/ha",
+          "entryLocator": "HA kal., senses 1-2",
+          "sourceHashOrArchiveHash": null,
+          "attestedForm": "ha",
+          "attestedGloss": "to eat; chew and swallow something for nourishment"
+        }
+      ],
+      "functionalHypotheses": [
+        {
+          "targetWord": "eat",
+          "semanticBridge": "the independently attested Albanian verb ha denotes eating and can be tested as a direct cross-language functional witness for the EAT concept; this is research-only and does not assert historical origin, transmission, winner status, or candidate truth",
+          "functionalBridgeTruth": "hypothesis",
+          "claimBoundary": "functional_hypothesis_only"
+        }
+      ],
+      "historicalOriginClaim": "not_claimed",
+      "historicalTransmissionClaim": "not_claimed",
+      "winnerClaim": "not_claimed",
+      "languageSuperiorityClaim": "not_claimed",
+      "candidateTruthClaim": "not_claimed",
+      "userDecisionPosture": "user_decides"
+    },
+    {
+      "registryVersion": "open-instrument.multi-source-functional-research-evidence-registry.v0_1",
+      "researchEvidenceId": "research.external.albanian-mendje-mind.scale50.v0_1",
+      "embryo": "MENDJE",
+      "evidenceFamily": "lexical_dictionary",
+      "language": "Albanian",
+      "form": "mendje",
+      "gloss": "mind; human capacity to think, know, reason, and judge",
+      "embryoRelation": "exact_form",
+      "relationOperationIds": [],
+      "attestationTruth": "fact",
+      "sourceStatus": "research_candidate",
+      "citations": [
+        {
+          "citationId": "research.external.fjale-mendje-mind.scale50.citation.v0_1",
+          "sourceTitle": "FJALË — Mendje",
+          "sourceAuthorOrEditor": null,
+          "sourcePublisherOrHost": "FJALË — Fjalor Shqip",
+          "sourceDateOrVersion": "accessed 2026-09-07",
+          "sourceUrlOrArchiveRef": "https://fjale.al/mendje",
+          "entryLocator": "MENDJE f., sense 1",
+          "sourceHashOrArchiveHash": null,
+          "attestedForm": "mendje",
+          "attestedGloss": "mind; capacity to think, know, reason, and judge"
+        }
+      ],
+      "functionalHypotheses": [
+        {
+          "targetWord": "mind",
+          "semanticBridge": "the independently attested Albanian noun mendje denotes the mind and can be tested as a direct cross-language functional witness for the MIND concept; this is research-only and does not assert historical origin, transmission, winner status, or candidate truth",
+          "functionalBridgeTruth": "hypothesis",
+          "claimBoundary": "functional_hypothesis_only"
+        }
+      ],
+      "historicalOriginClaim": "not_claimed",
+      "historicalTransmissionClaim": "not_claimed",
+      "winnerClaim": "not_claimed",
+      "languageSuperiorityClaim": "not_claimed",
+      "candidateTruthClaim": "not_claimed",
+      "userDecisionPosture": "user_decides"
+    },
+    {
+      "registryVersion": "open-instrument.multi-source-functional-research-evidence-registry.v0_1",
+      "researchEvidenceId": "research.external.albanian-lufte-war.scale50.v0_1",
+      "embryo": "LUFTË",
+      "evidenceFamily": "lexical_dictionary",
+      "language": "Albanian",
+      "form": "luftë",
+      "gloss": "war; armed conflict between opposing states or forces",
+      "embryoRelation": "exact_form",
+      "relationOperationIds": [],
+      "attestationTruth": "fact",
+      "sourceStatus": "research_candidate",
+      "citations": [
+        {
+          "citationId": "research.external.fjale-lufte-war.scale50.citation.v0_1",
+          "sourceTitle": "FJALË — Luftë",
+          "sourceAuthorOrEditor": null,
+          "sourcePublisherOrHost": "FJALË — Fjalor Shqip",
+          "sourceDateOrVersion": "accessed 2026-09-07",
+          "sourceUrlOrArchiveRef": "https://fjale.al/luft%C3%AB",
+          "entryLocator": "LUFTË f., sense 1",
+          "sourceHashOrArchiveHash": null,
+          "attestedForm": "luftë",
+          "attestedGloss": "war; armed conflict between states or opposing military forces"
+        }
+      ],
+      "functionalHypotheses": [
+        {
+          "targetWord": "war",
+          "semanticBridge": "the independently attested Albanian noun luftë denotes war and can be tested as a direct cross-language functional witness for the WAR concept; this is research-only and does not assert historical origin, transmission, winner status, or candidate truth",
+          "functionalBridgeTruth": "hypothesis",
+          "claimBoundary": "functional_hypothesis_only"
+        }
+      ],
+      "historicalOriginClaim": "not_claimed",
+      "historicalTransmissionClaim": "not_claimed",
+      "winnerClaim": "not_claimed",
+      "languageSuperiorityClaim": "not_claimed",
+      "candidateTruthClaim": "not_claimed",
+      "userDecisionPosture": "user_decides"
     }
   ]
 }
