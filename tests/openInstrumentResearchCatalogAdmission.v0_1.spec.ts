@@ -104,14 +104,18 @@ function acceptReview(
 }
 
 function reviewedBreakPacket() {
+  const candidates = candidatesFromVerifiedSources();
   const review = buildOpenInstrumentSourceReviewPacketV0_1({
     reviewPacketId: breakPacket.packetId,
     targetWord: breakPacket.targetWord,
     targetSenseId: breakPacket.targetSenseId,
     semanticBridge: breakPacket.semanticBridge,
-    candidates: candidatesFromVerifiedSources(),
+    candidates,
   });
-  const finalized = finalizeOpenInstrumentSourceReviewPacketV0_1(acceptReview(review));
+  const finalized = finalizeOpenInstrumentSourceReviewPacketV0_1(
+    acceptReview(review),
+    candidates,
+  );
   expect(finalized.ok).toBe(true);
   if (!finalized.ok) throw new Error(finalized.reasonCodes.join(", "));
   expect(finalized.packet).toEqual(breakPacket);
@@ -175,6 +179,32 @@ describe("Open Instrument research catalog admission v0.1", () => {
     const result = admitOpenInstrumentResearchCatalogV0_1(PRE_ADMISSION_CATALOG, mutate(BREAK_ROWS));
     expect(result.ok).toBe(false);
     if (!result.ok) expect(result.reasonCodes.some((code) => code.startsWith(reason))).toBe(true);
+  });
+
+  it("admits generated rows into a valid empty catalog", () => {
+    const generatedRows = compileOpenInstrumentResearchEvidencePacketInputV0_1(
+      reviewedBreakPacket(),
+    );
+    const emptyCatalog = {
+      catalogVersion: catalog.catalogVersion,
+      rows: [],
+    };
+
+    const result = admitOpenInstrumentResearchCatalogV0_1(
+      emptyCatalog,
+      generatedRows,
+    );
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) throw new Error(result.reasonCodes.join(", "));
+    expect(result.dryRun).toMatchObject({
+      currentRowCount: 0,
+      incomingRowCount: 2,
+      resultRowCount: 2,
+      collisions: [],
+      wouldChange: true,
+    });
+    expect(result.catalog.rows).toEqual(generatedRows);
   });
 
   it("rejects malformed rows and repeated admission", () => {

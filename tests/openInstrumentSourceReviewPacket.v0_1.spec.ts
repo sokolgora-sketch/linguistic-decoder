@@ -96,6 +96,24 @@ function reviewFor(
   });
 }
 
+function finalizeReview(
+  review: OpenInstrumentSourceReviewPacketV0_1,
+) {
+  if (review.targetWord === starPacket.targetWord) {
+    return finalizeOpenInstrumentSourceReviewPacketV0_1(
+      review,
+      candidatesFor(starPacket, [starSnapshotA, starSnapshotB]),
+    );
+  }
+  if (review.targetWord === bluePacket.targetWord) {
+    return finalizeOpenInstrumentSourceReviewPacketV0_1(
+      review,
+      candidatesFor(bluePacket, [blueSnapshotA, blueSnapshotB]),
+    );
+  }
+  throw new Error(`unsupported review target: ${review.targetWord}`);
+}
+
 describe("Open Instrument source review packet v0.1", () => {
   it("prefills only non-authoritative source suggestions", () => {
     const review = reviewFor(starPacket, [starSnapshotA, starSnapshotB]);
@@ -117,7 +135,7 @@ describe("Open Instrument source review packet v0.1", () => {
     ["blue", bluePacket, [blueSnapshotA, blueSnapshotB]],
   ] as const)("finalizes the already-reviewed %s packet", (_name, packet, snapshots) => {
     const review = acceptReview(reviewFor(packet, snapshots));
-    const finalized = finalizeOpenInstrumentSourceReviewPacketV0_1(review);
+    const finalized = finalizeReview(review);
 
     expect(finalized.ok).toBe(true);
     if (!finalized.ok) throw new Error(finalized.reasonCodes.join(", "));
@@ -130,7 +148,7 @@ describe("Open Instrument source review packet v0.1", () => {
 
   it("requires explicit decisions before finalization", () => {
     const review = reviewFor(starPacket, [starSnapshotA, starSnapshotB]);
-    const result = finalizeOpenInstrumentSourceReviewPacketV0_1(review);
+    const result = finalizeReview(review);
 
     expect(result.ok).toBe(false);
     if (result.ok) throw new Error("pending review finalized unexpectedly");
@@ -162,7 +180,7 @@ describe("Open Instrument source review packet v0.1", () => {
       ),
     }), "EMBRYO_REVIEW_REQUIRED"],
   ] as const)("rejects %s without emitting a research packet", (_name, mutate, reason) => {
-    const result = finalizeOpenInstrumentSourceReviewPacketV0_1(
+    const result = finalizeReview(
       mutate(reviewFor(starPacket, [starSnapshotA, starSnapshotB])),
     );
 
@@ -172,23 +190,34 @@ describe("Open Instrument source review packet v0.1", () => {
   });
 
   it("rejects duplicate provenance groups even when the reviewer accepts them", () => {
-    const review = acceptReview(reviewFor(starPacket, [starSnapshotA, starSnapshotB]));
-    const duplicate = {
-      ...review,
-      sources: review.sources.map((source, index) =>
-        index === 1
-          ? {
-              ...source,
-              citation: {
-                ...source.citation!,
-                provenanceGroupId: review.sources[0].citation!.provenanceGroupId,
-              },
-            }
-          : source,
-      ),
-    };
+    const candidates = candidatesFor(starPacket, [starSnapshotA, starSnapshotB]);
+    const duplicateCandidates = candidates.map((candidate, index) =>
+      index === 1
+        ? {
+            ...candidate,
+            citation: {
+              ...candidate.citation!,
+              provenanceGroupId: candidates[0].citation!.provenanceGroupId,
+            },
+          }
+        : candidate,
+    );
 
-    const result = finalizeOpenInstrumentSourceReviewPacketV0_1(duplicate);
+    const review = acceptReview(
+      buildOpenInstrumentSourceReviewPacketV0_1({
+        reviewPacketId: starPacket.packetId,
+        targetWord: starPacket.targetWord,
+        targetSenseId: starPacket.targetSenseId,
+        semanticBridge: starPacket.semanticBridge,
+        candidates: duplicateCandidates,
+      }),
+    );
+
+    const result = finalizeOpenInstrumentSourceReviewPacketV0_1(
+      review,
+      duplicateCandidates,
+    );
+
     expect(result.ok).toBe(false);
     if (result.ok) throw new Error("duplicate provenance finalized unexpectedly");
     expect(result.reasonCodes).toContain("PROVENANCE_DUPLICATE");
@@ -211,7 +240,7 @@ describe("Open Instrument source review packet v0.1", () => {
       ),
     };
 
-    const result = finalizeOpenInstrumentSourceReviewPacketV0_1(invalid);
+    const result = finalizeReview(invalid);
     expect(result.ok).toBe(false);
     if (result.ok) throw new Error("invalid relation finalized unexpectedly");
     expect(result.reasonCodes).toContain("REVIEW_PACKET_INVALID");
@@ -219,7 +248,7 @@ describe("Open Instrument source review packet v0.1", () => {
 
   it("keeps compiler-controlled research boundaries immutable", () => {
     const review = acceptReview(reviewFor(bluePacket, [blueSnapshotA, blueSnapshotB]));
-    const finalized = finalizeOpenInstrumentSourceReviewPacketV0_1({
+    const finalized = finalizeReview({
       ...review,
       ...( {
         historicalOriginClaim: "claimed",
@@ -236,10 +265,75 @@ describe("Open Instrument source review packet v0.1", () => {
     );
   });
 
+  it("rejects mutation of verified source facts in the review document", () => {
+    const candidates = candidatesFor(starPacket, [starSnapshotA, starSnapshotB]);
+    const accepted = acceptReview(reviewFor(starPacket, [starSnapshotA, starSnapshotB]));
+
+    const tamperedForm = {
+      ...accepted,
+      sources: accepted.sources.map((source, index) =>
+        index === 0 ? { ...source, form: "tampered-form" } : source,
+      ),
+    };
+    const formResult = finalizeOpenInstrumentSourceReviewPacketV0_1(
+      tamperedForm,
+      candidates,
+    );
+    expect(formResult.ok).toBe(false);
+    if (formResult.ok) throw new Error("tampered source form finalized unexpectedly");
+    expect(formResult.reasonCodes).toContain("REVIEW_PACKET_INVALID");
+
+    const tamperedCitation = {
+      ...accepted,
+      sources: accepted.sources.map((source, index) =>
+        index === 0
+          ? {
+              ...source,
+              citation: {
+                ...source.citation!,
+                sourceUrlOrArchiveRef: "https://example.invalid/tampered",
+              },
+            }
+          : source,
+      ),
+    };
+    const citationResult = finalizeOpenInstrumentSourceReviewPacketV0_1(
+      tamperedCitation,
+      candidates,
+    );
+    expect(citationResult.ok).toBe(false);
+    if (citationResult.ok) throw new Error("tampered citation finalized unexpectedly");
+    expect(citationResult.reasonCodes).toContain("REVIEW_PACKET_INVALID");
+  });
+
+  it("requires sourceReviewDecision to be explicitly accepted at runtime", () => {
+    const candidates = candidatesFor(starPacket, [starSnapshotA, starSnapshotB]);
+    const accepted = acceptReview(reviewFor(starPacket, [starSnapshotA, starSnapshotB]));
+    const invalidDecision = {
+      ...accepted,
+      sources: accepted.sources.map((source, index) =>
+        index === 0
+          ? {
+              ...source,
+              sourceReviewDecision: "invalid-runtime-value",
+            }
+          : source,
+      ),
+    } as unknown as OpenInstrumentSourceReviewPacketV0_1;
+
+    const result = finalizeOpenInstrumentSourceReviewPacketV0_1(
+      invalidDecision,
+      candidates,
+    );
+    expect(result.ok).toBe(false);
+    if (result.ok) throw new Error("invalid source decision finalized unexpectedly");
+    expect(result.reasonCodes).toContain("SOURCE_REVIEW_REQUIRED");
+  });
+
   it("is deterministic and records the assembly reduction boundary", () => {
     const review = acceptReview(reviewFor(starPacket, [starSnapshotA, starSnapshotB]));
-    const first = finalizeOpenInstrumentSourceReviewPacketV0_1(review);
-    const second = finalizeOpenInstrumentSourceReviewPacketV0_1(review);
+    const first = finalizeReview(review);
+    const second = finalizeReview(review);
 
     expect(first).toEqual(second);
 

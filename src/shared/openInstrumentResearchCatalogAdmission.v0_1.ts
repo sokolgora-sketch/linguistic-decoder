@@ -163,13 +163,16 @@ export function admitOpenInstrumentResearchCatalogV0_1(
   const incomingRows = incomingRowsV0_1(generatedRows);
   const collisions: OpenInstrumentResearchCatalogAdmissionCollisionV0_1[] = [];
 
-  if (
-    currentRows.length === 0 ||
-    typeof existingCatalog !== "object" ||
-    existingCatalog === null ||
-    (existingCatalog as { rows?: unknown }).rows instanceof Array &&
-      (existingCatalog as { rows: unknown[] }).rows.length !== currentRows.length
-  ) {
+  const existingCatalogIsValid =
+    typeof existingCatalog === "object" &&
+    existingCatalog !== null &&
+    !Array.isArray(existingCatalog) &&
+    (existingCatalog as { catalogVersion?: unknown }).catalogVersion ===
+      MULTI_SOURCE_FUNCTIONAL_RESEARCH_EVIDENCE_CATALOG_VERSION_V0_1 &&
+    Array.isArray((existingCatalog as { rows?: unknown }).rows) &&
+    (existingCatalog as { rows: unknown[] }).rows.length === currentRows.length;
+
+  if (!existingCatalogIsValid) {
     collisions.push({ kind: "malformedRow", value: "existingCatalog" });
   }
   if (incomingRows === null) {

@@ -170,8 +170,49 @@ function sourceFactsAreUsableV0_1(
   );
 }
 
+function citationMatchesCandidateV0_1(
+  left: OpenInstrumentSourceReviewPacketSourceV0_1["citation"],
+  right: OpenInstrumentNormalizedSourceCandidateV0_1["citation"],
+): boolean {
+  if (!left || !right) return false;
+
+  const fields = [
+    "citationId",
+    "sourceTitle",
+    "sourceAuthorOrEditor",
+    "sourcePublisherOrHost",
+    "sourceDateOrVersion",
+    "sourceUrlOrArchiveRef",
+    "entryLocator",
+    "sourceHashOrArchiveHash",
+    "attestedForm",
+    "attestedGloss",
+    "provenanceGroupId",
+  ] as const;
+
+  return fields.every(
+    (field) =>
+      normalizeTextV0_1(left[field]) === normalizeTextV0_1(right[field]),
+  );
+}
+
+function sourceFactsMatchCandidateV0_1(
+  source: OpenInstrumentSourceReviewPacketSourceV0_1,
+  candidate: OpenInstrumentNormalizedSourceCandidateV0_1,
+): boolean {
+  return (
+    normalizeTextV0_1(source.sourceKey) === normalizeTextV0_1(candidate.sourceKey) &&
+    source.evidenceFamily === candidate.evidenceFamily &&
+    normalizeTextV0_1(source.language) === normalizeTextV0_1(candidate.language) &&
+    normalizeTextV0_1(source.form) === normalizeTextV0_1(candidate.form) &&
+    normalizeTextV0_1(source.gloss) === normalizeTextV0_1(candidate.gloss) &&
+    citationMatchesCandidateV0_1(source.citation, candidate.citation)
+  );
+}
+
 function relationConfigurationIsValidV0_1(
   source: OpenInstrumentSourceReviewPacketSourceV0_1,
+  verifiedForm: string | null,
 ): boolean {
   const embryo = source.proposedEmbryo.value;
   const relation = source.proposedEmbryoRelation.value;
@@ -188,7 +229,7 @@ function relationConfigurationIsValidV0_1(
   }
 
   if (relation === "exact_form") {
-    return normalizeTextV0_1(embryo) === normalizeTextV0_1(source.form);
+    return normalizeTextV0_1(embryo) === normalizeTextV0_1(verifiedForm);
   }
 
   return relation !== "authorized_transformation" || operationIds.length > 0;
@@ -196,8 +237,32 @@ function relationConfigurationIsValidV0_1(
 
 export function finalizeOpenInstrumentSourceReviewPacketV0_1(
   reviewPacket: OpenInstrumentSourceReviewPacketV0_1,
+  verifiedCandidates: readonly OpenInstrumentNormalizedSourceCandidateV0_1[],
 ): FinalizeOpenInstrumentSourceReviewPacketResultV0_1 {
   const reasonCodes = new Set<OpenInstrumentSourceReviewPacketReasonCodeV0_1>();
+  const verifiedCandidateList = Array.isArray(verifiedCandidates)
+    ? verifiedCandidates
+    : [];
+  const verifiedCandidatesBySourceKey = new Map<
+    string,
+    OpenInstrumentNormalizedSourceCandidateV0_1
+  >();
+
+  if (
+    !Array.isArray(verifiedCandidates) ||
+    verifiedCandidateList.length !== reviewPacket.sources.length
+  ) {
+    reasonCodes.add("REVIEW_PACKET_INVALID");
+  }
+
+  for (const candidate of verifiedCandidateList) {
+    const sourceKey = normalizeTextV0_1(candidate.sourceKey);
+    if (!sourceKey || verifiedCandidatesBySourceKey.has(sourceKey)) {
+      reasonCodes.add("REVIEW_PACKET_INVALID");
+      continue;
+    }
+    verifiedCandidatesBySourceKey.set(sourceKey, candidate);
+  }
 
   if (
     reviewPacket.reviewVersion !== OPEN_INSTRUMENT_SOURCE_REVIEW_PACKET_VERSION_V0_1 ||
@@ -240,15 +305,26 @@ export function finalizeOpenInstrumentSourceReviewPacketV0_1(
   const packetSources: OpenInstrumentResearchEvidencePacketSourceV0_1[] = [];
 
   for (const source of reviewPacket.sources) {
-    if (!sourceFactsAreUsableV0_1(source)) {
+    const normalizedSourceKey = normalizeTextV0_1(source.sourceKey);
+    const verifiedCandidate = normalizedSourceKey
+      ? verifiedCandidatesBySourceKey.get(normalizedSourceKey)
+      : undefined;
+
+    if (
+      !sourceFactsAreUsableV0_1(source) ||
+      !verifiedCandidate ||
+      !sourceFactsMatchCandidateV0_1(source, verifiedCandidate)
+    ) {
       reasonCodes.add("REVIEW_PACKET_INVALID");
       continue;
     }
 
-    if (source.sourceReviewDecision === "pending") {
-      reasonCodes.add("SOURCE_REVIEW_REQUIRED");
-    } else if (source.sourceReviewDecision === "rejected") {
-      reasonCodes.add("SOURCE_REJECTED");
+    if (source.sourceReviewDecision !== "accepted") {
+      reasonCodes.add(
+        source.sourceReviewDecision === "rejected"
+          ? "SOURCE_REJECTED"
+          : "SOURCE_REVIEW_REQUIRED",
+      );
     }
 
     if (
@@ -257,11 +333,15 @@ export function finalizeOpenInstrumentSourceReviewPacketV0_1(
       !acceptedFieldV0_1(source.proposedRelationOperationIds)
     ) {
       reasonCodes.add("EMBRYO_REVIEW_REQUIRED");
-    } else if (!relationConfigurationIsValidV0_1(source)) {
+    } else if (
+      !relationConfigurationIsValidV0_1(source, verifiedCandidate.form)
+    ) {
       reasonCodes.add("REVIEW_PACKET_INVALID");
     }
 
-    const provenanceGroupId = normalizeTextV0_1(source.citation?.provenanceGroupId);
+    const provenanceGroupId = normalizeTextV0_1(
+      verifiedCandidate.citation?.provenanceGroupId,
+    );
     if (!provenanceGroupId) {
       reasonCodes.add("REVIEW_PACKET_INVALID");
     } else if (provenanceGroupIds.has(provenanceGroupId)) {
@@ -271,15 +351,15 @@ export function finalizeOpenInstrumentSourceReviewPacketV0_1(
     }
 
     packetSources.push({
-      sourceKey: source.sourceKey,
+      sourceKey: verifiedCandidate.sourceKey,
       embryo: source.proposedEmbryo.value ?? "",
-      evidenceFamily: source.evidenceFamily ?? "other",
-      language: source.language ?? "",
-      form: source.form ?? "",
-      gloss: source.gloss ?? "",
+      evidenceFamily: verifiedCandidate.evidenceFamily ?? "other",
+      language: verifiedCandidate.language ?? "",
+      form: verifiedCandidate.form ?? "",
+      gloss: verifiedCandidate.gloss ?? "",
       embryoRelation: source.proposedEmbryoRelation.value ?? "exact_form",
       relationOperationIds: source.proposedRelationOperationIds.value ?? [],
-      citation: source.citation!,
+      citation: verifiedCandidate.citation!,
     });
   }
 
