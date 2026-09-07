@@ -62,8 +62,8 @@ The existing `sterile` control remains a positive structural family with `ER` as
 | 5. End-to-end functional discovery | DONE |
 | 6. Generalization / anti-hardcode proof | DONE |
 | 7. Negative / adversarial controls | DONE |
-| 8. Live product proof | NEXT |
-| 9. Milestone closeout | NOT_STARTED |
+| 8. Live product proof | DONE |
+| 9. Milestone closeout | NEXT |
 
 ## 5. Exit criteria
 
@@ -193,11 +193,25 @@ Validation:
 - 60 tests passed;
 - opening, held-out, Unicode, minimum-anchor, verifier, precedence, and no-single-winner controls passed.
 
-## 14. Initial next task
+## 14. Lane 8 closeout: live product proof
 
-**Lane 8 — Live product proof.**
+The implementation branch passed the repository validation required before review:
 
-Run the repository’s actual focused gate, integration path, production build, live smoke, direct API proof, and normal `/chat` proof from the implementation branch. Do not claim product completion from unit tests alone.
+- `npm run gate:quick`: PASS; lint completed successfully;
+- standalone `npm run build`: PASS; TypeScript completed and all application routes generated;
+- `npm run test:integration`: PASS; 2 suites and 5 tests passed;
+- `npm run open-instrument:live-smoke`: PASS; production rebuild and the live Open Instrument smoke profile completed successfully;
+- direct API proof: label-only `candle` request returns `candidate_only` with `user_sense_a_wax_light_source`;
+- normal product-surface proof: the API result was adapted through the telemetry VM and rendered by `CandidatesAccordion`;
+- `/chat` request proof: the composer sends the explicit label without requiring an internal ID.
+
+No catalog data or production evidence rows were added. The new result remains logic-derived, hypothesis-level, and user-decided.
+
+## 15. Initial next task
+
+**Lane 9 — Milestone closeout.**
+
+Push the implementation branch, open the bounded PR, complete independent review/CI, merge only the exact green head, synchronize local `main`, perform post-merge proof, close this document with the real merge SHA, and update the authorized DF_BRAIN log/project records.
 
 ## 11. Opening proof
 
