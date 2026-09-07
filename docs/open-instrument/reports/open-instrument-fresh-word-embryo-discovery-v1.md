@@ -2,7 +2,7 @@
 
 **Milestone ID:** `OPEN_INSTRUMENT_FRESH_WORD_EMBRYO_DISCOVERY_V1`
 
-**Status:** `ACTIVE`
+**Status:** `DONE`
 
 **Opened:** 2026-09-08
 
@@ -63,7 +63,7 @@ The existing `sterile` control remains a positive structural family with `ER` as
 | 6. Generalization / anti-hardcode proof | DONE |
 | 7. Negative / adversarial controls | DONE |
 | 8. Live product proof | DONE |
-| 9. Milestone closeout | NEXT |
+| 9. Milestone closeout | DONE |
 
 ## 5. Exit criteria
 
@@ -207,11 +207,36 @@ The implementation branch passed the repository validation required before revie
 
 No catalog data or production evidence rows were added. The new result remains logic-derived, hypothesis-level, and user-decided.
 
-## 15. Initial next task
+## 15. Lane 9 closeout: merged milestone proof
 
-**Lane 9 — Milestone closeout.**
+Implementation PR #1849 was opened from `186f5553de0fd1a07b76ab81b285029eae23e7f9`, passed all required CI checks, and was squash-merged with confirmed merge commit `3fd84dd63ac7550130cc8976d4a3a120b52fee18`. No independent reviewer was available; the authorized campaign review-waiver procedure was used after exact-head diff inspection and green CI.
 
-Push the implementation branch, open the bounded PR, complete independent review/CI, merge only the exact green head, synchronize local `main`, perform post-merge proof, close this document with the real merge SHA, and update the authorized DF_BRAIN log/project records.
+Post-merge proof:
+
+- repository: `sokolgora-sketch/linguistic-decoder`;
+- branch: `main`;
+- `HEAD=origin/main=3fd84dd63ac7550130cc8976d4a3a120b52fee18`;
+- divergence: `0 behind / 0 ahead`;
+- worktree: clean;
+- protected JO stash object and marker unchanged;
+- merged-tree focused proof: 4 suites passed, 20 tests passed;
+- `git diff --check`: PASS.
+
+Final capability result:
+
+- opening set: `candle` is `candidate_only` with `AN -> CAN -> CANDLE`; the other 7 opening words remain valid Null;
+- held-out set: `bistro`, `contra`, and `mantra` survive the same generic family; 7 held-out controls remain Null;
+- explicit user target sense is accepted through `/chat` without requiring an internal ID;
+- logic-derived output remains hypothesis-level, candidate-only, non-winning, non-historical, non-superiority, non-candidate-truth, and user-decided;
+- no catalog rows, reviewed evidence, historical origin, or candidate truth were added.
+
+`OPEN_INSTRUMENT_FRESH_WORD_EMBRYO_DISCOVERY_V1_CLOSED_2026-09-08`
+
+## 16. Initial next task
+
+**Milestone closed.**
+
+Update the authorized DF_BRAIN log and project record with this confirmed merge and capability boundary. Do not add evidence rows or reopen the prior logic-first milestone.
 
 ## 11. Opening proof
 
