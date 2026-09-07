@@ -61,8 +61,8 @@ The existing `sterile` control remains a positive structural family with `ER` as
 | 4. Explicit target-sense product path | DONE |
 | 5. End-to-end functional discovery | DONE |
 | 6. Generalization / anti-hardcode proof | DONE |
-| 7. Negative / adversarial controls | NEXT |
-| 8. Live product proof | NOT_STARTED |
+| 7. Negative / adversarial controls | DONE |
+| 8. Live product proof | NEXT |
 | 9. Milestone closeout | NOT_STARTED |
 
 ## 5. Exit criteria
@@ -181,11 +181,23 @@ Validation:
 - opening distribution remains 1 positive and 7 Null;
 - held-out distribution is 3 positive and 7 Null.
 
-## 13. Initial next task
+## 13. Lane 7 closeout: negative and adversarial controls
 
-**Lane 7 — Negative and adversarial controls.**
+Existing and milestone-focused controls remain green without weakening the grammar. Unsupported Unicode input fails closed rather than being transliterated, punctuation does not create unsupported lexical equivalence, weak one-step terminals remain rejected, `terror` and `sister` do not leak `ER`, malformed verifier values reject, unauthorized operation IDs reject, and repeated verification does not mutate hypotheses.
 
-Exercise malformed and near-miss inputs, duplicate/competing structural paths, unsupported symbols, minimum-size boundaries, and explicit no-single-winner behavior. Preserve fail-closed discovery and all existing claim boundaries.
+The control set also preserves the claim boundary: structural and logic-derived outputs remain non-winning, non-historical, non-superiority, non-candidate-truth, and user-decided. Stronger reviewed/research evidence continues to own aggregate status.
+
+Validation:
+
+- 5 suites passed;
+- 60 tests passed;
+- opening, held-out, Unicode, minimum-anchor, verifier, precedence, and no-single-winner controls passed.
+
+## 14. Initial next task
+
+**Lane 8 — Live product proof.**
+
+Run the repository’s actual focused gate, integration path, production build, live smoke, direct API proof, and normal `/chat` proof from the implementation branch. Do not claim product completion from unit tests alone.
 
 ## 11. Opening proof
 
