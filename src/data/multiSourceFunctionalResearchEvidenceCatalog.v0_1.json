@@ -1160,6 +1160,211 @@
       "languageSuperiorityClaim": "not_claimed",
       "candidateTruthClaim": "not_claimed",
       "userDecisionPosture": "user_decides"
+    },
+    {
+      "registryVersion": "open-instrument.multi-source-functional-research-evidence-registry.v0_1",
+      "researchEvidenceId": "research.external.latin-caelum-sky.scale50.v0_1",
+      "embryo": "CAELUM",
+      "evidenceFamily": "historical_dictionary",
+      "language": "Latin",
+      "form": "caelum",
+      "gloss": "sky; heaven; vault of heaven",
+      "embryoRelation": "exact_form",
+      "relationOperationIds": [],
+      "attestationTruth": "fact",
+      "sourceStatus": "research_candidate",
+      "citations": [
+        {
+          "citationId": "research.external.lewis-short-caelum-sky.scale50.citation.v0_1",
+          "sourceTitle": "Lewis and Short Latin Dictionary — caelum",
+          "sourceAuthorOrEditor": null,
+          "sourcePublisherOrHost": "Scaife ATLAS / Perseus Digital Library",
+          "sourceDateOrVersion": "Scaife ATLAS entry accessed 2026-09-07",
+          "sourceUrlOrArchiveRef": "https://atlas.perseus.tufts.edu/dictionaries/entry/urn%3Acite2%3Ascaife-viewer%3Adictionary-entries.atlas_v1%3Alat.ls.perseus-eng2-n6042/",
+          "entryLocator": "caelum, main dictionary entry",
+          "sourceHashOrArchiveHash": null,
+          "attestedForm": "caelum",
+          "attestedGloss": "the sky, heaven, the heavens, the vault of heaven"
+        }
+      ],
+      "functionalHypotheses": [
+        {
+          "targetWord": "sky",
+          "semanticBridge": "Latin caelum independently denotes the sky or heavens and can serve as a second-language functional witness for the SKY concept. This corroborates concept-level research only; it does not assert historical origin, transmission, ownership, or winner status",
+          "functionalBridgeTruth": "hypothesis",
+          "claimBoundary": "functional_hypothesis_only"
+        }
+      ],
+      "historicalOriginClaim": "not_claimed",
+      "historicalTransmissionClaim": "not_claimed",
+      "winnerClaim": "not_claimed",
+      "languageSuperiorityClaim": "not_claimed",
+      "candidateTruthClaim": "not_claimed",
+      "userDecisionPosture": "user_decides"
+    },
+    {
+      "registryVersion": "open-instrument.multi-source-functional-research-evidence-registry.v0_1",
+      "researchEvidenceId": "research.external.latin-cor-heart.scale50.v0_1",
+      "embryo": "COR",
+      "evidenceFamily": "historical_dictionary",
+      "language": "Latin",
+      "form": "cor",
+      "gloss": "heart; organ associated with circulation and life",
+      "embryoRelation": "exact_form",
+      "relationOperationIds": [],
+      "attestationTruth": "fact",
+      "sourceStatus": "research_candidate",
+      "citations": [
+        {
+          "citationId": "research.external.lewis-short-cor-heart.scale50.citation.v0_1",
+          "sourceTitle": "Lewis and Short Latin Dictionary — cor",
+          "sourceAuthorOrEditor": null,
+          "sourcePublisherOrHost": "Scaife ATLAS / Perseus Digital Library",
+          "sourceDateOrVersion": "Scaife ATLAS entry accessed 2026-09-07",
+          "sourceUrlOrArchiveRef": "https://atlas.perseus.tufts.edu/dictionaries/entry/urn%3Acite2%3Ascaife-viewer%3Adictionary-entries.atlas_v1%3Alat.ls.perseus-eng2-n11124/",
+          "entryLocator": "cor, main dictionary entry",
+          "sourceHashOrArchiveHash": null,
+          "attestedForm": "cor",
+          "attestedGloss": "the heart; chief source of circulation and life"
+        }
+      ],
+      "functionalHypotheses": [
+        {
+          "targetWord": "heart",
+          "semanticBridge": "Latin cor independently denotes the heart and can serve as a second-language functional witness for the HEART concept. This remains research-only and makes no historical-origin, transmission, ownership, or winner claim",
+          "functionalBridgeTruth": "hypothesis",
+          "claimBoundary": "functional_hypothesis_only"
+        }
+      ],
+      "historicalOriginClaim": "not_claimed",
+      "historicalTransmissionClaim": "not_claimed",
+      "winnerClaim": "not_claimed",
+      "languageSuperiorityClaim": "not_claimed",
+      "candidateTruthClaim": "not_claimed",
+      "userDecisionPosture": "user_decides"
+    },
+    {
+      "registryVersion": "open-instrument.multi-source-functional-research-evidence-registry.v0_1",
+      "researchEvidenceId": "research.external.latin-edo-eat.scale50.v0_1",
+      "embryo": "EDO",
+      "evidenceFamily": "historical_dictionary",
+      "language": "Latin",
+      "form": "edo",
+      "gloss": "to eat",
+      "embryoRelation": "exact_form",
+      "relationOperationIds": [],
+      "attestationTruth": "fact",
+      "sourceStatus": "research_candidate",
+      "citations": [
+        {
+          "citationId": "research.external.lewis-short-edo-eat.scale50.citation.v0_1",
+          "sourceTitle": "Lewis and Short Latin Dictionary — edo",
+          "sourceAuthorOrEditor": null,
+          "sourcePublisherOrHost": "Scaife ATLAS / Perseus Digital Library",
+          "sourceDateOrVersion": "Scaife ATLAS entry accessed 2026-09-07",
+          "sourceUrlOrArchiveRef": "https://atlas.perseus.tufts.edu/dictionaries/entry/urn%3Acite2%3Ascaife-viewer%3Adictionary-entries.atlas_v1%3Alat.ls.perseus-eng2-n15156/",
+          "entryLocator": "edo, normalized/stripped headword; main verbal entry",
+          "sourceHashOrArchiveHash": null,
+          "attestedForm": "edo",
+          "attestedGloss": "to eat"
+        }
+      ],
+      "functionalHypotheses": [
+        {
+          "targetWord": "eat",
+          "semanticBridge": "Latin edo independently denotes the act of eating and can serve as a second-language functional witness for the EAT concept. This remains research-only and does not assert historical origin, transmission, ownership, or winner status",
+          "functionalBridgeTruth": "hypothesis",
+          "claimBoundary": "functional_hypothesis_only"
+        }
+      ],
+      "historicalOriginClaim": "not_claimed",
+      "historicalTransmissionClaim": "not_claimed",
+      "winnerClaim": "not_claimed",
+      "languageSuperiorityClaim": "not_claimed",
+      "candidateTruthClaim": "not_claimed",
+      "userDecisionPosture": "user_decides"
+    },
+    {
+      "registryVersion": "open-instrument.multi-source-functional-research-evidence-registry.v0_1",
+      "researchEvidenceId": "research.external.latin-mens-mind.scale50.v0_1",
+      "embryo": "MENS",
+      "evidenceFamily": "historical_dictionary",
+      "language": "Latin",
+      "form": "mens",
+      "gloss": "mind; understanding; intellect; reason; judgment",
+      "embryoRelation": "exact_form",
+      "relationOperationIds": [],
+      "attestationTruth": "fact",
+      "sourceStatus": "research_candidate",
+      "citations": [
+        {
+          "citationId": "research.external.lewis-short-mens-mind.scale50.citation.v0_1",
+          "sourceTitle": "Lewis and Short Latin Dictionary — mens",
+          "sourceAuthorOrEditor": null,
+          "sourcePublisherOrHost": "Scaife ATLAS / Perseus Digital Library",
+          "sourceDateOrVersion": "Scaife ATLAS entry accessed 2026-09-07",
+          "sourceUrlOrArchiveRef": "https://atlas.perseus.tufts.edu/dictionaries/entry/urn%3Acite2%3Ascaife-viewer%3Adictionary-entries.atlas_v1%3Alat.ls.perseus-eng2-n28694/",
+          "entryLocator": "mens, main dictionary entry",
+          "sourceHashOrArchiveHash": null,
+          "attestedForm": "mens",
+          "attestedGloss": "mind; understanding, intellect, reason, judgment and related faculties"
+        }
+      ],
+      "functionalHypotheses": [
+        {
+          "targetWord": "mind",
+          "semanticBridge": "Latin mens independently denotes the mind and intellectual faculties and can serve as a second-language functional witness for the MIND concept. This remains research-only and does not assert historical origin, transmission, ownership, or winner status",
+          "functionalBridgeTruth": "hypothesis",
+          "claimBoundary": "functional_hypothesis_only"
+        }
+      ],
+      "historicalOriginClaim": "not_claimed",
+      "historicalTransmissionClaim": "not_claimed",
+      "winnerClaim": "not_claimed",
+      "languageSuperiorityClaim": "not_claimed",
+      "candidateTruthClaim": "not_claimed",
+      "userDecisionPosture": "user_decides"
+    },
+    {
+      "registryVersion": "open-instrument.multi-source-functional-research-evidence-registry.v0_1",
+      "researchEvidenceId": "research.external.latin-belligero-war.scale50.v0_1",
+      "embryo": "BELLIGERO",
+      "evidenceFamily": "historical_dictionary",
+      "language": "Latin",
+      "form": "belligero",
+      "gloss": "to wage or carry on war; to fight",
+      "embryoRelation": "exact_form",
+      "relationOperationIds": [],
+      "attestationTruth": "fact",
+      "sourceStatus": "research_candidate",
+      "citations": [
+        {
+          "citationId": "research.external.lewis-short-belligero-war.scale50.citation.v0_1",
+          "sourceTitle": "Lewis and Short Latin Dictionary — belligero",
+          "sourceAuthorOrEditor": null,
+          "sourcePublisherOrHost": "Scaife ATLAS / Perseus Digital Library",
+          "sourceDateOrVersion": "Scaife ATLAS entry accessed 2026-09-07",
+          "sourceUrlOrArchiveRef": "https://atlas.perseus.tufts.edu/dictionaries/entry/urn%3Acite2%3Ascaife-viewer%3Adictionary-entries.atlas_v1%3Alat.ls.perseus-eng2-n5128/",
+          "entryLocator": "belligero, normalized headword; main verbal entry",
+          "sourceHashOrArchiveHash": null,
+          "attestedForm": "belligero",
+          "attestedGloss": "to wage or carry on war; to fight"
+        }
+      ],
+      "functionalHypotheses": [
+        {
+          "targetWord": "war",
+          "semanticBridge": "Latin belligero independently denotes waging or carrying on war and can serve as a second-language functional witness for the WAR concept. The target bridge remains a hypothesis and does not assert historical origin, transmission, ownership, or winner status",
+          "functionalBridgeTruth": "hypothesis",
+          "claimBoundary": "functional_hypothesis_only"
+        }
+      ],
+      "historicalOriginClaim": "not_claimed",
+      "historicalTransmissionClaim": "not_claimed",
+      "winnerClaim": "not_claimed",
+      "languageSuperiorityClaim": "not_claimed",
+      "candidateTruthClaim": "not_claimed",
+      "userDecisionPosture": "user_decides"
     }
   ]
 }
