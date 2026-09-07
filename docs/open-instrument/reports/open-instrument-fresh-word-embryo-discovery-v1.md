@@ -59,9 +59,9 @@ The existing `sterile` control remains a positive structural family with `ER` as
 | 2. Generic structural grammar expansion | DONE |
 | 3. Structural defensibility v0.2 / additive verification | DONE |
 | 4. Explicit target-sense product path | DONE |
-| 5. End-to-end functional discovery | NEXT |
-| 6. Generalization / anti-hardcode proof | NOT_STARTED |
-| 7. Negative / adversarial controls | NOT_STARTED |
+| 5. End-to-end functional discovery | DONE |
+| 6. Generalization / anti-hardcode proof | DONE |
+| 7. Negative / adversarial controls | NEXT |
 | 8. Live product proof | NOT_STARTED |
 | 9. Milestone closeout | NOT_STARTED |
 
@@ -155,11 +155,37 @@ Focused validation:
 - historical origin, historical transmission, winner, language-superiority, candidate-truth, and user-decision boundaries remain unchanged;
 - existing verifier and responsive-shell tests remain green.
 
-## 11. Initial next task
+## 11. Lane 5 closeout: end-to-end functional discovery
 
-**Lane 5 — End-to-end functional discovery.**
+The new structural family now travels through the existing deterministic analysis adapter and public UI model without a parallel product path. A label-only request for `candle` produces a verified logic-derived candidate with the public expansion chain `AN -> CAN -> CANDLE`, `candidate_only` status, and the explicit target-sense label. `CandidatesAccordion` renders it as a logic-derived functional hypothesis with an explicitly hypothesis-level bridge.
 
-Prove the full path from structural discovery through analysis status, public API projection, and the normal `/chat` result surface for the new fresh-word family. Preserve stronger evidence precedence and keep the result explicitly hypothesis-level.
+The existing stronger-evidence `sterile` path remains research-functional-hypothesis precedence, and blank target sense continues to suppress logic-derived output. No catalog, research, or projection contract was changed.
+
+Focused validation:
+
+- direct API, analysis adapter, verifier, UI candidate-model, and candidate-surface coverage passed;
+- the candle label-only request was rendered through `adaptAnalysisToTelemetryVM`, `buildCandidateRowsFromVM`, and `CandidatesAccordion`;
+- the rendered result shows `Target sense: a wax light source`, `AN`, and `Functional bridge: Hypothesis only; no source-backed evidence`.
+
+## 12. Lane 6 closeout: held-out generalization and anti-hardcode proof
+
+A frozen held-out set confirms that the new behavior is generic rather than a `candle` branch. The same bounded operation family produces logic-derived candidates for `bistro -> IS`, `contra -> ON`, and `mantra -> AN`. `electro`, `extra`, `ultra`, `metro`, `intro`, `terror`, and `sister` remain `null_no_supported_candidate` under the same explicit target-sense request.
+
+The held-out test also scans `src/shared/structuralHypothesisDiscovery.v0_1.ts` and rejects target-word literals for the opening and held-out sets. The implementation remains driven by normalized form shape, canonical voice membership, bounded suffix length, existing operation-count, and minimum-anchor gates.
+
+Validation:
+
+- held-out/generalization, UI truth-display, and structural-contract suites passed;
+- 3 suites passed;
+- 17 tests passed;
+- opening distribution remains 1 positive and 7 Null;
+- held-out distribution is 3 positive and 7 Null.
+
+## 13. Initial next task
+
+**Lane 7 — Negative and adversarial controls.**
+
+Exercise malformed and near-miss inputs, duplicate/competing structural paths, unsupported symbols, minimum-size boundaries, and explicit no-single-winner behavior. Preserve fail-closed discovery and all existing claim boundaries.
 
 ## 11. Opening proof
 
