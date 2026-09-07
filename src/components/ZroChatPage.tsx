@@ -92,6 +92,7 @@ function OpenInstrumentEmptyState() {
 export default function ZroChatPage() {
   const [input, setInput] = React.useState('');
   const [ipa, setIpa] = React.useState('');
+  const [targetSense, setTargetSense] = React.useState('');
   const [lastRun, setLastRun] = React.useState<{ word: string; ipa?: string } | null>(null);
   const [busy, setBusy] = React.useState(false);
   const [validation, setValidation] = React.useState<string | null>(null);
@@ -120,9 +121,10 @@ export default function ZroChatPage() {
     if (typeof fn === 'function') fn.call(el, { behavior: 'smooth', block: 'end' });
   }, [messages.length]);
 
-  async function runAnalysis(word: string, ipaRaw?: string) {
+  async function runAnalysis(word: string, ipaRaw?: string, targetSenseRaw?: string) {
     const w = word.trim();
     const ipaTrim = (ipaRaw ?? "").trim();
+    const targetSenseTrim = (targetSenseRaw ?? "").trim();
     const runMeta = { word: w, ipa: ipaTrim || undefined };
     if (!w) {
       setValidation('Type a word before analyzing.');
@@ -141,7 +143,7 @@ export default function ZroChatPage() {
     setBusy(true);
 
     try {
-      const url = `/api/analyze-v1?word=${encodeURIComponent(w)}&mode=strict${ipaTrim ? `&ipa=${encodeURIComponent(ipaTrim)}` : ""}`;
+      const url = `/api/analyze-v1?word=${encodeURIComponent(w)}&mode=strict${ipaTrim ? `&ipa=${encodeURIComponent(ipaTrim)}` : ""}${targetSenseTrim ? `&targetSenseLabel=${encodeURIComponent(targetSenseTrim)}` : ""}`;
       const res = await fetch(url, { method: 'GET' });
       const json: unknown =
         typeof res.json === 'function' ? await res.json() : null;
@@ -227,7 +229,7 @@ export default function ZroChatPage() {
 
   function onSubmit() {
     if (busy) return;
-    void runAnalysis(input, ipa);
+    void runAnalysis(input, ipa, targetSense);
   }
 
   function onKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
@@ -242,7 +244,7 @@ export default function ZroChatPage() {
 
   const composer = (
     <div className="overflow-hidden rounded-[14px] border border-[#2f3742] bg-[#13171d] p-2.5 shadow-[0_16px_40px_rgba(0,0,0,0.24)] sm:p-3">
-      <div className="grid min-w-0 grid-cols-1 gap-3 md:grid-cols-[minmax(0,1fr)_minmax(220px,0.45fr)] xl:grid-cols-[minmax(0,1fr)_minmax(260px,0.42fr)_132px] xl:items-end">
+      <div className="grid min-w-0 grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-[minmax(0,1fr)_minmax(220px,0.45fr)_minmax(260px,0.55fr)_132px] xl:items-end">
         <label className="block min-w-0">
           <span className={`${MT.fieldLabel} mb-2 text-[11px] text-[#8ea4ba]`}>
             Word
@@ -253,6 +255,21 @@ export default function ZroChatPage() {
             onKeyDown={onKeyDown}
             placeholder="gjuha"
             aria-label="Word"
+            disabled={busy}
+            className={inputClassName}
+          />
+        </label>
+
+        <label className="block min-w-0">
+          <span className={`${MT.fieldLabel} mb-2 text-[11px] text-[#8ea4ba]`}>
+            Intended sense
+          </span>
+          <Input
+            value={targetSense}
+            onChange={e => setTargetSense(e.target.value)}
+            onKeyDown={onKeyDown}
+            placeholder="optional e.g. wax light source"
+            aria-label="Intended sense"
             disabled={busy}
             className={inputClassName}
           />

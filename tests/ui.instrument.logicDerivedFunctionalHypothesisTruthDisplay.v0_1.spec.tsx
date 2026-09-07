@@ -33,4 +33,25 @@ describe("logic-derived functional hypothesis UI boundary v0.1", () => {
       ),
     ).toHaveLength(2);
   });
+
+  it("renders the fresh candle path from a label-only product request", async () => {
+    const response = await GET(
+      new Request(
+        "http://localhost/api/analyze-v1?word=candle&mode=strict&targetSenseLabel=a%20wax%20light%20source",
+      ),
+    );
+
+    const body = await response.json();
+    const vm = adaptAnalysisToTelemetryVM(body);
+    const rows = buildCandidateRowsFromVM(vm);
+
+    render(<CandidatesAccordion rows={rows} />);
+
+    expect(screen.getByText("Logic-derived functional hypothesis")).toBeInTheDocument();
+    expect(screen.getByText("Target sense: a wax light source")).toBeInTheDocument();
+    expect(
+      screen.getByText("Functional bridge: Hypothesis only; no source-backed evidence"),
+    ).toBeInTheDocument();
+    expect(screen.getByText("AN")).toBeInTheDocument();
+  });
 });

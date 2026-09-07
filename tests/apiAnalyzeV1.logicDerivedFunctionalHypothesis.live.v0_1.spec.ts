@@ -59,4 +59,30 @@ describe("/api/analyze-v1 logic-derived functional hypothesis v0.1", () => {
       ),
     ).toBe(false);
   });
+
+  it("derives an opaque sense id from a label-only request", async () => {
+    const body = await analyze(
+      "candle",
+      "&targetSenseLabel=a%20wax%20light%20source",
+    );
+
+    const logicCandidate = (body.candidates ?? []).find(
+      (candidate: any) =>
+        candidate.sourceKind === "logic_derived_functional_hypothesis",
+    );
+
+    expect(body.analysisStatusV0_1.status).toBe("candidate_only");
+    expect(logicCandidate?.targetWord).toBe("candle");
+    expect(logicCandidate?.targetSenseId).toBe("user_sense_a_wax_light_source");
+    expect(logicCandidate?.targetSenseLabel).toBe("a wax light source");
+    expect(logicCandidate?.expansionChain).toEqual([
+      "AN",
+      "CAN",
+      "CANDLE",
+    ]);
+    expect(logicCandidate?.functionalBridgeTruth).toBe("hypothesis");
+    expect(logicCandidate?.historicalOriginClaim).toBe("not_claimed");
+    expect(logicCandidate?.winnerClaim).toBe("not_claimed");
+    expect(logicCandidate?.candidateTruthClaim).toBe("not_claimed");
+  });
 });

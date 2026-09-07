@@ -37,6 +37,7 @@ describe('Analyze keyboard interactions', () => {
     expect(screen.queryByText('No origin proof')).not.toBeInTheDocument();
     expect(screen.getByLabelText('Word')).toBeInTheDocument();
     expect(screen.getByLabelText('IPA')).toBeInTheDocument();
+    expect(screen.getByLabelText('Intended sense')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Analyze' })).toBeInTheDocument();
   });
 
@@ -76,6 +77,26 @@ describe('Analyze keyboard interactions', () => {
     await waitFor(() => {
       expect(countAnalyzeV1Fetches()).toBe(1);
     });
+  });
+
+  it('passes an explicit intended sense label without requiring an internal sense id', async () => {
+    render(<ZroChatPage />);
+    fireEvent.change(screen.getByLabelText('Word'), { target: { value: 'candle' } });
+    fireEvent.change(screen.getByLabelText('Intended sense'), {
+      target: { value: 'a wax light source' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Analyze' }));
+
+    await waitFor(() => {
+      expect(countAnalyzeV1Fetches()).toBe(1);
+    });
+
+    const [request] = (global.fetch as jest.Mock).mock.calls.find(([input]) =>
+      String(input).includes('/api/analyze-v1?'),
+    ) ?? [];
+    const requestUrl = new URL(String(request), 'http://localhost');
+    expect(requestUrl.searchParams.get('targetSenseLabel')).toBe('a wax light source');
+    expect(requestUrl.searchParams.has('targetSenseId')).toBe(false);
   });
 
   it('shows validation on Enter with empty input and does not call fetch', async () => {

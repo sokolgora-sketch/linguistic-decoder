@@ -113,6 +113,7 @@ export function verifyLogicDerivedFunctionalHypothesisV0_1(
     : null;
   const authorizedOperationIds = new Set([
     "peel_right_vowel_led_expansion",
+    "peel_right_consonant_led_expansion",
     "peel_left_consonant_frame",
   ]);
   const structuralAnchorValid = Boolean(

@@ -252,6 +252,37 @@ describe(
     );
 
     it(
+      "supports bounded consonant-led right-edge families without relaxing the size gate",
+      () => {
+        const expected = [
+          ["candle", "AN"],
+        ] as const;
+
+        for (const [word, embryo] of expected) {
+          const hypothesis = findEmbryo(word, embryo);
+
+          expect(hypothesis).toBeDefined();
+          expect(hypothesis?.embryoSize).toBe(2);
+          expect(hypothesis?.reductionSteps[0]).toEqual(
+            expect.objectContaining({
+              operationId:
+                "peel_right_consonant_led_expansion",
+            }),
+          );
+          expect(hypothesis?.reductionSteps.length).toBeGreaterThanOrEqual(2);
+        }
+
+        expect(findEmbryo("staircase", "AI")).toBeUndefined();
+        expect(findEmbryo("orchard", "OR")).toBeUndefined();
+        expect(findEmbryo("tunnel", "UN")).toBeUndefined();
+        expect(findEmbryo("ribbon", "IB")).toBeUndefined();
+        expect(findEmbryo("helmet", "EL")).toBeUndefined();
+        expect(findEmbryo("pocket", "OC")).toBeUndefined();
+        expect(findEmbryo("chimney", "HI")).toBeUndefined();
+      },
+    );
+
+    it(
       "does not delete final R from ERROR merely to manufacture ER",
       () => {
         expect(

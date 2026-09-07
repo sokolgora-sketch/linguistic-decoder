@@ -1,3 +1,5 @@
+import fs from "node:fs";
+
 import { GET } from "../app/api/analyze-v1/route";
 
 const FRESH_WORDS = [
@@ -95,5 +97,42 @@ describe("logic-first fresh-word generalization v0.1", () => {
           candidate.winnerClaim === "not_claimed",
       ),
     ).toBe(true);
+  });
+
+  it("generalizes the bounded family to held-out words without target-word branches", async () => {
+    const heldOutPositive = ["bistro", "contra", "mantra"] as const;
+    const heldOutNull = ["electro", "extra", "ultra", "metro", "intro", "terror", "sister"] as const;
+
+    for (const word of heldOutPositive) {
+      const body = await analyze(word, true);
+      const logicCandidate = (body.candidates ?? []).find(
+        (candidate: any) =>
+          candidate.sourceKind === "logic_derived_functional_hypothesis",
+      );
+
+      expect(body.analysisStatusV0_1?.status).toBe("candidate_only");
+      expect(logicCandidate?.targetWord).toBe(word);
+      expect(logicCandidate?.functionalBridgeTruth).toBe("hypothesis");
+      expect(logicCandidate?.expansionChain?.at(-1)).toBe(word.toUpperCase());
+    }
+
+    for (const word of heldOutNull) {
+      const body = await analyze(word, true);
+      expect(body.analysisStatusV0_1?.status).toBe("null_no_supported_candidate");
+      expect(
+        (body.candidates ?? []).some(
+          (candidate: any) =>
+            candidate.sourceKind === "logic_derived_functional_hypothesis",
+        ),
+      ).toBe(false);
+    }
+
+    const source = fs.readFileSync(
+      "src/shared/structuralHypothesisDiscovery.v0_1.ts",
+      "utf8",
+    );
+    expect(source).not.toMatch(
+      /\b(?:candle|bistro|contra|mantra|electro|extra|ultra|metro|intro|terror|sister)\b/i,
+    );
   });
 });
