@@ -1,0 +1,20 @@
+{
+  "snapshotVersion": "open-instrument.offline-source-entry-snapshot.v0_1",
+  "sourceTraditionId": "fjale.fjalor-shqip.v0_1",
+  "sourceSnapshotId": "fjale-art-reviewed-2026-09-07",
+  "sourceDateOrVersion": "accessed 2026-09-07",
+  "sourceUrlOrArchiveRef": "https://fjale.al/art",
+  "entry": {
+    "headword": "art",
+    "locator": "art m.; sense 1",
+    "attestedForms": [
+      "art"
+    ],
+    "senses": [
+      {
+        "label": "sense 1",
+        "text": "Formë e pasqyrimit të botës nëpërmjet riprodhimit të realitetit në mënyrë krijuese me anë figurash artistike; veprimtaria krijuese artistike."
+      }
+    ]
+  }
+}

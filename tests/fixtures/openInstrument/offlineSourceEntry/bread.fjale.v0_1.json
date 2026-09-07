@@ -1,0 +1,18 @@
+{
+  "snapshotVersion": "open-instrument.offline-source-entry-snapshot.v0_1",
+  "sourceTraditionId": "fjale.fjalor-shqip.v0_1",
+  "sourceSnapshotId": "fjale-buke-reviewed-2026-09-07",
+  "sourceDateOrVersion": "accessed 2026-09-07",
+  "sourceUrlOrArchiveRef": "https://fjale.al/buk%C3%AB",
+  "entry": {
+    "headword": "bukë",
+    "locator": "bukë f.; sense 1",
+    "attestedForms": ["bukë"],
+    "senses": [
+      {
+        "label": "sense 1",
+        "text": "Ushqim që bëhet me miell drithi të gatuar me ujë e të pjekur në furrë a në saç; një copë e veçantë e këtij ushqimi, e gatuar me forma të ndryshme dhe e pjekur."
+      }
+    ]
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "snapshotVersion": "open-instrument.offline-source-entry-snapshot.v0_1",
+  "sourceTraditionId": "fjale.fjalor-shqip.v0_1",
+  "sourceSnapshotId": "fjale-det-reviewed-2026-09-07",
+  "sourceDateOrVersion": "accessed 2026-09-07",
+  "sourceUrlOrArchiveRef": "https://fjale.al/det",
+  "entry": {
+    "headword": "det",
+    "locator": "det m.; sense 1",
+    "attestedForms": ["det"],
+    "senses": [
+      {
+        "label": "sense 1",
+        "text": "Hapësirë shumë e madhe me ujë të kripur, që zakonisht është e rrethuar me tokë jo nga të gjitha anët dhe që qëndron disi e veçuar; pjesa më e madhe e rruzullit tokësor, e mbuluar me ujë të kripur."
+      }
+    ]
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "packetVersion": "open-instrument.research-evidence-packet.v0_1",
+  "packetId": "art.creative_artistic_activity.v0_1",
+  "targetWord": "art",
+  "targetSenseId": "creative_artistic_activity",
+  "semanticBridge": "The source entries attest lexical forms for the bounded creative-artistic activity sense; treating that shared functional referent as a ZË-RO bridge remains a research hypothesis only.",
+  "sources": [
+    {
+      "sourceKey": "verified-source:capture.fjale-fjalor-shqip-v0-1.art-m-sense-1.art.v0_1",
+      "embryo": "art",
+      "evidenceFamily": "lexical_dictionary",
+      "language": "Albanian",
+      "form": "art",
+      "gloss": "Formë e pasqyrimit të botës nëpërmjet riprodhimit të realitetit në mënyrë krijuese me anë figurash artistike; veprimtaria krijuese artistike.",
+      "embryoRelation": "exact_form",
+      "relationOperationIds": [],
+      "citation": {
+        "citationId": "open-instrument.source-record.capture.fjale-fjalor-shqip-v0-1.art-m-sense-1.art.v0_1.citation.v0_1",
+        "sourceTitle": "FJALË — Fjalor Shqip",
+        "sourceAuthorOrEditor": null,
+        "sourcePublisherOrHost": "FJALË — Fjalor Shqip",
+        "sourceDateOrVersion": "accessed 2026-09-07",
+        "sourceUrlOrArchiveRef": "https://fjale.al/art",
+        "entryLocator": "art m.; sense 1",
+        "sourceHashOrArchiveHash": null,
+        "attestedForm": "art",
+        "attestedGloss": "Formë e pasqyrimit të botës nëpërmjet riprodhimit të realitetit në mënyrë krijuese me anë figurash artistike; veprimtaria krijuese artistike.",
+        "provenanceGroupId": "fjale.fjalor-shqip.v0_1"
+      }
+    },
+    {
+      "sourceKey": "verified-source:capture.scaife-lewis-short-v0-1.headword-ars-art-sense-entry-text-beginning-skill-in-producing-any-material-form.ars.v0_1",
+      "embryo": "ars",
+      "evidenceFamily": "historical_dictionary",
+      "language": "Latin",
+      "form": "ars",
+      "gloss": "the knowledge, art, skill, workmanship",
+      "embryoRelation": "exact_form",
+      "relationOperationIds": [],
+      "citation": {
+        "citationId": "open-instrument.source-record.capture.scaife-lewis-short-v0-1.headword-ars-art-sense-entry-text-beginning-skill-in-producing-any-material-form.ars.v0_1.citation.v0_1",
+        "sourceTitle": "Lewis & Short Latin Dictionary",
+        "sourceAuthorOrEditor": "Charlton T. Lewis and Charles Short",
+        "sourcePublisherOrHost": "Scaife ATLAS / Perseus Digital Library",
+        "sourceDateOrVersion": "Lewis & Short; accessed 2026-09-07",
+        "sourceUrlOrArchiveRef": "https://atlas.perseus.tufts.edu/dictionaries/entry/urn%3Acite2%3Ascaife-viewer%3Adictionary-entries.atlas_v1%3Alat.ls.perseus-eng2-n3769/",
+        "entryLocator": "headword ars; art sense; entry text beginning skill in producing any material form.",
+        "sourceHashOrArchiveHash": null,
+        "attestedForm": "ars",
+        "attestedGloss": "the knowledge, art, skill, workmanship",
+        "provenanceGroupId": "scaife.lewis-short.v0_1"
+      }
+    }
+  ]
+}

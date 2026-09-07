@@ -1,0 +1,17 @@
+{
+  "snapshotVersion": "open-instrument.offline-source-entry-snapshot.v0_1",
+  "sourceTraditionId": "fjale.fjalor-shqip.v0_1",
+  "sourceSnapshotId": "fjale-bore-reviewed-2026-09-07",
+  "sourceUrlOrArchiveRef": "https://fjale.al/bor%C3%AB",
+  "entry": {
+    "headword": "borë",
+    "locator": "borë f.kryes.nj.sh.; sense 1",
+    "attestedForms": ["borë"],
+    "senses": [
+      {
+        "label": "sense 1",
+        "text": "Reshje atmosferike, që bie nga retë flokë-flokë në trajtë kristalesh të bardha; shtresa e bardhë e këtyre flokëve, që mbulojnë vendin aty ku bien; dëborë."
+      }
+    ]
+  }
+}

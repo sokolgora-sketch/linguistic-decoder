@@ -51,6 +51,12 @@ export type MultiSourceFunctionalResearchCitationV0_1 = {
 
   attestedForm: string;
   attestedGloss: string;
+
+  /**
+   * Shared identifier for the underlying editorial/source provenance.
+   * This is not a language, host, or evidence-family identifier.
+   */
+  provenanceGroupId?: string;
 };
 
 export type MultiSourceFunctionalResearchHypothesisV0_1 = {
@@ -59,6 +65,12 @@ export type MultiSourceFunctionalResearchHypothesisV0_1 = {
   semanticBridge: string | null;
   functionalBridgeTruth:
     MultiSourceTruthStatusV0_1;
+
+  /**
+   * Opaque target/sense discriminator used by bounded research policies.
+   * This does not assert semantic truth or ontology membership.
+   */
+  targetSenseId?: string;
 
   claimBoundary:
     "functional_hypothesis_only";

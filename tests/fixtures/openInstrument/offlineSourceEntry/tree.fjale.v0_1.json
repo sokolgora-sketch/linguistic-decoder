@@ -1,0 +1,17 @@
+{
+  "snapshotVersion": "open-instrument.offline-source-entry-snapshot.v0_1",
+  "sourceTraditionId": "fjale.fjalor-shqip.v0_1",
+  "sourceSnapshotId": "fjale-peme-reviewed-2026-09-07",
+  "sourceUrlOrArchiveRef": "https://fjale.al/pem%C3%AB",
+  "entry": {
+    "headword": "PEMË",
+    "locator": "PEMË f.; sense 2",
+    "attestedForms": ["pemë"],
+    "senses": [
+      {
+        "label": "sense 2",
+        "text": "Dru me trung dhe me shumë degë të cilat formojnë një si kurorë; fryti i këtij druri."
+      }
+    ]
+  }
+}

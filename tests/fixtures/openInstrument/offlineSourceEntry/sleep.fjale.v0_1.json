@@ -1,0 +1,18 @@
+{
+  "snapshotVersion": "open-instrument.offline-source-entry-snapshot.v0_1",
+  "sourceTraditionId": "fjale.fjalor-shqip.v0_1",
+  "sourceSnapshotId": "fjale-gjume-reviewed-2026-09-07",
+  "sourceDateOrVersion": "accessed 2026-09-07",
+  "sourceUrlOrArchiveRef": "https://fjale.al/gjum%C3%AB",
+  "entry": {
+    "headword": "gjumë",
+    "locator": "gjumë m.; sense 1",
+    "attestedForms": ["gjumë"],
+    "senses": [
+      {
+        "label": "sense 1",
+        "text": "Gjendje e njeriut që fle, kur pushon trupi, ndërpritet pjesërisht ose plotësisht veprimtaria e vetëdijes dhe dobësohen disa procese fiziologjike; nevoja, dëshira ose mundësia për të fjetur."
+      }
+    ]
+  }
+}

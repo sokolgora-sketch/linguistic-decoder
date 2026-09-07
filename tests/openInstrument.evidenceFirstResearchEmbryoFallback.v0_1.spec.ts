@@ -199,7 +199,7 @@ describe(
     );
 
     it(
-      "preserves HOPE as Null when neither structural nor source-backed research is available",
+      "admits source-backed HOPE research without promoting semantic truth",
       async () => {
         const body =
           await analyze(
@@ -216,19 +216,22 @@ describe(
           researchCandidates(
             body,
           ),
-        ).toEqual([]);
+        ).toHaveLength(2);
 
         expect(
           body.analysisStatusV0_1
             .status,
         ).toBe(
-          "null_no_supported_candidate",
+          "research_functional_hypothesis",
         );
 
         expect(
           body.analysisStatusV0_1
             .researchHypothesisEmbryos,
-        ).toEqual([]);
+        ).toEqual([
+          "shpresë",
+          "spēs",
+        ]);
 
         expect(
           body.analysisStatusV0_1
@@ -244,6 +247,67 @@ describe(
           body.analysisStatusV0_1
             .structuralTokens,
         ).toEqual([]);
+
+        for (
+          const candidate
+          of researchCandidates(
+            body,
+          )
+        ) {
+          expect(
+            candidate.targetWord,
+          ).toBe(
+            "hope",
+          );
+
+          expect(
+            candidate.sourceStatus,
+          ).toBe(
+            "research_candidate",
+          );
+
+          expect(
+            candidate.claimBoundary,
+          ).toBe(
+            "research_functional_hypothesis_only",
+          );
+
+          expect(
+            candidate.historicalOriginClaim,
+          ).toBe(
+            "not_claimed",
+          );
+
+          expect(
+            candidate.historicalTransmissionClaim,
+          ).toBe(
+            "not_claimed",
+          );
+
+          expect(
+            candidate.winnerClaim,
+          ).toBe(
+            "not_claimed",
+          );
+
+          expect(
+            candidate.languageSuperiorityClaim,
+          ).toBe(
+            "not_claimed",
+          );
+
+          expect(
+            candidate.candidateTruthClaim,
+          ).toBe(
+            "not_claimed",
+          );
+
+          expect(
+            candidate.userDecisionPosture,
+          ).toBe(
+            "user_decides",
+          );
+        }
       },
     );
 
