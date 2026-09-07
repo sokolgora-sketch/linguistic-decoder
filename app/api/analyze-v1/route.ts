@@ -38,6 +38,16 @@ const BodySchema = z
   })
   .passthrough();
 
+function deriveTargetSenseIdV0_1(label: string): string {
+  const normalized = label.normalize("NFKC").trim().toLocaleLowerCase("en-US");
+  const slug = normalized
+    .replace(/[^\p{L}\p{N}]+/gu, "_")
+    .replace(/^_+|_+$/g, "")
+    .slice(0, 80);
+
+  return slug ? `user_sense_${slug}` : "";
+}
+
 function applyDevOriginClaimGates(reqUrl?: string): boolean | null {
   if (process.env.NODE_ENV === "production") return null;
   if (!reqUrl) return null;
@@ -706,7 +716,7 @@ export async function POST(req: Request) {
       ? languageRaw.trim()
       : "";
 
-  const targetSenseId =
+  const targetSenseIdRawTrimmed =
     typeof targetSenseIdRaw === "string"
       ? targetSenseIdRaw.trim()
       : "";
@@ -714,6 +724,8 @@ export async function POST(req: Request) {
     typeof targetSenseLabelRaw === "string"
       ? targetSenseLabelRaw.trim()
       : "";
+  const targetSenseId =
+    targetSenseIdRawTrimmed || deriveTargetSenseIdV0_1(targetSenseLabel);
 
 const modeParsed =
     mode === "strict" || mode === "open" ? (mode as "strict" | "open") : undefined;
@@ -753,6 +765,8 @@ try {
         alphabet: alphabet ?? "auto",
         language:
           language || undefined,
+        targetSenseId: targetSenseId || undefined,
+        targetSenseLabel: targetSenseLabel || undefined,
         brainCandidatesSeedFallback: seedFallbackEnabled,
       };
 
@@ -1045,10 +1059,12 @@ export async function GET(req: Request) {
     const ipa = (url.searchParams.get("ipa") ?? "").trim();
     const language =
       (url.searchParams.get("language") ?? "").trim();
-    const targetSenseId =
+    const targetSenseIdRaw =
       (url.searchParams.get("targetSenseId") ?? "").trim();
     const targetSenseLabel =
       (url.searchParams.get("targetSenseLabel") ?? "").trim();
+    const targetSenseId =
+      targetSenseIdRaw || deriveTargetSenseIdV0_1(targetSenseLabel);
 // Seed fallback flag (BRAIN-0.2)
     const seedFallbackEnabled =
       url.searchParams.get("seed") === "1" ||

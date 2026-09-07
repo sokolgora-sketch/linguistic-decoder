@@ -58,8 +58,8 @@ The existing `sterile` control remains a positive structural family with `ER` as
 | 1. Baseline failure taxonomy | DONE |
 | 2. Generic structural grammar expansion | DONE |
 | 3. Structural defensibility v0.2 / additive verification | DONE |
-| 4. Explicit target-sense product path | NEXT |
-| 5. End-to-end functional discovery | NOT_STARTED |
+| 4. Explicit target-sense product path | DONE |
+| 5. End-to-end functional discovery | NEXT |
 | 6. Generalization / anti-hardcode proof | NOT_STARTED |
 | 7. Negative / adversarial controls | NOT_STARTED |
 | 8. Live product proof | NOT_STARTED |
@@ -140,11 +140,26 @@ Focused validation:
 
 This closes verification for the additive operation. It does not claim that `AN` is a lexical meaning or reviewed evidence.
 
-## 10. Initial next task
+## 10. Lane 4 closeout: explicit target-sense product path
 
-**Lane 4 — Explicit target-sense product path.**
+The normal `/chat` composer now accepts an optional `Intended sense` label. The UI sends the label only; callers do not need to know an internal sense ID. The API derives a deterministic opaque `user_sense_*` identifier from the normalized label when an ID is absent, preserves explicit IDs for existing callers, and continues to omit the logic-derived layer when the label is blank.
 
-Carry an explicit user-provided target-sense label through the normal product request path without requiring the user to know an internal ID. Derive only a deterministic opaque request identifier at the API boundary, preserve blank-sense backward compatibility, and bind the label to the existing logic-derived hypothesis without promoting it to lexical truth.
+The route carries both target-sense fields into the existing analysis adapter for GET and POST requests. No discovery, evidence, catalog, or truth-status rules were changed.
+
+Focused validation:
+
+- 4 suites passed;
+- 24 tests passed;
+- UI request proof confirms the label is sent and an internal ID is not required;
+- direct API proof confirms `candle` produces a `candidate_only` logic-derived hypothesis with `AN -> CAN -> CANDLE`;
+- historical origin, historical transmission, winner, language-superiority, candidate-truth, and user-decision boundaries remain unchanged;
+- existing verifier and responsive-shell tests remain green.
+
+## 11. Initial next task
+
+**Lane 5 — End-to-end functional discovery.**
+
+Prove the full path from structural discovery through analysis status, public API projection, and the normal `/chat` result surface for the new fresh-word family. Preserve stronger evidence precedence and keep the result explicitly hypothesis-level.
 
 ## 11. Opening proof
 
