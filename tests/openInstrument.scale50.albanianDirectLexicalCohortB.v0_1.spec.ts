@@ -17,43 +17,43 @@ function isRecord(
 
 const COHORT = [
   {
-    word: "rain",
-    embryo: "SHI",
+    word: "mountain",
+    embryo: "MAL",
     sourceId:
-      "research.external.albanian-shi-rain.scale50.v0_1",
+      "research.external.albanian-mal-mountain.scale50.v0_1",
   },
   {
-    word: "hand",
-    embryo: "DORË",
+    word: "bone",
+    embryo: "KOCKË",
     sourceId:
-      "research.external.albanian-dore-hand.scale50.v0_1",
+      "research.external.albanian-kocke-bone.scale50.v0_1",
   },
   {
-    word: "run",
-    embryo: "VRAPOJ",
+    word: "walk",
+    embryo: "ECI",
     sourceId:
-      "research.external.albanian-vrapoj-run.scale50.v0_1",
+      "research.external.albanian-eci-walk.scale50.v0_1",
   },
   {
-    word: "truth",
-    embryo: "VËRTETË",
+    word: "life",
+    embryo: "JETË",
     sourceId:
-      "research.external.albanian-vertete-truth.scale50.v0_1",
+      "research.external.albanian-jete-life.scale50.v0_1",
   },
   {
-    word: "mother",
-    embryo: "NËNË",
+    word: "child",
+    embryo: "FËMIJË",
     sourceId:
-      "research.external.albanian-nene-mother.scale50.v0_1",
+      "research.external.albanian-femije-child.scale50.v0_1",
   },
 ] as const;
 
 const NULL_CONTROLS = [
-  "wind",
-  "mouth",
-  "drink",
-  "time",
-  "work",
+  "stone",
+  "head",
+  "hear",
+  "death",
+  "home",
 ] as const;
 
 async function analyze(
@@ -85,12 +85,12 @@ async function analyze(
 }
 
 describe(
-  "Open Instrument SCALE-50 Albanian direct lexical cohort A v0.1",
+  "Open Instrument SCALE-50 Albanian direct lexical cohort B v0.1",
   () => {
     jest.setTimeout(180_000);
 
     it.each(COHORT)(
-      "$word gains only source-backed research-functional status through exact-form evidence",
+      "$word gains bounded source-backed research status without truth promotion",
       async ({
         word,
         embryo,
@@ -173,7 +173,7 @@ describe(
 
         if (!isRecord(status)) {
           throw new Error(
-            `Missing analysis status for ${word}`,
+            `Missing status for ${word}`,
           );
         }
 
@@ -199,6 +199,10 @@ describe(
         ).toBe("not_claimed");
 
         expect(
+          boundary.historicalTransmissionClaim,
+        ).toBe("not_claimed");
+
+        expect(
           boundary.winnerClaim,
         ).toBe("not_claimed");
 
@@ -207,13 +211,17 @@ describe(
         ).toBe("not_claimed");
 
         expect(
+          boundary.structuralOutputIsCandidateTruth,
+        ).toBe(false);
+
+        expect(
           boundary.nullIsValid,
         ).toBe(true);
       },
     );
 
     it.each(NULL_CONTROLS)(
-      "%s remains valid Null and proves target-bound evidence isolation",
+      "%s remains valid Null and proves target isolation",
       async (word) => {
         const body =
           await analyze(word);
