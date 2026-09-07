@@ -195,6 +195,14 @@ function parseCitationV0_1(
       value.attestedGloss,
     );
 
+  const provenanceGroupId =
+    value.provenanceGroupId ===
+      undefined
+      ? undefined
+      : nonEmptyString(
+          value.provenanceGroupId,
+        );
+
   if (
     !citationId ||
     !sourceTitle ||
@@ -207,7 +215,12 @@ function parseCitationV0_1(
     sourceHashOrArchiveHash ===
       undefined ||
     !attestedForm ||
-    !attestedGloss
+    !attestedGloss ||
+    (
+      value.provenanceGroupId !==
+        undefined &&
+      !provenanceGroupId
+    )
   ) {
     return null;
   }
@@ -223,6 +236,9 @@ function parseCitationV0_1(
     sourceHashOrArchiveHash,
     attestedForm,
     attestedGloss,
+    ...(provenanceGroupId
+      ? { provenanceGroupId }
+      : {}),
   };
 }
 
@@ -253,11 +269,24 @@ function parseHypothesisV0_1(
       TRUTH_STATUSES_V0_1,
     );
 
+  const targetSenseId =
+    value.targetSenseId ===
+      undefined
+      ? undefined
+      : nonEmptyString(
+          value.targetSenseId,
+        );
+
   if (
     !targetWord ||
     semanticBridge ===
       undefined ||
     !functionalBridgeTruth ||
+    (
+      value.targetSenseId !==
+        undefined &&
+      !targetSenseId
+    ) ||
     value.claimBoundary !==
       "functional_hypothesis_only"
   ) {
@@ -268,6 +297,9 @@ function parseHypothesisV0_1(
     targetWord,
     semanticBridge,
     functionalBridgeTruth,
+    ...(targetSenseId
+      ? { targetSenseId }
+      : {}),
     claimBoundary:
       "functional_hypothesis_only",
   };

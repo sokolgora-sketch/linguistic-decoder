@@ -514,6 +514,86 @@ describe(
     );
 
     it(
+      "preserves optional Cohort-G metadata while keeping legacy rows valid",
+      () => {
+        const loaderModule = require(loaderPath) as Record<string, unknown>;
+        const load = loaderModule.loadMultiSourceFunctionalResearchEvidenceCatalogV0_1;
+        const parse = loaderModule.parseMultiSourceFunctionalResearchEvidenceCatalogV0_1;
+
+        expect(typeof load).toBe("function");
+        expect(typeof parse).toBe("function");
+
+        if (typeof load !== "function" || typeof parse !== "function") {
+          return;
+        }
+
+        const loaded = (load as () => Array<Record<string, unknown>>)();
+        expect(loaded).toHaveLength(38);
+        expect(loaded[0]?.functionalHypotheses[0]).not.toHaveProperty("targetSenseId");
+        expect(loaded[0]?.citations[0]).not.toHaveProperty("provenanceGroupId");
+
+        const raw = readJson(catalogPath) as {
+          catalogVersion: string;
+          rows: Array<Record<string, unknown>>;
+        };
+        const enriched = JSON.parse(JSON.stringify(raw)) as typeof raw;
+        const row = enriched.rows[0];
+        const citation = (row.citations as Array<Record<string, unknown>>)[0];
+        const hypothesis = (row.functionalHypotheses as Array<Record<string, unknown>>)[0];
+
+        citation.provenanceGroupId = "source-family-a";
+        hypothesis.targetSenseId = "target-sense-a";
+
+        const parsed = (parse as (value: unknown) => Array<Record<string, unknown>>)(enriched);
+        expect(parsed).toHaveLength(38);
+        expect(parsed[0]?.citations[0]).toMatchObject({
+          provenanceGroupId: "source-family-a",
+        });
+        expect(parsed[0]?.functionalHypotheses[0]).toMatchObject({
+          targetSenseId: "target-sense-a",
+        });
+      },
+    );
+
+    it(
+      "fails closed for malformed present Cohort-G metadata",
+      () => {
+        const loaderModule = require(loaderPath) as Record<string, unknown>;
+        const parse = loaderModule.parseMultiSourceFunctionalResearchEvidenceCatalogV0_1;
+
+        expect(typeof parse).toBe("function");
+
+        if (typeof parse !== "function") {
+          return;
+        }
+
+        const raw = readJson(catalogPath) as {
+          catalogVersion: string;
+          rows: Array<Record<string, unknown>>;
+        };
+        const malformedSense = JSON.parse(JSON.stringify(raw)) as typeof raw;
+        const malformedSenseHypothesis = (
+          malformedSense.rows[0].functionalHypotheses as Array<Record<string, unknown>>
+        )[0];
+        malformedSenseHypothesis.targetSenseId = "   ";
+
+        expect(
+          (parse as (value: unknown) => unknown)(malformedSense),
+        ).toEqual([]);
+
+        const malformedProvenance = JSON.parse(JSON.stringify(raw)) as typeof raw;
+        const malformedCitation = (
+          malformedProvenance.rows[0].citations as Array<Record<string, unknown>>
+        )[0];
+        malformedCitation.provenanceGroupId = null;
+
+        expect(
+          (parse as (value: unknown) => unknown)(malformedProvenance),
+        ).toEqual([]);
+      },
+    );
+
+    it(
       "keeps the catalog loader passive with no provider, network, cache, or promotion execution",
       () => {
         if (
