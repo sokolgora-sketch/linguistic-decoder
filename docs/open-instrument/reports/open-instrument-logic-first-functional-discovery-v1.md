@@ -336,7 +336,7 @@ Initial candidate posture should reuse the existing functional-candidate contrac
 
 ## Lane 3 — Deterministic Discovery Verification v0.1
 
-**Status:** `NEXT`
+**Status:** `DONE`
 
 Purpose:
 
@@ -350,13 +350,13 @@ Deterministically verify that a discovered functional hypothesis:
 - does not overwrite stronger evidence;
 - fails closed on malformed or unsupported proposals.
 
-The existing automatic functional proposal verifier should be reused or extended where correct.
+The verifier is implemented as a dedicated logic-derived verifier under the existing verifier namespace, because the existing automatic functional proposal verifier has a provider-specific input contract.
 
 ---
 
 ## Lane 4 — Runtime / API / UI Integration v0.1
 
-**Status:** `NOT_STARTED`
+**Status:** `NEXT`
 
 Purpose:
 
@@ -470,8 +470,8 @@ OPEN_INSTRUMENT_LOGIC_FIRST_FUNCTIONAL_DISCOVERY_V1_CLOSED_<DATE>
 | Milestone opening | ACTIVE |
 | 1. Deterministic Doctrine Projection v0.1 | DONE |
 | 2. Sense-Bound Logic-Derived Functional Hypothesis v0.1 | DONE |
-| 3. Deterministic Discovery Verification v0.1 | NEXT |
-| 4. Runtime / API / UI Integration v0.1 | NOT_STARTED |
+| 3. Deterministic Discovery Verification v0.1 | DONE |
+| 4. Runtime / API / UI Integration v0.1 | NEXT |
 | 5. Fresh-Word Generalization and Negative-Control Proof v0.1 | NOT_STARTED |
 | 6. Milestone Closeout | NOT_STARTED |
 
@@ -479,20 +479,18 @@ OPEN_INSTRUMENT_LOGIC_FIRST_FUNCTIONAL_DISCOVERY_V1_CLOSED_<DATE>
 
 # 15. Current next task
 
-**Lane 3 — Deterministic Discovery Verification v0.1**
+**Lane 4 — Runtime / API / UI Integration v0.1**
 
 Before implementation:
 
 1. inspect current branch and divergence from `main`;
-2. inspect Seven-Voice SSOT and doctrine consumers;
-3. inspect current functional-path contracts;
-4. inspect existing tests;
-5. inspect the existing automatic functional proposal verifier and define the smallest verification extension;
-6. patch only that lane;
-7. run focused tests;
-8. run the repository gate before merge.
+2. inspect live analysis route, adapter, status, result contract, and UI consumers;
+3. identify the smallest runtime/API/UI wiring for verified logic-derived hypotheses;
+4. patch only that lane;
+5. run focused tests;
+6. run the repository gate before merge.
 
-Do not implement Lane 4 during Lane 3.
+Do not implement Lane 5 during Lane 4.
 
 ---
 
@@ -551,8 +549,33 @@ Full `npm run gate:quick` validation:
 - Next.js 16.2.12 production build passed
 - static generation passed: 22/22
 
-# 18. Codex continuation protocol
-# 17. Codex continuation protocol
+# 18. Lane 3 closeout evidence
+
+Lane 3 was implemented and committed at `b851d890` (`feat(open-instrument): verify logic-derived hypotheses`).
+
+Implementation files:
+
+- `src/shared/verifier/verifyLogicDerivedFunctionalHypothesis.v0_1.ts`
+- `tests/verifier/verifyLogicDerivedFunctionalHypothesis.v0_1.spec.ts`
+
+The dedicated verifier reuses the Lane 1 doctrine projection and Lane 2 hypothesis contract, verifies target and sense binding, authorized structural operations, canonical doctrine projection, truth boundaries, stronger-evidence precedence, and malformed input fail-closed behavior. It does not mutate or promote evidence.
+
+Focused validation:
+
+- 4 suites passed
+- 33 tests passed
+
+Full `npm run gate:quick` validation on the closing Lane 3 head:
+
+- 635 unit suites passed, 3 skipped
+- 2,848 unit tests passed, 4 skipped
+- 149 snapshots passed
+- 2 integration suites passed
+- 5 integration tests passed
+- Next.js 16.2.12 production build passed
+- static generation passed: 22/22
+
+# 19. Codex continuation protocol
 
 Every Codex task working on this milestone must begin with these rules:
 
@@ -579,7 +602,7 @@ If Codex finds repository state inconsistent with this milestone document, it mu
 
 ---
 
-# 19. Milestone doctrine lock
+# 20. Milestone doctrine lock
 
 The governing milestone principle is:
 
@@ -587,7 +610,7 @@ The governing milestone principle is:
 
 ---
 
-# 20. Opening proof
+# 21. Opening proof
 
 Opening baseline:
 
