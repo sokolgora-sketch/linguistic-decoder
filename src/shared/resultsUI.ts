@@ -64,6 +64,18 @@ export interface CandidateUI {
   candidateId?: string;
   displayForm?: string;
   candidateLanguage?: string;
+  targetWord?: string;
+  targetSenseId?: string;
+  targetSenseLabel?: string;
+  sourceStatus?: string;
+  functionalBridgeTruth?: string;
+  evidenceRefs?: string[];
+  historicalOriginClaim?: string;
+  historicalTransmissionClaim?: string;
+  winnerClaim?: string;
+  languageSuperiorityClaim?: string;
+  candidateTruthClaim?: string;
+  logicDerivedFunctionalHypothesisVerificationV0_1?: unknown;
   functionalStatement?: string;
   vowelPath?: string;
   decomposition?: string[];

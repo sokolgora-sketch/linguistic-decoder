@@ -8,6 +8,8 @@ export interface UICandidateRow {
   status?: string | null;
   sourceKind?: string | null;
   targetWord?: string | null;
+  targetSenseId?: string | null;
+  targetSenseLabel?: string | null;
   sourceId?: string | null;
   sourceStatus?: string | null;
   semanticBridge?: string | null;
@@ -111,6 +113,16 @@ export function buildCandidateRowsFromVM(vm: TelemetryViewModel): UICandidateRow
     targetWord:
       c.targetWord
         ? pomStr(c.targetWord)
+        : null,
+
+    targetSenseId:
+      c.targetSenseId
+        ? pomStr(c.targetSenseId)
+        : null,
+
+    targetSenseLabel:
+      c.targetSenseLabel
+        ? pomStr(c.targetSenseLabel)
         : null,
 
     sourceId:

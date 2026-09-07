@@ -692,6 +692,8 @@ export async function POST(req: Request) {
     alphabet,
     ipa: ipaRaw,
     language: languageRaw,
+    targetSenseId: targetSenseIdRaw,
+    targetSenseLabel: targetSenseLabelRaw,
   } = parsed.data;
 
   const ipa =
@@ -702,6 +704,15 @@ export async function POST(req: Request) {
   const language =
     typeof languageRaw === "string"
       ? languageRaw.trim()
+      : "";
+
+  const targetSenseId =
+    typeof targetSenseIdRaw === "string"
+      ? targetSenseIdRaw.trim()
+      : "";
+  const targetSenseLabel =
+    typeof targetSenseLabelRaw === "string"
+      ? targetSenseLabelRaw.trim()
       : "";
 
 const modeParsed =
@@ -1034,6 +1045,10 @@ export async function GET(req: Request) {
     const ipa = (url.searchParams.get("ipa") ?? "").trim();
     const language =
       (url.searchParams.get("language") ?? "").trim();
+    const targetSenseId =
+      (url.searchParams.get("targetSenseId") ?? "").trim();
+    const targetSenseLabel =
+      (url.searchParams.get("targetSenseLabel") ?? "").trim();
 // Seed fallback flag (BRAIN-0.2)
     const seedFallbackEnabled =
       url.searchParams.get("seed") === "1" ||
@@ -1064,6 +1079,8 @@ if (!word) {
         ipa: ipa || undefined,
         language:
           language || undefined,
+        targetSenseId: targetSenseId || undefined,
+        targetSenseLabel: targetSenseLabel || undefined,
           brainCandidatesSeedFallback: seedFallbackEnabled,
       };
 

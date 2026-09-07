@@ -100,6 +100,12 @@ export function CandidatesAccordion({ rows }: { rows: UICandidateRow[] }) {
             c.claimBoundary ===
               "research_functional_hypothesis_only";
 
+          const isLogicDerivedFunctionalHypothesis =
+            c.sourceKind ===
+              "logic_derived_functional_hypothesis" &&
+            c.claimType === "functionalMotivation" &&
+            c.functionalBridgeTruth === "hypothesis";
+
           const hasEmbryoFirstReadout =
             Boolean(
               c.embryo ||
@@ -178,6 +184,12 @@ export function CandidatesAccordion({ rows }: { rows: UICandidateRow[] }) {
                             </CandidateChip>
                           ) : null}
 
+                          {isLogicDerivedFunctionalHypothesis ? (
+                            <CandidateChip tone="amber">
+                              Logic-derived functional hypothesis
+                            </CandidateChip>
+                          ) : null}
+
                           {isStructuralHypothesis ? (
                             <CandidateChip tone="amber">
                               Structural hypothesis
@@ -224,6 +236,19 @@ export function CandidatesAccordion({ rows }: { rows: UICandidateRow[] }) {
                         c.functionalBridgeTruth ? (
                           <div className="break-words text-xs font-medium text-amber-100">
                             {`Functional bridge: ${truthLabel(c.functionalBridgeTruth)}`}
+                          </div>
+                        ) : null}
+
+                        {isLogicDerivedFunctionalHypothesis &&
+                        c.targetSenseLabel ? (
+                          <div className="break-words text-xs text-slate-300">
+                            {`Target sense: ${c.targetSenseLabel}`}
+                          </div>
+                        ) : null}
+
+                        {isLogicDerivedFunctionalHypothesis ? (
+                          <div className="break-words text-xs font-medium text-amber-100">
+                            Functional bridge: Hypothesis only; no source-backed evidence
                           </div>
                         ) : null}
 

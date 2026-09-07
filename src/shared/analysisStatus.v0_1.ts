@@ -157,6 +157,42 @@ function readVerifiedProposedFunctionalCandidatesV0_1(
   );
 }
 
+function readLogicDerivedFunctionalHypothesisCandidatesV0_1(
+  result: UnknownRecord,
+): string[] {
+  const rows = Array.isArray(result.candidates) ? result.candidates : [];
+
+  return uniqueStrings(
+    rows.flatMap((candidate) => {
+      if (!isRecord(candidate)) return [];
+
+      const isLogicDerived =
+        candidate.claimType === "functionalMotivation" &&
+        candidate.sourceKind === "logic_derived_functional_hypothesis" &&
+        candidate.sourceStatus === "logic_derived_candidate" &&
+        candidate.validationOutcome === "not_evaluated" &&
+        candidate.claimBoundary ===
+          "logic-derived functional hypothesis only; not source-backed evidence, candidate truth, or historical origin" &&
+        candidate.userDecisionPosture === "user_decides" &&
+        candidate.functionalBridgeTruth === "hypothesis" &&
+        candidate.historicalOriginClaim === "not_claimed" &&
+        candidate.historicalTransmissionClaim === "not_claimed" &&
+        candidate.winnerClaim === "not_claimed" &&
+        candidate.languageSuperiorityClaim === "not_claimed" &&
+        candidate.candidateTruthClaim === "not_claimed";
+
+      if (!isLogicDerived) return [];
+
+      const targetWord =
+        typeof candidate.targetWord === "string"
+          ? candidate.targetWord.trim()
+          : "";
+
+      return targetWord ? [targetWord] : [];
+    }),
+  );
+}
+
 function readResearchFunctionalHypothesisCandidatesV0_1(
   result: UnknownRecord,
   analyzedWord: string,
@@ -462,6 +498,13 @@ export function buildAnalysisStatusV0_1(resultValue: unknown): AnalysisStatusV0_
         )
       : [];
 
+  const logicDerivedFunctionalHypotheses =
+    resultRecord
+      ? readLogicDerivedFunctionalHypothesisCandidatesV0_1(
+          resultRecord,
+        )
+      : [];
+
   const structuralHypothesisCandidates =
     resultRecord
       ? readStructuralHypothesisCandidatesV0_1(
@@ -527,6 +570,13 @@ export function buildAnalysisStatusV0_1(resultValue: unknown): AnalysisStatusV0_
       `Deterministically verified Proposed functional candidate${proposedFunctionalCandidates.length === 1 ? "" : "s"} available: ${proposedFunctionalCandidates.join(
         ", ",
       )}. ${proposedFunctionalCandidates.length === 1 ? "It remains an unreviewed functional hypothesis" : "They remain unreviewed functional hypotheses"}, not candidate truth or historical-origin evidence. User decides.`;
+  } else if (logicDerivedFunctionalHypotheses.length > 0) {
+    status = "candidate_only";
+
+    summary =
+      `Logic-derived functional hypothes${logicDerivedFunctionalHypotheses.length === 1 ? "is" : "es"} available for ${logicDerivedFunctionalHypotheses.join(
+        ", ",
+      )}. ${logicDerivedFunctionalHypotheses.length === 1 ? "It remains" : "They remain"} a bounded hypothesis, not source-backed evidence, candidate truth, or historical-origin evidence. User decides.`;
   } else if (
     candidateOnlyOperators.length > 0
   ) {
