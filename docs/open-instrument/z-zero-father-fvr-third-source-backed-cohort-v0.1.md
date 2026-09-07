@@ -2,7 +2,13 @@
 
 Date: 2026-08-31
 
-Status: IMPLEMENTATION_CANDIDATE.
+Status: IMPLEMENTED_RESEARCH_SURFACE.
+
+The bounded FATHER research cohort is implemented in the current generic
+catalog, `/api/research/fvr`, `/chat` recurrence card, and provider-disabled
+live smoke. Its recurrence meaning remains `research_hypothesis`; this status
+does not promote the observation to statistics, historical origin, cognacy, or
+production linguistic truth.
 
 ## Purpose
 

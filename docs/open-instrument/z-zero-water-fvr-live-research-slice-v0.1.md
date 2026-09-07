@@ -2,7 +2,12 @@
 
 Date: 2026-08-30
 
-Status: IMPLEMENTATION_CANDIDATE.
+Status: IMPLEMENTED_RESEARCH_SURFACE.
+
+The bounded research surface described here is implemented in the current
+catalog, `/api/research/fvr`, `/chat` recurrence card, and provider-disabled
+live smoke. This status does not promote recurrence observations to statistics,
+historical origin, cognacy, or production linguistic truth.
 
 ## Purpose
 
