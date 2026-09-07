@@ -312,7 +312,7 @@ Exit proof:
 
 ## Lane 2 — Sense-Bound Logic-Derived Functional Hypothesis v0.1
 
-**Status:** `NEXT`
+**Status:** `DONE`
 
 Purpose:
 
@@ -336,7 +336,7 @@ Initial candidate posture should reuse the existing functional-candidate contrac
 
 ## Lane 3 — Deterministic Discovery Verification v0.1
 
-**Status:** `NOT_STARTED`
+**Status:** `NEXT`
 
 Purpose:
 
@@ -469,8 +469,8 @@ OPEN_INSTRUMENT_LOGIC_FIRST_FUNCTIONAL_DISCOVERY_V1_CLOSED_<DATE>
 | --- | --- |
 | Milestone opening | ACTIVE |
 | 1. Deterministic Doctrine Projection v0.1 | DONE |
-| 2. Sense-Bound Logic-Derived Functional Hypothesis v0.1 | NEXT |
-| 3. Deterministic Discovery Verification v0.1 | NOT_STARTED |
+| 2. Sense-Bound Logic-Derived Functional Hypothesis v0.1 | DONE |
+| 3. Deterministic Discovery Verification v0.1 | NEXT |
 | 4. Runtime / API / UI Integration v0.1 | NOT_STARTED |
 | 5. Fresh-Word Generalization and Negative-Control Proof v0.1 | NOT_STARTED |
 | 6. Milestone Closeout | NOT_STARTED |
@@ -479,7 +479,7 @@ OPEN_INSTRUMENT_LOGIC_FIRST_FUNCTIONAL_DISCOVERY_V1_CLOSED_<DATE>
 
 # 15. Current next task
 
-**Lane 2 — Sense-Bound Logic-Derived Functional Hypothesis v0.1**
+**Lane 3 — Deterministic Discovery Verification v0.1**
 
 Before implementation:
 
@@ -487,12 +487,12 @@ Before implementation:
 2. inspect Seven-Voice SSOT and doctrine consumers;
 3. inspect current functional-path contracts;
 4. inspect existing tests;
-5. inspect the existing sense-bound candidate contract and define the smallest reusable hypothesis seam;
+5. inspect the existing automatic functional proposal verifier and define the smallest verification extension;
 6. patch only that lane;
 7. run focused tests;
 8. run the repository gate before merge.
 
-Do not implement Lane 3 during Lane 2.
+Do not implement Lane 4 during Lane 3.
 
 ---
 
@@ -525,6 +525,33 @@ Full `npm run gate:quick` validation:
 
 No existing Seven-Voice consumer changed.
 
+# 17. Lane 2 closeout evidence
+
+Lane 2 was implemented and committed at `4f1c47ff` (`feat(open-instrument): add sense-bound logic hypothesis`).
+
+Implementation files:
+
+- `src/shared/openInstrument/logicDerivedFunctionalHypothesis.v0_1.ts`
+- `tests/openInstrument.logicDerivedFunctionalHypothesis.v0_1.spec.ts`
+
+The composition requires an explicit target word and target sense, a defensible structural hypothesis, and a non-empty terminal canonical voice path. It reuses the Lane 1 doctrine projection, emits `candidate_only`, keeps the semantic bridge at `functionalBridgeTruth: hypothesis`, preserves `noSingleWinner`, and fixes historical origin, transmission, winner, language-superiority, and candidate-truth claims at `not_claimed`. It does not wire runtime/API/UI surfaces or promote evidence.
+
+Focused validation:
+
+- 4 suites passed
+- 41 tests passed
+
+Full `npm run gate:quick` validation:
+
+- 634 unit suites passed, 3 skipped
+- 2,838 unit tests passed, 4 skipped
+- 149 snapshots passed
+- 2 integration suites passed
+- 5 integration tests passed
+- Next.js 16.2.12 production build passed
+- static generation passed: 22/22
+
+# 18. Codex continuation protocol
 # 17. Codex continuation protocol
 
 Every Codex task working on this milestone must begin with these rules:
@@ -552,7 +579,7 @@ If Codex finds repository state inconsistent with this milestone document, it mu
 
 ---
 
-# 18. Milestone doctrine lock
+# 19. Milestone doctrine lock
 
 The governing milestone principle is:
 
@@ -560,7 +587,7 @@ The governing milestone principle is:
 
 ---
 
-# 19. Opening proof
+# 20. Opening proof
 
 Opening baseline:
 
