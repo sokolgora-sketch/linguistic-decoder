@@ -57,6 +57,24 @@ function structuralFixture(): StructuralHypothesisV0_1 {
   };
 }
 
+function semanticAlignmentFixture() {
+  return {
+    schemaVersion: "open-instrument.semantic-alignment.v0_1" as const,
+    targetWord: "fixture",
+    targetSenseId: "fixture_sense",
+    targetSenseLabel: "a bounded test object",
+    structuralHypothesisId: structuralFixture().hypothesisId,
+    alignmentStatus: "proposed" as const,
+    alignmentSource: "provider_proposed_hypothesis" as const,
+    semanticBridge:
+      "A bounded object can be tested as a functional relation to the structural anchor without asserting lexical truth.",
+    doctrineRoles: ["Expansion/Bridge"],
+    reasonCodes: [],
+    providerId: "fixture",
+    modelId: "fixture",
+  };
+}
+
 describe("Open Instrument logic-derived functional hypothesis v0.1", () => {
   test("combines a target sense, structural anchor, and doctrine projection without promoting truth", () => {
     const result = buildLogicDerivedFunctionalHypothesisV0_1({
@@ -66,6 +84,7 @@ describe("Open Instrument logic-derived functional hypothesis v0.1", () => {
         label: "a bounded test object",
       },
       structuralHypothesis: structuralFixture(),
+      semanticAlignment: semanticAlignmentFixture(),
     });
 
     expect(result.ok).toBe(true);
@@ -94,10 +113,10 @@ describe("Open Instrument logic-derived functional hypothesis v0.1", () => {
       doctrineRole: "Expansion/Bridge",
     });
     expect(result.hypothesis.semanticBridge).toContain(
-      "possible functional bridge",
+      "bounded object can be tested",
     );
     expect(result.hypothesis.semanticBridge).toContain(
-      "not lexical evidence, candidate truth, or historical origin",
+      "without asserting lexical truth",
     );
   });
 
@@ -106,6 +125,7 @@ describe("Open Instrument logic-derived functional hypothesis v0.1", () => {
       targetWord: "fixture",
       targetSense: { id: "fixture_sense", label: "a bounded test object" },
       structuralHypothesis: structuralFixture(),
+      semanticAlignment: semanticAlignmentFixture(),
     };
 
     expect(
@@ -144,6 +164,7 @@ describe("Open Instrument logic-derived functional hypothesis v0.1", () => {
         targetWord: "fixture",
         targetSense: { id: "fixture_sense", label: "a bounded test object" },
         structuralHypothesis: structural,
+        semanticAlignment: semanticAlignmentFixture(),
       }),
     ).toMatchObject({
       ok: false,
@@ -160,10 +181,43 @@ describe("Open Instrument logic-derived functional hypothesis v0.1", () => {
         targetWord: "fixture",
         targetSense: { id: "fixture_sense", label: "a bounded test object" },
         structuralHypothesis: structural,
+        semanticAlignment: semanticAlignmentFixture(),
       }),
     ).toMatchObject({
       ok: false,
       reasonCodes: ["DOCTRINE_PROJECTION_REJECTED", "unsupported_voice"],
+    });
+  });
+
+  test("requires a proposed semantic alignment instead of manufacturing a bridge", () => {
+    const result = buildLogicDerivedFunctionalHypothesisV0_1({
+      targetWord: "fixture",
+      targetSense: { id: "fixture_sense", label: "a bounded test object" },
+      structuralHypothesis: structuralFixture(),
+    });
+
+    expect(result).toMatchObject({
+      ok: false,
+      reasonCodes: ["SEMANTIC_ALIGNMENT_REQUIRED"],
+    });
+  });
+
+  test("rejects unknown semantic alignment without emitting a functional hypothesis", () => {
+    expect(
+      buildLogicDerivedFunctionalHypothesisV0_1({
+        targetWord: "fixture",
+        targetSense: { id: "fixture_sense", label: "a bounded test object" },
+        structuralHypothesis: structuralFixture(),
+        semanticAlignment: {
+          ...semanticAlignmentFixture(),
+          alignmentStatus: "unknown",
+          semanticBridge: null,
+          doctrineRoles: [],
+        },
+      }),
+    ).toMatchObject({
+      ok: false,
+      reasonCodes: ["SEMANTIC_ALIGNMENT_INVALID"],
     });
   });
 });

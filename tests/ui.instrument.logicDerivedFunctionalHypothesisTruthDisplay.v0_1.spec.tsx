@@ -9,6 +9,14 @@ import { buildCandidateRowsFromVM } from "../src/ui/candidates/candidateModel";
 import { CandidatesAccordion } from "../src/ui/candidates/CandidatesAccordion";
 
 describe("logic-derived functional hypothesis UI boundary v0.1", () => {
+  beforeEach(() => {
+    process.env.OPEN_INSTRUMENT_SEMANTIC_ALIGNMENT_TEST_PROVIDER =
+      "mock_semantic_proposed";
+  });
+
+  afterAll(() => {
+    delete process.env.OPEN_INSTRUMENT_SEMANTIC_ALIGNMENT_TEST_PROVIDER;
+  });
   it("labels the row as a hypothesis and shows the explicit target sense", async () => {
     const response = await GET(
       new Request(

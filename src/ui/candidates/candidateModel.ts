@@ -10,6 +10,10 @@ export interface UICandidateRow {
   targetWord?: string | null;
   targetSenseId?: string | null;
   targetSenseLabel?: string | null;
+  semanticAlignmentStatus?: string | null;
+  semanticAlignmentSource?: string | null;
+  semanticAlignmentReasonCodes?: string[] | null;
+  semanticAlignmentBridge?: string | null;
   sourceId?: string | null;
   sourceStatus?: string | null;
   semanticBridge?: string | null;
@@ -123,6 +127,26 @@ export function buildCandidateRowsFromVM(vm: TelemetryViewModel): UICandidateRow
     targetSenseLabel:
       c.targetSenseLabel
         ? pomStr(c.targetSenseLabel)
+        : null,
+
+    semanticAlignmentStatus:
+      c.semanticAlignmentStatus
+        ? pomStr(c.semanticAlignmentStatus)
+        : null,
+
+    semanticAlignmentSource:
+      c.semanticAlignmentSource
+        ? pomStr(c.semanticAlignmentSource)
+        : null,
+
+    semanticAlignmentReasonCodes:
+      c.semanticAlignmentReasonCodes
+        ? pomStringArray(c.semanticAlignmentReasonCodes)
+        : null,
+
+    semanticAlignmentBridge:
+      c.semanticAlignmentBridge
+        ? pomStr(c.semanticAlignmentBridge)
         : null,
 
     sourceId:

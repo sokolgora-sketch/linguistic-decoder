@@ -15,6 +15,14 @@ async function analyze(
 }
 
 describe("/api/analyze-v1 logic-derived functional hypothesis v0.1", () => {
+  beforeEach(() => {
+    process.env.OPEN_INSTRUMENT_SEMANTIC_ALIGNMENT_TEST_PROVIDER =
+      "mock_semantic_proposed";
+  });
+
+  afterAll(() => {
+    delete process.env.OPEN_INSTRUMENT_SEMANTIC_ALIGNMENT_TEST_PROVIDER;
+  });
   it("emits a verified, explicitly sense-bound hypothesis when requested", async () => {
     const body = await analyze(
       "sterile",

@@ -164,6 +164,10 @@ export interface CandidateRowVM {
   targetWord?: PresentOrMissing<string>;
   targetSenseId?: PresentOrMissing<string>;
   targetSenseLabel?: PresentOrMissing<string>;
+  semanticAlignmentStatus?: PresentOrMissing<string>;
+  semanticAlignmentSource?: PresentOrMissing<string>;
+  semanticAlignmentReasonCodes?: PresentOrMissing<string[]>;
+  semanticAlignmentBridge?: PresentOrMissing<string>;
   sourceId?: PresentOrMissing<string>;
   sourceStatus?: PresentOrMissing<string>;
   semanticBridge?: PresentOrMissing<string>;

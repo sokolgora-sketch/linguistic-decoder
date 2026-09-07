@@ -1,4 +1,10 @@
-export type ProposerProviderIdV0_2 = "mock" | "mock_reject_ops" | "openai_compat";
+export type ProposerProviderIdV0_2 =
+  | "mock"
+  | "mock_reject_ops"
+  | "mock_semantic_proposed"
+  | "mock_semantic_unknown"
+  | "mock_semantic_rejected"
+  | "openai_compat";
 
 export type ProposerRequestV0_2 = {
   word: string;
@@ -56,6 +62,52 @@ async function proposeMockRejectOps(req: ProposerRequestV0_2): Promise<ProposerR
   return { provider: "mock_reject_ops", rawText: JSON.stringify(proposal, null, 2), meta: { model: "mock_reject_ops" } };
 }
 
+async function proposeMockSemantic(
+  req: ProposerRequestV0_2,
+  status: "proposed" | "unknown" | "rejected",
+): Promise<ProposerResultV0_2> {
+  const context =
+    req.userPayload && typeof req.userPayload === "object"
+      ? (req.userPayload as Record<string, unknown>).semanticContext
+      : null;
+  const record =
+    context && typeof context === "object"
+      ? (context as Record<string, unknown>)
+      : {};
+  const projection =
+    record.doctrineProjection && typeof record.doctrineProjection === "object"
+      ? (record.doctrineProjection as Record<string, unknown>)
+      : {};
+  const projections = Array.isArray(projection.projections)
+    ? projection.projections
+    : [];
+  const firstRole =
+    projections[0] && typeof projections[0] === "object"
+      ? (projections[0] as Record<string, unknown>).doctrineRole
+      : null;
+
+  const proposal = {
+    alignmentStatus: status,
+    doctrineRoles: status === "proposed" && typeof firstRole === "string" ? [firstRole] : [],
+    semanticBridge:
+      status === "proposed"
+        ? `The selected doctrine role can be tested as a bounded functional relation to the supplied sense through the structural anchor; this remains a reviewable hypothesis, not lexical truth.`
+        : null,
+    reasonCodes: [`mock_semantic_${status}`],
+  };
+
+  return {
+    provider:
+      status === "proposed"
+        ? "mock_semantic_proposed"
+        : status === "unknown"
+          ? "mock_semantic_unknown"
+          : "mock_semantic_rejected",
+    rawText: JSON.stringify(proposal, null, 2),
+    meta: { model: "mock_semantic_fixture" },
+  };
+}
+
 async function proposeOpenAICompat(req: ProposerRequestV0_2): Promise<ProposerResultV0_2> {
   // Optional provider: OpenAI-compatible Chat Completions API.
   // Requires env:
@@ -107,6 +159,9 @@ export async function runProposerV0_2(
   provider: ProposerProviderIdV0_2
 ): Promise<ProposerResultV0_2> {
   if (provider === "openai_compat") return proposeOpenAICompat(req);
+  if (provider === "mock_semantic_proposed") return proposeMockSemantic(req, "proposed");
+  if (provider === "mock_semantic_unknown") return proposeMockSemantic(req, "unknown");
+  if (provider === "mock_semantic_rejected") return proposeMockSemantic(req, "rejected");
   if (provider === "mock_reject_ops") return proposeMockRejectOps(req);
   return proposeMock(req);
 }
