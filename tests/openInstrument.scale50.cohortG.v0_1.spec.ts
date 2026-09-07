@@ -107,7 +107,7 @@ describe("Open Instrument SCALE-50 Cohort G v0.1", () => {
 
   it("admits only the four approved Null targets through the packet contract", async () => {
     const rows = loadMultiSourceFunctionalResearchEvidenceCatalogV0_1();
-    expect(rows).toHaveLength(78);
+    expect(rows).toHaveLength(80);
 
     for (const target of COHORT_G_CASES_V0_1) {
       expect(PRE_COHORT_G_NULL_TARGETS_V0_1.has(target.targetWord)).toBe(true);

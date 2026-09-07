@@ -243,7 +243,7 @@ describe(
     );
 
     it.each(["break"])(
-      "%s remains structural-only without target-bound source evidence",
+      "%s uses source-backed research status after catalog admission",
       async (word) => {
         const body =
           await analyze(word);
@@ -253,9 +253,9 @@ describe(
         ).toEqual(
           expect.objectContaining({
             status:
-              "structural_unreviewed",
+              "research_functional_hypothesis",
             researchHypothesisEmbryos:
-              [],
+              ["thyej", "frango"],
           }),
         );
       },
