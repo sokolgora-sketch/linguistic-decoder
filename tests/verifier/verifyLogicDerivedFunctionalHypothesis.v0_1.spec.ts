@@ -10,6 +10,7 @@ import type {
 import {
   discoverStructuralHypothesesV0_1,
 } from "../../src/shared/structuralHypothesisDiscovery.v0_1";
+import { buildSemanticAlignmentContextV0_1 } from "../../src/shared/openInstrument/semanticAlignment.v0_1";
 
 function structuralFixture(): StructuralHypothesisV0_1 {
   return {
@@ -64,17 +65,52 @@ function structuralFixture(): StructuralHypothesisV0_1 {
 }
 
 function hypothesisFixture(): Record<string, unknown> {
+  const structuralHypothesis = structuralFixture();
   const result = buildLogicDerivedFunctionalHypothesisV0_1({
     targetWord: "fixture",
     targetSense: {
       id: "fixture_sense",
       label: "a bounded test object",
     },
-    structuralHypothesis: structuralFixture(),
+    structuralHypothesis,
+    semanticAlignment: semanticAlignmentFixture(
+      "fixture",
+      "fixture_sense",
+      "a bounded test object",
+      structuralHypothesis,
+    ),
   });
 
   if (!result.ok) throw new Error(result.reasonCodes.join(","));
   return JSON.parse(JSON.stringify(result.hypothesis)) as Record<string, unknown>;
+}
+
+function semanticAlignmentFixture(
+  targetWord: string,
+  targetSenseId: string,
+  targetSenseLabel: string,
+  structuralHypothesis: StructuralHypothesisV0_1,
+) {
+  const context = buildSemanticAlignmentContextV0_1({
+    targetWord,
+    targetSenseId,
+    targetSenseLabel,
+    structuralHypothesis,
+  });
+  if (!context.ok) throw new Error(context.reasonCodes.join(","));
+  return {
+    schemaVersion: "open-instrument.semantic-alignment.v0_1" as const,
+    targetWord,
+    targetSenseId,
+    targetSenseLabel,
+    structuralHypothesisId: structuralHypothesis.hypothesisId,
+    alignmentStatus: "proposed" as const,
+    alignmentSource: "provider_proposed_hypothesis" as const,
+    semanticBridge:
+      "A bounded sense can be tested as a functional relation to the structural anchor without asserting lexical truth.",
+    doctrineRoles: [context.context.doctrineProjection.projections[0].doctrineRole],
+    reasonCodes: [],
+  };
 }
 
 function validContext(overrides: Record<string, unknown> = {}) {
@@ -113,6 +149,12 @@ describe("logic-derived functional hypothesis verifier v0.1", () => {
         label: "a wax light source",
       },
       structuralHypothesis: structuralHypothesis!,
+      semanticAlignment: semanticAlignmentFixture(
+        "candle",
+        "wax_light_source",
+        "a wax light source",
+        structuralHypothesis!,
+      ),
     });
 
     expect(result.ok).toBe(true);

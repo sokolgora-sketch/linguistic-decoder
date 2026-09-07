@@ -3,6 +3,13 @@ import { z } from "zod";
 
 import { runAnalysisDeterministic } from "@/lib/runAnalysisDeterministic";
 import { enginePayloadToAnalysisResult } from "@/shared/analysisAdapter";
+import { discoverStructuralHypothesesV0_1 } from "@/shared/structuralHypothesisDiscovery.v0_1";
+import {
+  buildSemanticAlignmentContextV0_1,
+} from "@/shared/openInstrument/semanticAlignment.v0_1";
+import {
+  runSemanticAlignmentProposalV0_1,
+} from "@/shared/orchestrator/semanticAlignmentProposal.v0_1";
 import { adaptAnalyzeV1ToUI } from "@/shared/analyzeV1Adapter";
 import { buildEvidencePackageFromVM } from "@/ui/telemetry/buildEvidencePackageFromVM";
 import { backfillEvidencePackageSignalsCountV01 } from "./evidencePackage.signalsCount.backfill.v0.1";
@@ -46,6 +53,29 @@ function deriveTargetSenseIdV0_1(label: string): string {
     .slice(0, 80);
 
   return slug ? `user_sense_${slug}` : "";
+}
+
+async function buildSemanticAlignmentMapV0_1(input: {
+  word: string;
+  targetSenseId: string;
+  targetSenseLabel: string;
+}): Promise<Record<string, unknown>> {
+  if (!input.targetSenseId || !input.targetSenseLabel) return {};
+
+  const assessments: Record<string, unknown> = {};
+  for (const structuralHypothesis of discoverStructuralHypothesesV0_1(input.word)) {
+    const context = buildSemanticAlignmentContextV0_1({
+      targetWord: input.word,
+      targetSenseId: input.targetSenseId,
+      targetSenseLabel: input.targetSenseLabel,
+      structuralHypothesis,
+    });
+    if (!context.ok) continue;
+
+    const proposal = await runSemanticAlignmentProposalV0_1(context.context);
+    assessments[structuralHypothesis.hypothesisId] = proposal.assessment;
+  }
+  return assessments;
 }
 
 function applyDevOriginClaimGates(reqUrl?: string): boolean | null {
@@ -757,6 +787,12 @@ try {
     const heartInstrumentV1 = buildHeartInstrumentV1(word);
 
     const payload = await runAnalysisDeterministic(word, { mode, alphabet });
+    const semanticAlignmentByStructuralHypothesisId =
+      await buildSemanticAlignmentMapV0_1({
+        word,
+        targetSenseId,
+        targetSenseLabel,
+      });
       // Attach request-ish inputs so downstream (OriginClaim) can see seedFallbackEnabled.
       // Additive only; does not change deterministic solver output.
       (payload as any).inputs = {
@@ -767,6 +803,9 @@ try {
           language || undefined,
         targetSenseId: targetSenseId || undefined,
         targetSenseLabel: targetSenseLabel || undefined,
+        ...(Object.keys(semanticAlignmentByStructuralHypothesisId).length > 0
+          ? { semanticAlignmentByStructuralHypothesisId }
+          : {}),
         brainCandidatesSeedFallback: seedFallbackEnabled,
       };
 
@@ -1087,6 +1126,12 @@ if (!word) {
       mode: modeParsed,
       alphabet: alphabet || undefined,
     });
+    const semanticAlignmentByStructuralHypothesisId =
+      await buildSemanticAlignmentMapV0_1({
+        word,
+        targetSenseId,
+        targetSenseLabel,
+      });
       // Attach request-ish inputs so downstream (OriginClaim) can see seedFallbackEnabled.
       (payload as any).inputs = {
         word,
@@ -1097,7 +1142,10 @@ if (!word) {
           language || undefined,
         targetSenseId: targetSenseId || undefined,
         targetSenseLabel: targetSenseLabel || undefined,
-          brainCandidatesSeedFallback: seedFallbackEnabled,
+        ...(Object.keys(semanticAlignmentByStructuralHypothesisId).length > 0
+          ? { semanticAlignmentByStructuralHypothesisId }
+          : {}),
+        brainCandidatesSeedFallback: seedFallbackEnabled,
       };
 
     const out = enginePayloadToAnalysisResult(payload);

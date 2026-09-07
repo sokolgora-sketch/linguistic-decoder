@@ -7,6 +7,7 @@ import {
   type StructuralHypothesisV0_1,
 } from "@/shared/structuralHypothesisDiscovery.v0_1";
 import type { SevenVoiceKey } from "@/shared/sevenVoiceOrderedViews.v0.1";
+import type { SemanticAlignmentAssessmentV0_1 } from "@/shared/openInstrument/semanticAlignment.v0_1";
 
 export const LOGIC_DERIVED_FUNCTIONAL_HYPOTHESIS_SCHEMA_V0_1 =
   "open-instrument.logic-derived-functional-hypothesis.v0_1" as const;
@@ -18,6 +19,7 @@ export type LogicDerivedFunctionalHypothesisInputV0_1 = Readonly<{
     label: string;
   }>;
   structuralHypothesis: StructuralHypothesisV0_1;
+  semanticAlignment?: SemanticAlignmentAssessmentV0_1;
 }>;
 
 export type LogicDerivedFunctionalHypothesisV0_1 = Readonly<{
@@ -39,6 +41,7 @@ export type LogicDerivedFunctionalHypothesisV0_1 = Readonly<{
   }>;
   voicePath: SevenVoiceKey[];
   doctrineProjection: DoctrineProjectionSuccessV0_1;
+  semanticAlignment: SemanticAlignmentAssessmentV0_1;
   semanticBridge: string;
   functionalBridgeTruth: "hypothesis";
   historicalOriginClaim: "not_claimed";
@@ -87,6 +90,7 @@ export function buildLogicDerivedFunctionalHypothesisV0_1(
   const targetSenseId = textV0_1(input?.targetSense?.id);
   const targetSenseLabel = textV0_1(input?.targetSense?.label);
   const structural = input?.structuralHypothesis;
+  const semanticAlignment = input?.semanticAlignment;
 
   if (!targetWord) {
     return failureV0_1(["TARGET_WORD_REQUIRED"]);
@@ -96,6 +100,11 @@ export function buildLogicDerivedFunctionalHypothesisV0_1(
     return failureV0_1(["TARGET_SENSE_REQUIRED"]);
   }
 
+  if (!semanticAlignment) {
+    return failureV0_1(["SEMANTIC_ALIGNMENT_REQUIRED"]);
+  }
+
+  const semanticBridge = textV0_1(semanticAlignment.semanticBridge);
   if (
     !structural ||
     structural.hypothesisVersion !==
@@ -140,6 +149,24 @@ export function buildLogicDerivedFunctionalHypothesisV0_1(
   const roles = doctrineProjection.projections.map(
     (projection) => projection.doctrineRole,
   );
+
+  if (
+    semanticAlignment.schemaVersion !==
+      "open-instrument.semantic-alignment.v0_1" ||
+    semanticAlignment.alignmentStatus !== "proposed" ||
+    semanticAlignment.targetWord !== targetWord ||
+    semanticAlignment.targetSenseId !== targetSenseId ||
+    semanticAlignment.targetSenseLabel !== targetSenseLabel ||
+    semanticAlignment.structuralHypothesisId !== structural.hypothesisId ||
+    !semanticBridge ||
+    semanticAlignment.alignmentSource === "deterministic_no_alignment" ||
+    semanticAlignment.doctrineRoles.some(
+      (role) => !roles.includes(role as (typeof roles)[number]),
+    )
+  ) {
+    return failureV0_1(["SEMANTIC_ALIGNMENT_INVALID"]);
+  }
+
   const voicePath = doctrineProjection.inputPath;
   const hypothesisId = [
     "logic-functional",
@@ -172,8 +199,8 @@ export function buildLogicDerivedFunctionalHypothesisV0_1(
       },
       voicePath,
       doctrineProjection,
-      semanticBridge:
-        `The canonical doctrine path ${voicePath.join(" -> ")} (${roles.join(" -> ")}) is a possible functional bridge for target sense "${targetSenseLabel}" through structural anchor "${structural.embryo}". This remains a logic-derived hypothesis only; it is not lexical evidence, candidate truth, or historical origin.`,
+      semanticAlignment,
+      semanticBridge,
       functionalBridgeTruth: "hypothesis",
       historicalOriginClaim: "not_claimed",
       historicalTransmissionClaim: "not_claimed",

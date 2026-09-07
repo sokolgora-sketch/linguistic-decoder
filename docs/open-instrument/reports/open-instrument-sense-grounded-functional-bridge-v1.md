@@ -77,25 +77,25 @@ The milestone must inspect and reuse the existing owners rather than create para
 | Lane | State |
 | --- | --- |
 | 1. Baseline arbitrary-sense acceptance proof | DONE |
-| 2. Semantic alignment contract v0.1 | NEXT |
-| 3. Deterministic alignment context | NOT_STARTED |
-| 4. Semantic bridge proposal seam | NOT_STARTED |
-| 5. Semantic alignment integrity verification | NOT_STARTED |
-| 6. Remove automatic tautological bridge | NOT_STARTED |
+| 2. Semantic alignment contract v0.1 | DONE |
+| 3. Deterministic alignment context | DONE |
+| 4. Semantic bridge proposal seam | DONE |
+| 5. Semantic alignment integrity verification | DONE |
+| 6. Remove automatic tautological bridge | DONE |
 | 7. Optional user-asserted functional link decision | NOT_STARTED |
-| 8. Runtime/API integration | NOT_STARTED |
-| 9. Status and precedence rules | NOT_STARTED |
-| 10. UI truth display | NOT_STARTED |
-| 11. Matched/mismatched sense matrix | NOT_STARTED |
-| 12. Tautology and quality controls | NOT_STARTED |
-| 13. Prompt-injection safety | NOT_STARTED |
-| 14. Evidence precedence controls | NOT_STARTED |
-| 15. Null and structural-only controls | NOT_STARTED |
-| 16. No-hardcode proof | NOT_STARTED |
-| 17. Determinism and repeatability | NOT_STARTED |
-| 18. Product reality proof | NOT_STARTED |
-| 19. Real-provider proof, if available | NOT_STARTED |
-| 20. Full validation | NOT_STARTED |
+| 8. Runtime/API integration | DONE |
+| 9. Status and precedence rules | DONE |
+| 10. UI truth display | DONE |
+| 11. Matched/mismatched sense matrix | DONE |
+| 12. Tautology and quality controls | DONE |
+| 13. Prompt-injection safety | DONE |
+| 14. Evidence precedence controls | DONE |
+| 15. Null and structural-only controls | DONE |
+| 16. No-hardcode proof | DONE |
+| 17. Determinism and repeatability | DONE |
+| 18. Product reality proof | DONE |
+| 19. Real-provider proof, if available | DONE (unavailable, not claimed) |
+| 20. Full validation | DONE |
 | 21. Implementation PR and review | NOT_STARTED |
 | 22. Merge, closure, and DF_BRAIN | NOT_STARTED |
 
@@ -132,11 +132,37 @@ The only changes across rows were the echoed target-sense label, hypothesis ID c
 
 The baseline regression is frozen in `tests/openInstrument.senseGroundedFunctionalBridge.baseline.v0_1.spec.ts`. No production behavior was changed in this lane.
 
-## 6B. Initial next task
+## 6B. Implementation closeout
 
-**Lane 2 — Semantic alignment contract v0.1.**
+The contract-hardening implementation is complete in the working branch:
 
-Add a versioned, explicit assessment contract that can represent `proposed`, `unknown`, and `rejected` alignment, with source/provenance and fail-closed quality boundaries, without claiming semantic truth.
+- `src/shared/openInstrument/semanticAlignment.v0_1.ts` defines the versioned `proposed|unknown|rejected` assessment, deterministic context, fail-closed parser, bounded claim language, and deterministic no-alignment result;
+- `src/shared/orchestrator/semanticAlignmentProposal.v0_1.ts` reuses the existing proposer seam, supports test-only semantic fixtures, and reports a real provider as unavailable unless explicitly configured;
+- `src/shared/openInstrument/logicDerivedFunctionalHypothesis.v0_1.ts` now requires a bound `proposed` assessment and uses only its reviewed hypothesis bridge;
+- `src/shared/verifier/verifyLogicDerivedFunctionalHypothesis.v0_1.ts` verifies assessment binding, provider source, doctrine-role membership, and truth boundaries;
+- `app/api/analyze-v1/route.ts` builds bounded context per structural hypothesis and carries deterministic `unknown` when no provider is available;
+- the analysis/UI adapters expose alignment status and the UI labels structural-only `unknown` posture without turning it into a functional candidate.
+
+The old automatic bridge is therefore removed from the logic-derived path. A target sense alone no longer creates a candidate. The provider-backed test fixture produces a candidate-only hypothesis; unknown or rejected alignment leaves the structural hypothesis visible and preserves valid Null/structural status.
+
+The matched/mismatched matrix is covered by `tests/openInstrument.senseGroundedFunctionalBridge.baseline.v0_1.spec.ts` and `tests/openInstrument.semanticAlignment.v0_1.spec.ts`. The matrix includes ordinary, unrelated, underspecified, and prompt-injection-shaped senses; all provider-disabled cases remain `unknown` and none promote historical, winner, language-superiority, candidate-truth, or evidence claims.
+
+## 6C. Validation closeout
+
+- focused semantic, builder, verifier, API, UI, and regression suites: PASS;
+- `npm run typecheck`: PASS;
+- `npm run build`: PASS;
+- `npm run gate:quick`: PASS;
+- gate unit phase: `640 passed`, `3 skipped`; `2,874 passed`, `4 skipped` tests;
+- gate integration phase: `2 suites`, `5 tests`, PASS;
+- gate production build: PASS, including TypeScript and static generation;
+- real provider: NOT CONFIGURED / NOT CLAIMED; only deterministic mock provider fixtures were used;
+- catalog/evidence rows: unchanged; no SCALE-50 evidence expansion;
+- JO stash: protected object and marker unchanged.
+
+## 6D. Next task
+
+**Lane 21 — implementation PR and review.**
 
 ## 7. Explicit non-goals
 

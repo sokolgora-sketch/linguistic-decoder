@@ -1153,6 +1153,14 @@ const normalizationSteps =
         asString(rec["targetSenseId"]);
       const targetSenseLabel =
         asString(rec["targetSenseLabel"]);
+      const semanticAlignmentStatus =
+        asString(rec["semanticAlignmentStatus"]);
+      const semanticAlignmentSource =
+        asString(rec["semanticAlignmentSource"]);
+      const semanticAlignmentReasonCodes =
+        asStringArray(rec["semanticAlignmentReasonCodes"]);
+      const semanticAlignmentBridge =
+        asString(rec["semanticAlignmentBridge"]);
       const sourceId =
         asString(rec["sourceId"]);
       const sourceStatus =
@@ -1362,6 +1370,22 @@ const evidenceId = String(id).toLowerCase().replace(/[^a-z0-9_]/g, "_");
           ? {
               targetSenseLabel: present(targetSenseLabel),
             }
+          : {}),
+
+        ...(semanticAlignmentStatus
+          ? { semanticAlignmentStatus: present(semanticAlignmentStatus) }
+          : {}),
+
+        ...(semanticAlignmentSource
+          ? { semanticAlignmentSource: present(semanticAlignmentSource) }
+          : {}),
+
+        ...(semanticAlignmentReasonCodes && semanticAlignmentReasonCodes.length > 0
+          ? { semanticAlignmentReasonCodes: present(semanticAlignmentReasonCodes) }
+          : {}),
+
+        ...(semanticAlignmentBridge
+          ? { semanticAlignmentBridge: present(semanticAlignmentBridge) }
           : {}),
 
         ...(sourceId

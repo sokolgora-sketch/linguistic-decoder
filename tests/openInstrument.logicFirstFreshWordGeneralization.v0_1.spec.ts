@@ -28,6 +28,14 @@ async function analyze(word: string, sense = false): Promise<any> {
 }
 
 describe("logic-first fresh-word generalization v0.1", () => {
+  beforeEach(() => {
+    process.env.OPEN_INSTRUMENT_SEMANTIC_ALIGNMENT_TEST_PROVIDER =
+      "mock_semantic_proposed";
+  });
+
+  afterAll(() => {
+    delete process.env.OPEN_INSTRUMENT_SEMANTIC_ALIGNMENT_TEST_PROVIDER;
+  });
   it("records the real fresh-word distribution without requiring non-Null output", async () => {
     const rows = [] as Array<Record<string, unknown>>;
 

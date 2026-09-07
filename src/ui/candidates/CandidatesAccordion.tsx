@@ -252,6 +252,19 @@ export function CandidatesAccordion({ rows }: { rows: UICandidateRow[] }) {
                           </div>
                         ) : null}
 
+                        {isStructuralHypothesis && c.semanticAlignmentStatus ? (
+                          <div className="break-words text-xs text-slate-300">
+                            {`Semantic alignment: ${truthLabel(c.semanticAlignmentStatus)}`}
+                          </div>
+                        ) : null}
+
+                        {isStructuralHypothesis &&
+                        c.semanticAlignmentStatus === "unknown" ? (
+                          <div className="break-words text-xs text-slate-400">
+                            No bounded functional relationship was proposed; human review remains required.
+                          </div>
+                        ) : null}
+
                         {isResearchFunctionalHypothesis &&
                         c.sourceId ? (
                           <div className="break-all font-mono text-xs text-slate-400">

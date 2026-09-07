@@ -53,6 +53,7 @@ import { loadMultiSourceFunctionalResearchEvidenceCatalogV0_1 } from "./multiSou
 import { projectMultiSourceFunctionalResearchWitnessesV0_1 } from "./multiSourceFunctionalResearchProjection.v0_1";
 import { buildLogicDerivedFunctionalHypothesisV0_1 } from "./openInstrument/logicDerivedFunctionalHypothesis.v0_1";
 import { verifyLogicDerivedFunctionalHypothesisV0_1 } from "./verifier/verifyLogicDerivedFunctionalHypothesis.v0_1";
+import type { SemanticAlignmentAssessmentV0_1 } from "./openInstrument/semanticAlignment.v0_1";
 
 const multiSourceFunctionalResearchEvidenceCatalogV0_1 =
   loadMultiSourceFunctionalResearchEvidenceCatalogV0_1();
@@ -333,6 +334,11 @@ export function enginePayloadToAnalysisResult(payload: EnginePayload): AnalyzeWo
     typeof requestInputs?.targetSenseLabel === "string"
       ? requestInputs.targetSenseLabel.trim()
       : "";
+  const semanticAlignmentByStructuralHypothesisId =
+    requestInputs?.semanticAlignmentByStructuralHypothesisId &&
+    typeof requestInputs.semanticAlignmentByStructuralHypothesisId === "object"
+      ? requestInputs.semanticAlignmentByStructuralHypothesisId
+      : {};
   const canEmitLogicDerivedFunctionalHypothesisV0_1 =
     baselineAnalysisStatusV0_1.status ===
       "null_no_supported_candidate" &&
@@ -348,6 +354,10 @@ export function enginePayloadToAnalysisResult(payload: EnginePayload): AnalyzeWo
               label: targetSenseLabel,
             },
             structuralHypothesis,
+            semanticAlignment:
+              semanticAlignmentByStructuralHypothesisId[
+                structuralHypothesis.hypothesisId
+              ] as SemanticAlignmentAssessmentV0_1 | undefined,
           });
 
           if (!built.ok) return [];
@@ -375,6 +385,14 @@ export function enginePayloadToAnalysisResult(payload: EnginePayload): AnalyzeWo
               targetWord: built.hypothesis.targetWord,
               targetSenseId: built.hypothesis.targetSenseId,
               targetSenseLabel: built.hypothesis.targetSenseLabel,
+              semanticAlignmentStatus:
+                built.hypothesis.semanticAlignment.alignmentStatus,
+              semanticAlignmentSource:
+                built.hypothesis.semanticAlignment.alignmentSource,
+              semanticAlignmentReasonCodes:
+                built.hypothesis.semanticAlignment.reasonCodes,
+              semanticAlignmentBridge:
+                built.hypothesis.semanticAlignment.semanticBridge,
               claimType: "functionalMotivation",
               originClaim: "not_claimed",
               historicalRelation: "not_evaluated",
@@ -433,8 +451,12 @@ export function enginePayloadToAnalysisResult(payload: EnginePayload): AnalyzeWo
         (
           hypothesis,
           index,
-        ) =>
-          projectEmbryoFirstCandidateForAnalyzeV1(
+        ) => {
+          const semanticAlignment =
+            semanticAlignmentByStructuralHypothesisId[
+              hypothesis.hypothesisId
+            ] as SemanticAlignmentAssessmentV0_1 | undefined;
+          return projectEmbryoFirstCandidateForAnalyzeV1(
             {
               id:
                 hypothesis
@@ -450,6 +472,16 @@ export function enginePayloadToAnalysisResult(payload: EnginePayload): AnalyzeWo
                   .embryo,
               candidateLanguage:
                 "unknown",
+              targetSenseId: targetSenseId || undefined,
+              targetSenseLabel: targetSenseLabel || undefined,
+              semanticAlignmentStatus:
+                semanticAlignment?.alignmentStatus,
+              semanticAlignmentSource:
+                semanticAlignment?.alignmentSource,
+              semanticAlignmentReasonCodes:
+                semanticAlignment?.reasonCodes,
+              semanticAlignmentBridge:
+                semanticAlignment?.semanticBridge,
               sourceKind:
                 "logic_derived_structural_hypothesis",
               claimType:
@@ -549,7 +581,8 @@ export function enginePayloadToAnalysisResult(payload: EnginePayload): AnalyzeWo
             },
             payload,
             index,
-          ),
+          );
+        },
       );
 
     (result as any).candidates =

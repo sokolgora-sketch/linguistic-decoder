@@ -9,7 +9,11 @@ const SENSES = [
 ] as const;
 
 describe("sense-grounded functional bridge arbitrary-sense baseline v0.1", () => {
-  it("accepts every non-empty sense as an equivalent functional hypothesis before grounding", async () => {
+  beforeEach(() => {
+    delete process.env.OPEN_INSTRUMENT_SEMANTIC_ALIGNMENT_TEST_PROVIDER;
+  });
+
+  it("does not accept arbitrary non-empty senses without semantic alignment", async () => {
     const results = [] as Array<Record<string, unknown>>;
 
     for (const targetSenseLabel of SENSES) {
@@ -27,31 +31,27 @@ describe("sense-grounded functional bridge arbitrary-sense baseline v0.1", () =>
         (candidate: any) =>
           candidate.sourceKind === "logic_derived_functional_hypothesis",
       );
-      const candidate = candidates[0];
-
-      expect(body.analysisStatusV0_1.status).toBe("candidate_only");
-      expect(candidates).toHaveLength(1);
-      expect(candidate.targetSenseId).toBe("baseline_sense");
-      expect(candidate.targetSenseLabel).toBe(targetSenseLabel);
-      expect(candidate.expansionChain).toEqual(["AN", "CAN", "CANDLE"]);
-      expect(candidate.functionalBridgeTruth).toBe("hypothesis");
-      expect(candidate.logicDerivedFunctionalHypothesisVerificationV0_1).toMatchObject({
-        status: "verified",
-        accepted: true,
-      });
+      expect(candidates).toHaveLength(0);
+      expect(body.analysisStatusV0_1.status).toBe("structural_unreviewed");
+      const structural = (body.candidates ?? []).find(
+        (candidate: any) => candidate.claimType === "structuralHypothesis",
+      );
+      expect(structural?.semanticAlignmentStatus).toBe("unknown");
+      expect(structural?.targetSenseId).toBe("baseline_sense");
+      expect(structural?.targetSenseLabel).toBe(targetSenseLabel);
 
       results.push({
         targetSenseLabel,
         status: body.analysisStatusV0_1.status,
         logicCandidateCount: candidates.length,
-        semanticBridge: candidate.semanticBridge,
-        verifier: candidate.logicDerivedFunctionalHypothesisVerificationV0_1,
+        semanticBridge: null,
+        verifier: null,
       });
     }
 
     expect(results).toHaveLength(SENSES.length);
     expect(new Set(results.map((result) => result.status))).toEqual(
-      new Set(["candidate_only"]),
+      new Set(["structural_unreviewed"]),
     );
   });
 });

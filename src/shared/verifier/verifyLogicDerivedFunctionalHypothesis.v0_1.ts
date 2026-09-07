@@ -144,6 +144,38 @@ export function verifyLogicDerivedFunctionalHypothesisV0_1(
   const semanticBridgePresent = Boolean(textV0_1(hypothesis.semanticBridge));
   checks.push(checkV0_1("semantic_bridge_present", semanticBridgePresent));
 
+  const semanticAlignment = isRecordV0_1(hypothesis.semanticAlignment)
+    ? hypothesis.semanticAlignment
+    : null;
+  const semanticAlignmentRoles = semanticAlignment
+    ? stringArrayV0_1(semanticAlignment.doctrineRoles)
+    : null;
+  const projectedRoles = doctrineProjection.ok
+    ? doctrineProjection.projections.map((projection) => projection.doctrineRole)
+    : [];
+  const semanticAlignmentValid = Boolean(
+    semanticAlignment &&
+      semanticAlignment.schemaVersion ===
+        "open-instrument.semantic-alignment.v0_1" &&
+      semanticAlignment.alignmentStatus === "proposed" &&
+      semanticAlignment.alignmentSource !== "deterministic_no_alignment" &&
+      normalizedWordV0_1(semanticAlignment.targetWord) ===
+        normalizedWordV0_1(hypothesis.targetWord) &&
+      textV0_1(semanticAlignment.targetSenseId) ===
+        textV0_1(hypothesis.targetSenseId) &&
+      textV0_1(semanticAlignment.targetSenseLabel) ===
+        textV0_1(hypothesis.targetSenseLabel) &&
+      textV0_1(semanticAlignment.structuralHypothesisId) ===
+        textV0_1(structuralAnchor?.hypothesisId) &&
+      Boolean(textV0_1(semanticAlignment.semanticBridge)) &&
+      semanticAlignmentRoles &&
+      semanticAlignmentRoles.length > 0 &&
+      semanticAlignmentRoles.every(
+        (role) => projectedRoles.includes(role as (typeof projectedRoles)[number]),
+      )
+  );
+  checks.push(checkV0_1("semantic_alignment_integrity", semanticAlignmentValid));
+
   const truthBoundaryValid =
     hypothesis.aggregateStatus === "candidate_only" &&
     hypothesis.sourceKind === "logic_derived_functional_hypothesis" &&
@@ -178,6 +210,9 @@ export function verifyLogicDerivedFunctionalHypothesisV0_1(
     reasonCodes.push("DOCTRINE_PROJECTION_MISMATCH");
   }
   if (!semanticBridgePresent) reasonCodes.push("SEMANTIC_BRIDGE_MISSING");
+  if (!semanticAlignmentValid) {
+    reasonCodes.push("SEMANTIC_ALIGNMENT_INVALID");
+  }
   if (!truthBoundaryValid) reasonCodes.push("TRUTH_BOUNDARY_VIOLATION");
   if (strongerEvidencePresent) {
     reasonCodes.push("STRONGER_EVIDENCE_OWNS_RESULT");
