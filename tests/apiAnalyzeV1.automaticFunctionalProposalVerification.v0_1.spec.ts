@@ -470,19 +470,22 @@ describe(
         ).toBe(false);
 
         // The rejected automatic functional proposal must not erase
-        // an independently derived deterministic structural hypothesis.
-        // MEMORY already yields MEMORY -> MEM -> EM with the automatic
-        // proposer disabled; EM remains meaning-unknown and unreviewed.
+        // independently derived deterministic structural context.
+        //
+        // MEMORY also has independent source-backed KUJTESË research.
+        // Research owns the aggregate status by precedence, while EM
+        // remains a lower-precedence meaning-unknown structural candidate.
         expect(
           body.analysisStatusV0_1,
         ).toMatchObject({
           status:
-            "structural_unreviewed",
+            "research_functional_hypothesis",
           reviewedOperators: [],
           candidateOnlyOperators: [],
-          structuralTokens: [
-            "EM",
+          researchHypothesisEmbryos: [
+            "KUJTESË",
           ],
+          structuralTokens: [],
         });
 
         const structuralEm =

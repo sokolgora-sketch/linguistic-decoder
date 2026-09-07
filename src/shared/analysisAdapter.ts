@@ -523,19 +523,19 @@ export function enginePayloadToAnalysisResult(payload: EnginePayload): AnalyzeWo
         )
       : [];
 
-  // Evidence-first research fallback v0.1.
+  // Evidence-first source-attested research composition v0.2.
   //
-  // This seam activates only when deterministic analysis is genuinely
-  // Null and structural discovery produced no defensible embryo.
-  // Source rows must directly attest their declared embryo as an exact
-  // form. No structural chain is fabricated and no reviewed/origin/
-  // winner/candidate truth is created here.
+  // This seam activates only when the untouched baseline is genuinely
+  // Null. It may coexist with later deterministic structural hypotheses.
+  // Source-attested exact-form evidence is independent authority and MUST
+  // NOT be interpreted as validating a logic-derived structural embryo.
+  // Source rows must directly attest their declared embryo as an exact form.
+  // No structural chain is fabricated and no reviewed/origin/winner/
+  // candidate truth is created here.
   const shouldProjectSourceAttestedResearchV0_1 =
     baselineAnalysisStatusV0_1
       .status ===
-        "null_no_supported_candidate" &&
-    structuralHypothesesV0_1.length ===
-      0;
+        "null_no_supported_candidate";
 
   const projectedSourceAttestedResearchCandidatesV0_1 =
     shouldProjectSourceAttestedResearchV0_1

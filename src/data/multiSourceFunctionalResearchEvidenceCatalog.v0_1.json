@@ -750,6 +750,211 @@
       "languageSuperiorityClaim": "not_claimed",
       "candidateTruthClaim": "not_claimed",
       "userDecisionPosture": "user_decides"
+    },
+    {
+      "registryVersion": "open-instrument.multi-source-functional-research-evidence-registry.v0_1",
+      "researchEvidenceId": "research.external.albanian-lume-river.scale50.v0_1",
+      "embryo": "LUMË",
+      "evidenceFamily": "lexical_dictionary",
+      "language": "Albanian",
+      "form": "lumë",
+      "gloss": "river; large permanent natural flow of fresh water",
+      "embryoRelation": "exact_form",
+      "relationOperationIds": [],
+      "attestationTruth": "fact",
+      "sourceStatus": "research_candidate",
+      "citations": [
+        {
+          "citationId": "research.external.fjale-lume-river.scale50.citation.v0_1",
+          "sourceTitle": "FJALË — Lumë",
+          "sourceAuthorOrEditor": null,
+          "sourcePublisherOrHost": "FJALË — Fjalor Shqip",
+          "sourceDateOrVersion": "accessed 2026-09-07",
+          "sourceUrlOrArchiveRef": "https://fjale.al/lum%C3%AB",
+          "entryLocator": "LUMË m., sense 1",
+          "sourceHashOrArchiveHash": null,
+          "attestedForm": "lumë",
+          "attestedGloss": "river; large permanent natural flow of fresh water"
+        }
+      ],
+      "functionalHypotheses": [
+        {
+          "targetWord": "river",
+          "semanticBridge": "the independently attested Albanian noun lumë denotes a river and can be tested as a direct cross-language functional witness for the RIVER concept; it does not validate the separate IV structural hypothesis and does not assert historical origin",
+          "functionalBridgeTruth": "hypothesis",
+          "claimBoundary": "functional_hypothesis_only"
+        }
+      ],
+      "historicalOriginClaim": "not_claimed",
+      "historicalTransmissionClaim": "not_claimed",
+      "winnerClaim": "not_claimed",
+      "languageSuperiorityClaim": "not_claimed",
+      "candidateTruthClaim": "not_claimed",
+      "userDecisionPosture": "user_decides"
+    },
+    {
+      "registryVersion": "open-instrument.multi-source-functional-research-evidence-registry.v0_1",
+      "researchEvidenceId": "research.external.albanian-gjak-blood.scale50.v0_1",
+      "embryo": "GJAK",
+      "evidenceFamily": "lexical_dictionary",
+      "language": "Albanian",
+      "form": "gjak",
+      "gloss": "blood; red liquid circulating in the human and animal body",
+      "embryoRelation": "exact_form",
+      "relationOperationIds": [],
+      "attestationTruth": "fact",
+      "sourceStatus": "research_candidate",
+      "citations": [
+        {
+          "citationId": "research.external.fjale-gjak-blood.scale50.citation.v0_1",
+          "sourceTitle": "FJALË — Gjak",
+          "sourceAuthorOrEditor": null,
+          "sourcePublisherOrHost": "FJALË — Fjalor Shqip",
+          "sourceDateOrVersion": "accessed 2026-09-07",
+          "sourceUrlOrArchiveRef": "https://fjale.al/gjak",
+          "entryLocator": "GJAK m., sense 1",
+          "sourceHashOrArchiveHash": null,
+          "attestedForm": "gjak",
+          "attestedGloss": "blood; red liquid circulating in the body"
+        }
+      ],
+      "functionalHypotheses": [
+        {
+          "targetWord": "blood",
+          "semanticBridge": "the independently attested Albanian noun gjak denotes blood and can be tested as a direct cross-language functional witness for the BLOOD concept; it does not validate the separate LO or OOD structural hypotheses and does not assert historical origin",
+          "functionalBridgeTruth": "hypothesis",
+          "claimBoundary": "functional_hypothesis_only"
+        }
+      ],
+      "historicalOriginClaim": "not_claimed",
+      "historicalTransmissionClaim": "not_claimed",
+      "winnerClaim": "not_claimed",
+      "languageSuperiorityClaim": "not_claimed",
+      "candidateTruthClaim": "not_claimed",
+      "userDecisionPosture": "user_decides"
+    },
+    {
+      "registryVersion": "open-instrument.multi-source-functional-research-evidence-registry.v0_1",
+      "researchEvidenceId": "research.external.albanian-flas-speak.scale50.v0_1",
+      "embryo": "FLAS",
+      "evidenceFamily": "lexical_dictionary",
+      "language": "Albanian",
+      "form": "flas",
+      "gloss": "to speak; articulate words and sentences to communicate thought",
+      "embryoRelation": "exact_form",
+      "relationOperationIds": [],
+      "attestationTruth": "fact",
+      "sourceStatus": "research_candidate",
+      "citations": [
+        {
+          "citationId": "research.external.fjale-flas-speak.scale50.citation.v0_1",
+          "sourceTitle": "FJALË — Flas",
+          "sourceAuthorOrEditor": null,
+          "sourcePublisherOrHost": "FJALË — Fjalor Shqip",
+          "sourceDateOrVersion": "accessed 2026-09-07",
+          "sourceUrlOrArchiveRef": "https://fjale.al/flas",
+          "entryLocator": "FLAS jokal., senses 1-2",
+          "sourceHashOrArchiveHash": null,
+          "attestedForm": "flas",
+          "attestedGloss": "to speak; articulate words and sentences"
+        }
+      ],
+      "functionalHypotheses": [
+        {
+          "targetWord": "speak",
+          "semanticBridge": "the independently attested Albanian verb flas denotes speaking and can be tested as a direct cross-language functional witness for the SPEAK concept; it does not validate the separate PE or EAK structural hypotheses and does not assert historical origin",
+          "functionalBridgeTruth": "hypothesis",
+          "claimBoundary": "functional_hypothesis_only"
+        }
+      ],
+      "historicalOriginClaim": "not_claimed",
+      "historicalTransmissionClaim": "not_claimed",
+      "winnerClaim": "not_claimed",
+      "languageSuperiorityClaim": "not_claimed",
+      "candidateTruthClaim": "not_claimed",
+      "userDecisionPosture": "user_decides"
+    },
+    {
+      "registryVersion": "open-instrument.multi-source-functional-research-evidence-registry.v0_1",
+      "researchEvidenceId": "research.external.albanian-kujtese-memory.scale50.v0_1",
+      "embryo": "KUJTESË",
+      "evidenceFamily": "lexical_dictionary",
+      "language": "Albanian",
+      "form": "kujtesë",
+      "gloss": "memory; ability to retain and reproduce what was previously perceived or learned",
+      "embryoRelation": "exact_form",
+      "relationOperationIds": [],
+      "attestationTruth": "fact",
+      "sourceStatus": "research_candidate",
+      "citations": [
+        {
+          "citationId": "research.external.fjale-kujtese-memory.scale50.citation.v0_1",
+          "sourceTitle": "FJALË — Kujtesë",
+          "sourceAuthorOrEditor": null,
+          "sourcePublisherOrHost": "FJALË — Fjalor Shqip",
+          "sourceDateOrVersion": "accessed 2026-09-07",
+          "sourceUrlOrArchiveRef": "https://fjale.al/kujtes%C3%AB",
+          "entryLocator": "KUJTESË f., senses 1-2",
+          "sourceHashOrArchiveHash": null,
+          "attestedForm": "kujtesë",
+          "attestedGloss": "memory; ability to retain and reproduce past experience or learning"
+        }
+      ],
+      "functionalHypotheses": [
+        {
+          "targetWord": "memory",
+          "semanticBridge": "the independently attested Albanian noun kujtesë denotes memory and can be tested as a direct cross-language functional witness for the MEMORY concept; it does not validate the separate EM structural hypothesis and does not assert historical origin",
+          "functionalBridgeTruth": "hypothesis",
+          "claimBoundary": "functional_hypothesis_only"
+        }
+      ],
+      "historicalOriginClaim": "not_claimed",
+      "historicalTransmissionClaim": "not_claimed",
+      "winnerClaim": "not_claimed",
+      "languageSuperiorityClaim": "not_claimed",
+      "candidateTruthClaim": "not_claimed",
+      "userDecisionPosture": "user_decides"
+    },
+    {
+      "registryVersion": "open-instrument.multi-source-functional-research-evidence-registry.v0_1",
+      "researchEvidenceId": "research.external.albanian-grua-woman.scale50.v0_1",
+      "embryo": "GRUA",
+      "evidenceFamily": "lexical_dictionary",
+      "language": "Albanian",
+      "form": "grua",
+      "gloss": "woman; adult female human",
+      "embryoRelation": "exact_form",
+      "relationOperationIds": [],
+      "attestationTruth": "fact",
+      "sourceStatus": "research_candidate",
+      "citations": [
+        {
+          "citationId": "research.external.fjale-grua-woman.scale50.citation.v0_1",
+          "sourceTitle": "FJALË — Grua",
+          "sourceAuthorOrEditor": null,
+          "sourcePublisherOrHost": "FJALË — Fjalor Shqip",
+          "sourceDateOrVersion": "accessed 2026-09-07",
+          "sourceUrlOrArchiveRef": "https://fjale.al/grua",
+          "entryLocator": "GRUA f., sense 1",
+          "sourceHashOrArchiveHash": null,
+          "attestedForm": "grua",
+          "attestedGloss": "woman; adult female human"
+        }
+      ],
+      "functionalHypotheses": [
+        {
+          "targetWord": "woman",
+          "semanticBridge": "the independently attested Albanian noun grua denotes a woman and can be tested as a direct cross-language functional witness for the WOMAN concept; it does not validate the separate OM structural hypothesis and does not assert historical origin",
+          "functionalBridgeTruth": "hypothesis",
+          "claimBoundary": "functional_hypothesis_only"
+        }
+      ],
+      "historicalOriginClaim": "not_claimed",
+      "historicalTransmissionClaim": "not_claimed",
+      "winnerClaim": "not_claimed",
+      "languageSuperiorityClaim": "not_claimed",
+      "candidateTruthClaim": "not_claimed",
+      "userDecisionPosture": "user_decides"
     }
   ]
 }
