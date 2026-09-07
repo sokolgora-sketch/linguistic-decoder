@@ -130,7 +130,7 @@ describe("Open Instrument real evidence-packet compiler pilot v0.1", () => {
 
   it("reproduces the four catalog rows from the two reviewed packets", () => {
     const catalogRows = loadMultiSourceFunctionalResearchEvidenceCatalogV0_1();
-    expect(catalogRows).toHaveLength(70);
+    expect(catalogRows).toHaveLength(78);
 
     const compiledRows = PILOT_TARGETS_V0_1.flatMap((target) => {
       const parsed = parseOpenInstrumentResearchEvidencePacketV0_1(

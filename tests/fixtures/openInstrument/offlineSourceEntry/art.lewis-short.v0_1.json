@@ -1,0 +1,20 @@
+{
+  "snapshotVersion": "open-instrument.offline-source-entry-snapshot.v0_1",
+  "sourceTraditionId": "scaife.lewis-short.v0_1",
+  "sourceSnapshotId": "scaife-ars-reviewed-2026-09-07",
+  "sourceDateOrVersion": "Lewis & Short; accessed 2026-09-07",
+  "sourceUrlOrArchiveRef": "https://atlas.perseus.tufts.edu/dictionaries/entry/urn%3Acite2%3Ascaife-viewer%3Adictionary-entries.atlas_v1%3Alat.ls.perseus-eng2-n3769/",
+  "entry": {
+    "headword": "ars",
+    "locator": "headword ars; art sense; entry text beginning skill in producing any material form.",
+    "attestedForms": [
+      "ars"
+    ],
+    "senses": [
+      {
+        "label": "art sense",
+        "text": "the knowledge, art, skill, workmanship"
+      }
+    ]
+  }
+}

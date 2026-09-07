@@ -1,0 +1,55 @@
+{
+  "packetVersion": "open-instrument.research-evidence-packet.v0_1",
+  "packetId": "vision.visual_appearance_or_vision.v0_1",
+  "targetWord": "vision",
+  "targetSenseId": "visual_appearance_or_vision",
+  "semanticBridge": "The source entries attest lexical forms for the bounded visual appearance or vision sense; treating that shared functional referent as a ZË-RO bridge remains a research hypothesis only.",
+  "sources": [
+    {
+      "sourceKey": "verified-source:capture.fjale-fjalor-shqip-v0-1.vizion-m-sense-1.vizion.v0_1",
+      "embryo": "vizion",
+      "evidenceFamily": "lexical_dictionary",
+      "language": "Albanian",
+      "form": "vizion",
+      "gloss": "Vegim.",
+      "embryoRelation": "exact_form",
+      "relationOperationIds": [],
+      "citation": {
+        "citationId": "open-instrument.source-record.capture.fjale-fjalor-shqip-v0-1.vizion-m-sense-1.vizion.v0_1.citation.v0_1",
+        "sourceTitle": "FJALË — Fjalor Shqip",
+        "sourceAuthorOrEditor": null,
+        "sourcePublisherOrHost": "FJALË — Fjalor Shqip",
+        "sourceDateOrVersion": "accessed 2026-09-07",
+        "sourceUrlOrArchiveRef": "https://fjale.al/vizion",
+        "entryLocator": "vizion m.; sense 1",
+        "sourceHashOrArchiveHash": null,
+        "attestedForm": "vizion",
+        "attestedGloss": "Vegim.",
+        "provenanceGroupId": "fjale.fjalor-shqip.v0_1"
+      }
+    },
+    {
+      "sourceKey": "verified-source:capture.scaife-lewis-short-v0-1.headword-v-s-o-vision-sense-entry-text-beginning-sight-vision.v-s-o.v0_1",
+      "embryo": "vīsĭo",
+      "evidenceFamily": "historical_dictionary",
+      "language": "Latin",
+      "form": "vīsĭo",
+      "gloss": "the act or sense of seeing, sight, vision",
+      "embryoRelation": "exact_form",
+      "relationOperationIds": [],
+      "citation": {
+        "citationId": "open-instrument.source-record.capture.scaife-lewis-short-v0-1.headword-v-s-o-vision-sense-entry-text-beginning-sight-vision.v-s-o.v0_1.citation.v0_1",
+        "sourceTitle": "Lewis & Short Latin Dictionary",
+        "sourceAuthorOrEditor": "Charlton T. Lewis and Charles Short",
+        "sourcePublisherOrHost": "Scaife ATLAS / Perseus Digital Library",
+        "sourceDateOrVersion": "Lewis & Short; accessed 2026-09-07",
+        "sourceUrlOrArchiveRef": "https://atlas.perseus.tufts.edu/dictionaries/entry/urn%3Acite2%3Ascaife-viewer%3Adictionary-entries.atlas_v1%3Alat.ls.perseus-eng2-n51131/",
+        "entryLocator": "headword vīsĭo; vision sense; entry text beginning sight, vision.",
+        "sourceHashOrArchiveHash": null,
+        "attestedForm": "vīsĭo",
+        "attestedGloss": "the act or sense of seeing, sight, vision",
+        "provenanceGroupId": "scaife.lewis-short.v0_1"
+      }
+    }
+  ]
+}
