@@ -272,7 +272,7 @@ Where applicable the system should preserve:
 
 ## Lane 1 — Deterministic Doctrine Projection v0.1
 
-**Status:** `NEXT`
+**Status:** `DONE`
 
 Purpose:
 
@@ -312,7 +312,7 @@ Exit proof:
 
 ## Lane 2 — Sense-Bound Logic-Derived Functional Hypothesis v0.1
 
-**Status:** `NOT_STARTED`
+**Status:** `NEXT`
 
 Purpose:
 
@@ -468,8 +468,8 @@ OPEN_INSTRUMENT_LOGIC_FIRST_FUNCTIONAL_DISCOVERY_V1_CLOSED_<DATE>
 | Lane | State |
 | --- | --- |
 | Milestone opening | ACTIVE |
-| 1. Deterministic Doctrine Projection v0.1 | NEXT |
-| 2. Sense-Bound Logic-Derived Functional Hypothesis v0.1 | NOT_STARTED |
+| 1. Deterministic Doctrine Projection v0.1 | DONE |
+| 2. Sense-Bound Logic-Derived Functional Hypothesis v0.1 | NEXT |
 | 3. Deterministic Discovery Verification v0.1 | NOT_STARTED |
 | 4. Runtime / API / UI Integration v0.1 | NOT_STARTED |
 | 5. Fresh-Word Generalization and Negative-Control Proof v0.1 | NOT_STARTED |
@@ -479,7 +479,7 @@ OPEN_INSTRUMENT_LOGIC_FIRST_FUNCTIONAL_DISCOVERY_V1_CLOSED_<DATE>
 
 # 15. Current next task
 
-**Lane 1 — Deterministic Doctrine Projection v0.1**
+**Lane 2 — Sense-Bound Logic-Derived Functional Hypothesis v0.1**
 
 Before implementation:
 
@@ -487,16 +487,45 @@ Before implementation:
 2. inspect Seven-Voice SSOT and doctrine consumers;
 3. inspect current functional-path contracts;
 4. inspect existing tests;
-5. define the smallest reusable projection seam;
+5. inspect the existing sense-bound candidate contract and define the smallest reusable hypothesis seam;
 6. patch only that lane;
 7. run focused tests;
 8. run the repository gate before merge.
 
-Do not implement Lane 2 during Lane 1.
+Do not implement Lane 3 during Lane 2.
 
 ---
 
-# 16. Codex continuation protocol
+# 16. Lane 1 closeout evidence
+
+Lane 1 was implemented and committed at `f3b45b9d` (`feat(open-instrument): add deterministic doctrine projection`).
+
+Implementation files:
+
+- `src/shared/openInstrument/doctrineProjection.v0_1.ts`
+- `tests/openInstrument.doctrineProjection.v0_1.spec.ts`
+
+The projection reuses `sevenVoiceOrderedViews.v0.1.ts` and `sevenPrinciples.v1.ts`, preserves canonical path order and duplicates, accepts an explicit empty path, fails closed on malformed or unsupported path values, and records the existing Seven-Voice/doctrine SSOT references. It does not generate lexical meaning, semantic bridges, evidence, candidate truth, or runtime/API output.
+
+Focused validation:
+
+- 3 suites passed
+- 21 tests passed
+- 1 snapshot passed
+
+Full `npm run gate:quick` validation:
+
+- 633 unit suites passed, 3 skipped
+- 2,832 unit tests passed, 4 skipped
+- 149 snapshots passed
+- 2 integration suites passed
+- 5 integration tests passed
+- Next.js 16.2.12 production build passed
+- static generation passed: 22/22
+
+No existing Seven-Voice consumer changed.
+
+# 17. Codex continuation protocol
 
 Every Codex task working on this milestone must begin with these rules:
 
@@ -523,7 +552,7 @@ If Codex finds repository state inconsistent with this milestone document, it mu
 
 ---
 
-# 17. Milestone doctrine lock
+# 18. Milestone doctrine lock
 
 The governing milestone principle is:
 
@@ -531,7 +560,7 @@ The governing milestone principle is:
 
 ---
 
-# 18. Opening proof
+# 19. Opening proof
 
 Opening baseline:
 
