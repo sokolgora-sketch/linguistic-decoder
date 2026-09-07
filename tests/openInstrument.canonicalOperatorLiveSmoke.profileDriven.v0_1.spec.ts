@@ -126,6 +126,10 @@ describe("Open Instrument canonical operator live smoke profile contract v0.1", 
     expect(runner).toContain(
       "citationBearingEvidenceVisible",
     );
+    expect(runner).toContain("async function stopOwnedServer");
+    expect(runner).toContain("process.kill(-proc.pid, value)");
+    expect(runner).toContain('detached: process.platform !== "win32"');
+    expect(runner).not.toContain('server.kill("SIGTERM")');
 
     expect(runner).toContain(
       '"research_functional_hypothesis"',
