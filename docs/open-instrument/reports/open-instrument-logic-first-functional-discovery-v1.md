@@ -2,7 +2,7 @@
 
 **Milestone ID:** `OPEN_INSTRUMENT_LOGIC_FIRST_FUNCTIONAL_DISCOVERY_V1`
 
-**Status:** `ACTIVE`
+**Status:** `DONE`
 
 **Opened:** 2026-09-07
 
@@ -422,7 +422,7 @@ Required controls include:
 
 ## Lane 6 — Milestone Closeout
 
-**Status:** `NEXT`
+**Status:** `DONE`
 
 The milestone may become `DONE` only after all prior lanes are complete and their actual proof is recorded.
 
@@ -443,22 +443,16 @@ Required closeout proof:
 - merged-main synchronization proof;
 - protected JO stash unchanged.
 
-Only then:
+After the consolidation PR is merged and local `main` is synchronized:
 
 ~~~text
 Status: DONE
 ~~~
 
-may replace:
-
-~~~text
-Status: ACTIVE
-~~~
-
 A closure marker should then be added:
 
 ~~~text
-OPEN_INSTRUMENT_LOGIC_FIRST_FUNCTIONAL_DISCOVERY_V1_CLOSED_<DATE>
+OPEN_INSTRUMENT_LOGIC_FIRST_FUNCTIONAL_DISCOVERY_V1_CLOSED_2026-09-08
 ~~~
 
 ---
@@ -467,28 +461,26 @@ OPEN_INSTRUMENT_LOGIC_FIRST_FUNCTIONAL_DISCOVERY_V1_CLOSED_<DATE>
 
 | Lane | State |
 | --- | --- |
-| Milestone opening | ACTIVE |
+| Milestone opening | DONE |
 | 1. Deterministic Doctrine Projection v0.1 | DONE |
 | 2. Sense-Bound Logic-Derived Functional Hypothesis v0.1 | DONE |
 | 3. Deterministic Discovery Verification v0.1 | DONE |
 | 4. Runtime / API / UI Integration v0.1 | DONE |
 | 5. Fresh-Word Generalization and Negative-Control Proof v0.1 | DONE |
-| 6. Milestone Closeout | NEXT |
+| 6. Milestone Closeout | DONE |
 
 ---
 
 # 15. Current next task
 
-**Lane 6 — Milestone Closeout**
+**Milestone closed; no implementation lane remains.**
 
 Before implementation:
 
-1. inspect final branch, diff, and milestone evidence;
-2. run the available live Open Instrument smoke proof;
-3. verify final gate, build, branch, and protected stash state;
-4. prepare the final milestone review and merge lane.
+1. preserve the merged main proof and closure marker;
+2. keep future work in a new bounded milestone.
 
-Do not change milestone status to `DONE` until all closeout criteria are proven.
+No further implementation is authorized under this milestone.
 
 ---
 
@@ -661,7 +653,17 @@ Direct closing-head API proof:
 - both rows were bound to `sterile` and `bounded_functional_sense`.
 - both rows remained `functionalBridgeTruth=hypothesis`, `historicalOriginClaim=not_claimed`, `winnerClaim=not_claimed`, and `userDecisionPosture=user_decides`.
 
-The fresh-word matrix, missing-sense suppression, reviewed/research precedence, Null preservation, and no-single-winner controls are recorded in Lane 5 and its focused tests. The protected JO stash remained present and unchanged. The milestone remains `ACTIVE` with Lane 6 `NEXT` until the consolidation PR review and merged-main synchronization proof are complete.
+The fresh-word matrix, missing-sense suppression, reviewed/research precedence, Null preservation, and no-single-winner controls are recorded in Lane 5 and its focused tests. The protected JO stash remained present and unchanged.
+
+Post-merge proof:
+
+- consolidation PR `#1847` merged with squash commit `5c9d93068ce761f85d66261a5ba8cdf8728adc67`;
+- local `main` equals `origin/main` at that commit;
+- divergence is `0 behind / 0 ahead`;
+- working tree is clean;
+- protected JO stash object `8b7e4397ac3341c1c4ea9c004b29e6fa93db40b1` remains present.
+
+The milestone is closed. Future implementation must begin under a new bounded milestone.
 
 ---
 
