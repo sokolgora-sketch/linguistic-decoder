@@ -356,7 +356,7 @@ The verifier is implemented as a dedicated logic-derived verifier under the exis
 
 ## Lane 4 — Runtime / API / UI Integration v0.1
 
-**Status:** `NEXT`
+**Status:** `DONE`
 
 Purpose:
 
@@ -382,7 +382,7 @@ The display must make clear that logic-derived functional hypotheses are not rev
 
 ## Lane 5 — Fresh-Word Generalization and Negative-Control Proof v0.1
 
-**Status:** `NOT_STARTED`
+**Status:** `DONE`
 
 Purpose:
 
@@ -422,7 +422,7 @@ Required controls include:
 
 ## Lane 6 — Milestone Closeout
 
-**Status:** `NOT_STARTED`
+**Status:** `NEXT`
 
 The milestone may become `DONE` only after all prior lanes are complete and their actual proof is recorded.
 
@@ -471,26 +471,24 @@ OPEN_INSTRUMENT_LOGIC_FIRST_FUNCTIONAL_DISCOVERY_V1_CLOSED_<DATE>
 | 1. Deterministic Doctrine Projection v0.1 | DONE |
 | 2. Sense-Bound Logic-Derived Functional Hypothesis v0.1 | DONE |
 | 3. Deterministic Discovery Verification v0.1 | DONE |
-| 4. Runtime / API / UI Integration v0.1 | NEXT |
-| 5. Fresh-Word Generalization and Negative-Control Proof v0.1 | NOT_STARTED |
-| 6. Milestone Closeout | NOT_STARTED |
+| 4. Runtime / API / UI Integration v0.1 | DONE |
+| 5. Fresh-Word Generalization and Negative-Control Proof v0.1 | DONE |
+| 6. Milestone Closeout | NEXT |
 
 ---
 
 # 15. Current next task
 
-**Lane 4 — Runtime / API / UI Integration v0.1**
+**Lane 6 — Milestone Closeout**
 
 Before implementation:
 
-1. inspect current branch and divergence from `main`;
-2. inspect live analysis route, adapter, status, result contract, and UI consumers;
-3. identify the smallest runtime/API/UI wiring for verified logic-derived hypotheses;
-4. patch only that lane;
-5. run focused tests;
-6. run the repository gate before merge.
+1. inspect final branch, diff, and milestone evidence;
+2. run the available live Open Instrument smoke proof;
+3. verify final gate, build, branch, and protected stash state;
+4. prepare the final milestone review and merge lane.
 
-Do not implement Lane 5 during Lane 4.
+Do not change milestone status to `DONE` until all closeout criteria are proven.
 
 ---
 
@@ -575,7 +573,99 @@ Full `npm run gate:quick` validation on the closing Lane 3 head:
 - Next.js 16.2.12 production build passed
 - static generation passed: 22/22
 
-# 19. Codex continuation protocol
+# 19. Lane 4 closeout evidence
+
+Lane 4 was implemented and committed at `bdc581bd` (`feat(open-instrument): wire logic hypotheses to instrument`).
+
+Implementation surfaces:
+
+- `app/api/analyze-v1/route.ts`
+- `src/shared/analysisAdapter.ts`
+- `src/shared/analysisStatus.v0_1.ts`
+- `src/shared/analyzeV1Adapter.ts`
+- `src/shared/resultsUI.ts`
+- `src/ui/instrument/contractAdapter.ts`
+- `src/ui/telemetry/types.ts`
+- `src/ui/candidates/candidateModel.ts`
+- `src/ui/candidates/CandidatesAccordion.tsx`
+
+Focused tests:
+
+- 7 suites passed
+- 37 tests passed
+
+The runtime accepts an explicit `targetSenseId` and `targetSenseLabel`, emits only verified logic-derived hypotheses, preserves research precedence in aggregate status, and keeps the logic row visibly distinct from source-backed research. Requests without an explicit sense do not emit the logic-derived layer.
+
+Full `npm run gate:quick` validation on the closing Lane 4 head:
+
+- 637 unit suites passed, 3 skipped
+- 2,851 unit tests passed, 4 skipped
+- 149 snapshots passed
+- 2 integration suites passed
+- 5 integration tests passed
+- Next.js 16.2.12 production build passed
+- static generation passed: 22/22
+
+# 20. Lane 5 closeout evidence
+
+Lane 5 was implemented and committed at `dacd8582` (`test(open-instrument): prove fresh-word discovery boundaries`).
+
+Implementation file:
+
+- `tests/openInstrument.logicFirstFreshWordGeneralization.v0_1.spec.ts`
+
+Focused validation:
+
+- 1 suite passed
+- 3 tests passed
+
+Observed fresh-word matrix with explicit target sense:
+
+- `candle`: `null_no_supported_candidate`, logic rows `0`
+- `staircase`: `null_no_supported_candidate`, logic rows `0`
+- `orchard`: `null_no_supported_candidate`, logic rows `0`
+- `tunnel`: `null_no_supported_candidate`, logic rows `0`
+- `ribbon`: `null_no_supported_candidate`, logic rows `0`
+- `helmet`: `null_no_supported_candidate`, logic rows `0`
+- `pocket`: `null_no_supported_candidate`, logic rows `0`
+- `chimney`: `null_no_supported_candidate`, logic rows `0`
+
+The suite also proves that missing target sense suppresses logic-derived output and that the stronger-evidence `sterile` control remains `research_functional_hypothesis` while preserving unclaimed winner truth and visible bounded logic context.
+
+Full `npm run gate:quick` validation on the closing Lane 5 head:
+
+- 638 unit suites passed, 3 skipped
+- 2,854 unit tests passed, 4 skipped
+- 149 snapshots passed
+- 2 integration suites passed
+- 5 integration tests passed
+- Next.js 16.2.12 production build passed
+- static generation passed: 22/22
+
+# 21. Lane 6 closeout evidence
+
+The implementation closeout proof was completed on 2026-09-08 at closing head `dacd858293b0331ae0bc9d50106b9ca59e87e043`.
+
+Production live smoke:
+
+- `npm run open-instrument:live-smoke` passed.
+- production build passed; static generation completed 22/22.
+- live `/chat` and `/` returned HTTP 200.
+- canonical reviewed, negative, and cross-language runtime cases passed.
+- all live-smoke focused regression suites passed.
+
+Direct closing-head API proof:
+
+- `GET /api/analyze-v1?word=sterile&mode=strict&targetSenseId=bounded_functional_sense&targetSenseLabel=bounded%20functional%20sense` returned `research_functional_hypothesis`.
+- two logic-derived rows were visible.
+- both rows were bound to `sterile` and `bounded_functional_sense`.
+- both rows remained `functionalBridgeTruth=hypothesis`, `historicalOriginClaim=not_claimed`, `winnerClaim=not_claimed`, and `userDecisionPosture=user_decides`.
+
+The fresh-word matrix, missing-sense suppression, reviewed/research precedence, Null preservation, and no-single-winner controls are recorded in Lane 5 and its focused tests. The protected JO stash remained present and unchanged. The milestone remains `ACTIVE` with Lane 6 `NEXT` until the consolidation PR review and merged-main synchronization proof are complete.
+
+---
+
+# 22. Codex continuation protocol
 
 Every Codex task working on this milestone must begin with these rules:
 
@@ -602,7 +692,7 @@ If Codex finds repository state inconsistent with this milestone document, it mu
 
 ---
 
-# 20. Milestone doctrine lock
+# 23. Milestone doctrine lock
 
 The governing milestone principle is:
 
@@ -610,7 +700,7 @@ The governing milestone principle is:
 
 ---
 
-# 21. Opening proof
+# 24. Opening proof
 
 Opening baseline:
 
