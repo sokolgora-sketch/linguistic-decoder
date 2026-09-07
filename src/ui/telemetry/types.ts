@@ -162,6 +162,8 @@ export interface CandidateRowVM {
   // These fields remain presentation metadata only and do not imply
   // review, production promotion, historical origin, or candidate truth.
   targetWord?: PresentOrMissing<string>;
+  targetSenseId?: PresentOrMissing<string>;
+  targetSenseLabel?: PresentOrMissing<string>;
   sourceId?: PresentOrMissing<string>;
   sourceStatus?: PresentOrMissing<string>;
   semanticBridge?: PresentOrMissing<string>;

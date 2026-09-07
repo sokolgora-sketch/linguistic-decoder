@@ -1149,6 +1149,10 @@ const normalizationSteps =
 
       const targetWord =
         asString(rec["targetWord"]);
+      const targetSenseId =
+        asString(rec["targetSenseId"]);
+      const targetSenseLabel =
+        asString(rec["targetSenseLabel"]);
       const sourceId =
         asString(rec["sourceId"]);
       const sourceStatus =
@@ -1345,6 +1349,18 @@ const evidenceId = String(id).toLowerCase().replace(/[^a-z0-9_]/g, "_");
           ? {
               targetWord:
                 present(targetWord),
+            }
+          : {}),
+
+        ...(targetSenseId
+          ? {
+              targetSenseId: present(targetSenseId),
+            }
+          : {}),
+
+        ...(targetSenseLabel
+          ? {
+              targetSenseLabel: present(targetSenseLabel),
             }
           : {}),
 

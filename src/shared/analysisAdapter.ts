@@ -51,6 +51,8 @@ import {
 } from "./multiSourceFunctionalResearchEvidenceRegistry.v0_1";
 import { loadMultiSourceFunctionalResearchEvidenceCatalogV0_1 } from "./multiSourceFunctionalResearchEvidenceCatalog.v0_1";
 import { projectMultiSourceFunctionalResearchWitnessesV0_1 } from "./multiSourceFunctionalResearchProjection.v0_1";
+import { buildLogicDerivedFunctionalHypothesisV0_1 } from "./openInstrument/logicDerivedFunctionalHypothesis.v0_1";
+import { verifyLogicDerivedFunctionalHypothesisV0_1 } from "./verifier/verifyLogicDerivedFunctionalHypothesis.v0_1";
 
 const multiSourceFunctionalResearchEvidenceCatalogV0_1 =
   loadMultiSourceFunctionalResearchEvidenceCatalogV0_1();
@@ -315,6 +317,98 @@ export function enginePayloadToAnalysisResult(payload: EnginePayload): AnalyzeWo
           .candidates,
     });
 
+  // Logic-derived functional discovery is opt-in because its target sense
+  // must be supplied explicitly by the caller. Stronger existing evidence
+  // owns the result and prevents this layer from being emitted.
+  const requestInputs =
+    (payload as any)?.inputs &&
+    typeof (payload as any).inputs === "object"
+      ? (payload as any).inputs
+      : null;
+  const targetSenseId =
+    typeof requestInputs?.targetSenseId === "string"
+      ? requestInputs.targetSenseId.trim()
+      : "";
+  const targetSenseLabel =
+    typeof requestInputs?.targetSenseLabel === "string"
+      ? requestInputs.targetSenseLabel.trim()
+      : "";
+  const canEmitLogicDerivedFunctionalHypothesisV0_1 =
+    baselineAnalysisStatusV0_1.status ===
+      "null_no_supported_candidate" &&
+    targetSenseId.length > 0 &&
+    targetSenseLabel.length > 0;
+  const logicDerivedFunctionalCandidatesV0_1 =
+    canEmitLogicDerivedFunctionalHypothesisV0_1
+      ? structuralHypothesesV0_1.flatMap((structuralHypothesis) => {
+          const built = buildLogicDerivedFunctionalHypothesisV0_1({
+            targetWord: rootMapBasis,
+            targetSense: {
+              id: targetSenseId,
+              label: targetSenseLabel,
+            },
+            structuralHypothesis,
+          });
+
+          if (!built.ok) return [];
+
+          const verification =
+            verifyLogicDerivedFunctionalHypothesisV0_1(
+              built.hypothesis,
+              {
+                targetWord: rootMapBasis,
+                strongerEvidencePresent: false,
+              },
+            );
+
+          if (!verification.accepted) return [];
+
+          return [
+            {
+              id: built.hypothesis.hypothesisId,
+              candidateId: built.hypothesis.hypothesisId,
+              displayForm: rootMapBasis,
+              form: rootMapBasis,
+              candidateLanguage: "unknown",
+              sourceKind: "logic_derived_functional_hypothesis",
+              sourceStatus: "logic_derived_candidate",
+              targetWord: built.hypothesis.targetWord,
+              targetSenseId: built.hypothesis.targetSenseId,
+              targetSenseLabel: built.hypothesis.targetSenseLabel,
+              claimType: "functionalMotivation",
+              originClaim: "not_claimed",
+              historicalRelation: "not_evaluated",
+              embryo: built.hypothesis.embryo,
+              embryoSize: built.hypothesis.embryoSize,
+              embryoLanguage: null,
+              isolatedStandaloneForm: null,
+              plainStandaloneGloss: null,
+              sourceNote: null,
+              segmentation: null,
+              semanticBridge: built.hypothesis.semanticBridge,
+              functionalBridgeTruth: built.hypothesis.functionalBridgeTruth,
+              evidenceRefs: [],
+              expansionChain: built.hypothesis.structuralAnchor.expansionChain,
+              validationOutcome: "not_evaluated",
+              validationReasons: [],
+              rankGroup: "unresolved",
+              rankScore: 20,
+              rankReason: "logic-derived functional hypothesis; user review required",
+              claimBoundary:
+                "logic-derived functional hypothesis only; not source-backed evidence, candidate truth, or historical origin",
+              historicalOriginClaim: built.hypothesis.historicalOriginClaim,
+              historicalTransmissionClaim: built.hypothesis.historicalTransmissionClaim,
+              winnerClaim: built.hypothesis.winnerClaim,
+              languageSuperiorityClaim: built.hypothesis.languageSuperiorityClaim,
+              candidateTruthClaim: built.hypothesis.candidateTruthClaim,
+              userDecisionPosture: built.hypothesis.userDecisionPosture,
+              logicDerivedFunctionalHypothesisV0_1: built.hypothesis,
+              logicDerivedFunctionalHypothesisVerificationV0_1: verification,
+            },
+          ];
+        })
+      : [];
+
   const shouldProjectStructuralHypothesesV0_1 =
     baselineAnalysisStatusV0_1
       .status ===
@@ -566,6 +660,20 @@ export function enginePayloadToAnalysisResult(payload: EnginePayload): AnalyzeWo
     ...projectedSourceAttestedResearchCandidatesV0_1,
   ];
 
+  // Research evidence outranks discovery in aggregate status, while the
+  // bounded logic row remains visible for structural context.
+  if (logicDerivedFunctionalCandidatesV0_1.length > 0) {
+    const existingCandidates = Array.isArray((result as any).candidates)
+      ? (result as any).candidates
+      : [];
+
+    (result as any).candidates =
+      orderEmbryoFirstCandidatesForAnalyzeV1([
+        ...existingCandidates,
+        ...logicDerivedFunctionalCandidatesV0_1,
+      ]);
+  }
+
   if (
     projectedResearchCandidatesV0_1
       .length > 0
@@ -622,6 +730,7 @@ export function enginePayloadToAnalysisResult(payload: EnginePayload): AnalyzeWo
   // research/structural seam actually changed the candidate surface.
   const shouldRecomputeGapFilledStatusV0_1 =
     shouldProjectStructuralHypothesesV0_1 ||
+    logicDerivedFunctionalCandidatesV0_1.length > 0 ||
     projectedSourceAttestedResearchCandidatesV0_1
       .length > 0;
 

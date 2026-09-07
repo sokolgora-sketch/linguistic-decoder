@@ -256,6 +256,8 @@ function adaptCandidate(rawCandidate: RawCandidate): CandidateUI {
     // this adapter does not validate, promote, reinterpret, or
     // manufacture research evidence.
     targetWord: optionalString(rawCandidate?.targetWord),
+    targetSenseId: optionalString(rawCandidate?.targetSenseId),
+    targetSenseLabel: optionalString(rawCandidate?.targetSenseLabel),
     sourceId: optionalString(rawCandidate?.sourceId),
     sourceStatus: optionalString(rawCandidate?.sourceStatus),
     embryoRelation: optionalString(rawCandidate?.embryoRelation),
@@ -286,7 +288,7 @@ function adaptCandidate(rawCandidate: RawCandidate): CandidateUI {
       rawCandidate?.independentStandaloneMeaning,
     lexicalAttestation: optionalString(rawCandidate?.lexicalAttestation),
     functionalSupportStatus: optionalString(rawCandidate?.functionalSupportStatus),
-    evidenceRefs: rawCandidate?.evidenceRefs,
+    evidenceRefs: optionalStringArray(rawCandidate?.evidenceRefs),
     reductionSteps: rawCandidate?.reductionSteps,
     reasonCodes: rawCandidate?.reasonCodes,
     historicalOriginClaim: optionalString(rawCandidate?.historicalOriginClaim),
@@ -294,6 +296,8 @@ function adaptCandidate(rawCandidate: RawCandidate): CandidateUI {
     winnerClaim: optionalString(rawCandidate?.winnerClaim),
     languageSuperiorityClaim: optionalString(rawCandidate?.languageSuperiorityClaim),
     candidateTruthClaim: optionalString(rawCandidate?.candidateTruthClaim),
+    logicDerivedFunctionalHypothesisVerificationV0_1:
+      rawCandidate?.logicDerivedFunctionalHypothesisVerificationV0_1,
 
     validationOutcome: optionalString(rawCandidate?.validationOutcome),
     validationReasons: optionalStringArray(rawCandidate?.validationReasons),
