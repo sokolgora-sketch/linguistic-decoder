@@ -12,6 +12,7 @@ import {
   parseContrastiveSemanticProposalV0_1,
   type ContrastiveSemanticAssessmentV0_1,
   type ContrastiveSemanticContextV0_1,
+  type ContrastiveSemanticResponseShapeDiagnosticsV0_1,
 } from "@/shared/openInstrument/contrastiveSemanticCalibration.v0_1";
 import { semanticProviderPreflightV0_1 } from "@/shared/orchestrator/semanticAlignmentProposal.v0_1";
 
@@ -32,6 +33,7 @@ export type ContrastiveSemanticProposalResultV0_1 = Readonly<{
   reasonCodes: readonly string[];
   timeoutMs: number;
   assessment: ContrastiveSemanticAssessmentV0_1 | null;
+  diagnostics?: ContrastiveSemanticResponseShapeDiagnosticsV0_1;
   error: "provider_error" | "timeout" | null;
 }>;
 
@@ -115,6 +117,7 @@ export async function runContrastiveSemanticProposalV0_1(
         reasonCodes: [...preflight.reasonCodes, "CONTRASTIVE_OUTPUT_REJECTED", ...parsed.reasonCodes],
         timeoutMs,
         assessment: null,
+        diagnostics: parsed.diagnostics,
         error: null,
       };
     }
@@ -145,6 +148,13 @@ export async function runContrastiveSemanticProposalV0_1(
       ],
       timeoutMs,
       assessment: null,
+      diagnostics: {
+        parseStage: timedOut ? "provider_timeout" : "provider_error",
+        jsonParsed: false,
+        topLevelType: "unavailable",
+        objectExtracted: false,
+        fieldIssues: [],
+      },
       error: timedOut ? "timeout" : "provider_error",
     };
   } finally {

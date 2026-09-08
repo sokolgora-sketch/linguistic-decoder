@@ -174,6 +174,41 @@ describe("Open Instrument contrastive semantic calibration v0.1", () => {
     expect(parseContrastiveSemanticProposalV0_1(value, contextResult.context, { providerId: "fixture" })).toMatchObject({ ok: false });
   });
 
+  test.each([
+    ["reasonCodes", undefined, "CONTRASTIVE_REASON_CODES_FIELD_MISSING"],
+    ["reasonCodes", "not-an-array", "CONTRASTIVE_REASON_CODES_FIELD_WRONG_TYPE"],
+    ["reasonCodes", ["ok", 7], "CONTRASTIVE_REASON_CODES_NON_STRING_MEMBER"],
+    ["reasonCodes", ["   "], "CONTRASTIVE_REASON_CODES_EMPTY_MEMBER"],
+    ["doctrineRoles", undefined, "CONTRASTIVE_DOCTRINE_ROLES_FIELD_MISSING"],
+    ["doctrineRoles", "not-an-array", "CONTRASTIVE_DOCTRINE_ROLES_FIELD_WRONG_TYPE"],
+    ["doctrineRoles", ["Initiation/Source", 7], "CONTRASTIVE_DOCTRINE_ROLES_NON_STRING_MEMBER"],
+    ["doctrineRoles", ["   "], "CONTRASTIVE_DOCTRINE_ROLES_EMPTY_MEMBER"],
+  ] as const)("reports bounded diagnostics for invalid %s", (field, invalidValue, expectedCode) => {
+    const structural = discoverStructuralHypothesesV0_1("candle")[0];
+    if (!structural) throw new Error("missing candle structural fixture");
+    const contextResult = buildContrastiveSemanticContextV0_1(pairs[0], structural);
+    if (!contextResult.ok) throw new Error(contextResult.reasonCodes.join(","));
+    const role = contextResult.context.doctrineProjection.projections[0].doctrineRole;
+    const output: Record<string, unknown> = {
+      contrastiveDecision: { preferredSense: "neither" },
+      semanticBridge: null,
+      doctrineRoles: [role],
+      supportTrace: null,
+      reasonCodes: ["CONTRASTIVE_RELATION_NEITHER"],
+    };
+    output[field] = invalidValue;
+    const parsed = parseContrastiveSemanticProposalV0_1(output, contextResult.context, { providerId: "fixture" });
+    expect(parsed).toMatchObject({
+      ok: false,
+      reasonCodes: expect.arrayContaining(["CONTRASTIVE_OUTPUT_FIELDS_INVALID", expectedCode]),
+      diagnostics: {
+        parseStage: "field_shape",
+        objectExtracted: true,
+        fieldIssues: expect.arrayContaining([{ field, issue: expect.any(String) }]),
+      },
+    });
+  });
+
   test("binds pair order, contract version, four calls, retries, timeout, and loopback", async () => {
     const execute = jest.fn(async (context: Parameters<NonNullable<Parameters<typeof runControlledSemanticContrastiveProviderExecutionV0_1>[2]>["execute"]>[0]) => proposedResult(context));
     const result = await runControlledSemanticContrastiveProviderExecutionV0_1(packet, authorization(), { execute });
@@ -208,5 +243,39 @@ describe("Open Instrument contrastive semantic calibration v0.1", () => {
     }));
     const result = await runControlledSemanticContrastiveProviderExecutionV0_1(packet, authorization(), { execute });
     expect(result.rows.every((row) => row.logicCandidateEmitted === false && row.aggregateStatus === "unknown" && row.truthBoundary === "hypothesis_only_user_decides_no_evidence_promotion")).toBe(true);
+  });
+
+  test("keeps controlled diagnostics sanitized and preserves bound model and elapsed time", async () => {
+    let call = 0;
+    const execute = jest.fn(async (): Promise<ContrastiveSemanticProposalResultV0_1> => {
+      call += 1;
+      const timeout = call === 1;
+      return {
+        attempted: true,
+        status: timeout ? "provider_error" : "malformed_output",
+        provider: "mock",
+        providerReady: true,
+        realProvider: false,
+        mockProvider: true,
+        reasonCodes: [timeout ? "CONTRASTIVE_PROVIDER_TIMEOUT" : "CONTRASTIVE_OUTPUT_FIELDS_INVALID"],
+        timeoutMs: 8000,
+        assessment: null,
+        diagnostics: {
+          parseStage: timeout ? "provider_timeout" : "field_shape",
+          jsonParsed: !timeout,
+          topLevelType: timeout ? "unavailable" : "object",
+          objectExtracted: !timeout,
+          fieldIssues: timeout ? [] : [{ field: "reasonCodes", issue: "missing" }],
+        },
+        error: timeout ? "timeout" : null,
+      };
+    });
+    const result = await runControlledSemanticContrastiveProviderExecutionV0_1(packet, authorization(), { execute });
+    expect(result.rows).toHaveLength(4);
+    expect(result.rows.every((row) => row.modelId === "fixture-model")).toBe(true);
+    expect(result.rows.every((row) => Number.isInteger(row.elapsedMs) && row.elapsedMs >= 0)).toBe(true);
+    expect(result.rows[0]).toMatchObject({ timeout: true, diagnostics: { parseStage: "provider_timeout" } });
+    expect(result.rows[1]).toMatchObject({ malformed: true, diagnostics: { fieldIssues: [{ field: "reasonCodes", issue: "missing" }] } });
+    expect(JSON.stringify(result)).not.toContain("rawText");
   });
 });

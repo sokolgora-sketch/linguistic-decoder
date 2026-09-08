@@ -40,6 +40,32 @@ provider execution is part of this closeout.
 No implementation lane remains under this milestone. Any future change must
 be opened as a new bounded milestone.
 
+## Post-Closure Experiment Addendum (2026-09-09)
+
+The first controlled contrastive calibration execution was performed after
+this milestone had closed, using `gemma3:4b` and its one-shot local
+authorization. Four of four bounded calls completed: three returned the
+generic `CONTRASTIVE_OUTPUT_FIELDS_INVALID` malformed posture, one timed out,
+zero produced parseable contrastive decisions, zero candidates were emitted,
+and no evidence was promoted. The authorization was spent.
+
+The captured result did not retain provider raw text, exact malformed field
+values, model identity on failed rows, or per-call elapsed timing. The
+defensible classification is
+`CONTRASTIVE_SEMANTIC_CALIBRATION_V1_NO_PARSEABLE_DECISIONS`. This run is not
+evidence that semantic discrimination succeeded or failed because no valid
+contrastive decision reached evaluation.
+
+The bounded diagnostics follow-up preserves deterministic field-specific
+parser issues, sanitized response-shape diagnostics, the packet-bound model
+identity, and non-negative per-call elapsed time without adding raw provider
+text or changing semantic policy. It improves future observability only; it
+does not rewrite the historical run as though these diagnostics existed then.
+
+The milestone remains `DONE` and closed. No new provider execution,
+authorization, packet, evidence, or truth promotion is part of this
+addendum.
+
 ## Motivation
 
 The completed v0.1 and v0.2 single-sense calibration runs did not produce
