@@ -10,6 +10,18 @@ import type { SevenVoiceKey } from "@/shared/sevenVoiceOrderedViews.v0.1";
 export const SEMANTIC_ALIGNMENT_SCHEMA_V0_1 =
   "open-instrument.semantic-alignment.v0_1" as const;
 
+export const SEMANTIC_DECISION_CONTRACT_VERSION_V0_2 =
+  "open-instrument.semantic-decision-contract.v0_2" as const;
+
+export type SemanticAlignmentRelationSpecificityV0_2 =
+  | "structure_specific"
+  | "generic_or_unclear"
+  | "conflicting";
+
+export type SemanticAlignmentDecisionV0_2 = Readonly<{
+  relationSpecificity: SemanticAlignmentRelationSpecificityV0_2;
+}>;
+
 export type SemanticAlignmentStatusV0_1 =
   | "proposed"
   | "unknown"
@@ -54,6 +66,7 @@ export type SemanticAlignmentAssessmentV0_1 = Readonly<{
   semanticBridge: string | null;
   doctrineRoles: readonly string[];
   reasonCodes: readonly string[];
+  semanticDecision?: SemanticAlignmentDecisionV0_2;
   providerId?: string;
   modelId?: string;
 }>;
@@ -72,6 +85,18 @@ export type SemanticAlignmentParseResultV0_1 =
   | Readonly<{
       ok: true;
       assessment: SemanticAlignmentAssessmentV0_1;
+    }>
+  | Readonly<{
+      ok: false;
+      reasonCodes: readonly string[];
+  }>;
+
+export type SemanticAlignmentParseResultV0_2 =
+  | Readonly<{
+      ok: true;
+      assessment: SemanticAlignmentAssessmentV0_1 & {
+        semanticDecision: SemanticAlignmentDecisionV0_2;
+      };
     }>
   | Readonly<{
       ok: false;
@@ -105,6 +130,12 @@ function failureV0_1(
 function parseFailureV0_1(
   reasonCodes: readonly string[],
 ): SemanticAlignmentParseResultV0_1 {
+  return { ok: false, reasonCodes };
+}
+
+function parseFailureV0_2(
+  reasonCodes: readonly string[],
+): SemanticAlignmentParseResultV0_2 {
   return { ok: false, reasonCodes };
 }
 
@@ -301,6 +332,109 @@ export function parseSemanticAlignmentProposalV0_1(
       semanticBridge: status === "proposed" ? semanticBridge : null,
       doctrineRoles: status === "proposed" ? doctrineRoles : [],
       reasonCodes: stringArrayV0_1(value.reasonCodes) ?? [],
+      ...(metadata.providerId ? { providerId: metadata.providerId } : {}),
+      ...(metadata.modelId ? { modelId: metadata.modelId } : {}),
+    },
+  };
+}
+
+function parseSemanticDecisionV0_2(
+  value: unknown,
+): SemanticAlignmentDecisionV0_2 | null {
+  if (!isRecordV0_1(value)) return null;
+  const relationSpecificity = textV0_1(value.relationSpecificity);
+  if (
+    relationSpecificity !== "structure_specific" &&
+    relationSpecificity !== "generic_or_unclear" &&
+    relationSpecificity !== "conflicting"
+  ) {
+    return null;
+  }
+  return { relationSpecificity };
+}
+
+export function parseSemanticAlignmentProposalV0_2(
+  value: unknown,
+  context: SemanticAlignmentContextV0_1,
+  metadata: Readonly<{
+    alignmentSource: SemanticAlignmentSourceV0_1;
+    providerId?: string;
+    modelId?: string;
+  }>,
+): SemanticAlignmentParseResultV0_2 {
+  if (!isRecordV0_1(value)) return parseFailureV0_2(["MALFORMED_ALIGNMENT_OUTPUT"]);
+
+  const decision = parseSemanticDecisionV0_2(value.semanticDecision);
+  if (!decision) return parseFailureV0_2(["SEMANTIC_DECISION_REQUIRED"]);
+
+  const alignmentStatus = textV0_1(value.alignmentStatus);
+  if (alignmentStatus !== "proposed" && alignmentStatus !== "unknown" && alignmentStatus !== "rejected") {
+    return parseFailureV0_2(["ALIGNMENT_STATUS_INVALID"]);
+  }
+
+  const doctrineRoles = stringArrayV0_1(value.doctrineRoles);
+  if (!doctrineRoles || doctrineRoles.some((role) => !role)) {
+    return parseFailureV0_2(["DOCTRINE_ROLES_INVALID"]);
+  }
+
+  const allowedRoles = new Set(
+    context.doctrineProjection.projections.map((projection) => projection.doctrineRole),
+  );
+  if (doctrineRoles.some((role) => !allowedRoles.has(role as (typeof context.doctrineProjection.projections)[number]["doctrineRole"]))) {
+    return parseFailureV0_2(["DOCTRINE_ROLE_NOT_IN_CONTEXT"]);
+  }
+
+  const reasonCodes = stringArrayV0_1(value.reasonCodes);
+  if (!reasonCodes) return parseFailureV0_2(["REASON_CODES_INVALID"]);
+
+  const semanticBridge = textV0_1(value.semanticBridge);
+  const status = alignmentStatus as SemanticAlignmentStatusV0_1;
+  const expectedRelation =
+    status === "proposed"
+      ? "structure_specific"
+      : status === "unknown"
+        ? "generic_or_unclear"
+        : "conflicting";
+  if (decision.relationSpecificity !== expectedRelation) {
+    return parseFailureV0_2(["SEMANTIC_DECISION_STATUS_MISMATCH"]);
+  }
+
+  const requiredReasonCode =
+    expectedRelation === "structure_specific"
+      ? "SEMANTIC_RELATION_STRUCTURE_SPECIFIC"
+      : expectedRelation === "generic_or_unclear"
+        ? "SEMANTIC_RELATION_GENERIC_OR_UNCLEAR"
+        : "SEMANTIC_RELATION_CONFLICTING";
+  if (!reasonCodes.includes(requiredReasonCode)) {
+    return parseFailureV0_2(["SEMANTIC_DECISION_REASON_CODE_MISSING"]);
+  }
+
+  if (status === "proposed") {
+    if (metadata.alignmentSource !== "provider_proposed_hypothesis" && metadata.alignmentSource !== "user_asserted_hypothesis") {
+      return parseFailureV0_2(["PROPOSED_SOURCE_INVALID"]);
+    }
+    if (!semanticBridge) return parseFailureV0_2(["SEMANTIC_BRIDGE_REQUIRED"]);
+    const qualityCodes = qualityFailureCodesV0_1(semanticBridge, context);
+    if (qualityCodes.length > 0) return parseFailureV0_2(qualityCodes);
+    if (doctrineRoles.length === 0) return parseFailureV0_2(["DOCTRINE_ROLE_REQUIRED"]);
+  } else if (semanticBridge || doctrineRoles.length > 0) {
+    return parseFailureV0_2(["NON_PROPOSED_OUTPUT_MUST_BE_EMPTY"]);
+  }
+
+  return {
+    ok: true,
+    assessment: {
+      schemaVersion: SEMANTIC_ALIGNMENT_SCHEMA_V0_1,
+      targetWord: context.targetWord,
+      targetSenseId: context.targetSenseId,
+      targetSenseLabel: context.targetSenseLabel,
+      structuralHypothesisId: context.structuralHypothesisId,
+      alignmentStatus: status,
+      alignmentSource: metadata.alignmentSource,
+      semanticBridge: status === "proposed" ? semanticBridge : null,
+      doctrineRoles: status === "proposed" ? doctrineRoles : [],
+      reasonCodes,
+      semanticDecision: decision,
       ...(metadata.providerId ? { providerId: metadata.providerId } : {}),
       ...(metadata.modelId ? { modelId: metadata.modelId } : {}),
     },

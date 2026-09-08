@@ -87,13 +87,38 @@ async function proposeMockSemantic(
       : null;
 
   const proposal = {
+    ...(req.userPayload && typeof req.userPayload === "object" &&
+    (req.userPayload as Record<string, unknown>).semanticDecisionContractVersion === "open-instrument.semantic-decision-contract.v0_2"
+      ? {
+          semanticDecision: {
+            relationSpecificity:
+              status === "proposed"
+                ? "structure_specific"
+                : status === "unknown"
+                  ? "generic_or_unclear"
+                  : "conflicting",
+          },
+        }
+      : {}),
     alignmentStatus: status,
     doctrineRoles: status === "proposed" && typeof firstRole === "string" ? [firstRole] : [],
     semanticBridge:
       status === "proposed"
         ? `The selected doctrine role can be tested as a bounded functional relation to the supplied sense through the structural anchor; this remains a reviewable hypothesis, not lexical truth.`
         : null,
-    reasonCodes: [`mock_semantic_${status}`],
+    reasonCodes: [
+      ...(req.userPayload && typeof req.userPayload === "object" &&
+      (req.userPayload as Record<string, unknown>).semanticDecisionContractVersion === "open-instrument.semantic-decision-contract.v0_2"
+        ? [
+            status === "proposed"
+              ? "SEMANTIC_RELATION_STRUCTURE_SPECIFIC"
+              : status === "unknown"
+                ? "SEMANTIC_RELATION_GENERIC_OR_UNCLEAR"
+                : "SEMANTIC_RELATION_CONFLICTING",
+          ]
+        : []),
+      `mock_semantic_${status}`,
+    ],
   };
 
   return {

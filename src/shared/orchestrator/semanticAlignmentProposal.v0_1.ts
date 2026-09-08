@@ -1,5 +1,6 @@
 import {
   buildSemanticAlignmentProposerSystemPromptV0_1,
+  buildSemanticAlignmentProposerSystemPromptV0_2,
   semanticAlignmentContextForPromptV0_1,
 } from "@/shared/llm/prompts/semanticAlignmentProposer.v0.1";
 import {
@@ -9,8 +10,10 @@ import {
 } from "@/shared/llm/providers/proposerProvider.v0.2";
 import { tryParseJsonV0_2 } from "@/shared/orchestrator/proposalParse.v0.2";
 import {
+  SEMANTIC_DECISION_CONTRACT_VERSION_V0_2,
   deterministicNoAlignmentV0_1,
   parseSemanticAlignmentProposalV0_1,
+  parseSemanticAlignmentProposalV0_2,
   type SemanticAlignmentAssessmentV0_1,
   type SemanticAlignmentContextV0_1,
 } from "@/shared/openInstrument/semanticAlignment.v0_1";
@@ -40,6 +43,7 @@ export type SemanticAlignmentProposalResultV0_1 = Readonly<{
 export type RunSemanticAlignmentProposalOptionsV0_1 = Readonly<{
   providerOverrideForTests?: ProposerProviderIdV0_2;
   timeoutMs?: number;
+  semanticDecisionContractVersion?: typeof SEMANTIC_DECISION_CONTRACT_VERSION_V0_2;
 }>;
 
 export type SemanticProviderPreflightStatusV0_1 =
@@ -216,24 +220,31 @@ export async function runSemanticAlignmentProposalV0_1(
       {
         word: context.targetWord,
         mode: "strict",
-        systemPrompt: buildSemanticAlignmentProposerSystemPromptV0_1(),
+        systemPrompt: options.semanticDecisionContractVersion === SEMANTIC_DECISION_CONTRACT_VERSION_V0_2
+          ? buildSemanticAlignmentProposerSystemPromptV0_2()
+          : buildSemanticAlignmentProposerSystemPromptV0_1(),
         userPayload: {
           semanticContext: semanticAlignmentContextForPromptV0_1(context),
+          ...(options.semanticDecisionContractVersion
+            ? { semanticDecisionContractVersion: options.semanticDecisionContractVersion }
+            : {}),
         },
         signal: controller.signal,
       },
       provider,
     );
     const parsed = tryParseJsonV0_2(result.rawText);
-    const parsedAssessment = parseSemanticAlignmentProposalV0_1(
-      parsed,
-      context,
-      {
-        alignmentSource: "provider_proposed_hypothesis",
-        providerId: result.provider,
-        modelId: typeof result.meta?.model === "string" ? result.meta.model : undefined,
-      },
-    );
+    const parsedAssessment = options.semanticDecisionContractVersion === SEMANTIC_DECISION_CONTRACT_VERSION_V0_2
+      ? parseSemanticAlignmentProposalV0_2(parsed, context, {
+          alignmentSource: "provider_proposed_hypothesis",
+          providerId: result.provider,
+          modelId: typeof result.meta?.model === "string" ? result.meta.model : undefined,
+        })
+      : parseSemanticAlignmentProposalV0_1(parsed, context, {
+          alignmentSource: "provider_proposed_hypothesis",
+          providerId: result.provider,
+          modelId: typeof result.meta?.model === "string" ? result.meta.model : undefined,
+        });
 
     if (!parsedAssessment.ok) {
       return {

@@ -1,5 +1,5 @@
 import { discoverStructuralHypothesesV0_1 } from "@/shared/structuralHypothesisDiscovery.v0_1";
-import { buildSemanticAlignmentContextV0_1, type SemanticAlignmentContextV0_1 } from "@/shared/openInstrument/semanticAlignment.v0_1";
+import { buildSemanticAlignmentContextV0_1, SEMANTIC_DECISION_CONTRACT_VERSION_V0_2, type SemanticAlignmentContextV0_1, type SemanticAlignmentRelationSpecificityV0_2 } from "@/shared/openInstrument/semanticAlignment.v0_1";
 import { runSemanticAlignmentProposalV0_1, semanticProviderPreflightV0_1, type SemanticAlignmentProposalResultV0_1 } from "@/shared/orchestrator/semanticAlignmentProposal.v0_1";
 
 export const CONTROLLED_SEMANTIC_PROVIDER_RUNNER_SCHEMA_V0_1 = "open-instrument.controlled-semantic-provider-runner.v0_1" as const;
@@ -19,6 +19,7 @@ export type ControlledSemanticExecutionPacketV0_1 = Readonly<{
   maximumRetryCount: 0;
   purpose: "controlled_semantic_alignment_research";
   truthBoundary: "hypothesis_only_user_decides_no_evidence_promotion";
+  semanticDecisionContractVersion?: typeof SEMANTIC_DECISION_CONTRACT_VERSION_V0_2;
 }>;
 export type ControlledSemanticExecutionAuthorizationV0_1 = Readonly<{
   schemaVersion: typeof CONTROLLED_SEMANTIC_PROVIDER_RUNNER_SCHEMA_V0_1;
@@ -34,11 +35,13 @@ export type ControlledSemanticExecutionAuthorizationV0_1 = Readonly<{
   localOnly: true;
   purpose: "controlled_semantic_alignment_research";
   truthBoundary: "hypothesis_only_user_decides_no_evidence_promotion";
+  semanticDecisionContractVersion?: typeof SEMANTIC_DECISION_CONTRACT_VERSION_V0_2;
 }>;
 export type ControlledSemanticExecutionRowV0_1 = Readonly<{
   word: string; targetSenseId: string; targetSenseLabel: string; structuralHypothesisId: string; embryo: string;
   expansionChain: readonly string[]; voicePath: readonly string[]; providerAttempted: boolean; providerId: string | null; modelId: string | null;
   alignmentStatus: string | null; alignmentSource: string | null; semanticBridge: string | null; doctrineRoles: readonly string[];
+  semanticDecision: SemanticAlignmentRelationSpecificityV0_2 | null;
   reasonCodes: readonly string[]; timeout: boolean; providerError: boolean; logicCandidateEmitted: false;
   aggregateStatus: "candidate_only" | "unknown"; truthBoundary: "hypothesis_only_user_decides_no_evidence_promotion";
 }>;
@@ -59,7 +62,7 @@ function isLoopbackUrlV0_1(value: string): boolean {
 }
 
 export function fingerprintControlledSemanticExecutionPacketV0_1(packet: ControlledSemanticExecutionPacketV0_1): string {
-  return JSON.stringify({ schemaVersion: packet.schemaVersion, packetId: packet.packetId, milestoneId: packet.milestoneId, providerId: packet.providerId, modelId: packet.modelId, endpointUrl: packet.endpointUrl, localOnly: packet.localOnly, targets: packet.targets, maximumCallCount: packet.maximumCallCount, timeoutMs: packet.timeoutMs, maximumRetryCount: packet.maximumRetryCount, purpose: packet.purpose, truthBoundary: packet.truthBoundary });
+  return JSON.stringify({ schemaVersion: packet.schemaVersion, packetId: packet.packetId, milestoneId: packet.milestoneId, providerId: packet.providerId, modelId: packet.modelId, endpointUrl: packet.endpointUrl, localOnly: packet.localOnly, targets: packet.targets, maximumCallCount: packet.maximumCallCount, timeoutMs: packet.timeoutMs, maximumRetryCount: packet.maximumRetryCount, purpose: packet.purpose, truthBoundary: packet.truthBoundary, ...(packet.semanticDecisionContractVersion ? { semanticDecisionContractVersion: packet.semanticDecisionContractVersion } : {}) });
 }
 
 export function validateControlledSemanticExecutionPacketV0_1(packet: ControlledSemanticExecutionPacketV0_1): readonly string[] {
@@ -80,6 +83,7 @@ export function validateControlledSemanticExecutionPacketV0_1(packet: Controlled
   if (packet.maximumRetryCount !== 0) reasons.push("RETRY_BOUND_INVALID");
   if (packet.purpose !== "controlled_semantic_alignment_research") reasons.push("PURPOSE_INVALID");
   if (packet.truthBoundary !== "hypothesis_only_user_decides_no_evidence_promotion") reasons.push("TRUTH_BOUNDARY_INVALID");
+  if (packet.semanticDecisionContractVersion && packet.semanticDecisionContractVersion !== SEMANTIC_DECISION_CONTRACT_VERSION_V0_2) reasons.push("DECISION_CONTRACT_VERSION_INVALID");
   return reasons;
 }
 
@@ -104,6 +108,7 @@ export async function runControlledSemanticProviderExecutionV0_1(packet: Control
     authorization.localOnly !== packet.localOnly ? "LOCAL_ONLY_MISMATCH" : "",
     authorization.purpose !== packet.purpose ? "PURPOSE_MISMATCH" : "",
     authorization.truthBoundary !== packet.truthBoundary ? "TRUTH_BOUNDARY_MISMATCH" : "",
+    authorization.semanticDecisionContractVersion !== packet.semanticDecisionContractVersion ? "DECISION_CONTRACT_VERSION_MISMATCH" : "",
   ].filter(Boolean);
   if (packetReasons.length || authReasons.length) return blockedV0_1([...packetReasons, ...authReasons], packet.targets.length);
 
@@ -122,7 +127,12 @@ export async function runControlledSemanticProviderExecutionV0_1(packet: Control
   }
 
   consumedAuthorizationIdsV0_1.add(authorization.authorizationId);
-  const execute = options.execute ?? ((context, timeoutMs) => runSemanticAlignmentProposalV0_1(context, { timeoutMs }));
+  const execute = options.execute ?? ((context, timeoutMs) => runSemanticAlignmentProposalV0_1(context, {
+    timeoutMs,
+    ...(packet.semanticDecisionContractVersion
+      ? { semanticDecisionContractVersion: packet.semanticDecisionContractVersion }
+      : {}),
+  }));
   const counts = { proposed: 0, unknown: 0, rejected: 0, malformed: 0, timeout: 0, providerError: 0, skipped: 0 };
   const rows: ControlledSemanticExecutionRowV0_1[] = [];
   for (const { target, context } of contexts) {
@@ -133,7 +143,7 @@ export async function runControlledSemanticProviderExecutionV0_1(packet: Control
     else if (["unknown", "skipped_disabled", "skipped_provider_not_ready"].includes(proposal.status)) counts.unknown += 1;
     else if (proposal.status === "rejected") counts.rejected += 1;
     else if (proposal.status === "malformed_output") counts.malformed += 1;
-    rows.push({ word: target.word, targetSenseId: target.targetSenseId, targetSenseLabel: target.targetSenseLabel, structuralHypothesisId: target.structuralHypothesisId, embryo: context.embryo, expansionChain: context.expansionChain, voicePath: context.voicePath, providerAttempted: proposal.attempted, providerId: proposal.provider, modelId: proposal.assessment.modelId ?? null, alignmentStatus: proposal.assessment.alignmentStatus, alignmentSource: proposal.assessment.alignmentSource, semanticBridge: proposal.assessment.semanticBridge, doctrineRoles: proposal.assessment.doctrineRoles, reasonCodes: proposal.reasonCodes, timeout: proposal.error === "timeout", providerError: proposal.error === "provider_error", logicCandidateEmitted: false, aggregateStatus: proposal.assessment.alignmentStatus === "proposed" ? "candidate_only" : "unknown", truthBoundary: "hypothesis_only_user_decides_no_evidence_promotion" });
+    rows.push({ word: target.word, targetSenseId: target.targetSenseId, targetSenseLabel: target.targetSenseLabel, structuralHypothesisId: target.structuralHypothesisId, embryo: context.embryo, expansionChain: context.expansionChain, voicePath: context.voicePath, providerAttempted: proposal.attempted, providerId: proposal.provider, modelId: proposal.assessment.modelId ?? null, alignmentStatus: proposal.assessment.alignmentStatus, alignmentSource: proposal.assessment.alignmentSource, semanticBridge: proposal.assessment.semanticBridge, doctrineRoles: proposal.assessment.doctrineRoles, semanticDecision: proposal.assessment.semanticDecision?.relationSpecificity ?? null, reasonCodes: proposal.reasonCodes, timeout: proposal.error === "timeout", providerError: proposal.error === "provider_error", logicCandidateEmitted: false, aggregateStatus: proposal.assessment.alignmentStatus === "proposed" ? "candidate_only" : "unknown", truthBoundary: "hypothesis_only_user_decides_no_evidence_promotion" });
   }
   return { status: "completed", authorizationState: "consumed", reasonCodes: ["CONTROLLED_RUN_COMPLETED", "AUTHORIZATION_CONSUMED"], plannedCalls: contexts.length, attemptedCalls: rows.filter((row) => row.providerAttempted).length, completedCalls: rows.length, failedCalls: rows.filter((row) => row.providerError || row.timeout).length, remainingCalls: 0, counts, rows };
 }
