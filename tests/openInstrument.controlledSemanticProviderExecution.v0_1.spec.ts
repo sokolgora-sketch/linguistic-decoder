@@ -14,7 +14,7 @@ const structuralIds = [
 ];
 const words = ["candle", "bistro", "contra", "mantra"];
 const targets = words.flatMap((word, index) => ["plausible", "unrelated"].map((sense) => ({
-  word, targetSenseId: `${word}_${sense}`, targetSenseLabel: sense === "plausible" ? `${word} functional sense` : "unrelated sense", structuralHypothesisId: structuralIds[index],
+  word, targetSenseId: `${word}_${sense}`, targetSenseLabel: sense === "plausible" ? `${word} functional sense` : "unrelated sense", targetSenseDefinition: sense === "plausible" ? `A bounded ${word} functional concept for calibration.` : "A clearly unrelated mechanical storage concept.", structuralHypothesisId: structuralIds[index],
 })));
 const packet: ControlledSemanticExecutionPacketV0_1 = {
   schemaVersion: "open-instrument.controlled-semantic-provider-runner.v0_1",
@@ -53,6 +53,14 @@ describe("controlled semantic provider execution v0.1", () => {
     expect((await runControlledSemanticProviderExecutionV0_1({ ...packet, endpointUrl: "https://api.example.test/v1" }, authorization(), { execute })).reasonCodes).toContain("LOCAL_ONLY_ENDPOINT_REQUIRED");
     expect((await runControlledSemanticProviderExecutionV0_1({ ...packet, maximumRetryCount: 1 as 0 }, authorization(), { execute })).reasonCodes).toContain("RETRY_BOUND_INVALID");
     expect((await runControlledSemanticProviderExecutionV0_1({ ...packet, targets: packet.targets.slice(0, 7), maximumCallCount: 7 }, authorization(), { execute })).reasonCodes).toContain("SENSE_BOUND_INVALID");
+    expect(execute).not.toHaveBeenCalled();
+  });
+  test("requires definition-bearing semantic context before any provider call", async () => {
+    const execute = jest.fn(async () => proposal("proposed"));
+    const missingDefinition = { ...packet, targets: packet.targets.map(({ targetSenseDefinition: _definition, ...target }) => target) } as ControlledSemanticExecutionPacketV0_1;
+    const result = await runControlledSemanticProviderExecutionV0_1(missingDefinition, authorization(), { execute });
+    expect(result.status).toBe("blocked");
+    expect(result.reasonCodes).toContain("TARGET_FIELDS_REQUIRED");
     expect(execute).not.toHaveBeenCalled();
   });
   test("requires provider readiness before the default executor", async () => {

@@ -25,6 +25,7 @@ export type SemanticAlignmentContextV0_1 = Readonly<{
   targetWord: string;
   targetSenseId: string;
   targetSenseLabel: string;
+  targetSenseDefinition?: string;
   structuralHypothesisId: string;
   embryo: string;
   expansionChain: readonly string[];
@@ -112,12 +113,14 @@ export function buildSemanticAlignmentContextV0_1(
     targetWord: unknown;
     targetSenseId: unknown;
     targetSenseLabel: unknown;
+    targetSenseDefinition?: unknown;
     structuralHypothesis: unknown;
   }>,
 ): SemanticAlignmentContextResultV0_1 {
   const targetWord = textV0_1(input?.targetWord);
   const targetSenseId = textV0_1(input?.targetSenseId);
   const targetSenseLabel = textV0_1(input?.targetSenseLabel);
+  const targetSenseDefinition = textV0_1(input?.targetSenseDefinition);
   const structural = isRecordV0_1(input?.structuralHypothesis)
     ? input.structuralHypothesis
     : null;
@@ -178,6 +181,7 @@ export function buildSemanticAlignmentContextV0_1(
       targetWord,
       targetSenseId,
       targetSenseLabel,
+      ...(targetSenseDefinition ? { targetSenseDefinition } : {}),
       structuralHypothesisId,
       embryo,
       expansionChain,
