@@ -2,6 +2,7 @@ import {
   buildSemanticAlignmentContextV0_1,
   deterministicNoAlignmentV0_1,
   parseSemanticAlignmentProposalV0_1,
+  parseSemanticAlignmentProposalV0_2,
 } from "../src/shared/openInstrument/semanticAlignment.v0_1";
 import { discoverStructuralHypothesesV0_1 } from "../src/shared/structuralHypothesisDiscovery.v0_1";
 import {
@@ -185,6 +186,53 @@ describe("Open Instrument semantic alignment v0.1", () => {
       expect(result.mockProvider).toBe(true);
       expect(result.realProvider).toBe(false);
     }
+  });
+
+  test("requires and enforces the versioned semantic decision contract", () => {
+    const context = contextFixture();
+    const base = {
+      doctrineRoles: [context.doctrineProjection.projections[0].doctrineRole],
+      semanticBridge:
+        "The supplied sense can be related to the structural anchor as a bounded reviewable hypothesis.",
+      reasonCodes: ["SEMANTIC_RELATION_STRUCTURE_SPECIFIC"],
+    };
+    expect(
+      parseSemanticAlignmentProposalV0_2(
+        { ...base, alignmentStatus: "proposed", semanticDecision: { relationSpecificity: "structure_specific" } },
+        context,
+        { alignmentSource: "provider_proposed_hypothesis" },
+      ),
+    ).toMatchObject({ ok: true, assessment: { semanticDecision: { relationSpecificity: "structure_specific" } } });
+    expect(
+      parseSemanticAlignmentProposalV0_2(
+        { ...base, alignmentStatus: "proposed", semanticDecision: { relationSpecificity: "generic_or_unclear" } },
+        context,
+        { alignmentSource: "provider_proposed_hypothesis" },
+      ),
+    ).toMatchObject({ ok: false, reasonCodes: ["SEMANTIC_DECISION_STATUS_MISMATCH"] });
+    expect(
+      parseSemanticAlignmentProposalV0_2(
+        { alignmentStatus: "unknown", doctrineRoles: [], semanticBridge: null, reasonCodes: ["SEMANTIC_RELATION_GENERIC_OR_UNCLEAR"], semanticDecision: { relationSpecificity: "generic_or_unclear" } },
+        context,
+        { alignmentSource: "provider_proposed_hypothesis" },
+      ),
+    ).toMatchObject({ ok: true, assessment: { alignmentStatus: "unknown" } });
+    expect(
+      parseSemanticAlignmentProposalV0_2(
+        { alignmentStatus: "proposed", doctrineRoles: [], semanticBridge: base.semanticBridge, reasonCodes: [], },
+        context,
+        { alignmentSource: "provider_proposed_hypothesis" },
+      ),
+    ).toMatchObject({ ok: false, reasonCodes: ["SEMANTIC_DECISION_REQUIRED"] });
+  });
+
+  test("uses the decision contract in deterministic mock execution", async () => {
+    const result = await runSemanticAlignmentProposalV0_1(contextFixture(), {
+      providerOverrideForTests: "mock_semantic_proposed",
+      semanticDecisionContractVersion: "open-instrument.semantic-decision-contract.v0_2",
+    });
+    expect(result.status).toBe("proposed");
+    expect(result.assessment.semanticDecision).toEqual({ relationSpecificity: "structure_specific" });
   });
 
   test.each([

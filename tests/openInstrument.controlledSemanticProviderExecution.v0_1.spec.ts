@@ -56,6 +56,34 @@ describe("controlled semantic provider execution v0.1", () => {
     expect((await runControlledSemanticProviderExecutionV0_1({ ...packet, targets: packet.targets.slice(0, 7), maximumCallCount: 7 }, authorization(), { execute })).reasonCodes).toContain("SENSE_BOUND_INVALID");
     expect(execute).not.toHaveBeenCalled();
   });
+
+  test("binds the versioned semantic decision contract into packet authorization", async () => {
+    const execute = jest.fn(async () => proposal("unknown"));
+    const versionedPacket = {
+      ...packet,
+      semanticDecisionContractVersion: "open-instrument.semantic-decision-contract.v0_2" as const,
+    };
+    const result = await runControlledSemanticProviderExecutionV0_1(
+      versionedPacket,
+      authorization(),
+      { execute },
+    );
+    expect(result.status).toBe("blocked");
+    expect(result.reasonCodes).toContain("DECISION_CONTRACT_VERSION_MISMATCH");
+    expect(execute).not.toHaveBeenCalled();
+    const matchingAuthorization = {
+      ...authorization(),
+      semanticDecisionContractVersion: versionedPacket.semanticDecisionContractVersion,
+      packetFingerprint: fingerprintControlledSemanticExecutionPacketV0_1(versionedPacket),
+    };
+    const completed = await runControlledSemanticProviderExecutionV0_1(
+      versionedPacket,
+      matchingAuthorization,
+      { execute },
+    );
+    expect(completed.status).toBe("completed");
+    expect(completed.rows.every((row) => row.semanticDecision === null)).toBe(true);
+  });
   test("requires definition-bearing semantic context before any provider call", async () => {
     const execute = jest.fn(async () => proposal("proposed"));
     const missingDefinition = { ...packet, targets: packet.targets.map(({ targetSenseDefinition: _definition, ...target }) => target) } as ControlledSemanticExecutionPacketV0_1;
