@@ -13,8 +13,12 @@ import {
   type ContrastiveSemanticProposalResultV0_1,
 } from "@/shared/orchestrator/contrastiveSemanticCalibrationProposal.v0_1";
 
+export const CONTROLLED_SEMANTIC_CONTRASTIVE_EXECUTION_VERSION_V0_1 =
+  "open-instrument.controlled-semantic-contrastive-execution.v0_1" as const;
+
 export type ControlledSemanticContrastiveExecutionPacketV0_1 = Readonly<{
   schemaVersion: typeof CONTROLLED_SEMANTIC_CONTRASTIVE_RUNNER_SCHEMA_V0_1;
+  controlledExecutionVersion: typeof CONTROLLED_SEMANTIC_CONTRASTIVE_EXECUTION_VERSION_V0_1;
   packetId: string;
   milestoneId: string;
   providerId: "openai_compat";
@@ -32,6 +36,7 @@ export type ControlledSemanticContrastiveExecutionPacketV0_1 = Readonly<{
 
 export type ControlledSemanticContrastiveAuthorizationV0_1 = Readonly<{
   schemaVersion: typeof CONTROLLED_SEMANTIC_CONTRASTIVE_RUNNER_SCHEMA_V0_1;
+  controlledExecutionVersion: typeof CONTROLLED_SEMANTIC_CONTRASTIVE_EXECUTION_VERSION_V0_1;
   authorizationId: string;
   state: "authorization_not_granted" | "granted_one_shot_local_only" | "consumed" | "expired";
   milestoneId: string;
@@ -73,6 +78,7 @@ export type ControlledSemanticContrastiveExecutionRowV0_1 = Readonly<{
 }>;
 
 export type ControlledSemanticContrastiveExecutionResultV0_1 = Readonly<{
+  controlledExecutionVersion: typeof CONTROLLED_SEMANTIC_CONTRASTIVE_EXECUTION_VERSION_V0_1;
   status: "blocked" | "completed";
   authorizationState: "authorization_not_granted" | "consumed";
   reasonCodes: readonly string[];
@@ -110,6 +116,7 @@ export function fingerprintControlledSemanticContrastiveExecutionPacketV0_1(
 ): string {
   return JSON.stringify({
     schemaVersion: packet.schemaVersion,
+    controlledExecutionVersion: packet.controlledExecutionVersion,
     packetId: packet.packetId,
     milestoneId: packet.milestoneId,
     providerId: packet.providerId,
@@ -132,6 +139,7 @@ export function validateControlledSemanticContrastiveExecutionPacketV0_1(
   const reasons: string[] = [];
   const words = new Set(packet.pairs.map((pair) => textV0_1(pair.word)));
   if (packet.schemaVersion !== CONTROLLED_SEMANTIC_CONTRASTIVE_RUNNER_SCHEMA_V0_1) reasons.push("CONTRASTIVE_RUNNER_SCHEMA_INVALID");
+  if (packet.controlledExecutionVersion !== CONTROLLED_SEMANTIC_CONTRASTIVE_EXECUTION_VERSION_V0_1) reasons.push("CONTRASTIVE_EXECUTION_VERSION_INVALID");
   if (!packet.packetId || !packet.milestoneId) reasons.push("CONTRASTIVE_PACKET_ID_REQUIRED");
   if (packet.providerId !== "openai_compat") reasons.push("CONTRASTIVE_PROVIDER_UNSUPPORTED");
   if (!packet.modelId) reasons.push("CONTRASTIVE_MODEL_REQUIRED");
@@ -151,6 +159,7 @@ export function validateControlledSemanticContrastiveExecutionPacketV0_1(
 
 function blockedV0_1(reasonCodes: readonly string[], plannedCalls = 0): ControlledSemanticContrastiveExecutionResultV0_1 {
   return {
+    controlledExecutionVersion: CONTROLLED_SEMANTIC_CONTRASTIVE_EXECUTION_VERSION_V0_1,
     status: "blocked",
     authorizationState: "authorization_not_granted",
     reasonCodes,
@@ -173,6 +182,7 @@ export async function runControlledSemanticContrastiveProviderExecutionV0_1(
   const fingerprint = fingerprintControlledSemanticContrastiveExecutionPacketV0_1(packet);
   const authReasons = [
     authorization.schemaVersion !== CONTROLLED_SEMANTIC_CONTRASTIVE_RUNNER_SCHEMA_V0_1 ? "CONTRASTIVE_AUTH_SCHEMA_INVALID" : "",
+    authorization.controlledExecutionVersion !== packet.controlledExecutionVersion ? "CONTRASTIVE_EXECUTION_VERSION_MISMATCH" : "",
     authorization.state !== "granted_one_shot_local_only" ? "CONTRASTIVE_AUTHORIZATION_NOT_ACTIVE" : "",
     consumedAuthorizationIdsV0_1.has(authorization.authorizationId) ? "CONTRASTIVE_AUTHORIZATION_CONSUMED" : "",
     authorization.packetFingerprint !== fingerprint ? "CONTRASTIVE_PACKET_FINGERPRINT_MISMATCH" : "",
@@ -243,6 +253,7 @@ export async function runControlledSemanticContrastiveProviderExecutionV0_1(
     });
   }
   return {
+    controlledExecutionVersion: CONTROLLED_SEMANTIC_CONTRASTIVE_EXECUTION_VERSION_V0_1,
     status: "completed",
     authorizationState: "consumed",
     reasonCodes: ["CONTRASTIVE_RUN_COMPLETED", "CONTRASTIVE_AUTHORIZATION_CONSUMED"],

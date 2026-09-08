@@ -6,6 +6,7 @@ import {
 } from "../src/shared/openInstrument/contrastiveSemanticCalibration.v0_1";
 import { contrastiveSemanticContextForPromptV0_1 } from "../src/shared/llm/prompts/semanticAlignmentProposer.v0.1";
 import {
+  CONTROLLED_SEMANTIC_CONTRASTIVE_EXECUTION_VERSION_V0_1,
   fingerprintControlledSemanticContrastiveExecutionPacketV0_1,
   runControlledSemanticContrastiveProviderExecutionV0_1,
   validateControlledSemanticContrastiveExecutionPacketV0_1,
@@ -43,6 +44,7 @@ function pair(word: string, structuralHypothesisId: string, firstId: string, sec
 const pairs = words.map((word, index) => pair(word, structuralIds[index], `${word}_a`, `${word}_b`));
 const packet: ControlledSemanticContrastiveExecutionPacketV0_1 = {
   schemaVersion: "open-instrument.controlled-semantic-contrastive-runner.v0_1",
+  controlledExecutionVersion: CONTROLLED_SEMANTIC_CONTRASTIVE_EXECUTION_VERSION_V0_1,
   packetId: "fixture.controlled-semantic-contrastive-run.v0.1",
   milestoneId: "OPEN_INSTRUMENT_CONTRASTIVE_SEMANTIC_CALIBRATION_V1",
   providerId: "openai_compat",
@@ -63,6 +65,7 @@ function authorization(state: ControlledSemanticContrastiveAuthorizationV0_1["st
   authorizationCount += 1;
   return {
     schemaVersion: packet.schemaVersion,
+    controlledExecutionVersion: packet.controlledExecutionVersion,
     authorizationId: `contrastive-auth-${authorizationCount}`,
     state,
     milestoneId: packet.milestoneId,
@@ -217,14 +220,31 @@ describe("Open Instrument contrastive semantic calibration v0.1", () => {
     const swapped = { ...packet, pairs: [packet.pairs[0], packet.pairs[1], packet.pairs[3], packet.pairs[2]] };
     expect(fingerprintControlledSemanticContrastiveExecutionPacketV0_1(swapped)).not.toBe(fingerprintControlledSemanticContrastiveExecutionPacketV0_1(packet));
     expect(fingerprintControlledSemanticContrastiveExecutionPacketV0_1({ ...packet, contrastiveDecisionContractVersion: "open-instrument.semantic-contrastive-decision-contract.v9" as typeof packet.contrastiveDecisionContractVersion })).not.toBe(fingerprintControlledSemanticContrastiveExecutionPacketV0_1(packet));
+    expect(fingerprintControlledSemanticContrastiveExecutionPacketV0_1({ ...packet, controlledExecutionVersion: "open-instrument.controlled-semantic-contrastive-execution.v9" as typeof packet.controlledExecutionVersion })).not.toBe(fingerprintControlledSemanticContrastiveExecutionPacketV0_1(packet));
     expect((await runControlledSemanticContrastiveProviderExecutionV0_1({ ...packet, maximumCallCount: 3 as 4 }, authorization(), { execute })).status).toBe("blocked");
     expect((await runControlledSemanticContrastiveProviderExecutionV0_1({ ...packet, endpointUrl: "https://example.test/v1" }, authorization(), { execute })).status).toBe("blocked");
+  });
+
+  test("keeps execution provenance distinct from the semantic decision contract", () => {
+    expect(CONTROLLED_SEMANTIC_CONTRASTIVE_EXECUTION_VERSION_V0_1).not.toBe(CONTRASTIVE_SEMANTIC_DECISION_CONTRACT_VERSION_V0_1);
+    expect(packet.controlledExecutionVersion).toBe(CONTROLLED_SEMANTIC_CONTRASTIVE_EXECUTION_VERSION_V0_1);
   });
 
   test("authorization mismatch blocks before any pair execution", async () => {
     const execute = jest.fn(async (context: Parameters<NonNullable<Parameters<typeof runControlledSemanticContrastiveProviderExecutionV0_1>[2]>["execute"]>[0]) => proposedResult(context));
     const result = await runControlledSemanticContrastiveProviderExecutionV0_1(packet, { ...authorization(), packetFingerprint: "wrong" }, { execute });
     expect(result.status).toBe("blocked");
+    expect(execute).not.toHaveBeenCalled();
+  });
+
+  test("execution-version mismatch blocks before any provider call", async () => {
+    const execute = jest.fn(async (context: Parameters<NonNullable<Parameters<typeof runControlledSemanticContrastiveProviderExecutionV0_1>[2]>["execute"]>[0]) => proposedResult(context));
+    const result = await runControlledSemanticContrastiveProviderExecutionV0_1(
+      packet,
+      { ...authorization(), controlledExecutionVersion: "open-instrument.controlled-semantic-contrastive-execution.v9" as typeof packet.controlledExecutionVersion },
+      { execute },
+    );
+    expect(result).toMatchObject({ status: "blocked", controlledExecutionVersion: CONTROLLED_SEMANTIC_CONTRASTIVE_EXECUTION_VERSION_V0_1, reasonCodes: expect.arrayContaining(["CONTRASTIVE_EXECUTION_VERSION_MISMATCH"]) });
     expect(execute).not.toHaveBeenCalled();
   });
 
@@ -271,6 +291,7 @@ describe("Open Instrument contrastive semantic calibration v0.1", () => {
       };
     });
     const result = await runControlledSemanticContrastiveProviderExecutionV0_1(packet, authorization(), { execute });
+    expect(result).toMatchObject({ controlledExecutionVersion: CONTROLLED_SEMANTIC_CONTRASTIVE_EXECUTION_VERSION_V0_1 });
     expect(result.rows).toHaveLength(4);
     expect(result.rows.every((row) => row.modelId === "fixture-model")).toBe(true);
     expect(result.rows.every((row) => Number.isInteger(row.elapsedMs) && row.elapsedMs >= 0)).toBe(true);
