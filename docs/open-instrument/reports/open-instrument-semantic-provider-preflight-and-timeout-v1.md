@@ -75,7 +75,7 @@ Implementation PR `#1856` merged by squash with commit `78860b7c59c7151570c78f39
 - `git diff --check`: passed;
 - API output remains assessment-only; no catalog or evidence rows changed;
 - real provider execution: not authorized, not configured, and not claimed;
-- local `main` and `origin/main` match at `78860b7c59c7151570c78f399f0209aa6e734fbc` with divergence `0 behind / 0 ahead` and a clean worktree;
+- implementation merge `78860b7c59c7151570c78f399f0209aa6e734fbc` is an ancestor of the final synchronized `main`; closure PR `#1857` merged at `2d8c3dcf8a2132378c7b55929a679438dc339421`, which matches `origin/main` at divergence `0 behind / 0 ahead` with a clean worktree;
 - protected JO stash object and marker remain present and unchanged;
 - no implementation lane remains under this milestone; any real-provider execution requires a separate explicit authorization milestone.
 
