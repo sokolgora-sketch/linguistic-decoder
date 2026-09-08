@@ -176,7 +176,7 @@ Lane 21 is complete.
 
 ## 6E. Final closure proof
 
-Lane 22 is complete. The implementation merge is an ancestor of synchronized `main`; local `main` and `origin/main` are both `9be82f35aac185a4df81cc7c688ab58ff4894704`, with divergence `0/0` and a clean worktree. This report reconciliation is the docs-only closure PR for the milestone and introduces no production, evidence, catalog, SCALE-50, or provider change.
+Lane 22 is complete. The implementation merge `9be82f35aac185a4df81cc7c688ab58ff4894704` is an ancestor of synchronized `main`; local `main` and `origin/main` are both `e4b02a678e630b55fc9cd809911dbc6352f239fd`, with divergence `0/0` and a clean worktree. This report reconciliation is the docs-only closure PR for the milestone and introduces no production, evidence, catalog, SCALE-50, or provider change.
 
 - provider posture: `NOT CONFIGURED / NOT CLAIMED`;
 - validation totals: `640` unit suites passed, `3` skipped; `2,874` unit tests passed, `4` skipped; `149` snapshots passed; integration `2` suites / `5` tests passed; TypeScript, production build, static generation, and `npm run gate:quick` passed;
