@@ -2,7 +2,7 @@
 
 **Milestone ID:** `OPEN_INSTRUMENT_SENSE_GROUNDED_FUNCTIONAL_BRIDGE_V1`
 
-**Status:** `ACTIVE`
+**Status:** `DONE`
 
 **Opened:** 2026-09-08
 
@@ -82,7 +82,7 @@ The milestone must inspect and reuse the existing owners rather than create para
 | 4. Semantic bridge proposal seam | DONE |
 | 5. Semantic alignment integrity verification | DONE |
 | 6. Remove automatic tautological bridge | DONE |
-| 7. Optional user-asserted functional link decision | NOT_STARTED |
+| 7. Optional user-asserted functional link decision | DONE — not implemented by explicit design decision |
 | 8. Runtime/API integration | DONE |
 | 9. Status and precedence rules | DONE |
 | 10. UI truth display | DONE |
@@ -96,8 +96,8 @@ The milestone must inspect and reuse the existing owners rather than create para
 | 18. Product reality proof | DONE |
 | 19. Real-provider proof, if available | DONE (unavailable, not claimed) |
 | 20. Full validation | DONE |
-| 21. Implementation PR and review | NOT_STARTED |
-| 22. Merge, closure, and DF_BRAIN | NOT_STARTED |
+| 21. Implementation PR and review | DONE |
+| 22. Merge, closure, and DF_BRAIN | DONE |
 
 ## 6. Exit criteria
 
@@ -134,7 +134,7 @@ The baseline regression is frozen in `tests/openInstrument.senseGroundedFunction
 
 ## 6B. Implementation closeout
 
-The contract-hardening implementation is complete in the working branch:
+The contract-hardening implementation was completed and merged through PR #1851:
 
 - `src/shared/openInstrument/semanticAlignment.v0_1.ts` defines the versioned `proposed|unknown|rejected` assessment, deterministic context, fail-closed parser, bounded claim language, and deterministic no-alignment result;
 - `src/shared/orchestrator/semanticAlignmentProposal.v0_1.ts` reuses the existing proposer seam, supports test-only semantic fixtures, and reports a real provider as unavailable unless explicitly configured;
@@ -146,6 +146,8 @@ The contract-hardening implementation is complete in the working branch:
 The old automatic bridge is therefore removed from the logic-derived path. A target sense alone no longer creates a candidate. The provider-backed test fixture produces a candidate-only hypothesis; unknown or rejected alignment leaves the structural hypothesis visible and preserves valid Null/structural status.
 
 The matched/mismatched matrix is covered by `tests/openInstrument.senseGroundedFunctionalBridge.baseline.v0_1.spec.ts` and `tests/openInstrument.semanticAlignment.v0_1.spec.ts`. The matrix includes ordinary, unrelated, underspecified, and prompt-injection-shaped senses; all provider-disabled cases remain `unknown` and none promote historical, winner, language-superiority, candidate-truth, or evidence claims.
+
+Lane 7 is complete as an explicit v1 design decision: no separate user-asserted functional-link field was implemented. Target-sense-only automatic bridging has been removed, and semantic alignment is now an explicit fail-closed proposal. When no provider result is available, the system remains `unknown` / structural-only. Adding a second user-supplied semantic authority is not required to close this milestone's truth gap and would unnecessarily widen the product surface.
 
 ## 6C. Validation closeout
 
@@ -160,9 +162,30 @@ The matched/mismatched matrix is covered by `tests/openInstrument.senseGroundedF
 - catalog/evidence rows: unchanged; no SCALE-50 evidence expansion;
 - JO stash: protected object and marker unchanged.
 
-## 6D. Next task
+## 6D. Implementation PR and review closeout
 
-**Lane 21 — implementation PR and review.**
+Lane 21 is complete.
+
+- PR: [#1851](https://github.com/sokolgora-sketch/linguistic-decoder/pull/1851)
+- Title: `feat(open-instrument): ground functional bridges in sense alignment`;
+- final implementation branch head before merge: `2dfc8048f690f64b75932f718fc064b73d6b2638`;
+- base: `main` at `152659d1d8f0d5e1cf8f616a270c1f515125347a`;
+- squash merge: `9be82f35aac185a4df81cc7c688ab58ff4894704`;
+- GitHub checks: `lint-test-build`, `contracts`, `CodeQL`, `Analyze (actions)`, and `Analyze (javascript-typescript)` all passed;
+- review posture: no independent human review was recorded; the authorized campaign review-waiver procedure was used after technical checks passed, and the automated Codex review produced no unresolved material finding.
+
+## 6E. Final closure proof
+
+Lane 22 is complete. The implementation merge is an ancestor of synchronized `main`; local `main` and `origin/main` are both `9be82f35aac185a4df81cc7c688ab58ff4894704`, with divergence `0/0` and a clean worktree. This report reconciliation is the docs-only closure PR for the milestone and introduces no production, evidence, catalog, SCALE-50, or provider change.
+
+- provider posture: `NOT CONFIGURED / NOT CLAIMED`;
+- validation totals: `640` unit suites passed, `3` skipped; `2,874` unit tests passed, `4` skipped; `149` snapshots passed; integration `2` suites / `5` tests passed; TypeScript, production build, static generation, and `npm run gate:quick` passed;
+- real-provider performance: not claimed; only deterministic mock/test fixtures were used;
+- protected JO stash: object `8b7e4397ac3341c1c4ea9c004b29e6fa93db40b1` and marker `park-jo-runtime-verified-before-logic-first-milestone-2026-08-25` remain present and unchanged;
+- DF_BRAIN was already updated locally after the implementation merge and remains no-remote; no duplicate milestone entry is required;
+- no implementation lane remains under this milestone. Any future implementation requires a new bounded milestone.
+
+`OPEN_INSTRUMENT_SENSE_GROUNDED_FUNCTIONAL_BRIDGE_V1_CLOSED_2026-09-08`
 
 ## 7. Explicit non-goals
 
