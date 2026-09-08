@@ -1,7 +1,7 @@
 # Open Instrument semantic provider preflight and timeout v1
 
 Milestone ID: `OPEN_INSTRUMENT_SEMANTIC_PROVIDER_PREFLIGHT_AND_TIMEOUT_V1`
-Status: ACTIVE
+Status: DONE
 Opened: 2026-09-08
 Repository: `sokolgora-sketch/linguistic-decoder`
 Opening main: `3d572c3bbf1fd8257ed175f7c31354aac6895b31`
@@ -61,3 +61,22 @@ The implementation preserves Fact / Inference / Hypothesis / Unknown boundaries,
 ## Continuation protocol
 
 Before merge, inspect the exact diff and changed-file scope, run focused tests followed by the repository gate and provider-disabled live smoke, verify the worktree and protected stash, then merge only after required CI and review evidence is green. A future real-provider lane requires a separate explicit authorization milestone.
+
+## Implementation and closure proof
+
+Implementation PR `#1856` merged by squash with commit `78860b7c59c7151570c78f399f0209aa6e734fbc`.
+
+- implementation head: `910625161ee74ac2d8594c240cb7d1c324fa41d7`;
+- CI: `lint-test-build`, `contracts`, `Analyze (actions)`, `Analyze (javascript-typescript)`, and CodeQL passed;
+- focused tests: 3 suites, 29 tests passed;
+- `npm run typecheck`: passed;
+- `npm run gate:quick`: passed; 640 suites passed, 3 skipped; 2,882 tests passed, 4 skipped; 149 snapshots passed; integration 2 suites / 5 tests passed; production build and static generation passed;
+- provider-disabled `npm run open-instrument:live-smoke`: passed;
+- `git diff --check`: passed;
+- API output remains assessment-only; no catalog or evidence rows changed;
+- real provider execution: not authorized, not configured, and not claimed;
+- local `main` and `origin/main` match at `78860b7c59c7151570c78f399f0209aa6e734fbc` with divergence `0 behind / 0 ahead` and a clean worktree;
+- protected JO stash object and marker remain present and unchanged;
+- no implementation lane remains under this milestone; any real-provider execution requires a separate explicit authorization milestone.
+
+`OPEN_INSTRUMENT_SEMANTIC_PROVIDER_PREFLIGHT_AND_TIMEOUT_V1_CLOSED_2026-09-08`
