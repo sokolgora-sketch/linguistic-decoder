@@ -5,6 +5,7 @@ import {
   type ControlledSemanticExecutionPacketV0_1,
 } from "@/shared/openInstrument/controlledSemanticProviderExecution.v0_1";
 import type { SemanticAlignmentProposalResultV0_1 } from "@/shared/orchestrator/semanticAlignmentProposal.v0_1";
+import { semanticAlignmentContextForPromptV0_1 } from "@/shared/llm/prompts/semanticAlignmentProposer.v0.1";
 
 const structuralIds = [
   "logic-structural:candle:an:peel_right_consonant_led_expansion+peel_left_consonant_frame",
@@ -14,7 +15,7 @@ const structuralIds = [
 ];
 const words = ["candle", "bistro", "contra", "mantra"];
 const targets = words.flatMap((word, index) => ["plausible", "unrelated"].map((sense) => ({
-  word, targetSenseId: `${word}_${sense}`, targetSenseLabel: sense === "plausible" ? `${word} functional sense` : "unrelated sense", targetSenseDefinition: sense === "plausible" ? `A bounded ${word} functional concept for calibration.` : "A clearly unrelated mechanical storage concept.", structuralHypothesisId: structuralIds[index],
+  word, targetSenseId: `${word}_${sense}`, targetSenseLabel: sense === "plausible" ? `${word} semantic sense` : "mechanical storage concept sense", targetSenseDefinition: sense === "plausible" ? `A bounded ${word} functional concept for calibration.` : "A mechanical storage concept involving rigid components.", structuralHypothesisId: structuralIds[index],
 })));
 const packet: ControlledSemanticExecutionPacketV0_1 = {
   schemaVersion: "open-instrument.controlled-semantic-provider-runner.v0_1",
@@ -70,6 +71,21 @@ describe("controlled semantic provider execution v0.1", () => {
     expect(result.status).toBe("blocked");
     expect(result.reasonCodes).toContain("TARGET_FIELDS_REQUIRED");
     expect(execute).not.toHaveBeenCalled();
+  });
+  test("keeps calibration classification metadata out of provider-visible context", async () => {
+    const seen: unknown[] = [];
+    const execute = jest.fn(async (context: unknown) => {
+      seen.push(semanticAlignmentContextForPromptV0_1(context as Parameters<typeof semanticAlignmentContextForPromptV0_1>[0]));
+      return proposal("unknown");
+    });
+    const result = await runControlledSemanticProviderExecutionV0_1(packet, authorization(), { execute });
+    expect(result.status).toBe("completed");
+    expect(seen).toHaveLength(8);
+    const serialized = JSON.stringify(seen);
+    expect(serialized).not.toMatch(/plausible|unrelated|positive|negative|accept|reject/i);
+    expect(serialized).not.toContain("targetSenseId");
+    expect(seen.every((context) => typeof context === "object" && context !== null && "targetSenseDefinition" in context)).toBe(true);
+    expect(seen.every((context) => typeof context === "object" && context !== null && "structuralHypothesisId" in context)).toBe(true);
   });
   test("requires provider readiness before the default executor", async () => {
     const result = await runControlledSemanticProviderExecutionV0_1(packet, authorization());
