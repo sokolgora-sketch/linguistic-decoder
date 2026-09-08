@@ -1,0 +1,24 @@
+{
+  "schemaVersion": "open-instrument.controlled-semantic-provider-runner.v0_1",
+  "packetId": "fixture.controlled-semantic-provider-run.v0.1",
+  "milestoneId": "OPEN_INSTRUMENT_FIRST_CONTROLLED_SEMANTIC_PROVIDER_EXECUTION_AUTHORIZATION_AND_BOUNDED_RUNNER_V1",
+  "providerId": "openai_compat",
+  "modelId": "fixture-model",
+  "endpointUrl": "http://127.0.0.1:11434/v1",
+  "localOnly": true,
+  "targets": [
+    { "word": "candle", "targetSenseId": "candle_plausible", "targetSenseLabel": "candle functional sense", "structuralHypothesisId": "logic-structural:candle:an:peel_right_consonant_led_expansion+peel_left_consonant_frame" },
+    { "word": "candle", "targetSenseId": "candle_unrelated", "targetSenseLabel": "unrelated sense", "structuralHypothesisId": "logic-structural:candle:an:peel_right_consonant_led_expansion+peel_left_consonant_frame" },
+    { "word": "bistro", "targetSenseId": "bistro_plausible", "targetSenseLabel": "bistro functional sense", "structuralHypothesisId": "logic-structural:bistro:is:peel_right_consonant_led_expansion+peel_left_consonant_frame" },
+    { "word": "bistro", "targetSenseId": "bistro_unrelated", "targetSenseLabel": "unrelated sense", "structuralHypothesisId": "logic-structural:bistro:is:peel_right_consonant_led_expansion+peel_left_consonant_frame" },
+    { "word": "contra", "targetSenseId": "contra_plausible", "targetSenseLabel": "contra functional sense", "structuralHypothesisId": "logic-structural:contra:on:peel_right_consonant_led_expansion+peel_left_consonant_frame" },
+    { "word": "contra", "targetSenseId": "contra_unrelated", "targetSenseLabel": "unrelated sense", "structuralHypothesisId": "logic-structural:contra:on:peel_right_consonant_led_expansion+peel_left_consonant_frame" },
+    { "word": "mantra", "targetSenseId": "mantra_plausible", "targetSenseLabel": "mantra functional sense", "structuralHypothesisId": "logic-structural:mantra:an:peel_right_consonant_led_expansion+peel_left_consonant_frame" },
+    { "word": "mantra", "targetSenseId": "mantra_unrelated", "targetSenseLabel": "unrelated sense", "structuralHypothesisId": "logic-structural:mantra:an:peel_right_consonant_led_expansion+peel_left_consonant_frame" }
+  ],
+  "maximumCallCount": 8,
+  "timeoutMs": 8000,
+  "maximumRetryCount": 0,
+  "purpose": "controlled_semantic_alignment_research",
+  "truthBoundary": "hypothesis_only_user_decides_no_evidence_promotion"
+}
