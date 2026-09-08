@@ -1,10 +1,44 @@
 # Open Instrument contrastive semantic calibration v1
 
 Milestone ID: `OPEN_INSTRUMENT_CONTRASTIVE_SEMANTIC_CALIBRATION_V1`
-Status: `ACTIVE`
+Status: `DONE`
 Opened: `2026-09-08`
 Opening main: `e180aa4da3bdad0317fed35ca554a634f5bc9f44`
 Opening branch: `feat/open-instrument-contrastive-semantic-calibration-v1`
+
+## Closeout
+
+Implementation PR `#1866` (`feat(open-instrument): add contrastive semantic calibration contract`) merged into `main` as squash commit `3db4013e323443c8e4dca9955eede184d10135c8` from implementation head `ab87b545d3e4003d8eb8b451ebcfccd92f92ba8f`.
+
+Validation proved:
+
+- focused contrastive plus legacy semantic-provider tests: 3 suites / 45 tests passed;
+- `npm run typecheck:full`: passed;
+- `npm run build`: passed;
+- `npm run gate:quick`: passed with 642 suites passed, 3 skipped, 2,908 tests passed, 4 skipped, 149 snapshots passed, and 2 integration suites / 5 integration tests passed;
+- GitHub checks: Analyze, CodeQL, contracts, and lint-test-build passed;
+- `git diff --check`: passed;
+- post-merge `main` and `origin/main`: `3db4013e323443c8e4dca9955eede184d10135c8`, divergence `0/0`, clean worktree;
+- protected JO stash remained present and unchanged.
+
+The implementation lane made no provider calls and invoked no controlled
+provider runner. The four-pair contrastive contract keeps sense IDs and
+calibration orientation out of provider-visible context, preserves neutral
+uncertainty, and leaves all provider output hypothesis-only/candidate-only
+with `user_decides`; it does not promote evidence, history, origin,
+transmission, winner, superiority, or candidate truth.
+
+This milestone is closed with marker:
+
+`OPEN_INSTRUMENT_CONTRASTIVE_SEMANTIC_CALIBRATION_V1_CLOSED_2026-09-08`
+
+The next live contrastive calibration remains a separate action requiring a
+new explicit human authorization bound to one exact model, packet, four-call
+maximum, 8000 ms timeout, zero retries, and loopback-only execution. No live
+provider execution is part of this closeout.
+
+No implementation lane remains under this milestone. Any future change must
+be opened as a new bounded milestone.
 
 ## Motivation
 
