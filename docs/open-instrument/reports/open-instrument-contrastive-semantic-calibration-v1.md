@@ -66,6 +66,21 @@ The milestone remains `DONE` and closed. No new provider execution,
 authorization, packet, evidence, or truth promotion is part of this
 addendum.
 
+## Post-Closure Provenance Note (2026-09-09)
+
+PR `#1868` added bounded diagnostics but did not bind the diagnostic
+implementation identity into the controlled packet, authorization, or result.
+Inspection classified that state as
+`EXECUTION_PROVENANCE_GAP_BEFORE_RERUN`. The bounded provenance follow-up adds
+the stable controlled execution/diagnostic version
+`open-instrument.controlled-semantic-contrastive-execution.v0_1` to the packet
+identity, authorization binding, and sanitized top-level result. Future
+executions must bind this version across all three surfaces. Historical
+pre-provenance executions remain historical and are not retroactively
+versioned. No provider execution occurred in this provenance lane.
+
+The milestone remains `DONE` and closed.
+
 ## Motivation
 
 The completed v0.1 and v0.2 single-sense calibration runs did not produce
