@@ -54,4 +54,8 @@ The implementation was delivered through PR `#1861`, titled `feat(open-instrumen
 - Protected JO stash object `8b7e4397ac3341c1c4ea9c004b29e6fa93db40b1` and marker `park-jo-runtime-verified-before-logic-first-milestone-2026-08-25` remain present and unchanged.
 - No implementation lane remains under this milestone. Any further provider calibration requires a separate bounded milestone and authorization.
 
+## Post-closure calibration-blindness correction
+
+During preparation for the second calibration experiment, a provider-visible label leak was found in the closed fixture: negative controls used the label `unrelated sense`. No second semantic-provider execution occurred. Before any new authorization was prepared, the fixture labels were replaced with neutral descriptive labels while the internal calibration IDs remained non-provider-facing and the definition-bearing semantic inputs remained visible by design. The milestone truth boundary is unchanged: these definitions are calibration inputs, not evidence, and provider output remains hypothesis-only, candidate-only where applicable, and `user_decides`.
+
 `OPEN_INSTRUMENT_SEMANTIC_CALIBRATION_PACKET_AND_DECISION_POLICY_V1_CLOSED_2026-09-08`
