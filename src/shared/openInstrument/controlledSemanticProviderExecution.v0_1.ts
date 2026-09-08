@@ -4,7 +4,7 @@ import { runSemanticAlignmentProposalV0_1, semanticProviderPreflightV0_1, type S
 
 export const CONTROLLED_SEMANTIC_PROVIDER_RUNNER_SCHEMA_V0_1 = "open-instrument.controlled-semantic-provider-runner.v0_1" as const;
 
-export type ControlledSemanticExecutionTargetV0_1 = Readonly<{ word: string; targetSenseId: string; targetSenseLabel: string; structuralHypothesisId: string }>;
+export type ControlledSemanticExecutionTargetV0_1 = Readonly<{ word: string; targetSenseId: string; targetSenseLabel: string; targetSenseDefinition: string; structuralHypothesisId: string }>;
 export type ControlledSemanticExecutionPacketV0_1 = Readonly<{
   schemaVersion: typeof CONTROLLED_SEMANTIC_PROVIDER_RUNNER_SCHEMA_V0_1;
   packetId: string;
@@ -75,7 +75,7 @@ export function validateControlledSemanticExecutionPacketV0_1(packet: Controlled
   if (packet.targets.length === 0 || words.size > 4) reasons.push("WORD_BOUND_INVALID");
   if (packet.targets.length > 8 || packet.maximumCallCount !== packet.targets.length) reasons.push("CALL_BOUND_INVALID");
   if (!packet.targets.every((target) => senseCounts.get(target.word)?.size === 2)) reasons.push("SENSE_BOUND_INVALID");
-  if (!packet.targets.every((target) => target.word && target.targetSenseId && target.targetSenseLabel && target.structuralHypothesisId)) reasons.push("TARGET_FIELDS_REQUIRED");
+  if (!packet.targets.every((target) => textV0_1(target.word) && textV0_1(target.targetSenseId) && textV0_1(target.targetSenseLabel) && textV0_1(target.targetSenseDefinition) && textV0_1(target.structuralHypothesisId))) reasons.push("TARGET_FIELDS_REQUIRED");
   if (packet.timeoutMs < 10 || packet.timeoutMs > 30000) reasons.push("TIMEOUT_BOUND_INVALID");
   if (packet.maximumRetryCount !== 0) reasons.push("RETRY_BOUND_INVALID");
   if (packet.purpose !== "controlled_semantic_alignment_research") reasons.push("PURPOSE_INVALID");
@@ -116,7 +116,7 @@ export async function runControlledSemanticProviderExecutionV0_1(packet: Control
   const contexts: Array<{ target: ControlledSemanticExecutionTargetV0_1; context: SemanticAlignmentContextV0_1 }> = [];
   for (const target of packet.targets) {
     const structural = discoverStructuralHypothesesV0_1(target.word).find((candidate) => candidate.hypothesisId === target.structuralHypothesisId);
-    const contextResult = buildSemanticAlignmentContextV0_1({ targetWord: target.word, targetSenseId: target.targetSenseId, targetSenseLabel: target.targetSenseLabel, structuralHypothesis: structural });
+    const contextResult = buildSemanticAlignmentContextV0_1({ targetWord: target.word, targetSenseId: target.targetSenseId, targetSenseLabel: target.targetSenseLabel, targetSenseDefinition: target.targetSenseDefinition, structuralHypothesis: structural });
     if (!structural || !contextResult.ok) return blockedV0_1(["FROZEN_STRUCTURAL_INPUT_INVALID", ...(contextResult.ok ? [] : contextResult.reasonCodes)], packet.targets.length);
     contexts.push({ target, context: contextResult.context });
   }

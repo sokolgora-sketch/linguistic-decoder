@@ -8,6 +8,7 @@ import {
   runSemanticAlignmentProposalV0_1,
   semanticProviderPreflightV0_1,
 } from "../src/shared/orchestrator/semanticAlignmentProposal.v0_1";
+import { semanticAlignmentContextForPromptV0_1 } from "../src/shared/llm/prompts/semanticAlignmentProposer.v0.1";
 
 function contextFixture() {
   const structuralHypothesis = discoverStructuralHypothesesV0_1("candle")[0];
@@ -16,6 +17,7 @@ function contextFixture() {
     targetWord: "candle",
     targetSenseId: "wax_light_source",
     targetSenseLabel: "a wax light source",
+    targetSenseDefinition: "A portable object that produces light by sustaining a controlled flame.",
     structuralHypothesis,
   });
   if (!result.ok) throw new Error(result.reasonCodes.join(","));
@@ -46,6 +48,7 @@ describe("Open Instrument semantic alignment v0.1", () => {
     const first = contextFixture();
     expect(first).toEqual(contextFixture());
     expect(first.targetSenseLabel).toBe("a wax light source");
+    expect(first.targetSenseDefinition).toBe("A portable object that produces light by sustaining a controlled flame.");
     expect(first.claimBoundary).toMatchObject({
       historicalOriginClaim: "not_claimed",
       winnerClaim: "not_claimed",
@@ -63,6 +66,61 @@ describe("Open Instrument semantic alignment v0.1", () => {
         alignmentSource: "provider_proposed_hypothesis",
       },
     });
+  });
+
+  test("does not pretend deterministic parsing proves semantic compatibility", () => {
+    const context = contextFixture();
+    const result = parseSemanticAlignmentProposalV0_1(
+      {
+        alignmentStatus: "proposed",
+        doctrineRoles: [context.doctrineProjection.projections[0].doctrineRole],
+        semanticBridge:
+          "A bounded functional relation can be reviewed against the supplied context without asserting lexical truth.",
+        reasonCodes: ["provider_judgment_required"],
+      },
+      context,
+      { alignmentSource: "provider_proposed_hypothesis" },
+    );
+
+    expect(result.ok).toBe(true);
+  });
+
+  test("rejects a bridge that copies the supplied semantic definition", () => {
+    const context = contextFixture();
+    expect(
+      parseSemanticAlignmentProposalV0_1(
+        {
+          alignmentStatus: "proposed",
+          doctrineRoles: [context.doctrineProjection.projections[0].doctrineRole],
+          semanticBridge: context.targetSenseDefinition,
+          reasonCodes: [],
+        },
+        context,
+        { alignmentSource: "provider_proposed_hypothesis" },
+      ),
+    ).toMatchObject({ ok: false, reasonCodes: ["SEMANTIC_BRIDGE_REPEATS_TARGET_DEFINITION"] });
+  });
+
+  test("keeps definition optional for legacy semantic contexts", () => {
+    const structuralHypothesis = discoverStructuralHypothesesV0_1("candle")[0];
+    const result = buildSemanticAlignmentContextV0_1({
+      targetWord: "candle",
+      targetSenseId: "legacy_sense",
+      targetSenseLabel: "a wax light source",
+      structuralHypothesis,
+    });
+    expect(result.ok).toBe(true);
+    if (result.ok) expect(result.context).not.toHaveProperty("targetSenseDefinition");
+  });
+
+  test("serializes definition-bearing context without leaking calibration sense IDs", () => {
+    const serialized = semanticAlignmentContextForPromptV0_1(contextFixture());
+    expect(serialized).toMatchObject({
+      targetWord: "candle",
+      targetSenseLabel: "a wax light source",
+      targetSenseDefinition: "A portable object that produces light by sustaining a controlled flame.",
+    });
+    expect(serialized).not.toHaveProperty("targetSenseId");
   });
 
   test.each(["unknown", "rejected"] as const)("accepts %s without a bridge", (alignmentStatus) => {
