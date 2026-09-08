@@ -64,7 +64,8 @@
     "open-instrument:validate-provider-execution-preflight-static-fixture": "node scripts/openInstrumentProviderExecutionPreflightStaticFixtureSchemaValidation.v0.1.mjs",
     "open-instrument:audit-provider-execution-preflight-mapping-coverage": "node scripts/openInstrumentProviderExecutionPreflightMappingCoverageAudit.v0.1.mjs",
     "open-instrument:live-smoke": "tsx scripts/open-instrument/live-smoke.v0.1.ts",
-    "open-instrument:controlled-semantic-provider-runner": "tsx scripts/openInstrumentControlledSemanticProviderExecutionRunner.v0.1.ts"
+    "open-instrument:controlled-semantic-provider-runner": "tsx scripts/openInstrumentControlledSemanticProviderExecutionRunner.v0.1.ts",
+    "open-instrument:controlled-semantic-contrastive-provider-runner": "tsx scripts/openInstrumentControlledSemanticContrastiveProviderExecutionRunner.v0.1.ts"
   },
   "dependencies": {
     "@genkit-ai/google-genai": "^1.37.0",
