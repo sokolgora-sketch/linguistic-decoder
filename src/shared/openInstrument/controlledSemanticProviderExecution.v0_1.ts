@@ -75,7 +75,7 @@ export function validateControlledSemanticExecutionPacketV0_1(packet: Controlled
   if (packet.targets.length === 0 || words.size > 4) reasons.push("WORD_BOUND_INVALID");
   if (packet.targets.length > 8 || packet.maximumCallCount !== packet.targets.length) reasons.push("CALL_BOUND_INVALID");
   if (!packet.targets.every((target) => senseCounts.get(target.word)?.size === 2)) reasons.push("SENSE_BOUND_INVALID");
-  if (!packet.targets.every((target) => target.word && target.targetSenseId && target.targetSenseLabel && target.targetSenseDefinition && target.structuralHypothesisId)) reasons.push("TARGET_FIELDS_REQUIRED");
+  if (!packet.targets.every((target) => textV0_1(target.word) && textV0_1(target.targetSenseId) && textV0_1(target.targetSenseLabel) && textV0_1(target.targetSenseDefinition) && textV0_1(target.structuralHypothesisId))) reasons.push("TARGET_FIELDS_REQUIRED");
   if (packet.timeoutMs < 10 || packet.timeoutMs > 30000) reasons.push("TIMEOUT_BOUND_INVALID");
   if (packet.maximumRetryCount !== 0) reasons.push("RETRY_BOUND_INVALID");
   if (packet.purpose !== "controlled_semantic_alignment_research") reasons.push("PURPOSE_INVALID");

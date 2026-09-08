@@ -16,7 +16,7 @@ This bounded lane repairs the first controlled semantic-provider calibration con
 - require that context before a controlled provider call;
 - serialize the definition to the provider while keeping calibration IDs internal;
 - make proposed / unknown / rejected policy explicit;
-- preserve deterministic structural, binding, non-tautology, and truth-boundary checks.
+- preserve deterministic structural, binding, definition-copy, non-tautology, and truth-boundary checks.
 
 General target-sense callers remain backward-compatible when no controlled calibration definition is supplied. Controlled packets fail closed when their definition is absent.
 

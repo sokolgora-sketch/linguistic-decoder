@@ -63,6 +63,14 @@ describe("controlled semantic provider execution v0.1", () => {
     expect(result.reasonCodes).toContain("TARGET_FIELDS_REQUIRED");
     expect(execute).not.toHaveBeenCalled();
   });
+  test("rejects whitespace-only definitions before any provider call", async () => {
+    const execute = jest.fn(async () => proposal("proposed"));
+    const blankDefinition = { ...packet, targets: packet.targets.map((target, index) => index === 0 ? { ...target, targetSenseDefinition: "   " } : target) };
+    const result = await runControlledSemanticProviderExecutionV0_1(blankDefinition, authorization(), { execute });
+    expect(result.status).toBe("blocked");
+    expect(result.reasonCodes).toContain("TARGET_FIELDS_REQUIRED");
+    expect(execute).not.toHaveBeenCalled();
+  });
   test("requires provider readiness before the default executor", async () => {
     const result = await runControlledSemanticProviderExecutionV0_1(packet, authorization());
     expect(result.status).toBe("blocked");

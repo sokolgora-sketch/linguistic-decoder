@@ -85,6 +85,34 @@ describe("Open Instrument semantic alignment v0.1", () => {
     expect(result.ok).toBe(true);
   });
 
+  test("rejects a bridge that copies the supplied semantic definition", () => {
+    const context = contextFixture();
+    expect(
+      parseSemanticAlignmentProposalV0_1(
+        {
+          alignmentStatus: "proposed",
+          doctrineRoles: [context.doctrineProjection.projections[0].doctrineRole],
+          semanticBridge: context.targetSenseDefinition,
+          reasonCodes: [],
+        },
+        context,
+        { alignmentSource: "provider_proposed_hypothesis" },
+      ),
+    ).toMatchObject({ ok: false, reasonCodes: ["SEMANTIC_BRIDGE_REPEATS_TARGET_DEFINITION"] });
+  });
+
+  test("keeps definition optional for legacy semantic contexts", () => {
+    const structuralHypothesis = discoverStructuralHypothesesV0_1("candle")[0];
+    const result = buildSemanticAlignmentContextV0_1({
+      targetWord: "candle",
+      targetSenseId: "legacy_sense",
+      targetSenseLabel: "a wax light source",
+      structuralHypothesis,
+    });
+    expect(result.ok).toBe(true);
+    if (result.ok) expect(result.context).not.toHaveProperty("targetSenseDefinition");
+  });
+
   test("serializes definition-bearing context without leaking calibration sense IDs", () => {
     const serialized = semanticAlignmentContextForPromptV0_1(contextFixture());
     expect(serialized).toMatchObject({

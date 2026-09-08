@@ -207,6 +207,7 @@ function qualityFailureCodesV0_1(
 ): string[] {
   const lowerBridge = bridge.toLocaleLowerCase("en-US");
   const lowerSense = context.targetSenseLabel.toLocaleLowerCase("en-US");
+  const lowerDefinition = context.targetSenseDefinition?.toLocaleLowerCase("en-US") ?? "";
   const lowerWord = context.targetWord.toLocaleLowerCase("en-US");
   const forbiddenClaimLanguage =
     /\b(?:proven|true meaning|historical origin|historically|winner|language superiority|candidate truth|reviewed evidence|dictionary|cognat|borrow(?:ed|ing)?|transmission)\b/i;
@@ -215,6 +216,9 @@ function qualityFailureCodesV0_1(
   if (bridge.length < 24) codes.push("SEMANTIC_BRIDGE_TOO_SHORT");
   if (lowerSense && lowerBridge.includes(lowerSense)) {
     codes.push("SEMANTIC_BRIDGE_REPEATS_TARGET_SENSE");
+  }
+  if (lowerDefinition && lowerBridge.includes(lowerDefinition)) {
+    codes.push("SEMANTIC_BRIDGE_REPEATS_TARGET_DEFINITION");
   }
   if (lowerWord && lowerBridge === lowerWord) {
     codes.push("SEMANTIC_BRIDGE_REPEATS_TARGET_WORD");
