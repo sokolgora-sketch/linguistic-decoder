@@ -6,6 +6,7 @@ import {
   type ContrastiveSemanticAssessmentV0_1,
   type ContrastiveSemanticContextV0_1,
   type ContrastiveSemanticPairV0_1,
+  type ContrastiveSemanticResponseShapeDiagnosticsV0_1,
 } from "@/shared/openInstrument/contrastiveSemanticCalibration.v0_1";
 import {
   runContrastiveSemanticProposalV0_1,
@@ -60,6 +61,8 @@ export type ControlledSemanticContrastiveExecutionRowV0_1 = Readonly<{
   semanticBridge: string | null;
   doctrineRoles: readonly string[];
   supportTrace: ContrastiveSemanticAssessmentV0_1["supportTrace"];
+  diagnostics: ContrastiveSemanticResponseShapeDiagnosticsV0_1 | null;
+  elapsedMs: number;
   reasonCodes: readonly string[];
   timeout: boolean;
   providerError: boolean;
@@ -205,7 +208,9 @@ export async function runControlledSemanticContrastiveProviderExecutionV0_1(
   const counts = { proposed: 0, unknown: 0, malformed: 0, timeout: 0, providerError: 0, skipped: 0 };
   const rows: ControlledSemanticContrastiveExecutionRowV0_1[] = [];
   for (const { pair, context } of contexts) {
+    const startedAt = Date.now();
     const proposal = await execute(context, packet.timeoutMs);
+    const elapsedMs = Math.max(0, Date.now() - startedAt);
     if (proposal.error === "timeout") counts.timeout += 1;
     else if (proposal.error === "provider_error") counts.providerError += 1;
     else if (proposal.status === "proposed") counts.proposed += 1;
@@ -220,12 +225,14 @@ export async function runControlledSemanticContrastiveProviderExecutionV0_1(
       voicePath: context.voicePath,
       providerAttempted: proposal.attempted,
       providerId: proposal.provider,
-      modelId: assessment?.modelId ?? null,
+      modelId: packet.modelId,
       preferredSense: assessment?.preferredSense ?? null,
       alignmentStatus: assessment?.alignmentStatus ?? null,
       semanticBridge: assessment?.semanticBridge ?? null,
       doctrineRoles: assessment?.doctrineRoles ?? [],
       supportTrace: assessment?.supportTrace ?? null,
+      diagnostics: proposal.diagnostics ?? null,
+      elapsedMs,
       reasonCodes: proposal.reasonCodes,
       timeout: proposal.error === "timeout",
       providerError: proposal.error === "provider_error",

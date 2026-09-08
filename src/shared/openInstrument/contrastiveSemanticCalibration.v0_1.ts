@@ -69,7 +69,24 @@ export type ContrastiveSemanticAssessmentV0_1 = Readonly<{
 
 export type ContrastiveSemanticParseResultV0_1 =
   | Readonly<{ ok: true; assessment: ContrastiveSemanticAssessmentV0_1 }>
-  | Readonly<{ ok: false; reasonCodes: readonly string[] }>;
+  | Readonly<{
+      ok: false;
+      reasonCodes: readonly string[];
+      diagnostics: ContrastiveSemanticResponseShapeDiagnosticsV0_1;
+    }>;
+
+export type ContrastiveSemanticFieldIssueV0_1 = Readonly<{
+  field: "reasonCodes" | "doctrineRoles";
+  issue: "missing" | "wrong_type" | "non_string_member" | "empty_member";
+}>;
+
+export type ContrastiveSemanticResponseShapeDiagnosticsV0_1 = Readonly<{
+  parseStage: "top_level" | "field_shape" | "context_validation" | "quality_validation" | "provider_timeout" | "provider_error";
+  jsonParsed: boolean;
+  topLevelType: "object" | "array" | "string" | "number" | "boolean" | "null" | "undefined" | "unavailable";
+  objectExtracted: boolean;
+  fieldIssues: readonly ContrastiveSemanticFieldIssueV0_1[];
+}>;
 
 export type ContrastiveSemanticContextResultV0_1 =
   | Readonly<{ ok: true; context: ContrastiveSemanticContextV0_1 }>
@@ -92,6 +109,60 @@ function stringArrayV0_1(value: unknown): string[] | null {
 
 function failV0_1(reasonCodes: readonly string[]): { ok: false; reasonCodes: readonly string[] } {
   return { ok: false, reasonCodes };
+}
+
+function topLevelTypeV0_1(value: unknown): ContrastiveSemanticResponseShapeDiagnosticsV0_1["topLevelType"] {
+  if (value === null) return "null";
+  if (Array.isArray(value)) return "array";
+  if (value === undefined) return "undefined";
+  return typeof value as ContrastiveSemanticResponseShapeDiagnosticsV0_1["topLevelType"];
+}
+
+function parseFailV0_1(
+  value: unknown,
+  reasonCodes: readonly string[],
+  parseStage: ContrastiveSemanticResponseShapeDiagnosticsV0_1["parseStage"],
+  fieldIssues: readonly ContrastiveSemanticFieldIssueV0_1[] = [],
+): ContrastiveSemanticParseResultV0_1 {
+  return {
+    ok: false,
+    reasonCodes,
+    diagnostics: {
+      parseStage,
+      jsonParsed: value !== null && value !== undefined,
+      topLevelType: topLevelTypeV0_1(value),
+      objectExtracted: isRecordV0_1(value),
+      fieldIssues,
+    },
+  };
+}
+
+type StringArrayValidationV0_1 =
+  | Readonly<{ ok: true; value: string[] }>
+  | Readonly<{ ok: false; issues: readonly ContrastiveSemanticFieldIssueV0_1[] }>;
+
+function validateStringArrayFieldV0_1(
+  field: "reasonCodes" | "doctrineRoles",
+  value: unknown,
+): StringArrayValidationV0_1 {
+  if (value === undefined) return { ok: false, issues: [{ field, issue: "missing" }] };
+  if (!Array.isArray(value)) return { ok: false, issues: [{ field, issue: "wrong_type" }] };
+  const issues: ContrastiveSemanticFieldIssueV0_1[] = [];
+  if (value.some((item) => typeof item !== "string")) issues.push({ field, issue: "non_string_member" });
+  if (value.some((item) => typeof item === "string" && !textV0_1(item))) issues.push({ field, issue: "empty_member" });
+  if (issues.length) return { ok: false, issues };
+  return { ok: true, value: value.map((item) => textV0_1(item)) };
+}
+
+function fieldIssueReasonCodeV0_1(issue: ContrastiveSemanticFieldIssueV0_1): string {
+  const field = issue.field === "reasonCodes" ? "REASON_CODES" : "DOCTRINE_ROLES";
+  const suffix = {
+    missing: "FIELD_MISSING",
+    wrong_type: "FIELD_WRONG_TYPE",
+    non_string_member: "NON_STRING_MEMBER",
+    empty_member: "EMPTY_MEMBER",
+  }[issue.issue];
+  return `CONTRASTIVE_${field}_${suffix}`;
 }
 
 export function buildContrastiveSemanticContextV0_1(
@@ -184,35 +255,46 @@ export function parseContrastiveSemanticProposalV0_1(
   context: ContrastiveSemanticContextV0_1,
   metadata: Readonly<{ providerId?: string; modelId?: string }>,
 ): ContrastiveSemanticParseResultV0_1 {
-  if (!isRecordV0_1(value)) return failV0_1(["MALFORMED_CONTRASTIVE_OUTPUT"]);
+  if (!isRecordV0_1(value)) return parseFailV0_1(value, ["MALFORMED_CONTRASTIVE_OUTPUT"], "top_level");
   const decision = isRecordV0_1(value.contrastiveDecision)
     ? textV0_1(value.contrastiveDecision.preferredSense)
     : "";
   if (!["sense_a", "sense_b", "neither", "both_or_unclear"].includes(decision)) {
-    return failV0_1(["CONTRASTIVE_DECISION_REQUIRED"]);
+    return parseFailV0_1(value, ["CONTRASTIVE_DECISION_REQUIRED"], "field_shape");
   }
-  const reasonCodes = stringArrayV0_1(value.reasonCodes);
-  const doctrineRoles = stringArrayV0_1(value.doctrineRoles);
-  if (!reasonCodes || reasonCodes.some((item) => !item) || !doctrineRoles || doctrineRoles.some((item) => !item)) {
-    return failV0_1(["CONTRASTIVE_OUTPUT_FIELDS_INVALID"]);
+  const reasonCodesResult = validateStringArrayFieldV0_1("reasonCodes", value.reasonCodes);
+  const doctrineRolesResult = validateStringArrayFieldV0_1("doctrineRoles", value.doctrineRoles);
+  if (!reasonCodesResult.ok || !doctrineRolesResult.ok) {
+    const fieldIssues = [
+      ...(reasonCodesResult.ok ? [] : reasonCodesResult.issues),
+      ...(doctrineRolesResult.ok ? [] : doctrineRolesResult.issues),
+    ];
+    return parseFailV0_1(
+      value,
+      ["CONTRASTIVE_OUTPUT_FIELDS_INVALID", ...fieldIssues.map(fieldIssueReasonCodeV0_1)],
+      "field_shape",
+      fieldIssues,
+    );
   }
+  const reasonCodes = reasonCodesResult.value;
+  const doctrineRoles = doctrineRolesResult.value;
   const allowedRoles = new Set(context.doctrineProjection.projections.map((projection) => projection.doctrineRole));
   if (doctrineRoles.some((role) => !allowedRoles.has(role as (typeof context.doctrineProjection.projections)[number]["doctrineRole"]))) {
-    return failV0_1(["CONTRASTIVE_DOCTRINE_ROLE_NOT_IN_CONTEXT"]);
+    return parseFailV0_1(value, ["CONTRASTIVE_DOCTRINE_ROLE_NOT_IN_CONTEXT"], "context_validation");
   }
   const bridge = textV0_1(value.semanticBridge);
   const trace = value.supportTrace === undefined || value.supportTrace === null ? null : supportTraceV0_1(value.supportTrace);
-  if (value.supportTrace !== undefined && value.supportTrace !== null && !trace) return failV0_1(["CONTRASTIVE_SUPPORT_TRACE_INVALID"]);
+  if (value.supportTrace !== undefined && value.supportTrace !== null && !trace) return parseFailV0_1(value, ["CONTRASTIVE_SUPPORT_TRACE_INVALID"], "field_shape");
 
   if (decision === "neither" || decision === "both_or_unclear") {
     const required = decision === "neither" ? "CONTRASTIVE_RELATION_NEITHER" : "CONTRASTIVE_RELATION_BOTH_OR_UNCLEAR";
     if (bridge || doctrineRoles.length || trace || !reasonCodes.includes(required)) {
-      return failV0_1(["CONTRASTIVE_NON_SELECTED_OUTPUT_INVALID"]);
+      return parseFailV0_1(value, ["CONTRASTIVE_NON_SELECTED_OUTPUT_INVALID"], "context_validation");
     }
   } else {
-    if (!bridge || doctrineRoles.length === 0 || !trace) return failV0_1(["CONTRASTIVE_SELECTED_OUTPUT_INCOMPLETE"]);
+    if (!bridge || doctrineRoles.length === 0 || !trace) return parseFailV0_1(value, ["CONTRASTIVE_SELECTED_OUTPUT_INCOMPLETE"], "context_validation");
     if (!reasonCodes.includes("CONTRASTIVE_RELATION_STRUCTURE_SPECIFIC")) {
-      return failV0_1(["CONTRASTIVE_RELATION_REASON_CODE_MISSING"]);
+      return parseFailV0_1(value, ["CONTRASTIVE_RELATION_REASON_CODE_MISSING"], "context_validation");
     }
     const suppliedStructuralElements = new Set([
       context.structuralHypothesisId,
@@ -221,13 +303,13 @@ export function parseContrastiveSemanticProposalV0_1(
       ...context.reductionOperationIds,
     ]);
     if (trace.structuralElements.some((element) => !suppliedStructuralElements.has(element))) {
-      return failV0_1(["CONTRASTIVE_SUPPORT_TRACE_STRUCTURAL_ELEMENT_INVALID"]);
+      return parseFailV0_1(value, ["CONTRASTIVE_SUPPORT_TRACE_STRUCTURAL_ELEMENT_INVALID"], "context_validation");
     }
     if (trace.doctrineRoles.some((role) => !allowedRoles.has(role as (typeof context.doctrineProjection.projections)[number]["doctrineRole"]))) {
-      return failV0_1(["CONTRASTIVE_SUPPORT_TRACE_DOCTRINE_ROLE_INVALID"]);
+      return parseFailV0_1(value, ["CONTRASTIVE_SUPPORT_TRACE_DOCTRINE_ROLE_INVALID"], "context_validation");
     }
     const qualityCodes = qualityFailureCodesV0_1(bridge, context);
-    if (qualityCodes.length) return failV0_1(qualityCodes);
+    if (qualityCodes.length) return parseFailV0_1(value, qualityCodes, "quality_validation");
   }
 
   const preferredSense = decision as ContrastivePreferredSenseV0_1;
