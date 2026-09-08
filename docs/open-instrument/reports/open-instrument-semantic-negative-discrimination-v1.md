@@ -1,7 +1,7 @@
 # Open Instrument semantic negative-discrimination decision contract v1
 
 Milestone ID: `OPEN_INSTRUMENT_SEMANTIC_NEGATIVE_DISCRIMINATION_V1`
-Status: `ACTIVE`
+Status: `DONE`
 Opened: `2026-09-08`
 Opening main: `ca644afd3dea06dcbf998657bfc23ded8a1c6ca3`
 Opening branch: `feat/open-instrument-semantic-negative-discrimination-v1`
@@ -48,3 +48,36 @@ not become a deterministic semantic-truth engine.
 - fresh blinded model-bound packets can be prepared without provider calls;
 - a future real comparison requires separate human authorization.
 
+## Closure proof
+
+Implementation PR `#1864` was squash-merged at
+`32a0ed35ccc4579e6c418c3b85d878c2b415ae06` from implementation head
+`c9126415f7b906a795bfe2c9ce4385842cf702d3`. CI passed for `contracts`,
+`lint-test-build`, `Analyze (actions)`, `Analyze (javascript-typescript)`,
+and CodeQL. The implementation was validated with 34 focused tests,
+`npm run typecheck:full`, `npm run gate:quick`, `npm run build`, and
+`git diff --check`.
+
+The merged decision contract is explicitly opt-in. Legacy v0.1 callers and
+packets remain unchanged. A controlled v0.2 packet must bind
+`open-instrument.semantic-decision-contract.v0_2`; its provider response must
+include one of `structure_specific`, `generic_or_unclear`, or `conflicting`,
+and that decision must agree with `proposed`, `unknown`, or `rejected`.
+
+No real provider call, Ollama completion, controlled runner invocation, or
+authorization consumption occurred during implementation or closure. No
+evidence, catalog, SCALE-50, history, origin, transmission, winner,
+superiority, or candidate-truth promotion occurred. Provider output remains
+hypothesis-only, candidate-only where applicable, and `user_decides`.
+
+Post-merge main proof: `32a0ed35ccc4579e6c418c3b85d878c2b415ae06` equals
+`origin/main`, divergence is `0/0`, and the worktree is clean. Protected JO
+stash object `8b7e4397ac3341c1c4ea9c004b29e6fa93db40b1` and marker
+`park-jo-runtime-verified-before-logic-first-milestone-2026-08-25` remain
+present and unchanged.
+
+Fresh blinded llama3.1:8b and gemma3:4b packet preparation is outside this
+repository closure and requires a new explicit human authorization before any
+provider execution.
+
+`OPEN_INSTRUMENT_SEMANTIC_NEGATIVE_DISCRIMINATION_V1_CLOSED_2026-09-08`
