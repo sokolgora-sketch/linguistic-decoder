@@ -29,6 +29,10 @@ function resolveGitSha() {
 const nextConfig = {
   distDir: (process.env.NEXT_DIST_DIR ?? "").trim() || ".next",
 
+  typescript: {
+    tsconfigPath: "tsconfig.typecheck.prod.json",
+  },
+
   allowedDevOrigins: [
     "9002-firebase-studio-1763047330759.cluster-w5vd22whf5gmav2vgkomwtc4go.cloudworkstations.dev",
     "3000-firebase-studio-1763047330759.cluster-w5vd22whf5gmav2vgkomwtc4go.cloudworkstations.dev",
