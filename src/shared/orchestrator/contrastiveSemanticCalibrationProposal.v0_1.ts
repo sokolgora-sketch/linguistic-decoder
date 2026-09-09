@@ -1,6 +1,6 @@
 import {
-  buildContrastiveSemanticProposerSystemPromptV0_1,
-  contrastiveSemanticContextForPromptV0_1,
+  buildContrastiveSemanticProposerSystemPromptV0_2,
+  contrastiveSemanticContextForPromptV0_2,
 } from "@/shared/llm/prompts/semanticAlignmentProposer.v0.1";
 import {
   runProposerV0_2,
@@ -8,7 +8,7 @@ import {
 } from "@/shared/llm/providers/proposerProvider.v0.2";
 import { tryParseJsonV0_2 } from "@/shared/orchestrator/proposalParse.v0.2";
 import {
-  CONTRASTIVE_SEMANTIC_DECISION_CONTRACT_VERSION_V0_1,
+  CONTRASTIVE_SEMANTIC_DECISION_CONTRACT_VERSION_V0_2,
   parseContrastiveSemanticProposalV0_1,
   type ContrastiveSemanticAssessmentV0_1,
   type ContrastiveSemanticContextV0_1,
@@ -95,10 +95,10 @@ export async function runContrastiveSemanticProposalV0_1(
     const result = await runProposerV0_2({
       word: context.targetWord,
       mode: "strict",
-      systemPrompt: buildContrastiveSemanticProposerSystemPromptV0_1(),
+      systemPrompt: buildContrastiveSemanticProposerSystemPromptV0_2(),
       userPayload: {
-        ...contrastiveSemanticContextForPromptV0_1(context),
-        contrastiveSemanticContractVersion: CONTRASTIVE_SEMANTIC_DECISION_CONTRACT_VERSION_V0_1,
+        ...contrastiveSemanticContextForPromptV0_2(context),
+        contrastiveSemanticContractVersion: CONTRASTIVE_SEMANTIC_DECISION_CONTRACT_VERSION_V0_2,
       },
       signal: controller.signal,
     }, provider);

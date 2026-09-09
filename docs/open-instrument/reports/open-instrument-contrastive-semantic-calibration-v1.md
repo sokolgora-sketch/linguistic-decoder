@@ -81,6 +81,35 @@ versioned. No provider execution occurred in this provenance lane.
 
 The milestone remains `DONE` and closed.
 
+## Post-Closure Response Completeness Contract Note (2026-09-09)
+
+The second post-provenance Gemma calibration execution used controlled
+execution version `open-instrument.controlled-semantic-contrastive-execution.v0_1`
+with four attempted/completed calls. Three JSON objects omitted both
+`reasonCodes` and `doctrineRoles`; one call timed out at approximately 8027 ms.
+No parseable decisions, candidates, or evidence were emitted, so semantic
+discrimination was not measurable. The parser correctly remained fail-closed,
+and the authorization was spent.
+
+The bounded correction adds a new provider-visible semantic decision contract
+version, `open-instrument.semantic-contrastive-decision-contract.v0_2`, with an
+explicit complete-object response policy. Every response must include
+`contrastiveDecision`, `semanticBridge`, `doctrineRoles`, `supportTrace`, and
+`reasonCodes`; neutral decisions retain the exact empty/null shapes and
+required neutral reason code, while selected decisions retain the existing
+non-empty bridge, valid doctrine roles, valid support trace, and
+`CONTRASTIVE_RELATION_STRUCTURE_SPECIFIC` requirements. The parser acceptance
+boundary is unchanged and the controlled execution version remains v0.1.
+
+The v0.2 decision-contract version participates in packet validation,
+canonical fingerprinting, authorization comparison, and pre-execution
+mismatch blocking. Historical v0.1 packet/run identities remain unchanged and
+interpretable. This implementation does not establish that the model will
+comply with the strengthened prompt; a later fresh human-authorized controlled
+run is required to test adherence. No provider execution is part of this
+correction, and no evidence, history, winner, superiority, or candidate-truth
+promotion occurred.
+
 ## Motivation
 
 The completed v0.1 and v0.2 single-sense calibration runs did not produce

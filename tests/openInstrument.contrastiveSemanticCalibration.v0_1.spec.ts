@@ -1,10 +1,15 @@
 import {
   buildContrastiveSemanticContextV0_1,
   CONTRASTIVE_SEMANTIC_DECISION_CONTRACT_VERSION_V0_1,
+  CONTRASTIVE_SEMANTIC_DECISION_CONTRACT_VERSION_V0_2,
   parseContrastiveSemanticProposalV0_1,
   type ContrastiveSemanticPairV0_1,
 } from "../src/shared/openInstrument/contrastiveSemanticCalibration.v0_1";
-import { contrastiveSemanticContextForPromptV0_1 } from "../src/shared/llm/prompts/semanticAlignmentProposer.v0.1";
+import {
+  buildContrastiveSemanticProposerSystemPromptV0_2,
+  contrastiveSemanticContextForPromptV0_1,
+  contrastiveSemanticContextForPromptV0_2,
+} from "../src/shared/llm/prompts/semanticAlignmentProposer.v0.1";
 import {
   CONTROLLED_SEMANTIC_CONTRASTIVE_EXECUTION_VERSION_V0_1,
   fingerprintControlledSemanticContrastiveExecutionPacketV0_1,
@@ -51,7 +56,7 @@ const packet: ControlledSemanticContrastiveExecutionPacketV0_1 = {
   modelId: "fixture-model",
   endpointUrl: "http://127.0.0.1:11434/v1",
   localOnly: true,
-  contrastiveDecisionContractVersion: CONTRASTIVE_SEMANTIC_DECISION_CONTRACT_VERSION_V0_1,
+  contrastiveDecisionContractVersion: CONTRASTIVE_SEMANTIC_DECISION_CONTRACT_VERSION_V0_2,
   pairs,
   maximumCallCount: 4,
   timeoutMs: 8000,
@@ -110,7 +115,7 @@ function proposedResult(context: Parameters<NonNullable<Parameters<typeof runCon
   };
 }
 
-describe("Open Instrument contrastive semantic calibration v0.1", () => {
+describe("Open Instrument contrastive semantic calibration v0.2", () => {
   test("builds exactly four pairs with two senses sharing structure", () => {
     expect(packet.pairs).toHaveLength(4);
     expect(packet.pairs.every((item) => item.senseA.targetSenseId !== item.senseB.targetSenseId)).toBe(true);
@@ -124,7 +129,7 @@ describe("Open Instrument contrastive semantic calibration v0.1", () => {
     const result = buildContrastiveSemanticContextV0_1(pairs[0], structural);
     expect(result).toMatchObject({ ok: true });
     if (!result.ok) return;
-    const serialized = JSON.stringify(contrastiveSemanticContextForPromptV0_1(result.context));
+    const serialized = JSON.stringify(contrastiveSemanticContextForPromptV0_2(result.context));
     expect(serialized).toContain("sense_a");
     expect(serialized).toContain("sense_b");
     expect(serialized).toContain("light-producing object sense");
@@ -134,6 +139,35 @@ describe("Open Instrument contrastive semantic calibration v0.1", () => {
     expect(serialized).not.toMatch(/_plausible|_unrelated|positive|negative|expected (?:answer|winner)|selected slot/i);
     expect(serialized).toContain("structuralHypothesisId");
     expect(serialized).toContain("doctrineProjection");
+  });
+
+  test("binds the v0.2 completeness prompt without changing anonymous context serialization", () => {
+    const structural = discoverStructuralHypothesesV0_1("candle")[0];
+    if (!structural) throw new Error("missing candle structural fixture");
+    const result = buildContrastiveSemanticContextV0_1(pairs[0], structural);
+    if (!result.ok) throw new Error(result.reasonCodes.join(","));
+
+    const prompt = buildContrastiveSemanticProposerSystemPromptV0_2();
+    const serialized = JSON.stringify(contrastiveSemanticContextForPromptV0_2(result.context));
+    const historicalSerialized = JSON.stringify(contrastiveSemanticContextForPromptV0_1(result.context));
+
+    expect(CONTRASTIVE_SEMANTIC_DECISION_CONTRACT_VERSION_V0_2).toBe("open-instrument.semantic-contrastive-decision-contract.v0_2");
+    expect(CONTRASTIVE_SEMANTIC_DECISION_CONTRACT_VERSION_V0_2).not.toBe(CONTRASTIVE_SEMANTIC_DECISION_CONTRACT_VERSION_V0_1);
+    expect(prompt).toContain("Every response MUST include all five top-level keys");
+    expect(prompt).toContain("Never omit a required key");
+    expect(prompt).toContain('"contrastiveDecision"');
+    expect(prompt).toContain('"semanticBridge"');
+    expect(prompt).toContain('"doctrineRoles"');
+    expect(prompt).toContain('"supportTrace"');
+    expect(prompt).toContain('"reasonCodes"');
+    expect(prompt).toContain("CONTRASTIVE_RELATION_NEITHER");
+    expect(prompt).toContain("CONTRASTIVE_RELATION_BOTH_OR_UNCLEAR");
+    expect(prompt).toContain("CONTRASTIVE_RELATION_STRUCTURE_SPECIFIC");
+    expect(prompt).toContain("Return JSON only, with no markdown or prose outside the complete object.");
+    expect(serialized).toContain(CONTRASTIVE_SEMANTIC_DECISION_CONTRACT_VERSION_V0_2);
+    expect(historicalSerialized).toContain(CONTRASTIVE_SEMANTIC_DECISION_CONTRACT_VERSION_V0_1);
+    expect(serialized).not.toContain("candle_a");
+    expect(serialized).not.toContain("candle_b");
   });
 
   test("accepts a selected sense with bounded support trace", () => {
@@ -226,14 +260,27 @@ describe("Open Instrument contrastive semantic calibration v0.1", () => {
   });
 
   test("keeps execution provenance distinct from the semantic decision contract", () => {
-    expect(CONTROLLED_SEMANTIC_CONTRASTIVE_EXECUTION_VERSION_V0_1).not.toBe(CONTRASTIVE_SEMANTIC_DECISION_CONTRACT_VERSION_V0_1);
+    expect(CONTROLLED_SEMANTIC_CONTRASTIVE_EXECUTION_VERSION_V0_1).not.toBe(CONTRASTIVE_SEMANTIC_DECISION_CONTRACT_VERSION_V0_2);
+    expect(CONTRASTIVE_SEMANTIC_DECISION_CONTRACT_VERSION_V0_1).not.toBe(CONTRASTIVE_SEMANTIC_DECISION_CONTRACT_VERSION_V0_2);
     expect(packet.controlledExecutionVersion).toBe(CONTROLLED_SEMANTIC_CONTRASTIVE_EXECUTION_VERSION_V0_1);
+    expect(packet.contrastiveDecisionContractVersion).toBe(CONTRASTIVE_SEMANTIC_DECISION_CONTRACT_VERSION_V0_2);
   });
 
   test("authorization mismatch blocks before any pair execution", async () => {
     const execute = jest.fn(async (context: Parameters<NonNullable<Parameters<typeof runControlledSemanticContrastiveProviderExecutionV0_1>[2]>["execute"]>[0]) => proposedResult(context));
     const result = await runControlledSemanticContrastiveProviderExecutionV0_1(packet, { ...authorization(), packetFingerprint: "wrong" }, { execute });
     expect(result.status).toBe("blocked");
+    expect(execute).not.toHaveBeenCalled();
+  });
+
+  test("historical v0.1 decision contracts block before any pair execution", async () => {
+    const execute = jest.fn(async (context: Parameters<NonNullable<Parameters<typeof runControlledSemanticContrastiveProviderExecutionV0_1>[2]>["execute"]>[0]) => proposedResult(context));
+    const result = await runControlledSemanticContrastiveProviderExecutionV0_1(
+      { ...packet, contrastiveDecisionContractVersion: CONTRASTIVE_SEMANTIC_DECISION_CONTRACT_VERSION_V0_1 as typeof packet.contrastiveDecisionContractVersion },
+      authorization(),
+      { execute },
+    );
+    expect(result).toMatchObject({ status: "blocked", reasonCodes: expect.arrayContaining(["CONTRASTIVE_DECISION_CONTRACT_INVALID"]) });
     expect(execute).not.toHaveBeenCalled();
   });
 

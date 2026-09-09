@@ -9,6 +9,9 @@ import type { StructuralHypothesisV0_1 } from "@/shared/structuralHypothesisDisc
 export const CONTRASTIVE_SEMANTIC_DECISION_CONTRACT_VERSION_V0_1 =
   "open-instrument.semantic-contrastive-decision-contract.v0_1" as const;
 
+export const CONTRASTIVE_SEMANTIC_DECISION_CONTRACT_VERSION_V0_2 =
+  "open-instrument.semantic-contrastive-decision-contract.v0_2" as const;
+
 export const CONTROLLED_SEMANTIC_CONTRASTIVE_RUNNER_SCHEMA_V0_1 =
   "open-instrument.controlled-semantic-contrastive-runner.v0_1" as const;
 
