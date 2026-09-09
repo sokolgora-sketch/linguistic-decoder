@@ -1,7 +1,7 @@
 import { discoverStructuralHypothesesV0_1 } from "@/shared/structuralHypothesisDiscovery.v0_1";
 import {
   buildContrastiveSemanticContextV0_1,
-  CONTRASTIVE_SEMANTIC_DECISION_CONTRACT_VERSION_V0_1,
+  CONTRASTIVE_SEMANTIC_DECISION_CONTRACT_VERSION_V0_2,
   CONTROLLED_SEMANTIC_CONTRASTIVE_RUNNER_SCHEMA_V0_1,
   type ContrastiveSemanticAssessmentV0_1,
   type ContrastiveSemanticContextV0_1,
@@ -25,7 +25,7 @@ export type ControlledSemanticContrastiveExecutionPacketV0_1 = Readonly<{
   modelId: string;
   endpointUrl: string;
   localOnly: true;
-  contrastiveDecisionContractVersion: typeof CONTRASTIVE_SEMANTIC_DECISION_CONTRACT_VERSION_V0_1;
+  contrastiveDecisionContractVersion: typeof CONTRASTIVE_SEMANTIC_DECISION_CONTRACT_VERSION_V0_2;
   pairs: readonly ContrastiveSemanticPairV0_1[];
   maximumCallCount: 4;
   timeoutMs: number;
@@ -47,7 +47,7 @@ export type ControlledSemanticContrastiveAuthorizationV0_1 = Readonly<{
   timeoutMs: number;
   maximumRetryCount: 0;
   localOnly: true;
-  contrastiveDecisionContractVersion: typeof CONTRASTIVE_SEMANTIC_DECISION_CONTRACT_VERSION_V0_1;
+  contrastiveDecisionContractVersion: typeof CONTRASTIVE_SEMANTIC_DECISION_CONTRACT_VERSION_V0_2;
   purpose: "controlled_semantic_alignment_research";
   truthBoundary: "hypothesis_only_user_decides_no_evidence_promotion";
 }>;
@@ -144,7 +144,7 @@ export function validateControlledSemanticContrastiveExecutionPacketV0_1(
   if (packet.providerId !== "openai_compat") reasons.push("CONTRASTIVE_PROVIDER_UNSUPPORTED");
   if (!packet.modelId) reasons.push("CONTRASTIVE_MODEL_REQUIRED");
   if (!packet.localOnly || !isLoopbackUrlV0_1(packet.endpointUrl)) reasons.push("CONTRASTIVE_LOCAL_ONLY_ENDPOINT_REQUIRED");
-  if (packet.contrastiveDecisionContractVersion !== CONTRASTIVE_SEMANTIC_DECISION_CONTRACT_VERSION_V0_1) reasons.push("CONTRASTIVE_DECISION_CONTRACT_INVALID");
+  if (packet.contrastiveDecisionContractVersion !== CONTRASTIVE_SEMANTIC_DECISION_CONTRACT_VERSION_V0_2) reasons.push("CONTRASTIVE_DECISION_CONTRACT_INVALID");
   if (packet.pairs.length !== 4 || words.size !== 4) reasons.push("CONTRASTIVE_PAIR_BOUND_INVALID");
   if (packet.maximumCallCount !== 4 || packet.maximumCallCount !== packet.pairs.length) reasons.push("CONTRASTIVE_CALL_BOUND_INVALID");
   if (packet.pairs.some((pair) => pair.senseA.targetSenseId === pair.senseB.targetSenseId)) reasons.push("CONTRASTIVE_SENSE_ID_DUPLICATE");
