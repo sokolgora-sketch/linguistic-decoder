@@ -40,6 +40,7 @@ export type ContrastiveSemanticProposalResultV0_1 = Readonly<{
 export type RunContrastiveSemanticProposalOptionsV0_1 = Readonly<{
   providerOverrideForTests?: ProposerProviderIdV0_2;
   timeoutMs?: number;
+  maximumOutputTokens?: number;
 }>;
 
 function envText(name: string): string | null {
@@ -100,6 +101,9 @@ export async function runContrastiveSemanticProposalV0_1(
         ...contrastiveSemanticContextForPromptV0_2(context),
         contrastiveSemanticContractVersion: CONTRASTIVE_SEMANTIC_DECISION_CONTRACT_VERSION_V0_2,
       },
+      ...(typeof options.maximumOutputTokens === "number"
+        ? { maximumOutputTokens: options.maximumOutputTokens }
+        : {}),
       signal: controller.signal,
     }, provider);
     const parsed = parseContrastiveSemanticProposalV0_1(tryParseJsonV0_2(result.rawText), context, {
