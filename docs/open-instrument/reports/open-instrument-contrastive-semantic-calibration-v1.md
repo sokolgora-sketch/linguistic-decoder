@@ -81,6 +81,30 @@ versioned. No provider execution occurred in this provenance lane.
 
 The milestone remains `DONE` and closed.
 
+## Post-Closure Runtime Preflight Note (2026-09-09)
+
+The response-completeness v0.2 execution used controlled execution version
+`open-instrument.controlled-semantic-contrastive-execution.v0.1`, a spent
+one-shot authorization, and four bounded calls. It produced four timeouts at
+`8041 / 8002 / 8005 / 8003` ms, zero provider responses, zero parseable
+decisions, and zero candidates or evidence. The prior readiness check
+`/v1/models` proved only endpoint reachability and installed-model visibility;
+the runtime diagnosis observed a cold first-row Gemma load and could not treat
+visibility as residency or as an 8000 ms latency guarantee. No timeout or model
+change was justified, and no semantic separation result was obtained.
+
+The follow-up runtime-control lane introduces a new controlled execution
+identity, `open-instrument.controlled-semantic-contrastive-execution.v0.2`,
+without rewriting historical v0.1 runs. Its local-only, non-semantic
+preflight checks `/v1/models` and `/api/ps` through bounded HTTP inspection,
+requires the requested model to be both visible and resident, blocks before
+authorization consumption when residency is absent or unknown, and emits only
+sanitized runtime provenance. Residency is runtime evidence, not a latency
+guarantee. The v0.2 semantic decision contract, prompt, timeout, retry bound,
+model policy, and truth boundary remain unchanged. No provider generation is
+part of this implementation lane; a future calibration still requires a fresh
+packet and explicit human authorization.
+
 ## Post-Closure Response Completeness Contract Note (2026-09-09)
 
 The second post-provenance Gemma calibration execution used controlled
