@@ -12,6 +12,7 @@ import {
   runContrastiveSemanticProposalV0_1,
   type ContrastiveSemanticProposalResultV0_1,
 } from "@/shared/orchestrator/contrastiveSemanticCalibrationProposal.v0_1";
+import type { ProposerProviderTokenUsageV0_1 } from "@/shared/llm/providers/proposerProvider.v0.2";
 import {
   runLocalProviderRuntimePreflightV0_1,
   type LocalProviderRuntimePreflightV0_1,
@@ -34,7 +35,9 @@ export type ControlledSemanticContrastiveAuthorizationV0_3 = Omit<HistoricalAuth
   maximumOutputTokens: number;
 };
 
-export type ControlledSemanticContrastiveExecutionRowV0_3 = HistoricalRowV0_2;
+export type ControlledSemanticContrastiveExecutionRowV0_3 = Omit<HistoricalRowV0_2, "tokenUsage"> & {
+  tokenUsage: ProposerProviderTokenUsageV0_1 | null;
+};
 
 export type ControlledSemanticContrastiveExecutionResultV0_3 = Readonly<{
   controlledExecutionVersion: typeof CONTROLLED_SEMANTIC_CONTRASTIVE_EXECUTION_VERSION_V0_3;
@@ -241,6 +244,7 @@ export async function runControlledSemanticContrastiveProviderExecutionV0_3(
       doctrineRoles: assessment?.doctrineRoles ?? [],
       supportTrace: assessment?.supportTrace ?? null,
       diagnostics: proposal.diagnostics ?? null,
+      tokenUsage: proposal.usage ?? null,
       elapsedMs,
       reasonCodes: proposal.reasonCodes,
       timeout: proposal.error === "timeout",

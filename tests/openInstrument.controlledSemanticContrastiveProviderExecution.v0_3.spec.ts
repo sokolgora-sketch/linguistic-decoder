@@ -79,7 +79,9 @@ function authorization(): ControlledSemanticContrastiveAuthorizationV0_3 {
   };
 }
 
-function proposal(): ContrastiveSemanticProposalResultV0_1 {
+function proposal(
+  usage?: { promptTokens: number; completionTokens: number; totalTokens: number },
+): ContrastiveSemanticProposalResultV0_1 {
   return {
     attempted: true,
     status: "unknown",
@@ -90,6 +92,7 @@ function proposal(): ContrastiveSemanticProposalResultV0_1 {
     reasonCodes: ["CONTRASTIVE_RELATION_NEITHER"],
     timeoutMs: 8000,
     assessment: null,
+    ...(usage ? { usage } : {}),
     error: null,
   };
 }
@@ -136,6 +139,21 @@ describe("controlled contrastive execution v0.3 output budget seam", () => {
     expect(result).toMatchObject({ status: "blocked", authorizationState: "authorization_not_granted" });
     expect(result.reasonCodes).toContain("CONTRASTIVE_OUTPUT_BUDGET_MISMATCH");
     expect(execute).not.toHaveBeenCalled();
+  });
+
+  test("propagates valid provider usage and preserves null when usage is unavailable", async () => {
+    const usage = { promptTokens: 12, completionTokens: 34, totalTokens: 46 };
+    const withUsage = await runControlledSemanticContrastiveProviderExecutionV0_3(packet, authorization(), {
+      execute: async () => proposal(usage),
+      runtimePreflight: async () => readyPreflight(),
+    });
+    const withoutUsage = await runControlledSemanticContrastiveProviderExecutionV0_3(packet, authorization(), {
+      execute: async () => proposal(),
+      runtimePreflight: async () => readyPreflight(),
+    });
+
+    expect(withUsage.rows.every((row) => row.tokenUsage && row.tokenUsage.totalTokens === 46)).toBe(true);
+    expect(withoutUsage.rows.every((row) => row.tokenUsage === null)).toBe(true);
   });
 
   test("keeps the v0.3 execution identity and truth boundary explicit", async () => {

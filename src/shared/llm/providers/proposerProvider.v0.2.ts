@@ -23,10 +23,17 @@ export type ProposerRequestV0_2 = {
   signal?: AbortSignal;
 };
 
+export type ProposerProviderTokenUsageV0_1 = Readonly<{
+  promptTokens: number;
+  completionTokens: number;
+  totalTokens: number;
+}>;
+
 export type ProposerResultV0_2 = {
   provider: ProposerProviderIdV0_2;
   rawText: string;
   meta?: Record<string, unknown>;
+  usage?: ProposerProviderTokenUsageV0_1;
 };
 
 function env(name: string): string | null {
@@ -192,7 +199,25 @@ async function proposeOpenAICompat(req: ProposerRequestV0_2): Promise<ProposerRe
 
   const j: any = await r.json();
   const rawText = j?.choices?.[0]?.message?.content ?? "";
-  return { provider: "openai_compat", rawText, meta: { model, baseUrl } };
+  const usage = j?.usage;
+  const usageValues = [usage?.prompt_tokens, usage?.completion_tokens, usage?.total_tokens];
+  const hasValidUsage = usageValues.every(
+    (value): value is number => Number.isSafeInteger(value) && value >= 0,
+  );
+  return {
+    provider: "openai_compat",
+    rawText,
+    meta: { model, baseUrl },
+    ...(hasValidUsage
+      ? {
+          usage: {
+            promptTokens: usageValues[0],
+            completionTokens: usageValues[1],
+            totalTokens: usageValues[2],
+          },
+        }
+      : {}),
+  };
 }
 
 export async function runProposerV0_2(
