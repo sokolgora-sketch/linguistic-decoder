@@ -67,6 +67,9 @@ export function validateControlledSemanticContrastiveNaturalCompletionMeasuremen
   if (packet.measurementMode !== CONTROLLED_SEMANTIC_CONTRASTIVE_NATURAL_COMPLETION_MODE_V0_1) {
     reasons.push("NATURAL_COMPLETION_MEASUREMENT_MODE_INVALID");
   }
+  if (!Number.isSafeInteger(packet.timeoutMs)) {
+    reasons.push("NATURAL_COMPLETION_TIMEOUT_INVALID");
+  }
   if (hasOwnMaximumOutputTokensV0_1(packet)) {
     reasons.push("NATURAL_COMPLETION_OUTPUT_BUDGET_FORBIDDEN");
   }

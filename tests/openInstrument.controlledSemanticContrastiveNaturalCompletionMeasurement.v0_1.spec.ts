@@ -108,6 +108,25 @@ describe("controlled contrastive natural completion measurement v0.1", () => {
     expect(validateControlledSemanticContrastiveNaturalCompletionMeasurementPacketV0_1(withBudget)).toContain("NATURAL_COMPLETION_OUTPUT_BUDGET_FORBIDDEN");
   });
 
+  test("rejects omitted or non-integer timeoutMs", () => {
+    const { timeoutMs: _omitted, ...withoutTimeoutShape } = packet;
+    const withoutTimeout =
+      withoutTimeoutShape as unknown as ControlledSemanticContrastiveNaturalCompletionMeasurementPacketV0_1;
+
+    expect(
+      validateControlledSemanticContrastiveNaturalCompletionMeasurementPacketV0_1(withoutTimeout),
+    ).toContain("NATURAL_COMPLETION_TIMEOUT_INVALID");
+
+    const fractionalTimeout = {
+      ...packet,
+      timeoutMs: 8000.5,
+    } as ControlledSemanticContrastiveNaturalCompletionMeasurementPacketV0_1;
+
+    expect(
+      validateControlledSemanticContrastiveNaturalCompletionMeasurementPacketV0_1(fractionalTimeout),
+    ).toContain("NATURAL_COMPLETION_TIMEOUT_INVALID");
+  });
+
   test("validates one-shot authorization binding without consuming it", () => {
     expect(validateControlledSemanticContrastiveNaturalCompletionMeasurementAuthorizationV0_1(packet, authorization())).toEqual([]);
     expect(validateControlledSemanticContrastiveNaturalCompletionMeasurementAuthorizationV0_1(packet, authorization({ measurementMode: "wrong_mode" as typeof packet.measurementMode }))).toContain("NATURAL_COMPLETION_MEASUREMENT_MODE_MISMATCH");
