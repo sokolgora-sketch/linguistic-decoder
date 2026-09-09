@@ -4,6 +4,7 @@ import {
 } from "@/shared/llm/prompts/semanticAlignmentProposer.v0.1";
 import {
   runProposerV0_2,
+  type ProposerProviderTokenUsageV0_1,
   type ProposerProviderIdV0_2,
 } from "@/shared/llm/providers/proposerProvider.v0.2";
 import { tryParseJsonV0_2 } from "@/shared/orchestrator/proposalParse.v0.2";
@@ -34,6 +35,7 @@ export type ContrastiveSemanticProposalResultV0_1 = Readonly<{
   timeoutMs: number;
   assessment: ContrastiveSemanticAssessmentV0_1 | null;
   diagnostics?: ContrastiveSemanticResponseShapeDiagnosticsV0_1;
+  usage?: ProposerProviderTokenUsageV0_1;
   error: "provider_error" | "timeout" | null;
 }>;
 
@@ -122,6 +124,7 @@ export async function runContrastiveSemanticProposalV0_1(
         timeoutMs,
         assessment: null,
         diagnostics: parsed.diagnostics,
+        ...(result.usage ? { usage: result.usage } : {}),
         error: null,
       };
     }
@@ -135,6 +138,7 @@ export async function runContrastiveSemanticProposalV0_1(
       reasonCodes: preflight.reasonCodes,
       timeoutMs,
       assessment: parsed.assessment,
+      ...(result.usage ? { usage: result.usage } : {}),
       error: null,
     };
   } catch {

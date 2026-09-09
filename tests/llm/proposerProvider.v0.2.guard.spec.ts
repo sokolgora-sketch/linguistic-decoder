@@ -115,6 +115,7 @@ describe("proposerProvider v0.2 real-provider readiness guard", () => {
         model: "fake-model",
         baseUrl: "http://localhost:11434/v1",
       });
+      expect(out.usage).toBeUndefined();
     } finally {
       global.fetch = originalFetch;
     }
@@ -138,6 +139,7 @@ describe("proposerProvider v0.2 real-provider readiness guard", () => {
       return new Response(
         JSON.stringify({
           choices: [{ message: { content: rawText } }],
+          usage: { prompt_tokens: 7, completion_tokens: 11, total_tokens: 18 },
         }),
         { status: 200, headers: { "content-type": "application/json" } }
       );
@@ -158,6 +160,41 @@ describe("proposerProvider v0.2 real-provider readiness guard", () => {
 
       expect(fetchMock).toHaveBeenCalledTimes(1);
       expect(out.rawText).toBe(rawText);
+      expect(out.usage).toEqual({ promptTokens: 7, completionTokens: 11, totalTokens: 18 });
+    } finally {
+      global.fetch = originalFetch;
+    }
+  });
+
+  it("keeps absent or malformed provider usage unknown without inferring counts", async () => {
+    process.env.OPENAI_API_KEY = "fake-key";
+    process.env.OPENAI_MODEL = "fake-model";
+    process.env.OPENAI_BASE_URL = "http://localhost:11434/v1";
+
+    const originalFetch = global.fetch;
+    const rawText = '{"word":"study","mode":"strict","candidates":[]}';
+    const fetchMock = jest
+      .fn()
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({ choices: [{ message: { content: rawText } }], usage: { prompt_tokens: 7, completion_tokens: 11 } }),
+          { status: 200, headers: { "content-type": "application/json" } },
+        ),
+      )
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({ choices: [{ message: { content: rawText } }], usage: { prompt_tokens: 7, completion_tokens: -1, total_tokens: 6 } }),
+          { status: 200, headers: { "content-type": "application/json" } },
+        ),
+      );
+    global.fetch = fetchMock as any;
+
+    try {
+      const absent = await runProposerV0_2({ word: "study", mode: "strict", systemPrompt: "Return JSON only." }, "openai_compat");
+      const malformed = await runProposerV0_2({ word: "study", mode: "strict", systemPrompt: "Return JSON only." }, "openai_compat");
+
+      expect(absent.usage).toBeUndefined();
+      expect(malformed.usage).toBeUndefined();
     } finally {
       global.fetch = originalFetch;
     }
