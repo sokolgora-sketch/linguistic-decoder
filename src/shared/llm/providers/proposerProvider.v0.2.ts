@@ -15,6 +15,11 @@ export type ProposerRequestV0_2 = {
    * Used by v0.3 loop to send repair failReasons deterministically.
    */
   userPayload?: unknown;
+  /**
+   * Optional provider output-generation ceiling.
+   * Omitted by default so existing proposer lanes preserve historical behavior.
+   */
+  maximumOutputTokens?: number;
   signal?: AbortSignal;
 };
 
@@ -149,10 +154,21 @@ async function proposeOpenAICompat(req: ProposerRequestV0_2): Promise<ProposerRe
   }
 
   const userPayload = req.userPayload ?? { word: req.word, mode: req.mode };
+  const maximumOutputTokens = req.maximumOutputTokens;
+
+  if (
+    typeof maximumOutputTokens !== "undefined" &&
+    (!Number.isSafeInteger(maximumOutputTokens) || maximumOutputTokens <= 0)
+  ) {
+    throw new Error("openai_compat maximumOutputTokens must be a positive safe integer");
+  }
 
   const body = {
     model,
     temperature: 0,
+    ...(typeof maximumOutputTokens === "number"
+      ? { max_tokens: maximumOutputTokens }
+      : {}),
     messages: [
       { role: "system", content: req.systemPrompt },
       { role: "user", content: JSON.stringify(userPayload) },

@@ -82,6 +82,7 @@ describe("proposerProvider v0.2 real-provider readiness guard", () => {
       const body = JSON.parse(String(init?.body ?? "{}"));
       expect(body.model).toBe("fake-model");
       expect(body.temperature).toBe(0);
+      expect(body).not.toHaveProperty("max_tokens");
       expect(body.messages).toEqual([
         { role: "system", content: "Return JSON only." },
         { role: "user", content: JSON.stringify({ word: "study", mode: "strict" }) },
@@ -114,6 +115,77 @@ describe("proposerProvider v0.2 real-provider readiness guard", () => {
         model: "fake-model",
         baseUrl: "http://localhost:11434/v1",
       });
+    } finally {
+      global.fetch = originalFetch;
+    }
+  });
+
+  it("maps explicit maximumOutputTokens to OpenAI-compatible max_tokens", async () => {
+    process.env.OPENAI_API_KEY = "fake-key";
+    process.env.OPENAI_MODEL = "fake-model";
+    process.env.OPENAI_BASE_URL = "http://localhost:11434/v1";
+
+    const originalFetch = global.fetch;
+    const rawText = '{"word":"study","mode":"strict","candidates":[]}';
+
+    const fetchMock = jest.fn(async (_input: unknown, init?: RequestInit) => {
+      const body = JSON.parse(String(init?.body ?? "{}"));
+
+      expect(body.model).toBe("fake-model");
+      expect(body.temperature).toBe(0);
+      expect(body.max_tokens).toBe(128);
+
+      return new Response(
+        JSON.stringify({
+          choices: [{ message: { content: rawText } }],
+        }),
+        { status: 200, headers: { "content-type": "application/json" } }
+      );
+    });
+
+    global.fetch = fetchMock as any;
+
+    try {
+      const out = await runProposerV0_2(
+        {
+          word: "study",
+          mode: "strict",
+          systemPrompt: "Return JSON only.",
+          maximumOutputTokens: 128,
+        },
+        "openai_compat"
+      );
+
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+      expect(out.rawText).toBe(rawText);
+    } finally {
+      global.fetch = originalFetch;
+    }
+  });
+
+  it("rejects invalid explicit maximumOutputTokens before provider fetch", async () => {
+    process.env.OPENAI_API_KEY = "fake-key";
+    process.env.OPENAI_MODEL = "fake-model";
+    process.env.OPENAI_BASE_URL = "http://localhost:11434/v1";
+
+    const originalFetch = global.fetch;
+    const fetchMock = jest.fn();
+    global.fetch = fetchMock as any;
+
+    try {
+      await expect(
+        runProposerV0_2(
+          {
+            word: "study",
+            mode: "strict",
+            systemPrompt: "Return JSON only.",
+            maximumOutputTokens: 0,
+          },
+          "openai_compat"
+        )
+      ).rejects.toThrow(/positive safe integer/);
+
+      expect(fetchMock).not.toHaveBeenCalled();
     } finally {
       global.fetch = originalFetch;
     }
