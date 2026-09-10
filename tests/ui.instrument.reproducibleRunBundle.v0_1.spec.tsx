@@ -189,6 +189,46 @@ describe("reproducible run bundle UI handoff v0.1", () => {
     expect(researchFetchCount()).toBe(1);
   });
 
+  it("exports the completed run metadata instead of later draft edits", async () => {
+    mockSuccessfulAnalysis();
+    render(<ZroChatPage />);
+
+    fireEvent.change(screen.getByLabelText("Word"), { target: { value: "study" } });
+    fireEvent.change(screen.getByLabelText("Intended sense"), {
+      target: { value: "learning activity" },
+    });
+    fireEvent.change(screen.getByLabelText("IPA"), { target: { value: "/ˈstʌdi/" } });
+    fireEvent.click(screen.getByRole("button", { name: "Analyze" }));
+    await screen.findByRole("button", { name: "Download analysis" });
+
+    fireEvent.change(screen.getByLabelText("Intended sense"), {
+      target: { value: "draft replacement sense" },
+    });
+    fireEvent.change(screen.getByLabelText("IPA"), { target: { value: "/draft/" } });
+    fireEvent.click(screen.getByRole("button", { name: "Download analysis" }));
+
+    await waitFor(() => expect(mockedDownloadText).toHaveBeenCalledTimes(1));
+    const [, serialized] = mockedDownloadText.mock.calls[0];
+    const parsed = await parseReproducibleRunBundleV0_1(serialized);
+    expect(parsed.ok).toBe(true);
+    if (!parsed.ok) return;
+    expect(parsed.value.input).toEqual({
+      ipa: "/ˈstʌdi/",
+      targetSenseLabel: "learning activity",
+    });
+  });
+
+  it("disables local snapshot handoff while analysis is pending", async () => {
+    global.fetch = jest.fn().mockReturnValue(new Promise(() => {}));
+    render(<ZroChatPage />);
+
+    fireEvent.change(screen.getByLabelText("Word"), { target: { value: "study" } });
+    fireEvent.click(screen.getByRole("button", { name: "Analyze" }));
+
+    expect(screen.getByLabelText("Open saved analysis")).toBeDisabled();
+    expect(screen.queryByRole("button", { name: "Download analysis" })).not.toBeInTheDocument();
+  });
+
   it("reopens a saved result locally, restores inputs, preserves Null and metadata, and makes no fetch", async () => {
     global.fetch = jest.fn();
     const bundle = await makeBundle(

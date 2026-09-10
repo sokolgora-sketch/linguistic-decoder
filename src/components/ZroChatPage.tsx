@@ -95,7 +95,11 @@ export default function ZroChatPage() {
   const [input, setInput] = React.useState('');
   const [ipa, setIpa] = React.useState('');
   const [targetSense, setTargetSense] = React.useState('');
-  const [lastRun, setLastRun] = React.useState<{ word: string; ipa?: string } | null>(null);
+  const [lastRun, setLastRun] = React.useState<{
+    word: string;
+    ipa?: string;
+    targetSenseLabel?: string;
+  } | null>(null);
   const [busy, setBusy] = React.useState(false);
   const [validation, setValidation] = React.useState<string | null>(null);
   const [statusBanner, setStatusBanner] = React.useState<string | null>(null);
@@ -155,7 +159,6 @@ export default function ZroChatPage() {
       if (!res.ok) {
         const status = res.status;
         const statusText = res.statusText;
-    setLastRun(runMeta);
 
 
         setMessages(prev =>
@@ -176,7 +179,10 @@ export default function ZroChatPage() {
         setDebug(statusText || (json ? JSON.stringify(json, null, 2) : '') || `HTTP ${status}` || '');
         return;
       }
-    setLastRun(runMeta);
+      setLastRun({
+        ...runMeta,
+        targetSenseLabel: targetSenseTrim || undefined,
+      });
 
       setMessages(prev =>
         prev.map(x =>
@@ -324,7 +330,11 @@ export default function ZroChatPage() {
     setInput(bundle.result.word);
     setIpa(bundle.input.ipa ?? '');
     setTargetSense(bundle.input.targetSenseLabel ?? '');
-    setLastRun({ word: bundle.result.word, ipa: bundle.input.ipa });
+    setLastRun({
+      word: bundle.result.word,
+      ipa: bundle.input.ipa,
+      targetSenseLabel: bundle.input.targetSenseLabel,
+    });
     setRecurrenceResearch(null);
     setValidation(null);
     setStatusBanner(null);
@@ -341,8 +351,11 @@ export default function ZroChatPage() {
       <div className="space-y-4">
         <ReproducibleRunBundleControls
           payload={latestInstrumentPayload}
-          ipa={ipa}
-          targetSenseLabel={targetSense}
+          completedInput={{
+            ipa: lastRun?.ipa,
+            targetSenseLabel: lastRun?.targetSenseLabel,
+          }}
+          disabled={busy}
           onImport={handleImportedBundle}
         />
 

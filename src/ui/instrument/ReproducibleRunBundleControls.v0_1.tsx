@@ -14,8 +14,11 @@ import { MT } from "@/ui/typography/marketingType.v0.1";
 
 type Props = {
   payload: unknown;
-  ipa?: string;
-  targetSenseLabel?: string;
+  completedInput?: {
+    ipa?: string;
+    targetSenseLabel?: string;
+  };
+  disabled?: boolean;
   onImport: (bundle: ReproducibleRunBundleV0_1) => void;
 };
 
@@ -45,25 +48,25 @@ function importError(reason: string): string {
 
 export function ReproducibleRunBundleControls({
   payload,
-  ipa,
-  targetSenseLabel,
+  completedInput,
+  disabled = false,
   onImport,
 }: Props) {
   const inputRef = React.useRef<HTMLInputElement | null>(null);
   const [busy, setBusy] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const canExport = React.useMemo(() => exportablePayload(payload), [payload]);
+  const controlsDisabled = disabled || busy;
 
   async function handleDownload() {
-    if (!canExport || busy) return;
+    if (!canExport || controlsDisabled) return;
 
     setBusy(true);
     setError(null);
     try {
       const bundle = await buildReproducibleRunBundleV0_1({
         result: payload,
-        ipa,
-        targetSenseLabel,
+        ...completedInput,
       });
       const serialized = serializeReproducibleRunBundleV0_1(bundle);
       const safeWord = bundle.result.word.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "analysis";
@@ -78,7 +81,7 @@ export function ReproducibleRunBundleControls({
   async function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
     event.target.value = "";
-    if (!file || busy) return;
+    if (!file || controlsDisabled) return;
 
     setBusy(true);
     setError(null);
@@ -110,18 +113,18 @@ export function ReproducibleRunBundleControls({
             type="button"
             variant="outline"
             onClick={() => void handleDownload()}
-            disabled={busy}
-            aria-busy={busy ? "true" : "false"}
+            disabled={controlsDisabled}
+            aria-busy={controlsDisabled ? "true" : "false"}
           >
             Download analysis
           </Button>
         ) : null}
         <label
           htmlFor="open-instrument-saved-analysis"
-          tabIndex={busy ? -1 : 0}
-          aria-disabled={busy ? "true" : "false"}
+          tabIndex={controlsDisabled ? -1 : 0}
+          aria-disabled={controlsDisabled ? "true" : "false"}
           onKeyDown={(event) => {
-            if (busy) return;
+            if (controlsDisabled) return;
             if (event.key === "Enter" || event.key === " ") {
               event.preventDefault();
               inputRef.current?.click();
@@ -139,7 +142,7 @@ export function ReproducibleRunBundleControls({
           aria-label="Open saved analysis"
           className="sr-only"
           onChange={(event) => void handleFileChange(event)}
-          disabled={busy}
+          disabled={controlsDisabled}
         />
       </div>
       <div className="mt-2 text-xs text-[#9fb1bf]">
