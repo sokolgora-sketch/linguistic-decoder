@@ -18,7 +18,9 @@ import {
 
 const reviewedRow = getReviewedExternalLexiconProductionSourceRowsV0_1()[0];
 const reviewedCitation = reviewedRow.externalCitations[0];
-const researchRow = loadMultiSourceFunctionalResearchEvidenceCatalogV0_1()[0];
+const researchRow = loadMultiSourceFunctionalResearchEvidenceCatalogV0_1().find(
+  (row) => row.citations.length > 1,
+)!;
 const researchCitation = researchRow.citations[0];
 
 describe("Open Instrument evidence reference resolution contract v0.1", () => {
@@ -132,6 +134,23 @@ describe("Open Instrument evidence reference resolution contract v0.1", () => {
       locator: researchCitation.entryLocator,
     });
     expect(resolved.kind).not.toBe("reviewed_evidence");
+  });
+
+  it("matches the raw research citation within a bound multi-citation row", () => {
+    const secondCitation = researchRow.citations[1];
+    const resolved = resolveResearchEvidenceReferenceV0_1({
+      ref: secondCitation.citationId,
+      researchEvidenceId: researchRow.researchEvidenceId,
+    });
+
+    expect(resolved).toMatchObject({
+      researchEvidenceId: researchRow.researchEvidenceId,
+      citationId: secondCitation.citationId,
+      title: secondCitation.sourceTitle,
+      locator: secondCitation.entryLocator,
+      safeUrl: secondCitation.sourceUrlOrArchiveRef,
+      navigable: true,
+    });
   });
 
   it("makes a research https source navigable", () => {
