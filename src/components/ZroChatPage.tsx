@@ -5,7 +5,9 @@ import ChatShell from '@/components/ChatShell';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { InstrumentPanel } from '@/ui/instrument/InstrumentPanel';
+import { ReproducibleRunBundleControls } from '@/ui/instrument/ReproducibleRunBundleControls.v0_1';
 import { CrossLanguageRecurrenceCardV0_1 } from '@/ui/instrument/sections/CrossLanguageRecurrenceCard.v0.1';
+import type { ReproducibleRunBundleV0_1 } from '@/shared/openInstrument/reproducibleRunBundle.v0_1';
 import type { SevenVoiceFunctionalRecurrenceResearchAvailableV0_1 } from '@/shared/openInstrument/sevenVoiceFunctionalRecurrenceResearchCatalog.v0_1';
 import { MT } from '@/ui/typography/marketingType.v0.1';
 
@@ -93,13 +95,19 @@ export default function ZroChatPage() {
   const [input, setInput] = React.useState('');
   const [ipa, setIpa] = React.useState('');
   const [targetSense, setTargetSense] = React.useState('');
-  const [lastRun, setLastRun] = React.useState<{ word: string; ipa?: string } | null>(null);
+  const [lastRun, setLastRun] = React.useState<{
+    word: string;
+    ipa?: string;
+    targetSenseLabel?: string;
+  } | null>(null);
   const [busy, setBusy] = React.useState(false);
   const [validation, setValidation] = React.useState<string | null>(null);
   const [statusBanner, setStatusBanner] = React.useState<string | null>(null);
   const [debug, setDebug] = React.useState<string | null>(null);
   const [recurrenceResearch, setRecurrenceResearch] =
     React.useState<SevenVoiceFunctionalRecurrenceResearchAvailableV0_1 | null>(null);
+  const [importedBundle, setImportedBundle] =
+    React.useState<ReproducibleRunBundleV0_1 | null>(null);
   const [messages, setMessages] = React.useState<Msg[]>([
       { id: 'init', role: 'assistant', text: 'Type a word and press Enter.' },
     ]);
@@ -151,7 +159,6 @@ export default function ZroChatPage() {
       if (!res.ok) {
         const status = res.status;
         const statusText = res.statusText;
-    setLastRun(runMeta);
 
 
         setMessages(prev =>
@@ -172,7 +179,10 @@ export default function ZroChatPage() {
         setDebug(statusText || (json ? JSON.stringify(json, null, 2) : '') || `HTTP ${status}` || '');
         return;
       }
-    setLastRun(runMeta);
+      setLastRun({
+        ...runMeta,
+        targetSenseLabel: targetSenseTrim || undefined,
+      });
 
       setMessages(prev =>
         prev.map(x =>
@@ -186,6 +196,7 @@ export default function ZroChatPage() {
             : x
         )
       );
+      setImportedBundle(null);
 
       try {
         const recurrenceRes = await fetch(
@@ -304,6 +315,7 @@ export default function ZroChatPage() {
   );
 
   const latestInstrumentPayload =
+    importedBundle?.result ??
     messages
       .slice()
       .reverse()
@@ -313,6 +325,22 @@ export default function ZroChatPage() {
       )
       ?.instrumentPayload ?? null;
 
+  function handleImportedBundle(bundle: ReproducibleRunBundleV0_1) {
+    setImportedBundle(bundle);
+    setInput(bundle.result.word);
+    setIpa(bundle.input.ipa ?? '');
+    setTargetSense(bundle.input.targetSenseLabel ?? '');
+    setLastRun({
+      word: bundle.result.word,
+      ipa: bundle.input.ipa,
+      targetSenseLabel: bundle.input.targetSenseLabel,
+    });
+    setRecurrenceResearch(null);
+    setValidation(null);
+    setStatusBanner(null);
+    setDebug(null);
+  }
+
   return (
     <ChatShell
       title="ZË-RO"
@@ -321,6 +349,16 @@ export default function ZroChatPage() {
       maxWidthClass="max-w-screen-2xl"
     >
       <div className="space-y-4">
+        <ReproducibleRunBundleControls
+          payload={latestInstrumentPayload}
+          completedInput={{
+            ipa: lastRun?.ipa,
+            targetSenseLabel: lastRun?.targetSenseLabel,
+          }}
+          disabled={busy}
+          onImport={handleImportedBundle}
+        />
+
         {latestInstrumentPayload ? (
           <UiErrorBoundary label="InstrumentPanel">
             <InstrumentPanel
