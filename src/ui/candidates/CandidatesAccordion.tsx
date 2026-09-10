@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import type { UICandidateRow } from "./candidateModel";
+import { CandidateEvidenceReferences } from "./EvidenceReferenceLink";
 import { toPrettyJson } from "@/ui/instrument/prettyJson";
 
 function CopyButton({ text, label }: { text: string; label: string }) {
@@ -272,14 +273,6 @@ export function CandidatesAccordion({ rows }: { rows: UICandidateRow[] }) {
                           </div>
                         ) : null}
 
-                        {isResearchFunctionalHypothesis &&
-                        Array.isArray(c.evidenceRefs) &&
-                        c.evidenceRefs.length > 0 ? (
-                          <div className="break-all font-mono text-xs text-slate-400">
-                            {`Evidence refs: ${c.evidenceRefs.join(", ")}`}
-                          </div>
-                        ) : null}
-
                         {(isStructuralHypothesis ||
                           isResearchFunctionalHypothesis) &&
                         c.historicalOriginClaim === "not_claimed" ? (
@@ -343,6 +336,10 @@ export function CandidatesAccordion({ rows }: { rows: UICandidateRow[] }) {
                   </div>
                 ) : null}
               </button>
+
+              {hasEmbryoFirstReadout ? (
+                <CandidateEvidenceReferences row={c} />
+              ) : null}
 
               {isOpen ? (
                 <div className="border-t border-slate-800 bg-black/20 px-3 py-3">
