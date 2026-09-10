@@ -64,6 +64,7 @@
     "open-instrument:validate-provider-execution-preflight-static-fixture": "node scripts/openInstrumentProviderExecutionPreflightStaticFixtureSchemaValidation.v0.1.mjs",
     "open-instrument:audit-provider-execution-preflight-mapping-coverage": "node scripts/openInstrumentProviderExecutionPreflightMappingCoverageAudit.v0.1.mjs",
     "open-instrument:live-smoke": "tsx scripts/open-instrument/live-smoke.v0.1.ts",
+    "open-instrument:browser-smoke:boot": "tsx scripts/open-instrument/chat-runtime-smoke-boot.v0.1.ts",
     "open-instrument:controlled-semantic-provider-runner": "tsx scripts/openInstrumentControlledSemanticProviderExecutionRunner.v0.1.ts",
     "open-instrument:controlled-semantic-contrastive-provider-runner": "tsx scripts/openInstrumentControlledSemanticContrastiveProviderExecutionRunner.v0.2.ts"
   },
@@ -138,6 +139,7 @@
     "globals": "^17.6.0",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^30.4.1",
+    "playwright": "^1.63.0",
     "postcss": "8.5.23",
     "tailwindcss": "^3.4.1",
     "ts-jest": "^29.4.11",

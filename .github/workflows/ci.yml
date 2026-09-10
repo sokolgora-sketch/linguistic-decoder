@@ -52,3 +52,9 @@ jobs:
         env:
           NEXT_TELEMETRY_DISABLED: "1"
         run: npm run build
+
+      - name: Install Chromium for Open Instrument browser smoke
+        run: npx playwright install --with-deps chromium
+
+      - name: Open Instrument browser boot smoke
+        run: npm run open-instrument:browser-smoke:boot
