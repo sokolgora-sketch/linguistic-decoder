@@ -56,5 +56,5 @@ jobs:
       - name: Install Chromium for Open Instrument browser smoke
         run: npx playwright install --with-deps chromium
 
-      - name: Open Instrument browser boot smoke
-        run: npm run open-instrument:browser-smoke:boot
+      - name: Open Instrument browser handoff smoke
+        run: npm run open-instrument:browser-smoke
