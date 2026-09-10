@@ -9,6 +9,10 @@ import {
   parseReproducibleRunBundleV0_1,
   serializeReproducibleRunBundleV0_1,
 } from "@/shared/openInstrument/reproducibleRunBundle.v0_1";
+import {
+  serializeEvidencePackageExportV0_1,
+  validateEvidencePackageExportV0_1,
+} from "@/shared/openInstrument/evidencePackageExport.v0_1";
 
 jest.mock("@/lib/downloadJson", () => ({
   downloadText: jest.fn(),
@@ -187,6 +191,91 @@ describe("reproducible run bundle UI handoff v0.1", () => {
     });
     expect(analyzeFetchCount()).toBe(1);
     expect(researchFetchCount()).toBe(1);
+  });
+
+  it("downloads the exact durable evidence package without reanalysis", async () => {
+    mockSuccessfulAnalysis();
+    render(<ZroChatPage />);
+
+    fireEvent.change(screen.getByLabelText("Word"), { target: { value: "study" } });
+    fireEvent.click(screen.getByRole("button", { name: "Analyze" }));
+
+    await screen.findByTestId("open-instrument-shell");
+    fireEvent.click(screen.getByRole("tab", { name: "Evidence" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Download Evidence Package" }));
+
+    await waitFor(() => expect(mockedDownloadText).toHaveBeenCalledTimes(1));
+    const [filename, serialized, mimeType] = mockedDownloadText.mock.calls[0];
+    expect(filename).toBe("open-instrument-evidence-package-study.json");
+    expect(mimeType).toBe("application/json");
+
+    const exported = JSON.parse(serialized);
+    expect(validateEvidencePackageExportV0_1(exported)).toEqual({ ok: true });
+    expect(exported.schemaVersion).toBe("open-instrument.evidence-package-export.v0.1");
+    expect(exported.input.word).toBe("study");
+    expect(JSON.stringify(exported)).not.toMatch(/raw|debug|provider|runtime|researchRows/);
+    expect(serializeEvidencePackageExportV0_1(exported)).toEqual({ ok: true, value: serialized });
+    expect(analyzeFetchCount()).toBe(1);
+  });
+
+  it("keeps canonical Null status in the durable evidence download", async () => {
+    mockSuccessfulAnalysis(
+      makeResult({
+        analysisStatusV0_1: {
+          ...makeResult().analysisStatusV0_1,
+          status: "null_no_supported_candidate",
+          summary: "No supported functional conclusion is available at this boundary.",
+        },
+      }),
+    );
+    render(<ZroChatPage />);
+
+    fireEvent.change(screen.getByLabelText("Word"), { target: { value: "study" } });
+    fireEvent.click(screen.getByRole("button", { name: "Analyze" }));
+    await screen.findByText("Null — no supported candidate");
+    fireEvent.click(screen.getByRole("tab", { name: "Evidence" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Download Evidence Package" }));
+
+    await waitFor(() => expect(mockedDownloadText).toHaveBeenCalledTimes(1));
+    const [, serialized] = mockedDownloadText.mock.calls[0];
+    expect(JSON.parse(serialized).analysisStatusV0_1.status).toBe("null_no_supported_candidate");
+    expect(analyzeFetchCount()).toBe(1);
+  });
+
+  it("keeps structural status and candidate order distinct in the durable evidence download", async () => {
+    mockSuccessfulAnalysis();
+    render(<ZroChatPage />);
+
+    fireEvent.change(screen.getByLabelText("Word"), { target: { value: "study" } });
+    fireEvent.click(screen.getByRole("button", { name: "Analyze" }));
+    await screen.findByTestId("open-instrument-shell");
+    fireEvent.click(screen.getByRole("tab", { name: "Evidence" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Download Evidence Package" }));
+
+    await waitFor(() => expect(mockedDownloadText).toHaveBeenCalledTimes(1));
+    const [, serialized] = mockedDownloadText.mock.calls[0];
+    const exported = JSON.parse(serialized);
+    expect(exported.analysisStatusV0_1.status).toBe("candidate_only");
+    expect(exported.candidates.map((candidate: { index: number }) => candidate.index)).toEqual([0]);
+    expect(exported.candidates[0].status).toBe("unknown");
+    expect(exported.candidates[0].discoveryStatus).toBe("structural_hypothesis");
+    expect(analyzeFetchCount()).toBe(1);
+  });
+
+  it("sanitizes the durable evidence filename without adding volatile metadata", async () => {
+    mockSuccessfulAnalysis(makeResult({ word: "Study / unsafe", sanitized: "Study / unsafe" }));
+    render(<ZroChatPage />);
+
+    fireEvent.change(screen.getByLabelText("Word"), { target: { value: "study" } });
+    fireEvent.click(screen.getByRole("button", { name: "Analyze" }));
+    await screen.findByTestId("open-instrument-shell");
+    fireEvent.click(screen.getByRole("tab", { name: "Evidence" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Download Evidence Package" }));
+
+    await waitFor(() => expect(mockedDownloadText).toHaveBeenCalledTimes(1));
+    const [filename] = mockedDownloadText.mock.calls[0];
+    expect(filename).toBe("open-instrument-evidence-package-study-unsafe.json");
+    expect(filename).not.toMatch(/[\\/]/);
   });
 
   it("marks a completed fresh analysis as current without exposing a fingerprint", async () => {

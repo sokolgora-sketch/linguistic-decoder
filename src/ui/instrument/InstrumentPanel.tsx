@@ -10,6 +10,11 @@ import { RootMapCard } from "@/ui/instrument/RootMapCard";
 import { SoundRootsCard } from "@/ui/instrument/SoundRootsCard";
 import { useToast } from '@/hooks/use-toast';
 import { toPrettyJson } from "@/ui/instrument/prettyJson";
+import { downloadText } from "@/lib/downloadJson";
+import {
+  buildEvidencePackageExportV0_1,
+  serializeEvidencePackageExportV0_1,
+} from "@/shared/openInstrument/evidencePackageExport.v0_1";
 import { buildEvidencePackageFromVM } from "@/ui/telemetry/buildEvidencePackageFromVM";
 import { buildEvidenceSummaryTextFromVM } from "@/ui/telemetry/buildEvidenceSummaryTextFromVM";
 import type { MissingState, PresentOrMissing, ResonanceProfileV1VM, RootMapVM, SoundRootsVM, TelemetryViewModel, Vowel } from "@/ui/telemetry/types";
@@ -279,6 +284,34 @@ export function InstrumentPanel(props: Props) {
     }
   }
 
+  function downloadEvidencePackage() {
+    const projected = buildEvidencePackageExportV0_1(vm, ledgerModel ?? undefined);
+    if (!projected.ok) {
+      toast({
+        title: "Download failed",
+        description: "The durable evidence package could not be built.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const serialized = serializeEvidencePackageExportV0_1(projected.value);
+    if (!serialized.ok) {
+      toast({
+        title: "Download failed",
+        description: "The durable evidence package could not be serialized.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const filenameWord = (normalizedWord || vm.readout.word)
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "") || "analysis";
+    downloadText(`open-instrument-evidence-package-${filenameWord}.json`, serialized.value, "application/json");
+  }
+
   const evidenceSummaryText = React.useMemo(() => {
     if (!isValidVm) return "";
     return buildEvidenceSummaryTextFromVM(vm, { ledgerModel, candidateRows });
@@ -484,6 +517,7 @@ export function InstrumentPanel(props: Props) {
                     const pkg = buildEvidencePackageFromVM(vm, { ledgerModel });
                     void copyText("Evidence package copied.", toPrettyJson(pkg));
                   }}
+                  onDownloadEvidencePackage={downloadEvidencePackage}
                 />
               </div>
               <div className="space-y-4 xl:col-span-7">
