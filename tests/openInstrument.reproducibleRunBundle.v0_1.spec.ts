@@ -69,6 +69,33 @@ function makeResult(overrides: Record<string, unknown> = {}): Record<string, unk
       },
     ],
     deepRoot: { status: "candidate_only", embryo: "study" },
+    automaticCarrierPronunciationV0_1: {
+      schemaVersion: "open-instrument.automatic-carrier-pronunciation.v0_1",
+      attempted: true,
+      status: "proposed",
+      provider: "manual",
+      localOnly: true,
+      language: "English",
+      ipa: "/ˈstʌdi/",
+      error: null,
+      boundary:
+        "pronunciation proposal only; Seven-Voice normalization is deterministic and separate",
+    },
+    functionalVoiceNormalizationV0_1: {
+      schemaVersion: "open-instrument.functional-voice-normalization.v0_1",
+      word: "study",
+      language: "English",
+      ipa: "/ˈstʌdi/",
+      status: "normalized",
+      usable: true,
+      surfacePath: ["A", "E", "I"],
+      carrierPath: ["A", "E", "I"],
+      functionalPath: ["A", "E", "I"],
+      transforms: [],
+      unresolvedCarrierDifferences: [],
+      boundary:
+        "bounded functional normalization only; carrier evidence does not automatically overwrite orthographic functional truth",
+    },
     rootMap: { nodes: [], edges: [] },
     evidence: { refs: ["candidate-ref-1"], status: "candidate-only" },
     analysisStatusV0_1: {
@@ -111,11 +138,13 @@ describe("Open Instrument reproducible run bundle v0.1", () => {
     expect(keys).toEqual(
       [
         "alphabet",
+        "automaticCarrierPronunciationV0_1",
         "analysisStatusV0_1",
         "candidates",
         "deepRoot",
         "engineVersion",
         "evidence",
+        "functionalVoiceNormalizationV0_1",
         "heart",
         "heartPrimaryPath",
         "mode",
@@ -219,6 +248,146 @@ describe("Open Instrument reproducible run bundle v0.1", () => {
       value: ["candidate-ref-1"],
     });
     expect(parsed.value.result.analysisStatusV0_1.status).toBe("candidate_only");
+  });
+
+  it("preserves functional normalization authority and failed-pronunciation posture", async () => {
+    const result = makeResult({
+      primaryPath: { voicePath: ["U", "Y"] },
+      heartPrimaryPath: ["U", "Y"],
+      heartInstrumentV1: { surfaceVowels: ["U", "Y"] },
+      evidence: {
+        surfaceVowelsRaw: ["U", "Y"],
+        surfaceVowels: ["U", "Y"],
+        vowelPath: ["U", "Y"],
+      },
+      candidates: [],
+      automaticCarrierPronunciationV0_1: {
+        attempted: true,
+        status: "provider_error",
+      },
+      functionalVoiceNormalizationV0_1: {
+        functionalPath: ["U", "I"],
+      },
+    });
+
+    const originalVm = adaptAnalysisToTelemetryVM(result);
+    const bundle = await buildReproducibleRunBundleV0_1({ result });
+    const parsed = await parseReproducibleRunBundleV0_1(
+      serializeReproducibleRunBundleV0_1(bundle),
+    );
+
+    expect(parsed.ok).toBe(true);
+    if (!parsed.ok) return;
+
+    const restoredVm = adaptAnalysisToTelemetryVM(parsed.value.result);
+    expect(restoredVm.readout.voicePathFunctional).toEqual(
+      originalVm.readout.voicePathFunctional,
+    );
+    expect(restoredVm.readout.sevenPrinciplesSpectrum.functional).toEqual(
+      originalVm.readout.sevenPrinciplesSpectrum.functional,
+    );
+    expect(restoredVm.readout.voicePathFunctional).toEqual({
+      kind: "present",
+      value: ["U", "I"],
+    });
+
+    const failedOnlyResult = makeResult({
+      primaryPath: { voicePath: ["U", "Y"] },
+      heartPrimaryPath: ["U", "Y"],
+      heartInstrumentV1: { surfaceVowels: ["U", "Y"] },
+      evidence: {
+        surfaceVowelsRaw: ["U", "Y"],
+        surfaceVowels: ["U", "Y"],
+        vowelPath: ["U", "Y"],
+      },
+      candidates: [],
+      automaticCarrierPronunciationV0_1: {
+        attempted: true,
+        status: "provider_error",
+      },
+    });
+    delete failedOnlyResult.functionalVoiceNormalizationV0_1;
+
+    const failedOnlyBundle = await buildReproducibleRunBundleV0_1({
+      result: failedOnlyResult,
+    });
+    const failedOnlyParsed = await parseReproducibleRunBundleV0_1(
+      serializeReproducibleRunBundleV0_1(failedOnlyBundle),
+    );
+
+    expect(failedOnlyParsed.ok).toBe(true);
+    if (!failedOnlyParsed.ok) return;
+    const failedOnlyRestoredVm = adaptAnalysisToTelemetryVM(
+      failedOnlyParsed.value.result,
+    );
+    expect(failedOnlyRestoredVm.readout.voicePathFunctional).toEqual({
+      kind: "missing",
+      missing: "not_emitted",
+    });
+  });
+
+  it("makes functional normalization authority fingerprint-significant", async () => {
+    const first = await buildReproducibleRunBundleV0_1({
+      result: makeResult({
+        functionalVoiceNormalizationV0_1: {
+          functionalPath: ["U", "I"],
+        },
+      }),
+    });
+    const second = await buildReproducibleRunBundleV0_1({
+      result: makeResult({
+        functionalVoiceNormalizationV0_1: {
+          functionalPath: ["U", "E"],
+        },
+      }),
+    });
+    const changedPronunciation = await buildReproducibleRunBundleV0_1({
+      result: makeResult({
+        automaticCarrierPronunciationV0_1: {
+          attempted: true,
+          status: "provider_error",
+          error: "timeout",
+        },
+      }),
+    });
+
+    expect(first.fingerprint.value).not.toBe(second.fingerprint.value);
+    expect(first.fingerprint.value).not.toBe(changedPronunciation.fingerprint.value);
+  });
+
+  it("preserves structural discovery status through bundle round-trip", async () => {
+    const structuralCandidate = {
+      ...(makeResult().candidates as Record<string, unknown>[])[0],
+      claimType: "structuralHypothesis",
+      sourceKind: "logic_derived_structural_hypothesis",
+      discoveryStatus: "structural_hypothesis",
+      claimBoundary: "structural hypothesis only; not reviewed lexical evidence",
+      functionalSupportStatus: "unknown",
+      lexicalAttestation: "not_evaluated",
+      validationOutcome: "not_evaluated",
+      rankGroup: "structuralHypothesis",
+    };
+    const result = makeResult({ candidates: [structuralCandidate] });
+    const originalVm = adaptAnalysisToTelemetryVM(result);
+    const bundle = await buildReproducibleRunBundleV0_1({ result });
+    const parsed = await parseReproducibleRunBundleV0_1(
+      serializeReproducibleRunBundleV0_1(bundle),
+    );
+
+    expect(parsed.ok).toBe(true);
+    if (!parsed.ok) return;
+
+    const restoredVm = adaptAnalysisToTelemetryVM(parsed.value.result);
+    expect(restoredVm.candidates[0].claimType).toEqual(
+      originalVm.candidates[0].claimType,
+    );
+    expect(restoredVm.candidates[0].discoveryStatus).toEqual(
+      originalVm.candidates[0].discoveryStatus,
+    );
+    expect(restoredVm.candidates[0].discoveryStatus).toEqual({
+      kind: "present",
+      value: "structural_hypothesis",
+    });
   });
 
   it("preserves a valid Null result without inventing candidates", async () => {
