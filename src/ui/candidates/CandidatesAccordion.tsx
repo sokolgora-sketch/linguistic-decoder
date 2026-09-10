@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import type { UICandidateRow } from "./candidateModel";
+import { CandidateEvidenceReferences } from "./EvidenceReferenceLink";
 import { toPrettyJson } from "@/ui/instrument/prettyJson";
 
 function CopyButton({ text, label }: { text: string; label: string }) {
@@ -272,13 +273,7 @@ export function CandidatesAccordion({ rows }: { rows: UICandidateRow[] }) {
                           </div>
                         ) : null}
 
-                        {isResearchFunctionalHypothesis &&
-                        Array.isArray(c.evidenceRefs) &&
-                        c.evidenceRefs.length > 0 ? (
-                          <div className="break-all font-mono text-xs text-slate-400">
-                            {`Evidence refs: ${c.evidenceRefs.join(", ")}`}
-                          </div>
-                        ) : null}
+                        <CandidateEvidenceReferences row={c} />
 
                         {(isStructuralHypothesis ||
                           isResearchFunctionalHypothesis) &&
