@@ -33,6 +33,7 @@ export const EVIDENCE_PACKAGE_EXPORT_FORBIDDEN_KEYS_V0_1 = [
 const vowel = z.enum(["A", "E", "I", "O", "U", "Y", "Ë"]);
 const candidateStatus = z.enum(["pass", "fail", "unknown"]);
 const voicePathDelta = z.enum(["MATCH", "SHIFT", "DIVERGE", "NOT_EMITTED"]);
+const count = z.number().finite().int().nonnegative();
 
 const analysisStatus = z
   .object({
@@ -122,11 +123,11 @@ const exportSchema = z
       .strict(),
     counts: z
       .object({
-        candidates: z.number().finite().nonnegative(),
-        ops: z.number().finite().nonnegative().optional(),
-        notes: z.number().finite().nonnegative().optional(),
-        signals: z.number().finite().nonnegative().optional(),
-        rejections: z.number().finite().nonnegative().optional(),
+        candidates: count,
+        ops: count.optional(),
+        notes: count.optional(),
+        signals: count.optional(),
+        rejections: count.optional(),
       })
       .strict(),
     candidates: z.array(candidate),
@@ -188,13 +189,13 @@ function optionalStringArray(value: unknown, path: string): ReadResult<string[] 
     : fail(`${path}.value must be a string array`);
 }
 
-function optionalNumber(value: unknown, path: string): ReadResult<number | undefined> {
+function optionalCount(value: unknown, path: string): ReadResult<number | undefined> {
   const unwrapped = unwrapPresentOrMissing(value, path);
   if (!unwrapped.ok) return unwrapped;
   if (unwrapped.value === undefined) return { ok: true, value: undefined };
-  return typeof unwrapped.value === "number" && Number.isFinite(unwrapped.value) && unwrapped.value >= 0
+  return typeof unwrapped.value === "number" && Number.isFinite(unwrapped.value) && Number.isInteger(unwrapped.value) && unwrapped.value >= 0
     ? { ok: true, value: unwrapped.value }
-    : fail(`${path}.value must be a finite non-negative number`);
+    : fail(`${path}.value must be a finite non-negative integer`);
 }
 
 function optionalVowels(value: unknown, path: string): ReadResult<Vowel[] | undefined> {
@@ -302,7 +303,10 @@ export function validateEvidencePackageExportV0_1(value: unknown): { ok: true } 
   const jsonFailure = inspectJson(value, "export", new WeakSet<object>());
   if (jsonFailure) return fail(jsonFailure);
   const parsed = exportSchema.safeParse(value);
-  return parsed.success ? { ok: true } : fail(parsed.error.message);
+  if (!parsed.success) return fail(parsed.error.message);
+  return parsed.data.counts.candidates === parsed.data.candidates.length
+    ? { ok: true }
+    : fail("counts.candidates must match candidates.length");
 }
 
 export function buildEvidencePackageExportV0_1(
@@ -349,7 +353,7 @@ export function buildEvidencePackageExportV0_1(
   if (typeof candidatesCount !== "number" || !Number.isFinite(candidatesCount) || candidatesCount < 0) return fail("readout.counts.candidates is invalid");
   counts.candidates = candidatesCount;
   for (const field of ["ops", "notes", "signals", "rejections"] as const) {
-    const read = optionalNumber(readout.counts[field], `readout.counts.${field}`);
+    const read = optionalCount(readout.counts[field], `readout.counts.${field}`);
     if (!read.ok) return read;
     if (read.value !== undefined) counts[field] = read.value;
   }

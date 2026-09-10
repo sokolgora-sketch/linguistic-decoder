@@ -206,6 +206,53 @@ describe("Open Instrument evidence package export contract v0.1", () => {
     expect(firstJson).toEqual(secondJson);
   });
 
+  it("requires integer, non-negative candidate counts that match the projected candidates", () => {
+    const result = buildEvidencePackageExportV0_1(makeVm(), ledgerModel);
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+
+    expect(
+      validateEvidencePackageExportV0_1({
+        ...result.value,
+        counts: { ...result.value.counts, candidates: 1.5 },
+      }).ok,
+    ).toBe(false);
+    expect(
+      validateEvidencePackageExportV0_1({
+        ...result.value,
+        counts: { ...result.value.counts, candidates: -1 },
+      }).ok,
+    ).toBe(false);
+    expect(
+      validateEvidencePackageExportV0_1({
+        ...result.value,
+        candidates: result.value.candidates.slice(0, 1),
+      }).ok,
+    ).toBe(false);
+    expect(validateEvidencePackageExportV0_1(result.value).ok).toBe(true);
+  });
+
+  it("keeps count validation separate from candidate order, truth, and evidence semantics", () => {
+    const result = buildEvidencePackageExportV0_1(makeVm(), ledgerModel);
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+
+    expect(result.value.candidates.map((candidate) => candidate.id)).toEqual([
+      "candidate-1",
+      "candidate-2",
+    ]);
+    expect(result.value.candidates.map((candidate) => candidate.status)).toEqual([
+      "pass",
+      "unknown",
+    ]);
+    expect(result.value.candidates[0]?.evidenceRefs).toEqual(["reviewed-source-1:citation-1"]);
+    expect(result.value.candidates[1]?.sourceStatus).toBe("research_candidate");
+    expect(result.value.analysisStatusV0_1?.claimBoundary.candidateTruthClaim).toBe("not_claimed");
+    expect(result.value.analysisStatusV0_1?.userDecisionPosture).toBe("user_decides");
+  });
+
   it("fails closed on nested forbidden data", () => {
     const result = buildEvidencePackageExportV0_1(makeVm(), ledgerModel);
     expect(result.ok).toBe(true);
