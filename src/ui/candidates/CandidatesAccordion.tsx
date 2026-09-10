@@ -273,8 +273,6 @@ export function CandidatesAccordion({ rows }: { rows: UICandidateRow[] }) {
                           </div>
                         ) : null}
 
-                        <CandidateEvidenceReferences row={c} />
-
                         {(isStructuralHypothesis ||
                           isResearchFunctionalHypothesis) &&
                         c.historicalOriginClaim === "not_claimed" ? (
@@ -338,6 +336,10 @@ export function CandidatesAccordion({ rows }: { rows: UICandidateRow[] }) {
                   </div>
                 ) : null}
               </button>
+
+              {hasEmbryoFirstReadout ? (
+                <CandidateEvidenceReferences row={c} />
+              ) : null}
 
               {isOpen ? (
                 <div className="border-t border-slate-800 bg-black/20 px-3 py-3">

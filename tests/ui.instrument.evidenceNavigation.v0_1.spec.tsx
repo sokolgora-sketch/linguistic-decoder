@@ -84,6 +84,7 @@ describe("Open Instrument evidence navigation v0.1", () => {
     );
     expect(link).toHaveAttribute("target", "_blank");
     expect(link).toHaveAttribute("rel", "noreferrer noopener");
+    expect(link.closest("button")).toBeNull();
     expect(screen.getByText(/Reviewed source · reviewed_accepted/i)).toBeInTheDocument();
     expect(
       screen.getByText(`Ref: ${reviewedCitation.citationId}`),
@@ -112,6 +113,7 @@ describe("Open Instrument evidence navigation v0.1", () => {
       firstCitation.sourceUrlOrArchiveRef,
       secondCitation.sourceUrlOrArchiveRef,
     ]);
+    expect(links.every((link) => link.closest("button") === null)).toBe(true);
     expect(
       screen.getAllByText(/Research source · research_candidate/i),
     ).toHaveLength(2);
