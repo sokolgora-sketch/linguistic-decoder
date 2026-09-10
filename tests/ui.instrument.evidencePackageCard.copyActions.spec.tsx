@@ -6,12 +6,14 @@ describe("EvidencePackageCard copy actions", () => {
   it("labels evidence export as VM-derived summary and JSON package copy actions", () => {
     const onCopyEvidenceSummary = jest.fn();
     const onCopyEvidencePackage = jest.fn();
+    const onDownloadEvidencePackage = jest.fn();
 
     render(
       <EvidencePackageCard
         engineVersion="0.2.0-symbolic"
         onCopyEvidenceSummary={onCopyEvidenceSummary}
         onCopyEvidencePackage={onCopyEvidencePackage}
+        onDownloadEvidencePackage={onDownloadEvidencePackage}
       />
     );
 
@@ -29,8 +31,10 @@ describe("EvidencePackageCard copy actions", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Copy Evidence Summary" }));
     fireEvent.click(screen.getByRole("button", { name: "Copy Evidence Package" }));
+    fireEvent.click(screen.getByRole("button", { name: "Download Evidence Package" }));
 
     expect(onCopyEvidenceSummary).toHaveBeenCalledTimes(1);
     expect(onCopyEvidencePackage).toHaveBeenCalledTimes(1);
+    expect(onDownloadEvidencePackage).toHaveBeenCalledTimes(1);
   });
 });

@@ -5,6 +5,10 @@ import net from "node:net";
 import { tmpdir } from "node:os";
 import { basename, join } from "node:path";
 import { chromium, type Browser } from "playwright";
+import {
+  serializeEvidencePackageExportV0_1,
+  validateEvidencePackageExportV0_1,
+} from "../../src/shared/openInstrument/evidencePackageExport.v0_1";
 import { parseReproducibleRunBundleV0_1 } from "../../src/shared/openInstrument/reproducibleRunBundle.v0_1";
 import { startNextServer } from "../../tests/helpers/ownedNextServer";
 
@@ -83,6 +87,50 @@ async function main(): Promise<void> {
     console.log("FRESH_ANALYSIS=PASS");
     console.log("CURRENT_ANALYSIS_PROVENANCE=PASS");
     console.log(`ANALYZE_REQUESTS_AFTER_FRESH=${analyzeRequests}`);
+
+    await page.getByRole("tab", { name: "Evidence" }).click();
+    const evidenceDownloadPromise = page.waitForEvent("download", { timeout: PAGE_TIMEOUT_MS });
+    await page.getByRole("button", { name: "Download Evidence Package" }).click();
+    const evidenceDownload = await evidenceDownloadPromise;
+    console.log("EVIDENCE_DOWNLOAD_EVENT_OBSERVED=PASS");
+
+    const evidenceDownloadPath = join(
+      downloadDirectory,
+      basename(evidenceDownload.suggestedFilename() || "open-instrument-evidence-package.json"),
+    );
+    await evidenceDownload.saveAs(evidenceDownloadPath);
+    const evidenceFile = await stat(evidenceDownloadPath);
+    assert(evidenceFile.isFile() && evidenceFile.size > 0, "Evidence Package download did not produce a non-empty file.");
+    console.log("EVIDENCE_PHYSICAL_DOWNLOAD_EXISTS=PASS");
+    const evidenceBytes = await readFile(evidenceDownloadPath);
+    assert(evidenceBytes.length > 0, "Evidence Package download contained no bytes.");
+    console.log("EVIDENCE_DOWNLOADED_BYTES_READ=PASS");
+
+    const evidenceText = evidenceBytes.toString("utf8");
+    let evidenceValue: unknown;
+    try {
+      evidenceValue = JSON.parse(evidenceText);
+    } catch {
+      throw new Error("Evidence Package download was not valid JSON.");
+    }
+    assert(validateEvidencePackageExportV0_1(evidenceValue).ok, "Downloaded Evidence Package failed durable validation.");
+    const canonicalEvidence = serializeEvidencePackageExportV0_1(evidenceValue as Parameters<typeof serializeEvidencePackageExportV0_1>[0]);
+    assert(canonicalEvidence.ok && canonicalEvidence.value === evidenceText, "Downloaded Evidence Package bytes were not canonical.");
+    assert(
+      typeof evidenceValue === "object" && evidenceValue !== null && !Array.isArray(evidenceValue),
+      "Downloaded Evidence Package was not an object.",
+    );
+    const evidenceRecord = evidenceValue as { schemaVersion?: unknown; input?: { word?: unknown } };
+    assert(evidenceRecord.schemaVersion === "open-instrument.evidence-package-export.v0.1", "Evidence Package schema was unexpected.");
+    assert(evidenceRecord.input?.word === "study", "Evidence Package input did not contain study.");
+    for (const forbiddenKey of ["raw", "debug", "providerOutput", "providerRequest", "providerResponse", "runtime", "researchRows"]) {
+      assert(!evidenceText.includes(`"${forbiddenKey}"`), `Evidence Package contained forbidden field ${forbiddenKey}.`);
+    }
+    console.log("EVIDENCE_DURABLE_SERIALIZATION=PASS");
+    console.log("EVIDENCE_SCHEMA=PASS");
+    console.log("EVIDENCE_FORBIDDEN_FIELDS=PASS");
+    assert(analyzeRequests === 1, `Evidence Package download triggered an additional analysis request; observed ${analyzeRequests}.`);
+    console.log(`ANALYZE_REQUESTS_AFTER_EVIDENCE_DOWNLOAD=${analyzeRequests}`);
 
     const downloadPromise = page.waitForEvent("download", { timeout: PAGE_TIMEOUT_MS });
     await page.getByRole("button", { name: "Download analysis" }).click();

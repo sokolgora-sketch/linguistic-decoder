@@ -1,11 +1,12 @@
 'use client';
 
 import React from "react";
-import { Copy } from "lucide-react";
+import { Copy, Download } from "lucide-react";
 
 type Props = {
   onCopyEvidenceSummary: () => void;
   onCopyEvidencePackage: () => void;
+  onDownloadEvidencePackage: () => void;
   engineVersion?: string | null;
 };
 
@@ -60,6 +61,14 @@ export function EvidencePackageCard(props: Props) {
           >
             <Copy className="h-3.5 w-3.5" aria-hidden="true" />
             Copy Evidence Package
+          </button>
+          <button
+            type="button"
+            className="mt-3 ml-2 inline-flex items-center gap-2 rounded-[8px] border border-cyan-400/50 bg-cyan-500/10 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-cyan-100 transition hover:border-cyan-300 hover:bg-cyan-500/20"
+            onClick={props.onDownloadEvidencePackage}
+          >
+            <Download className="h-3.5 w-3.5" aria-hidden="true" />
+            Download Evidence Package
           </button>
         </div>
       </div>
