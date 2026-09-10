@@ -189,6 +189,101 @@ describe("reproducible run bundle UI handoff v0.1", () => {
     expect(researchFetchCount()).toBe(1);
   });
 
+  it("marks a completed fresh analysis as current without exposing a fingerprint", async () => {
+    mockSuccessfulAnalysis();
+    render(<ZroChatPage />);
+
+    fireEvent.change(screen.getByLabelText("Word"), { target: { value: "study" } });
+    fireEvent.click(screen.getByRole("button", { name: "Analyze" }));
+
+    await screen.findByText("Current analysis");
+    expect(screen.queryByText("Imported local snapshot")).not.toBeInTheDocument();
+    expect(screen.queryByText(/Bundle fingerprint:/)).not.toBeInTheDocument();
+    expect(analyzeFetchCount()).toBe(1);
+  });
+
+  it("shows validated provenance for an imported local snapshot", async () => {
+    global.fetch = jest.fn();
+    const bundle = await makeBundle();
+
+    render(<ZroChatPage />);
+    fireEvent.change(screen.getByLabelText("Open saved analysis"), {
+      target: { files: [fileFrom(serializeReproducibleRunBundleV0_1(bundle))] },
+    });
+
+    await screen.findByText("Imported local snapshot");
+    expect(screen.getByText(bundle.schemaVersion)).toBeInTheDocument();
+    expect(screen.getByText(bundle.fingerprint.value)).toBeInTheDocument();
+    expect(screen.getByText(bundle.createdAt as string)).toBeInTheDocument();
+    expect(screen.getByText(/Bundle fingerprint matched the saved contents\./)).toBeInTheDocument();
+    expect(global.fetch).not.toHaveBeenCalled();
+  });
+
+  it("does not fabricate snapshot time when an imported bundle omits createdAt", async () => {
+    global.fetch = jest.fn();
+    const bundle = await makeBundle();
+    const withoutCreatedAt = { ...bundle };
+    delete withoutCreatedAt.createdAt;
+
+    render(<ZroChatPage />);
+    fireEvent.change(screen.getByLabelText("Open saved analysis"), {
+      target: { files: [fileFrom(serializeReproducibleRunBundleV0_1(withoutCreatedAt))] },
+    });
+
+    await screen.findByText("Imported local snapshot");
+    expect(screen.queryByText(/Snapshot time:/)).not.toBeInTheDocument();
+    expect(screen.getByText(bundle.fingerprint.value)).toBeInTheDocument();
+    expect(global.fetch).not.toHaveBeenCalled();
+  });
+
+  it("resets imported provenance to current after a fresh successful analysis", async () => {
+    global.fetch = jest.fn();
+    const bundle = await makeBundle(makeResult({ word: "saved" }));
+
+    render(<ZroChatPage />);
+    fireEvent.change(screen.getByLabelText("Open saved analysis"), {
+      target: { files: [fileFrom(serializeReproducibleRunBundleV0_1(bundle))] },
+    });
+    await screen.findByText("Imported local snapshot");
+
+    mockSuccessfulAnalysis(makeResult({ word: "fresh" }));
+    fireEvent.change(screen.getByLabelText("Word"), { target: { value: "fresh" } });
+    fireEvent.click(screen.getByRole("button", { name: "Analyze" }));
+
+    await screen.findByText("Current analysis");
+    expect(screen.queryByText("Imported local snapshot")).not.toBeInTheDocument();
+    expect(screen.queryByText(bundle.fingerprint.value)).not.toBeInTheDocument();
+    expect(screen.getByTestId("instrument-word")).toHaveTextContent("fresh");
+    expect(analyzeFetchCount()).toBe(1);
+  });
+
+  it("keeps imported provenance attached to the displayed snapshot after a failed fresh request", async () => {
+    global.fetch = jest.fn();
+    const bundle = await makeBundle(makeResult({ word: "saved" }));
+
+    render(<ZroChatPage />);
+    fireEvent.change(screen.getByLabelText("Open saved analysis"), {
+      target: { files: [fileFrom(serializeReproducibleRunBundleV0_1(bundle))] },
+    });
+    await screen.findByText("Imported local snapshot");
+
+    global.fetch = jest.fn().mockResolvedValueOnce({
+      ok: false,
+      status: 500,
+      statusText: "Server Error",
+      json: async () => ({ error: "failed" }),
+    } as any);
+    fireEvent.change(screen.getByLabelText("Word"), { target: { value: "retry" } });
+    fireEvent.click(screen.getByRole("button", { name: "Analyze" }));
+
+    await screen.findByText("Engine error.");
+    expect(screen.getByText("Imported local snapshot")).toBeInTheDocument();
+    expect(screen.getByText(bundle.fingerprint.value)).toBeInTheDocument();
+    expect(screen.getByTestId("instrument-word")).toHaveTextContent("saved");
+    expect(screen.queryByText("Current analysis")).not.toBeInTheDocument();
+    expect(screen.getByText("Engine error.")).toBeInTheDocument();
+  });
+
   it("exports the completed run metadata instead of later draft edits", async () => {
     mockSuccessfulAnalysis();
     render(<ZroChatPage />);
@@ -261,6 +356,8 @@ describe("reproducible run bundle UI handoff v0.1", () => {
     expect(screen.getByLabelText("IPA")).toHaveValue("/ˈseɪvd/");
     expect(screen.getByLabelText("Intended sense")).toHaveValue("archived learning action");
     expect(screen.getAllByText("No supported functional candidate yet.").length).toBeGreaterThan(0);
+    expect(screen.getByText("Imported local snapshot")).toBeInTheDocument();
+    expect(screen.getByText(bundle.fingerprint.value)).toBeInTheDocument();
     expect(global.fetch).not.toHaveBeenCalled();
   });
 
@@ -350,6 +447,7 @@ describe("reproducible run bundle UI handoff v0.1", () => {
 
     expect(await screen.findByRole("alert")).toHaveTextContent(error as string);
     expect(screen.getByTestId("instrument-word")).toHaveTextContent("study");
+    expect(screen.queryByText("Imported local snapshot")).not.toBeInTheDocument();
     expect(analyzeFetchCount()).toBe(1);
     expect(researchFetchCount()).toBe(1);
   });

@@ -12,12 +12,22 @@ import {
 } from "@/shared/openInstrument/reproducibleRunBundle.v0_1";
 import { MT } from "@/ui/typography/marketingType.v0.1";
 
+export type ReproducibleRunBundleDisplaySourceV0_1 =
+  | { kind: "current" }
+  | {
+      kind: "imported";
+      schemaVersion: ReproducibleRunBundleV0_1["schemaVersion"];
+      fingerprint: ReproducibleRunBundleV0_1["fingerprint"];
+      createdAt?: ReproducibleRunBundleV0_1["createdAt"];
+    };
+
 type Props = {
   payload: unknown;
   completedInput?: {
     ipa?: string;
     targetSenseLabel?: string;
   };
+  source: ReproducibleRunBundleDisplaySourceV0_1;
   disabled?: boolean;
   onImport: (bundle: ReproducibleRunBundleV0_1) => void;
 };
@@ -49,6 +59,7 @@ function importError(reason: string): string {
 export function ReproducibleRunBundleControls({
   payload,
   completedInput,
+  source,
   disabled = false,
   onImport,
 }: Props) {
@@ -57,6 +68,7 @@ export function ReproducibleRunBundleControls({
   const [error, setError] = React.useState<string | null>(null);
   const canExport = React.useMemo(() => exportablePayload(payload), [payload]);
   const controlsDisabled = disabled || busy;
+  const displayedSource = canExport ? source : null;
 
   async function handleDownload() {
     if (!canExport || controlsDisabled) return;
@@ -145,6 +157,37 @@ export function ReproducibleRunBundleControls({
           disabled={controlsDisabled}
         />
       </div>
+      {displayedSource ? (
+        <div
+          role="status"
+          aria-label="Displayed analysis source"
+          className="mt-3 rounded-md border border-[#2f3742] bg-[#0d131a] p-2.5 text-xs text-[#c7d3df]"
+        >
+          <div className="font-semibold text-[#e4edf5]">
+            {displayedSource.kind === "imported"
+              ? "Imported local snapshot"
+              : "Current analysis"}
+          </div>
+          {displayedSource.kind === "imported" ? (
+            <div className="mt-2 flex min-w-0 flex-col gap-1 leading-5">
+              <div>
+                Bundle schema: <span className="break-all font-mono select-text">{displayedSource.schemaVersion}</span>
+              </div>
+              <div>
+                Bundle fingerprint: <span className="break-all font-mono select-text">{displayedSource.fingerprint.value}</span>
+              </div>
+              <div className="text-[#9fb1bf]">
+                Bundle fingerprint matched the saved contents.
+              </div>
+              {displayedSource.createdAt ? (
+                <div>
+                  Snapshot time: <span className="break-words">{displayedSource.createdAt}</span>
+                </div>
+              ) : null}
+            </div>
+          ) : null}
+        </div>
+      ) : null}
       <div className="mt-2 text-xs text-[#9fb1bf]">
         Local JSON snapshot only; opening it does not run analysis again.
       </div>

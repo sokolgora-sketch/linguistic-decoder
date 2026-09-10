@@ -5,7 +5,10 @@ import ChatShell from '@/components/ChatShell';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { InstrumentPanel } from '@/ui/instrument/InstrumentPanel';
-import { ReproducibleRunBundleControls } from '@/ui/instrument/ReproducibleRunBundleControls.v0_1';
+import {
+  ReproducibleRunBundleControls,
+  type ReproducibleRunBundleDisplaySourceV0_1,
+} from '@/ui/instrument/ReproducibleRunBundleControls.v0_1';
 import { CrossLanguageRecurrenceCardV0_1 } from '@/ui/instrument/sections/CrossLanguageRecurrenceCard.v0.1';
 import type { ReproducibleRunBundleV0_1 } from '@/shared/openInstrument/reproducibleRunBundle.v0_1';
 import type { SevenVoiceFunctionalRecurrenceResearchAvailableV0_1 } from '@/shared/openInstrument/sevenVoiceFunctionalRecurrenceResearchCatalog.v0_1';
@@ -325,6 +328,18 @@ export default function ZroChatPage() {
       )
       ?.instrumentPayload ?? null;
 
+  const displayedAnalysisSource: ReproducibleRunBundleDisplaySourceV0_1 =
+    importedBundle
+      ? {
+          kind: "imported",
+          schemaVersion: importedBundle.schemaVersion,
+          fingerprint: importedBundle.fingerprint,
+          ...(importedBundle.createdAt !== undefined
+            ? { createdAt: importedBundle.createdAt }
+            : {}),
+        }
+      : { kind: "current" };
+
   function handleImportedBundle(bundle: ReproducibleRunBundleV0_1) {
     setImportedBundle(bundle);
     setInput(bundle.result.word);
@@ -355,6 +370,7 @@ export default function ZroChatPage() {
             ipa: lastRun?.ipa,
             targetSenseLabel: lastRun?.targetSenseLabel,
           }}
+          source={displayedAnalysisSource}
           disabled={busy}
           onImport={handleImportedBundle}
         />
