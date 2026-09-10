@@ -245,6 +245,12 @@ export function InstrumentPanel(props: Props) {
       ? vm.analysisStatusV0_1
       : null;
 
+  React.useEffect(() => {
+    if (primaryNullStatus) {
+      setActiveSection("overview");
+    }
+  }, [primaryNullStatus]);
+
   const lightMap = React.useMemo(() => {
     try {
       // VM-only for v0.1 (taxonomy scaffold)

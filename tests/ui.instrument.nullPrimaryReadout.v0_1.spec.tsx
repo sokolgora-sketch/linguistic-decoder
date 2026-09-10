@@ -202,4 +202,31 @@ describe("Open Instrument canonical Null primary readout v0.1", () => {
       }),
     ).not.toBeInTheDocument();
   });
+
+  it("returns to Overview when a canonical Null arrives while Advanced is open", () => {
+    const initial = vmFixture({ analysisStatusV0_1: statusValue("candidate_only") });
+    const { rerender } = render(<InstrumentPanel vm={initial} />);
+
+    fireEvent.click(screen.getByRole("tab", { name: "Advanced" }));
+    expect(screen.getByRole("tab", { name: "Advanced" })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+
+    rerender(
+      <InstrumentPanel
+        vm={vmFixture({ analysisStatusV0_1: statusValue("null_no_supported_candidate") })}
+      />,
+    );
+
+    expect(screen.getByRole("tab", { name: "Overview" })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+    expect(
+      within(visibleOverview()).getByRole("heading", {
+        name: "Null — no supported candidate",
+      }),
+    ).toBeVisible();
+  });
 });
