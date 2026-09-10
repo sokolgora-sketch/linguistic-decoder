@@ -74,7 +74,7 @@ function makeResult(overrides: Record<string, unknown> = {}) {
     rootMap: { tokens: [], keys: [], carriers: [], spans: [], composedMeaning: "" },
     evidence: {},
     analysisStatusV0_1: {
-      schemaVersion: "open-instrument.analysis-status.v0.1",
+      schemaVersion: "open-instrument.analysis-status.v0_1",
       status: "candidate_only",
       summary: "Candidate-only analysis.",
       reviewedOperators: [],
@@ -254,6 +254,9 @@ describe("reproducible run bundle UI handoff v0.1", () => {
 
     await screen.findByTestId("open-instrument-shell");
     expect(screen.getByTestId("instrument-word")).toHaveTextContent("saved");
+    expect(
+      screen.getByRole("heading", { name: "Null — no supported candidate" }),
+    ).toBeVisible();
     expect(screen.getByLabelText("Word")).toHaveValue("saved");
     expect(screen.getByLabelText("IPA")).toHaveValue("/ˈseɪvd/");
     expect(screen.getByLabelText("Intended sense")).toHaveValue("archived learning action");

@@ -237,6 +237,20 @@ export function InstrumentPanel(props: Props) {
 
   const isValidVm = isTelemetryVm(vm);
 
+  const primaryNullStatus =
+    isValidVm &&
+    vm.analysisStatusV0_1?.kind === "present" &&
+    vm.analysisStatusV0_1.value.status ===
+      "null_no_supported_candidate"
+      ? vm.analysisStatusV0_1
+      : null;
+
+  React.useEffect(() => {
+    if (primaryNullStatus) {
+      setActiveSection("overview");
+    }
+  }, [primaryNullStatus]);
+
   const lightMap = React.useMemo(() => {
     try {
       // VM-only for v0.1 (taxonomy scaffold)
@@ -416,6 +430,12 @@ export function InstrumentPanel(props: Props) {
         <div className="space-y-4">
           <TabPanel id="overview" active={activeSection}>
             <div className="space-y-4">
+              {primaryNullStatus ? (
+                <AnalysisStatusCardV0_1
+                  status={primaryNullStatus}
+                />
+              ) : null}
+
               <EmbryoExpansionContextCardV0_1
                 vm={vm}
               />
@@ -542,15 +562,17 @@ export function InstrumentPanel(props: Props) {
                   <HonestContractCard />
                 </div>
 
-                <AnalysisStatusCardV0_1
-                  status={
-                    vm.analysisStatusV0_1 ?? {
-                      kind: "missing",
-                      missing: "not_emitted",
-                      note: "analysisStatusV0_1",
+                {!primaryNullStatus ? (
+                  <AnalysisStatusCardV0_1
+                    status={
+                      vm.analysisStatusV0_1 ?? {
+                        kind: "missing",
+                        missing: "not_emitted",
+                        note: "analysisStatusV0_1",
+                      }
                     }
-                  }
-                />
+                  />
+                ) : null}
 
                 <MaskCarrierCard
                   word={String(
