@@ -153,6 +153,12 @@ export interface CandidateRowVM {
   language: PresentOrMissing<string>;
   form: PresentOrMissing<string>;
 
+  // Candidate evaluation metadata is presentation-only. Invalid values are
+  // rejected at the raw-payload boundary rather than reinterpreted as truth.
+  status?: PresentOrMissing<"pass" | "fail" | "unknown">;
+  confidenceTag?: PresentOrMissing<string>;
+  fitTag?: PresentOrMissing<string>;
+
   // v0.3 honest-provenance: SEED | LLM_PROPOSED | DATASET | USER_ADDED, etc.
   // Surfaced from candidateRecord.source.kind. Blueprint section 0: "no single
   // winner" — provenance must be visible, not implied.

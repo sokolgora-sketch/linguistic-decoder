@@ -9,6 +9,10 @@ exports[`ui telemetry vm contract v0.1.1 (candidates evidence lists) adapts cand
   },
   "candidates": [
     {
+      "confidenceTag": {
+        "kind": "present",
+        "value": "strong",
+      },
       "decomposition": {
         "kind": "missing",
         "missing": "not_emitted",
@@ -24,6 +28,10 @@ exports[`ui telemetry vm contract v0.1.1 (candidates evidence lists) adapts cand
           "reasonCodes": [],
           "status": "aligned",
         },
+      },
+      "fitTag": {
+        "kind": "present",
+        "value": "strong",
       },
       "form": {
         "kind": "present",
@@ -55,6 +63,10 @@ exports[`ui telemetry vm contract v0.1.1 (candidates evidence lists) adapts cand
         "kind": "missing",
         "missing": "not_emitted",
       },
+      "status": {
+        "kind": "present",
+        "value": "pass",
+      },
       "vowelPath": {
         "kind": "present",
         "value": [
@@ -64,6 +76,10 @@ exports[`ui telemetry vm contract v0.1.1 (candidates evidence lists) adapts cand
       },
     },
     {
+      "confidenceTag": {
+        "kind": "present",
+        "value": "strong",
+      },
       "decomposition": {
         "kind": "missing",
         "missing": "not_emitted",
@@ -79,6 +95,10 @@ exports[`ui telemetry vm contract v0.1.1 (candidates evidence lists) adapts cand
           "reasonCodes": [],
           "status": "aligned",
         },
+      },
+      "fitTag": {
+        "kind": "present",
+        "value": "strong",
       },
       "form": {
         "kind": "present",
@@ -109,6 +129,10 @@ exports[`ui telemetry vm contract v0.1.1 (candidates evidence lists) adapts cand
       "sourceKind": {
         "kind": "missing",
         "missing": "not_emitted",
+      },
+      "status": {
+        "kind": "present",
+        "value": "pass",
       },
       "vowelPath": {
         "kind": "present",

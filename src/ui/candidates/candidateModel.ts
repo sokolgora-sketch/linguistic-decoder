@@ -6,6 +6,8 @@ export interface UICandidateRow {
   language: string;
   form: string;
   status?: string | null;
+  confidenceTag?: string | null;
+  fitTag?: string | null;
   sourceKind?: string | null;
   targetWord?: string | null;
   targetSenseId?: string | null;
@@ -49,6 +51,12 @@ function pomStr(
   x: { kind: "present"; value: string } | { kind: "missing"; missing: string; note?: string }
 ): string | null {
   return x.kind === "present" ? x.value : null;
+}
+
+function pomValue<T>(
+  x: PresentOrMissing<T> | undefined,
+): T | null {
+  return x?.kind === "present" ? x.value : null;
 }
 
 function pomStringArray(
@@ -111,7 +119,9 @@ export function buildCandidateRowsFromVM(vm: TelemetryViewModel): UICandidateRow
     id: c.id,
     language: pomStr(c.language) ?? "Unknown",
     form: pomStr(c.form) ?? "—",
-    status: null, // do not invent; only show when engine emits later
+    status: pomValue(c.status),
+    confidenceTag: c.confidenceTag ? pomStr(c.confidenceTag) : null,
+    fitTag: c.fitTag ? pomStr(c.fitTag) : null,
     sourceKind: c.sourceKind ? pomStr(c.sourceKind) : null, // v0.3: provenance surfaced; guard undefined for partial/mock VMs
 
     targetWord:

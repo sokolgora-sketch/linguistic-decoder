@@ -332,6 +332,23 @@ function asString(v: unknown): string | null {
   return typeof v === "string" ? v : null;
 }
 
+type CandidateStatus = "pass" | "fail" | "unknown";
+
+function parseCandidateStatus(v: unknown): CandidateStatus | null {
+  return v === "pass" || v === "fail" || v === "unknown" ? v : null;
+}
+
+function parseOptionalCandidateString(
+  rec: Record<string, unknown>,
+  field: "confidenceTag" | "fitTag",
+): PresentOrMissing<string> | undefined {
+  if (!(field in rec)) return undefined;
+  const value = rec[field];
+  return typeof value === "string" && value.trim().length > 0
+    ? present(value)
+    : missing("malformed", `candidate.${field} expected non-empty string`);
+}
+
 // Pick helpers (Instrument contract adapter)
 function pickFromRootMetaContract(root: Record<string, unknown> | null, key: string): string | null {
   const meta = root && isRecord(root["meta"]) ? root["meta"] : null;
@@ -1147,6 +1164,16 @@ const normalizationSteps =
       const candSource = candRecord && isRecord(candRecord["source"]) ? candRecord["source"] : null;
       const candSourceKind = asString(rec["sourceKind"]) ?? (candSource ? asString(candSource["kind"]) : null);
 
+      const statusWasEmitted = Object.prototype.hasOwnProperty.call(rec, "status");
+      const candidateStatus = parseCandidateStatus(rec["status"]);
+      const status = statusWasEmitted
+          ? candidateStatus
+          ? present<CandidateStatus>(candidateStatus)
+          : missing<CandidateStatus>("malformed", "candidate.status expected pass | fail | unknown")
+        : undefined;
+      const confidenceTag = parseOptionalCandidateString(rec, "confidenceTag");
+      const fitTag = parseOptionalCandidateString(rec, "fitTag");
+
       const targetWord =
         asString(rec["targetWord"]);
       const targetSenseId =
@@ -1352,6 +1379,10 @@ const evidenceId = String(id).toLowerCase().replace(/[^a-z0-9_]/g, "_");
         language: lang ? present(lang) : missing("not_emitted"),
         form: form ? present(form) : missing("not_emitted"),
         sourceKind: candSourceKind ? present(candSourceKind) : missing("not_emitted"),
+
+        ...(status ? { status } : {}),
+        ...(confidenceTag ? { confidenceTag } : {}),
+        ...(fitTag ? { fitTag } : {}),
 
         ...(targetWord
           ? {
