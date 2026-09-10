@@ -215,7 +215,9 @@ describe("reproducible run bundle UI handoff v0.1", () => {
     expect(screen.getByText(bundle.schemaVersion)).toBeInTheDocument();
     expect(screen.getByText(bundle.fingerprint.value)).toBeInTheDocument();
     expect(screen.getByText(bundle.createdAt as string)).toBeInTheDocument();
-    expect(screen.getByText(/Bundle fingerprint matched the saved contents\./)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Bundle fingerprint matched the saved analysis input and result\./),
+    ).toBeInTheDocument();
     expect(global.fetch).not.toHaveBeenCalled();
   });
 

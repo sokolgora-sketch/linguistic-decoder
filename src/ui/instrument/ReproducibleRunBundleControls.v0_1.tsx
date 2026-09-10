@@ -177,7 +177,7 @@ export function ReproducibleRunBundleControls({
                 Bundle fingerprint: <span className="break-all font-mono select-text">{displayedSource.fingerprint.value}</span>
               </div>
               <div className="text-[#9fb1bf]">
-                Bundle fingerprint matched the saved contents.
+                Bundle fingerprint matched the saved analysis input and result.
               </div>
               {displayedSource.createdAt ? (
                 <div>
