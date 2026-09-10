@@ -195,7 +195,7 @@ export function resolveReviewedEvidenceReferenceV0_1(
     for (const citation of row.externalCitations) {
       const citationMatches = requestedCitationId
         ? citation.citationId === requestedCitationId
-        : !requestedSourceId && citation.citationId === lookupRef;
+        : citation.citationId === lookupRef;
 
       if (!citationMatches) continue;
       if (requestedStatus && row.sourceStatus !== requestedStatus) {
@@ -210,7 +210,11 @@ export function resolveReviewedEvidenceReferenceV0_1(
       });
     }
 
-    if (sourceMatches && !requestedCitationId) {
+    if (
+      sourceMatches &&
+      !requestedCitationId &&
+      row.sourceId === lookupRef
+    ) {
       const citation = row.externalCitations[0];
       if (!citation) return unresolvedV0_1(originalRef);
 
@@ -281,7 +285,7 @@ export function resolveResearchEvidenceReferenceV0_1(
     for (const citation of row.citations) {
       const citationMatches = requestedCitationId
         ? citation.citationId === requestedCitationId
-        : !requestedResearchEvidenceId && citation.citationId === lookupRef;
+        : citation.citationId === lookupRef;
 
       if (!citationMatches) continue;
       if (requestedStatus && row.sourceStatus !== requestedStatus) {
@@ -296,7 +300,11 @@ export function resolveResearchEvidenceReferenceV0_1(
       });
     }
 
-    if (researchIdMatches && !requestedCitationId) {
+    if (
+      researchIdMatches &&
+      !requestedCitationId &&
+      row.researchEvidenceId === lookupRef
+    ) {
       const citation = row.citations[0];
       if (!citation) return unresolvedV0_1(originalRef);
 
