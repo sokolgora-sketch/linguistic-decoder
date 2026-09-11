@@ -168,7 +168,25 @@ describe("Open Instrument canonical Null primary readout v0.1", () => {
     expect(
       screen.getByRole("heading", { name: "Hypothesis — structural, unreviewed" }),
     ).toBeVisible();
-    expect(screen.getByText(/Structural output is not candidate truth/i)).toBeVisible();
+    expect(
+      within(screen.getByRole("tabpanel")).getByText(
+        /Structural output is not candidate truth/i,
+      ),
+    ).toBeVisible();
+  });
+
+  it("exposes candidate-only status in the primary hierarchy without promotion", () => {
+    render(
+      <InstrumentPanel
+        vm={vmFixture({ analysisStatusV0_1: statusValue("candidate_only") })}
+      />,
+    );
+
+    const overview = visibleOverview();
+    expect(
+      within(overview).getByRole("heading", { name: "Candidate only" }),
+    ).toBeVisible();
+    expect(within(overview).getByText(/candidate-truth claim/i)).toBeVisible();
   });
 
   it.each([
@@ -176,6 +194,10 @@ describe("Open Instrument canonical Null primary readout v0.1", () => {
     { kind: "missing" as const, missing: "malformed" as const },
   ])("does not convert $missing analysis status into Null", (analysisStatusV0_1) => {
     render(<InstrumentPanel vm={vmFixture({ analysisStatusV0_1 })} />);
+
+    expect(
+      within(visibleOverview()).queryByTestId("primary-analysis-status"),
+    ).not.toBeInTheDocument();
 
     expect(
       within(visibleOverview()).queryByRole("heading", {

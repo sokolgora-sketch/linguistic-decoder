@@ -255,6 +255,12 @@ export function InstrumentPanel(props: Props) {
       ? vm.analysisStatusV0_1
       : null;
 
+  const primaryAnalysisStatus =
+    isValidVm &&
+    vm.analysisStatusV0_1?.kind === "present"
+      ? vm.analysisStatusV0_1
+      : null;
+
   React.useEffect(() => {
     if (primaryNullStatus) {
       setActiveSection("overview");
@@ -487,6 +493,11 @@ export function InstrumentPanel(props: Props) {
               {primaryNullStatus ? (
                 <AnalysisStatusCardV0_1
                   status={primaryNullStatus}
+                />
+              ) : primaryAnalysisStatus ? (
+                <AnalysisStatusCardV0_1
+                  status={primaryAnalysisStatus}
+                  variant="primary"
                 />
               ) : null}
 
