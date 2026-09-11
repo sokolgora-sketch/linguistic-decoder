@@ -1,0 +1,210 @@
+{
+  "schemaVersion": "open-instrument.petro-zheji-interview-terminology-glossary.v0.1",
+  "status": "INTERVIEW_GROUNDED_BOOK_PAGE_PENDING",
+  "parentMilestone": "PETRO_ZHEJI_PRIMARY_SOURCE_AND_SYMBOLIC_ALGORITHM_FIDELITY_BASELINE_V0_1",
+  "sourceId": "pz-primary-interview-gjata-mapo-2013-v0.1",
+  "sourceClass": "PETRO_ZHEJI_PRIMARY_INTERVIEW",
+  "citationStability": "DIGITAL_LOCATION_ONLY",
+  "completeAlgorithmSpecification": false,
+  "petroZhejiDirectPromotion": false,
+  "claimBoundary": "This glossary records only bounded terminology and source-attributed statements from the reviewed MAPO interview. It is not page-stable book evidence, a complete Symbolic Algorithm specification, or runtime attribution.",
+  "entries": [
+    {
+      "termId": "PZ-INTERVIEW-GLOSSARY-AS-001",
+      "originalTerm": "Algoritmi Simbolik",
+      "normalizedLabel": "Algoritmi Simbolik",
+      "language": "Albanian",
+      "sourceId": "pz-primary-interview-gjata-mapo-2013-v0.1",
+      "sourceClass": "PETRO_ZHEJI_PRIMARY_INTERVIEW",
+      "sourceLocation": "MAPO interview Q&A after the interview heading",
+      "citationStability": "DIGITAL_LOCATION_ONLY",
+      "evidenceStatus": "INTERVIEW_GROUNDED_BOOK_PAGE_PENDING",
+      "directStatementStatus": "DIRECT_INTERVIEW_STATEMENT",
+      "boundedDefinition": "The interview presents Algoritmi Simbolik as the mathematics or inner mathematics of the symbol and connects it with universal symbolic structures.",
+      "englishExplanation": "This is a source-attributed description of the term, not a reconstruction of a complete algorithm.",
+      "claimBoundary": {
+        "fact": "The MAPO interview attributes this description to Petro Zheji.",
+        "inference": "The statement points to a symbolic-mathematical account of symbols.",
+        "unknown": [
+          "Whether his published books define the term identically.",
+          "Whether the interview provides a complete formal algorithm specification.",
+          "Whether the complete method has additional steps, operands, or constraints.",
+          "Whether any current Open Instrument runtime implements it faithfully."
+        ]
+      },
+      "bookPageVerificationStatus": "BOOK_PAGE_VERIFICATION_PENDING",
+      "runtimeEquivalenceStatus": "NOT_ESTABLISHED",
+      "notes": [
+        "No pseudo-code, formal grammar, or complete algorithm is stored."
+      ]
+    },
+    {
+      "termId": "PZ-INTERVIEW-GLOSSARY-E-001",
+      "originalTerm": "Kodi E",
+      "normalizedLabel": "Kodi E",
+      "language": "Albanian",
+      "sourceId": "pz-primary-interview-gjata-mapo-2013-v0.1",
+      "sourceClass": "PETRO_ZHEJI_PRIMARY_INTERVIEW",
+      "sourceLocation": "MAPO answer explaining the included third",
+      "citationStability": "DIGITAL_LOCATION_ONLY",
+      "evidenceStatus": "INTERVIEW_GROUNDED_BOOK_PAGE_PENDING",
+      "directStatementStatus": "DIRECT_INTERVIEW_STATEMENT",
+      "boundedDefinition": "The interview identifies Kodi E with the included third and associates it with a supreme or mystical centre.",
+      "englishExplanation": "The interview relates Code E to an included-third concept without defining a complete formal operator.",
+      "claimBoundary": {
+        "fact": "The MAPO interview attributes this relationship between Kodi E and the included third to Petro Zheji.",
+        "inference": "Code E is presented as part of the interview's included-third explanation.",
+        "unknown": [
+          "Whether the published books give a fuller or different definition.",
+          "What formal inputs, outputs, or transitions the code has.",
+          "Whether current Open Instrument Code E fields are equivalent to the interview concept."
+        ]
+      },
+      "bookPageVerificationStatus": "BOOK_PAGE_VERIFICATION_PENDING",
+      "runtimeEquivalenceStatus": "NOT_ESTABLISHED",
+      "notes": [
+        "No algebraic identity or runtime mapping is asserted."
+      ]
+    },
+    {
+      "termId": "PZ-INTERVIEW-GLOSSARY-F-001",
+      "originalTerm": "Kodi F",
+      "normalizedLabel": "Kodi F",
+      "language": "Albanian",
+      "sourceId": "pz-primary-interview-gjata-mapo-2013-v0.1",
+      "sourceClass": "PETRO_ZHEJI_PRIMARY_INTERVIEW",
+      "sourceLocation": "MAPO answer explaining the excluded third",
+      "citationStability": "DIGITAL_LOCATION_ONLY",
+      "evidenceStatus": "INTERVIEW_GROUNDED_BOOK_PAGE_PENDING",
+      "directStatementStatus": "DIRECT_INTERVIEW_STATEMENT",
+      "boundedDefinition": "The interview identifies Kodi F with the excluded third and associates it with the material-world or classical-science side of the explanation.",
+      "englishExplanation": "The interview relates Code F to an excluded-third concept without defining a complete formal operator.",
+      "claimBoundary": {
+        "fact": "The MAPO interview attributes this relationship between Kodi F and the excluded third to Petro Zheji.",
+        "inference": "Code F is presented as part of the interview's excluded-third explanation.",
+        "unknown": [
+          "Whether the published books give a fuller or different definition.",
+          "What formal inputs, outputs, or transitions the code has.",
+          "Whether current Open Instrument Code F fields are equivalent to the interview concept."
+        ]
+      },
+      "bookPageVerificationStatus": "BOOK_PAGE_VERIFICATION_PENDING",
+      "runtimeEquivalenceStatus": "NOT_ESTABLISHED",
+      "notes": [
+        "No algebraic identity or runtime mapping is asserted."
+      ]
+    },
+    {
+      "termId": "PZ-INTERVIEW-GLOSSARY-THIRD-INCLUDED-001",
+      "originalTerm": "included third",
+      "normalizedLabel": "Tertium Datur / included third",
+      "language": "Albanian",
+      "sourceId": "pz-primary-interview-gjata-mapo-2013-v0.1",
+      "sourceClass": "PETRO_ZHEJI_PRIMARY_INTERVIEW",
+      "sourceLocation": "MAPO answer contrasting Codes E and F",
+      "citationStability": "DIGITAL_LOCATION_ONLY",
+      "evidenceStatus": "INTERVIEW_GROUNDED_BOOK_PAGE_PENDING",
+      "directStatementStatus": "BOUNDED_INTERVIEW_RELATIONSHIP",
+      "boundedDefinition": "The interview records an included-third side of the contrast and relates it to Kodi E.",
+      "englishExplanation": "Tertium Datur is used here as a normalized label for the included-third concept, not as a claimed quoted Latin term from the interview.",
+      "claimBoundary": {
+        "fact": "The interview contrasts an included third with an excluded third and relates the included side to Kodi E.",
+        "inference": "The included-third label provides a compact description of one side of the interview's Code E/Code F relationship.",
+        "unknown": [
+          "Whether the included/excluded relationship has a formal logical equivalence.",
+          "Whether the Latin label appears in the published books with the same meaning.",
+          "Whether current runtime logic implements this relationship."
+        ]
+      },
+      "bookPageVerificationStatus": "BOOK_PAGE_VERIFICATION_PENDING",
+      "runtimeEquivalenceStatus": "NOT_ESTABLISHED",
+      "notes": [
+        "This entry is a bounded relationship label, not a proof of formal logic equivalence."
+      ]
+    },
+    {
+      "termId": "PZ-INTERVIEW-GLOSSARY-THIRD-EXCLUDED-001",
+      "originalTerm": "excluded third",
+      "normalizedLabel": "Tertium Non Datur / excluded third",
+      "language": "Albanian",
+      "sourceId": "pz-primary-interview-gjata-mapo-2013-v0.1",
+      "sourceClass": "PETRO_ZHEJI_PRIMARY_INTERVIEW",
+      "sourceLocation": "MAPO answer contrasting Codes E and F",
+      "citationStability": "DIGITAL_LOCATION_ONLY",
+      "evidenceStatus": "INTERVIEW_GROUNDED_BOOK_PAGE_PENDING",
+      "directStatementStatus": "BOUNDED_INTERVIEW_RELATIONSHIP",
+      "boundedDefinition": "The interview records an excluded-third side of the contrast and relates it to Kodi F.",
+      "englishExplanation": "Tertium Non Datur is used here as a normalized label for the excluded-third concept, not as a claimed quoted Latin term from the interview.",
+      "claimBoundary": {
+        "fact": "The interview contrasts an included third with an excluded third and relates the excluded side to Kodi F.",
+        "inference": "The excluded-third label provides a compact description of one side of the interview's Code E/Code F relationship.",
+        "unknown": [
+          "Whether the included/excluded relationship has a formal logical equivalence.",
+          "Whether the Latin label appears in the published books with the same meaning.",
+          "Whether current runtime logic implements this relationship."
+        ]
+      },
+      "bookPageVerificationStatus": "BOOK_PAGE_VERIFICATION_PENDING",
+      "runtimeEquivalenceStatus": "NOT_ESTABLISHED",
+      "notes": [
+        "This entry is a bounded relationship label, not a proof of formal logic equivalence."
+      ]
+    },
+    {
+      "termId": "PZ-INTERVIEW-GLOSSARY-EQUATION-001",
+      "originalTerm": "symbolic equations",
+      "normalizedLabel": "Symbolic equation concept",
+      "language": "Albanian",
+      "sourceId": "pz-primary-interview-gjata-mapo-2013-v0.1",
+      "sourceClass": "PETRO_ZHEJI_PRIMARY_INTERVIEW",
+      "sourceLocation": "MAPO discussion of E/F and physical/spiritual relations",
+      "citationStability": "DIGITAL_LOCATION_ONLY",
+      "evidenceStatus": "INTERVIEW_GROUNDED_BOOK_PAGE_PENDING",
+      "directStatementStatus": "DIRECT_INTERVIEW_REFERENCE",
+      "boundedDefinition": "The interview discusses equations and symbolic relations as part of its explanation of the Code E and Code F contrast.",
+      "englishExplanation": "The source supports that symbolic equations are discussed; it does not define their operands, operators, or evaluation rules.",
+      "claimBoundary": {
+        "fact": "The interview presents equations and symbolic relations in its explanation.",
+        "inference": "Equations function as part of the interview's explanatory vocabulary.",
+        "unknown": [
+          "The formal equation grammar.",
+          "The operands, operators, and evaluation rules.",
+          "Whether any repository formula is equivalent to the interview's equations."
+        ]
+      },
+      "bookPageVerificationStatus": "BOOK_PAGE_VERIFICATION_PENDING",
+      "runtimeEquivalenceStatus": "NOT_ESTABLISHED",
+      "notes": [
+        "No equation text or pseudo-code is reconstructed in this glossary."
+      ]
+    },
+    {
+      "termId": "PZ-INTERVIEW-GLOSSARY-CROSS-LANGUAGE-001",
+      "originalTerm": "applicability beyond Albanian",
+      "normalizedLabel": "Applicability beyond Albanian",
+      "language": "Albanian",
+      "sourceId": "pz-primary-interview-gjata-mapo-2013-v0.1",
+      "sourceClass": "PETRO_ZHEJI_PRIMARY_INTERVIEW",
+      "sourceLocation": "MAPO question asking whether the algorithm can exist in other languages",
+      "citationStability": "DIGITAL_LOCATION_ONLY",
+      "evidenceStatus": "INTERVIEW_GROUNDED_BOOK_PAGE_PENDING",
+      "directStatementStatus": "DIRECT_INTERVIEW_STATEMENT",
+      "boundedDefinition": "The interview records an answer that the Symbolic Algorithm can be found in other languages and that sciences can be turned to the Symbolic Algorithm.",
+      "englishExplanation": "This records a source statement about intended applicability, not empirical validation across languages or sciences.",
+      "claimBoundary": {
+        "fact": "The interview attributes a claim of applicability beyond Albanian to Petro Zheji.",
+        "inference": "The statement presents the method as not limited to one language or domain.",
+        "unknown": [
+          "Whether empirical validation exists across languages or sciences.",
+          "The operational criteria for applying the method outside Albanian.",
+          "Whether Open Instrument should implement or test this claim."
+        ]
+      },
+      "bookPageVerificationStatus": "BOOK_PAGE_VERIFICATION_PENDING",
+      "runtimeEquivalenceStatus": "NOT_ESTABLISHED",
+      "notes": [
+        "Applicability is recorded as a source statement only; no scientific validation is implied."
+      ]
+    }
+  ]
+}
