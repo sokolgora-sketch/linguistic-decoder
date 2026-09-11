@@ -255,7 +255,7 @@
     },
     {
       "sourceId": "pz-primary-interview-gjata-mapo-2013-v0.1",
-      "workId": "pz-work-libri-i-aforizmave",
+      "workId": "pz-work-interview-gjata-mapo-2013",
       "canonicalTitle": "Petro Zheji, njeriu i veprave të mëdha, i sëmurë dhe i harruar nga akademikët",
       "originalLanguageTitle": "Petro Zheji, njeriu i veprave të mëdha, i sëmurë dhe i harruar nga akademikët",
       "author": "Ermira Gjata",
@@ -288,9 +288,9 @@
         "This is a public interview publication, not a book-edition record; printed pagination and edition identity do not apply.",
         "Radi & Radi is retained as a corroborating republication of the interview, not as independent Petro Zheji testimony."
       ],
-      "editionSelectionRole": "UNDECIDED",
+      "editionSelectionRole": "REJECTED_FOR_BASELINE",
       "editionSelectionRoles": [
-        "UNDECIDED"
+        "REJECTED_FOR_BASELINE"
       ],
       "editionSelectionReason": "The interview is attributable primary evidence but is not eligible as a book-edition fidelity baseline.",
       "existingOpenInstrumentCitationRefs": [
@@ -404,16 +404,16 @@
       ]
     },
     {
-      "workId": "pz-work-libri-i-aforizmave",
+      "workId": "pz-work-interview-gjata-mapo-2013",
       "candidateSourceIds": [
         "pz-primary-interview-gjata-mapo-2013-v0.1"
       ],
       "candidateSourceRoleAssignments": [
         {
           "sourceId": "pz-primary-interview-gjata-mapo-2013-v0.1",
-          "editionSelectionRole": "UNDECIDED",
+          "editionSelectionRole": "REJECTED_FOR_BASELINE",
           "editionSelectionRoles": [
-            "UNDECIDED"
+            "REJECTED_FOR_BASELINE"
           ]
         }
       ],

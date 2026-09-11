@@ -251,13 +251,7 @@ describe(
     });
 
     it("requires every record to contain exactly the 38 accepted fields", () => {
-      for (
-        const record
-        of inventory.records.filter(
-          (candidate: { sourceClass: string }) =>
-            candidate.sourceClass === "EDITION_OR_LIBRARY_METADATA",
-        )
-      ) {
+      for (const record of inventory.records) {
         expect(
           Object.keys(record),
         ).toEqual(
@@ -356,12 +350,16 @@ describe(
         "CONTENT_LOCATED",
       );
 
+      expect(record.workId).toBe(
+        "pz-work-interview-gjata-mapo-2013",
+      );
+
       expect(record.editionSelectionRole).toBe(
-        "UNDECIDED",
+        "REJECTED_FOR_BASELINE",
       );
 
       expect(record.editionSelectionRoles).toEqual([
-        "UNDECIDED",
+        "REJECTED_FOR_BASELINE",
       ]);
 
       expect(record.printedPageSystem).toBeNull();
@@ -472,8 +470,14 @@ describe(
       }
     });
 
-    it("keeps every baseline-selection posture explicitly UNDECIDED", () => {
-      for (const record of inventory.records) {
+    it("keeps book-edition baseline selection posture explicitly UNDECIDED", () => {
+      for (
+        const record
+        of inventory.records.filter(
+          (candidate: { sourceClass: string }) =>
+            candidate.sourceClass === "EDITION_OR_LIBRARY_METADATA",
+        )
+      ) {
         expect(
           record.editionSelectionRole,
         ).toBe(
