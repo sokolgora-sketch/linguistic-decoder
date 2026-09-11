@@ -20,6 +20,7 @@ import {
 
 const reviewedRow = getReviewedExternalLexiconProductionSourceRowsV0_1().find(
   (row) =>
+    row.candidateId === "albanian-di-know-functional" &&
     row.sourceStatus === "reviewed_accepted" &&
     row.externalCitations.some((citation) =>
       /^https?:\/\//i.test(citation.sourceUrlOrArchiveRef ?? ""),
@@ -65,6 +66,7 @@ describe("Open Instrument evidence navigation v0.1", () => {
       <CandidatesAccordion
         rows={[
           candidateRow({
+            id: reviewedRow.candidateId,
             sourceKind: "reviewed_dictionary_source",
             sourceId: reviewedRow.sourceId,
             sourceStatus: "reviewed_accepted",

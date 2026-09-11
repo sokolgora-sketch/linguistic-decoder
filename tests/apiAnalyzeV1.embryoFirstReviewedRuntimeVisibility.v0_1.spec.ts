@@ -124,6 +124,13 @@ describe(
       expect(candidate.sourceKind).toBe(
         "reviewed_dictionary_source",
       );
+      expect(candidate.sourceId).toBe(
+        "reviewed.external.di.knowledge.candidate.v0_1",
+      );
+      expect(candidate.sourceStatus).toBe("reviewed_accepted");
+      expect(candidate.evidenceRefs).toEqual([
+        "reviewed.external.di.knowledge.candidate.citation.v0_1",
+      ]);
       expect(candidate.claimType).toBe(
         "functionalMotivation",
       );
