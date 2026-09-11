@@ -468,7 +468,7 @@ describe("reproducible run bundle UI handoff v0.1", () => {
 
     await screen.findByTestId("open-instrument-shell");
     fireEvent.click(screen.getByRole("tab", { name: "Candidates" }));
-    fireEvent.click(screen.getByText("Other candidate records"));
+    fireEvent.click(screen.getByText("All candidate records"));
     expect(screen.getByText("study-embryo")).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("tab", { name: "Roots / Meaning" }));

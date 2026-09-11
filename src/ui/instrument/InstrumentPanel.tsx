@@ -536,7 +536,7 @@ export function InstrumentPanel(props: Props) {
               {candidateRows ? (
                 <details className="rounded-xl border border-[#303a45] bg-[#10151c]">
                   <summary className="cursor-pointer list-none px-4 py-3 text-sm font-semibold text-[#c6d0dc] [&::-webkit-details-marker]:hidden">
-                    Other candidate records
+                    All candidate records
                   </summary>
 
                   <div className="border-t border-[#303a45] p-4">
