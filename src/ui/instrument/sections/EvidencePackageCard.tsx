@@ -52,7 +52,15 @@ export function EvidencePackageCard(props: Props) {
         <div className="rounded-[10px] border border-[#27313d] bg-[#0d1117] p-3">
           <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#8ea4ba]">JSON audit bundle</div>
           <div className="mt-2 text-xs leading-5 text-[#aeb7c5]">
-            Copies the structured evidence package for audit and reproducible inspection.
+            Copy and download use separate JSON formats for compatibility and durable local handoff.
+          </div>
+          <div className="mt-2 space-y-1 text-[11px] leading-4 text-[#8ea4ba]">
+            <div>
+              Copy: compatibility clipboard JSON · <span className="font-mono">evidence_package.v0.1</span>
+            </div>
+            <div>
+              Download: durable validated JSON · <span className="font-mono">open-instrument.evidence-package-export.v0.1</span>
+            </div>
           </div>
           <button
             type="button"
