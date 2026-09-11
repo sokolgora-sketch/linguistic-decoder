@@ -216,9 +216,9 @@ describe(
       );
     });
 
-    it("contains exactly four first real inventory records across two works", () => {
+    it("contains exactly five first real inventory records across three works", () => {
       expect(inventory.records).toHaveLength(
-        4,
+        5,
       );
 
       const sourceIds = inventory.records.map(
@@ -240,13 +240,13 @@ describe(
           ),
         ).size,
       ).toBe(
-        2,
+        3,
       );
 
       expect(
         inventory.status,
       ).toBe(
-        "ACTIVE_PARTIAL_METADATA_ONLY",
+        "ACTIVE_PARTIAL_WITH_INTERVIEW_EVIDENCE",
       );
     });
 
@@ -280,7 +280,13 @@ describe(
         ],
       ]);
 
-      for (const record of inventory.records) {
+      for (
+        const record
+        of inventory.records.filter(
+          (candidate: { sourceClass: string }) =>
+            candidate.sourceClass === "EDITION_OR_LIBRARY_METADATA",
+        )
+      ) {
         expect(
           record.sourceClass,
         ).toBe(
@@ -311,7 +317,86 @@ describe(
       expect(
         inventory.claimBoundary,
       ).toContain(
-        "not verified primary-text records",
+        "not page-stable book records",
+      );
+    });
+
+    it("records the attributable MAPO interview without book-level promotion", () => {
+      const record = inventory.records.find(
+        (candidate: { sourceId: string }) =>
+          candidate.sourceId
+          === "pz-primary-interview-gjata-mapo-2013-v0.1",
+      );
+
+      expect(record).toBeDefined();
+
+      expect(record.sourceClass).toBe(
+        "PETRO_ZHEJI_PRIMARY_INTERVIEW",
+      );
+
+      expect(record.sourceAccessStatus).toBe(
+        "ACCESSIBLE_UNVERIFIED_EDITION",
+      );
+
+      expect(record.editionIdentityStatus).toBe(
+        "UNKNOWN",
+      );
+
+      expect(record.citationStability).toBe(
+        "DIGITAL_LOCATION_ONLY",
+      );
+
+      expect(record.verificationStatus).toBe(
+        "CONTENT_LOCATED",
+      );
+
+      expect(record.workId).toBe(
+        "pz-work-interview-gjata-mapo-2013",
+      );
+
+      expect(record.editionSelectionRole).toBe(
+        "REJECTED_FOR_BASELINE",
+      );
+
+      expect(record.editionSelectionRoles).toEqual([
+        "REJECTED_FOR_BASELINE",
+      ]);
+
+      expect(record.printedPageSystem).toBeNull();
+      expect(record.digitalPageSystem).toBeNull();
+      expect(record.totalPages).toBeNull();
+      expect(record.volume).toBeNull();
+      expect(record.isbnOrCatalogueId).toBeNull();
+      expect(record.provenanceNotes).toContain(
+        "pz-evidence-mapo-gjata-zheji-interview-2013-01-21",
+      );
+      expect(record.provenanceNotes).toContain(
+        "pz-evidence-radiandradi-gjata-zheji-republication-2025-07-24",
+      );
+      expect(record.existingOpenInstrumentCitationRefs).toContain(
+        "docs/open-instrument/reports/petro-zheji-public-primary-interview-evidence-v0.1.md",
+      );
+      expect(record.blockers).toContain(
+        "PAGINATION_NOT_VERIFIED",
+      );
+
+      expect(record.contentRelevance).toContain(
+        "Algoritmi Simbolik",
+      );
+
+      expect(record.contentRelevance).toContain(
+        "Kodi E",
+      );
+
+      expect(record.contentRelevance).toContain(
+        "Kodi F",
+      );
+
+      expect(JSON.stringify(record)).not.toContain(
+        "PAGE_STABLE",
+      );
+      expect(JSON.stringify(record)).not.toContain(
+        "FIDELITY_BASELINE_SELECTED",
       );
     });
 
@@ -385,8 +470,14 @@ describe(
       }
     });
 
-    it("keeps every baseline-selection posture explicitly UNDECIDED", () => {
-      for (const record of inventory.records) {
+    it("keeps book-edition baseline selection posture explicitly UNDECIDED", () => {
+      for (
+        const record
+        of inventory.records.filter(
+          (candidate: { sourceClass: string }) =>
+            candidate.sourceClass === "EDITION_OR_LIBRARY_METADATA",
+        )
+      ) {
         expect(
           record.editionSelectionRole,
         ).toBe(
@@ -768,7 +859,7 @@ describe(
       expect(
         inventory.provenanceEvidence,
       ).toHaveLength(
-        13,
+        15,
       );
 
       const evidenceIds = inventory.provenanceEvidence.map(
@@ -848,7 +939,7 @@ describe(
       expect(
         inventory.perWorkEditionSelectionDecisions,
       ).toHaveLength(
-        2,
+        3,
       );
 
       const representedWorkIds = [

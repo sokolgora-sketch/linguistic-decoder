@@ -1,10 +1,10 @@
 {
   "inventoryId": "PETRO_ZHEJI_PRIMARY_SOURCE_INVENTORY_V0_1",
-  "status": "ACTIVE_PARTIAL_METADATA_ONLY",
+  "status": "ACTIVE_PARTIAL_WITH_INTERVIEW_EVIDENCE",
   "lane": "CONSTRUCT_PETRO_ZHEJI_PRIMARY_SOURCE_INVENTORY_V0_1",
   "constructedAt": "2026-08-07",
   "governingProductMain": "c3c1dcd428833d99233801304eaff2b6cc9dcd4a",
-  "claimBoundary": "These are source-inventory metadata records, not verified primary-text records and not Symbolic Algorithm evidence.",
+  "claimBoundary": "These records combine bounded source-inventory metadata with one attributable primary-interview record; they are not page-stable book records, complete Symbolic Algorithm evidence, or runtime attribution.",
   "records": [
     {
       "sourceId": "pz-meta-shqipja-sanskritishtja-1996-v0.1",
@@ -252,6 +252,60 @@
         "CONFLICTING_PUBLICATION_METADATA",
         "PASSAGE_NOT_LOCATED"
       ]
+    },
+    {
+      "sourceId": "pz-primary-interview-gjata-mapo-2013-v0.1",
+      "workId": "pz-work-interview-gjata-mapo-2013",
+      "canonicalTitle": "Petro Zheji, njeriu i veprave të mëdha, i sëmurë dhe i harruar nga akademikët",
+      "originalLanguageTitle": "Petro Zheji, njeriu i veprave të mëdha, i sëmurë dhe i harruar nga akademikët",
+      "author": "Ermira Gjata",
+      "workType": "INTERVIEW",
+      "sourceClass": "PETRO_ZHEJI_PRIMARY_INTERVIEW",
+      "publisher": "MAPO",
+      "publicationYear": 2013,
+      "editionStatement": null,
+      "editionNumber": null,
+      "editionIdentityStatus": "UNKNOWN",
+      "volume": null,
+      "isbnOrCatalogueId": null,
+      "totalPages": null,
+      "printedPageSystem": null,
+      "digitalPageSystem": null,
+      "language": "Albanian",
+      "physicalCopyStatus": null,
+      "scanStatus": null,
+      "sourceAccessStatus": "ACCESSIBLE_UNVERIFIED_EDITION",
+      "sourceAccessOwner": "MAPO public web archive",
+      "sourceLocationClass": "OPEN_WEB_SECONDARY_SOURCE",
+      "provenanceNotes": [
+        "pz-evidence-mapo-gjata-zheji-interview-2013-01-21",
+        "pz-evidence-radiandradi-gjata-zheji-republication-2025-07-24"
+      ],
+      "citationStability": "DIGITAL_LOCATION_ONLY",
+      "quotationAvailability": "Bounded paraphrase and short term references only; no full article is stored.",
+      "legalUseNotes": "The public MAPO interview page was inspected. The repository stores provenance, digital locators, and bounded paraphrase only; no full copyrighted article or long quotation is stored.",
+      "knownEditionDifferences": [
+        "This is a public interview publication, not a book-edition record; printed pagination and edition identity do not apply.",
+        "Radi & Radi is retained as a corroborating republication of the interview, not as independent Petro Zheji testimony."
+      ],
+      "editionSelectionRole": "REJECTED_FOR_BASELINE",
+      "editionSelectionRoles": [
+        "REJECTED_FOR_BASELINE"
+      ],
+      "editionSelectionReason": "The interview is attributable primary evidence but is not eligible as a book-edition fidelity baseline.",
+      "existingOpenInstrumentCitationRefs": [
+        "docs/open-instrument/reports/petro-zheji-primary-source-and-symbolic-algorithm-fidelity-baseline-v0.1.md",
+        "docs/open-instrument/reports/petro-zheji-primary-source-inventory-and-edition-policy-design-v0.2.md",
+        "docs/open-instrument/reports/petro-zheji-public-primary-interview-evidence-v0.1.md"
+      ],
+      "unresolvedEditionConflicts": [],
+      "contentRelevance": "Attributable interview evidence for bounded terminology and first-person statements about Algoritmi Simbolik, Kodi E, Kodi F, the included third, symbolic equations, and applicability beyond Albanian; it does not establish book-level fidelity.",
+      "verificationStatus": "CONTENT_LOCATED",
+      "reviewer": "Open Instrument public-source evidence review v0.1",
+      "reviewedAt": "2026-09-11",
+      "blockers": [
+        "PAGINATION_NOT_VERIFIED"
+      ]
     }
   ],
   "perWorkEditionSelectionDecisions": [
@@ -347,6 +401,40 @@
         "EXACT_EDITION_NOT_VERIFIED",
         "PAGINATION_NOT_VERIFIED",
         "CONFLICTING_PUBLICATION_METADATA"
+      ]
+    },
+    {
+      "workId": "pz-work-interview-gjata-mapo-2013",
+      "candidateSourceIds": [
+        "pz-primary-interview-gjata-mapo-2013-v0.1"
+      ],
+      "candidateSourceRoleAssignments": [
+        {
+          "sourceId": "pz-primary-interview-gjata-mapo-2013-v0.1",
+          "editionSelectionRole": "REJECTED_FOR_BASELINE",
+          "editionSelectionRoles": [
+            "REJECTED_FOR_BASELINE"
+          ]
+        }
+      ],
+      "selectedSourceId": null,
+      "selectionDecisionStatus": "DECISION_BLOCKED",
+      "selectionReason": "This interview is attributable primary evidence but is not a book edition and cannot be selected as the fidelity baseline.",
+      "existingOpenInstrumentCitationRefs": [
+        "docs/open-instrument/reports/petro-zheji-primary-source-and-symbolic-algorithm-fidelity-baseline-v0.1.md",
+        "docs/open-instrument/reports/petro-zheji-public-primary-interview-evidence-v0.1.md"
+      ],
+      "knownEditionDifferences": [
+        "Public interview publication has no book edition, volume, or printed pagination.",
+        "Radi & Radi is a corroborating republication, not an independent testimony record."
+      ],
+      "unresolvedEditionConflicts": [
+        "Book-edition fidelity selection does not apply to this interview record."
+      ],
+      "reviewer": "Open Instrument public-source evidence review v0.1",
+      "reviewedAt": "2026-09-11",
+      "blockers": [
+        "PAGINATION_NOT_VERIFIED"
       ]
     }
   ],
@@ -515,6 +603,31 @@
         "Catalogue contents note includes 'Një parashtrim i shkurtër i algoritmit simbolik'.",
         "Catalogue note identifies index pages [915]-[928].",
         "The physical holdings have not been inspected by Open Instrument."
+      ]
+    },
+    {
+      "evidenceId": "pz-evidence-mapo-gjata-zheji-interview-2013-01-21",
+      "sourceName": "MAPO public web archive",
+      "catalogueRecordId": "https://mapo.al/68f76371d74ca-petro-zheji-njeriu-i-veprave-te-medha-i-semure-dhe-i-harruar-nga-akademiket",
+      "observedFacts": [
+        "Publication title: Petro Zheji, njeriu i veprave të mëdha, i sëmurë dhe i harruar nga akademikët.",
+        "Publication date: 21 January 2013.",
+        "Byline: Ermira Gjata; MAPO page labels the text and introduces a direct interview with Petro Zheji.",
+        "The page contains explicitly attributed first-person answers concerning Algoritmi Simbolik, Kodi E, Kodi F, the included third, symbolic equations, and applicability beyond Albanian.",
+        "Stable digital location is available; no printed page system or book-edition identity is established.",
+        "Only bounded provenance and paraphrase are retained in this repository; the article is not archived in full."
+      ]
+    },
+    {
+      "evidenceId": "pz-evidence-radiandradi-gjata-zheji-republication-2025-07-24",
+      "sourceName": "Radi & Radi public web archive",
+      "catalogueRecordId": "https://www.radiandradi.com/universi-ne-aforizma-nga-ermira-gjata-petro-zheji-njeriu-i-veprave-te-medha/",
+      "observedFacts": [
+        "Publication title: Universi në Aforizma – nga Ermira Gjata – Petro Zheji, Njeriu i Veprave të Mëdha.",
+        "Publication date: 24 July 2025.",
+        "The page attributes the text to Ermira Gjata and reproduces the MAPO interview content, including the Code E/Code F and cross-language/science passages.",
+        "Radi & Radi is treated as a corroborating republication of the MAPO interview, not as independent Petro Zheji testimony.",
+        "Stable digital location is available; no printed page system or book-edition identity is established."
       ]
     }
   ]
