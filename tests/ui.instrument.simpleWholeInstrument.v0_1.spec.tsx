@@ -111,7 +111,7 @@ describe(
     );
 
     it(
-      "keeps candidate records collapsed and supported DA primary",
+      "keeps all candidate records collapsed and preserves the complete candidate list",
       async () => {
         const body =
           await analyze("damage");
@@ -149,7 +149,7 @@ describe(
           within(
             candidatesPanel,
           ).getByText(
-            "Other candidate records",
+            "All candidate records",
           );
 
         expect(
@@ -159,6 +159,34 @@ describe(
         ).not.toHaveAttribute(
           "open",
         );
+
+        fireEvent.click(summary);
+
+        expect(
+          summary.closest(
+            "details",
+          ),
+        ).toHaveAttribute(
+          "open",
+        );
+
+        expect(
+          within(
+            candidatesPanel,
+          ).getByText(
+            `${body.candidates.length} emitted`,
+          ),
+        ).toBeVisible();
+
+        for (const candidate of body.candidates) {
+          expect(
+            within(
+              candidatesPanel,
+            ).getByText(
+              candidate.form,
+            ),
+          ).toBeInTheDocument();
+        }
       },
     );
 
