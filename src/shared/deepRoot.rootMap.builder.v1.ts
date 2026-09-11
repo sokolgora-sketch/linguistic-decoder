@@ -207,6 +207,7 @@ type ReviewedFunctionalRuntimeEvidenceV0_1 = {
   sourceId: string;
   embryo: string;
   language: string;
+  evidenceRefs: string[];
   evidenceText: string;
 };
 
@@ -380,6 +381,7 @@ function buildReviewedFunctionalRuntimeEvidenceByEmbryoV0_1(): ReadonlyMap<
         sourceId: projection.sourceId,
         embryo: projection.embryo,
         language: row.candidateLanguage,
+        evidenceRefs: projection.evidenceRefs,
         evidenceText:
           `reviewed functional free-operator evidence: ${projection.evidenceText}; historicalOriginClaim=${projection.claimBoundary.historicalOriginClaim}; winnerClaim=${projection.claimBoundary.winnerClaim}; languageSuperiorityClaim=${projection.claimBoundary.languageSuperiorityClaim}; userDecisionPosture=${projection.claimBoundary.userDecisionPosture}`,
       },
@@ -727,6 +729,9 @@ export function buildReviewedFunctionalCandidateProjectionsFromRootMapV0_1(
       sourceId: row.sourceId,
       sourceKind: row.sourceKind,
       sourceStatus: row.sourceStatus,
+      evidenceRefs: [
+        ...(authorizedEvidenceByEmbryo.get(row.embryo)?.evidenceRefs ?? []),
+      ],
 
       candidateId: row.candidateId,
       displayForm: row.displayForm,

@@ -8,6 +8,7 @@ export type ReviewedExternalLexiconRuntimeProjectionV0_1 = {
   candidateId: string;
   embryo: string;
   isolatedStandaloneForm: string;
+  evidenceRefs: string[];
   evidenceText: string;
   claimBoundary: {
     historicalOriginClaim: "not_claimed";
@@ -68,6 +69,20 @@ export function projectReviewedExternalLexiconProductionRowForRuntimeV0_1(
   const citation = firstCitation(row);
   if (!citation || citation.citationStatus !== "reviewed_accepted") return null;
 
+  const evidenceRefs = row.externalCitations.map((candidate) =>
+    text(candidate.citationId),
+  );
+
+  if (
+    evidenceRefs.length === 0 ||
+    evidenceRefs.some((ref) => !ref) ||
+    row.externalCitations.some(
+      (candidate) => candidate.citationStatus !== "reviewed_accepted",
+    )
+  ) {
+    return null;
+  }
+
   const label = sourceLabel(citation);
   const locator = text(citation.entryLocator);
   const sourceRef = text(citation.sourceUrlOrArchiveRef);
@@ -84,6 +99,7 @@ export function projectReviewedExternalLexiconProductionRowForRuntimeV0_1(
     candidateId: row.candidateId,
     embryo: row.embryo,
     isolatedStandaloneForm: form,
+    evidenceRefs,
     evidenceText: `${label}, ${locator}: ${attestedForm} = ${attestedGloss}. ${sourceRef}`,
     claimBoundary: {
       historicalOriginClaim: "not_claimed",

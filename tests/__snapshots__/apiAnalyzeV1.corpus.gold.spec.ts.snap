@@ -2192,6 +2192,9 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         "embryo": "DA",
         "embryoLanguage": "sq",
         "embryoSize": 2,
+        "evidenceRefs": [
+          "reviewed.external.gheg-da.damage.candidate.citation.v0_1",
+        ],
         "expansionChain": [
           "DA",
           "DAMAGE",
@@ -2797,6 +2800,9 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
           "embryo": "DA",
           "embryoLanguage": "sq",
           "embryoSize": 2,
+          "evidenceRefs": [
+            "reviewed.external.gheg-da.damage.candidate.citation.v0_1",
+          ],
           "expansionChain": [
             "DA",
             "DAMAGE",
@@ -4376,6 +4382,9 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         "embryo": "AT",
         "embryoLanguage": "sq",
         "embryoSize": 2,
+        "evidenceRefs": [
+          "reviewed.external.albanian-at.father.citation.v0_1",
+        ],
         "expansionChain": [
           "AT",
           "FATHER",
@@ -4973,6 +4982,9 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
           "embryo": "AT",
           "embryoLanguage": "sq",
           "embryoSize": 2,
+          "evidenceRefs": [
+            "reviewed.external.albanian-at.father.citation.v0_1",
+          ],
           "expansionChain": [
             "AT",
             "FATHER",
@@ -13998,6 +14010,9 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         "embryo": "DI",
         "embryoLanguage": "sq",
         "embryoSize": 2,
+        "evidenceRefs": [
+          "reviewed.external.di.knowledge.candidate.citation.v0_1",
+        ],
         "expansionChain": [
           "DI",
           "STUDY",
@@ -14788,6 +14803,9 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
           "embryo": "DI",
           "embryoLanguage": "sq",
           "embryoSize": 2,
+          "evidenceRefs": [
+            "reviewed.external.di.knowledge.candidate.citation.v0_1",
+          ],
           "expansionChain": [
             "DI",
             "STUDY",

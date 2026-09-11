@@ -75,6 +75,9 @@ describe("reviewed external lexicon runtime projection contract v0.1", () => {
       candidateId: "albanian-di-know-functional",
       embryo: "DI",
       isolatedStandaloneForm: "di",
+      evidenceRefs: [
+        "reviewed.external.di.knowledge.candidate.citation.v0_1",
+      ],
       claimBoundary: {
         historicalOriginClaim: "not_claimed",
         winnerClaim: "not_claimed",
@@ -99,6 +102,61 @@ describe("reviewed external lexicon runtime projection contract v0.1", () => {
     expect(projection?.evidenceText).not.toContain(
       "Direct DPEWA/FGJSH locator",
     );
+  });
+
+  it("preserves every reviewed citation identity in stable order", () => {
+    const diRow =
+      reviewedExternalLexiconSourceRowCandidateRegistryV0_1.find(
+        (row) =>
+          row.sourceId ===
+          "reviewed.external.di.knowledge.candidate.v0_1",
+      );
+
+    expect(diRow).toBeDefined();
+
+    const secondCitation = {
+      ...diRow!.externalCitations[0],
+      citationId:
+        "reviewed.external.di.knowledge.candidate.citation.v0_1.second",
+    };
+
+    const projection =
+      projectReviewedExternalLexiconProductionRowForRuntimeV0_1({
+        ...diRow!,
+        externalCitations: [
+          diRow!.externalCitations[0],
+          secondCitation,
+        ],
+      });
+
+    expect(projection?.evidenceRefs).toEqual([
+      diRow!.externalCitations[0].citationId,
+      secondCitation.citationId,
+    ]);
+  });
+
+  it("fails closed when a reviewed citation has no identity", () => {
+    const diRow =
+      reviewedExternalLexiconSourceRowCandidateRegistryV0_1.find(
+        (row) =>
+          row.sourceId ===
+          "reviewed.external.di.knowledge.candidate.v0_1",
+      );
+
+    expect(diRow).toBeDefined();
+
+    const projection =
+      projectReviewedExternalLexiconProductionRowForRuntimeV0_1({
+        ...diRow!,
+        externalCitations: [
+          {
+            ...diRow!.externalCitations[0],
+            citationId: "",
+          },
+        ],
+      });
+
+    expect(projection).toBeNull();
   });
 
   it("keeps projection mediated through the RootMap builder rather than routes or UI adapters", () => {
