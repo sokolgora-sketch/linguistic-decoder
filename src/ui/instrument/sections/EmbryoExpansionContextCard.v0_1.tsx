@@ -503,8 +503,10 @@ function NoSupportedFunctionalCandidate({
 
 export function EmbryoExpansionContextCardV0_1({
   vm,
+  onViewCandidateRecord,
 }: {
   vm: TelemetryViewModel;
+  onViewCandidateRecord?: (candidateId: string) => void;
 }) {
   const rootMap =
     vm.rootMap?.kind === "present"
@@ -1098,10 +1100,22 @@ export function EmbryoExpansionContextCardV0_1({
           </div>
         </div>
 
-        <div className="shrink-0 rounded-full border border-amber-400/50 bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-900 dark:bg-amber-500/10 dark:text-amber-100">
-          {isResearchFunctionalCandidate
-            ? "Research hypothesis"
-            : `Evidence: ${evidenceStatus}`}
+        <div className="flex shrink-0 flex-col items-start gap-2 sm:items-end">
+          <div className="rounded-full border border-amber-400/50 bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-900 dark:bg-amber-500/10 dark:text-amber-100">
+            {isResearchFunctionalCandidate
+              ? "Research hypothesis"
+              : `Evidence: ${evidenceStatus}`}
+          </div>
+
+          {onViewCandidateRecord && primaryCandidate.id.trim() ? (
+            <button
+              type="button"
+              className="rounded-md border border-slate-400/70 bg-white/70 px-3 py-1.5 text-xs font-semibold text-slate-800 transition hover:border-slate-500 hover:bg-white dark:border-slate-600 dark:bg-slate-900/70 dark:text-slate-100 dark:hover:border-slate-400 dark:hover:bg-slate-900"
+              onClick={() => onViewCandidateRecord(primaryCandidate.id)}
+            >
+              View candidate record
+            </button>
+          ) : null}
         </div>
       </div>
 
