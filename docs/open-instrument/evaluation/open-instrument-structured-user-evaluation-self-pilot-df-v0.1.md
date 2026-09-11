@@ -25,7 +25,8 @@ evaluation passed.
 | Field | Value |
 | --- | --- |
 | Pilot identifier | `SELF_PILOT_DF` |
-| Product commit tested | `89fe60edbad8869ace23fe840a79593670959ad1` |
+| Original scored pilot commit | `a854a388f20ea7befc4714f5769da52e0490d0eb` |
+| Post-fix T5 verification commit | `89fe60edbad8869ace23fe840a79593670959ad1` |
 | Moderator context | Product builder/operator |
 | Evaluation mode | Moderator-guided local deterministic `/chat` run |
 | Official participant count | `0` |
@@ -49,14 +50,14 @@ score is intentionally preserved even though the defect was fixed afterward.
 | T5 | `study` / evidence navigation | 1 | 2 | 2 | NO | NO | PRODUCT_DEFECT | Original pilot found `EVIDENCE_REFS_PROJECTION_MISSING`: reviewed DI citation identity was resolvable in the repository but absent from live candidate `evidenceRefs`. Major navigation/discoverability issue. |
 | T6 | Evidence Package | 1 | 2 | 2 | NO | NO | NON_ACTIONABLE | Initial answer partially blurred the VM-derived audit/handoff export with the reopenable Reproducible Run Bundle. One observation does not authorize a product change. |
 | T7 | Reproducible Run Bundle reopen | 2 | 2 | 2 | NO | NO | NON_ACTIONABLE | Successfully reopened a local snapshot and correctly identified that no fresh analysis ran. |
-| T8 | Imported snapshot provenance | 2 | 2 | 2 | YES | NO | NON_ACTIONABLE | Correctly identified imported state and bounded the fingerprint as bundle identity/integrity correspondence, not analytical or linguistic truth. Moderator provided the exact provenance/metadata location. |
+| T8 | Imported snapshot provenance | 1 | 2 | 2 | YES | NO | NON_ACTIONABLE | Correctly identified imported state and bounded the fingerprint as bundle identity/integrity correspondence, not analytical or linguistic truth. Moderator provided the exact provenance/metadata location. |
 | T9 | Winner/order boundary | 2 | 2 | 2 | NO | NO | NON_ACTIONABLE | Correctly identified ordered candidate presentation without an engine-declared winner; `user_decides` and `no_single_winner` remained intact. |
 
 ## Pilot aggregates
 
 | Measure | Result |
 | --- | --- |
-| CORE | `16/18` (`88.9%`) |
+| CORE | `15/18` (`83.3%`) |
 | BOUNDARY | `18/18` (`100%`) |
 | CONFIDENCE | `18/18` (`100%`) |
 | Assisted tasks | `T8` only |
@@ -79,8 +80,11 @@ CONFIDENCE=2
 ASSISTED=NO
 ```
 
-The defect was subsequently fixed by PR #1904, merged at
-`89fe60edbad8869ace23fe840a79593670959ad1`.
+Original scored pilot commit: `a854a388f20ea7befc4714f5769da52e0490d0eb`.
+
+The defect was subsequently fixed by PR #1904.
+
+Post-fix T5 verification commit: `89fe60edbad8869ace23fe840a79593670959ad1`.
 
 Separate post-fix runtime verification, not a retroactive pilot score, did the
 following:
