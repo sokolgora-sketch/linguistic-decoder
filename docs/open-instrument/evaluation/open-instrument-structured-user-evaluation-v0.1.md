@@ -138,7 +138,7 @@ for v0.1 and must not be made more leading during a session.
 | T6 | C1 | `study` | Evidence Package | Open the Evidence tab and inspect the Evidence Package actions. | What is this package for, and what would you use it for? | It is a VM-derived audit/handoff export; it is not origin proof, a forced answer, or a reopenable analysis snapshot. | Expects the package to restore or reproduce analysis. | 2 distinguishes audit export from reopenable snapshot; 1 identifies export but not the boundary; 0 treats it as the saved analysis. | Evidence Package and RRB are separate artifacts. |
 | T7 | C1 | `study` | Reproducible Run Bundle controls | Download the analysis, then open the saved file through the existing control. | What changed after opening the saved file? | The local snapshot was reopened from the file; import does not mean a fresh analysis was run. | Assumes the file is only a report or assumes import triggered analysis. | 2 identifies reopen and no re-analysis; 1 identifies import without the request distinction; 0 misidentifies the flow. | Reopen is local handoff, not fresh execution. |
 | T8 | C6 | saved `study` bundle | Imported local snapshot | Inspect the provenance label and bundle metadata after import. | Is the visible result current or imported, and what supports your answer? | It is an imported local snapshot; schema and fingerprint identify the saved bundle, not analytical truth. | Calls it current analysis or treats the fingerprint as proof of the claim. | 2 identifies imported state and limits fingerprint meaning; 1 identifies state only; 0 confuses state or truth. | Provenance and integrity are not analytical validation. |
-| T9 | C1 or C2 | `study` or `damage` | Candidate list with user decision posture | Return to candidate records and compare the visible candidates. | Which candidate did the engine select as the one true winner? | No single winner is declared; ordering and presentation do not replace `user_decides`. | Treats the first candidate as an engine-selected winner. | 2 explicitly rejects the premise and states user decision posture; 1 says uncertain; 0 names a winner. | No single winner; user decides. |
+| T9 | C1 or C2 | `study` or `damage` | Candidate list with user decision posture | Return to candidate records and compare the visible candidates. | Does the interface indicate that the engine selected one candidate as the winner? What do you see? | No single winner is declared; ordering and presentation do not replace `user_decides`. | Treats the first candidate as an engine-selected winner. | 2 states that no engine-selected winner is indicated and identifies the user decision posture; 1 says uncertain; 0 names a winner. | No single winner; user decides. |
 
 `TASK_COUNT=9`.
 
@@ -261,6 +261,9 @@ may not explain what Null, research, reviewed, structural, or winner means.
 
 Ask the same neutral probes after each task:
 
+- On a scale from 0 to 2, how confident are you in that answer, and what
+  visible detail supports your confidence? Record the response before further
+  discussion.
 - What made you choose that answer?
 - What, if anything, was difficult to find?
 - What would you want to inspect next?

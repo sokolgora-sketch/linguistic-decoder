@@ -25,6 +25,9 @@ personally identifying information.
   or uncertain, 2 correct and bounded.
 - `CONFIDENCE`: 0 guessing/no confidence, 1 some confidence, 2 confident with
   an articulated basis.
+- Ask this fixed confidence question after every task and record the answer
+  before discussion: "On a scale from 0 to 2, how confident are you in that
+  answer, and what visible detail supports your confidence?"
 - Mark `ASSISTED=YES` whenever the moderator provides a mechanical locator or
   repeats an instruction.
 
