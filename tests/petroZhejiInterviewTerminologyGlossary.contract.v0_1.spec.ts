@@ -13,6 +13,7 @@ type GlossaryEntry = {
   originalTerm: string;
   normalizedLabel: string;
   language: string;
+  sourceTermStatus: "SOURCE_LANGUAGE_TERM" | "ENGLISH_CONCEPTUAL_LABEL";
   sourceId: string;
   sourceClass: string;
   sourceLocation: string;
@@ -186,6 +187,23 @@ describe("Petro Zheji interview terminology glossary v0.1", () => {
     expect(excluded.claimBoundary.unknown.join(" ")).toContain(
       "formal logical equivalence",
     );
+  });
+
+  it("does not present English conceptual labels as source-language terms", () => {
+    expect(
+      glossary.entries.slice(0, 3).every(
+        (entry) =>
+          entry.sourceTermStatus === "SOURCE_LANGUAGE_TERM" &&
+          entry.language === "Albanian",
+      ),
+    ).toBe(true);
+    expect(
+      glossary.entries.slice(3).every(
+        (entry) =>
+          entry.sourceTermStatus === "ENGLISH_CONCEPTUAL_LABEL" &&
+          entry.language === "English",
+      ),
+    ).toBe(true);
   });
 
   it("records symbolic equations without inventing a grammar", () => {

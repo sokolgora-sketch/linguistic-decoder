@@ -14,6 +14,7 @@
       "originalTerm": "Algoritmi Simbolik",
       "normalizedLabel": "Algoritmi Simbolik",
       "language": "Albanian",
+      "sourceTermStatus": "SOURCE_LANGUAGE_TERM",
       "sourceId": "pz-primary-interview-gjata-mapo-2013-v0.1",
       "sourceClass": "PETRO_ZHEJI_PRIMARY_INTERVIEW",
       "sourceLocation": "MAPO interview Q&A after the interview heading",
@@ -43,6 +44,7 @@
       "originalTerm": "Kodi E",
       "normalizedLabel": "Kodi E",
       "language": "Albanian",
+      "sourceTermStatus": "SOURCE_LANGUAGE_TERM",
       "sourceId": "pz-primary-interview-gjata-mapo-2013-v0.1",
       "sourceClass": "PETRO_ZHEJI_PRIMARY_INTERVIEW",
       "sourceLocation": "MAPO answer explaining the included third",
@@ -71,6 +73,7 @@
       "originalTerm": "Kodi F",
       "normalizedLabel": "Kodi F",
       "language": "Albanian",
+      "sourceTermStatus": "SOURCE_LANGUAGE_TERM",
       "sourceId": "pz-primary-interview-gjata-mapo-2013-v0.1",
       "sourceClass": "PETRO_ZHEJI_PRIMARY_INTERVIEW",
       "sourceLocation": "MAPO answer explaining the excluded third",
@@ -98,7 +101,8 @@
       "termId": "PZ-INTERVIEW-GLOSSARY-THIRD-INCLUDED-001",
       "originalTerm": "included third",
       "normalizedLabel": "Tertium Datur / included third",
-      "language": "Albanian",
+      "language": "English",
+      "sourceTermStatus": "ENGLISH_CONCEPTUAL_LABEL",
       "sourceId": "pz-primary-interview-gjata-mapo-2013-v0.1",
       "sourceClass": "PETRO_ZHEJI_PRIMARY_INTERVIEW",
       "sourceLocation": "MAPO answer contrasting Codes E and F",
@@ -119,14 +123,16 @@
       "bookPageVerificationStatus": "BOOK_PAGE_VERIFICATION_PENDING",
       "runtimeEquivalenceStatus": "NOT_ESTABLISHED",
       "notes": [
-        "This entry is a bounded relationship label, not a proof of formal logic equivalence."
+        "This entry is a bounded relationship label, not a proof of formal logic equivalence.",
+        "English conceptual label only; the reviewed interview record does not establish this exact source-language wording."
       ]
     },
     {
       "termId": "PZ-INTERVIEW-GLOSSARY-THIRD-EXCLUDED-001",
       "originalTerm": "excluded third",
       "normalizedLabel": "Tertium Non Datur / excluded third",
-      "language": "Albanian",
+      "language": "English",
+      "sourceTermStatus": "ENGLISH_CONCEPTUAL_LABEL",
       "sourceId": "pz-primary-interview-gjata-mapo-2013-v0.1",
       "sourceClass": "PETRO_ZHEJI_PRIMARY_INTERVIEW",
       "sourceLocation": "MAPO answer contrasting Codes E and F",
@@ -147,14 +153,16 @@
       "bookPageVerificationStatus": "BOOK_PAGE_VERIFICATION_PENDING",
       "runtimeEquivalenceStatus": "NOT_ESTABLISHED",
       "notes": [
-        "This entry is a bounded relationship label, not a proof of formal logic equivalence."
+        "This entry is a bounded relationship label, not a proof of formal logic equivalence.",
+        "English conceptual label only; the reviewed interview record does not establish this exact source-language wording."
       ]
     },
     {
       "termId": "PZ-INTERVIEW-GLOSSARY-EQUATION-001",
       "originalTerm": "symbolic equations",
       "normalizedLabel": "Symbolic equation concept",
-      "language": "Albanian",
+      "language": "English",
+      "sourceTermStatus": "ENGLISH_CONCEPTUAL_LABEL",
       "sourceId": "pz-primary-interview-gjata-mapo-2013-v0.1",
       "sourceClass": "PETRO_ZHEJI_PRIMARY_INTERVIEW",
       "sourceLocation": "MAPO discussion of E/F and physical/spiritual relations",
@@ -175,14 +183,16 @@
       "bookPageVerificationStatus": "BOOK_PAGE_VERIFICATION_PENDING",
       "runtimeEquivalenceStatus": "NOT_ESTABLISHED",
       "notes": [
-        "No equation text or pseudo-code is reconstructed in this glossary."
+        "No equation text or pseudo-code is reconstructed in this glossary.",
+        "English conceptual label only; the reviewed interview record supports the discussion but does not establish this exact source-language wording."
       ]
     },
     {
       "termId": "PZ-INTERVIEW-GLOSSARY-CROSS-LANGUAGE-001",
       "originalTerm": "applicability beyond Albanian",
       "normalizedLabel": "Applicability beyond Albanian",
-      "language": "Albanian",
+      "language": "English",
+      "sourceTermStatus": "ENGLISH_CONCEPTUAL_LABEL",
       "sourceId": "pz-primary-interview-gjata-mapo-2013-v0.1",
       "sourceClass": "PETRO_ZHEJI_PRIMARY_INTERVIEW",
       "sourceLocation": "MAPO question asking whether the algorithm can exist in other languages",
@@ -203,7 +213,8 @@
       "bookPageVerificationStatus": "BOOK_PAGE_VERIFICATION_PENDING",
       "runtimeEquivalenceStatus": "NOT_ESTABLISHED",
       "notes": [
-        "Applicability is recorded as a source statement only; no scientific validation is implied."
+        "Applicability is recorded as a source statement only; no scientific validation is implied.",
+        "English conceptual label only; the reviewed interview record supports the question and answer but does not establish this exact source-language wording."
       ]
     }
   ]
