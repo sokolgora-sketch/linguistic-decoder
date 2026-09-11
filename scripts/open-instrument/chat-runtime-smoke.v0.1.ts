@@ -169,6 +169,37 @@ async function main(): Promise<void> {
     console.log(`ANALYZE_REQUESTS_AFTER_IMPORT=${analyzeRequests}`);
     console.log("IMPORT_REANALYSIS=NO");
 
+    const primaryTruthCases = [
+      { word: "study", status: "Reviewed functional evidence" },
+      { word: "damage", status: "Reviewed functional evidence" },
+      { word: "xyz", status: "Null — no supported candidate" },
+      { word: "mode", status: "Hypothesis — structural, unreviewed" },
+      { word: "sterile", status: "Research functional hypothesis" },
+    ] as const;
+
+    for (const truthCase of primaryTruthCases) {
+      await page.reload({
+        waitUntil: "domcontentloaded",
+        timeout: PAGE_TIMEOUT_MS,
+      });
+      await page.getByRole("textbox", { name: "Word" }).waitFor({ state: "visible" });
+      await page.getByRole("textbox", { name: "Word" }).fill(truthCase.word);
+      const expectedRequestCount = analyzeRequests + 1;
+      await page.getByRole("button", { name: "Analyze" }).click();
+      await page.getByTestId("open-instrument-shell").waitFor({ state: "visible" });
+      await page.getByText("Current analysis", { exact: true }).waitFor({ state: "visible" });
+      const overview = page.locator('[role="tabpanel"]:not([hidden])');
+      await overview
+        .getByRole("heading", { name: truthCase.status, exact: true })
+        .waitFor({ state: "visible" });
+      assert(
+        analyzeRequests === expectedRequestCount,
+        `Expected one analysis request for ${truthCase.word}, observed ${analyzeRequests}.`,
+      );
+      console.log(`PRIMARY_TRUTH_${truthCase.word.toUpperCase()}=PASS`);
+    }
+    console.log("PRIMARY_TRUTH_BOUNDARY_MATRIX=PASS");
+
     if (externalRequests.size > 0) {
       throw new Error(`Browser smoke observed non-loopback requests: ${[...externalRequests].join(", ")}`);
     }

@@ -14,14 +14,28 @@ const STATUS_LABELS: Record<AnalysisStatusCodeV0_1, string> = {
   null_no_supported_candidate: "Null — no supported candidate",
 };
 
+type AnalysisStatusCardVariantV0_1 = "full" | "primary";
+
 function joinOrNone(values: readonly string[]): string {
   return values.length > 0 ? values.join(", ") : "none";
 }
 
+function StatusBoundaryNoticeV0_1() {
+  return (
+    <div className="mt-4 rounded-[8px] border border-[#33423a] bg-[#111a16] p-3 text-xs leading-5 text-[#b7d8c1]">
+      No historical-origin, transmission, winner, superiority, ownership, or
+      candidate-truth claim is made. Structural output is not candidate truth.
+      Null remains valid. User decides.
+    </div>
+  );
+}
+
 export function AnalysisStatusCardV0_1({
   status,
+  variant = "full",
 }: {
   status: PresentOrMissing<AnalysisStatusV0_1VM>;
+  variant?: AnalysisStatusCardVariantV0_1;
 }) {
   if (status.kind !== "present") {
     return (
@@ -40,6 +54,27 @@ export function AnalysisStatusCardV0_1({
   }
 
   const value = status.value;
+
+  if (variant === "primary") {
+    return (
+      <section
+        aria-label="Primary analysis status"
+        data-testid="primary-analysis-status"
+        className="rounded-[12px] border border-[#3b434d] bg-[#171c22] p-4"
+      >
+        <div className="text-[12px] font-semibold uppercase tracking-[0.16em] text-[#aeb7c5]">
+          Analysis status
+        </div>
+        <h2 className="mt-2 text-base font-semibold text-[#f5f7fb]">
+          {STATUS_LABELS[value.status]}
+        </h2>
+        <p className="mt-3 text-sm leading-6 text-[#c5ced8]">
+          {value.summary}
+        </p>
+        <StatusBoundaryNoticeV0_1 />
+      </section>
+    );
+  }
 
   return (
     <section
@@ -102,11 +137,7 @@ export function AnalysisStatusCardV0_1({
         </div>
       </dl>
 
-      <div className="mt-4 rounded-[8px] border border-[#33423a] bg-[#111a16] p-3 text-xs leading-5 text-[#b7d8c1]">
-        No historical-origin, transmission, winner, superiority, ownership, or
-        candidate-truth claim is made. Structural output is not candidate truth.
-        Null remains valid. User decides.
-      </div>
+      <StatusBoundaryNoticeV0_1 />
     </section>
   );
 }
