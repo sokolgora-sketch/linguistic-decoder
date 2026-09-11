@@ -3,7 +3,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { EvidencePackageCard } from "@/ui/instrument/sections/EvidencePackageCard";
 
 describe("EvidencePackageCard copy actions", () => {
-  it("labels evidence export as VM-derived summary and JSON package copy actions", () => {
+  it("distinguishes compatibility copy from durable download", () => {
     const onCopyEvidenceSummary = jest.fn();
     const onCopyEvidencePackage = jest.fn();
     const onDownloadEvidencePackage = jest.fn();
@@ -24,6 +24,10 @@ describe("EvidencePackageCard copy actions", () => {
     expect(screen.getByText("source=VM")).toBeInTheDocument();
     expect(screen.getByText("Readable summary")).toBeInTheDocument();
     expect(screen.getByText("JSON audit bundle")).toBeInTheDocument();
+    expect(screen.getByText(/Copy: compatibility clipboard JSON/i)).toBeInTheDocument();
+    expect(screen.getByText("evidence_package.v0.1")).toBeInTheDocument();
+    expect(screen.getByText(/Download: durable validated JSON/i)).toBeInTheDocument();
+    expect(screen.getByText("open-instrument.evidence-package-export.v0.1")).toBeInTheDocument();
     expect(screen.getByText(/Boundary: VM-derived export actions only/i)).toBeInTheDocument();
     expect(screen.getByText(/raw engine JSON stays in Advanced/i)).toBeInTheDocument();
     expect(screen.getByText(/no origin proof/i)).toBeInTheDocument();
