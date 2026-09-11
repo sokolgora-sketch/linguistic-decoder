@@ -231,6 +231,11 @@ export function InstrumentPanel(props: Props) {
   const { toast } = useToast();
   const [activeSection, setActiveSection] = React.useState<InstrumentSectionKey>("overview");
   const [isDarkMode, setIsDarkMode] = React.useState(true);
+  const [candidateRecordsOpen, setCandidateRecordsOpen] = React.useState(false);
+  const [candidateNavigation, setCandidateNavigation] = React.useState<{
+    candidateId: string;
+    requestId: number;
+  } | null>(null);
 
   const inputVm = "vm" in props ? props.vm : undefined;
   const inputPayload = "payload" in props ? props.payload : undefined;
@@ -255,6 +260,22 @@ export function InstrumentPanel(props: Props) {
       setActiveSection("overview");
     }
   }, [primaryNullStatus]);
+
+  React.useEffect(() => {
+    setCandidateRecordsOpen(false);
+    setCandidateNavigation(null);
+  }, [vm]);
+
+  function handleViewCandidateRecord(candidateId: string) {
+    if (!candidateId.trim()) return;
+
+    setCandidateNavigation((current) => ({
+      candidateId,
+      requestId: (current?.requestId ?? 0) + 1,
+    }));
+    setCandidateRecordsOpen(true);
+    setActiveSection("candidates");
+  }
 
   const lightMap = React.useMemo(() => {
     try {
@@ -471,6 +492,7 @@ export function InstrumentPanel(props: Props) {
 
               <EmbryoExpansionContextCardV0_1
                 vm={vm}
+                onViewCandidateRecord={handleViewCandidateRecord}
               />
 
               <details
@@ -534,7 +556,11 @@ export function InstrumentPanel(props: Props) {
               />
 
               {candidateRows ? (
-                <details className="rounded-xl border border-[#303a45] bg-[#10151c]">
+                <details
+                  open={candidateRecordsOpen}
+                  onToggle={(event) => setCandidateRecordsOpen(event.currentTarget.open)}
+                  className="rounded-xl border border-[#303a45] bg-[#10151c]"
+                >
                   <summary className="cursor-pointer list-none px-4 py-3 text-sm font-semibold text-[#c6d0dc] [&::-webkit-details-marker]:hidden">
                     All candidate records
                   </summary>
@@ -542,6 +568,8 @@ export function InstrumentPanel(props: Props) {
                   <div className="border-t border-[#303a45] p-4">
                     <CandidatesAccordion
                       rows={candidateRows}
+                      targetCandidateId={candidateNavigation?.candidateId}
+                      targetRequestId={candidateNavigation?.requestId ?? null}
                     />
                   </div>
                 </details>

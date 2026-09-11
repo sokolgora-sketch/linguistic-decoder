@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import type { UICandidateRow } from "./candidateModel";
 import { CandidateEvidenceReferences } from "./EvidenceReferenceLink";
 import { toPrettyJson } from "@/ui/instrument/prettyJson";
@@ -63,8 +63,27 @@ function truthLabel(
   );
 }
 
-export function CandidatesAccordion({ rows }: { rows: UICandidateRow[] }) {
+export function CandidatesAccordion({
+  rows,
+  targetCandidateId = null,
+  targetRequestId = null,
+}: {
+  rows: UICandidateRow[];
+  targetCandidateId?: string | null;
+  targetRequestId?: number | null;
+}) {
   const [openId, setOpenId] = useState<string | null>(null);
+  const targetButtonRef = useRef<HTMLButtonElement | null>(null);
+
+  useEffect(() => {
+    if (!targetCandidateId || targetRequestId === null) return;
+
+    const targetButton = targetButtonRef.current;
+    if (!targetButton || targetButton.dataset.candidateId !== targetCandidateId) return;
+
+    targetButton.focus();
+    targetButton.scrollIntoView?.({ block: "nearest" });
+  }, [rows, targetCandidateId, targetRequestId]);
 
   if (!rows.length) {
     return (
@@ -88,6 +107,8 @@ export function CandidatesAccordion({ rows }: { rows: UICandidateRow[] }) {
       <div className="space-y-2">
         {rows.map((c) => {
           const isOpen = openId === c.id;
+          const isNavigationTarget =
+            targetCandidateId === c.id && targetRequestId !== null;
 
           const isStructuralHypothesis =
             c.claimType === "structuralHypothesis" &&
@@ -117,7 +138,9 @@ export function CandidatesAccordion({ rows }: { rows: UICandidateRow[] }) {
             <div key={c.id} className="min-w-0 overflow-hidden rounded-lg border border-slate-800 bg-black/25">
               <button
                 type="button"
-                className="w-full min-w-0 px-3 py-3 text-left transition hover:bg-slate-900/50"
+                ref={isNavigationTarget ? targetButtonRef : undefined}
+                data-candidate-id={c.id}
+                className="w-full min-w-0 px-3 py-3 text-left transition hover:bg-slate-900/50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
                 aria-expanded={isOpen}
                 onClick={() => setOpenId(isOpen ? null : c.id)}
               >
