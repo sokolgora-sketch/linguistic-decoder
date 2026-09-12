@@ -66,6 +66,43 @@ auto | albanian | latin | sanskrit | ancient_greek | pie | turkish | german
   but it does not change the canonical Seven-Voices vowel set
   `A, E, I, O, U, Y, Ë`.
 
+### Analyze V1 request extensions
+
+Analyze V1 request inputs are grouped into the following surfaces:
+
+- Core selectors: `word`, `mode`, and `alphabet`.
+- Optional context: `ipa` and `language`.
+- Semantic context: `targetSenseId` and `targetSenseLabel`.
+- Experimental/internal POST options: `opts.brainCandidatesSeedFallback` and
+  `opts.seedBrainCandidates`.
+- Development query controls: `seed`, `seedBrainCandidates`,
+  `brainCandidatesSeedFallback`, and `ocg`.
+
+The target-sense fields are optional. String values are trimmed before semantic
+use. A label-only request derives a deterministic internal sense ID, while an
+explicit ID takes precedence. Target-sense context may affect semantic
+alignment and candidate projection, but it does not declare an etymological
+winner; the `no_single_winner` and `user_decides` boundaries remain unchanged.
+
+The named POST extensions are explicitly recognized by the route while
+retaining the existing compatibility behavior. Non-string target-sense values
+are treated as absent rather than rejected. Seed option values retain the
+existing truthiness-compatible behavior and are not strict boolean fields in
+this contract version. Only the two named seed members are consumed; unrelated
+nested `opts` members remain ignored. Raw `opts` is not copied wholesale into
+response metadata.
+
+The query seed aliases are development/testing controls. Each enables seed
+fallback only when its value is exactly `1`; other values do not enable it.
+`ocg` is a development-only OriginClaim gate control and is disabled in
+production. These controls are not ordinary stable analytical selectors.
+
+The request object continues to retain top-level passthrough compatibility.
+This version makes the existing runtime-influential extension names explicit;
+the policy for unrelated unknown fields and stricter extension type validation
+remains a separate contract decision. No requested/effective metadata fields
+are added here.
+
 ### Analyze V1 error behavior
 
 For invalid client requests, Analyze V1 returns HTTP `400` with a JSON body
