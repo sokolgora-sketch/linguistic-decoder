@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 
 import { runAnalysisDeterministic } from "@/lib/runAnalysisDeterministic";
+import type { Alphabet } from "@/shared/analysisResult.v1";
 import { enginePayloadToAnalysisResult } from "@/shared/analysisAdapter";
 import { discoverStructuralHypothesesV0_1 } from "@/shared/structuralHypothesisDiscovery.v0_1";
 import {
@@ -59,6 +60,34 @@ function normalizeModeV0_1(value: unknown): NormalizedModeV0_1 {
   if (!normalized) return { ok: true, value: undefined };
   if (normalized === "strict" || normalized === "open") {
     return { ok: true, value: normalized };
+  }
+
+  return { ok: false };
+}
+
+const CANONICAL_ALPHABETS_V0_1 = new Set<Alphabet>([
+  "auto",
+  "albanian",
+  "latin",
+  "sanskrit",
+  "ancient_greek",
+  "pie",
+  "turkish",
+  "german",
+]);
+
+type NormalizedAlphabetV0_1 =
+  | { ok: true; value: Alphabet | undefined }
+  | { ok: false };
+
+function normalizeAlphabetV0_1(value: unknown): NormalizedAlphabetV0_1 {
+  if (value === undefined) return { ok: true, value: undefined };
+  if (typeof value !== "string") return { ok: false };
+
+  const normalized = value.trim();
+  if (!normalized) return { ok: true, value: undefined };
+  if (CANONICAL_ALPHABETS_V0_1.has(normalized as Alphabet)) {
+    return { ok: true, value: normalized as Alphabet };
   }
 
   return { ok: false };
@@ -1146,6 +1175,15 @@ export async function POST(req: Request) {
   }
   const modeParsed = normalizedMode.value;
 
+  const normalizedAlphabet = normalizeAlphabetV0_1(alphabet);
+  if (!normalizedAlphabet.ok) {
+    return NextResponse.json(
+      { error: 'Missing/invalid "word". Expected: { word: string }' },
+      { status: 400 },
+    );
+  }
+  const alphabetParsed = normalizedAlphabet.value;
+
 
 
     // Seed fallback flag (BRAIN-0.2)
@@ -1172,9 +1210,9 @@ export async function POST(req: Request) {
   return runAnalyzeV1Orchestration({
     word,
     engineMode: modeParsed,
-    engineAlphabet: alphabet,
+    engineAlphabet: alphabetParsed,
     payloadMode: modeParsed ?? "strict",
-    payloadAlphabet: alphabet ?? "auto",
+    payloadAlphabet: alphabetParsed ?? "auto",
     includeIpaInPayload: false,
     evidencePackageMode: modeParsed ?? "strict",
     ipa,
@@ -1227,12 +1265,21 @@ if (!word) {
   }
   const modeParsed = normalizedMode.value;
 
+  const normalizedAlphabet = normalizeAlphabetV0_1(alphabet);
+  if (!normalizedAlphabet.ok) {
+    return NextResponse.json(
+      { error: 'Missing/invalid "word". Expected: { word: string }' },
+      { status: 400 },
+    );
+  }
+  const alphabetParsed = normalizedAlphabet.value;
+
   return runAnalyzeV1Orchestration({
     word,
     engineMode: modeParsed,
-    engineAlphabet: alphabet || undefined,
+    engineAlphabet: alphabetParsed,
     payloadMode: modeParsed ?? "strict",
-    payloadAlphabet: alphabet || "auto",
+    payloadAlphabet: alphabetParsed ?? "auto",
     includeIpaInPayload: true,
     evidencePackageMode: modeParsed ?? "strict",
     ipa,
