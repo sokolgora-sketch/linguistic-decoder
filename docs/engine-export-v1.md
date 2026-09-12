@@ -153,7 +153,10 @@ The query seed aliases are development/testing controls. Each enables seed
 fallback only when its first URL value is exactly `1`; other values, including
 padding and `true`, do not enable it. The aliases are OR-combined, and the
 same query behavior is available when a development query is supplied to
-either route. These aliases do not preserve their raw values in metadata.
+either route. Query-derived and POST-derived controls are also OR-combined at
+the route boundary, so an enabling query alias remains effective when the
+POST seed members are false or omitted. These aliases do not preserve their
+raw values in metadata.
 `ocg` is a development-only OriginClaim gate control and is disabled in
 production. These controls are not ordinary stable analytical selectors.
 
