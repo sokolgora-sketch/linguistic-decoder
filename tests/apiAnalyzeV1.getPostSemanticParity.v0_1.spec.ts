@@ -57,6 +57,12 @@ function candidateProjection(value: unknown): JsonObject {
     status: candidate.status,
     sourceKind: candidate.sourceKind,
     sourceStatus: candidate.sourceStatus,
+    targetSenseId: candidate.targetSenseId,
+    targetSenseLabel: candidate.targetSenseLabel,
+    semanticAlignmentStatus: candidate.semanticAlignmentStatus,
+    semanticAlignmentSource: candidate.semanticAlignmentSource,
+    semanticAlignmentReasonCodes: candidate.semanticAlignmentReasonCodes,
+    semanticAlignmentBridge: candidate.semanticAlignmentBridge,
     claimType: candidate.claimType,
     semanticBridge: candidate.semanticBridge,
     functionalSupportStatus: candidate.functionalSupportStatus,
@@ -206,6 +212,24 @@ function inputMetadata(response: JsonObject): JsonObject {
   return object(object(response.meta, "response meta").inputs, "input metadata");
 }
 
+async function withoutSemanticAlignmentTestProvider<T>(
+  run: () => Promise<T>,
+): Promise<T> {
+  const envName = "OPEN_INSTRUMENT_SEMANTIC_ALIGNMENT_TEST_PROVIDER";
+  const previous = process.env[envName];
+  delete process.env[envName];
+
+  try {
+    return await run();
+  } finally {
+    if (previous === undefined) {
+      delete process.env[envName];
+    } else {
+      process.env[envName] = previous;
+    }
+  }
+}
+
 describe("/api/analyze-v1 GET/POST semantic parity v0.1", () => {
   it.each(REPRESENTATIVE_CASES)(
     "GET and POST preserve equivalent semantic analysis for $word",
@@ -268,23 +292,25 @@ describe("/api/analyze-v1 GET/POST semantic parity v0.1", () => {
   });
 
   it("GET and POST preserve target-sense input at the contract seam without provider execution", async () => {
-    const targetSenseLabel = "a fashion or manner";
-    const pair = await semanticPair("mode", {
-      mode: "strict",
-      alphabet: "auto",
-      targetSenseLabel,
+    await withoutSemanticAlignmentTestProvider(async () => {
+      const targetSenseLabel = "a fashion or manner";
+      const pair = await semanticPair("mode", {
+        mode: "strict",
+        alphabet: "auto",
+        targetSenseLabel,
+      });
+
+      expect(projectSemanticResponse(pair.get)).toEqual(
+        projectSemanticResponse(pair.post),
+      );
+
+      const expectedInputs = {
+        targetSenseId: "user_sense_a_fashion_or_manner",
+        targetSenseLabel,
+      };
+      expect(inputMetadata(pair.get)).toMatchObject(expectedInputs);
+      expect(inputMetadata(pair.post)).toMatchObject(expectedInputs);
     });
-
-    expect(projectSemanticResponse(pair.get)).toEqual(
-      projectSemanticResponse(pair.post),
-    );
-
-    const expectedInputs = {
-      targetSenseId: "user_sense_a_fashion_or_manner",
-      targetSenseLabel,
-    };
-    expect(inputMetadata(pair.get)).toMatchObject(expectedInputs);
-    expect(inputMetadata(pair.post)).toMatchObject(expectedInputs);
   });
 
   it("GET and POST preserve ordered candidate projection and evidence references for sterile", async () => {
