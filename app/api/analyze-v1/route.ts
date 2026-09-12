@@ -37,7 +37,7 @@ import { buildHeartInstrumentV1 } from "@/v1/heartInstrument.v1";
 
 const BodySchema = z
   .object({
-    word: z.string().min(1),
+    word: z.string().min(1).refine((value) => value.trim().length > 0),
     mode: z.enum(["strict", "open"]).optional(),
     alphabet: z.string().optional(),
       ipa: z.string().optional(),

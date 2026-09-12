@@ -331,27 +331,65 @@ describe("/api/analyze-v1 GET/POST semantic parity v0.1", () => {
     ]);
   });
 
-  it("GET preserves current blank-word compatibility behavior", async () => {
-    const result = await getAnalysis(" ", { mode: "strict" });
+  it.each(["", "   ", "\t\n"])(
+    "GET rejects logically blank word %j with the existing 400 behavior",
+    async (word) => {
+      const result = await getAnalysis(word, { mode: "strict" });
 
-    expect(result.status).toBe(400);
-    expect(result.body.error).toBe(
-      'Missing "word" query param. Use: /api/analyze-v1?word=study',
-    );
-  });
+      expect(result.status).toBe(400);
+      expect(result.body.error).toBe(
+        'Missing "word" query param. Use: /api/analyze-v1?word=study',
+      );
+    },
+  );
 
-  it("POST preserves current whitespace-only word compatibility behavior", async () => {
+  it.each(["", "   ", "\t\n"])(
+    "POST rejects logically blank word %j with the explicit 400 validation contract",
+    async (word) => {
+      const result = await postAnalysis(word, { mode: "strict" });
+
+      expect(result.status).toBe(400);
+      expect(result.body.error).toBe(
+        'Missing/invalid "word". Expected: { word: string }',
+      );
+    },
+  );
+
+  it("POST rejects non-string word with the existing invalid-request response", async () => {
     const response = await POST(
       new Request("http://localhost/api/analyze-v1", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ word: "   ", mode: "strict" }),
+        body: JSON.stringify({ word: 42, mode: "strict" }),
       }),
     );
     const body = await responseJson(response);
 
-    expect(response.status).toBe(500);
-    expect(body.error).toBe("analyze-v1 contract failure");
+    expect(response.status).toBe(400);
+    expect(body.error).toBe(
+      'Missing/invalid "word". Expected: { word: string }',
+    );
+  });
+
+  it("POST preserves valid padded-word metadata and analytical semantics", async () => {
+    const padded = await postAnalysis(" study ", {
+      mode: "strict",
+      alphabet: "auto",
+    });
+    const canonical = await postAnalysis("study", {
+      mode: "strict",
+      alphabet: "auto",
+    });
+
+    expect(padded.status).toBe(200);
+    expect(canonical.status).toBe(200);
+    expect(inputMetadata(padded.body).word).toBe(" study ");
+    expect(padded.body.analysisStatusV0_1).toEqual(
+      canonical.body.analysisStatusV0_1,
+    );
+    expect(padded.body.primaryPath).toEqual(canonical.body.primaryPath);
+    expect(padded.body.candidates).toEqual(canonical.body.candidates);
+    expect(padded.body.evidence).toEqual(canonical.body.evidence);
   });
 
   it("GET retains current unknown-mode fallback while preserving raw mode metadata", async () => {
