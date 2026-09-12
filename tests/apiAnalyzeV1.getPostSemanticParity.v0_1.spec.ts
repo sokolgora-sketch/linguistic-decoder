@@ -286,6 +286,8 @@ describe("/api/analyze-v1 GET/POST semantic parity v0.1", () => {
       expect(post.status).toBe(200);
       expect(get.body.mode).toBe("strict");
       expect(post.body.mode).toBe("strict");
+      expect(inputMetadata(get.body).mode).toBe("strict");
+      expect(inputMetadata(post.body).mode).toBe("strict");
     },
   );
 
