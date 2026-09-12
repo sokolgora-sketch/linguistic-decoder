@@ -87,9 +87,12 @@ surrounding whitespace, in surfaces such as `meta.inputs.word`,
 not an analytical divergence, and the current response does not add formal
 `requestedWord` or `effectiveWord` fields.
 
-Other result surfaces use the effective word: the top-level result `word`,
-`sanitized`, the OriginClaim word, and the Reproducible Run Bundle `result.word`.
-The complete RRB fingerprint can nevertheless differ for padded POST input
+Other result surfaces derive from the effective word: the top-level result
+`word`, the OriginClaim word, and the Reproducible Run Bundle `result.word`.
+The `sanitized` value is also derived from the effective word, with additional
+engine-level lowercasing and character filtering, so it is not a verbatim copy
+of that spelling. The complete RRB fingerprint can nevertheless differ for
+padded POST input
 because projected result structures such as `heartInstrumentV1` may retain the
 submitted spelling. This is provenance/result-structure sensitivity, not a
 different analysis.
