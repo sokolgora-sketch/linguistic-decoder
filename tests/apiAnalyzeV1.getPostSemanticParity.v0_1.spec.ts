@@ -4,6 +4,16 @@ import { GET as legacyGET } from "../app/api/analyze/route";
 type JsonObject = Record<string, unknown>;
 
 const CANONICAL_VOICES = new Set(["A", "E", "I", "O", "U", "Y", "Ë"]);
+const CANONICAL_ALPHABETS = [
+  "auto",
+  "albanian",
+  "latin",
+  "sanskrit",
+  "ancient_greek",
+  "pie",
+  "turkish",
+  "german",
+] as const;
 
 const CLAIM_BOUNDARY = {
   historicalOriginClaim: "not_claimed",
@@ -171,6 +181,12 @@ async function postAnalysis(
     if (options[key] !== undefined) body[key] = options[key];
   }
 
+  return postBody(body);
+}
+
+async function postBody(
+  body: JsonObject,
+): Promise<{ status: number; body: JsonObject }> {
   const response = await POST(
     new Request("http://localhost/api/analyze-v1", {
       method: "POST",
@@ -210,6 +226,12 @@ function expectCanonicalPrimaryVoicePath(response: JsonObject): void {
 
 function inputMetadata(response: JsonObject): JsonObject {
   return object(object(response.meta, "response meta").inputs, "input metadata");
+}
+
+function profileSignal(response: JsonObject): string | undefined {
+  return array(object(response.evidence, "evidence").signals)
+    .map(String)
+    .find((signal) => signal.startsWith("consonant_profile="));
 }
 
 async function withoutSemanticAlignmentTestProvider<T>(
@@ -450,15 +472,124 @@ describe("/api/analyze-v1 GET/POST semantic parity v0.1", () => {
     expect(result.body.error).toBe('Missing/invalid "word". Expected: { word: string }');
   });
 
-  it("GET and POST retain distinct empty-alphabet compatibility behavior", async () => {
-    const get = await getAnalysis("study", { mode: "strict", alphabet: "" });
-    const post = await postAnalysis("study", { mode: "strict", alphabet: "" });
+  it.each([
+    { label: "missing", alphabet: undefined },
+    { label: "empty", alphabet: "" },
+    { label: "whitespace-only", alphabet: " \t\n" },
+  ])(
+    "GET and POST normalize $label alphabet to the canonical auto selector",
+    async ({ alphabet }) => {
+      const get = await getAnalysis("study", {
+        mode: "strict",
+        ...(alphabet === undefined ? {} : { alphabet }),
+      });
+      const post = await postAnalysis("study", {
+        mode: "strict",
+        ...(alphabet === undefined ? {} : { alphabet }),
+      });
 
-    expect(get.status).toBe(200);
-    expect(get.body.alphabet).toBe("auto");
-    expect(post.status).toBe(500);
-    expect(post.body.error).toBe("analyze-v1 contract failure");
+      expect(get.status).toBe(200);
+      expect(post.status).toBe(200);
+      expect(get.body.alphabet).toBe("auto");
+      expect(post.body.alphabet).toBe("auto");
+      expect(inputMetadata(get.body).alphabet).toBe("auto");
+      expect(inputMetadata(post.body).alphabet).toBe("auto");
+    },
+  );
+
+  it.each(CANONICAL_ALPHABETS)(
+    "GET and POST preserve canonical alphabet %s",
+    async (alphabet) => {
+      const get = await getAnalysis("study", { mode: "strict", alphabet });
+      const post = await postAnalysis("study", { mode: "strict", alphabet });
+
+      expect(get.status).toBe(200);
+      expect(post.status).toBe(200);
+      expect(get.body.alphabet).toBe(alphabet);
+      expect(post.body.alphabet).toBe(alphabet);
+      expect(inputMetadata(get.body).alphabet).toBe(alphabet);
+      expect(inputMetadata(post.body).alphabet).toBe(alphabet);
+    },
+  );
+
+  it.each(CANONICAL_ALPHABETS)(
+    "GET and POST trim padded canonical alphabet %s without changing semantics",
+    async (alphabet) => {
+      const exact = await semanticPair("study", {
+        mode: "strict",
+        alphabet,
+      });
+      const padded = await semanticPair("study", {
+        mode: "strict",
+        alphabet: ` ${alphabet} `,
+      });
+
+      expect(padded.get.alphabet).toBe(alphabet);
+      expect(padded.post.alphabet).toBe(alphabet);
+      expect(inputMetadata(padded.get).alphabet).toBe(alphabet);
+      expect(inputMetadata(padded.post).alphabet).toBe(alphabet);
+      expect(projectSemanticResponse(padded.get)).toEqual(
+        projectSemanticResponse(exact.get),
+      );
+      expect(projectSemanticResponse(padded.post)).toEqual(
+        projectSemanticResponse(exact.post),
+      );
+    },
+  );
+
+  it("GET and POST use the same explicit profile for padded latin", async () => {
+    const exact = await getAnalysis("gjuhë", {
+      mode: "strict",
+      alphabet: "latin",
+    });
+    const padded = await postAnalysis("gjuhë", {
+      mode: "strict",
+      alphabet: " latin ",
+    });
+
+    expect(exact.status).toBe(200);
+    expect(padded.status).toBe(200);
+    expect(exact.body.alphabet).toBe("latin");
+    expect(padded.body.alphabet).toBe("latin");
+    expect(inputMetadata(padded.body).alphabet).toBe("latin");
+    expect(profileSignal(exact.body)).toBe("consonant_profile=latin");
+    expect(profileSignal(padded.body)).toBe("consonant_profile=latin");
+    expect(projectSemanticResponse(padded.body)).toEqual(
+      projectSemanticResponse(exact.body),
+    );
   });
+
+  it.each([
+    { label: "mixed-case canonical spelling", alphabet: "Latin" },
+    { label: "unknown non-empty value", alphabet: "bogus" },
+  ])(
+    "GET and POST reject $label before producing analysis output",
+    async ({ alphabet }) => {
+      const get = await getAnalysis("study", { alphabet });
+      const post = await postAnalysis("study", { alphabet });
+
+      expect(get.status).toBe(400);
+      expect(post.status).toBe(400);
+      expect(get.body).not.toHaveProperty("alphabet");
+      expect(post.body).not.toHaveProperty("alphabet");
+    },
+  );
+
+  it.each([
+    ["null", null],
+    ["number", 42],
+    ["boolean", true],
+    ["array", []],
+    ["object", {}],
+  ] as const)(
+    "POST rejects non-string alphabet (%s) through the existing 400 path",
+    async (_label, alphabet) => {
+      const result = await postBody({ word: "study", alphabet });
+
+      expect(result.status).toBe(400);
+      expect(result.body).not.toHaveProperty("alphabet");
+    },
+  );
 
   it("POST retains malformed-JSON rejection behavior", async () => {
     const response = await POST(

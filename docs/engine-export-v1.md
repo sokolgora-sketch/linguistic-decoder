@@ -42,6 +42,30 @@ separate RRB identity field. Durable Evidence Package exports likewise use
 the canonical effective mode. Neither export surface preserves raw mode
 spelling under this contract.
 
+### Analyze V1 alphabet contract
+
+`GET /api/analyze-v1` and `POST /api/analyze-v1` use the same canonical
+alphabet selector contract for successful analysis responses. The canonical
+values are:
+
+```text
+auto | albanian | latin | sanskrit | ancient_greek | pie | turkish | german
+```
+
+- A missing, empty, or whitespace-only alphabet selects canonical `auto`.
+- Surrounding whitespace is removed before validation, so padded canonical
+  values such as ` latin ` are accepted as `latin`.
+- Canonical values are case-sensitive. Mixed-case values such as `Latin` and
+  unsupported non-empty values return HTTP `400` without analysis metadata.
+- Successful responses expose the canonical selector in both the top-level
+  `alphabet` field and `meta.inputs.alphabet`. `auto` remains `auto`; it is
+  not replaced by the internally detected profile.
+- Raw transport spelling is not preserved in `meta.inputs.alphabet`, and no
+  separate requested, effective, or detected alphabet fields are exposed.
+- Alphabet selection can affect deterministic profile and consonant analysis,
+  but it does not change the canonical Seven-Voices vowel set
+  `A, E, I, O, U, Y, Ë`.
+
 ### `GET /api/analyze-core`
 
 Core-only view of the Seven-Voices heart for a single word.
