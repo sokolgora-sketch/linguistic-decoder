@@ -43,6 +43,18 @@ const BodySchema = z
     alphabet: z.string().optional(),
       ipa: z.string().optional(),
       language: z.string().optional(),
+    // Named extensions remain permissive; route-level guards preserve legacy behavior.
+    targetSenseId: z.unknown().optional(),
+    targetSenseLabel: z.unknown().optional(),
+    opts: z.union([
+      z
+        .object({
+          brainCandidatesSeedFallback: z.unknown().optional(),
+          seedBrainCandidates: z.unknown().optional(),
+        })
+        .passthrough(),
+      z.unknown(),
+    ]).optional(),
   })
   .passthrough();
 
