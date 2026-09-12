@@ -98,10 +98,32 @@ fallback only when its value is exactly `1`; other values do not enable it.
 production. These controls are not ordinary stable analytical selectors.
 
 The request object continues to retain top-level passthrough compatibility.
-This version makes the existing runtime-influential extension names explicit;
-the policy for unrelated unknown fields and stricter extension type validation
-remains a separate contract decision. No requested/effective metadata fields
-are added here.
+This version makes the existing runtime-influential extension names explicit.
+Stricter extension type validation and requested/effective metadata remain
+separate contract decisions. No requested/effective metadata fields are added
+here.
+
+### Unknown request fields and compatibility
+
+The explicitly documented fields define the Analyze V1 analytical request
+surface. An otherwise unknown top-level POST field may be accepted by the
+current passthrough parser for compatibility, but it is ignored before
+orchestration. It is not an analytical input and is not automatically copied
+into `meta.inputs`, successful response output, the Reproducible Run Bundle, or
+the Evidence Package. Passthrough acceptance is not a public extension
+mechanism or a guarantee that an unknown field will remain accepted.
+
+Within `opts`, Analyze V1 recognizes only `brainCandidatesSeedFallback` and
+`seedBrainCandidates`. Other nested members are currently tolerated but
+ignored; they do not become analytical selectors or affect seed behavior.
+
+GET reads a fixed set of documented query parameters. Unrelated query
+parameters are ignored, are not forwarded, and are not copied into metadata or
+analytical inputs. New supported request inputs should be added explicitly to
+the declared request schema and reviewed contract. Any future decision to strip
+or reject unknown POST fields or nested `opts` members requires a separate
+compatibility review. The legacy `/api/analyze` route re-exports the Analyze
+V1 handlers and inherits this request compatibility behavior.
 
 ### Analyze V1 error behavior
 
