@@ -66,6 +66,22 @@ auto | albanian | latin | sanskrit | ancient_greek | pie | turkish | german
   but it does not change the canonical Seven-Voices vowel set
   `A, E, I, O, U, Y, Ë`.
 
+### Analyze V1 error behavior
+
+For invalid client requests, Analyze V1 returns HTTP `400` with a JSON body
+containing an `error` string. Human-readable wording is diagnostic and
+non-normative; clients should not parse or depend on exact message text.
+
+Malformed JSON and request-schema failures use this same envelope. Explicit
+unsupported string values for `mode` and `alphabet` identify the affected
+field, while schema/type failures are not guaranteed to use field-specific
+wording.
+
+Unexpected response-contract or orchestration failures return HTTP `500`.
+Diagnostic fields in those internal failure responses are not part of the
+public API contract. The legacy `/api/analyze` route inherits this behavior
+because it re-exports the Analyze V1 handlers.
+
 ### `GET /api/analyze-core`
 
 Core-only view of the Seven-Voices heart for a single word.
