@@ -135,8 +135,28 @@ this contract version. Only the two named seed members are consumed; unrelated
 nested `opts` members remain ignored. Raw `opts` is not copied wholesale into
 response metadata.
 
+The POST seed options use JavaScript-style truthiness rather than boolean
+literal parsing. Omitted values, `false`, `0`, `null`, and `""` disable seed
+fallback. `true`, nonzero numbers, non-empty strings (including `"false"` and
+`"0"`), arrays, and objects enable it; empty arrays and objects are also
+truthy. When both named POST seed members are supplied, their effective values
+are OR-combined. Only the resulting boolean is placed in `meta.inputs`; the
+raw supplied type and spelling are not preserved.
+
+When enabled, the fallback adds deterministic supplemental `Seed` candidate
+records from `seedLexicon.v0.1` to the OriginClaim side-channel when no valid
+upstream brain candidate is present. These records remain explicitly seed
+source data under the existing `no_single_winner` posture; the control does
+not promote them to reviewed, historical, Petro, or provider evidence.
+
 The query seed aliases are development/testing controls. Each enables seed
-fallback only when its value is exactly `1`; other values do not enable it.
+fallback only when its first URL value is exactly `1`; other values, including
+padding and `true`, do not enable it. The aliases are OR-combined, and the
+same query behavior is available when a development query is supplied to
+either route. Query-derived and POST-derived controls are also OR-combined at
+the route boundary, so an enabling query alias remains effective when the
+POST seed members are false or omitted. These aliases do not preserve their
+raw values in metadata.
 `ocg` is a development-only OriginClaim gate control and is disabled in
 production. These controls are not ordinary stable analytical selectors.
 
