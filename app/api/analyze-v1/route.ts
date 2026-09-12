@@ -702,6 +702,367 @@ async function applyAutomaticFunctionalVoiceNormalizationV0_1(
     normalization;
 }
 
+type AnalyzeV1OrchestrationInput = {
+  word: string;
+  engineMode: "strict" | "open" | undefined;
+  engineAlphabet: string | undefined;
+  payloadMode: string;
+  payloadAlphabet: string;
+  includeIpaInPayload: boolean;
+  evidencePackageMode: string | undefined;
+  ipa: string;
+  language: string;
+  targetSenseId: string;
+  targetSenseLabel: string;
+  seedFallbackEnabled: boolean;
+  gatesOn: boolean | null;
+  preserveMalformedEvidencePackageFallback: boolean;
+};
+
+async function runAnalyzeV1Orchestration(
+  input: AnalyzeV1OrchestrationInput,
+): Promise<NextResponse> {
+  const {
+    word,
+    engineMode,
+    engineAlphabet,
+    payloadMode,
+    payloadAlphabet,
+    includeIpaInPayload,
+    evidencePackageMode,
+    ipa,
+    language,
+    targetSenseId,
+    targetSenseLabel,
+    seedFallbackEnabled,
+    gatesOn,
+    preserveMalformedEvidencePackageFallback,
+  } = input;
+
+  try {
+    const heartInstrumentV1 = buildHeartInstrumentV1(word);
+
+    const payload = await runAnalysisDeterministic(word, {
+      mode: engineMode,
+      alphabet: engineAlphabet,
+    });
+    const semanticAlignmentByStructuralHypothesisId =
+      await buildSemanticAlignmentMapV0_1({
+        word,
+        targetSenseId,
+        targetSenseLabel,
+      });
+
+    // Attach request-ish inputs so downstream (OriginClaim) can see seedFallbackEnabled.
+    (payload as any).inputs = {
+      word,
+      mode: payloadMode,
+      alphabet: payloadAlphabet,
+      ...(includeIpaInPayload
+        ? { ipa: ipa || undefined }
+        : {}),
+      language: language || undefined,
+      targetSenseId: targetSenseId || undefined,
+      targetSenseLabel: targetSenseLabel || undefined,
+      ...(Object.keys(semanticAlignmentByStructuralHypothesisId).length > 0
+        ? { semanticAlignmentByStructuralHypothesisId }
+        : {}),
+      brainCandidatesSeedFallback: seedFallbackEnabled,
+    };
+
+    const out = enginePayloadToAnalysisResult(payload);
+    const ui = adaptAnalyzeV1ToUI(out as any);
+
+    // EvidencePackage is optional and must never break /api/analyze-v1.
+    // Build it ONLY from Telemetry VM (VM-only) and swallow errors defensively.
+    let evidencePackage: any = {
+      version: "evidence_package.v0.1",
+      sevenPrinciplesSpectrum: null,
+    };
+    try {
+      const telemetryVm = buildTelemetryVmForEvidencePackage({
+        word,
+        mode: evidencePackageMode,
+        out,
+        heartInstrumentV1,
+      });
+      const phoneticIpaForPkg = ipa
+        ? extractCarrierVoicesFromIpaV0_1(ipa)
+        : null;
+      if (
+        ipa &&
+        phoneticIpaForPkg &&
+        telemetryVm &&
+        typeof telemetryVm === "object"
+      ) {
+        (telemetryVm as any).readout =
+          (telemetryVm as any).readout ?? {};
+        (telemetryVm as any).readout.phoneticIpaV0_1 = {
+          kind: "present",
+          value: {
+            ipa,
+            voices: (phoneticIpaForPkg as any).voices,
+          },
+        };
+      }
+
+      evidencePackage = buildEvidencePackageFromVM(telemetryVm as any, {
+        ledgerModel: (ui as any)?.ledgerModel ?? undefined,
+      });
+
+      // Backfill: ensure sevenPrinciplesSpectrum is always present (null allowed)
+      if (
+        (evidencePackage as any)?.sevenPrinciplesSpectrum ===
+        undefined
+      ) {
+        const tvm: any = telemetryVm as any;
+        (evidencePackage as any).sevenPrinciplesSpectrum =
+          tvm?.sevenPrinciplesSpectrum ??
+          tvm?.readout?.sevenPrinciplesSpectrum ??
+          null;
+      }
+
+      // Preserve the existing GET-only fallback for malformed adapter output.
+      if (
+        preserveMalformedEvidencePackageFallback &&
+        (!evidencePackage || typeof evidencePackage !== "object")
+      ) {
+        evidencePackage = {
+          version: "evidence_package.v0.1",
+          sevenPrinciplesSpectrum: null,
+          signals: ["EVIDENCE_PACKAGE_MALFORMED"],
+        };
+      }
+    } catch (_e) {
+      evidencePackage = {
+        version: "evidence_package.v0.1",
+        sevenPrinciplesSpectrum: null,
+        signals: ["EVIDENCE_PACKAGE_BUILD_FAILED"],
+      };
+    }
+
+    const checked = AnalyzeWordResultV1ContractSchema.safeParse(out);
+    if (!checked.success) {
+      return contractFailResponse({
+        message: "enginePayloadToAnalysisResult produced an off-contract V1 payload",
+        issues: checked.error.issues,
+        out,
+      });
+    }
+
+    const ensured = ensurePrimaryAndCandidatePaths(ui);
+    let evidence = buildEvidenceV1FromPayload(payload);
+    evidence = backfillEvidenceMath7({
+      evidence,
+      ensured,
+      out,
+      heartInstrumentV1,
+    });
+
+    // Milestone B — auditable raw vs functional vowel paths (evidence-level truth)
+    //
+    // Semantics (v0.1.x):
+    // - evidence.surfaceVowels = authoritative detected/functional path (what the instrument uses)
+    // - evidence.surfaceVowelsRaw = true raw surface (heartInstrumentV1; may differ by layer)
+    // - evidence.vowelPath = functional path (duplicate for legacy readers)
+    // - normalizationSteps proves SHIFT when raw != functional
+    {
+      const surfaceRaw = Array.isArray(
+        (heartInstrumentV1 as any)?.surfaceVowels,
+      )
+        ? (heartInstrumentV1 as any).surfaceVowels
+        : null;
+
+      const functional = Array.isArray(
+        (out as any)?.heart?.math7?.primary?.vowels,
+      )
+        ? (out as any).heart.math7.primary.vowels
+        : Array.isArray((out as any)?.primaryPath?.voicePath)
+          ? (out as any).primaryPath.voicePath
+          : null;
+
+      // Always emit vowelPath (null allowed)
+      (evidence as any).vowelPath = functional ?? null;
+
+      // Authoritative detected path for instrument UI/contract readers
+      if (functional) (evidence as any).surfaceVowels = functional;
+
+      // Preserve true raw surface separately (never overwrite detected)
+      if (surfaceRaw) (evidence as any).surfaceVowelsRaw = surfaceRaw;
+
+      const same =
+        Array.isArray(surfaceRaw) &&
+        Array.isArray(functional) &&
+        surfaceRaw.length === functional.length &&
+        surfaceRaw.every(
+          (v: any, i: number) => String(v) === String(functional[i]),
+        );
+
+      (evidence as any).normalizationSteps =
+        surfaceRaw && functional && !same
+          ? [
+              {
+                op: "vowel_normalize",
+                from: surfaceRaw.join(""),
+                to: functional.join(""),
+                reason: "functional_equivalence",
+              },
+            ]
+          : [];
+    }
+
+    const finalEvidence = { ...evidence };
+
+    let final: any = {
+      ...ensured,
+      rootMap: (out as any).rootMap,
+      analysisStatusV0_1: (out as any).analysisStatusV0_1,
+      originClaim: (out as any).originClaim,
+      originClaimGates: { flag: "ocg", active: gatesOn },
+      evidence: finalEvidence,
+      raw: (ensured as any).raw
+        ? { ...((ensured as any).raw as any), evidence: finalEvidence }
+        : (ensured as any).raw,
+      heartInstrumentV1,
+    };
+
+    // ✅ Contract check should validate ONLY the contract-picked projection
+    try {
+      toAnalyzeWordResultV1Contract(final);
+    } catch (e: any) {
+      return contractFailResponse({
+        message: "final /api/analyze-v1 response failed V1 contract projection",
+        issues: e?.issues ?? e?.message ?? String(e),
+        out: final,
+      });
+    }
+
+    const phoneticIpa = ipa
+      ? extractCarrierVoicesFromIpaV0_1(ipa)
+      : null;
+
+    if (final && typeof final === "object" && ipa && phoneticIpa) {
+      (final as any).phoneticIpaV0_1 = { ipa, ...phoneticIpa };
+    }
+
+    if (evidencePackage && typeof evidencePackage === "object") {
+      const n = Array.isArray((final as any)?.evidence?.signals)
+        ? (final as any).evidence.signals.length
+        : undefined;
+
+      backfillEvidencePackageSignalsCountV01({
+        evidencePackage,
+        finalEvidenceSignalsLen: n,
+      });
+    }
+    if (final && typeof final === "object") {
+      (final as any).evidencePackage = evidencePackage;
+    }
+
+    const normalizationMode =
+      engineMode === "open" ? "open" : "strict";
+    await applyAutomaticFunctionalVoiceNormalizationV0_1({
+      final,
+      word,
+      mode: normalizationMode,
+      ipa,
+      manualLanguageHint: language,
+    });
+
+    refreshEvidencePackageAfterFunctionalNormalizationV0_1({
+      final,
+      word,
+      mode: normalizationMode,
+      heartInstrumentV1,
+    });
+
+    const automaticFunctionalProposalV0_1 =
+      await runAutomaticFunctionalCandidateProposalV0_1({
+        word,
+        mode: normalizationMode,
+        analysis: final,
+      });
+
+    const automaticFunctionalProposalVerificationV0_1 =
+      verifyAutomaticFunctionalProposalV0_1({
+        analysis: final,
+        automaticProposal: automaticFunctionalProposalV0_1,
+      });
+
+    if (
+      final &&
+      typeof final === "object" &&
+      automaticFunctionalProposalVerificationV0_1.promotedCandidates.length > 0
+    ) {
+      const deterministicCandidates = Array.isArray(
+        (final as any).candidates,
+      )
+        ? (final as any).candidates
+        : [];
+
+      (final as any).candidates = [
+        ...deterministicCandidates,
+        ...automaticFunctionalProposalVerificationV0_1.promotedCandidates,
+      ];
+
+      // Proposal promotion happens after the deterministic analysis
+      // adapter has already emitted analysisStatusV0_1.
+      // Reconcile the status from the final candidate set so a
+      // verified Proposed result cannot coexist with a stale Null
+      // status. Reviewed evidence still wins inside the shared
+      // status builder.
+      (final as any).analysisStatusV0_1 = buildAnalysisStatusV0_1(
+        final,
+      );
+
+      try {
+        toAnalyzeWordResultV1Contract(final);
+      } catch (e: any) {
+        return contractFailResponse({
+          message: "Slice E candidate promotion failed V1 contract projection",
+          issues: e?.issues ?? e?.message ?? String(e),
+          out: final,
+        });
+      }
+    }
+
+    if (
+      final &&
+      typeof final === "object" &&
+      (
+        automaticFunctionalProposalV0_1.attempted ||
+        automaticFunctionalProposalV0_1.status ===
+          "skipped_real_provider_not_ready" ||
+        automaticFunctionalProposalV0_1.status ===
+          "skipped_functional_path_unavailable"
+      )
+    ) {
+      (final as any).automaticFunctionalProposalV0_1 =
+        automaticFunctionalProposalV0_1;
+    }
+
+    if (
+      final &&
+      typeof final === "object" &&
+      automaticFunctionalProposalV0_1.realProvider === true &&
+      automaticFunctionalProposalV0_1.attempted === true
+    ) {
+      (final as any).automaticFunctionalProposalVerificationV0_1 =
+        automaticFunctionalProposalVerificationV0_1;
+    }
+
+    return NextResponse.json(final);
+  } catch (err: any) {
+    return NextResponse.json(
+      {
+        error: "analyze-v1 failed",
+        details: String(err?.stack ?? err?.message ?? err),
+      },
+      { status: 500 },
+    );
+  }
+}
+
 export async function POST(req: Request) {
   const gatesOn = applyDevOriginClaimGates(req.url);
 
@@ -760,7 +1121,7 @@ export async function POST(req: Request) {
 const modeParsed =
     mode === "strict" || mode === "open" ? (mode as "strict" | "open") : undefined;
 
-  
+
 
     // Seed fallback flag (BRAIN-0.2)
     // Accept via POST body opts (preferred) and also via query params for dev testing.
@@ -783,306 +1144,22 @@ const modeParsed =
         !!(bodyOpts.brainCandidatesSeedFallback || bodyOpts.seedBrainCandidates) ||
         seedFallbackEnabled;
     }
-try {
-    const heartInstrumentV1 = buildHeartInstrumentV1(word);
-
-    const payload = await runAnalysisDeterministic(word, { mode, alphabet });
-    const semanticAlignmentByStructuralHypothesisId =
-      await buildSemanticAlignmentMapV0_1({
-        word,
-        targetSenseId,
-        targetSenseLabel,
-      });
-      // Attach request-ish inputs so downstream (OriginClaim) can see seedFallbackEnabled.
-      // Additive only; does not change deterministic solver output.
-      (payload as any).inputs = {
-        word,
-        mode: modeParsed ?? mode ?? "strict",
-        alphabet: alphabet ?? "auto",
-        language:
-          language || undefined,
-        targetSenseId: targetSenseId || undefined,
-        targetSenseLabel: targetSenseLabel || undefined,
-        ...(Object.keys(semanticAlignmentByStructuralHypothesisId).length > 0
-          ? { semanticAlignmentByStructuralHypothesisId }
-          : {}),
-        brainCandidatesSeedFallback: seedFallbackEnabled,
-      };
-
-    const out = enginePayloadToAnalysisResult(payload);
-
-    const ui = adaptAnalyzeV1ToUI(out as any);
-      // EvidencePackage is optional and must never break /api/analyze-v1.
-      // Build it ONLY from UI VM (VM-only) and swallow errors defensively.
-      let evidencePackage: any = {
-          version: "evidence_package.v0.1",
-          sevenPrinciplesSpectrum: null,
-        };
-      try {
-        const telemetryVm = buildTelemetryVmForEvidencePackage({
-          word,
-          mode: modeParsed ?? mode,
-          out,
-          heartInstrumentV1,
-        });
-        const phoneticIpaForPkg = ipa ? extractCarrierVoicesFromIpaV0_1(ipa) : null;
-        if (ipa && phoneticIpaForPkg && telemetryVm && typeof telemetryVm === "object") {
-          (telemetryVm as any).readout = (telemetryVm as any).readout ?? {};
-          (telemetryVm as any).readout.phoneticIpaV0_1 = {
-            kind: "present",
-            value: { ipa, voices: (phoneticIpaForPkg as any).voices },
-          };
-        }
-
-        evidencePackage = buildEvidencePackageFromVM(telemetryVm as any, {
-          ledgerModel: (ui as any)?.ledgerModel ?? undefined,
-        });
-
-
-        // Backfill: ensure sevenPrinciplesSpectrum is always present (null allowed)
-        if ((evidencePackage as any)?.sevenPrinciplesSpectrum === undefined) {
-          const tvm: any = telemetryVm as any;
-          (evidencePackage as any).sevenPrinciplesSpectrum =
-            tvm?.sevenPrinciplesSpectrum ??
-            tvm?.readout?.sevenPrinciplesSpectrum ??
-            null;
-        }
-      } catch (_e) {
-          evidencePackage = {
-            version: "evidence_package.v0.1",
-            sevenPrinciplesSpectrum: null,
-            signals: ["EVIDENCE_PACKAGE_BUILD_FAILED"],
-          };
-        }
-const checked = AnalyzeWordResultV1ContractSchema.safeParse(out);
-    if (!checked.success) {
-
-      return contractFailResponse({
-        message: "enginePayloadToAnalysisResult produced an off-contract V1 payload",
-        issues: checked.error.issues,
-        out,
-      });
-    }
-
-    const ensured = ensurePrimaryAndCandidatePaths(ui);
-
-    let evidence = buildEvidenceV1FromPayload(payload);
-    evidence = backfillEvidenceMath7({ evidence, ensured, out, heartInstrumentV1 });
-
-      // Milestone B — auditable raw vs functional vowel paths (evidence-level truth)
-//
-// Semantics (v0.1.x):
-// - evidence.surfaceVowels = authoritative detected/functional path (what the instrument uses)
-// - evidence.surfaceVowelsRaw = true raw surface (heartInstrumentV1; may differ by layer)
-// - evidence.vowelPath = functional path (duplicate for legacy readers)
-// - normalizationSteps proves SHIFT when raw != functional
-{
-  const surfaceRaw = Array.isArray((heartInstrumentV1 as any)?.surfaceVowels)
-    ? (heartInstrumentV1 as any).surfaceVowels
-    : null;
-
-  const functional = 
-    Array.isArray((out as any)?.heart?.math7?.primary?.vowels)
-      ? (out as any).heart.math7.primary.vowels
-      : (Array.isArray((out as any)?.primaryPath?.voicePath) ? (out as any).primaryPath.voicePath : null);
-
-  // Always emit vowelPath (null allowed)
-  (evidence as any).vowelPath = functional ?? null;
-
-  // Authoritative detected path for instrument UI/contract readers
-  if (functional) (evidence as any).surfaceVowels = functional;
-
-  // Preserve true raw surface separately (never overwrite detected)
-  if (surfaceRaw) (evidence as any).surfaceVowelsRaw = surfaceRaw;
-
-  const same = 
-    Array.isArray(surfaceRaw) &&
-    Array.isArray(functional) &&
-    surfaceRaw.length === functional.length &&
-    surfaceRaw.every((v: any, i: number) => String(v) === String(functional[i]));
-
-  (evidence as any).normalizationSteps = 
-    surfaceRaw && functional && !same
-      ? [
-          {
-            op: "vowel_normalize",
-            from: surfaceRaw.join(""),
-            to: functional.join(""),
-            reason: "functional_equivalence",
-          },
-        ]
-      : [];
-}
-
-
-
-    const finalEvidence = { ...evidence };
-
-    let final: any = {
-      ...ensured,
-      rootMap: (out as any).rootMap,
-      analysisStatusV0_1: (out as any).analysisStatusV0_1,
-      originClaim: (out as any).originClaim,
-      originClaimGates: { flag: "ocg", active: gatesOn },
-      evidence: finalEvidence,
-      raw: (ensured as any).raw
-        ? { ...((ensured as any).raw as any), evidence: finalEvidence }
-        : (ensured as any).raw,
-      heartInstrumentV1,
-    };
-// ✅ Contract check should validate ONLY the contract-picked projection
-    try {
-      toAnalyzeWordResultV1Contract(final);
-    } catch (e: any) {
-      return contractFailResponse({
-        message: "final /api/analyze-v1 response failed V1 contract projection",
-        issues: e?.issues ?? e?.message ?? String(e),
-        out: final,
-      });
-    }
-
-    const phoneticIpa = ipa ? extractCarrierVoicesFromIpaV0_1(ipa) : null;
-
-    if (final && typeof final === "object" && ipa && phoneticIpa) {
-
-      (final as any).phoneticIpaV0_1 = { ipa, ...phoneticIpa };
-
-    }
-
-
-
-    if (evidencePackage && typeof evidencePackage === "object") {
-      const n =
-        Array.isArray((final as any)?.evidence?.signals) ? (final as any).evidence.signals.length : undefined;
-
-      backfillEvidencePackageSignalsCountV01({
-        evidencePackage,
-        finalEvidenceSignalsLen: n,
-      });
-    }
-    if (final && typeof final === "object") (final as any).evidencePackage = evidencePackage;
-
-    await applyAutomaticFunctionalVoiceNormalizationV0_1({
-      final,
-      word,
-      mode:
-        modeParsed === "open"
-          ? "open"
-          : "strict",
-      ipa,
-      manualLanguageHint:
-        language,
-    });
-
-    refreshEvidencePackageAfterFunctionalNormalizationV0_1({
-      final,
-      word,
-      mode:
-        modeParsed === "open"
-          ? "open"
-          : "strict",
-      heartInstrumentV1,
-    });
-
-    const automaticFunctionalProposalV0_1 =
-      await runAutomaticFunctionalCandidateProposalV0_1({
-        word,
-        mode:
-          modeParsed === "open"
-            ? "open"
-            : "strict",
-        analysis: final,
-      });
-
-    const automaticFunctionalProposalVerificationV0_1 =
-      verifyAutomaticFunctionalProposalV0_1({
-        analysis: final,
-        automaticProposal:
-          automaticFunctionalProposalV0_1,
-      });
-
-    if (
-      final &&
-      typeof final === "object" &&
-      automaticFunctionalProposalVerificationV0_1
-        .promotedCandidates.length > 0
-    ) {
-      const deterministicCandidates =
-        Array.isArray(
-          (final as any).candidates,
-        )
-          ? (final as any).candidates
-          : [];
-
-      (final as any).candidates = [
-        ...deterministicCandidates,
-        ...automaticFunctionalProposalVerificationV0_1
-          .promotedCandidates,
-      ];
-
-      // Proposal promotion happens after the deterministic analysis
-      // adapter has already emitted analysisStatusV0_1.
-      // Reconcile the status from the final candidate set so a
-      // verified Proposed result cannot coexist with a stale Null
-      // status. Reviewed evidence still wins inside the shared
-      // status builder.
-      (final as any).analysisStatusV0_1 =
-        buildAnalysisStatusV0_1(
-          final,
-        );
-
-      try {
-        toAnalyzeWordResultV1Contract(
-          final,
-        );
-      } catch (e: any) {
-        return contractFailResponse({
-          message:
-            "Slice E candidate promotion failed V1 contract projection",
-          issues:
-            e?.issues ??
-            e?.message ??
-            String(e),
-          out: final,
-        });
-      }
-    }
-
-    if (
-      final &&
-      typeof final === "object" &&
-      (
-        automaticFunctionalProposalV0_1.attempted ||
-        automaticFunctionalProposalV0_1.status ===
-          "skipped_real_provider_not_ready" ||
-        automaticFunctionalProposalV0_1.status ===
-          "skipped_functional_path_unavailable"
-      )
-    ) {
-      (final as any).automaticFunctionalProposalV0_1 =
-        automaticFunctionalProposalV0_1;
-    }
-
-    if (
-      final &&
-      typeof final === "object" &&
-      automaticFunctionalProposalV0_1
-        .realProvider === true &&
-      automaticFunctionalProposalV0_1
-        .attempted === true
-    ) {
-      (final as any)
-        .automaticFunctionalProposalVerificationV0_1 =
-        automaticFunctionalProposalVerificationV0_1;
-    }
-
-    return NextResponse.json(final);
-  } catch (err: any) {
-    return NextResponse.json(
-      { error: "analyze-v1 failed", details: String(err?.stack ?? err?.message ?? err) },
-      { status: 500 }
-    );
-  }
+  return runAnalyzeV1Orchestration({
+    word,
+    engineMode: mode,
+    engineAlphabet: alphabet,
+    payloadMode: modeParsed ?? mode ?? "strict",
+    payloadAlphabet: alphabet ?? "auto",
+    includeIpaInPayload: false,
+    evidencePackageMode: modeParsed ?? mode,
+    ipa,
+    language,
+    targetSenseId,
+    targetSenseLabel,
+    seedFallbackEnabled,
+    gatesOn,
+    preserveMalformedEvidencePackageFallback: false,
+  });
 }
 
 export async function GET(req: Request) {
@@ -1093,7 +1170,7 @@ export async function GET(req: Request) {
   const mode = (url.searchParams.get("mode") ?? "").trim();
   const alphabet = (url.searchParams.get("alphabet") ?? "").trim();
 
-  
+
 
     const ipa = (url.searchParams.get("ipa") ?? "").trim();
     const language =
@@ -1119,316 +1196,20 @@ if (!word) {
   const modeParsed =
     mode === "strict" || mode === "open" ? (mode as "strict" | "open") : undefined;
 
-  try {
-    const heartInstrumentV1 = buildHeartInstrumentV1(word);
-
-    const payload = await runAnalysisDeterministic(word, {
-      mode: modeParsed,
-      alphabet: alphabet || undefined,
-    });
-    const semanticAlignmentByStructuralHypothesisId =
-      await buildSemanticAlignmentMapV0_1({
-        word,
-        targetSenseId,
-        targetSenseLabel,
-      });
-      // Attach request-ish inputs so downstream (OriginClaim) can see seedFallbackEnabled.
-      (payload as any).inputs = {
-        word,
-        mode: modeParsed ?? (mode as any) ?? "strict",
-        alphabet: alphabet || "auto",
-        ipa: ipa || undefined,
-        language:
-          language || undefined,
-        targetSenseId: targetSenseId || undefined,
-        targetSenseLabel: targetSenseLabel || undefined,
-        ...(Object.keys(semanticAlignmentByStructuralHypothesisId).length > 0
-          ? { semanticAlignmentByStructuralHypothesisId }
-          : {}),
-        brainCandidatesSeedFallback: seedFallbackEnabled,
-      };
-
-    const out = enginePayloadToAnalysisResult(payload);
-
-    const ui = adaptAnalyzeV1ToUI(out as any);
-
-    // EvidencePackage is optional and must never break /api/analyze-v1.
-    // Build it ONLY from Telemetry VM (VM-only) and swallow errors defensively.
-    let evidencePackage: any = {
-      version: "evidence_package.v0.1",
-      sevenPrinciplesSpectrum: null,
-    };
-    try {
-      const telemetryVm = buildTelemetryVmForEvidencePackage({
-        word,
-        mode: modeParsed ?? mode,
-        out,
-        heartInstrumentV1,
-      });
-      const phoneticIpaForPkg = ipa ? extractCarrierVoicesFromIpaV0_1(ipa) : null;
-      if (ipa && phoneticIpaForPkg && telemetryVm && typeof telemetryVm === "object") {
-        (telemetryVm as any).readout = (telemetryVm as any).readout ?? {};
-        (telemetryVm as any).readout.phoneticIpaV0_1 = {
-          kind: "present",
-          value: { ipa, voices: (phoneticIpaForPkg as any).voices },
-        };
-      }
-
-      evidencePackage = buildEvidencePackageFromVM(telemetryVm as any, {
-        ledgerModel: (ui as any)?.ledgerModel ?? undefined,
-      });
-
-      // Backfill: ensure sevenPrinciplesSpectrum is always present (null allowed)
-      if ((evidencePackage as any)?.sevenPrinciplesSpectrum === undefined) {
-        const tvm: any = telemetryVm as any;
-        (evidencePackage as any).sevenPrinciplesSpectrum =
-          tvm?.sevenPrinciplesSpectrum ??
-          tvm?.readout?.sevenPrinciplesSpectrum ??
-          null;
-      }
-
-      // If adapter returns undefined/null/non-object, keep minimal object
-      if (!evidencePackage || typeof evidencePackage !== "object") {
-        evidencePackage = {
-          version: "evidence_package.v0.1",
-          sevenPrinciplesSpectrum: null,
-          signals: ["EVIDENCE_PACKAGE_MALFORMED"],
-        };
-      }
-    } catch (_e) {
-      evidencePackage = {
-        version: "evidence_package.v0.1",
-        sevenPrinciplesSpectrum: null,
-        signals: ["EVIDENCE_PACKAGE_BUILD_FAILED"],
-      };
-    }
-
-const checked = AnalyzeWordResultV1ContractSchema.safeParse(out);
-    if (!checked.success) {
-      return contractFailResponse({
-        message: "enginePayloadToAnalysisResult produced an off-contract V1 payload",
-        issues: checked.error.issues,
-        out,
-      });
-    }
-
-    const ensured = ensurePrimaryAndCandidatePaths(ui);
-    let evidence = buildEvidenceV1FromPayload(payload);
-    evidence = backfillEvidenceMath7({ evidence, ensured, out, heartInstrumentV1 });
-
-      // Milestone B — auditable raw vs functional vowel paths (evidence-level truth)
-//
-// Semantics (v0.1.x):
-// - evidence.surfaceVowels = authoritative detected/functional path (what the instrument uses)
-// - evidence.surfaceVowelsRaw = true raw surface (heartInstrumentV1; may differ by layer)
-// - evidence.vowelPath = functional path (duplicate for legacy readers)
-// - normalizationSteps proves SHIFT when raw != functional
-{
-  const surfaceRaw = Array.isArray((heartInstrumentV1 as any)?.surfaceVowels)
-    ? (heartInstrumentV1 as any).surfaceVowels
-    : null;
-
-  const functional = 
-    Array.isArray((out as any)?.heart?.math7?.primary?.vowels)
-      ? (out as any).heart.math7.primary.vowels
-      : (Array.isArray((out as any)?.primaryPath?.voicePath) ? (out as any).primaryPath.voicePath : null);
-
-  // Always emit vowelPath (null allowed)
-  (evidence as any).vowelPath = functional ?? null;
-
-  // Authoritative detected path for instrument UI/contract readers
-  if (functional) (evidence as any).surfaceVowels = functional;
-
-  // Preserve true raw surface separately (never overwrite detected)
-  if (surfaceRaw) (evidence as any).surfaceVowelsRaw = surfaceRaw;
-
-  const same = 
-    Array.isArray(surfaceRaw) &&
-    Array.isArray(functional) &&
-    surfaceRaw.length === functional.length &&
-    surfaceRaw.every((v: any, i: number) => String(v) === String(functional[i]));
-
-  (evidence as any).normalizationSteps = 
-    surfaceRaw && functional && !same
-      ? [
-          {
-            op: "vowel_normalize",
-            from: surfaceRaw.join(""),
-            to: functional.join(""),
-            reason: "functional_equivalence",
-          },
-        ]
-      : [];
-}
-
-
-
-    const finalEvidence = { ...evidence };
-
-    let final: any = {
-      ...ensured,
-      rootMap: (out as any).rootMap,
-      analysisStatusV0_1: (out as any).analysisStatusV0_1,
-      originClaim: (out as any).originClaim,
-      originClaimGates: { flag: "ocg", active: gatesOn },
-      evidence: finalEvidence,
-      raw: (ensured as any).raw
-        ? { ...((ensured as any).raw as any), evidence: finalEvidence }
-        : (ensured as any).raw,
-      heartInstrumentV1,
-    };
-      // Mind derives from heart.math7.primary (single source of truth)
-      // ✅ Contract check should validate ONLY the contract-picked projection
-    try {
-      toAnalyzeWordResultV1Contract(final);
-    } catch (e: any) {
-      return contractFailResponse({
-        message: "final /api/analyze-v1 response failed V1 contract projection",
-        issues: e?.issues ?? e?.message ?? String(e),
-        out: final,
-      });
-    }
-
-    const phoneticIpa = ipa ? extractCarrierVoicesFromIpaV0_1(ipa) : null;
-
-    if (final && typeof final === "object" && ipa && phoneticIpa) {
-
-      (final as any).phoneticIpaV0_1 = { ipa, ...phoneticIpa };
-
-    }
-
-
-
-    if (evidencePackage && typeof evidencePackage === "object") {
-      const n =
-        Array.isArray((final as any)?.evidence?.signals) ? (final as any).evidence.signals.length : undefined;
-
-      backfillEvidencePackageSignalsCountV01({
-        evidencePackage,
-        finalEvidenceSignalsLen: n,
-      });
-    }
-    if (final && typeof final === "object") (final as any).evidencePackage = evidencePackage;
-
-    await applyAutomaticFunctionalVoiceNormalizationV0_1({
-      final,
-      word,
-      mode:
-        modeParsed === "open"
-          ? "open"
-          : "strict",
-      ipa,
-      manualLanguageHint:
-        language,
-    });
-
-    refreshEvidencePackageAfterFunctionalNormalizationV0_1({
-      final,
-      word,
-      mode:
-        modeParsed === "open"
-          ? "open"
-          : "strict",
-      heartInstrumentV1,
-    });
-
-    const automaticFunctionalProposalV0_1 =
-      await runAutomaticFunctionalCandidateProposalV0_1({
-        word,
-        mode:
-          modeParsed === "open"
-            ? "open"
-            : "strict",
-        analysis: final,
-      });
-
-    const automaticFunctionalProposalVerificationV0_1 =
-      verifyAutomaticFunctionalProposalV0_1({
-        analysis: final,
-        automaticProposal:
-          automaticFunctionalProposalV0_1,
-      });
-
-    if (
-      final &&
-      typeof final === "object" &&
-      automaticFunctionalProposalVerificationV0_1
-        .promotedCandidates.length > 0
-    ) {
-      const deterministicCandidates =
-        Array.isArray(
-          (final as any).candidates,
-        )
-          ? (final as any).candidates
-          : [];
-
-      (final as any).candidates = [
-        ...deterministicCandidates,
-        ...automaticFunctionalProposalVerificationV0_1
-          .promotedCandidates,
-      ];
-
-      // Proposal promotion happens after the deterministic analysis
-      // adapter has already emitted analysisStatusV0_1.
-      // Reconcile the status from the final candidate set so a
-      // verified Proposed result cannot coexist with a stale Null
-      // status. Reviewed evidence still wins inside the shared
-      // status builder.
-      (final as any).analysisStatusV0_1 =
-        buildAnalysisStatusV0_1(
-          final,
-        );
-
-      try {
-        toAnalyzeWordResultV1Contract(
-          final,
-        );
-      } catch (e: any) {
-        return contractFailResponse({
-          message:
-            "Slice E candidate promotion failed V1 contract projection",
-          issues:
-            e?.issues ??
-            e?.message ??
-            String(e),
-          out: final,
-        });
-      }
-    }
-
-    if (
-      final &&
-      typeof final === "object" &&
-      (
-        automaticFunctionalProposalV0_1.attempted ||
-        automaticFunctionalProposalV0_1.status ===
-          "skipped_real_provider_not_ready" ||
-        automaticFunctionalProposalV0_1.status ===
-          "skipped_functional_path_unavailable"
-      )
-    ) {
-      (final as any).automaticFunctionalProposalV0_1 =
-        automaticFunctionalProposalV0_1;
-    }
-
-    if (
-      final &&
-      typeof final === "object" &&
-      automaticFunctionalProposalV0_1
-        .realProvider === true &&
-      automaticFunctionalProposalV0_1
-        .attempted === true
-    ) {
-      (final as any)
-        .automaticFunctionalProposalVerificationV0_1 =
-        automaticFunctionalProposalVerificationV0_1;
-    }
-
-    return NextResponse.json(final);
-  } catch (err: any) {
-    return NextResponse.json(
-      { error: "analyze-v1 failed", details: String(err?.stack ?? err?.message ?? err) },
-      { status: 500 }
-    );
-  }
+  return runAnalyzeV1Orchestration({
+    word,
+    engineMode: modeParsed,
+    engineAlphabet: alphabet || undefined,
+    payloadMode: modeParsed ?? mode ?? "strict",
+    payloadAlphabet: alphabet || "auto",
+    includeIpaInPayload: true,
+    evidencePackageMode: modeParsed ?? mode,
+    ipa,
+    language,
+    targetSenseId,
+    targetSenseLabel,
+    seedFallbackEnabled,
+    gatesOn,
+    preserveMalformedEvidencePackageFallback: true,
+  });
 }
