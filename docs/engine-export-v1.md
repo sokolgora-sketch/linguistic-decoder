@@ -66,6 +66,49 @@ auto | albanian | latin | sanskrit | ancient_greek | pie | turkish | german
   but it does not change the canonical Seven-Voices vowel set
   `A, E, I, O, U, Y, Ë`.
 
+### Analyze V1 word input and method metadata
+
+`word` is the core lexical selector. GET trims surrounding whitespace from the
+query value before orchestration. POST rejects missing, non-string, empty, and
+whitespace-only values, but accepts a nonblank string with surrounding
+whitespace. In this section, trimming means outer-whitespace removal only; it
+does not define Unicode, case, lexical, or semantic normalization.
+
+Deterministic analysis uses the effective trimmed word. Consequently, outer
+padding does not change the Seven-Voices path, core candidates or ordering,
+status, evidence posture, `Null`, or the `no_single_winner` and `user_decides`
+boundaries.
+
+The methods retain a compatibility distinction in selected request and
+provenance surfaces. GET has already trimmed the word before later metadata is
+constructed. POST may preserve the submitted nonblank spelling, including
+surrounding whitespace, in surfaces such as `meta.inputs.word`,
+`heartInstrumentV1.basisNfc`, and the inline `evidencePackage.word`. This is
+not an analytical divergence, and the current response does not add formal
+`requestedWord` or `effectiveWord` fields.
+
+Other result surfaces derive from the effective word: the top-level result
+`word`, the OriginClaim word, and the Reproducible Run Bundle `result.word`.
+The `sanitized` value is also derived from the effective word, with additional
+engine-level lowercasing and character filtering, so it is not a verbatim copy
+of that spelling. The complete RRB fingerprint can nevertheless differ for
+padded POST input
+because projected result structures such as `heartInstrumentV1` may retain the
+submitted spelling. This is provenance/result-structure sensitivity, not a
+different analysis.
+
+The inline Analyze V1 Evidence Package can retain the POST spelling in its
+`word` surface. UI-generated durable Evidence Package exports derive their word
+through normalized response/view-model data, so package forms should not be
+assumed to preserve identical word provenance. The legacy `/api/analyze` route
+re-exports the Analyze V1 handlers and inherits this behavior.
+
+The current POST preservation behavior is retained for compatibility. Any
+future change to normalize POST metadata would require a separate reviewed
+compatibility decision because it could affect response metadata, the legacy
+route, inline Evidence Package output, `heartInstrumentV1`, and complete RRB
+fingerprints.
+
 ### Analyze V1 request extensions
 
 Analyze V1 request inputs are grouped into the following surfaces:
