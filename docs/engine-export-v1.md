@@ -103,6 +103,31 @@ Stricter extension type validation and requested/effective metadata remain
 separate contract decisions. No requested/effective metadata fields are added
 here.
 
+### IPA request context and method metadata
+
+`ipa` is optional pronunciation context in both GET query parameters and POST
+request bodies. String values are trimmed before use, and blank values are
+treated as absent. The POST field is schema-declared as an optional string;
+wrong-type values retain the existing generic schema-validation `400` behavior.
+
+IPA does not enter the deterministic core selector path, which is driven by
+`word`, `mode`, and `alphabet`. It can still feed the bounded phonetic/carrier
+path, so equivalent GET and POST requests can produce equivalent
+`phoneticIpaV0_1` output and carrier-derived Evidence Package information.
+
+The methods retain a transport-specific request-metadata distinction. For a
+nonblank GET `ipa`, the normalized value is included in `meta.inputs.ipa`.
+POST accepts and uses `ipa` through the same bounded carrier path, but
+intentionally does not copy it into `meta.inputs`. This is request metadata,
+not an analytical divergence; GET/POST semantic parity does not require
+identical transport metadata in this contract version.
+
+IPA may also be included in Reproducible Run Bundle input and fingerprinting
+through bundle construction. That path does not read IPA from
+`meta.inputs.ipa`. No requested/effective IPA fields are added here. The
+legacy `/api/analyze` route re-exports these handlers and inherits the same
+IPA behavior.
+
 ### Unknown request fields and compatibility
 
 The explicitly documented fields define the Analyze V1 analytical request
