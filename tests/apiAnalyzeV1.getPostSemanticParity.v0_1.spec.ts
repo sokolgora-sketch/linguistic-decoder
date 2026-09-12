@@ -456,20 +456,22 @@ describe("/api/analyze-v1 GET/POST semantic parity v0.1", () => {
     expect(padded.body.evidence).toEqual(canonical.body.evidence);
   });
 
-  it("GET rejects unknown non-empty mode before orchestration", async () => {
+  it("GET rejects unknown non-empty mode with the mode-specific 400 error", async () => {
     const result = await getAnalysis("study", { mode: "bogus" });
 
     expect(result.status).toBe(400);
     expect(result.body.error).toBe(
-      'Missing/invalid "word". Expected: { word: string }',
+      'Invalid "mode". Expected: "strict" or "open".',
     );
   });
 
-  it("POST retains current invalid-mode rejection behavior", async () => {
+  it("POST rejects unknown non-empty mode with the mode-specific 400 error", async () => {
     const result = await postAnalysis("study", { mode: "bogus" });
 
     expect(result.status).toBe(400);
-    expect(result.body.error).toBe('Missing/invalid "word". Expected: { word: string }');
+    expect(result.body.error).toBe(
+      'Invalid "mode". Expected: "strict" or "open".',
+    );
   });
 
   it.each([
@@ -572,6 +574,12 @@ describe("/api/analyze-v1 GET/POST semantic parity v0.1", () => {
       expect(post.status).toBe(400);
       expect(get.body).not.toHaveProperty("alphabet");
       expect(post.body).not.toHaveProperty("alphabet");
+      expect(get.body.error).toBe(
+        'Invalid "alphabet". Expected one of: "auto", "albanian", "latin", "sanskrit", "ancient_greek", "pie", "turkish", "german".',
+      );
+      expect(post.body.error).toBe(
+        'Invalid "alphabet". Expected one of: "auto", "albanian", "latin", "sanskrit", "ancient_greek", "pie", "turkish", "german".',
+      );
     },
   );
 

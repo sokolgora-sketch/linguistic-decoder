@@ -1169,7 +1169,7 @@ export async function POST(req: Request) {
   const normalizedMode = normalizeModeV0_1(mode);
   if (!normalizedMode.ok) {
     return NextResponse.json(
-      { error: 'Missing/invalid "word". Expected: { word: string }' },
+      { error: 'Invalid "mode". Expected: "strict" or "open".' },
       { status: 400 },
     );
   }
@@ -1178,7 +1178,10 @@ export async function POST(req: Request) {
   const normalizedAlphabet = normalizeAlphabetV0_1(alphabet);
   if (!normalizedAlphabet.ok) {
     return NextResponse.json(
-      { error: 'Missing/invalid "word". Expected: { word: string }' },
+      {
+        error:
+          'Invalid "alphabet". Expected one of: "auto", "albanian", "latin", "sanskrit", "ancient_greek", "pie", "turkish", "german".',
+      },
       { status: 400 },
     );
   }
@@ -1259,7 +1262,7 @@ if (!word) {
   const normalizedMode = normalizeModeV0_1(mode);
   if (!normalizedMode.ok) {
     return NextResponse.json(
-      { error: 'Missing/invalid "word". Expected: { word: string }' },
+      { error: 'Invalid "mode". Expected: "strict" or "open".' },
       { status: 400 },
     );
   }
@@ -1268,7 +1271,10 @@ if (!word) {
   const normalizedAlphabet = normalizeAlphabetV0_1(alphabet);
   if (!normalizedAlphabet.ok) {
     return NextResponse.json(
-      { error: 'Missing/invalid "word". Expected: { word: string }' },
+      {
+        error:
+          'Invalid "alphabet". Expected one of: "auto", "albanian", "latin", "sanskrit", "ancient_greek", "pie", "turkish", "german".',
+      },
       { status: 400 },
     );
   }
