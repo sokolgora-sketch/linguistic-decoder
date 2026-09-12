@@ -272,6 +272,48 @@ describe("/api/analyze-v1 GET/POST semantic parity v0.1", () => {
     expect(pair.post.alphabet).toBe("latin");
   });
 
+  it.each([
+    { label: "missing", options: {} },
+    { label: "empty", options: { mode: "" } },
+    { label: "whitespace-only", options: { mode: " \t\n" } },
+  ])(
+    "GET and POST treat $label mode as the strict default",
+    async ({ options }) => {
+      const get = await getAnalysis("study", options);
+      const post = await postAnalysis("study", options);
+
+      expect(get.status).toBe(200);
+      expect(post.status).toBe(200);
+      expect(get.body.mode).toBe("strict");
+      expect(post.body.mode).toBe("strict");
+      expect(inputMetadata(get.body).mode).toBe("strict");
+      expect(inputMetadata(post.body).mode).toBe("strict");
+    },
+  );
+
+  it.each(["strict", "open"])(
+    "GET and POST trim and accept padded %s mode without changing semantics",
+    async (mode) => {
+      const exact = await semanticPair("study", {
+        mode,
+        alphabet: "auto",
+      });
+      const padded = await semanticPair("study", {
+        mode: ` ${mode} `,
+        alphabet: "auto",
+      });
+
+      expect(padded.get.mode).toBe(mode);
+      expect(padded.post.mode).toBe(mode);
+      expect(projectSemanticResponse(padded.get)).toEqual(
+        projectSemanticResponse(exact.get),
+      );
+      expect(projectSemanticResponse(padded.post)).toEqual(
+        projectSemanticResponse(exact.post),
+      );
+    },
+  );
+
   it("GET and POST preserve equivalent valid IPA output while allowing method metadata differences", async () => {
     const pair = await semanticPair("rhythm", {
       mode: "strict",
@@ -392,12 +434,13 @@ describe("/api/analyze-v1 GET/POST semantic parity v0.1", () => {
     expect(padded.body.evidence).toEqual(canonical.body.evidence);
   });
 
-  it("GET retains current unknown-mode fallback while preserving raw mode metadata", async () => {
+  it("GET rejects unknown non-empty mode before orchestration", async () => {
     const result = await getAnalysis("study", { mode: "bogus" });
 
-    expect(result.status).toBe(200);
-    expect(result.body.mode).toBe("strict");
-    expect(inputMetadata(result.body).mode).toBe("bogus");
+    expect(result.status).toBe(400);
+    expect(result.body.error).toBe(
+      'Missing/invalid "word". Expected: { word: string }',
+    );
   });
 
   it("POST retains current invalid-mode rejection behavior", async () => {
