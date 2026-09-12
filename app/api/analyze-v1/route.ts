@@ -38,12 +38,31 @@ import { buildHeartInstrumentV1 } from "@/v1/heartInstrument.v1";
 const BodySchema = z
   .object({
     word: z.string().min(1).refine((value) => value.trim().length > 0),
-    mode: z.enum(["strict", "open"]).optional(),
+    mode: z.string().optional(),
     alphabet: z.string().optional(),
       ipa: z.string().optional(),
       language: z.string().optional(),
   })
   .passthrough();
+
+type AnalyzeV1Mode = "strict" | "open";
+
+type NormalizedModeV0_1 =
+  | { ok: true; value: AnalyzeV1Mode | undefined }
+  | { ok: false };
+
+function normalizeModeV0_1(value: unknown): NormalizedModeV0_1 {
+  if (value === undefined) return { ok: true, value: undefined };
+  if (typeof value !== "string") return { ok: false };
+
+  const normalized = value.trim();
+  if (!normalized) return { ok: true, value: undefined };
+  if (normalized === "strict" || normalized === "open") {
+    return { ok: true, value: normalized };
+  }
+
+  return { ok: false };
+}
 
 function deriveTargetSenseIdV0_1(label: string): string {
   const normalized = label.normalize("NFKC").trim().toLocaleLowerCase("en-US");
@@ -1118,8 +1137,14 @@ export async function POST(req: Request) {
   const targetSenseId =
     targetSenseIdRawTrimmed || deriveTargetSenseIdV0_1(targetSenseLabel);
 
-const modeParsed =
-    mode === "strict" || mode === "open" ? (mode as "strict" | "open") : undefined;
+  const normalizedMode = normalizeModeV0_1(mode);
+  if (!normalizedMode.ok) {
+    return NextResponse.json(
+      { error: 'Missing/invalid "word". Expected: { word: string }' },
+      { status: 400 },
+    );
+  }
+  const modeParsed = normalizedMode.value;
 
 
 
@@ -1146,7 +1171,7 @@ const modeParsed =
     }
   return runAnalyzeV1Orchestration({
     word,
-    engineMode: mode,
+    engineMode: modeParsed,
     engineAlphabet: alphabet,
     payloadMode: modeParsed ?? mode ?? "strict",
     payloadAlphabet: alphabet ?? "auto",
@@ -1193,8 +1218,14 @@ if (!word) {
     );
   }
 
-  const modeParsed =
-    mode === "strict" || mode === "open" ? (mode as "strict" | "open") : undefined;
+  const normalizedMode = normalizeModeV0_1(mode);
+  if (!normalizedMode.ok) {
+    return NextResponse.json(
+      { error: 'Missing/invalid "word". Expected: { word: string }' },
+      { status: 400 },
+    );
+  }
+  const modeParsed = normalizedMode.value;
 
   return runAnalyzeV1Orchestration({
     word,
