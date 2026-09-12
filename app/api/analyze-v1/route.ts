@@ -591,16 +591,60 @@ function safeJsonPreview(value: unknown, maxChars = 6000) {
   }
 }
 
-function contractFailResponse(params: { message: string; issues?: unknown; out?: unknown }) {
+function isProductionEnvironment() {
+  return process.env.NODE_ENV === "production";
+}
+
+function logInternalFailure(params: {
+  kind: "contract" | "orchestration";
+  message?: string;
+  issues?: unknown;
+  out?: unknown;
+  details?: string;
+}) {
+  try {
+    console.error("[analyze-v1] internal failure", {
+      kind: params.kind,
+      ...(params.message !== undefined ? { message: params.message } : {}),
+      ...(params.issues !== undefined
+        ? { issues: safeJsonPreview(params.issues, 2000) }
+        : {}),
+      ...(params.out !== undefined
+        ? { outPreview: safeJsonPreview(params.out) }
+        : {}),
+      ...(params.details !== undefined ? { details: params.details } : {}),
+    });
+  } catch {
+    // Diagnostics must never change the failure response.
+  }
+}
+
+function genericInternalFailureResponse() {
   return NextResponse.json(
-    {
-      error: "analyze-v1 contract failure",
-      message: params.message,
-      issues: params.issues ?? null,
-      outPreview: safeJsonPreview(params.out),
-    },
-    { status: 500 }
+    { error: "Internal server error" },
+    { status: 500 },
   );
+}
+
+function contractFailResponse(params: { message: string; issues?: unknown; out?: unknown }) {
+  const outPreview = safeJsonPreview(params.out);
+  const diagnosticBody = {
+    error: "analyze-v1 contract failure",
+    message: params.message,
+    issues: params.issues ?? null,
+    outPreview,
+  };
+
+  logInternalFailure({
+    kind: "contract",
+    message: params.message,
+    issues: params.issues,
+    out: params.out,
+  });
+
+  if (isProductionEnvironment()) return genericInternalFailureResponse();
+
+  return NextResponse.json(diagnosticBody, { status: 500 });
 }
 
 
@@ -1101,10 +1145,18 @@ async function runAnalyzeV1Orchestration(
 
     return NextResponse.json(final);
   } catch (err: any) {
+    const details = String(err?.stack ?? err?.message ?? err);
+    logInternalFailure({
+      kind: "orchestration",
+      details,
+    });
+
+    if (isProductionEnvironment()) return genericInternalFailureResponse();
+
     return NextResponse.json(
       {
         error: "analyze-v1 failed",
-        details: String(err?.stack ?? err?.message ?? err),
+        details,
       },
       { status: 500 },
     );
