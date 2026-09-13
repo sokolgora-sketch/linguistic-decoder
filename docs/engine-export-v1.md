@@ -216,18 +216,37 @@ V1 handlers and inherits this request compatibility behavior.
 ### Analyze V1 error behavior
 
 For invalid client requests, Analyze V1 returns HTTP `400` with a JSON body
-containing an `error` string. Human-readable wording is diagnostic and
-non-normative; clients should not parse or depend on exact message text.
+containing the legacy `error` string and a stable `reason` code:
 
-Malformed JSON and request-schema failures use this same envelope. Explicit
-unsupported string values for `mode` and `alphabet` identify the affected
-field, while schema/type failures are not guaranteed to use field-specific
-wording.
+```json
+{ "error": "<legacy diagnostic text>", "reason": "<reason code>" }
+```
+
+The `error` value remains human-readable diagnostic text and is non-normative;
+clients should use `reason` for machine-readable classification rather than
+parsing the message. The finite reason vocabulary is:
+
+- `MALFORMED_JSON` - the POST body could not be parsed as JSON.
+- `INVALID_REQUEST_BODY` - the POST body failed the request schema or a field
+  had an invalid type other than the separately classified word case.
+- `MISSING_WORD` - the required word was missing, empty, or whitespace-only.
+- `INVALID_MODE` - a supplied non-empty mode was not `strict` or `open`.
+- `INVALID_ALPHABET` - a supplied non-empty alphabet was not one of the
+  canonical selectors.
+
+GET and POST use the same reason for the same explicit mode or alphabet
+validation class. GET missing/blank word requests and POST missing/blank word
+requests both use `MISSING_WORD`; other POST schema/type failures use
+`INVALID_REQUEST_BODY`. Schema/type failures are not guaranteed to identify a
+field through the `reason` value. The error contract does not expose a
+structured field path, a multi-error `issues` array, raw Zod issues, or request
+values.
 
 Unexpected response-contract or orchestration failures return HTTP `500`.
 Diagnostic fields in those internal failure responses are not part of the
 public API contract. The legacy `/api/analyze` route inherits this behavior
-because it re-exports the Analyze V1 handlers.
+and the additive `reason` field because it re-exports the Analyze V1 handlers.
+Successful analysis output is unchanged.
 
 ### `GET /api/analyze-core`
 
