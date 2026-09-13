@@ -4,6 +4,13 @@ import React from 'react';
 import ChatShell from '@/components/ChatShell';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { InstrumentPanel } from '@/ui/instrument/InstrumentPanel';
 import {
   ReproducibleRunBundleControls,
@@ -12,6 +19,7 @@ import {
 import { CrossLanguageRecurrenceCardV0_1 } from '@/ui/instrument/sections/CrossLanguageRecurrenceCard.v0.1';
 import type { ReproducibleRunBundleV0_1 } from '@/shared/openInstrument/reproducibleRunBundle.v0_1';
 import type { SevenVoiceFunctionalRecurrenceResearchAvailableV0_1 } from '@/shared/openInstrument/sevenVoiceFunctionalRecurrenceResearchCatalog.v0_1';
+import type { AlphabetId, Mode } from '@/types/engine';
 import { MT } from '@/ui/typography/marketingType.v0.1';
 
 class UiErrorBoundary extends React.Component<
@@ -89,6 +97,25 @@ const ANALYZE_V1_REQUEST_REASON_COPY_V0_1: Record<
   INVALID_ALPHABET: "The requested alphabet is invalid.",
 };
 
+const ANALYZE_V1_MODE_OPTIONS: ReadonlyArray<{ value: Mode; label: string }> = [
+  { value: "strict", label: "Strict" },
+  { value: "open", label: "Open" },
+];
+
+const ANALYZE_V1_ALPHABET_OPTIONS: ReadonlyArray<{
+  value: AlphabetId;
+  label: string;
+}> = [
+  { value: "auto", label: "Auto" },
+  { value: "albanian", label: "Albanian" },
+  { value: "latin", label: "Latin" },
+  { value: "sanskrit", label: "Sanskrit" },
+  { value: "ancient_greek", label: "Ancient Greek" },
+  { value: "pie", label: "PIE" },
+  { value: "turkish", label: "Turkish" },
+  { value: "german", label: "German" },
+];
+
 function parseAnalyzeV1RequestErrorV0_1(
   status: number,
   body: unknown,
@@ -147,6 +174,9 @@ export default function ZroChatPage() {
   const [input, setInput] = React.useState('');
   const [ipa, setIpa] = React.useState('');
   const [targetSense, setTargetSense] = React.useState('');
+  const [analysisMode, setAnalysisMode] = React.useState<Mode>("strict");
+  const [analysisAlphabet, setAnalysisAlphabet] =
+    React.useState<AlphabetId>("auto");
   const [lastRun, setLastRun] = React.useState<{
     word: string;
     ipa?: string;
@@ -181,7 +211,13 @@ export default function ZroChatPage() {
     if (typeof fn === 'function') fn.call(el, { behavior: 'smooth', block: 'end' });
   }, [messages.length]);
 
-  async function runAnalysis(word: string, ipaRaw?: string, targetSenseRaw?: string) {
+  async function runAnalysis(
+    word: string,
+    ipaRaw?: string,
+    targetSenseRaw?: string,
+    mode: Mode = "strict",
+    alphabet: AlphabetId = "auto",
+  ) {
     const w = word.trim();
     const ipaTrim = (ipaRaw ?? "").trim();
     const targetSenseTrim = (targetSenseRaw ?? "").trim();
@@ -203,7 +239,11 @@ export default function ZroChatPage() {
     setBusy(true);
 
     try {
-      const url = `/api/analyze-v1?word=${encodeURIComponent(w)}&mode=strict${ipaTrim ? `&ipa=${encodeURIComponent(ipaTrim)}` : ""}${targetSenseTrim ? `&targetSenseLabel=${encodeURIComponent(targetSenseTrim)}` : ""}`;
+      const alphabetQuery =
+        alphabet === "auto"
+          ? ""
+          : `&alphabet=${encodeURIComponent(alphabet)}`;
+      const url = `/api/analyze-v1?word=${encodeURIComponent(w)}&mode=${encodeURIComponent(mode)}${alphabetQuery}${ipaTrim ? `&ipa=${encodeURIComponent(ipaTrim)}` : ""}${targetSenseTrim ? `&targetSenseLabel=${encodeURIComponent(targetSenseTrim)}` : ""}`;
       const res = await fetch(url, { method: 'GET' });
       const json: unknown =
         typeof res.json === 'function' ? await res.json() : null;
@@ -296,7 +336,7 @@ export default function ZroChatPage() {
 
   function onSubmit() {
     if (busy) return;
-    void runAnalysis(input, ipa, targetSense);
+    void runAnalysis(input, ipa, targetSense, analysisMode, analysisAlphabet);
   }
 
   function onKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
@@ -311,7 +351,7 @@ export default function ZroChatPage() {
 
   const composer = (
     <div className="overflow-hidden rounded-[14px] border border-[#2f3742] bg-[#13171d] p-2.5 shadow-[0_16px_40px_rgba(0,0,0,0.24)] sm:p-3">
-      <div className="grid min-w-0 grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-[minmax(0,1fr)_minmax(220px,0.45fr)_minmax(260px,0.55fr)_132px] xl:items-end">
+      <div className="grid min-w-0 grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-[minmax(0,1fr)_minmax(220px,0.45fr)_minmax(260px,0.55fr)_minmax(150px,0.32fr)_minmax(180px,0.42fr)_132px] xl:items-end">
         <label className="block min-w-0">
           <span className={`${MT.fieldLabel} mb-2 text-[11px] text-[#8ea4ba]`}>
             Word
@@ -355,6 +395,56 @@ export default function ZroChatPage() {
             disabled={busy}
             className={inputClassName}
           />
+        </label>
+
+        <label className="block min-w-0">
+          <span className={`${MT.fieldLabel} mb-2 text-[11px] text-[#8ea4ba]`}>
+            Analysis mode
+          </span>
+          <Select
+            value={analysisMode}
+            onValueChange={(value) => setAnalysisMode(value as Mode)}
+          >
+            <SelectTrigger
+              aria-label="Analysis mode"
+              disabled={busy}
+              className={`${inputClassName} text-left`}
+            >
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {ANALYZE_V1_MODE_OPTIONS.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </label>
+
+        <label className="block min-w-0">
+          <span className={`${MT.fieldLabel} mb-2 text-[11px] text-[#8ea4ba]`}>
+            Alphabet profile
+          </span>
+          <Select
+            value={analysisAlphabet}
+            onValueChange={(value) => setAnalysisAlphabet(value as AlphabetId)}
+          >
+            <SelectTrigger
+              aria-label="Alphabet profile"
+              disabled={busy}
+              className={`${inputClassName} text-left`}
+            >
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {ANALYZE_V1_ALPHABET_OPTIONS.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </label>
 
         <Button

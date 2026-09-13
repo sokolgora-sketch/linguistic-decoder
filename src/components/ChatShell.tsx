@@ -60,7 +60,7 @@ export default function ChatShell({
         </div>
       </header>
 
-      <main className={composer ? "flex-1 pb-[calc(16rem+env(safe-area-inset-bottom))] md:pb-[calc(9.5rem+env(safe-area-inset-bottom))] xl:pb-[calc(7.5rem+env(safe-area-inset-bottom))]" : "flex-1"}>
+      <main className={composer ? "flex-1 pb-[calc(32rem+env(safe-area-inset-bottom))] md:pb-[calc(22rem+env(safe-area-inset-bottom))] xl:pb-[calc(7.5rem+env(safe-area-inset-bottom))]" : "flex-1"}>
         <div className={`${wrap} py-4`}>{children}</div>
       </main>
 
