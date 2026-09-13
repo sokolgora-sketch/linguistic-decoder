@@ -506,6 +506,13 @@ export function InstrumentPanel(props: Props) {
                 onViewCandidateRecord={handleViewCandidateRecord}
               />
 
+              <VowelPathTimeline
+                detected={vm.readout.voicePath}
+                surface={surfaceVoicePath}
+                functional={functionalVoicePath}
+                delta={vm.readout.voicePathDelta}
+              />
+
               <details
                 data-testid="deterministic-details"
                 className="rounded-xl border border-[#303a45] bg-[#10151c]"
