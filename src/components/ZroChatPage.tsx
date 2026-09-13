@@ -71,6 +71,55 @@ function safeString(e: unknown): string {
   }
 }
 
+type AnalyzeV1InvalidRequestReasonV0_1 =
+  | "MALFORMED_JSON"
+  | "INVALID_REQUEST_BODY"
+  | "MISSING_WORD"
+  | "INVALID_MODE"
+  | "INVALID_ALPHABET";
+
+const ANALYZE_V1_REQUEST_REASON_COPY_V0_1: Record<
+  AnalyzeV1InvalidRequestReasonV0_1,
+  string
+> = {
+  MALFORMED_JSON: "The request body could not be parsed.",
+  INVALID_REQUEST_BODY: "The request body is invalid.",
+  MISSING_WORD: "A word is required.",
+  INVALID_MODE: "The requested mode is invalid.",
+  INVALID_ALPHABET: "The requested alphabet is invalid.",
+};
+
+function parseAnalyzeV1RequestErrorV0_1(
+  status: number,
+  body: unknown,
+): { reason: AnalyzeV1InvalidRequestReasonV0_1; message: string } | null {
+  if (!body || typeof body !== "object" || Array.isArray(body) || status !== 400) {
+    return null;
+  }
+
+  const record = body as Record<string, unknown>;
+  const reason = record.reason;
+  if (
+    typeof reason !== "string" ||
+    !Object.prototype.hasOwnProperty.call(
+      ANALYZE_V1_REQUEST_REASON_COPY_V0_1,
+      reason,
+    )
+  ) {
+    return null;
+  }
+
+  return {
+    reason: reason as AnalyzeV1InvalidRequestReasonV0_1,
+    message:
+      typeof record.error === "string" && record.error.length > 0
+        ? record.error
+        : ANALYZE_V1_REQUEST_REASON_COPY_V0_1[
+            reason as AnalyzeV1InvalidRequestReasonV0_1
+          ],
+  };
+}
+
 function OpenInstrumentEmptyState() {
   return (
     <section
@@ -162,23 +211,27 @@ export default function ZroChatPage() {
       if (!res.ok) {
         const status = res.status;
         const statusText = res.statusText;
-
+        const structuredRequestError = parseAnalyzeV1RequestErrorV0_1(status, json);
 
         setMessages(prev =>
           prev.map(x =>
             x.id === assistantMsg.id
               ? {
                   ...x,
-                  text: 'Request failed.',
-                  error: statusText || `HTTP ${status}`,
-                  result: json ?? undefined,
-                  instrumentPayload: json,
+                  text: structuredRequestError
+                    ? 'Request validation failed.'
+                    : 'Request failed.',
+                  error: structuredRequestError?.message || statusText || `HTTP ${status}`,
                 }
               : x
           )
         );
 
-        setStatusBanner('Engine error.');
+        setStatusBanner(
+          structuredRequestError
+            ? `Request error: ${structuredRequestError.message}`
+            : 'Engine error.',
+        );
         setDebug(statusText || (json ? JSON.stringify(json, null, 2) : '') || `HTTP ${status}` || '');
         return;
       }
@@ -317,16 +370,15 @@ export default function ZroChatPage() {
     </div>
   );
 
+  const latestAssistantMessage = messages
+    .slice()
+    .reverse()
+    .find((m): m is Extract<Msg, { role: 'assistant' }> => m.role === 'assistant');
   const latestInstrumentPayload =
     importedBundle?.result ??
-    messages
-      .slice()
-      .reverse()
-      .find(
-        (m): m is Extract<Msg, { role: 'assistant' }> & { instrumentPayload: unknown } =>
-          'instrumentPayload' in m && m.instrumentPayload != null,
-      )
-      ?.instrumentPayload ?? null;
+    (latestAssistantMessage && 'instrumentPayload' in latestAssistantMessage
+      ? latestAssistantMessage.instrumentPayload ?? null
+      : null);
 
   const displayedAnalysisSource: ReproducibleRunBundleDisplaySourceV0_1 =
     importedBundle
