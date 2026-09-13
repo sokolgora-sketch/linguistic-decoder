@@ -8,6 +8,9 @@ import type {
   Vowel,
 } from "@/ui/telemetry/types";
 
+import { buildCandidateRowsFromVM } from "@/ui/candidates/candidateModel";
+import { CandidateEvidenceReferences } from "@/ui/candidates/EvidenceReferenceLink";
+
 import {
   SEVEN_PRINCIPLES,
   VOWELS_7,
@@ -504,9 +507,11 @@ function NoSupportedFunctionalCandidate({
 export function EmbryoExpansionContextCardV0_1({
   vm,
   onViewCandidateRecord,
+  showPrimaryEvidence = false,
 }: {
   vm: TelemetryViewModel;
   onViewCandidateRecord?: (candidateId: string) => void;
+  showPrimaryEvidence?: boolean;
 }) {
   const rootMap =
     vm.rootMap?.kind === "present"
@@ -543,6 +548,15 @@ export function EmbryoExpansionContextCardV0_1({
       />
     );
   }
+
+  const primaryCandidateIndex = rows.indexOf(primaryCandidate);
+  const candidateUiRows = showPrimaryEvidence
+    ? buildCandidateRowsFromVM(vm)
+    : [];
+  const primaryCandidateUiRow =
+    showPrimaryEvidence && primaryCandidateIndex >= 0
+      ? candidateUiRows[primaryCandidateIndex] ?? null
+      : null;
 
   const rootTokens =
     Array.isArray(
@@ -1174,6 +1188,10 @@ export function EmbryoExpansionContextCardV0_1({
             "A functional explanation was not emitted."}
         </div>
       </div>
+
+      {primaryCandidateUiRow ? (
+        <CandidateEvidenceReferences row={primaryCandidateUiRow} tone="light" />
+      ) : null}
 
       {functionalPath ? (
         <div className="mt-4 font-mono text-sm text-slate-700 dark:text-slate-300">
