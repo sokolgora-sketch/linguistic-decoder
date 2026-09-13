@@ -504,6 +504,7 @@ export function InstrumentPanel(props: Props) {
               <EmbryoExpansionContextCardV0_1
                 vm={vm}
                 onViewCandidateRecord={handleViewCandidateRecord}
+                showPrimaryEvidence
               />
 
               <VowelPathTimeline

@@ -155,14 +155,15 @@ afterEach(() => {
 });
 
 describe("Open Instrument primary candidate navigation affordance v0.1", () => {
-  it("targets the exact selected candidate, opens the disclosure, preserves order, and stays Overview-only", async () => {
+  it("shows primary evidence in Overview and targets the exact selected candidate", async () => {
     const body = makePrimarySelectionFixture(await analyze("study"));
     const vm = adaptAnalysisToTelemetryVM(body.payload);
     render(<InstrumentPanel payload={body.payload} />);
 
     const overviewPanel = screen.getByRole("tabpanel");
     expect(within(overviewPanel).getByRole("button", { name: "View candidate record" })).toBeVisible();
-    expect(within(overviewPanel).queryByRole("link")).not.toBeInTheDocument();
+    expect(within(overviewPanel).getByText("Evidence sources")).toBeVisible();
+    expect(within(overviewPanel).getByRole("link")).toBeVisible();
 
     fireEvent.click(
       within(overviewPanel).getByRole("button", { name: "View candidate record" }),
