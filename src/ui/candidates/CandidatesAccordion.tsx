@@ -165,6 +165,14 @@ export function CandidatesAccordion({
                       </div>
                     ) : null}
 
+                    {c.expansionChain?.length ? (
+                      <div className="break-words text-xs text-slate-300">
+                        <span className="font-mono">
+                          {`Expansion chain: ${c.expansionChain.join(" → ")}`}
+                        </span>
+                      </div>
+                    ) : null}
+
                     {hasEmbryoFirstReadout ? (
                       <div className="space-y-2 rounded-md border border-slate-700/80 bg-slate-950/35 p-2.5">
                         <div className="flex flex-wrap items-center gap-2">

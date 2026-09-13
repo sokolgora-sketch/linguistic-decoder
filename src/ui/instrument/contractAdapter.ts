@@ -1205,6 +1205,11 @@ const normalizationSteps =
           rec["functionalBridgeTruth"],
         );
 
+      // Analyze V1 validates this as an ordered string array; preserve it
+      // without deriving, sorting, or normalizing the emitted chain.
+      const expansionChain =
+        asStringArray(rec["expansionChain"]);
+
       const embryo = asString(rec["embryo"]);
       const plainStandaloneGloss =
         asString(rec["plainStandaloneGloss"]);
@@ -1461,6 +1466,13 @@ const evidenceId = String(id).toLowerCase().replace(/[^a-z0-9_]/g, "_");
                 present(
                   functionalBridgeTruth,
                 ),
+            }
+          : {}),
+
+        ...(expansionChain
+          ? {
+              expansionChain:
+                present(expansionChain),
             }
           : {}),
 
