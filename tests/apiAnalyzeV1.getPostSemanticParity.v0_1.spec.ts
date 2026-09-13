@@ -1,5 +1,5 @@
 import { GET, POST } from "../app/api/analyze-v1/route";
-import { GET as legacyGET } from "../app/api/analyze/route";
+import { GET as legacyGET, POST as legacyPOST } from "../app/api/analyze/route";
 
 type JsonObject = Record<string, unknown>;
 
@@ -401,9 +401,10 @@ describe("/api/analyze-v1 GET/POST semantic parity v0.1", () => {
       const result = await getAnalysis(word, { mode: "strict" });
 
       expect(result.status).toBe(400);
-      expect(result.body.error).toBe(
-        'Missing "word" query param. Use: /api/analyze-v1?word=study',
-      );
+      expect(result.body).toEqual({
+        error: 'Missing "word" query param. Use: /api/analyze-v1?word=study',
+        reason: "MISSING_WORD",
+      });
     },
   );
 
@@ -413,9 +414,10 @@ describe("/api/analyze-v1 GET/POST semantic parity v0.1", () => {
       const result = await postAnalysis(word, { mode: "strict" });
 
       expect(result.status).toBe(400);
-      expect(result.body.error).toBe(
-        'Missing/invalid "word". Expected: { word: string }',
-      );
+      expect(result.body).toEqual({
+        error: 'Missing/invalid "word". Expected: { word: string }',
+        reason: "MISSING_WORD",
+      });
     },
   );
 
@@ -430,9 +432,24 @@ describe("/api/analyze-v1 GET/POST semantic parity v0.1", () => {
     const body = await responseJson(response);
 
     expect(response.status).toBe(400);
-    expect(body.error).toBe(
-      'Missing/invalid "word". Expected: { word: string }',
-    );
+    expect(body).toEqual({
+      error: 'Missing/invalid "word". Expected: { word: string }',
+      reason: "INVALID_REQUEST_BODY",
+    });
+  });
+
+  it("groups POST schema/type failures without exposing validation internals", async () => {
+    const result = await postBody({
+      word: "study",
+      mode: 42,
+      ipa: { value: "studi" },
+    });
+
+    expect(result.status).toBe(400);
+    expect(result.body).toEqual({
+      error: 'Missing/invalid "word". Expected: { word: string }',
+      reason: "INVALID_REQUEST_BODY",
+    });
   });
 
   it("POST preserves valid padded-word metadata and analytical semantics", async () => {
@@ -460,18 +477,20 @@ describe("/api/analyze-v1 GET/POST semantic parity v0.1", () => {
     const result = await getAnalysis("study", { mode: "bogus" });
 
     expect(result.status).toBe(400);
-    expect(result.body.error).toBe(
-      'Invalid "mode". Expected: "strict" or "open".',
-    );
+    expect(result.body).toEqual({
+      error: 'Invalid "mode". Expected: "strict" or "open".',
+      reason: "INVALID_MODE",
+    });
   });
 
   it("POST rejects unknown non-empty mode with the mode-specific 400 error", async () => {
     const result = await postAnalysis("study", { mode: "bogus" });
 
     expect(result.status).toBe(400);
-    expect(result.body.error).toBe(
-      'Invalid "mode". Expected: "strict" or "open".',
-    );
+    expect(result.body).toEqual({
+      error: 'Invalid "mode". Expected: "strict" or "open".',
+      reason: "INVALID_MODE",
+    });
   });
 
   it.each([
@@ -574,12 +593,16 @@ describe("/api/analyze-v1 GET/POST semantic parity v0.1", () => {
       expect(post.status).toBe(400);
       expect(get.body).not.toHaveProperty("alphabet");
       expect(post.body).not.toHaveProperty("alphabet");
-      expect(get.body.error).toBe(
-        'Invalid "alphabet". Expected one of: "auto", "albanian", "latin", "sanskrit", "ancient_greek", "pie", "turkish", "german".',
-      );
-      expect(post.body.error).toBe(
-        'Invalid "alphabet". Expected one of: "auto", "albanian", "latin", "sanskrit", "ancient_greek", "pie", "turkish", "german".',
-      );
+      expect(get.body).toEqual({
+        error:
+          'Invalid "alphabet". Expected one of: "auto", "albanian", "latin", "sanskrit", "ancient_greek", "pie", "turkish", "german".',
+        reason: "INVALID_ALPHABET",
+      });
+      expect(post.body).toEqual({
+        error:
+          'Invalid "alphabet". Expected one of: "auto", "albanian", "latin", "sanskrit", "ancient_greek", "pie", "turkish", "german".',
+        reason: "INVALID_ALPHABET",
+      });
     },
   );
 
@@ -595,7 +618,10 @@ describe("/api/analyze-v1 GET/POST semantic parity v0.1", () => {
       const result = await postBody({ word: "study", alphabet });
 
       expect(result.status).toBe(400);
-      expect(result.body).not.toHaveProperty("alphabet");
+      expect(result.body).toEqual({
+        error: 'Missing/invalid "word". Expected: { word: string }',
+        reason: "INVALID_REQUEST_BODY",
+      });
     },
   );
 
@@ -610,9 +636,11 @@ describe("/api/analyze-v1 GET/POST semantic parity v0.1", () => {
     const body = await responseJson(response);
 
     expect(response.status).toBe(400);
-    expect(body.error).toBe(
-      'Invalid JSON body. Expected: { word: string, mode?: "strict"|"open", alphabet?: string }',
-    );
+    expect(body).toEqual({
+      error:
+        'Invalid JSON body. Expected: { word: string, mode?: "strict"|"open", alphabet?: string }',
+      reason: "MALFORMED_JSON",
+    });
   });
 
   it("GET and POST retain independent missing-word 400 errors", async () => {
@@ -628,8 +656,43 @@ describe("/api/analyze-v1 GET/POST semantic parity v0.1", () => {
 
     expect(get.status).toBe(400);
     expect(post.status).toBe(400);
-    expect(get.body.error).toContain('Missing "word" query param');
-    expect(postBody.error).toBe('Missing/invalid "word". Expected: { word: string }');
+    expect(get.body).toEqual({
+      error: 'Missing "word" query param. Use: /api/analyze-v1?word=study',
+      reason: "MISSING_WORD",
+    });
+    expect(postBody).toEqual({
+      error: 'Missing/invalid "word". Expected: { word: string }',
+      reason: "MISSING_WORD",
+    });
+  });
+
+  it("legacy /api/analyze inherits the V1 invalid-request reason field", async () => {
+    const legacyGetResponse = await legacyGET(
+      new Request(queryUrl("study", { mode: "bogus" })),
+    );
+    const legacyGetBody = await responseJson(legacyGetResponse);
+
+    expect(legacyGetResponse.status).toBe(400);
+    expect(legacyGetBody).toEqual({
+      error: 'Invalid "mode". Expected: "strict" or "open".',
+      reason: "INVALID_MODE",
+    });
+
+    const legacyPostResponse = await legacyPOST(
+      new Request("http://localhost/api/analyze", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ word: "study", alphabet: "bogus" }),
+      }),
+    );
+    const legacyPostBody = await responseJson(legacyPostResponse);
+
+    expect(legacyPostResponse.status).toBe(400);
+    expect(legacyPostBody).toEqual({
+      error:
+        'Invalid "alphabet". Expected one of: "auto", "albanian", "latin", "sanskrit", "ancient_greek", "pie", "turkish", "german".',
+      reason: "INVALID_ALPHABET",
+    });
   });
 
   it("legacy /api/analyze delegates to the v1 GET semantic result", async () => {

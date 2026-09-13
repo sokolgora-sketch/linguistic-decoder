@@ -60,6 +60,38 @@ const BodySchema = z
 
 type AnalyzeV1Mode = "strict" | "open";
 
+type AnalyzeV1InvalidRequestReasonV0_1 =
+  | "MALFORMED_JSON"
+  | "INVALID_REQUEST_BODY"
+  | "MISSING_WORD"
+  | "INVALID_MODE"
+  | "INVALID_ALPHABET";
+
+function invalidRequestResponseV0_1(
+  error: string,
+  reason: AnalyzeV1InvalidRequestReasonV0_1,
+) {
+  return NextResponse.json({ error, reason }, { status: 400 });
+}
+
+function classifyPostBodyFailureV0_1(
+  body: unknown,
+): AnalyzeV1InvalidRequestReasonV0_1 {
+  if (!body || typeof body !== "object" || Array.isArray(body)) {
+    return "INVALID_REQUEST_BODY";
+  }
+
+  const rawWord = (body as Record<string, unknown>).word;
+  if (
+    rawWord === undefined ||
+    (typeof rawWord === "string" && rawWord.trim().length === 0)
+  ) {
+    return "MISSING_WORD";
+  }
+
+  return "INVALID_REQUEST_BODY";
+}
+
 type NormalizedModeV0_1 =
   | { ok: true; value: AnalyzeV1Mode | undefined }
   | { ok: false };
@@ -1182,20 +1214,17 @@ export async function POST(req: Request) {
   try {
     body = await req.json();
   } catch {
-    return NextResponse.json(
-      {
-        error:
-          'Invalid JSON body. Expected: { word: string, mode?: "strict"|"open", alphabet?: string }',
-      },
-      { status: 400 }
+    return invalidRequestResponseV0_1(
+      'Invalid JSON body. Expected: { word: string, mode?: "strict"|"open", alphabet?: string }',
+      "MALFORMED_JSON",
     );
   }
 
   const parsed = BodySchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: 'Missing/invalid "word". Expected: { word: string }' },
-      { status: 400 }
+    return invalidRequestResponseV0_1(
+      'Missing/invalid "word". Expected: { word: string }',
+      classifyPostBodyFailureV0_1(body),
     );
   }
 
@@ -1232,21 +1261,18 @@ export async function POST(req: Request) {
 
   const normalizedMode = normalizeModeV0_1(mode);
   if (!normalizedMode.ok) {
-    return NextResponse.json(
-      { error: 'Invalid "mode". Expected: "strict" or "open".' },
-      { status: 400 },
+    return invalidRequestResponseV0_1(
+      'Invalid "mode". Expected: "strict" or "open".',
+      "INVALID_MODE",
     );
   }
   const modeParsed = normalizedMode.value;
 
   const normalizedAlphabet = normalizeAlphabetV0_1(alphabet);
   if (!normalizedAlphabet.ok) {
-    return NextResponse.json(
-      {
-        error:
-          'Invalid "alphabet". Expected one of: "auto", "albanian", "latin", "sanskrit", "ancient_greek", "pie", "turkish", "german".',
-      },
-      { status: 400 },
+    return invalidRequestResponseV0_1(
+      'Invalid "alphabet". Expected one of: "auto", "albanian", "latin", "sanskrit", "ancient_greek", "pie", "turkish", "german".',
+      "INVALID_ALPHABET",
     );
   }
   const alphabetParsed = normalizedAlphabet.value;
@@ -1317,29 +1343,26 @@ export async function GET(req: Request) {
       url.searchParams.get("seedBrainCandidates") === "1" ||
       url.searchParams.get("brainCandidatesSeedFallback") === "1";
 if (!word) {
-    return NextResponse.json(
-      { error: 'Missing "word" query param. Use: /api/analyze-v1?word=study' },
-      { status: 400 }
+    return invalidRequestResponseV0_1(
+      'Missing "word" query param. Use: /api/analyze-v1?word=study',
+      "MISSING_WORD",
     );
   }
 
   const normalizedMode = normalizeModeV0_1(mode);
   if (!normalizedMode.ok) {
-    return NextResponse.json(
-      { error: 'Invalid "mode". Expected: "strict" or "open".' },
-      { status: 400 },
+    return invalidRequestResponseV0_1(
+      'Invalid "mode". Expected: "strict" or "open".',
+      "INVALID_MODE",
     );
   }
   const modeParsed = normalizedMode.value;
 
   const normalizedAlphabet = normalizeAlphabetV0_1(alphabet);
   if (!normalizedAlphabet.ok) {
-    return NextResponse.json(
-      {
-        error:
-          'Invalid "alphabet". Expected one of: "auto", "albanian", "latin", "sanskrit", "ancient_greek", "pie", "turkish", "german".',
-      },
-      { status: 400 },
+    return invalidRequestResponseV0_1(
+      'Invalid "alphabet". Expected one of: "auto", "albanian", "latin", "sanskrit", "ancient_greek", "pie", "turkish", "german".',
+      "INVALID_ALPHABET",
     );
   }
   const alphabetParsed = normalizedAlphabet.value;
