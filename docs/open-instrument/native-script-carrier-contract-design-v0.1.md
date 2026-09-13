@@ -147,6 +147,7 @@ type NativeScriptCarrierResearchRepresentationV0_1 = Readonly<{
   surfaceForm: string;
   sourceScript: string | null;
   comparisonForm: string | null;
+  normalizedAnalysisForm: string | null;
   comparisonMode:
     | "orthography"
     | "transliteration"
@@ -166,6 +167,15 @@ This record is intentionally smaller than a full source/evidence packet. The
 existing candidate and cohort contracts remain the owners of source
 attestation, review status, claim boundaries, and admission rules.
 
+`comparisonForm` is the declared comparison representation. When a comparison
+representation is sent to a Seven-Voice extractor, `normalizedAnalysisForm`
+must identify the exact deterministic form sent to that extractor. The current
+FVR implementation uses its `comparisonForm` directly, so a future adapter must
+either make `comparisonForm` equal to that exact analysis form or provide an
+equivalent mode-aware extraction seam. A `comparisonMode`, rule ID, or language
+label by itself is not enough to stop an unnormalized transliteration from
+being interpreted under the default orthography mapper.
+
 The following invariants apply:
 
 - `surfaceForm` is required for an admitted observation and is not silently
@@ -179,7 +189,15 @@ The following invariants apply:
 - `comparisonAuthority` must agree with provenance authority.
 - Missing provenance cannot be admitted; staging remains Null/Unknown or is
   rejected.
-- `comparisonForm` is analyzed only under the declared mode and rule.
+- `normalizedAnalysisForm` is Null until the exact deterministic analysis form
+  is established.
+- An admitted transliteration or functional-normalization observation requires
+  a non-empty `normalizedAnalysisForm`, unless the implementation uses an
+  equivalently explicit mode-aware extraction rule that is part of the
+  reviewed contract.
+- The extractor must consume `normalizedAnalysisForm` (or the equivalent
+  explicitly mode-aware form), never an unnormalized transliteration merely
+  because `comparisonMode` is declared.
 - A missing or unresolved mapping yields Null/Unknown or remains a research
   candidate; it does not trigger a guessed production conversion.
 
@@ -192,6 +210,8 @@ The following invariants apply:
 - `comparisonForm`
 - `comparisonMode`
 - `comparisonAuthority`
+- `normalizedAnalysisForm` for a transliteration or functional-normalization
+  observation, unless an equivalent mode-aware extraction rule is admitted
 - `comparisonProvenance.provenanceId`
 - `comparisonProvenance.authority`
 - `comparisonProvenance.ruleId` for transliteration or functional
@@ -204,6 +224,8 @@ The following invariants apply:
 - `languageId` when the staging packet has not yet resolved the language
   identity
 - proposed comparison form and mode before admission review
+- proposed normalized analysis form before the deterministic extraction input is
+  established
 - source citations and language variety, using the existing candidate packet
   contract
 
@@ -385,6 +407,8 @@ A later implementation must add deterministic tests before runtime wiring:
 - any language-bound consonantal-Y rule is explicit and does not alter the
   default rail;
 - a frozen reviewed mapping gives the same comparison form on repeated runs;
+- the exact normalized analysis form or mode-aware extraction rule is fixed and
+  repeated runs cannot silently reinterpret transliteration characters;
 - the mapping rule, authority, and evidence references are retained;
 - an unknown or unsupported script yields Null/Unknown rather than a guessed
   analysis form;
