@@ -10,7 +10,8 @@ describe("Open Instrument responsive shell guard", () => {
 
     expect(source).toContain("sticky bottom-0");
     expect(source).toContain("env(safe-area-inset-bottom)");
-    expect(source).toContain("pb-[calc(16rem+env(safe-area-inset-bottom))]");
+    expect(source).toContain("pb-[calc(32rem+env(safe-area-inset-bottom))]");
+    expect(source).toContain("md:pb-[calc(22rem+env(safe-area-inset-bottom))]");
     expect(source).toContain("xl:pb-[calc(7.5rem+env(safe-area-inset-bottom))]");
   });
 
