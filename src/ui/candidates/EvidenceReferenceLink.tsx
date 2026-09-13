@@ -73,23 +73,32 @@ function resolutionLabelV0_1(
 
 export function EvidenceReferenceItem({
   resolution,
+  tone = "dark",
 }: {
   resolution: EvidenceReferenceResolutionV0_1;
+  tone?: "dark" | "light";
 }) {
   const sourceLabel = resolutionLabelV0_1(resolution);
   const title = resolution.title ??
     (resolution.kind === "unresolved" ? "Unresolved reference" : "Source record");
+  const isLight = tone === "light";
 
   return (
-    <li className="rounded-md border border-slate-800 bg-black/20 px-2.5 py-2 text-xs text-slate-300">
+    <li className={isLight
+      ? "rounded-md border border-slate-300 bg-white/80 px-2.5 py-2 text-xs text-slate-700 dark:border-slate-800 dark:bg-black/20 dark:text-slate-300"
+      : "rounded-md border border-slate-800 bg-black/20 px-2.5 py-2 text-xs text-slate-300"}>
       <div className="flex flex-wrap items-center gap-2">
-        <span className="font-semibold text-slate-200">{sourceLabel}</span>
+        <span className={isLight
+          ? "font-semibold text-slate-800 dark:text-slate-200"
+          : "font-semibold text-slate-200"}>{sourceLabel}</span>
         {resolution.navigable && resolution.safeUrl ? (
           <a
             href={resolution.safeUrl}
             target="_blank"
             rel="noreferrer noopener"
-            className="text-blue-200 underline decoration-blue-400/70 underline-offset-2 hover:text-blue-100"
+            className={isLight
+              ? "text-blue-700 underline decoration-blue-600/70 underline-offset-2 hover:text-blue-800 dark:text-blue-200 dark:decoration-blue-400/70 dark:hover:text-blue-100"
+              : "text-blue-200 underline decoration-blue-400/70 underline-offset-2 hover:text-blue-100"}
           >
             {title}
           </a>
@@ -97,7 +106,9 @@ export function EvidenceReferenceItem({
           <span>{title}</span>
         )}
       </div>
-      <div className="mt-1 break-all font-mono text-slate-400">
+      <div className={isLight
+        ? "mt-1 break-all font-mono text-slate-600 dark:text-slate-400"
+        : "mt-1 break-all font-mono text-slate-400"}>
         {`Ref: ${resolution.originalRef}`}
       </div>
       {resolution.locator ? (
@@ -111,8 +122,10 @@ export function EvidenceReferenceItem({
 
 export function CandidateEvidenceReferences({
   row,
+  tone = "dark",
 }: {
   row: UICandidateRow;
+  tone?: "dark" | "light";
 }) {
   const refs = Array.isArray(row.evidenceRefs)
     ? row.evidenceRefs.filter((ref) => typeof ref === "string" && ref.trim())
@@ -121,13 +134,18 @@ export function CandidateEvidenceReferences({
   if (!refs.length) return null;
 
   return (
-    <div className="mt-3 rounded-md border border-slate-700/80 bg-slate-950/35 p-2.5">
-      <div className="text-xs font-semibold text-slate-200">Evidence sources</div>
+    <div className={tone === "light"
+      ? "mt-3 rounded-md border border-slate-300 bg-slate-100/80 p-2.5 dark:border-slate-700/80 dark:bg-slate-950/35"
+      : "mt-3 rounded-md border border-slate-700/80 bg-slate-950/35 p-2.5"}>
+      <div className={tone === "light"
+        ? "text-xs font-semibold text-slate-800 dark:text-slate-200"
+        : "text-xs font-semibold text-slate-200"}>Evidence sources</div>
       <ul className="mt-2 space-y-2">
         {refs.map((ref, index) => (
           <EvidenceReferenceItem
             key={`${ref}-${index}`}
             resolution={resolveCandidateEvidenceReferenceV0_1(row, ref)}
+            tone={tone}
           />
         ))}
       </ul>

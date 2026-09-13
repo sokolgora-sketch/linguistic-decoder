@@ -549,11 +549,14 @@ export function EmbryoExpansionContextCardV0_1({
     );
   }
 
-  const primaryCandidateUiRow = showPrimaryEvidence
-    ? buildCandidateRowsFromVM(vm).find(
-        (row) => row.id === primaryCandidate.id,
-      ) ?? null
-    : null;
+  const primaryCandidateIndex = rows.indexOf(primaryCandidate);
+  const candidateUiRows = showPrimaryEvidence
+    ? buildCandidateRowsFromVM(vm)
+    : [];
+  const primaryCandidateUiRow =
+    showPrimaryEvidence && primaryCandidateIndex >= 0
+      ? candidateUiRows[primaryCandidateIndex] ?? null
+      : null;
 
   const rootTokens =
     Array.isArray(
@@ -1187,7 +1190,7 @@ export function EmbryoExpansionContextCardV0_1({
       </div>
 
       {primaryCandidateUiRow ? (
-        <CandidateEvidenceReferences row={primaryCandidateUiRow} />
+        <CandidateEvidenceReferences row={primaryCandidateUiRow} tone="light" />
       ) : null}
 
       {functionalPath ? (

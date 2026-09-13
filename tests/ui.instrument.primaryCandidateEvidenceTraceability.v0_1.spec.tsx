@@ -5,6 +5,8 @@ import { render, screen, within } from "@testing-library/react";
 
 import { GET } from "../app/api/analyze-v1/route";
 import { InstrumentPanel } from "../src/ui/instrument/InstrumentPanel";
+import { EmbryoExpansionContextCardV0_1 } from "../src/ui/instrument/sections/EmbryoExpansionContextCard.v0_1";
+import { adaptAnalysisToTelemetryVM } from "../src/ui/instrument/contractAdapter";
 import {
   getReviewedExternalLexiconProductionSourceRowsV0_1,
 } from "../src/shared/reviewedExternalLexiconSourceRowRegistry.v0_1";
@@ -68,7 +70,9 @@ describe("Open Instrument primary candidate evidence traceability v0.1", () => {
 
     const overview = screen.getByRole("tabpanel");
     expect(within(overview).getByText("Evidence: Reviewed")).toBeVisible();
-    expect(within(overview).getByText("Evidence sources")).toBeVisible();
+    expect(within(overview).getByText("Evidence sources")).toHaveClass(
+      "text-slate-800",
+    );
     expect(
       within(overview).getByText("Reviewed source · reviewed_accepted"),
     ).toBeVisible();
@@ -82,6 +86,7 @@ describe("Open Instrument primary candidate evidence traceability v0.1", () => {
     );
     expect(link).toHaveAttribute("target", "_blank");
     expect(link).toHaveAttribute("rel", "noreferrer noopener");
+    expect(link).toHaveClass("text-blue-700");
     expect(
       within(overview).getByText(`Ref: ${reviewedCitation?.citationId}`),
     ).toBeVisible();
@@ -89,6 +94,64 @@ describe("Open Instrument primary candidate evidence traceability v0.1", () => {
       within(overview).getByText(`Locator: ${reviewedCitation?.entryLocator}`),
     ).toBeVisible();
     expect(within(overview).getByText(/Functional motivation, not historical etymology\./)).toBeVisible();
+  });
+
+  it("keeps evidence bound to the selected candidate when IDs repeat", async () => {
+    const body = await analyze("study");
+    const reviewedRow = getReviewedExternalLexiconProductionSourceRowsV0_1().find(
+      (row) =>
+        row.candidateId === "albanian-di-know-functional" &&
+        row.sourceStatus === "reviewed_accepted",
+    );
+    const reviewedCitation = reviewedRow?.externalCitations.find((citation) =>
+      /^https?:\/\//i.test(citation.sourceUrlOrArchiveRef ?? ""),
+    );
+
+    expect(reviewedRow).toBeDefined();
+    expect(reviewedCitation).toBeDefined();
+
+    const candidate = primaryCandidate(body);
+    const duplicateCandidates = [
+      {
+        ...candidate,
+        id: "duplicate-primary",
+        candidateId: "duplicate-primary",
+        validationOutcome: "partial",
+        sourceId: null,
+        sourceStatus: null,
+        evidenceRefs: ["first-candidate-only-ref"],
+      },
+      {
+        ...candidate,
+        id: "duplicate-primary",
+        candidateId: "duplicate-primary",
+        validationOutcome: "validated",
+        sourceId: reviewedRow?.sourceId,
+        sourceStatus: "reviewed_accepted",
+        evidenceRefs: [reviewedCitation?.citationId ?? ""],
+      },
+    ];
+
+    const duplicatePayload = {
+      ...body,
+      rootMap: undefined,
+      candidates: duplicateCandidates,
+    };
+    const duplicateVm = adaptAnalysisToTelemetryVM(duplicatePayload);
+
+    render(
+      <EmbryoExpansionContextCardV0_1
+        vm={duplicateVm}
+        showPrimaryEvidence
+      />,
+    );
+
+    expect(screen.getByText("Reviewed source · reviewed_accepted")).toBeVisible();
+    expect(
+      screen.getByText(`Ref: ${reviewedCitation?.citationId}`),
+    ).toBeVisible();
+    expect(screen.queryByText("Ref: first-candidate-only-ref")).not.toBeInTheDocument();
+    expect(screen.queryByText("Unresolved reference")).not.toBeInTheDocument();
   });
 
   it("keeps research evidence visibly research-only in Overview", async () => {
