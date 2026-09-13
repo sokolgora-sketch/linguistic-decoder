@@ -19,7 +19,7 @@ describe("Open Instrument responsive shell guard", () => {
 
     expect(source).toContain("w-full min-w-0");
     expect(source).toContain("md:grid-cols-2");
-    expect(source).toContain("xl:grid-cols-[minmax(0,1fr)_minmax(220px,0.45fr)_minmax(260px,0.55fr)_132px]");
+    expect(source).toContain("xl:grid-cols-[minmax(0,1fr)_minmax(220px,0.45fr)_minmax(260px,0.55fr)_minmax(150px,0.32fr)_minmax(180px,0.42fr)_132px]");
     expect(source).toContain("md:col-span-2 xl:col-span-1");
   });
 

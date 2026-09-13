@@ -151,7 +151,8 @@ Before running a word, check:
 - the ZË-RO console frame loads;
 - `Open Instrument ready` appears;
 - the honest contract panel is visible;
-- the bottom composer has `Word`, optional `IPA`, and `Analyze` controls.
+- the bottom composer has `Word`, optional `IPA`, `Analysis mode`, `Alphabet
+  profile`, and `Analyze` controls.
 
 Run one minimal local check:
 
