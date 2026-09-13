@@ -7,6 +7,55 @@ describe("/chat error-state contract", () => {
     jest.restoreAllMocks();
   });
 
+  it.each([
+    {
+      reason: "MISSING_WORD",
+      error: 'Missing "word" query param. Use: /api/analyze-v1?word=study',
+    },
+    {
+      reason: "INVALID_MODE",
+      error: 'Invalid "mode". Expected: "strict" or "open".',
+    },
+    {
+      reason: "INVALID_ALPHABET",
+      error:
+        'Invalid "alphabet". Expected one of: "auto", "albanian", "latin", "sanskrit", "ancient_greek", "pie", "turkish", "german".',
+    },
+    {
+      reason: "INVALID_REQUEST_BODY",
+      error: 'Missing/invalid "word". Expected: { word: string }',
+    },
+    {
+      reason: "MALFORMED_JSON",
+      error:
+        'Invalid JSON body. Expected: { word: string, mode?: "strict"|"open", alphabet?: string }',
+    },
+  ])(
+    "surfaces the structured $reason request error without rendering it as analysis",
+    async ({ reason, error }) => {
+      global.fetch = jest.fn().mockResolvedValue({
+        ok: false,
+        status: 400,
+        statusText: "Bad Request",
+        json: async () => ({
+          error,
+          reason,
+          issues: [{ path: ["word"], message: "internal detail" }],
+        }),
+      } as any);
+
+      render(<ZroChatPage />);
+
+      fireEvent.change(screen.getByLabelText("Word"), { target: { value: "study" } });
+      fireEvent.click(screen.getByRole("button", { name: "Analyze" }));
+
+      expect(await screen.findByRole("alert")).toHaveTextContent(`Request error: ${error}`);
+      expect(screen.queryByText("Engine error.")).not.toBeInTheDocument();
+      expect(screen.getByText("Analyze one word")).toBeInTheDocument();
+      expect(screen.queryByTestId("open-instrument-shell")).not.toBeInTheDocument();
+    },
+  );
+
   it("surfaces Engine error on non-ok HTTP responses and clears busy state", async () => {
     global.fetch = jest.fn().mockResolvedValue({
       ok: false,

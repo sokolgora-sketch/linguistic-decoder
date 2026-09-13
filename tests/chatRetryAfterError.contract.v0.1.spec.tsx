@@ -50,7 +50,8 @@ describe("/chat retry-after-error contract", () => {
     fireEvent.click(screen.getByRole("button", { name: "Analyze" }));
 
     await screen.findByText("Engine error.");
-    expect(screen.getByTestId("open-instrument-shell")).toBeInTheDocument();
+    expect(screen.getByText("Analyze one word")).toBeInTheDocument();
+    expect(screen.queryByTestId("open-instrument-shell")).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("button", { name: "Analyze" }));
 
