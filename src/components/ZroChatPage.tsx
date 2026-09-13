@@ -370,16 +370,15 @@ export default function ZroChatPage() {
     </div>
   );
 
+  const latestAssistantMessage = messages
+    .slice()
+    .reverse()
+    .find((m): m is Extract<Msg, { role: 'assistant' }> => m.role === 'assistant');
   const latestInstrumentPayload =
     importedBundle?.result ??
-    messages
-      .slice()
-      .reverse()
-      .find(
-        (m): m is Extract<Msg, { role: 'assistant' }> & { instrumentPayload: unknown } =>
-          'instrumentPayload' in m && m.instrumentPayload != null,
-      )
-      ?.instrumentPayload ?? null;
+    (latestAssistantMessage && 'instrumentPayload' in latestAssistantMessage
+      ? latestAssistantMessage.instrumentPayload ?? null
+      : null);
 
   const displayedAnalysisSource: ReproducibleRunBundleDisplaySourceV0_1 =
     importedBundle

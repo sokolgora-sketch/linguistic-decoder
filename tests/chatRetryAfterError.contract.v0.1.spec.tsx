@@ -97,4 +97,40 @@ describe("/chat retry-after-error contract", () => {
 
     expect(countAnalyzeV1Fetches()).toBe(2);
   });
+
+  it("does not keep an earlier analysis visible after a later HTTP failure", async () => {
+    global.fetch = jest
+      .fn()
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        statusText: "OK",
+        json: async () => SUCCESS_PAYLOAD,
+      } as any)
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 503,
+        statusText: "Service Unavailable",
+        json: async () => ({ error: "research unavailable" }),
+      } as any)
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 500,
+        statusText: "Internal Server Error",
+        json: async () => ({ error: "boom" }),
+      } as any);
+
+    render(<ZroChatPage />);
+
+    fireEvent.change(screen.getByLabelText("Word"), { target: { value: "study" } });
+    fireEvent.click(screen.getByRole("button", { name: "Analyze" }));
+
+    await screen.findByTestId("open-instrument-shell");
+
+    fireEvent.click(screen.getByRole("button", { name: "Analyze" }));
+
+    await screen.findByText("Engine error.");
+    expect(screen.getByText("Analyze one word")).toBeInTheDocument();
+    expect(screen.queryByTestId("open-instrument-shell")).not.toBeInTheDocument();
+  });
 });
