@@ -39,15 +39,22 @@ function sourceAttestedWitness() {
   return witness;
 }
 
+function buildProposal(
+  witness = sourceAttestedWitness(),
+  targetWord = "love",
+) {
+  return buildDeterministicSourceAttestedResearchWitnessFunctionalProposalV1({
+    witness,
+    targetWord,
+  });
+}
+
 describe(
   "deterministic source-attested research-witness functional proposal v1",
   () => {
     test("accepts an exact-form witness only as research scope", () => {
       const witness = sourceAttestedWitness();
-      const result =
-        buildDeterministicSourceAttestedResearchWitnessFunctionalProposalV1({
-          witness,
-        });
+      const result = buildProposal(witness);
 
       expect(result.decision).toBe("ACCEPT");
       expect(result.acceptance?.acceptedFunctionalCandidate).toMatchObject({
@@ -66,10 +73,7 @@ describe(
 
     test("copies the existing bridge, citations, and provenance", () => {
       const witness = sourceAttestedWitness();
-      const result =
-        buildDeterministicSourceAttestedResearchWitnessFunctionalProposalV1({
-          witness,
-        });
+      const result = buildProposal(witness);
 
       expect(result.proposal?.functionalStatement).toBe(
         witness.semanticBridge,
@@ -93,14 +97,11 @@ describe(
       "accepts usable truth states: %s/%s",
       (attestationTruth, functionalBridgeTruth) => {
         const witness = sourceAttestedWitness();
-        const result =
-          buildDeterministicSourceAttestedResearchWitnessFunctionalProposalV1({
-            witness: {
-              ...witness,
-              attestationTruth,
-              functionalBridgeTruth,
-            },
-          });
+        const result = buildProposal({
+          ...witness,
+          attestationTruth,
+          functionalBridgeTruth,
+        });
 
         expect(result.decision).toBe("ACCEPT");
       },
@@ -113,10 +114,7 @@ describe(
       "keeps unknown %s insufficient",
       (field, value, reason) => {
         const witness = sourceAttestedWitness();
-        const result =
-          buildDeterministicSourceAttestedResearchWitnessFunctionalProposalV1({
-            witness: { ...witness, [field]: value },
-          });
+        const result = buildProposal({ ...witness, [field]: value });
 
         expect(result.decision).toBe("INSUFFICIENT_SUPPORT");
         expect(result.reasonCodes).toEqual([reason]);
@@ -126,10 +124,10 @@ describe(
     );
 
     test("fails closed for a missing bridge through shared acceptance", () => {
-      const result =
-        buildDeterministicSourceAttestedResearchWitnessFunctionalProposalV1({
-          witness: { ...sourceAttestedWitness(), semanticBridge: null },
-        });
+      const result = buildProposal({
+        ...sourceAttestedWitness(),
+        semanticBridge: null,
+      });
 
       expect(result.decision).toBe("INSUFFICIENT_SUPPORT");
       expect(result.reasonCodes).toContain("MISSING_SEMANTIC_BRIDGE");
@@ -137,10 +135,10 @@ describe(
     });
 
     test("rejects missing citations before admission", () => {
-      const result =
-        buildDeterministicSourceAttestedResearchWitnessFunctionalProposalV1({
-          witness: { ...sourceAttestedWitness(), citationRefs: [] },
-        });
+      const result = buildProposal({
+        ...sourceAttestedWitness(),
+        citationRefs: [],
+      });
 
       expect(result.decision).toBe("REJECT");
       expect(result.reasonCodes).toEqual([
@@ -149,13 +147,10 @@ describe(
     });
 
     test("rejects non-research source status", () => {
-      const result =
-        buildDeterministicSourceAttestedResearchWitnessFunctionalProposalV1({
-          witness: {
-            ...sourceAttestedWitness(),
-            sourceStatus: "reviewed_candidate",
-          },
-        });
+      const result = buildProposal({
+        ...sourceAttestedWitness(),
+        sourceStatus: "reviewed_candidate",
+      });
 
       expect(result.decision).toBe("REJECT");
       expect(result.reasonCodes).toEqual([
@@ -164,13 +159,10 @@ describe(
     });
 
     test("rejects a source-form mismatch instead of treating it as an anchor", () => {
-      const result =
-        buildDeterministicSourceAttestedResearchWitnessFunctionalProposalV1({
-          witness: {
-            ...sourceAttestedWitness(),
-            sourceForm: "different-form",
-          },
-        });
+      const result = buildProposal({
+        ...sourceAttestedWitness(),
+        sourceForm: "different-form",
+      });
 
       expect(result.decision).toBe("REJECT");
       expect(result.reasonCodes).toEqual([
@@ -178,11 +170,26 @@ describe(
       ]);
     });
 
+    test("rejects a witness bound to a different analyzed target", () => {
+      const result = buildProposal(sourceAttestedWitness(), "hope");
+
+      expect(result.decision).toBe("REJECT");
+      expect(result.reasonCodes).toEqual([
+        "SOURCE_ATTESTED_TARGET_WORD_MISMATCH",
+      ]);
+    });
+
+    test("requires an independent analyzed target binding", () => {
+      const result = buildProposal(sourceAttestedWitness(), "");
+
+      expect(result.decision).toBe("REJECT");
+      expect(result.reasonCodes).toEqual([
+        "SOURCE_ATTESTED_EXPECTED_TARGET_WORD_REQUIRED",
+      ]);
+    });
+
     test("does not fabricate target alignment or components", () => {
-      const result =
-        buildDeterministicSourceAttestedResearchWitnessFunctionalProposalV1({
-          witness: sourceAttestedWitness(),
-        });
+      const result = buildProposal();
 
       expect(result.proposal?.targetSenseRequirement).toBe("NOT_APPLICABLE");
       expect(result.proposal?.semanticAlignment).toBeNull();
@@ -191,10 +198,7 @@ describe(
     });
 
     test("rejects claim-boundary violations through shared acceptance", () => {
-      const proposal =
-        buildDeterministicSourceAttestedResearchWitnessFunctionalProposalV1({
-          witness: sourceAttestedWitness(),
-        }).proposal;
+      const proposal = buildProposal().proposal;
 
       if (!proposal) {
         throw new Error("expected a valid source-attested proposal");
@@ -215,7 +219,7 @@ describe(
     });
 
     test("is deterministic for repeated identical input", () => {
-      const input = { witness: sourceAttestedWitness() };
+      const input = { witness: sourceAttestedWitness(), targetWord: "love" };
       expect(
         buildDeterministicSourceAttestedResearchWitnessFunctionalProposalV1(
           input,

@@ -20,6 +20,7 @@ export type DeterministicSourceAttestedResearchWitnessFunctionalProposalReasonCo
   | "SOURCE_ATTESTED_EXACT_FORM_REQUIRED"
   | "SOURCE_ATTESTED_TARGET_WORD_MISMATCH"
   | "SOURCE_ATTESTED_EMBRYO_FORM_MISMATCH"
+  | "SOURCE_ATTESTED_EXPECTED_TARGET_WORD_REQUIRED"
   | "SOURCE_ATTESTED_ATTESTATION_TRUTH_SUPPORT_REQUIRED"
   | "SOURCE_ATTESTED_FUNCTIONAL_BRIDGE_TRUTH_SUPPORT_REQUIRED";
 
@@ -87,12 +88,14 @@ function insufficientSupportV1(
 export function buildDeterministicSourceAttestedResearchWitnessFunctionalProposalV1(
   input: Readonly<{
     witness: MultiSourceFunctionalWitnessV0_1;
+    targetWord: string;
   }>,
 ): DeterministicSourceAttestedResearchWitnessFunctionalProposalResultV1 {
   const witness = input.witness;
   const witnessId = normalizedTextV1(witness.witnessId);
   const sourceId = normalizedTextV1(witness.sourceId);
-  const targetWord = normalizedTextV1(witness.targetWord);
+  const targetWord = normalizedTextV1(input.targetWord);
+  const witnessTargetWord = normalizedTextV1(witness.targetWord);
   const embryo = normalizedTextV1(witness.embryo);
   const sourceForm = normalizedTextV1(witness.sourceForm);
   const evidenceRefs = witness.citationRefs
@@ -121,7 +124,9 @@ export function buildDeterministicSourceAttestedResearchWitnessFunctionalProposa
   if (witness.embryoRelation !== "exact_form") {
     preconditionFailures.push("SOURCE_ATTESTED_EXACT_FORM_REQUIRED");
   }
-  if (!sameResearchKeyV1(targetWord, witness.targetWord)) {
+  if (!targetWord) {
+    preconditionFailures.push("SOURCE_ATTESTED_EXPECTED_TARGET_WORD_REQUIRED");
+  } else if (!sameResearchKeyV1(targetWord, witnessTargetWord)) {
     preconditionFailures.push("SOURCE_ATTESTED_TARGET_WORD_MISMATCH");
   }
   if (!sameResearchKeyV1(sourceForm, embryo)) {

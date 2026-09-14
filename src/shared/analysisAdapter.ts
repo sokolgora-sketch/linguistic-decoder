@@ -722,6 +722,7 @@ export function enginePayloadToAnalysisResult(payload: EnginePayload): AnalyzeWo
             const proposal =
               buildDeterministicSourceAttestedResearchWitnessFunctionalProposalV1({
                 witness,
+                targetWord: rootMapBasis,
               });
             const accepted =
               proposal.acceptance?.acceptedFunctionalCandidate;
