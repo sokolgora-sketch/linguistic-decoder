@@ -54,7 +54,7 @@ describe("InstrumentPanel — EvidenceLedgerCard", () => {
     render(<InstrumentPanel payload={{ any: "thing" }} />);
 
     // Present lists should render list items.
-    expect(screen.getByText("S1")).toBeInTheDocument();
+    expect(screen.getAllByText("S1").length).toBeGreaterThanOrEqual(2);
     expect(screen.getByText("OP1")).toBeInTheDocument();
 
     // Combined Signals/Notes section shows none emitted.

@@ -6,6 +6,7 @@ type Props = {
   surface: PresentOrMissing<Vowel[]>;
   functional: PresentOrMissing<Vowel[]>;
   delta: 'MATCH' | 'SHIFT' | 'DIVERGE' | 'NOT_EMITTED';
+  normalizationSteps?: PresentOrMissing<string[]>;
 };
 
 function isPresent<T>(
@@ -55,6 +56,25 @@ function DeltaBadge({ delta }: { delta: Props['delta'] }) {
   );
 }
 
+function NormalizationRecord({
+  steps,
+}: {
+  steps: Props['normalizationSteps'];
+}) {
+  if (!isPresent(steps) || steps.value.length === 0) return null;
+
+  return (
+    <div className="mt-3 border-t border-neutral-800 pt-3">
+      <div className="text-sm text-neutral-300">Normalization record</div>
+      <div className="mt-1 space-y-1 break-words font-mono text-sm text-neutral-100">
+        {steps.value.map((step, index) => (
+          <div key={`${index}-${step}`}>{step}</div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export function VowelPathTimeline(props: Props) {
   const detected = props.detected;
   const surface = props.surface;
@@ -80,6 +100,8 @@ export function VowelPathTimeline(props: Props) {
         <PathRow label="Surface" maybe={surface} />
         <PathRow label="Functional" maybe={functional} />
       </div>
+
+      <NormalizationRecord steps={props.normalizationSteps} />
 
       <div className="mt-3 text-xs text-neutral-500">source: telemetry VM</div>
     </div>
