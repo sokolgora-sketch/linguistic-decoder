@@ -191,6 +191,7 @@ describe("Open Instrument analytical capability baseline v1", () => {
     });
     expect(baseline.aggregate.composition.totalComponents).toBe(2);
     expect(baseline.aggregate.composition.candidatesWithFunctionalStatements).toBeGreaterThan(0);
+    expect(baseline.aggregate.evidence.candidatesWithRefs).toBe(64);
     expect(baseline.aggregate.evidence.totalRefs).toBe(64);
     expect(baseline.aggregate.targetSense.casesWithRequestContext).toBe(2);
   });

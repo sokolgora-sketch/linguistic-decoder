@@ -20,7 +20,7 @@
       "casesWithEmbryos": 44
     },
     "evidence": {
-      "candidatesWithRefs": 88,
+      "candidatesWithRefs": 64,
       "casesWithRefs": 43,
       "navigableRefs": 64,
       "refsWithLocator": 64,
@@ -705,7 +705,7 @@
       },
       "engineVersion": "0.2.0-symbolic",
       "evidence": {
-        "candidatesWithRefs": 3,
+        "candidatesWithRefs": 2,
         "navigableRefs": 2,
         "refsWithLocator": 2,
         "refsWithSafeUrl": 2,
@@ -828,7 +828,7 @@
       },
       "engineVersion": "0.2.0-symbolic",
       "evidence": {
-        "candidatesWithRefs": 1,
+        "candidatesWithRefs": 0,
         "navigableRefs": 0,
         "refsWithLocator": 0,
         "refsWithSafeUrl": 0,
@@ -1039,7 +1039,7 @@
       },
       "engineVersion": "0.2.0-symbolic",
       "evidence": {
-        "candidatesWithRefs": 3,
+        "candidatesWithRefs": 2,
         "navigableRefs": 2,
         "refsWithLocator": 2,
         "refsWithSafeUrl": 2,
@@ -1421,7 +1421,7 @@
       },
       "engineVersion": "0.2.0-symbolic",
       "evidence": {
-        "candidatesWithRefs": 2,
+        "candidatesWithRefs": 1,
         "navigableRefs": 1,
         "refsWithLocator": 1,
         "refsWithSafeUrl": 1,
@@ -1840,7 +1840,7 @@
       },
       "engineVersion": "0.2.0-symbolic",
       "evidence": {
-        "candidatesWithRefs": 3,
+        "candidatesWithRefs": 2,
         "navigableRefs": 2,
         "refsWithLocator": 2,
         "refsWithSafeUrl": 2,
@@ -2128,7 +2128,7 @@
       },
       "engineVersion": "0.2.0-symbolic",
       "evidence": {
-        "candidatesWithRefs": 3,
+        "candidatesWithRefs": 2,
         "navigableRefs": 2,
         "refsWithLocator": 2,
         "refsWithSafeUrl": 2,
@@ -2497,7 +2497,7 @@
       },
       "engineVersion": "0.2.0-symbolic",
       "evidence": {
-        "candidatesWithRefs": 3,
+        "candidatesWithRefs": 2,
         "navigableRefs": 2,
         "refsWithLocator": 2,
         "refsWithSafeUrl": 2,
@@ -2736,7 +2736,7 @@
       },
       "engineVersion": "0.2.0-symbolic",
       "evidence": {
-        "candidatesWithRefs": 4,
+        "candidatesWithRefs": 2,
         "navigableRefs": 2,
         "refsWithLocator": 2,
         "refsWithSafeUrl": 2,
@@ -3309,7 +3309,7 @@
       },
       "engineVersion": "0.2.0-symbolic",
       "evidence": {
-        "candidatesWithRefs": 3,
+        "candidatesWithRefs": 1,
         "navigableRefs": 1,
         "refsWithLocator": 1,
         "refsWithSafeUrl": 1,
@@ -3645,7 +3645,7 @@
       },
       "engineVersion": "0.2.0-symbolic",
       "evidence": {
-        "candidatesWithRefs": 3,
+        "candidatesWithRefs": 2,
         "navigableRefs": 2,
         "refsWithLocator": 2,
         "refsWithSafeUrl": 2,
@@ -4554,7 +4554,7 @@
       },
       "engineVersion": "0.2.0-symbolic",
       "evidence": {
-        "candidatesWithRefs": 3,
+        "candidatesWithRefs": 1,
         "navigableRefs": 1,
         "refsWithLocator": 1,
         "refsWithSafeUrl": 1,
@@ -5124,7 +5124,7 @@
       },
       "engineVersion": "0.2.0-symbolic",
       "evidence": {
-        "candidatesWithRefs": 4,
+        "candidatesWithRefs": 2,
         "navigableRefs": 2,
         "refsWithLocator": 2,
         "refsWithSafeUrl": 2,
@@ -5545,7 +5545,7 @@
       },
       "engineVersion": "0.2.0-symbolic",
       "evidence": {
-        "candidatesWithRefs": 4,
+        "candidatesWithRefs": 2,
         "navigableRefs": 2,
         "refsWithLocator": 2,
         "refsWithSafeUrl": 2,
@@ -6453,7 +6453,7 @@
       },
       "engineVersion": "0.2.0-symbolic",
       "evidence": {
-        "candidatesWithRefs": 2,
+        "candidatesWithRefs": 1,
         "navigableRefs": 1,
         "refsWithLocator": 1,
         "refsWithSafeUrl": 1,
@@ -7125,7 +7125,7 @@
       },
       "engineVersion": "0.2.0-symbolic",
       "evidence": {
-        "candidatesWithRefs": 4,
+        "candidatesWithRefs": 2,
         "navigableRefs": 2,
         "refsWithLocator": 2,
         "refsWithSafeUrl": 2,
@@ -7623,7 +7623,7 @@
       },
       "engineVersion": "0.2.0-symbolic",
       "evidence": {
-        "candidatesWithRefs": 4,
+        "candidatesWithRefs": 2,
         "navigableRefs": 2,
         "refsWithLocator": 2,
         "refsWithSafeUrl": 2,
@@ -8369,7 +8369,7 @@
       },
       "engineVersion": "0.2.0-symbolic",
       "evidence": {
-        "candidatesWithRefs": 2,
+        "candidatesWithRefs": 1,
         "navigableRefs": 1,
         "refsWithLocator": 1,
         "refsWithSafeUrl": 1,

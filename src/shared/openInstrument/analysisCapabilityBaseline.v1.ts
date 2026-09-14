@@ -761,7 +761,9 @@ export function buildAnalysisCapabilityBaselineCaseV1(
       candidatesWithVowelPath: candidates.filter((candidate) => candidate.vowelPath !== null).length,
     },
     evidence: {
-      candidatesWithRefs: candidates.filter((candidate) => candidate.evidence !== null).length,
+      candidatesWithRefs: candidates.filter(
+        (candidate) => (candidate.evidence?.refCount ?? 0) > 0,
+      ).length,
       totalRefs: candidates.reduce((sum, candidate) => sum + (candidate.evidence?.refCount ?? 0), 0),
       resolvedRefs: candidates.reduce((sum, candidate) => sum + (candidate.evidence?.resolvedCount ?? 0), 0),
       unresolvedRefs: candidates.reduce((sum, candidate) => sum + (candidate.evidence?.unresolvedCount ?? 0), 0),
