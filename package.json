@@ -67,7 +67,8 @@
     "open-instrument:browser-smoke:boot": "tsx scripts/open-instrument/chat-runtime-smoke-boot.v0.1.ts",
     "open-instrument:browser-smoke": "tsx scripts/open-instrument/chat-runtime-smoke.v0.1.ts",
     "open-instrument:controlled-semantic-provider-runner": "tsx scripts/openInstrumentControlledSemanticProviderExecutionRunner.v0.1.ts",
-    "open-instrument:controlled-semantic-contrastive-provider-runner": "tsx scripts/openInstrumentControlledSemanticContrastiveProviderExecutionRunner.v0.2.ts"
+    "open-instrument:controlled-semantic-contrastive-provider-runner": "tsx scripts/openInstrumentControlledSemanticContrastiveProviderExecutionRunner.v0.2.ts",
+    "open-instrument:analysis-capability-baseline": "tsx scripts/openInstrumentAnalysisCapabilityBaseline.v1.ts"
   },
   "dependencies": {
     "@genkit-ai/google-genai": "^1.37.0",

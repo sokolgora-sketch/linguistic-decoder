@@ -1,0 +1,407 @@
+{
+  "schemaVersion": "open-instrument.analysis-capability-baseline-manifest.v1",
+  "corpusVersion": "open-instrument.analysis-capability-baseline-corpus.v1",
+  "cases": [
+    {
+      "caseId": "canonical.study",
+      "word": "study",
+      "mode": "strict",
+      "alphabet": "auto",
+      "category": "canonical"
+    },
+    {
+      "caseId": "canonical.damage",
+      "word": "damage",
+      "mode": "strict",
+      "alphabet": "auto",
+      "category": "canonical"
+    },
+    {
+      "caseId": "canonical.mystery",
+      "word": "mystery",
+      "mode": "strict",
+      "alphabet": "auto",
+      "category": "canonical"
+    },
+    {
+      "caseId": "canonical.water",
+      "word": "water",
+      "mode": "strict",
+      "alphabet": "auto",
+      "category": "canonical"
+    },
+    {
+      "caseId": "target-sense.candle",
+      "word": "candle",
+      "mode": "strict",
+      "alphabet": "auto",
+      "targetSenseLabel": "a wax light source",
+      "category": "target_sense"
+    },
+    {
+      "caseId": "target-sense.water-physical-liquid",
+      "word": "water",
+      "mode": "strict",
+      "alphabet": "auto",
+      "targetSenseId": "physical_water_liquid",
+      "category": "target_sense"
+    },
+    {
+      "caseId": "null.xyz",
+      "word": "xyz",
+      "mode": "strict",
+      "alphabet": "auto",
+      "category": "null_control"
+    },
+    {
+      "caseId": "scale50.rain.nature",
+      "word": "rain",
+      "mode": "strict",
+      "alphabet": "auto",
+      "category": "nature"
+    },
+    {
+      "caseId": "scale50.river.nature",
+      "word": "river",
+      "mode": "strict",
+      "alphabet": "auto",
+      "category": "nature"
+    },
+    {
+      "caseId": "scale50.mountain.nature",
+      "word": "mountain",
+      "mode": "strict",
+      "alphabet": "auto",
+      "category": "nature"
+    },
+    {
+      "caseId": "scale50.stone.nature",
+      "word": "stone",
+      "mode": "strict",
+      "alphabet": "auto",
+      "category": "nature"
+    },
+    {
+      "caseId": "scale50.tree.nature",
+      "word": "tree",
+      "mode": "strict",
+      "alphabet": "auto",
+      "category": "nature"
+    },
+    {
+      "caseId": "scale50.wind.nature",
+      "word": "wind",
+      "mode": "strict",
+      "alphabet": "auto",
+      "category": "nature"
+    },
+    {
+      "caseId": "scale50.sea.nature",
+      "word": "sea",
+      "mode": "strict",
+      "alphabet": "auto",
+      "category": "nature"
+    },
+    {
+      "caseId": "scale50.sky.nature",
+      "word": "sky",
+      "mode": "strict",
+      "alphabet": "auto",
+      "category": "nature"
+    },
+    {
+      "caseId": "scale50.snow.nature",
+      "word": "snow",
+      "mode": "strict",
+      "alphabet": "auto",
+      "category": "nature"
+    },
+    {
+      "caseId": "scale50.cloud.nature",
+      "word": "cloud",
+      "mode": "strict",
+      "alphabet": "auto",
+      "category": "nature"
+    },
+    {
+      "caseId": "scale50.hand.body",
+      "word": "hand",
+      "mode": "strict",
+      "alphabet": "auto",
+      "category": "body"
+    },
+    {
+      "caseId": "scale50.head.body",
+      "word": "head",
+      "mode": "strict",
+      "alphabet": "auto",
+      "category": "body"
+    },
+    {
+      "caseId": "scale50.heart.body",
+      "word": "heart",
+      "mode": "strict",
+      "alphabet": "auto",
+      "category": "body"
+    },
+    {
+      "caseId": "scale50.blood.body",
+      "word": "blood",
+      "mode": "strict",
+      "alphabet": "auto",
+      "category": "body"
+    },
+    {
+      "caseId": "scale50.bone.body",
+      "word": "bone",
+      "mode": "strict",
+      "alphabet": "auto",
+      "category": "body"
+    },
+    {
+      "caseId": "scale50.skin.body",
+      "word": "skin",
+      "mode": "strict",
+      "alphabet": "auto",
+      "category": "body"
+    },
+    {
+      "caseId": "scale50.mouth.body",
+      "word": "mouth",
+      "mode": "strict",
+      "alphabet": "auto",
+      "category": "body"
+    },
+    {
+      "caseId": "scale50.ear.body",
+      "word": "ear",
+      "mode": "strict",
+      "alphabet": "auto",
+      "category": "body"
+    },
+    {
+      "caseId": "scale50.nose.body",
+      "word": "nose",
+      "mode": "strict",
+      "alphabet": "auto",
+      "category": "body"
+    },
+    {
+      "caseId": "scale50.foot.body",
+      "word": "foot",
+      "mode": "strict",
+      "alphabet": "auto",
+      "category": "body"
+    },
+    {
+      "caseId": "scale50.run.action",
+      "word": "run",
+      "mode": "strict",
+      "alphabet": "auto",
+      "category": "action"
+    },
+    {
+      "caseId": "scale50.walk.action",
+      "word": "walk",
+      "mode": "strict",
+      "alphabet": "auto",
+      "category": "action"
+    },
+    {
+      "caseId": "scale50.speak.action",
+      "word": "speak",
+      "mode": "strict",
+      "alphabet": "auto",
+      "category": "action"
+    },
+    {
+      "caseId": "scale50.hear.action",
+      "word": "hear",
+      "mode": "strict",
+      "alphabet": "auto",
+      "category": "action"
+    },
+    {
+      "caseId": "scale50.eat.action",
+      "word": "eat",
+      "mode": "strict",
+      "alphabet": "auto",
+      "category": "action"
+    },
+    {
+      "caseId": "scale50.drink.action",
+      "word": "drink",
+      "mode": "strict",
+      "alphabet": "auto",
+      "category": "action"
+    },
+    {
+      "caseId": "scale50.sleep.action",
+      "word": "sleep",
+      "mode": "strict",
+      "alphabet": "auto",
+      "category": "action"
+    },
+    {
+      "caseId": "scale50.build.action",
+      "word": "build",
+      "mode": "strict",
+      "alphabet": "auto",
+      "category": "action"
+    },
+    {
+      "caseId": "scale50.break.action",
+      "word": "break",
+      "mode": "strict",
+      "alphabet": "auto",
+      "category": "action"
+    },
+    {
+      "caseId": "scale50.carry.action",
+      "word": "carry",
+      "mode": "strict",
+      "alphabet": "auto",
+      "category": "action"
+    },
+    {
+      "caseId": "scale50.truth.abstract",
+      "word": "truth",
+      "mode": "strict",
+      "alphabet": "auto",
+      "category": "abstract"
+    },
+    {
+      "caseId": "scale50.time.abstract",
+      "word": "time",
+      "mode": "strict",
+      "alphabet": "auto",
+      "category": "abstract"
+    },
+    {
+      "caseId": "scale50.life.abstract",
+      "word": "life",
+      "mode": "strict",
+      "alphabet": "auto",
+      "category": "abstract"
+    },
+    {
+      "caseId": "scale50.death.abstract",
+      "word": "death",
+      "mode": "strict",
+      "alphabet": "auto",
+      "category": "abstract"
+    },
+    {
+      "caseId": "scale50.mind.abstract",
+      "word": "mind",
+      "mode": "strict",
+      "alphabet": "auto",
+      "category": "abstract"
+    },
+    {
+      "caseId": "scale50.memory.abstract",
+      "word": "memory",
+      "mode": "strict",
+      "alphabet": "auto",
+      "category": "abstract"
+    },
+    {
+      "caseId": "scale50.freedom.abstract",
+      "word": "freedom",
+      "mode": "strict",
+      "alphabet": "auto",
+      "category": "abstract"
+    },
+    {
+      "caseId": "scale50.justice.abstract",
+      "word": "justice",
+      "mode": "strict",
+      "alphabet": "auto",
+      "category": "abstract"
+    },
+    {
+      "caseId": "scale50.order.abstract",
+      "word": "order",
+      "mode": "strict",
+      "alphabet": "auto",
+      "category": "abstract"
+    },
+    {
+      "caseId": "scale50.change.abstract",
+      "word": "change",
+      "mode": "strict",
+      "alphabet": "auto",
+      "category": "abstract"
+    },
+    {
+      "caseId": "scale50.mother.human-social",
+      "word": "mother",
+      "mode": "strict",
+      "alphabet": "auto",
+      "category": "human_social"
+    },
+    {
+      "caseId": "scale50.child.human-social",
+      "word": "child",
+      "mode": "strict",
+      "alphabet": "auto",
+      "category": "human_social"
+    },
+    {
+      "caseId": "scale50.friend.human-social",
+      "word": "friend",
+      "mode": "strict",
+      "alphabet": "auto",
+      "category": "human_social"
+    },
+    {
+      "caseId": "scale50.home.human-social",
+      "word": "home",
+      "mode": "strict",
+      "alphabet": "auto",
+      "category": "human_social"
+    },
+    {
+      "caseId": "scale50.work.human-social",
+      "word": "work",
+      "mode": "strict",
+      "alphabet": "auto",
+      "category": "human_social"
+    },
+    {
+      "caseId": "scale50.war.human-social",
+      "word": "war",
+      "mode": "strict",
+      "alphabet": "auto",
+      "category": "human_social"
+    },
+    {
+      "caseId": "scale50.peace.human-social",
+      "word": "peace",
+      "mode": "strict",
+      "alphabet": "auto",
+      "category": "human_social"
+    },
+    {
+      "caseId": "scale50.king.human-social",
+      "word": "king",
+      "mode": "strict",
+      "alphabet": "auto",
+      "category": "human_social"
+    },
+    {
+      "caseId": "scale50.woman.human-social",
+      "word": "woman",
+      "mode": "strict",
+      "alphabet": "auto",
+      "category": "human_social"
+    },
+    {
+      "caseId": "scale50.man.human-social",
+      "word": "man",
+      "mode": "strict",
+      "alphabet": "auto",
+      "category": "human_social"
+    }
+  ]
+}
