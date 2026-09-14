@@ -393,9 +393,11 @@ export function CandidatesAccordion({
 
                   <div className="flex shrink-0 flex-wrap items-center gap-2 lg:justify-end">
                     {c.vowelPath ? (
-                      <CandidateChip tone="blue">{c.vowelPath}</CandidateChip>
+                      <CandidateChip tone="blue">
+                        {`Candidate vowel path: ${c.vowelPath}`}
+                      </CandidateChip>
                     ) : (
-                      <CandidateChip>vowel path not emitted</CandidateChip>
+                      <CandidateChip>Candidate vowel path: not emitted</CandidateChip>
                     )}
 
                     {c.deepRootHeartGateStatus ? (
