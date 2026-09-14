@@ -39,6 +39,7 @@ const DEFAULT_OUTPUT_PATH =
 const PROVIDER_ENV_KEYS = [
   "OPEN_INSTRUMENT_SEMANTIC_ALIGNMENT",
   "OPEN_INSTRUMENT_AUTO_PROPOSER",
+  "OPEN_INSTRUMENT_AUTO_CARRIER",
   "OPEN_INSTRUMENT_SEMANTIC_ALIGNMENT_TEST_PROVIDER",
   "OPEN_INSTRUMENT_AUTO_PROPOSER_TEST_PROVIDER",
 ] as const;
@@ -91,6 +92,7 @@ function disableProviderExecution(): Record<string, string | undefined> {
 
   process.env.OPEN_INSTRUMENT_SEMANTIC_ALIGNMENT = "0";
   process.env.OPEN_INSTRUMENT_AUTO_PROPOSER = "0";
+  process.env.OPEN_INSTRUMENT_AUTO_CARRIER = "0";
   delete process.env.OPEN_INSTRUMENT_SEMANTIC_ALIGNMENT_TEST_PROVIDER;
   delete process.env.OPEN_INSTRUMENT_AUTO_PROPOSER_TEST_PROVIDER;
   return previous;
@@ -129,7 +131,8 @@ function providerExecutionObserved(value: unknown, parentKey = ""): boolean {
     if (
       key === "attempted" &&
       child === true &&
-      /provider|proposal|alignment/i.test(parentKey)
+      (/provider|proposal|alignment/i.test(parentKey) ||
+        parentKey === "automaticCarrierPronunciationV0_1")
     ) {
       return true;
     }

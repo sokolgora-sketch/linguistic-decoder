@@ -975,12 +975,20 @@ function parseBaselineCaseV1(
   assertCondition(isRecord(value.repeatability), `baseline.cases[${index}].repeatability: expected object`);
   assertCondition(value.invariants.providerExecutionObserved === false, `baseline.cases[${index}]: provider execution observed`);
   assertCondition(value.invariants.valid === true, `baseline.cases[${index}]: invalid invariants`);
+  assertCondition(
+    typeof value.fingerprint === "string" && /^[a-f0-9]{64}$/.test(value.fingerprint),
+    `baseline.cases[${index}]: invalid fingerprint`,
+  );
   assertCondition(value.repeatability.checked === true, `baseline.cases[${index}]: repeatability not checked`);
   assertCondition(value.repeatability.stable === true, `baseline.cases[${index}]: repeatability failed`);
   assertCondition(
     typeof value.repeatability.repeatedFingerprint === "string" &&
-      /^[a-f0-9]{64}$/.test(value.repeatability.repeatedFingerprint),
+    /^[a-f0-9]{64}$/.test(value.repeatability.repeatedFingerprint),
     `baseline.cases[${index}]: invalid repeated fingerprint`,
+  );
+  assertCondition(
+    value.fingerprint === value.repeatability.repeatedFingerprint,
+    `baseline.cases[${index}]: repeated fingerprint does not match fingerprint`,
   );
   return value as unknown as AnalysisCapabilityBaselineCaseResultV1;
 }

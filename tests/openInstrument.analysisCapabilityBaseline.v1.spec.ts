@@ -214,6 +214,29 @@ describe("Open Instrument analytical capability baseline v1", () => {
     }
   });
 
+  test("repeatability parser rejects forged or mismatched fingerprints", () => {
+    const forged = JSON.parse(
+      readFileSync(BASELINE_PATH, "utf8"),
+    ) as Record<string, unknown>;
+    const forgedCases = array(forged.cases);
+    const forgedCase = record(forgedCases[0]);
+    forgedCase.fingerprint = "b".repeat(64);
+    expect(() => parseAnalysisCapabilityBaselineV1(forged)).toThrow(
+      /fingerprint/i,
+    );
+
+    const mismatched = JSON.parse(
+      readFileSync(BASELINE_PATH, "utf8"),
+    ) as Record<string, unknown>;
+    const mismatchedCases = array(mismatched.cases);
+    const mismatchedCase = record(mismatchedCases[0]);
+    const repeatability = record(mismatchedCase.repeatability);
+    repeatability.repeatedFingerprint = "b".repeat(64);
+    expect(() => parseAnalysisCapabilityBaselineV1(mismatched)).toThrow(
+      /repeated fingerprint/i,
+    );
+  });
+
   test("study preserves run-level paths, delta, candidate order, and composition fields", () => {
     const item = caseById("canonical.study");
     expect(item.paths.detected).toEqual(["U", "Y"]);
