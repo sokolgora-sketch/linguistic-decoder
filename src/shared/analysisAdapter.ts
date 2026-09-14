@@ -51,6 +51,7 @@ import {
 } from "./multiSourceFunctionalResearchEvidenceRegistry.v0_1";
 import { loadMultiSourceFunctionalResearchEvidenceCatalogV0_1 } from "./multiSourceFunctionalResearchEvidenceCatalog.v0_1";
 import { projectMultiSourceFunctionalResearchWitnessesV0_1 } from "./multiSourceFunctionalResearchProjection.v0_1";
+import { buildDeterministicResearchWitnessFunctionalProposalV1 } from "./openInstrument/deterministicResearchWitnessFunctionalProposal.v1";
 import { buildLogicDerivedFunctionalHypothesisV0_1 } from "./openInstrument/logicDerivedFunctionalHypothesis.v0_1";
 import { verifyLogicDerivedFunctionalHypothesisV0_1 } from "./verifier/verifyLogicDerivedFunctionalHypothesis.v0_1";
 import type { SemanticAlignmentAssessmentV0_1 } from "./openInstrument/semanticAlignment.v0_1";
@@ -643,9 +644,38 @@ export function enginePayloadToAnalysisResult(payload: EnginePayload): AnalyzeWo
                   researchInputs,
               });
 
+            const acceptedFunctionalStatementsByCandidateId =
+              new Map<string, string>();
+
+            for (const witness of researchWitnesses) {
+              const proposal =
+                buildDeterministicResearchWitnessFunctionalProposalV1({
+                  structuralHypothesis: hypothesis,
+                  witness,
+                });
+              const accepted =
+                proposal.acceptance?.acceptedFunctionalCandidate;
+
+              if (accepted) {
+                acceptedFunctionalStatementsByCandidateId.set(
+                  accepted.candidateId,
+                  accepted.functionalStatement,
+                );
+              }
+            }
+
             return projectMultiSourceFunctionalResearchWitnessesV0_1(
               researchWitnesses,
-            );
+            ).map((candidate) => {
+              const functionalStatement =
+                acceptedFunctionalStatementsByCandidateId.get(
+                  candidate.candidateId,
+                );
+
+              return functionalStatement
+                ? { ...candidate, functionalStatement }
+                : candidate;
+            });
           },
         )
       : [];
