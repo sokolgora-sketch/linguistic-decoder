@@ -524,6 +524,7 @@ export default function ZroChatPage() {
               debug={debugEnabled}
               wordForMask={lastRun?.word}
               carrierIpa={lastRun?.ipa}
+              targetSenseLabel={lastRun?.targetSenseLabel}
             />
           </UiErrorBoundary>
         ) : (
