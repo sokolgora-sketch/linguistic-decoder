@@ -50,6 +50,7 @@ type Props =
       vm?: never;
         wordForMask?: string;
         carrierIpa?: string;
+        targetSenseLabel?: string | null;
       debug?: boolean;
       onCopyFullJson?: () => void;
     }
@@ -59,6 +60,7 @@ type Props =
       payload?: never;
         wordForMask?: string;
         carrierIpa?: string;
+        targetSenseLabel?: string | null;
       debug?: boolean;
       onCopyFullJson?: () => void;
     };
@@ -229,6 +231,11 @@ function rootMapPanelValue(
 
 export function InstrumentPanel(props: Props) {
   const { toast } = useToast();
+  const targetSenseLabel =
+    typeof props.targetSenseLabel === "string" &&
+    props.targetSenseLabel.trim().length > 0
+      ? props.targetSenseLabel
+      : null;
   const [activeSection, setActiveSection] = React.useState<InstrumentSectionKey>("overview");
   const [isDarkMode, setIsDarkMode] = React.useState(true);
   const [candidateRecordsOpen, setCandidateRecordsOpen] = React.useState(false);
@@ -462,6 +469,18 @@ export function InstrumentPanel(props: Props) {
                   .toLowerCase() ? (
                 <div className="mt-2 font-mono text-[12px] text-[#8ea4ba]">
                   {`normalized: ${normalizedWord}`}
+                </div>
+              ) : null}
+
+              {targetSenseLabel ? (
+                <div
+                  data-testid="instrument-target-sense"
+                  className="mt-3 max-w-3xl break-words text-sm leading-6 text-[#c5ced8]"
+                >
+                  <span className="font-semibold text-[#8ea4ba]">
+                    Intended sense (request context):
+                  </span>{" "}
+                  <span>{targetSenseLabel}</span>
                 </div>
               ) : null}
             </div>
