@@ -205,6 +205,10 @@ export interface CandidateRowVM {
   functionalComponents?:
     PresentOrMissing<FunctionalCandidateComponentVM[]>;
 
+  // Ordered structural context emitted by Analyze V1. This remains optional
+  // for legacy payloads and does not imply ranking or truth promotion.
+  expansionChain?: PresentOrMissing<string[]>;
+
   functionalStatement: PresentOrMissing<string>;
   vowelPath: PresentOrMissing<Vowel[]>;
   deepRootHeartGate: PresentOrMissing<DeepRootHeartGateV01>;
