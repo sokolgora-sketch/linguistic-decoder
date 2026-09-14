@@ -173,6 +173,54 @@ export function CandidatesAccordion({
                       </div>
                     ) : null}
 
+                    {c.functionalComponents?.length ? (
+                      <div className="space-y-2 rounded-md border border-slate-700/80 bg-slate-950/35 p-2.5">
+                        <div className="text-xs font-semibold text-slate-200">
+                          Functional components
+                        </div>
+                        <div className="space-y-2">
+                          {c.functionalComponents.map((component, index) => {
+                            const language =
+                              component.language.kind === "present"
+                                ? component.language.value
+                                : null;
+                            const plainMeaning =
+                              component.plainMeaning.kind === "present"
+                                ? component.plainMeaning.value
+                                : null;
+                            const evidenceState =
+                              component.evidenceState.kind === "present"
+                                ? component.evidenceState.value
+                                : null;
+
+                            return (
+                              <div
+                                key={`${component.embryo}-${index}`}
+                                className="min-w-0 border-l border-slate-700 pl-2"
+                              >
+                                <div className="flex min-w-0 flex-wrap items-center gap-2">
+                                  <span className="break-all font-mono text-sm text-slate-100">
+                                    {component.embryo}
+                                  </span>
+                                  {language ? (
+                                    <CandidateChip>{`Language: ${language}`}</CandidateChip>
+                                  ) : null}
+                                  {evidenceState ? (
+                                    <CandidateChip>{`State: ${evidenceState}`}</CandidateChip>
+                                  ) : null}
+                                </div>
+                                {plainMeaning ? (
+                                  <div className="mt-1 break-words text-xs text-slate-300">
+                                    {plainMeaning}
+                                  </div>
+                                ) : null}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    ) : null}
+
                     {hasEmbryoFirstReadout ? (
                       <div className="space-y-2 rounded-md border border-slate-700/80 bg-slate-950/35 p-2.5">
                         <div className="flex flex-wrap items-center gap-2">
