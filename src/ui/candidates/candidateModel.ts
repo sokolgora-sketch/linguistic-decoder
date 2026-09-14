@@ -1,5 +1,10 @@
 import type { DeepRootHeartGateV01 } from "@/shared/deepRootHeartGate.v0.1";
-import type { CandidateRowVM, PresentOrMissing, TelemetryViewModel } from "../telemetry/types";
+import type {
+  CandidateRowVM,
+  FunctionalCandidateComponentVM,
+  PresentOrMissing,
+  TelemetryViewModel,
+} from "../telemetry/types";
 
 export interface UICandidateRow {
   id: string;
@@ -23,6 +28,7 @@ export interface UICandidateRow {
   attestationTruth?: string | null;
   functionalBridgeTruth?: string | null;
   expansionChain?: string[] | null;
+  functionalComponents?: FunctionalCandidateComponentVM[] | null;
 
   embryo?: string | null;
   plainStandaloneGloss?: string | null;
@@ -199,6 +205,11 @@ export function buildCandidateRowsFromVM(vm: TelemetryViewModel): UICandidateRow
     expansionChain:
       c.expansionChain?.kind === "present"
         ? c.expansionChain.value
+        : null,
+
+    functionalComponents:
+      c.functionalComponents?.kind === "present"
+        ? c.functionalComponents.value
         : null,
 
     embryo:
