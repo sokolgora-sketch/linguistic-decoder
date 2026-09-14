@@ -23,9 +23,11 @@ export type FunctionalDiscoveryAcceptanceReasonCodeV0_1 =
   | "INVALID_FUNCTIONAL_COMPONENT"
   | "INVALID_COMPONENT_OWNERSHIP"
   | "MISSING_COMPONENT_ROLE"
+  | "REVIEWED_COMPONENT_SUPPORT_REQUIRED"
   | "MISSING_TARGET_SENSE_WHEN_REQUIRED"
   | "FUNCTIONAL_STATEMENT_NOT_BOUND_TO_TARGET_SENSE"
   | "MISSING_SEMANTIC_BRIDGE"
+  | "SEMANTIC_BRIDGE_MISMATCH"
   | "UNSUPPORTED_SEMANTIC_BRIDGE"
   | "RESEARCH_EVIDENCE_NOT_PRODUCTION_AUTHORITY"
   | "REVIEWED_EVIDENCE_REQUIRED_FOR_PRODUCTION"
@@ -33,6 +35,7 @@ export type FunctionalDiscoveryAcceptanceReasonCodeV0_1 =
   | "USER_DECIDES_MISSING"
   | "SINGLE_WINNER_POSTURE_FORBIDDEN"
   | "PROVIDER_OUTPUT_NOT_AUTHORIZED"
+  | "PROVIDER_RESEARCH_ONLY_CANNOT_BE_REVIEWED"
   | "PROPOSAL_PROVENANCE_MISSING"
   | "PROPOSAL_PROVENANCE_UNSUPPORTED"
   | "TARGET_SENSE_REQUIREMENT_UNSUPPORTED"
@@ -298,6 +301,18 @@ function componentListV0_1(
         ),
       );
     }
+    if (
+      input.evidenceState === "reviewed_accepted" &&
+      input.componentRequirement === "required" &&
+      textV0_1(component.evidenceState) !== "reviewed"
+    ) {
+      failures.push(
+        failureV0_1(
+          "REVIEWED_COMPONENT_SUPPORT_REQUIRED",
+          `functionalComponents[${index}].evidenceState`,
+        ),
+      );
+    }
   }
 
   return components.map((component) => ({
@@ -319,8 +334,9 @@ function componentListV0_1(
 function semanticBridgeV0_1(
   input: FunctionalDiscoveryAcceptanceInputV0_1,
 ): string {
+  const alignmentBridge = textV0_1(input.semanticAlignment?.semanticBridge);
   return textV0_1(
-    input.semanticBridge ?? input.semanticAlignment?.semanticBridge,
+    alignmentBridge || input.semanticBridge,
   );
 }
 
@@ -363,6 +379,8 @@ export function evaluateDeterministicFunctionalDiscoveryAcceptanceV0_1(
   const targetWord = textV0_1(input?.targetWord);
   const structural = input?.structuralHypothesis;
   const statement = textV0_1(input?.functionalStatement);
+  const explicitBridge = textV0_1(input?.semanticBridge);
+  const alignmentBridge = textV0_1(input?.semanticAlignment?.semanticBridge);
   const bridge = semanticBridgeV0_1(input);
   const provenance = input?.proposalProvenance;
   const targetSense = input?.targetSense;
@@ -487,6 +505,19 @@ export function evaluateDeterministicFunctionalDiscoveryAcceptanceV0_1(
     );
   }
 
+  if (
+    provenance?.kind === "provider_proposed_hypothesis" &&
+    input.evidenceState === "reviewed_accepted" &&
+    provenance.providerAuthorization !== "reviewed_production"
+  ) {
+    failures.push(
+      failureV0_1(
+        "PROVIDER_RESEARCH_ONLY_CANNOT_BE_REVIEWED",
+        "proposalProvenance.providerAuthorization",
+      ),
+    );
+  }
+
   if (input.targetSenseRequirement === "REQUIRED") {
     if (!textV0_1(targetSense?.id) || !textV0_1(targetSense?.label)) {
       failures.push(
@@ -507,6 +538,15 @@ export function evaluateDeterministicFunctionalDiscoveryAcceptanceV0_1(
   }
 
   const alignment = input.semanticAlignment;
+  if (
+    explicitBridge &&
+    alignmentBridge &&
+    explicitBridge !== alignmentBridge
+  ) {
+    failures.push(
+      failureV0_1("SEMANTIC_BRIDGE_MISMATCH", "semanticBridge"),
+    );
+  }
   if (alignment) {
     const alignmentMatches =
       alignment.alignmentStatus === "proposed" &&
@@ -608,12 +648,15 @@ export function evaluateDeterministicFunctionalDiscoveryAcceptanceV0_1(
         "USER_DECIDES_MISSING",
         "SINGLE_WINNER_POSTURE_FORBIDDEN",
         "PROVIDER_OUTPUT_NOT_AUTHORIZED",
+        "PROVIDER_RESEARCH_ONLY_CANNOT_BE_REVIEWED",
         "PROPOSAL_PROVENANCE_MISSING",
         "PROPOSAL_PROVENANCE_UNSUPPORTED",
         "TARGET_SENSE_REQUIREMENT_UNSUPPORTED",
         "COMPONENT_REQUIREMENT_UNSUPPORTED",
         "EVIDENCE_STATE_UNSUPPORTED",
         "REVIEWED_EVIDENCE_REQUIRED_FOR_PRODUCTION",
+        "REVIEWED_COMPONENT_SUPPORT_REQUIRED",
+        "SEMANTIC_BRIDGE_MISMATCH",
       ].includes(failure.code),
     );
 

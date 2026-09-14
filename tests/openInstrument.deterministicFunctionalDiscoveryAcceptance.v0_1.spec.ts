@@ -173,12 +173,36 @@ describe("deterministic functional discovery acceptance v0.1", () => {
     expect(result.reasonCodes).toEqual([
       "RESEARCH_EVIDENCE_NOT_PRODUCTION_AUTHORITY",
     ]);
+    expect(result.acceptedFunctionalCandidate?.semanticBridge).toBe(
+      alignment.semanticBridge,
+    );
+  });
+
+  test("rejects a conflicting explicit semantic bridge", () => {
+    const result = evaluateDeterministicFunctionalDiscoveryAcceptanceV0_1(
+      completeInput({ semanticBridge: "a different bridge" }),
+    );
+
+    expect(result.decision).toBe("REJECT");
+    expect(result.reasonCodes).toContain("SEMANTIC_BRIDGE_MISMATCH");
+    expect(result.acceptedFunctionalCandidate).toBeUndefined();
   });
 
   test("accepts reviewed evidence only with existing reviewed authorization", () => {
     const result = evaluateDeterministicFunctionalDiscoveryAcceptanceV0_1(
       completeInput({
         evidenceState: "reviewed_accepted",
+        functionalComponents: [
+          {
+            candidateId: "candidate:fixture",
+            embryo: "ER",
+            language: "test",
+            plainMeaning: "bounded relation",
+            role: "Expansion/Bridge",
+            evidenceState: "reviewed",
+            evidenceRefs: ["reviewed:fixture"],
+          },
+        ],
         proposalProvenance: {
           kind: "reviewed_external_evidence",
           sourceId: "reviewed:fixture",
@@ -199,6 +223,136 @@ describe("deterministic functional discovery acceptance v0.1", () => {
       },
     });
   });
+
+  test("rejects provider research-only provenance from reviewed scope", () => {
+    const result = evaluateDeterministicFunctionalDiscoveryAcceptanceV0_1(
+      completeInput({
+        evidenceState: "reviewed_accepted",
+        functionalComponents: [
+          {
+            candidateId: "candidate:fixture",
+            embryo: "ER",
+            language: "test",
+            plainMeaning: "bounded relation",
+            role: "Expansion/Bridge",
+            evidenceState: "reviewed",
+            evidenceRefs: ["reviewed:fixture"],
+          },
+        ],
+        proposalProvenance: {
+          kind: "provider_proposed_hypothesis",
+          providerId: "provider",
+          modelId: "model",
+          providerAuthorization: "research_only",
+        },
+        evidenceRefs: ["reviewed:fixture"],
+        reviewedAuthorization: {
+          authorized: true,
+          sourceStatus: "reviewed_accepted",
+        },
+      }),
+    );
+
+    expect(result.decision).toBe("REJECT");
+    expect(result.reasonCodes).toContain(
+      "PROVIDER_RESEARCH_ONLY_CANNOT_BE_REVIEWED",
+    );
+    expect(result.acceptedFunctionalCandidate).toBeUndefined();
+  });
+
+  test("keeps provider research-only provenance at research scope", () => {
+    const result = evaluateDeterministicFunctionalDiscoveryAcceptanceV0_1(
+      completeInput({
+        proposalProvenance: {
+          kind: "provider_proposed_hypothesis",
+          providerId: "provider",
+          modelId: "model",
+          providerAuthorization: "research_only",
+        },
+      }),
+    );
+
+    expect(result).toMatchObject({
+      decision: "ACCEPT",
+      acceptedFunctionalCandidate: {
+        admissionScope: "research_hypothesis_only",
+        evidenceState: "research_candidate",
+      },
+    });
+  });
+
+  test("allows provider reviewed-production provenance only through reviewed gates", () => {
+    const result = evaluateDeterministicFunctionalDiscoveryAcceptanceV0_1(
+      completeInput({
+        evidenceState: "reviewed_accepted",
+        functionalComponents: [
+          {
+            candidateId: "candidate:fixture",
+            embryo: "ER",
+            language: "test",
+            plainMeaning: "bounded relation",
+            role: "Expansion/Bridge",
+            evidenceState: "reviewed",
+            evidenceRefs: ["reviewed:fixture"],
+          },
+        ],
+        proposalProvenance: {
+          kind: "provider_proposed_hypothesis",
+          providerId: "provider",
+          modelId: "model",
+          providerAuthorization: "reviewed_production",
+        },
+        evidenceRefs: ["reviewed:fixture"],
+        reviewedAuthorization: {
+          authorized: true,
+          sourceStatus: "reviewed_accepted",
+        },
+      }),
+    );
+
+    expect(result).toMatchObject({
+      decision: "ACCEPT",
+      acceptedFunctionalCandidate: {
+        admissionScope: "reviewed_functional_evidence",
+      },
+    });
+  });
+
+  test.each(["research_candidate", "unresolved", "unknown_state"])(
+    "rejects reviewed scope when a required component is %s",
+    (evidenceState) => {
+      const result = evaluateDeterministicFunctionalDiscoveryAcceptanceV0_1(
+        completeInput({
+          evidenceState: "reviewed_accepted",
+          functionalComponents: [
+            {
+              candidateId: "candidate:fixture",
+              embryo: "ER",
+              language: "test",
+              plainMeaning: "bounded relation",
+              role: "Expansion/Bridge",
+              evidenceState,
+              evidenceRefs: ["reviewed:fixture"],
+            },
+          ],
+          proposalProvenance: {
+            kind: "reviewed_external_evidence",
+            sourceId: "reviewed:fixture",
+          },
+          evidenceRefs: ["reviewed:fixture"],
+          reviewedAuthorization: {
+            authorized: true,
+            sourceStatus: "reviewed_accepted",
+          },
+        }),
+      );
+
+      expect(result.decision).toBe("REJECT");
+      expect(result.reasonCodes).toContain(
+        "REVIEWED_COMPONENT_SUPPORT_REQUIRED",
+      );
+    },
+  );
 
   test("rejects reviewed status without reviewed authorization", () => {
     const result = evaluateDeterministicFunctionalDiscoveryAcceptanceV0_1(
