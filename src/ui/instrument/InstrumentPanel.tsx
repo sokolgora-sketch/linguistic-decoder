@@ -531,6 +531,7 @@ export function InstrumentPanel(props: Props) {
                 surface={surfaceVoicePath}
                 functional={functionalVoicePath}
                 delta={vm.readout.voicePathDelta}
+                normalizationSteps={vm.evidence?.normalizationSteps}
               />
 
               <details
