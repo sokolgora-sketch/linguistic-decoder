@@ -7,6 +7,9 @@ import {
 import {
   discoverMultiSourceFunctionalWitnessesV0_1,
 } from "@/shared/multiSourceFunctionalDiscovery.v0_1";
+import type {
+  MultiSourceTruthStatusV0_1,
+} from "@/shared/multiSourceFunctionalDiscovery.v0_1";
 import {
   buildMultiSourceFunctionalResearchInputsV0_1,
 } from "@/shared/multiSourceFunctionalResearchEvidenceRegistry.v0_1";
@@ -49,6 +52,21 @@ function realInput() {
   return { structuralHypothesis, witness };
 }
 
+function resultForTruthStatuses(
+  attestationTruth: MultiSourceTruthStatusV0_1,
+  functionalBridgeTruth: MultiSourceTruthStatusV0_1,
+) {
+  const input = realInput();
+  return buildDeterministicResearchWitnessFunctionalProposalV1({
+    ...input,
+    witness: {
+      ...input.witness,
+      attestationTruth,
+      functionalBridgeTruth,
+    },
+  });
+}
+
 describe(
   "deterministic research-witness functional proposal adapter v1",
   () => {
@@ -66,6 +84,25 @@ describe(
         userDecisionPosture: "user_decides",
       });
     });
+
+    test.each([
+      ["fact", "hypothesis"],
+      ["inference", "fact"],
+      ["hypothesis", "inference"],
+    ] as const)(
+      "accepts usable truth states: %s/%s",
+      (attestationTruth, functionalBridgeTruth) => {
+        const result = resultForTruthStatuses(
+          attestationTruth,
+          functionalBridgeTruth,
+        );
+
+        expect(result.decision).toBe("ACCEPT");
+        expect(
+          result.acceptance?.acceptedFunctionalCandidate?.admissionScope,
+        ).toBe("research_hypothesis_only");
+      },
+    );
 
     test("copies the witness bridge into both bounded proposal fields", () => {
       const input = realInput();
@@ -152,6 +189,48 @@ describe(
         "RESEARCH_WITNESS_MUST_REMAIN_RESEARCH",
       ]);
       expect(result.proposal).toBeNull();
+    });
+
+    test("fails closed when attestation truth is unknown", () => {
+      const result = resultForTruthStatuses("unknown", "hypothesis");
+
+      expect(result.decision).toBe("INSUFFICIENT_SUPPORT");
+      expect(result.reasonCodes).toEqual([
+        "RESEARCH_WITNESS_ATTESTATION_TRUTH_SUPPORT_REQUIRED",
+      ]);
+      expect(result.proposal).toBeNull();
+      expect(result.acceptance).toBeNull();
+    });
+
+    test("fails closed when functional bridge truth is unknown", () => {
+      const result = resultForTruthStatuses("fact", "unknown");
+
+      expect(result.decision).toBe("INSUFFICIENT_SUPPORT");
+      expect(result.reasonCodes).toEqual([
+        "RESEARCH_WITNESS_FUNCTIONAL_BRIDGE_TRUTH_SUPPORT_REQUIRED",
+      ]);
+      expect(result.proposal).toBeNull();
+      expect(result.acceptance).toBeNull();
+    });
+
+    test("returns both deterministic truth-support reasons", () => {
+      const result = resultForTruthStatuses("unknown", "unknown");
+
+      expect(result.decision).toBe("INSUFFICIENT_SUPPORT");
+      expect(result.reasonCodes).toEqual([
+        "RESEARCH_WITNESS_ATTESTATION_TRUTH_SUPPORT_REQUIRED",
+        "RESEARCH_WITNESS_FUNCTIONAL_BRIDGE_TRUTH_SUPPORT_REQUIRED",
+      ]);
+      expect(result.proposal).toBeNull();
+      expect(result.acceptance).toBeNull();
+    });
+
+    test("is deterministic for repeated unknown-status input", () => {
+      expect(
+        resultForTruthStatuses("unknown", "unknown"),
+      ).toEqual(
+        resultForTruthStatuses("unknown", "unknown"),
+      );
     });
 
     test("keeps an invalid structural anchor fail-closed", () => {

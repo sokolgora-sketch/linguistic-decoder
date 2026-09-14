@@ -1,4 +1,5 @@
 import type {
+  MultiSourceTruthStatusV0_1,
   MultiSourceFunctionalWitnessV0_1,
 } from "../multiSourceFunctionalDiscovery.v0_1";
 import type {
@@ -20,7 +21,9 @@ export type DeterministicResearchWitnessFunctionalProposalReasonCodeV1 =
   | "RESEARCH_WITNESS_MUST_REMAIN_RESEARCH"
   | "RESEARCH_WITNESS_MUST_USE_STRUCTURAL_EMBRYO"
   | "RESEARCH_WITNESS_TARGET_WORD_MISMATCH"
-  | "RESEARCH_WITNESS_EMBRYO_MISMATCH";
+  | "RESEARCH_WITNESS_EMBRYO_MISMATCH"
+  | "RESEARCH_WITNESS_ATTESTATION_TRUTH_SUPPORT_REQUIRED"
+  | "RESEARCH_WITNESS_FUNCTIONAL_BRIDGE_TRUTH_SUPPORT_REQUIRED";
 
 export type DeterministicResearchWitnessFunctionalProposalResultV1 = Readonly<{
   schemaVersion:
@@ -60,6 +63,29 @@ function rejectedV1(
   };
 }
 
+function insufficientSupportV1(
+  reasonCodes: readonly DeterministicResearchWitnessFunctionalProposalReasonCodeV1[],
+): DeterministicResearchWitnessFunctionalProposalResultV1 {
+  return {
+    schemaVersion:
+      DETERMINISTIC_RESEARCH_WITNESS_FUNCTIONAL_PROPOSAL_SCHEMA_V1,
+    decision: "INSUFFICIENT_SUPPORT",
+    reasonCodes: [...new Set(reasonCodes)].sort(),
+    proposal: null,
+    acceptance: null,
+  };
+}
+
+function hasUsableResearchTruthV1(
+  value: MultiSourceTruthStatusV0_1,
+): boolean {
+  return (
+    value === "fact" ||
+    value === "inference" ||
+    value === "hypothesis"
+  );
+}
+
 /**
  * Build one bounded functional proposal from one existing research witness.
  *
@@ -80,6 +106,8 @@ export function buildDeterministicResearchWitnessFunctionalProposalV1(
   const evidenceRefs = [...input.witness.citationRefs];
   const preconditionFailures: DeterministicResearchWitnessFunctionalProposalReasonCodeV1[] =
     [];
+  const insufficientSupportFailures: DeterministicResearchWitnessFunctionalProposalReasonCodeV1[] =
+    [];
 
   if (!witnessId) {
     preconditionFailures.push("RESEARCH_WITNESS_ID_REQUIRED");
@@ -99,6 +127,16 @@ export function buildDeterministicResearchWitnessFunctionalProposalV1(
   if (input.witness.embryoAuthority !== "structural_discovery") {
     preconditionFailures.push("RESEARCH_WITNESS_MUST_USE_STRUCTURAL_EMBRYO");
   }
+  if (!hasUsableResearchTruthV1(input.witness.attestationTruth)) {
+    insufficientSupportFailures.push(
+      "RESEARCH_WITNESS_ATTESTATION_TRUTH_SUPPORT_REQUIRED",
+    );
+  }
+  if (!hasUsableResearchTruthV1(input.witness.functionalBridgeTruth)) {
+    insufficientSupportFailures.push(
+      "RESEARCH_WITNESS_FUNCTIONAL_BRIDGE_TRUTH_SUPPORT_REQUIRED",
+    );
+  }
 
   if (input.structuralHypothesis) {
     if (
@@ -117,6 +155,9 @@ export function buildDeterministicResearchWitnessFunctionalProposalV1(
 
   if (preconditionFailures.length > 0) {
     return rejectedV1(preconditionFailures);
+  }
+  if (insufficientSupportFailures.length > 0) {
+    return insufficientSupportV1(insufficientSupportFailures);
   }
 
   const proposal: FunctionalDiscoveryAcceptanceInputV0_1 = {
