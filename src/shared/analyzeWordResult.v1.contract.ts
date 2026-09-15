@@ -56,6 +56,7 @@ export const AnalyzeWordPrimaryPathV1ContractSchema = z
 
 const EMBRYO_FIRST_CLAIM_TYPES = [
   "functionalMotivation",
+  "genericFunctionalHypothesis",
   "structuralHypothesis",
   "historicalTransmission",
   "surfaceResonance",

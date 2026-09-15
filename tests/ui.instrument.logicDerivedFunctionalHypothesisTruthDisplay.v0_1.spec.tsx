@@ -60,6 +60,22 @@ describe("logic-derived functional hypothesis UI boundary v0.1", () => {
     expect(
       screen.getByText("Functional bridge: Hypothesis only; no source-backed evidence"),
     ).toBeInTheDocument();
-    expect(screen.getByText("AN")).toBeInTheDocument();
+    expect(
+      rows.find(
+        (row) =>
+          row.sourceKind ===
+          "logic_derived_generic_functional_hypothesis",
+      )?.functionalComponents,
+    ).toEqual([
+      expect.objectContaining({
+        embryo: "A",
+        language: { kind: "present", value: "voice-profile" },
+      }),
+    ]);
+    expect(
+      screen.getByText(
+        "Provenance: logic_derived_generic_functional_hypothesis",
+      ),
+    ).toBeInTheDocument();
   });
 });
