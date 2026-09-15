@@ -89,7 +89,13 @@ Stop on a repository or lane mismatch. Do not guess repository state.
 
 ## 7. Test and gate discipline
 
-Run focused tests first for changed behavior. Use the actual repository gate commands for repository-wide validation. `npm run gate:quick` is normally the primary Open Instrument pre-PR and pre-merge gate when applicable.
+Run focused tests first for changed behavior. Use the actual repository commands for repository-wide validation:
+
+- `npm run gate:quick` runs lint, unit tests, and integration tests but does not run the production build.
+- `npm run build` runs the production build directly.
+- `npm run gate` runs lint, unit tests, integration tests, and the production build.
+
+Use `npm run gate:quick` for quick validation when a build is not required. Use `npm run gate`, or report a separately executed `npm run build`, when production-build validation is required. Pre-merge proof must show the command that actually provided build coverage.
 
 Never claim PASS, build success, CI success, or gate success without actual output. Do not encode transient test counts in this durable workflow.
 

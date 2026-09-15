@@ -15,7 +15,7 @@ Run this from the repo root:
     cd "$HOME/Desktop/ZËRO /Dwnlosads /zero-firebase-studio-export" || exit 1
 
     echo "=== workflow index ==="
-    sed -n '1,220p' docs/process/workflows.md
+    cat docs/process/workflows.md
 
     echo
     echo "=== available workflow docs ==="
