@@ -484,6 +484,10 @@ export type FunctionalRoleComparativeEvaluationCorpusValidationV0_1 = Readonly<{
   reasonCodes: readonly string[];
 }>;
 
+const FROZEN_CORPUS_SERIALIZATION_V0_1 = JSON.stringify(
+  FUNCTIONAL_ROLE_COMPARATIVE_EVALUATION_CORPUS_V0_1,
+);
+
 export function validateFunctionalRoleComparativeEvaluationCorpusV0_1(
   value: unknown,
 ): FunctionalRoleComparativeEvaluationCorpusValidationV0_1 {
@@ -534,6 +538,7 @@ export function validateFunctionalRoleComparativeEvaluationCorpusV0_1(
       if (typeof value[field] !== "string" || value[field].length === 0) failures.push("POLICY_INVALID");
     }
     if (value.structuralOrderSemanticDirectionBoundary !== "PRESERVED") failures.push("STRUCTURAL_DIRECTION_BOUNDARY_INVALID");
+    if (JSON.stringify(value) !== FROZEN_CORPUS_SERIALIZATION_V0_1) failures.push("CORPUS_CONTENT_MISMATCH");
     if (!Array.isArray(value.cases) || value.cases.length !== FUNCTIONAL_ROLE_COMPARATIVE_EVALUATION_CORPUS_CASE_COUNT_V0_1) {
       failures.push("CASE_COUNT_INVALID");
     } else {

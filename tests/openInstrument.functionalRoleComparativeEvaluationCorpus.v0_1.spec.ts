@@ -169,6 +169,16 @@ describe("functional role comparative evaluation corpus v0.1", () => {
     expect(validateFunctionalRoleComparativeEvaluationCorpusV0_1(heldOutPayload).ok).toBe(false);
   });
 
+  test("rejects content mutations to the frozen preregistered corpus", () => {
+    const alteredCase = clone(FUNCTIONAL_ROLE_COMPARATIVE_EVALUATION_CORPUS_V0_1) as any;
+    alteredCase.cases[7].split = "DEVELOPMENT";
+    expect(validateFunctionalRoleComparativeEvaluationCorpusV0_1(alteredCase).ok).toBe(false);
+
+    const alteredPolicy = clone(FUNCTIONAL_ROLE_COMPARATIVE_EVALUATION_CORPUS_V0_1) as any;
+    alteredPolicy.selectionPolicy = "changed after preregistration";
+    expect(validateFunctionalRoleComparativeEvaluationCorpusV0_1(alteredPolicy).ok).toBe(false);
+  });
+
   test("is deeply immutable", () => {
     expect(Object.isFrozen(FUNCTIONAL_ROLE_COMPARATIVE_EVALUATION_CORPUS_V0_1)).toBe(true);
     expect(Object.isFrozen(FUNCTIONAL_ROLE_COMPARATIVE_EVALUATION_CORPUS_V0_1.cases)).toBe(true);
