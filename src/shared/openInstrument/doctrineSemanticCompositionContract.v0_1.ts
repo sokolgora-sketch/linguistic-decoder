@@ -1,6 +1,12 @@
 import type {
+  StructuralHypothesisReasonCodeV0_1,
   StructuralHypothesisV0_1,
 } from "@/shared/structuralHypothesisDiscovery.v0_1";
+import {
+  extractSevenVowelsFromString,
+  isSevenVowel,
+} from "@/shared/math7.core";
+import { STRUCTURAL_HYPOTHESIS_VERSION_V0_1 } from "@/shared/structuralHypothesisDiscovery.v0_1";
 import {
   DOCTRINE_PROJECTION_SCHEMA_V0_1,
   projectSevenVoiceDoctrineV0_1,
@@ -176,24 +182,261 @@ function normalizeTargetSenseV0_1(
   };
 }
 
+const AUTHORIZED_REDUCTION_OPERATION_IDS_V0_1 = new Set<string>([
+  "peel_right_vowel_led_expansion",
+  "peel_right_consonant_led_expansion",
+  "peel_left_consonant_frame",
+]);
+
+const REDUCTION_REASON_CODES_V0_1 = new Set<string>([
+  "structural_reduction_applied",
+  "right_edge_vowel_led_expansion",
+  "right_edge_consonant_led_expansion",
+  "left_consonant_frame_preserved",
+  "structural_containment_preserved",
+  "deterministic_operation_authorized",
+  "voice_path_recorded",
+]);
+
+const HYPOTHESIS_REASON_CODES_V0_1 = new Set<string>([
+  "structural_reduction_applied",
+  "structural_containment_preserved",
+  "deterministic_operation_authorized",
+  "terminal_structural_hypothesis_reached",
+  "minimum_defensible_embryo_reached",
+  "insufficient_structural_support",
+  "voice_path_recorded",
+  "independent_meaning_unknown",
+  "lexical_attestation_not_required_for_discovery",
+  "historical_origin_not_claimed",
+  "candidate_truth_not_claimed",
+  "production_promotion_not_claimed",
+]);
+
+const REQUIRED_HYPOTHESIS_REASON_CODES_V0_1: readonly StructuralHypothesisReasonCodeV0_1[] = [
+  "structural_reduction_applied",
+  "structural_containment_preserved",
+  "deterministic_operation_authorized",
+  "terminal_structural_hypothesis_reached",
+  "voice_path_recorded",
+  "independent_meaning_unknown",
+  "lexical_attestation_not_required_for_discovery",
+  "historical_origin_not_claimed",
+  "candidate_truth_not_claimed",
+  "production_promotion_not_claimed",
+];
+
+function canonicalKeyV0_1(value: unknown): string {
+  return textV0_1(value).toLocaleUpperCase("en-US");
+}
+
+function stringArrayV0_1(value: unknown): value is string[] {
+  return (
+    Array.isArray(value) &&
+    value.every((entry) => typeof entry === "string")
+  );
+}
+
+function canonicalVoicePathV0_1(
+  value: unknown,
+): value is string[] {
+  return (
+    stringArrayV0_1(value) &&
+    value.every((voice) => isSevenVowel(voice))
+  );
+}
+
+function sameStringArrayV0_1(
+  left: readonly string[],
+  right: readonly string[],
+): boolean {
+  return (
+    left.length === right.length &&
+    left.every((value, index) => value === right[index])
+  );
+}
+
+function canonicalPathMatchesFormV0_1(
+  value: unknown,
+  form: string,
+  allowEmpty: boolean,
+): value is string[] {
+  return (
+    canonicalVoicePathV0_1(value) &&
+    (allowEmpty || value.length > 0) &&
+    sameStringArrayV0_1(value, extractSevenVowelsFromString(form))
+  );
+}
+
+function requiredReasonCodesPresentV0_1(
+  actual: readonly string[],
+  required: readonly string[],
+): boolean {
+  return required.every((reasonCode) => actual.includes(reasonCode));
+}
+
+function reductionStepValidV0_1(
+  value: unknown,
+  previousForm: string,
+): value is RecordV0_1 {
+  if (!isRecordV0_1(value)) return false;
+
+  const from = textV0_1(value.from);
+  const to = textV0_1(value.to);
+  const operationId = textV0_1(value.operationId);
+  const reasonCodes = value.reasonCodes;
+  const fromSpan = value.fromSpan;
+  const removedOrChanged = textV0_1(value.removedOrChanged);
+
+  if (
+    !from ||
+    !to ||
+    !AUTHORIZED_REDUCTION_OPERATION_IDS_V0_1.has(operationId) ||
+    !stringArrayV0_1(reasonCodes) ||
+    reasonCodes.length === 0 ||
+    !reasonCodes.every((reasonCode) =>
+      REDUCTION_REASON_CODES_V0_1.has(reasonCode),
+    ) ||
+    !requiredReasonCodesPresentV0_1(
+      reasonCodes,
+      [
+        "structural_reduction_applied",
+        "structural_containment_preserved",
+        "deterministic_operation_authorized",
+        "voice_path_recorded",
+      ],
+    ) ||
+    !removedOrChanged ||
+    !isRecordV0_1(fromSpan) ||
+    !Number.isInteger(fromSpan.start) ||
+    !Number.isInteger(fromSpan.end)
+  ) {
+    return false;
+  }
+
+  const chars = Array.from(from.normalize("NFC"));
+  const start = Number(fromSpan.start);
+  const end = Number(fromSpan.end);
+  const expectedTo = chars.slice(0, start).concat(chars.slice(end)).join("");
+
+  const validSpan = start >= 0 && end > start && end <= chars.length;
+  const operationSpanValid =
+    operationId === "peel_left_consonant_frame"
+      ? start === 0 && end === 1
+      : end === chars.length && end - start >= 2 && end - start <= 3;
+  const removedValueMatches =
+    canonicalKeyV0_1(chars.slice(start, end).join("")) ===
+    canonicalKeyV0_1(removedOrChanged);
+  const sequenceMatches = canonicalKeyV0_1(from) === canonicalKeyV0_1(previousForm);
+  const beforePathValid = canonicalPathMatchesFormV0_1(
+    value.voicePathBefore,
+    from,
+    false,
+  );
+  const afterPathValid = canonicalPathMatchesFormV0_1(
+    value.voicePathAfter,
+    to,
+    false,
+  );
+
+  const operationReasonCode =
+    operationId === "peel_left_consonant_frame"
+      ? "left_consonant_frame_preserved"
+      : operationId === "peel_right_vowel_led_expansion"
+        ? "right_edge_vowel_led_expansion"
+        : "right_edge_consonant_led_expansion";
+
+  return (
+    validSpan &&
+    operationSpanValid &&
+    removedValueMatches &&
+    sequenceMatches &&
+    expectedTo.length > 0 &&
+    canonicalKeyV0_1(expectedTo) === canonicalKeyV0_1(to) &&
+    reasonCodes.includes(operationReasonCode) &&
+    beforePathValid &&
+    afterPathValid
+  );
+}
+
 function structuralHypothesisValidV0_1(
   value: unknown,
 ): value is StructuralHypothesisV0_1 {
   if (!isRecordV0_1(value)) return false;
 
-  return (
-    value.hypothesisVersion === "z-zero.structural-hypothesis.v0_1" &&
+  const reductionSteps = value.reductionSteps;
+  const expansionChain = value.expansionChain;
+  const reasonCodes = value.reasonCodes;
+  const evidenceRefs = value.evidenceRefs;
+
+  if (!(
+    value.hypothesisVersion === STRUCTURAL_HYPOTHESIS_VERSION_V0_1 &&
+    textV0_1(value.basis).length > 0 &&
     value.discoveryStatus === "structural_hypothesis" &&
     textV0_1(value.hypothesisId).length > 0 &&
     textV0_1(value.embryo).length > 0 &&
     Number.isInteger(value.embryoSize) &&
     Number(value.embryoSize) > 0 &&
+    Number(value.embryoSize) === Array.from(textV0_1(value.embryo)).length &&
+    value.independentStandaloneMeaning === null &&
+    value.lexicalAttestation === "not_evaluated" &&
+    value.functionalSupportStatus === "unknown" &&
     value.historicalOriginClaim === "not_claimed" &&
     value.historicalTransmissionClaim === "not_claimed" &&
     value.winnerClaim === "not_claimed" &&
     value.languageSuperiorityClaim === "not_claimed" &&
     value.candidateTruthClaim === "not_claimed" &&
     value.userDecisionPosture === "user_decides"
+  )) {
+    return false;
+  }
+
+  if (
+    !Array.isArray(reductionSteps) ||
+    !Array.isArray(expansionChain) ||
+    expansionChain.length < 2 ||
+    !stringArrayV0_1(expansionChain) ||
+    !stringArrayV0_1(reasonCodes) ||
+    reasonCodes.length === 0 ||
+    !reasonCodes.every((reasonCode) =>
+      HYPOTHESIS_REASON_CODES_V0_1.has(reasonCode),
+    ) ||
+    !requiredReasonCodesPresentV0_1(
+      reasonCodes,
+      REQUIRED_HYPOTHESIS_REASON_CODES_V0_1,
+    ) ||
+    !stringArrayV0_1(evidenceRefs) ||
+    !evidenceRefs.every((ref) => textV0_1(ref).length > 0) ||
+    !expansionChain.every((entry) => textV0_1(entry).length > 0)
+  ) {
+    return false;
+  }
+
+  if (reductionSteps.length === 0) return true;
+
+  if (
+    !reductionSteps.every((step, index, steps) =>
+      reductionStepValidV0_1(
+        step,
+        index === 0
+          ? textV0_1(value.basis)
+          : textV0_1(steps[index - 1]?.to),
+      ),
+    ) ||
+    expansionChain.length !== reductionSteps.length + 1 ||
+    canonicalKeyV0_1(reductionSteps[0]?.from) !==
+      canonicalKeyV0_1(value.basis) ||
+    canonicalKeyV0_1(reductionSteps[reductionSteps.length - 1]?.to) !==
+      canonicalKeyV0_1(value.embryo)
+  ) {
+    return false;
+  }
+
+  return expansionChain.every((entry, index) =>
+    index < reductionSteps.length
+      ? canonicalKeyV0_1(entry) ===
+        canonicalKeyV0_1(reductionSteps[reductionSteps.length - 1 - index]?.to)
+      : canonicalKeyV0_1(entry) === canonicalKeyV0_1(value.basis),
   );
 }
 

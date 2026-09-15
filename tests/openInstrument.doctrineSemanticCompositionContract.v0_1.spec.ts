@@ -9,20 +9,23 @@ import type {
 function structuralFixture(
   terminalVoicePath: string[] = ["U"],
 ): StructuralHypothesisV0_1 {
+  const terminalForm = `R${terminalVoicePath.join("")}`;
+  const basis = `T${terminalForm}`;
+
   return {
     hypothesisVersion: "z-zero.structural-hypothesis.v0_1",
     hypothesisId: "logic-structural:fixture:ER:peel_left_consonant_frame",
-    basis: "fixture",
-    embryo: "ER",
-    embryoSize: 2,
+    basis,
+    embryo: terminalForm,
+    embryoSize: Array.from(terminalForm).length,
     discoveryStatus: "structural_hypothesis",
     independentStandaloneMeaning: null,
     lexicalAttestation: "not_evaluated",
     functionalSupportStatus: "unknown",
     reductionSteps: [
       {
-        from: "FIXTURE",
-        to: "ER",
+        from: basis,
+        to: terminalForm,
         operationId: "peel_left_consonant_frame",
         reasonCodes: [
           "structural_reduction_applied",
@@ -31,13 +34,13 @@ function structuralFixture(
           "deterministic_operation_authorized",
           "voice_path_recorded",
         ],
-        fromSpan: { start: 0, end: 2 },
-        removedOrChanged: "FIX",
-        voicePathBefore: ["I"],
+        fromSpan: { start: 0, end: 1 },
+        removedOrChanged: "T",
+        voicePathBefore: terminalVoicePath as StructuralHypothesisV0_1["reductionSteps"][number]["voicePathBefore"],
         voicePathAfter: terminalVoicePath as StructuralHypothesisV0_1["reductionSteps"][number]["voicePathAfter"],
       },
     ],
-    expansionChain: ["ER", "FIXTURE"],
+    expansionChain: [terminalForm, basis],
     reasonCodes: [
       "structural_reduction_applied",
       "structural_containment_preserved",
@@ -195,20 +198,89 @@ describe("Open Instrument doctrine semantic composition contract v0.1", () => {
   });
 
   test.each([
-    [[], "TERMINAL_VOICE_PATH_REQUIRED"],
-    [["V"], "UNSUPPORTED_VOICE"],
-  ])("fails closed for terminal path %#", (path, reasonCode) => {
+    [[]],
+    [["V"]],
+  ])("fails closed for malformed terminal path %#", (path) => {
     const result = evaluateDoctrineSemanticCompositionContractV0_1({
       structuralHypothesis: structuralFixture(path as string[]),
     });
 
-    expect(result).toMatchObject({ status: "REJECT" });
-    expect(result.reasonCodes).toContain(reasonCode);
-    expect(result.reasonCodes).toContain(
-      path.length === 0
-        ? "TERMINAL_VOICE_PATH_REQUIRED"
-        : "DOCTRINE_PROJECTION_REJECTED",
-    );
+    expect(result).toMatchObject({
+      status: "REJECT",
+      reasonCodes: ["STRUCTURAL_HYPOTHESIS_INVALID"],
+    });
+  });
+
+  test.each([
+    ["basis missing", (structural: StructuralHypothesisV0_1) => {
+      delete (structural as unknown as Record<string, unknown>).basis;
+    }],
+    ["basis empty", (structural: StructuralHypothesisV0_1) => {
+      structural.basis = "  ";
+    }],
+    ["expansionChain missing", (structural: StructuralHypothesisV0_1) => {
+      delete (structural as unknown as Record<string, unknown>).expansionChain;
+    }],
+    ["expansionChain malformed", (structural: StructuralHypothesisV0_1) => {
+      structural.expansionChain = [structural.embryo];
+    }],
+    ["independentStandaloneMeaning wrong", (structural: StructuralHypothesisV0_1) => {
+      (structural as unknown as Record<string, unknown>).independentStandaloneMeaning = "meaning";
+    }],
+    ["lexicalAttestation wrong", (structural: StructuralHypothesisV0_1) => {
+      (structural as unknown as Record<string, unknown>).lexicalAttestation = "attested";
+    }],
+    ["functionalSupportStatus wrong", (structural: StructuralHypothesisV0_1) => {
+      (structural as unknown as Record<string, unknown>).functionalSupportStatus = "supported";
+    }],
+    ["reasonCodes missing", (structural: StructuralHypothesisV0_1) => {
+      delete (structural as unknown as Record<string, unknown>).reasonCodes;
+    }],
+    ["reasonCodes malformed", (structural: StructuralHypothesisV0_1) => {
+      structural.reasonCodes = ["unknown_reason"] as StructuralHypothesisV0_1["reasonCodes"];
+    }],
+    ["evidenceRefs missing", (structural: StructuralHypothesisV0_1) => {
+      delete (structural as unknown as Record<string, unknown>).evidenceRefs;
+    }],
+    ["evidenceRefs malformed", (structural: StructuralHypothesisV0_1) => {
+      (structural as unknown as Record<string, unknown>).evidenceRefs = [42];
+    }],
+    ["reduction step missing from", (structural: StructuralHypothesisV0_1) => {
+      delete (structural.reductionSteps[0] as unknown as Record<string, unknown>).from;
+    }],
+    ["reduction step missing to", (structural: StructuralHypothesisV0_1) => {
+      delete (structural.reductionSteps[0] as unknown as Record<string, unknown>).to;
+    }],
+    ["unauthorized operationId", (structural: StructuralHypothesisV0_1) => {
+      (structural.reductionSteps[0] as unknown as Record<string, unknown>).operationId = "invented_operation";
+    }],
+    ["malformed fromSpan", (structural: StructuralHypothesisV0_1) => {
+      structural.reductionSteps[0].fromSpan = { start: -1, end: 0 };
+    }],
+    ["malformed voicePathBefore", (structural: StructuralHypothesisV0_1) => {
+      structural.reductionSteps[0].voicePathBefore = ["V"] as StructuralHypothesisV0_1["reductionSteps"][number]["voicePathBefore"];
+    }],
+    ["malformed voicePathAfter", (structural: StructuralHypothesisV0_1) => {
+      structural.reductionSteps[0].voicePathAfter = ["V"] as StructuralHypothesisV0_1["reductionSteps"][number]["voicePathAfter"];
+    }],
+    ["malformed reduction-step reasonCodes", (structural: StructuralHypothesisV0_1) => {
+      structural.reductionSteps[0].reasonCodes = ["unknown_reason"] as StructuralHypothesisV0_1["reductionSteps"][number]["reasonCodes"];
+    }],
+    ["incoherent reduction step span", (structural: StructuralHypothesisV0_1) => {
+      structural.reductionSteps[0].fromSpan = { start: 0, end: 2 };
+    }],
+  ])("rejects corrupted structural anchor: %s", (_label, mutate) => {
+    const structural = structuralFixture(["U"]);
+    mutate(structural);
+
+    expect(
+      evaluateDoctrineSemanticCompositionContractV0_1({
+        structuralHypothesis: structural,
+      }),
+    ).toMatchObject({
+      status: "REJECT",
+      reasonCodes: ["STRUCTURAL_HYPOTHESIS_INVALID"],
+    });
   });
 
   test("rejects malformed target sense context", () => {
