@@ -203,6 +203,86 @@ export type SevenVoiceDoctrineFunctionalProfileV0_1 = Readonly<{
   noSingleWinner: true;
 }>;
 
+const AUTHOR_SOURCE_IDS_V0_1 = new Set<string>([
+  "seven-voices.author-source.chapter-01.sq",
+  "seven-voices.author-source.chapter-02.sq",
+  "seven-voices.author-source.chapter-03.sq",
+  "seven-voices.author-source.chapter-04.sq",
+]);
+
+const FUNCTIONAL_PROPERTY_IDS_V0_1 = new Set<string>([
+  "beginning",
+  "creation",
+  "activation",
+  "life_pulse",
+  "expansion",
+  "transformation",
+  "connection",
+  "growth",
+  "illumination",
+  "knowledge",
+  "recognition",
+  "clarity",
+  "truth_orientation",
+  "understanding",
+  "mediation",
+  "balance",
+  "order",
+  "center",
+  "harmonization",
+  "non_domination",
+  "unification",
+  "support",
+  "grounding",
+  "depth",
+  "stability",
+  "nourishment",
+  "belonging",
+  "foundation",
+  "choice",
+  "duality",
+  "exploration",
+  "adventure",
+  "mystery",
+  "imagination",
+  "experimentation",
+  "discovery",
+  "risk",
+  "learning_from_experience",
+  "resolution",
+  "harmony",
+  "peace",
+  "reconciliation",
+  "unity",
+  "emotional_interiority",
+]);
+
+const PRINCIPLE_LABELS_V0_1 = new Set<string>([
+  "Bashkimi",
+  "Vibrimi",
+  "Ritmi",
+  "Balanca",
+  "Ndryshimi",
+  "Nisma",
+  "Dashuria",
+]);
+
+const RELATION_IDS_V0_1 = new Set<string>([
+  "a-eh-complementarity",
+  "o-high-low-mediation",
+  "o-non-domination-balance",
+]);
+
+const COLORS_V0_1 = new Set<string>([
+  "red",
+  "orange",
+  "yellow",
+  "green",
+  "blue",
+  "indigo",
+  "violet",
+]);
+
 export const DOCTRINE_FUNCTIONAL_PROFILE_SOURCE_REFS_V0_1 = Object.freeze({
   chapter01Lines16To20: {
     sourceId: "seven-voices.author-source.chapter-01.sq",
@@ -448,7 +528,7 @@ const FREQUENCY_TENSION_V0_1: DoctrineFunctionalProfileTensionV0_1 = {
   noSingleWinner: true,
 };
 
-export const SEVEN_VOICE_DOCTRINE_PROFILE_TENSIONS_V0_1 = Object.freeze([
+export const SEVEN_VOICE_DOCTRINE_PROFILE_TENSIONS_V0_1 = deepFreezeV0_1([
   FREQUENCY_TENSION_V0_1,
 ] as const);
 
@@ -465,7 +545,7 @@ function symbolicMetadataV0_1(
   };
 }
 
-const PROFILE_RELATIONS_V0_1 = Object.freeze({
+const PROFILE_RELATIONS_V0_1 = deepFreezeV0_1({
   "a-eh-complementarity": {
     relationId: "a-eh-complementarity",
     subject: "A",
@@ -699,10 +779,27 @@ function nonEmptyStringV0_1(value: unknown): value is string {
   return typeof value === "string" && value.trim().length > 0;
 }
 
+function isKnownValueV0_1<T extends string>(
+  value: unknown,
+  values: ReadonlySet<string>,
+): value is T {
+  return typeof value === "string" && values.has(value);
+}
+
 function isSourceRefV0_1(value: unknown): value is DoctrineFunctionalProfileSourceRefV0_1 {
   if (!isRecordV0_1(value)) return false;
   return (
-    nonEmptyStringV0_1(value.sourceId) &&
+    hasOnlyKnownKeysV0_1(value, [
+      "sourceId",
+      "locator",
+      "sourceKind",
+      "sourceStatus",
+      "engineAuthority",
+    ]) &&
+    isKnownValueV0_1<SevenVoicesAuthorSourceIdV0_1>(
+      value.sourceId,
+      AUTHOR_SOURCE_IDS_V0_1,
+    ) &&
     nonEmptyStringV0_1(value.locator) &&
     value.sourceKind === DOCTRINE_FUNCTIONAL_PROFILE_SOURCE_KIND_V0_1 &&
     value.sourceStatus === DOCTRINE_FUNCTIONAL_PROFILE_SOURCE_STATUS_V0_1 &&
@@ -731,7 +828,16 @@ function isFunctionalPropertyDatumV0_1(
 ): value is DoctrineFunctionalProfileDatumV0_1 {
   if (!isRecordV0_1(value)) return false;
   return (
-    nonEmptyStringV0_1(value.id) &&
+    hasOnlyKnownKeysV0_1(value, [
+      "id",
+      "sourceClass",
+      "sourceRefs",
+      "normalizationStatus",
+    ]) &&
+    isKnownValueV0_1<DoctrineFunctionalPropertyIdV0_1>(
+      value.id,
+      FUNCTIONAL_PROPERTY_IDS_V0_1,
+    ) &&
     (value.sourceClass === "EXPLICIT_DOCTRINE" ||
       value.sourceClass === "FUNCTIONAL_INTERPRETATION") &&
     sourceRefsValidV0_1(value.sourceRefs) &&
@@ -743,7 +849,16 @@ function isFunctionalPropertyDatumV0_1(
 function isPrincipleV0_1(value: unknown): value is DoctrineFunctionalProfilePrincipleV0_1 {
   if (!isRecordV0_1(value)) return false;
   return (
-    nonEmptyStringV0_1(value.label) &&
+    hasOnlyKnownKeysV0_1(value, [
+      "label",
+      "sourceRefs",
+      "sourceClass",
+      "normalizationStatus",
+    ]) &&
+    isKnownValueV0_1<SevenVoicesPrincipleAssociationV0_1>(
+      value.label,
+      PRINCIPLE_LABELS_V0_1,
+    ) &&
     value.sourceClass === "EXPLICIT_DOCTRINE" &&
     sourceRefsValidV0_1(value.sourceRefs) &&
     value.normalizationStatus ===
@@ -754,6 +869,15 @@ function isPrincipleV0_1(value: unknown): value is DoctrineFunctionalProfilePrin
 function isClaimBoundaryV0_1(value: unknown): value is DoctrineFunctionalProfileClaimBoundaryV0_1 {
   if (!isRecordV0_1(value)) return false;
   return (
+    hasOnlyKnownKeysV0_1(value, [
+      "lexicalEvidence",
+      "historicalEvidence",
+      "etymologicalEvidence",
+      "empiricalScientificEvidence",
+      "targetSenseBinding",
+      "pathComposition",
+      "productionCandidate",
+    ]) &&
     value.lexicalEvidence === "NOT_CLAIMED" &&
     value.historicalEvidence === "NOT_CLAIMED" &&
     value.etymologicalEvidence === "NOT_CLAIMED" &&
@@ -834,15 +958,25 @@ export function validateSevenVoiceDoctrineFunctionalProfileV0_1(
   }
   if (
     !Array.isArray(value.relationalPropertyIds) ||
-    !value.relationalPropertyIds.every(nonEmptyStringV0_1)
+    !value.relationalPropertyIds.every((relationId) =>
+      isKnownValueV0_1<DoctrineFunctionalProfileRelationIdV0_1>(
+        relationId,
+        RELATION_IDS_V0_1,
+      ),
+    )
   ) {
     reasonCodes.push("RELATIONAL_PROPERTIES_INVALID");
   }
   const symbolicMetadata = value.symbolicMetadata;
   if (
     !isRecordV0_1(symbolicMetadata) ||
+    !hasOnlyKnownKeysV0_1(symbolicMetadata, ["color", "frequencyTensionIds"]) ||
     !isRecordV0_1(symbolicMetadata.color) ||
-    !nonEmptyStringV0_1(symbolicMetadata.color.value) ||
+    !hasOnlyKnownKeysV0_1(symbolicMetadata.color, ["value", "sourceRefs"]) ||
+    !isKnownValueV0_1<DoctrineFunctionalProfileColorV0_1>(
+      symbolicMetadata.color.value,
+      COLORS_V0_1,
+    ) ||
     !sourceRefsValidV0_1(symbolicMetadata.color.sourceRefs) ||
     !Array.isArray(symbolicMetadata.frequencyTensionIds) ||
     symbolicMetadata.frequencyTensionIds.length !== 1 ||
@@ -913,7 +1047,8 @@ export function validateSevenVoiceDoctrineProfilesV0_1(
 
   const failures = keys.flatMap((key) => {
     const result = validateSevenVoiceDoctrineFunctionalProfileV0_1(value[key]);
-    return result.ok ? [] : result.reasonCodes;
+    if (!result.ok) return result.reasonCodes;
+    return result.value.voice === key ? [] : ["VOICE_INVALID" as const];
   });
 
   return {

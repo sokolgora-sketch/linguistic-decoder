@@ -217,6 +217,65 @@ describe("Open Instrument Seven Voices doctrine functional profile v0.1", () => 
     expect(Object.isFrozen(first)).toBe(true);
   });
 
+  test("deep-freezes exported tension and relation registries", () => {
+    const tension = SEVEN_VOICE_DOCTRINE_PROFILE_TENSIONS_V0_1[0];
+    const relation = SEVEN_VOICE_DOCTRINE_PROFILE_RELATIONS_V0_1[
+      "o-high-low-mediation"
+    ];
+
+    expect(Object.isFrozen(tension)).toBe(true);
+    expect(Object.isFrozen(tension.competingClaims)).toBe(true);
+    expect(Object.isFrozen(relation)).toBe(true);
+    expect(Object.isFrozen(relation.relatedVoices)).toBe(true);
+  });
+
+  test("rejects unknown closed-world IDs and registry key swaps", () => {
+    const malformedProperty = {
+      ...SEVEN_VOICE_DOCTRINE_PROFILES_V0_1.A,
+      functionalProperties: [
+        { ...SEVEN_VOICE_DOCTRINE_PROFILES_V0_1.A.functionalProperties[0], id: "typo" },
+      ],
+    };
+    const malformedPrinciple = {
+      ...SEVEN_VOICE_DOCTRINE_PROFILES_V0_1.A,
+      principleAssociation: {
+        ...SEVEN_VOICE_DOCTRINE_PROFILES_V0_1.A.principleAssociation,
+        label: "Unknown",
+      },
+    };
+    const swapped = {
+      ...SEVEN_VOICE_DOCTRINE_PROFILES_V0_1,
+      A: { ...SEVEN_VOICE_DOCTRINE_PROFILES_V0_1.A, voice: "E" },
+      E: { ...SEVEN_VOICE_DOCTRINE_PROFILES_V0_1.E, voice: "A" },
+    };
+
+    expect(validateSevenVoiceDoctrineFunctionalProfileV0_1(malformedProperty).ok).toBe(
+      false,
+    );
+    expect(validateSevenVoiceDoctrineFunctionalProfileV0_1(malformedPrinciple).ok).toBe(
+      false,
+    );
+    expect(validateSevenVoiceDoctrineProfilesV0_1(swapped).reasonCodes).toEqual([
+      "VOICE_INVALID",
+    ]);
+  });
+
+  test("rejects forbidden fields nested inside profile data", () => {
+    const malformed = {
+      ...SEVEN_VOICE_DOCTRINE_PROFILES_V0_1.A,
+      functionalProperties: [
+        {
+          ...SEVEN_VOICE_DOCTRINE_PROFILES_V0_1.A.functionalProperties[0],
+          evidenceRefs: [],
+        },
+      ],
+    };
+
+    expect(validateSevenVoiceDoctrineFunctionalProfileV0_1(malformed).ok).toBe(
+      false,
+    );
+  });
+
   test.each([null, undefined, "Ẽ", "V1", 1, [], {}])(
     "fails closed for invalid Voice %p",
     (voice: unknown) => {
