@@ -27,12 +27,22 @@ describe("sense-grounded functional bridge arbitrary-sense baseline v0.1", () =>
       expect(response.status).toBe(200);
 
       const body = await response.json();
-      const candidates = (body.candidates ?? []).filter(
+      const logicCandidates = (body.candidates ?? []).filter(
         (candidate: any) =>
           candidate.sourceKind === "logic_derived_functional_hypothesis",
       );
-      expect(candidates).toHaveLength(0);
-      expect(body.analysisStatusV0_1.status).toBe("structural_unreviewed");
+      const genericCandidates = (body.candidates ?? []).filter(
+        (candidate: any) =>
+          candidate.sourceKind ===
+          "logic_derived_generic_functional_hypothesis",
+      );
+      expect(logicCandidates).toHaveLength(0);
+      expect(genericCandidates).toHaveLength(1);
+      expect(body.analysisStatusV0_1.status).toBe("candidate_only");
+      expect(genericCandidates[0].targetSenseId).toBeUndefined();
+      expect(genericCandidates[0].semanticAlignmentStatus).toBeUndefined();
+      expect(genericCandidates[0].semanticBridge).toBeNull();
+      expect(genericCandidates[0].evidenceRefs).toEqual([]);
       const structural = (body.candidates ?? []).find(
         (candidate: any) => candidate.claimType === "structuralHypothesis",
       );
@@ -43,7 +53,8 @@ describe("sense-grounded functional bridge arbitrary-sense baseline v0.1", () =>
       results.push({
         targetSenseLabel,
         status: body.analysisStatusV0_1.status,
-        logicCandidateCount: candidates.length,
+        logicCandidateCount: logicCandidates.length,
+        genericFunctionalHypothesisCount: genericCandidates.length,
         semanticBridge: null,
         verifier: null,
       });
@@ -51,7 +62,7 @@ describe("sense-grounded functional bridge arbitrary-sense baseline v0.1", () =>
 
     expect(results).toHaveLength(SENSES.length);
     expect(new Set(results.map((result) => result.status))).toEqual(
-      new Set(["structural_unreviewed"]),
+      new Set(["candidate_only"]),
     );
   });
 });
