@@ -6,6 +6,7 @@ import {
   produceGenericFunctionalHypothesisV1,
   validateGenericFunctionalHypothesisV1,
 } from "@/shared/openInstrument/genericFunctionalHypothesisProducer.v1";
+import { adaptAnalysisToTelemetryVM } from "@/ui/instrument/contractAdapter";
 
 // Frozen before observing its generated embryo or profile projection. It is
 // absent from the repository's semantic registries, catalogs, and fixtures.
@@ -179,6 +180,23 @@ describe("generic functional hypothesis producer v1", () => {
     expect(generic.targetSenseLabel).toBeUndefined();
     expect(generic.semanticAlignmentStatus).toBeUndefined();
     expect(result.analysisStatusV0_1.status).toBe("candidate_only");
+
+    const genericRow = adaptAnalysisToTelemetryVM(result).candidates.find(
+      (candidate) => candidate.id === generic.id,
+    );
+    expect(genericRow?.functionalComponents).toEqual({
+      kind: "present",
+      value: [
+        expect.objectContaining({
+          embryo: generic.functionalComponents[0].voice,
+          language: { kind: "present", value: "voice-profile" },
+          evidenceState: {
+            kind: "present",
+            value: generic.functionalComponents[0].profileTruthClassification,
+          },
+        }),
+      ],
+    });
   });
 
   test("is deterministic and immutable", () => {
@@ -220,5 +238,20 @@ describe("generic functional hypothesis producer v1", () => {
 
     expect(validation.ok).toBe(false);
     expect(validation.reasonCodes).toContain("FUNCTIONAL_COMPONENTS_INVALID");
+
+    const flattenedSemanticFields = {
+      ...built.hypothesis,
+      targetSenseId: "answer-bearing-sense",
+      targetSenseLabel: "answer-bearing label",
+      semanticAlignmentStatus: "proposed",
+    };
+    const flattenedValidation = validateGenericFunctionalHypothesisV1(
+      flattenedSemanticFields,
+    );
+
+    expect(flattenedValidation.ok).toBe(false);
+    expect(flattenedValidation.reasonCodes).toContain(
+      "PROHIBITED_SEMANTIC_FIELD_PRESENT",
+    );
   });
 });

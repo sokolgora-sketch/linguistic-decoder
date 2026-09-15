@@ -110,6 +110,20 @@ const CLAIM_BOUNDARY_V1: GenericFunctionalHypothesisClaimBoundaryV1 =
     pathComposition: "NOT_AUTHORIZED",
   });
 
+const PROHIBITED_SEMANTIC_FIELD_KEYS_V1 = [
+  "targetSense",
+  "targetSenseId",
+  "targetSenseLabel",
+  "semanticAlignment",
+  "semanticAlignmentStatus",
+  "semanticAlignmentSource",
+  "semanticAlignmentReasonCodes",
+  "semanticAlignmentBridge",
+  "startState",
+  "resultState",
+  "transitions",
+] as const;
+
 function isRecordV1(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
 }
@@ -326,7 +340,9 @@ export function validateGenericFunctionalHypothesisV1(
   ) {
     reasons.push("EPISTEMIC_BOUNDARY_INVALID");
   }
-  if ("targetSense" in value || "semanticAlignment" in value || "startState" in value || "resultState" in value || "transitions" in value) {
+  if (
+    PROHIBITED_SEMANTIC_FIELD_KEYS_V1.some((key) => key in value)
+  ) {
     reasons.push("PROHIBITED_SEMANTIC_FIELD_PRESENT");
   }
 

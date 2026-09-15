@@ -1222,6 +1222,9 @@ const normalizationSteps =
       const userDecisionPosture =
         asString(rec["userDecisionPosture"]);
 
+      const isGenericFunctionalHypothesis =
+        claimType === "genericFunctionalHypothesis";
+
       const discoveryStatus =
         asString(rec["discoveryStatus"]);
 
@@ -1273,7 +1276,9 @@ const normalizationSteps =
           ? asArray(
               segmentation["components"],
             )
-          : null;
+          : isGenericFunctionalHypothesis
+            ? asArray(rec["functionalComponents"])
+            : null;
 
       const functionalComponents =
         (
@@ -1284,20 +1289,29 @@ const normalizationSteps =
           }
 
           const embryo =
-            asString(item["embryo"]);
+            asString(item["embryo"]) ??
+            (isGenericFunctionalHypothesis
+              ? asString(item["voice"])
+              : null);
 
           if (!embryo) {
             return [];
           }
 
           const componentLanguageRaw =
-            item["language"];
+            item["language"] ??
+            (isGenericFunctionalHypothesis
+              ? "voice-profile"
+              : null);
 
           const plainMeaningRaw =
             item["plainMeaning"];
 
           const evidenceStateRaw =
-            item["evidenceState"];
+            item["evidenceState"] ??
+            (isGenericFunctionalHypothesis
+              ? item["profileTruthClassification"]
+              : null);
 
           const componentLanguage:
             string | null =
