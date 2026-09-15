@@ -242,7 +242,9 @@ from `PrincipleRole`:
 | Relation | Source evidence | Extraction status |
 | --- | --- | --- |
 | A and Ë are counterparts, opposed yet inseparable | chapter 1 lines 21-25 | `EXPLICIT_DOCTRINE`, `RELATIONAL_PROPERTY` |
-| A, E, I are grouped with high/light forces and U, Y, Ë with lower/anchoring forces | chapter 1 lines 37-38 | `EXPLICIT_DOCTRINE`, `RELATIONAL_PROPERTY`; frequency language is symbolic, not measured. |
+| Chapter 1 high/light grouping | chapter 1 line 37 | `EXPLICIT_DOCTRINE`, `RELATIONAL_PROPERTY`; this passage groups Ë with A/E/I among forces of light, height, and growth. |
+| Chapter 1 lower/anchoring grouping | chapter 1 line 38 | `EXPLICIT_DOCTRINE`, `RELATIONAL_PROPERTY`; this passage names U/Y as lower forces that anchor and deepen the universe. |
+| Cross-chapter high/low partition | chapter 1 lines 37-38; chapter 2 lines 27-28; chapter 3 lines 25, 27, 29, 31 | `UNRESOLVED_OR_CONFLICTING`; the passages do not establish one universal executable partition: Ë appears in the Chapter 1 high/light grouping and in the Chapter 2 low grouping, while other frequency descriptions vary. |
 | O mediates high and low groups | chapter 2 lines 27-28; chapter 3 line 25; chapter 4 line 26 | `EXPLICIT_DOCTRINE`, `RELATIONAL_PROPERTY` |
 | O prevents any Voice from dominating | chapter 2 lines 37-38 | `FUNCTIONAL_INTERPRETATION` with strong source support; no executable adjacency rule. |
 | Voices interact and harmonize | chapter 3 lines 33-35 | `FUNCTIONAL_INTERPRETATION`; interaction is not a pairwise path algebra. |
@@ -312,7 +314,7 @@ established scientific, historical, or linguistic facts.
 | Ë resolution/harmony/peace vs `Dashuria`, `Completion/Unit`, and evolution language | `MULTIPLE_DIMENSIONS` | Do not collapse relational, principle, completion, or change language. |
 | O unity/source language vs unity/source language elsewhere | `POTENTIAL_TENSION` | O has the strongest mediator/center relation, but unity/source words are not exclusive proof of one machine role. |
 | Chapter 1 six-Voice development before O vs Chapter 2 O as seventh mediator | `NARRATIVE_ORIGIN` | Preserve as narrative sequence; do not infer path order semantics. |
-| High/low/frequency descriptions | `UNRESOLVED_OR_CONFLICTING` | Descriptions are symbolic and not a stable measurement or universal ordering contract. |
+| Chapter 1 / Chapter 2 high-low descriptions | `UNRESOLVED_OR_CONFLICTING` | Chapter 1 line 37 groups Ë with A/E/I in high/light forces, line 38 names U/Y as lower/anchoring, and chapter 2 line 27 places Ë with U/Y in the low group. Preserve both source statements; do not derive a universal executable partition. |
 | `Ë` vs `Ẽ` in chapter 2 line 40 | `UNRESOLVED_OR_CONFLICTING` | Preserve source spelling; do not normalize or reinterpret the character in technical authority. |
 
 ## Engine-Model Gap Analysis
