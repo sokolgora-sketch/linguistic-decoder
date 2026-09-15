@@ -15,7 +15,7 @@ Run this from the repo root:
     cd "$HOME/Desktop/ZËRO /Dwnlosads /zero-firebase-studio-export" || exit 1
 
     echo "=== workflow index ==="
-    sed -n '1,220p' docs/process/workflows.md
+    cat docs/process/workflows.md
 
     echo
     echo "=== available workflow docs ==="
@@ -28,6 +28,31 @@ Run this from the repo root:
 ---
 
 ## Core workflows
+
+### 0. ChatGPT / Codex engineering workflow
+
+Path:
+
+    docs/dev-workflow.md
+
+Use this when:
+
+- opening a new Open Instrument engineering task;
+- deciding whether a capability gap is measured and actionable;
+- assigning bounded work between ChatGPT and Codex;
+- preparing focused tests, gates, PR evidence, or merge review;
+- recording capability and truth-boundary deltas.
+
+This workflow preserves:
+
+- repository evidence as the source of truth;
+- inspection-first and stop-on-mismatch discipline;
+- bounded model escalation and unattended work;
+- explicit merge authorization;
+- capability-delta reporting;
+- protected-state and provider boundaries.
+
+It does not replace the Constitution, Reality Guide, Engine Contract Freeze, Recovery Playbook, or lane-specific Open Instrument runbooks.
 
 ### 1. Cohort battery workflow
 
@@ -206,13 +231,14 @@ For future repo work:
 3. Then inspect current repo state.
 4. Then make changes on a branch.
 5. Run gates before PR.
-6. After merge, update DF_BRAIN.
+6. After a confirmed significant merge, update DF_BRAIN when appropriate.
 
 ---
 
 ## Workflow docs currently treated as active
 
 - `docs/process/workflows.md`
+- `docs/dev-workflow.md`
 - `docs/evals/cohort-battery-workflow-v0.1.md`
 - `docs/papers/zero-cohort-01-reproduction-runbook-v0.1.md`
 - `docs/evals/quickstart.md`
