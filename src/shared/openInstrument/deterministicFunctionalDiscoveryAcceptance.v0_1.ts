@@ -41,7 +41,9 @@ export type FunctionalDiscoveryAcceptanceReasonCodeV0_1 =
   | "TARGET_SENSE_REQUIREMENT_UNSUPPORTED"
   | "COMPONENT_REQUIREMENT_UNSUPPORTED"
   | "EVIDENCE_STATE_UNSUPPORTED"
-  | "INSUFFICIENT_FUNCTIONAL_SUPPORT";
+  | "INSUFFICIENT_FUNCTIONAL_SUPPORT"
+  | "SOURCE_ATTESTED_ANCHOR_CONFLICT"
+  | "SOURCE_ATTESTED_ANCHOR_INVALID";
 
 export type FunctionalDiscoveryTargetSenseRequirementV0_1 =
   | "REQUIRED"
@@ -87,6 +89,23 @@ export type FunctionalDiscoveryComponentInputV0_1 = Readonly<{
   evidenceRefs?: readonly string[];
 }>;
 
+export type FunctionalDiscoverySourceAttestedAnchorV0_1 = Readonly<{
+  kind: "source_attested_exact_form";
+  witnessId: string;
+  sourceId: string;
+  targetWord: string;
+  embryo: string;
+  sourceForm: string;
+  language: string;
+  embryoAuthority: "source_attested_exact_form";
+  embryoRelation: "exact_form";
+  sourceStatus: "research_candidate";
+  attestationTruth: "fact" | "inference" | "hypothesis" | "unknown";
+  functionalBridgeTruth:
+    "fact" | "inference" | "hypothesis" | "unknown";
+  evidenceRefs: readonly string[];
+}>;
+
 export type FunctionalDiscoveryAcceptanceInputV0_1 = Readonly<{
   candidateId: string;
   targetWord: string;
@@ -123,7 +142,9 @@ export type FunctionalDiscoveryAcceptanceInputV0_1 = Readonly<{
 export type FunctionalDiscoveryAcceptedCandidateV0_1 = Readonly<{
   candidateId: string;
   targetWord: string;
-  structuralHypothesisId: string;
+  structuralHypothesisId?: string;
+  anchorKind?: "source_attested_exact_form";
+  anchorId?: string;
   embryo: string;
   functionalStatement: string;
   functionalComponents: readonly FunctionalDiscoveryComponentInputV0_1[];
@@ -162,6 +183,14 @@ export type FunctionalDiscoveryAcceptanceResultV0_1 = Readonly<{
   acceptedFunctionalCandidate?: FunctionalDiscoveryAcceptedCandidateV0_1;
   failures: readonly FunctionalDiscoveryAcceptanceFailureV0_1[];
 }>;
+
+export type FunctionalDiscoverySourceAttestedAcceptanceInputV0_1 = Omit<
+  FunctionalDiscoveryAcceptanceInputV0_1,
+  "structuralHypothesis"
+> & {
+  structuralHypothesis: null;
+  sourceAttestedAnchor: FunctionalDiscoverySourceAttestedAnchorV0_1;
+};
 
 type UnknownRecordV0_1 = Record<string, unknown>;
 
@@ -233,6 +262,47 @@ function structuralAnchorValidV0_1(
     value.languageSuperiorityClaim === "not_claimed" &&
     value.candidateTruthClaim === "not_claimed" &&
     value.userDecisionPosture === "user_decides"
+  );
+}
+
+function sameAnchorKeyV0_1(left: unknown, right: unknown): boolean {
+  return (
+    textV0_1(left).toLocaleUpperCase("en-US") ===
+    textV0_1(right).toLocaleUpperCase("en-US")
+  );
+}
+
+function sourceTruthStatusValidV0_1(value: unknown): boolean {
+  return (
+    value === "fact" ||
+    value === "inference" ||
+    value === "hypothesis" ||
+    value === "unknown"
+  );
+}
+
+function sourceAttestedAnchorValidV0_1(
+  value: unknown,
+  targetWord: string,
+): value is FunctionalDiscoverySourceAttestedAnchorV0_1 {
+  if (!isRecordV0_1(value)) return false;
+
+  return (
+    value.kind === "source_attested_exact_form" &&
+    textV0_1(value.witnessId).length > 0 &&
+    textV0_1(value.sourceId).length > 0 &&
+    sameAnchorKeyV0_1(value.targetWord, targetWord) &&
+    textV0_1(value.embryo).length > 0 &&
+    sameAnchorKeyV0_1(value.sourceForm, value.embryo) &&
+    textV0_1(value.language).length > 0 &&
+    value.embryoAuthority === "source_attested_exact_form" &&
+    value.embryoRelation === "exact_form" &&
+    value.sourceStatus === "research_candidate" &&
+    sourceTruthStatusValidV0_1(value.attestationTruth) &&
+    sourceTruthStatusValidV0_1(value.functionalBridgeTruth) &&
+    Array.isArray(value.evidenceRefs) &&
+    value.evidenceRefs.length > 0 &&
+    value.evidenceRefs.every((ref) => textV0_1(ref).length > 0)
   );
 }
 
@@ -370,14 +440,19 @@ function baseResultV0_1(
   };
 }
 
-export function evaluateDeterministicFunctionalDiscoveryAcceptanceV0_1(
-  input: FunctionalDiscoveryAcceptanceInputV0_1,
+type InternalAcceptanceInputV0_1 = FunctionalDiscoveryAcceptanceInputV0_1 & {
+  sourceAttestedAnchor?: FunctionalDiscoverySourceAttestedAnchorV0_1 | null;
+};
+
+function evaluateAcceptanceWithAnchorV0_1(
+  input: InternalAcceptanceInputV0_1,
 ): FunctionalDiscoveryAcceptanceResultV0_1 {
   const failures: FunctionalDiscoveryAcceptanceFailureV0_1[] = [];
   const reasons: FunctionalDiscoveryAcceptanceReasonCodeV0_1[] = [];
   const candidateId = textV0_1(input?.candidateId);
   const targetWord = textV0_1(input?.targetWord);
   const structural = input?.structuralHypothesis;
+  const sourceAttestedAnchor = input?.sourceAttestedAnchor ?? null;
   const statement = textV0_1(input?.functionalStatement);
   const explicitBridge = textV0_1(input?.semanticBridge);
   const alignmentBridge = textV0_1(input?.semanticAlignment?.semanticBridge);
@@ -400,15 +475,48 @@ export function evaluateDeterministicFunctionalDiscoveryAcceptanceV0_1(
   if (!targetWord) {
     failures.push(failureV0_1("TARGET_WORD_REQUIRED", "targetWord"));
   }
-  if (!structural) {
+  if (structural && sourceAttestedAnchor) {
+    failures.push(
+      failureV0_1(
+        "SOURCE_ATTESTED_ANCHOR_CONFLICT",
+        "sourceAttestedAnchor",
+      ),
+    );
+  } else if (!structural && !sourceAttestedAnchor) {
     failures.push(
       failureV0_1("MISSING_STRUCTURAL_ANCHOR", "structuralHypothesis"),
     );
   } else if (!structuralAnchorValidV0_1(structural)) {
+    if (structural) {
+      failures.push(
+        failureV0_1(
+          "INVALID_STRUCTURAL_DERIVATION",
+          "structuralHypothesis",
+        ),
+      );
+    }
+  }
+  if (
+    sourceAttestedAnchor &&
+    !sourceAttestedAnchorValidV0_1(sourceAttestedAnchor, targetWord)
+  ) {
     failures.push(
       failureV0_1(
-        "INVALID_STRUCTURAL_DERIVATION",
-        "structuralHypothesis",
+        "SOURCE_ATTESTED_ANCHOR_INVALID",
+        "sourceAttestedAnchor",
+      ),
+    );
+  }
+  if (
+    sourceAttestedAnchor &&
+    sourceAttestedAnchorValidV0_1(sourceAttestedAnchor, targetWord) &&
+    (sourceAttestedAnchor.attestationTruth === "unknown" ||
+      sourceAttestedAnchor.functionalBridgeTruth === "unknown")
+  ) {
+    failures.push(
+      failureV0_1(
+        "INSUFFICIENT_FUNCTIONAL_SUPPORT",
+        "sourceAttestedAnchor.truth",
       ),
     );
   }
@@ -462,6 +570,7 @@ export function evaluateDeterministicFunctionalDiscoveryAcceptanceV0_1(
 
   const hasProposalSignal = Boolean(
     structural ||
+      sourceAttestedAnchor ||
       statement ||
       components.length > 0 ||
       input.semanticAlignment ||
@@ -657,6 +766,8 @@ export function evaluateDeterministicFunctionalDiscoveryAcceptanceV0_1(
         "REVIEWED_EVIDENCE_REQUIRED_FOR_PRODUCTION",
         "REVIEWED_COMPONENT_SUPPORT_REQUIRED",
         "SEMANTIC_BRIDGE_MISMATCH",
+        "SOURCE_ATTESTED_ANCHOR_CONFLICT",
+        "SOURCE_ATTESTED_ANCHOR_INVALID",
       ].includes(failure.code),
     );
 
@@ -667,7 +778,7 @@ export function evaluateDeterministicFunctionalDiscoveryAcceptanceV0_1(
     );
   }
 
-  if (!structural) {
+  if (!structural && !sourceAttestedAnchor) {
     return baseResultV0_1(
       "INSUFFICIENT_SUPPORT",
       ["MISSING_STRUCTURAL_ANCHOR"],
@@ -675,11 +786,23 @@ export function evaluateDeterministicFunctionalDiscoveryAcceptanceV0_1(
     );
   }
 
+  const anchorEmbryo = structural
+    ? structural.embryo
+    : sourceAttestedAnchor?.embryo;
+  const anchorId = structural
+    ? structural.hypothesisId
+    : sourceAttestedAnchor?.witnessId;
+
   const acceptedFunctionalCandidate: FunctionalDiscoveryAcceptedCandidateV0_1 = {
     candidateId,
     targetWord,
-    structuralHypothesisId: structural.hypothesisId,
-    embryo: structural.embryo,
+    ...(structural
+      ? { structuralHypothesisId: structural.hypothesisId }
+      : {
+          anchorKind: "source_attested_exact_form" as const,
+          anchorId,
+        }),
+    embryo: anchorEmbryo as string,
     functionalStatement: statement,
     functionalComponents: components,
     admissionScope: admissionScopeV0_1(input),
@@ -715,4 +838,16 @@ export function evaluateDeterministicFunctionalDiscoveryAcceptanceV0_1(
     ...baseResultV0_1("ACCEPT", reasons, []),
     acceptedFunctionalCandidate,
   };
+}
+
+export function evaluateDeterministicFunctionalDiscoveryAcceptanceV0_1(
+  input: FunctionalDiscoveryAcceptanceInputV0_1,
+): FunctionalDiscoveryAcceptanceResultV0_1 {
+  return evaluateAcceptanceWithAnchorV0_1(input);
+}
+
+export function evaluateSourceAttestedFunctionalDiscoveryAcceptanceV0_1(
+  input: FunctionalDiscoverySourceAttestedAcceptanceInputV0_1,
+): FunctionalDiscoveryAcceptanceResultV0_1 {
+  return evaluateAcceptanceWithAnchorV0_1(input);
 }

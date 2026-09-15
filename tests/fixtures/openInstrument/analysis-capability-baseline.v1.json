@@ -8,11 +8,11 @@
       "candidatesWithCandidateVowelPaths": 3,
       "candidatesWithComponents": 1,
       "candidatesWithExpansionChains": 31,
-      "candidatesWithFunctionalStatements": 4,
+      "candidatesWithFunctionalStatements": 66,
       "casesWithCandidateVowelPaths": 1,
       "casesWithComponents": 1,
       "casesWithExpansionChains": 19,
-      "casesWithFunctionalStatements": 2,
+      "casesWithFunctionalStatements": 43,
       "totalComponents": 2
     },
     "embryos": {
@@ -631,7 +631,7 @@
           "expansionChain": null,
           "form": "ujë",
           "functionalComponents": null,
-          "functionalStatement": null,
+          "functionalStatement": "The two source entries independently attest their language's lexical form for the physical water/liquid sense; treating those bounded source facts as a shared functional referent remains a research hypothesis only.",
           "id": "Albanian-ujë",
           "ordinal": 1,
           "sourceKind": "multi_source_research_witness",
@@ -670,7 +670,7 @@
           "expansionChain": null,
           "form": "ăqua",
           "functionalComponents": null,
-          "functionalStatement": null,
+          "functionalStatement": "The two source entries independently attest their language's lexical form for the physical water/liquid sense; treating those bounded source facts as a shared functional referent remains a research hypothesis only.",
           "id": "Latin-ăqua",
           "ordinal": 2,
           "sourceKind": "multi_source_research_witness",
@@ -687,7 +687,7 @@
       "composition": {
         "candidatesWithComponents": 0,
         "candidatesWithExpansionChain": 1,
-        "candidatesWithFunctionalStatements": 0,
+        "candidatesWithFunctionalStatements": 2,
         "candidatesWithVowelPath": 0,
         "totalComponents": 0
       },
@@ -715,7 +715,7 @@
         "totalRefs": 2,
         "unresolvedRefs": 0
       },
-      "fingerprint": "349d98d8d8716d3ccf42e67faae2340936d70ea0b5e757a0b50b4cb0daad790d",
+      "fingerprint": "62929606fe13b9fdf576bd22322df3d9d4092988c81a72ca0d1a74de6a5ad033",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -749,7 +749,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "349d98d8d8716d3ccf42e67faae2340936d70ea0b5e757a0b50b4cb0daad790d",
+        "repeatedFingerprint": "62929606fe13b9fdf576bd22322df3d9d4092988c81a72ca0d1a74de6a5ad033",
         "stable": true
       },
       "request": {
@@ -965,7 +965,7 @@
           "expansionChain": null,
           "form": "ujë",
           "functionalComponents": null,
-          "functionalStatement": null,
+          "functionalStatement": "The two source entries independently attest their language's lexical form for the physical water/liquid sense; treating those bounded source facts as a shared functional referent remains a research hypothesis only.",
           "id": "Albanian-ujë",
           "ordinal": 1,
           "sourceKind": "multi_source_research_witness",
@@ -1004,7 +1004,7 @@
           "expansionChain": null,
           "form": "ăqua",
           "functionalComponents": null,
-          "functionalStatement": null,
+          "functionalStatement": "The two source entries independently attest their language's lexical form for the physical water/liquid sense; treating those bounded source facts as a shared functional referent remains a research hypothesis only.",
           "id": "Latin-ăqua",
           "ordinal": 2,
           "sourceKind": "multi_source_research_witness",
@@ -1021,7 +1021,7 @@
       "composition": {
         "candidatesWithComponents": 0,
         "candidatesWithExpansionChain": 1,
-        "candidatesWithFunctionalStatements": 0,
+        "candidatesWithFunctionalStatements": 2,
         "candidatesWithVowelPath": 0,
         "totalComponents": 0
       },
@@ -1049,7 +1049,7 @@
         "totalRefs": 2,
         "unresolvedRefs": 0
       },
-      "fingerprint": "abf90d23033d2844ed07de48b71b1b3ed5fa851df499ddca8d52b96486846735",
+      "fingerprint": "1497b643d62376cb207bd0a428bc9026d0fbc4072ce5d4caa3a9e2a6f44731e7",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -1083,7 +1083,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "abf90d23033d2844ed07de48b71b1b3ed5fa851df499ddca8d52b96486846735",
+        "repeatedFingerprint": "1497b643d62376cb207bd0a428bc9026d0fbc4072ce5d4caa3a9e2a6f44731e7",
         "stable": true
       },
       "request": {
@@ -1219,7 +1219,7 @@
           "expansionChain": null,
           "form": "shi",
           "functionalComponents": null,
-          "functionalStatement": null,
+          "functionalStatement": "the independently attested Albanian noun shi denotes rain and can be tested as a direct cross-language functional expression of the RAIN concept; this is functional research only and does not assert historical origin or transmission",
           "id": "Albanian-shi",
           "ordinal": 0,
           "sourceKind": "multi_source_research_witness",
@@ -1236,7 +1236,7 @@
       "composition": {
         "candidatesWithComponents": 0,
         "candidatesWithExpansionChain": 0,
-        "candidatesWithFunctionalStatements": 0,
+        "candidatesWithFunctionalStatements": 1,
         "candidatesWithVowelPath": 0,
         "totalComponents": 0
       },
@@ -1260,7 +1260,7 @@
         "totalRefs": 1,
         "unresolvedRefs": 0
       },
-      "fingerprint": "e63d103b754b75aa1134089c703e79f0a8cceb74e4f8da2f7c7a12cdd3656d0e",
+      "fingerprint": "5b991b138d7a19e697abdb598b804d6a2a1fa6116eaae635f1f720db143bf495",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -1301,7 +1301,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "e63d103b754b75aa1134089c703e79f0a8cceb74e4f8da2f7c7a12cdd3656d0e",
+        "repeatedFingerprint": "5b991b138d7a19e697abdb598b804d6a2a1fa6116eaae635f1f720db143bf495",
         "stable": true
       },
       "request": {
@@ -1387,7 +1387,7 @@
           "expansionChain": null,
           "form": "lumë",
           "functionalComponents": null,
-          "functionalStatement": null,
+          "functionalStatement": "the independently attested Albanian noun lumë denotes a river and can be tested as a direct cross-language functional witness for the RIVER concept; it does not validate the separate IV structural hypothesis and does not assert historical origin",
           "id": "Albanian-lumë",
           "ordinal": 1,
           "sourceKind": "multi_source_research_witness",
@@ -1404,7 +1404,7 @@
       "composition": {
         "candidatesWithComponents": 0,
         "candidatesWithExpansionChain": 1,
-        "candidatesWithFunctionalStatements": 0,
+        "candidatesWithFunctionalStatements": 1,
         "candidatesWithVowelPath": 0,
         "totalComponents": 0
       },
@@ -1431,7 +1431,7 @@
         "totalRefs": 1,
         "unresolvedRefs": 0
       },
-      "fingerprint": "6c83bc0d5676d3df6af02bc0482d6b453815e99df20dfceb8098c8af7b46c193",
+      "fingerprint": "cb76078482c657aa92e5fd624d1721fe4df10e1c0f9ca5dcb493862463657343",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -1465,7 +1465,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "6c83bc0d5676d3df6af02bc0482d6b453815e99df20dfceb8098c8af7b46c193",
+        "repeatedFingerprint": "cb76078482c657aa92e5fd624d1721fe4df10e1c0f9ca5dcb493862463657343",
         "stable": true
       },
       "request": {
@@ -1516,7 +1516,7 @@
           "expansionChain": null,
           "form": "mal",
           "functionalComponents": null,
-          "functionalStatement": null,
+          "functionalStatement": "the independently attested Albanian noun mal denotes a mountain and can be tested as a direct cross-language functional expression of the MOUNTAIN concept; this is functional research only and does not assert historical origin or transmission",
           "id": "Albanian-mal",
           "ordinal": 0,
           "sourceKind": "multi_source_research_witness",
@@ -1533,7 +1533,7 @@
       "composition": {
         "candidatesWithComponents": 0,
         "candidatesWithExpansionChain": 0,
-        "candidatesWithFunctionalStatements": 0,
+        "candidatesWithFunctionalStatements": 1,
         "candidatesWithVowelPath": 0,
         "totalComponents": 0
       },
@@ -1557,7 +1557,7 @@
         "totalRefs": 1,
         "unresolvedRefs": 0
       },
-      "fingerprint": "80d069c8f2af456ae376d1667d267892b9ab3eec36a88f65880f93e360f673de",
+      "fingerprint": "a82310f42fb7dea004bef44ac9499bf82833ad6493f9d0d187488a20f777f094",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -1597,7 +1597,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "80d069c8f2af456ae376d1667d267892b9ab3eec36a88f65880f93e360f673de",
+        "repeatedFingerprint": "a82310f42fb7dea004bef44ac9499bf82833ad6493f9d0d187488a20f777f094",
         "stable": true
       },
       "request": {
@@ -1766,7 +1766,7 @@
           "expansionChain": null,
           "form": "pemë",
           "functionalComponents": null,
-          "functionalStatement": null,
+          "functionalStatement": "The Albanian and Latin entries independently attest lexical forms for a physical tree; treating them as a shared functional referent remains a research hypothesis only.",
           "id": "Albanian-pemë",
           "ordinal": 1,
           "sourceKind": "multi_source_research_witness",
@@ -1805,7 +1805,7 @@
           "expansionChain": null,
           "form": "arbor",
           "functionalComponents": null,
-          "functionalStatement": null,
+          "functionalStatement": "The Albanian and Latin entries independently attest lexical forms for a physical tree; treating them as a shared functional referent remains a research hypothesis only.",
           "id": "Latin-arbor",
           "ordinal": 2,
           "sourceKind": "multi_source_research_witness",
@@ -1822,7 +1822,7 @@
       "composition": {
         "candidatesWithComponents": 0,
         "candidatesWithExpansionChain": 1,
-        "candidatesWithFunctionalStatements": 0,
+        "candidatesWithFunctionalStatements": 2,
         "candidatesWithVowelPath": 0,
         "totalComponents": 0
       },
@@ -1850,7 +1850,7 @@
         "totalRefs": 2,
         "unresolvedRefs": 0
       },
-      "fingerprint": "8e7e356d2a7c3dc31ed4f917e385603f321ba811a3bccb24106b7d37e218034d",
+      "fingerprint": "332579c9493053bbe4e831752f4f6b4b9adfe1fec229e433c3aced24239f2e82",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -1889,7 +1889,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "8e7e356d2a7c3dc31ed4f917e385603f321ba811a3bccb24106b7d37e218034d",
+        "repeatedFingerprint": "332579c9493053bbe4e831752f4f6b4b9adfe1fec229e433c3aced24239f2e82",
         "stable": true
       },
       "request": {
@@ -2054,7 +2054,7 @@
           "expansionChain": null,
           "form": "det",
           "functionalComponents": null,
-          "functionalStatement": null,
+          "functionalStatement": "The source entries attest lexical forms for a bounded sea or saltwater-body sense; treating that shared physical referent as a ZË-RO functional bridge remains a research hypothesis only.",
           "id": "Albanian-det",
           "ordinal": 1,
           "sourceKind": "multi_source_research_witness",
@@ -2093,7 +2093,7 @@
           "expansionChain": null,
           "form": "mare",
           "functionalComponents": null,
-          "functionalStatement": null,
+          "functionalStatement": "The source entries attest lexical forms for a bounded sea or saltwater-body sense; treating that shared physical referent as a ZË-RO functional bridge remains a research hypothesis only.",
           "id": "Latin-mare",
           "ordinal": 2,
           "sourceKind": "multi_source_research_witness",
@@ -2110,7 +2110,7 @@
       "composition": {
         "candidatesWithComponents": 0,
         "candidatesWithExpansionChain": 1,
-        "candidatesWithFunctionalStatements": 0,
+        "candidatesWithFunctionalStatements": 2,
         "candidatesWithVowelPath": 0,
         "totalComponents": 0
       },
@@ -2138,7 +2138,7 @@
         "totalRefs": 2,
         "unresolvedRefs": 0
       },
-      "fingerprint": "00257577492ec027249bb5518ca1395e2203a259639a87c7e9138b5d1a340827",
+      "fingerprint": "f450177d8866301723a19913679d43bafedad1107c4ed77ed7330ec3fa3d4378",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -2172,7 +2172,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "00257577492ec027249bb5518ca1395e2203a259639a87c7e9138b5d1a340827",
+        "repeatedFingerprint": "f450177d8866301723a19913679d43bafedad1107c4ed77ed7330ec3fa3d4378",
         "stable": true
       },
       "request": {
@@ -2224,7 +2224,7 @@
           "expansionChain": null,
           "form": "qiell",
           "functionalComponents": null,
-          "functionalStatement": null,
+          "functionalStatement": "the independently attested Albanian noun qiell denotes the sky and can be tested as a direct cross-language functional witness for the SKY concept; this is research-only and does not assert historical origin, transmission, winner status, or candidate truth",
           "id": "Albanian-qiell",
           "ordinal": 0,
           "sourceKind": "multi_source_research_witness",
@@ -2263,7 +2263,7 @@
           "expansionChain": null,
           "form": "caelum",
           "functionalComponents": null,
-          "functionalStatement": null,
+          "functionalStatement": "Latin caelum independently denotes the sky or heavens and can serve as a second-language functional witness for the SKY concept. This corroborates concept-level research only; it does not assert historical origin, transmission, ownership, or winner status",
           "id": "Latin-caelum",
           "ordinal": 1,
           "sourceKind": "multi_source_research_witness",
@@ -2280,7 +2280,7 @@
       "composition": {
         "candidatesWithComponents": 0,
         "candidatesWithExpansionChain": 0,
-        "candidatesWithFunctionalStatements": 0,
+        "candidatesWithFunctionalStatements": 2,
         "candidatesWithVowelPath": 0,
         "totalComponents": 0
       },
@@ -2305,7 +2305,7 @@
         "totalRefs": 2,
         "unresolvedRefs": 0
       },
-      "fingerprint": "0a88d34ec25bc8571fc172cdf76ae738efe6d4256f897220799b03baaefbd7e2",
+      "fingerprint": "f8e0106f7d7921c4e812f142e8c91e090b908f4d0b35e253928b8bb71a65331c",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -2336,7 +2336,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "0a88d34ec25bc8571fc172cdf76ae738efe6d4256f897220799b03baaefbd7e2",
+        "repeatedFingerprint": "f8e0106f7d7921c4e812f142e8c91e090b908f4d0b35e253928b8bb71a65331c",
         "stable": true
       },
       "request": {
@@ -2423,7 +2423,7 @@
           "expansionChain": null,
           "form": "borë",
           "functionalComponents": null,
-          "functionalStatement": null,
+          "functionalStatement": "The Albanian and Latin entries independently attest lexical forms for physical snow precipitation; treating them as a shared functional referent remains a research hypothesis only.",
           "id": "Albanian-borë",
           "ordinal": 1,
           "sourceKind": "multi_source_research_witness",
@@ -2462,7 +2462,7 @@
           "expansionChain": null,
           "form": "nix",
           "functionalComponents": null,
-          "functionalStatement": null,
+          "functionalStatement": "The Albanian and Latin entries independently attest lexical forms for physical snow precipitation; treating them as a shared functional referent remains a research hypothesis only.",
           "id": "Latin-nix",
           "ordinal": 2,
           "sourceKind": "multi_source_research_witness",
@@ -2479,7 +2479,7 @@
       "composition": {
         "candidatesWithComponents": 0,
         "candidatesWithExpansionChain": 1,
-        "candidatesWithFunctionalStatements": 0,
+        "candidatesWithFunctionalStatements": 2,
         "candidatesWithVowelPath": 0,
         "totalComponents": 0
       },
@@ -2507,7 +2507,7 @@
         "totalRefs": 2,
         "unresolvedRefs": 0
       },
-      "fingerprint": "0df73909e02e87b2c48cf02b63083884d2d23f12201d7e342425d8f8532c1bca",
+      "fingerprint": "0238bf40531e394886a1165f1e3db70253b383207c015898049ae50736303c25",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -2538,7 +2538,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "0df73909e02e87b2c48cf02b63083884d2d23f12201d7e342425d8f8532c1bca",
+        "repeatedFingerprint": "0238bf40531e394886a1165f1e3db70253b383207c015898049ae50736303c25",
         "stable": true
       },
       "request": {
@@ -2660,7 +2660,7 @@
           "expansionChain": null,
           "form": "re",
           "functionalComponents": null,
-          "functionalStatement": null,
+          "functionalStatement": "The Albanian and Latin entries independently attest lexical forms for an atmospheric cloud; treating them as a shared functional referent remains a research hypothesis only.",
           "id": "Albanian-re",
           "ordinal": 2,
           "sourceKind": "multi_source_research_witness",
@@ -2699,7 +2699,7 @@
           "expansionChain": null,
           "form": "nimbus",
           "functionalComponents": null,
-          "functionalStatement": null,
+          "functionalStatement": "The Albanian and Latin entries independently attest lexical forms for an atmospheric cloud; treating them as a shared functional referent remains a research hypothesis only.",
           "id": "Latin-nimbus",
           "ordinal": 3,
           "sourceKind": "multi_source_research_witness",
@@ -2716,7 +2716,7 @@
       "composition": {
         "candidatesWithComponents": 0,
         "candidatesWithExpansionChain": 2,
-        "candidatesWithFunctionalStatements": 0,
+        "candidatesWithFunctionalStatements": 2,
         "candidatesWithVowelPath": 0,
         "totalComponents": 0
       },
@@ -2746,7 +2746,7 @@
         "totalRefs": 2,
         "unresolvedRefs": 0
       },
-      "fingerprint": "bbbecb97b20ac6be275cb35f5b2cc2f424636e30335cc5b4f3b6112ad8b78051",
+      "fingerprint": "3ee05e7ce2648409bec4cd00568539798ebb7a8ed0e7328ba26502646a2e089d",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -2780,7 +2780,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "bbbecb97b20ac6be275cb35f5b2cc2f424636e30335cc5b4f3b6112ad8b78051",
+        "repeatedFingerprint": "3ee05e7ce2648409bec4cd00568539798ebb7a8ed0e7328ba26502646a2e089d",
         "stable": true
       },
       "request": {
@@ -2831,7 +2831,7 @@
           "expansionChain": null,
           "form": "dorë",
           "functionalComponents": null,
-          "functionalStatement": null,
+          "functionalStatement": "the independently attested Albanian noun dorë denotes the hand and can be tested as a direct cross-language functional expression of the HAND concept; this is functional research only and does not assert historical origin or transmission",
           "id": "Albanian-dorë",
           "ordinal": 0,
           "sourceKind": "multi_source_research_witness",
@@ -2848,7 +2848,7 @@
       "composition": {
         "candidatesWithComponents": 0,
         "candidatesWithExpansionChain": 0,
-        "candidatesWithFunctionalStatements": 0,
+        "candidatesWithFunctionalStatements": 1,
         "candidatesWithVowelPath": 0,
         "totalComponents": 0
       },
@@ -2872,7 +2872,7 @@
         "totalRefs": 1,
         "unresolvedRefs": 0
       },
-      "fingerprint": "84009d47ac39fdeff52ea07d8a205a8772cc0d13896f096994115041cb2ec665",
+      "fingerprint": "a928ae7a7dcbd0d412b364a3d22b1d8a2d2c7632f792e8d8b3c2350a79817231",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -2903,7 +2903,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "84009d47ac39fdeff52ea07d8a205a8772cc0d13896f096994115041cb2ec665",
+        "repeatedFingerprint": "a928ae7a7dcbd0d412b364a3d22b1d8a2d2c7632f792e8d8b3c2350a79817231",
         "stable": true
       },
       "request": {
@@ -3037,7 +3037,7 @@
           "expansionChain": null,
           "form": "zemër",
           "functionalComponents": null,
-          "functionalStatement": null,
+          "functionalStatement": "the independently attested Albanian noun zemër denotes the heart and can be tested as a direct cross-language functional witness for the HEART concept; this is research-only and does not assert historical origin, transmission, winner status, or candidate truth",
           "id": "Albanian-zemër",
           "ordinal": 0,
           "sourceKind": "multi_source_research_witness",
@@ -3076,7 +3076,7 @@
           "expansionChain": null,
           "form": "cor",
           "functionalComponents": null,
-          "functionalStatement": null,
+          "functionalStatement": "Latin cor independently denotes the heart and can serve as a second-language functional witness for the HEART concept. This remains research-only and makes no historical-origin, transmission, ownership, or winner claim",
           "id": "Latin-cor",
           "ordinal": 1,
           "sourceKind": "multi_source_research_witness",
@@ -3093,7 +3093,7 @@
       "composition": {
         "candidatesWithComponents": 0,
         "candidatesWithExpansionChain": 0,
-        "candidatesWithFunctionalStatements": 0,
+        "candidatesWithFunctionalStatements": 2,
         "candidatesWithVowelPath": 0,
         "totalComponents": 0
       },
@@ -3118,7 +3118,7 @@
         "totalRefs": 2,
         "unresolvedRefs": 0
       },
-      "fingerprint": "b61a7f51d407ea287af33212c90748aebffd775458384c370c44f24781a63b97",
+      "fingerprint": "84212ae79f633c4e3263d011bee514f016fe017bd4f96b4cd68ca08127ae6469",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -3152,7 +3152,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "b61a7f51d407ea287af33212c90748aebffd775458384c370c44f24781a63b97",
+        "repeatedFingerprint": "84212ae79f633c4e3263d011bee514f016fe017bd4f96b4cd68ca08127ae6469",
         "stable": true
       },
       "request": {
@@ -3273,7 +3273,7 @@
           "expansionChain": null,
           "form": "gjak",
           "functionalComponents": null,
-          "functionalStatement": null,
+          "functionalStatement": "the independently attested Albanian noun gjak denotes blood and can be tested as a direct cross-language functional witness for the BLOOD concept; it does not validate the separate LO or OOD structural hypotheses and does not assert historical origin",
           "id": "Albanian-gjak",
           "ordinal": 2,
           "sourceKind": "multi_source_research_witness",
@@ -3290,7 +3290,7 @@
       "composition": {
         "candidatesWithComponents": 0,
         "candidatesWithExpansionChain": 2,
-        "candidatesWithFunctionalStatements": 0,
+        "candidatesWithFunctionalStatements": 1,
         "candidatesWithVowelPath": 0,
         "totalComponents": 0
       },
@@ -3319,7 +3319,7 @@
         "totalRefs": 1,
         "unresolvedRefs": 0
       },
-      "fingerprint": "a7d76fa6bbc2ba0db6e095854932e1611b0c5e18e5122b0511bcf15f92c696a8",
+      "fingerprint": "8806e92c72d0e02c7a6f5ce7b838ed817941a57b242404a80619fe2e96946491",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -3358,7 +3358,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "a7d76fa6bbc2ba0db6e095854932e1611b0c5e18e5122b0511bcf15f92c696a8",
+        "repeatedFingerprint": "8806e92c72d0e02c7a6f5ce7b838ed817941a57b242404a80619fe2e96946491",
         "stable": true
       },
       "request": {
@@ -3409,7 +3409,7 @@
           "expansionChain": null,
           "form": "kockë",
           "functionalComponents": null,
-          "functionalStatement": null,
+          "functionalStatement": "the independently attested Albanian noun kockë denotes bone and can be tested as a direct cross-language functional expression of the BONE concept; this is functional research only and does not assert historical origin or transmission",
           "id": "Albanian-kockë",
           "ordinal": 0,
           "sourceKind": "multi_source_research_witness",
@@ -3426,7 +3426,7 @@
       "composition": {
         "candidatesWithComponents": 0,
         "candidatesWithExpansionChain": 0,
-        "candidatesWithFunctionalStatements": 0,
+        "candidatesWithFunctionalStatements": 1,
         "candidatesWithVowelPath": 0,
         "totalComponents": 0
       },
@@ -3450,7 +3450,7 @@
         "totalRefs": 1,
         "unresolvedRefs": 0
       },
-      "fingerprint": "be6d9f637b7ca8793b64913476aeafb6b138dbc4a5d4d40f76de5bbaf2a135fa",
+      "fingerprint": "27bf934599d88ffd6d9b83f3481f54998312107b8a433a22e3ad392b62a5aef4",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -3484,7 +3484,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "be6d9f637b7ca8793b64913476aeafb6b138dbc4a5d4d40f76de5bbaf2a135fa",
+        "repeatedFingerprint": "27bf934599d88ffd6d9b83f3481f54998312107b8a433a22e3ad392b62a5aef4",
         "stable": true
       },
       "request": {
@@ -3571,7 +3571,7 @@
           "expansionChain": null,
           "form": "lëkurë",
           "functionalComponents": null,
-          "functionalStatement": null,
+          "functionalStatement": "The Albanian and Latin entries independently attest lexical forms for physical human or animal skin; treating them as a shared functional referent remains a research hypothesis only.",
           "id": "Albanian-lëkurë",
           "ordinal": 1,
           "sourceKind": "multi_source_research_witness",
@@ -3610,7 +3610,7 @@
           "expansionChain": null,
           "form": "pellis",
           "functionalComponents": null,
-          "functionalStatement": null,
+          "functionalStatement": "The Albanian and Latin entries independently attest lexical forms for physical human or animal skin; treating them as a shared functional referent remains a research hypothesis only.",
           "id": "Latin-pellis",
           "ordinal": 2,
           "sourceKind": "multi_source_research_witness",
@@ -3627,7 +3627,7 @@
       "composition": {
         "candidatesWithComponents": 0,
         "candidatesWithExpansionChain": 1,
-        "candidatesWithFunctionalStatements": 0,
+        "candidatesWithFunctionalStatements": 2,
         "candidatesWithVowelPath": 0,
         "totalComponents": 0
       },
@@ -3655,7 +3655,7 @@
         "totalRefs": 2,
         "unresolvedRefs": 0
       },
-      "fingerprint": "c40e0d91d8442c1a6a20604846a249831dc83876a5d019722f67b6ec5d3e28c5",
+      "fingerprint": "d05d681ee5dae3d38cb051403bdff0c11b32b2bf4b91d04ff441a9620d65df86",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -3686,7 +3686,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "c40e0d91d8442c1a6a20604846a249831dc83876a5d019722f67b6ec5d3e28c5",
+        "repeatedFingerprint": "d05d681ee5dae3d38cb051403bdff0c11b32b2bf4b91d04ff441a9620d65df86",
         "stable": true
       },
       "request": {
@@ -3819,7 +3819,7 @@
           "expansionChain": null,
           "form": "vesh",
           "functionalComponents": null,
-          "functionalStatement": null,
+          "functionalStatement": "the independently attested Albanian noun vesh denotes the ear and can be tested as a direct cross-language functional witness for the EAR concept; this remains research-only and does not assert historical origin, transmission, winner status, or candidate truth",
           "id": "Albanian-vesh",
           "ordinal": 0,
           "sourceKind": "multi_source_research_witness",
@@ -3836,7 +3836,7 @@
       "composition": {
         "candidatesWithComponents": 0,
         "candidatesWithExpansionChain": 0,
-        "candidatesWithFunctionalStatements": 0,
+        "candidatesWithFunctionalStatements": 1,
         "candidatesWithVowelPath": 0,
         "totalComponents": 0
       },
@@ -3860,7 +3860,7 @@
         "totalRefs": 1,
         "unresolvedRefs": 0
       },
-      "fingerprint": "4e5e6bc218c2e271a43b15ca10d62ab398f760e57da946fe71f2529c3c7318f5",
+      "fingerprint": "bfe66d021ad0c9c20173de1c26bf92e7d09c589c8e71d8ea964644581b97b1f8",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -3894,7 +3894,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "4e5e6bc218c2e271a43b15ca10d62ab398f760e57da946fe71f2529c3c7318f5",
+        "repeatedFingerprint": "bfe66d021ad0c9c20173de1c26bf92e7d09c589c8e71d8ea964644581b97b1f8",
         "stable": true
       },
       "request": {
@@ -3945,7 +3945,7 @@
           "expansionChain": null,
           "form": "hundë",
           "functionalComponents": null,
-          "functionalStatement": null,
+          "functionalStatement": "the independently attested Albanian noun hundë denotes the nose and can be tested as a direct cross-language functional witness for the NOSE concept; this remains research-only and does not assert historical origin, transmission, winner status, or candidate truth",
           "id": "Albanian-hundë",
           "ordinal": 0,
           "sourceKind": "multi_source_research_witness",
@@ -3962,7 +3962,7 @@
       "composition": {
         "candidatesWithComponents": 0,
         "candidatesWithExpansionChain": 0,
-        "candidatesWithFunctionalStatements": 0,
+        "candidatesWithFunctionalStatements": 1,
         "candidatesWithVowelPath": 0,
         "totalComponents": 0
       },
@@ -3986,7 +3986,7 @@
         "totalRefs": 1,
         "unresolvedRefs": 0
       },
-      "fingerprint": "c6ae05ede0796e78d7e5ccf0e849017bc9ce9e01bd56585bedeb35a59523cf52",
+      "fingerprint": "1871550027f62de76d00bd02a10a41438f6e9100d61f5f0158094b06c880443a",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -4020,7 +4020,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "c6ae05ede0796e78d7e5ccf0e849017bc9ce9e01bd56585bedeb35a59523cf52",
+        "repeatedFingerprint": "1871550027f62de76d00bd02a10a41438f6e9100d61f5f0158094b06c880443a",
         "stable": true
       },
       "request": {
@@ -4071,7 +4071,7 @@
           "expansionChain": null,
           "form": "këmbë",
           "functionalComponents": null,
-          "functionalStatement": null,
+          "functionalStatement": "the independently attested Albanian noun këmbë includes the foot and lower limb and can be tested as a direct cross-language functional witness for the FOOT concept; this remains research-only and does not assert historical origin, transmission, winner status, or candidate truth",
           "id": "Albanian-këmbë",
           "ordinal": 0,
           "sourceKind": "multi_source_research_witness",
@@ -4088,7 +4088,7 @@
       "composition": {
         "candidatesWithComponents": 0,
         "candidatesWithExpansionChain": 0,
-        "candidatesWithFunctionalStatements": 0,
+        "candidatesWithFunctionalStatements": 1,
         "candidatesWithVowelPath": 0,
         "totalComponents": 0
       },
@@ -4112,7 +4112,7 @@
         "totalRefs": 1,
         "unresolvedRefs": 0
       },
-      "fingerprint": "4307aff6f4a2189a4ee799f9a0cf8268118c825c71bed2a04fb00c5d174b3f83",
+      "fingerprint": "520c66a0cb326282a87aa891f7d59c7e03c9730000b932b740735fa847cc995a",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -4151,7 +4151,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "4307aff6f4a2189a4ee799f9a0cf8268118c825c71bed2a04fb00c5d174b3f83",
+        "repeatedFingerprint": "520c66a0cb326282a87aa891f7d59c7e03c9730000b932b740735fa847cc995a",
         "stable": true
       },
       "request": {
@@ -4202,7 +4202,7 @@
           "expansionChain": null,
           "form": "vrapoj",
           "functionalComponents": null,
-          "functionalStatement": null,
+          "functionalStatement": "the independently attested Albanian verb vrapoj denotes running and can be tested as a direct cross-language functional expression of the RUN concept; this is functional research only and does not assert historical origin or transmission",
           "id": "Albanian-vrapoj",
           "ordinal": 0,
           "sourceKind": "multi_source_research_witness",
@@ -4219,7 +4219,7 @@
       "composition": {
         "candidatesWithComponents": 0,
         "candidatesWithExpansionChain": 0,
-        "candidatesWithFunctionalStatements": 0,
+        "candidatesWithFunctionalStatements": 1,
         "candidatesWithVowelPath": 0,
         "totalComponents": 0
       },
@@ -4243,7 +4243,7 @@
         "totalRefs": 1,
         "unresolvedRefs": 0
       },
-      "fingerprint": "17f8b89a8d1ac5cf808a725c54940b5149104813da514edf785d4f768a1e4e3d",
+      "fingerprint": "564d781924ce35b4051d43ac9941e2946c26d83df9b375a5189289b8a89a6efb",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -4274,7 +4274,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "17f8b89a8d1ac5cf808a725c54940b5149104813da514edf785d4f768a1e4e3d",
+        "repeatedFingerprint": "564d781924ce35b4051d43ac9941e2946c26d83df9b375a5189289b8a89a6efb",
         "stable": true
       },
       "request": {
@@ -4325,7 +4325,7 @@
           "expansionChain": null,
           "form": "eci",
           "functionalComponents": null,
-          "functionalStatement": null,
+          "functionalStatement": "the independently attested Albanian verb eci denotes walking or going on foot and can be tested as a direct cross-language functional expression of the WALK concept; this is functional research only and does not assert historical origin or transmission",
           "id": "Albanian-eci",
           "ordinal": 0,
           "sourceKind": "multi_source_research_witness",
@@ -4342,7 +4342,7 @@
       "composition": {
         "candidatesWithComponents": 0,
         "candidatesWithExpansionChain": 0,
-        "candidatesWithFunctionalStatements": 0,
+        "candidatesWithFunctionalStatements": 1,
         "candidatesWithVowelPath": 0,
         "totalComponents": 0
       },
@@ -4366,7 +4366,7 @@
         "totalRefs": 1,
         "unresolvedRefs": 0
       },
-      "fingerprint": "9fcb2243b5b6e3bb53913f4df6e805f92f6f660a9f57f9b25475cff677962cb5",
+      "fingerprint": "d3c54c18793df31a513473b3fb67673d31bc7b4dfef175d33bd08d7d930ce2d5",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -4397,7 +4397,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "9fcb2243b5b6e3bb53913f4df6e805f92f6f660a9f57f9b25475cff677962cb5",
+        "repeatedFingerprint": "d3c54c18793df31a513473b3fb67673d31bc7b4dfef175d33bd08d7d930ce2d5",
         "stable": true
       },
       "request": {
@@ -4518,7 +4518,7 @@
           "expansionChain": null,
           "form": "flas",
           "functionalComponents": null,
-          "functionalStatement": null,
+          "functionalStatement": "the independently attested Albanian verb flas denotes speaking and can be tested as a direct cross-language functional witness for the SPEAK concept; it does not validate the separate PE or EAK structural hypotheses and does not assert historical origin",
           "id": "Albanian-flas",
           "ordinal": 2,
           "sourceKind": "multi_source_research_witness",
@@ -4535,7 +4535,7 @@
       "composition": {
         "candidatesWithComponents": 0,
         "candidatesWithExpansionChain": 2,
-        "candidatesWithFunctionalStatements": 0,
+        "candidatesWithFunctionalStatements": 1,
         "candidatesWithVowelPath": 0,
         "totalComponents": 0
       },
@@ -4564,7 +4564,7 @@
         "totalRefs": 1,
         "unresolvedRefs": 0
       },
-      "fingerprint": "6b74edec7afc5388b1752593b9c0ec090bed4f1cab9cefeaa9bd988fa2c287d9",
+      "fingerprint": "66d8b46b5e493f802da51d1eada1a038c73f64846b87bf74afe692168d2c12bc",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -4598,7 +4598,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "6b74edec7afc5388b1752593b9c0ec090bed4f1cab9cefeaa9bd988fa2c287d9",
+        "repeatedFingerprint": "66d8b46b5e493f802da51d1eada1a038c73f64846b87bf74afe692168d2c12bc",
         "stable": true
       },
       "request": {
@@ -4732,7 +4732,7 @@
           "expansionChain": null,
           "form": "ha",
           "functionalComponents": null,
-          "functionalStatement": null,
+          "functionalStatement": "the independently attested Albanian verb ha denotes eating and can be tested as a direct cross-language functional witness for the EAT concept; this is research-only and does not assert historical origin, transmission, winner status, or candidate truth",
           "id": "Albanian-ha",
           "ordinal": 0,
           "sourceKind": "multi_source_research_witness",
@@ -4771,7 +4771,7 @@
           "expansionChain": null,
           "form": "edo",
           "functionalComponents": null,
-          "functionalStatement": null,
+          "functionalStatement": "Latin edo independently denotes the act of eating and can serve as a second-language functional witness for the EAT concept. This remains research-only and does not assert historical origin, transmission, ownership, or winner status",
           "id": "Latin-edo",
           "ordinal": 1,
           "sourceKind": "multi_source_research_witness",
@@ -4788,7 +4788,7 @@
       "composition": {
         "candidatesWithComponents": 0,
         "candidatesWithExpansionChain": 0,
-        "candidatesWithFunctionalStatements": 0,
+        "candidatesWithFunctionalStatements": 2,
         "candidatesWithVowelPath": 0,
         "totalComponents": 0
       },
@@ -4813,7 +4813,7 @@
         "totalRefs": 2,
         "unresolvedRefs": 0
       },
-      "fingerprint": "56180e44cbd1adfcc1329f1a70728bec7f08d5d7b958636f73ed3c262f634d4a",
+      "fingerprint": "831fa1d8353cf690ad0bbf56230c3fb7c5e1c71a1656db10843ee680850b70bd",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -4847,7 +4847,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "56180e44cbd1adfcc1329f1a70728bec7f08d5d7b958636f73ed3c262f634d4a",
+        "repeatedFingerprint": "831fa1d8353cf690ad0bbf56230c3fb7c5e1c71a1656db10843ee680850b70bd",
         "stable": true
       },
       "request": {
@@ -5048,7 +5048,7 @@
           "expansionChain": null,
           "form": "gjumë",
           "functionalComponents": null,
-          "functionalStatement": null,
+          "functionalStatement": "The source entries attest lexical forms for the bounded bodily sleep-state sense; treating that shared functional referent as a ZË-RO bridge remains a research hypothesis only.",
           "id": "Albanian-gjumë",
           "ordinal": 2,
           "sourceKind": "multi_source_research_witness",
@@ -5087,7 +5087,7 @@
           "expansionChain": null,
           "form": "somnus",
           "functionalComponents": null,
-          "functionalStatement": null,
+          "functionalStatement": "The source entries attest lexical forms for the bounded bodily sleep-state sense; treating that shared functional referent as a ZË-RO bridge remains a research hypothesis only.",
           "id": "Latin-somnus",
           "ordinal": 3,
           "sourceKind": "multi_source_research_witness",
@@ -5104,7 +5104,7 @@
       "composition": {
         "candidatesWithComponents": 0,
         "candidatesWithExpansionChain": 2,
-        "candidatesWithFunctionalStatements": 0,
+        "candidatesWithFunctionalStatements": 2,
         "candidatesWithVowelPath": 0,
         "totalComponents": 0
       },
@@ -5134,7 +5134,7 @@
         "totalRefs": 2,
         "unresolvedRefs": 0
       },
-      "fingerprint": "469c4db3852eef99e1e5d6c7a4b22d5bcb747172357b1aa9505027c1f9a7f95c",
+      "fingerprint": "d6283302abaf0886e4716838431361401c4adbf6e4dabc25195410908a625226",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -5173,7 +5173,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "469c4db3852eef99e1e5d6c7a4b22d5bcb747172357b1aa9505027c1f9a7f95c",
+        "repeatedFingerprint": "d6283302abaf0886e4716838431361401c4adbf6e4dabc25195410908a625226",
         "stable": true
       },
       "request": {
@@ -5225,7 +5225,7 @@
           "expansionChain": null,
           "form": "ndërtoj",
           "functionalComponents": null,
-          "functionalStatement": null,
+          "functionalStatement": "the independently attested Albanian verb ndërtoj directly denotes physical construction or assembly and can be tested as a bounded functional witness for the BUILD concept; this remains research-only and makes no historical-origin, winner, or candidate-truth claim",
           "id": "Albanian-ndërtoj",
           "ordinal": 0,
           "sourceKind": "multi_source_research_witness",
@@ -5264,7 +5264,7 @@
           "expansionChain": null,
           "form": "οἰκοδομέω",
           "functionalComponents": null,
-          "functionalStatement": null,
+          "functionalStatement": "the independently attested Ancient Greek verb οἰκοδομέω denotes building or constructing a house and can be tested as a bounded functional witness for physical BUILD; this remains research-only and makes no historical-origin, winner, or candidate-truth claim",
           "id": "Ancient Greek-οἰκοδομέω",
           "ordinal": 1,
           "sourceKind": "multi_source_research_witness",
@@ -5281,7 +5281,7 @@
       "composition": {
         "candidatesWithComponents": 0,
         "candidatesWithExpansionChain": 0,
-        "candidatesWithFunctionalStatements": 0,
+        "candidatesWithFunctionalStatements": 2,
         "candidatesWithVowelPath": 0,
         "totalComponents": 0
       },
@@ -5306,7 +5306,7 @@
         "totalRefs": 2,
         "unresolvedRefs": 0
       },
-      "fingerprint": "98a74f42501c6f5f1f18667437ca7e8764ee8de70dcf0ab4c742f81aa0c999ec",
+      "fingerprint": "244e01609503db2286240b085981977ea5009964f93f7a9f2cc0c4da66ab6704",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -5347,7 +5347,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "98a74f42501c6f5f1f18667437ca7e8764ee8de70dcf0ab4c742f81aa0c999ec",
+        "repeatedFingerprint": "244e01609503db2286240b085981977ea5009964f93f7a9f2cc0c4da66ab6704",
         "stable": true
       },
       "request": {
@@ -5469,7 +5469,7 @@
           "expansionChain": null,
           "form": "thyej",
           "functionalComponents": null,
-          "functionalStatement": null,
+          "functionalStatement": "The reviewed entries attest physical breaking or separation of a material object; treating that shared physical operation as a functional bridge is a research hypothesis only.",
           "id": "Albanian-thyej",
           "ordinal": 2,
           "sourceKind": "multi_source_research_witness",
@@ -5508,7 +5508,7 @@
           "expansionChain": null,
           "form": "frango",
           "functionalComponents": null,
-          "functionalStatement": null,
+          "functionalStatement": "The reviewed entries attest physical breaking or separation of a material object; treating that shared physical operation as a functional bridge is a research hypothesis only.",
           "id": "Latin-frango",
           "ordinal": 3,
           "sourceKind": "multi_source_research_witness",
@@ -5525,7 +5525,7 @@
       "composition": {
         "candidatesWithComponents": 0,
         "candidatesWithExpansionChain": 2,
-        "candidatesWithFunctionalStatements": 0,
+        "candidatesWithFunctionalStatements": 2,
         "candidatesWithVowelPath": 0,
         "totalComponents": 0
       },
@@ -5555,7 +5555,7 @@
         "totalRefs": 2,
         "unresolvedRefs": 0
       },
-      "fingerprint": "390c874447495ec180eb2aeec43f4880279688ef37b8c747754827964367af4a",
+      "fingerprint": "5c0a9db7c5ab99b752b651c0d55ec744fdd11f07b6e423b4f298377e6fc9d93c",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -5589,7 +5589,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "390c874447495ec180eb2aeec43f4880279688ef37b8c747754827964367af4a",
+        "repeatedFingerprint": "5c0a9db7c5ab99b752b651c0d55ec744fdd11f07b6e423b4f298377e6fc9d93c",
         "stable": true
       },
       "request": {
@@ -5641,7 +5641,7 @@
           "expansionChain": null,
           "form": "mbaj",
           "functionalComponents": null,
-          "functionalStatement": null,
+          "functionalStatement": "the independently attested Albanian verb mbaj directly covers physically holding, bearing, and transporting an object and can be tested as a bounded functional witness for CARRY; this remains research-only and makes no historical-origin, winner, or candidate-truth claim",
           "id": "Albanian-mbaj",
           "ordinal": 0,
           "sourceKind": "multi_source_research_witness",
@@ -5680,7 +5680,7 @@
           "expansionChain": null,
           "form": "φέρω",
           "functionalComponents": null,
-          "functionalStatement": null,
+          "functionalStatement": "the independently attested Ancient Greek verb φέρω denotes bearing or carrying a load and can be tested as a bounded functional witness for physical CARRY; this remains research-only and makes no historical-origin, winner, or candidate-truth claim",
           "id": "Ancient Greek-φέρω",
           "ordinal": 1,
           "sourceKind": "multi_source_research_witness",
@@ -5697,7 +5697,7 @@
       "composition": {
         "candidatesWithComponents": 0,
         "candidatesWithExpansionChain": 0,
-        "candidatesWithFunctionalStatements": 0,
+        "candidatesWithFunctionalStatements": 2,
         "candidatesWithVowelPath": 0,
         "totalComponents": 0
       },
@@ -5722,7 +5722,7 @@
         "totalRefs": 2,
         "unresolvedRefs": 0
       },
-      "fingerprint": "8a5809f914fa6bd32a409ba572526546bfa3b4865a7087cb4d7f9bc70c285f35",
+      "fingerprint": "8ed00b76ad4413f502a57a1b04ec6a5928abc2b6b091d1d1e0f4b8396973b684",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -5756,7 +5756,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "8a5809f914fa6bd32a409ba572526546bfa3b4865a7087cb4d7f9bc70c285f35",
+        "repeatedFingerprint": "8ed00b76ad4413f502a57a1b04ec6a5928abc2b6b091d1d1e0f4b8396973b684",
         "stable": true
       },
       "request": {
@@ -5807,7 +5807,7 @@
           "expansionChain": null,
           "form": "vërtetë",
           "functionalComponents": null,
-          "functionalStatement": null,
+          "functionalStatement": "the independently attested Albanian noun vërtetë denotes truth or that which corresponds to reality and can be tested as a direct cross-language functional expression of the TRUTH concept; this is functional research only and does not assert historical origin or transmission",
           "id": "Albanian-vërtetë",
           "ordinal": 0,
           "sourceKind": "multi_source_research_witness",
@@ -5824,7 +5824,7 @@
       "composition": {
         "candidatesWithComponents": 0,
         "candidatesWithExpansionChain": 0,
-        "candidatesWithFunctionalStatements": 0,
+        "candidatesWithFunctionalStatements": 1,
         "candidatesWithVowelPath": 0,
         "totalComponents": 0
       },
@@ -5848,7 +5848,7 @@
         "totalRefs": 1,
         "unresolvedRefs": 0
       },
-      "fingerprint": "084a471d8cc02153bf0306c83e0d9e9b472e779c9eda06e04b4f410b3dda4a98",
+      "fingerprint": "f1e568484f115687a0f7cd3df10bb8eb34f2101a46feb9f71977fe38c9a85f4e",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -5879,7 +5879,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "084a471d8cc02153bf0306c83e0d9e9b472e779c9eda06e04b4f410b3dda4a98",
+        "repeatedFingerprint": "f1e568484f115687a0f7cd3df10bb8eb34f2101a46feb9f71977fe38c9a85f4e",
         "stable": true
       },
       "request": {
@@ -6012,7 +6012,7 @@
           "expansionChain": null,
           "form": "jetë",
           "functionalComponents": null,
-          "functionalStatement": null,
+          "functionalStatement": "the independently attested Albanian noun jetë denotes life and the state or existence of living beings and can be tested as a direct cross-language functional expression of the LIFE concept; this is functional research only and does not assert historical origin or transmission",
           "id": "Albanian-jetë",
           "ordinal": 0,
           "sourceKind": "multi_source_research_witness",
@@ -6029,7 +6029,7 @@
       "composition": {
         "candidatesWithComponents": 0,
         "candidatesWithExpansionChain": 0,
-        "candidatesWithFunctionalStatements": 0,
+        "candidatesWithFunctionalStatements": 1,
         "candidatesWithVowelPath": 0,
         "totalComponents": 0
       },
@@ -6053,7 +6053,7 @@
         "totalRefs": 1,
         "unresolvedRefs": 0
       },
-      "fingerprint": "83244b0ab0bf727bfc4189ecb4ea7960719bbc55ca1d4a786f273b5777f35756",
+      "fingerprint": "246c5284ecbb73bbbcd50df37d2a60496ff804b4e565b31e5c1ac19d945e4c3b",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -6087,7 +6087,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "83244b0ab0bf727bfc4189ecb4ea7960719bbc55ca1d4a786f273b5777f35756",
+        "repeatedFingerprint": "246c5284ecbb73bbbcd50df37d2a60496ff804b4e565b31e5c1ac19d945e4c3b",
         "stable": true
       },
       "request": {
@@ -6221,7 +6221,7 @@
           "expansionChain": null,
           "form": "mendje",
           "functionalComponents": null,
-          "functionalStatement": null,
+          "functionalStatement": "the independently attested Albanian noun mendje denotes the mind and can be tested as a direct cross-language functional witness for the MIND concept; this is research-only and does not assert historical origin, transmission, winner status, or candidate truth",
           "id": "Albanian-mendje",
           "ordinal": 0,
           "sourceKind": "multi_source_research_witness",
@@ -6260,7 +6260,7 @@
           "expansionChain": null,
           "form": "mens",
           "functionalComponents": null,
-          "functionalStatement": null,
+          "functionalStatement": "Latin mens independently denotes the mind and intellectual faculties and can serve as a second-language functional witness for the MIND concept. This remains research-only and does not assert historical origin, transmission, ownership, or winner status",
           "id": "Latin-mens",
           "ordinal": 1,
           "sourceKind": "multi_source_research_witness",
@@ -6277,7 +6277,7 @@
       "composition": {
         "candidatesWithComponents": 0,
         "candidatesWithExpansionChain": 0,
-        "candidatesWithFunctionalStatements": 0,
+        "candidatesWithFunctionalStatements": 2,
         "candidatesWithVowelPath": 0,
         "totalComponents": 0
       },
@@ -6302,7 +6302,7 @@
         "totalRefs": 2,
         "unresolvedRefs": 0
       },
-      "fingerprint": "fd8c27eaeb7f9656075eb97fc69b70e4b3e9066b6ba09f547931aa475fd5e77e",
+      "fingerprint": "6e892a06b116b3b1042465242ae9dbc648689149949cf5e40ac7208c07092ba1",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -6333,7 +6333,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "fd8c27eaeb7f9656075eb97fc69b70e4b3e9066b6ba09f547931aa475fd5e77e",
+        "repeatedFingerprint": "6e892a06b116b3b1042465242ae9dbc648689149949cf5e40ac7208c07092ba1",
         "stable": true
       },
       "request": {
@@ -6419,7 +6419,7 @@
           "expansionChain": null,
           "form": "kujtesë",
           "functionalComponents": null,
-          "functionalStatement": null,
+          "functionalStatement": "the independently attested Albanian noun kujtesë denotes memory and can be tested as a direct cross-language functional witness for the MEMORY concept; it does not validate the separate EM structural hypothesis and does not assert historical origin",
           "id": "Albanian-kujtesë",
           "ordinal": 1,
           "sourceKind": "multi_source_research_witness",
@@ -6436,7 +6436,7 @@
       "composition": {
         "candidatesWithComponents": 0,
         "candidatesWithExpansionChain": 1,
-        "candidatesWithFunctionalStatements": 0,
+        "candidatesWithFunctionalStatements": 1,
         "candidatesWithVowelPath": 0,
         "totalComponents": 0
       },
@@ -6463,7 +6463,7 @@
         "totalRefs": 1,
         "unresolvedRefs": 0
       },
-      "fingerprint": "e40a1ec2893acbb8ef148f65451869ef2ab0cdbe4a80552edf20d9a39edc13a4",
+      "fingerprint": "26e7451c416aa0d3803e44c7efd49622b6cef46d54111f44b6b258325a01927d",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -6500,7 +6500,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "e40a1ec2893acbb8ef148f65451869ef2ab0cdbe4a80552edf20d9a39edc13a4",
+        "repeatedFingerprint": "26e7451c416aa0d3803e44c7efd49622b6cef46d54111f44b6b258325a01927d",
         "stable": true
       },
       "request": {
@@ -6552,7 +6552,7 @@
           "expansionChain": null,
           "form": "liri",
           "functionalComponents": null,
-          "functionalStatement": null,
+          "functionalStatement": "the independently attested Albanian noun liri denotes liberty and freedom from oppression or restraint and can be tested as a bounded functional witness for FREEDOM; this remains research-only and makes no historical-origin, winner, or candidate-truth claim",
           "id": "Albanian-liri",
           "ordinal": 0,
           "sourceKind": "multi_source_research_witness",
@@ -6591,7 +6591,7 @@
           "expansionChain": null,
           "form": "lībertas",
           "functionalComponents": null,
-          "functionalStatement": null,
+          "functionalStatement": "the independently attested Latin noun lībertas denotes freedom or liberty, including freedom from restraint or obligation, and can be tested as a bounded functional witness for FREEDOM; this remains research-only and makes no historical-origin, winner, or candidate-truth claim",
           "id": "Latin-lībertas",
           "ordinal": 1,
           "sourceKind": "multi_source_research_witness",
@@ -6608,7 +6608,7 @@
       "composition": {
         "candidatesWithComponents": 0,
         "candidatesWithExpansionChain": 0,
-        "candidatesWithFunctionalStatements": 0,
+        "candidatesWithFunctionalStatements": 2,
         "candidatesWithVowelPath": 0,
         "totalComponents": 0
       },
@@ -6633,7 +6633,7 @@
         "totalRefs": 2,
         "unresolvedRefs": 0
       },
-      "fingerprint": "eb6fba213cc7840ff4c73c7081e521e65e3651742ae74305287505c710b78ca7",
+      "fingerprint": "9b32004ad9023f923ac35b9a4a60df38b0d2b727c645b04018541d58b99d8595",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -6675,7 +6675,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "eb6fba213cc7840ff4c73c7081e521e65e3651742ae74305287505c710b78ca7",
+        "repeatedFingerprint": "9b32004ad9023f923ac35b9a4a60df38b0d2b727c645b04018541d58b99d8595",
         "stable": true
       },
       "request": {
@@ -6812,7 +6812,7 @@
           "expansionChain": null,
           "form": "rend",
           "functionalComponents": null,
-          "functionalStatement": null,
+          "functionalStatement": "The attested lexical senses describe ordered arrangement or sequence; treating that relation as a ZË-RO functional bridge remains a research hypothesis only.",
           "id": "Albanian-rend",
           "ordinal": 0,
           "sourceKind": "multi_source_research_witness",
@@ -6851,7 +6851,7 @@
           "expansionChain": null,
           "form": "ordo",
           "functionalComponents": null,
-          "functionalStatement": null,
+          "functionalStatement": "The attested lexical senses describe ordered arrangement or sequence; treating that relation as a ZË-RO functional bridge remains a research hypothesis only.",
           "id": "Latin-ordo",
           "ordinal": 1,
           "sourceKind": "multi_source_research_witness",
@@ -6868,7 +6868,7 @@
       "composition": {
         "candidatesWithComponents": 0,
         "candidatesWithExpansionChain": 0,
-        "candidatesWithFunctionalStatements": 0,
+        "candidatesWithFunctionalStatements": 2,
         "candidatesWithVowelPath": 0,
         "totalComponents": 0
       },
@@ -6893,7 +6893,7 @@
         "totalRefs": 2,
         "unresolvedRefs": 0
       },
-      "fingerprint": "77f531d15ba0d71f1893c48f98ff21283b8cfe96eeac24b0569abe3349dba9bc",
+      "fingerprint": "eda83af30c6c62fcbe034d8a0dcb03d66ff591e7b1c5c4bcae3f1f5285d47bdc",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -6927,7 +6927,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "77f531d15ba0d71f1893c48f98ff21283b8cfe96eeac24b0569abe3349dba9bc",
+        "repeatedFingerprint": "eda83af30c6c62fcbe034d8a0dcb03d66ff591e7b1c5c4bcae3f1f5285d47bdc",
         "stable": true
       },
       "request": {
@@ -7049,7 +7049,7 @@
           "expansionChain": null,
           "form": "ndryshim",
           "functionalComponents": null,
-          "functionalStatement": null,
+          "functionalStatement": "The attested lexical senses describe changing or altering a state or condition; treating that relation as a ZË-RO functional bridge remains a research hypothesis only.",
           "id": "Albanian-ndryshim",
           "ordinal": 2,
           "sourceKind": "multi_source_research_witness",
@@ -7088,7 +7088,7 @@
           "expansionChain": null,
           "form": "mūtātiō",
           "functionalComponents": null,
-          "functionalStatement": null,
+          "functionalStatement": "The attested lexical senses describe changing or altering a state or condition; treating that relation as a ZË-RO functional bridge remains a research hypothesis only.",
           "id": "Latin-mūtātiō",
           "ordinal": 3,
           "sourceKind": "multi_source_research_witness",
@@ -7105,7 +7105,7 @@
       "composition": {
         "candidatesWithComponents": 0,
         "candidatesWithExpansionChain": 2,
-        "candidatesWithFunctionalStatements": 0,
+        "candidatesWithFunctionalStatements": 2,
         "candidatesWithVowelPath": 0,
         "totalComponents": 0
       },
@@ -7135,7 +7135,7 @@
         "totalRefs": 2,
         "unresolvedRefs": 0
       },
-      "fingerprint": "90e8a17d7cf9679440592a75eca1bafcd28f2027229ddb9ad2e06bf01c6d34bd",
+      "fingerprint": "b97579e0c891e9fc0b8d52ea0686e9b991fe600badb55d51847563f3fc4e6022",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -7169,7 +7169,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "90e8a17d7cf9679440592a75eca1bafcd28f2027229ddb9ad2e06bf01c6d34bd",
+        "repeatedFingerprint": "b97579e0c891e9fc0b8d52ea0686e9b991fe600badb55d51847563f3fc4e6022",
         "stable": true
       },
       "request": {
@@ -7220,7 +7220,7 @@
           "expansionChain": null,
           "form": "nënë",
           "functionalComponents": null,
-          "functionalStatement": null,
+          "functionalStatement": "the independently attested Albanian noun nënë denotes mother and can be tested as a direct cross-language functional expression of the MOTHER concept; this is functional research only and does not assert historical origin or transmission",
           "id": "Albanian-nënë",
           "ordinal": 0,
           "sourceKind": "multi_source_research_witness",
@@ -7237,7 +7237,7 @@
       "composition": {
         "candidatesWithComponents": 0,
         "candidatesWithExpansionChain": 0,
-        "candidatesWithFunctionalStatements": 0,
+        "candidatesWithFunctionalStatements": 1,
         "candidatesWithVowelPath": 0,
         "totalComponents": 0
       },
@@ -7261,7 +7261,7 @@
         "totalRefs": 1,
         "unresolvedRefs": 0
       },
-      "fingerprint": "fb3396b3a902f3d145c6ae3027888e4925dc6c2a13311ad4eeb126fbe271cd5b",
+      "fingerprint": "3662c37f0770707e6aa43d38295e1fe4ca22887d60cba3107d3e9b86ccdd7640",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -7302,7 +7302,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "fb3396b3a902f3d145c6ae3027888e4925dc6c2a13311ad4eeb126fbe271cd5b",
+        "repeatedFingerprint": "3662c37f0770707e6aa43d38295e1fe4ca22887d60cba3107d3e9b86ccdd7640",
         "stable": true
       },
       "request": {
@@ -7353,7 +7353,7 @@
           "expansionChain": null,
           "form": "fëmijë",
           "functionalComponents": null,
-          "functionalStatement": null,
+          "functionalStatement": "the independently attested Albanian noun fëmijë denotes a child and can be tested as a direct cross-language functional expression of the CHILD concept; this is functional research only and does not assert historical origin or transmission",
           "id": "Albanian-fëmijë",
           "ordinal": 0,
           "sourceKind": "multi_source_research_witness",
@@ -7370,7 +7370,7 @@
       "composition": {
         "candidatesWithComponents": 0,
         "candidatesWithExpansionChain": 0,
-        "candidatesWithFunctionalStatements": 0,
+        "candidatesWithFunctionalStatements": 1,
         "candidatesWithVowelPath": 0,
         "totalComponents": 0
       },
@@ -7394,7 +7394,7 @@
         "totalRefs": 1,
         "unresolvedRefs": 0
       },
-      "fingerprint": "b35c7a1c7c588331c87e16c80019ab0f44c0eaff289fa1d2a09d3d930e59297f",
+      "fingerprint": "fa76a11545c4c7bd583827d105a5ed1ca167c80204eeddddd5db25b0ec25ff5b",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -7425,7 +7425,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "b35c7a1c7c588331c87e16c80019ab0f44c0eaff289fa1d2a09d3d930e59297f",
+        "repeatedFingerprint": "fa76a11545c4c7bd583827d105a5ed1ca167c80204eeddddd5db25b0ec25ff5b",
         "stable": true
       },
       "request": {
@@ -7547,7 +7547,7 @@
           "expansionChain": null,
           "form": "mik",
           "functionalComponents": null,
-          "functionalStatement": null,
+          "functionalStatement": "The Albanian and Latin entries independently attest lexical forms for a close friend or familiar person; treating them as a shared functional referent remains a research hypothesis only.",
           "id": "Albanian-mik",
           "ordinal": 2,
           "sourceKind": "multi_source_research_witness",
@@ -7586,7 +7586,7 @@
           "expansionChain": null,
           "form": "familiaris",
           "functionalComponents": null,
-          "functionalStatement": null,
+          "functionalStatement": "The Albanian and Latin entries independently attest lexical forms for a close friend or familiar person; treating them as a shared functional referent remains a research hypothesis only.",
           "id": "Latin-familiaris",
           "ordinal": 3,
           "sourceKind": "multi_source_research_witness",
@@ -7603,7 +7603,7 @@
       "composition": {
         "candidatesWithComponents": 0,
         "candidatesWithExpansionChain": 2,
-        "candidatesWithFunctionalStatements": 0,
+        "candidatesWithFunctionalStatements": 2,
         "candidatesWithVowelPath": 0,
         "totalComponents": 0
       },
@@ -7633,7 +7633,7 @@
         "totalRefs": 2,
         "unresolvedRefs": 0
       },
-      "fingerprint": "25d7e884fc3c345fea05f49d6f7712d9376eda2d9432674e8acee714baf90466",
+      "fingerprint": "35042e2dd38af298b90639a4312556e3dcb54aca5f266c9be61f75998ed4c7d3",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -7672,7 +7672,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "25d7e884fc3c345fea05f49d6f7712d9376eda2d9432674e8acee714baf90466",
+        "repeatedFingerprint": "35042e2dd38af298b90639a4312556e3dcb54aca5f266c9be61f75998ed4c7d3",
         "stable": true
       },
       "request": {
@@ -7885,7 +7885,7 @@
           "expansionChain": null,
           "form": "luftë",
           "functionalComponents": null,
-          "functionalStatement": null,
+          "functionalStatement": "the independently attested Albanian noun luftë denotes war and can be tested as a direct cross-language functional witness for the WAR concept; this is research-only and does not assert historical origin, transmission, winner status, or candidate truth",
           "id": "Albanian-luftë",
           "ordinal": 0,
           "sourceKind": "multi_source_research_witness",
@@ -7924,7 +7924,7 @@
           "expansionChain": null,
           "form": "belligero",
           "functionalComponents": null,
-          "functionalStatement": null,
+          "functionalStatement": "Latin belligero independently denotes waging or carrying on war and can serve as a second-language functional witness for the WAR concept. The target bridge remains a hypothesis and does not assert historical origin, transmission, ownership, or winner status",
           "id": "Latin-belligero",
           "ordinal": 1,
           "sourceKind": "multi_source_research_witness",
@@ -7941,7 +7941,7 @@
       "composition": {
         "candidatesWithComponents": 0,
         "candidatesWithExpansionChain": 0,
-        "candidatesWithFunctionalStatements": 0,
+        "candidatesWithFunctionalStatements": 2,
         "candidatesWithVowelPath": 0,
         "totalComponents": 0
       },
@@ -7966,7 +7966,7 @@
         "totalRefs": 2,
         "unresolvedRefs": 0
       },
-      "fingerprint": "1a698c80933214756902a402f1886fe09b8ab5ac08f657c5a27c872d606e1af3",
+      "fingerprint": "3789e51a5fb120cec8e8557823b6d172848812cbbfaf6a0acd1214b95ea09153",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -7997,7 +7997,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "1a698c80933214756902a402f1886fe09b8ab5ac08f657c5a27c872d606e1af3",
+        "repeatedFingerprint": "3789e51a5fb120cec8e8557823b6d172848812cbbfaf6a0acd1214b95ea09153",
         "stable": true
       },
       "request": {
@@ -8048,7 +8048,7 @@
           "expansionChain": null,
           "form": "paqe",
           "functionalComponents": null,
-          "functionalStatement": null,
+          "functionalStatement": "the independently attested Albanian noun paqe denotes peace and can be tested as a direct cross-language functional witness for the PEACE concept; this remains research-only and does not assert historical origin, transmission, winner status, or candidate truth",
           "id": "Albanian-paqe",
           "ordinal": 0,
           "sourceKind": "multi_source_research_witness",
@@ -8065,7 +8065,7 @@
       "composition": {
         "candidatesWithComponents": 0,
         "candidatesWithExpansionChain": 0,
-        "candidatesWithFunctionalStatements": 0,
+        "candidatesWithFunctionalStatements": 1,
         "candidatesWithVowelPath": 0,
         "totalComponents": 0
       },
@@ -8089,7 +8089,7 @@
         "totalRefs": 1,
         "unresolvedRefs": 0
       },
-      "fingerprint": "8f548af4781eccdf4a8638a3e9ce5aca0de2a950112411ab393a031d68e04ce2",
+      "fingerprint": "5abae86bce288edce6b5fe6a15dd8c3e9254f36dd844459693f8a137428e1186",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -8126,7 +8126,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "8f548af4781eccdf4a8638a3e9ce5aca0de2a950112411ab393a031d68e04ce2",
+        "repeatedFingerprint": "5abae86bce288edce6b5fe6a15dd8c3e9254f36dd844459693f8a137428e1186",
         "stable": true
       },
       "request": {
@@ -8177,7 +8177,7 @@
           "expansionChain": null,
           "form": "mbret",
           "functionalComponents": null,
-          "functionalStatement": null,
+          "functionalStatement": "the independently attested Albanian noun mbret denotes a king and can be tested as a direct cross-language functional witness for the KING concept; this remains research-only and does not assert historical origin, transmission, winner status, or candidate truth",
           "id": "Albanian-mbret",
           "ordinal": 0,
           "sourceKind": "multi_source_research_witness",
@@ -8194,7 +8194,7 @@
       "composition": {
         "candidatesWithComponents": 0,
         "candidatesWithExpansionChain": 0,
-        "candidatesWithFunctionalStatements": 0,
+        "candidatesWithFunctionalStatements": 1,
         "candidatesWithVowelPath": 0,
         "totalComponents": 0
       },
@@ -8218,7 +8218,7 @@
         "totalRefs": 1,
         "unresolvedRefs": 0
       },
-      "fingerprint": "34ebe711e7e5235cfb645b34fe4f7a89b018e562f1a6a0c062b482578346c0fb",
+      "fingerprint": "63452ed2ce609a448d8e440b649488d1152f56491e82abb4919e0f0809c60b1b",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -8249,7 +8249,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "34ebe711e7e5235cfb645b34fe4f7a89b018e562f1a6a0c062b482578346c0fb",
+        "repeatedFingerprint": "63452ed2ce609a448d8e440b649488d1152f56491e82abb4919e0f0809c60b1b",
         "stable": true
       },
       "request": {
@@ -8335,7 +8335,7 @@
           "expansionChain": null,
           "form": "grua",
           "functionalComponents": null,
-          "functionalStatement": null,
+          "functionalStatement": "the independently attested Albanian noun grua denotes a woman and can be tested as a direct cross-language functional witness for the WOMAN concept; it does not validate the separate OM structural hypothesis and does not assert historical origin",
           "id": "Albanian-grua",
           "ordinal": 1,
           "sourceKind": "multi_source_research_witness",
@@ -8352,7 +8352,7 @@
       "composition": {
         "candidatesWithComponents": 0,
         "candidatesWithExpansionChain": 1,
-        "candidatesWithFunctionalStatements": 0,
+        "candidatesWithFunctionalStatements": 1,
         "candidatesWithVowelPath": 0,
         "totalComponents": 0
       },
@@ -8379,7 +8379,7 @@
         "totalRefs": 1,
         "unresolvedRefs": 0
       },
-      "fingerprint": "0768a2e30cba94edb0f2bd618ff5f4b173e3de1940f1bfb0021306c2b7dbbc95",
+      "fingerprint": "e133751fb2ca1632ec92f9dd5220d05e0d8298718190444fe00979201e4ddce1",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -8420,7 +8420,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "0768a2e30cba94edb0f2bd618ff5f4b173e3de1940f1bfb0021306c2b7dbbc95",
+        "repeatedFingerprint": "e133751fb2ca1632ec92f9dd5220d05e0d8298718190444fe00979201e4ddce1",
         "stable": true
       },
       "request": {
@@ -8472,7 +8472,7 @@
           "expansionChain": null,
           "form": "burrë",
           "functionalComponents": null,
-          "functionalStatement": null,
+          "functionalStatement": "the independently attested Albanian noun burrë denotes an adult male human and can be tested as a bounded functional witness for the adult-male MAN sense; this does not claim mankind, humanity, personhood, or historical origin",
           "id": "Albanian-burrë",
           "ordinal": 0,
           "sourceKind": "multi_source_research_witness",
@@ -8511,7 +8511,7 @@
           "expansionChain": null,
           "form": "vĭr",
           "functionalComponents": null,
-          "functionalStatement": null,
+          "functionalStatement": "the independently attested Latin noun vĭr denotes a male person or adult male and can be tested as a bounded functional witness for the adult-male MAN sense; this does not claim mankind, humanity, personhood, or historical origin",
           "id": "Latin-vĭr",
           "ordinal": 1,
           "sourceKind": "multi_source_research_witness",
@@ -8528,7 +8528,7 @@
       "composition": {
         "candidatesWithComponents": 0,
         "candidatesWithExpansionChain": 0,
-        "candidatesWithFunctionalStatements": 0,
+        "candidatesWithFunctionalStatements": 2,
         "candidatesWithVowelPath": 0,
         "totalComponents": 0
       },
@@ -8553,7 +8553,7 @@
         "totalRefs": 2,
         "unresolvedRefs": 0
       },
-      "fingerprint": "e58e588d7fa7697bbbf591550dabec246e2e1300d496643cc7ac548fdbf69c34",
+      "fingerprint": "b353864c65d42f4446faa6d10947033c5840086734a19764faf1f8533920bfb0",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -8584,7 +8584,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "e58e588d7fa7697bbbf591550dabec246e2e1300d496643cc7ac548fdbf69c34",
+        "repeatedFingerprint": "b353864c65d42f4446faa6d10947033c5840086734a19764faf1f8533920bfb0",
         "stable": true
       },
       "request": {
