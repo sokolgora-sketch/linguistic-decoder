@@ -13,6 +13,9 @@ export const DOCTRINE_FUNCTIONAL_PROFILE_ENGINE_AUTHORITY_V0_1 =
 export const DOCTRINE_FUNCTIONAL_PROFILE_NORMALIZATION_STATUS_V0_1 =
   "REVIEWED_DOCTRINE_NORMALIZATION" as const;
 
+export const DOCTRINE_FUNCTIONAL_PROFILE_COMPLETENESS_V0_1 =
+  "PROFILE_NOT_SEMANTICALLY_EXHAUSTIVE" as const;
+
 export const DOCTRINE_FUNCTIONAL_PROFILE_TRUTH_CLASSIFICATION_V0_1 =
   "inference" as const;
 
@@ -124,6 +127,29 @@ export type DoctrineFunctionalProfileRelationTypeV0_1 =
   | "MEDIATES_HIGH_LOW_GROUPINGS"
   | "NON_DOMINATING_BALANCE";
 
+const PRINCIPLE_ASSOCIATION_BY_VOICE_V0_1 = {
+  A: "Bashkimi",
+  E: "Vibrimi",
+  I: "Ritmi",
+  O: "Balanca",
+  U: "Ndryshimi",
+  Y: "Nisma",
+  "Ë": "Dashuria",
+} as const satisfies Record<SevenVoiceKey, SevenVoicesPrincipleAssociationV0_1>;
+
+const RELATIONAL_PROPERTY_IDS_BY_VOICE_V0_1 = {
+  A: ["a-eh-complementarity"],
+  E: [],
+  I: [],
+  O: ["o-high-low-mediation", "o-non-domination-balance"],
+  U: [],
+  Y: [],
+  "Ë": ["a-eh-complementarity"],
+} as const satisfies Record<
+  SevenVoiceKey,
+  readonly DoctrineFunctionalProfileRelationIdV0_1[]
+>;
+
 export type DoctrineFunctionalProfileRelationV0_1 = Readonly<{
   relationId: DoctrineFunctionalProfileRelationIdV0_1;
   subject: SevenVoiceKey;
@@ -188,6 +214,7 @@ export type SevenVoiceDoctrineFunctionalProfileV0_1 = Readonly<{
   engineAuthority: typeof DOCTRINE_FUNCTIONAL_PROFILE_ENGINE_AUTHORITY_V0_1;
   normalizationStatus:
     typeof DOCTRINE_FUNCTIONAL_PROFILE_NORMALIZATION_STATUS_V0_1;
+  profileCompleteness: typeof DOCTRINE_FUNCTIONAL_PROFILE_COMPLETENESS_V0_1;
   truthClassification:
     typeof DOCTRINE_FUNCTIONAL_PROFILE_TRUTH_CLASSIFICATION_V0_1;
   voice: SevenVoiceKey;
@@ -449,6 +476,10 @@ export const DOCTRINE_FUNCTIONAL_PROFILE_SOURCE_REFS_V0_1 = Object.freeze({
 
 type SourceRefKeyV0_1 = keyof typeof DOCTRINE_FUNCTIONAL_PROFILE_SOURCE_REFS_V0_1;
 
+const ADMITTED_SOURCE_REFS_V0_1 = Object.values(
+  DOCTRINE_FUNCTIONAL_PROFILE_SOURCE_REFS_V0_1,
+);
+
 function sourceRefsV0_1(
   ...keys: readonly SourceRefKeyV0_1[]
 ): readonly DoctrineFunctionalProfileSourceRefV0_1[] {
@@ -594,8 +625,7 @@ export const SEVEN_VOICE_DOCTRINE_PROFILE_RELATIONS_V0_1 = Object.freeze(
 function profileV0_1(
   voice: SevenVoiceKey,
   functionalProperties: readonly DoctrineFunctionalProfileDatumV0_1[],
-  principleAssociation: DoctrineFunctionalProfilePrincipleV0_1,
-  relationalPropertyIds: readonly DoctrineFunctionalProfileRelationIdV0_1[],
+  principleSourceRef: SourceRefKeyV0_1,
   symbolicMetadata: DoctrineFunctionalProfileSymbolicMetadataV0_1,
 ): SevenVoiceDoctrineFunctionalProfileV0_1 {
   return {
@@ -603,12 +633,16 @@ function profileV0_1(
     engineAuthority: DOCTRINE_FUNCTIONAL_PROFILE_ENGINE_AUTHORITY_V0_1,
     normalizationStatus:
       DOCTRINE_FUNCTIONAL_PROFILE_NORMALIZATION_STATUS_V0_1,
+    profileCompleteness: DOCTRINE_FUNCTIONAL_PROFILE_COMPLETENESS_V0_1,
     truthClassification:
       DOCTRINE_FUNCTIONAL_PROFILE_TRUTH_CLASSIFICATION_V0_1,
     voice,
     functionalProperties,
-    principleAssociation,
-    relationalPropertyIds,
+    principleAssociation: principleV0_1(
+      PRINCIPLE_ASSOCIATION_BY_VOICE_V0_1[voice],
+      principleSourceRef,
+    ),
+    relationalPropertyIds: RELATIONAL_PROPERTY_IDS_BY_VOICE_V0_1[voice],
     symbolicMetadata,
     unresolvedTensionIds: [FREQUENCY_TENSION_ID_V0_1],
     claimBoundary: CLAIM_BOUNDARY_V0_1,
@@ -617,15 +651,20 @@ function profileV0_1(
   };
 }
 
-function deepFreezeV0_1<T>(value: T): T {
-  if (value && typeof value === "object" && !Object.isFrozen(value)) {
-    Object.freeze(value);
+function deepFreezeV0_1<T>(value: T, seen = new WeakSet<object>()): T {
+  if (value && typeof value === "object") {
+    const objectValue = value as object;
+    if (seen.has(objectValue)) return value;
+    seen.add(objectValue);
     for (const child of Object.values(value as Record<string, unknown>)) {
-      deepFreezeV0_1(child);
+      deepFreezeV0_1(child, seen);
     }
+    Object.freeze(value);
   }
   return value;
 }
+
+deepFreezeV0_1(DOCTRINE_FUNCTIONAL_PROFILE_SOURCE_REFS_V0_1);
 
 export const SEVEN_VOICE_DOCTRINE_PROFILES_V0_1 = deepFreezeV0_1({
   A: profileV0_1(
@@ -636,8 +675,7 @@ export const SEVEN_VOICE_DOCTRINE_PROFILES_V0_1 = deepFreezeV0_1({
       datumV0_1("activation", "FUNCTIONAL_INTERPRETATION", "chapter03Line15"),
       datumV0_1("life_pulse", "EXPLICIT_DOCTRINE", "chapter01Lines16To20", "chapter03Line15"),
     ],
-    principleV0_1("Bashkimi", "chapter04Lines16To17"),
-    ["a-eh-complementarity"],
+    "chapter04Lines16To17",
     symbolicMetadataV0_1("red", "chapter03Line15"),
   ),
   E: profileV0_1(
@@ -648,8 +686,7 @@ export const SEVEN_VOICE_DOCTRINE_PROFILES_V0_1 = deepFreezeV0_1({
       datumV0_1("connection", "FUNCTIONAL_INTERPRETATION", "chapter03Lines17To19"),
       datumV0_1("growth", "FUNCTIONAL_INTERPRETATION", "chapter01Lines27To33", "chapter03Lines17To19"),
     ],
-    principleV0_1("Vibrimi", "chapter04Lines19To20"),
-    [],
+    "chapter04Lines19To20",
     symbolicMetadataV0_1("orange", "chapter03Lines17To19"),
   ),
   I: profileV0_1(
@@ -662,8 +699,7 @@ export const SEVEN_VOICE_DOCTRINE_PROFILES_V0_1 = deepFreezeV0_1({
       datumV0_1("truth_orientation", "FUNCTIONAL_INTERPRETATION", "chapter03Lines21To23"),
       datumV0_1("understanding", "EXPLICIT_DOCTRINE", "chapter03Lines21To23"),
     ],
-    principleV0_1("Ritmi", "chapter04Lines22To23"),
-    [],
+    "chapter04Lines22To23",
     symbolicMetadataV0_1("yellow", "chapter03Lines21To23"),
   ),
   O: profileV0_1(
@@ -677,8 +713,7 @@ export const SEVEN_VOICE_DOCTRINE_PROFILES_V0_1 = deepFreezeV0_1({
       datumV0_1("non_domination", "EXPLICIT_DOCTRINE", "chapter02Lines37To38"),
       datumV0_1("unification", "FUNCTIONAL_INTERPRETATION", "chapter02Lines13To28"),
     ],
-    principleV0_1("Balanca", "chapter04Lines25To26"),
-    ["o-high-low-mediation", "o-non-domination-balance"],
+    "chapter04Lines25To26",
     symbolicMetadataV0_1("green", "chapter03Line25"),
   ),
   U: profileV0_1(
@@ -692,8 +727,7 @@ export const SEVEN_VOICE_DOCTRINE_PROFILES_V0_1 = deepFreezeV0_1({
       datumV0_1("belonging", "EXPLICIT_DOCTRINE", "chapter03Line27"),
       datumV0_1("foundation", "FUNCTIONAL_INTERPRETATION", "chapter03Line27"),
     ],
-    principleV0_1("Ndryshimi", "chapter04Lines28To29"),
-    [],
+    "chapter04Lines28To29",
     symbolicMetadataV0_1("blue", "chapter03Line27"),
   ),
   Y: profileV0_1(
@@ -710,8 +744,7 @@ export const SEVEN_VOICE_DOCTRINE_PROFILES_V0_1 = deepFreezeV0_1({
       datumV0_1("risk", "FUNCTIONAL_INTERPRETATION", "chapter03Line29"),
       datumV0_1("learning_from_experience", "EXPLICIT_DOCTRINE", "chapter03Line29"),
     ],
-    principleV0_1("Nisma", "chapter04Lines31To32"),
-    [],
+    "chapter04Lines31To32",
     symbolicMetadataV0_1("indigo", "chapter03Line29"),
   ),
   "Ë": profileV0_1(
@@ -725,8 +758,7 @@ export const SEVEN_VOICE_DOCTRINE_PROFILES_V0_1 = deepFreezeV0_1({
       datumV0_1("emotional_interiority", "EXPLICIT_DOCTRINE", "chapter01Lines21To26"),
       datumV0_1("connection", "FUNCTIONAL_INTERPRETATION", "chapter03Line31"),
     ],
-    principleV0_1("Dashuria", "chapter04Lines34To35"),
-    ["a-eh-complementarity"],
+    "chapter04Lines34To35",
     symbolicMetadataV0_1("violet", "chapter03Line31"),
   ),
 } as const satisfies Record<
@@ -739,6 +771,7 @@ export type DoctrineFunctionalProfileReasonCodeV0_1 =
   | "SCHEMA_VERSION_INVALID"
   | "ENGINE_AUTHORITY_INVALID"
   | "NORMALIZATION_STATUS_INVALID"
+  | "PROFILE_COMPLETENESS_INVALID"
   | "TRUTH_CLASSIFICATION_INVALID"
   | "VOICE_INVALID"
   | "FUNCTIONAL_PROPERTIES_INVALID"
@@ -749,6 +782,8 @@ export type DoctrineFunctionalProfileReasonCodeV0_1 =
   | "CLAIM_BOUNDARY_INVALID"
   | "USER_DECISION_POSTURE_INVALID"
   | "NO_SINGLE_WINNER_INVALID"
+  | "RELATION_RECORD_INVALID"
+  | "TENSION_RECORD_INVALID"
   | "LEXICAL_EVIDENCE_FIELD_PRESENT"
   | "PATH_COMPOSITION_FIELD_PRESENT"
   | "SOURCE_REFERENCE_INVALID";
@@ -769,6 +804,12 @@ export type DoctrineFunctionalProfileValidationResultV0_1 =
   | DoctrineFunctionalProfileValidationSuccessV0_1
   | DoctrineFunctionalProfileValidationFailureV0_1;
 
+export type DoctrineFunctionalProfileRecordValidationResultV0_1 = Readonly<{
+  ok: boolean;
+  schemaVersion: typeof DOCTRINE_FUNCTIONAL_PROFILE_SCHEMA_V0_1;
+  reasonCodes: readonly DoctrineFunctionalProfileReasonCodeV0_1[];
+}>;
+
 type RecordV0_1 = Record<string, unknown>;
 
 function isRecordV0_1(value: unknown): value is RecordV0_1 {
@@ -786,6 +827,54 @@ function isKnownValueV0_1<T extends string>(
   return typeof value === "string" && values.has(value);
 }
 
+function hasUniqueValuesV0_1(values: readonly unknown[]): boolean {
+  return new Set(values).size === values.length;
+}
+
+function hasExactStringSequenceV0_1(
+  value: unknown,
+  expected: readonly string[],
+): boolean {
+  return (
+    Array.isArray(value) &&
+    value.length === expected.length &&
+    value.every((entry, index) => entry === expected[index])
+  );
+}
+
+function sourceRefIdentityV0_1(
+  value: DoctrineFunctionalProfileSourceRefV0_1,
+): string {
+  return `${value.sourceId}\u0000${value.locator}`;
+}
+
+function sourceRefsEqualV0_1(
+  left: readonly DoctrineFunctionalProfileSourceRefV0_1[],
+  right: readonly DoctrineFunctionalProfileSourceRefV0_1[],
+): boolean {
+  return (
+    left.length === right.length &&
+    left.every((sourceRef, index) => {
+      const expected = right[index];
+      return (
+        sourceRef.sourceId === expected.sourceId &&
+        sourceRef.locator === expected.locator &&
+        sourceRef.sourceKind === expected.sourceKind &&
+        sourceRef.sourceStatus === expected.sourceStatus &&
+        sourceRef.engineAuthority === expected.engineAuthority
+      );
+    })
+  );
+}
+
+function isAdmittedSourceRefV0_1(value: RecordV0_1): boolean {
+  return ADMITTED_SOURCE_REFS_V0_1.some(
+    (sourceRef) =>
+      sourceRef.sourceId === value.sourceId &&
+      sourceRef.locator === value.locator,
+  );
+}
+
 function isSourceRefV0_1(value: unknown): value is DoctrineFunctionalProfileSourceRefV0_1 {
   if (!isRecordV0_1(value)) return false;
   return (
@@ -801,6 +890,7 @@ function isSourceRefV0_1(value: unknown): value is DoctrineFunctionalProfileSour
       AUTHOR_SOURCE_IDS_V0_1,
     ) &&
     nonEmptyStringV0_1(value.locator) &&
+    isAdmittedSourceRefV0_1(value) &&
     value.sourceKind === DOCTRINE_FUNCTIONAL_PROFILE_SOURCE_KIND_V0_1 &&
     value.sourceStatus === DOCTRINE_FUNCTIONAL_PROFILE_SOURCE_STATUS_V0_1 &&
     value.engineAuthority ===
@@ -812,7 +902,8 @@ function sourceRefsValidV0_1(value: unknown): value is readonly DoctrineFunction
   return (
     Array.isArray(value) &&
     value.length > 0 &&
-    value.every(isSourceRefV0_1)
+    value.every(isSourceRefV0_1) &&
+    hasUniqueValuesV0_1(value.map((sourceRef) => sourceRefIdentityV0_1(sourceRef)))
   );
 }
 
@@ -821,6 +912,31 @@ function hasOnlyKnownKeysV0_1(
   keys: readonly string[],
 ): boolean {
   return Object.keys(value).every((key) => keys.includes(key));
+}
+
+function isCanonicalFunctionalPropertyForVoiceV0_1(
+  voice: SevenVoiceKey,
+  value: DoctrineFunctionalProfileDatumV0_1,
+): boolean {
+  return SEVEN_VOICE_DOCTRINE_PROFILES_V0_1[voice].functionalProperties.some(
+    (expected) =>
+      expected.id === value.id &&
+      expected.sourceClass === value.sourceClass &&
+      expected.normalizationStatus === value.normalizationStatus &&
+      sourceRefsEqualV0_1(value.sourceRefs, expected.sourceRefs),
+  );
+}
+
+function isCanonicalPrincipleForVoiceV0_1(
+  voice: SevenVoiceKey,
+  value: DoctrineFunctionalProfilePrincipleV0_1,
+): boolean {
+  const expected =
+    SEVEN_VOICE_DOCTRINE_PROFILES_V0_1[voice].principleAssociation;
+  return (
+    value.label === expected.label &&
+    sourceRefsEqualV0_1(value.sourceRefs, expected.sourceRefs)
+  );
 }
 
 function isFunctionalPropertyDatumV0_1(
@@ -866,6 +982,102 @@ function isPrincipleV0_1(value: unknown): value is DoctrineFunctionalProfilePrin
   );
 }
 
+function isRelationRecordV0_1(value: unknown): value is DoctrineFunctionalProfileRelationV0_1 {
+  if (!isRecordV0_1(value)) return false;
+  if (
+    !hasOnlyKnownKeysV0_1(value, [
+      "relationId",
+      "subject",
+      "relatedVoices",
+      "relationType",
+      "directionality",
+      "sourceRefs",
+      "sourceClass",
+      "normalizationStatus",
+    ]) ||
+    !isKnownValueV0_1<DoctrineFunctionalProfileRelationIdV0_1>(
+      value.relationId,
+      RELATION_IDS_V0_1,
+    )
+  ) {
+    return false;
+  }
+
+  const expected = PROFILE_RELATIONS_V0_1[value.relationId];
+  if (
+    value.subject !== expected.subject ||
+    !hasExactStringSequenceV0_1(value.relatedVoices, expected.relatedVoices) ||
+    value.relationType !== expected.relationType ||
+    value.directionality !== expected.directionality ||
+    value.sourceClass !== "EXPLICIT_DOCTRINE" ||
+    value.normalizationStatus !==
+      DOCTRINE_FUNCTIONAL_PROFILE_NORMALIZATION_STATUS_V0_1 ||
+    !sourceRefsValidV0_1(value.sourceRefs)
+  ) {
+    return false;
+  }
+
+  return sourceRefsEqualV0_1(value.sourceRefs, expected.sourceRefs);
+}
+
+function isTensionRecordV0_1(value: unknown): value is DoctrineFunctionalProfileTensionV0_1 {
+  if (!isRecordV0_1(value)) return false;
+  if (
+    !hasOnlyKnownKeysV0_1(value, [
+      "tensionId",
+      "affectedVoices",
+      "dimension",
+      "competingClaims",
+      "status",
+      "noSingleWinner",
+    ]) ||
+    value.tensionId !== FREQUENCY_TENSION_ID_V0_1 ||
+    !hasExactStringSequenceV0_1(value.affectedVoices, symbolicMathOrder) ||
+    value.dimension !== "frequency_or_level_association" ||
+    value.status !== "UNRESOLVED_OR_CONFLICTING" ||
+    value.noSingleWinner !== true ||
+    !Array.isArray(value.competingClaims) ||
+    value.competingClaims.length !== FREQUENCY_TENSION_V0_1.competingClaims.length
+  ) {
+    return false;
+  }
+
+  return value.competingClaims.every((claim, index) => {
+    if (!isRecordV0_1(claim)) return false;
+    const expected = FREQUENCY_TENSION_V0_1.competingClaims[index];
+    if (
+      !hasOnlyKnownKeysV0_1(claim, ["claimId", "sourceRefs"]) ||
+      claim.claimId !== expected.claimId ||
+      !sourceRefsValidV0_1(claim.sourceRefs)
+    ) {
+      return false;
+    }
+    return sourceRefsEqualV0_1(claim.sourceRefs, expected.sourceRefs);
+  });
+}
+
+export function validateSevenVoiceDoctrineProfileRelationV0_1(
+  value: unknown,
+): DoctrineFunctionalProfileRecordValidationResultV0_1 {
+  const ok = isRelationRecordV0_1(value);
+  return {
+    ok,
+    schemaVersion: DOCTRINE_FUNCTIONAL_PROFILE_SCHEMA_V0_1,
+    reasonCodes: ok ? [] : ["RELATION_RECORD_INVALID"],
+  };
+}
+
+export function validateSevenVoiceDoctrineProfileTensionV0_1(
+  value: unknown,
+): DoctrineFunctionalProfileRecordValidationResultV0_1 {
+  const ok = isTensionRecordV0_1(value);
+  return {
+    ok,
+    schemaVersion: DOCTRINE_FUNCTIONAL_PROFILE_SCHEMA_V0_1,
+    reasonCodes: ok ? [] : ["TENSION_RECORD_INVALID"],
+  };
+}
+
 function isClaimBoundaryV0_1(value: unknown): value is DoctrineFunctionalProfileClaimBoundaryV0_1 {
   if (!isRecordV0_1(value)) return false;
   return (
@@ -904,6 +1116,7 @@ export function validateSevenVoiceDoctrineFunctionalProfileV0_1(
     "schemaVersion",
     "engineAuthority",
     "normalizationStatus",
+    "profileCompleteness",
     "truthClassification",
     "voice",
     "functionalProperties",
@@ -940,30 +1153,58 @@ export function validateSevenVoiceDoctrineFunctionalProfileV0_1(
   ) {
     reasonCodes.push("NORMALIZATION_STATUS_INVALID");
   }
+  if (
+    value.profileCompleteness !==
+    DOCTRINE_FUNCTIONAL_PROFILE_COMPLETENESS_V0_1
+  ) {
+    reasonCodes.push("PROFILE_COMPLETENESS_INVALID");
+  }
   if (value.truthClassification !== DOCTRINE_FUNCTIONAL_PROFILE_TRUTH_CLASSIFICATION_V0_1) {
     reasonCodes.push("TRUTH_CLASSIFICATION_INVALID");
   }
-  if (typeof value.voice !== "string" || !isSevenVoiceKey(value.voice)) {
+  const canonicalVoice =
+    typeof value.voice === "string" && isSevenVoiceKey(value.voice)
+      ? value.voice
+      : null;
+  const canonicalProfile = canonicalVoice
+    ? SEVEN_VOICE_DOCTRINE_PROFILES_V0_1[canonicalVoice]
+    : null;
+  if (!canonicalVoice) {
     reasonCodes.push("VOICE_INVALID");
   }
   if (
     !Array.isArray(value.functionalProperties) ||
     value.functionalProperties.length === 0 ||
-    !value.functionalProperties.every(isFunctionalPropertyDatumV0_1)
+    !value.functionalProperties.every(isFunctionalPropertyDatumV0_1) ||
+    !hasUniqueValuesV0_1(
+      value.functionalProperties.map((property) => property.id),
+    ) ||
+    (canonicalVoice !== null &&
+      !value.functionalProperties.every((property) =>
+        isCanonicalFunctionalPropertyForVoiceV0_1(canonicalVoice, property),
+      ))
   ) {
     reasonCodes.push("FUNCTIONAL_PROPERTIES_INVALID");
   }
-  if (!isPrincipleV0_1(value.principleAssociation)) {
+  if (
+    !isPrincipleV0_1(value.principleAssociation) ||
+    (canonicalVoice !== null &&
+      (!isCanonicalPrincipleForVoiceV0_1(
+        canonicalVoice,
+        value.principleAssociation,
+      ) ||
+        value.principleAssociation.label !==
+          PRINCIPLE_ASSOCIATION_BY_VOICE_V0_1[canonicalVoice]))
+  ) {
     reasonCodes.push("PRINCIPLE_ASSOCIATION_INVALID");
   }
   if (
     !Array.isArray(value.relationalPropertyIds) ||
-    !value.relationalPropertyIds.every((relationId) =>
-      isKnownValueV0_1<DoctrineFunctionalProfileRelationIdV0_1>(
-        relationId,
-        RELATION_IDS_V0_1,
-      ),
-    )
+    (canonicalVoice !== null &&
+      !hasExactStringSequenceV0_1(
+        value.relationalPropertyIds,
+        RELATIONAL_PROPERTY_IDS_BY_VOICE_V0_1[canonicalVoice],
+      ))
   ) {
     reasonCodes.push("RELATIONAL_PROPERTIES_INVALID");
   }
@@ -981,6 +1222,20 @@ export function validateSevenVoiceDoctrineFunctionalProfileV0_1(
     !Array.isArray(symbolicMetadata.frequencyTensionIds) ||
     symbolicMetadata.frequencyTensionIds.length !== 1 ||
     symbolicMetadata.frequencyTensionIds[0] !== FREQUENCY_TENSION_ID_V0_1
+  ) {
+    reasonCodes.push("SYMBOLIC_METADATA_INVALID");
+  }
+  if (
+    canonicalProfile !== null &&
+    isRecordV0_1(symbolicMetadata) &&
+    isRecordV0_1(symbolicMetadata.color) &&
+    sourceRefsValidV0_1(symbolicMetadata.color.sourceRefs) &&
+    (symbolicMetadata.color.value !==
+      canonicalProfile.symbolicMetadata.color.value ||
+      !sourceRefsEqualV0_1(
+        symbolicMetadata.color.sourceRefs,
+        canonicalProfile.symbolicMetadata.color.sourceRefs,
+      ))
   ) {
     reasonCodes.push("SYMBOLIC_METADATA_INVALID");
   }

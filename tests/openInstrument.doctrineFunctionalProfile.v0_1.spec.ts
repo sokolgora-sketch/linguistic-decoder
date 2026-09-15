@@ -1,5 +1,6 @@
 import {
   DOCTRINE_FUNCTIONAL_PROFILE_ENGINE_AUTHORITY_V0_1,
+  DOCTRINE_FUNCTIONAL_PROFILE_COMPLETENESS_V0_1,
   DOCTRINE_FUNCTIONAL_PROFILE_SCHEMA_V0_1,
   DOCTRINE_FUNCTIONAL_PROFILE_SOURCE_ENGINE_AUTHORITY_V0_1,
   DOCTRINE_FUNCTIONAL_PROFILE_SOURCE_KIND_V0_1,
@@ -8,6 +9,8 @@ import {
   SEVEN_VOICE_DOCTRINE_PROFILE_RELATIONS_V0_1,
   SEVEN_VOICE_DOCTRINE_PROFILE_TENSIONS_V0_1,
   SEVEN_VOICE_DOCTRINE_PROFILES_V0_1,
+  validateSevenVoiceDoctrineProfileRelationV0_1,
+  validateSevenVoiceDoctrineProfileTensionV0_1,
   getSevenVoiceDoctrineFunctionalProfileV0_1,
   validateSevenVoiceDoctrineFunctionalProfileV0_1,
   validateSevenVoiceDoctrineProfilesV0_1,
@@ -38,6 +41,7 @@ describe("Open Instrument Seven Voices doctrine functional profile v0.1", () => 
     expect(profile).toMatchObject({
       schemaVersion: DOCTRINE_FUNCTIONAL_PROFILE_SCHEMA_V0_1,
       engineAuthority: DOCTRINE_FUNCTIONAL_PROFILE_ENGINE_AUTHORITY_V0_1,
+      profileCompleteness: DOCTRINE_FUNCTIONAL_PROFILE_COMPLETENESS_V0_1,
       truthClassification: DOCTRINE_FUNCTIONAL_PROFILE_TRUTH_CLASSIFICATION_V0_1,
       userDecisionPosture: "user_decides",
       noSingleWinner: true,
@@ -256,7 +260,10 @@ describe("Open Instrument Seven Voices doctrine functional profile v0.1", () => 
       false,
     );
     expect(validateSevenVoiceDoctrineProfilesV0_1(swapped).reasonCodes).toEqual([
-      "VOICE_INVALID",
+      "FUNCTIONAL_PROPERTIES_INVALID",
+      "PRINCIPLE_ASSOCIATION_INVALID",
+      "RELATIONAL_PROPERTIES_INVALID",
+      "SYMBOLIC_METADATA_INVALID",
     ]);
   });
 
@@ -298,5 +305,189 @@ describe("Open Instrument Seven Voices doctrine functional profile v0.1", () => 
         "PATH_COMPOSITION_FIELD_PRESENT",
       ],
     });
+  });
+
+  test("marks every profile as non-semantically exhaustive", () => {
+    expect(
+      Object.values(SEVEN_VOICE_DOCTRINE_PROFILES_V0_1).every(
+        (profile) =>
+          profile.profileCompleteness ===
+          DOCTRINE_FUNCTIONAL_PROFILE_COMPLETENESS_V0_1,
+      ),
+    ).toBe(true);
+
+    const { profileCompleteness: _missing, ...missing } =
+      SEVEN_VOICE_DOCTRINE_PROFILES_V0_1.A;
+    const wrong = {
+      ...SEVEN_VOICE_DOCTRINE_PROFILES_V0_1.A,
+      profileCompleteness: "SEMANTICALLY_EXHAUSTIVE",
+    };
+
+    expect(validateSevenVoiceDoctrineFunctionalProfileV0_1(missing).ok).toBe(false);
+    expect(validateSevenVoiceDoctrineFunctionalProfileV0_1(wrong).ok).toBe(false);
+  });
+
+  test("enforces the canonical Voice-to-principle mapping", () => {
+    const malformed = {
+      ...SEVEN_VOICE_DOCTRINE_PROFILES_V0_1.A,
+      principleAssociation: {
+        ...SEVEN_VOICE_DOCTRINE_PROFILES_V0_1.A.principleAssociation,
+        label: "Vibrimi",
+      },
+    };
+
+    expect(validateSevenVoiceDoctrineFunctionalProfileV0_1(malformed).ok).toBe(false);
+  });
+
+  test("enforces relation membership by Voice and relation invariants", () => {
+    const wrongVoice = {
+      ...SEVEN_VOICE_DOCTRINE_PROFILES_V0_1.A,
+      relationalPropertyIds: ["o-high-low-mediation"],
+    };
+    const malformedRelation = {
+      ...SEVEN_VOICE_DOCTRINE_PROFILE_RELATIONS_V0_1[
+        "o-high-low-mediation"
+      ],
+      subject: "A",
+    };
+
+    expect(validateSevenVoiceDoctrineFunctionalProfileV0_1(wrongVoice).ok).toBe(
+      false,
+    );
+    expect(
+      validateSevenVoiceDoctrineProfileRelationV0_1(
+        SEVEN_VOICE_DOCTRINE_PROFILE_RELATIONS_V0_1[
+          "o-high-low-mediation"
+        ],
+      ).ok,
+    ).toBe(true);
+    expect(validateSevenVoiceDoctrineProfileRelationV0_1(malformedRelation).ok).toBe(
+      false,
+    );
+  });
+
+  test("admits only registered source references and rejects duplicates", () => {
+    const sourceRef =
+      SEVEN_VOICE_DOCTRINE_PROFILES_V0_1.A.functionalProperties[0]
+        .sourceRefs[0];
+    const property = SEVEN_VOICE_DOCTRINE_PROFILES_V0_1.A.functionalProperties[0];
+    const arbitraryLocator = {
+      ...property,
+      sourceRefs: [{ ...sourceRef, locator: "arbitrary" }],
+    };
+    const unknownSourceId = {
+      ...property,
+      sourceRefs: [
+        { ...sourceRef, sourceId: "seven-voices.author-source.unknown.sq" },
+      ],
+    };
+    const duplicateRefs = {
+      ...property,
+      sourceRefs: [sourceRef, sourceRef],
+    };
+    const unrelatedRegisteredRef = {
+      ...property,
+      sourceRefs: [
+        SEVEN_VOICE_DOCTRINE_PROFILES_V0_1.E.functionalProperties[0]
+          .sourceRefs[0],
+      ],
+    };
+
+    for (const malformedProperty of [
+      arbitraryLocator,
+      unknownSourceId,
+      duplicateRefs,
+      unrelatedRegisteredRef,
+    ]) {
+      expect(
+        validateSevenVoiceDoctrineFunctionalProfileV0_1({
+          ...SEVEN_VOICE_DOCTRINE_PROFILES_V0_1.A,
+          functionalProperties: [malformedProperty],
+        }).ok,
+      ).toBe(false);
+    }
+  });
+
+  test("rejects duplicate functional properties, relations, and tensions", () => {
+    const profile = SEVEN_VOICE_DOCTRINE_PROFILES_V0_1.O;
+    const duplicateProperty = {
+      ...SEVEN_VOICE_DOCTRINE_PROFILES_V0_1.A,
+      functionalProperties: [
+        ...SEVEN_VOICE_DOCTRINE_PROFILES_V0_1.A.functionalProperties,
+        SEVEN_VOICE_DOCTRINE_PROFILES_V0_1.A.functionalProperties[0],
+      ],
+    };
+    const duplicateRelation = {
+      ...profile,
+      relationalPropertyIds: [
+        ...profile.relationalPropertyIds,
+        profile.relationalPropertyIds[0],
+      ],
+    };
+    const duplicateTension = {
+      ...SEVEN_VOICE_DOCTRINE_PROFILES_V0_1.A,
+      unresolvedTensionIds: [
+        "seven-voices.frequency-grouping.v0_1",
+        "seven-voices.frequency-grouping.v0_1",
+      ],
+    };
+
+    expect(validateSevenVoiceDoctrineFunctionalProfileV0_1(duplicateProperty).ok).toBe(
+      false,
+    );
+    expect(validateSevenVoiceDoctrineFunctionalProfileV0_1(duplicateRelation).ok).toBe(
+      false,
+    );
+    expect(validateSevenVoiceDoctrineFunctionalProfileV0_1(duplicateTension).ok).toBe(
+      false,
+    );
+  });
+
+  test("validates tensions independently and rejects winner selection", () => {
+    const tension = SEVEN_VOICE_DOCTRINE_PROFILE_TENSIONS_V0_1[0];
+    const noWinner = {
+      ...tension,
+      noSingleWinner: false,
+    };
+    const malformedStatus = {
+      ...tension,
+      status: "RESOLVED",
+    };
+    const malformedVoices = {
+      ...tension,
+      affectedVoices: ["A", "E"],
+    };
+
+    expect(validateSevenVoiceDoctrineProfileTensionV0_1(tension).ok).toBe(true);
+    expect(validateSevenVoiceDoctrineProfileTensionV0_1(noWinner).ok).toBe(false);
+    expect(validateSevenVoiceDoctrineProfileTensionV0_1(malformedStatus).ok).toBe(
+      false,
+    );
+    expect(validateSevenVoiceDoctrineProfileTensionV0_1(malformedVoices).ok).toBe(
+      false,
+    );
+  });
+
+  test("freezes source-reference leaves and resists mutation", () => {
+    const sourceRef =
+      SEVEN_VOICE_DOCTRINE_PROFILES_V0_1.A.functionalProperties[0]
+        .sourceRefs[0];
+    const claimSourceRef =
+      SEVEN_VOICE_DOCTRINE_PROFILE_TENSIONS_V0_1[0].competingClaims[0]
+        .sourceRefs[0];
+    const originalLocator = sourceRef.locator;
+
+    expect(Object.isFrozen(sourceRef)).toBe(true);
+    expect(Object.isFrozen(claimSourceRef)).toBe(true);
+    try {
+      (sourceRef as { locator: string }).locator = "arbitrary";
+    } catch {
+      // Frozen data may throw in strict mode; either result must preserve it.
+    }
+    expect(sourceRef.locator).toBe(originalLocator);
+    expect(
+      getSevenVoiceDoctrineFunctionalProfileV0_1("A")?.functionalProperties[0]
+        .sourceRefs[0].locator,
+    ).toBe(originalLocator);
   });
 });
