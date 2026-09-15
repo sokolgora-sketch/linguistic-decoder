@@ -194,8 +194,11 @@ export type ComparativeRepeatabilityRecordV0_1 = Readonly<{
   modelId: ComparativeModelIdV0_1;
   voicePath: readonly SevenVoiceKey[];
   representationFingerprint: string;
+  repeatedRepresentationFingerprint: string;
   provenanceRefs: readonly string[];
+  repeatedProvenanceRefs: readonly string[];
   modelOutput: "MODEL_EMITTED_NULL" | "MODEL_EMITTED_NON_NULL";
+  repeatedModelOutput: "MODEL_EMITTED_NULL" | "MODEL_EMITTED_NON_NULL";
   serializedInputFingerprint: string;
   repeatedSerializedInputFingerprint: string;
   stable: boolean;
@@ -577,6 +580,7 @@ export function buildComparativeModelRepresentationV0_1(
 function validateNullAssessmentV0_1(
   value: unknown,
   modelOutput: ComparativeModelJudgmentV0_1["modelOutput"],
+  circularity: ComparativeCircularityStatusV0_1,
 ): boolean {
   if (
     !isRecordV0_1(value) ||
@@ -602,6 +606,13 @@ function validateNullAssessmentV0_1(
       value.expectedOutcomeProvenance,
       PROVENANCE_SET_V0_1,
     )
+  ) {
+    return false;
+  }
+  if (
+    value.expectedOutcome !== "UNKNOWN_EXPECTED_NULLNESS" &&
+    (value.expectedOutcomeProvenance !== "INDEPENDENT" ||
+      circularity !== "INDEPENDENT_SIGNAL")
   ) {
     return false;
   }
@@ -690,7 +701,13 @@ function validateModelJudgmentV0_1(value: unknown): boolean {
   if (value.modelOutput === "MODEL_EMITTED_NON_NULL" && value.verdict === "NULL") {
     return false;
   }
-  if (!validateNullAssessmentV0_1(value.nullAssessment, value.modelOutput)) {
+  if (
+    !validateNullAssessmentV0_1(
+      value.nullAssessment,
+      value.modelOutput,
+      value.circularity,
+    )
+  ) {
     return false;
   }
   if (
@@ -777,8 +794,11 @@ function validateRepeatabilityV0_1(
       "modelId",
       "voicePath",
       "representationFingerprint",
+      "repeatedRepresentationFingerprint",
       "provenanceRefs",
+      "repeatedProvenanceRefs",
       "modelOutput",
+      "repeatedModelOutput",
       "serializedInputFingerprint",
       "repeatedSerializedInputFingerprint",
       "stable",
@@ -804,13 +824,21 @@ function validateRepeatabilityV0_1(
   }
   if (
     !nonEmptyStringV0_1(value.representationFingerprint) ||
-    !uniqueStringsV0_1(value.provenanceRefs)
+    !nonEmptyStringV0_1(value.repeatedRepresentationFingerprint) ||
+    !uniqueStringsV0_1(value.provenanceRefs) ||
+    !uniqueStringsV0_1(value.repeatedProvenanceRefs)
   ) {
     return false;
   }
   if (
     value.modelOutput !== "MODEL_EMITTED_NULL" &&
     value.modelOutput !== "MODEL_EMITTED_NON_NULL"
+  ) {
+    return false;
+  }
+  if (
+    value.repeatedModelOutput !== "MODEL_EMITTED_NULL" &&
+    value.repeatedModelOutput !== "MODEL_EMITTED_NON_NULL"
   ) {
     return false;
   }
@@ -823,7 +851,13 @@ function validateRepeatabilityV0_1(
   return (
     typeof value.stable === "boolean" &&
     value.stable ===
-      (value.serializedInputFingerprint === value.repeatedSerializedInputFingerprint)
+      (value.serializedInputFingerprint ===
+        value.repeatedSerializedInputFingerprint &&
+        value.representationFingerprint ===
+          value.repeatedRepresentationFingerprint &&
+        JSON.stringify(value.provenanceRefs) ===
+          JSON.stringify(value.repeatedProvenanceRefs) &&
+        value.modelOutput === value.repeatedModelOutput)
   );
 }
 
@@ -1237,7 +1271,10 @@ export function calculateUnsupportedRateMetricV0_1(
   cases: readonly ComparativeEvaluationCaseV0_1[],
   modelId: ComparativeModelIdV0_1,
 ): ComparativeRateMetricV0_1 {
-  const judgments = judgmentsForModelV0_1(cases, modelId);
+  const judgments = judgmentsForModelV0_1(
+    cases.filter((item) => item.evaluationEligibility === "ELIGIBLE"),
+    modelId,
+  );
   const scored = judgments.filter((item) => scoreableVerdictV0_1(item.verdict));
   const numerator = scored.filter((item) => item.verdict === "UNSUPPORTED").length;
   return {

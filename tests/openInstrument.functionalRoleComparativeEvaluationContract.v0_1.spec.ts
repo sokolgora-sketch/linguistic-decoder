@@ -272,6 +272,122 @@ describe("Open Instrument comparative functional-role evaluation contract v0.1",
     });
   });
 
+  test("requires deterministic repeated representation and output identity", () => {
+    const repeatability = {
+      caseId: "case.one",
+      modelId: "FUNCTIONAL_ROLE_F",
+      voicePath: ["A"] as const,
+      representationFingerprint: "role:A",
+      repeatedRepresentationFingerprint: "role:A",
+      provenanceRefs: ["sevenPrinciples.v1:A"],
+      repeatedProvenanceRefs: ["sevenPrinciples.v1:A"],
+      modelOutput: "MODEL_EMITTED_NON_NULL" as const,
+      repeatedModelOutput: "MODEL_EMITTED_NON_NULL" as const,
+      serializedInputFingerprint: "input:one",
+      repeatedSerializedInputFingerprint: "input:one",
+      stable: true,
+    };
+    expect(
+      validateComparativeEvaluationCaseV0_1(
+        baseCase({ repeatability: [repeatability] }),
+      ).ok,
+    ).toBe(true);
+
+    expect(
+      validateComparativeEvaluationCaseV0_1(
+        baseCase({
+          repeatability: [
+            { ...repeatability, repeatedRepresentationFingerprint: "role:B", stable: true },
+          ],
+        }),
+      ).ok,
+    ).toBe(false);
+    expect(
+      validateComparativeEvaluationCaseV0_1(
+        baseCase({
+          repeatability: [
+            { ...repeatability, repeatedProvenanceRefs: ["sevenPrinciples.v1:B"], stable: true },
+          ],
+        }),
+      ).ok,
+    ).toBe(false);
+    expect(
+      validateComparativeEvaluationCaseV0_1(
+        baseCase({
+          repeatability: [
+            { ...repeatability, repeatedModelOutput: "MODEL_EMITTED_NULL", stable: true },
+          ],
+        }),
+      ).ok,
+    ).toBe(false);
+
+    expect(
+      validateComparativeEvaluationCaseV0_1(
+        baseCase({
+          repeatability: [repeatability],
+          modelJudgments: [judgment("FUNCTIONAL_ROLE_F", { verdict: "UNKNOWN" })],
+        }),
+      ).ok,
+    ).toBe(true);
+  });
+
+  test("requires independent, non-circular provenance for independent Null expectations", () => {
+    const independentNullCase = (
+      caseId: string,
+      overrides: Partial<ComparativeModelJudgmentV0_1> = {},
+    ) =>
+      baseCase({
+        caseId,
+        modelJudgments: [
+          judgment("FUNCTIONAL_ROLE_F", {
+            modelOutput: "MODEL_EMITTED_NULL",
+            verdict: "NULL",
+            nullAssessment: {
+              modelOutcome: "MODEL_EMITTED_NULL",
+              expectedOutcome: "INDEPENDENTLY_EXPECTED_NULL",
+              expectedOutcomeProvenance: "INDEPENDENT",
+              classification: "CORRECT_NULL",
+            },
+            ...overrides,
+          }),
+        ],
+      });
+
+    expect(validateComparativeEvaluationCaseV0_1(independentNullCase("positive")).ok).toBe(
+      true,
+    );
+    for (const [caseId, overrides] of [
+      ["fixture", { nullAssessment: { modelOutcome: "MODEL_EMITTED_NULL", expectedOutcome: "INDEPENDENTLY_EXPECTED_NULL", expectedOutcomeProvenance: "FIXTURE_AUTHORED", classification: "CORRECT_NULL" } }],
+      ["canonical", { nullAssessment: { modelOutcome: "MODEL_EMITTED_NULL", expectedOutcome: "INDEPENDENTLY_EXPECTED_NULL", expectedOutcomeProvenance: "CANONICAL_AUTHORED", classification: "CORRECT_NULL" } }],
+      ["synthetic", { evaluatorKind: "SYNTHETIC_MODEL", provenance: "SYNTHETIC", circularity: "UNKNOWN" }],
+      ["unknown", { nullAssessment: { modelOutcome: "MODEL_EMITTED_NULL", expectedOutcome: "INDEPENDENTLY_EXPECTED_NULL", expectedOutcomeProvenance: "UNKNOWN", classification: "CORRECT_NULL" } }],
+      ["circular", { circularity: "CIRCULAR" }],
+      ["partially-circular", { circularity: "PARTIALLY_CIRCULAR" }],
+    ] as const) {
+      expect(validateComparativeEvaluationCaseV0_1(independentNullCase(caseId, overrides)).ok).toBe(
+        false,
+      );
+    }
+    expect(
+      validateComparativeEvaluationCaseV0_1(
+        baseCase({
+          modelJudgments: [
+            judgment("FUNCTIONAL_ROLE_F", {
+              modelOutput: "MODEL_EMITTED_NULL",
+              verdict: "NULL",
+              nullAssessment: {
+                modelOutcome: "MODEL_EMITTED_NULL",
+                expectedOutcome: "UNKNOWN_EXPECTED_NULLNESS",
+                expectedOutcomeProvenance: "UNKNOWN",
+                classification: "UNKNOWN_NULL_CORRECTNESS",
+              },
+            }),
+          ],
+        }),
+      ).ok,
+    ).toBe(true);
+  });
+
   test("keeps provenance and circularity distributions visible", () => {
     const cases = [
       baseCase({
@@ -341,6 +457,33 @@ describe("Open Instrument comparative functional-role evaluation contract v0.1",
           judgment("FUNCTIONAL_ROLE_F", { verdict: "UNKNOWN" }),
         ],
       }),
+      baseCase({
+        caseId: "ineligible-unsupported",
+        evaluationEligibility: "INELIGIBLE",
+        modelJudgments: [
+          judgment("FUNCTIONAL_ROLE_F", { verdict: "UNSUPPORTED" }),
+        ],
+      }),
+      baseCase({
+        caseId: "ineligible-supported",
+        evaluationEligibility: "INELIGIBLE",
+        modelJudgments: [judgment("FUNCTIONAL_ROLE_F")],
+      }),
+      baseCase({
+        caseId: "eligible-null",
+        modelJudgments: [
+          judgment("FUNCTIONAL_ROLE_F", {
+            modelOutput: "MODEL_EMITTED_NULL",
+            verdict: "NULL",
+            nullAssessment: {
+              modelOutcome: "MODEL_EMITTED_NULL",
+              expectedOutcome: "UNKNOWN_EXPECTED_NULLNESS",
+              expectedOutcomeProvenance: "UNKNOWN",
+              classification: "UNKNOWN_NULL_CORRECTNESS",
+            },
+          }),
+        ],
+      }),
     ];
     expect(
       calculateUnsupportedRateMetricV0_1(cases, "FUNCTIONAL_ROLE_F"),
@@ -349,7 +492,7 @@ describe("Open Instrument comparative functional-role evaluation contract v0.1",
       denominator: 2,
       rate: 0.5,
       unknownCount: 1,
-      nullCount: 0,
+      nullCount: 1,
     });
     expect(
       calculateFunctionalExplanatorySupportMetricV0_1(
