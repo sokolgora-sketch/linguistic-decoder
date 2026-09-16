@@ -109,6 +109,17 @@ const ADMISSIBLE_EMBRYO_RELATIONS_V1 = new Set<EmbryoSourceRelationV0_1>([
   "semantic_resemblance",
 ]);
 
+const ADMISSIBLE_EVIDENCE_FAMILIES_V1 = new Set<MultiSourceEvidenceFamilyV0_1>([
+  "lexical_dictionary",
+  "dialect_lexicon",
+  "etymological_dictionary",
+  "historical_dictionary",
+  "corpus",
+  "scholarly_paper",
+  "reconstructed_lexicon",
+  "other",
+]);
+
 function compareTextV1(left: string, right: string): number {
   if (left < right) return -1;
   if (left > right) return 1;
@@ -128,6 +139,12 @@ function isResearchSourceStatusV1(
   value: unknown,
 ): value is MultiSourceFunctionalResearchSourceStatusV0_1 {
   return value === "research_candidate" || value === "reviewed_candidate";
+}
+
+function isEvidenceFamilyV1(
+  value: unknown,
+): value is MultiSourceEvidenceFamilyV0_1 {
+  return ADMISSIBLE_EVIDENCE_FAMILIES_V1.has(value as MultiSourceEvidenceFamilyV0_1);
 }
 
 function isTruthStatusV1(value: unknown): value is MultiSourceTruthStatusV0_1 {
@@ -179,6 +196,7 @@ function sourceRecordIsValidV1(
     record.queryForm === queryForm &&
     exactTextV1(record.queryForm) &&
     exactTextV1(record.sourceId) &&
+    isEvidenceFamilyV1(record.evidenceFamily) &&
     exactTextV1(record.language) &&
     typeof record.sourceForm === "string" &&
     record.sourceForm.length > 0 &&
@@ -193,6 +211,20 @@ function sourceRecordIsValidV1(
     isTruthStatusV1(record.attestationTruth) &&
     isResearchSourceStatusV1(record.sourceStatus)
   );
+}
+
+function sourceAdapterResultIsValidV1(
+  value: unknown,
+): value is GenericFunctionalWitnessSourceAdapterResultV1 {
+  if (value === null || typeof value !== "object" || Array.isArray(value)) {
+    return false;
+  }
+
+  const result = value as Record<string, unknown>;
+  if (result.ok === false) {
+    return result.reasonCode === "SOURCE_ADAPTER_FAILURE";
+  }
+  return result.ok === true && Array.isArray(result.records);
 }
 
 function deepFreezeV1<T>(value: T, seen = new WeakSet<object>()): T {
@@ -230,12 +262,27 @@ function resultV1(
   });
 }
 
+function cloneQueryV1(
+  input: GenericFunctionalWitnessQueryV1,
+): GenericFunctionalWitnessQueryV1 {
+  return {
+    schemaVersion: input.schemaVersion,
+    embryo: input.embryo,
+    voicePath: [...input.voicePath],
+    queryNormalization: input.queryNormalization,
+  };
+}
+
+function encodeWitnessIdPartV1(value: string): string {
+  return `${value.length}:${value}`;
+}
+
 function buildWitnessV1(
   adapterId: string,
   record: GenericFunctionalWitnessSourceRecordV1,
 ): GenericFunctionalWitnessV1 {
   return {
-    witnessId: `generic-functional-witness:${adapterId}:${record.sourceId}`,
+    witnessId: `generic-functional-witness:${encodeWitnessIdPartV1(adapterId)}:${encodeWitnessIdPartV1(record.sourceId)}`,
     queryForm: record.queryForm,
     sourceId: record.sourceId,
     evidenceFamily: record.evidenceFamily,
@@ -272,6 +319,7 @@ export function queryGenericFunctionalWitnessesV1(
     });
   }
 
+  const validQuery = cloneQueryV1(input);
   const validAdapters = adapters.filter(adapterIsValidV1).sort((left, right) =>
     compareTextV1(left.adapterId, right.adapterId),
   );
@@ -280,10 +328,18 @@ export function queryGenericFunctionalWitnessesV1(
   const seenWitnessIds = new Set<string>();
 
   for (const adapter of validAdapters) {
-    let adapterResult: GenericFunctionalWitnessSourceAdapterResultV1;
+    let adapterResult: unknown;
     try {
-      adapterResult = adapter.query(input);
+      adapterResult = adapter.query(validQuery);
     } catch {
+      sourceFailures.push({
+        adapterId: adapter.adapterId,
+        reasonCode: "SOURCE_ADAPTER_FAILURE",
+      });
+      continue;
+    }
+
+    if (!sourceAdapterResultIsValidV1(adapterResult)) {
       sourceFailures.push({
         adapterId: adapter.adapterId,
         reasonCode: "SOURCE_ADAPTER_FAILURE",
@@ -299,10 +355,8 @@ export function queryGenericFunctionalWitnessesV1(
       continue;
     }
 
-    const records = [...adapterResult.records].sort((left, right) =>
-      compareTextV1(left.sourceId, right.sourceId),
-    );
-    for (const record of records) {
+    const validRecords: GenericFunctionalWitnessSourceRecordV1[] = [];
+    for (const record of adapterResult.records) {
       if (!sourceRecordIsValidV1(record, input.embryo)) {
         sourceFailures.push({
           adapterId: adapter.adapterId,
@@ -311,6 +365,13 @@ export function queryGenericFunctionalWitnessesV1(
         continue;
       }
 
+      validRecords.push(record);
+    }
+
+    const records = validRecords.sort((left, right) =>
+      compareTextV1(left.sourceId, right.sourceId),
+    );
+    for (const record of records) {
       const witness = buildWitnessV1(adapter.adapterId, record);
       if (seenWitnessIds.has(witness.witnessId)) continue;
       seenWitnessIds.add(witness.witnessId);
@@ -332,7 +393,7 @@ export function queryGenericFunctionalWitnessesV1(
         : sortedFailures.length > 0
           ? "SOURCE_FAILURE"
           : "NO_MATCHES",
-    query: input,
+    query: validQuery,
     matches,
     sourceFailures: sortedFailures,
   });

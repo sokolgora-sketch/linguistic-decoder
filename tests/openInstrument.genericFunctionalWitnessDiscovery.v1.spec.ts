@@ -197,4 +197,76 @@ describe("generic functional witness discovery v1", () => {
       ],
     });
   });
+
+  it.each([
+    ["undefined-result", () => undefined],
+    ["missing-records", () => ({ ok: true })],
+  ])("fails closed for a malformed adapter result: %s", (_adapterId, queryFn) => {
+    const result = queryGenericFunctionalWitnessesV1(query("ER"), [
+      { adapterId: _adapterId, query: queryFn },
+    ]);
+
+    expect(result).toMatchObject({
+      status: "SOURCE_FAILURE",
+      matches: [],
+      sourceFailures: [
+        { adapterId: _adapterId, reasonCode: "SOURCE_ADAPTER_FAILURE" },
+      ],
+    });
+  });
+
+  it("fails closed for a null record without sorting or dereferencing it", () => {
+    const result = queryGenericFunctionalWitnessesV1(query("ER"), [
+      {
+        adapterId: "null-record",
+        query: () => ({ ok: true as const, records: [null] }),
+      },
+    ]);
+
+    expect(result).toMatchObject({
+      status: "SOURCE_FAILURE",
+      matches: [],
+      sourceFailures: [
+        { adapterId: "null-record", reasonCode: "SOURCE_RECORD_INVALID" },
+      ],
+    });
+  });
+
+  it("rejects an unsupported evidence family before creating attestation", () => {
+    const result = queryGenericFunctionalWitnessesV1(query("ER"), [
+      adapter("invalid-family", [
+        sourceRecord({ evidenceFamily: "invented" as never }),
+      ]),
+    ]);
+
+    expect(result).toMatchObject({
+      status: "SOURCE_FAILURE",
+      matches: [],
+      sourceFailures: [
+        { adapterId: "invalid-family", reasonCode: "SOURCE_RECORD_INVALID" },
+      ],
+    });
+  });
+
+  it("does not freeze caller-owned query objects", () => {
+    const input = query("YË", ["Y", "Ë"] as const);
+    const result = queryGenericFunctionalWitnessesV1(input, [
+      adapter("fixture", [sourceRecord({ queryForm: "YË", sourceId: "fixture.yë.v0_1" })]),
+    ]);
+
+    expect(Object.isFrozen(input)).toBe(false);
+    expect(Object.isFrozen(input.voicePath)).toBe(false);
+    expect(result.query).not.toBe(input);
+    expect(result.query?.voicePath).not.toBe(input.voicePath);
+  });
+
+  it("keeps witness identities distinct when adapter and source IDs contain delimiters", () => {
+    const result = queryGenericFunctionalWitnessesV1(query("ER"), [
+      adapter("a", [sourceRecord({ sourceId: "b:c" })]),
+      adapter("a:b", [sourceRecord({ sourceId: "c" })]),
+    ]);
+
+    expect(result.matches).toHaveLength(2);
+    expect(new Set(result.matches.map((match) => match.witnessId)).size).toBe(2);
+  });
 });
