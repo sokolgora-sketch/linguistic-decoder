@@ -193,6 +193,49 @@ function readLogicDerivedFunctionalHypothesisCandidatesV0_1(
   );
 }
 
+function readGenericFunctionalHypothesisCandidatesV0_1(
+  result: UnknownRecord,
+): string[] {
+  const rows = Array.isArray(result.candidates) ? result.candidates : [];
+
+  return uniqueStrings(
+    rows.flatMap((candidate) => {
+      if (!isRecord(candidate)) return [];
+
+      const evidenceRefs = Array.isArray(candidate.evidenceRefs)
+        ? candidate.evidenceRefs
+        : [];
+      const components = Array.isArray(candidate.functionalComponents)
+        ? candidate.functionalComponents
+        : [];
+      const isGenericHypothesis =
+        candidate.claimType === "genericFunctionalHypothesis" &&
+        candidate.sourceKind ===
+          "logic_derived_generic_functional_hypothesis" &&
+        candidate.sourceStatus === "logic_derived_candidate" &&
+        candidate.truthClassification === "hypothesis" &&
+        candidate.validationOutcome === "not_evaluated" &&
+        candidate.semanticBridge === null &&
+        candidate.semanticInteraction === "NOT_AUTHORIZED" &&
+        candidate.targetBinding === "NOT_EVALUATED" &&
+        candidate.evidenceStatus === "NO_EXTERNAL_EVIDENCE" &&
+        evidenceRefs.length === 0 &&
+        components.length > 0 &&
+        candidate.userDecisionPosture === "user_decides" &&
+        candidate.noSingleWinner === true;
+
+      if (!isGenericHypothesis) return [];
+
+      const targetWord =
+        typeof candidate.targetWord === "string"
+          ? candidate.targetWord.trim()
+          : "";
+
+      return targetWord ? [targetWord] : [];
+    }),
+  );
+}
+
 function readResearchFunctionalHypothesisCandidatesV0_1(
   result: UnknownRecord,
   analyzedWord: string,
@@ -505,6 +548,13 @@ export function buildAnalysisStatusV0_1(resultValue: unknown): AnalysisStatusV0_
         )
       : [];
 
+  const genericFunctionalHypotheses =
+    resultRecord
+      ? readGenericFunctionalHypothesisCandidatesV0_1(
+          resultRecord,
+        )
+      : [];
+
   const structuralHypothesisCandidates =
     resultRecord
       ? readStructuralHypothesisCandidatesV0_1(
@@ -577,6 +627,13 @@ export function buildAnalysisStatusV0_1(resultValue: unknown): AnalysisStatusV0_
       `Logic-derived functional hypothes${logicDerivedFunctionalHypotheses.length === 1 ? "is" : "es"} available for ${logicDerivedFunctionalHypotheses.join(
         ", ",
       )}. ${logicDerivedFunctionalHypotheses.length === 1 ? "It remains" : "They remain"} a bounded hypothesis, not source-backed evidence, candidate truth, or historical-origin evidence. User decides.`;
+  } else if (genericFunctionalHypotheses.length > 0) {
+    status = "candidate_only";
+
+    summary =
+      `Generic Voice-profile hypothes${genericFunctionalHypotheses.length === 1 ? "is" : "es"} available for ${genericFunctionalHypotheses.join(
+        ", ",
+      )}. ${genericFunctionalHypotheses.length === 1 ? "It remains" : "They remain"} bounded ordered components without target meaning, external evidence, or semantic interaction. User decides.`;
   } else if (
     candidateOnlyOperators.length > 0
   ) {

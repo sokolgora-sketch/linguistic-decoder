@@ -2,6 +2,7 @@
 import type { AnalyzeWordResultV1, Alphabet, Mode } from "./analysisResult.v1";
 import type { EnginePayload, Candidate } from "@/shared/engineShape";
 import { computeMath7ForResult } from "@/engine/math7";
+import { extractSevenVowelsFromString } from "./math7.core";
 import { analyzeMind, analyzeConsonants, analyzeSymbolic } from "@/engine/mindAnalyzer";
 import { CANON_CANDIDATES } from "./canonCandidates";
 import { buildWordMatrix } from "./wordMatrix.v1";
@@ -54,6 +55,9 @@ import { projectMultiSourceFunctionalResearchWitnessesV0_1 } from "./multiSource
 import { buildDeterministicResearchWitnessFunctionalProposalV1 } from "./openInstrument/deterministicResearchWitnessFunctionalProposal.v1";
 import { buildDeterministicSourceAttestedResearchWitnessFunctionalProposalV1 } from "./openInstrument/deterministicSourceAttestedResearchWitnessFunctionalProposal.v1";
 import { buildLogicDerivedFunctionalHypothesisV0_1 } from "./openInstrument/logicDerivedFunctionalHypothesis.v0_1";
+import {
+  produceGenericFunctionalHypothesisV1,
+} from "./openInstrument/genericFunctionalHypothesisProducer.v1";
 import { verifyLogicDerivedFunctionalHypothesisV0_1 } from "./verifier/verifyLogicDerivedFunctionalHypothesis.v0_1";
 import type { SemanticAlignmentAssessmentV0_1 } from "./openInstrument/semanticAlignment.v0_1";
 
@@ -755,6 +759,88 @@ export function enginePayloadToAnalysisResult(payload: EnginePayload): AnalyzeWo
     ...projectedSourceAttestedResearchCandidatesV0_1,
   ];
 
+  // Generic doctrine hypotheses are emitted only after the evidence layers
+  // have had their normal chance to own the result. They fill the remaining
+  // structural-only gap and never compete with research or reviewed output.
+  const shouldProjectGenericFunctionalHypothesesV1 =
+    (baselineAnalysisStatusV0_1.status ===
+      "null_no_supported_candidate" ||
+      baselineAnalysisStatusV0_1.status ===
+        "structural_unreviewed") &&
+    structuralHypothesesV0_1.length > 0 &&
+    projectedResearchCandidatesV0_1.length === 0;
+
+  const genericFunctionalCandidatesV1 =
+    shouldProjectGenericFunctionalHypothesesV1
+      ? structuralHypothesesV0_1.flatMap((hypothesis) => {
+          const built = produceGenericFunctionalHypothesisV1({
+            targetWord: rootMapBasis,
+            structuralHypothesis: hypothesis,
+            voicePath: extractSevenVowelsFromString(hypothesis.embryo),
+          });
+
+          if (!built.ok) return [];
+
+          const genericHypothesis = built.hypothesis;
+          return [
+            {
+              id: `${hypothesis.hypothesisId}:generic-functional`,
+              candidateId: `${hypothesis.hypothesisId}:generic-functional`,
+              displayForm: hypothesis.embryo,
+              form: hypothesis.embryo,
+              candidateLanguage: "unknown",
+              sourceKind: genericHypothesis.sourceKind,
+              sourceStatus: "logic_derived_candidate",
+              targetWord: genericHypothesis.targetWord,
+              claimType: genericHypothesis.claimType,
+              originClaim: "not_claimed",
+              historicalRelation: "not_evaluated",
+              embryo: genericHypothesis.embryo,
+              embryoSize: hypothesis.embryoSize,
+              embryoLanguage: null,
+              isolatedStandaloneForm: null,
+              plainStandaloneGloss: null,
+              sourceNote: null,
+              segmentation: null,
+              semanticBridge: null,
+              functionalStatement: null,
+              functionalComponents: genericHypothesis.functionalComponents,
+              evidenceRefs: [],
+              expansionChain: genericHypothesis.expansionChain,
+              validationOutcome: "not_evaluated",
+              validationReasons: [],
+              rankGroup: "unresolved",
+              rankScore: 20,
+              rankReason:
+                "generic Voice-profile hypothesis; semantic interaction and target meaning remain unauthorized",
+              claimBoundary:
+                "generic Voice-profile hypothesis only; no target meaning, evidence, or semantic interaction is claimed",
+              userDecisionPosture: "user_decides",
+              noSingleWinner: true,
+              truthClassification: genericHypothesis.truthClassification,
+              targetBinding: genericHypothesis.targetBinding,
+              lexicalMeaning: genericHypothesis.lexicalMeaning,
+              evidenceStatus: genericHypothesis.evidenceStatus,
+              semanticInteraction: genericHypothesis.semanticInteraction,
+              doctrineSourceRefs: genericHypothesis.sourceRefs,
+              genericFunctionalHypothesisV1: genericHypothesis,
+            },
+          ];
+        })
+      : [];
+
+  if (genericFunctionalCandidatesV1.length > 0) {
+    const existingCandidates = Array.isArray((result as any).candidates)
+      ? (result as any).candidates
+      : [];
+
+    (result as any).candidates =
+      orderEmbryoFirstCandidatesForAnalyzeV1([
+        ...existingCandidates,
+        ...genericFunctionalCandidatesV1,
+      ]);
+  }
+
   // Research evidence outranks discovery in aggregate status, while the
   // bounded logic row remains visible for structural context.
   if (logicDerivedFunctionalCandidatesV0_1.length > 0) {
@@ -825,6 +911,7 @@ export function enginePayloadToAnalysisResult(payload: EnginePayload): AnalyzeWo
   // research/structural seam actually changed the candidate surface.
   const shouldRecomputeGapFilledStatusV0_1 =
     shouldProjectStructuralHypothesesV0_1 ||
+    genericFunctionalCandidatesV1.length > 0 ||
     logicDerivedFunctionalCandidatesV0_1.length > 0 ||
     projectedSourceAttestedResearchCandidatesV0_1
       .length > 0;
@@ -938,6 +1025,7 @@ function buildHeartSummary(payload: any, math7: any) {
 
 const EMBRYO_FIRST_CLAIM_TYPES = [
   "functionalMotivation",
+  "genericFunctionalHypothesis",
   "structuralHypothesis",
   "historicalTransmission",
   "surfaceResonance",

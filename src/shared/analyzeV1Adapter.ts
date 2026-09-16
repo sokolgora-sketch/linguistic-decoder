@@ -280,6 +280,7 @@ function adaptCandidate(rawCandidate: RawCandidate): CandidateUI {
     plainStandaloneGloss: optionalStringOrNull(rawCandidate?.plainStandaloneGloss),
     sourceNote: optionalStringOrNull(rawCandidate?.sourceNote),
     segmentation: rawCandidate?.segmentation,
+    functionalComponents: rawCandidate?.functionalComponents,
     semanticBridge: optionalStringOrNull(rawCandidate?.semanticBridge),
     expansionChain: optionalStringArray(rawCandidate?.expansionChain),
 
