@@ -17,7 +17,7 @@ This guide keeps ZË-RO honest. We stop self-deception by enforcing deterministi
 ## v1 Product Posture
 - The canonical Voices are exactly `A E I O U Y Ë`.
 - External research/evidence is a separate layer. It may support, challenge, or contextualize a doctrine-based reading, but its absence does not invalidate that reading and its outcome does not block v1 shipment.
-- Structural Null remains valid when no valid structural input exists. Evidence Null records missing or insufficient evidence and must not suppress a valid doctrine-layer reading.
+- Structural Null remains valid when no structural hypothesis survives the permitted discovery rules; invalid or missing input remains governed by the API rejection path. Evidence Null records missing or insufficient evidence and must not suppress a valid doctrine-layer reading.
 - `user_decides` and `no_single_winner` remain the decision posture; the instrument does not crown an automatic winner.
 - The Chapter-4 names `Bashkimi`, `Vibrimi`, `Ritmi`, `Balanca`, `Ndryshimi`, `Nisma`, and `Dashuria`, together with Hermetic labels, are noncanonical reference vocabulary. They do not replace current machine `PrincipleRole` values or authorize lexical evidence.
 - This product decision creates no language-authorization tier. No language or source is admitted as lexical evidence by this document alone.
