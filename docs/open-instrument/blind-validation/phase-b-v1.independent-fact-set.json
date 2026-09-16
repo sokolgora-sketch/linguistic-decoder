@@ -8,10 +8,14 @@
     "excludedSelfField": "phaseBFactSetSha256"
   },
   "protocolId": "OPEN_INSTRUMENT_BLIND_VALIDATION_PILOT_PREREGISTRATION_V1",
-  "phaseBStatus": "INDEPENDENT_FACT_SET_FROZEN",
+  "phaseBStatus": "FACT_SET_FROZEN_BEFORE_PROFILE_COMPARISON",
   "phaseARedactedViewSha256": "8c260608f6cecd07b34c49a67a536961cd7e79bfd1f5022d02e4675dd22e359c",
   "collectorBlinding": {
     "inputArtifact": "PHASE_B_REDACTED_RESEARCH_VIEW",
+    "collectorIdentity": "PHASE_B_EXTERNAL_RESEARCH_ACQUISITION_PIPELINE",
+    "phaseAOperatorIdentity": "PHASE_A_PROFILE_ASSIGNMENT_OPERATOR",
+    "phaseAOperatorServedAsPhaseBCollector": false,
+    "operatorAccessSeparation": "PASS_PHASE_A_OPERATOR_NOT_PHASE_B_COLLECTOR",
     "fullPhaseAManifestProvided": false,
     "assignedSemanticDataProvided": false,
     "doctrineTermsUsedInQueries": false,
@@ -305,5 +309,5 @@
   "invalidationCodesTriggered": [
     "INSUFFICIENT_SOURCE_COVERAGE"
   ],
-  "phaseBFactSetSha256": "a75b494e8e2613794c5e994cde5a138ce5be91e1d5b3faa62ec39520b43f8f82"
+  "phaseBFactSetSha256": "20d9ad12752518f1f80858ca54509442b90ff35a65a5eea35a82f448db04df33"
 }
