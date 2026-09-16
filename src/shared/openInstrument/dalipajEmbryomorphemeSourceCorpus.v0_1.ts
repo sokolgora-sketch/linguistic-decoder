@@ -85,6 +85,7 @@ export type DalipajEmbryomorphemeSourceCorpusReasonCodeV0_1 =
   | "CONFIDENCE_INVALID"
   | "STANDALONE_ATOMIC_STATUS_INVALID"
   | "FORBIDDEN_FIELD_PRESENT"
+  | "CANONICAL_CONTENT_INVALID"
   | "DUPLICATE_FORM";
 
 export type DalipajEmbryomorphemeSourceCorpusValidationResultV0_1 = Readonly<
@@ -187,6 +188,9 @@ export const DALIPAJ_EMBRYOMORPHEME_SOURCE_CORPUS_V0_1 = deepFreezeV0_1({
 } satisfies DalipajEmbryomorphemeSourceCorpusV0_1);
 
 const FORMS_V0_1 = new Set(["GROP", "SY", "SY-GROP"]);
+const CANONICAL_RECORDS_BY_FORM_V0_1 = new Map(
+  RECORDS_V0_1.map((record) => [record.form, record]),
+);
 const FORM_CLASSIFICATIONS_V0_1 = new Set([
   "ATOMIC_EMBRYOMORPHEME",
   "CONSTITUENT_CLAIM",
@@ -232,6 +236,38 @@ function hasForbiddenFieldV0_1(value: unknown): boolean {
 
 function hasOnlyStringsV0_1(value: unknown): value is readonly string[] {
   return Array.isArray(value) && value.every((item) => typeof item === "string");
+}
+
+function isKnownFormV0_1(
+  value: unknown,
+): value is DalipajEmbryomorphemeSourceRecordV0_1["form"] {
+  return typeof value === "string" && FORMS_V0_1.has(value);
+}
+
+function matchesCanonicalValueV0_1(actual: unknown, expected: unknown): boolean {
+  if (Array.isArray(expected)) {
+    return (
+      Array.isArray(actual) &&
+      actual.length === expected.length &&
+      expected.every((item, index) =>
+        matchesCanonicalValueV0_1(actual[index], item),
+      )
+    );
+  }
+
+  if (isRecordV0_1(expected)) {
+    if (!isRecordV0_1(actual)) return false;
+    const expectedKeys = Object.keys(expected).sort();
+    const actualKeys = Object.keys(actual).sort();
+    return (
+      JSON.stringify(actualKeys) === JSON.stringify(expectedKeys) &&
+      expectedKeys.every((key) =>
+        matchesCanonicalValueV0_1(actual[key], expected[key]),
+      )
+    );
+  }
+
+  return actual === expected;
 }
 
 function validateRecordV0_1(
@@ -298,6 +334,15 @@ function validateRecordV0_1(
   ) {
     reasons.add("ZERO_EVALUATION_STATUS_INVALID");
   }
+  if (
+    isKnownFormV0_1(value.form) &&
+    !matchesCanonicalValueV0_1(
+      value,
+      CANONICAL_RECORDS_BY_FORM_V0_1.get(value.form),
+    )
+  ) {
+    reasons.add("CANONICAL_CONTENT_INVALID");
+  }
 
   return [...reasons].sort();
 }
@@ -349,8 +394,11 @@ export function validateDalipajEmbryomorphemeSourceCorpusV0_1(
     reasons.add("RECORDS_INVALID");
   } else {
     const seenForms = new Set<string>();
-    for (const record of value.records) {
+    for (const [index, record] of value.records.entries()) {
       for (const reason of validateRecordV0_1(record)) reasons.add(reason);
+      if (!matchesCanonicalValueV0_1(record, RECORDS_V0_1[index])) {
+        reasons.add("CANONICAL_CONTENT_INVALID");
+      }
       if (isRecordV0_1(record) && typeof record.form === "string") {
         if (seenForms.has(record.form)) reasons.add("DUPLICATE_FORM");
         seenForms.add(record.form);

@@ -136,7 +136,23 @@ describe("Dalipaj embryomorpheme source corpus v0.1", () => {
 
     expect(validateDalipajEmbryomorphemeSourceCorpusV0_1(malformed)).toEqual({
       ok: false,
-      reasonCodes: ["FORBIDDEN_FIELD_PRESENT"],
+      reasonCodes: ["CANONICAL_CONTENT_INVALID", "FORBIDDEN_FIELD_PRESENT"],
+    });
+
+    const altered = {
+      ...DALIPAJ_EMBRYOMORPHEME_SOURCE_CORPUS_V0_1,
+      records: [
+        {
+          ...DALIPAJ_EMBRYOMORPHEME_SOURCE_CORPUS_V0_1.records[0],
+          sourceGloss: "altered gloss",
+        },
+        ...DALIPAJ_EMBRYOMORPHEME_SOURCE_CORPUS_V0_1.records.slice(1),
+      ],
+    };
+
+    expect(validateDalipajEmbryomorphemeSourceCorpusV0_1(altered)).toEqual({
+      ok: false,
+      reasonCodes: ["CANONICAL_CONTENT_INVALID"],
     });
   });
 });
