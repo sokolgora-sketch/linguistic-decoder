@@ -156,7 +156,7 @@ describe(
       expect(
         screen.getByText("Seven-Voices doctrinal reading"),
       ).toBeInTheDocument();
-      expect(screen.getByText("A · proposed")).toBeInTheDocument();
+      expect(screen.getByText("A · inference")).toBeInTheDocument();
       expect(screen.getByText("Evidence: None available")).toBeInTheDocument();
       expect(screen.getByText("Bounded doctrinal reading")).toBeInTheDocument();
       expect(
@@ -176,9 +176,15 @@ describe(
       render(<EmbryoExpansionContextCardV0_1 vm={vm} />);
 
       expect(screen.getByText("UI", { exact: true })).toBeInTheDocument();
-      expect(screen.getByText("U · proposed")).toBeInTheDocument();
-      expect(screen.getByText("I · proposed")).toBeInTheDocument();
+      expect(screen.getByText("U · inference")).toBeInTheDocument();
+      expect(screen.getByText("I · inference")).toBeInTheDocument();
       expect(screen.getByText("Evidence: None available")).toBeInTheDocument();
+      expect(
+        screen.queryByTestId("functional-seven-voice-alignment"),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByText(/Functional path:/),
+      ).not.toBeInTheDocument();
       expect(
         screen.queryByText("No supported functional candidate yet."),
       ).not.toBeInTheDocument();

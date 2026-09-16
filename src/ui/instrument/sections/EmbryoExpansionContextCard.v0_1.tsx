@@ -795,6 +795,7 @@ export function EmbryoExpansionContextCardV0_1({
       | "structural"
       | "partial"
       | "research"
+      | "inference"
       | "proposed";
   }> = [];
 
@@ -1054,6 +1055,7 @@ export function EmbryoExpansionContextCardV0_1({
         | "structural"
         | "partial"
         | "research"
+        | "inference"
         | "proposed" =
         emittedState ===
           "reviewed" ||
@@ -1063,6 +1065,8 @@ export function EmbryoExpansionContextCardV0_1({
           "partial" ||
         emittedState ===
           "research" ||
+        emittedState ===
+          "inference" ||
         emittedState ===
           "proposed"
           ? emittedState
@@ -1208,7 +1212,7 @@ export function EmbryoExpansionContextCardV0_1({
         <CandidateEvidenceReferences row={primaryCandidateUiRow} tone="light" />
       ) : null}
 
-      {functionalPath ? (
+      {!isGenericFunctionalCandidate && functionalPath ? (
         <div className="mt-4 font-mono text-sm text-slate-700 dark:text-slate-300">
           {`Functional path: ${functionalPath}`}
         </div>
@@ -1223,7 +1227,7 @@ export function EmbryoExpansionContextCardV0_1({
             ZË-RO Seven-Voice model
           </div>
 
-          {functionalSevenVoices.length > 0 ? (
+          {!isGenericFunctionalCandidate && functionalSevenVoices.length > 0 ? (
             <div
               data-testid="functional-seven-voice-alignment"
               className="mt-3"
