@@ -22,6 +22,16 @@ This guide keeps ZË-RO honest. We stop self-deception by enforcing deterministi
 - The Chapter-4 names `Bashkimi`, `Vibrimi`, `Ritmi`, `Balanca`, `Ndryshimi`, `Nisma`, and `Dashuria`, together with Hermetic labels, are noncanonical reference vocabulary. They do not replace current machine `PrincipleRole` values or authorize lexical evidence.
 - This product decision creates no language-authorization tier. No language or source is admitted as lexical evidence by this document alone.
 
+## Logic-First Functional Discovery Doctrine
+- Logic generates candidates. Languages provide witnesses. The Seven Voices provide the doctrinal functional lens. Evidence establishes what is externally attested. History provides context, but does not terminate functional discovery.
+- Functional discovery is embryo-first: normalize deterministically, derive the canonical Seven-Voices structure, inspect the smallest defensible structural/functional embryos first, inspect larger expansions only afterward, search for attested functional witnesses, compare correspondence, preserve competing candidates, attach provenance and truth status, and return Structural Null when no defensible structure can be produced.
+- `HISTORICAL_ETYMOLOGY` and `FUNCTIONAL_MOTIVATION` are separate claims. An accepted historical derivation is not an automatic functional winner, and a compelling functional correspondence is not proof of historical ancestry. No single source has an automatic veto over a logic-generated candidate, and no candidate becomes an automatic historical winner.
+- Functional witness discovery is dialect-aware. Relevant evidence may include Standard Albanian, Gheg/Gegë, Tosk, Arbëresh, older documented Albanian forms, other documented vernaculars, and other languages. A form being nonstandard is not sufficient to establish it as true; every external lexical claim still requires traceable evidence and provenance.
+- Albanian is an important witness source, not a predetermined winner. Other languages may provide smaller embryos, parallel or competing witnesses, older attestations, or different structural explanations. The instrument must expose relevant competition rather than create language authority tiers.
+- Search broadly, claim narrowly. Credible dialect dictionaries, historical dictionaries, regional lexicons, academic resources, corpora, archives, primary attestations, and modern or older lexical resources may be searched without promoting weak support to Fact.
+- Outputs should keep structure, doctrinal reading, functional witnesses, external evidence, historical context, claim boundaries, competing candidates, and user judgment distinguishable. Fact, Inference, Hypothesis, and Unknown/Null remain separate truth states; `user_decides` and `no_single_winner` remain mandatory.
+- This doctrine does not authorize generic path composition, historical-origin claims, lexical evidence promotion, target-sense binding, provider execution, or runtime language authorization. Structural Null and Evidence Null remain valid; Evidence Null does not suppress an otherwise valid doctrinal reading.
+
 ## Authority chain (single source of truth)
 - basis = exact string analyzed (sanitized, NFC normalized)
 - surface vowels extracted from basis (A, E, I, O, U, Y, Ë only)
