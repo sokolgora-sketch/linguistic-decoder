@@ -227,4 +227,54 @@ describe("Dalipaj expanded embryomorpheme source batch v0.1", () => {
       }),
     );
   });
+
+  test("does not serialize caller-controlled claim types", () => {
+    const malformedRecord = {
+      ...DALIPAJ_EXPANDED_EMBRYOMORPHEME_SOURCE_CORPUS_V0_1.records[0],
+      claimTypes: [1n],
+    };
+    const cyclicClaimTypes: unknown[] = [];
+    cyclicClaimTypes.push(cyclicClaimTypes);
+
+    for (const claimTypes of [malformedRecord.claimTypes, cyclicClaimTypes]) {
+      const malformed = {
+        ...DALIPAJ_EXPANDED_EMBRYOMORPHEME_SOURCE_CORPUS_V0_1,
+        records: [
+          { ...malformedRecord, claimTypes },
+          ...DALIPAJ_EXPANDED_EMBRYOMORPHEME_SOURCE_CORPUS_V0_1.records.slice(1),
+        ],
+      };
+
+      expect(
+        validateDalipajExpandedEmbryomorphemeSourceCorpusV0_1(malformed),
+      ).toEqual(
+        expect.objectContaining({
+          ok: false,
+          reasonCodes: expect.arrayContaining(["CLAIM_TYPES_INVALID"]),
+        }),
+      );
+    }
+  });
+
+  test("reports an invalid form classification explicitly", () => {
+    const malformed = {
+      ...DALIPAJ_EXPANDED_EMBRYOMORPHEME_SOURCE_CORPUS_V0_1,
+      records: [
+        {
+          ...DALIPAJ_EXPANDED_EMBRYOMORPHEME_SOURCE_CORPUS_V0_1.records[0],
+          formClassification: "CONSTITUENT_CLAIM",
+        },
+        ...DALIPAJ_EXPANDED_EMBRYOMORPHEME_SOURCE_CORPUS_V0_1.records.slice(1),
+      ],
+    };
+
+    expect(
+      validateDalipajExpandedEmbryomorphemeSourceCorpusV0_1(malformed),
+    ).toEqual(
+      expect.objectContaining({
+        ok: false,
+        reasonCodes: expect.arrayContaining(["FORM_CLASSIFICATION_INVALID"]),
+      }),
+    );
+  });
 });

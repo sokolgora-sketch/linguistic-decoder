@@ -76,6 +76,7 @@ export type DalipajExpandedEmbryomorphemeSourceCorpusReasonCodeV0_1 =
   | "FORM_INVALID"
   | "SOURCE_GLOSS_INVALID"
   | "CLAIM_TYPES_INVALID"
+  | "FORM_CLASSIFICATION_INVALID"
   | "AUTHOR_INVALID"
   | "SOURCE_TITLE_INVALID"
   | "SOURCE_URL_INVALID"
@@ -320,6 +321,14 @@ function matchesCanonicalValueV0_1(actual: unknown, expected: unknown): boolean 
   return actual === expected;
 }
 
+function matchesClaimTypesV0_1(value: unknown): boolean {
+  return (
+    Array.isArray(value) &&
+    value.length === CLAIM_TYPES_V0_1.length &&
+    value.every((claimType, index) => claimType === CLAIM_TYPES_V0_1[index])
+  );
+}
+
 function validateRecordV0_1(
   value: unknown,
 ): DalipajExpandedEmbryomorphemeSourceCorpusReasonCodeV0_1[] {
@@ -346,11 +355,11 @@ function validateRecordV0_1(
   if (typeof value.sourceGloss !== "string" || value.sourceGloss.length === 0) {
     reasons.add("SOURCE_GLOSS_INVALID");
   }
-  if (
-    !Array.isArray(value.claimTypes) ||
-    JSON.stringify(value.claimTypes) !== JSON.stringify(CLAIM_TYPES_V0_1)
-  ) {
+  if (!matchesClaimTypesV0_1(value.claimTypes)) {
     reasons.add("CLAIM_TYPES_INVALID");
+  }
+  if (value.formClassification !== "ATOMIC_EMBRYOMORPHEME") {
+    reasons.add("FORM_CLASSIFICATION_INVALID");
   }
   if (value.author !== "Agron Dalipaj") reasons.add("AUTHOR_INVALID");
   const requiredTextFields = {
