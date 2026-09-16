@@ -1,0 +1,49 @@
+{
+  "artifactType": "PHASE_B_REDACTED_RESEARCH_VIEW",
+  "artifactVersion": "v1",
+  "fingerprintMethod": {
+    "algorithm": "SHA-256",
+    "inputEncoding": "UTF-8",
+    "canonicalization": "Recursively sort object keys in Unicode code-point order; preserve array order; serialize JSON with no insignificant whitespace",
+    "excludedSelfField": "phaseBResearchViewSha256"
+  },
+  "protocolId": "OPEN_INSTRUMENT_BLIND_VALIDATION_PILOT_PREREGISTRATION_V1",
+  "view": [
+    {
+      "caseId": "phase-a-case-001",
+      "targetWord": "babas",
+      "normalizedWord": "babas",
+      "language": "en",
+      "sourceAcquisitionInstructions": "Collect independent English lexical or morphological facts for this word without consulting the full Phase-A manifest or any assigned Voice/profile information."
+    },
+    {
+      "caseId": "phase-a-case-002",
+      "targetWord": "babasu",
+      "normalizedWord": "babasu",
+      "language": "en",
+      "sourceAcquisitionInstructions": "Collect independent English lexical or morphological facts for this word without consulting the full Phase-A manifest or any assigned Voice/profile information."
+    },
+    {
+      "caseId": "phase-a-case-003",
+      "targetWord": "babbly",
+      "normalizedWord": "babbly",
+      "language": "en",
+      "sourceAcquisitionInstructions": "Collect independent English lexical or morphological facts for this word without consulting the full Phase-A manifest or any assigned Voice/profile information."
+    },
+    {
+      "caseId": "phase-a-case-004",
+      "targetWord": "babels",
+      "normalizedWord": "babels",
+      "language": "en",
+      "sourceAcquisitionInstructions": "Collect independent English lexical or morphological facts for this word without consulting the full Phase-A manifest or any assigned Voice/profile information."
+    },
+    {
+      "caseId": "phase-a-case-005",
+      "targetWord": "babery",
+      "normalizedWord": "babery",
+      "language": "en",
+      "sourceAcquisitionInstructions": "Collect independent English lexical or morphological facts for this word without consulting the full Phase-A manifest or any assigned Voice/profile information."
+    }
+  ],
+  "phaseBResearchViewSha256": "8c260608f6cecd07b34c49a67a536961cd7e79bfd1f5022d02e4675dd22e359c"
+}
