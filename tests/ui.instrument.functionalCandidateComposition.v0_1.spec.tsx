@@ -147,6 +147,57 @@ describe(
       ).not.toBeInTheDocument();
     });
 
+    it("shows a generic single-Voice doctrine reading when external evidence is absent", async () => {
+      const body = await analyzeV1("banana");
+      const vm = adaptAnalysisToTelemetryVM(body);
+
+      render(<EmbryoExpansionContextCardV0_1 vm={vm} />);
+
+      expect(
+        screen.getByText("Seven-Voices doctrinal reading"),
+      ).toBeInTheDocument();
+      expect(screen.getByText("A · proposed")).toBeInTheDocument();
+      expect(screen.getByText("Evidence: None available")).toBeInTheDocument();
+      expect(screen.getByText("Bounded doctrinal reading")).toBeInTheDocument();
+      expect(
+        screen.getByText(
+          "This reading is generated under the ZË-RO Seven-Voices framework. No external lexical evidence is currently attached.",
+        ),
+      ).toBeInTheDocument();
+      expect(
+        screen.queryByText("No supported functional candidate yet."),
+      ).not.toBeInTheDocument();
+    });
+
+    it("shows ordered bounded components for a generic multi-Voice reading", async () => {
+      const body = await analyzeV1("quiet");
+      const vm = adaptAnalysisToTelemetryVM(body);
+
+      render(<EmbryoExpansionContextCardV0_1 vm={vm} />);
+
+      expect(screen.getByText("UI", { exact: true })).toBeInTheDocument();
+      expect(screen.getByText("U · proposed")).toBeInTheDocument();
+      expect(screen.getByText("I · proposed")).toBeInTheDocument();
+      expect(screen.getByText("Evidence: None available")).toBeInTheDocument();
+      expect(
+        screen.queryByText("No supported functional candidate yet."),
+      ).not.toBeInTheDocument();
+    });
+
+    it("keeps the true Structural Null fallback when no hypothesis exists", async () => {
+      const body = await analyzeV1("xyz");
+      const vm = adaptAnalysisToTelemetryVM(body);
+
+      render(<EmbryoExpansionContextCardV0_1 vm={vm} />);
+
+      expect(
+        screen.getByText("No supported functional candidate yet."),
+      ).toBeInTheDocument();
+      expect(
+        screen.queryByText("Seven-Voices doctrinal reading"),
+      ).not.toBeInTheDocument();
+    });
+
     it("does not borrow the run-level U-I alignment when the displayed DI fallback has no candidate vowel path", async () => {
       const body =
         await analyzeV1("study");

@@ -282,6 +282,8 @@ function isFunctionalCandidate(
   return (
     claimType ===
       "functionalMotivation" ||
+    claimType ===
+      "genericFunctionalHypothesis" ||
     (
       claimType === null &&
       Boolean(embryo)
@@ -626,6 +628,11 @@ export function EmbryoExpansionContextCardV0_1({
         .claimBoundary,
     ) ===
       "research_functional_hypothesis_only";
+
+  const isGenericFunctionalCandidate =
+    presentString(
+      primaryCandidate.claimType,
+    ) === "genericFunctionalHypothesis";
 
   const useLegacyRootMapComposition =
     !isCompositionCandidate(
@@ -1102,7 +1109,9 @@ export function EmbryoExpansionContextCardV0_1({
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <div className="text-xs font-semibold uppercase tracking-[0.16em] text-emerald-700 dark:text-emerald-300">
-            Functional motivation
+            {isGenericFunctionalCandidate
+              ? "Seven-Voices doctrinal reading"
+              : "Functional motivation"}
           </div>
 
           <div className="mt-2 text-sm text-slate-600 dark:text-slate-400">
@@ -1116,7 +1125,9 @@ export function EmbryoExpansionContextCardV0_1({
 
         <div className="flex shrink-0 flex-col items-start gap-2 sm:items-end">
           <div className="rounded-full border border-amber-400/50 bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-900 dark:bg-amber-500/10 dark:text-amber-100">
-            {isResearchFunctionalCandidate
+            {isGenericFunctionalCandidate
+              ? "Evidence: None available"
+              : isResearchFunctionalCandidate
               ? "Research hypothesis"
               : `Evidence: ${evidenceStatus}`}
           </div>
@@ -1180,12 +1191,16 @@ export function EmbryoExpansionContextCardV0_1({
 
       <div className="mt-5 rounded-lg border border-blue-300 bg-blue-50 p-4 dark:border-blue-400/25 dark:bg-blue-500/5">
         <div className="text-xs font-semibold uppercase tracking-[0.14em] text-blue-700 dark:text-blue-200">
-          {`How it can motivate "${word || "this word"}"`}
+          {isGenericFunctionalCandidate
+            ? "Bounded doctrinal reading"
+            : `How it can motivate "${word || "this word"}"`}
         </div>
 
         <div className="mt-2 text-base leading-7 text-slate-900 dark:text-slate-100">
           {composedMeaning ||
-            "A functional explanation was not emitted."}
+            (isGenericFunctionalCandidate
+              ? "This reading is generated under the ZË-RO Seven-Voices framework. No external lexical evidence is currently attached."
+              : "A functional explanation was not emitted.")}
         </div>
       </div>
 
@@ -1329,7 +1344,9 @@ export function EmbryoExpansionContextCardV0_1({
       ) : null}
 
       <div className="mt-4 text-xs leading-5 text-slate-500 dark:text-slate-400">
-        Functional motivation, not historical etymology.
+        {isGenericFunctionalCandidate
+          ? "Doctrinal reading, not historical etymology."
+          : "Functional motivation, not historical etymology."}
       </div>
     </section>
   );
