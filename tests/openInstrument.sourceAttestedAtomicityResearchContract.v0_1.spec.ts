@@ -154,6 +154,22 @@ describe("source-attested atomicity research contract v0.1", () => {
   });
 
   test("rejects noncanonical source forms without changing canonical Voice rules", () => {
+    expect(projectDalipajExpandedAtomicityResearchV0_1("Bı")).toEqual({
+      ok: false,
+      reasonCodes: ["SOURCE_RECORD_NOT_FOUND"],
+    });
+    expect(projectDalipajExpandedAtomicityResearchV0_1("bi")).toEqual({
+      ok: false,
+      reasonCodes: ["SOURCE_RECORD_NOT_FOUND"],
+    });
+    expect(projectDalipajExpandedAtomicityResearchV0_1("Bİ")).toEqual({
+      ok: false,
+      reasonCodes: ["SOURCE_RECORD_NOT_FOUND"],
+    });
+    expect(projectDalipajExpandedAtomicityResearchV0_1("BI ")).toEqual({
+      ok: false,
+      reasonCodes: ["SOURCE_RECORD_NOT_FOUND"],
+    });
     expect(projectDalipajExpandedAtomicityResearchV0_1("Ẽ")).toEqual({
       ok: false,
       reasonCodes: ["SOURCE_RECORD_NOT_FOUND"],

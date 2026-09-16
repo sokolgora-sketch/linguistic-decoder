@@ -329,10 +329,9 @@ export function projectDalipajExpandedAtomicityResearchV0_1(
     return { ok: false, reasonCodes: ["SOURCE_CORPUS_INVALID"] };
   }
 
-  const normalized =
-    typeof form === "string" ? normalizedFormV0_1(form) : "";
+  const sourceForm = typeof form === "string" ? form : "";
   const sourceRecord =
-    getDalipajExpandedEmbryomorphemeSourceRecordV0_1(normalized);
+    getDalipajExpandedEmbryomorphemeSourceRecordV0_1(sourceForm);
   if (!sourceRecord) {
     return { ok: false, reasonCodes: ["SOURCE_RECORD_NOT_FOUND"] };
   }
