@@ -16,3 +16,8 @@ Format: Keep entries short and factual. Prefer PR numbers.
 
 ### Changed
 - ESLint hygiene cleanup (removed unused disables; named flat config export). No runtime changes. (PR #153)
+
+## 2026-09-16
+### Release Closeout
+- Prepared the ZË-RO v1.0.1 release closeout: valid generic Seven-Voices doctrinal readings are visible while Evidence Null, Structural Null, `no_single_winner`, `user_decides`, and separate external-evidence boundaries remain preserved. (PR #1953)
+- The final release identity is the annotated `v1.0.1` tag on the merged release commit; no empirical validation or Phase C claim is made, and PR #1940 remains open and unmerged.
