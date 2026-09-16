@@ -160,7 +160,7 @@ describe("Dalipaj expanded atomic blind comparison v0.1", () => {
       noCorrespondenceCount: 0,
       insufficientInformationCount: 0,
       propertyDefinitionInsufficientCases: 0,
-      functionalCorrespondenceObserved: "NO",
+      functionalCorrespondenceObserved: "INSUFFICIENT",
       propertyDefinitionGapMateriallyObserved: "NO",
     });
   });

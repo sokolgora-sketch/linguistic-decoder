@@ -639,7 +639,9 @@ export async function compareDalipajExpandedAtomicCorpusToZeroV0_1(
     corpusLevelResult: corpusLevelResultV0_1(records),
     structuralDiscoveryLimitObserved: structuralNullCount > 0 ? "YES" : "NO",
     functionalCorrespondenceObserved:
-      directCorrespondenceCount > 0 || partialCorrespondenceCount > 0
+      functionallyComparableCount === 0
+        ? "INSUFFICIENT"
+        : directCorrespondenceCount > 0 || partialCorrespondenceCount > 0
         ? directCorrespondenceCount > 0 && partialCorrespondenceCount > 0
           ? "MIXED"
           : "YES"
