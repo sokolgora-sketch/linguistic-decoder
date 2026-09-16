@@ -1,0 +1,313 @@
+{
+  "artifactType": "PHASE_B_INDEPENDENT_FACT_SET",
+  "artifactVersion": "v1",
+  "fingerprintMethod": {
+    "algorithm": "SHA-256",
+    "inputEncoding": "UTF-8",
+    "canonicalization": "Recursively sort object keys in Unicode code-point order; preserve array order; serialize JSON with no insignificant whitespace",
+    "excludedSelfField": "phaseBFactSetSha256"
+  },
+  "protocolId": "OPEN_INSTRUMENT_BLIND_VALIDATION_PILOT_PREREGISTRATION_V1",
+  "phaseBStatus": "FACT_SET_FROZEN_BEFORE_PROFILE_COMPARISON",
+  "phaseARedactedViewSha256": "8c260608f6cecd07b34c49a67a536961cd7e79bfd1f5022d02e4675dd22e359c",
+  "collectorBlinding": {
+    "inputArtifact": "PHASE_B_REDACTED_RESEARCH_VIEW",
+    "collectorIdentity": "PHASE_B_EXTERNAL_RESEARCH_ACQUISITION_PIPELINE",
+    "phaseAOperatorIdentity": "PHASE_A_PROFILE_ASSIGNMENT_OPERATOR",
+    "phaseAOperatorServedAsPhaseBCollector": false,
+    "operatorAccessSeparation": "PASS_PHASE_A_OPERATOR_NOT_PHASE_B_COLLECTOR",
+    "fullPhaseAManifestProvided": false,
+    "assignedSemanticDataProvided": false,
+    "doctrineTermsUsedInQueries": false,
+    "collectorContext": "REDACTED_PHASE_B_RESEARCH_VIEW_ONLY"
+  },
+  "acquisitionProcedure": {
+    "languageScope": "en",
+    "queryFamilies": [
+      "<target word> dictionary",
+      "<target word> English dictionary definition",
+      "<target word> morphology",
+      "<target word> etymology"
+    ],
+    "sourceSelection": "Prefer direct English dictionary or morphology sources; preserve source scope; do not silently substitute a near-spelling; retain non-English observations as rejected provenance when useful.",
+    "comparisonBoundary": "NO_COMPARISON_PERFORMED",
+    "semanticAdjudication": "NOT_PERFORMED",
+    "providerExecution": "NOT_PERFORMED"
+  },
+  "sourceClassSet": [
+    "DICTIONARY_EXACT_FORM",
+    "DICTIONARY_BASE_LEMMA",
+    "HISTORICAL_DICTIONARY",
+    "COMMUNITY_DICTIONARY",
+    "BILINGUAL_DICTIONARY",
+    "NEAR_SPELLING_REFERENCE"
+  ],
+  "cases": [
+    {
+      "caseId": "phase-a-case-001",
+      "targetWord": "babas",
+      "normalizedWord": "babas",
+      "language": "en",
+      "caseStatus": "SOURCE_COVERAGE_SUFFICIENT",
+      "ambiguityStatus": "MULTIPLE_BASE_LEMMA_SENSES",
+      "sourceConflictStatus": "NO_DIRECT_SOURCE_CONFLICT_IDENTIFIED",
+      "facts": [
+        {
+          "factId": "phase-b-fact-001-001",
+          "factType": "MORPHOLOGICAL_RELATION",
+          "neutralStatement": "Dictionary.com records babas as the plural grammatical form of baba and gives a cake sense for the base lemma.",
+          "senseScope": "baba cake sense",
+          "sourceClass": "DICTIONARY_EXACT_FORM",
+          "sourceTitle": "BABAS Definition & Meaning",
+          "sourcePublisherOrAuthority": "Dictionary.com / Dictionary Media Group",
+          "sourceLocator": "https://www.dictionary.com/browse/babas",
+          "retrievalDate": "2026-09-16",
+          "sourceSupportStatus": "EXACT_ENGLISH_FORM",
+          "claimStatus": "SOURCE_REPORTED_NOT_PROMOTED",
+          "independenceCheck": "PASS_EXTERNAL_DICTIONARY_SOURCE"
+        },
+        {
+          "factId": "phase-b-fact-001-002",
+          "factType": "MORPHOLOGICAL_RELATION",
+          "neutralStatement": "The English entry on Wiktionary records babas as plural of baba; the same page contains other language sections that are not counted for this English case.",
+          "senseScope": "English subsection only",
+          "sourceClass": "COMMUNITY_DICTIONARY",
+          "sourceTitle": "babas",
+          "sourcePublisherOrAuthority": "Wiktionary",
+          "sourceLocator": "https://en.wiktionary.org/wiki/babas",
+          "retrievalDate": "2026-09-16",
+          "sourceSupportStatus": "EXACT_ENGLISH_FORM",
+          "claimStatus": "SOURCE_REPORTED_NOT_PROMOTED",
+          "independenceCheck": "PASS_EXTERNAL_DICTIONARY_SOURCE"
+        },
+        {
+          "factId": "phase-b-fact-001-003",
+          "factType": "LEXICAL_SENSE",
+          "neutralStatement": "Cambridge records baba in Indian English for father or a respectful term for an older man, and for a friend or child, especially a man or boy; its examples include babas.",
+          "senseScope": "Indian English base-lemma senses",
+          "sourceClass": "DICTIONARY_BASE_LEMMA",
+          "sourceTitle": "Meaning of baba in English",
+          "sourcePublisherOrAuthority": "Cambridge Dictionary / Cambridge University Press & Assessment",
+          "sourceLocator": "https://dictionary.cambridge.org/us/dictionary/english/baba",
+          "retrievalDate": "2026-09-16",
+          "sourceSupportStatus": "BASE_LEMMA_CONTEXT_NOT_DIRECT_EXACT_FORM_ENTRY",
+          "claimStatus": "SOURCE_REPORTED_NOT_PROMOTED",
+          "independenceCheck": "PASS_EXTERNAL_DICTIONARY_SOURCE"
+        }
+      ],
+      "ambiguity": {
+        "status": "MULTIPLE_SENSE_SCOPES",
+        "notes": "The exact English form is morphologically linked to baba, while the base lemma has more than one dictionary sense. No single sense is selected."
+      },
+      "sourceConflicts": [],
+      "evidencePromotion": "NOT_AUTHORIZED"
+    },
+    {
+      "caseId": "phase-a-case-002",
+      "targetWord": "babasu",
+      "normalizedWord": "babasu",
+      "language": "en",
+      "caseStatus": "INSUFFICIENT_SOURCE_COVERAGE",
+      "ambiguityStatus": "NEAR_SPELLING_AND_LANGUAGE_SCOPE_AMBIGUITY",
+      "sourceConflictStatus": "NO_ENGLISH_EXACT_FORM_CONFLICT_ESTABLISHED",
+      "facts": [
+        {
+          "factId": "phase-b-fact-002-001",
+          "factType": "NEAR_SPELLING_OBSERVATION",
+          "neutralStatement": "English dictionary sources returned babassu, not babasu; babassu is a Brazilian palm whose nuts yield oil. The extra s is retained and the form is not substituted for babasu.",
+          "senseScope": "babassu near-spelling only",
+          "sourceClass": "NEAR_SPELLING_REFERENCE",
+          "sourceTitle": "BABASSU definition and meaning",
+          "sourcePublisherOrAuthority": "Collins English Dictionary / HarperCollins Publishers",
+          "sourceLocator": "https://www.collinsdictionary.com/dictionary/english/babassu",
+          "retrievalDate": "2026-09-16",
+          "sourceSupportStatus": "NOT_EXACT_CASE_FORM",
+          "claimStatus": "REJECTED_FOR_EXACT_ENGLISH_CASE",
+          "independenceCheck": "PASS_EXTERNAL_DICTIONARY_SOURCE"
+        },
+        {
+          "factId": "phase-b-fact-002-002",
+          "factType": "LANGUAGE_SCOPE_OBSERVATION",
+          "neutralStatement": "A Sisaala-English dictionary search result lists the exact form babasu as a Sisaala noun glossed as gonorrhoea; this is not an English entry and is not counted as English-case evidence.",
+          "senseScope": "Sisaala entry, not English",
+          "sourceClass": "BILINGUAL_DICTIONARY",
+          "sourceTitle": "Sisaala-English / English-Sisaala Dictionary",
+          "sourcePublisherOrAuthority": "Webonary lexical resource",
+          "sourceLocator": "https://www.webonary.org/sisaala/files/2021-08-05-Sisaala-English_English-Sisaala.pdf",
+          "retrievalDate": "2026-09-16",
+          "sourceSupportStatus": "EXACT_FORM_NON_ENGLISH_NOT_COUNTED",
+          "claimStatus": "REJECTED_FOR_ENGLISH_CASE",
+          "independenceCheck": "PASS_EXTERNAL_DICTIONARY_SOURCE"
+        }
+      ],
+      "ambiguity": {
+        "status": "INSUFFICIENT_ENGLISH_EXACT_FORM_COVERAGE",
+        "notes": "The near-spelling babassu and the non-English exact-form observation remain separate observations. No English sense is assigned to babasu."
+      },
+      "sourceConflicts": [],
+      "evidencePromotion": "NOT_AUTHORIZED"
+    },
+    {
+      "caseId": "phase-a-case-003",
+      "targetWord": "babbly",
+      "normalizedWord": "babbly",
+      "language": "en",
+      "caseStatus": "SOURCE_COVERAGE_SUFFICIENT",
+      "ambiguityStatus": "MULTIPLE_DICTIONARY_WORDINGS",
+      "sourceConflictStatus": "NO_DIRECT_SOURCE_CONFLICT_IDENTIFIED",
+      "facts": [
+        {
+          "factId": "phase-b-fact-003-001",
+          "factType": "LEXICAL_SENSE",
+          "neutralStatement": "Collins records babbly as a British English literary adjective meaning babbling, chatty, or talkative, with comparative and superlative forms babblier and babbliest.",
+          "senseScope": "British English literary adjective",
+          "sourceClass": "DICTIONARY_EXACT_FORM",
+          "sourceTitle": "Definition of babbly",
+          "sourcePublisherOrAuthority": "Collins English Dictionary / HarperCollins Publishers",
+          "sourceLocator": "https://www.collinsdictionary.com/us/dictionary/english/babbly",
+          "retrievalDate": "2026-09-16",
+          "sourceSupportStatus": "EXACT_ENGLISH_FORM",
+          "claimStatus": "SOURCE_REPORTED_NOT_PROMOTED",
+          "independenceCheck": "PASS_EXTERNAL_DICTIONARY_SOURCE"
+        },
+        {
+          "factId": "phase-b-fact-003-002",
+          "factType": "MORPHOLOGICAL_RELATION",
+          "neutralStatement": "The English entry on Wiktionary derives babbly from babble plus -y, records the sense resembling babbles, and lists comparative and superlative alternatives.",
+          "senseScope": "English adjective and derivational note",
+          "sourceClass": "COMMUNITY_DICTIONARY",
+          "sourceTitle": "babbly",
+          "sourcePublisherOrAuthority": "Wiktionary",
+          "sourceLocator": "https://en.wiktionary.org/wiki/babbly",
+          "retrievalDate": "2026-09-16",
+          "sourceSupportStatus": "EXACT_ENGLISH_FORM",
+          "claimStatus": "SOURCE_REPORTED_NOT_PROMOTED",
+          "independenceCheck": "PASS_EXTERNAL_DICTIONARY_SOURCE"
+        }
+      ],
+      "ambiguity": {
+        "status": "MULTIPLE_DICTIONARY_WORDINGS",
+        "notes": "The sources use overlapping but non-identical descriptions; both are retained without adjudicating a preferred wording."
+      },
+      "sourceConflicts": [],
+      "evidencePromotion": "NOT_AUTHORIZED"
+    },
+    {
+      "caseId": "phase-a-case-004",
+      "targetWord": "babels",
+      "normalizedWord": "babels",
+      "language": "en",
+      "caseStatus": "SOURCE_COVERAGE_SUFFICIENT",
+      "ambiguityStatus": "COMMON_NOUN_AND_PROPER_NAME_SCOPE",
+      "sourceConflictStatus": "NO_DIRECT_SOURCE_CONFLICT_IDENTIFIED",
+      "facts": [
+        {
+          "factId": "phase-b-fact-004-001",
+          "factType": "MORPHOLOGICAL_RELATION",
+          "neutralStatement": "The English entry on Wiktionary records babel as usually uncountable and gives babels as its plural form; it also lists an alternative-form relation to Babel and a confused-noise noun sense.",
+          "senseScope": "English lowercase babel and plural babels",
+          "sourceClass": "COMMUNITY_DICTIONARY",
+          "sourceTitle": "babel",
+          "sourcePublisherOrAuthority": "Wiktionary",
+          "sourceLocator": "https://en.wiktionary.org/wiki/babel",
+          "retrievalDate": "2026-09-16",
+          "sourceSupportStatus": "EXACT_PLURAL_FORM_VIA_ENGLISH_LEMMA_ENTRY",
+          "claimStatus": "SOURCE_REPORTED_NOT_PROMOTED",
+          "independenceCheck": "PASS_EXTERNAL_DICTIONARY_SOURCE"
+        },
+        {
+          "factId": "phase-b-fact-004-002",
+          "factType": "LEXICAL_SENSE",
+          "neutralStatement": "Cambridge defines babel as the confusing sound of many people talking at the same time or using different languages.",
+          "senseScope": "formal English common-noun sense",
+          "sourceClass": "DICTIONARY_BASE_LEMMA",
+          "sourceTitle": "Meaning of babel in English",
+          "sourcePublisherOrAuthority": "Cambridge Dictionary / Cambridge University Press & Assessment",
+          "sourceLocator": "https://dictionary.cambridge.org/dictionary/english/babel",
+          "retrievalDate": "2026-09-16",
+          "sourceSupportStatus": "BASE_LEMMA_CONTEXT_FOR_EXACT_PLURAL",
+          "claimStatus": "SOURCE_REPORTED_NOT_PROMOTED",
+          "independenceCheck": "PASS_EXTERNAL_DICTIONARY_SOURCE"
+        },
+        {
+          "factId": "phase-b-fact-004-003",
+          "factType": "LEXICAL_SENSE",
+          "neutralStatement": "Oxford describes babel as the sound of many voices talking at one time, especially when more than one language is being spoken, and presents it as a singular formal noun.",
+          "senseScope": "formal English common-noun sense",
+          "sourceClass": "DICTIONARY_BASE_LEMMA",
+          "sourceTitle": "Definition of babel noun",
+          "sourcePublisherOrAuthority": "Oxford Advanced Learner's Dictionary / Oxford University Press",
+          "sourceLocator": "https://www.oxfordlearnersdictionaries.com/us/definition/english/babel",
+          "retrievalDate": "2026-09-16",
+          "sourceSupportStatus": "BASE_LEMMA_CONTEXT_FOR_EXACT_PLURAL",
+          "claimStatus": "SOURCE_REPORTED_NOT_PROMOTED",
+          "independenceCheck": "PASS_EXTERNAL_DICTIONARY_SOURCE"
+        }
+      ],
+      "ambiguity": {
+        "status": "SENSE_AND_CASE_SCOPE_AMBIGUITY",
+        "notes": "The lowercase common-noun plural is kept distinct from capitalized proper-name or organization uses encountered during search."
+      },
+      "sourceConflicts": [],
+      "evidencePromotion": "NOT_AUTHORIZED"
+    },
+    {
+      "caseId": "phase-a-case-005",
+      "targetWord": "babery",
+      "normalizedWord": "babery",
+      "language": "en",
+      "caseStatus": "SOURCE_COVERAGE_SUFFICIENT",
+      "ambiguityStatus": "OBSOLETE_SENSE_VARIATION",
+      "sourceConflictStatus": "NO_DIRECT_SOURCE_CONFLICT_IDENTIFIED",
+      "facts": [
+        {
+          "factId": "phase-b-fact-005-001",
+          "factType": "LEXICAL_SENSE",
+          "neutralStatement": "The World English Historical Dictionary marks babery obsolete and records grotesque ornamentation in architecture and books, along with grotesque absurdity; its historical material also records child-pleasing finery.",
+          "senseScope": "historical English noun, obsolete",
+          "sourceClass": "HISTORICAL_DICTIONARY",
+          "sourceTitle": "Babery",
+          "sourcePublisherOrAuthority": "World English Historical Dictionary, based on Murray's New English Dictionary",
+          "sourceLocator": "https://wehd.com/7/Babery.html",
+          "retrievalDate": "2026-09-16",
+          "sourceSupportStatus": "EXACT_ENGLISH_FORM",
+          "claimStatus": "SOURCE_REPORTED_NOT_PROMOTED",
+          "independenceCheck": "PASS_EXTERNAL_HISTORICAL_DICTIONARY_SOURCE"
+        },
+        {
+          "factId": "phase-b-fact-005-002",
+          "factType": "LEXICAL_SENSE",
+          "neutralStatement": "The English entry on Wiktionary records babery as an uncountable obsolete noun meaning finery of a kind to please a child.",
+          "senseScope": "obsolete English noun",
+          "sourceClass": "COMMUNITY_DICTIONARY",
+          "sourceTitle": "babery",
+          "sourcePublisherOrAuthority": "Wiktionary, with a Webster's Revised Unabridged Dictionary reference",
+          "sourceLocator": "https://en.wiktionary.org/wiki/babery",
+          "retrievalDate": "2026-09-16",
+          "sourceSupportStatus": "EXACT_ENGLISH_FORM",
+          "claimStatus": "SOURCE_REPORTED_NOT_PROMOTED",
+          "independenceCheck": "PASS_EXTERNAL_DICTIONARY_SOURCE"
+        }
+      ],
+      "ambiguity": {
+        "status": "HISTORICAL_SENSE_VARIATION",
+          "notes": "The historical sources preserve related but distinct ornamentation and child-pleasing-finery senses; neither is discarded."
+      },
+      "sourceConflicts": [],
+      "evidencePromotion": "NOT_AUTHORIZED"
+    }
+  ],
+  "factSetBoundary": {
+    "noComparisonMarker": "NO_COMPARISON_PERFORMED",
+    "assignmentDataProvided": false,
+    "lexicalCandidateGeneration": "NOT_PERFORMED",
+    "targetSenseBinding": "NOT_PERFORMED",
+    "evidencePromotion": "NOT_AUTHORIZED",
+    "userDecides": true,
+    "noSingleWinner": true
+  },
+  "invalidationCodesTriggered": [
+    "INSUFFICIENT_SOURCE_COVERAGE"
+  ],
+  "phaseBFactSetSha256": "20d9ad12752518f1f80858ca54509442b90ff35a65a5eea35a82f448db04df33"
+}
