@@ -108,6 +108,31 @@ describe("Dalipaj frozen corpus and Zero blind comparison v0.1", () => {
     expect(result.records[1].zeroOutput.embryo).toBeNull();
   });
 
+  test("preserves source constituent and compound classifications for non-null analyses", async () => {
+    const atomicOutput = await runDalipajZeroFormOnlyAnalysisV0_1("GROP");
+    const result = await compareDalipajFrozenCorpusToZeroV0_1({
+      analyzeForm: async (form) => ({
+        ...atomicOutput,
+        form,
+      }),
+    });
+    const sy = result.records[1];
+    const syGrop = result.records[2];
+
+    expect(sy.zeroOutput.embryo).toBe("OP");
+    expect(sy.reasonCodes).toEqual(expect.arrayContaining([
+      "SOURCE_FORM_CONSTITUENT_ONLY",
+      "STANDALONE_ATOMIC_STATUS_NOT_ESTABLISHED",
+    ]));
+    expect(sy.reasonCodes).not.toContain("SOURCE_FORM_ATOMIC");
+    expect(syGrop.zeroOutput.embryo).toBe("OP");
+    expect(syGrop.reasonCodes).toEqual(expect.arrayContaining([
+      "SOURCE_FORM_COMPOUND_CLAIM",
+      "HISTORICAL_CLAIM_OUTSIDE_COMPARISON",
+    ]));
+    expect(syGrop.reasonCodes).not.toContain("SOURCE_FORM_ATOMIC");
+  });
+
   test("uses only bounded verdicts, explicit reason codes, and deterministic output", async () => {
     const first = await compareDalipajFrozenCorpusToZeroV0_1();
     const second = await compareDalipajFrozenCorpusToZeroV0_1();

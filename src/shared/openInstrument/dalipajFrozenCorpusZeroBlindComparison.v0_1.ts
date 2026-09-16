@@ -271,6 +271,24 @@ function commonReasonCodesV0_1(): DalipajZeroBlindComparisonReasonCodeV0_1[] {
   ];
 }
 
+function sourceClassificationReasonCodesV0_1(
+  sourceRecord: DalipajEmbryomorphemeSourceRecordV0_1,
+): readonly DalipajZeroBlindComparisonReasonCodeV0_1[] {
+  if (sourceRecord.formClassification === "CONSTITUENT_CLAIM") {
+    return [
+      "SOURCE_FORM_CONSTITUENT_ONLY",
+      "STANDALONE_ATOMIC_STATUS_NOT_ESTABLISHED",
+    ];
+  }
+  if (sourceRecord.formClassification === "COMPOUND_CLAIM") {
+    return [
+      "SOURCE_FORM_COMPOUND_CLAIM",
+      "HISTORICAL_CLAIM_OUTSIDE_COMPARISON",
+    ];
+  }
+  return ["SOURCE_FORM_ATOMIC"];
+}
+
 function compareRecordV0_1(
   sourceRecord: DalipajEmbryomorphemeSourceRecordV0_1,
   zeroOutput: DalipajZeroFrozenAnalysisV0_1,
@@ -279,18 +297,7 @@ function compareRecordV0_1(
 
   if (zeroOutput.embryo === null) {
     reasonCodes.push("ZERO_STRUCTURAL_NULL");
-    if (sourceRecord.formClassification === "CONSTITUENT_CLAIM") {
-      reasonCodes.push(
-        "SOURCE_FORM_CONSTITUENT_ONLY",
-        "STANDALONE_ATOMIC_STATUS_NOT_ESTABLISHED",
-      );
-    }
-    if (sourceRecord.formClassification === "COMPOUND_CLAIM") {
-      reasonCodes.push(
-        "SOURCE_FORM_COMPOUND_CLAIM",
-        "HISTORICAL_CLAIM_OUTSIDE_COMPARISON",
-      );
-    }
+    reasonCodes.push(...sourceClassificationReasonCodesV0_1(sourceRecord));
 
     return {
       recordId: sourceRecord.recordId,
@@ -305,7 +312,10 @@ function compareRecordV0_1(
     };
   }
 
-  reasonCodes.push("SOURCE_FORM_ATOMIC", "NO_EXTERNAL_EVIDENCE_IN_ZERO_OUTPUT");
+  reasonCodes.push(
+    ...sourceClassificationReasonCodesV0_1(sourceRecord),
+    "NO_EXTERNAL_EVIDENCE_IN_ZERO_OUTPUT",
+  );
   const matches = exactProfileMatchesV0_1(sourceRecord.sourceGloss, zeroOutput);
 
   if (matches.matchedTerms.length === 0) {
