@@ -1,6 +1,12 @@
 {
   "artifactType": "PRIVATE_FULL_PHASE_A_MANIFEST",
   "artifactVersion": "v1",
+  "fingerprintMethod": {
+    "algorithm": "SHA-256",
+    "inputEncoding": "UTF-8",
+    "canonicalization": "Recursively sort object keys in Unicode code-point order; preserve array order; serialize JSON with no insignificant whitespace",
+    "excludedSelfField": "phaseAFullManifestSha256"
+  },
   "protocolId": "OPEN_INSTRUMENT_BLIND_VALIDATION_PILOT_PREREGISTRATION_V1",
   "protocolVersion": "v1",
   "phaseAStatus": "FROZEN_BEFORE_EVIDENCE_REVEAL",
@@ -255007,5 +255013,5 @@
     "blindingStatus": "PHASE_B_NOT_STARTED"
   },
   "invalidationCodesTriggered": [],
-  "phaseAFullManifestSha256": "a0fdf1b15706caa2ef56d54469ef961ad104125cae890d86ed9c20a9df1ee7a1"
+  "phaseAFullManifestSha256": "62aee78b5b649fc9793b081affefdf0b92f49b79c09e1d56e9a4e8b742bcee2e"
 }
