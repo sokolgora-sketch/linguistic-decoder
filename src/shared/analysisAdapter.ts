@@ -58,6 +58,12 @@ import { buildLogicDerivedFunctionalHypothesisV0_1 } from "./openInstrument/logi
 import {
   produceGenericFunctionalHypothesisV1,
 } from "./openInstrument/genericFunctionalHypothesisProducer.v1";
+import {
+  buildGenericFunctionalWitnessRuntimeProjectionV1,
+} from "./openInstrument/genericFunctionalWitnessRuntimeProjection.v1";
+import type {
+  GenericFunctionalWitnessRuntimeProjectionV1,
+} from "./openInstrument/genericFunctionalWitnessRuntimeProjection.v1";
 import { verifyLogicDerivedFunctionalHypothesisV0_1 } from "./verifier/verifyLogicDerivedFunctionalHypothesis.v0_1";
 import type { SemanticAlignmentAssessmentV0_1 } from "./openInstrument/semanticAlignment.v0_1";
 
@@ -770,6 +776,27 @@ export function enginePayloadToAnalysisResult(payload: EnginePayload): AnalyzeWo
     structuralHypothesesV0_1.length > 0 &&
     projectedResearchCandidatesV0_1.length === 0;
 
+  // Lane 4 integration is metadata-only: each validated structural embryo
+  // delegates to the reviewed Lane 1 -> Lane 2 -> Lane 3 contracts. It does
+  // not alter candidate precedence, aggregate status, or provider behavior.
+  const genericFunctionalWitnessProjectionByHypothesisId =
+    new Map(
+      structuralHypothesesV0_1.map((structuralHypothesis) => [
+        structuralHypothesis.hypothesisId,
+        buildGenericFunctionalWitnessRuntimeProjectionV1({
+          targetWord: rootMapBasis,
+          structuralHypothesis,
+          targetSense:
+            targetSenseId && targetSenseLabel
+              ? {
+                  id: targetSenseId,
+                  label: targetSenseLabel,
+                }
+              : null,
+        }),
+      ]),
+    );
+
   const genericFunctionalCandidatesV1 =
     shouldProjectGenericFunctionalHypothesesV1
       ? structuralHypothesesV0_1.flatMap((hypothesis) => {
@@ -824,6 +851,16 @@ export function enginePayloadToAnalysisResult(payload: EnginePayload): AnalyzeWo
               semanticInteraction: genericHypothesis.semanticInteraction,
               doctrineSourceRefs: genericHypothesis.sourceRefs,
               genericFunctionalHypothesisV1: genericHypothesis,
+              ...(genericFunctionalWitnessProjectionByHypothesisId.get(
+                hypothesis.hypothesisId,
+              )?.discovery.status !== "NO_MATCHES"
+                ? {
+                    genericFunctionalWitnessRuntimeProjectionV1:
+                      genericFunctionalWitnessProjectionByHypothesisId.get(
+                        hypothesis.hypothesisId,
+                      ),
+                  }
+                : {}),
             },
           ];
         })
@@ -905,6 +942,56 @@ export function enginePayloadToAnalysisResult(payload: EnginePayload): AnalyzeWo
         ...existingCandidates,
         ...researchCandidateById.values(),
       ]);
+  }
+
+  // Attach the same bounded witness projection to any existing candidate
+  // sharing the validated embryo. This keeps reviewed/research precedence
+  // intact while making source witnesses visible alongside stronger results.
+  const witnessProjectionByEmbryo = new Map<
+    string,
+    GenericFunctionalWitnessRuntimeProjectionV1
+  >();
+
+  for (const hypothesis of structuralHypothesesV0_1) {
+    const projection =
+      genericFunctionalWitnessProjectionByHypothesisId.get(
+        hypothesis.hypothesisId,
+      );
+
+    if (
+      projection &&
+      projection.discovery.status !== "NO_MATCHES"
+    ) {
+      witnessProjectionByEmbryo.set(
+        hypothesis.embryo,
+        projection,
+      );
+    }
+  }
+
+  if (witnessProjectionByEmbryo.size > 0) {
+    const existingCandidates = Array.isArray((result as any).candidates)
+      ? (result as any).candidates
+      : [];
+
+    (result as any).candidates = existingCandidates.map(
+      (candidate: Record<string, unknown>) => {
+        const embryo =
+          typeof candidate.embryo === "string"
+            ? candidate.embryo
+            : null;
+        const projection = embryo
+          ? witnessProjectionByEmbryo.get(embryo)
+          : undefined;
+
+        return projection
+          ? {
+              ...candidate,
+              genericFunctionalWitnessRuntimeProjectionV1: projection,
+            }
+          : candidate;
+      },
+    );
   }
 
   // Reuse the untouched baseline unless a bounded gap-filling

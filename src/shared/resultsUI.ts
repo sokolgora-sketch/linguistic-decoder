@@ -2,6 +2,7 @@
 
 import type { EngineMetaSummary } from "@/lib/engineMetaSummary";
 import type { HeartInstrumentV1 } from "@/v1/heartInstrument.v1";
+import type { GenericFunctionalWitnessRuntimeProjectionV1 } from "./openInstrument/genericFunctionalWitnessRuntimeProjection.v1";
 
 export interface EngineMetaRaw {
   engineName?: string;
@@ -76,6 +77,8 @@ export interface CandidateUI {
   languageSuperiorityClaim?: string;
   candidateTruthClaim?: string;
   logicDerivedFunctionalHypothesisVerificationV0_1?: unknown;
+  genericFunctionalWitnessRuntimeProjectionV1?:
+    GenericFunctionalWitnessRuntimeProjectionV1 | null;
   functionalStatement?: string;
   vowelPath?: string;
   decomposition?: string[];

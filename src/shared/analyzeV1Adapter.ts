@@ -5,6 +5,9 @@ import type {
   PrimaryPathSummary,
 } from "@/shared/resultsUI";
 import { extractSevenVowelsFromString } from "@/shared/math7.core";
+import {
+  parseGenericFunctionalWitnessRuntimeProjectionV1,
+} from "@/shared/openInstrument/genericFunctionalWitnessRuntimeProjection.v1";
 
 /**
  * analyze-v1 Adapter (UI-first contract)
@@ -245,6 +248,10 @@ function adaptCandidate(rawCandidate: RawCandidate): CandidateUI {
   const confidenceTag = typeof rawCandidate?.confidenceTag === "string" ? rawCandidate.confidenceTag : undefined;
   const fitTag = typeof rawCandidate?.fitTag === "string" ? rawCandidate.fitTag : undefined;
   const sourceKind = pickCandidateSourceKind(rawCandidate);
+  const witnessProjection =
+    parseGenericFunctionalWitnessRuntimeProjectionV1(
+      rawCandidate?.genericFunctionalWitnessRuntimeProjectionV1,
+    );
   const embryoFirstCandidateFields = {
     candidateId: optionalString(rawCandidate?.candidateId),
     displayForm: optionalString(rawCandidate?.displayForm),
@@ -303,6 +310,11 @@ function adaptCandidate(rawCandidate: RawCandidate): CandidateUI {
     candidateTruthClaim: optionalString(rawCandidate?.candidateTruthClaim),
     logicDerivedFunctionalHypothesisVerificationV0_1:
       rawCandidate?.logicDerivedFunctionalHypothesisVerificationV0_1,
+    ...(witnessProjection
+      ? {
+          genericFunctionalWitnessRuntimeProjectionV1: witnessProjection,
+        }
+      : {}),
 
     validationOutcome: optionalString(rawCandidate?.validationOutcome),
     validationReasons: optionalStringArray(rawCandidate?.validationReasons),

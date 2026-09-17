@@ -2,6 +2,7 @@ export type Mode = "strict" | "open";
 
 import type { RootMapV1 } from "@/shared/deepRoot.rootMap.v1";
 import type { DeepRootHeartGateV01 } from "@/shared/deepRootHeartGate.v0.1";
+import type { GenericFunctionalWitnessRuntimeProjectionV1 } from "@/shared/openInstrument/genericFunctionalWitnessRuntimeProjection.v1";
 
 /**
  * UI contract for vowel chips. Keep this as the only allowed vowel set.
@@ -199,6 +200,9 @@ export interface CandidateRowVM {
   functionalSupportStatus?: PresentOrMissing<string>;
   historicalOriginClaim?: PresentOrMissing<string>;
   candidateTruthClaim?: PresentOrMissing<string>;
+
+  genericFunctionalWitnessRuntimeProjectionV1?:
+    PresentOrMissing<GenericFunctionalWitnessRuntimeProjectionV1>;
 
   // Structured multi-embryo presentation data.
   // Lifted only by contractAdapter from emitted candidate segmentation.
