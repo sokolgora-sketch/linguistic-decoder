@@ -52,9 +52,12 @@ describe("Open Instrument Lane 3 bounded witness correspondence", () => {
   it("keeps exact form/source attestation separate from functional acceptance", () => {
     const witness = witnessFor("SHI", ["I"]);
     expect(witness).not.toBeNull();
+    const exactWitness = witness
+      ? { ...witness, embryoRelation: "exact_form" as const }
+      : null;
 
     const result = evaluateGenericFunctionalWitnessCorrespondenceV1(
-      inputFor(witness),
+      inputFor(exactWitness),
     );
 
     expect(result).toMatchObject({
@@ -79,13 +82,34 @@ describe("Open Instrument Lane 3 bounded witness correspondence", () => {
   });
 
   it("does not treat exact form equality as supported correspondence", () => {
+    const witness = witnessFor("SHI", ["I"]);
+    expect(witness).not.toBeNull();
+    const exactWitness = witness
+      ? { ...witness, embryoRelation: "exact_form" as const }
+      : null;
     const result = evaluateGenericFunctionalWitnessCorrespondenceV1(
-      inputFor(witnessFor("SHI", ["I"])),
+      inputFor(exactWitness),
     );
 
     expect(result.verdict).not.toBe("SUPPORTED");
     expect(result.verdict).not.toBe("PARTIALLY_SUPPORTED");
     expect(result.reasonCodes).toContain("EXACT_FORM_MATCH_ONLY");
+  });
+
+  it("does not label non-exact source relations as exact matches", () => {
+    const witness = witnessFor("SHI", ["I"]);
+    if (!witness) throw new Error("expected frozen SHI witness");
+
+    const result = evaluateGenericFunctionalWitnessCorrespondenceV1(
+      inputFor({
+        ...witness,
+        embryoRelation: "semantic_resemblance",
+      }),
+    );
+
+    expect(result.verdict).toBe("UNKNOWN");
+    expect(result.reasonCodes).toContain("SOURCE_RELATION_REQUIRES_REVIEW");
+    expect(result.reasonCodes).not.toContain("EXACT_FORM_MATCH_ONLY");
   });
 
   it("returns NULL when no witness is available", () => {
@@ -222,5 +246,40 @@ describe("Open Instrument Lane 3 bounded witness correspondence", () => {
       "TARGET_ANALYSIS_INVALID",
       "VOICE_PATH_INVALID",
     ]);
+  });
+
+  it("rejects malformed target senses without returning them", () => {
+    const result = evaluateGenericFunctionalWitnessCorrespondenceV1(
+      inputFor(null, {
+        targetAnalysis: {
+          analysisId: "analysis:fresh-word",
+          targetWord: "fresh-word",
+          targetSense: { id: "", label: "malformed" },
+        },
+      }),
+    );
+
+    expect(result.verdict).toBe("NULL");
+    expect(result.reasonCodes).toContain("TARGET_ANALYSIS_INVALID");
+    expect(result.targetAnalysis).toBeNull();
+  });
+
+  it("strips unvalidated claim fields from returned witnesses", () => {
+    const witness = witnessFor("SHI", ["I"]);
+    if (!witness) throw new Error("expected frozen SHI witness");
+
+    const result = evaluateGenericFunctionalWitnessCorrespondenceV1(
+      inputFor({
+        ...witness,
+        targetOriginClaim: "CLAIMED_BY_INPUT",
+        functionalAcceptance: "AUTHORIZED_BY_INPUT",
+      } as GenericFunctionalWitnessV1),
+    );
+
+    expect(result.sourceWitness).not.toBeNull();
+    expect(result.sourceWitness).not.toHaveProperty("targetOriginClaim");
+    expect(result.sourceWitness).not.toHaveProperty("functionalAcceptance");
+    expect(result.targetOriginClaim).toBe("NOT_CLAIMED");
+    expect(result.functionalAcceptance).toBe("NOT_AUTHORIZED");
   });
 });

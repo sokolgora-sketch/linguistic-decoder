@@ -28,6 +28,7 @@ export type GenericFunctionalWitnessCorrespondenceReasonCodeV1 =
   | "SOURCE_WITNESS_EMBRYO_MISMATCH"
   | "SOURCE_SEMANTICS_UNAVAILABLE"
   | "EXACT_FORM_MATCH_ONLY"
+  | "SOURCE_RELATION_REQUIRES_REVIEW"
   | "NO_REVIEWED_COMPARISON_RULE"
   | "FUNCTIONAL_CORRESPONDENCE_NOT_AUTHORIZED";
 
@@ -153,7 +154,25 @@ function cloneSourceWitnessV1(
   value: GenericFunctionalWitnessV1,
 ): GenericFunctionalWitnessV1 {
   return {
-    ...value,
+    witnessId: value.witnessId,
+    queryForm: value.queryForm,
+    sourceId: value.sourceId,
+    evidenceFamily: value.evidenceFamily,
+    language: value.language,
+    sourceForm: value.sourceForm,
+    sourceFormNormalization: value.sourceFormNormalization,
+    gloss: value.gloss,
+    embryoRelation: value.embryoRelation,
+    attestationTruth: value.attestationTruth,
+    sourceStatus: value.sourceStatus,
+    sourceAttestation: value.sourceAttestation,
+    functionalCorrespondence: value.functionalCorrespondence,
+    targetMeaning: value.targetMeaning,
+    historicalRelation: value.historicalRelation,
+    winnerClaim: value.winnerClaim,
+    languageSuperiorityClaim: value.languageSuperiorityClaim,
+    userDecisionPosture: value.userDecisionPosture,
+    noSingleWinner: value.noSingleWinner,
     citationRefs: [...value.citationRefs],
     relationOperationIds: [...value.relationOperationIds],
     ...(value.languageVariety !== undefined
@@ -171,6 +190,23 @@ function targetSenseBindingV1(
   return targetAnalysis.targetSense
     ? "TARGET_SENSE_PRESENT_NOT_BOUND"
     : "TARGET_SENSE_UNBOUND";
+}
+
+function targetAnalysisIsValidV1(
+  value: unknown,
+): value is GenericFunctionalWitnessCorrespondenceInputV1["targetAnalysis"] {
+  if (!isRecordV1(value)) return false;
+
+  const targetSense = value.targetSense;
+  return (
+    exactTextV1(value.analysisId) &&
+    exactTextV1(value.targetWord) &&
+    (targetSense === undefined ||
+      targetSense === null ||
+      (isRecordV1(targetSense) &&
+        exactTextV1(targetSense.id) &&
+        exactTextV1(targetSense.label)))
+  );
 }
 
 function baseResultV1(
@@ -276,21 +312,11 @@ function inputIsValidV1(
 
   const targetAnalysis = value.targetAnalysis;
   const structuralAnalysis = value.structuralAnalysis;
-  const targetSense =
-    isRecordV1(targetAnalysis) && targetAnalysis.targetSense !== undefined
-      ? targetAnalysis.targetSense
-      : null;
 
   return (
     value.schemaVersion ===
       GENERIC_FUNCTIONAL_WITNESS_CORRESPONDENCE_SCHEMA_V1 &&
-    isRecordV1(targetAnalysis) &&
-    exactTextV1(targetAnalysis.analysisId) &&
-    exactTextV1(targetAnalysis.targetWord) &&
-    (targetSense === null ||
-      (isRecordV1(targetSense) &&
-        exactTextV1(targetSense.id) &&
-        exactTextV1(targetSense.label))) &&
+    targetAnalysisIsValidV1(targetAnalysis) &&
     isRecordV1(structuralAnalysis) &&
     exactTextV1(structuralAnalysis.hypothesisId) &&
     exactTextV1(structuralAnalysis.embryo) &&
@@ -383,10 +409,8 @@ export function evaluateGenericFunctionalWitnessCorrespondenceV1(
     const targetAnalysis = input.targetAnalysis;
     const structuralAnalysis = input.structuralAnalysis;
     const reasons: GenericFunctionalWitnessCorrespondenceReasonCodeV1[] = [];
-    if (
-      !exactTextV1(targetAnalysis.analysisId) ||
-      !exactTextV1(targetAnalysis.targetWord)
-    ) {
+    const targetAnalysisValid = targetAnalysisIsValidV1(targetAnalysis);
+    if (!targetAnalysisValid) {
       reasons.push("TARGET_ANALYSIS_INVALID");
     }
     if (
@@ -404,13 +428,9 @@ export function evaluateGenericFunctionalWitnessCorrespondenceV1(
     return baseResultV1({
       verdict: "NULL",
       reasonCodes: reasons,
-      targetAnalysis:
-        exactTextV1(targetAnalysis.analysisId) &&
-        exactTextV1(targetAnalysis.targetWord)
-          ? cloneTargetAnalysisV1(
-              targetAnalysis as GenericFunctionalWitnessCorrespondenceInputV1["targetAnalysis"],
-            )
-          : null,
+      targetAnalysis: targetAnalysisValid
+        ? cloneTargetAnalysisV1(targetAnalysis)
+        : null,
       structuralAnalysis:
         exactTextV1(structuralAnalysis.hypothesisId) &&
         exactTextV1(structuralAnalysis.embryo) &&
@@ -470,10 +490,14 @@ export function evaluateGenericFunctionalWitnessCorrespondenceV1(
   }
 
   const sourceWitness = cloneSourceWitnessV1(validInput.sourceWitness);
+  const relationReasonCode =
+    validInput.sourceWitness.embryoRelation === "exact_form"
+      ? "EXACT_FORM_MATCH_ONLY"
+      : "SOURCE_RELATION_REQUIRES_REVIEW";
   return baseResultV1({
     verdict: "UNKNOWN",
     reasonCodes: [
-      "EXACT_FORM_MATCH_ONLY",
+      relationReasonCode,
       "NO_REVIEWED_COMPARISON_RULE",
       "FUNCTIONAL_CORRESPONDENCE_NOT_AUTHORIZED",
     ],
