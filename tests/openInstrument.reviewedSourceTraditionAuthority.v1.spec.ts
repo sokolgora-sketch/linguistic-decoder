@@ -94,6 +94,19 @@ describe("reviewed source tradition authority v1", () => {
     expect(result.dimensions.LICENSE_STATUS.status).toBe("UNKNOWN");
   });
 
+  it("fails closed when source date or version is missing", () => {
+    const result = evaluateReviewedSourceTraditionAuthorityV1(
+      validInput({ sourceDateOrVersion: null }),
+    );
+
+    expect(result.status).toBe("NOT_ELIGIBLE_FOR_REVIEWED_INTAKE");
+    expect(result.reasonCodes).toEqual(["SOURCE_IDENTITY_UNRESOLVED"]);
+    expect(result.dimensions.SOURCE_IDENTITY).toEqual({
+      status: "UNKNOWN",
+      reasonCodes: ["SOURCE_IDENTITY_UNRESOLVED"],
+    });
+  });
+
   it("requires an explicitly supported source type and citation type", () => {
     const grammar = evaluateReviewedSourceTraditionAuthorityV1(
       validInput({

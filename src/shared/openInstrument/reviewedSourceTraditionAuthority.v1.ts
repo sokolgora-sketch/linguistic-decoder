@@ -160,7 +160,8 @@ function evaluateSourceIdentityV1(
   if (
     !hasTextV1(input.sourceTraditionId) ||
     !hasTextV1(input.sourceTitle) ||
-    !hasTextV1(input.sourcePublisherOrHost)
+    !hasTextV1(input.sourcePublisherOrHost) ||
+    !hasTextV1(input.sourceDateOrVersion)
   ) {
     return dimensionResultV1("UNKNOWN", ["SOURCE_IDENTITY_UNRESOLVED"]);
   }
