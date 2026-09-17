@@ -93,6 +93,31 @@ describe("Lane 4 witness presentation", () => {
                             languageVariety: "Gheg",
                           },
                         },
+                        {
+                          queryForm: "SHI",
+                          sourceId: "fixture.shi.second",
+                          evidenceFamily: "dialect_lexicon",
+                          language: "Albanian",
+                          languageVariety: "Tosk",
+                          sourceForm: "shia",
+                          sourceFormNormalization: "EXACT_PRESERVED",
+                          gloss: "second fixture source gloss",
+                          citationRefs: ["fixture.shi.second.citation"],
+                          embryoRelation: "exact_form",
+                          relationOperationIds: ["fixture_exact_form_second"],
+                          attestationTruth: "fact",
+                          sourceStatus: "research_candidate",
+                          sourceProvenance: {
+                            sourceRecordId: "fixture.shi.second",
+                            sourceTraditionId: "fixture.tradition.second",
+                            sourceTitle: "Second fixture source",
+                            sourceDateOrVersion: "fixture v1",
+                            sourceUrlOrArchiveRef: "fixture://shia",
+                            entryLocator: "SHIA",
+                            sourceHashOrArchiveHash: null,
+                            languageVariety: "Tosk",
+                          },
+                        },
                       ]
                     : [],
               };
@@ -111,12 +136,49 @@ describe("Lane 4 witness presentation", () => {
 
     expect(screen.getByText("Functional witnesses")).toBeInTheDocument();
     expect(screen.getByText("shi")).toBeInTheDocument();
+    expect(screen.getByText("shia")).toBeInTheDocument();
     expect(
-      screen.getByText(/Functional correspondence: Unknown \/ unresolved/),
-    ).toBeInTheDocument();
-    expect(screen.getByText(/Historical relation: Not claimed\./)).toBeInTheDocument();
+      screen.getAllByText(/Functional correspondence: Unknown \/ unresolved/),
+    ).toHaveLength(2);
+    expect(screen.getAllByText(/Historical relation: Not claimed\./)).toHaveLength(2);
     expect(screen.getByText("No single witness is selected. User decides.")).toBeInTheDocument();
     expect(screen.queryByText(/comes from|proves|true root/i)).not.toBeInTheDocument();
+  });
+
+  it("renders a non-primary witness under its owning structural candidate", async () => {
+    const body = await analyze("bamoar");
+    const amoCandidate = body.candidates.find(
+      (candidate: any) =>
+        candidate?.embryo === "AMO" &&
+        candidate?.genericFunctionalWitnessRuntimeProjectionV1?.discovery
+          ?.matches?.some((match: any) => match?.sourceForm === "amo"),
+    );
+
+    expect(amoCandidate).toBeTruthy();
+
+    const vm = adaptAnalysisToTelemetryVM(body);
+    render(
+      <EmbryoExpansionContextCardV0_1
+        vm={vm}
+        showPrimaryEvidence
+      />,
+    );
+
+    const secondary = screen.getByTestId(
+      "non-primary-generic-functional-witnesses",
+    );
+    expect(secondary).toHaveTextContent("Structural candidate: AMO");
+    expect(secondary).toHaveTextContent("amo");
+    expect(secondary).toHaveTextContent("Lewis and Short Latin Dictionary");
+    expect(secondary).toHaveTextContent(
+      "Functional correspondence: Unknown / unresolved",
+    );
+    expect(secondary).toHaveTextContent("Historical relation: Not claimed.");
+    expect(secondary).toHaveTextContent("No single witness is selected. User decides.");
+
+    const primary = screen.getByTestId("functional-motivation-card");
+    expect(primary).toHaveTextContent("Candidate");
+    expect(primary.textContent).toContain("A");
   });
 
   it("preserves the existing Structural Null presentation", async () => {
