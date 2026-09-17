@@ -97,6 +97,10 @@ describe("source-provided lookup representation contract v1", () => {
       { ...validInput(), representationKind: "SEMANTIC_ALIAS" },
       "REPRESENTATION_KIND_INVALID",
     );
+    expectRejected(
+      { ...validInput(), authorizedLookupRepresentation: "DOG" },
+      "SOURCE_FIELD_TRANSFORMATION_MISMATCH",
+    );
   });
 
   test("rejects empty, malformed, non-NFC, and source-identical representations", () => {

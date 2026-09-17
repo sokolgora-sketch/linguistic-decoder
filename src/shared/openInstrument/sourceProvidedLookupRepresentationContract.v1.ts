@@ -61,6 +61,7 @@ export type SourceProvidedLookupRepresentationReasonCodeResultV1 =
   | "SOURCE_FIELD_INVALID"
   | "SOURCE_FIELD_VALUE_INVALID"
   | "SOURCE_LOCATOR_INVALID"
+  | "SOURCE_FIELD_TRANSFORMATION_MISMATCH"
   | "REPRESENTATION_KIND_INVALID"
   | "LOSSINESS_INVALID"
   | "SOURCE_DISAMBIGUATION_INVALID"
@@ -278,6 +279,15 @@ function inputReasonCodesV1(
   }
   if (!validSourceFormV1(value.sourceFieldValue)) {
     reasons.push("SOURCE_FIELD_VALUE_INVALID");
+  }
+  if (
+    value.authority === "SOURCE_PROVIDED" &&
+    validSourceFormV1(value.sourceFieldValue) &&
+    typeof value.authorizedLookupRepresentation === "string" &&
+    value.authorizedLookupRepresentation !==
+      value.sourceFieldValue.toLocaleUpperCase("en-US").normalize("NFC")
+  ) {
+    reasons.push("SOURCE_FIELD_TRANSFORMATION_MISMATCH");
   }
   if (!validNfcTextV1(value.sourceLocator)) {
     reasons.push("SOURCE_LOCATOR_INVALID");
