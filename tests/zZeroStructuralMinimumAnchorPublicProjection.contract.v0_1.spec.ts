@@ -117,37 +117,31 @@ describe(
     );
 
     it.each([
-      ["study", "UDY"],
-      ["father", "ATH"],
-      [
-        "philosophy",
-        "ILOSOPHY",
-      ],
-      [
-        "mathematics",
-        "ATHEMAT",
-      ],
-      ["language", "ANGU"],
-      ["terror", "ERR"],
-      ["sister", "IST"],
+      ["study", ["UDY"]],
+      ["father", ["ATH"]],
+      ["philosophy", ["ILOSO", "ILOSOPHY"]],
+      ["mathematics", ["ATHEMAT"]],
+      ["language", ["ANGU"]],
+      ["terror", ["ERR"]],
+      ["sister", ["IST"]],
     ] as const)(
-      "does not emit %s family when minimum terminal %s never reaches the size-2 grammar floor",
+      "emits the smallest defensible variable-length anchor for %s",
       (
         word,
-        terminal,
+        expectedEmbryos,
       ) => {
         expect(
           structuralEmbryos(
             word,
           ),
-        ).not.toContain(
-          terminal,
+        ).toEqual(
+          expectedEmbryos,
         );
       },
     );
 
     it(
-      "only marks size-2 emitted anchors as minimum_defensible_embryo_reached",
+      "only marks emitted anchors at or above the grammar floor as minimum_defensible_embryo_reached",
       () => {
         for (
           const word of [
@@ -177,7 +171,7 @@ describe(
               expect(
                 hypothesis
                   .embryoSize,
-              ).toBe(2);
+              ).toBeGreaterThanOrEqual(2);
             }
           }
         }
@@ -306,30 +300,31 @@ describe(
     );
 
     it.each([
-      "philosophy",
-      "mathematics",
-      "language",
-      "terror",
-      "sister",
-    ])(
-      "keeps unsupported non-floor family %s out of the public structural surface",
-      async (word) => {
+      ["philosophy", ["ILOSO", "ILOSOPHY"]],
+      ["mathematics", ["ATHEMAT"]],
+      ["language", ["ANGU"]],
+      ["terror", ["ERR"]],
+      ["sister", ["IST"]],
+    ] as const)(
+      "projects the defensible variable-length family %s without assigning meaning",
+      async (word, expectedEmbryos) => {
         const body =
           await analyze(word);
 
         expect(
-          liveStructuralCandidates(
-            body,
+          liveStructuralCandidates(body).map(
+            (candidate) => candidate.embryo,
           ),
-        ).toEqual([]);
+        ).toEqual(expectedEmbryos);
 
         expect(
-          body
-            .analysisStatusV0_1
-            .status,
-        ).not.toBe(
-          "structural_unreviewed",
-        );
+          liveStructuralCandidates(body).every(
+            (candidate) =>
+              candidate.independentStandaloneMeaning === null &&
+              candidate.candidateTruthClaim === "not_claimed" &&
+              candidate.historicalOriginClaim === "not_claimed",
+          ),
+        ).toBe(true);
       },
     );
 

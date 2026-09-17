@@ -51,7 +51,6 @@ const COHORT = [
 const NULL_CONTROLS = [
   "wind",
   "mouth",
-  "drink",
   "time",
   "work",
 ] as const;

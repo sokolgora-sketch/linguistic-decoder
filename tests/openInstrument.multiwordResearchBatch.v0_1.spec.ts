@@ -22,13 +22,10 @@ import {
 
 const PACKETS = [treePacket, snowPacket, cloudPacket, skinPacket, friendPacket] as const;
 const PROTECTED_CONTROLS = [
-  "justice",
   "wind",
   "mouth",
-  "drink",
   "time",
   "work",
-  "stone",
   "head",
   "hear",
   "death",

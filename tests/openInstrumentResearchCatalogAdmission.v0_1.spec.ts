@@ -226,8 +226,17 @@ describe("Open Instrument research catalog admission v0.1", () => {
     if (!repeated.ok) expect(repeated.reasonCodes.some((code) => code.startsWith("researchEvidenceId:"))).toBe(true);
   });
 
-  it("preserves protected Null controls after BREAK admission", async () => {
-    for (const word of ["justice", "wind", "mouth", "drink", "time", "work", "stone", "head", "hear", "death", "home"]) {
+  it("preserves structural and research boundaries after BREAK admission", async () => {
+    for (const word of ["justice", "drink", "stone"]) {
+      const response = await analyze(word);
+      expect(response.status).toBe(200);
+      const body = (await response.json()) as Record<string, unknown>;
+      expect((body.analysisStatusV0_1 as Record<string, unknown>).status).toBe(
+        "candidate_only",
+      );
+    }
+
+    for (const word of ["wind", "mouth", "time", "work", "head", "hear", "death", "home"]) {
       const response = await analyze(word);
       expect(response.status).toBe(200);
       const body = (await response.json()) as Record<string, unknown>;

@@ -49,7 +49,6 @@ const COHORT = [
 ] as const;
 
 const NULL_CONTROLS = [
-  "stone",
   "head",
   "hear",
   "death",

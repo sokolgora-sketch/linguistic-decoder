@@ -225,10 +225,8 @@ describe(
     it.each([
       "wind",
       "mouth",
-      "drink",
       "time",
       "work",
-      "stone",
       "head",
       "hear",
       "death",

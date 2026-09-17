@@ -185,13 +185,10 @@ describe("Open Instrument live source intake WATER pilot v0.1", () => {
     ).toHaveLength(2);
 
     for (const word of [
-      "justice",
       "wind",
       "mouth",
-      "drink",
       "time",
       "work",
-      "stone",
       "head",
       "hear",
       "death",

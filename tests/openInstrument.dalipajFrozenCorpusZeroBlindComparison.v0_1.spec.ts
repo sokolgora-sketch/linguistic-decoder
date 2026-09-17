@@ -76,10 +76,10 @@ describe("Dalipaj frozen corpus and Zero blind comparison v0.1", () => {
       form: "SY-GROP",
       normalizedForm: "sygrop",
       voicePath: ["Y", "O"],
-      embryo: null,
-      functionalComponents: null,
+      embryo: "YGR",
+      evidenceStatus: "NO_EXTERNAL_EVIDENCE",
     });
-    expect(syGrop.verdict).toBe("STRUCTURAL_NULL");
+    expect(syGrop.verdict).toBe("NO_CORRESPONDENCE");
     expect(syGrop.sourceFormClassification).toBe("COMPOUND_CLAIM");
     expect(syGrop.reasonCodes).toEqual(expect.arrayContaining([
       "SOURCE_FORM_COMPOUND_CLAIM",
