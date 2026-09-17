@@ -1,6 +1,9 @@
 import {
   buildGenericFunctionalWitnessRuntimeProjectionV1,
 } from "../src/shared/openInstrument/genericFunctionalWitnessRuntimeProjection.v1";
+import {
+  createGenericFunctionalWitnessSourceAdapterV1,
+} from "../src/shared/openInstrument/genericFunctionalWitnessSourceAcquisition.v1";
 import type {
   GenericFunctionalWitnessSourceAdapterV1,
   GenericFunctionalWitnessSourceRecordV1,
@@ -89,6 +92,31 @@ describe("Lane 4 generic witness runtime projection", () => {
     expect(projection?.correspondences[0]?.functionalAcceptance).toBe(
       "NOT_AUTHORIZED",
     );
+  });
+
+  it("projects expanded frozen witnesses for a fresh target through the existing runtime seam", () => {
+    const projection = buildGenericFunctionalWitnessRuntimeProjectionV1({
+      targetWord: "fresh-arbitrary-target",
+      structuralHypothesis: {
+        hypothesisId: "logic-structural:fresh-arbitrary:ERË:fixture",
+        embryo: "ERË",
+      } as any,
+    }, [createGenericFunctionalWitnessSourceAdapterV1()]);
+
+    expect(projection?.discovery.status).toBe("MATCHES_FOUND");
+    expect(projection?.discovery.matches.map((match) => match.sourceId)).toEqual([
+      "research.external.albanian-ere-era.v0_1",
+      "research.external.albanian-ere-smell.v0_1",
+      "research.external.albanian-ere-wind.v0_1",
+    ]);
+    expect(projection?.correspondences).toHaveLength(3);
+    expect(projection?.correspondences.every((correspondence) =>
+      correspondence.verdict === "UNKNOWN" &&
+      correspondence.functionalAcceptance === "NOT_AUTHORIZED" &&
+      correspondence.historicalRelation === "NOT_CLAIMED" &&
+      correspondence.winnerClaim === "NOT_CLAIMED" &&
+      correspondence.noSingleWinner,
+    )).toBe(true);
   });
 
   it("preserves Evidence Null for a valid structural embryo with no match", () => {
