@@ -22,25 +22,35 @@ An emitted structural hypothesis does not automatically become a public candidat
 
 The deterministic structural reduction grammar already requires a resulting structural form to contain at least two Unicode symbols.
 
-Therefore the v0.1 structural grammar floor is:
+Therefore the lower bound for a v0.1 structural family anchor is:
 
 `2`
 
-This contract does not invent a new lexical threshold.
+This contract does not invent a lexical threshold.
 
-It uses the minimum form size already permitted by the structural operation grammar.
+It uses the smallest defensible terminal already permitted by the structural
+operation grammar, while preserving the lower bound of two symbols.
 
 ## Minimum-anchor family gate
 
-After operation-level and structural-support filtering, a structural hypothesis family is emit-eligible only when at least one surviving terminal reaches:
+After operation-level and structural-support filtering, a structural hypothesis
+family is emit-eligible when its smallest surviving terminal reaches the
+structural grammar floor:
 
-`embryoSize = 2`
+`embryoSize >= 2`
 
-The smallest surviving terminal is the family anchor.
+The smallest surviving terminal is the family anchor, whether its size is 2 or
+larger.
 
-If the smallest surviving terminal has size greater than 2, the family has not reached the v0.1 structural grammar floor and is not emitted as `StructuralHypothesisV0_1`.
+If the smallest surviving terminal has size 1, the family is not emitted as
+`StructuralHypothesisV0_1`.
 
 This is structural compactness only.
+
+The normalized structural basis is bounded to 80 Unicode symbols, matching the
+existing bounded candidate-form contract. Inputs above that bound remain
+Structural Null; this is a resource and payload-safety boundary, not a
+semantic preference or a new lexical rule.
 
 It does not imply:
 
@@ -54,7 +64,8 @@ It does not imply:
 
 ## Family behavior
 
-Once a family contains a size-2 anchor, larger sibling hypotheses that already passed the operation-support gate may remain visible.
+Once a family contains a minimum anchor of size 2 or larger, larger sibling
+hypotheses that already passed the operation-support gate may remain visible.
 
 Therefore:
 
@@ -147,7 +158,13 @@ This is a genericity consequence, not reviewed Albanian evidence and not a lexic
 
 ## Families that do not reach the v0.1 minimum anchor
 
-The following inspected terminals have minimum size greater than 2 and must not be emitted as structural hypotheses in v0.1:
+Families with a defensible minimum terminal of size 2 or larger are now
+eligible for structural emission. A mechanically reachable terminal is still
+not sufficient: the existing operation-support gate remains mandatory.
+
+The following previously inspected terminals remain useful controls because
+their reachability or support must be evaluated by the unchanged pre-gate
+rules rather than by terminal length alone:
 
 - `STUDY → UDY` — size 3
 - `FATHER → ATH` — size 3
@@ -158,8 +175,11 @@ The following inspected terminals have minimum size greater than 2 and must not 
 - `SISTER → IST` — size 3
 
 Their mechanical reduction paths may be internally reachable during search.
+They produce an emitted row only if they already pass the existing
+defensibility gate and their minimum terminal is at least two symbols.
 
-They do not produce emitted `StructuralHypothesisV0_1` rows because the family never reaches the v0.1 minimum structural anchor.
+An otherwise defensible anchor above 80 Unicode symbols is also withheld by the
+bounded structural-form contract.
 
 ## TERROR boundary
 
@@ -171,7 +191,8 @@ The existing TERROR control requires:
 
 It does not require `ERR` to be emitted.
 
-Therefore suppression of the size-3 `ERR` terminal by this minimum-anchor gate is compatible with the existing deterministic reduction contract.
+Therefore the existing no-ER/no-TER safety boundary remains independent of
+whether a defensible size-3 terminal is eligible for emission.
 
 ## ERROR boundary
 
@@ -257,37 +278,28 @@ Its meaning remains Unknown.
 
 It is not reviewed evidence.
 
-### PHILOSOPHY
+### Previously inspected variable-length families
 
-ILOSOPHY does not reach the minimum anchor.
+The following previously inspected families now emit their smallest defensible
+terminal when the unchanged operation-support gate accepts it:
 
-No structural candidate.
+- `STUDY → UDY` — size 3
+- `FATHER → ATH` — size 3
+- `PHILOSOPHY → ILOSO` — size 5, with `ILOSOPHY` remaining as a larger sibling
+- `MATHEMATICS → ATHEMAT` — size 7
+- `LANGUAGE → ANGU` — size 4
+- `TERROR → ERR` — size 3
+- `SISTER → IST` — size 3
 
-Baseline Null remains Null unless some separate stronger architecture changes it.
-
-### MATHEMATICS
-
-ATHEMAT does not reach the minimum anchor.
-
-No structural candidate.
-
-### LANGUAGE
-
-ANGU does not reach the minimum anchor.
-
-No structural candidate.
-
-### TERROR
-
-ERR does not reach the minimum anchor.
-
-No structural candidate is required.
+These rows remain structural hypotheses only. They do not receive independent
+meaning, lexical attestation, historical origin, or candidate truth.
 
 The existing no-ER/no-TER safety boundary remains mandatory.
 
 ## `minimum_defensible_embryo_reached`
 
-This reason code must only describe a hypothesis at the structural grammar floor for v0.1.
+This reason code describes the smallest defensible emitted hypothesis at the
+structural grammar floor for v0.1.
 
 Therefore an emitted minimum anchor carrying:
 
@@ -295,15 +307,17 @@ Therefore an emitted minimum anchor carrying:
 
 must have:
 
-`embryoSize = 2`
+`embryoSize >= 2`
 
-A size-3, size-4, size-7, or size-8 terminal must not receive this reason code as an emitted structural hypothesis.
+A size-1 terminal must not receive this reason code or be emitted as a
+structural hypothesis.
 
 ## Null
 
 Null remains a valid result.
 
-Failure to reach the minimum structural anchor is a valid reason for structural discovery to produce no emitted hypothesis family.
+Failure to produce a defensible minimum anchor of at least two symbols is a
+valid reason for structural discovery to produce no emitted hypothesis family.
 
 ## No shortcuts
 

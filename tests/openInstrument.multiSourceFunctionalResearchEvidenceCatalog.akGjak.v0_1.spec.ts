@@ -495,7 +495,7 @@ describe(
           terror?.analysisStatusV0_1
             ?.status,
         ).toBe(
-          "null_no_supported_candidate",
+          "candidate_only",
         );
       },
     );

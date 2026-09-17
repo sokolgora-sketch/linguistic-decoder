@@ -178,8 +178,14 @@ describe("Open Instrument SCALE-50 Cohort G v0.1", () => {
     }
   });
 
-  it("keeps justice Null and preserves legacy Null controls", async () => {
-    for (const word of ["justice", "stone", "wind"]) {
+  it("keeps justice out of research and preserves true Null controls", async () => {
+    const justice = await analyzeV0_1("justice");
+    expect(
+      (justice.analysisStatusV0_1 as Record<string, unknown>).status,
+    ).toBe("candidate_only");
+    expect(researchCandidatesV0_1(justice)).toEqual([]);
+
+    for (const word of ["wind"]) {
       const body = await analyzeV0_1(word);
       expect(
         (body.analysisStatusV0_1 as Record<string, unknown>).status,

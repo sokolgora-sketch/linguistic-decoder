@@ -2,6 +2,8 @@ import {
   GET,
 } from "../app/api/analyze-v1/route";
 
+import { readFileSync } from "node:fs";
+
 import {
   discoverStructuralHypothesesV0_1,
 } from "../src/shared/structuralHypothesisDiscovery.v0_1";
@@ -16,6 +18,29 @@ function embryos(
       (hypothesis) =>
         hypothesis.embryo,
     )
+  );
+}
+
+function frozenCorpusWords(): string[] {
+  const files = [
+    "tests/research/albanian200.words.v0.1.txt",
+    "tests/research/classical100.words.v0.1.txt",
+  ];
+  const seen = new Set<string>();
+
+  return files.flatMap((file) =>
+    readFileSync(file, "utf8")
+      .split("\n")
+      .map((line) => line.trim())
+      .filter(Boolean)
+      .map((line) => line.split(/\s+/u)[1] ?? "")
+      .map((word) => word.normalize("NFC"))
+      .filter((word) => word.length > 0)
+      .filter((word) => {
+        if (seen.has(word)) return false;
+        seen.add(word);
+        return true;
+      }),
   );
 }
 
@@ -72,6 +97,94 @@ describe(
         ).toContain(
           "YË",
         );
+      },
+    );
+
+    it(
+      "emits a defensible size-3 minimum anchor without changing the pre-gate rules",
+      () => {
+        const discovered =
+          discoverStructuralHypothesesV0_1(
+            "kripë",
+          );
+
+        expect(
+          discovered.map(
+            (hypothesis) => hypothesis.embryo,
+          ),
+        ).toEqual(["IPË"]);
+
+        expect(
+          discovered[0]?.embryoSize,
+        ).toBe(3);
+
+        expect(
+          discovered[0]?.reductionSteps.at(-1)
+            ?.voicePathAfter,
+        ).toEqual(["I", "Ë"]);
+
+        expect(
+          discovered[0]?.reasonCodes,
+        ).toContain(
+          "minimum_defensible_embryo_reached",
+        );
+      },
+    );
+
+    it(
+      "measures the frozen target-blind corpus without converting pre-gate Nulls",
+      () => {
+        const words = frozenCorpusWords();
+        const discovered = words.map((word) =>
+          discoverStructuralHypothesesV0_1(word),
+        );
+        const successful = discovered.filter(
+          (hypotheses) => hypotheses.length > 0,
+        );
+
+        expect(words).toHaveLength(288);
+        expect(successful).toHaveLength(157);
+        expect(
+          discovered.filter(
+            (hypotheses) => hypotheses.length === 0,
+          ),
+        ).toHaveLength(131);
+        expect(
+          successful.every((hypotheses) =>
+            hypotheses.every(
+              (hypothesis) => hypothesis.embryoSize >= 2,
+            ),
+          ),
+        ).toBe(true);
+      },
+    );
+
+    it(
+      "keeps length-one and weak structural controls fail-closed",
+      () => {
+        expect(embryos("a")).toEqual([]);
+        expect(embryos("xyz")).toEqual([]);
+        expect(embryos("jetë")).toEqual([]);
+      },
+    );
+
+    it(
+      "bounds variable-length structural output without restoring an exact-size gate",
+      () => {
+        const boundedInput = `${"a".repeat(77)}tra`;
+        const oversizedInput = `${"a".repeat(78)}tra`;
+
+        expect(
+          discoverStructuralHypothesesV0_1(
+            boundedInput,
+          )[0]?.embryoSize,
+        ).toBe(77);
+
+        expect(
+          discoverStructuralHypothesesV0_1(
+            oversizedInput,
+          ),
+        ).toEqual([]);
       },
     );
 

@@ -108,8 +108,14 @@ describe("logic-first fresh-word generalization v0.1", () => {
   });
 
   it("generalizes the bounded family to held-out words without target-word branches", async () => {
-    const heldOutPositive = ["bistro", "contra", "mantra"] as const;
-    const heldOutNull = ["electro", "extra", "ultra", "metro", "intro", "terror", "sister"] as const;
+    const heldOutPositive = [
+      "bistro",
+      "contra",
+      "mantra",
+      "terror",
+      "sister",
+    ] as const;
+    const heldOutNull = ["electro", "extra", "ultra", "metro", "intro"] as const;
 
     for (const word of heldOutPositive) {
       const body = await analyze(word, true);

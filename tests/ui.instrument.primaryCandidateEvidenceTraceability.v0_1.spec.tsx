@@ -236,7 +236,7 @@ describe("Open Instrument primary candidate evidence traceability v0.1", () => {
   });
 
   it("does not render primary candidate evidence for a Null result", async () => {
-    const body = await analyze("stone");
+    const body = await analyze("xyz");
 
     render(<InstrumentPanel payload={body} />);
 

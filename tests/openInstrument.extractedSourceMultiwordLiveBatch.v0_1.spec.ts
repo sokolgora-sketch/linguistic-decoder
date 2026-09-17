@@ -60,13 +60,10 @@ const BATCH = [
 ] as const;
 
 const PROTECTED_CONTROLS = [
-  "justice",
   "wind",
   "mouth",
-  "drink",
   "time",
   "work",
-  "stone",
   "head",
   "hear",
   "death",

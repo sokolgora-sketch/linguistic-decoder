@@ -93,6 +93,7 @@ type ReductionBranchV0_1 = {
 const MAX_RIGHT_EDGE_PEELS_V0_1 = 1;
 const MAX_LEFT_FRAME_PEELS_V0_1 = 2;
 const MIN_TERMINAL_LENGTH_V0_1 = 2;
+const MAX_STRUCTURAL_FORM_LENGTH_V0_1 = 80;
 
 function normalizeStructuralBasisV0_1(
   value: unknown,
@@ -673,6 +674,16 @@ export function discoverStructuralHypothesesV0_1(
     return [];
   }
 
+  // Keep variable-length structural output within the existing bounded
+  // candidate-form contract. Oversized inputs remain structural Null rather
+  // than producing disproportionately large hypothesis payloads.
+  if (
+    symbolsV0_1(basis).length >
+    MAX_STRUCTURAL_FORM_LENGTH_V0_1
+  ) {
+    return [];
+  }
+
   const branches:
     ReductionBranchV0_1[] = [
       {
@@ -794,18 +805,12 @@ export function discoverStructuralHypothesesV0_1(
       },
     );
 
-  // Structural-family emission requires reaching the minimum
-  // form size already authorized by the v0.1 operation grammar.
-  //
-  // A family that bottoms out above two symbols remains only a
-  // mechanically reachable reduction path; it is not emitted as
-  // StructuralHypothesisV0_1.
-  //
-  // Once a size-2 anchor exists, larger siblings that already
-  // passed the structural-support gate may remain visible under
-  // the no-single-winner posture.
-  const structuralMinimumAnchorSizeV0_1 =
-    2;
+  // Structural-family emission requires the smallest defensible
+  // anchor to remain within the reviewed grammar floor. The floor
+  // prevents unauthorized one-symbol embryos, while the minimum
+  // defensible result is allowed to remain larger when no smaller
+  // defensible anchor exists.
+  const structuralMinimumAnchorSizeV0_1 = 2;
 
   const minimumDefensibleAnchorSize =
     defensibleHypotheses.length > 0
@@ -818,8 +823,9 @@ export function discoverStructuralHypothesesV0_1(
       : null;
 
   if (
-    minimumDefensibleAnchorSize !==
-    structuralMinimumAnchorSizeV0_1
+    minimumDefensibleAnchorSize === null ||
+    minimumDefensibleAnchorSize <
+      structuralMinimumAnchorSizeV0_1
   ) {
     return [];
   }

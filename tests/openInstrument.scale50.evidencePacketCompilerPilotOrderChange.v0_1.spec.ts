@@ -224,21 +224,27 @@ describe("Open Instrument real evidence-packet compiler pilot v0.1", () => {
     const controls = [
       "wind",
       "mouth",
-      "drink",
       "time",
       "work",
-      "stone",
       "head",
       "hear",
       "death",
       "home",
     ];
 
-    for (const word of ["justice", ...controls]) {
+    for (const word of controls) {
       const body = await analyzeV0_1(word);
       expect(
         (body.analysisStatusV0_1 as Record<string, unknown>).status,
       ).toBe("null_no_supported_candidate");
+      expect(researchCandidatesV0_1(body)).toEqual([]);
+    }
+
+    for (const word of ["justice", "drink", "stone"]) {
+      const body = await analyzeV0_1(word);
+      expect(
+        (body.analysisStatusV0_1 as Record<string, unknown>).status,
+      ).toBe("candidate_only");
       expect(researchCandidatesV0_1(body)).toEqual([]);
     }
   });
