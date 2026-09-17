@@ -71,12 +71,17 @@ describe("Open Instrument Lane 2 generic source acquisition", () => {
     expect(parsed.ok).toBe(true);
 
     const dataset = loadGenericFunctionalWitnessSourceDatasetV1();
-    expect(dataset.records).toHaveLength(4);
+    expect(dataset.records).toHaveLength(9);
     expect(dataset.records.map((record) => record.sourceForm)).toEqual([
       "dorë",
+      "dua",
+      "erë",
+      "erë",
+      "erë",
       "jetë",
       "shi",
       "amo",
+      "caelum",
     ]);
     expect(JSON.stringify(rawSourceDataset)).not.toContain("targetWord");
     expect(JSON.stringify(rawSourceDataset)).not.toContain("targetSense");
@@ -147,6 +152,57 @@ describe("Open Instrument Lane 2 generic source acquisition", () => {
       sourceUrlOrArchiveRef: "https://fjale.al/shi",
       entryLocator: "SHI m., sense 1",
     });
+  });
+
+  it("preserves multiple exact source senses for one embryo without selecting a winner", () => {
+    const result = queryGenericFunctionalWitnessesV1(
+      query("ERË", ["E", "Ë"]),
+      [createGenericFunctionalWitnessSourceAdapterV1()],
+    );
+
+    expect(result.status).toBe("MATCHES_FOUND");
+    expect(result.matches.map((match) => match.sourceId)).toEqual([
+      "research.external.albanian-ere-era.v0_1",
+      "research.external.albanian-ere-smell.v0_1",
+      "research.external.albanian-ere-wind.v0_1",
+    ]);
+    expect(result.matches.map((match) => match.sourceProvenance?.entryLocator)).toEqual([
+      "ERË III f. libr., senses 1-2",
+      "ERË II f., senses 1-2",
+      "ERË I f., senses 1-2",
+    ]);
+    expect(result.matches.every((match) =>
+      match.sourceForm === "erë" &&
+      match.sourceAttestation === "SOURCE_RECORD_ONLY" &&
+      match.functionalCorrespondence === "NOT_EVALUATED" &&
+      match.targetMeaning === "NOT_CLAIMED" &&
+      match.winnerClaim === "NOT_CLAIMED" &&
+      match.noSingleWinner &&
+      match.userDecisionPosture === "user_decides",
+    )).toBe(true);
+  });
+
+  it("exposes added exact forms without target-word rows", () => {
+    const adapterV1 = createGenericFunctionalWitnessSourceAdapterV1();
+    const dua = queryGenericFunctionalWitnessesV1(query("DUA", ["U", "A"]), [adapterV1]);
+    const caelum = queryGenericFunctionalWitnessesV1(query("CAELUM", ["A", "E", "U"]), [adapterV1]);
+
+    expect(dua.matches[0]).toMatchObject({
+      sourceForm: "dua",
+      language: "Albanian",
+      sourceAttestation: "SOURCE_RECORD_ONLY",
+      functionalCorrespondence: "NOT_EVALUATED",
+      historicalRelation: "NOT_CLAIMED",
+    });
+    expect(caelum.matches[0]).toMatchObject({
+      sourceForm: "caelum",
+      language: "Latin",
+      sourceAttestation: "SOURCE_RECORD_ONLY",
+      functionalCorrespondence: "NOT_EVALUATED",
+      historicalRelation: "NOT_CLAIMED",
+    });
+    expect(dua.query).not.toHaveProperty("targetWord");
+    expect(caelum.query).not.toHaveProperty("targetWord");
   });
 
   it("keeps misses as Evidence Null and rejects case or Unicode variants", () => {
