@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Exact entryFree fragments from PerseusDL/lexica at the pinned commit in the
+  adjacent manifest. This bounded slice is distributed under the upstream
+  CC BY-SA 4.0 terms with the required Perseus attribution.
+-->
+<sourceSlice sourceFormat="TEI.2 XML" sourceTraditionId="scaife.lewis-short.v0_1">
+  <entryFree key="Aaron" type="main" id="n3"><orth lang="la" extent="full">Ăărōn</orth> (ăārōn, <bibl><author>Prud.</author> Psych. 884</bibl>), <itype>indecl.</itype> or <itype>ōnis</itype>, <gen>m.</gen>, <foreign></foreign> <sense level="1" n="I" id="n3.0"><hi rend="ital">Aaron</hi>, <hi rend="ital">brother of Moses</hi>, and <hi rend="ital">first high-priest of the Hebrews</hi>, <bibl n="urn:cts:greekLit:tlg0527.tlg002:4:14"><author>Vulg.</author> Exod. 4, 14</bibl>; <bibl>6, 25 al.</bibl></sense></entryFree>
+  <entryFree key="abactor" type="main" id="n7"><orth lang="la" extent="full">ăbactor</orth>, <itype>ōris</itype>, <gen>m.</gen> <etym>abigo</etym>,=abigeus and abigeator, <sense level="1" n="I" id="n7.0"><hi rend="ital">one who drives off, a driver off</hi> (late Latin): pecorum, Firm. Astr. 6, 31; cf. <bibl><author>Isid.</author> Orig. 10, 14</bibl>; and boum, Min. Fel. O-ct. 5; and <hi rend="ital">absol., a cuttle-stealer</hi> or <hi rend="ital">thief</hi>, <bibl><author>App.</author> M. 7, p. 199 <hi rend="ital">med.</hi></bibl> Elm.; Paul. Sent. ō, 18, 1.</sense></entryFree>
+  <entryFree n="2" key="abactus2" type="hapax" id="n9"><orth lang="la" extent="full">ăbactus</orth>, <itype>ūs</itype>, <gen>m.</gen> <etym>abigo</etym>, <sense level="1" n="I" id="n9.0"><hi rend="ital">a driving away, robbing</hi> (of cattle, vessels, etc.), <bibl n="Plin. Pan. 20.4"><author>Plin.</author> Pan. 20, 4</bibl>.</sense></entryFree>
+</sourceSlice>
