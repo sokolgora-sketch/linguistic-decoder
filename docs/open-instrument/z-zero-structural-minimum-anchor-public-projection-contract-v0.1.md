@@ -47,6 +47,11 @@ If the smallest surviving terminal has size 1, the family is not emitted as
 
 This is structural compactness only.
 
+The normalized structural basis is bounded to 80 Unicode symbols, matching the
+existing bounded candidate-form contract. Inputs above that bound remain
+Structural Null; this is a resource and payload-safety boundary, not a
+semantic preference or a new lexical rule.
+
 It does not imply:
 
 - lexical meaning
@@ -172,6 +177,9 @@ rules rather than by terminal length alone:
 Their mechanical reduction paths may be internally reachable during search.
 They produce an emitted row only if they already pass the existing
 defensibility gate and their minimum terminal is at least two symbols.
+
+An otherwise defensible anchor above 80 Unicode symbols is also withheld by the
+bounded structural-form contract.
 
 ## TERROR boundary
 

@@ -93,6 +93,7 @@ type ReductionBranchV0_1 = {
 const MAX_RIGHT_EDGE_PEELS_V0_1 = 1;
 const MAX_LEFT_FRAME_PEELS_V0_1 = 2;
 const MIN_TERMINAL_LENGTH_V0_1 = 2;
+const MAX_STRUCTURAL_FORM_LENGTH_V0_1 = 80;
 
 function normalizeStructuralBasisV0_1(
   value: unknown,
@@ -670,6 +671,16 @@ export function discoverStructuralHypothesesV0_1(
     );
 
   if (!basis) {
+    return [];
+  }
+
+  // Keep variable-length structural output within the existing bounded
+  // candidate-form contract. Oversized inputs remain structural Null rather
+  // than producing disproportionately large hypothesis payloads.
+  if (
+    symbolsV0_1(basis).length >
+    MAX_STRUCTURAL_FORM_LENGTH_V0_1
+  ) {
     return [];
   }
 

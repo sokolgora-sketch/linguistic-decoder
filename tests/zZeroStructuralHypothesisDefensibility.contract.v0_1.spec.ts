@@ -168,6 +168,26 @@ describe(
       },
     );
 
+    it(
+      "bounds variable-length structural output without restoring an exact-size gate",
+      () => {
+        const boundedInput = `${"a".repeat(77)}tra`;
+        const oversizedInput = `${"a".repeat(78)}tra`;
+
+        expect(
+          discoverStructuralHypothesesV0_1(
+            boundedInput,
+          )[0]?.embryoSize,
+        ).toBe(77);
+
+        expect(
+          discoverStructuralHypothesesV0_1(
+            oversizedInput,
+          ),
+        ).toEqual([]);
+      },
+    );
+
     it.each([
       ["xyz", "YZ"],
       ["data", "ATA"],
