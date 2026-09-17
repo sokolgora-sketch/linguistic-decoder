@@ -7,6 +7,7 @@ import type {
   TelemetryViewModel,
   Vowel,
 } from "@/ui/telemetry/types";
+import type { GenericFunctionalWitnessRuntimeProjectionV1 } from "@/shared/openInstrument/genericFunctionalWitnessRuntimeProjection.v1";
 
 import { buildCandidateRowsFromVM } from "@/ui/candidates/candidateModel";
 import { CandidateEvidenceReferences } from "@/ui/candidates/EvidenceReferenceLink";
@@ -506,6 +507,122 @@ function NoSupportedFunctionalCandidate({
   );
 }
 
+function presentWitnessProjection(
+  row: CandidateRowVM,
+): GenericFunctionalWitnessRuntimeProjectionV1 | null {
+  const projection =
+    row.genericFunctionalWitnessRuntimeProjectionV1;
+
+  return projection?.kind === "present"
+    ? projection.value
+    : null;
+}
+
+function witnessCorrespondenceLabel(
+  verdict: string,
+): string {
+  switch (verdict) {
+    case "SUPPORTED":
+      return "Supported";
+    case "PARTIALLY_SUPPORTED":
+      return "Partially supported";
+    case "UNSUPPORTED":
+      return "Unsupported";
+    case "UNKNOWN":
+      return "Unknown / unresolved";
+    case "NULL":
+      return "Not evaluated";
+    default:
+      return "Not evaluated";
+  }
+}
+
+function GenericFunctionalWitnesses({
+  projection,
+}: {
+  projection: GenericFunctionalWitnessRuntimeProjectionV1 | null;
+}) {
+  const matches = projection?.discovery.matches ?? [];
+
+  return (
+    <section
+      data-testid="generic-functional-witnesses"
+      className="mt-5 rounded-lg border border-cyan-300 bg-cyan-50 p-4 dark:border-cyan-400/25 dark:bg-cyan-500/5"
+    >
+      <div className="text-xs font-semibold uppercase tracking-[0.14em] text-cyan-700 dark:text-cyan-200">
+        Functional witnesses
+      </div>
+
+      {matches.length === 0 ? (
+        <div className="mt-2 text-sm leading-6 text-slate-800 dark:text-slate-200">
+          No external evidence was found for this embryo. The doctrinal
+          reading remains separate from this Evidence Null.
+        </div>
+      ) : (
+        <>
+          <div className="mt-2 text-sm leading-6 text-slate-800 dark:text-slate-200">
+            The following source-attested forms match this embryo. They are
+            witnesses, not historical origins or automatic functional winners.
+          </div>
+
+          <div className="mt-3 grid gap-3">
+            {matches.map((witness, index) => {
+              const correspondence =
+                projection?.correspondences[index] ?? null;
+              const provenance = witness.sourceProvenance;
+              const variety = witness.languageVariety?.trim();
+
+              return (
+                <div
+                  key={witness.witnessId}
+                  data-testid="generic-functional-witness"
+                  className="rounded-lg border border-cyan-200 bg-white/75 p-3 dark:border-cyan-400/20 dark:bg-black/20"
+                >
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <div className="font-mono text-base font-semibold text-slate-950 dark:text-white">
+                      {witness.sourceForm}
+                    </div>
+                    <span className="rounded-full border border-amber-400/50 bg-amber-100 px-2 py-0.5 text-[11px] font-semibold text-amber-900 dark:bg-amber-500/10 dark:text-amber-100">
+                      Source attestation
+                    </span>
+                  </div>
+
+                  <div className="mt-2 text-sm text-slate-800 dark:text-slate-200">
+                    {witness.language}
+                    {variety ? ` · ${variety}` : ""}
+                  </div>
+
+                  <div className="mt-2 text-sm leading-6 text-slate-800 dark:text-slate-200">
+                    {witness.gloss}
+                  </div>
+
+                  {provenance ? (
+                    <div className="mt-2 text-xs leading-5 text-slate-600 dark:text-slate-400">
+                      {`${provenance.sourceTitle} · ${provenance.entryLocator}`}
+                    </div>
+                  ) : null}
+
+                  <div className="mt-3 border-t border-cyan-200 pt-2 text-xs leading-5 text-slate-700 dark:border-cyan-400/20 dark:text-slate-300">
+                    {`Functional correspondence: ${witnessCorrespondenceLabel(
+                      correspondence?.verdict ?? "NULL",
+                    )}`}
+                    <br />
+                    Historical relation: Not claimed.
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="mt-3 text-xs leading-5 text-slate-600 dark:text-slate-400">
+            No single witness is selected. User decides.
+          </div>
+        </>
+      )}
+    </section>
+  );
+}
+
 export function EmbryoExpansionContextCardV0_1({
   vm,
   onViewCandidateRecord,
@@ -559,6 +676,13 @@ export function EmbryoExpansionContextCardV0_1({
     showPrimaryEvidence && primaryCandidateIndex >= 0
       ? candidateUiRows[primaryCandidateIndex] ?? null
       : null;
+
+  const witnessProjection =
+    presentWitnessProjection(primaryCandidate);
+
+  const hasSourceWitness =
+    witnessProjection?.discovery.status === "MATCHES_FOUND" &&
+    witnessProjection.discovery.matches.length > 0;
 
   const rootTokens =
     Array.isArray(
@@ -1130,7 +1254,9 @@ export function EmbryoExpansionContextCardV0_1({
         <div className="flex shrink-0 flex-col items-start gap-2 sm:items-end">
           <div className="rounded-full border border-amber-400/50 bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-900 dark:bg-amber-500/10 dark:text-amber-100">
             {isGenericFunctionalCandidate
-              ? "Evidence: None available"
+              ? hasSourceWitness
+                ? "Evidence: Source attestation available"
+                : "Evidence: None available"
               : isResearchFunctionalCandidate
               ? "Research hypothesis"
               : `Evidence: ${evidenceStatus}`}
@@ -1207,6 +1333,12 @@ export function EmbryoExpansionContextCardV0_1({
               : "A functional explanation was not emitted.")}
         </div>
       </div>
+
+      {witnessProjection || isGenericFunctionalCandidate ? (
+        <GenericFunctionalWitnesses
+          projection={witnessProjection}
+        />
+      ) : null}
 
       {primaryCandidateUiRow ? (
         <CandidateEvidenceReferences row={primaryCandidateUiRow} tone="light" />

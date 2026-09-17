@@ -29,6 +29,9 @@ import type { RootMapV1 } from "@/shared/deepRoot.rootMap.v1";
 import { computeDeepRootHeartGateV01 } from "@/shared/deepRootHeartGate.v0.1.compute";
 import { SEVEN_PRINCIPLES, vowelToIndex1, vowelToRingIndex, vowelToColor, vowelToNote } from "@/shared/sevenPrinciples.v1";
 import type { AnalysisStatusV0_1VM } from "../telemetry/types";
+import {
+  parseGenericFunctionalWitnessRuntimeProjectionV1,
+} from "@/shared/openInstrument/genericFunctionalWitnessRuntimeProjection.v1";
 
 type ParseRootMapResult = { ok: true; value: RootMapV1 } | { ok: false; reason: string };
 
@@ -1253,6 +1256,11 @@ const normalizationSteps =
       const candidateTruthClaim =
         asString(rec["candidateTruthClaim"]);
 
+      const genericFunctionalWitnessRuntimeProjection =
+        parseGenericFunctionalWitnessRuntimeProjectionV1(
+          rec["genericFunctionalWitnessRuntimeProjectionV1"],
+        );
+
       const segmentation =
         isRecord(rec["segmentation"])
           ? rec["segmentation"]
@@ -1565,6 +1573,15 @@ const evidenceId = String(id).toLowerCase().replace(/[^a-z0-9_]/g, "_");
           ? {
               candidateTruthClaim:
                 present(candidateTruthClaim),
+            }
+          : {}),
+
+        ...(genericFunctionalWitnessRuntimeProjection
+          ? {
+              genericFunctionalWitnessRuntimeProjectionV1:
+                present(
+                  genericFunctionalWitnessRuntimeProjection,
+                ),
             }
           : {}),
 
