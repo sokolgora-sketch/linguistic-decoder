@@ -1,0 +1,23 @@
+{
+  "manifestVersion": "open-instrument.reviewed-lewis-short-batch-import.v1",
+  "sourceName": "Lewis & Short Latin Dictionary",
+  "sourceEdition": "A Latin Dictionary, 1879; Unicode TEI source file",
+  "sourceRepository": "https://github.com/PerseusDL/lexica",
+  "sourceRepositoryCommit": "56061ca127f4a2844980baffc5f2b6d1332897b3",
+  "sourceFilePath": "CTS_XML_TEI/perseus/pdllex/lat/ls/lat.ls.perseus-eng2.xml",
+  "sourceFormat": "TEI.2 XML",
+  "sourceLicense": "CC BY-SA 4.0",
+  "licenseFile": "license.md; CTS_XML_TEI/perseus/pdllex/lat/ls/README.md",
+  "attribution": "Text provided under a CC BY-SA license by Perseus Digital Library, http://www.perseus.tufts.edu, with funding from The National Endowment for the Humanities. Data accessed from https://github.com/PerseusDL/lexica/ at the pinned commit.",
+  "sourceFileGitBlobSha": "c3474349ef9073bb436229cdf886eb77ed88d2fd",
+  "sourceUrlOrArchiveRef": "https://github.com/PerseusDL/lexica/blob/56061ca127f4a2844980baffc5f2b6d1332897b3/CTS_XML_TEI/perseus/pdllex/lat/ls/lat.ls.perseus-eng2.xml",
+  "sourceDateOrVersion": "Lewis & Short source file release date 1997-10-28; upstream commit 56061ca127f4a2844980baffc5f2b6d1332897b3",
+  "sourceSliceSha256": "f40581bcaa8a8772cc5056b7ba1359cef7594a6efa4cfd474c3393258f93fe9c",
+  "sourceSliceFormat": "TEI.2 XML entryFree slice",
+  "language": "Latin",
+  "languageVariety": null,
+  "evidenceFamily": "historical_dictionary",
+  "sourceStatus": "research_candidate",
+  "selectedEntryIds": ["n3", "n7", "n9"],
+  "selectionRule": "Exact source-internal entryFree IDs n3,n7,n9 in source-document order; selection is target-blind and does not inspect target words, embryos, correspondences, or chat examples."
+}
