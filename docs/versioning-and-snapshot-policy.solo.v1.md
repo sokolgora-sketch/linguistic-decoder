@@ -26,6 +26,25 @@ It prevents accidental drift when you are tired, moving fast, or context-switchi
 - Bump when the canon word list, battery policy, or fixtures change.
 - Example: adding/removing a gold word; changing expected outputs for canon battery.
 
+## Product release versions
+
+Annotated `vX.Y.Z` Git tags are the public ZË-RO product release authority.
+The `package.json` `version` field is package metadata and is not synchronized
+with product tags unless a separate decision explicitly changes that role.
+
+Use the smallest SemVer increment that describes the merged product change:
+
+- **PATCH**: backward-compatible bug fixes or corrections without a new
+  user-visible analytical capability.
+- **MINOR**: backward-compatible new user-visible analytical capability.
+- **MAJOR**: intentional breaking product, contract, or doctrine compatibility
+  change.
+
+A product release requires its changelog entry, merged PR, required validation,
+and tag creation from the verified merged `main` commit. Product release
+versioning does not replace the separate `engineVersion`, `contractVersion`,
+`rulesetVersion`, or `canonVersion` levers above.
+
 ---
 
 ## 2) Snapshot rules (hard)
