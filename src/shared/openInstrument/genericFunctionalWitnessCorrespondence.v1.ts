@@ -165,6 +165,9 @@ function cloneSourceWitnessV1(
     embryoRelation: value.embryoRelation,
     attestationTruth: value.attestationTruth,
     sourceStatus: value.sourceStatus,
+    ...(value.sourceAuthorityStatus
+      ? { sourceAuthorityStatus: value.sourceAuthorityStatus }
+      : {}),
     sourceAttestation: value.sourceAttestation,
     functionalCorrespondence: value.functionalCorrespondence,
     targetMeaning: value.targetMeaning,
@@ -292,6 +295,8 @@ function sourceWitnessIsValidV1(value: unknown): value is GenericFunctionalWitne
       value.attestationTruth === "unknown") &&
     (value.sourceStatus === "research_candidate" ||
       value.sourceStatus === "reviewed_candidate") &&
+    (value.sourceAuthorityStatus === undefined ||
+      value.sourceAuthorityStatus === "reviewed_accepted") &&
     (value.sourceProvenance === undefined ||
       sourceProvenanceIsValidV1(value.sourceProvenance, value.sourceId)) &&
     value.sourceAttestation === "SOURCE_RECORD_ONLY" &&

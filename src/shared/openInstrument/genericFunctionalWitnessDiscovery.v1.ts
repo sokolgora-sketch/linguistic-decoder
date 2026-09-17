@@ -51,6 +51,7 @@ export type GenericFunctionalWitnessSourceRecordV1 = Readonly<{
   relationOperationIds: readonly string[];
   attestationTruth: MultiSourceTruthStatusV0_1;
   sourceStatus: MultiSourceFunctionalResearchSourceStatusV0_1;
+  sourceAuthorityStatus?: "reviewed_accepted";
   sourceProvenance?: GenericFunctionalWitnessSourceProvenanceV1;
 }>;
 
@@ -86,6 +87,7 @@ export type GenericFunctionalWitnessV1 = Readonly<{
   relationOperationIds: readonly string[];
   attestationTruth: MultiSourceTruthStatusV0_1;
   sourceStatus: MultiSourceFunctionalResearchSourceStatusV0_1;
+  sourceAuthorityStatus?: "reviewed_accepted";
   sourceProvenance?: GenericFunctionalWitnessSourceProvenanceV1;
   sourceAttestation: "SOURCE_RECORD_ONLY";
   functionalCorrespondence: "NOT_EVALUATED";
@@ -252,6 +254,8 @@ function sourceRecordIsValidV1(
     record.relationOperationIds.every(exactTextV1) &&
     isTruthStatusV1(record.attestationTruth) &&
     isResearchSourceStatusV1(record.sourceStatus) &&
+    (record.sourceAuthorityStatus === undefined ||
+      record.sourceAuthorityStatus === "reviewed_accepted") &&
     (record.sourceProvenance === undefined ||
       sourceProvenanceIsValidV1(record.sourceProvenance, record.sourceId))
   );
@@ -339,6 +343,9 @@ function buildWitnessV1(
     relationOperationIds: [...record.relationOperationIds],
     attestationTruth: record.attestationTruth,
     sourceStatus: record.sourceStatus,
+    ...(record.sourceAuthorityStatus
+      ? { sourceAuthorityStatus: record.sourceAuthorityStatus }
+      : {}),
     ...(record.languageVariety !== undefined
       ? { languageVariety: record.languageVariety }
       : {}),
