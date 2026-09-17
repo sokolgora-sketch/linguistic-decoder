@@ -26,11 +26,23 @@ export type GenericFunctionalWitnessQueryV1 = Readonly<{
   queryNormalization: typeof GENERIC_FUNCTIONAL_WITNESS_QUERY_NORMALIZATION_V1;
 }>;
 
+export type GenericFunctionalWitnessSourceProvenanceV1 = Readonly<{
+  sourceRecordId: string;
+  sourceTraditionId: string;
+  sourceTitle: string;
+  sourceDateOrVersion: string;
+  sourceUrlOrArchiveRef: string;
+  entryLocator: string;
+  sourceHashOrArchiveHash: string | null;
+  languageVariety: string | null;
+}>;
+
 export type GenericFunctionalWitnessSourceRecordV1 = Readonly<{
   queryForm: string;
   sourceId: string;
   evidenceFamily: MultiSourceEvidenceFamilyV0_1;
   language: string;
+  languageVariety?: string | null;
   sourceForm: string;
   sourceFormNormalization: "EXACT_PRESERVED";
   gloss: string;
@@ -39,6 +51,7 @@ export type GenericFunctionalWitnessSourceRecordV1 = Readonly<{
   relationOperationIds: readonly string[];
   attestationTruth: MultiSourceTruthStatusV0_1;
   sourceStatus: MultiSourceFunctionalResearchSourceStatusV0_1;
+  sourceProvenance?: GenericFunctionalWitnessSourceProvenanceV1;
 }>;
 
 export type GenericFunctionalWitnessSourceAdapterResultV1 =
@@ -64,6 +77,7 @@ export type GenericFunctionalWitnessV1 = Readonly<{
   sourceId: string;
   evidenceFamily: MultiSourceEvidenceFamilyV0_1;
   language: string;
+  languageVariety?: string | null;
   sourceForm: string;
   sourceFormNormalization: "EXACT_PRESERVED";
   gloss: string;
@@ -72,6 +86,7 @@ export type GenericFunctionalWitnessV1 = Readonly<{
   relationOperationIds: readonly string[];
   attestationTruth: MultiSourceTruthStatusV0_1;
   sourceStatus: MultiSourceFunctionalResearchSourceStatusV0_1;
+  sourceProvenance?: GenericFunctionalWitnessSourceProvenanceV1;
   sourceAttestation: "SOURCE_RECORD_ONLY";
   functionalCorrespondence: "NOT_EVALUATED";
   targetMeaning: "NOT_CLAIMED";
@@ -141,6 +156,30 @@ function isResearchSourceStatusV1(
   return value === "research_candidate" || value === "reviewed_candidate";
 }
 
+function sourceProvenanceIsValidV1(
+  value: unknown,
+  sourceId: string,
+): value is GenericFunctionalWitnessSourceProvenanceV1 {
+  if (value === null || typeof value !== "object" || Array.isArray(value)) {
+    return false;
+  }
+
+  const provenance = value as Record<string, unknown>;
+  return (
+    provenance.sourceRecordId === sourceId &&
+    exactTextV1(provenance.sourceRecordId) &&
+    exactTextV1(provenance.sourceTraditionId) &&
+    exactTextV1(provenance.sourceTitle) &&
+    exactTextV1(provenance.sourceDateOrVersion) &&
+    exactTextV1(provenance.sourceUrlOrArchiveRef) &&
+    exactTextV1(provenance.entryLocator) &&
+    (provenance.sourceHashOrArchiveHash === null ||
+      exactTextV1(provenance.sourceHashOrArchiveHash)) &&
+    (provenance.languageVariety === null ||
+      exactTextV1(provenance.languageVariety))
+  );
+}
+
 function isEvidenceFamilyV1(
   value: unknown,
 ): value is MultiSourceEvidenceFamilyV0_1 {
@@ -198,6 +237,9 @@ function sourceRecordIsValidV1(
     exactTextV1(record.sourceId) &&
     isEvidenceFamilyV1(record.evidenceFamily) &&
     exactTextV1(record.language) &&
+    (record.languageVariety === undefined ||
+      record.languageVariety === null ||
+      exactTextV1(record.languageVariety)) &&
     typeof record.sourceForm === "string" &&
     record.sourceForm.length > 0 &&
     record.sourceFormNormalization === "EXACT_PRESERVED" &&
@@ -209,7 +251,9 @@ function sourceRecordIsValidV1(
     Array.isArray(record.relationOperationIds) &&
     record.relationOperationIds.every(exactTextV1) &&
     isTruthStatusV1(record.attestationTruth) &&
-    isResearchSourceStatusV1(record.sourceStatus)
+    isResearchSourceStatusV1(record.sourceStatus) &&
+    (record.sourceProvenance === undefined ||
+      sourceProvenanceIsValidV1(record.sourceProvenance, record.sourceId))
   );
 }
 
@@ -295,6 +339,16 @@ function buildWitnessV1(
     relationOperationIds: [...record.relationOperationIds],
     attestationTruth: record.attestationTruth,
     sourceStatus: record.sourceStatus,
+    ...(record.languageVariety !== undefined
+      ? { languageVariety: record.languageVariety }
+      : {}),
+    ...(record.sourceProvenance
+      ? {
+          sourceProvenance: {
+            ...record.sourceProvenance,
+          },
+        }
+      : {}),
     sourceAttestation: "SOURCE_RECORD_ONLY",
     functionalCorrespondence: "NOT_EVALUATED",
     targetMeaning: "NOT_CLAIMED",
