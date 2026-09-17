@@ -145,6 +145,33 @@ describe("Lane 4 witness presentation", () => {
     expect(screen.queryByText(/comes from|proves|true root/i)).not.toBeInTheDocument();
   });
 
+  it.each(["pater", "mater"])(
+    "renders the reviewed AT witness for natural %s input",
+    async (word) => {
+      const vm = adaptAnalysisToTelemetryVM(await analyze(word));
+
+      render(
+        <EmbryoExpansionContextCardV0_1
+          vm={vm}
+          showPrimaryEvidence
+        />,
+      );
+
+      const witness = screen
+        .getAllByTestId("generic-functional-witness")
+        .find((element) => element.textContent?.includes("at"));
+
+      expect(witness).toBeDefined();
+      expect(witness).toHaveTextContent("at");
+      expect(witness).toHaveTextContent("The Albanian inherited lexicon");
+      expect(witness).toHaveTextContent(
+        "Functional correspondence: Unknown / unresolved",
+      );
+      expect(witness).toHaveTextContent("Historical relation: Not claimed.");
+      expect(witness).not.toHaveTextContent(/comes from|proves|winner/i);
+    },
+  );
+
   it("renders a non-primary witness under its owning structural candidate", async () => {
     const body = await analyze("bamoar");
     const amoCandidate = body.candidates.find(

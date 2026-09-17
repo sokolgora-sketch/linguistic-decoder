@@ -13,6 +13,9 @@ import {
   type GenericFunctionalWitnessCorrespondenceResultV1,
 } from "./genericFunctionalWitnessCorrespondence.v1";
 import { createGenericFunctionalWitnessSourceAdapterV1 } from "./genericFunctionalWitnessSourceAcquisition.v1";
+import {
+  createReviewedExternalLexiconWitnessAdapterV0_1,
+} from "./reviewedExternalLexiconWitnessAdapter.v0_1";
 
 export const GENERIC_FUNCTIONAL_WITNESS_RUNTIME_PROJECTION_SCHEMA_V1 =
   "open-instrument.generic-functional-witness-runtime-projection.v1" as const;
@@ -102,7 +105,10 @@ export function parseGenericFunctionalWitnessRuntimeProjectionV1(
 }
 
 const DEFAULT_SOURCE_ADAPTERS_V1: readonly GenericFunctionalWitnessSourceAdapterV1[] =
-  Object.freeze([createGenericFunctionalWitnessSourceAdapterV1()]);
+  Object.freeze([
+    createGenericFunctionalWitnessSourceAdapterV1(),
+    createReviewedExternalLexiconWitnessAdapterV0_1(),
+  ]);
 
 export function buildGenericFunctionalWitnessRuntimeProjectionV1(
   input: GenericFunctionalWitnessRuntimeProjectionInputV1,
