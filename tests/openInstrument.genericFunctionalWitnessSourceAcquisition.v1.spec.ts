@@ -84,6 +84,37 @@ describe("Open Instrument Lane 2 generic source acquisition", () => {
     expect(JSON.stringify(rawSourceDataset)).not.toContain("semanticBridge");
   });
 
+  it("preserves canonically decomposed source forms while normalizing only the lookup key", () => {
+    const decomposedDataset = JSON.parse(JSON.stringify(rawSourceDataset)) as typeof rawSourceDataset;
+    const record = decomposedDataset.records[0];
+    record.sourceForm = "e\u0308r";
+    record.queryForm = "ËR";
+    record.lookupForm = "ËR";
+    record.citation.attestedForm = "e\u0308r";
+
+    const parsed = parseGenericFunctionalWitnessSourceDatasetV1(decomposedDataset);
+
+    expect(parsed.ok).toBe(true);
+    if (!parsed.ok) return;
+    const decomposedRecord = parsed.dataset.records.find(
+      (candidate) => candidate.sourceRecordId === "research.external.albanian-shi-rain.scale50.v0_1",
+    );
+    expect(decomposedRecord?.sourceForm).toBe("e\u0308r");
+    expect(decomposedRecord?.lookupForm).toBe("ËR");
+  });
+
+  it("rejects a source record whose evidence family disagrees with the verified tradition", () => {
+    const mismatchedDataset = JSON.parse(JSON.stringify(rawSourceDataset)) as typeof rawSourceDataset;
+    mismatchedDataset.records[0].evidenceFamily = "scholarly_paper";
+
+    const parsed = parseGenericFunctionalWitnessSourceDatasetV1(mismatchedDataset);
+
+    expect(parsed).toEqual({
+      ok: false,
+      reasonCodes: ["SOURCE_RECORD_INVALID"],
+    });
+  });
+
   it("returns an exact lookup hit with source provenance and source semantics", () => {
     const result = queryGenericFunctionalWitnessesV1(
       query("SHI", ["I"]),

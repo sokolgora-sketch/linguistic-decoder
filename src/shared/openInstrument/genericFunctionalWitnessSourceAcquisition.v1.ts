@@ -162,6 +162,14 @@ function exactTextV1(value: unknown): value is string {
   );
 }
 
+function exactSourceFormV1(value: unknown): value is string {
+  return (
+    typeof value === "string" &&
+    value.length > 0 &&
+    value.trim() === value
+  );
+}
+
 function nullableExactTextV1(value: unknown): value is string | null {
   return value === null || exactTextV1(value);
 }
@@ -221,7 +229,11 @@ function verifiedSourceRecordIsValidV1(
     attestedGloss: value.gloss,
   });
 
-  return result.ok && result.admissible;
+  return (
+    result.ok &&
+    result.admissible &&
+    result.candidate.evidenceFamily === value.evidenceFamily
+  );
 }
 
 function parseRecordV1(
@@ -249,7 +261,7 @@ function parseRecordV1(
     !exactTextV1(value.sourceUrlOrArchiveRef) ||
     !exactTextV1(value.entryLocator) ||
     !nullableExactTextV1(value.sourceHashOrArchiveHash) ||
-    !exactTextV1(sourceForm) ||
+    !exactSourceFormV1(sourceForm) ||
     value.sourceFormNormalization !== "EXACT_PRESERVED" ||
     !exactTextV1(queryForm) ||
     value.queryNormalization !== "STRUCTURAL_DISPLAY_UPPERCASE" ||
@@ -275,7 +287,7 @@ function parseRecordV1(
 
   if (
     queryForm !== lookupForm ||
-    lookupForm !== sourceForm.toLocaleUpperCase("en-US") ||
+    lookupForm !== sourceForm.toLocaleUpperCase("en-US").normalize("NFC") ||
     (value.citation as Record<string, unknown>).sourceTitle !== value.sourceTitle ||
     (value.citation as Record<string, unknown>).sourcePublisherOrHost !==
       value.sourcePublisherOrHost ||
