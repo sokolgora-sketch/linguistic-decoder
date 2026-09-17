@@ -131,6 +131,43 @@ describe("Open Instrument reviewed Lewis & Short batch importer v1", () => {
     ]);
   });
 
+  it("keeps incomplete and encoded markup inert in source gloss extraction", () => {
+    const incompleteTag = sourceSlice.replace(
+      "<hi rend=\"ital\">Aaron</hi>",
+      "<hi rend=\"ital\">Aaron</hi><script",
+    );
+    const incompleteTagResult = importReviewedLewisShortBatchV1(
+      incompleteTag,
+      {
+        ...manifest,
+        sourceSliceSha256: createHash("sha256").update(incompleteTag).digest("hex"),
+      },
+    );
+    expect(incompleteTagResult.status).toBe("IMPORTED");
+    expect(incompleteTagResult.acceptedRecords[0]?.gloss).not.toContain(
+      "<script",
+    );
+
+    const encodedMarkup = sourceSlice.replace(
+      "<hi rend=\"ital\">Aaron</hi>",
+      "<hi rend=\"ital\">A&amp;lt;script&amp;gt;</hi>",
+    );
+    const encodedMarkupResult = importReviewedLewisShortBatchV1(
+      encodedMarkup,
+      {
+        ...manifest,
+        sourceSliceSha256: createHash("sha256").update(encodedMarkup).digest("hex"),
+      },
+    );
+    expect(encodedMarkupResult.status).toBe("IMPORTED");
+    expect(encodedMarkupResult.acceptedRecords[0]?.gloss).toContain(
+      "A&lt;script&gt;",
+    );
+    expect(encodedMarkupResult.acceptedRecords[0]?.gloss).not.toContain(
+      "<script>",
+    );
+  });
+
   it("rejects duplicate or unexpected source identities", () => {
     const duplicate = sourceSlice.replace(
       '</entryFree>\n  <entryFree n="2"',

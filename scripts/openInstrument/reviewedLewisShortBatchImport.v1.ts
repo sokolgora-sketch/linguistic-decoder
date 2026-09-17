@@ -201,14 +201,50 @@ function parseSourceEntriesV1(sourceSlice: string):
     : { ok: false };
 }
 
+function decodeXmlEntityV1(value: string): string {
+  switch (value) {
+    case "&amp;":
+      return "&";
+    case "&lt;":
+      return "<";
+    case "&gt;":
+      return ">";
+    case "&quot;":
+      return '"';
+    case "&apos;":
+      return "'";
+    default:
+      return value;
+  }
+}
+
 function stripXmlTagsV1(value: string): string {
-  return value
-    .replace(/<[^>]+>/gu, "")
-    .replace(/&amp;/gu, "&")
-    .replace(/&lt;/gu, "<")
-    .replace(/&gt;/gu, ">")
-    .replace(/&quot;/gu, '"')
-    .replace(/&apos;/gu, "'")
+  let output = "";
+  let insideTag = false;
+
+  for (let index = 0; index < value.length; index += 1) {
+    const character = value[index];
+    if (insideTag) {
+      if (character === ">") insideTag = false;
+      continue;
+    }
+    if (character === "<") {
+      insideTag = true;
+      continue;
+    }
+    if (character === "&") {
+      const semicolonIndex = value.indexOf(";", index + 1);
+      if (semicolonIndex >= 0) {
+        const entity = value.slice(index, semicolonIndex + 1);
+        output += decodeXmlEntityV1(entity);
+        index = semicolonIndex;
+        continue;
+      }
+    }
+    output += character;
+  }
+
+  return output
     .normalize("NFC")
     .trim()
     .replace(/\s+/gu, " ");
