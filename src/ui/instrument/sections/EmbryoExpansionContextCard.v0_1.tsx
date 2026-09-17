@@ -680,6 +680,25 @@ export function EmbryoExpansionContextCardV0_1({
   const witnessProjection =
     presentWitnessProjection(primaryCandidate);
 
+  const additionalWitnessCandidates: Array<{
+    candidate: CandidateRowVM;
+    projection: GenericFunctionalWitnessRuntimeProjectionV1;
+  }> = [];
+
+  for (const candidate of rows) {
+    if (candidate === primaryCandidate) {
+      continue;
+    }
+
+    const projection = presentWitnessProjection(candidate);
+    if (
+      projection?.discovery.status === "MATCHES_FOUND" &&
+      projection.discovery.matches.length > 0
+    ) {
+      additionalWitnessCandidates.push({ candidate, projection });
+    }
+  }
+
   const hasSourceWitness =
     witnessProjection?.discovery.status === "MATCHES_FOUND" &&
     witnessProjection.discovery.matches.length > 0;
@@ -1338,6 +1357,38 @@ export function EmbryoExpansionContextCardV0_1({
         <GenericFunctionalWitnesses
           projection={witnessProjection}
         />
+      ) : null}
+
+      {additionalWitnessCandidates.length > 0 ? (
+        <section
+          data-testid="non-primary-generic-functional-witnesses"
+          className="mt-5 rounded-lg border border-cyan-300 bg-cyan-50 p-4 dark:border-cyan-400/25 dark:bg-cyan-500/5"
+        >
+          <div className="text-xs font-semibold uppercase tracking-[0.14em] text-cyan-700 dark:text-cyan-200">
+            Additional candidate witnesses
+          </div>
+
+          <div className="mt-3 grid gap-4">
+            {additionalWitnessCandidates.map(
+              ({ candidate, projection }) => (
+                <div
+                  key={`${candidate.id}:${projection.hypothesisId}`}
+                  data-testid="non-primary-generic-functional-witness"
+                  className="rounded-lg border border-cyan-200 bg-white/75 p-3 dark:border-cyan-400/20 dark:bg-black/20"
+                >
+                  <div className="font-mono text-sm font-semibold text-slate-950 dark:text-white">
+                    {`Structural candidate: ${
+                      presentString(candidate.embryo) ??
+                      presentString(candidate.form) ??
+                      "not emitted"
+                    }`}
+                  </div>
+                  <GenericFunctionalWitnesses projection={projection} />
+                </div>
+              ),
+            )}
+          </div>
+        </section>
       ) : null}
 
       {primaryCandidateUiRow ? (
