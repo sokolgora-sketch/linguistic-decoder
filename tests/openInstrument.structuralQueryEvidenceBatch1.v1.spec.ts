@@ -27,6 +27,43 @@ describe("Open Instrument structural query evidence Batch 1 review artifact", ()
     )).toBe(true);
   });
 
+  it("pins AS, IN, and IS to exact upstream Lewis & Short entries without admission", () => {
+    const parsed = parseGenericFunctionalWitnessSourceDatasetV1(rawBatch);
+
+    expect(parsed.ok).toBe(true);
+    if (!parsed.ok) return;
+
+    expect(parsed.dataset.records.map((record) => ({
+      queryForm: record.queryForm,
+      sourceForm: record.sourceForm,
+      entryLocator: record.entryLocator,
+      sourceHashOrArchiveHash: record.sourceHashOrArchiveHash,
+      sourceStatus: record.sourceStatus,
+    }))).toEqual([
+      {
+        queryForm: "AS",
+        sourceForm: "as",
+        entryLocator: 'TEI.2 entryFree id="n3855" key="as"',
+        sourceHashOrArchiveHash: "c3474349ef9073bb436229cdf886eb77ed88d2fd",
+        sourceStatus: "research_candidate",
+      },
+      {
+        queryForm: "IN",
+        sourceForm: "in",
+        entryLocator: 'TEI.2 entryFree id="n22111" key="in1"',
+        sourceHashOrArchiveHash: "c3474349ef9073bb436229cdf886eb77ed88d2fd",
+        sourceStatus: "research_candidate",
+      },
+      {
+        queryForm: "IS",
+        sourceForm: "is",
+        entryLocator: 'TEI.2 entryFree id="n25029" key="is"',
+        sourceHashOrArchiveHash: "c3474349ef9073bb436229cdf886eb77ed88d2fd",
+        sourceStatus: "research_candidate",
+      },
+    ]);
+  });
+
   it("preserves the witness-only and provenance firewall", () => {
     const serialized = JSON.stringify(rawBatch);
 
