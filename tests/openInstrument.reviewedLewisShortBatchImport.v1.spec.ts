@@ -131,7 +131,7 @@ describe("Open Instrument reviewed Lewis & Short batch importer v1", () => {
     ]);
   });
 
-  it("keeps incomplete and encoded markup inert in source gloss extraction", () => {
+  it("rejects malformed markup and keeps encoded markup inert", () => {
     const incompleteTag = sourceSlice.replace(
       "<hi rend=\"ital\">Aaron</hi>",
       "<hi rend=\"ital\">Aaron</hi><script",
@@ -143,10 +143,10 @@ describe("Open Instrument reviewed Lewis & Short batch importer v1", () => {
         sourceSliceSha256: createHash("sha256").update(incompleteTag).digest("hex"),
       },
     );
-    expect(incompleteTagResult.status).toBe("IMPORTED");
-    expect(incompleteTagResult.acceptedRecords[0]?.gloss).not.toContain(
-      "<script",
-    );
+    expect(incompleteTagResult.status).toBe("REJECTED");
+    expect(incompleteTagResult.rejections).toEqual([
+      { entryId: null, reasonCodes: ["SOURCE_XML_MALFORMED"] },
+    ]);
 
     const encodedMarkup = sourceSlice.replace(
       "<hi rend=\"ital\">Aaron</hi>",
@@ -166,6 +166,19 @@ describe("Open Instrument reviewed Lewis & Short batch importer v1", () => {
     expect(encodedMarkupResult.acceptedRecords[0]?.gloss).not.toContain(
       "<script>",
     );
+
+    const nestedSense = sourceSlice.replace(
+      '<hi rend="ital">Aaron</hi>',
+      '<sense level="2"><hi rend="ital">nested</hi></sense>',
+    );
+    const nestedSenseResult = importReviewedLewisShortBatchV1(nestedSense, {
+      ...manifest,
+      sourceSliceSha256: createHash("sha256").update(nestedSense).digest("hex"),
+    });
+    expect(nestedSenseResult.status).toBe("REJECTED");
+    expect(nestedSenseResult.rejections).toEqual([
+      { entryId: "n3", reasonCodes: ["AMBIGUOUS_SENSE_STRUCTURE"] },
+    ]);
   });
 
   it("rejects duplicate or unexpected source identities", () => {

@@ -102,7 +102,12 @@ type SourceEntryV1 = Readonly<{
   id: string;
   key: string;
   xml: string;
+  senseCount: number;
 }>;
+
+type XmlScanResultV1 =
+  | { ok: true; startTagNames: readonly string[] }
+  | { ok: false };
 
 const EXPECTED_SOURCE_REPOSITORY_V1 = "https://github.com/PerseusDL/lexica";
 const EXPECTED_SOURCE_EDITION_V1 =
@@ -177,12 +182,104 @@ function manifestIsValidV1(
   );
 }
 
+function findTagEndV1(source: string, startIndex: number): number {
+  let quote: '"' | "'" | null = null;
+  for (let index = startIndex; index < source.length; index += 1) {
+    const character = source[index];
+    if (quote) {
+      if (character === quote) quote = null;
+      continue;
+    }
+    if (character === '"' || character === "'") {
+      quote = character;
+      continue;
+    }
+    if (character === ">") return index;
+  }
+  return -1;
+}
+
+function scanXmlV1(source: string): XmlScanResultV1 {
+  const stack: string[] = [];
+  const startTagNames: string[] = [];
+  let rootName: string | null = null;
+  let rootCompleted = false;
+
+  for (let index = 0; index < source.length; index += 1) {
+    if (source[index] !== "<") {
+      if (
+        stack.length === 0 &&
+        !/^\s$/u.test(source[index] ?? "")
+      ) {
+        return { ok: false };
+      }
+      continue;
+    }
+
+    if (source.startsWith("<!--", index)) {
+      const commentEnd = source.indexOf("-->", index + 4);
+      if (commentEnd < 0) return { ok: false };
+      index = commentEnd + 2;
+      continue;
+    }
+    if (source.startsWith("<![CDATA[", index)) {
+      const cdataEnd = source.indexOf("]]>", index + 9);
+      if (cdataEnd < 0 || stack.length === 0) return { ok: false };
+      index = cdataEnd + 2;
+      continue;
+    }
+    if (source.startsWith("<?", index)) {
+      const instructionEnd = source.indexOf("?>", index + 2);
+      if (instructionEnd < 0) return { ok: false };
+      index = instructionEnd + 1;
+      continue;
+    }
+    if (source.startsWith("<!", index)) return { ok: false };
+
+    const tagEnd = findTagEndV1(source, index + 1);
+    if (tagEnd < 0) return { ok: false };
+    const token = source.slice(index, tagEnd + 1);
+    if (token.startsWith("</")) {
+      const closingMatch = token.match(
+        /^<\/([A-Za-z_][A-Za-z0-9_.:-]*)\s*>$/u,
+      );
+      if (!closingMatch || stack.pop() !== closingMatch[1]) {
+        return { ok: false };
+      }
+      if (stack.length === 0) rootCompleted = true;
+      index = tagEnd;
+      continue;
+    }
+
+    const openingMatch = token.match(
+      /^<([A-Za-z_][A-Za-z0-9_.:-]*)(?=\s|\/?\s*>)[\s\S]*>$/u,
+    );
+    if (!openingMatch || rootCompleted) return { ok: false };
+    const tagName = openingMatch[1];
+    if (stack.length === 0) {
+      if (rootName) return { ok: false };
+      rootName = tagName;
+    }
+    startTagNames.push(tagName);
+    if (!/\/\s*>$/u.test(token)) stack.push(tagName);
+    else if (stack.length === 0) rootCompleted = true;
+    index = tagEnd;
+  }
+
+  return rootName === "sourceSlice" && rootCompleted && stack.length === 0
+    ? { ok: true, startTagNames }
+    : { ok: false };
+}
+
 function parseSourceEntriesV1(sourceSlice: string):
   | { ok: true; entries: readonly SourceEntryV1[] }
   | { ok: false } {
-  const openCount = sourceSlice.match(/<entryFree\b/gu)?.length ?? 0;
-  const closeCount = sourceSlice.match(/<\/entryFree>/gu)?.length ?? 0;
-  if (openCount === 0 || openCount !== closeCount) return { ok: false };
+  const scannedSource = scanXmlV1(sourceSlice);
+  if (!scannedSource.ok) return { ok: false };
+  const openCount = scannedSource.startTagNames.filter(
+    (tagName) => tagName === "entryFree",
+  ).length;
+  if (openCount === 0) return { ok: false };
 
   const entries: SourceEntryV1[] = [];
   const entryPattern =
@@ -193,7 +290,18 @@ function parseSourceEntriesV1(sourceSlice: string):
     const key = match[2];
     const xml = match[0];
     if (!id || !key || !xml) return { ok: false };
-    entries.push({ id, key, xml });
+    const scannedEntry = scanXmlV1(
+      `<sourceSlice>${xml}</sourceSlice>`,
+    );
+    if (!scannedEntry.ok) return { ok: false };
+    entries.push({
+      id,
+      key,
+      xml,
+      senseCount: scannedEntry.startTagNames.filter(
+        (tagName) => tagName === "sense",
+      ).length,
+    });
   }
 
   return entries.length === openCount
@@ -262,7 +370,9 @@ function buildRecordV1(
   const orthMatch = headwordXml.match(
     /<orth\b[^>]*\blang="la"[^>]*>([\s\S]*?)<\/orth>/u,
   );
-  const senseMatches = [...entry.xml.matchAll(/<sense\b[^>]*>([\s\S]*?)<\/sense>/gu)];
+  const senseMatches = [
+    ...entry.xml.matchAll(/<sense\b[^>]*>([\s\S]*?)<\/sense>/gu),
+  ];
   const reasonCodes = new Set<ReviewedLewisShortBatchImportReasonCodeV1>();
 
   if (!firstSenseOffset || firstSenseOffset < 0) {
@@ -272,8 +382,8 @@ function buildRecordV1(
   if (orthMatch?.[1].includes("<") || orthMatch?.[1].includes("&")) {
     reasonCodes.add("UNSUPPORTED_SOURCE_FORM_ENCODING");
   }
-  if (senseMatches.length === 0) reasonCodes.add("GLOSS_MISSING");
-  if (senseMatches.length > 1) reasonCodes.add("AMBIGUOUS_SENSE_STRUCTURE");
+  if (entry.senseCount === 0) reasonCodes.add("GLOSS_MISSING");
+  if (entry.senseCount > 1) reasonCodes.add("AMBIGUOUS_SENSE_STRUCTURE");
 
   if (reasonCodes.size > 0) {
     return {
