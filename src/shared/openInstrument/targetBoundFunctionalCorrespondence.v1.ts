@@ -644,6 +644,12 @@ export function validateTargetBoundFunctionalCorrespondenceV1(
   if (reviewResult?.ok && reviewResult.review.reviewDecision !== "accepted") {
     reasons.add("SOURCE_REVIEW_NOT_ACCEPTED");
   }
+  if (
+    attestationResult.ok &&
+    value.sourceEntrySelectionStatus !== attestationResult.attestation.entrySelectionStatus
+  ) {
+    reasons.add("SOURCE_SELECTION_INVALID");
+  }
 
   if (attestationResult.ok && reviewResult?.ok) {
     const attestationFingerprint = fingerprintSourceEntryAttestationV1(attestationResult.attestation);
@@ -689,6 +695,7 @@ export function validateTargetBoundFunctionalCorrespondenceV1(
           reasons.add("COMPARISON_UNIT_ORDER_MISMATCH");
         }
         if (
+          actual.sourceAttestationId !== expected.sourceAttestationId ||
           actual.comparisonUnitId !== expected.comparisonUnitId ||
           actual.targetInputFingerprint !== expected.targetInputFingerprint ||
           actual.sourceAttestationFingerprint !== expected.sourceAttestationFingerprint

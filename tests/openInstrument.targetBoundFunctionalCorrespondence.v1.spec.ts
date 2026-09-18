@@ -194,6 +194,35 @@ describe("target-bound functional correspondence contract v1", () => {
         "COMPARISON_UNIT_FINGERPRINT_MISMATCH",
       ]),
     });
+
+    const changedUnit = {
+      ...result,
+      comparisonUnits: [
+        {
+          ...result.comparisonUnits[0],
+          sourceAttestationId: "source-entry-attestation:other",
+        },
+        ...result.comparisonUnits.slice(1),
+      ],
+    };
+    expect(validateTargetBoundFunctionalCorrespondenceV1(changedUnit, attestation, review)).toEqual({
+      ok: false,
+      reasonCodes: expect.arrayContaining(["COMPARISON_UNIT_IDENTITY_MISMATCH"]),
+    });
+
+    const inFixture = buildFor("in");
+    const changedSelectionStatus = {
+      ...inFixture.result,
+      sourceEntrySelectionStatus: "NOT_APPLICABLE" as const,
+    };
+    expect(validateTargetBoundFunctionalCorrespondenceV1(
+      changedSelectionStatus,
+      inFixture.attestation,
+      inFixture.review,
+    )).toEqual({
+      ok: false,
+      reasonCodes: expect.arrayContaining(["SOURCE_SELECTION_INVALID"]),
+    });
   });
 
   it("does not accept a rejected or pending source review", () => {
