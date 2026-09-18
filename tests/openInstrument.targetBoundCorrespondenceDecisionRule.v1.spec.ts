@@ -12,6 +12,7 @@ import {
   fingerprintTargetBoundCorrespondenceDecisionRuleV1,
   TARGET_BOUND_CORRESPONDENCE_DECISION_RULE_SCHEMA_V1,
   validateTargetBoundCorrespondenceDecisionRuleV1,
+  type TargetBoundCorrespondenceDecisionRuleV1,
   type TargetBoundCorrespondenceReviewV1,
 } from "../src/shared/openInstrument/targetBoundCorrespondenceDecisionRule.v1";
 import type { SourceEntryAttestationV1 } from "../src/shared/openInstrument/sourceEntryAttestation.v1";
@@ -131,6 +132,17 @@ function decisionFor(
   );
   if (!result.ok) throw new Error(result.reasonCodes.join(","));
   return { ...fixture, decision: result.decision };
+}
+
+function decisionWithReview(
+  decision: TargetBoundCorrespondenceDecisionRuleV1,
+  review: TargetBoundCorrespondenceReviewV1,
+): TargetBoundCorrespondenceDecisionRuleV1 {
+  const candidate = { ...decision, review };
+  return {
+    ...candidate,
+    decisionFingerprint: fingerprintTargetBoundCorrespondenceDecisionRuleV1(candidate),
+  };
 }
 
 describe("reviewed target-bound correspondence decision rule v1", () => {
@@ -319,6 +331,49 @@ describe("reviewed target-bound correspondence decision rule v1", () => {
         reasonCodes: expect.arrayContaining([reasonCode]),
       });
     }
+  });
+
+  it("rejects reason codes that contradict the selected verdict", () => {
+    const fixture = decisionFor("as", reviewFor("SUPPORTED", true));
+    const contradictorySupport = decisionWithReview(fixture.decision, {
+      ...fixture.decision.review,
+      reasonCodes: ["REVIEWED_SUPPORT", "REVIEWED_NON_SUPPORT"],
+    });
+    expect(validateTargetBoundCorrespondenceDecisionRuleV1(
+      contradictorySupport,
+      fixture.package,
+      fixture.attestation,
+      fixture.review,
+    )).toMatchObject({
+      ok: false,
+      reasonCodes: expect.arrayContaining(["VERDICT_REASON_MISMATCH"]),
+    });
+
+    const contradictoryMaterial = decisionWithReview(fixture.decision, {
+      ...fixture.decision.review,
+      reasonCodes: ["REVIEWED_SUPPORT", "SOURCE_SENSE_MATERIAL_MISSING"],
+    });
+    expect(validateTargetBoundCorrespondenceDecisionRuleV1(
+      contradictoryMaterial,
+      fixture.package,
+      fixture.attestation,
+      fixture.review,
+    )).toMatchObject({
+      ok: false,
+      reasonCodes: expect.arrayContaining(["VERDICT_REASON_MISMATCH"]),
+    });
+
+    const unknown = decisionFor("as", reviewFor("UNKNOWN", true));
+    const allowedMaterial = decisionWithReview(unknown.decision, {
+      ...unknown.decision.review,
+      reasonCodes: ["INSUFFICIENT_AUTHORIZED_INFORMATION", "SOURCE_SENSE_MATERIAL_MISSING"],
+    });
+    expect(validateTargetBoundCorrespondenceDecisionRuleV1(
+      allowedMaterial,
+      unknown.package,
+      unknown.attestation,
+      unknown.review,
+    )).toMatchObject({ ok: true });
   });
 
   it("preserves the 63 zero-decision AS, IN, and IS compatibility units", () => {

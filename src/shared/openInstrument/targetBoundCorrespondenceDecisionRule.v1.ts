@@ -445,9 +445,18 @@ function reviewV1(
     UNKNOWN: targetSensePresent ? "INSUFFICIENT_AUTHORIZED_INFORMATION" : "TARGET_SENSE_UNBOUND",
     NULL: "NO_DEFENSIBLE_COMPARISON",
   }[verdict] as TargetBoundCorrespondenceReviewReasonCodeV1;
+  const compatibleReasons = new Set<TargetBoundCorrespondenceReviewReasonCodeV1>([requiredReason]);
+  if (verdict === "UNKNOWN" || verdict === "NULL") {
+    compatibleReasons.add("SOURCE_SENSE_MATERIAL_MISSING");
+  }
 
   const reasons = new Set<TargetBoundCorrespondenceDecisionRuleValidationReasonCodeV1>();
-  if (!reasonCodes.includes(requiredReason)) reasons.add("VERDICT_REASON_MISMATCH");
+  if (
+    !reasonCodes.includes(requiredReason) ||
+    reasonCodes.some((reason) => !compatibleReasons.has(reason))
+  ) {
+    reasons.add("VERDICT_REASON_MISMATCH");
+  }
 
   if (["SUPPORTED", "PARTIALLY_SUPPORTED", "UNSUPPORTED"].includes(verdict)) {
     if (!targetSensePresent) reasons.add("TARGET_SENSE_REQUIRED_FOR_POSITIVE_VERDICT");
