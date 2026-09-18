@@ -47,8 +47,6 @@ export type TargetBoundCorrespondenceReviewReasonCodeV1 =
   | "NO_DEFENSIBLE_COMPARISON";
 
 export type TargetBoundCorrespondenceRationaleV1 = Readonly<{
-  targetFunctionalPropositionRef: string | null;
-  sourceFunctionalPropositionRef: string | null;
   relationship: TargetBoundCorrespondenceRationaleRelationshipV1;
   limitations: readonly string[];
 }>;
@@ -207,8 +205,6 @@ const REVIEW_KEYS_V1 = [
 ] as const;
 
 const RATIONALE_KEYS_V1 = [
-  "targetFunctionalPropositionRef",
-  "sourceFunctionalPropositionRef",
   "relationship",
   "limitations",
 ] as const;
@@ -290,10 +286,6 @@ function exactTextV1(value: unknown): value is string {
   );
 }
 
-function validTextOrNullV1(value: unknown): value is string | null {
-  return value === null || exactTextV1(value);
-}
-
 function validSha256V1(value: unknown): value is string {
   return typeof value === "string" && /^[0-9a-f]{64}$/u.test(value);
 }
@@ -368,8 +360,6 @@ function reviewFingerprintV1(value: TargetBlindReviewedSourceAttestationV1): str
 function validRationaleV1(value: unknown): value is TargetBoundCorrespondenceRationaleV1 {
   if (!isRecordV1(value) || !hasExactKeysV1(value, RATIONALE_KEYS_V1)) return false;
   return (
-    validTextOrNullV1(value.targetFunctionalPropositionRef) &&
-    validTextOrNullV1(value.sourceFunctionalPropositionRef) &&
     typeof value.relationship === "string" &&
     RELATIONSHIPS_V1.has(value.relationship as TargetBoundCorrespondenceRationaleRelationshipV1) &&
     Array.isArray(value.limitations) &&
@@ -460,12 +450,6 @@ function reviewV1(
 
   if (["SUPPORTED", "PARTIALLY_SUPPORTED", "UNSUPPORTED"].includes(verdict)) {
     if (!targetSensePresent) reasons.add("TARGET_SENSE_REQUIRED_FOR_POSITIVE_VERDICT");
-    if (
-      rationale.targetFunctionalPropositionRef === null ||
-      rationale.sourceFunctionalPropositionRef === null
-    ) {
-      reasons.add("RATIONALE_INVALID");
-    }
   }
 
   const expectedRelationship = {
@@ -476,12 +460,6 @@ function reviewV1(
     NULL: "NOT_APPLICABLE",
   }[verdict];
   if (rationale.relationship !== expectedRelationship) reasons.add("RATIONALE_INVALID");
-  if (verdict === "UNKNOWN" && !targetSensePresent && (
-    rationale.targetFunctionalPropositionRef !== null ||
-    rationale.sourceFunctionalPropositionRef !== null
-  )) {
-    reasons.add("RATIONALE_INVALID");
-  }
   if (verdict === "NULL" && rationale.limitations.length === 0) {
     reasons.add("RATIONALE_INVALID");
   }
@@ -496,8 +474,6 @@ function reviewV1(
       reviewerKind: "HUMAN",
       reviewedAt: value.reviewedAt as string,
       rationale: deepFreezeV1({
-        targetFunctionalPropositionRef: rationale.targetFunctionalPropositionRef,
-        sourceFunctionalPropositionRef: rationale.sourceFunctionalPropositionRef,
         relationship: rationale.relationship,
         limitations: Object.freeze([...rationale.limitations]),
       }),

@@ -94,7 +94,6 @@ function reviewFor(
     UNKNOWN: "UNDETERMINED",
     NULL: "NOT_APPLICABLE",
   }[verdict] as const;
-  const positive = ["SUPPORTED", "PARTIALLY_SUPPORTED", "UNSUPPORTED"].includes(verdict);
   return {
     reviewStatus: "REVIEWED",
     verdict,
@@ -102,12 +101,6 @@ function reviewFor(
     reviewerKind: "HUMAN",
     reviewedAt: "2026-09-18",
     rationale: {
-      targetFunctionalPropositionRef: targetSensePresent && positive
-        ? "fixture:target-functional-proposition"
-        : null,
-      sourceFunctionalPropositionRef: targetSensePresent && positive
-        ? "fixture:source-functional-proposition"
-        : null,
       relationship,
       limitations: verdict === "SUPPORTED" ? [] : ["fixture-bound-review"],
     },
