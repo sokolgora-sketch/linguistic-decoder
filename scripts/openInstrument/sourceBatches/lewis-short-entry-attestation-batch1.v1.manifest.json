@@ -1,0 +1,13 @@
+{
+  "manifestVersion": "open-instrument.reviewed-lewis-short-entry-attestation-import.v1",
+  "sourceName": "Lewis & Short Latin Dictionary",
+  "sourceRepository": "https://github.com/PerseusDL/lexica",
+  "sourceRepositoryCommit": "56061ca127f4a2844980baffc5f2b6d1332897b3",
+  "sourceFilePath": "CTS_XML_TEI/perseus/pdllex/lat/ls/lat.ls.perseus-eng2.xml",
+  "sourceLicense": "CC BY-SA 4.0",
+  "sourceUrlOrArchiveRef": "https://github.com/PerseusDL/lexica/blob/56061ca127f4a2844980baffc5f2b6d1332897b3/CTS_XML_TEI/perseus/pdllex/lat/ls/lat.ls.perseus-eng2.xml",
+  "sourceDateOrVersion": "Lewis & Short source file release date 1997-10-28; upstream commit 56061ca127f4a2844980baffc5f2b6d1332897b3",
+  "sourceFileGitBlobSha": "c3474349ef9073bb436229cdf886eb77ed88d2fd",
+  "sourceSliceSha256": "92bd71660cdcc2c2b57d6869fdaed42aa2b04e19e9182aeffe0eae269937ab65",
+  "selectedEntryIds": ["n3855", "n22111", "n22112", "n25029"]
+}

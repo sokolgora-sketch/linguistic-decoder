@@ -106,6 +106,8 @@ type SourceEntryV1 = Readonly<{
   senseCount: number;
 }>;
 
+export type ReviewedLewisShortSourceEntryV1 = SourceEntryV1;
+
 type XmlScanResultV1 =
   | { ok: true; startTagNames: readonly string[] }
   | { ok: false };
@@ -310,6 +312,12 @@ function parseSourceEntriesV1(sourceSlice: string):
   return entries.length === openCount
     ? { ok: true, entries }
     : { ok: false };
+}
+
+export function parseReviewedLewisShortSourceEntriesV1(sourceSlice: string):
+  | { ok: true; entries: readonly ReviewedLewisShortSourceEntryV1[] }
+  | { ok: false } {
+  return parseSourceEntriesV1(sourceSlice);
 }
 
 function decodeXmlEntityV1(value: string): string {
