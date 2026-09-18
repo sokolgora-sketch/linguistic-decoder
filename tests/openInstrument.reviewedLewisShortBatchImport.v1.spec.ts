@@ -144,6 +144,16 @@ describe("Open Instrument reviewed Lewis & Short batch importer v1", () => {
         '<hi rend="ital">P. a. fin.</hi>',
       ),
     ).toBe("LEXICAL_DEFINITION_MISSING");
+    expect(
+      classifyLewisShortSenseStructureV1(
+        '<hi rend="ital"><abbr>fin.</abbr></hi><pb/>',
+      ),
+    ).toBe("LEXICAL_DEFINITION_MISSING");
+    expect(
+      classifyLewisShortSenseStructureV1(
+        '<hi rend="ital">fin.</hi><pb/>',
+      ),
+    ).toBe("LEXICAL_DEFINITION_MISSING");
 
     expect(
       classifyLewisShortSenseStructureV1(

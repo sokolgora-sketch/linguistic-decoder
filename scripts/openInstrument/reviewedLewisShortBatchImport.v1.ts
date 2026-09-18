@@ -364,15 +364,8 @@ function stripXmlTagsV1(value: string): string {
 export function classifyLewisShortSenseStructureV1(
   senseXml: string,
 ): "LEXICAL_GLOSS_PRESENT" | "LEXICAL_DEFINITION_MISSING" {
-  const trimmedSenseXml = senseXml.trim();
-  const markerOnlySense = /^<hi\b[^>]*\brend\s*=\s*["']ital["'][^>]*>[^<]*<\/hi>$/u.test(
-    trimmedSenseXml,
-  );
-  if (!markerOnlySense) return "LEXICAL_GLOSS_PRESENT";
-
-  return EDITORIAL_ONLY_SENSE_MARKER_PATTERN_V1.test(
-    stripXmlTagsV1(trimmedSenseXml),
-  )
+  const normalizedSenseText = stripXmlTagsV1(senseXml);
+  return EDITORIAL_ONLY_SENSE_MARKER_PATTERN_V1.test(normalizedSenseText)
     ? "LEXICAL_DEFINITION_MISSING"
     : "LEXICAL_GLOSS_PRESENT";
 }
