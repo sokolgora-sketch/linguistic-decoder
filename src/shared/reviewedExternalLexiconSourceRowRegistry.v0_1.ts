@@ -215,6 +215,100 @@ export const reviewedExternalLexiconSourceRowCandidateRegistryV0_1 = [
       },
     ],
   },
+  {
+    sourceId: "reviewed.external.latin-eu.source-attestation.v0_1",
+    candidateId: "latin-eu-source-attestation",
+    candidateLanguage: "la",
+    displayForm: "EU",
+    sourceKind: "reviewed_dictionary_source",
+    sourceStatus: "reviewed_accepted",
+    embryo: "EU",
+    isolatedStandaloneForm: "eu",
+    plainStandaloneGloss:
+      "well! well done! bravo! an exclamation of joy or approbation",
+    sourceNote:
+      "Reviewed Gate-2 source attestation for the exact Lewis & Short entry only. This row records source evidence without functional correspondence, functional acceptance, historical relation, etymology, or runtime authorization; the user decides.",
+    semanticBridge: null,
+    originClaim: false,
+    historicalTransmissionClaim: false,
+    winnerClaim: false,
+    languageSuperiorityClaim: false,
+    candidateTruthClaim: false,
+    publicationEvidenceClaim: false,
+    scientificEvidenceClaim: false,
+    userDecisionPosture: "user_decides",
+    externalCitations: [
+      {
+        citationId: "reviewed.external.latin-eu.source-attestation.citation.v0_1",
+        citationStatus: "reviewed_accepted",
+        citationType: "dictionary_entry",
+        sourceTitle: "Lewis & Short Latin Dictionary",
+        sourceAuthorOrEditor: "Charlton T. Lewis and Charles Short",
+        sourcePublisherOrHost: "Perseus Digital Library / Tufts University",
+        sourceDateOrVersion:
+          "Lewis & Short source file release date 1997-10-28; upstream commit 56061ca127f4a2844980baffc5f2b6d1332897b3",
+        sourceUrlOrArchiveRef:
+          "https://github.com/PerseusDL/lexica/blob/56061ca127f4a2844980baffc5f2b6d1332897b3/CTS_XML_TEI/perseus/pdllex/lat/ls/lat.ls.perseus-eng2.xml",
+        entryLocator: 'TEI.2 entryFree id="n16308" key="eu"',
+        attestedForm: "eu",
+        attestedGloss:
+          "well! well done! bravo! an exclamation of joy or approbation",
+        attestedGrammarNote: "interj.",
+        reviewedBy: "open-instrument-gate2-human-review",
+        reviewedAt: "2026-09-18",
+        reviewNote:
+          "DF human Gate-2 decision: ACCEPT. Exact source attestation only; functional correspondence, functional acceptance, historical relation, etymology, cognacy, borrowing, language priority, winner selection, and production/runtime authorization remain unclaimed.",
+        sourceHashOrArchiveHash:
+          "a21c3799f42d33931b463c19a036b0e5c4a6504ccbd81ee55a262421a9e1836c",
+      },
+    ],
+  },
+  {
+    sourceId: "reviewed.external.latin-oh.source-attestation.v0_1",
+    candidateId: "latin-oh-source-attestation",
+    candidateLanguage: "la",
+    displayForm: "OH",
+    sourceKind: "reviewed_dictionary_source",
+    sourceStatus: "reviewed_accepted",
+    embryo: "OH",
+    isolatedStandaloneForm: "oh",
+    plainStandaloneGloss: "oh! O! ah!",
+    sourceNote:
+      "Reviewed Gate-2 source attestation for the exact Lewis & Short entry only. This row records source evidence without functional correspondence, functional acceptance, historical relation, etymology, or runtime authorization; the user decides.",
+    semanticBridge: null,
+    originClaim: false,
+    historicalTransmissionClaim: false,
+    winnerClaim: false,
+    languageSuperiorityClaim: false,
+    candidateTruthClaim: false,
+    publicationEvidenceClaim: false,
+    scientificEvidenceClaim: false,
+    userDecisionPosture: "user_decides",
+    externalCitations: [
+      {
+        citationId: "reviewed.external.latin-oh.source-attestation.citation.v0_1",
+        citationStatus: "reviewed_accepted",
+        citationType: "dictionary_entry",
+        sourceTitle: "Lewis & Short Latin Dictionary",
+        sourceAuthorOrEditor: "Charlton T. Lewis and Charles Short",
+        sourcePublisherOrHost: "Perseus Digital Library / Tufts University",
+        sourceDateOrVersion:
+          "Lewis & Short source file release date 1997-10-28; upstream commit 56061ca127f4a2844980baffc5f2b6d1332897b3",
+        sourceUrlOrArchiveRef:
+          "https://github.com/PerseusDL/lexica/blob/56061ca127f4a2844980baffc5f2b6d1332897b3/CTS_XML_TEI/perseus/pdllex/lat/ls/lat.ls.perseus-eng2.xml",
+        entryLocator: 'TEI.2 entryFree id="n32423" key="oh"',
+        attestedForm: "oh",
+        attestedGloss: "oh! O! ah!",
+        attestedGrammarNote: "interj.",
+        reviewedBy: "open-instrument-gate2-human-review",
+        reviewedAt: "2026-09-18",
+        reviewNote:
+          "DF human Gate-2 decision: ACCEPT. Exact source attestation only; functional correspondence, functional acceptance, historical relation, etymology, cognacy, borrowing, language priority, winner selection, and production/runtime authorization remain unclaimed.",
+        sourceHashOrArchiveHash:
+          "a21c3799f42d33931b463c19a036b0e5c4a6504ccbd81ee55a262421a9e1836c",
+      },
+    ],
+  },
 
 ] as const satisfies readonly ReviewedExternalLexiconCandidateSourceRowV0_1[];
 

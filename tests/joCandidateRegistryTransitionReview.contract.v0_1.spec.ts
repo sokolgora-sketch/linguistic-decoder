@@ -155,6 +155,8 @@ describe("JO candidate registry transition review v0.1", () => {
       "reviewed.external.albanian-at.father.candidate.v0_1",
       "reviewed.external.gheg-da.damage.candidate.v0_1",
       "reviewed.external.jo.refusal.candidate.v0_1",
+      "reviewed.external.latin-eu.source-attestation.v0_1",
+      "reviewed.external.latin-oh.source-attestation.v0_1",
     ]);
 
     expect(
