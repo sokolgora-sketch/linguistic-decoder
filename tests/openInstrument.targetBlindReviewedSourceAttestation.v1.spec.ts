@@ -226,6 +226,60 @@ describe("target-blind reviewed source attestation v1", () => {
     }
   });
 
+  it("rejects an attestation with a preselected entry or sense", () => {
+    const attestation = attestationFor("in");
+    const selected = JSON.parse(JSON.stringify(attestation)) as SourceEntryAttestationV1;
+    selected.selectedEntryId = "n22111";
+    selected.entrySelectionStatus = "EXPLICITLY_RESOLVED";
+    selected.entries[0].selectedSenseId = selected.entries[0].senses[0].senseId;
+    selected.entries[0].senseSelectionStatus = "EXPLICITLY_RESOLVED";
+
+    const result = validateTargetBlindReviewedSourceAttestationV1(
+      acceptedReviewFor(attestation),
+      selected,
+    );
+
+    expect(result).toEqual({
+      ok: false,
+      reasonCodes: ["ATTESTATION_FINGERPRINT_MISMATCH", "PRESELECTED_ENTRY_OR_SENSE"],
+    });
+  });
+
+  it("rejects sparse reason-code arrays", () => {
+    const attestation = attestationFor("as");
+    const sparseReasons = new Array(1) as TargetBlindReviewedSourceAttestationV1["reasonCodes"];
+    const result = validateTargetBlindReviewedSourceAttestationV1(
+      {
+        ...acceptedReviewFor(attestation),
+        reviewDecision: "rejected",
+        reasonCodes: sparseReasons,
+      },
+      attestation,
+    );
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.reasonCodes).toContain("REASON_CODES_INVALID");
+    }
+  });
+
+  it("rejects nonexistent review calendar dates", () => {
+    const attestation = attestationFor("is");
+    const result = validateTargetBlindReviewedSourceAttestationV1(
+      {
+        ...acceptedReviewFor(attestation),
+        reviewedAt: "2026-02-31",
+      },
+      attestation,
+    );
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.reasonCodes).toContain("REVIEWED_AT_INVALID");
+      expect(result.reasonCodes).toContain("REVIEWED_AT_REQUIRED");
+    }
+  });
+
   it("is deterministic and deeply immutable", () => {
     const attestation = attestationFor("in");
     const first = validateTargetBlindReviewedSourceAttestationV1(

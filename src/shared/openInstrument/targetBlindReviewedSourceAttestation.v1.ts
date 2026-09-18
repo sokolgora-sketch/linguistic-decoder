@@ -52,6 +52,7 @@ export type TargetBlindReviewedSourceAttestationValidationReasonCodeV1 =
   | "REVIEWED_AT_REQUIRED"
   | "REVIEWED_AT_INVALID"
   | "REASON_CODES_INVALID"
+  | "PRESELECTED_ENTRY_OR_SENSE"
   | "REASON_REQUIRED_FOR_REJECTED"
   | "REVIEW_DEFERRED_REASON_REQUIRED"
   | "FINAL_DECISION_REASON_INVALID"
@@ -163,10 +164,21 @@ function validReviewerV1(value: unknown): value is string {
 }
 
 function validReviewDateV1(value: unknown): value is string {
+  if (
+    typeof value !== "string" ||
+    !/^\d{4}-\d{2}-\d{2}$/u.test(value) ||
+    value !== value.trim()
+  ) {
+    return false;
+  }
+
+  const [year, month, day] = value.split("-").map(Number);
+  if (year < 1) return false;
+  const date = new Date(Date.UTC(year, month - 1, day));
   return (
-    typeof value === "string" &&
-    /^\d{4}-\d{2}-\d{2}$/u.test(value) &&
-    value === value.trim()
+    date.getUTCFullYear() === year &&
+    date.getUTCMonth() === month - 1 &&
+    date.getUTCDate() === day
   );
 }
 
@@ -255,6 +267,7 @@ export function validateTargetBlindReviewedSourceAttestationV1(
   }
   if (
     !Array.isArray(value.reasonCodes) ||
+    Object.keys(value.reasonCodes).length !== value.reasonCodes.length ||
     value.reasonCodes.some(
       (reasonCode) =>
         !REVIEW_REASON_CODES_V1.has(
@@ -273,6 +286,17 @@ export function validateTargetBlindReviewedSourceAttestationV1(
     reasons.add("ATTESTATION_INVALID");
   } else {
     const normalizedAttestation = attestationResult.attestation;
+    if (
+      normalizedAttestation.selectedEntryId !== null ||
+      normalizedAttestation.entrySelectionStatus === "EXPLICITLY_RESOLVED" ||
+      normalizedAttestation.entries.some(
+        (entry) =>
+          entry.selectedSenseId !== null ||
+          entry.senseSelectionStatus === "EXPLICITLY_RESOLVED",
+      )
+    ) {
+      reasons.add("PRESELECTED_ENTRY_OR_SENSE");
+    }
     if (value.attestationId !== normalizedAttestation.attestationId) {
       reasons.add("ATTESTATION_ID_MISMATCH");
     }
