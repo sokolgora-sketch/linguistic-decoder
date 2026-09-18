@@ -149,4 +149,44 @@ describe("Open Instrument source-entry attestation v1", () => {
       { entryId: "im-editorial", reasonCodes: ["NO_SUBSTANTIVE_SENSES"] },
     ]);
   });
+
+  it("preserves nested Lewis & Short senses in source order", () => {
+    const nestedSource =
+      '<?xml version="1.0"?><sourceSlice sourceFormat="TEI.2 XML"><entryFree id="nested" key="nested"><orth lang="la">nested</orth><sense id="outer"><hi rend="ital">outer gloss</hi> <sense id="inner"><hi rend="ital">inner gloss</hi></sense></sense></entryFree></sourceSlice>';
+    const result = importReviewedLewisShortEntryAttestationsV1(nestedSource, {
+      ...entryManifest,
+      sourceSliceSha256: createHash("sha256")
+        .update(nestedSource, "utf8")
+        .digest("hex"),
+      selectedEntryIds: ["nested"],
+    });
+
+    expect(result.status).toBe("IMPORTED");
+    expect(result.attestations[0]?.entries[0]?.senses.map((sense) => sense.senseId)).toEqual([
+      "outer",
+      "inner",
+    ]);
+    expect(result.attestations[0]?.entries[0]?.senses.map((sense) => sense.text)).toEqual([
+      "outer gloss inner gloss",
+      "inner gloss",
+    ]);
+  });
+
+  it("permits an explicitly resolved multi-entry attestation", () => {
+    const inAttestation = attestationFor("in");
+    const resolved = {
+      ...inAttestation,
+      entrySelectionStatus: "EXPLICITLY_RESOLVED",
+      selectedEntryId: inAttestation.entries[0]?.entryId,
+    };
+    const result = validateSourceEntryAttestationV1(resolved);
+
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.attestation.entrySelectionStatus).toBe("EXPLICITLY_RESOLVED");
+      expect(result.attestation.selectedEntryId).toBe(
+        inAttestation.entries[0]?.entryId,
+      );
+    }
+  });
 });

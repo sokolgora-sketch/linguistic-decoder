@@ -112,11 +112,44 @@ function extractSenseAttestationsV1(
   entryKey: string,
 ): readonly SourceEntryAttestationSenseV1[] {
   const senses: SourceEntryAttestationSenseV1[] = [];
-  for (const match of entryXml.matchAll(
-    /<sense\b[^>]*\bid="([^"]+)"[^>]*>([\s\S]*?)<\/sense>/gu,
-  )) {
+  const senseFrames: Array<{
+    senseId: string;
+    contentStart: number;
+    sourceOrder: number;
+  }> = [];
+  const senseBlocks: Array<{
+    senseId: string;
+    senseXml: string;
+    sourceOrder: number;
+  }> = [];
+  const senseTokenPattern = /<sense\b[^>]*\bid="([^"]+)"[^>]*>|<\/sense>/gu;
+  let sourceOrder = 0;
+  for (const match of entryXml.matchAll(senseTokenPattern)) {
+    const token = match[0];
+    const tokenStart = match.index ?? 0;
+    if (token.startsWith("</")) {
+      const frame = senseFrames.pop();
+      if (!frame) continue;
+      senseBlocks.push({
+        senseId: frame.senseId,
+        senseXml: entryXml.slice(frame.contentStart, tokenStart),
+        sourceOrder: frame.sourceOrder,
+      });
+      continue;
+    }
     const senseId = match[1];
-    const senseXml = match[2];
+    if (!senseId) continue;
+    senseFrames.push({
+      senseId,
+      contentStart: tokenStart + token.length,
+      sourceOrder: sourceOrder++,
+    });
+  }
+
+  for (const block of senseBlocks.sort(
+    (left, right) => left.sourceOrder - right.sourceOrder,
+  )) {
+    const { senseId, senseXml } = block;
     if (
       classifyLewisShortSenseStructureV1(senseXml) !==
       "LEXICAL_GLOSS_PRESENT"

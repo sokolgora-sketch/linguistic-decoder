@@ -362,7 +362,7 @@ export function validateSourceEntryAttestationV1(
     reasons.add("ENTRY_SELECTION_STATUS_MISMATCH");
   } else if (
     entries.length > 1 &&
-    value.entrySelectionStatus !== "UNRESOLVED"
+    value.entrySelectionStatus === "NOT_APPLICABLE"
   ) {
     reasons.add("ENTRY_SELECTION_STATUS_MISMATCH");
   } else if (
