@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import manifest from "../scripts/openInstrument/sourceBatches/lewis-short-bounded-slice.v1.manifest.json";
 import {
+  classifyLewisShortSenseStructureV1,
   importReviewedLewisShortBatchV1,
   REVIEWED_LEWIS_SHORT_SOURCE_FILE_GIT_BLOB_SHA_V1,
   REVIEWED_LEWIS_SHORT_SOURCE_REPOSITORY_COMMIT_V1,
@@ -128,6 +129,44 @@ describe("Open Instrument reviewed Lewis & Short batch importer v1", () => {
     });
     expect(unsupportedResult.rejections).toEqual([
       { entryId: "n3", reasonCodes: ["UNSUPPORTED_SOURCE_FORM_ENCODING"] },
+    ]);
+  });
+
+  it("rejects editorial-only sense markers while preserving substantive controls", () => {
+    expect(
+      classifyLewisShortSenseStructureV1('<hi rend="ital">init.</hi>'),
+    ).toBe("LEXICAL_DEFINITION_MISSING");
+    expect(
+      classifyLewisShortSenseStructureV1('<hi rend="ital">fin.</hi>'),
+    ).toBe("LEXICAL_DEFINITION_MISSING");
+    expect(
+      classifyLewisShortSenseStructureV1(
+        '<hi rend="ital">P. a. fin.</hi>',
+      ),
+    ).toBe("LEXICAL_DEFINITION_MISSING");
+
+    expect(
+      classifyLewisShortSenseStructureV1(
+        '<hi rend="ital">well! well done! bravo!</hi> an exclamation of joy or approbation',
+      ),
+    ).toBe("LEXICAL_GLOSS_PRESENT");
+    expect(
+      classifyLewisShortSenseStructureV1('<hi rend="ital">oh! O! ah!</hi>'),
+    ).toBe("LEXICAL_GLOSS_PRESENT");
+
+    const editorialOnly = sourceSlice.replace(
+      /<sense level="1" n="I" id="n3\.0">[\s\S]*?<\/sense>/u,
+      '<sense level="1" n="I" id="n3.0"><hi rend="ital">init.</hi></sense>',
+    );
+    const result = importReviewedLewisShortBatchV1(editorialOnly, {
+      ...manifest,
+      sourceSliceSha256: createHash("sha256")
+        .update(editorialOnly, "utf8")
+        .digest("hex"),
+    });
+    expect(result.status).toBe("REJECTED");
+    expect(result.rejections).toEqual([
+      { entryId: "n3", reasonCodes: ["LEXICAL_DEFINITION_MISSING"] },
     ]);
   });
 

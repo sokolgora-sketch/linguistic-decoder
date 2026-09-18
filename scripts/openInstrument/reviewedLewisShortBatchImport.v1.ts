@@ -80,6 +80,7 @@ export type ReviewedLewisShortBatchImportReasonCodeV1 =
   | "EXACT_FORM_MISSING"
   | "UNSUPPORTED_SOURCE_FORM_ENCODING"
   | "AMBIGUOUS_SENSE_STRUCTURE"
+  | "LEXICAL_DEFINITION_MISSING"
   | "GLOSS_MISSING"
   | "LANE2_VALIDATION_FAILED";
 
@@ -119,6 +120,8 @@ const EXPECTED_SOURCE_EVIDENCE_FAMILY_V1 = "historical_dictionary";
 const EXPECTED_SOURCE_STATUS_V1 = "research_candidate";
 const EXPECTED_SOURCE_HASH_PATTERN_V1 = /^[0-9a-f]{40}$/u;
 const EXPECTED_SLICE_HASH_PATTERN_V1 = /^[0-9a-f]{64}$/u;
+const EDITORIAL_ONLY_SENSE_MARKER_PATTERN_V1 =
+  /^(?:init|fin)\.$|^P\.?\s*a\.?\s*fin\.$/iu;
 
 function sha256V1(value: string): string {
   return createHash("sha256").update(value, "utf8").digest("hex");
@@ -358,6 +361,22 @@ function stripXmlTagsV1(value: string): string {
     .replace(/\s+/gu, " ");
 }
 
+export function classifyLewisShortSenseStructureV1(
+  senseXml: string,
+): "LEXICAL_GLOSS_PRESENT" | "LEXICAL_DEFINITION_MISSING" {
+  const trimmedSenseXml = senseXml.trim();
+  const markerOnlySense = /^<hi\b[^>]*\brend\s*=\s*["']ital["'][^>]*>[^<]*<\/hi>$/u.test(
+    trimmedSenseXml,
+  );
+  if (!markerOnlySense) return "LEXICAL_GLOSS_PRESENT";
+
+  return EDITORIAL_ONLY_SENSE_MARKER_PATTERN_V1.test(
+    stripXmlTagsV1(trimmedSenseXml),
+  )
+    ? "LEXICAL_DEFINITION_MISSING"
+    : "LEXICAL_GLOSS_PRESENT";
+}
+
 function buildRecordV1(
   entry: SourceEntryV1,
   manifest: ReviewedLewisShortBatchManifestV1,
@@ -384,6 +403,13 @@ function buildRecordV1(
   }
   if (entry.senseCount === 0) reasonCodes.add("GLOSS_MISSING");
   if (entry.senseCount > 1) reasonCodes.add("AMBIGUOUS_SENSE_STRUCTURE");
+  if (
+    senseMatches[0] &&
+    classifyLewisShortSenseStructureV1(senseMatches[0][1]) ===
+      "LEXICAL_DEFINITION_MISSING"
+  ) {
+    reasonCodes.add("LEXICAL_DEFINITION_MISSING");
+  }
 
   if (reasonCodes.size > 0) {
     return {
