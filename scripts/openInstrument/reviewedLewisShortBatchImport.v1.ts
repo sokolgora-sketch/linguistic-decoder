@@ -337,7 +337,7 @@ function decodeXmlEntityV1(value: string): string {
   }
 }
 
-function stripXmlTagsV1(value: string): string {
+export function stripXmlTagsV1(value: string): string {
   let output = "";
   let insideTag = false;
 

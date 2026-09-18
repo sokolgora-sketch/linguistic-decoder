@@ -6,6 +6,7 @@ import {
   REVIEWED_LEWIS_SHORT_SOURCE_FILE_PATH_V1,
   REVIEWED_LEWIS_SHORT_SOURCE_REPOSITORY_COMMIT_V1,
   REVIEWED_LEWIS_SHORT_SOURCE_URL_V1,
+  stripXmlTagsV1,
 } from "./reviewedLewisShortBatchImport.v1";
 import {
   SOURCE_ENTRY_ATTESTATION_SCHEMA_V1,
@@ -123,13 +124,7 @@ function extractSenseAttestationsV1(
       continue;
     }
 
-    const text = senseXml
-      .replace(/<[^>]*>/gu, "")
-      .replace(/&amp;/gu, "&")
-      .replace(/&lt;/gu, "<")
-      .replace(/&gt;/gu, ">")
-      .replace(/&quot;/gu, '"')
-      .replace(/&apos;/gu, "'")
+    const text = stripXmlTagsV1(senseXml)
       .normalize("NFC")
       .trim()
       .replace(/\s+/gu, " ");
