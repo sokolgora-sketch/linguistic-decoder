@@ -10,7 +10,7 @@ describe("reviewed lexicon candidate diagnostics audit v0.1", () => {
 
     const report = JSON.parse(raw);
     expect(report.reportVersion).toBe("reviewed-lexicon-candidate-diagnostics.v0.1");
-    expect(report.rows).toHaveLength(4);
+    expect(report.rows).toHaveLength(6);
 
     const daRow = report.rows.find(
       (row: { sourceId?: string }) =>
@@ -23,6 +23,14 @@ describe("reviewed lexicon candidate diagnostics audit v0.1", () => {
     const joRow = report.rows.find(
       (row: { sourceId?: string }) =>
         row.sourceId === "reviewed.external.jo.refusal.candidate.v0_1",
+    );
+    const euRow = report.rows.find(
+      (row: { sourceId?: string }) =>
+        row.sourceId === "reviewed.external.latin-eu.source-attestation.v0_1",
+    );
+    const ohRow = report.rows.find(
+      (row: { sourceId?: string }) =>
+        row.sourceId === "reviewed.external.latin-oh.source-attestation.v0_1",
     );
 
     expect(daRow).toBeDefined();
@@ -126,5 +134,47 @@ describe("reviewed lexicon candidate diagnostics audit v0.1", () => {
     expect(
       joRow.promotionChecklistFailedItems,
     ).toEqual([]);
+
+    expect(euRow).toMatchObject({
+      sourceId: "reviewed.external.latin-eu.source-attestation.v0_1",
+      candidateId: "latin-eu-source-attestation",
+      productionSafe: true,
+      liveStatus: "promotion_ready_candidate",
+      validationOutcome: "blocked",
+      userDecisionPosture: "user_decides",
+    });
+    expect(euRow.promotionChecklist).toMatchObject({
+      checklistVersion:
+        "reviewed-external-lexicon-promotion-checklist.v0_1",
+      promotionReady: true,
+    });
+    expect(euRow).toEqual(
+      expect.objectContaining({
+        validationReasons: expect.arrayContaining([
+          "missing_semanticBridge",
+        ]),
+      }),
+    );
+
+    expect(ohRow).toMatchObject({
+      sourceId: "reviewed.external.latin-oh.source-attestation.v0_1",
+      candidateId: "latin-oh-source-attestation",
+      productionSafe: true,
+      liveStatus: "promotion_ready_candidate",
+      validationOutcome: "blocked",
+      userDecisionPosture: "user_decides",
+    });
+    expect(ohRow.promotionChecklist).toMatchObject({
+      checklistVersion:
+        "reviewed-external-lexicon-promotion-checklist.v0_1",
+      promotionReady: true,
+    });
+    expect(ohRow).toEqual(
+      expect.objectContaining({
+        validationReasons: expect.arrayContaining([
+          "missing_semanticBridge",
+        ]),
+      }),
+    );
   });
 });
