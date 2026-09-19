@@ -20,10 +20,14 @@ const fixtureEntries = fixture.slice(
 const sourceFormat = "TEI.2 XML";
 const sourceTraditionId = "scaife.lewis-short.v0_1";
 
+const configuredAquaArtifactPath = process.env.OPEN_INSTRUMENT_PINNED_LS_PATH;
 const aquaArtifactPath =
-  process.env.OPEN_INSTRUMENT_PINNED_LS_PATH ??
+  configuredAquaArtifactPath ??
   "/tmp/open-instrument-ls-pinned-revalidation/lat.ls.perseus-eng2.xml";
-const aquaTest = existsSync(aquaArtifactPath) ? it : it.skip;
+const aquaTest =
+  configuredAquaArtifactPath !== undefined || existsSync(aquaArtifactPath)
+    ? it
+    : it.skip;
 
 function sha256(value: string): string {
   return createHash("sha256").update(value, "utf8").digest("hex");
