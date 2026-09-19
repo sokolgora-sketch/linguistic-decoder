@@ -2,11 +2,15 @@ import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import manifest from "../scripts/openInstrument/sourceBatches/lewis-short-entry-attestation-batch1.v1.manifest.json";
+import aquaManifest from "../scripts/openInstrument/sourceBatches/lewis-short-aqua-entry-attestation-batch1.v1.manifest.json";
 import {
   importReviewedLewisShortEntryAttestationsV1,
   type ReviewedLewisShortEntryAttestationManifestV1,
 } from "../scripts/openInstrument/reviewedLewisShortEntryAttestationImport.v1";
 import type { SourceEntryAttestationV1 } from "../src/shared/openInstrument/sourceEntryAttestation.v1";
+import {
+  fingerprintTargetBoundReviewEnvelopeV1,
+} from "../src/shared/openInstrument/targetBoundFunctionalCorrespondence.v1";
 import {
   fingerprintSourceEntryAttestationV1,
   validateTargetBlindReviewedSourceAttestationV1,
@@ -22,11 +26,17 @@ const fixturePath = join(
   __dirname,
   "../scripts/openInstrument/sourceBatches/lewis-short-entry-attestation-batch1.v1.xml",
 );
+const aquaFixturePath = join(
+  __dirname,
+  "../scripts/openInstrument/sourceBatches/lewis-short-aqua-entry-attestation-batch1.v1.xml",
+);
 const sourceSlice = readFileSync(fixturePath, "utf8");
+const aquaSourceSlice = readFileSync(aquaFixturePath, "utf8");
 const sourceSliceSha256 = createHash("sha256")
   .update(sourceSlice, "utf8")
   .digest("hex");
 const entryManifest = manifest as unknown as ReviewedLewisShortEntryAttestationManifestV1;
+const aquaEntryManifest = aquaManifest as unknown as ReviewedLewisShortEntryAttestationManifestV1;
 
 function importAttestations(): readonly SourceEntryAttestationV1[] {
   const result = importReviewedLewisShortEntryAttestationsV1(sourceSlice, {
@@ -38,14 +48,31 @@ function importAttestations(): readonly SourceEntryAttestationV1[] {
   return result.attestations;
 }
 
+function importAquaAttestation(): SourceEntryAttestationV1 {
+  const result = importReviewedLewisShortEntryAttestationsV1(aquaSourceSlice, {
+    ...aquaEntryManifest,
+    sourceSliceSha256: createHash("sha256")
+      .update(aquaSourceSlice, "utf8")
+      .digest("hex"),
+  });
+
+  if (result.status !== "IMPORTED" || result.attestations.length !== 1) {
+    throw new Error("Expected one imported AQUA attestation");
+  }
+  const attestation = result.attestations[0];
+  if (!attestation) throw new Error("Missing imported AQUA attestation");
+  return attestation;
+}
+
 describe("target-blind reviewed source attestation registry v1", () => {
-  it("records the three accepted source-only decisions against exact packages", () => {
+  it("records the accepted source-only decisions against exact packages", () => {
     const attestations = importAttestations();
     const expectedForms = ["as", "in", "is"];
     const expectedAttestationIds = [
       "source-entry-attestation.scaife-lewis-short.form-as.v1",
       "source-entry-attestation.scaife-lewis-short.form-in.v1",
       "source-entry-attestation.scaife-lewis-short.form-is.v1",
+      "source-entry-attestation.scaife-lewis-short.form-ăqua.v1",
     ];
 
     expect(TARGET_BLIND_REVIEWED_SOURCE_ATTESTATION_REGISTRY_SCHEMA_V1).toBe(
@@ -57,7 +84,7 @@ describe("target-blind reviewed source attestation registry v1", () => {
     expect(entryManifest.sourceRepositoryCommit).toBe(
       "56061ca127f4a2844980baffc5f2b6d1332897b3",
     );
-    expect(targetBlindReviewedSourceAttestationRegistryV1).toHaveLength(3);
+    expect(targetBlindReviewedSourceAttestationRegistryV1).toHaveLength(4);
     expect(targetBlindReviewedSourceAttestationRegistryV1.map((review) => review.attestationId)).toEqual(
       expectedAttestationIds,
     );
@@ -94,6 +121,47 @@ describe("target-blind reviewed source attestation registry v1", () => {
       expect(validation.ok).toBe(true);
       expect(JSON.stringify(attestation)).toBe(before);
     }
+  });
+
+  it("records the explicit accepted AQUA source-only human review", () => {
+    const attestation = importAquaAttestation();
+    const review = targetBlindReviewedSourceAttestationRegistryV1.find(
+      (candidate) => candidate.attestationId === attestation.attestationId,
+    );
+
+    expect(review).toBeDefined();
+    if (!review) return;
+
+    expect(review).toEqual({
+      schemaVersion: "open-instrument.target-blind-reviewed-source-attestation.v1",
+      attestationSchemaVersion: "open-instrument.source-entry-attestation.v1",
+      attestationId: "source-entry-attestation.scaife-lewis-short.form-ăqua.v1",
+      attestationFingerprint:
+        "0a4bdc13e2f422f3724b3a52fcd9279260e6b7c40875caba33b432502b6f00d7",
+      reviewDecision: "accepted",
+      reviewer: "DF / Sokol Gora",
+      reviewedAt: "2026-09-19",
+      reasonCodes: [],
+      claimBoundary: "SOURCE_ATTESTATION_ONLY",
+    });
+    expect(review.reasonCodes).toEqual([]);
+    expect(review.attestationFingerprint).toBe(
+      fingerprintSourceEntryAttestationV1(attestation),
+    );
+    expect(fingerprintTargetBoundReviewEnvelopeV1(review)).toBe(
+      "9b5c1dcada0b4635331aa9992eaf33cfa06c74670fc2b081717fe5885a042c6c",
+    );
+    expect(fingerprintTargetBoundReviewEnvelopeV1(review)).toBe(
+      fingerprintTargetBoundReviewEnvelopeV1({ ...review }),
+    );
+    expect(validateTargetBlindReviewedSourceAttestationV1(review, attestation)).toEqual({
+      ok: true,
+      review,
+    });
+    expect(attestation.selectedEntryId).toBeNull();
+    expect(attestation.entries.every((entry) => entry.selectedSenseId === null)).toBe(true);
+    expect(Object.isFrozen(review)).toBe(true);
+    expect(Object.isFrozen(review.reasonCodes)).toBe(true);
   });
 
   it("preserves four entries and 63 senses without selecting any", () => {

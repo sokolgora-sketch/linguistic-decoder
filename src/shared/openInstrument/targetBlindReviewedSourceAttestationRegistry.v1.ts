@@ -15,9 +15,12 @@ export const TARGET_BLIND_REVIEWED_SOURCE_ATTESTATION_REVIEWER_V1 =
 export const TARGET_BLIND_REVIEWED_SOURCE_ATTESTATION_REVIEW_DATE_V1 =
   "2026-09-18" as const;
 
+const AQUA_REVIEW_DATE_V1 = "2026-09-19" as const;
+
 function acceptedReviewV1(
   attestationId: string,
   attestationFingerprint: string,
+  reviewedAt: string = TARGET_BLIND_REVIEWED_SOURCE_ATTESTATION_REVIEW_DATE_V1,
 ): TargetBlindReviewedSourceAttestationV1 {
   return Object.freeze({
     schemaVersion: TARGET_BLIND_REVIEWED_SOURCE_ATTESTATION_SCHEMA_V1,
@@ -26,7 +29,7 @@ function acceptedReviewV1(
     attestationFingerprint,
     reviewDecision: "accepted",
     reviewer: TARGET_BLIND_REVIEWED_SOURCE_ATTESTATION_REVIEWER_V1,
-    reviewedAt: TARGET_BLIND_REVIEWED_SOURCE_ATTESTATION_REVIEW_DATE_V1,
+    reviewedAt,
     reasonCodes: Object.freeze([]),
     claimBoundary: "SOURCE_ATTESTATION_ONLY",
   });
@@ -44,5 +47,10 @@ export const targetBlindReviewedSourceAttestationRegistryV1 = Object.freeze([
   acceptedReviewV1(
     "source-entry-attestation.scaife-lewis-short.form-is.v1",
     "0a4a233779d54fb5a9f95680fe0dbfaeba5468b956ff16806d690e8ae551ea1e",
+  ),
+  acceptedReviewV1(
+    "source-entry-attestation.scaife-lewis-short.form-ăqua.v1",
+    "0a4bdc13e2f422f3724b3a52fcd9279260e6b7c40875caba33b432502b6f00d7",
+    AQUA_REVIEW_DATE_V1,
   ),
 ] as const);
