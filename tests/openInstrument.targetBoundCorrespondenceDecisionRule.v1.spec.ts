@@ -103,6 +103,7 @@ function reviewFor(
     rationale: {
       relationship,
       limitations: verdict === "SUPPORTED" ? [] : ["fixture-bound-review"],
+      text: `Fixture rationale for ${verdict}.`,
     },
     reasonCodes: [reasonCode],
   };
@@ -176,6 +177,58 @@ describe("reviewed target-bound correspondence decision rule v1", () => {
     }
   });
 
+  it("preserves substantive rationale text and rejects missing or non-exact text", () => {
+    const fixture = decisionFor("as", reviewFor("UNSUPPORTED", true));
+    expect(fixture.decision.review.rationale).toEqual({
+      relationship: "NONE",
+      limitations: ["fixture-bound-review"],
+      text: "Fixture rationale for UNSUPPORTED.",
+    });
+
+    for (const rationale of [
+      { relationship: "NONE", limitations: ["fixture-bound-review"] },
+      { relationship: "NONE", limitations: ["fixture-bound-review"], text: "" },
+      { relationship: "NONE", limitations: ["fixture-bound-review"], text: "   " },
+      { relationship: "NONE", limitations: ["fixture-bound-review"], text: "e\u0301" },
+    ]) {
+      const result = buildTargetBoundCorrespondenceDecisionRuleV1(
+        fixture.package,
+        fixture.attestation,
+        fixture.review,
+        fixture.package.comparisonUnits[0]!.comparisonUnitId,
+        {
+          ...reviewFor("UNSUPPORTED", true),
+          rationale,
+        } as unknown as TargetBoundCorrespondenceReviewV1,
+      );
+      expect(result).toEqual({
+        ok: false,
+        reasonCodes: expect.arrayContaining(["RATIONALE_INVALID"]),
+      });
+    }
+  });
+
+  it("accepts the authorized rationale key and rejects unknown rationale fields", () => {
+    const fixture = decisionFor("as", reviewFor("SUPPORTED", true));
+    const extraFieldReview = {
+      ...fixture.decision.review,
+      rationale: {
+        ...fixture.decision.review.rationale,
+        extra: "not authorized",
+      },
+    } as unknown as TargetBoundCorrespondenceReviewV1;
+    expect(buildTargetBoundCorrespondenceDecisionRuleV1(
+      fixture.package,
+      fixture.attestation,
+      fixture.review,
+      fixture.package.comparisonUnits[0]!.comparisonUnitId,
+      extraFieldReview,
+    )).toEqual({
+      ok: false,
+      reasonCodes: expect.arrayContaining(["RATIONALE_INVALID"]),
+    });
+  });
+
   it("distinguishes target-sense-unbound review from not-reviewed state", () => {
     const fixture = packageFor("as");
     const unitId = fixture.package.comparisonUnits[0]?.comparisonUnitId;
@@ -225,6 +278,29 @@ describe("reviewed target-bound correspondence decision rule v1", () => {
     expect(fingerprintTargetBoundCorrespondenceDecisionRuleV1(fixture.decision)).toBe(
       fixture.decision.decisionFingerprint,
     );
+
+    const changedRationale = decisionWithReview(fixture.decision, {
+      ...fixture.decision.review,
+      rationale: {
+        ...fixture.decision.review.rationale,
+        text: "A different substantive rationale.",
+      },
+    });
+    expect(changedRationale.decisionFingerprint).not.toBe(
+      fixture.decision.decisionFingerprint,
+    );
+    expect(fingerprintTargetBoundCorrespondenceDecisionRuleV1(changedRationale)).toBe(
+      changedRationale.decisionFingerprint,
+    );
+    expect(validateTargetBoundCorrespondenceDecisionRuleV1(
+      { ...fixture.decision, review: changedRationale.review },
+      fixture.package,
+      fixture.attestation,
+      fixture.review,
+    )).toEqual({
+      ok: false,
+      reasonCodes: expect.arrayContaining(["DECISION_FINGERPRINT_MISMATCH"]),
+    });
 
     const changedDecision = {
       ...fixture.decision,
@@ -398,6 +474,7 @@ describe("reviewed target-bound correspondence decision rule v1", () => {
     expect(Object.isFrozen(first)).toBe(true);
     expect(Object.isFrozen(first.review)).toBe(true);
     expect(Object.isFrozen(first.review.rationale)).toBe(true);
+    expect(Object.isFrozen(first.review.rationale.text)).toBe(true);
     expect(Object.isFrozen(first.doctrineVoicePath)).toBe(true);
   });
 });

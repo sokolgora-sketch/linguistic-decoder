@@ -49,6 +49,7 @@ export type TargetBoundCorrespondenceReviewReasonCodeV1 =
 export type TargetBoundCorrespondenceRationaleV1 = Readonly<{
   relationship: TargetBoundCorrespondenceRationaleRelationshipV1;
   limitations: readonly string[];
+  text: string;
 }>;
 
 export type TargetBoundCorrespondenceReviewV1 = Readonly<
@@ -207,6 +208,7 @@ const REVIEW_KEYS_V1 = [
 const RATIONALE_KEYS_V1 = [
   "relationship",
   "limitations",
+  "text",
 ] as const;
 
 const REVIEW_VERDICTS_V1 = new Set<ComparativeVerdictV0_1>([
@@ -363,7 +365,8 @@ function validRationaleV1(value: unknown): value is TargetBoundCorrespondenceRat
     typeof value.relationship === "string" &&
     RELATIONSHIPS_V1.has(value.relationship as TargetBoundCorrespondenceRationaleRelationshipV1) &&
     Array.isArray(value.limitations) &&
-    value.limitations.every(exactTextV1)
+    value.limitations.every(exactTextV1) &&
+    exactTextV1(value.text)
   );
 }
 
@@ -476,6 +479,7 @@ function reviewV1(
       rationale: deepFreezeV1({
         relationship: rationale.relationship,
         limitations: Object.freeze([...rationale.limitations]),
+        text: rationale.text,
       }),
       reasonCodes: Object.freeze(reasonCodes),
     }),
