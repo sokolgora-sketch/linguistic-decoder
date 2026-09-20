@@ -132,6 +132,12 @@ export type BuildMultiSourceFunctionalResearchInputsOptionsV0_1 = {
   targetWord: string;
   embryo: string;
 
+  /** Optional exact target-sense binding for the target-bound seam. */
+  targetSenseId?: string | null;
+
+  /** Preserve the selected target sense in the runtime input record. */
+  preserveTargetSenseId?: boolean;
+
   rows:
     readonly MultiSourceFunctionalResearchEvidenceRowV0_1[];
 };
@@ -141,6 +147,12 @@ export type BuildSourceAttestedFunctionalResearchInputGroupsOptionsV0_1 = {
 
   rows:
     readonly MultiSourceFunctionalResearchEvidenceRowV0_1[];
+};
+
+export type BuildTargetBoundFunctionalResearchInputGroupsOptionsV0_1 = {
+  targetWord: string;
+  targetSenseId: string | null;
+  rows: readonly MultiSourceFunctionalResearchEvidenceRowV0_1[];
 };
 
 export type SourceAttestedFunctionalResearchInputGroupV0_1 = {
@@ -168,6 +180,16 @@ function sameResearchKeyV0_1(
     normalizeResearchTextV0_1(right)
       .toLocaleUpperCase("en-US")
   );
+}
+
+function targetSenseMatchesV0_1(
+  value: string | undefined,
+  expected: string | null | undefined,
+): boolean {
+  if (expected === undefined) return true;
+
+  return normalizeResearchTextV0_1(value ?? "") ===
+    normalizeResearchTextV0_1(expected ?? "");
 }
 
 function citationIdIfUsableV0_1(
@@ -370,6 +392,10 @@ export function buildMultiSourceFunctionalResearchInputsV0_1(
           sameResearchKeyV0_1(
             candidate.targetWord,
             targetWord,
+          ) &&
+          targetSenseMatchesV0_1(
+            candidate.targetSenseId,
+            options.targetSenseId,
           ),
       );
 
@@ -412,6 +438,14 @@ export function buildMultiSourceFunctionalResearchInputsV0_1(
 
     out.push({
       sourceId,
+
+      ...(options.preserveTargetSenseId && hypothesis.targetSenseId
+        ? {
+            targetSenseId: normalizeResearchTextV0_1(
+              hypothesis.targetSenseId,
+            ),
+          }
+        : {}),
 
       evidenceFamily:
         row.evidenceFamily,
@@ -576,4 +610,89 @@ export function buildSourceAttestedFunctionalResearchInputGroupsV0_1(
       (group) =>
         group.sources.length > 0,
     );
+}
+
+/**
+ * Build target-bound research groups for rows that explicitly claim no
+ * structural relation to their declared embryo.
+ *
+ * Exact-form rows remain owned by the existing source-attested seam. These
+ * rows are eligible only for target-bound functional projection and require
+ * an exact target-sense binding when one is present in the request.
+ */
+export function buildTargetBoundFunctionalResearchInputGroupsV0_1(
+  options: BuildTargetBoundFunctionalResearchInputGroupsOptionsV0_1,
+): SourceAttestedFunctionalResearchInputGroupV0_1[] {
+  const targetWord = normalizeResearchTextV0_1(options.targetWord);
+
+  if (!targetWord) return [];
+
+  const targetSenseId = normalizeResearchTextV0_1(
+    options.targetSenseId ?? "",
+  );
+
+  const eligibleRows = options.rows.filter((row) => {
+    if (
+      !researchBoundaryIsPreservedV0_1(row) ||
+      row.embryoRelation !== "no_structural_relation" ||
+      row.relationOperationIds.length !== 0 ||
+      sameResearchKeyV0_1(row.embryo, row.form) ||
+      row.attestationTruth !== "fact"
+    ) {
+      return false;
+    }
+
+    const hasMatchingUsableCitation = row.citations.some(
+      (citation) =>
+        citationIdIfUsableV0_1(citation) !== null &&
+        sameResearchKeyV0_1(citation.attestedForm, row.form),
+    );
+
+    if (!hasMatchingUsableCitation) {
+      return false;
+    }
+
+    const hypothesis = row.functionalHypotheses.find(
+      (candidate) =>
+        candidate.claimBoundary === "functional_hypothesis_only" &&
+        candidate.functionalBridgeTruth === "hypothesis" &&
+        sameResearchKeyV0_1(candidate.targetWord, targetWord) &&
+        targetSenseMatchesV0_1(
+          candidate.targetSenseId,
+          targetSenseId,
+        ),
+    );
+
+    return Boolean(hypothesis);
+  });
+
+  const embryos: string[] = [];
+  const seenEmbryos = new Set<string>();
+
+  for (const row of eligibleRows) {
+    const embryo = normalizeResearchTextV0_1(row.embryo);
+    const key = embryo.toLocaleUpperCase("en-US");
+
+    if (!embryo || seenEmbryos.has(key)) continue;
+    seenEmbryos.add(key);
+    embryos.push(embryo);
+  }
+
+  return embryos
+    .map((embryo) => ({
+      embryo,
+      sources: buildMultiSourceFunctionalResearchInputsV0_1({
+        targetWord,
+        embryo,
+        targetSenseId,
+        preserveTargetSenseId: true,
+        rows: eligibleRows,
+      }).filter(
+        (source) =>
+          source.embryoRelation === "no_structural_relation" &&
+          source.relationOperationIds.length === 0 &&
+          !sameResearchKeyV0_1(source.form, embryo),
+      ),
+    }))
+    .filter((group) => group.sources.length > 0);
 }

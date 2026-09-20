@@ -59,6 +59,9 @@ export type MultiSourceFunctionalEvidenceRecordV0_1 = {
   form: string;
   gloss: string;
 
+  /** Optional target-sense binding for target-bound research runtime paths. */
+  targetSenseId?: string;
+
   citationRefs: readonly string[];
 
   /**
@@ -141,9 +144,17 @@ export type SourceAttestedFunctionalDiscoveryInputV0_1 = {
   sources: readonly MultiSourceFunctionalEvidenceRecordV0_1[];
 };
 
+export type TargetBoundFunctionalResearchDiscoveryInputV0_1 = {
+  targetWord: string;
+  targetSenseId: string | null;
+  embryo: string;
+  sources: readonly MultiSourceFunctionalEvidenceRecordV0_1[];
+};
+
 export type FunctionalEmbryoAuthorityV0_1 =
   | "structural_discovery"
-  | "source_attested_exact_form";
+  | "source_attested_exact_form"
+  | "target_bound_research";
 
 export type MultiSourceFunctionalWitnessV0_1 = {
   witnessId: string;
@@ -155,6 +166,7 @@ export type MultiSourceFunctionalWitnessV0_1 = {
     FunctionalEmbryoAuthorityV0_1;
 
   sourceId: string;
+  targetSenseId?: string;
   evidenceFamily: MultiSourceEvidenceFamilyV0_1;
   sourceStatus: MultiSourceFunctionalEvidenceRecordV0_1["sourceStatus"];
 
@@ -188,6 +200,10 @@ const ADMISSIBLE_EMBRYO_SOURCE_RELATIONS_V0_1 =
     "phonetic_resemblance",
     "semantic_resemblance",
   ]);
+
+type EvidenceRecordAdmissionModeV0_1 =
+  | "structural"
+  | "target_bound_research";
 
 function normalizeDiscoveryTextV0_1(
   value: string,
@@ -229,12 +245,16 @@ function normalizeOperationIdsV0_1(
 function isAdmissibleEvidenceRecordV0_1(
   source:
     MultiSourceFunctionalEvidenceRecordV0_1,
+  mode: EvidenceRecordAdmissionModeV0_1 = "structural",
 ): boolean {
-  if (
-    !ADMISSIBLE_EMBRYO_SOURCE_RELATIONS_V0_1.has(
-      source.embryoRelation,
-    )
-  ) {
+  const relationIsAdmissible =
+    mode === "target_bound_research"
+      ? source.embryoRelation === "no_structural_relation"
+      : ADMISSIBLE_EMBRYO_SOURCE_RELATIONS_V0_1.has(
+          source.embryoRelation,
+        );
+
+  if (!relationIsAdmissible) {
     return false;
   }
 
@@ -262,11 +282,24 @@ function isAdmissibleEvidenceRecordV0_1(
     return false;
   }
 
+  if (
+    mode === "target_bound_research" &&
+    (
+      source.relationOperationIds.length > 0 ||
+      source.attestationTruth !== "fact" ||
+      source.functionalBridgeTruth !== "hypothesis" ||
+      !source.semanticBridge?.normalize("NFC").trim()
+    )
+  ) {
+    return false;
+  }
+
   /**
    * An authorized_transformation relation is meaningful only when
    * at least one actual canonical operation supports it.
    */
   if (
+    mode === "structural" &&
     source.embryoRelation ===
       "authorized_transformation" &&
     canonicalOperationIds.length === 0
@@ -345,6 +378,7 @@ function buildFunctionalWitnessesV0_1(
 
     sources:
       readonly MultiSourceFunctionalEvidenceRecordV0_1[];
+    admissionMode?: EvidenceRecordAdmissionModeV0_1;
   },
 ): MultiSourceFunctionalWitnessV0_1[] {
   const witnesses:
@@ -358,6 +392,7 @@ function buildFunctionalWitnessesV0_1(
     if (
       !isAdmissibleEvidenceRecordV0_1(
         source,
+        input.admissionMode,
       )
     ) {
       continue;
@@ -401,6 +436,15 @@ function buildFunctionalWitnessesV0_1(
         input.embryoAuthority,
 
       sourceId,
+
+      ...(source.targetSenseId
+        ? {
+            targetSenseId:
+              normalizeDiscoveryTextV0_1(
+                source.targetSenseId,
+              ),
+          }
+        : {}),
 
       evidenceFamily:
         source.evidenceFamily,
@@ -563,5 +607,61 @@ export function discoverSourceAttestedFunctionalWitnessesV0_1(
 
     sources:
       exactSources,
+  });
+}
+
+/**
+ * Target-bound research path for independently attested source forms that
+ * make no structural claim about the requested embryo.
+ *
+ * This is separate from structural discovery and from the exact-form
+ * source-attested fallback. It cannot create a structural expansion chain
+ * or a source-attested embryo authority.
+ */
+export function discoverTargetBoundFunctionalResearchWitnessesV0_1(
+  input: TargetBoundFunctionalResearchDiscoveryInputV0_1,
+): MultiSourceFunctionalWitnessV0_1[] {
+  const targetWord = normalizeDiscoveryTextV0_1(input.targetWord);
+  const targetSenseId = input.targetSenseId
+    ? normalizeDiscoveryTextV0_1(input.targetSenseId)
+    : "";
+  const embryo = normalizeDiscoveryTextV0_1(input.embryo);
+
+  if (!targetWord || !embryo) {
+    return [];
+  }
+
+  const targetSources = input.sources.filter((source) => {
+    const sourceSenseId = source.targetSenseId
+      ? normalizeDiscoveryTextV0_1(source.targetSenseId)
+      : "";
+
+    if (Boolean(targetSenseId) !== Boolean(sourceSenseId)) {
+      return false;
+    }
+
+    if (targetSenseId && targetSenseId !== sourceSenseId) {
+      return false;
+    }
+
+    if (
+      normalizeDiscoveryTextV0_1(source.form).toLocaleUpperCase("en-US") ===
+      embryo.toLocaleUpperCase("en-US")
+    ) {
+      return false;
+    }
+
+    return isAdmissibleEvidenceRecordV0_1(
+      source,
+      "target_bound_research",
+    );
+  });
+
+  return buildFunctionalWitnessesV0_1({
+    targetWord,
+    embryo,
+    embryoAuthority: "target_bound_research",
+    sources: targetSources,
+    admissionMode: "target_bound_research",
   });
 }
