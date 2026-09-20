@@ -31,6 +31,10 @@ export type MultiSourceTruthStatusV0_1 =
   | "hypothesis"
   | "unknown";
 
+export type EvidenceBasisV0_1 =
+  | "lexical_equivalence"
+  | "functional_correspondence";
+
 export type MultiSourceEvidenceFamilyV0_1 =
   | "lexical_dictionary"
   | "dialect_lexicon"
@@ -58,6 +62,8 @@ export type MultiSourceFunctionalEvidenceRecordV0_1 = {
   language: string;
   form: string;
   gloss: string;
+
+  evidenceBasis: EvidenceBasisV0_1;
 
   /** Optional target-sense binding for target-bound research runtime paths. */
   targetSenseId?: string;
@@ -173,6 +179,7 @@ export type MultiSourceFunctionalWitnessV0_1 = {
   language: string;
   sourceForm: string;
   gloss: string;
+  evidenceBasis: EvidenceBasisV0_1;
   citationRefs: readonly string[];
 
   embryoRelation: EmbryoSourceRelationV0_1;
@@ -247,6 +254,13 @@ function isAdmissibleEvidenceRecordV0_1(
     MultiSourceFunctionalEvidenceRecordV0_1,
   mode: EvidenceRecordAdmissionModeV0_1 = "structural",
 ): boolean {
+  if (
+    source.evidenceBasis !== "lexical_equivalence" &&
+    source.evidenceBasis !== "functional_correspondence"
+  ) {
+    return false;
+  }
+
   const relationIsAdmissible =
     mode === "target_bound_research"
       ? source.embryoRelation === "no_structural_relation"
@@ -287,8 +301,11 @@ function isAdmissibleEvidenceRecordV0_1(
     (
       source.relationOperationIds.length > 0 ||
       source.attestationTruth !== "fact" ||
-      source.functionalBridgeTruth !== "hypothesis" ||
-      !source.semanticBridge?.normalize("NFC").trim()
+      (source.evidenceBasis === "functional_correspondence" &&
+        (source.functionalBridgeTruth !== "hypothesis" ||
+          !source.semanticBridge?.normalize("NFC").trim())) ||
+      (source.evidenceBasis === "lexical_equivalence" &&
+        source.functionalBridgeTruth !== "unknown")
     )
   ) {
     return false;
@@ -467,6 +484,9 @@ function buildFunctionalWitnessesV0_1(
           source.gloss,
         ),
 
+      evidenceBasis:
+        source.evidenceBasis,
+
       citationRefs:
         normalizeCitationRefsV0_1(
           source.citationRefs,
@@ -486,6 +506,7 @@ function buildFunctionalWitnessesV0_1(
       semanticBridge,
 
       functionalBridgeTruth:
+        source.evidenceBasis !== "functional_correspondence" ||
         semanticBridge == null
           ? "unknown"
           : source.functionalBridgeTruth,

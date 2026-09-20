@@ -3,6 +3,7 @@
   "packetId": "art.creative_artistic_activity.v0_1",
   "targetWord": "art",
   "targetSenseId": "creative_artistic_activity",
+  "evidenceBasis": "lexical_equivalence",
   "semanticBridge": "The source entries attest lexical forms for the bounded creative-artistic activity sense; treating that shared functional referent as a ZË-RO bridge remains a research hypothesis only.",
   "sources": [
     {

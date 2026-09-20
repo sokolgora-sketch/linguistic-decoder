@@ -103,10 +103,10 @@ describe(
             "sterile",
           );
 
-          expect(
-            candidate.claimType,
-          ).toBe(
-            "functionalMotivation",
+          expect(candidate.claimType).toBe(
+            candidate.sourceId.includes("greek-eremos")
+              ? "unresolved"
+              : "functionalMotivation",
           );
 
           expect(
@@ -127,10 +127,10 @@ describe(
             "research_candidate",
           );
 
-          expect(
-            candidate.claimBoundary,
-          ).toBe(
-            "research_functional_hypothesis_only",
+          expect(candidate.claimBoundary).toBe(
+            candidate.sourceId.includes("greek-eremos")
+              ? "lexical_source_evidence_only"
+              : "research_functional_hypothesis_only",
           );
 
           expect(
@@ -261,9 +261,7 @@ describe(
         expect(
           pokorny
             .functionalBridgeTruth,
-        ).toBe(
-          "hypothesis",
-        );
+        ).toBe("hypothesis");
 
         expect(
           greek,
@@ -279,9 +277,7 @@ describe(
         expect(
           greek
             .functionalBridgeTruth,
-        ).toBe(
-          "hypothesis",
-        );
+        ).toBe("unknown");
 
         expect(
           greek
@@ -290,12 +286,7 @@ describe(
           "empty",
         );
 
-        expect(
-          greek
-            .semanticBridge,
-        ).toContain(
-          "productive or reproductive capacity",
-        );
+        expect(greek.semanticBridge).toBeNull();
 
         expect(
           greek

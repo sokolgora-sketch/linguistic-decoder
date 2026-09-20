@@ -3,6 +3,7 @@
   "packetId": "fixture.packet.compiler.v0_1",
   "targetWord": "compiler-fixture",
   "targetSenseId": "fixture_exact_form",
+  "evidenceBasis": "functional_correspondence",
   "semanticBridge": "CONTRACT TEST ONLY: this packet validates deterministic compilation without asserting external evidence.",
   "sources": [
     {

@@ -53,7 +53,7 @@ export type MultiSourceFunctionalResearchProjectionV0_1 = {
     MultiSourceFunctionalWitnessV0_1["sourceStatus"];
 
   claimType:
-    "functionalMotivation";
+    "functionalMotivation" | "unresolved";
 
   validationOutcome:
     "not_evaluated";
@@ -66,6 +66,9 @@ export type MultiSourceFunctionalResearchProjectionV0_1 = {
 
   semanticBridge:
     string | null;
+
+  evidenceBasis:
+    MultiSourceFunctionalWitnessV0_1["evidenceBasis"];
 
   evidenceRefs:
     readonly string[];
@@ -83,7 +86,8 @@ export type MultiSourceFunctionalResearchProjectionV0_1 = {
     MultiSourceTruthStatusV0_1;
 
   claimBoundary:
-    "research_functional_hypothesis_only";
+    | "research_functional_hypothesis_only"
+    | "lexical_source_evidence_only";
 
   historicalOriginClaim:
     "not_claimed";
@@ -265,7 +269,9 @@ export function projectMultiSourceFunctionalResearchWitnessesV0_1(
         witness.sourceStatus,
 
       claimType:
-        "functionalMotivation",
+        witness.evidenceBasis === "functional_correspondence"
+          ? "functionalMotivation"
+          : "unresolved",
 
       validationOutcome:
         "not_evaluated",
@@ -290,12 +296,18 @@ export function projectMultiSourceFunctionalResearchWitnessesV0_1(
         witness.attestationTruth,
 
       functionalBridgeTruth:
+        witness.evidenceBasis !== "functional_correspondence" ||
         semanticBridge == null
           ? "unknown"
           : witness.functionalBridgeTruth,
 
+      evidenceBasis:
+        witness.evidenceBasis,
+
       claimBoundary:
-        "research_functional_hypothesis_only",
+        witness.evidenceBasis === "functional_correspondence"
+          ? "research_functional_hypothesis_only"
+          : "lexical_source_evidence_only",
 
       historicalOriginClaim:
         "not_claimed",

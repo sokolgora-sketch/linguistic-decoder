@@ -130,7 +130,7 @@ describe("Open Instrument real evidence-packet compiler pilot v0.1", () => {
 
   it("reproduces the four catalog rows from the two reviewed packets", () => {
     const catalogRows = loadMultiSourceFunctionalResearchEvidenceCatalogV0_1();
-    expect(catalogRows).toHaveLength(93);
+    expect(catalogRows).toHaveLength(90);
 
     const compiledRows = PILOT_TARGETS_V0_1.flatMap((target) => {
       const parsed = parseOpenInstrumentResearchEvidencePacketV0_1(
@@ -169,13 +169,14 @@ describe("Open Instrument real evidence-packet compiler pilot v0.1", () => {
         policyForV0_1(target),
       );
 
-      expect(result.ready).toBe(true);
-      expect(result.reasonCodes).toEqual([]);
-      expect(result.acceptedResearchEvidenceIds).toHaveLength(2);
-      expect(result.provenanceGroupIds).toEqual([
-        "fjale.fjalor-shqip.v0_1",
-        "scaife.lewis-short.v0_1",
-      ]);
+      expect(result.ready).toBe(false);
+      expect(result.reasonCodes).toEqual(expect.arrayContaining([
+        "functional_bridge_missing",
+        "minimum_rows_not_met",
+        "minimum_provenance_groups_not_met",
+      ]));
+      expect(result.acceptedResearchEvidenceIds).toEqual([]);
+      expect(result.provenanceGroupIds).toEqual([]);
 
       expect(rows.map((row) => ({
         id: row.researchEvidenceId,
@@ -190,8 +191,9 @@ describe("Open Instrument real evidence-packet compiler pilot v0.1", () => {
         expect(row.functionalHypotheses[0]).toMatchObject({
           targetWord: target.targetWord,
           targetSenseId: target.targetSenseId,
-          functionalBridgeTruth: "hypothesis",
-          claimBoundary: "functional_hypothesis_only",
+          functionalBridgeTruth: "unknown",
+          claimBoundary: "lexical_source_evidence_only",
+          evidenceBasis: "lexical_equivalence",
         });
         expect(row.attestationTruth).toBe("fact");
         expect(row.sourceStatus).toBe("research_candidate");
@@ -211,12 +213,13 @@ describe("Open Instrument real evidence-packet compiler pilot v0.1", () => {
       const body = await analyzeV0_1(target.targetWord);
       const status = (body.analysisStatusV0_1 as Record<string, unknown>).status;
       expect(status as AnalysisStatusCodeV0_1).toBe(
-        "research_functional_hypothesis",
+        target.targetWord === "order"
+          ? "null_no_supported_candidate"
+          : "structural_unreviewed",
       );
-      expect(
-        (body.analysisStatusV0_1 as Record<string, unknown>)
-          .researchHypothesisEmbryos,
-      ).toEqual(expect.arrayContaining(target.expectedRows.map((row) => row.embryo)));
+      expect(body.candidates).toEqual(expect.arrayContaining([
+        expect.objectContaining({ evidenceBasis: "lexical_equivalence" }),
+      ]));
     }
   });
 

@@ -39,8 +39,9 @@ describe("five-case accepted research witness admission v1", () => {
     for (const row of compiled) {
       for (const hypothesis of row.functionalHypotheses) {
         rowsByTarget.set(hypothesis.targetWord, (rowsByTarget.get(hypothesis.targetWord) ?? 0) + 1);
-        expect(hypothesis.functionalBridgeTruth).toBe("hypothesis");
-        expect(hypothesis.claimBoundary).toBe("functional_hypothesis_only");
+        expect(hypothesis.evidenceBasis).toBe("lexical_equivalence");
+        expect(hypothesis.functionalBridgeTruth).toBe("unknown");
+        expect(hypothesis.claimBoundary).toBe("lexical_source_evidence_only");
       }
     }
     expect(Object.fromEntries(rowsByTarget)).toEqual(TARGET_COUNTS);
@@ -104,7 +105,9 @@ describe("five-case accepted research witness admission v1", () => {
         (candidate: any) => candidate.sourceKind !== "multi_source_research_witness",
       );
 
-      expect(result.analysisStatusV0_1.status).toBe("research_functional_hypothesis");
+      expect(["candidate_only", "structural_unreviewed"]).toContain(
+        result.analysisStatusV0_1.status,
+      );
       expect(research).toHaveLength(expectedWitnessCount);
       expect(structural.some((candidate: any) => candidate.embryo === embryo)).toBe(true);
       expect(research.every((candidate: any) => candidate.targetWord === word)).toBe(true);
@@ -114,8 +117,9 @@ describe("five-case accepted research witness admission v1", () => {
       expect(research.every((candidate: any) => candidate.embryoRelation === "no_structural_relation")).toBe(true);
       expect(research.every((candidate: any) => candidate.relationOperationIds.length === 0)).toBe(true);
       expect(research.every((candidate: any) => candidate.attestationTruth === "fact")).toBe(true);
-      expect(research.every((candidate: any) => candidate.functionalBridgeTruth === "hypothesis")).toBe(true);
-      expect(research.every((candidate: any) => candidate.claimBoundary === "research_functional_hypothesis_only")).toBe(true);
+      expect(research.every((candidate: any) => candidate.evidenceBasis === "lexical_equivalence")).toBe(true);
+      expect(research.every((candidate: any) => candidate.functionalBridgeTruth === "unknown")).toBe(true);
+      expect(research.every((candidate: any) => candidate.claimBoundary === "lexical_source_evidence_only")).toBe(true);
       expect(research.every((candidate: any) => candidate.evidenceRefs.length === 1)).toBe(true);
       expect(research.every((candidate: any) => candidate.winnerClaim === "not_claimed")).toBe(true);
       expect(research.every((candidate: any) => candidate.candidateTruthClaim === "not_claimed")).toBe(true);

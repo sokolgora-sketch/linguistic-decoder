@@ -3,6 +3,7 @@
   "packetId": "five-case",
   "targetWord": "mystery",
   "targetSenseId": "user_sense_something_unknown_or_difficult_to_understand",
+  "evidenceBasis": "lexical_equivalence",
   "semanticBridge": "The source-attested meaning may functionally correspond to something unknown or difficult to understand; bounded hypothesis only.",
   "sources": [
     {

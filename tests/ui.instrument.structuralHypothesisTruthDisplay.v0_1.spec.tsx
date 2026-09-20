@@ -133,17 +133,6 @@ describe(
           ),
         ).toBeInTheDocument();
 
-        expect(
-          screen.getByText(
-            "Historical origin: not claimed",
-          ),
-        ).toBeInTheDocument();
-
-        expect(
-          screen.getByText(
-            "Candidate truth: not claimed",
-          ),
-        ).toBeInTheDocument();
 
         expect(
           screen.queryByText(
@@ -222,9 +211,7 @@ describe(
           presentValue(
             research?.functionalBridgeTruth,
           ),
-        ).toBe(
-          "hypothesis",
-        );
+        ).toBe("unknown");
 
         expect(
           presentValue(
@@ -255,33 +242,11 @@ describe(
 
         expect(
           screen.getByText(
-            "Research functional hypothesis",
+          "Lexical source evidence",
           ),
         ).toBeInTheDocument();
 
-        expect(
-          screen.getByText(
-            "Attestation: Fact",
-          ),
-        ).toBeInTheDocument();
-
-        expect(
-          screen.getByText(
-            "Functional bridge: Hypothesis",
-          ),
-        ).toBeInTheDocument();
-
-        expect(
-          screen.getByText(
-            "Historical origin: not claimed",
-          ),
-        ).toBeInTheDocument();
-
-        expect(
-          screen.getByText(
-            "Candidate truth: not claimed",
-          ),
-        ).toBeInTheDocument();
+        expect(screen.getByText("Boundary: lexical_source_evidence_only")).toBeInTheDocument();
 
         expect(
           screen.getByText(

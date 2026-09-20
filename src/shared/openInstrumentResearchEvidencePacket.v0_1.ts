@@ -5,6 +5,8 @@ import {
   type MultiSourceFunctionalResearchHypothesisV0_1,
 } from "./multiSourceFunctionalResearchEvidenceRegistry.v0_1";
 
+import type { EvidenceBasisV0_1 } from "./multiSourceFunctionalDiscovery.v0_1";
+
 import { normalizeToAllowedOpId } from "./ops/allowedOps.v0.1";
 
 export const OPEN_INSTRUMENT_RESEARCH_EVIDENCE_PACKET_VERSION_V0_1 =
@@ -49,7 +51,8 @@ export type OpenInstrumentResearchEvidencePacketV0_1 = {
   packetId: string;
   targetWord: string;
   targetSenseId: string;
-  semanticBridge: string;
+  semanticBridge: string | null;
+  evidenceBasis: EvidenceBasisV0_1;
   sources: readonly OpenInstrumentResearchEvidencePacketSourceV0_1[];
 };
 
@@ -343,11 +346,17 @@ export function parseOpenInstrumentResearchEvidencePacketV0_1(
   const targetWord = normalizeTextV0_1(value.targetWord);
   const targetSenseId = normalizeTextV0_1(value.targetSenseId);
   const semanticBridge = normalizeTextV0_1(value.semanticBridge);
+  const evidenceBasis = value.evidenceBasis;
 
   if (!packetId) errors.push("packetId must be a non-empty string");
   if (!targetWord) errors.push("targetWord must be a non-empty string");
   if (!targetSenseId) errors.push("targetSenseId must be a non-empty string");
-  if (!semanticBridge) errors.push("semanticBridge must be a non-empty string");
+  if (evidenceBasis !== "lexical_equivalence" && evidenceBasis !== "functional_correspondence") {
+    errors.push("evidenceBasis is invalid");
+  }
+  if (evidenceBasis === "functional_correspondence" && !semanticBridge) {
+    errors.push("functional_correspondence requires semanticBridge");
+  }
 
   const sourcesValue = value.sources;
   if (!Array.isArray(sourcesValue) || sourcesValue.length === 0) {
@@ -374,7 +383,7 @@ export function parseOpenInstrumentResearchEvidencePacketV0_1(
     citationIds.add(source.citation.citationId);
   }
 
-  if (errors.length > 0 || !packetId || !targetWord || !targetSenseId || !semanticBridge) {
+  if (errors.length > 0 || !packetId || !targetWord || !targetSenseId) {
     return { ok: false, errors };
   }
 
@@ -387,6 +396,7 @@ export function parseOpenInstrumentResearchEvidencePacketV0_1(
       targetWord,
       targetSenseId,
       semanticBridge,
+      evidenceBasis: evidenceBasis as EvidenceBasisV0_1,
       sources: sources as OpenInstrumentResearchEvidencePacketSourceV0_1[],
     },
   };
@@ -418,9 +428,19 @@ export function compileOpenInstrumentResearchEvidencePacketV0_1(
       const hypothesis: MultiSourceFunctionalResearchHypothesisV0_1 = {
         targetWord: packet.targetWord,
         targetSenseId: packet.targetSenseId,
-        semanticBridge: packet.semanticBridge,
-        functionalBridgeTruth: "hypothesis",
-        claimBoundary: "functional_hypothesis_only",
+        semanticBridge:
+          packet.evidenceBasis === "functional_correspondence"
+            ? packet.semanticBridge
+            : null,
+        evidenceBasis: packet.evidenceBasis,
+        functionalBridgeTruth:
+          packet.evidenceBasis === "functional_correspondence"
+            ? "hypothesis"
+            : "unknown",
+        claimBoundary:
+          packet.evidenceBasis === "functional_correspondence"
+            ? "functional_hypothesis_only"
+            : "lexical_source_evidence_only",
       };
 
       return {

@@ -69,9 +69,7 @@ describe(
         expect(
           body.analysisStatusV0_1
             .status,
-        ).toBe(
-          "research_functional_hypothesis",
-        );
+        ).not.toBe("research_functional_hypothesis");
 
         expect(
           new Set(
@@ -79,10 +77,7 @@ describe(
               .researchHypothesisEmbryos,
           ),
         ).toEqual(
-          new Set([
-            "AMO",
-            "DUA",
-          ]),
+          new Set(),
         );
 
         expect(
@@ -131,10 +126,7 @@ describe(
             ),
           ),
         ).toEqual(
-          new Set([
-            "AMO",
-            "DUA",
-          ]),
+          new Set(["AMO", "DUA"]),
         );
 
         for (
@@ -144,7 +136,7 @@ describe(
           expect(
             candidate.claimType,
           ).toBe(
-            "functionalMotivation",
+            "unresolved",
           );
 
           expect(
@@ -174,8 +166,17 @@ describe(
           expect(
             candidate.claimBoundary,
           ).toBe(
-            "research_functional_hypothesis_only",
+            "lexical_source_evidence_only",
           );
+
+          expect(candidate.evidenceBasis).toBe("lexical_equivalence");
+          expect(candidate.functionalBridgeTruth).toBe("unknown");
+
+          expect(candidate.evidenceBasis).toBe("lexical_equivalence");
+          expect(candidate.functionalBridgeTruth).toBe("unknown");
+
+          expect(candidate.evidenceBasis).toBe("lexical_equivalence");
+          expect(candidate.functionalBridgeTruth).toBe("unknown");
 
           expect(
             candidate.historicalOriginClaim,
@@ -221,17 +222,12 @@ describe(
         expect(
           body.analysisStatusV0_1
             .status,
-        ).toBe(
-          "research_functional_hypothesis",
-        );
+        ).not.toBe("research_functional_hypothesis");
 
         expect(
           body.analysisStatusV0_1
             .researchHypothesisEmbryos,
-        ).toEqual([
-          "shpresë",
-          "spēs",
-        ]);
+        ).toEqual([]);
 
         expect(
           body.analysisStatusV0_1
@@ -269,7 +265,7 @@ describe(
           expect(
             candidate.claimBoundary,
           ).toBe(
-            "research_functional_hypothesis_only",
+            "lexical_source_evidence_only",
           );
 
           expect(

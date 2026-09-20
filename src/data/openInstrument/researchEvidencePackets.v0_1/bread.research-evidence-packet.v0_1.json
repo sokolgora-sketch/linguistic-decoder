@@ -3,6 +3,7 @@
   "packetId": "bread.physical-baked-food.v0_1",
   "targetWord": "bread",
   "targetSenseId": "physical_baked_bread_food",
+  "evidenceBasis": "lexical_equivalence",
   "semanticBridge": "The source entries attest lexical forms for the bounded baked bread-food sense; treating that shared functional referent as a ZË-RO bridge remains a research hypothesis only.",
   "sources": [
     {

@@ -275,6 +275,7 @@ function adaptCandidate(rawCandidate: RawCandidate): CandidateUI {
     relationOperationIds: optionalStringArray(rawCandidate?.relationOperationIds),
     attestationTruth: optionalString(rawCandidate?.attestationTruth),
     functionalBridgeTruth: optionalString(rawCandidate?.functionalBridgeTruth),
+    evidenceBasis: optionalString(rawCandidate?.evidenceBasis),
 
     claimType: optionalString(rawCandidate?.claimType),
     originClaim: optionalString(rawCandidate?.originClaim),

@@ -3,6 +3,7 @@
   "packetId": "water.physical-liquid.v0_1",
   "targetWord": "water",
   "targetSenseId": "physical_water_liquid",
+  "evidenceBasis": "lexical_equivalence",
   "semanticBridge": "The two source entries independently attest their language's lexical form for the physical water/liquid sense; treating those bounded source facts as a shared functional referent remains a research hypothesis only.",
   "sources": [
     {

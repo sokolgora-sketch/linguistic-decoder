@@ -13,7 +13,9 @@ describe(
         evidenceFamily: "lexical_dictionary",
         language: "Albanian",
         form: "erë",
+        evidenceBasis: "functional_correspondence",
         gloss: "wind / air / smell",
+        evidenceBasis: "functional_correspondence",
         citationRefs: [
           "fixture:citation:albanian-er",
         ],
@@ -30,7 +32,9 @@ describe(
         evidenceFamily: "historical_dictionary",
         language: "Greek",
         form: "er-family-form",
+        evidenceBasis: "functional_correspondence",
         gloss: "empty / devoid / deserted",
+        evidenceBasis: "functional_correspondence",
         citationRefs: [
           "fixture:citation:greek-er-family",
         ],
@@ -47,7 +51,9 @@ describe(
         evidenceFamily: "reconstructed_lexicon",
         language: "Proto-language reconstruction",
         form: "*er-",
+        evidenceBasis: "functional_correspondence",
         gloss: "weak / loose / infirm",
+        evidenceBasis: "functional_correspondence",
         citationRefs: [
           "fixture:citation:reconstructed-er",
         ],
@@ -64,7 +70,9 @@ describe(
         evidenceFamily: "other",
         language: "Fixture",
         form: "er",
+        evidenceBasis: "functional_correspondence",
         gloss: "unrelated test meaning",
+        evidenceBasis: "functional_correspondence",
         citationRefs: [
           "fixture:citation:unrelated",
         ],
@@ -222,6 +230,7 @@ describe(
                 language:
                   "Fixture Language",
                 form: "di",
+                evidenceBasis: "functional_correspondence",
                 gloss:
                   "fixture gloss",
                 citationRefs: [
@@ -268,6 +277,7 @@ describe(
                 language:
                   "Fixture Language",
                 form: "di",
+                evidenceBasis: "functional_correspondence",
                 gloss:
                   "fixture gloss",
                 citationRefs: [
@@ -354,6 +364,7 @@ describe(
           evidenceFamily: "dialect_lexicon",
           language: "Fixture Language",
           form: "ak",
+          evidenceBasis: "functional_correspondence",
           gloss: "fixture gloss",
           citationRefs: [
             "fixture:citation:ak",
@@ -403,6 +414,7 @@ describe(
               "Fixture Albanian",
             form:
               "dua",
+            evidenceBasis: "functional_correspondence",
             gloss:
               "to love",
             citationRefs: [

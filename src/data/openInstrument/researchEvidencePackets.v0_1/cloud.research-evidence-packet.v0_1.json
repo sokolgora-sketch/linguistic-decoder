@@ -3,6 +3,7 @@
   "packetId": "cloud.physical-atmospheric.v0_1",
   "targetWord": "cloud",
   "targetSenseId": "physical_cloud_atmospheric",
+  "evidenceBasis": "lexical_equivalence",
   "semanticBridge": "The Albanian and Latin entries independently attest lexical forms for an atmospheric cloud; treating them as a shared functional referent remains a research hypothesis only.",
   "sources": [
     {

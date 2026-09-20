@@ -9,6 +9,7 @@ import {
 
 import type {
   EmbryoSourceRelationV0_1,
+  EvidenceBasisV0_1,
   MultiSourceEvidenceFamilyV0_1,
   MultiSourceTruthStatusV0_1,
 } from "./multiSourceFunctionalDiscovery.v0_1";
@@ -141,6 +142,11 @@ const SOURCE_STATUSES_V0_1 =
     "research_candidate",
     "reviewed_candidate",
   ] as const;
+
+const EVIDENCE_BASES_V0_1 = [
+  "lexical_equivalence",
+  "functional_correspondence",
+] as const satisfies readonly EvidenceBasisV0_1[];
 
 function parseCitationV0_1(
   value: unknown,
@@ -277,6 +283,11 @@ function parseHypothesisV0_1(
       TRUTH_STATUSES_V0_1,
     );
 
+  const evidenceBasis = exactString(
+    value.evidenceBasis,
+    EVIDENCE_BASES_V0_1,
+  );
+
   const targetSenseId =
     value.targetSenseId ===
       undefined
@@ -289,6 +300,7 @@ function parseHypothesisV0_1(
     !targetWord ||
     semanticBridge ===
       undefined ||
+    !evidenceBasis ||
     !functionalBridgeTruth ||
     (
       value.targetSenseId !==
@@ -296,7 +308,13 @@ function parseHypothesisV0_1(
       !targetSenseId
     ) ||
     value.claimBoundary !==
-      "functional_hypothesis_only"
+      (evidenceBasis === "functional_correspondence"
+        ? "functional_hypothesis_only"
+        : "lexical_source_evidence_only") ||
+    (evidenceBasis === "functional_correspondence" &&
+      (functionalBridgeTruth !== "hypothesis" || !semanticBridge)) ||
+    (evidenceBasis === "lexical_equivalence" &&
+      functionalBridgeTruth !== "unknown")
   ) {
     return null;
   }
@@ -304,13 +322,35 @@ function parseHypothesisV0_1(
   return {
     targetWord,
     semanticBridge,
-    functionalBridgeTruth,
+    evidenceBasis,
+    functionalBridgeTruth:
+      evidenceBasis === "functional_correspondence"
+        ? functionalBridgeTruth
+        : "unknown",
     ...(targetSenseId
       ? { targetSenseId }
       : {}),
     claimBoundary:
-      "functional_hypothesis_only",
+      evidenceBasis === "functional_correspondence"
+        ? "functional_hypothesis_only"
+        : "lexical_source_evidence_only",
   };
+}
+
+export function isQuarantinedUnresolvedResearchRowV0_1(
+  value: unknown,
+): boolean {
+  return isRecord(value) &&
+    value.evidenceBasis === undefined &&
+    Array.isArray(value.functionalHypotheses) &&
+    value.functionalHypotheses.length > 0 &&
+    value.functionalHypotheses.every((hypothesis) =>
+      isRecord(hypothesis) &&
+      hypothesis.semanticBridge === null &&
+      hypothesis.functionalBridgeTruth === "unknown" &&
+      hypothesis.claimBoundary === "functional_hypothesis_only"
+    ) &&
+    value.embryoRelation === "unresolved";
 }
 
 function parseRowV0_1(
@@ -583,24 +623,29 @@ export function parseMultiSourceFunctionalResearchEvidenceCatalogV0_1(
     return [];
   }
 
-  const rows =
-    value.rows.map(
-      parseRowV0_1,
-    );
+  const parsedRowsWithNulls = value.rows.map(parseRowV0_1);
 
-  if (
-    rows.some(
-      (row) =>
-        row ===
-          null,
-    )
-  ) {
+  // The historical catalog contains three deliberately unresolved research
+  // artifacts.  They are quarantined until durable evidence-basis authority
+  // exists.  Every other malformed row still fails the complete catalog
+  // closed, preserving the pre-existing validation boundary.
+  const unresolvedQuarantineRows = value.rows.filter(
+    isQuarantinedUnresolvedResearchRowV0_1,
+  );
+
+  const invalidNonQuarantineRow = value.rows.some((row, index) =>
+    parsedRowsWithNulls[index] === null &&
+    !unresolvedQuarantineRows.includes(row as never),
+  );
+
+  if (invalidNonQuarantineRow) {
     return [];
   }
 
-  const parsedRows =
-    rows as
-      MultiSourceFunctionalResearchEvidenceRowV0_1[];
+  const parsedRows = parsedRowsWithNulls.filter(
+    (row): row is MultiSourceFunctionalResearchEvidenceRowV0_1 =>
+      row !== null,
+  );
 
   const researchEvidenceIds =
     parsedRows.map(

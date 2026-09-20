@@ -30,9 +30,13 @@ describe(
 
         form:
           "fixture-form-one",
+        evidenceBasis: "functional_correspondence",
 
         gloss:
           "fixture lexical meaning one",
+
+        evidenceBasis:
+          "functional_correspondence",
 
         embryoRelation:
           "semantic_resemblance",
@@ -87,6 +91,9 @@ describe(
             semanticBridge:
               "fixture meaning one may functionally participate in the target concept",
 
+            evidenceBasis:
+              "functional_correspondence",
+
             functionalBridgeTruth:
               "hypothesis",
 
@@ -99,6 +106,9 @@ describe(
 
             semanticBridge:
               "different target bridge",
+
+            evidenceBasis:
+              "functional_correspondence",
 
             functionalBridgeTruth:
               "hypothesis",
@@ -144,6 +154,7 @@ describe(
 
         form:
           "fixture-form-two",
+        evidenceBasis: "functional_correspondence",
 
         gloss:
           "fixture lexical meaning two",
@@ -204,6 +215,9 @@ describe(
             functionalBridgeTruth:
               "inference",
 
+            evidenceBasis:
+              "functional_correspondence",
+
             claimBoundary:
               "functional_hypothesis_only",
           },
@@ -244,6 +258,7 @@ describe(
           "Fixture Language Three",
 
         form: "di",
+        evidenceBasis: "functional_correspondence",
 
         gloss:
           "fixture transform meaning",
@@ -306,6 +321,9 @@ describe(
             functionalBridgeTruth:
               "hypothesis",
 
+            evidenceBasis:
+              "functional_correspondence",
+
             claimBoundary:
               "functional_hypothesis_only",
           },
@@ -346,6 +364,7 @@ describe(
           "Fixture Language Four",
 
         form: "ak",
+        evidenceBasis: "functional_correspondence",
 
         gloss:
           "fixture AK meaning",
@@ -405,6 +424,9 @@ describe(
 
             functionalBridgeTruth:
               "hypothesis",
+
+            evidenceBasis:
+              "functional_correspondence",
 
             claimBoundary:
               "functional_hypothesis_only",
@@ -523,6 +545,9 @@ describe(
 
           functionalBridgeTruth:
             "hypothesis",
+
+          evidenceBasis:
+            "functional_correspondence",
 
           sourceStatus:
             "research_candidate",

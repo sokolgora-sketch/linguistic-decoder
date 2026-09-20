@@ -3,6 +3,7 @@
   "packetId": "change.alteration.v0_1",
   "targetWord": "change",
   "targetSenseId": "become_different_alteration",
+  "evidenceBasis": "lexical_equivalence",
   "semanticBridge": "The attested lexical senses describe changing or altering a state or condition; treating that relation as a ZË-RO functional bridge remains a research hypothesis only.",
   "sources": [
     {

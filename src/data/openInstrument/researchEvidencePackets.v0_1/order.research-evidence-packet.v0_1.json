@@ -3,6 +3,7 @@
   "packetId": "order.lexical-arrangement.v0_1",
   "targetWord": "order",
   "targetSenseId": "arrangement_structured_sequence",
+  "evidenceBasis": "lexical_equivalence",
   "semanticBridge": "The attested lexical senses describe ordered arrangement or sequence; treating that relation as a ZË-RO functional bridge remains a research hypothesis only.",
   "sources": [
     {

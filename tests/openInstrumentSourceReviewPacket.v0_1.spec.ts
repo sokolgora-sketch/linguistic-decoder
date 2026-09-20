@@ -65,6 +65,10 @@ function acceptReview(
       ...review.semanticBridge,
       decision: "accepted",
     },
+    evidenceBasis: {
+      ...review.evidenceBasis,
+      decision: "accepted",
+    },
     sources: review.sources.map((source) => ({
       ...source,
       proposedEmbryo: { ...source.proposedEmbryo, decision: "accepted" },
@@ -92,6 +96,7 @@ function reviewFor(
     targetWord: packet.targetWord,
     targetSenseId: packet.targetSenseId,
     semanticBridge: packet.semanticBridge,
+    evidenceBasis: packet.evidenceBasis,
     candidates: candidatesFor(packet, snapshots),
   });
 }
@@ -137,6 +142,7 @@ describe("Open Instrument source review packet v0.1", () => {
       targetWord: starPacket.targetWord,
       targetSenseId: starPacket.targetSenseId,
       semanticBridge: starPacket.semanticBridge,
+      evidenceBasis: starPacket.evidenceBasis,
       candidates: candidatesFor(starPacket, [starSnapshotA, starSnapshotB]),
       noStructuralRelation: { targetStructuralEmbryo },
     });
@@ -244,6 +250,7 @@ describe("Open Instrument source review packet v0.1", () => {
         targetWord: starPacket.targetWord,
         targetSenseId: starPacket.targetSenseId,
         semanticBridge: starPacket.semanticBridge,
+        evidenceBasis: starPacket.evidenceBasis,
         candidates: duplicateCandidates,
       }),
     );

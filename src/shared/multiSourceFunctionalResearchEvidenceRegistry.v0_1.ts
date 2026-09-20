@@ -1,5 +1,6 @@
 import type {
   EmbryoSourceRelationV0_1,
+  EvidenceBasisV0_1,
   MultiSourceEvidenceFamilyV0_1,
   MultiSourceFunctionalEvidenceRecordV0_1,
   MultiSourceTruthStatusV0_1,
@@ -63,6 +64,7 @@ export type MultiSourceFunctionalResearchHypothesisV0_1 = {
   targetWord: string;
 
   semanticBridge: string | null;
+  evidenceBasis: EvidenceBasisV0_1;
   functionalBridgeTruth:
     MultiSourceTruthStatusV0_1;
 
@@ -73,7 +75,8 @@ export type MultiSourceFunctionalResearchHypothesisV0_1 = {
   targetSenseId?: string;
 
   claimBoundary:
-    "functional_hypothesis_only";
+    | "functional_hypothesis_only"
+    | "lexical_source_evidence_only";
 };
 
 export type MultiSourceFunctionalResearchEvidenceRowV0_1 = {
@@ -387,8 +390,10 @@ export function buildMultiSourceFunctionalResearchInputsV0_1(
     const hypothesis =
       row.functionalHypotheses.find(
         (candidate) =>
-          candidate.claimBoundary ===
-            "functional_hypothesis_only" &&
+          (candidate.claimBoundary ===
+            "functional_hypothesis_only" ||
+            candidate.claimBoundary ===
+              "lexical_source_evidence_only") &&
           sameResearchKeyV0_1(
             candidate.targetWord,
             targetWord,
@@ -454,6 +459,9 @@ export function buildMultiSourceFunctionalResearchInputsV0_1(
       form,
       gloss,
 
+      evidenceBasis:
+        hypothesis.evidenceBasis,
+
       citationRefs,
 
       embryoRelation:
@@ -467,6 +475,7 @@ export function buildMultiSourceFunctionalResearchInputsV0_1(
       semanticBridge,
 
       functionalBridgeTruth:
+        hypothesis.evidenceBasis !== "functional_correspondence" ||
         semanticBridge === null
           ? "unknown"
           : hypothesis.functionalBridgeTruth,
@@ -550,8 +559,10 @@ export function buildSourceAttestedFunctionalResearchInputGroupsV0_1(
 
         return row.functionalHypotheses.some(
           (candidate) =>
-            candidate.claimBoundary ===
-              "functional_hypothesis_only" &&
+            (candidate.claimBoundary ===
+              "functional_hypothesis_only" ||
+              candidate.claimBoundary ===
+                "lexical_source_evidence_only") &&
             sameResearchKeyV0_1(
               candidate.targetWord,
               targetWord,
@@ -654,8 +665,13 @@ export function buildTargetBoundFunctionalResearchInputGroupsV0_1(
 
     const hypothesis = row.functionalHypotheses.find(
       (candidate) =>
-        candidate.claimBoundary === "functional_hypothesis_only" &&
-        candidate.functionalBridgeTruth === "hypothesis" &&
+          (candidate.claimBoundary === "functional_hypothesis_only" ||
+            candidate.claimBoundary === "lexical_source_evidence_only") &&
+          (candidate.evidenceBasis === "functional_correspondence" ||
+            candidate.evidenceBasis === "lexical_equivalence") &&
+          (candidate.evidenceBasis === "functional_correspondence"
+            ? candidate.functionalBridgeTruth === "hypothesis"
+            : candidate.functionalBridgeTruth === "unknown") &&
         sameResearchKeyV0_1(candidate.targetWord, targetWord) &&
         targetSenseMatchesV0_1(
           candidate.targetSenseId,

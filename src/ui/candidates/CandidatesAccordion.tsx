@@ -122,6 +122,11 @@ export function CandidatesAccordion({
             c.claimBoundary ===
               "research_functional_hypothesis_only";
 
+          const isLexicalSourceEvidence =
+            c.sourceKind ===
+              "multi_source_research_witness" &&
+            c.evidenceBasis === "lexical_equivalence";
+
           const isLogicDerivedFunctionalHypothesis =
             c.sourceKind ===
               "logic_derived_functional_hypothesis" &&
@@ -226,7 +231,11 @@ export function CandidatesAccordion({
                         <div className="flex flex-wrap items-center gap-2">
                           {c.embryo ? (
                             <CandidateChip tone="blue">
-                              {`Embryo: ${c.embryo}`}
+                              {isLexicalSourceEvidence
+                                ? `Research-row form: ${c.embryo}`
+                                : c.sourceKind === "multi_source_research_witness"
+                                  ? `Research-row embryo: ${c.embryo}`
+                                  : `Embryo: ${c.embryo}`}
                             </CandidateChip>
                           ) : null}
 
@@ -255,6 +264,12 @@ export function CandidatesAccordion({
                           {c.claimType === "functionalMotivation" ? (
                             <CandidateChip tone="green">
                               Functional motivation
+                            </CandidateChip>
+                          ) : null}
+
+                          {isLexicalSourceEvidence ? (
+                            <CandidateChip tone="amber">
+                              Lexical source evidence
                             </CandidateChip>
                           ) : null}
 

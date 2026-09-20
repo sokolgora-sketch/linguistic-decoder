@@ -313,11 +313,8 @@ describe(
             >;
           };
 
-        expect(
-          loaded,
-        ).toHaveLength(
-          raw.rows.length,
-        );
+        expect(loaded).toHaveLength(90);
+        expect(raw.rows).toHaveLength(93);
 
         const unsafeStatus =
           JSON.parse(
@@ -446,6 +443,9 @@ describe(
             targetWord:
               "gjak",
 
+            evidenceBasis:
+              "functional_correspondence",
+
             semanticBridge:
               "fixture AK evidence may be tested as a bounded functional hypothesis for gjak",
 
@@ -532,7 +532,8 @@ describe(
           catalogVersion: string;
           rows: Array<Record<string, unknown>>;
         };
-        expect(loaded).toHaveLength(raw.rows.length);
+        expect(loaded).toHaveLength(90);
+        expect(raw.rows).toHaveLength(93);
         expect(loaded[0]?.functionalHypotheses[0]).not.toHaveProperty("targetSenseId");
         expect(loaded[0]?.citations[0]).not.toHaveProperty("provenanceGroupId");
 
@@ -545,7 +546,7 @@ describe(
         hypothesis.targetSenseId = "target-sense-a";
 
         const parsed = (parse as (value: unknown) => Array<Record<string, unknown>>)(enriched);
-        expect(parsed).toHaveLength(raw.rows.length);
+        expect(parsed).toHaveLength(90);
         expect(parsed[0]?.citations[0]).toMatchObject({
           provenanceGroupId: "source-family-a",
         });

@@ -3,6 +3,7 @@
   "packetId": "five-case",
   "targetWord": "candle",
   "targetSenseId": "user_sense_a_wax_light_source",
+  "evidenceBasis": "lexical_equivalence",
   "semanticBridge": "The source-attested meaning may functionally correspond to a wax light source; bounded hypothesis only.",
   "sources": [
     { "sourceKey": "qiri", "embryo": "AN", "evidenceFamily": "lexical_dictionary", "language": "Albanian", "form": "QIRI", "gloss": "wax/fat/stearin stick with a wick used to make light", "embryoRelation": "no_structural_relation", "relationOperationIds": [], "citation": { "citationId": "five-case.qiri.fjale.citation.v1", "sourceTitle": "FJALË — Fjalor Shqip", "sourceAuthorOrEditor": null, "sourcePublisherOrHost": "FJALË — Fjalor Shqip", "sourceDateOrVersion": "accessed 2026-09-20", "sourceUrlOrArchiveRef": "https://fjale.al/qiri", "entryLocator": "QIRI; sense 1", "sourceHashOrArchiveHash": null, "attestedForm": "QIRI", "attestedGloss": "wax/fat/stearin stick with a wick used to make light", "provenanceGroupId": "fjale.fjalor-shqip.v0_1" } },

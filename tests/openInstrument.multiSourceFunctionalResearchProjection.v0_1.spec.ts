@@ -94,7 +94,7 @@ describe(
     );
 
     it(
-      "projects research witnesses as functionalMotivation but leaves validation unresolved and not evaluated",
+      "projects functional and lexical witnesses without promoting lexical evidence",
       () => {
         const projected =
           projectMultiSourceFunctionalResearchWitnessesV0_1(
@@ -108,10 +108,10 @@ describe(
             "multi_source_research_witness",
           );
 
-          expect(
-            item.claimType,
-          ).toBe(
-            "functionalMotivation",
+          expect(item.claimType).toBe(
+            item.evidenceBasis === "functional_correspondence"
+              ? "functionalMotivation"
+              : "unresolved",
           );
 
           expect(
@@ -170,11 +170,9 @@ describe(
           "empty",
         );
 
-        expect(
-          greek?.semanticBridge,
-        ).toContain(
-          "productive or reproductive capacity",
-        );
+        expect(greek?.semanticBridge).toBeNull();
+        expect(greek?.evidenceBasis).toBe("lexical_equivalence");
+        expect(greek?.claimBoundary).toBe("lexical_source_evidence_only");
 
         expect(
           greek?.evidenceRefs,
@@ -225,11 +223,7 @@ describe(
           "fact",
         );
 
-        expect(
-          greek?.functionalBridgeTruth,
-        ).toBe(
-          "hypothesis",
-        );
+        expect(greek?.functionalBridgeTruth).toBe("unknown");
       },
     );
 
@@ -246,10 +240,10 @@ describe(
         ).toBeGreaterThan(0);
 
         for (const item of projected) {
-          expect(
-            item.claimBoundary,
-          ).toBe(
-            "research_functional_hypothesis_only",
+          expect(item.claimBoundary).toBe(
+            item.evidenceBasis === "functional_correspondence"
+              ? "research_functional_hypothesis_only"
+              : "lexical_source_evidence_only",
           );
 
           expect(

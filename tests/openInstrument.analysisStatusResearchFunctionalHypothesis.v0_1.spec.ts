@@ -33,8 +33,10 @@ function researchCandidate(
     sourceStatus:
       "research_candidate",
 
-    claimType:
-      "functionalMotivation",
+            claimType:
+              "functionalMotivation",
+            evidenceBasis:
+              "functional_correspondence",
 
     validationOutcome:
       "not_evaluated",

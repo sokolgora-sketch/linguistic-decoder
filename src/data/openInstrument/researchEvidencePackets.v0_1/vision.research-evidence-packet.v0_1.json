@@ -3,6 +3,7 @@
   "packetId": "vision.visual_appearance_or_vision.v0_1",
   "targetWord": "vision",
   "targetSenseId": "visual_appearance_or_vision",
+  "evidenceBasis": "lexical_equivalence",
   "semanticBridge": "The source entries attest lexical forms for the bounded visual appearance or vision sense; treating that shared functional referent as a ZË-RO bridge remains a research hypothesis only.",
   "sources": [
     {

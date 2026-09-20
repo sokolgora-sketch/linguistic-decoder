@@ -17,23 +17,23 @@ import {
 
 function sourceAttestedWitness() {
   const groups = buildSourceAttestedFunctionalResearchInputGroupsV0_1({
-    targetWord: "love",
+    targetWord: "break",
     rows: loadMultiSourceFunctionalResearchEvidenceCatalogV0_1(),
   });
   const group = groups[0];
 
   if (!group) {
-    throw new Error("expected an existing source-attested love group");
+    throw new Error("expected an existing source-attested break group");
   }
 
   const witness = discoverSourceAttestedFunctionalWitnessesV0_1({
-    targetWord: "love",
+    targetWord: "break",
     embryo: group.embryo,
     sources: group.sources,
   })[0];
 
   if (!witness) {
-    throw new Error("expected an existing source-attested love witness");
+    throw new Error("expected an existing source-attested break witness");
   }
 
   return witness;
@@ -41,7 +41,7 @@ function sourceAttestedWitness() {
 
 function buildProposal(
   witness = sourceAttestedWitness(),
-  targetWord = "love",
+    targetWord = "break",
 ) {
   return buildDeterministicSourceAttestedResearchWitnessFunctionalProposalV1({
     witness,

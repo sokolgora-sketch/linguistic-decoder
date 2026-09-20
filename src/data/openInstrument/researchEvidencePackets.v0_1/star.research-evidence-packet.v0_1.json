@@ -3,6 +3,7 @@
   "packetId": "star.astronomical_star.v0_1",
   "targetWord": "star",
   "targetSenseId": "astronomical_star",
+  "evidenceBasis": "lexical_equivalence",
   "semanticBridge": "The source entries attest lexical forms for the bounded astronomical-star sense; treating that shared functional referent as a ZË-RO bridge remains a research hypothesis only.",
   "sources": [
     {

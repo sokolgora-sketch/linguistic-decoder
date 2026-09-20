@@ -3,6 +3,7 @@
   "packetId": "break-physical-break-damage-source-review-v0_1",
   "targetWord": "break",
   "targetSenseId": "physical_break_damage",
+  "evidenceBasis": "functional_correspondence",
   "semanticBridge": "The reviewed entries attest physical breaking or separation of a material object; treating that shared physical operation as a functional bridge is a research hypothesis only.",
   "sources": [
     {
