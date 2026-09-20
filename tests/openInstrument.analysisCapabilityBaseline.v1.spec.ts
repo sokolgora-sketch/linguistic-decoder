@@ -174,11 +174,11 @@ describe("Open Instrument analytical capability baseline v1", () => {
     expect(baseline.aggregate.statusCounts).toEqual({
       reviewed_functional_evidence: 2,
       research_functional_hypothesis: 41,
-      candidate_only: 0,
-      structural_unreviewed: 1,
-      null_no_supported_candidate: 13,
+      candidate_only: 5,
+      structural_unreviewed: 0,
+      null_no_supported_candidate: 9,
     });
-    expect(baseline.aggregate.nullCount).toBe(13);
+    expect(baseline.aggregate.nullCount).toBe(9);
     expect(baseline.aggregate.pathCoverage).toEqual({
       detected: 57,
       surface: 57,
@@ -186,13 +186,35 @@ describe("Open Instrument analytical capability baseline v1", () => {
       delta: 57,
     });
     expect(baseline.aggregate.candidates).toEqual({
-      casesWithCandidates: 44,
-      totalCandidates: 93,
+      casesWithCandidates: 48,
+      totalCandidates: 109,
     });
+    expect(
+      baseline.cases.filter((item) => item.status === "candidate_only").map(
+        (item) => item.caseId,
+      ),
+    ).toEqual([
+      "canonical.mystery",
+      "target-sense.candle",
+      "scale50.stone.nature",
+      "scale50.drink.action",
+      "scale50.justice.abstract",
+    ]);
+    expect(
+      baseline.cases.filter((item) =>
+        item.candidates.some(
+          (candidate) =>
+            candidate.sourceKind === "logic_derived_structural_hypothesis",
+        ),
+      ),
+    ).toHaveLength(26);
     expect(baseline.aggregate.composition.totalComponents).toBe(2);
     expect(baseline.aggregate.composition.candidatesWithFunctionalStatements).toBeGreaterThan(0);
     expect(baseline.aggregate.evidence.candidatesWithRefs).toBe(64);
     expect(baseline.aggregate.evidence.totalRefs).toBe(64);
+    expect(baseline.aggregate.evidence.reviewedRefs).toBe(2);
+    expect(baseline.aggregate.evidence.researchRefs).toBe(62);
+    expect(baseline.aggregate.evidence.unresolvedRefs).toBe(0);
     expect(baseline.aggregate.targetSense.casesWithRequestContext).toBe(2);
   });
 
