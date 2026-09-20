@@ -54,6 +54,13 @@ function nonEmptyString(
     null;
 }
 
+function sameResearchKey(
+  left: string,
+  right: string,
+): boolean {
+  return left.toLocaleUpperCase("en-US") === right.toLocaleUpperCase("en-US");
+}
+
 function nullableString(
   value: unknown,
 ): string | null | undefined {
@@ -114,6 +121,7 @@ const EMBRYO_RELATIONS_V0_1 =
     "reconstructed_form",
     "phonetic_resemblance",
     "semantic_resemblance",
+    "no_structural_relation",
     "unresolved",
     "unsupported",
   ] as const satisfies
@@ -407,6 +415,21 @@ function parseRowV0_1(
           operationId,
         )!,
     );
+
+  if (
+    embryoRelation ===
+      "no_structural_relation" &&
+    (
+      sameResearchKey(
+        embryo,
+        form,
+      ) ||
+      relationOperationIds.length >
+        0
+    )
+  ) {
+    return null;
+  }
 
   if (
     !Array.isArray(

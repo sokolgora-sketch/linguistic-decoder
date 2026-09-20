@@ -77,12 +77,18 @@ export type OpenInstrumentSourceReviewPacketReasonCodeV0_1 =
   | "OVERALL_REVIEW_REQUIRED"
   | "OVERALL_REJECTED";
 
+type NoStructuralRelationReviewOptionV0_1 = {
+  /** Target structural embryo; source form remains independently attested in `form`. */
+  targetStructuralEmbryo: string;
+};
+
 const EMBRYO_RELATIONS_V0_1 = [
   "exact_form",
   "authorized_transformation",
   "reconstructed_form",
   "phonetic_resemblance",
   "semantic_resemblance",
+  "no_structural_relation",
 ] as const;
 
 function normalizeTextV0_1(value: unknown): string | null {
@@ -119,7 +125,10 @@ export function buildOpenInstrumentSourceReviewPacketV0_1(options: {
   targetSenseId: string | null;
   semanticBridge: string | null;
   candidates: readonly OpenInstrumentNormalizedSourceCandidateV0_1[];
+  noStructuralRelation?: NoStructuralRelationReviewOptionV0_1;
 }): OpenInstrumentSourceReviewPacketV0_1 {
+  const noStructuralRelation = options.noStructuralRelation;
+
   return {
     reviewVersion: OPEN_INSTRUMENT_SOURCE_REVIEW_PACKET_VERSION_V0_1,
     reviewPacketId: options.reviewPacketId,
@@ -134,9 +143,17 @@ export function buildOpenInstrumentSourceReviewPacketV0_1(options: {
         form: candidate.form,
         gloss: candidate.gloss,
         citation: candidate.citation,
-        proposedEmbryo: suggestedFieldV0_1(candidate.form),
+        // For the no-structural-relation mode this is the target structural
+        // embryo, not the independently attested source form.
+        proposedEmbryo: suggestedFieldV0_1(
+          noStructuralRelation?.targetStructuralEmbryo ?? candidate.form,
+        ),
         proposedEmbryoRelation: suggestedFieldV0_1(
-          candidate.form ? "exact_form" : null,
+          noStructuralRelation
+            ? "no_structural_relation"
+            : candidate.form
+              ? "exact_form"
+              : null,
         ),
         proposedRelationOperationIds: suggestedFieldV0_1([]),
         sourceReviewDecision: "pending",
@@ -230,6 +247,13 @@ function relationConfigurationIsValidV0_1(
 
   if (relation === "exact_form") {
     return normalizeTextV0_1(embryo) === normalizeTextV0_1(verifiedForm);
+  }
+
+  if (relation === "no_structural_relation") {
+    return (
+      normalizeTextV0_1(embryo) !== normalizeTextV0_1(verifiedForm) &&
+      operationIds.length === 0
+    );
   }
 
   return relation !== "authorized_transformation" || operationIds.length > 0;

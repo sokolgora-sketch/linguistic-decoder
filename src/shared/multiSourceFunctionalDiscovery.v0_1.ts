@@ -47,6 +47,7 @@ export type EmbryoSourceRelationV0_1 =
   | "reconstructed_form"
   | "phonetic_resemblance"
   | "semantic_resemblance"
+  | "no_structural_relation"
   | "unresolved"
   | "unsupported";
 
@@ -65,6 +66,8 @@ export type MultiSourceFunctionalEvidenceRecordV0_1 = {
    * the externally observed form.
    *
    * No relation may be inferred merely because two strings look similar.
+   * `no_structural_relation` explicitly records that the source form is
+   * independently attested while no source-form/embryo relation is claimed.
    */
   embryoRelation: EmbryoSourceRelationV0_1;
 
