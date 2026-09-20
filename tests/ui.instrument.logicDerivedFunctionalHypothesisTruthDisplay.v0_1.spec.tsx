@@ -55,27 +55,18 @@ describe("logic-derived functional hypothesis UI boundary v0.1", () => {
 
     render(<CandidatesAccordion rows={rows} />);
 
-    expect(screen.getByText("Logic-derived functional hypothesis")).toBeInTheDocument();
-    expect(screen.getByText("Target sense: a wax light source")).toBeInTheDocument();
+    expect(screen.getAllByText("Research functional hypothesis")).toHaveLength(2);
+    expect(screen.getAllByText("Functional bridge: Hypothesis")).toHaveLength(2);
     expect(
-      screen.getByText("Functional bridge: Hypothesis only; no source-backed evidence"),
-    ).toBeInTheDocument();
+      rows.filter((row) => row.sourceKind === "multi_source_research_witness").map((row) => row.form),
+    ).toEqual(["QIRI", "candēla"]);
     expect(
-      rows.find(
-        (row) =>
-          row.sourceKind ===
-          "logic_derived_generic_functional_hypothesis",
-      )?.functionalComponents,
-    ).toEqual([
-      expect.objectContaining({
-        embryo: "A",
-        language: { kind: "present", value: "voice-profile" },
-      }),
-    ]);
+      rows.some((row) => row.sourceKind === "logic_derived_generic_functional_hypothesis"),
+    ).toBe(false);
     expect(
-      screen.getByText(
-        "Provenance: logic_derived_generic_functional_hypothesis",
+      screen.getAllByText(
+        "Provenance: multi_source_research_witness",
       ),
-    ).toBeInTheDocument();
+    ).toHaveLength(2);
   });
 });

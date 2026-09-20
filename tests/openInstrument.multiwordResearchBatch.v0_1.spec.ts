@@ -176,7 +176,7 @@ describe("Open Instrument multiword research batch v0.1", () => {
   });
 
   it("preserves deterministic throughput accounting and protected controls", async () => {
-    expect(catalog.rows).toHaveLength(80);
+    expect(catalog.rows).toHaveLength(93);
     expect(catalog.rows.filter((row) =>
       ["tree", "snow", "cloud", "skin", "friend"].includes(
         row.functionalHypotheses[0]?.targetWord,

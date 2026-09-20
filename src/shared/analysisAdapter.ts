@@ -772,7 +772,9 @@ export function enginePayloadToAnalysisResult(payload: EnginePayload): AnalyzeWo
   // attested path above.
   const shouldProjectTargetBoundFunctionalResearchV0_1 =
     baselineAnalysisStatusV0_1.status ===
-      "candidate_only";
+      "candidate_only" ||
+    baselineAnalysisStatusV0_1.status ===
+      "null_no_supported_candidate";
 
   const projectedTargetBoundFunctionalResearchCandidatesV0_1 =
     shouldProjectTargetBoundFunctionalResearchV0_1

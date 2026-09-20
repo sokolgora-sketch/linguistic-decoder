@@ -173,8 +173,8 @@ describe("Open Instrument analytical capability baseline v1", () => {
   test("aggregate preserves dimensional status and capability counts", () => {
     expect(baseline.aggregate.statusCounts).toEqual({
       reviewed_functional_evidence: 2,
-      research_functional_hypothesis: 41,
-      candidate_only: 5,
+      research_functional_hypothesis: 42,
+      candidate_only: 4,
       structural_unreviewed: 0,
       null_no_supported_candidate: 9,
     });
@@ -187,7 +187,7 @@ describe("Open Instrument analytical capability baseline v1", () => {
     });
     expect(baseline.aggregate.candidates).toEqual({
       casesWithCandidates: 48,
-      totalCandidates: 109,
+      totalCandidates: 110,
     });
     expect(
       baseline.cases.filter((item) => item.status === "candidate_only").map(
@@ -195,7 +195,6 @@ describe("Open Instrument analytical capability baseline v1", () => {
       ),
     ).toEqual([
       "canonical.mystery",
-      "target-sense.candle",
       "scale50.stone.nature",
       "scale50.drink.action",
       "scale50.justice.abstract",
@@ -210,10 +209,10 @@ describe("Open Instrument analytical capability baseline v1", () => {
     ).toHaveLength(26);
     expect(baseline.aggregate.composition.totalComponents).toBe(2);
     expect(baseline.aggregate.composition.candidatesWithFunctionalStatements).toBeGreaterThan(0);
-    expect(baseline.aggregate.evidence.candidatesWithRefs).toBe(64);
-    expect(baseline.aggregate.evidence.totalRefs).toBe(64);
+    expect(baseline.aggregate.evidence.candidatesWithRefs).toBe(66);
+    expect(baseline.aggregate.evidence.totalRefs).toBe(66);
     expect(baseline.aggregate.evidence.reviewedRefs).toBe(2);
-    expect(baseline.aggregate.evidence.researchRefs).toBe(62);
+    expect(baseline.aggregate.evidence.researchRefs).toBe(64);
     expect(baseline.aggregate.evidence.unresolvedRefs).toBe(0);
     expect(baseline.aggregate.targetSense.casesWithRequestContext).toBe(2);
   });
