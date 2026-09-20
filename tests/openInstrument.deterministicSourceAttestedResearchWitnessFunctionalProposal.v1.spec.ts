@@ -8,32 +8,37 @@ import {
 import {
   discoverSourceAttestedFunctionalWitnessesV0_1,
 } from "@/shared/multiSourceFunctionalDiscovery.v0_1";
-import {
-  buildSourceAttestedFunctionalResearchInputGroupsV0_1,
-} from "@/shared/multiSourceFunctionalResearchEvidenceRegistry.v0_1";
-import {
-  loadMultiSourceFunctionalResearchEvidenceCatalogV0_1,
-} from "@/shared/multiSourceFunctionalResearchEvidenceCatalog.v0_1";
 
 function sourceAttestedWitness() {
-  const groups = buildSourceAttestedFunctionalResearchInputGroupsV0_1({
-    targetWord: "break",
-    rows: loadMultiSourceFunctionalResearchEvidenceCatalogV0_1(),
-  });
-  const group = groups[0];
-
-  if (!group) {
-    throw new Error("expected an existing source-attested break group");
-  }
-
   const witness = discoverSourceAttestedFunctionalWitnessesV0_1({
-    targetWord: "break",
-    embryo: group.embryo,
-    sources: group.sources,
+    targetWord: "gjak",
+    embryo: "AK",
+    sources: [
+      {
+        sourceId: "fixture.source.ak-flow.v0_1",
+        evidenceFamily: "dialect_lexicon",
+        language: "Turkic",
+        form: "AK",
+        gloss: "to flow",
+        evidenceBasis: "functional_correspondence",
+        citationRefs: ["fixture.citation.ak-flow.v0_1"],
+        embryoRelation: "exact_form",
+        relationOperationIds: [],
+        attestationTruth: "fact",
+        semanticBridge: "flow can motivate circulation as a bounded hypothesis",
+        functionalBridgeTruth: "hypothesis",
+        historicalOriginClaim: "not_claimed",
+        historicalTransmissionClaim: "not_claimed",
+        winnerClaim: "not_claimed",
+        languageSuperiorityClaim: "not_claimed",
+        candidateTruthClaim: "not_claimed",
+        sourceStatus: "research_candidate",
+      },
+    ],
   })[0];
 
   if (!witness) {
-    throw new Error("expected an existing source-attested break witness");
+    throw new Error("expected a synthetic source-attested witness");
   }
 
   return witness;
@@ -41,7 +46,7 @@ function sourceAttestedWitness() {
 
 function buildProposal(
   witness = sourceAttestedWitness(),
-    targetWord = "break",
+    targetWord = "gjak",
 ) {
   return buildDeterministicSourceAttestedResearchWitnessFunctionalProposalV1({
     witness,

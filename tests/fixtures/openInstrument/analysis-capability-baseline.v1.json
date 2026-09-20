@@ -8,11 +8,11 @@
       "candidatesWithCandidateVowelPaths": 3,
       "candidatesWithComponents": 1,
       "candidatesWithExpansionChains": 46,
-      "candidatesWithFunctionalStatements": 6,
+      "candidatesWithFunctionalStatements": 4,
       "casesWithCandidateVowelPaths": 1,
       "casesWithComponents": 1,
       "casesWithExpansionChains": 28,
-      "casesWithFunctionalStatements": 3,
+      "casesWithFunctionalStatements": 2,
       "totalComponents": 2
     },
     "embryos": {
@@ -51,9 +51,9 @@
     "statusCounts": {
       "candidate_only": 4,
       "null_no_supported_candidate": 29,
-      "research_functional_hypothesis": 1,
+      "research_functional_hypothesis": 0,
       "reviewed_functional_evidence": 2,
-      "structural_unreviewed": 21
+      "structural_unreviewed": 22
     },
     "targetSense": {
       "candidateBindings": 4,
@@ -5844,7 +5844,7 @@
           "vowelPath": null
         },
         {
-          "claimBoundary": "research_functional_hypothesis_only",
+          "claimBoundary": "lexical_source_evidence_only",
           "embryo": "thyej",
           "embryoSize": null,
           "evidence": {
@@ -5870,7 +5870,7 @@
           "expansionChain": null,
           "form": "thyej",
           "functionalComponents": null,
-          "functionalStatement": "The reviewed entries attest physical breaking or separation of a material object; treating that shared physical operation as a functional bridge is a research hypothesis only.",
+          "functionalStatement": null,
           "id": "Albanian-thyej",
           "ordinal": 2,
           "sourceKind": "multi_source_research_witness",
@@ -5883,7 +5883,7 @@
           "vowelPath": null
         },
         {
-          "claimBoundary": "research_functional_hypothesis_only",
+          "claimBoundary": "lexical_source_evidence_only",
           "embryo": "frango",
           "embryoSize": null,
           "evidence": {
@@ -5909,7 +5909,7 @@
           "expansionChain": null,
           "form": "frango",
           "functionalComponents": null,
-          "functionalStatement": "The reviewed entries attest physical breaking or separation of a material object; treating that shared physical operation as a functional bridge is a research hypothesis only.",
+          "functionalStatement": null,
           "id": "Latin-frango",
           "ordinal": 3,
           "sourceKind": "multi_source_research_witness",
@@ -5926,7 +5926,7 @@
       "composition": {
         "candidatesWithComponents": 0,
         "candidatesWithExpansionChain": 2,
-        "candidatesWithFunctionalStatements": 2,
+        "candidatesWithFunctionalStatements": 0,
         "candidatesWithVowelPath": 0,
         "totalComponents": 0
       },
@@ -5956,7 +5956,7 @@
         "totalRefs": 2,
         "unresolvedRefs": 0
       },
-      "fingerprint": "7e496c13be0ec97ef14e2143253c42bbe5b9ef8e865edadd4aa2beff23156276",
+      "fingerprint": "539c97b02773ed2e1aa4bae0240cf85f5d12a06e7f0cf35c000058b6f458a450",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -5990,7 +5990,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "7e496c13be0ec97ef14e2143253c42bbe5b9ef8e865edadd4aa2beff23156276",
+        "repeatedFingerprint": "539c97b02773ed2e1aa4bae0240cf85f5d12a06e7f0cf35c000058b6f458a450",
         "stable": true
       },
       "request": {
@@ -6003,7 +6003,7 @@
         "targetSenseLabel": null,
         "word": "break"
       },
-      "status": "research_functional_hypothesis",
+      "status": "structural_unreviewed",
       "targetSense": {
         "candidateBindings": []
       }

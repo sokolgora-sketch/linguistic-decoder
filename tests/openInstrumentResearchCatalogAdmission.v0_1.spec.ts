@@ -135,10 +135,18 @@ async function analyze(word: string) {
 describe("Open Instrument research catalog admission v0.1", () => {
   jest.setTimeout(180_000);
 
-  it("admits compiler-generated BREAK rows through the complete reviewed pipeline", async () => {
+  it("admits compiler-generated BREAK lexical rows through the complete pipeline", async () => {
     const packet = reviewedBreakPacket();
     const generatedRows = compileOpenInstrumentResearchEvidencePacketInputV0_1(packet);
     expect(generatedRows).toHaveLength(2);
+    expect(generatedRows.every((row) =>
+      row.functionalHypotheses.every((hypothesis) =>
+        hypothesis.evidenceBasis === "lexical_equivalence" &&
+        hypothesis.semanticBridge === null &&
+        hypothesis.functionalBridgeTruth === "unknown" &&
+        hypothesis.claimBoundary === "lexical_source_evidence_only",
+      ),
+    )).toBe(true);
 
     const admission = admitOpenInstrumentResearchCatalogV0_1(
       PRE_ADMISSION_CATALOG,
@@ -161,8 +169,19 @@ describe("Open Instrument research catalog admission v0.1", () => {
     expect(response.status).toBe(200);
     const body = (await response.json()) as Record<string, unknown>;
     expect((body.analysisStatusV0_1 as Record<string, unknown>).status).toBe(
-      "research_functional_hypothesis",
+      "structural_unreviewed",
     );
+    const candidates = body.candidates as Array<Record<string, unknown>>;
+    expect(candidates.some((candidate) => candidate.form === "thyej")).toBe(true);
+    expect(candidates.some((candidate) => candidate.form === "frango")).toBe(true);
+    expect(candidates.filter((candidate) =>
+      candidate.form === "thyej" || candidate.form === "frango",
+    ).every((candidate) =>
+      candidate.sourceKind === "multi_source_research_witness" &&
+      candidate.claimBoundary === "lexical_source_evidence_only" &&
+      candidate.claimType === "unresolved" &&
+      candidate.userDecisionPosture === "user_decides",
+    )).toBe(true);
   });
 
   it("dry-runs without mutation and produces byte-stable output", () => {
