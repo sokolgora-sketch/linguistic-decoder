@@ -1,0 +1,10 @@
+{
+  "schemaVersion": "open-instrument.m7-three-case-replication-hash-manifest.v1",
+  "algorithm": "sha256",
+  "artifactPath": "docs/open-instrument/research-artifacts/m7-three-case-replication-v1/preregistration.json",
+  "artifactByteLength": 24321,
+  "artifactSha256": "54d579f1af4bb597ccb4037d156dc27123742b487845ecd52fc80d84cc69cd3e",
+  "candidatePoolSha256": "c3f1feeec5da2ae2c89cfa0ce99703bfd98e62e0faef1cd1cbd9828b05a9394a",
+  "controllerSha256": ["f07d86814fd18ded35774a48fee5000606bc1f772bbc4f07070ae4d7859988fc", "d0f681cc5bb02cd515fdbf5b53595856a5ca64b6b2bf85dc934fab2e9e548363", "4828faec258c60bb9598df1cf1b901e00943abe735696da3f4fa7fd6321f1e78"],
+  "blindPayloadSha256": ["7a2fc96866c576bf81d27dc325e6266bfc25c2e243a9377b89691ec8b51be485", "4590fa01a764702dc49458f1fb00472e3af2c91ebc21c086de9e671de1b5ee77", "d6669664d8644f086ffc36b06f814555d379fbc8d070f005e8f50ea326f15997"]
+}
