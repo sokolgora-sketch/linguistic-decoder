@@ -196,6 +196,23 @@ describe(
             ],
           }),
         ).toEqual([]);
+
+        expect(
+          buildTargetBoundFunctionalResearchInputGroupsV0_1({
+            targetWord: "fixture-target",
+            targetSenseId: "fixture-sense",
+            rows: [
+              targetBoundRow(6, {
+                citations: [
+                  {
+                    ...targetBoundRow(6).citations[0],
+                    attestedForm: "UNRELATED-SOURCE-FORM",
+                  },
+                ],
+              }),
+            ],
+          }),
+        ).toEqual([]);
       },
     );
 

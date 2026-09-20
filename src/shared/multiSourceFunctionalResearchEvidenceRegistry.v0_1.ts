@@ -642,6 +642,16 @@ export function buildTargetBoundFunctionalResearchInputGroupsV0_1(
       return false;
     }
 
+    const hasMatchingUsableCitation = row.citations.some(
+      (citation) =>
+        citationIdIfUsableV0_1(citation) !== null &&
+        sameResearchKeyV0_1(citation.attestedForm, row.form),
+    );
+
+    if (!hasMatchingUsableCitation) {
+      return false;
+    }
+
     const hypothesis = row.functionalHypotheses.find(
       (candidate) =>
         candidate.claimBoundary === "functional_hypothesis_only" &&
