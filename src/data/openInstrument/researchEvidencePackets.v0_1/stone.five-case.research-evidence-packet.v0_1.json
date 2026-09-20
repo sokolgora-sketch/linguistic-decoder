@@ -1,0 +1,11 @@
+{
+  "packetVersion": "open-instrument.research-evidence-packet.v0_1",
+  "packetId": "five-case",
+  "targetWord": "stone",
+  "targetSenseId": "user_sense_hard_natural_mineral_rock_material",
+  "semanticBridge": "The source-attested meaning may functionally correspond to hard natural mineral/rock material; bounded hypothesis only.",
+  "sources": [
+    { "sourceKey": "gur", "embryo": "ONE", "evidenceFamily": "lexical_dictionary", "language": "Albanian", "form": "GUR", "gloss": "hard mineral material", "embryoRelation": "no_structural_relation", "relationOperationIds": [], "citation": { "citationId": "five-case.gur.fjale.citation.v1", "sourceTitle": "FJALË — Fjalor Shqip", "sourceAuthorOrEditor": null, "sourcePublisherOrHost": "FJALË — Fjalor Shqip", "sourceDateOrVersion": "accessed 2026-09-20", "sourceUrlOrArchiveRef": "https://fjale.al/gur", "entryLocator": "GUR; sense 1", "sourceHashOrArchiveHash": null, "attestedForm": "GUR", "attestedGloss": "hard mineral material", "provenanceGroupId": "fjale.fjalor-shqip.v0_1" } },
+    { "sourceKey": "lapis", "embryo": "ONE", "evidenceFamily": "historical_dictionary", "language": "Latin", "form": "lăpis", "gloss": "stone / stone material", "embryoRelation": "no_structural_relation", "relationOperationIds": [], "citation": { "citationId": "five-case.lapis.lewis-short.citation.v1", "sourceTitle": "Lewis & Short Latin Dictionary", "sourceAuthorOrEditor": "Charlton T. Lewis and Charles Short", "sourcePublisherOrHost": "Scaife ATLAS / Perseus Digital Library", "sourceDateOrVersion": "Lewis & Short source file release date 1997-10-28; upstream commit 56061ca127f4a2844980baffc5f2b6d1332897b3", "sourceUrlOrArchiveRef": "https://atlas.perseus.tufts.edu/dictionaries/entry/urn%3Acite2%3Ascaife-viewer%3Adictionary-entries.atlas_v1%3Alat.ls.perseus-eng2-n25849/", "entryLocator": "TEI.2 entryFree id=\"n25849\" key=\"lapis\"", "sourceHashOrArchiveHash": "c3474349ef9073bb436229cdf886eb77ed88d2fd", "attestedForm": "lăpis", "attestedGloss": "stone / stone material", "provenanceGroupId": "scaife.lewis-short.v0_1" } }
+  ]
+}

@@ -79,7 +79,7 @@ describe("/api/analyze-v1 logic-derived functional hypothesis v0.1", () => {
         candidate.sourceKind === "logic_derived_functional_hypothesis",
     );
 
-    expect(body.analysisStatusV0_1.status).toBe("candidate_only");
+    expect(body.analysisStatusV0_1.status).toBe("research_functional_hypothesis");
     expect(logicCandidate?.targetWord).toBe("candle");
     expect(logicCandidate?.targetSenseId).toBe("user_sense_a_wax_light_source");
     expect(logicCandidate?.targetSenseLabel).toBe("a wax light source");

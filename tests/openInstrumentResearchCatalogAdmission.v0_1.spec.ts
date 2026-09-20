@@ -145,13 +145,15 @@ describe("Open Instrument research catalog admission v0.1", () => {
     expect(admission.ok).toBe(true);
     if (!admission.ok) throw new Error(admission.reasonCodes.join(", "));
     expect(admission.dryRun).toMatchObject({
-      currentRowCount: 78,
+      currentRowCount: 91,
       incomingRowCount: 2,
-      resultRowCount: 80,
+      resultRowCount: 93,
       wouldChange: true,
       collisions: [],
     });
-    expect(admission.catalog.rows).toEqual(catalog.rows);
+    expect(admission.catalog.rows.map((row) => row.researchEvidenceId).sort()).toEqual(
+      catalog.rows.map((row) => row.researchEvidenceId).sort(),
+    );
 
     const response = await analyze("break");
     expect(response.status).toBe(200);

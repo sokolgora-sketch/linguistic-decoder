@@ -2,12 +2,12 @@
   "aggregate": {
     "candidates": {
       "casesWithCandidates": 48,
-      "totalCandidates": 109
+      "totalCandidates": 110
     },
     "composition": {
       "candidatesWithCandidateVowelPaths": 3,
       "candidatesWithComponents": 1,
-      "candidatesWithExpansionChains": 47,
+      "candidatesWithExpansionChains": 46,
       "candidatesWithFunctionalStatements": 66,
       "casesWithCandidateVowelPaths": 1,
       "casesWithComponents": 1,
@@ -16,19 +16,19 @@
       "totalComponents": 2
     },
     "embryos": {
-      "candidatesWithEmbryos": 104,
+      "candidatesWithEmbryos": 105,
       "casesWithEmbryos": 48
     },
     "evidence": {
-      "candidatesWithRefs": 64,
-      "casesWithRefs": 43,
-      "navigableRefs": 64,
-      "refsWithLocator": 64,
-      "refsWithSafeUrl": 64,
-      "researchRefs": 62,
-      "resolvedRefs": 64,
+      "candidatesWithRefs": 66,
+      "casesWithRefs": 44,
+      "navigableRefs": 66,
+      "refsWithLocator": 66,
+      "refsWithSafeUrl": 66,
+      "researchRefs": 64,
+      "resolvedRefs": 66,
       "reviewedRefs": 2,
-      "totalRefs": 64,
+      "totalRefs": 66,
       "unresolvedRefs": 0
     },
     "invariantFailures": [],
@@ -49,14 +49,14 @@
       "stableCases": 57
     },
     "statusCounts": {
-      "candidate_only": 5,
+      "candidate_only": 4,
       "null_no_supported_candidate": 9,
-      "research_functional_hypothesis": 41,
+      "research_functional_hypothesis": 42,
       "reviewed_functional_evidence": 2,
       "structural_unreviewed": 0
     },
     "targetSense": {
-      "candidateBindings": 2,
+      "candidateBindings": 4,
       "casesWithRequestContext": 2
     },
     "totalCases": 57
@@ -846,10 +846,11 @@
       }
     },
     {
-      "candidateCount": 2,
+      "candidateCount": 3,
       "candidateIds": [
         "logic-structural:candle:an:peel_right_consonant_led_expansion+peel_left_consonant_frame",
-        "logic-structural:candle:an:peel_right_consonant_led_expansion+peel_left_consonant_frame:generic-functional"
+        "Albanian-QIRI",
+        "Latin-candēla"
       ],
       "candidates": [
         {
@@ -887,34 +888,78 @@
           "vowelPath": null
         },
         {
-          "claimBoundary": "generic Voice-profile hypothesis only; no target meaning, evidence, or semantic interaction is claimed",
+          "claimBoundary": "research_functional_hypothesis_only",
           "embryo": "AN",
-          "embryoSize": 2,
+          "embryoSize": null,
           "evidence": {
-            "locatorCount": 0,
-            "navigableCount": 0,
-            "refCount": 0,
-            "refs": [],
-            "researchCount": 0,
-            "resolvedCount": 0,
+            "locatorCount": 1,
+            "navigableCount": 1,
+            "refCount": 1,
+            "refs": [
+              {
+                "hasLocator": true,
+                "hasSafeUrl": true,
+                "kind": "research_evidence",
+                "navigable": true,
+                "ref": "five-case.qiri.fjale.citation.v1",
+                "sourceStatus": "research_candidate"
+              }
+            ],
+            "researchCount": 1,
+            "resolvedCount": 1,
             "reviewedCount": 0,
-            "safeUrlCount": 0,
+            "safeUrlCount": 1,
             "unresolvedCount": 0
           },
-          "expansionChain": [
-            "AN",
-            "CAN",
-            "CANDLE"
-          ],
-          "form": "AN",
+          "expansionChain": null,
+          "form": "QIRI",
           "functionalComponents": null,
           "functionalStatement": null,
-          "id": "logic-structural:candle:an:peel_right_consonant_led_expansion+peel_left_consonant_frame:generic-functional",
+          "id": "Albanian-QIRI",
           "ordinal": 1,
-          "sourceKind": "logic_derived_generic_functional_hypothesis",
-          "sourceStatus": "logic_derived_candidate",
+          "sourceKind": "multi_source_research_witness",
+          "sourceStatus": "research_candidate",
           "status": "unknown",
-          "targetSenseId": null,
+          "targetSenseId": "user_sense_a_wax_light_source",
+          "targetSenseLabel": null,
+          "userDecisionPosture": "user_decides",
+          "validationOutcome": "not_evaluated",
+          "vowelPath": null
+        },
+        {
+          "claimBoundary": "research_functional_hypothesis_only",
+          "embryo": "AN",
+          "embryoSize": null,
+          "evidence": {
+            "locatorCount": 1,
+            "navigableCount": 1,
+            "refCount": 1,
+            "refs": [
+              {
+                "hasLocator": true,
+                "hasSafeUrl": true,
+                "kind": "research_evidence",
+                "navigable": true,
+                "ref": "five-case.candela.lewis-short.citation.v1",
+                "sourceStatus": "research_candidate"
+              }
+            ],
+            "researchCount": 1,
+            "resolvedCount": 1,
+            "reviewedCount": 0,
+            "safeUrlCount": 1,
+            "unresolvedCount": 0
+          },
+          "expansionChain": null,
+          "form": "candēla",
+          "functionalComponents": null,
+          "functionalStatement": null,
+          "id": "Latin-candēla",
+          "ordinal": 2,
+          "sourceKind": "multi_source_research_witness",
+          "sourceStatus": "research_candidate",
+          "status": "unknown",
+          "targetSenseId": "user_sense_a_wax_light_source",
           "targetSenseLabel": null,
           "userDecisionPosture": "user_decides",
           "validationOutcome": "not_evaluated",
@@ -924,36 +969,36 @@
       "caseId": "target-sense.candle",
       "composition": {
         "candidatesWithComponents": 0,
-        "candidatesWithExpansionChain": 2,
+        "candidatesWithExpansionChain": 1,
         "candidatesWithFunctionalStatements": 0,
         "candidatesWithVowelPath": 0,
         "totalComponents": 0
       },
       "embryo": {
-        "candidateCount": 2,
-        "candidatesWithEmbryo": 2,
+        "candidateCount": 3,
+        "candidatesWithEmbryo": 3,
         "forms": [
+          "AN",
           "AN",
           "AN"
         ],
         "sizes": [
-          2,
           2
         ]
       },
       "engineVersion": "0.2.0-symbolic",
       "evidence": {
-        "candidatesWithRefs": 0,
-        "navigableRefs": 0,
-        "refsWithLocator": 0,
-        "refsWithSafeUrl": 0,
-        "researchRefs": 0,
-        "resolvedRefs": 0,
+        "candidatesWithRefs": 2,
+        "navigableRefs": 2,
+        "refsWithLocator": 2,
+        "refsWithSafeUrl": 2,
+        "researchRefs": 2,
+        "resolvedRefs": 2,
         "reviewedRefs": 0,
-        "totalRefs": 0,
+        "totalRefs": 2,
         "unresolvedRefs": 0
       },
-      "fingerprint": "cda3ac1ca3b5652b84f743745dce566707b281e059422bc935c92f12b5e6b77e",
+      "fingerprint": "55ade3b5cd0d1a7b8f144e693cfd1a623227226edc77c1e8556f48ecffb712c6",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -987,7 +1032,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "cda3ac1ca3b5652b84f743745dce566707b281e059422bc935c92f12b5e6b77e",
+        "repeatedFingerprint": "55ade3b5cd0d1a7b8f144e693cfd1a623227226edc77c1e8556f48ecffb712c6",
         "stable": true
       },
       "request": {
@@ -1000,13 +1045,23 @@
         "targetSenseLabel": "a wax light source",
         "word": "candle"
       },
-      "status": "candidate_only",
+      "status": "research_functional_hypothesis",
       "targetSense": {
         "candidateBindings": [
           {
             "candidateId": "logic-structural:candle:an:peel_right_consonant_led_expansion+peel_left_consonant_frame",
             "targetSenseId": "user_sense_a_wax_light_source",
             "targetSenseLabel": "a wax light source"
+          },
+          {
+            "candidateId": "Albanian-QIRI",
+            "targetSenseId": "user_sense_a_wax_light_source",
+            "targetSenseLabel": null
+          },
+          {
+            "candidateId": "Latin-candēla",
+            "targetSenseId": "user_sense_a_wax_light_source",
+            "targetSenseLabel": null
           }
         ]
       }

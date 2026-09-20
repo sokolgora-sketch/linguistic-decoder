@@ -1,0 +1,11 @@
+{
+  "packetVersion": "open-instrument.research-evidence-packet.v0_1",
+  "packetId": "five-case",
+  "targetWord": "candle",
+  "targetSenseId": "user_sense_a_wax_light_source",
+  "semanticBridge": "The source-attested meaning may functionally correspond to a wax light source; bounded hypothesis only.",
+  "sources": [
+    { "sourceKey": "qiri", "embryo": "AN", "evidenceFamily": "lexical_dictionary", "language": "Albanian", "form": "QIRI", "gloss": "wax/fat/stearin stick with a wick used to make light", "embryoRelation": "no_structural_relation", "relationOperationIds": [], "citation": { "citationId": "five-case.qiri.fjale.citation.v1", "sourceTitle": "FJALË — Fjalor Shqip", "sourceAuthorOrEditor": null, "sourcePublisherOrHost": "FJALË — Fjalor Shqip", "sourceDateOrVersion": "accessed 2026-09-20", "sourceUrlOrArchiveRef": "https://fjale.al/qiri", "entryLocator": "QIRI; sense 1", "sourceHashOrArchiveHash": null, "attestedForm": "QIRI", "attestedGloss": "wax/fat/stearin stick with a wick used to make light", "provenanceGroupId": "fjale.fjalor-shqip.v0_1" } },
+    { "sourceKey": "candela", "embryo": "AN", "evidenceFamily": "historical_dictionary", "language": "Latin", "form": "candēla", "gloss": "wax or tallow light", "embryoRelation": "no_structural_relation", "relationOperationIds": [], "citation": { "citationId": "five-case.candela.lewis-short.citation.v1", "sourceTitle": "Lewis & Short Latin Dictionary", "sourceAuthorOrEditor": "Charlton T. Lewis and Charles Short", "sourcePublisherOrHost": "Scaife ATLAS / Perseus Digital Library", "sourceDateOrVersion": "Lewis & Short source file release date 1997-10-28; upstream commit 56061ca127f4a2844980baffc5f2b6d1332897b3", "sourceUrlOrArchiveRef": "https://atlas.perseus.tufts.edu/dictionaries/entry/urn%3Acite2%3Ascaife-viewer%3Adictionary-entries.atlas_v1%3Alat.ls.perseus-eng2-n6461/", "entryLocator": "TEI.2 entryFree id=\"n6461\" key=\"candela\"", "sourceHashOrArchiveHash": "c3474349ef9073bb436229cdf886eb77ed88d2fd", "attestedForm": "candēla", "attestedGloss": "wax or tallow light", "provenanceGroupId": "scaife.lewis-short.v0_1" } }
+  ]
+}

@@ -230,7 +230,7 @@ describe("Open Instrument extracted-source multiword live batch v0.1", () => {
     }
 
     expect(compiledRows).toHaveLength(8);
-    expect(catalog.rows).toHaveLength(80);
+    expect(catalog.rows).toHaveLength(93);
   });
 
   it("preserves ambiguity, throughput accounting, and protected controls", async () => {
