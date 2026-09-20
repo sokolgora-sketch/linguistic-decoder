@@ -11,6 +11,9 @@ import {
   parseMultiSourceFunctionalResearchEvidenceCatalogV0_1,
 } from "@/shared/multiSourceFunctionalResearchEvidenceCatalog.v0_1";
 import {
+  admitOpenInstrumentResearchCatalogV0_1,
+} from "@/shared/openInstrumentResearchCatalogAdmission.v0_1";
+import {
   buildSourceAttestedFunctionalResearchInputGroupsV0_1,
 } from "@/shared/multiSourceFunctionalResearchEvidenceRegistry.v0_1";
 import {
@@ -40,6 +43,65 @@ describe("Open Instrument research evidence packet compiler v0.1", () => {
       );
       expect(parsed.packet.sources).toHaveLength(2);
     }
+  });
+
+  it("preserves an explicit no-structural-relation research hypothesis without automatic witness discovery", () => {
+    const value = fixture();
+    const sources = value.sources as Array<Record<string, unknown>>;
+    for (const source of sources) {
+      source.embryo = "TARGET-STRUCTURAL-EMBRYO";
+      source.embryoRelation = "no_structural_relation";
+      source.relationOperationIds = [];
+    }
+
+    const parsed = parseOpenInstrumentResearchEvidencePacketV0_1(value);
+    expect(parsed.ok).toBe(true);
+    if (!parsed.ok) throw new Error(parsed.errors.join("; "));
+
+    const rows = compileOpenInstrumentResearchEvidencePacketV0_1(parsed.packet);
+    expect(rows).toHaveLength(2);
+    expect(rows.every((row) => row.embryoRelation === "no_structural_relation")).toBe(true);
+    expect(rows.every((row) => row.attestationTruth === "fact")).toBe(true);
+    expect(rows.every((row) => row.functionalHypotheses[0]?.functionalBridgeTruth === "hypothesis")).toBe(true);
+    expect(rows.every((row) => row.userDecisionPosture === "user_decides")).toBe(true);
+    expect(rows.every((row) => row.winnerClaim === "not_claimed")).toBe(true);
+
+    const catalog = parseMultiSourceFunctionalResearchEvidenceCatalogV0_1({
+      catalogVersion: "open-instrument.multi-source-functional-research-evidence-catalog.v0_1",
+      rows,
+    });
+    expect(catalog).toEqual(rows);
+
+    const sameFormRows = rows.map((row, index) =>
+      index === 0 ? { ...row, embryo: row.form } : row,
+    );
+    expect(parseMultiSourceFunctionalResearchEvidenceCatalogV0_1({
+      catalogVersion: "open-instrument.multi-source-functional-research-evidence-catalog.v0_1",
+      rows: sameFormRows,
+    })).toEqual([]);
+
+    const operationRows = rows.map((row, index) =>
+      index === 0 ? { ...row, relationOperationIds: ["exact"] } : row,
+    );
+    expect(parseMultiSourceFunctionalResearchEvidenceCatalogV0_1({
+      catalogVersion: "open-instrument.multi-source-functional-research-evidence-catalog.v0_1",
+      rows: operationRows,
+    })).toEqual([]);
+
+    const admission = admitOpenInstrumentResearchCatalogV0_1(
+      {
+        catalogVersion: "open-instrument.multi-source-functional-research-evidence-catalog.v0_1",
+        rows: [],
+      },
+      rows,
+    );
+    expect(admission.ok).toBe(true);
+    expect(admission.dryRun.wouldChange).toBe(true);
+
+    expect(buildSourceAttestedFunctionalResearchInputGroupsV0_1({
+      targetWord: "compiler-fixture",
+      rows,
+    })).toHaveLength(0);
   });
 
   it("is byte-stable and independent of source input order", () => {
@@ -78,6 +140,15 @@ describe("Open Instrument research evidence packet compiler v0.1", () => {
     ["duplicate citation ID", (value: Record<string, unknown>) => { (value.sources as Array<Record<string, unknown>>)[1].citation.citationId = "fixture.citation.b.v0_1"; }],
     ["malformed evidence family", (value: Record<string, unknown>) => { (value.sources as Array<Record<string, unknown>>)[0].evidenceFamily = "invented"; }],
     ["malformed relation", (value: Record<string, unknown>) => { (value.sources as Array<Record<string, unknown>>)[0].embryoRelation = "unsupported"; }],
+    ["same-form no-structural relation", (value: Record<string, unknown>) => {
+      (value.sources as Array<Record<string, unknown>>)[0].embryoRelation = "no_structural_relation";
+    }],
+    ["operation on no-structural relation", (value: Record<string, unknown>) => {
+      const source = (value.sources as Array<Record<string, unknown>>)[0];
+      source.embryo = "TARGET-STRUCTURAL-EMBRYO";
+      source.embryoRelation = "no_structural_relation";
+      source.relationOperationIds = ["exact"];
+    }],
     ["unsupported operation", (value: Record<string, unknown>) => { (value.sources as Array<Record<string, unknown>>)[0].relationOperationIds = ["invented_op"]; }],
     ["unsupported exact-form reduction", (value: Record<string, unknown>) => { (value.sources as Array<Record<string, unknown>>)[0].embryo = "GAMMA"; }],
   ])("fails closed for %s", (_name, mutate) => {

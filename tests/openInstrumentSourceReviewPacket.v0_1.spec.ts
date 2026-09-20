@@ -130,6 +130,41 @@ describe("Open Instrument source review packet v0.1", () => {
     expect(review.sources.every((source) => source.proposedRelationOperationIds.value?.length === 0)).toBe(true);
   });
 
+  it("keeps a no-structural-relation suggestion separate from the source fact", () => {
+    const targetStructuralEmbryo = "TARGET-STRUCTURAL-EMBRYO";
+    const review = buildOpenInstrumentSourceReviewPacketV0_1({
+      reviewPacketId: starPacket.packetId,
+      targetWord: starPacket.targetWord,
+      targetSenseId: starPacket.targetSenseId,
+      semanticBridge: starPacket.semanticBridge,
+      candidates: candidatesFor(starPacket, [starSnapshotA, starSnapshotB]),
+      noStructuralRelation: { targetStructuralEmbryo },
+    });
+
+    expect(review.sources.map((source) => source.form)).toEqual(["yll", "stella"]);
+    expect(review.sources.every((source) => source.proposedEmbryo.value === targetStructuralEmbryo)).toBe(true);
+    expect(review.sources.every((source) => source.proposedEmbryoRelation.value === "no_structural_relation")).toBe(true);
+
+    const finalized = finalizeReview(acceptReview(review));
+    expect(finalized.ok).toBe(true);
+    if (!finalized.ok) throw new Error(finalized.reasonCodes.join(", "));
+
+    expect(finalized.packet.sources).toEqual([
+      expect.objectContaining({
+        embryo: targetStructuralEmbryo,
+        form: "yll",
+        embryoRelation: "no_structural_relation",
+        relationOperationIds: [],
+      }),
+      expect.objectContaining({
+        embryo: targetStructuralEmbryo,
+        form: "stella",
+        embryoRelation: "no_structural_relation",
+        relationOperationIds: [],
+      }),
+    ]);
+  });
+
   it.each([
     ["star", starPacket, [starSnapshotA, starSnapshotB]],
     ["blue", bluePacket, [blueSnapshotA, blueSnapshotB]],

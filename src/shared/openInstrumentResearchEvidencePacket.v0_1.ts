@@ -27,6 +27,7 @@ const EMBRYO_RELATIONS_V0_1 = [
   "reconstructed_form",
   "phonetic_resemblance",
   "semantic_resemblance",
+  "no_structural_relation",
 ] as const;
 
 type NormalizedCitationV0_1 = MultiSourceFunctionalResearchCitationV0_1;
@@ -280,6 +281,15 @@ function parseSourceV0_1(
     errors.push(`${path}.embryo must match form for exact_form`);
   }
 
+  if (
+    embryoRelation === "no_structural_relation" &&
+    sameResearchKeyV0_1(embryo, form)
+  ) {
+    errors.push(
+      `${path}.embryo must differ from form for no_structural_relation`,
+    );
+  }
+
   if (!sameResearchKeyV0_1(citation.attestedForm, form)) {
     errors.push(`${path}.citation.attestedForm must match form`);
   }
@@ -289,6 +299,15 @@ function parseSourceV0_1(
     relationOperationIds.length === 0
   ) {
     errors.push(`${path}.authorized_transformation requires relationOperationIds`);
+  }
+
+  if (
+    embryoRelation === "no_structural_relation" &&
+    relationOperationIds.length > 0
+  ) {
+    errors.push(
+      `${path}.no_structural_relation must not carry relationOperationIds`,
+    );
   }
 
   return {
