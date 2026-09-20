@@ -1,0 +1,155 @@
+{
+  "schemaVersion": "open-instrument.m7-three-case-replication-preregistration.v1",
+  "experimentId": "open-instrument-m7-three-case-replication-v1",
+  "stage": "M7-A",
+  "status": "PREREGISTERED_BEFORE_BLIND_RESEARCH",
+  "repository": {
+    "identity": "sokolgora-sketch/linguistic-decoder",
+    "mainSha": "6e62c62a55ed0f3fd7ead2fae7db8017da68dbde",
+    "baselineArtifactSha256": "12a92a4fe5faec0516b30d3a7e86e75924f9c68349b905a2c07d61289d406650",
+    "corpusPath": "tests/research/corpus70.words.v0.1.txt",
+    "corpusSha256": "d2459e58b7e61e125afb8d1ab894e04b7b21d1d66fe0eebdcacf69ed10ca2d2f"
+  },
+  "predecessor": {
+    "milestone": "M6",
+    "artifactPath": "docs/open-instrument/research-artifacts/m6-one-embryo-proof-v1/one-embryo-proof-v1.archival.json",
+    "artifactSha256": "34e6bcc4e0630bf9210e1d9aa22973a78534f9b6fbec569ccb82f743aeb0480f",
+    "artifactByteLength": 4939,
+    "result": "INSUFFICIENT_CORRESPONDENCE"
+  },
+  "purpose": "Test whether the embryo-first protocol repeatedly performs frozen target/sense binding, deterministic structural discovery, isolated target-blind research, pre-reveal function freezing, controlled reveal, and target-specific correspondence evaluation.",
+  "firstExperimentExclusion": {
+    "targetWord": "support",
+    "embryo": "UPP",
+    "result": "INSUFFICIENT_CORRESPONDENCE",
+    "excludedFromM7": true
+  },
+  "candidatePoolAuthority": {
+    "orderingSource": "tests/research/corpus70.words.v0.1.txt",
+    "orderingOnly": true,
+    "orderingAuthority": "repository file order after normalization and eligibility filtering",
+    "sourceResearchPerformed": false
+  },
+  "contaminationExclusions": {
+    "currentBaselineCaseWords": ["study", "damage", "mystery", "water", "candle", "xyz", "rain", "river", "mountain", "stone", "tree", "wind", "sea", "sky", "snow", "cloud", "hand", "head", "heart", "blood", "bone", "skin", "mouth", "ear", "nose", "foot", "run", "walk", "speak", "hear", "eat", "drink", "sleep", "build", "break", "carry", "truth", "time", "life", "death", "mind", "memory", "freedom", "justice", "order", "change", "mother", "child", "friend", "home", "work", "war", "peace", "king", "woman", "man"],
+    "priorTargetSpecificResearchOrControlWords": ["art", "blood", "blue", "bone", "bread", "break", "build", "candle", "carry", "change", "child", "cloud", "drink", "ear", "eat", "foot", "freedom", "friend", "gjak", "hand", "heart", "hope", "justice", "king", "life", "love", "man", "memory", "mind", "mother", "mountain", "mystery", "nose", "order", "peace", "rain", "river", "run", "sea", "skin", "sky", "sleep", "snow", "speak", "star", "sterile", "stone", "tree", "truth", "vision", "walk", "war", "water", "woman"],
+    "priorEmbryoFirstMethodologyWords": ["support", "candle", "bistro", "contra", "mantra", "sterile", "study", "damage"],
+    "parkedWaterCases": ["water"],
+    "quarantinedEreCases": ["erë"],
+    "firstExperimentTargetAndEmbryo": ["support", "UPP"]
+  },
+  "englishSenseEligibility": {
+    "authority": "Cambridge Dictionary English",
+    "eligibilityRule": "ordinary English headword plus part of speech, usable ordinary sense, and stable locator; no translation, etymology, or embryo evidence used",
+    "candidateRecords": [
+      {"word":"charge","partOfSpeech":"verb","targetSenseId":"cambridge.en.charge.verb.move-forward-1","targetSenseDefinition":"to move forward quickly, especially to attack","locator":"https://dictionary.cambridge.org/dictionary/english/charge"},
+      {"word":"balance","partOfSpeech":"noun","targetSenseId":"cambridge.en.balance.noun.physical-state-1","targetSenseDefinition":"the ability to remain standing, especially because your weight is equally distributed","locator":"https://dictionary.cambridge.org/dictionary/english/balance"},
+      {"word":"synergy","partOfSpeech":"noun","targetSenseId":"cambridge.en.synergy.noun.combined-power-1","targetSenseDefinition":"the combined power of a group of things when they are working together that is greater than the total power achieved by each working separately","locator":"https://dictionary.cambridge.org/dictionary/english/synergy"},
+      {"word":"crystal","partOfSpeech":"noun","targetSenseId":"cambridge.en.crystal.noun.mineral-1","targetSenseDefinition":"a piece of a substance that has become solid, with a regular shape","locator":"https://dictionary.cambridge.org/dictionary/english/crystal"},
+      {"word":"father","partOfSpeech":"noun","targetSenseId":"cambridge.en.father.noun.parent-1","targetSenseDefinition":"a male parent","locator":"https://dictionary.cambridge.org/dictionary/english/father"},
+      {"word":"start","partOfSpeech":"verb","targetSenseId":"cambridge.en.start.verb.begin-1","targetSenseDefinition":"to begin doing something","locator":"https://dictionary.cambridge.org/dictionary/english/start"},
+      {"word":"direct","partOfSpeech":"adjective","targetSenseId":"cambridge.en.direct.adjective.straight-1","targetSenseDefinition":"going in a straight line towards somewhere or someone without stopping or changing direction","locator":"https://dictionary.cambridge.org/dictionary/english/direct"},
+      {"word":"whole","partOfSpeech":"adjective","targetSenseId":"cambridge.en.whole.adjective.complete-1","targetSenseDefinition":"complete or not divided","locator":"https://dictionary.cambridge.org/dictionary/english/whole"},
+      {"word":"rhythm","partOfSpeech":"noun","targetSenseId":"cambridge.en.rhythm.noun.regular-pattern-1","targetSenseDefinition":"a regular pattern of change, especially one that happens in nature","locator":"https://dictionary.cambridge.org/dictionary/english/rhythm"},
+      {"word":"symbol","partOfSpeech":"noun","targetSenseId":"cambridge.en.symbol.noun.representation-1","targetSenseDefinition":"a sign, shape, or object that is used to represent something else","locator":"https://dictionary.cambridge.org/dictionary/english/symbol"},
+      {"word":"system","partOfSpeech":"noun","targetSenseId":"cambridge.en.system.noun.connected-set-1","targetSenseDefinition":"a set of connected things or devices that operate together","locator":"https://dictionary.cambridge.org/dictionary/english/system"}
+    ]
+  },
+  "frozenCandidatePool": [
+    {"corpusId":"holdout.c70.a10","word":"charge","partOfSpeech":"verb","targetSenseId":"cambridge.en.charge.verb.move-forward-1","targetSenseDefinition":"to move forward quickly, especially to attack","targetSenseLocator":"https://dictionary.cambridge.org/dictionary/english/charge"},
+    {"corpusId":"holdout.c70.sch10","word":"balance","partOfSpeech":"noun","targetSenseId":"cambridge.en.balance.noun.physical-state-1","targetSenseDefinition":"the ability to remain standing, especially because your weight is equally distributed","targetSenseLocator":"https://dictionary.cambridge.org/dictionary/english/balance"},
+    {"corpusId":"holdout.c70.y06","word":"synergy","partOfSpeech":"noun","targetSenseId":"cambridge.en.synergy.noun.combined-power-1","targetSenseDefinition":"the combined power of a group of things when they are working together that is greater than the total power achieved by each working separately","targetSenseLocator":"https://dictionary.cambridge.org/dictionary/english/synergy"},
+    {"corpusId":"holdout.c70.y08","word":"crystal","partOfSpeech":"noun","targetSenseId":"cambridge.en.crystal.noun.mineral-1","targetSenseDefinition":"a piece of a substance that has become solid, with a regular shape","targetSenseLocator":"https://dictionary.cambridge.org/dictionary/english/crystal"},
+    {"corpusId":"train.c70.a01","word":"father","partOfSpeech":"noun","targetSenseId":"cambridge.en.father.noun.parent-1","targetSenseDefinition":"a male parent","targetSenseLocator":"https://dictionary.cambridge.org/dictionary/english/father"},
+    {"corpusId":"train.c70.a09","word":"start","partOfSpeech":"verb","targetSenseId":"cambridge.en.start.verb.begin-1","targetSenseDefinition":"to begin doing something","targetSenseLocator":"https://dictionary.cambridge.org/dictionary/english/start"},
+    {"corpusId":"train.c70.i03","word":"direct","partOfSpeech":"adjective","targetSenseId":"cambridge.en.direct.adjective.straight-1","targetSenseDefinition":"going in a straight line towards somewhere or someone without stopping or changing direction","targetSenseLocator":"https://dictionary.cambridge.org/dictionary/english/direct"},
+    {"corpusId":"train.c70.o04","word":"whole","partOfSpeech":"adjective","targetSenseId":"cambridge.en.whole.adjective.complete-1","targetSenseDefinition":"complete or not divided","targetSenseLocator":"https://dictionary.cambridge.org/dictionary/english/whole"},
+    {"corpusId":"train.c70.y01","word":"rhythm","partOfSpeech":"noun","targetSenseId":"cambridge.en.rhythm.noun.regular-pattern-1","targetSenseDefinition":"a regular pattern of change, especially one that happens in nature","targetSenseLocator":"https://dictionary.cambridge.org/dictionary/english/rhythm"},
+    {"corpusId":"train.c70.y02","word":"symbol","partOfSpeech":"noun","targetSenseId":"cambridge.en.symbol.noun.representation-1","targetSenseDefinition":"a sign, shape, or object that is used to represent something else","targetSenseLocator":"https://dictionary.cambridge.org/dictionary/english/symbol"},
+    {"corpusId":"train.c70.y07","word":"system","partOfSpeech":"noun","targetSenseId":"cambridge.en.system.noun.connected-set-1","targetSenseDefinition":"a set of connected things or devices that operate together","targetSenseLocator":"https://dictionary.cambridge.org/dictionary/english/system"}
+  ],
+  "candidatePoolConstruction": {
+    "normalization": "NFC, trim, lowercase comparison, preserve corpus file order",
+    "eligibilityBeforeStructuralSelection": true,
+    "structuralDiscoveryUsesExternalEvidence": false,
+    "candidatePoolFrozenBeforeStructuralDiscovery": true
+  },
+  "structuralDiscoveryResults": [
+    {"word":"charge","hypotheses":[{"embryo":"HA","embryoLength":2,"structuralHypothesisId":"logic-structural:charge:ha:peel_right_consonant_led_expansion+peel_left_consonant_frame","expansionChain":["HA","CHA","CHARGE"],"operationIds":["peel_right_consonant_led_expansion","peel_left_consonant_frame"],"targetVoicePath":["A","A"],"claimBoundary":"logic_derived_structural_hypothesis_only"},{"embryo":"ARGE","embryoLength":4,"structuralHypothesisId":"logic-structural:charge:arge:peel_left_consonant_frame+peel_left_consonant_frame","expansionChain":["ARGE","HARGE","CHARGE"],"operationIds":["peel_left_consonant_frame","peel_left_consonant_frame"],"targetVoicePath":["A","A","E"],"claimBoundary":"logic_derived_structural_hypothesis_only"}]},
+    {"word":"balance","hypotheses":[{"embryo":"ALA","embryoLength":3,"structuralHypothesisId":"logic-structural:balance:ala:peel_right_consonant_led_expansion+peel_left_consonant_frame","expansionChain":["ALA","BALA","BALANCE"],"operationIds":["peel_right_consonant_led_expansion","peel_left_consonant_frame"],"targetVoicePath":["A","A","E"],"claimBoundary":"logic_derived_structural_hypothesis_only"}]},
+    {"word":"synergy","hypotheses":[{"embryo":"YNE","embryoLength":3,"structuralHypothesisId":"logic-structural:synergy:yne:peel_right_consonant_led_expansion+peel_left_consonant_frame","expansionChain":["YNE","SYNE","SYNERGY"],"operationIds":["peel_right_consonant_led_expansion","peel_left_consonant_frame"],"targetVoicePath":["Y","E"],"claimBoundary":"logic_derived_structural_hypothesis_only"}]},
+    {"word":"crystal","hypotheses":[{"embryo":"YST","embryoLength":3,"structuralHypothesisId":"logic-structural:crystal:yst:peel_right_vowel_led_expansion+peel_left_consonant_frame+peel_left_consonant_frame","expansionChain":["YST","RYST","CRYST","CRYSTAL"],"operationIds":["peel_right_vowel_led_expansion","peel_left_consonant_frame","peel_left_consonant_frame"],"targetVoicePath":["Y"],"claimBoundary":"logic_derived_structural_hypothesis_only"},{"embryo":"YSTAL","embryoLength":5,"structuralHypothesisId":"logic-structural:crystal:ystal:peel_left_consonant_frame+peel_left_consonant_frame","expansionChain":["YSTAL","RYSTAL","CRYSTAL"],"operationIds":["peel_left_consonant_frame","peel_left_consonant_frame"],"targetVoicePath":["Y","A"],"claimBoundary":"logic_derived_structural_hypothesis_only"}]},
+    {"word":"father","hypotheses":[{"embryo":"ATH","embryoLength":3,"structuralHypothesisId":"logic-structural:father:ath:peel_right_vowel_led_expansion+peel_left_consonant_frame","expansionChain":["ATH","FATH","FATHER"],"operationIds":["peel_right_vowel_led_expansion","peel_left_consonant_frame"],"targetVoicePath":["A","E"],"claimBoundary":"logic_derived_structural_hypothesis_only"}]},
+    {"word":"start","hypotheses":[{"embryo":"ART","embryoLength":3,"structuralHypothesisId":"logic-structural:start:art:peel_left_consonant_frame+peel_left_consonant_frame","expansionChain":["ART","TART","START"],"operationIds":["peel_left_consonant_frame","peel_left_consonant_frame"],"targetVoicePath":["A"],"claimBoundary":"logic_derived_structural_hypothesis_only"}]},
+    {"word":"direct","hypotheses":[{"embryo":"IR","embryoLength":2,"structuralHypothesisId":"logic-structural:direct:ir:peel_right_vowel_led_expansion+peel_left_consonant_frame","expansionChain":["IR","DIR","DIRECT"],"operationIds":["peel_right_vowel_led_expansion","peel_left_consonant_frame"],"targetVoicePath":["I"],"claimBoundary":"logic_derived_structural_hypothesis_only"}]},
+    {"word":"whole","hypotheses":[{"embryo":"OLE","embryoLength":3,"structuralHypothesisId":"logic-structural:whole:ole:peel_left_consonant_frame+peel_left_consonant_frame","expansionChain":["OLE","HOLE","WHOLE"],"operationIds":["peel_left_consonant_frame","peel_left_consonant_frame"],"targetVoicePath":["O","E"],"claimBoundary":"logic_derived_structural_hypothesis_only"}]},
+    {"word":"rhythm","hypotheses":[{"embryo":"YTHM","embryoLength":4,"structuralHypothesisId":"logic-structural:rhythm:ythm:peel_left_consonant_frame+peel_left_consonant_frame","expansionChain":["YTHM","HYTHM","RHYTHM"],"operationIds":["peel_left_consonant_frame","peel_left_consonant_frame"],"targetVoicePath":["Y"],"claimBoundary":"logic_derived_structural_hypothesis_only"}]},
+    {"word":"symbol","hypotheses":[{"embryo":"YMB","embryoLength":3,"structuralHypothesisId":"logic-structural:symbol:ymb:peel_right_vowel_led_expansion+peel_left_consonant_frame","expansionChain":["YMB","SYMB","SYMBOL"],"operationIds":["peel_right_vowel_led_expansion","peel_left_consonant_frame"],"targetVoicePath":["Y"],"claimBoundary":"logic_derived_structural_hypothesis_only"}]},
+    {"word":"system","hypotheses":[{"embryo":"YST","embryoLength":3,"structuralHypothesisId":"logic-structural:system:yst:peel_right_vowel_led_expansion+peel_left_consonant_frame","expansionChain":["YST","SYST","SYSTEM"],"operationIds":["peel_right_vowel_led_expansion","peel_left_consonant_frame"],"targetVoicePath":["Y"],"claimBoundary":"logic_derived_structural_hypothesis_only"}]}
+  ],
+  "selectionRule": {
+    "frozenBeforeApplication": true,
+    "steps": ["require at least one deterministic structural hypothesis","prefer exactly one structural embryo","prefer fewer structural operations","prefer shorter embryo","select at most one case per operation signature until three distinct signatures are represented","use corpus order as final tie-break"],
+    "diversityFeatures": ["operation signature","embryo length","target Voice path"],
+    "meaningOrSourceInformationUsed": false
+  },
+  "selectedControllers": [
+    {"experimentId":"open-instrument-m7-three-case-replication-v1","replicationSlot":"M7-01","targetWord":"balance","partOfSpeech":"noun","targetSenseId":"cambridge.en.balance.noun.physical-state-1","targetSenseDefinition":"the ability to remain standing, especially because your weight is equally distributed","targetSenseAuthority":"Cambridge Dictionary English","targetSenseLocator":"https://dictionary.cambridge.org/dictionary/english/balance","embryo":"ALA","structuralHypothesisId":"logic-structural:balance:ala:peel_right_consonant_led_expansion+peel_left_consonant_frame","expansionChain":["ALA","BALA","BALANCE"],"operationIds":["peel_right_consonant_led_expansion","peel_left_consonant_frame"],"voicePath":["A","A","E"],"structuralSourceKind":"logic_derived_structural_hypothesis","structuralClaimBoundary":"logic_derived_structural_hypothesis_only","controllerSha256":"f07d86814fd18ded35774a48fee5000606bc1f772bbc4f07070ae4d7859988fc"},
+    {"experimentId":"open-instrument-m7-three-case-replication-v1","replicationSlot":"M7-02","targetWord":"father","partOfSpeech":"noun","targetSenseId":"cambridge.en.father.noun.parent-1","targetSenseDefinition":"a male parent","targetSenseAuthority":"Cambridge Dictionary English","targetSenseLocator":"https://dictionary.cambridge.org/dictionary/english/father","embryo":"ATH","structuralHypothesisId":"logic-structural:father:ath:peel_right_vowel_led_expansion+peel_left_consonant_frame","expansionChain":["ATH","FATH","FATHER"],"operationIds":["peel_right_vowel_led_expansion","peel_left_consonant_frame"],"voicePath":["A","E"],"structuralSourceKind":"logic_derived_structural_hypothesis","structuralClaimBoundary":"logic_derived_structural_hypothesis_only","controllerSha256":"d0f681cc5bb02cd515fdbf5b53595856a5ca64b6b2bf85dc934fab2e9e548363"},
+    {"experimentId":"open-instrument-m7-three-case-replication-v1","replicationSlot":"M7-03","targetWord":"start","partOfSpeech":"verb","targetSenseId":"cambridge.en.start.verb.begin-1","targetSenseDefinition":"to begin doing something","targetSenseAuthority":"Cambridge Dictionary English","targetSenseLocator":"https://dictionary.cambridge.org/dictionary/english/start","embryo":"ART","structuralHypothesisId":"logic-structural:start:art:peel_left_consonant_frame+peel_left_consonant_frame","expansionChain":["ART","TART","START"],"operationIds":["peel_left_consonant_frame","peel_left_consonant_frame"],"voicePath":["A"],"structuralSourceKind":"logic_derived_structural_hypothesis","structuralClaimBoundary":"logic_derived_structural_hypothesis_only","controllerSha256":"4828faec258c60bb9598df1cf1b901e00943abe735696da3f4fa7fd6321f1e78"}
+  ],
+  "blindPayloads": [
+    {"replicationExperimentId":"open-instrument-m7-three-case-replication-v1","replicationSlot":"M7-01","embryo":"ALA","voicePath":["A","A","E"],"opaqueStructuralProvenanceReference":"sha256:f07d86814fd18ded35774a48fee5000606bc1f772bbc4f07070ae4d7859988fc","sourcePolicyVersion":"open-instrument-m7-common-source-universe-v1","searchPolicyVersion":"open-instrument-m7-search-s0-s4-v1","claimBoundary":"research_only; no historical origin, cognacy, borrowing, language superiority, candidate truth, or winner claim","blindPayloadSha256":"7a2fc96866c576bf81d27dc325e6266bfc25c2e243a9377b89691ec8b51be485"},
+    {"replicationExperimentId":"open-instrument-m7-three-case-replication-v1","replicationSlot":"M7-02","embryo":"ATH","voicePath":["A","E"],"opaqueStructuralProvenanceReference":"sha256:d0f681cc5bb02cd515fdbf5b53595856a5ca64b6b2bf85dc934fab2e9e548363","sourcePolicyVersion":"open-instrument-m7-common-source-universe-v1","searchPolicyVersion":"open-instrument-m7-search-s0-s4-v1","claimBoundary":"research_only; no historical origin, cognacy, borrowing, language superiority, candidate truth, or winner claim","blindPayloadSha256":"4590fa01a764702dc49458f1fb00472e3af2c91ebc21c086de9e671de1b5ee77"},
+    {"replicationExperimentId":"open-instrument-m7-three-case-replication-v1","replicationSlot":"M7-03","embryo":"ART","voicePath":["A"],"opaqueStructuralProvenanceReference":"sha256:4828faec258c60bb9598df1cf1b901e00943abe735696da3f4fa7fd6321f1e78","sourcePolicyVersion":"open-instrument-m7-common-source-universe-v1","searchPolicyVersion":"open-instrument-m7-search-s0-s4-v1","claimBoundary":"research_only; no historical origin, cognacy, borrowing, language superiority, candidate truth, or winner claim","blindPayloadSha256":"d6669664d8644f086ffc36b06f814555d379fbc8d070f005e8f50ea326f15997"}
+  ],
+  "leakageAudit": {
+    "targetWordInPayload": false,
+    "partOfSpeechInPayload": false,
+    "targetSenseIdInPayload": false,
+    "targetSenseDefinitionInPayload": false,
+    "targetSenseLocatorInPayload": false,
+    "expansionChainInPayload": false,
+    "translationOrEtymologyInPayload": false,
+    "expectedFunctionInPayload": false,
+    "operationMetadataInPayload": false,
+    "opaqueReferenceContainsTarget": false,
+    "operatorContextRule": "BLIND_DISCOVERY_OPERATOR_MUST_BE_ISOLATED_FROM_TARGET_AND_CONTROLLER_CONTEXT",
+    "proof": "Payloads contain only the embryo, voice path, policy identifiers, opaque provenance reference, and claim boundary. Isolation is required because an embryo can be cross-referenced against repository context if the operator receives that context."
+  },
+  "blindSessionIsolationPolicy": {
+    "sessions": 3,
+    "design": "three independent fresh standalone sessions, one blind payload per session",
+    "operatorReceives": ["one blind payload","common frozen M7 research protocol"],
+    "operatorDoesNotReceive": ["this preregistration report","candidate pool","controller records","other targets","other payloads","repository context unless strictly required","prior experiment results"],
+    "createdBeforeTargetReveal": true
+  },
+  "sourceUniverse": {
+    "traditions": [
+      {"id":"fjale.fjalor-shqip.v0_1","label":"FJALË / Fjalor Shqip","authorityStatus":"existing authorized source tradition","permitted":true},
+      {"id":"scaife.lewis-short.v0_1","label":"Scaife Lewis & Short","authorityStatus":"existing authorized source tradition","permitted":true},
+      {"id":"scaife.middle-liddell.v0_1","label":"Scaife Middle Liddell","authorityStatus":"existing authorized source tradition","permitted":true}
+    ],
+    "languagesAreWitnessesNotWinners": true,
+    "noNewTradition": true
+  },
+  "searchPolicy": {
+    "orderedStages":["S0 exact embryo","S1 identity-preserving normalization","S2 source-attested bounded morphology","S3 source-attested dialect/history","S4 authoritative reconstruction"],
+    "forbidden":["target lookup","target translation","target semantic search","unlimited spelling mutation","unlogged substitution","post-hoc function search"],
+    "allCasesUseSamePolicy": true
+  },
+  "functionFreezePolicy": {
+    "freezeBeforeReveal":["SOURCE_QUERY_LOG","SOURCE_FACTS","FORM_RELATIONS","FUNCTION_CANDIDATES","FUNCTION_CLASSES","TRUTH_LEVELS","ALTERNATIVES","REJECTIONS","NULL_IF_NONE","EVIDENCE_REFS"],
+    "createdBeforeTargetReveal": true,
+    "preRevealArtifactRequiredBeforeReveal": true
+  },
+  "revealPolicy": {"targetRevealRequiresOwnPreRevealSha":true,"caseIndependence":true,"protocolCannotChangeAfterFirstRun":true},
+  "specificityPolicy": {"rule":"A recovered function counts only when sufficiently specific for the frozen target sense; broad functions fitting many unrelated concepts count against specificity","metaphoricalPostHocStoryInsufficient":true},
+  "outcomeClasses":["FUNCTIONAL_CORRESPONDENCE","LEXICAL_EQUIVALENCE","FORM_RESEMBLANCE_ONLY","HISTORICAL_RELATION_ONLY","INSUFFICIENT_CORRESPONDENCE","NULL"],
+  "aggregateMetrics": ["STRUCTURAL_CASES_SELECTED","BLIND_RUNS_COMPLETED","BLIND_FUNCTION_RECOVERY_COUNT","PRE_REVEAL_NULL_COUNT","FUNCTIONAL_CORRESPONDENCE_COUNT","INSUFFICIENT_CORRESPONDENCE_COUNT","LEXICAL_EQUIVALENCE_COUNT","FORM_RESEMBLANCE_ONLY_COUNT","HISTORICAL_RELATION_ONLY_COUNT","POST_REVEAL_NULL_COUNT","BLINDNESS_FAILURE_COUNT","PROTOCOL_INTEGRITY_FAILURE_COUNT"],
+  "expectedAggregateShape": {"STRUCTURAL_CASES_SELECTED":3},
+  "broaderHypothesisBoundary": "WORD_FORMS_ARE_NOT_ARBITRARY_WITH_RESPECT_TO_FUNCTIONAL_STRUCTURE",
+  "claimBoundaries": ["research_only","no_production_evidence","no_runtime_authorization","no_historical_derivation_claim","no_cognacy_claim","no_borrowing_claim","no_language_superiority_claim","no_candidate_truth_claim","no_single_winner","user_decides","negative_or_null_result_does_not_establish_arbitrariness"],
+  "durability": {"canonicalSerialization":"UTF-8 JSON.stringify with fixed insertion order, two-space indentation, and final LF","canonicalArtifactBeforeM7B":true,"futurePreRevealArtifactsSeparate":true,"futurePostRevealArtifactsSeparate":true},
+  "protocolIntegrity": {"targetsChanged":0,"targetSensesChanged":0,"structuralStatesChanged":0,"sourceUniverseChanged":0,"sourceOrderChanged":0,"functionalThresholdChanged":0,"stopRulesChanged":0,"embryoResearchPerformed":false,"blindRunsPerformed":false}
+}
