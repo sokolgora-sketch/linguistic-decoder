@@ -1,0 +1,127 @@
+{
+  "schemaVersion": "open-instrument.m6-one-embryo-proof-archival.v1",
+  "artifactKind": "research_only_durability_archive",
+  "experiment": {
+    "id": "open-instrument-m2-one-embryo-proof-v1",
+    "status": "completed",
+    "productionAuthorization": false,
+    "result": "INSUFFICIENT_CORRESPONDENCE"
+  },
+  "reportedOriginalArtifacts": {
+    "m2TargetPool": {
+      "reportedByteLength": 5054,
+      "reportedSha256": "ad535658c10e5e3712e60e84ef686709c18d3b6aa3d85562c45f54b8c0c7bb44"
+    },
+    "m2Controller": {
+      "reportedByteLength": 890,
+      "reportedSha256": "b0e658fb55ce8165aa8cfd7dc5e587dba2e5b6afd20092231557d5081430255e"
+    },
+    "m2BlindPayload": {
+      "reportedByteLength": 865,
+      "reportedSha256": "3e569e842c7c9bc03bb56ba6127fe9ebc7b1d36322134632997d50fb0151c27e"
+    },
+    "m2Preregistration": {
+      "reportedByteLength": 13445,
+      "reportedSha256": "b8bc7daf3244418d5ce0d0ea148a52afdd84a712b2bf5c09451d419c874f1e31"
+    },
+    "m3PreReveal": {
+      "reportedByteLength": 18025,
+      "reportedSha256": "d7138ad6cc0700df72b2dddf5ac5374489a5396b1cebcf6a6382a41d5f23921e"
+    },
+    "m5PostReveal": {
+      "reportedByteLength": 1700,
+      "reportedSha256": "01ed7a987036281fbc3f8c4acbe0f2e120826231b19574cbadaafd82b4261889"
+    }
+  },
+  "originalRecovery": {
+    "exactOriginalBytesRecovered": false,
+    "originalHashesIndependentlyVerifiedNow": false,
+    "note": "The original canonical byte payloads were not recovered. This archival representation must not be treated as those original bytes."
+  },
+  "controller": {
+    "targetWord": "support",
+    "targetSenseId": "cambridge.en.support.verb.ordinary-1",
+    "targetSenseDefinition": "to agree with and encourage someone or something because you want it to succeed",
+    "embryo": "UPP",
+    "expansionChain": ["UPP", "SUPP", "SUPPORT"],
+    "voicePath": "U",
+    "structuralClaimBoundary": "logic_derived_structural_hypothesis_only"
+  },
+  "preRevealFunctions": [
+    {
+      "id": "FC-01",
+      "class": "SPATIAL_ORIENTATION",
+      "statement": "orientation or movement toward a higher position",
+      "truthLevel": "INFERENCE",
+      "support": ["SF-01", "SF-02", "SF-03", "SF-04", "SF-06"]
+    },
+    {
+      "id": "FC-02",
+      "class": "PROCESS",
+      "statement": "ascending, rising, or elevation as a transition",
+      "truthLevel": "INFERENCE",
+      "support": ["SF-02", "SF-03", "SF-06"]
+    },
+    {
+      "id": "FC-03",
+      "class": "STATE",
+      "statement": "being in an elevated or upper location",
+      "truthLevel": "INFERENCE",
+      "support": ["SF-05"]
+    }
+  ],
+  "m3": {
+    "preRevealArtifactSha256": "d7138ad6cc0700df72b2dddf5ac5374489a5396b1cebcf6a6382a41d5f23921e",
+    "preRevealArtifactByteLength": 18025,
+    "blindnessStatus": "PASS",
+    "targetRevealAtFreeze": "NOT_REQUESTED_AND_NOT_PERFORMED"
+  },
+  "m5": {
+    "classification": "INSUFFICIENT_CORRESPONDENCE",
+    "specificity": "NONSPECIFIC",
+    "gates": {
+      "G1": "PASS",
+      "G2": "PASS",
+      "G3": "PASS",
+      "G4": "FAIL",
+      "G5": "PASS",
+      "G6": "PASS",
+      "G7": "PASS",
+      "G8": "PASS",
+      "G9": "PASS",
+      "G10": "PASS"
+    },
+    "reason": "The pre-reveal upward/rising/elevated cluster did not independently contain agreement, encouragement, or desire for another entity to succeed."
+  },
+  "sourceProvenance": {
+    "status": "confirmed_classes_preserved_detail_unavailable",
+    "records": [
+      {"id": "SF-01", "class": "Old English historical lexicography", "detail": null},
+      {"id": "SF-02", "class": "Old English historical lexicography", "detail": null},
+      {"id": "SF-03", "class": "Old Norse/Icelandic lexicography", "detail": null},
+      {"id": "SF-04", "class": "Norwegian historical lexicography", "detail": null},
+      {"id": "SF-05", "class": "Old Norse/Icelandic lexicography", "detail": null},
+      {"id": "SF-06", "class": "authoritative Indo-European reconstruction", "detail": null}
+    ],
+    "note": "No fresh source lookup was performed. Missing source names or locators are intentionally marked unavailable rather than invented."
+  },
+  "blindnessRecord": {
+    "invalidInitialAttempts": "Target/controller context was visible; no research was performed in those attempts.",
+    "successfulAttempt": "A fresh isolated session received only the blind payload; target/controller identity was unavailable; the pre-reveal artifact was frozen before reveal.",
+    "futureRule": "BLIND_DISCOVERY_OPERATOR_MUST_BE_ISOLATED_FROM_TARGET_AND_CONTROLLER_CONTEXT"
+  },
+  "claimBoundaries": [
+    "RESEARCH_ONLY",
+    "NON_PRODUCTION",
+    "NO_RUNTIME_AUTHORIZATION",
+    "NO_HISTORICAL_WINNER",
+    "NO_COGNACY_CLAIM",
+    "NO_BORROWING_CLAIM",
+    "NO_LANGUAGE_SUPERIORITY_CLAIM",
+    "NO_CANDIDATE_TRUTH_PROMOTION",
+    "NO_SINGLE_WINNER",
+    "USER_DECIDES",
+    "INSUFFICIENT_CORRESPONDENCE_DOES_NOT_ESTABLISH_ARBITRARINESS",
+    "NO_UNIVERSAL_NON_ARBITRARINESS_CLAIM"
+  ]
+}

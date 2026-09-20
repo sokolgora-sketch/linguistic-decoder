@@ -1,0 +1,26 @@
+{
+  "schemaVersion": "open-instrument.m6-one-embryo-proof-hash-manifest.v1",
+  "algorithm": "sha256",
+  "originalBytesRecoveryStatus": "NOT_RECOVERED",
+  "reportedOriginals": [
+    {"artifactId": "m2.target-pool", "reportedOriginalByteLength": 5054, "reportedOriginalSha256": "ad535658c10e5e3712e60e84ef686709c18d3b6aa3d85562c45f54b8c0c7bb44", "originalBytesRecovered": false, "originalSha256IndependentlyVerifiedNow": false, "archivalRepresentationPath": "docs/open-instrument/research-artifacts/m6-one-embryo-proof-v1/one-embryo-proof-v1.archival.json", "archivalRepresentationByteLength": 4939, "archivalRepresentationSha256": "34e6bcc4e0630bf9210e1d9aa22973a78534f9b6fbec569ccb82f743aeb0480f"},
+    {"artifactId": "m2.controller", "reportedOriginalByteLength": 890, "reportedOriginalSha256": "b0e658fb55ce8165aa8cfd7dc5e587dba2e5b6afd20092231557d5081430255e", "originalBytesRecovered": false, "originalSha256IndependentlyVerifiedNow": false, "archivalRepresentationPath": "docs/open-instrument/research-artifacts/m6-one-embryo-proof-v1/one-embryo-proof-v1.archival.json", "archivalRepresentationByteLength": 4939, "archivalRepresentationSha256": "34e6bcc4e0630bf9210e1d9aa22973a78534f9b6fbec569ccb82f743aeb0480f"},
+    {"artifactId": "m2.blind-payload", "reportedOriginalByteLength": 865, "reportedOriginalSha256": "3e569e842c7c9bc03bb56ba6127fe9ebc7b1d36322134632997d50fb0151c27e", "originalBytesRecovered": false, "originalSha256IndependentlyVerifiedNow": false, "archivalRepresentationPath": "docs/open-instrument/research-artifacts/m6-one-embryo-proof-v1/one-embryo-proof-v1.archival.json", "archivalRepresentationByteLength": 4939, "archivalRepresentationSha256": "34e6bcc4e0630bf9210e1d9aa22973a78534f9b6fbec569ccb82f743aeb0480f"},
+    {"artifactId": "m2.preregistration", "reportedOriginalByteLength": 13445, "reportedOriginalSha256": "b8bc7daf3244418d5ce0d0ea148a52afdd84a712b2bf5c09451d419c874f1e31", "originalBytesRecovered": false, "originalSha256IndependentlyVerifiedNow": false, "archivalRepresentationPath": "docs/open-instrument/research-artifacts/m6-one-embryo-proof-v1/one-embryo-proof-v1.archival.json", "archivalRepresentationByteLength": 4939, "archivalRepresentationSha256": "34e6bcc4e0630bf9210e1d9aa22973a78534f9b6fbec569ccb82f743aeb0480f"},
+    {"artifactId": "m3.pre-reveal", "reportedOriginalByteLength": 18025, "reportedOriginalSha256": "d7138ad6cc0700df72b2dddf5ac5374489a5396b1cebcf6a6382a41d5f23921e", "originalBytesRecovered": false, "originalSha256IndependentlyVerifiedNow": false, "archivalRepresentationPath": "docs/open-instrument/research-artifacts/m6-one-embryo-proof-v1/one-embryo-proof-v1.archival.json", "archivalRepresentationByteLength": 4939, "archivalRepresentationSha256": "34e6bcc4e0630bf9210e1d9aa22973a78534f9b6fbec569ccb82f743aeb0480f"},
+    {"artifactId": "m5.post-reveal", "reportedOriginalByteLength": 1700, "reportedOriginalSha256": "01ed7a987036281fbc3f8c4acbe0f2e120826231b19574cbadaafd82b4261889", "originalBytesRecovered": false, "originalSha256IndependentlyVerifiedNow": false, "archivalRepresentationPath": "docs/open-instrument/research-artifacts/m6-one-embryo-proof-v1/one-embryo-proof-v1.archival.json", "archivalRepresentationByteLength": 4939, "archivalRepresentationSha256": "34e6bcc4e0630bf9210e1d9aa22973a78534f9b6fbec569ccb82f743aeb0480f"}
+  ],
+  "artifacts": [
+    {
+      "artifactId": "m6.archival.experiment-record",
+      "artifactRole": "new archival representation of confirmed M2-M5 records",
+      "repositoryPath": "docs/open-instrument/research-artifacts/m6-one-embryo-proof-v1/one-embryo-proof-v1.archival.json",
+      "reportedOriginalByteLength": null,
+      "reportedOriginalSha256": null,
+      "originalBytesRecovered": false,
+      "originalSha256IndependentlyVerifiedNow": false,
+      "archivalByteLength": 4939,
+      "archivalSha256": "34e6bcc4e0630bf9210e1d9aa22973a78534f9b6fbec569ccb82f743aeb0480f"
+    }
+  ]
+}
