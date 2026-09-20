@@ -3,6 +3,7 @@
   "packetId": "hope.mental-desired-expectation.v0_1",
   "targetWord": "hope",
   "targetSenseId": "mental_desired_outcome_expectation",
+  "evidenceBasis": "lexical_equivalence",
   "semanticBridge": "The source entries attest lexical forms for the bounded expectation of a desired outcome sense; treating that shared functional referent as a ZË-RO bridge remains a research hypothesis only.",
   "sources": [
     {

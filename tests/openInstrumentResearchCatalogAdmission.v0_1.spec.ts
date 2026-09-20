@@ -91,6 +91,7 @@ function acceptReview(
     ...review,
     targetSenseId: { ...review.targetSenseId, decision: "accepted" },
     semanticBridge: { ...review.semanticBridge, decision: "accepted" },
+    evidenceBasis: { ...review.evidenceBasis, decision: "accepted" },
     sources: review.sources.map((source) => ({
       ...source,
       proposedEmbryo: { ...source.proposedEmbryo, decision: "accepted" },
@@ -110,6 +111,7 @@ function reviewedBreakPacket() {
     targetWord: breakPacket.targetWord,
     targetSenseId: breakPacket.targetSenseId,
     semanticBridge: breakPacket.semanticBridge,
+    evidenceBasis: breakPacket.evidenceBasis,
     candidates,
   });
   const finalized = finalizeOpenInstrumentSourceReviewPacketV0_1(
@@ -145,9 +147,9 @@ describe("Open Instrument research catalog admission v0.1", () => {
     expect(admission.ok).toBe(true);
     if (!admission.ok) throw new Error(admission.reasonCodes.join(", "));
     expect(admission.dryRun).toMatchObject({
-      currentRowCount: 91,
+      currentRowCount: 88,
       incomingRowCount: 2,
-      resultRowCount: 93,
+      resultRowCount: 90,
       wouldChange: true,
       collisions: [],
     });

@@ -319,6 +319,8 @@ function readResearchFunctionalHypothesisCandidatesV0_1(
         embryo.length > 0 &&
         candidate.sourceKind ===
           "multi_source_research_witness" &&
+        candidate.evidenceBasis ===
+          "functional_correspondence" &&
         sourceStatusIsResearch &&
         candidate.claimType ===
           "functionalMotivation" &&

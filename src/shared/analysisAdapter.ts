@@ -731,6 +731,12 @@ export function enginePayloadToAnalysisResult(payload: EnginePayload): AnalyzeWo
             new Map<string, string>();
 
           for (const witness of witnesses) {
+            if (
+              witness.evidenceBasis !==
+              "functional_correspondence"
+            ) {
+              continue;
+            }
             const proposal =
               buildDeterministicSourceAttestedResearchWitnessFunctionalProposalV1({
                 witness,

@@ -27,6 +27,7 @@ export interface UICandidateRow {
   evidenceRefs?: string[] | null;
   attestationTruth?: string | null;
   functionalBridgeTruth?: string | null;
+  evidenceBasis?: string | null;
   expansionChain?: string[] | null;
   functionalComponents?: FunctionalCandidateComponentVM[] | null;
 
@@ -200,6 +201,11 @@ export function buildCandidateRowsFromVM(vm: TelemetryViewModel): UICandidateRow
         ? pomStr(
             c.functionalBridgeTruth,
           )
+        : null,
+
+    evidenceBasis:
+      c.evidenceBasis
+        ? pomStr(c.evidenceBasis)
         : null,
 
     expansionChain:

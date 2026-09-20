@@ -3,6 +3,7 @@
   "packetId": "five-case",
   "targetWord": "justice",
   "targetSenseId": "user_sense_fairness_in_how_people_are_treated",
+  "evidenceBasis": "lexical_equivalence",
   "semanticBridge": "The source-attested meaning may functionally correspond to fairness in how people are treated; bounded hypothesis only.",
   "sources": [
     { "sourceKey": "drejtesi", "embryo": "UST", "evidenceFamily": "lexical_dictionary", "language": "Albanian", "form": "DREJTËSI", "gloss": "being just / quality of being just / justice", "embryoRelation": "no_structural_relation", "relationOperationIds": [], "citation": { "citationId": "five-case.drejtesi.fjale.citation.v1", "sourceTitle": "FJALË — Fjalor Shqip", "sourceAuthorOrEditor": null, "sourcePublisherOrHost": "FJALË — Fjalor Shqip", "sourceDateOrVersion": "accessed 2026-09-20", "sourceUrlOrArchiveRef": "https://fjale.al/drejt%C3%ABsi", "entryLocator": "DREJTËSI; sense 1", "sourceHashOrArchiveHash": null, "attestedForm": "DREJTËSI", "attestedGloss": "being just / quality of being just / justice", "provenanceGroupId": "fjale.fjalor-shqip.v0_1" } },

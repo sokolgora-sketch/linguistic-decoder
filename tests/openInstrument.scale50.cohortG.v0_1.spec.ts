@@ -107,7 +107,7 @@ describe("Open Instrument SCALE-50 Cohort G v0.1", () => {
 
   it("admits only the four approved Null targets through the packet contract", async () => {
     const rows = loadMultiSourceFunctionalResearchEvidenceCatalogV0_1();
-    expect(rows).toHaveLength(93);
+    expect(rows).toHaveLength(90);
 
     for (const target of COHORT_G_CASES_V0_1) {
       expect(PRE_COHORT_G_NULL_TARGETS_V0_1.has(target.targetWord)).toBe(true);
@@ -124,9 +124,13 @@ describe("Open Instrument SCALE-50 Cohort G v0.1", () => {
         targetRows,
         policyFor(target),
       );
-      expect(result.ready).toBe(true);
-      expect(result.reasonCodes).toEqual([]);
-      expect(result.provenanceGroupIds).toHaveLength(2);
+      expect(result.ready).toBe(false);
+      expect(result.reasonCodes).toEqual(expect.arrayContaining([
+        "functional_bridge_missing",
+        "minimum_rows_not_met",
+        "minimum_provenance_groups_not_met",
+      ]));
+      expect(result.provenanceGroupIds).toHaveLength(0);
 
       expect(targetRows.map((row) => row.researchEvidenceId)).toEqual(
         expect.arrayContaining(target.expectedSourceIds),
@@ -141,9 +145,10 @@ describe("Open Instrument SCALE-50 Cohort G v0.1", () => {
         expect(row.citations[0]?.attestedForm).toBe(row.form);
         expect(row.attestationTruth).toBe("fact");
         expect(row.sourceStatus).toBe("research_candidate");
-        expect(row.functionalHypotheses[0]?.functionalBridgeTruth).toBe("hypothesis");
+        expect(row.functionalHypotheses[0]?.evidenceBasis).toBe("lexical_equivalence");
+        expect(row.functionalHypotheses[0]?.functionalBridgeTruth).toBe("unknown");
         expect(row.functionalHypotheses[0]?.claimBoundary).toBe(
-          "functional_hypothesis_only",
+          "lexical_source_evidence_only",
         );
         expect(row.historicalOriginClaim).toBe("not_claimed");
         expect(row.historicalTransmissionClaim).toBe("not_claimed");
@@ -156,13 +161,7 @@ describe("Open Instrument SCALE-50 Cohort G v0.1", () => {
 
       const body = await analyzeV0_1(target.targetWord);
       const status = (body.analysisStatusV0_1 as Record<string, unknown>).status;
-      expect(status as AnalysisStatusCodeV0_1).toBe("research_functional_hypothesis");
-      expect(
-        new Set(
-          (body.analysisStatusV0_1 as Record<string, unknown>)
-            .researchHypothesisEmbryos as string[],
-        ),
-      ).toEqual(new Set(target.expectedEmbryos));
+      expect(status as AnalysisStatusCodeV0_1).not.toBe("research_functional_hypothesis");
 
       const candidates = researchCandidatesV0_1(body);
       expect(candidates).toHaveLength(2);

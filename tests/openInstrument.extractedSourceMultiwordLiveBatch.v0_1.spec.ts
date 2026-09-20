@@ -193,19 +193,21 @@ describe("Open Instrument extracted-source multiword live batch v0.1", () => {
         minimumProvenanceGroups: 2,
       });
 
-      expect(readiness.ready).toBe(true);
-      expect(readiness.reasonCodes).toEqual([]);
-      expect(readiness.provenanceGroupIds).toEqual([
-        "fjale.fjalor-shqip.v0_1",
-        "scaife.lewis-short.v0_1",
-      ]);
+      expect(readiness.ready).toBe(false);
+      expect(readiness.reasonCodes).toEqual(expect.arrayContaining([
+        "functional_bridge_missing",
+        "minimum_rows_not_met",
+        "minimum_provenance_groups_not_met",
+      ]));
+      expect(readiness.provenanceGroupIds).toEqual([]);
       expect(new Set(rows.map((row) => row.researchEvidenceId)).size).toBe(2);
       expect(rows.every((row) => row.attestationTruth === "fact")).toBe(true);
       expect(rows.every((row) => row.sourceStatus === "research_candidate")).toBe(true);
       expect(rows.every((row) => row.functionalHypotheses[0].targetWord === item.packet.targetWord)).toBe(true);
       expect(rows.every((row) => row.functionalHypotheses[0].targetSenseId === item.packet.targetSenseId)).toBe(true);
-      expect(rows.every((row) => row.functionalHypotheses[0].functionalBridgeTruth === "hypothesis")).toBe(true);
-      expect(rows.every((row) => row.functionalHypotheses[0].claimBoundary === "functional_hypothesis_only")).toBe(true);
+      expect(rows.every((row) => row.functionalHypotheses[0].evidenceBasis === "lexical_equivalence")).toBe(true);
+      expect(rows.every((row) => row.functionalHypotheses[0].functionalBridgeTruth === "unknown")).toBe(true);
+      expect(rows.every((row) => row.functionalHypotheses[0].claimBoundary === "lexical_source_evidence_only")).toBe(true);
       expect(rows.every((row) => row.historicalOriginClaim === "not_claimed")).toBe(true);
       expect(rows.every((row) => row.historicalTransmissionClaim === "not_claimed")).toBe(true);
       expect(rows.every((row) => row.winnerClaim === "not_claimed")).toBe(true);
@@ -223,10 +225,10 @@ describe("Open Instrument extracted-source multiword live batch v0.1", () => {
       expect(response.status).toBe(200);
       const body = (await response.json()) as Record<string, unknown>;
       const status = body.analysisStatusV0_1 as Record<string, unknown>;
-      expect(status.status).toBe("research_functional_hypothesis");
-      expect(status.researchHypothesisEmbryos).toEqual(
-        expect.arrayContaining(item.expectedEmbryos),
-      );
+      expect(status.status).toBe(item.beforeStatus);
+      expect(body.candidates).toEqual(expect.arrayContaining([
+        expect.objectContaining({ evidenceBasis: "lexical_equivalence" }),
+      ]));
     }
 
     expect(compiledRows).toHaveLength(8);

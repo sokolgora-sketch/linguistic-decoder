@@ -14,11 +14,11 @@ describe(
   "Open Instrument first real ER multi-source research rows v0.1",
   () => {
     it(
-      "keeps five distinct research observations including three separate Albanian erë homonyms",
+      "quarantines three unresolved Albanian erë homonyms",
       () => {
         expect(
           multiSourceFunctionalResearchEvidenceRowsErV0_1,
-        ).toHaveLength(5);
+        ).toHaveLength(2);
 
         const albanian =
           multiSourceFunctionalResearchEvidenceRowsErV0_1.filter(
@@ -27,17 +27,9 @@ describe(
               "Albanian",
           );
 
-        expect(albanian).toHaveLength(3);
+        expect(albanian).toHaveLength(0);
 
-        expect(
-          albanian.map(
-            (row) => row.gloss,
-          ),
-        ).toEqual([
-          "wind; moving air; colloquially air",
-          "smell; scent; odor",
-          "era; epoch; geological era",
-        ]);
+        expect(albanian).toEqual([]);
       },
     );
 
@@ -61,7 +53,7 @@ describe(
           "https://logeion.uchicago.edu/%E1%BC%90%CF%81%E1%BF%86%CE%BC%CE%BF%CF%82",
         );
 
-        expect(refs).toContain(
+        expect(refs).not.toContain(
           "https://fjale.al/er%C3%AB",
         );
       },
@@ -91,7 +83,7 @@ describe(
     );
 
     it(
-      "keeps Greek lexical attestation factual while its functional bridge remains hypothetical",
+      "keeps Greek lexical attestation factual without functional promotion",
       () => {
         const row =
           multiSourceFunctionalResearchEvidenceRowsErV0_1.find(
@@ -107,9 +99,7 @@ describe(
         expect(
           row?.functionalHypotheses[0]
             ?.functionalBridgeTruth,
-        ).toBe(
-          "hypothesis",
-        );
+        ).toBe("unknown");
 
         expect(
           row?.historicalOriginClaim,
@@ -156,7 +146,7 @@ describe(
     );
 
     it(
-      "allows all five source observations through research intake but emits only the two currently admissible ER witnesses",
+      "admits only the two durable ER witnesses and excludes unresolved Albanian rows",
       () => {
         const inputs =
           buildMultiSourceFunctionalResearchInputsV0_1({
@@ -170,7 +160,7 @@ describe(
               multiSourceFunctionalResearchEvidenceRowsErV0_1,
           });
 
-        expect(inputs).toHaveLength(5);
+        expect(inputs).toHaveLength(2);
 
         const witnesses =
           discoverMultiSourceFunctionalWitnessesV0_1({

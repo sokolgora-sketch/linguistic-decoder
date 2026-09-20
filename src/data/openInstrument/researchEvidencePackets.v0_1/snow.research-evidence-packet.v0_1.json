@@ -3,6 +3,7 @@
   "packetId": "snow.physical-precipitation.v0_1",
   "targetWord": "snow",
   "targetSenseId": "physical_snow_precipitation",
+  "evidenceBasis": "lexical_equivalence",
   "semanticBridge": "The Albanian and Latin entries independently attest lexical forms for physical snow precipitation; treating them as a shared functional referent remains a research hypothesis only.",
   "sources": [
     {

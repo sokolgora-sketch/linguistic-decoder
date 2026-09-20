@@ -208,8 +208,11 @@ describe(
                 /flow/i,
               ),
 
-            functionalBridgeTruth:
+          functionalBridgeTruth:
               "hypothesis",
+
+            evidenceBasis:
+              "functional_correspondence",
 
             claimBoundary:
               "functional_hypothesis_only",
@@ -226,9 +229,7 @@ describe(
 
                 expect(
           loaded,
-        ).toHaveLength(
-          catalog.rows.length,
-        );
+        ).toHaveLength(90);
 
         const ak =
           loaded.find(

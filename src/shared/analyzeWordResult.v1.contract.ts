@@ -137,12 +137,30 @@ const AnalyzeV1ResearchCandidateEnvelopeSchema = z
     displayForm: z.string().min(1),
     candidateLanguage: z.string().min(1),
     claimType: z.literal("functionalMotivation"),
+    evidenceBasis: z.literal("functional_correspondence"),
     embryo: z.string().min(1),
     plainStandaloneGloss: z.string().min(1),
     semanticBridge: z.string().nullable(),
     validationOutcome: z.literal("not_evaluated"),
     rankGroup: z.literal("unresolved"),
     claimBoundary: z.literal("research_functional_hypothesis_only"),
+    userDecisionPosture: z.literal("user_decides"),
+  })
+  .passthrough();
+
+const AnalyzeV1LexicalEvidenceEnvelopeSchema = z
+  .object({
+    candidateId: z.string().min(1),
+    displayForm: z.string().min(1),
+    candidateLanguage: z.string().min(1),
+    claimType: z.literal("unresolved"),
+    evidenceBasis: z.literal("lexical_equivalence"),
+    embryo: z.string().min(1),
+    plainStandaloneGloss: z.string().min(1),
+    semanticBridge: z.string().nullable(),
+    validationOutcome: z.literal("not_evaluated"),
+    rankGroup: z.literal("unresolved"),
+    claimBoundary: z.literal("lexical_source_evidence_only"),
     userDecisionPosture: z.literal("user_decides"),
   })
   .passthrough();
@@ -160,6 +178,7 @@ function validateLiveCandidateEnvelopeArray(value: unknown): void {
         z.union([
           AnalyzeV1CandidateEnvelopeSchema,
           AnalyzeV1ResearchCandidateEnvelopeSchema,
+          AnalyzeV1LexicalEvidenceEnvelopeSchema,
         ]),
       )
       .parse(value);

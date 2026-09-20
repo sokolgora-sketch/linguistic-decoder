@@ -32,7 +32,8 @@
           "targetWord": "sterile",
           "semanticBridge": "a reconstructed weak, infirm, loose, or reduced-cohesion state can be tested as a functional precursor to reduced productive capacity; this is a functional hypothesis, not a historical-origin claim",
           "functionalBridgeTruth": "hypothesis",
-          "claimBoundary": "functional_hypothesis_only"
+          "claimBoundary": "functional_hypothesis_only",
+          "evidenceBasis": "functional_correspondence"
         }
       ],
       "historicalOriginClaim": "not_claimed",
@@ -83,9 +84,10 @@
       "functionalHypotheses": [
         {
           "targetWord": "sterile",
-          "semanticBridge": "empty, devoid, or lacking can functionally motivate absence of productive or reproductive capacity; this remains a hypothesis and does not assert that Greek ἐρῆμος is the historical origin of sterile",
-          "functionalBridgeTruth": "hypothesis",
-          "claimBoundary": "functional_hypothesis_only"
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
         }
       ],
       "historicalOriginClaim": "not_claimed",
@@ -249,7 +251,8 @@
           "targetWord": "gjak",
           "semanticBridge": "an attested 'to flow' function can be tested as functional motivation for blood as a flowing or circulating bodily substance; this is a functional hypothesis only and does not assert historical origin or transmission",
           "functionalBridgeTruth": "hypothesis",
-          "claimBoundary": "functional_hypothesis_only"
+          "claimBoundary": "functional_hypothesis_only",
+          "evidenceBasis": "functional_correspondence"
         }
       ],
       "historicalOriginClaim": "not_claimed",
@@ -288,9 +291,10 @@
       "functionalHypotheses": [
         {
           "targetWord": "love",
-          "semanticBridge": "the independently attested Albanian verb dua meaning 'to love' can be tested as a direct functional expression of the LOVE concept; this is cross-language functional research only and does not assert historical origin or transmission",
-          "functionalBridgeTruth": "hypothesis",
-          "claimBoundary": "functional_hypothesis_only"
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
         }
       ],
       "historicalOriginClaim": "not_claimed",
@@ -329,9 +333,10 @@
       "functionalHypotheses": [
         {
           "targetWord": "love",
-          "semanticBridge": "the independently attested Latin verb amo meaning 'to love' can be tested as a direct functional expression of the LOVE concept; this is cross-language functional research only and does not assert historical origin or transmission",
-          "functionalBridgeTruth": "hypothesis",
-          "claimBoundary": "functional_hypothesis_only"
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
         }
       ],
       "historicalOriginClaim": "not_claimed",
@@ -370,9 +375,10 @@
       "functionalHypotheses": [
         {
           "targetWord": "rain",
-          "semanticBridge": "the independently attested Albanian noun shi denotes rain and can be tested as a direct cross-language functional expression of the RAIN concept; this is functional research only and does not assert historical origin or transmission",
-          "functionalBridgeTruth": "hypothesis",
-          "claimBoundary": "functional_hypothesis_only"
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
         }
       ],
       "historicalOriginClaim": "not_claimed",
@@ -411,9 +417,10 @@
       "functionalHypotheses": [
         {
           "targetWord": "hand",
-          "semanticBridge": "the independently attested Albanian noun dorë denotes the hand and can be tested as a direct cross-language functional expression of the HAND concept; this is functional research only and does not assert historical origin or transmission",
-          "functionalBridgeTruth": "hypothesis",
-          "claimBoundary": "functional_hypothesis_only"
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
         }
       ],
       "historicalOriginClaim": "not_claimed",
@@ -452,9 +459,10 @@
       "functionalHypotheses": [
         {
           "targetWord": "run",
-          "semanticBridge": "the independently attested Albanian verb vrapoj denotes running and can be tested as a direct cross-language functional expression of the RUN concept; this is functional research only and does not assert historical origin or transmission",
-          "functionalBridgeTruth": "hypothesis",
-          "claimBoundary": "functional_hypothesis_only"
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
         }
       ],
       "historicalOriginClaim": "not_claimed",
@@ -493,9 +501,10 @@
       "functionalHypotheses": [
         {
           "targetWord": "truth",
-          "semanticBridge": "the independently attested Albanian noun vërtetë denotes truth or that which corresponds to reality and can be tested as a direct cross-language functional expression of the TRUTH concept; this is functional research only and does not assert historical origin or transmission",
-          "functionalBridgeTruth": "hypothesis",
-          "claimBoundary": "functional_hypothesis_only"
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
         }
       ],
       "historicalOriginClaim": "not_claimed",
@@ -534,9 +543,10 @@
       "functionalHypotheses": [
         {
           "targetWord": "mother",
-          "semanticBridge": "the independently attested Albanian noun nënë denotes mother and can be tested as a direct cross-language functional expression of the MOTHER concept; this is functional research only and does not assert historical origin or transmission",
-          "functionalBridgeTruth": "hypothesis",
-          "claimBoundary": "functional_hypothesis_only"
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
         }
       ],
       "historicalOriginClaim": "not_claimed",
@@ -575,9 +585,10 @@
       "functionalHypotheses": [
         {
           "targetWord": "mountain",
-          "semanticBridge": "the independently attested Albanian noun mal denotes a mountain and can be tested as a direct cross-language functional expression of the MOUNTAIN concept; this is functional research only and does not assert historical origin or transmission",
-          "functionalBridgeTruth": "hypothesis",
-          "claimBoundary": "functional_hypothesis_only"
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
         }
       ],
       "historicalOriginClaim": "not_claimed",
@@ -616,9 +627,10 @@
       "functionalHypotheses": [
         {
           "targetWord": "bone",
-          "semanticBridge": "the independently attested Albanian noun kockë denotes bone and can be tested as a direct cross-language functional expression of the BONE concept; this is functional research only and does not assert historical origin or transmission",
-          "functionalBridgeTruth": "hypothesis",
-          "claimBoundary": "functional_hypothesis_only"
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
         }
       ],
       "historicalOriginClaim": "not_claimed",
@@ -657,9 +669,10 @@
       "functionalHypotheses": [
         {
           "targetWord": "walk",
-          "semanticBridge": "the independently attested Albanian verb eci denotes walking or going on foot and can be tested as a direct cross-language functional expression of the WALK concept; this is functional research only and does not assert historical origin or transmission",
-          "functionalBridgeTruth": "hypothesis",
-          "claimBoundary": "functional_hypothesis_only"
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
         }
       ],
       "historicalOriginClaim": "not_claimed",
@@ -698,9 +711,10 @@
       "functionalHypotheses": [
         {
           "targetWord": "life",
-          "semanticBridge": "the independently attested Albanian noun jetë denotes life and the state or existence of living beings and can be tested as a direct cross-language functional expression of the LIFE concept; this is functional research only and does not assert historical origin or transmission",
-          "functionalBridgeTruth": "hypothesis",
-          "claimBoundary": "functional_hypothesis_only"
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
         }
       ],
       "historicalOriginClaim": "not_claimed",
@@ -739,9 +753,10 @@
       "functionalHypotheses": [
         {
           "targetWord": "child",
-          "semanticBridge": "the independently attested Albanian noun fëmijë denotes a child and can be tested as a direct cross-language functional expression of the CHILD concept; this is functional research only and does not assert historical origin or transmission",
-          "functionalBridgeTruth": "hypothesis",
-          "claimBoundary": "functional_hypothesis_only"
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
         }
       ],
       "historicalOriginClaim": "not_claimed",
@@ -780,9 +795,10 @@
       "functionalHypotheses": [
         {
           "targetWord": "river",
-          "semanticBridge": "the independently attested Albanian noun lumë denotes a river and can be tested as a direct cross-language functional witness for the RIVER concept; it does not validate the separate IV structural hypothesis and does not assert historical origin",
-          "functionalBridgeTruth": "hypothesis",
-          "claimBoundary": "functional_hypothesis_only"
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
         }
       ],
       "historicalOriginClaim": "not_claimed",
@@ -821,9 +837,10 @@
       "functionalHypotheses": [
         {
           "targetWord": "blood",
-          "semanticBridge": "the independently attested Albanian noun gjak denotes blood and can be tested as a direct cross-language functional witness for the BLOOD concept; it does not validate the separate LO or OOD structural hypotheses and does not assert historical origin",
-          "functionalBridgeTruth": "hypothesis",
-          "claimBoundary": "functional_hypothesis_only"
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
         }
       ],
       "historicalOriginClaim": "not_claimed",
@@ -862,9 +879,10 @@
       "functionalHypotheses": [
         {
           "targetWord": "speak",
-          "semanticBridge": "the independently attested Albanian verb flas denotes speaking and can be tested as a direct cross-language functional witness for the SPEAK concept; it does not validate the separate PE or EAK structural hypotheses and does not assert historical origin",
-          "functionalBridgeTruth": "hypothesis",
-          "claimBoundary": "functional_hypothesis_only"
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
         }
       ],
       "historicalOriginClaim": "not_claimed",
@@ -903,9 +921,10 @@
       "functionalHypotheses": [
         {
           "targetWord": "memory",
-          "semanticBridge": "the independently attested Albanian noun kujtesë denotes memory and can be tested as a direct cross-language functional witness for the MEMORY concept; it does not validate the separate EM structural hypothesis and does not assert historical origin",
-          "functionalBridgeTruth": "hypothesis",
-          "claimBoundary": "functional_hypothesis_only"
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
         }
       ],
       "historicalOriginClaim": "not_claimed",
@@ -944,9 +963,10 @@
       "functionalHypotheses": [
         {
           "targetWord": "woman",
-          "semanticBridge": "the independently attested Albanian noun grua denotes a woman and can be tested as a direct cross-language functional witness for the WOMAN concept; it does not validate the separate OM structural hypothesis and does not assert historical origin",
-          "functionalBridgeTruth": "hypothesis",
-          "claimBoundary": "functional_hypothesis_only"
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
         }
       ],
       "historicalOriginClaim": "not_claimed",
@@ -985,9 +1005,10 @@
       "functionalHypotheses": [
         {
           "targetWord": "sky",
-          "semanticBridge": "the independently attested Albanian noun qiell denotes the sky and can be tested as a direct cross-language functional witness for the SKY concept; this is research-only and does not assert historical origin, transmission, winner status, or candidate truth",
-          "functionalBridgeTruth": "hypothesis",
-          "claimBoundary": "functional_hypothesis_only"
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
         }
       ],
       "historicalOriginClaim": "not_claimed",
@@ -1026,9 +1047,10 @@
       "functionalHypotheses": [
         {
           "targetWord": "heart",
-          "semanticBridge": "the independently attested Albanian noun zemër denotes the heart and can be tested as a direct cross-language functional witness for the HEART concept; this is research-only and does not assert historical origin, transmission, winner status, or candidate truth",
-          "functionalBridgeTruth": "hypothesis",
-          "claimBoundary": "functional_hypothesis_only"
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
         }
       ],
       "historicalOriginClaim": "not_claimed",
@@ -1067,9 +1089,10 @@
       "functionalHypotheses": [
         {
           "targetWord": "eat",
-          "semanticBridge": "the independently attested Albanian verb ha denotes eating and can be tested as a direct cross-language functional witness for the EAT concept; this is research-only and does not assert historical origin, transmission, winner status, or candidate truth",
-          "functionalBridgeTruth": "hypothesis",
-          "claimBoundary": "functional_hypothesis_only"
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
         }
       ],
       "historicalOriginClaim": "not_claimed",
@@ -1108,9 +1131,10 @@
       "functionalHypotheses": [
         {
           "targetWord": "mind",
-          "semanticBridge": "the independently attested Albanian noun mendje denotes the mind and can be tested as a direct cross-language functional witness for the MIND concept; this is research-only and does not assert historical origin, transmission, winner status, or candidate truth",
-          "functionalBridgeTruth": "hypothesis",
-          "claimBoundary": "functional_hypothesis_only"
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
         }
       ],
       "historicalOriginClaim": "not_claimed",
@@ -1149,9 +1173,10 @@
       "functionalHypotheses": [
         {
           "targetWord": "war",
-          "semanticBridge": "the independently attested Albanian noun luftë denotes war and can be tested as a direct cross-language functional witness for the WAR concept; this is research-only and does not assert historical origin, transmission, winner status, or candidate truth",
-          "functionalBridgeTruth": "hypothesis",
-          "claimBoundary": "functional_hypothesis_only"
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
         }
       ],
       "historicalOriginClaim": "not_claimed",
@@ -1190,9 +1215,10 @@
       "functionalHypotheses": [
         {
           "targetWord": "sky",
-          "semanticBridge": "Latin caelum independently denotes the sky or heavens and can serve as a second-language functional witness for the SKY concept. This corroborates concept-level research only; it does not assert historical origin, transmission, ownership, or winner status",
-          "functionalBridgeTruth": "hypothesis",
-          "claimBoundary": "functional_hypothesis_only"
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
         }
       ],
       "historicalOriginClaim": "not_claimed",
@@ -1231,9 +1257,10 @@
       "functionalHypotheses": [
         {
           "targetWord": "heart",
-          "semanticBridge": "Latin cor independently denotes the heart and can serve as a second-language functional witness for the HEART concept. This remains research-only and makes no historical-origin, transmission, ownership, or winner claim",
-          "functionalBridgeTruth": "hypothesis",
-          "claimBoundary": "functional_hypothesis_only"
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
         }
       ],
       "historicalOriginClaim": "not_claimed",
@@ -1272,9 +1299,10 @@
       "functionalHypotheses": [
         {
           "targetWord": "eat",
-          "semanticBridge": "Latin edo independently denotes the act of eating and can serve as a second-language functional witness for the EAT concept. This remains research-only and does not assert historical origin, transmission, ownership, or winner status",
-          "functionalBridgeTruth": "hypothesis",
-          "claimBoundary": "functional_hypothesis_only"
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
         }
       ],
       "historicalOriginClaim": "not_claimed",
@@ -1313,9 +1341,10 @@
       "functionalHypotheses": [
         {
           "targetWord": "mind",
-          "semanticBridge": "Latin mens independently denotes the mind and intellectual faculties and can serve as a second-language functional witness for the MIND concept. This remains research-only and does not assert historical origin, transmission, ownership, or winner status",
-          "functionalBridgeTruth": "hypothesis",
-          "claimBoundary": "functional_hypothesis_only"
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
         }
       ],
       "historicalOriginClaim": "not_claimed",
@@ -1354,9 +1383,10 @@
       "functionalHypotheses": [
         {
           "targetWord": "war",
-          "semanticBridge": "Latin belligero independently denotes waging or carrying on war and can serve as a second-language functional witness for the WAR concept. The target bridge remains a hypothesis and does not assert historical origin, transmission, ownership, or winner status",
-          "functionalBridgeTruth": "hypothesis",
-          "claimBoundary": "functional_hypothesis_only"
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
         }
       ],
       "historicalOriginClaim": "not_claimed",
@@ -1395,9 +1425,10 @@
       "functionalHypotheses": [
         {
           "targetWord": "ear",
-          "semanticBridge": "the independently attested Albanian noun vesh denotes the ear and can be tested as a direct cross-language functional witness for the EAR concept; this remains research-only and does not assert historical origin, transmission, winner status, or candidate truth",
-          "functionalBridgeTruth": "hypothesis",
-          "claimBoundary": "functional_hypothesis_only"
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
         }
       ],
       "historicalOriginClaim": "not_claimed",
@@ -1436,9 +1467,10 @@
       "functionalHypotheses": [
         {
           "targetWord": "nose",
-          "semanticBridge": "the independently attested Albanian noun hundë denotes the nose and can be tested as a direct cross-language functional witness for the NOSE concept; this remains research-only and does not assert historical origin, transmission, winner status, or candidate truth",
-          "functionalBridgeTruth": "hypothesis",
-          "claimBoundary": "functional_hypothesis_only"
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
         }
       ],
       "historicalOriginClaim": "not_claimed",
@@ -1477,9 +1509,10 @@
       "functionalHypotheses": [
         {
           "targetWord": "foot",
-          "semanticBridge": "the independently attested Albanian noun këmbë includes the foot and lower limb and can be tested as a direct cross-language functional witness for the FOOT concept; this remains research-only and does not assert historical origin, transmission, winner status, or candidate truth",
-          "functionalBridgeTruth": "hypothesis",
-          "claimBoundary": "functional_hypothesis_only"
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
         }
       ],
       "historicalOriginClaim": "not_claimed",
@@ -1518,9 +1551,10 @@
       "functionalHypotheses": [
         {
           "targetWord": "peace",
-          "semanticBridge": "the independently attested Albanian noun paqe denotes peace and can be tested as a direct cross-language functional witness for the PEACE concept; this remains research-only and does not assert historical origin, transmission, winner status, or candidate truth",
-          "functionalBridgeTruth": "hypothesis",
-          "claimBoundary": "functional_hypothesis_only"
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
         }
       ],
       "historicalOriginClaim": "not_claimed",
@@ -1559,9 +1593,10 @@
       "functionalHypotheses": [
         {
           "targetWord": "king",
-          "semanticBridge": "the independently attested Albanian noun mbret denotes a king and can be tested as a direct cross-language functional witness for the KING concept; this remains research-only and does not assert historical origin, transmission, winner status, or candidate truth",
-          "functionalBridgeTruth": "hypothesis",
-          "claimBoundary": "functional_hypothesis_only"
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
         }
       ],
       "historicalOriginClaim": "not_claimed",
@@ -1602,9 +1637,10 @@
         {
           "targetWord": "build",
           "targetSenseId": "physical_construction",
-          "semanticBridge": "the independently attested Albanian verb ndërtoj directly denotes physical construction or assembly and can be tested as a bounded functional witness for the BUILD concept; this remains research-only and makes no historical-origin, winner, or candidate-truth claim",
-          "functionalBridgeTruth": "hypothesis",
-          "claimBoundary": "functional_hypothesis_only"
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
         }
       ],
       "historicalOriginClaim": "not_claimed",
@@ -1645,9 +1681,10 @@
         {
           "targetWord": "build",
           "targetSenseId": "physical_construction",
-          "semanticBridge": "the independently attested Ancient Greek verb οἰκοδομέω denotes building or constructing a house and can be tested as a bounded functional witness for physical BUILD; this remains research-only and makes no historical-origin, winner, or candidate-truth claim",
-          "functionalBridgeTruth": "hypothesis",
-          "claimBoundary": "functional_hypothesis_only"
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
         }
       ],
       "historicalOriginClaim": "not_claimed",
@@ -1688,9 +1725,10 @@
         {
           "targetWord": "carry",
           "targetSenseId": "physical_bearing_transport",
-          "semanticBridge": "the independently attested Albanian verb mbaj directly covers physically holding, bearing, and transporting an object and can be tested as a bounded functional witness for CARRY; this remains research-only and makes no historical-origin, winner, or candidate-truth claim",
-          "functionalBridgeTruth": "hypothesis",
-          "claimBoundary": "functional_hypothesis_only"
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
         }
       ],
       "historicalOriginClaim": "not_claimed",
@@ -1731,9 +1769,10 @@
         {
           "targetWord": "carry",
           "targetSenseId": "physical_bearing_transport",
-          "semanticBridge": "the independently attested Ancient Greek verb φέρω denotes bearing or carrying a load and can be tested as a bounded functional witness for physical CARRY; this remains research-only and makes no historical-origin, winner, or candidate-truth claim",
-          "functionalBridgeTruth": "hypothesis",
-          "claimBoundary": "functional_hypothesis_only"
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
         }
       ],
       "historicalOriginClaim": "not_claimed",
@@ -1774,9 +1813,10 @@
         {
           "targetWord": "man",
           "targetSenseId": "adult_male_human",
-          "semanticBridge": "the independently attested Albanian noun burrë denotes an adult male human and can be tested as a bounded functional witness for the adult-male MAN sense; this does not claim mankind, humanity, personhood, or historical origin",
-          "functionalBridgeTruth": "hypothesis",
-          "claimBoundary": "functional_hypothesis_only"
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
         }
       ],
       "historicalOriginClaim": "not_claimed",
@@ -1817,9 +1857,10 @@
         {
           "targetWord": "man",
           "targetSenseId": "adult_male_human",
-          "semanticBridge": "the independently attested Latin noun vĭr denotes a male person or adult male and can be tested as a bounded functional witness for the adult-male MAN sense; this does not claim mankind, humanity, personhood, or historical origin",
-          "functionalBridgeTruth": "hypothesis",
-          "claimBoundary": "functional_hypothesis_only"
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
         }
       ],
       "historicalOriginClaim": "not_claimed",
@@ -1860,9 +1901,10 @@
         {
           "targetWord": "freedom",
           "targetSenseId": "liberty_absence_of_restraint",
-          "semanticBridge": "the independently attested Albanian noun liri denotes liberty and freedom from oppression or restraint and can be tested as a bounded functional witness for FREEDOM; this remains research-only and makes no historical-origin, winner, or candidate-truth claim",
-          "functionalBridgeTruth": "hypothesis",
-          "claimBoundary": "functional_hypothesis_only"
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
         }
       ],
       "historicalOriginClaim": "not_claimed",
@@ -1903,9 +1945,10 @@
         {
           "targetWord": "freedom",
           "targetSenseId": "liberty_absence_of_restraint",
-          "semanticBridge": "the independently attested Latin noun lībertas denotes freedom or liberty, including freedom from restraint or obligation, and can be tested as a bounded functional witness for FREEDOM; this remains research-only and makes no historical-origin, winner, or candidate-truth claim",
-          "functionalBridgeTruth": "hypothesis",
-          "claimBoundary": "functional_hypothesis_only"
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
         }
       ],
       "historicalOriginClaim": "not_claimed",
@@ -1946,9 +1989,10 @@
         {
           "targetWord": "order",
           "targetSenseId": "arrangement_structured_sequence",
-          "semanticBridge": "The attested lexical senses describe ordered arrangement or sequence; treating that relation as a ZË-RO functional bridge remains a research hypothesis only.",
-          "functionalBridgeTruth": "hypothesis",
-          "claimBoundary": "functional_hypothesis_only"
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
         }
       ],
       "historicalOriginClaim": "not_claimed",
@@ -1989,9 +2033,10 @@
         {
           "targetWord": "order",
           "targetSenseId": "arrangement_structured_sequence",
-          "semanticBridge": "The attested lexical senses describe ordered arrangement or sequence; treating that relation as a ZË-RO functional bridge remains a research hypothesis only.",
-          "functionalBridgeTruth": "hypothesis",
-          "claimBoundary": "functional_hypothesis_only"
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
         }
       ],
       "historicalOriginClaim": "not_claimed",
@@ -2032,9 +2077,10 @@
         {
           "targetWord": "change",
           "targetSenseId": "become_different_alteration",
-          "semanticBridge": "The attested lexical senses describe changing or altering a state or condition; treating that relation as a ZË-RO functional bridge remains a research hypothesis only.",
-          "functionalBridgeTruth": "hypothesis",
-          "claimBoundary": "functional_hypothesis_only"
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
         }
       ],
       "historicalOriginClaim": "not_claimed",
@@ -2075,9 +2121,10 @@
         {
           "targetWord": "change",
           "targetSenseId": "become_different_alteration",
-          "semanticBridge": "The attested lexical senses describe changing or altering a state or condition; treating that relation as a ZË-RO functional bridge remains a research hypothesis only.",
-          "functionalBridgeTruth": "hypothesis",
-          "claimBoundary": "functional_hypothesis_only"
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
         }
       ],
       "historicalOriginClaim": "not_claimed",
@@ -2118,9 +2165,10 @@
         {
           "targetWord": "water",
           "targetSenseId": "physical_water_liquid",
-          "semanticBridge": "The two source entries independently attest their language's lexical form for the physical water/liquid sense; treating those bounded source facts as a shared functional referent remains a research hypothesis only.",
-          "functionalBridgeTruth": "hypothesis",
-          "claimBoundary": "functional_hypothesis_only"
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
         }
       ],
       "historicalOriginClaim": "not_claimed",
@@ -2161,9 +2209,10 @@
         {
           "targetWord": "water",
           "targetSenseId": "physical_water_liquid",
-          "semanticBridge": "The two source entries independently attest their language's lexical form for the physical water/liquid sense; treating those bounded source facts as a shared functional referent remains a research hypothesis only.",
-          "functionalBridgeTruth": "hypothesis",
-          "claimBoundary": "functional_hypothesis_only"
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
         }
       ],
       "historicalOriginClaim": "not_claimed",
@@ -2204,9 +2253,10 @@
         {
           "targetWord": "tree",
           "targetSenseId": "physical_tree_plant",
-          "semanticBridge": "The Albanian and Latin entries independently attest lexical forms for a physical tree; treating them as a shared functional referent remains a research hypothesis only.",
-          "functionalBridgeTruth": "hypothesis",
-          "claimBoundary": "functional_hypothesis_only"
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
         }
       ],
       "historicalOriginClaim": "not_claimed",
@@ -2247,9 +2297,10 @@
         {
           "targetWord": "tree",
           "targetSenseId": "physical_tree_plant",
-          "semanticBridge": "The Albanian and Latin entries independently attest lexical forms for a physical tree; treating them as a shared functional referent remains a research hypothesis only.",
-          "functionalBridgeTruth": "hypothesis",
-          "claimBoundary": "functional_hypothesis_only"
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
         }
       ],
       "historicalOriginClaim": "not_claimed",
@@ -2290,9 +2341,10 @@
         {
           "targetWord": "snow",
           "targetSenseId": "physical_snow_precipitation",
-          "semanticBridge": "The Albanian and Latin entries independently attest lexical forms for physical snow precipitation; treating them as a shared functional referent remains a research hypothesis only.",
-          "functionalBridgeTruth": "hypothesis",
-          "claimBoundary": "functional_hypothesis_only"
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
         }
       ],
       "historicalOriginClaim": "not_claimed",
@@ -2333,9 +2385,10 @@
         {
           "targetWord": "snow",
           "targetSenseId": "physical_snow_precipitation",
-          "semanticBridge": "The Albanian and Latin entries independently attest lexical forms for physical snow precipitation; treating them as a shared functional referent remains a research hypothesis only.",
-          "functionalBridgeTruth": "hypothesis",
-          "claimBoundary": "functional_hypothesis_only"
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
         }
       ],
       "historicalOriginClaim": "not_claimed",
@@ -2376,9 +2429,10 @@
         {
           "targetWord": "cloud",
           "targetSenseId": "physical_cloud_atmospheric",
-          "semanticBridge": "The Albanian and Latin entries independently attest lexical forms for an atmospheric cloud; treating them as a shared functional referent remains a research hypothesis only.",
-          "functionalBridgeTruth": "hypothesis",
-          "claimBoundary": "functional_hypothesis_only"
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
         }
       ],
       "historicalOriginClaim": "not_claimed",
@@ -2419,9 +2473,10 @@
         {
           "targetWord": "cloud",
           "targetSenseId": "physical_cloud_atmospheric",
-          "semanticBridge": "The Albanian and Latin entries independently attest lexical forms for an atmospheric cloud; treating them as a shared functional referent remains a research hypothesis only.",
-          "functionalBridgeTruth": "hypothesis",
-          "claimBoundary": "functional_hypothesis_only"
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
         }
       ],
       "historicalOriginClaim": "not_claimed",
@@ -2462,9 +2517,10 @@
         {
           "targetWord": "skin",
           "targetSenseId": "physical_human_animal_skin",
-          "semanticBridge": "The Albanian and Latin entries independently attest lexical forms for physical human or animal skin; treating them as a shared functional referent remains a research hypothesis only.",
-          "functionalBridgeTruth": "hypothesis",
-          "claimBoundary": "functional_hypothesis_only"
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
         }
       ],
       "historicalOriginClaim": "not_claimed",
@@ -2505,9 +2561,10 @@
         {
           "targetWord": "skin",
           "targetSenseId": "physical_human_animal_skin",
-          "semanticBridge": "The Albanian and Latin entries independently attest lexical forms for physical human or animal skin; treating them as a shared functional referent remains a research hypothesis only.",
-          "functionalBridgeTruth": "hypothesis",
-          "claimBoundary": "functional_hypothesis_only"
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
         }
       ],
       "historicalOriginClaim": "not_claimed",
@@ -2548,9 +2605,10 @@
         {
           "targetWord": "friend",
           "targetSenseId": "close_friend_person",
-          "semanticBridge": "The Albanian and Latin entries independently attest lexical forms for a close friend or familiar person; treating them as a shared functional referent remains a research hypothesis only.",
-          "functionalBridgeTruth": "hypothesis",
-          "claimBoundary": "functional_hypothesis_only"
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
         }
       ],
       "historicalOriginClaim": "not_claimed",
@@ -2591,9 +2649,10 @@
         {
           "targetWord": "friend",
           "targetSenseId": "close_friend_person",
-          "semanticBridge": "The Albanian and Latin entries independently attest lexical forms for a close friend or familiar person; treating them as a shared functional referent remains a research hypothesis only.",
-          "functionalBridgeTruth": "hypothesis",
-          "claimBoundary": "functional_hypothesis_only"
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
         }
       ],
       "historicalOriginClaim": "not_claimed",
@@ -2634,9 +2693,10 @@
         {
           "targetWord": "sea",
           "targetSenseId": "physical_sea_saltwater_body",
-          "semanticBridge": "The source entries attest lexical forms for a bounded sea or saltwater-body sense; treating that shared physical referent as a ZË-RO functional bridge remains a research hypothesis only.",
-          "functionalBridgeTruth": "hypothesis",
-          "claimBoundary": "functional_hypothesis_only"
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
         }
       ],
       "historicalOriginClaim": "not_claimed",
@@ -2677,9 +2737,10 @@
         {
           "targetWord": "sea",
           "targetSenseId": "physical_sea_saltwater_body",
-          "semanticBridge": "The source entries attest lexical forms for a bounded sea or saltwater-body sense; treating that shared physical referent as a ZË-RO functional bridge remains a research hypothesis only.",
-          "functionalBridgeTruth": "hypothesis",
-          "claimBoundary": "functional_hypothesis_only"
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
         }
       ],
       "historicalOriginClaim": "not_claimed",
@@ -2720,9 +2781,10 @@
         {
           "targetWord": "sleep",
           "targetSenseId": "physical_sleep_state",
-          "semanticBridge": "The source entries attest lexical forms for the bounded bodily sleep-state sense; treating that shared functional referent as a ZË-RO bridge remains a research hypothesis only.",
-          "functionalBridgeTruth": "hypothesis",
-          "claimBoundary": "functional_hypothesis_only"
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
         }
       ],
       "historicalOriginClaim": "not_claimed",
@@ -2763,9 +2825,10 @@
         {
           "targetWord": "sleep",
           "targetSenseId": "physical_sleep_state",
-          "semanticBridge": "The source entries attest lexical forms for the bounded bodily sleep-state sense; treating that shared functional referent as a ZË-RO bridge remains a research hypothesis only.",
-          "functionalBridgeTruth": "hypothesis",
-          "claimBoundary": "functional_hypothesis_only"
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
         }
       ],
       "historicalOriginClaim": "not_claimed",
@@ -2806,9 +2869,10 @@
         {
           "targetWord": "bread",
           "targetSenseId": "physical_baked_bread_food",
-          "semanticBridge": "The source entries attest lexical forms for the bounded baked bread-food sense; treating that shared functional referent as a ZË-RO bridge remains a research hypothesis only.",
-          "functionalBridgeTruth": "hypothesis",
-          "claimBoundary": "functional_hypothesis_only"
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
         }
       ],
       "historicalOriginClaim": "not_claimed",
@@ -2849,9 +2913,10 @@
         {
           "targetWord": "bread",
           "targetSenseId": "physical_baked_bread_food",
-          "semanticBridge": "The source entries attest lexical forms for the bounded baked bread-food sense; treating that shared functional referent as a ZË-RO bridge remains a research hypothesis only.",
-          "functionalBridgeTruth": "hypothesis",
-          "claimBoundary": "functional_hypothesis_only"
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
         }
       ],
       "historicalOriginClaim": "not_claimed",
@@ -2892,9 +2957,10 @@
         {
           "targetWord": "hope",
           "targetSenseId": "mental_desired_outcome_expectation",
-          "semanticBridge": "The source entries attest lexical forms for the bounded expectation of a desired outcome sense; treating that shared functional referent as a ZË-RO bridge remains a research hypothesis only.",
-          "functionalBridgeTruth": "hypothesis",
-          "claimBoundary": "functional_hypothesis_only"
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
         }
       ],
       "historicalOriginClaim": "not_claimed",
@@ -2935,9 +3001,10 @@
         {
           "targetWord": "hope",
           "targetSenseId": "mental_desired_outcome_expectation",
-          "semanticBridge": "The source entries attest lexical forms for the bounded expectation of a desired outcome sense; treating that shared functional referent as a ZË-RO bridge remains a research hypothesis only.",
-          "functionalBridgeTruth": "hypothesis",
-          "claimBoundary": "functional_hypothesis_only"
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
         }
       ],
       "historicalOriginClaim": "not_claimed",
@@ -2978,9 +3045,10 @@
         {
           "targetWord": "star",
           "targetSenseId": "astronomical_star",
-          "semanticBridge": "The source entries attest lexical forms for the bounded astronomical-star sense; treating that shared functional referent as a ZË-RO bridge remains a research hypothesis only.",
-          "functionalBridgeTruth": "hypothesis",
-          "claimBoundary": "functional_hypothesis_only"
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
         }
       ],
       "historicalOriginClaim": "not_claimed",
@@ -3021,9 +3089,10 @@
         {
           "targetWord": "star",
           "targetSenseId": "astronomical_star",
-          "semanticBridge": "The source entries attest lexical forms for the bounded astronomical-star sense; treating that shared functional referent as a ZË-RO bridge remains a research hypothesis only.",
-          "functionalBridgeTruth": "hypothesis",
-          "claimBoundary": "functional_hypothesis_only"
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
         }
       ],
       "historicalOriginClaim": "not_claimed",
@@ -3064,9 +3133,10 @@
         {
           "targetWord": "art",
           "targetSenseId": "creative_artistic_activity",
-          "semanticBridge": "The source entries attest lexical forms for the bounded creative-artistic activity sense; treating that shared functional referent as a ZË-RO bridge remains a research hypothesis only.",
-          "functionalBridgeTruth": "hypothesis",
-          "claimBoundary": "functional_hypothesis_only"
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
         }
       ],
       "historicalOriginClaim": "not_claimed",
@@ -3107,9 +3177,10 @@
         {
           "targetWord": "art",
           "targetSenseId": "creative_artistic_activity",
-          "semanticBridge": "The source entries attest lexical forms for the bounded creative-artistic activity sense; treating that shared functional referent as a ZË-RO bridge remains a research hypothesis only.",
-          "functionalBridgeTruth": "hypothesis",
-          "claimBoundary": "functional_hypothesis_only"
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
         }
       ],
       "historicalOriginClaim": "not_claimed",
@@ -3150,9 +3221,10 @@
         {
           "targetWord": "vision",
           "targetSenseId": "visual_appearance_or_vision",
-          "semanticBridge": "The source entries attest lexical forms for the bounded visual appearance or vision sense; treating that shared functional referent as a ZË-RO bridge remains a research hypothesis only.",
-          "functionalBridgeTruth": "hypothesis",
-          "claimBoundary": "functional_hypothesis_only"
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
         }
       ],
       "historicalOriginClaim": "not_claimed",
@@ -3193,9 +3265,10 @@
         {
           "targetWord": "vision",
           "targetSenseId": "visual_appearance_or_vision",
-          "semanticBridge": "The source entries attest lexical forms for the bounded visual appearance or vision sense; treating that shared functional referent as a ZË-RO bridge remains a research hypothesis only.",
-          "functionalBridgeTruth": "hypothesis",
-          "claimBoundary": "functional_hypothesis_only"
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
         }
       ],
       "historicalOriginClaim": "not_claimed",
@@ -3236,9 +3309,10 @@
         {
           "targetWord": "blue",
           "targetSenseId": "blue_color",
-          "semanticBridge": "The source entries attest lexical forms for the bounded blue-color sense; treating that shared functional referent as a ZË-RO bridge remains a research hypothesis only.",
-          "functionalBridgeTruth": "hypothesis",
-          "claimBoundary": "functional_hypothesis_only"
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
         }
       ],
       "historicalOriginClaim": "not_claimed",
@@ -3279,9 +3353,10 @@
         {
           "targetWord": "blue",
           "targetSenseId": "blue_color",
-          "semanticBridge": "The source entries attest lexical forms for the bounded blue-color sense; treating that shared functional referent as a ZË-RO bridge remains a research hypothesis only.",
-          "functionalBridgeTruth": "hypothesis",
-          "claimBoundary": "functional_hypothesis_only"
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
         }
       ],
       "historicalOriginClaim": "not_claimed",
@@ -3324,7 +3399,8 @@
           "semanticBridge": "The reviewed entries attest physical breaking or separation of a material object; treating that shared physical operation as a functional bridge is a research hypothesis only.",
           "functionalBridgeTruth": "hypothesis",
           "targetSenseId": "physical_break_damage",
-          "claimBoundary": "functional_hypothesis_only"
+          "claimBoundary": "functional_hypothesis_only",
+          "evidenceBasis": "functional_correspondence"
         }
       ],
       "historicalOriginClaim": "not_claimed",
@@ -3367,7 +3443,8 @@
           "semanticBridge": "The reviewed entries attest physical breaking or separation of a material object; treating that shared physical operation as a functional bridge is a research hypothesis only.",
           "functionalBridgeTruth": "hypothesis",
           "targetSenseId": "physical_break_damage",
-          "claimBoundary": "functional_hypothesis_only"
+          "claimBoundary": "functional_hypothesis_only",
+          "evidenceBasis": "functional_correspondence"
         }
       ],
       "historicalOriginClaim": "not_claimed",
@@ -3380,45 +3457,574 @@
     {
       "registryVersion": "open-instrument.multi-source-functional-research-evidence-registry.v0_1",
       "researchEvidenceId": "research.external.open-instrument-research-evidence-packet-v0-1.five-case.mister",
-      "embryo": "YST", "evidenceFamily": "lexical_dictionary", "language": "Albanian", "form": "MISTER", "gloss": "something unknown, secret, barely understood, or unexplained", "embryoRelation": "no_structural_relation", "relationOperationIds": [], "attestationTruth": "fact", "sourceStatus": "research_candidate",
-      "citations": [{ "citationId": "five-case.mister.fjale.citation.v1", "sourceTitle": "FJALË — Fjalor Shqip", "sourceAuthorOrEditor": null, "sourcePublisherOrHost": "FJALË — Fjalor Shqip", "sourceDateOrVersion": "accessed 2026-09-20", "sourceUrlOrArchiveRef": "https://fjale.al/mister", "entryLocator": "MISTER; sense 1", "sourceHashOrArchiveHash": null, "attestedForm": "MISTER", "attestedGloss": "something unknown, secret, barely understood, or unexplained", "provenanceGroupId": "fjale.fjalor-shqip.v0_1" }],
-      "functionalHypotheses": [{ "targetWord": "mystery", "targetSenseId": "user_sense_something_unknown_or_difficult_to_understand", "semanticBridge": "The source-attested meaning may functionally correspond to something unknown or difficult to understand; bounded hypothesis only.", "functionalBridgeTruth": "hypothesis", "claimBoundary": "functional_hypothesis_only" }], "historicalOriginClaim": "not_claimed", "historicalTransmissionClaim": "not_claimed", "winnerClaim": "not_claimed", "languageSuperiorityClaim": "not_claimed", "candidateTruthClaim": "not_claimed", "userDecisionPosture": "user_decides"
+      "embryo": "YST",
+      "evidenceFamily": "lexical_dictionary",
+      "language": "Albanian",
+      "form": "MISTER",
+      "gloss": "something unknown, secret, barely understood, or unexplained",
+      "embryoRelation": "no_structural_relation",
+      "relationOperationIds": [],
+      "attestationTruth": "fact",
+      "sourceStatus": "research_candidate",
+      "citations": [
+        {
+          "citationId": "five-case.mister.fjale.citation.v1",
+          "sourceTitle": "FJALË — Fjalor Shqip",
+          "sourceAuthorOrEditor": null,
+          "sourcePublisherOrHost": "FJALË — Fjalor Shqip",
+          "sourceDateOrVersion": "accessed 2026-09-20",
+          "sourceUrlOrArchiveRef": "https://fjale.al/mister",
+          "entryLocator": "MISTER; sense 1",
+          "sourceHashOrArchiveHash": null,
+          "attestedForm": "MISTER",
+          "attestedGloss": "something unknown, secret, barely understood, or unexplained",
+          "provenanceGroupId": "fjale.fjalor-shqip.v0_1"
+        }
+      ],
+      "functionalHypotheses": [
+        {
+          "targetWord": "mystery",
+          "targetSenseId": "user_sense_something_unknown_or_difficult_to_understand",
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
+        }
+      ],
+      "historicalOriginClaim": "not_claimed",
+      "historicalTransmissionClaim": "not_claimed",
+      "winnerClaim": "not_claimed",
+      "languageSuperiorityClaim": "not_claimed",
+      "candidateTruthClaim": "not_claimed",
+      "userDecisionPosture": "user_decides"
     },
     {
-      "registryVersion": "open-instrument.multi-source-functional-research-evidence-registry.v0_1", "researchEvidenceId": "research.external.open-instrument-research-evidence-packet-v0-1.five-case.mysterium", "embryo": "YST", "evidenceFamily": "historical_dictionary", "language": "Latin", "form": "mystērĭum", "gloss": "secret/mystery; something transcending ordinary human intelligence", "embryoRelation": "no_structural_relation", "relationOperationIds": [], "attestationTruth": "fact", "sourceStatus": "research_candidate", "citations": [{ "citationId": "five-case.mysterium.lewis-short.citation.v1", "sourceTitle": "Lewis & Short Latin Dictionary", "sourceAuthorOrEditor": "Charlton T. Lewis and Charles Short", "sourcePublisherOrHost": "Scaife ATLAS / Perseus Digital Library", "sourceDateOrVersion": "Lewis & Short source file release date 1997-10-28; upstream commit 56061ca127f4a2844980baffc5f2b6d1332897b3", "sourceUrlOrArchiveRef": "https://atlas.perseus.tufts.edu/dictionaries/entry/urn%3Acite2%3Ascaife-viewer%3Adictionary-entries.atlas_v1%3Alat.ls.perseus-eng2-n30303/", "entryLocator": "TEI.2 entryFree id=\"n30303\" key=\"mysterium\"; senses n30303.2 and n30303.4", "sourceHashOrArchiveHash": "c3474349ef9073bb436229cdf886eb77ed88d2fd", "attestedForm": "mystērĭum", "attestedGloss": "secret/mystery; something transcending ordinary human intelligence", "provenanceGroupId": "scaife.lewis-short.v0_1" }], "functionalHypotheses": [{ "targetWord": "mystery", "targetSenseId": "user_sense_something_unknown_or_difficult_to_understand", "semanticBridge": "The source-attested meaning may functionally correspond to something unknown or difficult to understand; bounded hypothesis only.", "functionalBridgeTruth": "hypothesis", "claimBoundary": "functional_hypothesis_only" }], "historicalOriginClaim": "not_claimed", "historicalTransmissionClaim": "not_claimed", "winnerClaim": "not_claimed", "languageSuperiorityClaim": "not_claimed", "candidateTruthClaim": "not_claimed", "userDecisionPosture": "user_decides"
+      "registryVersion": "open-instrument.multi-source-functional-research-evidence-registry.v0_1",
+      "researchEvidenceId": "research.external.open-instrument-research-evidence-packet-v0-1.five-case.mysterium",
+      "embryo": "YST",
+      "evidenceFamily": "historical_dictionary",
+      "language": "Latin",
+      "form": "mystērĭum",
+      "gloss": "secret/mystery; something transcending ordinary human intelligence",
+      "embryoRelation": "no_structural_relation",
+      "relationOperationIds": [],
+      "attestationTruth": "fact",
+      "sourceStatus": "research_candidate",
+      "citations": [
+        {
+          "citationId": "five-case.mysterium.lewis-short.citation.v1",
+          "sourceTitle": "Lewis & Short Latin Dictionary",
+          "sourceAuthorOrEditor": "Charlton T. Lewis and Charles Short",
+          "sourcePublisherOrHost": "Scaife ATLAS / Perseus Digital Library",
+          "sourceDateOrVersion": "Lewis & Short source file release date 1997-10-28; upstream commit 56061ca127f4a2844980baffc5f2b6d1332897b3",
+          "sourceUrlOrArchiveRef": "https://atlas.perseus.tufts.edu/dictionaries/entry/urn%3Acite2%3Ascaife-viewer%3Adictionary-entries.atlas_v1%3Alat.ls.perseus-eng2-n30303/",
+          "entryLocator": "TEI.2 entryFree id=\"n30303\" key=\"mysterium\"; senses n30303.2 and n30303.4",
+          "sourceHashOrArchiveHash": "c3474349ef9073bb436229cdf886eb77ed88d2fd",
+          "attestedForm": "mystērĭum",
+          "attestedGloss": "secret/mystery; something transcending ordinary human intelligence",
+          "provenanceGroupId": "scaife.lewis-short.v0_1"
+        }
+      ],
+      "functionalHypotheses": [
+        {
+          "targetWord": "mystery",
+          "targetSenseId": "user_sense_something_unknown_or_difficult_to_understand",
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
+        }
+      ],
+      "historicalOriginClaim": "not_claimed",
+      "historicalTransmissionClaim": "not_claimed",
+      "winnerClaim": "not_claimed",
+      "languageSuperiorityClaim": "not_claimed",
+      "candidateTruthClaim": "not_claimed",
+      "userDecisionPosture": "user_decides"
     },
     {
-      "registryVersion": "open-instrument.multi-source-functional-research-evidence-registry.v0_1", "researchEvidenceId": "research.external.open-instrument-research-evidence-packet-v0-1.five-case.musterion", "embryo": "YST", "evidenceFamily": "historical_dictionary", "language": "Ancient Greek", "form": "μυστήριον", "gloss": "mystery or secret doctrine; something above human intelligence", "embryoRelation": "no_structural_relation", "relationOperationIds": [], "attestationTruth": "fact", "sourceStatus": "research_candidate", "citations": [{ "citationId": "five-case.musterion.middle-liddell.citation.v1", "sourceTitle": "Middle Liddell", "sourceAuthorOrEditor": "Henry George Liddell and Robert Scott", "sourcePublisherOrHost": "Scaife ATLAS / Perseus Digital Library", "sourceDateOrVersion": "accessed 2026-09-20", "sourceUrlOrArchiveRef": "https://atlas.perseus.tufts.edu/dictionaries/entry/urn%3Acite2%3Ascaife-viewer%3Adictionary-entries.atlas_v1%3Amiddle-liddell.perseus-eng2-n21784/", "entryLocator": "Middle Liddell entry n21784; headword μυστήριον", "sourceHashOrArchiveHash": null, "attestedForm": "μυστήριον", "attestedGloss": "mystery or secret doctrine; something above human intelligence", "provenanceGroupId": "scaife.middle-liddell.v0_1" }], "functionalHypotheses": [{ "targetWord": "mystery", "targetSenseId": "user_sense_something_unknown_or_difficult_to_understand", "semanticBridge": "The source-attested meaning may functionally correspond to something unknown or difficult to understand; bounded hypothesis only.", "functionalBridgeTruth": "hypothesis", "claimBoundary": "functional_hypothesis_only" }], "historicalOriginClaim": "not_claimed", "historicalTransmissionClaim": "not_claimed", "winnerClaim": "not_claimed", "languageSuperiorityClaim": "not_claimed", "candidateTruthClaim": "not_claimed", "userDecisionPosture": "user_decides"
+      "registryVersion": "open-instrument.multi-source-functional-research-evidence-registry.v0_1",
+      "researchEvidenceId": "research.external.open-instrument-research-evidence-packet-v0-1.five-case.musterion",
+      "embryo": "YST",
+      "evidenceFamily": "historical_dictionary",
+      "language": "Ancient Greek",
+      "form": "μυστήριον",
+      "gloss": "mystery or secret doctrine; something above human intelligence",
+      "embryoRelation": "no_structural_relation",
+      "relationOperationIds": [],
+      "attestationTruth": "fact",
+      "sourceStatus": "research_candidate",
+      "citations": [
+        {
+          "citationId": "five-case.musterion.middle-liddell.citation.v1",
+          "sourceTitle": "Middle Liddell",
+          "sourceAuthorOrEditor": "Henry George Liddell and Robert Scott",
+          "sourcePublisherOrHost": "Scaife ATLAS / Perseus Digital Library",
+          "sourceDateOrVersion": "accessed 2026-09-20",
+          "sourceUrlOrArchiveRef": "https://atlas.perseus.tufts.edu/dictionaries/entry/urn%3Acite2%3Ascaife-viewer%3Adictionary-entries.atlas_v1%3Amiddle-liddell.perseus-eng2-n21784/",
+          "entryLocator": "Middle Liddell entry n21784; headword μυστήριον",
+          "sourceHashOrArchiveHash": null,
+          "attestedForm": "μυστήριον",
+          "attestedGloss": "mystery or secret doctrine; something above human intelligence",
+          "provenanceGroupId": "scaife.middle-liddell.v0_1"
+        }
+      ],
+      "functionalHypotheses": [
+        {
+          "targetWord": "mystery",
+          "targetSenseId": "user_sense_something_unknown_or_difficult_to_understand",
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
+        }
+      ],
+      "historicalOriginClaim": "not_claimed",
+      "historicalTransmissionClaim": "not_claimed",
+      "winnerClaim": "not_claimed",
+      "languageSuperiorityClaim": "not_claimed",
+      "candidateTruthClaim": "not_claimed",
+      "userDecisionPosture": "user_decides"
     },
     {
-      "registryVersion": "open-instrument.multi-source-functional-research-evidence-registry.v0_1", "researchEvidenceId": "research.external.open-instrument-research-evidence-packet-v0-1.five-case.qiri", "embryo": "AN", "evidenceFamily": "lexical_dictionary", "language": "Albanian", "form": "QIRI", "gloss": "wax/fat/stearin stick with a wick used to make light", "embryoRelation": "no_structural_relation", "relationOperationIds": [], "attestationTruth": "fact", "sourceStatus": "research_candidate", "citations": [{ "citationId": "five-case.qiri.fjale.citation.v1", "sourceTitle": "FJALË — Fjalor Shqip", "sourceAuthorOrEditor": null, "sourcePublisherOrHost": "FJALË — Fjalor Shqip", "sourceDateOrVersion": "accessed 2026-09-20", "sourceUrlOrArchiveRef": "https://fjale.al/qiri", "entryLocator": "QIRI; sense 1", "sourceHashOrArchiveHash": null, "attestedForm": "QIRI", "attestedGloss": "wax/fat/stearin stick with a wick used to make light", "provenanceGroupId": "fjale.fjalor-shqip.v0_1" }], "functionalHypotheses": [{ "targetWord": "candle", "targetSenseId": "user_sense_a_wax_light_source", "semanticBridge": "The source-attested meaning may functionally correspond to a wax light source; bounded hypothesis only.", "functionalBridgeTruth": "hypothesis", "claimBoundary": "functional_hypothesis_only" }], "historicalOriginClaim": "not_claimed", "historicalTransmissionClaim": "not_claimed", "winnerClaim": "not_claimed", "languageSuperiorityClaim": "not_claimed", "candidateTruthClaim": "not_claimed", "userDecisionPosture": "user_decides"
+      "registryVersion": "open-instrument.multi-source-functional-research-evidence-registry.v0_1",
+      "researchEvidenceId": "research.external.open-instrument-research-evidence-packet-v0-1.five-case.qiri",
+      "embryo": "AN",
+      "evidenceFamily": "lexical_dictionary",
+      "language": "Albanian",
+      "form": "QIRI",
+      "gloss": "wax/fat/stearin stick with a wick used to make light",
+      "embryoRelation": "no_structural_relation",
+      "relationOperationIds": [],
+      "attestationTruth": "fact",
+      "sourceStatus": "research_candidate",
+      "citations": [
+        {
+          "citationId": "five-case.qiri.fjale.citation.v1",
+          "sourceTitle": "FJALË — Fjalor Shqip",
+          "sourceAuthorOrEditor": null,
+          "sourcePublisherOrHost": "FJALË — Fjalor Shqip",
+          "sourceDateOrVersion": "accessed 2026-09-20",
+          "sourceUrlOrArchiveRef": "https://fjale.al/qiri",
+          "entryLocator": "QIRI; sense 1",
+          "sourceHashOrArchiveHash": null,
+          "attestedForm": "QIRI",
+          "attestedGloss": "wax/fat/stearin stick with a wick used to make light",
+          "provenanceGroupId": "fjale.fjalor-shqip.v0_1"
+        }
+      ],
+      "functionalHypotheses": [
+        {
+          "targetWord": "candle",
+          "targetSenseId": "user_sense_a_wax_light_source",
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
+        }
+      ],
+      "historicalOriginClaim": "not_claimed",
+      "historicalTransmissionClaim": "not_claimed",
+      "winnerClaim": "not_claimed",
+      "languageSuperiorityClaim": "not_claimed",
+      "candidateTruthClaim": "not_claimed",
+      "userDecisionPosture": "user_decides"
     },
     {
-      "registryVersion": "open-instrument.multi-source-functional-research-evidence-registry.v0_1", "researchEvidenceId": "research.external.open-instrument-research-evidence-packet-v0-1.five-case.candela", "embryo": "AN", "evidenceFamily": "historical_dictionary", "language": "Latin", "form": "candēla", "gloss": "wax or tallow light", "embryoRelation": "no_structural_relation", "relationOperationIds": [], "attestationTruth": "fact", "sourceStatus": "research_candidate", "citations": [{ "citationId": "five-case.candela.lewis-short.citation.v1", "sourceTitle": "Lewis & Short Latin Dictionary", "sourceAuthorOrEditor": "Charlton T. Lewis and Charles Short", "sourcePublisherOrHost": "Scaife ATLAS / Perseus Digital Library", "sourceDateOrVersion": "Lewis & Short source file release date 1997-10-28; upstream commit 56061ca127f4a2844980baffc5f2b6d1332897b3", "sourceUrlOrArchiveRef": "https://atlas.perseus.tufts.edu/dictionaries/entry/urn%3Acite2%3Ascaife-viewer%3Adictionary-entries.atlas_v1%3Alat.ls.perseus-eng2-n6461/", "entryLocator": "TEI.2 entryFree id=\"n6461\" key=\"candela\"", "sourceHashOrArchiveHash": "c3474349ef9073bb436229cdf886eb77ed88d2fd", "attestedForm": "candēla", "attestedGloss": "wax or tallow light", "provenanceGroupId": "scaife.lewis-short.v0_1" }], "functionalHypotheses": [{ "targetWord": "candle", "targetSenseId": "user_sense_a_wax_light_source", "semanticBridge": "The source-attested meaning may functionally correspond to a wax light source; bounded hypothesis only.", "functionalBridgeTruth": "hypothesis", "claimBoundary": "functional_hypothesis_only" }], "historicalOriginClaim": "not_claimed", "historicalTransmissionClaim": "not_claimed", "winnerClaim": "not_claimed", "languageSuperiorityClaim": "not_claimed", "candidateTruthClaim": "not_claimed", "userDecisionPosture": "user_decides"
+      "registryVersion": "open-instrument.multi-source-functional-research-evidence-registry.v0_1",
+      "researchEvidenceId": "research.external.open-instrument-research-evidence-packet-v0-1.five-case.candela",
+      "embryo": "AN",
+      "evidenceFamily": "historical_dictionary",
+      "language": "Latin",
+      "form": "candēla",
+      "gloss": "wax or tallow light",
+      "embryoRelation": "no_structural_relation",
+      "relationOperationIds": [],
+      "attestationTruth": "fact",
+      "sourceStatus": "research_candidate",
+      "citations": [
+        {
+          "citationId": "five-case.candela.lewis-short.citation.v1",
+          "sourceTitle": "Lewis & Short Latin Dictionary",
+          "sourceAuthorOrEditor": "Charlton T. Lewis and Charles Short",
+          "sourcePublisherOrHost": "Scaife ATLAS / Perseus Digital Library",
+          "sourceDateOrVersion": "Lewis & Short source file release date 1997-10-28; upstream commit 56061ca127f4a2844980baffc5f2b6d1332897b3",
+          "sourceUrlOrArchiveRef": "https://atlas.perseus.tufts.edu/dictionaries/entry/urn%3Acite2%3Ascaife-viewer%3Adictionary-entries.atlas_v1%3Alat.ls.perseus-eng2-n6461/",
+          "entryLocator": "TEI.2 entryFree id=\"n6461\" key=\"candela\"",
+          "sourceHashOrArchiveHash": "c3474349ef9073bb436229cdf886eb77ed88d2fd",
+          "attestedForm": "candēla",
+          "attestedGloss": "wax or tallow light",
+          "provenanceGroupId": "scaife.lewis-short.v0_1"
+        }
+      ],
+      "functionalHypotheses": [
+        {
+          "targetWord": "candle",
+          "targetSenseId": "user_sense_a_wax_light_source",
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
+        }
+      ],
+      "historicalOriginClaim": "not_claimed",
+      "historicalTransmissionClaim": "not_claimed",
+      "winnerClaim": "not_claimed",
+      "languageSuperiorityClaim": "not_claimed",
+      "candidateTruthClaim": "not_claimed",
+      "userDecisionPosture": "user_decides"
     },
     {
-      "registryVersion": "open-instrument.multi-source-functional-research-evidence-registry.v0_1", "researchEvidenceId": "research.external.open-instrument-research-evidence-packet-v0-1.five-case.gur", "embryo": "ONE", "evidenceFamily": "lexical_dictionary", "language": "Albanian", "form": "GUR", "gloss": "hard mineral material", "embryoRelation": "no_structural_relation", "relationOperationIds": [], "attestationTruth": "fact", "sourceStatus": "research_candidate", "citations": [{ "citationId": "five-case.gur.fjale.citation.v1", "sourceTitle": "FJALË — Fjalor Shqip", "sourceAuthorOrEditor": null, "sourcePublisherOrHost": "FJALË — Fjalor Shqip", "sourceDateOrVersion": "accessed 2026-09-20", "sourceUrlOrArchiveRef": "https://fjale.al/gur", "entryLocator": "GUR; sense 1", "sourceHashOrArchiveHash": null, "attestedForm": "GUR", "attestedGloss": "hard mineral material", "provenanceGroupId": "fjale.fjalor-shqip.v0_1" }], "functionalHypotheses": [{ "targetWord": "stone", "targetSenseId": "user_sense_hard_natural_mineral_rock_material", "semanticBridge": "The source-attested meaning may functionally correspond to hard natural mineral/rock material; bounded hypothesis only.", "functionalBridgeTruth": "hypothesis", "claimBoundary": "functional_hypothesis_only" }], "historicalOriginClaim": "not_claimed", "historicalTransmissionClaim": "not_claimed", "winnerClaim": "not_claimed", "languageSuperiorityClaim": "not_claimed", "candidateTruthClaim": "not_claimed", "userDecisionPosture": "user_decides"
+      "registryVersion": "open-instrument.multi-source-functional-research-evidence-registry.v0_1",
+      "researchEvidenceId": "research.external.open-instrument-research-evidence-packet-v0-1.five-case.gur",
+      "embryo": "ONE",
+      "evidenceFamily": "lexical_dictionary",
+      "language": "Albanian",
+      "form": "GUR",
+      "gloss": "hard mineral material",
+      "embryoRelation": "no_structural_relation",
+      "relationOperationIds": [],
+      "attestationTruth": "fact",
+      "sourceStatus": "research_candidate",
+      "citations": [
+        {
+          "citationId": "five-case.gur.fjale.citation.v1",
+          "sourceTitle": "FJALË — Fjalor Shqip",
+          "sourceAuthorOrEditor": null,
+          "sourcePublisherOrHost": "FJALË — Fjalor Shqip",
+          "sourceDateOrVersion": "accessed 2026-09-20",
+          "sourceUrlOrArchiveRef": "https://fjale.al/gur",
+          "entryLocator": "GUR; sense 1",
+          "sourceHashOrArchiveHash": null,
+          "attestedForm": "GUR",
+          "attestedGloss": "hard mineral material",
+          "provenanceGroupId": "fjale.fjalor-shqip.v0_1"
+        }
+      ],
+      "functionalHypotheses": [
+        {
+          "targetWord": "stone",
+          "targetSenseId": "user_sense_hard_natural_mineral_rock_material",
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
+        }
+      ],
+      "historicalOriginClaim": "not_claimed",
+      "historicalTransmissionClaim": "not_claimed",
+      "winnerClaim": "not_claimed",
+      "languageSuperiorityClaim": "not_claimed",
+      "candidateTruthClaim": "not_claimed",
+      "userDecisionPosture": "user_decides"
     },
     {
-      "registryVersion": "open-instrument.multi-source-functional-research-evidence-registry.v0_1", "researchEvidenceId": "research.external.open-instrument-research-evidence-packet-v0-1.five-case.lapis", "embryo": "ONE", "evidenceFamily": "historical_dictionary", "language": "Latin", "form": "lăpis", "gloss": "stone / stone material", "embryoRelation": "no_structural_relation", "relationOperationIds": [], "attestationTruth": "fact", "sourceStatus": "research_candidate", "citations": [{ "citationId": "five-case.lapis.lewis-short.citation.v1", "sourceTitle": "Lewis & Short Latin Dictionary", "sourceAuthorOrEditor": "Charlton T. Lewis and Charles Short", "sourcePublisherOrHost": "Scaife ATLAS / Perseus Digital Library", "sourceDateOrVersion": "Lewis & Short source file release date 1997-10-28; upstream commit 56061ca127f4a2844980baffc5f2b6d1332897b3", "sourceUrlOrArchiveRef": "https://atlas.perseus.tufts.edu/dictionaries/entry/urn%3Acite2%3Ascaife-viewer%3Adictionary-entries.atlas_v1%3Alat.ls.perseus-eng2-n25849/", "entryLocator": "TEI.2 entryFree id=\"n25849\" key=\"lapis\"", "sourceHashOrArchiveHash": "c3474349ef9073bb436229cdf886eb77ed88d2fd", "attestedForm": "lăpis", "attestedGloss": "stone / stone material", "provenanceGroupId": "scaife.lewis-short.v0_1" }], "functionalHypotheses": [{ "targetWord": "stone", "targetSenseId": "user_sense_hard_natural_mineral_rock_material", "semanticBridge": "The source-attested meaning may functionally correspond to hard natural mineral/rock material; bounded hypothesis only.", "functionalBridgeTruth": "hypothesis", "claimBoundary": "functional_hypothesis_only" }], "historicalOriginClaim": "not_claimed", "historicalTransmissionClaim": "not_claimed", "winnerClaim": "not_claimed", "languageSuperiorityClaim": "not_claimed", "candidateTruthClaim": "not_claimed", "userDecisionPosture": "user_decides"
+      "registryVersion": "open-instrument.multi-source-functional-research-evidence-registry.v0_1",
+      "researchEvidenceId": "research.external.open-instrument-research-evidence-packet-v0-1.five-case.lapis",
+      "embryo": "ONE",
+      "evidenceFamily": "historical_dictionary",
+      "language": "Latin",
+      "form": "lăpis",
+      "gloss": "stone / stone material",
+      "embryoRelation": "no_structural_relation",
+      "relationOperationIds": [],
+      "attestationTruth": "fact",
+      "sourceStatus": "research_candidate",
+      "citations": [
+        {
+          "citationId": "five-case.lapis.lewis-short.citation.v1",
+          "sourceTitle": "Lewis & Short Latin Dictionary",
+          "sourceAuthorOrEditor": "Charlton T. Lewis and Charles Short",
+          "sourcePublisherOrHost": "Scaife ATLAS / Perseus Digital Library",
+          "sourceDateOrVersion": "Lewis & Short source file release date 1997-10-28; upstream commit 56061ca127f4a2844980baffc5f2b6d1332897b3",
+          "sourceUrlOrArchiveRef": "https://atlas.perseus.tufts.edu/dictionaries/entry/urn%3Acite2%3Ascaife-viewer%3Adictionary-entries.atlas_v1%3Alat.ls.perseus-eng2-n25849/",
+          "entryLocator": "TEI.2 entryFree id=\"n25849\" key=\"lapis\"",
+          "sourceHashOrArchiveHash": "c3474349ef9073bb436229cdf886eb77ed88d2fd",
+          "attestedForm": "lăpis",
+          "attestedGloss": "stone / stone material",
+          "provenanceGroupId": "scaife.lewis-short.v0_1"
+        }
+      ],
+      "functionalHypotheses": [
+        {
+          "targetWord": "stone",
+          "targetSenseId": "user_sense_hard_natural_mineral_rock_material",
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
+        }
+      ],
+      "historicalOriginClaim": "not_claimed",
+      "historicalTransmissionClaim": "not_claimed",
+      "winnerClaim": "not_claimed",
+      "languageSuperiorityClaim": "not_claimed",
+      "candidateTruthClaim": "not_claimed",
+      "userDecisionPosture": "user_decides"
     },
     {
-      "registryVersion": "open-instrument.multi-source-functional-research-evidence-registry.v0_1", "researchEvidenceId": "research.external.open-instrument-research-evidence-packet-v0-1.five-case.pi", "embryo": "INK", "evidenceFamily": "lexical_dictionary", "language": "Albanian", "form": "PI", "gloss": "take liquid by mouth and swallow it", "embryoRelation": "no_structural_relation", "relationOperationIds": [], "attestationTruth": "fact", "sourceStatus": "research_candidate", "citations": [{ "citationId": "five-case.pi.fjale.citation.v1", "sourceTitle": "FJALË — Fjalor Shqip", "sourceAuthorOrEditor": null, "sourcePublisherOrHost": "FJALË — Fjalor Shqip", "sourceDateOrVersion": "accessed 2026-09-20", "sourceUrlOrArchiveRef": "https://fjale.al/pi", "entryLocator": "PI; sense 1", "sourceHashOrArchiveHash": null, "attestedForm": "PI", "attestedGloss": "take liquid by mouth and swallow it", "provenanceGroupId": "fjale.fjalor-shqip.v0_1" }], "functionalHypotheses": [{ "targetWord": "drink", "targetSenseId": "user_sense_to_take_liquid_into_the_mouth_and_swallow_it", "semanticBridge": "The source-attested meaning may functionally correspond to taking liquid into the mouth and swallowing it; bounded hypothesis only.", "functionalBridgeTruth": "hypothesis", "claimBoundary": "functional_hypothesis_only" }], "historicalOriginClaim": "not_claimed", "historicalTransmissionClaim": "not_claimed", "winnerClaim": "not_claimed", "languageSuperiorityClaim": "not_claimed", "candidateTruthClaim": "not_claimed", "userDecisionPosture": "user_decides"
+      "registryVersion": "open-instrument.multi-source-functional-research-evidence-registry.v0_1",
+      "researchEvidenceId": "research.external.open-instrument-research-evidence-packet-v0-1.five-case.pi",
+      "embryo": "INK",
+      "evidenceFamily": "lexical_dictionary",
+      "language": "Albanian",
+      "form": "PI",
+      "gloss": "take liquid by mouth and swallow it",
+      "embryoRelation": "no_structural_relation",
+      "relationOperationIds": [],
+      "attestationTruth": "fact",
+      "sourceStatus": "research_candidate",
+      "citations": [
+        {
+          "citationId": "five-case.pi.fjale.citation.v1",
+          "sourceTitle": "FJALË — Fjalor Shqip",
+          "sourceAuthorOrEditor": null,
+          "sourcePublisherOrHost": "FJALË — Fjalor Shqip",
+          "sourceDateOrVersion": "accessed 2026-09-20",
+          "sourceUrlOrArchiveRef": "https://fjale.al/pi",
+          "entryLocator": "PI; sense 1",
+          "sourceHashOrArchiveHash": null,
+          "attestedForm": "PI",
+          "attestedGloss": "take liquid by mouth and swallow it",
+          "provenanceGroupId": "fjale.fjalor-shqip.v0_1"
+        }
+      ],
+      "functionalHypotheses": [
+        {
+          "targetWord": "drink",
+          "targetSenseId": "user_sense_to_take_liquid_into_the_mouth_and_swallow_it",
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
+        }
+      ],
+      "historicalOriginClaim": "not_claimed",
+      "historicalTransmissionClaim": "not_claimed",
+      "winnerClaim": "not_claimed",
+      "languageSuperiorityClaim": "not_claimed",
+      "candidateTruthClaim": "not_claimed",
+      "userDecisionPosture": "user_decides"
     },
     {
-      "registryVersion": "open-instrument.multi-source-functional-research-evidence-registry.v0_1", "researchEvidenceId": "research.external.open-instrument-research-evidence-packet-v0-1.five-case.poto", "embryo": "INK", "evidenceFamily": "historical_dictionary", "language": "Latin", "form": "pōto", "gloss": "to drink", "embryoRelation": "no_structural_relation", "relationOperationIds": [], "attestationTruth": "fact", "sourceStatus": "research_candidate", "citations": [{ "citationId": "five-case.poto.lewis-short.citation.v1", "sourceTitle": "Lewis & Short Latin Dictionary", "sourceAuthorOrEditor": "Charlton T. Lewis and Charles Short", "sourcePublisherOrHost": "Scaife ATLAS / Perseus Digital Library", "sourceDateOrVersion": "Lewis & Short source file release date 1997-10-28; upstream commit 56061ca127f4a2844980baffc5f2b6d1332897b3", "sourceUrlOrArchiveRef": "https://atlas.perseus.tufts.edu/dictionaries/entry/urn%3Acite2%3Ascaife-viewer%3Adictionary-entries.atlas_v1%3Alat.ls.perseus-eng2-n37321/", "entryLocator": "TEI.2 entryFree id=\"n37321\" key=\"poto\"; senses n37321.0 and n37321.6", "sourceHashOrArchiveHash": "c3474349ef9073bb436229cdf886eb77ed88d2fd", "attestedForm": "pōto", "attestedGloss": "to drink", "provenanceGroupId": "scaife.lewis-short.v0_1" }], "functionalHypotheses": [{ "targetWord": "drink", "targetSenseId": "user_sense_to_take_liquid_into_the_mouth_and_swallow_it", "semanticBridge": "The source-attested meaning may functionally correspond to taking liquid into the mouth and swallowing it; bounded hypothesis only.", "functionalBridgeTruth": "hypothesis", "claimBoundary": "functional_hypothesis_only" }], "historicalOriginClaim": "not_claimed", "historicalTransmissionClaim": "not_claimed", "winnerClaim": "not_claimed", "languageSuperiorityClaim": "not_claimed", "candidateTruthClaim": "not_claimed", "userDecisionPosture": "user_decides"
+      "registryVersion": "open-instrument.multi-source-functional-research-evidence-registry.v0_1",
+      "researchEvidenceId": "research.external.open-instrument-research-evidence-packet-v0-1.five-case.poto",
+      "embryo": "INK",
+      "evidenceFamily": "historical_dictionary",
+      "language": "Latin",
+      "form": "pōto",
+      "gloss": "to drink",
+      "embryoRelation": "no_structural_relation",
+      "relationOperationIds": [],
+      "attestationTruth": "fact",
+      "sourceStatus": "research_candidate",
+      "citations": [
+        {
+          "citationId": "five-case.poto.lewis-short.citation.v1",
+          "sourceTitle": "Lewis & Short Latin Dictionary",
+          "sourceAuthorOrEditor": "Charlton T. Lewis and Charles Short",
+          "sourcePublisherOrHost": "Scaife ATLAS / Perseus Digital Library",
+          "sourceDateOrVersion": "Lewis & Short source file release date 1997-10-28; upstream commit 56061ca127f4a2844980baffc5f2b6d1332897b3",
+          "sourceUrlOrArchiveRef": "https://atlas.perseus.tufts.edu/dictionaries/entry/urn%3Acite2%3Ascaife-viewer%3Adictionary-entries.atlas_v1%3Alat.ls.perseus-eng2-n37321/",
+          "entryLocator": "TEI.2 entryFree id=\"n37321\" key=\"poto\"; senses n37321.0 and n37321.6",
+          "sourceHashOrArchiveHash": "c3474349ef9073bb436229cdf886eb77ed88d2fd",
+          "attestedForm": "pōto",
+          "attestedGloss": "to drink",
+          "provenanceGroupId": "scaife.lewis-short.v0_1"
+        }
+      ],
+      "functionalHypotheses": [
+        {
+          "targetWord": "drink",
+          "targetSenseId": "user_sense_to_take_liquid_into_the_mouth_and_swallow_it",
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
+        }
+      ],
+      "historicalOriginClaim": "not_claimed",
+      "historicalTransmissionClaim": "not_claimed",
+      "winnerClaim": "not_claimed",
+      "languageSuperiorityClaim": "not_claimed",
+      "candidateTruthClaim": "not_claimed",
+      "userDecisionPosture": "user_decides"
     },
     {
-      "registryVersion": "open-instrument.multi-source-functional-research-evidence-registry.v0_1", "researchEvidenceId": "research.external.open-instrument-research-evidence-packet-v0-1.five-case.pino", "embryo": "INK", "evidenceFamily": "historical_dictionary", "language": "Ancient Greek", "form": "πίνω", "gloss": "to drink", "embryoRelation": "no_structural_relation", "relationOperationIds": [], "attestationTruth": "fact", "sourceStatus": "research_candidate", "citations": [{ "citationId": "five-case.pino.middle-liddell.citation.v1", "sourceTitle": "Middle Liddell", "sourceAuthorOrEditor": "Henry George Liddell and Robert Scott", "sourcePublisherOrHost": "Scaife ATLAS / Perseus Digital Library", "sourceDateOrVersion": "accessed 2026-09-20", "sourceUrlOrArchiveRef": "https://atlas.perseus.tufts.edu/dictionaries/entry/urn%3Acite2%3Ascaife-viewer%3Adictionary-entries.atlas_v1%3Amiddle-liddell.perseus-eng2-n26243/", "entryLocator": "Middle Liddell entry n26243; headword πίνω", "sourceHashOrArchiveHash": null, "attestedForm": "πίνω", "attestedGloss": "to drink", "provenanceGroupId": "scaife.middle-liddell.v0_1" }], "functionalHypotheses": [{ "targetWord": "drink", "targetSenseId": "user_sense_to_take_liquid_into_the_mouth_and_swallow_it", "semanticBridge": "The source-attested meaning may functionally correspond to taking liquid into the mouth and swallowing it; bounded hypothesis only.", "functionalBridgeTruth": "hypothesis", "claimBoundary": "functional_hypothesis_only" }], "historicalOriginClaim": "not_claimed", "historicalTransmissionClaim": "not_claimed", "winnerClaim": "not_claimed", "languageSuperiorityClaim": "not_claimed", "candidateTruthClaim": "not_claimed", "userDecisionPosture": "user_decides"
+      "registryVersion": "open-instrument.multi-source-functional-research-evidence-registry.v0_1",
+      "researchEvidenceId": "research.external.open-instrument-research-evidence-packet-v0-1.five-case.pino",
+      "embryo": "INK",
+      "evidenceFamily": "historical_dictionary",
+      "language": "Ancient Greek",
+      "form": "πίνω",
+      "gloss": "to drink",
+      "embryoRelation": "no_structural_relation",
+      "relationOperationIds": [],
+      "attestationTruth": "fact",
+      "sourceStatus": "research_candidate",
+      "citations": [
+        {
+          "citationId": "five-case.pino.middle-liddell.citation.v1",
+          "sourceTitle": "Middle Liddell",
+          "sourceAuthorOrEditor": "Henry George Liddell and Robert Scott",
+          "sourcePublisherOrHost": "Scaife ATLAS / Perseus Digital Library",
+          "sourceDateOrVersion": "accessed 2026-09-20",
+          "sourceUrlOrArchiveRef": "https://atlas.perseus.tufts.edu/dictionaries/entry/urn%3Acite2%3Ascaife-viewer%3Adictionary-entries.atlas_v1%3Amiddle-liddell.perseus-eng2-n26243/",
+          "entryLocator": "Middle Liddell entry n26243; headword πίνω",
+          "sourceHashOrArchiveHash": null,
+          "attestedForm": "πίνω",
+          "attestedGloss": "to drink",
+          "provenanceGroupId": "scaife.middle-liddell.v0_1"
+        }
+      ],
+      "functionalHypotheses": [
+        {
+          "targetWord": "drink",
+          "targetSenseId": "user_sense_to_take_liquid_into_the_mouth_and_swallow_it",
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
+        }
+      ],
+      "historicalOriginClaim": "not_claimed",
+      "historicalTransmissionClaim": "not_claimed",
+      "winnerClaim": "not_claimed",
+      "languageSuperiorityClaim": "not_claimed",
+      "candidateTruthClaim": "not_claimed",
+      "userDecisionPosture": "user_decides"
     },
     {
-      "registryVersion": "open-instrument.multi-source-functional-research-evidence-registry.v0_1", "researchEvidenceId": "research.external.open-instrument-research-evidence-packet-v0-1.five-case.drejtesi", "embryo": "UST", "evidenceFamily": "lexical_dictionary", "language": "Albanian", "form": "DREJTËSI", "gloss": "being just / quality of being just / justice", "embryoRelation": "no_structural_relation", "relationOperationIds": [], "attestationTruth": "fact", "sourceStatus": "research_candidate", "citations": [{ "citationId": "five-case.drejtesi.fjale.citation.v1", "sourceTitle": "FJALË — Fjalor Shqip", "sourceAuthorOrEditor": null, "sourcePublisherOrHost": "FJALË — Fjalor Shqip", "sourceDateOrVersion": "accessed 2026-09-20", "sourceUrlOrArchiveRef": "https://fjale.al/drejt%C3%ABsi", "entryLocator": "DREJTËSI; sense 1", "sourceHashOrArchiveHash": null, "attestedForm": "DREJTËSI", "attestedGloss": "being just / quality of being just / justice", "provenanceGroupId": "fjale.fjalor-shqip.v0_1" }], "functionalHypotheses": [{ "targetWord": "justice", "targetSenseId": "user_sense_fairness_in_how_people_are_treated", "semanticBridge": "The source-attested meaning may functionally correspond to fairness in how people are treated; bounded hypothesis only.", "functionalBridgeTruth": "hypothesis", "claimBoundary": "functional_hypothesis_only" }], "historicalOriginClaim": "not_claimed", "historicalTransmissionClaim": "not_claimed", "winnerClaim": "not_claimed", "languageSuperiorityClaim": "not_claimed", "candidateTruthClaim": "not_claimed", "userDecisionPosture": "user_decides"
+      "registryVersion": "open-instrument.multi-source-functional-research-evidence-registry.v0_1",
+      "researchEvidenceId": "research.external.open-instrument-research-evidence-packet-v0-1.five-case.drejtesi",
+      "embryo": "UST",
+      "evidenceFamily": "lexical_dictionary",
+      "language": "Albanian",
+      "form": "DREJTËSI",
+      "gloss": "being just / quality of being just / justice",
+      "embryoRelation": "no_structural_relation",
+      "relationOperationIds": [],
+      "attestationTruth": "fact",
+      "sourceStatus": "research_candidate",
+      "citations": [
+        {
+          "citationId": "five-case.drejtesi.fjale.citation.v1",
+          "sourceTitle": "FJALË — Fjalor Shqip",
+          "sourceAuthorOrEditor": null,
+          "sourcePublisherOrHost": "FJALË — Fjalor Shqip",
+          "sourceDateOrVersion": "accessed 2026-09-20",
+          "sourceUrlOrArchiveRef": "https://fjale.al/drejt%C3%ABsi",
+          "entryLocator": "DREJTËSI; sense 1",
+          "sourceHashOrArchiveHash": null,
+          "attestedForm": "DREJTËSI",
+          "attestedGloss": "being just / quality of being just / justice",
+          "provenanceGroupId": "fjale.fjalor-shqip.v0_1"
+        }
+      ],
+      "functionalHypotheses": [
+        {
+          "targetWord": "justice",
+          "targetSenseId": "user_sense_fairness_in_how_people_are_treated",
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
+        }
+      ],
+      "historicalOriginClaim": "not_claimed",
+      "historicalTransmissionClaim": "not_claimed",
+      "winnerClaim": "not_claimed",
+      "languageSuperiorityClaim": "not_claimed",
+      "candidateTruthClaim": "not_claimed",
+      "userDecisionPosture": "user_decides"
     },
     {
-      "registryVersion": "open-instrument.multi-source-functional-research-evidence-registry.v0_1", "researchEvidenceId": "research.external.open-instrument-research-evidence-packet-v0-1.five-case.justitia", "embryo": "UST", "evidenceFamily": "historical_dictionary", "language": "Latin", "form": "justĭtĭa", "gloss": "justice / equity / righteousness / uprightness", "embryoRelation": "no_structural_relation", "relationOperationIds": [], "attestationTruth": "fact", "sourceStatus": "research_candidate", "citations": [{ "citationId": "five-case.justitia.lewis-short.citation.v1", "sourceTitle": "Lewis & Short Latin Dictionary", "sourceAuthorOrEditor": "Charlton T. Lewis and Charles Short", "sourcePublisherOrHost": "Scaife ATLAS / Perseus Digital Library", "sourceDateOrVersion": "Lewis & Short source file release date 1997-10-28; upstream commit 56061ca127f4a2844980baffc5f2b6d1332897b3", "sourceUrlOrArchiveRef": "https://atlas.perseus.tufts.edu/dictionaries/entry/urn%3Acite2%3Ascaife-viewer%3Adictionary-entries.atlas_v1%3Alat.ls.perseus-eng2-n25422/", "entryLocator": "TEI.2 entryFree id=\"n25422\" key=\"justitia\"", "sourceHashOrArchiveHash": "c3474349ef9073bb436229cdf886eb77ed88d2fd", "attestedForm": "justĭtĭa", "attestedGloss": "justice / equity / righteousness / uprightness", "provenanceGroupId": "scaife.lewis-short.v0_1" }], "functionalHypotheses": [{ "targetWord": "justice", "targetSenseId": "user_sense_fairness_in_how_people_are_treated", "semanticBridge": "The source-attested meaning may functionally correspond to fairness in how people are treated; bounded hypothesis only.", "functionalBridgeTruth": "hypothesis", "claimBoundary": "functional_hypothesis_only" }], "historicalOriginClaim": "not_claimed", "historicalTransmissionClaim": "not_claimed", "winnerClaim": "not_claimed", "languageSuperiorityClaim": "not_claimed", "candidateTruthClaim": "not_claimed", "userDecisionPosture": "user_decides"
+      "registryVersion": "open-instrument.multi-source-functional-research-evidence-registry.v0_1",
+      "researchEvidenceId": "research.external.open-instrument-research-evidence-packet-v0-1.five-case.justitia",
+      "embryo": "UST",
+      "evidenceFamily": "historical_dictionary",
+      "language": "Latin",
+      "form": "justĭtĭa",
+      "gloss": "justice / equity / righteousness / uprightness",
+      "embryoRelation": "no_structural_relation",
+      "relationOperationIds": [],
+      "attestationTruth": "fact",
+      "sourceStatus": "research_candidate",
+      "citations": [
+        {
+          "citationId": "five-case.justitia.lewis-short.citation.v1",
+          "sourceTitle": "Lewis & Short Latin Dictionary",
+          "sourceAuthorOrEditor": "Charlton T. Lewis and Charles Short",
+          "sourcePublisherOrHost": "Scaife ATLAS / Perseus Digital Library",
+          "sourceDateOrVersion": "Lewis & Short source file release date 1997-10-28; upstream commit 56061ca127f4a2844980baffc5f2b6d1332897b3",
+          "sourceUrlOrArchiveRef": "https://atlas.perseus.tufts.edu/dictionaries/entry/urn%3Acite2%3Ascaife-viewer%3Adictionary-entries.atlas_v1%3Alat.ls.perseus-eng2-n25422/",
+          "entryLocator": "TEI.2 entryFree id=\"n25422\" key=\"justitia\"",
+          "sourceHashOrArchiveHash": "c3474349ef9073bb436229cdf886eb77ed88d2fd",
+          "attestedForm": "justĭtĭa",
+          "attestedGloss": "justice / equity / righteousness / uprightness",
+          "provenanceGroupId": "scaife.lewis-short.v0_1"
+        }
+      ],
+      "functionalHypotheses": [
+        {
+          "targetWord": "justice",
+          "targetSenseId": "user_sense_fairness_in_how_people_are_treated",
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
+        }
+      ],
+      "historicalOriginClaim": "not_claimed",
+      "historicalTransmissionClaim": "not_claimed",
+      "winnerClaim": "not_claimed",
+      "languageSuperiorityClaim": "not_claimed",
+      "candidateTruthClaim": "not_claimed",
+      "userDecisionPosture": "user_decides"
     },
     {
-      "registryVersion": "open-instrument.multi-source-functional-research-evidence-registry.v0_1", "researchEvidenceId": "research.external.open-instrument-research-evidence-packet-v0-1.five-case.thesmosyne", "embryo": "UST", "evidenceFamily": "historical_dictionary", "language": "Ancient Greek", "form": "θεσμοσύνη", "gloss": "justice", "embryoRelation": "no_structural_relation", "relationOperationIds": [], "attestationTruth": "fact", "sourceStatus": "research_candidate", "citations": [{ "citationId": "five-case.thesmosyne.middle-liddell.citation.v1", "sourceTitle": "Middle Liddell", "sourceAuthorOrEditor": "Henry George Liddell and Robert Scott", "sourcePublisherOrHost": "Scaife ATLAS / Perseus Digital Library", "sourceDateOrVersion": "accessed 2026-09-20", "sourceUrlOrArchiveRef": "https://atlas.perseus.tufts.edu/dictionaries/entry/urn%3Acite2%3Ascaife-viewer%3Adictionary-entries.atlas_v1%3Amiddle-liddell.perseus-eng2-n15196/", "entryLocator": "Middle Liddell entry n15196; headword θεσμοσύνη", "sourceHashOrArchiveHash": null, "attestedForm": "θεσμοσύνη", "attestedGloss": "justice", "provenanceGroupId": "scaife.middle-liddell.v0_1" }], "functionalHypotheses": [{ "targetWord": "justice", "targetSenseId": "user_sense_fairness_in_how_people_are_treated", "semanticBridge": "The source-attested meaning may functionally correspond to fairness in how people are treated; bounded hypothesis only.", "functionalBridgeTruth": "hypothesis", "claimBoundary": "functional_hypothesis_only" }], "historicalOriginClaim": "not_claimed", "historicalTransmissionClaim": "not_claimed", "winnerClaim": "not_claimed", "languageSuperiorityClaim": "not_claimed", "candidateTruthClaim": "not_claimed", "userDecisionPosture": "user_decides"
+      "registryVersion": "open-instrument.multi-source-functional-research-evidence-registry.v0_1",
+      "researchEvidenceId": "research.external.open-instrument-research-evidence-packet-v0-1.five-case.thesmosyne",
+      "embryo": "UST",
+      "evidenceFamily": "historical_dictionary",
+      "language": "Ancient Greek",
+      "form": "θεσμοσύνη",
+      "gloss": "justice",
+      "embryoRelation": "no_structural_relation",
+      "relationOperationIds": [],
+      "attestationTruth": "fact",
+      "sourceStatus": "research_candidate",
+      "citations": [
+        {
+          "citationId": "five-case.thesmosyne.middle-liddell.citation.v1",
+          "sourceTitle": "Middle Liddell",
+          "sourceAuthorOrEditor": "Henry George Liddell and Robert Scott",
+          "sourcePublisherOrHost": "Scaife ATLAS / Perseus Digital Library",
+          "sourceDateOrVersion": "accessed 2026-09-20",
+          "sourceUrlOrArchiveRef": "https://atlas.perseus.tufts.edu/dictionaries/entry/urn%3Acite2%3Ascaife-viewer%3Adictionary-entries.atlas_v1%3Amiddle-liddell.perseus-eng2-n15196/",
+          "entryLocator": "Middle Liddell entry n15196; headword θεσμοσύνη",
+          "sourceHashOrArchiveHash": null,
+          "attestedForm": "θεσμοσύνη",
+          "attestedGloss": "justice",
+          "provenanceGroupId": "scaife.middle-liddell.v0_1"
+        }
+      ],
+      "functionalHypotheses": [
+        {
+          "targetWord": "justice",
+          "targetSenseId": "user_sense_fairness_in_how_people_are_treated",
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
+        }
+      ],
+      "historicalOriginClaim": "not_claimed",
+      "historicalTransmissionClaim": "not_claimed",
+      "winnerClaim": "not_claimed",
+      "languageSuperiorityClaim": "not_claimed",
+      "candidateTruthClaim": "not_claimed",
+      "userDecisionPosture": "user_decides"
     }
   ]
 }

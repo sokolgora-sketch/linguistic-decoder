@@ -3,6 +3,7 @@
   "packetId": "blue.blue_color.v0_1",
   "targetWord": "blue",
   "targetSenseId": "blue_color",
+  "evidenceBasis": "lexical_equivalence",
   "semanticBridge": "The source entries attest lexical forms for the bounded blue-color sense; treating that shared functional referent as a ZË-RO bridge remains a research hypothesis only.",
   "sources": [
     {

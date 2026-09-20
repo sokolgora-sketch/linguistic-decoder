@@ -479,13 +479,11 @@ describe(
           body.analysisStatusV0_1,
         ).toMatchObject({
           status:
-            "research_functional_hypothesis",
+            "structural_unreviewed",
           reviewedOperators: [],
           candidateOnlyOperators: [],
-          researchHypothesisEmbryos: [
-            "KUJTESË",
-          ],
-          structuralTokens: [],
+          researchHypothesisEmbryos: [],
+          structuralTokens: ["EM"],
         });
 
         const structuralEm =

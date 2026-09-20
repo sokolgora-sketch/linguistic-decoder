@@ -75,6 +75,9 @@ describe(
             semanticBridge:
               "fixture ER-family meaning may functionally participate in the target concept",
 
+            evidenceBasis:
+              "functional_correspondence",
+
             functionalBridgeTruth:
               "hypothesis",
 
@@ -87,6 +90,9 @@ describe(
 
             semanticBridge:
               "the same attested source may support a different bounded functional hypothesis",
+
+            evidenceBasis:
+              "functional_correspondence",
 
             functionalBridgeTruth:
               "hypothesis",
@@ -185,6 +191,9 @@ describe(
             functionalBridgeTruth:
               "inference",
 
+            evidenceBasis:
+              "functional_correspondence",
+
             claimBoundary:
               "functional_hypothesis_only",
           },
@@ -278,6 +287,9 @@ describe(
 
             functionalBridgeTruth:
               "hypothesis",
+
+            evidenceBasis:
+              "functional_correspondence",
 
             claimBoundary:
               "functional_hypothesis_only",

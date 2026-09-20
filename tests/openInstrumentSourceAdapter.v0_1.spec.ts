@@ -171,6 +171,7 @@ describe("Open Instrument verified source adapter v0.1", () => {
       packetId: "adapter-interoperability.v0_1",
       targetWord: "order",
       targetSenseId: "arrangement_structured_sequence",
+      evidenceBasis: "functional_correspondence",
       semanticBridge:
         "The source fact is supplied to a human reviewer for a bounded functional hypothesis.",
       sources: [

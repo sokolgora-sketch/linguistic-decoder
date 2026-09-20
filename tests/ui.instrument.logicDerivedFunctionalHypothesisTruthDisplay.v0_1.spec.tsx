@@ -55,8 +55,7 @@ describe("logic-derived functional hypothesis UI boundary v0.1", () => {
 
     render(<CandidatesAccordion rows={rows} />);
 
-    expect(screen.getAllByText("Research functional hypothesis")).toHaveLength(2);
-    expect(screen.getAllByText("Functional bridge: Hypothesis")).toHaveLength(2);
+    expect(screen.getAllByText("Lexical source evidence")).toHaveLength(2);
     expect(
       rows.filter((row) => row.sourceKind === "multi_source_research_witness").map((row) => row.form),
     ).toEqual(["QIRI", "candēla"]);

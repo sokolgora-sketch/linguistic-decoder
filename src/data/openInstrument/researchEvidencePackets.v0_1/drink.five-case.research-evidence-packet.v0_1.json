@@ -3,6 +3,7 @@
   "packetId": "five-case",
   "targetWord": "drink",
   "targetSenseId": "user_sense_to_take_liquid_into_the_mouth_and_swallow_it",
+  "evidenceBasis": "lexical_equivalence",
   "semanticBridge": "The source-attested meaning may functionally correspond to taking liquid into the mouth and swallowing it; bounded hypothesis only.",
   "sources": [
     { "sourceKey": "pi", "embryo": "INK", "evidenceFamily": "lexical_dictionary", "language": "Albanian", "form": "PI", "gloss": "take liquid by mouth and swallow it", "embryoRelation": "no_structural_relation", "relationOperationIds": [], "citation": { "citationId": "five-case.pi.fjale.citation.v1", "sourceTitle": "FJALË — Fjalor Shqip", "sourceAuthorOrEditor": null, "sourcePublisherOrHost": "FJALË — Fjalor Shqip", "sourceDateOrVersion": "accessed 2026-09-20", "sourceUrlOrArchiveRef": "https://fjale.al/pi", "entryLocator": "PI; sense 1", "sourceHashOrArchiveHash": null, "attestedForm": "PI", "attestedGloss": "take liquid by mouth and swallow it", "provenanceGroupId": "fjale.fjalor-shqip.v0_1" } },

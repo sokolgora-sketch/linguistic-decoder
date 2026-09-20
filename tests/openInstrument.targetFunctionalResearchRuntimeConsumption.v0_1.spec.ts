@@ -50,6 +50,7 @@ function targetBoundRow(
         semanticBridge:
           "the source meaning may functionally correspond to the frozen target sense",
         functionalBridgeTruth: "hypothesis",
+        evidenceBasis: "functional_correspondence",
         claimBoundary: "functional_hypothesis_only",
       },
     ],

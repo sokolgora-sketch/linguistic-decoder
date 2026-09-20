@@ -142,17 +142,15 @@ describe("Open Instrument live source intake WATER pilot v0.1", () => {
       minimumRows: 2,
       minimumProvenanceGroups: 2,
     });
-    expect(readiness).toMatchObject({
-      ready: true,
-      reasonCodes: [],
-      acceptedResearchEvidenceIds: expect.arrayContaining(
-        compiledRows.map((row) => row.researchEvidenceId),
-      ),
-      provenanceGroupIds: [
-        "fjale.fjalor-shqip.v0_1",
-        "scaife.lewis-short.v0_1",
-      ],
-    });
+    expect(readiness.ready).toBe(false);
+    expect(readiness.reasonCodes).toEqual(expect.arrayContaining([
+      "functional_bridge_missing",
+      "minimum_rows_not_met",
+      "minimum_provenance_groups_not_met",
+    ]));
+    expect(readiness.acceptedResearchEvidenceIds).toEqual([]);
+    expect(readiness.provenanceGroupIds).toEqual([]);
+    expect(compiledRows.every((row) => row.functionalHypotheses[0].evidenceBasis === "lexical_equivalence")).toBe(true);
     expect(compiledRows.every((row) => row.attestationTruth === "fact")).toBe(true);
     expect(compiledRows.every((row) => row.sourceStatus === "research_candidate")).toBe(true);
     expect(compiledRows.every((row) => row.historicalOriginClaim === "not_claimed")).toBe(true);
@@ -174,15 +172,15 @@ describe("Open Instrument live source intake WATER pilot v0.1", () => {
   it("promotes only WATER at runtime and preserves the protected Null controls", async () => {
     const water = await analyzeV0_1("water");
     const waterStatus = water.analysisStatusV0_1 as Record<string, unknown>;
-    expect(waterStatus.status).toBe("research_functional_hypothesis");
-    expect(waterStatus.researchHypothesisEmbryos).toEqual(
-      expect.arrayContaining(["ujë", "ăqua"]),
-    );
+    expect(waterStatus.status).toBe("structural_unreviewed");
     expect(
       (water.candidates as Array<Record<string, unknown>>).filter(
         (candidate) => candidate.sourceKind === "multi_source_research_witness",
       ),
     ).toHaveLength(2);
+    expect(water.candidates).toEqual(expect.arrayContaining([
+      expect.objectContaining({ evidenceBasis: "lexical_equivalence" }),
+    ]));
 
     for (const word of [
       "wind",

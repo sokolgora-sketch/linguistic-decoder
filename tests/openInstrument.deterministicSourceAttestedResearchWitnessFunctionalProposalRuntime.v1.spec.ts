@@ -45,11 +45,11 @@ describe(
           expect(candidate.candidateId).toBe(
             `research-functional:multi-source-functional:${word}:${candidate.embryo}:${candidate.sourceId}`,
           );
-          expect(candidate.functionalStatement).toBe(candidate.semanticBridge);
+          expect(candidate.functionalStatement).toBeUndefined();
           expect(candidate.sourceStatus).toBe("research_candidate");
-          expect(candidate.claimBoundary).toBe(
-            "research_functional_hypothesis_only",
-          );
+          expect(candidate.claimBoundary).toBe("lexical_source_evidence_only");
+          expect(candidate.evidenceBasis).toBe("lexical_equivalence");
+          expect(candidate.functionalBridgeTruth).toBe("unknown");
           expect(candidate.functionalComponents).toBeUndefined();
           expect(candidate.userDecisionPosture).toBe("user_decides");
         }

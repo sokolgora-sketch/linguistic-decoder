@@ -181,6 +181,7 @@ export interface CandidateRowVM {
   evidenceRefs?: PresentOrMissing<string[]>;
   attestationTruth?: PresentOrMissing<string>;
   functionalBridgeTruth?: PresentOrMissing<string>;
+  evidenceBasis?: PresentOrMissing<string>;
 
   // Embryo-first fields are optional because legacy payloads may not emit them.
   // When present, only contractAdapter may lift them from raw analysis data.

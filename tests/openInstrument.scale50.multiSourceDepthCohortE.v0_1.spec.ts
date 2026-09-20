@@ -124,19 +124,13 @@ describe(
           body.analysisStatusV0_1,
         ).toEqual(
           expect.objectContaining({
-            status:
-              "research_functional_hypothesis",
             reviewedOperators: [],
             candidateOnlyOperators: [],
-            researchHypothesisEmbryos:
-              expect.arrayContaining([
-                albanianEmbryo,
-                latinEmbryo,
-              ]),
             userDecisionPosture:
               "user_decides",
           }),
         );
+        expect((body.analysisStatusV0_1 as Record<string, unknown>).status).not.toBe("research_functional_hypothesis");
 
         const research =
           candidateRows(body)
@@ -174,8 +168,9 @@ describe(
               "research_candidate",
             attestationTruth:
               "fact",
+            evidenceBasis: "lexical_equivalence",
             functionalBridgeTruth:
-              "hypothesis",
+              "unknown",
             candidateTruthClaim:
               "not_claimed",
             historicalOriginClaim:
@@ -197,8 +192,9 @@ describe(
               "research_candidate",
             attestationTruth:
               "fact",
+            evidenceBasis: "lexical_equivalence",
             functionalBridgeTruth:
-              "hypothesis",
+              "unknown",
             candidateTruthClaim:
               "not_claimed",
             historicalOriginClaim:

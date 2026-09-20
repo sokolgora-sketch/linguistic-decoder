@@ -3,6 +3,7 @@
   "packetId": "sea.physical-saltwater-body.v0_1",
   "targetWord": "sea",
   "targetSenseId": "physical_sea_saltwater_body",
+  "evidenceBasis": "lexical_equivalence",
   "semanticBridge": "The source entries attest lexical forms for a bounded sea or saltwater-body sense; treating that shared physical referent as a ZË-RO functional bridge remains a research hypothesis only.",
   "sources": [
     {

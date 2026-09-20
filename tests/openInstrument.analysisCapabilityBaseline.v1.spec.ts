@@ -173,12 +173,12 @@ describe("Open Instrument analytical capability baseline v1", () => {
   test("aggregate preserves dimensional status and capability counts", () => {
     expect(baseline.aggregate.statusCounts).toEqual({
       reviewed_functional_evidence: 2,
-      research_functional_hypothesis: 42,
+      research_functional_hypothesis: 1,
       candidate_only: 4,
-      structural_unreviewed: 0,
-      null_no_supported_candidate: 9,
+      structural_unreviewed: 21,
+      null_no_supported_candidate: 29,
     });
-    expect(baseline.aggregate.nullCount).toBe(9);
+    expect(baseline.aggregate.nullCount).toBe(29);
     expect(baseline.aggregate.pathCoverage).toEqual({
       detected: 57,
       surface: 57,
@@ -301,7 +301,7 @@ describe("Open Instrument analytical capability baseline v1", () => {
 
   test("reviewed, research, target-sense, and Null dimensions remain distinct", () => {
     const reviewed = caseById("canonical.study");
-    const research = caseById("target-sense.water-physical-liquid");
+    const research = caseById("scale50.break.action");
     const nullCase = caseById("null.xyz");
 
     expect(reviewed.status).toBe("reviewed_functional_evidence");
@@ -310,7 +310,7 @@ describe("Open Instrument analytical capability baseline v1", () => {
     expect(research.status).toBe("research_functional_hypothesis");
     expect(research.evidence.researchRefs).toBe(2);
     expect(research.evidence.reviewedRefs).toBe(0);
-    expect(research.request.targetSenseId).toBe("physical_water_liquid");
+    expect(research.request.targetSenseId).toBeNull();
     expect(nullCase.status).toBe("null_no_supported_candidate");
     expect(nullCase.nullResult).toBe(true);
     expect(nullCase.candidateCount).toBe(0);

@@ -1,5 +1,6 @@
 import {
   MULTI_SOURCE_FUNCTIONAL_RESEARCH_EVIDENCE_CATALOG_VERSION_V0_1,
+  isQuarantinedUnresolvedResearchRowV0_1,
   parseMultiSourceFunctionalResearchEvidenceCatalogV0_1,
 } from "./multiSourceFunctionalResearchEvidenceCatalog.v0_1";
 import type {
@@ -113,9 +114,21 @@ function validateIncomingRowV0_1(
       reasons.push(`${row.researchEvidenceId}:TARGET_BINDING_MALFORMED`);
     }
     if (
-      hypothesis.functionalBridgeTruth !== "hypothesis" ||
-      hypothesis.claimBoundary !== "functional_hypothesis_only" ||
-      !hypothesis.semanticBridge?.trim()
+      hypothesis.evidenceBasis !== "lexical_equivalence" &&
+      hypothesis.evidenceBasis !== "functional_correspondence"
+    ) {
+      reasons.push(`${row.researchEvidenceId}:EVIDENCE_BASIS_INVALID`);
+    }
+    if (
+      hypothesis.claimBoundary !==
+        (hypothesis.evidenceBasis === "functional_correspondence"
+          ? "functional_hypothesis_only"
+          : "lexical_source_evidence_only") ||
+      (hypothesis.evidenceBasis === "functional_correspondence" &&
+        (hypothesis.functionalBridgeTruth !== "hypothesis" ||
+          !hypothesis.semanticBridge?.trim())) ||
+      (hypothesis.evidenceBasis === "lexical_equivalence" &&
+        hypothesis.functionalBridgeTruth !== "unknown")
     ) {
       reasons.push(`${row.researchEvidenceId}:FUNCTIONAL_BOUNDARY_VIOLATION`);
     }
@@ -170,7 +183,13 @@ export function admitOpenInstrumentResearchCatalogV0_1(
     (existingCatalog as { catalogVersion?: unknown }).catalogVersion ===
       MULTI_SOURCE_FUNCTIONAL_RESEARCH_EVIDENCE_CATALOG_VERSION_V0_1 &&
     Array.isArray((existingCatalog as { rows?: unknown }).rows) &&
-    (existingCatalog as { rows: unknown[] }).rows.length === currentRows.length;
+    (() => {
+      const rawRows = (existingCatalog as { rows: readonly unknown[] }).rows;
+      const quarantinedCount = rawRows.filter(
+        isQuarantinedUnresolvedResearchRowV0_1,
+      ).length;
+      return rawRows.length === currentRows.length + quarantinedCount;
+    })();
 
   if (!existingCatalogIsValid) {
     collisions.push({ kind: "malformedRow", value: "existingCatalog" });

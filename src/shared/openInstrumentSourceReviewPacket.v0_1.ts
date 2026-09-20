@@ -8,6 +8,7 @@ import {
   type OpenInstrumentResearchEvidencePacketSourceV0_1,
 } from "./openInstrumentResearchEvidencePacket.v0_1";
 import { normalizeToAllowedOpId } from "./ops/allowedOps.v0.1";
+import type { EvidenceBasisV0_1 } from "./multiSourceFunctionalDiscovery.v0_1";
 
 export const OPEN_INSTRUMENT_SOURCE_REVIEW_PACKET_VERSION_V0_1 =
   "open-instrument.source-review-packet.v0_1" as const;
@@ -47,7 +48,8 @@ export type OpenInstrumentSourceReviewPacketV0_1 = {
   reviewPacketId: string;
   targetWord: string;
   targetSenseId: OpenInstrumentSourceReviewFieldV0_1<string>;
-  semanticBridge: OpenInstrumentSourceReviewFieldV0_1<string>;
+  semanticBridge: OpenInstrumentSourceReviewFieldV0_1<string | null>;
+  evidenceBasis: OpenInstrumentSourceReviewFieldV0_1<EvidenceBasisV0_1>;
   sources: readonly OpenInstrumentSourceReviewPacketSourceV0_1[];
   provenanceIndependenceDecision: OpenInstrumentSourceReviewDecisionV0_1;
   overallDecision: OpenInstrumentSourceReviewDecisionV0_1;
@@ -124,6 +126,7 @@ export function buildOpenInstrumentSourceReviewPacketV0_1(options: {
   targetWord: string;
   targetSenseId: string | null;
   semanticBridge: string | null;
+  evidenceBasis: EvidenceBasisV0_1;
   candidates: readonly OpenInstrumentNormalizedSourceCandidateV0_1[];
   noStructuralRelation?: NoStructuralRelationReviewOptionV0_1;
 }): OpenInstrumentSourceReviewPacketV0_1 {
@@ -135,6 +138,7 @@ export function buildOpenInstrumentSourceReviewPacketV0_1(options: {
     targetWord: options.targetWord,
     targetSenseId: humanFieldV0_1(options.targetSenseId),
     semanticBridge: humanFieldV0_1(options.semanticBridge),
+    evidenceBasis: humanFieldV0_1(options.evidenceBasis),
     sources: options.candidates.map((candidate) =>
       ({
         sourceKey: candidate.sourceKey,
@@ -305,7 +309,13 @@ export function finalizeOpenInstrumentSourceReviewPacketV0_1(
     );
   }
 
-  if (reviewPacket.semanticBridge.decision === "pending" || !acceptedFieldV0_1(reviewPacket.semanticBridge)) {
+  const evidenceBasis = reviewPacket.evidenceBasis.value;
+  const semanticBridgeAccepted =
+    reviewPacket.semanticBridge.decision === "accepted" &&
+    (evidenceBasis === "lexical_equivalence" ||
+      normalizeTextV0_1(reviewPacket.semanticBridge.value) !== null);
+
+  if (!semanticBridgeAccepted) {
     reasonCodes.add(
       reviewPacket.semanticBridge.decision === "rejected"
         ? "SEMANTIC_BRIDGE_REJECTED"
@@ -397,6 +407,7 @@ export function finalizeOpenInstrumentSourceReviewPacketV0_1(
     targetWord: reviewPacket.targetWord,
     targetSenseId: reviewPacket.targetSenseId.value,
     semanticBridge: reviewPacket.semanticBridge.value,
+    evidenceBasis,
     sources: packetSources,
   });
 

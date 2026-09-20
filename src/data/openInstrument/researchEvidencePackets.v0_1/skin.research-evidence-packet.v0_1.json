@@ -3,6 +3,7 @@
   "packetId": "skin.physical-body-covering.v0_1",
   "targetWord": "skin",
   "targetSenseId": "physical_human_animal_skin",
+  "evidenceBasis": "lexical_equivalence",
   "semanticBridge": "The Albanian and Latin entries independently attest lexical forms for physical human or animal skin; treating them as a shared functional referent remains a research hypothesis only.",
   "sources": [
     {
