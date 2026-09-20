@@ -30,6 +30,9 @@ export type MultiSourceFunctionalResearchProjectionV0_1 = {
    */
   targetWord: string;
 
+  /** Optional exact target-sense binding preserved for target-bound research. */
+  targetSenseId?: string;
+
   displayForm: string;
   form: string;
 
@@ -227,6 +230,15 @@ export function projectMultiSourceFunctionalResearchWitnessesV0_1(
         `research-functional:${witnessId}`,
 
       targetWord,
+
+      ...(witness.targetSenseId
+        ? {
+            targetSenseId:
+              witness.targetSenseId
+                .normalize("NFC")
+                .trim(),
+          }
+        : {}),
 
       displayForm:
         sourceForm,

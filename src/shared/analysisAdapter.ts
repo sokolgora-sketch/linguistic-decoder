@@ -44,10 +44,12 @@ import { buildAnalysisStatusV0_1 } from "./analysisStatus.v0_1";
 import { discoverStructuralHypothesesV0_1 } from "./structuralHypothesisDiscovery.v0_1";
 import {
   discoverMultiSourceFunctionalWitnessesV0_1,
+  discoverTargetBoundFunctionalResearchWitnessesV0_1,
   discoverSourceAttestedFunctionalWitnessesV0_1,
 } from "./multiSourceFunctionalDiscovery.v0_1";
 import {
   buildMultiSourceFunctionalResearchInputsV0_1,
+  buildTargetBoundFunctionalResearchInputGroupsV0_1,
   buildSourceAttestedFunctionalResearchInputGroupsV0_1,
 } from "./multiSourceFunctionalResearchEvidenceRegistry.v0_1";
 import { loadMultiSourceFunctionalResearchEvidenceCatalogV0_1 } from "./multiSourceFunctionalResearchEvidenceCatalog.v0_1";
@@ -760,9 +762,43 @@ export function enginePayloadToAnalysisResult(payload: EnginePayload): AnalyzeWo
         })
       : [];
 
+  // Target-bound functional research composition v0.1.
+  //
+  // This path augments an existing candidate_only structural result with
+  // independently attested research witnesses that explicitly claim no
+  // relation to the structural embryo. It never enters structural witness
+  // discovery, never fabricates an expansion chain, and never replaces the
+  // structural candidate. Exact-form rows remain owned by the source-
+  // attested path above.
+  const shouldProjectTargetBoundFunctionalResearchV0_1 =
+    baselineAnalysisStatusV0_1.status ===
+      "candidate_only";
+
+  const projectedTargetBoundFunctionalResearchCandidatesV0_1 =
+    shouldProjectTargetBoundFunctionalResearchV0_1
+      ? buildTargetBoundFunctionalResearchInputGroupsV0_1({
+          targetWord: rootMapBasis,
+          targetSenseId: targetSenseId || null,
+          rows: multiSourceFunctionalResearchEvidenceCatalogV0_1,
+        }).flatMap((group) => {
+          const witnesses =
+            discoverTargetBoundFunctionalResearchWitnessesV0_1({
+              targetWord: rootMapBasis,
+              targetSenseId: targetSenseId || null,
+              embryo: group.embryo,
+              sources: group.sources,
+            });
+
+          return projectMultiSourceFunctionalResearchWitnessesV0_1(
+            witnesses,
+          );
+        })
+      : [];
+
   const projectedResearchCandidatesV0_1 = [
     ...projectedStructuralResearchCandidatesV0_1,
     ...projectedSourceAttestedResearchCandidatesV0_1,
+    ...projectedTargetBoundFunctionalResearchCandidatesV0_1,
   ];
 
   // Generic doctrine hypotheses are emitted only after the evidence layers
@@ -1001,6 +1037,8 @@ export function enginePayloadToAnalysisResult(payload: EnginePayload): AnalyzeWo
     genericFunctionalCandidatesV1.length > 0 ||
     logicDerivedFunctionalCandidatesV0_1.length > 0 ||
     projectedSourceAttestedResearchCandidatesV0_1
+      .length > 0 ||
+    projectedTargetBoundFunctionalResearchCandidatesV0_1
       .length > 0;
 
   (result as any).analysisStatusV0_1 =
