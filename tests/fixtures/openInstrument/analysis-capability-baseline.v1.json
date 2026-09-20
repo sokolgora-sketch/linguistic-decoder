@@ -1,23 +1,23 @@
 {
   "aggregate": {
     "candidates": {
-      "casesWithCandidates": 44,
-      "totalCandidates": 93
+      "casesWithCandidates": 48,
+      "totalCandidates": 109
     },
     "composition": {
       "candidatesWithCandidateVowelPaths": 3,
       "candidatesWithComponents": 1,
-      "candidatesWithExpansionChains": 31,
+      "candidatesWithExpansionChains": 47,
       "candidatesWithFunctionalStatements": 66,
       "casesWithCandidateVowelPaths": 1,
       "casesWithComponents": 1,
-      "casesWithExpansionChains": 19,
+      "casesWithExpansionChains": 28,
       "casesWithFunctionalStatements": 43,
       "totalComponents": 2
     },
     "embryos": {
-      "candidatesWithEmbryos": 88,
-      "casesWithEmbryos": 44
+      "candidatesWithEmbryos": 104,
+      "casesWithEmbryos": 48
     },
     "evidence": {
       "candidatesWithRefs": 64,
@@ -36,7 +36,7 @@
       "casesWithRecords": 11,
       "recordCount": 11
     },
-    "nullCount": 13,
+    "nullCount": 9,
     "pathCoverage": {
       "delta": 57,
       "detected": 57,
@@ -49,11 +49,11 @@
       "stableCases": 57
     },
     "statusCounts": {
-      "candidate_only": 0,
-      "null_no_supported_candidate": 13,
+      "candidate_only": 5,
+      "null_no_supported_candidate": 9,
       "research_functional_hypothesis": 41,
       "reviewed_functional_evidence": 2,
-      "structural_unreviewed": 1
+      "structural_unreviewed": 0
     },
     "targetSense": {
       "candidateBindings": 2,
@@ -478,22 +478,100 @@
       }
     },
     {
-      "candidateCount": 0,
-      "candidateIds": [],
-      "candidates": [],
+      "candidateCount": 2,
+      "candidateIds": [
+        "logic-structural:mystery:yst:peel_right_vowel_led_expansion+peel_left_consonant_frame",
+        "logic-structural:mystery:yst:peel_right_vowel_led_expansion+peel_left_consonant_frame:generic-functional"
+      ],
+      "candidates": [
+        {
+          "claimBoundary": "logic-derived structural hypothesis only; independent meaning unknown; not reviewed evidence, candidate truth, or historical origin",
+          "embryo": "YST",
+          "embryoSize": 3,
+          "evidence": {
+            "locatorCount": 0,
+            "navigableCount": 0,
+            "refCount": 0,
+            "refs": [],
+            "researchCount": 0,
+            "resolvedCount": 0,
+            "reviewedCount": 0,
+            "safeUrlCount": 0,
+            "unresolvedCount": 0
+          },
+          "expansionChain": [
+            "YST",
+            "MYST",
+            "MYSTERY"
+          ],
+          "form": "YST",
+          "functionalComponents": null,
+          "functionalStatement": null,
+          "id": "logic-structural:mystery:yst:peel_right_vowel_led_expansion+peel_left_consonant_frame",
+          "ordinal": 0,
+          "sourceKind": "logic_derived_structural_hypothesis",
+          "sourceStatus": null,
+          "status": "unknown",
+          "targetSenseId": null,
+          "targetSenseLabel": null,
+          "userDecisionPosture": "user_decides",
+          "validationOutcome": "not_evaluated",
+          "vowelPath": null
+        },
+        {
+          "claimBoundary": "generic Voice-profile hypothesis only; no target meaning, evidence, or semantic interaction is claimed",
+          "embryo": "YST",
+          "embryoSize": 3,
+          "evidence": {
+            "locatorCount": 0,
+            "navigableCount": 0,
+            "refCount": 0,
+            "refs": [],
+            "researchCount": 0,
+            "resolvedCount": 0,
+            "reviewedCount": 0,
+            "safeUrlCount": 0,
+            "unresolvedCount": 0
+          },
+          "expansionChain": [
+            "YST",
+            "MYST",
+            "MYSTERY"
+          ],
+          "form": "YST",
+          "functionalComponents": null,
+          "functionalStatement": null,
+          "id": "logic-structural:mystery:yst:peel_right_vowel_led_expansion+peel_left_consonant_frame:generic-functional",
+          "ordinal": 1,
+          "sourceKind": "logic_derived_generic_functional_hypothesis",
+          "sourceStatus": "logic_derived_candidate",
+          "status": "unknown",
+          "targetSenseId": null,
+          "targetSenseLabel": null,
+          "userDecisionPosture": "user_decides",
+          "validationOutcome": "not_evaluated",
+          "vowelPath": null
+        }
+      ],
       "caseId": "canonical.mystery",
       "composition": {
         "candidatesWithComponents": 0,
-        "candidatesWithExpansionChain": 0,
+        "candidatesWithExpansionChain": 2,
         "candidatesWithFunctionalStatements": 0,
         "candidatesWithVowelPath": 0,
         "totalComponents": 0
       },
       "embryo": {
-        "candidateCount": 0,
-        "candidatesWithEmbryo": 0,
-        "forms": [],
-        "sizes": []
+        "candidateCount": 2,
+        "candidatesWithEmbryo": 2,
+        "forms": [
+          "YST",
+          "YST"
+        ],
+        "sizes": [
+          3,
+          3
+        ]
       },
       "engineVersion": "0.2.0-symbolic",
       "evidence": {
@@ -507,7 +585,7 @@
         "totalRefs": 0,
         "unresolvedRefs": 0
       },
-      "fingerprint": "842e19fba818f29efdfaaea14b32cf449252b0a63979cbb273e133905febd80d",
+      "fingerprint": "1bc7224c44ae31294a66561599f6001797b4bde460438c99e2754d49a9709e76",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -521,7 +599,7 @@
         "valid": true
       },
       "normalizedWord": "mystery",
-      "nullResult": true,
+      "nullResult": false,
       "paths": {
         "delta": "MATCH",
         "detected": [
@@ -544,7 +622,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "842e19fba818f29efdfaaea14b32cf449252b0a63979cbb273e133905febd80d",
+        "repeatedFingerprint": "1bc7224c44ae31294a66561599f6001797b4bde460438c99e2754d49a9709e76",
         "stable": true
       },
       "request": {
@@ -557,7 +635,7 @@
         "targetSenseLabel": null,
         "word": "mystery"
       },
-      "status": "null_no_supported_candidate",
+      "status": "candidate_only",
       "targetSense": {
         "candidateBindings": []
       }
@@ -715,7 +793,7 @@
         "totalRefs": 2,
         "unresolvedRefs": 0
       },
-      "fingerprint": "62929606fe13b9fdf576bd22322df3d9d4092988c81a72ca0d1a74de6a5ad033",
+      "fingerprint": "1a745801c9be80ea489dc4bf925af2e861b99cef9fff7aab2794550902150c29",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -749,7 +827,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "62929606fe13b9fdf576bd22322df3d9d4092988c81a72ca0d1a74de6a5ad033",
+        "repeatedFingerprint": "1a745801c9be80ea489dc4bf925af2e861b99cef9fff7aab2794550902150c29",
         "stable": true
       },
       "request": {
@@ -768,9 +846,10 @@
       }
     },
     {
-      "candidateCount": 1,
+      "candidateCount": 2,
       "candidateIds": [
-        "logic-structural:candle:an:peel_right_consonant_led_expansion+peel_left_consonant_frame"
+        "logic-structural:candle:an:peel_right_consonant_led_expansion+peel_left_consonant_frame",
+        "logic-structural:candle:an:peel_right_consonant_led_expansion+peel_left_consonant_frame:generic-functional"
       ],
       "candidates": [
         {
@@ -806,23 +885,59 @@
           "userDecisionPosture": "user_decides",
           "validationOutcome": "not_evaluated",
           "vowelPath": null
+        },
+        {
+          "claimBoundary": "generic Voice-profile hypothesis only; no target meaning, evidence, or semantic interaction is claimed",
+          "embryo": "AN",
+          "embryoSize": 2,
+          "evidence": {
+            "locatorCount": 0,
+            "navigableCount": 0,
+            "refCount": 0,
+            "refs": [],
+            "researchCount": 0,
+            "resolvedCount": 0,
+            "reviewedCount": 0,
+            "safeUrlCount": 0,
+            "unresolvedCount": 0
+          },
+          "expansionChain": [
+            "AN",
+            "CAN",
+            "CANDLE"
+          ],
+          "form": "AN",
+          "functionalComponents": null,
+          "functionalStatement": null,
+          "id": "logic-structural:candle:an:peel_right_consonant_led_expansion+peel_left_consonant_frame:generic-functional",
+          "ordinal": 1,
+          "sourceKind": "logic_derived_generic_functional_hypothesis",
+          "sourceStatus": "logic_derived_candidate",
+          "status": "unknown",
+          "targetSenseId": null,
+          "targetSenseLabel": null,
+          "userDecisionPosture": "user_decides",
+          "validationOutcome": "not_evaluated",
+          "vowelPath": null
         }
       ],
       "caseId": "target-sense.candle",
       "composition": {
         "candidatesWithComponents": 0,
-        "candidatesWithExpansionChain": 1,
+        "candidatesWithExpansionChain": 2,
         "candidatesWithFunctionalStatements": 0,
         "candidatesWithVowelPath": 0,
         "totalComponents": 0
       },
       "embryo": {
-        "candidateCount": 1,
-        "candidatesWithEmbryo": 1,
+        "candidateCount": 2,
+        "candidatesWithEmbryo": 2,
         "forms": [
+          "AN",
           "AN"
         ],
         "sizes": [
+          2,
           2
         ]
       },
@@ -838,7 +953,7 @@
         "totalRefs": 0,
         "unresolvedRefs": 0
       },
-      "fingerprint": "8861fce69d992961110e3866a657e6f74c6fe8acca0346f0d6e720bbf9279757",
+      "fingerprint": "cda3ac1ca3b5652b84f743745dce566707b281e059422bc935c92f12b5e6b77e",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -872,7 +987,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "8861fce69d992961110e3866a657e6f74c6fe8acca0346f0d6e720bbf9279757",
+        "repeatedFingerprint": "cda3ac1ca3b5652b84f743745dce566707b281e059422bc935c92f12b5e6b77e",
         "stable": true
       },
       "request": {
@@ -885,7 +1000,7 @@
         "targetSenseLabel": "a wax light source",
         "word": "candle"
       },
-      "status": "structural_unreviewed",
+      "status": "candidate_only",
       "targetSense": {
         "candidateBindings": [
           {
@@ -1049,7 +1164,7 @@
         "totalRefs": 2,
         "unresolvedRefs": 0
       },
-      "fingerprint": "1497b643d62376cb207bd0a428bc9026d0fbc4072ce5d4caa3a9e2a6f44731e7",
+      "fingerprint": "6086516a01e413f11fb3b5432688a5ef4b49ef6e23795ae1acbe99ce8fd98b03",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -1083,7 +1198,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "1497b643d62376cb207bd0a428bc9026d0fbc4072ce5d4caa3a9e2a6f44731e7",
+        "repeatedFingerprint": "6086516a01e413f11fb3b5432688a5ef4b49ef6e23795ae1acbe99ce8fd98b03",
         "stable": true
       },
       "request": {
@@ -1484,11 +1599,81 @@
       }
     },
     {
-      "candidateCount": 1,
+      "candidateCount": 3,
       "candidateIds": [
+        "logic-structural:mountain:ount:peel_right_vowel_led_expansion+peel_left_consonant_frame",
+        "logic-structural:mountain:ounta:peel_right_vowel_led_expansion+peel_left_consonant_frame",
         "Albanian-mal"
       ],
       "candidates": [
+        {
+          "claimBoundary": "logic-derived structural hypothesis only; independent meaning unknown; not reviewed evidence, candidate truth, or historical origin",
+          "embryo": "OUNT",
+          "embryoSize": 4,
+          "evidence": {
+            "locatorCount": 0,
+            "navigableCount": 0,
+            "refCount": 0,
+            "refs": [],
+            "researchCount": 0,
+            "resolvedCount": 0,
+            "reviewedCount": 0,
+            "safeUrlCount": 0,
+            "unresolvedCount": 0
+          },
+          "expansionChain": [
+            "OUNT",
+            "MOUNT",
+            "MOUNTAIN"
+          ],
+          "form": "OUNT",
+          "functionalComponents": null,
+          "functionalStatement": null,
+          "id": "logic-structural:mountain:ount:peel_right_vowel_led_expansion+peel_left_consonant_frame",
+          "ordinal": 0,
+          "sourceKind": "logic_derived_structural_hypothesis",
+          "sourceStatus": null,
+          "status": "unknown",
+          "targetSenseId": null,
+          "targetSenseLabel": null,
+          "userDecisionPosture": "user_decides",
+          "validationOutcome": "not_evaluated",
+          "vowelPath": null
+        },
+        {
+          "claimBoundary": "logic-derived structural hypothesis only; independent meaning unknown; not reviewed evidence, candidate truth, or historical origin",
+          "embryo": "OUNTA",
+          "embryoSize": 5,
+          "evidence": {
+            "locatorCount": 0,
+            "navigableCount": 0,
+            "refCount": 0,
+            "refs": [],
+            "researchCount": 0,
+            "resolvedCount": 0,
+            "reviewedCount": 0,
+            "safeUrlCount": 0,
+            "unresolvedCount": 0
+          },
+          "expansionChain": [
+            "OUNTA",
+            "MOUNTA",
+            "MOUNTAIN"
+          ],
+          "form": "OUNTA",
+          "functionalComponents": null,
+          "functionalStatement": null,
+          "id": "logic-structural:mountain:ounta:peel_right_vowel_led_expansion+peel_left_consonant_frame",
+          "ordinal": 1,
+          "sourceKind": "logic_derived_structural_hypothesis",
+          "sourceStatus": null,
+          "status": "unknown",
+          "targetSenseId": null,
+          "targetSenseLabel": null,
+          "userDecisionPosture": "user_decides",
+          "validationOutcome": "not_evaluated",
+          "vowelPath": null
+        },
         {
           "claimBoundary": "research_functional_hypothesis_only",
           "embryo": "MAL",
@@ -1518,7 +1703,7 @@
           "functionalComponents": null,
           "functionalStatement": "the independently attested Albanian noun mal denotes a mountain and can be tested as a direct cross-language functional expression of the MOUNTAIN concept; this is functional research only and does not assert historical origin or transmission",
           "id": "Albanian-mal",
-          "ordinal": 0,
+          "ordinal": 2,
           "sourceKind": "multi_source_research_witness",
           "sourceStatus": "research_candidate",
           "status": "unknown",
@@ -1532,18 +1717,23 @@
       "caseId": "scale50.mountain.nature",
       "composition": {
         "candidatesWithComponents": 0,
-        "candidatesWithExpansionChain": 0,
+        "candidatesWithExpansionChain": 2,
         "candidatesWithFunctionalStatements": 1,
         "candidatesWithVowelPath": 0,
         "totalComponents": 0
       },
       "embryo": {
-        "candidateCount": 1,
-        "candidatesWithEmbryo": 1,
+        "candidateCount": 3,
+        "candidatesWithEmbryo": 3,
         "forms": [
+          "OUNT",
+          "OUNTA",
           "MAL"
         ],
-        "sizes": []
+        "sizes": [
+          4,
+          5
+        ]
       },
       "engineVersion": "0.2.0-symbolic",
       "evidence": {
@@ -1557,7 +1747,7 @@
         "totalRefs": 1,
         "unresolvedRefs": 0
       },
-      "fingerprint": "a82310f42fb7dea004bef44ac9499bf82833ad6493f9d0d187488a20f777f094",
+      "fingerprint": "c38a8dfd4017a515cad6773e2d9ed52a524d1d591a747eda4e388e2a58d21603",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -1597,7 +1787,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "a82310f42fb7dea004bef44ac9499bf82833ad6493f9d0d187488a20f777f094",
+        "repeatedFingerprint": "c38a8dfd4017a515cad6773e2d9ed52a524d1d591a747eda4e388e2a58d21603",
         "stable": true
       },
       "request": {
@@ -1616,22 +1806,100 @@
       }
     },
     {
-      "candidateCount": 0,
-      "candidateIds": [],
-      "candidates": [],
+      "candidateCount": 2,
+      "candidateIds": [
+        "logic-structural:stone:one:peel_left_consonant_frame+peel_left_consonant_frame",
+        "logic-structural:stone:one:peel_left_consonant_frame+peel_left_consonant_frame:generic-functional"
+      ],
+      "candidates": [
+        {
+          "claimBoundary": "logic-derived structural hypothesis only; independent meaning unknown; not reviewed evidence, candidate truth, or historical origin",
+          "embryo": "ONE",
+          "embryoSize": 3,
+          "evidence": {
+            "locatorCount": 0,
+            "navigableCount": 0,
+            "refCount": 0,
+            "refs": [],
+            "researchCount": 0,
+            "resolvedCount": 0,
+            "reviewedCount": 0,
+            "safeUrlCount": 0,
+            "unresolvedCount": 0
+          },
+          "expansionChain": [
+            "ONE",
+            "TONE",
+            "STONE"
+          ],
+          "form": "ONE",
+          "functionalComponents": null,
+          "functionalStatement": null,
+          "id": "logic-structural:stone:one:peel_left_consonant_frame+peel_left_consonant_frame",
+          "ordinal": 0,
+          "sourceKind": "logic_derived_structural_hypothesis",
+          "sourceStatus": null,
+          "status": "unknown",
+          "targetSenseId": null,
+          "targetSenseLabel": null,
+          "userDecisionPosture": "user_decides",
+          "validationOutcome": "not_evaluated",
+          "vowelPath": null
+        },
+        {
+          "claimBoundary": "generic Voice-profile hypothesis only; no target meaning, evidence, or semantic interaction is claimed",
+          "embryo": "ONE",
+          "embryoSize": 3,
+          "evidence": {
+            "locatorCount": 0,
+            "navigableCount": 0,
+            "refCount": 0,
+            "refs": [],
+            "researchCount": 0,
+            "resolvedCount": 0,
+            "reviewedCount": 0,
+            "safeUrlCount": 0,
+            "unresolvedCount": 0
+          },
+          "expansionChain": [
+            "ONE",
+            "TONE",
+            "STONE"
+          ],
+          "form": "ONE",
+          "functionalComponents": null,
+          "functionalStatement": null,
+          "id": "logic-structural:stone:one:peel_left_consonant_frame+peel_left_consonant_frame:generic-functional",
+          "ordinal": 1,
+          "sourceKind": "logic_derived_generic_functional_hypothesis",
+          "sourceStatus": "logic_derived_candidate",
+          "status": "unknown",
+          "targetSenseId": null,
+          "targetSenseLabel": null,
+          "userDecisionPosture": "user_decides",
+          "validationOutcome": "not_evaluated",
+          "vowelPath": null
+        }
+      ],
       "caseId": "scale50.stone.nature",
       "composition": {
         "candidatesWithComponents": 0,
-        "candidatesWithExpansionChain": 0,
+        "candidatesWithExpansionChain": 2,
         "candidatesWithFunctionalStatements": 0,
         "candidatesWithVowelPath": 0,
         "totalComponents": 0
       },
       "embryo": {
-        "candidateCount": 0,
-        "candidatesWithEmbryo": 0,
-        "forms": [],
-        "sizes": []
+        "candidateCount": 2,
+        "candidatesWithEmbryo": 2,
+        "forms": [
+          "ONE",
+          "ONE"
+        ],
+        "sizes": [
+          3,
+          3
+        ]
       },
       "engineVersion": "0.2.0-symbolic",
       "evidence": {
@@ -1645,7 +1913,7 @@
         "totalRefs": 0,
         "unresolvedRefs": 0
       },
-      "fingerprint": "c3a8da816c9a7e7590346123dc7c73f5b2fcabec0922734548ef9c4d105562e0",
+      "fingerprint": "e5f0def55b7968da611f5220acb1fa10704d792e95afdcc0f42cb15dce5d0e51",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -1659,7 +1927,7 @@
         "valid": true
       },
       "normalizedWord": "stone",
-      "nullResult": true,
+      "nullResult": false,
       "paths": {
         "delta": "MATCH",
         "detected": [
@@ -1679,7 +1947,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "c3a8da816c9a7e7590346123dc7c73f5b2fcabec0922734548ef9c4d105562e0",
+        "repeatedFingerprint": "e5f0def55b7968da611f5220acb1fa10704d792e95afdcc0f42cb15dce5d0e51",
         "stable": true
       },
       "request": {
@@ -1692,7 +1960,7 @@
         "targetSenseLabel": null,
         "word": "stone"
       },
-      "status": "null_no_supported_candidate",
+      "status": "candidate_only",
       "targetSense": {
         "candidateBindings": []
       }
@@ -4866,22 +5134,100 @@
       }
     },
     {
-      "candidateCount": 0,
-      "candidateIds": [],
-      "candidates": [],
+      "candidateCount": 2,
+      "candidateIds": [
+        "logic-structural:drink:ink:peel_left_consonant_frame+peel_left_consonant_frame",
+        "logic-structural:drink:ink:peel_left_consonant_frame+peel_left_consonant_frame:generic-functional"
+      ],
+      "candidates": [
+        {
+          "claimBoundary": "logic-derived structural hypothesis only; independent meaning unknown; not reviewed evidence, candidate truth, or historical origin",
+          "embryo": "INK",
+          "embryoSize": 3,
+          "evidence": {
+            "locatorCount": 0,
+            "navigableCount": 0,
+            "refCount": 0,
+            "refs": [],
+            "researchCount": 0,
+            "resolvedCount": 0,
+            "reviewedCount": 0,
+            "safeUrlCount": 0,
+            "unresolvedCount": 0
+          },
+          "expansionChain": [
+            "INK",
+            "RINK",
+            "DRINK"
+          ],
+          "form": "INK",
+          "functionalComponents": null,
+          "functionalStatement": null,
+          "id": "logic-structural:drink:ink:peel_left_consonant_frame+peel_left_consonant_frame",
+          "ordinal": 0,
+          "sourceKind": "logic_derived_structural_hypothesis",
+          "sourceStatus": null,
+          "status": "unknown",
+          "targetSenseId": null,
+          "targetSenseLabel": null,
+          "userDecisionPosture": "user_decides",
+          "validationOutcome": "not_evaluated",
+          "vowelPath": null
+        },
+        {
+          "claimBoundary": "generic Voice-profile hypothesis only; no target meaning, evidence, or semantic interaction is claimed",
+          "embryo": "INK",
+          "embryoSize": 3,
+          "evidence": {
+            "locatorCount": 0,
+            "navigableCount": 0,
+            "refCount": 0,
+            "refs": [],
+            "researchCount": 0,
+            "resolvedCount": 0,
+            "reviewedCount": 0,
+            "safeUrlCount": 0,
+            "unresolvedCount": 0
+          },
+          "expansionChain": [
+            "INK",
+            "RINK",
+            "DRINK"
+          ],
+          "form": "INK",
+          "functionalComponents": null,
+          "functionalStatement": null,
+          "id": "logic-structural:drink:ink:peel_left_consonant_frame+peel_left_consonant_frame:generic-functional",
+          "ordinal": 1,
+          "sourceKind": "logic_derived_generic_functional_hypothesis",
+          "sourceStatus": "logic_derived_candidate",
+          "status": "unknown",
+          "targetSenseId": null,
+          "targetSenseLabel": null,
+          "userDecisionPosture": "user_decides",
+          "validationOutcome": "not_evaluated",
+          "vowelPath": null
+        }
+      ],
       "caseId": "scale50.drink.action",
       "composition": {
         "candidatesWithComponents": 0,
-        "candidatesWithExpansionChain": 0,
+        "candidatesWithExpansionChain": 2,
         "candidatesWithFunctionalStatements": 0,
         "candidatesWithVowelPath": 0,
         "totalComponents": 0
       },
       "embryo": {
-        "candidateCount": 0,
-        "candidatesWithEmbryo": 0,
-        "forms": [],
-        "sizes": []
+        "candidateCount": 2,
+        "candidatesWithEmbryo": 2,
+        "forms": [
+          "INK",
+          "INK"
+        ],
+        "sizes": [
+          3,
+          3
+        ]
       },
       "engineVersion": "0.2.0-symbolic",
       "evidence": {
@@ -4895,7 +5241,7 @@
         "totalRefs": 0,
         "unresolvedRefs": 0
       },
-      "fingerprint": "c67f627c3281e42d879d25bb108197988d8123567f626dae8dcbd3b31f255e0a",
+      "fingerprint": "1d287266fe3643828c182a06528ae7d4226a4ac7cb20a8e49a76dc0c1fd76683",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -4909,7 +5255,7 @@
         "valid": true
       },
       "normalizedWord": "drink",
-      "nullResult": true,
+      "nullResult": false,
       "paths": {
         "delta": "MATCH",
         "detected": [
@@ -4926,7 +5272,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "c67f627c3281e42d879d25bb108197988d8123567f626dae8dcbd3b31f255e0a",
+        "repeatedFingerprint": "1d287266fe3643828c182a06528ae7d4226a4ac7cb20a8e49a76dc0c1fd76683",
         "stable": true
       },
       "request": {
@@ -4939,7 +5285,7 @@
         "targetSenseLabel": null,
         "word": "drink"
       },
-      "status": "null_no_supported_candidate",
+      "status": "candidate_only",
       "targetSense": {
         "candidateBindings": []
       }
@@ -5775,11 +6121,46 @@
       }
     },
     {
-      "candidateCount": 1,
+      "candidateCount": 2,
       "candidateIds": [
+        "logic-structural:truth:uth:peel_left_consonant_frame+peel_left_consonant_frame",
         "Albanian-vërtetë"
       ],
       "candidates": [
+        {
+          "claimBoundary": "logic-derived structural hypothesis only; independent meaning unknown; not reviewed evidence, candidate truth, or historical origin",
+          "embryo": "UTH",
+          "embryoSize": 3,
+          "evidence": {
+            "locatorCount": 0,
+            "navigableCount": 0,
+            "refCount": 0,
+            "refs": [],
+            "researchCount": 0,
+            "resolvedCount": 0,
+            "reviewedCount": 0,
+            "safeUrlCount": 0,
+            "unresolvedCount": 0
+          },
+          "expansionChain": [
+            "UTH",
+            "RUTH",
+            "TRUTH"
+          ],
+          "form": "UTH",
+          "functionalComponents": null,
+          "functionalStatement": null,
+          "id": "logic-structural:truth:uth:peel_left_consonant_frame+peel_left_consonant_frame",
+          "ordinal": 0,
+          "sourceKind": "logic_derived_structural_hypothesis",
+          "sourceStatus": null,
+          "status": "unknown",
+          "targetSenseId": null,
+          "targetSenseLabel": null,
+          "userDecisionPosture": "user_decides",
+          "validationOutcome": "not_evaluated",
+          "vowelPath": null
+        },
         {
           "claimBoundary": "research_functional_hypothesis_only",
           "embryo": "VËRTETË",
@@ -5809,7 +6190,7 @@
           "functionalComponents": null,
           "functionalStatement": "the independently attested Albanian noun vërtetë denotes truth or that which corresponds to reality and can be tested as a direct cross-language functional expression of the TRUTH concept; this is functional research only and does not assert historical origin or transmission",
           "id": "Albanian-vërtetë",
-          "ordinal": 0,
+          "ordinal": 1,
           "sourceKind": "multi_source_research_witness",
           "sourceStatus": "research_candidate",
           "status": "unknown",
@@ -5823,18 +6204,21 @@
       "caseId": "scale50.truth.abstract",
       "composition": {
         "candidatesWithComponents": 0,
-        "candidatesWithExpansionChain": 0,
+        "candidatesWithExpansionChain": 1,
         "candidatesWithFunctionalStatements": 1,
         "candidatesWithVowelPath": 0,
         "totalComponents": 0
       },
       "embryo": {
-        "candidateCount": 1,
-        "candidatesWithEmbryo": 1,
+        "candidateCount": 2,
+        "candidatesWithEmbryo": 2,
         "forms": [
+          "UTH",
           "VËRTETË"
         ],
-        "sizes": []
+        "sizes": [
+          3
+        ]
       },
       "engineVersion": "0.2.0-symbolic",
       "evidence": {
@@ -5848,7 +6232,7 @@
         "totalRefs": 1,
         "unresolvedRefs": 0
       },
-      "fingerprint": "f1e568484f115687a0f7cd3df10bb8eb34f2101a46feb9f71977fe38c9a85f4e",
+      "fingerprint": "78e1657b79e25ab52fc487ecf2b79490547ba472558522081357b8d4cf4bae2a",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -5879,7 +6263,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "f1e568484f115687a0f7cd3df10bb8eb34f2101a46feb9f71977fe38c9a85f4e",
+        "repeatedFingerprint": "78e1657b79e25ab52fc487ecf2b79490547ba472558522081357b8d4cf4bae2a",
         "stable": true
       },
       "request": {
@@ -6519,12 +6903,83 @@
       }
     },
     {
-      "candidateCount": 2,
+      "candidateCount": 4,
       "candidateIds": [
+        "logic-structural:freedom:eed:peel_right_vowel_led_expansion+peel_left_consonant_frame+peel_left_consonant_frame",
+        "logic-structural:freedom:eedom:peel_left_consonant_frame+peel_left_consonant_frame",
         "Albanian-liri",
         "Latin-lībertas"
       ],
       "candidates": [
+        {
+          "claimBoundary": "logic-derived structural hypothesis only; independent meaning unknown; not reviewed evidence, candidate truth, or historical origin",
+          "embryo": "EED",
+          "embryoSize": 3,
+          "evidence": {
+            "locatorCount": 0,
+            "navigableCount": 0,
+            "refCount": 0,
+            "refs": [],
+            "researchCount": 0,
+            "resolvedCount": 0,
+            "reviewedCount": 0,
+            "safeUrlCount": 0,
+            "unresolvedCount": 0
+          },
+          "expansionChain": [
+            "EED",
+            "REED",
+            "FREED",
+            "FREEDOM"
+          ],
+          "form": "EED",
+          "functionalComponents": null,
+          "functionalStatement": null,
+          "id": "logic-structural:freedom:eed:peel_right_vowel_led_expansion+peel_left_consonant_frame+peel_left_consonant_frame",
+          "ordinal": 0,
+          "sourceKind": "logic_derived_structural_hypothesis",
+          "sourceStatus": null,
+          "status": "unknown",
+          "targetSenseId": null,
+          "targetSenseLabel": null,
+          "userDecisionPosture": "user_decides",
+          "validationOutcome": "not_evaluated",
+          "vowelPath": null
+        },
+        {
+          "claimBoundary": "logic-derived structural hypothesis only; independent meaning unknown; not reviewed evidence, candidate truth, or historical origin",
+          "embryo": "EEDOM",
+          "embryoSize": 5,
+          "evidence": {
+            "locatorCount": 0,
+            "navigableCount": 0,
+            "refCount": 0,
+            "refs": [],
+            "researchCount": 0,
+            "resolvedCount": 0,
+            "reviewedCount": 0,
+            "safeUrlCount": 0,
+            "unresolvedCount": 0
+          },
+          "expansionChain": [
+            "EEDOM",
+            "REEDOM",
+            "FREEDOM"
+          ],
+          "form": "EEDOM",
+          "functionalComponents": null,
+          "functionalStatement": null,
+          "id": "logic-structural:freedom:eedom:peel_left_consonant_frame+peel_left_consonant_frame",
+          "ordinal": 1,
+          "sourceKind": "logic_derived_structural_hypothesis",
+          "sourceStatus": null,
+          "status": "unknown",
+          "targetSenseId": null,
+          "targetSenseLabel": null,
+          "userDecisionPosture": "user_decides",
+          "validationOutcome": "not_evaluated",
+          "vowelPath": null
+        },
         {
           "claimBoundary": "research_functional_hypothesis_only",
           "embryo": "LIRI",
@@ -6554,7 +7009,7 @@
           "functionalComponents": null,
           "functionalStatement": "the independently attested Albanian noun liri denotes liberty and freedom from oppression or restraint and can be tested as a bounded functional witness for FREEDOM; this remains research-only and makes no historical-origin, winner, or candidate-truth claim",
           "id": "Albanian-liri",
-          "ordinal": 0,
+          "ordinal": 2,
           "sourceKind": "multi_source_research_witness",
           "sourceStatus": "research_candidate",
           "status": "unknown",
@@ -6593,7 +7048,7 @@
           "functionalComponents": null,
           "functionalStatement": "the independently attested Latin noun lībertas denotes freedom or liberty, including freedom from restraint or obligation, and can be tested as a bounded functional witness for FREEDOM; this remains research-only and makes no historical-origin, winner, or candidate-truth claim",
           "id": "Latin-lībertas",
-          "ordinal": 1,
+          "ordinal": 3,
           "sourceKind": "multi_source_research_witness",
           "sourceStatus": "research_candidate",
           "status": "unknown",
@@ -6607,19 +7062,24 @@
       "caseId": "scale50.freedom.abstract",
       "composition": {
         "candidatesWithComponents": 0,
-        "candidatesWithExpansionChain": 0,
+        "candidatesWithExpansionChain": 2,
         "candidatesWithFunctionalStatements": 2,
         "candidatesWithVowelPath": 0,
         "totalComponents": 0
       },
       "embryo": {
-        "candidateCount": 2,
-        "candidatesWithEmbryo": 2,
+        "candidateCount": 4,
+        "candidatesWithEmbryo": 4,
         "forms": [
+          "EED",
+          "EEDOM",
           "LIRI",
           "LĪBERTAS"
         ],
-        "sizes": []
+        "sizes": [
+          3,
+          5
+        ]
       },
       "engineVersion": "0.2.0-symbolic",
       "evidence": {
@@ -6633,7 +7093,7 @@
         "totalRefs": 2,
         "unresolvedRefs": 0
       },
-      "fingerprint": "9b32004ad9023f923ac35b9a4a60df38b0d2b727c645b04018541d58b99d8595",
+      "fingerprint": "fd418a7e47a60a4d4bd0ec622487323fc8c6e06a0e4788c2a7799576a18dfc4d",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -6675,7 +7135,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "9b32004ad9023f923ac35b9a4a60df38b0d2b727c645b04018541d58b99d8595",
+        "repeatedFingerprint": "fd418a7e47a60a4d4bd0ec622487323fc8c6e06a0e4788c2a7799576a18dfc4d",
         "stable": true
       },
       "request": {
@@ -6694,22 +7154,100 @@
       }
     },
     {
-      "candidateCount": 0,
-      "candidateIds": [],
-      "candidates": [],
+      "candidateCount": 2,
+      "candidateIds": [
+        "logic-structural:justice:ust:peel_right_vowel_led_expansion+peel_left_consonant_frame",
+        "logic-structural:justice:ust:peel_right_vowel_led_expansion+peel_left_consonant_frame:generic-functional"
+      ],
+      "candidates": [
+        {
+          "claimBoundary": "logic-derived structural hypothesis only; independent meaning unknown; not reviewed evidence, candidate truth, or historical origin",
+          "embryo": "UST",
+          "embryoSize": 3,
+          "evidence": {
+            "locatorCount": 0,
+            "navigableCount": 0,
+            "refCount": 0,
+            "refs": [],
+            "researchCount": 0,
+            "resolvedCount": 0,
+            "reviewedCount": 0,
+            "safeUrlCount": 0,
+            "unresolvedCount": 0
+          },
+          "expansionChain": [
+            "UST",
+            "JUST",
+            "JUSTICE"
+          ],
+          "form": "UST",
+          "functionalComponents": null,
+          "functionalStatement": null,
+          "id": "logic-structural:justice:ust:peel_right_vowel_led_expansion+peel_left_consonant_frame",
+          "ordinal": 0,
+          "sourceKind": "logic_derived_structural_hypothesis",
+          "sourceStatus": null,
+          "status": "unknown",
+          "targetSenseId": null,
+          "targetSenseLabel": null,
+          "userDecisionPosture": "user_decides",
+          "validationOutcome": "not_evaluated",
+          "vowelPath": null
+        },
+        {
+          "claimBoundary": "generic Voice-profile hypothesis only; no target meaning, evidence, or semantic interaction is claimed",
+          "embryo": "UST",
+          "embryoSize": 3,
+          "evidence": {
+            "locatorCount": 0,
+            "navigableCount": 0,
+            "refCount": 0,
+            "refs": [],
+            "researchCount": 0,
+            "resolvedCount": 0,
+            "reviewedCount": 0,
+            "safeUrlCount": 0,
+            "unresolvedCount": 0
+          },
+          "expansionChain": [
+            "UST",
+            "JUST",
+            "JUSTICE"
+          ],
+          "form": "UST",
+          "functionalComponents": null,
+          "functionalStatement": null,
+          "id": "logic-structural:justice:ust:peel_right_vowel_led_expansion+peel_left_consonant_frame:generic-functional",
+          "ordinal": 1,
+          "sourceKind": "logic_derived_generic_functional_hypothesis",
+          "sourceStatus": "logic_derived_candidate",
+          "status": "unknown",
+          "targetSenseId": null,
+          "targetSenseLabel": null,
+          "userDecisionPosture": "user_decides",
+          "validationOutcome": "not_evaluated",
+          "vowelPath": null
+        }
+      ],
       "caseId": "scale50.justice.abstract",
       "composition": {
         "candidatesWithComponents": 0,
-        "candidatesWithExpansionChain": 0,
+        "candidatesWithExpansionChain": 2,
         "candidatesWithFunctionalStatements": 0,
         "candidatesWithVowelPath": 0,
         "totalComponents": 0
       },
       "embryo": {
-        "candidateCount": 0,
-        "candidatesWithEmbryo": 0,
-        "forms": [],
-        "sizes": []
+        "candidateCount": 2,
+        "candidatesWithEmbryo": 2,
+        "forms": [
+          "UST",
+          "UST"
+        ],
+        "sizes": [
+          3,
+          3
+        ]
       },
       "engineVersion": "0.2.0-symbolic",
       "evidence": {
@@ -6723,7 +7261,7 @@
         "totalRefs": 0,
         "unresolvedRefs": 0
       },
-      "fingerprint": "ec54720ac6e11460f722062092aa68a27608a0fa341212efd29bde909c3166ee",
+      "fingerprint": "bc89b57d6594f0862ef0273fba4138d04006c29e96ad2405dd959b3c9d4474bf",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -6737,7 +7275,7 @@
         "valid": true
       },
       "normalizedWord": "justice",
-      "nullResult": true,
+      "nullResult": false,
       "paths": {
         "delta": "MATCH",
         "detected": [
@@ -6760,7 +7298,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "ec54720ac6e11460f722062092aa68a27608a0fa341212efd29bde909c3166ee",
+        "repeatedFingerprint": "bc89b57d6594f0862ef0273fba4138d04006c29e96ad2405dd959b3c9d4474bf",
         "stable": true
       },
       "request": {
@@ -6773,7 +7311,7 @@
         "targetSenseLabel": null,
         "word": "justice"
       },
-      "status": "null_no_supported_candidate",
+      "status": "candidate_only",
       "targetSense": {
         "candidateBindings": []
       }
@@ -7188,11 +7726,46 @@
       }
     },
     {
-      "candidateCount": 1,
+      "candidateCount": 2,
       "candidateIds": [
+        "logic-structural:mother:oth:peel_right_vowel_led_expansion+peel_left_consonant_frame",
         "Albanian-nënë"
       ],
       "candidates": [
+        {
+          "claimBoundary": "logic-derived structural hypothesis only; independent meaning unknown; not reviewed evidence, candidate truth, or historical origin",
+          "embryo": "OTH",
+          "embryoSize": 3,
+          "evidence": {
+            "locatorCount": 0,
+            "navigableCount": 0,
+            "refCount": 0,
+            "refs": [],
+            "researchCount": 0,
+            "resolvedCount": 0,
+            "reviewedCount": 0,
+            "safeUrlCount": 0,
+            "unresolvedCount": 0
+          },
+          "expansionChain": [
+            "OTH",
+            "MOTH",
+            "MOTHER"
+          ],
+          "form": "OTH",
+          "functionalComponents": null,
+          "functionalStatement": null,
+          "id": "logic-structural:mother:oth:peel_right_vowel_led_expansion+peel_left_consonant_frame",
+          "ordinal": 0,
+          "sourceKind": "logic_derived_structural_hypothesis",
+          "sourceStatus": null,
+          "status": "unknown",
+          "targetSenseId": null,
+          "targetSenseLabel": null,
+          "userDecisionPosture": "user_decides",
+          "validationOutcome": "not_evaluated",
+          "vowelPath": null
+        },
         {
           "claimBoundary": "research_functional_hypothesis_only",
           "embryo": "NËNË",
@@ -7222,7 +7795,7 @@
           "functionalComponents": null,
           "functionalStatement": "the independently attested Albanian noun nënë denotes mother and can be tested as a direct cross-language functional expression of the MOTHER concept; this is functional research only and does not assert historical origin or transmission",
           "id": "Albanian-nënë",
-          "ordinal": 0,
+          "ordinal": 1,
           "sourceKind": "multi_source_research_witness",
           "sourceStatus": "research_candidate",
           "status": "unknown",
@@ -7236,18 +7809,21 @@
       "caseId": "scale50.mother.human-social",
       "composition": {
         "candidatesWithComponents": 0,
-        "candidatesWithExpansionChain": 0,
+        "candidatesWithExpansionChain": 1,
         "candidatesWithFunctionalStatements": 1,
         "candidatesWithVowelPath": 0,
         "totalComponents": 0
       },
       "embryo": {
-        "candidateCount": 1,
-        "candidatesWithEmbryo": 1,
+        "candidateCount": 2,
+        "candidatesWithEmbryo": 2,
         "forms": [
+          "OTH",
           "NËNË"
         ],
-        "sizes": []
+        "sizes": [
+          3
+        ]
       },
       "engineVersion": "0.2.0-symbolic",
       "evidence": {
@@ -7261,7 +7837,7 @@
         "totalRefs": 1,
         "unresolvedRefs": 0
       },
-      "fingerprint": "3662c37f0770707e6aa43d38295e1fe4ca22887d60cba3107d3e9b86ccdd7640",
+      "fingerprint": "8be25e0f31938c4994d2238de6e14c2e8195cecfb66e6de40d48cc665278fe7f",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -7302,7 +7878,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "3662c37f0770707e6aa43d38295e1fe4ca22887d60cba3107d3e9b86ccdd7640",
+        "repeatedFingerprint": "8be25e0f31938c4994d2238de6e14c2e8195cecfb66e6de40d48cc665278fe7f",
         "stable": true
       },
       "request": {
@@ -7321,11 +7897,46 @@
       }
     },
     {
-      "candidateCount": 1,
+      "candidateCount": 2,
       "candidateIds": [
+        "logic-structural:child:ild:peel_left_consonant_frame+peel_left_consonant_frame",
         "Albanian-fëmijë"
       ],
       "candidates": [
+        {
+          "claimBoundary": "logic-derived structural hypothesis only; independent meaning unknown; not reviewed evidence, candidate truth, or historical origin",
+          "embryo": "ILD",
+          "embryoSize": 3,
+          "evidence": {
+            "locatorCount": 0,
+            "navigableCount": 0,
+            "refCount": 0,
+            "refs": [],
+            "researchCount": 0,
+            "resolvedCount": 0,
+            "reviewedCount": 0,
+            "safeUrlCount": 0,
+            "unresolvedCount": 0
+          },
+          "expansionChain": [
+            "ILD",
+            "HILD",
+            "CHILD"
+          ],
+          "form": "ILD",
+          "functionalComponents": null,
+          "functionalStatement": null,
+          "id": "logic-structural:child:ild:peel_left_consonant_frame+peel_left_consonant_frame",
+          "ordinal": 0,
+          "sourceKind": "logic_derived_structural_hypothesis",
+          "sourceStatus": null,
+          "status": "unknown",
+          "targetSenseId": null,
+          "targetSenseLabel": null,
+          "userDecisionPosture": "user_decides",
+          "validationOutcome": "not_evaluated",
+          "vowelPath": null
+        },
         {
           "claimBoundary": "research_functional_hypothesis_only",
           "embryo": "FËMIJË",
@@ -7355,7 +7966,7 @@
           "functionalComponents": null,
           "functionalStatement": "the independently attested Albanian noun fëmijë denotes a child and can be tested as a direct cross-language functional expression of the CHILD concept; this is functional research only and does not assert historical origin or transmission",
           "id": "Albanian-fëmijë",
-          "ordinal": 0,
+          "ordinal": 1,
           "sourceKind": "multi_source_research_witness",
           "sourceStatus": "research_candidate",
           "status": "unknown",
@@ -7369,18 +7980,21 @@
       "caseId": "scale50.child.human-social",
       "composition": {
         "candidatesWithComponents": 0,
-        "candidatesWithExpansionChain": 0,
+        "candidatesWithExpansionChain": 1,
         "candidatesWithFunctionalStatements": 1,
         "candidatesWithVowelPath": 0,
         "totalComponents": 0
       },
       "embryo": {
-        "candidateCount": 1,
-        "candidatesWithEmbryo": 1,
+        "candidateCount": 2,
+        "candidatesWithEmbryo": 2,
         "forms": [
+          "ILD",
           "FËMIJË"
         ],
-        "sizes": []
+        "sizes": [
+          3
+        ]
       },
       "engineVersion": "0.2.0-symbolic",
       "evidence": {
@@ -7394,7 +8008,7 @@
         "totalRefs": 1,
         "unresolvedRefs": 0
       },
-      "fingerprint": "fa76a11545c4c7bd583827d105a5ed1ca167c80204eeddddd5db25b0ec25ff5b",
+      "fingerprint": "327191a94e27e1e9559351e8f24434fc147ce3947dda9c493beefc46f5074251",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -7425,7 +8039,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "fa76a11545c4c7bd583827d105a5ed1ca167c80204eeddddd5db25b0ec25ff5b",
+        "repeatedFingerprint": "327191a94e27e1e9559351e8f24434fc147ce3947dda9c493beefc46f5074251",
         "stable": true
       },
       "request": {
