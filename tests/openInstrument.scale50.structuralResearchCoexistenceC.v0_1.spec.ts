@@ -239,7 +239,7 @@ describe(
     );
 
     it.each(["break"])(
-      "%s uses source-backed research status after catalog admission",
+      "%s preserves structural status after lexical source reclassification",
       async (word) => {
         const body =
           await analyze(word);
@@ -248,10 +248,9 @@ describe(
           body.analysisStatusV0_1,
         ).toEqual(
           expect.objectContaining({
-            status:
-              "research_functional_hypothesis",
-            researchHypothesisEmbryos:
-              ["thyej", "frango"],
+            status: "structural_unreviewed",
+            researchHypothesisEmbryos: [],
+            structuralTokens: ["RE", "EAK"],
           }),
         );
       },

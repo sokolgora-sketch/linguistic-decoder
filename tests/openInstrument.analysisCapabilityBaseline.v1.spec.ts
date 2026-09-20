@@ -173,9 +173,9 @@ describe("Open Instrument analytical capability baseline v1", () => {
   test("aggregate preserves dimensional status and capability counts", () => {
     expect(baseline.aggregate.statusCounts).toEqual({
       reviewed_functional_evidence: 2,
-      research_functional_hypothesis: 1,
+      research_functional_hypothesis: 0,
       candidate_only: 4,
-      structural_unreviewed: 21,
+      structural_unreviewed: 22,
       null_no_supported_candidate: 29,
     });
     expect(baseline.aggregate.nullCount).toBe(29);
@@ -307,7 +307,7 @@ describe("Open Instrument analytical capability baseline v1", () => {
     expect(reviewed.status).toBe("reviewed_functional_evidence");
     expect(reviewed.evidence.reviewedRefs).toBe(1);
     expect(reviewed.evidence.researchRefs).toBe(0);
-    expect(research.status).toBe("research_functional_hypothesis");
+    expect(research.status).toBe("structural_unreviewed");
     expect(research.evidence.researchRefs).toBe(2);
     expect(research.evidence.reviewedRefs).toBe(0);
     expect(research.request.targetSenseId).toBeNull();

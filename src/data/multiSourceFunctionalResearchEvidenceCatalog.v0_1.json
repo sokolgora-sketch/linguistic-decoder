@@ -3396,11 +3396,11 @@
       "functionalHypotheses": [
         {
           "targetWord": "break",
-          "semanticBridge": "The reviewed entries attest physical breaking or separation of a material object; treating that shared physical operation as a functional bridge is a research hypothesis only.",
-          "functionalBridgeTruth": "hypothesis",
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
           "targetSenseId": "physical_break_damage",
-          "claimBoundary": "functional_hypothesis_only",
-          "evidenceBasis": "functional_correspondence"
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
         }
       ],
       "historicalOriginClaim": "not_claimed",
@@ -3440,11 +3440,11 @@
       "functionalHypotheses": [
         {
           "targetWord": "break",
-          "semanticBridge": "The reviewed entries attest physical breaking or separation of a material object; treating that shared physical operation as a functional bridge is a research hypothesis only.",
-          "functionalBridgeTruth": "hypothesis",
+          "semanticBridge": null,
+          "functionalBridgeTruth": "unknown",
           "targetSenseId": "physical_break_damage",
-          "claimBoundary": "functional_hypothesis_only",
-          "evidenceBasis": "functional_correspondence"
+          "claimBoundary": "lexical_source_evidence_only",
+          "evidenceBasis": "lexical_equivalence"
         }
       ],
       "historicalOriginClaim": "not_claimed",
