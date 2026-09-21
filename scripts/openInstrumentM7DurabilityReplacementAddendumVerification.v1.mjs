@@ -51,6 +51,21 @@ const EXPECTED_LOST_RUNS = [
   { slot: "M7-02", byteLength: 14855, sha256: "3ffbe21b4d4aa73ff06680de4f271ce895ce79dc2e8f7ce6a524e1fbea52f1ad" },
   { slot: "M7-03", byteLength: 12201, sha256: "e329fc66958becf961e212c989a042ddc33ec6816685a9b173d4d18ad38c6246" },
 ];
+export const REQUIRED_DURABILITY_GATE_FLAGS = [
+  "canonicalArtifactBeforeRevealRequired",
+  "primaryPersistedBeforeReveal",
+  "primaryRawLengthAndShaComputedFromDisk",
+  "primaryClosedAndReopened",
+  "primaryRecomputedAfterReadback",
+  "internalIdentityReverifiedFromReopenedBytes",
+  "separateVerificationReportRequired",
+  "secondaryByteForByteCopyRequired",
+  "secondaryRecomputedFromDisk",
+  "primaryAndSecondaryMustMatchExactly",
+  "bothPathsAndIdentitiesRecorded",
+  "revealBlockedUntilAllChecksPass",
+  "secondCopyMustNotBeCreatedByReserialization",
+];
 
 const sha256 = (bytes) => createHash("sha256").update(bytes).digest("hex");
 const readJson = (path) => JSON.parse(readFileSync(path, "utf8"));
@@ -83,6 +98,12 @@ function findForbiddenKeys(value, path = "$") {
     found.push(...findForbiddenKeys(child, `${path}.${key}`));
   }
   return found;
+}
+
+export function assertCompleteDurabilityGate(durabilityGate) {
+  for (const flag of REQUIRED_DURABILITY_GATE_FLAGS) {
+    if (durabilityGate?.[flag] !== true) throw new Error(`durability gate incomplete: ${flag}`);
+  }
 }
 
 export function verifyM7DurabilityReplacementAddendum() {
@@ -134,7 +155,7 @@ export function verifyM7DurabilityReplacementAddendum() {
   const forbidden = findForbiddenKeys(addendum.replacementRuns);
   if (forbidden.length) throw new Error(`target/controller leakage in replacement authorization: ${forbidden.join(",")}`);
   if (addendum.blindInputPolicy.sameOriginalBlindPayload !== true || addendum.blindInputPolicy.previousResultsInput !== false || addendum.blindInputPolicy.caseIndependence !== true || addendum.blindInputPolicy.freshStandaloneSessionPerReplacement !== true) throw new Error("blind input policy mismatch");
-  if (addendum.durabilityGate.canonicalArtifactBeforeRevealRequired !== true || addendum.durabilityGate.primaryClosedAndReopened !== true || addendum.durabilityGate.secondaryByteForByteCopyRequired !== true || addendum.durabilityGate.primaryAndSecondaryMustMatchExactly !== true || addendum.durabilityGate.revealBlockedUntilAllChecksPass !== true || addendum.durabilityGate.secondCopyMustNotBeCreatedByReserialization !== true) throw new Error("durability gate incomplete");
+  assertCompleteDurabilityGate(addendum.durabilityGate);
   if (addendum.claimBoundaries.includes("production_evidence") || !addendum.claimBoundaries.includes("research_only") || !addendum.claimBoundaries.includes("no_single_winner") || !addendum.claimBoundaries.includes("user_decides")) throw new Error("claim boundaries invalid");
   if (addendum.historicalInterpretation.originalPreregistrationRemainsHistoricalAuthority !== true || addendum.historicalInterpretation.replacementResultsMustNotBeReportedAsOriginalBytes !== true || addendum.historicalInterpretation.replacementResultsDoNotRetroactivelyChangeHistoricalOutcomes !== true) throw new Error("historical interpretation boundary invalid");
 
