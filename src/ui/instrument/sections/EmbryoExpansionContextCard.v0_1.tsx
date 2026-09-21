@@ -10,6 +10,7 @@ import type {
 import type { GenericFunctionalWitnessRuntimeProjectionV1 } from "@/shared/openInstrument/genericFunctionalWitnessRuntimeProjection.v1";
 
 import { buildCandidateRowsFromVM } from "@/ui/candidates/candidateModel";
+import type { UICandidateRow } from "@/ui/candidates/candidateModel";
 import { CandidateEvidenceReferences } from "@/ui/candidates/EvidenceReferenceLink";
 
 import {
@@ -476,6 +477,97 @@ function evidenceStateFromCandidate(
   return "Proposed";
 }
 
+function lexicalSourceEvidenceRowsV0_1(
+  rows: UICandidateRow[],
+): UICandidateRow[] {
+  const seenEvidenceRefs = new Set<string>();
+
+  return rows.flatMap((row) => {
+    if (
+      row.evidenceBasis !== "lexical_equivalence" ||
+      !row.sourceId ||
+      !(
+        row.sourceStatus === "research_candidate" ||
+        row.sourceStatus === "reviewed_candidate" ||
+        row.sourceStatus === "reviewed_accepted"
+      ) ||
+      !Array.isArray(row.evidenceRefs)
+    ) {
+      return [];
+    }
+
+    const evidenceRefs = row.evidenceRefs.filter((ref) => {
+      const normalizedRef = ref.trim();
+
+      if (!normalizedRef || seenEvidenceRefs.has(normalizedRef)) {
+        return false;
+      }
+
+      seenEvidenceRefs.add(normalizedRef);
+      return true;
+    });
+
+    return evidenceRefs.length > 0
+      ? [{ ...row, evidenceRefs }]
+      : [];
+  });
+}
+
+function LexicalSourceEvidencePrimarySurface({
+  rows,
+}: {
+  rows: UICandidateRow[];
+}) {
+  if (rows.length === 0) {
+    return null;
+  }
+
+  return (
+    <section
+      data-testid="lexical-source-evidence-primary"
+      className="mt-4 rounded-xl border border-amber-300 bg-amber-50 p-5 dark:border-amber-400/30 dark:bg-amber-500/5"
+    >
+      <div className="text-xs font-semibold uppercase tracking-[0.16em] text-amber-800 dark:text-amber-200">
+        Lexical source evidence
+      </div>
+
+      <div className="mt-2 text-sm leading-6 text-slate-800 dark:text-slate-200">
+        Open Instrument has an attested source relationship for this analysis.
+        This is lexical evidence, not functional motivation or historical origin.
+      </div>
+
+      <div className="mt-4 grid gap-3">
+        {rows.map((row) => (
+          <div
+            key={row.evidenceRefs?.[0] ?? row.id}
+            className="rounded-lg border border-amber-200 bg-white/75 p-3 dark:border-amber-400/20 dark:bg-black/20"
+          >
+            {row.form ? (
+              <div className="font-mono text-base font-semibold text-slate-950 dark:text-white">
+                {`Source form: ${row.form}`}
+              </div>
+            ) : null}
+
+            {row.language ? (
+              <div className="mt-2 text-sm text-slate-700 dark:text-slate-300">
+                {`Language: ${row.language}`}
+              </div>
+            ) : null}
+
+            {row.plainStandaloneGloss ? (
+              <div className="mt-2 text-sm leading-6 text-slate-800 dark:text-slate-200">
+                {`Source meaning: ${row.plainStandaloneGloss}`}
+              </div>
+            ) : null}
+
+            <CandidateEvidenceReferences row={row} tone="light" />
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 function NoSupportedFunctionalCandidate({
   word,
 }: {
@@ -660,18 +752,31 @@ export function EmbryoExpansionContextCardV0_1({
       rows,
     );
 
+  const candidateUiRows = showPrimaryEvidence
+    ? buildCandidateRowsFromVM(vm)
+    : [];
+  const lexicalSourceEvidenceRows =
+    lexicalSourceEvidenceRowsV0_1(
+      candidateUiRows,
+    );
+  const lexicalSourceEvidence = (
+    <LexicalSourceEvidencePrimarySurface
+      rows={lexicalSourceEvidenceRows}
+    />
+  );
+
   if (!primaryCandidate) {
     return (
-      <NoSupportedFunctionalCandidate
-        word={word}
-      />
+      <>
+        <NoSupportedFunctionalCandidate
+          word={word}
+        />
+        {lexicalSourceEvidence}
+      </>
     );
   }
 
   const primaryCandidateIndex = rows.indexOf(primaryCandidate);
-  const candidateUiRows = showPrimaryEvidence
-    ? buildCandidateRowsFromVM(vm)
-    : [];
   const primaryCandidateUiRow =
     showPrimaryEvidence && primaryCandidateIndex >= 0
       ? candidateUiRows[primaryCandidateIndex] ?? null
@@ -1020,9 +1125,12 @@ export function EmbryoExpansionContextCardV0_1({
 
     if (tokens.length === 0) {
       return (
-        <NoSupportedFunctionalCandidate
-          word={word}
-        />
+        <>
+          <NoSupportedFunctionalCandidate
+            word={word}
+          />
+          {lexicalSourceEvidence}
+        </>
       );
     }
 
@@ -1249,10 +1357,11 @@ export function EmbryoExpansionContextCardV0_1({
     tokens.join(" + ");
 
   return (
-    <section
-      data-testid="functional-motivation-card"
-      className="rounded-xl border border-emerald-300 bg-emerald-50 p-5 dark:border-emerald-400/35 dark:bg-emerald-500/5"
-    >
+    <>
+      <section
+        data-testid="functional-motivation-card"
+        className="rounded-xl border border-emerald-300 bg-emerald-50 p-5 dark:border-emerald-400/35 dark:bg-emerald-500/5"
+      >
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <div className="text-xs font-semibold uppercase tracking-[0.16em] text-emerald-700 dark:text-emerald-300">
@@ -1535,6 +1644,8 @@ export function EmbryoExpansionContextCardV0_1({
           ? "Doctrinal reading, not historical etymology."
           : "Functional motivation, not historical etymology."}
       </div>
-    </section>
+      </section>
+      {lexicalSourceEvidence}
+    </>
   );
 }

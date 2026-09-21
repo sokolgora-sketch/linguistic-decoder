@@ -335,7 +335,7 @@ describe(
 
         expect(
           screen.getByText(
-            "Functional motivation for one word",
+            "Seven-Voices analysis for one word",
           ),
         ).toBeVisible();
 
