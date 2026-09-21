@@ -1,0 +1,382 @@
+{
+  "schemaVersion": "open-instrument.strict-blind-embryo-first-replication-series-target-safe-worker-envelope.v1",
+  "artifactKind": "TARGET_SAFE_WORKER_EXECUTION_ENVELOPE",
+  "experimentId": "open-instrument-strict-blind-embryo-first-replication-series-v1",
+  "status": "EXECUTION_CONTRACT_ONLY",
+  "authorizationBoundary": {
+    "researchOnly": true,
+    "noScientificExecution": true,
+    "noTargetReveal": true,
+    "noProductionEvidence": true,
+    "noRuntimeAuthorization": true,
+    "noCatalogMutation": true,
+    "noBaselineMutation": true,
+    "noPreregistrationMutation": true,
+    "noHistoricalM7Mutation": true
+  },
+  "preregistrationBinding": {
+    "path": "docs/open-instrument/research-artifacts/strict-blind-embryo-first-replication-series-v1/preregistration.json",
+    "sha256": "ee1baa297a3155a0c0e29afe8c96cc909b7329d49cc1498c0e58cfecd32a4352",
+    "requiredStatus": "PREREGISTERED_BEFORE_BLIND_RESEARCH",
+    "mustRemainByteIdentical": true,
+    "selectedCasesAreNotIncluded": true,
+    "controllersAreNotIncluded": true
+  },
+  "workerInputContract": {
+    "allowedInputs": [
+      "this exact target-safe worker envelope",
+      "exactly one committed blind payload for the execution slot",
+      "authorized source access for the frozen source universe",
+      "one case-specific external durability directory"
+    ],
+    "noOtherContext": true,
+    "externalDurabilityDirectoryIsRuntimeParameter": true,
+    "directoryMustBeOutsideProductionEvidencePaths": true,
+    "directoryMustBeCaseSpecific": true,
+    "directoryMustBeParentReadableAndWorkerWritable": true
+  },
+  "blindPayloadContract": {
+    "requiredSchemaVersion": "open-instrument.strict-blind-embryo-first-replication-series.v1.blind-payload",
+    "requiredFields": [
+      "schemaVersion",
+      "experimentId",
+      "sourceUniverseId",
+      "searchPolicyVersion",
+      "functionFreezePolicyVersion",
+      "forbiddenOperations",
+      "truthHierarchy",
+      "claimBoundary",
+      "workerIsolationPolicyId",
+      "durabilityPolicyId",
+      "targetRevealStatus",
+      "replicationSlot",
+      "embryo",
+      "voicePath",
+      "opaqueStructuralProvenanceReference"
+    ],
+    "onePayloadOnly": true,
+    "mustMatchPreregistrationDeclaration": true,
+    "mustRemainByteIdentical": true,
+    "targetRevealStatus": "FORBIDDEN_UNTIL_DURABILITY_GATE"
+  },
+  "sourceUniverse": {
+    "sourcePolicyId": "open-instrument-m7-common-source-universe-v1",
+    "traditions": [
+      {
+        "id": "fjale.fjalor-shqip.v0_1",
+        "label": "FJALË / Fjalor Shqip",
+        "authorityStatus": "existing authorized source tradition"
+      },
+      {
+        "id": "scaife.lewis-short.v0_1",
+        "label": "Scaife Lewis & Short",
+        "authorityStatus": "existing authorized source tradition"
+      },
+      {
+        "id": "scaife.middle-liddell.v0_1",
+        "label": "Scaife Middle Liddell",
+        "authorityStatus": "existing authorized source tradition"
+      }
+    ],
+    "noNewTradition": true,
+    "languagesAreWitnessesNotWinners": true,
+    "sourceUnavailabilityIsValidState": true
+  },
+  "searchPolicy": {
+    "searchPolicyVersion": "open-instrument-m7-search-s0-s4-v1",
+    "orderedStages": [
+      "S0 exact embryo",
+      "S1 identity-preserving normalization",
+      "S2 source-attested bounded morphology",
+      "S3 source-attested dialect/history",
+      "S4 authoritative reconstruction"
+    ],
+    "everyQueryMustBeLogged": true,
+    "forbidden": [
+      "target lookup",
+      "target translation",
+      "target semantic search",
+      "unlimited spelling mutation",
+      "unlogged substitution",
+      "post-hoc function search"
+    ],
+    "allCasesUseSamePolicy": true
+  },
+  "workerForbiddenOperations": [
+    "target guessing",
+    "target etymology search",
+    "source selection based on hidden target",
+    "unsupported morphology",
+    "prior-result import",
+    "DF_BRAIN access",
+    "Linear access",
+    "project-context access",
+    "parent-context access",
+    "repository exploration beyond supplied target-safe inputs",
+    "other case inspection",
+    "M7 result inspection",
+    "general web search to discover the experiment or controller",
+    "searching for forms merely to infer a hidden target",
+    "selecting evidence because it might fit an unknown target"
+  ],
+  "sourceQueryRecordContract": {
+    "requiredFields": [
+      "queryRecordId",
+      "sourceId",
+      "searchStage",
+      "queryForm",
+      "queryType",
+      "result",
+      "locator",
+      "rawSourceFact",
+      "normalizationUsed",
+      "boundary"
+    ],
+    "searchStages": ["S0", "S1", "S2", "S3", "S4"],
+    "resultStates": ["FOUND", "NOT_FOUND", "SOURCE_UNAVAILABLE", "AMBIGUOUS"],
+    "resultStateSemantics": {
+      "FOUND": "authorized source returned a relevant record",
+      "NOT_FOUND": "authorized source was available and returned no relevant record",
+      "SOURCE_UNAVAILABLE": "authorized source could not be accessed or verified",
+      "AMBIGUOUS": "authorized source response cannot be resolved to one bounded record"
+    },
+    "interpretationForbidden": true
+  },
+  "sourceFactContract": {
+    "requiredFields": [
+      "sourceFactId",
+      "queryRecordRefs",
+      "sourceId",
+      "attestedForm",
+      "sourceSenseOrDescription",
+      "locator",
+      "searchStage",
+      "truthLevel"
+    ],
+    "truthLevel": "FACT",
+    "sourceAttestationRequired": true,
+    "targetBindingForbidden": true,
+    "functionalInterpretationSeparate": true
+  },
+  "formRelationContract": {
+    "requiredFields": [
+      "inputForm",
+      "relatedForm",
+      "relationType",
+      "sourceAttestation",
+      "identityBoundary",
+      "searchStage",
+      "truthLevel"
+    ],
+    "allowedRelationTypes": [
+      "exact_identity",
+      "identity_preserving_normalization",
+      "source_attested_bounded_morphology",
+      "source_attested_dialect_history",
+      "authoritative_reconstruction"
+    ],
+    "sourceEvidenceRequired": true,
+    "unlimitedMutationForbidden": true
+  },
+  "functionFreezeContract": {
+    "requiredFields": [
+      "functionId",
+      "functionClass",
+      "frozenFunctionStatement",
+      "truthLevel",
+      "supportingSourceFactIds",
+      "formRelationRefs",
+      "derivation",
+      "reasonCodes",
+      "boundary",
+      "limitations"
+    ],
+    "allowedTruthLevels": ["INFERENCE", "HYPOTHESIS"],
+    "nullTruthLevel": "UNKNOWN / NULL",
+    "targetBindingForbidden": true,
+    "freezeStatus": "FROZEN",
+    "noBoundedFunctionStatus": "NULL",
+    "freezeBeforeReveal": [
+      "SOURCE_QUERY_LOG",
+      "SOURCE_FACTS",
+      "FORM_RELATIONS",
+      "FUNCTION_CANDIDATES",
+      "FUNCTION_CLASSES",
+      "TRUTH_LEVELS",
+      "ALTERNATIVES",
+      "REJECTIONS",
+      "NULL_IF_NONE",
+      "EVIDENCE_REFS"
+    ],
+    "createdBeforeTargetReveal": true,
+    "immutableAfterFreeze": true,
+    "functionsMayNotBeAddedRemovedStrengthenedWeakenedOrRewrittenAfterFreeze": true
+  },
+  "nullIfNone": {
+    "ruleId": "open-instrument-m7-null-if-no-bounded-function-v1",
+    "condition": "NO_BOUNDED_FUNCTION_AT_PRE_REVEAL_FREEZE",
+    "result": "NULL",
+    "appliesWhen": [
+      "no source fact exists",
+      "source facts exist but do not support a bounded functional proposition"
+    ],
+    "sourceFactAloneDoesNotImplyInsufficientCorrespondence": true,
+    "explicitNullRequired": true
+  },
+  "truthHierarchy": ["FACT", "INFERENCE", "HYPOTHESIS", "UNKNOWN / NULL"],
+  "outcomeContract": {
+    "outcomeSpace": [
+      "FUNCTIONAL_CORRESPONDENCE",
+      "LEXICAL_EQUIVALENCE",
+      "FORM_RESEMBLANCE_ONLY",
+      "HISTORICAL_RELATION_ONLY",
+      "INSUFFICIENT_CORRESPONDENCE",
+      "NULL"
+    ],
+    "specificityPolicy": {
+      "requiresBoundedTargetSpecificMechanism": true,
+      "broadFunctionInsufficient": true,
+      "metaphoricalPostHocFitInsufficient": true,
+      "synonymExpansionForbidden": true,
+      "semanticStrengtheningAfterRevealForbidden": true,
+      "semanticWeakeningAfterRevealForbidden": true
+    },
+    "preRevealOutcome": {
+      "noBoundedFunction": "NULL",
+      "boundedFunctionsFrozen": "FROZEN_FUNCTIONS_OR_EXPLICIT_NULL"
+    },
+    "postRevealOutcome": {
+      "boundedFunctionFrozenButNoFunctionPassesCorrespondenceOrSpecificity": "INSUFFICIENT_CORRESPONDENCE",
+      "otherRelationOutcomes": "Use only the frozen outcome space and existing preregistered correspondence authority; do not invent precedence or strengthen a relation after reveal"
+    },
+    "targetCorrespondenceForbiddenBeforeDurability": true
+  },
+  "artifactContract": {
+    "primaryFilenameTemplate": "<case-id>.pre-reveal-canonical.v1.json",
+    "secondaryFilenameTemplate": "<case-id>.pre-reveal-canonical.v1.secondary.json",
+    "verificationFilenameTemplate": "<case-id>.durability-verification.v1.json",
+    "manifestFilenameTemplate": "<case-id>.durability-manifest.v1.json",
+    "requiredPrimaryFields": [
+      "artifactType",
+      "replicationExperimentId",
+      "replicationSlot",
+      "embryo",
+      "voicePath",
+      "blindPayloadSha256",
+      "sourcePolicyId",
+      "searchPolicyId",
+      "createdBeforeTargetReveal",
+      "targetRevealStatus",
+      "blindnessAttestation",
+      "sourceQueryLog",
+      "acceptedSourceFacts",
+      "formRelationAnalysis",
+      "functionCandidates",
+      "alternativeFunctions",
+      "rejectedInterpretations",
+      "preRevealNullState",
+      "evidenceReferences",
+      "truthHierarchy",
+      "claimBoundaries",
+      "noSingleWinner",
+      "userDecides",
+      "freezeStatus"
+    ],
+    "targetRevealStatus": "NOT_REQUESTED_AND_NOT_PERFORMED",
+    "createdBeforeTargetReveal": true,
+    "explicitNullAllowed": true,
+    "noTargetBearingFields": true
+  },
+  "durabilityContract": {
+    "revealBlockedUntilComplete": true,
+    "primaryPersistedBeforeReveal": true,
+    "primaryCanonicalBytesPreserved": true,
+    "primaryClosedAndReopened": true,
+    "primaryRawLengthAndShaComputedFromDisk": true,
+    "primaryRecomputedAfterReadback": true,
+    "internalIdentityReverifiedFromReopenedBytes": true,
+    "separateVerificationReportRequired": true,
+    "secondaryByteForByteCopyRequired": true,
+    "secondaryRecomputedFromDisk": true,
+    "primaryAndSecondaryMustMatchExactly": true,
+    "bothPathsAndIdentitiesRecorded": true,
+    "secondaryMustNotBeCreatedByReserialization": true,
+    "parentRecoveryRequired": true
+  },
+  "parentRecoveryContract": {
+    "requiredArtifacts": [
+      "primary",
+      "secondary",
+      "durability verification report",
+      "durability manifest"
+    ],
+    "parentRecomputes": [
+      "primary byte length",
+      "primary SHA-256",
+      "secondary byte length",
+      "secondary SHA-256",
+      "primary-secondary byte equality",
+      "experiment identity",
+      "case identity",
+      "blind payload identity",
+      "freeze state",
+      "targetRevealStatus"
+    ],
+    "failureBehavior": "FAIL_CLOSED_NO_TARGET_REVEAL"
+  },
+  "workerIsolationContract": {
+    "forkContext": false,
+    "mechanism": "multi_agent_v1__spawn_agent",
+    "requiredPassFlags": [
+      "CLEAN_WORKER_NO_DF_BRAIN",
+      "CLEAN_WORKER_NO_PROJECT_CONTEXT",
+      "CLEAN_WORKER_NO_PARENT_CONTEXT",
+      "CLEAN_WORKER_EXPLICIT_INPUT_ONLY",
+      "WORKER_FILESYSTEM_PERSISTENCE",
+      "PARENT_BYTE_RECOVERY",
+      "NO_USER_TRANSFER_REQUIRED"
+    ],
+    "selfAuditBeforeSourceResearch": true,
+    "failureBehavior": "STOP_BEFORE_SOURCE_RESEARCH"
+  },
+  "caseIndependenceContract": {
+    "oneFreshWorkerPerCase": true,
+    "workerReuseForbidden": true,
+    "previousResultsInput": false,
+    "crossCaseLearningForbidden": true,
+    "otherCaseInspectionForbidden": true,
+    "executionOrder": ["SBR-01", "SBR-02", "SBR-03"]
+  },
+  "claimBoundaries": [
+    "research_only",
+    "no_production_evidence",
+    "no_runtime_authorization",
+    "no_historical_derivation_claim",
+    "no_cognacy_claim",
+    "no_borrowing_claim",
+    "no_language_superiority_claim",
+    "no_candidate_truth_claim",
+    "no_single_winner",
+    "user_decides",
+    "null_is_valid"
+  ],
+  "failureSemantics": {
+    "canonicalizationFailure": "STOP_NO_REVEAL",
+    "persistenceFailure": "STOP_NO_REVEAL",
+    "readbackMismatch": "STOP_NO_REVEAL",
+    "secondaryCopyFailure": "STOP_NO_REVEAL",
+    "copyMismatch": "STOP_NO_REVEAL",
+    "blindnessCompromise": "STOP_INVALID_NO_REVEAL",
+    "preFreezeTargetInformation": "STOP_INVALID_NO_REVEAL",
+    "parentRecoveryFailure": "STOP_NO_REVEAL",
+    "automaticTargetAwareRepair": false,
+    "functionReconstruction": false
+  },
+  "runtimeAuthorization": {
+    "productionEvidenceAdmitted": false,
+    "catalogMutationAuthorized": false,
+    "baselineMutationAuthorized": false,
+    "runtimeMutationAuthorized": false,
+    "apiOrUiMutationAuthorized": false
+  }
+}
