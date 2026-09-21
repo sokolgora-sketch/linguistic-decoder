@@ -1,0 +1,17 @@
+{
+  "schemaVersion": "open-instrument.strict-blind-embryo-first-replication-series-hash-manifest.v1",
+  "algorithm": "sha256",
+  "artifactPath": "docs/open-instrument/research-artifacts/strict-blind-embryo-first-replication-series-v1/preregistration.json",
+  "artifactByteLength": 18031,
+  "artifactSha256": "ee1baa297a3155a0c0e29afe8c96cc909b7329d49cc1498c0e58cfecd32a4352",
+  "controllerSha256": [
+    "d775465223a24dd98b6a8d7812e97012aad49bc0b3d014759a68e11d53e952cb",
+    "8a60b26352a80d6de3f89ac47bdfbd180ac1c1f6bb46f54d9efcf08f13da314f",
+    "c3635d61350693404d79f26b4bb9df9c11668f0d85329b8df776c72f80e113d9"
+  ],
+  "blindPayloadSha256": [
+    "093269e360f3a42348f5c09342b43562bf0313d3c5d92449f847ee4c7fbead08",
+    "54e43efe8e498fc874730dcf6ef2f7b358eb9ca57a67d1e85516614ea102cdb8",
+    "ca58b25ad84241634caf16ff24228d05d485be4b0d00b7536b28b2e49ff5b50d"
+  ]
+}
