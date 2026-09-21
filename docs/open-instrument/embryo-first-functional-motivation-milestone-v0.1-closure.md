@@ -176,12 +176,17 @@ The milestone does not claim that M7 produced a positive functional
 correspondence. No M7 source row, provider execution, or scientific claim is
 admitted by this closure.
 
-Remaining implementation limitations are the reviewed ones: no real isolated
-source-evidence path is wired for the bounded damage/study examples, no live
-validated external evidence has been promoted for those examples, and the
-examples remain bounded contract fixtures. Those limitations are compatible
-with this implementation milestone and define a later source-definition or
-adjudication lane.
+The named `albanian-da-dam-damage-functional` and
+`albanian-shtu-di-study-functional` records in the examples test remain static
+contract fixtures; they are not assertions that those exact fixture objects
+are the live catalog rows. The repository does, however, already expose live
+validated reviewed candidates for the `damage` and `study` routes through the
+separate runtime-visibility coverage cited above, including their source
+attestation and bounded claim fields. This closure does not add or alter that
+reviewed evidence. The remaining limitation is scientific rather than a
+missing runtime seam: M7 has not supplied a strict positive embryo-first
+correspondence, so this milestone does not claim new source discovery or
+historical validation.
 
 ## Scope and non-goals
 
