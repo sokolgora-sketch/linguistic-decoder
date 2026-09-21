@@ -53,7 +53,7 @@ describe('Analyze keyboard interactions', () => {
 
     expect(screen.getByAltText('ZË-RO')).toBeInTheDocument();
     expect(screen.getByText('instrument · open')).toBeInTheDocument();
-    expect(screen.getByText('Functional motivation for one word')).toBeInTheDocument();
+    expect(screen.getByText('Seven-Voices analysis for one word')).toBeInTheDocument();
     expect(screen.getByText('Analyze one word')).toBeInTheDocument();
     expect(screen.queryByText('No origin proof')).not.toBeInTheDocument();
     expect(screen.getByLabelText('Word')).toBeInTheDocument();

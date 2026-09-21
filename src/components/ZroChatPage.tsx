@@ -501,7 +501,7 @@ export default function ZroChatPage() {
   return (
     <ChatShell
       title="ZË-RO"
-      subtitle="Functional motivation for one word"
+      subtitle="Seven-Voices analysis for one word"
       composer={composer}
       maxWidthClass="max-w-screen-2xl"
     >
