@@ -1,0 +1,179 @@
+{
+  "schemaVersion": "open-instrument.m7-durability-replacement-governance-addendum.v1",
+  "artifactKind": "research_only_m7_durability_replacement_governance_addendum",
+  "createdAfterDurabilityFailure": true,
+  "createdBeforeReplacementResearch": true,
+  "governanceDecision": "PROSPECTIVE_DURABILITY_REPLACEMENTS_AUTHORIZED_WITHOUT_RETROACTIVE_PREREGISTRATION_CHANGE",
+  "originalPreregistration": {
+    "path": "docs/open-instrument/research-artifacts/m7-three-case-replication-v1/preregistration.json",
+    "experimentId": "open-instrument-m7-three-case-replication-v1",
+    "rawByteLength": 24321,
+    "rawSha256": "54d579f1af4bb597ccb4037d156dc27123742b487845ecd52fc80d84cc69cd3e",
+    "immutable": true,
+    "protocolCannotChangeAfterFirstRun": true,
+    "historicalAuthorityOnly": true
+  },
+  "historicalRuns": [
+    {
+      "replicationSlot": "M7-02",
+      "status": "COMPLETED_BUT_CANONICAL_BYTES_NOT_DURABLY_RECOVERABLE",
+      "reportedArtifact": {
+        "rawByteLength": 14855,
+        "rawSha256": "3ffbe21b4d4aa73ff06680de4f271ce895ce79dc2e8f7ce6a524e1fbea52f1ad"
+      },
+      "canonicalBytesCurrentlyVerified": false,
+      "internalFrozenContentCurrentlyVerified": false,
+      "controlledRevealAuthorized": false,
+      "reconstructionForbidden": true
+    },
+    {
+      "replicationSlot": "M7-03",
+      "status": "COMPLETED_BUT_CANONICAL_BYTES_NOT_DURABLY_RECOVERABLE",
+      "reportedArtifact": {
+        "rawByteLength": 12201,
+        "rawSha256": "e329fc66958becf961e212c989a042ddc33ec6816685a9b173d4d18ad38c6246"
+      },
+      "canonicalBytesCurrentlyVerified": false,
+      "internalFrozenContentCurrentlyVerified": false,
+      "controlledRevealAuthorized": false,
+      "reconstructionForbidden": true
+    }
+  ],
+  "replacementRuns": [
+    {
+      "replacementRunId": "open-instrument-m7-three-case-replication-v1:M7-02-REPLACEMENT-02",
+      "replicationSlot": "M7-02",
+      "isNewBlindObservation": true,
+      "isReproductionOfLostBytes": false,
+      "isReplacementForHistoricalRunOnly": true,
+      "blindPayload": {
+        "replicationExperimentId": "open-instrument-m7-three-case-replication-v1",
+        "replicationSlot": "M7-02",
+        "embryo": "ATH",
+        "voicePath": ["A", "E"],
+        "opaqueStructuralProvenanceReference": "sha256:d0f681cc5bb02cd515fdbf5b53595856a5ca64b6b2bf85dc934fab2e9e548363",
+        "sourcePolicyVersion": "open-instrument-m7-common-source-universe-v1",
+        "searchPolicyVersion": "open-instrument-m7-search-s0-s4-v1",
+        "claimBoundary": "research_only; no historical origin, cognacy, borrowing, language superiority, candidate truth, or winner claim",
+        "blindPayloadSha256": "4590fa01a764702dc49458f1fb00472e3af2c91ebc21c086de9e671de1b5ee77"
+      }
+    },
+    {
+      "replacementRunId": "open-instrument-m7-three-case-replication-v1:M7-03-REPLACEMENT-03",
+      "replicationSlot": "M7-03",
+      "isNewBlindObservation": true,
+      "isReproductionOfLostBytes": false,
+      "isReplacementForHistoricalRunOnly": true,
+      "blindPayload": {
+        "replicationExperimentId": "open-instrument-m7-three-case-replication-v1",
+        "replicationSlot": "M7-03",
+        "embryo": "ART",
+        "voicePath": ["A"],
+        "opaqueStructuralProvenanceReference": "sha256:4828faec258c60bb9598df1cf1b901e00943abe735696da3f4fa7fd6321f1e78",
+        "sourcePolicyVersion": "open-instrument-m7-common-source-universe-v1",
+        "searchPolicyVersion": "open-instrument-m7-search-s0-s4-v1",
+        "claimBoundary": "research_only; no historical origin, cognacy, borrowing, language superiority, candidate truth, or winner claim",
+        "blindPayloadSha256": "d6669664d8644f086ffc36b06f814555d379fbc8d070f005e8f50ea326f15997"
+      }
+    }
+  ],
+  "blindInputPolicy": {
+    "sameOriginalBlindPayload": true,
+    "sameSourceUniverse": true,
+    "sameSearchPolicy": true,
+    "previousResultsInput": false,
+    "caseIndependence": true,
+    "freshStandaloneSessionPerReplacement": true,
+    "workerReceivesOnly": [
+      "the exact blind payload for its replication slot",
+      "the frozen common M7 research protocol",
+      "the frozen source-universe and search-policy rules required to execute the protocol"
+    ],
+    "workerMustNotReceive": [
+      "controller records",
+      "target-directed material",
+      "target definitions or senses",
+      "target expansion chains",
+      "lost-run functions or summaries",
+      "the current director conversation",
+      "other M7 case material",
+      "repository context capable of resolving opaque provenance"
+    ]
+  },
+  "sourceUniverse": {
+    "traditions": [
+      "fjale.fjalor-shqip.v0_1",
+      "scaife.lewis-short.v0_1",
+      "scaife.middle-liddell.v0_1"
+    ],
+    "noNewTradition": true
+  },
+  "searchPolicy": {
+    "orderedStages": [
+      "S0 exact embryo",
+      "S1 identity-preserving normalization",
+      "S2 source-attested bounded morphology",
+      "S3 source-attested dialect/history",
+      "S4 authoritative reconstruction"
+    ],
+    "forbidden": [
+      "target lookup",
+      "target translation",
+      "target semantic search",
+      "unlimited spelling mutation",
+      "unlogged substitution",
+      "post-hoc function search"
+    ],
+    "unchangedFromOriginalPreregistration": true
+  },
+  "durabilityGate": {
+    "canonicalArtifactBeforeRevealRequired": true,
+    "primaryPersistedBeforeReveal": true,
+    "primaryRawLengthAndShaComputedFromDisk": true,
+    "primaryClosedAndReopened": true,
+    "primaryRecomputedAfterReadback": true,
+    "internalIdentityReverifiedFromReopenedBytes": true,
+    "separateVerificationReportRequired": true,
+    "secondaryByteForByteCopyRequired": true,
+    "secondaryRecomputedFromDisk": true,
+    "primaryAndSecondaryMustMatchExactly": true,
+    "bothPathsAndIdentitiesRecorded": true,
+    "revealBlockedUntilAllChecksPass": true,
+    "secondCopyMustNotBeCreatedByReserialization": true
+  },
+  "failureSemantics": {
+    "sourceResearchFailure": "allow_valid_null_under_original_m7_rules",
+    "canonicalizationFailure": "STOP_NO_REVEAL",
+    "primaryPersistenceFailure": "STOP_NO_REVEAL",
+    "primaryReadbackMismatch": "STOP_NO_REVEAL",
+    "secondaryCopyFailure": "STOP_NO_REVEAL",
+    "copyMismatch": "STOP_NO_REVEAL",
+    "blindnessCompromise": "STOP_INVALID_REPLACEMENT_NO_REVEAL",
+    "preFreezeTargetInformation": "STOP_INVALID_REPLACEMENT_NO_REVEAL",
+    "automaticTargetAwareRepair": false,
+    "functionReconstruction": false
+  },
+  "claimBoundaries": [
+    "research_only",
+    "no_production_evidence",
+    "no_runtime_authorization",
+    "no_historical_derivation_claim",
+    "no_cognacy_claim",
+    "no_borrowing_claim",
+    "no_language_superiority_claim",
+    "no_candidate_truth_claim",
+    "no_single_winner",
+    "user_decides",
+    "positive_replacement_does_not_prove_universal_hypothesis",
+    "negative_or_null_replacement_does_not_establish_arbitrariness"
+  ],
+  "historicalInterpretation": {
+    "originalPreregistrationRemainsHistoricalAuthority": true,
+    "m7_01RemainsOriginalValidRun": true,
+    "m7_02AndM7_03ReplacementsAreProspectiveRecoveryObservations": true,
+    "replacementResultsMustDiscloseDurabilityFailure": true,
+    "replacementResultsMustNotBeReportedAsOriginalBytes": true,
+    "replacementResultsDoNotRetroactivelyChangeHistoricalOutcomes": true,
+    "universalHypothesisRemainsUnresolvedByIndividualCases": true
+  }
+}
