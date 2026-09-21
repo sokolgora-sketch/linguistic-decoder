@@ -1,0 +1,29 @@
+{
+  "schemaVersion": "open-instrument.strict-blind-embryo-first-replication-series.v1.blind-payload",
+  "experimentId": "open-instrument-strict-blind-embryo-first-replication-series-v1",
+  "sourceUniverseId": "open-instrument-m7-common-source-universe-v1",
+  "searchPolicyVersion": "open-instrument-m7-search-s0-s4-v1",
+  "functionFreezePolicyVersion": "open-instrument-m7-function-freeze-v1",
+  "forbiddenOperations": [
+    "target lookup",
+    "target translation",
+    "target semantic search",
+    "unlimited spelling mutation",
+    "unlogged substitution",
+    "post-hoc function search"
+  ],
+  "truthHierarchy": [
+    "source_fact",
+    "inference",
+    "hypothesis",
+    "unknown"
+  ],
+  "claimBoundary": "research_only; no historical origin, cognacy, borrowing, language superiority, candidate truth, or winner claim",
+  "workerIsolationPolicyId": "open-instrument-clean-worker-multi-agent-v1-fork-context-false",
+  "durabilityPolicyId": "open-instrument-pre-reveal-durability-gate-v1",
+  "targetRevealStatus": "FORBIDDEN_UNTIL_DURABILITY_GATE",
+  "replicationSlot": "SBR-02",
+  "embryo": "YNE",
+  "voicePath": ["Y", "E"],
+  "opaqueStructuralProvenanceReference": "sha256:8a60b26352a80d6de3f89ac47bdfbd180ac1c1f6bb46f54d9efcf08f13da314f"
+}

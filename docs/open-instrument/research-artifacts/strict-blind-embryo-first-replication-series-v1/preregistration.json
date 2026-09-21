@@ -1,0 +1,319 @@
+{
+  "schemaVersion": "open-instrument.strict-blind-embryo-first-replication-series-preregistration.v1",
+  "experimentId": "open-instrument-strict-blind-embryo-first-replication-series-v1",
+  "status": "PREREGISTERED_BEFORE_BLIND_RESEARCH",
+  "series": {
+    "isNewScientificSeries": true,
+    "isM7": false,
+    "historicalM7Immutable": true,
+    "implementationMilestoneClosed": true,
+    "researchOnly": true,
+    "noProductionPromotion": true,
+    "noRuntimeMutation": true
+  },
+  "repository": {
+    "identity": "sokolgora-sketch/linguistic-decoder",
+    "preregistrationBaseSha": "a9ea69d9e247e4434feddcc6a5467ef288233564",
+    "baselineArtifactPath": "tests/fixtures/openInstrument/analysis-capability-baseline.v1.json",
+    "baselineArtifactSha256": "12a92a4fe5faec0516b30d3a7e86e75924f9c68349b905a2c07d61289d406650",
+    "corpusPath": "tests/research/corpus70.words.v0.1.txt",
+    "corpusSha256": "d2459e58b7e61e125afb8d1ab894e04b7b21d1d66fe0eebdcacf69ed10ca2d2f"
+  },
+  "historicalStartingState": {
+    "completedStrictBlindObservations": 2,
+    "strictPositiveCount": 0,
+    "m7_01": "INSUFFICIENT_CORRESPONDENCE",
+    "m7_02Replacement02": "UNRESOLVED_CANONICAL_PRE_REVEAL_BYTES_INACCESSIBLE",
+    "m7_03Replacement03": "NULL",
+    "m7_02CountedAsCompleted": false,
+    "m7Mutation": false
+  },
+  "scientificQuestion": "Under target-blind conditions, can independently researched deterministic internal structure yield a sufficiently specific function for a frozen target meaning, as defined by the existing functional-correspondence contract?",
+  "positiveCriterion": {
+    "reusedUnchanged": true,
+    "authority": [
+      "docs/open-instrument/research-artifacts/m7-three-case-replication-v1/preregistration.json",
+      "docs/open-instrument/research-artifacts/m6-one-embryo-proof-v1/one-embryo-proof-v1.archival.json"
+    ],
+    "requiredGates": [
+      "independently source-attested source fact",
+      "target and target sense frozen before blind research",
+      "structural controller frozen before semantic research",
+      "functional mechanism frozen before target reveal",
+      "mechanism supported by blind source evidence",
+      "mechanism goes beyond shared gloss",
+      "mechanism is sufficiently specific for the frozen target sense",
+      "target reveal only after function freeze and durability",
+      "case independence preserved",
+      "structural relation separate from semantic correspondence"
+    ],
+    "insufficientAlone": [
+      "lexical equivalence",
+      "shared gloss",
+      "broad semantic association",
+      "metaphorical post-hoc fit",
+      "form resemblance",
+      "historical relation alone"
+    ]
+  },
+  "sampleAndStopping": {
+    "currentCompletedStrictN": 2,
+    "plannedValidNewCases": 3,
+    "plannedCompletedStrictN": 5,
+    "completionRule": "complete after three valid new blind-freeze-reveal-correspondence observations",
+    "insufficientPoolRule": "stop if fewer than three eligible fresh cases survive contamination screening",
+    "replacementAllowedOnlyFor": [
+      "contamination",
+      "target reveal before function freeze",
+      "packet identity failure",
+      "durability failure before reveal",
+      "worker isolation failure",
+      "controller mismatch",
+      "protocol violation"
+    ],
+    "replacementForbiddenForScientificOutcome": true,
+    "validNegativeOutcomesAreNotReplacementReasons": true
+  },
+  "candidatePoolAuthority": {
+    "sourceArtifact": "docs/open-instrument/research-artifacts/m7-three-case-replication-v1/preregistration.json",
+    "sourceResearchPerformed": false,
+    "normalization": "NFC, trim, lowercase comparison, preserve corpus file order",
+    "targetSenseAuthority": "existing frozen Cambridge Dictionary English records from the M7 preregistration",
+    "embryoSemanticResearchPerformed": false,
+    "candidatePool": [
+      {
+        "corpusId": "holdout.c70.a10",
+        "word": "charge",
+        "partOfSpeech": "verb",
+        "targetSenseId": "cambridge.en.charge.verb.move-forward-1",
+        "targetSenseDefinition": "to move forward quickly, especially to attack",
+        "targetSenseLocator": "https://dictionary.cambridge.org/dictionary/english/charge",
+        "status": "ELIGIBLE",
+        "eligibilityReason": "deterministic structural hypotheses, frozen ordinary sense, not baseline, not prior strict use, no target-specific functional conclusion found"
+      },
+      {
+        "corpusId": "holdout.c70.y06",
+        "word": "synergy",
+        "partOfSpeech": "noun",
+        "targetSenseId": "cambridge.en.synergy.noun.combined-power-1",
+        "targetSenseDefinition": "the combined power of a group of things when they are working together that is greater than the total power achieved by each working separately",
+        "targetSenseLocator": "https://dictionary.cambridge.org/dictionary/english/synergy",
+        "status": "ELIGIBLE",
+        "eligibilityReason": "deterministic structural hypothesis, frozen ordinary sense, not baseline, not prior strict use, no target-specific functional conclusion found"
+      },
+      {
+        "corpusId": "holdout.c70.y08",
+        "word": "crystal",
+        "partOfSpeech": "noun",
+        "targetSenseId": "cambridge.en.crystal.noun.mineral-1",
+        "targetSenseDefinition": "a piece of a substance that has become solid, with a regular shape",
+        "targetSenseLocator": "https://dictionary.cambridge.org/dictionary/english/crystal",
+        "status": "ELIGIBLE",
+        "eligibilityReason": "deterministic structural hypotheses, frozen ordinary sense, not baseline, not prior strict use, no target-specific functional conclusion found"
+      },
+      {
+        "corpusId": "train.c70.i03",
+        "word": "direct",
+        "partOfSpeech": "adjective",
+        "targetSenseId": "cambridge.en.direct.adjective.straight-1",
+        "targetSenseDefinition": "going in a straight line towards somewhere or someone without stopping or changing direction",
+        "targetSenseLocator": "https://dictionary.cambridge.org/dictionary/english/direct",
+        "status": "ELIGIBLE",
+        "eligibilityReason": "deterministic structural hypothesis, frozen ordinary sense, not baseline, not prior strict use, no target-specific functional conclusion found"
+      },
+      {
+        "corpusId": "train.c70.o04",
+        "word": "whole",
+        "partOfSpeech": "adjective",
+        "targetSenseId": "cambridge.en.whole.adjective.complete-1",
+        "targetSenseDefinition": "complete or not divided",
+        "targetSenseLocator": "https://dictionary.cambridge.org/dictionary/english/whole",
+        "status": "ELIGIBLE",
+        "eligibilityReason": "deterministic structural hypothesis, frozen ordinary sense, not baseline, not prior strict use, no target-specific functional conclusion found"
+      },
+      {
+        "corpusId": "train.c70.y01",
+        "word": "rhythm",
+        "partOfSpeech": "noun",
+        "targetSenseId": "cambridge.en.rhythm.noun.regular-pattern-1",
+        "targetSenseDefinition": "a regular pattern of change, especially one that happens in nature",
+        "targetSenseLocator": "https://dictionary.cambridge.org/dictionary/english/rhythm",
+        "status": "ELIGIBLE",
+        "eligibilityReason": "deterministic structural hypothesis, frozen ordinary sense, not baseline, not prior strict use, no target-specific functional conclusion found"
+      },
+      {
+        "corpusId": "train.c70.y02",
+        "word": "symbol",
+        "partOfSpeech": "noun",
+        "targetSenseId": "cambridge.en.symbol.noun.representation-1",
+        "targetSenseDefinition": "a sign, shape, or object that is used to represent something else",
+        "targetSenseLocator": "https://dictionary.cambridge.org/dictionary/english/symbol",
+        "status": "ELIGIBLE",
+        "eligibilityReason": "deterministic structural hypothesis, frozen ordinary sense, not baseline, not prior strict use, no target-specific functional conclusion found"
+      },
+      {
+        "corpusId": "train.c70.y07",
+        "word": "system",
+        "partOfSpeech": "noun",
+        "targetSenseId": "cambridge.en.system.noun.connected-set-1",
+        "targetSenseDefinition": "a set of connected things or devices that operate together",
+        "targetSenseLocator": "https://dictionary.cambridge.org/dictionary/english/system",
+        "status": "ELIGIBLE",
+        "eligibilityReason": "deterministic structural hypothesis, frozen ordinary sense, not baseline, not prior strict use, no target-specific functional conclusion found"
+      }
+    ],
+    "priorExclusions": [
+      {"word":"balance","reason":"EXCLUDE_PRIOR_STRICT_USE","authority":"M7-01"},
+      {"word":"father","reason":"EXCLUDE_PRIOR_STRICT_USE","authority":"M7-02 historical/replacement material"},
+      {"word":"start","reason":"EXCLUDE_PRIOR_STRICT_USE","authority":"M7-03 Replacement-03"},
+      {"word":"support","reason":"EXCLUDE_PRIOR_TARGET_RESEARCH","authority":"M6 one-embryo proof"}
+    ],
+    "currentBaselineExclusion": {
+      "rule": "exclude every current 57-case baseline word",
+      "authority": "current committed analysis-capability baseline",
+      "appliesToAllCandidatePoolEntries": true
+    }
+  },
+  "structuralControllers": [
+    {
+      "replicationSlot": "SBR-01",
+      "corpusId": "train.c70.i03",
+      "targetWord": "direct",
+      "partOfSpeech": "adjective",
+      "targetSenseId": "cambridge.en.direct.adjective.straight-1",
+      "targetSenseDefinition": "going in a straight line towards somewhere or someone without stopping or changing direction",
+      "targetSenseAuthority": "Cambridge Dictionary English",
+      "targetSenseLocator": "https://dictionary.cambridge.org/dictionary/english/direct",
+      "embryo": "IR",
+      "structuralHypothesisId": "logic-structural:direct:ir:peel_right_vowel_led_expansion+peel_left_consonant_frame",
+      "expansionChain": ["IR", "DIR", "DIRECT"],
+      "operationIds": ["peel_right_vowel_led_expansion", "peel_left_consonant_frame"],
+      "voicePath": ["I"],
+      "structuralSourceKind": "logic_derived_structural_hypothesis",
+      "structuralClaimBoundary": "logic_derived_structural_hypothesis_only",
+      "controllerSha256": "d775465223a24dd98b6a8d7812e97012aad49bc0b3d014759a68e11d53e952cb"
+    },
+    {
+      "replicationSlot": "SBR-02",
+      "corpusId": "holdout.c70.y06",
+      "targetWord": "synergy",
+      "partOfSpeech": "noun",
+      "targetSenseId": "cambridge.en.synergy.noun.combined-power-1",
+      "targetSenseDefinition": "the combined power of a group of things when they are working together that is greater than the total power achieved by each working separately",
+      "targetSenseAuthority": "Cambridge Dictionary English",
+      "targetSenseLocator": "https://dictionary.cambridge.org/dictionary/english/synergy",
+      "embryo": "YNE",
+      "structuralHypothesisId": "logic-structural:synergy:yne:peel_right_consonant_led_expansion+peel_left_consonant_frame",
+      "expansionChain": ["YNE", "SYNE", "SYNERGY"],
+      "operationIds": ["peel_right_consonant_led_expansion", "peel_left_consonant_frame"],
+      "voicePath": ["Y", "E"],
+      "structuralSourceKind": "logic_derived_structural_hypothesis",
+      "structuralClaimBoundary": "logic_derived_structural_hypothesis_only",
+      "controllerSha256": "8a60b26352a80d6de3f89ac47bdfbd180ac1c1f6bb46f54d9efcf08f13da314f"
+    },
+    {
+      "replicationSlot": "SBR-03",
+      "corpusId": "train.c70.o04",
+      "targetWord": "whole",
+      "partOfSpeech": "adjective",
+      "targetSenseId": "cambridge.en.whole.adjective.complete-1",
+      "targetSenseDefinition": "complete or not divided",
+      "targetSenseAuthority": "Cambridge Dictionary English",
+      "targetSenseLocator": "https://dictionary.cambridge.org/dictionary/english/whole",
+      "embryo": "OLE",
+      "structuralHypothesisId": "logic-structural:whole:ole:peel_left_consonant_frame+peel_left_consonant_frame",
+      "expansionChain": ["OLE", "HOLE", "WHOLE"],
+      "operationIds": ["peel_left_consonant_frame", "peel_left_consonant_frame"],
+      "voicePath": ["O", "E"],
+      "structuralSourceKind": "logic_derived_structural_hypothesis",
+      "structuralClaimBoundary": "logic_derived_structural_hypothesis_only",
+      "controllerSha256": "c3635d61350693404d79f26b4bb9df9c11668f0d85329b8df776c72f80e113d9"
+    }
+  ],
+  "selectionRule": {
+    "frozenBeforeApplication": true,
+    "orderedPool": ["charge", "synergy", "crystal", "direct", "whole", "rhythm", "symbol", "system"],
+    "sortKey": ["one_deterministic_embryo_first", "ascending_operation_count", "ascending_minimum_embryo_length", "corpus_file_order"],
+    "selectionProcedure": "sort eligible cases by the frozen sort key, then select the first case for each previously unrepresented operation signature until three distinct signatures are represented",
+    "selectedOperationSignatures": [
+      "peel_right_vowel_led_expansion+peel_left_consonant_frame",
+      "peel_right_consonant_led_expansion+peel_left_consonant_frame",
+      "peel_left_consonant_frame+peel_left_consonant_frame"
+    ],
+    "meaningOrSourceInformationUsed": false,
+    "expectedSelectedSlots": ["SBR-01", "SBR-02", "SBR-03"]
+  },
+  "blindPayloads": [
+    {"replicationSlot":"SBR-01","path":"docs/open-instrument/research-artifacts/strict-blind-embryo-first-replication-series-v1/blind-payloads/SBR-01.json","rawByteLength":1242,"rawSha256":"093269e360f3a42348f5c09342b43562bf0313d3c5d92449f847ee4c7fbead08"},
+    {"replicationSlot":"SBR-02","path":"docs/open-instrument/research-artifacts/strict-blind-embryo-first-replication-series-v1/blind-payloads/SBR-02.json","rawByteLength":1248,"rawSha256":"54e43efe8e498fc874730dcf6ef2f7b358eb9ca57a67d1e85516614ea102cdb8"},
+    {"replicationSlot":"SBR-03","path":"docs/open-instrument/research-artifacts/strict-blind-embryo-first-replication-series-v1/blind-payloads/SBR-03.json","rawByteLength":1248,"rawSha256":"ca58b25ad84241634caf16ff24228d05d485be4b0d00b7536b28b2e49ff5b50d"}
+  ],
+  "sourceUniverse": {
+    "traditions": [
+      {"id":"fjale.fjalor-shqip.v0_1","label":"FJALË / Fjalor Shqip","permitted":true},
+      {"id":"scaife.lewis-short.v0_1","label":"Scaife Lewis & Short","permitted":true},
+      {"id":"scaife.middle-liddell.v0_1","label":"Scaife Middle Liddell","permitted":true}
+    ],
+    "noNewTradition": true,
+    "languagesAreWitnessesNotWinners": true
+  },
+  "searchPolicy": {
+    "orderedStages": ["S0 exact embryo", "S1 identity-preserving normalization", "S2 source-attested bounded morphology", "S3 source-attested dialect/history", "S4 authoritative reconstruction"],
+    "forbidden": ["target lookup", "target translation", "target semantic search", "unlimited spelling mutation", "unlogged substitution", "post-hoc function search"],
+    "allCasesUseSamePolicy": true
+  },
+  "outcomeSpace": ["FUNCTIONAL_CORRESPONDENCE", "LEXICAL_EQUIVALENCE", "FORM_RESEMBLANCE_ONLY", "HISTORICAL_RELATION_ONLY", "INSUFFICIENT_CORRESPONDENCE", "NULL"],
+  "specificityPolicy": {
+    "requiresBoundedTargetSpecificMechanism": true,
+    "broadFunctionInsufficient": true,
+    "metaphoricalPostHocFitInsufficient": true,
+    "synonymExpansionForbidden": true,
+    "semanticStrengtheningAfterRevealForbidden": true,
+    "semanticWeakeningAfterRevealForbidden": true
+  },
+  "cleanWorkerPolicy": {
+    "mechanism": "multi_agent_v1__spawn_agent",
+    "forkContext": false,
+    "required": ["CLEAN_WORKER_NO_DF_BRAIN", "CLEAN_WORKER_NO_PROJECT_CONTEXT", "CLEAN_WORKER_NO_PARENT_CONTEXT", "CLEAN_WORKER_EXPLICIT_INPUT_ONLY", "WORKER_FILESYSTEM_PERSISTENCE", "PARENT_BYTE_RECOVERY", "NO_USER_TRANSFER_REQUIRED"],
+    "failureSemantics": "fail closed before source research"
+  },
+  "durabilityPolicy": {
+    "revealBlockedUntilComplete": true,
+    "requirements": ["primary canonical pre-reveal artifact", "secondary byte-for-byte copy", "separate durability report", "separate durability manifest", "primary close/reopen/readback", "raw length and SHA recomputation", "internal identity verification", "function freeze verification", "created-before-reveal verification", "direct primary-secondary byte comparison", "parent recovery of all artifacts"]
+  },
+  "caseIndependence": {
+    "independentWorkerPerCase": true,
+    "previousResultsInput": false,
+    "crossCaseLearningForbidden": true,
+    "executionOrder": ["SBR-01", "SBR-02", "SBR-03"]
+  },
+  "interpretationBoundaries": {
+    "zeroOfThreeDoesNotProveArbitrariness": true,
+    "oneOrMoreOfThreeDoesNotProveUniversalMotivation": true,
+    "noPopulationPrevalenceEstimate": true,
+    "m7_02RemainsUnresolved": true,
+    "noRetroactiveM7Change": true
+  },
+  "claimBoundaries": ["research_only", "no_production_evidence", "no_runtime_authorization", "no_historical_derivation_claim", "no_cognacy_claim", "no_borrowing_claim", "no_language_superiority_claim", "no_candidate_truth_claim", "no_single_winner", "user_decides", "null_is_valid"],
+  "protocolIntegrity": {
+    "sourceResearchPerformed": false,
+    "blindRunsPerformed": false,
+    "targetRevealPerformed": false,
+    "productionEvidenceAdmitted": false,
+    "catalogMutated": false,
+    "baselineMutated": false,
+    "runtimeMutated": false,
+    "historicalM7Mutated": false,
+    "selectedAfterSourceResearch": false
+  },
+  "historicalM7": {
+    "preregistrationPath": "docs/open-instrument/research-artifacts/m7-three-case-replication-v1/preregistration.json",
+    "preregistrationSha256": "54d579f1af4bb597ccb4037d156dc27123742b487845ecd52fc80d84cc69cd3e",
+    "addendumPath": "docs/open-instrument/research-artifacts/m7-three-case-replication-v1/durability-replacement-addendum.v1.json",
+    "reconstructionForbidden": true
+  },
+  "artifactConventions": {
+    "manifestPath": "docs/open-instrument/research-artifacts/strict-blind-embryo-first-replication-series-v1/hash-manifest.json",
+    "canonicalSerialization": "JSON UTF-8 with two-space indentation and one trailing LF for blind payload files; controller hashes use JSON.stringify of the controller without controllerSha256, matching the existing M7 verifier convention"
+  }
+}
