@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import {
   assertCompleteDurabilityGate,
+  assertExactBlindPayload,
   REQUIRED_DURABILITY_GATE_FLAGS,
   verifyM7DurabilityReplacementAddendum,
 } from "../scripts/openInstrumentM7DurabilityReplacementAddendumVerification.v1.mjs";
@@ -35,5 +36,16 @@ describe("Open Instrument M7 durability replacement governance addendum", () => 
 
     const weakenedGate = { ...addendum.durabilityGate, secondaryRecomputedFromDisk: false };
     expect(() => assertCompleteDurabilityGate(weakenedGate)).toThrow("secondaryRecomputedFromDisk");
+  });
+
+  test("requires exact equality with the original blind payload", () => {
+    const addendum = JSON.parse(readFileSync(addendumPath, "utf8"));
+    const preregistration = JSON.parse(readFileSync(preregistrationPath, "utf8"));
+    const replacement = addendum.replacementRuns.find((item: { replicationSlot: string }) => item.replicationSlot === "M7-02");
+    const original = preregistration.blindPayloads.find((item: { replicationSlot: string }) => item.replicationSlot === "M7-02");
+    expect(() => assertExactBlindPayload(replacement.blindPayload, original, "M7-02")).not.toThrow();
+
+    const withUnexpectedField = { ...replacement.blindPayload, unexpectedExtraField: true };
+    expect(() => assertExactBlindPayload(withUnexpectedField, original, "M7-02")).toThrow("M7-02");
   });
 });

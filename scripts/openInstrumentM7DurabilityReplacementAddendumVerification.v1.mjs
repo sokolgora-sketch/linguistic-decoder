@@ -69,7 +69,12 @@ export const REQUIRED_DURABILITY_GATE_FLAGS = [
 
 const sha256 = (bytes) => createHash("sha256").update(bytes).digest("hex");
 const readJson = (path) => JSON.parse(readFileSync(path, "utf8"));
-const same = (left, right) => JSON.stringify(left) === JSON.stringify(right);
+const canonicalize = (value) => {
+  if (Array.isArray(value)) return value.map(canonicalize);
+  if (!value || typeof value !== "object") return value;
+  return Object.fromEntries(Object.keys(value).sort().map((key) => [key, canonicalize(value[key])]));
+};
+const same = (left, right) => JSON.stringify(canonicalize(left)) === JSON.stringify(canonicalize(right));
 
 const FORBIDDEN_AUTHORIZATION_KEYS = new Set([
   "targetWord",
@@ -104,6 +109,10 @@ export function assertCompleteDurabilityGate(durabilityGate) {
   for (const flag of REQUIRED_DURABILITY_GATE_FLAGS) {
     if (durabilityGate?.[flag] !== true) throw new Error(`durability gate incomplete: ${flag}`);
   }
+}
+
+export function assertExactBlindPayload(payload, originalPayload, replicationSlot) {
+  if (!same(payload, originalPayload)) throw new Error(`blind payload exact mismatch: ${replicationSlot}`);
 }
 
 export function verifyM7DurabilityReplacementAddendum() {
@@ -143,6 +152,7 @@ export function verifyM7DurabilityReplacementAddendum() {
     if (payload.replicationExperimentId !== EXPECTED_EXPERIMENT_ID || payload.replicationSlot !== expected.slot || payload.embryo !== expected.embryo || !same(payload.voicePath, expected.voicePath) || payload.opaqueStructuralProvenanceReference !== expected.opaqueStructuralProvenanceReference || payload.sourcePolicyVersion !== expected.sourcePolicyVersion || payload.searchPolicyVersion !== expected.searchPolicyVersion || payload.claimBoundary !== expected.claimBoundary || payload.blindPayloadSha256 !== expected.blindPayloadSha256) throw new Error(`replacement payload mismatch: ${expected.slot}`);
     const originalPayload = preregPayloads.get(expected.slot);
     if (!originalPayload || originalPayload.blindPayloadSha256 !== expected.blindPayloadSha256 || originalPayload.embryo !== expected.embryo || !same(originalPayload.voicePath, expected.voicePath)) throw new Error(`original blind payload mismatch: ${expected.slot}`);
+    assertExactBlindPayload(payload, originalPayload, expected.slot);
   }
 
   for (const expected of EXPECTED_LOST_RUNS) {
