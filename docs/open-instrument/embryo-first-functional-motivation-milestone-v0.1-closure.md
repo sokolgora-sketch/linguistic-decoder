@@ -108,9 +108,15 @@ API, engine, fixture, artifact, or provider changes:
 
 These examples are asserted by
 `tests/apiAnalyzeV1.embryoFirstCandidate.examples.v0_1.spec.ts:261-374`.
-The live GET-path checks at `:347-374` prove that the bounded candidates are
-visible through the existing response path while seed/context candidates remain
-unvalidated when isolation, source, or semantic-bridge requirements are absent.
+That file's live GET-path checks at `:347-374` prove only that the current
+`damage` and `study` responses remain bounded and that any seed/context
+candidates stay unvalidated when isolation, source, or semantic-bridge
+requirements are absent; they do not assert those static fixture IDs. The
+dedicated reviewed-runtime visibility test
+`tests/apiAnalyzeV1.embryoFirstReviewedRuntimeVisibility.v0_1.spec.ts:43-173`
+proves the separate live reviewed candidates, including
+`albanian-da-dam-damage-functional` for damage and
+`albanian-di-know-functional` for study.
 The example review records the same limits at
 `docs/open-instrument/reviews/embryo-first-candidate-examples-damage-study-review-v0.1.md:44-103`.
 
